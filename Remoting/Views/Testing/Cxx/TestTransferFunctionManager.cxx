@@ -36,7 +36,7 @@ int TestTransferFunctionManager(int argc, char* argv[])
 
   vtkNew<vtkSMTransferFunctionManager> mgr;
   vtkSMProxy* colorTF = mgr->GetColorTransferFunction("arrayOne", pxm);
-  if (colorTF == NULL)
+  if (colorTF == nullptr)
   {
     cerr << "ERROR: Failed at line " << __LINE__ << endl;
     return EXIT_FAILURE;
@@ -85,11 +85,11 @@ int TestTransferFunctionManager(int argc, char* argv[])
   vtkSMProxy* view = pxm->NewProxy("views", "RenderView");
   view->UpdateVTKObjects();
 
-  vtkSMProxy* sbProxy = mgr->GetScalarBarRepresentation(NULL, NULL);
-  assert(sbProxy == NULL);
+  vtkSMProxy* sbProxy = mgr->GetScalarBarRepresentation(nullptr, nullptr);
+  assert(sbProxy == nullptr);
 
   sbProxy = mgr->GetScalarBarRepresentation(colorTF, view);
-  if (sbProxy == NULL)
+  if (sbProxy == nullptr)
   {
     cerr << "ERROR: Failed at line " << __LINE__ << endl;
     return EXIT_FAILURE;

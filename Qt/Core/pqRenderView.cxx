@@ -88,7 +88,7 @@ pqDataRepresentation* findRepresentationFromProxy(vtkSMRepresentationProxy* prox
 {
   if (!proxy)
   {
-    return 0;
+    return nullptr;
   }
 
   pqServerManagerModel* smm = pqApplicationCore::instance()->getServerManagerModel();
@@ -151,7 +151,7 @@ void pqRenderView::InternalConstructor(vtkSMViewProxy* renModule)
 
   // we need to fire signals when undo stack changes.
   this->getConnector()->Connect(this->Internal->InteractionUndoStack, vtkCommand::ModifiedEvent,
-    this, SLOT(onUndoStackChanged()), 0, 0, Qt::QueuedConnection);
+    this, SLOT(onUndoStackChanged()), nullptr, 0, Qt::QueuedConnection);
 
   this->ResetCenterWithCamera = true;
   this->UseMultipleRepresentationSelection = false;
@@ -566,7 +566,7 @@ void pqRenderView::emitSelectionSignal(QList<pqOutputPort*> opPorts, int selecti
     if (selectionModifier == pqView::PV_SELECTION_DEFAULT)
     {
       // Only emit an empty selection if we aren't modifying the current selection
-      Q_EMIT this->selected(0);
+      Q_EMIT this->selected(nullptr);
     }
   }
 

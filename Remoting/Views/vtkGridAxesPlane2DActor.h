@@ -147,7 +147,7 @@ public:
    * Set the tick positions for each of the coordinate axis. Which tick
    * positions get used depended on the face being rendered e.g. if Face is
    * MIN_XY, then the tick positions for Z-axis i.e. axis=2 will not be used
-   * and hence need not be specified. Pass NULL for data will clear the ticks
+   * and hence need not be specified. Pass nullptr for data will clear the ticks
    * positions for that axis.
    * Note: This creates a deep-copy of the values in \c data and stores that.
    */
@@ -187,7 +187,7 @@ public:
   void ReleaseGraphicsResources(vtkWindow*) override;
 
 protected:
-  vtkGridAxesPlane2DActor(vtkGridAxesHelper* helper = NULL);
+  vtkGridAxesPlane2DActor(vtkGridAxesHelper* helper = nullptr);
   ~vtkGridAxesPlane2DActor() override;
 
   //@{

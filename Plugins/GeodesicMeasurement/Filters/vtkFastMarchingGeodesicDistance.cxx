@@ -57,7 +57,7 @@ vtkCxxSetObjectMacro(vtkFastMarchingGeodesicDistance, PropagationWeights, vtkDat
 class vtkGeodesicMeshInternals
 {
 public:
-  vtkGeodesicMeshInternals() { this->Mesh = NULL; }
+  vtkGeodesicMeshInternals() { this->Mesh = nullptr; }
 
   ~vtkGeodesicMeshInternals()
   {
@@ -141,9 +141,9 @@ vtkFastMarchingGeodesicDistance::vtkFastMarchingGeodesicDistance()
   this->NotVisitedValue = -1;
   this->NumberOfVisitedPoints = 0;
   this->DistanceStopCriterion = -1;
-  this->DestinationVertexStopCriterion = NULL;
-  this->ExclusionPointIds = NULL;
-  this->PropagationWeights = NULL;
+  this->DestinationVertexStopCriterion = nullptr;
+  this->ExclusionPointIds = nullptr;
+  this->PropagationWeights = nullptr;
   this->IterationIndex = 0;
   this->FastMarchingIterationEventResolution = 100;
 }
@@ -151,9 +151,9 @@ vtkFastMarchingGeodesicDistance::vtkFastMarchingGeodesicDistance()
 //-----------------------------------------------------------------------------
 vtkFastMarchingGeodesicDistance::~vtkFastMarchingGeodesicDistance()
 {
-  this->SetDestinationVertexStopCriterion(NULL);
-  this->SetExclusionPointIds(NULL);
-  this->SetPropagationWeights(NULL);
+  this->SetDestinationVertexStopCriterion(nullptr);
+  this->SetExclusionPointIds(nullptr);
+  this->SetPropagationWeights(nullptr);
   delete this->Internals;
 }
 
@@ -188,8 +188,8 @@ int vtkFastMarchingGeodesicDistance::RequestData(vtkInformation* vtkNotUsed(requ
   // Extract seed point id list as points with non-zero values of a given field
   this->SetSeedsFromNonZeroField(this->GetInputArrayToProcess(0, input));
 
-  // Set propagation weight field. NULL is handled internally as constant uniform propagation
-  // weights
+  // Set propagation weight field. nullptr is handled internally as constant
+  // uniform propagation weights
   this->SetPropagationWeights(this->GetInputArrayToProcess(1, input));
 
   // Internally setup seeds for fast marching
@@ -269,7 +269,7 @@ void vtkFastMarchingGeodesicDistance::SetupGeodesicMesh(vtkPolyData* in)
       {
         vtkErrorMacro(<< "This filter works only with triangle meshes. Triangulate first.");
         delete this->Internals->Mesh;
-        this->Internals->Mesh = NULL;
+        this->Internals->Mesh = nullptr;
         return;
       }
 
@@ -432,7 +432,7 @@ void vtkFastMarchingGeodesicDistance::SetupCallbacks()
   }
   else
   {
-    this->Internals->Mesh->RegisterForceStopCallbackFunction(NULL);
+    this->Internals->Mesh->RegisterForceStopCallbackFunction(nullptr);
   }
 
   // Setup callback prior to adding a new vertex into the front...
@@ -446,7 +446,7 @@ void vtkFastMarchingGeodesicDistance::SetupCallbacks()
   }
   else
   {
-    this->Internals->Mesh->RegisterVertexInsersionCallbackFunction(NULL);
+    this->Internals->Mesh->RegisterVertexInsersionCallbackFunction(nullptr);
   }
 
   // Setup callback to get the propagation weights

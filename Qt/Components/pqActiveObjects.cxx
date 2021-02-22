@@ -241,7 +241,7 @@ void pqActiveObjects::viewSelectionChanged()
 
   if (this->ActiveView)
   {
-    QObject::disconnect(this->ActiveView, 0, this, 0);
+    QObject::disconnect(this->ActiveView, nullptr, this, nullptr);
   }
   if (view)
   {

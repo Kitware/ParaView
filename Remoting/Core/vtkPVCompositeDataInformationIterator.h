@@ -62,13 +62,13 @@ public:
 
   /**
    * Returns the current nodes data-information. If current node is a piece
-   * within a multi-piece dataset, then this will return NULL.
+   * within a multi-piece dataset, then this will return nullptr.
    */
   vtkPVDataInformation* GetCurrentDataInformation();
 
   /**
    * Returns the name for the current node. Name may be valid only for a child
-   * node. The root node has no name. Returns NULL when no name is provided.
+   * node. The root node has no name. Returns nullptr when no name is provided.
    */
   const char* GetCurrentName();
 

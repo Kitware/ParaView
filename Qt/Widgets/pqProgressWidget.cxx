@@ -56,7 +56,7 @@ public:
     : QLabel(parentObj)
     , ProgressPercentage(0)
     , ShowProgress(false)
-    , Style(NULL)
+    , Style(nullptr)
   {
     this->setFrameShape(QFrame::Panel);
     this->setFrameShadow(QFrame::Sunken);

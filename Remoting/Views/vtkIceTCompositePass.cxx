@@ -127,8 +127,8 @@ vtkIceTCompositePass::vtkIceTCompositePass()
 {
   this->IceTContext = vtkIceTContext::New();
   this->IceTContext->UseOpenGLOn();
-  this->Controller = 0;
-  this->RenderPass = 0;
+  this->Controller = nullptr;
+  this->RenderPass = nullptr;
   this->OrderedCompositingHelper = nullptr;
   this->TileMullions[0] = this->TileMullions[1] = 0;
   this->TileDimensions[0] = 1;
@@ -142,9 +142,9 @@ vtkIceTCompositePass::vtkIceTCompositePass()
 
   this->LastRenderedRGBAColors.reset(new vtkSynchronizedRenderers::vtkRawImage());
 
-  this->PBO = 0;
-  this->ZTexture = 0;
-  this->Program = 0;
+  this->PBO = nullptr;
+  this->ZTexture = nullptr;
+  this->Program = nullptr;
 
   this->DisplayRGBAResults = false;
   this->DisplayDepthResults = false;
@@ -153,47 +153,47 @@ vtkIceTCompositePass::vtkIceTCompositePass()
 //----------------------------------------------------------------------------
 vtkIceTCompositePass::~vtkIceTCompositePass()
 {
-  if (this->PBO != 0)
+  if (this->PBO != nullptr)
   {
     vtkErrorMacro(<< "PixelBufferObject should have been deleted in ReleaseGraphicsResources().");
   }
-  if (this->ZTexture != 0)
+  if (this->ZTexture != nullptr)
   {
     vtkErrorMacro(<< "ZTexture should have been deleted in ReleaseGraphicsResources().");
   }
-  if (this->Program != 0)
+  if (this->Program != nullptr)
   {
     delete this->Program;
-    this->Program = 0;
+    this->Program = nullptr;
   }
 
   this->SetOrderedCompositingHelper(nullptr);
-  this->SetRenderPass(0);
-  this->SetController(0);
+  this->SetRenderPass(nullptr);
+  this->SetController(nullptr);
   this->IceTContext->Delete();
-  this->IceTContext = 0;
+  this->IceTContext = nullptr;
   this->LastRenderedRGBAColors.reset();
 }
 
 //----------------------------------------------------------------------------
 void vtkIceTCompositePass::ReleaseGraphicsResources(vtkWindow* window)
 {
-  if (this->RenderPass != 0)
+  if (this->RenderPass != nullptr)
   {
     this->RenderPass->ReleaseGraphicsResources(window);
   }
 
-  if (this->PBO != 0)
+  if (this->PBO != nullptr)
   {
     this->PBO->Delete();
-    this->PBO = 0;
+    this->PBO = nullptr;
   }
-  if (this->ZTexture != 0)
+  if (this->ZTexture != nullptr)
   {
     this->ZTexture->Delete();
-    this->ZTexture = 0;
+    this->ZTexture = nullptr;
   }
-  if (this->Program != 0)
+  if (this->Program != nullptr)
   {
     this->Program->ReleaseGraphicsResources(window);
   }
@@ -790,12 +790,12 @@ void vtkIceTCompositePass::PushIceTDepthBufferToScreen(const vtkRenderState* ren
     vtkOpenGLRenderWindow::SafeDownCast(render_state->GetRenderer()->GetRenderWindow());
   vtkOpenGLState* ostate = context->GetState();
 
-  if (this->PBO == 0)
+  if (this->PBO == nullptr)
   {
     this->PBO = vtkPixelBufferObject::New();
     this->PBO->SetContext(context);
   }
-  if (this->ZTexture == 0)
+  if (this->ZTexture == nullptr)
   {
     this->ZTexture = vtkTextureObject::New();
     this->ZTexture->SetContext(context);

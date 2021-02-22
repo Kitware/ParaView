@@ -80,15 +80,15 @@ vtkStandardNewMacro(vtkSIProxy);
 vtkSIProxy::vtkSIProxy()
 {
   this->Internals = new vtkInternals();
-  this->VTKObject = NULL;
+  this->VTKObject = nullptr;
   this->ObjectsCreated = false;
 
-  this->XMLGroup = 0;
-  this->XMLName = 0;
-  this->XMLSubProxyName = 0;
-  this->VTKClassName = 0;
-  this->PostPush = 0;
-  this->PostCreation = 0;
+  this->XMLGroup = nullptr;
+  this->XMLName = nullptr;
+  this->XMLSubProxyName = nullptr;
+  this->VTKClassName = nullptr;
+  this->PostPush = nullptr;
+  this->PostCreation = nullptr;
   this->NumberOfInputPorts = -1;
 
   this->LogName = nullptr;
@@ -100,14 +100,14 @@ vtkSIProxy::~vtkSIProxy()
   this->DeleteVTKObjects();
 
   delete this->Internals;
-  this->Internals = 0;
+  this->Internals = nullptr;
 
-  this->SetXMLGroup(0);
-  this->SetXMLName(0);
-  this->SetXMLSubProxyName(0);
-  this->SetVTKClassName(0);
-  this->SetPostPush(0);
-  this->SetPostCreation(0);
+  this->SetXMLGroup(nullptr);
+  this->SetXMLName(nullptr);
+  this->SetXMLSubProxyName(nullptr);
+  this->SetVTKClassName(nullptr);
+  this->SetPostPush(nullptr);
+  this->SetPostCreation(nullptr);
 
   delete[] this->LogName;
   this->LogName = nullptr;
@@ -160,7 +160,7 @@ void vtkSIProxy::Push(vtkSMMessage* message)
   }
 
   // Execute post_push if any
-  if (this->PostPush != NULL)
+  if (this->PostPush != nullptr)
   {
     vtkClientServerStream stream;
     stream << vtkClientServerStream::Invoke << this->GetVTKObject() << this->PostPush
@@ -267,7 +267,7 @@ vtkSIProxyDefinitionManager* vtkSIProxy::GetProxyDefinitionManager()
 
   vtkWarningMacro("No valid session provided. "
                   "This class may not have been initialized yet.");
-  return NULL;
+  return nullptr;
 }
 
 //----------------------------------------------------------------------------
@@ -278,7 +278,7 @@ vtkSIProperty* vtkSIProxy::GetSIProperty(const char* name)
   {
     return iter->second.GetPointer();
   }
-  return NULL;
+  return nullptr;
 }
 
 //----------------------------------------------------------------------------
@@ -308,7 +308,7 @@ bool vtkSIProxy::InitializeAndCreateVTKObjects(vtkSMMessage* message)
   this->SetXMLName(message->GetExtension(ProxyState::xml_name).c_str());
   this->SetXMLSubProxyName(message->HasExtension(ProxyState::xml_sub_proxy_name)
       ? message->GetExtension(ProxyState::xml_sub_proxy_name).c_str()
-      : NULL);
+      : nullptr);
 
   vtkSIProxyDefinitionManager* pdm = this->GetProxyDefinitionManager();
   vtkPVXMLElement* element = pdm->GetCollapsedProxyDefinition(
@@ -316,7 +316,7 @@ bool vtkSIProxy::InitializeAndCreateVTKObjects(vtkSMMessage* message)
     message->GetExtension(ProxyState::xml_name).c_str(),
     (message->HasExtension(ProxyState::xml_sub_proxy_name)
         ? message->GetExtension(ProxyState::xml_sub_proxy_name).c_str()
-        : NULL));
+        : nullptr));
 
   if (!element)
   {
@@ -345,7 +345,7 @@ bool vtkSIProxy::InitializeAndCreateVTKObjects(vtkSMMessage* message)
     vtkSIProxy* subproxy = vtkSIProxy::SafeDownCast(this->GetSIObject(subproxyMsg.global_id()));
     this->Internals->SubProxyInfoVector.push_back(
       SubProxyInfo(subproxyMsg.name(), subproxyMsg.global_id()));
-    if (subproxy == NULL)
+    if (subproxy == nullptr)
     {
       // This code has been commented to support ImplicitPlaneWidgetRepresentation
       // which as a widget as SubProxy which stay on the client side.
@@ -399,7 +399,7 @@ bool vtkSIProxy::InitializeAndCreateVTKObjects(vtkSMMessage* message)
 //----------------------------------------------------------------------------
 void vtkSIProxy::DeleteVTKObjects()
 {
-  this->VTKObject = NULL;
+  this->VTKObject = nullptr;
   this->ObjectsCreated = false;
 }
 
@@ -429,7 +429,7 @@ bool vtkSIProxy::CreateVTKObjects()
     return true;
   }
 
-  assert(this->VTKObject != NULL);
+  assert(this->VTKObject != nullptr);
 
   // Setup progress handler
   {
@@ -455,7 +455,7 @@ bool vtkSIProxy::CreateVTKObjects()
   }
 
   // Handle any PostCreation method invocation request.
-  if (this->PostCreation != NULL)
+  if (this->PostCreation != nullptr)
   {
     vtkClientServerStream stream;
     stream << vtkClientServerStream::Invoke << this->VTKObject << this->PostCreation
@@ -566,11 +566,11 @@ bool vtkSIProxy::ReadXMLSubProxy(vtkPVXMLElement* subproxyElement)
   // Process "command" for the sub proxy, if any. These are used in
   // CreateVTKObjects() to pass the sub proxy's VTK object to this proxy's VTK
   // object.
-  const char* command = subproxyElement ? subproxyElement->GetAttribute("command") : NULL;
+  const char* command = subproxyElement ? subproxyElement->GetAttribute("command") : nullptr;
   if (command)
   {
     vtkPVXMLElement* proxyElement = subproxyElement->GetNestedElement(0);
-    const char* name = proxyElement ? proxyElement->GetAttribute("name") : NULL;
+    const char* name = proxyElement ? proxyElement->GetAttribute("name") : nullptr;
     if (name)
     {
       this->Internals->SubProxyCommands[name] = command;
@@ -585,7 +585,7 @@ bool vtkSIProxy::ReadXMLProperty(vtkPVXMLElement* propElement)
   // Since the XML is "cleaned" out, we are assured that there are no duplicate
   // properties.
   std::string name = propElement->GetAttributeOrEmpty("name");
-  assert(!name.empty() && this->GetSIProperty(name.c_str()) == NULL);
+  assert(!name.empty() && this->GetSIProperty(name.c_str()) == nullptr);
 
   // Patch XML to remove InformationHelper and set right si_class
   vtkSIProxyDefinitionManager::PatchXMLProperty(propElement);
@@ -642,7 +642,7 @@ vtkSIProxy* vtkSIProxy::GetSubSIProxy(unsigned int cc)
 {
   if (cc >= this->GetNumberOfSubSIProxys())
   {
-    return NULL;
+    return nullptr;
   }
 
   unsigned int index = 0;
@@ -655,7 +655,7 @@ vtkSIProxy* vtkSIProxy::GetSubSIProxy(unsigned int cc)
       return iter->second;
     }
   }
-  return NULL;
+  return nullptr;
 }
 
 //----------------------------------------------------------------------------

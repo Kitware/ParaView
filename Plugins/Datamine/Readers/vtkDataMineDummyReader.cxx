@@ -20,7 +20,7 @@ vtkStandardNewMacro(vtkDataMineDummyReader);
 // Constructor
 vtkDataMineDummyReader::vtkDataMineDummyReader()
 {
-  this->FileName = NULL;
+  this->FileName = nullptr;
   this->SetNumberOfInputPorts(0);
   this->SetNumberOfOutputPorts(1);
 }
@@ -29,7 +29,7 @@ vtkDataMineDummyReader::vtkDataMineDummyReader()
 // Destructor
 vtkDataMineDummyReader::~vtkDataMineDummyReader()
 {
-  this->SetFileName(0);
+  this->SetFileName(nullptr);
 }
 
 void vtkDataMineDummyReader::PrintSelf(ostream& os, vtkIndent indent)
@@ -42,7 +42,7 @@ int vtkDataMineDummyReader::CanReadFile(const char* fname)
 {
   // okay we have to un constant the char* so that TDMFile can use it
   // TDMFile does not modify the fname so this is 'okay'
-  if (fname == NULL || fname[0] == '\0' || strcmp(fname, " ") == 0)
+  if (fname == nullptr || fname[0] == '\0' || strcmp(fname, " ") == 0)
     return 0;
   char* tmpName = const_cast<char*>(fname);
 

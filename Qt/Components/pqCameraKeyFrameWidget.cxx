@@ -162,7 +162,7 @@ pqCameraKeyFrameWidget::pqCameraKeyFrameWidget(QWidget* parentObject)
 
   // hide the header for the tree widget.
   this->Internal->leftPane->header()->hide();
-  this->Internal->leftPane->setCurrentItem(0);
+  this->Internal->leftPane->setCurrentItem(nullptr);
 
   this->connect(this->Internal->leftPane,
     SIGNAL(currentItemChanged(QTreeWidgetItem*, QTreeWidgetItem*)), this,
@@ -342,5 +342,5 @@ void pqCameraKeyFrameWidget::showEvent(QShowEvent* anEvent)
 void pqCameraKeyFrameWidget::hideEvent(QHideEvent* anEvent)
 {
   this->Superclass::hideEvent(anEvent);
-  this->Internal->leftPane->setCurrentItem(0);
+  this->Internal->leftPane->setCurrentItem(nullptr);
 }

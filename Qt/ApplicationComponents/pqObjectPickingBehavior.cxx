@@ -89,7 +89,7 @@ bool pqObjectPickingBehavior::eventFilter(QObject* caller, QEvent* e)
       QPoint newPos = static_cast<QMouseEvent*>(e)->pos();
       QPoint delta = newPos - this->Position;
       QWidget* senderWidget = qobject_cast<QWidget*>(caller);
-      if (delta.manhattanLength() < 3.0 && senderWidget != NULL)
+      if (delta.manhattanLength() < 3.0 && senderWidget != nullptr)
       {
         pqRenderView* view = qobject_cast<pqRenderView*>(pqActiveObjects::instance().activeView());
         if (view)

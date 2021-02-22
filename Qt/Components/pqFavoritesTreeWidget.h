@@ -51,7 +51,7 @@ class PQCOMPONENTS_EXPORT pqFavoritesTreeWidget : public QTreeWidget
   Q_OBJECT
 
 public:
-  pqFavoritesTreeWidget(QWidget* p = NULL);
+  pqFavoritesTreeWidget(QWidget* p = nullptr);
 
   bool isDropOnItem() { return this->dropIndicatorPosition() == QAbstractItemView::OnItem; }
 

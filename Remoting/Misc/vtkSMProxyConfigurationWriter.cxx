@@ -33,12 +33,12 @@ vtkStandardNewMacro(vtkSMProxyConfigurationWriter);
 
 //---------------------------------------------------------------------------
 vtkSMProxyConfigurationWriter::vtkSMProxyConfigurationWriter()
-  : FileName(0)
-  , Proxy(0)
-  , PropertyIterator(0)
-  , FileIdentifier(0)
-  , FileDescription(0)
-  , FileExtension(0)
+  : FileName(nullptr)
+  , Proxy(nullptr)
+  , PropertyIterator(nullptr)
+  , FileIdentifier(nullptr)
+  , FileDescription(nullptr)
+  , FileExtension(nullptr)
 {
   vtkSMProxyConfigurationFileInfo info;
   this->SetFileIdentifier(info.FileIdentifier);
@@ -49,12 +49,12 @@ vtkSMProxyConfigurationWriter::vtkSMProxyConfigurationWriter()
 //---------------------------------------------------------------------------
 vtkSMProxyConfigurationWriter::~vtkSMProxyConfigurationWriter()
 {
-  this->SetFileName(0);
-  this->SetProxy(0);
-  this->SetPropertyIterator(0);
-  this->SetFileIdentifier(0);
-  this->SetFileDescription(0);
-  this->SetFileExtension(0);
+  this->SetFileName(nullptr);
+  this->SetProxy(nullptr);
+  this->SetPropertyIterator(nullptr);
+  this->SetFileIdentifier(nullptr);
+  this->SetFileDescription(nullptr);
+  this->SetFileExtension(nullptr);
 }
 
 //---------------------------------------------------------------------------
@@ -101,16 +101,16 @@ int vtkSMProxyConfigurationWriter::WriteConfiguration(std::ostream& os)
 //---------------------------------------------------------------------------
 int vtkSMProxyConfigurationWriter::WriteConfiguration(const char* cFilename)
 {
-  if (cFilename == 0)
+  if (cFilename == nullptr)
   {
     vtkErrorMacro("Cannot write filename NULL.");
     return 0;
   }
 
   // If there client has set an extension then we add it if it's not
-  // present. To save with out th eextension, set it NULL.
+  // present. To save with out th eextension, set it nullptr.
   const char* cExt = this->GetFileExtension();
-  cExt = (cExt == NULL ? "" : cExt);
+  cExt = (cExt == nullptr ? "" : cExt);
   std::string filename(cFilename);
   std::string ext(cExt);
   if (!ext.empty() && (filename.size() <= ext.size() ||

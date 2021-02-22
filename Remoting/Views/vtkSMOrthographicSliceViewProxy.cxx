@@ -69,7 +69,7 @@ const char* vtkSMOrthographicSliceViewProxy::GetRepresentationType(
 {
   if (!producer)
   {
-    return 0;
+    return nullptr;
   }
 
   assert("Session should be valid" && this->GetSession());

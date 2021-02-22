@@ -67,7 +67,7 @@ public:
   /**
    * Enable/disable scalar coloring using the specified array. This will set up a
    * color and opacity transfer functions using vtkSMTransferFunctionProxy
-   * instance. If arrayname is NULL, then scalar coloring is turned off.
+   * instance. If arrayname is nullptr, then scalar coloring is turned off.
    * \c attribute_type must be one of vtkDataObject::AttributeTypes.
    */
   virtual bool SetScalarColoring(const char* arrayname, int attribute_type);
@@ -75,7 +75,7 @@ public:
   /**
    * Enable/disable scalar coloring using the specified array. This will set up a
    * color and opacity transfer functions using vtkSMTransferFunctionProxy
-   * instance. If arrayname is NULL, then scalar coloring is turned off.
+   * instance. If arrayname is nullptr, then scalar coloring is turned off.
    * \param arrayname the name of the array.
    * \param attribute_type must be one of vtkDataObject::AttributeTypes.
    * \param component enables choosing a component to color with,
@@ -283,7 +283,7 @@ public:
   /**
    * Returns the array information for the data array used for scalar coloring, from input data.
    * If checkRepresentedData is true, it will also check in the represented data. Default is true.
-   * If none is found, returns NULL.
+   * If none is found, returns nullptr.
    */
   virtual vtkPVArrayInformation* GetArrayInformationForColorArray(bool checkRepresentedData = true);
   static vtkPVArrayInformation* GetArrayInformationForColorArray(
@@ -297,7 +297,7 @@ public:
   //@{
   /**
    * Call vtkSMRepresentationProxy::GetProminentValuesInformation() for the
-   * array used for scalar color, if any. Otherwise returns NULL.
+   * array used for scalar color, if any. Otherwise returns nullptr.
    */
   virtual vtkPVProminentValuesInformation* GetProminentValuesInformationForColorArray(
     double uncertaintyAllowed = 1e-6, double fraction = 1e-3, bool force = false);
@@ -307,7 +307,7 @@ public:
     vtkSMPVRepresentationProxy* self = vtkSMPVRepresentationProxy::SafeDownCast(proxy);
     return self
       ? self->GetProminentValuesInformationForColorArray(uncertaintyAllowed, fraction, force)
-      : NULL;
+      : nullptr;
   }
   //@}
 

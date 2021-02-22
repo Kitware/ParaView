@@ -85,7 +85,7 @@ vtkSMRenderViewProxy::vtkSMRenderViewProxy()
 //----------------------------------------------------------------------------
 vtkSMRenderViewProxy::~vtkSMRenderViewProxy()
 {
-  this->InteractorHelper->SetViewProxy(NULL);
+  this->InteractorHelper->SetViewProxy(nullptr);
   this->InteractorHelper->CleanupInteractor();
 
   if (this->NewMasterObserverId != 0 && this->Session && this->Session->GetCollaborationManager())
@@ -154,7 +154,7 @@ const char* vtkSMRenderViewProxy::IsSelectVisibleCellsAvailable()
     return "Selection not supported due to insufficient color depth.";
   }
 
-  return NULL;
+  return nullptr;
 }
 
 //-----------------------------------------------------------------------------
@@ -235,7 +235,7 @@ vtkTypeUInt32 vtkSMRenderViewProxy::PreRender(bool interactive)
   this->Superclass::PreRender(interactive);
 
   vtkPVRenderView* rv = vtkPVRenderView::SafeDownCast(this->GetClientSideObject());
-  assert(rv != NULL);
+  assert(rv != nullptr);
   if (interactive && rv->GetUseLODForInteractiveRender())
   {
     // for interactive renders, we need to determine if we are going to use LOD.
@@ -285,7 +285,7 @@ vtkRenderer* vtkSMRenderViewProxy::GetRenderer()
 {
   this->CreateVTKObjects();
   vtkPVRenderView* rv = vtkPVRenderView::SafeDownCast(this->GetClientSideObject());
-  return rv ? rv->GetRenderer() : NULL;
+  return rv ? rv->GetRenderer() : nullptr;
 }
 
 //----------------------------------------------------------------------------
@@ -293,7 +293,7 @@ vtkCamera* vtkSMRenderViewProxy::GetActiveCamera()
 {
   this->CreateVTKObjects();
   vtkPVRenderView* rv = vtkPVRenderView::SafeDownCast(this->GetClientSideObject());
-  return rv ? rv->GetActiveCamera() : NULL;
+  return rv ? rv->GetActiveCamera() : nullptr;
 }
 
 //----------------------------------------------------------------------------
@@ -315,7 +315,7 @@ vtkRenderWindowInteractor* vtkSMRenderViewProxy::GetInteractor()
 {
   this->CreateVTKObjects();
   vtkPVRenderView* rv = vtkPVRenderView::SafeDownCast(this->GetClientSideObject());
-  return rv ? rv->GetInteractor() : NULL;
+  return rv ? rv->GetInteractor() : nullptr;
 }
 
 //----------------------------------------------------------------------------
@@ -329,7 +329,7 @@ vtkRenderWindow* vtkSMRenderViewProxy::GetRenderWindow()
 {
   this->CreateVTKObjects();
   vtkPVRenderView* rv = vtkPVRenderView::SafeDownCast(this->GetClientSideObject());
-  return rv ? rv->GetRenderWindow() : NULL;
+  return rv ? rv->GetRenderWindow() : nullptr;
 }
 
 //----------------------------------------------------------------------------
@@ -481,8 +481,8 @@ const char* vtkSMRenderViewProxy::GetRepresentationType(vtkSMSourceProxy* produc
   vtkSMSessionProxyManager* pxm = this->GetSessionProxyManager();
   const char* representationsToTry[] = { "UnstructuredGridRepresentation",
     "StructuredGridRepresentation", "AMRRepresentation", "UniformGridRepresentation",
-    "PVMoleculeRepresentation", "GeometryRepresentation", NULL };
-  for (int cc = 0; representationsToTry[cc] != NULL; ++cc)
+    "PVMoleculeRepresentation", "GeometryRepresentation", nullptr };
+  for (int cc = 0; representationsToTry[cc] != nullptr; ++cc)
   {
     vtkSMProxy* prototype = pxm->GetPrototypeProxy("representations", representationsToTry[cc]);
     if (prototype)
@@ -519,7 +519,7 @@ const char* vtkSMRenderViewProxy::GetRepresentationType(vtkSMSourceProxy* produc
       }
     }
   }
-  return NULL;
+  return nullptr;
 }
 
 //----------------------------------------------------------------------------
@@ -669,7 +669,7 @@ vtkSMRepresentationProxy* vtkSMRenderViewProxy::Pick(int x, int y)
   // 1) Create surface selection.
   //   Will returns a surface selection in terms of cells selected on the
   //   visible props from all representations.
-  vtkSMRepresentationProxy* repr = NULL;
+  vtkSMRepresentationProxy* repr = nullptr;
   vtkCollection* reprs = vtkCollection::New();
   vtkCollection* sources = vtkCollection::New();
   int region[4] = { x, y, x, y };
@@ -688,7 +688,7 @@ vtkSMRepresentationProxy* vtkSMRenderViewProxy::Pick(int x, int y)
 //-----------------------------------------------------------------------------
 vtkSMRepresentationProxy* vtkSMRenderViewProxy::PickBlock(int x, int y, unsigned int& flatIndex)
 {
-  vtkSMRepresentationProxy* repr = NULL;
+  vtkSMRepresentationProxy* repr = nullptr;
   vtkSmartPointer<vtkCollection> reprs = vtkSmartPointer<vtkCollection>::New();
   vtkSmartPointer<vtkCollection> sources = vtkSmartPointer<vtkCollection>::New();
   int region[4] = { x, y, x, y };
@@ -703,7 +703,7 @@ vtkSMRepresentationProxy* vtkSMRenderViewProxy::PickBlock(int x, int y, unsigned
   if (!repr)
   {
     // nothing selected
-    return 0;
+    return nullptr;
   }
 
   // get data information

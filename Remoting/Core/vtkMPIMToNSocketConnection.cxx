@@ -49,11 +49,11 @@ vtkMPIMToNSocketConnection::vtkMPIMToNSocketConnection()
   this->Socket = 0;
   this->PortNumber = 0;
   this->Internals = new vtkMPIMToNSocketConnectionInternals;
-  this->Controller = 0;
+  this->Controller = nullptr;
   this->SetController(vtkMultiProcessController::GetGlobalController());
-  this->SocketCommunicator = 0;
+  this->SocketCommunicator = nullptr;
   this->NumberOfConnections = -1;
-  this->ServerSocket = 0;
+  this->ServerSocket = nullptr;
   this->IsWaiting = false;
 }
 
@@ -62,16 +62,16 @@ vtkMPIMToNSocketConnection::~vtkMPIMToNSocketConnection()
   if (this->ServerSocket)
   {
     this->ServerSocket->Delete();
-    this->ServerSocket = 0;
+    this->ServerSocket = nullptr;
   }
   if (this->SocketCommunicator)
   {
     this->SocketCommunicator->CloseConnection();
     this->SocketCommunicator->Delete();
   }
-  this->SetController(0);
+  this->SetController(nullptr);
   delete this->Internals;
-  this->Internals = 0;
+  this->Internals = nullptr;
 }
 
 //------------------------------------------------------------------------------
@@ -101,7 +101,7 @@ void vtkMPIMToNSocketConnection::Initialize(int waiting_process_type)
 {
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   vtkPVOptions* options = pm->GetOptions();
-  assert(options != NULL);
+  assert(options != nullptr);
 
   this->SetController(pm->GetGlobalController());
   this->Internals->SelfHostName = options->GetHostName();
@@ -174,7 +174,7 @@ void vtkMPIMToNSocketConnection::WaitForConnection()
 
   vtkClientSocket* socket = this->ServerSocket->WaitForConnection();
   this->ServerSocket->Delete();
-  this->ServerSocket = 0;
+  this->ServerSocket = nullptr;
   if (!socket)
   {
     vtkErrorMacro("Failed to get connection!");

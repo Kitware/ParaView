@@ -192,14 +192,14 @@ pqAnimationScene* pqAnimationManager::getScene(pqServer* server) const
   {
     return this->Internals->Scenes.value(server);
   }
-  return 0;
+  return nullptr;
 }
 
 //-----------------------------------------------------------------------------
 pqAnimationCue* pqAnimationManager::getCue(
   pqAnimationScene* scene, vtkSMProxy* proxy, const char* propertyname, int index) const
 {
-  return (scene ? scene->getCue(proxy, propertyname, index) : 0);
+  return (scene ? scene->getCue(proxy, propertyname, index) : nullptr);
 }
 
 //-----------------------------------------------------------------------------

@@ -121,7 +121,7 @@ void vtkImageFileSeriesReader::UpdateFileNames()
     {
       filenames->SetValue(cc, this->GetFileName(cc));
     }
-    if (imageReader->GetFileNames() == NULL)
+    if (imageReader->GetFileNames() == nullptr)
     {
       imageReader->SetFileNames(filenames.GetPointer());
     }

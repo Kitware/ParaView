@@ -26,14 +26,14 @@ vtkCxxSetObjectMacro(vtkSMTesting, ViewProxy, vtkSMViewProxy);
 //-----------------------------------------------------------------------------
 vtkSMTesting::vtkSMTesting()
 {
-  this->ViewProxy = NULL;
+  this->ViewProxy = nullptr;
   this->Testing = vtkTesting::New();
 }
 
 //-----------------------------------------------------------------------------
 vtkSMTesting::~vtkSMTesting()
 {
-  this->SetViewProxy(NULL);
+  this->SetViewProxy(nullptr);
   this->Testing->Delete();
 }
 

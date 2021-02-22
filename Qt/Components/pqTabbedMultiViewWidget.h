@@ -202,7 +202,7 @@ protected:
     typedef QTabWidget Superclass;
 
   public:
-    pqTabWidget(QWidget* parentWdg = NULL);
+    pqTabWidget(QWidget* parentWdg = nullptr);
     ~pqTabWidget() override;
 
     /**

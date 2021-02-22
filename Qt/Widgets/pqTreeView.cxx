@@ -144,7 +144,7 @@ void pqTreeView::setModel(QAbstractItemModel* newModel)
   QAbstractItemModel* current = this->model();
   if (current)
   {
-    this->disconnect(current, 0, this, 0);
+    this->disconnect(current, nullptr, this, nullptr);
   }
 
   QTreeView::setModel(newModel);

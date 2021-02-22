@@ -50,7 +50,7 @@ class PQCORE_EXPORT pqPipelineFilter : public pqPipelineSource
   typedef pqPipelineSource Superclass;
 
 public:
-  pqPipelineFilter(QString name, vtkSMProxy* proxy, pqServer* server, QObject* parent = NULL);
+  pqPipelineFilter(QString name, vtkSMProxy* proxy, pqServer* server, QObject* parent = nullptr);
   ~pqPipelineFilter() override;
 
   /**
@@ -119,7 +119,7 @@ public:
 
   /**
   * Get first available input, any port, any index.
-  * Return NULL if none are available.
+  * Return nullptr if none are available.
   */
   pqOutputPort* getAnyInput() const;
 

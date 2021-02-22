@@ -553,7 +553,7 @@ const char* vtkPVServerInformation::GetEnvironment(unsigned int idx) const
 {
   if (idx >= this->GetNumberOfMachines())
   {
-    return NULL;
+    return nullptr;
   }
   return this->MachinesInternals->MachineInformationVector[idx].Environment.c_str();
 }
@@ -582,7 +582,7 @@ int* vtkPVServerInformation::GetGeometry(unsigned int idx) const
 {
   if (idx >= this->GetNumberOfMachines())
   {
-    return NULL;
+    return nullptr;
   }
   return this->MachinesInternals->MachineInformationVector[idx].Geometry;
 }
@@ -691,7 +691,7 @@ double* vtkPVServerInformation::GetLowerLeft(unsigned int idx) const
 {
   if (idx >= this->GetNumberOfMachines())
   {
-    return NULL;
+    return nullptr;
   }
   return this->MachinesInternals->MachineInformationVector[idx].LowerLeft;
 }
@@ -719,7 +719,7 @@ double* vtkPVServerInformation::GetLowerRight(unsigned int idx) const
 {
   if (idx >= this->GetNumberOfMachines())
   {
-    return NULL;
+    return nullptr;
   }
   return this->MachinesInternals->MachineInformationVector[idx].LowerRight;
 }
@@ -747,7 +747,7 @@ double* vtkPVServerInformation::GetUpperRight(unsigned int idx) const
 {
   if (idx >= this->GetNumberOfMachines())
   {
-    return NULL;
+    return nullptr;
   }
   return this->MachinesInternals->MachineInformationVector[idx].UpperRight;
 }

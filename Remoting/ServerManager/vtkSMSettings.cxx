@@ -124,7 +124,7 @@ public:
   //----------------------------------------------------------------------------
   // Description: Get a Json::Value given a setting name. Returns the
   // highest-priority setting defined in the setting collections, and
-  // null if it isn't defined in any of the collections.
+  // nullptr if it isn't defined in any of the collections.
   //
   // String format is:
   // "." => root node
@@ -547,7 +547,7 @@ public:
     {
       if (jsonValue.isArray())
       {
-        // Reset to null so that we aren't setting a value on a Json::Value array
+        // Reset to nullptr so that we aren't setting a value on a Json::Value array
         jsonValue = Json::Value::nullSingleton();
         this->Modified();
       }
@@ -562,7 +562,7 @@ public:
     {
       if (!jsonValue.isArray() && !jsonValue.isNull())
       {
-        // Reset to null so that the jsonValue.resize() operation works
+        // Reset to nullptr so that the jsonValue.resize() operation works
         jsonValue = Json::Value::nullSingleton();
         this->Modified();
       }
@@ -590,7 +590,7 @@ public:
     {
       if (jsonValue.isArray())
       {
-        // Reset to null so that we aren't setting a value on a Json::Value array
+        // Reset to nullptr so that we aren't setting a value on a Json::Value array
         jsonValue = Json::Value::nullSingleton();
         this->Modified();
       }
@@ -605,7 +605,7 @@ public:
     {
       if (!jsonValue.isArray() && !jsonValue.isNull())
       {
-        // Reset to null so that the jsonValue.resize() operation works
+        // Reset to nullptr so that the jsonValue.resize() operation works
         jsonValue = Json::Value::nullSingleton();
         this->Modified();
       }
@@ -633,7 +633,7 @@ public:
     {
       if (jsonValue.isArray())
       {
-        // Reset to null so that we aren't setting a value on a Json::Value array
+        // Reset to nullptr so that we aren't setting a value on a Json::Value array
         jsonValue = Json::Value::nullSingleton();
         this->Modified();
       }
@@ -648,7 +648,7 @@ public:
     {
       if (!jsonValue.isArray() && !jsonValue.isNull())
       {
-        // Reset to null so that the jsonValue.resize() operation works
+        // Reset to nullptr so that the jsonValue.resize() operation works
         jsonValue = Json::Value::nullSingleton();
         this->Modified();
       }
@@ -990,7 +990,7 @@ vtkSMSettings::~vtkSMSettings()
 vtkSMSettings* vtkSMSettings::GetInstance()
 {
   static vtkSmartPointer<vtkSMSettings> Instance;
-  if (Instance.GetPointer() == NULL)
+  if (Instance.GetPointer() == nullptr)
   {
     vtkSMSettings* settings = vtkSMSettings::New();
     Instance = settings;
@@ -1458,7 +1458,7 @@ Json::Value vtkConvertXMLElementToJSON(
   {
     T xmlValue;
     elements[cc]->GetScalarAttribute("value", &xmlValue);
-    const char* txt = enumDomain ? enumDomain->GetEntryTextForValue(xmlValue) : NULL;
+    const char* txt = enumDomain ? enumDomain->GetEntryTextForValue(xmlValue) : nullptr;
     if (txt)
     {
       value[static_cast<unsigned int>(cc)] = Json::Value(txt);
@@ -1495,7 +1495,7 @@ Json::Value vtkConvertXMLElementToJSON<vtkIdType>(
   {
     vtkIdType xmlValue;
     elements[cc]->GetScalarAttribute("value", &xmlValue);
-    const char* txt = enumDomain ? enumDomain->GetEntryTextForValue(xmlValue) : NULL;
+    const char* txt = enumDomain ? enumDomain->GetEntryTextForValue(xmlValue) : nullptr;
     if (txt)
     {
       value[static_cast<unsigned int>(cc)] = Json::Value(txt);
@@ -1531,14 +1531,15 @@ Json::Value vtkConvertXMLElementToJSON<std::string>(
 }
 
 //---------------------------------------------------------------------------
-Json::Value vtkSMSettings::SerializeAsJSON(vtkSMProxy* proxy, vtkSMPropertyIterator* iter /*=NULL*/)
+Json::Value vtkSMSettings::SerializeAsJSON(
+  vtkSMProxy* proxy, vtkSMPropertyIterator* iter /*=nullptr*/)
 {
-  if (proxy == NULL)
+  if (proxy == nullptr)
   {
     return Json::Value();
   }
   vtkSmartPointer<vtkPVXMLElement> xml;
-  xml.TakeReference(proxy->SaveXMLState(/*parent=*/NULL, iter));
+  xml.TakeReference(proxy->SaveXMLState(/*parent=*/nullptr, iter));
   Json::Value root(Json::objectValue);
   for (unsigned int cc = 0, max = xml->GetNumberOfNestedElements(); cc < max; ++cc)
   {
@@ -1553,7 +1554,7 @@ Json::Value vtkSMSettings::SerializeAsJSON(vtkSMProxy* proxy, vtkSMPropertyItera
       }
 
       vtkSMProperty* prop = proxy->GetProperty(pname);
-      if (prop == NULL || prop->GetInformationOnly())
+      if (prop == nullptr || prop->GetInformationOnly())
       {
         continue;
       }
@@ -1649,7 +1650,7 @@ bool vtkSMSettings::DeserializeFromJSON(vtkSMProxy* proxy, const Json::Value& va
     }
     xml->AddNestedElement(propXML.GetPointer());
   }
-  return (proxy->LoadXMLState(xml.GetPointer(), NULL) != 0);
+  return (proxy->LoadXMLState(xml.GetPointer(), nullptr) != 0);
 }
 
 //----------------------------------------------------------------------------

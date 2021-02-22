@@ -340,7 +340,7 @@ const char* vtkSquirtCompressor::RestoreConfiguration(const char* stream)
     iss >> this->SquirtLevel;
     return stream + iss.tellg();
   }
-  return 0;
+  return nullptr;
 }
 
 //-----------------------------------------------------------------------------

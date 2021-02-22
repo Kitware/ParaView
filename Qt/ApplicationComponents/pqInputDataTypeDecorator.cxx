@@ -57,7 +57,7 @@ pqInputDataTypeDecorator::pqInputDataTypeDecorator(
   , ObserverId(0)
 {
   vtkSMProxy* proxy = parentObject->proxy();
-  vtkSMProperty* prop = proxy ? proxy->GetProperty("Input") : NULL;
+  vtkSMProperty* prop = proxy ? proxy->GetProperty("Input") : nullptr;
   if (!prop)
   {
     qDebug("Could not locate property named 'Input'. "
@@ -114,7 +114,7 @@ bool pqInputDataTypeDecorator::processState() const
 {
   pqPropertyWidget* parentObject = this->parentWidget();
   vtkSMProxy* proxy = parentObject->proxy();
-  vtkSMProperty* prop = proxy ? proxy->GetProperty("Input") : NULL;
+  vtkSMProperty* prop = proxy ? proxy->GetProperty("Input") : nullptr;
   if (prop)
   {
     pqPipelineSource* source =
@@ -125,9 +125,9 @@ bool pqInputDataTypeDecorator::processState() const
     {
       return false;
     }
-    pqOutputPort* cur_input = NULL;
+    pqOutputPort* cur_input = nullptr;
     QList<pqOutputPort*> ports = source->getOutputPorts();
-    cur_input = ports.size() > 0 ? ports[0] : NULL;
+    cur_input = ports.size() > 0 ? ports[0] : nullptr;
     int exclude = 0;
     this->xml()->GetScalarAttribute("exclude", &exclude);
     std::string dataname = this->xml()->GetAttribute("name");

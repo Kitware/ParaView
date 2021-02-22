@@ -26,15 +26,15 @@ vtkStandardNewMacro(vtkSMTextWidgetRepresentationProxy);
 //----------------------------------------------------------------------------
 vtkSMTextWidgetRepresentationProxy::vtkSMTextWidgetRepresentationProxy()
 {
-  this->TextActorProxy = 0;
-  this->TextPropertyProxy = 0;
+  this->TextActorProxy = nullptr;
+  this->TextPropertyProxy = nullptr;
 }
 
 //----------------------------------------------------------------------------
 vtkSMTextWidgetRepresentationProxy::~vtkSMTextWidgetRepresentationProxy()
 {
-  this->TextActorProxy = 0;
-  this->TextPropertyProxy = 0;
+  this->TextActorProxy = nullptr;
+  this->TextPropertyProxy = nullptr;
 }
 
 //----------------------------------------------------------------------------

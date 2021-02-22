@@ -45,16 +45,16 @@ vtkCxxSetObjectMacro(vtkPVCompositeDataInformationIterator, DataInformation, vtk
 vtkPVCompositeDataInformationIterator::vtkPVCompositeDataInformationIterator()
 {
   this->Internal = new vtkInternal();
-  this->DataInformation = 0;
+  this->DataInformation = nullptr;
   this->CurrentFlatIndex = 0;
 }
 
 //----------------------------------------------------------------------------
 vtkPVCompositeDataInformationIterator::~vtkPVCompositeDataInformationIterator()
 {
-  this->SetDataInformation(0);
+  this->SetDataInformation(nullptr);
   delete this->Internal;
-  this->Internal = 0;
+  this->Internal = nullptr;
 }
 
 //----------------------------------------------------------------------------
@@ -63,7 +63,7 @@ void vtkPVCompositeDataInformationIterator::InitTraversal()
   this->Internal->Stack.clear();
   if (this->DataInformation)
   {
-    this->Internal->Stack.push_back(vtkInternal::vtkItem(this->DataInformation, NULL));
+    this->Internal->Stack.push_back(vtkInternal::vtkItem(this->DataInformation, nullptr));
   }
   this->CurrentFlatIndex = 0;
 }
@@ -73,7 +73,7 @@ vtkPVDataInformation* vtkPVCompositeDataInformationIterator::GetCurrentDataInfor
 {
   if (this->IsDoneWithTraversal())
   {
-    return NULL;
+    return nullptr;
   }
 
   vtkInternal::vtkItem& item = this->Internal->Stack.back();
@@ -85,7 +85,7 @@ const char* vtkPVCompositeDataInformationIterator::GetCurrentName()
 {
   if (this->IsDoneWithTraversal())
   {
-    return NULL;
+    return nullptr;
   }
   vtkInternal::vtkItem& item = this->Internal->Stack.back();
   return item.Name;
@@ -114,7 +114,7 @@ void vtkPVCompositeDataInformationIterator::GoToNextItem()
     {
       vtkPVDataInformation* current = cdInfo->GetDataInformation(item.NextChildIndex);
       const char* name = cdInfo->GetName(item.NextChildIndex);
-      // current may be NULL for multi piece datasets.
+      // current may be nullptr for multi piece datasets.
       item.NextChildIndex++;
       this->CurrentFlatIndex++;
       this->Internal->Stack.push_back(vtkInternal::vtkItem(current, name));

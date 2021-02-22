@@ -26,7 +26,7 @@ vtkPVRenderViewSettings* vtkPVRenderViewSettings::New()
 {
   vtkPVRenderViewSettings* instance = vtkPVRenderViewSettings::GetInstance();
   assert(instance);
-  instance->Register(NULL);
+  instance->Register(nullptr);
   return instance;
 }
 

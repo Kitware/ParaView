@@ -67,7 +67,7 @@ int vtkAMRFileSeriesReader::RequestUpdateTimeDependentInformation(
 
   // Make sure that the reader file name is set correctly and that
   // RequestInformation has been called.
-  this->RequestInformationForInput(index, NULL, outputVector);
+  this->RequestInformationForInput(index, nullptr, outputVector);
 
   return 1;
 }

@@ -99,7 +99,7 @@ vtkDataObject* vtkMoleculeRepresentation::GetRenderedDataObject(int)
   {
     return this->Molecule;
   }
-  return NULL;
+  return nullptr;
 }
 
 //------------------------------------------------------------------------------

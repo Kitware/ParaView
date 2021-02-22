@@ -199,7 +199,7 @@ void pqContextView::selectionChanged()
 void pqContextView::setSelection(vtkSelection* sel)
 {
   // Get the representation's source
-  pqDataRepresentation* pqRepr = 0;
+  pqDataRepresentation* pqRepr = nullptr;
 
   for (int i = 0; i < this->getNumberOfRepresentations(); ++i)
   {

@@ -38,7 +38,7 @@ vtkPVEnsembleDataReaderInformation::vtkPVEnsembleDataReaderInformation()
 vtkPVEnsembleDataReaderInformation::~vtkPVEnsembleDataReaderInformation()
 {
   delete this->Internal;
-  this->Internal = NULL;
+  this->Internal = nullptr;
 }
 
 //-----------------------------------------------------------------------------

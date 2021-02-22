@@ -37,8 +37,8 @@ vtkSMProxyDefinitionManager::vtkSMProxyDefinitionManager()
 //----------------------------------------------------------------------------
 vtkSMProxyDefinitionManager::~vtkSMProxyDefinitionManager()
 {
-  this->SetSession(NULL);
-  this->Forwarder->SetTarget(NULL);
+  this->SetSession(nullptr);
+  this->Forwarder->SetTarget(nullptr);
   this->Forwarder->Delete();
 }
 
@@ -54,7 +54,7 @@ void vtkSMProxyDefinitionManager::SetSession(vtkSMSession* session)
   {
     this->ProxyDefinitionManager->RemoveObserver(this->Forwarder);
   }
-  this->ProxyDefinitionManager = NULL;
+  this->ProxyDefinitionManager = nullptr;
   this->Superclass::SetSession(session);
 
   if (session)

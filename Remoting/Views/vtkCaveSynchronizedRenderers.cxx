@@ -35,7 +35,7 @@ vtkStandardNewMacro(vtkCaveSynchronizedRenderers);
 vtkCaveSynchronizedRenderers::vtkCaveSynchronizedRenderers()
 {
   this->NumberOfDisplays = 0;
-  this->Displays = 0;
+  this->Displays = nullptr;
   this->SetNumberOfDisplays(1);
   this->SetEyeSeparation(0.065);
   this->DisplayOrigin[0] = -0.5;
@@ -106,7 +106,7 @@ void vtkCaveSynchronizedRenderers::SetNumberOfDisplays(int numberOfDisplays)
   {
     return;
   }
-  double** newDisplays = 0;
+  double** newDisplays = nullptr;
   if (numberOfDisplays > 0)
   {
     newDisplays = new double*[numberOfDisplays];

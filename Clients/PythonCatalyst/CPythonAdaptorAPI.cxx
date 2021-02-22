@@ -19,8 +19,8 @@
 
 void coprocessorinitializewithpython(char* pythonFileName, int* pythonFileNameLength)
 {
-  vtkCPPythonAdaptorAPI::CoProcessorInitialize(NULL);
-  if (pythonFileName != NULL || *pythonFileNameLength > 0)
+  vtkCPPythonAdaptorAPI::CoProcessorInitialize(nullptr);
+  if (pythonFileName != nullptr || *pythonFileNameLength > 0)
   { // we put in a check here so that we avoid the warning below
     coprocessoraddpythonscript(pythonFileName, pythonFileNameLength);
   }
@@ -28,7 +28,7 @@ void coprocessorinitializewithpython(char* pythonFileName, int* pythonFileNameLe
 
 void coprocessoraddpythonscript(char* pythonFileName, int* pythonFileNameLength)
 {
-  if (pythonFileName == NULL || *pythonFileNameLength == 0)
+  if (pythonFileName == nullptr || *pythonFileNameLength == 0)
   {
     vtkGenericWarningMacro("Bad Python file name or length.");
     return;

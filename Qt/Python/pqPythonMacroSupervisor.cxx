@@ -91,7 +91,7 @@ pqPythonMacroSupervisor::pqPythonMacroSupervisor(QObject* p)
 pqPythonMacroSupervisor::~pqPythonMacroSupervisor()
 {
   delete this->Internal;
-  this->Internal = 0;
+  this->Internal = nullptr;
 }
 
 // Util methods
@@ -151,7 +151,7 @@ QAction* pqPythonMacroSupervisor::getMacro(const QString& fileName)
   {
     return this->Internal->RunActionMap[fileName];
   }
-  return NULL;
+  return nullptr;
 }
 //----------------------------------------------------------------------------
 void pqPythonMacroSupervisor::addWidgetForRunMacros(QWidget* widget)
@@ -171,7 +171,7 @@ void pqPythonMacroSupervisor::addWidgetForDeleteMacros(QWidget* widget)
 //----------------------------------------------------------------------------
 void pqPythonMacroSupervisor::addWidgetForMacros(QWidget* widget, int actionType)
 {
-  QList<QPointer<QWidget> >* widgetContainers = NULL;
+  QList<QPointer<QWidget> >* widgetContainers = nullptr;
   switch (actionType)
   {
     case 0: // run

@@ -30,9 +30,9 @@ vtkPVSession::vtkPVSession()
 //----------------------------------------------------------------------------
 vtkPVSession::~vtkPVSession()
 {
-  this->ProgressHandler->SetSession(NULL);
+  this->ProgressHandler->SetSession(nullptr);
   this->ProgressHandler->Delete();
-  this->ProgressHandler = NULL;
+  this->ProgressHandler = nullptr;
 }
 
 //----------------------------------------------------------------------------
@@ -44,7 +44,7 @@ vtkPVSession::ServerFlags vtkPVSession::GetProcessRoles()
 //----------------------------------------------------------------------------
 vtkMultiProcessController* vtkPVSession::GetController(vtkPVSession::ServerFlags)
 {
-  return NULL;
+  return nullptr;
 }
 
 //----------------------------------------------------------------------------

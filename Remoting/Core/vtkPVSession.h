@@ -69,7 +69,7 @@ public:
   /**
    * Returns the controller used to communicate with the process. Value must be
    * DATA_SERVER_ROOT or RENDER_SERVER_ROOT or CLIENT.
-   * Default implementation returns NULL.
+   * Default implementation returns nullptr.
    */
   virtual vtkMultiProcessController* GetController(ServerFlags processType);
 
@@ -77,7 +77,7 @@ public:
    * This is socket connection, if any to communicate between the data-server
    * and render-server nodes.
    */
-  virtual vtkMPIMToNSocketConnection* GetMPIMToNSocketConnection() { return NULL; }
+  virtual vtkMPIMToNSocketConnection* GetMPIMToNSocketConnection() { return nullptr; }
 
   /**
    * vtkPVServerInformation is an information-object that provides information

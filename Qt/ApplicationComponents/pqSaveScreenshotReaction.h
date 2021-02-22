@@ -54,7 +54,7 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqSaveScreenshotReaction : public pqReactio
 
 public:
   /**
-  * Constructor. Parent cannot be NULL.
+  * Constructor. Parent cannot be nullptr.
   */
   pqSaveScreenshotReaction(QAction* parent, bool clipboardMode = false);
 

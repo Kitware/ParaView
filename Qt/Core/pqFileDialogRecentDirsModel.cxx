@@ -57,7 +57,7 @@ pqFileDialogRecentDirsModel::pqFileDialogRecentDirsModel(
   this->FileDialogModel = fileDialogModel;
 
   // We need to determine the URI for this server to get the list of recent dirs
-  // from the pqSettings. If server==NULL, we use the "builtin:" resource.
+  // from the pqSettings. If server==nullptr, we use the "builtin:" resource.
   pqServerResource resource = server ? server->getResource() : pqServerResource("builtin:");
 
   QString uri = resource.configuration().URI();

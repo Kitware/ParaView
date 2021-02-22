@@ -57,7 +57,7 @@ vtkPVAxesWidget::vtkPVAxesWidget()
   this->AxesActor->SetVisibility(1);
   this->Renderer->AddActor(this->AxesActor);
 
-  this->ParentRenderer = NULL;
+  this->ParentRenderer = nullptr;
 
   this->Moving = 0;
   this->MouseCursorState = vtkPVAxesWidget::Outside;
@@ -92,8 +92,8 @@ vtkPVAxesWidget::vtkPVAxesWidget()
 //----------------------------------------------------------------------------
 vtkPVAxesWidget::~vtkPVAxesWidget()
 {
-  this->SetInteractor(NULL);
-  this->SetParentRenderer(NULL);
+  this->SetInteractor(nullptr);
+  this->SetParentRenderer(nullptr);
 
   this->AxesActor->Delete();
   this->OutlineActor->Delete();
@@ -318,7 +318,7 @@ void vtkPVAxesWidget::OnButtonPress()
   this->Moving = 1;
   this->EventCallbackCommand->SetAbortFlag(1);
   this->StartInteraction();
-  this->InvokeEvent(vtkCommand::StartInteractionEvent, NULL);
+  this->InvokeEvent(vtkCommand::StartInteractionEvent, nullptr);
 }
 
 //----------------------------------------------------------------------------
@@ -331,7 +331,7 @@ void vtkPVAxesWidget::OnButtonRelease()
 
   this->Moving = 0;
   this->EndInteraction();
-  this->InvokeEvent(vtkCommand::EndInteractionEvent, NULL);
+  this->InvokeEvent(vtkCommand::EndInteractionEvent, nullptr);
 }
 
 //----------------------------------------------------------------------------
@@ -360,7 +360,7 @@ void vtkPVAxesWidget::OnMouseMove()
 
     this->UpdateCursorIcon();
     this->EventCallbackCommand->SetAbortFlag(1);
-    this->InvokeEvent(vtkCommand::InteractionEvent, NULL);
+    this->InvokeEvent(vtkCommand::InteractionEvent, nullptr);
   }
   else
   {

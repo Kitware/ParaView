@@ -35,7 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 pqXYHistogramChartView::pqXYHistogramChartView(const QString& group, const QString& name,
-  vtkSMContextViewProxy* viewModule, pqServer* server, QObject* p /*=NULL*/)
+  vtkSMContextViewProxy* viewModule, pqServer* server, QObject* p /*=nullptr*/)
   : Superclass(XYHistogramChartViewType(), group, name, viewModule, server, p)
 {
 }

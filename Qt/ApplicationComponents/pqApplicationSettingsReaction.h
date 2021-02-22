@@ -49,7 +49,7 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqApplicationSettingsReaction : public pqRe
 
 public:
   /**
-  * Constructor. Parent cannot be NULL.
+  * Constructor. Parent cannot be nullptr.
   */
   pqApplicationSettingsReaction(QAction* parent);
   ~pqApplicationSettingsReaction() override;

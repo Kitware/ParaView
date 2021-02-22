@@ -57,11 +57,11 @@ public:
   int Index;
   bool WidgetIsInDialog;
   pqInternal()
-    : Settings(NULL)
-    , Layout(NULL)
-    , WidgetToPopOut(NULL)
-    , Dialog(NULL)
-    , Button(NULL)
+    : Settings(nullptr)
+    , Layout(nullptr)
+    , WidgetToPopOut(nullptr)
+    , Dialog(nullptr)
+    , Button(nullptr)
     , Index(-1)
     , WidgetIsInDialog(false)
   {

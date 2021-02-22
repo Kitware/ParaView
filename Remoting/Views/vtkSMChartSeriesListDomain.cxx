@@ -63,7 +63,7 @@ void vtkSMChartSeriesListDomain::Update(vtkSMProperty*)
   int fieldAssociation = vtkSMUncheckedPropertyHelper(fieldDataSelection).GetAsInt(0);
   vtkPVDataSetAttributesInformation* dsa = dataInfo->GetAttributeInformation(fieldAssociation);
 
-  for (int cc = 0; dsa != NULL && cc < dsa->GetNumberOfArrays(); cc++)
+  for (int cc = 0; dsa != nullptr && cc < dsa->GetNumberOfArrays(); cc++)
   {
     this->PopulateArrayComponents(dsa->GetArrayInformation(cc), strings);
   }
@@ -121,7 +121,7 @@ vtkPVDataInformation* vtkSMChartSeriesListDomain::GetInputInformation()
       return sp->GetDataInformation(helper.GetOutputPort());
     }
   }
-  return NULL;
+  return nullptr;
 }
 
 //----------------------------------------------------------------------------
@@ -163,7 +163,7 @@ int vtkSMChartSeriesListDomain::SetDefaultValues(vtkSMProperty* prop, bool use_u
   const char** strings_to_check = vtkSMChartSeriesListDomain::GetKnownSeriesNames();
 
   const std::vector<std::string> domain_strings = this->GetStrings();
-  for (int cc = 0; strings_to_check[cc] != NULL; cc++)
+  for (int cc = 0; strings_to_check[cc] != nullptr; cc++)
   {
     if (std::find(domain_strings.begin(), domain_strings.end(),
           std::string(strings_to_check[cc])) != domain_strings.end())

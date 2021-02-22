@@ -55,7 +55,7 @@ void pqSpreadSheetVisibilityBehavior::showActiveSource(pqView* view)
   if (spreadSheet)
   {
     pqPipelineSource* source = pqActiveObjects::instance().activeSource();
-    if (source != 0 && source->modifiedState() != pqProxy::UNINITIALIZED)
+    if (source != nullptr && source->modifiedState() != pqProxy::UNINITIALIZED)
     {
       pqOutputPort* port = pqActiveObjects::instance().activePort();
       if (!port)

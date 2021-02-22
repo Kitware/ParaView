@@ -44,7 +44,7 @@ void pqExampleVisualizationsDialog::onButtonPressed()
   QPushButton* button = qobject_cast<QPushButton*>(sender());
   if (button)
   {
-    const char* stateFile = NULL;
+    const char* stateFile = nullptr;
     bool needsData = false;
     if (button == this->ui->CanExampleButton)
     {
@@ -90,7 +90,7 @@ void pqExampleVisualizationsDialog::onButtonPressed()
     }
 
     this->hide();
-    assert(stateFile != NULL);
+    assert(stateFile != nullptr);
 
     QFile qfile(stateFile);
     if (qfile.open(QIODevice::ReadOnly | QIODevice::Text))

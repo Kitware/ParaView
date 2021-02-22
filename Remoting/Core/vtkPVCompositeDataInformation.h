@@ -86,7 +86,7 @@ public:
   //@{
   /**
    * Get/Set if the data is multipiece. If so, then GetDataInformation() will
-   * always return NULL. For vtkMultiblockDataSet, we don't collect information
+   * always return nullptr. For vtkMultiblockDataSet, we don't collect information
    * about individual pieces. One can however, query the number of pieces by
    * using GetNumberOfChildren().
    */

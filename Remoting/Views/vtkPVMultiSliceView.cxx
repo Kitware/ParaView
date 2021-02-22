@@ -53,7 +53,7 @@ vtkPVMultiSliceView::vtkPVMultiSliceView()
 vtkPVMultiSliceView::~vtkPVMultiSliceView()
 {
   delete this->Internal;
-  this->Internal = NULL;
+  this->Internal = nullptr;
 }
 
 //----------------------------------------------------------------------------
@@ -114,7 +114,7 @@ const char* vtkPVMultiSliceView::GetAxisLabel(int axis) const
 {
   assert(axis >= 0 && axis <= 2);
   return this->Internal->AxisLabels[axis].first ? this->Internal->AxisLabels[axis].second.c_str()
-                                                : NULL;
+                                                : nullptr;
 }
 
 //----------------------------------------------------------------------------

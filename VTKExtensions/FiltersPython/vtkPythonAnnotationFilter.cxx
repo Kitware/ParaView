@@ -52,15 +52,15 @@ bool CheckAndFlushPythonErrors()
 vtkStandardNewMacro(vtkPythonAnnotationFilter);
 //----------------------------------------------------------------------------
 vtkPythonAnnotationFilter::vtkPythonAnnotationFilter()
-  : Expression(NULL)
-  , ComputedAnnotationValue(NULL)
+  : Expression(nullptr)
+  , ComputedAnnotationValue(nullptr)
   , ArrayAssociation(vtkDataObject::FIELD)
   , DataTimeValid(false)
   , DataTime(0.0)
   , NumberOfTimeSteps(0)
-  , TimeSteps(NULL)
+  , TimeSteps(nullptr)
   , TimeRangeValid(false)
-  , CurrentInputDataObject(NULL)
+  , CurrentInputDataObject(nullptr)
 {
   this->SetNumberOfInputPorts(1);
   this->TimeRange[0] = this->TimeRange[1] = 0.0;
@@ -69,15 +69,15 @@ vtkPythonAnnotationFilter::vtkPythonAnnotationFilter()
 //----------------------------------------------------------------------------
 vtkPythonAnnotationFilter::~vtkPythonAnnotationFilter()
 {
-  this->SetExpression(0);
-  this->SetComputedAnnotationValue(0);
+  this->SetExpression(nullptr);
+  this->SetComputedAnnotationValue(nullptr);
 }
 
 //----------------------------------------------------------------------------
 void vtkPythonAnnotationFilter::SetComputedAnnotationValue(const char* value)
 {
   delete[] this->ComputedAnnotationValue;
-  // SystemTools handles NULL strings.
+  // SystemTools handles nullptr strings.
   this->ComputedAnnotationValue = vtksys::SystemTools::DuplicateString(value);
   // don't call this->Modified. This method gets called in RequestData().
 }
@@ -87,16 +87,16 @@ int vtkPythonAnnotationFilter::RequestData(vtkInformation* vtkNotUsed(request),
   vtkInformationVector** inputVector, vtkInformationVector* outputVector)
 {
   vtkDataObject* input = vtkDataObject::GetData(inputVector[0], 0);
-  assert(input != NULL);
+  assert(input != nullptr);
 
   // initialize variables.
   this->DataTimeValid = false;
   this->DataTime = 0.0;
-  this->TimeSteps = NULL;
+  this->TimeSteps = nullptr;
   this->NumberOfTimeSteps = 0;
   this->TimeRangeValid = false;
   this->TimeRange[0] = this->TimeRange[1] = 0.0;
-  this->SetComputedAnnotationValue(NULL);
+  this->SetComputedAnnotationValue(nullptr);
   this->CurrentInputDataObject = input;
 
   // Extract time information
@@ -126,7 +126,7 @@ int vtkPythonAnnotationFilter::RequestData(vtkInformation* vtkNotUsed(request),
   this->EvaluateExpression();
 
   // Make sure a valid ComputedAnnotationValue is available
-  if (this->ComputedAnnotationValue == NULL)
+  if (this->ComputedAnnotationValue == nullptr)
   {
     this->SetComputedAnnotationValue("(error)");
   }
@@ -140,7 +140,7 @@ int vtkPythonAnnotationFilter::RequestData(vtkInformation* vtkNotUsed(request),
   vtkTable* output = vtkTable::GetData(outputVector);
   output->AddColumn(data);
   data->FastDelete();
-  this->CurrentInputDataObject = NULL;
+  this->CurrentInputDataObject = nullptr;
 
   if (vtkMultiProcessController::GetGlobalController() &&
     vtkMultiProcessController::GetGlobalController()->GetLocalProcessId() > 0)

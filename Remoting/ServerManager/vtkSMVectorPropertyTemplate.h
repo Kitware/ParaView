@@ -165,12 +165,12 @@ public:
   }
 
   //---------------------------------------------------------------------------
-  T* GetElements() { return (this->Values.size() > 0) ? &this->Values[0] : NULL; }
+  T* GetElements() { return (this->Values.size() > 0) ? &this->Values[0] : nullptr; }
 
   //---------------------------------------------------------------------------
   T* GetUncheckedElements()
   {
-    return (this->UncheckedValues.size() > 0) ? &this->UncheckedValues[0] : NULL;
+    return (this->UncheckedValues.size() > 0) ? &this->UncheckedValues[0] : nullptr;
   }
   //---------------------------------------------------------------------------
   T& GetUncheckedElement(unsigned int idx)

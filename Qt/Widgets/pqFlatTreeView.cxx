@@ -116,7 +116,7 @@ pqFlatTreeViewItem::pqFlatTreeViewItem()
   , Index()
   , Cells()
 {
-  this->Parent = 0;
+  this->Parent = nullptr;
   this->ContentsY = 0;
   this->Height = 0;
   this->Indent = 0;
@@ -135,7 +135,7 @@ pqFlatTreeViewItem::~pqFlatTreeViewItem()
   }
 
   this->Items.clear();
-  this->Parent = 0;
+  this->Parent = nullptr;
 }
 
 //----------------------------------------------------------------------------
@@ -145,7 +145,7 @@ pqFlatTreeViewInternal::pqFlatTreeViewInternal()
   , LastSearchTime(QTime::currentTime())
   , KeySearch()
 {
-  this->Editor = 0;
+  this->Editor = nullptr;
 }
 
 //----------------------------------------------------------------------------
@@ -154,11 +154,11 @@ int pqFlatTreeView::PipeLength = 4;
 pqFlatTreeView::pqFlatTreeView(QWidget* p)
   : QAbstractScrollArea(p)
 {
-  this->Model = 0;
-  this->Selection = 0;
+  this->Model = nullptr;
+  this->Selection = nullptr;
   this->Behavior = pqFlatTreeView::SelectItems;
   this->Mode = pqFlatTreeView::SingleSelection;
-  this->HeaderView = 0;
+  this->HeaderView = nullptr;
   this->Root = new pqFlatTreeViewItem();
   this->Internal = new pqFlatTreeViewInternal();
   this->IconSize = 0;
@@ -174,7 +174,7 @@ pqFlatTreeView::pqFlatTreeView(QWidget* p)
   this->SelectionOwned = false;
 
   // Set up the default header view.
-  this->setHeader(0);
+  this->setHeader(nullptr);
 }
 
 pqFlatTreeView::~pqFlatTreeView()
@@ -276,13 +276,13 @@ void pqFlatTreeView::setModel(QAbstractItemModel* model)
   if (this->Model)
   {
     // Disconnect from the previous model's signals.
-    this->disconnect(this->Model, 0, this, 0);
+    this->disconnect(this->Model, nullptr, this, nullptr);
   }
 
   if (this->Selection)
   {
     // Disconnect from the selection model's signals.
-    this->disconnect(this->Selection, 0, this, 0);
+    this->disconnect(this->Selection, nullptr, this, nullptr);
     this->Internal->ShiftStart = QPersistentModelIndex();
   }
 
@@ -317,7 +317,7 @@ void pqFlatTreeView::setModel(QAbstractItemModel* model)
   }
 
   // Create a new selection model for the new model.
-  this->setSelectionModel(0);
+  this->setSelectionModel(nullptr);
 
   // Traverse the model to set up the view items. Only set up the
   // visible items.
@@ -381,11 +381,11 @@ void pqFlatTreeView::setSelectionModel(QItemSelectionModel* selectionModel)
   {
   }
 
-  QItemSelectionModel* toDelete = 0;
+  QItemSelectionModel* toDelete = nullptr;
   if (this->Selection)
   {
     // Disconnect from the selection model signals.
-    this->disconnect(this->Selection, 0, this, 0);
+    this->disconnect(this->Selection, nullptr, this, nullptr);
     if (this->SelectionOwned)
     {
       this->SelectionOwned = false;
@@ -471,7 +471,7 @@ void pqFlatTreeView::setHeader(QHeaderView* headerView)
   if (this->HeaderView)
   {
     this->HeaderView->removeEventFilter(this);
-    this->disconnect(this->HeaderView, 0, this, 0);
+    this->disconnect(this->HeaderView, nullptr, this, nullptr);
     if (this->HeaderOwned)
     {
       this->HeaderOwned = false;
@@ -482,7 +482,7 @@ void pqFlatTreeView::setHeader(QHeaderView* headerView)
       this->HeaderView->hide();
     }
 
-    this->HeaderView = 0;
+    this->HeaderView = nullptr;
   }
 
   this->HeaderView = headerView;
@@ -750,7 +750,7 @@ void pqFlatTreeView::getSelectionIn(const QRect& area, QItemSelection& items) co
     start = this->HeaderView->visualIndexAt(bounds.left());
   }
 
-  pqFlatTreeViewItem* item = 0;
+  pqFlatTreeViewItem* item = nullptr;
   if (bounds.top() < top)
   {
     item = this->getNextVisibleItem(this->Root);
@@ -1016,7 +1016,7 @@ void pqFlatTreeView::cancelEditing()
   {
     // Clean up the editor.
     QWidget* editor = this->Internal->Editor;
-    this->Internal->Editor = 0;
+    this->Internal->Editor = nullptr;
     editor->deleteLater();
 
     // Repaint the affected area.
@@ -1476,7 +1476,7 @@ void pqFlatTreeView::updateData(const QModelIndex& topLeft, const QModelIndex& b
     // affected columns in the items.
     bool itemsVisible = !parentItem->Expandable || parentItem->Expanded;
     QFontMetrics fm = this->fontMetrics();
-    pqFlatTreeViewItem* item = 0;
+    pqFlatTreeViewItem* item = nullptr;
     int startPoint = 0;
     int point = 0;
     int start = topLeft.column();
@@ -1562,7 +1562,7 @@ void pqFlatTreeView::keyPressEvent(QKeyEvent* e)
   int column = 0;
   QModelIndex index;
   bool handled = true;
-  pqFlatTreeViewItem* item = 0;
+  pqFlatTreeViewItem* item = nullptr;
   QModelIndex current = this->Selection->currentIndex();
   switch (e->key())
   {
@@ -1789,7 +1789,7 @@ void pqFlatTreeView::keyPressEvent(QKeyEvent* e)
           item = this->getNextVisibleItem(this->Root);
         }
 
-        pqFlatTreeViewItem* currentItem = 0;
+        pqFlatTreeViewItem* currentItem = nullptr;
         if (current.isValid())
         {
           currentItem = this->getItem(current);
@@ -1846,7 +1846,7 @@ void pqFlatTreeView::keyPressEvent(QKeyEvent* e)
           item = this->getLastVisibleItem();
         }
 
-        pqFlatTreeViewItem* currentItem = 0;
+        pqFlatTreeViewItem* currentItem = nullptr;
         if (current.isValid())
         {
           currentItem = this->getItem(current);
@@ -2704,7 +2704,7 @@ void pqFlatTreeView::changeCurrent(const QModelIndex& current, const QModelIndex
   {
     // If the last index is valid, add its row to the repaint region.
     QRegion region;
-    pqFlatTreeViewItem* item = 0;
+    pqFlatTreeViewItem* item = nullptr;
     if (previous.isValid())
     {
       item = this->getItem(previous);
@@ -2739,7 +2739,7 @@ void pqFlatTreeView::changeCurrentRow(const QModelIndex& current, const QModelIn
   {
     // If the last index is valid, add its row to the repaint region.
     QRegion region;
-    pqFlatTreeViewItem* item = 0;
+    pqFlatTreeViewItem* item = nullptr;
     if (previous.isValid())
     {
       item = this->getItem(previous);
@@ -2798,8 +2798,8 @@ void pqFlatTreeView::changeSelection(
   }
 
   // Start with the deselected items.
-  pqFlatTreeViewItem* parentItem = 0;
-  pqFlatTreeViewItem* item = 0;
+  pqFlatTreeViewItem* parentItem = nullptr;
+  pqFlatTreeViewItem* item = nullptr;
   QItemSelection::ConstIterator iter = deselected.begin();
   for (; iter != deselected.end(); ++iter)
   {
@@ -3241,7 +3241,7 @@ void pqFlatTreeView::addChildItems(pqFlatTreeViewItem* item, int parentChildCoun
       // Set up the parent and model index for each added child.
       // The model's hierarchical data should be in column 0.
       QModelIndex index;
-      pqFlatTreeViewItem* child = 0;
+      pqFlatTreeViewItem* child = nullptr;
       for (int i = 0; i < count; i++)
       {
         index = this->Model->index(i, 0, item->Index);
@@ -3305,7 +3305,7 @@ pqFlatTreeViewItem* pqFlatTreeView::getItem(const pqFlatTreeViewItemRows& rowLis
     }
     else
     {
-      return 0;
+      return nullptr;
     }
   }
 
@@ -3314,7 +3314,7 @@ pqFlatTreeViewItem* pqFlatTreeView::getItem(const pqFlatTreeViewItemRows& rowLis
 
 pqFlatTreeViewItem* pqFlatTreeView::getItem(const QModelIndex& index) const
 {
-  pqFlatTreeViewItem* item = 0;
+  pqFlatTreeViewItem* item = nullptr;
   pqFlatTreeViewItemRows rowList;
   if (this->getIndexRowList(index, rowList))
   {
@@ -3328,12 +3328,12 @@ pqFlatTreeViewItem* pqFlatTreeView::getItemAt(int contentsY) const
 {
   if (contentsY > this->ContentsHeight)
   {
-    return 0;
+    return nullptr;
   }
 
   if (this->HeaderView->isVisible() && contentsY < this->HeaderView->size().height())
   {
-    return 0;
+    return nullptr;
   }
 
   pqFlatTreeViewItem* item = this->getNextVisibleItem(this->Root);
@@ -3341,7 +3341,7 @@ pqFlatTreeViewItem* pqFlatTreeView::getItemAt(int contentsY) const
   {
     if (item->ContentsY > contentsY)
     {
-      return 0;
+      return nullptr;
     }
 
     if (item->ContentsY + item->Height > contentsY)
@@ -3384,7 +3384,7 @@ pqFlatTreeViewItem* pqFlatTreeView::getNextItem(pqFlatTreeViewItem* item) const
     }
   }
 
-  return 0;
+  return nullptr;
 }
 
 pqFlatTreeViewItem* pqFlatTreeView::getNextVisibleItem(pqFlatTreeViewItem* item) const
@@ -3423,7 +3423,7 @@ pqFlatTreeViewItem* pqFlatTreeView::getNextVisibleItem(pqFlatTreeViewItem* item)
     }
   }
 
-  return 0;
+  return nullptr;
 }
 
 pqFlatTreeViewItem* pqFlatTreeView::getPreviousVisibleItem(pqFlatTreeViewItem* item) const
@@ -3433,7 +3433,7 @@ pqFlatTreeViewItem* pqFlatTreeView::getPreviousVisibleItem(pqFlatTreeViewItem* i
     int row = item->Parent->Items.indexOf(item);
     if (row == 0)
     {
-      return item->Parent == this->Root ? 0 : item->Parent;
+      return item->Parent == this->Root ? nullptr : item->Parent;
     }
     else
     {
@@ -3447,7 +3447,7 @@ pqFlatTreeViewItem* pqFlatTreeView::getPreviousVisibleItem(pqFlatTreeViewItem* i
     }
   }
 
-  return 0;
+  return nullptr;
 }
 
 pqFlatTreeViewItem* pqFlatTreeView::getLastVisibleItem() const
@@ -3463,7 +3463,7 @@ pqFlatTreeViewItem* pqFlatTreeView::getLastVisibleItem() const
     return item;
   }
 
-  return 0;
+  return nullptr;
 }
 
 void pqFlatTreeView::expandItem(pqFlatTreeViewItem* item)

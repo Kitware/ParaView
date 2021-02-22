@@ -63,10 +63,10 @@ vtkStandardNewMacro(vtkDataMineWireFrameReader);
 // Constructor
 vtkDataMineWireFrameReader::vtkDataMineWireFrameReader()
 {
-  this->PointFileName = NULL;
-  this->TopoFileName = NULL;
-  this->StopeSummaryFileName = NULL;
-  this->StopeFileMap = NULL;
+  this->PointFileName = nullptr;
+  this->TopoFileName = nullptr;
+  this->StopeSummaryFileName = nullptr;
+  this->StopeFileMap = nullptr;
   this->UseStopeSummary = false;
 
   this->PropertyCount = -1;

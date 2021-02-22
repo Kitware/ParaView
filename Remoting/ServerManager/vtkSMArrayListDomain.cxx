@@ -330,8 +330,8 @@ void vtkSMArrayListDomainInternals::BuildArrayList(
 vtkSMArrayListDomain::vtkSMArrayListDomain()
 {
   this->AttributeType = vtkDataSetAttributes::SCALARS;
-  this->InputDomainName = 0;
-  this->NoneString = 0;
+  this->InputDomainName = nullptr;
+  this->NoneString = nullptr;
   this->ALDInternals = new vtkSMArrayListDomainInternals;
   this->PickFirstAvailableArrayByDefault = true;
 }
@@ -339,8 +339,8 @@ vtkSMArrayListDomain::vtkSMArrayListDomain()
 //---------------------------------------------------------------------------
 vtkSMArrayListDomain::~vtkSMArrayListDomain()
 {
-  this->SetInputDomainName(0);
-  this->SetNoneString(0);
+  this->SetInputDomainName(nullptr);
+  this->SetNoneString(nullptr);
   delete this->ALDInternals;
   this->ALDInternals = nullptr;
 }

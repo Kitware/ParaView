@@ -65,7 +65,7 @@ public:
 vtkPVEnSightMasterServerReader::vtkPVEnSightMasterServerReader()
 {
   this->Internal = new vtkPVEnSightMasterServerReaderInternal;
-  this->Controller = 0;
+  this->Controller = nullptr;
   this->SetController(vtkMultiProcessController::GetGlobalController());
   this->InformationError = 0;
   this->ExtentTranslator = vtkPVEnSightMasterServerTranslator::New();
@@ -75,7 +75,7 @@ vtkPVEnSightMasterServerReader::vtkPVEnSightMasterServerReader()
 //----------------------------------------------------------------------------
 vtkPVEnSightMasterServerReader::~vtkPVEnSightMasterServerReader()
 {
-  this->SetController(0);
+  this->SetController(nullptr);
   delete this->Internal;
   this->ExtentTranslator->Delete();
 }

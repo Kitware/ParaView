@@ -61,11 +61,11 @@ struct OrderByNames : std::binary_function<vtkAbstractArray*, vtkAbstractArray*,
   {
     const char* order[] = { "vtkBlockNameIndices", "vtkOriginalProcessIds",
       "vtkCompositeIndexArray", "vtkOriginalIndices", "vtkOriginalCellIds", "vtkOriginalPointIds",
-      "vtkOriginalRowIds", "Structured Coordinates", NULL };
+      "vtkOriginalRowIds", "Structured Coordinates", nullptr };
     std::string a1Name = a1->GetName() ? a1->GetName() : "";
     std::string a2Name = a2->GetName() ? a2->GetName() : "";
     int a1Index = VTK_INT_MAX, a2Index = VTK_INT_MAX;
-    for (int cc = 0; order[cc] != NULL; cc++)
+    for (int cc = 0; order[cc] != nullptr; cc++)
     {
       if (a1Index == VTK_INT_MAX && a1Name == order[cc])
       {
@@ -392,7 +392,7 @@ public:
       this->MostRecentlyAccessedBlock = blockId;
       return iter->second.Dataobject.GetPointer();
     }
-    return NULL;
+    return nullptr;
   }
 
   vtkTable* AddToCache(vtkIdType blockId, vtkTable* data, vtkIdType max)
@@ -537,7 +537,7 @@ vtkAlgorithmOutput* vtkGetDataProducer(vtkSpreadSheetView* self, vtkSpreadSheetR
       return repr->GetDataProducer();
     }
   }
-  return NULL;
+  return nullptr;
 }
 
 #if 0 // Its usage is commented out below.
@@ -548,11 +548,11 @@ vtkAlgorithmOutput* vtkGetDataProducer(vtkSpreadSheetView* self, vtkSpreadSheetR
       {
       if (self->GetShowExtractedSelection())
         {
-        return NULL;
+        return nullptr;
         }
       return repr->GetSelectionProducer();
       }
-    return NULL;
+    return nullptr;
     }
 #endif
 }
@@ -618,7 +618,7 @@ vtkSpreadSheetView::~vtkSpreadSheetView()
 
   this->Internals->Observer->Delete();
   delete this->Internals;
-  this->Internals = 0;
+  this->Internals = nullptr;
 }
 
 //----------------------------------------------------------------------------
@@ -722,7 +722,7 @@ void vtkSpreadSheetView::PrintSelf(ostream& os, vtkIndent indent)
 void vtkSpreadSheetView::Update()
 {
   vtkSpreadSheetRepresentation* prev = this->Internals->ActiveRepresentation;
-  vtkSpreadSheetRepresentation* cur = NULL;
+  vtkSpreadSheetRepresentation* cur = nullptr;
   for (int cc = 0; cc < this->GetNumberOfRepresentations(); cc++)
   {
     vtkSpreadSheetRepresentation* repr =
@@ -756,7 +756,7 @@ void vtkSpreadSheetView::Update()
 int vtkSpreadSheetView::StreamToClient()
 {
   vtkSpreadSheetRepresentation* cur = this->Internals->ActiveRepresentation;
-  if (cur == NULL)
+  if (cur == nullptr)
   {
     if (this->NumberOfRows > 0)
     {
@@ -834,7 +834,7 @@ vtkTable* vtkSpreadSheetView::FetchBlockCallback(vtkIdType blockindex)
   // Sanity Check
   if (!this->Internals->ActiveRepresentation)
   {
-    return NULL;
+    return nullptr;
   }
 
   // cout << "FetchBlockCallback" << endl;
@@ -948,7 +948,7 @@ bool vtkSpreadSheetView::IsAvailable(vtkIdType row)
 {
   vtkIdType blockSize = this->TableStreamer->GetBlockSize();
   vtkIdType blockIndex = row / blockSize;
-  return this->Internals->GetDataObject(blockIndex) != NULL;
+  return this->Internals->GetDataObject(blockIndex) != nullptr;
 }
 
 //----------------------------------------------------------------------------

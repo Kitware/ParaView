@@ -43,19 +43,19 @@ int TestParaViewPipelineController(int argc, char* argv[])
     return EXIT_FAILURE;
   }
 
-  if (controller->FindTimeKeeper(session) == NULL)
+  if (controller->FindTimeKeeper(session) == nullptr)
   {
     cerr << "Failed at line " << __LINE__ << endl;
     return EXIT_FAILURE;
   }
 
-  if (controller->FindAnimationScene(session) == NULL)
+  if (controller->FindAnimationScene(session) == nullptr)
   {
     cerr << "Failed at line " << __LINE__ << endl;
     return EXIT_FAILURE;
   }
 
-  if (controller->GetTimeAnimationTrack(controller->GetAnimationScene(session)) == NULL)
+  if (controller->GetTimeAnimationTrack(controller->GetAnimationScene(session)) == nullptr)
   {
     cerr << "Failed at line " << __LINE__ << endl;
     return EXIT_FAILURE;

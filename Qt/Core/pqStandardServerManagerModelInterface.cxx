@@ -74,7 +74,7 @@ namespace
 inline pqProxy* CreatePQView(
   const QString& group, const QString& name, vtkSMViewProxy* proxy, pqServer* server)
 {
-  QObject* parent = NULL;
+  QObject* parent = nullptr;
   QString xmlname = proxy->GetXMLName();
   if (vtkSMSpreadSheetViewProxy::SafeDownCast(proxy))
   {
@@ -146,7 +146,7 @@ inline pqProxy* CreatePQView(
     return new pqXYChartView(
       group, name, vtkSMContextViewProxy::SafeDownCast(proxy), server, parent);
   }
-  return NULL;
+  return nullptr;
 }
 }
 
@@ -172,17 +172,17 @@ pqProxy* pqStandardServerManagerModelInterface::createPQProxy(
   }
   else if (group == "layouts")
   {
-    return new pqProxy(group, name, proxy, server, NULL);
+    return new pqProxy(group, name, proxy, server, nullptr);
   }
   else if (group == "sources")
   {
     if (pqPipelineFilter::getInputPorts(proxy).size() > 0)
     {
-      return new pqPipelineFilter(name, proxy, server, 0);
+      return new pqPipelineFilter(name, proxy, server, nullptr);
     }
     else
     {
-      return new pqPipelineSource(name, proxy, server, 0);
+      return new pqPipelineSource(name, proxy, server, nullptr);
     }
   }
   else if (group == "extractors" && xml_type == "Extractor")
@@ -191,15 +191,15 @@ pqProxy* pqStandardServerManagerModelInterface::createPQProxy(
   }
   else if (group == "timekeeper")
   {
-    return new pqTimeKeeper(group, name, proxy, server, 0);
+    return new pqTimeKeeper(group, name, proxy, server, nullptr);
   }
   else if (group == "lookup_tables")
   {
-    return new pqScalarsToColors(group, name, proxy, server, 0);
+    return new pqScalarsToColors(group, name, proxy, server, nullptr);
   }
   else if (group == "scalar_bars")
   {
-    return new pqScalarBarRepresentation(group, name, proxy, server, 0);
+    return new pqScalarBarRepresentation(group, name, proxy, server, nullptr);
   }
   else if (group == "representations")
   {
@@ -209,24 +209,24 @@ pqProxy* pqStandardServerManagerModelInterface::createPQProxy(
       {
         // pqPipelineRepresentation is a design flaw! We need to get rid of it
         // and have helper code that manages the crap in that class
-        return new pqPipelineRepresentation(group, name, proxy, server, 0);
+        return new pqPipelineRepresentation(group, name, proxy, server, nullptr);
       }
 
       // If everything fails, simply create a pqDataRepresentation object.
-      return new pqDataRepresentation(group, name, proxy, server, 0);
+      return new pqDataRepresentation(group, name, proxy, server, nullptr);
     }
   }
   else if (group == "animation")
   {
     if (xml_type == "AnimationScene")
     {
-      return new pqAnimationScene(group, name, proxy, server, 0);
+      return new pqAnimationScene(group, name, proxy, server, nullptr);
     }
     else if (xml_type == "KeyFrameAnimationCue" || xml_type == "CameraAnimationCue" ||
       xml_type == "TimeAnimationCue" || xml_type == "PythonAnimationCue")
     {
-      return new pqAnimationCue(group, name, proxy, server, 0);
+      return new pqAnimationCue(group, name, proxy, server, nullptr);
     }
   }
-  return 0;
+  return nullptr;
 }

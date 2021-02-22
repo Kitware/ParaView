@@ -65,7 +65,7 @@ public:
   //---------------------------------------------------------------------------
   void UnRegisterDataInformation(vtkTypeUInt32 globalid)
   {
-    std::string id = this->GenerateID(globalid, 0, NULL);
+    std::string id = this->GenerateID(globalid, 0, nullptr);
     std::vector<std::string> keysToDelete;
     std::map<std::string, vtkSmartPointer<vtkPVInformation> >::iterator iter;
     for (iter = this->DataInformationMap.begin(); iter != this->DataInformationMap.end(); iter++)
@@ -174,7 +174,7 @@ bool vtkPVCatalystSessionCore::GatherInformation(
 {
   if (globalid == 0)
   {
-    information->CopyFromObject(NULL);
+    information->CopyFromObject(nullptr);
     return true;
   }
 

@@ -104,7 +104,7 @@ public:
    * "outside" proxies. Outside proxies are proxies that are not contained
    * in the compound proxy.  As a result, the saved state will be self
    * contained.  Returns the top element created. It is the caller's
-   * responsibility to delete the returned element. If root is NULL,
+   * responsibility to delete the returned element. If root is nullptr,
    * the returned element will be a top level element.
    */
   vtkPVXMLElement* SaveDefinition(vtkPVXMLElement* root);

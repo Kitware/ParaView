@@ -61,7 +61,7 @@ public:
 
   /**
   * Returns the pqPVApplicationCore instance. If no pqPVApplicationCore has been
-  * created then return NULL.
+  * created then return nullptr.
   */
   static pqPVApplicationCore* instance()
   {
@@ -87,7 +87,7 @@ public:
   pqTestUtility* testUtility() override;
 
   /**
-  * Provides access to the python manager. This is non-null only when paraview
+  * Provides access to the python manager. This is non-nullptr only when paraview
   * is compiled with python support i.e. PARAVIEW_USE_PYTHON is ON.
   */
   pqPythonManager* pythonManager() const;

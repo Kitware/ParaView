@@ -25,8 +25,8 @@ vtkStandardNewMacro(vtkSIObject);
 //----------------------------------------------------------------------------
 vtkSIObject::vtkSIObject()
 {
-  this->Interpreter = 0;
-  this->SessionCore = 0;
+  this->Interpreter = nullptr;
+  this->SessionCore = nullptr;
   this->GlobalID = 0;
   this->LastPushedMessage = new vtkSMMessage();
 }
@@ -35,7 +35,7 @@ vtkSIObject::vtkSIObject()
 vtkSIObject::~vtkSIObject()
 {
   delete this->LastPushedMessage;
-  this->LastPushedMessage = NULL;
+  this->LastPushedMessage = nullptr;
 }
 
 //----------------------------------------------------------------------------
@@ -47,7 +47,7 @@ void vtkSIObject::PrintSelf(ostream& os, vtkIndent indent)
 //----------------------------------------------------------------------------
 void vtkSIObject::Initialize(vtkPVSessionCore* session)
 {
-  assert(session != NULL);
+  assert(session != nullptr);
   this->SessionCore = session;
   this->Interpreter = session->GetInterpreter();
 }
@@ -59,7 +59,7 @@ vtkSIObject* vtkSIObject::GetSIObject(vtkTypeUInt32 globalid) const
   {
     return this->SessionCore->GetSIObject(globalid);
   }
-  return NULL;
+  return nullptr;
 }
 //----------------------------------------------------------------------------
 vtkObject* vtkSIObject::GetRemoteObject(vtkTypeUInt32 globalid)
@@ -68,7 +68,7 @@ vtkObject* vtkSIObject::GetRemoteObject(vtkTypeUInt32 globalid)
   {
     return this->SessionCore->GetRemoteObject(globalid);
   }
-  return NULL;
+  return nullptr;
 }
 
 //----------------------------------------------------------------------------

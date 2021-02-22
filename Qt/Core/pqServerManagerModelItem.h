@@ -49,7 +49,7 @@ class PQCORE_EXPORT pqServerManagerModelItem : public QObject
   Q_OBJECT
 
 public:
-  pqServerManagerModelItem(QObject* parent = NULL);
+  pqServerManagerModelItem(QObject* parent = nullptr);
   ~pqServerManagerModelItem() override;
 
 protected:

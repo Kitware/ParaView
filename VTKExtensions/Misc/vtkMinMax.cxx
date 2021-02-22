@@ -40,9 +40,9 @@ void vtkMinMaxExecute(vtkMinMax* self, int numComp, int compIdx, T* idata, T* od
 vtkMinMax::vtkMinMax()
 {
   this->Operation = vtkMinMax::MIN;
-  this->CFirstPass = NULL;
-  this->PFirstPass = NULL;
-  this->FirstPasses = NULL;
+  this->CFirstPass = nullptr;
+  this->PFirstPass = nullptr;
+  this->FirstPasses = nullptr;
   this->MismatchOccurred = 0;
 }
 
@@ -102,7 +102,7 @@ int vtkMinMax::RequestData(vtkInformation* vtkNotUsed(reqInfo), vtkInformationVe
 {
   int numInputs;
   int idx, numArrays;
-  vtkCompositeDataSet* cdobj = NULL;
+  vtkCompositeDataSet* cdobj = nullptr;
 
   // get hold of input, output
   vtkPolyData* output = vtkPolyData::SafeDownCast(
@@ -264,9 +264,9 @@ void vtkMinMax::OperateOnField(vtkFieldData* ifd, vtkFieldData* ofd)
     vtkAbstractArray* oa = ofd->GetArray(idx);
 
     // type check
-    // oa will not be null since we are iterating over ifd
+    // oa will not be nullptr since we are iterating over ifd
     // input and output numtuples don't need to match (out will always be 1)
-    if (ia == NULL || ia->GetDataType() != oa->GetDataType() ||
+    if (ia == nullptr || ia->GetDataType() != oa->GetDataType() ||
       ia->GetNumberOfComponents() != oa->GetNumberOfComponents() ||
       (strcmp(ia->GetName(), oa->GetName()) != 0))
     {
@@ -300,7 +300,7 @@ void vtkMinMax::OperateOnArray(vtkAbstractArray* ia, vtkAbstractArray* oa)
   {
     this->Idx = idx;
 
-    if ((this->GhostArray != NULL) &&
+    if ((this->GhostArray != nullptr) &&
       (this->GhostArray->GetValue(idx) & vtkDataSetAttributes::DUPLICATECELL))
     {
       // skip cell and point attributes that don't belong to me

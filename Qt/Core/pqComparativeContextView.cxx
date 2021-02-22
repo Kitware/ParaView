@@ -154,7 +154,7 @@ void pqComparativeContextView::updateViewWidgets()
 
   currentViews->InitTraversal();
   vtkSMViewProxy* temp = vtkSMViewProxy::SafeDownCast(currentViews->GetNextItemAsObject());
-  for (; temp != 0; temp = vtkSMViewProxy::SafeDownCast(currentViews->GetNextItemAsObject()))
+  for (; temp != nullptr; temp = vtkSMViewProxy::SafeDownCast(currentViews->GetNextItemAsObject()))
   {
     currentViewsSet.insert(temp);
   }

@@ -16,9 +16,9 @@ vtkSpyPlotBlockIterator::vtkSpyPlotBlockIterator()
   this->FileIndex = 0;
 
   this->BlockEnd = 0;
-  this->FileMap = 0;
-  this->UniReader = 0;
-  this->Parent = 0;
+  this->FileMap = nullptr;
+  this->UniReader = nullptr;
+  this->Parent = nullptr;
 }
 
 void vtkSpyPlotBlockIterator::Init(int numberOfProcessors, int processorId,

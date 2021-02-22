@@ -156,7 +156,7 @@ class pqGlobalOpacityRangeDialog : public QDialog
 {
 public:
   pqGlobalOpacityRangeDialog(
-    double globalOpacity = 1.0, double selectedOpacity = 1.0, QWidget* parent = 0)
+    double globalOpacity = 1.0, double selectedOpacity = 1.0, QWidget* parent = nullptr)
     : QDialog(parent)
   {
     this->GlobalOpacityWidget = new pqDoubleRangeWidget(this);

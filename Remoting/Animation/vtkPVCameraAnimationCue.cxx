@@ -25,7 +25,7 @@ vtkCxxSetObjectMacro(vtkPVCameraAnimationCue, TimeKeeper, vtkSMProxy);
 //----------------------------------------------------------------------------
 vtkPVCameraAnimationCue::vtkPVCameraAnimationCue()
 {
-  this->View = 0;
+  this->View = nullptr;
   this->TimeKeeper = nullptr;
   vtkPVCameraCueManipulator* manip = vtkPVCameraCueManipulator::New();
   this->SetManipulator(manip);
@@ -35,14 +35,14 @@ vtkPVCameraAnimationCue::vtkPVCameraAnimationCue()
 //----------------------------------------------------------------------------
 vtkPVCameraAnimationCue::~vtkPVCameraAnimationCue()
 {
-  this->SetView(NULL);
+  this->SetView(nullptr);
   this->SetTimeKeeper(nullptr);
 }
 
 //----------------------------------------------------------------------------
 vtkCamera* vtkPVCameraAnimationCue::GetCamera()
 {
-  return this->View ? this->View->GetActiveCamera() : NULL;
+  return this->View ? this->View->GetActiveCamera() : nullptr;
 }
 
 //----------------------------------------------------------------------------

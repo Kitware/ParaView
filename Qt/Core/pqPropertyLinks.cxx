@@ -68,7 +68,7 @@ pqPropertyLinks::~pqPropertyLinks()
   this->clear();
 
   delete this->Internals;
-  this->Internals = 0;
+  this->Internals = nullptr;
 }
 
 //-----------------------------------------------------------------------------

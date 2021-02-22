@@ -147,11 +147,11 @@ pqVRAddConnectionDialog::pqVRAddConnectionDialog(QWidget* parentObject, Qt::Wind
   this->Internals->setupUi(this);
   this->Internals->Type = pqInternals::None;
 #if PARAVIEW_PLUGIN_VRPlugin_USE_VRPN
-  this->Internals->VRPNConn = NULL;
+  this->Internals->VRPNConn = nullptr;
   this->Internals->connectionType->addItem("VRPN");
 #endif
 #if PARAVIEW_PLUGIN_VRPlugin_USE_VRUI
-  this->Internals->VRUIConn = NULL;
+  this->Internals->VRUIConn = nullptr;
   this->Internals->connectionType->addItem("VRUI");
 #endif
   this->connectionTypeChanged();
@@ -202,7 +202,7 @@ pqVRPNConnection* pqVRAddConnectionDialog::getVRPNConnection()
   {
     return this->Internals->VRPNConn;
   }
-  return NULL;
+  return nullptr;
 }
 
 //-----------------------------------------------------------------------------
@@ -236,7 +236,7 @@ pqVRUIConnection* pqVRAddConnectionDialog::getVRUIConnection()
   {
     return this->Internals->VRUIConn;
   }
-  return NULL;
+  return nullptr;
 }
 
 //-----------------------------------------------------------------------------

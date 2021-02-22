@@ -230,7 +230,7 @@ protected:
    * "additional" vtkPVDataInformation instance to get available arrays list
    * from.
    */
-  virtual vtkPVDataInformation* GetExtraDataInformation() { return NULL; }
+  virtual vtkPVDataInformation* GetExtraDataInformation() { return nullptr; }
 
   /**
    * Returns true if an array should be filtered out. This is typically used to

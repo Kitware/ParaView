@@ -80,7 +80,7 @@ double* Grid::GetSpacing()
 
 Attributes::Attributes()
 {
-  this->GridPtr = NULL;
+  this->GridPtr = nullptr;
 }
 
 void Attributes::Initialize(Grid* grid)
@@ -108,7 +108,7 @@ double* Attributes::GetVelocityArray()
 {
   if (this->Velocity.empty())
   {
-    return NULL;
+    return nullptr;
   }
   return &this->Velocity[0];
 }
@@ -117,7 +117,7 @@ float* Attributes::GetPressureArray()
 {
   if (this->Pressure.empty())
   {
-    return NULL;
+    return nullptr;
   }
   return &this->Pressure[0];
 }

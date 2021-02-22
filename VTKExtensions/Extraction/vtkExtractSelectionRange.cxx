@@ -45,14 +45,14 @@ vtkExtractSelectionRange::vtkExtractSelectionRange()
   this->SetNumberOfOutputPorts(1);
 
   this->Component = 0;
-  this->ArrayName = NULL;
+  this->ArrayName = nullptr;
   this->FieldType = vtkSelectionNode::CELL;
 }
 
 //----------------------------------------------------------------------------
 vtkExtractSelectionRange::~vtkExtractSelectionRange()
 {
-  this->SetArrayName(0);
+  this->SetArrayName(nullptr);
 }
 
 //----------------------------------------------------------------------------
@@ -88,14 +88,14 @@ int vtkExtractSelectionRange::RequestData(vtkInformation* vtkNotUsed(request),
 
     if (!node)
     {
-      vtkDebugMacro(<< "Selection node null");
+      vtkDebugMacro(<< "Selection node nullptr");
       continue;
     }
 
     vtkIdTypeArray* idList = vtkIdTypeArray::SafeDownCast(node->GetSelectionList());
     if (!idList)
     {
-      vtkDebugMacro(<< "Selection node list null");
+      vtkDebugMacro(<< "Selection node list nullptr");
       continue;
     }
 

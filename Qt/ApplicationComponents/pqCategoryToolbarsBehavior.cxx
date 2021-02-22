@@ -57,8 +57,8 @@ pqCategoryToolbarsBehavior::pqCategoryToolbarsBehavior(
   // When tests start, hide toolbars that have asked to be off by default.
   // Do the same when starting to record events for a test.
   pqTestUtility* testUtil = pqApplicationCore::instance()->testUtility();
-  pqEventDispatcher* testPlayer = testUtil ? testUtil->dispatcher() : NULL;
-  pqEventTranslator* testRecorder = testUtil ? testUtil->eventTranslator() : NULL;
+  pqEventDispatcher* testPlayer = testUtil ? testUtil->dispatcher() : nullptr;
+  pqEventTranslator* testRecorder = testUtil ? testUtil->eventTranslator() : nullptr;
   if (testPlayer)
   {
     QObject::connect(testPlayer, SIGNAL(restarted()), this, SLOT(prepareForTest()));

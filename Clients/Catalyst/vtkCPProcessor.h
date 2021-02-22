@@ -54,7 +54,7 @@ class vtkSMSourceProxy;
 /// In the second step the Co-Processor implementation is called with the
 /// actual data that it has been asked to provide, if any. If no data was
 /// selected during the Configuration Step than the provided vtkDataObject
-/// may be NULL.
+/// may be nullptr.
 class VTKPVCATALYST_EXPORT vtkCPProcessor : public vtkObject
 {
 public:

@@ -35,14 +35,14 @@ vtkStandardNewMacro(vtkSMScalarBarWidgetRepresentationProxy);
 //----------------------------------------------------------------------------
 vtkSMScalarBarWidgetRepresentationProxy::vtkSMScalarBarWidgetRepresentationProxy()
 {
-  this->ActorProxy = NULL;
-  this->TraceItem = NULL;
+  this->ActorProxy = nullptr;
+  this->TraceItem = nullptr;
 }
 
 //----------------------------------------------------------------------------
 vtkSMScalarBarWidgetRepresentationProxy::~vtkSMScalarBarWidgetRepresentationProxy()
 {
-  this->ActorProxy = NULL;
+  this->ActorProxy = nullptr;
   delete this->TraceItem;
 }
 
@@ -143,7 +143,7 @@ void vtkSMScalarBarWidgetRepresentationProxy::ExecuteEvent(unsigned long event)
 //----------------------------------------------------------------------------
 void vtkSMScalarBarWidgetRepresentationProxy::BeginTrackingPropertiesForTrace()
 {
-  assert(this->TraceItem == NULL);
+  assert(this->TraceItem == nullptr);
   this->TraceItem = new vtkSMTrace::TraceItem("ScalarBarInteraction");
   (*this->TraceItem) =
     vtkSMTrace::TraceItemArgs().arg("proxy", this).arg("comment", " change scalar bar placement");
@@ -153,7 +153,7 @@ void vtkSMScalarBarWidgetRepresentationProxy::BeginTrackingPropertiesForTrace()
 void vtkSMScalarBarWidgetRepresentationProxy::EndTrackingPropertiesForTrace()
 {
   delete this->TraceItem;
-  this->TraceItem = NULL;
+  this->TraceItem = nullptr;
 }
 
 //----------------------------------------------------------------------------
@@ -166,7 +166,7 @@ void vtkSMScalarBarWidgetRepresentationProxy::PrintSelf(ostream& os, vtkIndent i
 bool vtkSMScalarBarWidgetRepresentationProxy::UpdateComponentTitle(vtkPVArrayInformation* arrayInfo)
 {
   vtkSMProperty* compProp = this->GetProperty("ComponentTitle");
-  if (compProp == NULL)
+  if (compProp == nullptr)
   {
     vtkErrorMacro("Failed to locate ComponentTitle property.");
     return false;
@@ -181,10 +181,11 @@ bool vtkSMScalarBarWidgetRepresentationProxy::UpdateComponentTitle(vtkPVArrayInf
     component = vtkSMPropertyHelper(lutProxy, "VectorComponent").GetAsInt();
   }
 
-  if (arrayInfo == NULL || arrayInfo->GetNumberOfComponents() > 1)
+  if (arrayInfo == nullptr || arrayInfo->GetNumberOfComponents() > 1)
   {
-    const char* componentNameFromData = arrayInfo ? arrayInfo->GetComponentName(component) : NULL;
-    if (componentNameFromData == NULL)
+    const char* componentNameFromData =
+      arrayInfo ? arrayInfo->GetComponentName(component) : nullptr;
+    if (componentNameFromData == nullptr)
     {
       // just use the component number directly.
       if (component >= 0)

@@ -49,8 +49,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 pqViewMenuManager::pqViewMenuManager(QMainWindow* mainWindow, QMenu* menu)
   : Superclass(mainWindow)
 {
-  assert(mainWindow != NULL);
-  assert(menu != NULL);
+  assert(mainWindow != nullptr);
+  assert(menu != nullptr);
 
   this->Menu = menu;
   this->Window = mainWindow;

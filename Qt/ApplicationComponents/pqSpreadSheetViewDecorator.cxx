@@ -301,7 +301,7 @@ pqSpreadSheetViewDecorator::pqSpreadSheetViewDecorator(pqSpreadSheetView* view)
   auto& internal = *this->Internal;
   internal.setupUi(header);
   internal.Source->setAutoUpdateIndex(false);
-  internal.Source->addCustomEntry("None", NULL);
+  internal.Source->addCustomEntry("None", nullptr);
   internal.Source->fillExistingPorts();
 
   internal.spinBoxPrecision->setValue(model->getDecimalPrecision());

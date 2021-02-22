@@ -47,7 +47,7 @@ void vtkPVTrackballMoveActor::OnButtonUp(int, int, vtkRenderer*, vtkRenderWindow
 void vtkPVTrackballMoveActor::OnMouseMove(
   int x, int y, vtkRenderer* ren, vtkRenderWindowInteractor* rwi)
 {
-  if (ren == NULL || !this->GetGUIHelper())
+  if (ren == nullptr || !this->GetGUIHelper())
   {
     return;
   }

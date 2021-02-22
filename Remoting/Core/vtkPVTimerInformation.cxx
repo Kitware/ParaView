@@ -30,7 +30,7 @@ vtkStandardNewMacro(vtkPVTimerInformation);
 vtkPVTimerInformation::vtkPVTimerInformation()
 {
   this->NumberOfLogs = 0;
-  this->Logs = NULL;
+  this->Logs = nullptr;
   this->LogThreshold = 0;
 }
 
@@ -44,14 +44,14 @@ vtkPVTimerInformation::~vtkPVTimerInformation()
     if (this->Logs && this->Logs[idx])
     {
       delete[] this->Logs[idx];
-      this->Logs[idx] = NULL;
+      this->Logs[idx] = nullptr;
     }
   }
 
   if (this->Logs)
   {
     delete[] this->Logs;
-    this->Logs = NULL;
+    this->Logs = nullptr;
   }
   this->NumberOfLogs = 0;
 }
@@ -83,7 +83,7 @@ void vtkPVTimerInformation::InsertLog(int id, const char* log)
   if (this->Logs[id])
   {
     delete[] this->Logs[id];
-    this->Logs[id] = NULL;
+    this->Logs[id] = nullptr;
   }
   size_t len = strlen(log);
   char* str = new char[len + 1];
@@ -111,14 +111,14 @@ void vtkPVTimerInformation::Reallocate(int num)
   newLogs = new char*[num];
   for (idx = 0; idx < num; ++idx)
   {
-    newLogs[idx] = NULL;
+    newLogs[idx] = nullptr;
   }
 
   // Copy existing logs.
   for (idx = 0; idx < this->NumberOfLogs; ++idx)
   {
     newLogs[idx] = this->Logs[idx];
-    this->Logs[idx] = NULL;
+    this->Logs[idx] = nullptr;
   }
 
   if (this->Logs)
@@ -178,7 +178,7 @@ void vtkPVTimerInformation::CopyFromMessage(unsigned char* msg)
     log = new char[length + 1];
     memcpy(log, msg, length + 1);
     this->InsertLog(idx, log);
-    log = NULL;
+    log = nullptr;
     msg += length + 1;
   }
 }
@@ -210,7 +210,7 @@ void vtkPVTimerInformation::AddInformation(vtkPVInformation* info)
       copyLog = new char[length + 1];
       memcpy(copyLog, log, length + 1);
       this->InsertLog((idx + oldNum), copyLog);
-      copyLog = NULL;
+      copyLog = nullptr;
     }
   }
 }
@@ -267,7 +267,7 @@ char* vtkPVTimerInformation::GetLog(int idx)
 {
   if (idx < 0 || idx >= this->NumberOfLogs)
   {
-    return NULL;
+    return nullptr;
   }
   return this->Logs[idx];
 }

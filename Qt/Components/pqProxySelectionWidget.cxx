@@ -129,7 +129,7 @@ pqProxySelectionWidget::pqProxySelectionWidget(
   // only show the widgets for the selected proxy in advanced mode.
   vtkPVXMLElement* hints = smproperty->GetHints()
     ? smproperty->GetHints()->FindNestedElementByName("ProxyPropertyWidget")
-    : NULL;
+    : nullptr;
   this->Internal->HideProxyWidgetsInDefaultView = (hints &&
     strcmp(hints->GetAttributeOrDefault("selected_proxy_panel_visibility", ""), "advanced") == 0);
   this->Internal->HideProxyWidgets = (hints &&

@@ -296,7 +296,7 @@ double vtkCellIntegrator::Integrate(vtkDataSet* input, vtkIdType cellId)
 
   int cellType = input->GetCellType(cellId);
 
-  vtkPoints* cellPoints = 0;
+  vtkPoints* cellPoints = nullptr;
   vtkIdList* cellPtIds = vtkIdList::New();
 
   switch (cellType)

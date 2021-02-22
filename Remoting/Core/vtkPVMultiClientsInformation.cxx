@@ -31,7 +31,7 @@ vtkStandardNewMacro(vtkPVMultiClientsInformation);
 vtkPVMultiClientsInformation::vtkPVMultiClientsInformation()
 {
   this->MultiClientEnable = 0;
-  this->ClientIds = NULL;
+  this->ClientIds = nullptr;
   this->ClientId = 0;
   this->MasterId = 0;
   this->NumberOfClients = 1;
@@ -43,7 +43,7 @@ vtkPVMultiClientsInformation::~vtkPVMultiClientsInformation()
   if (this->ClientIds)
   {
     delete[] this->ClientIds;
-    this->ClientIds = NULL;
+    this->ClientIds = nullptr;
   }
 }
 
@@ -73,7 +73,7 @@ void vtkPVMultiClientsInformation::DeepCopy(vtkPVMultiClientsInformation* info)
   if (this->ClientIds)
   {
     delete[] this->ClientIds;
-    this->ClientIds = NULL;
+    this->ClientIds = nullptr;
   }
   if (info->ClientIds)
   {
@@ -104,7 +104,7 @@ void vtkPVMultiClientsInformation::CopyFromObject(vtkObject* vtkNotUsed(obj))
   if (this->ClientIds)
   {
     delete[] this->ClientIds;
-    this->ClientIds = NULL;
+    this->ClientIds = nullptr;
   }
   if (session && (ctrl = vtkCompositeMultiProcessController::SafeDownCast(
                     session->GetController(vtkPVSession::CLIENT))))
@@ -148,7 +148,7 @@ void vtkPVMultiClientsInformation::AddInformation(vtkPVInformation* info)
     {
       this->MasterId = serverInfo->MasterId;
     }
-    if (this->ClientIds == NULL && serverInfo->ClientIds)
+    if (this->ClientIds == nullptr && serverInfo->ClientIds)
     {
       this->ClientIds = new int[serverInfo->NumberOfClients];
       for (int cc = 0; cc < serverInfo->NumberOfClients; cc++)
@@ -203,7 +203,7 @@ void vtkPVMultiClientsInformation::CopyFromStream(const vtkClientServerStream* c
     if (this->ClientIds)
     {
       delete[] this->ClientIds;
-      this->ClientIds = NULL;
+      this->ClientIds = nullptr;
     }
     this->ClientIds = new int[this->NumberOfClients];
     for (int cc = 0; cc < this->NumberOfClients; cc++)
@@ -221,7 +221,7 @@ void vtkPVMultiClientsInformation::CopyFromStream(const vtkClientServerStream* c
 int vtkPVMultiClientsInformation::GetClientId(int idx)
 {
   // Invalid internal data
-  if (this->ClientIds == NULL || !(idx < this->NumberOfClients && idx >= 0))
+  if (this->ClientIds == nullptr || !(idx < this->NumberOfClients && idx >= 0))
   {
     return this->ClientId;
   }

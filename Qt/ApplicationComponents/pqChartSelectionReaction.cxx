@@ -51,10 +51,11 @@ pqChartSelectionReaction::pqChartSelectionReaction(
   : Superclass(parentObject, modifierGroup)
   , View(view)
 {
-  parentObject->setEnabled(view != NULL && view->supportsSelection());
+  parentObject->setEnabled(view != nullptr && view->supportsSelection());
   this->connect(parentObject, SIGNAL(triggered(bool)), SLOT(triggered(bool)));
 
-  vtkRenderWindowInteractor* interactor = (view ? view->getVTKContextView()->GetInteractor() : 0);
+  vtkRenderWindowInteractor* interactor =
+    (view ? view->getVTKContextView()->GetInteractor() : nullptr);
   if (interactor)
   {
     pqCoreUtilities::connect(
@@ -66,7 +67,7 @@ pqChartSelectionReaction::pqChartSelectionReaction(
 inline void setChartParameters(pqContextView* view, int selectionType, bool update_type,
   int selectionModifier, bool update_modifier)
 {
-  if (view == NULL && !view->supportsSelection() && view->getContextViewProxy() == NULL)
+  if (view == nullptr && !view->supportsSelection() && view->getContextViewProxy() == nullptr)
   {
     return;
   }

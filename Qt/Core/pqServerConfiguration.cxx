@@ -162,11 +162,11 @@ pqServerConfiguration::StartupType pqServerConfiguration::startupType() const
 vtkPVXMLElement* pqServerConfiguration::optionsXML() const
 {
   vtkPVXMLElement* startup = this->startupXML();
-  if (startup != NULL)
+  if (startup != nullptr)
   {
     return startup->FindNestedElementByName("Options");
   }
-  return NULL;
+  return nullptr;
 }
 
 //-----------------------------------------------------------------------------
@@ -205,7 +205,7 @@ vtkPVXMLElement* pqServerConfiguration::startupXML() const
     }
     default:
     {
-      return NULL;
+      return nullptr;
       break;
     }
   }

@@ -100,7 +100,7 @@ public:
       AdiosGlobal::Parameters[method] = (parameters ? parameters : "");
 
       // Look for MPI controller if any
-      MPI_Comm* comm = NULL;
+      MPI_Comm* comm = nullptr;
       vtkMultiProcessController* ctrl = vtkMultiProcessController::GetGlobalController();
       vtkMPICommunicator* mpiComm = vtkMPICommunicator::SafeDownCast(ctrl->GetCommunicator());
       if (mpiComm && mpiComm->GetMPIComm())
@@ -143,7 +143,7 @@ public:
       // Do we need to finalize the method ?
       if (AdiosGlobal::InitializationCounter[method] == 0)
       {
-        AdiosGlobal::MPIController[method] = NULL;
+        AdiosGlobal::MPIController[method] = nullptr;
         adios_read_finalize_method(method);
       }
     }
@@ -265,7 +265,7 @@ class AdiosData
 {
 public:
   // Set of Constructors
-  AdiosData() { this->Initialize("Undefined", adios_unknown, NULL); }
+  AdiosData() { this->Initialize("Undefined", adios_unknown, nullptr); }
   AdiosData(const char* name, ADIOS_VARINFO* varInfo)
   {
     this->Initialize(name, varInfo->type, varInfo->value);
@@ -281,7 +281,7 @@ public:
     if (this->Data)
     {
       free(this->Data);
-      this->Data = NULL;
+      this->Data = nullptr;
     }
   }
 
@@ -325,7 +325,7 @@ void AdiosData::Initialize(const char* name, ADIOS_DATATYPES type, void* data)
 {
   this->Name = name;
   this->Type = type;
-  this->Data = NULL;
+  this->Data = nullptr;
   this->Size = 0;
   if (type != adios_unknown)
   {
@@ -373,7 +373,7 @@ public:
 
   // Description:
   // Return true if the stream is currently Open
-  bool IsOpen() const { return this->File != NULL; }
+  bool IsOpen() const { return this->File != nullptr; }
 
   // Description:
   // Open the stream and load the meta-data
@@ -399,7 +399,7 @@ public:
 
   // Description:
   // Create a vtkDataArray and schedule its data read if possible, otherwise
-  // return NULL;
+  // return nullptr;
   vtkDataArray* ReadDataArray(
     const std::string& key, const ADIOS_SELECTION* selection, vtkIdType resultSize);
 
@@ -436,10 +436,10 @@ AdiosStream::AdiosStream(const char* fileName, ADIOS_READ_METHOD method, const c
   this->Parameters = parameters;
   this->FileName = fileName;
   this->Method = method;
-  this->File = NULL;
+  this->File = nullptr;
   this->CurrentStep = -1;
   this->LastAvailableStep = -1;
-  this->ExtentTranslator = NULL;
+  this->ExtentTranslator = nullptr;
 }
 // ----------------------------------------------------------------------------
 AdiosStream::~AdiosStream()
@@ -447,7 +447,7 @@ AdiosStream::~AdiosStream()
   if (this->ExtentTranslator)
   {
     this->ExtentTranslator->Delete();
-    this->ExtentTranslator = NULL;
+    this->ExtentTranslator = nullptr;
   }
   this->Close();
 }
@@ -496,7 +496,7 @@ bool AdiosStream::Open()
     // stream has been gone before we tried to open
     cerr << "The stream has terminated before open: " << adios_errmsg() << endl;
   }
-  else if (this->File == NULL)
+  else if (this->File == nullptr)
   {
     // some other error happened
     cerr << "Error while trying to open the stream: " << adios_errmsg() << endl;
@@ -526,7 +526,7 @@ void AdiosStream::UpdateMetaData()
   {
     // Load meta-data
     ADIOS_VARINFO* varInfo = adios_inq_var_byid(this->File, varIdx);
-    if (varInfo == NULL)
+    if (varInfo == nullptr)
     {
       cerr << "Error opening variable " << this->File->var_namelist[varIdx] << " of bp file "
            << this->FileName.c_str() << ":" << endl
@@ -573,7 +573,7 @@ void AdiosStream::UpdateMetaData()
   for (int attrIdx = 0; attrIdx < this->File->nattrs; ++attrIdx)
   {
     int size = 0;
-    void* data = NULL;
+    void* data = nullptr;
     ADIOS_DATATYPES attributeType;
     const char* name = this->File->attr_namelist[attrIdx];
 
@@ -601,7 +601,7 @@ bool AdiosStream::Close()
   if (this->File)
   {
     success = (0 == adios_read_close(this->File));
-    this->File = NULL;
+    this->File = nullptr;
     AdiosGlobal::Finalize(this->Method);
   }
 
@@ -660,12 +660,12 @@ vtkDataArray* AdiosStream::ReadDataArray(
   AdiosVariableMapIterator iter = this->MetaData.find(key);
   if (iter == this->MetaData.end())
   {
-    return NULL;
+    return nullptr;
   }
   AdiosVariable var = iter->second;
 
   // Create data array based on its type
-  vtkDataArray* array = NULL;
+  vtkDataArray* array = nullptr;
   switch (var.GetType())
   {
     case adios_unsigned_byte:
@@ -710,7 +710,7 @@ vtkDataArray* AdiosStream::ReadDataArray(
     case adios_double_complex: // 16 bytes
     default:
       cerr << "ERROR: Invalid data type" << endl;
-      return NULL;
+      return nullptr;
       break;
   }
 
@@ -782,10 +782,10 @@ public:
     AdiosStream* adiosStreamFile, bool loadAllCompatibleFields)
   {
     // Find the dimension of the grid
-    vtkStructuredGrid* grid = NULL;
-    vtkDataArray* xCoord = NULL;
-    vtkDataArray* yCoord = NULL;
-    vtkDataArray* zCoord = NULL;
+    vtkStructuredGrid* grid = nullptr;
+    vtkDataArray* xCoord = nullptr;
+    vtkDataArray* yCoord = nullptr;
+    vtkDataArray* zCoord = nullptr;
     int wholeExtent[6] = { 0, 0, 0, 0, 0, 0 };
     int pieceExtent[6] = { 0, 0, 0, 0, 0, 0 };
     uint64_t gridSize[3] = { 0, 0, 0 };
@@ -793,8 +793,8 @@ public:
     uint64_t countCells[3] = { 0, 0, 0 };
     uint64_t countPoints[3] = { 0, 0, 0 };
     AdiosVariableMapIterator varIter;
-    ADIOS_SELECTION* selectionCells = NULL;
-    ADIOS_SELECTION* selectionPoints = NULL;
+    ADIOS_SELECTION* selectionCells = nullptr;
+    ADIOS_SELECTION* selectionPoints = nullptr;
 
     // Retrieve grid dimension
     std::string nodeVarName = "/nodes/Z"; // Use Z to overcome a bug
@@ -807,7 +807,7 @@ public:
     // Make sure a grid can be built
     if (gridSize[0] == 0 || gridSize[1] == 0 || gridSize[2] == 0)
     {
-      return NULL;
+      return nullptr;
     }
 
     // Update extent
@@ -851,9 +851,9 @@ public:
     zCoord = adiosStreamFile->ReadDataArray("/nodes/Z", selectionPoints, nbPoints);
 
     // Make sure a grid can still be built
-    if (xCoord == NULL || yCoord == NULL || zCoord == NULL)
+    if (xCoord == nullptr || yCoord == nullptr || zCoord == nullptr)
     {
-      return NULL;
+      return nullptr;
     }
 
     // Create data structure
@@ -938,7 +938,7 @@ public:
     AdiosStream* adiosStreamFile, bool loadAllCompatibleFields)
   {
     // Find the dimension of the grid
-    vtkImageData* grid = NULL;
+    vtkImageData* grid = nullptr;
     int wholeExtent[6] = { 0, 0, 0, 0, 0, 0 };
     int pieceExtent[6] = { 0, 0, 0, 0, 0, 0 };
     uint64_t gridSize[3] = { 0, 0, 0 };
@@ -946,8 +946,8 @@ public:
     uint64_t countCells[3] = { 0, 0, 0 };
     uint64_t countPoints[3] = { 0, 0, 0 };
     AdiosVariableMapIterator varIter;
-    ADIOS_SELECTION* selectionCells = NULL;
-    ADIOS_SELECTION* selectionPoints = NULL;
+    ADIOS_SELECTION* selectionCells = nullptr;
+    ADIOS_SELECTION* selectionPoints = nullptr;
 
     // Retrieve grid dimension
     std::string nodeVarName = "/cells/Z"; // Use Z to overcome a bug
@@ -960,7 +960,7 @@ public:
     // Make sure a grid can be built
     if (gridSize[0] == 0 || gridSize[1] == 0 || gridSize[2] == 0)
     {
-      return NULL;
+      return nullptr;
     }
 
     // Update extent

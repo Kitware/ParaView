@@ -109,7 +109,7 @@ pqPropertyWidget* pqStandardPropertyWidgetInterface::createWidgetForProperty(
   const char* custom_widget = smProperty->GetPanelWidget();
   if (!custom_widget)
   {
-    return NULL;
+    return nullptr;
   }
 
   std::string name = custom_widget;
@@ -211,7 +211,7 @@ pqPropertyWidget* pqStandardPropertyWidgetInterface::createWidgetForProperty(
   }
 
   // *** NOTE: When adding new types, please update the header documentation ***
-  return NULL;
+  return nullptr;
 }
 
 //-----------------------------------------------------------------------------
@@ -323,7 +323,7 @@ pqPropertyWidget* pqStandardPropertyWidgetInterface::createWidgetForPropertyGrou
   }
   // *** NOTE: When adding new types, please update the header documentation ***
 
-  return 0;
+  return nullptr;
 }
 
 //-----------------------------------------------------------------------------
@@ -365,7 +365,7 @@ pqPropertyWidgetDecorator* pqStandardPropertyWidgetInterface::createWidgetDecora
   }
 
   // *** NOTE: When adding new types, please update the header documentation ***
-  return NULL;
+  return nullptr;
 }
 
 //-----------------------------------------------------------------------------

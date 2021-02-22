@@ -111,13 +111,13 @@ public:
 
   /**
   * Returns a list of representations for this output port in the given view.
-  * If view == NULL, returns all representations of this port.
+  * If view == nullptr, returns all representations of this port.
   */
   QList<pqDataRepresentation*> getRepresentations(pqView* view) const;
 
   /**
   * Returns the first representation for this output port in the given view.
-  * If view is NULL, returns 0.
+  * If view is nullptr, returns 0.
   */
   pqDataRepresentation* getRepresentation(pqView* view) const;
 

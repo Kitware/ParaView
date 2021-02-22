@@ -56,7 +56,7 @@ pqPropertyManager::pqPropertyManager(QObject* p)
 pqPropertyManager::~pqPropertyManager()
 {
   delete this->Links;
-  this->Links = NULL;
+  this->Links = nullptr;
 }
 
 //-----------------------------------------------------------------------------

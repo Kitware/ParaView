@@ -56,7 +56,7 @@ class pqItemViewSearchWidget::PIMPL : public Ui::pqItemViewSearchWidget
 public:
   PIMPL(QWidget* parentW)
   {
-    this->BaseWidget = parentW ? qobject_cast<QAbstractItemView*>(parentW) : NULL;
+    this->BaseWidget = parentW ? qobject_cast<QAbstractItemView*>(parentW) : nullptr;
     ;
     this->RedPal.setColor(QPalette::Base, QColor(240, 128, 128));
     this->WhitePal.setColor(QPalette::Base, QColor(Qt::white));
@@ -106,7 +106,7 @@ pqItemViewSearchWidget::~pqItemViewSearchWidget()
 // -------------------------------------------------------------------------
 void pqItemViewSearchWidget::setBaseWidget(QWidget* widget)
 {
-  this->Private->BaseWidget = widget ? qobject_cast<QAbstractItemView*>(widget) : NULL;
+  this->Private->BaseWidget = widget ? qobject_cast<QAbstractItemView*>(widget) : nullptr;
   ;
 }
 

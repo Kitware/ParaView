@@ -145,7 +145,7 @@ const char* vtkLZ4Compressor::RestoreConfiguration(const char* stream)
     this->SetQuality(quality);
     return stream + iss.tellg();
   }
-  return 0;
+  return nullptr;
 }
 
 //----------------------------------------------------------------------------

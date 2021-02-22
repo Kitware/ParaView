@@ -134,7 +134,7 @@ vtkFieldData* vtkExtractHistogram::GetInputFieldData(vtkDataObject* input)
       return vtkTable::SafeDownCast(input)->GetRowData();
       break;
   }
-  return 0;
+  return nullptr;
 }
 
 //-----------------------------------------------------------------------------
@@ -289,7 +289,7 @@ void vtkExtractHistogram::BinAnArray(
 {
   // If the requested component is out-of-range for the input,
   // the bin_values will be 0, so no need to do any actual counting.
-  if (data_array == NULL || this->Component < 0 ||
+  if (data_array == nullptr || this->Component < 0 ||
     this->Component > data_array->GetNumberOfComponents())
   {
     return;

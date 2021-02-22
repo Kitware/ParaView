@@ -64,7 +64,8 @@ public:
   * If \c selector is specified, only those server-configurations that match the
   * selector's scheme and hostname are shown.
   */
-  pqServerConnectDialog(QWidget* parent = 0, const pqServerResource& selector = pqServerResource());
+  pqServerConnectDialog(
+    QWidget* parent = nullptr, const pqServerResource& selector = pqServerResource());
   ~pqServerConnectDialog() override;
 
   /**
@@ -81,7 +82,7 @@ public:
   * selected_configuration will be set to the chosen configuration.
   */
   static bool selectServer(pqServerConfiguration& selected_configuration,
-    QWidget* dialogParent = NULL, const pqServerResource& selector = pqServerResource());
+    QWidget* dialogParent = nullptr, const pqServerResource& selector = pqServerResource());
 
 Q_SIGNALS:
 

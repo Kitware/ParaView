@@ -582,7 +582,7 @@ VTK_CLIENT_SERVER_OPERATOR(double)
 //----------------------------------------------------------------------------
 vtkClientServerStream& vtkClientServerStream::operator<<(const char* x)
 {
-  // String length will include null terminator.  NULL string will be
+  // String length will include null terminator.  nullptr string will be
   // length 0.
   vtkTypeUInt32 length = static_cast<vtkTypeUInt32>(x ? (strlen(x) + 1) : 0);
   *this << vtkClientServerStream::string_value;
@@ -1166,8 +1166,8 @@ int vtkClientServerStream::GetArgument(int message, int argument, const char** v
       }
       else
       {
-        // String pointer value was NULL.
-        *value = 0;
+        // String pointer value was nullptr.
+        *value = nullptr;
       }
       return 1;
     }
@@ -1196,7 +1196,7 @@ int vtkClientServerStream::GetArgument(int message, int argument, vtkStdString* 
 //----------------------------------------------------------------------------
 int vtkClientServerStream::GetArgument(int message, int argument, std::string* value) const
 {
-  char* tmp = NULL;
+  char* tmp = nullptr;
   if (this->GetArgument(message, argument, &tmp) && tmp)
   {
     *value = tmp;
@@ -1256,7 +1256,7 @@ int vtkClientServerStream::GetArgument(int message, int argument, vtkClientServe
 }
 
 //----------------------------------------------------------------------------
-// Template to implement GetArgument zero-to-null-pointer conversions.
+// Template to implement GetArgument zero-to-nullptr-pointer conversions.
 template <class SourceType>
 int vtkClientServerStreamGetArgumentPointer(
   SourceType*, const unsigned char* src, vtkObjectBase** dest)
@@ -1265,10 +1265,10 @@ int vtkClientServerStreamGetArgumentPointer(
   SourceType value;
   memcpy(&value, src, sizeof(value));
 
-  // Values of 0 can be converted to a NULL pointer.
+  // Values of 0 can be converted to a nullptr pointer.
   if (value == static_cast<SourceType>(0))
   {
-    *dest = 0;
+    *dest = nullptr;
     return 1;
   }
   return 0;
@@ -1302,10 +1302,10 @@ int vtkClientServerStream::GetArgument(int message, int argument, vtkObjectBase*
         // Copy the value out of the stream.
         vtkClientServerID id;
         memcpy(&id.ID, data, sizeof(id.ID));
-        // ID value 0 can be converted to a NULL pointer.
+        // ID value 0 can be converted to a nullptr pointer.
         if (id.ID == 0)
         {
-          *value = 0;
+          *value = nullptr;
           return 1;
         }
         return 0;
@@ -1494,7 +1494,7 @@ int vtkClientServerStream::GetData(const unsigned char** data, size_t* length) c
   {
     if (data)
     {
-      *data = 0;
+      *data = nullptr;
     }
 
     if (length)
@@ -1632,7 +1632,7 @@ int vtkClientServerStream::ParseData()
         // An object pointer cannot be safely transferred in a buffer.
         case vtkClientServerStream::vtk_object_pointer:
         default: /* ERROR */
-          data = 0;
+          data = nullptr;
           break;
       }
     }
@@ -1650,7 +1650,7 @@ unsigned char* vtkClientServerStream::ParseCommand(
   if (data > end - sizeof(vtkTypeUInt32))
   {
     /* ERROR */
-    return 0;
+    return nullptr;
   }
   this->PerformByteSwap(order, data, 1, sizeof(vtkTypeUInt32));
 
@@ -1680,7 +1680,7 @@ unsigned char* vtkClientServerStream::ParseType(int order, unsigned char* data,
   if (data > end - sizeof(tp))
   {
     /* ERROR */
-    return 0;
+    return nullptr;
   }
   this->PerformByteSwap(order, data, 1, sizeof(tp));
   memcpy(&tp, data, sizeof(tp));
@@ -1701,7 +1701,7 @@ unsigned char* vtkClientServerStream::ParseValue(
   if (data > end - wordSize)
   {
     /* ERROR */
-    return 0;
+    return nullptr;
   }
   this->PerformByteSwap(order, data, 1, wordSize);
 
@@ -1718,7 +1718,7 @@ unsigned char* vtkClientServerStream::ParseArray(
   if (data > end - sizeof(length))
   {
     /* ERROR */
-    return 0;
+    return nullptr;
   }
   this->PerformByteSwap(order, data, 1, sizeof(length));
   memcpy(&length, data, sizeof(length));
@@ -1731,7 +1731,7 @@ unsigned char* vtkClientServerStream::ParseArray(
   if (data > end - size)
   {
     /* ERROR */
-    return 0;
+    return nullptr;
   }
   this->PerformByteSwap(order, data, length, wordSize);
 
@@ -1748,7 +1748,7 @@ unsigned char* vtkClientServerStream::ParseString(
   if (data > end - sizeof(length))
   {
     /* ERROR */
-    return 0;
+    return nullptr;
   }
   this->PerformByteSwap(order, data, 1, sizeof(length));
   memcpy(&length, data, sizeof(length));
@@ -1758,7 +1758,7 @@ unsigned char* vtkClientServerStream::ParseString(
   if (data > end - length)
   {
     /* ERROR */
-    return 0;
+    return nullptr;
   }
 
   // Return the position after the string.
@@ -1872,7 +1872,7 @@ const unsigned char* vtkClientServerStream::GetValue(int message, int value) con
   }
   else
   {
-    return 0;
+    return nullptr;
   }
 }
 
@@ -1895,7 +1895,7 @@ size_t vtkClientServerStreamArraySize(const unsigned char* data, T*)
 vtkClientServerStream::Argument vtkClientServerStream::GetArgument(int message, int argument) const
 {
   // Prepare a return value.
-  vtkClientServerStream::Argument result = { 0, 0 };
+  vtkClientServerStream::Argument result = { nullptr, 0 };
 
   // Get a pointer to the type/value pair in the stream.
   if (const unsigned char* data = this->GetValue(message, 1 + argument))
@@ -1922,7 +1922,7 @@ vtkClientServerStream::Argument vtkClientServerStream::GetArgument(int message, 
       case vtkClientServerStream::string_value:
       {
         // A string is represented as an array of 1 byte values.
-        vtkTypeUInt8* T = 0;
+        vtkTypeUInt8* T = nullptr;
         result.Size = sizeof(tp) + vtkClientServerStreamArraySize(data, T);
       }
       break;
@@ -1934,7 +1934,7 @@ vtkClientServerStream::Argument vtkClientServerStream::GetArgument(int message, 
       case vtkClientServerStream::stream_value:
       {
         // A stream is represented as an array of 1 byte values.
-        vtkTypeUInt8* T = 0;
+        vtkTypeUInt8* T = nullptr;
         result.Size = sizeof(tp) + vtkClientServerStreamArraySize(data, T);
       }
       break;
@@ -1945,7 +1945,7 @@ vtkClientServerStream::Argument vtkClientServerStream::GetArgument(int message, 
       break;
       case vtkClientServerStream::End:
       default:
-        result.Data = 0;
+        result.Data = nullptr;
         break;
     }
   }
@@ -2003,20 +2003,22 @@ vtkClientServerStream::Types vtkClientServerStream::GetArgumentType(int message,
 //----------------------------------------------------------------------------
 // Map from the vtkClientServerStream::Types enumeration to strings.
 // This must be kept in-sync with the enumeration.
-static const char* const vtkClientServerStreamTypeNames[][4] = { { "int8_value", "int8", "i8", 0 },
-  { "int8_array", "int8a", "i8a", 0 }, { "int16_value", "int16", "i16", 0 },
-  { "int16_array", "int16a", "i16a", 0 }, { "int32_value", "int32", "i32", 0 },
-  { "int32_array", "int32a", "i32a", 0 }, { "int64_value", "int64", "i64", 0 },
-  { "int64_array", "int64a", "i64a", 0 }, { "uint8_value", "uint8", "u8", 0 },
-  { "uint8_array", "uint8a", "u8a", 0 }, { "uint16_value", "uint16", "u16", 0 },
-  { "uint16_array", "uint16a", "u16a", 0 }, { "uint32_value", "uint32", "u32", 0 },
-  { "uint32_array", "uint32a", "u32a", 0 }, { "uint64_value", "uint64", "u64", 0 },
-  { "uint64_array", "uint64a", "u64a", 0 }, { "float32_value", "float32", "f32", 0 },
-  { "float32_array", "float32a", "f32a", 0 }, { "float64_value", "float64", "f64", 0 },
-  { "float64_array", "float64a", "f64a", 0 }, { "bool_value", "bool", "bool", 0 },
-  { "string_value", "string", "str", 0 }, { "id_value", "id", 0, 0 },
-  { "vtk_object_pointer", "obj", 0, 0 }, { "stream_value", "stream", 0, 0 },
-  { "LastResult", "result", 0, 0 }, { "End", 0, 0, 0 }, { 0, 0, 0, 0 } };
+static const char* const vtkClientServerStreamTypeNames[][4] = {
+  { "int8_value", "int8", "i8", nullptr }, { "int8_array", "int8a", "i8a", nullptr },
+  { "int16_value", "int16", "i16", nullptr }, { "int16_array", "int16a", "i16a", nullptr },
+  { "int32_value", "int32", "i32", nullptr }, { "int32_array", "int32a", "i32a", nullptr },
+  { "int64_value", "int64", "i64", nullptr }, { "int64_array", "int64a", "i64a", nullptr },
+  { "uint8_value", "uint8", "u8", nullptr }, { "uint8_array", "uint8a", "u8a", nullptr },
+  { "uint16_value", "uint16", "u16", nullptr }, { "uint16_array", "uint16a", "u16a", nullptr },
+  { "uint32_value", "uint32", "u32", nullptr }, { "uint32_array", "uint32a", "u32a", nullptr },
+  { "uint64_value", "uint64", "u64", nullptr }, { "uint64_array", "uint64a", "u64a", nullptr },
+  { "float32_value", "float32", "f32", nullptr }, { "float32_array", "float32a", "f32a", nullptr },
+  { "float64_value", "float64", "f64", nullptr }, { "float64_array", "float64a", "f64a", nullptr },
+  { "bool_value", "bool", "bool", nullptr }, { "string_value", "string", "str", nullptr },
+  { "id_value", "id", nullptr, nullptr }, { "vtk_object_pointer", "obj", nullptr, nullptr },
+  { "stream_value", "stream", nullptr, nullptr }, { "LastResult", "result", nullptr, nullptr },
+  { "End", nullptr, nullptr, nullptr }, { nullptr, nullptr, nullptr, nullptr }
+};
 
 //----------------------------------------------------------------------------
 const char* vtkClientServerStream::GetStringFromType(vtkClientServerStream::Types type)
@@ -2058,7 +2060,7 @@ const char* vtkClientServerStream::GetStringFromType(vtkClientServerStream::Type
 //----------------------------------------------------------------------------
 vtkClientServerStream::Types vtkClientServerStream::GetTypeFromString(const char* name)
 {
-  return vtkClientServerStream::GetTypeFromString(name, 0);
+  return vtkClientServerStream::GetTypeFromString(name, nullptr);
 }
 
 //----------------------------------------------------------------------------
@@ -2089,7 +2091,7 @@ vtkClientServerStream::Types vtkClientServerStream::GetTypeFromString(
 // Map from the vtkClientServerStream::Commands enumeration to strings.
 // This must be kept in-sync with the enumeration.
 static const char* const vtkClientServerStreamCommandNames[] = { "New", "Invoke", "Delete",
-  "Assign", "Reply", "Error", "EndOfCommands", 0 };
+  "Assign", "Reply", "Error", "EndOfCommands", nullptr };
 
 //----------------------------------------------------------------------------
 const char* vtkClientServerStream::GetStringFromCommand(vtkClientServerStream::Commands cmd)
@@ -2108,7 +2110,7 @@ const char* vtkClientServerStream::GetStringFromCommand(vtkClientServerStream::C
 //----------------------------------------------------------------------------
 vtkClientServerStream::Commands vtkClientServerStream::GetCommandFromString(const char* name)
 {
-  return vtkClientServerStream::GetCommandFromString(name, 0);
+  return vtkClientServerStream::GetCommandFromString(name, nullptr);
 }
 
 //----------------------------------------------------------------------------
@@ -2290,7 +2292,7 @@ void vtkClientServerStream::PrintArgumentInternal(
     break;
     case vtkClientServerStream::string_value:
     {
-      const char* arg = NULL;
+      const char* arg = nullptr;
       this->GetArgument(message, argument, &arg);
       if (annotate)
       {
@@ -2447,10 +2449,10 @@ void vtkClientServerStream::ArgumentToString(ostream& os, int m, int a, vtkInden
 {
   vtkClientServerStream::Types type = this->GetArgumentType(m, a);
 
-  // Special case for strings: string0 == null, string() == ""
+  // Special case for strings: string0 == nullptr, string() == ""
   if (type == vtkClientServerStream::string_value)
   {
-    const char* arg = NULL;
+    const char* arg = nullptr;
     this->GetArgument(m, a, &arg);
     if (!arg)
     {
@@ -2494,7 +2496,7 @@ void vtkClientServerStream::ArgumentValueToString(ostream& os, int m, int a, vtk
     break;
     case vtkClientServerStream::string_value:
     {
-      const char* arg = NULL;
+      const char* arg = nullptr;
       this->GetArgument(m, a, &arg);
       if (arg)
       {
@@ -2942,12 +2944,12 @@ int vtkClientServerStream::AddArgumentFromString(
     // Report where to continue scanning.
     *next = typeEnd;
 
-    // Special case for strings: string0 == null
+    // Special case for strings: string0 == nullptr
     if ((strncmp(typeBegin, "string0", typeEnd - typeBegin) == 0) ||
       (strncmp(typeBegin, "str0", typeEnd - typeBegin) == 0))
     {
-      // Insert the null string.
-      *this << static_cast<char*>(0);
+      // Insert the nullptr string.
+      *this << static_cast<char*>(nullptr);
       return 1;
     }
 

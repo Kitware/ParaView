@@ -85,7 +85,7 @@ void vtkVRResetTransformStyle::PrintSelf(ostream& os, vtkIndent indent)
 //
 vtkCamera* vtkVRResetTransformStyle::GetCamera()
 {
-  vtkCamera* camera = NULL;
+  vtkCamera* camera = nullptr;
   pqActiveObjects& activeObjs = pqActiveObjects::instance();
 
   /* Alert!  The following conditional uses a lazy assignment/evaluation -- the "=" is not a bug
@@ -120,7 +120,7 @@ void vtkVRResetTransformStyle::HandleButton(const vtkVREvent& event)
 
   if (role == "Navigate world")
   {
-    vtkCamera* camera = NULL;
+    vtkCamera* camera = nullptr;
     this->EnableNavigate = event.data.button.state;
     if (!this->EnableNavigate)
     {
@@ -140,7 +140,7 @@ void vtkVRResetTransformStyle::HandleButton(const vtkVREvent& event)
 // HandleTracker() method
 void vtkVRResetTransformStyle::HandleTracker(const vtkVREvent& event)
 {
-  vtkCamera* camera = NULL;
+  vtkCamera* camera = nullptr;
   std::string role = this->GetTrackerRole(event.name);
 
   if (role != "Tracker")

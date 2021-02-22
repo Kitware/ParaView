@@ -46,16 +46,16 @@ vtkCxxSetObjectMacro(vtkArrowGlyphFilter, ArrowSourceObject, vtkArrowSource);
 vtkArrowGlyphFilter::vtkArrowGlyphFilter()
 {
   this->ScaleByOrientationVectorMagnitude = 1;
-  this->OrientationVectorArray = NULL;
+  this->OrientationVectorArray = nullptr;
   //
   this->ScaleFactor = 1.0;
-  this->ScaleArray = NULL;
+  this->ScaleArray = nullptr;
   //
   this->ShaftRadiusFactor = 1.0;
-  this->ShaftRadiusArray = NULL;
+  this->ShaftRadiusArray = nullptr;
   //
   this->TipRadiusFactor = 1.0;
-  this->TipRadiusArray = NULL;
+  this->TipRadiusArray = nullptr;
   //
   this->MaskPoints = vtkMaskPoints::New();
   this->RandomMode = this->MaskPoints->GetRandomMode();
@@ -66,7 +66,7 @@ vtkArrowGlyphFilter::vtkArrowGlyphFilter()
   //
   this->SetNumberOfInputPorts(1);
   //
-  this->ArrowSourceObject = NULL; // vtkSmartPointer<vtkArrowSource>::New();
+  this->ArrowSourceObject = nullptr; // vtkSmartPointer<vtkArrowSource>::New();
 }
 
 //----------------------------------------------------------------------------
@@ -92,7 +92,7 @@ vtkArrowGlyphFilter::~vtkArrowGlyphFilter()
   {
     this->MaskPoints->Delete();
   }
-  this->SetArrowSourceObject(NULL);
+  this->SetArrowSourceObject(nullptr);
 }
 
 //----------------------------------------------------------------------------
@@ -100,7 +100,7 @@ vtkMTimeType vtkArrowGlyphFilter::GetMTime()
 {
   vtkMTimeType mTime = this->Superclass::GetMTime();
   vtkMTimeType time;
-  if (this->ArrowSourceObject != NULL)
+  if (this->ArrowSourceObject != nullptr)
   {
     time = this->ArrowSourceObject->GetMTime();
     mTime = (time > mTime ? time : mTime);
@@ -309,13 +309,13 @@ int vtkArrowGlyphFilter::MaskAndExecute(vtkIdType numPts, vtkIdType maxNumPts, v
   //
   vtkDataArray* orientdata = this->OrientationVectorArray
     ? minput->GetPointData()->GetArray(this->OrientationVectorArray)
-    : NULL;
+    : nullptr;
   vtkDataArray* scaledata =
-    this->ScaleArray ? minput->GetPointData()->GetArray(this->ScaleArray) : NULL;
+    this->ScaleArray ? minput->GetPointData()->GetArray(this->ScaleArray) : nullptr;
   vtkDataArray* shaftradiusdata =
-    this->ShaftRadiusArray ? minput->GetPointData()->GetArray(this->ShaftRadiusArray) : NULL;
+    this->ShaftRadiusArray ? minput->GetPointData()->GetArray(this->ShaftRadiusArray) : nullptr;
   vtkDataArray* tipradiusdata =
-    this->TipRadiusArray ? minput->GetPointData()->GetArray(this->TipRadiusArray) : NULL;
+    this->TipRadiusArray ? minput->GetPointData()->GetArray(this->TipRadiusArray) : nullptr;
   bool orientMagnitude = false;
   bool shaftradiusMagnitude = false;
   bool tipradiusMagnitude = false;
@@ -366,7 +366,7 @@ int vtkArrowGlyphFilter::MaskAndExecute(vtkIdType numPts, vtkIdType maxNumPts, v
     double tradius = 1.0;
     double scale = 1.0;
     double vMag = 0.0;
-    double* orientvector = NULL;
+    double* orientvector = nullptr;
 
     // update progress bar
     if (!(i % 10000))

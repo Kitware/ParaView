@@ -76,7 +76,7 @@ public:
   }
 
   /**
-   * partition ordering that gives processes ordering. Initial value is a NULL pointer.
+   * partition ordering that gives processes ordering. Initial value is a nullptr pointer.
    * This is used only when UseOrderedCompositing is true.
    */
   void SetOrderedCompositingHelper(vtkOrderedCompositingHelper* helper)

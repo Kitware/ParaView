@@ -121,15 +121,15 @@ vtkStandardNewMacro(vtkCPTestPipeline);
 namespace
 {
 // Internal helpers used by the Adaptor itself
-vtkCPProcessor* Processor = NULL;
-vtkImageData* VTKVolume = NULL;
-vtkUnstructuredGrid* VTKPoints = NULL;
+vtkCPProcessor* Processor = nullptr;
+vtkImageData* VTKVolume = nullptr;
+vtkUnstructuredGrid* VTKPoints = nullptr;
 
 void BuildVTKVolume(Grid& grid)
 {
   // The grid topological structure doesn't change so we just build
   // the first time it's needed.
-  if (VTKVolume == NULL)
+  if (VTKVolume == nullptr)
   {
     VTKVolume = vtkImageData::New();
     int extent[6];
@@ -246,7 +246,7 @@ void Initialize(int argc, char* argv[])
     vtkObjectBase::SetMemkindDirectory(home.c_str());
   }
 
-  if (Processor == NULL)
+  if (Processor == nullptr)
   {
     Processor = vtkCPProcessor::New();
     // KEY POINT:
@@ -340,17 +340,17 @@ void Finalize()
   if (Processor)
   {
     Processor->Delete();
-    Processor = NULL;
+    Processor = nullptr;
   }
   if (VTKVolume)
   {
     VTKVolume->Delete();
-    VTKVolume = NULL;
+    VTKVolume = nullptr;
   }
   if (VTKPoints)
   {
     VTKPoints->Delete();
-    VTKPoints = NULL;
+    VTKPoints = nullptr;
   }
 }
 

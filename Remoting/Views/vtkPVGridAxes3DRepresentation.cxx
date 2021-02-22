@@ -189,7 +189,7 @@ int vtkPVGridAxes3DRepresentation::ProcessViewRequest(
 //------------------------------------------------------------------------------
 vtkPVGridAxes3DRepresentation::vtkPVGridAxes3DRepresentation()
   : GridAxesVisibility(false)
-  , GridAxes(NULL)
+  , GridAxes(nullptr)
 {
   std::fill(this->Position, this->Position + 3, 0.);
   std::fill(this->Scale, this->Scale + 3, 1.);
@@ -198,7 +198,7 @@ vtkPVGridAxes3DRepresentation::vtkPVGridAxes3DRepresentation()
 //------------------------------------------------------------------------------
 vtkPVGridAxes3DRepresentation::~vtkPVGridAxes3DRepresentation()
 {
-  this->SetGridAxes(NULL);
+  this->SetGridAxes(nullptr);
 }
 
 //------------------------------------------------------------------------------

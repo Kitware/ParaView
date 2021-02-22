@@ -228,7 +228,7 @@ void pqApplyBehavior::applied(pqPropertiesPanel*)
       if (vtkSMPVRepresentationProxy::SafeDownCast(reprProxy) &&
         vtkSMPVRepresentationProxy::GetUsingScalarColoring(reprProxy) == false &&
         reprProxy->GetRepresentedDataInformation()->GetArrayInformation(
-          "vtkBlockColors", vtkDataObject::FIELD) != NULL &&
+          "vtkBlockColors", vtkDataObject::FIELD) != nullptr &&
         reprProxy->GetRepresentedDataInformation()->GetNumberOfBlockLeafs(false) > 1)
       {
         vtkSMPVRepresentationProxy::SetScalarColoring(
@@ -274,7 +274,7 @@ void pqApplyBehavior::showData(pqPipelineSource* source, pqView* view)
   vtkNew<vtkSMParaViewPipelineControllerWithRendering> controller;
   pqServerManagerModel* smmodel = pqApplicationCore::instance()->getServerManagerModel();
 
-  vtkSMViewProxy* currentViewProxy = view ? view->getViewProxy() : NULL;
+  vtkSMViewProxy* currentViewProxy = view ? view->getViewProxy() : nullptr;
 
   const auto& activeObjects = pqActiveObjects::instance();
   auto activeLayout = activeObjects.activeLayout();

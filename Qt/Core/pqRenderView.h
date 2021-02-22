@@ -57,11 +57,11 @@ public:
   // \c server:- server on which the proxy is created.
   // \c parent:- QObject parent.
   pqRenderView(const QString& group, const QString& name, vtkSMViewProxy* renModule,
-    pqServer* server, QObject* parent = NULL);
+    pqServer* server, QObject* parent = nullptr);
 
   // This version allows subclasses to substitute their own renderViewType.
   pqRenderView(const QString& tname, const QString& group, const QString& name,
-    vtkSMViewProxy* renModule, pqServer* server, QObject* parent = NULL);
+    vtkSMViewProxy* renModule, pqServer* server, QObject* parent = nullptr);
 
   // Destructor.
   ~pqRenderView() override;

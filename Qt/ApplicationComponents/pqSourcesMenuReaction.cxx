@@ -65,7 +65,7 @@ void pqSourcesMenuReaction::updateEnableState()
 {
   pqActiveObjects* activeObjects = &pqActiveObjects::instance();
   this->updateEnableState(
-    activeObjects->activeServer() != NULL && activeObjects->activeServer()->isMaster());
+    activeObjects->activeServer() != nullptr && activeObjects->activeServer()->isMaster());
 }
 //-----------------------------------------------------------------------------
 void pqSourcesMenuReaction::updateEnableState(bool enabled)

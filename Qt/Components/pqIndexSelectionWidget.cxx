@@ -79,10 +79,10 @@ const char keyPropertyName[] = "IndexSelectionKey";
 struct Widgets
 {
   Widgets()
-    : layout(NULL)
-    , label(NULL)
-    , slider(NULL)
-    , edit(NULL)
+    : layout(nullptr)
+    , label(nullptr)
+    , slider(nullptr)
+    , edit(nullptr)
   {
   }
   Widgets(pqIndexSelectionWidget* parent, const QString& key, int current, int size);
@@ -139,7 +139,7 @@ Widgets::~Widgets()
   if (this->layout)
   {
     this->layout->deleteLater();
-    this->layout = NULL;
+    this->layout = nullptr;
   }
 }
 
@@ -205,10 +205,10 @@ public:
       QVariant keyVar = obj->property(keyPropertyName);
       if (keyVar.isValid())
       {
-        return this->widgetMap.value(keyVar.toString(), NULL);
+        return this->widgetMap.value(keyVar.toString(), nullptr);
       }
     }
-    return NULL;
+    return nullptr;
   }
 
   WidgetMap widgetMap;
@@ -267,7 +267,7 @@ pqIndexSelectionWidget::pqIndexSelectionWidget(
 pqIndexSelectionWidget::~pqIndexSelectionWidget()
 {
   delete this->Internals;
-  this->Internals = 0;
+  this->Internals = nullptr;
 }
 
 //------------------------------------------------------------------------------
@@ -366,7 +366,7 @@ void pqIndexSelectionWidget::propertyChanged()
       continue;
     }
 
-    Widgets* w = this->Internals->widgetMap.value(key, NULL);
+    Widgets* w = this->Internals->widgetMap.value(key, nullptr);
     if (!w)
     {
       qWarning() << Q_FUNC_INFO << "No widgets found for key" << key;

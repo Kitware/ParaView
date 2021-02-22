@@ -25,13 +25,13 @@ vtkStandardNewMacro(vtkPVEnvironmentInformation);
 vtkPVEnvironmentInformation::vtkPVEnvironmentInformation()
 {
   this->RootOnly = 1;
-  this->Variable = NULL;
+  this->Variable = nullptr;
 }
 
 //-----------------------------------------------------------------------------
 vtkPVEnvironmentInformation::~vtkPVEnvironmentInformation()
 {
-  this->SetVariable(NULL);
+  this->SetVariable(nullptr);
 }
 
 //-----------------------------------------------------------------------------
@@ -57,7 +57,7 @@ void vtkPVEnvironmentInformation::CopyToStream(vtkClientServerStream* stream)
 //-----------------------------------------------------------------------------
 void vtkPVEnvironmentInformation::CopyFromStream(const vtkClientServerStream* css)
 {
-  const char* temp = 0;
+  const char* temp = nullptr;
   if (!css->GetArgument(0, 0, &temp))
   {
     vtkErrorMacro("Error parsing Variable.");

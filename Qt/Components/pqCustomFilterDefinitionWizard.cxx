@@ -82,7 +82,7 @@ pqCustomFilterDefinitionWizard::pqCustomFilterDefinitionWizard(
 {
   this->CurrentPage = 0;
   this->OverwriteOK = false;
-  this->Filter = 0;
+  this->Filter = nullptr;
   this->Model = model;
   this->Form = new pqCustomFilterDefinitionWizardForm();
   this->Form->setupUi(this);
@@ -192,13 +192,13 @@ QString pqCustomFilterDefinitionWizard::getCustomFilterName() const
 //-----------------------------------------------------------------------------
 void pqCustomFilterDefinitionWizard::createCustomFilter()
 {
-  if (this->Filter != 0 || this->Form->CustomFilterName->text().isEmpty())
+  if (this->Filter != nullptr || this->Form->CustomFilterName->text().isEmpty())
   {
     return;
   }
 
   // Create the compound proxy. Add all the proxies to it.
-  pqPipelineSource* source = 0;
+  pqPipelineSource* source = nullptr;
   this->Filter = vtkSMCompoundSourceProxy::New();
   bool first = true;
   QModelIndex index = this->Model->getNextIndex(QModelIndex());
@@ -221,7 +221,7 @@ void pqCustomFilterDefinitionWizard::createCustomFilter()
 
   // Expose the input properties.
   int i = 0;
-  QTreeWidgetItem* item = 0;
+  QTreeWidgetItem* item = nullptr;
   int numInputs = this->Form->InputPorts->topLevelItemCount();
   for (; i < numInputs; i++)
   {
@@ -258,7 +258,7 @@ void pqCustomFilterDefinitionWizard::createCustomFilter()
   this->addAutoIncludedProxies();
 
   // Register the compound proxy definition with the server manager.
-  vtkPVXMLElement* root = this->Filter->SaveDefinition(0);
+  vtkPVXMLElement* root = this->Filter->SaveDefinition(nullptr);
   vtkSMSessionProxyManager* proxyManager = source->proxyManager();
   if (numInputs > 0)
   {
@@ -299,7 +299,7 @@ void pqCustomFilterDefinitionWizard::addAutoIncludedProxies()
       for (unsigned int i = 0; i < proxy_count; i++)
       {
         vtkSMProxy* proxy = pp->GetProxy(i);
-        if (!proxy || pxm->GetProxyName("sources", proxy) != NULL)
+        if (!proxy || pxm->GetProxyName("sources", proxy) != nullptr)
         {
           continue;
         }
@@ -361,7 +361,7 @@ void pqCustomFilterDefinitionWizard::setupDefaultInputOutput()
       if (proxy)
       {
         QStringList inputNames;
-        vtkSMInputProperty* input = 0;
+        vtkSMInputProperty* input = nullptr;
         vtkSMPropertyIterator* iter = proxy->NewPropertyIterator();
         for (iter->Begin(); !iter->IsAtEnd(); iter->Next())
         {
@@ -497,7 +497,7 @@ void pqCustomFilterDefinitionWizard::updateInputForm(const QModelIndex& current,
     vtkSMProxy* proxy = source->getProxy();
     if (proxy)
     {
-      vtkSMInputProperty* input = 0;
+      vtkSMInputProperty* input = nullptr;
       vtkSMPropertyIterator* iter = proxy->NewPropertyIterator();
       for (iter->Begin(); !iter->IsAtEnd(); iter->Next())
       {
@@ -563,7 +563,7 @@ void pqCustomFilterDefinitionWizard::updatePropertyForm(
     vtkSMProxy* proxy = source->getProxy();
     if (proxy)
     {
-      vtkSMInputProperty* input = 0;
+      vtkSMInputProperty* input = nullptr;
       vtkSMPropertyIterator* iter = proxy->NewPropertyIterator();
       for (iter->Begin(); !iter->IsAtEnd(); iter->Next())
       {

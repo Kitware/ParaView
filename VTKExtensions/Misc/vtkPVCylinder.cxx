@@ -100,6 +100,6 @@ void vtkPVCylinder::UpdateTransform()
   }
   else
   {
-    this->SetTransform(static_cast<vtkAbstractTransform*>(NULL));
+    this->SetTransform(static_cast<vtkAbstractTransform*>(nullptr));
   }
 }

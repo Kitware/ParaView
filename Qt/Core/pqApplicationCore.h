@@ -245,20 +245,20 @@ public:
   * Loads the ServerManager state. Emits the signal
   * stateLoaded() on loading state successfully.
   */
-  void loadState(vtkPVXMLElement* root, pqServer* server, vtkSMStateLoader* loader = NULL);
+  void loadState(vtkPVXMLElement* root, pqServer* server, vtkSMStateLoader* loader = nullptr);
 
   /**
   * Load state xml from a file. The filename can be a Qt resource file,
   * besides regular filesystem files (refer to QFile documentation for more
   * information on Qt resource system).
   */
-  void loadState(const char* filename, pqServer* server, vtkSMStateLoader* loader = NULL);
+  void loadState(const char* filename, pqServer* server, vtkSMStateLoader* loader = nullptr);
 
   /**
   * Loads state from an in-memory buffer.
   */
   void loadStateFromString(
-    const char* xmlcontents, pqServer* server, vtkSMStateLoader* loader = NULL);
+    const char* xmlcontents, pqServer* server, vtkSMStateLoader* loader = nullptr);
 
   void clearViewsForLoadingState(pqServer* server);
 
@@ -267,9 +267,9 @@ public:
   * state.
   */
   void loadStateIncremental(
-    vtkPVXMLElement* root, pqServer* server, vtkSMStateLoader* loader = NULL);
+    vtkPVXMLElement* root, pqServer* server, vtkSMStateLoader* loader = nullptr);
   void loadStateIncremental(
-    const QString& filename, pqServer* server, vtkSMStateLoader* loader = NULL);
+    const QString& filename, pqServer* server, vtkSMStateLoader* loader = nullptr);
 
   /**
   * Set the loading state flag

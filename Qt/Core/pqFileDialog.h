@@ -54,7 +54,7 @@ class QShowEvent;
   the files the user selected:
 
   /code
-  pqFileDialog* dialog = new pqFileDialog(NULL, this);
+  pqFileDialog* dialog = new pqFileDialog(nullptr, this);
   dialog->setAttribute(Qt::WA_DeleteOnClose);
 
   QObject::connect(
@@ -71,7 +71,7 @@ class QShowEvent;
   getSelectedFiles() method:
 
   /code
-  pqFileDialog dialog(NULL, this);
+  pqFileDialog dialog(nullptr, this);
   if(Qt::Accepted == dialog.exec())
     {
     //each string list holds a list of files that represent a file-series
@@ -117,7 +117,7 @@ public:
 
   /**
   * Creates a file dialog with the specified server
-  * if the server is NULL, files are browsed locally
+  * if the server is nullptr, files are browsed locally
   * the title, and start directory may be specified
   * the filter is a string of semi-colon separated filters
   */

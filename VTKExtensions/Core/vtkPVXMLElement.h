@@ -58,9 +58,9 @@ public:
 
   /**
    * Get the attribute with the given name.  If it doesn't exist,
-   * returns NULL.
+   * returns nullptr.
    */
-  const char* GetAttribute(const char* name) { return this->GetAttributeOrDefault(name, NULL); }
+  const char* GetAttribute(const char* name) { return this->GetAttributeOrDefault(name, nullptr); }
 
   /**
    * Get the attribute with the given name.  If it doesn't exist,

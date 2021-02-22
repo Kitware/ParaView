@@ -113,7 +113,7 @@ public:
    * Initializes the link. For in situ this returns true it there is a
    * connection and false otherwise. For live it always returns true.
    */
-  bool Initialize() { return this->Initialize(NULL); }
+  bool Initialize() { return this->Initialize(nullptr); }
   bool Initialize(vtkSMSessionProxyManager*);
 
   // **************************************************************************

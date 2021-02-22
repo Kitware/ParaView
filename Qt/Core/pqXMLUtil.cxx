@@ -41,7 +41,7 @@ vtkPVXMLElement* pqXMLUtil::FindNestedElementByName(vtkPVXMLElement* element, co
   if (element && name)
   {
     QString qname = name;
-    vtkPVXMLElement* child = 0;
+    vtkPVXMLElement* child = nullptr;
     unsigned int total = element->GetNumberOfNestedElements();
     for (unsigned int i = 0; i < total; i++)
     {
@@ -53,7 +53,7 @@ vtkPVXMLElement* pqXMLUtil::FindNestedElementByName(vtkPVXMLElement* element, co
     }
   }
 
-  return 0;
+  return nullptr;
 }
 
 QString pqXMLUtil::GetStringFromIntList(const QList<int>& list)

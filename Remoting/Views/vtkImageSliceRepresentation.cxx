@@ -49,7 +49,7 @@ vtkImageSliceRepresentation::vtkImageSliceRepresentation()
 //----------------------------------------------------------------------------
 vtkImageSliceRepresentation::~vtkImageSliceRepresentation()
 {
-  this->SliceMapper->SetInputData(0);
+  this->SliceMapper->SetInputData(nullptr);
   this->SliceMapper->Delete();
   this->Actor->Delete();
 }

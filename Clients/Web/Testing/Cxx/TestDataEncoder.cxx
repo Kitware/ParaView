@@ -24,10 +24,10 @@ int TestDataEncoder(int argc, char* argv[])
   // encode/compress them and then verify that they are indeed the same.
   const char* filenames[] = { "/Clients/Web/Testing/Data/Baseline/Clip.png",
     "/Clients/Web/Testing/Data/Baseline/EnSight.png",
-    "/Clients/Web/Testing/Data/Baseline/ExtractBlock.png", NULL };
+    "/Clients/Web/Testing/Data/Baseline/ExtractBlock.png", nullptr };
 
   std::vector<vtkSmartPointer<vtkImageData> > images;
-  for (int cc = 0; filenames[cc] != NULL; cc++)
+  for (int cc = 0; filenames[cc] != nullptr; cc++)
   {
     vtkNew<vtkPNGReader> reader;
     std::string filename(dataroot);
@@ -42,8 +42,8 @@ int TestDataEncoder(int argc, char* argv[])
   for (size_t cc = 0; cc < images.size(); cc++)
   {
     vtkImageData* img = images[cc].GetPointer();
-    img->Register(NULL);
-    images[cc] = NULL;
+    img->Register(nullptr);
+    images[cc] = nullptr;
     encoder->PushAndTakeReference(cc % 3, img, 100);
     vtksys::SystemTools::Delay(10); // 0.2s
   }

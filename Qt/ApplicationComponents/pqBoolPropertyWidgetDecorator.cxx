@@ -49,7 +49,7 @@ pqBoolPropertyWidgetDecorator::pqBoolPropertyWidgetDecorator(
   , BoolProperty(true)
 {
   vtkSMProxy* proxy = this->parentWidget()->proxy();
-  assert(proxy != NULL);
+  assert(proxy != nullptr);
 
   for (unsigned int cc = 0; cc < config->GetNumberOfNestedElements(); cc++)
   {

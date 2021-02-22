@@ -111,7 +111,7 @@ vtkMultiSliceContextItem::vtkMultiSliceContextItem()
 vtkMultiSliceContextItem::~vtkMultiSliceContextItem()
 {
   delete this->Internal;
-  this->Internal = NULL;
+  this->Internal = nullptr;
 }
 
 //-----------------------------------------------------------------------------
@@ -419,7 +419,7 @@ const double* vtkMultiSliceContextItem::GetVisibleSlices(int& nbSlices) const
 const double* vtkMultiSliceContextItem::GetSlices(int& nbSlices) const
 {
   nbSlices = static_cast<int>(this->Internal->Slices.size());
-  return nbSlices > 0 ? (&this->Internal->Slices[0]) : NULL;
+  return nbSlices > 0 ? (&this->Internal->Slices[0]) : nullptr;
 }
 
 //-----------------------------------------------------------------------------

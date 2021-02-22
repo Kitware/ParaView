@@ -53,7 +53,7 @@ vtkMaterialInterfacePieceTransactionMatrix::vtkMaterialInterfacePieceTransaction
   this->NFragments = 0;
   this->NProcs = 0;
   this->FlatMatrixSize = 0;
-  this->Matrix = 0;
+  this->Matrix = nullptr;
   this->NumberOfTransactions = 0;
 }
 
@@ -78,7 +78,7 @@ void vtkMaterialInterfacePieceTransactionMatrix::Clear()
   if (this->Matrix)
   {
     delete[] this->Matrix;
-    this->Matrix = 0;
+    this->Matrix = nullptr;
   }
   this->NumberOfTransactions = 0;
 }
@@ -236,7 +236,7 @@ void vtkMaterialInterfacePieceTransactionMatrix::Broadcast(vtkCommunicator* comm
   // NOTE: this will be replaced by tree structured
   // broadcast.
   // pack
-  int* buf = 0;
+  int* buf = nullptr;
   int bufSize = 0;
   if (myProcId == srcProc)
   {

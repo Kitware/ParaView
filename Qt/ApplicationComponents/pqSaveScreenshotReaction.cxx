@@ -110,8 +110,8 @@ QString pqSaveScreenshotReaction::promptFileName(
     return QString();
   }
 
-  pqFileDialog file_dialog(
-    NULL, pqCoreUtilities::mainWidget(), tr(prototype->GetXMLLabel()), QString(), filters.c_str());
+  pqFileDialog file_dialog(nullptr, pqCoreUtilities::mainWidget(), tr(prototype->GetXMLLabel()),
+    QString(), filters.c_str());
   file_dialog.setRecentlyUsedExtension(lastUsedExt);
   file_dialog.setObjectName(QString("%1FileDialog").arg(prototype->GetXMLName()));
   file_dialog.setFileMode(pqFileDialog::AnyFile);

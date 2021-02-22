@@ -44,7 +44,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 pqPersistentMainWindowStateBehavior::pqPersistentMainWindowStateBehavior(QMainWindow* parentWindow)
   : Superclass(parentWindow)
 {
-  assert(parentWindow != NULL);
+  assert(parentWindow != nullptr);
   QObject::connect(QCoreApplication::instance(), SIGNAL(aboutToQuit()), this, SLOT(saveState()));
 
   // This is done after a slight delay so that any GUI elements that get created

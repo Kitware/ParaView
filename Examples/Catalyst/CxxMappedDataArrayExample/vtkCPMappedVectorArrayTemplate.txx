@@ -41,7 +41,7 @@ void vtkCPMappedVectorArrayTemplate<Scalar>::PrintSelf(ostream& os, vtkIndent in
 template <class Scalar>
 void vtkCPMappedVectorArrayTemplate<Scalar>::Initialize()
 {
-  this->Array = NULL;
+  this->Array = nullptr;
   this->MaxId = -1;
   this->Size = 0;
   this->NumberOfComponents = 3;
@@ -106,7 +106,7 @@ template <class Scalar>
 vtkArrayIterator* vtkCPMappedVectorArrayTemplate<Scalar>::NewIterator()
 {
   vtkErrorMacro(<< "Not implemented.");
-  return NULL;
+  return nullptr;
 }
 
 //------------------------------------------------------------------------------
@@ -472,7 +472,7 @@ void vtkCPMappedVectorArrayTemplate<Scalar>::InsertValue(vtkIdType, Scalar)
 //------------------------------------------------------------------------------
 template <class Scalar>
 vtkCPMappedVectorArrayTemplate<Scalar>::vtkCPMappedVectorArrayTemplate()
-  : Array(NULL)
+  : Array(nullptr)
 {
 }
 

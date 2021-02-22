@@ -78,7 +78,7 @@ pqLinksManager::~pqLinksManager()
 void pqLinksManager::addLink()
 {
   pqLinksModel* model = pqApplicationCore::instance()->getLinksModel();
-  pqLinksEditor editor(NULL, this);
+  pqLinksEditor editor(nullptr, this);
   editor.setWindowTitle("Add Link");
   if (editor.exec() == QDialog::Accepted)
   {

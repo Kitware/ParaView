@@ -93,7 +93,7 @@ public:
 
   /**
    * If the \c proxy is part of the domain, then this returns the name used for
-   * the proxy in the domain. Returns NULL otherwise.
+   * the proxy in the domain. Returns nullptr otherwise.
    */
   const char* GetProxyName(vtkSMProxy* proxy);
 

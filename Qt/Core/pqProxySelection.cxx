@@ -45,7 +45,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //-----------------------------------------------------------------------------
 bool pqProxySelectionUtilities::copy(vtkSMProxySelectionModel* source, pqProxySelection& dest)
 {
-  assert(source != NULL);
+  assert(source != nullptr);
 
   pqServerManagerModel* smmodel = pqApplicationCore::instance()->getServerManagerModel();
 
@@ -74,7 +74,7 @@ bool pqProxySelectionUtilities::copy(vtkSMProxySelectionModel* source, pqProxySe
 //-----------------------------------------------------------------------------
 bool pqProxySelectionUtilities::copy(const pqProxySelection& source, vtkSMProxySelectionModel* dest)
 {
-  assert(dest != NULL);
+  assert(dest != nullptr);
 
   vtkSMProxySelectionModel::SelectionType selection;
   foreach (pqServerManagerModelItem* item, source)

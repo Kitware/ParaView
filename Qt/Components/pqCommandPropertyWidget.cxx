@@ -70,7 +70,7 @@ void pqCommandPropertyWidget::buttonClicked()
 {
   vtkSMProxy* smproxy = this->proxy();
   vtkSMProperty* smproperty = this->property();
-  if (smproperty != NULL && smproxy != NULL)
+  if (smproperty != nullptr && smproxy != nullptr)
   {
     const char* pname = smproxy->GetPropertyName(smproperty);
     if (pname)

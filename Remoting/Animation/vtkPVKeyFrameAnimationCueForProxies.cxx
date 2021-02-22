@@ -36,15 +36,15 @@ vtkPVKeyFrameAnimationCueForProxies::vtkPVKeyFrameAnimationCueForProxies()
 //----------------------------------------------------------------------------
 vtkPVKeyFrameAnimationCueForProxies::~vtkPVKeyFrameAnimationCueForProxies()
 {
-  this->SetAnimatedProxy(0);
-  this->SetAnimatedPropertyName(0);
-  this->SetAnimatedDomainName(0);
+  this->SetAnimatedProxy(nullptr);
+  this->SetAnimatedPropertyName(nullptr);
+  this->SetAnimatedDomainName(nullptr);
 }
 
 //----------------------------------------------------------------------------
 void vtkPVKeyFrameAnimationCueForProxies::RemoveAnimatedProxy()
 {
-  this->SetAnimatedProxy(0);
+  this->SetAnimatedProxy(nullptr);
 }
 
 //----------------------------------------------------------------------------

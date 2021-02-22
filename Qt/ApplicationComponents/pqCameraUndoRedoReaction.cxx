@@ -80,8 +80,8 @@ void pqCameraUndoRedoReaction::setActiveView(pqView* view)
 {
   if (this->LastView)
   {
-    QObject::disconnect(this->LastView, 0, this, 0);
-    this->LastView = NULL;
+    QObject::disconnect(this->LastView, nullptr, this, nullptr);
+    this->LastView = nullptr;
   }
 
   if (!view || !view->supportsUndo())

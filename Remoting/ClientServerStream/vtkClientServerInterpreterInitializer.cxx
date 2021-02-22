@@ -116,7 +116,7 @@ void vtkClientServerInterpreterInitializer::RegisterCallback(
   for (iter = this->Internals->Interpreters.begin(); iter != this->Internals->Interpreters.end();
        ++iter)
   {
-    if (iter->GetPointer() != NULL)
+    if (iter->GetPointer() != nullptr)
     {
       (*callback)(iter->GetPointer());
     }

@@ -54,23 +54,23 @@ vtkAMRFragmentsFilter::vtkAMRFragmentsFilter()
 
 vtkAMRFragmentsFilter::~vtkAMRFragmentsFilter()
 {
-  if (this->Producer != 0)
+  if (this->Producer != nullptr)
   {
     this->Producer->Delete();
   }
-  if (this->Extract != 0)
+  if (this->Extract != nullptr)
   {
     this->Extract->Delete();
   }
-  if (this->Contour != 0)
+  if (this->Contour != nullptr)
   {
     this->Contour->Delete();
   }
-  if (this->Connectivity != 0)
+  if (this->Connectivity != nullptr)
   {
     this->Connectivity->Delete();
   }
-  if (this->Integration != 0)
+  if (this->Integration != nullptr)
   {
     this->Integration->Delete();
   }

@@ -300,7 +300,7 @@ QSize pqTreeWidget::sizeHint() const
   // for no items, let's give a space of X pixels
   int minItemHeight = 20;
 
-  int num = this->itemCount(NULL) + 1; /* extra room for scroll bar */
+  int num = this->itemCount(nullptr) + 1; /* extra room for scroll bar */
   num = qMin(num, maxItemHint);
 
   int pix = minItemHeight;

@@ -49,9 +49,9 @@ vtkGridAxesPlane2DActor::vtkGridAxesPlane2DActor(vtkGridAxesHelper* helper)
   , GenerateTicks(true)
   , TickDirection(vtkGridAxesPlane2DActor::TICK_DIRECTION_BOTH)
   , Helper(helper)
-  , HelperManagedExternally(helper != NULL)
+  , HelperManagedExternally(helper != nullptr)
 {
-  if (helper == NULL)
+  if (helper == nullptr)
   {
     this->Helper = vtkSmartPointer<vtkGridAxesHelper>::New();
     this->GridBounds[0] = this->GridBounds[2] = this->GridBounds[4] = -1.0;
@@ -111,8 +111,8 @@ vtkProperty* vtkGridAxesPlane2DActor::GetProperty()
 //----------------------------------------------------------------------------
 void vtkGridAxesPlane2DActor::SetTickPositions(int index, vtkDoubleArray* data)
 {
-  assert(index >= 0 && index < 3 && (data == NULL || data->GetNumberOfComponents() <= 1));
-  if (data == NULL)
+  assert(index >= 0 && index < 3 && (data == nullptr || data->GetNumberOfComponents() <= 1));
+  if (data == nullptr)
   {
     if (this->TickPositions[index].size() != 0)
     {

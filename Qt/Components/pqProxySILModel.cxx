@@ -116,7 +116,7 @@ void pqProxySILModel::setSourceModel(QAbstractItemModel* srcModel)
   }
   if (this->sourceModel())
   {
-    QObject::disconnect(this->sourceModel(), 0, this, 0);
+    QObject::disconnect(this->sourceModel(), nullptr, this, nullptr);
   }
 
   this->Superclass::setSourceModel(srcModel);

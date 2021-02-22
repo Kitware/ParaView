@@ -116,7 +116,7 @@ public:
 
   void show(QWidget* parentWdg)
   {
-    assert(parentWdg != NULL);
+    assert(parentWdg != nullptr);
 
     delete parentWdg->layout();
     QVBoxLayout* layout = new QVBoxLayout(parentWdg);
@@ -349,7 +349,7 @@ pqPropertiesPanel::pqPropertiesPanel(QWidget* parentObject)
 pqPropertiesPanel::~pqPropertiesPanel()
 {
   delete this->Internals;
-  this->Internals = 0;
+  this->Internals = nullptr;
 }
 
 //-----------------------------------------------------------------------------
@@ -496,7 +496,7 @@ void pqPropertiesPanel::updatePanel(pqOutputPort* port)
   // Determine if the proxy/repr has changed. If so, we have to recreate the
   // entire panel, else we simply update the widgets.
   this->setPipelineProxy(port);
-  this->updateDisplayPanel(port ? port->getRepresentation(this->view()) : NULL);
+  this->updateDisplayPanel(port ? port->getRepresentation(this->view()) : nullptr);
   this->updateViewPanel(this->view());
   this->updateButtonState();
 }
@@ -507,7 +507,7 @@ void pqPropertiesPanel::updatePropertiesPanel(pqProxy* source)
 {
   if ((this->PanelMode & SOURCE_PROPERTIES) == 0)
   {
-    source = NULL;
+    source = nullptr;
   }
 
   if (this->Internals->Source != source)
@@ -570,13 +570,13 @@ void pqPropertiesPanel::updateDisplayPanel(pqDataRepresentation* repr)
 {
   if ((this->PanelMode & pqPropertiesPanel::DISPLAY_PROPERTIES) == 0)
   {
-    repr = NULL;
+    repr = nullptr;
   }
 
-  // since this->Internals->Representation is QPointer, it can go NULL (e.g. during
+  // since this->Internals->Representation is QPointer, it can go nullptr (e.g. during
   // disconnect) before we get the chance to clear the panel's widgets. Hence we
-  // do the block of code if (repr==NULL) event if nothing has changed.
-  if (this->Internals->Representation != repr || repr == NULL)
+  // do the block of code if (repr==nullptr) event if nothing has changed.
+  if (this->Internals->Representation != repr || repr == nullptr)
   {
     // Representation has changed, destroy the current display panel and create
     // a new one. Unlike properties panels, display panels are not cached.
@@ -627,7 +627,7 @@ void pqPropertiesPanel::updateViewPanel(pqView* argView)
   pqView* _view = argView;
   if ((this->PanelMode & pqPropertiesPanel::VIEW_PROPERTIES) == 0)
   {
-    _view = NULL;
+    _view = nullptr;
   }
 
   if (this->Internals->View != argView)
@@ -660,7 +660,7 @@ void pqPropertiesPanel::updateViewPanel(pqView* argView)
     vtkSMViewProxy* proxy = _view->getViewProxy();
     const char* label = proxy->GetXMLLabel();
     this->Internals->Ui.ViewButton->setText(
-      tr("View") + QString(" (%1)").arg(label != 0 ? label : _view->getViewType()));
+      tr("View") + QString(" (%1)").arg(label != nullptr ? label : _view->getViewType()));
     this->Internals->ViewWidgets->showWidgets(
       this->Internals->Ui.SearchBox->isAdvancedSearchActive(),
       this->Internals->Ui.SearchBox->text());
@@ -730,13 +730,13 @@ void pqPropertiesPanel::updateButtonState()
 
   ui.Accept->setEnabled(false);
   ui.Reset->setEnabled(false);
-  ui.Help->setEnabled(this->Internals->Source != NULL);
+  ui.Help->setEnabled(this->Internals->Source != nullptr);
   ui.Delete->setEnabled(isDeletable(this->Internals->Source));
 
   foreach (const pqProxyWidgets* widgets, this->Internals->SourceWidgets)
   {
     pqProxy* proxy = widgets->Proxy;
-    if (proxy == NULL)
+    if (proxy == nullptr)
     {
       continue;
     }
@@ -789,16 +789,17 @@ void pqPropertiesPanel::updateButtonEnableState()
   // Update PropertiesSaveAsDefaults and PropertiesRestoreDefaults state.
   // If the source's properties are yet to be applied, we disable the two
   // buttons (see BUG #15338).
-  bool canSaveRestoreSourcePropertyDefaults =
-    internals.Source != NULL ? (internals.Source->modifiedState() == pqProxy::UNMODIFIED) : false;
+  bool canSaveRestoreSourcePropertyDefaults = internals.Source != nullptr
+    ? (internals.Source->modifiedState() == pqProxy::UNMODIFIED)
+    : false;
   ui.PropertiesSaveAsDefaults->setEnabled(canSaveRestoreSourcePropertyDefaults);
   ui.PropertiesRestoreDefaults->setEnabled(canSaveRestoreSourcePropertyDefaults);
 
-  ui.DisplayRestoreDefaults->setEnabled(internals.DisplayWidgets != NULL);
-  ui.DisplaySaveAsDefaults->setEnabled(internals.DisplayWidgets != NULL);
+  ui.DisplayRestoreDefaults->setEnabled(internals.DisplayWidgets != nullptr);
+  ui.DisplaySaveAsDefaults->setEnabled(internals.DisplayWidgets != nullptr);
 
-  ui.ViewRestoreDefaults->setEnabled(internals.ViewWidgets != NULL);
-  ui.ViewSaveAsDefaults->setEnabled(internals.ViewWidgets != NULL);
+  ui.ViewRestoreDefaults->setEnabled(internals.ViewWidgets != nullptr);
+  ui.ViewSaveAsDefaults->setEnabled(internals.ViewWidgets != nullptr);
 
   // Now update copy-paste button state as well.
   if (internals.Source)
@@ -850,7 +851,7 @@ void pqPropertiesPanel::apply()
   if (onlyApplyCurrentPanel)
   {
     pqProxyWidgets* widgets =
-      this->Internals->Source ? this->Internals->SourceWidgets[this->Internals->Source] : NULL;
+      this->Internals->Source ? this->Internals->SourceWidgets[this->Internals->Source] : nullptr;
     if (widgets)
     {
       widgets->apply(this->view());
@@ -883,7 +884,7 @@ void pqPropertiesPanel::reset()
   if (onlyApplyCurrentPanel)
   {
     pqProxyWidgets* widgets =
-      this->Internals->Source ? this->Internals->SourceWidgets[this->Internals->Source] : NULL;
+      this->Internals->Source ? this->Internals->SourceWidgets[this->Internals->Source] : nullptr;
     if (widgets)
     {
       widgets->reset();
@@ -926,7 +927,7 @@ void pqPropertiesPanel::showHelp()
 void pqPropertiesPanel::propertiesRestoreDefaults()
 {
   pqProxyWidgets* widgets =
-    this->Internals->Source ? this->Internals->SourceWidgets[this->Internals->Source] : NULL;
+    this->Internals->Source ? this->Internals->SourceWidgets[this->Internals->Source] : nullptr;
   if (widgets && widgets->Panel)
   {
     if (widgets->Panel->restoreDefaults())
@@ -945,7 +946,7 @@ void pqPropertiesPanel::propertiesRestoreDefaults()
 void pqPropertiesPanel::propertiesSaveAsDefaults()
 {
   pqProxyWidgets* widgets =
-    this->Internals->Source ? this->Internals->SourceWidgets[this->Internals->Source] : NULL;
+    this->Internals->Source ? this->Internals->SourceWidgets[this->Internals->Source] : nullptr;
   if (widgets && widgets->Panel)
   {
     widgets->Panel->saveAsDefaults();

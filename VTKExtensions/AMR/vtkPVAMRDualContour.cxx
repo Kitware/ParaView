@@ -49,7 +49,7 @@ vtkPVAMRDualContour::~vtkPVAMRDualContour()
   if (this->Implementation)
   {
     delete this->Implementation;
-    this->Implementation = 0;
+    this->Implementation = nullptr;
   }
 }
 

@@ -59,7 +59,7 @@ vtkSMSelfGeneratingSourceProxy::vtkSMSelfGeneratingSourceProxy()
 vtkSMSelfGeneratingSourceProxy::~vtkSMSelfGeneratingSourceProxy()
 {
   delete this->Internals;
-  this->Internals = NULL;
+  this->Internals = nullptr;
 }
 
 //----------------------------------------------------------------------------
@@ -147,7 +147,7 @@ vtkPVXMLElement* vtkSMSelfGeneratingSourceProxy::SaveXMLState(
 {
   if (vtkPVXMLElement* xml = this->Superclass::SaveXMLState(root, iter))
   {
-    if (xml->FindNestedElementByName("ExtendedDefinition") == NULL)
+    if (xml->FindNestedElementByName("ExtendedDefinition") == nullptr)
     {
       vtkNew<vtkPVXMLElement> node;
       node->SetName("ExtendedDefinition");
@@ -160,7 +160,7 @@ vtkPVXMLElement* vtkSMSelfGeneratingSourceProxy::SaveXMLState(
     return xml;
   }
 
-  return NULL;
+  return nullptr;
 }
 
 //----------------------------------------------------------------------------
@@ -168,7 +168,8 @@ int vtkSMSelfGeneratingSourceProxy::LoadXMLState(
   vtkPVXMLElement* element, vtkSMProxyLocator* locator)
 {
   std::vector<vtkPVXMLElement*> extensions;
-  vtkPVXMLElement* defs = element ? element->FindNestedElementByName("ExtendedDefinition") : NULL;
+  vtkPVXMLElement* defs =
+    element ? element->FindNestedElementByName("ExtendedDefinition") : nullptr;
 
   for (unsigned int cc = 0, max = (defs ? defs->GetNumberOfNestedElements() : 0); cc < max; ++cc)
   {

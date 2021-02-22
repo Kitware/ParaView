@@ -258,7 +258,7 @@ public:
   {
     pqProxyWidgetItem* item = newItem(widget, widget_label, parentObj);
     item->Group = true;
-    // ensure GroupTag is not null for multi-property groups.
+    // ensure GroupTag is not nullptr for multi-property groups.
     item->GroupTag = group_label.isNull() ? QString("") : group_label;
     if (!group_label.isEmpty() && showSeparators)
     {
@@ -592,7 +592,7 @@ public:
     if (this->Properties->GetLength() == 0)
     {
       this->Properties->Delete();
-      this->Properties = NULL;
+      this->Properties = nullptr;
     }
   }
 
@@ -684,7 +684,7 @@ void pqProxyWidget::constructor(vtkSMProxy* smproxy, const QStringList& properti
   this->createWidgets(properties);
 
   this->setApplyChangesImmediately(false);
-  this->hideEvent(NULL);
+  this->hideEvent(nullptr);
 
   // In collaboration setup any pqProxyWidget should be disable
   // when the user lose its MASTER role. And enable back when
@@ -699,7 +699,7 @@ void pqProxyWidget::constructor(vtkSMProxy* smproxy, const QStringList& properti
 pqProxyWidget::~pqProxyWidget()
 {
   delete this->Internals;
-  this->Internals = NULL;
+  this->Internals = nullptr;
 }
 
 //-----------------------------------------------------------------------------
@@ -727,7 +727,7 @@ const char* vtkGetDocumentation(vtkSMDocumentation* doc, pqProxyWidget::Document
         break;
     }
   }
-  return NULL;
+  return nullptr;
 }
 }
 
@@ -735,7 +735,7 @@ const char* vtkGetDocumentation(vtkSMDocumentation* doc, pqProxyWidget::Document
 QString pqProxyWidget::documentationText(vtkSMProperty* smProperty, DocumentationType dtype)
 {
   const char* xmlDocumentation =
-    smProperty ? vtkGetDocumentation(smProperty->GetDocumentation(), dtype) : NULL;
+    smProperty ? vtkGetDocumentation(smProperty->GetDocumentation(), dtype) : nullptr;
   if (!xmlDocumentation || xmlDocumentation[0] == 0)
   {
     const char* xmlLabel = smProperty->GetXMLLabel();
@@ -751,7 +751,7 @@ QString pqProxyWidget::documentationText(vtkSMProperty* smProperty, Documentatio
 QString pqProxyWidget::documentationText(vtkSMProxy* smProxy, DocumentationType dtype)
 {
   const char* xmlDocumentation =
-    smProxy ? vtkGetDocumentation(smProxy->GetDocumentation(), dtype) : NULL;
+    smProxy ? vtkGetDocumentation(smProxy->GetDocumentation(), dtype) : nullptr;
   return (!xmlDocumentation || xmlDocumentation[0] == 0)
     ? QString()
     : pqProxy::rstToHtml(xmlDocumentation).c_str();
@@ -762,7 +762,7 @@ pqProxyWidget::DocumentationType pqProxyWidget::showProxyDocumentationInPanel(vt
 {
   vtkPVXMLElement* xml = (smproxy && smproxy->GetHints())
     ? smproxy->GetHints()->FindNestedElementByName("ShowProxyDocumentationInPanel")
-    : NULL;
+    : nullptr;
   if (xml)
   {
     const QString type = QString(xml->GetAttributeOrDefault("type", "description")).toLower();
@@ -789,7 +789,7 @@ vtkSMProxy* pqProxyWidget::proxy() const
 void pqProxyWidget::showEvent(QShowEvent* sevent)
 {
   this->Superclass::showEvent(sevent);
-  if (sevent == NULL || !sevent->spontaneous())
+  if (sevent == nullptr || !sevent->spontaneous())
   {
     foreach (const pqProxyWidgetItem* item, this->Internals->Items)
     {
@@ -801,7 +801,7 @@ void pqProxyWidget::showEvent(QShowEvent* sevent)
 //-----------------------------------------------------------------------------
 void pqProxyWidget::hideEvent(QHideEvent* hevent)
 {
-  if (hevent == NULL || !hevent->spontaneous())
+  if (hevent == nullptr || !hevent->spontaneous())
   {
     foreach (const pqProxyWidgetItem* item, this->Internals->Items)
     {
@@ -1145,7 +1145,7 @@ void pqProxyWidget::create3DWidgets()
 {
   vtkSMProxy* smProxy = this->proxy();
   vtkPVXMLElement* hints = smProxy->GetHints();
-  if (hints && (hints->FindNestedElementByName("PropertyGroup") != NULL))
+  if (hints && (hints->FindNestedElementByName("PropertyGroup") != nullptr))
   {
     qCritical("Obsolete 3DWidget request encountered in the proxy hints. "
               "Please refer to the 'Major API Changes' guide in ParaView developer documentation.");
@@ -1157,7 +1157,7 @@ pqPropertyWidget* pqProxyWidget::createWidgetForProperty(
   vtkSMProperty* smproperty, vtkSMProxy* smproxy, QWidget* parentObj)
 {
   // check for custom widgets
-  pqPropertyWidget* widget = NULL;
+  pqPropertyWidget* widget = nullptr;
   pqInterfaceTracker* interfaceTracker = pqApplicationCore::instance()->interfaceTracker();
   QList<pqPropertyWidgetInterface*> interfaces =
     interfaceTracker->interfaces<pqPropertyWidgetInterface*>();
@@ -1170,7 +1170,7 @@ pqPropertyWidget* pqProxyWidget::createWidgetForProperty(
     }
   }
 
-  if (widget != NULL)
+  if (widget != nullptr)
   {
   }
   else if (vtkSMDoubleVectorProperty* dvp = vtkSMDoubleVectorProperty::SafeDownCast(smproperty))
@@ -1191,7 +1191,7 @@ pqPropertyWidget* pqProxyWidget::createWidgetForProperty(
       (pp->GetHints() && pp->GetHints()->FindNestedElementByName("SelectionInput"));
 
     // find the domain
-    vtkSMDomain* domain = 0;
+    vtkSMDomain* domain = nullptr;
     vtkSMDomainIterator* domainIter = pp->NewDomainIterator();
     for (domainIter->Begin(); !domainIter->IsAtEnd(); domainIter->Next())
     {
@@ -1250,7 +1250,7 @@ bool pqProxyWidget::filterWidgets(bool show_advanced, const QString& filterText)
     this->setUpdatesEnabled(false);
   }
 
-  const pqProxyWidgetItem* prevItem = NULL;
+  const pqProxyWidgetItem* prevItem = nullptr;
   vtkSMProxy* smProxy = this->Internals->Proxy;
   foreach (const pqProxyWidgetItem* item, this->Internals->Items)
   {
@@ -1269,7 +1269,7 @@ bool pqProxyWidget::filterWidgets(bool show_advanced, const QString& filterText)
   {
     this->setUpdatesEnabled(prevUE);
   }
-  return (prevItem != NULL);
+  return (prevItem != nullptr);
 }
 
 //-----------------------------------------------------------------------------
@@ -1333,7 +1333,7 @@ bool pqProxyWidget::restoreDefaults()
 void pqProxyWidget::saveAsDefaults()
 {
   vtkSMSettings* settings = vtkSMSettings::GetInstance();
-  vtkSMNamedPropertyIterator* propertyIt = NULL;
+  vtkSMNamedPropertyIterator* propertyIt = nullptr;
   if (this->Internals->Properties)
   {
     propertyIt = vtkSMNamedPropertyIterator::New();

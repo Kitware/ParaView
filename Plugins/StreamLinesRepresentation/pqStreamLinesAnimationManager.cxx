@@ -44,7 +44,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QtDebug>
 
 //-----------------------------------------------------------------------------
-pqStreamLinesAnimationManager::pqStreamLinesAnimationManager(QObject* p /*=0*/)
+pqStreamLinesAnimationManager::pqStreamLinesAnimationManager(QObject* p /*=nullptr*/)
   : QObject(p)
 {
   pqServerManagerModel* smmodel = pqApplicationCore::instance()->getServerManagerModel();

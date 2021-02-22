@@ -51,7 +51,7 @@ vtkPVCameraCollection::vtkPVCameraCollection()
 vtkPVCameraCollection::~vtkPVCameraCollection()
 {
   delete this->Internals;
-  this->Internals = NULL;
+  this->Internals = nullptr;
 }
 
 //----------------------------------------------------------------------------
@@ -79,7 +79,7 @@ vtkCamera* vtkPVCameraCollection::GetCamera(int index)
   {
     return this->Internals->Cameras[index];
   }
-  return NULL;
+  return nullptr;
 }
 
 //----------------------------------------------------------------------------
@@ -107,7 +107,7 @@ int vtkPVCameraCollection::FindClosestCamera(vtkCamera* target)
 bool vtkPVCameraCollection::UpdateCamera(int index, vtkCamera* target)
 {
   vtkCamera* source = this->GetCamera(index);
-  if (source == NULL || target == NULL)
+  if (source == nullptr || target == nullptr)
   {
     return false;
   }

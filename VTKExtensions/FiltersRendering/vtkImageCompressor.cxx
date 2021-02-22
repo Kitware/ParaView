@@ -29,10 +29,10 @@ vtkCxxSetObjectMacro(vtkImageCompressor, Input, vtkUnsignedCharArray);
 
 //-----------------------------------------------------------------------------
 vtkImageCompressor::vtkImageCompressor()
-  : Output(0)
-  , Input(0)
+  : Output(nullptr)
+  , Input(nullptr)
   , LossLessMode(0)
-  , Configuration(0)
+  , Configuration(nullptr)
 {
   // Always allocate output array as a convenience.
   vtkUnsignedCharArray* data = vtkUnsignedCharArray::New();
@@ -43,9 +43,9 @@ vtkImageCompressor::vtkImageCompressor()
 //-----------------------------------------------------------------------------
 vtkImageCompressor::~vtkImageCompressor()
 {
-  this->SetOutput(0);
-  this->SetInput(0);
-  this->SetConfiguration(NULL);
+  this->SetOutput(nullptr);
+  this->SetInput(nullptr);
+  this->SetConfiguration(nullptr);
 }
 
 //-----------------------------------------------------------------------------
@@ -98,7 +98,7 @@ const char* vtkImageCompressor::RestoreConfiguration(const char* stream)
     this->SetLossLessMode(mode);
     return stream + iss.tellg();
   }
-  return 0;
+  return nullptr;
 }
 
 //-----------------------------------------------------------------------------

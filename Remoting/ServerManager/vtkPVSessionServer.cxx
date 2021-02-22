@@ -255,7 +255,7 @@ public:
   {
     if (this->SatelliteServerSession)
     {
-      return NULL;
+      return nullptr;
     }
     return this->CompositeMultiProcessController.GetPointer();
   }
@@ -347,7 +347,7 @@ vtkPVSessionServer::vtkPVSessionServer()
 vtkPVSessionServer::~vtkPVSessionServer()
 {
   delete this->Internal;
-  this->Internal = NULL;
+  this->Internal = nullptr;
 }
 
 //----------------------------------------------------------------------------
@@ -363,7 +363,7 @@ vtkMultiProcessController* vtkPVSessionServer::GetController(ServerFlags process
       // vtkWarningMacro("Invalid processtype of GetController(): " << processType);
       break;
   }
-  return NULL;
+  return nullptr;
 }
 
 //----------------------------------------------------------------------------
@@ -466,7 +466,7 @@ bool vtkPVSessionServer::Connect(const char* url)
       vtkCommand::ConnectionCreatedEvent, this->Internal, &vtkInternals::CreateController);
   }
 
-  return (this->Internal->GetActiveController() != NULL);
+  return (this->Internal->GetActiveController() != nullptr);
 }
 
 //----------------------------------------------------------------------------
@@ -479,7 +479,7 @@ bool vtkPVSessionServer::GetIsAlive()
   }
 
   // TODO: check for validity
-  return (this->Internal->GetActiveController() != NULL);
+  return (this->Internal->GetActiveController() != nullptr);
 }
 
 //----------------------------------------------------------------------------

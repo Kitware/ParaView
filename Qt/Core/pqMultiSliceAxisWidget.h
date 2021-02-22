@@ -47,7 +47,7 @@ class PQCORE_EXPORT pqMultiSliceAxisWidget : public QWidget
   Q_PROPERTY(QString title READ title WRITE setTitle);
 
 public:
-  pqMultiSliceAxisWidget(QWidget* parent = NULL);
+  pqMultiSliceAxisWidget(QWidget* parent = nullptr);
   ~pqMultiSliceAxisWidget() override;
 
   /**

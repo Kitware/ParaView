@@ -67,7 +67,7 @@ bool vtkSpyPlotReaderMap::Save(vtkMultiProcessStream& stream)
 //-----------------------------------------------------------------------------
 bool vtkSpyPlotReaderMap::Load(vtkMultiProcessStream& stream)
 {
-  this->Clean(NULL);
+  this->Clean(nullptr);
   int size, magic_number;
   stream >> magic_number >> size;
   assert(magic_number == 12345);
@@ -75,7 +75,7 @@ bool vtkSpyPlotReaderMap::Load(vtkMultiProcessStream& stream)
   {
     std::string fname;
     stream >> fname;
-    this->Files[fname] = NULL;
+    this->Files[fname] = nullptr;
   }
   return true;
 }
@@ -83,7 +83,7 @@ bool vtkSpyPlotReaderMap::Load(vtkMultiProcessStream& stream)
 //-----------------------------------------------------------------------------
 bool vtkSpyPlotReaderMap::Initialize(const char* filename)
 {
-  this->Clean(NULL);
+  this->Clean(nullptr);
 
   vtksys::ifstream ifs(filename);
   if (!ifs)
@@ -155,7 +155,7 @@ bool vtkSpyPlotReaderMap::InitializeFromSpyFile(const char* filename)
   {
     // Add an entry in the Map. The reader will be created on-demand when
     // needed.
-    this->Files[filename] = NULL;
+    this->Files[filename] = nullptr;
     return true;
   }
 
@@ -229,7 +229,7 @@ bool vtkSpyPlotReaderMap::InitializeFromSpyFile(const char* filename)
   {
     sprintf(buffer, "%s/%s.%d", filePath.c_str(), fileNoExt.c_str(), idx);
     // cerr << "buffer3 == " << buffer << endl;
-    this->Files[buffer] = 0;
+    this->Files[buffer] = nullptr;
   }
   // Okay now open just the first file to get meta data
   // cerr << "updating meta... " << endl;
@@ -267,7 +267,7 @@ bool vtkSpyPlotReaderMap::InitializeFromCaseFile(const char* filename)
         {
           f = vtksys::SystemTools::GetFilenamePath(filename) + "/" + f;
         }
-        this->Files[f.c_str()] = 0;
+        this->Files[f.c_str()] = nullptr;
       }
     }
   }

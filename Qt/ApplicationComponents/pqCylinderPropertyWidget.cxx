@@ -233,7 +233,7 @@ void pqCylinderPropertyWidget::resetCameraToAxis()
 void pqCylinderPropertyWidget::useCameraAxis()
 {
   vtkSMRenderViewProxy* viewProxy =
-    this->view() ? vtkSMRenderViewProxy::SafeDownCast(this->view()->getProxy()) : NULL;
+    this->view() ? vtkSMRenderViewProxy::SafeDownCast(this->view()->getProxy()) : nullptr;
   if (viewProxy)
   {
     vtkCamera* camera = viewProxy->GetActiveCamera();

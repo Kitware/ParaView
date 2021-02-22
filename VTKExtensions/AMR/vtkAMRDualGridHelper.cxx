@@ -72,7 +72,8 @@ namespace
 class vtkTimerLogSmartMarkEvent
 {
 public:
-  vtkTimerLogSmartMarkEvent(const char* eventString, vtkMultiProcessController* controller = NULL)
+  vtkTimerLogSmartMarkEvent(
+    const char* eventString, vtkMultiProcessController* controller = nullptr)
     : EventString(eventString)
     , Controller(controller)
   {
@@ -157,8 +158,8 @@ vtkAMRDualGridHelperDegenerateRegion::vtkAMRDualGridHelperDegenerateRegion()
   this->ReceivingRegion[0] = 0;
   this->ReceivingRegion[1] = 0;
   this->ReceivingRegion[2] = 0;
-  this->ReceivingBlock = this->SourceBlock = 0;
-  this->ReceivingArray = this->SourceArray = 0;
+  this->ReceivingBlock = this->SourceBlock = nullptr;
+  this->ReceivingArray = this->SourceArray = nullptr;
 }
 
 //-----------------------------------------------------------------------------
@@ -220,7 +221,7 @@ vtkAMRDualGridHelperSeed::vtkAMRDualGridHelperSeed()
 vtkAMRDualGridHelperLevel::vtkAMRDualGridHelperLevel()
 {
   this->Level = 0;
-  this->Grid = 0;
+  this->Grid = nullptr;
   for (int ii = 0; ii < 3; ++ii)
   {
     this->GridExtent[2 * ii] = 0;
@@ -239,7 +240,7 @@ vtkAMRDualGridHelperLevel::~vtkAMRDualGridHelperLevel()
     if (this->Blocks[ii])
     {
       delete this->Blocks[ii];
-      this->Blocks[ii] = 0;
+      this->Blocks[ii] = nullptr;
     }
   }
 
@@ -252,7 +253,7 @@ vtkAMRDualGridHelperLevel::~vtkAMRDualGridHelperLevel()
   if (this->Grid)
   {
     delete[] this->Grid;
-    this->Grid = 0;
+    this->Grid = nullptr;
   }
 }
 //----------------------------------------------------------------------------
@@ -260,15 +261,15 @@ vtkAMRDualGridHelperBlock* vtkAMRDualGridHelperLevel::GetGridBlock(int x, int y,
 {
   if (x < this->GridExtent[0] || x > this->GridExtent[1])
   {
-    return 0;
+    return nullptr;
   }
   if (y < this->GridExtent[2] || y > this->GridExtent[3])
   {
-    return 0;
+    return nullptr;
   }
   if (z < this->GridExtent[4] || z > this->GridExtent[5])
   {
-    return 0;
+    return nullptr;
   }
 
   return this->Grid[x + y * this->GridIncY + z * this->GridIncZ];
@@ -380,7 +381,7 @@ void vtkAMRDualGridHelperLevel::CreateBlockFaces(
 //****************************************************************************
 vtkAMRDualGridHelperBlock::vtkAMRDualGridHelperBlock()
 {
-  this->UserData = 0;
+  this->UserData = nullptr;
 
   // int ii;
   this->Level = 0;
@@ -398,7 +399,7 @@ vtkAMRDualGridHelperBlock::vtkAMRDualGridHelperBlock()
   //  {
   //  this->Faces[ii] = 0;
   //  }
-  this->Image = 0;
+  this->Image = nullptr;
   this->CopyFlag = 0;
 
   this->ResetRegionBits();
@@ -410,7 +411,7 @@ vtkAMRDualGridHelperBlock::~vtkAMRDualGridHelperBlock()
   {
     // It is not a vtkObject yet.
     // this->UserData->Delete();
-    this->UserData = 0;
+    this->UserData = nullptr;
   }
 
   int ii;
@@ -434,7 +435,7 @@ vtkAMRDualGridHelperBlock::~vtkAMRDualGridHelperBlock()
     { // We made a copy of the image and have to delete it.
       this->Image->Delete();
     }
-    this->Image = 0;
+    this->Image = nullptr;
   }
 }
 //----------------------------------------------------------------------------
@@ -515,7 +516,7 @@ void vtkAMRDualGridHelperBlock::AddBackGhostLevels(int standardBlockDimensions[3
   int ii;
   int inDim[3];
   int outDim[3];
-  if (this->Image == 0)
+  if (this->Image == nullptr)
   {
     vtkGenericWarningMacro("Missing image.");
     return;
@@ -599,7 +600,7 @@ void vtkAMRDualGridHelperBlock::SetFace(int faceId, vtkAMRDualGridHelperFace* fa
     {
       delete tmp;
     }
-    this->Faces[faceId] = 0;
+    this->Faces[faceId] = nullptr;
   }
 
   if (face)
@@ -715,7 +716,7 @@ vtkAMRDualGridHelper::vtkAMRDualGridHelper()
   this->SkipGhostCopy = 0;
 
   this->DataTypeSize = 8;
-  this->ArrayName = 0;
+  this->ArrayName = nullptr;
   this->EnableDegenerateCells = 1;
   this->EnableAsynchronousCommunication = 1;
   this->NumberOfBlocksInThisProcess = 0;
@@ -742,12 +743,12 @@ vtkAMRDualGridHelper::~vtkAMRDualGridHelper()
   int ii;
   int numberOfLevels = (int)(this->Levels.size());
 
-  this->SetArrayName(0);
+  this->SetArrayName(nullptr);
 
   for (ii = 0; ii < numberOfLevels; ++ii)
   {
     delete this->Levels[ii];
-    this->Levels[ii] = 0;
+    this->Levels[ii] = nullptr;
   }
 
   // Todo: See if we really need this.
@@ -756,7 +757,7 @@ vtkAMRDualGridHelper::~vtkAMRDualGridHelper()
   this->DegenerateRegionQueue.clear();
 
   this->Controller->UnRegister(this);
-  this->Controller = NULL;
+  this->Controller = nullptr;
 }
 //----------------------------------------------------------------------------
 void vtkAMRDualGridHelper::PrintSelf(ostream& os, vtkIndent indent)
@@ -778,9 +779,9 @@ void vtkAMRDualGridHelper::SetController(vtkMultiProcessController* controller)
 
   if (!controller)
   {
-    // It is common to use NULL for a multi process controller when no parallel
+    // It is common to use nullptr for a multi process controller when no parallel
     // communication is needed (for example, in a serial program).  Rather than
-    // have to constantly check for a NULL pointer, use a dummy controller
+    // have to constantly check for a nullptr pointer, use a dummy controller
     // so that we don't have to constantly check for it.
     if (!this->Controller->IsA("vtkDummyController"))
     {
@@ -789,7 +790,7 @@ void vtkAMRDualGridHelper::SetController(vtkMultiProcessController* controller)
     return;
   }
 
-  // Controller is never NULL.
+  // Controller is never nullptr.
   this->Controller->UnRegister(this);
 
   this->Controller = controller;
@@ -813,11 +814,11 @@ vtkAMRDualGridHelperBlock* vtkAMRDualGridHelper::GetBlock(int level, int blockId
 {
   if (level < 0 || level >= (int)(this->Levels.size()))
   {
-    return 0;
+    return nullptr;
   }
   if ((int)(this->Levels[level]->Blocks.size()) <= blockIdx)
   {
-    return 0;
+    return nullptr;
   }
   return this->Levels[level]->Blocks[blockIdx];
 }
@@ -828,7 +829,7 @@ vtkAMRDualGridHelperBlock* vtkAMRDualGridHelper::GetBlock(
 {
   if (level < 0 || level >= (int)(this->Levels.size()))
   {
-    return 0;
+    return nullptr;
   }
   return this->Levels[level]->GetGridBlock(xGrid, yGrid, zGrid);
 }
@@ -888,7 +889,7 @@ vtkAMRDualGridHelperBlock* vtkAMRDualGridHelperLevel::AddGridBlock(
   // std::cerr << "Adding a grid block to level " << this->Level << " at " << x << " " << y << " "
   // << z << std::endl;
   // Expand the grid array if necessary.
-  if (this->Grid == 0 || x < this->GridExtent[0] || x > this->GridExtent[1] ||
+  if (this->Grid == nullptr || x < this->GridExtent[0] || x > this->GridExtent[1] ||
     y < this->GridExtent[2] || y > this->GridExtent[3] || z < this->GridExtent[4] ||
     z > this->GridExtent[5])
   { // Reallocate
@@ -926,7 +927,7 @@ vtkAMRDualGridHelperBlock* vtkAMRDualGridHelperLevel::AddGridBlock(
     this->Grid = newGrid;
   }
 
-  if (this->Grid[x + (y * this->GridIncY) + (z * this->GridIncZ)] == 0)
+  if (this->Grid[x + (y * this->GridIncY) + (z * this->GridIncZ)] == nullptr)
   {
     vtkAMRDualGridHelperBlock* newBlock = new vtkAMRDualGridHelperBlock();
     newBlock->Image = volume;
@@ -978,7 +979,7 @@ void vtkAMRDualGridHelper::CreateFaces()
 void vtkAMRDualGridHelper::FindExistingFaces(
   vtkAMRDualGridHelperBlock* block, int level, int x, int y, int z)
 {
-  if (block == 0)
+  if (block == nullptr)
   {
     return;
   }
@@ -1295,11 +1296,11 @@ int vtkAMRDualGridHelper::ClaimBlockSharedRegion(vtkAMRDualGridHelperBlock* bloc
   // volume fractions from the lower level grid too.
   if (this->EnableDegenerateCells && bestLevel < blockLevel)
   {
-    if (block->Image == 0 || bestBlock->Image == 0)
+    if (block->Image == nullptr || bestBlock->Image == nullptr)
     { // Deal with remote blocks later.
       // Add the pair of blocks to a queue to copy when we get the data.
-      vtkDataArray* bestBlockArray = 0;
-      vtkDataArray* blockArray = 0;
+      vtkDataArray* bestBlockArray = nullptr;
+      vtkDataArray* blockArray = nullptr;
       if (block->Image)
       {
         blockArray = block->Image->GetCellData()->GetArray(this->ArrayName);
@@ -1620,7 +1621,7 @@ void* vtkAMRDualGridHelper::CopyDegenerateRegionBlockToMessage(
     return messagePtr;
   }
   // Lower block pointer
-  if (region.SourceArray == 0)
+  if (region.SourceArray == nullptr)
   {
     return messagePtr;
   }
@@ -1779,7 +1780,7 @@ const void* vtkAMRDualGridHelper::CopyDegenerateRegionMessageToBlock(
 
   // Now copy low resolution into highresolution ghost layer.
   // For simplicity loop over all three axes (one will be degenerate).
-  if (region.ReceivingArray == 0)
+  if (region.ReceivingArray == nullptr)
   {
     return messagePtr;
   }
@@ -2590,7 +2591,7 @@ void vtkAMRDualGridHelper::UnmarshalBlocks(vtkIntArray* inBuffer)
         int y = *buffer++;
         int z = *buffer++;
 
-        vtkAMRDualGridHelperBlock* block = level->AddGridBlock(x, y, z, blockIdx, NULL);
+        vtkAMRDualGridHelperBlock* block = level->AddGridBlock(x, y, z, blockIdx, nullptr);
         block->ProcessId = *buffer++;
 
         block->OriginIndex[0] = this->StandardBlockDimensions[0] * x - 1;
@@ -2622,7 +2623,7 @@ void vtkAMRDualGridHelper::UnmarshalBlocksFromOne(vtkIntArray* inBuffer, int vtk
       int y = *buffer++;
       int z = *buffer++;
 
-      vtkAMRDualGridHelperBlock* block = level->AddGridBlock(x, y, z, blockIdx, NULL);
+      vtkAMRDualGridHelperBlock* block = level->AddGridBlock(x, y, z, blockIdx, nullptr);
       block->ProcessId = *buffer++;
 
       block->OriginIndex[0] = this->StandardBlockDimensions[0] * x - 1;

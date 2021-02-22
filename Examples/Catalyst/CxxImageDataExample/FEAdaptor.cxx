@@ -18,15 +18,15 @@
 
 namespace
 {
-vtkCPProcessor* Processor = NULL;
-vtkImageData* VTKGrid = NULL;
+vtkCPProcessor* Processor = nullptr;
+vtkImageData* VTKGrid = nullptr;
 
 void BuildVTKGrid(Grid& grid)
 {
   // The grid structure isn't changing so we only build it
   // the first time it's needed. If we needed the memory
   // we could delete it and rebuild as necessary.
-  if (VTKGrid == NULL)
+  if (VTKGrid == nullptr)
   {
     VTKGrid = vtkImageData::New();
     int extent[6];
@@ -97,7 +97,7 @@ namespace FEAdaptor
 
 void Initialize(int numScripts, char* scripts[])
 {
-  if (Processor == NULL)
+  if (Processor == nullptr)
   {
     Processor = vtkCPProcessor::New();
     Processor->Initialize();
@@ -124,12 +124,12 @@ void Finalize()
   if (Processor)
   {
     Processor->Delete();
-    Processor = NULL;
+    Processor = nullptr;
   }
   if (VTKGrid)
   {
     VTKGrid->Delete();
-    VTKGrid = NULL;
+    VTKGrid = nullptr;
   }
 }
 

@@ -85,7 +85,7 @@ void vtkVRTrackStyle::HandleTracker(const vtkVREvent& event)
 
   if (role == "Tracker")
   {
-    if (this->ControlledProxy && this->ControlledPropertyName != NULL &&
+    if (this->ControlledProxy && this->ControlledPropertyName != nullptr &&
       this->ControlledPropertyName[0] != '\0')
     {
       vtkSMPropertyHelper(this->ControlledProxy, this->ControlledPropertyName)

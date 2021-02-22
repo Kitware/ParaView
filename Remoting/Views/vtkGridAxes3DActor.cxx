@@ -508,7 +508,7 @@ void vtkGridAxes3DActor::Update(vtkViewport* viewport)
       for (int axis = 0; axis < 3; axis++)
       {
         this->GridAxes2DActors[cc]->SetCustomTickPositions(
-          axis, this->UseCustomLabels[axis] ? this->CustomLabels[axis].GetPointer() : NULL);
+          axis, this->UseCustomLabels[axis] ? this->CustomLabels[axis].GetPointer() : nullptr);
       }
     }
 
@@ -589,7 +589,7 @@ void vtkGridAxes3DActor::ShallowCopy(vtkProp* prop)
 {
   this->Superclass::ShallowCopy(prop);
   vtkGridAxes3DActor* other = vtkGridAxes3DActor::SafeDownCast(prop);
-  if (other == NULL)
+  if (other == nullptr)
   {
     return;
   }

@@ -24,20 +24,20 @@ namespace vtkGenericIOUtilities
 //==============================================================================
 MPI_Comm GetMPICommunicator(vtkMultiProcessController* mpc)
 {
-  assert("pre: null multiprocess controller!" && (mpc != NULL));
+  assert("pre: nullptr multiprocess controller!" && (mpc != nullptr));
   MPI_Comm comm = MPI_COMM_NULL;
 
   // STEP 0: Get the communicator from the controller
   vtkCommunicator* vtkComm = mpc->GetCommunicator();
-  assert("pre: VTK communicator is NULL" && (vtkComm != NULL));
+  assert("pre: VTK communicator is nullptr" && (vtkComm != nullptr));
 
   // STEP 1: Safe downcast to an vtkMPICommunicator
   vtkMPICommunicator* vtkMPIComm = vtkMPICommunicator::SafeDownCast(vtkComm);
-  assert("pre: MPI communicator is NULL" && (vtkMPIComm != NULL));
+  assert("pre: MPI communicator is nullptr" && (vtkMPIComm != nullptr));
 
   // STEP 2: Get the opaque VTK MPI communicator
   vtkMPICommunicatorOpaqueComm* mpiComm = vtkMPIComm->GetMPIComm();
-  assert("pre: Opaque MPI communicator is NULL" && (mpiComm != NULL));
+  assert("pre: Opaque MPI communicator is nullptr" && (mpiComm != nullptr));
 
   // STEP 3: Finally, get the MPI comm
   comm = *(mpiComm->GetHandle());
@@ -48,8 +48,8 @@ MPI_Comm GetMPICommunicator(vtkMultiProcessController* mpc)
 //==============================================================================
 vtkDataArray* GetVtkDataArray(std::string name, int type, void* rawBuffer, int N)
 {
-  assert("pre: cannot read from null buffer!" && (rawBuffer != NULL));
-  vtkDataArray* dataArray = NULL;
+  assert("pre: cannot read from nullptr buffer!" && (rawBuffer != nullptr));
+  vtkDataArray* dataArray = nullptr;
   size_t dataSize = 0;
 
   switch (type)
@@ -84,10 +84,10 @@ vtkDataArray* GetVtkDataArray(std::string name, int type, void* rawBuffer, int N
       break;
     default:
       dataSize = 0;
-      return NULL;
+      return nullptr;
   } // END switch
 
-  assert("pre: null data array!" && (dataArray != NULL));
+  assert("pre: nullptr data array!" && (dataArray != nullptr));
 
   dataArray->SetNumberOfComponents(1);
   dataArray->SetNumberOfTuples(N);
@@ -95,7 +95,7 @@ vtkDataArray* GetVtkDataArray(std::string name, int type, void* rawBuffer, int N
   if (N > 0)
   {
     void* dataBuffer = dataArray->GetVoidPointer(0);
-    assert("pre: encountered NULL data buffer!" && (dataBuffer != NULL));
+    assert("pre: encountered nullptr data buffer!" && (dataBuffer != nullptr));
     memcpy(dataBuffer, rawBuffer, N * dataSize);
   }
   return (dataArray);
@@ -104,7 +104,7 @@ vtkDataArray* GetVtkDataArray(std::string name, int type, void* rawBuffer, int N
 //==============================================================================
 double GetDoubleFromRawBuffer(const int type, void* buffer, vtkIdType buffer_idx)
 {
-  assert("pre: cannot read from null buffer!" && (buffer != NULL));
+  assert("pre: cannot read from nullptr buffer!" && (buffer != nullptr));
 
   double dataItem = 0.0;
 
@@ -156,7 +156,7 @@ double GetDoubleFromRawBuffer(const int type, void* buffer, vtkIdType buffer_idx
 //==============================================================================
 vtkIdType GetIdFromRawBuffer(const int type, void* buffer, vtkIdType buffer_idx)
 {
-  assert("pre: cannot read from null buffer!" && (buffer != NULL));
+  assert("pre: cannot read from nullptr buffer!" && (buffer != nullptr));
 
   vtkIdType dataItem = 0;
 
@@ -209,7 +209,7 @@ vtkIdType GetIdFromRawBuffer(const int type, void* buffer, vtkIdType buffer_idx)
 gio::GenericIOReader* GetReader(
   MPI_Comm comm, bool posix, int distribution, const std::string& fileName)
 {
-  gio::GenericIOReader* reader = NULL;
+  gio::GenericIOReader* reader = nullptr;
   if (posix)
   {
     reader = new gio::GenericIOPosixReader();
@@ -218,7 +218,7 @@ gio::GenericIOReader* GetReader(
   {
     reader = new gio::GenericIOMPIReader();
   }
-  assert("pre: reader is NULL!" && (reader != NULL));
+  assert("pre: reader is nullptr!" && (reader != nullptr));
 
   reader->SetCommunicator(comm);
   reader->SetBlockAssignmentStrategy(distribution);

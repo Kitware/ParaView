@@ -53,7 +53,7 @@ class PQCORE_EXPORT pqFileDialogRecentDirsModel : public QAbstractListModel
 public:
   /**
   * server is the server for which we need the listing.
-  * if the server is NULL, we get file listings locally (i.e. builtin server).
+  * if the server is nullptr, we get file listings locally (i.e. builtin server).
   * pqFileDialogModel is used to test the validity of directories.
   */
   pqFileDialogRecentDirsModel(pqFileDialogModel* model, pqServer* server, QObject* parent);

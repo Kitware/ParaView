@@ -71,7 +71,7 @@ public:
     bool IsEmpty() const;
 
   // Description:
-  // Adds \p property to the group. function can be NULL.
+  // Adds \p property to the group. function can be nullptr.
   void AddProperty(const char* function, vtkSMProperty* property);
 
   // Description:
@@ -83,7 +83,7 @@ public:
   vtkSMProperty* GetProperty(const char* function) const;
 
   // Description:
-  // Given property in the group, returns its function. Will return NULL if the
+  // Given property in the group, returns its function. Will return nullptr if the
   // property is not present in this group.
   const char* GetFunction(vtkSMProperty* property) const;
 
@@ -101,7 +101,7 @@ public:
   // Server Manager does not (and should not) interpret the hints. Hints
   // provide a mechanism to add GUI pertinant information to the server
   // manager XML.  Returns the XML element for the hints associated with
-  // this property, if any, otherwise returns NULL.
+  // this property, if any, otherwise returns nullptr.
   vtkGetObjectMacro(Hints, vtkPVXMLElement);
 
 protected:

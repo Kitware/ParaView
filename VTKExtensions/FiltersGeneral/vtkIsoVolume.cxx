@@ -81,7 +81,7 @@ int vtkIsoVolume::RequestData(vtkInformation* vtkNotUsed(request),
   // bool          usingLowerBoundClipDS (false);
   // bool          usingUpperBoundClipDS (false);
 
-  vtkSmartPointer<vtkDataObject> outObj1(0);
+  vtkSmartPointer<vtkDataObject> outObj1(nullptr);
 
   // Get the array name and field information.
   vtkInformationVector* inArrayVec = this->GetInformation()->Get(INPUT_ARRAYS_TO_PROCESS());

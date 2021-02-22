@@ -153,7 +153,7 @@ public:
   * DASHBOARD_TEST_FROM_CTEST environment variable is set. This may change in future.
   */
   static bool promptUser(const QString& settingsKey, QMessageBox::Icon icon, const QString& title,
-    const QString& message, QMessageBox::StandardButtons buttons, QWidget* parentWdg = NULL);
+    const QString& message, QMessageBox::StandardButtons buttons, QWidget* parentWdg = nullptr);
 
   /**
    * Converts a double value to a full precision QString.

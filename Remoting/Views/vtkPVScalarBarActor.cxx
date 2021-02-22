@@ -77,7 +77,7 @@ vtkPVScalarBarActor::vtkPVScalarBarActor()
   this->DrawTickMarks = 1;
   this->DrawSubTickMarks = 1;
   this->AddRangeLabels = 1;
-  this->RangeLabelFormat = NULL;
+  this->RangeLabelFormat = nullptr;
   this->SetRangeLabelFormat("%4.3e");
   this->TitleJustification = VTK_TEXT_CENTERED;
   this->AddRangeAnnotations = 1;
@@ -110,11 +110,11 @@ vtkPVScalarBarActor::~vtkPVScalarBarActor()
   if (this->ComponentTitle)
   {
     delete[] this->ComponentTitle;
-    this->ComponentTitle = NULL;
+    this->ComponentTitle = nullptr;
   }
 
   delete[] this->RangeLabelFormat;
-  this->RangeLabelFormat = NULL;
+  this->RangeLabelFormat = nullptr;
 }
 
 //-----------------------------------------------------------------------------
@@ -364,8 +364,8 @@ void vtkPVScalarBarActor::ComputeScalarBarThickness()
 //----------------------------------------------------------------------------
 void vtkPVScalarBarActor::LayoutTitle()
 {
-  if ((this->Title == NULL || !strlen(this->Title)) &&
-    (this->ComponentTitle == NULL || !strlen(this->ComponentTitle)))
+  if ((this->Title == nullptr || !strlen(this->Title)) &&
+    (this->ComponentTitle == nullptr || !strlen(this->ComponentTitle)))
   {
     this->P->TitleBox.Size[0] = this->P->TitleBox.Size[1] = 0;
     return;

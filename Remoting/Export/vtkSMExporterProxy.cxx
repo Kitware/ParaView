@@ -25,7 +25,7 @@ vtkCxxSetObjectMacro(vtkSMExporterProxy, View, vtkSMViewProxy);
 //----------------------------------------------------------------------------
 vtkSMExporterProxy::vtkSMExporterProxy()
 {
-  this->View = 0;
+  this->View = nullptr;
   this->FileExtensions.push_back("txt");
   this->SetLocation(vtkProcessModule::CLIENT);
 }
@@ -33,7 +33,7 @@ vtkSMExporterProxy::vtkSMExporterProxy()
 //----------------------------------------------------------------------------
 vtkSMExporterProxy::~vtkSMExporterProxy()
 {
-  this->SetView(0);
+  this->SetView(nullptr);
 }
 
 //----------------------------------------------------------------------------

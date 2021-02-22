@@ -225,7 +225,7 @@ public:
       std::pair<vtkItem, vtkItem>& itemsPair = this->ItemsMap[key];
       return use_second ? &(itemsPair.second) : &(itemsPair.first);
     }
-    return NULL;
+    return nullptr;
   }
 
   vtkItem* GetItem(
@@ -275,7 +275,7 @@ public:
   bool IsRepresentationVisible(unsigned int id) const
   {
     RepresentationsMapType::const_iterator riter = this->RepresentationsMap.find(id);
-    return (riter != this->RepresentationsMap.end() && riter->second.GetPointer() != NULL &&
+    return (riter != this->RepresentationsMap.end() && riter->second.GetPointer() != nullptr &&
       riter->second->GetVisibility());
   }
 

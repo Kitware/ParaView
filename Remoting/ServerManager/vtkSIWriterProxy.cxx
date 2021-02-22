@@ -32,13 +32,13 @@ vtkStandardNewMacro(vtkSIWriterProxy);
 //----------------------------------------------------------------------------
 vtkSIWriterProxy::vtkSIWriterProxy()
 {
-  this->FileNameMethod = NULL;
+  this->FileNameMethod = nullptr;
 }
 
 //----------------------------------------------------------------------------
 vtkSIWriterProxy::~vtkSIWriterProxy()
 {
-  this->SetFileNameMethod(NULL);
+  this->SetFileNameMethod(nullptr);
 }
 
 //----------------------------------------------------------------------------

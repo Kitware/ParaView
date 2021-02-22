@@ -139,7 +139,7 @@ void pqAboutDialog::AddClientInformation()
   ::addItem(tree, "vtkIdType size", QString("%1bits").arg(8 * sizeof(vtkIdType)));
 
   vtkNew<vtkPVPythonInformation> pythonInfo;
-  pythonInfo->CopyFromObject(NULL);
+  pythonInfo->CopyFromObject(nullptr);
 
   ::addItem(tree, "Embedded Python", pythonInfo->GetPythonSupport() ? "On" : "Off");
   if (pythonInfo->GetPythonSupport())

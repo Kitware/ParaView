@@ -54,7 +54,7 @@ public:
   ~pqLoadMaterialsReaction() override;
 
   static bool loadMaterials();
-  static bool loadMaterials(const QString& dbase, pqServer* server = NULL);
+  static bool loadMaterials(const QString& dbase, pqServer* server = nullptr);
 
 protected:
   /// Called when the action is triggered.

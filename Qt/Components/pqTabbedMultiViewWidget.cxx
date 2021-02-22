@@ -477,7 +477,7 @@ void pqTabbedMultiViewWidget::closeTab(int index)
 {
   pqMultiViewWidget* widget =
     qobject_cast<pqMultiViewWidget*>(this->Internals->TabWidget->widget(index));
-  vtkSMProxy* vlayout = widget ? widget->layoutManager() : NULL;
+  vtkSMProxy* vlayout = widget ? widget->layoutManager() : nullptr;
   if (vlayout)
   {
     pqServerManagerModel* smmodel = pqApplicationCore::instance()->getServerManagerModel();
@@ -688,7 +688,7 @@ void pqTabbedMultiViewWidget::contextMenuRequested(const QPoint& point)
   int tabIndex = this->Internals->TabWidget->tabBar()->tabAt(point);
   pqMultiViewWidget* widget =
     qobject_cast<pqMultiViewWidget*>(this->Internals->TabWidget->widget(tabIndex));
-  vtkSMProxy* vlayout = widget ? widget->layoutManager() : NULL;
+  vtkSMProxy* vlayout = widget ? widget->layoutManager() : nullptr;
   if (!vlayout)
   {
     return;

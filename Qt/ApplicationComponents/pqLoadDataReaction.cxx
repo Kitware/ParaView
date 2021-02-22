@@ -65,7 +65,7 @@ void pqLoadDataReaction::updateEnableState()
 {
   pqActiveObjects& activeObjects = pqActiveObjects::instance();
   // TODO: also is there's a pending accept.
-  bool enable_state = (activeObjects.activeServer() != NULL);
+  bool enable_state = (activeObjects.activeServer() != nullptr);
   this->parentAction()->setEnabled(enable_state);
 }
 
@@ -119,18 +119,18 @@ pqPipelineSource* pqLoadDataReaction::loadData(
 {
   if (files.empty())
   {
-    return NULL;
+    return nullptr;
   }
 
-  server = server != NULL ? server : pqActiveObjects::instance().activeServer();
+  server = server != nullptr ? server : pqActiveObjects::instance().activeServer();
   if (!server)
   {
     qCritical() << "Cannot create reader without an active server.";
-    return NULL;
+    return nullptr;
   }
 
   vtkSMReaderFactory* readerFactory = vtkSMProxyManager::GetProxyManager()->GetReaderFactory();
-  pqPipelineSource* reader = NULL;
+  pqPipelineSource* reader = nullptr;
 
   // Extension to ReaderType,ReaderGroup Hash table
   QHash<QString, QPair<QString, QString> > extensionToReaderSelection;

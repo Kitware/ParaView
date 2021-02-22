@@ -66,7 +66,7 @@ const char* vtkStringList::GetString(int idx)
   const auto& internals = (*this->Internals);
   if (idx < 0 || idx >= static_cast<int>(internals.Strings.size()))
   {
-    return NULL;
+    return nullptr;
   }
 
   return internals.Strings[idx].c_str();

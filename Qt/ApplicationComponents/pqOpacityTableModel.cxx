@@ -174,7 +174,7 @@ void pqOpacityTableModel::controlPointsChanged()
   int newSize = 0;
   if (stc)
   {
-    pwf = stc ? stc->GetScalarOpacityFunction() : NULL;
+    pwf = stc ? stc->GetScalarOpacityFunction() : nullptr;
     if (pwf)
     {
       newSize = pwf->GetSize();

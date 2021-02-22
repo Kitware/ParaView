@@ -30,7 +30,7 @@ vtkSMNullProxy::~vtkSMNullProxy()
 //-----------------------------------------------------------------------------
 void vtkSMNullProxy::CreateVTKObjects()
 {
-  this->SetVTKClassName(0);
+  this->SetVTKClassName(nullptr);
   this->Superclass::CreateVTKObjects();
 }
 

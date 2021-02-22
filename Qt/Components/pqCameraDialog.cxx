@@ -217,7 +217,7 @@ public:
 };
 
 //-----------------------------------------------------------------------------
-pqCameraDialog::pqCameraDialog(QWidget* _p /*=null*/, Qt::WindowFlags f /*=0*/)
+pqCameraDialog::pqCameraDialog(QWidget* _p /*=nullptr*/, Qt::WindowFlags f /*=0*/)
   : pqDialog(_p, f)
 {
   this->Internal = new pqCameraDialogInternal;
@@ -365,7 +365,7 @@ void pqCameraDialog::setupGUI()
     {
       // check if it is a camera link
       vtkSMCameraLink* cameraLink = vtkSMCameraLink::SafeDownCast(cameraLinks->GetItemAsObject(i));
-      if (cameraLink != NULL)
+      if (cameraLink != nullptr)
       {
         const char* linkName = pxm->GetRegisteredLinkName(cameraLink);
         if (model->hasInteractiveViewLink(linkName))
@@ -846,7 +846,7 @@ void pqCameraDialog::saveCameraConfiguration()
                       .arg(writer->GetFileDescription())
                       .arg(writer->GetFileExtension());
 
-  pqFileDialog dialog(0, this, "Save Camera Configuration", "", filters);
+  pqFileDialog dialog(nullptr, this, "Save Camera Configuration", "", filters);
   dialog.setFileMode(pqFileDialog::AnyFile);
 
   if (dialog.exec() == QDialog::Accepted)
@@ -873,7 +873,7 @@ void pqCameraDialog::loadCameraConfiguration()
                       .arg(reader->GetFileDescription())
                       .arg(reader->GetFileExtension());
 
-  pqFileDialog dialog(0, this, "Load Camera Configuration", "", filters);
+  pqFileDialog dialog(nullptr, this, "Load Camera Configuration", "", filters);
   dialog.setFileMode(pqFileDialog::ExistingFile);
 
   if (dialog.exec() == QDialog::Accepted)

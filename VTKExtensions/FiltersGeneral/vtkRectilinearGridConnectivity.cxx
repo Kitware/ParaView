@@ -172,17 +172,17 @@ private:
 
 vtkRectilinearGridConnectivityFaceHeap::vtkRectilinearGridConnectivityFaceHeap()
 {
-  this->Heap = 0;
-  this->Heaps = 0;
+  this->Heap = nullptr;
+  this->Heaps = nullptr;
   this->HeapLength = 0;
-  this->RecycleBin = 0;
+  this->RecycleBin = nullptr;
   this->NextFaceIndex = 0;
   this->NumberOfFacesPerAllocation = 1000;
 }
 
 vtkRectilinearGridConnectivityFaceHeap::~vtkRectilinearGridConnectivityFaceHeap()
 {
-  this->RecycleBin = 0;
+  this->RecycleBin = nullptr;
   this->NumberOfFacesPerAllocation = 0;
 
   while (this->Heaps)
@@ -216,14 +216,14 @@ void vtkRectilinearGridConnectivityFaceHeap::RecycleFace(vtkRectilinearGridConne
 
 vtkRectilinearGridConnectivityFace* vtkRectilinearGridConnectivityFaceHeap::NewFace()
 {
-  vtkRectilinearGridConnectivityFace* face = NULL;
+  vtkRectilinearGridConnectivityFace* face = nullptr;
 
   // look for faces to use in the recycle bin
   if (this->RecycleBin)
   {
     face = this->RecycleBin;
     this->RecycleBin = face->NextFace;
-    face->NextFace = 0;
+    face->NextFace = nullptr;
   }
   else
   {
@@ -243,7 +243,7 @@ vtkRectilinearGridConnectivityFace* vtkRectilinearGridConnectivityFaceHeap::NewF
   // we only need one cell id, because we delete from the hash
   // any face with two cells because it is internal
   face->BlockId = 0;
-  face->NextFace = 0;
+  face->NextFace = nullptr;
   face->PolygonId = 0;
   face->FragmentId = 0;
 
@@ -305,13 +305,13 @@ private:
 
 vtkRectilinearGridConnectivityFaceHash::vtkRectilinearGridConnectivityFaceHash()
 {
-  this->Hash = 0;
+  this->Hash = nullptr;
   this->Heap = new vtkRectilinearGridConnectivityFaceHeap;
 
   this->NumberOfPoints = 0;
   this->NumberOfFaces = 0;
   this->IteratorIndex = -1;
-  this->IteratorCurrent = 0;
+  this->IteratorCurrent = nullptr;
 }
 
 vtkRectilinearGridConnectivityFaceHash::~vtkRectilinearGridConnectivityFaceHash()
@@ -319,14 +319,14 @@ vtkRectilinearGridConnectivityFaceHash::~vtkRectilinearGridConnectivityFaceHash(
   if (this->Hash)
   {
     delete[] this->Hash;
-    this->Hash = 0;
+    this->Hash = nullptr;
   }
 
   delete this->Heap;
-  this->Heap = 0;
+  this->Heap = nullptr;
 
   this->IteratorIndex = 0;
-  this->IteratorCurrent = 0;
+  this->IteratorCurrent = nullptr;
   this->NumberOfFaces = 0;
 }
 
@@ -337,7 +337,7 @@ void vtkRectilinearGridConnectivityFaceHash::InitTraversal()
   // I just initialize the IteratorIndex as -1 (special value).
   // This assume that vtkIdType is signed!
   this->IteratorIndex = -1;
-  this->IteratorCurrent = 0;
+  this->IteratorCurrent = nullptr;
 }
 
 vtkRectilinearGridConnectivityFace* vtkRectilinearGridConnectivityFaceHash::GetNextFace()
@@ -345,7 +345,7 @@ vtkRectilinearGridConnectivityFace* vtkRectilinearGridConnectivityFaceHash::GetN
   if (this->IteratorIndex >= this->NumberOfPoints)
   {
     // past the end of the hash --- it has not been initialized.
-    return 0;
+    return nullptr;
   }
 
   // traverse the linked list.
@@ -356,12 +356,12 @@ vtkRectilinearGridConnectivityFace* vtkRectilinearGridConnectivityFaceHash::GetN
 
   // move through heap to find the next linked list if we hit the end of
   // the current linked list,
-  while (this->IteratorCurrent == 0)
+  while (this->IteratorCurrent == nullptr)
   {
     this->IteratorIndex++;
     if (this->IteratorIndex >= this->NumberOfPoints)
     {
-      return 0;
+      return nullptr;
     }
 
     this->IteratorCurrent = this->Hash[this->IteratorIndex];
@@ -421,7 +421,7 @@ vtkRectilinearGridConnectivityFace* vtkRectilinearGridConnectivityFaceHash::AddF
     {
       // find the face and remove it from the hash
       *ref = face->NextFace;
-      face->NextFace = 0;
+      face->NextFace = nullptr;
       this->Heap->RecycleFace(face);
       this->NumberOfFaces--;
 
@@ -494,15 +494,15 @@ vtkRectilinearGridConnectivityFace* vtkRectilinearGridConnectivityFaceHash::AddF
 //-----------------------------------------------------------------------------
 vtkRectilinearGridConnectivity::vtkRectilinearGridConnectivity()
 {
-  this->FaceHash = NULL;
-  this->DualGridBlocks = NULL;
+  this->FaceHash = nullptr;
+  this->DualGridBlocks = nullptr;
   this->NumberOfBlocks = 0;
   this->DualGridsReady = 0;
   this->DataBlocksTime = -1.0;
   this->DualGridBounds[0] = this->DualGridBounds[2] = this->DualGridBounds[4] = VTK_DOUBLE_MAX;
   this->DualGridBounds[1] = this->DualGridBounds[3] = this->DualGridBounds[5] = VTK_DOUBLE_MIN;
-  this->EquivalenceSet = NULL;
-  this->FragmentValues = NULL;
+  this->EquivalenceSet = nullptr;
+  this->FragmentValues = nullptr;
 
   this->Controller = vtkMultiProcessController::GetGlobalController();
 
@@ -522,7 +522,7 @@ vtkRectilinearGridConnectivity::vtkRectilinearGridConnectivity()
 //-----------------------------------------------------------------------------
 vtkRectilinearGridConnectivity::~vtkRectilinearGridConnectivity()
 {
-  this->Controller = NULL;
+  this->Controller = nullptr;
 
   if (this->Internal)
   {
@@ -531,25 +531,25 @@ vtkRectilinearGridConnectivity::~vtkRectilinearGridConnectivity()
     this->Internal->VolumeDataAttributeNames.clear();
     this->Internal->IntegrableAttributeNames.clear();
     delete this->Internal;
-    this->Internal = NULL;
+    this->Internal = nullptr;
   }
 
   if (this->FaceHash)
   {
     delete this->FaceHash;
-    this->FaceHash = NULL;
+    this->FaceHash = nullptr;
   }
 
   if (this->EquivalenceSet)
   {
     this->EquivalenceSet->Delete();
-    this->EquivalenceSet = NULL;
+    this->EquivalenceSet = nullptr;
   }
 
   if (this->FragmentValues)
   {
     this->FragmentValues->Delete();
-    this->FragmentValues = NULL;
+    this->FragmentValues = nullptr;
   }
 
   if (this->DualGridBlocks && this->NumberOfBlocks)
@@ -557,10 +557,10 @@ vtkRectilinearGridConnectivity::~vtkRectilinearGridConnectivity()
     for (int i = 0; i < this->NumberOfBlocks; i++)
     {
       this->DualGridBlocks[i]->Delete();
-      this->DualGridBlocks[i] = NULL;
+      this->DualGridBlocks[i] = nullptr;
     }
     delete[] this->DualGridBlocks;
-    this->DualGridBlocks = NULL;
+    this->DualGridBlocks = nullptr;
   }
 }
 
@@ -620,7 +620,7 @@ void vtkRectilinearGridConnectivity::RemoveUnsignedCharVolumeArrayNames()
 //-----------------------------------------------------------------------------
 void vtkRectilinearGridConnectivity::AddVolumeArrayName(char* arayName)
 {
-  if (arayName == 0)
+  if (arayName == nullptr)
   {
     return;
   }
@@ -633,7 +633,7 @@ void vtkRectilinearGridConnectivity::AddVolumeArrayName(char* arayName)
 //-----------------------------------------------------------------------------
 void vtkRectilinearGridConnectivity::AddDoubleVolumeArrayName(char* arayName)
 {
-  if (arayName == 0)
+  if (arayName == nullptr)
   {
     return;
   }
@@ -651,7 +651,7 @@ void vtkRectilinearGridConnectivity::AddDoubleVolumeArrayName(char* arayName)
 //-----------------------------------------------------------------------------
 void vtkRectilinearGridConnectivity::AddFloatVolumeArrayName(char* arayName)
 {
-  if (arayName == 0)
+  if (arayName == nullptr)
   {
     return;
   }
@@ -669,7 +669,7 @@ void vtkRectilinearGridConnectivity::AddFloatVolumeArrayName(char* arayName)
 //-----------------------------------------------------------------------------
 void vtkRectilinearGridConnectivity::AddUnsignedCharVolumeArrayName(char* arayName)
 {
-  if (arayName == 0)
+  if (arayName == nullptr)
   {
     return;
   }
@@ -701,7 +701,7 @@ const char* vtkRectilinearGridConnectivity::GetVolumeFractionArrayName(int array
 {
   if (arrayIdx < 0 || arrayIdx >= static_cast<int>(this->Internal->VolumeFractionArrayNames.size()))
   {
-    return 0;
+    return nullptr;
   }
   return this->Internal->VolumeFractionArrayNames[arrayIdx].c_str();
 }
@@ -783,9 +783,9 @@ int vtkRectilinearGridConnectivity::CheckVolumeDataArrays(
   int beNormal = 1;
   int numFracs = 0;
   int numArays = 0;
-  const char** aryNames = NULL;
-  const char* arayName = NULL;
-  vtkDataArray* cellAray = NULL;
+  const char** aryNames = nullptr;
+  const char* arayName = nullptr;
+  vtkDataArray* cellAray = nullptr;
 
   // check the number of arrays and specific array names
 
@@ -799,13 +799,13 @@ int vtkRectilinearGridConnectivity::CheckVolumeDataArrays(
   for (i = 0; i < numFracs; i++)
   {
     arayName = this->GetVolumeFractionArrayName(i);
-    if (recGrids[0]->GetCellData()->GetArray(arayName) == NULL)
+    if (recGrids[0]->GetCellData()->GetArray(arayName) == nullptr)
     {
-      arayName = NULL;
+      arayName = nullptr;
       vtkErrorMacro(<< "Cell data array " << arayName << " not found." << endl);
       return 0;
     }
-    arayName = NULL;
+    arayName = nullptr;
   }
 
   aryNames = new const char*[numArays];
@@ -828,10 +828,10 @@ int vtkRectilinearGridConnectivity::CheckVolumeDataArrays(
   {
     for (i = 0; i < numArays; i++)
     {
-      aryNames[i] = NULL;
+      aryNames[i] = nullptr;
     }
     delete[] aryNames;
-    aryNames = NULL;
+    aryNames = nullptr;
 
     vtkErrorMacro(<< "Blocks inconsistent in the number of arrays "
                   << "or array names." << endl);
@@ -868,9 +868,9 @@ int vtkRectilinearGridConnectivity::CheckVolumeDataArrays(
                       << "data type" << endl);
         break;
       }
-      cellAray = NULL;
+      cellAray = nullptr;
     }
-    arayName = NULL;
+    arayName = nullptr;
   }
 
   if (beNormal && this->Internal->VolumeDataAttributeNames.empty())
@@ -892,10 +892,10 @@ int vtkRectilinearGridConnectivity::CheckVolumeDataArrays(
 
   for (i = 0; i < numArays; i++)
   {
-    aryNames[i] = NULL;
+    aryNames[i] = nullptr;
   }
   delete[] aryNames;
-  aryNames = NULL;
+  aryNames = nullptr;
 
   return beNormal;
 }
@@ -918,7 +918,7 @@ int vtkRectilinearGridConnectivity::RequestData(
     vtkMultiBlockDataSet::SafeDownCast(outInfor->Get(vtkDataObject::DATA_OBJECT()));
   if (!outputMB)
   {
-    outInfor = NULL;
+    outInfor = nullptr;
     vtkErrorMacro(<< "Output vtkMultiBlockDataSet NULL." << endl);
     return 0;
   }
@@ -926,12 +926,12 @@ int vtkRectilinearGridConnectivity::RequestData(
   // check the input
   int inputIdx = 0;
   int numBlcks = 0;
-  vtkRectilinearGrid** recGrids = NULL;
+  vtkRectilinearGrid** recGrids = nullptr;
   vtkInformation* inputInf = inputVector[0]->GetInformationObject(0);
   vtkDataObject* pDataObj = inputInf->Get(vtkDataObject::DATA_OBJECT());
   vtkCompositeDataSet* cdsInput = vtkCompositeDataSet::SafeDownCast(pDataObj);
   vtkRectilinearGrid* recInput = vtkRectilinearGrid::SafeDownCast(pDataObj);
-  vtkCompositeDataIterator* cdIterat = NULL;
+  vtkCompositeDataIterator* cdIterat = nullptr;
 
   if (recInput)
   {
@@ -978,16 +978,16 @@ int vtkRectilinearGridConnectivity::RequestData(
     }
 
     cdIterat->Delete();
-    cdIterat = NULL;
+    cdIterat = nullptr;
   }
   else if (pDataObj)
   {
     // the input dataset is neither vtkCompositeDataSet nor vtkRectilinearGrid
-    inputInf = NULL;
-    outInfor = NULL;
-    pDataObj = NULL;
-    cdsInput = NULL;
-    recInput = NULL;
+    inputInf = nullptr;
+    outInfor = nullptr;
+    pDataObj = nullptr;
+    cdsInput = nullptr;
+    recInput = nullptr;
     vtkErrorMacro(<< "Failed to handle dataset of type " << pDataObj->GetClassName() << endl);
     return 0;
   }
@@ -1014,11 +1014,11 @@ int vtkRectilinearGridConnectivity::RequestData(
     this->DataBlocksTime = timeStep;
   }
 
-  inputInf = NULL;
-  outInfor = NULL;
-  pDataObj = NULL;
-  cdsInput = NULL;
-  recInput = NULL;
+  inputInf = nullptr;
+  outInfor = nullptr;
+  pDataObj = nullptr;
+  cdsInput = nullptr;
+  recInput = nullptr;
 
   // create vtkPolyData objects to be attached to the output
   int i;
@@ -1030,7 +1030,7 @@ int vtkRectilinearGridConnectivity::RequestData(
     theParts[i] = vtkPolyData::New();
     outputMB->SetBlock(i, theParts[i]);
   }
-  outputMB = NULL;
+  outputMB = nullptr;
 
   // note that some processes may not be assigned with any block if there are
   // more processes than the blocks and in this case nothing can be  done
@@ -1039,7 +1039,7 @@ int vtkRectilinearGridConnectivity::RequestData(
   // from the remote processes
   if (!recGrids || !numBlcks)
   {
-    // recGrids might be NULL and numBlcks might be zero in multi-process mode
+    // recGrids might be nullptr and numBlcks might be zero in multi-process mode
 
     if (this->Controller->GetLocalProcessId() &&   // a root process
       this->Controller->GetNumberOfProcesses() > 1 // multi-process
@@ -1054,10 +1054,10 @@ int vtkRectilinearGridConnectivity::RequestData(
     for (i = 0; i < numParts; i++)
     {
       theParts[i]->Delete();
-      theParts[i] = NULL;
+      theParts[i] = nullptr;
     }
     delete[] theParts;
-    theParts = NULL;
+    theParts = nullptr;
 
     return 1;
   }
@@ -1074,18 +1074,18 @@ int vtkRectilinearGridConnectivity::RequestData(
     {
       for (inputIdx = 0; inputIdx < numBlcks; inputIdx++)
       {
-        recGrids[inputIdx] = NULL;
+        recGrids[inputIdx] = nullptr;
       }
       delete[] recGrids;
-      recGrids = NULL;
+      recGrids = nullptr;
 
       for (i = 0; i < numParts; i++)
       {
         theParts[i]->Delete();
-        theParts[i] = NULL;
+        theParts[i] = nullptr;
       }
       delete[] theParts;
-      theParts = NULL;
+      theParts = nullptr;
 
       vtkErrorMacro(<< "Error with volume data arrays --- Fragments extraction "
                     << "cancelled." << endl);
@@ -1100,10 +1100,10 @@ int vtkRectilinearGridConnectivity::RequestData(
       for (i = 0; i < this->NumberOfBlocks; i++)
       {
         this->DualGridBlocks[i]->Delete();
-        this->DualGridBlocks[i] = NULL;
+        this->DualGridBlocks[i] = nullptr;
       }
       delete[] this->DualGridBlocks;
-      this->DualGridBlocks = NULL;
+      this->DualGridBlocks = nullptr;
     }
 
     // allocate a new array of dual grids
@@ -1112,7 +1112,7 @@ int vtkRectilinearGridConnectivity::RequestData(
     this->DualGridBlocks = new vtkRectilinearGrid*[numBlcks];
 
     // clear the bounding box
-    double* rcBounds = NULL;
+    double* rcBounds = nullptr;
     this->DualGridBounds[0] = this->DualGridBounds[2] = this->DualGridBounds[4] = VTK_DOUBLE_MAX;
     this->DualGridBounds[1] = this->DualGridBounds[3] = this->DualGridBounds[5] = VTK_DOUBLE_MIN;
 
@@ -1132,7 +1132,7 @@ int vtkRectilinearGridConnectivity::RequestData(
         (rcBounds[3] > this->DualGridBounds[3]) ? rcBounds[3] : this->DualGridBounds[3];
       this->DualGridBounds[5] =
         (rcBounds[5] > this->DualGridBounds[5]) ? rcBounds[5] : this->DualGridBounds[5];
-      rcBounds = NULL;
+      rcBounds = nullptr;
 
       this->DualGridBlocks[i] = vtkRectilinearGrid::New();
       this->CreateDualRectilinearGrid(recGrids[i], this->DualGridBlocks[i]);
@@ -1142,20 +1142,20 @@ int vtkRectilinearGridConnectivity::RequestData(
   // deallocate the pointers to the original grid blocks (with cell data)
   for (i = 0; i < numBlcks; i++)
   {
-    recGrids[i] = NULL;
+    recGrids[i] = nullptr;
   }
   delete[] recGrids;
-  recGrids = NULL;
+  recGrids = nullptr;
 
   // extract fragments based on the volume fraction array(s)
   for (i = 0; i < numParts; i++)
   {
     this->ExtractFragments(this->DualGridBlocks, numBlcks, this->DualGridBounds, i, theParts[i]);
     theParts[i]->Delete();
-    theParts[i] = NULL;
+    theParts[i] = nullptr;
   }
   delete[] theParts;
-  theParts = NULL;
+  theParts = nullptr;
 
   return 1;
 }
@@ -1173,11 +1173,11 @@ void vtkRectilinearGridConnectivity::ExtractFragments(vtkRectilinearGrid** dualG
   }
 
   int i;
-  int* maxFsize = NULL;
-  vtkPolyData** surfaces = NULL;
-  vtkPolyData* plyHedra = NULL;
-  vtkPoints* mbPoints = NULL;
-  vtkIncrementalOctreePointLocator* mbPntLoc = NULL;
+  int* maxFsize = nullptr;
+  vtkPolyData** surfaces = nullptr;
+  vtkPolyData* plyHedra = nullptr;
+  vtkPoints* mbPoints = nullptr;
+  vtkIncrementalOctreePointLocator* mbPntLoc = nullptr;
 
   mbPoints = vtkPoints::New();
   mbPntLoc = vtkIncrementalOctreePointLocator::New();
@@ -1219,7 +1219,7 @@ void vtkRectilinearGridConnectivity::ExtractFragments(vtkRectilinearGrid** dualG
     this->ExtractFragmentPolygons(i, maxFsize[i], plyHedra, surfaces[i], mbPntLoc);
 
     plyHedra->Delete();
-    plyHedra = NULL;
+    plyHedra = nullptr;
   }
 
   // The equivalenceSet keeps track of fragment ids and determines which
@@ -1227,7 +1227,7 @@ void vtkRectilinearGridConnectivity::ExtractFragments(vtkRectilinearGrid** dualG
   if (this->EquivalenceSet)
   {
     this->EquivalenceSet->Delete();
-    this->EquivalenceSet = NULL;
+    this->EquivalenceSet = nullptr;
   }
   this->EquivalenceSet = vtkEquivalenceSet::New();
 
@@ -1235,7 +1235,7 @@ void vtkRectilinearGridConnectivity::ExtractFragments(vtkRectilinearGrid** dualG
   if (this->FragmentValues)
   {
     this->FragmentValues->Delete();
-    this->FragmentValues = NULL;
+    this->FragmentValues = nullptr;
   }
   this->FragmentValues = vtkDoubleArray::New();
   this->FragmentValues->SetNumberOfComponents(
@@ -1249,19 +1249,19 @@ void vtkRectilinearGridConnectivity::ExtractFragments(vtkRectilinearGrid** dualG
   // memory deallocation
   mbPntLoc->Delete();
   mbPoints->Delete();
-  mbPntLoc = NULL;
-  mbPoints = NULL;
+  mbPntLoc = nullptr;
+  mbPoints = nullptr;
 
   delete[] maxFsize;
-  maxFsize = NULL;
+  maxFsize = nullptr;
 
   for (i = 0; i < numBlcks; i++)
   {
     surfaces[i]->Delete();
-    surfaces[i] = NULL;
+    surfaces[i] = nullptr;
   }
   delete[] surfaces;
-  surfaces = NULL;
+  surfaces = nullptr;
 
   // So far each process (either a remote process or the root process) has
   // processed the block(s), if any (some processes may not be assigned with
@@ -1313,7 +1313,7 @@ void vtkRectilinearGridConnectivity::ExtractFragments(vtkRectilinearGrid** dualG
 
       // obtain the global bounding box (note that vtkPolyData objects provided
       // by some processes including the root process might be just empty)
-      double* localBox = NULL;
+      double* localBox = nullptr;
       double globalBB[6] = { VTK_DOUBLE_MAX, VTK_DOUBLE_MIN, VTK_DOUBLE_MAX, VTK_DOUBLE_MIN,
         VTK_DOUBLE_MAX, VTK_DOUBLE_MIN };
       for (i = 0; i < numProcs; i++)
@@ -1327,7 +1327,7 @@ void vtkRectilinearGridConnectivity::ExtractFragments(vtkRectilinearGrid** dualG
           globalBB[1] = (localBox[1] > globalBB[1]) ? localBox[1] : globalBB[1];
           globalBB[3] = (localBox[3] > globalBB[3]) ? localBox[3] : globalBB[3];
           globalBB[5] = (localBox[5] > globalBB[5]) ? localBox[5] : globalBB[5];
-          localBox = NULL;
+          localBox = nullptr;
         }
       }
 
@@ -1344,16 +1344,16 @@ void vtkRectilinearGridConnectivity::ExtractFragments(vtkRectilinearGrid** dualG
         this->CreateInterProcessPolygons(
           tempPlys[procIndx], procPlys[procIndx], mbPntLoc, maxFsize[procIndx]);
         tempPlys[procIndx]->Delete();
-        tempPlys[procIndx] = NULL;
+        tempPlys[procIndx] = nullptr;
       }
       delete[] tempPlys;
-      tempPlys = NULL;
+      tempPlys = nullptr;
 
       // create an equivalence set for removing multiple fragments
       if (this->EquivalenceSet)
       {
         this->EquivalenceSet->Delete();
-        this->EquivalenceSet = NULL;
+        this->EquivalenceSet = nullptr;
       }
       this->EquivalenceSet = vtkEquivalenceSet::New();
 
@@ -1361,7 +1361,7 @@ void vtkRectilinearGridConnectivity::ExtractFragments(vtkRectilinearGrid** dualG
       if (this->FragmentValues)
       {
         this->FragmentValues->Delete();
-        this->FragmentValues = NULL;
+        this->FragmentValues = nullptr;
       }
       this->FragmentValues = vtkDoubleArray::New();
       this->FragmentValues->SetNumberOfComponents(
@@ -1376,18 +1376,18 @@ void vtkRectilinearGridConnectivity::ExtractFragments(vtkRectilinearGrid** dualG
       // memory deallocation specific to the inter-process module
       mbPntLoc->Delete();
       mbPoints->Delete();
-      mbPntLoc = NULL;
-      mbPoints = NULL;
+      mbPntLoc = nullptr;
+      mbPoints = nullptr;
 
       for (i = 0; i < numProcs; i++)
       {
         procPlys[i]->Delete();
-        procPlys[i] = NULL;
+        procPlys[i] = nullptr;
       }
       delete[] procPlys;
       delete[] maxFsize;
-      procPlys = NULL;
-      maxFsize = NULL;
+      procPlys = nullptr;
+      maxFsize = nullptr;
     }
   }
 
@@ -1395,19 +1395,19 @@ void vtkRectilinearGridConnectivity::ExtractFragments(vtkRectilinearGrid** dualG
   if (this->FaceHash)
   {
     delete this->FaceHash;
-    this->FaceHash = NULL;
+    this->FaceHash = nullptr;
   }
 
   if (this->EquivalenceSet)
   {
     this->EquivalenceSet->Delete();
-    this->EquivalenceSet = NULL;
+    this->EquivalenceSet = nullptr;
   }
 
   if (this->FragmentValues)
   {
     this->FragmentValues->Delete();
-    this->FragmentValues = NULL;
+    this->FragmentValues = nullptr;
   }
 }
 
@@ -1434,18 +1434,18 @@ void vtkRectilinearGridConnectivity::CreateDualRectilinearGrid(
   int dualDims[3];
   double theCords[2];
   double tempCord;
-  double* xSpacing = NULL;
-  double* ySpacing = NULL;
-  double* zSpacing = NULL;
-  vtkDataArray* rXcoords = NULL;
-  vtkDataArray* rYcoords = NULL;
-  vtkDataArray* rZcoords = NULL;
-  vtkDataArray** rcArrays = NULL;
-  vtkDoubleArray* dXcoords = NULL;
-  vtkDoubleArray* dYcoords = NULL;
-  vtkDoubleArray* dZcoords = NULL;
-  vtkDoubleArray** dpArrays = NULL;
-  vtkDoubleArray* dVolumes = NULL;
+  double* xSpacing = nullptr;
+  double* ySpacing = nullptr;
+  double* zSpacing = nullptr;
+  vtkDataArray* rXcoords = nullptr;
+  vtkDataArray* rYcoords = nullptr;
+  vtkDataArray* rZcoords = nullptr;
+  vtkDataArray** rcArrays = nullptr;
+  vtkDoubleArray* dXcoords = nullptr;
+  vtkDoubleArray* dYcoords = nullptr;
+  vtkDoubleArray* dZcoords = nullptr;
+  vtkDoubleArray** dpArrays = nullptr;
+  vtkDoubleArray* dVolumes = nullptr;
 
   // get the input grid
   rectGrid->GetDimensions(rectDims);
@@ -1563,15 +1563,15 @@ void vtkRectilinearGridConnectivity::CreateDualRectilinearGrid(
   {
     dualGrid->GetPointData()->AddArray(dpArrays[i]);
     dpArrays[i]->Delete();
-    dpArrays[i] = NULL;
-    rcArrays[i] = NULL;
+    dpArrays[i] = nullptr;
+    rcArrays[i] = nullptr;
   }
   delete[] dpArrays;
   delete[] rcArrays;
   delete[] numComps;
-  dpArrays = NULL;
-  rcArrays = NULL;
-  numComps = NULL;
+  dpArrays = nullptr;
+  rcArrays = nullptr;
+  numComps = nullptr;
 
   // memory de-allocation
   dXcoords->Delete();
@@ -1581,16 +1581,16 @@ void vtkRectilinearGridConnectivity::CreateDualRectilinearGrid(
   delete[] xSpacing;
   delete[] ySpacing;
   delete[] zSpacing;
-  dXcoords = NULL;
-  dYcoords = NULL;
-  dZcoords = NULL;
-  dVolumes = NULL;
-  xSpacing = NULL;
-  ySpacing = NULL;
-  zSpacing = NULL;
-  rXcoords = NULL;
-  rYcoords = NULL;
-  rZcoords = NULL;
+  dXcoords = nullptr;
+  dYcoords = nullptr;
+  dZcoords = nullptr;
+  dVolumes = nullptr;
+  xSpacing = nullptr;
+  ySpacing = nullptr;
+  zSpacing = nullptr;
+  rXcoords = nullptr;
+  rYcoords = nullptr;
+  rZcoords = nullptr;
 }
 
 //-----------------------------------------------------------------------------
@@ -1598,8 +1598,8 @@ void vtkRectilinearGridConnectivity::ExtractFragmentPolyhedra(
   vtkRectilinearGrid* rectGrid, const char* fracName, double isoValue, vtkPolyData* plyHedra)
 {
   if (!rectGrid || !plyHedra || !this->Internal->IntegrablePointDataArraysAvailable(rectGrid) ||
-    vtkDoubleArray::SafeDownCast(rectGrid->GetPointData()->GetArray(fracName)) == NULL ||
-    vtkDoubleArray::SafeDownCast(rectGrid->GetPointData()->GetArray("GeometricVolume")) == NULL)
+    vtkDoubleArray::SafeDownCast(rectGrid->GetPointData()->GetArray(fracName)) == nullptr ||
+    vtkDoubleArray::SafeDownCast(rectGrid->GetPointData()->GetArray("GeometricVolume")) == nullptr)
   {
     vtkErrorMacro(<< "Input vtkRectilinearGrid, point data GeometricVolume, "
                   << "integrable point data arrays, or output vtkPolyData "
@@ -1632,17 +1632,17 @@ void vtkRectilinearGridConnectivity::ExtractFragmentPolyhedra(
   int pntJindx = 0;
   int pntIndex = 0;
   int volIndex = 0;
-  int* numComps = NULL; // number of components
-  int* volPtIds = NULL;
-  double* volFracs = NULL;
-  double* geomVols = NULL;   // geometric volumes of the original cells
-  double** ptValues = NULL;  // arrays / pointer
-  double*** lastVals = NULL; // arrays / components / 8 nodes
-  double*** nodeVals = NULL; // arrays / components / 8 nodes
-  double*** acumVals = NULL; // accumulated values a vertex scatters
-  double** integVal = NULL;  // integrated attributes of a sub-volume
-  double integVol = 0.0;     // integrated attribute of a sub-volume
-  double interplt = 0.0;     // fraction value used for interpolation
+  int* numComps = nullptr; // number of components
+  int* volPtIds = nullptr;
+  double* volFracs = nullptr;
+  double* geomVols = nullptr;   // geometric volumes of the original cells
+  double** ptValues = nullptr;  // arrays / pointer
+  double*** lastVals = nullptr; // arrays / components / 8 nodes
+  double*** nodeVals = nullptr; // arrays / components / 8 nodes
+  double*** acumVals = nullptr; // accumulated values a vertex scatters
+  double** integVal = nullptr;  // integrated attributes of a sub-volume
+  double integVol = 0.0;        // integrated attribute of a sub-volume
+  double interplt = 0.0;        // fraction value used for interpolation
   double dataBbox[6];
   double acumVols[8]; // accumulated volume a vertex scatters
   double lastFrcs[8]; // to reuse quad scalars (1, 2, 5, 6 only)
@@ -1655,15 +1655,15 @@ void vtkRectilinearGridConnectivity::ExtractFragmentPolyhedra(
   vtkIdType cellIdxs[12]; // polygon-/face-indices of a sub-volume
   vtkIdType plyPtIds[5];  // PointT IDs of a PoLYgon
   vtkIdType cellIndx = 0;
-  vtkPoints* surfPnts = NULL;
-  vtkDataArray* pXcoords = NULL;
-  vtkDataArray* pYcoords = NULL;
-  vtkDataArray* pZcoords = NULL;
-  vtkCellArray* surfaces = NULL;
-  vtkIdTypeArray* uniVIdxs = NULL;
-  vtkDoubleArray* mVolumes = NULL;  // material volumes: SIGMA(fraction * volume)
-  vtkDoubleArray** volArays = NULL; // arrays / pointer
-  vtkIncrementalOctreePointLocator* pntAdder = NULL;
+  vtkPoints* surfPnts = nullptr;
+  vtkDataArray* pXcoords = nullptr;
+  vtkDataArray* pYcoords = nullptr;
+  vtkDataArray* pZcoords = nullptr;
+  vtkCellArray* surfaces = nullptr;
+  vtkIdTypeArray* uniVIdxs = nullptr;
+  vtkDoubleArray* mVolumes = nullptr;  // material volumes: SIGMA(fraction * volume)
+  vtkDoubleArray** volArays = nullptr; // arrays / pointer
+  vtkIncrementalOctreePointLocator* pntAdder = nullptr;
 
   static int EDGEVTXS[12][2] = { { 0, 1 }, { 1, 2 }, { 3, 2 }, { 0, 3 }, { 4, 5 }, { 5, 6 },
     { 7, 6 }, { 4, 7 }, { 0, 4 }, { 1, 5 }, { 3, 7 },
@@ -1708,7 +1708,7 @@ void vtkRectilinearGridConnectivity::ExtractFragmentPolyhedra(
       lastVals[a][c] = new double[8];
       nodeVals[a][c] = new double[8];
     }
-    tempAray = NULL;
+    tempAray = nullptr;
   }
   if (this->Internal->ComponentNumbersObtained == 0)
   {
@@ -2165,21 +2165,21 @@ void vtkRectilinearGridConnectivity::ExtractFragmentPolyhedra(
       delete[] lastVals[a][c];
       delete[] nodeVals[a][c];
       delete[] acumVals[a][c];
-      lastVals[a][c] = NULL;
-      nodeVals[a][c] = NULL;
-      acumVals[a][c] = NULL;
+      lastVals[a][c] = nullptr;
+      nodeVals[a][c] = nullptr;
+      acumVals[a][c] = nullptr;
     }
     delete[] lastVals[a];
     delete[] nodeVals[a];
     delete[] acumVals[a];
     delete[] integVal[a];
     volArays[a]->Delete();
-    lastVals[a] = NULL;
-    nodeVals[a] = NULL;
-    acumVals[a] = NULL;
-    integVal[a] = NULL;
-    volArays[a] = NULL;
-    ptValues[a] = NULL;
+    lastVals[a] = nullptr;
+    nodeVals[a] = nullptr;
+    acumVals[a] = nullptr;
+    integVal[a] = nullptr;
+    volArays[a] = nullptr;
+    ptValues[a] = nullptr;
   }
   delete[] numComps;
   delete[] lastVals;
@@ -2188,32 +2188,32 @@ void vtkRectilinearGridConnectivity::ExtractFragmentPolyhedra(
   delete[] integVal;
   delete[] volArays;
   delete[] ptValues;
-  numComps = NULL;
-  lastVals = NULL;
-  nodeVals = NULL;
-  acumVals = NULL;
-  integVal = NULL;
-  volArays = NULL;
-  ptValues = NULL;
+  numComps = nullptr;
+  lastVals = nullptr;
+  nodeVals = nullptr;
+  acumVals = nullptr;
+  integVal = nullptr;
+  volArays = nullptr;
+  ptValues = nullptr;
 
   surfPnts->Delete();
   surfaces->Delete();
   pntAdder->Delete();
   uniVIdxs->Delete();
   mVolumes->Delete();
-  surfPnts = NULL;
-  surfaces = NULL;
-  pntAdder = NULL;
-  uniVIdxs = NULL;
-  mVolumes = NULL;
+  surfPnts = nullptr;
+  surfaces = nullptr;
+  pntAdder = nullptr;
+  uniVIdxs = nullptr;
+  mVolumes = nullptr;
 
-  volPtIds = NULL;
-  volFracs = NULL;
-  geomVols = NULL;
-  pXcoords = NULL;
-  pYcoords = NULL;
-  pZcoords = NULL;
-  volCases = NULL;
+  volPtIds = nullptr;
+  volFracs = nullptr;
+  geomVols = nullptr;
+  pXcoords = nullptr;
+  pYcoords = nullptr;
+  pZcoords = nullptr;
+  volCases = nullptr;
 }
 
 //-----------------------------------------------------------------------------
@@ -2228,7 +2228,7 @@ void vtkRectilinearGridConnectivity::InitializeFaceHash(vtkPolyData* plyHedra)
   if (this->FaceHash)
   {
     delete this->FaceHash;
-    this->FaceHash = NULL;
+    this->FaceHash = nullptr;
   }
 
   int hashSize = plyHedra->GetPoints()->GetNumberOfPoints();
@@ -2245,9 +2245,9 @@ void vtkRectilinearGridConnectivity::AddPolygonsToFaceHash(int blockIdx, vtkPoly
 
   // make sure the vtkPolyData (set of polyhedra) contains cell data attributes
   // global volume Ids and material volume
-  if (plyHedra == NULL || !this->Internal->IntegrableCellDataArraysAvailable(plyHedra) ||
-    vtkIdTypeArray::SafeDownCast(plyHedra->GetCellData()->GetArray("VolumeId")) == NULL ||
-    vtkDoubleArray::SafeDownCast(plyHedra->GetCellData()->GetArray("MaterialVolume")) == NULL)
+  if (plyHedra == nullptr || !this->Internal->IntegrableCellDataArraysAvailable(plyHedra) ||
+    vtkIdTypeArray::SafeDownCast(plyHedra->GetCellData()->GetArray("VolumeId")) == nullptr ||
+    vtkDoubleArray::SafeDownCast(plyHedra->GetCellData()->GetArray("MaterialVolume")) == nullptr)
   {
     vtkErrorMacro(<< "Input vtkPolyData (plyHedra), cell data VolumeId "
                   << "or MaterialVolume NULL, or integrable cell data "
@@ -2260,22 +2260,22 @@ void vtkRectilinearGridConnectivity::AddPolygonsToFaceHash(int blockIdx, vtkPoly
   int theShift = 0;
   int bufIndex = 0;
   int numArays = 0;
-  int tupleSiz = 0;        // number of integrated components
-  int newIndex = 0;        // index of a new face
-  int fragIndx = 1;        // next fragment Id and 0 for removing faces
-  int minIndex = 1;        // the smallest fragment Id so far
-  int* numComps = NULL;    // number of integrated components
-  double* tupleBuf = NULL; // integrated component values
-  double** attrPtrs = NULL;
-  vtkCell* thisFace = NULL;   // a 2D polygon (instead of a 3D cell)
-  vtkIdType numFaces = 0;     // number of 2D polygons in a vtkPolyData
-  vtkIdType volIndex = 0;     // global volume Id attached to a 2D polygon
-  vtkIdType* vIdxsPtr = NULL; // array of global volume Ids
-  vtkDoubleArray* theArray = NULL;
-  vtkRectilinearGridConnectivityFace* hashFace = NULL; // a face in the hash
+  int tupleSiz = 0;           // number of integrated components
+  int newIndex = 0;           // index of a new face
+  int fragIndx = 1;           // next fragment Id and 0 for removing faces
+  int minIndex = 1;           // the smallest fragment Id so far
+  int* numComps = nullptr;    // number of integrated components
+  double* tupleBuf = nullptr; // integrated component values
+  double** attrPtrs = nullptr;
+  vtkCell* thisFace = nullptr;   // a 2D polygon (instead of a 3D cell)
+  vtkIdType numFaces = 0;        // number of 2D polygons in a vtkPolyData
+  vtkIdType volIndex = 0;        // global volume Id attached to a 2D polygon
+  vtkIdType* vIdxsPtr = nullptr; // array of global volume Ids
+  vtkDoubleArray* theArray = nullptr;
+  vtkRectilinearGridConnectivityFace* hashFace = nullptr; // a face in the hash
   vtkRectilinearGridConnectivityFace* newFaces[VTK_MAX_FACES_PER_CELL];
   for (i = 0; i < VTK_MAX_FACES_PER_CELL; i++)
-    newFaces[i] = NULL;
+    newFaces[i] = nullptr;
 
   // determine the number of integrated components (including the material
   // volume) to be saved to the global fragment attributes array and
@@ -2297,7 +2297,7 @@ void vtkRectilinearGridConnectivity::AddPolygonsToFaceHash(int blockIdx, vtkPoly
       plyHedra->GetCellData()->GetArray(this->Internal->IntegrableAttributeNames[a - 1].c_str()));
     attrPtrs[a] = theArray->GetPointer(0);
     numComps[a] = theArray->GetNumberOfComponents();
-    theArray = NULL;
+    theArray = nullptr;
   }
 
   // the vtkPolyData stores separated 2D polygons (triangles, quadrilaterlas,
@@ -2313,7 +2313,7 @@ void vtkRectilinearGridConnectivity::AddPolygonsToFaceHash(int blockIdx, vtkPoly
   numFaces = plyHedra->GetNumberOfCells();
   while (i < numFaces) // for each separated 2D polygon (face)
   {
-    // "0 < numFaces" guarantees that vIdxsPtr is not NULL
+    // "0 < numFaces" guarantees that vIdxsPtr is not nullptr
 
     // note that each cell is a 2D polygon (instead of a 3D cell) and we
     // have to use the cell data attribute, i.e., the attached volume Id,
@@ -2340,7 +2340,7 @@ void vtkRectilinearGridConnectivity::AddPolygonsToFaceHash(int blockIdx, vtkPoly
     while (vIdxsPtr[i] == volIndex) // for each face of the current volume
     {
       // this is really a face of the current volume: add it to the hash
-      hashFace = NULL;
+      hashFace = nullptr;
       thisFace = plyHedra->GetCell(i);
       switch (thisFace->GetNumberOfPoints())
       {
@@ -2360,11 +2360,11 @@ void vtkRectilinearGridConnectivity::AddPolygonsToFaceHash(int blockIdx, vtkPoly
           break;
 
         default:
-          hashFace = NULL;
+          hashFace = nullptr;
           vtkWarningMacro("Invalid number of points: face ignoired.");
           break;
       }
-      thisFace = NULL;
+      thisFace = nullptr;
 
       if (hashFace)
       {
@@ -2429,7 +2429,7 @@ void vtkRectilinearGridConnectivity::AddPolygonsToFaceHash(int blockIdx, vtkPoly
 
       // process the next 2D polygon by updating the index of the face
       i++;
-      hashFace = NULL;
+      hashFace = nullptr;
 
     } // for each face of a volume
 
@@ -2463,15 +2463,15 @@ void vtkRectilinearGridConnectivity::AddPolygonsToFaceHash(int blockIdx, vtkPoly
 
   for (i = 0; i < numArays; i++)
   {
-    attrPtrs[i] = NULL;
+    attrPtrs[i] = nullptr;
   }
   delete[] attrPtrs;
   delete[] numComps;
   delete[] tupleBuf;
-  attrPtrs = NULL;
-  numComps = NULL;
-  tupleBuf = NULL;
-  vIdxsPtr = NULL;
+  attrPtrs = nullptr;
+  numComps = nullptr;
+  tupleBuf = nullptr;
+  vIdxsPtr = nullptr;
 }
 
 //-----------------------------------------------------------------------------
@@ -2480,7 +2480,7 @@ void vtkRectilinearGridConnectivity::IntegrateFragmentAttributes(
 {
   // note this function may be called with non-successive values of fragIndx
 
-  double* attrsPtr = NULL;
+  double* attrsPtr = nullptr;
   vtkIdType arrayIdx = 0;
   vtkIdType fragSize = this->FragmentValues->GetNumberOfTuples();
 
@@ -2502,7 +2502,7 @@ void vtkRectilinearGridConnectivity::IntegrateFragmentAttributes(
   {
     (*attrsPtr) += (*attrVals);
   }
-  attrsPtr = NULL;
+  attrsPtr = nullptr;
 }
 
 //-----------------------------------------------------------------------------
@@ -2530,7 +2530,7 @@ void vtkRectilinearGridConnectivity::ResolveIntegratedFragmentAttributes()
   tmpArray->SetNumberOfTuples(resolves);
   memset(tmpArray->GetPointer(0), 0, resolves * numComps * sizeof(double));
 
-  double* arayPtr1 = NULL;
+  double* arayPtr1 = nullptr;
   double* arayPtr0 = this->FragmentValues->GetPointer(0);
   for (vtkIdType j = 0; j < initials; j++)
   {
@@ -2545,15 +2545,15 @@ void vtkRectilinearGridConnectivity::ResolveIntegratedFragmentAttributes()
   this->FragmentValues->Delete();
   this->FragmentValues = tmpArray; // to use shallow copy? xxx
 
-  tmpArray = NULL;
-  arayPtr0 = NULL;
-  arayPtr1 = NULL;
+  tmpArray = nullptr;
+  arayPtr0 = nullptr;
+  arayPtr1 = nullptr;
 }
 
 //-----------------------------------------------------------------------------
 void vtkRectilinearGridConnectivity::ResolveFaceFragmentIds()
 {
-  vtkRectilinearGridConnectivityFace* thisFace = NULL;
+  vtkRectilinearGridConnectivityFace* thisFace = nullptr;
   this->FaceHash->InitTraversal();
 
   while ((thisFace = this->FaceHash->GetNextFace()))
@@ -2561,7 +2561,7 @@ void vtkRectilinearGridConnectivity::ResolveFaceFragmentIds()
     thisFace->FragmentId = this->EquivalenceSet->GetEquivalentSetId(thisFace->FragmentId);
   }
 
-  thisFace = NULL;
+  thisFace = nullptr;
 }
 
 //-----------------------------------------------------------------------------
@@ -2592,7 +2592,7 @@ void vtkRectilinearGridConnectivity::ExtractFragmentPolygons(int blockIdx, int& 
   if (this->EquivalenceSet)
   {
     this->EquivalenceSet->Delete();
-    this->EquivalenceSet = NULL;
+    this->EquivalenceSet = nullptr;
   }
   this->EquivalenceSet = vtkEquivalenceSet::New();
 
@@ -2607,7 +2607,7 @@ void vtkRectilinearGridConnectivity::ExtractFragmentPolygons(int blockIdx, int& 
   if (this->FragmentValues)
   {
     this->FragmentValues->Delete();
-    this->FragmentValues = NULL;
+    this->FragmentValues = nullptr;
   }
   this->FragmentValues = vtkDoubleArray::New();
   this->FragmentValues->SetNumberOfComponents(tupleSiz);
@@ -2627,25 +2627,25 @@ void vtkRectilinearGridConnectivity::ExtractFragmentPolygons(int blockIdx, int& 
   int numArays;
   int numFaces;
   int numbPnts; // for a face
-  int* numComps = NULL;
+  int* numComps = nullptr;
   double* tupleBuf;   // integrated component values
   double pntCoord[3]; // a face point
   double thisBbox[6];
-  vtkIdType globePId;         // global Id of a point on exterior face
-  vtkIdType cellIndx;         // for the output vtkPolyData
-  vtkIdType facePIds[5];      // point Ids of a face (at most 5)
-  vtkCell* faceCell = NULL;   // a face from the polyhedra
-  vtkPoints* hedraPts = NULL; // vtkPoints of the polyhedra
-  vtkPoints* polyPnts = NULL;
-  vtkCellArray* plyCells = NULL;
-  vtkIntArray* fragIdxs = NULL;
-  vtkIdTypeArray* uniPIdxs = NULL;
-  vtkDoubleArray* theArray = NULL;
-  vtkDoubleArray** attrVals = NULL;
+  vtkIdType globePId;            // global Id of a point on exterior face
+  vtkIdType cellIndx;            // for the output vtkPolyData
+  vtkIdType facePIds[5];         // point Ids of a face (at most 5)
+  vtkCell* faceCell = nullptr;   // a face from the polyhedra
+  vtkPoints* hedraPts = nullptr; // vtkPoints of the polyhedra
+  vtkPoints* polyPnts = nullptr;
+  vtkCellArray* plyCells = nullptr;
+  vtkIntArray* fragIdxs = nullptr;
+  vtkIdTypeArray* uniPIdxs = nullptr;
+  vtkDoubleArray* theArray = nullptr;
+  vtkDoubleArray** attrVals = nullptr;
 
-  vtkIncrementalOctreePointLocator* pntAdder = NULL;   // for this block only
-  vtkRectilinearGridConnectivityFace* thisFace = NULL; // face from the hash
-  std::vector<vtkRectilinearGridConnectivityFace*>* theGroup = NULL;
+  vtkIncrementalOctreePointLocator* pntAdder = nullptr;   // for this block only
+  vtkRectilinearGridConnectivityFace* thisFace = nullptr; // face from the hash
+  std::vector<vtkRectilinearGridConnectivityFace*>* theGroup = nullptr;
   std::vector<vtkRectilinearGridConnectivityFace*>::iterator faceItrt;
   std::map<int,
     std::vector<vtkRectilinearGridConnectivityFace*> >
@@ -2686,7 +2686,7 @@ void vtkRectilinearGridConnectivity::ExtractFragmentPolygons(int blockIdx, int& 
       }
     }
   }
-  thisFace = NULL;
+  thisFace = nullptr;
 
   // the vtkPoints of the output vtkPolyData
   polyPnts = vtkPoints::New();
@@ -2736,7 +2736,7 @@ void vtkRectilinearGridConnectivity::ExtractFragmentPolygons(int blockIdx, int& 
     attrVals[i]->SetName(theArray->GetName());
     attrVals[i]->SetNumberOfComponents(numComps[i]);
     attrVals[i]->Allocate(numFaces, numFaces >> 4);
-    theArray = NULL;
+    theArray = nullptr;
   }
 
   // Now that all exterior faces (though each with incomplete information ---
@@ -2795,20 +2795,20 @@ void vtkRectilinearGridConnectivity::ExtractFragmentPolygons(int blockIdx, int& 
         theShift += numComps[i];
       }
 
-      thisFace = NULL;
-      faceCell = NULL;
+      thisFace = nullptr;
+      faceCell = nullptr;
 
-      // Set NULL to this entry to avoid the face from being destructed
+      // Set nullptr to this entry to avoid the face from being destructed
       // when the vector (theGroup) is removed from the map (groups). We
       // will use 'delete this->FaceHash' later to destroy all the faces.
-      *faceItrt = NULL;
+      *faceItrt = nullptr;
     }
 
     theGroup->clear();
-    theGroup = NULL;
+    theGroup = nullptr;
   }
   faceGrps.clear();
-  hedraPts = NULL;
+  hedraPts = nullptr;
 
   // fill the output vtkPolyData --- polygons
   polygons->SetPoints(polyPnts);
@@ -2819,7 +2819,7 @@ void vtkRectilinearGridConnectivity::ExtractFragmentPolygons(int blockIdx, int& 
   {
     polygons->GetCellData()->AddArray(attrVals[i]);
     attrVals[i]->Delete();
-    attrVals[i] = NULL;
+    attrVals[i] = nullptr;
   }
   polygons->Squeeze();
 
@@ -2833,14 +2833,14 @@ void vtkRectilinearGridConnectivity::ExtractFragmentPolygons(int blockIdx, int& 
   delete[] numComps;
   delete[] tupleBuf;
 
-  pntAdder = NULL;
-  polyPnts = NULL;
-  plyCells = NULL;
-  uniPIdxs = NULL;
-  fragIdxs = NULL;
-  attrVals = NULL;
-  numComps = NULL;
-  tupleBuf = NULL;
+  pntAdder = nullptr;
+  polyPnts = nullptr;
+  plyCells = nullptr;
+  uniPIdxs = nullptr;
+  fragIdxs = nullptr;
+  attrVals = nullptr;
+  numComps = nullptr;
+  tupleBuf = nullptr;
 }
 
 //-----------------------------------------------------------------------------
@@ -2858,7 +2858,8 @@ void vtkRectilinearGridConnectivity::InitializeFaceHash(vtkPolyData** plyDatas, 
     // else no any polygon remains after in-hash polygons resolution (removal
     // of internal faces). Note that a process may be assigned with no any block
     // at all.
-    if (vtkIdTypeArray::SafeDownCast(plyDatas[i]->GetPointData()->GetArray("GlobalNodeId")) == NULL)
+    if (vtkIdTypeArray::SafeDownCast(plyDatas[i]->GetPointData()->GetArray("GlobalNodeId")) ==
+      nullptr)
     {
       vtkDebugMacro(<< "Point data GlobalNodeId not found in "
                     << "vtkPolyData #" << i << endl);
@@ -2880,7 +2881,7 @@ void vtkRectilinearGridConnectivity::InitializeFaceHash(vtkPolyData** plyDatas, 
   if (this->FaceHash)
   {
     delete this->FaceHash;
-    this->FaceHash = NULL;
+    this->FaceHash = nullptr;
   }
   this->FaceHash = new vtkRectilinearGridConnectivityFaceHash;
   this->FaceHash->Initialize(maxIndex + 1);
@@ -2901,24 +2902,24 @@ void vtkRectilinearGridConnectivity::AddPolygonsToFaceHash(
   int theShift = 0;
   int bufIndex = 0;
   int numArays = 0;
-  int tupleSiz = 0;        // number of integrated components
-  int newIndex = 0;        // index of a new face of the local fragment
-  int minIndex = 1;        // the smallest (inter-block) fragment Id
-  int fragIndx = 1;        // next inter-block fragment Id and 0 for
-                           // removing faces
-  int* lfIdsPtr = NULL;    // array of local fragment Ids
-  int* numComps = NULL;    // number of integrated components
-  double* tupleBuf = NULL; // integrated component values
-  double** attrPtrs = NULL;
-  vtkCell* thisFace = NULL;   // a 2D polygon (not a 3D cell)
-  vtkIdType numFaces = 0;     // number of 2D polygons of an input vtkPolyData
-  vtkIdType localFId = 0;     // Id of the local fragment being processed
-  vtkIdType numbPnts = 0;     // for a face
-  vtkIdType pointIds[5];      // point Ids of a face (at most 5 points)
-  vtkIdType* ptIdsPtr = NULL; // array of point Ids
-  vtkDoubleArray* theArray = NULL;
-  vtkRectilinearGridConnectivityFace* hashFace = NULL; // a face in the hash
-  vtkRectilinearGridConnectivityFace** newFaces = NULL;
+  int tupleSiz = 0;           // number of integrated components
+  int newIndex = 0;           // index of a new face of the local fragment
+  int minIndex = 1;           // the smallest (inter-block) fragment Id
+  int fragIndx = 1;           // next inter-block fragment Id and 0 for
+                              // removing faces
+  int* lfIdsPtr = nullptr;    // array of local fragment Ids
+  int* numComps = nullptr;    // number of integrated components
+  double* tupleBuf = nullptr; // integrated component values
+  double** attrPtrs = nullptr;
+  vtkCell* thisFace = nullptr;   // a 2D polygon (not a 3D cell)
+  vtkIdType numFaces = 0;        // number of 2D polygons of an input vtkPolyData
+  vtkIdType localFId = 0;        // Id of the local fragment being processed
+  vtkIdType numbPnts = 0;        // for a face
+  vtkIdType pointIds[5];         // point Ids of a face (at most 5 points)
+  vtkIdType* ptIdsPtr = nullptr; // array of point Ids
+  vtkDoubleArray* theArray = nullptr;
+  vtkRectilinearGridConnectivityFace* hashFace = nullptr; // a face in the hash
+  vtkRectilinearGridConnectivityFace** newFaces = nullptr;
 
   // determine the number of integrated components (including the material
   // volume) to be saved to the global fragment attributes array and allocate a
@@ -2932,11 +2933,11 @@ void vtkRectilinearGridConnectivity::AddPolygonsToFaceHash(
   numComps = new int[numArays];
   attrPtrs = new double*[numArays];
   numComps[0] = 1;
-  attrPtrs[0] = NULL;
+  attrPtrs[0] = nullptr;
   for (a = 1; a < numArays; a++)
   {
     numComps[a] = 0;
-    attrPtrs[a] = NULL;
+    attrPtrs[a] = nullptr;
   }
 
   // process each vtkPolyData and add its 2D polygons (faces) to the hash
@@ -2948,10 +2949,10 @@ void vtkRectilinearGridConnectivity::AddPolygonsToFaceHash(
     // the exterior polygons of the same fragment --- 'macro volume'
 
     if (vtkIdTypeArray::SafeDownCast(plyDatas[j]->GetPointData()->GetArray("GlobalNodeId")) ==
-        NULL ||
-      vtkIntArray::SafeDownCast(plyDatas[j]->GetCellData()->GetArray("FragmentId")) == NULL ||
+        nullptr ||
+      vtkIntArray::SafeDownCast(plyDatas[j]->GetCellData()->GetArray("FragmentId")) == nullptr ||
       vtkDoubleArray::SafeDownCast(plyDatas[j]->GetCellData()->GetArray("MaterialVolume")) ==
-        NULL ||
+        nullptr ||
       !this->Internal->IntegrableCellDataArraysAvailable(plyDatas[j]))
     {
       vtkDebugMacro(<< "Point data GlobalNodeId, cell data FragmentId, "
@@ -2974,7 +2975,7 @@ void vtkRectilinearGridConnectivity::AddPolygonsToFaceHash(
         this->Internal->IntegrableAttributeNames[a - 1].c_str()));
       attrPtrs[a] = theArray->GetPointer(0);
       numComps[a] = theArray->GetNumberOfComponents();
-      theArray = NULL;
+      theArray = nullptr;
     }
 
     // given the maximum size of a fragment, i.e., the maximum number of
@@ -2983,7 +2984,7 @@ void vtkRectilinearGridConnectivity::AddPolygonsToFaceHash(
     newFaces = new vtkRectilinearGridConnectivityFace*[maxFsize[j]];
     for (k = 0; k < maxFsize[j]; k++)
     {
-      newFaces[k] = NULL;
+      newFaces[k] = nullptr;
     }
 
     i = 0;
@@ -2991,7 +2992,7 @@ void vtkRectilinearGridConnectivity::AddPolygonsToFaceHash(
     numFaces = plyDatas[j]->GetNumberOfCells();
     while (i < numFaces) // for each individual 2D polygon (face)
     {
-      // "0 < numFaces" guarantees ptIdsPtr, and lfIdsPtr are not NULL
+      // "0 < numFaces" guarantees ptIdsPtr, and lfIdsPtr are not nullptr
 
       // note that each cell is a 2D polygon (instead of a 3D cell) and we
       // have to use the cell data attribute, i.e., the local fragment Id,
@@ -3018,7 +3019,7 @@ void vtkRectilinearGridConnectivity::AddPolygonsToFaceHash(
       while (lfIdsPtr[i] == localFId) // for each face of the 'macro' volume
       {
         // this is a face of the current 'macro' volume
-        hashFace = NULL;
+        hashFace = nullptr;
         thisFace = plyDatas[j]->GetCell(i);
         numbPnts = thisFace->GetNumberOfPoints();
 
@@ -3050,10 +3051,10 @@ void vtkRectilinearGridConnectivity::AddPolygonsToFaceHash(
         }
         else
         {
-          hashFace = NULL;
+          hashFace = nullptr;
           vtkWarningMacro("Face ignored due to invalid number of points.");
         }
-        thisFace = NULL;
+        thisFace = nullptr;
 
         if (hashFace)
         {
@@ -3113,7 +3114,7 @@ void vtkRectilinearGridConnectivity::AddPolygonsToFaceHash(
 
         // process the next 2D polygon by updating the index of the face
         i++;
-        hashFace = NULL;
+        hashFace = nullptr;
 
       } // for each face of a 'macro' volume
 
@@ -3150,25 +3151,25 @@ void vtkRectilinearGridConnectivity::AddPolygonsToFaceHash(
     // clean up the buffer of new faces
     for (k = 0; k < maxFsize[j]; k++)
     {
-      newFaces[k] = NULL;
+      newFaces[k] = nullptr;
     }
     delete[] newFaces;
-    newFaces = NULL;
+    newFaces = nullptr;
 
     for (i = 0; i < numArays; i++)
     {
-      attrPtrs[i] = NULL;
+      attrPtrs[i] = nullptr;
     }
-    ptIdsPtr = NULL;
-    lfIdsPtr = NULL;
+    ptIdsPtr = nullptr;
+    lfIdsPtr = nullptr;
   } // for each input vtkPolyData
 
   delete[] attrPtrs;
   delete[] numComps;
   delete[] tupleBuf;
-  attrPtrs = NULL;
-  numComps = NULL;
-  tupleBuf = NULL;
+  attrPtrs = nullptr;
+  numComps = nullptr;
+  tupleBuf = nullptr;
 }
 
 //-----------------------------------------------------------------------------
@@ -3191,22 +3192,22 @@ void vtkRectilinearGridConnectivity::GenerateOutputFromSingleProcess(
   int tupleSiz; // number of integrated components
   int degnerat;
   int numbPnts; // for a face
-  int* numComps = NULL;
-  double pntCoord[3];      // a face point
-  double* tupleBuf = NULL; // integrated component values
-  double* rcBounds = NULL;
+  int* numComps = nullptr;
+  double pntCoord[3];         // a face point
+  double* tupleBuf = nullptr; // integrated component values
+  double* rcBounds = nullptr;
   double mbBounds[6] = { VTK_DOUBLE_MAX, VTK_DOUBLE_MIN, VTK_DOUBLE_MAX, VTK_DOUBLE_MIN,
     VTK_DOUBLE_MAX, VTK_DOUBLE_MIN };
-  vtkIdType facePIds[5];      // point Ids of a face (at most 5)
-  vtkCell* faceCell = NULL;   // a face from the vtkPolyData
-  vtkPoints* surfPnts = NULL; // vtkPoints attached to vtkPolyData
-  vtkPoints* polyPnts = NULL;
-  vtkCellArray* polygons = NULL;
-  vtkIntArray* fragIdxs = NULL;
-  vtkDoubleArray** attrVals = NULL;
-  vtkUnsignedCharArray* partIdxs = NULL;
-  vtkIncrementalOctreePointLocator* pntAdder = NULL;
-  vtkRectilinearGridConnectivityFace* thisFace = NULL;
+  vtkIdType facePIds[5];         // point Ids of a face (at most 5)
+  vtkCell* faceCell = nullptr;   // a face from the vtkPolyData
+  vtkPoints* surfPnts = nullptr; // vtkPoints attached to vtkPolyData
+  vtkPoints* polyPnts = nullptr;
+  vtkCellArray* polygons = nullptr;
+  vtkIntArray* fragIdxs = nullptr;
+  vtkDoubleArray** attrVals = nullptr;
+  vtkUnsignedCharArray* partIdxs = nullptr;
+  vtkIncrementalOctreePointLocator* pntAdder = nullptr;
+  vtkRectilinearGridConnectivityFace* thisFace = nullptr;
 
   // points and polygons (cells)
   polyPnts = vtkPoints::New();
@@ -3254,7 +3255,7 @@ void vtkRectilinearGridConnectivity::GenerateOutputFromSingleProcess(
     mbBounds[1] = (rcBounds[1] > mbBounds[1]) ? rcBounds[1] : mbBounds[1];
     mbBounds[3] = (rcBounds[3] > mbBounds[3]) ? rcBounds[3] : mbBounds[3];
     mbBounds[5] = (rcBounds[5] > mbBounds[5]) ? rcBounds[5] : mbBounds[5];
-    rcBounds = NULL;
+    rcBounds = nullptr;
   }
   pntAdder->SetTolerance(0.0001);
   pntAdder->InitPointInsertion(polyPnts, mbBounds, 10000);
@@ -3327,9 +3328,9 @@ void vtkRectilinearGridConnectivity::GenerateOutputFromSingleProcess(
     } // end if it is an exterior face
   }   // end loop over faces in the hash
 
-  thisFace = NULL;
-  surfPnts = NULL;
-  faceCell = NULL;
+  thisFace = nullptr;
+  surfPnts = nullptr;
+  faceCell = nullptr;
 
   // fill the output vtkPolyData
   polyData->SetPoints(polyPnts);
@@ -3340,7 +3341,7 @@ void vtkRectilinearGridConnectivity::GenerateOutputFromSingleProcess(
   {
     polyData->GetCellData()->AddArray(attrVals[i]);
     attrVals[i]->Delete();
-    attrVals[i] = NULL;
+    attrVals[i] = nullptr;
   }
   polyData->Squeeze();
 
@@ -3354,14 +3355,14 @@ void vtkRectilinearGridConnectivity::GenerateOutputFromSingleProcess(
   delete[] numComps;
   delete[] tupleBuf;
 
-  pntAdder = NULL;
-  polyPnts = NULL;
-  polygons = NULL;
-  fragIdxs = NULL;
-  partIdxs = NULL;
-  attrVals = NULL;
-  numComps = NULL;
-  tupleBuf = NULL;
+  pntAdder = nullptr;
+  polyPnts = nullptr;
+  polygons = nullptr;
+  fragIdxs = nullptr;
+  partIdxs = nullptr;
+  attrVals = nullptr;
+  numComps = nullptr;
+  tupleBuf = nullptr;
 }
 
 //-----------------------------------------------------------------------------
@@ -3382,8 +3383,8 @@ void vtkRectilinearGridConnectivity::CreateInterProcessPolygons(vtkPolyData* fra
 
   maxFsize = 1; // must be initialized before the if-statement below
 
-  if (vtkIntArray::SafeDownCast(fragPoly->GetCellData()->GetArray("FragmentId")) == NULL ||
-    vtkDoubleArray::SafeDownCast(fragPoly->GetCellData()->GetArray("MaterialVolume")) == NULL ||
+  if (vtkIntArray::SafeDownCast(fragPoly->GetCellData()->GetArray("FragmentId")) == nullptr ||
+    vtkDoubleArray::SafeDownCast(fragPoly->GetCellData()->GetArray("MaterialVolume")) == nullptr ||
     !this->Internal->IntegrableCellDataArraysAvailable(fragPoly))
   {
     vtkDebugMacro(<< "Cell data FragmentId, MaterialVolume, or integrated "
@@ -3398,19 +3399,19 @@ void vtkRectilinearGridConnectivity::CreateInterProcessPolygons(vtkPolyData* fra
   int numCells;
   int inCellId;
   int cellIndx;
-  int* fIdxsPtr = NULL;
-  int* numComps = NULL;
-  double** attrPtrs = NULL;
+  int* fIdxsPtr = nullptr;
+  int* numComps = nullptr;
+  double** attrPtrs = nullptr;
   double pntCoord[3];
-  vtkPoints* polyPnts = NULL;
+  vtkPoints* polyPnts = nullptr;
   vtkIdType globalId = 0;
-  vtkIntArray* uniFIdxs = NULL;
-  vtkCellArray* polygons = NULL;
-  vtkIdTypeArray* uniPIdxs = NULL;
-  vtkDoubleArray* theArray = NULL;
-  vtkDoubleArray** attrVals = NULL;
+  vtkIntArray* uniFIdxs = nullptr;
+  vtkCellArray* polygons = nullptr;
+  vtkIdTypeArray* uniPIdxs = nullptr;
+  vtkDoubleArray* theArray = nullptr;
+  vtkDoubleArray** attrVals = nullptr;
 
-  std::vector<int>* theGroup = NULL;
+  std::vector<int>* theGroup = nullptr;
   std::vector<int>::iterator cellItrt;
   std::map<int, std::vector<int> > cellGrps;
   std::map<int, std::vector<int> >::iterator grpItrat;
@@ -3465,7 +3466,7 @@ void vtkRectilinearGridConnectivity::CreateInterProcessPolygons(vtkPolyData* fra
     attrVals[i]->SetName(theArray->GetName());
     attrVals[i]->SetNumberOfComponents(numComps[i]);
     attrVals[i]->SetNumberOfTuples(numCells);
-    theArray = NULL;
+    theArray = nullptr;
   }
 
   // fill the GlobalNodeId array
@@ -3519,7 +3520,7 @@ void vtkRectilinearGridConnectivity::CreateInterProcessPolygons(vtkPolyData* fra
     }
 
     theGroup->clear();
-    theGroup = NULL;
+    theGroup = nullptr;
   }
   cellGrps.clear();
 
@@ -3532,8 +3533,8 @@ void vtkRectilinearGridConnectivity::CreateInterProcessPolygons(vtkPolyData* fra
   {
     procPoly->GetCellData()->AddArray(attrVals[i]);
     attrVals[i]->Delete();
-    attrVals[i] = NULL;
-    attrPtrs[i] = NULL;
+    attrVals[i] = nullptr;
+    attrPtrs[i] = nullptr;
   }
   procPoly->Squeeze();
 
@@ -3546,15 +3547,15 @@ void vtkRectilinearGridConnectivity::CreateInterProcessPolygons(vtkPolyData* fra
   delete[] attrPtrs;
   delete[] numComps;
 
-  polyPnts = NULL;
-  polygons = NULL;
-  uniFIdxs = NULL;
-  uniPIdxs = NULL;
-  attrVals = NULL;
-  fIdxsPtr = NULL;
-  attrVals = NULL;
-  attrPtrs = NULL;
-  numComps = NULL;
+  polyPnts = nullptr;
+  polygons = nullptr;
+  uniFIdxs = nullptr;
+  uniPIdxs = nullptr;
+  attrVals = nullptr;
+  fIdxsPtr = nullptr;
+  attrVals = nullptr;
+  attrPtrs = nullptr;
+  numComps = nullptr;
 }
 
 //-----------------------------------------------------------------------------
@@ -3571,24 +3572,24 @@ void vtkRectilinearGridConnectivity::AddInterProcessPolygonsToFaceHash(
   int theShift = 0;
   int bufIndex = 0;
   int numArays = 0;
-  int tupleSiz = 0;        // number of integrated components
-  int newIndex = 0;        // index of a new face of a local fragment
-  int minIndex = 1;        // the smallest (inter-process) fragment Id
-  int fragIndx = 1;        // next inter-process fragment Id and 0 for
-                           // removing faces
-  int* fIdxsPtr = NULL;    // array of local fragment Ids
-  int* numComps = NULL;    // number of integrated components
-  double* tupleBuf = NULL; // integrated component values
-  double** attrPtrs = NULL;
-  vtkCell* thisFace = NULL;   // a 2D polygon (not a 3D cell)
-  vtkIdType numFaces = 0;     // number of 2D polygons of an input vtkPolyData
-  vtkIdType procFIdx = 0;     // Id of the local fragment being processed
-  vtkIdType numbPnts = 0;     // for a face / polygon
-  vtkIdType pointIds[5];      // point Ids of a face (at most 5 points)
-  vtkIdType* pIdxsPtr = NULL; // array of point Ids
-  vtkDoubleArray* theArray = NULL;
-  vtkRectilinearGridConnectivityFace* hashFace = NULL; // a face in the hash
-  vtkRectilinearGridConnectivityFace** newFaces = NULL;
+  int tupleSiz = 0;           // number of integrated components
+  int newIndex = 0;           // index of a new face of a local fragment
+  int minIndex = 1;           // the smallest (inter-process) fragment Id
+  int fragIndx = 1;           // next inter-process fragment Id and 0 for
+                              // removing faces
+  int* fIdxsPtr = nullptr;    // array of local fragment Ids
+  int* numComps = nullptr;    // number of integrated components
+  double* tupleBuf = nullptr; // integrated component values
+  double** attrPtrs = nullptr;
+  vtkCell* thisFace = nullptr;   // a 2D polygon (not a 3D cell)
+  vtkIdType numFaces = 0;        // number of 2D polygons of an input vtkPolyData
+  vtkIdType procFIdx = 0;        // Id of the local fragment being processed
+  vtkIdType numbPnts = 0;        // for a face / polygon
+  vtkIdType pointIds[5];         // point Ids of a face (at most 5 points)
+  vtkIdType* pIdxsPtr = nullptr; // array of point Ids
+  vtkDoubleArray* theArray = nullptr;
+  vtkRectilinearGridConnectivityFace* hashFace = nullptr; // a face in the hash
+  vtkRectilinearGridConnectivityFace** newFaces = nullptr;
 
   // determine the number of integrated components (including the material
   // volume) to be saved to the global fragment attributes array and allocate
@@ -3602,11 +3603,11 @@ void vtkRectilinearGridConnectivity::AddInterProcessPolygonsToFaceHash(
   numComps = new int[numArays];
   attrPtrs = new double*[numArays];
   numComps[0] = 1;
-  attrPtrs[0] = NULL;
+  attrPtrs[0] = nullptr;
   for (a = 1; a < numArays; a++)
   {
     numComps[a] = 0;
-    attrPtrs[a] = NULL;
+    attrPtrs[a] = nullptr;
   }
 
   // process each vtkPolyData and add 2D polygons (faces) to the global hash
@@ -3622,10 +3623,10 @@ void vtkRectilinearGridConnectivity::AddInterProcessPolygonsToFaceHash(
     // with no any block at all due to the number of processes greater than that
     // of blocks) after local in-hash polygons-resolution may be just 'empty'.
     if (vtkIdTypeArray::SafeDownCast(procPlys[j]->GetPointData()->GetArray("GlobalNodeId")) ==
-        NULL ||
-      vtkIntArray::SafeDownCast(procPlys[j]->GetCellData()->GetArray("FragmentId")) == NULL ||
+        nullptr ||
+      vtkIntArray::SafeDownCast(procPlys[j]->GetCellData()->GetArray("FragmentId")) == nullptr ||
       vtkDoubleArray::SafeDownCast(procPlys[j]->GetCellData()->GetArray("MaterialVolume")) ==
-        NULL ||
+        nullptr ||
       !this->Internal->IntegrableCellDataArraysAvailable(procPlys[j]))
     {
       vtkDebugMacro(<< "Point data GlobalNodeId, cell data FragmentId, "
@@ -3648,7 +3649,7 @@ void vtkRectilinearGridConnectivity::AddInterProcessPolygonsToFaceHash(
         this->Internal->IntegrableAttributeNames[a - 1].c_str()));
       attrPtrs[a] = theArray->GetPointer(0);
       numComps[a] = theArray->GetNumberOfComponents();
-      theArray = NULL;
+      theArray = nullptr;
     }
 
     // given the maximum size of a fragment, i.e., the maximum number of
@@ -3657,7 +3658,7 @@ void vtkRectilinearGridConnectivity::AddInterProcessPolygonsToFaceHash(
     newFaces = new vtkRectilinearGridConnectivityFace*[maxFsize[j]];
     for (k = 0; k < maxFsize[j]; k++)
     {
-      newFaces[k] = NULL;
+      newFaces[k] = nullptr;
     }
 
     i = 0;
@@ -3665,7 +3666,7 @@ void vtkRectilinearGridConnectivity::AddInterProcessPolygonsToFaceHash(
     numFaces = procPlys[j]->GetNumberOfCells();
     while (i < numFaces) // for each individual 2D polygon (face)
     {
-      // "0 < numFaces" guarantees pIdxsPtr and fIdxsPtr are not NULL
+      // "0 < numFaces" guarantees pIdxsPtr and fIdxsPtr are not nullptr
 
       // note that each cell is a 2D polygon (instead of a 3D cell) and we
       // have to use the cell data attribute, i.e., the local fragment Id,
@@ -3692,7 +3693,7 @@ void vtkRectilinearGridConnectivity::AddInterProcessPolygonsToFaceHash(
       while (fIdxsPtr[i] == procFIdx) // for each face of the 'macro' volume
       {
         // this is a face of the current 'macro' volume
-        hashFace = NULL;
+        hashFace = nullptr;
         thisFace = procPlys[j]->GetCell(i);
         numbPnts = thisFace->GetNumberOfPoints();
 
@@ -3724,10 +3725,10 @@ void vtkRectilinearGridConnectivity::AddInterProcessPolygonsToFaceHash(
         }
         else
         {
-          hashFace = NULL;
+          hashFace = nullptr;
           vtkWarningMacro("Face ignored due to invalid number of points.");
         }
-        thisFace = NULL;
+        thisFace = nullptr;
 
         if (hashFace)
         {
@@ -3786,7 +3787,7 @@ void vtkRectilinearGridConnectivity::AddInterProcessPolygonsToFaceHash(
 
         // process the next 2D polygon by updating the index of the face
         i++;
-        hashFace = NULL;
+        hashFace = nullptr;
 
       } // for each face of a 'macro' volume
 
@@ -3823,25 +3824,25 @@ void vtkRectilinearGridConnectivity::AddInterProcessPolygonsToFaceHash(
     // clean up the buffer of new faces
     for (k = 0; k < maxFsize[j]; k++)
     {
-      newFaces[k] = NULL;
+      newFaces[k] = nullptr;
     }
     delete[] newFaces;
-    newFaces = NULL;
+    newFaces = nullptr;
 
     for (a = 0; a < numArays; a++)
     {
-      attrPtrs[a] = NULL;
+      attrPtrs[a] = nullptr;
     }
-    pIdxsPtr = NULL;
-    fIdxsPtr = NULL;
+    pIdxsPtr = nullptr;
+    fIdxsPtr = nullptr;
   } // for each input vtkPolyData
 
   delete[] attrPtrs;
   delete[] numComps;
   delete[] tupleBuf;
-  attrPtrs = NULL;
-  numComps = NULL;
-  tupleBuf = NULL;
+  attrPtrs = nullptr;
+  numComps = nullptr;
+  tupleBuf = nullptr;
 }
 
 //-----------------------------------------------------------------------------
@@ -3865,23 +3866,23 @@ void vtkRectilinearGridConnectivity::GenerateOutputFromMultiProcesses(
   int tupleSiz; // number of integrated components
   int degnerat;
   int numbPnts; // for an exterior face
-  int* numComps = NULL;
+  int* numComps = nullptr;
   double pntCoord[3];
-  double* tupleBuf = NULL; // integrated component values
-  double* rcBounds = NULL;
+  double* tupleBuf = nullptr; // integrated component values
+  double* rcBounds = nullptr;
   double mbBounds[6] = { VTK_DOUBLE_MAX, VTK_DOUBLE_MIN, VTK_DOUBLE_MAX, VTK_DOUBLE_MIN,
     VTK_DOUBLE_MAX, VTK_DOUBLE_MIN };
-  vtkCell* faceCell = NULL;   // a polygon of a vtkPolyData
-  vtkIdType facePIds[5];      // point Ids of a polygon (at most 5)
-  vtkPoints* surfPnts = NULL; // vtkPoints attached to a vtkPolyData
-  vtkPoints* polyPnts = NULL;
-  vtkIntArray* fragIdxs = NULL;
-  vtkIntArray* procIdxs = NULL;
-  vtkCellArray* polygons = NULL;
-  vtkDoubleArray** attrVals = NULL;
-  vtkUnsignedCharArray* partIdxs = NULL;
-  vtkIncrementalOctreePointLocator* pntAdder = NULL;
-  vtkRectilinearGridConnectivityFace* thisFace = NULL;
+  vtkCell* faceCell = nullptr;   // a polygon of a vtkPolyData
+  vtkIdType facePIds[5];         // point Ids of a polygon (at most 5)
+  vtkPoints* surfPnts = nullptr; // vtkPoints attached to a vtkPolyData
+  vtkPoints* polyPnts = nullptr;
+  vtkIntArray* fragIdxs = nullptr;
+  vtkIntArray* procIdxs = nullptr;
+  vtkCellArray* polygons = nullptr;
+  vtkDoubleArray** attrVals = nullptr;
+  vtkUnsignedCharArray* partIdxs = nullptr;
+  vtkIncrementalOctreePointLocator* pntAdder = nullptr;
+  vtkRectilinearGridConnectivityFace* thisFace = nullptr;
 
   // output points and polygons (cells)
   polyPnts = vtkPoints::New();
@@ -3932,7 +3933,7 @@ void vtkRectilinearGridConnectivity::GenerateOutputFromMultiProcesses(
     mbBounds[1] = (rcBounds[1] > mbBounds[1]) ? rcBounds[1] : mbBounds[1];
     mbBounds[3] = (rcBounds[3] > mbBounds[3]) ? rcBounds[3] : mbBounds[3];
     mbBounds[5] = (rcBounds[5] > mbBounds[5]) ? rcBounds[5] : mbBounds[5];
-    rcBounds = NULL;
+    rcBounds = nullptr;
   }
   pntAdder->SetTolerance(0.0001);
   pntAdder->InitPointInsertion(polyPnts, mbBounds, 10000);
@@ -4004,9 +4005,9 @@ void vtkRectilinearGridConnectivity::GenerateOutputFromMultiProcesses(
     } // end if it is an exterior face
   }   // end loop over faces in the hash
 
-  thisFace = NULL;
-  surfPnts = NULL;
-  faceCell = NULL;
+  thisFace = nullptr;
+  surfPnts = nullptr;
+  faceCell = nullptr;
 
   // fill the output vtkPolyData
   polyData->SetPoints(polyPnts);
@@ -4018,7 +4019,7 @@ void vtkRectilinearGridConnectivity::GenerateOutputFromMultiProcesses(
   {
     polyData->GetCellData()->AddArray(attrVals[i]);
     attrVals[i]->Delete();
-    attrVals[i] = NULL;
+    attrVals[i] = nullptr;
   }
   polyData->Squeeze();
 
@@ -4033,15 +4034,15 @@ void vtkRectilinearGridConnectivity::GenerateOutputFromMultiProcesses(
   delete[] numComps;
   delete[] tupleBuf;
 
-  pntAdder = NULL;
-  polyPnts = NULL;
-  polygons = NULL;
-  fragIdxs = NULL;
-  procIdxs = NULL;
-  partIdxs = NULL;
-  attrVals = NULL;
-  numComps = NULL;
-  tupleBuf = NULL;
+  pntAdder = nullptr;
+  polyPnts = nullptr;
+  polygons = nullptr;
+  fragIdxs = nullptr;
+  procIdxs = nullptr;
+  partIdxs = nullptr;
+  attrVals = nullptr;
+  numComps = nullptr;
+  tupleBuf = nullptr;
 }
 
 //-----------------------------------------------------------------------------

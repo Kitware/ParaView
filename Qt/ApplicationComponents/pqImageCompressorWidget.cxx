@@ -91,7 +91,7 @@ pqImageCompressorWidget::pqImageCompressorWidget(
 pqImageCompressorWidget::~pqImageCompressorWidget()
 {
   delete this->Internals;
-  this->Internals = 0;
+  this->Internals = nullptr;
 }
 
 //-----------------------------------------------------------------------------

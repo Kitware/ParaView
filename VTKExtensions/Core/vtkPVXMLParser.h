@@ -58,7 +58,7 @@ public:
   //@}
 
   /**
-   * Convenience method to parse XML contents. Will return NULL is the
+   * Convenience method to parse XML contents. Will return nullptr is the
    * xmlcontents cannot be parsed.
    */
   static vtkSmartPointer<vtkPVXMLElement> ParseXML(

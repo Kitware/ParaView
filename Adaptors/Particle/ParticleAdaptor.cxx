@@ -29,10 +29,10 @@
 
 namespace
 {
-vtkMPIController* controller = 0;
-vtkParticlePipeline* pipeline = 0;
-vtkCPProcessor* coProcessor = 0;
-vtkCPDataDescription* coProcessorData = 0;
+vtkMPIController* controller = nullptr;
+vtkParticlePipeline* pipeline = nullptr;
+vtkCPProcessor* coProcessor = nullptr;
+vtkCPDataDescription* coProcessorData = nullptr;
 }
 
 void coprocessorinitialize(void* handle)
@@ -40,11 +40,11 @@ void coprocessorinitialize(void* handle)
   if (!controller)
   {
     controller = vtkMPIController::New();
-    controller->Initialize(0, 0, 1);
+    controller->Initialize(nullptr, nullptr, 1);
     vtkMultiProcessController::SetGlobalController(controller);
   }
 
-  if (handle != NULL)
+  if (handle != nullptr)
   {
     vtkMPICommunicatorOpaqueComm mpicomm((MPI_Comm*)handle);
     vtkMPICommunicator* comm = vtkMPICommunicator::New();
@@ -132,23 +132,23 @@ void coprocessorfinalize()
   if (coProcessorData)
   {
     coProcessorData->Delete();
-    coProcessorData = 0;
+    coProcessorData = nullptr;
   }
   if (coProcessor)
   {
     coProcessor->Delete();
-    coProcessor = 0;
+    coProcessor = nullptr;
   }
   if (pipeline)
   {
     pipeline->Delete();
-    pipeline = 0;
+    pipeline = nullptr;
   }
   if (controller)
   {
     controller->Finalize(1);
     controller->Delete();
-    controller = 0;
-    vtkMultiProcessController::SetGlobalController(0);
+    controller = nullptr;
+    vtkMultiProcessController::SetGlobalController(nullptr);
   }
 }

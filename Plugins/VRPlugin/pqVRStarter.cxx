@@ -134,12 +134,12 @@ pqVRStarter::pqVRStarter(QObject* _parent /*=0*/)
   : QObject(_parent)
 {
   this->Internals = new pqInternals;
-  this->Internals->EventQueue = NULL;
-  this->Internals->Handler = NULL;
-  this->Internals->StyleFactory = NULL;
+  this->Internals->EventQueue = nullptr;
+  this->Internals->Handler = nullptr;
+  this->Internals->StyleFactory = nullptr;
 
 #if PARAVIEW_PLUGIN_VRPlugin_USE_VRPN
-  pqVREventPlayer* player = new pqVREventPlayer(NULL);
+  pqVREventPlayer* player = new pqVREventPlayer(nullptr);
   pqApplicationCore::instance()->testUtility()->eventPlayer()->addWidgetEventPlayer(player);
 #endif // PARAVIEW_PLUGIN_VRPlugin_USE_VRPN
 
@@ -182,9 +182,9 @@ void pqVRStarter::onShutdown()
     return;
   }
   this->IsShutdown = true;
-  pqVRConnectionManager::setInstance(NULL);
-  pqVRQueueHandler::setInstance(NULL);
-  vtkVRInteractorStyleFactory::SetInstance(NULL);
+  pqVRConnectionManager::setInstance(nullptr);
+  pqVRQueueHandler::setInstance(nullptr);
+  vtkVRInteractorStyleFactory::SetInstance(nullptr);
   delete this->Internals->Handler;
   delete this->Internals->ConnectionManager;
   this->Internals->EventQueue->Delete();

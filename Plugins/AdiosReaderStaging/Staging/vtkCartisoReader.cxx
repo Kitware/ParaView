@@ -49,8 +49,8 @@ struct vtkCartisoReader::Internals
 };
 
 vtkCartisoReader::vtkCartisoReader()
-  : Controller(NULL)
-  , StreamName(NULL)
+  : Controller(nullptr)
+  , StreamName(nullptr)
   , TimeOut(300.0f)
   , Step(-1)
   , StreamEnded(false)
@@ -62,7 +62,7 @@ vtkCartisoReader::vtkCartisoReader()
   this->SetStreamName("cartiso.full.bp");
 
   this->Internal = new Internals;
-  this->Internal->File = NULL;
+  this->Internal->File = nullptr;
   this->Internal->ReadMethod = ADIOS_READ_METHOD_FLEXPATH;
   // this->Internal->ReadMethod = ADIOS_READ_METHOD_BP;
 
@@ -74,7 +74,7 @@ vtkCartisoReader::~vtkCartisoReader()
 {
   this->Finalize();
 
-  this->SetController(NULL);
+  this->SetController(nullptr);
   delete this->Internal;
 }
 
@@ -126,7 +126,7 @@ void vtkCartisoReader::Finalize()
     adios_read_finalize_method(this->Internal->ReadMethod);
     adios_finalize(this->Controller->GetLocalProcessId());
 
-    this->Internal->File = NULL;
+    this->Internal->File = nullptr;
   }
 }
 
@@ -184,9 +184,9 @@ int vtkCartisoReader::RequestInformation(
   if (this->Internal->File && !this->Internal->Cached)
   {
     int ni, nj, nk;
-    adios_schedule_read(this->Internal->File, NULL, "ni", 0, 1, &ni);
-    adios_schedule_read(this->Internal->File, NULL, "nj", 0, 1, &nj);
-    adios_schedule_read(this->Internal->File, NULL, "nk", 0, 1, &nk);
+    adios_schedule_read(this->Internal->File, nullptr, "ni", 0, 1, &ni);
+    adios_schedule_read(this->Internal->File, nullptr, "nj", 0, 1, &nj);
+    adios_schedule_read(this->Internal->File, nullptr, "nk", 0, 1, &nk);
     adios_perform_reads(this->Internal->File, 1);
 
     int wholeExtent[6] = { 0, ni - 1, 0, nj - 1, 0, nk - 1 };
@@ -244,10 +244,10 @@ int vtkCartisoReader::RequestData(vtkInformation* vtkNotUsed(request),
 
     float deltax, deltay, deltaz;
     int tstep;
-    adios_schedule_read(this->Internal->File, NULL, "tstep", 0, 1, &tstep);
-    adios_schedule_read(this->Internal->File, NULL, "deltax", 0, 1, &deltax);
-    adios_schedule_read(this->Internal->File, NULL, "deltay", 0, 1, &deltay);
-    adios_schedule_read(this->Internal->File, NULL, "deltaz", 0, 1, &deltaz);
+    adios_schedule_read(this->Internal->File, nullptr, "tstep", 0, 1, &tstep);
+    adios_schedule_read(this->Internal->File, nullptr, "deltax", 0, 1, &deltax);
+    adios_schedule_read(this->Internal->File, nullptr, "deltay", 0, 1, &deltay);
+    adios_schedule_read(this->Internal->File, nullptr, "deltaz", 0, 1, &deltaz);
 
     ADIOS_SELECTION* sel = adios_selection_boundingbox(3, start, count);
     adios_schedule_read(this->Internal->File, sel, "value", 0, 1, value->GetPointer(0));

@@ -76,7 +76,7 @@ class vtkSMRepresentedArrayListDomainUpdateCommand : public vtkCommand
 public:
   vtkWeakPointer<vtkSMRepresentedArrayListDomain> Domain;
   typedef vtkCommand Superclass;
-  vtkSMRepresentedArrayListDomainUpdateCommand() { this->Domain = NULL; }
+  vtkSMRepresentedArrayListDomainUpdateCommand() { this->Domain = nullptr; }
   const char* GetClassNameInternal() const override
   {
     return "vtkSMRepresentedArrayListDomainUpdateCommand";
@@ -89,7 +89,7 @@ public:
   {
     if (this->Domain)
     {
-      this->Domain->Update(NULL);
+      this->Domain->Update(nullptr);
     }
   }
 };
@@ -124,20 +124,20 @@ vtkSMRepresentedArrayListDomain::vtkSMRepresentedArrayListDomain()
 //----------------------------------------------------------------------------
 vtkSMRepresentedArrayListDomain::~vtkSMRepresentedArrayListDomain()
 {
-  this->SetRepresentationProxy(NULL);
+  this->SetRepresentationProxy(nullptr);
 }
 
 //----------------------------------------------------------------------------
 void vtkSMRepresentedArrayListDomain::Update(vtkSMProperty* property)
 {
-  if (this->RepresentationProxy == NULL)
+  if (this->RepresentationProxy == nullptr)
   {
     // When the update happens the first time, save a reference to the
     // representation proxy and add observers so that we can monitor the
     // representation updates.
     vtkSMRepresentationProxy* selfProxy = (this->GetProperty()
         ? vtkSMRepresentationProxy::SafeDownCast(this->GetProperty()->GetParent())
-        : NULL);
+        : nullptr);
 
     // BUG #15586. This is a tricky issue. The problem is that the
     // PVRepresentationBase (which is a composite representation comprising of
@@ -154,7 +154,7 @@ void vtkSMRepresentedArrayListDomain::Update(vtkSMProperty* property)
     vtkSMRepresentationProxy* outerMostRepresentation =
       (selfProxy && this->UseTrueParentForRepresentatedDataInformation)
       ? vtkSMRepresentationProxy::SafeDownCast(selfProxy->GetTrueParentProxy())
-      : NULL;
+      : nullptr;
 
     this->SetRepresentationProxy(outerMostRepresentation ? outerMostRepresentation : selfProxy);
   }
@@ -182,7 +182,7 @@ void vtkSMRepresentedArrayListDomain::SetRepresentationProxy(vtkSMRepresentation
 //----------------------------------------------------------------------------
 void vtkSMRepresentedArrayListDomain::OnRepresentationDataUpdated()
 {
-  this->Update(NULL);
+  this->Update(nullptr);
 }
 
 //----------------------------------------------------------------------------
@@ -229,7 +229,7 @@ vtkPVDataInformation* vtkSMRepresentedArrayListDomain::GetExtraDataInformation()
   // messing up the state of other subproxies yet to be deserialized!
   return this->RepresentationProxy && this->RepresentationProxy->GetObjectsCreated()
     ? this->RepresentationProxy->GetRepresentedDataInformation()
-    : NULL;
+    : nullptr;
 }
 
 //----------------------------------------------------------------------------

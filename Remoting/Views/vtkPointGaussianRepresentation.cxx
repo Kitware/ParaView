@@ -33,10 +33,10 @@ vtkPointGaussianRepresentation::vtkPointGaussianRepresentation()
   this->Actor = vtkSmartPointer<vtkActor>::New();
   this->Actor->SetMapper(this->Mapper);
   this->ScaleByArray = false;
-  this->LastScaleArray = NULL;
+  this->LastScaleArray = nullptr;
   this->LastScaleArrayComponent = 0;
   this->OpacityByArray = false;
-  this->LastOpacityArray = NULL;
+  this->LastOpacityArray = nullptr;
   this->UseScaleFunction = true;
   this->SelectedPreset = vtkPointGaussianRepresentation::GAUSSIAN_BLUR;
   InitializeShaderPresets();
@@ -45,8 +45,8 @@ vtkPointGaussianRepresentation::vtkPointGaussianRepresentation()
 //----------------------------------------------------------------------------
 vtkPointGaussianRepresentation::~vtkPointGaussianRepresentation()
 {
-  this->SetLastScaleArray(NULL);
-  this->SetLastOpacityArray(NULL);
+  this->SetLastScaleArray(nullptr);
+  this->SetLastOpacityArray(nullptr);
 }
 
 //----------------------------------------------------------------------------
@@ -216,7 +216,7 @@ int vtkPointGaussianRepresentation::RequestData(
   }
 
   // Create a vtkMultiBlockDataSet on the client to match what is delivered by the server
-  if (this->ProcessedData == NULL)
+  if (this->ProcessedData == nullptr)
   {
     this->ProcessedData = vtkSmartPointer<vtkMultiBlockDataSet>::New();
   }
@@ -292,14 +292,14 @@ void vtkPointGaussianRepresentation::UpdateColoringParameters()
     else
     {
       this->Mapper->SetScalarVisibility(0);
-      this->Mapper->SelectColorArray(static_cast<const char*>(NULL));
+      this->Mapper->SelectColorArray(static_cast<const char*>(nullptr));
     }
 
     switch (fieldAssociation)
     {
       case vtkDataObject::FIELD_ASSOCIATION_CELLS:
         this->Mapper->SetScalarVisibility(0);
-        this->Mapper->SelectColorArray(static_cast<const char*>(NULL));
+        this->Mapper->SelectColorArray(static_cast<const char*>(nullptr));
         break;
 
       case vtkDataObject::FIELD_ASSOCIATION_POINTS:
@@ -360,7 +360,7 @@ void vtkPointGaussianRepresentation::SetScaleByArray(bool newVal)
   {
     this->ScaleByArray = newVal;
     this->Modified();
-    this->Mapper->SetScaleArray(this->ScaleByArray ? this->LastScaleArray : NULL);
+    this->Mapper->SetScaleArray(this->ScaleByArray ? this->LastScaleArray : nullptr);
     this->Mapper->SetScaleArrayComponent(this->ScaleByArray ? this->LastScaleArrayComponent : 0);
   }
 }
@@ -397,7 +397,7 @@ void vtkPointGaussianRepresentation::UpdateMapperScaleFunction()
 void vtkPointGaussianRepresentation::SelectScaleArray(int, int, int, int, const char* name)
 {
   this->SetLastScaleArray(name);
-  this->Mapper->SetScaleArray(this->ScaleByArray ? name : NULL);
+  this->Mapper->SetScaleArray(this->ScaleByArray ? name : nullptr);
 }
 
 //----------------------------------------------------------------------------
@@ -414,7 +414,7 @@ void vtkPointGaussianRepresentation::SetOpacityByArray(bool newVal)
   {
     this->OpacityByArray = newVal;
     this->Modified();
-    this->Mapper->SetOpacityArray(this->OpacityByArray ? this->LastOpacityArray : NULL);
+    this->Mapper->SetOpacityArray(this->OpacityByArray ? this->LastOpacityArray : nullptr);
     this->Mapper->SetOpacityArrayComponent(
       this->OpacityByArray ? this->LastOpacityArrayComponent : 0);
   }
@@ -430,7 +430,7 @@ void vtkPointGaussianRepresentation::SetOpacityTransferFunction(vtkPiecewiseFunc
 void vtkPointGaussianRepresentation::SelectOpacityArray(int, int, int, int, const char* name)
 {
   this->SetLastOpacityArray(name);
-  this->Mapper->SetOpacityArray(this->OpacityByArray ? name : NULL);
+  this->Mapper->SetOpacityArray(this->OpacityByArray ? name : nullptr);
 }
 
 //----------------------------------------------------------------------------

@@ -35,13 +35,13 @@ vtkSMBoundsDomain::vtkSMBoundsDomain()
   this->Mode = vtkSMBoundsDomain::NORMAL;
   this->ScaleFactor = 0.1;
   this->AxisFlags = X_Y_AND_Z_AXES;
-  this->ArrayRangeDomain = NULL;
+  this->ArrayRangeDomain = nullptr;
 }
 
 //---------------------------------------------------------------------------
 vtkSMBoundsDomain::~vtkSMBoundsDomain()
 {
-  if (this->ArrayRangeDomain != NULL)
+  if (this->ArrayRangeDomain != nullptr)
   {
     this->ArrayRangeDomain->Delete();
   }
@@ -82,7 +82,7 @@ vtkPVDataInformation* vtkSMBoundsDomain::GetInputInformation()
   if (!inputProperty)
   {
     vtkErrorMacro("Missing required property with function 'Input'");
-    return NULL;
+    return nullptr;
   }
 
   vtkSMUncheckedPropertyHelper helper(inputProperty);
@@ -94,7 +94,7 @@ vtkPVDataInformation* vtkSMBoundsDomain::GetInputInformation()
       return sp->GetDataInformation(helper.GetOutputPort());
     }
   }
-  return NULL;
+  return nullptr;
 }
 
 //---------------------------------------------------------------------------
@@ -284,7 +284,7 @@ void vtkSMBoundsDomain::SetDomainValues(double bounds[6])
   }
   else if (this->Mode == vtkSMBoundsDomain::ARRAY_SCALED_EXTENT)
   {
-    this->ArrayRangeDomain->Update(NULL);
+    this->ArrayRangeDomain->Update(nullptr);
     double arrayScaleFactor = 0;
     for (unsigned int i = 0; i < this->ArrayRangeDomain->GetNumberOfEntries(); i++)
     {
@@ -378,7 +378,7 @@ int vtkSMBoundsDomain::ReadXMLAttributes(vtkSMProperty* prop, vtkPVXMLElement* e
     return 0;
   }
 
-  bool has_default_mode = (element->GetAttribute("default_mode") != NULL);
+  bool has_default_mode = (element->GetAttribute("default_mode") != nullptr);
   const char* mode = element->GetAttribute("mode");
   if (mode)
   {
@@ -434,7 +434,7 @@ int vtkSMBoundsDomain::ReadXMLAttributes(vtkSMProperty* prop, vtkPVXMLElement* e
     else if (strcmp(mode, "array_scaled_extent") == 0)
     {
       this->Mode = vtkSMBoundsDomain::ARRAY_SCALED_EXTENT;
-      if (this->ArrayRangeDomain != NULL)
+      if (this->ArrayRangeDomain != nullptr)
       {
         this->ArrayRangeDomain->Delete();
       }

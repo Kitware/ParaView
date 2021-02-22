@@ -224,7 +224,7 @@ const char* vtkXMLCollectionReader::GetRestriction(const char* name)
   }
   else
   {
-    return 0;
+    return nullptr;
   }
 }
 
@@ -562,7 +562,7 @@ void vtkXMLCollectionReader::ReadXMLDataImpl()
 
       // Set the block name from the DataSet name attribute, if any
       vtkXMLDataElement* ds = this->Internal->RestrictedDataSets[i];
-      const char* name = ds ? ds->GetAttribute("name") : 0;
+      const char* name = ds ? ds->GetAttribute("name") : nullptr;
       if (name)
       {
         output->GetMetaData(i)->Set(vtkCompositeDataSet::NAME(), name);
@@ -605,7 +605,7 @@ void vtkXMLCollectionReader::ReadAFile(int index, int updatePiece, int updateNum
     // If a "name" attribute exists, store the name of the output in
     // its field data.
     vtkXMLDataElement* ds = this->Internal->RestrictedDataSets[index];
-    const char* name = ds ? ds->GetAttribute("name") : 0;
+    const char* name = ds ? ds->GetAttribute("name") : nullptr;
     if (name)
     {
       vtkCharArray* nmArray = vtkCharArray::New();
@@ -629,7 +629,7 @@ void vtkXMLCollectionReader::AddAttributeNameValue(const char* name, const char*
   // Find an entry for this attribute.
   vtkXMLCollectionReaderAttributeNames::iterator n =
     std::find(this->Internal->AttributeNames.begin(), this->Internal->AttributeNames.end(), name);
-  std::vector<vtkXMLCollectionReaderString>* values = 0;
+  std::vector<vtkXMLCollectionReaderString>* values = nullptr;
   if (n == this->Internal->AttributeNames.end())
   {
     // Need to create an entry for this attribute.
@@ -669,7 +669,7 @@ const char* vtkXMLCollectionReader::GetAttributeName(int attribute)
   {
     return this->Internal->AttributeNames[attribute].c_str();
   }
-  return 0;
+  return nullptr;
 }
 
 //----------------------------------------------------------------------------
@@ -707,7 +707,7 @@ const char* vtkXMLCollectionReader::GetAttributeValue(int attribute, int index)
   {
     return this->Internal->AttributeValueSets[attribute][index].c_str();
   }
-  return 0;
+  return nullptr;
 }
 
 //----------------------------------------------------------------------------
@@ -753,7 +753,7 @@ vtkXMLDataElement* vtkXMLCollectionReader::GetOutputXMLDataElement(int index)
     vtkErrorMacro("Attempt to get XMLDataElement for output index "
       << index << " from a reader with " << this->Internal->RestrictedDataSets.size()
       << " outputs.");
-    return 0;
+    return nullptr;
   }
   return this->Internal->RestrictedDataSets[index];
 }

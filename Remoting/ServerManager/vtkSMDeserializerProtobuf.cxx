@@ -42,13 +42,13 @@ vtkCxxSetObjectMacro(vtkSMDeserializerProtobuf, StateLocator, vtkSMStateLocator)
 //----------------------------------------------------------------------------
 vtkSMDeserializerProtobuf::vtkSMDeserializerProtobuf()
 {
-  this->StateLocator = 0;
+  this->StateLocator = nullptr;
 }
 
 //----------------------------------------------------------------------------
 vtkSMDeserializerProtobuf::~vtkSMDeserializerProtobuf()
 {
-  this->SetStateLocator(0);
+  this->SetStateLocator(nullptr);
 }
 
 //----------------------------------------------------------------------------
@@ -57,14 +57,14 @@ vtkSMProxy* vtkSMDeserializerProtobuf::NewProxy(vtkTypeUInt32 id, vtkSMProxyLoca
   vtkSMSession* session = this->GetSession();
   // Make sure that the requested proxy does not already exist
   assert("SMDeserializer should not create a proxy if that proxy exist" &&
-    (session == NULL || session->GetRemoteObject(id) == NULL));
+    (session == nullptr || session->GetRemoteObject(id) == nullptr));
 
   vtkSMMessage msg;
   // First extract state for the requested proxy
   // Did not find the proxy, start the creation procedure
   if (!this->StateLocator || !this->StateLocator->FindState(id, &msg))
   {
-    return 0;
+    return nullptr;
   }
 
   // ** isn't this unused code especially after the assert(..) above? Commenting
@@ -89,12 +89,12 @@ vtkSMProxy* vtkSMDeserializerProtobuf::NewProxy(vtkTypeUInt32 id, vtkSMProxyLoca
   const char* type = msg.GetExtension(ProxyState::xml_name).c_str();
   const char* subProxyName = (msg.HasExtension(ProxyState::xml_sub_proxy_name))
     ? msg.GetExtension(ProxyState::xml_sub_proxy_name).c_str()
-    : NULL;
+    : nullptr;
 
   if (!type)
   {
     vtkErrorMacro("Could not create proxy from element, missing 'type'.");
-    return 0;
+    return nullptr;
   }
 
   // Create Proxy based on its XML definition
@@ -104,7 +104,7 @@ vtkSMProxy* vtkSMDeserializerProtobuf::NewProxy(vtkTypeUInt32 id, vtkSMProxyLoca
     vtkErrorMacro("Could not create a proxy of group: "
       << (group ? group : "(null)") << " type: " << type
       << " subProxyName: " << (subProxyName ? subProxyName : "(null)"));
-    return 0;
+    return nullptr;
   }
 
   // Load the state of the proxy now

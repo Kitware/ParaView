@@ -22,10 +22,10 @@ vtkMaterialInterfaceCommBuffer::vtkMaterialInterfaceCommBuffer()
 {
   // header
   this->HeaderSize = 0;
-  this->Header = 0;
+  this->Header = nullptr;
   // buffer
   this->EOD = 0;
-  this->Buffer = 0;
+  this->Buffer = nullptr;
 }
 //----------------------------------------------------------------------------
 vtkMaterialInterfaceCommBuffer::~vtkMaterialInterfaceCommBuffer()
@@ -178,7 +178,7 @@ int vtkMaterialInterfaceCommBuffer::UnPack(
   vtkFloatArray* da, const int nComps, const vtkIdType nTups, const bool copyFlag)
 {
   int ret = 0;
-  float* pData = 0;
+  float* pData = nullptr;
   if (copyFlag)
   {
     da->SetNumberOfComponents(nComps);
@@ -205,7 +205,7 @@ int vtkMaterialInterfaceCommBuffer::UnPack(
   vtkDoubleArray* da, const int nComps, const vtkIdType nTups, const bool copyFlag)
 {
   int ret = 0;
-  double* pData = 0;
+  double* pData = nullptr;
   if (copyFlag)
   {
     da->SetNumberOfComponents(nComps);

@@ -461,7 +461,7 @@ const char* vtkFileSeriesReader::GetFileName(unsigned int idx)
 {
   if (idx >= this->Internal->RealFileNames.size())
   {
-    return 0;
+    return nullptr;
   }
   return this->Internal->RealFileNames[idx].c_str();
 }
@@ -745,7 +745,7 @@ int vtkFileSeriesReader::RequestData(
 int vtkFileSeriesReader::RequestInformationForInput(
   int index, vtkInformation* request, vtkInformationVector* outputVector)
 {
-  if ((index != this->_FileIndex) || (outputVector != NULL))
+  if ((index != this->_FileIndex) || (outputVector != nullptr))
   {
     if (this->GetNumberOfFileNames() > 0)
     {
@@ -753,7 +753,7 @@ int vtkFileSeriesReader::RequestInformationForInput(
     }
     else
     {
-      this->ReaderSetFileName(0);
+      this->ReaderSetFileName(nullptr);
     }
 
     this->_FileIndex = index;
@@ -784,7 +784,7 @@ int vtkFileSeriesReader::RequestInformationForInput(
       }
     }
     return this->Reader->ProcessRequest(
-      tempRequest, (vtkInformationVector**)NULL, tempOutputVector);
+      tempRequest, (vtkInformationVector**)nullptr, tempOutputVector);
   }
   return 1;
 }

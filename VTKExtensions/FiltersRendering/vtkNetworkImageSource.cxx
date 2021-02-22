@@ -41,15 +41,15 @@ vtkNetworkImageSource::vtkNetworkImageSource()
 {
   this->SetNumberOfInputPorts(0);
   this->Buffer = vtkImageData::New();
-  this->FileName = 0;
+  this->FileName = nullptr;
 }
 
 //----------------------------------------------------------------------------
 vtkNetworkImageSource::~vtkNetworkImageSource()
 {
-  this->SetFileName(0);
+  this->SetFileName(nullptr);
   this->Buffer->Delete();
-  this->Buffer = NULL;
+  this->Buffer = nullptr;
 }
 
 //----------------------------------------------------------------------------
@@ -60,7 +60,7 @@ void vtkNetworkImageSource::UpdateImage()
     return;
   }
 
-  if (this->FileName == NULL || this->FileName[0] == 0)
+  if (this->FileName == nullptr || this->FileName[0] == 0)
   {
     return;
   }

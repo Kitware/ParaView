@@ -49,14 +49,14 @@ public:
   static QString chartViewType() { return "BoxChartView"; }
 
   pqBoxChartView(const QString& group, const QString& name, vtkSMContextViewProxy* viewModule,
-    pqServer* server, QObject* parent = NULL);
+    pqServer* server, QObject* parent = nullptr);
 
   ~pqBoxChartView() override;
 
 Q_SIGNALS:
   /**
   * Fired when the currently shown representation changes. \c repr may be
-  * NULL.
+  * nullptr.
   */
   void showing(pqDataRepresentation* repr);
 

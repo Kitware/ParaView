@@ -26,7 +26,7 @@ void vtkSMPropertyHelperTest::Set()
   vtkSMSession* session = vtkSMSession::New();
   vtkSMSessionProxyManager* pxm = session->GetSessionProxyManager();
   vtkSMProxy* proxy = pxm->NewProxy("sources", "SphereSource");
-  QVERIFY(proxy != NULL);
+  QVERIFY(proxy != nullptr);
   QCOMPARE(vtkSMPropertyHelper(proxy, "Radius").GetAsDouble(), 0.5);
 
   vtkSMPropertyHelper(proxy, "Radius").Set(4.2);

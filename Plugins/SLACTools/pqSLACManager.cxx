@@ -66,17 +66,17 @@ public:
 };
 
 //=============================================================================
-QPointer<pqSLACManager> pqSLACManagerInstance = NULL;
+QPointer<pqSLACManager> pqSLACManagerInstance = nullptr;
 
 pqSLACManager* pqSLACManager::instance()
 {
-  if (pqSLACManagerInstance == NULL)
+  if (pqSLACManagerInstance == nullptr)
   {
     pqApplicationCore* core = pqApplicationCore::instance();
     if (!core)
     {
       qFatal("Cannot use the SLAC Tools without an application core instance.");
-      return NULL;
+      return nullptr;
     }
 
     pqSLACManagerInstance = new pqSLACManager(core);
@@ -95,7 +95,7 @@ pqSLACManager::pqSLACManager(QObject* p)
 
   // This widget serves no real purpose other than initializing the Actions
   // structure created with designer that holds the actions.
-  this->Internal->ActionPlaceholder = new QWidget(NULL);
+  this->Internal->ActionPlaceholder = new QWidget(nullptr);
   this->Internal->Actions.setupUi(this->Internal->ActionPlaceholder);
 
   this->actionShowParticles()->setChecked(true);
@@ -208,7 +208,7 @@ QWidget* pqSLACManager::getMainWindow()
     if (qobject_cast<QMainWindow*>(topWidget))
       return topWidget;
   }
-  return NULL;
+  return nullptr;
 }
 
 //-----------------------------------------------------------------------------
@@ -244,7 +244,7 @@ pqView* pqSLACManager::findView(pqPipelineSource* source, int port, const QStrin
   }
 
   // Give up.  A new view needs to be created.
-  return NULL;
+  return nullptr;
 }
 
 pqView* pqSLACManager::getMeshView()
@@ -275,7 +275,7 @@ pqPipelineSource* pqSLACManager::findPipelineSource(const char* SMName)
       return s;
   }
 
-  return NULL;
+  return nullptr;
 }
 
 pqPipelineSource* pqSLACManager::getMeshReader()
@@ -359,20 +359,20 @@ void pqSLACManager::checkActionEnabled()
     vtkPVDataInformation* dataInfo = outputPort->getDataInformation();
     vtkPVDataSetAttributesInformation* pointFields = dataInfo->GetPointDataInformation();
 
-    this->actionShowEField()->setEnabled(pointFields->GetArrayInformation("efield") != NULL);
-    this->actionShowBField()->setEnabled(pointFields->GetArrayInformation("bfield") != NULL);
+    this->actionShowEField()->setEnabled(pointFields->GetArrayInformation("efield") != nullptr);
+    this->actionShowBField()->setEnabled(pointFields->GetArrayInformation("bfield") != nullptr);
 
     this->actionSolidMesh()->setEnabled(true);
     this->actionWireframeSolidMesh()->setEnabled(true);
     this->actionWireframeAndBackMesh()->setEnabled(true);
 
-    this->actionPlotOverZ()->setEnabled(pointFields->GetArrayInformation("efield") != NULL);
+    this->actionPlotOverZ()->setEnabled(pointFields->GetArrayInformation("efield") != nullptr);
 
     this->actionTemporalResetRange()->setEnabled(true);
     this->actionCurrentTimeResetRange()->setEnabled(true);
   }
 
-  this->actionShowParticles()->setEnabled(particlesReader != NULL);
+  this->actionShowParticles()->setEnabled(particlesReader != nullptr);
 }
 
 //-----------------------------------------------------------------------------
@@ -452,7 +452,7 @@ void pqSLACManager::showField(const char* name)
       pm->NewProxy("strategies", "ClientDeliveryStrategy"));
     vtkSMSourceProxy* temporalRangesProxy =
       vtkSMSourceProxy::SafeDownCast(temporalRanges->getProxy());
-    delivery->AddInput(temporalRangesProxy, NULL);
+    delivery->AddInput(temporalRangesProxy, nullptr);
     delivery->Update();
     vtkAlgorithm* alg = vtkAlgorithm::SafeDownCast(delivery->GetOutput()->GetClientSideObject());
     vtkTable* ranges = vtkTable::SafeDownCast(alg->GetOutputDataObject(0));
@@ -538,7 +538,7 @@ void pqSLACManager::updatePlotField()
   // with the viewed mesh.
   auto domain =
     reprProxy->GetProperty("SeriesVisibility")->FindDomain<vtkSMChartSeriesSelectionDomain>();
-  if (domain == NULL)
+  if (domain == nullptr)
   {
     return;
   }

@@ -33,7 +33,7 @@ bool vtkSMInputArrayDomain::AutomaticPropertyConversion = false;
 
 //---------------------------------------------------------------------------
 static const char* const vtkSMInputArrayDomainAttributeTypes[] = { "point", "cell", "field",
-  "any-except-field", "vertex", "edge", "row", "any", NULL };
+  "any-except-field", "vertex", "edge", "row", "any", nullptr };
 
 //---------------------------------------------------------------------------
 vtkSMInputArrayDomain::vtkSMInputArrayDomain()
@@ -137,7 +137,7 @@ int vtkSMInputArrayDomain::IsInDomain(vtkSMSourceProxy* proxy, unsigned int outp
 
 //----------------------------------------------------------------------------
 bool vtkSMInputArrayDomain::IsAttributeTypeAcceptable(
-  int required_type, int attribute_type, int* acceptable_as_type /*=NULL*/)
+  int required_type, int attribute_type, int* acceptable_as_type /*=nullptr*/)
 {
   if (acceptable_as_type)
   {
@@ -216,7 +216,7 @@ bool vtkSMInputArrayDomain::IsAttributeTypeAcceptable(
 //----------------------------------------------------------------------------
 int vtkSMInputArrayDomain::IsArrayAcceptable(vtkPVArrayInformation* arrayInfo)
 {
-  if (arrayInfo == NULL)
+  if (arrayInfo == nullptr)
   {
     return -1;
   }
@@ -260,7 +260,8 @@ int vtkSMInputArrayDomain::IsArrayAcceptable(vtkPVArrayInformation* arrayInfo)
 //----------------------------------------------------------------------------
 bool vtkSMInputArrayDomain::IsAttributeTypeAcceptable(int attributeType)
 {
-  return vtkSMInputArrayDomain::IsAttributeTypeAcceptable(this->AttributeType, attributeType, NULL);
+  return vtkSMInputArrayDomain::IsAttributeTypeAcceptable(
+    this->AttributeType, attributeType, nullptr);
 }
 
 //----------------------------------------------------------------------------
@@ -342,7 +343,7 @@ const char* vtkSMInputArrayDomain::GetAttributeTypeAsString()
 //---------------------------------------------------------------------------
 void vtkSMInputArrayDomain::SetAttributeType(const char* type)
 {
-  if (type == NULL)
+  if (type == nullptr)
   {
     vtkErrorMacro("No type specified");
     return;

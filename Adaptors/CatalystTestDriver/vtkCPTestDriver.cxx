@@ -29,7 +29,7 @@ vtkCPTestDriver::vtkCPTestDriver()
 {
   // put in reasonable values for the time stepping
   this->NumberOfTimeSteps = 10;
-  this->GridBuilder = 0;
+  this->GridBuilder = nullptr;
   this->StartTime = 0;
   this->EndTime = 1;
 }
@@ -37,12 +37,12 @@ vtkCPTestDriver::vtkCPTestDriver()
 //----------------------------------------------------------------------------
 vtkCPTestDriver::~vtkCPTestDriver()
 {
-  this->SetGridBuilder(0);
+  this->SetGridBuilder(nullptr);
 }
 //----------------------------------------------------------------------------
 int vtkCPTestDriver::Run()
 {
-  if (this->GridBuilder == 0)
+  if (this->GridBuilder == nullptr)
   {
     vtkErrorMacro("Need to set the grid builder.");
     return 1;

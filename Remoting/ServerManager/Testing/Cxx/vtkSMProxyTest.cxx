@@ -35,7 +35,7 @@ void vtkSMProxyTest::SetAnnotation()
   QVERIFY(proxy->HasAnnotation("Owner"));
 
   // remove owner annotation
-  proxy->SetAnnotation("Owner", NULL);
+  proxy->SetAnnotation("Owner", nullptr);
   QCOMPARE(proxy->GetNumberOfAnnotations(), 2);
   QVERIFY(proxy->HasAnnotation("Color"));
   QVERIFY(proxy->HasAnnotation("Tooltip"));
@@ -70,17 +70,17 @@ void vtkSMProxyTest::GetProperty()
   vtkSMSession* session = vtkSMSession::New();
   vtkSMSessionProxyManager* pxm = session->GetSessionProxyManager();
   vtkSMProxy* proxy = pxm->NewProxy("sources", "SphereSource");
-  QVERIFY(proxy != NULL);
+  QVERIFY(proxy != nullptr);
 
   // get 'Center' smproperty
   vtkSMProperty* smproperty = proxy->GetProperty("Center");
-  QVERIFY(smproperty != NULL);
+  QVERIFY(smproperty != nullptr);
   QCOMPARE(proxy->GetPropertyName(smproperty), "Center");
 
   // try to get an invalid smproperty
   smproperty = proxy->GetProperty("NonexistantSphereProperty");
-  QVERIFY(smproperty == NULL);
-  QVERIFY(proxy->GetPropertyName(smproperty) == NULL);
+  QVERIFY(smproperty == nullptr);
+  QVERIFY(proxy->GetPropertyName(smproperty) == nullptr);
 
   proxy->Delete();
   session->Delete();
@@ -89,7 +89,7 @@ void vtkSMProxyTest::GetProperty()
 void vtkSMProxyTest::GetVTKClassName()
 {
   vtkSMProxy* proxy = vtkSMProxy::New();
-  QVERIFY(proxy->GetVTKClassName() == NULL);
+  QVERIFY(proxy->GetVTKClassName() == nullptr);
 
   proxy->SetVTKClassName("vtkSphereSource");
   QCOMPARE(proxy->GetVTKClassName(), "vtkSphereSource");

@@ -72,13 +72,13 @@ int TestResampledAMRImageSource(int argc, char* argv[])
   vtk_assert(resampler->NeedsInitialization() == false);
 
   vtkImageData* output = vtkImageData::SafeDownCast(resampler->GetOutputDataObject(0));
-  vtk_assert(output != NULL);
+  vtk_assert(output != nullptr);
   vtk_assert(output->GetDimensions()[0] == 32);
   vtk_assert(output->GetDimensions()[1] == 32);
   vtk_assert(output->GetDimensions()[2] == 32);
 
   vtkDataArray* temp = output->GetPointData()->GetArray("temp");
-  vtk_assert(temp != NULL);
+  vtk_assert(temp != nullptr);
   cout << "Tuple: 14544: " << temp->GetTuple1(14544) << endl;
 
   // FIXME: Add more validation code.

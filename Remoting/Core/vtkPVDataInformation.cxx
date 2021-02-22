@@ -266,7 +266,7 @@ void vtkPVDataInformation::Initialize()
   this->PointArrayInformation->Initialize();
   this->SetDataClassName(nullptr);
   this->SetCompositeDataClassName(nullptr);
-  this->SetCompositeDataSetName(0);
+  this->SetCompositeDataSetName(nullptr);
   this->TimeSpan[0] = VTK_DOUBLE_MAX;
   this->TimeSpan[1] = -VTK_DOUBLE_MAX;
   this->HasTime = 0;
@@ -1521,7 +1521,7 @@ void vtkPVDataInformation::CopyFromStream(const vtkClientServerStream* css)
     vtkErrorMacro("Error parsing number of time steps.");
     return;
   }
-  const char* timeLabel = 0;
+  const char* timeLabel = nullptr;
   if (!CSS_GET_NEXT_ARGUMENT(css, 0, &timeLabel))
   {
     vtkErrorMacro("Error parsing time label.");

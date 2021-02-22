@@ -83,8 +83,8 @@ int vtkCDBWriter::RequestData(vtkInformation* vtkNotUsed(request),
   vtkSmartPyObject py_callable(PyObject_GetAttrString(module, "write"));
   vtkSmartPyObject py_fname(PyString_FromString(this->Path));
   vtkSmartPyObject py_table(vtkPythonUtil::GetObjectFromPointer(input));
-  vtkSmartPyObject py_result(
-    PyObject_CallFunctionObjArgs(py_callable, py_fname.GetPointer(), py_table.GetPointer(), NULL));
+  vtkSmartPyObject py_result(PyObject_CallFunctionObjArgs(
+    py_callable, py_fname.GetPointer(), py_table.GetPointer(), nullptr));
   if (::CheckError() || !py_result)
   {
     return 0;

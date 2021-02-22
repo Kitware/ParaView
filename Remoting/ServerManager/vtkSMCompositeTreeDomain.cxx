@@ -30,28 +30,28 @@ vtkCxxSetObjectMacro(vtkSMCompositeTreeDomain, Information, vtkPVDataInformation
 //----------------------------------------------------------------------------
 vtkSMCompositeTreeDomain::vtkSMCompositeTreeDomain()
 {
-  this->Information = 0;
-  this->LastInformation = 0;
+  this->Information = nullptr;
+  this->LastInformation = nullptr;
   this->Mode = ALL;
   this->DefaultMode = DEFAULT;
-  this->Source = 0;
+  this->Source = nullptr;
   this->SourcePort = 0;
 }
 
 //----------------------------------------------------------------------------
 vtkSMCompositeTreeDomain::~vtkSMCompositeTreeDomain()
 {
-  this->Source = 0;
+  this->Source = nullptr;
   this->SourcePort = 0;
-  this->SetInformation(0);
+  this->SetInformation(nullptr);
 }
 
 //---------------------------------------------------------------------------
 void vtkSMCompositeTreeDomain::Update(vtkSMProperty*)
 {
-  this->Source = 0;
+  this->Source = nullptr;
   this->SourcePort = 0;
-  this->SetInformation(0);
+  this->SetInformation(nullptr);
 
   vtkSMInputProperty* pp = vtkSMInputProperty::SafeDownCast(this->GetRequiredProperty("Input"));
   if (pp)

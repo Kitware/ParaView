@@ -46,14 +46,14 @@ vtkClientServerMoveData::vtkClientServerMoveData()
   this->WholeExtent[3] = -1;
   this->WholeExtent[4] = 0;
   this->WholeExtent[5] = -1;
-  this->Controller = 0;
+  this->Controller = nullptr;
   this->ProcessType = AUTO;
 }
 
 //-----------------------------------------------------------------------------
 vtkClientServerMoveData::~vtkClientServerMoveData()
 {
-  this->SetController(NULL);
+  this->SetController(nullptr);
 }
 
 //-----------------------------------------------------------------------------
@@ -110,7 +110,7 @@ int vtkClientServerMoveData::RequestData(
 {
   vtkInformation* outInfo = outputVector->GetInformationObject(0);
 
-  vtkDataObject* input = 0;
+  vtkDataObject* input = nullptr;
   vtkDataObject* output = outInfo->Get(vtkDataObject::DATA_OBJECT());
 
   if (inputVector[0]->GetNumberOfInformationObjects() > 0)
@@ -217,7 +217,7 @@ int vtkClientServerMoveData::SendData(vtkDataObject* input, vtkMultiProcessContr
 //-----------------------------------------------------------------------------
 vtkDataObject* vtkClientServerMoveData::ReceiveData(vtkMultiProcessController* controller)
 {
-  vtkDataObject* data = NULL;
+  vtkDataObject* data = nullptr;
   if (this->OutputDataType == VTK_SELECTION)
   {
     // Get the size of the string.
@@ -225,7 +225,7 @@ vtkDataObject* vtkClientServerMoveData::ReceiveData(vtkMultiProcessController* c
     controller->Receive(&size, 1, 1, vtkClientServerMoveData::TRANSMIT_DATA_OBJECT);
     if (size == 0)
     {
-      return NULL;
+      return nullptr;
     }
     char* xml = new char[size + 1];
     // Get the string itself.

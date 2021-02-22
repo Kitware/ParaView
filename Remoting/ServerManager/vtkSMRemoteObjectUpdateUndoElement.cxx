@@ -32,7 +32,7 @@ vtkSetObjectImplementationMacro(
 //-----------------------------------------------------------------------------
 vtkSMRemoteObjectUpdateUndoElement::vtkSMRemoteObjectUpdateUndoElement()
 {
-  this->ProxyLocator = NULL;
+  this->ProxyLocator = nullptr;
   this->AfterState = new vtkSMMessage();
   this->BeforeState = new vtkSMMessage();
 }
@@ -42,10 +42,10 @@ vtkSMRemoteObjectUpdateUndoElement::~vtkSMRemoteObjectUpdateUndoElement()
 {
   delete this->AfterState;
   delete this->BeforeState;
-  this->AfterState = NULL;
-  this->BeforeState = NULL;
+  this->AfterState = nullptr;
+  this->BeforeState = nullptr;
 
-  this->SetProxyLocator(NULL);
+  this->SetProxyLocator(nullptr);
 }
 
 //-----------------------------------------------------------------------------

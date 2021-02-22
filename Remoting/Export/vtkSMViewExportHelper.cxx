@@ -94,10 +94,10 @@ std::string vtkSMViewExportHelper::GetSupportedFileTypes(vtkSMViewProxy* view)
 vtkSMExporterProxy* vtkSMViewExportHelper::CreateExporter(
   const char* filename, vtkSMViewProxy* view)
 {
-  if (!view || filename == NULL || filename[0] == '\0')
+  if (!view || filename == nullptr || filename[0] == '\0')
   {
     vtkErrorMacro("Invalid input arguments to Export.");
-    return NULL;
+    return nullptr;
   }
 
   vtkSMSessionProxyManager* pxm = view->GetSessionProxyManager();
@@ -132,7 +132,7 @@ vtkSMExporterProxy* vtkSMViewExportHelper::CreateExporter(
       }
     }
   }
-  return NULL;
+  return nullptr;
 }
 
 //----------------------------------------------------------------------------

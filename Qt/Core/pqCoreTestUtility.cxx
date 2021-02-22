@@ -194,7 +194,7 @@ QString pqCoreTestUtility::BaselineDirectory()
   if (result.isEmpty())
   {
     pqApplicationCore* core = pqApplicationCore::instance();
-    if (core != NULL)
+    if (core != nullptr)
     {
       pqTestUtility* testUtil = core->testUtility();
       result = QFileInfo(testUtil->filename()).path();
@@ -296,7 +296,7 @@ bool pqCoreTestUtility::CompareImage(QWidget* widget, const QString& referenceIm
   double threshold, ostream& vtkNotUsed(output), const QString& tempDirectory,
   const QSize& size /*=QSize(300, 300)*/)
 {
-  assert(widget != NULL);
+  assert(widget != nullptr);
 
   // try to locate a pqView, if any associated with the QWidget.
   QList<pqView*> views =
@@ -353,7 +353,7 @@ bool pqCoreTestUtility::CompareImage(QWidget* widget, const QString& referenceIm
 bool pqCoreTestUtility::CompareView(pqView* curView, const QString& referenceImage,
   double threshold, const QString& tempDirectory, const QSize& size /*=QSize()*/)
 {
-  assert(curView != NULL);
+  assert(curView != nullptr);
 
   SCOPED_UNDO_EXCLUDE();
 

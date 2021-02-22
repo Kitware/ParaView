@@ -116,7 +116,7 @@ bool vtkSIStringVectorProperty::Pull(vtkSMMessage* message)
 
   for (int argIdx = 0; argIdx < numArgs; ++argIdx)
   {
-    const char* arg = NULL;
+    const char* arg = nullptr;
     int retVal = res.GetArgument(0, argIdx, &arg);
     if (retVal == 0)
     {
@@ -197,7 +197,7 @@ bool vtkSIStringVectorProperty::ReadXMLAttributes(vtkSIProxy* proxy, vtkPVXMLEle
     values.resize(number_of_elements);
     const char* tmp = element->GetAttribute("default_values");
     const char* delimiter = element->GetAttribute("default_values_delimiter");
-    hasDefaultValues = (tmp != NULL);
+    hasDefaultValues = (tmp != nullptr);
     if (tmp && delimiter)
     {
       std::string initVal = tmp;

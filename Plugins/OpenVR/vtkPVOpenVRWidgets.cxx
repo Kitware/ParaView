@@ -1539,7 +1539,7 @@ void vtkPVOpenVRWidgets::HandlePickEvent(vtkObject*, void* calldata)
   node->GetProperties()->Set(vtkSelectionNode::SOURCE(), repr);
 
   vtkCompositeDataSet* cds = vtkCompositeDataSet::SafeDownCast(dobj);
-  vtkDataSet* ds = NULL;
+  vtkDataSet* ds = nullptr;
   // handle composite datasets
   if (cds)
   {

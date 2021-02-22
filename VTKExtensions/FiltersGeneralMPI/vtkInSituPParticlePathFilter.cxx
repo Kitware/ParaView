@@ -59,7 +59,7 @@ void vtkInSituPParticlePathFilter::AddRestartConnection(vtkAlgorithmOutput* inpu
 //----------------------------------------------------------------------------
 void vtkInSituPParticlePathFilter::RemoveAllRestarts()
 {
-  this->SetInputConnection(2, 0);
+  this->SetInputConnection(2, nullptr);
 }
 
 //---------------------------------------------------------------------------

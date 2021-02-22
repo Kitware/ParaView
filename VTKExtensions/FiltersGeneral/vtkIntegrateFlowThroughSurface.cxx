@@ -166,7 +166,7 @@ int vtkIntegrateFlowThroughSurface::RequestData(
   }
 
   integrate->Delete();
-  integrate = 0;
+  integrate = nullptr;
 
   return 1;
 }

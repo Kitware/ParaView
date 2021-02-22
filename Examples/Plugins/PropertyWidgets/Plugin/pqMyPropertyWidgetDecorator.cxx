@@ -44,7 +44,7 @@ pqMyPropertyWidgetDecorator::pqMyPropertyWidgetDecorator(
   : Superclass(config, parentObject)
 {
   vtkSMProxy* proxy = parentObject->proxy();
-  vtkSMProperty* prop = proxy ? proxy->GetProperty("ShrinkFactor") : NULL;
+  vtkSMProperty* prop = proxy ? proxy->GetProperty("ShrinkFactor") : nullptr;
   if (!prop)
   {
     qDebug("Could not locate property named 'ShrinkFactor'. "
@@ -71,7 +71,7 @@ bool pqMyPropertyWidgetDecorator::canShowWidget(bool show_advanced) const
 {
   pqPropertyWidget* parentObject = this->parentWidget();
   vtkSMProxy* proxy = parentObject->proxy();
-  vtkSMProperty* prop = proxy ? proxy->GetProperty("ShrinkFactor") : NULL;
+  vtkSMProperty* prop = proxy ? proxy->GetProperty("ShrinkFactor") : nullptr;
   if (prop)
   {
     double value = vtkSMUncheckedPropertyHelper(prop).GetAsDouble();

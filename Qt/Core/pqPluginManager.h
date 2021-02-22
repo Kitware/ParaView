@@ -80,9 +80,9 @@ public:
 
   /**
   * attempt to load an extension on a server
-  * if server is NULL, extension will be loaded on client side
+  * if server is nullptr, extension will be loaded on client side
   * return status on success, if NOTLOADED was returned, the error is reported
-  * If errorMsg is non-null, then errors are not reported, but the error
+  * If errorMsg is non-nullptr, then errors are not reported, but the error
   * message is put in the errorMsg string
   */
   LoadStatus loadExtension(
@@ -90,7 +90,7 @@ public:
 
   /**
   * attempt to load all available plugins on a server,
-  * or client plugins if NULL
+  * or client plugins if nullptr
   */
   void loadExtensions(pqServer*);
 

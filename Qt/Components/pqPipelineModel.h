@@ -210,7 +210,7 @@ public:
 
   /**
   * Given the index, get the pqServerManagerModelItem it represents.
-  * NULL is returned for root or invalid index.
+  * nullptr is returned for root or invalid index.
   */
   pqServerManagerModelItem* getItemFor(const QModelIndex&) const;
 

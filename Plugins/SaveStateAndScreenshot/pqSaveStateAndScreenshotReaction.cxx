@@ -78,7 +78,7 @@ pqSaveStateAndScreenshotReaction::pqSaveStateAndScreenshotReaction(
   QObject::connect(
     &pqActiveObjects::instance(), SIGNAL(viewChanged(pqView*)), this, SLOT(onViewChanged(pqView*)));
   this->updateEnableState();
-  this->FromCTest = (vtksys::SystemTools::GetEnv("DASHBOARD_TEST_FROM_CTEST") != NULL);
+  this->FromCTest = (vtksys::SystemTools::GetEnv("DASHBOARD_TEST_FROM_CTEST") != nullptr);
 }
 
 //-----------------------------------------------------------------------------
@@ -169,7 +169,7 @@ void pqSaveStateAndScreenshotReaction::onSettings()
   // Configure directory and name
   QString fileExt = tr("ParaView state file (*.pvsm);;All files (*)");
   pqFileDialog fileDialog(
-    NULL, pqCoreUtilities::mainWidget(), tr("Save State and Screenshot"), QString(), fileExt);
+    nullptr, pqCoreUtilities::mainWidget(), tr("Save State and Screenshot"), QString(), fileExt);
 
   fileDialog.setObjectName("FileSaveServerStateDialog");
   fileDialog.setFileMode(pqFileDialog::AnyFile);

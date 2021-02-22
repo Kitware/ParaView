@@ -191,7 +191,7 @@ vtkSmartPointer<vtkDataObject> vtkPVHistogramChartRepresentation::TransformInput
   // the server-side, so avoid doing anything that modifies the MTime.
   if (this->ArrayName.empty())
   {
-    return NULL;
+    return nullptr;
   }
 
   this->ExtractHistogram->SetInputArrayToProcess(
@@ -217,7 +217,7 @@ void vtkPVHistogramChartRepresentation::PrepareForRendering()
 //----------------------------------------------------------------------------
 bool vtkPVHistogramChartRepresentation::MapSelectionToInput(vtkSelection* sel)
 {
-  assert(sel != NULL);
+  assert(sel != nullptr);
 
   // Now we do the magic: convert chart row selection to threshold selection
   vtkNew<vtkDoubleArray> selRanges;
@@ -266,7 +266,7 @@ bool vtkPVHistogramChartRepresentation::MapSelectionToInput(vtkSelection* sel)
 //----------------------------------------------------------------------------
 bool vtkPVHistogramChartRepresentation::MapSelectionToView(vtkSelection* sel)
 {
-  assert(sel != NULL);
+  assert(sel != nullptr);
 
   // For vtkPVHistogramChartRepresentation (in the ServerManagerConfiguration
   // xml), we set the SelectionRepresentation up so that the original input
@@ -282,8 +282,8 @@ bool vtkPVHistogramChartRepresentation::MapSelectionToView(vtkSelection* sel)
   {
     vtkSelectionNode* node = sel->GetNode(cc);
     if (node && node->GetFieldType() == fieldType &&
-      node->GetContentType() == vtkSelectionNode::THRESHOLDS && node->GetSelectionList() != NULL &&
-      node->GetSelectionList()->GetName() != NULL &&
+      node->GetContentType() == vtkSelectionNode::THRESHOLDS &&
+      node->GetSelectionList() != nullptr && node->GetSelectionList()->GetName() != nullptr &&
       this->ArrayName == node->GetSelectionList()->GetName() &&
       node->GetSelectionList()->GetNumberOfTuples() > 0)
     {
@@ -303,8 +303,8 @@ bool vtkPVHistogramChartRepresentation::MapSelectionToView(vtkSelection* sel)
   // `pre_delivery` data.
   vtkTable* table = this->GetLocalOutput(/*pre_delivery = */ true);
   vtkDoubleArray* binExtents =
-    table ? vtkDoubleArray::SafeDownCast(table->GetColumnByName(BIN_EXTENTS)) : NULL;
-  if (binExtents == NULL)
+    table ? vtkDoubleArray::SafeDownCast(table->GetColumnByName(BIN_EXTENTS)) : nullptr;
+  if (binExtents == nullptr)
   {
     // Seems like the vtkPVHistogramChartRepresentation hasn't updated yet and
     // the selection is being updated before it. Shouldn't happen, but let's

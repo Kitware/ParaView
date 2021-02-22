@@ -39,7 +39,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 pqSectionVisibilityContextMenu::pqSectionVisibilityContextMenu(QWidget* _p)
   : QMenu(_p)
 {
-  this->HeaderView = 0;
+  this->HeaderView = nullptr;
   QObject::connect(
     this, SIGNAL(triggered(QAction*)), this, SLOT(toggleSectionVisibility(QAction*)));
 }

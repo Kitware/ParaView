@@ -34,12 +34,12 @@ vtkCPCellFieldBuilder::vtkCPCellFieldBuilder()
 void vtkCPCellFieldBuilder::BuildField(unsigned long timeStep, double time, vtkDataSet* grid)
 {
   vtkCPTensorFieldFunction* tensorFieldFunction = this->GetTensorFieldFunction();
-  if (tensorFieldFunction == 0)
+  if (tensorFieldFunction == nullptr)
   {
     vtkErrorMacro("Must set TensorFieldFunction.");
     return;
   }
-  if (this->GetArrayName() == 0)
+  if (this->GetArrayName() == nullptr)
   {
     vtkErrorMacro("Must set ArrayName.");
     return;

@@ -59,7 +59,7 @@ class PQWIDGETS_EXPORT pqTreeWidget : public QTreeWidget
   typedef QTreeWidget Superclass;
   Q_OBJECT
 public:
-  pqTreeWidget(QWidget* p = NULL);
+  pqTreeWidget(QWidget* p = nullptr);
   ~pqTreeWidget() override;
 
   bool event(QEvent* e) override;

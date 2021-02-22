@@ -47,8 +47,8 @@ vtkNIfTIReader::vtkNIfTIReader()
     q[count] = new double[4];
     s[count] = new double[4];
   }
-  this->niftiHeader = 0;
-  this->niftiHeaderUnsignedCharArray = 0;
+  this->niftiHeader = nullptr;
+  this->niftiHeaderUnsignedCharArray = nullptr;
   this->niftiHeaderSize = 348;
   this->niftiType = 0;
 }
@@ -60,23 +60,23 @@ vtkNIfTIReader::~vtkNIfTIReader()
   for (count = 0; count < 4; count++)
   {
     delete[] q[count];
-    q[count] = NULL;
+    q[count] = nullptr;
     delete[] s[count];
-    s[count] = NULL;
+    s[count] = nullptr;
   }
   delete[] q;
   delete[] s;
-  q = NULL;
-  s = NULL;
+  q = nullptr;
+  s = nullptr;
   if (this->niftiHeader)
   {
     this->niftiHeader->Delete();
-    this->niftiHeader = 0;
+    this->niftiHeader = nullptr;
   }
   if (this->niftiHeaderUnsignedCharArray)
   {
     delete this->niftiHeaderUnsignedCharArray;
-    this->niftiHeaderUnsignedCharArray = 0;
+    this->niftiHeaderUnsignedCharArray = nullptr;
   }
 }
 
@@ -209,7 +209,7 @@ void vtkNIfTIReader::ExecuteInformation()
   CanReadFile(this->GetFileName());
 
   m_NiftiImage = vtknifti1_io::nifti_image_read(this->GetFileName(), true);
-  if (m_NiftiImage == NULL)
+  if (m_NiftiImage == nullptr)
   {
     vtkErrorMacro("Read failed");
     return;
@@ -665,12 +665,12 @@ void vtkNIfTIReaderUpdate2(
   // In addition, it has the added benefit of reading gzip compressed image
   // files that do not have a .gz ending.
   gzFile file_p = ::gzopen(ImageFileName.c_str(), "rb");
-  if (file_p == NULL)
+  if (file_p == nullptr)
   {
     /* Do a separate check to take care of case #4 */
     ImageFileName += ".gz";
     file_p = ::gzopen(ImageFileName.c_str(), "rb");
-    if (file_p == NULL)
+    if (file_p == nullptr)
     {
       // vtkErrorMacro( << "File cannot be read");
     }
@@ -702,7 +702,7 @@ void vtkNIfTIReader::ExecuteDataWithInformation(vtkDataObject* output, vtkInform
   {
     return;
   }
-  if (this->GetFileName() == NULL)
+  if (this->GetFileName() == nullptr)
   {
     vtkErrorMacro(<< "Either a FileName or FilePrefix must be specified.");
     return;
@@ -741,7 +741,7 @@ void vtkNIfTIReader::ExecuteDataWithInformation(vtkDataObject* output, vtkInform
   vtkDataArray* tempVolumeOriginDoubleArray = fa->GetArray(VOLUME_ORIGIN_DOUBLE_ARRAY);
   if (!tempVolumeOriginDoubleArray)
   {
-    vtkDoubleArray* volumeOriginDoubleArray = NULL;
+    vtkDoubleArray* volumeOriginDoubleArray = nullptr;
     volumeOriginDoubleArray = vtkDoubleArray::New();
     volumeOriginDoubleArray->SetName(VOLUME_ORIGIN_DOUBLE_ARRAY);
     volumeOriginDoubleArray->SetNumberOfValues(3);
@@ -756,7 +756,7 @@ void vtkNIfTIReader::ExecuteDataWithInformation(vtkDataObject* output, vtkInform
   vtkDataArray* tempVolumeSpacingDoubleArray = fa->GetArray(VOLUME_SPACING_DOUBLE_ARRAY);
   if (!tempVolumeSpacingDoubleArray)
   {
-    vtkDoubleArray* volumeSpacingDoubleArray = NULL;
+    vtkDoubleArray* volumeSpacingDoubleArray = nullptr;
     volumeSpacingDoubleArray = vtkDoubleArray::New();
     volumeSpacingDoubleArray->SetName(VOLUME_SPACING_DOUBLE_ARRAY);
     volumeSpacingDoubleArray->SetNumberOfValues(3);
@@ -1112,7 +1112,7 @@ void vtkNIfTIReader::ExecuteDataWithInformation(vtkDataObject* output, vtkInform
     this->DataOrigin[count] = outOrigin[count];
   }
 
-  unsigned char* tempUnsignedCharData = NULL;
+  unsigned char* tempUnsignedCharData = nullptr;
 
   // permute
 
@@ -1241,7 +1241,7 @@ void vtkNIfTIReader::ExecuteDataWithInformation(vtkDataObject* output, vtkInform
   }
 
   delete tempUnsignedCharData;
-  tempUnsignedCharData = NULL;
+  tempUnsignedCharData = nullptr;
 }
 
 //----------------------------------------------------------------------------

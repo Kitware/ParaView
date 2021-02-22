@@ -68,7 +68,7 @@ public:
   };
 
   pqProxy(const QString& group, const QString& name, vtkSMProxy* proxy, pqServer* server,
-    QObject* parent = NULL);
+    QObject* parent = nullptr);
   ~pqProxy() override;
 
   /**
@@ -96,7 +96,7 @@ public:
 
   /**
   * Get the vtkSMProxy this object stands for.
-  * This can never be null. A pqProxy always represents
+  * This can never be nullptr. A pqProxy always represents
   * one and only one Server Manager proxy.
   */
   vtkSMProxy* getProxy() const;
@@ -117,7 +117,7 @@ public:
   void setModifiedState(ModifiedState modified);
 
   /**
-  * Returns the hints for this proxy, if any. May returns NULL
+  * Returns the hints for this proxy, if any. May returns nullptr
   * if no hints are defined.
   */
   vtkPVXMLElement* getHints() const;

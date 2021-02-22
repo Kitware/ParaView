@@ -40,7 +40,7 @@ inline bool vtkSkipAttributeType(int attr)
 inline void vtkShallowCopy(vtkDataObject* output, vtkDataObject* input)
 {
   vtkCompositeDataSet* cdout = vtkCompositeDataSet::SafeDownCast(output);
-  if (cdout == NULL)
+  if (cdout == nullptr)
   {
     output->ShallowCopy(input);
     return;
@@ -344,7 +344,7 @@ int vtkCleanArrays::RequestData(
   vtkCompositeDataSet* outputCD = vtkCompositeDataSet::SafeDownCast(outputDO);
 
   vtkMultiProcessController* controller = this->Controller;
-  if ((!controller || controller->GetNumberOfProcesses() <= 1) && outputCD == NULL)
+  if ((!controller || controller->GetNumberOfProcesses() <= 1) && outputCD == nullptr)
   {
     // Nothing to do since not running in parallel or on composite datasets.
     return 1;

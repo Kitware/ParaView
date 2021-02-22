@@ -80,7 +80,7 @@ public:
 
   /**
    * Returns a pointer to the key frame at the given time.
-   * If no key frame exists at the given time, it returns NULL.
+   * If no key frame exists at the given time, it returns nullptr.
    */
   vtkPVKeyFrame* GetKeyFrame(double time);
 
@@ -102,7 +102,7 @@ public:
   //@{
   /**
    * Get the next/previous key frame relative to argument key frame.
-   * Returns NULL when no next/previous frame exists.
+   * Returns nullptr when no next/previous frame exists.
    */
   vtkPVKeyFrame* GetNextKeyFrame(vtkPVKeyFrame* keyFrame);
   vtkPVKeyFrame* GetPreviousKeyFrame(vtkPVKeyFrame* keyFrame);

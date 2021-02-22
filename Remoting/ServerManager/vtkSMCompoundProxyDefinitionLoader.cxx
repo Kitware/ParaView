@@ -25,13 +25,13 @@ vtkCxxSetObjectMacro(vtkSMCompoundProxyDefinitionLoader, RootElement, vtkPVXMLEl
 //---------------------------------------------------------------------------
 vtkSMCompoundProxyDefinitionLoader::vtkSMCompoundProxyDefinitionLoader()
 {
-  this->RootElement = 0;
+  this->RootElement = nullptr;
 }
 
 //---------------------------------------------------------------------------
 vtkSMCompoundProxyDefinitionLoader::~vtkSMCompoundProxyDefinitionLoader()
 {
-  this->SetRootElement(0);
+  this->SetRootElement(nullptr);
 }
 
 //---------------------------------------------------------------------------
@@ -40,7 +40,7 @@ vtkPVXMLElement* vtkSMCompoundProxyDefinitionLoader::LocateProxyElement(vtkTypeU
   if (!this->RootElement)
   {
     vtkErrorMacro("No root is defined. Cannot locate proxy element with id " << id_);
-    return 0;
+    return nullptr;
   }
   vtkIdType id = static_cast<vtkIdType>(id_);
 
@@ -64,7 +64,7 @@ vtkPVXMLElement* vtkSMCompoundProxyDefinitionLoader::LocateProxyElement(vtkTypeU
       return currentElement;
     }
   }
-  return 0;
+  return nullptr;
 }
 
 //---------------------------------------------------------------------------

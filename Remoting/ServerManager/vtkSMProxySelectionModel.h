@@ -75,7 +75,7 @@ public:
   };
 
   /**
-   * Returns the proxy that is current, NULL if there is no current.
+   * Returns the proxy that is current, nullptr if there is no current.
    */
   vtkSMProxy* GetCurrentProxy();
 
@@ -126,7 +126,7 @@ public:
   /**
    * Wrapper friendly methods to doing what Select() can do.
    */
-  void Clear() { this->Select(NULL, CLEAR); }
+  void Clear() { this->Select(nullptr, CLEAR); }
   void Select(vtkSMProxy* proxy) { this->Select(proxy, SELECT); }
   void Deselect(vtkSMProxy* proxy) { this->Select(proxy, DESELECT); }
   void ClearAndSelect(vtkSMProxy* proxy) { this->Select(proxy, CLEAR_AND_SELECT); }
@@ -143,7 +143,7 @@ public:
    * This method return the full object state that can be used to create that
    * object from scratch.
    * This method will be used to fill the undo stack.
-   * If not overridden this will return NULL.
+   * If not overridden this will return nullptr.
    */
   const vtkSMMessage* GetFullState() override;
 

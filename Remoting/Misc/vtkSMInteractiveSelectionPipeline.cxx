@@ -34,7 +34,7 @@ vtkSMInteractiveSelectionPipeline::~vtkSMInteractiveSelectionPipeline()
 vtkSMInteractiveSelectionPipeline* vtkSMInteractiveSelectionPipeline::GetInstance()
 {
   static vtkSmartPointer<vtkSMInteractiveSelectionPipeline> Instance;
-  if (Instance.GetPointer() == NULL)
+  if (Instance.GetPointer() == nullptr)
   {
     vtkSMInteractiveSelectionPipeline* pipeline = vtkSMInteractiveSelectionPipeline::New();
     Instance = pipeline;

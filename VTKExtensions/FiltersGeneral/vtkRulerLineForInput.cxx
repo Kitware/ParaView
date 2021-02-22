@@ -30,7 +30,7 @@ vtkStandardNewMacro(vtkRulerLineForInput);
 vtkCxxSetObjectMacro(vtkRulerLineForInput, Controller, vtkMultiProcessController);
 
 vtkRulerLineForInput::vtkRulerLineForInput()
-  : Controller(NULL)
+  : Controller(nullptr)
   , Axis(0)
 {
   this->SetController(vtkMultiProcessController::GetGlobalController());
@@ -38,7 +38,7 @@ vtkRulerLineForInput::vtkRulerLineForInput()
 
 vtkRulerLineForInput::~vtkRulerLineForInput()
 {
-  this->SetController(NULL);
+  this->SetController(nullptr);
 }
 
 void vtkRulerLineForInput::PrintSelf(ostream& os, vtkIndent indent)

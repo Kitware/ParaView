@@ -115,7 +115,7 @@ bool pqPluginTreeWidgetEventPlayer::playEvent(
     int check_state = regExp0.cap(3).toInt();
 
     QStringList indices = str_index.split(".", PV_QT_SKIP_EMPTY_PARTS);
-    QTreeWidgetItem* cur_item = NULL;
+    QTreeWidgetItem* cur_item = nullptr;
     foreach (QString cur_index, indices)
     {
       int index = cur_index.toInt();

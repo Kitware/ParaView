@@ -131,7 +131,7 @@ pqServerConfigurationImporter::pqServerConfigurationImporter(QObject* parentObje
 pqServerConfigurationImporter::~pqServerConfigurationImporter()
 {
   delete this->Internals;
-  this->Internals = NULL;
+  this->Internals = nullptr;
 }
 
 //-----------------------------------------------------------------------------
@@ -247,9 +247,9 @@ bool pqServerConfigurationImporter::fetch(const QUrl& url)
     return_value = this->processDownloadedContents();
   }
 
-  // this will set ActiveReply to NULL automatically.
+  // this will set ActiveReply to nullptr automatically.
   delete reply;
-  reply = NULL;
+  reply = nullptr;
   return return_value;
 }
 
@@ -266,7 +266,7 @@ void pqServerConfigurationImporter::abortFetch()
 //-----------------------------------------------------------------------------
 void pqServerConfigurationImporter::readCurrentData()
 {
-  assert(this->Internals->ActiveReply != NULL);
+  assert(this->Internals->ActiveReply != nullptr);
   this->Internals->ActiveFetchedData.append(this->Internals->ActiveReply->readAll());
 }
 

@@ -22,17 +22,17 @@ vtkSIVectorProperty::vtkSIVectorProperty()
 {
   this->NumberOfElementsPerCommand = 1;
   this->UseIndex = false;
-  this->CleanCommand = NULL;
-  this->SetNumberCommand = NULL;
-  this->InitialString = NULL;
+  this->CleanCommand = nullptr;
+  this->SetNumberCommand = nullptr;
+  this->InitialString = nullptr;
 }
 
 //----------------------------------------------------------------------------
 vtkSIVectorProperty::~vtkSIVectorProperty()
 {
-  this->SetCleanCommand(0);
-  this->SetSetNumberCommand(0);
-  this->SetInitialString(0);
+  this->SetCleanCommand(nullptr);
+  this->SetSetNumberCommand(nullptr);
+  this->SetInitialString(nullptr);
 }
 
 //---------------------------------------------------------------------------

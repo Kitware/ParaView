@@ -103,7 +103,7 @@ vtkPCosmoReader::vtkPCosmoReader()
     this->SetController(controller);
   }
 
-  this->FileName = NULL;
+  this->FileName = nullptr;
   this->RL = 100;
   this->Overlap = 5;
   this->ReadMode = 1;
@@ -135,7 +135,7 @@ void vtkPCosmoReader::PrintSelf(ostream& os, vtkIndent indent)
     os << indent << "Controller: (null)\n";
   }
 
-  os << indent << "FileName: " << (this->FileName != NULL ? this->FileName : "") << endl;
+  os << indent << "FileName: " << (this->FileName != nullptr ? this->FileName : "") << endl;
   os << indent << "rL: " << this->RL << endl;
   os << indent << "Overlap: " << this->Overlap << endl;
   os << indent << "ReadMode: " << this->ReadMode << endl;
@@ -188,7 +188,7 @@ int vtkPCosmoReader::RequestData(vtkInformation* vtkNotUsed(request),
     return 0;
   }
 
-  if (this->FileName == NULL || this->FileName[0] == '\0')
+  if (this->FileName == nullptr || this->FileName[0] == '\0')
   {
     vtkErrorMacro(<< "No FileName specified!");
     return 0;

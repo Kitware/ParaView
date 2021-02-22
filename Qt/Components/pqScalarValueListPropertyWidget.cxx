@@ -72,7 +72,7 @@ class pqTableModel : public QAbstractTableModel
   }
 
 public:
-  pqTableModel(int num_columns, bool integers_only = false, QObject* parentObject = NULL)
+  pqTableModel(int num_columns, bool integers_only = false, QObject* parentObject = nullptr)
     : Superclass(parentObject)
     , NumberOfColumns(num_columns)
     , AllowIntegralValuesOnly(integers_only)
@@ -386,7 +386,7 @@ pqScalarValueListPropertyWidget::pqScalarValueListPropertyWidget(
   this->setShowLabel(false);
 
   vtkSMVectorProperty* vp = vtkSMVectorProperty::SafeDownCast(smProperty);
-  assert(vp != NULL);
+  assert(vp != nullptr);
 
   this->Internals = new pqInternals(this, vp->GetNumberOfElementsPerCommand());
   QObject::connect(&this->Internals->Model,
@@ -424,7 +424,7 @@ pqScalarValueListPropertyWidget::pqScalarValueListPropertyWidget(
 pqScalarValueListPropertyWidget::~pqScalarValueListPropertyWidget()
 {
   delete this->Internals;
-  this->Internals = NULL;
+  this->Internals = nullptr;
 }
 
 //-----------------------------------------------------------------------------
@@ -636,7 +636,7 @@ bool pqScalarValueListPropertyWidget::getRange(double& range_min, double& range_
     int min_exists = 0, max_exists = 0;
     vtkSMDoubleRangeDomain* doubleRange =
       vtkSMDoubleRangeDomain::SafeDownCast(this->Internals->RangeDomain);
-    assert(doubleRange != NULL);
+    assert(doubleRange != nullptr);
     range_min = doubleRange->GetMinimum(0, min_exists);
     range_max = doubleRange->GetMaximum(0, max_exists);
     return (min_exists && max_exists);
@@ -654,7 +654,7 @@ bool pqScalarValueListPropertyWidget::getRange(int& range_min, int& range_max)
     int min_exists = 0, max_exists = 0;
     vtkSMIntRangeDomain* doubleRange =
       vtkSMIntRangeDomain::SafeDownCast(this->Internals->RangeDomain);
-    assert(doubleRange != NULL);
+    assert(doubleRange != nullptr);
     range_min = doubleRange->GetMinimum(0, min_exists);
     range_max = doubleRange->GetMaximum(0, max_exists);
     return (min_exists && max_exists);

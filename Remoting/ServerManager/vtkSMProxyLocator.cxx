@@ -37,8 +37,8 @@ vtkCxxSetObjectMacro(vtkSMProxyLocator, Deserializer, vtkSMDeserializer);
 vtkSMProxyLocator::vtkSMProxyLocator()
 {
   this->Internal = new vtkInternal();
-  this->Deserializer = 0;
-  this->Session = 0;
+  this->Deserializer = nullptr;
+  this->Session = nullptr;
   this->LocateProxyWithSessionToo = false;
 }
 
@@ -46,8 +46,8 @@ vtkSMProxyLocator::vtkSMProxyLocator()
 vtkSMProxyLocator::~vtkSMProxyLocator()
 {
   delete this->Internal;
-  this->SetDeserializer(0);
-  this->SetSession(0);
+  this->SetDeserializer(nullptr);
+  this->SetSession(nullptr);
 }
 
 //----------------------------------------------------------------------------
@@ -64,7 +64,7 @@ vtkSMProxy* vtkSMProxyLocator::LocateProxy(vtkTypeUInt32 id)
   iter = this->Internal->AssignedProxies.find(id);
   if (iter != this->Internal->AssignedProxies.end())
   {
-    if (iter->second.GetPointer() != NULL)
+    if (iter->second.GetPointer() != nullptr)
     {
       // add to the Proxies map.
       this->Internal->Proxies[id] = iter->second;
@@ -110,7 +110,7 @@ vtkSMProxy* vtkSMProxyLocator::NewProxy(vtkTypeUInt32 id)
     // that id, and load the state on it and then return this fresh proxy, if possible.
     return this->Deserializer->NewProxy(id, this);
   }
-  return 0;
+  return nullptr;
 }
 
 //----------------------------------------------------------------------------
@@ -152,6 +152,6 @@ void vtkSMProxyLocator::SetSession(vtkSMSession* s)
   this->Session = s;
   if (this->Deserializer)
   {
-    this->Deserializer->SetSessionProxyManager(s ? s->GetSessionProxyManager() : NULL);
+    this->Deserializer->SetSessionProxyManager(s ? s->GetSessionProxyManager() : nullptr);
   }
 }

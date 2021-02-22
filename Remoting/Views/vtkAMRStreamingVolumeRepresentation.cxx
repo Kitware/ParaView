@@ -165,7 +165,7 @@ int vtkAMRStreamingVolumeRepresentation::ProcessViewRequest(
       vtkAlgorithm* producer = producerPort->GetProducer();
       vtkOverlappingAMR* amr =
         vtkOverlappingAMR::SafeDownCast(producer->GetOutputDataObject(producerPort->GetIndex()));
-      assert(amr != NULL);
+      assert(amr != nullptr);
       this->Resampler->UpdateResampledVolume(amr);
     }
 
@@ -290,7 +290,7 @@ int vtkAMRStreamingVolumeRepresentation::RequestData(
     this->Resampler->Reset();
   }
 
-  this->ProcessedPiece = NULL;
+  this->ProcessedPiece = nullptr;
   if (inputVector[0]->GetNumberOfInformationObjects() == 1)
   {
     // Do the streaming independent "transformation" of the data here, in our

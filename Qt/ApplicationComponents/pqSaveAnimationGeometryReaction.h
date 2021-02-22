@@ -45,7 +45,7 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqSaveAnimationGeometryReaction : public pq
 
 public:
   /**
-  * Constructor. Parent cannot be NULL.
+  * Constructor. Parent cannot be nullptr.
   */
   pqSaveAnimationGeometryReaction(QAction* parent);
 

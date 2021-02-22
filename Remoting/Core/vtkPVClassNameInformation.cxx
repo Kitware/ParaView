@@ -26,14 +26,14 @@ vtkStandardNewMacro(vtkPVClassNameInformation);
 vtkPVClassNameInformation::vtkPVClassNameInformation()
 {
   this->RootOnly = 1;
-  this->VTKClassName = 0;
+  this->VTKClassName = nullptr;
   this->PortNumber = -1;
 }
 
 //----------------------------------------------------------------------------
 vtkPVClassNameInformation::~vtkPVClassNameInformation()
 {
-  this->SetVTKClassName(0);
+  this->SetVTKClassName(nullptr);
 }
 
 //----------------------------------------------------------------------------
@@ -53,7 +53,7 @@ void vtkPVClassNameInformation::CopyFromObject(vtkObject* obj)
     return;
   }
   vtkAlgorithm* algo = vtkAlgorithm::SafeDownCast(obj);
-  if (algo == NULL || this->PortNumber == -1)
+  if (algo == nullptr || this->PortNumber == -1)
   {
     this->SetVTKClassName(obj->GetClassName());
   }
@@ -90,7 +90,7 @@ void vtkPVClassNameInformation::CopyToStream(vtkClientServerStream* css)
 //----------------------------------------------------------------------------
 void vtkPVClassNameInformation::CopyFromStream(const vtkClientServerStream* css)
 {
-  const char* cname = 0;
+  const char* cname = nullptr;
   css->GetArgument(0, 0, &cname);
   this->SetVTKClassName(cname);
 }

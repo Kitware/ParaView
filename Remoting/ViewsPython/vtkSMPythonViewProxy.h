@@ -51,8 +51,8 @@ public:
 
   /**
    * Returns the interactor. Note, that views may not use vtkRenderWindow at all
-   * in which case they will not have any interactor and will return NULL.
-   * Default implementation returns NULL.
+   * in which case they will not have any interactor and will return nullptr.
+   * Default implementation returns nullptr.
    */
   vtkRenderWindowInteractor* GetInteractor() override;
 

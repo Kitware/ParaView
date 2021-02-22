@@ -17,7 +17,7 @@
 
 namespace
 {
-vtkCPProcessor* Processor = NULL;
+vtkCPProcessor* Processor = nullptr;
 vtkUnstructuredGrid* VTKGrid;
 
 void BuildVTKGrid(unsigned int numberOfPoints, double* pointsData, unsigned int numberOfCells,
@@ -90,7 +90,7 @@ void BuildVTKDataStructures(vtkCPInputDataDescription* idd, unsigned int numberO
   double* points, double* velocity, unsigned int numberOfCells, unsigned int* cells,
   float* pressure)
 {
-  if (VTKGrid == NULL)
+  if (VTKGrid == nullptr)
   {
     // The grid structure isn't changing so we only build it
     // the first time it's needed. If we needed the memory
@@ -104,7 +104,7 @@ void BuildVTKDataStructures(vtkCPInputDataDescription* idd, unsigned int numberO
 
 void CatalystInitialize(int numScripts, char* scripts[])
 {
-  if (Processor == NULL)
+  if (Processor == nullptr)
   {
     Processor = vtkCPProcessor::New();
     Processor->Initialize();
@@ -131,12 +131,12 @@ void CatalystFinalize()
   if (Processor)
   {
     Processor->Delete();
-    Processor = NULL;
+    Processor = nullptr;
   }
   if (VTKGrid)
   {
     VTKGrid->Delete();
-    VTKGrid = NULL;
+    VTKGrid = nullptr;
   }
 }
 

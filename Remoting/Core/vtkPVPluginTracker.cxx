@@ -61,7 +61,7 @@ public:
   bool AutoLoad;
   vtkItem()
   {
-    this->Plugin = NULL;
+    this->Plugin = nullptr;
     this->AutoLoad = false;
   }
 };
@@ -110,7 +110,7 @@ std::string vtkLocatePluginOrConfigFile(const char* plugin, const char* hint, bo
 
   auto pm = vtkProcessModule::GetProcessModule();
   // Make sure we can get the options before going further
-  if (pm == NULL)
+  if (pm == nullptr)
   {
     vtkLogF(ERROR, "vtkProcessModule does not exist!");
     return std::string();
@@ -258,14 +258,14 @@ vtkPVPluginTracker::vtkPVPluginTracker()
 vtkPVPluginTracker::~vtkPVPluginTracker()
 {
   delete this->PluginsList;
-  this->PluginsList = NULL;
+  this->PluginsList = nullptr;
 }
 
 //----------------------------------------------------------------------------
 vtkPVPluginTracker* vtkPVPluginTracker::GetInstance()
 {
   static vtkSmartPointer<vtkPVPluginTracker> Instance;
-  if (Instance.GetPointer() == NULL)
+  if (Instance.GetPointer() == nullptr)
   {
     vtkPVPluginTracker* mgr = vtkPVPluginTracker::New();
     Instance = mgr;
@@ -412,7 +412,7 @@ void vtkPVPluginTracker::LoadPluginConfigurationXML(vtkPVXMLElement* root, bool 
 void vtkPVPluginTracker::LoadPluginConfigurationXMLHinted(
   vtkPVXMLElement* root, char const* hint, bool forceLoad)
 {
-  if (root == NULL)
+  if (root == nullptr)
   {
     return;
   }
@@ -540,7 +540,7 @@ unsigned int vtkPVPluginTracker::RegisterAvailablePlugin(const char* filename)
 //----------------------------------------------------------------------------
 void vtkPVPluginTracker::RegisterPlugin(vtkPVPlugin* plugin)
 {
-  assert(plugin != NULL);
+  assert(plugin != nullptr);
 
   vtkPluginsList::iterator iter = this->PluginsList->LocateUsingPluginName(plugin->GetPluginName());
   if (iter == this->PluginsList->end())
@@ -607,7 +607,7 @@ vtkPVPlugin* vtkPVPluginTracker::GetPlugin(unsigned int index)
   if (index >= this->GetNumberOfPlugins())
   {
     vtkWarningMacro("Invalid index: " << index);
-    return NULL;
+    return nullptr;
   }
   return (*this->PluginsList)[index].Plugin;
 }
@@ -618,7 +618,7 @@ const char* vtkPVPluginTracker::GetPluginName(unsigned int index)
   if (index >= this->GetNumberOfPlugins())
   {
     vtkWarningMacro("Invalid index: " << index);
-    return NULL;
+    return nullptr;
   }
   return (*this->PluginsList)[index].PluginName.c_str();
 }
@@ -629,7 +629,7 @@ const char* vtkPVPluginTracker::GetPluginFileName(unsigned int index)
   if (index >= this->GetNumberOfPlugins())
   {
     vtkWarningMacro("Invalid index: " << index);
-    return NULL;
+    return nullptr;
   }
   return (*this->PluginsList)[index].FileName.c_str();
 }
@@ -642,7 +642,7 @@ bool vtkPVPluginTracker::GetPluginLoaded(unsigned int index)
     vtkWarningMacro("Invalid index: " << index);
     return false;
   }
-  return (*this->PluginsList)[index].Plugin != NULL;
+  return (*this->PluginsList)[index].Plugin != nullptr;
 }
 
 //----------------------------------------------------------------------------

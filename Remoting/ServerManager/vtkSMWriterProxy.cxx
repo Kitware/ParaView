@@ -26,13 +26,13 @@ vtkSMWriterProxy::vtkSMWriterProxy()
   this->SetSIClassName("vtkSIWriterProxy");
   this->SupportsParallel = 0;
   this->ParallelOnly = 0;
-  this->FileNameMethod = 0;
+  this->FileNameMethod = nullptr;
 }
 
 //-----------------------------------------------------------------------------
 vtkSMWriterProxy::~vtkSMWriterProxy()
 {
-  this->SetFileNameMethod(0);
+  this->SetFileNameMethod(nullptr);
 }
 
 //-----------------------------------------------------------------------------

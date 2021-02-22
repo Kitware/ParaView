@@ -37,7 +37,7 @@ vtkPVDataInformation* vtkSMRepresentationTypeDomain::GetInputInformation()
   vtkSMProperty* inputProperty = this->GetRequiredProperty("Input");
   if (!inputProperty)
   {
-    return NULL;
+    return nullptr;
   }
 
   vtkSMUncheckedPropertyHelper helper(inputProperty);
@@ -49,7 +49,7 @@ vtkPVDataInformation* vtkSMRepresentationTypeDomain::GetInputInformation()
       return sp->GetDataInformation(helper.GetOutputPort());
     }
   }
-  return NULL;
+  return nullptr;
 }
 
 //----------------------------------------------------------------------------

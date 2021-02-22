@@ -22,7 +22,7 @@
 vtkPVAnimationCue::vtkPVAnimationCue()
 {
   this->AnimatedElement = 0;
-  this->Manipulator = 0;
+  this->Manipulator = nullptr;
   this->Enabled = true;
   this->UseAnimationTime = false;
   this->ObserverID = 0;
@@ -31,7 +31,7 @@ vtkPVAnimationCue::vtkPVAnimationCue()
 //----------------------------------------------------------------------------
 vtkPVAnimationCue::~vtkPVAnimationCue()
 {
-  this->SetManipulator(0);
+  this->SetManipulator(nullptr);
 }
 
 //----------------------------------------------------------------------------

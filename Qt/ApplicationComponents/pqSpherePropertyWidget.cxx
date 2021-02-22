@@ -98,7 +98,7 @@ pqSpherePropertyWidget::pqSpherePropertyWidget(
     qCritical("Missing required property for function 'Radius'.");
   }
 
-  if (smgroup->GetProperty("Input") == NULL)
+  if (smgroup->GetProperty("Input") == nullptr)
   {
     this->connect(ui.centerOnBounds, SIGNAL(clicked()), SLOT(centerOnBounds()));
   }

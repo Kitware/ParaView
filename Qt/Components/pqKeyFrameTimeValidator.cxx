@@ -83,7 +83,7 @@ void pqKeyFrameTimeValidator::setAnimationScene(pqAnimationScene* scene)
 {
   if (this->Internals->AnimationScene)
   {
-    QObject::disconnect(this->Internals->AnimationScene, 0, this, 0);
+    QObject::disconnect(this->Internals->AnimationScene, nullptr, this, nullptr);
   }
   this->Internals->AnimationScene = scene;
   if (scene)

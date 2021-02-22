@@ -110,7 +110,7 @@ public:
 
   vtkSMProxySelectionModel* activeSourcesSelectionModel() const
   {
-    return this->activeServer() ? this->activeServer()->activeSourcesSelectionModel() : NULL;
+    return this->activeServer() ? this->activeServer()->activeSourcesSelectionModel() : nullptr;
   }
 
   /**

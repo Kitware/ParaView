@@ -127,12 +127,12 @@ pqStringVectorPropertyWidget::pqStringVectorPropertyWidget(
   }
 
   // find the domain(s)
-  vtkSMEnumerationDomain* enumerationDomain = 0;
-  vtkSMFileListDomain* fileListDomain = 0;
-  vtkSMArrayListDomain* arrayListDomain = 0;
-  vtkSMStringListDomain* stringListDomain = 0;
-  vtkSMSILDomain* silDomain = 0;
-  vtkSMArraySelectionDomain* arraySelectionDomain = 0;
+  vtkSMEnumerationDomain* enumerationDomain = nullptr;
+  vtkSMFileListDomain* fileListDomain = nullptr;
+  vtkSMArrayListDomain* arrayListDomain = nullptr;
+  vtkSMStringListDomain* stringListDomain = nullptr;
+  vtkSMSILDomain* silDomain = nullptr;
+  vtkSMArraySelectionDomain* arraySelectionDomain = nullptr;
   vtkSMSubsetInclusionLatticeDomain* silDomain2 = nullptr;
 
   vtkSMDomainIterator* domainIter = svp->NewDomainIterator();

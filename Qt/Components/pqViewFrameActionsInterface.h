@@ -51,7 +51,7 @@ public:
 
   /**
   * This method is called after a frame is assigned to a view. The view may be
-  * NULL, indicating the frame has been assigned to an empty view. Frames are
+  * nullptr, indicating the frame has been assigned to an empty view. Frames are
   * never reused (except a frame assigned to an empty view).
   */
   virtual void frameConnected(pqViewFrame* frame, pqView* view) = 0;

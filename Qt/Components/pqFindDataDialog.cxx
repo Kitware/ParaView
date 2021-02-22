@@ -78,7 +78,7 @@ pqFindDataDialog::pqFindDataDialog(QWidget* parentObject, Qt::WindowFlags wflags
 pqFindDataDialog::~pqFindDataDialog()
 {
   delete this->Internals;
-  this->Internals = NULL;
+  this->Internals = nullptr;
 }
 
 //-----------------------------------------------------------------------------
@@ -96,16 +96,16 @@ void pqFindDataDialog::showing(pqOutputPort* port)
   }
 
   // enable extraction buttons only if we have an active selection.
-  this->Internals->Ui.freezeSelection->setEnabled(port != NULL);
-  this->Internals->Ui.extractSelection->setEnabled(port != NULL);
-  this->Internals->Ui.extractSelectionOverTime->setEnabled(port != NULL);
+  this->Internals->Ui.freezeSelection->setEnabled(port != nullptr);
+  this->Internals->Ui.extractSelection->setEnabled(port != nullptr);
+  this->Internals->Ui.extractSelectionOverTime->setEnabled(port != nullptr);
 }
 
 //-----------------------------------------------------------------------------
 void pqFindDataDialog::freezeSelection()
 {
   pqOutputPort* port = this->Internals->Ui.currentSelectionFrame->showingPort();
-  assert(port != NULL);
+  assert(port != nullptr);
 
   vtkSMSourceProxy* curSelSource = static_cast<vtkSMSourceProxy*>(port->getSelectionInput());
 
@@ -159,7 +159,7 @@ void pqFindDataDialog::freezeSelection()
 void pqFindDataDialog::extractSelection()
 {
   pqOutputPort* port = this->Internals->Ui.currentSelectionFrame->showingPort();
-  assert(port != NULL);
+  assert(port != nullptr);
   pqObjectBuilder* builder = pqApplicationCore::instance()->getObjectBuilder();
   builder->createFilter("filters", "ExtractSelection", port->getSource(), port->getPortNumber());
 }
@@ -168,7 +168,7 @@ void pqFindDataDialog::extractSelection()
 void pqFindDataDialog::extractSelectionOverTime()
 {
   pqOutputPort* port = this->Internals->Ui.currentSelectionFrame->showingPort();
-  assert(port != NULL);
+  assert(port != nullptr);
   pqObjectBuilder* builder = pqApplicationCore::instance()->getObjectBuilder();
   builder->createFilter(
     "filters", "ExtractSelectionOverTime", port->getSource(), port->getPortNumber());

@@ -42,7 +42,7 @@ public:
   }
 
 protected:
-  vtkPVKeyFrameCueManipulatorObserver() { this->KeyFrameAnimationCueManipulatorProxy = 0; }
+  vtkPVKeyFrameCueManipulatorObserver() { this->KeyFrameAnimationCueManipulatorProxy = nullptr; }
   vtkPVKeyFrameCueManipulator* KeyFrameAnimationCueManipulatorProxy;
 };
 //----------------------------------------------------------------------------
@@ -146,14 +146,14 @@ vtkPVKeyFrame* vtkPVKeyFrameCueManipulator::GetKeyFrame(double time)
     }
   }
 
-  return NULL;
+  return nullptr;
 }
 
 //----------------------------------------------------------------------------
 vtkPVKeyFrame* vtkPVKeyFrameCueManipulator::GetStartKeyFrame(double time)
 {
   // we use the fact that we have maintained the vector in sorted order.
-  vtkPVKeyFrame* proxy = NULL;
+  vtkPVKeyFrame* proxy = nullptr;
   vtkPVKeyFrameCueManipulatorInternals::KeyFrameVector::iterator it =
     this->Internals->KeyFrames.begin();
   for (; it != this->Internals->KeyFrames.end(); it++)
@@ -170,7 +170,7 @@ vtkPVKeyFrame* vtkPVKeyFrameCueManipulator::GetStartKeyFrame(double time)
     proxy = *it;
     ;
   }
-  return NULL;
+  return nullptr;
 }
 
 //----------------------------------------------------------------------------
@@ -185,7 +185,7 @@ vtkPVKeyFrame* vtkPVKeyFrameCueManipulator::GetEndKeyFrame(double time)
       return *it;
     }
   }
-  return NULL;
+  return nullptr;
 }
 
 //----------------------------------------------------------------------------
@@ -205,7 +205,7 @@ void vtkPVKeyFrameCueManipulator::UpdateValue(double currenttime, vtkPVAnimation
 
   vtkPVKeyFrame* startKF = this->GetStartKeyFrame(currenttime);
   vtkPVKeyFrame* endKF = this->GetEndKeyFrame(currenttime);
-  if (endKF && startKF == NULL)
+  if (endKF && startKF == nullptr)
   {
     // This means that we are at a time location before the first keyframe in
     // this cue. In that case, simply duplicate the first key-frame as the
@@ -259,13 +259,13 @@ vtkPVKeyFrame* vtkPVKeyFrameCueManipulator::GetNextKeyFrame(vtkPVKeyFrame* keyFr
       break;
     }
   }
-  return NULL;
+  return nullptr;
 }
 
 //----------------------------------------------------------------------------
 vtkPVKeyFrame* vtkPVKeyFrameCueManipulator::GetPreviousKeyFrame(vtkPVKeyFrame* keyFrame)
 {
-  vtkPVKeyFrame* proxy = NULL;
+  vtkPVKeyFrame* proxy = nullptr;
 
   vtkPVKeyFrameCueManipulatorInternals::KeyFrameVector::iterator it =
     this->Internals->KeyFrames.begin();
@@ -277,7 +277,7 @@ vtkPVKeyFrame* vtkPVKeyFrameCueManipulator::GetPreviousKeyFrame(vtkPVKeyFrame* k
     }
     proxy = *it;
   }
-  return NULL;
+  return nullptr;
 }
 
 //----------------------------------------------------------------------------
@@ -286,7 +286,7 @@ vtkPVKeyFrame* vtkPVKeyFrameCueManipulator::GetKeyFrameAtIndex(int index)
   if (index < 0 || index >= static_cast<int>(this->GetNumberOfKeyFrames()))
   {
     vtkErrorMacro("Index beyond range");
-    return NULL;
+    return nullptr;
   }
   return this->Internals->KeyFrames[index];
 }
@@ -360,8 +360,8 @@ void vtkPVKeyFrameCueManipulator::UpdateKeyTimeDomains()
   for (unsigned int cc = 0; cc < numFrames; ++cc)
   {
     vtkPVKeyFrame* kf = this->Internals->KeyFrames[cc];
-    vtkPVKeyFrame* prev = (cc > 0) ? this->Internals->KeyFrames[cc - 1] : NULL;
-    vtkPVKeyFrame* next = (cc + 1 < numFrames) ? this->Internals->KeyFrames[cc + 1] : NULL;
+    vtkPVKeyFrame* prev = (cc > 0) ? this->Internals->KeyFrames[cc - 1] : nullptr;
+    vtkPVKeyFrame* next = (cc + 1 < numFrames) ? this->Internals->KeyFrames[cc + 1] : nullptr;
     double min = (prev) ? prev->GetKeyTime() : 0.0;
     double max = (next) ? next->GetKeyTime() : 1.0;
     vtkSMProperty* keyTimeProp = kf->GetProperty("KeyTime");

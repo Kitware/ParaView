@@ -67,7 +67,7 @@ protected:
    * simply asks the proxy manager to create a new proxy of the requested type.
    */
   vtkSMProxy* CreateProxy(
-    const char* xmlgroup, const char* xmlname, const char* subProxyName = NULL) override;
+    const char* xmlgroup, const char* xmlname, const char* subProxyName = nullptr) override;
 
   /**
    * Called after a new proxy has been created. Gives the subclasses an

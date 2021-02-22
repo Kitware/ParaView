@@ -208,19 +208,19 @@ void vtkPVSynchronizedRenderer::Initialize(vtkPVSession* session)
 //----------------------------------------------------------------------------
 vtkPVSynchronizedRenderer::~vtkPVSynchronizedRenderer()
 {
-  this->SetRenderer(0);
+  this->SetRenderer(nullptr);
   if (this->ParallelSynchronizer)
   {
     this->ParallelSynchronizer->Delete();
-    this->ParallelSynchronizer = 0;
+    this->ParallelSynchronizer = nullptr;
   }
   if (this->CSSynchronizer)
   {
     this->CSSynchronizer->Delete();
-    this->CSSynchronizer = 0;
+    this->CSSynchronizer = nullptr;
   }
-  this->SetImageProcessingPass(0);
-  this->SetRenderPass(0);
+  this->SetImageProcessingPass(nullptr);
+  this->SetRenderPass(nullptr);
 }
 
 //----------------------------------------------------------------------------
@@ -279,7 +279,7 @@ void vtkPVSynchronizedRenderer::SetRenderPass(vtkRenderPass* pass)
 //----------------------------------------------------------------------------
 void vtkPVSynchronizedRenderer::SetUseDepthBuffer(bool useDB)
 {
-  if (this->ParallelSynchronizer == 0)
+  if (this->ParallelSynchronizer == nullptr)
   {
     return;
   }
@@ -298,7 +298,7 @@ void vtkPVSynchronizedRenderer::SetUseDepthBuffer(bool useDB)
 //----------------------------------------------------------------------------
 void vtkPVSynchronizedRenderer::SetRenderEmptyImages(bool useREI)
 {
-  if (this->ParallelSynchronizer == 0)
+  if (this->ParallelSynchronizer == nullptr)
   {
     return;
   }

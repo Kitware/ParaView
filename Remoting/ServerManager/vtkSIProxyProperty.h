@@ -54,7 +54,7 @@ public:
   vtkGetStringMacro(RemoveCommand);
   //@}
 
-  // When set to true, the property will push a NULL i.e. 0 when there are no
+  // When set to true, the property will push a nullptr i.e. 0 when there are no
   // proxies in the property. Not used when CleanCommand or RemoveCommand is
   // set. Default is false.
   vtkGetMacro(NullOnEmpty, bool);
@@ -94,7 +94,7 @@ protected:
   char* RemoveCommand;
   //@}
 
-  // When set to true, the property will push a NULL i.e. 0 when there are no
+  // When set to true, the property will push a nullptr i.e. 0 when there are no
   // proxies in the property. Not used when CleanCommand or RemoveCommand is
   // set. Default is false.
   vtkSetMacro(NullOnEmpty, bool);
@@ -116,7 +116,7 @@ protected:
   // Base on the ArgumentType will return either the VTK object or the SMProxy object
   vtkObjectBase* GetObjectBase(vtkTypeUInt32 globalId);
 
-  // Allow to detect if a null argument is really meant to be null
+  // Allow to detect if a nullptr argument is really meant to be nullptr
   bool IsValidNull(vtkTypeUInt32 globalId);
 
 private:

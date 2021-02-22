@@ -49,11 +49,11 @@ void vtkSMGL2PSExporterProxy::Write()
   vtkPVGL2PSExporter* exporter = vtkPVGL2PSExporter::SafeDownCast(this->GetClientSideObject());
 
   vtkSMRenderViewProxy* rv =
-    this->ViewType == RenderView ? vtkSMRenderViewProxy::SafeDownCast(this->View) : NULL;
+    this->ViewType == RenderView ? vtkSMRenderViewProxy::SafeDownCast(this->View) : nullptr;
   vtkSMContextViewProxy* cv =
-    this->ViewType == ContextView ? vtkSMContextViewProxy::SafeDownCast(this->View) : NULL;
+    this->ViewType == ContextView ? vtkSMContextViewProxy::SafeDownCast(this->View) : nullptr;
 
-  vtkRenderWindow* renWin = NULL;
+  vtkRenderWindow* renWin = nullptr;
   if (rv)
   {
     renWin = rv->GetRenderWindow();
@@ -67,7 +67,7 @@ void vtkSMGL2PSExporterProxy::Write()
   {
     exporter->SetRenderWindow(renWin);
     exporter->Write();
-    exporter->SetRenderWindow(NULL);
+    exporter->SetRenderWindow(nullptr);
   }
 }
 

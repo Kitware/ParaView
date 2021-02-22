@@ -61,8 +61,8 @@ pqColorSelectorPropertyWidget::pqColorSelectorPropertyWidget(
     vbox->addWidget(label, /*stretch=*/1);
   }
 
-  pqColorChooserButton* button = NULL;
-  pqColorChooserButtonWithPalettes* paletteButton = NULL;
+  pqColorChooserButton* button = nullptr;
+  pqColorChooserButtonWithPalettes* paletteButton = nullptr;
   if (withPalette)
   {
     paletteButton = new pqColorChooserButtonWithPalettes(this);

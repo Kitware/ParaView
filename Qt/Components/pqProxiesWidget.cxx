@@ -143,7 +143,7 @@ void pqProxiesWidget::updateLayout()
   for (int cc = 0, max = keys.size(); cc < max; cc++)
   {
     const QString& key = keys[cc];
-    pqExpanderButton* expander = NULL;
+    pqExpanderButton* expander = nullptr;
     if (add_expanders)
     {
       expander = new pqExpanderButton(this);

@@ -60,7 +60,7 @@ class pqSpreadSheetViewWidget::pqDelegate : public pqNonEditableStyledItemDelega
   typedef pqNonEditableStyledItemDelegate Superclass;
 
 public:
-  pqDelegate(QObject* _parent = 0)
+  pqDelegate(QObject* _parent = nullptr)
     : Superclass(_parent)
   {
   }
@@ -120,8 +120,8 @@ pqSpreadSheetViewWidget::~pqSpreadSheetViewWidget()
 //-----------------------------------------------------------------------------
 void pqSpreadSheetViewWidget::setModel(QAbstractItemModel* modelToUse)
 {
-  // if model is non-null, then it must be a pqSpreadSheetViewModel.
-  assert(modelToUse == NULL || qobject_cast<pqSpreadSheetViewModel*>(modelToUse) != NULL);
+  // if model is non-nullptr, then it must be a pqSpreadSheetViewModel.
+  assert(modelToUse == nullptr || qobject_cast<pqSpreadSheetViewModel*>(modelToUse) != nullptr);
   this->Superclass::setModel(modelToUse);
   if (modelToUse)
   {

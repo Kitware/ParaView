@@ -40,7 +40,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 pqReaction::pqReaction(QAction* parentObject, Qt::ConnectionType type)
   : Superclass(parentObject)
 {
-  assert(parentObject != NULL);
+  assert(parentObject != nullptr);
 
   QObject::connect(parentObject, SIGNAL(triggered(bool)), this, SLOT(onTriggered()), type);
 

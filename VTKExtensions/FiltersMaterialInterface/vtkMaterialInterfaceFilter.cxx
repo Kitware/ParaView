@@ -209,7 +209,7 @@ vtkUniformGrid* GetReferenceGrid(vtkNonOverlappingAMR* amrds)
     for (unsigned int dataIdx = 0; dataIdx < numDatasets; ++dataIdx)
     {
       vtkUniformGrid* refGrid = amrds->GetDataSet(l, dataIdx);
-      if (refGrid != NULL)
+      if (refGrid != nullptr)
       {
         return (refGrid);
       }
@@ -217,7 +217,7 @@ vtkUniformGrid* GetReferenceGrid(vtkNonOverlappingAMR* amrds)
   }   // END for all number of levels
 
   // This process has no grids
-  return NULL;
+  return nullptr;
 }
 
 // Construct a list of the selected array names
@@ -306,7 +306,7 @@ vtkMaterialInterfaceEquivalenceSet::~vtkMaterialInterfaceEquivalenceSet()
   if (this->EquivalenceArray)
   {
     this->EquivalenceArray->Delete();
-    this->EquivalenceArray = 0;
+    this->EquivalenceArray = nullptr;
   }
 }
 
@@ -640,8 +640,8 @@ private:
 vtkMaterialInterfaceFilterBlock::vtkMaterialInterfaceFilterBlock()
 {
   this->GhostFlag = 0;
-  this->Image = 0;
-  this->VolumeFractionArray = 0;
+  this->Image = nullptr;
+  this->VolumeFractionArray = nullptr;
   this->WeHaveToDeleteTheVolumeFractionMemory = 0;
   this->Level = 0;
   this->CellIncrements[0] = this->CellIncrements[1] = this->CellIncrements[2] = 0;
@@ -650,7 +650,7 @@ vtkMaterialInterfaceFilterBlock::vtkMaterialInterfaceFilterBlock()
     this->CellExtent[ii] = 0;
     this->BaseCellExtent[ii] = 0;
   }
-  this->FragmentIds = 0;
+  this->FragmentIds = nullptr;
   this->Spacing[0] = this->Spacing[1] = this->Spacing[2] = 0.0;
   this->Origin[0] = this->Origin[1] = this->Origin[2] = 0.0;
 
@@ -664,14 +664,14 @@ vtkMaterialInterfaceFilterBlock::~vtkMaterialInterfaceFilterBlock()
 {
   if (this->Image)
   {
-    this->Image->UnRegister(0);
-    this->Image = 0;
+    this->Image->UnRegister(nullptr);
+    this->Image = nullptr;
   }
   if (this->VolumeFractionArray && this->WeHaveToDeleteTheVolumeFractionMemory)
   { // Memory was allocated without an image.
     delete[] this->VolumeFractionArray;
   }
-  this->VolumeFractionArray = 0;
+  this->VolumeFractionArray = nullptr;
 
   this->Level = 0;
 
@@ -680,10 +680,10 @@ vtkMaterialInterfaceFilterBlock::~vtkMaterialInterfaceFilterBlock()
     this->CellExtent[ii] = 0;
     this->BaseCellExtent[ii] = 0;
   }
-  if (this->FragmentIds != 0)
+  if (this->FragmentIds != nullptr)
   {
     delete[] this->FragmentIds;
-    this->FragmentIds = 0;
+    this->FragmentIds = nullptr;
   }
   this->Spacing[0] = this->Spacing[1] = this->Spacing[2] = 0.0;
   this->Origin[0] = this->Origin[1] = this->Origin[2] = 0.0;
@@ -701,7 +701,7 @@ void vtkMaterialInterfaceFilterBlock::InitializeVolumeFractionArray(int invertVo
   double tmp;
   unsigned char* inPtr = (unsigned char*)(volumeFractionArray->GetVoidPointer(0));
 
-  if (implicitFunction == 0)
+  if (implicitFunction == nullptr)
   {
     this->VolumeFractionArray = inPtr;
     this->WeHaveToDeleteTheVolumeFractionMemory = 0;
@@ -761,7 +761,7 @@ void vtkMaterialInterfaceFilterBlock::Initialize(int blockId, vtkImageData* imag
     vtkGenericWarningMacro("Block already initialized !!!");
     return;
   }
-  if (image == 0)
+  if (image == nullptr)
   {
     vtkGenericWarningMacro("No image to initialize with.");
     return;
@@ -769,7 +769,7 @@ void vtkMaterialInterfaceFilterBlock::Initialize(int blockId, vtkImageData* imag
 
   this->BlockId = blockId;
   this->Image = image;
-  this->Image->Register(0);
+  this->Image->Register(nullptr);
   this->Level = level;
   image->GetSpacing(this->Spacing);
   image->GetOrigin(this->Origin);
@@ -787,7 +787,7 @@ void vtkMaterialInterfaceFilterBlock::Initialize(int blockId, vtkImageData* imag
   // get pointers to arrays to volume weighted average
   this->NVolumeWtdAvgs = static_cast<int>(volumeWtdAvgArrayNames.size());
   this->VolumeWtdAvgArrays.clear();
-  this->VolumeWtdAvgArrays.resize(this->NVolumeWtdAvgs, 0);
+  this->VolumeWtdAvgArrays.resize(this->NVolumeWtdAvgs, nullptr);
   for (int i = 0; i < this->NVolumeWtdAvgs; ++i)
   {
     this->VolumeWtdAvgArrays[i] =
@@ -798,7 +798,7 @@ void vtkMaterialInterfaceFilterBlock::Initialize(int blockId, vtkImageData* imag
   // get pointers to arrays to mass weighted average
   this->NMassWtdAvgs = static_cast<int>(massWtdAvgArrayNames.size());
   this->MassWtdAvgArrays.clear();
-  this->MassWtdAvgArrays.resize(this->NMassWtdAvgs, 0);
+  this->MassWtdAvgArrays.resize(this->NMassWtdAvgs, nullptr);
   for (int i = 0; i < this->NMassWtdAvgs; ++i)
   {
     this->MassWtdAvgArrays[i] =
@@ -810,7 +810,7 @@ void vtkMaterialInterfaceFilterBlock::Initialize(int blockId, vtkImageData* imag
   // output.ie Integrated arrays
   this->NToIntegrate = static_cast<int>(integratedArrayNames.size());
   this->IntegratedArrays.clear();
-  this->IntegratedArrays.resize(this->NToIntegrate, 0);
+  this->IntegratedArrays.resize(this->NToIntegrate, nullptr);
   for (int i = 0; i < this->NToIntegrate; ++i)
   {
     this->IntegratedArrays[i] =
@@ -821,7 +821,7 @@ void vtkMaterialInterfaceFilterBlock::Initialize(int blockId, vtkImageData* imag
   // get pointers to arrays to sum
   this->NToSum = static_cast<int>(summedArrayNames.size());
   this->ArraysToSum.clear();
-  this->ArraysToSum.resize(this->NToSum, 0);
+  this->ArraysToSum.resize(this->NToSum, nullptr);
   for (int i = 0; i < this->NToSum; ++i)
   {
     this->ArraysToSum[i] = this->Image->GetCellData()->GetArray(summedArrayNames[i].c_str());
@@ -830,7 +830,7 @@ void vtkMaterialInterfaceFilterBlock::Initialize(int blockId, vtkImageData* imag
   }
   // Get the mass array, if it is provided then certain
   // calculations which depend on it will be unavailable.
-  this->MassArray = 0;
+  this->MassArray = nullptr;
   if (!massArrayName.empty())
   {
     this->MassArray = this->Image->GetCellData()->GetArray(massArrayName.c_str());
@@ -983,7 +983,7 @@ void vtkMaterialInterfaceFilterBlock::InitializeGhostLayer(unsigned char* volFra
   this->GhostFlag = 1;
   this->BlockId = blockId;
 
-  this->Image = 0;
+  this->Image = nullptr;
   this->Level = level;
   // Skip spacing and origin.
 
@@ -1225,7 +1225,7 @@ vtkMaterialInterfaceLevel::vtkMaterialInterfaceLevel()
   this->BlockDimensions[0] = 0;
   this->BlockDimensions[1] = 0;
   this->BlockDimensions[2] = 0;
-  this->Grid = 0;
+  this->Grid = nullptr;
 }
 //----------------------------------------------------------------------------
 vtkMaterialInterfaceLevel::~vtkMaterialInterfaceLevel()
@@ -1246,7 +1246,7 @@ vtkMaterialInterfaceLevel::~vtkMaterialInterfaceLevel()
       {
         // We are not the only container for blocks yet.
         // delete this->Grid[ii];
-        this->Grid[ii] = 0;
+        this->Grid[ii] = nullptr;
       }
     }
     delete[] this->Grid;
@@ -1361,7 +1361,7 @@ vtkMaterialInterfaceFilterBlock* vtkMaterialInterfaceLevel::GetBlock(int xIdx, i
   if (xIdx < this->GridExtent[0] || xIdx > this->GridExtent[1] || yIdx < this->GridExtent[2] ||
     yIdx > this->GridExtent[3] || zIdx < this->GridExtent[4] || zIdx > this->GridExtent[5])
   {
-    return 0;
+    return nullptr;
   }
   xIdx -= this->GridExtent[0];
   yIdx -= this->GridExtent[2];
@@ -1392,9 +1392,9 @@ public:
 };
 void vtkMaterialInterfaceFilterIterator::Initialize()
 {
-  this->Block = 0;
-  this->VolumeFractionPointer = 0;
-  this->FragmentIdPointer = 0;
+  this->Block = nullptr;
+  this->VolumeFractionPointer = nullptr;
+  this->FragmentIdPointer = nullptr;
   this->Index[0] = this->Index[1] = this->Index[2] = 0;
   this->FlatIndex = 0;
 }
@@ -1437,7 +1437,7 @@ vtkMaterialInterfaceFilterRingBuffer::vtkMaterialInterfaceFilterRingBuffer()
   this->Ring = new vtkMaterialInterfaceFilterIterator[initialSize];
   this->RingLength = initialSize;
   this->End = this->Ring + this->RingLength;
-  this->First = 0;
+  this->First = nullptr;
   this->Next = this->Ring;
   this->Size = 0;
 }
@@ -1446,9 +1446,9 @@ vtkMaterialInterfaceFilterRingBuffer::vtkMaterialInterfaceFilterRingBuffer()
 vtkMaterialInterfaceFilterRingBuffer::~vtkMaterialInterfaceFilterRingBuffer()
 {
   delete[] this->Ring;
-  this->End = 0;
+  this->End = nullptr;
   this->RingLength = 0;
-  this->Next = this->First = 0;
+  this->Next = this->First = nullptr;
   this->Size = 0;
 }
 
@@ -1599,44 +1599,44 @@ vtkMaterialInterfaceFilter::vtkMaterialInterfaceFilter()
   this->SummationArraySelection = vtkDataArraySelection::New();
   this->SummationArraySelection->AddObserver(vtkCommand::ModifiedEvent, this->SelectionObserver);
 
-  this->OutputBaseName = 0;
+  this->OutputBaseName = nullptr;
   this->WriteGeometryOutput = false;
   this->WriteStatisticsOutput = false;
 
   this->NumberOfInputBlocks = 0;
-  this->InputBlocks = 0;
+  this->InputBlocks = nullptr;
   this->GlobalOrigin[0] = this->GlobalOrigin[1] = this->GlobalOrigin[2] = 0.0;
   this->RootSpacing[0] = this->RootSpacing[1] = this->RootSpacing[2] = 1.0;
 
   this->FragmentId = 0;
   this->FragmentVolume = 0.0;
-  this->FragmentVolumes = 0;
+  this->FragmentVolumes = nullptr;
   this->FragmentMoment.resize(4, 0.0);
-  this->FragmentMoments = 0;
-  this->FragmentAABBCenters = 0;
-  this->FragmentOBBs = 0;
-  this->FragmentSplitGeometry = 0;
+  this->FragmentMoments = nullptr;
+  this->FragmentAABBCenters = nullptr;
+  this->FragmentOBBs = nullptr;
+  this->FragmentSplitGeometry = nullptr;
 
   // Keep depth of crater along clip plane normal.
   this->ClipDepthMax = 0.0;
   this->ClipDepthMin = VTK_FLOAT_MAX;
-  this->ClipDepthMaximums = 0;
-  this->ClipDepthMinimums = 0;
+  this->ClipDepthMaximums = nullptr;
+  this->ClipDepthMinimums = nullptr;
 
   this->EquivalenceSet = new vtkMaterialInterfaceEquivalenceSet;
-  this->LocalToGlobalOffsets = 0;
+  this->LocalToGlobalOffsets = nullptr;
   this->TotalNumberOfRawFragments = 0;
   this->NumberOfResolvedFragments = 0;
   this->ResolvedFragmentCount = 0;
   this->MaterialId = 0;
 
-  this->ResolvedFragments = 0;
-  this->ResolvedFragmentCenters = 0;
-  this->ResolvedFragmentOBBs = 0;
+  this->ResolvedFragments = nullptr;
+  this->ResolvedFragmentCenters = nullptr;
+  this->ResolvedFragmentOBBs = nullptr;
 
   this->FaceNeighbors = new vtkMaterialInterfaceFilterIterator[32];
 
-  this->CurrentFragmentMesh = 0;
+  this->CurrentFragmentMesh = nullptr;
 
   this->NVolumeWtdAvgs = 0;
   this->NToSum = 0;
@@ -1653,7 +1653,7 @@ vtkMaterialInterfaceFilter::vtkMaterialInterfaceFilter()
   this->ProgressResolutionInc = 0.0;
 
   // Crater extraction variables.
-  this->ClipFunction = 0;
+  this->ClipFunction = nullptr;
   this->ClipCenter[0] = 0.0;
   this->ClipCenter[1] = 0.0;
   this->ClipCenter[2] = 0.0;
@@ -1675,7 +1675,7 @@ vtkMaterialInterfaceFilter::vtkMaterialInterfaceFilter()
 vtkMaterialInterfaceFilter::~vtkMaterialInterfaceFilter()
 {
   this->DeleteAllBlocks();
-  this->Controller = 0;
+  this->Controller = nullptr;
   this->GlobalOrigin[0] = this->GlobalOrigin[1] = this->GlobalOrigin[2] = 0.0;
   this->RootSpacing[0] = this->RootSpacing[1] = this->RootSpacing[2] = 1.0;
 
@@ -1684,7 +1684,7 @@ vtkMaterialInterfaceFilter::~vtkMaterialInterfaceFilter()
   this->ClipDepthMax = 0.0;
   this->ClipDepthMin = VTK_FLOAT_MAX;
 
-  this->SetClipFunction(0);
+  this->SetClipFunction(nullptr);
 
   CheckAndReleaseVtkPointer(this->ClipDepthMaximums);
   CheckAndReleaseVtkPointer(this->ClipDepthMinimums);
@@ -1698,35 +1698,35 @@ vtkMaterialInterfaceFilter::~vtkMaterialInterfaceFilter()
   ClearVectorOfVtkPointers(this->FragmentSums);
 
   delete this->EquivalenceSet;
-  this->EquivalenceSet = 0;
+  this->EquivalenceSet = nullptr;
 
   delete[] this->FaceNeighbors;
-  this->FaceNeighbors = 0;
+  this->FaceNeighbors = nullptr;
 
   // clean up PV interface
   this->MaterialArraySelection->RemoveObserver(this->SelectionObserver);
   this->MaterialArraySelection->Delete();
-  this->MaterialArraySelection = 0;
+  this->MaterialArraySelection = nullptr;
   //
   this->MassArraySelection->RemoveObserver(this->SelectionObserver);
   this->MassArraySelection->Delete();
-  this->MassArraySelection = 0;
+  this->MassArraySelection = nullptr;
   //
   this->VolumeWtdAvgArraySelection->RemoveObserver(this->SelectionObserver);
   this->VolumeWtdAvgArraySelection->Delete();
-  this->VolumeWtdAvgArraySelection = 0;
+  this->VolumeWtdAvgArraySelection = nullptr;
   //
   this->MassWtdAvgArraySelection->RemoveObserver(this->SelectionObserver);
   this->MassWtdAvgArraySelection->Delete();
-  this->MassWtdAvgArraySelection = 0;
+  this->MassWtdAvgArraySelection = nullptr;
   //
   this->SummationArraySelection->RemoveObserver(this->SelectionObserver);
   this->SummationArraySelection->Delete();
-  this->SummationArraySelection = 0;
+  this->SummationArraySelection = nullptr;
 
   this->SelectionObserver->Delete();
 
-  if (this->OutputBaseName != 0)
+  if (this->OutputBaseName != nullptr)
   {
     delete[] this->OutputBaseName;
   }
@@ -1744,7 +1744,7 @@ vtkMTimeType vtkMaterialInterfaceFilter::GetMTime()
   vtkMTimeType mTime = this->Superclass::GetMTime();
   vtkMTimeType time;
 
-  if (this->ClipFunction != NULL)
+  if (this->ClipFunction != nullptr)
   {
     time = this->ClipFunction->GetMTime();
     mTime = (time > mTime ? time : mTime);
@@ -1815,13 +1815,13 @@ void vtkMaterialInterfaceFilter::DeleteAllBlocks()
     if (this->InputBlocks[ii])
     {
       delete this->InputBlocks[ii];
-      this->InputBlocks[ii] = 0;
+      this->InputBlocks[ii] = nullptr;
     }
   }
   if (this->InputBlocks)
   {
     delete[] this->InputBlocks;
-    this->InputBlocks = 0;
+    this->InputBlocks = nullptr;
   }
   this->NumberOfInputBlocks = 0;
 
@@ -1833,7 +1833,7 @@ void vtkMaterialInterfaceFilter::DeleteAllBlocks()
     if (this->Levels[level])
     {
       delete this->Levels[level];
-      this->Levels[level] = 0;
+      this->Levels[level] = nullptr;
     }
   }
 }
@@ -1850,7 +1850,7 @@ int vtkMaterialInterfaceFilter::InitializeBlocks(vtkNonOverlappingAMR* input,
   vtkMaterialInterfaceFilterBlock* block;
   int myProc = this->Controller->GetLocalProcessId();
   int numProcs = this->Controller->GetNumberOfProcesses();
-  vtkMaterialInterfaceFilterHalfSphere* sphere = 0;
+  vtkMaterialInterfaceFilterHalfSphere* sphere = nullptr;
 
 #ifdef vtkMaterialInterfaceFilterPROFILE
   // Lets profile to see what takes the most time for large number of processes.
@@ -1890,10 +1890,10 @@ int vtkMaterialInterfaceFilter::InitializeBlocks(vtkNonOverlappingAMR* input,
   this->NumberOfInputBlocks = this->GetNumberOfLocalBlocks(input);
 
   this->InputBlocks = new vtkMaterialInterfaceFilterBlock*[this->NumberOfInputBlocks];
-  // Initialize to NULL.
+  // Initialize to nullptr.
   for (int blockId = 0; blockId < this->NumberOfInputBlocks; ++blockId)
   {
-    this->InputBlocks[blockId] = 0;
+    this->InputBlocks[blockId] = nullptr;
   }
 
   // Initialize each block with the input image
@@ -2016,7 +2016,7 @@ int vtkMaterialInterfaceFilter::InitializeBlocks(vtkNonOverlappingAMR* input,
     this->Levels[level]->SetStandardBlockDimensions(this->StandardBlockDimensions);
   }
   delete sphere;
-  sphere = 0;
+  sphere = nullptr;
 
   // Now add all the blocks to the level structures.
   int ii;
@@ -2392,7 +2392,7 @@ void vtkMaterialInterfaceFilter::ComputeOriginAndRootSpacing(vtkNonOverlappingAM
   {
     this->SetBlockGhostLevel(blockGhostLayer->GetValue(0));
   }
-  else if (globalBoundsDa == NULL)
+  else if (globalBoundsDa == nullptr)
   {
     // Update ghostLayer if available
     // CAUTION: as no global fields were provided we assume that it is not the
@@ -2402,8 +2402,8 @@ void vtkMaterialInterfaceFilter::ComputeOriginAndRootSpacing(vtkNonOverlappingAM
 
   // if these are not present then the dataset
   // is malformed.
-  if (globalBoundsDa == NULL || standardBoxSizeIa == NULL || minLevelIa == NULL ||
-    minLevelSpacingDa == NULL)
+  if (globalBoundsDa == nullptr || standardBoxSizeIa == nullptr || minLevelIa == nullptr ||
+    minLevelSpacingDa == nullptr)
   {
     // Need to figure out this information
     int nbProcs = this->Controller->GetNumberOfProcesses();
@@ -2929,7 +2929,7 @@ void vtkMaterialInterfaceFilter::ComputeAndDistributeGhostBlocks(
   int requestMsg[8];
   int* ext;
   int bufSize = 0;
-  unsigned char* buf = 0;
+  unsigned char* buf = nullptr;
   int dataSize;
   vtkMaterialInterfaceFilterBlock* ghostBlock;
 
@@ -3005,7 +3005,7 @@ void vtkMaterialInterfaceFilter::HandleGhostBlockRequests()
   int blockId;
   vtkMaterialInterfaceFilterBlock* block;
   int bufSize = 0;
-  unsigned char* buf = 0;
+  unsigned char* buf = nullptr;
   int dataSize;
   int* ext;
 
@@ -3024,7 +3024,7 @@ void vtkMaterialInterfaceFilter::HandleGhostBlockRequests()
     {
       // Find the block.
       block = this->InputBlocks[blockId];
-      if (block == 0)
+      if (block == nullptr)
       { // Sanity check. This will lock up!
         vtkErrorMacro("Missing block request.");
         return;
@@ -3272,7 +3272,7 @@ void vtkMaterialInterfaceFilter::PrepareForPass(vtkNonOverlappingAMR* hbdsInput,
   vtkCompositeDataIterator* hbdsIt = hbdsInput->NewIterator();
   hbdsIt->SkipEmptyNodesOn();
   hbdsIt->InitTraversal();
-  vtkImageData* testImage = 0;
+  vtkImageData* testImage = nullptr;
   if (!hbdsIt->IsDoneWithTraversal())
   {
     //    testImage=dynamic_cast<vtkImageData *>(hbdsInput->GetDataSet(hbdsIt));
@@ -3460,7 +3460,7 @@ int vtkMaterialInterfaceFilter::RequestData(vtkInformation* vtkNotUsed(request),
   vtkMultiBlockDataSet* mbdsOutput2 =
     vtkMultiBlockDataSet::SafeDownCast(outInfo->Get(vtkDataObject::DATA_OBJECT()));
 #else
-  vtkMultiBlockDataSet* mbdsOutput2 = 0;
+  vtkMultiBlockDataSet* mbdsOutput2 = nullptr;
 #endif
 
   // Get arrays to process based on array selection status
@@ -3528,7 +3528,7 @@ int vtkMaterialInterfaceFilter::RequestData(vtkInformation* vtkNotUsed(request),
     this->IntegratedArrayNames.clear();
     this->NToIntegrate = 0;
 
-    if (hbdsInput != 0)
+    if (hbdsInput != nullptr)
     {
       // Extract all compatible cell data so they could be used by the user
       // to color by. Previously only the array that were used for computation
@@ -3754,7 +3754,7 @@ int vtkMaterialInterfaceFilter::ProcessBlock(int blockId)
   this->UpdateProgress(this->Progress);
 
   vtkMaterialInterfaceFilterBlock* block = this->InputBlocks[blockId];
-  if (block == 0)
+  if (block == nullptr)
   {
     return 0;
   }
@@ -4270,9 +4270,9 @@ int vtkMaterialInterfaceFilter::SubVoxelPositionCorner(double* point,
   // difficult, we are only considering corner, edge and face directions.
 
   // Half edges of the smallest voxel.
-  double* hEdge0 = 0;
-  double* hEdge1 = 0;
-  double* hEdge2 = 0;
+  double* hEdge0 = nullptr;
+  double* hEdge1 = nullptr;
+  double* hEdge2 = nullptr;
   int highestLevel = -1;
   for (int ii = 0; ii < 8; ++ii)
   {
@@ -4326,12 +4326,12 @@ int vtkMaterialInterfaceFilter::SubVoxelPositionCorner(double* point,
 void vtkMaterialInterfaceFilter::CreateFace(vtkMaterialInterfaceFilterIterator* in,
   vtkMaterialInterfaceFilterIterator* out, int axis, int outMaxFlag)
 {
-  if (in->Block == 0 || in->Block->GetGhostFlag())
+  if (in->Block == nullptr || in->Block->GetGhostFlag())
   {
     return;
   }
 
-  if (out->Block == 0)
+  if (out->Block == nullptr)
   { // Pad the volume so we can create faces on the outside of the dataset.
     *out = *in;
     if (outMaxFlag)
@@ -5234,7 +5234,7 @@ void vtkMaterialInterfaceFilter::GetNeighborIteratorPad(vtkMaterialInterfaceFilt
   vtkMaterialInterfaceFilterIterator* iterator, int axis0, int maxFlag0, int axis1, int maxFlag1,
   int axis2, int maxFlag2)
 {
-  if (iterator->VolumeFractionPointer == 0)
+  if (iterator->VolumeFractionPointer == nullptr)
   {
     vtkErrorMacro("Error empty input block.  Cannot find neighbor.");
     *next = *iterator;
@@ -5242,7 +5242,7 @@ void vtkMaterialInterfaceFilter::GetNeighborIteratorPad(vtkMaterialInterfaceFilt
   }
   this->GetNeighborIterator(next, iterator, axis0, maxFlag0, axis1, maxFlag1, axis2, maxFlag2);
 
-  if (next->VolumeFractionPointer == 0)
+  if (next->VolumeFractionPointer == nullptr)
   { // Next is out of bounds. Duplicate the last iterator to get a values.
     *next = *iterator;
     if (maxFlag0)
@@ -5268,7 +5268,7 @@ void vtkMaterialInterfaceFilter::GetNeighborIterator(vtkMaterialInterfaceFilterI
   vtkMaterialInterfaceFilterIterator* iterator, int axis0, int maxFlag0, int axis1, int maxFlag1,
   int axis2, int maxFlag2)
 {
-  if (iterator->Block == 0)
+  if (iterator->Block == nullptr)
   { // No input, no output.  This should not happen.
     vtkWarningMacro("Can not find neighbor for NULL block.");
     *next = *iterator;
@@ -5558,7 +5558,7 @@ void vtkMaterialInterfaceFilter::ConnectFragment(vtkMaterialInterfaceFilterRingB
       // "Left"/min
       this->GetNeighborIterator(&next, &iterator, ii, 0, (ii + 1) % 3, 0, (ii + 2) % 3, 0);
 
-      if (next.VolumeFractionPointer == 0 ||
+      if (next.VolumeFractionPointer == nullptr ||
         next.VolumeFractionPointer[0] < this->scaledMaterialFractionThreshold)
       {
         // Neighbor is outside of fragment.  Make a face.
@@ -5589,7 +5589,7 @@ void vtkMaterialInterfaceFilter::ConnectFragment(vtkMaterialInterfaceFilterRingB
         if (ii != 1 || threeDimFlag)
         { // stupid after the fact way of dealing with 2d AMR input.
           this->GetNeighborIterator(&next2, &next, (ii + 1) % 3, 1, (ii + 2) % 3, 0, ii, 0);
-          if (next2.VolumeFractionPointer == 0 ||
+          if (next2.VolumeFractionPointer == nullptr ||
             next2.VolumeFractionPointer[0] < this->scaledMaterialFractionThreshold)
           {
             // Neighbor is outside of fragment.  Make a face.
@@ -5610,7 +5610,7 @@ void vtkMaterialInterfaceFilter::ConnectFragment(vtkMaterialInterfaceFilterRingB
         if (ii != 0 || threeDimFlag)
         { // stupid after the fact way of dealing with 2d AMR input.
           this->GetNeighborIterator(&next2, &next, (ii + 2) % 3, 1, ii, 0, (ii + 1) % 3, 0);
-          if (next2.VolumeFractionPointer == 0 ||
+          if (next2.VolumeFractionPointer == nullptr ||
             next2.VolumeFractionPointer[0] < this->scaledMaterialFractionThreshold)
           {
             // Neighbor is outside of fragment.  Make a face.
@@ -5631,7 +5631,7 @@ void vtkMaterialInterfaceFilter::ConnectFragment(vtkMaterialInterfaceFilterRingB
         if (next2.Block && threeDimFlag)
         {
           this->GetNeighborIterator(&next, &next2, (ii + 1) % 3, 1, (ii + 2) % 3, 0, ii, 0);
-          if (next.VolumeFractionPointer == 0 ||
+          if (next.VolumeFractionPointer == nullptr ||
             next.VolumeFractionPointer[0] < this->scaledMaterialFractionThreshold)
           {
             // Neighbor is outside of fragment.  Make a face.
@@ -5652,7 +5652,7 @@ void vtkMaterialInterfaceFilter::ConnectFragment(vtkMaterialInterfaceFilterRingB
 
       // "Right"/max
       this->GetNeighborIterator(&next, &iterator, ii, 1, (ii + 1) % 3, 0, (ii + 2) % 3, 0);
-      if (next.VolumeFractionPointer == 0 ||
+      if (next.VolumeFractionPointer == nullptr ||
         next.VolumeFractionPointer[0] < this->scaledMaterialFractionThreshold)
       { // Neighbor is outside of fragment.  Make a face.
         this->CreateFace(&iterator, &next, ii, 1);
@@ -5677,7 +5677,7 @@ void vtkMaterialInterfaceFilter::ConnectFragment(vtkMaterialInterfaceFilterRingB
         if (ii != 1 || threeDimFlag)
         { // stupid after the fact way of dealing with 2d AMR input.
           this->GetNeighborIterator(&next2, &next, (ii + 1) % 3, 1, (ii + 2) % 3, 0, ii, 0);
-          if (next2.VolumeFractionPointer == 0 ||
+          if (next2.VolumeFractionPointer == nullptr ||
             next2.VolumeFractionPointer[0] < this->scaledMaterialFractionThreshold)
           {
             // Neighbor is outside of fragment.  Make a face.
@@ -5698,7 +5698,7 @@ void vtkMaterialInterfaceFilter::ConnectFragment(vtkMaterialInterfaceFilterRingB
         if (ii != 0 || threeDimFlag)
         { // stupid after the fact way of dealing with 2d AMR input.
           this->GetNeighborIterator(&next2, &next, (ii + 2) % 3, 1, ii, 0, (ii + 1) % 3, 0);
-          if (next2.VolumeFractionPointer == 0 ||
+          if (next2.VolumeFractionPointer == nullptr ||
             next2.VolumeFractionPointer[0] < this->scaledMaterialFractionThreshold)
           {
             // Neighbor is outside of fragment.  Make a face.
@@ -5719,7 +5719,7 @@ void vtkMaterialInterfaceFilter::ConnectFragment(vtkMaterialInterfaceFilterRingB
         if (next2.Block && threeDimFlag)
         {
           this->GetNeighborIterator(&next, &next2, (ii + 1) % 3, 1, (ii + 2) % 3, 0, ii, 0);
-          if (next.VolumeFractionPointer == 0 ||
+          if (next.VolumeFractionPointer == nullptr ||
             next.VolumeFractionPointer[0] < this->scaledMaterialFractionThreshold)
           {
             // Neighbor is outside of fragment.  Make a face.
@@ -6392,7 +6392,7 @@ void vtkMaterialInterfaceFilter::ResolveLocalFragmentGeometry()
     // resolved and we need to append.
     vtkPolyData* destMesh = dynamic_cast<vtkPolyData*>(resolvedFragments->GetPiece(globalId));
     vtkPolyData*& srcMesh = this->FragmentMeshes[localId];
-    if (destMesh == 0)
+    if (destMesh == nullptr)
     {
       resolvedFragments->SetPiece(globalId, srcMesh);
       // make a note that we have a piece of this fragment
@@ -6436,7 +6436,7 @@ void vtkMaterialInterfaceFilter::ResolveLocalFragmentGeometry()
       // move id to end of the vector
       shortEnd = remove(start, shortEnd, globalId);
       // remove from output data set
-      resolvedFragments->SetPiece(globalId, 0);
+      resolvedFragments->SetPiece(globalId, nullptr);
 #ifdef vtkMaterialInterfaceFilterDEBUG
       cerr << "[" << __LINE__ << "] " << myProcId << " fragment " << globalId
            << " is empty and will be ignored." << endl;
@@ -6756,7 +6756,7 @@ void vtkMaterialInterfaceFilter::ComputeGeometricAttributes()
       int thisMsgId = msgBase;
 
       // create and send my loading array
-      vtkIdType* buffer = 0;
+      vtkIdType* buffer = nullptr;
       int bufSize = this->PackLoadingArray(buffer);
       comm->Send(&bufSize, 1, controllingProcId, thisMsgId);
       ++thisMsgId;
@@ -6779,7 +6779,7 @@ void vtkMaterialInterfaceFilter::ComputeGeometricAttributes()
     {
       nAttributeComps += 3;
     }
-    vtkOBBTree* obbCalc = 0;
+    vtkOBBTree* obbCalc = nullptr;
     if (this->ComputeOBB)
     {
       obbCalc = vtkOBBTree::New();
@@ -6863,7 +6863,7 @@ void vtkMaterialInterfaceFilter::ComputeGeometricAttributes()
           // I have a piece. From now on I need to treat
           // this fragment as split.
           int localId = -1;
-          if (localMesh != 0)
+          if (localMesh != nullptr)
           {
             localId = idList.GetLocalId(fragmentId);
             assert("Fragment id not found." && localId != -1);
@@ -6896,7 +6896,7 @@ void vtkMaterialInterfaceFilter::ComputeGeometricAttributes()
               buffer.UnPack(writePointer, 3, nPoints, true);
             }
             // append points that I own.
-            if (localMesh != 0)
+            if (localMesh != nullptr)
             {
               // get the points
               vtkFloatArray* ptsArray =
@@ -7018,7 +7018,7 @@ void vtkMaterialInterfaceFilter::ComputeGeometricAttributes()
             }
             // If I own a piece save the results, and mark
             // piece as split.
-            if (localMesh != 0)
+            if (localMesh != nullptr)
             {
               pBuf = attributeCommBuffer;
               if (!this->ComputeMoments)
@@ -7105,7 +7105,7 @@ void vtkMaterialInterfaceFilter::BuildLoadingArray(vector<vtkIdType>& loadingArr
 // pointer initialized to null, allocation is internal.
 int vtkMaterialInterfaceFilter::PackLoadingArray(vtkIdType*& buffer)
 {
-  assert("Buffer appears to have been pre-allocated." && buffer == 0);
+  assert("Buffer appears to have been pre-allocated." && buffer == nullptr);
 
   vtkMultiPieceDataSet* resolvedFragments =
     dynamic_cast<vtkMultiPieceDataSet*>(this->ResolvedFragments->GetBlock(this->MaterialId));
@@ -7309,14 +7309,14 @@ int vtkMaterialInterfaceFilter::PrepareToCollectGeometricAttributes(
     obb[myProcId] = this->FragmentOBBs;
   }
   // ids
-  ids.resize(nProcs, static_cast<int*>(0));
+  ids.resize(nProcs, static_cast<int*>(nullptr));
   if (this->ResolvedFragmentIds[this->MaterialId].size() != 0)
   {
     ids[myProcId] = &(this->ResolvedFragmentIds[this->MaterialId][0]);
   }
   else
   {
-    ids[myProcId] = 0;
+    ids[myProcId] = nullptr;
   }
 
   // note, this could be a problem if we need to update ResolvedFragmentIds
@@ -7883,7 +7883,7 @@ int vtkMaterialInterfaceFilter::CleanUpAfterCollectIntegratedAttributes(
 int vtkMaterialInterfaceFilter::PrepareToResolveIntegratedAttributes()
 {
   int nComps;
-  double* pResolved = 0;
+  double* pResolved = nullptr;
   vtkIdType bytesPerComponent = sizeof(double) * this->NumberOfResolvedFragments;
 
   // volume
@@ -8256,9 +8256,9 @@ void vtkMaterialInterfaceFilter::ResolveEquivalences()
 #endif
 
   delete[] this->NumberOfRawFragmentsInProcess;
-  this->NumberOfRawFragmentsInProcess = 0;
+  this->NumberOfRawFragmentsInProcess = nullptr;
   delete[] this->LocalToGlobalOffsets;
-  this->LocalToGlobalOffsets = 0;
+  this->LocalToGlobalOffsets = nullptr;
 }
 
 //----------------------------------------------------------------------------
@@ -8476,7 +8476,7 @@ void vtkMaterialInterfaceFilter::ReceiveGhostFragmentIds(
   int blockId;
   vtkMaterialInterfaceFilterBlock* block;
   int bufSize = 0;
-  int* buf = 0;
+  int* buf = nullptr;
   int dataSize;
   int* remoteExt;
   int localId, remoteId;
@@ -8499,7 +8499,7 @@ void vtkMaterialInterfaceFilter::ReceiveGhostFragmentIds(
     {
       // Find the block.
       block = this->InputBlocks[blockId];
-      if (block == 0)
+      if (block == nullptr)
       { // Sanity check. This will lock up!
         vtkErrorMacro("Missing block request.");
         return;
@@ -8592,8 +8592,8 @@ void vtkMaterialInterfaceFilter::CopyAttributesToOutput0()
   for (int i = 0; i < nLocalFragments; ++i)
   {
     int nComps = 0;
-    const char* name = 0;
-    const double* srcTuple = 0;
+    const char* name = nullptr;
+    const double* srcTuple = nullptr;
 
     // get the fragment
     int globalId = resolvedFragmentIds[i];
@@ -8936,13 +8936,13 @@ void vtkMaterialInterfaceFilter::CopyAttributesToOutput1()
   if (procId != 0)
   {
     // resolvedFragmentCenters->Delete();
-    this->ResolvedFragmentCenters->SetBlock(this->MaterialId, static_cast<vtkPolyData*>(0));
+    this->ResolvedFragmentCenters->SetBlock(this->MaterialId, static_cast<vtkPolyData*>(nullptr));
     return;
   }
   // Copy the attributes into point data
   vtkPointData* pd = resolvedFragmentCenters->GetPointData();
-  vtkIntArray* ia = 0;
-  vtkDoubleArray* da = 0;
+  vtkIntArray* ia = nullptr;
+  vtkDoubleArray* da = nullptr;
   // 0 id
   ia = vtkIntArray::New();
   ia->SetName("Id");
@@ -9142,7 +9142,7 @@ void vtkMaterialInterfaceFilter::CopyAttributesToOutput2()
   if (procId != 0)
   {
     // resolvedFragmentCenters->Delete();
-    this->ResolvedFragmentOBBs->SetBlock(this->MaterialId, static_cast<vtkPolyData*>(0));
+    this->ResolvedFragmentOBBs->SetBlock(this->MaterialId, static_cast<vtkPolyData*>(nullptr));
     return;
   }
 
@@ -9637,9 +9637,9 @@ int vtkMaterialInterfaceFilter::WriteStatisticsOutputToTextFile()
           vtkDataArray* a = pd->GetArray(arrayId);
           int nComps = a->GetNumberOfComponents();
           int idx = nComps * localId;
-          vtkIntArray* ia = 0;
-          vtkDoubleArray* da = 0;
-          if ((ia = dynamic_cast<vtkIntArray*>(a)) != 0)
+          vtkIntArray* ia = nullptr;
+          vtkDoubleArray* da = nullptr;
+          if ((ia = dynamic_cast<vtkIntArray*>(a)) != nullptr)
           {
             int* pIa = ia->GetPointer(0);
             pIa += idx;
@@ -9648,7 +9648,7 @@ int vtkMaterialInterfaceFilter::WriteStatisticsOutputToTextFile()
               fout << ", " << pIa[q];
             }
           }
-          else if ((da = dynamic_cast<vtkDoubleArray*>(a)) != 0)
+          else if ((da = dynamic_cast<vtkDoubleArray*>(a)) != nullptr)
           {
             double* pDa = da->GetPointer(0);
             pDa += idx;

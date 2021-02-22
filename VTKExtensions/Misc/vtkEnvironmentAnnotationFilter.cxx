@@ -102,7 +102,7 @@ int vtkEnvironmentAnnotationFilter::RequestData(vtkInformation* vtkNotUsed(reque
   vtkInformationVector** inputVector, vtkInformationVector* outputVector)
 {
   vtkDataObject* input = vtkDataObject::GetData(inputVector[0], 0);
-  if (input == NULL)
+  if (input == nullptr)
   {
     return 0;
   }

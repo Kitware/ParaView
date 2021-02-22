@@ -193,7 +193,7 @@ vtkStandardNewMacro(vtkSMStateLocator);
 //---------------------------------------------------------------------------
 vtkSMStateLocator::vtkSMStateLocator()
 {
-  this->ParentLocator = 0;
+  this->ParentLocator = nullptr;
   this->Internals = new vtkInternal();
 }
 
@@ -203,7 +203,7 @@ vtkSMStateLocator::~vtkSMStateLocator()
   this->Internals->DetatchObserver(this->Session);
   this->Internals->DetatchObserver(this->UndoStack);
 
-  this->SetParentLocator(0);
+  this->SetParentLocator(nullptr);
   delete this->Internals;
 }
 
@@ -216,7 +216,7 @@ void vtkSMStateLocator::PrintSelf(ostream& os, vtkIndent indent)
 bool vtkSMStateLocator::FindState(
   vtkTypeUInt32 globalID, vtkSMMessage* stateToFill, bool useParent /*=true*/)
 {
-  if (stateToFill != NULL)
+  if (stateToFill != nullptr)
   {
     stateToFill->Clear();
   }
@@ -257,7 +257,7 @@ void vtkSMStateLocator::UnRegisterAllStates(bool force)
 //---------------------------------------------------------------------------
 bool vtkSMStateLocator::IsStateLocal(vtkTypeUInt32 globalID)
 {
-  return this->Internals->FindState(globalID, NULL);
+  return this->Internals->FindState(globalID, nullptr);
 }
 //---------------------------------------------------------------------------
 bool vtkSMStateLocator::IsStateAvailable(vtkTypeUInt32 globalID)

@@ -35,7 +35,7 @@ public:
 vtkStandardNewMacro(vtkEnsembleDataReader);
 //-----------------------------------------------------------------------------
 vtkEnsembleDataReader::vtkEnsembleDataReader()
-  : FileName(0)
+  : FileName(nullptr)
   , CurrentMember(0)
   , Internal(new vtkEnsembleDataReader::vtkInternal())
 {
@@ -48,13 +48,13 @@ vtkEnsembleDataReader::vtkEnsembleDataReader()
 vtkEnsembleDataReader::~vtkEnsembleDataReader()
 {
   delete this->Internal;
-  this->Internal = NULL;
+  this->Internal = nullptr;
 }
 
 //-----------------------------------------------------------------------------
 unsigned int vtkEnsembleDataReader::GetNumberOfMembers() const
 {
-  return this->Internal->MetaData != NULL
+  return this->Internal->MetaData != nullptr
     ? static_cast<unsigned int>(this->Internal->FilePaths.size())
     : 0;
 }
@@ -176,7 +176,7 @@ vtkAlgorithm* vtkEnsembleDataReader::GetCurrentReader()
 {
   if (this->CurrentMember >= static_cast<unsigned int>(this->Internal->Readers.size()))
   {
-    return NULL;
+    return nullptr;
   }
   return this->Internal->Readers[this->CurrentMember];
 }
@@ -189,7 +189,7 @@ bool vtkEnsembleDataReader::UpdateMetaData()
     return false;
   }
 
-  if (this->Internal->MetaData != NULL && this->Internal->PreviousFileName == this->FileName)
+  if (this->Internal->MetaData != nullptr && this->Internal->PreviousFileName == this->FileName)
   {
     return true;
   }
@@ -202,7 +202,7 @@ bool vtkEnsembleDataReader::UpdateMetaData()
   }
 
   this->Internal->FilePaths.clear();
-  this->Internal->MetaData = NULL;
+  this->Internal->MetaData = nullptr;
   this->Internal->PreviousFileName = this->FileName;
   this->Internal->ReadMetaDataMTime.Modified();
   this->CurrentMemberRange[0] = this->CurrentMemberRange[1] = 0;

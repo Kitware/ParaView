@@ -23,13 +23,13 @@ vtkStandardNewMacro(vtkPVRepresentationAnimationHelper);
 //----------------------------------------------------------------------------
 vtkPVRepresentationAnimationHelper::vtkPVRepresentationAnimationHelper()
 {
-  this->SourceProxy = 0;
+  this->SourceProxy = nullptr;
 }
 
 //----------------------------------------------------------------------------
 vtkPVRepresentationAnimationHelper::~vtkPVRepresentationAnimationHelper()
 {
-  this->SetSourceProxy(0);
+  this->SetSourceProxy(nullptr);
 }
 
 //----------------------------------------------------------------------------

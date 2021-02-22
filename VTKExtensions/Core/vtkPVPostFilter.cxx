@@ -306,7 +306,7 @@ int vtkPVPostFilter::DoAnyNeededConversions(vtkDataSet* dataset)
 int vtkPVPostFilter::DoAnyNeededConversions(vtkDataSet* output, const char* requested_name,
   int fieldAssociation, const char* demangled_name, const char* demagled_component_name)
 {
-  vtkDataSetAttributes* dsa = NULL;
+  vtkDataSetAttributes* dsa = nullptr;
   vtkDataSetAttributes* pointData = output->GetPointData();
   vtkDataSetAttributes* cellData = output->GetCellData();
 
@@ -434,7 +434,7 @@ void CopyComponent(T* outIter, U* inIter, int compNo)
   vtkDataArray* inDa = vtkDataArray::SafeDownCast(inIter->GetArray());
   vtkIdType numTuples = inIter->GetNumberOfTuples();
 
-  if (compNo == -1 && inDa == NULL)
+  if (compNo == -1 && inDa == nullptr)
   {
     compNo = 0;
   }
@@ -479,7 +479,7 @@ int vtkPVPostFilter::ExtractComponent(vtkDataSetAttributes* dsa, const char* req
   const char* demangled_name, const char* demangled_component_name)
 {
   vtkAbstractArray* array = dsa->GetAbstractArray(demangled_name);
-  assert(array != NULL && demangled_name && demangled_component_name);
+  assert(array != nullptr && demangled_name && demangled_component_name);
 
   int cIndex = -1;
   bool found = false;

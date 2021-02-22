@@ -400,7 +400,7 @@ int vtkPVClipDataSet::ClipUsingSuperclass(
 
   outputCD->CopyStructure(inputCD);
 
-  vtkSmartPointer<vtkHierarchicalBoxDataIterator> itr(0);
+  vtkSmartPointer<vtkHierarchicalBoxDataIterator> itr(nullptr);
   itr.TakeReference(vtkHierarchicalBoxDataIterator::SafeDownCast(inputCD->NewIterator()));
 
   // Loop over all the datasets.

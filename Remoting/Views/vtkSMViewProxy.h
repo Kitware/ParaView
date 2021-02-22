@@ -118,7 +118,7 @@ public:
 
   //@{
   /**
-   * Captures a image from this view. Default implementation returns NULL.
+   * Captures a image from this view. Default implementation returns nullptr.
    * Subclasses should override CaptureWindowInternal() to do the actual image
    * capture.
    */
@@ -162,17 +162,17 @@ public:
    * vtkSMComparativeViewProxy can have more than 1 render window in play, in
    * which case, using this method alone may yield incorrect results. Also,
    * certain views don't use a vtkRenderWindow at all (e.g. Spreadsheet View),
-   * in which case, this method will return NULL. Default implementation returns
-   * NULL.
+   * in which case, this method will return nullptr. Default implementation returns
+   * nullptr.
    */
-  virtual vtkRenderWindow* GetRenderWindow() { return NULL; }
+  virtual vtkRenderWindow* GetRenderWindow() { return nullptr; }
 
   /**
    * Returns the interactor. Note, that views may not use vtkRenderWindow at all
-   * in which case they will not have any interactor and will return NULL.
-   * Default implementation returns NULL.
+   * in which case they will not have any interactor and will return nullptr.
+   * Default implementation returns nullptr.
    */
-  virtual vtkRenderWindowInteractor* GetInteractor() { return NULL; }
+  virtual vtkRenderWindowInteractor* GetInteractor() { return nullptr; }
 
   /**
    * A client process need to set the interactor to enable interactivity. Use
@@ -270,7 +270,7 @@ protected:
    * @param[in] magnificationX The X magnification factor to use for generating the image.
    * @param[in] magnificationY The Y magnification factor to use for generating the image.
    * @returns A new vtkImageData instance or nullptr. Caller is responsible for
-   *          calling `vtkImageData::Delete()` on the returned non-null value.
+   *          calling `vtkImageData::Delete()` on the returned non-nullptr value.
    */
   virtual vtkImageData* CaptureWindowInternal(int magnificationX, int magnificationY);
 

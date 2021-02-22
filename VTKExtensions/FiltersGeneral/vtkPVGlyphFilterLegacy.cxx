@@ -88,7 +88,7 @@ public:
     this->Bounds.Reset();
     this->Points.clear();
     this->Locator->Initialize();
-    this->Locator->SetDataSet(NULL);
+    this->Locator->SetDataSet(nullptr);
   }
 
   //---------------------------------------------------------------------------
@@ -96,7 +96,7 @@ public:
   // bounds information for all datasets for SPATIALLY_UNIFORM_DISTRIBUTION.
   void UpdateWithDataset(vtkDataSet* ds, vtkPVGlyphFilterLegacy* self)
   {
-    assert(ds != NULL && self != NULL);
+    assert(ds != nullptr && self != nullptr);
     if (self->GetGlyphMode() != vtkPVGlyphFilterLegacy::SPATIALLY_UNIFORM_DISTRIBUTION)
     {
       // nothing to do.
@@ -187,7 +187,7 @@ public:
   //---------------------------------------------------------------------------
   inline bool IsPointVisible(vtkDataSet* ds, vtkIdType ptId, vtkPVGlyphFilterLegacy* self)
   {
-    assert(ds != NULL && self != NULL);
+    assert(ds != nullptr && self != nullptr);
     switch (self->GetGlyphMode())
     {
       case vtkPVGlyphFilterLegacy::ALL_POINTS:
@@ -232,7 +232,7 @@ vtkPVGlyphFilterLegacy::vtkPVGlyphFilterLegacy()
   , MaximumNumberOfSamplePoints(5000)
   , Seed(1)
   , Stride(1)
-  , Controller(0)
+  , Controller(nullptr)
   , Internals(new vtkPVGlyphFilterLegacy::vtkInternals())
 {
   this->SetController(vtkMultiProcessController::GetGlobalController());
@@ -241,7 +241,7 @@ vtkPVGlyphFilterLegacy::vtkPVGlyphFilterLegacy()
 //-----------------------------------------------------------------------------
 vtkPVGlyphFilterLegacy::~vtkPVGlyphFilterLegacy()
 {
-  this->SetController(NULL);
+  this->SetController(nullptr);
   delete this->Internals;
 }
 
@@ -288,7 +288,7 @@ int vtkPVGlyphFilterLegacy::RequestDataObject(
   if (vtkCompositeDataSet::GetData(inputVector[0], 0))
   {
     vtkMultiBlockDataSet* mds = vtkMultiBlockDataSet::GetData(outputVector, 0);
-    if (mds == NULL)
+    if (mds == nullptr)
     {
       mds = vtkMultiBlockDataSet::New();
       outputVector->GetInformationObject(0)->Set(vtkDataObject::DATA_OBJECT(), mds);
@@ -298,7 +298,7 @@ int vtkPVGlyphFilterLegacy::RequestDataObject(
   else
   {
     vtkPolyData* pd = vtkPolyData::GetData(outputVector, 0);
-    if (pd == NULL)
+    if (pd == nullptr)
     {
       pd = vtkPolyData::New();
       outputVector->GetInformationObject(0)->Set(vtkDataObject::DATA_OBJECT(), pd);

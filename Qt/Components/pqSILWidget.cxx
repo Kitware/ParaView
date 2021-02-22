@@ -102,7 +102,7 @@ void pqSILWidget::setModel(pqSILModel* curmodel)
 {
   if (this->Model)
   {
-    QObject::disconnect(this->Model, 0, this, 0);
+    QObject::disconnect(this->Model, nullptr, this, nullptr);
   }
   this->Model = curmodel;
   this->ActiveModel->setSourceModel(this->Model);

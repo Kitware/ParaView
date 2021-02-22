@@ -98,7 +98,7 @@ vtkAlgorithmOutput* vtkSICompoundSourceProxy::GetOutputPort(int port)
     return this->Internals->OutputPorts[port];
   }
 
-  return NULL;
+  return nullptr;
 }
 
 //----------------------------------------------------------------------------

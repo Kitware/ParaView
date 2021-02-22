@@ -58,7 +58,7 @@ public:
   /**
   * Given a proxy and its property, create a widget for the same, of possible.
   * For unsupported/unknown proxies/properties, implementations should simply
-  * return NULL without raising any errors (or messages).
+  * return nullptr without raising any errors (or messages).
   */
   virtual pqPropertyWidget* createWidgetForProperty(
     vtkSMProxy* proxy, vtkSMProperty* property, QWidget* parentWidget);
@@ -66,7 +66,7 @@ public:
   /**
   * Given a proxy and its property group, create a widget for the same, of possible.
   * For unsupported/unknown proxies/property-groups, implementations should simply
-  * return NULL without raising any errors (or messages).
+  * return nullptr without raising any errors (or messages).
   */
   virtual pqPropertyWidget* createWidgetForPropertyGroup(
     vtkSMProxy* proxy, vtkSMPropertyGroup* group, QWidget* parentWidget);
@@ -74,7 +74,7 @@ public:
   /**
   * Given the type of the decorator and the pqPropertyWidget that needs to be
   * decorated, create the pqPropertyWidgetDecorator instance, if possible.
-  * For unsupported/unknown, implementations should simply return NULL without
+  * For unsupported/unknown, implementations should simply return nullptr without
   * raising any errors (or messages).
   */
   virtual pqPropertyWidgetDecorator* createWidgetDecorator(

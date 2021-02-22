@@ -83,7 +83,7 @@ public:
   int ProcessOneMessage(const vtkClientServerStream& css, int message);
 
   /**
-   * Get the message for an ID.  ID 0 always returns a NULL message.
+   * Get the message for an ID.  ID 0 always returns a nullptr message.
    */
   const vtkClientServerStream* GetMessageFromID(vtkClientServerID id);
 
@@ -135,8 +135,8 @@ public:
   /**
    * Add a command function for a class.
    */
-  void AddCommandFunction(const char* cname, vtkClientServerCommandFunction func, void* ctx = NULL,
-    vtkContextFreeFunction ctx_free = NULL);
+  void AddCommandFunction(const char* cname, vtkClientServerCommandFunction func,
+    void* ctx = nullptr, vtkContextFreeFunction ctx_free = nullptr);
 
   /**
    * Return true if the classname has a command function, false otherwise.
@@ -153,7 +153,7 @@ public:
    * Add a function used to create new objects.
    */
   void AddNewInstanceFunction(const char* cname, vtkClientServerNewInstanceFunction f,
-    void* ctx = NULL, vtkContextFreeFunction ctx_free = NULL);
+    void* ctx = nullptr, vtkContextFreeFunction ctx_free = nullptr);
 
   //@{
   /**

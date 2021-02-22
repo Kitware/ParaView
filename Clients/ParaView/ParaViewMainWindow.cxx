@@ -180,8 +180,8 @@ ParaViewMainWindow::ParaViewMainWindow()
     case vtkPVGeneralSettings::SEPARATE_DISPLAY_PROPERTIES:
       delete this->Internals->viewPropertiesPanel;
       delete this->Internals->viewPropertiesDock;
-      this->Internals->viewPropertiesPanel = NULL;
-      this->Internals->viewPropertiesDock = NULL;
+      this->Internals->viewPropertiesPanel = nullptr;
+      this->Internals->viewPropertiesDock = nullptr;
 
       this->Internals->propertiesPanel->setPanelMode(
         pqPropertiesPanel::SOURCE_PROPERTIES | pqPropertiesPanel::VIEW_PROPERTIES);
@@ -190,8 +190,8 @@ ParaViewMainWindow::ParaViewMainWindow()
     case vtkPVGeneralSettings::SEPARATE_VIEW_PROPERTIES:
       delete this->Internals->displayPropertiesPanel;
       delete this->Internals->displayPropertiesDock;
-      this->Internals->displayPropertiesPanel = NULL;
-      this->Internals->displayPropertiesDock = NULL;
+      this->Internals->displayPropertiesPanel = nullptr;
+      this->Internals->displayPropertiesDock = nullptr;
 
       this->Internals->propertiesPanel->setPanelMode(
         pqPropertiesPanel::SOURCE_PROPERTIES | pqPropertiesPanel::DISPLAY_PROPERTIES);
@@ -205,13 +205,13 @@ ParaViewMainWindow::ParaViewMainWindow()
     default:
       delete this->Internals->viewPropertiesPanel;
       delete this->Internals->viewPropertiesDock;
-      this->Internals->viewPropertiesPanel = NULL;
-      this->Internals->viewPropertiesDock = NULL;
+      this->Internals->viewPropertiesPanel = nullptr;
+      this->Internals->viewPropertiesDock = nullptr;
 
       delete this->Internals->displayPropertiesPanel;
       delete this->Internals->displayPropertiesDock;
-      this->Internals->displayPropertiesPanel = NULL;
-      this->Internals->displayPropertiesDock = NULL;
+      this->Internals->displayPropertiesPanel = nullptr;
+      this->Internals->displayPropertiesDock = nullptr;
       break;
   }
 

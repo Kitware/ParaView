@@ -191,7 +191,7 @@ pqFontPropertyWidget::pqFontPropertyWidget(
 pqFontPropertyWidget::~pqFontPropertyWidget()
 {
   delete this->Internals;
-  this->Internals = NULL;
+  this->Internals = nullptr;
 }
 
 //-----------------------------------------------------------------------------

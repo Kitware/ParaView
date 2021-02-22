@@ -309,7 +309,7 @@ class pqPresetDialogProxyModel : public QSortFilterProxyModel
   int CurrentGroupColumn;
 
 public:
-  pqPresetDialogProxyModel(pqPresetDialog::Modes m, QObject* parentObject = NULL)
+  pqPresetDialogProxyModel(pqPresetDialog::Modes m, QObject* parentObject = nullptr)
     : Superclass(parentObject)
     , Mode(m)
     , CurrentGroupColumn(0)
@@ -472,7 +472,7 @@ public:
     {
       return false;
     }
-    while (obj != NULL)
+    while (obj != nullptr)
     {
       if (obj == this->Self)
       {
@@ -918,7 +918,7 @@ bool pqPresetDialog::usePresetRange() const
 //-----------------------------------------------------------------------------
 void pqPresetDialog::importPresets()
 {
-  pqFileDialog dialog(NULL, this, tr("Import Presets"), QString(),
+  pqFileDialog dialog(nullptr, this, tr("Import Presets"), QString(),
     "Supported Presets/Color Map Files (*.json *.xml);;"
     "ParaView Color/Opacity Presets (*.json);;Legacy Color Maps (*.xml);;All Files (*)");
   dialog.setObjectName("ImportPresets");
@@ -954,7 +954,7 @@ void pqPresetDialog::importPresets()
 //-----------------------------------------------------------------------------
 void pqPresetDialog::exportPresets()
 {
-  pqFileDialog dialog(NULL, this, tr("Export Preset(s)"), QString(),
+  pqFileDialog dialog(nullptr, this, tr("Export Preset(s)"), QString(),
     "ParaView Color/Opacity Presets (*.json);;All Files (*)");
   dialog.setObjectName("ExportPresets");
   dialog.setFileMode(pqFileDialog::AnyFile);

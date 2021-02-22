@@ -91,7 +91,7 @@ public:
     this->DecimalPrecision = 6;
     this->FixedRepresentation = false;
     this->ActiveRegion[0] = this->ActiveRegion[1] = -1;
-    this->VTKView = NULL;
+    this->VTKView = nullptr;
 
     this->LastColumnCount = 0;
     this->LastRowCount = 0;
@@ -117,7 +117,7 @@ public:
 pqSpreadSheetViewModel::pqSpreadSheetViewModel(vtkSMProxy* view, QObject* parentObject)
   : Superclass(parentObject)
 {
-  assert(view != NULL);
+  assert(view != nullptr);
   this->ViewProxy = view;
   this->Internal = new pqInternal(this);
   this->Internal->VTKView = vtkSpreadSheetView::SafeDownCast(view->GetClientSideObject());
@@ -592,7 +592,7 @@ void pqSpreadSheetViewModel::resetCompositeDataSetIndex()
   for (iter->InitTraversal(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
   {
     vtkPVDataInformation* curInfo = iter->GetCurrentDataInformation();
-    if (!curInfo || curInfo->GetCompositeDataClassName() != 0)
+    if (!curInfo || curInfo->GetCompositeDataClassName() != nullptr)
     {
       continue;
     }

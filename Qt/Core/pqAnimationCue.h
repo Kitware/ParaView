@@ -44,7 +44,7 @@ class PQCORE_EXPORT pqAnimationCue : public pqProxy
 
 public:
   pqAnimationCue(const QString& group, const QString& name, vtkSMProxy* proxy, pqServer* server,
-    QObject* parent = NULL);
+    QObject* parent = nullptr);
   ~pqAnimationCue() override;
 
   // Returns the number of keyframes in this cue.
@@ -57,7 +57,7 @@ public:
   // The time for the key frame is computed using the times
   // for the neighbouring keyframes if any.
   // Returns the newly created keyframe proxy on success,
-  // NULL otherwise.
+  // nullptr otherwise.
   vtkSMProxy* insertKeyFrame(int index);
 
   // Deletes the keyframe at the given index.
@@ -65,7 +65,7 @@ public:
   void deleteKeyFrame(int index);
 
   // Returns keyframe at a given index, if one exists,
-  // NULL otherwise.
+  // nullptr otherwise.
   vtkSMProxy* getKeyFrame(int index) const;
 
   // Returns the animated proxy, if any.

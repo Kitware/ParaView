@@ -26,7 +26,7 @@ typedef vtkSMProxyInternals::ExposedPropertyInfoMap::iterator ExposedPropertyIte
 
 //---------------------------------------------------------------------------
 vtkSMNamedPropertyIterator::vtkSMNamedPropertyIterator()
-  : PropertyNames(0)
+  : PropertyNames(nullptr)
   , PropertyNameIndex(0)
 {
 }
@@ -34,7 +34,7 @@ vtkSMNamedPropertyIterator::vtkSMNamedPropertyIterator()
 //---------------------------------------------------------------------------
 vtkSMNamedPropertyIterator::~vtkSMNamedPropertyIterator()
 {
-  this->SetPropertyNames(0);
+  this->SetPropertyNames(nullptr);
 }
 
 //---------------------------------------------------------------------------
@@ -70,7 +70,7 @@ const char* vtkSMNamedPropertyIterator::GetKey()
   if (!this->PropertyNames)
   {
     vtkErrorMacro("PropertyNames is not set. Can not perform operation: GetKey()");
-    return 0;
+    return nullptr;
   }
 
   return this->PropertyNames->GetString(this->PropertyNameIndex);
@@ -88,12 +88,12 @@ vtkSMProperty* vtkSMNamedPropertyIterator::GetProperty()
   if (!this->PropertyNames)
   {
     vtkErrorMacro("PropertyNames is not set. Can not perform operation: GetProperty()");
-    return 0;
+    return nullptr;
   }
   if (!this->Proxy)
   {
     vtkErrorMacro("Proxy is not set. Can not perform operation: GetProperty()");
-    return 0;
+    return nullptr;
   }
 
   // get the requested prooperty's name, it's the key into
@@ -126,7 +126,7 @@ vtkSMProperty* vtkSMNamedPropertyIterator::GetProperty()
       {
         vtkErrorMacro(<< "In proxy " << this->Proxy->GetXMLName() << " cannot find sub proxy "
                       << subProxyName << ".");
-        return 0;
+        return nullptr;
       }
       const char* expPropName = expPropIt->second.PropertyName.c_str();
       vtkSMProperty* expProp = subProxy->GetProperty(expPropName);
@@ -146,7 +146,7 @@ vtkSMProperty* vtkSMNamedPropertyIterator::GetProperty()
   // property.
   vtkErrorMacro(<< "In proxy " << this->Proxy->GetXMLName() << " no property named " << name.c_str()
                 << " was found.");
-  return 0;
+  return nullptr;
 }
 
 //---------------------------------------------------------------------------

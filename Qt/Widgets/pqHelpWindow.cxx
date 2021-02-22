@@ -91,7 +91,7 @@ pqHelpWindow::pqHelpWindow(QHelpEngine* engine, QWidget* parentObject, Qt::Windo
   , HelpEngine(engine)
   , Browser(new PQBROWSER_TYPE(this->HelpEngine, this))
 {
-  assert(engine != NULL);
+  assert(engine != nullptr);
 
   Ui::pqHelpWindow ui;
   ui.setupUi(this);

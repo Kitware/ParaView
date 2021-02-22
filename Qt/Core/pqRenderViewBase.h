@@ -55,7 +55,7 @@ protected:
   // \c server:- server on which the proxy is created.
   // \c parent:- QObject parent.
   pqRenderViewBase(const QString& type, const QString& group, const QString& name,
-    vtkSMViewProxy* renModule, pqServer* server, QObject* parent = NULL);
+    vtkSMViewProxy* renModule, pqServer* server, QObject* parent = nullptr);
 
 public:
   // Destructor.

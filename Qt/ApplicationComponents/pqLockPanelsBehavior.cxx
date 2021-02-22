@@ -81,7 +81,7 @@ public:
   ~pqInternals()
   {
     this->Callback->Delete();
-    this->Callback = NULL;
+    this->Callback = nullptr;
   }
 
   vtkLockDockWidgetsCallback* Callback;

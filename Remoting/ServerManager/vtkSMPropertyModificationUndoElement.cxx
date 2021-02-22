@@ -26,7 +26,7 @@ vtkStandardNewMacro(vtkSMPropertyModificationUndoElement);
 vtkSMPropertyModificationUndoElement::vtkSMPropertyModificationUndoElement()
 {
   this->SetMergeable(true);
-  this->PropertyName = 0;
+  this->PropertyName = nullptr;
   this->ProxyGlobalID = 0;
   this->PropertyState = new vtkSMMessage();
 }
@@ -34,7 +34,7 @@ vtkSMPropertyModificationUndoElement::vtkSMPropertyModificationUndoElement()
 //-----------------------------------------------------------------------------
 vtkSMPropertyModificationUndoElement::~vtkSMPropertyModificationUndoElement()
 {
-  this->SetPropertyName(0);
+  this->SetPropertyName(nullptr);
   delete this->PropertyState;
 }
 
@@ -63,10 +63,10 @@ int vtkSMPropertyModificationUndoElement::RevertToState()
     return 0;
   }
   vtkSMProxy* proxy = vtkSMProxy::SafeDownCast(this->Session->GetRemoteObject(this->ProxyGlobalID));
-  vtkSMProperty* property = (proxy ? proxy->GetProperty(this->PropertyName) : NULL);
+  vtkSMProperty* property = (proxy ? proxy->GetProperty(this->PropertyName) : nullptr);
   if (property)
   {
-    property->ReadFrom(this->PropertyState, 0, NULL); // 0 because only one
+    property->ReadFrom(this->PropertyState, 0, nullptr); // 0 because only one
     proxy->UpdateProperty(this->PropertyName);
   }
   return 1;

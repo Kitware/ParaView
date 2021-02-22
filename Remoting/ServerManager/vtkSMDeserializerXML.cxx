@@ -39,7 +39,7 @@ vtkSMProxy* vtkSMDeserializerXML::NewProxy(vtkTypeUInt32 id, vtkSMProxyLocator* 
   vtkPVXMLElement* elem = this->LocateProxyElement(id);
   if (!elem)
   {
-    return 0;
+    return nullptr;
   }
 
   const char* group = elem->GetAttribute("group");
@@ -47,7 +47,7 @@ vtkSMProxy* vtkSMDeserializerXML::NewProxy(vtkTypeUInt32 id, vtkSMProxyLocator* 
   if (!type)
   {
     vtkErrorMacro("Could not create proxy from element, missing 'type'.");
-    return 0;
+    return nullptr;
   }
 
   vtkSMProxy* proxy;
@@ -56,14 +56,14 @@ vtkSMProxy* vtkSMDeserializerXML::NewProxy(vtkTypeUInt32 id, vtkSMProxyLocator* 
   {
     vtkErrorMacro(
       "Could not create a proxy of group: " << (group ? group : "(null)") << " type: " << type);
-    return 0;
+    return nullptr;
   }
 
   if (!this->LoadProxyState(elem, proxy, locator))
   {
     vtkErrorMacro("Failed to load state correctly.");
     proxy->Delete();
-    return 0;
+    return nullptr;
   }
 
   this->CreatedNewProxy(id, proxy);
@@ -72,7 +72,7 @@ vtkSMProxy* vtkSMDeserializerXML::NewProxy(vtkTypeUInt32 id, vtkSMProxyLocator* 
 
 //----------------------------------------------------------------------------
 vtkSMProxy* vtkSMDeserializerXML::CreateProxy(
-  const char* xmlgroup, const char* xmlname, const char* subProxyName /*=NULL*/)
+  const char* xmlgroup, const char* xmlname, const char* subProxyName /*=nullptr*/)
 {
   vtkSMSessionProxyManager* pxm = this->GetSessionProxyManager();
   vtkSMProxy* proxy = pxm->NewProxy(xmlgroup, xmlname, subProxyName);
@@ -82,7 +82,7 @@ vtkSMProxy* vtkSMDeserializerXML::CreateProxy(
 //----------------------------------------------------------------------------
 vtkPVXMLElement* vtkSMDeserializerXML::LocateProxyElement(vtkTypeUInt32 vtkNotUsed(id))
 {
-  return NULL;
+  return nullptr;
 }
 
 //----------------------------------------------------------------------------

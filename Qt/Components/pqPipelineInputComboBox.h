@@ -53,7 +53,7 @@ class PQCOMPONENTS_EXPORT pqPipelineInputComboBox : public QComboBox
   typedef QComboBox Superclass;
 
 public:
-  pqPipelineInputComboBox(vtkSMProxy* proxy, vtkSMProperty* property, QWidget* parent = NULL);
+  pqPipelineInputComboBox(vtkSMProxy* proxy, vtkSMProperty* property, QWidget* parent = nullptr);
   ~pqPipelineInputComboBox() override;
 
   vtkSMProxy* currentProxy() const;

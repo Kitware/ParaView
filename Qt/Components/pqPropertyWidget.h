@@ -114,7 +114,7 @@ public:
   * Description:
   * This static utility method returns the XML name for an object as
   * a QString. This allows for code to get the XML name of an object
-  * without having to explicitly check for a possibly NULL char* pointer.
+  * without having to explicitly check for a possibly nullptr char* pointer.
   *
   * This is templated so that it will work with a variety of objects such
   * as vtkSMProperty's and vtkSMDomain's. It can be called with anything

@@ -50,7 +50,7 @@ QSignalSpy* pqTextEditTester::spy(int spyType)
     default:
     {
       qCritical("Developer Error. No such spy (that's what a spy would say)");
-      return 0;
+      return nullptr;
       break;
     }
   }

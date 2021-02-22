@@ -94,7 +94,7 @@ public:
    */
   void InitCommunicator(vtkMultiProcessController* controller)
   {
-    assert("pre: controller is NULL!" && (controller != NULL));
+    assert("pre: controller is nullptr!" && (controller != nullptr));
     this->MPICommunicator = vtkGenericIOUtilities::GetMPICommunicator(controller);
   }
 
@@ -153,12 +153,12 @@ vtkPGenericIOReader::vtkPGenericIOReader()
   this->SetNumberOfOutputPorts(1);
 
   this->Controller = vtkMultiProcessController::GetGlobalController();
-  this->Reader = NULL;
-  this->FileName = NULL;
-  this->XAxisVariableName = NULL;
-  this->YAxisVariableName = NULL;
-  this->ZAxisVariableName = NULL;
-  this->HaloIdVariableName = NULL;
+  this->Reader = nullptr;
+  this->FileName = nullptr;
+  this->XAxisVariableName = nullptr;
+  this->YAxisVariableName = nullptr;
+  this->ZAxisVariableName = nullptr;
+  this->HaloIdVariableName = nullptr;
   this->GenericIOType = IOTYPEMPI;
   this->BlockAssignment = ROUND_ROBIN;
   this->BuildMetaData = false;
@@ -185,7 +185,7 @@ vtkPGenericIOReader::vtkPGenericIOReader()
 //------------------------------------------------------------------------------
 vtkPGenericIOReader::~vtkPGenericIOReader()
 {
-  if (this->Reader != NULL)
+  if (this->Reader != nullptr)
   {
     this->Reader->Close();
     delete this->Reader;
@@ -197,7 +197,7 @@ vtkPGenericIOReader::~vtkPGenericIOReader()
   vtkGenericIOUtilities::SafeDeleteString(this->ZAxisVariableName);
   vtkGenericIOUtilities::SafeDeleteString(this->HaloIdVariableName);
 
-  if (this->MetaData != NULL)
+  if (this->MetaData != nullptr)
   {
     delete this->MetaData;
   }
@@ -209,7 +209,7 @@ vtkPGenericIOReader::~vtkPGenericIOReader()
   this->SelectionObserver->Delete();
   this->PointDataArraySelection->Delete();
 
-  this->Controller = NULL;
+  this->Controller = nullptr;
 }
 
 //------------------------------------------------------------------------------
@@ -226,7 +226,7 @@ void vtkPGenericIOReader::PrintSelf(std::ostream& os, vtkIndent indent)
   this->ArrayList->PrintSelf(os, indent.GetNextIndent());
   os << indent << "PointDataSelection: " << endl;
   this->PointDataArraySelection->PrintSelf(os, indent.GetNextIndent());
-  if (Controller != NULL)
+  if (Controller != nullptr)
   {
     os << indent << "Controller: " << this->Controller << endl;
   }
@@ -321,7 +321,7 @@ void vtkPGenericIOReader::SetRequestedHaloId(vtkIdType i, vtkIdType haloId)
 //------------------------------------------------------------------------------
 bool vtkPGenericIOReader::ReaderParametersChanged()
 {
-  assert("pre: internal reader is NULL!" && (this->Reader != NULL));
+  assert("pre: internal reader is nullptr!" && (this->Reader != nullptr));
 
   if (this->Reader->GetFileName() != std::string(this->FileName))
   {
@@ -399,7 +399,7 @@ bool vtkPGenericIOReader::ReaderParametersChanged()
 //------------------------------------------------------------------------------
 gio::GenericIOReader* vtkPGenericIOReader::GetInternalReader()
 {
-  if (this->Reader != NULL)
+  if (this->Reader != nullptr)
   {
     if (this->ReaderParametersChanged())
     {
@@ -409,25 +409,25 @@ gio::GenericIOReader* vtkPGenericIOReader::GetInternalReader()
 #endif
       this->Reader->Close();
       delete this->Reader;
-      this->Reader = NULL;
+      this->Reader = nullptr;
     } // END if the reader parameters
     else
     {
       return (this->Reader);
     }
-  } // END if the reader is not NULL
+  } // END if the reader is not nullptr
 
   this->BuildMetaData = true; // signal to re-build metadata
 
-  assert("pre: Reader should be NULL" && (this->Reader == NULL));
-  gio::GenericIOReader* r = NULL;
+  assert("pre: Reader should be nullptr" && (this->Reader == nullptr));
+  gio::GenericIOReader* r = nullptr;
   bool posix = (this->GenericIOType == IOTYPEMPI) ? false : true;
   int distribution =
     (this->BlockAssignment == RCB) ? gio::RCB_BLOCK_ASSIGNMENT : gio::RR_BLOCK_ASSIGNMENT;
 
   r = vtkGenericIOUtilities::GetReader(vtkGenericIOUtilities::GetMPICommunicator(this->Controller),
     posix, distribution, std::string(this->FileName));
-  assert("post: Internal GenericIO reader should not be NULL!" && (r != NULL));
+  assert("post: Internal GenericIO reader should not be nullptr!" && (r != nullptr));
 
   return (r);
 }
@@ -468,7 +468,7 @@ void vtkPGenericIOReader::LoadMetaData()
       gio::GenericIOUtilities::DetectVariablePrimitiveType(this->MetaData->Information[vname]);
 
     this->MetaData->VariableStatus[vname] = false;
-    this->MetaData->RawCache[vname] = NULL;
+    this->MetaData->RawCache[vname] = nullptr;
 
     if (!this->PointDataArraySelection->ArrayExists(vname.c_str()))
     {
@@ -596,7 +596,7 @@ void vtkPGenericIOReader::GetPointFromRawData(int xType, void* xBuffer, int yTyp
 
   for (int i = 0; i < 3; ++i)
   {
-    assert("pre: raw buffer is NULL!" && (buffer[i] != NULL));
+    assert("pre: raw buffer is nullptr!" && (buffer[i] != nullptr));
 
     pnt[i] = vtkGenericIOUtilities::GetDoubleFromRawBuffer(type[i], buffer[i], idx);
   } // END for all dimensions
@@ -606,7 +606,7 @@ void vtkPGenericIOReader::GetPointFromRawData(int xType, void* xBuffer, int yTyp
 void vtkPGenericIOReader::LoadCoordinates(
   vtkUnstructuredGrid* grid, std::set<vtkIdType>& pointsInSelectedHalos)
 {
-  assert("pre: grid is NULL!" && (grid != NULL));
+  assert("pre: grid is nullptr!" && (grid != nullptr));
 
   if (this->QueryRankNeighbors && (this->BlockAssignment == RCB) &&
     !this->MetaData->LoadRank(this->Controller->GetLocalProcessId()))
@@ -717,7 +717,7 @@ void GetOnlyDataInHalo(
 void vtkPGenericIOReader::LoadData(
   vtkUnstructuredGrid* grid, const std::set<vtkIdType>& pointsInSelectedHalos)
 {
-  assert("pre: grid is NULL!" && (grid != NULL));
+  assert("pre: grid is nullptr!" && (grid != nullptr));
 
   if (this->QueryRankNeighbors && (this->BlockAssignment == RCB) &&
     !this->MetaData->LoadRank(this->Controller->GetLocalProcessId()))
@@ -810,7 +810,7 @@ void vtkPGenericIOReader::FindRankNeighbors()
   // Sanity checks
   assert("pre: rank in query is out-of bounds!" && (this->RankInQuery >= 0) &&
     (this->RankInQuery < this->Controller->GetNumberOfProcesses()));
-  assert("pre: reader should not be NULL!" && (this->Reader != NULL));
+  assert("pre: reader should not be nullptr!" && (this->Reader != nullptr));
   assert("pre: block assignment is not RCB!" &&
     (this->Reader->GetBlockAssignmentStrategy() == gio::RCB_BLOCK_ASSIGNMENT));
 
@@ -871,7 +871,7 @@ void vtkPGenericIOReader::FindRankNeighbors()
 void vtkPGenericIOReader::SelectionModifiedCallback(
   vtkObject*, unsigned long, void* clientdata, void*)
 {
-  assert("pre: clientdata is NULL!" && (clientdata != NULL));
+  assert("pre: clientdata is nullptr!" && (clientdata != nullptr));
   static_cast<vtkPGenericIOReader*>(clientdata)->Modified();
 }
 
@@ -892,7 +892,7 @@ int vtkPGenericIOReader::RequestInformation(vtkInformation* vtkNotUsed(request),
     vtkDataObject::DATA_NUMBER_OF_PIECES(), this->Controller->GetNumberOfProcesses());
 
   this->Reader = this->GetInternalReader();
-  assert("pre: internal reader is NULL!" && (this->Reader != NULL));
+  assert("pre: internal reader is nullptr!" && (this->Reader != nullptr));
 
   this->LoadMetaData();
   return 1;
@@ -911,7 +911,7 @@ int vtkPGenericIOReader::RequestData(vtkInformation* vtkNotUsed(request),
   vtkInformation* outInfo = outputVector->GetInformationObject(0);
   vtkUnstructuredGrid* output =
     vtkUnstructuredGrid::SafeDownCast(outInfo->Get(vtkDataObject::DATA_OBJECT()));
-  assert("pre: output grid is NULL!" && (output != NULL));
+  assert("pre: output grid is nullptr!" && (output != nullptr));
   std::set<vtkIdType> pointsInSelectedHalos;
 
   // STEP 1: Load raw data

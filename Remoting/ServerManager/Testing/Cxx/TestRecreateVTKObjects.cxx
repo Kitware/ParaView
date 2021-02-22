@@ -48,11 +48,11 @@ int TestRecreateVTKObjects(int argc, char* argv[])
   int exitCode = EXIT_SUCCESS;
   try
   {
-    if (oldObject != NULL)
+    if (oldObject != nullptr)
     {
       throw "ERROR: Old VTKObject not deleted!!!";
     }
-    if (sphereSource->GetClientSideObject() == NULL)
+    if (sphereSource->GetClientSideObject() == nullptr)
     {
       throw "ERROR: New VTKObject not created!!!";
     }

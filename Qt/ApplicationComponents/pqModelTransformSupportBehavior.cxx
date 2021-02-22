@@ -65,17 +65,17 @@ static vtkSMSourceProxy* FindVisibleProducerWithChangeOfBasisMatrix(pqView* view
       info->GetArrayInformation("ChangeOfBasisMatrix", vtkDataObject::FIELD);
     vtkPVArrayInformation* bbimc = cobm
       ? info->GetArrayInformation("BoundingBoxInModelCoordinates", vtkDataObject::FIELD)
-      : NULL;
+      : nullptr;
     if (cobm && bbimc)
     {
       return vtkSMSourceProxy::SafeDownCast(drepr->getInput()->getProxy());
     }
   }
-  return NULL;
+  return nullptr;
 }
 
 /// Changes the title property iff its value wasn't explicitly changed by the user.
-/// If value is NULL, we restore the property default else the property is set to
+/// If value is nullptr, we restore the property default else the property is set to
 /// the specified value.
 void SafeSetAxisTitle(vtkSMProxy* gridAxis, const char* pname, const char* value)
 {
@@ -171,9 +171,9 @@ void pqModelTransformSupportBehavior::enableModelTransform(pqView* view, vtkSMSo
     else
     {
       // clear data-dependent axis titles.
-      SafeSetAxisTitle(gridAxes3DActor, "XTitle", NULL);
-      SafeSetAxisTitle(gridAxes3DActor, "YTitle", NULL);
-      SafeSetAxisTitle(gridAxes3DActor, "ZTitle", NULL);
+      SafeSetAxisTitle(gridAxes3DActor, "XTitle", nullptr);
+      SafeSetAxisTitle(gridAxes3DActor, "YTitle", nullptr);
+      SafeSetAxisTitle(gridAxes3DActor, "ZTitle", nullptr);
     }
     gridAxes3DActor->UpdateVTKObjects();
   }
@@ -199,9 +199,9 @@ void pqModelTransformSupportBehavior::disableModelTransform(pqView* view)
     {
       helper.Set(0);
     }
-    SafeSetAxisTitle(gridAxes3DActor, "XTitle", NULL);
-    SafeSetAxisTitle(gridAxes3DActor, "YTitle", NULL);
-    SafeSetAxisTitle(gridAxes3DActor, "ZTitle", NULL);
+    SafeSetAxisTitle(gridAxes3DActor, "XTitle", nullptr);
+    SafeSetAxisTitle(gridAxes3DActor, "YTitle", nullptr);
+    SafeSetAxisTitle(gridAxes3DActor, "ZTitle", nullptr);
     gridAxes3DActor->UpdateVTKObjects();
   }
 }
@@ -217,7 +217,7 @@ vtkTuple<T, size> GetValues(const char* aname, vtkSMSourceProxy* producer, int p
   vtkTuple<T, size> value;
   vtkPVDataInformation* dinfo = producer->GetDataInformation(port);
   if (vtkPVArrayInformation* ainfo =
-        (dinfo ? dinfo->GetArrayInformation(aname, vtkDataObject::FIELD) : NULL))
+        (dinfo ? dinfo->GetArrayInformation(aname, vtkDataObject::FIELD) : nullptr))
   {
     if (ainfo->GetNumberOfComponents() == size)
     {
@@ -263,9 +263,9 @@ vtkTuple<std::string, 3> pqModelTransformSupportBehavior::getAxisTitles(
   vtkPVArrayInformation* xtitle = dinfo->GetArrayInformation("AxisTitleForX", vtkDataObject::FIELD);
   vtkPVArrayInformation* ytitle = dinfo->GetArrayInformation("AxisTitleForY", vtkDataObject::FIELD);
   vtkPVArrayInformation* ztitle = dinfo->GetArrayInformation("AxisTitleForZ", vtkDataObject::FIELD);
-  if ((xtitle && xtitle->GetComponentName(0) == NULL) ||
-    (ytitle && ytitle->GetComponentName(0) == NULL) ||
-    (ztitle && ztitle->GetComponentName(0) == NULL))
+  if ((xtitle && xtitle->GetComponentName(0) == nullptr) ||
+    (ytitle && ytitle->GetComponentName(0) == nullptr) ||
+    (ztitle && ztitle->GetComponentName(0) == nullptr))
   {
     qCritical() << "Mechanisms for specifying axis titles have changed. "
                    "Please contact the ParaView developers for more info.";

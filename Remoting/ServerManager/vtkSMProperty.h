@@ -190,7 +190,7 @@ public:
 
   /**
    * Overload of IsInDomains() that provides a mechanism to return the first
-   * domain that fails the check. \c domain is set to NULL when all domain
+   * domain that fails the check. \c domain is set to nullptr when all domain
    * checks pass.
    *
    * Domains that return `vtkSMDomain::NOT_APPLICABLE` for `vtkSMDomain::IsInDomain`
@@ -406,7 +406,7 @@ public:
   //@{
   /**
    * Returns the documentation for this proxy. The return value
-   * may be NULL if no documentation is defined in the XML
+   * may be nullptr if no documentation is defined in the XML
    * for this property.
    */
   vtkGetObjectMacro(Documentation, vtkSMDocumentation);
@@ -478,7 +478,7 @@ public:
    * Server Manager does not (and should not) interpret the hints. Hints
    * provide a mechanism to add GUI pertinant information to the server
    * manager XML.  Returns the XML element for the hints associated with
-   * this property, if any, otherwise returns NULL.
+   * this property, if any, otherwise returns nullptr.
    */
   vtkGetObjectMacro(Hints, vtkPVXMLElement);
   void SetHints(vtkPVXMLElement* hints);
@@ -605,7 +605,7 @@ protected:
    * after SetUncheckedXXX() to tell all dependent domains to
    * update themselves according to the new value.
    * Note that when calling Update() on domains contained by
-   * this property, a NULL is passed as the argument. This is
+   * this property, a nullptr is passed as the argument. This is
    * because the domain does not really "depend" on the property.
    * When calling Update() on dependent domains, the property
    * passes itself as the argument.

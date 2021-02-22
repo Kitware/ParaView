@@ -152,7 +152,7 @@ public:
   vtkPVDataSetAttributesInformation* attributeInformation(int fieldAssociation)
   {
     return this->Port ? this->Port->getDataInformation()->GetAttributeInformation(fieldAssociation)
-                      : NULL;
+                      : nullptr;
   }
 
   //---------------------------------------------------------------------------
@@ -173,7 +173,7 @@ public:
     }
 
     pqDataRepresentation* repr = this->Port->getRepresentation(this->View);
-    assert(repr != NULL);
+    assert(repr != nullptr);
 
     menu.addAction("ID")->setData(fieldAssociation == vtkDataObject::FIELD_ASSOCIATION_CELLS
         ? "vtkOriginalCellIds"
@@ -298,8 +298,8 @@ public:
         this->FrustumView->render();
       }
     }
-    this->FrustumWidget = NULL;
-    this->FrustumView = NULL;
+    this->FrustumWidget = nullptr;
+    this->FrustumView = nullptr;
   }
 
   //---------------------------------------------------------------------------
@@ -327,7 +327,7 @@ public:
     // doesn't result in calling this method again.
     this->Ui.showFrustumButton->setChecked(val);
 
-    if (this->FrustumWidget == NULL && val == true)
+    if (this->FrustumWidget == nullptr && val == true)
     {
       vtkSMSessionProxyManager* pxm = this->View->proxyManager();
       this->FrustumWidget.TakeReference(pxm->NewProxy("representations", "FrustumWidget"));
@@ -338,13 +338,13 @@ public:
       }
     }
 
-    if (this->FrustumWidget == NULL)
+    if (this->FrustumWidget == nullptr)
     {
       // nothing to do.
       return;
     }
 
-    pqView* targetView = val ? this->View : NULL;
+    pqView* targetView = val ? this->View : nullptr;
     if (targetView != this->FrustumView)
     {
       if (this->FrustumView)
@@ -353,7 +353,7 @@ public:
           .Remove(this->FrustumWidget);
         this->FrustumView->getProxy()->UpdateVTKObjects();
         this->FrustumView->render();
-        this->FrustumView = NULL;
+        this->FrustumView = nullptr;
       }
 
       if (targetView)
@@ -408,7 +408,7 @@ pqFindDataSelectionDisplayFrame::pqFindDataSelectionDisplayFrame(
 pqFindDataSelectionDisplayFrame::~pqFindDataSelectionDisplayFrame()
 {
   delete this->Internals;
-  this->Internals = NULL;
+  this->Internals = nullptr;
 }
 
 //-----------------------------------------------------------------------------
@@ -511,7 +511,7 @@ void pqFindDataSelectionDisplayFrame::setUseVerticalLayout(bool vertical)
 
   Ui::FindDataSelectionDisplayFrame& ui = this->Internals->Ui;
   delete this->layout();
-  ui.horizontalLayout = NULL;
+  ui.horizontalLayout = nullptr;
 
   if (vertical)
   {
@@ -554,7 +554,7 @@ void pqFindDataSelectionDisplayFrame::setUseVerticalLayout(bool vertical)
 //-----------------------------------------------------------------------------
 bool pqFindDataSelectionDisplayFrame::useVerticalLayout() const
 {
-  return qobject_cast<QVBoxLayout*>(this->layout()) != NULL;
+  return qobject_cast<QVBoxLayout*>(this->layout()) != nullptr;
 }
 
 void pqFindDataSelectionDisplayFrame::updateInteractiveSelectionLabelProperties()

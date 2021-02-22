@@ -72,7 +72,7 @@ pqAnimationModel::~pqAnimationModel()
     this->removeTrack(this->Tracks[0]);
   }
   delete this->CheckBoxPixMaps;
-  this->CheckBoxPixMaps = 0;
+  this->CheckBoxPixMaps = nullptr;
 }
 
 //-----------------------------------------------------------------------------

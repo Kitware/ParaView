@@ -58,7 +58,7 @@ vtkThreeSliceFilter::vtkThreeSliceFilter()
     // Bind pipeline
     this->CombinedFilteredInput->AddInputConnection(this->Slices[i]->GetOutputPort());
   }
-  this->Probe = NULL;
+  this->Probe = nullptr;
   this->PointToProbe = vtkPointSource::New();
   this->PointToProbe->SetNumberOfPoints(1);
   this->PointToProbe->SetRadius(0);
@@ -71,24 +71,24 @@ vtkThreeSliceFilter::~vtkThreeSliceFilter()
   for (int i = 0; i < 3; ++i)
   {
     this->Slices[i]->Delete();
-    this->Slices[i] = NULL;
+    this->Slices[i] = nullptr;
     this->Planes[i]->Delete();
-    this->Planes[i] = NULL;
+    this->Planes[i] = nullptr;
   }
 
   this->CombinedFilteredInput->Delete();
-  this->CombinedFilteredInput = NULL;
+  this->CombinedFilteredInput = nullptr;
 
   if (this->PointToProbe)
   {
     this->PointToProbe->Delete();
-    this->PointToProbe = NULL;
+    this->PointToProbe = nullptr;
   }
   if (this->Probe)
   {
     this->Probe->ReleaseDataFlagOn();
     this->Probe->Delete();
-    this->Probe = NULL;
+    this->Probe = nullptr;
   }
 }
 
@@ -386,14 +386,14 @@ void vtkThreeSliceFilter::Process(
 //----------------------------------------------------------------------------
 void vtkThreeSliceFilter::EnableProbe(int enable)
 {
-  if (enable != 0 && this->Probe == NULL)
+  if (enable != 0 && this->Probe == nullptr)
   {
     this->Probe = vtkPProbeFilter::New();
   }
-  else if (this->Probe != NULL)
+  else if (this->Probe != nullptr)
   {
     this->Probe->Delete();
-    this->Probe = NULL;
+    this->Probe = nullptr;
   }
 }
 //----------------------------------------------------------------------------

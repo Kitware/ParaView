@@ -383,7 +383,7 @@ vtkCDIReader::vtkCDIReader()
   this->Internals = new vtkCDIReader::Internal;
   this->StreamID = -1;
   this->VListID = -1;
-  this->CellMask = 0;
+  this->CellMask = nullptr;
   this->LoadingDimensions = vtkSmartPointer<vtkIntArray>::New();
   this->VariableDimensions = vtkStringArray::New();
   this->AllDimensions = vtkStringArray::New();

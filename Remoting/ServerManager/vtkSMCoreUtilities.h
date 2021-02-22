@@ -39,7 +39,7 @@ public:
   /**
    * Given a proxy (or proxy prototype), returns the name of the property that
    * ParaView application will be use as the default FileName property.
-   * Returns the name of the property or NULL when no such property is found.
+   * Returns the name of the property or nullptr when no such property is found.
    */
   static const char* GetFileNameProperty(vtkSMProxy*);
 

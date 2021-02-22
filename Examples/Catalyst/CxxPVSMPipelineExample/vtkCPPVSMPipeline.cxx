@@ -75,7 +75,7 @@ int vtkCPPVSMPipeline::CoProcess(vtkCPDataDescription* dataDescription)
   }
   vtkUnstructuredGrid* grid = vtkUnstructuredGrid::SafeDownCast(
     dataDescription->GetInputDescriptionByName("input")->GetGrid());
-  if (grid == NULL)
+  if (grid == nullptr)
   {
     vtkWarningMacro("DataDescription is missing input unstructured grid.");
     return 0;

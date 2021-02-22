@@ -50,7 +50,7 @@ MainPipelineWindow::MainPipelineWindow()
     SLOT(invertFilterMatching(int)), Qt::QueuedConnection);
 
   // Set Pipeline Widget
-  this->PipelineWidget = new pqPipelineBrowserWidget(NULL);
+  this->PipelineWidget = new pqPipelineBrowserWidget(nullptr);
 
   // Create server only after a pipeline browser get created...
   pqServer* server = ob->createServer(pqServerResource("builtin:"));

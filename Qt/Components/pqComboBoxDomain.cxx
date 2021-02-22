@@ -190,7 +190,7 @@ void pqComboBoxDomain::domainChanged()
 void pqComboBoxDomain::internalDomainChanged()
 {
   QComboBox* combo = qobject_cast<QComboBox*>(this->parent());
-  assert(combo != NULL);
+  assert(combo != nullptr);
   if (!combo)
   {
     return;

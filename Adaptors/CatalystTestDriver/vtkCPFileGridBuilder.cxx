@@ -27,17 +27,17 @@ vtkCxxSetObjectMacro(vtkCPFileGridBuilder, Grid, vtkDataObject);
 //----------------------------------------------------------------------------
 vtkCPFileGridBuilder::vtkCPFileGridBuilder()
 {
-  this->FileName = 0;
+  this->FileName = nullptr;
   this->KeepPointData = 1;
   this->KeepCellData = 1;
-  this->Grid = 0;
+  this->Grid = nullptr;
 }
 
 //----------------------------------------------------------------------------
 vtkCPFileGridBuilder::~vtkCPFileGridBuilder()
 {
-  this->SetFileName(0);
-  this->SetGrid(0);
+  this->SetFileName(nullptr);
+  this->SetGrid(nullptr);
 }
 
 //----------------------------------------------------------------------------
@@ -50,17 +50,17 @@ vtkDataObject* vtkCPFileGridBuilder::GetGrid()
 vtkDataObject* vtkCPFileGridBuilder::GetGrid(unsigned long timeStep, double time, int& builtNewGrid)
 {
   builtNewGrid = 0;
-  if (this->FileName == 0)
+  if (this->FileName == nullptr)
   {
     vtkWarningMacro("FileName is not set.");
-    return 0;
+    return nullptr;
   }
 
   vtkCPBaseFieldBuilder* fieldBuilder = this->GetFieldBuilder();
-  if (fieldBuilder == 0 && this->KeepPointData == 0 && this->KeepCellData == 0)
+  if (fieldBuilder == nullptr && this->KeepPointData == 0 && this->KeepCellData == 0)
   {
     vtkWarningMacro("Need field data.");
-    return 0;
+    return nullptr;
   }
 
   if (!this->KeepPointData)

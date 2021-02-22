@@ -140,7 +140,7 @@ public:
     if (this->NeedToInitializeControllers)
     {
       // CAUTION: This initialization is only correct for vtkSocketController
-      ctrl->Initialize(0, 0);
+      ctrl->Initialize(nullptr, nullptr);
     }
     this->Controllers.push_back(Controller(this->ControllerID++, ctrl));
     this->ActiveController = &this->Controllers.back();
@@ -169,7 +169,7 @@ public:
       {
         if (this->GetActiveController() == ctrl)
         {
-          this->ActiveController = NULL;
+          this->ActiveController = nullptr;
           this->UpdateActiveCommunicator();
         }
         iterToDel = iter;
@@ -195,7 +195,7 @@ public:
       }
       iter++;
     }
-    return NULL;
+    return nullptr;
   }
   //-----------------------------------------------------------------
   vtkMultiProcessController* GetActiveController()
@@ -204,7 +204,7 @@ public:
     {
       return this->ActiveController->MultiProcessController;
     }
-    return NULL;
+    return nullptr;
   }
   //-----------------------------------------------------------------
   int GetActiveControllerID()
@@ -236,7 +236,7 @@ public:
     while (iter != this->Controllers.end())
     {
       // CAUTION: This initialization only correct for vtkSocketController
-      iter->MultiProcessController->Initialize(0, 0);
+      iter->MultiProcessController->Initialize(nullptr, nullptr);
       iter++;
     }
   }
@@ -315,7 +315,7 @@ public:
     {
       return this->GetActiveController()->GetCommunicator();
     }
-    return NULL;
+    return nullptr;
   }
   //-----------------------------------------------------------------
   void UpdateActiveCommunicator()
@@ -481,7 +481,7 @@ vtkCompositeMultiProcessController::vtkCompositeMultiProcessController()
 vtkCompositeMultiProcessController::~vtkCompositeMultiProcessController()
 {
   delete this->Internal;
-  this->Internal = NULL;
+  this->Internal = nullptr;
 }
 
 //----------------------------------------------------------------------------

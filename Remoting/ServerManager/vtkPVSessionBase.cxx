@@ -31,7 +31,7 @@
 vtkPVSessionBase::vtkPVSessionBase()
 {
   this->InitSessionBase(vtkPVSessionCore::New());
-  this->SessionCore->UnRegister(NULL);
+  this->SessionCore->UnRegister(nullptr);
 }
 //----------------------------------------------------------------------------
 vtkPVSessionBase::vtkPVSessionBase(vtkPVSessionCore* coreToUse)
@@ -45,12 +45,12 @@ void vtkPVSessionBase::InitSessionBase(vtkPVSessionCore* coreToUse)
   this->SessionCore = coreToUse;
   if (this->SessionCore)
   {
-    this->SessionCore->Register(NULL);
+    this->SessionCore->Register(nullptr);
   }
 
   // initialize local process information.
   this->LocalServerInformation = vtkPVServerInformation::New();
-  this->LocalServerInformation->CopyFromObject(NULL);
+  this->LocalServerInformation->CopyFromObject(nullptr);
 
   // This ensure that whenever a message is received on  the parallel
   // controller, this session is marked active. This is essential for
@@ -84,11 +84,11 @@ vtkPVSessionBase::~vtkPVSessionBase()
   if (this->SessionCore)
   {
     this->SessionCore->Delete();
-    this->SessionCore = NULL;
+    this->SessionCore = nullptr;
   }
 
   this->LocalServerInformation->Delete();
-  this->LocalServerInformation = NULL;
+  this->LocalServerInformation = nullptr;
 }
 
 //----------------------------------------------------------------------------
@@ -101,7 +101,7 @@ vtkSIProxyDefinitionManager* vtkPVSessionBase::GetProxyDefinitionManager()
 vtkPVSessionBase::ServerFlags vtkPVSessionBase::GetProcessRoles()
 {
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-  assert(pm != NULL);
+  assert(pm != nullptr);
 
   int process_id = pm->GetPartitionId();
   switch (pm->GetProcessType())
@@ -202,7 +202,7 @@ void vtkPVSessionBase::RegisterSIObject(vtkSMMessage* msg)
 //----------------------------------------------------------------------------
 vtkSIObject* vtkPVSessionBase::GetSIObject(vtkTypeUInt32 globalid)
 {
-  return this->SessionCore ? this->SessionCore->GetSIObject(globalid) : NULL;
+  return this->SessionCore ? this->SessionCore->GetSIObject(globalid) : nullptr;
 }
 
 //----------------------------------------------------------------------------

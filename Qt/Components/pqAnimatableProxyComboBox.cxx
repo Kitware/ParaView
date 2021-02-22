@@ -96,7 +96,7 @@ void pqAnimatableProxyComboBox::onSourceRemoved(pqPipelineSource* source)
     this->removeItem(index);
     if (this->count() == 0)
     {
-      Q_EMIT this->currentProxyChanged(NULL);
+      Q_EMIT this->currentProxyChanged(nullptr);
     }
   }
 }
@@ -137,7 +137,7 @@ void pqAnimatableProxyComboBox::removeProxy(const QString& label)
     this->removeItem(index);
     if (this->count() == 0)
     {
-      Q_EMIT this->currentProxyChanged(NULL);
+      Q_EMIT this->currentProxyChanged(nullptr);
     }
   }
 }

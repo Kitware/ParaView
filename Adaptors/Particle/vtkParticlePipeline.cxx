@@ -58,7 +58,7 @@ vtkStandardNewMacro(vtkParticlePipeline);
 
 vtkParticlePipeline::vtkParticlePipeline()
 {
-  this->Filename = 0;
+  this->Filename = nullptr;
 
   this->ParticleRadius = 1.0;
 
@@ -190,7 +190,7 @@ void vtkParticlePipeline::SetupPipeline()
   VTK_CREATE(vtkCameraPass, cameraP);
   cameraP->SetDelegatePass(iceTPass);
   vtkOpenGLRenderer* glRenderer = vtkOpenGLRenderer::SafeDownCast(this->renderer);
-  if (glRenderer != NULL)
+  if (glRenderer != nullptr)
   {
     glRenderer->SetPass(cameraP);
   }

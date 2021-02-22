@@ -370,7 +370,7 @@ void pqAnimationViewWidget::setScene(pqAnimationScene* scene)
   if (this->Internal->Scene)
   {
     this->Internal->Links.removeAllPropertyLinks();
-    QObject::disconnect(this->Internal->Scene, 0, this, 0);
+    QObject::disconnect(this->Internal->Scene, nullptr, this, nullptr);
 
     pqComboBoxDomain* d0 = this->Internal->PlayMode->findChild<pqComboBoxDomain*>("ComboBoxDomain");
     if (d0)

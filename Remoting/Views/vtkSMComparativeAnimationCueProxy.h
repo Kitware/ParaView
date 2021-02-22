@@ -62,7 +62,7 @@ public:
    * Saves the state of the proxy. This state can be reloaded
    * to create a new proxy that is identical the present state of this proxy.
    * The resulting proxy's XML hieratchy is returned, in addition if the root
-   * argument is not NULL then it's also inserted as a nested element.
+   * argument is not nullptr then it's also inserted as a nested element.
    * This call saves all a proxy's properties, including exposed properties
    * and sub-proxies. More control is provided by the following overload.
    */
@@ -80,7 +80,7 @@ public:
    * Loads the proxy state from the XML element. Returns 0 on failure.
    * \c locator is used to locate other proxies that may be referred to in the
    * state XML (which happens in case of properties of type vtkSMProxyProperty
-   * or subclasses). If locator is NULL, then such properties are left
+   * or subclasses). If locator is nullptr, then such properties are left
    * unchanged.
    */
   int LoadXMLState(vtkPVXMLElement* element, vtkSMProxyLocator* locator) override;

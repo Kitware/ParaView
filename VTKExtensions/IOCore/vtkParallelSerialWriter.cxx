@@ -39,7 +39,7 @@ namespace
 {
 bool vtkIsEmpty(vtkDataObject* dobj)
 {
-  for (int cc = 0; (dobj != NULL) && (cc < vtkDataObject::NUMBER_OF_ASSOCIATIONS); ++cc)
+  for (int cc = 0; (dobj != nullptr) && (cc < vtkDataObject::NUMBER_OF_ASSOCIATIONS); ++cc)
   {
     if (dobj->GetNumberOfElements(cc) > 0)
     {
@@ -322,7 +322,7 @@ void vtkParallelSerialWriter::WriteAFile(const std::string& filename_arg, vtkDat
       this->Writer->SetInputDataObject(output);
       this->SetWriterFileName(fname.str().c_str());
       this->WriteInternal();
-      this->Writer->SetInputConnection(0);
+      this->Writer->SetInputConnection(nullptr);
     }
   }
 }

@@ -14,7 +14,7 @@
 =========================================================================*/
 /**
  * @class   vtkSMNullProxy
- * @brief   proxy with stands for NULL object on the server.
+ * @brief   proxy with stands for nullptr object on the server.
  *
  * vtkSMNullProxy stands for a 0 on the server side.
 */

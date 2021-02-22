@@ -181,7 +181,7 @@ void pqFileDialogTestWidget::openFileDialog()
   pqServer* server = this->Server;
   if (this->ConnectionMode->currentText() == "Local")
   {
-    server = NULL;
+    server = nullptr;
   }
 
   pqFileDialog diag(

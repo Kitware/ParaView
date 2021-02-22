@@ -44,14 +44,14 @@ vtkStandardNewMacro(vtkSISILProperty);
 //----------------------------------------------------------------------------
 vtkSISILProperty::vtkSISILProperty()
 {
-  this->SubTree = 0;
+  this->SubTree = nullptr;
   this->OutputPort = 0;
 }
 
 //----------------------------------------------------------------------------
 vtkSISILProperty::~vtkSISILProperty()
 {
-  this->SetSubTree(0);
+  this->SetSubTree(nullptr);
 }
 
 //----------------------------------------------------------------------------
@@ -65,7 +65,7 @@ bool vtkSISILProperty::ReadXMLAttributes(vtkSIProxy* proxyhelper, vtkPVXMLElemen
   bool retValue = this->Superclass::ReadXMLAttributes(proxyhelper, element);
 
   // Parse extra attribute
-  this->SetSubTree(element->GetAttribute("subtree")); // if none => set NULL
+  this->SetSubTree(element->GetAttribute("subtree")); // if none => set nullptr
   if (!this->SubTree)
   {
     std::ostringstream proxyDefinition;

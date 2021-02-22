@@ -78,7 +78,7 @@ public:
   {
     vtkSMProxy* plproxy = this->Proxy;
     vtkPVXMLElement* proxyListElement =
-      plproxy->GetHints() ? plproxy->GetHints()->FindNestedElementByName("ProxyList") : NULL;
+      plproxy->GetHints() ? plproxy->GetHints()->FindNestedElementByName("ProxyList") : nullptr;
     if (!proxyListElement)
     {
       return;
@@ -174,7 +174,7 @@ public:
     vtkSMProxyInfo info;
     info.Proxy = proxy;
 
-    vtkSMProxy* parent = self->GetProperty() ? self->GetProperty()->GetParent() : NULL;
+    vtkSMProxy* parent = self->GetProperty() ? self->GetProperty()->GetParent() : nullptr;
     if (parent)
     {
       // Handle proxy-list hints.
@@ -303,7 +303,7 @@ const char* vtkSMProxyListDomain::GetProxyGroup(unsigned int cc)
   if (this->GetNumberOfProxyTypes() <= cc)
   {
     vtkErrorMacro("Invalid index " << cc);
-    return NULL;
+    return nullptr;
   }
 
   return this->Internals->ProxyTypeList[cc].GroupName.c_str();
@@ -315,7 +315,7 @@ const char* vtkSMProxyListDomain::GetProxyName(unsigned int cc)
   if (this->GetNumberOfProxyTypes() <= cc)
   {
     vtkErrorMacro("Invalid index " << cc);
-    return NULL;
+    return nullptr;
   }
 
   return this->Internals->ProxyTypeList[cc].ProxyName.c_str();
@@ -324,7 +324,7 @@ const char* vtkSMProxyListDomain::GetProxyName(unsigned int cc)
 //-----------------------------------------------------------------------------
 const char* vtkSMProxyListDomain::GetProxyName(vtkSMProxy* proxy)
 {
-  return proxy ? proxy->GetXMLName() : NULL;
+  return proxy ? proxy->GetXMLName() : nullptr;
 }
 
 //-----------------------------------------------------------------------------
@@ -332,7 +332,7 @@ vtkSMProxy* vtkSMProxyListDomain::GetProxyWithName(const char* pname)
 {
   vtkSMProxyListDomainInternals::VectorOfProxies::const_iterator iter;
   const vtkSMProxyListDomainInternals::VectorOfProxies& proxies = this->Internals->GetProxies();
-  for (iter = proxies.begin(); pname != NULL && iter != proxies.end(); iter++)
+  for (iter = proxies.begin(); pname != nullptr && iter != proxies.end(); iter++)
   {
     if (iter->Proxy && iter->Proxy->GetXMLName() && strcmp(iter->Proxy->GetXMLName(), pname) == 0)
     {
@@ -340,7 +340,7 @@ vtkSMProxy* vtkSMProxyListDomain::GetProxyWithName(const char* pname)
     }
   }
 
-  return NULL;
+  return nullptr;
 }
 
 //-----------------------------------------------------------------------------
@@ -446,7 +446,7 @@ vtkSMProxy* vtkSMProxyListDomain::GetProxy(unsigned int index)
   if (index >= proxies.size())
   {
     vtkErrorMacro("Index " << index << " greater than max " << proxies.size());
-    return 0;
+    return nullptr;
   }
   return this->Internals->GetProxies()[index].Proxy;
 }
@@ -456,7 +456,8 @@ vtkSMProxy* vtkSMProxyListDomain::FindProxy(const char* xmlgroup, const char* xm
 {
   vtkSMProxyListDomainInternals::VectorOfProxies::const_iterator iter;
   const vtkSMProxyListDomainInternals::VectorOfProxies& proxies = this->Internals->GetProxies();
-  for (iter = proxies.begin(); xmlgroup != NULL && xmlname != NULL && iter != proxies.end(); iter++)
+  for (iter = proxies.begin(); xmlgroup != nullptr && xmlname != nullptr && iter != proxies.end();
+       iter++)
   {
     if (iter->Proxy && iter->Proxy->GetXMLGroup() && iter->Proxy->GetXMLName() &&
       strcmp(iter->Proxy->GetXMLGroup(), xmlgroup) == 0 &&
@@ -465,7 +466,7 @@ vtkSMProxy* vtkSMProxyListDomain::FindProxy(const char* xmlgroup, const char* xm
       return iter->Proxy;
     }
   }
-  return NULL;
+  return nullptr;
 }
 
 //-----------------------------------------------------------------------------

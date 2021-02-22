@@ -93,8 +93,8 @@ pqPythonSyntaxHighlighter::pqPythonSyntaxHighlighter(QObject* p, QTextEdit& text
       vtkSmartPyObject pythonLexerClass(PyObject_GetAttrString(lexersModule, "PythonLexer"));
 #endif
       vtkSmartPyObject emptyTuple(Py_BuildValue("()"));
-      this->PythonLexer.TakeReference(PyObject_Call(pythonLexerClass, emptyTuple, NULL));
-      this->HtmlFormatter.TakeReference(PyObject_Call(htmlFormatterClass, emptyTuple, NULL));
+      this->PythonLexer.TakeReference(PyObject_Call(pythonLexerClass, emptyTuple, nullptr));
+      this->HtmlFormatter.TakeReference(PyObject_Call(htmlFormatterClass, emptyTuple, nullptr));
       PyObject_SetAttrString(this->HtmlFormatter, "noclasses", Py_True);
       PyObject_SetAttrString(this->HtmlFormatter, "nobackground", Py_True);
     }
@@ -173,10 +173,10 @@ QString pqPythonSyntaxHighlighter::Highlight(const QString& text) const
     QByteArray bytes = text.trimmed().toUtf8();
 
     vtkPythonScopeGilEnsurer gilEnsurer;
-    vtkSmartPyObject unicode(PyUnicode_DecodeUTF8(bytes.data(), bytes.size(), NULL));
+    vtkSmartPyObject unicode(PyUnicode_DecodeUTF8(bytes.data(), bytes.size(), nullptr));
     vtkSmartPyObject args(Py_BuildValue("OOO", unicode.GetPointer(), this->PythonLexer.GetPointer(),
       this->HtmlFormatter.GetPointer()));
-    vtkSmartPyObject resultingText(PyObject_Call(this->HighlightFunction, args, NULL));
+    vtkSmartPyObject resultingText(PyObject_Call(this->HighlightFunction, args, nullptr));
 
 #if PY_VERSION_HEX >= 0x03070000
     char* resultingTextAsCString = const_cast<char*>(PyUnicode_AsUTF8(resultingText));

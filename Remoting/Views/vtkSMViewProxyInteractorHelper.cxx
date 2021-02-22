@@ -37,7 +37,7 @@ vtkSMViewProxyInteractorHelper::~vtkSMViewProxyInteractorHelper()
 {
   vtkMemberFunctionCommand<vtkSMViewProxyInteractorHelper>::SafeDownCast(this->Observer)->Reset();
   this->Observer->Delete();
-  this->Observer = NULL;
+  this->Observer = nullptr;
 }
 
 //----------------------------------------------------------------------------

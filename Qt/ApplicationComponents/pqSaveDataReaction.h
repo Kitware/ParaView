@@ -48,7 +48,7 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqSaveDataReaction : public pqReaction
 
 public:
   /**
-  * Constructor. Parent cannot be NULL.
+  * Constructor. Parent cannot be nullptr.
   */
   pqSaveDataReaction(QAction* parent);
 

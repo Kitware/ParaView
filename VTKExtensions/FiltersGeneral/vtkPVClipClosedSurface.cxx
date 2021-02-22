@@ -24,14 +24,14 @@ vtkStandardNewMacro(vtkPVClipClosedSurface);
 vtkPVClipClosedSurface::vtkPVClipClosedSurface()
 {
   this->InsideOut = 0;
-  this->ClippingPlane = NULL;
-  this->ClippingPlanes = NULL;
+  this->ClippingPlane = nullptr;
+  this->ClippingPlanes = nullptr;
 }
 
 //-----------------------------------------------------------------------------
 vtkPVClipClosedSurface::~vtkPVClipClosedSurface()
 {
-  this->ClippingPlane = NULL;
+  this->ClippingPlane = nullptr;
 
   // leave the plane collection to be deleted by the parent class
 }
@@ -44,7 +44,7 @@ void vtkPVClipClosedSurface::SetClippingPlane(vtkPlane* plane)
   if (this->ClippingPlanes)
   {
     this->ClippingPlanes->Delete();
-    this->ClippingPlanes = NULL;
+    this->ClippingPlanes = nullptr;
   }
 
   this->ClippingPlanes = vtkPlaneCollection::New();

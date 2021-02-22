@@ -42,7 +42,7 @@ public:
   virtual void SetExternalProxy(vtkSMSourceProxy* proxyFromAnotherServer, int port = 0);
 
   /**
-   * Return the proxy that is currently binded if any otherwise return NULL;
+   * Return the proxy that is currently binded if any otherwise return nullptr;
    */
   virtual vtkSMSourceProxy* GetExternalProxy();
 

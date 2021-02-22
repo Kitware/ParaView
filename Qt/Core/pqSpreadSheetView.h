@@ -53,7 +53,7 @@ public:
 
 public:
   pqSpreadSheetView(const QString& group, const QString& name, vtkSMViewProxy* viewModule,
-    pqServer* server, QObject* parent = NULL);
+    pqServer* server, QObject* parent = nullptr);
   ~pqSpreadSheetView() override;
 
   /**
@@ -70,7 +70,7 @@ public:
 Q_SIGNALS:
   /**
   * Fired when the currently shown representation changes. \c repr may be
-  * NULL.
+  * nullptr.
   */
   void showing(pqDataRepresentation* repr);
   void viewportUpdated();

@@ -56,7 +56,7 @@ public:
   bool supportsSelection() const override { return true; }
 
   pqXYHistogramChartView(const QString& group, const QString& name,
-    vtkSMContextViewProxy* viewModule, pqServer* server, QObject* parent = NULL);
+    vtkSMContextViewProxy* viewModule, pqServer* server, QObject* parent = nullptr);
 
   ~pqXYHistogramChartView() override;
 

@@ -60,11 +60,12 @@ void pqCopyReaction::updateEnableState()
   {
     QObject* clipboard = pqApplicationCore::instance()->manager("SOURCE_ON_CLIPBOARD");
     pqPipelineSource* active = pqActiveObjects::instance().activeSource();
-    this->parentAction()->setEnabled(clipboard != NULL && active != clipboard && active != NULL);
+    this->parentAction()->setEnabled(
+      clipboard != nullptr && active != clipboard && active != nullptr);
   }
   else
   {
-    this->parentAction()->setEnabled(pqActiveObjects::instance().activeSource() != NULL);
+    this->parentAction()->setEnabled(pqActiveObjects::instance().activeSource() != nullptr);
   }
 }
 

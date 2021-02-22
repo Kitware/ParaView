@@ -158,7 +158,7 @@ bool pqQuickLaunchDialog::eventFilter(QObject* watched, QEvent* evt)
 //-----------------------------------------------------------------------------
 void pqQuickLaunchDialog::setActions(const QList<QAction*>& actns)
 {
-  this->Internal->ActiveAction = 0;
+  this->Internal->ActiveAction = nullptr;
   this->Internal->selection->setText("");
   this->Internal->selection->setIcon(QIcon());
   this->Internal->searchString->setText("( )");
@@ -188,7 +188,7 @@ void pqQuickLaunchDialog::addActions(const QList<QAction*>& actns)
 // Given the current user selected SearchString, update the GUI.
 void pqQuickLaunchDialog::updateSearch()
 {
-  this->Internal->ActiveAction = 0;
+  this->Internal->ActiveAction = nullptr;
   this->Internal->selection->setText("");
   this->Internal->selection->setIcon(QIcon());
   this->Internal->options->clear();
@@ -255,7 +255,7 @@ void pqQuickLaunchDialog::currentRowChanged(int row)
 {
   this->Internal->selection->setText("");
   this->Internal->selection->setIcon(QIcon());
-  this->Internal->ActiveAction = 0;
+  this->Internal->ActiveAction = nullptr;
   QListWidgetItem* item = this->Internal->options->item(row);
   if (!item)
   {

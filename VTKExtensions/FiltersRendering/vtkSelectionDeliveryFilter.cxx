@@ -60,7 +60,7 @@ int vtkSelectionDeliveryFilter::RequestData(
 {
   vtkSelection* input = (inputVector[0]->GetNumberOfInformationObjects() == 1)
     ? vtkSelection::GetData(inputVector[0], 0)
-    : NULL;
+    : nullptr;
   vtkSelection* output = vtkSelection::GetData(outputVector, 0);
 
   if (input)

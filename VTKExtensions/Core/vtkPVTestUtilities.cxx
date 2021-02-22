@@ -29,11 +29,11 @@ vtkStandardNewMacro(vtkPVTestUtilities);
 //-----------------------------------------------------------------------------
 void vtkPVTestUtilities::Initialize(int argc, char** argv)
 {
-  this->DataRoot = NULL;
-  this->TempRoot = NULL;
+  this->DataRoot = nullptr;
+  this->TempRoot = nullptr;
   this->Argc = argc;
   this->Argv = argv;
-  if (!((argc == 0) || (argv == 0)))
+  if (!((argc == 0) || (argv == nullptr)))
   {
     this->DataRoot = this->GetDataRoot();
     this->TempRoot = this->GetTempRoot();
@@ -66,7 +66,7 @@ char* vtkPVTestUtilities::GetCommandTailArgument(const char* tag)
       }
     }
   }
-  return 0;
+  return nullptr;
 }
 //-----------------------------------------------------------------------------
 // int vtkPVTestUtilities::CheckForCommandTailArgument(const char *tag)

@@ -31,7 +31,7 @@ vtkCxxSetObjectMacro(vtkPConvertSelection, Controller, vtkMultiProcessController
 //----------------------------------------------------------------------------
 vtkPConvertSelection::vtkPConvertSelection()
 {
-  this->Controller = 0;
+  this->Controller = nullptr;
   this->SetController(vtkMultiProcessController::GetGlobalController());
   vtkNew<vtkPVExtractSelection> se;
   this->SetSelectionExtractor(se.GetPointer());
@@ -40,7 +40,7 @@ vtkPConvertSelection::vtkPConvertSelection()
 //----------------------------------------------------------------------------
 vtkPConvertSelection::~vtkPConvertSelection()
 {
-  this->SetController(0);
+  this->SetController(nullptr);
 }
 
 //----------------------------------------------------------------------------

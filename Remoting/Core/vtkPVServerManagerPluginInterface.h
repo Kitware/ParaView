@@ -41,7 +41,7 @@ public:
   //@{
   /**
    * Returns the callback function to call to initialize the interpretor for the
-   * new vtk/server-manager classes added by this plugin. Returning NULL is
+   * new vtk/server-manager classes added by this plugin. Returning nullptr is
    * perfectly valid.
    */
   virtual vtkClientServerInterpreterInitializer::InterpreterInitializationCallback

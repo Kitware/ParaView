@@ -339,8 +339,8 @@ bool vtkSMSaveAnimationProxy::WriteAnimation(const char* filename)
   vtkSMViewProxy* view = this->GetView();
 
   // view and layout are mutually exclusive.
-  assert(layout == NULL || view == NULL);
-  if (layout == NULL && view == NULL)
+  assert(layout == nullptr || view == nullptr);
+  if (layout == nullptr && view == nullptr)
   {
     vtkErrorMacro("Cannot WriteImage without a view or layout.");
     return false;
@@ -350,10 +350,12 @@ bool vtkSMSaveAnimationProxy::WriteAnimation(const char* filename)
   this->EnforceSizeRestrictions(filename);
 
   SM_SCOPED_TRACE(SaveLayoutSizes)
-    .arg("proxy", view != NULL ? static_cast<vtkSMProxy*>(view) : static_cast<vtkSMProxy*>(layout));
+    .arg(
+      "proxy", view != nullptr ? static_cast<vtkSMProxy*>(view) : static_cast<vtkSMProxy*>(layout));
 
   SM_SCOPED_TRACE(SaveCameras)
-    .arg("proxy", view != NULL ? static_cast<vtkSMProxy*>(view) : static_cast<vtkSMProxy*>(layout));
+    .arg(
+      "proxy", view != nullptr ? static_cast<vtkSMProxy*>(view) : static_cast<vtkSMProxy*>(layout));
 
   SM_SCOPED_TRACE(SaveScreenshotOrAnimation)
     .arg("helper", this)
@@ -497,7 +499,7 @@ vtkSMViewLayoutProxy* vtkSMSaveAnimationProxy::GetLayout()
   {
     return vtkSMViewLayoutProxy::SafeDownCast(vtkSMPropertyHelper(this, "Layout").GetAsProxy());
   }
-  return NULL;
+  return nullptr;
 }
 
 //----------------------------------------------------------------------------
@@ -507,7 +509,7 @@ vtkSMViewProxy* vtkSMSaveAnimationProxy::GetView()
   {
     return vtkSMViewProxy::SafeDownCast(vtkSMPropertyHelper(this, "View").GetAsProxy());
   }
-  return NULL;
+  return nullptr;
 }
 
 //----------------------------------------------------------------------------

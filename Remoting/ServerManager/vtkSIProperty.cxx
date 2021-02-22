@@ -27,7 +27,7 @@
 class vtkSIProperty::vtkInternals
 {
 public:
-  vtkInternals() { this->CacheValue = NULL; }
+  vtkInternals() { this->CacheValue = nullptr; }
   ~vtkInternals() { this->ClearCache(); }
 
   void ClearCache()
@@ -35,11 +35,11 @@ public:
     if (this->CacheValue)
     {
       delete this->CacheValue;
-      this->CacheValue = NULL;
+      this->CacheValue = nullptr;
     }
   }
 
-  bool HasCache() { return this->CacheValue != NULL; }
+  bool HasCache() { return this->CacheValue != nullptr; }
 
   void SaveToCache(const ProxyState_Property* newValue)
   {
@@ -56,20 +56,20 @@ vtkStandardNewMacro(vtkSIProperty);
 //----------------------------------------------------------------------------
 vtkSIProperty::vtkSIProperty()
 {
-  this->Command = NULL;
-  this->XMLName = NULL;
+  this->Command = nullptr;
+  this->XMLName = nullptr;
   this->IsInternal = false;
   this->InformationOnly = false;
   this->Repeatable = false;
-  this->SIProxyObject = NULL;
+  this->SIProxyObject = nullptr;
   this->Internals = new vtkInternals();
 }
 
 //----------------------------------------------------------------------------
 vtkSIProperty::~vtkSIProperty()
 {
-  this->SetCommand(NULL);
-  this->SetXMLName(NULL);
+  this->SetCommand(nullptr);
+  this->SetXMLName(nullptr);
   delete this->Internals;
 }
 
@@ -125,7 +125,7 @@ vtkSIObject* vtkSIProperty::GetSIObject(vtkTypeUInt32 globalid)
   {
     return this->SIProxyObject->GetSIObject(globalid);
   }
-  return NULL;
+  return nullptr;
 }
 
 //----------------------------------------------------------------------------
@@ -145,7 +145,7 @@ vtkObjectBase* vtkSIProperty::GetVTKObject()
   {
     return this->SIProxyObject->GetVTKObject();
   }
-  return NULL;
+  return nullptr;
 }
 
 //----------------------------------------------------------------------------
@@ -170,7 +170,7 @@ void vtkSIProperty::PrintSelf(ostream& os, vtkIndent indent)
 //          and not for value property.
 bool vtkSIProperty::Push(vtkSMMessage*, int)
 {
-  if (this->InformationOnly || !this->Command || this->GetVTKObject() == NULL)
+  if (this->InformationOnly || !this->Command || this->GetVTKObject() == nullptr)
   {
     return true;
   }

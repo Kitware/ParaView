@@ -48,7 +48,7 @@ public:
    * To abort the connection and cancel the waiting, simply call
    * AbortPendingConnection() in the vtkCommand::ProgressEvent callback.
 
-   * Returns the new connection instance on success, otherwise NULL.
+   * Returns the new connection instance on success, otherwise nullptr.
 
    * URLs are of the following form:
    * \p \<transport\>://\<address\>

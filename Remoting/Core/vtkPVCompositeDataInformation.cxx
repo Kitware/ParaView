@@ -75,7 +75,7 @@ vtkPVDataInformation* vtkPVCompositeDataInformation::GetDataInformationForCompos
 {
   if (!this->DataIsComposite)
   {
-    return 0;
+    return nullptr;
   }
 
   if (this->DataIsMultiPiece)
@@ -83,7 +83,7 @@ vtkPVDataInformation* vtkPVCompositeDataInformation::GetDataInformationForCompos
     if ((*index) < static_cast<int>(this->NumberOfPieces))
     {
       (*index) = -1;
-      return NULL;
+      return nullptr;
     }
 
     (*index) -= this->NumberOfPieces;
@@ -106,11 +106,11 @@ vtkPVDataInformation* vtkPVCompositeDataInformation::GetDataInformationForCompos
       (*index)--;
       if ((*index) < 0)
       {
-        return NULL;
+        return nullptr;
       }
     }
   }
-  return NULL;
+  return nullptr;
 }
 
 //----------------------------------------------------------------------------
@@ -135,12 +135,12 @@ vtkPVDataInformation* vtkPVCompositeDataInformation::GetDataInformation(unsigned
 {
   if (this->DataIsMultiPiece)
   {
-    return NULL;
+    return nullptr;
   }
 
   if (idx >= this->Internal->ChildrenInformation.size())
   {
-    return NULL;
+    return nullptr;
   }
 
   return this->Internal->ChildrenInformation[idx].Info;
@@ -151,12 +151,12 @@ const char* vtkPVCompositeDataInformation::GetName(unsigned int idx)
 {
   if (this->DataIsMultiPiece)
   {
-    return NULL;
+    return nullptr;
   }
 
   if (idx >= this->Internal->ChildrenInformation.size())
   {
-    return NULL;
+    return nullptr;
   }
 
   return this->Internal->ChildrenInformation[idx].Name.c_str();
@@ -287,7 +287,7 @@ void vtkPVCompositeDataInformation::AddInformation(vtkPVInformation* pvi)
   vtkPVCompositeDataInformation* info;
 
   info = vtkPVCompositeDataInformation::SafeDownCast(pvi);
-  if (info == NULL)
+  if (info == nullptr)
   {
     vtkErrorMacro("Could not cast object to data information.");
     return;
@@ -436,7 +436,7 @@ void vtkPVCompositeDataInformation::CopyFromStream(const vtkClientServerStream* 
     }
     msgIdx++;
 
-    const char* name = 0;
+    const char* name = nullptr;
     if (!css->GetArgument(0, msgIdx, &name))
     {
       vtkErrorMacro("Error parsing the name for the block.");

@@ -28,7 +28,7 @@ struct vtkSMDomainIteratorInternals
 //---------------------------------------------------------------------------
 vtkSMDomainIterator::vtkSMDomainIterator()
 {
-  this->Property = 0;
+  this->Property = nullptr;
   this->Internals = new vtkSMDomainIteratorInternals;
 }
 
@@ -47,12 +47,12 @@ void vtkSMDomainIterator::SetProperty(vtkSMProperty* proxy)
 {
   if (this->Property != proxy)
   {
-    if (this->Property != NULL)
+    if (this->Property != nullptr)
     {
       this->Property->UnRegister(this);
     }
     this->Property = proxy;
-    if (this->Property != NULL)
+    if (this->Property != nullptr)
     {
       this->Property->Register(this);
       this->Begin();
@@ -110,7 +110,7 @@ const char* vtkSMDomainIterator::GetKey()
   if (!this->Property)
   {
     vtkErrorMacro("Property is not set. Can not perform operation: GetKey()");
-    return 0;
+    return nullptr;
   }
 
   if (this->Internals->DomainIterator != this->Property->PInternals->Domains.end())
@@ -118,7 +118,7 @@ const char* vtkSMDomainIterator::GetKey()
     return this->Internals->DomainIterator->first.c_str();
   }
 
-  return 0;
+  return nullptr;
 }
 
 //---------------------------------------------------------------------------
@@ -127,7 +127,7 @@ vtkSMDomain* vtkSMDomainIterator::GetDomain()
   if (!this->Property)
   {
     vtkErrorMacro("Property is not set. Can not perform operation: GetProperty()");
-    return 0;
+    return nullptr;
   }
 
   if (this->Internals->DomainIterator != this->Property->PInternals->Domains.end())
@@ -135,7 +135,7 @@ vtkSMDomain* vtkSMDomainIterator::GetDomain()
     return this->Internals->DomainIterator->second.GetPointer();
   }
 
-  return 0;
+  return nullptr;
 }
 
 //---------------------------------------------------------------------------

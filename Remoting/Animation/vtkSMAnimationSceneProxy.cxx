@@ -39,8 +39,8 @@ namespace
 // being loaded if they should not be loaded.
 void PruneEndTimesIfNeeded(vtkPVXMLElement* element, vtkSMAnimationScene* self)
 {
-  vtkPVXMLElement* startTimeElement = NULL;
-  vtkPVXMLElement* endTimeElement = NULL;
+  vtkPVXMLElement* startTimeElement = nullptr;
+  vtkPVXMLElement* endTimeElement = nullptr;
   int playMode = self ? self->GetPlayMode() : vtkCompositeAnimationPlayer::SEQUENCE;
   int lockEndTime = self ? (self->GetLockEndTime() ? 1 : 0) : 0;
   int lockStartTime = self ? (self->GetLockStartTime() ? 1 : 0) : 0;
@@ -221,7 +221,7 @@ vtkSMProxy* vtkSMAnimationSceneProxy::FindAnimationCue(
 {
   if (!animatedProxy || !animatedPropertyName)
   {
-    return NULL;
+    return nullptr;
   }
 
   vtkSMPropertyHelper cuesHelper(this, "Cues");
@@ -257,14 +257,15 @@ vtkSMProxy* vtkSMAnimationSceneProxy::FindAnimationCue(
       return cue;
     }
   }
-  return NULL;
+  return nullptr;
 }
 
 //----------------------------------------------------------------------------
 int vtkSMAnimationSceneProxy::LoadXMLState(vtkPVXMLElement* element, vtkSMProxyLocator* locator)
 {
-  PruneEndTimesIfNeeded(element,
-    (this->ObjectsCreated ? vtkSMAnimationScene::SafeDownCast(this->GetClientSideObject()) : NULL));
+  PruneEndTimesIfNeeded(
+    element, (this->ObjectsCreated ? vtkSMAnimationScene::SafeDownCast(this->GetClientSideObject())
+                                   : nullptr));
   return this->Superclass::LoadXMLState(element, locator);
   ;
 }

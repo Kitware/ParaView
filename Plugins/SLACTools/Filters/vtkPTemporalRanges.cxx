@@ -48,8 +48,8 @@ public:
   vtkSetObjectMacro(Parent, vtkPTemporalRanges);
 
 protected:
-  vtkRangeTableReduction() { this->Parent = NULL; }
-  ~vtkRangeTableReduction() { this->SetParent(NULL); }
+  vtkRangeTableReduction() { this->Parent = nullptr; }
+  ~vtkRangeTableReduction() { this->SetParent(nullptr); }
 
   virtual int FillInputPortInformation(int port, vtkInformation* info) override
   {
@@ -89,13 +89,13 @@ vtkCxxSetObjectMacro(vtkPTemporalRanges, Controller, vtkMultiProcessController);
 //-----------------------------------------------------------------------------
 vtkPTemporalRanges::vtkPTemporalRanges()
 {
-  this->Controller = NULL;
+  this->Controller = nullptr;
   this->SetController(vtkMultiProcessController::GetGlobalController());
 }
 
 vtkPTemporalRanges::~vtkPTemporalRanges()
 {
-  this->SetController(NULL);
+  this->SetController(nullptr);
 }
 
 void vtkPTemporalRanges::PrintSelf(ostream& os, vtkIndent indent)

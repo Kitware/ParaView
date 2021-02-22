@@ -55,12 +55,12 @@ namespace
 {
 vtkSMProxy* lutProxy(pqPipelineRepresentation* repr)
 {
-  vtkSMProxy* reprProxy = repr ? repr->getProxy() : NULL;
+  vtkSMProxy* reprProxy = repr ? repr->getProxy() : nullptr;
   if (vtkSMPVRepresentationProxy::GetUsingScalarColoring(reprProxy))
   {
     return vtkSMPropertyHelper(reprProxy, "LookupTable", true).GetAsProxy();
   }
-  return NULL;
+  return nullptr;
 }
 }
 
@@ -69,7 +69,7 @@ pqResetScalarRangeReaction::pqResetScalarRangeReaction(
   QAction* parentObject, bool track_active_objects, pqResetScalarRangeReaction::Modes mode)
   : Superclass(parentObject)
   , Mode(mode)
-  , Connection(NULL)
+  , Connection(nullptr)
 {
   if (track_active_objects)
   {
@@ -109,7 +109,7 @@ void pqResetScalarRangeReaction::setRepresentation(pqDataRepresentation* repr)
 //-----------------------------------------------------------------------------
 void pqResetScalarRangeReaction::updateEnableState()
 {
-  bool enabled = this->Representation != NULL;
+  bool enabled = this->Representation != nullptr;
   if (enabled && this->Mode == TEMPORAL)
   {
     pqPipelineSource* source = this->Representation->getInput();
@@ -147,7 +147,7 @@ void pqResetScalarRangeReaction::onTriggered()
 //-----------------------------------------------------------------------------
 bool pqResetScalarRangeReaction::resetScalarRangeToData(pqPipelineRepresentation* repr)
 {
-  if (repr == NULL)
+  if (repr == nullptr)
   {
     repr =
       qobject_cast<pqPipelineRepresentation*>(pqActiveObjects::instance().activeRepresentation());
@@ -176,7 +176,7 @@ bool pqResetScalarRangeReaction::resetScalarRangeToData(pqPipelineRepresentation
 //-----------------------------------------------------------------------------
 bool pqResetScalarRangeReaction::resetScalarRangeToCustom(pqPipelineRepresentation* repr)
 {
-  if (repr == NULL)
+  if (repr == nullptr)
   {
     repr =
       qobject_cast<pqPipelineRepresentation*>(pqActiveObjects::instance().activeRepresentation());
@@ -268,7 +268,7 @@ bool pqResetScalarRangeReaction::resetScalarRangeToCustom(vtkSMProxy* lut, bool 
 //-----------------------------------------------------------------------------
 bool pqResetScalarRangeReaction::resetScalarRangeToDataOverTime(pqPipelineRepresentation* repr)
 {
-  if (repr == NULL)
+  if (repr == nullptr)
   {
     repr =
       qobject_cast<pqPipelineRepresentation*>(pqActiveObjects::instance().activeRepresentation());
@@ -315,7 +315,7 @@ bool pqResetScalarRangeReaction::resetScalarRangeToDataOverTime(pqPipelineRepres
 //-----------------------------------------------------------------------------
 bool pqResetScalarRangeReaction::resetScalarRangeToVisible(pqPipelineRepresentation* repr)
 {
-  if (repr == NULL)
+  if (repr == nullptr)
   {
     repr =
       qobject_cast<pqPipelineRepresentation*>(pqActiveObjects::instance().activeRepresentation());

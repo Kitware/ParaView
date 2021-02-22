@@ -46,7 +46,7 @@ class PQCOMPONENTS_EXPORT pqTimerLogDisplay : public QDialog
   Q_OBJECT
 
 public:
-  pqTimerLogDisplay(QWidget* p = NULL);
+  pqTimerLogDisplay(QWidget* p = nullptr);
   ~pqTimerLogDisplay() override;
   typedef QDialog Superclass;
 

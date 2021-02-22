@@ -280,7 +280,7 @@ void vtkZlibCompressorImageConditioner::PrintSelf(ostream& os, vtkIndent indent)
 
 //-----------------------------------------------------------------------------
 vtkZlibImageCompressor::vtkZlibImageCompressor()
-  : Conditioner(0)
+  : Conditioner(nullptr)
   , CompressionLevel(1)
 {
   this->Conditioner = new vtkZlibCompressorImageConditioner;
@@ -447,7 +447,7 @@ const char* vtkZlibImageCompressor::RestoreConfiguration(const char* stream)
     this->SetStripAlpha(stripAlpha);
     return stream + iss.tellg();
   }
-  return 0;
+  return nullptr;
 }
 
 //-----------------------------------------------------------------------------

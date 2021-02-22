@@ -43,7 +43,7 @@ public:
 
   // Description:
   // Test for successful initialization.
-  int Initialized() { return this->ClientHost != NULL; }
+  int Initialized() { return this->ClientHost != nullptr; }
 
 protected:
   // Description:

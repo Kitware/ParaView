@@ -148,7 +148,7 @@ public:
    * Same as AddPreset() expect it create a unique name using the prefix
    * provided. If no prefix is specified, "Preset" will be used as the prefix.
    */
-  std::string AddUniquePreset(const Json::Value& preset, const char* prefix = NULL);
+  std::string AddUniquePreset(const Json::Value& preset, const char* prefix = nullptr);
 
   /**
    * Returns true if the preset is a builtin preset.

@@ -749,7 +749,7 @@ QModelIndex pqPipelineModel::index(int row, int column, const QModelIndex& paren
     return QModelIndex();
   }
 
-  pqPipelineModelDataItem* parentItem = 0;
+  pqPipelineModelDataItem* parentItem = nullptr;
   if (parentIndex.isValid())
   {
     parentItem = reinterpret_cast<pqPipelineModelDataItem*>(parentIndex.internalPointer());
@@ -962,18 +962,18 @@ QModelIndex pqPipelineModel::getIndexFor(pqServerManagerModelItem* item) const
 
 //-----------------------------------------------------------------------------
 pqPipelineModelDataItem* pqPipelineModel::getDataItem(
-  pqServerManagerModelItem* item, pqPipelineModelDataItem* _parent = 0,
+  pqServerManagerModelItem* item, pqPipelineModelDataItem* _parent = nullptr,
   pqPipelineModel::ItemType type /*= pqPipelineModel::Invalid*/
   ) const
 {
-  if (_parent == 0)
+  if (_parent == nullptr)
   {
     _parent = &this->Internal->Root;
   }
 
   if (!item)
   {
-    return 0;
+    return nullptr;
   }
 
   if (_parent->Object == item && (type == pqPipelineModel::Invalid || type == _parent->Type))
@@ -989,7 +989,7 @@ pqPipelineModelDataItem* pqPipelineModel::getDataItem(
       return retVal;
     }
   }
-  return 0;
+  return nullptr;
 }
 
 //-----------------------------------------------------------------------------

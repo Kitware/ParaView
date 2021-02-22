@@ -45,7 +45,7 @@ class pqVRPNEventListener : public QObject
   Q_OBJECT
 public:
   typedef QObject Superclass;
-  explicit pqVRPNEventListener(QObject* _parent = NULL);
+  explicit pqVRPNEventListener(QObject* _parent = nullptr);
   ~pqVRPNEventListener();
 
   // Description:

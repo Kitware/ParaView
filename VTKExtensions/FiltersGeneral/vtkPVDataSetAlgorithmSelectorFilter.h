@@ -69,7 +69,7 @@ public:
   vtkAlgorithm* GetFilter(int index);
 
   /**
-   * Return the current active filter if any otherwise return NULL
+   * Return the current active filter if any otherwise return nullptr
    */
   vtkAlgorithm* GetActiveFilter();
 

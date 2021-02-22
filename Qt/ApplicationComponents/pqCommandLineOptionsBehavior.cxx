@@ -102,7 +102,7 @@ void pqCommandLineOptionsBehavior::processCommandLineOptions()
   }
   else if (server_url)
   {
-    if (strchr(server_url, '|') != NULL)
+    if (strchr(server_url, '|') != nullptr)
     {
       // We should connect multiple times
       QStringList urls = QString(server_url).split(QRegExp("\\|"), PV_QT_SKIP_EMPTY_PARTS);
@@ -121,7 +121,7 @@ void pqCommandLineOptionsBehavior::processCommandLineOptions()
                   << "\". Creating default builtin connection.";
     }
   }
-  if (pqActiveObjects::instance().activeServer() == NULL)
+  if (pqActiveObjects::instance().activeServer() == nullptr)
   {
     pqServerConnectReaction::connectToServer(pqServerResource("builtin:"));
   }
@@ -157,7 +157,7 @@ void pqCommandLineOptionsBehavior::processCommandLineOptions()
       QStringList file;
       foreach (file, files)
       {
-        if (pqLoadDataReaction::loadData(file) == NULL)
+        if (pqLoadDataReaction::loadData(file) == nullptr)
         {
           qCritical() << "Failed to load data file: " << options->GetParaViewDataName();
         }

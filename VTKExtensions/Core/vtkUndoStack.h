@@ -67,7 +67,7 @@ public:
    * Returns the label for the set at the given Undo position.
    * 0 is the current undo set, 1 is the one preceding to the current one
    * and so on.
-   * \returns NULL is no set exists at the given index, otherwise the label
+   * \returns nullptr is no set exists at the given index, otherwise the label
    * for the change set.
    */
   const char* GetUndoSetLabel(unsigned int position);
@@ -76,7 +76,7 @@ public:
    * Returns the label for the set at the given Redo position.
    * 0 is the next set to redo, 1 is the one after the next one
    * and so on.
-   * \returns NULL is no set exists at the given index, otherwise the label
+   * \returns nullptr is no set exists at the given index, otherwise the label
    * for the change set.
    */
   const char* GetRedoSetLabel(unsigned int position);

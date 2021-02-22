@@ -58,7 +58,7 @@ public:
   /**
    * Method to find and return attribute array information for a particular
    * array for the given attribute type if one exists.
-   * Returns NULL if none is found.
+   * Returns nullptr if none is found.
    * \c fieldAssociation can be vtkDataObject::FIELD_ASSOCIATION_POINTS,
    * vtkDataObject::FIELD_ASSOCIATION_CELLS etc.
    * (use vtkDataObject::FIELD_ASSOCIATION_NONE for field data) (or
@@ -284,7 +284,7 @@ public:
    * If this instance of vtkPVDataInformation summarizes a node in a
    * composite-dataset, and if that node has been given a label in that
    * composite dataset (using vtkCompositeDataSet::NAME meta-data), then this
-   * will return that name. Returns NULL if this instance doesn't represent a
+   * will return that name. Returns nullptr if this instance doesn't represent a
    * node in a composite dataset or doesn't have a label/name associated with
    * it.
    */

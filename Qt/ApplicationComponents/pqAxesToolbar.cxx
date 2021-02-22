@@ -76,7 +76,7 @@ void pqAxesToolbar::constructor()
 
   pqRenderViewSelectionReaction* selectionReaction =
     new pqRenderViewSelectionReaction(this->Internals->actionPickCenter,
-      NULL /* track active view*/, pqRenderViewSelectionReaction::SELECT_CUSTOM_BOX);
+      nullptr /* track active view*/, pqRenderViewSelectionReaction::SELECT_CUSTOM_BOX);
   QObject::connect(selectionReaction, SIGNAL(selectedCustomBox(int, int, int, int)), this,
     SLOT(pickCenterOfRotation(int, int)));
 
@@ -87,7 +87,7 @@ void pqAxesToolbar::constructor()
 pqAxesToolbar::~pqAxesToolbar()
 {
   delete this->Internals;
-  this->Internals = 0;
+  this->Internals = nullptr;
 }
 
 //-----------------------------------------------------------------------------
@@ -117,10 +117,10 @@ void pqAxesToolbar::setView(pqView* view)
 void pqAxesToolbar::updateEnabledState()
 {
   pqRenderView* renderView = qobject_cast<pqRenderView*>(pqActiveObjects::instance().activeView());
-  this->Internals->actionShowOrientationAxes->setEnabled(renderView != NULL);
-  this->Internals->actionShowCenterAxes->setEnabled(renderView != NULL);
+  this->Internals->actionShowOrientationAxes->setEnabled(renderView != nullptr);
+  this->Internals->actionShowCenterAxes->setEnabled(renderView != nullptr);
   this->Internals->actionResetCenter->setEnabled(
-    pqActiveObjects::instance().activeRepresentation() != NULL);
+    pqActiveObjects::instance().activeRepresentation() != nullptr);
 }
 
 //-----------------------------------------------------------------------------

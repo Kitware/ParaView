@@ -45,7 +45,7 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqCreateCustomFilterReaction : public pqRea
 
 public:
   /**
-  * Constructor. Parent cannot be NULL.
+  * Constructor. Parent cannot be nullptr.
   */
   pqCreateCustomFilterReaction(QAction* parent);
 

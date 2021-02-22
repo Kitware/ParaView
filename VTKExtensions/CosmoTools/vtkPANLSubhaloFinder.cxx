@@ -171,7 +171,7 @@ int vtkPANLSubhaloFinder::RequestData(vtkInformation* vtkNotUsed(request),
   vtkUnstructuredGrid* subFofProperties = vtkUnstructuredGrid::GetData(outputVector, 1);
   vtkMultiBlockDataSet* multiBlockSubProperties = vtkMultiBlockDataSet::GetData(outputVector, 1);
 
-  if (grid != NULL)
+  if (grid != nullptr)
   {
     assert(allParticlesOutput);
     assert(subFofProperties);
@@ -188,7 +188,7 @@ int vtkPANLSubhaloFinder::RequestData(vtkInformation* vtkNotUsed(request),
     for (vtkIdType i = 0; i < numberOfInputBlocks; ++i)
     {
       vtkUnstructuredGrid* block = vtkUnstructuredGrid::SafeDownCast(multiBlockIn->GetBlock(i));
-      if (block != NULL)
+      if (block != nullptr)
       {
         vtkNew<vtkUnstructuredGrid> blockAllParticles;
         vtkNew<vtkUnstructuredGrid> blockSubProperties;

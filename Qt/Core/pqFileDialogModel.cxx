@@ -534,7 +534,7 @@ public:
 
   const pqFileDialogModelFileInfo* infoForIndex(const QModelIndex& idx) const
   {
-    if (idx.isValid() && NULL == idx.internalPointer() && idx.row() >= 0 &&
+    if (idx.isValid() && nullptr == idx.internalPointer() && idx.row() >= 0 &&
       idx.row() < this->FileList.size())
     {
       return &this->FileList[idx.row()];
@@ -549,7 +549,7 @@ public:
         return &grp[idx.row()];
       }
     }
-    return NULL;
+    return nullptr;
   }
 
   void setShowDetailedInformation(bool show)
@@ -790,7 +790,7 @@ bool pqFileDialogModel::rename(const QString& oldname, const QString& newname)
   {
     QString message("Cannot rename to %1, which already exists");
     message = message.arg(newname);
-    QMessageBox::warning(NULL, "Error renaming", message);
+    QMessageBox::warning(nullptr, "Error renaming", message);
     return false;
   }
 
@@ -979,7 +979,7 @@ QModelIndex pqFileDialogModel::index(int row, int column, const QModelIndex& p) 
     return this->createIndex(row, column);
   }
   if (p.row() >= 0 && p.row() < this->Implementation->FileList.size() &&
-    NULL == p.internalPointer())
+    nullptr == p.internalPointer())
   {
     pqFileDialogModelFileInfo* fi = &this->Implementation->FileList[p.row()];
     return this->createIndex(row, column, fi);
@@ -1008,7 +1008,7 @@ int pqFileDialogModel::rowCount(const QModelIndex& idx) const
     return this->Implementation->FileList.size();
   }
 
-  if (NULL == idx.internalPointer() && idx.row() >= 0 &&
+  if (nullptr == idx.internalPointer() && idx.row() >= 0 &&
     idx.row() < this->Implementation->FileList.size())
   {
     return this->Implementation->FileList[idx.row()].group().size();
@@ -1022,7 +1022,7 @@ bool pqFileDialogModel::hasChildren(const QModelIndex& idx) const
   if (!idx.isValid())
     return true;
 
-  if (NULL == idx.internalPointer() && idx.row() >= 0 &&
+  if (nullptr == idx.internalPointer() && idx.row() >= 0 &&
     idx.row() < this->Implementation->FileList.size())
   {
     return this->Implementation->FileList[idx.row()].isGroup();

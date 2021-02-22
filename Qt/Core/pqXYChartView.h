@@ -51,7 +51,7 @@ public:
 
 public:
   pqXYChartView(const QString& group, const QString& name, vtkSMContextViewProxy* viewModule,
-    pqServer* server, QObject* parent = NULL);
+    pqServer* server, QObject* parent = nullptr);
 
   ~pqXYChartView() override;
 

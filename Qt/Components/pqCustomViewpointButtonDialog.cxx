@@ -220,7 +220,7 @@ pqCustomViewpointButtonDialog::pqCustomViewpointButtonDialog(QWidget* Parent, Qt
 pqCustomViewpointButtonDialog::~pqCustomViewpointButtonDialog()
 {
   delete this->ui;
-  this->ui = NULL;
+  this->ui = nullptr;
 }
 
 //------------------------------------------------------------------------------
@@ -312,7 +312,7 @@ void pqCustomViewpointButtonDialog::importConfigurations()
   QString filters =
     QString("%1 (*%2);;All Files (*.*)").arg(fileInfo.FileDescription).arg(fileInfo.FileExtension);
 
-  pqFileDialog dialog(0, this, "Load Custom Viewpoints Configuration", "", filters);
+  pqFileDialog dialog(nullptr, this, "Load Custom Viewpoints Configuration", "", filters);
   dialog.setFileMode(pqFileDialog::ExistingFile);
 
   if (dialog.exec() == QDialog::Accepted)
@@ -426,7 +426,7 @@ void pqCustomViewpointButtonDialog::exportConfigurations()
   QString filters =
     QString("%1 (*%2);;All Files (*.*)").arg(fileInfo.FileDescription).arg(fileInfo.FileExtension);
 
-  pqFileDialog dialog(0, this, "Save Custom Viewpoints Configuration", "", filters);
+  pqFileDialog dialog(nullptr, this, "Save Custom Viewpoints Configuration", "", filters);
   dialog.setFileMode(pqFileDialog::AnyFile);
 
   if (dialog.exec() == QDialog::Accepted)

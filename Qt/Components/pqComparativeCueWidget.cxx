@@ -93,7 +93,7 @@ pqComparativeCueWidget::~pqComparativeCueWidget()
 {
   this->VTKConnect->Disconnect();
   this->VTKConnect->Delete();
-  this->VTKConnect = 0;
+  this->VTKConnect = nullptr;
 }
 
 //-----------------------------------------------------------------------------
@@ -112,7 +112,7 @@ void pqComparativeCueWidget::setCue(vtkSMProxy* _cue)
       this->Cue, vtkCommand::PropertyModifiedEvent, this, SLOT(updateGUIOnIdle()));
   }
   this->updateGUI();
-  this->setEnabled(this->Cue != NULL);
+  this->setEnabled(this->Cue != nullptr);
 }
 
 //-----------------------------------------------------------------------------

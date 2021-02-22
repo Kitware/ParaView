@@ -52,7 +52,7 @@ void vtkPVGL2PSExporter::WriteData()
   // Setup raster exclusions if needed
   if (this->Write3DPropsAsRasterImage != 0)
   {
-    if (this->RasterExclusions == NULL)
+    if (this->RasterExclusions == nullptr)
     {
       vtkNew<vtkPropCollection> coll;
       this->SetRasterExclusions(coll.GetPointer());

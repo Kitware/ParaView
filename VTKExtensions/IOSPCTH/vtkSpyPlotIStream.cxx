@@ -114,8 +114,8 @@ void vtkSpyPlotIStream::SetStream(istream* ist)
 
 vtkSpyPlotIStream::vtkSpyPlotIStream()
   : FileBufferSize(2097152)
-  , Buffer(0)
-  , IStream(0)
+  , Buffer(nullptr)
+  , IStream(nullptr)
 {
 }
 
@@ -124,6 +124,6 @@ vtkSpyPlotIStream::~vtkSpyPlotIStream()
   if (this->Buffer)
   {
     delete[] this->Buffer;
-    this->Buffer = NULL;
+    this->Buffer = nullptr;
   }
 }

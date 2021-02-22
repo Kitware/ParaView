@@ -262,7 +262,7 @@ vtkSelectionNode* vtkPVExtractSelection::LocateSelection(
       }
     }
   }
-  return NULL;
+  return nullptr;
 }
 
 //----------------------------------------------------------------------------
@@ -283,7 +283,7 @@ vtkSelectionNode* vtkPVExtractSelection::LocateSelection(
       }
     }
   }
-  return NULL;
+  return nullptr;
 }
 
 //----------------------------------------------------------------------------

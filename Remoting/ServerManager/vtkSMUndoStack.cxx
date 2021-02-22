@@ -136,7 +136,7 @@ vtkSMUndoStack::vtkSMUndoStack()
 vtkSMUndoStack::~vtkSMUndoStack()
 {
   delete this->Internal;
-  this->Internal = NULL;
+  this->Internal = nullptr;
 }
 
 //-----------------------------------------------------------------------------

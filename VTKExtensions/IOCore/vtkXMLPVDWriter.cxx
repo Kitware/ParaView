@@ -620,7 +620,7 @@ vtkXMLWriter* vtkXMLPVDWriter::GetWriter(int index)
   {
     return this->Internal->Writers[index].GetPointer();
   }
-  return 0;
+  return nullptr;
 }
 
 //----------------------------------------------------------------------------

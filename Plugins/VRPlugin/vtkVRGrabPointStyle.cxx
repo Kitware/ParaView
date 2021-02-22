@@ -101,7 +101,7 @@ bool vtkVRGrabPointStyle::Update()
 //   I would like to get an explanation so we know if we can do the same here.
 vtkCamera* vtkVRGrabPointStyle::GetCamera()
 {
-  vtkCamera* camera = NULL;
+  vtkCamera* camera = nullptr;
   pqActiveObjects& activeObjs = pqActiveObjects::instance();
 
   /* Alert!  The following conditional uses a lazy assignment/evaluation -- the "=" is not a bug
@@ -155,7 +155,7 @@ void vtkVRGrabPointStyle::HandleButton(const vtkVREvent& event)
 // HandleTracker() method
 void vtkVRGrabPointStyle::HandleTracker(const vtkVREvent& event)
 {
-  vtkCamera* camera = NULL;
+  vtkCamera* camera = nullptr;
   std::string role = this->GetTrackerRole(event.name);
   if (role != "Move position")
     return;

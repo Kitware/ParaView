@@ -44,7 +44,7 @@ inline ostream& operator<<(ostream& os, const vtkSpyPlotWriteString& c)
 //-----------------------------------------------------------------------------
 vtkSpyPlotUniReader::vtkSpyPlotUniReader()
 {
-  this->FileName = 0;
+  this->FileName = nullptr;
   this->FileVersion = 0;
   this->SizeOfFilePointer = 32;
   this->FileCompressionFlag = 0;
@@ -59,19 +59,19 @@ vtkSpyPlotUniReader::vtkSpyPlotUniReader()
   this->NumberOfPossibleCellFields = 0;
   this->NumberOfPossibleMaterialFields = 0;
 
-  this->CellFields = 0;
-  this->MaterialFields = 0;
+  this->CellFields = nullptr;
+  this->MaterialFields = nullptr;
 
   this->NumberOfDataDumps = 0;
-  this->DumpCycle = 0;
-  this->DumpTime = 0;
-  this->DumpDT = 0;
-  this->DumpOffset = 0;
+  this->DumpCycle = nullptr;
+  this->DumpTime = nullptr;
+  this->DumpDT = nullptr;
+  this->DumpOffset = nullptr;
 
-  this->DataDumps = 0;
-  this->Blocks = 0;
+  this->DataDumps = nullptr;
+  this->Blocks = nullptr;
 
-  this->CellArraySelection = 0;
+  this->CellArraySelection = nullptr;
 
   this->TimeStepRange[0] = this->TimeStepRange[1] = 0;
   this->TimeRange[0] = this->TimeRange[1] = 0.0;
@@ -139,8 +139,8 @@ vtkSpyPlotUniReader::~vtkSpyPlotUniReader()
   }
   delete[] this->DataDumps;
   delete[] this->Blocks;
-  this->SetFileName(0);
-  this->SetCellArraySelection(0);
+  this->SetFileName(nullptr);
+  this->SetCellArraySelection(nullptr);
 
   if (this->MarkersOn)
   {
@@ -312,14 +312,14 @@ int vtkSpyPlotUniReader::MakeCurrent()
             if (cv->DataBlocks[ca])
             {
               cv->DataBlocks[ca]->Delete();
-              cv->DataBlocks[ca] = 0;
+              cv->DataBlocks[ca] = nullptr;
             }
           }
           vtkDebugMacro("* Delete Data blocks for variable: " << cv->Name);
           delete[] cv->DataBlocks;
-          cv->DataBlocks = 0;
+          cv->DataBlocks = nullptr;
           delete[] cv->GhostCellsFixed;
-          cv->GhostCellsFixed = 0;
+          cv->GhostCellsFixed = nullptr;
         }
       }
     }
@@ -352,12 +352,12 @@ int vtkSpyPlotUniReader::MakeCurrent()
         for (dataBlock = 0; dataBlock < dp->ActualNumberOfBlocks; ++dataBlock)
         {
           var->DataBlocks[dataBlock]->Delete();
-          var->DataBlocks[dataBlock] = 0;
+          var->DataBlocks[dataBlock] = nullptr;
         }
         delete[] var->DataBlocks;
-        var->DataBlocks = 0;
+        var->DataBlocks = nullptr;
         delete[] var->GhostCellsFixed;
-        var->GhostCellsFixed = 0;
+        var->GhostCellsFixed = nullptr;
         vtkDebugMacro("* Delete Data blocks for variable: " << var->Name);
       }
       vtkDebugMacro(" *** Ignore variable: " << var->Name);
@@ -398,9 +398,9 @@ int vtkSpyPlotUniReader::MakeCurrent()
       vtkSpyPlotBlock* bk = this->Blocks + block;
       if (bk->IsAllocated())
       {
-        vtkFloatArray* floatArray = 0;
-        vtkUnsignedCharArray* unsignedCharArray = 0;
-        vtkDataArray* dataArray = 0;
+        vtkFloatArray* floatArray = nullptr;
+        vtkUnsignedCharArray* unsignedCharArray = nullptr;
+        vtkDataArray* dataArray = nullptr;
         if (this->CellArraySelection->ArrayIsEnabled(var->Name) && !var->DataBlocks[actualBlockId])
         {
           if (this->DownConvertVolumeFraction && this->IsVolumeFraction(var))
@@ -862,7 +862,7 @@ vtkSpyPlotBlock* vtkSpyPlotUniReader::GetBlock(int block)
   {
     vtkDebugMacro(<< __LINE__ << " " << this << " Read: " << this->HaveInformation);
     if (!this->ReadInformation())
-      return 0;
+      return nullptr;
   }
   int cb = 0;
   int blockId;
@@ -877,7 +877,7 @@ vtkSpyPlotBlock* vtkSpyPlotUniReader::GetBlock(int block)
       cb++;
     }
   }
-  return 0;
+  return nullptr;
 }
 
 //-----------------------------------------------------------------------------
@@ -892,7 +892,7 @@ vtkSpyPlotUniReader::Variable* vtkSpyPlotUniReader::GetCellField(int field)
   vtkSpyPlotUniReader::DataDump* dp = this->DataDumps + this->CurrentTimeStep;
   if (field < 0 || field >= dp->NumVars)
   {
-    return 0;
+    return nullptr;
   }
   return dp->Variables + field;
 }
@@ -903,7 +903,7 @@ const char* vtkSpyPlotUniReader::GetCellFieldName(int field)
   vtkSpyPlotUniReader::Variable* var = this->GetCellField(field);
   if (!var)
   {
-    return 0;
+    return nullptr;
   }
   return var->Name;
 }
@@ -914,12 +914,12 @@ vtkDataArray* vtkSpyPlotUniReader::GetCellFieldData(int block, int field, int* f
   vtkSpyPlotUniReader::DataDump* dp = this->DataDumps + this->CurrentTimeStep;
   if (block < 0 || block > dp->ActualNumberOfBlocks)
   {
-    return 0;
+    return nullptr;
   }
   vtkSpyPlotUniReader::Variable* var = this->GetCellField(field);
   if (!var)
   {
-    return 0;
+    return nullptr;
   }
 
   *fixed = var->GhostCellsFixed[block];
@@ -933,20 +933,20 @@ vtkDataArray* vtkSpyPlotUniReader::GetCellFieldData(int block, int field, int* f
 vtkDataArray* vtkSpyPlotUniReader::GetMaterialField(
   const int& block, const int& materialIndex, const char* id)
 {
-  vtkSpyPlotUniReader::Variable* var = NULL;
+  vtkSpyPlotUniReader::Variable* var = nullptr;
   vtkSpyPlotUniReader::DataDump* dp = this->DataDumps + this->CurrentTimeStep;
   for (int v = 0; v < dp->NumVars; ++v)
   {
     var = &dp->Variables[v];
     if (strcmp(var->MaterialField->Id, id) == 0)
     {
-      if (var->Index == materialIndex && var->DataBlocks != NULL)
+      if (var->Index == materialIndex && var->DataBlocks != nullptr)
       {
         return var->DataBlocks[block];
       }
     }
   }
-  return NULL;
+  return nullptr;
 }
 //-----------------------------------------------------------------------------
 vtkDataArray* vtkSpyPlotUniReader::GetMaterialMassField(const int& block, const int& materialIndex)
@@ -991,7 +991,7 @@ vtkFloatArray* vtkSpyPlotUniReader::GetTracers()
   else
   {
     vtkDebugMacro("GetTracers() = " << 0);
-    return 0;
+    return nullptr;
   }
 }
 //-----------------------------------------------------------------------------
@@ -1274,7 +1274,7 @@ int vtkSpyPlotUniReader::ReadGroupHeaderInformation(vtkSpyPlotIStream* spis)
     nch.NumberOfDataDumps = this->NumberOfDataDumps + gh.NumberOfDataDumps;
     nch.DumpCycle = new int[nch.NumberOfDataDumps];
     nch.DumpTime = new double[nch.NumberOfDataDumps];
-    nch.DumpDT = NULL;
+    nch.DumpDT = nullptr;
     if (this->FileVersion >= 102)
     {
       nch.DumpDT = new double[nch.NumberOfDataDumps];
@@ -1549,7 +1549,7 @@ int vtkSpyPlotUniReader::ReadDataDumps(vtkSpyPlotIStream* spis)
       vtkSpyPlotUniReader::Variable* variable = dh->Variables + fieldCnt;
       variable->Material = -1;
       variable->Index = -1;
-      variable->DataBlocks = 0;
+      variable->DataBlocks = nullptr;
       int var = dh->SavedVariables[fieldCnt];
       if (var >= this->NumberOfPossibleCellFields)
       {

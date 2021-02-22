@@ -52,7 +52,7 @@ vtkAnimationPlayer* vtkCompositeAnimationPlayer::GetActivePlayer()
     case SNAP_TO_TIMESTEPS:
       return this->TimestepsAnimationPlayer;
   }
-  return NULL;
+  return nullptr;
 }
 
 //----------------------------------------------------------------------------

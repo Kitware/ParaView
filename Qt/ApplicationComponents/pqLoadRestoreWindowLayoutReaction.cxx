@@ -55,7 +55,7 @@ void pqLoadRestoreWindowLayoutReaction::onTriggered()
 {
   QMainWindow* window = qobject_cast<QMainWindow*>(pqCoreUtilities::mainWidget());
 
-  pqFileDialog fileDialog(NULL, window, this->parentAction()->text(), QString(),
+  pqFileDialog fileDialog(nullptr, window, this->parentAction()->text(), QString(),
     "ParaView Window Layout (*.pwin);;All files (*)");
   fileDialog.setFileMode(this->Load ? pqFileDialog::ExistingFile : pqFileDialog::AnyFile);
   fileDialog.setObjectName("LoadRestoreWindowLayout");

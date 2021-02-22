@@ -117,7 +117,7 @@ bool pqLinkViewWidget::eventFilter(QObject* watched, QEvent* e)
     }
 
     QWidget* wid = qobject_cast<QWidget*>(watched);
-    pqRenderView* otherView = 0;
+    pqRenderView* otherView = nullptr;
 
     QList<pqRenderView*> views = smModel->findItems<pqRenderView*>();
     foreach (pqRenderView* view, views)

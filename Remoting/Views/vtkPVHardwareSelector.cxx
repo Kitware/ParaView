@@ -61,7 +61,7 @@ vtkPVHardwareSelector::vtkPVHardwareSelector()
 vtkPVHardwareSelector::~vtkPVHardwareSelector()
 {
   delete this->Internals;
-  this->Internals = 0;
+  this->Internals = nullptr;
 }
 
 //----------------------------------------------------------------------------
@@ -117,7 +117,7 @@ vtkSelection* vtkPVHardwareSelector::Select(int region[4])
 {
   if (!this->PrepareSelect())
   {
-    return NULL;
+    return nullptr;
   }
 
   vtkSelection* sel = this->GenerateSelection(region[0], region[1], region[2], region[3]);
@@ -146,7 +146,7 @@ vtkSelection* vtkPVHardwareSelector::PolygonSelect(int* polygonPoints, vtkIdType
 {
   if (!this->PrepareSelect())
   {
-    return NULL;
+    return nullptr;
   }
   return this->GeneratePolygonSelection(polygonPoints, count);
 }

@@ -65,7 +65,7 @@ vtkStandardNewMacro(vtkSMDomain);
 //---------------------------------------------------------------------------
 vtkSMDomain::vtkSMDomain()
 {
-  this->XMLName = 0;
+  this->XMLName = nullptr;
   this->Internals = new vtkSMDomainInternals;
   this->IsOptional = false;
 
@@ -76,7 +76,7 @@ vtkSMDomain::vtkSMDomain()
 //---------------------------------------------------------------------------
 vtkSMDomain::~vtkSMDomain()
 {
-  this->SetXMLName(0);
+  this->SetXMLName(nullptr);
   delete this->Internals;
 }
 
@@ -95,7 +95,7 @@ vtkSMProperty* vtkSMDomain::GetRequiredProperty(const char* function)
   {
     return iter->second.GetPointer();
   }
-  return 0;
+  return nullptr;
 }
 
 //---------------------------------------------------------------------------
@@ -188,7 +188,7 @@ vtkPVDataInformation* vtkSMDomain::GetInputDataInformation(const char* function,
   vtkSMProperty* inputProperty = this->GetRequiredProperty(function);
   if (!inputProperty)
   {
-    return NULL;
+    return nullptr;
   }
 
   vtkSMUncheckedPropertyHelper helper(inputProperty);
@@ -201,7 +201,7 @@ vtkPVDataInformation* vtkSMDomain::GetInputDataInformation(const char* function,
     }
   }
 
-  return NULL;
+  return nullptr;
 }
 
 //---------------------------------------------------------------------------

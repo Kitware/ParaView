@@ -363,7 +363,7 @@ public:
     this->reset();
     this->Index = index++;
     lookupMap[this->Index] = this;
-    if (info == nullptr || info->GetCompositeDataClassName() == 0)
+    if (info == nullptr || info->GetCompositeDataClassName() == nullptr)
     {
       this->Name = info != nullptr ? info->GetPrettyDataTypeString() : "(empty)";
       this->DataType = info != nullptr ? info->GetDataSetType() : -1;

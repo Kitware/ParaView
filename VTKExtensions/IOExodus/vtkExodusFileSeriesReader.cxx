@@ -179,14 +179,14 @@ int vtkExodusFileSeriesReader::RequestInformationForInput(
     // push values to FilePattern and FilePrefix when in fact these should be
     // set internally (bug #10570).  This is a problem when we really have a
     // time file series.  Since the FilePattern/Prefix don't work with a time
-    // file series, just set them to NULL.
+    // file series, just set them to nullptr.
     if (this->GetNumberOfFileNames() > 1)
     {
       vtkPExodusIIReader* preader = vtkPExodusIIReader::SafeDownCast(reader);
       if (preader)
       {
-        preader->SetFilePattern(NULL);
-        preader->SetFilePrefix(NULL);
+        preader->SetFilePattern(nullptr);
+        preader->SetFilePrefix(nullptr);
       }
     }
 

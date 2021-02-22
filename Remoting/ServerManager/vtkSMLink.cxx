@@ -30,10 +30,10 @@ public:
   static vtkSMLinkObserver* New() { return new vtkSMLinkObserver; }
   vtkSMLinkObserver()
   {
-    this->Link = 0;
+    this->Link = nullptr;
     this->InProgress = false;
   }
-  ~vtkSMLinkObserver() override { this->Link = 0; }
+  ~vtkSMLinkObserver() override { this->Link = nullptr; }
 
   void Execute(vtkObject* c, unsigned long event, void* pname) override
   {
@@ -88,11 +88,11 @@ vtkSMLink::vtkSMLink()
 //-----------------------------------------------------------------------------
 vtkSMLink::~vtkSMLink()
 {
-  ((vtkSMLinkObserver*)this->Observer)->Link = NULL;
+  ((vtkSMLinkObserver*)this->Observer)->Link = nullptr;
   this->Observer->Delete();
-  this->Observer = NULL;
+  this->Observer = nullptr;
   delete this->State;
-  this->State = NULL;
+  this->State = nullptr;
 }
 
 //-----------------------------------------------------------------------------

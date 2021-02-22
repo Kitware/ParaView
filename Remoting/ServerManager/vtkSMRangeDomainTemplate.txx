@@ -47,7 +47,7 @@ int vtkSMRangeDomainTemplate<T>::IsInDomain(vtkSMProperty* property)
     return 1;
   }
 
-  if (property == NULL)
+  if (property == nullptr)
   {
     return 0;
   }

@@ -40,29 +40,29 @@ vtkCxxSetObjectMacro(vtkSMPropertyGroup, Hints, vtkPVXMLElement);
 vtkSMPropertyGroup::vtkSMPropertyGroup()
   : Internals(new vtkSMPropertyGroupInternals)
 {
-  this->Name = 0;
-  this->XMLLabel = 0;
-  this->PanelWidget = 0;
-  this->PanelVisibility = 0;
+  this->Name = nullptr;
+  this->XMLLabel = nullptr;
+  this->PanelWidget = nullptr;
+  this->PanelVisibility = nullptr;
 
   // by default, properties are set to always shown
   this->SetPanelVisibility("default");
 
   this->Documentation = vtkSMDocumentation::New();
-  this->Hints = 0;
+  this->Hints = nullptr;
 }
 
 //---------------------------------------------------------------------------
 vtkSMPropertyGroup::~vtkSMPropertyGroup()
 {
-  this->SetXMLLabel(0);
-  this->SetName(0);
-  this->SetPanelWidget(0);
-  this->SetPanelVisibility(0);
+  this->SetXMLLabel(nullptr);
+  this->SetName(nullptr);
+  this->SetPanelWidget(nullptr);
+  this->SetPanelVisibility(nullptr);
   delete this->Internals;
   this->Documentation->Delete();
-  this->Documentation = NULL;
-  this->SetHints(0);
+  this->Documentation = nullptr;
+  this->SetHints(nullptr);
 }
 
 //---------------------------------------------------------------------------
@@ -102,7 +102,7 @@ vtkSMProperty* vtkSMPropertyGroup::GetProperty(const char* function) const
     return this->Internals->PropertiesMap[function];
   }
 
-  return NULL;
+  return nullptr;
 }
 
 //---------------------------------------------------------------------------
@@ -126,7 +126,7 @@ const char* vtkSMPropertyGroup::GetFunction(vtkSMProperty* property) const
       }
     }
   }
-  return NULL;
+  return nullptr;
 }
 
 //---------------------------------------------------------------------------
@@ -190,7 +190,7 @@ int vtkSMPropertyGroup::ReadXMLAttributes(vtkSMProxy* proxy, vtkPVXMLElement* gr
     // "name".
     const char* propname = elem->GetAttribute("exposed_name") ? elem->GetAttribute("exposed_name")
                                                               : elem->GetAttribute("name");
-    vtkSMProperty* property = propname ? proxy->GetProperty(propname) : NULL;
+    vtkSMProperty* property = propname ? proxy->GetProperty(propname) : nullptr;
     if (!property)
     {
       vtkWarningMacro("Failed to locate property '" << (propname ? propname : "(none)")
@@ -199,7 +199,7 @@ int vtkSMPropertyGroup::ReadXMLAttributes(vtkSMProxy* proxy, vtkPVXMLElement* gr
     else
     {
       const char* functionAttribute = elem->GetAttribute("function");
-      if (functionAttribute == 0)
+      if (functionAttribute == nullptr)
       {
         functionAttribute = elem->GetAttribute("name");
       }

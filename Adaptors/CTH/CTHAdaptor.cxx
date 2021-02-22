@@ -31,8 +31,8 @@
 namespace
 {
 vtkCTHSource gSource;
-vtkCPProcessor* coProcessor = 0;
-vtkCPDataDescription* coProcessorData = 0;
+vtkCPProcessor* coProcessor = nullptr;
+vtkCPDataDescription* coProcessorData = nullptr;
 }
 
 #if !defined(_WIN32)
@@ -90,7 +90,7 @@ void pvspy_fil(char* filename, int len, char* /*runid*/, int* /*error*/)
       char* tok = strtok(line, " ");
       if (tok && strstr(tok, "*paraview"))
       {
-        script = strtok(0, " ");
+        script = strtok(nullptr, " ");
         len = static_cast<int>(strlen(script) + 1);
         break;
       }
@@ -131,10 +131,10 @@ void pvspy_viz(int cycle, double ptime, double /*pdt*/, int, int)
 void pvspy_fin()
 {
   coProcessor->Delete();
-  coProcessor = 0;
+  coProcessor = nullptr;
 
   coProcessorData->Delete();
-  coProcessorData = 0;
+  coProcessorData = nullptr;
 }
 
 //------------------------------------------------------------------------------

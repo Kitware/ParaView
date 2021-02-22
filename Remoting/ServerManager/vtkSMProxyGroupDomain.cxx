@@ -135,7 +135,7 @@ unsigned int vtkSMProxyGroupDomain::GetNumberOfProxies()
 //---------------------------------------------------------------------------
 const char* vtkSMProxyGroupDomain::GetProxyName(unsigned int idx)
 {
-  const char* proxyName = 0;
+  const char* proxyName = nullptr;
   unsigned int proxyCount = 0;
   unsigned int prevProxyCount = 0;
 
@@ -167,7 +167,7 @@ vtkSMProxy* vtkSMProxyGroupDomain::GetProxy(unsigned int idx)
 //---------------------------------------------------------------------------
 const char* vtkSMProxyGroupDomain::GetProxyName(vtkSMProxy* proxy)
 {
-  const char* proxyName = 0;
+  const char* proxyName = nullptr;
 
   assert("Session should be set by now" && this->Session);
   vtkSMSessionProxyManager* pm = this->GetSessionProxyManager();
@@ -203,7 +203,7 @@ vtkSMProxy* vtkSMProxyGroupDomain::GetProxy(const char* name)
       }
     }
   }
-  return 0;
+  return nullptr;
 }
 
 //---------------------------------------------------------------------------

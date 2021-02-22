@@ -76,7 +76,7 @@ public:
 
 //-----------------------------------------------------------------------------
 pqAnimationScene::pqAnimationScene(const QString& group, const QString& name, vtkSMProxy* proxy,
-  pqServer* server, QObject* _parent /*=NULL*/)
+  pqServer* server, QObject* _parent /*=nullptr*/)
   : pqProxy(group, name, proxy, server, _parent)
 {
   vtkObject* animationScene = vtkObject::SafeDownCast(proxy->GetClientSideObject());
@@ -216,7 +216,7 @@ pqAnimationCue* pqAnimationScene::getCue(
       return pqCue;
     }
   }
-  return 0;
+  return nullptr;
 }
 
 //-----------------------------------------------------------------------------
@@ -235,16 +235,17 @@ pqAnimationCue* pqAnimationScene::createCue(
 //-----------------------------------------------------------------------------
 pqAnimationCue* pqAnimationScene::createCue(const QString& cuetype)
 {
-  return this->createCueInternal(cuetype, NULL, NULL, -1);
+  return this->createCueInternal(cuetype, nullptr, nullptr, -1);
 }
 
 //-----------------------------------------------------------------------------
 static void pqAnimationSceneResetCameraKeyFrameToCurrent(vtkSMProxy* ren, vtkSMProxy* dest)
 {
   ren->UpdatePropertyInformation();
-  const char* names[] = { "Position", "FocalPoint", "ViewUp", "ViewAngle", "ParallelScale", 0 };
+  const char* names[] = { "Position", "FocalPoint", "ViewUp", "ViewAngle", "ParallelScale",
+    nullptr };
   const char* snames[] = { "CameraPositionInfo", "CameraFocalPointInfo", "CameraViewUpInfo",
-    "CameraViewAngle", "CameraParallelScale", 0 };
+    "CameraViewAngle", "CameraParallelScale", nullptr };
   for (int cc = 0; names[cc] && snames[cc]; cc++)
   {
     QList<QVariant> p = pqSMAdaptor::getMultipleElementProperty(ren->GetProperty(snames[cc]));
@@ -365,7 +366,7 @@ pqAnimationCue* pqAnimationScene::createCueInternal(
   if (!cue)
   {
     qDebug() << "Failed to create AnimationCue.";
-    return 0;
+    return nullptr;
   }
 
   if (proxy)

@@ -91,7 +91,7 @@ vtkDataObject* vtkMultiProcessControllerHelper::MergePieces(
 {
   if (num_pieces == 0)
   {
-    return NULL;
+    return nullptr;
   }
 
   vtkDataObject* result = pieces[0]->NewInstance();
@@ -108,7 +108,7 @@ vtkDataObject* vtkMultiProcessControllerHelper::MergePieces(
     return result;
   }
   result->Delete();
-  return NULL;
+  return nullptr;
 }
 
 //-----------------------------------------------------------------------------
@@ -133,7 +133,7 @@ bool vtkMultiProcessControllerHelper::MergePieces(
   }
 
   // PolyData and Unstructured grid need different append filters.
-  vtkAlgorithm* appender = NULL;
+  vtkAlgorithm* appender = nullptr;
   if (vtkPolyData::SafeDownCast(result))
   {
     appender = vtkAppendPolyData::New();

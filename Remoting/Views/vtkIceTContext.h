@@ -31,7 +31,7 @@
  *
  *
  * @bug
- * If you set the communicator to NULL and then to a valid value, the IceT state
+ * If you set the communicator to nullptr and then to a valid value, the IceT state
  * will be lost.
  *
  * @sa

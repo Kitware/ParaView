@@ -21,13 +21,13 @@ vtkCxxSetObjectMacro(vtkCPGridBuilder, FieldBuilder, vtkCPBaseFieldBuilder);
 //----------------------------------------------------------------------------
 vtkCPGridBuilder::vtkCPGridBuilder()
 {
-  this->FieldBuilder = 0;
+  this->FieldBuilder = nullptr;
 }
 
 //----------------------------------------------------------------------------
 vtkCPGridBuilder::~vtkCPGridBuilder()
 {
-  this->SetFieldBuilder(0);
+  this->SetFieldBuilder(nullptr);
 }
 
 //----------------------------------------------------------------------------

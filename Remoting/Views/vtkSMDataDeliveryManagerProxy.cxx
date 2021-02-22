@@ -55,7 +55,7 @@ void vtkSMDataDeliveryManagerProxy::Deliver(bool interactive)
 {
   this->CreateVTKObjects();
 
-  assert(this->ViewProxy != NULL);
+  assert(this->ViewProxy != nullptr);
 
   auto view = vtkPVView::SafeDownCast(this->ViewProxy->GetClientSideObject());
   auto renderview = vtkPVRenderView::SafeDownCast(view);

@@ -84,15 +84,15 @@ vtkSMTrace::vtkSMTrace()
     {
       vtkErrorMacro(
         "Failed to locate the _create_trace_item_internal function in paraview.smtrace module.");
-      this->Internals->TraceModule.TakeReference(NULL);
+      this->Internals->TraceModule.TakeReference(nullptr);
     }
     this->Internals->UntraceableException.TakeReference(
       PyObject_GetAttrString(this->Internals->TraceModule, "Untraceable"));
     if (!this->Internals->UntraceableException)
     {
       vtkErrorMacro("Failed to locate the Untraceable exception class in paraview.smtrace module.");
-      this->Internals->TraceModule.TakeReference(NULL);
-      this->Internals->CreateItemFunction.TakeReference(NULL);
+      this->Internals->TraceModule.TakeReference(nullptr);
+      this->Internals->CreateItemFunction.TakeReference(nullptr);
     }
   }
 #endif
@@ -102,13 +102,13 @@ vtkSMTrace::vtkSMTrace()
 vtkSMTrace::~vtkSMTrace()
 {
   delete this->Internals;
-  this->Internals = NULL;
+  this->Internals = nullptr;
 }
 
 //----------------------------------------------------------------------------
 std::string vtkSMTrace::GetState(vtkSMProxy* options)
 {
-  if (vtkSMTrace::ActiveTracer.GetPointer() != NULL)
+  if (vtkSMTrace::ActiveTracer.GetPointer() != nullptr)
   {
     vtkGenericWarningMacro("Tracing is active. Cannot save state.");
     return std::string();
@@ -154,7 +154,7 @@ std::string vtkSMTrace::GetState(vtkSMProxy* options)
 //----------------------------------------------------------------------------
 vtkSMTrace* vtkSMTrace::StartTrace(const char* preamble)
 {
-  if (vtkSMTrace::ActiveTracer.GetPointer() == NULL)
+  if (vtkSMTrace::ActiveTracer.GetPointer() == nullptr)
   {
     vtkSMTrace::ActiveTracer = vtkSmartPointer<vtkSMTrace>::New();
 #if VTK_MODULE_ENABLE_VTK_PythonInterpreter && VTK_MODULE_ENABLE_VTK_Python &&                     \
@@ -162,7 +162,7 @@ vtkSMTrace* vtkSMTrace::StartTrace(const char* preamble)
     if (!vtkSMTrace::ActiveTracer->Internals->TraceModule)
     {
       vtkGenericWarningMacro("Trace not started since required Python modules are missing.");
-      vtkSMTrace::ActiveTracer = NULL;
+      vtkSMTrace::ActiveTracer = nullptr;
     }
     else
     {
@@ -238,7 +238,7 @@ std::string vtkSMTrace::GetCurrentTrace()
   vtkSMTrace* active = vtkSMTrace::ActiveTracer;
   vtkPythonScopeGilEnsurer gilEnsurer;
   vtkSmartPyObject get_current_trace_output(PyObject_CallMethod(
-    active->GetTraceModule(), const_cast<char*>("get_current_trace_output"), NULL));
+    active->GetTraceModule(), const_cast<char*>("get_current_trace_output"), nullptr));
   if (active->CheckForError() == false && get_current_trace_output)
   {
     // no error.
@@ -375,7 +375,7 @@ vtkSMTrace::TraceItemArgs& vtkSMTrace::TraceItemArgs::arg(const char* key, const
     vtkPythonScopeGilEnsurer gilEnsurer;
     vtkSmartPyObject keyObj(PyString_FromString(key));
     vtkSmartPyObject valObj;
-    if (val == NULL)
+    if (val == nullptr)
     {
       PyObject* none = Py_None;
       Py_INCREF(none);
@@ -649,14 +649,14 @@ vtkSMTrace::TraceItem::~TraceItem()
   {
     vtkPythonScopeGilEnsurer gilEnsurer;
     vtkSmartPyObject reply(
-      PyObject_CallMethod(this->Internals->PyItem, const_cast<char*>("finalize"), NULL));
+      PyObject_CallMethod(this->Internals->PyItem, const_cast<char*>("finalize"), nullptr));
     tracer->CheckForError();
     tracer->InvokeEvent(vtkCommand::UpdateEvent);
   }
 #endif
 
   delete this->Internals;
-  this->Internals = NULL;
+  this->Internals = nullptr;
 
 #if VTK_MODULE_ENABLE_VTK_PythonInterpreter && VTK_MODULE_ENABLE_VTK_Python &&                     \
   VTK_MODULE_ENABLE_VTK_WrappingPythonCore
@@ -703,7 +703,7 @@ void vtkSMTrace::TraceItem::operator=(const TraceItemArgs& arguments)
       PyTuple_SET_ITEM(args.GetPointer(), 2, none);
     }
     this->Internals->PyItem.TakeReference(
-      PyObject_Call(tracer->GetCreateItemFunction(), args, NULL));
+      PyObject_Call(tracer->GetCreateItemFunction(), args, nullptr));
     tracer->CheckForError();
   }
 #endif

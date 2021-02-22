@@ -130,14 +130,14 @@ vtkACosmoReader::vtkACosmoReader()
   this->Level = 1;
   this->TotalNumberOfLevels = 0;
 
-  this->MetaData = NULL;
+  this->MetaData = nullptr;
   this->MetadataIsLoaded = false;
 }
 
 //----------------------------------------------------------------------------
 vtkACosmoReader::~vtkACosmoReader()
 {
-  if (this->MetaData != NULL)
+  if (this->MetaData != nullptr)
   {
     this->MetaData->Delete();
   }
@@ -402,11 +402,11 @@ int vtkACosmoReader::RequestInformation(
       int blockIdx = this->GetBlockIndex(i, j);
 
       // NOTE: we just store metadata in the information object of each block
-      levelBlocks->SetBlock(j, NULL);
+      levelBlocks->SetBlock(j, nullptr);
 
       // Set the bounds on the block metadata
       vtkInformation* blockMetadata = levelBlocks->GetMetaData(j);
-      assert("pre: block metadata is NULL!" && (blockMetadata != NULL));
+      assert("pre: block metadata is nullptr!" && (blockMetadata != nullptr));
       blockMetadata->Set(
         vtkStreamingDemandDrivenPipeline::BOUNDS(), this->ParticleBlocks[blockIdx].Bounds, 6);
 
@@ -418,7 +418,7 @@ int vtkACosmoReader::RequestInformation(
 
   // STEP 4: Push the metadata on the pipeline
   vtkInformation* info = outputVector->GetInformationObject(0);
-  assert("pre: output information object is NULL" && (info != NULL));
+  assert("pre: output information object is nullptr" && (info != nullptr));
   info->Set(vtkCompositeDataPipeline::COMPOSITE_DATA_META_DATA(), this->MetaData);
 
   return 1;
@@ -427,7 +427,7 @@ int vtkACosmoReader::RequestInformation(
 //----------------------------------------------------------------------------
 void vtkACosmoReader::SetupBlockRequest(vtkInformation* outInfo)
 {
-  assert("pre: output information should not be NULL!" && (outInfo != NULL));
+  assert("pre: output information should not be nullptr!" && (outInfo != nullptr));
 
 #ifdef DEBUG
   std::cout << "\t[INFO]: Setting up block request...\n";
@@ -492,11 +492,11 @@ void vtkACosmoReader::ReadBlock(const int blockIdx, vtkMultiBlockDataSet* mbds)
   assert("pre: blockIdx is out-of-bounds!" && (blockIdx >= 0) &&
     (blockIdx < static_cast<int>(this->ParticleBlocks.size())));
 
-  assert("pre: multiblock output dataset is NULL!" && (mbds != NULL));
+  assert("pre: multiblock output dataset is nullptr!" && (mbds != nullptr));
 
   // STEP 0: Get block and level/index information
   block_t* blockPtr = &this->ParticleBlocks[blockIdx];
-  assert("pre: blockPtr is NULL!" && (blockPtr != NULL));
+  assert("pre: blockPtr is nullptr!" && (blockPtr != nullptr));
   int level = blockPtr->Level;
   int index = blockPtr->IndexWithinLevel;
 
@@ -523,7 +523,7 @@ void vtkACosmoReader::ReadBlock(const int blockIdx, vtkMultiBlockDataSet* mbds)
 
   // STEP 4: Store the block in the output multi-block data-structure
   vtkMultiBlockDataSet* levelDS = vtkMultiBlockDataSet::SafeDownCast(mbds->GetBlock(level));
-  assert("pre: level data-structure is NULL!" && (levelDS != NULL));
+  assert("pre: level data-structure is nullptr!" && (levelDS != nullptr));
   levelDS->SetBlock(index, particles);
   particles->Delete();
 }
@@ -541,8 +541,8 @@ int vtkACosmoReader::RequestData(vtkInformation* vtkNotUsed(request),
   vtkInformation* outInfo = outputVector->GetInformationObject(0);
   vtkMultiBlockDataSet* output =
     vtkMultiBlockDataSet::SafeDownCast(outInfo->Get(vtkDataObject::DATA_OBJECT()));
-  assert("pre: output information object is NULL!" && (outInfo != NULL));
-  assert("pre: output object is NULL!" && (output != NULL));
+  assert("pre: output information object is nullptr!" && (outInfo != nullptr));
+  assert("pre: output object is nullptr!" && (output != nullptr));
 
   // STEP 1: Setup the block request
   this->SetupBlockRequest(outInfo);
@@ -564,8 +564,8 @@ int vtkACosmoReader::RequestData(vtkInformation* vtkNotUsed(request),
     this->ReadBlock(blockIdx, output);
   } // END for all requested blocks
 
-  outInfo = NULL;
-  output = NULL;
+  outInfo = nullptr;
+  output = nullptr;
   return 1;
 }
 
@@ -573,7 +573,7 @@ int vtkACosmoReader::RequestData(vtkInformation* vtkNotUsed(request),
 void vtkACosmoReader::ReadBlockFromFile(
   std::string file, const int start, const int end, vtkUnstructuredGrid* particles)
 {
-  assert("pre: input particles grid is NULL!" && (particles != NULL));
+  assert("pre: input particles grid is nullptr!" && (particles != nullptr));
 
 #ifdef DEBUG
   std::cout << "\t[INFO]: Reading Block from \"" << file << "\"\n";
@@ -719,9 +719,9 @@ void vtkACosmoReader::ReadBlockFromFile(
   particles->Squeeze();
 
   // STEP 6: cleanup and close the file
-  velPtr = NULL;
-  massPtr = NULL;
-  tagPtr = NULL;
+  velPtr = nullptr;
+  massPtr = nullptr;
+  tagPtr = nullptr;
 
   ifs.close();
 }

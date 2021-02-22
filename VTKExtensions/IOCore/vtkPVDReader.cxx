@@ -70,7 +70,7 @@ void vtkPVDReader::ReadXMLData()
   vtkInformation* outInfo = this->GetCurrentOutputInformation();
 
   int tsLength = 0;
-  double* steps = 0;
+  double* steps = nullptr;
   if (outInfo->Has(vtkStreamingDemandDrivenPipeline::TIME_STEPS()))
   {
     tsLength = outInfo->Length(vtkStreamingDemandDrivenPipeline::TIME_STEPS());
@@ -101,7 +101,7 @@ void vtkPVDReader::ReadXMLData()
       bool found = false;
       while (cnt2 < tsLength && !found)
       {
-        double val = strtod(this->GetAttributeValue("timestep", cnt2), NULL);
+        double val = strtod(this->GetAttributeValue("timestep", cnt2), nullptr);
         if (val == steps[cnt])
         {
           found = true;
@@ -180,7 +180,7 @@ int vtkPVDReader::RequestInformation(
   for (int i = 0; i < numTimeSteps; i++)
   {
     const char* attr = this->GetAttributeValue(index, i);
-    char* res = 0;
+    char* res = nullptr;
     double val = strtod(attr, &res);
     if (res == attr)
     {

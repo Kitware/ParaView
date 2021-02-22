@@ -71,7 +71,7 @@ public:
 
   //@{
   /**
-   * Returns a registered proxy definition or return a NULL otherwise.
+   * Returns a registered proxy definition or return a nullptr otherwise.
    * Moreover, error can be throw if the definition was not found if the
    * flag throwError is true.
    */
@@ -312,7 +312,7 @@ protected:
 
   /**
    * Convenient method used to extract sub-proxy definition inside a proxy
-   * definition. If (subProxyName == NULL) return proxyDefinition;
+   * definition. If (subProxyName == nullptr) return proxyDefinition;
    */
   vtkPVXMLElement* ExtractSubProxy(vtkPVXMLElement* proxyDefinition, const char* subProxyName);
 

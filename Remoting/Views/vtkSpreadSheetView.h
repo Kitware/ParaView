@@ -198,7 +198,7 @@ public:
    * \note CallOnAllProcesses
    */
   void SetColumnNameToSort(const char*);
-  void SetColumnNameToSort() { this->SetColumnNameToSort(NULL); }
+  void SetColumnNameToSort() { this->SetColumnNameToSort(nullptr); }
 
   /**
    * Get/Set whether the sort order must be Max to Min rather than Min to Max.

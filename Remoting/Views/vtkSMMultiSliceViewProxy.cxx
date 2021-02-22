@@ -62,7 +62,7 @@ const char* vtkSMMultiSliceViewProxy::GetRepresentationType(
 {
   if (!producer)
   {
-    return 0;
+    return nullptr;
   }
 
   assert("Session should be valid" && this->GetSession());
@@ -119,7 +119,7 @@ void vtkSMMultiSliceViewProxy::ForceRepresentationType(vtkSMProxy* repr, const c
 // HACK: Get representation's input data bounds.
 bool vtkSMMultiSliceViewProxy::GetDataBounds(vtkSMSourceProxy* source, int opport, double bounds[6])
 {
-  vtkPVDataInformation* info = source ? source->GetDataInformation(opport) : NULL;
+  vtkPVDataInformation* info = source ? source->GetDataInformation(opport) : nullptr;
   if (info)
   {
     if (vtkPVArrayInformation* ainfo =

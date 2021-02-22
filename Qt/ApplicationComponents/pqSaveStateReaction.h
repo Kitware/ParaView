@@ -45,7 +45,7 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqSaveStateReaction : public pqReaction
 
 public:
   /**
-  * Constructor. Parent cannot be NULL.
+  * Constructor. Parent cannot be nullptr.
   */
   pqSaveStateReaction(QAction* parent);
   ~pqSaveStateReaction() override {}

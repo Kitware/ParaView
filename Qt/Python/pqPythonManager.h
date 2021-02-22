@@ -56,7 +56,7 @@ class PQPYTHON_EXPORT pqPythonManager : public QObject
   Q_OBJECT
 
 public:
-  pqPythonManager(QObject* parent = NULL);
+  pqPythonManager(QObject* parent = nullptr);
   ~pqPythonManager() override;
 
   /**

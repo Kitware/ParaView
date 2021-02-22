@@ -152,11 +152,11 @@ public:
 
   pqImplementation(pqFileDialog* p, pqServer* server)
     : QObject(p)
-    , Model(new pqFileDialogModel(server, NULL))
-    , FavoriteModel(new pqFileDialogFavoriteModel(server, NULL))
-    , RecentModel(new pqFileDialogRecentDirsModel(Model, server, NULL))
+    , Model(new pqFileDialogModel(server, nullptr))
+    , FavoriteModel(new pqFileDialogFavoriteModel(server, nullptr))
+    , RecentModel(new pqFileDialogRecentDirsModel(Model, server, nullptr))
     , FileFilter(this->Model)
-    , Completer(new QCompleter(&this->FileFilter, NULL))
+    , Completer(new QCompleter(&this->FileFilter, nullptr))
     , Mode(ExistingFile)
     , SuppressOverwriteWarning(false)
     , ShowMultipleFileHelp(false)
@@ -779,7 +779,7 @@ void pqFileDialog::onModelReset()
     impl.Ui.Parents->addItem(str);
   }
   impl.Ui.Parents->setCurrentIndex(parents.size() - 1);
-  disconnect(impl.Ui.ShowDetail, SIGNAL(clicked(bool)), NULL, NULL);
+  disconnect(impl.Ui.ShowDetail, SIGNAL(clicked(bool)), nullptr, nullptr);
   connect(impl.Ui.ShowDetail, SIGNAL(clicked(bool)), this, SLOT(onShowDetailToggled(bool)));
   bool showDetail = impl.Model->isShowingDetailedInfo();
   impl.Ui.ShowDetail->setChecked(showDetail);

@@ -20,5 +20,5 @@ MyToolBarActions::~MyToolBarActions()
 
 void MyToolBarActions::onAction()
 {
-  QMessageBox::information(NULL, "MyAction", "MyAction was invoked\n");
+  QMessageBox::information(nullptr, "MyAction", "MyAction was invoked\n");
 }
