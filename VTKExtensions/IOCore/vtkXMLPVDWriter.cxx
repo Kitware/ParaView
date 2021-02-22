@@ -61,8 +61,7 @@ public:
   std::string FilePath;
   std::string FilePrefix;
   std::vector<std::string> Entries;
-  std::string CreatePieceFileName(
-    const int index, const bool addTimeIndex, const int currentTimeIndex);
+  std::string CreatePieceFileName(int index, bool addTimeIndex, int currentTimeIndex);
 };
 
 //----------------------------------------------------------------------------
@@ -709,7 +708,7 @@ void vtkXMLPVDWriter::DeleteAllEntries()
 
 //----------------------------------------------------------------------------
 std::string vtkXMLPVDWriterInternals::CreatePieceFileName(
-  const int index, const bool addTimeIndex, const int currentTimeIndex)
+  int index, bool addTimeIndex, int currentTimeIndex)
 {
   std::string fname;
   std::ostringstream fn_with_warning_C4701;
