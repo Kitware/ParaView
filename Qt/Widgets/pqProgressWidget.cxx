@@ -71,7 +71,7 @@ public:
     }
 #endif
   }
-  ~pqProgressWidgetLabel() { delete this->Style; }
+  ~pqProgressWidgetLabel() override { delete this->Style; }
   // returns true if value changed.
   bool setProgressPercentage(int val)
   {
@@ -88,7 +88,7 @@ public:
   bool showProgress() const { return this->ShowProgress; }
 protected:
   QStyle* astyle() { return this->Style ? this->Style : this->style(); }
-  void paintEvent(QPaintEvent* evt)
+  void paintEvent(QPaintEvent* evt) override
   {
     QStyleOptionProgressBar pbstyle;
     pbstyle.initFrom(this);

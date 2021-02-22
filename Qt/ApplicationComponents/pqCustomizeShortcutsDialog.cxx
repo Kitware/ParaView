@@ -181,7 +181,7 @@ public:
     this->RootItem = treeItem;
   }
 
-  ~pqCustomizeShortcutsModel() { delete this->RootItem; }
+  ~pqCustomizeShortcutsModel() override { delete this->RootItem; }
 
   QModelIndex index(int row, int column, const QModelIndex& parentIndex) const override
   {
@@ -369,7 +369,7 @@ public:
   {
   }
 
-  ~FilterLeavesProxyModel() = default;
+  ~FilterLeavesProxyModel() override = default;
 
   bool filterAcceptsRow(int source_row, const QModelIndex& source_parent) const override
   {

@@ -88,7 +88,7 @@ public:
     : QObject(obj)
   {
   }
-  ~WheelFilter() = default;
+  ~WheelFilter() override = default;
   bool eventFilter(QObject* obj, QEvent* evt) override
   {
     assert(obj && evt);

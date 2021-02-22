@@ -82,7 +82,7 @@ public:
   {
   }
 
-  ~SpreadsheetConnection() = default;
+  ~SpreadsheetConnection() override = default;
 
   void setServerManagerValue(bool use_unchecked, const QVariant& value) override
   {

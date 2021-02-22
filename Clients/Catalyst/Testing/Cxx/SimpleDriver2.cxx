@@ -61,7 +61,7 @@ protected:
     this->SetGridBuilder(gridBuilder);
     gridBuilder->Delete();
   }
-  ~vtkCPImplementedTestDriver() = default;
+  ~vtkCPImplementedTestDriver() override = default;
 
 private:
   vtkCPImplementedTestDriver(const vtkCPImplementedTestDriver&) = delete;

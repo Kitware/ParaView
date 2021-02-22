@@ -76,7 +76,7 @@ public:
 
 protected:
   SceneImageWriter() = default;
-  ~SceneImageWriter() = default;
+  ~SceneImageWriter() override = default;
   bool SaveInitialize(int vtkNotUsed(startCount)) override
   {
     // Animation scene call render on each tick. We override that render call
@@ -140,7 +140,7 @@ protected:
     : Started(false)
   {
   }
-  ~SceneImageWriterMovie() = default;
+  ~SceneImageWriterMovie() override = default;
 
   bool SaveInitialize(int startCount) override
   {
@@ -229,7 +229,7 @@ protected:
     , SuffixFormat(nullptr)
   {
   }
-  ~SceneImageWriterImageSeries() { this->SetSuffixFormat(nullptr); }
+  ~SceneImageWriterImageSeries() override { this->SetSuffixFormat(nullptr); }
 
   bool SaveInitialize(int startCount) override
   {
