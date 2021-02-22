@@ -181,7 +181,6 @@ void vtkOpenVRPolyfill::ApplyPose(
     this->SetPhysicalViewUp(thePose->PhysicalViewUp);
 
     cam->SetPosition(thePose->Position);
-    cam->SetDistance(thePose->Distance);
     cam->SetFocalPoint(thePose->Position[0] + thePose->Distance * thePose->ViewDirection[0],
       thePose->Position[1] + thePose->Distance * thePose->ViewDirection[1],
       thePose->Position[2] + thePose->Distance * thePose->ViewDirection[2]);

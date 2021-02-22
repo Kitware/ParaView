@@ -162,8 +162,6 @@ void vtkPVOpenVRHelper::ExportLocationsAsView(vtkSMViewProxy* view)
 
 void vtkPVOpenVRHelper::TakeMeasurement()
 {
-  this->SetRightTriggerMode("Grab");
-  this->OpenVRControls->SetRightTriggerMode("Grab");
   this->ToggleShowControls();
   this->Widgets->TakeMeasurement(this->RenderWindow);
 }
@@ -1195,6 +1193,7 @@ void vtkPVOpenVRHelper::GoToSavedLocation(int pos, double* collabTrans, double* 
   else
   {
     this->OpenVRPolyfill->ApplyPose(loc.Pose, this->Renderer, this->RenderWindow);
+    this->LoadLocationValue = pos;
   }
 }
 
@@ -1213,7 +1212,7 @@ void vtkPVOpenVRHelper::LoadLocationState(int slot)
   // apply navigation panel
   this->SetShowNavigationPanel(loc.NavigationPanelVisibility);
 
-  // load crops
+  // clear crops
   this->collabRemoveAllCropPlanes();
   this->collabRemoveAllThickCrops();
 
@@ -1302,6 +1301,7 @@ void vtkPVOpenVRHelper::ViewRemoved(vtkSMViewProxy* smview)
   }
   this->Quit();
   this->SMView = nullptr;
+  this->View = nullptr;
 }
 
 void vtkPVOpenVRHelper::DoOneEvent()
@@ -1656,7 +1656,7 @@ void vtkPVOpenVRHelper::AttachToCurrentView(vtkSMViewProxy* smview)
 
     QCoreApplication::processEvents();
 
-    if (this->LoadLocationValue >= 0)
+    if (this->SMView && this->LoadLocationValue >= 0)
     {
       this->SMView->StillRender();
       this->LoadLocationState(this->LoadLocationValue);
@@ -1677,7 +1677,10 @@ void vtkPVOpenVRHelper::AttachToCurrentView(vtkSMViewProxy* smview)
     }
   }
 
-  this->View->SetLockBounds(origLocked);
+  if (this->View)
+  {
+    this->View->SetLockBounds(origLocked);
+  }
 
   // disconnect
   this->CollaborationClient->Disconnect();
@@ -1882,12 +1885,12 @@ void vtkPVOpenVRHelper::SendToOpenVR(vtkSMViewProxy* smview)
 
     this->CollaborationClient->Render();
     QCoreApplication::processEvents();
-    if (this->NeedStillRender)
+    if (this->SMView && this->NeedStillRender)
     {
       this->SMView->StillRender();
       this->NeedStillRender = false;
     }
-    if (this->LoadLocationValue >= 0)
+    if (this->SMView && this->LoadLocationValue >= 0)
     {
       this->SMView->StillRender();
       this->LoadLocationState(this->LoadLocationValue);

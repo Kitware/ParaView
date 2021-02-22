@@ -211,6 +211,9 @@ public:
   // forward to widgets helper
   vtkGetObjectMacro(Widgets, vtkPVOpenVRWidgets);
 
+  // get polyfill
+  vtkGetObjectMacro(OpenVRPolyfill, vtkOpenVRPolyfill);
+
 protected:
   vtkPVOpenVRHelper();
   ~vtkPVOpenVRHelper();

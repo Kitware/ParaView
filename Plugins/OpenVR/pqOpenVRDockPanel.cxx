@@ -113,6 +113,10 @@ void pqOpenVRDockPanel::constructor()
     std::string pw = this->Internals->imagoPasswordValue->text().toLocal8Bit().constData();
     if (this->Helper->GetWidgets()->LoginToImago(uid, pw))
     {
+      // set the background of the login button to light green
+      // to indicate success
+      this->Internals->imagoLoginButton->setStyleSheet("border:2px solid #44ff44;");
+
       // set the combo box values to what the context has
       // try to save previous values if we can
       std::vector<std::string> vals;
@@ -130,6 +134,7 @@ void pqOpenVRDockPanel::constructor()
         this->Internals->imagoImageryTypeCombo->addItems(list);
         auto idx = this->Internals->imagoImageryTypeCombo->findText(QString(oldValue.c_str()));
         this->Internals->imagoImageryTypeCombo->setCurrentIndex(idx);
+        this->Helper->GetWidgets()->SetImagoImageryType(oldValue);
       }
 
       {
@@ -146,6 +151,7 @@ void pqOpenVRDockPanel::constructor()
         this->Internals->imagoImageTypeCombo->addItems(list);
         auto idx = this->Internals->imagoImageTypeCombo->findText(QString(oldValue.c_str()));
         this->Internals->imagoImageTypeCombo->setCurrentIndex(idx);
+        this->Helper->GetWidgets()->SetImagoImageType(oldValue);
       }
 
       {
@@ -161,6 +167,7 @@ void pqOpenVRDockPanel::constructor()
         this->Internals->imagoDatasetCombo->addItems(list);
         auto idx = this->Internals->imagoDatasetCombo->findText(QString(oldValue.c_str()));
         this->Internals->imagoDatasetCombo->setCurrentIndex(idx);
+        this->Helper->GetWidgets()->SetImagoDataset(oldValue);
       }
 
       {
@@ -177,11 +184,12 @@ void pqOpenVRDockPanel::constructor()
         this->Internals->imagoWorkspaceCombo->addItems(list);
         auto idx = this->Internals->imagoWorkspaceCombo->findText(QString(oldValue.c_str()));
         this->Internals->imagoWorkspaceCombo->setCurrentIndex(idx);
+        this->Helper->GetWidgets()->SetImagoWorkspace(oldValue);
       }
     }
     else
     {
-      vtkGenericWarningMacro("Failed to login to Imago");
+      this->Internals->imagoLoginButton->setStyleSheet("border:2px solid #ff4444;");
     }
   });
 
