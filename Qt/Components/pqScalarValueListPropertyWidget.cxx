@@ -217,7 +217,7 @@ public:
       }
     }
   }
-  const QVector<QVariant> value() const { return this->Values; }
+  QVector<QVariant> value() const { return this->Values; }
 
   QModelIndex addRow(const QModelIndex& after = QModelIndex())
   {

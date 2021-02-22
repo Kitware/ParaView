@@ -288,7 +288,7 @@ public:
   /**
    * Returns the index for the root of the tree.
    */
-  const QModelIndex rootIndex() const;
+  QModelIndex rootIndex() const;
 
   /**
    * Add a custom column to model.

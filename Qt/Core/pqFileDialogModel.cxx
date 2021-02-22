@@ -102,7 +102,7 @@ public:
 
   const QList<pqFileDialogModelFileInfo>& group() const { return this->Group; }
 
-  const QString extensionTypeString() const
+  QString extensionTypeString() const
   {
     if (this->Type == vtkPVFileInformation::DIRECTORY)
     {
@@ -117,7 +117,7 @@ public:
     }
   }
 
-  const QString sizeString() const
+  QString sizeString() const
   {
     if (this->Type == vtkPVFileInformation::DIRECTORY)
     {
@@ -147,7 +147,7 @@ public:
     return QString("%1 bytes").arg(QLocale().toString(static_cast<qulonglong>(this->Size)));
   }
 
-  const QString modificationTimeString() const
+  QString modificationTimeString() const
   {
     return QLocale::system().toString(
       QDateTime::fromTime_t(this->ModificationTime), QLocale::ShortFormat);
@@ -155,7 +155,7 @@ public:
 
   qulonglong size() const { return static_cast<qulonglong>(this->Size); }
 
-  const QDateTime modificationTime() const { return QDateTime::fromTime_t(this->ModificationTime); }
+  QDateTime modificationTime() const { return QDateTime::fromTime_t(this->ModificationTime); }
 
 private:
   QString Label;
@@ -356,7 +356,7 @@ public:
 
   /// Removes multiple-slashes, ".", and ".." from the given path string,
   /// and points slashes in the correct direction for the server
-  const QString cleanPath(const QString& path)
+  QString cleanPath(const QString& path)
   {
     QString result = QDir::cleanPath(QDir::fromNativeSeparators(path));
     return result.trimmed();

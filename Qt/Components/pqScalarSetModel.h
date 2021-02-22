@@ -69,7 +69,7 @@ public:
   /**
   * Returns the sorted collection of numbers stored in the model
   */
-  const QList<double> values();
+  QList<double> values();
 
   /** Controls formatting of displayed data, supports the
   'e', 'E', 'f', 'F', 'g', and 'G' formats provided by printf() */

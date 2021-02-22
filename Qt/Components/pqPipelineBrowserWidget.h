@@ -104,7 +104,7 @@ public:
   * TODO document
   * @note Moved from proteced
   */
-  const QModelIndex pipelineModelIndex(const QModelIndex& index) const;
+  QModelIndex pipelineModelIndex(const QModelIndex& index) const;
   const pqPipelineModel* getPipelineModel(const QModelIndex& index) const;
 
   /**

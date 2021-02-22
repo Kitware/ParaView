@@ -205,7 +205,7 @@ pqServerResource::~pqServerResource()
   delete this->Implementation;
 }
 
-const QString pqServerResource::toURI() const
+QString pqServerResource::toURI() const
 {
   QString result;
   result += this->Implementation->Scheme + ":";
@@ -255,7 +255,7 @@ const QString pqServerResource::toURI() const
   return result;
 }
 
-const QString pqServerResource::scheme() const
+QString pqServerResource::scheme() const
 {
   return this->Implementation->Scheme;
 }
@@ -270,7 +270,7 @@ bool pqServerResource::isReverse() const
   return (this->Implementation->Scheme == "csrc" || this->Implementation->Scheme == "cdsrsrc");
 }
 
-const QString pqServerResource::host() const
+QString pqServerResource::host() const
 {
   if (this->Implementation->Scheme == "cdsrs" || this->Implementation->Scheme == "cdsrsrc")
   {
@@ -325,7 +325,7 @@ void pqServerResource::setPort(int rhs)
   this->Implementation->Port = rhs;
 }
 
-const QString pqServerResource::dataServerHost() const
+QString pqServerResource::dataServerHost() const
 {
   if (this->Implementation->Scheme != "cdsrs" && this->Implementation->Scheme != "cdsrsrc")
   {
@@ -380,7 +380,7 @@ void pqServerResource::setDataServerPort(int rhs)
   this->Implementation->DataServerPort = rhs;
 }
 
-const QString pqServerResource::renderServerHost() const
+QString pqServerResource::renderServerHost() const
 {
   if (this->Implementation->Scheme != "cdsrs" && this->Implementation->Scheme != "cdsrsrc")
   {
@@ -435,7 +435,7 @@ void pqServerResource::setRenderServerPort(int rhs)
   this->Implementation->RenderServerPort = rhs;
 }
 
-const QString pqServerResource::path() const
+QString pqServerResource::path() const
 {
   return this->Implementation->Path;
 }
@@ -445,7 +445,7 @@ void pqServerResource::setPath(const QString& rhs)
   this->Implementation->Path = rhs;
 }
 
-const pqServerResource pqServerResource::sessionServer() const
+pqServerResource pqServerResource::sessionServer() const
 {
   if (this->Implementation->Scheme != "session")
   {
@@ -465,7 +465,7 @@ void pqServerResource::setSessionServer(const pqServerResource& rhs)
   this->Implementation->SessionServer = rhs.toURI();
 }
 
-const pqServerResource pqServerResource::schemeHostsPorts() const
+pqServerResource pqServerResource::schemeHostsPorts() const
 {
   pqServerResource result;
 
@@ -480,7 +480,7 @@ const pqServerResource pqServerResource::schemeHostsPorts() const
   return result;
 }
 
-const pqServerResource pqServerResource::schemeHosts() const
+pqServerResource pqServerResource::schemeHosts() const
 {
   pqServerResource result;
 
@@ -492,7 +492,7 @@ const pqServerResource pqServerResource::schemeHosts() const
   return result;
 }
 
-const pqServerResource pqServerResource::hostPath() const
+pqServerResource pqServerResource::hostPath() const
 {
   pqServerResource result;
 
@@ -524,12 +524,12 @@ void pqServerResource::addData(const QString& key, const QString& value)
   this->Implementation->ExtraData[key] = value;
 }
 
-const QString pqServerResource::data(const QString& key) const
+QString pqServerResource::data(const QString& key) const
 {
   return this->data(key, QString());
 }
 
-const QString pqServerResource::data(const QString& key, const QString& default_value) const
+QString pqServerResource::data(const QString& key, const QString& default_value) const
 {
   return this->Implementation->ExtraData.contains(key) ? this->Implementation->ExtraData[key]
                                                        : default_value;
@@ -540,7 +540,7 @@ bool pqServerResource::hasData(const QString& key) const
   return this->Implementation->ExtraData.contains(key);
 }
 
-const QString pqServerResource::serializeString() const
+QString pqServerResource::serializeString() const
 {
   QString uri = this->toURI();
   QMap<QString, QString>::iterator iter;

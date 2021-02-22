@@ -426,7 +426,7 @@ void pqPipelineBrowserWidget::disableSessionFilter()
 }
 
 //----------------------------------------------------------------------------
-const QModelIndex pqPipelineBrowserWidget::pipelineModelIndex(const QModelIndex& index) const
+QModelIndex pqPipelineBrowserWidget::pipelineModelIndex(const QModelIndex& index) const
 {
   if (qobject_cast<const pqPipelineModel*>(index.model()))
   {

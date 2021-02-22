@@ -893,7 +893,7 @@ QModelIndex pqCompositeDataInformationTreeModel::find(unsigned int idx) const
 }
 
 //-----------------------------------------------------------------------------
-const QModelIndex pqCompositeDataInformationTreeModel::rootIndex() const
+QModelIndex pqCompositeDataInformationTreeModel::rootIndex() const
 {
   return this->createIndex(0, 0, static_cast<quintptr>(0));
 }

@@ -114,7 +114,7 @@ bool pqUndoStack::canRedo()
 }
 
 //-----------------------------------------------------------------------------
-const QString pqUndoStack::undoLabel()
+QString pqUndoStack::undoLabel()
 {
   return this->Implementation->UndoStack->CanUndo()
     ? this->Implementation->UndoStack->GetUndoSetLabel(0)
@@ -122,7 +122,7 @@ const QString pqUndoStack::undoLabel()
 }
 
 //-----------------------------------------------------------------------------
-const QString pqUndoStack::redoLabel()
+QString pqUndoStack::redoLabel()
 {
   return this->Implementation->UndoStack->CanRedo()
     ? this->Implementation->UndoStack->GetRedoSetLabel(0)

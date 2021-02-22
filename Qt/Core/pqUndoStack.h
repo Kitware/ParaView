@@ -77,12 +77,12 @@ public:
   /**
   * returns the undo label.
   */
-  const QString undoLabel();
+  QString undoLabel();
 
   /**
   * returns the redo label.
   */
-  const QString redoLabel();
+  QString redoLabel();
 
   /**
   * Get the status of the IgnoreAllChanges flag on the

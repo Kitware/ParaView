@@ -61,7 +61,7 @@ public:
     }
   }
 
-  static const std::string CreateSubProxyName(vtkSMProxy* proxy)
+  static std::string CreateSubProxyName(vtkSMProxy* proxy)
   {
     std::ostringstream str;
     str << proxy->GetXMLGroup() << "." << proxy->GetXMLName();

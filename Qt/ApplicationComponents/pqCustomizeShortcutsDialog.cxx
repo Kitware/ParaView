@@ -74,7 +74,7 @@ public:
 
   const QString& settingsKey() const { return this->FullKey; }
 
-  const QKeySequence keySequence() const { return this->KeySequence; }
+  QKeySequence keySequence() const { return this->KeySequence; }
 
   void setKeySequence(const QKeySequence& shortcut)
   {

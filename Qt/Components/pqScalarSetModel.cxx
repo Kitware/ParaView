@@ -137,7 +137,7 @@ void pqScalarSetModel::erase(int row)
 }
 
 //-----------------------------------------------------------------------------
-const QList<double> pqScalarSetModel::values()
+QList<double> pqScalarSetModel::values()
 {
   return this->Implementation->Values;
 }
