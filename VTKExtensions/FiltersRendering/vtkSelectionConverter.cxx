@@ -86,14 +86,10 @@ static unsigned int GetPointPieceOffset(vtkInformation* pieceMetaData, vtkIdType
 vtkStandardNewMacro(vtkSelectionConverter);
 
 //----------------------------------------------------------------------------
-vtkSelectionConverter::vtkSelectionConverter()
-{
-}
+vtkSelectionConverter::vtkSelectionConverter() = default;
 
 //----------------------------------------------------------------------------
-vtkSelectionConverter::~vtkSelectionConverter()
-{
-}
+vtkSelectionConverter::~vtkSelectionConverter() = default;
 
 //----------------------------------------------------------------------------
 void vtkSelectionConverter::Convert(vtkSelection* input, vtkSelection* output, int global_ids)

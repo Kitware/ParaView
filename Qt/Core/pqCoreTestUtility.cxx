@@ -151,9 +151,7 @@ pqCoreTestUtility::pqCoreTestUtility(QObject* p)
 }
 
 //-----------------------------------------------------------------------------
-pqCoreTestUtility::~pqCoreTestUtility()
-{
-}
+pqCoreTestUtility::~pqCoreTestUtility() = default;
 
 //-----------------------------------------------------------------------------
 QString pqCoreTestUtility::DataRoot()

@@ -61,9 +61,7 @@ pqPropertyLinksConnection::pqPropertyLinksConnection(QObject* qobject, const cha
 }
 
 //-----------------------------------------------------------------------------
-pqPropertyLinksConnection::~pqPropertyLinksConnection()
-{
-}
+pqPropertyLinksConnection::~pqPropertyLinksConnection() = default;
 
 //-----------------------------------------------------------------------------
 void pqPropertyLinksConnection::setUseUncheckedProperties(bool useUnchecked)

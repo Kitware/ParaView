@@ -20,14 +20,10 @@
 
 vtkStandardNewMacro(vtkSMChartUseIndexForAxisDomain);
 //----------------------------------------------------------------------------
-vtkSMChartUseIndexForAxisDomain::vtkSMChartUseIndexForAxisDomain()
-{
-}
+vtkSMChartUseIndexForAxisDomain::vtkSMChartUseIndexForAxisDomain() = default;
 
 //----------------------------------------------------------------------------
-vtkSMChartUseIndexForAxisDomain::~vtkSMChartUseIndexForAxisDomain()
-{
-}
+vtkSMChartUseIndexForAxisDomain::~vtkSMChartUseIndexForAxisDomain() = default;
 
 //----------------------------------------------------------------------------
 void vtkSMChartUseIndexForAxisDomain::Update(vtkSMProperty* requestingProperty)

@@ -44,9 +44,7 @@ pqColorButtonEventPlayer::pqColorButtonEventPlayer(QObject* parentObject)
 }
 
 //----------------------------------------------------------------------------
-pqColorButtonEventPlayer::~pqColorButtonEventPlayer()
-{
-}
+pqColorButtonEventPlayer::~pqColorButtonEventPlayer() = default;
 
 //-----------------------------------------------------------------------------
 bool pqColorButtonEventPlayer::playEvent(

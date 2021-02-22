@@ -36,9 +36,7 @@ vtkPVPLYWriter::vtkPVPLYWriter()
 }
 
 //----------------------------------------------------------------------------
-vtkPVPLYWriter::~vtkPVPLYWriter()
-{
-}
+vtkPVPLYWriter::~vtkPVPLYWriter() = default;
 
 //----------------------------------------------------------------------------
 int vtkPVPLYWriter::FillInputPortInformation(int, vtkInformation* info)

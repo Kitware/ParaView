@@ -358,9 +358,7 @@ pqDoubleVectorPropertyWidget::pqDoubleVectorPropertyWidget(
 }
 
 //-----------------------------------------------------------------------------
-pqDoubleVectorPropertyWidget::~pqDoubleVectorPropertyWidget()
-{
-}
+pqDoubleVectorPropertyWidget::~pqDoubleVectorPropertyWidget() = default;
 
 //-----------------------------------------------------------------------------
 void pqDoubleVectorPropertyWidget::resetButtonClicked()

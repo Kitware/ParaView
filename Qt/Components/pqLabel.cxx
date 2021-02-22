@@ -36,9 +36,7 @@ pqLabel::pqLabel(const QString& txt, QWidget* parentObject, Qt::WindowFlags f)
 {
 }
 
-pqLabel::~pqLabel()
-{
-}
+pqLabel::~pqLabel() = default;
 
 void pqLabel::mousePressEvent(QMouseEvent*)
 {

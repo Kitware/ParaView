@@ -57,7 +57,7 @@ public:
     set_to_min_id->SetNumberOfTuples(0);
   }
 
-  ~vtkAMRConnectivityEquivalence() {}
+  ~vtkAMRConnectivityEquivalence() = default;
 
   int AddEquivalence(int id1, int id2)
   {
@@ -245,9 +245,7 @@ vtkAMRConnectivity::vtkAMRConnectivity()
   this->PropagateGhosts = 0;
 }
 
-vtkAMRConnectivity::~vtkAMRConnectivity()
-{
-}
+vtkAMRConnectivity::~vtkAMRConnectivity() = default;
 
 void vtkAMRConnectivity::PrintSelf(ostream& os, vtkIndent indent)
 {

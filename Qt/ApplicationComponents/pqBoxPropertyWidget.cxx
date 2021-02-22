@@ -237,9 +237,7 @@ pqBoxPropertyWidget::pqBoxPropertyWidget(
 }
 
 //-----------------------------------------------------------------------------
-pqBoxPropertyWidget::~pqBoxPropertyWidget()
-{
-}
+pqBoxPropertyWidget::~pqBoxPropertyWidget() = default;
 
 //-----------------------------------------------------------------------------
 void pqBoxPropertyWidget::placeWidget()

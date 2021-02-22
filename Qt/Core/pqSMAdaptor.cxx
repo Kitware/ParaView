@@ -112,13 +112,9 @@ T* FindDomain(vtkSMProperty* prop)
 }
 }
 
-pqSMAdaptor::pqSMAdaptor()
-{
-}
+pqSMAdaptor::pqSMAdaptor() = default;
 
-pqSMAdaptor::~pqSMAdaptor()
-{
-}
+pqSMAdaptor::~pqSMAdaptor() = default;
 
 pqSMAdaptor::PropertyType pqSMAdaptor::getPropertyType(vtkSMProperty* Property)
 {

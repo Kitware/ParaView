@@ -370,9 +370,7 @@ pqSpreadSheetViewDecorator::pqSpreadSheetViewDecorator(pqSpreadSheetView* view)
 }
 
 //-----------------------------------------------------------------------------
-pqSpreadSheetViewDecorator::~pqSpreadSheetViewDecorator()
-{
-}
+pqSpreadSheetViewDecorator::~pqSpreadSheetViewDecorator() = default;
 
 //-----------------------------------------------------------------------------
 void pqSpreadSheetViewDecorator::setPrecision(int p)

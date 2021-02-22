@@ -31,6 +31,4 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 #include "vtkPVGUIPluginInterface.h"
 
-vtkPVGUIPluginInterface::~vtkPVGUIPluginInterface()
-{
-}
+vtkPVGUIPluginInterface::~vtkPVGUIPluginInterface() = default;

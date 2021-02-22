@@ -95,7 +95,7 @@ protected:
     : Actor(nullptr)
   {
   }
-  ~vtkScalarBarItem() override {}
+  ~vtkScalarBarItem() override = default;
 };
 
 //----------------------------------------------------------------------------

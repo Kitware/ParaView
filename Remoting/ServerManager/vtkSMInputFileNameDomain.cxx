@@ -29,14 +29,10 @@
 vtkStandardNewMacro(vtkSMInputFileNameDomain);
 
 //---------------------------------------------------------------------------
-vtkSMInputFileNameDomain::vtkSMInputFileNameDomain()
-{
-}
+vtkSMInputFileNameDomain::vtkSMInputFileNameDomain() = default;
 
 //---------------------------------------------------------------------------
-vtkSMInputFileNameDomain::~vtkSMInputFileNameDomain()
-{
-}
+vtkSMInputFileNameDomain::~vtkSMInputFileNameDomain() = default;
 
 //---------------------------------------------------------------------------
 void vtkSMInputFileNameDomain::Update(vtkSMProperty* vtkNotUsed(prop))

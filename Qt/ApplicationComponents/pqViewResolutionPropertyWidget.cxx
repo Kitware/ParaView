@@ -106,9 +106,7 @@ pqViewResolutionPropertyWidget::pqViewResolutionPropertyWidget(
 }
 
 //-----------------------------------------------------------------------------
-pqViewResolutionPropertyWidget::~pqViewResolutionPropertyWidget()
-{
-}
+pqViewResolutionPropertyWidget::~pqViewResolutionPropertyWidget() = default;
 
 //-----------------------------------------------------------------------------
 void pqViewResolutionPropertyWidget::resetButtonClicked()

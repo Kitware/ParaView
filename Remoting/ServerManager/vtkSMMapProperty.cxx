@@ -16,14 +16,10 @@
 #include "vtkSMMapProperty.h"
 
 //---------------------------------------------------------------------------
-vtkSMMapProperty::vtkSMMapProperty()
-{
-}
+vtkSMMapProperty::vtkSMMapProperty() = default;
 
 //---------------------------------------------------------------------------
-vtkSMMapProperty::~vtkSMMapProperty()
-{
-}
+vtkSMMapProperty::~vtkSMMapProperty() = default;
 
 //---------------------------------------------------------------------------
 vtkIdType vtkSMMapProperty::GetNumberOfElements()

@@ -61,9 +61,7 @@ vtkSliceAlongPolyPlane::vtkSliceAlongPolyPlane()
 }
 
 //----------------------------------------------------------------------------
-vtkSliceAlongPolyPlane::~vtkSliceAlongPolyPlane()
-{
-}
+vtkSliceAlongPolyPlane::~vtkSliceAlongPolyPlane() = default;
 
 //----------------------------------------------------------------------------
 int vtkSliceAlongPolyPlane::RequestDataObject(

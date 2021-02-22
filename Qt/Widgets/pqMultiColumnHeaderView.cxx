@@ -64,9 +64,7 @@ pqMultiColumnHeaderView::pqMultiColumnHeaderView(Qt::Orientation orientation, QW
 }
 
 //-----------------------------------------------------------------------------
-pqMultiColumnHeaderView::~pqMultiColumnHeaderView()
-{
-}
+pqMultiColumnHeaderView::~pqMultiColumnHeaderView() = default;
 
 //-----------------------------------------------------------------------------
 QString pqMultiColumnHeaderView::sectionDisplayText(int logicalIndex) const

@@ -56,9 +56,7 @@ pqPythonDebugLeaksView::pqPythonDebugLeaksView(QWidget* p)
 }
 
 //-----------------------------------------------------------------------------
-pqPythonDebugLeaksView::~pqPythonDebugLeaksView()
-{
-}
+pqPythonDebugLeaksView::~pqPythonDebugLeaksView() = default;
 
 //-----------------------------------------------------------------------------
 void pqPythonDebugLeaksView::setShell(pqPythonShell* shell)

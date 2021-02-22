@@ -35,9 +35,7 @@ vtkPVCylinder::vtkPVCylinder()
 }
 
 //----------------------------------------------------------------------------
-vtkPVCylinder::~vtkPVCylinder()
-{
-}
+vtkPVCylinder::~vtkPVCylinder() = default;
 
 //----------------------------------------------------------------------------
 void vtkPVCylinder::PrintSelf(ostream& os, vtkIndent indent)

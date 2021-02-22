@@ -51,9 +51,7 @@ pqBoxChartView::pqBoxChartView(const QString& group, const QString& name,
 }
 
 //-----------------------------------------------------------------------------
-pqBoxChartView::~pqBoxChartView()
-{
-}
+pqBoxChartView::~pqBoxChartView() = default;
 
 //-----------------------------------------------------------------------------
 void pqBoxChartView::onAddRepresentation(pqRepresentation* repr)

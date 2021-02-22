@@ -34,9 +34,7 @@ vtkSMMultiServerSourceProxy::vtkSMMultiServerSourceProxy()
 }
 
 //---------------------------------------------------------------------------
-vtkSMMultiServerSourceProxy::~vtkSMMultiServerSourceProxy()
-{
-}
+vtkSMMultiServerSourceProxy::~vtkSMMultiServerSourceProxy() = default;
 //---------------------------------------------------------------------------
 void vtkSMMultiServerSourceProxy::PrintSelf(ostream& os, vtkIndent indent)
 {

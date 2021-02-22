@@ -101,7 +101,7 @@ public:
     });
   }
 
-  ~pqPresetDialogTableModel() override {}
+  ~pqPresetDialogTableModel() override = default;
 
   void importPresets(const QString& filename)
   {
@@ -315,7 +315,7 @@ public:
     , CurrentGroupColumn(0)
   {
   }
-  ~pqPresetDialogProxyModel() override {}
+  ~pqPresetDialogProxyModel() override = default;
 
   pqPresetDialog::Modes mode() { return this->Mode; }
   void setMode(pqPresetDialog::Modes m)
@@ -379,7 +379,7 @@ public:
     , NumColumns(cols)
   {
   }
-  ~pqPresetDialogReflowModel() override {}
+  ~pqPresetDialogReflowModel() override = default;
 
   QModelIndex mapFromSource(const QModelIndex& sourceIndex) const override
   {
@@ -646,9 +646,7 @@ pqPresetDialog::pqPresetDialog(QWidget* parentObject, pqPresetDialog::Modes mode
 }
 
 //-----------------------------------------------------------------------------
-pqPresetDialog::~pqPresetDialog()
-{
-}
+pqPresetDialog::~pqPresetDialog() = default;
 
 //-----------------------------------------------------------------------------
 void pqPresetDialog::showEvent(QShowEvent* e)

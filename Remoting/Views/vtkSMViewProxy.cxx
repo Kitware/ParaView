@@ -110,8 +110,8 @@ public:
   void SetParent(vtkSMViewProxy* view) { this->Parent = view; }
 
 protected:
-  WindowToImageFilter() {}
-  ~WindowToImageFilter() override {}
+  WindowToImageFilter() = default;
+  ~WindowToImageFilter() override = default;
 
   void Render() override
   {

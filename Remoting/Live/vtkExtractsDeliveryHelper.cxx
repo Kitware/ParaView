@@ -42,9 +42,7 @@ vtkExtractsDeliveryHelper::vtkExtractsDeliveryHelper()
 }
 
 //----------------------------------------------------------------------------
-vtkExtractsDeliveryHelper::~vtkExtractsDeliveryHelper()
-{
-}
+vtkExtractsDeliveryHelper::~vtkExtractsDeliveryHelper() = default;
 
 //----------------------------------------------------------------------------
 void vtkExtractsDeliveryHelper::SetSimulation2VisualizationController(vtkSocketController* cont)

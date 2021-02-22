@@ -36,14 +36,10 @@
 
 vtkStandardNewMacro(vtkMultiProcessControllerHelper);
 //----------------------------------------------------------------------------
-vtkMultiProcessControllerHelper::vtkMultiProcessControllerHelper()
-{
-}
+vtkMultiProcessControllerHelper::vtkMultiProcessControllerHelper() = default;
 
 //----------------------------------------------------------------------------
-vtkMultiProcessControllerHelper::~vtkMultiProcessControllerHelper()
-{
-}
+vtkMultiProcessControllerHelper::~vtkMultiProcessControllerHelper() = default;
 
 //----------------------------------------------------------------------------
 int vtkMultiProcessControllerHelper::ReduceToAll(vtkMultiProcessController* controller,

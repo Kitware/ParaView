@@ -132,9 +132,7 @@ void pqPreviewMenuManager::init(const QStringList& defaultItems, QMenu* menu)
 }
 
 //-----------------------------------------------------------------------------
-pqPreviewMenuManager::~pqPreviewMenuManager()
-{
-}
+pqPreviewMenuManager::~pqPreviewMenuManager() = default;
 
 //-----------------------------------------------------------------------------
 void pqPreviewMenuManager::updateEnabledState()

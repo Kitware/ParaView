@@ -36,9 +36,7 @@ vtkPVImplicitCylinderRepresentation::vtkPVImplicitCylinderRepresentation()
 }
 
 //----------------------------------------------------------------------------
-vtkPVImplicitCylinderRepresentation::~vtkPVImplicitCylinderRepresentation()
-{
-}
+vtkPVImplicitCylinderRepresentation::~vtkPVImplicitCylinderRepresentation() = default;
 
 //----------------------------------------------------------------------------
 void vtkPVImplicitCylinderRepresentation::PrintSelf(ostream& os, vtkIndent indent)

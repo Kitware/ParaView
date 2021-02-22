@@ -21,9 +21,7 @@
 
 vtkStandardNewMacro(vtkAMRFileSeriesReader);
 
-vtkAMRFileSeriesReader::vtkAMRFileSeriesReader()
-{
-}
+vtkAMRFileSeriesReader::vtkAMRFileSeriesReader() = default;
 
 int vtkAMRFileSeriesReader::RequestInformation(
   vtkInformation* request, vtkInformationVector** inputVector, vtkInformationVector* outputVector)

@@ -73,9 +73,7 @@ pqSettings::pqSettings(QObject* prnt)
 }
 
 //-----------------------------------------------------------------------------
-pqSettings::~pqSettings()
-{
-}
+pqSettings::~pqSettings() = default;
 
 //-----------------------------------------------------------------------------
 QString pqSettings::backup(const QString& argName)

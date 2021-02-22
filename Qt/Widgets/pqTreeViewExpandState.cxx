@@ -145,9 +145,7 @@ pqTreeViewExpandState::pqTreeViewExpandState(QObject* parentObject)
 }
 
 //-----------------------------------------------------------------------------
-pqTreeViewExpandState::~pqTreeViewExpandState()
-{
-}
+pqTreeViewExpandState::~pqTreeViewExpandState() = default;
 
 //-----------------------------------------------------------------------------
 void pqTreeViewExpandState::save(QTreeView* treeView)

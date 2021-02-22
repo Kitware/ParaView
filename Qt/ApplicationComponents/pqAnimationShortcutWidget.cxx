@@ -82,9 +82,7 @@ pqAnimationShortcutWidget::pqAnimationShortcutWidget(
 }
 
 //-----------------------------------------------------------------------------
-pqAnimationShortcutWidget::~pqAnimationShortcutWidget()
-{
-}
+pqAnimationShortcutWidget::~pqAnimationShortcutWidget() = default;
 
 //-----------------------------------------------------------------------------
 void pqAnimationShortcutWidget::setScene(pqAnimationScene* scene)

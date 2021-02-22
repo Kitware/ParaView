@@ -22,9 +22,7 @@ vtkDataMinePerimeterReader::vtkDataMinePerimeterReader()
 
 // --------------------------------------
 // Destructor
-vtkDataMinePerimeterReader::~vtkDataMinePerimeterReader()
-{
-}
+vtkDataMinePerimeterReader::~vtkDataMinePerimeterReader() = default;
 
 // --------------------------------------
 void vtkDataMinePerimeterReader::PrintSelf(ostream& os, vtkIndent indent)

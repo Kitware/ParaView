@@ -43,9 +43,7 @@ pqRecentlyUsedResourcesList::pqRecentlyUsedResourcesList(QObject* parentObject)
 }
 
 //-----------------------------------------------------------------------------
-pqRecentlyUsedResourcesList::~pqRecentlyUsedResourcesList()
-{
-}
+pqRecentlyUsedResourcesList::~pqRecentlyUsedResourcesList() = default;
 
 //-----------------------------------------------------------------------------
 void pqRecentlyUsedResourcesList::add(const pqServerResource& resource)

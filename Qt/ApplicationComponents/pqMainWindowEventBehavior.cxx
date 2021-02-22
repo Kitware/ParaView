@@ -70,9 +70,7 @@ pqMainWindowEventBehavior::pqMainWindowEventBehavior(QObject* parentObject)
 }
 
 //-----------------------------------------------------------------------------
-pqMainWindowEventBehavior::~pqMainWindowEventBehavior()
-{
-}
+pqMainWindowEventBehavior::~pqMainWindowEventBehavior() = default;
 
 //-----------------------------------------------------------------------------
 void pqMainWindowEventBehavior::onClose(QCloseEvent*)

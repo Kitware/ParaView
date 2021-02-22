@@ -45,9 +45,7 @@ vtkSpreadSheetRepresentation::vtkSpreadSheetRepresentation()
 }
 
 //----------------------------------------------------------------------------
-vtkSpreadSheetRepresentation::~vtkSpreadSheetRepresentation()
-{
-}
+vtkSpreadSheetRepresentation::~vtkSpreadSheetRepresentation() = default;
 
 //----------------------------------------------------------------------------
 void vtkSpreadSheetRepresentation::SetFieldAssociation(int val)

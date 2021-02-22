@@ -20,14 +20,10 @@
 
 vtkStandardNewMacro(vtkPVRepresentedDataInformation);
 //----------------------------------------------------------------------------
-vtkPVRepresentedDataInformation::vtkPVRepresentedDataInformation()
-{
-}
+vtkPVRepresentedDataInformation::vtkPVRepresentedDataInformation() = default;
 
 //----------------------------------------------------------------------------
-vtkPVRepresentedDataInformation::~vtkPVRepresentedDataInformation()
-{
-}
+vtkPVRepresentedDataInformation::~vtkPVRepresentedDataInformation() = default;
 
 //----------------------------------------------------------------------------
 void vtkPVRepresentedDataInformation::CopyFromObject(vtkObject* object)

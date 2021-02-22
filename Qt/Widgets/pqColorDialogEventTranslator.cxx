@@ -44,9 +44,7 @@ pqColorDialogEventTranslator::pqColorDialogEventTranslator(QObject* parentObject
 }
 
 //-----------------------------------------------------------------------------
-pqColorDialogEventTranslator::~pqColorDialogEventTranslator()
-{
-}
+pqColorDialogEventTranslator::~pqColorDialogEventTranslator() = default;
 
 //-----------------------------------------------------------------------------
 bool pqColorDialogEventTranslator::translateEvent(

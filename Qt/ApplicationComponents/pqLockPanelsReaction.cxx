@@ -43,9 +43,7 @@ pqLockPanelsReaction::pqLockPanelsReaction(QAction* action)
 }
 
 //-----------------------------------------------------------------------------
-pqLockPanelsReaction::~pqLockPanelsReaction()
-{
-}
+pqLockPanelsReaction::~pqLockPanelsReaction() = default;
 
 //-----------------------------------------------------------------------------
 void pqLockPanelsReaction::actionTriggered()

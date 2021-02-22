@@ -15,14 +15,10 @@
 #include "vtkNetworkAccessManager.h"
 
 //----------------------------------------------------------------------------
-vtkNetworkAccessManager::vtkNetworkAccessManager()
-{
-}
+vtkNetworkAccessManager::vtkNetworkAccessManager() = default;
 
 //----------------------------------------------------------------------------
-vtkNetworkAccessManager::~vtkNetworkAccessManager()
-{
-}
+vtkNetworkAccessManager::~vtkNetworkAccessManager() = default;
 
 //----------------------------------------------------------------------------
 void vtkNetworkAccessManager::PrintSelf(ostream& os, vtkIndent indent)

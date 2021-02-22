@@ -52,9 +52,7 @@ pqPipelineModelSelectionAdaptor::pqPipelineModelSelectionAdaptor(
 }
 
 //-----------------------------------------------------------------------------
-pqPipelineModelSelectionAdaptor::~pqPipelineModelSelectionAdaptor()
-{
-}
+pqPipelineModelSelectionAdaptor::~pqPipelineModelSelectionAdaptor() = default;
 
 //-----------------------------------------------------------------------------
 QModelIndex pqPipelineModelSelectionAdaptor::mapFromItem(pqServerManagerModelItem* item) const

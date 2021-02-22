@@ -50,9 +50,7 @@ vtkAttributeDataToTableFilter::vtkAttributeDataToTableFilter()
 }
 
 //----------------------------------------------------------------------------
-vtkAttributeDataToTableFilter::~vtkAttributeDataToTableFilter()
-{
-}
+vtkAttributeDataToTableFilter::~vtkAttributeDataToTableFilter() = default;
 
 //----------------------------------------------------------------------------
 vtkExecutive* vtkAttributeDataToTableFilter::CreateDefaultExecutive()

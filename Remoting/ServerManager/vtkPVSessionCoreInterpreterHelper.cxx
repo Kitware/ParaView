@@ -29,9 +29,7 @@ vtkPVSessionCoreInterpreterHelper::vtkPVSessionCoreInterpreterHelper()
 }
 
 //----------------------------------------------------------------------------
-vtkPVSessionCoreInterpreterHelper::~vtkPVSessionCoreInterpreterHelper()
-{
-}
+vtkPVSessionCoreInterpreterHelper::~vtkPVSessionCoreInterpreterHelper() = default;
 
 //----------------------------------------------------------------------------
 void vtkPVSessionCoreInterpreterHelper::SetCore(vtkPVSessionCore* core)

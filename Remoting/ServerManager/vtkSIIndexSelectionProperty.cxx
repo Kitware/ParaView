@@ -31,14 +31,10 @@
 vtkStandardNewMacro(vtkSIIndexSelectionProperty);
 
 //----------------------------------------------------------------------------
-vtkSIIndexSelectionProperty::vtkSIIndexSelectionProperty()
-{
-}
+vtkSIIndexSelectionProperty::vtkSIIndexSelectionProperty() = default;
 
 //----------------------------------------------------------------------------
-vtkSIIndexSelectionProperty::~vtkSIIndexSelectionProperty()
-{
-}
+vtkSIIndexSelectionProperty::~vtkSIIndexSelectionProperty() = default;
 
 //----------------------------------------------------------------------------
 void vtkSIIndexSelectionProperty::PrintSelf(ostream& os, vtkIndent indent)

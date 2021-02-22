@@ -41,9 +41,7 @@ pqConsoleWidgetEventTranslator::pqConsoleWidgetEventTranslator(QObject* parentOb
 }
 
 //-----------------------------------------------------------------------------
-pqConsoleWidgetEventTranslator::~pqConsoleWidgetEventTranslator()
-{
-}
+pqConsoleWidgetEventTranslator::~pqConsoleWidgetEventTranslator() = default;
 
 //-----------------------------------------------------------------------------
 bool pqConsoleWidgetEventTranslator::translateEvent(

@@ -20,14 +20,10 @@
 
 vtkStandardNewMacro(vtkSMMultiplexerInputDomain);
 //----------------------------------------------------------------------------
-vtkSMMultiplexerInputDomain::vtkSMMultiplexerInputDomain()
-{
-}
+vtkSMMultiplexerInputDomain::vtkSMMultiplexerInputDomain() = default;
 
 //----------------------------------------------------------------------------
-vtkSMMultiplexerInputDomain::~vtkSMMultiplexerInputDomain()
-{
-}
+vtkSMMultiplexerInputDomain::~vtkSMMultiplexerInputDomain() = default;
 
 //----------------------------------------------------------------------------
 int vtkSMMultiplexerInputDomain::IsInDomain(vtkSMProperty* property)

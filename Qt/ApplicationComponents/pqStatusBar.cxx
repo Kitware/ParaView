@@ -66,6 +66,4 @@ pqStatusBar::pqStatusBar(QWidget* parentObject)
 }
 
 //-----------------------------------------------------------------------------
-pqStatusBar::~pqStatusBar()
-{
-}
+pqStatusBar::~pqStatusBar() = default;

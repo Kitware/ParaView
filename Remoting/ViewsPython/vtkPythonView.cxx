@@ -106,7 +106,7 @@ public:
     : Initialized(false)
   {
   }
-  ~vtkInternals() {}
+  ~vtkInternals() = default;
 
   bool Prepare(const std::string& script)
   {

@@ -46,7 +46,7 @@ public:
     : ActiveSessionID(0)
   {
   }
-  ~vtkPXMInternal() {}
+  ~vtkPXMInternal() = default;
   vtkIdType ActiveSessionID;
 };
 

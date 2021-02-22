@@ -43,9 +43,7 @@ vtkSurfaceVectors::vtkSurfaceVectors()
 }
 
 //-----------------------------------------------------------------------------
-vtkSurfaceVectors::~vtkSurfaceVectors()
-{
-}
+vtkSurfaceVectors::~vtkSurfaceVectors() = default;
 
 //-----------------------------------------------------------------------------
 int vtkSurfaceVectors::RequestUpdateExtent(vtkInformation* vtkNotUsed(request),

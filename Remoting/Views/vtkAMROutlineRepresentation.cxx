@@ -61,9 +61,7 @@ vtkAMROutlineRepresentation::vtkAMROutlineRepresentation()
 }
 
 //----------------------------------------------------------------------------
-vtkAMROutlineRepresentation::~vtkAMROutlineRepresentation()
-{
-}
+vtkAMROutlineRepresentation::~vtkAMROutlineRepresentation() = default;
 
 //----------------------------------------------------------------------------
 void vtkAMROutlineRepresentation::SetVisibility(bool val)

@@ -35,9 +35,7 @@ vtkPVGL2PSExporter::vtkPVGL2PSExporter()
 }
 
 //----------------------------------------------------------------------------
-vtkPVGL2PSExporter::~vtkPVGL2PSExporter()
-{
-}
+vtkPVGL2PSExporter::~vtkPVGL2PSExporter() = default;
 
 //----------------------------------------------------------------------------
 void vtkPVGL2PSExporter::WriteData()

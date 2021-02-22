@@ -122,9 +122,7 @@ pqPluginDialog::pqPluginDialog(pqServer* server, QWidget* p)
 }
 
 //----------------------------------------------------------------------------
-pqPluginDialog::~pqPluginDialog()
-{
-}
+pqPluginDialog::~pqPluginDialog() = default;
 
 //----------------------------------------------------------------------------
 void pqPluginDialog::loadRemotePlugin()

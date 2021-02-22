@@ -25,9 +25,7 @@ pqDiscreteDoubleWidget::pqDiscreteDoubleWidget(QWidget* parent)
 }
 
 //-----------------------------------------------------------------------------
-pqDiscreteDoubleWidget::~pqDiscreteDoubleWidget()
-{
-}
+pqDiscreteDoubleWidget::~pqDiscreteDoubleWidget() = default;
 
 //-----------------------------------------------------------------------------
 std::vector<double> pqDiscreteDoubleWidget::values() const

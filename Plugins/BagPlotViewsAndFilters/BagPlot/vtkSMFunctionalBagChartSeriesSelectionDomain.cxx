@@ -22,14 +22,12 @@
 vtkStandardNewMacro(vtkSMFunctionalBagChartSeriesSelectionDomain);
 
 //----------------------------------------------------------------------------
-vtkSMFunctionalBagChartSeriesSelectionDomain::vtkSMFunctionalBagChartSeriesSelectionDomain()
-{
-}
+vtkSMFunctionalBagChartSeriesSelectionDomain::vtkSMFunctionalBagChartSeriesSelectionDomain() =
+  default;
 
 //----------------------------------------------------------------------------
-vtkSMFunctionalBagChartSeriesSelectionDomain::~vtkSMFunctionalBagChartSeriesSelectionDomain()
-{
-}
+vtkSMFunctionalBagChartSeriesSelectionDomain::~vtkSMFunctionalBagChartSeriesSelectionDomain() =
+  default;
 
 //----------------------------------------------------------------------------
 bool vtkSMFunctionalBagChartSeriesSelectionDomain::GetDefaultSeriesVisibility(const char* name)

@@ -52,9 +52,7 @@ pqReaction::pqReaction(QAction* parentObject, Qt::ConnectionType type)
 }
 
 //-----------------------------------------------------------------------------
-pqReaction::~pqReaction()
-{
-}
+pqReaction::~pqReaction() = default;
 
 //-----------------------------------------------------------------------------
 void pqReaction::updateMasterEnableState(bool isMaster)

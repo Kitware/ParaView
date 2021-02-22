@@ -183,7 +183,7 @@ class pqIndexSelectionWidget::pqInternals
 public:
   typedef QMap<QString, Widgets*> WidgetMap;
 
-  pqInternals() {}
+  pqInternals() = default;
 
   ~pqInternals()
   {

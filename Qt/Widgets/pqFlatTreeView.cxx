@@ -64,7 +64,7 @@ public:
     , Selected(false)
   {
   }
-  ~pqFlatTreeViewColumn() {}
+  ~pqFlatTreeViewColumn() = default;
 
 public:
   int Width;
@@ -101,7 +101,7 @@ class pqFlatTreeViewInternal
 {
 public:
   pqFlatTreeViewInternal();
-  ~pqFlatTreeViewInternal() {}
+  ~pqFlatTreeViewInternal() = default;
 
   QPersistentModelIndex ShiftStart;
   QPersistentModelIndex Index;

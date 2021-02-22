@@ -74,7 +74,7 @@ class vtkDomainObserver
   }
 
 public:
-  vtkDomainObserver() {}
+  vtkDomainObserver() = default;
   ~vtkDomainObserver()
   {
     for (size_t cc = 0; cc < this->MonitoredProperties.size(); cc++)

@@ -50,8 +50,8 @@ public:
   }
 
 protected:
-  vtkSMProxyClipboardPropertyIterator() {}
-  ~vtkSMProxyClipboardPropertyIterator() override {}
+  vtkSMProxyClipboardPropertyIterator() = default;
+  ~vtkSMProxyClipboardPropertyIterator() override = default;
 
   bool Skip(const char* vtkNotUsed(pname), vtkSMProperty* prop) const
   {

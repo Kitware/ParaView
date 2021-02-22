@@ -21,9 +21,7 @@ vtkPVInformation::vtkPVInformation()
 }
 
 //----------------------------------------------------------------------------
-vtkPVInformation::~vtkPVInformation()
-{
-}
+vtkPVInformation::~vtkPVInformation() = default;
 
 //----------------------------------------------------------------------------
 void vtkPVInformation::PrintSelf(ostream& os, vtkIndent indent)

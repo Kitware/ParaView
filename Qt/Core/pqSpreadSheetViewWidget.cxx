@@ -113,9 +113,7 @@ pqSpreadSheetViewWidget::pqSpreadSheetViewWidget(QWidget* parentObject)
 }
 
 //-----------------------------------------------------------------------------
-pqSpreadSheetViewWidget::~pqSpreadSheetViewWidget()
-{
-}
+pqSpreadSheetViewWidget::~pqSpreadSheetViewWidget() = default;
 
 //-----------------------------------------------------------------------------
 void pqSpreadSheetViewWidget::setModel(QAbstractItemModel* modelToUse)

@@ -61,14 +61,10 @@ vtkSMProxy* FindProxy(const char* groupName, const char* arrayName, vtkSMSession
 
 vtkObjectFactoryNewMacro(vtkSMTransferFunctionManager);
 //----------------------------------------------------------------------------
-vtkSMTransferFunctionManager::vtkSMTransferFunctionManager()
-{
-}
+vtkSMTransferFunctionManager::vtkSMTransferFunctionManager() = default;
 
 //----------------------------------------------------------------------------
-vtkSMTransferFunctionManager::~vtkSMTransferFunctionManager()
-{
-}
+vtkSMTransferFunctionManager::~vtkSMTransferFunctionManager() = default;
 
 //----------------------------------------------------------------------------
 vtkSMProxy* vtkSMTransferFunctionManager::GetColorTransferFunction(

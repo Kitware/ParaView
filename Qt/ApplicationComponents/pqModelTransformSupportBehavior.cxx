@@ -116,9 +116,7 @@ pqModelTransformSupportBehavior::pqModelTransformSupportBehavior(QObject* parent
 }
 
 //-----------------------------------------------------------------------------
-pqModelTransformSupportBehavior::~pqModelTransformSupportBehavior()
-{
-}
+pqModelTransformSupportBehavior::~pqModelTransformSupportBehavior() = default;
 
 //-----------------------------------------------------------------------------
 void pqModelTransformSupportBehavior::viewAdded(pqView* view)

@@ -59,9 +59,7 @@ vtkPythonAnimationCue::vtkPythonAnimationCue()
 }
 
 //----------------------------------------------------------------------------
-vtkPythonAnimationCue::~vtkPythonAnimationCue()
-{
-}
+vtkPythonAnimationCue::~vtkPythonAnimationCue() = default;
 
 //----------------------------------------------------------------------------
 void vtkPythonAnimationCue::HandleStartCueEvent()

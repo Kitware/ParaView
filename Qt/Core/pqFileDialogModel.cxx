@@ -352,7 +352,7 @@ public:
     this->CurrentPath = info->GetFullPath();
   }
 
-  ~pqImplementation() {}
+  ~pqImplementation() = default;
 
   /// Removes multiple-slashes, ".", and ".." from the given path string,
   /// and points slashes in the correct direction for the server

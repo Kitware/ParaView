@@ -19,14 +19,10 @@
 
 vtkStandardNewMacro(vtkPVContextInteractorStyle);
 //----------------------------------------------------------------------------
-vtkPVContextInteractorStyle::vtkPVContextInteractorStyle()
-{
-}
+vtkPVContextInteractorStyle::vtkPVContextInteractorStyle() = default;
 
 //----------------------------------------------------------------------------
-vtkPVContextInteractorStyle::~vtkPVContextInteractorStyle()
-{
-}
+vtkPVContextInteractorStyle::~vtkPVContextInteractorStyle() = default;
 //----------------------------------------------------------------------------
 void vtkPVContextInteractorStyle::OnLeftButtonDown()
 {

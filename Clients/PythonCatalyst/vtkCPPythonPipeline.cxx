@@ -92,9 +92,7 @@ vtkCPPythonPipeline::vtkCPPythonPipeline()
 }
 
 //----------------------------------------------------------------------------
-vtkCPPythonPipeline::~vtkCPPythonPipeline()
-{
-}
+vtkCPPythonPipeline::~vtkCPPythonPipeline() = default;
 
 //----------------------------------------------------------------------------
 int vtkCPPythonPipeline::DetectScriptVersion(const char* fname)

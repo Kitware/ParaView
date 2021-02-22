@@ -20,14 +20,10 @@
 
 vtkStandardNewMacro(vtkSMAnimationFrameWindowDomain);
 //----------------------------------------------------------------------------
-vtkSMAnimationFrameWindowDomain::vtkSMAnimationFrameWindowDomain()
-{
-}
+vtkSMAnimationFrameWindowDomain::vtkSMAnimationFrameWindowDomain() = default;
 
 //----------------------------------------------------------------------------
-vtkSMAnimationFrameWindowDomain::~vtkSMAnimationFrameWindowDomain()
-{
-}
+vtkSMAnimationFrameWindowDomain::~vtkSMAnimationFrameWindowDomain() = default;
 
 //----------------------------------------------------------------------------
 void vtkSMAnimationFrameWindowDomain::Update(vtkSMProperty*)

@@ -248,9 +248,7 @@ pqGenericPropertyWidgetDecorator::pqGenericPropertyWidgetDecorator(
 }
 
 //-----------------------------------------------------------------------------
-pqGenericPropertyWidgetDecorator::~pqGenericPropertyWidgetDecorator()
-{
-}
+pqGenericPropertyWidgetDecorator::~pqGenericPropertyWidgetDecorator() = default;
 
 //-----------------------------------------------------------------------------
 void pqGenericPropertyWidgetDecorator::updateState()

@@ -69,9 +69,7 @@ pqMultiSliceView::pqMultiSliceView(const QString& viewType, const QString& group
 }
 
 //-----------------------------------------------------------------------------
-pqMultiSliceView::~pqMultiSliceView()
-{
-}
+pqMultiSliceView::~pqMultiSliceView() = default;
 //-----------------------------------------------------------------------------
 QWidget* pqMultiSliceView::createWidget()
 {

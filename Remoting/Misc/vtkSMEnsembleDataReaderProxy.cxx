@@ -23,9 +23,7 @@ vtkSMEnsembleDataReaderProxy::vtkSMEnsembleDataReaderProxy()
 }
 
 //-----------------------------------------------------------------------------
-vtkSMEnsembleDataReaderProxy::~vtkSMEnsembleDataReaderProxy()
-{
-}
+vtkSMEnsembleDataReaderProxy::~vtkSMEnsembleDataReaderProxy() = default;
 
 //-----------------------------------------------------------------------------
 void vtkSMEnsembleDataReaderProxy::SetPropertyModifiedFlag(const char* name, int flag)

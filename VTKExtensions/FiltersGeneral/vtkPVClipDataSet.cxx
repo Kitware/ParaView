@@ -60,9 +60,7 @@ vtkPVClipDataSet::vtkPVClipDataSet(vtkImplicitFunction* vtkNotUsed(cf))
 }
 
 //----------------------------------------------------------------------------
-vtkPVClipDataSet::~vtkPVClipDataSet()
-{
-}
+vtkPVClipDataSet::~vtkPVClipDataSet() = default;
 
 //----------------------------------------------------------------------------
 void vtkPVClipDataSet::PrintSelf(ostream& os, vtkIndent indent)

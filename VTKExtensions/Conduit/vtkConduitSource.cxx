@@ -238,9 +238,7 @@ vtkConduitSource::vtkConduitSource()
 }
 
 //----------------------------------------------------------------------------
-vtkConduitSource::~vtkConduitSource()
-{
-}
+vtkConduitSource::~vtkConduitSource() = default;
 
 //----------------------------------------------------------------------------
 void vtkConduitSource::SetNode(const conduit_node* node)

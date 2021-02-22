@@ -50,9 +50,7 @@ pqFileDialogFilter::pqFileDialogFilter(pqFileDialogModel* model, QObject* Parent
   this->setSortCaseSensitivity(Qt::CaseInsensitive);
 }
 
-pqFileDialogFilter::~pqFileDialogFilter()
-{
-}
+pqFileDialogFilter::~pqFileDialogFilter() = default;
 
 #include <stdio.h>
 

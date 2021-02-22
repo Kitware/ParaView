@@ -47,7 +47,7 @@ public:
   bool InitializedWidgets;
 
   pqInternal() { this->InitializedWidgets = false; }
-  ~pqInternal() {}
+  ~pqInternal() = default;
 };
 
 //-----------------------------------------------------------------------------

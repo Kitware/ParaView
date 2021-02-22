@@ -236,9 +236,7 @@ pqSeriesGeneratorDialog::pqSeriesGeneratorDialog(
 }
 
 //-----------------------------------------------------------------------------
-pqSeriesGeneratorDialog::~pqSeriesGeneratorDialog()
-{
-}
+pqSeriesGeneratorDialog::~pqSeriesGeneratorDialog() = default;
 
 //-----------------------------------------------------------------------------
 QVector<double> pqSeriesGeneratorDialog::series() const

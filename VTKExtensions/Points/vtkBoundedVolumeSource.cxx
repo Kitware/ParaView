@@ -37,9 +37,7 @@ vtkBoundedVolumeSource::vtkBoundedVolumeSource()
 }
 
 //----------------------------------------------------------------------------
-vtkBoundedVolumeSource::~vtkBoundedVolumeSource()
-{
-}
+vtkBoundedVolumeSource::~vtkBoundedVolumeSource() = default;
 
 //----------------------------------------------------------------------------
 int vtkBoundedVolumeSource::RequestInformation(

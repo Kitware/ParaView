@@ -53,9 +53,7 @@ pqPluginToolBarBehavior::pqPluginToolBarBehavior(QMainWindow* parentObject)
 }
 
 //-----------------------------------------------------------------------------
-pqPluginToolBarBehavior::~pqPluginToolBarBehavior()
-{
-}
+pqPluginToolBarBehavior::~pqPluginToolBarBehavior() = default;
 
 //-----------------------------------------------------------------------------
 void pqPluginToolBarBehavior::addPluginInterface(QObject* iface)

@@ -65,14 +65,10 @@ int vtkInSituInitializationHelper::WasInitializedOnce;
 int vtkInSituInitializationHelper::WasFinalizedOnce;
 vtkInSituInitializationHelper::vtkInternals* vtkInSituInitializationHelper::Internals;
 //----------------------------------------------------------------------------
-vtkInSituInitializationHelper::vtkInSituInitializationHelper()
-{
-}
+vtkInSituInitializationHelper::vtkInSituInitializationHelper() = default;
 
 //----------------------------------------------------------------------------
-vtkInSituInitializationHelper::~vtkInSituInitializationHelper()
-{
-}
+vtkInSituInitializationHelper::~vtkInSituInitializationHelper() = default;
 
 //----------------------------------------------------------------------------
 void vtkInSituInitializationHelper::Initialize(vtkTypeUInt64 comm)

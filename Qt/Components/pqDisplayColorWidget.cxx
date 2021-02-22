@@ -100,7 +100,7 @@ public:
         use_unchecked_modified_event, parentObject)
   {
   }
-  ~PropertyLinksConnection() override {}
+  ~PropertyLinksConnection() override = default;
 
   // Methods to convert between ValueType and QVariant. Since QVariant doesn't
   // support == operations of non-default Qt types, we are forced to convert the

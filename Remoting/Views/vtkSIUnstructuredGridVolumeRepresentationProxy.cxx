@@ -20,14 +20,12 @@
 
 vtkStandardNewMacro(vtkSIUnstructuredGridVolumeRepresentationProxy);
 //----------------------------------------------------------------------------
-vtkSIUnstructuredGridVolumeRepresentationProxy::vtkSIUnstructuredGridVolumeRepresentationProxy()
-{
-}
+vtkSIUnstructuredGridVolumeRepresentationProxy::vtkSIUnstructuredGridVolumeRepresentationProxy() =
+  default;
 
 //----------------------------------------------------------------------------
-vtkSIUnstructuredGridVolumeRepresentationProxy::~vtkSIUnstructuredGridVolumeRepresentationProxy()
-{
-}
+vtkSIUnstructuredGridVolumeRepresentationProxy::~vtkSIUnstructuredGridVolumeRepresentationProxy() =
+  default;
 
 //----------------------------------------------------------------------------
 bool vtkSIUnstructuredGridVolumeRepresentationProxy::CreateVTKObjects()

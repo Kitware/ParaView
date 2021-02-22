@@ -45,9 +45,7 @@ pqCollaborationEventPlayer::pqCollaborationEventPlayer(QObject* parentObject)
 }
 
 //-----------------------------------------------------------------------------
-pqCollaborationEventPlayer::~pqCollaborationEventPlayer()
-{
-}
+pqCollaborationEventPlayer::~pqCollaborationEventPlayer() = default;
 
 //-----------------------------------------------------------------------------
 void pqCollaborationEventPlayer::waitForMaster(int ms)

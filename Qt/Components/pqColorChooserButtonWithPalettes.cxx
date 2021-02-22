@@ -67,9 +67,7 @@ pqColorChooserButtonWithPalettes::pqColorChooserButtonWithPalettes(QWidget* pare
 }
 
 //-----------------------------------------------------------------------------
-pqColorChooserButtonWithPalettes::~pqColorChooserButtonWithPalettes()
-{
-}
+pqColorChooserButtonWithPalettes::~pqColorChooserButtonWithPalettes() = default;
 
 //-----------------------------------------------------------------------------
 vtkSMSettingsProxy* pqColorChooserButtonWithPalettes::colorPalette() const
@@ -180,9 +178,7 @@ pqColorPaletteLinkHelper::pqColorPaletteLinkHelper(
 }
 
 //-----------------------------------------------------------------------------
-pqColorPaletteLinkHelper::~pqColorPaletteLinkHelper()
-{
-}
+pqColorPaletteLinkHelper::~pqColorPaletteLinkHelper() = default;
 
 //-----------------------------------------------------------------------------
 void pqColorPaletteLinkHelper::setSelectedPaletteColor(const QString& colorName)

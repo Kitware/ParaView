@@ -71,14 +71,10 @@ bool Call(vtkSMSessionProxyManager* pxm, vtkTypeUInt32 location, F&& f)
 
 vtkStandardNewMacro(vtkSMFileUtilities);
 //----------------------------------------------------------------------------
-vtkSMFileUtilities::vtkSMFileUtilities()
-{
-}
+vtkSMFileUtilities::vtkSMFileUtilities() = default;
 
 //----------------------------------------------------------------------------
-vtkSMFileUtilities::~vtkSMFileUtilities()
-{
-}
+vtkSMFileUtilities::~vtkSMFileUtilities() = default;
 
 //----------------------------------------------------------------------------
 bool vtkSMFileUtilities::MakeDirectory(const std::string& name, vtkTypeUInt32 location)

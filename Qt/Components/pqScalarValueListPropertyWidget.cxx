@@ -80,7 +80,7 @@ public:
     assert(num_columns > 0);
   }
 
-  ~pqTableModel() override {}
+  ~pqTableModel() override = default;
 
   void setLabels(std::vector<const char*>& labels)
   {

@@ -93,9 +93,7 @@ pqViewTypePropertyWidget::pqViewTypePropertyWidget(
 }
 
 //-----------------------------------------------------------------------------
-pqViewTypePropertyWidget::~pqViewTypePropertyWidget()
-{
-}
+pqViewTypePropertyWidget::~pqViewTypePropertyWidget() = default;
 
 //-----------------------------------------------------------------------------
 QString pqViewTypePropertyWidget::value() const

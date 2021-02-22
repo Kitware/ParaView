@@ -26,14 +26,10 @@
 
 vtkStandardNewMacro(vtkSMCSVExporterProxy);
 //----------------------------------------------------------------------------
-vtkSMCSVExporterProxy::vtkSMCSVExporterProxy()
-{
-}
+vtkSMCSVExporterProxy::vtkSMCSVExporterProxy() = default;
 
 //----------------------------------------------------------------------------
-vtkSMCSVExporterProxy::~vtkSMCSVExporterProxy()
-{
-}
+vtkSMCSVExporterProxy::~vtkSMCSVExporterProxy() = default;
 
 //----------------------------------------------------------------------------
 bool vtkSMCSVExporterProxy::CanExport(vtkSMProxy* proxy)

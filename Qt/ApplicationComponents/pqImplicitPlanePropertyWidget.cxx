@@ -158,9 +158,7 @@ pqImplicitPlanePropertyWidget::pqImplicitPlanePropertyWidget(
 }
 
 //-----------------------------------------------------------------------------
-pqImplicitPlanePropertyWidget::~pqImplicitPlanePropertyWidget()
-{
-}
+pqImplicitPlanePropertyWidget::~pqImplicitPlanePropertyWidget() = default;
 
 //-----------------------------------------------------------------------------
 void pqImplicitPlanePropertyWidget::placeWidget()

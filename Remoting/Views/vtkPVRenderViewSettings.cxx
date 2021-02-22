@@ -53,9 +53,7 @@ vtkPVRenderViewSettings::vtkPVRenderViewSettings()
 }
 
 //----------------------------------------------------------------------------
-vtkPVRenderViewSettings::~vtkPVRenderViewSettings()
-{
-}
+vtkPVRenderViewSettings::~vtkPVRenderViewSettings() = default;
 
 //----------------------------------------------------------------------------
 void vtkPVRenderViewSettings::SetResolveCoincidentTopology(int mode)

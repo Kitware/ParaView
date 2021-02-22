@@ -74,9 +74,7 @@ vtkPVRenderingCapabilitiesInformation::vtkPVRenderingCapabilitiesInformation()
 }
 
 //----------------------------------------------------------------------------
-vtkPVRenderingCapabilitiesInformation::~vtkPVRenderingCapabilitiesInformation()
-{
-}
+vtkPVRenderingCapabilitiesInformation::~vtkPVRenderingCapabilitiesInformation() = default;
 
 //----------------------------------------------------------------------------
 vtkTypeUInt32 vtkPVRenderingCapabilitiesInformation::GetLocalCapabilities()

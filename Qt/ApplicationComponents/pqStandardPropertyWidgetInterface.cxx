@@ -97,9 +97,7 @@ pqStandardPropertyWidgetInterface::pqStandardPropertyWidgetInterface(QObject* p)
 }
 
 //-----------------------------------------------------------------------------
-pqStandardPropertyWidgetInterface::~pqStandardPropertyWidgetInterface()
-{
-}
+pqStandardPropertyWidgetInterface::~pqStandardPropertyWidgetInterface() = default;
 
 //-----------------------------------------------------------------------------
 pqPropertyWidget* pqStandardPropertyWidgetInterface::createWidgetForProperty(

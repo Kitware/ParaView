@@ -13,13 +13,9 @@
 
 vtkStandardNewMacro(vtkPSciVizMultiCorrelativeStats);
 
-vtkPSciVizMultiCorrelativeStats::vtkPSciVizMultiCorrelativeStats()
-{
-}
+vtkPSciVizMultiCorrelativeStats::vtkPSciVizMultiCorrelativeStats() = default;
 
-vtkPSciVizMultiCorrelativeStats::~vtkPSciVizMultiCorrelativeStats()
-{
-}
+vtkPSciVizMultiCorrelativeStats::~vtkPSciVizMultiCorrelativeStats() = default;
 
 void vtkPSciVizMultiCorrelativeStats::PrintSelf(ostream& os, vtkIndent indent)
 {

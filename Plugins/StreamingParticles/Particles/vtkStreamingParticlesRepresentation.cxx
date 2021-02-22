@@ -87,9 +87,7 @@ vtkStreamingParticlesRepresentation::vtkStreamingParticlesRepresentation()
 }
 
 //----------------------------------------------------------------------------
-vtkStreamingParticlesRepresentation::~vtkStreamingParticlesRepresentation()
-{
-}
+vtkStreamingParticlesRepresentation::~vtkStreamingParticlesRepresentation() = default;
 
 //----------------------------------------------------------------------------
 void vtkStreamingParticlesRepresentation::SetVisibility(bool val)

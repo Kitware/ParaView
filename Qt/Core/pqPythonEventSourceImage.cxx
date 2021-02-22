@@ -147,9 +147,7 @@ pqPythonEventSourceImage::pqPythonEventSourceImage(QObject* p)
 }
 
 //-----------------------------------------------------------------------------
-pqPythonEventSourceImage::~pqPythonEventSourceImage()
-{
-}
+pqPythonEventSourceImage::~pqPythonEventSourceImage() = default;
 
 //-----------------------------------------------------------------------------
 void pqPythonEventSourceImage::run()

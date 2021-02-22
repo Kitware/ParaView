@@ -18,14 +18,10 @@
 #include "vtkSMSessionProxyManager.h"
 
 //----------------------------------------------------------------------------
-vtkSMDeserializer::vtkSMDeserializer()
-{
-}
+vtkSMDeserializer::vtkSMDeserializer() = default;
 
 //----------------------------------------------------------------------------
-vtkSMDeserializer::~vtkSMDeserializer()
-{
-}
+vtkSMDeserializer::~vtkSMDeserializer() = default;
 
 //----------------------------------------------------------------------------
 vtkSMProxy* vtkSMDeserializer::CreateProxy(

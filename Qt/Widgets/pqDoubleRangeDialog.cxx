@@ -62,9 +62,7 @@ pqDoubleRangeDialog::pqDoubleRangeDialog(
   this->setLayout(layout_);
 }
 
-pqDoubleRangeDialog::~pqDoubleRangeDialog()
-{
-}
+pqDoubleRangeDialog::~pqDoubleRangeDialog() = default;
 
 void pqDoubleRangeDialog::setValue(double value_)
 {

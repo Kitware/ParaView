@@ -30,9 +30,7 @@ vtkLZ4Compressor::vtkLZ4Compressor()
 }
 
 //----------------------------------------------------------------------------
-vtkLZ4Compressor::~vtkLZ4Compressor()
-{
-}
+vtkLZ4Compressor::~vtkLZ4Compressor() = default;
 
 //----------------------------------------------------------------------------
 int vtkLZ4Compressor::Compress()

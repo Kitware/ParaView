@@ -52,9 +52,7 @@ vtkResampledAMRImageSource::vtkResampledAMRImageSource()
 }
 
 //----------------------------------------------------------------------------
-vtkResampledAMRImageSource::~vtkResampledAMRImageSource()
-{
-}
+vtkResampledAMRImageSource::~vtkResampledAMRImageSource() = default;
 
 //----------------------------------------------------------------------------
 void vtkResampledAMRImageSource::Reset()

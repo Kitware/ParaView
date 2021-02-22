@@ -25,14 +25,10 @@
 vtkStandardNewMacro(vtkSMArrayRangeDomain);
 
 //---------------------------------------------------------------------------
-vtkSMArrayRangeDomain::vtkSMArrayRangeDomain()
-{
-}
+vtkSMArrayRangeDomain::vtkSMArrayRangeDomain() = default;
 
 //---------------------------------------------------------------------------
-vtkSMArrayRangeDomain::~vtkSMArrayRangeDomain()
-{
-}
+vtkSMArrayRangeDomain::~vtkSMArrayRangeDomain() = default;
 
 //---------------------------------------------------------------------------
 void vtkSMArrayRangeDomain::Update(vtkSMProperty*)

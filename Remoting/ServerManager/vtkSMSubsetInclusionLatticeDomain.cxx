@@ -33,9 +33,7 @@ vtkSMSubsetInclusionLatticeDomain::vtkSMSubsetInclusionLatticeDomain()
 }
 
 //----------------------------------------------------------------------------
-vtkSMSubsetInclusionLatticeDomain::~vtkSMSubsetInclusionLatticeDomain()
-{
-}
+vtkSMSubsetInclusionLatticeDomain::~vtkSMSubsetInclusionLatticeDomain() = default;
 
 //----------------------------------------------------------------------------
 void vtkSMSubsetInclusionLatticeDomain::PrintSelf(ostream& os, vtkIndent indent)

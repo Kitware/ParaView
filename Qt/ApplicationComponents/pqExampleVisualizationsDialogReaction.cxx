@@ -41,9 +41,7 @@ pqExampleVisualizationsDialogReaction::pqExampleVisualizationsDialogReaction(QAc
 }
 
 //-----------------------------------------------------------------------------
-pqExampleVisualizationsDialogReaction::~pqExampleVisualizationsDialogReaction()
-{
-}
+pqExampleVisualizationsDialogReaction::~pqExampleVisualizationsDialogReaction() = default;
 
 //-----------------------------------------------------------------------------
 void pqExampleVisualizationsDialogReaction::showExampleVisualizationsDialog()

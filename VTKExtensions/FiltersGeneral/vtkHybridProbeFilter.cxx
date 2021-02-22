@@ -36,9 +36,7 @@ vtkHybridProbeFilter::vtkHybridProbeFilter()
 }
 
 //----------------------------------------------------------------------------
-vtkHybridProbeFilter::~vtkHybridProbeFilter()
-{
-}
+vtkHybridProbeFilter::~vtkHybridProbeFilter() = default;
 
 //----------------------------------------------------------------------------
 int vtkHybridProbeFilter::FillInputPortInformation(int, vtkInformation* info)

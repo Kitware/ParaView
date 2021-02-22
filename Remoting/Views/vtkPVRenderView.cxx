@@ -262,7 +262,7 @@ private:
     : RenderOnLocalProcess(false)
   {
   }
-  ~vtkPVRendererCuller() override {}
+  ~vtkPVRendererCuller() override = default;
   bool RenderOnLocalProcess;
 };
 vtkStandardNewMacro(vtkPVRendererCuller);

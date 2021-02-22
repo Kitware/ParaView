@@ -33,9 +33,7 @@ vtkPVTrackballRotate::vtkPVTrackballRotate()
 }
 
 //-------------------------------------------------------------------------
-vtkPVTrackballRotate::~vtkPVTrackballRotate()
-{
-}
+vtkPVTrackballRotate::~vtkPVTrackballRotate() = default;
 
 //-------------------------------------------------------------------------
 void vtkPVTrackballRotate::OnButtonDown(int, int, vtkRenderer* ren, vtkRenderWindowInteractor*)

@@ -39,9 +39,8 @@ pqNonOrthogonalAutoStart::pqNonOrthogonalAutoStart(QObject* parentObject)
 }
 
 //-----------------------------------------------------------------------------
-pqNonOrthogonalAutoStart::~pqNonOrthogonalAutoStart()
-{
-}
+pqNonOrthogonalAutoStart::~pqNonOrthogonalAutoStart() = default;
+
 //-----------------------------------------------------------------------------
 void pqNonOrthogonalAutoStart::startup()
 {

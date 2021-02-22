@@ -68,9 +68,7 @@ pqAnimatableProxyComboBox::pqAnimatableProxyComboBox(QWidget* _parent)
 }
 
 //-----------------------------------------------------------------------------
-pqAnimatableProxyComboBox::~pqAnimatableProxyComboBox()
-{
-}
+pqAnimatableProxyComboBox::~pqAnimatableProxyComboBox() = default;
 
 //-----------------------------------------------------------------------------
 vtkSMProxy* pqAnimatableProxyComboBox::getCurrentProxy() const

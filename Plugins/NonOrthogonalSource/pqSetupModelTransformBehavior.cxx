@@ -37,6 +37,4 @@ pqSetupModelTransformBehavior::pqSetupModelTransformBehavior(QObject* parent)
 {
 }
 
-pqSetupModelTransformBehavior::~pqSetupModelTransformBehavior()
-{
-}
+pqSetupModelTransformBehavior::~pqSetupModelTransformBehavior() = default;

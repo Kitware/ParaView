@@ -21,9 +21,7 @@ vtkDataMineBlockReader::vtkDataMineBlockReader()
 }
 
 // --------------------------------------
-vtkDataMineBlockReader::~vtkDataMineBlockReader()
-{
-}
+vtkDataMineBlockReader::~vtkDataMineBlockReader() = default;
 
 // --------------------------------------
 void vtkDataMineBlockReader::PrintSelf(ostream& os, vtkIndent indent)

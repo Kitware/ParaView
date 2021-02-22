@@ -595,9 +595,7 @@ vtkSMPropertyHelper::vtkSMPropertyHelper(vtkSMProperty* property, bool quiet)
 }
 
 //----------------------------------------------------------------------------
-vtkSMPropertyHelper::~vtkSMPropertyHelper()
-{
-}
+vtkSMPropertyHelper::~vtkSMPropertyHelper() = default;
 
 //----------------------------------------------------------------------------
 void vtkSMPropertyHelper::Initialize(vtkSMProperty* property)

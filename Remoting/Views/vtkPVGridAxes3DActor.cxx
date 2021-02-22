@@ -44,9 +44,7 @@ vtkPVGridAxes3DActor::vtkPVGridAxes3DActor()
 }
 
 //----------------------------------------------------------------------------
-vtkPVGridAxes3DActor::~vtkPVGridAxes3DActor()
-{
-}
+vtkPVGridAxes3DActor::~vtkPVGridAxes3DActor() = default;
 
 //----------------------------------------------------------------------------
 double* vtkPVGridAxes3DActor::GetBounds()

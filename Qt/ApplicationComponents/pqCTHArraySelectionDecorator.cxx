@@ -57,9 +57,7 @@ pqCTHArraySelectionDecorator::pqCTHArraySelectionDecorator(
 }
 
 //-----------------------------------------------------------------------------
-pqCTHArraySelectionDecorator::~pqCTHArraySelectionDecorator()
-{
-}
+pqCTHArraySelectionDecorator::~pqCTHArraySelectionDecorator() = default;
 
 //-----------------------------------------------------------------------------
 void pqCTHArraySelectionDecorator::updateSelection()

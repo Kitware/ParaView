@@ -32,14 +32,10 @@
 
 vtkObjectFactoryNewMacro(vtkSMViewExportHelper);
 //----------------------------------------------------------------------------
-vtkSMViewExportHelper::vtkSMViewExportHelper()
-{
-}
+vtkSMViewExportHelper::vtkSMViewExportHelper() = default;
 
 //----------------------------------------------------------------------------
-vtkSMViewExportHelper::~vtkSMViewExportHelper()
-{
-}
+vtkSMViewExportHelper::~vtkSMViewExportHelper() = default;
 
 //----------------------------------------------------------------------------
 std::string vtkSMViewExportHelper::GetSupportedFileTypes(vtkSMViewProxy* view)

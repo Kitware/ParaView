@@ -24,14 +24,10 @@
 vtkStandardNewMacro(vtkPVTrackballMoveActor);
 
 //-------------------------------------------------------------------------
-vtkPVTrackballMoveActor::vtkPVTrackballMoveActor()
-{
-}
+vtkPVTrackballMoveActor::vtkPVTrackballMoveActor() = default;
 
 //-------------------------------------------------------------------------
-vtkPVTrackballMoveActor::~vtkPVTrackballMoveActor()
-{
-}
+vtkPVTrackballMoveActor::~vtkPVTrackballMoveActor() = default;
 
 //-------------------------------------------------------------------------
 void vtkPVTrackballMoveActor::OnButtonDown(int, int, vtkRenderer*, vtkRenderWindowInteractor*)

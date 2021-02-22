@@ -19,14 +19,10 @@
 
 vtkStandardNewMacro(vtkSMInsituStateLoader);
 //----------------------------------------------------------------------------
-vtkSMInsituStateLoader::vtkSMInsituStateLoader()
-{
-}
+vtkSMInsituStateLoader::vtkSMInsituStateLoader() = default;
 
 //----------------------------------------------------------------------------
-vtkSMInsituStateLoader::~vtkSMInsituStateLoader()
-{
-}
+vtkSMInsituStateLoader::~vtkSMInsituStateLoader() = default;
 
 //----------------------------------------------------------------------------
 vtkSMProxy* vtkSMInsituStateLoader::NewProxy(vtkTypeUInt32 id, vtkSMProxyLocator* locator)

@@ -21,14 +21,10 @@
 
 vtkStandardNewMacro(vtkSMViewResolutionDomain);
 //----------------------------------------------------------------------------
-vtkSMViewResolutionDomain::vtkSMViewResolutionDomain()
-{
-}
+vtkSMViewResolutionDomain::vtkSMViewResolutionDomain() = default;
 
 //----------------------------------------------------------------------------
-vtkSMViewResolutionDomain::~vtkSMViewResolutionDomain()
-{
-}
+vtkSMViewResolutionDomain::~vtkSMViewResolutionDomain() = default;
 
 //----------------------------------------------------------------------------
 void vtkSMViewResolutionDomain::Update(vtkSMProperty*)

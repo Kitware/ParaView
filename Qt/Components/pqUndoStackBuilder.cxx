@@ -54,9 +54,7 @@ pqUndoStackBuilder::pqUndoStackBuilder()
 }
 
 //-----------------------------------------------------------------------------
-pqUndoStackBuilder::~pqUndoStackBuilder()
-{
-}
+pqUndoStackBuilder::~pqUndoStackBuilder() = default;
 
 //-----------------------------------------------------------------------------
 void pqUndoStackBuilder::SetUndoStack(vtkSMUndoStack* stack)

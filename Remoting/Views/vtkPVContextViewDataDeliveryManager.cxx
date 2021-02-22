@@ -29,14 +29,10 @@
 
 vtkStandardNewMacro(vtkPVContextViewDataDeliveryManager);
 //----------------------------------------------------------------------------
-vtkPVContextViewDataDeliveryManager::vtkPVContextViewDataDeliveryManager()
-{
-}
+vtkPVContextViewDataDeliveryManager::vtkPVContextViewDataDeliveryManager() = default;
 
 //----------------------------------------------------------------------------
-vtkPVContextViewDataDeliveryManager::~vtkPVContextViewDataDeliveryManager()
-{
-}
+vtkPVContextViewDataDeliveryManager::~vtkPVContextViewDataDeliveryManager() = default;
 
 //----------------------------------------------------------------------------
 void vtkPVContextViewDataDeliveryManager::MoveData(

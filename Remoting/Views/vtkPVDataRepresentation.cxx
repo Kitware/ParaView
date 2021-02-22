@@ -52,9 +52,7 @@ vtkPVDataRepresentation::vtkPVDataRepresentation()
 }
 
 //----------------------------------------------------------------------------
-vtkPVDataRepresentation::~vtkPVDataRepresentation()
-{
-}
+vtkPVDataRepresentation::~vtkPVDataRepresentation() = default;
 
 //----------------------------------------------------------------------------
 void vtkPVDataRepresentation::SetInputConnection(int port, vtkAlgorithmOutput* input)

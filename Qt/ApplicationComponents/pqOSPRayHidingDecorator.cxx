@@ -39,9 +39,7 @@ pqOSPRayHidingDecorator::pqOSPRayHidingDecorator(
 }
 
 //-----------------------------------------------------------------------------
-pqOSPRayHidingDecorator::~pqOSPRayHidingDecorator()
-{
-}
+pqOSPRayHidingDecorator::~pqOSPRayHidingDecorator() = default;
 
 //-----------------------------------------------------------------------------
 bool pqOSPRayHidingDecorator::canShowWidget(bool show_advanced) const

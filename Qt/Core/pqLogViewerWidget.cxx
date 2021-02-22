@@ -257,9 +257,7 @@ pqLogViewerWidget::pqLogViewerWidget(QWidget* parentObject)
 }
 
 //-----------------------------------------------------------------------------
-pqLogViewerWidget::~pqLogViewerWidget()
-{
-}
+pqLogViewerWidget::~pqLogViewerWidget() = default;
 
 //-----------------------------------------------------------------------------
 void pqLogViewerWidget::setLog(const QString& text)

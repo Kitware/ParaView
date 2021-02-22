@@ -115,9 +115,7 @@ pqCheckableProperty::pqCheckableProperty(
 }
 
 //-----------------------------------------------------------------------------
-pqCheckableProperty::~pqCheckableProperty()
-{
-}
+pqCheckableProperty::~pqCheckableProperty() = default;
 
 //-----------------------------------------------------------------------------
 bool pqCheckableProperty::enableCheckbox() const

@@ -91,14 +91,10 @@ vtkInformationKeyRestrictedMacro(vtkPVRVDMKeys, TRANSFORMED_GEOMETRY_BOUNDS, Dou
 //*****************************************************************************
 vtkStandardNewMacro(vtkPVRenderViewDataDeliveryManager);
 //----------------------------------------------------------------------------
-vtkPVRenderViewDataDeliveryManager::vtkPVRenderViewDataDeliveryManager()
-{
-}
+vtkPVRenderViewDataDeliveryManager::vtkPVRenderViewDataDeliveryManager() = default;
 
 //----------------------------------------------------------------------------
-vtkPVRenderViewDataDeliveryManager::~vtkPVRenderViewDataDeliveryManager()
-{
-}
+vtkPVRenderViewDataDeliveryManager::~vtkPVRenderViewDataDeliveryManager() = default;
 
 //----------------------------------------------------------------------------
 void vtkPVRenderViewDataDeliveryManager::SetDeliverToAllProcesses(

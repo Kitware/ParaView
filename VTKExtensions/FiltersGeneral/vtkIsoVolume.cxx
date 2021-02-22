@@ -46,9 +46,7 @@ vtkIsoVolume::vtkIsoVolume()
 }
 
 //----------------------------------------------------------------------------
-vtkIsoVolume::~vtkIsoVolume()
-{
-}
+vtkIsoVolume::~vtkIsoVolume() = default;
 
 //----------------------------------------------------------------------------
 // Criterion is cells whose scalars are between lower and upper thresholds.

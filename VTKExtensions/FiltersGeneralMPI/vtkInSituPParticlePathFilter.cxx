@@ -40,9 +40,7 @@ vtkInSituPParticlePathFilter::vtkInSituPParticlePathFilter()
   this->FirstTimeStep = 0;
 }
 
-vtkInSituPParticlePathFilter::~vtkInSituPParticlePathFilter()
-{
-}
+vtkInSituPParticlePathFilter::~vtkInSituPParticlePathFilter() = default;
 
 //----------------------------------------------------------------------------
 void vtkInSituPParticlePathFilter::SetClearCache(bool clearCache)

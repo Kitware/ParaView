@@ -26,14 +26,10 @@
 
 vtkStandardNewMacro(vtkSMChartRepresentationProxy);
 //----------------------------------------------------------------------------
-vtkSMChartRepresentationProxy::vtkSMChartRepresentationProxy()
-{
-}
+vtkSMChartRepresentationProxy::vtkSMChartRepresentationProxy() = default;
 
 //----------------------------------------------------------------------------
-vtkSMChartRepresentationProxy::~vtkSMChartRepresentationProxy()
-{
-}
+vtkSMChartRepresentationProxy::~vtkSMChartRepresentationProxy() = default;
 
 //----------------------------------------------------------------------------
 vtkChartRepresentation* vtkSMChartRepresentationProxy::GetRepresentation()

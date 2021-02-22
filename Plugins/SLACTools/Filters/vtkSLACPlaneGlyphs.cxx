@@ -45,9 +45,7 @@ vtkSLACPlaneGlyphs::vtkSLACPlaneGlyphs()
   this->Resolution = 10;
 }
 
-vtkSLACPlaneGlyphs::~vtkSLACPlaneGlyphs()
-{
-}
+vtkSLACPlaneGlyphs::~vtkSLACPlaneGlyphs() = default;
 
 void vtkSLACPlaneGlyphs::PrintSelf(ostream& os, vtkIndent indent)
 {

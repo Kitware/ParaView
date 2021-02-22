@@ -53,9 +53,7 @@ pqUseSeparateColorMapReaction::pqUseSeparateColorMapReaction(
 }
 
 //-----------------------------------------------------------------------------
-pqUseSeparateColorMapReaction::~pqUseSeparateColorMapReaction()
-{
-}
+pqUseSeparateColorMapReaction::~pqUseSeparateColorMapReaction() = default;
 
 //-----------------------------------------------------------------------------
 void pqUseSeparateColorMapReaction::updateEnableState()

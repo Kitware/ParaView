@@ -33,9 +33,7 @@ vtkPVBox::vtkPVBox()
 }
 
 //----------------------------------------------------------------------------
-vtkPVBox::~vtkPVBox()
-{
-}
+vtkPVBox::~vtkPVBox() = default;
 
 //----------------------------------------------------------------------------
 void vtkPVBox::SetUseReferenceBounds(bool val)

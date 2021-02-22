@@ -27,9 +27,7 @@ vtkSMExtractTriggerProxy::vtkSMExtractTriggerProxy()
 }
 
 //----------------------------------------------------------------------------
-vtkSMExtractTriggerProxy::~vtkSMExtractTriggerProxy()
-{
-}
+vtkSMExtractTriggerProxy::~vtkSMExtractTriggerProxy() = default;
 
 //----------------------------------------------------------------------------
 bool vtkSMExtractTriggerProxy::IsActivated(vtkSMExtractsController* controller)

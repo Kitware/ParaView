@@ -49,9 +49,7 @@ pqCopyReaction::pqCopyReaction(QAction* parentObject, bool paste_mode)
 }
 
 //-----------------------------------------------------------------------------
-pqCopyReaction::~pqCopyReaction()
-{
-}
+pqCopyReaction::~pqCopyReaction() = default;
 
 //-----------------------------------------------------------------------------
 void pqCopyReaction::updateEnableState()

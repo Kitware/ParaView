@@ -47,9 +47,7 @@ vtkChartTextRepresentation::vtkChartTextRepresentation()
 }
 
 //----------------------------------------------------------------------------
-vtkChartTextRepresentation::~vtkChartTextRepresentation()
-{
-}
+vtkChartTextRepresentation::~vtkChartTextRepresentation() = default;
 
 //----------------------------------------------------------------------------
 void vtkChartTextRepresentation::OnInteractionEvent()

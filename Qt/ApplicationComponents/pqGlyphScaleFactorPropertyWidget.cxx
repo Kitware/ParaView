@@ -57,9 +57,7 @@ pqGlyphScaleFactorPropertyWidget::pqGlyphScaleFactorPropertyWidget(
 }
 
 //-----------------------------------------------------------------------------
-pqGlyphScaleFactorPropertyWidget::~pqGlyphScaleFactorPropertyWidget()
-{
-}
+pqGlyphScaleFactorPropertyWidget::~pqGlyphScaleFactorPropertyWidget() = default;
 
 //-----------------------------------------------------------------------------
 void pqGlyphScaleFactorPropertyWidget::resetButtonClicked()

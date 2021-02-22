@@ -24,9 +24,7 @@ vtkPVSingleOutputExtractSelection::vtkPVSingleOutputExtractSelection()
 }
 
 //----------------------------------------------------------------------------
-vtkPVSingleOutputExtractSelection::~vtkPVSingleOutputExtractSelection()
-{
-}
+vtkPVSingleOutputExtractSelection::~vtkPVSingleOutputExtractSelection() = default;
 
 //----------------------------------------------------------------------------
 void vtkPVSingleOutputExtractSelection::PrintSelf(ostream& os, vtkIndent indent)

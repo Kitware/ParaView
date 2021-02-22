@@ -46,9 +46,7 @@ pqColorButtonEventTranslator::pqColorButtonEventTranslator(QObject* parentObject
 }
 
 //-----------------------------------------------------------------------------
-pqColorButtonEventTranslator::~pqColorButtonEventTranslator()
-{
-}
+pqColorButtonEventTranslator::~pqColorButtonEventTranslator() = default;
 
 //-----------------------------------------------------------------------------
 bool pqColorButtonEventTranslator::translateEvent(

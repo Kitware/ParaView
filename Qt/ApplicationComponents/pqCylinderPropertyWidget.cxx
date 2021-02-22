@@ -157,9 +157,7 @@ pqCylinderPropertyWidget::pqCylinderPropertyWidget(
 }
 
 //-----------------------------------------------------------------------------
-pqCylinderPropertyWidget::~pqCylinderPropertyWidget()
-{
-}
+pqCylinderPropertyWidget::~pqCylinderPropertyWidget() = default;
 
 //-----------------------------------------------------------------------------
 void pqCylinderPropertyWidget::placeWidget()

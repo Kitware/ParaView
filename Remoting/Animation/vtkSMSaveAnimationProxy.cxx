@@ -75,8 +75,8 @@ public:
   void SetHelper(vtkSMSaveAnimationProxy* helper) { this->Helper = helper; }
 
 protected:
-  SceneImageWriter() {}
-  ~SceneImageWriter() {}
+  SceneImageWriter() = default;
+  ~SceneImageWriter() = default;
   bool SaveInitialize(int vtkNotUsed(startCount)) override
   {
     // Animation scene call render on each tick. We override that render call
@@ -140,7 +140,7 @@ protected:
     : Started(false)
   {
   }
-  ~SceneImageWriterMovie() {}
+  ~SceneImageWriterMovie() = default;
 
   bool SaveInitialize(int startCount) override
   {
@@ -291,14 +291,10 @@ vtkStandardNewMacro(SceneImageWriterImageSeries);
 
 vtkStandardNewMacro(vtkSMSaveAnimationProxy);
 //----------------------------------------------------------------------------
-vtkSMSaveAnimationProxy::vtkSMSaveAnimationProxy()
-{
-}
+vtkSMSaveAnimationProxy::vtkSMSaveAnimationProxy() = default;
 
 //----------------------------------------------------------------------------
-vtkSMSaveAnimationProxy::~vtkSMSaveAnimationProxy()
-{
-}
+vtkSMSaveAnimationProxy::~vtkSMSaveAnimationProxy() = default;
 
 //----------------------------------------------------------------------------
 bool vtkSMSaveAnimationProxy::EnforceSizeRestrictions(const char* filename)

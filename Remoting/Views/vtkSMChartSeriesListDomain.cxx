@@ -36,9 +36,7 @@ vtkSMChartSeriesListDomain::vtkSMChartSeriesListDomain()
 }
 
 //----------------------------------------------------------------------------
-vtkSMChartSeriesListDomain::~vtkSMChartSeriesListDomain()
-{
-}
+vtkSMChartSeriesListDomain::~vtkSMChartSeriesListDomain() = default;
 
 //----------------------------------------------------------------------------
 void vtkSMChartSeriesListDomain::Update(vtkSMProperty*)

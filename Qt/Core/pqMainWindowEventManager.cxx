@@ -43,9 +43,7 @@ pqMainWindowEventManager::pqMainWindowEventManager(QObject* parentObject)
 }
 
 //-----------------------------------------------------------------------------
-pqMainWindowEventManager::~pqMainWindowEventManager()
-{
-}
+pqMainWindowEventManager::~pqMainWindowEventManager() = default;
 
 //-----------------------------------------------------------------------------
 void pqMainWindowEventManager::closeEvent(QCloseEvent* event)

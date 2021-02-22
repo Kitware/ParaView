@@ -71,7 +71,7 @@ public:
     };
     std::vector<FileEntryHint> FileEntryHints;
 
-    vtkValue() {}
+    vtkValue() = default;
 
     vtkSMSessionProxyManager* GetProxyManager(vtkSMSession* session)
     {

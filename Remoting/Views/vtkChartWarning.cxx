@@ -41,9 +41,7 @@ vtkChartWarning::vtkChartWarning()
 }
 
 //-----------------------------------------------------------------------------
-vtkChartWarning::~vtkChartWarning()
-{
-}
+vtkChartWarning::~vtkChartWarning() = default;
 
 //-----------------------------------------------------------------------------
 void vtkChartWarning::PrintSelf(ostream& os, vtkIndent indent)

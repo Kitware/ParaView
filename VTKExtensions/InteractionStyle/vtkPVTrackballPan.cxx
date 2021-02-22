@@ -25,14 +25,10 @@
 vtkStandardNewMacro(vtkPVTrackballPan);
 
 //-------------------------------------------------------------------------
-vtkPVTrackballPan::vtkPVTrackballPan()
-{
-}
+vtkPVTrackballPan::vtkPVTrackballPan() = default;
 
 //-------------------------------------------------------------------------
-vtkPVTrackballPan::~vtkPVTrackballPan()
-{
-}
+vtkPVTrackballPan::~vtkPVTrackballPan() = default;
 
 //-------------------------------------------------------------------------
 void vtkPVTrackballPan::OnButtonDown(int, int, vtkRenderer*, vtkRenderWindowInteractor*)

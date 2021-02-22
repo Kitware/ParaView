@@ -104,9 +104,7 @@ pqIntMaskPropertyWidget::pqIntMaskPropertyWidget(
 }
 
 //-----------------------------------------------------------------------------
-pqIntMaskPropertyWidget::~pqIntMaskPropertyWidget()
-{
-}
+pqIntMaskPropertyWidget::~pqIntMaskPropertyWidget() = default;
 
 //-----------------------------------------------------------------------------
 void pqIntMaskPropertyWidget::setMask(int ivalue)

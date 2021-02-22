@@ -76,9 +76,7 @@ pqExtractorsMenuReaction::pqExtractorsMenuReaction(
 }
 
 //-----------------------------------------------------------------------------
-pqExtractorsMenuReaction::~pqExtractorsMenuReaction()
-{
-}
+pqExtractorsMenuReaction::~pqExtractorsMenuReaction() = default;
 
 //-----------------------------------------------------------------------------
 void pqExtractorsMenuReaction::updateEnableState(bool)

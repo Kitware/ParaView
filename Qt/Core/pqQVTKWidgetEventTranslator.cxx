@@ -52,9 +52,7 @@ pqQVTKWidgetEventTranslator::pqQVTKWidgetEventTranslator(QObject* p)
 {
 }
 
-pqQVTKWidgetEventTranslator::~pqQVTKWidgetEventTranslator()
-{
-}
+pqQVTKWidgetEventTranslator::~pqQVTKWidgetEventTranslator() = default;
 
 bool pqQVTKWidgetEventTranslator::translateEvent(
   QObject* Object, QEvent* Event, int eventType, bool& error)

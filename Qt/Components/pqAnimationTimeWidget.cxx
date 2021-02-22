@@ -324,9 +324,7 @@ void pqAnimationTimeWidget::updateCurrentTime(double t)
 }
 
 //-----------------------------------------------------------------------------
-pqAnimationTimeWidget::~pqAnimationTimeWidget()
-{
-}
+pqAnimationTimeWidget::~pqAnimationTimeWidget() = default;
 
 //-----------------------------------------------------------------------------
 void pqAnimationTimeWidget::setAnimationScene(pqAnimationScene* ascene)

@@ -31,14 +31,10 @@
 
 vtkStandardNewMacro(vtkSMMaterialLibraryProxy);
 //-----------------------------------------------------------------------------
-vtkSMMaterialLibraryProxy::vtkSMMaterialLibraryProxy()
-{
-}
+vtkSMMaterialLibraryProxy::vtkSMMaterialLibraryProxy() = default;
 
 //-----------------------------------------------------------------------------
-vtkSMMaterialLibraryProxy::~vtkSMMaterialLibraryProxy()
-{
-}
+vtkSMMaterialLibraryProxy::~vtkSMMaterialLibraryProxy() = default;
 
 //-----------------------------------------------------------------------------
 void vtkSMMaterialLibraryProxy::LoadMaterials(const char* filename)

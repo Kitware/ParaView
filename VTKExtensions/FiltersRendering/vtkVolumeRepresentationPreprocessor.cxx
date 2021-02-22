@@ -35,9 +35,7 @@ vtkVolumeRepresentationPreprocessor::vtkVolumeRepresentationPreprocessor()
 }
 
 //----------------------------------------------------------------------------
-vtkVolumeRepresentationPreprocessor::~vtkVolumeRepresentationPreprocessor()
-{
-}
+vtkVolumeRepresentationPreprocessor::~vtkVolumeRepresentationPreprocessor() = default;
 
 //----------------------------------------------------------------------------
 int vtkVolumeRepresentationPreprocessor::RequestData(vtkInformation* vtkNotUsed(request),

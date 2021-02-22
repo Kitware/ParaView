@@ -103,6 +103,4 @@ pqColorSelectorPropertyWidget::pqColorSelectorPropertyWidget(
 }
 
 //-----------------------------------------------------------------------------
-pqColorSelectorPropertyWidget::~pqColorSelectorPropertyWidget()
-{
-}
+pqColorSelectorPropertyWidget::~pqColorSelectorPropertyWidget() = default;

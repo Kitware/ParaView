@@ -132,13 +132,9 @@ void vtkExodusFileSeriesReaderStatus::RestoreStatus(vtkExodusIIReader* reader)
 vtkStandardNewMacro(vtkExodusFileSeriesReader);
 
 //-----------------------------------------------------------------------------
-vtkExodusFileSeriesReader::vtkExodusFileSeriesReader()
-{
-}
+vtkExodusFileSeriesReader::vtkExodusFileSeriesReader() = default;
 
-vtkExodusFileSeriesReader::~vtkExodusFileSeriesReader()
-{
-}
+vtkExodusFileSeriesReader::~vtkExodusFileSeriesReader() = default;
 
 void vtkExodusFileSeriesReader::PrintSelf(ostream& os, vtkIndent indent)
 {

@@ -68,7 +68,7 @@ class pqCustomFilterDefinitionModelSource : public pqCustomFilterDefinitionModel
 public:
   pqCustomFilterDefinitionModelSource(
     pqCustomFilterDefinitionModelItem* parent = nullptr, pqPipelineSource* source = nullptr);
-  ~pqCustomFilterDefinitionModelSource() override {}
+  ~pqCustomFilterDefinitionModelSource() override = default;
 
   QString GetName() const override;
   pqPipelineSource* GetPipelineSource() const override;
@@ -82,7 +82,7 @@ class pqCustomFilterDefinitionModelLink : public pqCustomFilterDefinitionModelIt
 public:
   pqCustomFilterDefinitionModelLink(pqCustomFilterDefinitionModelItem* parent = nullptr,
     pqCustomFilterDefinitionModelSource* link = nullptr);
-  ~pqCustomFilterDefinitionModelLink() override {}
+  ~pqCustomFilterDefinitionModelLink() override = default;
 
   QString GetName() const override;
   pqPipelineSource* GetPipelineSource() const override;

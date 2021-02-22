@@ -29,14 +29,10 @@ PURPOSE.  See the above copyright notice for more information.
 
 vtkStandardNewMacro(vtkPVCompositeDataPipeline);
 //----------------------------------------------------------------------------
-vtkPVCompositeDataPipeline::vtkPVCompositeDataPipeline()
-{
-}
+vtkPVCompositeDataPipeline::vtkPVCompositeDataPipeline() = default;
 
 //----------------------------------------------------------------------------
-vtkPVCompositeDataPipeline::~vtkPVCompositeDataPipeline()
-{
-}
+vtkPVCompositeDataPipeline::~vtkPVCompositeDataPipeline() = default;
 
 //----------------------------------------------------------------------------
 void vtkPVCompositeDataPipeline::CopyDefaultInformation(vtkInformation* request, int direction,

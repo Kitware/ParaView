@@ -24,14 +24,10 @@
 
 vtkStandardNewMacro(vtkSMDeserializerXML);
 //----------------------------------------------------------------------------
-vtkSMDeserializerXML::vtkSMDeserializerXML()
-{
-}
+vtkSMDeserializerXML::vtkSMDeserializerXML() = default;
 
 //----------------------------------------------------------------------------
-vtkSMDeserializerXML::~vtkSMDeserializerXML()
-{
-}
+vtkSMDeserializerXML::~vtkSMDeserializerXML() = default;
 
 //----------------------------------------------------------------------------
 vtkSMProxy* vtkSMDeserializerXML::NewProxy(vtkTypeUInt32 id, vtkSMProxyLocator* locator)

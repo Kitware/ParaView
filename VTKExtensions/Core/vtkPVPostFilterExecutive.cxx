@@ -29,14 +29,10 @@ vtkInformationKeyMacro(vtkPVPostFilterExecutive, POST_ARRAYS_TO_PROCESS, Informa
 vtkInformationKeyMacro(vtkPVPostFilterExecutive, POST_ARRAY_COMPONENT_KEY, StringVector);
 
 //----------------------------------------------------------------------------
-vtkPVPostFilterExecutive::vtkPVPostFilterExecutive()
-{
-}
+vtkPVPostFilterExecutive::vtkPVPostFilterExecutive() = default;
 
 //----------------------------------------------------------------------------
-vtkPVPostFilterExecutive::~vtkPVPostFilterExecutive()
-{
-}
+vtkPVPostFilterExecutive::~vtkPVPostFilterExecutive() = default;
 
 //----------------------------------------------------------------------------
 int vtkPVPostFilterExecutive::NeedToExecuteData(

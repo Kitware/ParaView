@@ -33,9 +33,7 @@ vtkAllToNRedistributePolyData::vtkAllToNRedistributePolyData()
 }
 
 //----------------------------------------------------------------------------
-vtkAllToNRedistributePolyData::~vtkAllToNRedistributePolyData()
-{
-}
+vtkAllToNRedistributePolyData::~vtkAllToNRedistributePolyData() = default;
 
 //----------------------------------------------------------------------------
 void vtkAllToNRedistributePolyData::PrintSelf(ostream& os, vtkIndent indent)

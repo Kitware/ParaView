@@ -113,9 +113,7 @@ pqQVTKWidget::pqQVTKWidget(QWidget* parentObject, Qt::WindowFlags f, bool isSter
 }
 
 //----------------------------------------------------------------------------
-pqQVTKWidget::~pqQVTKWidget()
-{
-}
+pqQVTKWidget::~pqQVTKWidget() = default;
 
 //----------------------------------------------------------------------------
 void pqQVTKWidget::setViewProxy(vtkSMProxy* view)

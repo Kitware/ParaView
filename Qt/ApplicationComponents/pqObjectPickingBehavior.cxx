@@ -56,9 +56,7 @@ pqObjectPickingBehavior::pqObjectPickingBehavior(QObject* parentObject)
 }
 
 //-----------------------------------------------------------------------------
-pqObjectPickingBehavior::~pqObjectPickingBehavior()
-{
-}
+pqObjectPickingBehavior::~pqObjectPickingBehavior() = default;
 
 //-----------------------------------------------------------------------------
 void pqObjectPickingBehavior::onViewAdded(pqView* view)

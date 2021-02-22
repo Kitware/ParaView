@@ -26,14 +26,10 @@
 vtkStandardNewMacro(vtkSMExtentDomain);
 
 //---------------------------------------------------------------------------
-vtkSMExtentDomain::vtkSMExtentDomain()
-{
-}
+vtkSMExtentDomain::vtkSMExtentDomain() = default;
 
 //---------------------------------------------------------------------------
-vtkSMExtentDomain::~vtkSMExtentDomain()
-{
-}
+vtkSMExtentDomain::~vtkSMExtentDomain() = default;
 
 //---------------------------------------------------------------------------
 void vtkSMExtentDomain::Update(vtkSMProperty*)

@@ -82,14 +82,10 @@ static const int CatalystVerbosityKey = 7;
 }
 
 //----------------------------------------------------------------------------
-vtkPVLogger::vtkPVLogger()
-{
-}
+vtkPVLogger::vtkPVLogger() = default;
 
 //----------------------------------------------------------------------------
-vtkPVLogger::~vtkPVLogger()
-{
-}
+vtkPVLogger::~vtkPVLogger() = default;
 
 //----------------------------------------------------------------------------
 vtkLogger::Verbosity vtkPVLogger::GetDefaultVerbosity()

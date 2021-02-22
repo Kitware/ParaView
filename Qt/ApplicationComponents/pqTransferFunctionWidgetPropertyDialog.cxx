@@ -64,6 +64,4 @@ pqTransferFunctionWidgetPropertyDialog::pqTransferFunctionWidgetPropertyDialog(c
     this->PropertyWidget, SLOT(propagateProxyPointsProperty()));
 }
 
-pqTransferFunctionWidgetPropertyDialog::~pqTransferFunctionWidgetPropertyDialog()
-{
-}
+pqTransferFunctionWidgetPropertyDialog::~pqTransferFunctionWidgetPropertyDialog() = default;

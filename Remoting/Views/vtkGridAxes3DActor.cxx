@@ -89,9 +89,7 @@ vtkGridAxes3DActor::vtkGridAxes3DActor()
 }
 
 //----------------------------------------------------------------------------
-vtkGridAxes3DActor::~vtkGridAxes3DActor()
-{
-}
+vtkGridAxes3DActor::~vtkGridAxes3DActor() = default;
 
 //----------------------------------------------------------------------------
 void vtkGridAxes3DActor::GetActors(vtkPropCollection* props)

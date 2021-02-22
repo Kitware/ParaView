@@ -53,9 +53,7 @@ vtkPVContourFilter::vtkPVContourFilter()
 }
 
 //-----------------------------------------------------------------------------
-vtkPVContourFilter::~vtkPVContourFilter()
-{
-}
+vtkPVContourFilter::~vtkPVContourFilter() = default;
 
 //-----------------------------------------------------------------------------
 void vtkPVContourFilter::PrintSelf(ostream& os, vtkIndent indent)

@@ -276,9 +276,7 @@ pqArraySelectorPropertyWidget::pqArraySelectorPropertyWidget(
 }
 
 //-----------------------------------------------------------------------------
-pqArraySelectorPropertyWidget::~pqArraySelectorPropertyWidget()
-{
-}
+pqArraySelectorPropertyWidget::~pqArraySelectorPropertyWidget() = default;
 
 //-----------------------------------------------------------------------------
 void pqArraySelectorPropertyWidget::domainModified()

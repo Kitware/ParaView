@@ -72,7 +72,7 @@ public:
       vtkCommand::EndInteractionEvent, this->Widget_ptr, &pqMultiSliceAxisWidget::onMarkClicked);
   }
 
-  ~pqInternal() {}
+  ~pqInternal() = default;
 
   void init()
   {

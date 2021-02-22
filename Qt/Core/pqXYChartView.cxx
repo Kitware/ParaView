@@ -41,6 +41,4 @@ pqXYChartView::pqXYChartView(const QString& group, const QString& name,
 }
 
 //-----------------------------------------------------------------------------
-pqXYChartView::~pqXYChartView()
-{
-}
+pqXYChartView::~pqXYChartView() = default;

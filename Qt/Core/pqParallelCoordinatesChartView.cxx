@@ -41,6 +41,4 @@ pqParallelCoordinatesChartView::pqParallelCoordinatesChartView(const QString& gr
 }
 
 //-----------------------------------------------------------------------------
-pqParallelCoordinatesChartView::~pqParallelCoordinatesChartView()
-{
-}
+pqParallelCoordinatesChartView::~pqParallelCoordinatesChartView() = default;

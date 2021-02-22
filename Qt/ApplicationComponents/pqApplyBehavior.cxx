@@ -80,9 +80,7 @@ pqApplyBehavior::pqApplyBehavior(QObject* parentObject)
 }
 
 //-----------------------------------------------------------------------------
-pqApplyBehavior::~pqApplyBehavior()
-{
-}
+pqApplyBehavior::~pqApplyBehavior() = default;
 
 //-----------------------------------------------------------------------------
 void pqApplyBehavior::registerPanel(pqPropertiesPanel* panel)

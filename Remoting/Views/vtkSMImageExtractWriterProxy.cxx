@@ -91,14 +91,10 @@ public:
 
 vtkStandardNewMacro(vtkSMImageExtractWriterProxy);
 //----------------------------------------------------------------------------
-vtkSMImageExtractWriterProxy::vtkSMImageExtractWriterProxy()
-{
-}
+vtkSMImageExtractWriterProxy::vtkSMImageExtractWriterProxy() = default;
 
 //----------------------------------------------------------------------------
-vtkSMImageExtractWriterProxy::~vtkSMImageExtractWriterProxy()
-{
-}
+vtkSMImageExtractWriterProxy::~vtkSMImageExtractWriterProxy() = default;
 
 //----------------------------------------------------------------------------
 void vtkSMImageExtractWriterProxy::CreateVTKObjects()

@@ -34,7 +34,7 @@ public:
     this->CurrentPosition = 0;
     this->UseBase64Encoding = false;
   }
-  ~Output() {}
+  ~Output() = default;
   Output(const Output&) {}
   void operator=(const Output&) {}
   std::ostringstream Stream;

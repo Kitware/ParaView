@@ -38,6 +38,4 @@ pqViewManager::pqViewManager(QWidget* parentObject)
 }
 
 //-----------------------------------------------------------------------------
-pqViewManager::~pqViewManager()
-{
-}
+pqViewManager::~pqViewManager() = default;

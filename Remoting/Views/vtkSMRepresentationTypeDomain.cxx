@@ -22,14 +22,10 @@
 
 vtkStandardNewMacro(vtkSMRepresentationTypeDomain);
 //----------------------------------------------------------------------------
-vtkSMRepresentationTypeDomain::vtkSMRepresentationTypeDomain()
-{
-}
+vtkSMRepresentationTypeDomain::vtkSMRepresentationTypeDomain() = default;
 
 //----------------------------------------------------------------------------
-vtkSMRepresentationTypeDomain::~vtkSMRepresentationTypeDomain()
-{
-}
+vtkSMRepresentationTypeDomain::~vtkSMRepresentationTypeDomain() = default;
 
 //----------------------------------------------------------------------------
 vtkPVDataInformation* vtkSMRepresentationTypeDomain::GetInputInformation()

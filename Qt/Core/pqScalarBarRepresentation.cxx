@@ -51,9 +51,7 @@ pqScalarBarRepresentation::pqScalarBarRepresentation(const QString& group, const
 }
 
 //-----------------------------------------------------------------------------
-pqScalarBarRepresentation::~pqScalarBarRepresentation()
-{
-}
+pqScalarBarRepresentation::~pqScalarBarRepresentation() = default;
 
 //-----------------------------------------------------------------------------
 #define PUSH_PROPERTY(name)                                                                        \

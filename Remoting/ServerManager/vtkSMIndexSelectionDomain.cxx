@@ -67,11 +67,7 @@ int vtkSMIndexSelectionDomain::SetDefaultValues(vtkSMProperty* property, bool us
 }
 
 //------------------------------------------------------------------------------
-vtkSMIndexSelectionDomain::vtkSMIndexSelectionDomain()
-{
-}
+vtkSMIndexSelectionDomain::vtkSMIndexSelectionDomain() = default;
 
 //------------------------------------------------------------------------------
-vtkSMIndexSelectionDomain::~vtkSMIndexSelectionDomain()
-{
-}
+vtkSMIndexSelectionDomain::~vtkSMIndexSelectionDomain() = default;

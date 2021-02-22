@@ -21,14 +21,10 @@
 
 vtkStandardNewMacro(vtkPVDefaultPass);
 //----------------------------------------------------------------------------
-vtkPVDefaultPass::vtkPVDefaultPass()
-{
-}
+vtkPVDefaultPass::vtkPVDefaultPass() = default;
 
 //----------------------------------------------------------------------------
-vtkPVDefaultPass::~vtkPVDefaultPass()
-{
-}
+vtkPVDefaultPass::~vtkPVDefaultPass() = default;
 
 //----------------------------------------------------------------------------
 void vtkPVDefaultPass::Render(const vtkRenderState* render_state)

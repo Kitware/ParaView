@@ -69,9 +69,7 @@ vtkGridAxesPlane2DActor::vtkGridAxesPlane2DActor(vtkGridAxesHelper* helper)
 }
 
 //----------------------------------------------------------------------------
-vtkGridAxesPlane2DActor::~vtkGridAxesPlane2DActor()
-{
-}
+vtkGridAxesPlane2DActor::~vtkGridAxesPlane2DActor() = default;
 
 //----------------------------------------------------------------------------
 void vtkGridAxesPlane2DActor::GetActors(vtkPropCollection* props)

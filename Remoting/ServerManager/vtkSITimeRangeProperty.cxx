@@ -26,14 +26,10 @@
 
 vtkStandardNewMacro(vtkSITimeRangeProperty);
 //----------------------------------------------------------------------------
-vtkSITimeRangeProperty::vtkSITimeRangeProperty()
-{
-}
+vtkSITimeRangeProperty::vtkSITimeRangeProperty() = default;
 
 //----------------------------------------------------------------------------
-vtkSITimeRangeProperty::~vtkSITimeRangeProperty()
-{
-}
+vtkSITimeRangeProperty::~vtkSITimeRangeProperty() = default;
 
 //----------------------------------------------------------------------------
 void vtkSITimeRangeProperty::PrintSelf(ostream& os, vtkIndent indent)

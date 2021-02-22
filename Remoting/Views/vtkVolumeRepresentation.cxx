@@ -33,9 +33,7 @@ vtkVolumeRepresentation::vtkVolumeRepresentation()
 }
 
 //----------------------------------------------------------------------------
-vtkVolumeRepresentation::~vtkVolumeRepresentation()
-{
-}
+vtkVolumeRepresentation::~vtkVolumeRepresentation() = default;
 
 //***************************************************************************
 // Forwarded to Actor.

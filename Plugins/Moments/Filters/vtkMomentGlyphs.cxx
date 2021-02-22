@@ -52,9 +52,7 @@ vtkMomentGlyphs::vtkMomentGlyphs()
   this->ScaleByDensity = 0;
 }
 
-vtkMomentGlyphs::~vtkMomentGlyphs()
-{
-}
+vtkMomentGlyphs::~vtkMomentGlyphs() = default;
 
 void vtkMomentGlyphs::PrintSelf(ostream& os, vtkIndent indent)
 {

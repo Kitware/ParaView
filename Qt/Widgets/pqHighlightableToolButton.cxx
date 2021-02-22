@@ -41,9 +41,7 @@ pqHighlightableToolButton::pqHighlightableToolButton(QWidget* parentObject)
 }
 
 //-----------------------------------------------------------------------------
-pqHighlightableToolButton::~pqHighlightableToolButton()
-{
-}
+pqHighlightableToolButton::~pqHighlightableToolButton() = default;
 
 //-----------------------------------------------------------------------------
 void pqHighlightableToolButton::highlight(bool clearHighlight)

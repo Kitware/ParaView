@@ -15,14 +15,10 @@
 #include "vtkCPPipeline.h"
 
 //----------------------------------------------------------------------------
-vtkCPPipeline::vtkCPPipeline()
-{
-}
+vtkCPPipeline::vtkCPPipeline() = default;
 
 //----------------------------------------------------------------------------
-vtkCPPipeline::~vtkCPPipeline()
-{
-}
+vtkCPPipeline::~vtkCPPipeline() = default;
 
 //----------------------------------------------------------------------------
 int vtkCPPipeline::Finalize()

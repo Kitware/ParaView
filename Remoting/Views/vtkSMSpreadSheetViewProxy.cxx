@@ -24,14 +24,10 @@
 
 vtkStandardNewMacro(vtkSMSpreadSheetViewProxy);
 //----------------------------------------------------------------------------
-vtkSMSpreadSheetViewProxy::vtkSMSpreadSheetViewProxy()
-{
-}
+vtkSMSpreadSheetViewProxy::vtkSMSpreadSheetViewProxy() = default;
 
 //----------------------------------------------------------------------------
-vtkSMSpreadSheetViewProxy::~vtkSMSpreadSheetViewProxy()
-{
-}
+vtkSMSpreadSheetViewProxy::~vtkSMSpreadSheetViewProxy() = default;
 
 //----------------------------------------------------------------------------
 void vtkSMSpreadSheetViewProxy::CreateVTKObjects()

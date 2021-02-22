@@ -25,9 +25,7 @@
 vtkStandardNewMacro(vtkCPNodalFieldBuilder);
 
 //----------------------------------------------------------------------------
-vtkCPNodalFieldBuilder::vtkCPNodalFieldBuilder()
-{
-}
+vtkCPNodalFieldBuilder::vtkCPNodalFieldBuilder() = default;
 
 //----------------------------------------------------------------------------
 void vtkCPNodalFieldBuilder::BuildField(unsigned long timeStep, double time, vtkDataSet* grid)
@@ -65,9 +63,7 @@ void vtkCPNodalFieldBuilder::BuildField(unsigned long timeStep, double time, vtk
 }
 
 //----------------------------------------------------------------------------
-vtkCPNodalFieldBuilder::~vtkCPNodalFieldBuilder()
-{
-}
+vtkCPNodalFieldBuilder::~vtkCPNodalFieldBuilder() = default;
 
 //----------------------------------------------------------------------------
 void vtkCPNodalFieldBuilder::PrintSelf(ostream& os, vtkIndent indent)

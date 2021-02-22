@@ -82,9 +82,7 @@ pqLinkViewWidget::pqLinkViewWidget(pqRenderView* firstLink)
 }
 
 //-----------------------------------------------------------------------------
-pqLinkViewWidget::~pqLinkViewWidget()
-{
-}
+pqLinkViewWidget::~pqLinkViewWidget() = default;
 
 //-----------------------------------------------------------------------------
 bool pqLinkViewWidget::event(QEvent* e)

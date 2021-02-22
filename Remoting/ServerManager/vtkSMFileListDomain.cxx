@@ -20,14 +20,10 @@
 vtkStandardNewMacro(vtkSMFileListDomain);
 
 //---------------------------------------------------------------------------
-vtkSMFileListDomain::vtkSMFileListDomain()
-{
-}
+vtkSMFileListDomain::vtkSMFileListDomain() = default;
 
 //---------------------------------------------------------------------------
-vtkSMFileListDomain::~vtkSMFileListDomain()
-{
-}
+vtkSMFileListDomain::~vtkSMFileListDomain() = default;
 
 //---------------------------------------------------------------------------
 void vtkSMFileListDomain::PrintSelf(ostream& os, vtkIndent indent)

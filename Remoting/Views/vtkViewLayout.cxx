@@ -64,8 +64,8 @@ public:
   }
 
 protected:
-  vtkViewLayoutProp() {}
-  ~vtkViewLayoutProp() override {}
+  vtkViewLayoutProp() = default;
+  ~vtkViewLayoutProp() override = default;
 
   vtkWeakPointer<vtkViewLayout> Layout;
 

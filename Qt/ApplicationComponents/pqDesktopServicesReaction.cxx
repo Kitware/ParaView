@@ -47,9 +47,7 @@ pqDesktopServicesReaction::pqDesktopServicesReaction(const QUrl& url, QAction* p
 }
 
 //-----------------------------------------------------------------------------
-pqDesktopServicesReaction::~pqDesktopServicesReaction()
-{
-}
+pqDesktopServicesReaction::~pqDesktopServicesReaction() = default;
 
 //-----------------------------------------------------------------------------
 bool pqDesktopServicesReaction::openUrl(const QUrl& url)

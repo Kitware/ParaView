@@ -18,14 +18,10 @@
 
 vtkStandardNewMacro(vtkSMNullProxy);
 //-----------------------------------------------------------------------------
-vtkSMNullProxy::vtkSMNullProxy()
-{
-}
+vtkSMNullProxy::vtkSMNullProxy() = default;
 
 //-----------------------------------------------------------------------------
-vtkSMNullProxy::~vtkSMNullProxy()
-{
-}
+vtkSMNullProxy::~vtkSMNullProxy() = default;
 
 //-----------------------------------------------------------------------------
 void vtkSMNullProxy::CreateVTKObjects()

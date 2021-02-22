@@ -21,9 +21,7 @@ vtkDataMinePointReader::vtkDataMinePointReader()
 }
 
 // --------------------------------------
-vtkDataMinePointReader::~vtkDataMinePointReader()
-{
-}
+vtkDataMinePointReader::~vtkDataMinePointReader() = default;
 
 // --------------------------------------
 void vtkDataMinePointReader::PrintSelf(ostream& os, vtkIndent indent)

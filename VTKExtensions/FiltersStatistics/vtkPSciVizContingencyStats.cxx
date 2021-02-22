@@ -12,13 +12,9 @@
 
 vtkStandardNewMacro(vtkPSciVizContingencyStats);
 
-vtkPSciVizContingencyStats::vtkPSciVizContingencyStats()
-{
-}
+vtkPSciVizContingencyStats::vtkPSciVizContingencyStats() = default;
 
-vtkPSciVizContingencyStats::~vtkPSciVizContingencyStats()
-{
-}
+vtkPSciVizContingencyStats::~vtkPSciVizContingencyStats() = default;
 
 void vtkPSciVizContingencyStats::PrintSelf(ostream& os, vtkIndent indent)
 {

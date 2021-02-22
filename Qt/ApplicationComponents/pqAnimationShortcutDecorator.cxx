@@ -64,9 +64,7 @@ pqAnimationShortcutDecorator::pqAnimationShortcutDecorator(pqPropertyWidget* par
 }
 
 //-----------------------------------------------------------------------------
-pqAnimationShortcutDecorator::~pqAnimationShortcutDecorator()
-{
-}
+pqAnimationShortcutDecorator::~pqAnimationShortcutDecorator() = default;
 
 //-----------------------------------------------------------------------------
 bool pqAnimationShortcutDecorator::accept(pqPropertyWidget* parentWidget)

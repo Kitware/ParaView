@@ -20,14 +20,10 @@
 
 vtkStandardNewMacro(vtkSIImageTextureProxy);
 //----------------------------------------------------------------------------
-vtkSIImageTextureProxy::vtkSIImageTextureProxy()
-{
-}
+vtkSIImageTextureProxy::vtkSIImageTextureProxy() = default;
 
 //----------------------------------------------------------------------------
-vtkSIImageTextureProxy::~vtkSIImageTextureProxy()
-{
-}
+vtkSIImageTextureProxy::~vtkSIImageTextureProxy() = default;
 
 //----------------------------------------------------------------------------
 void vtkSIImageTextureProxy::OnCreateVTKObjects()

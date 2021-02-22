@@ -45,9 +45,7 @@ pqSectionVisibilityContextMenu::pqSectionVisibilityContextMenu(QWidget* _p)
 }
 
 //-----------------------------------------------------------------------------
-pqSectionVisibilityContextMenu::~pqSectionVisibilityContextMenu()
-{
-}
+pqSectionVisibilityContextMenu::~pqSectionVisibilityContextMenu() = default;
 
 //-----------------------------------------------------------------------------
 void pqSectionVisibilityContextMenu::setHeaderView(QHeaderView* header)

@@ -60,7 +60,7 @@ public:
   {
   }
 
-  ~SplineTableModel() override {}
+  ~SplineTableModel() override = default;
 
   int rowCount(const QModelIndex& prnt = QModelIndex()) const override
   {
@@ -385,9 +385,7 @@ pqSplinePropertyWidget::pqSplinePropertyWidget(vtkSMProxy* smproxy, vtkSMPropert
 }
 
 //-----------------------------------------------------------------------------
-pqSplinePropertyWidget::~pqSplinePropertyWidget()
-{
-}
+pqSplinePropertyWidget::~pqSplinePropertyWidget() = default;
 
 //-----------------------------------------------------------------------------
 void pqSplinePropertyWidget::setLineColor(const QColor& color)

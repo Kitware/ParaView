@@ -96,9 +96,7 @@ pqActiveObjects::pqActiveObjects()
 }
 
 //-----------------------------------------------------------------------------
-pqActiveObjects::~pqActiveObjects()
-{
-}
+pqActiveObjects::~pqActiveObjects() = default;
 
 //-----------------------------------------------------------------------------
 void pqActiveObjects::resetActives()

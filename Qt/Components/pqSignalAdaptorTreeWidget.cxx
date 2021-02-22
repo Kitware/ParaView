@@ -71,9 +71,7 @@ pqSignalAdaptorTreeWidget::pqSignalAdaptorTreeWidget(QTreeWidget* treeWidget, bo
 }
 
 //-----------------------------------------------------------------------------
-pqSignalAdaptorTreeWidget::~pqSignalAdaptorTreeWidget()
-{
-}
+pqSignalAdaptorTreeWidget::~pqSignalAdaptorTreeWidget() = default;
 
 //-----------------------------------------------------------------------------
 QList<QVariant> pqSignalAdaptorTreeWidget::values() const

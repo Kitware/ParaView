@@ -46,9 +46,7 @@ pqDisplayPanelPropertyWidget::pqDisplayPanelPropertyWidget(
   setLayout(layoutLocal);
 }
 
-pqDisplayPanelPropertyWidget::~pqDisplayPanelPropertyWidget()
-{
-}
+pqDisplayPanelPropertyWidget::~pqDisplayPanelPropertyWidget() = default;
 
 pqDisplayPanel* pqDisplayPanelPropertyWidget::getDisplayPanel() const
 {

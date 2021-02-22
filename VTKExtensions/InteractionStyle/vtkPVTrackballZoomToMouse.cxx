@@ -31,9 +31,7 @@ vtkPVTrackballZoomToMouse::vtkPVTrackballZoomToMouse()
 }
 
 //-------------------------------------------------------------------------
-vtkPVTrackballZoomToMouse::~vtkPVTrackballZoomToMouse()
-{
-}
+vtkPVTrackballZoomToMouse::~vtkPVTrackballZoomToMouse() = default;
 
 //-------------------------------------------------------------------------
 void vtkPVTrackballZoomToMouse::OnButtonDown(

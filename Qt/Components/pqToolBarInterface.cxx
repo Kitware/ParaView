@@ -32,11 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqToolBarInterface.h"
 
 //-----------------------------------------------------------------------------
-pqToolBarInterface::pqToolBarInterface()
-{
-}
+pqToolBarInterface::pqToolBarInterface() = default;
 
 //-----------------------------------------------------------------------------
-pqToolBarInterface::~pqToolBarInterface()
-{
-}
+pqToolBarInterface::~pqToolBarInterface() = default;

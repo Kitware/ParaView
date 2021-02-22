@@ -24,9 +24,7 @@
 #include "pqServer.h"
 #include "pqTestUtility.h"
 
-pqFileDialogTestUtility::pqFileDialogTestUtility()
-{
-}
+pqFileDialogTestUtility::pqFileDialogTestUtility() = default;
 
 pqFileDialogTestUtility::~pqFileDialogTestUtility()
 {

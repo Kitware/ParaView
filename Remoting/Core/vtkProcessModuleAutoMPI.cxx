@@ -61,8 +61,8 @@ public:
   }
 
 private:
-  vtkGetFreePort() {}
-  ~vtkGetFreePort() override {}
+  vtkGetFreePort() = default;
+  ~vtkGetFreePort() override = default;
 };
 vtkStandardNewMacro(vtkGetFreePort);
 

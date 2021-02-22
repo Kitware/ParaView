@@ -61,9 +61,7 @@ pqCommandPropertyWidget::pqCommandPropertyWidget(
 }
 
 //-----------------------------------------------------------------------------
-pqCommandPropertyWidget::~pqCommandPropertyWidget()
-{
-}
+pqCommandPropertyWidget::~pqCommandPropertyWidget() = default;
 
 //-----------------------------------------------------------------------------
 void pqCommandPropertyWidget::buttonClicked()

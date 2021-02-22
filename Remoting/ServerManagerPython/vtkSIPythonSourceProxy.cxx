@@ -361,9 +361,7 @@ vtkSIPythonSourceProxy::vtkSIPythonSourceProxy()
 }
 
 //----------------------------------------------------------------------------
-vtkSIPythonSourceProxy::~vtkSIPythonSourceProxy()
-{
-}
+vtkSIPythonSourceProxy::~vtkSIPythonSourceProxy() = default;
 
 //----------------------------------------------------------------------------
 void vtkSIPythonSourceProxy::OnPyFinalize()

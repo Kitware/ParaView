@@ -32,11 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqServerManagerModelInterface.h"
 
 //-----------------------------------------------------------------------------
-pqServerManagerModelInterface::pqServerManagerModelInterface()
-{
-}
+pqServerManagerModelInterface::pqServerManagerModelInterface() = default;
 
 //-----------------------------------------------------------------------------
-pqServerManagerModelInterface::~pqServerManagerModelInterface()
-{
-}
+pqServerManagerModelInterface::~pqServerManagerModelInterface() = default;

@@ -309,7 +309,7 @@ protected:
     this->InvalidCoreIterator = true;
     this->InvalidCustomIterator = true;
   }
-  ~vtkInternalDefinitionIterator() override {}
+  ~vtkInternalDefinitionIterator() override = default;
 
   //-------------------------------------------------------------------------
   void Reset()

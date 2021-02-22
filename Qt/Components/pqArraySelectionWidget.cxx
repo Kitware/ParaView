@@ -110,7 +110,7 @@ public:
   {
   }
 
-  ~Model() override {}
+  ~Model() override = default;
 
   void addPixmap(const QString& key, QIcon&& pixmap)
   {
@@ -382,9 +382,7 @@ pqArraySelectionWidget::pqArraySelectionWidget(QWidget* parentObject)
 }
 
 //-----------------------------------------------------------------------------
-pqArraySelectionWidget::~pqArraySelectionWidget()
-{
-}
+pqArraySelectionWidget::~pqArraySelectionWidget() = default;
 
 //-----------------------------------------------------------------------------
 void pqArraySelectionWidget::setIconType(const QString& pname, const QString& icon_type)

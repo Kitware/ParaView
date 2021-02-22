@@ -48,9 +48,7 @@ vtkOrderedCompositeDistributor::vtkOrderedCompositeDistributor()
 }
 
 //-----------------------------------------------------------------------------
-vtkOrderedCompositeDistributor::~vtkOrderedCompositeDistributor()
-{
-}
+vtkOrderedCompositeDistributor::~vtkOrderedCompositeDistributor() = default;
 
 //-----------------------------------------------------------------------------
 void vtkOrderedCompositeDistributor::SetCuts(const std::vector<vtkBoundingBox>& boxes)

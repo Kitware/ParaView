@@ -161,9 +161,7 @@ pqHierarchicalGridWidget::pqHierarchicalGridWidget(QWidget* parentObject)
 }
 
 //-----------------------------------------------------------------------------
-pqHierarchicalGridWidget::~pqHierarchicalGridWidget()
-{
-}
+pqHierarchicalGridWidget::~pqHierarchicalGridWidget() = default;
 
 //-----------------------------------------------------------------------------
 void pqHierarchicalGridWidget::setUserResizability(bool val)

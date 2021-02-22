@@ -62,7 +62,7 @@ class vtkPVXMLOnlyPlugin : public vtkPVPlugin, public vtkPVServerManagerPluginIn
 {
   std::string PluginName;
   std::string XML;
-  vtkPVXMLOnlyPlugin(){};
+  vtkPVXMLOnlyPlugin() = default;
   vtkPVXMLOnlyPlugin(const vtkPVXMLOnlyPlugin& other);
   void operator=(const vtkPVXMLOnlyPlugin& other);
 

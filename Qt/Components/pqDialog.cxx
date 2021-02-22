@@ -39,9 +39,7 @@ pqDialog::pqDialog(QWidget* _parent /*=0*/, Qt::WindowFlags f /*=0*/)
 }
 
 //-----------------------------------------------------------------------------
-pqDialog::~pqDialog()
-{
-}
+pqDialog::~pqDialog() = default;
 
 //-----------------------------------------------------------------------------
 void pqDialog::accept()

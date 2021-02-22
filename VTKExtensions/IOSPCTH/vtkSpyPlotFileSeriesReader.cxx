@@ -44,9 +44,7 @@ vtkSpyPlotFileSeriesReader::vtkSpyPlotFileSeriesReader()
 #endif // PARAVIEW_ENABLE_SPYPLOT_MARKERS
 }
 
-vtkSpyPlotFileSeriesReader::~vtkSpyPlotFileSeriesReader()
-{
-}
+vtkSpyPlotFileSeriesReader::~vtkSpyPlotFileSeriesReader() = default;
 
 void vtkSpyPlotFileSeriesReader::PrintSelf(ostream& os, vtkIndent indent)
 {

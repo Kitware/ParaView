@@ -29,9 +29,7 @@ vtkRawImageFileSeriesReader::vtkRawImageFileSeriesReader()
 }
 
 //----------------------------------------------------------------------------
-vtkRawImageFileSeriesReader::~vtkRawImageFileSeriesReader()
-{
-}
+vtkRawImageFileSeriesReader::~vtkRawImageFileSeriesReader() = default;
 
 //----------------------------------------------------------------------------
 void vtkRawImageFileSeriesReader::UpdateReaderDataExtent()

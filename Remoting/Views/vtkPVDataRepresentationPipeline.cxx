@@ -23,14 +23,10 @@
 
 vtkStandardNewMacro(vtkPVDataRepresentationPipeline);
 //----------------------------------------------------------------------------
-vtkPVDataRepresentationPipeline::vtkPVDataRepresentationPipeline()
-{
-}
+vtkPVDataRepresentationPipeline::vtkPVDataRepresentationPipeline() = default;
 
 //----------------------------------------------------------------------------
-vtkPVDataRepresentationPipeline::~vtkPVDataRepresentationPipeline()
-{
-}
+vtkPVDataRepresentationPipeline::~vtkPVDataRepresentationPipeline() = default;
 
 //----------------------------------------------------------------------------
 int vtkPVDataRepresentationPipeline::ForwardUpstream(int i, int j, vtkInformation* request)

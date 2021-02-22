@@ -76,9 +76,7 @@ void pqServerConfiguration::constructor(vtkPVXMLElement* xml, int connectionTime
 }
 
 //-----------------------------------------------------------------------------
-pqServerConfiguration::~pqServerConfiguration()
-{
-}
+pqServerConfiguration::~pqServerConfiguration() = default;
 
 //-----------------------------------------------------------------------------
 void pqServerConfiguration::setName(const QString& arg_name)

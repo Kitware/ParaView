@@ -82,8 +82,8 @@ public:
   bool IsInteractiveDelayActive;
   double TimeLeftBeforeFullResolution;
 
-  pqInternal() {}
-  ~pqInternal() {}
+  pqInternal() = default;
+  ~pqInternal() = default;
 
   void writeToStatusBar(const char* txt)
   {

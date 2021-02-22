@@ -14,6 +14,4 @@
 =========================================================================*/
 #include "vtkPVServerManagerPluginInterface.h"
 
-vtkPVServerManagerPluginInterface::~vtkPVServerManagerPluginInterface()
-{
-}
+vtkPVServerManagerPluginInterface::~vtkPVServerManagerPluginInterface() = default;

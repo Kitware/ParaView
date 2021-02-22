@@ -250,9 +250,7 @@ vtkQuartileChartRepresentation::vtkQuartileChartRepresentation()
 }
 
 //----------------------------------------------------------------------------
-vtkQuartileChartRepresentation::~vtkQuartileChartRepresentation()
-{
-}
+vtkQuartileChartRepresentation::~vtkQuartileChartRepresentation() = default;
 
 //----------------------------------------------------------------------------
 std::string vtkQuartileChartRepresentation::GetDefaultSeriesLabel(

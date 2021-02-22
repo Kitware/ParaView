@@ -37,14 +37,10 @@
 
 vtkStandardNewMacro(vtkSMMultiSliceViewProxy);
 //----------------------------------------------------------------------------
-vtkSMMultiSliceViewProxy::vtkSMMultiSliceViewProxy()
-{
-}
+vtkSMMultiSliceViewProxy::vtkSMMultiSliceViewProxy() = default;
 
 //----------------------------------------------------------------------------
-vtkSMMultiSliceViewProxy::~vtkSMMultiSliceViewProxy()
-{
-}
+vtkSMMultiSliceViewProxy::~vtkSMMultiSliceViewProxy() = default;
 
 //----------------------------------------------------------------------------
 void vtkSMMultiSliceViewProxy::GetDataBounds(double bounds[6])

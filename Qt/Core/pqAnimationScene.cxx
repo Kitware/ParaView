@@ -71,7 +71,7 @@ class pqAnimationScene::pqInternals
 public:
   QSet<QPointer<pqAnimationCue> > Cues;
   QPointer<pqAnimationCue> GlobalTimeCue;
-  pqInternals() {}
+  pqInternals() = default;
 };
 
 //-----------------------------------------------------------------------------

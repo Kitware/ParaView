@@ -52,7 +52,7 @@ public:
   {
   }
 
-  ~ProxyModel() {}
+  ~ProxyModel() = default;
 
   QVariant headerData(
     int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override
@@ -159,9 +159,7 @@ pqSubsetInclusionLatticeWidget::pqSubsetInclusionLatticeWidget(
 }
 
 //-----------------------------------------------------------------------------
-pqSubsetInclusionLatticeWidget::~pqSubsetInclusionLatticeWidget()
-{
-}
+pqSubsetInclusionLatticeWidget::~pqSubsetInclusionLatticeWidget() = default;
 
 //-----------------------------------------------------------------------------
 QAbstractItemModel* pqSubsetInclusionLatticeWidget::model() const

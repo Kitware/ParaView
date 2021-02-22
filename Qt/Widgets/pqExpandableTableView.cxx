@@ -48,9 +48,7 @@ pqExpandableTableView::pqExpandableTableView(QWidget* parentObject)
 }
 
 //-----------------------------------------------------------------------------
-pqExpandableTableView::~pqExpandableTableView()
-{
-}
+pqExpandableTableView::~pqExpandableTableView() = default;
 
 //-----------------------------------------------------------------------------
 QModelIndex pqExpandableTableView::moveCursor(

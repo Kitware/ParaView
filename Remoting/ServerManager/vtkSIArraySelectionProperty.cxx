@@ -30,14 +30,10 @@
 
 vtkStandardNewMacro(vtkSIArraySelectionProperty);
 //----------------------------------------------------------------------------
-vtkSIArraySelectionProperty::vtkSIArraySelectionProperty()
-{
-}
+vtkSIArraySelectionProperty::vtkSIArraySelectionProperty() = default;
 
 //----------------------------------------------------------------------------
-vtkSIArraySelectionProperty::~vtkSIArraySelectionProperty()
-{
-}
+vtkSIArraySelectionProperty::~vtkSIArraySelectionProperty() = default;
 
 //----------------------------------------------------------------------------
 void vtkSIArraySelectionProperty::PrintSelf(ostream& os, vtkIndent indent)

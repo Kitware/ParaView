@@ -21,9 +21,7 @@ vtkDataMineDrillHoleReader::vtkDataMineDrillHoleReader()
 }
 
 // --------------------------------------
-vtkDataMineDrillHoleReader::~vtkDataMineDrillHoleReader()
-{
-}
+vtkDataMineDrillHoleReader::~vtkDataMineDrillHoleReader() = default;
 
 // --------------------------------------
 void vtkDataMineDrillHoleReader::PrintSelf(ostream& os, vtkIndent indent)

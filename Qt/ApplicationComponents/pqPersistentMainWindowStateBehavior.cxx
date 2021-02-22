@@ -56,9 +56,7 @@ pqPersistentMainWindowStateBehavior::pqPersistentMainWindowStateBehavior(QMainWi
 }
 
 //-----------------------------------------------------------------------------
-pqPersistentMainWindowStateBehavior::~pqPersistentMainWindowStateBehavior()
-{
-}
+pqPersistentMainWindowStateBehavior::~pqPersistentMainWindowStateBehavior() = default;
 
 //-----------------------------------------------------------------------------
 void pqPersistentMainWindowStateBehavior::restoreState(QMainWindow* window)

@@ -21,14 +21,10 @@
 vtkStandardNewMacro(vtkSMBooleanDomain);
 
 //---------------------------------------------------------------------------
-vtkSMBooleanDomain::vtkSMBooleanDomain()
-{
-}
+vtkSMBooleanDomain::vtkSMBooleanDomain() = default;
 
 //---------------------------------------------------------------------------
-vtkSMBooleanDomain::~vtkSMBooleanDomain()
-{
-}
+vtkSMBooleanDomain::~vtkSMBooleanDomain() = default;
 
 //---------------------------------------------------------------------------
 int vtkSMBooleanDomain::IsInDomain(vtkSMProperty* property)

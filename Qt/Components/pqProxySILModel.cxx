@@ -70,9 +70,7 @@ pqProxySILModel::pqProxySILModel(const QString& hierarchyName, QObject* _parent)
 }
 
 //-----------------------------------------------------------------------------
-pqProxySILModel::~pqProxySILModel()
-{
-}
+pqProxySILModel::~pqProxySILModel() = default;
 
 //-----------------------------------------------------------------------------
 QModelIndex pqProxySILModel::mapFromSource(const QModelIndex& sourceIndex) const

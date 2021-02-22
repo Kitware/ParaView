@@ -36,9 +36,7 @@ vtkPVImplicitPlaneRepresentation::vtkPVImplicitPlaneRepresentation()
 }
 
 //----------------------------------------------------------------------------
-vtkPVImplicitPlaneRepresentation::~vtkPVImplicitPlaneRepresentation()
-{
-}
+vtkPVImplicitPlaneRepresentation::~vtkPVImplicitPlaneRepresentation() = default;
 
 //----------------------------------------------------------------------------
 void vtkPVImplicitPlaneRepresentation::PrintSelf(ostream& os, vtkIndent indent)

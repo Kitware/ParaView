@@ -98,9 +98,7 @@ pqColorPaletteSelectorWidget::pqColorPaletteSelectorWidget(
 }
 
 //-----------------------------------------------------------------------------
-pqColorPaletteSelectorWidget::~pqColorPaletteSelectorWidget()
-{
-}
+pqColorPaletteSelectorWidget::~pqColorPaletteSelectorWidget() = default;
 
 //-----------------------------------------------------------------------------
 QString pqColorPaletteSelectorWidget::paletteName() const

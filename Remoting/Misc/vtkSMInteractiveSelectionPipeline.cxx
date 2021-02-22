@@ -21,14 +21,10 @@
 vtkStandardNewMacro(vtkSMInteractiveSelectionPipeline);
 
 //----------------------------------------------------------------------------
-vtkSMInteractiveSelectionPipeline::vtkSMInteractiveSelectionPipeline()
-{
-}
+vtkSMInteractiveSelectionPipeline::vtkSMInteractiveSelectionPipeline() = default;
 
 //----------------------------------------------------------------------------
-vtkSMInteractiveSelectionPipeline::~vtkSMInteractiveSelectionPipeline()
-{
-}
+vtkSMInteractiveSelectionPipeline::~vtkSMInteractiveSelectionPipeline() = default;
 
 //----------------------------------------------------------------------------
 vtkSMInteractiveSelectionPipeline* vtkSMInteractiveSelectionPipeline::GetInstance()

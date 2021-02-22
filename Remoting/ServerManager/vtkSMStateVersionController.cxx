@@ -856,14 +856,10 @@ struct Process_5_8_to_5_9
 
 vtkStandardNewMacro(vtkSMStateVersionController);
 //----------------------------------------------------------------------------
-vtkSMStateVersionController::vtkSMStateVersionController()
-{
-}
+vtkSMStateVersionController::vtkSMStateVersionController() = default;
 
 //----------------------------------------------------------------------------
-vtkSMStateVersionController::~vtkSMStateVersionController()
-{
-}
+vtkSMStateVersionController::~vtkSMStateVersionController() = default;
 
 //----------------------------------------------------------------------------
 bool vtkSMStateVersionController::Process(vtkPVXMLElement* parent, vtkSMSession* session)

@@ -42,13 +42,9 @@
 #include <vector>
 vtkStandardNewMacro(vtkAMRFragmentIntegration);
 
-vtkAMRFragmentIntegration::vtkAMRFragmentIntegration()
-{
-}
+vtkAMRFragmentIntegration::vtkAMRFragmentIntegration() = default;
 
-vtkAMRFragmentIntegration::~vtkAMRFragmentIntegration()
-{
-}
+vtkAMRFragmentIntegration::~vtkAMRFragmentIntegration() = default;
 
 void vtkAMRFragmentIntegration::PrintSelf(ostream& os, vtkIndent indent)
 {

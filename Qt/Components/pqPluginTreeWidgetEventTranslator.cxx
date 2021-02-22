@@ -44,9 +44,7 @@ pqPluginTreeWidgetEventTranslator::pqPluginTreeWidgetEventTranslator(QObject* pa
 }
 
 //-----------------------------------------------------------------------------
-pqPluginTreeWidgetEventTranslator::~pqPluginTreeWidgetEventTranslator()
-{
-}
+pqPluginTreeWidgetEventTranslator::~pqPluginTreeWidgetEventTranslator() = default;
 
 //-----------------------------------------------------------------------------
 bool pqPluginTreeWidgetEventTranslator::translateEvent(

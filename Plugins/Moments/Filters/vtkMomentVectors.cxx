@@ -116,9 +116,7 @@ vtkMomentVectors::vtkMomentVectors()
   this->OutputMomentDensityName = nullptr;
 }
 
-vtkMomentVectors::~vtkMomentVectors()
-{
-}
+vtkMomentVectors::~vtkMomentVectors() = default;
 
 void vtkMomentVectors::PrintSelf(ostream& os, vtkIndent indent)
 {

@@ -47,9 +47,7 @@ vtkSMCameraConfigurationWriter::vtkSMCameraConfigurationWriter()
 }
 
 //-----------------------------------------------------------------------------
-vtkSMCameraConfigurationWriter::~vtkSMCameraConfigurationWriter()
-{
-}
+vtkSMCameraConfigurationWriter::~vtkSMCameraConfigurationWriter() = default;
 
 //-----------------------------------------------------------------------------
 void vtkSMCameraConfigurationWriter::SetRenderViewProxy(vtkSMProxy* rvProxy)

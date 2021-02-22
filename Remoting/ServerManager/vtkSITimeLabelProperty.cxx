@@ -25,14 +25,10 @@
 
 vtkStandardNewMacro(vtkSITimeLabelProperty);
 //----------------------------------------------------------------------------
-vtkSITimeLabelProperty::vtkSITimeLabelProperty()
-{
-}
+vtkSITimeLabelProperty::vtkSITimeLabelProperty() = default;
 
 //----------------------------------------------------------------------------
-vtkSITimeLabelProperty::~vtkSITimeLabelProperty()
-{
-}
+vtkSITimeLabelProperty::~vtkSITimeLabelProperty() = default;
 
 //----------------------------------------------------------------------------
 void vtkSITimeLabelProperty::PrintSelf(ostream& os, vtkIndent indent)

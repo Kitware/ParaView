@@ -79,9 +79,7 @@ pqAnimationCue::pqAnimationCue(const QString& group, const QString& name, vtkSMP
 }
 
 //-----------------------------------------------------------------------------
-pqAnimationCue::~pqAnimationCue()
-{
-}
+pqAnimationCue::~pqAnimationCue() = default;
 
 //-----------------------------------------------------------------------------
 void pqAnimationCue::addKeyFrameInternal(vtkSMProxy* keyframe)

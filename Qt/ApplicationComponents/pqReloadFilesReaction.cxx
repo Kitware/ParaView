@@ -88,9 +88,7 @@ pqReloadFilesReaction::pqReloadFilesReaction(QAction* parentObject)
 }
 
 //-----------------------------------------------------------------------------
-pqReloadFilesReaction::~pqReloadFilesReaction()
-{
-}
+pqReloadFilesReaction::~pqReloadFilesReaction() = default;
 
 //-----------------------------------------------------------------------------
 void pqReloadFilesReaction::updateEnableState()

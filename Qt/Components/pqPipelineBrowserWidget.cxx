@@ -88,9 +88,7 @@ pqPipelineBrowserWidget::pqPipelineBrowserWidget(QWidget* parentObject)
 }
 
 //-----------------------------------------------------------------------------
-pqPipelineBrowserWidget::~pqPipelineBrowserWidget()
-{
-}
+pqPipelineBrowserWidget::~pqPipelineBrowserWidget() = default;
 
 //-----------------------------------------------------------------------------
 void pqPipelineBrowserWidget::configureModel()

@@ -36,9 +36,7 @@ vtkSMDataDeliveryManagerProxy::vtkSMDataDeliveryManagerProxy()
 }
 
 //----------------------------------------------------------------------------
-vtkSMDataDeliveryManagerProxy::~vtkSMDataDeliveryManagerProxy()
-{
-}
+vtkSMDataDeliveryManagerProxy::~vtkSMDataDeliveryManagerProxy() = default;
 
 //----------------------------------------------------------------------------
 void vtkSMDataDeliveryManagerProxy::SetViewProxy(vtkSMViewProxy* viewproxy)

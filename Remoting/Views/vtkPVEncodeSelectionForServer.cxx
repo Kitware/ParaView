@@ -76,13 +76,9 @@ static void vtkShrinkSelection(vtkSelection* sel)
 
 vtkObjectFactoryNewMacro(vtkPVEncodeSelectionForServer);
 
-vtkPVEncodeSelectionForServer::vtkPVEncodeSelectionForServer()
-{
-}
+vtkPVEncodeSelectionForServer::vtkPVEncodeSelectionForServer() = default;
 
-vtkPVEncodeSelectionForServer::~vtkPVEncodeSelectionForServer()
-{
-}
+vtkPVEncodeSelectionForServer::~vtkPVEncodeSelectionForServer() = default;
 
 void vtkPVEncodeSelectionForServer::PrintSelf(ostream& os, vtkIndent indent)
 {

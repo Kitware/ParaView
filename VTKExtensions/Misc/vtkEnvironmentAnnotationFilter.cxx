@@ -43,9 +43,7 @@ vtkEnvironmentAnnotationFilter::vtkEnvironmentAnnotationFilter()
 }
 
 //----------------------------------------------------------------------------
-vtkEnvironmentAnnotationFilter::~vtkEnvironmentAnnotationFilter()
-{
-}
+vtkEnvironmentAnnotationFilter::~vtkEnvironmentAnnotationFilter() = default;
 
 //----------------------------------------------------------------------------
 void vtkEnvironmentAnnotationFilter::UpdateAnnotationValue()

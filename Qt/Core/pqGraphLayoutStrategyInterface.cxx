@@ -32,6 +32,4 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqGraphLayoutStrategyInterface.h"
 
 //-----------------------------------------------------------------------------
-pqGraphLayoutStrategyInterface::~pqGraphLayoutStrategyInterface()
-{
-}
+pqGraphLayoutStrategyInterface::~pqGraphLayoutStrategyInterface() = default;

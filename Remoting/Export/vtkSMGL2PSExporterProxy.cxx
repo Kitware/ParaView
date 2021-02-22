@@ -30,9 +30,7 @@ vtkSMGL2PSExporterProxy::vtkSMGL2PSExporterProxy()
 }
 
 //----------------------------------------------------------------------------
-vtkSMGL2PSExporterProxy::~vtkSMGL2PSExporterProxy()
-{
-}
+vtkSMGL2PSExporterProxy::~vtkSMGL2PSExporterProxy() = default;
 
 //----------------------------------------------------------------------------
 bool vtkSMGL2PSExporterProxy::CanExport(vtkSMProxy* proxy)

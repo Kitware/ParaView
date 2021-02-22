@@ -59,9 +59,7 @@ pqStreamLinesAnimationManager::pqStreamLinesAnimationManager(QObject* p /*=nullp
 }
 
 //-----------------------------------------------------------------------------
-pqStreamLinesAnimationManager::~pqStreamLinesAnimationManager()
-{
-}
+pqStreamLinesAnimationManager::~pqStreamLinesAnimationManager() = default;
 
 //-----------------------------------------------------------------------------
 void pqStreamLinesAnimationManager::onRenderEnded()

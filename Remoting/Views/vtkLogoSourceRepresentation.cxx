@@ -30,9 +30,7 @@ vtkCxxSetObjectMacro(
   vtkLogoSourceRepresentation, LogoWidgetRepresentation, vtk3DWidgetRepresentation);
 
 //----------------------------------------------------------------------------
-vtkLogoSourceRepresentation::vtkLogoSourceRepresentation()
-{
-}
+vtkLogoSourceRepresentation::vtkLogoSourceRepresentation() = default;
 
 //----------------------------------------------------------------------------
 vtkLogoSourceRepresentation::~vtkLogoSourceRepresentation()

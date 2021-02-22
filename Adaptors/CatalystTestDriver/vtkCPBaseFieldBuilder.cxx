@@ -15,14 +15,10 @@
 #include "vtkCPBaseFieldBuilder.h"
 
 //----------------------------------------------------------------------------
-vtkCPBaseFieldBuilder::vtkCPBaseFieldBuilder()
-{
-}
+vtkCPBaseFieldBuilder::vtkCPBaseFieldBuilder() = default;
 
 //----------------------------------------------------------------------------
-vtkCPBaseFieldBuilder::~vtkCPBaseFieldBuilder()
-{
-}
+vtkCPBaseFieldBuilder::~vtkCPBaseFieldBuilder() = default;
 
 //----------------------------------------------------------------------------
 void vtkCPBaseFieldBuilder::PrintSelf(ostream& os, vtkIndent indent)

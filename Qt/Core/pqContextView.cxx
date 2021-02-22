@@ -100,7 +100,7 @@ public:
     this->InitializedAfterObjectsCreated = false;
     this->SelectionAction = vtkChart::SELECT_RECTANGLE;
   }
-  ~pqInternal() {}
+  ~pqInternal() = default;
 
   vtkNew<vtkEventQtSlotConnect> VTKConnect;
 };

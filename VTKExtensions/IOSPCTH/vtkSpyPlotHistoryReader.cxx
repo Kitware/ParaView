@@ -47,7 +47,7 @@ public:
     TimeSteps.reserve(1024);
     MetaIndexes["time"] = -1;
   }
-  ~MetaInfo() {}
+  ~MetaInfo() = default;
 
   // rough bidirectional map of header index for time
   std::map<std::string, int> MetaIndexes;

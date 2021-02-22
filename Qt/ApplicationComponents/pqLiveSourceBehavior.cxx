@@ -205,9 +205,7 @@ pqLiveSourceBehavior::pqLiveSourceBehavior(QObject* parentObject)
 }
 
 //-----------------------------------------------------------------------------
-pqLiveSourceBehavior::~pqLiveSourceBehavior()
-{
-}
+pqLiveSourceBehavior::~pqLiveSourceBehavior() = default;
 
 //-----------------------------------------------------------------------------
 void pqLiveSourceBehavior::pause()

@@ -157,9 +157,7 @@ pqStandardServerManagerModelInterface::pqStandardServerManagerModelInterface(QOb
 }
 
 //-----------------------------------------------------------------------------
-pqStandardServerManagerModelInterface::~pqStandardServerManagerModelInterface()
-{
-}
+pqStandardServerManagerModelInterface::~pqStandardServerManagerModelInterface() = default;
 
 //-----------------------------------------------------------------------------
 pqProxy* pqStandardServerManagerModelInterface::createPQProxy(

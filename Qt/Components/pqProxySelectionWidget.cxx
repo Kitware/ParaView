@@ -157,9 +157,7 @@ pqProxySelectionWidget::pqProxySelectionWidget(
 }
 
 //-----------------------------------------------------------------------------
-pqProxySelectionWidget::~pqProxySelectionWidget()
-{
-}
+pqProxySelectionWidget::~pqProxySelectionWidget() = default;
 
 //-----------------------------------------------------------------------------
 vtkSMProxy* pqProxySelectionWidget::chosenProxy() const

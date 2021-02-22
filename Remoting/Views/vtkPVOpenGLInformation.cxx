@@ -32,9 +32,7 @@ vtkPVOpenGLInformation::vtkPVOpenGLInformation()
 }
 
 //----------------------------------------------------------------------------
-vtkPVOpenGLInformation::~vtkPVOpenGLInformation()
-{
-}
+vtkPVOpenGLInformation::~vtkPVOpenGLInformation() = default;
 
 //-----------------------------------------------------------------------------
 void vtkPVOpenGLInformation::CopyFromObject(vtkObject* obj)

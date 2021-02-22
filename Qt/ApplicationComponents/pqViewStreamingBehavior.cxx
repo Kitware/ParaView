@@ -68,9 +68,7 @@ pqViewStreamingBehavior::pqViewStreamingBehavior(QObject* parentObject)
 }
 
 //-----------------------------------------------------------------------------
-pqViewStreamingBehavior::~pqViewStreamingBehavior()
-{
-}
+pqViewStreamingBehavior::~pqViewStreamingBehavior() = default;
 
 //-----------------------------------------------------------------------------
 void pqViewStreamingBehavior::onViewAdded(pqView* view)

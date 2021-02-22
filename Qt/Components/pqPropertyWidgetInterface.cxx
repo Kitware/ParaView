@@ -32,9 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPropertyWidgetInterface.h"
 
 //-----------------------------------------------------------------------------
-pqPropertyWidgetInterface::~pqPropertyWidgetInterface()
-{
-}
+pqPropertyWidgetInterface::~pqPropertyWidgetInterface() = default;
 
 //-----------------------------------------------------------------------------
 pqPropertyWidget* pqPropertyWidgetInterface::createWidgetForProperty(

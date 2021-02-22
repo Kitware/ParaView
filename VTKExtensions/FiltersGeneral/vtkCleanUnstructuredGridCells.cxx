@@ -31,14 +31,10 @@ PURPOSE.  See the above copyright notice for more information.
 vtkStandardNewMacro(vtkCleanUnstructuredGridCells);
 
 //----------------------------------------------------------------------------
-vtkCleanUnstructuredGridCells::vtkCleanUnstructuredGridCells()
-{
-}
+vtkCleanUnstructuredGridCells::vtkCleanUnstructuredGridCells() = default;
 
 //----------------------------------------------------------------------------
-vtkCleanUnstructuredGridCells::~vtkCleanUnstructuredGridCells()
-{
-}
+vtkCleanUnstructuredGridCells::~vtkCleanUnstructuredGridCells() = default;
 
 //----------------------------------------------------------------------------
 void vtkCleanUnstructuredGridCells::PrintSelf(ostream& os, vtkIndent indent)

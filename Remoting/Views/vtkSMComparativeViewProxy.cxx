@@ -36,9 +36,7 @@ vtkSMComparativeViewProxy::vtkSMComparativeViewProxy()
 }
 
 //----------------------------------------------------------------------------
-vtkSMComparativeViewProxy::~vtkSMComparativeViewProxy()
-{
-}
+vtkSMComparativeViewProxy::~vtkSMComparativeViewProxy() = default;
 
 //----------------------------------------------------------------------------
 void vtkSMComparativeViewProxy::Update()

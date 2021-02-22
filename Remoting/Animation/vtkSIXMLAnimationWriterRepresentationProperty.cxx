@@ -22,14 +22,12 @@
 
 vtkStandardNewMacro(vtkSIXMLAnimationWriterRepresentationProperty);
 //----------------------------------------------------------------------------
-vtkSIXMLAnimationWriterRepresentationProperty::vtkSIXMLAnimationWriterRepresentationProperty()
-{
-}
+vtkSIXMLAnimationWriterRepresentationProperty::vtkSIXMLAnimationWriterRepresentationProperty() =
+  default;
 
 //----------------------------------------------------------------------------
-vtkSIXMLAnimationWriterRepresentationProperty::~vtkSIXMLAnimationWriterRepresentationProperty()
-{
-}
+vtkSIXMLAnimationWriterRepresentationProperty::~vtkSIXMLAnimationWriterRepresentationProperty() =
+  default;
 
 //----------------------------------------------------------------------------
 bool vtkSIXMLAnimationWriterRepresentationProperty::Push(vtkSMMessage* message, int offset)

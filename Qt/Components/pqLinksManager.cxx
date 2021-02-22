@@ -71,9 +71,7 @@ pqLinksManager::pqLinksManager(QWidget* p)
   this->Ui->removeButton->setEnabled(false);
 }
 
-pqLinksManager::~pqLinksManager()
-{
-}
+pqLinksManager::~pqLinksManager() = default;
 
 void pqLinksManager::addLink()
 {

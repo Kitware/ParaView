@@ -154,7 +154,7 @@ public:
     , ClockTime(clocktime)
   {
   }
-  virtual ~vtkTickOnGenericCue() {}
+  virtual ~vtkTickOnGenericCue() = default;
   virtual void operator()(vtkAnimationCue* cue) const
   {
     if (!this->IsAcceptable(cue))

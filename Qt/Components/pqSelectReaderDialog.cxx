@@ -105,9 +105,7 @@ pqSelectReaderDialog::pqSelectReaderDialog(
 };
 
 //-----------------------------------------------------------------------------
-pqSelectReaderDialog::~pqSelectReaderDialog()
-{
-}
+pqSelectReaderDialog::~pqSelectReaderDialog() = default;
 
 //-----------------------------------------------------------------------------
 QString pqSelectReaderDialog::getGroup() const

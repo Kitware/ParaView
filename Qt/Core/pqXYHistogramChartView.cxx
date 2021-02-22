@@ -41,6 +41,4 @@ pqXYHistogramChartView::pqXYHistogramChartView(const QString& group, const QStri
 }
 
 //-----------------------------------------------------------------------------
-pqXYHistogramChartView::~pqXYHistogramChartView()
-{
-}
+pqXYHistogramChartView::~pqXYHistogramChartView() = default;

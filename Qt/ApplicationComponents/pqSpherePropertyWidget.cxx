@@ -127,9 +127,7 @@ pqSpherePropertyWidget::pqSpherePropertyWidget(
 }
 
 //-----------------------------------------------------------------------------
-pqSpherePropertyWidget::~pqSpherePropertyWidget()
-{
-}
+pqSpherePropertyWidget::~pqSpherePropertyWidget() = default;
 
 //-----------------------------------------------------------------------------
 void pqSpherePropertyWidget::placeWidget()

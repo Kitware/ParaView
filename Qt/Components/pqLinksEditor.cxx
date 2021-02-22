@@ -587,9 +587,7 @@ pqLinksEditor::pqLinksEditor(vtkSMLink* link, QWidget* p)
   this->updateEnabledState();
 }
 
-pqLinksEditor::~pqLinksEditor()
-{
-}
+pqLinksEditor::~pqLinksEditor() = default;
 
 QString pqLinksEditor::linkName()
 {

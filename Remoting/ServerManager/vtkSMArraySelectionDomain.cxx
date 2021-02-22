@@ -25,14 +25,10 @@ vtkStandardNewMacro(vtkSMArraySelectionDomain);
 bool vtkSMArraySelectionDomain::LoadAllVariables = false;
 
 //---------------------------------------------------------------------------
-vtkSMArraySelectionDomain::vtkSMArraySelectionDomain()
-{
-}
+vtkSMArraySelectionDomain::vtkSMArraySelectionDomain() = default;
 
 //---------------------------------------------------------------------------
-vtkSMArraySelectionDomain::~vtkSMArraySelectionDomain()
-{
-}
+vtkSMArraySelectionDomain::~vtkSMArraySelectionDomain() = default;
 
 //---------------------------------------------------------------------------
 int vtkSMArraySelectionDomain::SetDefaultValues(vtkSMProperty* prop, bool use_unchecked_values)

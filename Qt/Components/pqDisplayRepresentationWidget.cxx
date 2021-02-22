@@ -59,7 +59,7 @@ public:
         use_unchecked_modified_event, parentObject)
   {
   }
-  ~PropertyLinksConnection() override {}
+  ~PropertyLinksConnection() override = default;
 
 protected:
   /// Called to update the ServerManager Property due to UI change.
@@ -89,7 +89,7 @@ public:
   QPointer<pqComboBoxDomain> Domain;
   QPointer<pqDataRepresentation> PQRepr;
   QSet<QString> WarnOnRepresentationChange;
-  pqInternals() {}
+  pqInternals() = default;
 
   bool setRepresentationText(const QString& text)
   {
@@ -230,6 +230,4 @@ pqDisplayRepresentationPropertyWidget::pqDisplayRepresentationPropertyWidget(
 }
 
 //-----------------------------------------------------------------------------
-pqDisplayRepresentationPropertyWidget::~pqDisplayRepresentationPropertyWidget()
-{
-}
+pqDisplayRepresentationPropertyWidget::~pqDisplayRepresentationPropertyWidget() = default;

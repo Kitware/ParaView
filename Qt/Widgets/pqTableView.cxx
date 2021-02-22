@@ -56,9 +56,7 @@ pqTableView::pqTableView(QWidget* parentObject)
 }
 
 //-----------------------------------------------------------------------------
-pqTableView::~pqTableView()
-{
-}
+pqTableView::~pqTableView() = default;
 
 //-----------------------------------------------------------------------------
 bool pqTableView::eventFilter(QObject* object, QEvent* e)

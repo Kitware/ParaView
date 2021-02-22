@@ -174,9 +174,9 @@ public:
   }
 
 protected:
-  vtkGSRGeometryFilter() {}
+  vtkGSRGeometryFilter() = default;
 
-  ~vtkGSRGeometryFilter() override {}
+  ~vtkGSRGeometryFilter() override = default;
 
 private:
   vtkGSRGeometryFilter(const vtkGSRGeometryFilter&);

@@ -29,14 +29,12 @@
 
 vtkStandardNewMacro(vtkSMXYChartRepresentationInitializationHelper);
 //----------------------------------------------------------------------------
-vtkSMXYChartRepresentationInitializationHelper::vtkSMXYChartRepresentationInitializationHelper()
-{
-}
+vtkSMXYChartRepresentationInitializationHelper::vtkSMXYChartRepresentationInitializationHelper() =
+  default;
 
 //----------------------------------------------------------------------------
-vtkSMXYChartRepresentationInitializationHelper::~vtkSMXYChartRepresentationInitializationHelper()
-{
-}
+vtkSMXYChartRepresentationInitializationHelper::~vtkSMXYChartRepresentationInitializationHelper() =
+  default;
 
 //----------------------------------------------------------------------------
 void vtkSMXYChartRepresentationInitializationHelper::PostInitializeProxy(

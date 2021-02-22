@@ -155,9 +155,7 @@ pqLinePropertyWidget::pqLinePropertyWidget(
 }
 
 //-----------------------------------------------------------------------------
-pqLinePropertyWidget::~pqLinePropertyWidget()
-{
-}
+pqLinePropertyWidget::~pqLinePropertyWidget() = default;
 
 //-----------------------------------------------------------------------------
 void pqLinePropertyWidget::updateLengthLabel()

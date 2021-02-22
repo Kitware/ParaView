@@ -19,14 +19,10 @@
 
 vtkStandardNewMacro(vtkStructuredGridVolumeRepresentation);
 //----------------------------------------------------------------------------
-vtkStructuredGridVolumeRepresentation::vtkStructuredGridVolumeRepresentation()
-{
-}
+vtkStructuredGridVolumeRepresentation::vtkStructuredGridVolumeRepresentation() = default;
 
 //----------------------------------------------------------------------------
-vtkStructuredGridVolumeRepresentation::~vtkStructuredGridVolumeRepresentation()
-{
-}
+vtkStructuredGridVolumeRepresentation::~vtkStructuredGridVolumeRepresentation() = default;
 
 //----------------------------------------------------------------------------
 int vtkStructuredGridVolumeRepresentation::FillInputPortInformation(int, vtkInformation* info)

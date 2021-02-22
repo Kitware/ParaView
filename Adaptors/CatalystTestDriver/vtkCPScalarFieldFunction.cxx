@@ -15,14 +15,10 @@
 #include "vtkCPScalarFieldFunction.h"
 
 //----------------------------------------------------------------------------
-vtkCPScalarFieldFunction::vtkCPScalarFieldFunction()
-{
-}
+vtkCPScalarFieldFunction::vtkCPScalarFieldFunction() = default;
 
 //----------------------------------------------------------------------------
-vtkCPScalarFieldFunction::~vtkCPScalarFieldFunction()
-{
-}
+vtkCPScalarFieldFunction::~vtkCPScalarFieldFunction() = default;
 
 //----------------------------------------------------------------------------
 void vtkCPScalarFieldFunction::PrintSelf(ostream& os, vtkIndent indent)

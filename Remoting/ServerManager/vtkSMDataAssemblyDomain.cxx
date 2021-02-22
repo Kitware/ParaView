@@ -28,9 +28,7 @@ vtkSMDataAssemblyDomain::vtkSMDataAssemblyDomain()
 }
 
 //----------------------------------------------------------------------------
-vtkSMDataAssemblyDomain::~vtkSMDataAssemblyDomain()
-{
-}
+vtkSMDataAssemblyDomain::~vtkSMDataAssemblyDomain() = default;
 
 //----------------------------------------------------------------------------
 void vtkSMDataAssemblyDomain::Update(vtkSMProperty* requestingProperty)

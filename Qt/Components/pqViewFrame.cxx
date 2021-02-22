@@ -123,9 +123,7 @@ pqViewFrame::pqViewFrame(QWidget* parentObject)
 }
 
 //-----------------------------------------------------------------------------
-pqViewFrame::~pqViewFrame()
-{
-}
+pqViewFrame::~pqViewFrame() = default;
 
 //-----------------------------------------------------------------------------
 void pqViewFrame::setBorderColor(const QColor& clr)

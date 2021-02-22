@@ -21,14 +21,10 @@
 vtkStandardNewMacro(vtkPVGenericAttributeInformation);
 
 //----------------------------------------------------------------------------
-vtkPVGenericAttributeInformation::vtkPVGenericAttributeInformation()
-{
-}
+vtkPVGenericAttributeInformation::vtkPVGenericAttributeInformation() = default;
 
 //----------------------------------------------------------------------------
-vtkPVGenericAttributeInformation::~vtkPVGenericAttributeInformation()
-{
-}
+vtkPVGenericAttributeInformation::~vtkPVGenericAttributeInformation() = default;
 
 //----------------------------------------------------------------------------
 void vtkPVGenericAttributeInformation::PrintSelf(ostream& os, vtkIndent indent)

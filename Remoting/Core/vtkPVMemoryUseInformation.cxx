@@ -33,14 +33,10 @@
 vtkStandardNewMacro(vtkPVMemoryUseInformation);
 
 //----------------------------------------------------------------------------
-vtkPVMemoryUseInformation::vtkPVMemoryUseInformation()
-{
-}
+vtkPVMemoryUseInformation::vtkPVMemoryUseInformation() = default;
 
 //----------------------------------------------------------------------------
-vtkPVMemoryUseInformation::~vtkPVMemoryUseInformation()
-{
-}
+vtkPVMemoryUseInformation::~vtkPVMemoryUseInformation() = default;
 
 //----------------------------------------------------------------------------
 void vtkPVMemoryUseInformation::CopyFromObject(vtkObject* obj)

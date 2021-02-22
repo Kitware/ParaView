@@ -26,14 +26,10 @@
 
 vtkStandardNewMacro(vtkPVMergeTables);
 //----------------------------------------------------------------------------
-vtkPVMergeTables::vtkPVMergeTables()
-{
-}
+vtkPVMergeTables::vtkPVMergeTables() = default;
 
 //----------------------------------------------------------------------------
-vtkPVMergeTables::~vtkPVMergeTables()
-{
-}
+vtkPVMergeTables::~vtkPVMergeTables() = default;
 
 //----------------------------------------------------------------------------
 int vtkPVMergeTables::FillInputPortInformation(int vtkNotUsed(port), vtkInformation* info)

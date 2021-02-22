@@ -32,9 +32,7 @@
 #include "vtkUnsignedCharArray.h"
 
 //---------------------------------------------------------------------------
-vtkCTHSource::vtkCTHSource()
-{
-}
+vtkCTHSource::vtkCTHSource() = default;
 
 vtkCTHSource::~vtkCTHSource()
 {

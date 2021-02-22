@@ -101,9 +101,7 @@ pqPresetToPixmap::pqPresetToPixmap(QObject* parentObject)
 }
 
 //-----------------------------------------------------------------------------
-pqPresetToPixmap::~pqPresetToPixmap()
-{
-}
+pqPresetToPixmap::~pqPresetToPixmap() = default;
 
 //-----------------------------------------------------------------------------
 QPixmap pqPresetToPixmap::render(const Json::Value& preset, const QSize& resolution) const

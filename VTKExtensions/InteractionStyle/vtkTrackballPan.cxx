@@ -45,9 +45,7 @@ vtkTrackballPan::vtkTrackballPan()
 }
 
 //-------------------------------------------------------------------------
-vtkTrackballPan::~vtkTrackballPan()
-{
-}
+vtkTrackballPan::~vtkTrackballPan() = default;
 
 //-------------------------------------------------------------------------
 void vtkTrackballPan::OnKeyUp(vtkRenderWindowInteractor* interactor)

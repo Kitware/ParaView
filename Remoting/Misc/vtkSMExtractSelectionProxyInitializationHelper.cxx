@@ -29,14 +29,12 @@
 vtkStandardNewMacro(vtkSMExtractSelectionProxyInitializationHelper);
 
 //----------------------------------------------------------------------------
-vtkSMExtractSelectionProxyInitializationHelper::vtkSMExtractSelectionProxyInitializationHelper()
-{
-}
+vtkSMExtractSelectionProxyInitializationHelper::vtkSMExtractSelectionProxyInitializationHelper() =
+  default;
 
 //----------------------------------------------------------------------------
-vtkSMExtractSelectionProxyInitializationHelper::~vtkSMExtractSelectionProxyInitializationHelper()
-{
-}
+vtkSMExtractSelectionProxyInitializationHelper::~vtkSMExtractSelectionProxyInitializationHelper() =
+  default;
 
 //----------------------------------------------------------------------------
 void vtkSMExtractSelectionProxyInitializationHelper::PostInitializeProxy(

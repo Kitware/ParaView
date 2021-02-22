@@ -6,13 +6,9 @@
 
 vtkStandardNewMacro(vtkSMMyBoundsDomain);
 
-vtkSMMyBoundsDomain::vtkSMMyBoundsDomain()
-{
-}
+vtkSMMyBoundsDomain::vtkSMMyBoundsDomain() = default;
 
-vtkSMMyBoundsDomain::~vtkSMMyBoundsDomain()
-{
-}
+vtkSMMyBoundsDomain::~vtkSMMyBoundsDomain() = default;
 
 void vtkSMMyBoundsDomain::PrintSelf(ostream& os, vtkIndent indent)
 {

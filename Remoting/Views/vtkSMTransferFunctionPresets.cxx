@@ -43,7 +43,7 @@ public:
   {
   }
 
-  ~vtkInternals() {}
+  ~vtkInternals() = default;
 
   void SaveToSettings()
   {

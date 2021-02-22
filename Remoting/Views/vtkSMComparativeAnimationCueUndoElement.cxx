@@ -33,9 +33,7 @@ vtkSMComparativeAnimationCueUndoElement::vtkSMComparativeAnimationCueUndoElement
 }
 
 //-----------------------------------------------------------------------------
-vtkSMComparativeAnimationCueUndoElement::~vtkSMComparativeAnimationCueUndoElement()
-{
-}
+vtkSMComparativeAnimationCueUndoElement::~vtkSMComparativeAnimationCueUndoElement() = default;
 
 //-----------------------------------------------------------------------------
 void vtkSMComparativeAnimationCueUndoElement::PrintSelf(ostream& os, vtkIndent indent)

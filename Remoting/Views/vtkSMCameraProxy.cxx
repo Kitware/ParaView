@@ -22,14 +22,10 @@
 
 vtkStandardNewMacro(vtkSMCameraProxy);
 //-----------------------------------------------------------------------------
-vtkSMCameraProxy::vtkSMCameraProxy()
-{
-}
+vtkSMCameraProxy::vtkSMCameraProxy() = default;
 
 //-----------------------------------------------------------------------------
-vtkSMCameraProxy::~vtkSMCameraProxy()
-{
-}
+vtkSMCameraProxy::~vtkSMCameraProxy() = default;
 
 //-----------------------------------------------------------------------------
 void vtkSMCameraProxy::UpdatePropertyInformation()

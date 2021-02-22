@@ -539,9 +539,7 @@ vtkPlotEdges::vtkPlotEdges()
   this->SetNumberOfOutputPorts(1);
 }
 
-vtkPlotEdges::~vtkPlotEdges()
-{
-}
+vtkPlotEdges::~vtkPlotEdges() = default;
 
 int vtkPlotEdges::FillInputPortInformation(int port, vtkInformation* info)
 {

@@ -47,7 +47,7 @@ public:
     this->Style = nullptr;
     this->forceCheck = false;
   }
-  ~pqCheckableHeaderViewInternal() {}
+  ~pqCheckableHeaderViewInternal() = default;
 
   /// \brief
   ///   Returns the placeholder rect for a checkbox in the section header.

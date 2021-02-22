@@ -728,8 +728,9 @@ public:
   vtkClientServerInterpreter* Interpreter;
 
 protected:
-  vtkClientServerInterpreterCommand() {}
-  ~vtkClientServerInterpreterCommand() override {}
+  vtkClientServerInterpreterCommand() = default;
+  ~vtkClientServerInterpreterCommand() override = default;
+
 private:
   vtkClientServerInterpreterCommand(const vtkClientServerInterpreterCommand&);
   void operator=(const vtkClientServerInterpreterCommand&);

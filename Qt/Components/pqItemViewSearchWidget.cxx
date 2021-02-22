@@ -63,7 +63,7 @@ public:
     this->Highlighter = new pqHighlightItemDelegate(QColor(175, 166, 238));
     this->UnHighlighter = new pqHighlightItemDelegate(QColor(Qt::white));
   }
-  ~PIMPL() {}
+  ~PIMPL() = default;
 
   QString SearchString;
   QModelIndex CurrentFound;

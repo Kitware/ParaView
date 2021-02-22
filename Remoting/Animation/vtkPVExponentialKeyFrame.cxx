@@ -29,9 +29,7 @@ vtkPVExponentialKeyFrame::vtkPVExponentialKeyFrame()
 }
 
 //----------------------------------------------------------------------------
-vtkPVExponentialKeyFrame::~vtkPVExponentialKeyFrame()
-{
-}
+vtkPVExponentialKeyFrame::~vtkPVExponentialKeyFrame() = default;
 
 //----------------------------------------------------------------------------
 // remember that currenttime is 0 at the KeyTime of this key frame

@@ -24,14 +24,10 @@
 vtkStandardNewMacro(vtkSMFixedTypeDomain);
 
 //---------------------------------------------------------------------------
-vtkSMFixedTypeDomain::vtkSMFixedTypeDomain()
-{
-}
+vtkSMFixedTypeDomain::vtkSMFixedTypeDomain() = default;
 
 //---------------------------------------------------------------------------
-vtkSMFixedTypeDomain::~vtkSMFixedTypeDomain()
-{
-}
+vtkSMFixedTypeDomain::~vtkSMFixedTypeDomain() = default;
 
 //---------------------------------------------------------------------------
 int vtkSMFixedTypeDomain::IsInDomain(vtkSMProperty* property)

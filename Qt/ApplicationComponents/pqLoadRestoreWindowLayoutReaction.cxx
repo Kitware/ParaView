@@ -46,9 +46,7 @@ pqLoadRestoreWindowLayoutReaction::pqLoadRestoreWindowLayoutReaction(
 }
 
 //-----------------------------------------------------------------------------
-pqLoadRestoreWindowLayoutReaction::~pqLoadRestoreWindowLayoutReaction()
-{
-}
+pqLoadRestoreWindowLayoutReaction::~pqLoadRestoreWindowLayoutReaction() = default;
 
 //-----------------------------------------------------------------------------
 void pqLoadRestoreWindowLayoutReaction::onTriggered()

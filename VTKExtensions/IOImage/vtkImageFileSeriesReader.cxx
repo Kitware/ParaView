@@ -49,9 +49,7 @@ vtkImageFileSeriesReader::vtkImageFileSeriesReader()
 }
 
 //----------------------------------------------------------------------------
-vtkImageFileSeriesReader::~vtkImageFileSeriesReader()
-{
-}
+vtkImageFileSeriesReader::~vtkImageFileSeriesReader() = default;
 
 //----------------------------------------------------------------------------
 int vtkImageFileSeriesReader::ProcessRequest(

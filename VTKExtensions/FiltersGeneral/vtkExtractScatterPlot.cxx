@@ -42,9 +42,7 @@ vtkExtractScatterPlot::vtkExtractScatterPlot()
     1, 0, 0, vtkDataObject::FIELD_ASSOCIATION_POINTS_THEN_CELLS, vtkDataSetAttributes::SCALARS);
 }
 
-vtkExtractScatterPlot::~vtkExtractScatterPlot()
-{
-}
+vtkExtractScatterPlot::~vtkExtractScatterPlot() = default;
 
 void vtkExtractScatterPlot::PrintSelf(ostream& os, vtkIndent indent)
 {

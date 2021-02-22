@@ -57,19 +57,13 @@ PropertyItem::PropertyItem(
       break;
   }
 }
-PropertyItem::~PropertyItem()
-{
-}
+PropertyItem::~PropertyItem() = default;
 
 // --------------------------------------
-PropertyStorage::PropertyStorage()
-{
-}
+PropertyStorage::PropertyStorage() = default;
 
 // --------------------------------------
-PropertyStorage::~PropertyStorage()
-{
-}
+PropertyStorage::~PropertyStorage() = default;
 
 // --------------------------------------
 void PropertyStorage::AddProperty(

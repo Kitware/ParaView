@@ -41,9 +41,7 @@ pqPresetGroupsManager::pqPresetGroupsManager(QObject* p)
 {
 }
 
-pqPresetGroupsManager::~pqPresetGroupsManager()
-{
-}
+pqPresetGroupsManager::~pqPresetGroupsManager() = default;
 
 int pqPresetGroupsManager::numberOfGroups()
 {

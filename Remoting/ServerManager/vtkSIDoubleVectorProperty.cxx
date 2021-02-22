@@ -18,14 +18,10 @@
 
 vtkStandardNewMacro(vtkSIDoubleVectorProperty);
 //----------------------------------------------------------------------------
-vtkSIDoubleVectorProperty::vtkSIDoubleVectorProperty()
-{
-}
+vtkSIDoubleVectorProperty::vtkSIDoubleVectorProperty() = default;
 
 //----------------------------------------------------------------------------
-vtkSIDoubleVectorProperty::~vtkSIDoubleVectorProperty()
-{
-}
+vtkSIDoubleVectorProperty::~vtkSIDoubleVectorProperty() = default;
 
 //----------------------------------------------------------------------------
 void vtkSIDoubleVectorProperty::PrintSelf(ostream& os, vtkIndent indent)

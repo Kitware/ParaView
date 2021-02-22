@@ -302,8 +302,8 @@ public:
   VTK_MODULE_ENABLE_VTK_WrappingPythonCore
   vtkSmartPyObject KWArgs;
   vtkSmartPyObject PositionalArgs;
-  vtkInternals() {}
-  ~vtkInternals() {}
+  vtkInternals() = default;
+  ~vtkInternals() = default;
 
   // This method will create a new PyDict is none is already
   // created for KWArgs.

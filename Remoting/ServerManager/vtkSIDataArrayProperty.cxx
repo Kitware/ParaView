@@ -27,14 +27,10 @@
 
 vtkStandardNewMacro(vtkSIDataArrayProperty);
 //----------------------------------------------------------------------------
-vtkSIDataArrayProperty::vtkSIDataArrayProperty()
-{
-}
+vtkSIDataArrayProperty::vtkSIDataArrayProperty() = default;
 
 //----------------------------------------------------------------------------
-vtkSIDataArrayProperty::~vtkSIDataArrayProperty()
-{
-}
+vtkSIDataArrayProperty::~vtkSIDataArrayProperty() = default;
 
 //----------------------------------------------------------------------------
 void vtkSIDataArrayProperty::PrintSelf(ostream& os, vtkIndent indent)

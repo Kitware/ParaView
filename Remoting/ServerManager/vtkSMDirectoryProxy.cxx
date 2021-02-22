@@ -22,14 +22,10 @@
 
 vtkStandardNewMacro(vtkSMDirectoryProxy);
 //----------------------------------------------------------------------------
-vtkSMDirectoryProxy::vtkSMDirectoryProxy()
-{
-}
+vtkSMDirectoryProxy::vtkSMDirectoryProxy() = default;
 
 //----------------------------------------------------------------------------
-vtkSMDirectoryProxy::~vtkSMDirectoryProxy()
-{
-}
+vtkSMDirectoryProxy::~vtkSMDirectoryProxy() = default;
 
 //----------------------------------------------------------------------------
 bool vtkSMDirectoryProxy::List(const char* dir)

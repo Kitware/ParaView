@@ -35,9 +35,7 @@ vtkOutlineRepresentation::vtkOutlineRepresentation()
 }
 
 //----------------------------------------------------------------------------
-vtkOutlineRepresentation::~vtkOutlineRepresentation()
-{
-}
+vtkOutlineRepresentation::~vtkOutlineRepresentation() = default;
 
 //----------------------------------------------------------------------------
 void vtkOutlineRepresentation::PrintSelf(ostream& os, vtkIndent indent)

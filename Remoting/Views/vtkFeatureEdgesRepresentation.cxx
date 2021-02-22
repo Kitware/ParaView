@@ -36,9 +36,7 @@ vtkFeatureEdgesRepresentation::vtkFeatureEdgesRepresentation()
 }
 
 //----------------------------------------------------------------------------
-vtkFeatureEdgesRepresentation::~vtkFeatureEdgesRepresentation()
-{
-}
+vtkFeatureEdgesRepresentation::~vtkFeatureEdgesRepresentation() = default;
 
 //----------------------------------------------------------------------------
 void vtkFeatureEdgesRepresentation::PrintSelf(ostream& os, vtkIndent indent)

@@ -23,14 +23,10 @@
 
 vtkStandardNewMacro(vtkSMBoxRepresentationProxy);
 //----------------------------------------------------------------------------
-vtkSMBoxRepresentationProxy::vtkSMBoxRepresentationProxy()
-{
-}
+vtkSMBoxRepresentationProxy::vtkSMBoxRepresentationProxy() = default;
 
 //----------------------------------------------------------------------------
-vtkSMBoxRepresentationProxy::~vtkSMBoxRepresentationProxy()
-{
-}
+vtkSMBoxRepresentationProxy::~vtkSMBoxRepresentationProxy() = default;
 
 //----------------------------------------------------------------------------
 void vtkSMBoxRepresentationProxy::CreateVTKObjects()

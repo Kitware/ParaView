@@ -54,9 +54,7 @@ pqTreeWidgetSelectionHelper::pqTreeWidgetSelectionHelper(QTreeWidget* tree)
 }
 
 //-----------------------------------------------------------------------------
-pqTreeWidgetSelectionHelper::~pqTreeWidgetSelectionHelper()
-{
-}
+pqTreeWidgetSelectionHelper::~pqTreeWidgetSelectionHelper() = default;
 
 //-----------------------------------------------------------------------------
 void pqTreeWidgetSelectionHelper::onItemPressed(QTreeWidgetItem* item, int)

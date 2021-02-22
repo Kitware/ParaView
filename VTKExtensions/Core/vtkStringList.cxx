@@ -37,9 +37,7 @@ vtkStringList::vtkStringList()
 }
 
 //----------------------------------------------------------------------------
-vtkStringList::~vtkStringList()
-{
-}
+vtkStringList::~vtkStringList() = default;
 
 //----------------------------------------------------------------------------
 void vtkStringList::RemoveAllItems()

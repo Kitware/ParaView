@@ -45,9 +45,7 @@ pqPluginTreeWidgetEventPlayer::pqPluginTreeWidgetEventPlayer(QObject* parentObje
 }
 
 //-----------------------------------------------------------------------------
-pqPluginTreeWidgetEventPlayer::~pqPluginTreeWidgetEventPlayer()
-{
-}
+pqPluginTreeWidgetEventPlayer::~pqPluginTreeWidgetEventPlayer() = default;
 
 //-----------------------------------------------------------------------------
 QModelIndex pqPluginTreeWidgetEventPlayerGetIndex(

@@ -20,14 +20,10 @@
 
 vtkStandardNewMacro(vtkSIMultiplexerSourceProxy);
 //----------------------------------------------------------------------------
-vtkSIMultiplexerSourceProxy::vtkSIMultiplexerSourceProxy()
-{
-}
+vtkSIMultiplexerSourceProxy::vtkSIMultiplexerSourceProxy() = default;
 
 //----------------------------------------------------------------------------
-vtkSIMultiplexerSourceProxy::~vtkSIMultiplexerSourceProxy()
-{
-}
+vtkSIMultiplexerSourceProxy::~vtkSIMultiplexerSourceProxy() = default;
 
 //----------------------------------------------------------------------------
 void vtkSIMultiplexerSourceProxy::Select(vtkSISourceProxy* subproxy)

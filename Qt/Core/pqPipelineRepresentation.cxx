@@ -43,9 +43,7 @@ pqPipelineRepresentation::pqPipelineRepresentation(const QString& group, const Q
 }
 
 //-----------------------------------------------------------------------------
-pqPipelineRepresentation::~pqPipelineRepresentation()
-{
-}
+pqPipelineRepresentation::~pqPipelineRepresentation() = default;
 
 //-----------------------------------------------------------------------------
 vtkSMRepresentationProxy* pqPipelineRepresentation::getRepresentationProxy() const

@@ -30,9 +30,7 @@ vtkSMInputProperty::vtkSMInputProperty()
 }
 
 //---------------------------------------------------------------------------
-vtkSMInputProperty::~vtkSMInputProperty()
-{
-}
+vtkSMInputProperty::~vtkSMInputProperty() = default;
 
 //---------------------------------------------------------------------------
 int vtkSMInputProperty::ReadXMLAttributes(vtkSMProxy* parent, vtkPVXMLElement* element)

@@ -55,9 +55,7 @@ pqVCRController::pqVCRController(QObject* _parent /*=nullptr*/)
 }
 
 //-----------------------------------------------------------------------------
-pqVCRController::~pqVCRController()
-{
-}
+pqVCRController::~pqVCRController() = default;
 
 //-----------------------------------------------------------------------------
 void pqVCRController::setAnimationScene(pqAnimationScene* scene)

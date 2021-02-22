@@ -63,8 +63,8 @@ using std::ostringstream;
 class vtkSortedTableStreamer::InternalsBase
 {
 public:
-  InternalsBase() {}
-  virtual ~InternalsBase() {}
+  InternalsBase() = default;
+  virtual ~InternalsBase() = default;
 
   virtual void SetSelectedComponent(int newValue) = 0;
   virtual void InvalidateCache() = 0;

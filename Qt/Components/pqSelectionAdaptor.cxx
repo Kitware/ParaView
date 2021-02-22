@@ -63,9 +63,7 @@ pqSelectionAdaptor::pqSelectionAdaptor(QItemSelectionModel* _parent)
 }
 
 //-----------------------------------------------------------------------------
-pqSelectionAdaptor::~pqSelectionAdaptor()
-{
-}
+pqSelectionAdaptor::~pqSelectionAdaptor() = default;
 
 //-----------------------------------------------------------------------------
 // Returns the QAbstractItemModel used by the QSelectionModel.

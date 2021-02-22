@@ -53,7 +53,7 @@ public:
         use_unchecked_modified_event, parentObject)
   {
   }
-  ~PropertyLinksConnection() override {}
+  ~PropertyLinksConnection() override = default;
 
 protected:
   /// Called to update the ServerManager Property due to UI change.

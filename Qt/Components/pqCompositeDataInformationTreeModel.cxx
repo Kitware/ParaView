@@ -152,7 +152,7 @@ public:
     , CustomColumnState()
   {
   }
-  ~CNode() {}
+  ~CNode() = default;
 
   static CNode& nullNode()
   {
@@ -426,8 +426,8 @@ using namespace pqCompositeDataInformationTreeModelNS;
 class pqCompositeDataInformationTreeModel::pqInternals
 {
 public:
-  pqInternals() {}
-  ~pqInternals() {}
+  pqInternals() = default;
+  ~pqInternals() = default;
 
   static CNode& nullNode() { return CNode::nullNode(); }
 
@@ -501,9 +501,7 @@ pqCompositeDataInformationTreeModel::pqCompositeDataInformationTreeModel(QObject
 }
 
 //-----------------------------------------------------------------------------
-pqCompositeDataInformationTreeModel::~pqCompositeDataInformationTreeModel()
-{
-}
+pqCompositeDataInformationTreeModel::~pqCompositeDataInformationTreeModel() = default;
 
 //-----------------------------------------------------------------------------
 int pqCompositeDataInformationTreeModel::columnCount(const QModelIndex&) const

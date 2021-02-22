@@ -25,9 +25,7 @@ vtkSequenceAnimationPlayer::vtkSequenceAnimationPlayer()
 }
 
 //----------------------------------------------------------------------------
-vtkSequenceAnimationPlayer::~vtkSequenceAnimationPlayer()
-{
-}
+vtkSequenceAnimationPlayer::~vtkSequenceAnimationPlayer() = default;
 
 //----------------------------------------------------------------------------
 void vtkSequenceAnimationPlayer::StartLoop(

@@ -21,14 +21,10 @@
 vtkStandardNewMacro(vtkSMDataSourceProxy);
 
 //---------------------------------------------------------------------------
-vtkSMDataSourceProxy::vtkSMDataSourceProxy()
-{
-}
+vtkSMDataSourceProxy::vtkSMDataSourceProxy() = default;
 
 //---------------------------------------------------------------------------
-vtkSMDataSourceProxy::~vtkSMDataSourceProxy()
-{
-}
+vtkSMDataSourceProxy::~vtkSMDataSourceProxy() = default;
 
 //----------------------------------------------------------------------------
 void vtkSMDataSourceProxy::CopyData(vtkSMSourceProxy* sourceProxy)

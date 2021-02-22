@@ -36,14 +36,10 @@
 
 vtkStandardNewMacro(vtkSMCoreUtilities);
 //----------------------------------------------------------------------------
-vtkSMCoreUtilities::vtkSMCoreUtilities()
-{
-}
+vtkSMCoreUtilities::vtkSMCoreUtilities() = default;
 
 //----------------------------------------------------------------------------
-vtkSMCoreUtilities::~vtkSMCoreUtilities()
-{
-}
+vtkSMCoreUtilities::~vtkSMCoreUtilities() = default;
 
 //----------------------------------------------------------------------------
 const char* vtkSMCoreUtilities::GetFileNameProperty(vtkSMProxy* proxy)

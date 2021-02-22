@@ -187,7 +187,7 @@ public:
     this->setLayout(layout_);
   }
 
-  ~pqGlobalOpacityRangeDialog() override{};
+  ~pqGlobalOpacityRangeDialog() override = default;
 
   double globalOpacity() const { return this->GlobalOpacityWidget->value(); }
   double selectedOpacity() const { return this->SelectedOpacityWidget->value(); }

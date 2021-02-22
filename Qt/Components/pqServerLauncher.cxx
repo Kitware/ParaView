@@ -122,7 +122,7 @@ public:
     , ToSave(false)
   {
   }
-  ~pqWidget() override {}
+  ~pqWidget() override = default;
 
   virtual QVariant get() const
   {

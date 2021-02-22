@@ -29,14 +29,10 @@
 
 vtkStandardNewMacro(vtkSMOrthographicSliceViewProxy);
 //----------------------------------------------------------------------------
-vtkSMOrthographicSliceViewProxy::vtkSMOrthographicSliceViewProxy()
-{
-}
+vtkSMOrthographicSliceViewProxy::vtkSMOrthographicSliceViewProxy() = default;
 
 //----------------------------------------------------------------------------
-vtkSMOrthographicSliceViewProxy::~vtkSMOrthographicSliceViewProxy()
-{
-}
+vtkSMOrthographicSliceViewProxy::~vtkSMOrthographicSliceViewProxy() = default;
 
 //----------------------------------------------------------------------------
 void vtkSMOrthographicSliceViewProxy::CreateVTKObjects()

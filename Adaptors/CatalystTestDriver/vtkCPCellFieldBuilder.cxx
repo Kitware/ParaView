@@ -26,9 +26,7 @@
 vtkStandardNewMacro(vtkCPCellFieldBuilder);
 
 //----------------------------------------------------------------------------
-vtkCPCellFieldBuilder::vtkCPCellFieldBuilder()
-{
-}
+vtkCPCellFieldBuilder::vtkCPCellFieldBuilder() = default;
 
 //----------------------------------------------------------------------------
 void vtkCPCellFieldBuilder::BuildField(unsigned long timeStep, double time, vtkDataSet* grid)
@@ -68,9 +66,7 @@ void vtkCPCellFieldBuilder::BuildField(unsigned long timeStep, double time, vtkD
 }
 
 //----------------------------------------------------------------------------
-vtkCPCellFieldBuilder::~vtkCPCellFieldBuilder()
-{
-}
+vtkCPCellFieldBuilder::~vtkCPCellFieldBuilder() = default;
 
 //----------------------------------------------------------------------------
 void vtkCPCellFieldBuilder::PrintSelf(ostream& os, vtkIndent indent)

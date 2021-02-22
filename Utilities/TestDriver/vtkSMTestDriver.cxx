@@ -94,9 +94,7 @@ vtkSMTestDriver::vtkSMTestDriver()
   this->ScriptExecutable.TypeName = "script";
 }
 
-vtkSMTestDriver::~vtkSMTestDriver()
-{
-}
+vtkSMTestDriver::~vtkSMTestDriver() = default;
 
 // now implement the vtkSMTestDriver class
 

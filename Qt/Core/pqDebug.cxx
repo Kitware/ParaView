@@ -46,9 +46,7 @@ pqDebugType::pqDebugType(const QString& envVariable /*=QString()*/)
 }
 
 //-----------------------------------------------------------------------------
-pqDebugType::~pqDebugType()
-{
-}
+pqDebugType::~pqDebugType() = default;
 
 //-----------------------------------------------------------------------------
 QDebug pqDebug(const pqDebugType& type /*=pqDebugType()*/)

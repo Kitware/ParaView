@@ -61,7 +61,7 @@ public:
   vtkSmartPointer<vtkSMProxy> FSplineProxy;
   QPointer<pqProxyWidget> FSplineWidget;
   double Data[3];
-  pqInternal() {}
+  pqInternal() = default;
 
   void setupValidators(QObject* parent)
   {

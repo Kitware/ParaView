@@ -43,9 +43,7 @@ vtkIntegrateFlowThroughSurface::vtkIntegrateFlowThroughSurface()
 }
 
 //-----------------------------------------------------------------------------
-vtkIntegrateFlowThroughSurface::~vtkIntegrateFlowThroughSurface()
-{
-}
+vtkIntegrateFlowThroughSurface::~vtkIntegrateFlowThroughSurface() = default;
 
 //-----------------------------------------------------------------------------
 int vtkIntegrateFlowThroughSurface::RequestUpdateExtent(vtkInformation* vtkNotUsed(request),

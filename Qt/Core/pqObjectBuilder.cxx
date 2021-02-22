@@ -143,9 +143,7 @@ pqObjectBuilder::pqObjectBuilder(QObject* _parent /*=0*/)
 }
 
 //-----------------------------------------------------------------------------
-pqObjectBuilder::~pqObjectBuilder()
-{
-}
+pqObjectBuilder::~pqObjectBuilder() = default;
 
 //-----------------------------------------------------------------------------
 pqPipelineSource* pqObjectBuilder::createSource(

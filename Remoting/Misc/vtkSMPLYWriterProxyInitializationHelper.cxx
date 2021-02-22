@@ -26,14 +26,10 @@
 
 vtkStandardNewMacro(vtkSMPLYWriterProxyInitializationHelper);
 //----------------------------------------------------------------------------
-vtkSMPLYWriterProxyInitializationHelper::vtkSMPLYWriterProxyInitializationHelper()
-{
-}
+vtkSMPLYWriterProxyInitializationHelper::vtkSMPLYWriterProxyInitializationHelper() = default;
 
 //----------------------------------------------------------------------------
-vtkSMPLYWriterProxyInitializationHelper::~vtkSMPLYWriterProxyInitializationHelper()
-{
-}
+vtkSMPLYWriterProxyInitializationHelper::~vtkSMPLYWriterProxyInitializationHelper() = default;
 
 //----------------------------------------------------------------------------
 void vtkSMPLYWriterProxyInitializationHelper::PostInitializeProxy(

@@ -34,9 +34,7 @@ vtkPVDReader::vtkPVDReader()
 }
 
 //----------------------------------------------------------------------------
-vtkPVDReader::~vtkPVDReader()
-{
-}
+vtkPVDReader::~vtkPVDReader() = default;
 
 //----------------------------------------------------------------------------
 void vtkPVDReader::PrintSelf(ostream& os, vtkIndent indent)

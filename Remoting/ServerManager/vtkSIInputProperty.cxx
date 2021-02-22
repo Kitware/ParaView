@@ -31,9 +31,7 @@ vtkSIInputProperty::vtkSIInputProperty()
 }
 
 //----------------------------------------------------------------------------
-vtkSIInputProperty::~vtkSIInputProperty()
-{
-}
+vtkSIInputProperty::~vtkSIInputProperty() = default;
 
 //----------------------------------------------------------------------------
 bool vtkSIInputProperty::ReadXMLAttributes(vtkSIProxy* proxyhelper, vtkPVXMLElement* element)

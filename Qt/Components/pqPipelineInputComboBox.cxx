@@ -81,9 +81,7 @@ pqPipelineInputComboBox::pqPipelineInputComboBox(
 }
 
 //-----------------------------------------------------------------------------
-pqPipelineInputComboBox::~pqPipelineInputComboBox()
-{
-}
+pqPipelineInputComboBox::~pqPipelineInputComboBox() = default;
 
 //-----------------------------------------------------------------------------
 vtkSMProxy* pqPipelineInputComboBox::currentProxy() const

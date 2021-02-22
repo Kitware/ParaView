@@ -169,9 +169,7 @@ vtkSMMultiplexerSourceProxy::vtkSMMultiplexerSourceProxy()
 }
 
 //----------------------------------------------------------------------------
-vtkSMMultiplexerSourceProxy::~vtkSMMultiplexerSourceProxy()
-{
-}
+vtkSMMultiplexerSourceProxy::~vtkSMMultiplexerSourceProxy() = default;
 
 //----------------------------------------------------------------------------
 int vtkSMMultiplexerSourceProxy::CreateSubProxiesAndProperties(

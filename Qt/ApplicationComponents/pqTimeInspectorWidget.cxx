@@ -86,7 +86,8 @@ public:
         use_unchecked_modified_event, parentObject)
   {
   }
-  ~PropertyLinksConnection() override {}
+  ~PropertyLinksConnection() override = default;
+
 protected:
   /// These are the methods that subclasses can override to customize how
   /// values are updated in either directions.
@@ -294,9 +295,7 @@ pqTimeInspectorWidget::pqTimeInspectorWidget(QWidget* parentObject)
 }
 
 //-----------------------------------------------------------------------------
-pqTimeInspectorWidget::~pqTimeInspectorWidget()
-{
-}
+pqTimeInspectorWidget::~pqTimeInspectorWidget() = default;
 
 //-----------------------------------------------------------------------------
 void pqTimeInspectorWidget::setAnimationScene(pqAnimationScene* scene)

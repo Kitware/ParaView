@@ -25,9 +25,7 @@ vtkCPConstantScalarFieldFunction::vtkCPConstantScalarFieldFunction()
 }
 
 //----------------------------------------------------------------------------
-vtkCPConstantScalarFieldFunction::~vtkCPConstantScalarFieldFunction()
-{
-}
+vtkCPConstantScalarFieldFunction::~vtkCPConstantScalarFieldFunction() = default;
 
 //----------------------------------------------------------------------------
 double vtkCPConstantScalarFieldFunction::ComputeComponenentAtPoint(unsigned int component,

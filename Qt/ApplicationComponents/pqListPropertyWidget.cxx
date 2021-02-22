@@ -106,9 +106,7 @@ pqListPropertyWidget::pqListPropertyWidget(
 }
 
 //-----------------------------------------------------------------------------
-pqListPropertyWidget::~pqListPropertyWidget()
-{
-}
+pqListPropertyWidget::~pqListPropertyWidget() = default;
 
 //-----------------------------------------------------------------------------
 QList<QVariant> pqListPropertyWidget::value() const

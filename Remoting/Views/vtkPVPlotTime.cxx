@@ -32,9 +32,7 @@ vtkPVPlotTime::vtkPVPlotTime()
 }
 
 //----------------------------------------------------------------------------
-vtkPVPlotTime::~vtkPVPlotTime()
-{
-}
+vtkPVPlotTime::~vtkPVPlotTime() = default;
 
 //-----------------------------------------------------------------------------
 bool vtkPVPlotTime::Paint(vtkContext2D* painter)

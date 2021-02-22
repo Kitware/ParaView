@@ -37,7 +37,8 @@ protected:
     : ArrayToSortBy(nullptr)
   {
   }
-  ~SortTableFilter() override {}
+  ~SortTableFilter() override = default;
+
 public:
   static SortTableFilter* New();
   int RequestData(

@@ -167,7 +167,7 @@ protected:
     this->NeedUpdate = false;
     this->DataValid = false;
   }
-  ~vtkTransferFunctionChartXY() override {}
+  ~vtkTransferFunctionChartXY() override = default;
 
   void AdjustAxes()
   {

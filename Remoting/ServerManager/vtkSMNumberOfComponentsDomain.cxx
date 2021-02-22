@@ -33,9 +33,7 @@ vtkSMNumberOfComponentsDomain::vtkSMNumberOfComponentsDomain()
 }
 
 //----------------------------------------------------------------------------
-vtkSMNumberOfComponentsDomain::~vtkSMNumberOfComponentsDomain()
-{
-}
+vtkSMNumberOfComponentsDomain::~vtkSMNumberOfComponentsDomain() = default;
 
 //---------------------------------------------------------------------------
 int vtkSMNumberOfComponentsDomain::ReadXMLAttributes(vtkSMProperty* prop, vtkPVXMLElement* element)

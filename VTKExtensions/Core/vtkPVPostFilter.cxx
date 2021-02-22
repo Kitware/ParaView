@@ -135,9 +135,7 @@ vtkPVPostFilter::vtkPVPostFilter()
 }
 
 //----------------------------------------------------------------------------
-vtkPVPostFilter::~vtkPVPostFilter()
-{
-}
+vtkPVPostFilter::~vtkPVPostFilter() = default;
 
 //----------------------------------------------------------------------------
 vtkExecutive* vtkPVPostFilter::CreateDefaultExecutive()

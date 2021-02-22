@@ -32,11 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqContextMenuInterface.h"
 
 //-----------------------------------------------------------------------------
-pqContextMenuInterface::pqContextMenuInterface()
-{
-}
+pqContextMenuInterface::pqContextMenuInterface() = default;
 
 //-----------------------------------------------------------------------------
-pqContextMenuInterface::~pqContextMenuInterface()
-{
-}
+pqContextMenuInterface::~pqContextMenuInterface() = default;

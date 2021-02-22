@@ -59,9 +59,7 @@ pqProgressManager::pqProgressManager(QObject* _parent)
 }
 
 //-----------------------------------------------------------------------------
-pqProgressManager::~pqProgressManager()
-{
-}
+pqProgressManager::~pqProgressManager() = default;
 
 //-----------------------------------------------------------------------------
 void pqProgressManager::onServerAdded(pqServer* server)

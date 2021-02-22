@@ -83,9 +83,7 @@ pqTabbedMultiViewWidget::pqTabWidget::pqTabWidget(QWidget* parentObject)
 }
 
 //-----------------------------------------------------------------------------
-pqTabbedMultiViewWidget::pqTabWidget::~pqTabWidget()
-{
-}
+pqTabbedMultiViewWidget::pqTabWidget::~pqTabWidget() = default;
 
 //-----------------------------------------------------------------------------
 int pqTabbedMultiViewWidget::pqTabWidget::tabButtonIndex(

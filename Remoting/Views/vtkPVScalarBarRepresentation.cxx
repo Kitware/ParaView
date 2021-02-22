@@ -48,9 +48,7 @@ vtkPVScalarBarRepresentation::vtkPVScalarBarRepresentation()
 }
 
 //-----------------------------------------------------------------------------
-vtkPVScalarBarRepresentation::~vtkPVScalarBarRepresentation()
-{
-}
+vtkPVScalarBarRepresentation::~vtkPVScalarBarRepresentation() = default;
 
 //-----------------------------------------------------------------------------
 int vtkPVScalarBarRepresentation::RenderOverlay(vtkViewport* viewport)

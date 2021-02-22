@@ -100,9 +100,7 @@ vtkTemporalRanges::vtkTemporalRanges()
   this->CurrentTimeIndex = 0;
 }
 
-vtkTemporalRanges::~vtkTemporalRanges()
-{
-}
+vtkTemporalRanges::~vtkTemporalRanges() = default;
 
 void vtkTemporalRanges::PrintSelf(ostream& os, vtkIndent indent)
 {

@@ -112,14 +112,10 @@ std::vector<std::string> vtkGetFilesInSeries(vtkSMSessionProxyManager* pxm, cons
 
 vtkStandardNewMacro(vtkSMReaderReloadHelper);
 //----------------------------------------------------------------------------
-vtkSMReaderReloadHelper::vtkSMReaderReloadHelper()
-{
-}
+vtkSMReaderReloadHelper::vtkSMReaderReloadHelper() = default;
 
 //----------------------------------------------------------------------------
-vtkSMReaderReloadHelper::~vtkSMReaderReloadHelper()
-{
-}
+vtkSMReaderReloadHelper::~vtkSMReaderReloadHelper() = default;
 
 //----------------------------------------------------------------------------
 bool vtkSMReaderReloadHelper::SupportsReload(vtkSMSourceProxy* proxy)

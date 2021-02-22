@@ -53,9 +53,7 @@ pqLoadMaterialsReaction::pqLoadMaterialsReaction(QAction* parentObject)
 }
 
 //-----------------------------------------------------------------------------
-pqLoadMaterialsReaction::~pqLoadMaterialsReaction()
-{
-}
+pqLoadMaterialsReaction::~pqLoadMaterialsReaction() = default;
 
 //-----------------------------------------------------------------------------
 bool pqLoadMaterialsReaction::loadMaterials()

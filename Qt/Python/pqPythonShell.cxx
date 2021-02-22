@@ -95,8 +95,9 @@ public:
   }
 
 protected:
-  pqPythonShellOutputWindow() {}
-  ~pqPythonShellOutputWindow() override {}
+  pqPythonShellOutputWindow() = default;
+  ~pqPythonShellOutputWindow() override = default;
+
 private:
   pqPythonShellOutputWindow(const pqPythonShellOutputWindow&) = delete;
   void operator=(const pqPythonShellOutputWindow&) = delete;

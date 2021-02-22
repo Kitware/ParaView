@@ -67,7 +67,7 @@ public:
     , IsAdvanced(false)
   {
   }
-  ~pqColorAnnotationsPropertyWidgetDecorator() override {}
+  ~pqColorAnnotationsPropertyWidgetDecorator() override = default;
 
   void setIsAdvanced(bool val)
   {

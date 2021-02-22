@@ -85,7 +85,7 @@ public:
     {
     }
 
-    ~LinkedSelection() {}
+    ~LinkedSelection() = default;
 
     vtkWeakPointer<vtkSMSourceProxy> Proxy;
     int UpdateDirection;

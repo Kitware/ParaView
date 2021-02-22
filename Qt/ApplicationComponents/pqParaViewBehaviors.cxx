@@ -344,8 +344,6 @@ pqParaViewBehaviors::pqParaViewBehaviors(QMainWindow* mainWindow, QObject* paren
 }
 
 //-----------------------------------------------------------------------------
-pqParaViewBehaviors::~pqParaViewBehaviors()
-{
-}
+pqParaViewBehaviors::~pqParaViewBehaviors() = default;
 
 #undef PQ_IS_BEHAVIOR_ENABLED

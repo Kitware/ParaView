@@ -97,14 +97,10 @@ void PruneEndTimesIfNeeded(vtkPVXMLElement* element, vtkSMAnimationScene* self)
 
 vtkStandardNewMacro(vtkSMAnimationSceneProxy);
 //----------------------------------------------------------------------------
-vtkSMAnimationSceneProxy::vtkSMAnimationSceneProxy()
-{
-}
+vtkSMAnimationSceneProxy::vtkSMAnimationSceneProxy() = default;
 
 //----------------------------------------------------------------------------
-vtkSMAnimationSceneProxy::~vtkSMAnimationSceneProxy()
-{
-}
+vtkSMAnimationSceneProxy::~vtkSMAnimationSceneProxy() = default;
 
 //----------------------------------------------------------------------------
 void vtkSMAnimationSceneProxy::CreateVTKObjects()

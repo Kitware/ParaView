@@ -64,9 +64,7 @@ pqCatalystExportReaction::pqCatalystExportReaction(QAction* parentObject)
 }
 
 //-----------------------------------------------------------------------------
-pqCatalystExportReaction::~pqCatalystExportReaction()
-{
-}
+pqCatalystExportReaction::~pqCatalystExportReaction() = default;
 
 //-----------------------------------------------------------------------------
 QString pqCatalystExportReaction::exportScript()

@@ -117,7 +117,7 @@ public:
     this->UndoStackBuilder->SetUndoStack(this->InteractionUndoStack);
   }
 
-  ~pqInternal() {}
+  ~pqInternal() = default;
 };
 
 namespace

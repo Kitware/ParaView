@@ -96,7 +96,7 @@ public:
 
 protected:
   OutputWindow() { this->PromptUserOff(); }
-  ~OutputWindow() override {}
+  ~OutputWindow() override = default;
 
   QPointer<pqOutputWidget> Widget;
   QMutex MutexGenericMessage;

@@ -23,9 +23,7 @@ vtkUndoElement::vtkUndoElement()
 }
 
 //-----------------------------------------------------------------------------
-vtkUndoElement::~vtkUndoElement()
-{
-}
+vtkUndoElement::~vtkUndoElement() = default;
 
 //-----------------------------------------------------------------------------
 void vtkUndoElement::PrintSelf(ostream& os, vtkIndent indent)

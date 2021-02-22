@@ -262,9 +262,7 @@ pqLightsInspector::pqLightsInspector(
 }
 
 //-----------------------------------------------------------------------------
-pqLightsInspector::~pqLightsInspector()
-{
-}
+pqLightsInspector::~pqLightsInspector() = default;
 
 //-----------------------------------------------------------------------------
 void pqLightsInspector::setActiveView(pqView*)

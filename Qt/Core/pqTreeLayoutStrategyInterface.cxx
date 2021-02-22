@@ -32,11 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqTreeLayoutStrategyInterface.h"
 
 //-----------------------------------------------------------------------------
-pqTreeLayoutStrategyInterface::pqTreeLayoutStrategyInterface()
-{
-}
+pqTreeLayoutStrategyInterface::pqTreeLayoutStrategyInterface() = default;
 
 //-----------------------------------------------------------------------------
-pqTreeLayoutStrategyInterface::~pqTreeLayoutStrategyInterface()
-{
-}
+pqTreeLayoutStrategyInterface::~pqTreeLayoutStrategyInterface() = default;

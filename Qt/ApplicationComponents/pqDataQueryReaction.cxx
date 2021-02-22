@@ -45,9 +45,7 @@ pqDataQueryReaction::pqDataQueryReaction(QAction* parentObject)
 }
 
 //-----------------------------------------------------------------------------
-pqDataQueryReaction::~pqDataQueryReaction()
-{
-}
+pqDataQueryReaction::~pqDataQueryReaction() = default;
 
 //-----------------------------------------------------------------------------
 void pqDataQueryReaction::showQueryDialog()

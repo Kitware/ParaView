@@ -458,9 +458,7 @@ pqStringVectorPropertyWidget::pqStringVectorPropertyWidget(
 }
 
 //-----------------------------------------------------------------------------
-pqStringVectorPropertyWidget::~pqStringVectorPropertyWidget()
-{
-}
+pqStringVectorPropertyWidget::~pqStringVectorPropertyWidget() = default;
 
 //-----------------------------------------------------------------------------
 pqPropertyWidget* pqStringVectorPropertyWidget::createWidget(

@@ -441,9 +441,7 @@ pqCustomizeShortcutsDialog::pqCustomizeShortcutsDialog(QWidget* parentObject)
   this->onSelectionChanged();
 }
 
-pqCustomizeShortcutsDialog::~pqCustomizeShortcutsDialog()
-{
-}
+pqCustomizeShortcutsDialog::~pqCustomizeShortcutsDialog() = default;
 
 void pqCustomizeShortcutsDialog::onEditingFinished()
 {

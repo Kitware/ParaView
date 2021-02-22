@@ -57,9 +57,7 @@ pqXMLEventObserver::pqXMLEventObserver(QObject* p)
 {
 }
 
-pqXMLEventObserver::~pqXMLEventObserver()
-{
-}
+pqXMLEventObserver::~pqXMLEventObserver() = default;
 
 void pqXMLEventObserver::setStream(QTextStream* stream)
 {

@@ -43,9 +43,7 @@ vtkSMInputArrayDomain::vtkSMInputArrayDomain()
 }
 
 //---------------------------------------------------------------------------
-vtkSMInputArrayDomain::~vtkSMInputArrayDomain()
-{
-}
+vtkSMInputArrayDomain::~vtkSMInputArrayDomain() = default;
 
 //---------------------------------------------------------------------------
 int vtkSMInputArrayDomain::IsInDomain(vtkSMProperty* property)

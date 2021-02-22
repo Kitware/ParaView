@@ -29,14 +29,10 @@
 vtkStandardNewMacro(vtkCustomUnstructuredGridBuilder);
 
 //----------------------------------------------------------------------------
-vtkCustomUnstructuredGridBuilder::vtkCustomUnstructuredGridBuilder()
-{
-}
+vtkCustomUnstructuredGridBuilder::vtkCustomUnstructuredGridBuilder() = default;
 
 //----------------------------------------------------------------------------
-vtkCustomUnstructuredGridBuilder::~vtkCustomUnstructuredGridBuilder()
-{
-}
+vtkCustomUnstructuredGridBuilder::~vtkCustomUnstructuredGridBuilder() = default;
 
 //----------------------------------------------------------------------------
 vtkDataObject* vtkCustomUnstructuredGridBuilder::GetGrid(

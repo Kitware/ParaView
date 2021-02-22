@@ -43,9 +43,7 @@ vtkPVPythonInformation::vtkPVPythonInformation()
 }
 
 //----------------------------------------------------------------------------
-vtkPVPythonInformation::~vtkPVPythonInformation()
-{
-}
+vtkPVPythonInformation::~vtkPVPythonInformation() = default;
 
 //----------------------------------------------------------------------------
 void vtkPVPythonInformation::PrintSelf(ostream& os, vtkIndent indent)

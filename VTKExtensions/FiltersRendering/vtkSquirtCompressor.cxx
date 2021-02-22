@@ -32,9 +32,7 @@ vtkSquirtCompressor::vtkSquirtCompressor()
 }
 
 //-----------------------------------------------------------------------------
-vtkSquirtCompressor::~vtkSquirtCompressor()
-{
-}
+vtkSquirtCompressor::~vtkSquirtCompressor() = default;
 
 //-----------------------------------------------------------------------------
 int vtkSquirtCompressor::Compress()

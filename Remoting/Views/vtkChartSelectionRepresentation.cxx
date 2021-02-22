@@ -34,9 +34,7 @@ vtkChartSelectionRepresentation::vtkChartSelectionRepresentation()
 }
 
 //----------------------------------------------------------------------------
-vtkChartSelectionRepresentation::~vtkChartSelectionRepresentation()
-{
-}
+vtkChartSelectionRepresentation::~vtkChartSelectionRepresentation() = default;
 
 //----------------------------------------------------------------------------
 void vtkChartSelectionRepresentation::SetChartRepresentation(vtkChartRepresentation* repr)

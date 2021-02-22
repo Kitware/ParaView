@@ -15,14 +15,10 @@
 #include "vtkCPVector3FieldFunction.h"
 
 //----------------------------------------------------------------------------
-vtkCPVector3FieldFunction::vtkCPVector3FieldFunction()
-{
-}
+vtkCPVector3FieldFunction::vtkCPVector3FieldFunction() = default;
 
 //----------------------------------------------------------------------------
-vtkCPVector3FieldFunction::~vtkCPVector3FieldFunction()
-{
-}
+vtkCPVector3FieldFunction::~vtkCPVector3FieldFunction() = default;
 
 //----------------------------------------------------------------------------
 void vtkCPVector3FieldFunction::PrintSelf(ostream& os, vtkIndent indent)

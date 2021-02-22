@@ -122,7 +122,7 @@ public:
   }
 
 protected:
-  pqInternal() {}
+  pqInternal() = default;
   ~pqInternal() override
   {
     // clean up interactiveViewLinks

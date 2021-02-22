@@ -68,14 +68,10 @@ vtkPVTrivialProducerStaticInternal* vtkDistributedTrivialProducer::InternalStati
 
 vtkStandardNewMacro(vtkDistributedTrivialProducer);
 //----------------------------------------------------------------------------
-vtkDistributedTrivialProducer::vtkDistributedTrivialProducer()
-{
-}
+vtkDistributedTrivialProducer::vtkDistributedTrivialProducer() = default;
 
 //----------------------------------------------------------------------------
-vtkDistributedTrivialProducer::~vtkDistributedTrivialProducer()
-{
-}
+vtkDistributedTrivialProducer::~vtkDistributedTrivialProducer() = default;
 //----------------------------------------------------------------------------
 void vtkDistributedTrivialProducer::SetGlobalOutput(const char* key, vtkDataObject* output)
 {

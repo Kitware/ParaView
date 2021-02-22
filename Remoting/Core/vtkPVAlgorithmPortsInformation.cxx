@@ -31,9 +31,7 @@ vtkPVAlgorithmPortsInformation::vtkPVAlgorithmPortsInformation()
 }
 
 //----------------------------------------------------------------------------
-vtkPVAlgorithmPortsInformation::~vtkPVAlgorithmPortsInformation()
-{
-}
+vtkPVAlgorithmPortsInformation::~vtkPVAlgorithmPortsInformation() = default;
 
 //----------------------------------------------------------------------------
 void vtkPVAlgorithmPortsInformation::PrintSelf(ostream& os, vtkIndent indent)

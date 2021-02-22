@@ -19,14 +19,10 @@
 
 vtkStandardNewMacro(vtkSMSpreadSheetRepresentationProxy);
 //----------------------------------------------------------------------------
-vtkSMSpreadSheetRepresentationProxy::vtkSMSpreadSheetRepresentationProxy()
-{
-}
+vtkSMSpreadSheetRepresentationProxy::vtkSMSpreadSheetRepresentationProxy() = default;
 
 //----------------------------------------------------------------------------
-vtkSMSpreadSheetRepresentationProxy::~vtkSMSpreadSheetRepresentationProxy()
-{
-}
+vtkSMSpreadSheetRepresentationProxy::~vtkSMSpreadSheetRepresentationProxy() = default;
 
 //----------------------------------------------------------------------------
 void vtkSMSpreadSheetRepresentationProxy::SetPropertyModifiedFlag(const char* name, int flag)

@@ -22,14 +22,10 @@
 
 vtkStandardNewMacro(vtkPVSystemInformation);
 //----------------------------------------------------------------------------
-vtkPVSystemInformation::vtkPVSystemInformation()
-{
-}
+vtkPVSystemInformation::vtkPVSystemInformation() = default;
 
 //----------------------------------------------------------------------------
-vtkPVSystemInformation::~vtkPVSystemInformation()
-{
-}
+vtkPVSystemInformation::~vtkPVSystemInformation() = default;
 
 //----------------------------------------------------------------------------
 void vtkPVSystemInformation::CopyFromObject(vtkObject*)
@@ -83,10 +79,7 @@ public:
     : Stream(stream)
   {
   }
-  vtkPVSystemInformationSave(const vtkPVSystemInformationSave& other)
-    : Stream(other.Stream)
-  {
-  }
+  vtkPVSystemInformationSave(const vtkPVSystemInformationSave& other) = default;
   void operator()(const vtkPVSystemInformation::SystemInformationType& data)
   {
     this->Stream << static_cast<int>(data.ProcessType) << data.ProcessId << data.NumberOfProcesses
@@ -114,12 +107,7 @@ public:
     , Offset(offset)
   {
   }
-  vtkPVSystemInformationLoad(const vtkPVSystemInformationLoad& other)
-    : Stream(other.Stream)
-    , LoadSuccessful(other.LoadSuccessful)
-    , Offset(other.Offset)
-  {
-  }
+  vtkPVSystemInformationLoad(const vtkPVSystemInformationLoad& other) = default;
   operator bool() { return this->LoadSuccessful; }
   void operator()(vtkPVSystemInformation::SystemInformationType& data)
   {

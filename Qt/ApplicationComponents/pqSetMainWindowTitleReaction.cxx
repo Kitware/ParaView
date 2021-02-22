@@ -41,9 +41,7 @@ pqSetMainWindowTitleReaction::pqSetMainWindowTitleReaction(QAction* parentObject
 }
 
 //-----------------------------------------------------------------------------
-pqSetMainWindowTitleReaction::~pqSetMainWindowTitleReaction()
-{
-}
+pqSetMainWindowTitleReaction::~pqSetMainWindowTitleReaction() = default;
 
 //-----------------------------------------------------------------------------
 void pqSetMainWindowTitleReaction::showSetMainWindowTitleDialog()

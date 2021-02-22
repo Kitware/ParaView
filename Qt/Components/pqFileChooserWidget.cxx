@@ -68,9 +68,7 @@ pqFileChooserWidget::pqFileChooserWidget(QWidget* p)
     SLOT(handleFileLineEditChanged(const QString&)));
 }
 
-pqFileChooserWidget::~pqFileChooserWidget()
-{
-}
+pqFileChooserWidget::~pqFileChooserWidget() = default;
 
 QStringList pqFileChooserWidget::filenames() const
 {

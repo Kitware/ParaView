@@ -58,9 +58,7 @@ pqOutputPortComboBox::pqOutputPortComboBox(QWidget* _parent)
 }
 
 //-----------------------------------------------------------------------------
-pqOutputPortComboBox::~pqOutputPortComboBox()
-{
-}
+pqOutputPortComboBox::~pqOutputPortComboBox() = default;
 
 //-----------------------------------------------------------------------------
 void pqOutputPortComboBox::fillExistingPorts()

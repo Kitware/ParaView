@@ -50,9 +50,9 @@
 class pqSelectionManagerImplementation
 {
 public:
-  pqSelectionManagerImplementation() {}
+  pqSelectionManagerImplementation() = default;
 
-  ~pqSelectionManagerImplementation() {}
+  ~pqSelectionManagerImplementation() = default;
 
   QSet<pqOutputPort*> SelectedPorts;
   QPointer<pqView> ActiveView;

@@ -47,9 +47,7 @@ vtkPGenericEnSightReader::vtkPGenericEnSightReader()
 }
 
 //----------------------------------------------------------------------------
-vtkPGenericEnSightReader::~vtkPGenericEnSightReader()
-{
-}
+vtkPGenericEnSightReader::~vtkPGenericEnSightReader() = default;
 
 //----------------------------------------------------------------------------
 int vtkPGenericEnSightReader::RequestInformation(

@@ -49,9 +49,7 @@ pqDisplayPanel::pqDisplayPanel(pqRepresentation* display, QWidget* p)
   }
 }
 
-pqDisplayPanel::~pqDisplayPanel()
-{
-}
+pqDisplayPanel::~pqDisplayPanel() = default;
 
 pqRepresentation* pqDisplayPanel::getRepresentation()
 {
