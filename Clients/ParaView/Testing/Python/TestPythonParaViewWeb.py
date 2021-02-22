@@ -29,7 +29,6 @@ class TestProtocol(pv_wamp.PVServerProtocol):
         TestProtocol.dataDir      = options.dataDir
         TestProtocol.authKey      = options.authKey
         TestProtocol.fileToLoad   = options.fileToLoad
-        TestProtocol.authKey      = options.authKey
         TestProtocol.groupRegex   = options.groupRegex
         TestProtocol.excludeRegex = options.excludeRegex
 
@@ -39,14 +38,12 @@ class TestProtocol(pv_wamp.PVServerProtocol):
 
         # Bring used components
         self.registerVtkWebProtocol(pv_protocols.ParaViewWebFileListing(TestProtocol.dataDir, "Home", TestProtocol.excludeRegex, TestProtocol.groupRegex))
-        self.registerVtkWebProtocol(pv_protocols.ParaViewWebPipelineManager(TestProtocol.dataDir, TestProtocol.fileToLoad))
         self.registerVtkWebProtocol(pv_protocols.ParaViewWebMouseHandler())
         self.registerVtkWebProtocol(pv_protocols.ParaViewWebViewPort())
         self.registerVtkWebProtocol(pv_protocols.ParaViewWebViewPortImageDelivery())
         self.registerVtkWebProtocol(pv_protocols.ParaViewWebViewPortGeometryDelivery())
         self.registerVtkWebProtocol(pv_protocols.ParaViewWebTimeHandler())
         self.registerVtkWebProtocol(pv_protocols.ParaViewWebRemoteConnection())
-        self.registerVtkWebProtocol(pv_protocols.ParaViewWebFileManager(TestProtocol.dataDir))
 
         # Update authentication key to use
         self.updateSecret(TestProtocol.authKey)
