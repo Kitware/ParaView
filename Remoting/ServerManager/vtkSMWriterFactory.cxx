@@ -291,7 +291,7 @@ vtkSMProxy* vtkSMWriterFactory::CreateWriter(
     if (extension.size() > 0)
     {
       // Find characters after last "."
-      std::string::size_type found = extension.find_last_of(".");
+      std::string::size_type found = extension.find_last_of('.');
       if (found != std::string::npos)
       {
         extension = extension.substr(found + 1);

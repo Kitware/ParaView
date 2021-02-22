@@ -1185,7 +1185,7 @@ bool pqFileDialog::selectFile(const QString& f)
   vtksys::SystemTools::ConvertToUnixSlashes(unix_path);
 
   std::string filename, dirname;
-  std::string::size_type slashPos = unix_path.rfind("/");
+  std::string::size_type slashPos = unix_path.rfind('/');
   if (slashPos != std::string::npos)
   {
     filename = unix_path.substr(slashPos + 1);

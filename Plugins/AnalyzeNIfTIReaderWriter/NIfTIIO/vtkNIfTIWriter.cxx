@@ -129,7 +129,7 @@ static std::string GetExtension(const std::string& filename)
 
   // This assumes that the final '.' in a file name is the delimiter
   // for the file's extension type
-  const std::string::size_type it = filename.find_last_of(".");
+  const std::string::size_type it = filename.find_last_of('.');
 
   // This determines the file's type by creating a new string
   // who's value is the extension of the input filename

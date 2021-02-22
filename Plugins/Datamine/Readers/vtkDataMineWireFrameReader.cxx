@@ -462,7 +462,7 @@ bool vtkDataMineWireFrameReader::FindAndSetFilePath(
 
   // default guess is the way datamine guess
   // which is namept.dm and nametr.dm ( that is why it is dot - 2 )
-  const auto dot = path.rfind(".");
+  const auto dot = path.rfind('.');
   baseName = path.substr(0, (dot - 2));
   baseExt = path.substr(dot, path.size());
 

@@ -299,7 +299,7 @@ bool vtkSMStateLoader::UpdateRegistrationInfo(
     if (name.substr(0, separateLen) == separatePrefix)
     {
       // This will change any "Separate_OLDGID_ArrayName" into "Separate_NEWGID_ArrayName"
-      size_t gidLen = name.find_first_of("_", separateLen) - separateLen;
+      size_t gidLen = name.find_first_of('_', separateLen) - separateLen;
       std::string gidStr = name.substr(separateLen, gidLen);
       vtkTypeUInt32 gid = static_cast<vtkTypeUInt32>(std::atoi(gidStr.c_str()));
       if (vtkSMProxy* helpedProxy = this->ProxyLocator->LocateProxy(gid))

@@ -86,7 +86,7 @@ static std::string GetExtension(const std::string& filename)
 
   // This assumes that the final '.' in a file name is the delimiter
   // for the file's extension type
-  const std::string::size_type it = filename.find_last_of(".");
+  const std::string::size_type it = filename.find_last_of('.');
 
   // This determines the file's type by creating a new std::string
   // who's value is the extension of the input filename
@@ -778,12 +778,12 @@ void vtkNIfTIReader::ExecuteDataWithInformation(vtkDataObject* output, vtkInform
     std::string fileName = this->GetFileName();
 
     // Remove directory part
-    size_t position = fileName.rfind("/");
+    size_t position = fileName.rfind('/');
     if (position != std::string::npos)
     {
       fileName.erase(0, position + 1);
     }
-    position = fileName.rfind("\\");
+    position = fileName.rfind('\\');
     if (position != std::string::npos)
     {
       fileName.erase(0, position + 1);

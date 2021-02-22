@@ -863,7 +863,7 @@ std::string vtkSMArrayListDomain::CreateMangledName(vtkPVArrayInformation* array
 std::string vtkSMArrayListDomain::ArrayNameFromMangledName(const char* name)
 {
   std::string extractedName = name;
-  size_t pos = extractedName.rfind("_");
+  size_t pos = extractedName.rfind('_');
   if (pos == std::string::npos)
   {
     return extractedName;
@@ -876,7 +876,7 @@ int vtkSMArrayListDomain::ComponentIndexFromMangledName(
   vtkPVArrayInformation* info, const char* name)
 {
   std::string extractedName = name;
-  size_t pos = extractedName.rfind("_");
+  size_t pos = extractedName.rfind('_');
   if (pos == std::string::npos)
   {
     return -1;
