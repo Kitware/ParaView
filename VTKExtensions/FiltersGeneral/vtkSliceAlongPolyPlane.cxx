@@ -44,10 +44,10 @@
 #include <iostream>
 #include <list>
 
-vtkStandardNewMacro(vtkSliceAlongPolyPlane)
+vtkStandardNewMacro(vtkSliceAlongPolyPlane);
 
-  //----------------------------------------------------------------------------
-  void vtkSliceAlongPolyPlane::PrintSelf(ostream& os, vtkIndent indent)
+//----------------------------------------------------------------------------
+void vtkSliceAlongPolyPlane::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
   os << indent << "Tolerance: " << this->Tolerance << endl;

@@ -164,9 +164,9 @@ public:
   }
 };
 
-vtkStandardNewMacro(vtkPGenericIOMultiBlockReader)
-  //------------------------------------------------------------------------------
-  vtkPGenericIOMultiBlockReader::vtkPGenericIOMultiBlockReader()
+vtkStandardNewMacro(vtkPGenericIOMultiBlockReader);
+//------------------------------------------------------------------------------
+vtkPGenericIOMultiBlockReader::vtkPGenericIOMultiBlockReader()
 {
   this->SetNumberOfInputPorts(0);
   this->SetNumberOfOutputPorts(1);

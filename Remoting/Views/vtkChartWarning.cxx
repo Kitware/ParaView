@@ -32,10 +32,10 @@
 #include "vtkObjectFactory.h"
 
 //-----------------------------------------------------------------------------
-vtkStandardNewMacro(vtkChartWarning)
+vtkStandardNewMacro(vtkChartWarning);
 
-  //-----------------------------------------------------------------------------
-  vtkChartWarning::vtkChartWarning()
+//-----------------------------------------------------------------------------
+vtkChartWarning::vtkChartWarning()
 {
   this->TextPad = 16.;
 }

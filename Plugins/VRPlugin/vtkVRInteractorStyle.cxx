@@ -47,12 +47,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <string>
 
 // ----------------------------------------------------------------------------
-vtkStandardNewMacro(vtkVRInteractorStyle)
-  vtkCxxSetObjectMacro(vtkVRInteractorStyle, ControlledProxy, vtkSMProxy)
+vtkStandardNewMacro(vtkVRInteractorStyle);
+vtkCxxSetObjectMacro(vtkVRInteractorStyle, ControlledProxy, vtkSMProxy);
 
-  // ----------------------------------------------------------------------------
-  // Constructor method
-  vtkVRInteractorStyle::vtkVRInteractorStyle()
+// ----------------------------------------------------------------------------
+// Constructor method
+vtkVRInteractorStyle::vtkVRInteractorStyle()
   : Superclass()
   , ControlledProxy(NULL)
   , ControlledPropertyName(NULL)

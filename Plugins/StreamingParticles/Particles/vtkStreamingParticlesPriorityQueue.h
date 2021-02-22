@@ -92,29 +92,33 @@ public:
   // vtkPGenericIOMultiBlockReader::BLOCK_AMOUNT_OF_DETAIL information, use this
   // information to determine the blocks to load, otherwise use a default selection
   // method.  Defaults to false.
-  vtkGetMacro(UseBlockDetailInformation, bool) vtkBooleanMacro(UseBlockDetailInformation, bool)
-    vtkSetMacro(UseBlockDetailInformation, bool)
+  vtkGetMacro(UseBlockDetailInformation, bool);
+  vtkBooleanMacro(UseBlockDetailInformation, bool);
+  vtkSetMacro(UseBlockDetailInformation, bool);
 
-    // Description:
-    // If this variable is set to true then the priority queue will internally manage
-    // round-robining the blocks across the processes.  If this is set to false, then
-    // the dataset should have the vtkCompositeData::CURRENT_PROCESS_CAN_LOAD_BLOCK
-    // key on each block's metadata to indicate which process can load each block and
-    // this information will be used to determine the process to use for each block.
-    // Defaults to true.
-    vtkGetMacro(AnyProcessCanLoadAnyBlock, bool) vtkBooleanMacro(AnyProcessCanLoadAnyBlock, bool)
-      vtkSetMacro(AnyProcessCanLoadAnyBlock, bool)
+  // Description:
+  // If this variable is set to true then the priority queue will internally manage
+  // round-robining the blocks across the processes.  If this is set to false, then
+  // the dataset should have the vtkCompositeData::CURRENT_PROCESS_CAN_LOAD_BLOCK
+  // key on each block's metadata to indicate which process can load each block and
+  // this information will be used to determine the process to use for each block.
+  // Defaults to true.
+  vtkGetMacro(AnyProcessCanLoadAnyBlock, bool);
+  vtkBooleanMacro(AnyProcessCanLoadAnyBlock, bool);
+  vtkSetMacro(AnyProcessCanLoadAnyBlock, bool);
 
-    // Description:
-    // When UseBlockDetailInformation is on, this variable controls the minimum level of
-    // detail a block can have and still be loaded.  More specifically, the value from
-    // vtkPGenericIOMultiBlockReader::BLOCK_AMOUNT_OF_DETAIL is used with the distance to
-    // the block to compute approximate distance between features in the dataset.  This
-    // computed distance is compared with this value.  Default: 8.5e-5 seems to work
-    // well with point clouds where the BLOCK_AMOUNT_OF_DETAIL is the number of points.
-    vtkGetMacro(DetailLevelToLoad, double) vtkSetMacro(DetailLevelToLoad, double)
+  // Description:
+  // When UseBlockDetailInformation is on, this variable controls the minimum level of
+  // detail a block can have and still be loaded.  More specifically, the value from
+  // vtkPGenericIOMultiBlockReader::BLOCK_AMOUNT_OF_DETAIL is used with the distance to
+  // the block to compute approximate distance between features in the dataset.  This
+  // computed distance is compared with this value.  Default: 8.5e-5 seems to work
+  // well with point clouds where the BLOCK_AMOUNT_OF_DETAIL is the number of points.
+  vtkGetMacro(DetailLevelToLoad, double);
+  vtkSetMacro(DetailLevelToLoad, double);
 
-      protected : vtkStreamingParticlesPriorityQueue();
+protected:
+  vtkStreamingParticlesPriorityQueue();
   ~vtkStreamingParticlesPriorityQueue();
 
   // Description:

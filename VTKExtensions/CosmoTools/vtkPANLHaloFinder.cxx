@@ -196,9 +196,9 @@ public:
   }
 };
 
-vtkStandardNewMacro(vtkPANLHaloFinder)
+vtkStandardNewMacro(vtkPANLHaloFinder);
 
-  vtkPANLHaloFinder::vtkPANLHaloFinder()
+vtkPANLHaloFinder::vtkPANLHaloFinder()
 {
   this->Internal = new vtkPANLHaloFinder::vtkInternals;
   this->Controller = vtkMultiProcessController::GetGlobalController();

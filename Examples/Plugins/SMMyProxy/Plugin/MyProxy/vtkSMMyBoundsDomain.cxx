@@ -4,9 +4,9 @@
 #include "vtkObjectFactory.h"
 #include "vtkPVDataInformation.h"
 
-vtkStandardNewMacro(vtkSMMyBoundsDomain)
+vtkStandardNewMacro(vtkSMMyBoundsDomain);
 
-  vtkSMMyBoundsDomain::vtkSMMyBoundsDomain()
+vtkSMMyBoundsDomain::vtkSMMyBoundsDomain()
 {
 }
 

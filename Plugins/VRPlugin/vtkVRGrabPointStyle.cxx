@@ -51,11 +51,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <sstream>
 
 // ----------------------------------------------------------------------------
-vtkStandardNewMacro(vtkVRGrabPointStyle)
+vtkStandardNewMacro(vtkVRGrabPointStyle);
 
-  // ----------------------------------------------------------------------------
-  // Constructor method
-  vtkVRGrabPointStyle::vtkVRGrabPointStyle()
+// ----------------------------------------------------------------------------
+// Constructor method
+vtkVRGrabPointStyle::vtkVRGrabPointStyle()
   : Superclass()
 {
   this->AddButtonRole("Grab point");

@@ -134,9 +134,9 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "LANL/utils/timer.h"
 */
 
-vtkStandardNewMacro(vtkGenIOReader)
+vtkStandardNewMacro(vtkGenIOReader);
 
-  vtkGenIOReader::vtkGenIOReader()
+vtkGenIOReader::vtkGenIOReader()
 {
   this->Controller = NULL;
   this->Controller = vtkMultiProcessController::GetGlobalController();

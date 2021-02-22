@@ -51,11 +51,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <sstream>
 
 // -----------------------------------------------------------------------------
-vtkStandardNewMacro(vtkVRVirtualHandStyle)
+vtkStandardNewMacro(vtkVRVirtualHandStyle);
 
-  // -----------------------------------------------------------------------------
-  // Constructor method
-  vtkVRVirtualHandStyle::vtkVRVirtualHandStyle()
+// -----------------------------------------------------------------------------
+// Constructor method
+vtkVRVirtualHandStyle::vtkVRVirtualHandStyle()
   : Superclass()
 {
   this->AddButtonRole("Grab world");

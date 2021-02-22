@@ -73,7 +73,7 @@ public:
     return 1;
   }
 };
-vtkStandardNewMacro(vtkGlyphRepresentationMultiBlockMaker)
+vtkStandardNewMacro(vtkGlyphRepresentationMultiBlockMaker);
 
 } // end anon namespace
 

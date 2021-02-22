@@ -414,10 +414,12 @@ private:
   bool InvalidCustomIterator;
 };
 
-//****************************************************************************/
-vtkStandardNewMacro(vtkSIProxyDefinitionManager) vtkStandardNewMacro(vtkInternalDefinitionIterator)
-  //---------------------------------------------------------------------------
-  vtkSIProxyDefinitionManager::vtkSIProxyDefinitionManager()
+//****************************************************************************
+vtkStandardNewMacro(vtkSIProxyDefinitionManager);
+vtkStandardNewMacro(vtkInternalDefinitionIterator);
+
+//---------------------------------------------------------------------------
+vtkSIProxyDefinitionManager::vtkSIProxyDefinitionManager()
 {
   this->Internals = new vtkInternals;
   this->InternalsFlatten = new vtkInternals;

@@ -54,11 +54,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <sstream>
 
 // ----------------------------------------------------------------------------
-vtkStandardNewMacro(vtkVRTrackStyle)
+vtkStandardNewMacro(vtkVRTrackStyle);
 
-  // ----------------------------------------------------------------------------
-  // Constructor method
-  vtkVRTrackStyle::vtkVRTrackStyle()
+// ----------------------------------------------------------------------------
+// Constructor method
+vtkVRTrackStyle::vtkVRTrackStyle()
   : Superclass()
 {
   this->AddTrackerRole("Tracker");

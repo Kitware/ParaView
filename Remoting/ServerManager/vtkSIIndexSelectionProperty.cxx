@@ -28,10 +28,10 @@
 #include <sstream>
 #include <string>
 
-vtkStandardNewMacro(vtkSIIndexSelectionProperty)
+vtkStandardNewMacro(vtkSIIndexSelectionProperty);
 
-  //----------------------------------------------------------------------------
-  vtkSIIndexSelectionProperty::vtkSIIndexSelectionProperty()
+//----------------------------------------------------------------------------
+vtkSIIndexSelectionProperty::vtkSIIndexSelectionProperty()
 {
 }
 

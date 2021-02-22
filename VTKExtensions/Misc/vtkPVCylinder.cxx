@@ -24,10 +24,10 @@
 #include <algorithm>
 #include <cmath>
 
-vtkStandardNewMacro(vtkPVCylinder)
+vtkStandardNewMacro(vtkPVCylinder);
 
-  //----------------------------------------------------------------------------
-  vtkPVCylinder::vtkPVCylinder()
+//----------------------------------------------------------------------------
+vtkPVCylinder::vtkPVCylinder()
 {
   this->OrientedAxis[0] = 0.;
   this->OrientedAxis[1] = 1.;

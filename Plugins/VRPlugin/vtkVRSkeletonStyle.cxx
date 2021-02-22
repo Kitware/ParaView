@@ -50,11 +50,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <sstream>
 
 // ----------------------------------------------------------------------------
-vtkStandardNewMacro(vtkVRSkeletonStyle)
+vtkStandardNewMacro(vtkVRSkeletonStyle);
 
-  // ----------------------------------------------------------------------------
-  // Constructor method
-  vtkVRSkeletonStyle::vtkVRSkeletonStyle()
+// ----------------------------------------------------------------------------
+// Constructor method
+vtkVRSkeletonStyle::vtkVRSkeletonStyle()
   : Superclass()
 {
   this->AddButtonRole("Rotate Tracker");

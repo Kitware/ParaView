@@ -10,10 +10,10 @@
 #include "vtkUnicodeString.h"
 
 //-----------------------------------------------------------------------------
-vtkStandardNewMacro(vtkBoundingRectContextDevice2D)
+vtkStandardNewMacro(vtkBoundingRectContextDevice2D);
 
-  //-----------------------------------------------------------------------------
-  vtkBoundingRectContextDevice2D::vtkBoundingRectContextDevice2D()
+//-----------------------------------------------------------------------------
+vtkBoundingRectContextDevice2D::vtkBoundingRectContextDevice2D()
   : Initialized(false)
   , DelegateDevice(NULL)
 {

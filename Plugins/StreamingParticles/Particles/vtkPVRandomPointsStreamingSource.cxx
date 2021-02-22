@@ -23,9 +23,9 @@ public:
   vtkMinimalStandardRandomSequence* RNG;
 };
 
-vtkStandardNewMacro(vtkPVRandomPointsStreamingSource)
+vtkStandardNewMacro(vtkPVRandomPointsStreamingSource);
 
-  vtkPVRandomPointsStreamingSource::vtkPVRandomPointsStreamingSource()
+vtkPVRandomPointsStreamingSource::vtkPVRandomPointsStreamingSource()
 {
   this->SetNumberOfInputPorts(0);
   this->SetNumberOfOutputPorts(1);

@@ -28,10 +28,10 @@
 #include "vtkView.h"
 
 //------------------------------------------------------------------------------
-vtkStandardNewMacro(vtkMoleculeRepresentation)
+vtkStandardNewMacro(vtkMoleculeRepresentation);
 
-  //------------------------------------------------------------------------------
-  vtkMoleculeRepresentation::vtkMoleculeRepresentation()
+//------------------------------------------------------------------------------
+vtkMoleculeRepresentation::vtkMoleculeRepresentation()
   : MoleculeRenderMode(0)
   , UseCustomRadii(false)
 {

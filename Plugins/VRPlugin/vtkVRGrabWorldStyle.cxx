@@ -51,11 +51,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <sstream>
 
 // ----------------------------------------------------------------------------
-vtkStandardNewMacro(vtkVRGrabWorldStyle)
+vtkStandardNewMacro(vtkVRGrabWorldStyle);
 
-  // ----------------------------------------------------------------------------
-  // Constructor method
-  vtkVRGrabWorldStyle::vtkVRGrabWorldStyle()
+// ----------------------------------------------------------------------------
+// Constructor method
+vtkVRGrabWorldStyle::vtkVRGrabWorldStyle()
   : Superclass()
 {
   this->AddButtonRole("Rotate world");

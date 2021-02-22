@@ -141,9 +141,9 @@ vtkPANLSubhaloFinder::~vtkPANLSubhaloFinder()
   delete this->Internal;
 }
 
-vtkStandardNewMacro(vtkPANLSubhaloFinder)
+vtkStandardNewMacro(vtkPANLSubhaloFinder);
 
-  void vtkPANLSubhaloFinder::PrintSelf(ostream& os, vtkIndent indent)
+void vtkPANLSubhaloFinder::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
 }

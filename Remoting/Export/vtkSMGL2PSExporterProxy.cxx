@@ -21,10 +21,10 @@
 #include "vtkSMProxy.h"
 #include "vtkSMRenderViewProxy.h"
 
-vtkStandardNewMacro(vtkSMGL2PSExporterProxy)
+vtkStandardNewMacro(vtkSMGL2PSExporterProxy);
 
-  //----------------------------------------------------------------------------
-  vtkSMGL2PSExporterProxy::vtkSMGL2PSExporterProxy()
+//----------------------------------------------------------------------------
+vtkSMGL2PSExporterProxy::vtkSMGL2PSExporterProxy()
   : ViewType(None)
 {
 }

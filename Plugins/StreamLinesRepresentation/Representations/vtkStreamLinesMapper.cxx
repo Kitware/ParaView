@@ -165,10 +165,10 @@ private:
   void operator=(const Private&) = delete;
 };
 
-vtkStandardNewMacro(vtkStreamLinesMapper::Private)
+vtkStandardNewMacro(vtkStreamLinesMapper::Private);
 
-  //----------------------------------------------------------------------------
-  vtkStreamLinesMapper::Private::Private()
+//----------------------------------------------------------------------------
+vtkStreamLinesMapper::Private::Private()
 {
   this->Mapper = 0;
   this->RandomNumberSequence = vtkSmartPointer<vtkMinimalStandardRandomSequence>::New();
@@ -758,10 +758,10 @@ void vtkStreamLinesMapper::Private::SetData(
 }
 
 //-----------------------------------------------------------------------------
-vtkStandardNewMacro(vtkStreamLinesMapper)
+vtkStandardNewMacro(vtkStreamLinesMapper);
 
-  //-----------------------------------------------------------------------------
-  vtkStreamLinesMapper::vtkStreamLinesMapper()
+//-----------------------------------------------------------------------------
+vtkStreamLinesMapper::vtkStreamLinesMapper()
 {
   this->Internal = Private::New();
   this->Internal->SetMapper(this);

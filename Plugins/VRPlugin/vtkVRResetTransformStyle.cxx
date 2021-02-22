@@ -51,11 +51,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <sstream>
 
 // ----------------------------------------------------------------------------
-vtkStandardNewMacro(vtkVRResetTransformStyle)
+vtkStandardNewMacro(vtkVRResetTransformStyle);
 
-  // ----------------------------------------------------------------------------
-  // Constructor method
-  vtkVRResetTransformStyle::vtkVRResetTransformStyle()
+// ----------------------------------------------------------------------------
+// Constructor method
+vtkVRResetTransformStyle::vtkVRResetTransformStyle()
   : Superclass()
 {
   this->AddButtonRole("Navigate world");
