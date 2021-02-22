@@ -373,7 +373,8 @@ void vtkNIfTIReader::ExecuteInformation()
   inOriginOffset[0] = s[0][3];
   inOriginOffset[1] = s[1][3];
   inOriginOffset[2] = s[2][3];
-  } else */ if (qform_code > 0)
+  } else */
+  if (qform_code > 0)
   {
     inOriginOffset[0] = q[0][3];
     inOriginOffset[1] = q[1][3];
