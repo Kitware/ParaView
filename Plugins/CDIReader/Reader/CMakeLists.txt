@@ -2,10 +2,10 @@ set(classes
   vtkCDIReader)
 
 set(sources
-  cdilib.c)
+  ThirdParty/cdilib.c)
 
 set(private_headers
-  cdi.h)
+  ThirdParty/cdi.h)
 
 set(CMAKE_C_STANDARD 99)
 vtk_module_add_module(CDIReader::vtkCDIReader

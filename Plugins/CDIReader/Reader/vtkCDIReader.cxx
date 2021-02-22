@@ -58,7 +58,7 @@
 
 #include "vtksys/FStream.hxx"
 
-#include "cdi.h"
+#include "ThirdParty/cdi.h"
 #include "vtk_netcdf.h"
 
 #include <cmath>
