@@ -118,7 +118,11 @@ void pqLoadStateReaction::loadState(const QString& filename, bool dialogBlocked,
       pqPVApplicationCore::instance()->setLoadingState(false);
 
       // This is needed since XML state currently does not save active view.
-      pqLoadStateReaction::activateView();
+      // Check for an already active view that could have been set by a custom behavior.
+      if (!pqActiveObjects::instance().activeView())
+      {
+        pqLoadStateReaction::activateView();
+      }
     }
   }
   else
