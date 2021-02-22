@@ -128,7 +128,7 @@ static PyMethodDef QtTestingImageMethods[] = {
   { const_cast<char*>("compareImage"), QtTestingImage_compareImage, METH_VARARGS,
     const_cast<char*>("compare the snapshot of a widget/image with a baseline") },
 
-  { NULL, NULL, 0, NULL } // Sentinal
+  { NULL, NULL, 0, NULL } // Sentinel
 };
 
 //-----------------------------------------------------------------------------
