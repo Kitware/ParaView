@@ -28,6 +28,7 @@
 
 #ifdef OPENVR_HAS_COLLABORATION
 #include "mvCollaborationClient.h"
+#include "vtkOpenVRPolyfill.h"
 #include "zhelpers.hpp"
 
 #define mvLog(x)                                                                                   \
@@ -46,6 +47,14 @@ class vtkPVOpenVRCollaborationClientInternal : public mvCollaborationClient
 {
 public:
   void SetHelper(vtkPVOpenVRHelper* l) { this->Helper = l; }
+
+  vtkPVOpenVRCollaborationClientInternal()
+  {
+    // override the scale callback to use polyfill
+    // so that desktop views look reasonable
+    this->ScaleCallback = [this](
+      void*) { return this->Helper->GetOpenVRPolyfill()->GetPhysicalScale(); };
+  }
 
 protected:
   void HandleBroadcastMessage(std::string const& otherID, std::string const& type) override

@@ -102,6 +102,7 @@ protected:
   std::atomic<double> LastStartDepth;
   std::atomic<double> LastEndDepth;
   std::list<std::pair<std::string, vtkSmartPointer<vtkImageData> > > ImageCache;
+  unsigned int CacheLimit = 20;
   std::map<std::pair<std::string, std::string>, Json::Value> CollectionMap;
   std::map<std::pair<std::string, std::string>, Json::Value> ImageryMap;
   std::mutex Mutex;
@@ -138,20 +139,22 @@ bool escapeURL(std::string& url, DWORD options = ICU_DECODE | ICU_ENCODE_PERCENT
   return result;
 }
 
-void getResult(HINTERNET hRequest, std::vector<char>& result)
+bool getResult(HINTERNET hRequest, std::vector<char>& result)
 {
-  static const int bufSize = 1024;
+  static const int bufSize = 10000;
   result.clear();
+  std::vector<char> buffer;
+  buffer.resize(bufSize);
 
   while (true)
   {
     DWORD bytesRead;
     bool success;
 
-    result.resize(result.size() + 1024);
-    success = InternetReadFile(hRequest, result.data() + result.size() - 1024, bufSize, &bytesRead);
+    success = InternetReadFile(hRequest, buffer.data(), bufSize, &bytesRead);
 
-    if (bytesRead == 0)
+    // only complete when bytesRead == 0
+    if (success && bytesRead == 0)
     {
       break;
     }
@@ -159,22 +162,27 @@ void getResult(HINTERNET hRequest, std::vector<char>& result)
     if (!success)
     {
       vtkGenericWarningMacro("InternetReadFile error : " << GetLastError());
-      break;
+      return false;
     }
 
-    if (bytesRead < 1024)
+    if (bytesRead > 0)
     {
-      result.resize(result.size() - 1024 + bytesRead);
+      buffer.resize(bytesRead);
+      result.insert(result.end(), buffer.begin(), buffer.end());
     }
   }
+
+  return true;
 }
 
 bool sendMessage(HINTERNET connection, std::string type, std::string address,
   std::vector<std::string> const& headers, std::string formData, std::vector<char>& result)
 {
-
+  PCTSTR rgpszAcceptTypes[] = { "*/*", nullptr };
   HINTERNET hRequest = HttpOpenRequest(connection, (LPCSTR)(type.c_str()),
-    (LPCSTR)(address.c_str()), nullptr, nullptr, nullptr, INTERNET_FLAG_SECURE, 0);
+    (LPCSTR)(address.c_str()), nullptr, nullptr, rgpszAcceptTypes, INTERNET_FLAG_RELOAD |
+      INTERNET_FLAG_NO_CACHE_WRITE | INTERNET_FLAG_NEED_FILE | INTERNET_FLAG_SECURE,
+    0);
   if (!hRequest)
   {
     vtkGenericWarningMacro("HttpOpenRequest error : " << GetLastError());
@@ -200,11 +208,12 @@ bool sendMessage(HINTERNET connection, std::string type, std::string address,
       NULL);
   }
 
-  getResult(hRequest, result);
-  std::string s(result.begin(), result.end());
-  std::cout << "Received: " << s << std::endl;
-  InternetCloseHandle(hRequest);
+  if (!getResult(hRequest, result))
+  {
+    return false;
+  }
 
+  InternetCloseHandle(hRequest);
   return true;
 }
 
@@ -218,7 +227,6 @@ Json::Value getJSON(std::vector<char> const& result)
     bool success = reader->parse(result.data(), result.data() + result.size(), &root, nullptr);
     if (!success)
     {
-      vtkGenericWarningMacro("Unable to parse the json response!");
       return false;
     }
   }
@@ -248,7 +256,7 @@ bool vtkImagoLoader::Connect()
 {
   if (!this->Session)
   {
-    this->Session = InternetOpen("Mozilla/5.0", INTERNET_OPEN_TYPE_PRECONFIG, nullptr, nullptr, 0);
+    this->Session = InternetOpen("Mozilla/5.0", INTERNET_OPEN_TYPE_DIRECT, nullptr, nullptr, 0);
     if (!this->Session)
     {
       vtkGenericWarningMacro("InternetOpen error : " << GetLastError());
@@ -430,7 +438,7 @@ bool vtkImagoLoader::IsCellImageDifferent(std::string const& /*oldimg*/, std::st
   double depth = std::stod(args["dp"].c_str());
 
   // is this depth a new image?
-  if (depth >= this->LastStartDepth && depth <= this->LastEndDepth)
+  if (depth >= this->LastStartDepth && depth < this->LastEndDepth)
   {
     return false;
   }
@@ -474,7 +482,6 @@ bool vtkImagoLoader::AcquireToken()
     Json::Value root = getJSON(result);
     if (!root.isObject() || !root.isMember("uid") || !root.isMember("apiToken"))
     {
-      vtkGenericWarningMacro("Failed to log into Imago");
       return false;
     }
     this->UID = root["uid"].asString();
@@ -816,14 +823,17 @@ bool vtkImagoLoader::GetImage(std::string const& workspace, std::string const& d
       // record last depth requested
       this->LastStartDepth = startDepth;
       this->LastEndDepth = endDepth;
+      size_t fileSize = 0;
       std::string imageryID;
       std::string mimeType;
       for (auto& i : imageryJSON["imageries"])
       {
         startDepth = i["startDepth"].asDouble();
         endDepth = i["endDepth"].asDouble();
-        if (targetDepth >= startDepth && targetDepth <= endDepth)
+        if (targetDepth >= startDepth && targetDepth < endDepth)
         {
+          std::string sFileSize = i["images"][0]["fileSize"].asString();
+          fileSize = std::atol(sFileSize.c_str());
           imageryID = i["id"].asString();
           mimeType = i["images"][0]["mimeType"].asString();
           // finally get the image
@@ -868,48 +878,54 @@ bool vtkImagoLoader::GetImage(std::string const& workspace, std::string const& d
       }
 
       std::vector<std::string> headers;
-      headers.push_back("Content-Type: application/json\r\n");
+      headers.push_back("Content-Type: image/jpeg\r\n");
       headers.push_back("imago-api-token: " + this->APIToken + "\r\n");
 
       std::string frmdata;
       // now search for the imageryID and mimeType for the image
       std::string urldata = "imageryid=" + imageryID + "&imagetypeid=" + imageTypeID;
-      if (!sendMessage(
-            this->Connection, "GET", "/integrate/2/image?" + urldata, headers, frmdata, result))
+
+      int tries = 0;
+      bool success = false;
+      do
       {
-        vtkGenericWarningMacro("Failed to find matching image for: " << urldata);
+        if (!sendMessage(
+              this->Connection, "GET", "/integrate/2/image?" + urldata, headers, frmdata, result))
+        {
+          vtkGenericWarningMacro("Failed to find matching image for: " << urldata);
+          return nullptr;
+        }
+        if (fileSize == result.size())
+        {
+          // stick it into a reader
+          vtkNew<vtkJPEGReader> rdr;
+          rdr->SetMemoryBuffer(result.data());
+          rdr->SetMemoryBufferLength(result.size());
+          rdr->Update();
+          if (rdr->GetErrorCode() == 0)
+          {
+            imageData = rdr->GetOutput();
+            imageData->Register(nullptr);
+            success = true;
+          }
+        }
+        tries++;
+      } while (tries < 5 && !success);
+
+      // did we succeed
+      if (!success)
+      {
+        vtkGenericWarningMacro("failed to retrieve file");
         return nullptr;
       }
 
-      if (this->ImageCache.size() > 10)
+      if (this->ImageCache.size() > this->CacheLimit)
       {
         this->ImageCache.pop_front();
       }
 
-      // stick it into a reader
-      vtkNew<vtkJPEGReader> rdr;
-      rdr->SetMemoryBuffer(result.data());
-      rdr->SetMemoryBufferLength(result.size());
-      rdr->Update();
-
-      // rotate the region we want to display if it is downhole
-      if (false && imageryType == "Downhole")
-      {
-        vtkNew<vtkImageReslice> perm;
-        perm->SetInputConnection(rdr->GetOutputPort());
-        perm->SetResliceAxesDirectionCosines(0, -1, 0, 1, 0, 0, 0, 0, 1);
-        perm->Update();
-        imageData = perm->GetOutput();
-        this->ImageCache.push_back(
-          std::pair<std::string, vtkSmartPointer<vtkImageData> >(imageString, imageData));
-      }
-      else
-      {
-        imageData = rdr->GetOutput();
-        this->ImageCache.push_back(
-          std::pair<std::string, vtkSmartPointer<vtkImageData> >(imageString, imageData));
-      }
-      imageData->Register(nullptr);
+      this->ImageCache.push_back(
+        std::pair<std::string, vtkSmartPointer<vtkImageData> >(imageString, imageData));
 
       // record last depth requested
       this->LastStartDepth = startDepth;
