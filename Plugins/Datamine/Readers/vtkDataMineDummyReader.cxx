@@ -6,7 +6,7 @@
 //     99-04-12: Written by Jeremy Maccelari, visualn@iafrica.com
 
 #include "vtkDataMineDummyReader.h"
-#include "dmfile.h"
+#include "ThirdParty/dmfile.h"
 
 #include "vtkCallbackCommand.h"
 #include "vtkDemandDrivenPipeline.h"

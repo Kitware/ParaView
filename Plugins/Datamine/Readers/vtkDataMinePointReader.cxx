@@ -6,8 +6,8 @@
 //     99-04-12: Written by Jeremy Maccelari, visualn@iafrica.com
 
 #include "vtkDataMinePointReader.h"
-#include "PropertyStorage.h"
-#include "dmfile.h"
+#include "ThirdParty/PropertyStorage.h"
+#include "ThirdParty/dmfile.h"
 
 #include "vtkCellArray.h"
 #include "vtkObjectFactory.h"

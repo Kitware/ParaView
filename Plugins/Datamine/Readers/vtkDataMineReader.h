@@ -6,7 +6,7 @@
 #ifndef vtkDataMineReader_h
 #define vtkDataMineReader_h
 
-#include "dmfile.h"                   // for dmfile
+#include "ThirdParty/dmfile.h"        // for dmfile
 #include "vtkDataArraySelection.h"    // for vtkDataArraySelection
 #include "vtkDatamineReadersModule.h" // for export macro
 #include "vtkPolyDataAlgorithm.h"
