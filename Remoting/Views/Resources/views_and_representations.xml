@@ -9285,9 +9285,14 @@
         </Documentation>
         <Hints>
           <PropertyWidgetDecorator type="GenericDecorator"
-                                  mode="visibility"
-                                  property="TextPropMode"
-                                  value="0" />
+                                   mode="visibility"
+                                   property="TextPropMode"
+                                   value="0" />
+
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="enabled_state"
+                                   property="WindowLocation"
+                                   value="0" />
         </Hints>
       </IntVectorProperty>
 
@@ -9297,18 +9302,44 @@
                proxyname="TextWidgetRepresentation"></Proxy>
         <ExposedProperties>
 
-          <Property name="ShowBorder" />
-          <Property name="BorderColor" />
-          <Property name="BorderThickness" />
-          <Property name="CornerRadius" />
-          <Property name="CornerResolution" />
-          <Property name="BackgroundColor" />
-          <Property name="BackgroundOpacity" />
-          <Property name="RightPadding" />
-          <Property name="TopPadding" />
-          <Property name="LineOffset" />
-          <Property name="LineSpacing" />
-          <Property name="CellOffset" />
+          <!-- properties for Text Position-->
+          <PropertyGroup name="TextPosition" label="Text Position" panel_widget="TextLocationEditor">
+            <Property name="WindowLocation" />
+            <Property name="Position" />
+            <Property name="Position2" panel_visibility="never"/>
+            <Property name="PositionInfo" />
+            <Property name="Position2Info" />
+            <Hints>
+              <PropertyWidgetDecorator type="GenericDecorator"
+                                       mode="visibility"
+                                       property="TextPropMode"
+                                       value="0" />
+            </Hints>
+          </PropertyGroup>
+          <Property name="TextScaleMode" panel_visibility="never" default_values="0"/>
+          <Property name="Resizable" panel_visibility="never"/>
+
+          <PropertyGroup label="Text Styling">
+            <Property name="ShowBorder" />
+            <Property name="BorderColor" />
+            <Property name="BorderThickness" />
+            <Property name="CornerRadius" />
+            <Property name="CornerResolution" />
+            <Property name="BackgroundColor" />
+            <Property name="BackgroundOpacity" />
+            <Property name="RightPadding" />
+            <Property name="TopPadding" />
+            <Property name="LineOffset" />
+            <Property name="LineSpacing" />
+            <Property name="CellOffset" />
+
+            <Hints>
+              <PropertyWidgetDecorator type="GenericDecorator"
+                                    mode="visibility"
+                                    property="TextPropMode"
+                                    value="0" />
+            </Hints>
+          </PropertyGroup>
 
           <!-- properties for Text -->
           <Property name="Orientation" panel_visibility="never"/>
@@ -9324,22 +9355,7 @@
             <Property name="Justification" function="Justification"/>
             <Property name="VerticalJustification" function="VerticalJustification"/>
           </PropertyGroup>
-          <!-- properties for Text Position-->
-          <PropertyGroup label="Text Position" panel_widget="TextLocationEditor">
-            <Property name="WindowLocation" />
-            <Property name="Position" />
-            <Property name="Position2" panel_visibility="never"/>
-            <Property name="PositionInfo" />
-            <Property name="Position2Info" />
-            <Hints>
-              <PropertyWidgetDecorator type="GenericDecorator"
-                                       mode="visibility"
-                                       property="TextPropMode"
-                                       value="0" />
-            </Hints>
-          </PropertyGroup>
-          <Property name="TextScaleMode" panel_visibility="never" default_values="0"/>
-          <Property name="Resizable" panel_visibility="never"/>
+
         </ExposedProperties>
       </SubProxy>
 
