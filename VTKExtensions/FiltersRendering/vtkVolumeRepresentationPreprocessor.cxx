@@ -16,7 +16,7 @@
 #include "vtkVolumeRepresentationPreprocessor.h"
 #include "vtkCompositeDataIterator.h"
 #include "vtkDataSetTriangleFilter.h"
-#include "vtkExtractBlock.h"
+#include "vtkExtractBlockUsingDataAssembly.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
 #include "vtkMergeBlocks.h"
@@ -30,12 +30,43 @@ vtkStandardNewMacro(vtkVolumeRepresentationPreprocessor);
 //----------------------------------------------------------------------------
 vtkVolumeRepresentationPreprocessor::vtkVolumeRepresentationPreprocessor()
   : TetrahedraOnly(0)
-  , ExtractedBlockIndex(0)
 {
 }
 
 //----------------------------------------------------------------------------
 vtkVolumeRepresentationPreprocessor::~vtkVolumeRepresentationPreprocessor() = default;
+
+//----------------------------------------------------------------------------
+bool vtkVolumeRepresentationPreprocessor::AddSelector(const char* selector)
+{
+  if (this->Extractor->AddSelector(selector))
+  {
+    this->Modified();
+    return true;
+  }
+  return false;
+}
+
+//----------------------------------------------------------------------------
+void vtkVolumeRepresentationPreprocessor::SetSelector(const char* selector)
+{
+  this->Extractor->SetSelector(selector);
+  this->Modified();
+}
+
+//----------------------------------------------------------------------------
+void vtkVolumeRepresentationPreprocessor::ClearSelectors()
+{
+  this->Extractor->ClearSelectors();
+  this->Modified();
+}
+
+//----------------------------------------------------------------------------
+void vtkVolumeRepresentationPreprocessor::SetAssemblyName(const char* name)
+{
+  this->Extractor->SetAssemblyName(name);
+  this->Modified();
+}
 
 //----------------------------------------------------------------------------
 int vtkVolumeRepresentationPreprocessor::RequestData(vtkInformation* vtkNotUsed(request),
@@ -104,24 +135,19 @@ vtkSmartPointer<vtkUnstructuredGrid> vtkVolumeRepresentationPreprocessor::Tetrah
 vtkSmartPointer<vtkDataSet> vtkVolumeRepresentationPreprocessor::ExtractDataSet(
   vtkCompositeDataSet* input)
 {
+  this->Extractor->SetInputData(input);
+  this->Extractor->Update();
+  this->Extractor->SetInputData(nullptr);
+
   vtkNew<vtkMergeBlocks> merger;
-  if (this->ExtractedBlockIndex != 0)
-  {
-    vtkNew<vtkExtractBlock> extractor;
-    extractor->AddIndex(this->ExtractedBlockIndex);
-    extractor->SetInputData(input);
-    merger->SetInputConnection(extractor->GetOutputPort());
-  }
-  else
-  {
-    merger->SetInputData(input);
-  }
+  merger->SetInputData(this->Extractor->GetOutputDataObject(0));
 
   // Once we fix the volume mapper to support composite datasets
   // better we should remove using vtkMergeBlocks.
   // ref: paraview/paraview#19955.
   merger->MergePointsOff();
   merger->Update();
+
   return vtkDataSet::SafeDownCast(merger->GetOutputDataObject(0));
 }
 
@@ -136,6 +162,5 @@ int vtkVolumeRepresentationPreprocessor::FillInputPortInformation(int, vtkInform
 void vtkVolumeRepresentationPreprocessor::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
-  os << indent << "ExtractedBlockIndex: " << this->ExtractedBlockIndex << "\n";
   os << indent << "TetrahedraOnly: " << (this->TetrahedraOnly ? "On" : "Off") << "\n";
 }

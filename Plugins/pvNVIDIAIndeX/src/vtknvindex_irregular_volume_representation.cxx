@@ -419,11 +419,25 @@ void vtknvindex_irregular_volume_representation::PrintSelf(ostream& os, vtkInden
 // Forwarded to vtkVolumeRepresentationPreprocessor
 
 //----------------------------------------------------------------------------
-void vtknvindex_irregular_volume_representation::SetExtractedBlockIndex(unsigned int index)
+void vtknvindex_irregular_volume_representation::SetActiveAssembly(const char* name)
 {
-  this->Preprocessor->SetExtractedBlockIndex(index);
+  this->Preprocessor->SetAssemblyName(name);
+  this->MarkModified();
 }
 
+//----------------------------------------------------------------------------
+void vtknvindex_irregular_volume_representation::AddBlockSelector(const char* selector)
+{
+  this->Preprocessor->AddSelector(selector);
+  this->MarkModified();
+}
+
+//----------------------------------------------------------------------------
+void vtknvindex_irregular_volume_representation::RemoveAllBlockSelectors()
+{
+  this->Preprocessor->ClearSelectors();
+  this->MarkModified();
+}
 //***************************************************************************
 // Forwarded to vtkResampleToImage
 //----------------------------------------------------------------------------

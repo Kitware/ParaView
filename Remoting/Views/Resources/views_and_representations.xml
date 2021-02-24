@@ -4768,8 +4768,6 @@
                       panel_visibility="advanced" />
             <Property name="OpacityComponent"
                       panel_visibility="advanced" />
-            <Property name="ExtractedBlockIndex"
-                      panel_visibility="advanced" />
             <Property name="SelectMapper"
                       panel_visibility="advanced"
                       panel_visibility_default_for_representation="volume" />
@@ -4840,8 +4838,6 @@
             <Property name="ScalarOpacityFunction" />
             <Property name="ScalarOpacityUnitDistance"
                       panel_visibility="advanced" />
-            <Property name="ExtractedBlockIndex"
-                      panel_visibility="never" />
             <Property name="SelectMapper"
                       panel_visibility="advanced"
                       panel_visibility_default_for_representation="volume" />
@@ -6020,22 +6016,43 @@
           </PropertyWidgetDecorator>
         </Hints>
       </IntVectorProperty>
-      <IntVectorProperty command="SetExtractedBlockIndex"
-                         default_values="0"
-                         name="ExtractedBlockIndex"
-                         number_of_elements="1">
-        <Documentation>In case of multiblock datasets, choose the index of
-        the dataset to volume render. The index must point to an
-        unstructured grid dataset. If the input is not a multiblock dataset
-        then this index is ignored.</Documentation>
-        <CompositeTreeDomain mode="leaves"
-                             name="tree">
+
+      <StringVectorProperty name="Assembly"
+        command="SetActiveAssembly"
+        number_of_elements="1"
+        default_values="Hierarchy"
+        panel_visibility="multiblock_inspector">
+        <DataAssemblyListDomain name="data_assembly">
           <RequiredProperties>
-            <Property function="Input"
-                      name="Input" />
+            <Property function="Input" name="Input" />
           </RequiredProperties>
-        </CompositeTreeDomain>
-      </IntVectorProperty>
+        </DataAssemblyListDomain>
+        <Documentation>
+          Select which assembly is used when specify selectors
+          to choose block visibilities, block colors, etc. for composite datasets.
+        </Documentation>
+      </StringVectorProperty>
+
+      <StringVectorProperty name="BlockSelectors"
+        command="AddBlockSelector"
+        clean_command="RemoveAllBlockSelectors"
+        repeat_command="1"
+        number_of_elements_per_command="1"
+        panel_visibility="multiblock_inspector"
+        number_of_elements="1"
+        default_values="/">
+        <DataAssemblyDomain name="data_assembly">
+          <RequiredProperties>
+            <Property function="Input" name="Input" />
+            <Property function="ActiveAssembly" name="Assembly" />
+          </RequiredProperties>
+        </DataAssemblyDomain>
+        <Documentation>
+          For composite datasets, specify selectors to limit the view
+          to a chosen subset of blocks.
+        </Documentation>
+      </StringVectorProperty>
+
       <DoubleVectorProperty command="SetPosition"
                             default_values="0 0 0"
                             name="Position"

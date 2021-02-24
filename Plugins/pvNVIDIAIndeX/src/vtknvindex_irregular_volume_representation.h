@@ -85,8 +85,15 @@ public:
   void SetVisibility(bool val) override;
 
   //***************************************************************************
-  // Forwarded to vtkVolumeRepresentationPreprocessor
-  void SetExtractedBlockIndex(unsigned int index);
+  //@{
+  /**
+   * Forwarded to vtkVolumeRepresentationPreprocessor. Controls which blocks in
+   * a composite dataset are rendered.
+   */
+  void SetActiveAssembly(const char*);
+  void AddBlockSelector(const char*);
+  void RemoveAllBlockSelectors();
+  //@}
 
   //***************************************************************************
   // Forwarded to vtkResampleToImage
