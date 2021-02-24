@@ -26,9 +26,7 @@ vtkPVKeyFrameAnimationCue::vtkPVKeyFrameAnimationCue()
 }
 
 //----------------------------------------------------------------------------
-vtkPVKeyFrameAnimationCue::~vtkPVKeyFrameAnimationCue()
-{
-}
+vtkPVKeyFrameAnimationCue::~vtkPVKeyFrameAnimationCue() = default;
 
 //----------------------------------------------------------------------------
 vtkPVKeyFrameCueManipulator* vtkPVKeyFrameAnimationCue::GetKeyFrameManipulator()

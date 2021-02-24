@@ -33,9 +33,7 @@ vtkSMComparativeAnimationCueUndoElement::vtkSMComparativeAnimationCueUndoElement
 }
 
 //-----------------------------------------------------------------------------
-vtkSMComparativeAnimationCueUndoElement::~vtkSMComparativeAnimationCueUndoElement()
-{
-}
+vtkSMComparativeAnimationCueUndoElement::~vtkSMComparativeAnimationCueUndoElement() = default;
 
 //-----------------------------------------------------------------------------
 void vtkSMComparativeAnimationCueUndoElement::PrintSelf(ostream& os, vtkIndent indent)
@@ -74,7 +72,7 @@ int vtkSMComparativeAnimationCueUndoElement::Redo()
       vtkSMProxy* proxy =
         this->Session->GetProxyLocator()->LocateProxy(this->ComparativeAnimationCueID);
       this->UndoSetWorkingContext->AddItem(proxy);
-      proxy->LoadXMLState(this->AfterState->GetNestedElement(0), NULL);
+      proxy->LoadXMLState(this->AfterState->GetNestedElement(0), nullptr);
       proxy->Delete();
     }
     else
@@ -100,7 +98,7 @@ void vtkSMComparativeAnimationCueUndoElement::SetXMLStates(
   }
   else
   {
-    this->BeforeState = NULL;
+    this->BeforeState = nullptr;
   }
   if (after)
   {
@@ -109,6 +107,6 @@ void vtkSMComparativeAnimationCueUndoElement::SetXMLStates(
   }
   else
   {
-    this->AfterState = NULL;
+    this->AfterState = nullptr;
   }
 }

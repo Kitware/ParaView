@@ -61,7 +61,8 @@ pqAnimatedExportReaction::pqAnimatedExportReaction(QAction* parentObject)
 void pqAnimatedExportReaction::updateEnableState()
 {
   pqActiveObjects* activeObjects = &pqActiveObjects::instance();
-  bool is_enabled = (activeObjects->activeServer() != NULL && activeObjects->activeView() != NULL);
+  bool is_enabled =
+    (activeObjects->activeServer() != nullptr && activeObjects->activeView() != nullptr);
   this->parentAction()->setEnabled(is_enabled);
 }
 

@@ -63,7 +63,7 @@ vtkSMRenderViewProxy* SetupView(vtkSMSession* session)
 }
 
 vtkSMSourceProxy* CreatePipelineProxy(
-  vtkSMSession* session, const char* xmlgroup, const char* xmlname, vtkSMProxy* input = NULL)
+  vtkSMSession* session, const char* xmlgroup, const char* xmlname, vtkSMProxy* input = nullptr)
 {
   vtkSMSessionProxyManager* pxm = session->GetSessionProxyManager();
   vtkSmartPointer<vtkSMSourceProxy> proxy;
@@ -76,7 +76,7 @@ vtkSMSourceProxy* CreatePipelineProxy(
 
   vtkNew<vtkSMParaViewPipelineController> controller;
   controller->PreInitializeProxy(proxy.Get());
-  if (input != NULL)
+  if (input != nullptr)
   {
     vtkSMPropertyHelper(proxy, "Input").Set(input);
   }

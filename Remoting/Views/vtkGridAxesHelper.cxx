@@ -73,7 +73,7 @@ vtkGridAxesHelper::vtkGridAxesHelper()
   this->GridBounds[1] = this->GridBounds[3] = this->GridBounds[5] = 1.0;
   this->Face = vtkGridAxesHelper::MIN_YZ;
   this->LabelMask = 0xff;
-  this->Matrix = NULL;
+  this->Matrix = nullptr;
 
   this->GetPointsMTime = 0;
   this->GetTransformedPointsMTime = 0;
@@ -83,7 +83,7 @@ vtkGridAxesHelper::vtkGridAxesHelper()
 //----------------------------------------------------------------------------
 vtkGridAxesHelper::~vtkGridAxesHelper()
 {
-  this->SetMatrix(NULL);
+  this->SetMatrix(nullptr);
 }
 
 //----------------------------------------------------------------------------

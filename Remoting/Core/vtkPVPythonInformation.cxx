@@ -43,9 +43,7 @@ vtkPVPythonInformation::vtkPVPythonInformation()
 }
 
 //----------------------------------------------------------------------------
-vtkPVPythonInformation::~vtkPVPythonInformation()
-{
-}
+vtkPVPythonInformation::~vtkPVPythonInformation() = default;
 
 //----------------------------------------------------------------------------
 void vtkPVPythonInformation::PrintSelf(ostream& os, vtkIndent indent)
@@ -139,11 +137,7 @@ std::string getModuleAttrAsString(const char* module, const char* attribute)
     return result.str();
   }
 
-#if PY_MAJOR_VERSION >= 3
   const char* cdata = PyUnicode_AsUTF8(attr);
-#else
-  const char* cdata = PyBytes_AsString(attr);
-#endif
   std::string result(cdata ? cdata : "");
   return result;
 }

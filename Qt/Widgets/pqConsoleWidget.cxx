@@ -397,7 +397,7 @@ public:
   {
     if (this->Completer)
     {
-      this->Completer->setWidget(0);
+      this->Completer->setWidget(nullptr);
       QObject::disconnect(this->Completer, SIGNAL(activated(const QString&)), &this->Parent,
         SLOT(insertCompletion(const QString&)));
     }

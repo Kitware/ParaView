@@ -144,7 +144,7 @@ public:
    * is simply set to attribute_type.
    */
   static bool IsAttributeTypeAcceptable(
-    int required_type, int attribute_type, int* acceptable_as_type = NULL);
+    int required_type, int attribute_type, int* acceptable_as_type = nullptr);
 
   /**
    * This method will check if the arrayInfo contain info about an acceptable array,

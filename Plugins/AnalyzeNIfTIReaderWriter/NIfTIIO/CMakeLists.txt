@@ -5,11 +5,11 @@ set(classes
   vtkNIfTIWriter)
 
 set(private_classes
-  vtknifti1_io
-  vtkznzlib)
+  ThirdParty/vtknifti1_io
+  ThirdParty/vtkznzlib)
 
 set(private_headers
-  vtkznzlib.h)
+  ThirdParty/vtkznzlib.h)
 
 vtk_module_add_module(AnalyzeNIfTIIO::NIfTIIO
   CLASSES ${classes}

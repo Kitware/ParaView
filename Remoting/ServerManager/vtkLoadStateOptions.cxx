@@ -22,14 +22,10 @@ using namespace vtksys;
 
 vtkStandardNewMacro(vtkLoadStateOptions);
 //----------------------------------------------------------------------------
-vtkLoadStateOptions::vtkLoadStateOptions()
-{
-}
+vtkLoadStateOptions::vtkLoadStateOptions() = default;
 
 //----------------------------------------------------------------------------
-vtkLoadStateOptions::~vtkLoadStateOptions()
-{
-}
+vtkLoadStateOptions::~vtkLoadStateOptions() = default;
 
 //----------------------------------------------------------------------------
 void vtkLoadStateOptions::PrintSelf(ostream& os, vtkIndent indent)

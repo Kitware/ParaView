@@ -71,14 +71,12 @@ pqLinksManager::pqLinksManager(QWidget* p)
   this->Ui->removeButton->setEnabled(false);
 }
 
-pqLinksManager::~pqLinksManager()
-{
-}
+pqLinksManager::~pqLinksManager() = default;
 
 void pqLinksManager::addLink()
 {
   pqLinksModel* model = pqApplicationCore::instance()->getLinksModel();
-  pqLinksEditor editor(NULL, this);
+  pqLinksEditor editor(nullptr, this);
   editor.setWindowTitle("Add Link");
   if (editor.exec() == QDialog::Accepted)
   {

@@ -66,9 +66,7 @@ pqHighlightablePushButton::pqHighlightablePushButton(
 }
 
 //-----------------------------------------------------------------------------
-pqHighlightablePushButton::~pqHighlightablePushButton()
-{
-}
+pqHighlightablePushButton::~pqHighlightablePushButton() = default;
 
 //-----------------------------------------------------------------------------
 void pqHighlightablePushButton::highlight(bool clearHighlight)

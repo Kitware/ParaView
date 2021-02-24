@@ -37,8 +37,8 @@ vtkStandardNewMacro(vtkVRMLSource);
 //------------------------------------------------------------------------------
 vtkVRMLSource::vtkVRMLSource()
 {
-  this->FileName = NULL;
-  this->Importer = NULL;
+  this->FileName = nullptr;
+  this->Importer = nullptr;
   this->Color = 1;
   this->Append = 1;
 
@@ -48,11 +48,11 @@ vtkVRMLSource::vtkVRMLSource()
 //------------------------------------------------------------------------------
 vtkVRMLSource::~vtkVRMLSource()
 {
-  this->SetFileName(NULL);
+  this->SetFileName(nullptr);
   if (this->Importer)
   {
     this->Importer->Delete();
-    this->Importer = NULL;
+    this->Importer = nullptr;
   }
 }
 
@@ -64,7 +64,7 @@ int vtkVRMLSource::CanReadFile(const char* filename)
     return 0;
 
   char header[128];
-  if (fgets(header, 128, fd) == NULL)
+  if (fgets(header, 128, fd) == nullptr)
   {
     return 0;
   }
@@ -92,7 +92,7 @@ int vtkVRMLSource::RequestData(
     return 0;
   }
 
-  if (this->Importer == NULL)
+  if (this->Importer == nullptr)
   {
     this->InitializeImporter();
   }
@@ -107,7 +107,7 @@ void vtkVRMLSource::InitializeImporter()
   if (this->Importer)
   {
     this->Importer->Delete();
-    this->Importer = NULL;
+    this->Importer = nullptr;
   }
   this->Importer = vtkVRMLImporter::New();
   this->Importer->SetFileName(this->FileName);
@@ -129,9 +129,9 @@ void vtkVRMLSource::CopyImporterToOutputs(vtkMultiBlockDataSet* mbOutput)
   int arrayCount = 0;
   char name[256];
   int ptIdx;
-  vtkAppendPolyData* append = NULL;
+  vtkAppendPolyData* append = nullptr;
 
-  if (this->Importer == NULL)
+  if (this->Importer == nullptr)
   {
     return;
   }
@@ -176,7 +176,7 @@ void vtkVRMLSource::CopyImporterToOutputs(vtkMultiBlockDataSet* mbOutput)
         array = input->GetPointData()->GetArray(arrayIdx);
         if (array->GetNumberOfTuples() == numPoints)
         {
-          if (array->GetName() == NULL)
+          if (array->GetName() == nullptr)
           {
             sprintf(name, "VRMLArray%d", ++arrayCount);
             array->SetName(name);
@@ -192,7 +192,7 @@ void vtkVRMLSource::CopyImporterToOutputs(vtkMultiBlockDataSet* mbOutput)
         array = input->GetCellData()->GetArray(arrayIdx);
         if (array->GetNumberOfTuples() == numCells)
         {
-          if (array->GetName() == NULL)
+          if (array->GetName() == nullptr)
           {
             sprintf(name, "VRMLArray%d", ++arrayCount);
             array->SetName(name);
@@ -220,20 +220,20 @@ void vtkVRMLSource::CopyImporterToOutputs(vtkMultiBlockDataSet* mbOutput)
         }
         output->GetPointData()->SetScalars(colorArray);
         colorArray->Delete();
-        colorArray = NULL;
+        colorArray = nullptr;
       }
       if (append)
       {
         append->AddInputData(output);
       }
       output->Delete();
-      output = NULL;
+      output = nullptr;
 
       ++idx;
       tf->Delete();
-      tf = NULL;
+      tf = nullptr;
       trans->Delete();
-      trans = NULL;
+      trans = nullptr;
     }
   }
 

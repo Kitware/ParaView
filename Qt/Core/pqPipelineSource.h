@@ -64,7 +64,7 @@ class PQCORE_EXPORT pqPipelineSource : public pqProxy
 
 public:
   pqPipelineSource(
-    const QString& name, vtkSMProxy* proxy, pqServer* server, QObject* parent = NULL);
+    const QString& name, vtkSMProxy* proxy, pqServer* server, QObject* parent = nullptr);
   ~pqPipelineSource() override;
 
   /**
@@ -117,7 +117,7 @@ public:
 
   /**
   * Returns a list of representations for this source in the given view.
-  * If view == NULL, returns all representations of this source.
+  * If view == nullptr, returns all representations of this source.
   */
   QList<pqDataRepresentation*> getRepresentations(int outputport, pqView* view) const;
   QList<pqDataRepresentation*> getRepresentations(pqView* view) const
@@ -127,7 +127,7 @@ public:
 
   /**
   * Returns the first representation for this source in the given view.
-  * If view is NULL, returns 0.
+  * If view is nullptr, returns 0.
   */
   pqDataRepresentation* getRepresentation(int outputport, pqView* view) const;
   pqDataRepresentation* getRepresentation(pqView* view) const

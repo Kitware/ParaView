@@ -49,7 +49,7 @@ vtkPVLODActor::vtkPVLODActor()
   this->Device->SetUserMatrix(m);
   m->Delete();
 
-  this->LODMapper = NULL;
+  this->LODMapper = nullptr;
 
   this->EnableLOD = 0;
 }
@@ -57,9 +57,9 @@ vtkPVLODActor::vtkPVLODActor()
 //----------------------------------------------------------------------------
 vtkPVLODActor::~vtkPVLODActor()
 {
-  this->SetLODMapper(NULL);
+  this->SetLODMapper(nullptr);
   this->Device->Delete();
-  this->Device = NULL;
+  this->Device = nullptr;
 }
 
 //----------------------------------------------------------------------------
@@ -67,11 +67,11 @@ vtkPVLODActor::~vtkPVLODActor()
 // A good example is verts.  One cell can contain any number of vertices.
 vtkMapper* vtkPVLODActor::SelectMapper()
 {
-  if (this->Mapper == NULL || this->Mapper->GetInputDataObject(0, 0) == NULL)
+  if (this->Mapper == nullptr || this->Mapper->GetInputDataObject(0, 0) == nullptr)
   {
     return this->LODMapper;
   }
-  if (this->LODMapper == NULL || this->LODMapper->GetInputDataObject(0, 0) == NULL)
+  if (this->LODMapper == nullptr || this->LODMapper->GetInputDataObject(0, 0) == nullptr)
   {
     return this->Mapper;
   }
@@ -90,7 +90,7 @@ void vtkPVLODActor::Render(vtkRenderer* ren, vtkMapper* vtkNotUsed(m))
   vtkMatrix4x4* matrix;
   vtkMapper* mapper;
 
-  if (this->Mapper == NULL)
+  if (this->Mapper == nullptr)
   {
     vtkErrorMacro("No mapper for actor.");
     return;
@@ -98,7 +98,7 @@ void vtkPVLODActor::Render(vtkRenderer* ren, vtkMapper* vtkNotUsed(m))
 
   mapper = this->SelectMapper();
 
-  if (mapper == NULL)
+  if (mapper == nullptr)
   {
     return;
   }
@@ -303,7 +303,7 @@ void vtkPVLODActor::Modified()
 void vtkPVLODActor::ShallowCopy(vtkProp* prop)
 {
   vtkPVLODActor* a = vtkPVLODActor::SafeDownCast(prop);
-  if (a != NULL)
+  if (a != nullptr)
   {
     this->SetLODMapper(a->GetLODMapper());
   }

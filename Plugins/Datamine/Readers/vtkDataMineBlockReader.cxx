@@ -6,8 +6,8 @@
 //     99-04-12: Written by Jeremy Maccelari, visualn@iafrica.com
 
 #include "vtkDataMineBlockReader.h"
-#include "PropertyStorage.h"
-#include "dmfile.h"
+#include "ThirdParty/PropertyStorage.h"
+#include "ThirdParty/dmfile.h"
 
 #include "vtkCellArray.h"
 #include "vtkObjectFactory.h"
@@ -21,9 +21,7 @@ vtkDataMineBlockReader::vtkDataMineBlockReader()
 }
 
 // --------------------------------------
-vtkDataMineBlockReader::~vtkDataMineBlockReader()
-{
-}
+vtkDataMineBlockReader::~vtkDataMineBlockReader() = default;
 
 // --------------------------------------
 void vtkDataMineBlockReader::PrintSelf(ostream& os, vtkIndent indent)

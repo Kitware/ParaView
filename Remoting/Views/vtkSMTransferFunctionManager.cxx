@@ -51,30 +51,26 @@ vtkSMProxy* FindProxy(const char* groupName, const char* arrayName, vtkSMSession
     const char* key = iter->GetKey();
     if (key && regExp.find(key))
     {
-      assert(iter->GetProxy() != NULL);
+      assert(iter->GetProxy() != nullptr);
       return iter->GetProxy();
     }
   }
-  return NULL;
+  return nullptr;
 }
 }
 
 vtkObjectFactoryNewMacro(vtkSMTransferFunctionManager);
 //----------------------------------------------------------------------------
-vtkSMTransferFunctionManager::vtkSMTransferFunctionManager()
-{
-}
+vtkSMTransferFunctionManager::vtkSMTransferFunctionManager() = default;
 
 //----------------------------------------------------------------------------
-vtkSMTransferFunctionManager::~vtkSMTransferFunctionManager()
-{
-}
+vtkSMTransferFunctionManager::~vtkSMTransferFunctionManager() = default;
 
 //----------------------------------------------------------------------------
 vtkSMProxy* vtkSMTransferFunctionManager::GetColorTransferFunction(
   const char* arrayName, vtkSMSessionProxyManager* pxm)
 {
-  assert(arrayName != NULL && pxm != NULL);
+  assert(arrayName != nullptr && pxm != nullptr);
 
   // sanitize the arrayName. This is necessary since sometimes array names have
   // characters that can mess up regular expressions.
@@ -92,7 +88,7 @@ vtkSMProxy* vtkSMTransferFunctionManager::GetColorTransferFunction(
   if (!proxy)
   {
     vtkErrorMacro("Failed to create PVLookupTable proxy.");
-    return NULL;
+    return nullptr;
   }
 
   proxy->SetLogName((std::string("lut-for-") + std::string(arrayName)).c_str());
@@ -143,7 +139,7 @@ vtkSMProxy* vtkSMTransferFunctionManager::GetColorTransferFunction(
 vtkSMProxy* vtkSMTransferFunctionManager::GetOpacityTransferFunction(
   const char* arrayName, vtkSMSessionProxyManager* pxm)
 {
-  assert(arrayName != NULL && pxm != NULL);
+  assert(arrayName != nullptr && pxm != nullptr);
 
   // sanitize the arrayName. This is necessary since sometimes array names have
   // characters that can mess up regular expressions.
@@ -161,7 +157,7 @@ vtkSMProxy* vtkSMTransferFunctionManager::GetOpacityTransferFunction(
   if (!proxy)
   {
     vtkErrorMacro("Failed to create PVLookupTable proxy.");
-    return NULL;
+    return nullptr;
   }
 
   vtkNew<vtkSMParaViewPipelineController> controller;
@@ -180,10 +176,10 @@ vtkSMProxy* vtkSMTransferFunctionManager::GetOpacityTransferFunction(
 vtkSMProxy* vtkSMTransferFunctionManager::GetScalarBarRepresentation(
   vtkSMProxy* colorTransferFunction, vtkSMProxy* view)
 {
-  if (colorTransferFunction == NULL || view == NULL ||
+  if (colorTransferFunction == nullptr || view == nullptr ||
     !colorTransferFunction->IsA("vtkSMTransferFunctionProxy"))
   {
-    return NULL;
+    return nullptr;
   }
 
   vtkSMProxy* scalarBarProxy =
@@ -199,7 +195,7 @@ vtkSMProxy* vtkSMTransferFunctionManager::GetScalarBarRepresentation(
   if (!scalarBarProxy)
   {
     vtkErrorMacro("Failed to create ScalarBarWidgetRepresentation proxy.");
-    return NULL;
+    return nullptr;
   }
 
   vtkNew<vtkSMParaViewPipelineController> controller;
@@ -232,7 +228,7 @@ void vtkSMTransferFunctionManager::ResetAllTransferFunctionRangesUsingCurrentDat
   for (iter->Begin("lookup_tables"); !iter->IsAtEnd(); iter->Next())
   {
     vtkSMProxy* lutProxy = iter->GetProxy();
-    assert(lutProxy != NULL);
+    assert(lutProxy != nullptr);
 
     int rescaleMode = vtkSMPropertyHelper(lutProxy, "AutomaticRescaleRangeMode", true).GetAsInt();
 

@@ -28,9 +28,7 @@ vtkPVDataSizeInformation::vtkPVDataSizeInformation()
 }
 
 //----------------------------------------------------------------------------
-vtkPVDataSizeInformation::~vtkPVDataSizeInformation()
-{
-}
+vtkPVDataSizeInformation::~vtkPVDataSizeInformation() = default;
 
 //----------------------------------------------------------------------------
 void vtkPVDataSizeInformation::CopyFromObject(vtkObject* object)

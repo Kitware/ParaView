@@ -54,7 +54,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //-----------------------------------------------------------------------------
 pqExportReaction::pqExportReaction(QAction* parentObject)
   : Superclass(parentObject)
-  , ConnectedView(NULL)
+  , ConnectedView(nullptr)
 {
   // load state enable state depends on whether we are connected to an active
   // server or not and whether
@@ -131,7 +131,7 @@ QString pqExportReaction::exportActiveView()
   }
 
   pqFileDialog file_dialog(
-    NULL, pqCoreUtilities::mainWidget(), tr("Export View:"), QString(), filters);
+    nullptr, pqCoreUtilities::mainWidget(), tr("Export View:"), QString(), filters);
   file_dialog.setObjectName("FileExportDialog");
   file_dialog.setFileMode(pqFileDialog::AnyFile);
   if (file_dialog.exec() == QDialog::Accepted && file_dialog.getSelectedFiles().size() > 0)

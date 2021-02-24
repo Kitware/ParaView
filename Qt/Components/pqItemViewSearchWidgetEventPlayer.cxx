@@ -42,9 +42,7 @@ pqItemViewSearchWidgetEventPlayer::pqItemViewSearchWidgetEventPlayer(QObject* p)
 }
 
 //----------------------------------------------------------------------------
-pqItemViewSearchWidgetEventPlayer::~pqItemViewSearchWidgetEventPlayer()
-{
-}
+pqItemViewSearchWidgetEventPlayer::~pqItemViewSearchWidgetEventPlayer() = default;
 
 //----------------------------------------------------------------------------
 bool pqItemViewSearchWidgetEventPlayer::playEvent(

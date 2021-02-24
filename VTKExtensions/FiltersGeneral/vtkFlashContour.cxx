@@ -53,9 +53,9 @@ static int vtkFlashIsoEdgeToVTKPointsTable[12][2] = { { 0, 1 }, { 1, 2 }, { 3, 2
 vtkFlashContour::vtkFlashContour()
 {
   this->IsoValue = 100.0;
-  this->PassAttribute = 0;
-  this->PassArray = 0;
-  this->CellArrayNameToProcess = 0;
+  this->PassAttribute = nullptr;
+  this->PassArray = nullptr;
+  this->CellArrayNameToProcess = nullptr;
 
   // Pipeline
   this->SetNumberOfOutputPorts(1);
@@ -64,8 +64,8 @@ vtkFlashContour::vtkFlashContour()
 //----------------------------------------------------------------------------
 vtkFlashContour::~vtkFlashContour()
 {
-  this->SetCellArrayNameToProcess(0);
-  this->SetPassAttribute(0);
+  this->SetCellArrayNameToProcess(nullptr);
+  this->SetPassAttribute(nullptr);
 }
 
 //----------------------------------------------------------------------------
@@ -233,7 +233,7 @@ int vtkFlashContour::RequestData(vtkInformation* vtkNotUsed(request),
 
   vtkDataArray* da = mbdsInput->GetFieldData()->GetArray("GlobalToLocalMap");
   vtkIntArray* globalToLocalMapArray = vtkIntArray::SafeDownCast(da);
-  if (globalToLocalMapArray == 0)
+  if (globalToLocalMapArray == nullptr)
   {
     vtkErrorMacro("Missing block map.");
     return 0;
@@ -243,7 +243,7 @@ int vtkFlashContour::RequestData(vtkInformation* vtkNotUsed(request),
 
   da = mbdsInput->GetFieldData()->GetArray("BlockChildren");
   vtkIntArray* childrenIdArray = vtkIntArray::SafeDownCast(da);
-  if (childrenIdArray == 0)
+  if (childrenIdArray == nullptr)
   {
     vtkErrorMacro("Missing children array.");
     return 0;
@@ -252,7 +252,7 @@ int vtkFlashContour::RequestData(vtkInformation* vtkNotUsed(request),
 
   da = mbdsInput->GetFieldData()->GetArray("BlockNeighbors");
   vtkIntArray* neighborIdArray = vtkIntArray::SafeDownCast(da);
-  if (neighborIdArray == 0)
+  if (neighborIdArray == nullptr)
   {
     vtkErrorMacro("Missing children array.");
     return 0;
@@ -261,7 +261,7 @@ int vtkFlashContour::RequestData(vtkInformation* vtkNotUsed(request),
 
   da = mbdsInput->GetFieldData()->GetArray("BlockLevel");
   vtkIntArray* levelArray = vtkIntArray::SafeDownCast(da);
-  if (levelArray == 0)
+  if (levelArray == nullptr)
   {
     vtkErrorMacro("Missing level array.");
     return 0;
@@ -281,7 +281,7 @@ int vtkFlashContour::RequestData(vtkInformation* vtkNotUsed(request),
 
   mpds->SetNumberOfPieces(0);
 
-  if (mbdsInput == 0)
+  if (mbdsInput == nullptr)
   {
     // Do not deal with rectilinear grid
     vtkErrorMacro("This filter requires a vtkMultiBlockDataSet on its input.");
@@ -331,15 +331,15 @@ int vtkFlashContour::RequestData(vtkInformation* vtkNotUsed(request),
   // this->BlockIdCellArray->SetName("BlockIds");
   // mesh->GetCellData()->AddArray(this->BlockIdCellArray);
 
-  this->PassArray = 0;
+  this->PassArray = nullptr;
   if (this->PassAttribute && mbdsInput->GetNumberOfBlocks() > 0)
   {
     // Find the array we are supposed to pass.
     // pain empty blocks.
     int blockId = 0;
     int numBlocks = mbdsInput->GetNumberOfBlocks();
-    vtkImageData* block = 0;
-    while (block == 0 && blockId < numBlocks)
+    vtkImageData* block = nullptr;
+    while (block == nullptr && blockId < numBlocks)
     {
       block = vtkImageData::SafeDownCast(mbdsInput->GetBlock(blockId));
       ++blockId;
@@ -347,7 +347,7 @@ int vtkFlashContour::RequestData(vtkInformation* vtkNotUsed(request),
     if (block)
     {
       da = block->GetCellData()->GetArray(this->PassAttribute);
-      if (da == 0 || da->GetDataType() != VTK_DOUBLE)
+      if (da == nullptr || da->GetDataType() != VTK_DOUBLE)
       {
         vtkErrorMacro("We can only pass double arrays.");
       }
@@ -419,22 +419,22 @@ int vtkFlashContour::RequestData(vtkInformation* vtkNotUsed(request),
 
   this->Mesh->Delete();
   this->Points->Delete();
-  this->Points = 0;
+  this->Points = nullptr;
   this->Faces->Delete();
-  this->Faces = 0;
+  this->Faces = nullptr;
   if (this->PassArray)
   {
     this->PassArray->Delete();
-    this->PassArray = 0;
+    this->PassArray = nullptr;
   }
   this->BlockIdCellArray->Delete();
-  this->BlockIdCellArray = 0;
+  this->BlockIdCellArray = nullptr;
   ;
   this->LevelCellArray->Delete();
-  this->LevelCellArray = 0;
+  this->LevelCellArray = nullptr;
   ;
   this->RemainingDepthCellArray->Delete();
-  this->RemainingDepthCellArray = 0;
+  this->RemainingDepthCellArray = nullptr;
 
   mpds->Delete();
 
@@ -694,7 +694,7 @@ void vtkFlashContour::ProcessBlock(vtkImageData* image)
   void* ptr = da->GetVoidPointer(0);
   double* dPtr = (double*)(ptr);
   // For passing / interpolating one double array.
-  double* pPtr = 0;
+  double* pPtr = nullptr;
   if (this->PassArray)
   {
     da = image->GetCellData()->GetArray(this->PassAttribute);
@@ -899,7 +899,7 @@ void vtkFlashContour::ProcessNeighborhoodSharedRegion(
     }
     vtkDataObject* block2 = input->GetBlock(block2LocalId);
     vtkImageData* image2 = vtkImageData::SafeDownCast(block2);
-    if (image2 == 0)
+    if (image2 == nullptr)
     {
       return;
     }

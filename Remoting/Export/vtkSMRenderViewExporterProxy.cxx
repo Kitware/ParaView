@@ -24,14 +24,10 @@
 
 vtkStandardNewMacro(vtkSMRenderViewExporterProxy);
 //----------------------------------------------------------------------------
-vtkSMRenderViewExporterProxy::vtkSMRenderViewExporterProxy()
-{
-}
+vtkSMRenderViewExporterProxy::vtkSMRenderViewExporterProxy() = default;
 
 //----------------------------------------------------------------------------
-vtkSMRenderViewExporterProxy::~vtkSMRenderViewExporterProxy()
-{
-}
+vtkSMRenderViewExporterProxy::~vtkSMRenderViewExporterProxy() = default;
 
 //----------------------------------------------------------------------------
 bool vtkSMRenderViewExporterProxy::CanExport(vtkSMProxy* view)

@@ -56,7 +56,7 @@ QWidget* PVBlotPluginActions::mainWindow()
     if (qobject_cast<QMainWindow*>(topWidget))
       return topWidget;
   }
-  return NULL;
+  return nullptr;
 }
 
 //-----------------------------------------------------------------------------

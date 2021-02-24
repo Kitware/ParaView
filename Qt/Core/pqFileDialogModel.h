@@ -60,9 +60,9 @@ class PQCORE_EXPORT pqFileDialogModel : public QAbstractItemModel
 public:
   /**
   * server is the server for which we need the listing.
-  * if the server is NULL, we get file listings locally
+  * if the server is nullptr, we get file listings locally
   */
-  pqFileDialogModel(pqServer* server, QObject* Parent = NULL);
+  pqFileDialogModel(pqServer* server, QObject* Parent = nullptr);
   ~pqFileDialogModel() override;
 
   //@{

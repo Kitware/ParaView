@@ -72,7 +72,7 @@ public:
       vtkCommand::EndInteractionEvent, this->Widget_ptr, &pqMultiSliceAxisWidget::onMarkClicked);
   }
 
-  ~pqInternal() {}
+  ~pqInternal() = default;
 
   void init()
   {
@@ -101,7 +101,7 @@ public:
 };
 
 //-----------------------------------------------------------------------------
-pqMultiSliceAxisWidget::pqMultiSliceAxisWidget(QWidget* parentW /*=NULL*/)
+pqMultiSliceAxisWidget::pqMultiSliceAxisWidget(QWidget* parentW /*=nullptr*/)
   : Superclass(parentW)
 {
   this->Internal = new pqMultiSliceAxisWidget::pqInternal(*this);

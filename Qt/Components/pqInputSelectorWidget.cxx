@@ -58,9 +58,7 @@ pqInputSelectorWidget::pqInputSelectorWidget(
 }
 
 //-----------------------------------------------------------------------------
-pqInputSelectorWidget::~pqInputSelectorWidget()
-{
-}
+pqInputSelectorWidget::~pqInputSelectorWidget() = default;
 
 //-----------------------------------------------------------------------------
 void pqInputSelectorWidget::setSelectedInput(pqSMProxy smproxy)

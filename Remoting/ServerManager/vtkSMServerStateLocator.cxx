@@ -22,13 +22,13 @@ vtkStandardNewMacro(vtkSMServerStateLocator);
 //---------------------------------------------------------------------------
 vtkSMServerStateLocator::vtkSMServerStateLocator()
 {
-  this->Session = NULL;
+  this->Session = nullptr;
 }
 
 //---------------------------------------------------------------------------
 vtkSMServerStateLocator::~vtkSMServerStateLocator()
 {
-  this->SetSession(NULL);
+  this->SetSession(nullptr);
 }
 
 //---------------------------------------------------------------------------

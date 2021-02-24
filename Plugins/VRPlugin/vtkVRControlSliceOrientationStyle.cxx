@@ -54,11 +54,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <sstream>
 
 // ----------------------------------------------------------------------------
-vtkStandardNewMacro(vtkVRControlSliceOrientationStyle)
+vtkStandardNewMacro(vtkVRControlSliceOrientationStyle);
 
-  // ----------------------------------------------------------------------------
-  // Constructor method
-  vtkVRControlSliceOrientationStyle::vtkVRControlSliceOrientationStyle()
+// ----------------------------------------------------------------------------
+// Constructor method
+vtkVRControlSliceOrientationStyle::vtkVRControlSliceOrientationStyle()
 {
   this->Enabled = false;
   this->InitialOrientationRecorded = false;

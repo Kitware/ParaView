@@ -23,14 +23,14 @@ vtkStandardNewMacro(vtkSMOrderedPropertyIterator);
 //---------------------------------------------------------------------------
 vtkSMOrderedPropertyIterator::vtkSMOrderedPropertyIterator()
 {
-  this->Proxy = 0;
+  this->Proxy = nullptr;
   this->Index = 0;
 }
 
 //---------------------------------------------------------------------------
 vtkSMOrderedPropertyIterator::~vtkSMOrderedPropertyIterator()
 {
-  this->SetProxy(0);
+  this->SetProxy(nullptr);
 }
 
 //---------------------------------------------------------------------------
@@ -38,12 +38,12 @@ void vtkSMOrderedPropertyIterator::SetProxy(vtkSMProxy* proxy)
 {
   if (this->Proxy != proxy)
   {
-    if (this->Proxy != NULL)
+    if (this->Proxy != nullptr)
     {
       this->Proxy->UnRegister(this);
     }
     this->Proxy = proxy;
-    if (this->Proxy != NULL)
+    if (this->Proxy != nullptr)
     {
       this->Proxy->Register(this);
       this->Begin();
@@ -98,7 +98,7 @@ const char* vtkSMOrderedPropertyIterator::GetKey()
   if (!this->Proxy)
   {
     vtkErrorMacro("Proxy is not set. Can not perform operation: GetKey()");
-    return 0;
+    return nullptr;
   }
 
   if (!this->IsAtEnd())
@@ -106,7 +106,7 @@ const char* vtkSMOrderedPropertyIterator::GetKey()
     return this->Proxy->Internals->PropertyNamesInOrder[this->Index].c_str();
   }
 
-  return 0;
+  return nullptr;
 }
 
 //---------------------------------------------------------------------------
@@ -115,7 +115,7 @@ const char* vtkSMOrderedPropertyIterator::GetPropertyLabel()
   if (!this->Proxy)
   {
     vtkErrorMacro("Proxy is not set. Can not perform operation: GetPropertyLabel()");
-    return 0;
+    return nullptr;
   }
 
   if (!this->IsAtEnd())
@@ -134,7 +134,7 @@ const char* vtkSMOrderedPropertyIterator::GetPropertyLabel()
     }
   }
 
-  return 0;
+  return nullptr;
 }
 
 //---------------------------------------------------------------------------
@@ -143,7 +143,7 @@ vtkSMProperty* vtkSMOrderedPropertyIterator::GetProperty()
   if (!this->Proxy)
   {
     vtkErrorMacro("Proxy is not set. Can not perform operation: GetProperty()");
-    return 0;
+    return nullptr;
   }
 
   if (!this->IsAtEnd())
@@ -151,7 +151,7 @@ vtkSMProperty* vtkSMOrderedPropertyIterator::GetProperty()
     return this->Proxy->GetProperty(
       this->Proxy->Internals->PropertyNamesInOrder[this->Index].c_str());
   }
-  return 0;
+  return nullptr;
 }
 
 //---------------------------------------------------------------------------

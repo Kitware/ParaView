@@ -80,7 +80,7 @@ public:
    */
   void SetupInteractor(vtkRenderWindowInteractor* iren);
   vtkRenderWindowInteractor* GetInteractor();
-  void CleanupInteractor() { this->SetupInteractor(NULL); }
+  void CleanupInteractor() { this->SetupInteractor(nullptr); }
   //@}
 
 protected:

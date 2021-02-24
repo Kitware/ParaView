@@ -22,14 +22,10 @@
 
 vtkStandardNewMacro(vtkSMRepresentationTypeDomain);
 //----------------------------------------------------------------------------
-vtkSMRepresentationTypeDomain::vtkSMRepresentationTypeDomain()
-{
-}
+vtkSMRepresentationTypeDomain::vtkSMRepresentationTypeDomain() = default;
 
 //----------------------------------------------------------------------------
-vtkSMRepresentationTypeDomain::~vtkSMRepresentationTypeDomain()
-{
-}
+vtkSMRepresentationTypeDomain::~vtkSMRepresentationTypeDomain() = default;
 
 //----------------------------------------------------------------------------
 vtkPVDataInformation* vtkSMRepresentationTypeDomain::GetInputInformation()
@@ -37,7 +33,7 @@ vtkPVDataInformation* vtkSMRepresentationTypeDomain::GetInputInformation()
   vtkSMProperty* inputProperty = this->GetRequiredProperty("Input");
   if (!inputProperty)
   {
-    return NULL;
+    return nullptr;
   }
 
   vtkSMUncheckedPropertyHelper helper(inputProperty);
@@ -49,7 +45,7 @@ vtkPVDataInformation* vtkSMRepresentationTypeDomain::GetInputInformation()
       return sp->GetDataInformation(helper.GetOutputPort());
     }
   }
-  return NULL;
+  return nullptr;
 }
 
 //----------------------------------------------------------------------------

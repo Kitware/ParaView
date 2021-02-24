@@ -57,7 +57,7 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqReaction : public QObject
 
 public:
   /**
-  * Constructor. Parent cannot be NULL.
+  * Constructor. Parent cannot be nullptr.
   */
   pqReaction(QAction* parent, Qt::ConnectionType type = Qt::AutoConnection);
   ~pqReaction() override;

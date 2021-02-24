@@ -81,9 +81,7 @@ vtkPVArrayCalculator::vtkPVArrayCalculator()
 }
 
 // ----------------------------------------------------------------------------
-vtkPVArrayCalculator::~vtkPVArrayCalculator()
-{
-}
+vtkPVArrayCalculator::~vtkPVArrayCalculator() = default;
 
 // ----------------------------------------------------------------------------
 int vtkPVArrayCalculator::GetAttributeTypeFromInput(vtkDataObject* input)

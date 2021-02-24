@@ -57,13 +57,13 @@ const char* GetRepresentationNameFromHints(const char* viewType, vtkPVXMLElement
 {
   if (!hints)
   {
-    return NULL;
+    return nullptr;
   }
 
   for (unsigned int cc = 0, max = hints->GetNumberOfNestedElements(); cc < max; ++cc)
   {
     vtkPVXMLElement* child = hints->GetNestedElement(cc);
-    if (child == NULL || child->GetName() == NULL)
+    if (child == nullptr || child->GetName() == nullptr)
     {
       continue;
     }
@@ -83,7 +83,7 @@ const char* GetRepresentationNameFromHints(const char* viewType, vtkPVXMLElement
     else if (strcmp(child->GetName(), "Representation") == 0 &&
       // has an attribute "view" that matches the viewType.
       child->GetAttribute("view") && strcmp(child->GetAttribute("view"), viewType) == 0 &&
-      child->GetAttribute("type") != NULL)
+      child->GetAttribute("type") != nullptr)
     {
       // if port is present, it must match "port".
       int xmlPort;
@@ -93,7 +93,7 @@ const char* GetRepresentationNameFromHints(const char* viewType, vtkPVXMLElement
       }
     }
   }
-  return NULL;
+  return nullptr;
 }
 
 /**
@@ -110,8 +110,8 @@ public:
   void SetParent(vtkSMViewProxy* view) { this->Parent = view; }
 
 protected:
-  WindowToImageFilter() {}
-  ~WindowToImageFilter() override {}
+  WindowToImageFilter() = default;
+  ~WindowToImageFilter() override = default;
 
   void Render() override
   {
@@ -334,7 +334,7 @@ vtkStandardNewMacro(vtkSMViewProxy);
 vtkSMViewProxy::vtkSMViewProxy()
 {
   this->SetLocation(vtkProcessModule::CLIENT_AND_SERVERS);
-  this->DefaultRepresentationName = 0;
+  this->DefaultRepresentationName = nullptr;
   this->Enable = true;
   this->DeliveryManager = nullptr;
 }
@@ -342,7 +342,7 @@ vtkSMViewProxy::vtkSMViewProxy()
 //----------------------------------------------------------------------------
 vtkSMViewProxy::~vtkSMViewProxy()
 {
-  this->SetDefaultRepresentationName(0);
+  this->SetDefaultRepresentationName(nullptr);
 }
 
 //----------------------------------------------------------------------------
@@ -352,7 +352,7 @@ vtkView* vtkSMViewProxy::GetClientSideView()
   {
     return vtkView::SafeDownCast(this->GetClientSideObject());
   }
-  return NULL;
+  return nullptr;
 }
 
 //----------------------------------------------------------------------------
@@ -518,11 +518,11 @@ vtkSMRepresentationProxy* vtkSMViewProxy::CreateDefaultRepresentation(
   assert("The session should be valid" && this->Session);
 
   vtkSMSourceProxy* producer = vtkSMSourceProxy::SafeDownCast(proxy);
-  if ((producer == NULL) || (outputPort < 0) ||
+  if ((producer == nullptr) || (outputPort < 0) ||
     (static_cast<int>(producer->GetNumberOfOutputPorts()) <= outputPort) ||
     (producer->GetSession() != this->GetSession()))
   {
-    return NULL;
+    return nullptr;
   }
 
   // Update with time from the view to ensure we have up-to-date data.
@@ -532,7 +532,7 @@ vtkSMRepresentationProxy* vtkSMViewProxy::CreateDefaultRepresentation(
   const char* representationType = this->GetRepresentationType(producer, outputPort);
   if (!representationType)
   {
-    return NULL;
+    return nullptr;
   }
 
   vtkSMSessionProxyManager* pxm = this->GetSessionProxyManager();
@@ -546,7 +546,7 @@ vtkSMRepresentationProxy* vtkSMViewProxy::CreateDefaultRepresentation(
   }
   vtkWarningMacro(
     "Failed to create representation (representations," << representationType << ").");
-  return NULL;
+  return nullptr;
 }
 
 //----------------------------------------------------------------------------
@@ -583,13 +583,13 @@ const char* vtkSMViewProxy::GetRepresentationType(vtkSMSourceProxy* producer, in
     }
   }
 
-  return NULL;
+  return nullptr;
 }
 
 //----------------------------------------------------------------------------
 bool vtkSMViewProxy::CanDisplayData(vtkSMSourceProxy* producer, int outputPort)
 {
-  if (producer == NULL || outputPort < 0 ||
+  if (producer == nullptr || outputPort < 0 ||
     static_cast<int>(producer->GetNumberOfOutputPorts()) <= outputPort ||
     producer->GetSession() != this->GetSession())
   {
@@ -597,10 +597,10 @@ bool vtkSMViewProxy::CanDisplayData(vtkSMSourceProxy* producer, int outputPort)
   }
 
   const char* type = this->GetRepresentationType(producer, outputPort);
-  if (type != NULL)
+  if (type != nullptr)
   {
     vtkSMSessionProxyManager* pxm = this->GetSessionProxyManager();
-    return (pxm->GetPrototypeProxy("representations", type) != NULL);
+    return (pxm->GetPrototypeProxy("representations", type) != nullptr);
   }
 
   return false;
@@ -624,7 +624,7 @@ vtkSMRepresentationProxy* vtkSMViewProxy::FindRepresentation(
       }
     }
   }
-  return NULL;
+  return nullptr;
 }
 
 //----------------------------------------------------------------------------
@@ -798,8 +798,8 @@ bool vtkSMViewProxy::IsContextReadyForRendering()
 //----------------------------------------------------------------------------
 bool vtkSMViewProxy::HideOtherRepresentationsIfNeeded(vtkSMProxy* repr)
 {
-  if (repr == NULL || this->GetHints() == NULL ||
-    this->GetHints()->FindNestedElementByName("ShowOneRepresentationAtATime") == NULL)
+  if (repr == nullptr || this->GetHints() == nullptr ||
+    this->GetHints()->FindNestedElementByName("ShowOneRepresentationAtATime") == nullptr)
   {
     return false;
   }
@@ -849,7 +849,7 @@ bool vtkSMViewProxy::GetLocalProcessSupportsInteraction()
 //----------------------------------------------------------------------------
 bool vtkSMViewProxy::MakeRenderWindowInteractor(bool quiet)
 {
-  if (this->GetInteractor() != NULL)
+  if (this->GetInteractor() != nullptr)
   {
     // all's setup already. nothing to do.
     return true;
@@ -894,7 +894,7 @@ bool vtkSMViewProxy::MakeRenderWindowInteractor(bool quiet)
     iren->Initialize();
   }
   this->SetupInteractor(iren);
-  return this->GetInteractor() != NULL;
+  return this->GetInteractor() != nullptr;
 }
 
 //----------------------------------------------------------------------------

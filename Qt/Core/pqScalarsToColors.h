@@ -49,7 +49,7 @@ class PQCORE_EXPORT pqScalarsToColors : public pqProxy
   Q_OBJECT
 public:
   pqScalarsToColors(const QString& group, const QString& name, vtkSMProxy* proxy, pqServer* server,
-    QObject* parent = NULL);
+    QObject* parent = nullptr);
   ~pqScalarsToColors() override;
 
   /**

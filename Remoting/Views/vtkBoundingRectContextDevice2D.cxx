@@ -10,12 +10,12 @@
 #include "vtkUnicodeString.h"
 
 //-----------------------------------------------------------------------------
-vtkStandardNewMacro(vtkBoundingRectContextDevice2D)
+vtkStandardNewMacro(vtkBoundingRectContextDevice2D);
 
-  //-----------------------------------------------------------------------------
-  vtkBoundingRectContextDevice2D::vtkBoundingRectContextDevice2D()
+//-----------------------------------------------------------------------------
+vtkBoundingRectContextDevice2D::vtkBoundingRectContextDevice2D()
   : Initialized(false)
-  , DelegateDevice(NULL)
+  , DelegateDevice(nullptr)
 {
   this->Reset();
 }
@@ -26,7 +26,7 @@ vtkBoundingRectContextDevice2D::~vtkBoundingRectContextDevice2D()
   if (this->DelegateDevice)
   {
     this->DelegateDevice->Delete();
-    this->DelegateDevice = NULL;
+    this->DelegateDevice = nullptr;
   }
 }
 
@@ -250,7 +250,7 @@ vtkPen* vtkBoundingRectContextDevice2D::GetPen()
     return this->DelegateDevice->GetPen();
   }
 
-  return NULL;
+  return nullptr;
 }
 
 //-----------------------------------------------------------------------------
@@ -270,7 +270,7 @@ vtkBrush* vtkBoundingRectContextDevice2D::GetBrush()
     return this->DelegateDevice->GetBrush();
   }
 
-  return NULL;
+  return nullptr;
 }
 
 //-----------------------------------------------------------------------------
@@ -290,7 +290,7 @@ vtkTextProperty* vtkBoundingRectContextDevice2D::GetTextProp()
     return this->DelegateDevice->GetTextProp();
   }
 
-  return NULL;
+  return nullptr;
 }
 
 //-----------------------------------------------------------------------------
@@ -304,7 +304,7 @@ void vtkBoundingRectContextDevice2D::DrawPoly(
 void vtkBoundingRectContextDevice2D::DrawLines(
   float* f, int n, unsigned char* vtkNotUsed(colors), int vtkNotUsed(nc_comps))
 {
-  if (f == NULL)
+  if (f == nullptr)
   {
     return;
   }
@@ -319,7 +319,7 @@ void vtkBoundingRectContextDevice2D::DrawLines(
 void vtkBoundingRectContextDevice2D::DrawPoints(
   float* points, int n, unsigned char* vtkNotUsed(colors), int vtkNotUsed(nc_comps))
 {
-  if (points == NULL)
+  if (points == nullptr)
   {
     return;
   }
@@ -334,7 +334,7 @@ void vtkBoundingRectContextDevice2D::DrawPoints(
 void vtkBoundingRectContextDevice2D::DrawPointSprites(vtkImageData* vtkNotUsed(sprite),
   float* points, int n, unsigned char* vtkNotUsed(colors), int vtkNotUsed(nc_comps))
 {
-  if (points == NULL || this->DelegateDevice)
+  if (points == nullptr || this->DelegateDevice)
   {
     return;
   }
@@ -357,12 +357,12 @@ void vtkBoundingRectContextDevice2D::DrawPointSprites(vtkImageData* vtkNotUsed(s
 void vtkBoundingRectContextDevice2D::DrawMarkers(int vtkNotUsed(shape), bool vtkNotUsed(highlight),
   float* points, int n, unsigned char* colors, int nc_comps)
 {
-  if (points == NULL)
+  if (points == nullptr)
   {
     return;
   }
 
-  this->DrawPointSprites(NULL, points, n, colors, nc_comps);
+  this->DrawPointSprites(nullptr, points, n, colors, nc_comps);
 }
 
 //-----------------------------------------------------------------------------
@@ -371,7 +371,7 @@ void vtkBoundingRectContextDevice2D::DrawEllipseWedge(float x, float y, float ou
 {
   if (outRy == 0.0f && outRx == 0.0f)
   {
-    // we make sure maxRadius will never be null.
+    // we make sure maxRadius will never be nullptr.
     return;
   }
 

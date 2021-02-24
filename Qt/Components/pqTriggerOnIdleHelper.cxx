@@ -43,9 +43,7 @@ pqTriggerOnIdleHelper::pqTriggerOnIdleHelper(QObject* parentObject)
 }
 
 //-----------------------------------------------------------------------------
-pqTriggerOnIdleHelper::~pqTriggerOnIdleHelper()
-{
-}
+pqTriggerOnIdleHelper::~pqTriggerOnIdleHelper() = default;
 
 //-----------------------------------------------------------------------------
 pqServer* pqTriggerOnIdleHelper::server() const

@@ -75,7 +75,7 @@ pqSaveAnimationReaction::pqSaveAnimationReaction(QAction* parentObject)
 void pqSaveAnimationReaction::updateEnableState()
 {
   pqActiveObjects* activeObjects = &pqActiveObjects::instance();
-  bool is_enabled = (activeObjects->activeServer() != NULL);
+  bool is_enabled = (activeObjects->activeServer() != nullptr);
   this->parentAction()->setEnabled(is_enabled);
 }
 

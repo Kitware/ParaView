@@ -24,10 +24,10 @@
 #include <algorithm>
 #include <cmath>
 
-vtkStandardNewMacro(vtkPVCylinder)
+vtkStandardNewMacro(vtkPVCylinder);
 
-  //----------------------------------------------------------------------------
-  vtkPVCylinder::vtkPVCylinder()
+//----------------------------------------------------------------------------
+vtkPVCylinder::vtkPVCylinder()
 {
   this->OrientedAxis[0] = 0.;
   this->OrientedAxis[1] = 1.;
@@ -35,9 +35,7 @@ vtkStandardNewMacro(vtkPVCylinder)
 }
 
 //----------------------------------------------------------------------------
-vtkPVCylinder::~vtkPVCylinder()
-{
-}
+vtkPVCylinder::~vtkPVCylinder() = default;
 
 //----------------------------------------------------------------------------
 void vtkPVCylinder::PrintSelf(ostream& os, vtkIndent indent)
@@ -100,6 +98,6 @@ void vtkPVCylinder::UpdateTransform()
   }
   else
   {
-    this->SetTransform(static_cast<vtkAbstractTransform*>(NULL));
+    this->SetTransform(static_cast<vtkAbstractTransform*>(nullptr));
   }
 }

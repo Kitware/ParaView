@@ -65,6 +65,4 @@ pqPauseLiveSourcePropertyWidget::pqPauseLiveSourcePropertyWidget(
 }
 
 //-----------------------------------------------------------------------------
-pqPauseLiveSourcePropertyWidget::~pqPauseLiveSourcePropertyWidget()
-{
-}
+pqPauseLiveSourcePropertyWidget::~pqPauseLiveSourcePropertyWidget() = default;

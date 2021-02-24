@@ -107,7 +107,7 @@ void pqServerDisconnectReaction::updateState()
   }
   else
   {
-    this->parentAction()->setEnabled(pqActiveObjects::instance().activeServer() != NULL);
+    this->parentAction()->setEnabled(pqActiveObjects::instance().activeServer() != nullptr);
   }
 }
 

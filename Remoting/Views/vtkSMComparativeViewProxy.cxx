@@ -36,9 +36,7 @@ vtkSMComparativeViewProxy::vtkSMComparativeViewProxy()
 }
 
 //----------------------------------------------------------------------------
-vtkSMComparativeViewProxy::~vtkSMComparativeViewProxy()
-{
-}
+vtkSMComparativeViewProxy::~vtkSMComparativeViewProxy() = default;
 
 //----------------------------------------------------------------------------
 void vtkSMComparativeViewProxy::Update()
@@ -116,7 +114,7 @@ vtkSMViewProxy* vtkSMComparativeViewProxy::GetRootView()
 //----------------------------------------------------------------------------
 void vtkSMComparativeViewProxy::MarkDirty(vtkSMProxy* modifiedProxy)
 {
-  if (vtkSMViewProxy::SafeDownCast(modifiedProxy) == NULL)
+  if (vtkSMViewProxy::SafeDownCast(modifiedProxy) == nullptr)
   {
     // cout << "vtkSMComparativeViewProxy::MarkDirty == " << modifiedProxy << endl;
     // The representation that gets added to this view is a consumer of it's
@@ -172,7 +170,7 @@ bool vtkSMComparativeViewProxy::MakeRenderWindowInteractor(bool quiet)
 
   views->InitTraversal();
   for (vtkSMViewProxy* view = vtkSMViewProxy::SafeDownCast(views->GetNextItemAsObject());
-       view != NULL; view = vtkSMViewProxy::SafeDownCast(views->GetNextItemAsObject()))
+       view != nullptr; view = vtkSMViewProxy::SafeDownCast(views->GetNextItemAsObject()))
   {
     flag = view->MakeRenderWindowInteractor(quiet) && flag;
   }

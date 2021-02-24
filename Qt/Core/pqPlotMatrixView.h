@@ -41,7 +41,7 @@ class PQCORE_EXPORT pqPlotMatrixView : public pqContextView
 
 public:
   pqPlotMatrixView(const QString& group, const QString& name, vtkSMContextViewProxy* viewModule,
-    pqServer* server, QObject* parent = NULL);
+    pqServer* server, QObject* parent = nullptr);
   ~pqPlotMatrixView() override;
 
   static QString viewType() { return "PlotMatrixView"; }

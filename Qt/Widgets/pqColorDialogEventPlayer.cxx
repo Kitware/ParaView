@@ -41,9 +41,7 @@ pqColorDialogEventPlayer::pqColorDialogEventPlayer(QObject* parentObject)
 }
 
 //----------------------------------------------------------------------------
-pqColorDialogEventPlayer::~pqColorDialogEventPlayer()
-{
-}
+pqColorDialogEventPlayer::~pqColorDialogEventPlayer() = default;
 
 //-----------------------------------------------------------------------------
 bool pqColorDialogEventPlayer::playEvent(

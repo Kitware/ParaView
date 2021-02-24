@@ -41,7 +41,7 @@ public:
   static void SetGlobalOutput(const char* key, vtkDataObject* output);
 
   /**
-   * Release a given Global output if a valid key (not NULL) is provided,
+   * Release a given Global output if a valid key (not nullptr) is provided,
    * otherwise the global output map will be cleared.
    */
   static void ReleaseGlobalOutput(const char* key);

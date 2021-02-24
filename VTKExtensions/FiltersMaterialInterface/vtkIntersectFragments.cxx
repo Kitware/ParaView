@@ -77,12 +77,12 @@ vtkIntersectFragments::vtkIntersectFragments()
   this->Controller = vtkMultiProcessController::GetGlobalController();
 
   this->Cutter = vtkCutter::New();
-  this->CutFunction = 0;
+  this->CutFunction = nullptr;
 
-  this->GeomIn = 0;
-  this->GeomOut = 0;
-  this->StatsIn = 0;
-  this->StatsOut = 0;
+  this->GeomIn = nullptr;
+  this->GeomOut = nullptr;
+  this->StatsIn = nullptr;
+  this->StatsOut = nullptr;
   this->NBlocks = 0;
 
   this->Progress = 0.0;
@@ -91,10 +91,10 @@ vtkIntersectFragments::vtkIntersectFragments()
 //----------------------------------------------------------------------------
 vtkIntersectFragments::~vtkIntersectFragments()
 {
-  this->Controller = 0;
+  this->Controller = nullptr;
   ClearVectorOfVtkPointers(this->IntersectionCenters);
   CheckAndReleaseVtkPointer(this->Cutter);
-  this->SetCutFunction(0);
+  this->SetCutFunction(nullptr);
 }
 
 //----------------------------------------------------------------------------
@@ -174,7 +174,7 @@ int vtkIntersectFragments::CopyInputStructureStats(
     vtkPolyData* srcPd = dynamic_cast<vtkPolyData*>(src->GetBlock(blockId));
     // stats exists on only one proc if we find empty block
     // assume this is not it. Its not an error.
-    if (srcPd == 0)
+    if (srcPd == nullptr)
     {
       break;
     }
@@ -210,7 +210,7 @@ int vtkIntersectFragments::CopyInputStructureGeom(
     vtkMultiPieceDataSet* srcFragments =
       dynamic_cast<vtkMultiPieceDataSet*>(src->GetBlock(blockId));
 
-    if (srcFragments != 0)
+    if (srcFragments != nullptr)
     {
       vtkMultiPieceDataSet* destFragments = vtkMultiPieceDataSet::New();
       int nSrcFragments = srcFragments->GetNumberOfPieces();
@@ -257,7 +257,7 @@ int vtkIntersectFragments::IdentifyLocalFragments()
     for (int fragmentId = 0; fragmentId < nFragments; ++fragmentId)
     {
       vtkPolyData* fragment = dynamic_cast<vtkPolyData*>(fragments->GetPiece(fragmentId));
-      if (fragment != 0)
+      if (fragment != nullptr)
       {
         // We have some of this fragment's geometry. Save
         // it's id. Id's are global within a block.
@@ -386,10 +386,10 @@ void vtkIntersectFragments::BuildLoadingArray(vector<vtkIdType>& loadingArray, i
 // Load a buffer containing the number of polys for each fragment
 // or fragment piece that we own. Return the size in vtkIdType's
 // of the packed buffer and the buffer itself. Pass in a
-// pointer initialized to null, allocation is internal.
+// pointer initialized to nullptr, allocation is internal.
 int vtkIntersectFragments::PackLoadingArray(vtkIdType*& buffer, int blockId)
 {
-  assert("Buffer appears to have been pre-allocated." && buffer == 0);
+  assert("Buffer appears to have been pre-allocated." && buffer == nullptr);
 
   vtkMultiPieceDataSet* intersectGeometry =
     dynamic_cast<vtkMultiPieceDataSet*>(this->GeomOut->GetBlock(blockId));
@@ -425,7 +425,7 @@ int vtkIntersectFragments::UnPackLoadingArray(
 {
   const int sizeOfPl = vtkMaterialInterfacePieceLoading::SIZE;
 
-  assert("Buffer is null pointer." && buffer != 0);
+  assert("Buffer is nullptr pointer." && buffer != 0);
   assert("Buffer size is incorrect." && bufSize % sizeOfPl == 0);
 
   vtkMultiPieceDataSet* intersectGeometry =
@@ -502,7 +502,7 @@ void vtkIntersectFragments::ComputeGeometricAttributes()
     // Prepare for projection onto the cut function
     double r0[3], N[3];
     vtkPlane* plane = dynamic_cast<vtkPlane*>(this->CutFunction);
-    if (plane != 0)
+    if (plane != nullptr)
     {
       // Get a point on the plane and its
       // unit normal.
@@ -653,7 +653,7 @@ void vtkIntersectFragments::ComputeGeometricAttributes()
       {
         int thisMsgId = msgBase;
         // create and send my loading array
-        vtkIdType* buffer = 0;
+        vtkIdType* buffer = nullptr;
         int bufSize = this->PackLoadingArray(buffer, blockId);
         comm->Send(&bufSize, 1, controllingProcId, thisMsgId);
         ++thisMsgId;
@@ -730,7 +730,7 @@ void vtkIntersectFragments::ComputeGeometricAttributes()
             // I have a piece. From now on I need to treat
             // this fragment as split.
             int localId = -1;
-            if (localMesh != 0)
+            if (localMesh != nullptr)
             {
               localId = idList.GetLocalId(fragmentId);
               assert("Fragment id not found." && localId != -1);
@@ -761,7 +761,7 @@ void vtkIntersectFragments::ComputeGeometricAttributes()
               buffer.UnPack(writePointer, 3, nPoints, true);
             }
             // append points that I own.
-            if (localMesh != 0)
+            if (localMesh != nullptr)
             {
               // get the points
               vtkFloatArray* ptsArray =
@@ -781,7 +781,7 @@ void vtkIntersectFragments::ComputeGeometricAttributes()
               aabbCen[q] = (aabb[k] + aabb[k + 1]) / 2.0;
             }
             // project back onto the plane
-            if (plane != 0)
+            if (plane != nullptr)
             {
               double d = 0;
               for (int q = 0; q < 3; ++q)
@@ -802,7 +802,7 @@ void vtkIntersectFragments::ComputeGeometricAttributes()
             }
             // If I own a piece save the results, and mark
             // piece as split.
-            if (localMesh != 0)
+            if (localMesh != nullptr)
             {
               this->IntersectionCenters[blockId]->SetTuple(localId, aabbCen);
             }
@@ -847,7 +847,7 @@ void vtkIntersectFragments::ComputeGeometricAttributes()
         pCoaabb[q] = (aabb[k] + aabb[k + 1]) / 2.0;
       }
       // project back onto the plane
-      if (plane != 0)
+      if (plane != nullptr)
       {
         double d = 0;
         for (int q = 0; q < 3; ++q)
@@ -1001,7 +1001,7 @@ int vtkIntersectFragments::PrepareToCollectGeometricAttributes(
   ids.resize(nProcs);
   for (int procId = 0; procId < nProcs; ++procId)
   {
-    ids[procId].resize(this->NBlocks, static_cast<int*>(0));
+    ids[procId].resize(this->NBlocks, static_cast<int*>(nullptr));
     //
     if (procId == myProcId)
     {
@@ -1222,10 +1222,10 @@ int vtkIntersectFragments::CleanUpAfterRequest()
   this->IntersectionIds.clear();
   ClearVectorOfVtkPointers(this->IntersectionCenters);
   this->NFragmentsIntersected.clear();
-  this->GeomIn = 0;
-  this->GeomOut = 0;
-  this->StatsIn = 0;
-  this->StatsOut = 0;
+  this->GeomIn = nullptr;
+  this->GeomOut = nullptr;
+  this->StatsIn = nullptr;
+  this->StatsOut = nullptr;
   this->NBlocks = 0;
   return 1;
 }
@@ -1240,7 +1240,7 @@ int vtkIntersectFragments::RequestData(vtkInformation* vtkNotUsed(request),
   vtkInformation* inInfo;
   inInfo = inputVector[0]->GetInformationObject(0);
   this->GeomIn = vtkMultiBlockDataSet::SafeDownCast(inInfo->Get(vtkDataObject::DATA_OBJECT()));
-  if (this->GeomIn == 0)
+  if (this->GeomIn == nullptr)
   {
     vtkErrorMacro("This filter requires a vtkMultiBlockDataSet on port 0 of its input.");
     return 1;
@@ -1250,7 +1250,7 @@ int vtkIntersectFragments::RequestData(vtkInformation* vtkNotUsed(request),
   // 1
   inInfo = inputVector[1]->GetInformationObject(0);
   this->StatsIn = vtkMultiBlockDataSet::SafeDownCast(inInfo->Get(vtkDataObject::DATA_OBJECT()));
-  if (this->StatsIn == 0)
+  if (this->StatsIn == nullptr)
   {
     vtkErrorMacro("This filter requires a vtkMultiBlockDataSet on port 1 of its input.");
     return 1;
@@ -1300,7 +1300,7 @@ vtkMTimeType vtkIntersectFragments::GetMTime()
   vtkMTimeType mTime = this->Superclass::GetMTime();
   vtkMTimeType time;
 
-  if (this->CutFunction != NULL)
+  if (this->CutFunction != nullptr)
   {
     time = this->CutFunction->GetMTime();
     mTime = (time > mTime ? time : mTime);

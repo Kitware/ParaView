@@ -34,7 +34,7 @@ public:
 
   ~vtkInternal()
   {
-    this->Parent = NULL;
+    this->Parent = nullptr;
     if (this->Observable)
     {
       this->Observable->RemoveObserver(this->CallbackID);
@@ -46,7 +46,7 @@ public:
   {
     // Make sure an UndoStackBuilder is available
     vtkSMUndoStackBuilder* usb = vtkSMProxyManager::GetProxyManager()->GetUndoStackBuilder();
-    if (usb == NULL)
+    if (usb == nullptr)
     {
       return;
     }
@@ -96,7 +96,7 @@ vtkSMComparativeAnimationCueProxy::vtkSMComparativeAnimationCueProxy()
 vtkSMComparativeAnimationCueProxy::~vtkSMComparativeAnimationCueProxy()
 {
   delete this->Internals;
-  this->Internals = NULL;
+  this->Internals = nullptr;
 }
 
 //----------------------------------------------------------------------------
@@ -139,7 +139,7 @@ int vtkSMComparativeAnimationCueProxy::LoadXMLState(
 
 #define SAFE_FORWARD(method)                                                                       \
   vtkPVComparativeAnimationCue* cue = this->GetComparativeAnimationCue();                          \
-  if (cue == NULL)                                                                                 \
+  if (cue == nullptr)                                                                              \
   {                                                                                                \
     vtkWarningMacro("Please call CreateVTKObjects() first.");                                      \
     return;                                                                                        \
@@ -148,7 +148,7 @@ int vtkSMComparativeAnimationCueProxy::LoadXMLState(
 
 #define SAFE_FORWARD_AND_RETURN(method, retval)                                                    \
   vtkPVComparativeAnimationCue* cue = this->GetComparativeAnimationCue();                          \
-  if (cue == NULL)                                                                                 \
+  if (cue == nullptr)                                                                              \
   {                                                                                                \
     vtkWarningMacro("Please call CreateVTKObjects() first.");                                      \
     return retval;                                                                                 \
@@ -234,7 +234,7 @@ void vtkSMComparativeAnimationCueProxy::UpdateAnimatedValue(int x, int y, int dx
 double* vtkSMComparativeAnimationCueProxy::GetValues(
   int x, int y, int dx, int dy, unsigned int& numValues)
 {
-  SAFE_FORWARD_AND_RETURN(GetValues, NULL)(x, y, dx, dy, numValues);
+  SAFE_FORWARD_AND_RETURN(GetValues, nullptr)(x, y, dx, dy, numValues);
 }
 
 //----------------------------------------------------------------------------

@@ -18,7 +18,7 @@
 
 namespace
 {
-vtkCPProcessor* Processor = NULL;
+vtkCPProcessor* Processor = nullptr;
 vtkUnstructuredGrid* VTKGrid;
 
 void BuildVTKGrid(Grid& grid)
@@ -87,7 +87,7 @@ void UpdateVTKAttributes(Grid& grid, Attributes& attributes)
 
 void BuildVTKDataStructures(Grid& grid, Attributes& attributes)
 {
-  if (VTKGrid == NULL)
+  if (VTKGrid == nullptr)
   {
     // The grid structure isn't changing so we only build it
     // the first time it's needed. If we needed the memory
@@ -103,7 +103,7 @@ namespace FEAdaptor
 {
 void Initialize(int outputFrequency, std::string fileName)
 {
-  if (Processor == NULL)
+  if (Processor == nullptr)
   {
     Processor = vtkCPProcessor::New();
     Processor->Initialize();
@@ -119,12 +119,12 @@ void Finalize()
   if (Processor)
   {
     Processor->Delete();
-    Processor = NULL;
+    Processor = nullptr;
   }
   if (VTKGrid)
   {
     VTKGrid->Delete();
-    VTKGrid = NULL;
+    VTKGrid = nullptr;
   }
 }
 

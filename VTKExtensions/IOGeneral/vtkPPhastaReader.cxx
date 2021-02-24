@@ -62,7 +62,7 @@ vtkStandardNewMacro(vtkPPhastaReader);
 //----------------------------------------------------------------------------
 vtkPPhastaReader::vtkPPhastaReader()
 {
-  this->FileName = 0;
+  this->FileName = nullptr;
 
   this->TimeStepIndex = 0;
   this->ActualTimeStep = 0;
@@ -71,7 +71,7 @@ vtkPPhastaReader::vtkPPhastaReader()
 
   this->SetNumberOfInputPorts(0);
 
-  this->Parser = 0;
+  this->Parser = nullptr;
 
   this->Internal = new vtkPPhastaReaderInternal;
 
@@ -83,7 +83,7 @@ vtkPPhastaReader::vtkPPhastaReader()
 vtkPPhastaReader::~vtkPPhastaReader()
 {
   this->Reader->Delete();
-  this->SetFileName(0);
+  this->SetFileName(nullptr);
 
   if (this->Parser)
   {
@@ -156,10 +156,10 @@ int vtkPPhastaReader::RequestData(
   output->SetBlock(0, MultiPieceDataSet);
   MultiPieceDataSet->Delete();
 
-  const char* geometryPattern = 0;
+  const char* geometryPattern = nullptr;
   int geomHasPiece = 0;
   int geomHasTime = 0;
-  const char* fieldPattern = 0;
+  const char* fieldPattern = nullptr;
   int fieldHasPiece = 0;
   int fieldHasTime = 0;
 
@@ -331,7 +331,7 @@ int vtkPPhastaReader::RequestInformation(
   if (this->Parser)
   {
     this->Parser->Delete();
-    this->Parser = 0;
+    this->Parser = nullptr;
   }
 
   vtkSmartPointer<vtkPVXMLParser> parser = vtkSmartPointer<vtkPVXMLParser>::New();
@@ -466,7 +466,7 @@ int vtkPPhastaReader::RequestInformation(
         {
           numberOfFields2++;
           std::string paraviewFieldTagStr, dataTypeStr;
-          const char* paraviewFieldTag = 0;
+          const char* paraviewFieldTag = nullptr;
           paraviewFieldTag = nested2->GetAttribute("paraview_field_tag");
           if (!paraviewFieldTag)
           {
@@ -475,7 +475,7 @@ int vtkPPhastaReader::RequestInformation(
             paraviewFieldTagStr = paraviewFieldTagStrStream.str();
             paraviewFieldTag = paraviewFieldTagStr.c_str();
           }
-          const char* phastaFieldTag = 0;
+          const char* phastaFieldTag = nullptr;
           phastaFieldTag = nested2->GetAttribute("phasta_field_tag");
           if (!phastaFieldTag)
           {
@@ -497,7 +497,7 @@ int vtkPPhastaReader::RequestInformation(
           {
             dataDependency = 0;
           }
-          const char* dataType = 0;
+          const char* dataType = nullptr;
           dataType = nested2->GetAttribute("data_type");
           if (!dataType) // "double" as default
           {

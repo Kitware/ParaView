@@ -94,17 +94,17 @@ void pqScalarBarVisibilityReaction::setRepresentation(pqDataRepresentation* repr
   {
     this->CachedRepresentation->disconnect(this->Timer);
     this->Timer->disconnect(this->CachedRepresentation);
-    this->CachedRepresentation = 0;
+    this->CachedRepresentation = nullptr;
   }
   if (this->CachedView)
   {
     this->CachedView->disconnect(this->Timer);
     this->Timer->disconnect(this->CachedView);
-    this->CachedView = 0;
+    this->CachedView = nullptr;
   }
 
-  vtkSMProxy* reprProxy = repr ? repr->getProxy() : NULL;
-  pqView* view = repr ? repr->getView() : NULL;
+  vtkSMProxy* reprProxy = repr ? repr->getProxy() : nullptr;
+  pqView* view = repr ? repr->getView() : nullptr;
 
   bool can_show_sb = repr && vtkSMPVRepresentationProxy::GetUsingScalarColoring(reprProxy);
   bool is_shown = false;
@@ -140,14 +140,14 @@ void pqScalarBarVisibilityReaction::setRepresentation(pqDataRepresentation* repr
 vtkSMProxy* pqScalarBarVisibilityReaction::scalarBarProxy() const
 {
   pqDataRepresentation* repr = this->CachedRepresentation;
-  vtkSMProxy* reprProxy = repr ? repr->getProxy() : NULL;
-  pqView* view = repr ? repr->getView() : NULL;
+  vtkSMProxy* reprProxy = repr ? repr->getProxy() : nullptr;
+  pqView* view = repr ? repr->getView() : nullptr;
   if (vtkSMPVRepresentationProxy::GetUsingScalarColoring(reprProxy))
   {
     return vtkSMTransferFunctionProxy::FindScalarBarRepresentation(
       repr->getLookupTableProxy(), view->getProxy());
   }
-  return NULL;
+  return nullptr;
 }
 
 //-----------------------------------------------------------------------------

@@ -23,14 +23,10 @@ VTK_SM_RANGE_DOMAIN_TEMPLATE_INSTANTIATE(double);
 
 vtkStandardNewMacro(vtkSMDoubleRangeDomain);
 //---------------------------------------------------------------------------
-vtkSMDoubleRangeDomain::vtkSMDoubleRangeDomain()
-{
-}
+vtkSMDoubleRangeDomain::vtkSMDoubleRangeDomain() = default;
 
 //---------------------------------------------------------------------------
-vtkSMDoubleRangeDomain::~vtkSMDoubleRangeDomain()
-{
-}
+vtkSMDoubleRangeDomain::~vtkSMDoubleRangeDomain() = default;
 
 //---------------------------------------------------------------------------
 void vtkSMDoubleRangeDomain::PrintSelf(ostream& os, vtkIndent indent)

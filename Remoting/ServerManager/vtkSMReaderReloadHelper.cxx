@@ -34,21 +34,21 @@ namespace
 {
 vtkPVFileInformation* vtkFindFileGroupFor(vtkPVFileInformation* info, const std::string& unixFname)
 {
-  if (info == NULL)
+  if (info == nullptr)
   {
-    return NULL;
+    return nullptr;
   }
   if (info->GetType() != vtkPVFileInformation::FILE_GROUP &&
     info->GetType() != vtkPVFileInformation::DIRECTORY)
   {
-    return NULL;
+    return nullptr;
   }
 
   for (int cc = 0, max = info->GetContents()->GetNumberOfItems(); cc < max; ++cc)
   {
     vtkPVFileInformation* item =
       vtkPVFileInformation::SafeDownCast(info->GetContents()->GetItemAsObject(cc));
-    if (item == NULL)
+    if (item == nullptr)
     {
       continue;
     }
@@ -60,7 +60,7 @@ vtkPVFileInformation* vtkFindFileGroupFor(vtkPVFileInformation* info, const std:
       }
     }
     else if (item->GetType() == vtkPVFileInformation::SINGLE_FILE &&
-      info->GetType() == vtkPVFileInformation::FILE_GROUP && item->GetFullPath() != NULL)
+      info->GetType() == vtkPVFileInformation::FILE_GROUP && item->GetFullPath() != nullptr)
     {
       std::string unixFullPath(item->GetFullPath());
       vtksys::SystemTools::ConvertToUnixSlashes(unixFullPath);
@@ -70,7 +70,7 @@ vtkPVFileInformation* vtkFindFileGroupFor(vtkPVFileInformation* info, const std:
       }
     }
   }
-  return NULL;
+  return nullptr;
 }
 
 // Returns empty to indicate nothing found or don't bother updating.
@@ -112,19 +112,15 @@ std::vector<std::string> vtkGetFilesInSeries(vtkSMSessionProxyManager* pxm, cons
 
 vtkStandardNewMacro(vtkSMReaderReloadHelper);
 //----------------------------------------------------------------------------
-vtkSMReaderReloadHelper::vtkSMReaderReloadHelper()
-{
-}
+vtkSMReaderReloadHelper::vtkSMReaderReloadHelper() = default;
 
 //----------------------------------------------------------------------------
-vtkSMReaderReloadHelper::~vtkSMReaderReloadHelper()
-{
-}
+vtkSMReaderReloadHelper::~vtkSMReaderReloadHelper() = default;
 
 //----------------------------------------------------------------------------
 bool vtkSMReaderReloadHelper::SupportsReload(vtkSMSourceProxy* proxy)
 {
-  if (vtkPVXMLElement* hints = proxy ? proxy->GetHints() : NULL)
+  if (vtkPVXMLElement* hints = proxy ? proxy->GetHints() : nullptr)
   {
     if (vtkPVXMLElement* rfhints = hints->FindNestedElementByName("ReloadFiles"))
     {
@@ -133,8 +129,8 @@ bool vtkSMReaderReloadHelper::SupportsReload(vtkSMSourceProxy* proxy)
         return true;
       }
     }
-    return (hints->FindNestedElementByName("ReaderFactory") != NULL &&
-      vtkSMCoreUtilities::GetFileNameProperty(proxy) != NULL);
+    return (hints->FindNestedElementByName("ReaderFactory") != nullptr &&
+      vtkSMCoreUtilities::GetFileNameProperty(proxy) != nullptr);
   }
 
   return false;
@@ -166,7 +162,7 @@ bool vtkSMReaderReloadHelper::ReloadFiles(vtkSMSourceProxy* proxy)
   SM_SCOPED_TRACE(CallFunction).arg("ReloadFiles").arg(proxy);
 
   vtkPVXMLElement* hints = proxy->GetHints();
-  vtkPVXMLElement* rfhints = hints ? hints->FindNestedElementByName("ReloadFiles") : NULL;
+  vtkPVXMLElement* rfhints = hints ? hints->FindNestedElementByName("ReloadFiles") : nullptr;
   if (rfhints && proxy->GetProperty(rfhints->GetAttributeOrEmpty("property")))
   {
     proxy->InvokeCommand(rfhints->GetAttributeOrEmpty("property"));

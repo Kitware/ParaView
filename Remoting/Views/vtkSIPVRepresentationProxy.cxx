@@ -53,7 +53,7 @@ vtkSIPVRepresentationProxy::vtkSIPVRepresentationProxy()
 vtkSIPVRepresentationProxy::~vtkSIPVRepresentationProxy()
 {
   delete this->Internals;
-  this->Internals = 0;
+  this->Internals = nullptr;
 }
 
 //----------------------------------------------------------------------------

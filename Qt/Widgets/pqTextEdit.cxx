@@ -100,9 +100,7 @@ pqTextEdit::pqTextEdit(const QString& _contents, QWidget* _parent)
 }
 
 //-----------------------------------------------------------------------------
-pqTextEdit::~pqTextEdit()
-{
-}
+pqTextEdit::~pqTextEdit() = default;
 
 //-----------------------------------------------------------------------------
 void pqTextEdit::onTextEdited()

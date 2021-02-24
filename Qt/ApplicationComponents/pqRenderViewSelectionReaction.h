@@ -83,11 +83,11 @@ public:
   };
 
   /**
-  * If \c view is NULL, this reaction will track the active-view maintained by
+  * If \c view is nullptr, this reaction will track the active-view maintained by
   * pqActiveObjects.
   */
   pqRenderViewSelectionReaction(QAction* parentAction, pqRenderView* view, SelectionMode mode,
-    QActionGroup* modifierGroup = NULL);
+    QActionGroup* modifierGroup = nullptr);
   ~pqRenderViewSelectionReaction() override;
 
 Q_SIGNALS:
@@ -111,7 +111,7 @@ private Q_SLOTS:
   void updateEnableState() override;
 
   /**
-  * Called when this object was created with NULL as the view and the active
+  * Called when this object was created with nullptr as the view and the active
   * view changes.
   */
   void setView(pqView* view);

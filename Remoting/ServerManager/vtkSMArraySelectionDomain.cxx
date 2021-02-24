@@ -25,14 +25,10 @@ vtkStandardNewMacro(vtkSMArraySelectionDomain);
 bool vtkSMArraySelectionDomain::LoadAllVariables = false;
 
 //---------------------------------------------------------------------------
-vtkSMArraySelectionDomain::vtkSMArraySelectionDomain()
-{
-}
+vtkSMArraySelectionDomain::vtkSMArraySelectionDomain() = default;
 
 //---------------------------------------------------------------------------
-vtkSMArraySelectionDomain::~vtkSMArraySelectionDomain()
-{
-}
+vtkSMArraySelectionDomain::~vtkSMArraySelectionDomain() = default;
 
 //---------------------------------------------------------------------------
 int vtkSMArraySelectionDomain::SetDefaultValues(vtkSMProperty* prop, bool use_unchecked_values)
@@ -56,7 +52,7 @@ int vtkSMArraySelectionDomain::SetDefaultValues(vtkSMProperty* prop, bool use_un
       {
         vtkPVXMLElement* omitFromLoadAllVariablesHint =
           (prop->GetHints() ? prop->GetHints()->FindNestedElementByName("OmitFromLoadAllVariables")
-                            : NULL);
+                            : nullptr);
         if (!omitFromLoadAllVariablesHint)
         {
           helper.SetStatus(this->GetString(i), 1);

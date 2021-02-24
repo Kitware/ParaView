@@ -17,14 +17,10 @@
 #include "vtkObjectFactory.h"
 
 //-----------------------------------------------------------------------------
-vtkCameraManipulatorGUIHelper::vtkCameraManipulatorGUIHelper()
-{
-}
+vtkCameraManipulatorGUIHelper::vtkCameraManipulatorGUIHelper() = default;
 
 //-----------------------------------------------------------------------------
-vtkCameraManipulatorGUIHelper::~vtkCameraManipulatorGUIHelper()
-{
-}
+vtkCameraManipulatorGUIHelper::~vtkCameraManipulatorGUIHelper() = default;
 
 //-----------------------------------------------------------------------------
 void vtkCameraManipulatorGUIHelper::PrintSelf(ostream& os, vtkIndent indent)

@@ -120,17 +120,17 @@ public:
   * Prefer using configuration->URI() if a configuration is available
   * and not default.
   */
-  const QString toURI() const;
+  QString toURI() const;
 
   /**
   * Returns a compact string representation of the resource including extra
   * data
   */
-  const QString serializeString() const;
+  QString serializeString() const;
 
   /** Returns the resource scheme -
   builtin, cs, csrc, cdsrs, cdsrsrc, or session */
-  const QString scheme() const;
+  QString scheme() const;
 
   /**
   * Sets the resource scheme
@@ -144,7 +144,7 @@ public:
 
   /** Returns the resource host, or empty string for builtin, session,
   cdsrs, and cdsrsrc schemes */
-  const QString host() const;
+  QString host() const;
   /**
   * Sets the resource host
   */
@@ -154,42 +154,42 @@ public:
   int port(int default_port) const;
   void setPort(int);
 
-  const QString dataServerHost() const;
+  QString dataServerHost() const;
   void setDataServerHost(const QString&);
 
   int dataServerPort() const;
   int dataServerPort(int default_port) const;
   void setDataServerPort(int);
 
-  const QString renderServerHost() const;
+  QString renderServerHost() const;
   void setRenderServerHost(const QString&);
 
   int renderServerPort() const;
   int renderServerPort(int default_port) const;
   void setRenderServerPort(int);
 
-  const QString path() const;
+  QString path() const;
   void setPath(const QString&);
 
-  const pqServerResource sessionServer() const;
+  pqServerResource sessionServer() const;
   void setSessionServer(const pqServerResource&);
 
   // add extra data to this resource
   void addData(const QString& key, const QString& value);
   // get extra data from this resource
-  const QString data(const QString& key) const;
-  const QString data(const QString& key, const QString& default_value) const;
+  QString data(const QString& key) const;
+  QString data(const QString& key, const QString& default_value) const;
   bool hasData(const QString& key) const;
 
   /** Returns a copy of this resource containing only server information -
   scheme, host, and port numbers */
-  const pqServerResource schemeHostsPorts() const;
+  pqServerResource schemeHostsPorts() const;
   /** Returns a copy of this resource containing a subset of server information -
   scheme and host (no port numbers */
-  const pqServerResource schemeHosts() const;
+  pqServerResource schemeHosts() const;
   /** Returns a copy of this resource containing only host and path information -
   scheme, port numbers, and server session are excluded */
-  const pqServerResource hostPath() const;
+  pqServerResource hostPath() const;
 
   bool operator==(const pqServerResource&) const;
   bool operator!=(const pqServerResource&) const;

@@ -213,7 +213,7 @@ pqBackgroundEditorWidget::pqBackgroundEditorWidget(
 pqBackgroundEditorWidget::~pqBackgroundEditorWidget()
 {
   delete this->Internal;
-  this->Internal = 0;
+  this->Internal = nullptr;
 }
 
 void pqBackgroundEditorWidget::currentIndexChangedBackgroundType(int type)

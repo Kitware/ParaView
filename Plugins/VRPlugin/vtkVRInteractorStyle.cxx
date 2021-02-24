@@ -47,15 +47,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <string>
 
 // ----------------------------------------------------------------------------
-vtkStandardNewMacro(vtkVRInteractorStyle)
-  vtkCxxSetObjectMacro(vtkVRInteractorStyle, ControlledProxy, vtkSMProxy)
+vtkStandardNewMacro(vtkVRInteractorStyle);
+vtkCxxSetObjectMacro(vtkVRInteractorStyle, ControlledProxy, vtkSMProxy);
 
-  // ----------------------------------------------------------------------------
-  // Constructor method
-  vtkVRInteractorStyle::vtkVRInteractorStyle()
+// ----------------------------------------------------------------------------
+// Constructor method
+vtkVRInteractorStyle::vtkVRInteractorStyle()
   : Superclass()
-  , ControlledProxy(NULL)
-  , ControlledPropertyName(NULL)
+  , ControlledProxy(nullptr)
+  , ControlledPropertyName(nullptr)
 {
 }
 
@@ -63,8 +63,8 @@ vtkStandardNewMacro(vtkVRInteractorStyle)
 // Destructor method
 vtkVRInteractorStyle::~vtkVRInteractorStyle()
 {
-  this->SetControlledProxy(NULL);
-  this->SetControlledPropertyName(NULL);
+  this->SetControlledProxy(nullptr);
+  this->SetControlledPropertyName(nullptr);
 }
 
 // ----------------------------------------------------------------------------
@@ -124,7 +124,7 @@ bool vtkVRInteractorStyle::Configure(vtkPVXMLElement* child, vtkSMProxyLocator* 
     return false;
   }
 
-  if (child->GetAttribute("property") == NULL)
+  if (child->GetAttribute("property") == nullptr)
   {
     return false;
   }
@@ -137,8 +137,8 @@ bool vtkVRInteractorStyle::Configure(vtkPVXMLElement* child, vtkSMProxyLocator* 
     {
       if (strcmp(element->GetName(), "Analog") == 0)
       {
-        const char* role = element->GetAttributeOrDefault("role", NULL);
-        const char* name = element->GetAttributeOrDefault("name", NULL);
+        const char* role = element->GetAttributeOrDefault("role", nullptr);
+        const char* name = element->GetAttributeOrDefault("name", nullptr);
         if (role && name && *role && *name)
         {
           if (!this->SetAnalogName(role, name))
@@ -150,8 +150,8 @@ bool vtkVRInteractorStyle::Configure(vtkPVXMLElement* child, vtkSMProxyLocator* 
       }
       else if (strcmp(element->GetName(), "Button") == 0)
       {
-        const char* role = element->GetAttributeOrDefault("role", NULL);
-        const char* name = element->GetAttributeOrDefault("name", NULL);
+        const char* role = element->GetAttributeOrDefault("role", nullptr);
+        const char* name = element->GetAttributeOrDefault("name", nullptr);
         if (role && name && *role && *name)
         {
           if (!this->SetButtonName(role, name))
@@ -163,8 +163,8 @@ bool vtkVRInteractorStyle::Configure(vtkPVXMLElement* child, vtkSMProxyLocator* 
       }
       else if (strcmp(element->GetName(), "Tracker") == 0)
       {
-        const char* role = element->GetAttributeOrDefault("role", NULL);
-        const char* name = element->GetAttributeOrDefault("name", NULL);
+        const char* role = element->GetAttributeOrDefault("role", nullptr);
+        const char* name = element->GetAttributeOrDefault("name", nullptr);
         if (role && name && *role && *name)
         {
           if (!this->SetTrackerName(role, name))
@@ -207,7 +207,7 @@ bool vtkVRInteractorStyle::Configure(vtkPVXMLElement* child, vtkSMProxyLocator* 
   }
 
   // Locate the proxy -- prefer ID lookup.
-  this->ControlledProxy = NULL;
+  this->ControlledProxy = nullptr;
   if (hasProxyId)
   {
     this->ControlledProxy = locator->LocateProxy(id);
@@ -227,7 +227,7 @@ bool vtkVRInteractorStyle::Configure(vtkPVXMLElement* child, vtkSMProxyLocator* 
   this->SetControlledPropertyName(child->GetAttribute("property"));
 
   // Verify settings
-  if (this->ControlledProxy == NULL || this->ControlledPropertyName == NULL ||
+  if (this->ControlledProxy == nullptr || this->ControlledPropertyName == nullptr ||
     this->ControlledPropertyName[0] == '\0')
   {
     vtkWarningMacro(<< "Invalid Controlled Proxy or PropertyName. "
@@ -258,7 +258,7 @@ vtkPVXMLElement* vtkVRInteractorStyle::SaveConfiguration() const
 
   child->AddAttribute(
     "proxy", this->ControlledProxy ? this->ControlledProxy->GetGlobalIDAsString() : "0");
-  if (this->ControlledPropertyName != NULL && this->ControlledPropertyName[0] != '\0')
+  if (this->ControlledPropertyName != nullptr && this->ControlledPropertyName[0] != '\0')
   {
     child->AddAttribute("property", this->ControlledPropertyName);
   }

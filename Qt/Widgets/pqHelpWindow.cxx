@@ -49,8 +49,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class pqBrowser
 {
 public:
-  pqBrowser() {}
-  virtual ~pqBrowser() {}
+  pqBrowser() = default;
+  virtual ~pqBrowser() = default;
   virtual QWidget* widget() const = 0;
   virtual void setUrl(const QUrl& url) = 0;
 
@@ -91,7 +91,7 @@ pqHelpWindow::pqHelpWindow(QHelpEngine* engine, QWidget* parentObject, Qt::Windo
   , HelpEngine(engine)
   , Browser(new PQBROWSER_TYPE(this->HelpEngine, this))
 {
-  assert(engine != NULL);
+  assert(engine != nullptr);
 
   Ui::pqHelpWindow ui;
   ui.setupUi(this);
@@ -123,9 +123,7 @@ pqHelpWindow::pqHelpWindow(QHelpEngine* engine, QWidget* parentObject, Qt::Windo
 }
 
 //-----------------------------------------------------------------------------
-pqHelpWindow::~pqHelpWindow()
-{
-}
+pqHelpWindow::~pqHelpWindow() = default;
 
 //-----------------------------------------------------------------------------
 void pqHelpWindow::showPage(const QString& url)

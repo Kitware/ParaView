@@ -61,9 +61,7 @@ vtkAMROutlineRepresentation::vtkAMROutlineRepresentation()
 }
 
 //----------------------------------------------------------------------------
-vtkAMROutlineRepresentation::~vtkAMROutlineRepresentation()
-{
-}
+vtkAMROutlineRepresentation::~vtkAMROutlineRepresentation() = default;
 
 //----------------------------------------------------------------------------
 void vtkAMROutlineRepresentation::SetVisibility(bool val)
@@ -100,7 +98,7 @@ int vtkAMROutlineRepresentation::ProcessViewRequest(
   }
   else if (request_type == vtkPVView::REQUEST_RENDER())
   {
-    if (this->RenderedData == NULL)
+    if (this->RenderedData == nullptr)
     {
       vtkStreamingStatusMacro(<< this << ": cloning delivered data.");
       vtkAlgorithmOutput* producerPort = vtkPVRenderView::GetPieceProducer(inInfo, this);
@@ -130,7 +128,7 @@ int vtkAMROutlineRepresentation::ProcessViewRequest(
     vtkDataObject* piece = vtkPVRenderView::GetCurrentStreamedPiece(inInfo, this);
     if (piece)
     {
-      assert(this->RenderedData != NULL);
+      assert(this->RenderedData != nullptr);
       vtkStreamingStatusMacro(<< this << ": received new piece.");
 
       // merge with what we are already rendering.
@@ -227,7 +225,7 @@ int vtkAMROutlineRepresentation::RequestData(
     }
   }
 
-  this->ProcessedPiece = 0;
+  this->ProcessedPiece = nullptr;
   if (inputVector[0]->GetNumberOfInformationObjects() == 1)
   {
     // Do the streaming independent "transformation" of the data here, in our
@@ -268,10 +266,10 @@ int vtkAMROutlineRepresentation::RequestData(
 
   if (!this->GetInStreamingUpdate())
   {
-    this->RenderedData = 0;
+    this->RenderedData = nullptr;
 
     // provide the mapper with an empty input. This is needed only because
-    // mappers die when input is NULL, currently.
+    // mappers die when input is nullptr, currently.
     vtkNew<vtkMultiBlockDataSet> tmp;
     this->Mapper->SetInputDataObject(tmp.GetPointer());
   }

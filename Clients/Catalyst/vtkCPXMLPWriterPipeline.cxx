@@ -128,9 +128,7 @@ vtkCPXMLPWriterPipeline::vtkCPXMLPWriterPipeline()
 }
 
 //----------------------------------------------------------------------------
-vtkCPXMLPWriterPipeline::~vtkCPXMLPWriterPipeline()
-{
-}
+vtkCPXMLPWriterPipeline::~vtkCPXMLPWriterPipeline() = default;
 
 //----------------------------------------------------------------------------
 int vtkCPXMLPWriterPipeline::RequestDataDescription(vtkCPDataDescription* dataDescription)

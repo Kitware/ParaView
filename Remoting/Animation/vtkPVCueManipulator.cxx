@@ -17,14 +17,10 @@
 #include "vtkObjectFactory.h"
 
 //----------------------------------------------------------------------------
-vtkPVCueManipulator::vtkPVCueManipulator()
-{
-}
+vtkPVCueManipulator::vtkPVCueManipulator() = default;
 
 //----------------------------------------------------------------------------
-vtkPVCueManipulator::~vtkPVCueManipulator()
-{
-}
+vtkPVCueManipulator::~vtkPVCueManipulator() = default;
 
 //----------------------------------------------------------------------------
 void vtkPVCueManipulator::PrintSelf(ostream& os, vtkIndent indent)

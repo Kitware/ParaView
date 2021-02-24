@@ -106,7 +106,7 @@ int vtkMooseXfemClip::RequestData(vtkInformation* vtkNotUsed(request),
   vtkCellData* outCD = output->GetCellData();
   vtkPoints* newPoints;
   vtkFloatArray* cellScalars;
-  vtkImplicitFunction* ClipFunction = NULL;
+  vtkImplicitFunction* ClipFunction = nullptr;
   vtkPlane* ClipPlane = nullptr;
 
   vtkDataArray* XFEMCutOriginArray = input->GetCellData()->GetArray("xfem_cut_origin_");

@@ -194,7 +194,7 @@ void pqShaderReplacementsSelectorPropertyWidget::onLoad()
   dynamic_cast<QToolButton*>(this->sender())->setChecked(false);
   // Popup load texture dialog.
   QString filters = "Shader replacements files (*.json);;All files (*)";
-  pqFileDialog dialog(0, this, tr("Open ShaderReplacements:"), QString(), filters);
+  pqFileDialog dialog(nullptr, this, tr("Open ShaderReplacements:"), QString(), filters);
   dialog.setObjectName("LoadShaderReplacementsDialog");
   dialog.setFileMode(pqFileDialog::ExistingFile);
   if (dialog.exec())

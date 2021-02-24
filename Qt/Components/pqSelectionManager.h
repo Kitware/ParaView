@@ -70,7 +70,7 @@ class PQCOMPONENTS_EXPORT pqSelectionManager : public QObject
   Q_OBJECT
 
 public:
-  pqSelectionManager(QObject* parent = NULL);
+  pqSelectionManager(QObject* parent = nullptr);
   ~pqSelectionManager() override;
 
   /**
@@ -98,17 +98,17 @@ public:
 Q_SIGNALS:
   /**
   * Fired when the selection changes. Argument is the pqOutputPort (if any)
-  * that was selected. If selection was cleared then the argument is NULL.
+  * that was selected. If selection was cleared then the argument is nullptr.
   */
   void selectionChanged(pqOutputPort*);
 
 public Q_SLOTS:
   /**
   * Clear selection on a pqOutputPort.
-  * Calling the method without arguments or with null
+  * Calling the method without arguments or with nullptr
   * will clear all selection
   */
-  void clearSelection(pqOutputPort* outputPort = NULL);
+  void clearSelection(pqOutputPort* outputPort = nullptr);
 
   /**
   * Used to keep track of active render module

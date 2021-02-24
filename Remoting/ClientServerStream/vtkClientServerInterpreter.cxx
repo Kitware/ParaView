@@ -84,8 +84,8 @@ vtkClientServerInterpreter::vtkClientServerInterpreter()
   this->NextAvailableId = 0;
   this->Internal = new vtkClientServerInterpreterInternals;
   this->LastResultMessage = new vtkClientServerStream(this);
-  this->LogStream = 0;
-  this->LogFileStream = 0;
+  this->LogStream = nullptr;
+  this->LogFileStream = nullptr;
 }
 
 //----------------------------------------------------------------------------
@@ -116,12 +116,12 @@ vtkClientServerInterpreter::~vtkClientServerInterpreter()
   }
 
   // End logging.
-  this->SetLogStream(0);
+  this->SetLogStream(nullptr);
 
   delete this->LastResultMessage;
-  this->LastResultMessage = 0;
+  this->LastResultMessage = nullptr;
   delete this->Internal;
-  this->Internal = 0;
+  this->Internal = nullptr;
 }
 
 //----------------------------------------------------------------------------
@@ -131,7 +131,7 @@ vtkObjectBase* vtkClientServerInterpreter::GetObjectFromID(vtkClientServerID id,
   if (const vtkClientServerStream* tmp = this->GetMessageFromID(id))
   {
     // Retrieve the object from the message.
-    vtkObjectBase* obj = 0;
+    vtkObjectBase* obj = nullptr;
     if (tmp->GetNumberOfArguments(0) == 1 && tmp->GetArgument(0, 0, &obj))
     {
       return obj;
@@ -143,7 +143,7 @@ vtkObjectBase* vtkClientServerInterpreter::GetObjectFromID(vtkClientServerID id,
         vtkErrorMacro("Attempt to get an object for ID "
           << id.ID << " whose message does not contain exactly one object.");
       }
-      return 0;
+      return nullptr;
     }
   }
   else
@@ -153,7 +153,7 @@ vtkObjectBase* vtkClientServerInterpreter::GetObjectFromID(vtkClientServerID id,
       vtkErrorMacro(
         "Attempt to get object for ID " << id.ID << " that is not present in the hash table.");
     }
-    return 0;
+    return nullptr;
   }
 }
 
@@ -180,7 +180,7 @@ vtkClientServerID vtkClientServerInterpreter::GetIDFromObject(vtkObjectBase* key
 void vtkClientServerInterpreter::SetLogFile(const char* name)
 {
   // Close any existing log.
-  this->SetLogStream(0);
+  this->SetLogStream(nullptr);
 
   // If a non-empty name was given, open a new log file.
   if (name && name[0])
@@ -196,7 +196,7 @@ void vtkClientServerInterpreter::SetLogFile(const char* name)
       if (this->LogFileStream)
       {
         delete this->LogFileStream;
-        this->LogFileStream = 0;
+        this->LogFileStream = nullptr;
       }
     }
   }
@@ -211,7 +211,7 @@ void vtkClientServerInterpreter::SetLogStream(ostream* ostr)
     if (this->LogStream && this->LogStream == this->LogFileStream)
     {
       delete this->LogFileStream;
-      this->LogFileStream = 0;
+      this->LogFileStream = nullptr;
     }
 
     // Set the log to use the given stream.
@@ -325,7 +325,7 @@ int vtkClientServerInterpreter::ProcessCommandNew(const vtkClientServerStream& c
   }
 
   // Get the class name and desired ID for the instance.
-  const char* cname = 0;
+  const char* cname = nullptr;
   vtkClientServerID id;
   if (css.GetNumberOfArguments(midx) == 2 && css.GetArgument(midx, 0, &cname) &&
     css.GetArgument(midx, 1, &id))
@@ -355,7 +355,7 @@ int vtkClientServerInterpreter::ProcessCommandNew(const vtkClientServerStream& c
       const vtkClientServerInterpreterInternals::NewInstanceFunction* n =
         this->Internal->NewInstanceFunctions[cname];
       vtkClientServerNewInstanceFunction function = n->Function;
-      void* ctx = n->Context ? n->Context->Context : 0;
+      void* ctx = n->Context ? n->Context->Context : nullptr;
       this->NewInstance(function(ctx), id);
       created = 1;
     }
@@ -453,7 +453,7 @@ int vtkClientServerInterpreter::ProcessCommandInvoke(const vtkClientServerStream
 int vtkClientServerInterpreter::ProcessCommandDelete(const vtkClientServerStream& msg, int midx)
 {
   // This command ignores any previous result.
-  if (this->LastResultMessage == NULL)
+  if (this->LastResultMessage == nullptr)
   {
     return 0;
   }
@@ -472,7 +472,7 @@ int vtkClientServerInterpreter::ProcessCommandDelete(const vtkClientServerStream
     }
 
     // Find the ID in the map.
-    vtkClientServerStream* item = 0;
+    vtkClientServerStream* item = nullptr;
     vtkClientServerInterpreterInternals::IDToMessageMapType::iterator itemi;
     itemi = this->Internal->IDToMessageMap.find(id.ID);
     if (itemi != this->Internal->IDToMessageMap.end())
@@ -682,7 +682,7 @@ const vtkClientServerStream* vtkClientServerInterpreter::GetMessageFromID(vtkCli
   }
   else
   {
-    return 0;
+    return nullptr;
   }
 }
 
@@ -728,8 +728,9 @@ public:
   vtkClientServerInterpreter* Interpreter;
 
 protected:
-  vtkClientServerInterpreterCommand() {}
-  ~vtkClientServerInterpreterCommand() override {}
+  vtkClientServerInterpreterCommand() = default;
+  ~vtkClientServerInterpreterCommand() override = default;
+
 private:
   vtkClientServerInterpreterCommand(const vtkClientServerInterpreterCommand&);
   void operator=(const vtkClientServerInterpreterCommand&);
@@ -769,7 +770,7 @@ void vtkClientServerInterpreter::AddCommandFunction(const char* cname,
     return;
   }
 
-  vtkClientServerInterpreterInternals::ContextInformation* context = NULL;
+  vtkClientServerInterpreterInternals::ContextInformation* context = nullptr;
   if (ctx || freeFunction)
   {
     context = new vtkClientServerInterpreterInternals::ContextInformation(ctx, freeFunction);
@@ -805,7 +806,7 @@ int vtkClientServerInterpreter::CallCommandFunction(const char* cname, vtkObject
   const vtkClientServerInterpreterInternals::CommandFunction* n = f->second;
 
   vtkClientServerCommandFunction function = n->Function;
-  void* ctx = n->Context ? n->Context->Context : 0;
+  void* ctx = n->Context ? n->Context->Context : nullptr;
   return function(this, ptr, method, msg, result, ctx);
 }
 
@@ -825,7 +826,7 @@ void vtkClientServerInterpreter::AddNewInstanceFunction(const char* name,
     return;
   }
 
-  vtkClientServerInterpreterInternals::ContextInformation* context = NULL;
+  vtkClientServerInterpreterInternals::ContextInformation* context = nullptr;
   if (ctx || freeFunction)
   {
     context = new vtkClientServerInterpreterInternals::ContextInformation(ctx, freeFunction);
@@ -838,7 +839,7 @@ void vtkClientServerInterpreter::AddNewInstanceFunction(const char* name,
 //----------------------------------------------------------------------------
 int vtkClientServerInterpreter::Load(const char* moduleName)
 {
-  return this->Load(moduleName, 0);
+  return this->Load(moduleName, nullptr);
 }
 
 //----------------------------------------------------------------------------
@@ -1002,14 +1003,14 @@ vtkObjectBase* vtkClientServerInterpreter::NewInstance(const char* classname)
 {
   if (!this->Internal->NewInstanceFunctions.count(classname))
   {
-    return NULL;
+    return nullptr;
   }
 
   const vtkClientServerInterpreterInternals::NewInstanceFunction* n =
     this->Internal->NewInstanceFunctions[classname];
 
   vtkClientServerNewInstanceFunction function = n->Function;
-  void* ctx = n->Context ? n->Context->Context : 0;
+  void* ctx = n->Context ? n->Context->Context : nullptr;
 
   return function(ctx);
 }

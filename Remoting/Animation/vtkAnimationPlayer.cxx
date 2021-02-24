@@ -21,7 +21,7 @@
 //----------------------------------------------------------------------------
 vtkAnimationPlayer::vtkAnimationPlayer()
 {
-  this->AnimationScene = 0;
+  this->AnimationScene = nullptr;
   this->InPlay = false;
   this->CurrentTime = 0;
   this->StopPlay = false;
@@ -31,7 +31,7 @@ vtkAnimationPlayer::vtkAnimationPlayer()
 //----------------------------------------------------------------------------
 vtkAnimationPlayer::~vtkAnimationPlayer()
 {
-  this->SetAnimationScene(0);
+  this->SetAnimationScene(nullptr);
 }
 
 //----------------------------------------------------------------------------

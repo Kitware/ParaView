@@ -226,8 +226,8 @@ vtkUnstructuredPOPReader::vtkUnstructuredPOPReader()
 {
   this->SetNumberOfInputPorts(0);
   this->SetNumberOfOutputPorts(1);
-  this->FileName = NULL;
-  this->OpenedFileName = NULL;
+  this->FileName = nullptr;
+  this->OpenedFileName = nullptr;
   this->Stride[0] = this->Stride[1] = this->Stride[2] = 1;
   this->NCDFFD = 0;
   this->SelectionObserver = vtkCallbackCommand::New();
@@ -255,21 +255,21 @@ vtkUnstructuredPOPReader::vtkUnstructuredPOPReader()
 // delete filename and netcdf file descriptor
 vtkUnstructuredPOPReader::~vtkUnstructuredPOPReader()
 {
-  this->SetFileName(0);
+  this->SetFileName(nullptr);
   if (this->OpenedFileName)
   {
     nc_close(this->NCDFFD);
-    this->SetOpenedFileName(NULL);
+    this->SetOpenedFileName(nullptr);
   }
   if (this->SelectionObserver)
   {
     this->SelectionObserver->Delete();
-    this->SelectionObserver = NULL;
+    this->SelectionObserver = nullptr;
   }
   if (this->Internals)
   {
     delete this->Internals;
-    this->Internals = NULL;
+    this->Internals = nullptr;
   }
 }
 
@@ -292,18 +292,18 @@ void vtkUnstructuredPOPReader::PrintSelf(ostream& os, vtkIndent indent)
 //----------------------------------------------------------------------------
 bool vtkUnstructuredPOPReader::ReadMetaData(int wholeExtent[6])
 {
-  if (this->FileName == NULL)
+  if (this->FileName == nullptr)
   {
     vtkErrorMacro("FileName not set.");
     return false;
   }
 
-  if (this->OpenedFileName == NULL || strcmp(this->OpenedFileName, this->FileName) != 0)
+  if (this->OpenedFileName == nullptr || strcmp(this->OpenedFileName, this->FileName) != 0)
   {
     if (this->OpenedFileName)
     {
       nc_close(this->NCDFFD);
-      this->SetOpenedFileName(NULL);
+      this->SetOpenedFileName(nullptr);
     }
     int retval = nc_open(this->FileName, NC_NOWRITE, &this->NCDFFD); // read file
     if (retval != NC_NOERR)                                          // checks if read file error
@@ -668,7 +668,7 @@ const char* vtkUnstructuredPOPReader::GetVariableArrayName(int index)
 {
   if (index < 0 || index >= this->GetNumberOfVariableArrays())
   {
-    return NULL;
+    return nullptr;
   }
   return this->Internals->VariableArraySelection->GetArrayName(index);
 }

@@ -26,14 +26,10 @@
 
 vtkStandardNewMacro(vtkSMChartRepresentationProxy);
 //----------------------------------------------------------------------------
-vtkSMChartRepresentationProxy::vtkSMChartRepresentationProxy()
-{
-}
+vtkSMChartRepresentationProxy::vtkSMChartRepresentationProxy() = default;
 
 //----------------------------------------------------------------------------
-vtkSMChartRepresentationProxy::~vtkSMChartRepresentationProxy()
-{
-}
+vtkSMChartRepresentationProxy::~vtkSMChartRepresentationProxy() = default;
 
 //----------------------------------------------------------------------------
 vtkChartRepresentation* vtkSMChartRepresentationProxy::GetRepresentation()
@@ -60,8 +56,8 @@ int vtkSMChartRepresentationProxy::ReadXMLAttributes(
   vtkSMProxy* optionsProxy = this->GetSubProxy("PlotOptions");
   if (optionsProxy)
   {
-    const char* names[] = { "Input", "CompositeDataSetIndex", "AttributeType", NULL };
-    for (int cc = 0; names[cc] != NULL; cc++)
+    const char* names[] = { "Input", "CompositeDataSetIndex", "AttributeType", nullptr };
+    for (int cc = 0; names[cc] != nullptr; cc++)
     {
       vtkSMProperty* src = this->GetProperty(names[cc]);
       vtkSMProperty* dest = optionsProxy->GetProperty(names[cc]);

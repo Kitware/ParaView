@@ -52,9 +52,7 @@ vtkSurfaceLICRepresentation::vtkSurfaceLICRepresentation()
 }
 
 //----------------------------------------------------------------------------
-vtkSurfaceLICRepresentation::~vtkSurfaceLICRepresentation()
-{
-}
+vtkSurfaceLICRepresentation::~vtkSurfaceLICRepresentation() = default;
 
 //----------------------------------------------------------------------------
 void vtkSurfaceLICRepresentation::SetUseLICForLOD(bool val)

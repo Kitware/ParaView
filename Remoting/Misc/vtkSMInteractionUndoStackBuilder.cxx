@@ -42,7 +42,7 @@ public:
   }
 
 protected:
-  vtkSMInteractionUndoStackBuilderObserver() { this->Target = 0; }
+  vtkSMInteractionUndoStackBuilderObserver() { this->Target = nullptr; }
   vtkSMInteractionUndoStackBuilder* Target;
 };
 
@@ -54,8 +54,8 @@ vtkCxxSetObjectMacro(vtkSMInteractionUndoStackBuilder, UndoStack, vtkSMUndoStack
 //-----------------------------------------------------------------------------
 vtkSMInteractionUndoStackBuilder::vtkSMInteractionUndoStackBuilder()
 {
-  this->RenderView = 0;
-  this->UndoStack = 0;
+  this->RenderView = nullptr;
+  this->UndoStack = nullptr;
 
   vtkSMInteractionUndoStackBuilderObserver* observer =
     vtkSMInteractionUndoStackBuilderObserver::New();
@@ -69,11 +69,11 @@ vtkSMInteractionUndoStackBuilder::vtkSMInteractionUndoStackBuilder()
 //-----------------------------------------------------------------------------
 vtkSMInteractionUndoStackBuilder::~vtkSMInteractionUndoStackBuilder()
 {
-  this->Observer->SetTarget(0);
+  this->Observer->SetTarget(nullptr);
   this->Observer->Delete();
 
-  this->SetRenderView(0);
-  this->SetUndoStack(0);
+  this->SetRenderView(nullptr);
+  this->SetUndoStack(nullptr);
   this->UndoSet->Delete();
 }
 

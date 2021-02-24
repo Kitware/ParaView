@@ -92,9 +92,9 @@ vtkCxxSetObjectMacro(vtkMPIMoveData, MPIMToNSocketConnection, vtkMPIMToNSocketCo
 //-----------------------------------------------------------------------------
 vtkMPIMoveData::vtkMPIMoveData()
 {
-  this->Controller = 0;
-  this->ClientDataServerSocketController = 0;
-  this->MPIMToNSocketConnection = 0;
+  this->Controller = nullptr;
+  this->ClientDataServerSocketController = nullptr;
+  this->MPIMToNSocketConnection = nullptr;
 
   this->SetController(vtkMultiProcessController::GetGlobalController());
 
@@ -104,12 +104,12 @@ vtkMPIMoveData::vtkMPIMoveData()
 
   // This is set on the data server and render server when we are running
   // with a render server.
-  this->MPIMToNSocketConnection = 0;
+  this->MPIMToNSocketConnection = nullptr;
 
   this->NumberOfBuffers = 0;
-  this->BufferLengths = 0;
-  this->BufferOffsets = 0;
-  this->Buffers = 0;
+  this->BufferLengths = nullptr;
+  this->BufferOffsets = nullptr;
+  this->Buffers = nullptr;
   this->BufferTotalLength = 9;
 
   this->OutputDataType = VTK_POLY_DATA;
@@ -123,9 +123,9 @@ vtkMPIMoveData::vtkMPIMoveData()
 //-----------------------------------------------------------------------------
 vtkMPIMoveData::~vtkMPIMoveData()
 {
-  this->SetController(0);
-  this->SetClientDataServerSocketController(0);
-  this->SetMPIMToNSocketConnection(0);
+  this->SetController(nullptr);
+  this->SetClientDataServerSocketController(nullptr);
+  this->SetMPIMToNSocketConnection(nullptr);
   this->ClearBuffer();
 }
 
@@ -133,7 +133,7 @@ vtkMPIMoveData::~vtkMPIMoveData()
 void vtkMPIMoveData::InitializeForCommunicationForParaView()
 {
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-  if (pm == NULL)
+  if (pm == nullptr)
   {
     vtkWarningMacro("No process module found.");
     return;
@@ -280,7 +280,7 @@ int vtkMPIMoveData::RequestData(
 {
   vtkInformation* outInfo = outputVector->GetInformationObject(0);
 
-  vtkDataObject* input = 0;
+  vtkDataObject* input = nullptr;
   vtkDataObject* output = outInfo->Get(vtkDataObject::DATA_OBJECT());
 
   if (inputVector[0]->GetNumberOfInformationObjects() > 0)
@@ -305,7 +305,7 @@ int vtkMPIMoveData::RequestData(
   // Client, Data and render server are all the same program.
   // This covers single process mode too, although this filter
   // is unnecessary in that mode and really should not be put in.
-  if (this->MPIMToNSocketConnection == 0 && this->ClientDataServerSocketController == 0)
+  if (this->MPIMToNSocketConnection == nullptr && this->ClientDataServerSocketController == nullptr)
   {
     // Clone in this mode is used for plots and picking.
     if (this->MoveMode == vtkMPIMoveData::CLONE)
@@ -343,7 +343,7 @@ int vtkMPIMoveData::RequestData(
   // PassThrough with no RenderServer. (Distributed rendering on data server).
   // Data server copy input to output.
   // Render server and client will not have an input.
-  if (this->MoveMode == vtkMPIMoveData::PASS_THROUGH && this->MPIMToNSocketConnection == 0)
+  if (this->MoveMode == vtkMPIMoveData::PASS_THROUGH && this->MPIMToNSocketConnection == nullptr)
   {
     if (input)
     {
@@ -378,7 +378,7 @@ int vtkMPIMoveData::RequestData(
   // Duplicate with no RenderServer.(Tile rendering on data server and client).
   // GatherAll on data server.
   // Data server process 0 sends data to client.
-  if (this->MoveMode == vtkMPIMoveData::CLONE && this->MPIMToNSocketConnection == 0)
+  if (this->MoveMode == vtkMPIMoveData::CLONE && this->MPIMToNSocketConnection == nullptr)
   {
     if (this->Server == vtkMPIMoveData::DATA_SERVER)
     {
@@ -441,7 +441,7 @@ int vtkMPIMoveData::RequestData(
 
   if (this->MoveMode == vtkMPIMoveData::COLLECT_AND_PASS_THROUGH)
   {
-    if (this->MPIMToNSocketConnection == 0)
+    if (this->MPIMToNSocketConnection == nullptr)
     {
       // In client-server mode without render server.
       if (this->Server == vtkMPIMoveData::DATA_SERVER)
@@ -450,7 +450,7 @@ int vtkMPIMoveData::RequestData(
         this->DataServerGatherToZero(input, tmp);
         this->DataServerSendToClient(tmp);
         tmp->Delete();
-        tmp = NULL;
+        tmp = nullptr;
         vtkVLogF(PARAVIEW_LOG_DATA_MOVEMENT_VERBOSITY(), "pass-through");
         output->ShallowCopy(input);
         return 1;
@@ -502,7 +502,7 @@ void vtkMPIMoveData::DataServerAllToN(vtkDataObject* input, vtkDataObject* outpu
   vtkMultiProcessController* controller = this->Controller;
   int m;
 
-  if (controller == 0)
+  if (controller == nullptr)
   {
     vtkErrorMacro("Missing controller.");
     return;
@@ -514,7 +514,7 @@ void vtkMPIMoveData::DataServerAllToN(vtkDataObject* input, vtkDataObject* outpu
     vtkWarningMacro("Too many render servers.");
     n = m;
   }
-  if (input == 0 || output == 0)
+  if (input == nullptr || output == nullptr)
   {
     vtkErrorMacro("All to N only works for poly data currently.");
     return;
@@ -529,7 +529,7 @@ void vtkMPIMoveData::DataServerAllToN(vtkDataObject* input, vtkDataObject* outpu
 
   // Perform the M to N operation.
   vtkVLogScopeF(PARAVIEW_LOG_DATA_MOVEMENT_VERBOSITY(), "redistribute MxN (M=%d, N=%d)", m, n);
-  vtkAllToNRedistributeCompositePolyData* AllToN = NULL;
+  vtkAllToNRedistributeCompositePolyData* AllToN = nullptr;
   AllToN = vtkAllToNRedistributeCompositePolyData::New();
   AllToN->SetController(controller);
   AllToN->SetNumberOfProcesses(n);
@@ -537,7 +537,7 @@ void vtkMPIMoveData::DataServerAllToN(vtkDataObject* input, vtkDataObject* outpu
   AllToN->Update();
   output->ShallowCopy(AllToN->GetOutputDataObject(0));
   AllToN->Delete();
-  AllToN = 0;
+  AllToN = nullptr;
 }
 
 //-----------------------------------------------------------------------------
@@ -559,7 +559,7 @@ void vtkMPIMoveData::DataServerGatherAll(vtkDataObject* input, vtkDataObject* ou
 
   int idx;
   auto com = this->Controller->GetCommunicator();
-  if (com == 0)
+  if (com == nullptr)
   {
     vtkErrorMacro("MPICommunicator neededfor this operation.");
     return;
@@ -573,7 +573,7 @@ void vtkMPIMoveData::DataServerGatherAll(vtkDataObject* input, vtkDataObject* ou
   // One data set, one buffer.
   vtkIdType inBufferLength = this->BufferTotalLength;
   char* inBuffer = this->Buffers;
-  this->Buffers = NULL;
+  this->Buffers = nullptr;
   this->ClearBuffer();
 
   // Allocate arrays used by the AllGatherV call.
@@ -632,7 +632,7 @@ void vtkMPIMoveData::DataServerGatherToZero(vtkDataObject* input, vtkDataObject*
   int idx;
   int myId = this->Controller->GetLocalProcessId();
   auto com = this->Controller->GetCommunicator();
-  if (com == 0)
+  if (com == nullptr)
   {
     vtkErrorMacro("MPICommunicator neededfor this operation.");
     return;
@@ -646,7 +646,7 @@ void vtkMPIMoveData::DataServerGatherToZero(vtkDataObject* input, vtkDataObject*
   // One data set, one buffer.
   vtkIdType inBufferLength = this->BufferTotalLength;
   char* inBuffer = this->Buffers;
-  this->Buffers = NULL;
+  this->Buffers = nullptr;
   this->ClearBuffer();
 
   if (myId == 0)
@@ -685,7 +685,7 @@ void vtkMPIMoveData::DataServerGatherToZero(vtkDataObject* input, vtkDataObject*
   this->ClearBuffer();
 
   delete[] inBuffer;
-  inBuffer = NULL;
+  inBuffer = nullptr;
 
   vtkTimerLog::MarkEndEvent("Dataserver gathering to 0");
 }
@@ -695,7 +695,7 @@ void vtkMPIMoveData::DataServerSendToRenderServer(vtkDataObject* output)
 {
   vtkSocketCommunicator* com = this->MPIMToNSocketConnection->GetSocketCommunicator();
 
-  if (com == 0)
+  if (com == nullptr)
   {
     // Some data server may not have sockets because there are more data
     // processes than render server processes.
@@ -719,7 +719,7 @@ void vtkMPIMoveData::RenderServerReceiveFromDataServer(vtkDataObject* output)
 {
   vtkSocketCommunicator* com = this->MPIMToNSocketConnection->GetSocketCommunicator();
 
-  if (com == 0)
+  if (com == nullptr)
   {
     vtkErrorMacro("All render server processes should have sockets.");
     return;
@@ -756,7 +756,7 @@ void vtkMPIMoveData::DataServerZeroSendToRenderServerZero(vtkDataObject* data)
   {
     vtkSocketCommunicator* com = this->MPIMToNSocketConnection->GetSocketCommunicator();
 
-    if (com == 0)
+    if (com == nullptr)
     {
       // Proc 0 (at least) should have a communicator.
       vtkErrorMacro("Missing socket connection.");
@@ -785,7 +785,7 @@ void vtkMPIMoveData::RenderServerZeroReceiveFromDataServerZero(vtkDataObject* da
   {
     vtkSocketCommunicator* com = this->MPIMToNSocketConnection->GetSocketCommunicator();
 
-    if (com == 0)
+    if (com == nullptr)
     {
       vtkErrorMacro("All render server processes should have sockets.");
       return;
@@ -817,7 +817,7 @@ void vtkMPIMoveData::RenderServerZeroReceiveFromDataServerZero(vtkDataObject* da
 //-----------------------------------------------------------------------------
 void vtkMPIMoveData::DataServerSendToClient(vtkDataObject* output)
 {
-  if (this->ClientDataServerSocketController == NULL)
+  if (this->ClientDataServerSocketController == nullptr)
   {
     return;
   }
@@ -842,9 +842,9 @@ void vtkMPIMoveData::DataServerSendToClient(vtkDataObject* output)
 //-----------------------------------------------------------------------------
 void vtkMPIMoveData::ClientReceiveFromDataServer(vtkDataObject* output)
 {
-  vtkCommunicator* com = 0;
+  vtkCommunicator* com = nullptr;
   com = this->ClientDataServerSocketController->GetCommunicator();
-  if (com == 0)
+  if (com == nullptr)
   {
     vtkErrorMacro("Missing socket controller on client.");
     return;
@@ -884,7 +884,7 @@ void vtkMPIMoveData::RenderServerZeroBroadcast(vtkDataObject* data)
   int myId = this->Controller->GetLocalProcessId();
 
   auto com = this->Controller->GetCommunicator();
-  if (com == 0)
+  if (com == nullptr)
   {
     vtkErrorMacro("MPICommunicator neededfor this operation.");
     return;
@@ -932,17 +932,17 @@ void vtkMPIMoveData::ClearBuffer()
   if (this->BufferLengths)
   {
     delete[] this->BufferLengths;
-    this->BufferLengths = 0;
+    this->BufferLengths = nullptr;
   }
   if (this->BufferOffsets)
   {
     delete[] this->BufferOffsets;
-    this->BufferOffsets = 0;
+    this->BufferOffsets = nullptr;
   }
   if (this->Buffers)
   {
     delete[] this->Buffers;
-    this->Buffers = 0;
+    this->Buffers = nullptr;
   }
   this->BufferTotalLength = 0;
 }
@@ -979,7 +979,7 @@ void vtkMPIMoveData::MarshalDataToBuffer(vtkDataObject* data)
   writer->WriteToOutputStringOn();
   writer->Write();
 
-  char* buffer = NULL;
+  char* buffer = nullptr;
   vtkIdType buffer_length = 0;
 
   if (vtkMPIMoveData::UseZLibCompression)
@@ -1022,13 +1022,13 @@ void vtkMPIMoveData::MarshalDataToBuffer(vtkDataObject* data)
   this->BufferTotalLength = this->BufferLengths[0];
 
   writer->Delete();
-  writer = 0;
+  writer = nullptr;
 }
 
 //-----------------------------------------------------------------------------
 void vtkMPIMoveData::ReconstructDataFromBuffer(vtkDataObject* data)
 {
-  if (this->NumberOfBuffers == 0 || this->Buffers == 0)
+  if (this->NumberOfBuffers == 0 || this->Buffers == nullptr)
   {
     data->Initialize();
     return;
@@ -1042,7 +1042,7 @@ void vtkMPIMoveData::ReconstructDataFromBuffer(vtkDataObject* data)
     char* bufferArray = this->Buffers + this->BufferOffsets[idx];
     vtkIdType bufferLength = this->BufferLengths[idx];
 
-    char* realBuffer = 0;
+    char* realBuffer = nullptr;
     if (bufferLength > 4 && strncmp(bufferArray, "zlib", 4) == 0)
     {
       // sender used zlib compression. Decompress it.
@@ -1096,7 +1096,7 @@ void vtkMPIMoveData::ReconstructDataFromBuffer(vtkDataObject* data)
       clone->SetExtent(extent);
       // reconstructing data distributted on MPI node, so global ids are valid
       // global ids attributes are removed when appending data so we set
-      // the active global ids attribute to null which keeps the global ids array.
+      // the active global ids attribute to nullptr which keeps the global ids array.
       unsetGlobalIdsAttribute(clone);
       pieces.push_back(clone);
       clone->Delete();
@@ -1109,11 +1109,11 @@ void vtkMPIMoveData::ReconstructDataFromBuffer(vtkDataObject* data)
       pieces.push_back(output);
     }
     mystring->Delete();
-    mystring = 0;
+    mystring = nullptr;
     reader->Delete();
-    reader = NULL;
+    reader = nullptr;
     delete[] realBuffer;
-    realBuffer = 0;
+    realBuffer = nullptr;
   }
 
   vtkMPIMoveDataMerge(pieces, data);

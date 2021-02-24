@@ -15,14 +15,10 @@
 #include "vtkCPTensorFieldFunction.h"
 
 //----------------------------------------------------------------------------
-vtkCPTensorFieldFunction::vtkCPTensorFieldFunction()
-{
-}
+vtkCPTensorFieldFunction::vtkCPTensorFieldFunction() = default;
 
 //----------------------------------------------------------------------------
-vtkCPTensorFieldFunction::~vtkCPTensorFieldFunction()
-{
-}
+vtkCPTensorFieldFunction::~vtkCPTensorFieldFunction() = default;
 
 //----------------------------------------------------------------------------
 void vtkCPTensorFieldFunction::PrintSelf(ostream& os, vtkIndent indent)

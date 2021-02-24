@@ -55,7 +55,7 @@ public:
   // \c server:- server on which the proxy is created.
   // \c parent:- QObject parent.
   pqRepresentation(const QString& group, const QString& name, vtkSMProxy* repr, pqServer* server,
-    QObject* parent = NULL);
+    QObject* parent = nullptr);
   ~pqRepresentation() override;
 
   /**

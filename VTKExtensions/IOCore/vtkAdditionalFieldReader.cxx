@@ -34,19 +34,19 @@ vtkStandardNewMacro(vtkAdditionalFieldReader);
 //----------------------------------------------------------------------------
 vtkAdditionalFieldReader::vtkAdditionalFieldReader()
 {
-  this->FileName = NULL;
+  this->FileName = nullptr;
 }
 
 //----------------------------------------------------------------------------
 vtkAdditionalFieldReader::~vtkAdditionalFieldReader()
 {
-  this->SetFileName(NULL);
+  this->SetFileName(nullptr);
 }
 
 //----------------------------------------------------------------------------
 void vtkAdditionalFieldReader::PrintSelf(ostream& os, vtkIndent indent)
 {
-  os << indent << "FileName: " << (this->FileName ? this->FileName : "NULL") << endl;
+  os << indent << "FileName: " << (this->FileName ? this->FileName : "nullptr") << endl;
 }
 
 //----------------------------------------------------------------------------
@@ -59,7 +59,7 @@ int vtkAdditionalFieldReader::RequestData(vtkInformation* vtkNotUsed(request),
   vtkInformation* outInfo = outputVector->GetInformationObject(0);
   vtkDataObject* dout = outInfo->Get(vtkDataObject::DATA_OBJECT());
   vtkCompositeDataSet* cdout = vtkCompositeDataSet::SafeDownCast(dout);
-  vtkCompositeDataIterator* cditer = NULL;
+  vtkCompositeDataIterator* cditer = nullptr;
   dout->ShallowCopy(din);
   if (cdout)
   {
@@ -77,7 +77,7 @@ int vtkAdditionalFieldReader::RequestData(vtkInformation* vtkNotUsed(request),
       return VTK_ERROR;
     }
     vtkFieldData* arrs = d->GetFieldData();
-    vtkFieldData* ofd = NULL;
+    vtkFieldData* ofd = nullptr;
     for (int i = 0; i < arrs->GetNumberOfArrays(); i++)
     {
       if (cditer)

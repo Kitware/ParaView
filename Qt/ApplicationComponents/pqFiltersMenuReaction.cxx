@@ -117,12 +117,12 @@ void pqFiltersMenuReaction::updateEnableState(bool updateOnlyToolbars)
 
   pqActiveObjects* activeObjects = &pqActiveObjects::instance();
   pqServer* server = activeObjects->activeServer();
-  bool enabled = (server != NULL);
+  bool enabled = (server != nullptr);
   enabled = enabled ? server->isMaster() : enabled;
 
   // Make sure we already have a selection model
   vtkSMProxySelectionModel* selModel = pqActiveObjects::instance().activeSourcesSelectionModel();
-  enabled = enabled && (selModel != NULL);
+  enabled = enabled && (selModel != nullptr);
 
   // selected ports.
   QList<pqOutputPort*> outputPorts;
@@ -247,7 +247,7 @@ void pqFiltersMenuReaction::updateEnableState(bool updateOnlyToolbars)
         input->AddUncheckedInputConnection(port->getSource()->getProxy(), port->getPortNumber());
       }
 
-      vtkSMDomain* domain = NULL;
+      vtkSMDomain* domain = nullptr;
       if (input->IsInDomains(&domain))
       {
         action->setEnabled(true);

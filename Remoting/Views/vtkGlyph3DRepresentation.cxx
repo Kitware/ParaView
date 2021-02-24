@@ -73,7 +73,7 @@ public:
     return 1;
   }
 };
-vtkStandardNewMacro(vtkGlyphRepresentationMultiBlockMaker)
+vtkStandardNewMacro(vtkGlyphRepresentationMultiBlockMaker);
 
 } // end anon namespace
 
@@ -275,7 +275,7 @@ int vtkGlyph3DRepresentation::ProcessViewRequest(
     }
     else
     {
-      this->GlyphMapper->SetInputDataObject(1, NULL);
+      this->GlyphMapper->SetInputDataObject(1, nullptr);
     }
 
     producerGlyphPortLOD->GetProducer()->Update();
@@ -288,7 +288,7 @@ int vtkGlyph3DRepresentation::ProcessViewRequest(
     }
     else
     {
-      this->LODGlyphMapper->SetInputDataObject(1, NULL);
+      this->LODGlyphMapper->SetInputDataObject(1, nullptr);
     }
 
     bool lod = this->SuppressLOD ? false : (inInfo->Has(vtkPVRenderView::USE_LOD()) == 1);
@@ -339,7 +339,7 @@ void vtkGlyph3DRepresentation::UpdateColoringParameters()
     this->Mapper->GetScalarMode() != VTK_SCALAR_MODE_USE_POINT_FIELD_DATA)
   {
     // we are not coloring the glyphs with scalars.
-    const char* null = NULL;
+    const char* null = nullptr;
     this->GlyphMapper->SetScalarVisibility(0);
     this->LODGlyphMapper->SetScalarVisibility(0);
     this->GlyphMapper->SelectColorArray(null);

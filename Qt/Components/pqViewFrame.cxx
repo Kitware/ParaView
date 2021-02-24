@@ -123,9 +123,7 @@ pqViewFrame::pqViewFrame(QWidget* parentObject)
 }
 
 //-----------------------------------------------------------------------------
-pqViewFrame::~pqViewFrame()
-{
-}
+pqViewFrame::~pqViewFrame() = default;
 
 //-----------------------------------------------------------------------------
 void pqViewFrame::setBorderColor(const QColor& clr)
@@ -401,7 +399,7 @@ void pqViewFrame::drop(QDropEvent* evt)
 //-----------------------------------------------------------------------------
 void pqViewFrame::finishedDrag(pqViewFrame* source)
 {
-  assert(source != NULL);
+  assert(source != nullptr);
   Q_EMIT this->swapPositions(source->uniqueID().toString());
 }
 

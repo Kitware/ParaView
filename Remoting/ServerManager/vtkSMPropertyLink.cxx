@@ -209,7 +209,7 @@ const char* vtkSMPropertyLink::GetLinkedPropertyName(int index)
   }
   if (iter == this->Internals->LinkedProperties.end())
   {
-    return NULL;
+    return nullptr;
   }
   return iter->PropertyName.c_str();
 }
@@ -225,7 +225,7 @@ vtkSMProxy* vtkSMPropertyLink::GetLinkedProxy(int index)
   }
   if (iter == this->Internals->LinkedProperties.end())
   {
-    return NULL;
+    return nullptr;
   }
   return iter->Proxy;
 }
@@ -301,7 +301,7 @@ void vtkSMPropertyLink::PropertyModified(vtkSMProxy* fromProxy, const char* pnam
   {
     if (iter->UpdateDirection & OUTPUT)
     {
-      vtkSMProperty* toProp = 0;
+      vtkSMProperty* toProp = nullptr;
       if (iter->Proxy.GetPointer())
       {
         toProp = iter->Proxy.GetPointer()->GetProperty(iter->PropertyName.c_str());
@@ -485,7 +485,7 @@ void vtkSMPropertyLink::LoadState(const vtkSMMessage* msg, vtkSMProxyLocator* lo
 //-----------------------------------------------------------------------------
 void vtkSMPropertyLink::UpdateState()
 {
-  if (this->Session == NULL)
+  if (this->Session == nullptr)
   {
     return;
   }

@@ -81,7 +81,7 @@ vtkSMCompoundSourceProxy::vtkSMCompoundSourceProxy()
 vtkSMCompoundSourceProxy::~vtkSMCompoundSourceProxy()
 {
   delete this->CSInternals;
-  this->CSInternals = NULL;
+  this->CSInternals = nullptr;
 }
 //----------------------------------------------------------------------------
 void vtkSMCompoundSourceProxy::PrintSelf(ostream& os, vtkIndent indent)
@@ -116,8 +116,8 @@ void vtkSMCompoundSourceProxy::CreateOutputPorts()
     }
 
     source->CreateOutputPorts();
-    vtkSMOutputPort* port = 0;
-    vtkSMDocumentation* doc = 0;
+    vtkSMOutputPort* port = nullptr;
+    vtkSMDocumentation* doc = nullptr;
     unsigned int port_index = 0;
     if (iter->HasPortIndex())
     {
@@ -242,7 +242,7 @@ int vtkSMCompoundSourceProxy::ReadXMLAttributes(
   }
 
   // Initialise exposed properties --------------------------------------------
-  vtkPVXMLElement* exposedProperties = NULL;
+  vtkPVXMLElement* exposedProperties = nullptr;
   exposedProperties = element->FindNestedElementByName("ExposedProperties");
   numElems = exposedProperties ? exposedProperties->GetNumberOfNestedElements() : 0;
   for (unsigned int i = 0; i < numElems; i++)
@@ -356,12 +356,12 @@ void vtkSMCompoundSourceProxy::CreateVTKObjects()
     // CreateOutputPorts() call to create the vtkSMOutputPort proxies.
     if (this->GetNumberOfOutputPorts() <= index)
     {
-      this->SetOutputPort(index, iter->ExposedName.c_str(), 0, 0);
+      this->SetOutputPort(index, iter->ExposedName.c_str(), nullptr, nullptr);
     }
 
     // This sets up the dependency chain correctly.
-    subProxy->AddConsumer(0, this);
-    this->AddProducer(0, subProxy);
+    subProxy->AddConsumer(nullptr, this);
+    this->AddProducer(nullptr, subProxy);
     index++;
 
     // Move forward
@@ -410,7 +410,7 @@ void vtkSMCompoundSourceProxy::ExposeOutputPort(
 // * Exposed output port information.
 vtkPVXMLElement* vtkSMCompoundSourceProxy::SaveDefinition(vtkPVXMLElement* root)
 {
-  vtkPVXMLElement* defElement = this->SaveXMLState(0);
+  vtkPVXMLElement* defElement = this->SaveXMLState(nullptr);
   defElement->SetName("CompoundSourceProxy");
   defElement->RemoveAllNestedElements();
 

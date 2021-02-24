@@ -48,9 +48,9 @@ public:
   /**
    * Return the instance of vtkSMCollaborationManager that will be
    * lazy created at the first call.
-   * By default we return NULL
+   * By default we return nullptr
    */
-  virtual vtkSMCollaborationManager* GetCollaborationManager() { return NULL; }
+  virtual vtkSMCollaborationManager* GetCollaborationManager() { return nullptr; }
 
   //---------------------------------------------------------------------------
   // API for client-side components of a session.
@@ -116,7 +116,7 @@ public:
    * Provide an access to the session state locator that can provide the last
    * state of a given remote object that have been pushed.
    * That locator will be filled by RemoteObject state only if
-   * the UndoStackBuilder in vtkSMProxyManager is non-null.
+   * the UndoStackBuilder in vtkSMProxyManager is non-nullptr.
    */
   vtkGetObjectMacro(StateLocator, vtkSMStateLocator);
   //@}
@@ -201,7 +201,7 @@ public:
    */
   static vtkIdType ReverseConnectToRemote(int port)
   {
-    return vtkSMSession::ReverseConnectToRemote(port, (bool (*)())NULL);
+    return vtkSMSession::ReverseConnectToRemote(port, (bool (*)())nullptr);
   }
   static vtkIdType ReverseConnectToRemote(int port, bool (*callback)());
 
@@ -224,7 +224,7 @@ public:
    */
   static vtkIdType ReverseConnectToRemote(int dsport, int rsport)
   {
-    return vtkSMSession::ReverseConnectToRemote(dsport, rsport, NULL);
+    return vtkSMSession::ReverseConnectToRemote(dsport, rsport, nullptr);
   }
   static vtkIdType ReverseConnectToRemote(int dsport, int rsport, bool (*callback)());
 
@@ -253,7 +253,7 @@ protected:
   // this->Initialize() is not called in constructor but only after the session
   // has been created/setup correctly.
   vtkSMSession(
-    bool initialize_during_constructor = true, vtkPVSessionCore* preExistingSessionCore = NULL);
+    bool initialize_during_constructor = true, vtkPVSessionCore* preExistingSessionCore = nullptr);
   ~vtkSMSession() override;
 
   /**

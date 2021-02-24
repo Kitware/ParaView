@@ -23,13 +23,13 @@ vtkStandardNewMacro(vtkSIDoubleMapProperty);
 //----------------------------------------------------------------------------
 vtkSIDoubleMapProperty::vtkSIDoubleMapProperty()
 {
-  this->CleanCommand = 0;
+  this->CleanCommand = nullptr;
 }
 
 //----------------------------------------------------------------------------
 vtkSIDoubleMapProperty::~vtkSIDoubleMapProperty()
 {
-  this->SetCleanCommand(0);
+  this->SetCleanCommand(nullptr);
 }
 
 //----------------------------------------------------------------------------

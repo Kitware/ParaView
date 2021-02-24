@@ -126,10 +126,10 @@ vtkStandardNewMacro(vtkPVProgressHandler);
 //----------------------------------------------------------------------------
 vtkPVProgressHandler::vtkPVProgressHandler()
 {
-  this->Session = 0;
+  this->Session = nullptr;
   this->Internals = new vtkInternals();
   this->LastProgress = 0;
-  this->LastProgressText = NULL;
+  this->LastProgressText = nullptr;
 
   // use higher frequency for client while lower for server (or batch).
   this->ProgressInterval =
@@ -147,8 +147,8 @@ vtkPVProgressHandler::vtkPVProgressHandler()
 //----------------------------------------------------------------------------
 vtkPVProgressHandler::~vtkPVProgressHandler()
 {
-  this->SetLastProgressText(NULL);
-  this->SetSession(0);
+  this->SetLastProgressText(nullptr);
+  this->SetSession(nullptr);
   delete this->Internals;
 }
 
@@ -261,7 +261,7 @@ void vtkPVProgressHandler::CleanupPendingProgress()
   // reply back to the client saying we are done cleaning up.
   // Now, if there exists a client-controller, send reply to the client.
   vtkMultiProcessController* client_controller = this->Session->GetController(vtkPVSession::CLIENT);
-  if (client_controller != NULL)
+  if (client_controller != nullptr)
   {
     char temp = 0;
     vtkCompositeMultiProcessController* collabController =
@@ -390,7 +390,7 @@ void vtkPVProgressHandler::RefreshProgress(const char* progress_text, double pro
   this->LastProgress = static_cast<int>(progress * 100.0);
   // cout << "Progress: " << progress_text << " " << progress * 100 << endl;
   this->InvokeEvent(vtkCommand::ProgressEvent, this);
-  this->SetLastProgressText(NULL);
+  this->SetLastProgressText(nullptr);
   this->LastProgress = 0;
 }
 

@@ -25,14 +25,10 @@
 #include <string>
 
 //----------------------------------------------------------------------------
-vtkSMExtractWriterProxy::vtkSMExtractWriterProxy()
-{
-}
+vtkSMExtractWriterProxy::vtkSMExtractWriterProxy() = default;
 
 //----------------------------------------------------------------------------
-vtkSMExtractWriterProxy::~vtkSMExtractWriterProxy()
-{
-}
+vtkSMExtractWriterProxy::~vtkSMExtractWriterProxy() = default;
 
 //----------------------------------------------------------------------------
 std::string vtkSMExtractWriterProxy::GenerateDataExtractsFileName(

@@ -26,9 +26,7 @@ vtkPVEnSightMasterServerTranslator::vtkPVEnSightMasterServerTranslator()
 }
 
 //----------------------------------------------------------------------------
-vtkPVEnSightMasterServerTranslator::~vtkPVEnSightMasterServerTranslator()
-{
-}
+vtkPVEnSightMasterServerTranslator::~vtkPVEnSightMasterServerTranslator() = default;
 
 //----------------------------------------------------------------------------
 void vtkPVEnSightMasterServerTranslator::PrintSelf(ostream& os, vtkIndent indent)

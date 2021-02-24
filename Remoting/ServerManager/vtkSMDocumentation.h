@@ -38,12 +38,12 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /**
-   * Returns the text for long help, if any. NULL otherwise.
+   * Returns the text for long help, if any. nullptr otherwise.
    */
   const char* GetLongHelp();
 
   /**
-   * Returns the text for short help, if any. NULL otherwise.
+   * Returns the text for short help, if any. nullptr otherwise.
    */
   const char* GetShortHelp();
 

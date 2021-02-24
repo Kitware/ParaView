@@ -29,7 +29,7 @@ struct vtkSMPropertyIteratorInternals
 //---------------------------------------------------------------------------
 vtkSMPropertyIterator::vtkSMPropertyIterator()
 {
-  this->Proxy = 0;
+  this->Proxy = nullptr;
   this->Internals = new vtkSMPropertyIteratorInternals;
   this->TraverseSubProxies = 1;
 }
@@ -37,7 +37,7 @@ vtkSMPropertyIterator::vtkSMPropertyIterator()
 //---------------------------------------------------------------------------
 vtkSMPropertyIterator::~vtkSMPropertyIterator()
 {
-  this->SetProxy(0);
+  this->SetProxy(nullptr);
   delete this->Internals;
 }
 
@@ -46,12 +46,12 @@ void vtkSMPropertyIterator::SetProxy(vtkSMProxy* proxy)
 {
   if (this->Proxy != proxy)
   {
-    if (this->Proxy != NULL)
+    if (this->Proxy != nullptr)
     {
       this->Proxy->UnRegister(this);
     }
     this->Proxy = proxy;
-    if (this->Proxy != NULL)
+    if (this->Proxy != nullptr)
     {
       this->Proxy->Register(this);
       this->Begin();
@@ -141,7 +141,7 @@ const char* vtkSMPropertyIterator::GetKey()
   if (!this->Proxy)
   {
     vtkErrorMacro("Proxy is not set. Can not perform operation: GetKey()");
-    return 0;
+    return nullptr;
   }
 
   if (this->Internals->PropertyIterator != this->Proxy->Internals->Properties.end())
@@ -158,7 +158,7 @@ const char* vtkSMPropertyIterator::GetKey()
     }
   }
 
-  return 0;
+  return nullptr;
 }
 
 //---------------------------------------------------------------------------
@@ -176,7 +176,7 @@ const char* vtkSMPropertyIterator::GetPropertyLabel()
     return this->GetKey();
   }
 
-  return 0;
+  return nullptr;
 }
 
 //---------------------------------------------------------------------------
@@ -185,7 +185,7 @@ vtkSMProperty* vtkSMPropertyIterator::GetProperty()
   if (!this->Proxy)
   {
     vtkErrorMacro("Proxy is not set. Can not perform operation: GetProperty()");
-    return 0;
+    return nullptr;
   }
   if (this->Internals->PropertyIterator != this->Proxy->Internals->Properties.end())
   {
@@ -204,7 +204,7 @@ vtkSMProperty* vtkSMPropertyIterator::GetProperty()
                       << this->Internals->ExposedPropertyIterator->second.SubProxyName.c_str()
                       << " that is supposed to contain exposed property "
                       << this->Internals->ExposedPropertyIterator->first.c_str());
-        return 0;
+        return nullptr;
       }
       vtkSMProperty* property =
         proxy->GetProperty(this->Internals->ExposedPropertyIterator->second.PropertyName.c_str());
@@ -219,7 +219,7 @@ vtkSMProperty* vtkSMPropertyIterator::GetProperty()
       return property;
     }
   }
-  return 0;
+  return nullptr;
 }
 
 //---------------------------------------------------------------------------

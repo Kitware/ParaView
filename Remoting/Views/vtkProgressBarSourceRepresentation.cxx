@@ -50,7 +50,7 @@ vtkCxxSetObjectMacro(
 //----------------------------------------------------------------------------
 vtkProgressBarSourceRepresentation::vtkProgressBarSourceRepresentation()
 {
-  this->ProgressBarWidgetRepresentation = 0;
+  this->ProgressBarWidgetRepresentation = nullptr;
   vtkPointSource* source = vtkPointSource::New();
   source->SetNumberOfPoints(1);
   source->Update();
@@ -61,7 +61,7 @@ vtkProgressBarSourceRepresentation::vtkProgressBarSourceRepresentation()
 //----------------------------------------------------------------------------
 vtkProgressBarSourceRepresentation::~vtkProgressBarSourceRepresentation()
 {
-  this->SetProgressBarWidgetRepresentation(0);
+  this->SetProgressBarWidgetRepresentation(nullptr);
 }
 
 //----------------------------------------------------------------------------
@@ -157,7 +157,7 @@ int vtkProgressBarSourceRepresentation::ProcessViewRequest(
     vtkProgressBarRepresentation* repr =
       vtkProgressBarRepresentation::SafeDownCast(this->ProgressBarWidgetRepresentation
           ? this->ProgressBarWidgetRepresentation->GetRepresentation()
-          : NULL);
+          : nullptr);
     if (repr)
     {
       repr->SetProgressRate(progressRate);

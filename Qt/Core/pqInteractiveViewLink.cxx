@@ -78,11 +78,11 @@ public:
 
   ~pqInternal()
   {
-    if (this->LinkWidget != NULL)
+    if (this->LinkWidget != nullptr)
     {
       this->LinkWidget->Delete();
     }
-    if (this->ViewLinkRepresentation != NULL)
+    if (this->ViewLinkRepresentation != nullptr)
     {
       this->ViewLinkRepresentation->Delete();
     }
@@ -242,8 +242,8 @@ bool pqInteractiveViewLink::getHideLinkedViewBackground()
 //-----------------------------------------------------------------------------
 void pqInteractiveViewLink::renderLinkedView()
 {
-  if (!this->Internal->Rendering && this->Internal->LinkedView != NULL &&
-    this->Internal->LinkedPVView != NULL && this->Internal->DisplayPVView != NULL)
+  if (!this->Internal->Rendering && this->Internal->LinkedView != nullptr &&
+    this->Internal->LinkedPVView != nullptr && this->Internal->DisplayPVView != nullptr)
   {
     if (this->Internal->LinkedPVView->GetUseDistributedRenderingForRender() ||
       this->Internal->DisplayPVView->GetUseDistributedRenderingForRender())

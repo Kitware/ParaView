@@ -17,14 +17,10 @@
 #include "vtkObjectFactory.h"
 
 //----------------------------------------------------------------------------
-vtkInSituPipeline::vtkInSituPipeline()
-{
-}
+vtkInSituPipeline::vtkInSituPipeline() = default;
 
 //----------------------------------------------------------------------------
-vtkInSituPipeline::~vtkInSituPipeline()
-{
-}
+vtkInSituPipeline::~vtkInSituPipeline() = default;
 
 //----------------------------------------------------------------------------
 void vtkInSituPipeline::PrintSelf(ostream& os, vtkIndent indent)

@@ -60,7 +60,8 @@ protected:
   vtkSMDirectoryProxy();
   ~vtkSMDirectoryProxy() override;
 
-  bool CallDirectoryMethod(const char* method, const char* path, const char* secondaryPath = NULL);
+  bool CallDirectoryMethod(
+    const char* method, const char* path, const char* secondaryPath = nullptr);
 
 private:
   vtkSMDirectoryProxy(const vtkSMDirectoryProxy&) = delete;

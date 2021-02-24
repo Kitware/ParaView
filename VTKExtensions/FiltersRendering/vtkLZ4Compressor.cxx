@@ -30,9 +30,7 @@ vtkLZ4Compressor::vtkLZ4Compressor()
 }
 
 //----------------------------------------------------------------------------
-vtkLZ4Compressor::~vtkLZ4Compressor()
-{
-}
+vtkLZ4Compressor::~vtkLZ4Compressor() = default;
 
 //----------------------------------------------------------------------------
 int vtkLZ4Compressor::Compress()
@@ -145,7 +143,7 @@ const char* vtkLZ4Compressor::RestoreConfiguration(const char* stream)
     this->SetQuality(quality);
     return stream + iss.tellg();
   }
-  return 0;
+  return nullptr;
 }
 
 //----------------------------------------------------------------------------

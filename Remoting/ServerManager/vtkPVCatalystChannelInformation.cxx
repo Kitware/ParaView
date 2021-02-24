@@ -33,14 +33,10 @@ const std::string InputArrayName = "__CatalystChannel__";
 }
 
 //----------------------------------------------------------------------------
-vtkPVCatalystChannelInformation::vtkPVCatalystChannelInformation()
-{
-}
+vtkPVCatalystChannelInformation::vtkPVCatalystChannelInformation() = default;
 
 //----------------------------------------------------------------------------
-vtkPVCatalystChannelInformation::~vtkPVCatalystChannelInformation()
-{
-}
+vtkPVCatalystChannelInformation::~vtkPVCatalystChannelInformation() = default;
 
 //----------------------------------------------------------------------------
 void vtkPVCatalystChannelInformation::Initialize()

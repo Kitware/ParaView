@@ -158,17 +158,17 @@ private:
 vtkGridConnectivityFaceHeap::vtkGridConnectivityFaceHeap()
 {
   this->NumberOfFacesPerAllocation = 1000;
-  this->RecycleBin = 0;
-  this->Heap = 0;
+  this->RecycleBin = nullptr;
+  this->Heap = nullptr;
   this->HeapLength = 0;
   this->NextFaceIndex = 0;
-  this->Heaps = 0;
+  this->Heaps = nullptr;
 }
 
 vtkGridConnectivityFaceHeap::~vtkGridConnectivityFaceHeap()
 {
   this->NumberOfFacesPerAllocation = 0;
-  this->RecycleBin = 0;
+  this->RecycleBin = nullptr;
   while (this->Heaps)
   {
     vtkGridConnectivityFace* next = this->Heaps->NextFace;
@@ -209,7 +209,7 @@ vtkGridConnectivityFace* vtkGridConnectivityFaceHeap::NewFace()
   {
     face = this->RecycleBin;
     this->RecycleBin = face->NextFace;
-    face->NextFace = 0;
+    face->NextFace = nullptr;
   }
   else
   {
@@ -229,7 +229,7 @@ vtkGridConnectivityFace* vtkGridConnectivityFaceHeap::NewFace()
   face->CellId = 0;
   face->FaceId = 0;
   face->FragmentId = 0;
-  face->NextFace = 0;
+  face->NextFace = nullptr;
 
   return face;
 }
@@ -287,12 +287,12 @@ private:
 
 vtkGridConnectivityFaceHash::vtkGridConnectivityFaceHash()
 {
-  this->Hash = 0;
+  this->Hash = nullptr;
   this->NumberOfPoints = 0;
   this->Heap = new vtkGridConnectivityFaceHeap;
 
   this->IteratorIndex = -1;
-  this->IteratorCurrent = 0;
+  this->IteratorCurrent = nullptr;
   this->NumberOfFaces = 0;
 }
 
@@ -301,12 +301,12 @@ vtkGridConnectivityFaceHash::~vtkGridConnectivityFaceHash()
   if (this->Hash)
   {
     delete[] this->Hash;
-    this->Hash = 0;
+    this->Hash = nullptr;
   }
   delete this->Heap;
-  this->Heap = 0;
+  this->Heap = nullptr;
   this->IteratorIndex = 0;
-  this->IteratorCurrent = 0;
+  this->IteratorCurrent = nullptr;
   this->NumberOfFaces = 0;
 }
 
@@ -317,14 +317,14 @@ void vtkGridConnectivityFaceHash::InitTraversal()
   // I just initialize the IteratorIndex as -1 (special value).
   // This assume that vtkIdType is signed!
   this->IteratorIndex = -1;
-  this->IteratorCurrent = 0;
+  this->IteratorCurrent = nullptr;
 }
 
 vtkGridConnectivityFace* vtkGridConnectivityFaceHash::GetNextFace()
 {
   if (this->IteratorIndex >= this->NumberOfPoints)
   { // Past the end of the hash.  User must not have initialized.
-    return 0;
+    return nullptr;
   }
   // Traverse the linked list.
   if (this->IteratorCurrent)
@@ -333,12 +333,12 @@ vtkGridConnectivityFace* vtkGridConnectivityFaceHash::GetNextFace()
   }
   // If we hit the end of the linked list,  move through heap to
   // find the next linked list.
-  while (this->IteratorCurrent == 0)
+  while (this->IteratorCurrent == nullptr)
   {
     ++this->IteratorIndex;
     if (this->IteratorIndex >= this->NumberOfPoints)
     {
-      return 0;
+      return nullptr;
     }
     this->IteratorCurrent = this->Hash[this->IteratorIndex];
   }
@@ -413,7 +413,7 @@ vtkGridConnectivityFace* vtkGridConnectivityFaceHash::AddFace(
       // Found the face.
       // Remove it from the hash.
       *ref = face->NextFace;
-      face->NextFace = 0;
+      face->NextFace = nullptr;
       this->Heap->RecycleFace(face);
       --this->NumberOfFaces;
       // The face will still be valid until the next cycle.
@@ -452,9 +452,9 @@ vtkGridConnectivityFace* vtkGridConnectivityFaceHash::AddFace(
 //-----------------------------------------------------------------------------
 vtkGridConnectivity::vtkGridConnectivity()
 {
-  this->EquivalenceSet = 0;
-  this->FragmentVolumes = 0;
-  this->FaceHash = 0;
+  this->EquivalenceSet = nullptr;
+  this->FragmentVolumes = nullptr;
+  this->FaceHash = nullptr;
   this->Controller = vtkMultiProcessController::GetGlobalController();
   this->ProcessId = this->Controller ? this->Controller->GetLocalProcessId() : 0;
 }
@@ -462,7 +462,7 @@ vtkGridConnectivity::vtkGridConnectivity()
 //-----------------------------------------------------------------------------
 vtkGridConnectivity::~vtkGridConnectivity()
 {
-  this->Controller = 0;
+  this->Controller = nullptr;
 }
 
 //----------------------------------------------------------------------------
@@ -546,9 +546,9 @@ void vtkGridConnectivityExecuteProcess(vtkGridConnectivity* self, vtkUnstructure
       (ghostArray->GetNumberOfComponents() != 1 || ghostArray->GetNumberOfTuples() != numCells))
     {
       vtkGenericWarningMacro("Poorly formed ghost cells. Ignoring them.");
-      ghostArray = NULL;
+      ghostArray = nullptr;
     }
-    double* statusPtr = 0;
+    double* statusPtr = nullptr;
     if (statusArray)
     {
       statusPtr = statusArray->GetPointer(0);
@@ -559,7 +559,7 @@ void vtkGridConnectivityExecuteProcess(vtkGridConnectivity* self, vtkUnstructure
       {
         continue;
       }
-      if (statusPtr == 0 || *statusPtr++ == 0.0)
+      if (statusPtr == nullptr || *statusPtr++ == 0.0)
       {
         // Loop through faces of the cell.
         // This might be an performance bottle neck. (cell api)
@@ -592,7 +592,7 @@ void vtkGridConnectivityExecuteProcess(vtkGridConnectivity* self, vtkUnstructure
           else
           {
             vtkGenericWarningMacro("Face ignored.");
-            face = 0;
+            face = nullptr;
           }
           if (face)
           {
@@ -789,7 +789,7 @@ int vtkGridConnectivity::RequestData(
   // Create a simple array of input blocks.
   //  This will simplify creating faces from the hash.
   int numberOfInputs = 0;
-  vtkUnstructuredGrid** inputs = 0;
+  vtkUnstructuredGrid** inputs = nullptr;
   // We need this to allocate the fragment array.
   vtkIdType totalNumberOfCellsInProcess = 0;
 
@@ -870,7 +870,7 @@ int vtkGridConnectivity::RequestData(
   switch (this->GlobalPointIdType)
   {
     vtkTemplateMacro(vtkGridConnectivityExecuteProcess(this, inputs, numberOfInputs,
-      this->ProcessId, this->FaceHash, this->EquivalenceSet, static_cast<VTK_TT*>(0)));
+      this->ProcessId, this->FaceHash, this->EquivalenceSet, static_cast<VTK_TT*>(nullptr)));
     default:
       vtkErrorMacro("ExecuteProcess: Unknown input ScalarType");
       return 0;
@@ -895,9 +895,9 @@ int vtkGridConnectivity::RequestData(
   {
     delete this->FaceHash;
   }
-  this->FaceHash = 0;
+  this->FaceHash = nullptr;
   this->EquivalenceSet->Delete();
-  this->EquivalenceSet = 0;
+  this->EquivalenceSet = nullptr;
 
   return 1;
 }
@@ -991,7 +991,7 @@ void vtkGridConnectivity::GenerateOutput(vtkPolyData* output, vtkUnstructuredGri
       {
         da = this->CellAttributesIntegration[ii];
         outArray = vtkDoubleArray::SafeDownCast(output->GetCellData()->GetArray(da->GetName()));
-        if (outArray == 0)
+        if (outArray == nullptr)
         {
           vtkErrorMacro("Missing cell integration array.");
           continue;
@@ -1005,7 +1005,7 @@ void vtkGridConnectivity::GenerateOutput(vtkPolyData* output, vtkUnstructuredGri
       {
         da = this->PointAttributesIntegration[ii];
         outArray = vtkDoubleArray::SafeDownCast(output->GetPointData()->GetArray(da->GetName()));
-        if (outArray == 0)
+        if (outArray == nullptr)
         {
           vtkErrorMacro("Missing point integration array.");
           continue;
@@ -1051,7 +1051,7 @@ void vtkGridConnectivity::GenerateOutput(vtkPolyData* output, vtkUnstructuredGri
   cellFragmentIdArray->Delete();
   volumeArray->Delete();
   this->FragmentVolumes->Delete();
-  this->FragmentVolumes = 0;
+  this->FragmentVolumes = nullptr;
   this->CellAttributesIntegration.clear();
   this->PointAttributesIntegration.clear();
 
@@ -1158,7 +1158,7 @@ void vtkGridConnectivity::IntegrateCellVolume(
     vtkDoubleArray* da = this->CellAttributesIntegration[ii];
     vtkDoubleArray* inputArray =
       vtkDoubleArray::SafeDownCast(input->GetCellData()->GetArray(da->GetName()));
-    if (inputArray == 0)
+    if (inputArray == nullptr)
     {
       vtkErrorMacro("Missing integration array.");
       continue;
@@ -1465,7 +1465,7 @@ void vtkGridConnectivity::ResolveProcessesFaces()
         memset(faceMask, 0, numFaces * sizeof(int));
         // Loop over the faces in the hash.
         this->FaceHash->InitTraversal();
-        while ((face = this->FaceHash->GetNextFace()) != 0)
+        while ((face = this->FaceHash->GetNextFace()) != nullptr)
         {
           if (face->ProcessId == procIdx)
           {
@@ -1667,7 +1667,7 @@ void vtkGridConnectivity::ComputePointIntegration(vtkUnstructuredGrid* input, vt
     vtkDoubleArray* da = this->PointAttributesIntegration[i];
     vtkDoubleArray* inputArray =
       vtkDoubleArray::SafeDownCast(input->GetPointData()->GetArray(da->GetName()));
-    if (inputArray == 0)
+    if (inputArray == nullptr)
     {
       vtkErrorMacro("Missing integration array.");
       continue;

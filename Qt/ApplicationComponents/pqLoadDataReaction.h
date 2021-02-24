@@ -51,7 +51,7 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqLoadDataReaction : public pqReaction
 
 public:
   /**
-  * Constructor. Parent cannot be NULL.
+  * Constructor. Parent cannot be nullptr.
   */
   pqLoadDataReaction(QAction* parent);
 
@@ -60,34 +60,34 @@ public:
   * supported. If a file requires user input the reader of choice, it will use
   * that reader for all other files of that type.
   * Returns the reader is creation successful, otherwise returns
-  * NULL.
+  * nullptr.
   * Note that this method is static. Applications can simply use this without
   * having to create a reaction instance.
   *
   * If `readergroup` and `readername` are non empty, then they are assumed to be
   * the type of the reader to use and reader factory is not used.
   *
-  * If `server` is NULL, active server is used.
+  * If `server` is nullptr, active server is used.
   */
   static pqPipelineSource* loadData(const QList<QStringList>& files,
     const QString& readergroup = QString(), const QString& readername = QString(),
-    pqServer* server = NULL);
+    pqServer* server = nullptr);
 
   /**
   * Loads data files. Uses reader factory to determine what reader are
   * supported. Returns the reader is creation successful, otherwise returns
-  * NULL.
+  * nullptr.
   * Note that this method is static. Applications can simply use this without
   * having to create a reaction instance.
   *
   * If `readergroup` and `readername` are non empty, then they are assumed to be
   * the type of the reader to use and reader factory is not used.
   *
-  * If `server` is NULL, active server is used.
+  * If `server` is nullptr, active server is used.
   */
   static pqPipelineSource* loadData(const QStringList& files,
     const QString& readergroup = QString(), const QString& readername = QString(),
-    pqServer* server = NULL);
+    pqServer* server = nullptr);
 
   static QList<pqPipelineSource*> loadData();
 

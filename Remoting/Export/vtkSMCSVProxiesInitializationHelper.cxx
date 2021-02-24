@@ -25,14 +25,10 @@
 
 vtkStandardNewMacro(vtkSMCSVProxiesInitializationHelper);
 //----------------------------------------------------------------------------
-vtkSMCSVProxiesInitializationHelper::vtkSMCSVProxiesInitializationHelper()
-{
-}
+vtkSMCSVProxiesInitializationHelper::vtkSMCSVProxiesInitializationHelper() = default;
 
 //----------------------------------------------------------------------------
-vtkSMCSVProxiesInitializationHelper::~vtkSMCSVProxiesInitializationHelper()
-{
-}
+vtkSMCSVProxiesInitializationHelper::~vtkSMCSVProxiesInitializationHelper() = default;
 
 //----------------------------------------------------------------------------
 void vtkSMCSVProxiesInitializationHelper::PostInitializeProxy(

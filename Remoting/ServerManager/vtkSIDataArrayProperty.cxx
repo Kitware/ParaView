@@ -27,14 +27,10 @@
 
 vtkStandardNewMacro(vtkSIDataArrayProperty);
 //----------------------------------------------------------------------------
-vtkSIDataArrayProperty::vtkSIDataArrayProperty()
-{
-}
+vtkSIDataArrayProperty::vtkSIDataArrayProperty() = default;
 
 //----------------------------------------------------------------------------
-vtkSIDataArrayProperty::~vtkSIDataArrayProperty()
-{
-}
+vtkSIDataArrayProperty::~vtkSIDataArrayProperty() = default;
 
 //----------------------------------------------------------------------------
 void vtkSIDataArrayProperty::PrintSelf(ostream& os, vtkIndent indent)
@@ -62,7 +58,7 @@ bool vtkSIDataArrayProperty::Pull(vtkSMMessage* msgToFill)
   this->ProcessMessage(str);
 
   // Get the result
-  vtkAbstractArray* abstractArray = NULL;
+  vtkAbstractArray* abstractArray = nullptr;
   if (!this->GetLastResult().GetArgument(0, 0, (vtkObjectBase**)&abstractArray))
   {
     vtkErrorMacro("Error getting return value of command: " << this->GetCommand());
@@ -91,9 +87,9 @@ bool vtkSIDataArrayProperty::Pull(vtkSMMessage* msgToFill)
   vtkIdType numValues = abstractArray->GetNumberOfComponents() * abstractArray->GetNumberOfTuples();
   if (dataArray)
   {
-    vtkDoubleArray* dataDouble = NULL;
-    vtkIntArray* dataInt = NULL;
-    vtkIdTypeArray* dataIdType = NULL;
+    vtkDoubleArray* dataDouble = nullptr;
+    vtkIntArray* dataInt = nullptr;
+    vtkIdTypeArray* dataIdType = nullptr;
     switch (dataArray->GetDataType())
     {
       case VTK_DOUBLE:

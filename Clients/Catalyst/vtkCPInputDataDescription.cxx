@@ -40,7 +40,7 @@ vtkCxxSetObjectMacro(vtkCPInputDataDescription, TemporalCache, vtkSMSourceProxy)
 //----------------------------------------------------------------------------
 vtkCPInputDataDescription::vtkCPInputDataDescription()
 {
-  this->Grid = NULL;
+  this->Grid = nullptr;
   this->GenerateMesh = false;
   this->AllFields = false;
   this->Internals = new vtkCPInputDataDescription::vtkInternals();
@@ -56,7 +56,7 @@ vtkCPInputDataDescription::~vtkCPInputDataDescription()
   if (this->Internals)
   {
     delete this->Internals;
-    this->Internals = NULL;
+    this->Internals = nullptr;
   }
   this->SetTemporalCache(nullptr);
 }

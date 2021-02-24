@@ -89,7 +89,7 @@ void pqVCRToolbar::constructor()
 pqVCRToolbar::~pqVCRToolbar()
 {
   delete this->UI;
-  this->UI = 0;
+  this->UI = nullptr;
 }
 
 //-----------------------------------------------------------------------------

@@ -118,9 +118,7 @@ vtkImageVolumeRepresentation::vtkImageVolumeRepresentation()
 }
 
 //----------------------------------------------------------------------------
-vtkImageVolumeRepresentation::~vtkImageVolumeRepresentation()
-{
-}
+vtkImageVolumeRepresentation::~vtkImageVolumeRepresentation() = default;
 
 //----------------------------------------------------------------------------
 int vtkImageVolumeRepresentation::FillInputPortInformation(int, vtkInformation* info)

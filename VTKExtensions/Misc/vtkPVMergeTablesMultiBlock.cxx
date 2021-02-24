@@ -35,9 +35,7 @@ vtkPVMergeTablesMultiBlock::vtkPVMergeTablesMultiBlock()
 }
 
 //----------------------------------------------------------------------------
-vtkPVMergeTablesMultiBlock::~vtkPVMergeTablesMultiBlock()
-{
-}
+vtkPVMergeTablesMultiBlock::~vtkPVMergeTablesMultiBlock() = default;
 
 //----------------------------------------------------------------------------
 int vtkPVMergeTablesMultiBlock::FillInputPortInformation(int vtkNotUsed(port), vtkInformation* info)

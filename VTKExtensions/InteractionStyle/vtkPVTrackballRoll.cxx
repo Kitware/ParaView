@@ -25,14 +25,10 @@
 vtkStandardNewMacro(vtkPVTrackballRoll);
 
 //-------------------------------------------------------------------------
-vtkPVTrackballRoll::vtkPVTrackballRoll()
-{
-}
+vtkPVTrackballRoll::vtkPVTrackballRoll() = default;
 
 //-------------------------------------------------------------------------
-vtkPVTrackballRoll::~vtkPVTrackballRoll()
-{
-}
+vtkPVTrackballRoll::~vtkPVTrackballRoll() = default;
 
 //-------------------------------------------------------------------------
 void vtkPVTrackballRoll::OnButtonDown(int, int, vtkRenderer*, vtkRenderWindowInteractor*)
@@ -47,7 +43,7 @@ void vtkPVTrackballRoll::OnButtonUp(int, int, vtkRenderer*, vtkRenderWindowInter
 //-------------------------------------------------------------------------
 void vtkPVTrackballRoll::OnMouseMove(int x, int y, vtkRenderer* ren, vtkRenderWindowInteractor* rwi)
 {
-  if (ren == NULL)
+  if (ren == nullptr)
   {
     return;
   }

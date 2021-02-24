@@ -52,5 +52,5 @@ vtkGraphLayoutStrategy* @_paraview_graph_layout_strategy_STRATEGY_TYPE@Implement
   {
     return vtk@_paraview_graph_layout_strategy_STRATEGY_TYPE@::New();
   }
-  return NULL;
+  return nullptr;
 }

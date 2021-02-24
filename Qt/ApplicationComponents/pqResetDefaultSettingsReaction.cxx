@@ -50,9 +50,7 @@ pqResetDefaultSettingsReaction::pqResetDefaultSettingsReaction(QAction* parentOb
 }
 
 //-----------------------------------------------------------------------------
-pqResetDefaultSettingsReaction::~pqResetDefaultSettingsReaction()
-{
-}
+pqResetDefaultSettingsReaction::~pqResetDefaultSettingsReaction() = default;
 
 //-----------------------------------------------------------------------------
 void pqResetDefaultSettingsReaction::resetSettingsToDefault()

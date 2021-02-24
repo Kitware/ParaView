@@ -55,9 +55,7 @@ vtkPVExtractSelection::vtkPVExtractSelection()
 }
 
 //----------------------------------------------------------------------------
-vtkPVExtractSelection::~vtkPVExtractSelection()
-{
-}
+vtkPVExtractSelection::~vtkPVExtractSelection() = default;
 
 //----------------------------------------------------------------------------
 int vtkPVExtractSelection::FillOutputPortInformation(int port, vtkInformation* info)
@@ -262,7 +260,7 @@ vtkSelectionNode* vtkPVExtractSelection::LocateSelection(
       }
     }
   }
-  return NULL;
+  return nullptr;
 }
 
 //----------------------------------------------------------------------------
@@ -283,7 +281,7 @@ vtkSelectionNode* vtkPVExtractSelection::LocateSelection(
       }
     }
   }
-  return NULL;
+  return nullptr;
 }
 
 //----------------------------------------------------------------------------

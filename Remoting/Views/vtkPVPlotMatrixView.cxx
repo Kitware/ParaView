@@ -634,21 +634,21 @@ int vtkPVPlotMatrixView::GetGridVisibility(int plotType)
 double* vtkPVPlotMatrixView::GetBackgroundColor(int plotType)
 {
   return this->PlotMatrix ? this->PlotMatrix->GetBackgroundColor(plotType).Cast<double>().GetData()
-                          : NULL;
+                          : nullptr;
 }
 
 //----------------------------------------------------------------------------
 double* vtkPVPlotMatrixView::GetAxisColor(int plotType)
 {
   return this->PlotMatrix ? this->PlotMatrix->GetAxisColor(plotType).Cast<double>().GetData()
-                          : NULL;
+                          : nullptr;
 }
 
 //----------------------------------------------------------------------------
 double* vtkPVPlotMatrixView::GetGridColor(int plotType)
 {
   return this->PlotMatrix ? this->PlotMatrix->GetGridColor(plotType).Cast<double>().GetData()
-                          : NULL;
+                          : nullptr;
 }
 
 //----------------------------------------------------------------------------
@@ -717,7 +717,7 @@ double* vtkPVPlotMatrixView::GetScatterPlotSelectedRowColumnColor()
 {
   return this->PlotMatrix
     ? this->PlotMatrix->GetScatterPlotSelectedRowColumnColor().Cast<double>().GetData()
-    : NULL;
+    : nullptr;
 }
 
 //----------------------------------------------------------------------------
@@ -725,7 +725,7 @@ double* vtkPVPlotMatrixView::GetScatterPlotSelectedActiveColor()
 {
   return this->PlotMatrix
     ? this->PlotMatrix->GetScatterPlotSelectedActiveColor().Cast<double>().GetData()
-    : NULL;
+    : nullptr;
 }
 
 //----------------------------------------------------------------------------

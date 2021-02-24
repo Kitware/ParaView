@@ -68,7 +68,7 @@ public:
 pqChangeInputDialog::pqChangeInputDialog(vtkSMProxy* filterProxy, QWidget* parentObject)
   : Superclass(parentObject)
 {
-  assert(filterProxy != NULL);
+  assert(filterProxy != nullptr);
 
   this->Internals = new pqInternals();
   this->Internals->Proxy = filterProxy;
@@ -103,7 +103,7 @@ pqChangeInputDialog::pqChangeInputDialog(vtkSMProxy* filterProxy, QWidget* paren
     for (unsigned int cc = 0; cc < numProxies; cc++)
     {
       pqPipelineSource* source = smModel->findItem<pqPipelineSource*>(helper.GetAsProxy(cc));
-      if (source == NULL)
+      if (source == nullptr)
       {
         qDebug("Not all current inputs to this filter are know to the ProxyManager");
         continue;
@@ -132,7 +132,7 @@ pqChangeInputDialog::pqChangeInputDialog(vtkSMProxy* filterProxy, QWidget* paren
 pqChangeInputDialog::~pqChangeInputDialog()
 {
   delete this->Internals;
-  this->Internals = 0;
+  this->Internals = nullptr;
 }
 
 //-----------------------------------------------------------------------------
@@ -149,7 +149,7 @@ void pqChangeInputDialog::buildPortWidgets()
   // we use this since it returns a nice ordered list of the input port names
   // rather than an alphabetically sorted one.
   QList<const char*> input_property_names = pqPipelineFilter::getInputPorts(this->Internals->Proxy);
-  QRadioButton* firstButton = 0;
+  QRadioButton* firstButton = nullptr;
   for (int cc = 0; cc < input_property_names.size(); cc++)
   {
     const char* input_prop_name = input_property_names[cc];

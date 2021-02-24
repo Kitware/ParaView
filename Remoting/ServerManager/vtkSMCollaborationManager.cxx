@@ -286,7 +286,7 @@ vtkSMCollaborationManager::vtkSMCollaborationManager()
 vtkSMCollaborationManager::~vtkSMCollaborationManager()
 {
   delete this->Internal;
-  this->Internal = NULL;
+  this->Internal = nullptr;
 }
 
 //----------------------------------------------------------------------------
@@ -468,7 +468,7 @@ void vtkSMCollaborationManager::UpdateUserInformations()
     vtkSMMessage msg;
     msg.CopyFrom(*this->GetFullState());
     this->PullState(&msg);
-    this->LoadState(&msg, NULL);
+    this->LoadState(&msg, nullptr);
   }
 }
 

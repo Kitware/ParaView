@@ -85,7 +85,7 @@ double* Grid::GetPointsArray()
 {
   if (this->Points.empty())
   {
-    return NULL;
+    return nullptr;
   }
   return &(this->Points[0]);
 }
@@ -106,14 +106,14 @@ unsigned int* Grid::GetCellPoints(size_t cellId)
 {
   if (cellId >= this->Cells.size())
   {
-    return NULL;
+    return nullptr;
   }
   return &(this->Cells[cellId * 8]);
 }
 
 Attributes::Attributes()
 {
-  this->GridPtr = NULL;
+  this->GridPtr = nullptr;
 }
 
 void Attributes::Initialize(Grid* grid)
@@ -141,7 +141,7 @@ double* Attributes::GetVelocityArray()
 {
   if (this->Velocity.empty())
   {
-    return NULL;
+    return nullptr;
   }
   return &this->Velocity[0];
 }
@@ -150,7 +150,7 @@ float* Attributes::GetPressureArray()
 {
   if (this->Pressure.empty())
   {
-    return NULL;
+    return nullptr;
   }
   return &this->Pressure[0];
 }

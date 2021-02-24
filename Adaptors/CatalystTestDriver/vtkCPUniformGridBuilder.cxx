@@ -31,13 +31,13 @@ vtkCPUniformGridBuilder::vtkCPUniformGridBuilder()
     this->Spacing[i] = 0;
     this->Origin[i] = 0;
   }
-  this->UniformGrid = 0;
+  this->UniformGrid = nullptr;
 }
 
 //----------------------------------------------------------------------------
 vtkCPUniformGridBuilder::~vtkCPUniformGridBuilder()
 {
-  this->SetUniformGrid(0);
+  this->SetUniformGrid(nullptr);
 }
 
 //----------------------------------------------------------------------------
@@ -48,7 +48,7 @@ vtkDataObject* vtkCPUniformGridBuilder::GetGrid(
   if (!fieldBuilder)
   {
     vtkErrorMacro("FieldBuilder is not defined.");
-    return 0;
+    return nullptr;
   }
 
   builtNewGrid = this->CreateUniformGrid();
@@ -86,7 +86,7 @@ double* vtkCPUniformGridBuilder::GetOrigin()
 bool vtkCPUniformGridBuilder::CreateUniformGrid()
 {
   bool builtNewGrid = 0;
-  if (this->UniformGrid == 0)
+  if (this->UniformGrid == nullptr)
   {
     builtNewGrid = 1;
   }

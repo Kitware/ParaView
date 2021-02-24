@@ -205,7 +205,7 @@ bool sendMessage(HINTERNET connection, std::string type, std::string address,
     InternetErrorDlg(GetDesktopWindow(), hRequest, ERROR_INTERNET_CLIENT_AUTH_CERT_NEEDED,
       FLAGS_ERROR_UI_FILTER_FOR_ERRORS | FLAGS_ERROR_UI_FLAGS_GENERATE_DATA |
         FLAGS_ERROR_UI_FLAGS_CHANGE_OPTIONS,
-      NULL);
+      nullptr);
   }
 
   if (!getResult(hRequest, result))

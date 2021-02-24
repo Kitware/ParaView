@@ -24,7 +24,7 @@
  * sits as a datastructure to manage ports specific things like
  * data-information. However for backwards compatibility, to keep the impact
  * minimal, we leave this as a sub-class of a Proxy with GlobalID=0 and
- * Session=NULL.
+ * Session=nullptr.
 */
 
 #ifndef vtkSMOutputPort_h
@@ -127,7 +127,7 @@ protected:
 
   void SetSourceProxy(vtkSMSourceProxy* src);
 
-  // When set to non-null, GetSourceProxy() returns this rather than the real
+  // When set to non-nullptr, GetSourceProxy() returns this rather than the real
   // source-proxy set using SetSourceProxy(). This provides a mechanism for
   // vtkSMCompoundSourceProxy to take ownership of ports that don't really
   // belong to it.

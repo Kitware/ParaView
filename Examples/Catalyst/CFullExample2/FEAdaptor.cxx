@@ -90,7 +90,7 @@ void BuildVTKDataStructures(vtkCPInputDataDescription* idd, unsigned int numberO
   double* points, double* velocity, unsigned int numberOfCells, unsigned int* cells,
   float* pressure)
 {
-  if (VTKGrid == NULL)
+  if (VTKGrid == nullptr)
   {
     // The grid structure isn't changing so we only build it
     // the first time it's needed. If we needed the memory
@@ -108,7 +108,7 @@ void CatalystCoProcess(unsigned int numberOfPoints, double* pointsData, unsigned
 {
   vtkCPProcessor* processor = vtkCPAdaptorAPI::GetCoProcessor();
   vtkCPDataDescription* dataDescription = vtkCPAdaptorAPI::GetCoProcessorData();
-  if (processor == NULL || dataDescription == NULL)
+  if (processor == nullptr || dataDescription == nullptr)
   {
     cerr << "ERROR: Catalyst not properly initialized.\n";
     return;
@@ -136,6 +136,6 @@ void CatalystFinalize()
 { // Used to free grid if it was used
   if (VTKGrid)
   {
-    VTKGrid = NULL;
+    VTKGrid = nullptr;
   }
 }

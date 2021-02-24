@@ -32,7 +32,7 @@ public:
   // Choose a color depth reducing mask, uses same masks
   // as Squirt.
   int GetMaskId() { return this->MaskId; }
-  void SetMaskId(const int maskId);
+  void SetMaskId(int maskId);
   // Description:
   // When set  pre-processing is garaunteed to be
   // loss-less regardless of settings.
@@ -52,8 +52,8 @@ public:
     int& freeOut);
   // Description:
   // Post-process will restore the apha.
-  void PostProcess(const unsigned char* in, unsigned char const* inEnd, const int inComps,
-    vtkUnsignedCharArray* out);
+  void PostProcess(
+    const unsigned char* in, unsigned char const* inEnd, int inComps, vtkUnsignedCharArray* out);
   // Description:
   // Print object state to the given stream.
   void PrintSelf(ostream& os, vtkIndent indent);
@@ -98,7 +98,7 @@ vtkZlibCompressorImageConditioner::vtkZlibCompressorImageConditioner()
 }
 
 //-----------------------------------------------------------------------------
-void vtkZlibCompressorImageConditioner::SetMaskId(const int maskId)
+void vtkZlibCompressorImageConditioner::SetMaskId(int maskId)
 {
   if (maskId < 0 || maskId > 6)
   {
@@ -251,8 +251,8 @@ void vtkZlibCompressorImageConditioner::PreProcess(vtkUnsignedCharArray* input, 
 }
 
 //-----------------------------------------------------------------------------
-void vtkZlibCompressorImageConditioner::PostProcess(const unsigned char* in,
-  unsigned char const* inEnd, const int inComps, vtkUnsignedCharArray* output)
+void vtkZlibCompressorImageConditioner::PostProcess(
+  const unsigned char* in, unsigned char const* inEnd, int inComps, vtkUnsignedCharArray* output)
 {
   // restore alpha
   const int outComps = output->GetNumberOfComponents();
@@ -280,7 +280,7 @@ void vtkZlibCompressorImageConditioner::PrintSelf(ostream& os, vtkIndent indent)
 
 //-----------------------------------------------------------------------------
 vtkZlibImageCompressor::vtkZlibImageCompressor()
-  : Conditioner(0)
+  : Conditioner(nullptr)
   , CompressionLevel(1)
 {
   this->Conditioner = new vtkZlibCompressorImageConditioner;
@@ -447,7 +447,7 @@ const char* vtkZlibImageCompressor::RestoreConfiguration(const char* stream)
     this->SetStripAlpha(stripAlpha);
     return stream + iss.tellg();
   }
-  return 0;
+  return nullptr;
 }
 
 //-----------------------------------------------------------------------------

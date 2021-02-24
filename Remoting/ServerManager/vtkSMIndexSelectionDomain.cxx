@@ -20,10 +20,10 @@
 #include "vtkObjectFactory.h"
 
 //------------------------------------------------------------------------------
-vtkStandardNewMacro(vtkSMIndexSelectionDomain)
+vtkStandardNewMacro(vtkSMIndexSelectionDomain);
 
-  //------------------------------------------------------------------------------
-  void vtkSMIndexSelectionDomain::PrintSelf(std::ostream& os, vtkIndent indent)
+//------------------------------------------------------------------------------
+void vtkSMIndexSelectionDomain::PrintSelf(std::ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
 }
@@ -67,11 +67,7 @@ int vtkSMIndexSelectionDomain::SetDefaultValues(vtkSMProperty* property, bool us
 }
 
 //------------------------------------------------------------------------------
-vtkSMIndexSelectionDomain::vtkSMIndexSelectionDomain()
-{
-}
+vtkSMIndexSelectionDomain::vtkSMIndexSelectionDomain() = default;
 
 //------------------------------------------------------------------------------
-vtkSMIndexSelectionDomain::~vtkSMIndexSelectionDomain()
-{
-}
+vtkSMIndexSelectionDomain::~vtkSMIndexSelectionDomain() = default;

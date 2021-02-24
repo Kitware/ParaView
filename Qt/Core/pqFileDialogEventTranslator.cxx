@@ -47,7 +47,7 @@ pqFileDialogEventTranslator::pqFileDialogEventTranslator(QObject* p)
 bool pqFileDialogEventTranslator::translateEvent(QObject* Object, QEvent* Event, bool& Error)
 {
   // Capture input for pqFileDialog and all its children ...
-  pqFileDialog* object = 0;
+  pqFileDialog* object = nullptr;
   for (QObject* o = Object; o; o = o->parent())
   {
     object = qobject_cast<pqFileDialog*>(o);

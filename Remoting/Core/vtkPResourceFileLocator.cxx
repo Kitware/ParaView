@@ -24,14 +24,10 @@
 
 vtkStandardNewMacro(vtkPResourceFileLocator);
 //----------------------------------------------------------------------------
-vtkPResourceFileLocator::vtkPResourceFileLocator()
-{
-}
+vtkPResourceFileLocator::vtkPResourceFileLocator() = default;
 
 //----------------------------------------------------------------------------
-vtkPResourceFileLocator::~vtkPResourceFileLocator()
-{
-}
+vtkPResourceFileLocator::~vtkPResourceFileLocator() = default;
 
 //----------------------------------------------------------------------------
 std::string vtkPResourceFileLocator::Locate(const std::string& anchor,

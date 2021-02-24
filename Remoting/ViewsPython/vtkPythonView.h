@@ -90,7 +90,7 @@ public:
   /**
    * Get a local copy of the visible data object at an index. The
    * index must be between 0 and this->GetNumberOfVisibleDataObjects().
-   * If outside this range, returns NULL. This will return a shallow
+   * If outside this range, returns nullptr. This will return a shallow
    * copy of the data object input to the representation.
 
    * WARNING: this method is intended to be called only from within
@@ -102,7 +102,7 @@ public:
   /**
    * Get the client's copy of the visible data object at an index. The
    * index must be between 0 and this->GetNumberOfVisibleDataObjects().
-   * If outside this range, returns NULL.
+   * If outside this range, returns nullptr.
 
    * WARNING: this method should be called only from within the render()
    * function in the Python Script set for this instance.

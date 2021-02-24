@@ -58,9 +58,7 @@ pqOutputPortComboBox::pqOutputPortComboBox(QWidget* _parent)
 }
 
 //-----------------------------------------------------------------------------
-pqOutputPortComboBox::~pqOutputPortComboBox()
-{
-}
+pqOutputPortComboBox::~pqOutputPortComboBox() = default;
 
 //-----------------------------------------------------------------------------
 void pqOutputPortComboBox::fillExistingPorts()
@@ -68,7 +66,7 @@ void pqOutputPortComboBox::fillExistingPorts()
   pqApplicationCore* core = pqApplicationCore::instance();
   pqServerManagerModel* smmodel = core->getServerManagerModel();
 
-  QList<pqPipelineSource*> sources = smmodel->findItems<pqPipelineSource*>(0);
+  QList<pqPipelineSource*> sources = smmodel->findItems<pqPipelineSource*>(nullptr);
   foreach (pqPipelineSource* source, sources)
   {
     this->addSource(source);
@@ -118,7 +116,7 @@ void pqOutputPortComboBox::removeSource(pqPipelineSource* source)
       this->removeItem(index);
     }
   }
-  QObject::disconnect(source, 0, this, 0);
+  QObject::disconnect(source, nullptr, this, nullptr);
 }
 
 //-----------------------------------------------------------------------------
@@ -181,7 +179,7 @@ pqOutputPort* pqOutputPortComboBox::currentPort() const
     QVariant _data = this->itemData(index);
     return reinterpret_cast<pqOutputPort*>(_data.value<void*>());
   }
-  return 0;
+  return nullptr;
 }
 
 //-----------------------------------------------------------------------------

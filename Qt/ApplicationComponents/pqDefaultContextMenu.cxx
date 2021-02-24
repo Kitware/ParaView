@@ -113,9 +113,7 @@ pqDefaultContextMenu::pqDefaultContextMenu(QObject* parentObject)
 }
 
 //-----------------------------------------------------------------------------
-pqDefaultContextMenu::~pqDefaultContextMenu()
-{
-}
+pqDefaultContextMenu::~pqDefaultContextMenu() = default;
 
 //-----------------------------------------------------------------------------
 bool pqDefaultContextMenu::contextMenu(QMenu* menu, pqView* viewContext, const QPoint& viewPoint,

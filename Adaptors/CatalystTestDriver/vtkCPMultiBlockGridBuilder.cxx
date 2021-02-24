@@ -35,16 +35,16 @@ struct vtkCPMultiBlockGridBuilderInternals
 //----------------------------------------------------------------------------
 vtkCPMultiBlockGridBuilder::vtkCPMultiBlockGridBuilder()
 {
-  this->Grid = 0;
+  this->Grid = nullptr;
   this->Internal = new vtkCPMultiBlockGridBuilderInternals;
 }
 
 //----------------------------------------------------------------------------
 vtkCPMultiBlockGridBuilder::~vtkCPMultiBlockGridBuilder()
 {
-  this->SetGrid(0);
+  this->SetGrid(nullptr);
   delete this->Internal;
-  this->Internal = 0;
+  this->Internal = nullptr;
 }
 
 //----------------------------------------------------------------------------
@@ -119,7 +119,7 @@ vtkCPGridBuilder* vtkCPMultiBlockGridBuilder::GetGridBuilder(unsigned int which)
   if (which >= this->GetNumberOfGridBuilders())
   {
     vtkWarningMacro("Bad input.");
-    return 0;
+    return nullptr;
   }
   return this->Internal->GridBuilders[which];
 }

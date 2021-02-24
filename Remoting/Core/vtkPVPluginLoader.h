@@ -117,7 +117,7 @@ public:
 
   //@{
   /**
-   * Get the error string if the plugin failed to load. Returns NULL if the
+   * Get the error string if the plugin failed to load. Returns nullptr if the
    * plugin was loaded successfully.
    */
   vtkGetStringMacro(ErrorString);

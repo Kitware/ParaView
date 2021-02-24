@@ -45,9 +45,7 @@ vtkSpreadSheetRepresentation::vtkSpreadSheetRepresentation()
 }
 
 //----------------------------------------------------------------------------
-vtkSpreadSheetRepresentation::~vtkSpreadSheetRepresentation()
-{
-}
+vtkSpreadSheetRepresentation::~vtkSpreadSheetRepresentation() = default;
 
 //----------------------------------------------------------------------------
 void vtkSpreadSheetRepresentation::SetFieldAssociation(int val)
@@ -148,7 +146,7 @@ vtkAlgorithmOutput* vtkSpreadSheetRepresentation::GetDataProducer()
 {
   return this->DataConditioner->GetNumberOfInputConnections(0) == 1
     ? this->CleanArrays->GetOutputPort(0)
-    : NULL;
+    : nullptr;
 }
 
 //----------------------------------------------------------------------------
@@ -156,7 +154,7 @@ vtkAlgorithmOutput* vtkSpreadSheetRepresentation::GetExtractedDataProducer()
 {
   return this->ExtractedDataConditioner->GetNumberOfInputConnections(0) == 1
     ? this->ExtractedCleanArrays->GetOutputPort(0)
-    : NULL;
+    : nullptr;
 }
 
 //----------------------------------------------------------------------------
@@ -166,7 +164,7 @@ vtkAlgorithmOutput* vtkSpreadSheetRepresentation::GetSelectionProducer()
   {
     return this->GetInternalOutputPort(1, 0);
   }
-  return NULL;
+  return nullptr;
 }
 
 //----------------------------------------------------------------------------

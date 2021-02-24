@@ -36,14 +36,14 @@ vtkCxxSetObjectMacro(vtkPExtractHistogram, Controller, vtkMultiProcessController
 //-----------------------------------------------------------------------------
 vtkPExtractHistogram::vtkPExtractHistogram()
 {
-  this->Controller = 0;
+  this->Controller = nullptr;
   this->SetController(vtkMultiProcessController::GetGlobalController());
 }
 
 //-----------------------------------------------------------------------------
 vtkPExtractHistogram::~vtkPExtractHistogram()
 {
-  this->SetController(0);
+  this->SetController(nullptr);
 }
 
 //-----------------------------------------------------------------------------
@@ -88,7 +88,7 @@ int vtkPExtractHistogram::RequestData(
 
   vtkTable* output = vtkTable::GetData(outputVector, 0);
   vtkSmartPointer<vtkDataArray> oldExtents = output->GetRowData()->GetArray("bin_extents");
-  if (oldExtents == NULL)
+  if (oldExtents == nullptr)
   {
     // Nothing to do if there is no data
     return 1;

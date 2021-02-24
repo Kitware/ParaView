@@ -91,7 +91,7 @@ public:
 
 //-----------------------------------------------------------------------------
 pqSpreadSheetView::pqSpreadSheetView(const QString& group, const QString& name,
-  vtkSMViewProxy* viewModule, pqServer* server, QObject* _parent /*=NULL*/)
+  vtkSMViewProxy* viewModule, pqServer* server, QObject* _parent /*=nullptr*/)
   : pqView(spreadsheetViewType(), group, name, viewModule, server, _parent)
 {
   this->Internal = new pqInternal(new pqSpreadSheetViewModel(viewModule, this));
@@ -159,8 +159,8 @@ void pqSpreadSheetView::updateRepresentationVisibility(pqRepresentation* repr, b
 
   if (!visible && repr && this->Internal->Model->activeRepresentation() == repr)
   {
-    this->Internal->Model->setActiveRepresentation(NULL);
-    Q_EMIT this->showing(0);
+    this->Internal->Model->setActiveRepresentation(nullptr);
+    Q_EMIT this->showing(nullptr);
   }
 
   if (!visible || !repr)
@@ -214,7 +214,7 @@ void pqSpreadSheetView::onCreateSelection(vtkSMSourceProxy* selSource)
   }
   else
   {
-    Q_EMIT this->selected(0);
+    Q_EMIT this->selected(nullptr);
   }
 }
 

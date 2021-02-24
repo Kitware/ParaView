@@ -165,7 +165,7 @@ void pqPluginManager::loadPluginsFromSettings()
     vtkVLogScopeF(PARAVIEW_LOG_PLUGIN_VERBOSITY(),
       "Loading local Plugin configuration using settings key: %s", key.toLocal8Bit().data());
     vtkSMProxyManager::GetProxyManager()->GetPluginManager()->LoadPluginConfigurationXMLFromString(
-      local_plugin_config.toUtf8().data(), NULL, false);
+      local_plugin_config.toUtf8().data(), nullptr, false);
   }
 }
 

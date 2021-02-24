@@ -32,13 +32,11 @@ vtkPVPLYWriter::vtkPVPLYWriter()
   , EnableAlpha(false)
 {
   this->SetInputArrayToProcess(
-    0, 0, 0, vtkDataObject::FIELD_ASSOCIATION_POINTS, static_cast<const char*>(NULL));
+    0, 0, 0, vtkDataObject::FIELD_ASSOCIATION_POINTS, static_cast<const char*>(nullptr));
 }
 
 //----------------------------------------------------------------------------
-vtkPVPLYWriter::~vtkPVPLYWriter()
-{
-}
+vtkPVPLYWriter::~vtkPVPLYWriter() = default;
 
 //----------------------------------------------------------------------------
 int vtkPVPLYWriter::FillInputPortInformation(int, vtkInformation* info)
@@ -83,9 +81,9 @@ void vtkPVPLYWriter::WriteData()
 {
   int fieldAssociation = 0;
   vtkPolyData* input = vtkPolyData::SafeDownCast(this->GetInputDataObject(0, 0));
-  if (vtkAbstractArray* scalars = (this->EnableColoring && this->LookupTable != NULL)
+  if (vtkAbstractArray* scalars = (this->EnableColoring && this->LookupTable != nullptr)
       ? this->GetInputAbstractArrayToProcess(0, input, fieldAssociation)
-      : NULL)
+      : nullptr)
   {
     this->Writer->SetColorModeToDefault();
     this->Writer->SetArrayName("vtkPVPLYWriterColors");
@@ -114,7 +112,7 @@ void vtkPVPLYWriter::WriteData()
     this->Writer->EnableAlphaOff();
   }
   this->Writer->Write();
-  this->Writer->SetInputDataObject(0, NULL);
+  this->Writer->SetInputDataObject(0, nullptr);
 }
 
 //----------------------------------------------------------------------------

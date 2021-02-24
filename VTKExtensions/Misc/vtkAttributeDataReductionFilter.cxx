@@ -38,9 +38,7 @@ vtkAttributeDataReductionFilter::vtkAttributeDataReductionFilter()
 }
 
 //-----------------------------------------------------------------------------
-vtkAttributeDataReductionFilter::~vtkAttributeDataReductionFilter()
-{
-}
+vtkAttributeDataReductionFilter::~vtkAttributeDataReductionFilter() = default;
 
 //----------------------------------------------------------------------------
 int vtkAttributeDataReductionFilter::FillInputPortInformation(int port, vtkInformation* info)

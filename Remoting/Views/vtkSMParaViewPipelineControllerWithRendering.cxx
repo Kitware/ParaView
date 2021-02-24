@@ -294,9 +294,8 @@ vtkSMParaViewPipelineControllerWithRendering::vtkSMParaViewPipelineControllerWit
 }
 
 //----------------------------------------------------------------------------
-vtkSMParaViewPipelineControllerWithRendering::~vtkSMParaViewPipelineControllerWithRendering()
-{
-}
+vtkSMParaViewPipelineControllerWithRendering::~vtkSMParaViewPipelineControllerWithRendering() =
+  default;
 
 //----------------------------------------------------------------------------
 void vtkSMParaViewPipelineControllerWithRendering::SetHideScalarBarOnHide(bool val)

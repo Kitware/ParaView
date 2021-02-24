@@ -48,7 +48,7 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqLoadStateReaction : public pqReaction
 
 public:
   /**
-  * Constructor. Parent cannot be NULL.
+  * Constructor. Parent cannot be nullptr.
   */
   pqLoadStateReaction(QAction* parent);
 
@@ -59,7 +59,7 @@ public:
   * If no server is specified, active server is used.
   */
   static void loadState(
-    const QString& filename, bool dialogBlocked = false, pqServer* server = NULL);
+    const QString& filename, bool dialogBlocked = false, pqServer* server = nullptr);
   static void loadState();
 
   /**

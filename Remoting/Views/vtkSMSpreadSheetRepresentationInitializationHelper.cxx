@@ -31,15 +31,11 @@
 vtkStandardNewMacro(vtkSMSpreadSheetRepresentationInitializationHelper);
 //----------------------------------------------------------------------------
 vtkSMSpreadSheetRepresentationInitializationHelper::
-  vtkSMSpreadSheetRepresentationInitializationHelper()
-{
-}
+  vtkSMSpreadSheetRepresentationInitializationHelper() = default;
 
 //----------------------------------------------------------------------------
 vtkSMSpreadSheetRepresentationInitializationHelper::
-  ~vtkSMSpreadSheetRepresentationInitializationHelper()
-{
-}
+  ~vtkSMSpreadSheetRepresentationInitializationHelper() = default;
 
 //----------------------------------------------------------------------------
 void vtkSMSpreadSheetRepresentationInitializationHelper::PrintSelf(ostream& os, vtkIndent indent)

@@ -165,34 +165,34 @@ private:
   void operator=(const Private&) = delete;
 };
 
-vtkStandardNewMacro(vtkStreamLinesMapper::Private)
+vtkStandardNewMacro(vtkStreamLinesMapper::Private);
 
-  //----------------------------------------------------------------------------
-  vtkStreamLinesMapper::Private::Private()
+//----------------------------------------------------------------------------
+vtkStreamLinesMapper::Private::Private()
 {
-  this->Mapper = 0;
+  this->Mapper = nullptr;
   this->RandomNumberSequence = vtkSmartPointer<vtkMinimalStandardRandomSequence>::New();
   this->RandomNumberSequence->SetSeed(1);
-  this->VBOs = 0;
-  this->ShaderCache = 0;
-  this->CurrentBuffer = 0;
-  this->FrameBuffer = 0;
-  this->CurrentTexture = 0;
-  this->FrameTexture = 0;
-  this->Program = 0;
-  this->BlendingProgram = 0;
-  this->TextureProgram = 0;
-  this->IndexBufferObject = 0;
+  this->VBOs = nullptr;
+  this->ShaderCache = nullptr;
+  this->CurrentBuffer = nullptr;
+  this->FrameBuffer = nullptr;
+  this->CurrentTexture = nullptr;
+  this->FrameTexture = nullptr;
+  this->Program = nullptr;
+  this->BlendingProgram = nullptr;
+  this->TextureProgram = nullptr;
+  this->IndexBufferObject = nullptr;
   this->Particles->SetDataTypeToFloat();
   this->RebuildBufferObjects = true;
-  this->InterpolationArray = 0;
-  this->InterpolationScalarArray = 0;
-  this->Vectors = 0;
+  this->InterpolationArray = nullptr;
+  this->InterpolationScalarArray = nullptr;
+  this->Vectors = nullptr;
   this->Scalars = this->Particles->GetData();
-  this->DataSet = 0;
+  this->DataSet = nullptr;
   this->ClearFlag = true;
   this->RebuildBufferObjects = true;
-  this->Locator = 0;
+  this->Locator = nullptr;
   this->ActorMTime = 0;
   this->CameraMTime = 0;
   this->AreCellVectors = false;
@@ -206,12 +206,12 @@ vtkStreamLinesMapper::Private::~Private()
   if (this->InterpolationArray)
   {
     this->InterpolationArray->Delete();
-    this->InterpolationArray = 0;
+    this->InterpolationArray = nullptr;
   }
   if (this->InterpolationScalarArray)
   {
     this->InterpolationScalarArray->Delete();
-    this->InterpolationScalarArray = 0;
+    this->InterpolationScalarArray = nullptr;
   }
   if (this->Locator)
   {
@@ -250,7 +250,7 @@ bool vtkStreamLinesMapper::Private::InterpolateSpeedAndColor(
   vtkIdType cellId = 0;
   if (!this->Locator)
   {
-    cellId = this->DataSet->FindCell(pos, 0, -1, 1e-10, subId, pcoords, weights);
+    cellId = this->DataSet->FindCell(pos, nullptr, -1, 1e-10, subId, pcoords, weights);
   }
   else
   {
@@ -462,7 +462,7 @@ void vtkStreamLinesMapper::Private::DrawParticles(vtkRenderer* ren, vtkActor* ac
     this->RebuildBufferObjects = false;
   }
 
-  vtkSmartPointer<vtkUnsignedCharArray> colors = 0;
+  vtkSmartPointer<vtkUnsignedCharArray> colors = nullptr;
   if (useScalars)
   {
     colors.TakeReference(this->Mapper->GetLookupTable()->MapScalars(this->InterpolationScalarArray,
@@ -700,7 +700,7 @@ void vtkStreamLinesMapper::Private::SetData(
     if (this->Locator)
     {
       this->Locator->Delete();
-      this->Locator = 0;
+      this->Locator = nullptr;
     }
     if (inData->GetDataObjectType() != VTK_IMAGE_DATA)
     {
@@ -724,7 +724,7 @@ void vtkStreamLinesMapper::Private::SetData(
     if (this->InterpolationScalarArray)
     {
       this->InterpolationScalarArray->Delete();
-      this->InterpolationScalarArray = 0;
+      this->InterpolationScalarArray = nullptr;
     }
     if (scalars)
     {
@@ -749,7 +749,7 @@ void vtkStreamLinesMapper::Private::SetData(
     if (this->InterpolationArray)
     {
       this->InterpolationArray->Delete();
-      this->InterpolationArray = 0;
+      this->InterpolationArray = nullptr;
     }
     this->InterpolationArray = vtkDataArray::CreateDataArray(speedField->GetDataType());
     this->InterpolationArray->SetNumberOfComponents(3);
@@ -758,10 +758,10 @@ void vtkStreamLinesMapper::Private::SetData(
 }
 
 //-----------------------------------------------------------------------------
-vtkStandardNewMacro(vtkStreamLinesMapper)
+vtkStandardNewMacro(vtkStreamLinesMapper);
 
-  //-----------------------------------------------------------------------------
-  vtkStreamLinesMapper::vtkStreamLinesMapper()
+//-----------------------------------------------------------------------------
+vtkStreamLinesMapper::vtkStreamLinesMapper()
 {
   this->Internal = Private::New();
   this->Internal->SetMapper(this);

@@ -39,9 +39,8 @@ vtkPVPythonAlgorithmPluginLoaderInitializer::vtkPVPythonAlgorithmPluginLoaderIni
   nifty_counter++;
 }
 
-vtkPVPythonAlgorithmPluginLoaderInitializer::~vtkPVPythonAlgorithmPluginLoaderInitializer()
-{
-}
+vtkPVPythonAlgorithmPluginLoaderInitializer::~vtkPVPythonAlgorithmPluginLoaderInitializer() =
+  default;
 
 //============================================================================
 
@@ -147,9 +146,7 @@ vtkPVPythonAlgorithmPlugin::vtkPVPythonAlgorithmPlugin(const char* modulefile)
 }
 
 //----------------------------------------------------------------------------
-vtkPVPythonAlgorithmPlugin::~vtkPVPythonAlgorithmPlugin()
-{
-}
+vtkPVPythonAlgorithmPlugin::~vtkPVPythonAlgorithmPlugin() = default;
 
 //----------------------------------------------------------------------------
 const char* vtkPVPythonAlgorithmPlugin::GetPluginName()

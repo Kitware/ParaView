@@ -26,14 +26,10 @@
 vtkStandardNewMacro(vtkImageTransparencyFilter);
 
 //-----------------------------------------------------------------------------
-vtkImageTransparencyFilter::vtkImageTransparencyFilter()
-{
-}
+vtkImageTransparencyFilter::vtkImageTransparencyFilter() = default;
 
 //-----------------------------------------------------------------------------
-vtkImageTransparencyFilter::~vtkImageTransparencyFilter()
-{
-}
+vtkImageTransparencyFilter::~vtkImageTransparencyFilter() = default;
 
 //-----------------------------------------------------------------------------
 int vtkImageTransparencyFilter::RequestData(

@@ -24,9 +24,7 @@
 #include "pqServer.h"
 #include "pqTestUtility.h"
 
-pqFileDialogTestUtility::pqFileDialogTestUtility()
-{
-}
+pqFileDialogTestUtility::pqFileDialogTestUtility() = default;
 
 pqFileDialogTestUtility::~pqFileDialogTestUtility()
 {
@@ -181,7 +179,7 @@ void pqFileDialogTestWidget::openFileDialog()
   pqServer* server = this->Server;
   if (this->ConnectionMode->currentText() == "Local")
   {
-    server = NULL;
+    server = nullptr;
   }
 
   pqFileDialog diag(

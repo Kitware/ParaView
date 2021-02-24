@@ -111,7 +111,7 @@ public:
 protected:
   //@{
   /**
-   * Construct with NULL input array and empty but allocated output array.
+   * Construct with nullptr input array and empty but allocated output array.
    */
   vtkImageCompressor();
   ~vtkImageCompressor() override;

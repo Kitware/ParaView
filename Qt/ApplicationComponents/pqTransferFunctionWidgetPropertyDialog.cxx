@@ -58,12 +58,10 @@ pqTransferFunctionWidgetPropertyDialog::pqTransferFunctionWidgetPropertyDialog(c
   this->setWindowTitle(label);
   this->Internals->Ui.Label->setText(this->Internals->Ui.Label->text().arg(label));
   this->Internals->Ui.TransferFunctionEditor->initialize(
-    NULL, false, this->TransferFunction.GetPointer(), true);
+    nullptr, false, this->TransferFunction.GetPointer(), true);
 
   QObject::connect(this->Internals->Ui.TransferFunctionEditor, SIGNAL(controlPointsModified()),
     this->PropertyWidget, SLOT(propagateProxyPointsProperty()));
 }
 
-pqTransferFunctionWidgetPropertyDialog::~pqTransferFunctionWidgetPropertyDialog()
-{
-}
+pqTransferFunctionWidgetPropertyDialog::~pqTransferFunctionWidgetPropertyDialog() = default;

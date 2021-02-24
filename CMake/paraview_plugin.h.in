@@ -101,8 +101,8 @@ public:
 
   /**
    * Returns the callback function to call to initialize the interpretor for
-   * the new vtk/server-manager classes added by this plugin. Returning NULL is
-   * perfectly valid.
+   * the new vtk/server-manager classes added by this plugin. Returning nullptr
+   * is perfectly valid.
    */
   vtkClientServerInterpreterInitializer::InterpreterInitializationCallback
     GetInitializeInterpreterCallback() override;

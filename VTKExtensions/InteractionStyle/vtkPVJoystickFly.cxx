@@ -45,9 +45,7 @@ vtkPVJoystickFly::vtkPVJoystickFly()
 }
 
 //-------------------------------------------------------------------------
-vtkPVJoystickFly::~vtkPVJoystickFly()
-{
-}
+vtkPVJoystickFly::~vtkPVJoystickFly() = default;
 
 //-------------------------------------------------------------------------
 void vtkPVJoystickFly::OnButtonDown(int, int, vtkRenderer* ren, vtkRenderWindowInteractor* rwi)

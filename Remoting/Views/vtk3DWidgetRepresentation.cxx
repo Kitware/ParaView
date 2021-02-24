@@ -32,8 +32,8 @@ vtk3DWidgetRepresentation::vtk3DWidgetRepresentation()
   , PlaceWidgetBounds{ 0, 0, 0, 0, 0, 0 }
 {
   this->SetNumberOfInputPorts(0);
-  this->Widget = 0;
-  this->Representation = 0;
+  this->Widget = nullptr;
+  this->Representation = nullptr;
   this->UseNonCompositedRenderer = false;
   this->Enabled = false;
 
@@ -44,8 +44,8 @@ vtk3DWidgetRepresentation::vtk3DWidgetRepresentation()
 //----------------------------------------------------------------------------
 vtk3DWidgetRepresentation::~vtk3DWidgetRepresentation()
 {
-  this->SetWidget(0);
-  this->SetRepresentation(0);
+  this->SetWidget(nullptr);
+  this->SetRepresentation(nullptr);
 }
 
 //-----------------------------------------------------------------------------
@@ -81,9 +81,9 @@ bool vtk3DWidgetRepresentation::AddToView(vtkView* view)
       this->UseNonCompositedRenderer ? pvview->GetNonCompositedRenderer() : pvview->GetRenderer();
     if (this->Widget)
     {
-      // If DefaultRenderer is non-null, SetCurrentRenderer() will have no
+      // If DefaultRenderer is non-nullptr, SetCurrentRenderer() will have no
       // effect.
-      this->Widget->SetDefaultRenderer(NULL);
+      this->Widget->SetDefaultRenderer(nullptr);
       this->Widget->SetCurrentRenderer(activeRenderer);
       // Set the DefaultRenderer to ensure that it doesn't get overridden by the
       // Widget. The Widget should use the specified renderer. Period.
@@ -123,23 +123,23 @@ void vtk3DWidgetRepresentation::SetEnabled(bool enable)
 //-----------------------------------------------------------------------------
 void vtk3DWidgetRepresentation::UpdateEnabled()
 {
-  if (this->Widget == NULL)
+  if (this->Widget == nullptr)
   {
     return;
   }
 
-  bool enable_widget = (this->View != NULL) ? this->Enabled : false;
+  bool enable_widget = (this->View != nullptr) ? this->Enabled : false;
 
   // BUG #14913: Don't enable widget when the representation is missing or not
   // visible.
-  if (this->Representation == NULL || this->Representation->GetVisibility() == 0)
+  if (this->Representation == nullptr || this->Representation->GetVisibility() == 0)
   {
     enable_widget = false;
   }
 
   // Not all processes have the interactor setup. Enable 3D widgets only on
   // those processes that have an interactor.
-  if (this->View == NULL || this->View->GetInteractor() == NULL)
+  if (this->View == nullptr || this->View->GetInteractor() == nullptr)
   {
     enable_widget = false;
   }
@@ -177,13 +177,13 @@ bool vtk3DWidgetRepresentation::RemoveFromView(vtkView* view)
   vtkPVRenderView* pvview = vtkPVRenderView::SafeDownCast(view);
   if (pvview)
   {
-    this->View = NULL;
+    this->View = nullptr;
     if (this->Widget)
     {
       this->Widget->SetEnabled(0);
-      this->Widget->SetDefaultRenderer(0);
-      this->Widget->SetCurrentRenderer(0);
-      this->Widget->SetInteractor(0);
+      this->Widget->SetDefaultRenderer(nullptr);
+      this->Widget->SetCurrentRenderer(nullptr);
+      this->Widget->SetInteractor(nullptr);
     }
     if (this->Representation)
     {
@@ -193,7 +193,7 @@ bool vtk3DWidgetRepresentation::RemoveFromView(vtkView* view)
         renderer->RemoveActor(this->Representation);
         // NOTE: this will modify the Representation and call
         // this->OnRepresentationModified().
-        this->Representation->SetRenderer(0);
+        this->Representation->SetRenderer(nullptr);
       }
     }
     return true;

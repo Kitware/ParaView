@@ -63,8 +63,8 @@ using std::ostringstream;
 class vtkSortedTableStreamer::InternalsBase
 {
 public:
-  InternalsBase() {}
-  virtual ~InternalsBase() {}
+  InternalsBase() = default;
+  virtual ~InternalsBase() = default;
 
   virtual void SetSelectedComponent(int newValue) = 0;
   virtual void InvalidateCache() = 0;
@@ -92,8 +92,8 @@ public:
     vtkIdType processId, vtkTable* otherTable, vtkTable* mergedTable, vtkIdType minSize)
   {
     // Loop on all column of the table
-    vtkAbstractArray* otherArray = 0;
-    vtkAbstractArray* dstArray = 0;
+    vtkAbstractArray* otherArray = nullptr;
+    vtkAbstractArray* dstArray = nullptr;
     bool needNewArray = false;
     for (vtkIdType colIdx = 0; colIdx < otherTable->GetNumberOfColumns(); ++colIdx)
     {
@@ -162,7 +162,7 @@ public:
       this->Size = 0;
       this->Min = 0;
       this->Delta = 1;
-      this->Values = 0;
+      this->Values = nullptr;
     }
 
     Histogram(int size)
@@ -184,7 +184,7 @@ public:
       if (this->Values)
       {
         delete[] this->Values;
-        this->Values = 0;
+        this->Values = nullptr;
       }
     }
 
@@ -335,7 +335,7 @@ public:
       if (other.Values)
       {
         delete[] other.Values;
-        other.Values = 0;
+        other.Values = nullptr;
       }
       other.Values = new vtkIdType[this->Size];
       for (int i = 0; i < this->Size; i++)
@@ -426,8 +426,8 @@ public:
 
     ArraySorter()
     {
-      this->Array = 0;
-      this->Histo = 0;
+      this->Array = nullptr;
+      this->Histo = nullptr;
     }
 
     ~ArraySorter() { this->Clear(); }
@@ -437,12 +437,12 @@ public:
       if (this->Array)
       {
         delete[] this->Array;
-        this->Array = 0;
+        this->Array = nullptr;
       }
       if (this->Histo)
       {
         delete this->Histo;
-        this->Histo = 0;
+        this->Histo = nullptr;
       }
     }
     void FillArray(vtkIdType numTuples)
@@ -554,8 +554,8 @@ public:
   Internals()
   {
     // Only used for testing
-    this->LocalSorter = 0;
-    this->GlobalHistogram = 0;
+    this->LocalSorter = nullptr;
+    this->GlobalHistogram = nullptr;
     this->Debug = false;
   }
 
@@ -568,7 +568,7 @@ public:
 
     this->InputMTime = input->GetMTime();
 
-    if (dataToSort) // Might be NULL
+    if (dataToSort) // Might be nullptr
     {
       this->DataMTime = dataToSort->GetMTime();
     }
@@ -596,7 +596,7 @@ public:
   {
     // See if one process is able to sort the table,
     // if not then just say NOT sortable
-    int localCanSort = (this->DataToSort == NULL) ? 0 : 1;
+    int localCanSort = (this->DataToSort == nullptr) ? 0 : 1;
     int globalCanSort;
     this->MPI->AllReduce(&localCanSort, &globalCanSort, 1, vtkCommunicator::MAX_OP);
     if (globalCanSort == 0)
@@ -633,7 +633,7 @@ public:
     {
       localRatio = sqrt(static_cast<double>(this->DataToSort->GetNumberOfComponents()));
     }
-    else if (this->DataToSort == NULL)
+    else if (this->DataToSort == nullptr)
     {
       localRatio = 0;
     }
@@ -729,7 +729,7 @@ public:
 
     // Build empty local table with empty arrays so they stay in the same order
     vtkSmartPointer<vtkTable> localResult;
-    localResult.TakeReference(NewSubsetTable(input, NULL, 0, blockSize));
+    localResult.TakeReference(NewSubsetTable(input, nullptr, 0, blockSize));
 
     // Get the array size of each processes
     vtkIdType* tableSizes = new vtkIdType[this->NumProcs];
@@ -842,7 +842,7 @@ public:
       this->MPI->Send(localResult.GetPointer(), mergePid, VTK_TABLE_EXCHANGE_TAG);
 
       // Add meta data of mergePid
-      this->DecorateTable(input, 0, mergePid);
+      this->DecorateTable(input, nullptr, mergePid);
     }
     return 1;
   }
@@ -969,7 +969,7 @@ public:
     else
     {
       // Ask other processes to provide metadata for table decoration
-      this->DecorateTable(input, NULL, mergePid);
+      this->DecorateTable(input, nullptr, mergePid);
     }
 
     return 1;
@@ -1064,7 +1064,7 @@ public:
       }
 
       vtkIdType max = size + offset;
-      if (sorter != NULL && sorter->Array != NULL)
+      if (sorter != nullptr && sorter->Array != nullptr)
       {
         max = (max > sorter->ArraySize) ? sorter->ArraySize : max;
         for (vtkIdType idx = offset; idx < max; ++idx)
@@ -1333,13 +1333,13 @@ vtkCxxSetObjectMacro(vtkSortedTableStreamer, Controller, vtkMultiProcessControll
 vtkSortedTableStreamer::vtkSortedTableStreamer()
 {
   this->InvertOrder = 0;
-  this->Controller = 0;
+  this->Controller = nullptr;
   this->SetNumberOfInputPorts(1);
-  this->ColumnToSort = 0;
+  this->ColumnToSort = nullptr;
   this->SetColumnToSort("");
   this->Block = 0;
   this->BlockSize = 1024;
-  this->Internal = 0;
+  this->Internal = nullptr;
   this->SelectedComponent = 0;
   this->SetController(vtkMultiProcessController::GetGlobalController());
 }
@@ -1347,12 +1347,12 @@ vtkSortedTableStreamer::vtkSortedTableStreamer()
 //----------------------------------------------------------------------------
 vtkSortedTableStreamer::~vtkSortedTableStreamer()
 {
-  this->SetColumnToSort(0);
-  this->SetController(0);
+  this->SetColumnToSort(nullptr);
+  this->SetController(nullptr);
   if (this->Internal)
   {
     delete this->Internal;
-    this->Internal = 0;
+    this->Internal = nullptr;
   }
 }
 
@@ -1527,7 +1527,7 @@ int vtkSortedTableStreamer::RequestData(vtkInformation* vtkNotUsed(request),
 
   // --------------------------------------------------------------------------
   // Caution: Because this filter can be used behind a cell/point extractor
-  // based on a selection, the input can be empty and arrayToProcess can be NULL.
+  // based on a selection, the input can be empty and arrayToProcess can be nullptr.
   // And this can happen on all processes if the selection do not select a
   // single point/cell.
   // --------------------------------------------------------------------------
@@ -1536,7 +1536,7 @@ int vtkSortedTableStreamer::RequestData(vtkInformation* vtkNotUsed(request),
   if (this->Internal && this->Internal->IsInvalid(input, arrayToProcess))
   {
     delete this->Internal;
-    this->Internal = 0;
+    this->Internal = nullptr;
   }
 
   // Make sure that an internal object is available
@@ -1585,7 +1585,7 @@ void vtkSortedTableStreamer::SetColumnNameToSort(const char* columnName)
     if (this->Internal)
     {
       delete this->Internal;
-      this->Internal = 0;
+      this->Internal = nullptr;
     }
   }
 }
@@ -1598,7 +1598,7 @@ void vtkSortedTableStreamer::SetInvertOrder(int newValue)
   if (removeInternal && this->Internal)
   {
     delete this->Internal;
-    this->Internal = 0;
+    this->Internal = nullptr;
   }
 
   if (changed)
@@ -1611,7 +1611,7 @@ void vtkSortedTableStreamer::SetInvertOrder(int newValue)
 vtkDataArray* vtkSortedTableStreamer::GetDataArrayToProcess(vtkTable* input)
 {
   // Get a default array to sort just in case
-  vtkDataArray* requestedArray = 0;
+  vtkDataArray* requestedArray = nullptr;
 
   if (this->GetColumnToSort())
   {
@@ -1638,7 +1638,7 @@ void vtkSortedTableStreamer::CreateInternalIfNeeded(vtkTable* input, vtkDataArra
     else
     {
       // Provide an empty data
-      this->Internal = new Internals<double>(input, 0, this->GetController());
+      this->Internal = new Internals<double>(input, nullptr, this->GetController());
     }
   }
 }

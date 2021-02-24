@@ -101,12 +101,12 @@ public:
 
   /**
    * Returns a vtkSIObject or subclass given its global id, if any otherwise
-   * return NULL;
+   * return nullptr;
    */
   vtkSIObject* GetSIObject(vtkTypeUInt32 globalid);
 
   /**
-   * Return a vtkObject given its global id if any otherwise return NULL;
+   * Return a vtkObject given its global id if any otherwise return nullptr;
    */
   vtkObject* GetRemoteObject(vtkTypeUInt32 globalid);
 

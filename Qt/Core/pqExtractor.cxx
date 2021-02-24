@@ -66,9 +66,7 @@ pqExtractor::pqExtractor(const QString& group, const QString& name, vtkSMProxy* 
 }
 
 //-----------------------------------------------------------------------------
-pqExtractor::~pqExtractor()
-{
-}
+pqExtractor::~pqExtractor() = default;
 
 //-----------------------------------------------------------------------------
 void pqExtractor::initialize()

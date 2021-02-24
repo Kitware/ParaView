@@ -29,14 +29,10 @@
 
 vtkStandardNewMacro(vtkSMOrthographicSliceViewProxy);
 //----------------------------------------------------------------------------
-vtkSMOrthographicSliceViewProxy::vtkSMOrthographicSliceViewProxy()
-{
-}
+vtkSMOrthographicSliceViewProxy::vtkSMOrthographicSliceViewProxy() = default;
 
 //----------------------------------------------------------------------------
-vtkSMOrthographicSliceViewProxy::~vtkSMOrthographicSliceViewProxy()
-{
-}
+vtkSMOrthographicSliceViewProxy::~vtkSMOrthographicSliceViewProxy() = default;
 
 //----------------------------------------------------------------------------
 void vtkSMOrthographicSliceViewProxy::CreateVTKObjects()
@@ -69,7 +65,7 @@ const char* vtkSMOrthographicSliceViewProxy::GetRepresentationType(
 {
   if (!producer)
   {
-    return 0;
+    return nullptr;
   }
 
   assert("Session should be valid" && this->GetSession());

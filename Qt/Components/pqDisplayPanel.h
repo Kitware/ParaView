@@ -48,7 +48,7 @@ public:
   /**
   * constructor
   */
-  pqDisplayPanel(pqRepresentation* Representation, QWidget* p = NULL);
+  pqDisplayPanel(pqRepresentation* Representation, QWidget* p = nullptr);
   /**
   * destructor
   */

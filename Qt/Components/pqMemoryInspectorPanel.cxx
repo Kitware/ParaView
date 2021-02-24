@@ -262,7 +262,7 @@ void ClearVectorOfPointers(vector<T*> data)
     if (data[i])
     {
       delete data[i];
-      data[i] = NULL;
+      data[i] = nullptr;
     }
   }
   data.clear();
@@ -542,7 +542,7 @@ RankData* HostData::GetRankData(int i)
   {
     return this->Ranks[i];
   }
-  return NULL;
+  return nullptr;
 }
 
 //-----------------------------------------------------------------------------
@@ -795,7 +795,7 @@ void pqMemoryInspectorPanel::ClearServer(map<string, HostData*>& hosts, vector<R
     if ((*it).second)
     {
       delete (*it).second;
-      (*it).second = NULL;
+      (*it).second = nullptr;
     }
     ++it;
   }
@@ -957,9 +957,9 @@ void pqMemoryInspectorPanel::InitializeServerGroup(long long clientPid,
 #endif
 
     // host
-    HostData* serverHost = NULL;
+    HostData* serverHost = nullptr;
 
-    pair<string, HostData*> ins(hostName, (HostData*)0);
+    pair<string, HostData*> ins(hostName, (HostData*)nullptr);
     pair<map<string, HostData*>::iterator, bool> ret;
     ret = hosts.insert(ins);
     if (ret.second)
@@ -1061,8 +1061,8 @@ int pqMemoryInspectorPanel::Initialize()
   QWidget* groupWidget = this->NewGroupWidget("client", ":/pqWidgets/Icons/pqClient32.png");
   this->Ui->configView->setItemWidget(clientGroup, 0, groupWidget);
 
-  vtkSMSession* session = NULL;
-  vtkPVSystemConfigInformation* configs = NULL;
+  vtkSMSession* session = nullptr;
+  vtkPVSystemConfigInformation* configs = nullptr;
 
   configs = vtkPVSystemConfigInformation::New();
   session = server->session();
@@ -1139,7 +1139,7 @@ int pqMemoryInspectorPanel::Initialize()
     cerr << left << setw(56) << setfill('=') << "server" << endl
          << right << setw(1) << setfill(' ');
 #endif
-    QTreeWidgetItem* group = NULL;
+    QTreeWidgetItem* group = nullptr;
     group = new QTreeWidgetItem(this->Ui->configView);
     group->setChildIndicatorPolicy(QTreeWidgetItem::DontShowIndicatorWhenChildless);
     group->setExpanded(true);
@@ -1284,8 +1284,8 @@ void pqMemoryInspectorPanel::UpdateRanks()
   }
 
   // fectch latest numbers
-  vtkSMSession* session = NULL;
-  vtkPVMemoryUseInformation* infos = NULL;
+  vtkSMSession* session = nullptr;
+  vtkPVMemoryUseInformation* infos = nullptr;
   size_t nInfos = 0;
 
   // client
@@ -1479,7 +1479,7 @@ void pqMemoryInspectorPanel::ExecuteRemoteCommand()
     if (type == ITEM_DATA_CLIENT_GROUP)
     {
       item = item->child(0);
-      if (item == NULL)
+      if (item == nullptr)
         return;
       type = item->data(0, ITEM_KEY_PROCESS_TYPE).toInt();
     }
@@ -1591,7 +1591,7 @@ void pqMemoryInspectorPanel::ShowOnlyNodes()
 
   QTreeWidgetItem* item;
   QTreeWidgetItemIterator it(this->Ui->configView);
-  while ((item = *it) != (QTreeWidgetItem*)0)
+  while ((item = *it) != (QTreeWidgetItem*)nullptr)
   {
     bool ok;
     int type = item->data(0, ITEM_KEY_PROCESS_TYPE).toInt(&ok);
@@ -1646,7 +1646,7 @@ void pqMemoryInspectorPanel::ShowHostPropertiesDialog()
   if (type == ITEM_DATA_CLIENT_GROUP)
   {
     item = item->child(0);
-    if (item == NULL)
+    if (item == nullptr)
       return;
     type = item->data(0, ITEM_KEY_PROCESS_TYPE).toInt();
   }
@@ -1703,7 +1703,7 @@ void pqMemoryInspectorPanel::ConfigViewContextMenu(const QPoint& position)
       case ITEM_DATA_CLIENT_GROUP:
       {
         QTreeWidgetItem* child = item->child(0);
-        if (child == NULL)
+        if (child == nullptr)
           return;
         context.addAction("properties...", this, SLOT(ShowHostPropertiesDialog()));
         int sysType = child->data(0, ITEM_KEY_SYSTEM_TYPE).toInt(&ok);
@@ -1727,7 +1727,7 @@ void pqMemoryInspectorPanel::ConfigViewContextMenu(const QPoint& position)
         context.addAction("show all ranks", this, SLOT(ShowAllRanks()));
 
         QTreeWidgetItem* child = item->child(0);
-        if (child == NULL)
+        if (child == nullptr)
           return;
         int sysType = child->data(0, ITEM_KEY_SYSTEM_TYPE).toInt(&ok);
         if (!ok)

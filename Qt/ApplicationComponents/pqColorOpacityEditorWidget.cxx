@@ -92,7 +92,7 @@ public:
     , Hidden(false)
   {
   }
-  ~pqColorOpacityEditorWidgetDecorator() override {}
+  ~pqColorOpacityEditorWidgetDecorator() override = default;
 
   void setHidden(bool val)
   {

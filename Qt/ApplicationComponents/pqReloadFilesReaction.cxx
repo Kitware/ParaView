@@ -88,16 +88,14 @@ pqReloadFilesReaction::pqReloadFilesReaction(QAction* parentObject)
 }
 
 //-----------------------------------------------------------------------------
-pqReloadFilesReaction::~pqReloadFilesReaction()
-{
-}
+pqReloadFilesReaction::~pqReloadFilesReaction() = default;
 
 //-----------------------------------------------------------------------------
 void pqReloadFilesReaction::updateEnableState()
 {
   vtkSMProxy* source = pqActiveObjects::instance().activeSource()
     ? pqActiveObjects::instance().activeSource()->getProxy()
-    : NULL;
+    : nullptr;
 
   vtkNew<vtkSMReaderReloadHelper> helper;
   this->parentAction()->setEnabled(helper->SupportsReload(vtkSMSourceProxy::SafeDownCast(source)));
@@ -108,7 +106,7 @@ bool pqReloadFilesReaction::reload()
 {
   vtkSMProxy* source = pqActiveObjects::instance().activeSource()
     ? pqActiveObjects::instance().activeSource()->getProxy()
-    : NULL;
+    : nullptr;
   return pqReloadFilesReaction::reload(vtkSMSourceProxy::SafeDownCast(source));
 }
 

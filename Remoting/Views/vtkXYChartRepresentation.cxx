@@ -37,7 +37,8 @@ protected:
     : ArrayToSortBy(nullptr)
   {
   }
-  ~SortTableFilter() override {}
+  ~SortTableFilter() override = default;
+
 public:
   static SortTableFilter* New();
   int RequestData(
@@ -146,7 +147,7 @@ vtkChartXY* vtkXYChartRepresentation::GetChart()
   }
   else
   {
-    return 0;
+    return nullptr;
   }
 }
 

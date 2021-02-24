@@ -206,7 +206,7 @@ vtkPLANLHaloFinder::vtkPLANLHaloFinder()
   this->ComputeSOD = 0;
   this->CenterFindingMethod = AVERAGE;
 
-  this->HaloFinder = NULL;
+  this->HaloFinder = nullptr;
   this->RhoC = cosmotk::RHO_C;
   this->SODMass = cosmotk::SOD_MASS;
   this->MinRadiusFactor = cosmotk::MIN_RADIUS_FACTOR;
@@ -222,25 +222,25 @@ vtkPLANLHaloFinder::vtkPLANLHaloFinder()
 //------------------------------------------------------------------------------
 vtkPLANLHaloFinder::~vtkPLANLHaloFinder()
 {
-  this->Controller = NULL;
+  this->Controller = nullptr;
 
-  if (this->HaloFinder != NULL)
+  if (this->HaloFinder != nullptr)
   {
     delete this->HaloFinder;
   }
 
-  if (this->Particles != NULL)
+  if (this->Particles != nullptr)
   {
     this->Particles->Clear();
     delete this->Particles;
-    this->Particles = NULL;
+    this->Particles = nullptr;
   }
 
-  if (this->Halos != NULL)
+  if (this->Halos != nullptr)
   {
     this->Halos->Clear();
     delete this->Halos;
-    this->Halos = NULL;
+    this->Halos = nullptr;
   }
 
   ;
@@ -255,7 +255,7 @@ void vtkPLANLHaloFinder::PrintSelf(ostream& os, vtkIndent indent)
 //------------------------------------------------------------------------------
 void vtkPLANLHaloFinder::SetController(vtkMultiProcessController* c)
 {
-  assert("pre: cannot set a NULL controller!" && (c != NULL));
+  assert("pre: cannot set a nullptr controller!" && (c != nullptr));
   this->Controller = c;
 }
 
@@ -269,32 +269,32 @@ vtkMultiProcessController* vtkPLANLHaloFinder::GetController()
 int vtkPLANLHaloFinder::RequestData(vtkInformation* vtkNotUsed(request),
   vtkInformationVector** inputVector, vtkInformationVector* outputVector)
 {
-  assert("pre: controller should not be NULL!" && (this->Controller != NULL));
+  assert("pre: controller should not be nullptr!" && (this->Controller != nullptr));
 
   // Reset previously calculated data
   this->ResetHaloFinderInternals();
 
   // STEP 0: Get input object
   vtkInformation* input = inputVector[0]->GetInformationObject(0);
-  assert("pre: input information object is NULL " && (input != NULL));
+  assert("pre: input information object is nullptr " && (input != nullptr));
   vtkUnstructuredGrid* inputParticles =
     vtkUnstructuredGrid::SafeDownCast(input->Get(vtkDataObject::DATA_OBJECT()));
-  assert("pre: input particles is NULL!" && (inputParticles != NULL));
+  assert("pre: input particles is nullptr!" && (inputParticles != nullptr));
 
   // STEP 1: Get output objects. The output consists of two objects: (1) The
   // particles with halo information attached to it and (2) the halo centers
   // and generic FOF information.
   vtkInformation* output0 = outputVector->GetInformationObject(0);
-  assert("pre: output information object is NULL" && (output0 != NULL));
+  assert("pre: output information object is nullptr" && (output0 != nullptr));
   vtkUnstructuredGrid* outputParticles =
     vtkUnstructuredGrid::SafeDownCast(output0->Get(vtkDataObject::DATA_OBJECT()));
-  assert("pre: output particles is NULL" && (outputParticles != NULL));
+  assert("pre: output particles is nullptr" && (outputParticles != nullptr));
 
   vtkInformation* output1 = outputVector->GetInformationObject(1);
-  assert("pre: output information object is NULL" && (output1 != NULL));
+  assert("pre: output information object is nullptr" && (output1 != nullptr));
   vtkUnstructuredGrid* haloCenters =
     vtkUnstructuredGrid::SafeDownCast(output1->Get(vtkDataObject::DATA_OBJECT()));
-  assert("pre: halocenters is NULL" && (haloCenters != NULL));
+  assert("pre: halocenters is nullptr" && (haloCenters != nullptr));
 
   if (inputParticles->GetNumberOfPoints() == 0)
   {
@@ -319,7 +319,7 @@ int vtkPLANLHaloFinder::RequestData(vtkInformation* vtkNotUsed(request),
   // TODO: We need to get smarter about this in the future, e.g., determine
   // if we really have to run the halo-finder again or just filter differently
   // the results, just change the halo-centers etc.
-  if (this->HaloFinder != NULL)
+  if (this->HaloFinder != nullptr)
   {
     delete this->HaloFinder;
   }
@@ -346,8 +346,8 @@ void vtkPLANLHaloFinder::ComputeSODHalos(
 #ifdef NDEBUG
   (void)(particles);
 #endif
-  assert("pre: input particles should not be NULL" && (particles != NULL));
-  assert("pre: FOF halo-centers should not be NULL" && (fofHaloCenters != NULL));
+  assert("pre: input particles should not be nullptr" && (particles != nullptr));
+  assert("pre: FOF halo-centers should not be nullptr" && (fofHaloCenters != nullptr));
 
   // STEP 0: Initialize SOD arrays & acquire handles
   // "SODAveragePosition"
@@ -437,7 +437,7 @@ void vtkPLANLHaloFinder::ComputeSODHalos(
 //------------------------------------------------------------------------------
 void vtkPLANLHaloFinder::InitializeSODHaloArrays(vtkUnstructuredGrid* haloCenters)
 {
-  assert("pre: centers is NULL" && (haloCenters != NULL));
+  assert("pre: centers is nullptr" && (haloCenters != nullptr));
 
   // TODO: Again, these arrays should match the type of POSVEL_T
 
@@ -501,25 +501,25 @@ void vtkPLANLHaloFinder::InitializeSODHaloArrays(vtkUnstructuredGrid* haloCenter
 //------------------------------------------------------------------------------
 void vtkPLANLHaloFinder::VectorizeData(vtkUnstructuredGrid* particles)
 {
-  assert("pre: input particles mesh is NULL" && (particles != NULL));
+  assert("pre: input particles mesh is nullptr" && (particles != nullptr));
 
   // TODO: VTK data arrays must match what POSVEL_T & ID_T are.
 
   vtkPoints* points = particles->GetPoints();
-  assert("pre: points should not be NULL!" && (points != NULL));
+  assert("pre: points should not be nullptr!" && (points != nullptr));
 
   vtkFloatArray* velocity =
     vtkFloatArray::SafeDownCast(particles->GetPointData()->GetArray("velocity"));
-  assert("pre: velocity should not be NULL!" && (velocity != NULL));
+  assert("pre: velocity should not be nullptr!" && (velocity != nullptr));
 
   vtkFloatArray* pmass = vtkFloatArray::SafeDownCast(particles->GetPointData()->GetArray("mass"));
-  assert("pre: pmass should not be NULL!" && (pmass != NULL));
+  assert("pre: pmass should not be nullptr!" && (pmass != nullptr));
 
   vtkIdTypeArray* uid = vtkIdTypeArray::SafeDownCast(particles->GetPointData()->GetArray("tag"));
-  assert("pre: uid should not be NULL!" && (uid != NULL));
+  assert("pre: uid should not be nullptr!" && (uid != nullptr));
 
   vtkIntArray* owner = vtkIntArray::SafeDownCast(particles->GetPointData()->GetArray("ghost"));
-  assert("pre: owner should not be NULL" && (owner != NULL));
+  assert("pre: owner should not be nullptr" && (owner != nullptr));
 
   vtkIntArray* haloTag = vtkIntArray::New();
   haloTag->SetName("HaloID");
@@ -567,9 +567,9 @@ void vtkPLANLHaloFinder::VectorizeData(vtkUnstructuredGrid* particles)
 void vtkPLANLHaloFinder::ComputeFOFHalos(
   vtkUnstructuredGrid* particles, vtkUnstructuredGrid* haloCenters)
 {
-  assert("pre: input particles mesh is NULL" && (particles != NULL));
-  assert("pre: halo-centers data-structure is NULL" && (haloCenters != NULL));
-  assert("pre: halo-finder is not allocated!" && (this->HaloFinder != NULL));
+  assert("pre: input particles mesh is nullptr" && (particles != nullptr));
+  assert("pre: halo-centers data-structure is nullptr" && (haloCenters != nullptr));
+  assert("pre: halo-finder is not allocated!" && (this->HaloFinder != nullptr));
 
   // STEP 0: Vectorize the data
   this->VectorizeData(particles);
@@ -648,7 +648,7 @@ void vtkPLANLHaloFinder::ComputeFOFHalos(
 void vtkPLANLHaloFinder::MarkHaloParticlesAndGetCenter(const unsigned int halo,
   const int internalHaloIdx, double center[3], vtkUnstructuredGrid* particles)
 {
-  assert("pre: output particles data-structured is NULL" && (particles != NULL));
+  assert("pre: output particles data-structured is nullptr" && (particles != nullptr));
   assert(
     "pre: particles must have a HaloID array" && (particles->GetPointData()->HasArray("HaloID")));
 
@@ -823,7 +823,7 @@ void vtkPLANLHaloFinder::InitializeHaloCenters(vtkUnstructuredGrid* haloCenters,
 //------------------------------------------------------------------------------
 void vtkPLANLHaloFinder::ComputeFOFHaloProperties()
 {
-  assert("pre: haloFinder is NULL!" && (this->HaloFinder != NULL));
+  assert("pre: haloFinder is nullptr!" && (this->HaloFinder != nullptr));
 
   int numberOfHalos = this->HaloFinder->getNumberOfHalos();
   int* fofHalos = this->HaloFinder->getHalos();
@@ -905,7 +905,7 @@ void vtkPLANLHaloFinder::ResetHaloFinderInternals()
 //------------------------------------------------------------------------------
 bool vtkPLANLHaloFinder::CheckOutputIntegrity(vtkUnstructuredGrid* outputParticles)
 {
-  assert("pre: particle mesh is NULL" && (outputParticles != NULL));
+  assert("pre: particle mesh is nullptr" && (outputParticles != nullptr));
   if (!outputParticles->GetPointData()->HasArray("velocity") ||
     !outputParticles->GetPointData()->HasArray("mass") ||
     !outputParticles->GetPointData()->HasArray("tag") ||

@@ -51,15 +51,15 @@ public:
 
   /**
    * Show the output data in the view. If data cannot be shown in the view,
-   * returns NULL. If \c view is NULL, this simply calls ShowInPreferredView().
+   * returns nullptr. If \c view is nullptr, this simply calls ShowInPreferredView().
    */
   virtual vtkSMProxy* Show(vtkSMSourceProxy* producer, int outputPort, vtkSMViewProxy* view);
 
   /**
    * Show the output data in the view. If data cannot be shown in the view,
-   * returns NULL. If \c view is NULL, this simply calls ShowInPreferredView().
+   * returns nullptr. If \c view is nullptr, this simply calls ShowInPreferredView().
    * \c representationName specifies which representation should be instantiated -
-   * if null, a default representation will be created based on hints in the XML.
+   * if nullptr, a default representation will be created based on hints in the XML.
    */
   virtual vtkSMProxy* Show(vtkSMSourceProxy* producer, int outputPort, vtkSMViewProxy* view,
     const char* representationType);
@@ -101,7 +101,7 @@ public:
   virtual bool GetVisibility(vtkSMSourceProxy* producer, int outputPort, vtkSMViewProxy* view);
 
   /**
-   * Same as Show() except that if the \c view is NULL or not the preferred
+   * Same as Show() except that if the \c view is nullptr or not the preferred
    * view for the producer's output, this method will create a new view and show
    * the data in that new view.
    *
@@ -210,10 +210,10 @@ public:
    * Register layout proxy. If `proxyname` is nullptr, a new name will be
    * assigned.
    */
-  virtual bool RegisterLayoutProxy(vtkSMProxy* proxy, const char* proxyname = NULL);
+  virtual bool RegisterLayoutProxy(vtkSMProxy* proxy, const char* proxyname = nullptr);
 
   /**
-   * Assigns the view to any cell in the layout. If the layout is null, then
+   * Assigns the view to any cell in the layout. If the layout is nullptr, then
    * this will locate a layout on the same session and use it. If no layout is
    * present on the session, a new layout will be created (and registered)
    * before assigning the view to it.

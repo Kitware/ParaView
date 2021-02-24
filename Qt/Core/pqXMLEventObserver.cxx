@@ -37,7 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QTextStream>
 
 /// Escapes strings so they can be embedded in an XML document
-static const QString textToXML(const QString& string)
+static QString textToXML(const QString& string)
 {
   QString result = string;
   result.replace("&", "&amp;"); // keep first
@@ -57,9 +57,7 @@ pqXMLEventObserver::pqXMLEventObserver(QObject* p)
 {
 }
 
-pqXMLEventObserver::~pqXMLEventObserver()
-{
-}
+pqXMLEventObserver::~pqXMLEventObserver() = default;
 
 void pqXMLEventObserver::setStream(QTextStream* stream)
 {

@@ -46,7 +46,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 pqAnimationShortcutDecorator::pqAnimationShortcutDecorator(pqPropertyWidget* parentWidget)
-  : Superclass(NULL, parentWidget)
+  : Superclass(nullptr, parentWidget)
 {
   QLayout* layout = parentWidget->layout();
   // Adding pqAnimationShortcutWidget
@@ -64,9 +64,7 @@ pqAnimationShortcutDecorator::pqAnimationShortcutDecorator(pqPropertyWidget* par
 }
 
 //-----------------------------------------------------------------------------
-pqAnimationShortcutDecorator::~pqAnimationShortcutDecorator()
-{
-}
+pqAnimationShortcutDecorator::~pqAnimationShortcutDecorator() = default;
 
 //-----------------------------------------------------------------------------
 bool pqAnimationShortcutDecorator::accept(pqPropertyWidget* parentWidget)

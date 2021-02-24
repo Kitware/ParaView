@@ -38,9 +38,7 @@ vtkSMFieldDataDomain::vtkSMFieldDataDomain()
 }
 
 //---------------------------------------------------------------------------
-vtkSMFieldDataDomain::~vtkSMFieldDataDomain()
-{
-}
+vtkSMFieldDataDomain::~vtkSMFieldDataDomain() = default;
 
 //---------------------------------------------------------------------------
 const char* vtkSMFieldDataDomain::GetAttributeTypeAsString(int attrType)

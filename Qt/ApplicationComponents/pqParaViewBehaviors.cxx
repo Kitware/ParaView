@@ -88,7 +88,7 @@ public:
     : QObject(obj)
   {
   }
-  ~WheelFilter() {}
+  ~WheelFilter() override = default;
   bool eventFilter(QObject* obj, QEvent* evt) override
   {
     assert(obj && evt);
@@ -264,10 +264,10 @@ pqParaViewBehaviors::pqParaViewBehaviors(QMainWindow* mainWindow, QObject* paren
     pqWidgetEventPlayer* player =
       pqApplicationCore::instance()->testUtility()->eventPlayer()->getWidgetEventPlayer(
         "pqStreamingTestingEventPlayer");
-    pqStreamingTestingEventPlayer* splayer = NULL;
+    pqStreamingTestingEventPlayer* splayer = nullptr;
     if (!player)
     {
-      splayer = new pqStreamingTestingEventPlayer(NULL);
+      splayer = new pqStreamingTestingEventPlayer(nullptr);
       // the testUtility takes ownership of the player.
       pqApplicationCore::instance()->testUtility()->eventPlayer()->addWidgetEventPlayer(splayer);
     }
@@ -344,8 +344,6 @@ pqParaViewBehaviors::pqParaViewBehaviors(QMainWindow* mainWindow, QObject* paren
 }
 
 //-----------------------------------------------------------------------------
-pqParaViewBehaviors::~pqParaViewBehaviors()
-{
-}
+pqParaViewBehaviors::~pqParaViewBehaviors() = default;
 
 #undef PQ_IS_BEHAVIOR_ENABLED

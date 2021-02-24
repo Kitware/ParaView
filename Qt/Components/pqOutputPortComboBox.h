@@ -61,7 +61,7 @@ public:
 
   /**
   * Makes is possible to add custom items to the combo-box.
-  * \c port can be NULL.
+  * \c port can be nullptr.
   */
   void addCustomEntry(const QString& label, pqOutputPort* port);
 

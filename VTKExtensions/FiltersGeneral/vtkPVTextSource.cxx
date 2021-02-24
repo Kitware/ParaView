@@ -24,14 +24,14 @@ vtkStandardNewMacro(vtkPVTextSource);
 //----------------------------------------------------------------------------
 vtkPVTextSource::vtkPVTextSource()
 {
-  this->Text = 0;
+  this->Text = nullptr;
   this->SetNumberOfInputPorts(0);
 }
 
 //----------------------------------------------------------------------------
 vtkPVTextSource::~vtkPVTextSource()
 {
-  this->SetText(0);
+  this->SetText(nullptr);
 }
 
 //----------------------------------------------------------------------------

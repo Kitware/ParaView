@@ -31,12 +31,12 @@
 
 //----------------------------------------------------------------------------
 vtkSMPreselectionPipeline::vtkSMPreselectionPipeline()
-  : ExtractInteractiveSelection(NULL)
-  , SelectionRepresentation(NULL)
-  , PreviousView(NULL)
-  , PreviousRepresentation(NULL)
-  , ColorObserver(NULL)
-  , ConnectionObserver(NULL)
+  : ExtractInteractiveSelection(nullptr)
+  , SelectionRepresentation(nullptr)
+  , PreviousView(nullptr)
+  , PreviousRepresentation(nullptr)
+  , ColorObserver(nullptr)
+  , ConnectionObserver(nullptr)
 {
   this->ConnectionObserver = vtkCallbackCommand::New();
   this->ConnectionObserver->SetCallback(&vtkSMPreselectionPipeline::ClearCache);
@@ -69,19 +69,19 @@ void vtkSMPreselectionPipeline::ClearCache()
   if (this->ExtractInteractiveSelection)
   {
     this->ExtractInteractiveSelection->Delete();
-    this->ExtractInteractiveSelection = NULL;
+    this->ExtractInteractiveSelection = nullptr;
   }
   if (this->SelectionRepresentation)
   {
     this->SelectionRepresentation->Delete();
-    this->SelectionRepresentation = NULL;
+    this->SelectionRepresentation = nullptr;
   }
-  this->PreviousView = NULL;
-  this->PreviousRepresentation = NULL;
+  this->PreviousView = nullptr;
+  this->PreviousRepresentation = nullptr;
   if (this->ColorObserver)
   {
     this->ColorObserver->Delete();
-    this->ColorObserver = NULL;
+    this->ColorObserver = nullptr;
   }
 }
 
@@ -91,7 +91,7 @@ vtkSMSourceProxy* vtkSMPreselectionPipeline::ConnectPVExtractSelection(
 {
   vtkSMSessionProxyManager* proxyManager =
     vtkSMProxyManager::GetProxyManager()->GetActiveSessionProxyManager();
-  vtkSMSourceProxy* extract = NULL;
+  vtkSMSourceProxy* extract = nullptr;
   if (!this->ExtractInteractiveSelection)
   {
     extract =
@@ -133,7 +133,7 @@ vtkSMProxy* vtkSMPreselectionPipeline::CreateSelectionRepresentation(vtkSMSource
     settings->GetProxySettings(representation);
 
     vtkSMPropertyHelper(representation, "Input").Set(extract);
-    vtkSMPropertyHelper(representation, "Visibility").Set(extract != NULL);
+    vtkSMPropertyHelper(representation, "Visibility").Set(extract != nullptr);
     double color[] = { 0.5, 0, 1 };
     vtkSMProxy* colorPalette = proxyManager->GetProxy("settings", "ColorPalette");
     if (!this->ColorObserver)
@@ -156,7 +156,7 @@ vtkSMProxy* vtkSMPreselectionPipeline::CreateSelectionRepresentation(vtkSMSource
   else
   {
     vtkSMPropertyHelper(this->SelectionRepresentation, "Input").Set(extract);
-    vtkSMPropertyHelper(this->SelectionRepresentation, "Visibility").Set(extract != NULL);
+    vtkSMPropertyHelper(this->SelectionRepresentation, "Visibility").Set(extract != nullptr);
     this->SelectionRepresentation->UpdateVTKObjects();
   }
   return this->SelectionRepresentation;
@@ -174,7 +174,7 @@ vtkSMProxy* vtkSMPreselectionPipeline::GetOrCreateSelectionRepresentation()
   vtkSMProxy* proxyISelectionRepresentation = this->GetSelectionRepresentation();
   if (!proxyISelectionRepresentation)
   {
-    proxyISelectionRepresentation = this->CreateSelectionRepresentation(NULL);
+    proxyISelectionRepresentation = this->CreateSelectionRepresentation(nullptr);
   }
   return proxyISelectionRepresentation;
 }
@@ -240,7 +240,7 @@ void vtkSMPreselectionPipeline::Show(
   }
   else
   {
-    this->PreviousRepresentation = NULL;
+    this->PreviousRepresentation = nullptr;
     this->Hide(view);
   }
 }

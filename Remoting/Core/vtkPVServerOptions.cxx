@@ -47,7 +47,7 @@ vtkPVServerOptions::vtkPVServerOptions()
   this->Internals = new vtkPVServerOptionsInternals;
 
   // initialize host names
-  this->ClientHostName = 0;
+  this->ClientHostName = nullptr;
   this->SetClientHostName(this->GetHostName());
 
   // This default value for ServerPort is setup in Initialize().
@@ -57,10 +57,10 @@ vtkPVServerOptions::vtkPVServerOptions()
 //----------------------------------------------------------------------------
 vtkPVServerOptions::~vtkPVServerOptions()
 {
-  this->SetClientHostName(0);
+  this->SetClientHostName(nullptr);
 
   delete this->Internals;
-  this->Internals = 0;
+  this->Internals = nullptr;
 }
 
 //----------------------------------------------------------------------------
@@ -270,7 +270,7 @@ const char* vtkPVServerOptions::GetMachineName(unsigned int idx) const
 {
   if (idx >= this->Internals->MachineInformationVector.size())
   {
-    return 0;
+    return nullptr;
   }
 
   return this->Internals->MachineInformationVector[idx].Name.c_str();
@@ -281,7 +281,7 @@ const char* vtkPVServerOptions::GetDisplayName(unsigned int idx) const
 {
   if (idx >= this->Internals->MachineInformationVector.size())
   {
-    return 0;
+    return nullptr;
   }
 
   return this->Internals->MachineInformationVector[idx].Environment.c_str();
@@ -292,7 +292,7 @@ int* vtkPVServerOptions::GetGeometry(unsigned int idx) const
 {
   if (idx >= this->Internals->MachineInformationVector.size())
   {
-    return 0;
+    return nullptr;
   }
 
   return this->Internals->MachineInformationVector[idx].Geometry;
@@ -336,7 +336,7 @@ double* vtkPVServerOptions::GetLowerLeft(unsigned int idx) const
 {
   if (idx >= this->Internals->MachineInformationVector.size())
   {
-    return 0;
+    return nullptr;
   }
   return this->Internals->MachineInformationVector[idx].LowerLeft;
 }
@@ -346,7 +346,7 @@ double* vtkPVServerOptions::GetLowerRight(unsigned int idx) const
 {
   if (idx >= this->Internals->MachineInformationVector.size())
   {
-    return 0;
+    return nullptr;
   }
   return this->Internals->MachineInformationVector[idx].LowerRight;
 }
@@ -356,7 +356,7 @@ double* vtkPVServerOptions::GetUpperRight(unsigned int idx) const
 {
   if (idx >= this->Internals->MachineInformationVector.size())
   {
-    return 0;
+    return nullptr;
   }
   return this->Internals->MachineInformationVector[idx].UpperRight;
 }

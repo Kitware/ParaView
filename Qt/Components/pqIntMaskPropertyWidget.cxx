@@ -74,7 +74,7 @@ pqIntMaskPropertyWidget::pqIntMaskPropertyWidget(
   this->Internals->Button->setText(smproperty->GetXMLLabel());
 
   vtkPVXMLElement* hints =
-    smproperty->GetHints() ? smproperty->GetHints()->FindNestedElementByName("Mask") : NULL;
+    smproperty->GetHints() ? smproperty->GetHints()->FindNestedElementByName("Mask") : nullptr;
   if (!hints)
   {
     qCritical() << "Missing 'Mask' hints for property! pqIntMaskPropertyWidget cannot work.";
@@ -85,9 +85,9 @@ pqIntMaskPropertyWidget::pqIntMaskPropertyWidget(
     vtkPVXMLElement* elem = hints->GetNestedElement(cc);
     if (elem && elem->GetName() && strcmp(elem->GetName(), "Item") == 0)
     {
-      const char* name = elem->GetAttributeOrDefault("name", NULL);
+      const char* name = elem->GetAttributeOrDefault("name", nullptr);
       int value;
-      if (name == NULL || name[0] == '\0' || !elem->GetScalarAttribute("value", &value))
+      if (name == nullptr || name[0] == '\0' || !elem->GetScalarAttribute("value", &value))
       {
         qCritical("'Item' must have a 'name' and an integer 'value'.");
         continue;
@@ -104,9 +104,7 @@ pqIntMaskPropertyWidget::pqIntMaskPropertyWidget(
 }
 
 //-----------------------------------------------------------------------------
-pqIntMaskPropertyWidget::~pqIntMaskPropertyWidget()
-{
-}
+pqIntMaskPropertyWidget::~pqIntMaskPropertyWidget() = default;
 
 //-----------------------------------------------------------------------------
 void pqIntMaskPropertyWidget::setMask(int ivalue)

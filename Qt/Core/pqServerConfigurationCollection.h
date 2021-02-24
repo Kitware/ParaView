@@ -109,7 +109,7 @@ public:
   QList<pqServerConfiguration> configurations(const pqServerResource& selector) const;
 
   /**
-  * Returns a configuration with the given name. Returns NULL when none is
+  * Returns a configuration with the given name. Returns nullptr when none is
   * found.
   */
   const pqServerConfiguration* configuration(const char* configuration_name) const;

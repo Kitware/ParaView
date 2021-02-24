@@ -29,14 +29,10 @@
 vtkStandardNewMacro(vtkPythonSelector);
 
 //----------------------------------------------------------------------------
-vtkPythonSelector::vtkPythonSelector()
-{
-}
+vtkPythonSelector::vtkPythonSelector() = default;
 
 //----------------------------------------------------------------------------
-vtkPythonSelector::~vtkPythonSelector()
-{
-}
+vtkPythonSelector::~vtkPythonSelector() = default;
 
 //----------------------------------------------------------------------------
 void vtkPythonSelector::Execute(vtkDataObject* input, vtkDataObject* output)

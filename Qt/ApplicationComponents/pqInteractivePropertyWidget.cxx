@@ -101,12 +101,12 @@ pqInteractivePropertyWidget::pqInteractivePropertyWidget(const char* widget_smgr
   aProxy.TakeReference(pxm->NewProxy(widget_smgroup, widget_smname));
   vtkSMNewWidgetRepresentationProxy* wdgProxy =
     vtkSMNewWidgetRepresentationProxy::SafeDownCast(aProxy);
-  if (aProxy == NULL)
+  if (aProxy == nullptr)
   {
     qCritical("Failed to create proxy for 3D Widget. Aborting for debugging purposes.");
     abort();
   }
-  if (wdgProxy == NULL)
+  if (wdgProxy == nullptr)
   {
     qCritical() << "Proxy (" << widget_smgroup << ", " << widget_smname
                 << ") must be a "
@@ -148,7 +148,7 @@ pqInteractivePropertyWidget::pqInteractivePropertyWidget(const char* widget_smgr
   }
   else
   {
-    this->setDataSource(NULL);
+    this->setDataSource(nullptr);
   }
 
   // This ensures that when the user changes the Qt widget, we re-render to show
@@ -172,7 +172,7 @@ pqInteractivePropertyWidget::~pqInteractivePropertyWidget()
   }
 
   // ensures that the widget proxy is removed from the active view, if any.
-  this->setView(NULL);
+  this->setView(nullptr);
 }
 
 //-----------------------------------------------------------------------------
@@ -190,9 +190,9 @@ vtkSMNewWidgetRepresentationProxy* pqInteractivePropertyWidget::widgetProxy() co
 //-----------------------------------------------------------------------------
 void pqInteractivePropertyWidget::setView(pqView* pqview)
 {
-  if (pqview != NULL && pqview->getServer()->session() != this->widgetProxy()->GetSession())
+  if (pqview != nullptr && pqview->getServer()->session() != this->widgetProxy()->GetSession())
   {
-    pqview = NULL;
+    pqview = nullptr;
   }
 
   pqView* rview = qobject_cast<pqRenderViewBase*>(pqview);
@@ -325,11 +325,11 @@ void pqInteractivePropertyWidget::handleUserEvent(
   assert(eventid == vtkCommand::UserEvent);
 
   const char* message = reinterpret_cast<const char*>(calldata);
-  if (message != NULL && strcmp("HideWidget", message) == 0)
+  if (message != nullptr && strcmp("HideWidget", message) == 0)
   {
     this->setWidgetVisible(false);
   }
-  else if (message != NULL && strcmp("ShowWidget", message) == 0)
+  else if (message != nullptr && strcmp("ShowWidget", message) == 0)
   {
     this->setWidgetVisible(true);
   }

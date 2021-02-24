@@ -186,7 +186,7 @@ protected:
    * run RequestInformation on the reader.
    */
   virtual int RequestInformationForInput(
-    int index, vtkInformation* request = NULL, vtkInformationVector* outputVector = NULL);
+    int index, vtkInformation* request = nullptr, vtkInformationVector* outputVector = nullptr);
 
   /**
    * Reads a metadata file and returns a list of filenames (in filesToRead).  If

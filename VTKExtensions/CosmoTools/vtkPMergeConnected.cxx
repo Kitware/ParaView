@@ -29,7 +29,7 @@ vtkPMergeConnected::vtkPMergeConnected()
   this->SetNumberOfInputPorts(1);
   this->SetNumberOfOutputPorts(1);
 
-  this->Controller = NULL;
+  this->Controller = nullptr;
   this->SetController(vtkMultiProcessController::GetGlobalController());
 }
 
@@ -47,7 +47,7 @@ void vtkPMergeConnected::PrintSelf(ostream& os, vtkIndent indent)
 
 void vtkPMergeConnected::SetController(vtkMultiProcessController* c)
 {
-  if ((c == NULL) || (c->GetNumberOfProcesses() == 0))
+  if ((c == nullptr) || (c->GetNumberOfProcesses() == 0))
   {
     this->NumProcesses = 1;
     this->MyId = 0;
@@ -60,13 +60,13 @@ void vtkPMergeConnected::SetController(vtkMultiProcessController* c)
 
   this->Modified();
 
-  if (this->Controller != NULL)
+  if (this->Controller != nullptr)
   {
     this->Controller->UnRegister(this);
-    this->Controller = NULL;
+    this->Controller = nullptr;
   }
 
-  if (c == NULL)
+  if (c == nullptr)
   {
     return;
   }

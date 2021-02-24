@@ -96,7 +96,7 @@ namespace
 template <class T>
 T* FindDomain(vtkSMProperty* prop)
 {
-  assert(prop != NULL);
+  assert(prop != nullptr);
 
   vtkSmartPointer<vtkSMDomainIterator> iter;
   iter.TakeReference(prop->NewDomainIterator());
@@ -108,17 +108,13 @@ T* FindDomain(vtkSMProperty* prop)
       return domain;
     }
   }
-  return NULL;
+  return nullptr;
 }
 }
 
-pqSMAdaptor::pqSMAdaptor()
-{
-}
+pqSMAdaptor::pqSMAdaptor() = default;
 
-pqSMAdaptor::~pqSMAdaptor()
-{
-}
+pqSMAdaptor::~pqSMAdaptor() = default;
 
 pqSMAdaptor::PropertyType pqSMAdaptor::getPropertyType(vtkSMProperty* Property)
 {
@@ -147,15 +143,15 @@ pqSMAdaptor::PropertyType pqSMAdaptor::getPropertyType(vtkSMProperty* Property)
   }
   else
   {
-    vtkSMBooleanDomain* booleanDomain = NULL;
-    vtkSMEnumerationDomain* enumerationDomain = NULL;
-    vtkSMProxyGroupDomain* proxyGroupDomain = NULL;
-    vtkSMFileListDomain* fileListDomain = NULL;
-    vtkSMStringListDomain* stringListDomain = NULL;
-    vtkSMCompositeTreeDomain* compositeTreeDomain = NULL;
-    vtkSMSILDomain* silDomain = NULL;
-    vtkSMSubsetInclusionLatticeDomain* silDomain2 = NULL;
-    vtkSMChartSeriesSelectionDomain* chartSeriesSelectionDomain = NULL;
+    vtkSMBooleanDomain* booleanDomain = nullptr;
+    vtkSMEnumerationDomain* enumerationDomain = nullptr;
+    vtkSMProxyGroupDomain* proxyGroupDomain = nullptr;
+    vtkSMFileListDomain* fileListDomain = nullptr;
+    vtkSMStringListDomain* stringListDomain = nullptr;
+    vtkSMCompositeTreeDomain* compositeTreeDomain = nullptr;
+    vtkSMSILDomain* silDomain = nullptr;
+    vtkSMSubsetInclusionLatticeDomain* silDomain2 = nullptr;
+    vtkSMChartSeriesSelectionDomain* chartSeriesSelectionDomain = nullptr;
 
     vtkSMDomainIterator* iter = Property->NewDomainIterator();
     for (iter->Begin(); !iter->IsAtEnd(); iter->Next())
@@ -264,7 +260,7 @@ pqSMProxy pqSMAdaptor::getProxyProperty(vtkSMProperty* Property, PropertyValueTy
       }
     }
   }
-  return pqSMProxy(NULL);
+  return pqSMProxy(nullptr);
 }
 
 void pqSMAdaptor::removeProxyProperty(vtkSMProperty* Property, pqSMProxy Value)
@@ -407,8 +403,8 @@ QList<QList<QVariant> > pqSMAdaptor::getSelectionProperty(
     return ret;
   }
 
-  vtkSMStringListDomain* StringListDomain = NULL;
-  vtkSMEnumerationDomain* EnumerationDomain = NULL;
+  vtkSMStringListDomain* StringListDomain = nullptr;
+  vtkSMEnumerationDomain* EnumerationDomain = nullptr;
 
   vtkSMDomainIterator* iter = Property->NewDomainIterator();
   iter->Begin();
@@ -457,9 +453,9 @@ QList<QVariant> pqSMAdaptor::getSelectionProperty(
     return ret;
   }
 
-  vtkSMArraySelectionDomain* StringDomain = NULL;
-  vtkSMStringListDomain* StringListDomain = NULL;
-  vtkSMEnumerationDomain* EnumerationDomain = NULL;
+  vtkSMArraySelectionDomain* StringDomain = nullptr;
+  vtkSMStringListDomain* StringListDomain = nullptr;
+  vtkSMEnumerationDomain* EnumerationDomain = nullptr;
 
   vtkSMDomainIterator* iter = Property->NewDomainIterator();
   iter->Begin();
@@ -482,7 +478,7 @@ QList<QVariant> pqSMAdaptor::getSelectionProperty(
   }
   iter->Delete();
 
-  vtkSMStringVectorProperty* StringProperty = NULL;
+  vtkSMStringVectorProperty* StringProperty = nullptr;
   StringProperty = vtkSMStringVectorProperty::SafeDownCast(Property);
   if (StringProperty && StringDomain)
   {
@@ -611,7 +607,7 @@ void pqSMAdaptor::setSelectionProperty(
     return;
   }
 
-  vtkSMArraySelectionDomain* StringDomain = NULL;
+  vtkSMArraySelectionDomain* StringDomain = nullptr;
 
   vtkSMDomainIterator* iter = Property->NewDomainIterator();
   iter->Begin();
@@ -681,9 +677,9 @@ void pqSMAdaptor::setSelectionProperty(
   std::vector<int> smValueInts;
   vtkNew<vtkStringList> smValueStrings;
 
-  vtkSMArraySelectionDomain* StringDomain = NULL;
-  vtkSMStringListDomain* StringListDomain = NULL;
-  vtkSMEnumerationDomain* EnumerationDomain = NULL;
+  vtkSMArraySelectionDomain* StringDomain = nullptr;
+  vtkSMStringListDomain* StringListDomain = nullptr;
+  vtkSMEnumerationDomain* EnumerationDomain = nullptr;
   vtkSMDomainIterator* iter = Property->NewDomainIterator();
   iter->Begin();
   while (!iter->IsAtEnd())
@@ -774,8 +770,8 @@ QList<QVariant> pqSMAdaptor::getSelectionPropertyDomain(vtkSMProperty* Property)
 
   vtkSMVectorProperty* VProperty = vtkSMVectorProperty::SafeDownCast(Property);
 
-  vtkSMStringListDomain* StringListDomain = NULL;
-  vtkSMEnumerationDomain* EnumerationDomain = NULL;
+  vtkSMStringListDomain* StringListDomain = nullptr;
+  vtkSMEnumerationDomain* EnumerationDomain = nullptr;
 
   vtkSMDomainIterator* iter = Property->NewDomainIterator();
   iter->Begin();
@@ -822,10 +818,10 @@ QVariant pqSMAdaptor::getEnumerationProperty(vtkSMProperty* Property, PropertyVa
     return var;
   }
 
-  vtkSMBooleanDomain* BooleanDomain = NULL;
-  vtkSMEnumerationDomain* EnumerationDomain = NULL;
-  vtkSMStringListDomain* StringListDomain = NULL;
-  vtkSMProxyGroupDomain* ProxyGroupDomain = NULL;
+  vtkSMBooleanDomain* BooleanDomain = nullptr;
+  vtkSMEnumerationDomain* EnumerationDomain = nullptr;
+  vtkSMStringListDomain* StringListDomain = nullptr;
+  vtkSMProxyGroupDomain* ProxyGroupDomain = nullptr;
 
   vtkSMDomainIterator* iter = Property->NewDomainIterator();
   iter->Begin();
@@ -930,7 +926,7 @@ QVariant pqSMAdaptor::getEnumerationProperty(vtkSMProperty* Property, PropertyVa
   }
   else if (ProxyGroupDomain && ppProxyCount > 0)
   {
-    vtkSMProxy* p = 0;
+    vtkSMProxy* p = nullptr;
 
     if (Type == CHECKED)
     {
@@ -958,10 +954,10 @@ void pqSMAdaptor::setEnumerationProperty(
     return;
   }
 
-  vtkSMBooleanDomain* BooleanDomain = NULL;
-  vtkSMEnumerationDomain* EnumerationDomain = NULL;
-  vtkSMStringListDomain* StringListDomain = NULL;
-  vtkSMProxyGroupDomain* ProxyGroupDomain = NULL;
+  vtkSMBooleanDomain* BooleanDomain = nullptr;
+  vtkSMEnumerationDomain* EnumerationDomain = nullptr;
+  vtkSMStringListDomain* StringListDomain = nullptr;
+  vtkSMProxyGroupDomain* ProxyGroupDomain = nullptr;
 
   vtkSMDomainIterator* iter = Property->NewDomainIterator();
   iter->Begin();
@@ -1089,11 +1085,11 @@ QList<QVariant> pqSMAdaptor::getEnumerationPropertyDomain(vtkSMProperty* Propert
     return enumerations;
   }
 
-  vtkSMBooleanDomain* BooleanDomain = NULL;
-  vtkSMEnumerationDomain* EnumerationDomain = NULL;
-  vtkSMStringListDomain* StringListDomain = NULL;
-  vtkSMProxyGroupDomain* ProxyGroupDomain = NULL;
-  vtkSMArrayListDomain* ArrayListDomain = NULL;
+  vtkSMBooleanDomain* BooleanDomain = nullptr;
+  vtkSMEnumerationDomain* EnumerationDomain = nullptr;
+  vtkSMStringListDomain* StringListDomain = nullptr;
+  vtkSMProxyGroupDomain* ProxyGroupDomain = nullptr;
+  vtkSMArrayListDomain* ArrayListDomain = nullptr;
 
   vtkSMDomainIterator* iter = Property->NewDomainIterator();
   iter->Begin();
@@ -1369,8 +1365,8 @@ QList<QList<QVariant> > pqSMAdaptor::getMultipleElementPropertyDomain(vtkSMPrope
     return domains;
   }
 
-  vtkSMDoubleRangeDomain* DoubleDomain = NULL;
-  vtkSMIntRangeDomain* IntDomain = NULL;
+  vtkSMDoubleRangeDomain* DoubleDomain = nullptr;
+  vtkSMIntRangeDomain* IntDomain = nullptr;
 
   vtkSMDomainIterator* iter = Property->NewDomainIterator();
   iter->Begin();
@@ -1574,8 +1570,8 @@ QList<QVariant> pqSMAdaptor::getMultipleElementPropertyDomain(
     return domain;
   }
 
-  vtkSMDoubleRangeDomain* DoubleDomain = NULL;
-  vtkSMIntRangeDomain* IntDomain = NULL;
+  vtkSMDoubleRangeDomain* DoubleDomain = nullptr;
+  vtkSMIntRangeDomain* IntDomain = nullptr;
 
   vtkSMDomainIterator* iter = Property->NewDomainIterator();
   iter->Begin();

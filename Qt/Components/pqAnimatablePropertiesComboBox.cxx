@@ -106,7 +106,7 @@ void pqAnimatablePropertiesComboBox::setSource(vtkSMProxy* proxy)
   }
 
   this->Internal->VTKConnect->Disconnect();
-  this->setEnabled(proxy != 0);
+  this->setEnabled(proxy != nullptr);
   this->Internal->Source = proxy;
   this->buildPropertyList();
 }
@@ -120,7 +120,7 @@ void pqAnimatablePropertiesComboBox::setSourceWithoutProperties(vtkSMProxy* prox
   }
 
   this->Internal->VTKConnect->Disconnect();
-  this->setEnabled(proxy != 0);
+  this->setEnabled(proxy != nullptr);
   this->Internal->Source = proxy;
   this->clear();
 }
@@ -155,7 +155,7 @@ void pqAnimatablePropertiesComboBox::buildPropertyList()
   }
   if (this->UseBlankEntry)
   {
-    this->addSMPropertyInternal("<select>", 0, QString(), -1);
+    this->addSMPropertyInternal("<select>", nullptr, QString(), -1);
   }
   this->buildPropertyListInternal(this->Internal->Source, QString());
   this->addDisplayProperties(this->Internal->Source);
@@ -216,7 +216,7 @@ void pqAnimatablePropertiesComboBox::buildPropertyListInternal(
         // if this property's value changes, we'll have to rebuild
         // the property names menu.
         this->Internal->VTKConnect->Connect(smproperty, vtkCommand::ModifiedEvent, this,
-          SLOT(buildPropertyList()), 0, 0, Qt::QueuedConnection);
+          SLOT(buildPropertyList()), nullptr, 0, Qt::QueuedConnection);
       }
     }
   }
@@ -295,13 +295,13 @@ vtkSMProxy* pqAnimatablePropertiesComboBox::getCurrentProxy() const
       }
       else
       {
-        return NULL;
+        return nullptr;
       }
     }
 
     return info.Proxy;
   }
-  return NULL;
+  return nullptr;
 }
 
 //-----------------------------------------------------------------------------

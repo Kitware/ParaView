@@ -29,23 +29,21 @@
 
 vtkStandardNewMacro(vtkSMXYChartRepresentationInitializationHelper);
 //----------------------------------------------------------------------------
-vtkSMXYChartRepresentationInitializationHelper::vtkSMXYChartRepresentationInitializationHelper()
-{
-}
+vtkSMXYChartRepresentationInitializationHelper::vtkSMXYChartRepresentationInitializationHelper() =
+  default;
 
 //----------------------------------------------------------------------------
-vtkSMXYChartRepresentationInitializationHelper::~vtkSMXYChartRepresentationInitializationHelper()
-{
-}
+vtkSMXYChartRepresentationInitializationHelper::~vtkSMXYChartRepresentationInitializationHelper() =
+  default;
 
 //----------------------------------------------------------------------------
 void vtkSMXYChartRepresentationInitializationHelper::PostInitializeProxy(
   vtkSMProxy* proxy, vtkPVXMLElement*, vtkMTimeType vtkNotUsed(ts))
 {
-  assert(proxy != NULL);
+  assert(proxy != nullptr);
 
   vtkSMSessionProxyManager* pxm = proxy->GetSessionProxyManager();
-  vtkSMViewProxy* activeView = NULL;
+  vtkSMViewProxy* activeView = nullptr;
   if (vtkSMProxySelectionModel* viewSM = pxm->GetSelectionModel("ActiveView"))
   {
     activeView = vtkSMViewProxy::SafeDownCast(viewSM->GetCurrentProxy());

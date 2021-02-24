@@ -83,7 +83,7 @@ public:
     vbox->setSpacing(0);
   }
 
-  ~pqInternals() {}
+  ~pqInternals() = default;
 };
 
 //-----------------------------------------------------------------------------
@@ -148,7 +148,7 @@ pqColorMapEditor::~pqColorMapEditor()
   }
 
   delete this->Internals;
-  this->Internals = NULL;
+  this->Internals = nullptr;
 }
 
 //-----------------------------------------------------------------------------
@@ -186,7 +186,7 @@ void pqColorMapEditor::updateActive()
   }
   else
   {
-    this->setColorTransferFunction(NULL);
+    this->setColorTransferFunction(nullptr);
     arrayNameLabel.append("<none>");
   }
 
@@ -227,7 +227,7 @@ void pqColorMapEditor::setColorTransferFunction(vtkSMProxy* ctf)
 {
   Ui::ColorMapEditor& ui = this->Internals->Ui;
 
-  if (this->Internals->ProxyWidget == NULL && ctf == NULL)
+  if (this->Internals->ProxyWidget == nullptr && ctf == nullptr)
   {
     return;
   }
@@ -236,16 +236,16 @@ void pqColorMapEditor::setColorTransferFunction(vtkSMProxy* ctf)
     return;
   }
 
-  if ((ctf == NULL && this->Internals->ProxyWidget) ||
+  if ((ctf == nullptr && this->Internals->ProxyWidget) ||
     (this->Internals->ProxyWidget && ctf && this->Internals->ProxyWidget->proxy() != ctf))
   {
     ui.PropertiesFrame->layout()->removeWidget(this->Internals->ProxyWidget);
     delete this->Internals->ProxyWidget;
   }
 
-  ui.RestoreDefaults->setEnabled(ctf != NULL);
-  ui.SaveAsDefaults->setEnabled(ctf != NULL);
-  ui.SaveAsArrayDefaults->setEnabled(ctf != NULL);
+  ui.RestoreDefaults->setEnabled(ctf != nullptr);
+  ui.SaveAsDefaults->setEnabled(ctf != nullptr);
+  ui.SaveAsArrayDefaults->setEnabled(ctf != nullptr);
   if (!ctf)
   {
     return;
@@ -303,8 +303,9 @@ void pqColorMapEditor::saveAsDefault()
     qCritical() << "No LookupTable property found.";
   }
 
-  vtkSMProxy* scalarOpacityFunctionProxy =
-    lutProxy ? pqSMAdaptor::getProxyProperty(lutProxy->GetProperty("ScalarOpacityFunction")) : NULL;
+  vtkSMProxy* scalarOpacityFunctionProxy = lutProxy
+    ? pqSMAdaptor::getProxyProperty(lutProxy->GetProperty("ScalarOpacityFunction"))
+    : nullptr;
   if (scalarOpacityFunctionProxy)
   {
     settings->SetProxySettings(scalarOpacityFunctionProxy);
@@ -345,8 +346,9 @@ void pqColorMapEditor::saveAsArrayDefault()
     qCritical() << "No LookupTable property found.";
   }
 
-  vtkSMProxy* scalarOpacityFunctionProxy =
-    lutProxy ? pqSMAdaptor::getProxyProperty(lutProxy->GetProperty("ScalarOpacityFunction")) : NULL;
+  vtkSMProxy* scalarOpacityFunctionProxy = lutProxy
+    ? pqSMAdaptor::getProxyProperty(lutProxy->GetProperty("ScalarOpacityFunction"))
+    : nullptr;
   if (scalarOpacityFunctionProxy)
   {
     settings->SetProxySettings(scalarOpacityFunctionProxy);

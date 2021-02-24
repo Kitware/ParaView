@@ -46,7 +46,7 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqServerDisconnectReaction : public pqReact
 
 public:
   /**
-  * Constructor. Parent cannot be NULL.
+  * Constructor. Parent cannot be nullptr.
   */
   pqServerDisconnectReaction(QAction* parent);
 

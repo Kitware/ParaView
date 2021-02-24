@@ -47,7 +47,7 @@ vtkFileSequenceParser::vtkFileSequenceParser()
   // if multiple exist).
   reg_ex_last(new vtksys::RegularExpression("^(.*[^0-9])([0-9]+)([^0-9]*)$"))
   , SequenceIndex(-1)
-  , SequenceName(NULL)
+  , SequenceName(nullptr)
 {
 }
 
@@ -61,7 +61,7 @@ vtkFileSequenceParser::~vtkFileSequenceParser()
   delete this->reg_ex5;
   delete this->reg_ex_last;
 
-  this->SetSequenceName(NULL);
+  this->SetSequenceName(nullptr);
 }
 
 //-----------------------------------------------------------------------------

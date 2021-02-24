@@ -38,14 +38,10 @@ vtkStandardNewMacro(vtkSelectionSerializer);
 vtkInformationKeyMacro(vtkSelectionSerializer, ORIGINAL_SOURCE_ID, Integer);
 
 //----------------------------------------------------------------------------
-vtkSelectionSerializer::vtkSelectionSerializer()
-{
-}
+vtkSelectionSerializer::vtkSelectionSerializer() = default;
 
 //----------------------------------------------------------------------------
-vtkSelectionSerializer::~vtkSelectionSerializer()
-{
-}
+vtkSelectionSerializer::~vtkSelectionSerializer() = default;
 
 //----------------------------------------------------------------------------
 void vtkSelectionSerializer::PrintXML(int printData, vtkSelection* selection)

@@ -81,7 +81,7 @@ protected:
       return pM->getIndexFor(outputPort);
     }
     pqPipelineSource* src = qobject_cast<pqPipelineSource*>(item);
-    return pM->getIndexFor(src ? src->getOutputPort(0) : 0);
+    return pM->getIndexFor(src ? src->getOutputPort(0) : nullptr);
   }
 
   /// Maps a QModelIndex to a pqServerManagerModelItem.

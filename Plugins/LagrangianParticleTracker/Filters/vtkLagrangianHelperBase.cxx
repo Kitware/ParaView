@@ -29,7 +29,7 @@ vtkLagrangianHelperBase::vtkLagrangianHelperBase()
 //---------------------------------------------------------------------------
 vtkLagrangianHelperBase::~vtkLagrangianHelperBase()
 {
-  this->SetIntegrationModel(NULL);
+  this->SetIntegrationModel(nullptr);
 }
 
 //----------------------------------------------------------------------------

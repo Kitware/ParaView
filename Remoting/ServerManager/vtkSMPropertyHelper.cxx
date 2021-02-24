@@ -155,7 +155,7 @@ inline const char* vtkSMPropertyHelper::GetProperty(unsigned int index) const
   {
     // enumeration domain
     auto domain = this->Property->FindDomain<vtkSMEnumerationDomain>();
-    if (domain != NULL)
+    if (domain != nullptr)
     {
       const char* entry = domain->GetEntryTextForValue(
         (this->UseUnchecked ? this->IntVectorProperty->GetUncheckedElement(index)
@@ -167,7 +167,7 @@ inline const char* vtkSMPropertyHelper::GetProperty(unsigned int index) const
     }
   }
 
-  return 0;
+  return nullptr;
 }
 
 //----------------------------------------------------------------------------
@@ -181,7 +181,7 @@ inline vtkSMProxy* vtkSMPropertyHelper::GetProperty(unsigned int index) const
       return this->UseUnchecked ? this->ProxyProperty->GetUncheckedProxy(index)
                                 : this->ProxyProperty->GetProxy(index);
     default:
-      return 0;
+      return nullptr;
   }
 }
 
@@ -385,7 +385,7 @@ inline void vtkSMPropertyHelper::SetProperty(unsigned int index, const char* val
   {
     // enumeration domain
     auto domain = this->Property->FindDomain<vtkSMEnumerationDomain>();
-    if (domain != NULL && domain->HasEntryText(value))
+    if (domain != nullptr && domain->HasEntryText(value))
     {
       int valid; // We already know that the entry exist...
       if (this->UseUnchecked)
@@ -572,7 +572,7 @@ vtkSMPropertyHelper::vtkSMPropertyHelper(vtkSMProxy* proxy, const char* pname, b
   this->Proxy = proxy;
   this->Quiet = quiet;
 
-  // If pname is NULL, on some platforms the warning macro can segfault
+  // If pname is nullptr, on some platforms the warning macro can segfault
   assert(pname);
 
   vtkSMProperty* property = proxy->GetProperty(pname);
@@ -588,16 +588,14 @@ vtkSMPropertyHelper::vtkSMPropertyHelper(vtkSMProxy* proxy, const char* pname, b
 //----------------------------------------------------------------------------
 vtkSMPropertyHelper::vtkSMPropertyHelper(vtkSMProperty* property, bool quiet)
 {
-  this->Proxy = 0;
+  this->Proxy = nullptr;
   this->Quiet = quiet;
 
   this->Initialize(property);
 }
 
 //----------------------------------------------------------------------------
-vtkSMPropertyHelper::~vtkSMPropertyHelper()
-{
-}
+vtkSMPropertyHelper::~vtkSMPropertyHelper() = default;
 
 //----------------------------------------------------------------------------
 void vtkSMPropertyHelper::Initialize(vtkSMProperty* property)
@@ -606,7 +604,7 @@ void vtkSMPropertyHelper::Initialize(vtkSMProperty* property)
   this->Type = vtkSMPropertyHelper::NONE;
   this->UseUnchecked = false;
 
-  if (property != NULL)
+  if (property != nullptr)
   {
     if (property->IsA("vtkSMIntVectorProperty"))
     {
@@ -875,7 +873,7 @@ void vtkSMPropertyHelper::Set(unsigned int index, vtkSMProxy* value, unsigned in
 
 //----------------------------------------------------------------------------
 void vtkSMPropertyHelper::Set(
-  vtkSMProxy** value, unsigned int count, unsigned int* outputports /*=NULL*/)
+  vtkSMProxy** value, unsigned int count, unsigned int* outputports /*=nullptr*/)
 {
   if (this->UseUnchecked)
   {
@@ -1092,7 +1090,7 @@ bool vtkSMPropertyHelper::GetStatus(const char* key, double* values, int num_val
     // Now check if the information_property has the value.
     svp = svp->GetInformationOnly() == 0
       ? vtkSMStringVectorProperty::SafeDownCast(svp->GetInformationProperty())
-      : 0;
+      : nullptr;
   }
 
   return false;
@@ -1201,7 +1199,7 @@ bool vtkSMPropertyHelper::GetStatus(const int key, int* values, int num_values) 
     // Now check if the information_property has the value.
     svp = svp->GetInformationOnly() == 0
       ? vtkSMIntVectorProperty::SafeDownCast(svp->GetInformationProperty())
-      : 0;
+      : nullptr;
   }
 
   return false;
@@ -1322,7 +1320,7 @@ const char* vtkSMPropertyHelper::GetStatus(const char* key, const char* default_
     // Now check if the information_property has the value.
     svp = svp->GetInformationOnly() == 0
       ? vtkSMStringVectorProperty::SafeDownCast(svp->GetInformationProperty())
-      : 0;
+      : nullptr;
   }
 
   return default_value;
@@ -1432,7 +1430,7 @@ int vtkSMPropertyHelper::GetStatus(const int key, const int default_value) const
     // Now check if the information_property has the value.
     svp = svp->GetInformationOnly() == 0
       ? vtkSMIntVectorProperty::SafeDownCast(svp->GetInformationProperty())
-      : 0;
+      : nullptr;
   }
 
   return default_value;
@@ -1525,7 +1523,7 @@ const char* vtkSMPropertyHelper::GetInputArrayNameToProcess() const
   {
     vtkSMPropertyHelperWarningMacro(
       "Property for 'InputArrayToProcess' can only be vtkSMStringVectorProperty.");
-    return NULL;
+    return nullptr;
   }
 
   vtkSMStringVectorProperty* svp = vtkSMStringVectorProperty::SafeDownCast(this->Property);
@@ -1534,7 +1532,7 @@ const char* vtkSMPropertyHelper::GetInputArrayNameToProcess() const
     if (svp->GetNumberOfUncheckedElements() != 2 && svp->GetNumberOfUncheckedElements() != 5)
     {
       vtkSMPropertyHelperWarningMacro("We only support 2 or 5 element properties.");
-      return NULL;
+      return nullptr;
     }
 
     return svp->GetNumberOfUncheckedElements() == 2 ? svp->GetUncheckedElement(1)
@@ -1545,7 +1543,7 @@ const char* vtkSMPropertyHelper::GetInputArrayNameToProcess() const
     if (svp->GetNumberOfElements() != 2 && svp->GetNumberOfElements() != 5)
     {
       vtkSMPropertyHelperWarningMacro("We only support 2 or 5 element properties.");
-      return NULL;
+      return nullptr;
     }
 
     return svp->GetNumberOfElements() == 2 ? svp->GetElement(1) : svp->GetElement(4);
@@ -1558,7 +1556,7 @@ bool vtkSMPropertyHelper::CopyInternal(const vtkSMPropertyHelper& source)
 {
   std::vector<T> values = source.GetPropertyArray<T>();
   this->SetPropertyArray<T>(
-    values.size() > 0 ? &values[0] : NULL, static_cast<unsigned int>(values.size()));
+    values.size() > 0 ? &values[0] : nullptr, static_cast<unsigned int>(values.size()));
   return true;
 }
 

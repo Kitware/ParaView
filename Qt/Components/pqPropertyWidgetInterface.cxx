@@ -32,9 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPropertyWidgetInterface.h"
 
 //-----------------------------------------------------------------------------
-pqPropertyWidgetInterface::~pqPropertyWidgetInterface()
-{
-}
+pqPropertyWidgetInterface::~pqPropertyWidgetInterface() = default;
 
 //-----------------------------------------------------------------------------
 pqPropertyWidget* pqPropertyWidgetInterface::createWidgetForProperty(
@@ -43,7 +41,7 @@ pqPropertyWidget* pqPropertyWidgetInterface::createWidgetForProperty(
   Q_UNUSED(proxy);
   Q_UNUSED(property);
   Q_UNUSED(parentWidget);
-  return 0;
+  return nullptr;
 }
 
 //-----------------------------------------------------------------------------
@@ -53,7 +51,7 @@ pqPropertyWidget* pqPropertyWidgetInterface::createWidgetForPropertyGroup(
   Q_UNUSED(proxy);
   Q_UNUSED(group);
   Q_UNUSED(parentWidget);
-  return 0;
+  return nullptr;
 }
 
 //-----------------------------------------------------------------------------
@@ -63,7 +61,7 @@ pqPropertyWidgetDecorator* pqPropertyWidgetInterface::createWidgetDecorator(
   Q_UNUSED(type);
   Q_UNUSED(config);
   Q_UNUSED(widget);
-  return NULL;
+  return nullptr;
 }
 
 //-----------------------------------------------------------------------------

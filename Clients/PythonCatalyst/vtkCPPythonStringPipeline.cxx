@@ -22,14 +22,10 @@
 
 vtkStandardNewMacro(vtkCPPythonStringPipeline);
 //----------------------------------------------------------------------------
-vtkCPPythonStringPipeline::vtkCPPythonStringPipeline()
-{
-}
+vtkCPPythonStringPipeline::vtkCPPythonStringPipeline() = default;
 
 //----------------------------------------------------------------------------
-vtkCPPythonStringPipeline::~vtkCPPythonStringPipeline()
-{
-}
+vtkCPPythonStringPipeline::~vtkCPPythonStringPipeline() = default;
 
 //----------------------------------------------------------------------------
 int vtkCPPythonStringPipeline::Initialize(const char* pythonString)

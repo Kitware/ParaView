@@ -149,12 +149,12 @@ public:
   /**
    * In STREAM_COLUMNS mode, use this method to add a column (\c yarray). One
    * can assign it a name different the the name of the array using \c
-   * yarrayname. If \c xarray is not NULL, then is used as the row-id. This
+   * yarrayname. If \c xarray is not nullptr, then is used as the row-id. This
    * makes it possible to add multiple columns with varying number of samples.
    * The final output will have empty cells for missing values.
    */
   void AddColumn(
-    vtkAbstractArray* yarray, const char* yarrayname = NULL, vtkDataArray* xarray = NULL);
+    vtkAbstractArray* yarray, const char* yarrayname = nullptr, vtkDataArray* xarray = nullptr);
 
   //@{
   /**

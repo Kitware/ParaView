@@ -41,7 +41,7 @@ PyObject* pqPythonQtWrapperFactory::wrap(const QByteArray& classname, void* ptr)
   {
     return vtkPythonUtil::GetObjectFromPointer(static_cast<vtkObjectBase*>(ptr));
   }
-  return NULL;
+  return nullptr;
 }
 
 //-----------------------------------------------------------------------------
@@ -51,5 +51,5 @@ void* pqPythonQtWrapperFactory::unwrap(const QByteArray& classname, PyObject* ob
   {
     return vtkPythonUtil::GetPointerFromObject(object, classname.data());
   }
-  return NULL;
+  return nullptr;
 }

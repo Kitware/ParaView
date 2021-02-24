@@ -79,7 +79,7 @@ public:
   pqInternals(pqFindDataCreateSelectionFrame* self)
     : CreatingSelection(false)
     , DataChangedSinceLastUpdate(true)
-    , CurrentPort(NULL)
+    , CurrentPort(nullptr)
   {
     this->SelectionManager = qobject_cast<pqSelectionManager*>(
       pqApplicationCore::instance()->manager("SELECTION_MANAGER"));
@@ -132,8 +132,8 @@ public:
     Ui::FindDataCreateSelectionFrame& ui = this->Ui;
 
     pqOutputPort* port = ui.source->currentPort();
-    ui.queryClauseWidget->setEnabled(port != NULL);
-    ui.runQuery->setEnabled(port != NULL);
+    ui.queryClauseWidget->setEnabled(port != nullptr);
+    ui.runQuery->setEnabled(port != nullptr);
 
     bool reset_clause = force_reset;
     if (ui.queryClauseWidget->producer() != port)
@@ -189,7 +189,7 @@ pqFindDataCreateSelectionFrame::pqFindDataCreateSelectionFrame(
 pqFindDataCreateSelectionFrame::~pqFindDataCreateSelectionFrame()
 {
   delete this->Internals;
-  this->Internals = NULL;
+  this->Internals = nullptr;
 }
 
 //-----------------------------------------------------------------------------
@@ -236,7 +236,7 @@ void pqFindDataCreateSelectionFrame::runQuery()
 {
   Ui::FindDataCreateSelectionFrame& ui = this->Internals->Ui;
   assert(ui.source->currentPort() == ui.queryClauseWidget->producer() &&
-    ui.source->currentPort() != NULL);
+    ui.source->currentPort() != nullptr);
 
   pqOutputPort* port = ui.source->currentPort();
 
@@ -279,7 +279,7 @@ void pqFindDataCreateSelectionFrame::onSelectionChanged(pqOutputPort* port)
 //-----------------------------------------------------------------------------
 void pqFindDataCreateSelectionFrame::populateSelectionTypeCombo(QComboBox* cbox, pqOutputPort* port)
 {
-  if (port == NULL)
+  if (port == nullptr)
   {
     cbox->clear();
     return;

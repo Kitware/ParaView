@@ -127,7 +127,7 @@ public:
   /**
    * Method to find and return attribute array information for a particular
    * array for the given attribute type if one exists.
-   * Returns NULL if none is found.
+   * Returns nullptr if none is found.
    * \c fieldAssociation can be vtkDataObject::FIELD_ASSOCIATION_POINTS,
    * vtkDataObject::FIELD_ASSOCIATION_CELLS etc.
    * (use vtkDataObject::FIELD_ASSOCIATION_NONE for field data) (or

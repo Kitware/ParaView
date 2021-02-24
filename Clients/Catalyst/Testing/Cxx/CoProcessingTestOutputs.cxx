@@ -13,13 +13,13 @@ public:
   vtkTypeMacro(vtkCPTestPipeline, vtkCPPipeline);
   static vtkCPTestPipeline* New();
 
-  virtual int RequestDataDescription(vtkCPDataDescription* dataDescription) override
+  int RequestDataDescription(vtkCPDataDescription* dataDescription) override
   {
     return this->ShouldOutput(dataDescription);
   }
 
   /// Execute the pipeline. Returns 1 for success and 0 for failure.
-  virtual int CoProcess(vtkCPDataDescription* dataDescription) override
+  int CoProcess(vtkCPDataDescription* dataDescription) override
   {
     this->OutputCounter++;
     if (this->ShouldOutput(dataDescription) == 0)
@@ -45,7 +45,7 @@ protected:
     this->SecondInputFrequency = -1;
     this->ExpectedOutputCounter = -1;
   }
-  virtual ~vtkCPTestPipeline()
+  ~vtkCPTestPipeline() override
   {
     // check that we've outputted the proper amount of times
     if (this->OutputCounter != this->ExpectedOutputCounter)

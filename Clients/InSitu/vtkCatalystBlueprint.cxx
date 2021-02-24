@@ -340,14 +340,10 @@ bool verify(const std::string& protocol, const conduit::Node& n)
 } // namespace execute
 
 //----------------------------------------------------------------------------
-vtkCatalystBlueprint::vtkCatalystBlueprint()
-{
-}
+vtkCatalystBlueprint::vtkCatalystBlueprint() = default;
 
 //----------------------------------------------------------------------------
-vtkCatalystBlueprint::~vtkCatalystBlueprint()
-{
-}
+vtkCatalystBlueprint::~vtkCatalystBlueprint() = default;
 
 //----------------------------------------------------------------------------
 bool vtkCatalystBlueprint::Verify(const std::string& protocol, const conduit::Node& n)

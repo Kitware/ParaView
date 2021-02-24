@@ -34,14 +34,14 @@ vtkStandardNewMacro(vtkSMDoubleMapPropertyIterator);
 //---------------------------------------------------------------------------
 vtkSMDoubleMapPropertyIterator::vtkSMDoubleMapPropertyIterator()
 {
-  this->Property = 0;
+  this->Property = nullptr;
   this->Internals = new vtkSMDoubleMapPropertyIteratorInternals;
 }
 
 //---------------------------------------------------------------------------
 vtkSMDoubleMapPropertyIterator::~vtkSMDoubleMapPropertyIterator()
 {
-  this->SetProperty(0);
+  this->SetProperty(nullptr);
   delete this->Internals;
 }
 
@@ -50,12 +50,12 @@ void vtkSMDoubleMapPropertyIterator::SetProperty(vtkSMDoubleMapProperty* propert
 {
   if (this->Property != property)
   {
-    if (this->Property != NULL)
+    if (this->Property != nullptr)
     {
       this->Property->UnRegister(this);
     }
     this->Property = property;
-    if (this->Property != NULL)
+    if (this->Property != nullptr)
     {
       this->Property->Register(this);
       this->Begin();

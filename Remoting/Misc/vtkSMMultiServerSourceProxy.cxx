@@ -34,9 +34,7 @@ vtkSMMultiServerSourceProxy::vtkSMMultiServerSourceProxy()
 }
 
 //---------------------------------------------------------------------------
-vtkSMMultiServerSourceProxy::~vtkSMMultiServerSourceProxy()
-{
-}
+vtkSMMultiServerSourceProxy::~vtkSMMultiServerSourceProxy() = default;
 //---------------------------------------------------------------------------
 void vtkSMMultiServerSourceProxy::PrintSelf(ostream& os, vtkIndent indent)
 {
@@ -64,7 +62,7 @@ void vtkSMMultiServerSourceProxy::SetExternalProxy(
 
   // Remove previous proxy dependency
   vtkSMSourceProxy* previousRemoteProxy = this->GetExternalProxy();
-  if (previousRemoteProxy != NULL)
+  if (previousRemoteProxy != nullptr)
   {
     previousRemoteProxy->RemoveConsumer(this->GetProperty("DependencyLink"), this);
   }
@@ -87,7 +85,7 @@ void vtkSMMultiServerSourceProxy::SetExternalProxy(
 //---------------------------------------------------------------------------
 vtkSMSourceProxy* vtkSMMultiServerSourceProxy::GetExternalProxy()
 {
-  vtkSMSourceProxy* bindedProxy = NULL;
+  vtkSMSourceProxy* bindedProxy = nullptr;
   vtkSMSession* remoteSession = vtkSMSession::SafeDownCast(
     vtkProcessModule::GetProcessModule()->GetSession(this->RemoteProxySessionID));
   if (remoteSession)

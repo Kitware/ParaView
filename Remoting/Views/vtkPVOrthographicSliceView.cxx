@@ -107,17 +107,17 @@ public:
 
 protected:
   vtkPVOrthographicSliceViewInteractorStyle()
-    : PrimaryInteractorStyle(NULL)
-    , OrthographicInteractorStyle(NULL)
-    , PrimaryRenderer(NULL)
+    : PrimaryInteractorStyle(nullptr)
+    , OrthographicInteractorStyle(nullptr)
+    , PrimaryRenderer(nullptr)
     , ClickCounter(0)
   {
   }
   ~vtkPVOrthographicSliceViewInteractorStyle() override
   {
-    this->SetPrimaryInteractorStyle(NULL);
-    this->SetOrthographicInteractorStyle(NULL);
-    this->SetPrimaryRenderer(NULL);
+    this->SetPrimaryInteractorStyle(nullptr);
+    this->SetOrthographicInteractorStyle(nullptr);
+    this->SetPrimaryRenderer(nullptr);
   }
 
   vtkCameraManipulator* FindManipulator(int button, int shift, int control) override
@@ -642,7 +642,7 @@ void vtkPVOrthographicSliceView::SetGridAxes3DActor(vtkPVGridAxes3DActor* gridAc
     {
       this->Renderers[cc]->RemoveViewProp(this->GridAxes3DActors[cc]);
     }
-    vtkPVGridAxes3DActor* clone = gridActor ? gridActor->NewInstance() : NULL;
+    vtkPVGridAxes3DActor* clone = gridActor ? gridActor->NewInstance() : nullptr;
     this->GridAxes3DActors[cc].TakeReference(clone);
     if (this->GridAxes3DActors[cc] && !in_tile_display_mode)
     {

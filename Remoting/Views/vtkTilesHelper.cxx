@@ -31,9 +31,7 @@ vtkTilesHelper::vtkTilesHelper()
 }
 
 //----------------------------------------------------------------------------
-vtkTilesHelper::~vtkTilesHelper()
-{
-}
+vtkTilesHelper::~vtkTilesHelper() = default;
 
 //----------------------------------------------------------------------------
 bool vtkTilesHelper::GetTileIndex(int rank, int* tileX, int* tileY) const

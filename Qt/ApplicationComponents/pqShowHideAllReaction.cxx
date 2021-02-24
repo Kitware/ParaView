@@ -50,7 +50,7 @@ pqShowHideAllReaction::pqShowHideAllReaction(QAction* parentObject, ActionType a
 void pqShowHideAllReaction::act(ActionType action)
 {
   pqView* activeView = pqActiveObjects::instance().activeView();
-  vtkSMViewProxy* viewProxy = activeView ? activeView->getViewProxy() : NULL;
+  vtkSMViewProxy* viewProxy = activeView ? activeView->getViewProxy() : nullptr;
   if (action == ActionType::Show)
   {
     BEGIN_UNDO_SET("Show All");

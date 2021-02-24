@@ -145,7 +145,7 @@ pqServer* pqServerManagerModel::findServer(vtkIdType cid) const
     return iter.value();
   }
 
-  return 0;
+  return nullptr;
 }
 
 //-----------------------------------------------------------------------------
@@ -158,7 +158,7 @@ pqServer* pqServerManagerModel::findServer(const pqServerResource& resource) con
       return server;
     }
   }
-  return NULL;
+  return nullptr;
 }
 
 //-----------------------------------------------------------------------------
@@ -188,7 +188,7 @@ pqServerManagerModelItem* pqServerManagerModel::findItemHelper(
     }
   }
 
-  return 0;
+  return nullptr;
 }
 
 //-----------------------------------------------------------------------------
@@ -207,7 +207,7 @@ pqServerManagerModelItem* pqServerManagerModel::findItemHelper(
     }
   }
 
-  return 0;
+  return nullptr;
 }
 
 //-----------------------------------------------------------------------------
@@ -226,7 +226,7 @@ pqServerManagerModelItem* pqServerManagerModel::findItemHelper(
     }
   }
 
-  return 0;
+  return nullptr;
 }
 
 //-----------------------------------------------------------------------------
@@ -259,7 +259,7 @@ void pqServerManagerModel::findItemsHelper(const pqServerManagerModel* const mod
 void pqServerManagerModel::onProxyRegistered(
   const QString& group, const QString& name, vtkSMProxy* proxy)
 {
-  if (group.endsWith("_prototypes") || proxy->GetSession() == NULL)
+  if (group.endsWith("_prototypes") || proxy->GetSession() == nullptr)
   {
     // Ignore prototype proxies.
     return;
@@ -292,7 +292,7 @@ void pqServerManagerModel::onProxyRegistered(
     return;
   }
 
-  pqProxy* item = 0;
+  pqProxy* item = nullptr;
 
   QObjectList ifaces = pqApplicationCore::instance()->interfaceTracker()->interfaces();
   foreach (QObject* iface, ifaces)
@@ -452,7 +452,7 @@ void pqServerManagerModel::onProxyUnRegistered(
   Q_EMIT this->preProxyRemoved(item);
   Q_EMIT this->preItemRemoved(item);
 
-  QObject::disconnect(item, 0, this, 0);
+  QObject::disconnect(item, nullptr, this, nullptr);
   this->Internal->ItemList.removeAll(item);
   this->Internal->Proxies.remove(item->getProxy());
 

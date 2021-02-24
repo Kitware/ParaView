@@ -89,7 +89,7 @@ public:
 
 Q_SIGNALS:
   /**
-  * emitted when the active scene changes (\c scene may be NULL).
+  * emitted when the active scene changes (\c scene may be nullptr).
   */
   void activeSceneChanged(pqAnimationScene* scene);
 

@@ -14,6 +14,4 @@
 =========================================================================*/
 #include "vtkPVPythonPluginInterface.h"
 
-vtkPVPythonPluginInterface::~vtkPVPythonPluginInterface()
-{
-}
+vtkPVPythonPluginInterface::~vtkPVPythonPluginInterface() = default;

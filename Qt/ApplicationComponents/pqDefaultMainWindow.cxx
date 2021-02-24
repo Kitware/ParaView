@@ -48,5 +48,5 @@ pqDefaultMainWindow::pqDefaultMainWindow(QWidget* parentObject, Qt::WindowFlags 
 pqDefaultMainWindow::~pqDefaultMainWindow()
 {
   delete this->Internals;
-  this->Internals = 0;
+  this->Internals = nullptr;
 }

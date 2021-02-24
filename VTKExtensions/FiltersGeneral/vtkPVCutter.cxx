@@ -44,9 +44,7 @@ vtkPVCutter::vtkPVCutter()
 }
 
 //----------------------------------------------------------------------------
-vtkPVCutter::~vtkPVCutter()
-{
-}
+vtkPVCutter::~vtkPVCutter() = default;
 
 //----------------------------------------------------------------------------
 void vtkPVCutter::PrintSelf(ostream& os, vtkIndent indent)

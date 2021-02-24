@@ -72,7 +72,7 @@ vtkPVMetaSliceDataSet::vtkPVMetaSliceDataSet()
 vtkPVMetaSliceDataSet::~vtkPVMetaSliceDataSet()
 {
   delete this->Internal;
-  this->Internal = NULL;
+  this->Internal = nullptr;
 }
 
 //----------------------------------------------------------------------------

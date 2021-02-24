@@ -62,7 +62,7 @@ public:
   /**
   * constructor
   */
-  pqFileChooserWidget(QWidget* p = NULL);
+  pqFileChooserWidget(QWidget* p = nullptr);
   /**
   * destructor
   */
@@ -137,7 +137,7 @@ public:
 
   /**
   * set server to work on.
-  * If server is NULL, a local file dialog is used
+  * If server is nullptr, a local file dialog is used
   */
   void setServer(pqServer* server);
   pqServer* server();

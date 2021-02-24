@@ -59,7 +59,7 @@ class PQCORE_EXPORT pqSpreadSheetViewModel : public QAbstractTableModel
   typedef QAbstractTableModel Superclass;
 
 public:
-  pqSpreadSheetViewModel(vtkSMProxy* viewProxy, QObject* parent = NULL);
+  pqSpreadSheetViewModel(vtkSMProxy* viewProxy, QObject* parent = nullptr);
   ~pqSpreadSheetViewModel() override;
 
   class vtkIndex

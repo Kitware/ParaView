@@ -60,7 +60,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <sstream>
 #include <vector>
 
-pqVRPNEventListener* pqVRPNConnection::Listener = NULL;
+pqVRPNEventListener* pqVRPNConnection::Listener = nullptr;
 
 class pqVRPNConnection::pqInternals
 {
@@ -226,11 +226,11 @@ void pqVRPNConnection::stop()
 
   this->Initialized = false;
   delete this->Internals->Analog;
-  this->Internals->Analog = NULL;
+  this->Internals->Analog = nullptr;
   delete this->Internals->Button;
-  this->Internals->Button = NULL;
+  this->Internals->Button = nullptr;
   delete this->Internals->Tracker;
-  this->Internals->Tracker = NULL;
+  this->Internals->Tracker = nullptr;
 }
 
 // ---------------------------------------------------------------------private

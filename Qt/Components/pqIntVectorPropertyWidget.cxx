@@ -261,9 +261,7 @@ pqIntVectorPropertyWidget::pqIntVectorPropertyWidget(
 }
 
 //-----------------------------------------------------------------------------
-pqIntVectorPropertyWidget::~pqIntVectorPropertyWidget()
-{
-}
+pqIntVectorPropertyWidget::~pqIntVectorPropertyWidget() = default;
 
 //-----------------------------------------------------------------------------
 pqPropertyWidget* pqIntVectorPropertyWidget::createWidget(

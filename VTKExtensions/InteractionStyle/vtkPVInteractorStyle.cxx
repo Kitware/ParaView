@@ -33,7 +33,7 @@ vtkPVInteractorStyle::vtkPVInteractorStyle()
 {
   this->UseTimers = 0;
   this->CameraManipulators = vtkCollection::New();
-  this->CurrentManipulator = NULL;
+  this->CurrentManipulator = nullptr;
   this->CenterOfRotation[0] = this->CenterOfRotation[1] = this->CenterOfRotation[2] = 0;
   this->RotationFactor = 1.0;
 }
@@ -42,7 +42,7 @@ vtkPVInteractorStyle::vtkPVInteractorStyle()
 vtkPVInteractorStyle::~vtkPVInteractorStyle()
 {
   this->CameraManipulators->Delete();
-  this->CameraManipulators = NULL;
+  this->CameraManipulators = nullptr;
 }
 
 //-------------------------------------------------------------------------
@@ -87,7 +87,7 @@ void vtkPVInteractorStyle::OnButtonDown(int button, int shift, int control)
   // Get the renderer.
   this->FindPokedRenderer(
     this->Interactor->GetEventPosition()[0], this->Interactor->GetEventPosition()[1]);
-  if (this->CurrentRenderer == NULL)
+  if (this->CurrentRenderer == nullptr)
   {
     return;
   }
@@ -111,7 +111,7 @@ vtkCameraManipulator* vtkPVInteractorStyle::FindManipulator(int button, int shif
 {
   // Look for a matching camera interactor.
   this->CameraManipulators->InitTraversal();
-  vtkCameraManipulator* manipulator = NULL;
+  vtkCameraManipulator* manipulator = nullptr;
   while ((manipulator = (vtkCameraManipulator*)this->CameraManipulators->GetNextItemAsObject()))
   {
     if (manipulator->GetButton() == button && manipulator->GetShift() == shift &&
@@ -120,7 +120,7 @@ vtkCameraManipulator* vtkPVInteractorStyle::FindManipulator(int button, int shif
       return manipulator;
     }
   }
-  return NULL;
+  return nullptr;
 }
 
 //-------------------------------------------------------------------------
@@ -142,7 +142,7 @@ void vtkPVInteractorStyle::OnRightButtonUp()
 //-------------------------------------------------------------------------
 void vtkPVInteractorStyle::OnButtonUp(int button)
 {
-  if (this->CurrentManipulator == NULL)
+  if (this->CurrentManipulator == nullptr)
   {
     return;
   }
@@ -153,7 +153,7 @@ void vtkPVInteractorStyle::OnButtonUp(int button)
     this->CurrentManipulator->EndInteraction();
     this->InvokeEvent(vtkCommand::EndInteractionEvent);
     this->CurrentManipulator->UnRegister(this);
-    this->CurrentManipulator = NULL;
+    this->CurrentManipulator = nullptr;
   }
 }
 
@@ -224,7 +224,7 @@ void vtkPVInteractorStyle::OnKeyDown()
 {
   // Look for a matching camera interactor.
   this->CameraManipulators->InitTraversal();
-  vtkCameraManipulator* manipulator = NULL;
+  vtkCameraManipulator* manipulator = nullptr;
   while ((manipulator = (vtkCameraManipulator*)this->CameraManipulators->GetNextItemAsObject()))
   {
     manipulator->OnKeyDown(this->Interactor);
@@ -236,7 +236,7 @@ void vtkPVInteractorStyle::OnKeyUp()
 {
   // Look for a matching camera interactor.
   this->CameraManipulators->InitTraversal();
-  vtkCameraManipulator* manipulator = NULL;
+  vtkCameraManipulator* manipulator = nullptr;
   while ((manipulator = (vtkCameraManipulator*)this->CameraManipulators->GetNextItemAsObject()))
   {
     manipulator->OnKeyUp(this->Interactor);

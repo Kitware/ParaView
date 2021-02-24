@@ -24,14 +24,10 @@
 
 vtkStandardNewMacro(vtkSITimeStepsProperty);
 //----------------------------------------------------------------------------
-vtkSITimeStepsProperty::vtkSITimeStepsProperty()
-{
-}
+vtkSITimeStepsProperty::vtkSITimeStepsProperty() = default;
 
 //----------------------------------------------------------------------------
-vtkSITimeStepsProperty::~vtkSITimeStepsProperty()
-{
-}
+vtkSITimeStepsProperty::~vtkSITimeStepsProperty() = default;
 
 //----------------------------------------------------------------------------
 void vtkSITimeStepsProperty::PrintSelf(ostream& os, vtkIndent indent)

@@ -196,7 +196,7 @@ class pqArraySelectorPropertyWidget::PropertyLinksConnection : public pqProperty
 public:
   PropertyLinksConnection(QObject* qobject, const char* qproperty, const char* qsignal,
     vtkSMProxy* smproxy, vtkSMProperty* smproperty, int smindex, bool use_unchecked_modified_event,
-    QObject* parentObject = 0)
+    QObject* parentObject = nullptr)
     : Superclass(qobject, qproperty, qsignal, smproxy, smproperty, smindex,
         use_unchecked_modified_event, parentObject)
   {
@@ -276,9 +276,7 @@ pqArraySelectorPropertyWidget::pqArraySelectorPropertyWidget(
 }
 
 //-----------------------------------------------------------------------------
-pqArraySelectorPropertyWidget::~pqArraySelectorPropertyWidget()
-{
-}
+pqArraySelectorPropertyWidget::~pqArraySelectorPropertyWidget() = default;
 
 //-----------------------------------------------------------------------------
 void pqArraySelectorPropertyWidget::domainModified()

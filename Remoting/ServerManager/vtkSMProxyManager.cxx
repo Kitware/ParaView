@@ -46,7 +46,7 @@ public:
     : ActiveSessionID(0)
   {
   }
-  ~vtkPXMInternal() {}
+  ~vtkPXMInternal() = default;
   vtkIdType ActiveSessionID;
 };
 
@@ -73,7 +73,7 @@ vtkSMProxyManager::vtkSMProxyManager()
 {
   this->PXMStorage = new vtkPXMInternal();
   this->PluginManager = vtkSMPluginManager::New();
-  this->UndoStackBuilder = NULL;
+  this->UndoStackBuilder = nullptr;
 
   this->ReaderFactory = vtkSMReaderFactory::New();
   this->WriterFactory = vtkSMWriterFactory::New();
@@ -101,19 +101,19 @@ vtkSMProxyManager::vtkSMProxyManager()
 //---------------------------------------------------------------------------
 vtkSMProxyManager::~vtkSMProxyManager()
 {
-  this->SetUndoStackBuilder(NULL);
+  this->SetUndoStackBuilder(nullptr);
 
   this->PluginManager->Delete();
-  this->PluginManager = NULL;
+  this->PluginManager = nullptr;
 
   this->ReaderFactory->Delete();
-  this->ReaderFactory = 0;
+  this->ReaderFactory = nullptr;
 
   this->WriterFactory->Delete();
-  this->WriterFactory = 0;
+  this->WriterFactory = nullptr;
 
   delete this->PXMStorage;
-  this->PXMStorage = NULL;
+  this->PXMStorage = nullptr;
 }
 
 //----------------------------------------------------------------------------
@@ -130,13 +130,13 @@ vtkSMProxyManager* vtkSMProxyManager::GetProxyManager()
 //----------------------------------------------------------------------------
 void vtkSMProxyManager::Finalize()
 {
-  vtkSMProxyManager::Singleton = NULL;
+  vtkSMProxyManager::Singleton = nullptr;
 }
 
 //---------------------------------------------------------------------------
 bool vtkSMProxyManager::IsInitialized()
 {
-  return (vtkSMProxyManager::Singleton != NULL);
+  return (vtkSMProxyManager::Singleton != nullptr);
 }
 
 //----------------------------------------------------------------------------
@@ -167,7 +167,8 @@ int vtkSMProxyManager::GetVersionPatch()
 vtkSMSession* vtkSMProxyManager::GetActiveSession()
 {
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-  return pm ? vtkSMSession::SafeDownCast(pm->GetSession(this->PXMStorage->ActiveSessionID)) : NULL;
+  return pm ? vtkSMSession::SafeDownCast(pm->GetSession(this->PXMStorage->ActiveSessionID))
+            : nullptr;
 }
 
 //----------------------------------------------------------------------------
@@ -193,7 +194,7 @@ void vtkSMProxyManager::ConnectionsUpdated(vtkObject*, unsigned long eventid, vo
       vtkSessionIterator* iter = pm->NewSessionIterator();
       for (iter->InitTraversal(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
       {
-        if (iter->GetCurrentSession() != NULL && iter->GetCurrentSessionId() != sid)
+        if (iter->GetCurrentSession() != nullptr && iter->GetCurrentSessionId() != sid)
         {
           newSID = iter->GetCurrentSessionId();
           break;
@@ -234,7 +235,7 @@ vtkSMSessionProxyManager* vtkSMProxyManager::GetActiveSessionProxyManager()
 //----------------------------------------------------------------------------
 vtkSMSessionProxyManager* vtkSMProxyManager::GetSessionProxyManager(vtkSMSession* session)
 {
-  return session ? session->GetSessionProxyManager() : NULL;
+  return session ? session->GetSessionProxyManager() : nullptr;
 }
 
 //---------------------------------------------------------------------------
@@ -264,7 +265,7 @@ vtkSMProxy* vtkSMProxyManager::NewProxy(
     return pxm->NewProxy(groupName, proxyName, subProxyName);
   }
   vtkErrorMacro("No active session found.");
-  return NULL;
+  return nullptr;
 }
 
 //---------------------------------------------------------------------------
@@ -288,7 +289,7 @@ vtkSMProxy* vtkSMProxyManager::GetProxy(const char* groupname, const char* name)
     return pxm->GetProxy(groupname, name);
   }
   vtkErrorMacro("No active session found.");
-  return NULL;
+  return nullptr;
 }
 
 //---------------------------------------------------------------------------
@@ -315,7 +316,7 @@ const char* vtkSMProxyManager::GetProxyName(const char* groupname, unsigned int 
   {
     vtkErrorMacro("No active session found.");
   }
-  return NULL;
+  return nullptr;
 }
 
 //---------------------------------------------------------------------------
@@ -329,7 +330,7 @@ const char* vtkSMProxyManager::GetProxyName(const char* groupname, vtkSMProxy* p
   {
     vtkErrorMacro("No active session found.");
   }
-  return NULL;
+  return nullptr;
 }
 
 //---------------------------------------------------------------------------

@@ -75,7 +75,7 @@ pqSILModel::pqSILModel(QObject* _parent /*=0*/)
 pqSILModel::~pqSILModel()
 {
   delete this->ModelIndexCache;
-  this->ModelIndexCache = 0;
+  this->ModelIndexCache = nullptr;
   this->SILModel->Delete();
 
   this->setSILDomain(nullptr);

@@ -133,7 +133,7 @@ vtkSMChartSeriesSelectionDomain::vtkSMChartSeriesSelectionDomain()
   : Internals(new vtkSMChartSeriesSelectionDomain::vtkInternals())
 {
   this->DefaultMode = vtkSMChartSeriesSelectionDomain::UNDEFINED;
-  this->DefaultValue = 0;
+  this->DefaultValue = nullptr;
   this->SetDefaultValue("");
   this->FlattenTable = true;
   this->HidePartialArrays = true;

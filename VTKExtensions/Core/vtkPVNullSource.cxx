@@ -24,9 +24,7 @@ vtkPVNullSource::vtkPVNullSource()
 }
 
 //----------------------------------------------------------------------------
-vtkPVNullSource::~vtkPVNullSource()
-{
-}
+vtkPVNullSource::~vtkPVNullSource() = default;
 
 //----------------------------------------------------------------------------
 void vtkPVNullSource::PrintSelf(ostream& os, vtkIndent indent)

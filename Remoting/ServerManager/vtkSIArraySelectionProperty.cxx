@@ -30,14 +30,10 @@
 
 vtkStandardNewMacro(vtkSIArraySelectionProperty);
 //----------------------------------------------------------------------------
-vtkSIArraySelectionProperty::vtkSIArraySelectionProperty()
-{
-}
+vtkSIArraySelectionProperty::vtkSIArraySelectionProperty() = default;
 
 //----------------------------------------------------------------------------
-vtkSIArraySelectionProperty::~vtkSIArraySelectionProperty()
-{
-}
+vtkSIArraySelectionProperty::~vtkSIArraySelectionProperty() = default;
 
 //----------------------------------------------------------------------------
 void vtkSIArraySelectionProperty::PrintSelf(ostream& os, vtkIndent indent)
@@ -64,7 +60,7 @@ bool vtkSIArraySelectionProperty::Pull(vtkSMMessage* msgToFill)
 
   // Get the ID for the reader.
   vtkObjectBase* reader = this->GetVTKObject();
-  if (reader != NULL)
+  if (reader != nullptr)
   {
     std::ostringstream aname;
     aname << "GetNumberOf" << this->Command << "Arrays" << ends;
@@ -104,7 +100,7 @@ bool vtkSIArraySelectionProperty::Pull(vtkSMMessage* msgToFill)
       }
       if (!pname)
       {
-        // Initializing a std::string to NULL does not have a defined
+        // Initializing a std::string to nullptr does not have a defined
         // behavior.
         break;
       }

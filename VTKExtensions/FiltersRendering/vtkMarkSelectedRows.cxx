@@ -81,9 +81,7 @@ vtkMarkSelectedRows::vtkMarkSelectedRows()
 }
 
 //----------------------------------------------------------------------------
-vtkMarkSelectedRows::~vtkMarkSelectedRows()
-{
-}
+vtkMarkSelectedRows::~vtkMarkSelectedRows() = default;
 
 //----------------------------------------------------------------------------
 int vtkMarkSelectedRows::FillInputPortInformation(int port, vtkInformation* info)

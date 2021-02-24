@@ -35,12 +35,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 pqXYChartView::pqXYChartView(const QString& group, const QString& name,
-  vtkSMContextViewProxy* viewModule, pqServer* server, QObject* p /*=NULL*/)
+  vtkSMContextViewProxy* viewModule, pqServer* server, QObject* p /*=nullptr*/)
   : Superclass(XYChartViewType(), group, name, viewModule, server, p)
 {
 }
 
 //-----------------------------------------------------------------------------
-pqXYChartView::~pqXYChartView()
-{
-}
+pqXYChartView::~pqXYChartView() = default;

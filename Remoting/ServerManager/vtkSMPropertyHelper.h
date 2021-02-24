@@ -207,7 +207,7 @@ public:
    */
   void Set(vtkSMProxy* value, unsigned int outputport = 0) { this->Set(0, value, outputport); }
   void Set(unsigned int index, vtkSMProxy* value, unsigned int outputport = 0);
-  void Set(vtkSMProxy** value, unsigned int count, unsigned int* outputports = NULL);
+  void Set(vtkSMProxy** value, unsigned int count, unsigned int* outputports = nullptr);
   void Add(vtkSMProxy* value, unsigned int outputport = 0);
   void Remove(vtkSMProxy* value);
   vtkSMProxy* GetAsProxy(unsigned int index = 0) const;

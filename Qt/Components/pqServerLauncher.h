@@ -78,7 +78,7 @@ public:
   * is specified, pqServerLauncher is created.
   */
   static pqServerLauncher* newInstance(
-    const pqServerConfiguration& configuration, QObject* parent = NULL);
+    const pqServerConfiguration& configuration, QObject* parent = nullptr);
 
   /**
   * This method will launch the server process based on the configuration and
@@ -117,7 +117,7 @@ protected:
   * An utility method to execute a command using a QProcess
   */
   bool processCommand(
-    QString command, double timeout, double delay, const QProcessEnvironment* options = NULL);
+    QString command, double timeout, double delay, const QProcessEnvironment* options = nullptr);
 
   virtual bool connectToPrelaunchedServer();
 

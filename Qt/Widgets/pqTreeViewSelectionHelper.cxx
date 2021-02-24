@@ -119,9 +119,7 @@ pqTreeViewSelectionHelper::pqTreeViewSelectionHelper(QAbstractItemView* tree, bo
 }
 
 //-----------------------------------------------------------------------------
-pqTreeViewSelectionHelper::~pqTreeViewSelectionHelper()
-{
-}
+pqTreeViewSelectionHelper::~pqTreeViewSelectionHelper() = default;
 
 //-----------------------------------------------------------------------------
 void pqTreeViewSelectionHelper::setSelectedItemsCheckState(Qt::CheckState state)

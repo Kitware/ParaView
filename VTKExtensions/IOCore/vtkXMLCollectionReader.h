@@ -44,7 +44,7 @@ public:
   //@{
   /**
    * Get/Set the required value for a particular named attribute.
-   * Only data sets matching this value will be read.  A NULL value or
+   * Only data sets matching this value will be read.  A nullptr value or
    * empty string will disable any restriction from the given
    * attribute.
    */

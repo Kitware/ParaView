@@ -54,12 +54,12 @@ class pqDisplayRepresentationWidget::PropertyLinksConnection : public pqProperty
 public:
   PropertyLinksConnection(QObject* qobject, const char* qproperty, const char* qsignal,
     vtkSMProxy* smproxy, vtkSMProperty* smproperty, int smindex, bool use_unchecked_modified_event,
-    QObject* parentObject = 0)
+    QObject* parentObject = nullptr)
     : Superclass(qobject, qproperty, qsignal, smproxy, smproperty, smindex,
         use_unchecked_modified_event, parentObject)
   {
   }
-  ~PropertyLinksConnection() override {}
+  ~PropertyLinksConnection() override = default;
 
 protected:
   /// Called to update the ServerManager Property due to UI change.
@@ -89,7 +89,7 @@ public:
   QPointer<pqComboBoxDomain> Domain;
   QPointer<pqDataRepresentation> PQRepr;
   QSet<QString> WarnOnRepresentationChange;
-  pqInternals() {}
+  pqInternals() = default;
 
   bool setRepresentationText(const QString& text)
   {
@@ -130,7 +130,7 @@ void pqDisplayRepresentationWidget::setRepresentation(pqDataRepresentation* disp
   {
     this->Internal->PQRepr->disconnect(this);
   }
-  vtkSMProxy* proxy = display ? display->getProxy() : NULL;
+  vtkSMProxy* proxy = display ? display->getProxy() : nullptr;
   this->setRepresentation(proxy);
   this->Internal->PQRepr = display;
   if (display)
@@ -149,8 +149,8 @@ void pqDisplayRepresentationWidget::setRepresentation(vtkSMProxy* proxy)
   delete this->Internal->Domain;
   bool prev = this->Internal->comboBox->blockSignals(true);
   this->Internal->comboBox->clear();
-  vtkSMProperty* smproperty = proxy ? proxy->GetProperty("Representation") : NULL;
-  this->Internal->comboBox->setEnabled(smproperty != NULL);
+  vtkSMProperty* smproperty = proxy ? proxy->GetProperty("Representation") : nullptr;
+  this->Internal->comboBox->setEnabled(smproperty != nullptr);
   if (!smproperty)
   {
     this->Internal->comboBox->addItem("Representation");
@@ -230,6 +230,4 @@ pqDisplayRepresentationPropertyWidget::pqDisplayRepresentationPropertyWidget(
 }
 
 //-----------------------------------------------------------------------------
-pqDisplayRepresentationPropertyWidget::~pqDisplayRepresentationPropertyWidget()
-{
-}
+pqDisplayRepresentationPropertyWidget::~pqDisplayRepresentationPropertyWidget() = default;

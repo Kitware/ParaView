@@ -35,10 +35,10 @@ vtkShearedWaveletSource::vtkShearedWaveletSource()
 {
   this->EnableAxisTitles = false;
   this->EnableTimeLabel = false;
-  this->TimeLabel = NULL;
-  this->AxisUTitle = NULL;
-  this->AxisVTitle = NULL;
-  this->AxisWTitle = NULL;
+  this->TimeLabel = nullptr;
+  this->AxisUTitle = nullptr;
+  this->AxisVTitle = nullptr;
+  this->AxisWTitle = nullptr;
 
   this->ModelBoundingBox[0] = this->ModelBoundingBox[2] = this->ModelBoundingBox[4] = 0.0;
   this->ModelBoundingBox[1] = this->ModelBoundingBox[3] = this->ModelBoundingBox[5] = 1.0;
@@ -59,10 +59,10 @@ vtkShearedWaveletSource::vtkShearedWaveletSource()
 //----------------------------------------------------------------------------
 vtkShearedWaveletSource::~vtkShearedWaveletSource()
 {
-  this->SetTimeLabel(NULL);
-  this->SetAxisUTitle(NULL);
-  this->SetAxisVTitle(NULL);
-  this->SetAxisWTitle(NULL);
+  this->SetTimeLabel(nullptr);
+  this->SetAxisUTitle(nullptr);
+  this->SetAxisVTitle(nullptr);
+  this->SetAxisWTitle(nullptr);
 }
 
 //----------------------------------------------------------------------------

@@ -36,7 +36,7 @@ namespace
 {
 bool vtkSkipArray(const char* aname)
 {
-  return (aname == NULL || strcmp(aname, "vtkOriginalCellIds") == 0 ||
+  return (aname == nullptr || strcmp(aname, "vtkOriginalCellIds") == 0 ||
     strcmp(aname, "vtkOriginalPointIds") == 0);
 }
 }
@@ -148,7 +148,7 @@ void vtkPVDataSetAttributesInformation::CopyFromFieldData(vtkFieldData* da)
   for (int idx = 0; idx < num; ++idx)
   {
     vtkAbstractArray* const array = da->GetAbstractArray(idx);
-    if (array != NULL && !vtkSkipArray(array->GetName()))
+    if (array != nullptr && !vtkSkipArray(array->GetName()))
     {
       vtkNew<vtkPVArrayInformation> info;
       info->CopyFromObject(array);
@@ -196,7 +196,7 @@ void vtkPVDataSetAttributesInformation::CopyFromGenericAttributes(
   for (int cc = 0, max = da->GetNumberOfAttributes(); cc < max; ++cc)
   {
     vtkGenericAttribute* array = da->GetAttribute(cc);
-    if (array != NULL && array->GetName() != NULL && !vtkSkipArray(array->GetName()) &&
+    if (array != nullptr && array->GetName() != nullptr && !vtkSkipArray(array->GetName()) &&
       array->GetCentering() == centering)
     {
       vtkNew<vtkPVGenericAttributeInformation> info;
@@ -327,7 +327,7 @@ vtkPVArrayInformation* vtkPVDataSetAttributesInformation::GetAttributeInformatio
   {
     return this->GetArrayInformation(internals.AttributesInformation[attributeType].c_str());
   }
-  return NULL;
+  return nullptr;
 }
 
 //----------------------------------------------------------------------------
@@ -364,7 +364,7 @@ vtkPVArrayInformation* vtkPVDataSetAttributesInformation::GetArrayInformation(in
       return miter->second;
     }
   }
-  return NULL;
+  return nullptr;
 }
 
 //----------------------------------------------------------------------------
@@ -375,9 +375,9 @@ vtkPVArrayInformation* vtkPVDataSetAttributesInformation::GetArrayInformation(
   {
     const vtkInternals& internals = (*this->Internals);
     vtkInternals::ArrayInformationType::const_iterator iter = internals.ArrayInformation.find(name);
-    return iter != internals.ArrayInformation.end() ? iter->second : NULL;
+    return iter != internals.ArrayInformation.end() ? iter->second : nullptr;
   }
-  return NULL;
+  return nullptr;
 }
 
 //----------------------------------------------------------------------------

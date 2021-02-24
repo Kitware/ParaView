@@ -60,9 +60,7 @@ pqLineEdit::pqLineEdit(const QString& _contents, QWidget* _parent)
 }
 
 //-----------------------------------------------------------------------------
-pqLineEdit::~pqLineEdit()
-{
-}
+pqLineEdit::~pqLineEdit() = default;
 
 //-----------------------------------------------------------------------------
 void pqLineEdit::onTextEdited()

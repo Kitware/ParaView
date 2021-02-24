@@ -101,7 +101,7 @@ public:
 
   //@{
   /**
-   * Set the active session. It's acceptable to set the active session as NULL
+   * Set the active session. It's acceptable to set the active session as nullptr
    * (or 0 in case of sessionId), however GetActiveSession() may automatically
    * pick an active session if none is provided.
    */
@@ -127,7 +127,7 @@ public:
    * GetActiveSessionProxyManager()).
    */
   vtkSMProxy* NewProxy(
-    const char* groupName, const char* proxyName, const char* subProxyName = NULL);
+    const char* groupName, const char* proxyName, const char* subProxyName = nullptr);
   void RegisterProxy(const char* groupname, const char* name, vtkSMProxy* proxy);
   vtkSMProxy* GetProxy(const char* groupname, const char* name);
   void UnRegisterProxy(const char* groupname, const char* name, vtkSMProxy*);

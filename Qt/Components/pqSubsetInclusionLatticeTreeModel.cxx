@@ -87,9 +87,7 @@ pqSubsetInclusionLatticeTreeModel::pqSubsetInclusionLatticeTreeModel(QObject* pa
 }
 
 //-----------------------------------------------------------------------------
-pqSubsetInclusionLatticeTreeModel::~pqSubsetInclusionLatticeTreeModel()
-{
-}
+pqSubsetInclusionLatticeTreeModel::~pqSubsetInclusionLatticeTreeModel() = default;
 
 //-----------------------------------------------------------------------------
 void pqSubsetInclusionLatticeTreeModel::setSubsetInclusionLattice(vtkSubsetInclusionLattice* sil)

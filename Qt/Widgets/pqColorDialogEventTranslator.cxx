@@ -44,9 +44,7 @@ pqColorDialogEventTranslator::pqColorDialogEventTranslator(QObject* parentObject
 }
 
 //-----------------------------------------------------------------------------
-pqColorDialogEventTranslator::~pqColorDialogEventTranslator()
-{
-}
+pqColorDialogEventTranslator::~pqColorDialogEventTranslator() = default;
 
 //-----------------------------------------------------------------------------
 bool pqColorDialogEventTranslator::translateEvent(
@@ -54,7 +52,7 @@ bool pqColorDialogEventTranslator::translateEvent(
 {
   // Capture events from QColorDialog and all its children.
 
-  QColorDialog* color_dialog = 0;
+  QColorDialog* color_dialog = nullptr;
   while (object && !color_dialog)
   {
     color_dialog = qobject_cast<QColorDialog*>(object);

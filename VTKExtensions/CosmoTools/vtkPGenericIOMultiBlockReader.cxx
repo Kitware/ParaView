@@ -115,7 +115,7 @@ public:
    * /
   void InitCommunicator(vtkMultiProcessController *controller)
   {
-    assert("pre: controller is NULL!" && (controller != NULL) );
+    assert("pre: controller is nullptr!" && (controller != nullptr) );
     this->MPICommunicator =
         vtkGenericIOUtilities::GetMPICommunicator(controller);
   } */
@@ -154,7 +154,7 @@ public:
       std::map<std::string, void*>::iterator varItr = blockItr->second.RawCache.begin();
       for (; varItr != blockItr->second.RawCache.end(); ++varItr)
       {
-        if (varItr->second != NULL)
+        if (varItr->second != nullptr)
         {
           delete[] static_cast<char*>(varItr->second);
         }
@@ -164,20 +164,20 @@ public:
   }
 };
 
-vtkStandardNewMacro(vtkPGenericIOMultiBlockReader)
-  //------------------------------------------------------------------------------
-  vtkPGenericIOMultiBlockReader::vtkPGenericIOMultiBlockReader()
+vtkStandardNewMacro(vtkPGenericIOMultiBlockReader);
+//------------------------------------------------------------------------------
+vtkPGenericIOMultiBlockReader::vtkPGenericIOMultiBlockReader()
 {
   this->SetNumberOfInputPorts(0);
   this->SetNumberOfOutputPorts(1);
 
   this->Controller = vtkMultiProcessController::GetGlobalController();
-  this->Reader = NULL;
-  this->FileName = NULL;
-  this->XAxisVariableName = NULL;
-  this->YAxisVariableName = NULL;
-  this->ZAxisVariableName = NULL;
-  this->HaloIdVariableName = NULL;
+  this->Reader = nullptr;
+  this->FileName = nullptr;
+  this->XAxisVariableName = nullptr;
+  this->YAxisVariableName = nullptr;
+  this->ZAxisVariableName = nullptr;
+  this->HaloIdVariableName = nullptr;
   this->GenericIOType = IOTYPEMPI;
   this->BlockAssignment = ROUND_ROBIN;
   this->BuildMetaData = false;
@@ -201,7 +201,7 @@ vtkStandardNewMacro(vtkPGenericIOMultiBlockReader)
 //------------------------------------------------------------------------------
 vtkPGenericIOMultiBlockReader::~vtkPGenericIOMultiBlockReader()
 {
-  if (this->Reader != NULL)
+  if (this->Reader != nullptr)
   {
     this->Reader->Close();
     delete this->Reader;
@@ -213,7 +213,7 @@ vtkPGenericIOMultiBlockReader::~vtkPGenericIOMultiBlockReader()
   vtkGenericIOUtilities::SafeDeleteString(this->ZAxisVariableName);
   vtkGenericIOUtilities::SafeDeleteString(this->HaloIdVariableName);
 
-  if (this->MetaData != NULL)
+  if (this->MetaData != nullptr)
   {
     delete this->MetaData;
   }
@@ -224,7 +224,7 @@ vtkPGenericIOMultiBlockReader::~vtkPGenericIOMultiBlockReader()
   this->SelectionObserver->Delete();
   this->PointDataArraySelection->Delete();
 
-  this->Controller = NULL;
+  this->Controller = nullptr;
 }
 
 //------------------------------------------------------------------------------
@@ -241,7 +241,7 @@ void vtkPGenericIOMultiBlockReader::PrintSelf(std::ostream& os, vtkIndent indent
   this->ArrayList->PrintSelf(os, indent.GetNextIndent());
   os << indent << "PointDataSelection: " << endl;
   this->PointDataArraySelection->PrintSelf(os, indent.GetNextIndent());
-  if (Controller != NULL)
+  if (Controller != nullptr)
   {
     os << indent << "Controller: " << this->Controller << endl;
   }
@@ -328,7 +328,7 @@ void vtkPGenericIOMultiBlockReader::SetRequestedHaloId(vtkIdType i, vtkIdType ha
 //------------------------------------------------------------------------------
 bool vtkPGenericIOMultiBlockReader::ReaderParametersChanged()
 {
-  assert("pre: internal reader is NULL!" && (this->Reader != NULL));
+  assert("pre: internal reader is nullptr!" && (this->Reader != nullptr));
 
   if (this->Reader->GetFileName() != std::string(this->FileName))
   {
@@ -406,7 +406,7 @@ bool vtkPGenericIOMultiBlockReader::ReaderParametersChanged()
 //------------------------------------------------------------------------------
 gio::GenericIOReader* vtkPGenericIOMultiBlockReader::GetInternalReader()
 {
-  if (this->Reader != NULL)
+  if (this->Reader != nullptr)
   {
     if (this->ReaderParametersChanged())
     {
@@ -416,25 +416,25 @@ gio::GenericIOReader* vtkPGenericIOMultiBlockReader::GetInternalReader()
 #endif
       this->Reader->Close();
       delete this->Reader;
-      this->Reader = NULL;
+      this->Reader = nullptr;
     } // END if the reader parameters
     else
     {
       return (this->Reader);
     }
-  } // END if the reader is not NULL
+  } // END if the reader is not nullptr
 
   this->BuildMetaData = true; // signal to re-build metadata
 
-  assert("pre: Reader should be NULL" && (this->Reader == NULL));
-  gio::GenericIOReader* r = NULL;
+  assert("pre: Reader should be nullptr" && (this->Reader == nullptr));
+  gio::GenericIOReader* r = nullptr;
   bool posix = (this->GenericIOType == IOTYPEMPI) ? false : true;
   int distribution =
     (this->BlockAssignment == RCB) ? gio::RCB_BLOCK_ASSIGNMENT : gio::RR_BLOCK_ASSIGNMENT;
 
   r = vtkGenericIOUtilities::GetReader(vtkGenericIOUtilities::GetMPICommunicator(this->Controller),
     posix, distribution, std::string(this->FileName));
-  assert("post: Internal GenericIO reader should not be NULL!" && (r != NULL));
+  assert("post: Internal GenericIO reader should not be nullptr!" && (r != nullptr));
 
   return (r);
 }
@@ -543,7 +543,7 @@ void vtkPGenericIOMultiBlockReader::LoadMetaData()
       for (int var = 0; var < this->Reader->GetNumberOfVariablesInFile(); ++var)
       {
         std::string vname = this->Reader->GetVariableName(var);
-        block.RawCache[vname] = NULL;
+        block.RawCache[vname] = nullptr;
         block.VariableStatus[vname] = false;
       }
     }
@@ -561,8 +561,8 @@ void vtkPGenericIOMultiBlockReader::LoadRawVariableDataForBlock(
   std::cout << "[INFO]: Loading variable: " << varName << std::endl;
   std::cout.flush();
 #endif
-  assert("pre: Reader is NULL" && (this->Reader != NULL));
-  assert("pre: metadata is NULL" && (this->MetaData != NULL));
+  assert("pre: Reader is nullptr" && (this->Reader != nullptr));
+  assert("pre: metadata is nullptr" && (this->MetaData != nullptr));
   assert("pre: metadata is corrupt" && (this->MetaData->SanityCheck()));
   assert("pre: block is owned by another process" && this->MetaData->HasBlock(blockId));
   assert("pre: metadata does not have requested variable" && this->MetaData->HasVariable(varName));
@@ -601,8 +601,8 @@ void vtkPGenericIOMultiBlockReader::LoadRawVariableDataForBlock(
 //------------------------------------------------------------------------------
 void vtkPGenericIOMultiBlockReader::LoadRawDataForBlock(int blockId)
 {
-  assert("pre: Reader is NULL" && (this->Reader != NULL));
-  assert("pre: metadata is NULL" && (this->MetaData != NULL));
+  assert("pre: Reader is nullptr" && (this->Reader != nullptr));
+  assert("pre: metadata is nullptr" && (this->MetaData != nullptr));
   assert("pre: metadata is corrupt!" && (this->MetaData->SanityCheck()));
   assert("pre: block is not owned by this process!" && this->MetaData->HasBlock(blockId));
 
@@ -686,7 +686,7 @@ void vtkPGenericIOMultiBlockReader::GetPointFromRawData(int xType, void* xBuffer
   {
     //    type = this->MetaData->VariableGenericIOType[ name[i] ];
     //    void *rawBuffer = this->MetaData->Blocks[ blockId ].RawCache[ name[i] ];
-    assert("pre: raw buffer is NULL!" && (buffer[i] != NULL));
+    assert("pre: raw buffer is nullptr!" && (buffer[i] != nullptr));
 
     pnt[i] = vtkGenericIOUtilities::GetDoubleFromRawBuffer(type[i], buffer[i], idx);
   } // END for all dimensions
@@ -696,8 +696,8 @@ void vtkPGenericIOMultiBlockReader::GetPointFromRawData(int xType, void* xBuffer
 void vtkPGenericIOMultiBlockReader::LoadCoordinatesForBlock(
   vtkUnstructuredGrid* grid, std::set<vtkIdType>& pointsInSelectedHalos, int blockId)
 {
-  assert("pre: metadata is NULL!" && (this->MetaData != NULL));
-  assert("pre: grid is NULL!" && (grid != NULL));
+  assert("pre: metadata is nullptr!" && (this->MetaData != nullptr));
+  assert("pre: grid is nullptr!" && (grid != nullptr));
   assert("pre: block is not owned by this process!" && this->MetaData->HasBlock(blockId));
 
   std::string xaxis = std::string(this->XAxisVariableName);
@@ -801,8 +801,8 @@ void GetOnlyDataInHalo(
 void vtkPGenericIOMultiBlockReader::LoadDataArraysForBlock(
   vtkUnstructuredGrid* grid, const std::set<vtkIdType>& pointsInSelectedHalos, int blockId)
 {
-  assert("pre: metadata is NULL!" && (this->MetaData != NULL));
-  assert("pre: grid is NULL!" && (grid != NULL));
+  assert("pre: metadata is nullptr!" && (this->MetaData != nullptr));
+  assert("pre: grid is nullptr!" && (grid != nullptr));
   assert("pre: block is not owned by this process!" && this->MetaData->HasBlock(blockId));
 
   block_t& dataBlock = this->MetaData->Blocks[blockId];
@@ -845,7 +845,7 @@ void vtkPGenericIOMultiBlockReader::LoadDataArraysForBlock(
 vtkUnstructuredGrid* vtkPGenericIOMultiBlockReader::LoadBlock(int blockId)
 {
   // Sanity Check
-  assert("pre: metadata is null" && (this->MetaData != NULL));
+  assert("pre: metadata is nullptr" && (this->MetaData != nullptr));
   assert("pre: block is not owned by this process!" && this->MetaData->HasBlock(blockId));
   // STEP 1: Load raw data
   this->LoadRawDataForBlock(blockId);
@@ -876,7 +876,7 @@ vtkUnstructuredGrid* vtkPGenericIOMultiBlockReader::LoadBlock(int blockId)
 void vtkPGenericIOMultiBlockReader::SelectionModifiedCallback(vtkObject* vtkNotUsed(caller),
   unsigned long vtkNotUsed(eid), void* clientdata, void* vtkNotUsed(calldata))
 {
-  assert("pre: clientdata is NULL!" && (clientdata != NULL));
+  assert("pre: clientdata is nullptr!" && (clientdata != nullptr));
   static_cast<vtkPGenericIOMultiBlockReader*>(clientdata)->Modified();
 }
 
@@ -897,7 +897,7 @@ int vtkPGenericIOMultiBlockReader::RequestInformation(vtkInformation* vtkNotUsed
     vtkDataObject::DATA_NUMBER_OF_PIECES(), this->Controller->GetNumberOfProcesses());
 
   this->Reader = this->GetInternalReader();
-  assert("pre: internal reader is NULL!" && (this->Reader != NULL));
+  assert("pre: internal reader is nullptr!" && (this->Reader != nullptr));
 
   this->LoadMetaData();
 
@@ -906,11 +906,11 @@ int vtkPGenericIOMultiBlockReader::RequestInformation(vtkInformation* vtkNotUsed
   int myProcessId = this->Controller->GetLocalProcessId();
   for (int i = 0; i < this->MetaData->NumberOfBlocks; ++i)
   {
-    outline->SetBlock(i, NULL);
+    outline->SetBlock(i, nullptr);
     if (this->MetaData->HasBlock(i))
     {
       vtkInformation* blockInfo = outline->GetMetaData(i);
-      assert("pre: block info is NULL!" && (blockInfo != NULL));
+      assert("pre: block info is nullptr!" && (blockInfo != nullptr));
       // bounds are meaningless if this is false
       if (this->Reader->IsSpatiallyDecomposed())
       {
@@ -941,7 +941,7 @@ int vtkPGenericIOMultiBlockReader::RequestData(vtkInformation* vtkNotUsed(reques
 
   // STEP 0: get the output grid
   vtkMultiBlockDataSet* output = vtkMultiBlockDataSet::GetData(outputVector, 0);
-  assert("pre: output dataset is NULL!" && (output != NULL));
+  assert("pre: output dataset is nullptr!" && (output != nullptr));
 
   vtkInformation* outInfo = outputVector->GetInformationObject(0);
 

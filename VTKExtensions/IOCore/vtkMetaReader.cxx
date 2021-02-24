@@ -29,13 +29,13 @@ vtkStandardNewMacro(vtkMetaReader);
 
 //----------------------------------------------------------------------------
 vtkMetaReader::vtkMetaReader()
-  : Reader(NULL)
+  : Reader(nullptr)
   , FileNameMTime(0)
   , BeforeFileNameMTime(0)
-  , FileNameMethod(NULL)
+  , FileNameMethod(nullptr)
   , _FileIndex(0)
   , FileIndexMTime(0)
-  , _MetaFileName(NULL)
+  , _MetaFileName(nullptr)
   , MetaFileNameMTime(0)
 {
   this->FileIndexRange[0] = 0;
@@ -45,12 +45,12 @@ vtkMetaReader::vtkMetaReader()
 
 vtkMetaReader::~vtkMetaReader()
 {
-  this->SetMetaFileName(NULL);
+  this->SetMetaFileName(nullptr);
   if (this->Reader)
   {
     this->Reader->Delete();
   }
-  this->SetFileNameMethod(NULL);
+  this->SetFileNameMethod(nullptr);
 }
 //----------------------------------------------------------------------------
 void vtkMetaReader::ReaderSetFileName(const char* name)

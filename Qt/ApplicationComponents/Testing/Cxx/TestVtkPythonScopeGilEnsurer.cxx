@@ -11,7 +11,7 @@
 int main(int argc, char** argv)
 {
   // set stdout to line buffering (aka C++ std::cout)
-  setvbuf(stdout, (char*)NULL, _IOLBF, BUFSIZ);
+  setvbuf(stdout, (char*)nullptr, _IOLBF, BUFSIZ);
 
   Py_Initialize(); // Initialize the interpreter
   PyRun_SimpleString("import threading\n");

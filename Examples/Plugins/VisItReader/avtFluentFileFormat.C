@@ -88,7 +88,7 @@ avtFluentFileFormat::PopulateDatabaseMetaData(avtDatabaseMetaData *md)
 
   GetNumberOfCellZones();
 
-  AddMeshToMetaData(md, "Mesh", AVT_UNSTRUCTURED_MESH, NULL, CellZones.size(), 0, 3, 3);
+  AddMeshToMetaData(md, "Mesh", AVT_UNSTRUCTURED_MESH, nullptr, CellZones.size(), 0, 3, 3);
 
   NumberOfScalars = 0;
   NumberOfVectors = 0;

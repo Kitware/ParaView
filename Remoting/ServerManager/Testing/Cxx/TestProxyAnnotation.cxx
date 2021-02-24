@@ -93,7 +93,7 @@ int TestProxyAnnotation(int argc, char* argv[])
   withAnnotationXML->PrintXML(withAnnotationStr, vtkIndent());
   // -----------------------------------------------------------------------
 
-  proxy->SetAnnotation("Owner", NULL);
+  proxy->SetAnnotation("Owner", nullptr);
   cout << "--- Remove Owner annotations ---" << endl;
   if (proxy->GetNumberOfAnnotations() != 2)
   {
@@ -214,7 +214,7 @@ int TestProxyAnnotation(int argc, char* argv[])
   {
     cout << " -> Before load OK no annotation" << endl;
   }
-  proxy->LoadXMLState(withAnnotationXML->GetNestedElement(0), NULL);
+  proxy->LoadXMLState(withAnnotationXML->GetNestedElement(0), nullptr);
   if (proxy->GetNumberOfAnnotations() != 3)
   {
     ret_val = EXIT_FAILURE;

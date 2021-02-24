@@ -23,14 +23,10 @@ PURPOSE.  See the above copyright notice for more information.
 
 vtkStandardNewMacro(vtkSMPSWriterProxy);
 //-----------------------------------------------------------------------------
-vtkSMPSWriterProxy::vtkSMPSWriterProxy()
-{
-}
+vtkSMPSWriterProxy::vtkSMPSWriterProxy() = default;
 
 //-----------------------------------------------------------------------------
-vtkSMPSWriterProxy::~vtkSMPSWriterProxy()
-{
-}
+vtkSMPSWriterProxy::~vtkSMPSWriterProxy() = default;
 
 //-----------------------------------------------------------------------------
 void vtkSMPSWriterProxy::PrintSelf(ostream& os, vtkIndent indent)

@@ -51,14 +51,14 @@ static inline void purge_blocks(
   for (unsigned int level = 0; level < num_levels; level++)
   {
     vtkMultiBlockDataSet* mb = vtkMultiBlockDataSet::SafeDownCast(data->GetBlock(level));
-    assert(mb != NULL);
+    assert(mb != nullptr);
 
     unsigned int num_blocks = mb->GetNumberOfBlocks();
     for (unsigned int cc = 0; cc < num_blocks; cc++, block_index++)
     {
       if (blocksToPurge.find(block_index) != blocksToPurge.end())
       {
-        mb->SetBlock(cc, NULL);
+        mb->SetBlock(cc, nullptr);
       }
     }
   }
@@ -87,9 +87,7 @@ vtkStreamingParticlesRepresentation::vtkStreamingParticlesRepresentation()
 }
 
 //----------------------------------------------------------------------------
-vtkStreamingParticlesRepresentation::~vtkStreamingParticlesRepresentation()
-{
-}
+vtkStreamingParticlesRepresentation::~vtkStreamingParticlesRepresentation() = default;
 
 //----------------------------------------------------------------------------
 void vtkStreamingParticlesRepresentation::SetVisibility(bool val)
@@ -176,7 +174,7 @@ int vtkStreamingParticlesRepresentation::ProcessViewRequest(
   }
   else if (request_type == vtkPVView::REQUEST_RENDER())
   {
-    if (this->RenderedData == NULL)
+    if (this->RenderedData == nullptr)
     {
       vtkStreamingStatusMacro(<< this << ": cloning delivered data.");
       vtkAlgorithmOutput* producerPort = vtkPVRenderView::GetPieceProducer(inInfo, this);
@@ -206,12 +204,12 @@ int vtkStreamingParticlesRepresentation::ProcessViewRequest(
     vtkDataObject* piece = vtkPVRenderView::GetCurrentStreamedPiece(inInfo, this);
     if (piece && piece->IsA("vtkMultiBlockDataSet"))
     {
-      assert(this->RenderedData != NULL);
+      assert(this->RenderedData != nullptr);
       vtkStreamingStatusMacro(<< this << ": received new piece.");
 
       vtkSmartPointer<vtkUnsignedIntArray> array = vtkUnsignedIntArray::SafeDownCast(
         piece->GetFieldData()->GetArray(BLOCKS_TO_PURGE_ARRAY_NAME));
-      if (array != NULL)
+      if (array != nullptr)
       {
         piece->GetFieldData()->RemoveArray(BLOCKS_TO_PURGE_ARRAY_NAME);
         vtkMultiBlockDataSet* data = vtkMultiBlockDataSet::SafeDownCast(this->RenderedData);
@@ -318,7 +316,7 @@ int vtkStreamingParticlesRepresentation::RequestData(
     }
   }
 
-  this->ProcessedPiece = 0;
+  this->ProcessedPiece = nullptr;
   if (inputVector[0]->GetNumberOfInformationObjects() == 1)
   {
     // Do the streaming independent "transformation" of the data here, in our
@@ -330,7 +328,7 @@ int vtkStreamingParticlesRepresentation::RequestData(
 
     vtkNew<vtkPVGeometryFilter> geomFilter;
     geomFilter->SetUseOutline(this->UseOutline ? 1 : 0);
-    geomFilter->SetController(NULL);
+    geomFilter->SetController(nullptr);
 
     vtkDataObject* input = vtkDataObject::GetData(inputVector[0], 0);
     geomFilter->SetInputData(input);
@@ -378,10 +376,10 @@ int vtkStreamingParticlesRepresentation::RequestData(
 
   if (!this->GetInStreamingUpdate())
   {
-    this->RenderedData = 0;
+    this->RenderedData = nullptr;
 
     // provide the mapper with an empty input. This is needed only because
-    // mappers die when input is NULL, currently.
+    // mappers die when input is nullptr, currently.
     vtkNew<vtkMultiBlockDataSet> tmp;
     this->Mapper->SetInputDataObject(tmp.GetPointer());
   }
@@ -557,7 +555,7 @@ void vtkStreamingParticlesRepresentation::SetInputArrayToProcess(
   else
   {
     this->Mapper->SetScalarVisibility(0);
-    this->Mapper->SelectColorArray(static_cast<const char*>(NULL));
+    this->Mapper->SelectColorArray(static_cast<const char*>(nullptr));
   }
 
   switch (fieldAssociation)

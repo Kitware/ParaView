@@ -59,9 +59,7 @@ pqProgressManager::pqProgressManager(QObject* _parent)
 }
 
 //-----------------------------------------------------------------------------
-pqProgressManager::~pqProgressManager()
-{
-}
+pqProgressManager::~pqProgressManager() = default;
 
 //-----------------------------------------------------------------------------
 void pqProgressManager::onServerAdded(pqServer* server)
@@ -119,14 +117,14 @@ void pqProgressManager::unlockProgress(QObject* object)
 
   if (this->Lock == object)
   {
-    this->Lock = 0;
+    this->Lock = nullptr;
   }
 }
 
 //-----------------------------------------------------------------------------
 bool pqProgressManager::isLocked() const
 {
-  return (this->Lock != 0);
+  return (this->Lock != nullptr);
 }
 
 //-----------------------------------------------------------------------------

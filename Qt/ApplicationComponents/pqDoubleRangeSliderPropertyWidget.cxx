@@ -121,7 +121,7 @@ pqDoubleRangeSliderPropertyWidget::pqDoubleRangeSliderPropertyWidget(
 pqDoubleRangeSliderPropertyWidget::~pqDoubleRangeSliderPropertyWidget()
 {
   delete this->Internals;
-  this->Internals = NULL;
+  this->Internals = nullptr;
 }
 
 //-----------------------------------------------------------------------------

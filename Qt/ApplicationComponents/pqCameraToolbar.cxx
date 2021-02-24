@@ -55,13 +55,13 @@ void pqCameraToolbar::constructor()
   new pqCameraReaction(ui.actionRotate90degCCW, pqCameraReaction::ROTATE_CAMERA_CCW);
 
   new pqRenderViewSelectionReaction(
-    ui.actionZoomToBox, NULL, pqRenderViewSelectionReaction::ZOOM_TO_BOX);
+    ui.actionZoomToBox, nullptr, pqRenderViewSelectionReaction::ZOOM_TO_BOX);
 
   this->ZoomToDataAction = ui.actionZoomToData;
-  this->ZoomToDataAction->setEnabled(pqActiveObjects::instance().activeSource() != 0);
+  this->ZoomToDataAction->setEnabled(pqActiveObjects::instance().activeSource() != nullptr);
 
   this->ZoomClosestToDataAction = ui.actionZoomClosestToData;
-  this->ZoomClosestToDataAction->setEnabled(pqActiveObjects::instance().activeSource() != 0);
+  this->ZoomClosestToDataAction->setEnabled(pqActiveObjects::instance().activeSource() != nullptr);
 
   QObject::connect(
     &pqActiveObjects::instance(), SIGNAL(viewChanged(pqView*)), this, SLOT(updateEnabledState()));

@@ -57,7 +57,7 @@ public:
   //@}
 
 protected:
-  vtkPVClipDataSet(vtkImplicitFunction* cf = NULL);
+  vtkPVClipDataSet(vtkImplicitFunction* cf = nullptr);
   ~vtkPVClipDataSet() override;
 
   int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;

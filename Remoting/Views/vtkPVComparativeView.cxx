@@ -99,7 +99,7 @@ void vtkGeomCalc(
 }
 
 #define ENSURE_INIT()                                                                              \
-  if (this->RootView == NULL)                                                                      \
+  if (this->RootView == nullptr)                                                                   \
   {                                                                                                \
     return;                                                                                        \
   }
@@ -279,8 +279,8 @@ public:
   }
 
 protected:
-  vtkCloningVector() {}
-  ~vtkCloningVector() override {}
+  vtkCloningVector() = default;
+  ~vtkCloningVector() override = default;
 
   /**
    * This must be called to initialize the vector with the "root".
@@ -421,8 +421,8 @@ public:
   }
 
 protected:
-  vtkCloningVectorOfRepresentations() {}
-  ~vtkCloningVectorOfRepresentations() override {}
+  vtkCloningVectorOfRepresentations() = default;
+  ~vtkCloningVectorOfRepresentations() override = default;
 
 private:
   vtkCloningVectorOfRepresentations(const vtkCloningVectorOfRepresentations&) = delete;
@@ -579,7 +579,7 @@ protected:
     this->CameraLink->SynchronizeInteractiveRendersOff();
   }
 
-  ~vtkCloningVectorOfViews() override {}
+  ~vtkCloningVectorOfViews() override = default;
 
   /**
    * A new view is being created, we need to create clones of representations too
@@ -662,7 +662,7 @@ vtkCxxSetObjectMacro(vtkPVComparativeView, RootView, vtkSMViewProxy);
 vtkPVComparativeView::vtkPVComparativeView()
 {
   this->Internal = new vtkInternal();
-  this->RootView = NULL;
+  this->RootView = nullptr;
   this->Dimensions[0] = 1;
   this->Dimensions[1] = 1;
   this->ViewSize[0] = 400;
@@ -684,7 +684,7 @@ vtkPVComparativeView::vtkPVComparativeView()
 //----------------------------------------------------------------------------
 vtkPVComparativeView::~vtkPVComparativeView()
 {
-  this->SetRootView(NULL);
+  this->SetRootView(nullptr);
   delete this->Internal;
   this->MarkOutdatedObserver->Delete();
 }
@@ -869,14 +869,14 @@ void vtkPVComparativeView::Update()
     return;
   }
 
-  vtkSMComparativeAnimationCueProxy* timeCue = NULL;
+  vtkSMComparativeAnimationCueProxy* timeCue = nullptr;
   // locate time cue.
   for (vtkInternal::VectorOfCues::iterator iter = this->Internal->Cues.begin();
        iter != this->Internal->Cues.end(); ++iter)
   {
     // for now, we are saying that the first cue that has no animatable  proxy
     // is for animating time.
-    if (vtkSMPropertyHelper(iter->GetPointer(), "AnimatedProxy").GetAsProxy() == NULL)
+    if (vtkSMPropertyHelper(iter->GetPointer(), "AnimatedProxy").GetAsProxy() == nullptr)
     {
       timeCue = iter->GetPointer();
       break;
@@ -956,7 +956,7 @@ vtkImageData* vtkPVComparativeView::CaptureWindow(int magX, int magY)
 
   if (images.size() == 0)
   {
-    return NULL;
+    return nullptr;
   }
 
   const unsigned char color[3] = { 0, 0, 0 };

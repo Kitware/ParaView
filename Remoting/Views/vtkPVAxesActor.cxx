@@ -41,9 +41,9 @@ vtkCxxSetObjectMacro(vtkPVAxesActor, UserDefinedShaft, vtkPolyData);
 //-----------------------------------------------------------------------------
 vtkPVAxesActor::vtkPVAxesActor()
 {
-  this->XAxisLabelText = NULL;
-  this->YAxisLabelText = NULL;
-  this->ZAxisLabelText = NULL;
+  this->XAxisLabelText = nullptr;
+  this->YAxisLabelText = nullptr;
+  this->ZAxisLabelText = nullptr;
 
   this->SetXAxisLabelText("X");
   this->SetYAxisLabelText("Y");
@@ -120,8 +120,8 @@ vtkPVAxesActor::vtkPVAxesActor()
   this->ShaftType = vtkPVAxesActor::LINE_SHAFT;
   this->TipType = vtkPVAxesActor::CONE_TIP;
 
-  this->UserDefinedTip = NULL;
-  this->UserDefinedShaft = NULL;
+  this->UserDefinedTip = nullptr;
+  this->UserDefinedShaft = nullptr;
 
   this->XAxisVectorText = vtkVectorText::New();
   this->YAxisVectorText = vtkVectorText::New();
@@ -166,12 +166,12 @@ vtkPVAxesActor::~vtkPVAxesActor()
   this->YAxisTip->Delete();
   this->ZAxisTip->Delete();
 
-  this->SetUserDefinedTip(NULL);
-  this->SetUserDefinedShaft(NULL);
+  this->SetUserDefinedTip(nullptr);
+  this->SetUserDefinedShaft(nullptr);
 
-  this->SetXAxisLabelText(NULL);
-  this->SetYAxisLabelText(NULL);
-  this->SetZAxisLabelText(NULL);
+  this->SetXAxisLabelText(nullptr);
+  this->SetYAxisLabelText(nullptr);
+  this->SetZAxisLabelText(nullptr);
 
   this->XAxisVectorText->Delete();
   this->YAxisVectorText->Delete();
@@ -187,7 +187,7 @@ vtkPVAxesActor::~vtkPVAxesActor()
 void vtkPVAxesActor::ShallowCopy(vtkProp* prop)
 {
   vtkPVAxesActor* a = vtkPVAxesActor::SafeDownCast(prop);
-  if (a != NULL)
+  if (a != nullptr)
   {
   }
 

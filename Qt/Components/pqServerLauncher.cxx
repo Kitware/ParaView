@@ -70,7 +70,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <cassert>
 
 //----------------------------------------------------------------------------
-const QMetaObject* pqServerLauncher::DefaultServerLauncherType = NULL;
+const QMetaObject* pqServerLauncher::DefaultServerLauncherType = nullptr;
 const QMetaObject* pqServerLauncher::setServerDefaultLauncherType(const QMetaObject* other)
 {
   const QMetaObject* old = pqServerLauncher::DefaultServerLauncherType;
@@ -112,7 +112,7 @@ public:
   QWidget* Widget;
   bool ToSave;
   pqWidget()
-    : Widget(NULL)
+    : Widget(nullptr)
     , ToSave(false)
   {
   }
@@ -122,7 +122,7 @@ public:
     , ToSave(false)
   {
   }
-  ~pqWidget() override {}
+  ~pqWidget() override = default;
 
   virtual QVariant get() const
   {
@@ -239,7 +239,7 @@ bool createWidgets(QMap<QString, pqWidget*>& widgets, QDialog& dialog,
   const pqServerConfiguration& configuration, QProcessEnvironment& options)
 {
   vtkPVXMLElement* optionsXML = configuration.optionsXML();
-  assert(optionsXML != NULL);
+  assert(optionsXML != nullptr);
 
   QFormLayout* formLayout = new QFormLayout();
   dialog.setLayout(formLayout);
@@ -251,7 +251,7 @@ bool createWidgets(QMap<QString, pqWidget*>& widgets, QDialog& dialog,
   for (unsigned int cc = 0; cc < optionsXML->GetNumberOfNestedElements(); cc++)
   {
     vtkPVXMLElement* node = optionsXML->GetNestedElement(cc);
-    if (node->GetName() == NULL)
+    if (node->GetName() == nullptr)
     {
       continue;
     }
@@ -263,7 +263,7 @@ bool createWidgets(QMap<QString, pqWidget*>& widgets, QDialog& dialog,
     else if (strcmp(node->GetName(), "Option") == 0)
     {
       vtkPVXMLElement* typeNode = node->GetNestedElement(0);
-      if (typeNode == NULL || typeNode->GetName() == NULL)
+      if (typeNode == nullptr || typeNode->GetName() == nullptr)
       {
         continue;
       }
@@ -318,7 +318,7 @@ bool createWidgets(QMap<QString, pqWidget*>& widgets, QDialog& dialog,
         QString min = typeNode->GetAttributeOrDefault("min", "0");
         QString max = typeNode->GetAttributeOrDefault("max", "99999999999");
         QString step = typeNode->GetAttributeOrDefault("step", "1");
-        QWidget* widget = NULL;
+        QWidget* widget = nullptr;
         if (strcmp(typeNode->GetAttributeOrDefault("type", "int"), "int") == 0)
         {
           widget = new QSpinBox(&dialog);
@@ -543,7 +543,7 @@ pqServerLauncher::pqServerLauncher(
 pqServerLauncher::~pqServerLauncher()
 {
   delete this->Internals;
-  this->Internals = NULL;
+  this->Internals = nullptr;
 }
 
 //-----------------------------------------------------------------------------
@@ -635,7 +635,7 @@ bool pqServerLauncher::connectToPrelaunchedServer()
   const pqServerResource& resource = this->Internals->Configuration.actualResource();
   this->Internals->Server =
     builder->createServer(resource, this->Internals->Configuration.connectionTimeout());
-  return this->Internals->Server != NULL;
+  return this->Internals->Server != nullptr;
 }
 
 //-----------------------------------------------------------------------------
@@ -653,7 +653,7 @@ bool pqServerLauncher::promptOptions()
   QProcessEnvironment& options = this->Internals->Options;
   // setup the options using the default environment, in any case.
   options = getDefaultEnvironment(this->Internals->Configuration);
-  if (optionsXML == NULL)
+  if (optionsXML == nullptr)
   {
     return true;
   }
@@ -766,7 +766,7 @@ bool pqServerLauncher::processCommand(
 {
   QProcess* process = new QProcess(pqApplicationCore::instance());
 
-  if (options != NULL)
+  if (options != nullptr)
   {
     process->setProcessEnvironment(*options);
   }

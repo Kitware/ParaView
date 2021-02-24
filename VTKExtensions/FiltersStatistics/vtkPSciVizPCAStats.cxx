@@ -22,9 +22,7 @@ vtkPSciVizPCAStats::vtkPSciVizPCAStats()
   this->RobustPCA = false;
 }
 
-vtkPSciVizPCAStats::~vtkPSciVizPCAStats()
-{
-}
+vtkPSciVizPCAStats::~vtkPSciVizPCAStats() = default;
 
 void vtkPSciVizPCAStats::PrintSelf(ostream& os, vtkIndent indent)
 {

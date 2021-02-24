@@ -141,8 +141,8 @@ vtkAMRDualContourEdgeLocator::vtkAMRDualContourEdgeLocator()
   this->DualCellDimensions[2] = 0;
   this->YIncrement = this->ZIncrement = 0;
   this->ArrayLength = 0;
-  this->XEdges = this->YEdges = this->ZEdges = 0;
-  this->Corners = 0;
+  this->XEdges = this->YEdges = this->ZEdges = nullptr;
+  this->Corners = nullptr;
 }
 //----------------------------------------------------------------------------
 vtkAMRDualContourEdgeLocator::~vtkAMRDualContourEdgeLocator()
@@ -368,8 +368,8 @@ vtkIdType* vtkAMRDualContourEdgeLocator::GetEdgePointer(
       return this->ZEdges + (xp0 + (yp0 * this->YIncrement) + (zp0 * this->ZIncrement));
     }
     default:
-      assert(0 && "Invalid edge index.");
-      return 0;
+      assert(nullptr && "Invalid edge index.");
+      return nullptr;
   }
 }
 
@@ -434,12 +434,12 @@ vtkIdType* vtkAMRDualContourEdgeLocator::GetCornerPointer(
 //----------------------------------------------------------------------------
 vtkAMRDualContourEdgeLocator* vtkAMRDualContourGetBlockLocator(vtkAMRDualGridHelperBlock* block)
 {
-  if (block->UserData == 0)
+  if (block->UserData == nullptr)
   {
     vtkImageData* image = block->Image;
-    if (image == 0)
+    if (image == nullptr)
     { // Remote blocks are only to setup local block bit flags.
-      return 0;
+      return nullptr;
     }
     int extent[6];
     // This is the same as the cell extent of the original grid (with ghosts).
@@ -624,17 +624,17 @@ vtkAMRDualContour::vtkAMRDualContour()
   this->EnableMergePoints = 1;
   this->TriangulateCap = 1;
 
-  this->Controller = NULL;
+  this->Controller = nullptr;
   this->SetController(vtkMultiProcessController::GetGlobalController());
 
   // Pipeline
   this->SetNumberOfOutputPorts(1);
 
-  this->TemperatureArray = 0;
-  this->BlockIdCellArray = 0;
-  this->Helper = 0;
+  this->TemperatureArray = nullptr;
+  this->BlockIdCellArray = nullptr;
+  this->Helper = nullptr;
 
-  this->BlockLocator = 0;
+  this->BlockLocator = nullptr;
 }
 
 //----------------------------------------------------------------------------
@@ -643,9 +643,9 @@ vtkAMRDualContour::~vtkAMRDualContour()
   if (this->BlockLocator)
   {
     delete this->BlockLocator;
-    this->BlockLocator = 0;
+    this->BlockLocator = nullptr;
   }
-  this->SetController(NULL);
+  this->SetController(nullptr);
 }
 
 //----------------------------------------------------------------------------
@@ -709,7 +709,7 @@ int vtkAMRDualContour::RequestData(vtkInformation* vtkNotUsed(request),
 
   mpds->SetNumberOfPieces(0);
 
-  if (hbdsInput == 0)
+  if (hbdsInput == nullptr)
   {
     // Do not deal with rectilinear grid
     vtkErrorMacro("This filter requires a vtkNonOverlappingAMR on its input.");
@@ -769,7 +769,7 @@ void vtkAMRDualContour::InitializeRequest(vtkNonOverlappingAMR* hbdsInput)
   }
   else
   {
-    this->Helper->SetController(NULL);
+    this->Helper->SetController(nullptr);
   }
   this->Helper->Initialize(hbdsInput);
 }
@@ -777,7 +777,7 @@ void vtkAMRDualContour::InitializeRequest(vtkNonOverlappingAMR* hbdsInput)
 void vtkAMRDualContour::FinalizeRequest()
 {
   this->Helper->Delete();
-  this->Helper = 0;
+  this->Helper = nullptr;
 }
 
 vtkMultiBlockDataSet* vtkAMRDualContour::DoRequestData(
@@ -822,14 +822,14 @@ vtkMultiBlockDataSet* vtkAMRDualContour::DoRequestData(
 
   this->FinalizeCopyAttributes(this->Mesh);
   this->BlockIdCellArray->Delete();
-  this->BlockIdCellArray = 0;
+  this->BlockIdCellArray = nullptr;
 
   this->Mesh->Delete();
-  this->Mesh = 0;
+  this->Mesh = nullptr;
   this->Points->Delete();
-  this->Points = 0;
+  this->Points = nullptr;
   this->Faces->Delete();
-  this->Faces = 0;
+  this->Faces = nullptr;
 
   mpds->Delete();
 
@@ -888,7 +888,7 @@ void vtkAMRDualContour::ProcessBlock(
   vtkAMRDualGridHelperBlock* block, int blockId, const char* arrayNameToProcess)
 {
   vtkImageData* image = block->Image;
-  if (image == 0)
+  if (image == nullptr)
   { // Remote blocks are only to setup local block bit flags.
     return;
   }
@@ -920,7 +920,7 @@ void vtkAMRDualContour::ProcessBlock(
   }
   else
   { // Shared locator.
-    if (this->BlockLocator == 0)
+    if (this->BlockLocator == nullptr)
     {
       this->BlockLocator = new vtkAMRDualContourEdgeLocator;
     }
@@ -1022,8 +1022,8 @@ void vtkAMRDualContour::ProcessBlock(
     this->ShareBlockLocatorWithNeighbors(block);
     // We are done.  We no longer need the locator for this block.
     delete this->BlockLocator;
-    this->BlockLocator = 0;
-    block->UserData = 0;
+    this->BlockLocator = nullptr;
+    block->UserData = nullptr;
     // Lets use this unused flag (owner of center region/block) to indicate
     // that the block is already processes.
     // This will keep neighbors from recreating the locator.
@@ -1096,7 +1096,7 @@ void vtkAMRDualContour::ProcessDualCell(vtkAMRDualGridHelperBlock* block, int bl
 {
   // compute the case index
   vtkImageData* image = block->Image;
-  if (image == 0)
+  if (image == nullptr)
   { // Remote blocks are only to setup local block bit flags.
     return;
   }
@@ -1706,7 +1706,7 @@ void vtkAMRDualContour::InitializeCopyAttributes(vtkNonOverlappingAMR* hbdsInput
   }
   vtkDataObject* dataObject = iter->GetCurrentDataObject();
   vtkUniformGrid* uGrid = vtkUniformGrid::SafeDownCast(dataObject);
-  if (uGrid == 0)
+  if (uGrid == nullptr)
   {
     vtkErrorMacro("Expecting a uniform grid.");
   }

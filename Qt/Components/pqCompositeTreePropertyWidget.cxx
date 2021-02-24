@@ -176,9 +176,7 @@ pqCompositeTreePropertyWidget::pqCompositeTreePropertyWidget(
 }
 
 //-----------------------------------------------------------------------------
-pqCompositeTreePropertyWidget::~pqCompositeTreePropertyWidget()
-{
-}
+pqCompositeTreePropertyWidget::~pqCompositeTreePropertyWidget() = default;
 
 //-----------------------------------------------------------------------------
 void pqCompositeTreePropertyWidget::domainModified()

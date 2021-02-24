@@ -97,7 +97,7 @@ vtkMultiProcessController* vtkTCPNetworkAccessManager::NewConnection(const char*
       }
     }
 
-    const char* handshake = NULL;
+    const char* handshake = nullptr;
     if (parameters.find("handshake") != parameters.end())
     {
       handshake = parameters["handshake"].c_str();
@@ -128,7 +128,7 @@ vtkMultiProcessController* vtkTCPNetworkAccessManager::NewConnection(const char*
     vtkErrorMacro("Malformed URL: " << (url ? url : "(empty)"));
   }
 
-  return NULL;
+  return nullptr;
 }
 
 //----------------------------------------------------------------------------
@@ -195,7 +195,7 @@ int vtkTCPNetworkAccessManager::ProcessEventsInternal(
   int sockets_to_select[MAX_SOCKETS];
   vtkObject* controller_or_server_socket[MAX_SOCKETS];
 
-  vtkSocketController* ctrlWithBufferToEmpty = NULL;
+  vtkSocketController* ctrlWithBufferToEmpty = nullptr;
   int size = 0;
   vtkInternals::VectorOfControllers::iterator iter1;
   for (iter1 = this->Internals->Controllers.begin(); iter1 != this->Internals->Controllers.end();
@@ -204,7 +204,7 @@ int vtkTCPNetworkAccessManager::ProcessEventsInternal(
     vtkSocketController* controller = iter1->GetPointer();
     if (!controller)
     {
-      // skip null controllers.
+      // skip nullptr controllers.
       continue;
     }
     vtkSocketCommunicator* comm =
@@ -390,7 +390,7 @@ vtkMultiProcessController* vtkTCPNetworkAccessManager::ConnectToRemote(
       if (timeout_in_seconds == 0 || timer->GetElapsedTime() > timeout_in_seconds)
       {
         vtkErrorMacro(<< "Connect timeout.");
-        return NULL;
+        return nullptr;
       }
       vtkWarningMacro(<< "Connect failed. Retrying for "
                       << (timeout_in_seconds - timer->GetElapsedTime()) << " more seconds.");
@@ -417,7 +417,7 @@ vtkMultiProcessController* vtkTCPNetworkAccessManager::ConnectToRemote(
     // handshake failed, must be bogus client, continue waiting (unless
     // this->AbortPendingConnectionFlag == true).
     this->PrintHandshakeError(errorcode, false);
-    return NULL;
+    return nullptr;
   }
   this->Internals->Controllers.push_back(controller);
   return controller;
@@ -427,7 +427,7 @@ vtkMultiProcessController* vtkTCPNetworkAccessManager::ConnectToRemote(
 vtkMultiProcessController* vtkTCPNetworkAccessManager::WaitForConnection(
   int port, bool once, const char* handshake, bool nonblocking)
 {
-  vtkServerSocket* server_socket = NULL;
+  vtkServerSocket* server_socket = nullptr;
   if (this->Internals->ServerSockets.find(port) != this->Internals->ServerSockets.end())
   {
     server_socket = this->Internals->ServerSockets[port];
@@ -439,7 +439,7 @@ vtkMultiProcessController* vtkTCPNetworkAccessManager::WaitForConnection(
     {
       vtkErrorMacro("Failed to set up server socket.");
       server_socket->Delete();
-      return NULL;
+      return nullptr;
     }
     this->Internals->ServerSockets[port] = server_socket;
     server_socket->FastDelete();
@@ -454,11 +454,11 @@ vtkMultiProcessController* vtkTCPNetworkAccessManager::WaitForConnection(
        << endl;
 
   this->AbortPendingConnectionFlag = false;
-  vtkSocketController* controller = NULL;
+  vtkSocketController* controller = nullptr;
 
-  while (this->AbortPendingConnectionFlag == false && controller == NULL)
+  while (this->AbortPendingConnectionFlag == false && controller == nullptr)
   {
-    vtkClientSocket* client_socket = NULL;
+    vtkClientSocket* client_socket = nullptr;
     if (nonblocking)
     {
       client_socket = server_socket->WaitForConnection(100);
@@ -466,7 +466,7 @@ vtkMultiProcessController* vtkTCPNetworkAccessManager::WaitForConnection(
     else
     {
       while (this->AbortPendingConnectionFlag == false &&
-        ((client_socket = server_socket->WaitForConnection(1000)) == NULL))
+        ((client_socket = server_socket->WaitForConnection(1000)) == nullptr))
       {
         double progress = 0.5;
         this->InvokeEvent(vtkCommand::ProgressEvent, &progress);
@@ -474,7 +474,7 @@ vtkMultiProcessController* vtkTCPNetworkAccessManager::WaitForConnection(
     }
     if (!client_socket)
     {
-      return NULL;
+      return nullptr;
     }
 
     controller = vtkSocketController::New();
@@ -487,7 +487,7 @@ vtkMultiProcessController* vtkTCPNetworkAccessManager::WaitForConnection(
       (errorcode = this->ParaViewHandshake(controller, true, handshake)))
     {
       controller->Delete();
-      controller = NULL;
+      controller = nullptr;
       this->PrintHandshakeError(errorcode, true);
       if (!once)
       {

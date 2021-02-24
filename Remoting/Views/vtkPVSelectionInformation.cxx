@@ -121,7 +121,7 @@ void vtkPVSelectionInformation::CopyFromStream(const vtkClientServerStream* css)
 {
   this->Initialize();
 
-  const char* xml = 0;
+  const char* xml = nullptr;
   if (!css->GetArgument(0, 0, &xml))
   {
     vtkErrorMacro("Error parsing selection xml from message.");

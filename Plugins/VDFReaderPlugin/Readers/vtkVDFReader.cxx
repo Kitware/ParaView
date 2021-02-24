@@ -152,11 +152,11 @@ vtkVDFReader::vtkVDFReader()
   this->SetNumberOfOutputPorts(1);
   this->Refinement = 0;
   this->nTimeSteps = 0;
-  this->TimeSteps = NULL;
+  this->TimeSteps = nullptr;
   this->TimeStep = 0;
-  this->vdc_md = NULL;
-  this->data_mgr = NULL;
-  this->vdfiobase = NULL;
+  this->vdc_md = nullptr;
+  this->data_mgr = nullptr;
+  this->vdfiobase = nullptr;
 
   this->CacheSize = 1000;
   this->height_factor = 4;
@@ -263,7 +263,7 @@ int vtkVDFReader::RequestData(
     float* vapor_data =
       data_mgr->GetRegion(TimeStep, it->first.c_str(), this->Refinement, v_min, v_max);
     // verify data pointer
-    if (vapor_data == NULL)
+    if (vapor_data == nullptr)
     {
       vtkErrorMacro(<< "Data manager returned NULL pointer.");
       return 0;
@@ -304,7 +304,7 @@ int vtkVDFReader::RequestInformation(
   // vtkImageData *output = vtkImageData::GetData(outInfo);
 
   // only perform the initial allocations once
-  if (vdc_md == NULL)
+  if (vdc_md == nullptr)
   {
     // spap all '\' with '/'
     char* filename_ptr = FileName;
@@ -384,7 +384,7 @@ void vtkVDFReader::SetCacheSize(int newSize)
   // printf("cache size changed to: %d\n", newSize);
   this->CacheSize = newSize;
 
-  if (data_mgr != NULL)
+  if (data_mgr != nullptr)
   {
     delete data_mgr;
     data_mgr = new DataMgr(vdc_md, this->CacheSize);

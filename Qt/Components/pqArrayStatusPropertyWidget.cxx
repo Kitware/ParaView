@@ -111,6 +111,4 @@ pqArrayStatusPropertyWidget::pqArrayStatusPropertyWidget(
 }
 
 //-----------------------------------------------------------------------------
-pqArrayStatusPropertyWidget::~pqArrayStatusPropertyWidget()
-{
-}
+pqArrayStatusPropertyWidget::~pqArrayStatusPropertyWidget() = default;

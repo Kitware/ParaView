@@ -50,9 +50,9 @@ pqBlotShell::pqBlotShell(QWidget* p)
   QObject::connect(this->Console, SIGNAL(executeCommand(const QString&)), this,
     SLOT(executeBlotCommand(const QString&)));
 
-  this->ActiveServer = NULL;
+  this->ActiveServer = nullptr;
   this->VTKConnect = vtkEventQtSlotConnect::New();
-  this->Interpretor = NULL;
+  this->Interpretor = nullptr;
 }
 
 pqBlotShell::~pqBlotShell()
@@ -127,7 +127,7 @@ void pqBlotShell::destroyInterpretor()
   this->Console->setFormat(format);
 
   this->Interpretor->Delete();
-  this->Interpretor = NULL;
+  this->Interpretor = nullptr;
 }
 
 //-----------------------------------------------------------------------------

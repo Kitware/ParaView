@@ -113,9 +113,7 @@ pqRecentFilesMenu::pqRecentFilesMenu(QMenu& menu, QObject* p)
 }
 
 //-----------------------------------------------------------------------------
-pqRecentFilesMenu::~pqRecentFilesMenu()
-{
-}
+pqRecentFilesMenu::~pqRecentFilesMenu() = default;
 
 //-----------------------------------------------------------------------------
 void pqRecentFilesMenu::buildMenu()

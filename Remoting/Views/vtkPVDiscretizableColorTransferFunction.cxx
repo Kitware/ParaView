@@ -26,8 +26,8 @@ vtkStandardNewMacro(vtkPVDiscretizableColorTransferFunction);
 //-------------------------------------------------------------------------
 vtkPVDiscretizableColorTransferFunction::vtkPVDiscretizableColorTransferFunction()
 {
-  this->AnnotatedValuesInFullSet = NULL;
-  this->AnnotationsInFullSet = NULL;
+  this->AnnotatedValuesInFullSet = nullptr;
+  this->AnnotationsInFullSet = nullptr;
   this->IndexedColorsInFullSet = vtkDoubleArray::New();
   this->IndexedColorsInFullSet->SetNumberOfComponents(3);
   this->IndexedOpacitiesInFullSet = vtkDoubleArray::New();
@@ -85,7 +85,7 @@ void vtkPVDiscretizableColorTransferFunction::SetAnnotationsInFullSet(
   if (this->AnnotatedValuesInFullSet && !values)
   {
     this->AnnotatedValuesInFullSet->Delete();
-    this->AnnotatedValuesInFullSet = 0;
+    this->AnnotatedValuesInFullSet = nullptr;
   }
   else if (values)
   { // Ensure arrays are of the same type before copying.
@@ -94,7 +94,7 @@ void vtkPVDiscretizableColorTransferFunction::SetAnnotationsInFullSet(
       if (this->AnnotatedValuesInFullSet->GetDataType() != values->GetDataType())
       {
         this->AnnotatedValuesInFullSet->Delete();
-        this->AnnotatedValuesInFullSet = 0;
+        this->AnnotatedValuesInFullSet = nullptr;
       }
     }
     if (!this->AnnotatedValuesInFullSet)
@@ -111,7 +111,7 @@ void vtkPVDiscretizableColorTransferFunction::SetAnnotationsInFullSet(
   if (this->AnnotationsInFullSet && !annotations)
   {
     this->AnnotationsInFullSet->Delete();
-    this->AnnotationsInFullSet = 0;
+    this->AnnotationsInFullSet = nullptr;
   }
   else if (!this->AnnotationsInFullSet && annotations)
   {

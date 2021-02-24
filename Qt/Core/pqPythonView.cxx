@@ -47,12 +47,12 @@ public:
   bool InitializedWidgets;
 
   pqInternal() { this->InitializedWidgets = false; }
-  ~pqInternal() {}
+  ~pqInternal() = default;
 };
 
 //-----------------------------------------------------------------------------
 pqPythonView::pqPythonView(const QString& type, const QString& group, const QString& name,
-  vtkSMViewProxy* renViewProxy, pqServer* server, QObject* _parent /*=NULL*/)
+  vtkSMViewProxy* renViewProxy, pqServer* server, QObject* _parent /*=nullptr*/)
   : Superclass(type, group, name, renViewProxy, server, _parent)
 {
   this->Internal = new pqPythonView::pqInternal();

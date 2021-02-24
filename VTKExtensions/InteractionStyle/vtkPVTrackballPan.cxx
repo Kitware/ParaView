@@ -25,14 +25,10 @@
 vtkStandardNewMacro(vtkPVTrackballPan);
 
 //-------------------------------------------------------------------------
-vtkPVTrackballPan::vtkPVTrackballPan()
-{
-}
+vtkPVTrackballPan::vtkPVTrackballPan() = default;
 
 //-------------------------------------------------------------------------
-vtkPVTrackballPan::~vtkPVTrackballPan()
-{
-}
+vtkPVTrackballPan::~vtkPVTrackballPan() = default;
 
 //-------------------------------------------------------------------------
 void vtkPVTrackballPan::OnButtonDown(int, int, vtkRenderer*, vtkRenderWindowInteractor*)
@@ -47,7 +43,7 @@ void vtkPVTrackballPan::OnButtonUp(int, int, vtkRenderer*, vtkRenderWindowIntera
 //-------------------------------------------------------------------------
 void vtkPVTrackballPan::OnMouseMove(int x, int y, vtkRenderer* ren, vtkRenderWindowInteractor* rwi)
 {
-  if (ren == NULL || !this->GetGUIHelper())
+  if (ren == nullptr || !this->GetGUIHelper())
   {
     return;
   }

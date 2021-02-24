@@ -68,7 +68,7 @@ public:
   // \c server:- server on which the proxy is created.
   // \c parent:- QObject parent.
   pqPipelineRepresentation(const QString& group, const QString& name, vtkSMProxy* repr,
-    pqServer* server, QObject* parent = NULL);
+    pqServer* server, QObject* parent = nullptr);
   ~pqPipelineRepresentation() override;
 
   // Get the internal display proxy.

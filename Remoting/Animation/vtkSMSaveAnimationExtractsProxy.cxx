@@ -95,14 +95,10 @@ vtkStandardNewMacro(ExtractsWriter);
 
 vtkStandardNewMacro(vtkSMSaveAnimationExtractsProxy);
 //----------------------------------------------------------------------------
-vtkSMSaveAnimationExtractsProxy::vtkSMSaveAnimationExtractsProxy()
-{
-}
+vtkSMSaveAnimationExtractsProxy::vtkSMSaveAnimationExtractsProxy() = default;
 
 //----------------------------------------------------------------------------
-vtkSMSaveAnimationExtractsProxy::~vtkSMSaveAnimationExtractsProxy()
-{
-}
+vtkSMSaveAnimationExtractsProxy::~vtkSMSaveAnimationExtractsProxy() = default;
 
 //----------------------------------------------------------------------------
 bool vtkSMSaveAnimationExtractsProxy::SaveExtracts()

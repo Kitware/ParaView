@@ -40,7 +40,7 @@ public:
    * Constructor/Destructor manage references of vtk objects stored in
    * the stream along with the rest of the stream data.
    */
-  vtkClientServerStream(vtkObjectBase* owner = 0);
+  vtkClientServerStream(vtkObjectBase* owner = nullptr);
   ~vtkClientServerStream();
   //@}
 
@@ -48,7 +48,7 @@ public:
   /**
    * Copy constructor and assignment operator copy all stream data.
    */
-  vtkClientServerStream(const vtkClientServerStream&, vtkObjectBase* owner = 0);
+  vtkClientServerStream(const vtkClientServerStream&, vtkObjectBase* owner = nullptr);
   vtkClientServerStream& operator=(const vtkClientServerStream&);
   //@}
 

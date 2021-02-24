@@ -30,9 +30,7 @@ vtkPVJoystickFlyIn::vtkPVJoystickFlyIn()
 }
 
 //-------------------------------------------------------------------------
-vtkPVJoystickFlyIn::~vtkPVJoystickFlyIn()
-{
-}
+vtkPVJoystickFlyIn::~vtkPVJoystickFlyIn() = default;
 
 //-------------------------------------------------------------------------
 void vtkPVJoystickFlyIn::PrintSelf(ostream& os, vtkIndent indent)

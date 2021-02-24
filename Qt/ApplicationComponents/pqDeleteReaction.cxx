@@ -124,7 +124,7 @@ static void pqDeleteReactionGetSelectedSet(
 bool pqDeleteReaction::canDeleteSelected()
 {
   vtkSMProxySelectionModel* selModel = pqActiveObjects::instance().activeSourcesSelectionModel();
-  if (selModel == NULL || selModel->GetNumberOfSelectedProxies() == 0)
+  if (selModel == nullptr || selModel->GetNumberOfSelectedProxies() == 0)
   {
     return false;
   }

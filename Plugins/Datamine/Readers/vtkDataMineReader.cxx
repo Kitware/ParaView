@@ -6,9 +6,9 @@
 //     99-04-12: Written by Jeremy Maccelari, visualn@iafrica.com
 
 #include "vtkDataMineReader.h"
-#include "PointMap.h"
-#include "PropertyStorage.h"
-#include "dmfile.h"
+#include "ThirdParty/PointMap.h"
+#include "ThirdParty/PropertyStorage.h"
+#include "ThirdParty/dmfile.h"
 
 #include "vtkCallbackCommand.h"
 #include "vtkCellArray.h"
@@ -31,7 +31,7 @@ vtkStandardNewMacro(vtkDataMineReader);
 // Constructor
 vtkDataMineReader::vtkDataMineReader()
 {
-  this->FileName = NULL;
+  this->FileName = nullptr;
   this->PropertyCount = 0;
 
   this->SetNumberOfInputPorts(0);
@@ -48,10 +48,10 @@ vtkDataMineReader::vtkDataMineReader()
 // Destructor
 vtkDataMineReader::~vtkDataMineReader()
 {
-  this->SetFileName(0);
+  this->SetFileName(nullptr);
 
   // deleting object variables
-  if (this->CellDataArraySelection != NULL)
+  if (this->CellDataArraySelection != nullptr)
   {
     this->CellDataArraySelection->RemoveObserver(this->SelectionObserver);
     this->CellDataArraySelection->Delete();
@@ -270,7 +270,7 @@ int vtkDataMineReader::SetFieldDataInfo(vtkDataArraySelection* CellDAS, int asso
   int i, activeFlag;
   const char* name;
 
-  vtkInformation* info = NULL;
+  vtkInformation* info = nullptr;
 
   if (!infoVector)
   {

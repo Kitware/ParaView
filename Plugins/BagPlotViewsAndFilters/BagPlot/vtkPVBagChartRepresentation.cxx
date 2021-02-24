@@ -56,14 +56,14 @@ vtkCxxSetObjectMacro(vtkPVBagChartRepresentation, LookupTable, vtkScalarsToColor
   vtkPVBagChartRepresentation::vtkPVBagChartRepresentation()
   : LineThickness(1)
   , LineStyle(0)
-  , LookupTable(NULL)
+  , LookupTable(nullptr)
   , Opacity(1.)
   , PointSize(5)
   , GridLineThickness(1)
   , GridLineStyle(0)
-  , XAxisSeriesName(NULL)
-  , YAxisSeriesName(NULL)
-  , DensitySeriesName(NULL)
+  , XAxisSeriesName(nullptr)
+  , YAxisSeriesName(nullptr)
+  , DensitySeriesName(nullptr)
   , UseIndexForXAxis(true)
 {
   this->BagColor[0] = 1.0;
@@ -88,7 +88,7 @@ vtkCxxSetObjectMacro(vtkPVBagChartRepresentation, LookupTable, vtkScalarsToColor
 //----------------------------------------------------------------------------
 vtkPVBagChartRepresentation::~vtkPVBagChartRepresentation()
 {
-  SetLookupTable(NULL);
+  SetLookupTable(nullptr);
 }
 
 //----------------------------------------------------------------------------
@@ -118,7 +118,7 @@ bool vtkPVBagChartRepresentation::RemoveFromView(vtkView* view)
 {
   if (this->GetChart())
   {
-    this->GetChart()->GetPlot(0)->SetInputData(0);
+    this->GetChart()->GetPlot(0)->SetInputData(nullptr);
     this->GetChart()->SetVisible(false);
   }
 
@@ -149,7 +149,7 @@ vtkChartXY* vtkPVBagChartRepresentation::GetChart()
     return vtkChartXY::SafeDownCast(this->ContextView->GetContextItem());
   }
 
-  return 0;
+  return nullptr;
 }
 
 //----------------------------------------------------------------------------
@@ -169,10 +169,10 @@ void vtkPVBagChartRepresentation::PrepareForRendering()
   }
 
   vtkChartXY* chart = this->GetChart();
-  vtkPlotBag* bagPlot = 0;
-  vtkPlotHistogram2D* gridPlot = 0;
-  vtkPlotLine* p50LinePlot = 0;
-  vtkPlotLine* pUserLinePlot = 0;
+  vtkPlotBag* bagPlot = nullptr;
+  vtkPlotHistogram2D* gridPlot = nullptr;
+  vtkPlotLine* p50LinePlot = nullptr;
+  vtkPlotLine* pUserLinePlot = nullptr;
   for (int i = 0;
        i < chart->GetNumberOfPlots() && (!bagPlot || !gridPlot || !p50LinePlot || !pUserLinePlot);
        i++)
@@ -189,7 +189,7 @@ void vtkPVBagChartRepresentation::PrepareForRendering()
     }
     if (vtkPlotLine::SafeDownCast(chart->GetPlot(i)))
     {
-      if (p50LinePlot == NULL)
+      if (p50LinePlot == nullptr)
       {
         p50LinePlot = vtkPlotLine::SafeDownCast(chart->GetPlot(i));
       }
@@ -221,7 +221,7 @@ void vtkPVBagChartRepresentation::PrepareForRendering()
 
   vtkDoubleArray* thresholdArray = this->LocalThreshold
     ? vtkDoubleArray::SafeDownCast(this->LocalThreshold->GetColumnByName("TValues"))
-    : NULL;
+    : nullptr;
 
   std::ostringstream labelp50;
   labelp50 << "P" << (thresholdArray ? thresholdArray->GetValue(0) : 50);
@@ -237,7 +237,7 @@ void vtkPVBagChartRepresentation::PrepareForRendering()
 
   vtkTable* plotInput = this->GetLocalOutput();
   bool hasBagPlot = plotInput && plotInput->GetNumberOfRows() > 0;
-  chart->SetVisible((hasBagPlot || this->LocalGrid != NULL) && this->GetVisibility());
+  chart->SetVisible((hasBagPlot || this->LocalGrid != nullptr) && this->GetVisibility());
   bagPlot->SetVisible(hasBagPlot);
   bagPlot->SetBagVisible(false);
 
@@ -273,9 +273,9 @@ void vtkPVBagChartRepresentation::PrepareForRendering()
   }
 
   gridPlot->SetInputData(this->LocalGrid);
-  gridPlot->SetVisible(this->LocalGrid != NULL);
-  p50LinePlot->SetVisible(this->LocalGrid != NULL);
-  pUserLinePlot->SetVisible(this->LocalGrid != NULL);
+  gridPlot->SetVisible(this->LocalGrid != nullptr);
+  p50LinePlot->SetVisible(this->LocalGrid != nullptr);
+  pUserLinePlot->SetVisible(this->LocalGrid != nullptr);
 
   if (this->LocalGrid)
   {

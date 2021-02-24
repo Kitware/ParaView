@@ -31,14 +31,10 @@ struct BoxT
 
 vtkStandardNewMacro(vtkOrderedCompositingHelper);
 //----------------------------------------------------------------------------
-vtkOrderedCompositingHelper::vtkOrderedCompositingHelper()
-{
-}
+vtkOrderedCompositingHelper::vtkOrderedCompositingHelper() = default;
 
 //----------------------------------------------------------------------------
-vtkOrderedCompositingHelper::~vtkOrderedCompositingHelper()
-{
-}
+vtkOrderedCompositingHelper::~vtkOrderedCompositingHelper() = default;
 
 //----------------------------------------------------------------------------
 void vtkOrderedCompositingHelper::SetBoundingBoxes(const std::vector<vtkBoundingBox>& boxes)

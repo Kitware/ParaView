@@ -38,7 +38,7 @@ public:
   // \c server:- server on which the proxy is created.
   // \c parent:- QObject parent.
   pqPythonView(const QString& type, const QString& group, const QString& name,
-    vtkSMViewProxy* renModule, pqServer* server, QObject* parent = NULL);
+    vtkSMViewProxy* renModule, pqServer* server, QObject* parent = nullptr);
 
   // Destructor.
   ~pqPythonView() override;

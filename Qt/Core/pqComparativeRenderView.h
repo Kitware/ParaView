@@ -54,7 +54,7 @@ public:
   // \c server:- server on which the proxy is created.
   // \c parent:- QObject parent.
   pqComparativeRenderView(const QString& group, const QString& name, vtkSMViewProxy* renModule,
-    pqServer* server, QObject* parent = NULL);
+    pqServer* server, QObject* parent = nullptr);
   ~pqComparativeRenderView() override;
 
   /**
@@ -71,7 +71,7 @@ protected Q_SLOTS:
   /**
   * Called when the layout on the comparative vis changes.
   */
-  void updateViewWidgets(QWidget* container = NULL);
+  void updateViewWidgets(QWidget* container = nullptr);
 
 protected:
   /**

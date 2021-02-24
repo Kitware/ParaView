@@ -39,6 +39,4 @@ pqComparativeXYBarChartView::pqComparativeXYBarChartView(const QString& group, c
 }
 
 //-----------------------------------------------------------------------------
-pqComparativeXYBarChartView::~pqComparativeXYBarChartView()
-{
-}
+pqComparativeXYBarChartView::~pqComparativeXYBarChartView() = default;

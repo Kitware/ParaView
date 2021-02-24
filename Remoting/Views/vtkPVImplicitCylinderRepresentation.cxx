@@ -23,10 +23,10 @@ vtkStandardNewMacro(vtkPVImplicitCylinderRepresentation);
 //----------------------------------------------------------------------------
 vtkPVImplicitCylinderRepresentation::vtkPVImplicitCylinderRepresentation()
 {
-  vtkMultiProcessController* ctrl = NULL;
+  vtkMultiProcessController* ctrl = nullptr;
   ctrl = vtkMultiProcessController::GetGlobalController();
   double opacity = 1;
-  if (ctrl == NULL || ctrl->GetNumberOfProcesses() == 1)
+  if (ctrl == nullptr || ctrl->GetNumberOfProcesses() == 1)
   {
     opacity = 0.25;
   }
@@ -36,9 +36,7 @@ vtkPVImplicitCylinderRepresentation::vtkPVImplicitCylinderRepresentation()
 }
 
 //----------------------------------------------------------------------------
-vtkPVImplicitCylinderRepresentation::~vtkPVImplicitCylinderRepresentation()
-{
-}
+vtkPVImplicitCylinderRepresentation::~vtkPVImplicitCylinderRepresentation() = default;
 
 //----------------------------------------------------------------------------
 void vtkPVImplicitCylinderRepresentation::PrintSelf(ostream& os, vtkIndent indent)

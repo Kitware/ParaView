@@ -215,7 +215,7 @@ public:
     this->Bounds.Reset();
     this->Points.clear();
     this->Locator->Initialize();
-    this->Locator->SetDataSet(NULL);
+    this->Locator->SetDataSet(nullptr);
 
     this->UniformSamplingVectorMap.clear();
     this->SamplingRunningSum = 0;
@@ -225,7 +225,7 @@ public:
   vtkSmartPointer<vtkDataSet> UpdateWithDataset(
     unsigned int index, vtkDataSet* ds, vtkPVGlyphFilter* self)
   {
-    assert(ds != NULL && self != NULL);
+    assert(ds != nullptr && self != nullptr);
 
     vtkSmartPointer<vtkDataSet> dataSetToReturn = ds;
 
@@ -454,7 +454,7 @@ public:
   inline bool IsPointVisible(
     unsigned int index, vtkDataSet* ds, vtkIdType ptId, bool cellCenters, vtkPVGlyphFilter* self)
   {
-    assert(ds != NULL && self != NULL);
+    assert(ds != nullptr && self != nullptr);
     switch (self->GetGlyphMode())
     {
       case vtkPVGlyphFilter::ALL_POINTS:
@@ -612,7 +612,7 @@ int vtkPVGlyphFilter::RequestDataObject(
   if (vtkCompositeDataSet::GetData(inputVector[0], 0))
   {
     vtkMultiBlockDataSet* mds = vtkMultiBlockDataSet::GetData(outputVector, 0);
-    if (mds == NULL)
+    if (mds == nullptr)
     {
       mds = vtkMultiBlockDataSet::New();
       outputVector->GetInformationObject(0)->Set(vtkDataObject::DATA_OBJECT(), mds);
@@ -622,7 +622,7 @@ int vtkPVGlyphFilter::RequestDataObject(
   else
   {
     vtkPolyData* pd = vtkPolyData::GetData(outputVector, 0);
-    if (pd == NULL)
+    if (pd == nullptr)
     {
       pd = vtkPolyData::New();
       outputVector->GetInformationObject(0)->Set(vtkDataObject::DATA_OBJECT(), pd);

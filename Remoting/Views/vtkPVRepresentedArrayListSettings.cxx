@@ -33,7 +33,7 @@ vtkPVRepresentedArrayListSettings* vtkPVRepresentedArrayListSettings::New()
 {
   vtkPVRepresentedArrayListSettings* instance = vtkPVRepresentedArrayListSettings::GetInstance();
   assert(instance);
-  instance->Register(NULL);
+  instance->Register(nullptr);
   return instance;
 }
 
@@ -106,7 +106,7 @@ const char* vtkPVRepresentedArrayListSettings::GetFilterExpression(int i)
     vtkErrorMacro("Index out of range: " << i);
   }
 
-  return NULL;
+  return nullptr;
 }
 
 //----------------------------------------------------------------------------

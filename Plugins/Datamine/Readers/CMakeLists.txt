@@ -8,12 +8,12 @@ set(classes
   vtkDataMineWireFrameReader)
 
 set(private_classes
-  dmfile
-  PointMap
-  PropertyStorage)
+  ThirdParty/dmfile
+  ThirdParty/PointMap
+  ThirdParty/PropertyStorage)
 
 set(private_headers
-  dm.h)
+  ThirdParty/dm.h)
 
 vtk_module_add_module(Datamine::DatamineReaders
   CLASSES ${classes}

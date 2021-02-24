@@ -47,15 +47,15 @@ vtkSMOutputPort::vtkSMOutputPort()
   this->DataInformationValid = false;
   this->TemporalDataInformationValid = false;
   this->PortIndex = 0;
-  this->SourceProxy = 0;
-  this->CompoundSourceProxy = 0;
+  this->SourceProxy = nullptr;
+  this->CompoundSourceProxy = nullptr;
   this->ObjectsCreated = 1;
 }
 
 //----------------------------------------------------------------------------
 vtkSMOutputPort::~vtkSMOutputPort()
 {
-  this->SetSourceProxy(0);
+  this->SetSourceProxy(nullptr);
   this->ClassNameInformation->Delete();
   this->DataInformation->Delete();
   this->DataAssemblyInformation->Delete();

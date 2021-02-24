@@ -152,7 +152,7 @@ public:
     , CustomColumnState()
   {
   }
-  ~CNode() {}
+  ~CNode() = default;
 
   static CNode& nullNode()
   {
@@ -363,7 +363,7 @@ public:
     this->reset();
     this->Index = index++;
     lookupMap[this->Index] = this;
-    if (info == nullptr || info->GetCompositeDataClassName() == 0)
+    if (info == nullptr || info->GetCompositeDataClassName() == nullptr)
     {
       this->Name = info != nullptr ? info->GetPrettyDataTypeString() : "(empty)";
       this->DataType = info != nullptr ? info->GetDataSetType() : -1;
@@ -426,8 +426,8 @@ using namespace pqCompositeDataInformationTreeModelNS;
 class pqCompositeDataInformationTreeModel::pqInternals
 {
 public:
-  pqInternals() {}
-  ~pqInternals() {}
+  pqInternals() = default;
+  ~pqInternals() = default;
 
   static CNode& nullNode() { return CNode::nullNode(); }
 
@@ -501,9 +501,7 @@ pqCompositeDataInformationTreeModel::pqCompositeDataInformationTreeModel(QObject
 }
 
 //-----------------------------------------------------------------------------
-pqCompositeDataInformationTreeModel::~pqCompositeDataInformationTreeModel()
-{
-}
+pqCompositeDataInformationTreeModel::~pqCompositeDataInformationTreeModel() = default;
 
 //-----------------------------------------------------------------------------
 int pqCompositeDataInformationTreeModel::columnCount(const QModelIndex&) const
@@ -895,7 +893,7 @@ QModelIndex pqCompositeDataInformationTreeModel::find(unsigned int idx) const
 }
 
 //-----------------------------------------------------------------------------
-const QModelIndex pqCompositeDataInformationTreeModel::rootIndex() const
+QModelIndex pqCompositeDataInformationTreeModel::rootIndex() const
 {
   return this->createIndex(0, 0, static_cast<quintptr>(0));
 }

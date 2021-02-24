@@ -25,14 +25,10 @@
 vtkStandardNewMacro(vtkSMArrayRangeDomain);
 
 //---------------------------------------------------------------------------
-vtkSMArrayRangeDomain::vtkSMArrayRangeDomain()
-{
-}
+vtkSMArrayRangeDomain::vtkSMArrayRangeDomain() = default;
 
 //---------------------------------------------------------------------------
-vtkSMArrayRangeDomain::~vtkSMArrayRangeDomain()
-{
-}
+vtkSMArrayRangeDomain::~vtkSMArrayRangeDomain() = default;
 
 //---------------------------------------------------------------------------
 void vtkSMArrayRangeDomain::Update(vtkSMProperty*)
@@ -67,7 +63,7 @@ void vtkSMArrayRangeDomain::Update(vtkSMProperty*)
     vtkSMUncheckedPropertyHelper componentSelectionHelper(propForComponentSelection);
     component = componentSelectionHelper.GetAsInt();
   }
-  if (vtkSMSourceProxy::SafeDownCast(inputHelper.GetAsProxy()) != NULL)
+  if (vtkSMSourceProxy::SafeDownCast(inputHelper.GetAsProxy()) != nullptr)
   {
     this->Update(arrayName, arraySelectionHelper.GetAsInt(3),
       vtkSMSourceProxy::SafeDownCast(inputHelper.GetAsProxy()), inputHelper.GetOutputPort(),
@@ -79,7 +75,7 @@ void vtkSMArrayRangeDomain::Update(vtkSMProperty*)
 void vtkSMArrayRangeDomain::Update(const char* arrayName, int fieldAssociation,
   vtkSMSourceProxy* producer, int producerPort, int component)
 {
-  assert(producer != NULL && arrayName != NULL);
+  assert(producer != nullptr && arrayName != nullptr);
 
   // Make sure the outputs are created.
   producer->CreateOutputPorts();
@@ -92,7 +88,7 @@ void vtkSMArrayRangeDomain::Update(const char* arrayName, int fieldAssociation,
 
   vtkPVArrayInformation* arrayInfo = info->GetArrayInformation(arrayName, fieldAssociation);
 
-  if (arrayInfo == NULL &&
+  if (arrayInfo == nullptr &&
     (fieldAssociation == vtkDataObject::POINT || fieldAssociation == vtkDataObject::CELL))
   {
     // it's possible that the array name was mangled due to "auto-conversion" of
@@ -102,7 +98,7 @@ void vtkSMArrayRangeDomain::Update(const char* arrayName, int fieldAssociation,
     // to locate the array information.
     std::string name = vtkSMArrayListDomain::ArrayNameFromMangledName(arrayName);
     arrayInfo =
-      name.length() > 0 ? info->GetArrayInformation(name.c_str(), fieldAssociation) : NULL;
+      name.length() > 0 ? info->GetArrayInformation(name.c_str(), fieldAssociation) : nullptr;
     if (!arrayInfo)
     {
       // try the other field association.

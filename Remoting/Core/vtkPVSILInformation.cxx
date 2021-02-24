@@ -109,7 +109,7 @@ void vtkPVSILInformation::CopyToStream(vtkClientServerStream* css)
   }
   else
   {
-    *css << vtkClientServerStream::InsertArray(static_cast<unsigned char*>(NULL), 0);
+    *css << vtkClientServerStream::InsertArray(static_cast<unsigned char*>(nullptr), 0);
   }
 
   if (this->SubsetInclusionLattice)

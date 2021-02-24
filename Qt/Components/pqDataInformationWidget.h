@@ -46,7 +46,7 @@ class PQCOMPONENTS_EXPORT pqDataInformationWidget : public QWidget
 {
   Q_OBJECT
 public:
-  pqDataInformationWidget(QWidget* parent = NULL);
+  pqDataInformationWidget(QWidget* parent = nullptr);
   ~pqDataInformationWidget() override;
 
 protected:

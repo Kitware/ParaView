@@ -21,15 +21,15 @@ vtkCxxSetObjectMacro(vtkCPFieldBuilder, TensorFieldFunction, vtkCPTensorFieldFun
 //----------------------------------------------------------------------------
 vtkCPFieldBuilder::vtkCPFieldBuilder()
 {
-  this->ArrayName = 0;
-  this->TensorFieldFunction = 0;
+  this->ArrayName = nullptr;
+  this->TensorFieldFunction = nullptr;
 }
 
 //----------------------------------------------------------------------------
 vtkCPFieldBuilder::~vtkCPFieldBuilder()
 {
-  this->SetArrayName(0);
-  this->SetTensorFieldFunction(0);
+  this->SetArrayName(nullptr);
+  this->SetTensorFieldFunction(nullptr);
 }
 
 //----------------------------------------------------------------------------

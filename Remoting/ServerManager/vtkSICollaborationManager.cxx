@@ -99,7 +99,7 @@ public:
 
   vtkSMMessage* BuildServerStateMessage()
   {
-    this->ServerInformations->CopyFromObject(NULL);
+    this->ServerInformations->CopyFromObject(nullptr);
     int master = this->ServerInformations->GetMasterId();
 
     this->ServerState.ClearExtension(ClientsInformation::user);
@@ -164,7 +164,7 @@ vtkSICollaborationManager::vtkSICollaborationManager()
 vtkSICollaborationManager::~vtkSICollaborationManager()
 {
   this->Internal->Delete();
-  this->Internal = NULL;
+  this->Internal = nullptr;
 }
 
 //----------------------------------------------------------------------------

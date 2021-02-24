@@ -92,7 +92,7 @@ public:
 
   typedef QMap<QString, CategoryInfo> CategoryInfoMap;
 
-  pqInternal() { this->LocalActiveSession = NULL; }
+  pqInternal() { this->LocalActiveSession = nullptr; }
 
   void addProxy(const QString& pgroup, const QString& pname, const QString& icon,
     const QString& omitFromToolbar = QString())
@@ -185,7 +185,7 @@ pqProxyGroupMenuManager::~pqProxyGroupMenuManager()
     vtkSMProxyManager::GetProxyManager()->RemoveObserver(this->Internal->ProxyManagerCallBackId);
   }
   delete this->Internal;
-  this->Internal = 0;
+  this->Internal = nullptr;
 }
 
 //-----------------------------------------------------------------------------
@@ -536,7 +536,7 @@ void pqProxyGroupMenuManager::populateMenu()
   QList<QAction*> menuActions = _menu->actions();
   foreach (QAction* action, menuActions)
   {
-    QObject::disconnect(action, 0, this, 0);
+    QObject::disconnect(action, nullptr, this, nullptr);
   }
   menuActions.clear();
   if (!this->Internal->SearchAction.isNull())
@@ -655,7 +655,7 @@ QAction* pqProxyGroupMenuManager::getAction(const QString& pgroup, const QString
 {
   if (pname.isEmpty() || pgroup.isEmpty())
   {
-    return 0;
+    return nullptr;
   }
 
   // Since Proxies map keeps the QAction instance, we will reuse the QAction
@@ -665,14 +665,14 @@ QAction* pqProxyGroupMenuManager::getAction(const QString& pgroup, const QString
   QString name = QString("%1").arg(pname);
   if (iter == this->Internal->Proxies.end())
   {
-    return 0;
+    return nullptr;
   }
 
   vtkSMSessionProxyManager* pxm =
     vtkSMProxyManager::GetProxyManager()->GetActiveSessionProxyManager();
   if (!pxm)
   {
-    return 0;
+    return nullptr;
   }
   vtkSMProxy* prototype =
     pxm->GetPrototypeProxy(pgroup.toLocal8Bit().data(), pname.toLocal8Bit().data());
@@ -725,7 +725,7 @@ QAction* pqProxyGroupMenuManager::getAction(const QString& pgroup, const QString
     this->connect(action, SIGNAL(triggered()), SLOT(triggered()), Qt::UniqueConnection);
     return action;
   }
-  return 0;
+  return nullptr;
 }
 
 //-----------------------------------------------------------------------------
@@ -797,12 +797,12 @@ vtkSMProxy* pqProxyGroupMenuManager::getPrototype(QAction* action) const
 {
   if (!action)
   {
-    return NULL;
+    return nullptr;
   }
   QStringList data_list = action->data().toStringList();
   if (data_list.size() != 2)
   {
-    return NULL;
+    return nullptr;
   }
 
   QPair<QString, QString> key(data_list[0], data_list[1]);
@@ -953,7 +953,7 @@ void pqProxyGroupMenuManager::lookForNewDefinitions()
   vtkSMSessionProxyManager* pxm =
     vtkSMProxyManager::GetProxyManager()->GetActiveSessionProxyManager();
 
-  if (this->Internal->ProxyDefinitionGroupToListen.size() == 0 || pxm == NULL)
+  if (this->Internal->ProxyDefinitionGroupToListen.size() == 0 || pxm == nullptr)
   {
     return; // Nothing to look into...
   }
@@ -974,9 +974,9 @@ void pqProxyGroupMenuManager::lookForNewDefinitions()
     const char* group = iter->GetGroupName();
     const char* name = iter->GetProxyName();
     vtkPVXMLElement* hints = iter->GetProxyHints();
-    if (hints != NULL)
+    if (hints != nullptr)
     {
-      if (hints->FindNestedElementByName("ReaderFactory") != NULL)
+      if (hints->FindNestedElementByName("ReaderFactory") != nullptr)
       {
         // skip readers.
         continue;
@@ -984,7 +984,7 @@ void pqProxyGroupMenuManager::lookForNewDefinitions()
       for (unsigned int cc = 0; cc < hints->GetNumberOfNestedElements(); cc++)
       {
         vtkPVXMLElement* showInMenu = hints->GetNestedElement(cc);
-        if (showInMenu == NULL || showInMenu->GetName() == NULL ||
+        if (showInMenu == nullptr || showInMenu->GetName() == nullptr ||
           strcmp(showInMenu->GetName(), "ShowInMenu") != 0)
         {
           continue;
@@ -1021,7 +1021,7 @@ void pqProxyGroupMenuManager::switchActiveServer()
 {
   void* newActiveSession = vtkSMProxyManager::IsInitialized()
     ? vtkSMProxyManager::GetProxyManager()->GetActiveSession()
-    : NULL;
+    : nullptr;
 
   if (newActiveSession && newActiveSession != this->Internal->LocalActiveSession)
   {

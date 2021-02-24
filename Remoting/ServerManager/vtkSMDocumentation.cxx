@@ -22,13 +22,13 @@ vtkCxxSetObjectMacro(vtkSMDocumentation, DocumentationElement, vtkPVXMLElement);
 //-----------------------------------------------------------------------------
 vtkSMDocumentation::vtkSMDocumentation()
 {
-  this->DocumentationElement = 0;
+  this->DocumentationElement = nullptr;
 }
 
 //-----------------------------------------------------------------------------
 vtkSMDocumentation::~vtkSMDocumentation()
 {
-  this->SetDocumentationElement(0);
+  this->SetDocumentationElement(nullptr);
 }
 
 //-----------------------------------------------------------------------------
@@ -36,7 +36,7 @@ const char* vtkSMDocumentation::GetLongHelp()
 {
   if (!this->DocumentationElement)
   {
-    return 0;
+    return nullptr;
   }
   return this->DocumentationElement->GetAttribute("long_help");
 }
@@ -46,7 +46,7 @@ const char* vtkSMDocumentation::GetShortHelp()
 {
   if (!this->DocumentationElement)
   {
-    return 0;
+    return nullptr;
   }
   return this->DocumentationElement->GetAttribute("short_help");
 }
@@ -56,7 +56,7 @@ const char* vtkSMDocumentation::GetDescription()
 {
   if (!this->DocumentationElement)
   {
-    return 0;
+    return nullptr;
   }
   return this->DocumentationElement->GetCharacterData();
 }

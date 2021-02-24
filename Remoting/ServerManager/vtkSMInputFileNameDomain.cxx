@@ -29,14 +29,10 @@
 vtkStandardNewMacro(vtkSMInputFileNameDomain);
 
 //---------------------------------------------------------------------------
-vtkSMInputFileNameDomain::vtkSMInputFileNameDomain()
-{
-}
+vtkSMInputFileNameDomain::vtkSMInputFileNameDomain() = default;
 
 //---------------------------------------------------------------------------
-vtkSMInputFileNameDomain::~vtkSMInputFileNameDomain()
-{
-}
+vtkSMInputFileNameDomain::~vtkSMInputFileNameDomain() = default;
 
 //---------------------------------------------------------------------------
 void vtkSMInputFileNameDomain::Update(vtkSMProperty* vtkNotUsed(prop))
@@ -49,11 +45,11 @@ void vtkSMInputFileNameDomain::Update(vtkSMProperty* vtkNotUsed(prop))
 
   vtkSMUncheckedPropertyHelper inputHelper(inputProperty);
   vtkSMProxy* inputProxy = inputHelper.GetAsProxy();
-  if (inputProxy != NULL)
+  if (inputProxy != nullptr)
   {
     const char* propertyName = vtkSMCoreUtilities::GetFileNameProperty(inputProxy);
     vtkSMProperty* fileNameProperty = inputProxy->GetProperty(propertyName);
-    if (fileNameProperty != NULL)
+    if (fileNameProperty != nullptr)
     {
       std::string fname(vtkSMPropertyHelper(fileNameProperty).GetAsString());
       this->FileName = fname;

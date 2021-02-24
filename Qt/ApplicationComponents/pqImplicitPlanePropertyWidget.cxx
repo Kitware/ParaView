@@ -158,9 +158,7 @@ pqImplicitPlanePropertyWidget::pqImplicitPlanePropertyWidget(
 }
 
 //-----------------------------------------------------------------------------
-pqImplicitPlanePropertyWidget::~pqImplicitPlanePropertyWidget()
-{
-}
+pqImplicitPlanePropertyWidget::~pqImplicitPlanePropertyWidget() = default;
 
 //-----------------------------------------------------------------------------
 void pqImplicitPlanePropertyWidget::placeWidget()
@@ -246,7 +244,7 @@ void pqImplicitPlanePropertyWidget::resetCameraToNormal()
 void pqImplicitPlanePropertyWidget::useCameraNormal()
 {
   vtkSMRenderViewProxy* viewProxy =
-    this->view() ? vtkSMRenderViewProxy::SafeDownCast(this->view()->getProxy()) : NULL;
+    this->view() ? vtkSMRenderViewProxy::SafeDownCast(this->view()->getProxy()) : nullptr;
   if (viewProxy)
   {
     vtkCamera* camera = viewProxy->GetActiveCamera();

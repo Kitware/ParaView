@@ -45,9 +45,7 @@ pqSignalAdaptorSILModel::pqSignalAdaptorSILModel(pqSILModel* model, const char* 
 }
 
 //-----------------------------------------------------------------------------
-pqSignalAdaptorSILModel::~pqSignalAdaptorSILModel()
-{
-}
+pqSignalAdaptorSILModel::~pqSignalAdaptorSILModel() = default;
 
 //-----------------------------------------------------------------------------
 QList<QVariant> pqSignalAdaptorSILModel::values() const

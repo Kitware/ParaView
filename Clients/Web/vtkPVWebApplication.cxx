@@ -57,7 +57,7 @@ public:
     ImageCacheValueType()
       : NeedsRender(true)
       , HasImagesBeingProcessed(false)
-      , ViewPointer(NULL)
+      , ViewPointer(nullptr)
       , ObserverId(0)
     {
     }
@@ -88,7 +88,7 @@ public:
       {
         this->ViewPointer->RemoveObserver(this->ObserverId);
         this->ObserverId = 0;
-        this->ViewPointer = NULL;
+        this->ViewPointer = nullptr;
       }
     }
 
@@ -130,7 +130,7 @@ vtkPVWebApplication::vtkPVWebApplication()
 vtkPVWebApplication::~vtkPVWebApplication()
 {
   delete this->Internals;
-  this->Internals = NULL;
+  this->Internals = nullptr;
 }
 
 //----------------------------------------------------------------------------
@@ -159,7 +159,7 @@ vtkUnsignedCharArray* vtkPVWebApplication::StillRender(vtkSMViewProxy* view, int
   if (!view)
   {
     vtkErrorMacro("No view specified.");
-    return NULL;
+    return nullptr;
   }
   // threading can be tricky to debug -
   bool doThread = true;
@@ -167,7 +167,7 @@ vtkUnsignedCharArray* vtkPVWebApplication::StillRender(vtkSMViewProxy* view, int
   vtkInternals::ImageCacheValueType& value = this->Internals->ImageCache[view];
   value.SetListener(view);
 
-  if (value.NeedsRender == false && value.Data != NULL && view->GetNeedsUpdate() == false)
+  if (value.NeedsRender == false && value.Data != nullptr && view->GetNeedsUpdate() == false)
   {
     // cout <<  "Reusing cache" << endl;
     if (doThread)
@@ -201,9 +201,9 @@ vtkUnsignedCharArray* vtkPVWebApplication::StillRender(vtkSMViewProxy* view, int
   {
     this->Internals->Encoder->PushAndTakeReference(
       view->GetGlobalID(), image, quality, this->ImageEncoding);
-    assert(image == NULL);
+    assert(image == nullptr);
 
-    if (value.Data == NULL)
+    if (value.Data == nullptr)
     {
       // we need to wait till output is processed.
       // cout << "Flushing" << endl;
@@ -239,7 +239,7 @@ const char* vtkPVWebApplication::StillRenderToString(
     // cout << "Image size: " << array->GetNumberOfTuples() << endl;
     return reinterpret_cast<char*>(array->GetPointer(0));
   }
-  return NULL;
+  return nullptr;
 }
 
 //----------------------------------------------------------------------------
@@ -252,14 +252,14 @@ vtkUnsignedCharArray* vtkPVWebApplication::StillRenderToBuffer(
     this->LastStillRenderToMTime = array->GetMTime();
     return array;
   }
-  return NULL;
+  return nullptr;
 }
 
 //----------------------------------------------------------------------------
 bool vtkPVWebApplication::HandleInteractionEvent(
   vtkSMViewProxy* view, vtkWebInteractionEvent* event)
 {
-  vtkRenderWindowInteractor* iren = NULL;
+  vtkRenderWindowInteractor* iren = nullptr;
 
   if (view->GetRenderWindow())
   {
@@ -332,16 +332,16 @@ const char* vtkPVWebApplication::GetWebGLSceneMetaData(vtkSMViewProxy* view)
   if (!view)
   {
     vtkErrorMacro("No view specified.");
-    return NULL;
+    return nullptr;
   }
 
   vtkRenderWindow* renWin = view->GetRenderWindow();
   vtkPVRenderView* pvRenderView = vtkPVRenderView::SafeDownCast(view->GetClientSideView());
 
-  if (renWin == NULL || pvRenderView == NULL)
+  if (renWin == nullptr || pvRenderView == nullptr)
   {
     vtkErrorMacro("The view is supported for WebGL export: " << view);
-    return NULL;
+    return nullptr;
   }
 
   // We use the camera focal point to be the center of rotation
@@ -384,22 +384,22 @@ const char* vtkPVWebApplication::GetWebGLBinaryData(vtkSMViewProxy* view, const 
   if (!view)
   {
     vtkErrorMacro("No view specified.");
-    return NULL;
+    return nullptr;
   }
   if (this->Internals->ViewWebGLMap.find(view) == this->Internals->ViewWebGLMap.end())
   {
-    if (this->GetWebGLSceneMetaData(view) == NULL)
+    if (this->GetWebGLSceneMetaData(view) == nullptr)
     {
       vtkErrorMacro("Failed to generate WebGL MetaData for: " << view);
-      return NULL;
+      return nullptr;
     }
   }
 
   vtkWebGLExporter* webglExporter = this->Internals->ViewWebGLMap[view];
-  if (webglExporter == NULL)
+  if (webglExporter == nullptr)
   {
     vtkErrorMacro("There is no cached WebGL Exporter for: " << view);
-    return NULL;
+    return nullptr;
   }
 
   if (this->Internals->WebGLExporterObjIdMap[webglExporter].size() > 0 &&
@@ -428,7 +428,7 @@ const char* vtkPVWebApplication::GetWebGLBinaryData(vtkSMViewProxy* view, const 
     }
   }
 
-  return NULL;
+  return nullptr;
 }
 //----------------------------------------------------------------------------
 void vtkPVWebApplication::PrintSelf(ostream& os, vtkIndent indent)

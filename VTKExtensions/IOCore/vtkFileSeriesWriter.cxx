@@ -252,7 +252,7 @@ bool vtkFileSeriesWriter::WriteATimestep(vtkDataObject* input, vtkInformation* i
   tp->FastDelete();
   this->SetWriterFileName(fname.str().c_str());
   this->WriteInternal();
-  this->Writer->SetInputConnection(0);
+  this->Writer->SetInputConnection(nullptr);
 
   return true;
 }

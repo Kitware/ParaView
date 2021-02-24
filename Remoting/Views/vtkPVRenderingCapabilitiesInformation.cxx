@@ -74,9 +74,7 @@ vtkPVRenderingCapabilitiesInformation::vtkPVRenderingCapabilitiesInformation()
 }
 
 //----------------------------------------------------------------------------
-vtkPVRenderingCapabilitiesInformation::~vtkPVRenderingCapabilitiesInformation()
-{
-}
+vtkPVRenderingCapabilitiesInformation::~vtkPVRenderingCapabilitiesInformation() = default;
 
 //----------------------------------------------------------------------------
 vtkTypeUInt32 vtkPVRenderingCapabilitiesInformation::GetLocalCapabilities()
@@ -95,7 +93,7 @@ vtkTypeUInt32 vtkPVRenderingCapabilitiesInformation::GetLocalCapabilities()
   // if using X, need to check if display is accessible.
   if (!SkipDisplayTest())
   {
-    Display* dId = XOpenDisplay((char*)NULL);
+    Display* dId = XOpenDisplay((char*)nullptr);
     if (dId)
     {
       XCloseDisplay(dId);

@@ -51,7 +51,7 @@ class PQCORE_EXPORT pqAnimationScene : public pqProxy
 
 public:
   pqAnimationScene(const QString& group, const QString& name, vtkSMProxy* proxy, pqServer* server,
-    QObject* parent = NULL);
+    QObject* parent = nullptr);
   ~pqAnimationScene() override;
 
   /**

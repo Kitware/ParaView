@@ -19,14 +19,10 @@
 #include "vtkPVDataInformation.h"
 
 //----------------------------------------------------------------------------
-vtkPVDataInformationHelper::vtkPVDataInformationHelper()
-{
-}
+vtkPVDataInformationHelper::vtkPVDataInformationHelper() = default;
 
 //----------------------------------------------------------------------------
-vtkPVDataInformationHelper::~vtkPVDataInformationHelper()
-{
-}
+vtkPVDataInformationHelper::~vtkPVDataInformationHelper() = default;
 
 //----------------------------------------------------------------------------
 void vtkPVDataInformationHelper::PrintSelf(ostream& os, vtkIndent indent)

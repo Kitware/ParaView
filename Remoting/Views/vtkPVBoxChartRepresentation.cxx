@@ -50,7 +50,7 @@ vtkPVBoxChartRepresentation::vtkPVBoxChartRepresentation()
 vtkPVBoxChartRepresentation::~vtkPVBoxChartRepresentation()
 {
   delete this->Internals;
-  this->Internals = NULL;
+  this->Internals = nullptr;
 }
 
 //----------------------------------------------------------------------------
@@ -80,7 +80,7 @@ bool vtkPVBoxChartRepresentation::RemoveFromView(vtkView* view)
 {
   if (this->GetChart())
   {
-    this->GetChart()->GetPlot(0)->SetInputData(0);
+    this->GetChart()->GetPlot(0)->SetInputData(nullptr);
     this->GetChart()->SetVisible(false);
   }
 
@@ -95,7 +95,7 @@ vtkChartBox* vtkPVBoxChartRepresentation::GetChart()
     return vtkChartBox::SafeDownCast(this->ContextView->GetContextItem());
   }
 
-  return 0;
+  return nullptr;
 }
 
 //----------------------------------------------------------------------------
@@ -117,7 +117,7 @@ void vtkPVBoxChartRepresentation::SetVisibility(bool visible)
 //----------------------------------------------------------------------------
 void vtkPVBoxChartRepresentation::SetSeriesVisibility(const char* series, bool visibility)
 {
-  assert(series != NULL);
+  assert(series != nullptr);
   this->Internals->SeriesVisibilities[series] = visibility;
   this->Modified();
 }
@@ -126,7 +126,7 @@ void vtkPVBoxChartRepresentation::SetSeriesVisibility(const char* series, bool v
 void vtkPVBoxChartRepresentation::SetSeriesColor(
   const char* seriesname, double r, double g, double b)
 {
-  assert(seriesname != NULL);
+  assert(seriesname != nullptr);
   this->Internals->SeriesColors[seriesname] = vtkColor3d(r, g, b);
   this->Modified();
 }
@@ -155,7 +155,7 @@ void vtkPVBoxChartRepresentation::PrepareForRendering()
   assert(plot);
 
   vtkTable* plotInput = this->GetLocalOutput();
-  chart->SetVisible(plotInput != NULL && this->GetVisibility());
+  chart->SetVisible(plotInput != nullptr && this->GetVisibility());
   chart->SetShowLegend(this->Legend);
 
   plot->GetPen()->SetWidth(this->LineThickness);

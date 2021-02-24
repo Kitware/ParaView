@@ -62,7 +62,7 @@ struct BaseOperation
   virtual bool canShowWidget(bool show_advanced) const = 0;
   virtual bool enableWidget() const = 0;
 
-  virtual ~BaseOperation() {}
+  virtual ~BaseOperation() = default;
 };
 
 template <typename BinaryOperation, bool init_value, bool default_value = init_value>
@@ -196,9 +196,7 @@ pqCompositePropertyWidgetDecorator::pqCompositePropertyWidgetDecorator(
 }
 
 //-----------------------------------------------------------------------------
-pqCompositePropertyWidgetDecorator::~pqCompositePropertyWidgetDecorator()
-{
-}
+pqCompositePropertyWidgetDecorator::~pqCompositePropertyWidgetDecorator() = default;
 
 //-----------------------------------------------------------------------------
 bool pqCompositePropertyWidgetDecorator::canShowWidget(bool show_advanced) const

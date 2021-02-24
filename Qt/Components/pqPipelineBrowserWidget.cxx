@@ -88,9 +88,7 @@ pqPipelineBrowserWidget::pqPipelineBrowserWidget(QWidget* parentObject)
 }
 
 //-----------------------------------------------------------------------------
-pqPipelineBrowserWidget::~pqPipelineBrowserWidget()
-{
-}
+pqPipelineBrowserWidget::~pqPipelineBrowserWidget() = default;
 
 //-----------------------------------------------------------------------------
 void pqPipelineBrowserWidget::configureModel()
@@ -196,8 +194,8 @@ void pqPipelineBrowserWidget::handleIndexClicked(const QModelIndex& index_)
     if (port)
     {
       pqView* activeView = pqActiveObjects::instance().activeView();
-      vtkSMViewProxy* viewProxy = activeView ? activeView->getViewProxy() : NULL;
-      bool cur_state = (viewProxy == NULL
+      vtkSMViewProxy* viewProxy = activeView ? activeView->getViewProxy() : nullptr;
+      bool cur_state = (viewProxy == nullptr
           ? false
           : (controller->GetVisibility(port->getSourceProxy(), port->getPortNumber(), viewProxy)));
 
@@ -317,7 +315,7 @@ void pqPipelineBrowserWidget::setVisibility(bool visible, pqOutputPort* port)
     auto& activeObjects = pqActiveObjects::instance();
     vtkNew<vtkSMParaViewPipelineControllerWithRendering> controller;
     pqView* activeView = activeObjects.activeView();
-    vtkSMViewProxy* viewProxy = activeView ? activeView->getViewProxy() : NULL;
+    vtkSMViewProxy* viewProxy = activeView ? activeView->getViewProxy() : nullptr;
     int scalarBarMode = vtkPVGeneralSettings::GetInstance()->GetScalarBarMode();
 
     if (pqLiveInsituManager::isInsituServer(port->getServer()))
@@ -428,7 +426,7 @@ void pqPipelineBrowserWidget::disableSessionFilter()
 }
 
 //----------------------------------------------------------------------------
-const QModelIndex pqPipelineBrowserWidget::pipelineModelIndex(const QModelIndex& index) const
+QModelIndex pqPipelineBrowserWidget::pipelineModelIndex(const QModelIndex& index) const
 {
   if (qobject_cast<const pqPipelineModel*>(index.model()))
   {

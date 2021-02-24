@@ -23,14 +23,10 @@
 
 vtkStandardNewMacro(vtkSMDimensionsDomain);
 //----------------------------------------------------------------------------
-vtkSMDimensionsDomain::vtkSMDimensionsDomain()
-{
-}
+vtkSMDimensionsDomain::vtkSMDimensionsDomain() = default;
 
 //----------------------------------------------------------------------------
-vtkSMDimensionsDomain::~vtkSMDimensionsDomain()
-{
-}
+vtkSMDimensionsDomain::~vtkSMDimensionsDomain() = default;
 
 //----------------------------------------------------------------------------
 void vtkSMDimensionsDomain::Update(vtkSMProperty*)

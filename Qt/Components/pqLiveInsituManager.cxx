@@ -114,7 +114,7 @@ vtkIdType pqLiveInsituManager::INVALID_TIME_STEP = std::numeric_limits<vtkIdType
 //-----------------------------------------------------------------------------
 pqLiveInsituManager* pqLiveInsituManager::instance()
 {
-  static pqLiveInsituManager* s_liveInsituManager = NULL;
+  static pqLiveInsituManager* s_liveInsituManager = nullptr;
   if (!s_liveInsituManager)
   {
     s_liveInsituManager = new pqLiveInsituManager();
@@ -129,7 +129,7 @@ pqLiveInsituManager::pqLiveInsituManager()
   , BreakpointTimeStep(INVALID_TIME_STEP)
   , TimeStep(INVALID_TIME_STEP)
 {
-  pqLiveInsituEventPlayer* player = new pqLiveInsituEventPlayer(NULL);
+  pqLiveInsituEventPlayer* player = new pqLiveInsituEventPlayer(nullptr);
   player->Manager = this;
   // the testUtility takes ownership of the player.
   pqApplicationCore::instance()->testUtility()->eventPlayer()->addWidgetEventPlayer(player);
@@ -195,7 +195,7 @@ pqServer* pqLiveInsituManager::selectedInsituServer()
         return server;
       }
     }
-    return NULL;
+    return nullptr;
   }
 }
 
@@ -211,7 +211,7 @@ vtkSMLiveInsituLinkProxy* pqLiveInsituManager::linkProxy(pqServer* insituSession
       return proxy;
     }
   }
-  return NULL;
+  return nullptr;
 }
 
 //-----------------------------------------------------------------------------
@@ -219,7 +219,7 @@ pqLiveInsituVisualizationManager* pqLiveInsituManager::connect(pqServer* server,
 {
   if (!server)
   {
-    return NULL;
+    return nullptr;
   }
   ManagersType::iterator it = this->Managers.find(server);
   if (it == this->Managers.end())
@@ -236,7 +236,7 @@ pqLiveInsituVisualizationManager* pqLiveInsituManager::connect(pqServer* server,
       if (!user_ok)
       {
         // user cancelled.
-        return NULL;
+        return nullptr;
       }
     }
 
@@ -316,7 +316,7 @@ pqPipelineSource* pqLiveInsituManager::pipelineSource(pqServer* insituSession)
     return pqApplicationCore::instance()->getServerManagerModel()->findItem<pqPipelineSource*>(
       proxy);
   }
-  return NULL;
+  return nullptr;
 }
 
 //-----------------------------------------------------------------------------

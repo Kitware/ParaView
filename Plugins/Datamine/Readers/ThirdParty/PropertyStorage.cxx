@@ -57,19 +57,13 @@ PropertyItem::PropertyItem(
       break;
   }
 }
-PropertyItem::~PropertyItem()
-{
-}
+PropertyItem::~PropertyItem() = default;
 
 // --------------------------------------
-PropertyStorage::PropertyStorage()
-{
-}
+PropertyStorage::PropertyStorage() = default;
 
 // --------------------------------------
-PropertyStorage::~PropertyStorage()
-{
-}
+PropertyStorage::~PropertyStorage() = default;
 
 // --------------------------------------
 void PropertyStorage::AddProperty(
@@ -163,14 +157,14 @@ void PropertyStorage::PushToDataSet(vtkDataSet* dataSet)
     size = item.Storage->GetNumberOfValues();
     if (numPoints == size)
     {
-      if (dataSet->GetPointData()->GetAbstractArray(item.name.c_str()) == NULL)
+      if (dataSet->GetPointData()->GetAbstractArray(item.name.c_str()) == nullptr)
       {
         dataSet->GetPointData()->AddArray(item.Storage);
       }
     }
     else
     {
-      if (dataSet->GetCellData()->GetAbstractArray(item.name.c_str()) == NULL)
+      if (dataSet->GetCellData()->GetAbstractArray(item.name.c_str()) == nullptr)
       {
         dataSet->GetCellData()->AddArray(item.Storage);
       }

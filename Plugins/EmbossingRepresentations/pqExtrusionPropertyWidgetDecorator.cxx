@@ -44,8 +44,8 @@ pqExtrusionPropertyWidgetDecorator::pqExtrusionPropertyWidgetDecorator(
   : Superclass(config, parentObject)
 {
   vtkSMProxy* proxy = parentObject->proxy();
-  this->ObservedObject1 = proxy ? proxy->GetProperty("ExtrusionNormalizeData") : NULL;
-  this->ObservedObject2 = proxy ? proxy->GetProperty("ExtrusionAutoScaling") : NULL;
+  this->ObservedObject1 = proxy ? proxy->GetProperty("ExtrusionNormalizeData") : nullptr;
+  this->ObservedObject2 = proxy ? proxy->GetProperty("ExtrusionAutoScaling") : nullptr;
 
   if (!this->ObservedObject1)
   {

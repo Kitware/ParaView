@@ -412,7 +412,7 @@ vtkTypeUInt32 vtkSMRepresentationProxy::GetGlobalID()
 {
   bool has_gid = this->HasGlobalID();
 
-  if (!has_gid && this->Session != NULL)
+  if (!has_gid && this->Session != nullptr)
   {
     // reserve 1+MAX_NUMBER_OF_INTERNAL_REPRESENTATIONS contiguous IDs for the source proxies and
     // possible extract
@@ -430,7 +430,7 @@ bool vtkSMRepresentationProxy::SetRepresentationType(const char* type)
   {
     auto sld = property->FindDomain<vtkSMStringListDomain>();
     unsigned int tmp;
-    if (sld != NULL && sld->IsInDomain(type, tmp) == 0)
+    if (sld != nullptr && sld->IsInDomain(type, tmp) == 0)
     {
       // Let's not warn about this. Let the caller decide if this is an
       // error/warning.

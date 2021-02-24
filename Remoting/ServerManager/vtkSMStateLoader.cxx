@@ -70,7 +70,7 @@ struct vtkSMStateLoaderInternals
 vtkSMStateLoader::vtkSMStateLoader()
 {
   this->Internal = new vtkSMStateLoaderInternals;
-  this->ServerManagerStateElement = 0;
+  this->ServerManagerStateElement = nullptr;
   this->KeepIdMapping = 0;
   this->ProxyLocator = vtkSMProxyLocator::New();
 }
@@ -78,9 +78,9 @@ vtkSMStateLoader::vtkSMStateLoader()
 //---------------------------------------------------------------------------
 vtkSMStateLoader::~vtkSMStateLoader()
 {
-  this->SetProxyLocator(0);
-  this->ServerManagerStateElement = 0;
-  this->ProxyLocator = 0;
+  this->SetProxyLocator(nullptr);
+  this->ServerManagerStateElement = nullptr;
+  this->ProxyLocator = nullptr;
   delete this->Internal;
 }
 
@@ -91,11 +91,11 @@ vtkSMProxy* vtkSMStateLoader::LocateExistingProxyUsingRegistrationName(vtkTypeUI
     this->Internal->RegistrationInformation.find(id);
   if (iter == this->Internal->RegistrationInformation.end())
   {
-    return NULL;
+    return nullptr;
   }
 
   vtkSMSessionProxyManager* pxm = this->GetSessionProxyManager();
-  assert(pxm != NULL);
+  assert(pxm != nullptr);
 
   vtkSMStateLoaderInternals::VectorOfRegInfo::iterator iter2;
   for (iter2 = iter->second.begin(); iter2 != iter->second.end(); iter2++)
@@ -107,7 +107,7 @@ vtkSMProxy* vtkSMStateLoader::LocateExistingProxyUsingRegistrationName(vtkTypeUI
     }
   }
 
-  return NULL;
+  return nullptr;
 }
 
 //-----------------------------------------------------------------------------
@@ -115,7 +115,7 @@ vtkSMProxy* vtkSMStateLoader::CreateProxy(
   const char* xml_group, const char* xml_name, const char* subProxyName)
 {
   vtkSMSessionProxyManager* pxm = this->GetSessionProxyManager();
-  assert(pxm != NULL);
+  assert(pxm != nullptr);
 
   //**************************************************************************
   // This is temporary code until we clean up time-keeper and animation scene
@@ -256,14 +256,14 @@ void vtkSMStateLoader::RegisterProxy(vtkTypeUInt32 id, vtkSMProxy* proxy)
 void vtkSMStateLoader::RegisterProxyInternal(
   const char* cgroup, const char* cname, vtkSMProxy* proxy)
 {
-  assert(cgroup != NULL && cname != NULL);
+  assert(cgroup != nullptr && cname != nullptr);
 
   std::string group(cgroup);
   std::string name(cname);
   if (this->UpdateRegistrationInfo(group, name, proxy))
   {
     vtkSMSessionProxyManager* pxm = this->GetSessionProxyManager();
-    assert(pxm != NULL);
+    assert(pxm != nullptr);
     if (pxm->GetProxyName(group.c_str(), proxy))
     {
       // Don't re-register a proxy in the same group.
@@ -299,7 +299,7 @@ bool vtkSMStateLoader::UpdateRegistrationInfo(
     if (name.substr(0, separateLen) == separatePrefix)
     {
       // This will change any "Separate_OLDGID_ArrayName" into "Separate_NEWGID_ArrayName"
-      size_t gidLen = name.find_first_of("_", separateLen) - separateLen;
+      size_t gidLen = name.find_first_of('_', separateLen) - separateLen;
       std::string gidStr = name.substr(separateLen, gidLen);
       vtkTypeUInt32 gid = static_cast<vtkTypeUInt32>(std::atoi(gidStr.c_str()));
       if (vtkSMProxy* helpedProxy = this->ProxyLocator->LocateProxy(gid))
@@ -325,7 +325,7 @@ vtkPVXMLElement* vtkSMStateLoader::LocateProxyElementInternal(
   if (!root)
   {
     vtkErrorMacro("No root is defined. Cannot locate proxy element with id " << id_);
-    return 0;
+    return nullptr;
   }
   vtkIdType id = static_cast<vtkIdType>(id_);
 
@@ -360,7 +360,7 @@ vtkPVXMLElement* vtkSMStateLoader::LocateProxyElementInternal(
     }
   }
 
-  return 0;
+  return nullptr;
 }
 
 //---------------------------------------------------------------------------
@@ -450,7 +450,7 @@ int vtkSMStateLoader::HandleProxyCollection(vtkPVXMLElement* collectionElement)
 void vtkSMStateLoader::HandleCustomProxyDefinitions(vtkPVXMLElement* element)
 {
   vtkSMSessionProxyManager* pm = this->GetSessionProxyManager();
-  assert(pm != NULL);
+  assert(pm != nullptr);
   pm->LoadCustomProxyDefinitions(element);
 }
 
@@ -458,7 +458,7 @@ void vtkSMStateLoader::HandleCustomProxyDefinitions(vtkPVXMLElement* element)
 int vtkSMStateLoader::HandleLinks(vtkPVXMLElement* element)
 {
   vtkSMSessionProxyManager* pxm = this->GetSessionProxyManager();
-  assert(pxm != NULL);
+  assert(pxm != nullptr);
 
   unsigned int numElems = element->GetNumberOfNestedElements();
   for (unsigned int cc = 0; cc < numElems; cc++)
@@ -470,14 +470,14 @@ int vtkSMStateLoader::HandleLinks(vtkPVXMLElement* element)
     if (name && linkname)
     {
       vtkSMLink* link = pxm->GetRegisteredLink(linkname);
-      if (link == NULL)
+      if (link == nullptr)
       {
         std::string classname = "vtkSM";
         classname += name;
         vtkSmartPointer<vtkObjectBase> obj;
         obj.TakeReference(vtkClientServerStreamInstantiator::CreateInstance(classname.c_str()));
         link = vtkSMLink::SafeDownCast(obj);
-        if (link == NULL)
+        if (link == nullptr)
         {
           vtkWarningMacro("Failed to create object for link (name="
             << name << "). Expected type was " << classname.c_str() << ". Skipping.");
@@ -485,7 +485,7 @@ int vtkSMStateLoader::HandleLinks(vtkPVXMLElement* element)
         }
         pxm->RegisterLink(linkname, link);
       }
-      assert(link != NULL);
+      assert(link != nullptr);
       if (!link->LoadXMLState(currentElement, this->ProxyLocator))
       {
         return 0;
@@ -527,7 +527,7 @@ int vtkSMStateLoader::LoadState(vtkPVXMLElement* elem, bool keepOriginalId)
   }
 
   vtkSMSessionProxyManager* pxm = this->GetSessionProxyManager();
-  if (pxm == NULL)
+  if (pxm == nullptr)
   {
     vtkErrorMacro("Cannot load state without a ProxyManager");
     return 0;
@@ -541,7 +541,7 @@ int vtkSMStateLoader::LoadState(vtkPVXMLElement* elem, bool keepOriginalId)
 
   this->ProxyLocator->SetDeserializer(this);
   int ret = this->LoadStateInternal(elem);
-  this->ProxyLocator->SetDeserializer(0);
+  this->ProxyLocator->SetDeserializer(nullptr);
 
   // BUG #10650. When animation scene time ranges are read from the state, they
   // often override those that the timekeeper painstakingly computed. Here we
@@ -634,7 +634,7 @@ int vtkSMStateLoader::LoadStateInternal(vtkPVXMLElement* parent)
   {
     vtkPVXMLElement* currentElement = rootElement->GetNestedElement(i);
     const char* name = currentElement->GetName();
-    if (name != NULL && strcmp(name, "ProxyCollection") == 0)
+    if (name != nullptr && strcmp(name, "ProxyCollection") == 0)
     {
       const char* group_name = currentElement->GetAttributeOrEmpty("name");
       if (strcmp(group_name, "animation") == 0 || strcmp(group_name, "timekeeper") == 0)
@@ -727,7 +727,7 @@ int vtkSMStateLoader::LoadStateInternal(vtkPVXMLElement* parent)
   // Clear internal data structures.
   this->Internal->ProxyCreationOrder.clear();
   this->Internal->RegistrationInformation.clear();
-  this->ServerManagerStateElement = 0;
+  this->ServerManagerStateElement = nullptr;
   return 1;
 }
 

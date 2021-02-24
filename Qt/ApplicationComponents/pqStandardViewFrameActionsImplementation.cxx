@@ -101,7 +101,7 @@ QAction* findActiveAction(const QString& name)
   {
     return activeView->widget()->parentWidget()->parentWidget()->findChild<QAction*>(name);
   }
-  return NULL;
+  return nullptr;
 }
 
 void triggerAction(const QString& name)
@@ -160,8 +160,8 @@ pqStandardViewFrameActionsImplementation::~pqStandardViewFrameActionsImplementat
 //-----------------------------------------------------------------------------
 void pqStandardViewFrameActionsImplementation::frameConnected(pqViewFrame* frame, pqView* view)
 {
-  assert(frame != NULL);
-  if (view == NULL)
+  assert(frame != nullptr);
+  if (view == nullptr)
   {
     // Setup the UI shown when no view is present in the frame.
     QWidget* empty_frame = new QWidget(frame);
@@ -242,9 +242,9 @@ QActionGroup* pqStandardViewFrameActionsImplementation::addSelectionModifierActi
   assert(view);
   assert(frame);
 
-  QAction* toggleAction = NULL;
-  QAction* minusAction = NULL;
-  QAction* plusAction = NULL;
+  QAction* toggleAction = nullptr;
+  QAction* minusAction = nullptr;
+  QAction* plusAction = nullptr;
 
   this->addSeparator(frame, view);
 
@@ -628,7 +628,7 @@ bool pqStandardViewFrameActionsImplementation::isButtonVisible(
     {
       // Turn all actions off *unless* the button has been
       // explicitly enabled by listing them as child elements
-      isVisible = isVisible && buttonElement != NULL;
+      isVisible = isVisible && buttonElement != nullptr;
     }
   }
 

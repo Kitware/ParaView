@@ -33,15 +33,15 @@ vtkCameraManipulator::vtkCameraManipulator()
   this->RotationFactor = 1.0;
   this->DisplayCenter[0] = this->DisplayCenter[1] = 0.0;
 
-  this->ManipulatorName = 0;
-  this->GUIHelper = 0;
+  this->ManipulatorName = nullptr;
+  this->GUIHelper = nullptr;
 }
 
 //-------------------------------------------------------------------------
 vtkCameraManipulator::~vtkCameraManipulator()
 {
-  this->SetManipulatorName(0);
-  this->SetGUIHelper(0);
+  this->SetManipulatorName(nullptr);
+  this->SetGUIHelper(nullptr);
 }
 
 //-------------------------------------------------------------------------

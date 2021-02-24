@@ -38,7 +38,7 @@ vtkCxxSetObjectMacro(vtkAMRStreamingPriorityQueue, Controller, vtkMultiProcessCo
 vtkAMRStreamingPriorityQueue::vtkAMRStreamingPriorityQueue()
 {
   this->Internals = new vtkInternals();
-  this->Controller = 0;
+  this->Controller = nullptr;
   this->SetController(vtkMultiProcessController::GetGlobalController());
 }
 
@@ -46,8 +46,8 @@ vtkAMRStreamingPriorityQueue::vtkAMRStreamingPriorityQueue()
 vtkAMRStreamingPriorityQueue::~vtkAMRStreamingPriorityQueue()
 {
   delete this->Internals;
-  this->Internals = 0;
-  this->SetController(0);
+  this->Internals = nullptr;
+  this->SetController(nullptr);
 }
 
 //----------------------------------------------------------------------------

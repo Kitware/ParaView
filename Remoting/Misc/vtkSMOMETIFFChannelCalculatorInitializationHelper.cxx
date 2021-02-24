@@ -73,15 +73,11 @@ void setupDefault(int channelNumber, vtkSMProxy* lut)
 vtkStandardNewMacro(vtkSMOMETIFFChannelCalculatorInitializationHelper);
 //----------------------------------------------------------------------------
 vtkSMOMETIFFChannelCalculatorInitializationHelper::
-  vtkSMOMETIFFChannelCalculatorInitializationHelper()
-{
-}
+  vtkSMOMETIFFChannelCalculatorInitializationHelper() = default;
 
 //----------------------------------------------------------------------------
 vtkSMOMETIFFChannelCalculatorInitializationHelper::
-  ~vtkSMOMETIFFChannelCalculatorInitializationHelper()
-{
-}
+  ~vtkSMOMETIFFChannelCalculatorInitializationHelper() = default;
 
 //----------------------------------------------------------------------------
 void vtkSMOMETIFFChannelCalculatorInitializationHelper::PostInitializeProxy(

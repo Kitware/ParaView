@@ -204,9 +204,7 @@ pqDataAssemblyTreeModel::pqDataAssemblyTreeModel(QObject* parentObject)
 }
 
 //-----------------------------------------------------------------------------
-pqDataAssemblyTreeModel::~pqDataAssemblyTreeModel()
-{
-}
+pqDataAssemblyTreeModel::~pqDataAssemblyTreeModel() = default;
 
 //-----------------------------------------------------------------------------
 void pqDataAssemblyTreeModel::setDataAssembly(vtkDataAssembly* assembly)

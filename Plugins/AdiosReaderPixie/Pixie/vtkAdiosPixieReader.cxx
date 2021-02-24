@@ -47,7 +47,7 @@ public:
   Internals(vtkAdiosPixieReader* owner)
   {
     this->Owner = owner;
-    this->MeshFile = NULL;
+    this->MeshFile = nullptr;
 
     // Manage piece information
     vtkMultiProcessController* ctrl = vtkMultiProcessController::GetGlobalController();
@@ -61,7 +61,7 @@ public:
     if (this->MeshFile)
     {
       delete this->MeshFile;
-      this->MeshFile = NULL;
+      this->MeshFile = nullptr;
     }
   }
   // --------------------------------------------------------------------------
@@ -109,7 +109,7 @@ public:
     {
       if (strcmp(currentFileName, this->MeshFile->GetFileName()) != 0)
       {
-        delete this->MeshFile; // not NULL because we are in the else
+        delete this->MeshFile; // not nullptr because we are in the else
         this->MeshFile =
           new AdiosStream(currentFileName, this->Method, this->Owner->GetParameters());
 
@@ -133,8 +133,8 @@ vtkStandardNewMacro(vtkAdiosPixieReader);
 //----------------------------------------------------------------------------
 vtkAdiosPixieReader::vtkAdiosPixieReader()
 {
-  this->FileName = NULL;
-  this->Parameters = NULL;
+  this->FileName = nullptr;
+  this->Parameters = nullptr;
   this->SetParameters("");
   this->Internal = new Internals(this);
   this->SetNumberOfInputPorts(0);
@@ -144,12 +144,12 @@ vtkAdiosPixieReader::vtkAdiosPixieReader()
 //----------------------------------------------------------------------------
 vtkAdiosPixieReader::~vtkAdiosPixieReader()
 {
-  this->SetFileName(NULL);
-  this->SetParameters(NULL);
+  this->SetFileName(nullptr);
+  this->SetParameters(nullptr);
   if (this->Internal)
   {
     delete this->Internal;
-    this->Internal = NULL;
+    this->Internal = nullptr;
   }
 }
 

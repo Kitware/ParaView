@@ -37,7 +37,7 @@ vtkSMPythonViewProxy::vtkSMPythonViewProxy()
 //----------------------------------------------------------------------------
 vtkSMPythonViewProxy::~vtkSMPythonViewProxy()
 {
-  this->InteractorHelper->SetViewProxy(NULL);
+  this->InteractorHelper->SetViewProxy(nullptr);
   this->InteractorHelper->CleanupInteractor();
 }
 
@@ -63,7 +63,7 @@ vtkRenderer* vtkSMPythonViewProxy::GetRenderer()
 {
   this->CreateVTKObjects();
   vtkPythonView* pv = vtkPythonView::SafeDownCast(this->GetClientSideObject());
-  return pv ? pv->GetRenderer() : NULL;
+  return pv ? pv->GetRenderer() : nullptr;
 }
 
 //----------------------------------------------------------------------------
@@ -71,7 +71,7 @@ vtkRenderWindow* vtkSMPythonViewProxy::GetRenderWindow()
 {
   this->CreateVTKObjects();
   vtkPythonView* pv = vtkPythonView::SafeDownCast(this->GetClientSideObject());
-  return pv ? pv->GetRenderWindow() : NULL;
+  return pv ? pv->GetRenderWindow() : nullptr;
 }
 
 //----------------------------------------------------------------------------

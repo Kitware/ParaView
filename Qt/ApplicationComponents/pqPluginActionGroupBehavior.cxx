@@ -54,7 +54,7 @@ QAction* findExitAction(QMenu* menu)
       return action;
     }
   }
-  return NULL;
+  return nullptr;
 }
 
 QAction* findHelpMenuAction(QMenuBar* menubar)
@@ -69,7 +69,7 @@ QAction* findHelpMenuAction(QMenuBar* menubar)
       return existingMenuAction;
     }
   }
-  return NULL;
+  return nullptr;
 }
 }
 
@@ -114,7 +114,7 @@ void pqPluginActionGroupBehavior::addPluginInterface(QObject* iface)
   }
   else if (splitName.size() == 2 && splitName[0] == "MenuBar")
   {
-    QMenu* menu = NULL;
+    QMenu* menu = nullptr;
     QList<QAction*> menuBarActions = mainWindow->menuBar()->actions();
     foreach (QAction* existingMenuAction, menuBarActions)
     {
@@ -132,7 +132,7 @@ void pqPluginActionGroupBehavior::addPluginInterface(QObject* iface)
 
       // Add to existing menu (before exit action, if exists).
       QAction* a;
-      if (exitAction == NULL)
+      if (exitAction == nullptr)
       {
         menu->addSeparator();
       }
@@ -140,7 +140,7 @@ void pqPluginActionGroupBehavior::addPluginInterface(QObject* iface)
       {
         menu->insertAction(exitAction, a);
       }
-      if (exitAction != NULL)
+      if (exitAction != nullptr)
       {
         menu->insertSeparator(exitAction);
       }

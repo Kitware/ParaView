@@ -57,7 +57,7 @@ public:
   /**
   * constructor requires the proxy, property
   */
-  pqDoubleRangeWidget(QWidget* parent = NULL);
+  pqDoubleRangeWidget(QWidget* parent = nullptr);
   ~pqDoubleRangeWidget() override;
 
   // get the min range value

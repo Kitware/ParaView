@@ -18,14 +18,10 @@
 
 vtkStandardNewMacro(vtkSMObject);
 //---------------------------------------------------------------------------
-vtkSMObject::vtkSMObject()
-{
-}
+vtkSMObject::vtkSMObject() = default;
 
 //---------------------------------------------------------------------------
-vtkSMObject::~vtkSMObject()
-{
-}
+vtkSMObject::~vtkSMObject() = default;
 
 //---------------------------------------------------------------------------
 void vtkSMObject::PrintSelf(ostream& os, vtkIndent indent)

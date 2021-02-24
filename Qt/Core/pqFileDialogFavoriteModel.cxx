@@ -60,7 +60,7 @@ Q_GLOBAL_STATIC(pqFileDialogModelIconProvider, Icons);
 class pqFileDialogFavoriteModelFileInfo
 {
 public:
-  pqFileDialogFavoriteModelFileInfo() {}
+  pqFileDialogFavoriteModelFileInfo() = default;
 
   pqFileDialogFavoriteModelFileInfo(const QString& l, const QString& filepath, int t)
     : Label(l)

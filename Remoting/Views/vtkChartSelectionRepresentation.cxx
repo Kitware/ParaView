@@ -34,9 +34,7 @@ vtkChartSelectionRepresentation::vtkChartSelectionRepresentation()
 }
 
 //----------------------------------------------------------------------------
-vtkChartSelectionRepresentation::~vtkChartSelectionRepresentation()
-{
-}
+vtkChartSelectionRepresentation::~vtkChartSelectionRepresentation() = default;
 
 //----------------------------------------------------------------------------
 void vtkChartSelectionRepresentation::SetChartRepresentation(vtkChartRepresentation* repr)
@@ -68,7 +66,7 @@ bool vtkChartSelectionRepresentation::RemoveFromView(vtkView* view)
 {
   if (view == this->ContextView.GetPointer())
   {
-    this->ContextView = NULL;
+    this->ContextView = nullptr;
     this->EnableServerSideRendering = false;
     return this->Superclass::RemoveFromView(view);
   }
@@ -99,7 +97,7 @@ int vtkChartSelectionRepresentation::ProcessViewRequest(
   }
   else if (request == vtkPVView::REQUEST_RENDER())
   {
-    assert(this->ContextView != NULL);
+    assert(this->ContextView != nullptr);
     this->ContextView->SetSelection(this->ChartRepresentation,
       vtkSelection::SafeDownCast(vtkPVView::GetDeliveredPiece(ininfo, this)));
   }

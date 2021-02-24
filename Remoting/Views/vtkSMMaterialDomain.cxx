@@ -45,7 +45,7 @@ public:
     this->Watchee = nullptr;
 #endif
   }
-  ~vtkSMMaterialObserver() {}
+  ~vtkSMMaterialObserver() override = default;
 
   void Execute(vtkObject* vtkNotUsed(caller), unsigned long vtkNotUsed(eventid),
     void* vtkNotUsed(calldata)) override

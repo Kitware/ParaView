@@ -43,7 +43,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 pqFileChooserWidget::pqFileChooserWidget(QWidget* p)
   : QWidget(p)
-  , Server(NULL)
+  , Server(nullptr)
 {
   this->ForceSingleFile = false;
   this->UseDirectoryMode = false;
@@ -68,9 +68,7 @@ pqFileChooserWidget::pqFileChooserWidget(QWidget* p)
     SLOT(handleFileLineEditChanged(const QString&)));
 }
 
-pqFileChooserWidget::~pqFileChooserWidget()
-{
-}
+pqFileChooserWidget::~pqFileChooserWidget() = default;
 
 QStringList pqFileChooserWidget::filenames() const
 {

@@ -74,9 +74,7 @@ pqChooseColorPresetReaction::pqChooseColorPresetReaction(
 }
 
 //-----------------------------------------------------------------------------
-pqChooseColorPresetReaction::~pqChooseColorPresetReaction()
-{
-}
+pqChooseColorPresetReaction::~pqChooseColorPresetReaction() = default;
 
 //-----------------------------------------------------------------------------
 void pqChooseColorPresetReaction::setRepresentation(pqDataRepresentation* repr)

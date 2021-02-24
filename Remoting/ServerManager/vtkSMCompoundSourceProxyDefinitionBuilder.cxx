@@ -59,7 +59,7 @@ vtkSMCompoundSourceProxyDefinitionBuilder::vtkSMCompoundSourceProxyDefinitionBui
 vtkSMCompoundSourceProxyDefinitionBuilder::~vtkSMCompoundSourceProxyDefinitionBuilder()
 {
   delete this->Internals;
-  this->Internals = 0;
+  this->Internals = nullptr;
 }
 
 //----------------------------------------------------------------------------
@@ -145,7 +145,7 @@ vtkSMProxy* vtkSMCompoundSourceProxyDefinitionBuilder::GetProxy(unsigned int ind
       return iter->second;
     }
   }
-  return NULL;
+  return nullptr;
 }
 
 //----------------------------------------------------------------------------
@@ -157,7 +157,7 @@ vtkSMProxy* vtkSMCompoundSourceProxyDefinitionBuilder::GetProxy(const char* name
     return iter->second;
   }
 
-  return NULL;
+  return nullptr;
 }
 
 //----------------------------------------------------------------------------
@@ -172,7 +172,7 @@ const char* vtkSMCompoundSourceProxyDefinitionBuilder::GetProxyName(unsigned int
     }
   }
 
-  return NULL;
+  return nullptr;
 }
 
 //----------------------------------------------------------------------------
@@ -185,7 +185,7 @@ const char* vtkSMCompoundSourceProxyDefinitionBuilder::GetProxyName(unsigned int
 vtkPVXMLElement* vtkSMCompoundSourceProxyDefinitionBuilder::SaveDefinition(vtkPVXMLElement* root)
 {
   (void)root;
-  return NULL;
+  return nullptr;
 #ifdef FIXME
   vtkPVXMLElement* defElement = this->SaveState(0);
   defElement->SetName("CompoundSourceProxy");

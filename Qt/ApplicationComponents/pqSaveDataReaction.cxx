@@ -69,7 +69,7 @@ void pqSaveDataReaction::updateEnableState()
   pqActiveObjects& activeObjects = pqActiveObjects::instance();
   // TODO: also is there's a pending accept.
   pqOutputPort* port = activeObjects.activePort();
-  bool enable_state = (port != NULL);
+  bool enable_state = (port != nullptr);
   if (enable_state)
   {
     vtkSMWriterFactory* writerFactory = vtkSMProxyManager::GetProxyManager()->GetWriterFactory();

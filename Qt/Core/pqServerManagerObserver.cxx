@@ -100,9 +100,9 @@ void pqServerManagerObserver::connectionCreated(vtkObject*, unsigned long, void*
   vtkSMSessionProxyManager* proxyManager =
     vtkSMProxyManager::GetProxyManager()->GetSessionProxyManager(session);
   this->Internal->VTKConnect->Connect(proxyManager, vtkCommand::RegisterEvent, this,
-    SLOT(proxyRegistered(vtkObject*, unsigned long, void*, void*, vtkCommand*)), NULL, 1.0);
+    SLOT(proxyRegistered(vtkObject*, unsigned long, void*, void*, vtkCommand*)), nullptr, 1.0);
   this->Internal->VTKConnect->Connect(proxyManager, vtkCommand::UnRegisterEvent, this,
-    SLOT(proxyUnRegistered(vtkObject*, unsigned long, void*, void*, vtkCommand*)), NULL, 1.0);
+    SLOT(proxyUnRegistered(vtkObject*, unsigned long, void*, void*, vtkCommand*)), nullptr, 1.0);
   this->Internal->VTKConnect->Connect(proxyManager, vtkCommand::LoadStateEvent, this,
     SLOT(stateLoaded(vtkObject*, unsigned long, void*, void*)));
   this->Internal->VTKConnect->Connect(proxyManager, vtkCommand::SaveStateEvent, this,

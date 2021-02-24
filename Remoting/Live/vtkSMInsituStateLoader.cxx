@@ -19,14 +19,10 @@
 
 vtkStandardNewMacro(vtkSMInsituStateLoader);
 //----------------------------------------------------------------------------
-vtkSMInsituStateLoader::vtkSMInsituStateLoader()
-{
-}
+vtkSMInsituStateLoader::vtkSMInsituStateLoader() = default;
 
 //----------------------------------------------------------------------------
-vtkSMInsituStateLoader::~vtkSMInsituStateLoader()
-{
-}
+vtkSMInsituStateLoader::~vtkSMInsituStateLoader() = default;
 
 //----------------------------------------------------------------------------
 vtkSMProxy* vtkSMInsituStateLoader::NewProxy(vtkTypeUInt32 id, vtkSMProxyLocator* locator)
@@ -42,7 +38,7 @@ vtkSMProxy* vtkSMInsituStateLoader::NewProxy(vtkTypeUInt32 id, vtkSMProxyLocator
       {
         vtkErrorMacro("Failed to load state correctly.");
         proxy->Delete();
-        return 0;
+        return nullptr;
       }
       this->CreatedNewProxy(id, proxy);
       return proxy;

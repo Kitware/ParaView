@@ -65,7 +65,7 @@ pqLiveInsituVisualizationManager::pqLiveInsituVisualizationManager(
   : Superclass(server)
   , Internals(new pqInternals())
 {
-  assert(server != NULL);
+  assert(server != nullptr);
 
   this->Internals->DisplaySession = server;
 
@@ -79,7 +79,7 @@ pqLiveInsituVisualizationManager::pqLiveInsituVisualizationManager(
     core->getObjectBuilder()->createProxy("coprocessing", "LiveInsituLink", server, "coprocessing");
 
   vtkSMLiveInsituLinkProxy* adaptor = vtkSMLiveInsituLinkProxy::SafeDownCast(proxy);
-  assert(adaptor != NULL);
+  assert(adaptor != nullptr);
 
   vtkSMPropertyHelper(adaptor, "InsituPort").Set(connection_port);
   vtkSMPropertyHelper(adaptor, "ProcessType").Set("Visualization");
@@ -120,8 +120,9 @@ pqServer* pqLiveInsituVisualizationManager::displaySession() const
 //-----------------------------------------------------------------------------
 pqServer* pqLiveInsituVisualizationManager::displaySession(pqServer* server)
 {
-  pqServer* displayServer =
-    server ? qobject_cast<pqServer*>(server->property("DisplaySession").value<QObject*>()) : NULL;
+  pqServer* displayServer = server
+    ? qobject_cast<pqServer*>(server->property("DisplaySession").value<QObject*>())
+    : nullptr;
   return displayServer ? displayServer : server;
 }
 
@@ -141,12 +142,12 @@ pqLiveInsituVisualizationManager::~pqLiveInsituVisualizationManager()
     pxm->UnRegisterProxy("coprocessing",
       pxm->GetProxyName("coprocessing", this->Internals->LiveInsituLinkProxy),
       this->Internals->LiveInsituLinkProxy);
-    if (this->Internals->LiveInsituLinkProxy != NULL)
+    if (this->Internals->LiveInsituLinkProxy != nullptr)
     {
       qWarning("LiveInsituLinkProxy must have been unregistered and deleted by now."
                " Since it wasn't, it would imply a leak.");
     }
-    this->Internals->LiveInsituLinkProxy = 0;
+    this->Internals->LiveInsituLinkProxy = nullptr;
   }
 
   delete this->Internals;
@@ -161,8 +162,8 @@ vtkSMLiveInsituLinkProxy* pqLiveInsituVisualizationManager::getProxy() const
 //-----------------------------------------------------------------------------
 bool pqLiveInsituVisualizationManager::hasExtracts(pqOutputPort* port) const
 {
-  if (port == NULL || port->getServer() != this->Internals->InsituSession ||
-    this->Internals->LiveInsituLinkProxy == NULL)
+  if (port == nullptr || port->getServer() != this->Internals->InsituSession ||
+    this->Internals->LiveInsituLinkProxy == nullptr)
   {
     return false;
   }
@@ -229,7 +230,8 @@ bool pqLiveInsituVisualizationManager::addExtract(pqOutputPort* port)
 void pqLiveInsituVisualizationManager::sourceRemoved(pqPipelineSource* source)
 {
   if (source->getServer() != this->Internals->DisplaySession ||
-    !source->property("CATALYST_EXTRACT").toBool() || this->Internals->LiveInsituLinkProxy == NULL)
+    !source->property("CATALYST_EXTRACT").toBool() ||
+    this->Internals->LiveInsituLinkProxy == nullptr)
   {
     return;
   }

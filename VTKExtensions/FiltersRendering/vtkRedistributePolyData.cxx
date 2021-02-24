@@ -61,7 +61,7 @@ _TimerInfo timerInfo8;
 
 vtkRedistributePolyData::vtkRedistributePolyData()
 {
-  this->Controller = NULL;
+  this->Controller = nullptr;
   this->SetController(vtkMultiProcessController::GetGlobalController());
 
   this->ColorProc = 0;
@@ -69,7 +69,7 @@ vtkRedistributePolyData::vtkRedistributePolyData()
 
 vtkRedistributePolyData::~vtkRedistributePolyData()
 {
-  this->SetController(0);
+  this->SetController(nullptr);
 }
 
 int vtkRedistributePolyData::RequestData(vtkInformation* vtkNotUsed(request),
@@ -304,7 +304,7 @@ int vtkRedistributePolyData::RequestData(vtkInformation* vtkNotUsed(request),
     else
     {
       this->SendCellSizes(
-        startCell, stopCell, input, sendTo[i], numPointsSend[i], cellArraySize[i], NULL);
+        startCell, stopCell, input, sendTo[i], numPointsSend[i], cellArraySize[i], nullptr);
     }
 
   } // end of list of processors to send to
@@ -534,7 +534,7 @@ int vtkRedistributePolyData::RequestData(vtkInformation* vtkNotUsed(request),
     else
     {
       // ... sending ...
-      if (sendCellList == NULL)
+      if (sendCellList == nullptr)
       {
         for (type = 0; type < NUM_CELL_TYPES; type++)
         {
@@ -542,7 +542,7 @@ int vtkRedistributePolyData::RequestData(vtkInformation* vtkNotUsed(request),
           stopCell[type] = startCell[type] + sendNum[type][scntr] - 1;
         }
         this->SendCells(startCell, stopCell, input, output, sendTo[scntr], numPointsSend[scntr],
-          cellArraySize[scntr], NULL);
+          cellArraySize[scntr], nullptr);
       }
       else
       {
@@ -569,7 +569,7 @@ int vtkRedistributePolyData::RequestData(vtkInformation* vtkNotUsed(request),
   }
 
   input->Delete();
-  input = NULL;
+  input = nullptr;
 
 // eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee
 #if VTK_REDIST_DO_TIMING
@@ -641,12 +641,12 @@ void vtkRedistributePolyData::MakeSchedule(vtkPolyData* input, vtkCommSched* loc
 
   localSched->SendCount = 0;
   localSched->ReceiveCount = 0;
-  localSched->SendTo = NULL;
-  localSched->SendNumber = NULL;
-  localSched->ReceiveFrom = NULL;
-  localSched->ReceiveNumber = NULL;
-  localSched->SendCellList = NULL;
-  localSched->KeepCellList = NULL;
+  localSched->SendTo = nullptr;
+  localSched->SendNumber = nullptr;
+  localSched->ReceiveFrom = nullptr;
+  localSched->ReceiveNumber = nullptr;
+  localSched->SendCellList = nullptr;
+  localSched->KeepCellList = nullptr;
 }
 //*****************************************************************
 void vtkRedistributePolyData::OrderSchedule(vtkCommSched* localSched)
@@ -717,7 +717,7 @@ void vtkRedistributePolyData::OrderSchedule(vtkCommSched* localSched)
             sendNum[type][temporder] = tempid;
           }
 
-          if (sendCellList != NULL)
+          if (sendCellList != nullptr)
           {
             for (type = 0; type < NUM_CELL_TYPES; type++)
             {
@@ -980,7 +980,7 @@ void vtkRedistributePolyData::CopyCells(
   for (type = 0; type < NUM_CELL_TYPES; type++)
   {
     vtkIdType* fromIds = new vtkIdType[numCells[type]];
-    if (keepCellList != NULL)
+    if (keepCellList != nullptr)
     {
       for (cellId = 0; cellId < numCells[type]; cellId++)
       {
@@ -988,7 +988,7 @@ void vtkRedistributePolyData::CopyCells(
       }
     }
 
-    if (keepCellList == NULL)
+    if (keepCellList == nullptr)
     {
       vtkIdType startCell = 0;
       this->CopyCellBlockDataArrays(
@@ -1023,9 +1023,9 @@ void vtkRedistributePolyData::CopyCells(
   float* outputPointsArrayData = outputPointsArray->GetPointer(0);
 
   vtkPoints* inputPoints = input->GetPoints();
-  void* inputPointsArrayData = NULL;
+  void* inputPointsArrayData = nullptr;
   int pointsType = VTK_VOID;
-  if (inputPoints != NULL)
+  if (inputPoints != nullptr)
   {
     pointsType = inputPoints->GetData()->GetDataType();
     inputPointsArrayData = inputPoints->GetVoidPointer(0);
@@ -1102,7 +1102,7 @@ void vtkRedistributePolyData::CopyCells(
         }
         cellsOut->InsertNextCell(cell);
       }
-    } // end if section where keepCellList is null
+    } // end if section where keepCellList is nullptr
     else
     {
       for (vtkIdType id = 0; id < numCells[type]; id++)
@@ -1236,7 +1236,7 @@ void vtkRedistributePolyData::SendCellSizes(vtkIdType* startCell, vtkIdType* sto
       // for each cell that contains the number of
       // points in that cell.
 
-      if (sendCellList == NULL)
+      if (sendCellList == nullptr)
       {
         for (cellIter->GoToCell(startCell[type]); cellIter->GetCurrentCellId() <= stopCell[type];
              cellIter->GoToNextCell())
@@ -1346,7 +1346,7 @@ void vtkRedistributePolyData::SendCells(vtkIdType* startCell, vtkIdType* stopCel
     numCells[type] = stopCell[type] - startCell[type] + 1;
 
     // ... set output number of points to input number of points ...
-    if (sendCellList == NULL)
+    if (sendCellList == nullptr)
     {
       for (cellIter->GoToCell(startCell[type]); cellIter->GetCurrentCellId() <= stopCell[type];
            cellIter->GoToNextCell())
@@ -1409,7 +1409,7 @@ void vtkRedistributePolyData::SendCells(vtkIdType* startCell, vtkIdType* stopCel
           }
         } // end loop over npts
       }   // end loop over numCells
-    }     // end else where sendCellList isn't null
+    }     // end else where sendCellList isn't nullptr
     // Sanity check:
     assert(ptcntr[type] == ptr - ptrsav[type]);
   } // end of type loop
@@ -1433,7 +1433,7 @@ void vtkRedistributePolyData::SendCells(vtkIdType* startCell, vtkIdType* stopCel
   {
     vtkIdType cnt = 0;
     vtkIdType* fromIds = new vtkIdType[numCells[type]];
-    if (sendCellList != NULL)
+    if (sendCellList != nullptr)
     {
       for (cellId = startCell[type]; cellId <= stopCell[type]; cellId++)
       {
@@ -1446,7 +1446,7 @@ void vtkRedistributePolyData::SendCells(vtkIdType* startCell, vtkIdType* stopCel
     //   on all processors) ...
 
     int typetag = type; //(typetag = type for cells, =5 for points)
-    if (sendCellList == NULL)
+    if (sendCellList == nullptr)
     {
       this->SendCellBlockDataArrays(inputCellData, outputCellData, numCells[type], sendTo,
         startCell[type] + cellOffset, typetag);
@@ -1670,7 +1670,7 @@ void vtkRedistributePolyData::AllocateArrays(vtkDataArray* Data, vtkIdType numTo
 
   if (numToCopyTotal > 0)
   {
-    if (Data->WriteVoidPointer(0, numToCopyTotal * numComp) == 0)
+    if (Data->WriteVoidPointer(0, numToCopyTotal * numComp) == nullptr)
     {
       vtkErrorMacro("Error: can't alloc mem for data array");
     }
@@ -2030,14 +2030,14 @@ int vtkRedistributePolyData::DoubleCheckArrays(vtkPolyData* input)
       }
     }
     delete[] zeroSanity;
-    zeroSanity = NULL;
+    zeroSanity = nullptr;
 
     this->Controller->Send(&mismatch, 1, 0, 77433);
     this->Controller->Receive(&mismatch, 1, 0, 77434);
   }
 
   delete[] sanity;
-  sanity = NULL;
+  sanity = nullptr;
   if (mismatch)
   {
     return 0;
@@ -2051,7 +2051,7 @@ int vtkRedistributePolyData::DoubleCheckArrays(vtkPolyData* input)
 // It is possible that no cells could also cause trouble.
 void vtkRedistributePolyData::CompleteInputArrays(vtkPolyData* input)
 {
-  if (this->Controller == NULL)
+  if (this->Controller == nullptr)
   {
     vtkErrorMacro("Missing controller.");
     return;
@@ -2121,7 +2121,7 @@ void vtkRedistributePolyData::ReceiveInputArrays(vtkDataSetAttributes* attr, int
 {
   int j;
   int num = 0;
-  vtkDataArray* array = 0;
+  vtkDataArray* array = nullptr;
   char* name;
   int nameLength = 0;
   int type = 0;
@@ -2155,15 +2155,15 @@ void vtkRedistributePolyData::ReceiveInputArrays(vtkDataSetAttributes* attr, int
         this->Controller->Receive(name, nameLength, recFrom, 997248);
         array->SetName(name);
         delete[] name;
-        name = NULL;
+        name = nullptr;
       }
       else
       {
-        array->SetName(NULL);
+        array->SetName(nullptr);
       }
       index = attr->AddArray(array);
       array->Delete();
-      array = NULL;
+      array = nullptr;
     }
     this->Controller->Receive(&attributeType, 1, recFrom, 997249);
     this->Controller->Receive(&copyFlag, 1, recFrom, 997250);
@@ -2200,7 +2200,7 @@ void vtkRedistributePolyData::SendInputArrays(vtkDataSetAttributes* attr, int se
 
     this->Controller->Send(&numComps, 1, sendTo, 997246);
     name = array->GetName();
-    if (name == NULL)
+    if (name == nullptr)
     {
       nameLength = 0;
     }
@@ -2258,15 +2258,15 @@ void vtkRedistributePolyData::SendInputArrays(vtkDataSetAttributes* attr, int se
 vtkRedistributePolyData::vtkCommSched::vtkCommSched()
 {
   // ... initialize a communication schedule to do nothing ...
-  this->NumberOfCells = 0;
+  this->NumberOfCells = nullptr;
   this->SendCount = 0;
   this->ReceiveCount = 0;
-  this->SendTo = NULL;
-  this->SendNumber = NULL;
-  this->ReceiveFrom = NULL;
-  this->ReceiveNumber = NULL;
-  this->SendCellList = NULL;
-  this->KeepCellList = NULL;
+  this->SendTo = nullptr;
+  this->SendNumber = nullptr;
+  this->ReceiveFrom = nullptr;
+  this->ReceiveNumber = nullptr;
+  this->SendCellList = nullptr;
+  this->KeepCellList = nullptr;
 }
 
 //*****************************************************************
@@ -2279,29 +2279,29 @@ vtkRedistributePolyData::vtkCommSched::~vtkCommSched()
 
   for (type = 0; type < NUM_CELL_TYPES; type++)
   {
-    if (this->SendNumber != NULL)
+    if (this->SendNumber != nullptr)
     {
       delete[] this->SendNumber[type];
     }
-    if (this->ReceiveNumber != NULL)
+    if (this->ReceiveNumber != nullptr)
     {
       delete[] this->ReceiveNumber[type];
     }
 
-    if (this->SendCellList != NULL)
+    if (this->SendCellList != nullptr)
     {
       for (int i = 0; i < this->SendCount; i++)
       {
         delete[] this->SendCellList[i][type];
       }
     }
-    if (this->KeepCellList != NULL)
+    if (this->KeepCellList != nullptr)
     {
       delete[] this->KeepCellList[type];
     }
   }
 
-  if (this->SendCellList != NULL)
+  if (this->SendCellList != nullptr)
   {
     for (int i = 0; i < this->SendCount; i++)
     {

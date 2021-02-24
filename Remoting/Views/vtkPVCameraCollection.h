@@ -57,7 +57,7 @@ public:
   /**
    * Return camera at a particular index.
    * @param[in] index Index of added camera to return
-   * @returns camera or NULL if index is invalid.
+   * @returns camera or nullptr if index is invalid.
    */
   vtkCamera* GetCamera(int index);
 

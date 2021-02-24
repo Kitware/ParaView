@@ -46,7 +46,7 @@ vtkAbstractArray* vtkNewArray(vtkPVArrayInformation* aInfo)
     array->SetName(aInfo->GetName());
     return array;
   }
-  return NULL;
+  return nullptr;
 }
 
 void vtkSerialize(vtkClientServerStream& css, vtkDataSetAttributes* dsa)
@@ -145,7 +145,7 @@ vtkCompleteArrays::~vtkCompleteArrays()
   if (this->Controller)
   {
     this->Controller->UnRegister(this);
-    this->Controller = NULL;
+    this->Controller = nullptr;
   }
 }
 
@@ -350,7 +350,7 @@ void vtkCompleteArrays::CompleteArraysOnBlock(vtkDataSet* inputDS, vtkDataSet*& 
   {
     // Collected information from the remote processes.
 
-    // Process 0 may have a null block - get the data type from the process
+    // Process 0 may have a nullptr block - get the data type from the process
     // that has the data information and instantiate a placeholder block.
     int typeAndLength[2];
     this->Controller->Receive(typeAndLength, 2, infoProc, 389002);

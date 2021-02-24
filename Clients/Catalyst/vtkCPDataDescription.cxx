@@ -45,7 +45,7 @@ vtkCPDataDescription::vtkCPDataDescription()
   this->TimeStep = 0;
   this->IsTimeDataSet = false;
   this->ForceOutput = false;
-  this->UserData = NULL;
+  this->UserData = nullptr;
 
   this->Internals = new vtkInternals();
 }
@@ -53,9 +53,9 @@ vtkCPDataDescription::vtkCPDataDescription()
 //----------------------------------------------------------------------------
 vtkCPDataDescription::~vtkCPDataDescription()
 {
-  this->SetUserData(NULL);
+  this->SetUserData(nullptr);
   delete this->Internals;
-  this->Internals = 0;
+  this->Internals = nullptr;
 }
 
 //----------------------------------------------------------------------------
@@ -116,7 +116,7 @@ vtkCPInputDataDescription* vtkCPDataDescription::GetInputDescription(unsigned in
       return iter->second;
     }
   }
-  return NULL;
+  return nullptr;
 }
 
 //----------------------------------------------------------------------------
@@ -133,7 +133,7 @@ const char* vtkCPDataDescription::GetInputDescriptionName(unsigned int index)
     }
   }
 
-  return NULL;
+  return nullptr;
 }
 
 //----------------------------------------------------------------------------
@@ -145,7 +145,7 @@ vtkCPInputDataDescription* vtkCPDataDescription::GetInputDescriptionByName(const
   {
     return iter->second;
   }
-  return NULL;
+  return nullptr;
 }
 
 //----------------------------------------------------------------------------

@@ -51,7 +51,7 @@ static unsigned int GetCellPieceOffset(vtkInformation* pieceMetaData, vtkIdType 
     for (int kk = 0; kk < 4; kk++)
     {
       int num_values = pieceMetaData->Length(keys[kk]);
-      int* values = num_values > 0 ? pieceMetaData->Get(keys[kk]) : NULL;
+      int* values = num_values > 0 ? pieceMetaData->Get(keys[kk]) : nullptr;
       for (int cc = 1; cc < num_values; cc++)
       {
         if (element_id >= values[cc - 1] && element_id < values[cc])
@@ -69,7 +69,8 @@ static unsigned int GetPointPieceOffset(vtkInformation* pieceMetaData, vtkIdType
   if (pieceMetaData)
   {
     int num_values = pieceMetaData->Length(vtkPVGeometryFilter::POINT_OFFSETS());
-    int* values = num_values > 0 ? pieceMetaData->Get(vtkPVGeometryFilter::POINT_OFFSETS()) : NULL;
+    int* values =
+      num_values > 0 ? pieceMetaData->Get(vtkPVGeometryFilter::POINT_OFFSETS()) : nullptr;
     for (int cc = 1; cc < num_values; cc++)
     {
       if (element_id >= values[cc - 1] && element_id <= values[cc])
@@ -85,14 +86,10 @@ static unsigned int GetPointPieceOffset(vtkInformation* pieceMetaData, vtkIdType
 vtkStandardNewMacro(vtkSelectionConverter);
 
 //----------------------------------------------------------------------------
-vtkSelectionConverter::vtkSelectionConverter()
-{
-}
+vtkSelectionConverter::vtkSelectionConverter() = default;
 
 //----------------------------------------------------------------------------
-vtkSelectionConverter::~vtkSelectionConverter()
-{
-}
+vtkSelectionConverter::~vtkSelectionConverter() = default;
 
 //----------------------------------------------------------------------------
 void vtkSelectionConverter::Convert(vtkSelection* input, vtkSelection* output, int global_ids)
@@ -157,7 +154,7 @@ void vtkSelectionConverter::Convert(
   vtkDataObject* geometryFilterOutput = geomAlg->GetOutputDataObject(0);
   vtkDataSet* ds = vtkDataSet::SafeDownCast(geometryFilterOutput);
   vtkCompositeDataSet* cd = vtkCompositeDataSet::SafeDownCast(geometryFilterOutput);
-  vtkInformation* pieceMetaData = NULL;
+  vtkInformation* pieceMetaData = nullptr;
   bool is_amr = false;
   int amr_index[2] = { 0, 0 };
   if (cd)
@@ -193,7 +190,7 @@ void vtkSelectionConverter::Convert(
   vtkIdType numHits = inputList->GetNumberOfTuples() * inputList->GetNumberOfComponents();
 
   bool using_cell = false;
-  vtkIdTypeArray* originalIdsArray = NULL;
+  vtkIdTypeArray* originalIdsArray = nullptr;
   if (inputProperties->Get(vtkSelectionNode::FIELD_TYPE()) == vtkSelectionNode::POINT)
   {
     originalIdsArray =
@@ -317,7 +314,7 @@ vtkDataSet* vtkSelectionConverter::LocateDataSet(vtkCompositeDataIterator* iter,
     break;
   }
 
-  return NULL;
+  return nullptr;
 }
 
 //----------------------------------------------------------------------------

@@ -52,9 +52,7 @@ vtkPVDataRepresentation::vtkPVDataRepresentation()
 }
 
 //----------------------------------------------------------------------------
-vtkPVDataRepresentation::~vtkPVDataRepresentation()
-{
-}
+vtkPVDataRepresentation::~vtkPVDataRepresentation() = default;
 
 //----------------------------------------------------------------------------
 void vtkPVDataRepresentation::SetInputConnection(int port, vtkAlgorithmOutput* input)
@@ -252,7 +250,7 @@ int vtkPVDataRepresentation::RequestUpdateExtent(
   // ideally, extent and time information will come from the view in
   // REQUEST_UPDATE(), include view-time.
   vtkMultiProcessController* controller = vtkMultiProcessController::GetGlobalController();
-  for (int cc = 0; cc < this->GetNumberOfInputPorts() && controller != NULL; cc++)
+  for (int cc = 0; cc < this->GetNumberOfInputPorts() && controller != nullptr; cc++)
   {
     for (int kk = 0; kk < inputVector[cc]->GetNumberOfInformationObjects(); kk++)
     {
@@ -279,7 +277,7 @@ vtkAlgorithmOutput* vtkPVDataRepresentation::GetInternalOutputPort(int port, int
   vtkAlgorithmOutput* prevOutput = this->Superclass::GetInternalOutputPort(port, conn);
   if (!prevOutput)
   {
-    return 0;
+    return nullptr;
   }
 
   vtkTrivialProducer* prevProducer = static_cast<vtkTrivialProducer*>(prevOutput->GetProducer());
@@ -307,7 +305,7 @@ vtkAlgorithmOutput* vtkPVDataRepresentation::GetInternalOutputPort(int port, int
 //----------------------------------------------------------------------------
 bool vtkPVDataRepresentation::AddToView(vtkView* view)
 {
-  if (this->View != NULL)
+  if (this->View != nullptr)
   {
     vtkWarningMacro("Added representation has a non-null 'View'. "
                     "A representation cannot be added to two views at the same time!");
@@ -321,7 +319,7 @@ bool vtkPVDataRepresentation::RemoveFromView(vtkView* view)
 {
   if (this->View == view)
   {
-    this->View = NULL;
+    this->View = nullptr;
   }
   return this->Superclass::RemoveFromView(view);
 }

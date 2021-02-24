@@ -654,7 +654,7 @@ void vtkCPPythonScriptV2Helper::DoLive(int timestep, double time)
     vtkVLogF(PARAVIEW_LOG_CATALYST_VERBOSITY(), "live: creating vtkLiveInsituLink");
     internals.LiveLink.TakeReference(vtkLiveInsituLink::New());
     const std::string url = vtkSMPropertyHelper(this->Options, "CatalystLiveURL").GetAsString();
-    auto split_idx = url.find(":");
+    auto split_idx = url.find(':');
     std::string hostname;
     int port = -1;
     if (split_idx == std::string::npos)

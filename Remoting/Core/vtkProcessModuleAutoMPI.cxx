@@ -61,8 +61,8 @@ public:
   }
 
 private:
-  vtkGetFreePort() {}
-  ~vtkGetFreePort() override {}
+  vtkGetFreePort() = default;
+  ~vtkGetFreePort() override = default;
 };
 vtkStandardNewMacro(vtkGetFreePort);
 
@@ -73,7 +73,7 @@ void vtkCopy(std::vector<const char*>& dest, const std::vector<std::string>& src
   {
     dest[cc] = src[cc].c_str();
   }
-  dest.push_back(NULL);
+  dest.push_back(nullptr);
 }
 }
 
@@ -211,7 +211,7 @@ int vtkProcessModuleAutoMPIInternals::StartRemoteBuiltInSelf(
   const char* vtkNotUsed(servername), int port)
 {
   // Create a new server process structure
-  vtksysProcess* server = 0;
+  vtksysProcess* server = nullptr;
   server = vtksysProcess_New();
   if (!server)
   {

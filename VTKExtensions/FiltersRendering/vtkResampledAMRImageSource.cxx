@@ -39,7 +39,7 @@ static inline vtkIdType FindCell(vtkImageData* image, double point[3])
 {
   double pcoords[3];
   int subid = 0;
-  return image->vtkImageData::FindCell(point, NULL, -1, 0.1, subid, pcoords, NULL);
+  return image->vtkImageData::FindCell(point, nullptr, -1, 0.1, subid, pcoords, nullptr);
 }
 }
 
@@ -52,9 +52,7 @@ vtkResampledAMRImageSource::vtkResampledAMRImageSource()
 }
 
 //----------------------------------------------------------------------------
-vtkResampledAMRImageSource::~vtkResampledAMRImageSource()
-{
-}
+vtkResampledAMRImageSource::~vtkResampledAMRImageSource() = default;
 
 //----------------------------------------------------------------------------
 void vtkResampledAMRImageSource::Reset()
@@ -86,7 +84,7 @@ void vtkResampledAMRImageSource::UpdateResampledVolume(vtkOverlappingAMR* amr)
     // note: this iteration "naturally" goes from datasets at lower levels to
     // those at higher levels.
     vtkImageData* data = vtkImageData::SafeDownCast(iter->GetCurrentDataObject());
-    assert(data != NULL);
+    assert(data != nullptr);
 
     unsigned int level = iter->GetCurrentLevel();
     unsigned int index = iter->GetCurrentIndex();
@@ -202,12 +200,12 @@ bool vtkResampledAMRImageSource::Initialize(vtkOverlappingAMR* amr)
   vtkStreamingStatusMacro(
     "Volume Dimensions: " << dimensions[0] << ", " << dimensions[1] << ", " << dimensions[2]);
 
-  // locate first non-null uniform grid in the AMR. That's the one we use to
+  // locate first non-nullptr uniform grid in the AMR. That's the one we use to
   // model the field arrays.
-  vtkImageData* reference = NULL;
-  for (unsigned int level = 0; reference == NULL && level < amr->GetNumberOfLevels(); level++)
+  vtkImageData* reference = nullptr;
+  for (unsigned int level = 0; reference == nullptr && level < amr->GetNumberOfLevels(); level++)
   {
-    for (unsigned int index = 0; reference == NULL && index < amr->GetNumberOfDataSets(level);
+    for (unsigned int index = 0; reference == nullptr && index < amr->GetNumberOfDataSets(level);
          index++)
     {
       reference = amr->GetDataSet(level, index);
@@ -237,7 +235,7 @@ bool vtkResampledAMRImageSource::Initialize(vtkOverlappingAMR* amr)
   }
   else
   {
-    this->ResampledAMRPointData = NULL;
+    this->ResampledAMRPointData = nullptr;
   }
 
   // Generate a mask array that's used to keep track of which point comes from
@@ -265,14 +263,14 @@ bool vtkResampledAMRImageSource::Initialize(vtkOverlappingAMR* amr)
   dualGrid->GetPointData()->PassData(output->GetCellData());
 
   // Pass arrays from this->ResampledAMRPointData to  the dualGrid as well.
-  for (int cc = 0;
-       this->ResampledAMRPointData != NULL && cc < this->ResampledAMRPointData->GetNumberOfArrays();
+  for (int cc = 0; this->ResampledAMRPointData != nullptr &&
+       cc < this->ResampledAMRPointData->GetNumberOfArrays();
        cc++)
   {
     vtkAbstractArray* curArray = this->ResampledAMRPointData->GetAbstractArray(cc);
 
     if (curArray && curArray->GetName() &&
-      dualGrid->GetPointData()->GetAbstractArray(curArray->GetName()) == NULL)
+      dualGrid->GetPointData()->GetAbstractArray(curArray->GetName()) == nullptr)
     {
       dualGrid->GetPointData()->AddArray(curArray);
     }

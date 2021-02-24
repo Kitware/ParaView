@@ -175,9 +175,9 @@ private:
 //----------------------------------------------------------------------------
 unsigned char* vtkAMRDualClipLocator::GetLevelMaskPointer()
 {
-  if (this->LevelMaskArray == 0)
+  if (this->LevelMaskArray == nullptr)
   {
-    return 0;
+    return nullptr;
   }
   return this->LevelMaskArray->GetPointer(0);
 }
@@ -185,13 +185,13 @@ unsigned char* vtkAMRDualClipLocator::GetLevelMaskPointer()
 //----------------------------------------------------------------------------
 vtkAMRDualClipLocator* vtkAMRDualClipGetBlockLocator(vtkAMRDualGridHelperBlock* block)
 {
-  if (block->UserData == 0)
+  if (block->UserData == nullptr)
   {
     vtkImageData* image = block->Image;
-    if (image == 0)
+    if (image == nullptr)
     { // Remote blocks are only to setup local block bit flags.
       // They do not need locators.
-      return 0;
+      return nullptr;
     }
     int extent[6];
     // This is the same as the cell extent of the original grid (with ghosts).
@@ -479,7 +479,7 @@ void vtkAMRDualClipLocator::CopyNeighborLevelMask(
     return;
   }
   vtkAMRDualClipLocator* neighborLocator = vtkAMRDualClipGetBlockLocator(neighborBlock);
-  if (neighborLocator == 0)
+  if (neighborLocator == nullptr)
   { // Figuring out logic for parallel case.
     return;
   }
@@ -587,13 +587,13 @@ vtkAMRDualClipLocator::vtkAMRDualClipLocator()
 {
   this->YIncrement = this->ZIncrement = 0;
   this->ArrayLength = 0;
-  this->XEdges = this->YEdges = this->ZEdges = 0;
-  this->Corners = 0;
+  this->XEdges = this->YEdges = this->ZEdges = nullptr;
+  this->Corners = nullptr;
   for (int ii = 0; ii < 3; ++ii)
   {
     this->DualCellDimensions[ii] = 0;
   }
-  this->LevelMaskArray = 0;
+  this->LevelMaskArray = nullptr;
   this->CenterLevelMaskComputed = 0;
 }
 //----------------------------------------------------------------------------
@@ -614,7 +614,7 @@ void vtkAMRDualClipLocator::Initialize(int xDualCellDim, int yDualCellDim, int z
       delete[] this->ZEdges;
       delete[] this->Corners;
       this->LevelMaskArray->Delete();
-      this->LevelMaskArray = 0;
+      this->LevelMaskArray = nullptr;
     }
     if (xDualCellDim > 0 && yDualCellDim > 0 && zDualCellDim > 0)
     {
@@ -701,8 +701,8 @@ vtkIdType* vtkAMRDualClipLocator::GetEdgePointer(int xCell, int yCell, int zCell
       return this->ZEdges + (xp0 + (yp0 * this->YIncrement) + (zp0 * this->ZIncrement));
     }
     default:
-      assert(0 && "Invalid edge index.");
-      return 0;
+      assert(nullptr && "Invalid edge index.");
+      return nullptr;
   }
 }
 
@@ -868,7 +868,7 @@ void vtkAMRDualClipLocator::ShareBlockLocatorWithNeighbor(
   vtkAMRDualClipLocator* neighborLocator = vtkAMRDualClipGetBlockLocator(neighbor);
 
   // Working on the logic to parallelize level mask.
-  if (blockLocator == 0 || neighborLocator == 0)
+  if (blockLocator == nullptr || neighborLocator == nullptr)
   { // This occurs if the block is owned by a different process.
     return;
   }
@@ -1031,17 +1031,17 @@ vtkAMRDualClip::vtkAMRDualClip()
   this->EnableMultiProcessCommunication = 0;
   this->EnableMergePoints = 0;
 
-  this->Controller = NULL;
+  this->Controller = nullptr;
   this->SetController(vtkMultiProcessController::GetGlobalController());
 
   // Pipeline
   this->SetNumberOfOutputPorts(1);
 
-  this->LevelMaskPointArray = 0;
-  this->BlockIdCellArray = 0;
-  this->Helper = 0;
+  this->LevelMaskPointArray = nullptr;
+  this->BlockIdCellArray = nullptr;
+  this->Helper = nullptr;
 
-  this->BlockLocator = 0;
+  this->BlockLocator = nullptr;
 }
 
 //----------------------------------------------------------------------------
@@ -1050,9 +1050,9 @@ vtkAMRDualClip::~vtkAMRDualClip()
   if (this->BlockLocator)
   {
     delete this->BlockLocator;
-    this->BlockLocator = 0;
+    this->BlockLocator = nullptr;
   }
-  this->SetController(NULL);
+  this->SetController(nullptr);
 }
 
 //----------------------------------------------------------------------------
@@ -1107,7 +1107,7 @@ int vtkAMRDualClip::RequestData(vtkInformation* vtkNotUsed(request),
   vtkMultiBlockDataSet* mbdsOutput0 =
     vtkMultiBlockDataSet::SafeDownCast(outInfo->Get(vtkDataObject::DATA_OBJECT()));
 
-  if (hbdsInput == 0)
+  if (hbdsInput == nullptr)
   {
     // Do not deal with rectilinear grid
     vtkErrorMacro("This filter requires a vtkNonOverlappingAMR on its input.");
@@ -1172,7 +1172,7 @@ vtkMultiBlockDataSet* vtkAMRDualClip::DoRequestData(
   }
   else
   {
-    this->Helper->SetController(NULL);
+    this->Helper->SetController(nullptr);
   }
 
   // @TODO: Check if this is the right thing to do.
@@ -1219,22 +1219,22 @@ vtkMultiBlockDataSet* vtkAMRDualClip::DoRequestData(
   }
 
   this->BlockIdCellArray->Delete();
-  this->BlockIdCellArray = 0;
+  this->BlockIdCellArray = nullptr;
   this->LevelMaskPointArray->Delete();
-  this->LevelMaskPointArray = 0;
+  this->LevelMaskPointArray = nullptr;
 
   mesh->SetCells(VTK_TETRA, this->Cells);
 
   mesh->Delete();
-  this->Mesh = 0;
+  this->Mesh = nullptr;
   this->Points->Delete();
-  this->Points = 0;
+  this->Points = nullptr;
   this->Cells->Delete();
-  this->Cells = 0;
+  this->Cells = nullptr;
 
   mpds->Delete();
   this->Helper->Delete();
-  this->Helper = 0;
+  this->Helper = nullptr;
 
   return mbdsOutput0;
 }
@@ -1308,7 +1308,7 @@ void vtkAMRDualClip::ShareBlockLocatorWithNeighbors(vtkAMRDualGridHelperBlock* b
 void vtkAMRDualClip::InitializeLevelMask(vtkAMRDualGridHelperBlock* block)
 {
   vtkImageData* image = block->Image;
-  if (image == 0)
+  if (image == nullptr)
   { // Remote blocks are only to setup local block bit flags.
     return;
   }
@@ -1459,7 +1459,7 @@ void vtkAMRDualClip::ProcessBlock(
   vtkAMRDualGridHelperBlock* block, int blockId, const char* arrayNameToProcess)
 {
   vtkImageData* image = block->Image;
-  if (image == 0)
+  if (image == nullptr)
   { // Remote blocks are only to setup local block bit flags.
     return;
   }
@@ -1493,7 +1493,7 @@ void vtkAMRDualClip::ProcessBlock(
   }
   else
   { // Shared locator.
-    if (this->BlockLocator == 0)
+    if (this->BlockLocator == nullptr)
     {
       this->BlockLocator = new vtkAMRDualClipLocator;
     }
@@ -1591,8 +1591,8 @@ void vtkAMRDualClip::ProcessBlock(
     this->ShareBlockLocatorWithNeighbors(block);
     // We are done.  We no longer need the locator for this block.
     delete this->BlockLocator;
-    this->BlockLocator = 0;
-    block->UserData = 0;
+    this->BlockLocator = nullptr;
+    block->UserData = nullptr;
     // Lets use this unused flag (owner of center region/block) to indicate
     // that the block is already processes.
     // This will keep neighbors from recreating the locator.
@@ -1611,7 +1611,7 @@ void vtkAMRDualClip::ProcessDualCell(vtkAMRDualGridHelperBlock* block, int block
 {
   // compute the case index
   vtkImageData* image = block->Image;
-  if (image == 0)
+  if (image == nullptr)
   { // Remote blocks are only to setup local block bit flags.
     return;
   }
@@ -1963,7 +1963,7 @@ void vtkAMRDualClip::DistributeLevelMasks()
   vtkAMRDualGridHelperBlock* block;
   vtkAMRDualGridHelperBlock* neighborBlock;
 
-  if (this->Controller == 0)
+  if (this->Controller == nullptr)
   {
     return;
   }
@@ -2011,8 +2011,8 @@ void vtkAMRDualClip::DistributeLevelMasks()
                   {
                     const char* arrayName = this->Helper->GetArrayName();
                     vtkDataArray* scalars;
-                    vtkDataArray* neighborLevelMaskArray = 0;
-                    vtkDataArray* blockLevelMaskArray = 0;
+                    vtkDataArray* neighborLevelMaskArray = nullptr;
+                    vtkDataArray* blockLevelMaskArray = nullptr;
                     if (block->Image)
                     {
                       scalars = block->Image->GetCellData()->GetArray(arrayName);
@@ -2060,7 +2060,7 @@ void vtkAMRDualClip::InitializeCopyAttributes(vtkNonOverlappingAMR* hbdsInput, v
   }
   vtkDataObject* dataObject = iter->GetCurrentDataObject();
   vtkUniformGrid* uGrid = vtkUniformGrid::SafeDownCast(dataObject);
-  if (uGrid == 0)
+  if (uGrid == nullptr)
   {
     vtkErrorMacro("Expecting a uniform grid.");
   }

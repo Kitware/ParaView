@@ -205,14 +205,10 @@ conduit::index_t GetTypeId(conduit::index_t type, bool force_signed)
 
 vtkStandardNewMacro(vtkConduitArrayUtilities);
 //----------------------------------------------------------------------------
-vtkConduitArrayUtilities::vtkConduitArrayUtilities()
-{
-}
+vtkConduitArrayUtilities::vtkConduitArrayUtilities() = default;
 
 //----------------------------------------------------------------------------
-vtkConduitArrayUtilities::~vtkConduitArrayUtilities()
-{
-}
+vtkConduitArrayUtilities::~vtkConduitArrayUtilities() = default;
 
 //----------------------------------------------------------------------------
 vtkSmartPointer<vtkDataArray> vtkConduitArrayUtilities::MCArrayToVTKArray(

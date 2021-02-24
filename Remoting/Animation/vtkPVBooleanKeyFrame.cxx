@@ -20,14 +20,10 @@
 vtkStandardNewMacro(vtkPVBooleanKeyFrame);
 
 //----------------------------------------------------------------------------
-vtkPVBooleanKeyFrame::vtkPVBooleanKeyFrame()
-{
-}
+vtkPVBooleanKeyFrame::vtkPVBooleanKeyFrame() = default;
 
 //----------------------------------------------------------------------------
-vtkPVBooleanKeyFrame::~vtkPVBooleanKeyFrame()
-{
-}
+vtkPVBooleanKeyFrame::~vtkPVBooleanKeyFrame() = default;
 
 //----------------------------------------------------------------------------
 // remember that currenttime is 0 at the KeyTime of this key frame

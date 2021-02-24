@@ -14,10 +14,10 @@
 =========================================================================*/
 #include "vtkNIfTIWriter.h"
 
+#include "ThirdParty/vtknifti1_io.h"
 #include "vtkImageData.h"
 #include "vtkObjectFactory.h"
 #include "vtkPointData.h"
-#include "vtknifti1_io.h"
 
 #include "vtkFieldData.h"
 #include "vtkUnsignedCharArray.h"
@@ -48,15 +48,15 @@ vtkNIfTIWriter::~vtkNIfTIWriter()
   for (count = 0; count < 4; count++)
   {
     delete[] q[count];
-    q[count] = NULL;
+    q[count] = nullptr;
 
     delete[] s[count];
-    s[count] = NULL;
+    s[count] = nullptr;
   }
   delete[] q;
   delete[] s;
-  q = NULL;
-  s = NULL;
+  q = nullptr;
+  s = nullptr;
 }
 
 void vtkNIfTIWriter::SetFileType(int inValue)
@@ -129,7 +129,7 @@ static std::string GetExtension(const std::string& filename)
 
   // This assumes that the final '.' in a file name is the delimiter
   // for the file's extension type
-  const std::string::size_type it = filename.find_last_of(".");
+  const std::string::size_type it = filename.find_last_of('.');
 
   // This determines the file's type by creating a new string
   // who's value is the extension of the input filename
@@ -188,10 +188,10 @@ void vtkNIfTIWriter::WriteFileHeader(
 {
 
   struct nifti_1_header nhdr;
-  znzFile fp = NULL;
+  znzFile fp = nullptr;
   size_t ss;
   int write_data, leave_open;
-  znzFile imgfile = NULL;
+  znzFile imgfile = nullptr;
   const char* opts = "wb";
   int orientPosition = 252;
 
@@ -236,7 +236,7 @@ void vtkNIfTIWriter::WriteFileHeader(
   }
 
   vtkDataArray* validNiftiDataArray = fa->GetArray(NIFTI_HEADER_ARRAY);
-  vtkUnsignedCharArray* headerUnsignedCharArray = NULL;
+  vtkUnsignedCharArray* headerUnsignedCharArray = nullptr;
   foundNiftiHeader = true;
   foundAnalayzeHeader = false;
   if (!validNiftiDataArray)
@@ -271,7 +271,7 @@ void vtkNIfTIWriter::WriteFileHeader(
 
   // this->headerUnsignedCharArray = new unsigned char[this->analyzeHeaderSize];
 
-  nifti_image* m_NiftiImage = NULL;
+  nifti_image* m_NiftiImage = nullptr;
 
   if (foundNiftiHeader)
   {
@@ -539,13 +539,13 @@ void vtkNIfTIWriter::WriteFileHeader(
     if (m_NiftiImage->iname && strcmp(m_NiftiImage->iname, m_NiftiImage->fname) == 0)
     {
       free(m_NiftiImage->iname);
-      m_NiftiImage->iname = NULL;
+      m_NiftiImage->iname = nullptr;
     }
-    if (m_NiftiImage->iname == NULL)
+    if (m_NiftiImage->iname == nullptr)
     { // then make a new one
       m_NiftiImage->iname =
         vtknifti1_io::nifti_makeimgname(m_NiftiImage->fname, m_NiftiImage->nifti_type, 0, 0);
-      if (m_NiftiImage->iname == NULL)
+      if (m_NiftiImage->iname == nullptr)
         return;
     }
   }
@@ -621,11 +621,11 @@ void vtkNIfTIWriter::WriteFile(
 {
   (void)wholeExtent; // Not used
   // struct nifti_1_header nhdr ;
-  znzFile fp = NULL;
+  znzFile fp = nullptr;
   // size_t                ss ;
   size_t numberOfBytes;
   int write_data, leave_open;
-  znzFile imgfile = NULL;
+  znzFile imgfile = nullptr;
   const char* opts = "ab";
   char* p = (char*)data->GetScalarPointer();
 
@@ -861,8 +861,8 @@ void vtkNIfTIWriter::WriteFile(
   }
   (void)outExtent;
 
-  unsigned char* tempUnsignedCharData = NULL;
-  unsigned char* tempOutUnsignedCharData = NULL;
+  unsigned char* tempUnsignedCharData = nullptr;
+  unsigned char* tempOutUnsignedCharData = nullptr;
 
   tempUnsignedCharData = new unsigned char[outDim[0] * outDim[1] * outDim[2] * scalarSize];
   tempOutUnsignedCharData = new unsigned char[outDim[0] * outDim[1] * outDim[2] * scalarSize];
@@ -985,7 +985,7 @@ void vtkNIfTIWriter::WriteFile(
   }
 
   delete tempUnsignedCharData;
-  tempUnsignedCharData = NULL;
+  tempUnsignedCharData = nullptr;
 
   write_data = 1;
   leave_open = 0;
@@ -1016,8 +1016,8 @@ void vtkNIfTIWriter::WriteFile(
     vtkznzlib::znzclose(fp);
 
   delete tempOutUnsignedCharData;
-  tempOutUnsignedCharData = NULL;
-  out_p = NULL;
+  tempOutUnsignedCharData = nullptr;
+  out_p = nullptr;
 }
 
 //----------------------------------------------------------------------------

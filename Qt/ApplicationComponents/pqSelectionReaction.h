@@ -49,14 +49,14 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqSelectionReaction : public pqReaction
 public:
   /**
   * Constructor.\c modifierGroup is used to determine selection modifier. If
-  * there's a non-null checkedAction() in the group, we use that action's
+  * there's a non-nullptr checkedAction() in the group, we use that action's
   * data() to determine the selection mode e.g.
   * pqView::PVSELECTION_ADDITION,
   * pqView::PVSELECTION_SUBTRACTION etc. If no QActionGroup is
   * specified or no checked action is present, then the default mode of
   * pqView::PVSELECTION_DEFAULT is used.
   */
-  pqSelectionReaction(QAction* parent, QActionGroup* modifierGroup = NULL);
+  pqSelectionReaction(QAction* parent, QActionGroup* modifierGroup = nullptr);
 
 protected Q_SLOTS:
   /**

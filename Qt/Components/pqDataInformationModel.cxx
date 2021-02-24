@@ -288,7 +288,7 @@ public:
 };
 
 //-----------------------------------------------------------------------------
-pqDataInformationModel::pqDataInformationModel(QObject* _parent /*=NULL*/)
+pqDataInformationModel::pqDataInformationModel(QObject* _parent /*=nullptr*/)
   : QAbstractTableModel(_parent)
 {
   this->Internal = new pqDataInformationModelInternal();
@@ -546,7 +546,7 @@ void pqDataInformationModel::removeSource(pqPipelineSource* source)
     this->endRemoveRows();
   }
 
-  QObject::disconnect(source, 0, this, 0);
+  QObject::disconnect(source, nullptr, this, nullptr);
 }
 
 //-----------------------------------------------------------------------------
@@ -564,12 +564,12 @@ pqOutputPort* pqDataInformationModel::getItemFor(const QModelIndex& idx) const
 {
   if (!idx.isValid() && idx.model() != this)
   {
-    return NULL;
+    return nullptr;
   }
   if (idx.row() >= this->Internal->Sources.size())
   {
     qDebug() << "Index: " << idx.row() << " beyond range.";
-    return NULL;
+    return nullptr;
   }
   return this->Internal->Sources[idx.row()].OutputPort;
 }
@@ -584,7 +584,7 @@ void pqDataInformationModel::setActiveView(pqView* view)
 
   if (this->Internal->View)
   {
-    QObject::disconnect(this->Internal->View, 0, this, 0);
+    QObject::disconnect(this->Internal->View, nullptr, this, nullptr);
   }
 
   this->Internal->View = view;

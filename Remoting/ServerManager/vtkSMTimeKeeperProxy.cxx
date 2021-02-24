@@ -25,14 +25,10 @@
 
 vtkStandardNewMacro(vtkSMTimeKeeperProxy);
 //----------------------------------------------------------------------------
-vtkSMTimeKeeperProxy::vtkSMTimeKeeperProxy()
-{
-}
+vtkSMTimeKeeperProxy::vtkSMTimeKeeperProxy() = default;
 
 //----------------------------------------------------------------------------
-vtkSMTimeKeeperProxy::~vtkSMTimeKeeperProxy()
-{
-}
+vtkSMTimeKeeperProxy::~vtkSMTimeKeeperProxy() = default;
 
 //----------------------------------------------------------------------------
 void vtkSMTimeKeeperProxy::CreateVTKObjects()

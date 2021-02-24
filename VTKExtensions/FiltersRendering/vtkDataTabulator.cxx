@@ -85,9 +85,7 @@ vtkDataTabulator::vtkDataTabulator()
 }
 
 //----------------------------------------------------------------------------
-vtkDataTabulator::~vtkDataTabulator()
-{
-}
+vtkDataTabulator::~vtkDataTabulator() = default;
 
 //----------------------------------------------------------------------------
 int vtkDataTabulator::FillOutputPortInformation(int, vtkInformation* info)

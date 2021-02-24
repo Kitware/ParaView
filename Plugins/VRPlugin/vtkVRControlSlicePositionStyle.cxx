@@ -54,11 +54,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <sstream>
 
 // ----------------------------------------------------------------------------
-vtkStandardNewMacro(vtkVRControlSlicePositionStyle)
+vtkStandardNewMacro(vtkVRControlSlicePositionStyle);
 
-  // ----------------------------------------------------------------------------
-  // Constructor method
-  vtkVRControlSlicePositionStyle::vtkVRControlSlicePositionStyle()
+// ----------------------------------------------------------------------------
+// Constructor method
+vtkVRControlSlicePositionStyle::vtkVRControlSlicePositionStyle()
 {
   this->Enabled = false;
   this->InitialPositionRecorded = false;

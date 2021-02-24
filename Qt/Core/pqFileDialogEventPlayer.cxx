@@ -54,7 +54,7 @@ bool pqFileDialogEventPlayer::playEvent(
   QObject* Object, const QString& Command, const QString& Arguments, bool& Error)
 {
   // Handle playback for pqFileDialog and all its children ...
-  pqFileDialog* object = 0;
+  pqFileDialog* object = nullptr;
   for (QObject* o = Object; o; o = o->parent())
   {
     if ((object = qobject_cast<pqFileDialog*>(o)))

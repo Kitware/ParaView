@@ -29,7 +29,7 @@ vtkStandardNewMacro(vtkPEnSightGoldBinaryReader);
 //----------------------------------------------------------------------------
 vtkPEnSightGoldBinaryReader::vtkPEnSightGoldBinaryReader()
 {
-  this->IFile = NULL;
+  this->IFile = nullptr;
   this->FileSize = 0;
   this->Fortran = 0;
   this->NodeIdsListed = 0;
@@ -67,7 +67,7 @@ int vtkPEnSightGoldBinaryReader::OpenFile(const char* filename)
 
   // Close file from any previous image
   delete this->IFile;
-  this->IFile = NULL;
+  this->IFile = nullptr;
 
   // Open the new file
   vtkDebugMacro(<< "Opening file " << filename);
@@ -342,7 +342,7 @@ int vtkPEnSightGoldBinaryReader::ReadGeometryFile(
     this->ReadLine(line); // part description line
 
     strncpy(nameline, line, 80); // 80 characters in line are allowed
-    nameline[79] = '\0';         // Ensure NULL character at end of part name
+    nameline[79] = '\0';         // Ensure nullptr character at end of part name
     char* name = strdup(nameline);
 
     // fix to bug #0008237
@@ -384,7 +384,7 @@ int vtkPEnSightGoldBinaryReader::ReadGeometryFile(
       {
         free(name);
         delete this->IFile;
-        this->IFile = NULL;
+        this->IFile = nullptr;
         return 0;
       }
     }
@@ -392,7 +392,7 @@ int vtkPEnSightGoldBinaryReader::ReadGeometryFile(
   }
 
   delete this->IFile;
-  this->IFile = NULL;
+  this->IFile = nullptr;
 
   if (lineRead < 0)
   {
@@ -522,7 +522,7 @@ int vtkPEnSightGoldBinaryReader::SkipTimeStep()
   if (lineRead < 0)
   {
     delete this->IFile;
-    this->IFile = NULL;
+    this->IFile = nullptr;
     return 0;
   }
 
@@ -1196,8 +1196,8 @@ int vtkPEnSightGoldBinaryReader::ReadMeasuredGeometryFile(
   int newDimensions[3];
   int splitDimension;
   int splitDimensionBeginIndex;
-  this->PrepareStructuredDimensionsForDistribution(
-    partId, dimensions, newDimensions, &splitDimension, &splitDimensionBeginIndex, 0, NULL, NULL);
+  this->PrepareStructuredDimensionsForDistribution(partId, dimensions, newDimensions,
+    &splitDimension, &splitDimensionBeginIndex, 0, nullptr, nullptr);
 
   pointIds = new int[this->NumberOfMeasuredPoints];
   xCoords = new float[this->NumberOfMeasuredPoints];
@@ -1260,7 +1260,7 @@ int vtkPEnSightGoldBinaryReader::ReadMeasuredGeometryFile(
   delete[] yCoords;
   delete[] zCoords;
   delete this->IFile;
-  this->IFile = NULL;
+  this->IFile = nullptr;
 
   return 1;
 }
@@ -1412,7 +1412,7 @@ int vtkPEnSightGoldBinaryReader::ReadScalarsPerNode(const char* fileName, const 
     }
 
     delete this->IFile;
-    this->IFile = NULL;
+    this->IFile = nullptr;
 
     return 1;
   }
@@ -1476,7 +1476,7 @@ int vtkPEnSightGoldBinaryReader::ReadScalarsPerNode(const char* fileName, const 
   }
 
   delete this->IFile;
-  this->IFile = NULL;
+  this->IFile = nullptr;
 
   return 1;
 }
@@ -1628,7 +1628,7 @@ int vtkPEnSightGoldBinaryReader::ReadVectorsPerNode(const char* fileName, const 
     }
 
     delete this->IFile;
-    this->IFile = NULL;
+    this->IFile = nullptr;
 
     return 1;
   }
@@ -1682,7 +1682,7 @@ int vtkPEnSightGoldBinaryReader::ReadVectorsPerNode(const char* fileName, const 
   }
 
   delete this->IFile;
-  this->IFile = NULL;
+  this->IFile = nullptr;
 
   return 1;
 }
@@ -1841,7 +1841,7 @@ int vtkPEnSightGoldBinaryReader::ReadTensorsPerNode(const char* fileName, const 
   }
 
   delete this->IFile;
-  this->IFile = NULL;
+  this->IFile = nullptr;
 
   return 1;
 }
@@ -1945,7 +1945,7 @@ int vtkPEnSightGoldBinaryReader::ReadScalarsPerElement(const char* fileName,
               {
                 vtkErrorMacro("Unknown element type \"" << line << "\"");
                 delete this->IFile;
-                this->IFile = NULL;
+                this->IFile = nullptr;
                 return 0;
               }
               idx = this->UnstructuredPartIds->IsId(realId);
@@ -2028,7 +2028,7 @@ int vtkPEnSightGoldBinaryReader::ReadScalarsPerElement(const char* fileName,
           {
             vtkErrorMacro("Unknown element type \"" << line << "\"");
             delete this->IFile;
-            this->IFile = NULL;
+            this->IFile = nullptr;
 
             if (component == 0)
             {
@@ -2087,7 +2087,7 @@ int vtkPEnSightGoldBinaryReader::ReadScalarsPerElement(const char* fileName,
   }
 
   delete this->IFile;
-  this->IFile = NULL;
+  this->IFile = nullptr;
 
   return 1;
 }
@@ -2191,7 +2191,7 @@ int vtkPEnSightGoldBinaryReader::ReadVectorsPerElement(const char* fileName,
               {
                 vtkErrorMacro("Unknown element type \"" << line << "\"");
                 delete this->IS;
-                this->IS = NULL;
+                this->IS = nullptr;
                 return 0;
               }
               idx = this->UnstructuredPartIds->IsId(realId);
@@ -2276,7 +2276,7 @@ int vtkPEnSightGoldBinaryReader::ReadVectorsPerElement(const char* fileName,
           {
             vtkErrorMacro("Unknown element type \"" << line << "\"");
             delete this->IS;
-            this->IS = NULL;
+            this->IS = nullptr;
             vectors->Delete();
             return 0;
           }
@@ -2333,7 +2333,7 @@ int vtkPEnSightGoldBinaryReader::ReadVectorsPerElement(const char* fileName,
   }
 
   delete this->IFile;
-  this->IFile = NULL;
+  this->IFile = nullptr;
 
   return 1;
 }
@@ -2437,7 +2437,7 @@ int vtkPEnSightGoldBinaryReader::ReadTensorsPerElement(const char* fileName,
               {
                 vtkErrorMacro("Unknown element type \"" << line << "\"");
                 delete this->IS;
-                this->IS = NULL;
+                this->IS = nullptr;
                 return 0;
               }
               idx = this->UnstructuredPartIds->IsId(realId);
@@ -2535,7 +2535,7 @@ int vtkPEnSightGoldBinaryReader::ReadTensorsPerElement(const char* fileName,
           {
             vtkErrorMacro("Unknown element type \"" << line << "\"");
             delete this->IS;
-            this->IS = NULL;
+            this->IS = nullptr;
             tensors->Delete();
             return 0;
           }
@@ -2600,7 +2600,7 @@ int vtkPEnSightGoldBinaryReader::ReadTensorsPerElement(const char* fileName,
   }
 
   delete this->IFile;
-  this->IFile = NULL;
+  this->IFile = nullptr;
 
   return 1;
 }
@@ -2618,7 +2618,7 @@ int vtkPEnSightGoldBinaryReader::CreateUnstructuredGridOutput(
 
   this->NumberOfNewOutputs++;
 
-  if (this->GetDataSetFromBlock(compositeOutput, partId) == NULL ||
+  if (this->GetDataSetFromBlock(compositeOutput, partId) == nullptr ||
     !this->GetDataSetFromBlock(compositeOutput, partId)->IsA("vtkUnstructuredGrid"))
   {
     vtkDebugMacro("creating new unstructured output");
@@ -3691,7 +3691,7 @@ int vtkPEnSightGoldBinaryReader::CreateStructuredGridOutput(
   this->NumberOfNewOutputs++;
 
   vtkDataSet* ds = this->GetDataSetFromBlock(compositeOutput, partId);
-  if (ds == NULL || !ds->IsA("vtkStructuredGrid"))
+  if (ds == nullptr || !ds->IsA("vtkStructuredGrid"))
   {
     vtkDebugMacro("creating new structured grid output");
     vtkStructuredGrid* sgrid = vtkStructuredGrid::New();
@@ -3731,12 +3731,12 @@ int vtkPEnSightGoldBinaryReader::CreateStructuredGridOutput(
   int newDimensions[3];
   int splitDimension;
   int splitDimensionBeginIndex;
-  vtkUnsignedCharArray* pointGhostArray = NULL;
-  vtkUnsignedCharArray* cellGhostArray = NULL;
+  vtkUnsignedCharArray* pointGhostArray = nullptr;
+  vtkUnsignedCharArray* cellGhostArray = nullptr;
   if (this->GhostLevels == 0)
   {
-    this->PrepareStructuredDimensionsForDistribution(
-      partId, dimensions, newDimensions, &splitDimension, &splitDimensionBeginIndex, 0, NULL, NULL);
+    this->PrepareStructuredDimensionsForDistribution(partId, dimensions, newDimensions,
+      &splitDimension, &splitDimensionBeginIndex, 0, nullptr, nullptr);
   }
   else
   {
@@ -3850,7 +3850,7 @@ int vtkPEnSightGoldBinaryReader::CreateRectilinearGridOutput(
   this->NumberOfNewOutputs++;
 
   vtkDataSet* ds = this->GetDataSetFromBlock(compositeOutput, partId);
-  if (ds == NULL || !ds->IsA("vtkRectilinearGrid"))
+  if (ds == nullptr || !ds->IsA("vtkRectilinearGrid"))
   {
     vtkDebugMacro("creating new rectilinear grid output");
     vtkRectilinearGrid* rgrid = vtkRectilinearGrid::New();
@@ -3892,12 +3892,12 @@ int vtkPEnSightGoldBinaryReader::CreateRectilinearGridOutput(
   int newDimensions[3];
   int splitDimension;
   int splitDimensionBeginIndex;
-  vtkUnsignedCharArray* pointGhostArray = NULL;
-  vtkUnsignedCharArray* cellGhostArray = NULL;
+  vtkUnsignedCharArray* pointGhostArray = nullptr;
+  vtkUnsignedCharArray* cellGhostArray = nullptr;
   if (this->GhostLevels == 0)
   {
-    this->PrepareStructuredDimensionsForDistribution(
-      partId, dimensions, newDimensions, &splitDimension, &splitDimensionBeginIndex, 0, NULL, NULL);
+    this->PrepareStructuredDimensionsForDistribution(partId, dimensions, newDimensions,
+      &splitDimension, &splitDimensionBeginIndex, 0, nullptr, nullptr);
   }
   else
   {
@@ -3988,7 +3988,7 @@ int vtkPEnSightGoldBinaryReader::CreateImageDataOutput(
   this->NumberOfNewOutputs++;
 
   vtkDataSet* ds = this->GetDataSetFromBlock(compositeOutput, partId);
-  if (ds == NULL || !ds->IsA("vtkImageData"))
+  if (ds == nullptr || !ds->IsA("vtkImageData"))
   {
     vtkDebugMacro("creating new image data output");
     vtkImageData* idata = vtkImageData::New();
@@ -4016,12 +4016,12 @@ int vtkPEnSightGoldBinaryReader::CreateImageDataOutput(
   int newDimensions[3];
   int splitDimension;
   int splitDimensionBeginIndex;
-  vtkUnsignedCharArray* pointGhostArray = NULL;
-  vtkUnsignedCharArray* cellGhostArray = NULL;
+  vtkUnsignedCharArray* pointGhostArray = nullptr;
+  vtkUnsignedCharArray* cellGhostArray = nullptr;
   if (this->GhostLevels == 0)
   {
-    this->PrepareStructuredDimensionsForDistribution(
-      partId, dimensions, newDimensions, &splitDimension, &splitDimensionBeginIndex, 0, NULL, NULL);
+    this->PrepareStructuredDimensionsForDistribution(partId, dimensions, newDimensions,
+      &splitDimension, &splitDimensionBeginIndex, 0, nullptr, nullptr);
   }
   else
   {

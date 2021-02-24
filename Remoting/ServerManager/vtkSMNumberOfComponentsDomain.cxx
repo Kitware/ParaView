@@ -33,9 +33,7 @@ vtkSMNumberOfComponentsDomain::vtkSMNumberOfComponentsDomain()
 }
 
 //----------------------------------------------------------------------------
-vtkSMNumberOfComponentsDomain::~vtkSMNumberOfComponentsDomain()
-{
-}
+vtkSMNumberOfComponentsDomain::~vtkSMNumberOfComponentsDomain() = default;
 
 //---------------------------------------------------------------------------
 int vtkSMNumberOfComponentsDomain::ReadXMLAttributes(vtkSMProperty* prop, vtkPVXMLElement* element)
@@ -87,7 +85,7 @@ void vtkSMNumberOfComponentsDomain::Update(vtkSMProperty*)
     return;
   }
 
-  vtkSMInputArrayDomain* iad = 0;
+  vtkSMInputArrayDomain* iad = nullptr;
   vtkSMDomainIterator* di = ip->NewDomainIterator();
   di->Begin();
   while (!di->IsAtEnd())
@@ -140,7 +138,7 @@ void vtkSMNumberOfComponentsDomain::Update(
   }
 
   int iadAttributeType = iad->GetAttributeType();
-  vtkPVArrayInformation* ai = 0;
+  vtkPVArrayInformation* ai = nullptr;
 
   if (iadAttributeType == vtkSMInputArrayDomain::POINT ||
     iadAttributeType == vtkSMInputArrayDomain::ANY ||

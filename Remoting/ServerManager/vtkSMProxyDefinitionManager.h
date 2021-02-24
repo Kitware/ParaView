@@ -75,7 +75,7 @@ public:
 
   //@{
   /**
-   * Returns a registered proxy definition or return a NULL otherwise.
+   * Returns a registered proxy definition or return a nullptr otherwise.
    * Moreover, error can be throw if the definition was not found if the
    * flag throwError is true.
    */
@@ -83,13 +83,13 @@ public:
   {
     return this->ProxyDefinitionManager
       ? this->ProxyDefinitionManager->GetProxyDefinition(group, name, throwError)
-      : NULL;
+      : nullptr;
   }
   vtkPVXMLElement* GetProxyDefinition(const char* group, const char* name)
   {
     return this->ProxyDefinitionManager
       ? this->ProxyDefinitionManager->GetProxyDefinition(group, name)
-      : NULL;
+      : nullptr;
   }
   //@}
 
@@ -104,7 +104,7 @@ public:
     return this->ProxyDefinitionManager
       ? this->ProxyDefinitionManager->GetCollapsedProxyDefinition(
           group, name, subProxyName, throwError)
-      : NULL;
+      : nullptr;
   }
 
   /**
@@ -141,12 +141,13 @@ public:
   VTK_NEWINSTANCE
   vtkPVProxyDefinitionIterator* NewIterator()
   {
-    return this->ProxyDefinitionManager ? this->ProxyDefinitionManager->NewIterator() : NULL;
+    return this->ProxyDefinitionManager ? this->ProxyDefinitionManager->NewIterator() : nullptr;
   }
   VTK_NEWINSTANCE
   vtkPVProxyDefinitionIterator* NewIterator(int scope)
   {
-    return this->ProxyDefinitionManager ? this->ProxyDefinitionManager->NewIterator(scope) : NULL;
+    return this->ProxyDefinitionManager ? this->ProxyDefinitionManager->NewIterator(scope)
+                                        : nullptr;
   }
   //@}
 
@@ -161,13 +162,13 @@ public:
   {
     return this->ProxyDefinitionManager
       ? this->ProxyDefinitionManager->NewSingleGroupIterator(groupName)
-      : NULL;
+      : nullptr;
   }
   vtkPVProxyDefinitionIterator* NewSingleGroupIterator(const char* groupName, int scope)
   {
     return this->ProxyDefinitionManager
       ? this->ProxyDefinitionManager->NewSingleGroupIterator(groupName, scope)
-      : NULL;
+      : nullptr;
   }
   //@}
 

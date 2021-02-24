@@ -131,7 +131,7 @@ pqVRPNConnection* pqVRConnectionManager::GetVRPNConnection(const QString& name)
       }
     }
   }
-  return NULL;
+  return nullptr;
 }
 #endif
 
@@ -166,7 +166,7 @@ pqVRUIConnection* pqVRConnectionManager::GetVRUIConnection(const QString& name)
       }
     }
   }
-  return NULL;
+  return nullptr;
 }
 #endif
 
@@ -345,7 +345,7 @@ void pqVRConnectionManager::configureConnections(vtkPVXMLElement* xml, vtkSMProx
 // ----------------------------------------------------------------------------
 void pqVRConnectionManager::saveConnectionsConfiguration(vtkPVXMLElement* root)
 {
-  assert(root != NULL);
+  assert(root != nullptr);
   vtkPVXMLElement* tempParent = vtkPVXMLElement::New();
   tempParent->SetName("VRConnectionManager");
 #if PARAVIEW_PLUGIN_VRPlugin_USE_VRPN

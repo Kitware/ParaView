@@ -166,7 +166,7 @@ vtkStandardNewMacro(vtkSMLoadStateOptionsProxy);
 vtkSMLoadStateOptionsProxy::vtkSMLoadStateOptionsProxy()
 {
   this->Internals = new vtkInternals();
-  this->StateFileName = 0;
+  this->StateFileName = nullptr;
   this->PathMatchingThreshold = 3;
 }
 
@@ -174,7 +174,7 @@ vtkSMLoadStateOptionsProxy::vtkSMLoadStateOptionsProxy()
 vtkSMLoadStateOptionsProxy::~vtkSMLoadStateOptionsProxy()
 {
   delete this->Internals;
-  this->SetStateFileName(0);
+  this->SetStateFileName(nullptr);
 }
 
 //----------------------------------------------------------------------------

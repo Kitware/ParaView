@@ -27,30 +27,30 @@ class vtkMaterialInterfaceToProcMap::ProcCountContainer : public std::vector<int
 //
 vtkMaterialInterfaceToProcMap::vtkMaterialInterfaceToProcMap()
 {
-  this->PieceToProcMap = 0;
-  this->ProcCount = 0;
+  this->PieceToProcMap = nullptr;
+  this->ProcCount = nullptr;
   this->Clear();
 }
 //
 vtkMaterialInterfaceToProcMap::vtkMaterialInterfaceToProcMap(int nFragments)
 {
-  this->PieceToProcMap = 0;
-  this->ProcCount = 0;
+  this->PieceToProcMap = nullptr;
+  this->ProcCount = nullptr;
   this->Initialize(nFragments);
 }
 //
 vtkMaterialInterfaceToProcMap::vtkMaterialInterfaceToProcMap(int nProcs, int nFragments)
 {
-  this->PieceToProcMap = 0;
-  this->ProcCount = 0;
+  this->PieceToProcMap = nullptr;
+  this->ProcCount = nullptr;
   this->Initialize(nProcs, nFragments);
 }
 //
 vtkMaterialInterfaceToProcMap::vtkMaterialInterfaceToProcMap(
   const vtkMaterialInterfaceToProcMap& other)
 {
-  this->PieceToProcMap = 0;
-  this->ProcCount = 0;
+  this->PieceToProcMap = nullptr;
+  this->ProcCount = nullptr;
   this->DeepCopy(other);
 }
 //

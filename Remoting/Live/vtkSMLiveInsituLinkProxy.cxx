@@ -55,7 +55,7 @@ vtkSMLiveInsituLinkProxy::vtkSMLiveInsituLinkProxy()
 vtkSMLiveInsituLinkProxy::~vtkSMLiveInsituLinkProxy()
 {
   delete this->Internals;
-  this->Internals = NULL;
+  this->Internals = nullptr;
 }
 
 //----------------------------------------------------------------------------
@@ -160,7 +160,7 @@ void vtkSMLiveInsituLinkProxy::LoadState(const vtkSMMessage* msg, vtkSMProxyLoca
     vtkSMSourceProxy* source = vtkSMSourceProxy::SafeDownCast(obj);
     if (source)
     {
-      source->MarkModified(NULL);
+      source->MarkModified(nullptr);
       source->UpdatePipeline();
     }
   }

@@ -53,7 +53,7 @@ public:
 
   void GetDataBounds(double bounds[6]) const;
 
-  // These return NULL when no overrides were specified.
+  // These return nullptr when no overrides were specified.
   const char* GetXAxisLabel() const { return this->GetAxisLabel(0); }
   const char* GetYAxisLabel() const { return this->GetAxisLabel(1); }
   const char* GetZAxisLabel() const { return this->GetAxisLabel(2); }

@@ -330,8 +330,8 @@ void vtkSMArrayListDomainInternals::BuildArrayList(
 vtkSMArrayListDomain::vtkSMArrayListDomain()
 {
   this->AttributeType = vtkDataSetAttributes::SCALARS;
-  this->InputDomainName = 0;
-  this->NoneString = 0;
+  this->InputDomainName = nullptr;
+  this->NoneString = nullptr;
   this->ALDInternals = new vtkSMArrayListDomainInternals;
   this->PickFirstAvailableArrayByDefault = true;
 }
@@ -339,8 +339,8 @@ vtkSMArrayListDomain::vtkSMArrayListDomain()
 //---------------------------------------------------------------------------
 vtkSMArrayListDomain::~vtkSMArrayListDomain()
 {
-  this->SetInputDomainName(0);
-  this->SetNoneString(0);
+  this->SetInputDomainName(nullptr);
+  this->SetNoneString(nullptr);
   delete this->ALDInternals;
   this->ALDInternals = nullptr;
 }
@@ -863,7 +863,7 @@ std::string vtkSMArrayListDomain::CreateMangledName(vtkPVArrayInformation* array
 std::string vtkSMArrayListDomain::ArrayNameFromMangledName(const char* name)
 {
   std::string extractedName = name;
-  size_t pos = extractedName.rfind("_");
+  size_t pos = extractedName.rfind('_');
   if (pos == std::string::npos)
   {
     return extractedName;
@@ -876,7 +876,7 @@ int vtkSMArrayListDomain::ComponentIndexFromMangledName(
   vtkPVArrayInformation* info, const char* name)
 {
   std::string extractedName = name;
-  size_t pos = extractedName.rfind("_");
+  size_t pos = extractedName.rfind('_');
   if (pos == std::string::npos)
   {
     return -1;

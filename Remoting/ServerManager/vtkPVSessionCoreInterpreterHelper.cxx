@@ -29,9 +29,7 @@ vtkPVSessionCoreInterpreterHelper::vtkPVSessionCoreInterpreterHelper()
 }
 
 //----------------------------------------------------------------------------
-vtkPVSessionCoreInterpreterHelper::~vtkPVSessionCoreInterpreterHelper()
-{
-}
+vtkPVSessionCoreInterpreterHelper::~vtkPVSessionCoreInterpreterHelper() = default;
 
 //----------------------------------------------------------------------------
 void vtkPVSessionCoreInterpreterHelper::SetCore(vtkPVSessionCore* core)
@@ -64,7 +62,7 @@ vtkObjectBase* vtkPVSessionCoreInterpreterHelper::GetVTKObject(vtkTypeUInt32 gid
       default:
         vtkWarningMacro("No vtkSIProxy for id : " << gid);
     }
-    return NULL;
+    return nullptr;
   }
   return siProxy->GetVTKObject();
 }
@@ -85,7 +83,7 @@ vtkPVProgressHandler* vtkPVSessionCoreInterpreterHelper::GetActiveProgressHandle
     session = vtkPVSession::SafeDownCast(vtkProcessModule::GetProcessModule()->GetSession());
   }
 
-  return session ? session->GetProgressHandler() : NULL;
+  return session ? session->GetProgressHandler() : nullptr;
 }
 
 //----------------------------------------------------------------------------

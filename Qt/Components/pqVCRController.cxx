@@ -49,15 +49,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqSMAdaptor.h"
 #include "pqUndoStack.h"
 //-----------------------------------------------------------------------------
-pqVCRController::pqVCRController(QObject* _parent /*=null*/)
+pqVCRController::pqVCRController(QObject* _parent /*=nullptr*/)
   : QObject(_parent)
 {
 }
 
 //-----------------------------------------------------------------------------
-pqVCRController::~pqVCRController()
-{
-}
+pqVCRController::~pqVCRController() = default;
 
 //-----------------------------------------------------------------------------
 void pqVCRController::setAnimationScene(pqAnimationScene* scene)
@@ -68,7 +66,7 @@ void pqVCRController::setAnimationScene(pqAnimationScene* scene)
   }
   if (this->Scene)
   {
-    QObject::disconnect(this->Scene, 0, this, 0);
+    QObject::disconnect(this->Scene, nullptr, this, nullptr);
   }
   this->Scene = scene;
   if (this->Scene)
@@ -85,7 +83,7 @@ void pqVCRController::setAnimationScene(pqAnimationScene* scene)
   }
 
   this->onTimeRangesChanged();
-  Q_EMIT this->enabled(this->Scene != NULL);
+  Q_EMIT this->enabled(this->Scene != nullptr);
 }
 
 //-----------------------------------------------------------------------------

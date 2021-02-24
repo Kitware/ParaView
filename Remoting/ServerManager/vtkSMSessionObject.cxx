@@ -40,14 +40,10 @@ vtkSMSessionObject::vtkScopedMonitorProgress::~vtkScopedMonitorProgress()
 
 vtkStandardNewMacro(vtkSMSessionObject);
 //---------------------------------------------------------------------------
-vtkSMSessionObject::vtkSMSessionObject()
-{
-}
+vtkSMSessionObject::vtkSMSessionObject() = default;
 
 //---------------------------------------------------------------------------
-vtkSMSessionObject::~vtkSMSessionObject()
-{
-}
+vtkSMSessionObject::~vtkSMSessionObject() = default;
 
 //----------------------------------------------------------------------------
 vtkSMSessionProxyManager* vtkSMSessionObject::GetSessionProxyManager()

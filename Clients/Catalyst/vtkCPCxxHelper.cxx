@@ -62,7 +62,7 @@ vtkCPCxxHelper* vtkCPCxxHelper::New()
 {
   if (vtkCPCxxHelper::Instance.GetPointer() != nullptr)
   {
-    vtkCPCxxHelper::Instance->Register(NULL);
+    vtkCPCxxHelper::Instance->Register(nullptr);
     return vtkCPCxxHelper::Instance;
   }
 

@@ -50,9 +50,7 @@ vtkAttributeDataToTableFilter::vtkAttributeDataToTableFilter()
 }
 
 //----------------------------------------------------------------------------
-vtkAttributeDataToTableFilter::~vtkAttributeDataToTableFilter()
-{
-}
+vtkAttributeDataToTableFilter::~vtkAttributeDataToTableFilter() = default;
 
 //----------------------------------------------------------------------------
 vtkExecutive* vtkAttributeDataToTableFilter::CreateDefaultExecutive()
@@ -221,7 +219,7 @@ void vtkAttributeDataToTableFilter::Decorate(vtkTable* output, vtkDataObject* in
   vtkRectilinearGrid* rgInput = vtkRectilinearGrid::SafeDownCast(input);
   vtkImageData* idInput = vtkImageData::SafeDownCast(input);
   vtkStructuredGrid* sgInput = vtkStructuredGrid::SafeDownCast(input);
-  const int* dimensions = 0;
+  const int* dimensions = nullptr;
   if (rgInput)
   {
     dimensions = rgInput->GetDimensions();

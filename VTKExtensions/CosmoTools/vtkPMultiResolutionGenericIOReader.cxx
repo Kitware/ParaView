@@ -150,14 +150,14 @@ vtkStandardNewMacro(vtkPMultiResolutionGenericIOReader);
 vtkPMultiResolutionGenericIOReader::vtkPMultiResolutionGenericIOReader()
 {
   this->Internal = new vtkInternal();
-  this->FileName = NULL;
+  this->FileName = nullptr;
   this->Internal->NumberOfBlocksPerLevel = -1;
   this->SetNumberOfInputPorts(0);
   this->SetNumberOfOutputPorts(1);
 
-  this->XAxisVariableName = NULL;
-  this->YAxisVariableName = NULL;
-  this->ZAxisVariableName = NULL;
+  this->XAxisVariableName = nullptr;
+  this->YAxisVariableName = nullptr;
+  this->ZAxisVariableName = nullptr;
 
   this->SetXAxisVariableName("x");
   this->SetYAxisVariableName("y");
@@ -174,7 +174,7 @@ vtkPMultiResolutionGenericIOReader::vtkPMultiResolutionGenericIOReader()
 //----------------------------------------------------------------------------
 vtkPMultiResolutionGenericIOReader::~vtkPMultiResolutionGenericIOReader()
 {
-  this->SetFileName(NULL);
+  this->SetFileName(nullptr);
   delete this->Internal;
   this->PointDataArraySelection->RemoveObserver(this->SelectionObserver);
   this->SelectionObserver->Delete();
@@ -199,7 +199,7 @@ bool vtkPMultiResolutionGenericIOReader::CanReadFile(const char* fName)
 //----------------------------------------------------------------------------
 static inline bool SetStringProperty(char*& destStr, const char* newStr)
 {
-  if (destStr == NULL && newStr == NULL)
+  if (destStr == nullptr && newStr == nullptr)
     return false;
   if (destStr && newStr && strcmp(destStr, newStr) == 0)
     return false;
@@ -217,7 +217,7 @@ static inline bool SetStringProperty(char*& destStr, const char* newStr)
   }
   else
   {
-    destStr = NULL;
+    destStr = nullptr;
   }
   return true;
 }
@@ -305,18 +305,18 @@ vtkStringArray* vtkPMultiResolutionGenericIOReader::GetArrayList()
   }
   else
   {
-    return NULL;
+    return nullptr;
   }
 }
 
 //----------------------------------------------------------------------------
 bool vtkPMultiResolutionGenericIOReader::InsertLevel(const char* fileName, int level)
 {
-  if (fileName == NULL)
+  if (fileName == nullptr)
   {
     return false;
   }
-  assert(this->Internal != NULL);
+  assert(this->Internal != nullptr);
   if (level < 0 || static_cast<unsigned>(level) > this->Internal->Resolutions.size())
   {
     vtkErrorMacro(<< "Level is out of range.");
@@ -341,17 +341,17 @@ bool vtkPMultiResolutionGenericIOReader::InsertLevel(const char* fileName, int l
 //----------------------------------------------------------------------------
 int vtkPMultiResolutionGenericIOReader::GetNumberOfLevels() const
 {
-  assert(this->Internal != NULL);
+  assert(this->Internal != nullptr);
   return this->Internal->Resolutions.size();
 }
 
 //----------------------------------------------------------------------------
 const char* vtkPMultiResolutionGenericIOReader::GetFileNameForLevel(int level) const
 {
-  assert(this->Internal != NULL);
+  assert(this->Internal != nullptr);
   if (level < 0 || static_cast<unsigned>(level) >= this->Internal->Resolutions.size())
   {
-    return (const char*)NULL;
+    return (const char*)nullptr;
   }
   return this->Internal->Resolutions[level].FileName.c_str();
 }
@@ -367,7 +367,7 @@ void vtkPMultiResolutionGenericIOReader::RemoveAllLevels()
 void vtkPMultiResolutionGenericIOReader::SelectionModifiedCallback(vtkObject* vtkNotUsed(caller),
   unsigned long vtkNotUsed(eid), void* clientdata, void* vtkNotUsed(calldata))
 {
-  assert(clientdata != NULL);
+  assert(clientdata != nullptr);
   vtkPMultiResolutionGenericIOReader* reader =
     static_cast<vtkPMultiResolutionGenericIOReader*>(clientdata);
   for (int i = 0; i < reader->GetNumberOfLevels(); ++i)
@@ -406,7 +406,8 @@ void vtkPMultiResolutionGenericIOReader::SetPointArrayStatus(const char* name, i
     assert(this->Internal->Resolutions.size() > 1);
     this->PointDataArraySelection->CopySelections(
       this->Internal->GetReaderForLevel(0)->GetPointDataArraySelection());
-    vtkPMultiResolutionGenericIOReader::SelectionModifiedCallback(NULL, 0l, (void*)this, NULL);
+    vtkPMultiResolutionGenericIOReader::SelectionModifiedCallback(
+      nullptr, 0l, (void*)this, nullptr);
     assert(this->PointDataArraySelection->ArrayExists(name));
   }
   if (status)
@@ -455,7 +456,7 @@ int vtkPMultiResolutionGenericIOReader::RequestInformation(
 
   // get the output info object
   vtkInformation* outInfo = outputVector->GetInformationObject(0);
-  assert(outInfo != NULL);
+  assert(outInfo != nullptr);
 
   // this filter does handle streaming pieces of the dataset
   outInfo->Set(CAN_HANDLE_PIECE_REQUEST(), 1);
@@ -581,9 +582,9 @@ int vtkPMultiResolutionGenericIOReader::RequestData(vtkInformation* request,
 {
   // Get the output dataset
   vtkInformation* outInfo = outputVector->GetInformationObject(0);
-  assert(outInfo != NULL);
+  assert(outInfo != nullptr);
   vtkMultiBlockDataSet* output = vtkMultiBlockDataSet::GetData(outputVector, 0);
-  assert(output != NULL);
+  assert(output != nullptr);
   // set the number of blocks
   output->SetNumberOfBlocks(this->GetNumberOfLevels());
 
@@ -651,7 +652,7 @@ int vtkPMultiResolutionGenericIOReader::RequestData(vtkInformation* request,
 
       // ask the internal reader for its data
       this->Internal->Resolutions[i].Reader->ProcessRequest(internalRequestData.GetPointer(),
-        (vtkInformationVector**)NULL, internalOutVector.GetPointer());
+        (vtkInformationVector**)nullptr, internalOutVector.GetPointer());
       // set the block in our output to the output of the internal reader
     }
     else

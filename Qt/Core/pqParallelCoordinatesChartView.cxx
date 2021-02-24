@@ -35,12 +35,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 pqParallelCoordinatesChartView::pqParallelCoordinatesChartView(const QString& group,
-  const QString& name, vtkSMContextViewProxy* viewModule, pqServer* server, QObject* p /*=NULL*/)
+  const QString& name, vtkSMContextViewProxy* viewModule, pqServer* server, QObject* p /*=nullptr*/)
   : Superclass(chartViewType(), group, name, viewModule, server, p)
 {
 }
 
 //-----------------------------------------------------------------------------
-pqParallelCoordinatesChartView::~pqParallelCoordinatesChartView()
-{
-}
+pqParallelCoordinatesChartView::~pqParallelCoordinatesChartView() = default;

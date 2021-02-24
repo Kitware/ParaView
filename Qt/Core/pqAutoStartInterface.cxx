@@ -32,11 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqAutoStartInterface.h"
 
 //-----------------------------------------------------------------------------
-pqAutoStartInterface::pqAutoStartInterface()
-{
-}
+pqAutoStartInterface::pqAutoStartInterface() = default;
 
 //-----------------------------------------------------------------------------
-pqAutoStartInterface::~pqAutoStartInterface()
-{
-}
+pqAutoStartInterface::~pqAutoStartInterface() = default;

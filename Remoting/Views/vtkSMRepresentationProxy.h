@@ -99,7 +99,7 @@ public:
   virtual vtkPVDataInformation* GetRepresentedDataInformation();
 
   /**
-   * Returns information about a specific array component's prominent values (or NULL).
+   * Returns information about a specific array component's prominent values (or nullptr).
 
    * The \a name, \a fieldAssoc, and \a numComponents arguments specify
    * which arrays on the input dataset to examine. Because multiblock

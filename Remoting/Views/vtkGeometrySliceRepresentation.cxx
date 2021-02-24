@@ -94,7 +94,7 @@ public:
   }
   static bool ExtractCachedBounds(vtkDataObject* dataObject, double bounds[6])
   {
-    if (dataObject == NULL || dataObject->GetFieldData() == NULL)
+    if (dataObject == nullptr || dataObject->GetFieldData() == nullptr)
     {
       return false;
     }
@@ -168,15 +168,15 @@ public:
     // vtkGeometrySliceRepresentation::RequestData().
     vtkDataObject* output = vtkDataObject::GetData(outputVector, 0);
     double inputBds[6];
-    vtkGeometryRepresentation::GetBounds(inputDO, inputBds, NULL);
+    vtkGeometryRepresentation::GetBounds(inputDO, inputBds, nullptr);
     vtkGSRGeometryFilter::CacheBounds(output, inputBds);
     return ret;
   }
 
 protected:
-  vtkGSRGeometryFilter() {}
+  vtkGSRGeometryFilter() = default;
 
-  ~vtkGSRGeometryFilter() override {}
+  ~vtkGSRGeometryFilter() override = default;
 
 private:
   vtkGSRGeometryFilter(const vtkGSRGeometryFilter&);
@@ -210,7 +210,7 @@ vtkGeometrySliceRepresentation::vtkGeometrySliceRepresentation()
 vtkGeometrySliceRepresentation::~vtkGeometrySliceRepresentation()
 {
   delete this->Internals;
-  this->Internals = NULL;
+  this->Internals = nullptr;
 }
 
 //----------------------------------------------------------------------------
@@ -296,11 +296,11 @@ int vtkGeometrySliceRepresentation::ProcessViewRequest(
           vtkPVMultiSliceView::SafeDownCast(inInfo->Get(vtkPVView::VIEW())))
     {
       view->SetModelTransformationMatrix(changeOfBasisMatrix);
-      const char* titles[3] = { NULL, NULL, NULL };
+      const char* titles[3] = { nullptr, nullptr, nullptr };
       vtkPVChangeOfBasisHelper::GetBasisName(localData, titles[0], titles[1], titles[2]);
       for (int axis = 0; axis < 3; ++axis)
       {
-        if (titles[axis] != NULL)
+        if (titles[axis] != nullptr)
         {
           vtkPVMultiSliceView::SetAxisTitle(inInfo, axis, titles[axis]);
         }

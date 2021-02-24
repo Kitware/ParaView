@@ -24,14 +24,10 @@
 vtkStandardNewMacro(vtkSMTimeStepIndexDomain);
 
 //---------------------------------------------------------------------------
-vtkSMTimeStepIndexDomain::vtkSMTimeStepIndexDomain()
-{
-}
+vtkSMTimeStepIndexDomain::vtkSMTimeStepIndexDomain() = default;
 
 //---------------------------------------------------------------------------
-vtkSMTimeStepIndexDomain::~vtkSMTimeStepIndexDomain()
-{
-}
+vtkSMTimeStepIndexDomain::~vtkSMTimeStepIndexDomain() = default;
 
 //---------------------------------------------------------------------------
 void vtkSMTimeStepIndexDomain::Update(vtkSMProperty*)

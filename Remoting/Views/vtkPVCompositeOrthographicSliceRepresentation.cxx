@@ -21,14 +21,12 @@
 
 vtkStandardNewMacro(vtkPVCompositeOrthographicSliceRepresentation);
 //----------------------------------------------------------------------------
-vtkPVCompositeOrthographicSliceRepresentation::vtkPVCompositeOrthographicSliceRepresentation()
-{
-}
+vtkPVCompositeOrthographicSliceRepresentation::vtkPVCompositeOrthographicSliceRepresentation() =
+  default;
 
 //----------------------------------------------------------------------------
-vtkPVCompositeOrthographicSliceRepresentation::~vtkPVCompositeOrthographicSliceRepresentation()
-{
-}
+vtkPVCompositeOrthographicSliceRepresentation::~vtkPVCompositeOrthographicSliceRepresentation() =
+  default;
 
 //----------------------------------------------------------------------------
 void vtkPVCompositeOrthographicSliceRepresentation::SetSliceRepresentation(

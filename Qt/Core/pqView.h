@@ -74,7 +74,7 @@ public:
 
   /**
   * Return the client-side vtkView encapsulated by this view (if any),
-  * or return NULL.
+  * or return nullptr.
   */
   virtual vtkView* getClientSideView() const;
 
@@ -83,7 +83,7 @@ public:
   * application must be able to render itself in a QWidget. The first time
   * this method is called, this will call pqView::createWidget(). Subclasses
   * createWidget() to create a QWidget for the view.
-  * This may return NULL if the view doesn't have QWidget associated with it
+  * This may return nullptr if the view doesn't have QWidget associated with it
   * (which is rare, if impossible) or the QWidget was previously created but
   * since has been destroyed due to Qt cleanup.
   */
@@ -342,7 +342,7 @@ protected:
   * \c parent:- QObject parent.
   */
   pqView(const QString& type, const QString& group, const QString& name, vtkSMViewProxy* view,
-    pqServer* server, QObject* parent = NULL);
+    pqServer* server, QObject* parent = nullptr);
 
   /**
   * Use this method to initialize the pqObject state using the

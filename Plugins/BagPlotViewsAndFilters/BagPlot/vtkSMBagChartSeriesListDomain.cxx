@@ -29,9 +29,7 @@ vtkSMBagChartSeriesListDomain::vtkSMBagChartSeriesListDomain()
 }
 
 //----------------------------------------------------------------------------
-vtkSMBagChartSeriesListDomain::~vtkSMBagChartSeriesListDomain()
-{
-}
+vtkSMBagChartSeriesListDomain::~vtkSMBagChartSeriesListDomain() = default;
 
 //----------------------------------------------------------------------------
 int vtkSMBagChartSeriesListDomain::ReadXMLAttributes(vtkSMProperty* prop, vtkPVXMLElement* element)

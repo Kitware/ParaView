@@ -155,8 +155,8 @@ public:
 
   vtkInternals()
   {
-    this->fof = NULL;
-    this->haloFinder = NULL;
+    this->fof = nullptr;
+    this->haloFinder = nullptr;
   }
 
   ~vtkInternals()
@@ -196,9 +196,9 @@ public:
   }
 };
 
-vtkStandardNewMacro(vtkPANLHaloFinder)
+vtkStandardNewMacro(vtkPANLHaloFinder);
 
-  vtkPANLHaloFinder::vtkPANLHaloFinder()
+vtkPANLHaloFinder::vtkPANLHaloFinder()
 {
   this->Internal = new vtkPANLHaloFinder::vtkInternals;
   this->Controller = vtkMultiProcessController::GetGlobalController();
@@ -257,7 +257,7 @@ int vtkPANLHaloFinder::RequestData(
 {
   vtkUnstructuredGrid* grid = vtkUnstructuredGrid::GetData(inVector[0], 0);
   vtkMultiBlockDataSet* multiBlock = vtkMultiBlockDataSet::GetData(inVector[0], 0);
-  if (grid == NULL && multiBlock == NULL)
+  if (grid == nullptr && multiBlock == nullptr)
   {
     vtkErrorMacro("No Input!");
     return 0;
@@ -271,7 +271,7 @@ int vtkPANLHaloFinder::RequestData(
 
   cosmotk::Partition::initialize();
 
-  if (grid != NULL)
+  if (grid != nullptr)
   {
     this->ExtractDataArrays(grid, 0);
   }
@@ -282,7 +282,7 @@ int vtkPANLHaloFinder::RequestData(
     for (vtkIdType i = 0; i < multiBlock->GetNumberOfBlocks(); ++i)
     {
       vtkUnstructuredGrid* block = vtkUnstructuredGrid::SafeDownCast(multiBlock->GetBlock(i));
-      if (block != NULL)
+      if (block != nullptr)
       {
         this->ExtractDataArrays(block, pointsSoFar);
         pointsSoFar += block->GetNumberOfPoints();

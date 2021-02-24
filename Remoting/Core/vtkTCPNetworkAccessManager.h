@@ -48,7 +48,7 @@ public:
    * To abort the connection and cancel the waiting, simply call
    * AbortPendingConnection() in the vtkCommand::ProgressEvent callback.
 
-   * Returns the new connection instance on success, otherwise NULL.
+   * Returns the new connection instance on success, otherwise nullptr.
 
    * URLs are of the following form:
    * \c \<transport\>://\<address\>
@@ -64,7 +64,7 @@ public:
    * multiple  :- leave server-socket open for more than 1 client to connect
    * (listen must be set to true)
    * nonblocking:- When listen is true, this will result in the call returning
-   * NULL if a client connection is not available immediately.
+   * nullptr if a client connection is not available immediately.
    * It leaves the server socket open for client to connect.
    * timeout   :- When connecting to remote i.e listen==false, specify the time
    * (in seconds) for which this call blocks to retry attempts to

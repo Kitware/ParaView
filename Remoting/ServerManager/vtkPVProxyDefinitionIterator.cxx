@@ -18,13 +18,9 @@
 class vtkPVXMLElement;
 
 //-----------------------------------------------------------------------------
-vtkPVProxyDefinitionIterator::vtkPVProxyDefinitionIterator()
-{
-}
+vtkPVProxyDefinitionIterator::vtkPVProxyDefinitionIterator() = default;
 //---------------------------------------------------------------------------
-vtkPVProxyDefinitionIterator::~vtkPVProxyDefinitionIterator()
-{
-}
+vtkPVProxyDefinitionIterator::~vtkPVProxyDefinitionIterator() = default;
 //---------------------------------------------------------------------------
 void vtkPVProxyDefinitionIterator::PrintSelf(ostream& os, vtkIndent indent)
 {

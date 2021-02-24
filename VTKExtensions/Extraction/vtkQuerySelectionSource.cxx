@@ -41,7 +41,7 @@ vtkQuerySelectionSource::vtkQuerySelectionSource()
   this->Internals = new vtkInternals();
 
   this->FieldType = vtkSelectionNode::CELL;
-  this->QueryString = 0;
+  this->QueryString = nullptr;
   this->CompositeIndex = -1;
   this->HierarchicalIndex = -1;
   this->HierarchicalLevel = -1;
@@ -54,7 +54,7 @@ vtkQuerySelectionSource::vtkQuerySelectionSource()
 vtkQuerySelectionSource::~vtkQuerySelectionSource()
 {
   delete this->Internals;
-  this->Internals = 0;
+  this->Internals = nullptr;
 }
 
 //----------------------------------------------------------------------------

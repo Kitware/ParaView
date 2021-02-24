@@ -60,8 +60,8 @@ protected:
   void PrintLine(const char* pname, const char* line);
   int WaitForAndPrintLine(const char* pname, vtksysProcess* process, std::string& line,
     double timeout, std::vector<char>& out, std::vector<char>& err,
-    const char* string_to_wait_for = NULL, int* foundWaiting = NULL,
-    std::string* matched_line = NULL);
+    const char* string_to_wait_for = nullptr, int* foundWaiting = nullptr,
+    std::string* matched_line = nullptr);
 
   std::string GetDirectory(std::string location);
 

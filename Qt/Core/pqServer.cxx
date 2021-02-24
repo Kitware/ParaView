@@ -156,7 +156,7 @@ pqServer::~pqServer()
     }
     */
   this->ConnectionID = 0;
-  this->Session = NULL;
+  this->Session = nullptr;
   delete this->Internals;
 }
 

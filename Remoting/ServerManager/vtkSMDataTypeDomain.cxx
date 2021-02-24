@@ -63,9 +63,9 @@ static std::map<std::string, vtkSmartPointer<vtkDataObject> > DataObjectMap;
 // Only instantiate classes once and use cache after...
 static vtkDataObject* GetDataObjectOfType(const char* classname)
 {
-  if (classname == NULL)
+  if (classname == nullptr)
   {
-    return 0;
+    return nullptr;
   }
 
   // Since we can not instantiate these classes, we'll replace
@@ -102,7 +102,7 @@ static vtkDataObject* GetDataObjectOfType(const char* classname)
     {
       object->Delete();
     }
-    return 0;
+    return nullptr;
   }
 
   DataObjectMap[classname] = dobj;

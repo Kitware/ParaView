@@ -40,9 +40,7 @@ pqLineEditEventPlayer::pqLineEditEventPlayer(QObject* parentObject)
 }
 
 //-----------------------------------------------------------------------------
-pqLineEditEventPlayer::~pqLineEditEventPlayer()
-{
-}
+pqLineEditEventPlayer::~pqLineEditEventPlayer() = default;
 
 //-----------------------------------------------------------------------------
 bool pqLineEditEventPlayer::playEvent(

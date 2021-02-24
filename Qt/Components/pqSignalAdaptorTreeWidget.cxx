@@ -43,7 +43,7 @@ pqSignalAdaptorTreeWidget::pqSignalAdaptorTreeWidget(QTreeWidget* treeWidget, bo
   this->TreeWidget = treeWidget;
   this->Sortable = this->TreeWidget->isSortingEnabled();
   this->Editable = editable;
-  this->ItemCreatorFunctionPtr = 0;
+  this->ItemCreatorFunctionPtr = nullptr;
 
   // by default none nothing is sorted until the user clicks on one of the
   // headers.
@@ -71,9 +71,7 @@ pqSignalAdaptorTreeWidget::pqSignalAdaptorTreeWidget(QTreeWidget* treeWidget, bo
 }
 
 //-----------------------------------------------------------------------------
-pqSignalAdaptorTreeWidget::~pqSignalAdaptorTreeWidget()
-{
-}
+pqSignalAdaptorTreeWidget::~pqSignalAdaptorTreeWidget() = default;
 
 //-----------------------------------------------------------------------------
 QList<QVariant> pqSignalAdaptorTreeWidget::values() const
@@ -112,13 +110,13 @@ QTreeWidgetItem* pqSignalAdaptorTreeWidget::newItem(const QStringList& columnVal
   if (columnValues.size() != column_count)
   {
     qDebug() << "Number of values does not match those required in one item.";
-    return 0;
+    return nullptr;
   }
 
-  QTreeWidgetItem* item = NULL;
+  QTreeWidgetItem* item = nullptr;
   if (this->ItemCreatorFunctionPtr)
   {
-    item = (*this->ItemCreatorFunctionPtr)(NULL, columnValues);
+    item = (*this->ItemCreatorFunctionPtr)(nullptr, columnValues);
   }
 
   if (!item)
@@ -200,7 +198,7 @@ void pqSignalAdaptorTreeWidget::updateSortingLinks()
   }
   else
   {
-    QObject::disconnect(this->TreeWidget->header(), 0, this, 0);
+    QObject::disconnect(this->TreeWidget->header(), nullptr, this, nullptr);
   }
 }
 

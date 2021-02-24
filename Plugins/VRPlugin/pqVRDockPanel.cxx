@@ -361,7 +361,7 @@ void pqVRDockPanel::removeStyle()
   }
   QString name = item->text();
 
-  vtkVRInteractorStyle* style = this->Internals->StyleNameMap.value(name, NULL);
+  vtkVRInteractorStyle* style = this->Internals->StyleNameMap.value(name, nullptr);
   if (!style)
   {
     return;
@@ -399,7 +399,7 @@ void pqVRDockPanel::editStyle(QListWidgetItem* item)
 
   pqVRAddStyleDialog dialog(this);
   QString name = item->text();
-  vtkVRInteractorStyle* style = this->Internals->StyleNameMap.value(name, NULL);
+  vtkVRInteractorStyle* style = this->Internals->StyleNameMap.value(name, nullptr);
   if (!style)
   {
     return;
@@ -459,7 +459,7 @@ void pqVRDockPanel::setActiveView(pqView* view)
     this->Internals->proxyCombo->addProxy(0, rview->getSMName(), rview->getProxy());
   }
 
-  this->Internals->Camera = NULL;
+  this->Internals->Camera = nullptr;
   if (rview)
   {
     vtkSMRenderViewProxy* renPxy = rview->getRenderViewProxy();
@@ -479,8 +479,8 @@ void pqVRDockPanel::setActiveView(pqView* view)
 //-----------------------------------------------------------------------------
 void pqVRDockPanel::saveState()
 {
-  pqFileDialog fileDialog(NULL, pqCoreUtilities::mainWidget(), "Save VR plugin template", QString(),
-    "VR plugin template files (*.pvvr)");
+  pqFileDialog fileDialog(nullptr, pqCoreUtilities::mainWidget(), "Save VR plugin template",
+    QString(), "VR plugin template files (*.pvvr)");
 
   fileDialog.setFileMode(pqFileDialog::AnyFile);
 
@@ -513,9 +513,9 @@ void pqVRDockPanel::saveState()
 //-----------------------------------------------------------------------------
 void pqVRDockPanel::restoreState()
 {
-  pqFileDialog fileDialog(NULL, pqCoreUtilities::mainWidget(), "Load VR plugin template", QString(),
-    "VR plugin template files (*.pvvr);;"
-    "ParaView state files (*.pvsm)");
+  pqFileDialog fileDialog(nullptr, pqCoreUtilities::mainWidget(), "Load VR plugin template",
+    QString(), "VR plugin template files (*.pvvr);;"
+               "ParaView state files (*.pvsm)");
 
   fileDialog.setFileMode(pqFileDialog::ExistingFile);
 
@@ -537,14 +537,14 @@ void pqVRDockPanel::restoreState()
   vtkPVXMLElement* connRoot = root->FindNestedElementByName("VRConnectionManager");
   if (connMgr && connRoot)
   {
-    connMgr->configureConnections(connRoot, NULL);
+    connMgr->configureConnections(connRoot, nullptr);
   }
 
   pqVRQueueHandler* queueHandler = pqVRQueueHandler::instance();
   vtkPVXMLElement* stylesRoot = root->FindNestedElementByName("VRInteractorStyles");
   if (queueHandler && stylesRoot)
   {
-    queueHandler->configureStyles(root, NULL);
+    queueHandler->configureStyles(root, nullptr);
   }
 }
 

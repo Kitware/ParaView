@@ -138,7 +138,7 @@ public:
   PQ_BEHAVIOR_DEFINE_METHODS(WheelNeedsFocusBehavior);
   //@}
 
-  pqParaViewBehaviors(QMainWindow* window, QObject* parent = NULL);
+  pqParaViewBehaviors(QMainWindow* window, QObject* parent = nullptr);
   ~pqParaViewBehaviors() override;
 
 private:

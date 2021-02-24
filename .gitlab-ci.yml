@@ -151,6 +151,18 @@ test:fedora33-shared-mpi-python-core:
     # editions testing needs some work.
     allow_failure: true
 
+## Static analysis
+
+build:fedora33-tidy:
+    extends:
+        - .fedora33_tidy
+        - .cmake_build_linux
+        - .linux_qt_builder_tags
+        - .cmake_tidy_artifacts
+        - .run_manually
+    # clang-tidy is *really* slow because it isn't cached.
+    timeout: 3 hours
+
 # macOS
 
 build:macos-python-qt:

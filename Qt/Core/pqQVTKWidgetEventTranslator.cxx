@@ -52,9 +52,7 @@ pqQVTKWidgetEventTranslator::pqQVTKWidgetEventTranslator(QObject* p)
 {
 }
 
-pqQVTKWidgetEventTranslator::~pqQVTKWidgetEventTranslator()
-{
-}
+pqQVTKWidgetEventTranslator::~pqQVTKWidgetEventTranslator() = default;
 
 bool pqQVTKWidgetEventTranslator::translateEvent(
   QObject* Object, QEvent* Event, int eventType, bool& error)
@@ -192,8 +190,8 @@ bool pqQVTKWidgetEventTranslator::translateEvent(
       filters += ";;TIFF image (*.tif)";
       filters += ";;PPM image (*.ppm)";
       filters += ";;JPG image (*.jpg)";
-      pqFileDialog file_dialog(
-        NULL, pqCoreUtilities::mainWidget(), tr("Save Screenshot:"), baselineDir.path(), filters);
+      pqFileDialog file_dialog(nullptr, pqCoreUtilities::mainWidget(), tr("Save Screenshot:"),
+        baselineDir.path(), filters);
       file_dialog.setObjectName("FileSaveScreenshotDialog");
       file_dialog.setFileMode(pqFileDialog::AnyFile);
 

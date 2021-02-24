@@ -103,9 +103,9 @@ int TestSelfGeneratingSourceProxy(int argc, char* argv[])
 
   pxm->SaveXMLState(path.c_str());
   controller->UnRegisterProxy(sgProxy);
-  sgProxy = NULL;
+  sgProxy = nullptr;
 
-  if (sphere != NULL)
+  if (sphere != nullptr)
   {
     cerr << "Cleanup has failed!" << endl;
     return EXIT_FAILURE;
@@ -141,7 +141,7 @@ int TestSelfGeneratingSourceProxy(int argc, char* argv[])
     cerr << "Failed to update VTK object correctly after loading state!" << endl;
     return EXIT_FAILURE;
   }
-  sgProxy = NULL;
+  sgProxy = nullptr;
 
   session->Delete();
   vtkInitializationHelper::Finalize();

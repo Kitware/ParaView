@@ -39,7 +39,7 @@ vtkEquivalenceSet::~vtkEquivalenceSet()
   if (this->EquivalenceArray)
   {
     this->EquivalenceArray->Delete();
-    this->EquivalenceArray = 0;
+    this->EquivalenceArray = nullptr;
   }
 }
 

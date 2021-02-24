@@ -175,7 +175,7 @@ public:
 
   /**
    * Set custom tick positions for each of the axes.
-   * The positions are deep copied. Set to NULL to not use custom tick positions
+   * The positions are deep copied. Set to nullptr to not use custom tick positions
    * for the axis.
    */
   void SetCustomTickPositions(int axis, vtkDoubleArray* positions);

@@ -62,9 +62,9 @@ vtkCompositeRepresentation::vtkCompositeRepresentation()
 vtkCompositeRepresentation::~vtkCompositeRepresentation()
 {
   delete this->Internals;
-  this->Internals = 0;
+  this->Internals = nullptr;
   this->Observer->Delete();
-  this->Observer = 0;
+  this->Observer = nullptr;
 }
 
 //----------------------------------------------------------------------------
@@ -95,7 +95,7 @@ void vtkCompositeRepresentation::SetVisibility(bool visible)
 //----------------------------------------------------------------------------
 void vtkCompositeRepresentation::AddRepresentation(const char* key, vtkPVDataRepresentation* repr)
 {
-  assert(repr != NULL && key != NULL);
+  assert(repr != nullptr && key != nullptr);
 
   // Make sure the representation that we register is already initialized
   repr->Initialize(1, 0); // Should abort if no initialized as 1 > 0
@@ -114,7 +114,7 @@ void vtkCompositeRepresentation::AddRepresentation(const char* key, vtkPVDataRep
 //----------------------------------------------------------------------------
 void vtkCompositeRepresentation::RemoveRepresentation(const char* key)
 {
-  assert(key != NULL);
+  assert(key != nullptr);
 
   vtkInternals::RepresentationMap::iterator iter = this->Internals->Representations.find(key);
   if (iter != this->Internals->Representations.end())
@@ -166,7 +166,7 @@ const char* vtkCompositeRepresentation::GetActiveRepresentationKey()
     return this->Internals->ActiveRepresentationKey.c_str();
   }
 
-  return NULL;
+  return nullptr;
 }
 
 //----------------------------------------------------------------------------
@@ -178,7 +178,7 @@ vtkPVDataRepresentation* vtkCompositeRepresentation::GetActiveRepresentation()
   {
     return iter->second;
   }
-  return NULL;
+  return nullptr;
 }
 
 //----------------------------------------------------------------------------
@@ -422,7 +422,7 @@ void vtkCompositeRepresentation::TriggerUpdateDataEvent()
 //----------------------------------------------------------------------------
 void vtkCompositeRepresentation::SetActiveRepresentation(const char* key)
 {
-  assert(key != NULL);
+  assert(key != nullptr);
 
   vtkPVDataRepresentation* curActive = this->GetActiveRepresentation();
   this->Internals->ActiveRepresentationKey = key;

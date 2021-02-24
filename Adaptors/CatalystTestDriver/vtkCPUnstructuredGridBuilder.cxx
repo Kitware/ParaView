@@ -26,7 +26,7 @@ vtkCxxSetObjectMacro(vtkCPUnstructuredGridBuilder, UnstructuredGrid, vtkUnstruct
 //----------------------------------------------------------------------------
 vtkCPUnstructuredGridBuilder::vtkCPUnstructuredGridBuilder()
 {
-  this->UnstructuredGrid = 0;
+  this->UnstructuredGrid = nullptr;
   vtkUnstructuredGrid* UG = vtkUnstructuredGrid::New();
   this->SetUnstructuredGrid(UG);
   UG->Delete();
@@ -36,7 +36,7 @@ vtkCPUnstructuredGridBuilder::vtkCPUnstructuredGridBuilder()
 //----------------------------------------------------------------------------
 vtkCPUnstructuredGridBuilder::~vtkCPUnstructuredGridBuilder()
 {
-  this->SetUnstructuredGrid(0);
+  this->SetUnstructuredGrid(nullptr);
 }
 
 //----------------------------------------------------------------------------
@@ -48,7 +48,7 @@ vtkDataObject* vtkCPUnstructuredGridBuilder::GetGrid(
   if (!fieldBuilder)
   {
     vtkErrorMacro("FieldBuilder is not defined.");
-    return 0;
+    return nullptr;
   }
 
   fieldBuilder->BuildField(timeStep, time, this->UnstructuredGrid);

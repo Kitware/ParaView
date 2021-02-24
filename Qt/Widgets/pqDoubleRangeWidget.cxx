@@ -45,9 +45,7 @@ pqDoubleRangeWidget::pqDoubleRangeWidget(QWidget* p)
 }
 
 //-----------------------------------------------------------------------------
-pqDoubleRangeWidget::~pqDoubleRangeWidget()
-{
-}
+pqDoubleRangeWidget::~pqDoubleRangeWidget() = default;
 
 //-----------------------------------------------------------------------------
 int pqDoubleRangeWidget::resolution() const

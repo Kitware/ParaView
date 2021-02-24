@@ -42,9 +42,7 @@ vtkGeodesicsBetweenPoints::vtkGeodesicsBetweenPoints()
 }
 
 //-----------------------------------------------------------------------------
-vtkGeodesicsBetweenPoints::~vtkGeodesicsBetweenPoints()
-{
-}
+vtkGeodesicsBetweenPoints::~vtkGeodesicsBetweenPoints() = default;
 
 //-----------------------------------------------------------------------------
 int vtkGeodesicsBetweenPoints::FillInputPortInformation(int port, vtkInformation* info)

@@ -113,9 +113,9 @@ static bool getNetworkSubdirs(
   {
     rc.dwUsage |= RESOURCEUSAGE_RESERVED; // wonder why this is needed?
   }
-  rc.lpLocalName = NULL;
-  rc.lpProvider = NULL;
-  rc.lpComment = NULL;
+  rc.lpLocalName = nullptr;
+  rc.lpProvider = nullptr;
+  rc.lpComment = nullptr;
   rc.lpRemoteName = const_cast<char*>(name.c_str());
 
   DWORD ret = WNetOpenEnumA(RESOURCE_GLOBALNET, RESOURCETYPE_ANY, 0, &rc, &han);
@@ -298,13 +298,13 @@ static std::string vtkPVFileInformationResolveLink(const std::string& fname, WIN
   std::string result;
 
   hr = ::CoCreateInstance(
-    CLSID_ShellLink, NULL, CLSCTX_INPROC_SERVER, IID_IShellLink, (LPVOID*)&shellLink);
+    CLSID_ShellLink, nullptr, CLSCTX_INPROC_SERVER, IID_IShellLink, (LPVOID*)&shellLink);
   if (hr == CO_E_NOTINITIALIZED)
   {
     coInit = true;
-    ::CoInitialize(NULL);
+    ::CoInitialize(nullptr);
     hr = ::CoCreateInstance(
-      CLSID_ShellLink, NULL, CLSCTX_INPROC_SERVER, IID_IShellLink, (LPVOID*)&shellLink);
+      CLSID_ShellLink, nullptr, CLSCTX_INPROC_SERVER, IID_IShellLink, (LPVOID*)&shellLink);
   }
   if (SUCCEEDED(hr))
   {
@@ -358,17 +358,17 @@ vtkPVFileInformation::vtkPVFileInformation()
   this->Contents = vtkCollection::New();
   this->SequenceParser = vtkFileSequenceParser::New();
   this->Type = INVALID;
-  this->Name = NULL;
-  this->FullPath = NULL;
+  this->Name = nullptr;
+  this->FullPath = nullptr;
   this->FastFileTypeDetection = 0;
   this->ReadDetailedFileInformation = false;
   this->Hidden = false;
-  this->Extension = NULL;
+  this->Extension = nullptr;
   this->Size = 0;
 #ifdef _WIN32
-  this->ModificationTime = _time64(NULL);
+  this->ModificationTime = _time64(nullptr);
 #else
-  this->ModificationTime = time(NULL);
+  this->ModificationTime = time(nullptr);
 #endif
 }
 
@@ -377,14 +377,14 @@ vtkPVFileInformation::~vtkPVFileInformation()
 {
   this->Contents->Delete();
   this->SequenceParser->Delete();
-  this->SetName(NULL);
-  this->SetFullPath(NULL);
-  this->SetExtension(NULL);
+  this->SetName(nullptr);
+  this->SetFullPath(nullptr);
+  this->SetExtension(nullptr);
   this->Size = 0;
 #ifdef _WIN32
-  this->ModificationTime = _time64(NULL);
+  this->ModificationTime = _time64(nullptr);
 #else
-  this->ModificationTime = time(NULL);
+  this->ModificationTime = time(nullptr);
 #endif
 }
 
@@ -495,7 +495,7 @@ void vtkPVFileInformation::GetSpecialDirectories()
   TCHAR szPath[MAX_PATH];
   std::string tmp;
 
-  if (SUCCEEDED(SHGetSpecialFolderPath(NULL, szPath, CSIDL_PERSONAL, false)))
+  if (SUCCEEDED(SHGetSpecialFolderPath(nullptr, szPath, CSIDL_PERSONAL, false)))
   {
     tmp = szPath;
     vtkSmartPointer<vtkPVFileInformation> info = vtkSmartPointer<vtkPVFileInformation>::New();
@@ -505,7 +505,7 @@ void vtkPVFileInformation::GetSpecialDirectories()
     this->Contents->AddItem(info);
   }
 
-  if (SUCCEEDED(SHGetSpecialFolderPath(NULL, szPath, CSIDL_DESKTOPDIRECTORY, false)))
+  if (SUCCEEDED(SHGetSpecialFolderPath(nullptr, szPath, CSIDL_DESKTOPDIRECTORY, false)))
   {
     tmp = szPath;
     vtkSmartPointer<vtkPVFileInformation> info = vtkSmartPointer<vtkPVFileInformation>::New();
@@ -515,7 +515,7 @@ void vtkPVFileInformation::GetSpecialDirectories()
     this->Contents->AddItem(info);
   }
 
-  if (SUCCEEDED(SHGetSpecialFolderPath(NULL, szPath, CSIDL_FAVORITES, false)))
+  if (SUCCEEDED(SHGetSpecialFolderPath(nullptr, szPath, CSIDL_FAVORITES, false)))
   {
     tmp = szPath;
     vtkSmartPointer<vtkPVFileInformation> info = vtkSmartPointer<vtkPVFileInformation>::New();
@@ -719,8 +719,8 @@ void vtkPVFileInformation::GetWindowsDirectoryListing()
   if (handle == INVALID_HANDLE_VALUE)
   {
     LPVOID lpMsgBuf;
-    FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM, NULL, GetLastError(),
-      MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPTSTR)&lpMsgBuf, 0, NULL);
+    FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM, nullptr,
+      GetLastError(), MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPTSTR)&lpMsgBuf, 0, nullptr);
     vtkErrorMacro(
       "Error calling FindFirstFile : " << (char*)lpMsgBuf << "\nDirectory: " << prefix.c_str());
     LocalFree(lpMsgBuf);
@@ -797,8 +797,8 @@ void vtkPVFileInformation::GetWindowsDirectoryListing()
   if (GetLastError() != ERROR_NO_MORE_FILES)
   {
     LPVOID lpMsgBuf;
-    FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM, NULL, GetLastError(),
-      MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPTSTR)&lpMsgBuf, 0, NULL);
+    FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM, nullptr,
+      GetLastError(), MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPTSTR)&lpMsgBuf, 0, nullptr);
     vtkErrorMacro(
       "Error calling FindNextFile : " << (char*)lpMsgBuf << "\nDirectory: " << prefix.c_str());
     LocalFree(lpMsgBuf);
@@ -1119,7 +1119,7 @@ void vtkPVFileInformation::CopyToStream(vtkClientServerStream* stream)
 void vtkPVFileInformation::CopyFromStream(const vtkClientServerStream* css)
 {
   this->Initialize();
-  const char* temp = 0;
+  const char* temp = nullptr;
   if (!css->GetArgument(0, 0, &temp))
   {
     vtkErrorMacro("Error parsing Name.");
@@ -1186,17 +1186,17 @@ void vtkPVFileInformation::CopyFromStream(const vtkClientServerStream* css)
 //-----------------------------------------------------------------------------
 void vtkPVFileInformation::Initialize()
 {
-  this->SetName(0);
-  this->SetFullPath(0);
+  this->SetName(nullptr);
+  this->SetFullPath(nullptr);
   this->Type = INVALID;
   this->Hidden = false;
   this->Contents->RemoveAllItems();
-  this->SetExtension(0);
+  this->SetExtension(nullptr);
   this->Size = 0;
 #ifdef _WIN32
-  this->ModificationTime = _time64(NULL);
+  this->ModificationTime = _time64(nullptr);
 #else
-  this->ModificationTime = time(NULL);
+  this->ModificationTime = time(nullptr);
 #endif
 }
 

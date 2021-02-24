@@ -45,7 +45,7 @@ class PQCOMPONENTS_EXPORT pqDataInformationModel : public QAbstractTableModel
   Q_OBJECT
 
 public:
-  pqDataInformationModel(QObject* _parent = NULL);
+  pqDataInformationModel(QObject* _parent = nullptr);
   ~pqDataInformationModel() override;
 
   /**

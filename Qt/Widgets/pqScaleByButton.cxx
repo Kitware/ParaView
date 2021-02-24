@@ -65,9 +65,7 @@ pqScaleByButton::pqScaleByButton(
 }
 
 //-----------------------------------------------------------------------------
-pqScaleByButton::~pqScaleByButton()
-{
-}
+pqScaleByButton::~pqScaleByButton() = default;
 
 //-----------------------------------------------------------------------------
 void pqScaleByButton::constructor(const QMap<double, QString>& scaleFactors)

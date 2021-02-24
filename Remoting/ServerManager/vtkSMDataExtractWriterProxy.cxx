@@ -25,14 +25,10 @@
 
 vtkStandardNewMacro(vtkSMDataExtractWriterProxy);
 //----------------------------------------------------------------------------
-vtkSMDataExtractWriterProxy::vtkSMDataExtractWriterProxy()
-{
-}
+vtkSMDataExtractWriterProxy::vtkSMDataExtractWriterProxy() = default;
 
 //----------------------------------------------------------------------------
-vtkSMDataExtractWriterProxy::~vtkSMDataExtractWriterProxy()
-{
-}
+vtkSMDataExtractWriterProxy::~vtkSMDataExtractWriterProxy() = default;
 
 //----------------------------------------------------------------------------
 bool vtkSMDataExtractWriterProxy::Write(vtkSMExtractsController* extractor)

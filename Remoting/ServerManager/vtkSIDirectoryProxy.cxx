@@ -28,14 +28,10 @@
 //****************************************************************************
 vtkStandardNewMacro(vtkSIDirectoryProxy);
 //----------------------------------------------------------------------------
-vtkSIDirectoryProxy::vtkSIDirectoryProxy()
-{
-}
+vtkSIDirectoryProxy::vtkSIDirectoryProxy() = default;
 
 //----------------------------------------------------------------------------
-vtkSIDirectoryProxy::~vtkSIDirectoryProxy()
-{
-}
+vtkSIDirectoryProxy::~vtkSIDirectoryProxy() = default;
 
 //----------------------------------------------------------------------------
 void vtkSIDirectoryProxy::Pull(vtkSMMessage* message)

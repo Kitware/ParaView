@@ -111,7 +111,7 @@ public:
     , HasVisibleWidgets(false)
     , HasAdvancedProperties(hasAdvancedProperties(proxy))
   {
-    assert(proxy != NULL);
+    assert(proxy != nullptr);
 
     Ui::ProxyWidgetDialog& ui = this->Ui;
     ui.setupUi(self);
@@ -337,7 +337,7 @@ pqProxyWidgetDialog::pqProxyWidgetDialog(
 pqProxyWidgetDialog::~pqProxyWidgetDialog()
 {
   delete this->Internals;
-  this->Internals = NULL;
+  this->Internals = nullptr;
 }
 
 //-----------------------------------------------------------------------------

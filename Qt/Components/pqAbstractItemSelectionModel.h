@@ -44,7 +44,7 @@ class pqAbstractItemSelectionModel : public QAbstractItemModel
   Q_OBJECT
 
 protected:
-  pqAbstractItemSelectionModel(QObject* parent_ = NULL);
+  pqAbstractItemSelectionModel(QObject* parent_ = nullptr);
   ~pqAbstractItemSelectionModel() override;
 
   /**

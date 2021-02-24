@@ -46,7 +46,7 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqDataQueryReaction : public pqReaction
 
 public:
   /**
-  * Constructor. Parent cannot be NULL.
+  * Constructor. Parent cannot be nullptr.
   */
   pqDataQueryReaction(QAction* parent);
   ~pqDataQueryReaction() override;

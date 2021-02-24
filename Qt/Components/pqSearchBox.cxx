@@ -85,9 +85,7 @@ pqSearchBox::pqSearchBox(bool advancedSearchEnabled, const QString& settingKey, 
 }
 
 //-----------------------------------------------------------------------------
-pqSearchBox::~pqSearchBox()
-{
-}
+pqSearchBox::~pqSearchBox() = default;
 
 //-----------------------------------------------------------------------------
 void pqSearchBox::keyPressEvent(QKeyEvent* keyEvent)

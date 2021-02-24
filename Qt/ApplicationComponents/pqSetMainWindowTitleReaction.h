@@ -46,7 +46,7 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqSetMainWindowTitleReaction : public pqRea
 
 public:
   /**
-  * Constructor. Parent cannot be NULL.
+  * Constructor. Parent cannot be nullptr.
   */
   pqSetMainWindowTitleReaction(QAction* parent);
   ~pqSetMainWindowTitleReaction() override;

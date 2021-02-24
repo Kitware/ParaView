@@ -6,8 +6,8 @@
 //     99-04-12: Written by Jeremy Maccelari, visualn@iafrica.com
 
 #include "vtkDataMinePerimeterReader.h"
-#include "PropertyStorage.h"
-#include "dmfile.h"
+#include "ThirdParty/PropertyStorage.h"
+#include "ThirdParty/dmfile.h"
 
 #include "vtkCellArray.h"
 #include "vtkObjectFactory.h"
@@ -22,9 +22,7 @@ vtkDataMinePerimeterReader::vtkDataMinePerimeterReader()
 
 // --------------------------------------
 // Destructor
-vtkDataMinePerimeterReader::~vtkDataMinePerimeterReader()
-{
-}
+vtkDataMinePerimeterReader::~vtkDataMinePerimeterReader() = default;
 
 // --------------------------------------
 void vtkDataMinePerimeterReader::PrintSelf(ostream& os, vtkIndent indent)

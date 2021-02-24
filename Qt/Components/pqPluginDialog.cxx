@@ -89,7 +89,7 @@ pqPluginDialog::pqPluginDialog(pqServer* server, QWidget* p)
     // hide the remote group
     this->Ui->remoteGroup->setVisible(false);
     helpText = "Local plugins are automatically searched for in %1.";
-    QStringList serverPaths = pm->pluginPaths(NULL, false);
+    QStringList serverPaths = pm->pluginPaths(nullptr, false);
     helpText = helpText.arg(serverPaths.join(", "));
   }
   else
@@ -122,9 +122,7 @@ pqPluginDialog::pqPluginDialog(pqServer* server, QWidget* p)
 }
 
 //----------------------------------------------------------------------------
-pqPluginDialog::~pqPluginDialog()
-{
-}
+pqPluginDialog::~pqPluginDialog() = default;
 
 //----------------------------------------------------------------------------
 void pqPluginDialog::loadRemotePlugin()
@@ -186,7 +184,7 @@ void pqPluginDialog::loadPlugin(pqServer* server, bool remote)
   }
   stream << "All files (*)";
 
-  pqFileDialog fd(remote ? server : NULL, this, "Load Plugin", QString(), filterString);
+  pqFileDialog fd(remote ? server : nullptr, this, "Load Plugin", QString(), filterString);
   if (fd.exec() == QDialog::Accepted)
   {
     QString plugin = fd.getSelectedFiles()[0];
@@ -313,7 +311,7 @@ vtkPVPluginsInformation* pqPluginDialog::getPluginInfo(
     return info;
   }
   index = 0;
-  return NULL;
+  return nullptr;
 }
 
 //----------------------------------------------------------------------------
@@ -384,7 +382,7 @@ void pqPluginDialog::addInfoNodes(QTreeWidgetItem* pluginNode, vtkPVPluginsInfor
   infoText << this->getStatusText(plInfo, index);
   infoNode = new QTreeWidgetItem(pluginNode, infoText);
   infoNode->setFlags(infoFlags);
-  if (plInfo->GetPluginStatusMessage(index) != NULL)
+  if (plInfo->GetPluginStatusMessage(index) != nullptr)
   {
     infoNode->setToolTip(ValueCol, tr(plInfo->GetPluginStatusMessage(index)));
   }

@@ -95,12 +95,12 @@ class pqDisplayColorWidget::PropertyLinksConnection : public pqPropertyLinksConn
 public:
   PropertyLinksConnection(QObject* qobject, const char* qproperty, const char* qsignal,
     vtkSMProxy* smproxy, vtkSMProperty* smproperty, int smindex, bool use_unchecked_modified_event,
-    QObject* parentObject = 0)
+    QObject* parentObject = nullptr)
     : Superclass(qobject, qproperty, qsignal, smproxy, smproperty, smindex,
         use_unchecked_modified_event, parentObject)
   {
   }
-  ~PropertyLinksConnection() override {}
+  ~PropertyLinksConnection() override = default;
 
   // Methods to convert between ValueType and QVariant. Since QVariant doesn't
   // support == operations of non-default Qt types, we are forced to convert the
@@ -237,7 +237,7 @@ public:
 //-----------------------------------------------------------------------------
 pqDisplayColorWidget::pqDisplayColorWidget(QWidget* parentObject)
   : Superclass(parentObject)
-  , CachedRepresentation(NULL)
+  , CachedRepresentation(nullptr)
   , Internals(new pqDisplayColorWidget::pqInternals())
 {
   this->CellDataIcon = new QIcon(":/pqWidgets/Icons/pqCellData.svg");
@@ -298,7 +298,7 @@ vtkSMViewProxy* pqDisplayColorWidget::viewProxy() const
   {
     return this->Representation->getViewProxy();
   }
-  return NULL;
+  return nullptr;
 }
 
 //-----------------------------------------------------------------------------
@@ -312,19 +312,19 @@ void pqDisplayColorWidget::setRepresentation(pqDataRepresentation* repr)
   if (this->Representation)
   {
     this->disconnect(this->Representation);
-    this->Representation = NULL;
+    this->Representation = nullptr;
   }
   if (this->ColorTransferFunction)
   {
     this->disconnect(this->ColorTransferFunction);
     this->ColorTransferFunction->disconnect(this);
-    this->ColorTransferFunction = NULL;
+    this->ColorTransferFunction = nullptr;
   }
   this->Variables->setEnabled(false);
   this->Components->setEnabled(false);
   this->Internals->Links.clear();
   this->Internals->Connector->Disconnect();
-  this->Internals->Domain = NULL;
+  this->Internals->Domain = nullptr;
   this->Variables->clear();
   this->Components->clear();
   this->Internals->OutOfDomainEntryIndex = -1;
@@ -333,8 +333,8 @@ void pqDisplayColorWidget::setRepresentation(pqDataRepresentation* repr)
   this->CachedRepresentation = repr;
   this->Representation = repr;
 
-  vtkSMProxy* proxy = repr ? repr->getProxy() : NULL;
-  bool can_color = (proxy != NULL && proxy->GetProperty("ColorArrayName") != NULL);
+  vtkSMProxy* proxy = repr ? repr->getProxy() : nullptr;
+  bool can_color = (proxy != nullptr && proxy->GetProperty("ColorArrayName") != nullptr);
   if (!can_color)
   {
     return;
@@ -566,7 +566,7 @@ void pqDisplayColorWidget::componentNumberChanged()
 
     // we could now respect some application setting to determine if the LUT is
     // to be reset.
-    vtkSMProxy* reprProxy = this->Representation ? this->Representation->getProxy() : NULL;
+    vtkSMProxy* reprProxy = this->Representation ? this->Representation->getProxy() : nullptr;
     vtkSMPVRepresentationProxy::RescaleTransferFunctionToDataRange(
       reprProxy, /*extend*/ false, /*force*/ false);
 
@@ -597,12 +597,13 @@ void pqDisplayColorWidget::refreshComponents()
 
   vtkPVDataInformation* dataInfo = this->Representation->getInputDataInformation();
   vtkPVArrayInformation* arrayInfo =
-    dataInfo ? dataInfo->GetArrayInformation(arrayName.toLocal8Bit().data(), association) : NULL;
+    dataInfo ? dataInfo->GetArrayInformation(arrayName.toLocal8Bit().data(), association) : nullptr;
   if (!arrayInfo)
   {
     vtkPVDataInformation* reprInfo = this->Representation->getRepresentedDataInformation();
-    arrayInfo =
-      reprInfo ? reprInfo->GetArrayInformation(arrayName.toLocal8Bit().data(), association) : NULL;
+    arrayInfo = reprInfo
+      ? reprInfo->GetArrayInformation(arrayName.toLocal8Bit().data(), association)
+      : nullptr;
   }
 
   if (!arrayInfo || arrayInfo->GetNumberOfComponents() <= 1)

@@ -73,11 +73,11 @@ public:
    */
   vtkRenderWindow* GetRenderWindow() override
   {
-    return this->GetRootView() ? this->GetRootView()->GetRenderWindow() : NULL;
+    return this->GetRootView() ? this->GetRootView()->GetRenderWindow() : nullptr;
   }
   vtkRenderWindowInteractor* GetInteractor() override
   {
-    return this->GetRootView() ? this->GetRootView()->GetInteractor() : NULL;
+    return this->GetRootView() ? this->GetRootView()->GetInteractor() : nullptr;
   }
 
   /**

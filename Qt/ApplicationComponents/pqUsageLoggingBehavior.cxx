@@ -75,9 +75,7 @@ pqUsageLoggingBehavior::pqUsageLoggingBehavior(QObject* parentObject)
 }
 
 //-----------------------------------------------------------------------------
-pqUsageLoggingBehavior::~pqUsageLoggingBehavior()
-{
-}
+pqUsageLoggingBehavior::~pqUsageLoggingBehavior() = default;
 
 //-----------------------------------------------------------------------------
 void pqUsageLoggingBehavior::setConfigFileName(const QString& fname)

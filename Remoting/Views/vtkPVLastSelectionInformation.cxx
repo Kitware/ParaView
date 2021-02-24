@@ -20,14 +20,10 @@
 
 vtkStandardNewMacro(vtkPVLastSelectionInformation);
 //----------------------------------------------------------------------------
-vtkPVLastSelectionInformation::vtkPVLastSelectionInformation()
-{
-}
+vtkPVLastSelectionInformation::vtkPVLastSelectionInformation() = default;
 
 //----------------------------------------------------------------------------
-vtkPVLastSelectionInformation::~vtkPVLastSelectionInformation()
-{
-}
+vtkPVLastSelectionInformation::~vtkPVLastSelectionInformation() = default;
 
 //----------------------------------------------------------------------------
 void vtkPVLastSelectionInformation::CopyFromObject(vtkObject* obj)

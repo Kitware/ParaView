@@ -93,7 +93,7 @@ void MainWindow::processTest()
     }
 
     bool comparison_succeeded = true;
-    if ((options->GetNumberOfTestScripts() > 0) && (options->GetTestBaseline(0) != NULL))
+    if ((options->GetNumberOfTestScripts() > 0) && (options->GetTestBaseline(0) != nullptr))
     {
       comparison_succeeded = this->compareView(options->GetTestBaseline(0),
         options->GetTestImageThreshold(0), cout, options->GetTestDirectory());

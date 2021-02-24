@@ -19,9 +19,7 @@ vtkPSciVizKMeans::vtkPSciVizKMeans()
   this->Tolerance = 0.01;
 }
 
-vtkPSciVizKMeans::~vtkPSciVizKMeans()
-{
-}
+vtkPSciVizKMeans::~vtkPSciVizKMeans() = default;
 
 void vtkPSciVizKMeans::PrintSelf(ostream& os, vtkIndent indent)
 {

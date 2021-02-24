@@ -30,9 +30,7 @@ vtkPVTrackballZoom::vtkPVTrackballZoom()
 }
 
 //-------------------------------------------------------------------------
-vtkPVTrackballZoom::~vtkPVTrackballZoom()
-{
-}
+vtkPVTrackballZoom::~vtkPVTrackballZoom() = default;
 
 //-------------------------------------------------------------------------
 void vtkPVTrackballZoom::OnButtonDown(int, int, vtkRenderer* ren, vtkRenderWindowInteractor*)

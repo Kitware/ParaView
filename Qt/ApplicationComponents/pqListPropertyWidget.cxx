@@ -49,7 +49,7 @@ class pqListPropertyWidgetDelegate : public QItemDelegate
 public:
   QPointer<QValidator> Validator;
 
-  pqListPropertyWidgetDelegate(QObject* parentObject = 0)
+  pqListPropertyWidgetDelegate(QObject* parentObject = nullptr)
     : QItemDelegate(parentObject)
   {
   }
@@ -106,9 +106,7 @@ pqListPropertyWidget::pqListPropertyWidget(
 }
 
 //-----------------------------------------------------------------------------
-pqListPropertyWidget::~pqListPropertyWidget()
-{
-}
+pqListPropertyWidget::~pqListPropertyWidget() = default;
 
 //-----------------------------------------------------------------------------
 QList<QVariant> pqListPropertyWidget::value() const

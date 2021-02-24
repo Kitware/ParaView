@@ -60,7 +60,7 @@ public:
     }
   }
   static void ResizeLabels(
-    TickLabelsType& labels, size_t new_size, vtkTextProperty* property = NULL)
+    TickLabelsType& labels, size_t new_size, vtkTextProperty* property = nullptr)
   {
     labels.resize(new_size);
     for (TickLabelsType::iterator iter = labels.begin(); iter != labels.end(); ++iter)
@@ -232,7 +232,7 @@ vtkGridAxes2DActor::vtkGridAxes2DActor()
 vtkGridAxes2DActor::~vtkGridAxes2DActor()
 {
   delete this->Labels;
-  this->Labels = NULL;
+  this->Labels = nullptr;
 }
 
 //----------------------------------------------------------------------------
@@ -332,7 +332,7 @@ vtkProperty* vtkGridAxes2DActor::GetProperty()
 //----------------------------------------------------------------------------
 void vtkGridAxes2DActor::SetTitleTextProperty(int axis, vtkTextProperty* tprop)
 {
-  if (axis >= 0 && axis < 3 && this->TitleTextProperty[axis] != tprop && tprop != NULL)
+  if (axis >= 0 && axis < 3 && this->TitleTextProperty[axis] != tprop && tprop != nullptr)
   {
     this->TitleTextProperty[axis] = tprop;
     this->Modified();
@@ -342,13 +342,13 @@ void vtkGridAxes2DActor::SetTitleTextProperty(int axis, vtkTextProperty* tprop)
 //----------------------------------------------------------------------------
 vtkTextProperty* vtkGridAxes2DActor::GetTitleTextProperty(int axis)
 {
-  return (axis >= 0 && axis < 3) ? this->TitleTextProperty[axis] : NULL;
+  return (axis >= 0 && axis < 3) ? this->TitleTextProperty[axis] : nullptr;
 }
 
 //----------------------------------------------------------------------------
 void vtkGridAxes2DActor::SetLabelTextProperty(int axis, vtkTextProperty* tprop)
 {
-  if (axis >= 0 && axis < 3 && this->LabelTextProperty[axis] != tprop && tprop != NULL)
+  if (axis >= 0 && axis < 3 && this->LabelTextProperty[axis] != tprop && tprop != nullptr)
   {
     this->LabelTextProperty[axis] = tprop;
     this->Modified();
@@ -358,7 +358,7 @@ void vtkGridAxes2DActor::SetLabelTextProperty(int axis, vtkTextProperty* tprop)
 //----------------------------------------------------------------------------
 vtkTextProperty* vtkGridAxes2DActor::GetLabelTextProperty(int axis)
 {
-  return (axis >= 0 && axis < 3) ? this->LabelTextProperty[axis] : NULL;
+  return (axis >= 0 && axis < 3) ? this->LabelTextProperty[axis] : nullptr;
 }
 
 //----------------------------------------------------------------------------
@@ -469,7 +469,7 @@ bool vtkGridAxes2DActor::Update(vtkViewport* viewport)
   this->PlaneActor->SetUserMatrix(this->GetMatrix());
 
   vtkRenderer* renderer = vtkRenderer::SafeDownCast(viewport);
-  assert(renderer != NULL);
+  assert(renderer != nullptr);
 
   // This is needed so the vtkAxis labels account for tile scaling.
   this->AxisHelperScene->SetRenderer(renderer);

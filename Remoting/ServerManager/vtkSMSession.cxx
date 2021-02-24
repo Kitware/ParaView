@@ -60,16 +60,16 @@ vtkSMSession* vtkSMSession::New(vtkPVSessionCore* otherSessionCore)
 }
 
 //----------------------------------------------------------------------------
-vtkSMSession::vtkSMSession(
-  bool initialize_during_constructor /*=true*/, vtkPVSessionCore* preExistingSessionCore /*=NULL*/)
+vtkSMSession::vtkSMSession(bool initialize_during_constructor /*=true*/,
+  vtkPVSessionCore* preExistingSessionCore /*=nullptr*/)
   : vtkPVSessionBase(preExistingSessionCore ? preExistingSessionCore : vtkPVSessionCore::New())
 {
   if (!preExistingSessionCore)
   {
-    this->SessionCore->UnRegister(NULL);
+    this->SessionCore->UnRegister(nullptr);
   }
 
-  this->SessionProxyManager = NULL;
+  this->SessionProxyManager = nullptr;
   this->StateLocator = vtkSMStateLocator::New();
   this->IsAutoMPI = false;
 
@@ -105,7 +105,7 @@ vtkSMSession::~vtkSMSession()
   if (this->SessionProxyManager)
   {
     this->SessionProxyManager->Delete();
-    this->SessionProxyManager = NULL;
+    this->SessionProxyManager = nullptr;
   }
 }
 
@@ -137,7 +137,7 @@ void vtkSMSession::UpdateStateHistory(vtkSMMessage* msg)
   // check is global-undo-stack builder is set.
   vtkSMUndoStackBuilder* usb = vtkSMProxyManager::GetProxyManager()->GetUndoStackBuilder();
 
-  if (usb == NULL || (this->GetProcessRoles() & vtkPVSession::CLIENT) == 0)
+  if (usb == nullptr || (this->GetProcessRoles() & vtkPVSession::CLIENT) == 0)
   {
     return;
   }
@@ -181,7 +181,7 @@ void vtkSMSession::UpdateStateHistory(vtkSMMessage* msg)
 //----------------------------------------------------------------------------
 void vtkSMSession::Initialize()
 {
-  assert(this->SessionProxyManager == NULL);
+  assert(this->SessionProxyManager == nullptr);
 
   // Remember, although vtkSMSession is always only created on the client side,
   // in batch mode, vtkSMSession is created on all nodes.
@@ -244,7 +244,7 @@ void vtkSMSession::Disconnect(vtkSMSession* session)
   pm->UnRegisterSession(session);
   // Although I'd like to have this check, when Disconnect() is called from
   // Python, we have 1 reference that gets cleared with the Python call returns.
-  // if (session != NULL)
+  // if (session != nullptr)
   //  {
   //  vtkGenericWarningMacro(
   //    "vtkSMSession wasn't destroyed after UnRegisterSession. "
@@ -357,12 +357,12 @@ public:
   vtkSMSessionClient* Session;
   vtkTemp()
   {
-    this->Callback = NULL;
-    this->Session = NULL;
+    this->Callback = nullptr;
+    this->Session = nullptr;
   }
   void OnEvent()
   {
-    if (this->Callback != NULL)
+    if (this->Callback != nullptr)
     {
       bool continue_waiting = (*this->Callback)();
       if (!continue_waiting && this->Session)

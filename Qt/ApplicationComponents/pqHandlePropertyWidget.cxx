@@ -110,9 +110,7 @@ pqHandlePropertyWidget::pqHandlePropertyWidget(
 }
 
 //-----------------------------------------------------------------------------
-pqHandlePropertyWidget::~pqHandlePropertyWidget()
-{
-}
+pqHandlePropertyWidget::~pqHandlePropertyWidget() = default;
 
 //-----------------------------------------------------------------------------
 void pqHandlePropertyWidget::selectionChanged()

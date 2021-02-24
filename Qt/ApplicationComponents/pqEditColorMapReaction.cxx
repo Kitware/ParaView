@@ -68,7 +68,7 @@ void pqEditColorMapReaction::setRepresentation(pqDataRepresentation* repr)
 //-----------------------------------------------------------------------------
 void pqEditColorMapReaction::updateEnableState()
 {
-  this->parentAction()->setEnabled(this->Representation != NULL);
+  this->parentAction()->setEnabled(this->Representation != nullptr);
 }
 
 //-----------------------------------------------------------------------------
@@ -80,7 +80,7 @@ void pqEditColorMapReaction::onTriggered()
 //-----------------------------------------------------------------------------
 void pqEditColorMapReaction::editColorMap(pqPipelineRepresentation* repr)
 {
-  if (repr == NULL)
+  if (repr == nullptr)
   {
     repr =
       qobject_cast<pqPipelineRepresentation*>(pqActiveObjects::instance().activeRepresentation());

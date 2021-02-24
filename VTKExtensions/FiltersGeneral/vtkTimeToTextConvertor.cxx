@@ -25,7 +25,7 @@ vtkStandardNewMacro(vtkTimeToTextConvertor);
 //----------------------------------------------------------------------------
 vtkTimeToTextConvertor::vtkTimeToTextConvertor()
 {
-  this->Format = 0;
+  this->Format = nullptr;
   this->Shift = 0.0;
   this->Scale = 1.0;
   this->SetFormat("Time: %f");
@@ -34,7 +34,7 @@ vtkTimeToTextConvertor::vtkTimeToTextConvertor()
 //----------------------------------------------------------------------------
 vtkTimeToTextConvertor::~vtkTimeToTextConvertor()
 {
-  this->SetFormat(0);
+  this->SetFormat(nullptr);
 }
 
 //----------------------------------------------------------------------------
@@ -76,7 +76,7 @@ int vtkTimeToTextConvertor::RequestData(vtkInformation* vtkNotUsed(request),
   char* buffer = new char[strlen(this->Format) + 1024];
   strcpy(buffer, "?");
 
-  vtkInformation* inputInfo = input ? input->GetInformation() : 0;
+  vtkInformation* inputInfo = input ? input->GetInformation() : nullptr;
   vtkInformation* outputInfo = outputVector->GetInformationObject(0);
 
   if (inputInfo && inputInfo->Has(vtkDataObject::DATA_TIME_STEP()) && this->Format)

@@ -50,16 +50,16 @@ public:
   }
 
 protected:
-  vtkSMProxyClipboardPropertyIterator() {}
-  ~vtkSMProxyClipboardPropertyIterator() override {}
+  vtkSMProxyClipboardPropertyIterator() = default;
+  ~vtkSMProxyClipboardPropertyIterator() override = default;
 
   bool Skip(const char* vtkNotUsed(pname), vtkSMProperty* prop) const
   {
-    if (prop->GetPanelVisibility() == NULL || strcmp(prop->GetPanelVisibility(), "never") == 0)
+    if (prop->GetPanelVisibility() == nullptr || strcmp(prop->GetPanelVisibility(), "never") == 0)
     {
       return true;
     }
-    if (vtkSMInputProperty::SafeDownCast(prop) != NULL)
+    if (vtkSMInputProperty::SafeDownCast(prop) != nullptr)
     {
       // FIXME: don't skip selection inputs.
       return true;
@@ -90,10 +90,10 @@ class vtkSMProxyClipboardInternals
   {
     vtkNew<vtkSMProxyClipboardPropertyIterator> iter;
     iter->SetProxy(source);
-    vtkPVXMLElement* sourceState = source->SaveXMLState(NULL, iter.GetPointer());
+    vtkPVXMLElement* sourceState = source->SaveXMLState(nullptr, iter.GetPointer());
     if (!sourceState)
     {
-      return NULL;
+      return nullptr;
     }
     // Now save state for proxies on proxy list domains.
     vtkSmartPointer<vtkSMPropertyIterator> piter;
@@ -144,7 +144,8 @@ class vtkSMProxyClipboardInternals
     for (unsigned int cc = 0, max = targetState->GetNumberOfNestedElements(); cc < max; ++cc)
     {
       vtkPVXMLElement* elem = targetState->GetNestedElement(cc);
-      if (elem == NULL || elem->GetName() == NULL || strcmp(elem->GetName(), "ClipboardState") != 0)
+      if (elem == nullptr || elem->GetName() == nullptr ||
+        strcmp(elem->GetName(), "ClipboardState") != 0)
       {
         continue;
       }
@@ -168,18 +169,18 @@ class vtkSMProxyClipboardInternals
   }
 
 public:
-  bool CanPaste(vtkSMProxy* vtkNotUsed(target)) const { return this->CopiedState != NULL; }
-  void Clear() { this->CopiedState = NULL; }
+  bool CanPaste(vtkSMProxy* vtkNotUsed(target)) const { return this->CopiedState != nullptr; }
+  void Clear() { this->CopiedState = nullptr; }
 
   bool Copy(vtkSMProxy* source)
   {
     this->CopiedState.TakeReference(this->Save(source));
-    return this->CopiedState != NULL;
+    return this->CopiedState != nullptr;
   }
 
   bool Paste(vtkSMProxy* source) const
   {
-    if (this->CopiedState == NULL || source == NULL)
+    if (this->CopiedState == nullptr || source == nullptr)
     {
       return false;
     }
@@ -215,7 +216,7 @@ bool vtkSMProxyClipboard::Copy(vtkSMProxy* source)
 //----------------------------------------------------------------------------
 bool vtkSMProxyClipboard::CanPaste(vtkSMProxy* target)
 {
-  return (target != NULL) && this->Internals->CanPaste(target);
+  return (target != nullptr) && this->Internals->CanPaste(target);
 }
 
 //----------------------------------------------------------------------------

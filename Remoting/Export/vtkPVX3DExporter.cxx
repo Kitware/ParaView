@@ -45,9 +45,7 @@ vtkPVX3DExporter::vtkPVX3DExporter()
 }
 
 //----------------------------------------------------------------------------
-vtkPVX3DExporter::~vtkPVX3DExporter()
-{
-}
+vtkPVX3DExporter::~vtkPVX3DExporter() = default;
 
 //----------------------------------------------------------------------------
 void vtkPVX3DExporter::WriteAdditionalNodes(vtkX3DExporterWriter* writer)

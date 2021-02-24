@@ -75,8 +75,8 @@ public:
   void SetHelper(vtkSMSaveAnimationProxy* helper) { this->Helper = helper; }
 
 protected:
-  SceneImageWriter() {}
-  ~SceneImageWriter() {}
+  SceneImageWriter() = default;
+  ~SceneImageWriter() override = default;
   bool SaveInitialize(int vtkNotUsed(startCount)) override
   {
     // Animation scene call render on each tick. We override that render call
@@ -140,7 +140,7 @@ protected:
     : Started(false)
   {
   }
-  ~SceneImageWriterMovie() {}
+  ~SceneImageWriterMovie() override = default;
 
   bool SaveInitialize(int startCount) override
   {
@@ -229,7 +229,7 @@ protected:
     , SuffixFormat(nullptr)
   {
   }
-  ~SceneImageWriterImageSeries() { this->SetSuffixFormat(nullptr); }
+  ~SceneImageWriterImageSeries() override { this->SetSuffixFormat(nullptr); }
 
   bool SaveInitialize(int startCount) override
   {
@@ -291,14 +291,10 @@ vtkStandardNewMacro(SceneImageWriterImageSeries);
 
 vtkStandardNewMacro(vtkSMSaveAnimationProxy);
 //----------------------------------------------------------------------------
-vtkSMSaveAnimationProxy::vtkSMSaveAnimationProxy()
-{
-}
+vtkSMSaveAnimationProxy::vtkSMSaveAnimationProxy() = default;
 
 //----------------------------------------------------------------------------
-vtkSMSaveAnimationProxy::~vtkSMSaveAnimationProxy()
-{
-}
+vtkSMSaveAnimationProxy::~vtkSMSaveAnimationProxy() = default;
 
 //----------------------------------------------------------------------------
 bool vtkSMSaveAnimationProxy::EnforceSizeRestrictions(const char* filename)
@@ -339,8 +335,8 @@ bool vtkSMSaveAnimationProxy::WriteAnimation(const char* filename)
   vtkSMViewProxy* view = this->GetView();
 
   // view and layout are mutually exclusive.
-  assert(layout == NULL || view == NULL);
-  if (layout == NULL && view == NULL)
+  assert(layout == nullptr || view == nullptr);
+  if (layout == nullptr && view == nullptr)
   {
     vtkErrorMacro("Cannot WriteImage without a view or layout.");
     return false;
@@ -350,10 +346,12 @@ bool vtkSMSaveAnimationProxy::WriteAnimation(const char* filename)
   this->EnforceSizeRestrictions(filename);
 
   SM_SCOPED_TRACE(SaveLayoutSizes)
-    .arg("proxy", view != NULL ? static_cast<vtkSMProxy*>(view) : static_cast<vtkSMProxy*>(layout));
+    .arg(
+      "proxy", view != nullptr ? static_cast<vtkSMProxy*>(view) : static_cast<vtkSMProxy*>(layout));
 
   SM_SCOPED_TRACE(SaveCameras)
-    .arg("proxy", view != NULL ? static_cast<vtkSMProxy*>(view) : static_cast<vtkSMProxy*>(layout));
+    .arg(
+      "proxy", view != nullptr ? static_cast<vtkSMProxy*>(view) : static_cast<vtkSMProxy*>(layout));
 
   SM_SCOPED_TRACE(SaveScreenshotOrAnimation)
     .arg("helper", this)
@@ -497,7 +495,7 @@ vtkSMViewLayoutProxy* vtkSMSaveAnimationProxy::GetLayout()
   {
     return vtkSMViewLayoutProxy::SafeDownCast(vtkSMPropertyHelper(this, "Layout").GetAsProxy());
   }
-  return NULL;
+  return nullptr;
 }
 
 //----------------------------------------------------------------------------
@@ -507,7 +505,7 @@ vtkSMViewProxy* vtkSMSaveAnimationProxy::GetView()
   {
     return vtkSMViewProxy::SafeDownCast(vtkSMPropertyHelper(this, "View").GetAsProxy());
   }
-  return NULL;
+  return nullptr;
 }
 
 //----------------------------------------------------------------------------

@@ -28,9 +28,7 @@ vtkSMWidgetRepresentationProxy::vtkSMWidgetRepresentationProxy()
 }
 
 //---------------------------------------------------------------------------
-vtkSMWidgetRepresentationProxy::~vtkSMWidgetRepresentationProxy()
-{
-}
+vtkSMWidgetRepresentationProxy::~vtkSMWidgetRepresentationProxy() = default;
 
 //---------------------------------------------------------------------------
 void vtkSMWidgetRepresentationProxy::OnStartInteraction()

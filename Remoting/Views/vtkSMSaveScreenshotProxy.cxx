@@ -188,7 +188,7 @@ public:
    */
   void SetColorPalette(const char* palette)
   {
-    if (palette == NULL || palette[0] == '\0')
+    if (palette == nullptr || palette[0] == '\0')
     {
       return;
     }
@@ -460,7 +460,7 @@ protected:
 vtkStandardNewMacro(vtkSMSaveScreenshotProxy);
 //----------------------------------------------------------------------------
 vtkSMSaveScreenshotProxy::vtkSMSaveScreenshotProxy()
-  : State(NULL)
+  : State(nullptr)
 {
 }
 
@@ -468,7 +468,7 @@ vtkSMSaveScreenshotProxy::vtkSMSaveScreenshotProxy()
 vtkSMSaveScreenshotProxy::~vtkSMSaveScreenshotProxy()
 {
   delete this->State;
-  this->State = NULL;
+  this->State = nullptr;
 }
 
 //----------------------------------------------------------------------------
@@ -511,8 +511,8 @@ bool vtkSMSaveScreenshotProxy::WriteImage(const char* fname, vtkTypeUInt32 locat
   vtkSMViewProxy* view = this->GetView();
 
   // view and layout are mutually exclusive.
-  assert(layout == NULL || view == NULL);
-  if (layout == NULL && view == NULL)
+  assert(layout == nullptr || view == nullptr);
+  if (layout == nullptr && view == nullptr)
   {
     vtkErrorMacro("Cannot WriteImage without a view or layout.");
     return false;
@@ -526,10 +526,12 @@ bool vtkSMSaveScreenshotProxy::WriteImage(const char* fname, vtkTypeUInt32 locat
   }
 
   SM_SCOPED_TRACE(SaveLayoutSizes)
-    .arg("proxy", view != NULL ? static_cast<vtkSMProxy*>(view) : static_cast<vtkSMProxy*>(layout));
+    .arg(
+      "proxy", view != nullptr ? static_cast<vtkSMProxy*>(view) : static_cast<vtkSMProxy*>(layout));
 
   SM_SCOPED_TRACE(SaveCameras)
-    .arg("proxy", view != NULL ? static_cast<vtkSMProxy*>(view) : static_cast<vtkSMProxy*>(layout));
+    .arg(
+      "proxy", view != nullptr ? static_cast<vtkSMProxy*>(view) : static_cast<vtkSMProxy*>(layout));
 
   SM_SCOPED_TRACE(SaveScreenshotOrAnimation)
     .arg("helper", this)
@@ -606,10 +608,10 @@ vtkSmartPointer<vtkImageData> vtkSMSaveScreenshotProxy::CaptureImage()
   if (!this->Prepare())
   {
     vtkErrorMacro("Failed to prepare to capture image.");
-    return NULL;
+    return nullptr;
   }
 
-  assert(this->State != NULL);
+  assert(this->State != nullptr);
   vtkSmartPointer<vtkImageData> img = this->CapturePreppedImages().first;
 
   this->Cleanup();
@@ -620,7 +622,7 @@ vtkSmartPointer<vtkImageData> vtkSMSaveScreenshotProxy::CaptureImage()
 std::pair<vtkSmartPointer<vtkImageData>, vtkSmartPointer<vtkImageData> >
 vtkSMSaveScreenshotProxy::CapturePreppedImages()
 {
-  assert(this->State != NULL);
+  assert(this->State != nullptr);
   return this->State->CaptureImages();
 }
 
@@ -755,7 +757,7 @@ vtkSMViewLayoutProxy* vtkSMSaveScreenshotProxy::GetLayout()
   {
     return vtkSMViewLayoutProxy::SafeDownCast(vtkSMPropertyHelper(this, "Layout").GetAsProxy());
   }
-  return NULL;
+  return nullptr;
 }
 
 //----------------------------------------------------------------------------
@@ -765,7 +767,7 @@ vtkSMViewProxy* vtkSMSaveScreenshotProxy::GetView()
   {
     return vtkSMViewProxy::SafeDownCast(vtkSMPropertyHelper(this, "View").GetAsProxy());
   }
-  return NULL;
+  return nullptr;
 }
 
 //----------------------------------------------------------------------------
@@ -775,14 +777,14 @@ bool vtkSMSaveScreenshotProxy::Prepare()
   vtkSMViewProxy* view = this->GetView();
 
   // view and layout are mutually exclusive.
-  assert(layout == NULL || view == NULL);
-  if (layout == NULL && view == NULL)
+  assert(layout == nullptr || view == nullptr);
+  if (layout == nullptr && view == nullptr)
   {
     vtkErrorMacro("Cannot `CaptureImage` without a view or layout.");
     return false;
   }
 
-  assert(this->State == NULL);
+  assert(this->State == nullptr);
   if (layout)
   {
     this->State = new vtkStateLayout(layout);
@@ -815,9 +817,9 @@ bool vtkSMSaveScreenshotProxy::Prepare()
 //----------------------------------------------------------------------------
 bool vtkSMSaveScreenshotProxy::Cleanup()
 {
-  assert(this->State != NULL);
+  assert(this->State != nullptr);
   delete this->State;
-  this->State = NULL;
+  this->State = nullptr;
   return true;
 }
 
@@ -835,7 +837,7 @@ void vtkSMSaveScreenshotProxy::UpdateDefaultsAndVisibilities(const char* filenam
 
   vtkSMViewLayoutProxy* layout =
     vtkSMViewLayoutProxy::SafeDownCast(vtkSMPropertyHelper(this, "Layout").GetAsProxy());
-  if (layout == NULL || (layout->GetViews().size() <= 1))
+  if (layout == nullptr || (layout->GetViews().size() <= 1))
   {
     this->GetProperty("SaveAllViews")->SetPanelVisibility("never");
     this->GetProperty("SeparatorWidth")->SetPanelVisibility("never");

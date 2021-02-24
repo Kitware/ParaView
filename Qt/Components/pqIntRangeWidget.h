@@ -59,7 +59,7 @@ public:
   /**
   * constructor requires the proxy, property
   */
-  pqIntRangeWidget(QWidget* parent = NULL);
+  pqIntRangeWidget(QWidget* parent = nullptr);
   ~pqIntRangeWidget() override;
 
   /**

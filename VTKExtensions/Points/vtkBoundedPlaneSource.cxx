@@ -40,9 +40,7 @@ vtkBoundedPlaneSource::vtkBoundedPlaneSource()
 }
 
 //----------------------------------------------------------------------------
-vtkBoundedPlaneSource::~vtkBoundedPlaneSource()
-{
-}
+vtkBoundedPlaneSource::~vtkBoundedPlaneSource() = default;
 
 //----------------------------------------------------------------------------
 int vtkBoundedPlaneSource::RequestData(

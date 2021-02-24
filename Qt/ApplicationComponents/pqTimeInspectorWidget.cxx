@@ -81,12 +81,13 @@ class pqTimeInspectorWidget::PropertyLinksConnection : public pqPropertyLinksCon
 public:
   PropertyLinksConnection(QObject* qobject, const char* qproperty, const char* qsignal,
     vtkSMProxy* smproxy, vtkSMProperty* smproperty, int smindex, bool use_unchecked_modified_event,
-    QObject* parentObject = 0)
+    QObject* parentObject = nullptr)
     : Superclass(qobject, qproperty, qsignal, smproxy, smproperty, smindex,
         use_unchecked_modified_event, parentObject)
   {
   }
-  ~PropertyLinksConnection() override {}
+  ~PropertyLinksConnection() override = default;
+
 protected:
   /// These are the methods that subclasses can override to customize how
   /// values are updated in either directions.
@@ -294,9 +295,7 @@ pqTimeInspectorWidget::pqTimeInspectorWidget(QWidget* parentObject)
 }
 
 //-----------------------------------------------------------------------------
-pqTimeInspectorWidget::~pqTimeInspectorWidget()
-{
-}
+pqTimeInspectorWidget::~pqTimeInspectorWidget() = default;
 
 //-----------------------------------------------------------------------------
 void pqTimeInspectorWidget::setAnimationScene(pqAnimationScene* scene)

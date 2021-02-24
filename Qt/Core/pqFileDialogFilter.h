@@ -43,7 +43,7 @@ class PQCORE_EXPORT pqFileDialogFilter : public QSortFilterProxyModel
   Q_OBJECT
 
 public:
-  pqFileDialogFilter(pqFileDialogModel* sourceModel, QObject* Parent = NULL);
+  pqFileDialogFilter(pqFileDialogModel* sourceModel, QObject* Parent = nullptr);
   ~pqFileDialogFilter() override;
 
 public Q_SLOTS:

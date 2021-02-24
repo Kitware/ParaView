@@ -210,7 +210,7 @@ void addWinWinCommands(QStringList& cmds)
 pqRemoteCommandDialog::pqRemoteCommandDialog(
   QWidget* Parent, Qt::WindowFlags flags, int clientSystemType, int serverSystemType)
   : QDialog(Parent, flags)
-  , Ui(0)
+  , Ui(nullptr)
 {
   this->Ui = new pqRemoteCommandDialogUI;
   this->Ui->setupUi(this);
@@ -539,7 +539,7 @@ string pqRemoteCommandDialog::LocateFile()
 {
   QString filters = QString("All Files (*)");
 
-  pqFileDialog dialog(0, this, "Find file", "", filters);
+  pqFileDialog dialog(nullptr, this, "Find file", "", filters);
   dialog.setFileMode(pqFileDialog::ExistingFile);
 
   if (dialog.exec() == QDialog::Accepted)

@@ -127,16 +127,16 @@ gio::GenericIOWriter* GetWriter(MPI_Comm comm, const std::string& fileName);
 //==============================================================================
 //@{
 /**
- * If the pointer given is non-null this function deletes the string and
- * set the pointer to NULL.  This sets the pointer variable in the calling
+ * If the pointer given is non-nullptr this function deletes the string and
+ * set the pointer to nullptr.  This sets the pointer variable in the calling
  * function since the pointer is passed by reference.
  */
 inline void SafeDeleteString(char*& str)
 {
-  if (str != NULL)
+  if (str != nullptr)
   {
     delete[] str;
-    str = NULL;
+    str = nullptr;
   }
 }
 //@}

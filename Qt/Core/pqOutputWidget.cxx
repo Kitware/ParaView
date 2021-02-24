@@ -96,7 +96,7 @@ public:
 
 protected:
   OutputWindow() { this->PromptUserOff(); }
-  ~OutputWindow() override {}
+  ~OutputWindow() override = default;
 
   QPointer<pqOutputWidget> Widget;
   QMutex MutexGenericMessage;
@@ -445,7 +445,7 @@ void pqOutputWidget::suppress(const QStringList& substrs)
 void pqOutputWidget::saveToFile()
 {
   QString text = this->Internals->Ui.consoleWidget->text();
-  pqFileDialog fileDialog(NULL, pqCoreUtilities::mainWidget(), "Save output", QString(),
+  pqFileDialog fileDialog(nullptr, pqCoreUtilities::mainWidget(), "Save output", QString(),
     "Text Files (*.txt);;All Files (*)");
   fileDialog.setFileMode(pqFileDialog::AnyFile);
   if (fileDialog.exec() != pqFileDialog::Accepted)

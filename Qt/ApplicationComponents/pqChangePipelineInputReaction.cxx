@@ -64,7 +64,7 @@ void pqChangePipelineInputReaction::updateEnableState()
 {
   pqPipelineFilter* filter =
     qobject_cast<pqPipelineFilter*>(pqActiveObjects::instance().activeSource());
-  if (filter == NULL || filter->modifiedState() == pqProxy::UNINITIALIZED)
+  if (filter == nullptr || filter->modifiedState() == pqProxy::UNINITIALIZED)
   {
     this->parentAction()->setEnabled(false);
     return;

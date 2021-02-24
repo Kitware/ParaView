@@ -126,7 +126,7 @@ vtkStandardNewMacro(vtkPlotEdges::Segment);
 
 vtkPlotEdges::Segment::Segment()
 {
-  this->PolyData = NULL;
+  this->PolyData = nullptr;
 
   this->StartId = -1;
   this->EndId = -1;
@@ -456,7 +456,7 @@ vtkStandardNewMacro(vtkPlotEdges::Node);
 
 vtkPlotEdges::Node::Node()
 {
-  this->PolyData = NULL;
+  this->PolyData = nullptr;
   this->PointId = -1;
   this->Segments = vtkCollection::New();
 }
@@ -539,9 +539,7 @@ vtkPlotEdges::vtkPlotEdges()
   this->SetNumberOfOutputPorts(1);
 }
 
-vtkPlotEdges::~vtkPlotEdges()
-{
-}
+vtkPlotEdges::~vtkPlotEdges() = default;
 
 int vtkPlotEdges::FillInputPortInformation(int port, vtkInformation* info)
 {
@@ -589,9 +587,9 @@ int vtkPlotEdges::RequestData(vtkInformation* vtkNotUsed(request),
     for (it->InitTraversal(); !it->IsDoneWithTraversal(); it->GoToNextItem())
     {
       inputPolyData = vtkPolyData::SafeDownCast(it->GetCurrentDataObject());
-      if (inputPolyData == NULL)
+      if (inputPolyData == nullptr)
       {
-        // this is bad!!! this is assuming that all processes have non-null
+        // this is bad!!! this is assuming that all processes have non-nullptr
         // nodes at the same location, which is true with exodus, but nothing
         // else. Pending BUG #11197.
         continue;
@@ -734,7 +732,7 @@ void vtkPlotEdges::ExtractSegments(
 
     // As the point may be in many cells, we need to create a node.
     // The nodes will be merged later in ConnectSegmentsWithNodes
-    Node* node = NULL;
+    Node* node = nullptr;
     if (numPtCells > 1)
     {
       node = Node::New();
@@ -753,7 +751,7 @@ void vtkPlotEdges::ExtractSegments(
   }
   // we don't need the visited array array
   delete[] visitedCells;
-  visitedCells = NULL;
+  visitedCells = nullptr;
 }
 
 void vtkPlotEdges::ExtractSegmentsFromExtremity(vtkPolyData* polyData, vtkCollection* segments,
@@ -896,7 +894,7 @@ void vtkPlotEdges::ExtractSegmentsFromExtremity(vtkPolyData* polyData, vtkCollec
 
 void vtkPlotEdges::ConnectSegmentsWithNodes(vtkCollection* segments, vtkCollection* nodes)
 {
-  Node* node = NULL;
+  Node* node = nullptr;
   // cerr << __FUNCTION__ << ": " << nodes->GetNumberOfItems()
   //          << " nodes." << endl;
   vtkCollectionIterator* nodeIt = nodes->NewIterator();
@@ -945,10 +943,10 @@ void vtkPlotEdges::ConnectSegmentsWithNodes(vtkCollection* segments, vtkCollecti
       vtkCollectionIterator* it = node->GetSegments()->NewIterator();
       vtkCollectionIterator* it2 = node->GetSegments()->NewIterator();
 
-      Segment* segmentI = NULL;
-      Segment* segmentJ = NULL;
-      Segment* segmentA = NULL;
-      Segment* segmentB = NULL;
+      Segment* segmentI = nullptr;
+      Segment* segmentJ = nullptr;
+      Segment* segmentA = nullptr;
+      Segment* segmentB = nullptr;
 
       double old_score = -2.;
       double score = 0;
@@ -1038,7 +1036,7 @@ void vtkPlotEdges::MergeSegments(
 vtkPlotEdges::Node* vtkPlotEdges::GetNodeAtPoint(vtkCollection* nodes, vtkIdType pointId)
 {
   vtkCollectionIterator* it = nodes->NewIterator();
-  Node* res = NULL;
+  Node* res = nullptr;
   for (it->GoToFirstItem(); !it->IsDoneWithTraversal(); it->GoToNextItem())
   {
     Node* node = Node::SafeDownCast(it->GetCurrentObject());
@@ -1057,7 +1055,7 @@ void vtkPlotEdges::SaveToMultiBlockDataSet(vtkCollection* segments, vtkMultiBloc
   // copy into dataset
   //
   segments->InitTraversal();
-  Segment* segment = NULL;
+  Segment* segment = nullptr;
   for (segment = Segment::SafeDownCast(segments->GetNextItemAsObject()); segment;
        segment = Segment::SafeDownCast(segments->GetNextItemAsObject()))
   {

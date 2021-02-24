@@ -101,7 +101,7 @@ public:
    * Return true if that Proxy is supposed to have NO vtk class, which means
    * its a NullProxy.
    */
-  bool IsNullProxy() { return (VTKClassName == NULL); };
+  bool IsNullProxy() { return (VTKClassName == nullptr); };
 
   //@{
   /**

@@ -56,8 +56,8 @@ vtkStandardNewMacro(vtkPythonCalculator);
 //----------------------------------------------------------------------------
 vtkPythonCalculator::vtkPythonCalculator()
 {
-  this->Expression = NULL;
-  this->ArrayName = NULL;
+  this->Expression = nullptr;
+  this->ArrayName = nullptr;
   this->SetArrayName("result");
   this->SetExecuteMethod(vtkPythonCalculator::ExecuteScript, this);
   this->ArrayAssociation = vtkDataObject::FIELD_ASSOCIATION_POINTS;
@@ -66,8 +66,8 @@ vtkPythonCalculator::vtkPythonCalculator()
 //----------------------------------------------------------------------------
 vtkPythonCalculator::~vtkPythonCalculator()
 {
-  this->SetExpression(NULL);
-  this->SetArrayName(NULL);
+  this->SetExpression(nullptr);
+  this->SetArrayName(nullptr);
 }
 
 //----------------------------------------------------------------------------
@@ -116,7 +116,7 @@ void vtkPythonCalculator::ExecuteScript(void* arg)
 //----------------------------------------------------------------------------
 void vtkPythonCalculator::Exec(const char* expression)
 {
-  // Do not execute if expression is null or empty.
+  // Do not execute if expression is nullptr or empty.
   if (!expression || expression[0] == '\0')
   {
     return;

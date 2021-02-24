@@ -76,9 +76,7 @@ void pqServerConfiguration::constructor(vtkPVXMLElement* xml, int connectionTime
 }
 
 //-----------------------------------------------------------------------------
-pqServerConfiguration::~pqServerConfiguration()
-{
-}
+pqServerConfiguration::~pqServerConfiguration() = default;
 
 //-----------------------------------------------------------------------------
 void pqServerConfiguration::setName(const QString& arg_name)
@@ -162,11 +160,11 @@ pqServerConfiguration::StartupType pqServerConfiguration::startupType() const
 vtkPVXMLElement* pqServerConfiguration::optionsXML() const
 {
   vtkPVXMLElement* startup = this->startupXML();
-  if (startup != NULL)
+  if (startup != nullptr)
   {
     return startup->FindNestedElementByName("Options");
   }
-  return NULL;
+  return nullptr;
 }
 
 //-----------------------------------------------------------------------------
@@ -205,7 +203,7 @@ vtkPVXMLElement* pqServerConfiguration::startupXML() const
     }
     default:
     {
-      return NULL;
+      return nullptr;
       break;
     }
   }

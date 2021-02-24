@@ -44,9 +44,7 @@ pqPluginTreeWidgetEventTranslator::pqPluginTreeWidgetEventTranslator(QObject* pa
 }
 
 //-----------------------------------------------------------------------------
-pqPluginTreeWidgetEventTranslator::~pqPluginTreeWidgetEventTranslator()
-{
-}
+pqPluginTreeWidgetEventTranslator::~pqPluginTreeWidgetEventTranslator() = default;
 
 //-----------------------------------------------------------------------------
 bool pqPluginTreeWidgetEventTranslator::translateEvent(
@@ -67,8 +65,8 @@ bool pqPluginTreeWidgetEventTranslator::translateEvent(
   {
     if (this->TreeView)
     {
-      QObject::disconnect(this->TreeView, 0, this, 0);
-      QObject::disconnect(this->TreeView->selectionModel(), 0, this, 0);
+      QObject::disconnect(this->TreeView, nullptr, this, nullptr);
+      QObject::disconnect(this->TreeView->selectionModel(), nullptr, this, nullptr);
     }
 
     QObject::connect(treeWidget, SIGNAL(clicked(const QModelIndex&)), this,

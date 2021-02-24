@@ -48,16 +48,16 @@ public:
   vtkSetObjectMacro(Parent, vtkPTemporalRanges);
 
 protected:
-  vtkRangeTableReduction() { this->Parent = NULL; }
-  ~vtkRangeTableReduction() { this->SetParent(NULL); }
+  vtkRangeTableReduction() { this->Parent = nullptr; }
+  ~vtkRangeTableReduction() override { this->SetParent(nullptr); }
 
-  virtual int FillInputPortInformation(int port, vtkInformation* info) override
+  int FillInputPortInformation(int port, vtkInformation* info) override
   {
     info->Set(vtkAlgorithm::INPUT_IS_REPEATABLE(), 1);
     return this->Superclass::FillInputPortInformation(port, info);
   }
 
-  virtual int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
+  int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
 
   vtkPTemporalRanges* Parent;
 };
@@ -89,13 +89,13 @@ vtkCxxSetObjectMacro(vtkPTemporalRanges, Controller, vtkMultiProcessController);
 //-----------------------------------------------------------------------------
 vtkPTemporalRanges::vtkPTemporalRanges()
 {
-  this->Controller = NULL;
+  this->Controller = nullptr;
   this->SetController(vtkMultiProcessController::GetGlobalController());
 }
 
 vtkPTemporalRanges::~vtkPTemporalRanges()
 {
-  this->SetController(NULL);
+  this->SetController(nullptr);
 }
 
 void vtkPTemporalRanges::PrintSelf(ostream& os, vtkIndent indent)

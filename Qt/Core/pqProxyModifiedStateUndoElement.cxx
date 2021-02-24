@@ -24,14 +24,10 @@
 
 vtkStandardNewMacro(pqProxyModifiedStateUndoElement);
 //----------------------------------------------------------------------------
-pqProxyModifiedStateUndoElement::pqProxyModifiedStateUndoElement()
-{
-}
+pqProxyModifiedStateUndoElement::pqProxyModifiedStateUndoElement() = default;
 
 //----------------------------------------------------------------------------
-pqProxyModifiedStateUndoElement::~pqProxyModifiedStateUndoElement()
-{
-}
+pqProxyModifiedStateUndoElement::~pqProxyModifiedStateUndoElement() = default;
 
 //----------------------------------------------------------------------------
 void pqProxyModifiedStateUndoElement::MadeUnmodified(pqProxy* source)

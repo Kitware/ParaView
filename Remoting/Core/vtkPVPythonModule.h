@@ -78,7 +78,7 @@ public:
 
   /**
    * Return the registered Python module with the given full module name.  If
-   * no such module has been registered, this returns NULL.
+   * no such module has been registered, this returns nullptr.
    */
   static vtkPVPythonModule* GetModule(const char* fullname);
 
@@ -88,7 +88,7 @@ public:
    */
   static int HasModule(const char* fullname)
   {
-    return (vtkPVPythonModule::GetModule(fullname) != NULL);
+    return (vtkPVPythonModule::GetModule(fullname) != nullptr);
   }
 
 protected:

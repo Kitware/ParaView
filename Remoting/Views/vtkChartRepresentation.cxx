@@ -52,7 +52,7 @@ vtkChartRepresentation::vtkChartRepresentation()
   this->LastLocalOutputMTime = 0;
   this->DummyRepresentation = vtkSmartPointer<vtkChartSelectionRepresentation>::New();
 
-  this->SelectionRepresentation = 0;
+  this->SelectionRepresentation = nullptr;
   this->SetSelectionRepresentation(this->DummyRepresentation);
 
   this->FlattenTable = 1;
@@ -62,7 +62,7 @@ vtkChartRepresentation::vtkChartRepresentation()
 //----------------------------------------------------------------------------
 vtkChartRepresentation::~vtkChartRepresentation()
 {
-  this->SetSelectionRepresentation(NULL);
+  this->SetSelectionRepresentation(nullptr);
 }
 
 //----------------------------------------------------------------------------
@@ -70,7 +70,7 @@ void vtkChartRepresentation::SetSelectionRepresentation(vtkChartSelectionReprese
 {
   if (this->SelectionRepresentation)
   {
-    this->SelectionRepresentation->SetChartRepresentation(NULL);
+    this->SelectionRepresentation->SetChartRepresentation(nullptr);
   }
   this->SelectionRepresentation = repr;
   if (repr)
@@ -94,7 +94,7 @@ int vtkChartRepresentation::ProcessViewRequest(
   }
   else if (request == vtkPVView::REQUEST_RENDER())
   {
-    assert(this->ContextView != NULL);
+    assert(this->ContextView != nullptr);
     // this is called before every render, so don't do expensive things here.
     // Hence, we'll use this check to avoid work unless really needed.
     auto deliveredData =
@@ -141,7 +141,7 @@ bool vtkChartRepresentation::RemoveFromView(vtkView* view)
   {
     return false;
   }
-  this->ContextView = 0;
+  this->ContextView = nullptr;
   view->RemoveRepresentation(this->SelectionRepresentation);
   return this->Superclass::RemoveFromView(view);
 }
@@ -313,7 +313,7 @@ vtkTable* vtkChartRepresentation::GetLocalOutput(bool pre_delivery)
   auto mb = pre_delivery ? this->LocalOutputRequestData : this->LocalOutput;
   if (!mb)
   {
-    return NULL;
+    return nullptr;
   }
 
   vtkSmartPointer<vtkCompositeDataIterator> iter;
@@ -326,7 +326,7 @@ vtkTable* vtkChartRepresentation::GetLocalOutput(bool pre_delivery)
       return table;
     }
   }
-  return NULL;
+  return nullptr;
 }
 
 //----------------------------------------------------------------------------
@@ -379,7 +379,7 @@ std::string vtkChartRepresentation::GetDefaultSeriesLabel(
 //----------------------------------------------------------------------------
 bool vtkChartRepresentation::MapSelectionToInput(vtkSelection* sel)
 {
-  assert(sel != NULL);
+  assert(sel != nullptr);
   // note: we don't work very well when there are multiple visible
   // representations in the view and selections are made in it.
   for (unsigned int cc = 0, max = sel->GetNumberOfNodes(); cc < max; ++cc)
@@ -393,14 +393,14 @@ bool vtkChartRepresentation::MapSelectionToInput(vtkSelection* sel)
 //----------------------------------------------------------------------------
 bool vtkChartRepresentation::MapSelectionToView(vtkSelection* sel)
 {
-  assert(sel != NULL);
+  assert(sel != nullptr);
   // note: we don't work very well when there are multiple visible
   // representations in the view and selections are made in it.
   int fieldType = vtkSelectionNode::ConvertAttributeTypeToSelectionField(this->FieldAssociation);
   for (unsigned int cc = sel->GetNumberOfNodes(); cc > 0; --cc)
   {
     vtkSelectionNode* node = sel->GetNode(cc - 1);
-    if (node == NULL || node->GetFieldType() != fieldType)
+    if (node == nullptr || node->GetFieldType() != fieldType)
     {
       sel->RemoveNode(cc - 1);
     }

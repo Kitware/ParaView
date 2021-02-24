@@ -46,9 +46,7 @@ pqColorButtonEventTranslator::pqColorButtonEventTranslator(QObject* parentObject
 }
 
 //-----------------------------------------------------------------------------
-pqColorButtonEventTranslator::~pqColorButtonEventTranslator()
-{
-}
+pqColorButtonEventTranslator::~pqColorButtonEventTranslator() = default;
 
 //-----------------------------------------------------------------------------
 bool pqColorButtonEventTranslator::translateEvent(
@@ -61,7 +59,7 @@ bool pqColorButtonEventTranslator::translateEvent(
     return false;
   }
 
-  pqColorChooserButton* color_button = 0;
+  pqColorChooserButton* color_button = nullptr;
   while (object && !color_button)
   {
     color_button = qobject_cast<pqColorChooserButton*>(object);
@@ -75,7 +73,7 @@ bool pqColorButtonEventTranslator::translateEvent(
 
   if (tr_event->type() == QEvent::FocusIn)
   {
-    QObject::disconnect(color_button, 0, this, 0);
+    QObject::disconnect(color_button, nullptr, this, nullptr);
     QObject::connect(color_button, SIGNAL(validColorChosen(const QColor&)), this,
       SLOT(onColorChosen(const QColor&)));
   }

@@ -89,7 +89,7 @@ vtkCxxSetObjectMacro(vtkStreamingParticlesPriorityQueue, Controller, vtkMultiPro
 vtkStreamingParticlesPriorityQueue::vtkStreamingParticlesPriorityQueue()
 {
   this->Internals = new vtkInternals();
-  this->Controller = 0;
+  this->Controller = nullptr;
   this->UseBlockDetailInformation = false;
   this->AnyProcessCanLoadAnyBlock = true;
   this->DetailLevelToLoad = 8.5e-5;
@@ -100,8 +100,8 @@ vtkStreamingParticlesPriorityQueue::vtkStreamingParticlesPriorityQueue()
 vtkStreamingParticlesPriorityQueue::~vtkStreamingParticlesPriorityQueue()
 {
   delete this->Internals;
-  this->Internals = 0;
-  this->SetController(0);
+  this->Internals = nullptr;
+  this->SetController(nullptr);
 }
 
 //----------------------------------------------------------------------------
@@ -188,7 +188,7 @@ void vtkStreamingParticlesPriorityQueue::UpdatePriorities(const double view_plan
   for (unsigned int level = 0; level < num_levels; level++)
   {
     vtkMultiBlockDataSet* mb = vtkMultiBlockDataSet::SafeDownCast(metadata->GetBlock(level));
-    assert(mb != NULL);
+    assert(mb != nullptr);
 
     unsigned int num_blocks = mb->GetNumberOfBlocks();
     if (num_blocks > num_block_per_level)

@@ -30,9 +30,7 @@ vtkSIDataArraySelectionProperty::vtkSIDataArraySelectionProperty()
 }
 
 //----------------------------------------------------------------------------
-vtkSIDataArraySelectionProperty::~vtkSIDataArraySelectionProperty()
-{
-}
+vtkSIDataArraySelectionProperty::~vtkSIDataArraySelectionProperty() = default;
 
 //----------------------------------------------------------------------------
 void vtkSIDataArraySelectionProperty::PrintSelf(ostream& os, vtkIndent indent)

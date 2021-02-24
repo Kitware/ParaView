@@ -52,10 +52,10 @@ vtkCxxSetObjectMacro(vtkReductionFilter, PostGatherHelper, vtkAlgorithm);
 //-----------------------------------------------------------------------------
 vtkReductionFilter::vtkReductionFilter()
 {
-  this->Controller = 0;
+  this->Controller = nullptr;
   this->SetController(vtkMultiProcessController::GetGlobalController());
-  this->PreGatherHelper = 0;
-  this->PostGatherHelper = 0;
+  this->PreGatherHelper = nullptr;
+  this->PostGatherHelper = nullptr;
   this->PassThrough = -1;
   this->GenerateProcessIds = 0;
   this->ReductionMode = vtkReductionFilter::REDUCE_ALL_TO_ONE;
@@ -65,9 +65,9 @@ vtkReductionFilter::vtkReductionFilter()
 //-----------------------------------------------------------------------------
 vtkReductionFilter::~vtkReductionFilter()
 {
-  this->SetPreGatherHelper(0);
-  this->SetPostGatherHelper(0);
-  this->SetController(0);
+  this->SetPreGatherHelper(nullptr);
+  this->SetPostGatherHelper(nullptr);
+  this->SetController(nullptr);
 }
 
 //-----------------------------------------------------------------------------
@@ -97,7 +97,7 @@ void vtkReductionFilter::SetPostGatherHelperName(const char* name)
 int vtkReductionFilter::RequestDataObject(
   vtkInformation* reqInfo, vtkInformationVector** inputVector, vtkInformationVector* outputVector)
 {
-  if (this->PostGatherHelper != NULL)
+  if (this->PostGatherHelper != nullptr)
   {
     vtkInformation* helpersInfo = this->PostGatherHelper->GetOutputPortInformation(0);
 
@@ -165,7 +165,7 @@ int vtkReductionFilter::RequestData(
   vtkInformation*, vtkInformationVector** inputVector, vtkInformationVector* outputVector)
 {
   vtkInformation* outInfo = outputVector->GetInformationObject(0);
-  vtkDataObject* input = 0;
+  vtkDataObject* input = nullptr;
   vtkDataObject* output = outInfo->Get(vtkDataObject::DATA_OBJECT());
 
   if (inputVector[0]->GetNumberOfInformationObjects() > 0)
@@ -190,11 +190,11 @@ vtkDataObject* vtkReductionFilter::PreProcess(vtkDataObject* input)
 {
   if (!input)
   {
-    return 0;
+    return nullptr;
   }
 
   vtkSmartPointer<vtkDataObject> result;
-  if (this->PreGatherHelper == NULL)
+  if (this->PreGatherHelper == nullptr)
   {
     // allow a passthrough
     result = input;
@@ -215,7 +215,7 @@ vtkDataObject* vtkReductionFilter::PreProcess(vtkDataObject* input)
 
     // If a PostGatherHelper is present, we need to ensure that the result produced
     // by this pre-processing stage is acceptable to the PostGatherHelper.
-    if (this->PostGatherHelper != NULL)
+    if (this->PostGatherHelper != nullptr)
     {
       vtkInformation* info = this->PostGatherHelper->GetInputPortInformation(0);
       if (info)
@@ -299,7 +299,7 @@ void vtkReductionFilter::Reduce(vtkDataObject* input, vtkDataObject* output)
   {
     // Note that preOutput is never the input directly (it is shallow copied at
     // the least, hence we can add arrays to it.
-    vtkIdTypeArray* originalProcessIds = 0;
+    vtkIdTypeArray* originalProcessIds = nullptr;
     if (dsPreOutput->GetNumberOfPoints() > 0)
     {
       originalProcessIds = vtkIdTypeArray::New();
@@ -399,13 +399,13 @@ void vtkReductionFilter::Reduce(vtkDataObject* input, vtkDataObject* output)
     }
   }
 
-  // the reduction from all ranks may return NULL datasets on certain ranks.
+  // the reduction from all ranks may return nullptr datasets on certain ranks.
   // So, we need to handle receiveData having NULLs.
   assert(static_cast<int>(receiveData.size()) == numProcs);
   if (myId == this->ReductionProcessId ||
     this->ReductionMode == vtkReductionFilter::REDUCE_ALL_TO_ALL)
   {
-    if (this->PassThrough >= 0 && receiveData[this->PassThrough] != NULL)
+    if (this->PassThrough >= 0 && receiveData[this->PassThrough] != nullptr)
     {
       data_sets.push_back(receiveData[this->PassThrough]);
     }
@@ -413,7 +413,7 @@ void vtkReductionFilter::Reduce(vtkDataObject* input, vtkDataObject* output)
     {
       for (int i = 0; i < controller->GetNumberOfProcesses(); ++i)
       {
-        if (receiveData[i] != NULL)
+        if (receiveData[i] != nullptr)
         {
           data_sets.push_back(receiveData[i]);
         }

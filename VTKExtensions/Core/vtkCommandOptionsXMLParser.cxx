@@ -111,7 +111,7 @@ int vtkCommandOptionsXMLParserInternal::SetArgument(const char* arg, const char*
         if (*variable)
         {
           delete[] * variable;
-          *variable = 0;
+          *variable = nullptr;
         }
         *variable = strcpy(new char[strlen(value) + 1], value);
       }
@@ -154,7 +154,7 @@ vtkStandardNewMacro(vtkCommandOptionsXMLParser);
 vtkCommandOptionsXMLParser::vtkCommandOptionsXMLParser()
 {
   this->InPVXTag = 0;
-  this->PVOptions = 0;
+  this->PVOptions = nullptr;
   this->Internals = new vtkCommandOptionsXMLParserInternal;
 }
 
@@ -227,7 +227,7 @@ void vtkCommandOptionsXMLParser::HandleOption(const char** atts)
   // atts should be { "Name", "somename", "Value", "somevalue" }
   // The Value is optional as it may be a boolean option
   const char* nameTag = atts[0];
-  const char* name = 0;
+  const char* name = nullptr;
   // make sure there is a Name=
   if (!nameTag || (strcmp(nameTag, "Name") != 0))
   {
@@ -246,7 +246,7 @@ void vtkCommandOptionsXMLParser::HandleOption(const char** atts)
 
   // Now look for Value tag
   const char* valueTag = atts[2];
-  const char* value = 0;
+  const char* value = nullptr;
   // if there is a value tag and it is "Value"
   if (valueTag && (strcmp(valueTag, "Value") != 0))
   {

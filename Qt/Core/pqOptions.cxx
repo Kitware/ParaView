@@ -71,14 +71,14 @@ static int AddTestImageThreshold(const char*, const char* value, void* call_data
 //-----------------------------------------------------------------------------
 pqOptions::pqOptions()
 {
-  this->BaselineDirectory = 0;
-  this->TestDirectory = 0;
-  this->DataDirectory = 0;
+  this->BaselineDirectory = nullptr;
+  this->TestDirectory = nullptr;
+  this->DataDirectory = nullptr;
   this->ExitAppWhenTestsDone = 0;
-  this->ServerResourceName = 0;
-  this->StateFileName = 0;
+  this->ServerResourceName = nullptr;
+  this->StateFileName = nullptr;
   this->CurrentImageThreshold = 12;
-  this->PythonScript = 0;
+  this->PythonScript = nullptr;
   this->TestMaster = 0;
   this->TestSlave = 0;
 }
@@ -86,12 +86,12 @@ pqOptions::pqOptions()
 //-----------------------------------------------------------------------------
 pqOptions::~pqOptions()
 {
-  this->SetBaselineDirectory(0);
-  this->SetTestDirectory(0);
-  this->SetDataDirectory(0);
-  this->SetServerResourceName(0);
-  this->SetStateFileName(0);
-  this->SetPythonScript(0);
+  this->SetBaselineDirectory(nullptr);
+  this->SetTestDirectory(nullptr);
+  this->SetDataDirectory(nullptr);
+  this->SetServerResourceName(nullptr);
+  this->SetStateFileName(nullptr);
+  this->SetPythonScript(nullptr);
 }
 
 //-----------------------------------------------------------------------------
@@ -99,16 +99,16 @@ void pqOptions::Initialize()
 {
   this->Superclass::Initialize();
 
-  this->AddArgument("--baseline-directory", NULL, &this->TestDirectory,
+  this->AddArgument("--baseline-directory", nullptr, &this->TestDirectory,
     "Set the baseline directory where test recorder will store baseline images.");
 
-  this->AddArgument("--test-directory", NULL, &this->TestDirectory,
+  this->AddArgument("--test-directory", nullptr, &this->TestDirectory,
     "Set the temporary directory where test-case output will be stored.");
 
-  this->AddArgument("--data-directory", NULL, &this->DataDirectory,
+  this->AddArgument("--data-directory", nullptr, &this->DataDirectory,
     "Set the data directory where test-case data are located.");
 
-  this->AddBooleanArgument("--exit", NULL, &this->ExitAppWhenTestsDone,
+  this->AddBooleanArgument("--exit", nullptr, &this->ExitAppWhenTestsDone,
     "Exit application when testing is done. Use for testing.");
 
   this->AddArgument("--server", "-s", &this->ServerResourceName,
@@ -116,29 +116,29 @@ void pqOptions::Initialize()
 
   // add new Command Option for loading StateFile (Bug #5711)
   this->AddArgument(
-    "--state", NULL, &this->StateFileName, "Load the specified statefile (.pvsm or .py).");
+    "--state", nullptr, &this->StateFileName, "Load the specified statefile (.pvsm or .py).");
 
-  this->AddCallback("--test-script", NULL, &::AddTestScript, this,
+  this->AddCallback("--test-script", nullptr, &::AddTestScript, this,
     "Add test script. Can be used multiple times to "
     "specify multiple tests.");
-  this->AddCallback("--test-baseline", NULL, &::AddTestBaseline, this,
+  this->AddCallback("--test-baseline", nullptr, &::AddTestBaseline, this,
     "Add test baseline. Can be used multiple times to specify "
     "multiple baselines for multiple tests, in order.");
-  this->AddCallback("--test-threshold", NULL, &::AddTestImageThreshold, this,
+  this->AddCallback("--test-threshold", nullptr, &::AddTestImageThreshold, this,
     "Add test image threshold. "
     "Can be used multiple times to specify multiple image thresholds for "
     "multiple tests in order. When recording test can be a directory to record image in");
 
   this->AddArgument(
-    "--script", NULL, &this->PythonScript, "Set a python script to be evaluated on startup.");
+    "--script", nullptr, &this->PythonScript, "Set a python script to be evaluated on startup.");
 
-  this->AddBooleanArgument("--test-master", 0, &this->TestMaster,
+  this->AddBooleanArgument("--test-master", nullptr, &this->TestMaster,
     "(For testing) When present, tests master configuration.");
 
-  this->AddBooleanArgument(
-    "--test-slave", 0, &this->TestSlave, "(For testing) When present, tests slave configuration.");
+  this->AddBooleanArgument("--test-slave", nullptr, &this->TestSlave,
+    "(For testing) When present, tests slave configuration.");
 
-  this->AddArgument("--live", 0, &this->CatalystLivePort, "Set the Catalyst Live port");
+  this->AddArgument("--live", nullptr, &this->CatalystLivePort, "Set the Catalyst Live port");
 }
 
 //-----------------------------------------------------------------------------

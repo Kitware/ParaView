@@ -430,7 +430,7 @@ void MyProcess::Execute()
     this->ReturnValue = vtkTesting::PASSED;
     return;
   }
-  temp = NULL;
+  temp = nullptr;
 
   int myId = this->Controller->GetLocalProcessId();
 

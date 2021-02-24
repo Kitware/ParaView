@@ -64,7 +64,7 @@ void pqTestingReaction::recordTest()
 #endif
   filters += "All Files (*)";
   pqFileDialog fileDialog(
-    NULL, pqCoreUtilities::mainWidget(), tr("Record Test"), QString(), filters);
+    nullptr, pqCoreUtilities::mainWidget(), tr("Record Test"), QString(), filters);
   fileDialog.setObjectName("ToolsRecordTestDialog");
   fileDialog.setFileMode(pqFileDialog::AnyFile);
   if (fileDialog.exec() == QDialog::Accepted)
@@ -92,7 +92,8 @@ void pqTestingReaction::playTest()
   filters += "Python Files (*.py);;";
 #endif
   filters += "All Files (*)";
-  pqFileDialog fileDialog(NULL, pqCoreUtilities::mainWidget(), tr("Play Test"), QString(), filters);
+  pqFileDialog fileDialog(
+    nullptr, pqCoreUtilities::mainWidget(), tr("Play Test"), QString(), filters);
   fileDialog.setObjectName("ToolsPlayTestDialog");
   fileDialog.setFileMode(pqFileDialog::ExistingFile);
   if (fileDialog.exec() == QDialog::Accepted)

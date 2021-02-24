@@ -21,14 +21,10 @@
 vtkStandardNewMacro(vtkSMImplicitPlaneRepresentationProxy);
 
 //---------------------------------------------------------------------------
-vtkSMImplicitPlaneRepresentationProxy::vtkSMImplicitPlaneRepresentationProxy()
-{
-}
+vtkSMImplicitPlaneRepresentationProxy::vtkSMImplicitPlaneRepresentationProxy() = default;
 
 //---------------------------------------------------------------------------
-vtkSMImplicitPlaneRepresentationProxy::~vtkSMImplicitPlaneRepresentationProxy()
-{
-}
+vtkSMImplicitPlaneRepresentationProxy::~vtkSMImplicitPlaneRepresentationProxy() = default;
 
 //---------------------------------------------------------------------------
 void vtkSMImplicitPlaneRepresentationProxy::SendRepresentation()

@@ -112,7 +112,7 @@ pqTextLocationWidget::pqTextLocationWidget(
 pqTextLocationWidget::~pqTextLocationWidget()
 {
   delete this->Internals;
-  this->Internals = NULL;
+  this->Internals = nullptr;
 }
 
 //-----------------------------------------------------------------------------

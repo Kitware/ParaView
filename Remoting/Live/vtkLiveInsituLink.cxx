@@ -67,7 +67,7 @@ void TriggerRMI(vtkMultiProcessController* controller, int tag, double time, vtk
 {
   vtkMultiProcessStream stream;
   stream << time << timeStep;
-  unsigned char* data = NULL;
+  unsigned char* data = nullptr;
   unsigned int dataSize;
   stream.GetRawData(data, dataSize);
   controller->TriggerRMI(1, const_cast<unsigned char*>(data), dataSize, tag);
@@ -79,7 +79,7 @@ void TriggerRMIOnAllChildren(
 {
   vtkMultiProcessStream stream;
   stream << time << timeStep;
-  unsigned char* data = NULL;
+  unsigned char* data = nullptr;
   unsigned int dataSize;
   stream.GetRawData(data, dataSize);
   controller->TriggerRMIOnAllChildren(const_cast<unsigned char*>(data), dataSize, tag);
@@ -90,7 +90,7 @@ void InitializeConnectionRMI(void* localArg, void* vtkNotUsed(remoteArg),
   int vtkNotUsed(remoteArgLength), int vtkNotUsed(remoteProcessId))
 {
   vtkLiveInsituLink* self = reinterpret_cast<vtkLiveInsituLink*>(localArg);
-  self->InsituConnect(NULL);
+  self->InsituConnect(nullptr);
 }
 
 void DropLiveInsituConnectionRMI(void* localArg, void* vtkNotUsed(remoteArg),
@@ -293,7 +293,7 @@ public:
     vtkClientServerStream stream;
     info->CopyToStream(&stream);
     size_t length = 0;
-    const unsigned char* data = NULL;
+    const unsigned char* data = nullptr;
     stream.GetData(&data, &length);
     std::string rawData((const char*)data, length);
 
@@ -319,15 +319,15 @@ public:
 vtkStandardNewMacro(vtkLiveInsituLink);
 //----------------------------------------------------------------------------
 vtkLiveInsituLink::vtkLiveInsituLink()
-  : Hostname(0)
+  : Hostname(nullptr)
   , InsituPort(0)
   , ProcessType(INSITU)
   , ProxyId(0)
   , InsituXMLStateChanged(false)
   , ExtractsChanged(false)
   , SimulationPaused(0)
-  , InsituXMLState(0)
-  , URL(0)
+  , InsituXMLState(nullptr)
+  , URL(nullptr)
   , Internals(new vtkInternals())
 {
   this->SetHostname("localhost");
@@ -336,20 +336,20 @@ vtkLiveInsituLink::vtkLiveInsituLink()
 //----------------------------------------------------------------------------
 vtkLiveInsituLink::~vtkLiveInsituLink()
 {
-  this->SetHostname(0);
-  this->SetURL(0);
+  this->SetHostname(nullptr);
+  this->SetURL(nullptr);
 
   delete[] this->InsituXMLState;
-  this->InsituXMLState = 0;
+  this->InsituXMLState = nullptr;
 
   delete this->Internals;
-  this->Internals = NULL;
+  this->Internals = nullptr;
 }
 
 //----------------------------------------------------------------------------
 bool vtkLiveInsituLink::Initialize(vtkSMSessionProxyManager* pxm)
 {
-  if (this->Proc0NodesController || this->ExtractsDeliveryHelper != NULL)
+  if (this->Proc0NodesController || this->ExtractsDeliveryHelper != nullptr)
   {
     // already initialized. all's well.
     // (this->Proc0NodesController is non-existant on satellites)
@@ -411,7 +411,7 @@ void vtkLiveInsituLink::InitializeLive()
       this->InsituPort);
     if (vtkMultiProcessController* proc0NodesController = nam->NewConnection(this->URL))
     {
-      // controller would generally be NULL, however due to magically timing,
+      // controller would generally be nullptr, however due to magically timing,
       // the insitu lib may indeed connect just as we setup the socket, so we
       // handle that case.
       this->InsituConnect(proc0NodesController);
@@ -443,8 +443,8 @@ void vtkLiveInsituLink::InitializeLive()
 bool vtkLiveInsituLink::InitializeInsitu()
 {
   // vtkLiveInsituLink::Initialize() should not call this method unless
-  // Proc0NodesController==NULL.
-  assert(this->Proc0NodesController == NULL);
+  // Proc0NodesController==nullptr.
+  assert(this->Proc0NodesController == nullptr);
 
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   int myId = pm->GetPartitionId();
@@ -474,12 +474,12 @@ bool vtkLiveInsituLink::InitializeInsitu()
     vtkObject::SetGlobalWarningDisplay(display_errors);
     if (numProcs > 1)
     {
-      int connection_established = proc0NodesController != NULL ? 1 : 0;
+      int connection_established = proc0NodesController != nullptr ? 1 : 0;
       pm->GetGlobalController()->Broadcast(&connection_established, 1, 0);
     }
     if (proc0NodesController)
     {
-      // controller would generally be NULL, however due to magically timing,
+      // controller would generally be nullptr, however due to magically timing,
       // the insitu lib may indeed connect just as we setup the socket, so we
       // handle that case.
       this->InsituConnect(proc0NodesController);
@@ -494,7 +494,7 @@ bool vtkLiveInsituLink::InitializeInsitu()
     pm->GetGlobalController()->Broadcast(&connection_established, 1, 0);
     if (connection_established)
     {
-      this->InsituConnect(NULL);
+      this->InsituConnect(nullptr);
       retVal = true;
     }
   }
@@ -547,8 +547,8 @@ void vtkLiveInsituLink::OnConnectionClosedEvent(vtkObject*, unsigned long, void*
 void vtkLiveInsituLink::DropLiveInsituConnection()
 {
   // smart pointers below
-  this->Proc0NodesController = 0;
-  this->ExtractsDeliveryHelper = 0;
+  this->Proc0NodesController = nullptr;
+  this->ExtractsDeliveryHelper = nullptr;
   this->SimulationPaused = 0;
   vtkDebugMacro("Catalyst and ParaView should now be disconnected");
 }
@@ -556,8 +556,8 @@ void vtkLiveInsituLink::DropLiveInsituConnection()
 //----------------------------------------------------------------------------
 void vtkLiveInsituLink::InsituConnect(vtkMultiProcessController* proc0NodesController)
 {
-  assert(this->Proc0NodesController == NULL);
-  assert(this->ExtractsDeliveryHelper.GetPointer() == NULL);
+  assert(this->Proc0NodesController == nullptr);
+  assert(this->ExtractsDeliveryHelper.GetPointer() == nullptr);
 
   this->Proc0NodesController = proc0NodesController;
 
@@ -572,11 +572,11 @@ void vtkLiveInsituLink::InsituConnect(vtkMultiProcessController* proc0NodesContr
 
   if (myId == 0)
   {
-    assert(proc0NodesController != NULL);
+    assert(proc0NodesController != nullptr);
   }
   else
   {
-    assert(proc0NodesController == NULL);
+    assert(proc0NodesController == nullptr);
   }
 
   switch (this->ProcessType)
@@ -815,7 +815,7 @@ void vtkLiveInsituLink::InsituUpdate(double time, vtkIdType timeStep)
   int myId = pm->GetPartitionId();
   int numProcs = pm->GetNumberOfLocalPartitions();
 
-  char* buffer = NULL;
+  char* buffer = nullptr;
   int buffer_size = 0;
 
   vtkMultiProcessStream extractsPauseMessage;
@@ -920,7 +920,7 @@ void vtkLiveInsituLink::InsituUpdate(double time, vtkIdType timeStep)
   extractsPauseMessage >> extracts_valid;
   if (extracts_valid)
   {
-    assert(this->ExtractsDeliveryHelper.GetPointer() != NULL);
+    assert(this->ExtractsDeliveryHelper.GetPointer() != nullptr);
     this->ExtractsDeliveryHelper->ClearAllExtracts();
     int numberOfExtracts;
     extractsPauseMessage >> numberOfExtracts;
@@ -971,7 +971,7 @@ void vtkLiveInsituLink::InsituPostProcess(double time, vtkIdType timeStep)
 
   if (!this->ExtractsDeliveryHelper)
   {
-    // if this->ExtractsDeliveryHelper is NULL it means we are not connected to
+    // if this->ExtractsDeliveryHelper is nullptr it means we are not connected to
     // any ParaView Visualization Engine yet. Just skip.
     return;
   }
@@ -1230,7 +1230,7 @@ void vtkLiveInsituLink::PrintSelf(ostream& os, vtkIndent indent)
 //----------------------------------------------------------------------------
 bool vtkLiveInsituLink::FilterXMLState(vtkPVXMLElement* xmlState)
 {
-  if (xmlState == NULL)
+  if (xmlState == nullptr)
   {
     return false;
   }
@@ -1333,7 +1333,7 @@ void vtkLiveInsituLink::LiveChanged()
   assert(this->ProcessType == LIVE);
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   int myId = pm->GetPartitionId();
-  if (myId == 0 && this->Proc0NodesController != NULL)
+  if (myId == 0 && this->Proc0NodesController != nullptr)
   {
     vtkLiveInsituLinkDebugMacro(<< "LiveChanged " << myId);
     this->Proc0NodesController->TriggerRMI(1, LIVE_CHANGED);

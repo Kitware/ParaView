@@ -34,7 +34,7 @@ vtkStandardNewMacro(vtkPVClientServerSynchronizedRenderers);
 vtkCxxSetObjectMacro(vtkPVClientServerSynchronizedRenderers, Compressor, vtkImageCompressor);
 //----------------------------------------------------------------------------
 vtkPVClientServerSynchronizedRenderers::vtkPVClientServerSynchronizedRenderers()
-  : Compressor(NULL)
+  : Compressor(nullptr)
   , LossLessCompression(true)
   , NVPipeSupport(false)
 {
@@ -44,7 +44,7 @@ vtkPVClientServerSynchronizedRenderers::vtkPVClientServerSynchronizedRenderers()
 //----------------------------------------------------------------------------
 vtkPVClientServerSynchronizedRenderers::~vtkPVClientServerSynchronizedRenderers()
 {
-  this->SetCompressor(NULL);
+  this->SetCompressor(nullptr);
 }
 
 //----------------------------------------------------------------------------
@@ -159,7 +159,7 @@ void vtkPVClientServerSynchronizedRenderers::ConfigureCompressor(const char* str
   // Allocate the desired compressor unless we have one in hand.
   if (this->Compressor == nullptr || !this->Compressor->IsA(className.c_str()))
   {
-    vtkImageCompressor* comp = 0;
+    vtkImageCompressor* comp = nullptr;
     if (className == "vtkSquirtCompressor")
     {
       comp = vtkSquirtCompressor::New();
@@ -191,11 +191,11 @@ void vtkPVClientServerSynchronizedRenderers::ConfigureCompressor(const char* str
     }
     else if (className == "NULL" || className.empty())
     {
-      this->SetCompressor(0);
+      this->SetCompressor(nullptr);
       return;
     }
 
-    if (comp == 0)
+    if (comp == nullptr)
     {
       vtkWarningMacro("Could not create the compressor by name " << className << ".");
       return;

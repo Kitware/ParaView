@@ -24,12 +24,12 @@ vtkStandardNewMacro(vtkPVXMLParser);
 //----------------------------------------------------------------------------
 vtkPVXMLParser::vtkPVXMLParser()
 {
-  this->InputString = 0;
+  this->InputString = nullptr;
   this->NumberOfOpenElements = 0;
   this->OpenElementsSize = 10;
   this->OpenElements = new vtkPVXMLElement*[this->OpenElementsSize];
   this->ElementIdIndex = 0;
-  this->RootElement = 0;
+  this->RootElement = nullptr;
   this->SuppressErrorMessages = 0;
 }
 
@@ -130,7 +130,7 @@ vtkPVXMLElement* vtkPVXMLParser::PopOpenElement()
     --this->NumberOfOpenElements;
     return this->OpenElements[this->NumberOfOpenElements];
   }
-  return 0;
+  return nullptr;
 }
 
 //----------------------------------------------------------------------------
@@ -145,7 +145,7 @@ int vtkPVXMLParser::ParseXML()
   if (this->RootElement)
   {
     this->RootElement->Delete();
-    this->RootElement = 0;
+    this->RootElement = nullptr;
   }
   return this->Superclass::ParseXML();
 }

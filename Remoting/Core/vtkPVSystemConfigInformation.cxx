@@ -54,20 +54,24 @@ void vtkPVSystemConfigInformation::ConfigInfo::Print()
 vtkStandardNewMacro(vtkPVSystemConfigInformation);
 
 //----------------------------------------------------------------------------
+#ifdef vtkPVSystemConfigInformationDEBUG
 vtkPVSystemConfigInformation::vtkPVSystemConfigInformation()
 {
-#ifdef vtkPVSystemConfigInformationDEBUG
   cerr << "=====vtkPVSystemConfigInformation::vtkPVSystemConfigInformation" << endl;
-#endif
 }
+#else
+vtkPVSystemConfigInformation::vtkPVSystemConfigInformation() = default;
+#endif
 
 //----------------------------------------------------------------------------
+#ifdef vtkPVSystemConfigInformationDEBUG
 vtkPVSystemConfigInformation::~vtkPVSystemConfigInformation()
 {
-#ifdef vtkPVSystemConfigInformationDEBUG
   cerr << "=====vtkPVSystemConfigInformation::~vtkPVSystemConfigInformation" << endl;
-#endif
 }
+#else
+vtkPVSystemConfigInformation::~vtkPVSystemConfigInformation() = default;
+#endif
 
 //----------------------------------------------------------------------------
 void vtkPVSystemConfigInformation::CopyFromObject(vtkObject* obj)

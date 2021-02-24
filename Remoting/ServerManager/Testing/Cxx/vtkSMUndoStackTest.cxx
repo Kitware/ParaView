@@ -32,7 +32,7 @@ void vtkSMUndoStackTest::UndoRedo()
 
   vtkSMProxy* sphere = pxm->NewProxy("sources", "SphereSource");
   sphere->UpdateVTKObjects();
-  QVERIFY(sphere != NULL);
+  QVERIFY(sphere != nullptr);
   QCOMPARE(vtkSMPropertyHelper(sphere, "Radius").GetAsDouble(), 0.5);
 
   vtkSMUndoStack* undoStack = vtkSMUndoStack::New();

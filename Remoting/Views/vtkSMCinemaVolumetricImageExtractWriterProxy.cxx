@@ -272,14 +272,12 @@ std::vector<double> GetOpacityTransferFunction(bool full_combination, int number
 
 vtkStandardNewMacro(vtkSMCinemaVolumetricImageExtractWriterProxy);
 //----------------------------------------------------------------------------
-vtkSMCinemaVolumetricImageExtractWriterProxy::vtkSMCinemaVolumetricImageExtractWriterProxy()
-{
-}
+vtkSMCinemaVolumetricImageExtractWriterProxy::vtkSMCinemaVolumetricImageExtractWriterProxy() =
+  default;
 
 //----------------------------------------------------------------------------
-vtkSMCinemaVolumetricImageExtractWriterProxy::~vtkSMCinemaVolumetricImageExtractWriterProxy()
-{
-}
+vtkSMCinemaVolumetricImageExtractWriterProxy::~vtkSMCinemaVolumetricImageExtractWriterProxy() =
+  default;
 
 //----------------------------------------------------------------------------
 bool vtkSMCinemaVolumetricImageExtractWriterProxy::WriteInternal(

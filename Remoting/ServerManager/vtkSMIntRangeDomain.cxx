@@ -23,14 +23,10 @@ VTK_SM_RANGE_DOMAIN_TEMPLATE_INSTANTIATE(int);
 
 vtkStandardNewMacro(vtkSMIntRangeDomain);
 //---------------------------------------------------------------------------
-vtkSMIntRangeDomain::vtkSMIntRangeDomain()
-{
-}
+vtkSMIntRangeDomain::vtkSMIntRangeDomain() = default;
 
 //---------------------------------------------------------------------------
-vtkSMIntRangeDomain::~vtkSMIntRangeDomain()
-{
-}
+vtkSMIntRangeDomain::~vtkSMIntRangeDomain() = default;
 
 ////---------------------------------------------------------------------------
 // int vtkSMIntRangeDomain::SetDefaultValues(vtkSMProperty* prop)

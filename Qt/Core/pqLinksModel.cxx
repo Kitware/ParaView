@@ -122,7 +122,7 @@ public:
   }
 
 protected:
-  pqInternal() {}
+  pqInternal() = default;
   ~pqInternal() override
   {
     // clean up interactiveViewLinks
@@ -166,7 +166,7 @@ pqLinksModel::pqLinksModel(QObject* p)
 /// destruct a links model
 pqLinksModel::~pqLinksModel()
 {
-  this->Internal->Model = NULL;
+  this->Internal->Model = nullptr;
   this->Internal->Delete();
 }
 
@@ -268,7 +268,7 @@ void pqLinksModel::onStateLoaded(vtkPVXMLElement* root, vtkSMProxyLocator* locat
 
 void pqLinksModel::onStateSaved(vtkPVXMLElement* root)
 {
-  assert(root != NULL);
+  assert(root != nullptr);
   vtkPVXMLElement* tempParent = vtkPVXMLElement::New();
   tempParent->SetName("InteractiveViewLinks");
 
@@ -276,7 +276,7 @@ void pqLinksModel::onStateSaved(vtkPVXMLElement* root)
   foreach (QString linkName, this->Internal->InteractiveViewLinks.keys())
   {
     pqInteractiveViewLink* interLink = this->Internal->InteractiveViewLinks[linkName];
-    if (interLink != NULL)
+    if (interLink != nullptr)
     {
       vtkPVXMLElement* interLinkXML = vtkPVXMLElement::New();
       interLinkXML->SetName("InteractiveViewLink");
@@ -302,7 +302,7 @@ static vtkSMProxy* getProxyFromLink(vtkSMLink* link, int desiredDir)
       return proxy;
     }
   }
-  return NULL;
+  return nullptr;
 }
 
 // TODO: fix this so it isn't dependent on the order of links
@@ -532,7 +532,7 @@ vtkSMLink* pqLinksModel::getLink(const QString& name) const
     vtkSMLink* link = pxm->GetRegisteredLink(name.toLocal8Bit().data());
     return link;
   }
-  return NULL;
+  return nullptr;
 }
 
 vtkSMLink* pqLinksModel::getLink(const QModelIndex& idx) const
@@ -631,8 +631,8 @@ void pqLinksModel::createInteractiveViewLink(const QString& name, vtkSMProxy* di
 {
   // Look for corresponding pqRenderView
   pqServerManagerModel* smModel = pqApplicationCore::instance()->getServerManagerModel();
-  pqRenderView* firstView = NULL;
-  pqRenderView* otherView = NULL;
+  pqRenderView* firstView = nullptr;
+  pqRenderView* otherView = nullptr;
   QList<pqRenderView*> views = smModel->findItems<pqRenderView*>();
   foreach (pqRenderView* view, views)
   {
@@ -647,7 +647,7 @@ void pqLinksModel::createInteractiveViewLink(const QString& name, vtkSMProxy* di
   }
 
   // If found, create the pqInteractiveViewLink
-  if (firstView != NULL && otherView != NULL)
+  if (firstView != nullptr && otherView != nullptr)
   {
     this->Internal->InteractiveViewLinks[name] =
       new pqInteractiveViewLink(firstView, otherView, xPos, yPos, xSize, ySize);
@@ -663,7 +663,7 @@ pqInteractiveViewLink* pqLinksModel::getInteractiveViewLink(const QString& name)
 {
   return this->Internal->InteractiveViewLinks.contains(name)
     ? this->Internal->InteractiveViewLinks[name]
-    : NULL;
+    : nullptr;
 }
 
 void pqLinksModel::addPropertyLink(const QString& name, vtkSMProxy* inputProxy,
@@ -761,7 +761,7 @@ pqProxy* pqLinksModel::representativeProxy(vtkSMProxy* pxy)
   {
     // get the owner of this internal proxy
     int numConsumers = pxy->GetNumberOfConsumers();
-    for (int i = 0; rep == NULL && i < numConsumers; i++)
+    for (int i = 0; rep == nullptr && i < numConsumers; i++)
     {
       vtkSMProxy* consumer = pxy->GetConsumerProxy(i);
       rep = smModel->findItem<pqProxy*>(consumer);
@@ -772,16 +772,16 @@ pqProxy* pqLinksModel::representativeProxy(vtkSMProxy* pxy)
 
 vtkSMProxyListDomain* pqLinksModel::proxyListDomain(vtkSMProxy* pxy)
 {
-  vtkSMProxyListDomain* pxyDomain = NULL;
+  vtkSMProxyListDomain* pxyDomain = nullptr;
 
-  if (pxy == NULL)
+  if (pxy == nullptr)
   {
-    return NULL;
+    return nullptr;
   }
 
   vtkSMPropertyIterator* iter = vtkSMPropertyIterator::New();
   iter->SetProxy(pxy);
-  for (iter->Begin(); pxyDomain == NULL && !iter->IsAtEnd(); iter->Next())
+  for (iter->Begin(); pxyDomain == nullptr && !iter->IsAtEnd(); iter->Next())
   {
     vtkSMProxyProperty* pxyProperty = vtkSMProxyProperty::SafeDownCast(iter->GetProperty());
     if (pxyProperty)

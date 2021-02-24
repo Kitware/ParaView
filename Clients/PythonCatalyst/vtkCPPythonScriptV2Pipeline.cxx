@@ -28,9 +28,7 @@ vtkCPPythonScriptV2Pipeline::vtkCPPythonScriptV2Pipeline()
 }
 
 //----------------------------------------------------------------------------
-vtkCPPythonScriptV2Pipeline::~vtkCPPythonScriptV2Pipeline()
-{
-}
+vtkCPPythonScriptV2Pipeline::~vtkCPPythonScriptV2Pipeline() = default;
 
 //----------------------------------------------------------------------------
 bool vtkCPPythonScriptV2Pipeline::Initialize(const char* path)

@@ -40,9 +40,7 @@ pqTemporalExportReaction::pqTemporalExportReaction(QAction* parentObject)
 }
 
 //-----------------------------------------------------------------------------
-pqTemporalExportReaction::~pqTemporalExportReaction()
-{
-}
+pqTemporalExportReaction::~pqTemporalExportReaction() = default;
 
 //-----------------------------------------------------------------------------
 void pqTemporalExportReaction::onTriggered()

@@ -33,18 +33,18 @@ vtkCxxSetObjectMacro(vtkSMAnimationSceneGeometryWriter, ViewModule, vtkSMProxy);
 //-----------------------------------------------------------------------------
 vtkSMAnimationSceneGeometryWriter::vtkSMAnimationSceneGeometryWriter()
 {
-  this->GeometryWriter = 0;
-  this->ViewModule = 0;
+  this->GeometryWriter = nullptr;
+  this->ViewModule = nullptr;
 }
 
 //-----------------------------------------------------------------------------
 vtkSMAnimationSceneGeometryWriter::~vtkSMAnimationSceneGeometryWriter()
 {
-  this->SetViewModule(0);
+  this->SetViewModule(nullptr);
   if (this->GeometryWriter)
   {
     this->GeometryWriter->Delete();
-    this->GeometryWriter = 0;
+    this->GeometryWriter = nullptr;
   }
 }
 
@@ -108,7 +108,7 @@ bool vtkSMAnimationSceneGeometryWriter::SaveFinalize()
 
   this->GeometryWriter->InvokeCommand("Finish");
   this->GeometryWriter->Delete();
-  this->GeometryWriter = 0;
+  this->GeometryWriter = nullptr;
   return true;
 }
 

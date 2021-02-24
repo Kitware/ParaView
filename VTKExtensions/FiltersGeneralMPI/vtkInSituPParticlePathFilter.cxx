@@ -40,9 +40,7 @@ vtkInSituPParticlePathFilter::vtkInSituPParticlePathFilter()
   this->FirstTimeStep = 0;
 }
 
-vtkInSituPParticlePathFilter::~vtkInSituPParticlePathFilter()
-{
-}
+vtkInSituPParticlePathFilter::~vtkInSituPParticlePathFilter() = default;
 
 //----------------------------------------------------------------------------
 void vtkInSituPParticlePathFilter::SetClearCache(bool clearCache)
@@ -59,7 +57,7 @@ void vtkInSituPParticlePathFilter::AddRestartConnection(vtkAlgorithmOutput* inpu
 //----------------------------------------------------------------------------
 void vtkInSituPParticlePathFilter::RemoveAllRestarts()
 {
-  this->SetInputConnection(2, 0);
+  this->SetInputConnection(2, nullptr);
 }
 
 //---------------------------------------------------------------------------

@@ -28,11 +28,11 @@ void vtkSMProxyLinkTest::AddLinkedProxy()
   vtkSMSessionProxyManager* pxm = session->GetSessionProxyManager();
 
   vtkSMProxy* sphere1 = pxm->NewProxy("sources", "SphereSource");
-  QVERIFY(sphere1 != NULL);
+  QVERIFY(sphere1 != nullptr);
   QCOMPARE(vtkSMPropertyHelper(sphere1, "Radius").GetAsDouble(), 0.5);
 
   vtkSMProxy* sphere2 = pxm->NewProxy("sources", "SphereSource");
-  QVERIFY(sphere1 != NULL);
+  QVERIFY(sphere1 != nullptr);
   QCOMPARE(vtkSMPropertyHelper(sphere2, "Radius").GetAsDouble(), 0.5);
 
   vtkSMProxyLink* link = vtkSMProxyLink::New();

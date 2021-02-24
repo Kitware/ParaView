@@ -104,9 +104,9 @@ vtkPVImageSliceMapper::vtkPVImageSliceMapper()
 vtkPVImageSliceMapper::~vtkPVImageSliceMapper()
 {
   this->Texture->Delete();
-  this->Texture = NULL;
+  this->Texture = nullptr;
   this->PolyDataActor->Delete();
-  this->PolyDataActor = NULL;
+  this->PolyDataActor = nullptr;
 }
 
 //----------------------------------------------------------------------------
@@ -256,7 +256,7 @@ void vtkPVImageSliceMapper::RenderInternal(vtkRenderer* renderer, vtkActor* acto
     {
       // if vtkExtractVOI did not produce a valid output, that means there's no
       // image slice to display.
-      this->Texture->SetInputData(0);
+      this->Texture->SetInputData(nullptr);
       return;
     }
 
@@ -301,7 +301,7 @@ void vtkPVImageSliceMapper::RenderInternal(vtkRenderer* renderer, vtkActor* acto
       }
     }
 
-    const int* indices = NULL;
+    const int* indices = nullptr;
     switch (sliceDescription)
     {
       case VTK_XY_PLANE:
@@ -530,19 +530,19 @@ void vtkPVImageSliceMapper::RenderPiece(vtkRenderer* ren, vtkActor* actor)
   {
     return;
   }
-  if (input == NULL)
+  if (input == nullptr)
   {
     vtkErrorMacro(<< "No input!");
     return;
   }
   else
   {
-    this->InvokeEvent(vtkCommand::StartEvent, NULL);
+    this->InvokeEvent(vtkCommand::StartEvent, nullptr);
     if (!this->Static)
     {
       this->Update();
     }
-    this->InvokeEvent(vtkCommand::EndEvent, NULL);
+    this->InvokeEvent(vtkCommand::EndEvent, nullptr);
 
     vtkIdType numPts = input->GetNumberOfPoints();
     if (numPts == 0)

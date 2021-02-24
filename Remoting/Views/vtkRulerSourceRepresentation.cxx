@@ -51,7 +51,7 @@ vtkRulerSourceRepresentation::vtkRulerSourceRepresentation()
 //----------------------------------------------------------------------------
 vtkRulerSourceRepresentation::~vtkRulerSourceRepresentation()
 {
-  this->SetDistanceRepresentation(0);
+  this->SetDistanceRepresentation(nullptr);
 }
 
 //----------------------------------------------------------------------------

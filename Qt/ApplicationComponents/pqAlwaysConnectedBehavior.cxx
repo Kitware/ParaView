@@ -62,9 +62,7 @@ pqAlwaysConnectedBehavior::pqAlwaysConnectedBehavior(QObject* parentObject)
 }
 
 //-----------------------------------------------------------------------------
-pqAlwaysConnectedBehavior::~pqAlwaysConnectedBehavior()
-{
-}
+pqAlwaysConnectedBehavior::~pqAlwaysConnectedBehavior() = default;
 
 //-----------------------------------------------------------------------------
 void pqAlwaysConnectedBehavior::serverCheck()

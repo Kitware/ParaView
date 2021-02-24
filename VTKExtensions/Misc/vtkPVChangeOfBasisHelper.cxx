@@ -146,7 +146,7 @@ bool vtkPVChangeOfBasisHelper::AddBasisNames(
 void vtkPVChangeOfBasisHelper::GetBasisName(
   vtkDataObject* dataObject, const char*& utitle, const char*& vtitle, const char*& wtitle)
 {
-  utitle = vtitle = wtitle = NULL;
+  utitle = vtitle = wtitle = nullptr;
   if (!dataObject || !dataObject->GetFieldData())
   {
     return;

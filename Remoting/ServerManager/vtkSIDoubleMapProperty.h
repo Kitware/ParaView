@@ -32,9 +32,11 @@ public:
   vtkTypeMacro(vtkSIDoubleMapProperty, vtkSIProperty);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  vtkGetStringMacro(CleanCommand) vtkSetStringMacro(CleanCommand)
+  vtkGetStringMacro(CleanCommand);
+  vtkSetStringMacro(CleanCommand);
 
-    protected : vtkSIDoubleMapProperty();
+protected:
+  vtkSIDoubleMapProperty();
   ~vtkSIDoubleMapProperty() override;
 
   bool Push(vtkSMMessage*, int) override;

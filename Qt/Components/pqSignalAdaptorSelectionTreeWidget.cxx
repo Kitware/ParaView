@@ -63,7 +63,7 @@ pqSignalAdaptorSelectionTreeWidget::pqSignalAdaptorSelectionTreeWidget(
   this->Internal->Property = prop;
   this->Internal->TreeWidget = treeWidget;
   this->Internal->VTKConnect = vtkSmartPointer<vtkEventQtSlotConnect>::New();
-  this->ItemCreatorFunctionPtr = NULL;
+  this->ItemCreatorFunctionPtr = nullptr;
 
   // get domain
   vtkSMDomainIterator* iter = prop->NewDomainIterator();
@@ -81,8 +81,8 @@ pqSignalAdaptorSelectionTreeWidget::pqSignalAdaptorSelectionTreeWidget(
 
   if (this->Internal->Domain)
   {
-    this->Internal->VTKConnect->Connect(
-      this->Internal->Domain, vtkCommand::DomainModifiedEvent, this, SLOT(domainChanged()), 0, 0);
+    this->Internal->VTKConnect->Connect(this->Internal->Domain, vtkCommand::DomainModifiedEvent,
+      this, SLOT(domainChanged()), nullptr, 0);
 
     this->domainChanged();
   }
@@ -201,7 +201,7 @@ void pqSignalAdaptorSelectionTreeWidget::domainChanged()
 
   foreach (QList<QVariant> newValue, newValues)
   {
-    QTreeWidgetItem* item = NULL;
+    QTreeWidgetItem* item = nullptr;
     if (this->ItemCreatorFunctionPtr)
     {
       item = (*this->ItemCreatorFunctionPtr)(

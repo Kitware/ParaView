@@ -51,7 +51,7 @@ int vtkSMUtilities::SaveImage(vtkImageData* image, const char* filename, int qua
   std::string ext = vtksys::SystemTools::GetFilenameLastExtension(filename);
   ext = vtksys::SystemTools::LowerCase(ext);
 
-  vtkImageWriter* writer = 0;
+  vtkImageWriter* writer = nullptr;
   if (ext == ".bmp")
   {
     writer = vtkBMPWriter::New();
@@ -274,7 +274,7 @@ void vtkSMUtilities::Merge(
     outIt.NextSpan();
   }
 
-  if (borderWidth < 1 || borderColorRGB == NULL)
+  if (borderWidth < 1 || borderColorRGB == nullptr)
   {
     return;
   }
@@ -340,7 +340,7 @@ vtkSmartPointer<vtkImageData> vtkSMUtilities::MergeImages(
 {
   if (images.size() == 0)
   {
-    return NULL;
+    return nullptr;
   }
   if (images.size() == 1)
   {

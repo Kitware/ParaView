@@ -76,9 +76,7 @@ pqExtractorsMenuReaction::pqExtractorsMenuReaction(
 }
 
 //-----------------------------------------------------------------------------
-pqExtractorsMenuReaction::~pqExtractorsMenuReaction()
-{
-}
+pqExtractorsMenuReaction::~pqExtractorsMenuReaction() = default;
 
 //-----------------------------------------------------------------------------
 void pqExtractorsMenuReaction::updateEnableState(bool)
@@ -156,7 +154,7 @@ void pqExtractorsMenuReaction::updateEnableState(bool)
           input->AddUncheckedInputConnection(port->getSource()->getProxy(), port->getPortNumber());
         }
 
-        vtkSMDomain* domain = NULL;
+        vtkSMDomain* domain = nullptr;
         if (input && !input->IsInDomains(&domain)) // Wrong input domain
         {
           actn->setStatusTip(pqMenuReactionUtils::getDomainDisplayText(domain));

@@ -53,7 +53,7 @@ public:
   /**
    * Given a proxy and its property, create a widget for the same, if possible.
    * For unsupported/unknown proxies/properties, implementations should simply
-   * return NULL without raising any errors (or messages).
+   * return nullptr without raising any errors (or messages).
    * Supported types are:
    * \li \c calculator : pqCalculatorWidget
    * \li \c camera_manipulator : pqCameraManipulatorWidget
@@ -84,7 +84,7 @@ public:
   /**
    * Given a proxy and its property group, create a widget for the same, of possible.
    * For unsupported/unknown proxies/property-groups, implementations should simply
-   * return NULL without raising any errors (or messages).
+   * return nullptr without raising any errors (or messages).
    * Supported types are:
    * \li \c AnnotationsEditor : pqColorAnnotationsPropertyWidget
    * \li \c ArrayStatus : pqArrayStatusPropertyWidget
@@ -113,7 +113,7 @@ public:
   /**
    * Given the type of the decorator and the pqPropertyWidget that needs to be
    * decorated, create the pqPropertyWidgetDecorator instance, if possible.
-   * For unsupported/unknown, implementations should simply return NULL without
+   * For unsupported/unknown, implementations should simply return nullptr without
    * raising any errors (or messages).
    * Supported types are:
    * \li \c CTHArraySelectionDecorator : pqCTHArraySelectionDecorator

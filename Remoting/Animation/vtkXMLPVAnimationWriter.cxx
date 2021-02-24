@@ -71,7 +71,7 @@ vtkXMLPVAnimationWriter::vtkXMLPVAnimationWriter()
   this->Internal = new vtkXMLPVAnimationWriterInternals;
   this->StartCalled = 0;
   this->FinishCalled = 0;
-  this->FileNamesCreated = 0;
+  this->FileNamesCreated = nullptr;
   this->NumberOfFileNamesCreated = 0;
 
   vtkMultiProcessController* globalController = vtkMultiProcessController::GetGlobalController();
@@ -381,7 +381,7 @@ void vtkXMLPVAnimationWriter::DeleteFileNames()
       delete[] this->FileNamesCreated[i];
     }
     delete[] this->FileNamesCreated;
-    this->FileNamesCreated = 0;
+    this->FileNamesCreated = nullptr;
   }
   this->NumberOfFileNamesCreated = 0;
 }

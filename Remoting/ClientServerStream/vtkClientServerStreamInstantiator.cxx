@@ -20,14 +20,10 @@
 
 vtkStandardNewMacro(vtkClientServerStreamInstantiator);
 //----------------------------------------------------------------------------
-vtkClientServerStreamInstantiator::vtkClientServerStreamInstantiator()
-{
-}
+vtkClientServerStreamInstantiator::vtkClientServerStreamInstantiator() = default;
 
 //----------------------------------------------------------------------------
-vtkClientServerStreamInstantiator::~vtkClientServerStreamInstantiator()
-{
-}
+vtkClientServerStreamInstantiator::~vtkClientServerStreamInstantiator() = default;
 
 //----------------------------------------------------------------------------
 vtkObjectBase* vtkClientServerStreamInstantiator::CreateInstance(const char* className)

@@ -29,13 +29,13 @@ vtkStandardNewMacro(vtkPVExtractComponent);
 vtkPVExtractComponent::vtkPVExtractComponent()
 {
   this->InputArrayComponent = -1;
-  this->OutputArrayName = 0;
+  this->OutputArrayName = nullptr;
 }
 
 //----------------------------------------------------------------------------
 vtkPVExtractComponent::~vtkPVExtractComponent()
 {
-  this->SetOutputArrayName(0);
+  this->SetOutputArrayName(nullptr);
 }
 
 //----------------------------------------------------------------------------

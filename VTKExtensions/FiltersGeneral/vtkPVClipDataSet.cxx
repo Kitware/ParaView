@@ -60,9 +60,7 @@ vtkPVClipDataSet::vtkPVClipDataSet(vtkImplicitFunction* vtkNotUsed(cf))
 }
 
 //----------------------------------------------------------------------------
-vtkPVClipDataSet::~vtkPVClipDataSet()
-{
-}
+vtkPVClipDataSet::~vtkPVClipDataSet() = default;
 
 //----------------------------------------------------------------------------
 void vtkPVClipDataSet::PrintSelf(ostream& os, vtkIndent indent)
@@ -400,7 +398,7 @@ int vtkPVClipDataSet::ClipUsingSuperclass(
 
   outputCD->CopyStructure(inputCD);
 
-  vtkSmartPointer<vtkHierarchicalBoxDataIterator> itr(0);
+  vtkSmartPointer<vtkHierarchicalBoxDataIterator> itr(nullptr);
   itr.TakeReference(vtkHierarchicalBoxDataIterator::SafeDownCast(inputCD->NewIterator()));
 
   // Loop over all the datasets.

@@ -41,6 +41,4 @@ pqPlotMatrixView::pqPlotMatrixView(const QString& group, const QString& name,
 }
 
 //-----------------------------------------------------------------------------
-pqPlotMatrixView::~pqPlotMatrixView()
-{
-}
+pqPlotMatrixView::~pqPlotMatrixView() = default;

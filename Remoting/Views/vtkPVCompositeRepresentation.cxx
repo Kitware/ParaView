@@ -34,7 +34,7 @@ vtkCxxSetObjectMacro(
 vtkPVCompositeRepresentation::vtkPVCompositeRepresentation()
 {
   this->SelectionRepresentation = vtkSelectionRepresentation::New();
-  this->PolarAxesRepresentation = NULL;
+  this->PolarAxesRepresentation = nullptr;
 
   this->SelectionVisibility = false;
   this->SelectionRepresentation->SetVisibility(false);
@@ -46,9 +46,9 @@ vtkPVCompositeRepresentation::vtkPVCompositeRepresentation()
 //----------------------------------------------------------------------------
 vtkPVCompositeRepresentation::~vtkPVCompositeRepresentation()
 {
-  this->SetSelectionRepresentation(NULL);
-  this->SetPolarAxesRepresentation(NULL);
-  this->SetGridAxesRepresentation(NULL);
+  this->SetSelectionRepresentation(nullptr);
+  this->SetPolarAxesRepresentation(nullptr);
+  this->SetGridAxesRepresentation(nullptr);
 }
 
 //----------------------------------------------------------------------------

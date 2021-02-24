@@ -69,9 +69,9 @@ public:
   bool Paste(vtkSMProxy* target);
 
   /**
-   * Clears the clipboard. Same as calling Copy(NULL).
+   * Clears the clipboard. Same as calling Copy(nullptr).
    */
-  void Clear() { this->Copy(NULL); }
+  void Clear() { this->Copy(nullptr); }
 
 protected:
   vtkSMProxyClipboard();

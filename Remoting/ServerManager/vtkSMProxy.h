@@ -158,12 +158,12 @@ public:
 
   // Description:
   // Set or override a key/value pair as annotation to that proxy.
-  // If the value is NULL, this method is equivalent to RemoveAnnotation(key)
+  // If the value is nullptr, this method is equivalent to RemoveAnnotation(key)
   void SetAnnotation(const char* key, const char* value);
 
   /**
    * Retrieve an annotation with a given key.
-   * If not found, this will return NULL.
+   * If not found, this will return nullptr.
    */
   const char* GetAnnotation(const char* key);
 
@@ -200,7 +200,7 @@ public:
 
   /**
    * Return the property with the given name. If no property is found
-   * NULL is returned.
+   * nullptr is returned.
    */
   virtual vtkSMProperty* GetProperty(const char* name)
   {
@@ -216,9 +216,9 @@ public:
 
   /**
    * Given a property pointer, returns the name that was used
-   * to add it to the proxy. Returns NULL if the property is
+   * to add it to the proxy. Returns nullptr if the property is
    * not in the proxy. If the property belongs to a sub-proxy,
-   * it returns the exposed name or NULL if the property is not
+   * it returns the exposed name or nullptr if the property is not
    * exposed.
    */
   const char* GetPropertyName(vtkSMProperty* prop);
@@ -444,7 +444,7 @@ public:
    * does not (and should not) interpret the hints. Hints provide a mechanism
    * to add GUI pertinant information to the server manager XML.
    * Returns the XML element for the hints associated with this proxy,
-   * if any, otherwise returns NULL.
+   * if any, otherwise returns nullptr.
    */
   vtkGetObjectMacro(Hints, vtkPVXMLElement);
   //@}
@@ -492,7 +492,7 @@ public:
    * Saves the state of the proxy. This state can be reloaded
    * to create a new proxy that is identical the present state of this proxy.
    * The resulting proxy's XML hieratchy is returned, in addition if the root
-   * argument is not NULL then it's also inserted as a nested element.
+   * argument is not nullptr then it's also inserted as a nested element.
    * This call saves all a proxy's properties, including exposed properties
    * and sub-proxies. More control is provided by the following overload.
    */
@@ -506,7 +506,7 @@ public:
    * Loads the proxy state from the XML element. Returns 0 on failure.
    * \c locator is used to locate other proxies that may be referred to in the
    * state XML (which happens in case of properties of type vtkSMProxyProperty
-   * or subclasses). If locator is NULL, then such properties are left
+   * or subclasses). If locator is nullptr, then such properties are left
    * unchanged.
    */
   virtual int LoadXMLState(vtkPVXMLElement* element, vtkSMProxyLocator* locator);
@@ -733,7 +733,7 @@ protected:
   /**
    * Assigned by the XML parser. It is used to figure out the origin
    * of the definition of that proxy.
-   * By default, it stay NULL, only in-line subProxy do specify
+   * By default, it stay nullptr, only in-line subProxy do specify
    * this field so when the definition is sent to the server, it can
    * retrieve the in-line definition of that proxy.
    */
@@ -930,7 +930,7 @@ protected:
    * overloads of UpdatePropertyInformation() call this method, so subclass can
    * override this method to perform special tasks.
    */
-  virtual void UpdatePropertyInformationInternal(vtkSMProperty* prop = NULL);
+  virtual void UpdatePropertyInformationInternal(vtkSMProperty* prop = nullptr);
 
   /**
   * vtkSMProxy tracks state of properties on this proxy in an internal State

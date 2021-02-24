@@ -191,9 +191,7 @@ pqFavoritesDialog::pqFavoritesDialog(const QVariant& filtersList, QWidget* p)
 }
 
 //----------------------------------------------------------------------------
-pqFavoritesDialog::~pqFavoritesDialog()
-{
-}
+pqFavoritesDialog::~pqFavoritesDialog() = default;
 
 //----------------------------------------------------------------------------
 void pqFavoritesDialog::onSearchTextChanged(QString pattern)

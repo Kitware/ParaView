@@ -52,7 +52,7 @@ public:
 
   /**
    * Exports the view to the given output file. Returns a new exporter instance
-   * (or NULL). Caller must release the returned object explicitly.
+   * (or nullptr). Caller must release the returned object explicitly.
    */
   virtual vtkSMExporterProxy* CreateExporter(const char* filename, vtkSMViewProxy*);
 

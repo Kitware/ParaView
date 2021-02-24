@@ -56,7 +56,7 @@ class PQCORE_EXPORT pqFileDialogFavoriteModel : public QAbstractListModel
 public:
   /**
   * server is the server for which we need the listing.
-  * if the server is NULL, we get file listings locally
+  * if the server is nullptr, we get file listings locally
   */
   pqFileDialogFavoriteModel(pqServer* server, QObject* Parent);
   ~pqFileDialogFavoriteModel() override;

@@ -52,7 +52,7 @@ public:
    * Utility method to merge pieces received from several processes. It does not
    * handle all data types, and hence not meant for non-paraview specific use.
    * Returns a new instance of data object containing the merged result on
-   * success, else returns NULL. The caller is expected to release the memory
+   * success, else returns nullptr. The caller is expected to release the memory
    * from the returned data-object.
    */
   static vtkDataObject* MergePieces(vtkDataObject** pieces, unsigned int num_pieces);

@@ -426,7 +426,7 @@ const char* vtkStreamLinesRepresentation::GetColorArrayName()
   {
     return info->Get(vtkDataObject::FIELD_NAME());
   }
-  return NULL;
+  return nullptr;
 }
 
 //****************************************************************************
@@ -480,7 +480,7 @@ void vtkStreamLinesRepresentation::SetInputArrayToProcess(
   else
   {
     this->StreamLinesMapper->SetScalarVisibility(0);
-    this->StreamLinesMapper->SelectColorArray(static_cast<const char*>(NULL));
+    this->StreamLinesMapper->SelectColorArray(static_cast<const char*>(nullptr));
   }
 
   switch (fieldAssociation)

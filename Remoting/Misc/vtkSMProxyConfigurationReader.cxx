@@ -29,12 +29,12 @@ vtkStandardNewMacro(vtkSMProxyConfigurationReader);
 
 //-----------------------------------------------------------------------------
 vtkSMProxyConfigurationReader::vtkSMProxyConfigurationReader()
-  : FileName(0)
+  : FileName(nullptr)
   , ValidateProxyType(1)
-  , Proxy(0)
-  , FileIdentifier(0)
-  , FileDescription(0)
-  , FileExtension(0)
+  , Proxy(nullptr)
+  , FileIdentifier(nullptr)
+  , FileDescription(nullptr)
+  , FileExtension(nullptr)
 {
   vtkSMCameraConfigurationFileInfo info;
   this->SetFileIdentifier(info.FileIdentifier);
@@ -45,11 +45,11 @@ vtkSMProxyConfigurationReader::vtkSMProxyConfigurationReader()
 //-----------------------------------------------------------------------------
 vtkSMProxyConfigurationReader::~vtkSMProxyConfigurationReader()
 {
-  this->SetFileName(0);
-  this->SetProxy(0);
-  this->SetFileIdentifier(0);
-  this->SetFileDescription(0);
-  this->SetFileExtension(0);
+  this->SetFileName(nullptr);
+  this->SetProxy(nullptr);
+  this->SetFileIdentifier(nullptr);
+  this->SetFileDescription(nullptr);
+  this->SetFileExtension(nullptr);
 }
 
 //-----------------------------------------------------------------------------
@@ -70,7 +70,7 @@ int vtkSMProxyConfigurationReader::ReadConfiguration()
 //-----------------------------------------------------------------------------
 int vtkSMProxyConfigurationReader::ReadConfiguration(const char* filename)
 {
-  if (filename == 0)
+  if (filename == nullptr)
   {
     vtkErrorMacro("Cannot read from filename NULL.");
     return 0;
@@ -85,7 +85,7 @@ int vtkSMProxyConfigurationReader::ReadConfiguration(const char* filename)
   }
 
   vtkPVXMLElement* xmlStream = parser->GetRootElement();
-  if (xmlStream == 0)
+  if (xmlStream == nullptr)
   {
     vtkErrorMacro("Invalid XML in file: " << filename << ".");
     return 0;
@@ -99,14 +99,14 @@ int vtkSMProxyConfigurationReader::ReadConfiguration(vtkPVXMLElement* configXml)
 {
   std::string requiredIdentifier(this->GetFileIdentifier());
   const char* foundIdentifier = configXml->GetName();
-  if (foundIdentifier == 0 || foundIdentifier != requiredIdentifier)
+  if (foundIdentifier == nullptr || foundIdentifier != requiredIdentifier)
   {
     vtkErrorMacro(<< "This is not a valid " << this->GetFileDescription() << " XML hierarchy.");
     return 0;
   }
 
   const char* foundVersion = configXml->GetAttribute("version");
-  if (foundVersion == 0)
+  if (foundVersion == nullptr)
   {
     vtkErrorMacro("No \"version\" attribute was found.");
     return 0;
@@ -121,7 +121,7 @@ int vtkSMProxyConfigurationReader::ReadConfiguration(vtkPVXMLElement* configXml)
   // Find a proxy emlement, this hierarchy is expected to contain one
   // and only one Proxy element.
   vtkPVXMLElement* proxyXml = configXml->FindNestedElementByName("Proxy");
-  if (proxyXml == 0)
+  if (proxyXml == nullptr)
   {
     vtkErrorMacro("No \"Proxy\" element was found.");
     return 0;
@@ -131,14 +131,14 @@ int vtkSMProxyConfigurationReader::ReadConfiguration(vtkPVXMLElement* configXml)
   // sure they match.
   const char* foundType = proxyXml->GetAttribute("type");
   std::string requiredType = this->Proxy->GetXMLName();
-  if (this->ValidateProxyType && (foundType == 0 || foundType != requiredType))
+  if (this->ValidateProxyType && (foundType == nullptr || foundType != requiredType))
   {
     vtkErrorMacro(<< "This is not a valid " << requiredType << " XML hierarchy.");
     return 0;
   }
 
   // Push hierarchy to the proxy.
-  int ok = this->Proxy->LoadXMLState(proxyXml, 0);
+  int ok = this->Proxy->LoadXMLState(proxyXml, nullptr);
   if (!ok)
   {
     vtkErrorMacro("Proxy::LoadState failed.");

@@ -135,9 +135,7 @@ vtkMergeBlocks::vtkMergeBlocks()
 }
 
 //----------------------------------------------------------------------------
-vtkMergeBlocks::~vtkMergeBlocks()
-{
-}
+vtkMergeBlocks::~vtkMergeBlocks() = default;
 
 //----------------------------------------------------------------------------
 int vtkMergeBlocks::RequestData(vtkInformation* vtkNotUsed(request),

@@ -45,9 +45,7 @@ vtkTrackballPan::vtkTrackballPan()
 }
 
 //-------------------------------------------------------------------------
-vtkTrackballPan::~vtkTrackballPan()
-{
-}
+vtkTrackballPan::~vtkTrackballPan() = default;
 
 //-------------------------------------------------------------------------
 void vtkTrackballPan::OnKeyUp(vtkRenderWindowInteractor* interactor)
@@ -88,7 +86,7 @@ void vtkTrackballPan::OnButtonUp(int, int, vtkRenderer*, vtkRenderWindowInteract
 //-------------------------------------------------------------------------
 void vtkTrackballPan::OnMouseMove(int x, int y, vtkRenderer* ren, vtkRenderWindowInteractor* rwi)
 {
-  if (ren == NULL)
+  if (ren == nullptr)
   {
     return;
   }

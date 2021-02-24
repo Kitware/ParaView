@@ -14,15 +14,15 @@
 =========================================================================*/
 #include "vtkAnalyzeReader.h"
 
+#include "ThirdParty/vtknifti1.h"
+#include "ThirdParty/vtknifti1_io.h"
+#include "ThirdParty/vtkznzlib.h"
 #include "vtkByteSwap.h"
 #include "vtkImageData.h"
 #include "vtkLookupTable.h"
 #include "vtkObjectFactory.h"
 #include "vtkPointData.h"
 #include "vtk_zlib.h"
-#include "vtknifti1.h"
-#include "vtknifti1_io.h"
-#include "vtkznzlib.h"
 
 #include "vtkBitArray.h"
 #include "vtkDataArray.h"
@@ -41,8 +41,8 @@ vtkStandardNewMacro(vtkAnalyzeReader);
 //----------------------------------------------------------------------------
 vtkAnalyzeReader::vtkAnalyzeReader()
 {
-  this->analyzeHeader = 0;
-  this->analyzeHeaderUnsignedCharArray = 0;
+  this->analyzeHeader = nullptr;
+  this->analyzeHeaderUnsignedCharArray = nullptr;
   this->analyzeHeaderSize = 348;
 
   this->fixFlipError = true;
@@ -54,12 +54,12 @@ vtkAnalyzeReader::~vtkAnalyzeReader()
   if (this->analyzeHeader)
   {
     this->analyzeHeader->Delete();
-    this->analyzeHeader = 0;
+    this->analyzeHeader = nullptr;
   }
   if (this->analyzeHeaderUnsignedCharArray)
   {
     delete[] this->analyzeHeaderUnsignedCharArray;
-    this->analyzeHeaderUnsignedCharArray = 0;
+    this->analyzeHeaderUnsignedCharArray = nullptr;
   }
 }
 
@@ -69,7 +69,7 @@ static std::string GetExtension(const std::string& filename)
 
   // This assumes that the final '.' in a file name is the delimiter
   // for the file's extension type
-  const std::string::size_type it = filename.find_last_of(".");
+  const std::string::size_type it = filename.find_last_of('.');
 
   // This determines the file's type by creating a new std::string
   // who's value is the extension of the input filename
@@ -171,7 +171,7 @@ void vtkAnalyzeReader::ExecuteInformation()
   this->analyzeHeaderUnsignedCharArray = new unsigned char[this->analyzeHeaderSize];
 
   m_NiftiImage = vtknifti1_io::nifti_image_read(this->GetFileName(), false);
-  if (m_NiftiImage == NULL)
+  if (m_NiftiImage == nullptr)
   {
     vtkErrorMacro("Read failed");
     return;
@@ -487,12 +487,12 @@ void vtkAnalyzeReaderUpdate2(vtkAnalyzeReader* self, vtkImageData* vtkNotUsed(da
   // In addition, it has the added benefit of reading gzip compressed image
   // files that do not have a .gz ending.
   gzFile file_p = ::gzopen(ImageFileName.c_str(), "rb");
-  if (file_p == NULL)
+  if (file_p == nullptr)
   {
     /* Do a separate check to take care of case #4 */
     ImageFileName += ".gz";
     file_p = ::gzopen(ImageFileName.c_str(), "rb");
-    if (file_p == NULL)
+    if (file_p == nullptr)
     {
       // vtkErrorMacro( << "File cannot be read");
     }
@@ -583,12 +583,12 @@ void vtkAnalyzeReader::vtkAnalyzeReaderUpdateVTKBit(vtkImageData* vtkNotUsed(dat
   // In addition, it has the added benefit of reading gzip compressed image
   // files that do not have a .gz ending.
   gzFile file_p = ::gzopen(ImageFileName.c_str(), "rb");
-  if (file_p == NULL)
+  if (file_p == nullptr)
   {
     /* Do a separate check to take care of case #4 */
     ImageFileName += ".gz";
     file_p = ::gzopen(ImageFileName.c_str(), "rb");
-    if (file_p == NULL)
+    if (file_p == nullptr)
     {
       // vtkErrorMacro( << "File cannot be read");
     }
@@ -747,11 +747,11 @@ void vtkAnalyzeReader::vtkAnalyzeReaderUpdateVTKBit(vtkImageData* vtkNotUsed(dat
 
     unsignedOutP[count] = newByte;
   }
-  if (p != NULL)
+  if (p != nullptr)
   {
     delete[] p;
-    p = NULL;
-    unsignedP = NULL;
+    p = nullptr;
+    unsignedP = nullptr;
   }
 }
 
@@ -766,7 +766,7 @@ void vtkAnalyzeReader::ExecuteDataWithInformation(vtkDataObject* output, vtkInfo
   {
     return;
   }
-  if (this->GetFileName() == NULL)
+  if (this->GetFileName() == nullptr)
   {
     vtkErrorMacro(<< "Either a FileName or FilePrefix must be specified.");
     return;
@@ -950,7 +950,7 @@ Note: Index0 is fastest-varying (innermost-nested) index, Index2 the outermost.
     }
   }
 
-  unsigned char* tempUnsignedCharData = NULL;
+  unsigned char* tempUnsignedCharData = nullptr;
 
   unsigned char* outUnsignedCharPtr = (unsigned char*)outPtr;
 
@@ -965,10 +965,10 @@ Note: Index0 is fastest-varying (innermost-nested) index, Index2 the outermost.
     {
       tempSizeInt++;
     }
-    if (tempUnsignedCharData != NULL)
+    if (tempUnsignedCharData != nullptr)
     {
       delete[] tempUnsignedCharData;
-      tempUnsignedCharData = NULL;
+      tempUnsignedCharData = nullptr;
     }
     tempUnsignedCharData = new unsigned char[tempSizeInt];
   }
@@ -1259,10 +1259,10 @@ Note: Index0 is fastest-varying (innermost-nested) index, Index2 the outermost.
       }
     }
   }
-  if (tempUnsignedCharData != NULL)
+  if (tempUnsignedCharData != nullptr)
   {
     delete[] tempUnsignedCharData;
-    tempUnsignedCharData = NULL;
+    tempUnsignedCharData = nullptr;
   }
 
   vtkFieldData* fa = data->GetFieldData();
@@ -1294,7 +1294,7 @@ Note: Index0 is fastest-varying (innermost-nested) index, Index2 the outermost.
   vtkDataArray* tempVolumeOriginDoubleArray = fa->GetArray(VOLUME_ORIGIN_DOUBLE_ARRAY);
   if (!tempVolumeOriginDoubleArray)
   {
-    vtkDoubleArray* volumeOriginDoubleArray = NULL;
+    vtkDoubleArray* volumeOriginDoubleArray = nullptr;
     volumeOriginDoubleArray = vtkDoubleArray::New();
     volumeOriginDoubleArray->SetName(VOLUME_ORIGIN_DOUBLE_ARRAY);
     volumeOriginDoubleArray->SetNumberOfValues(3);
@@ -1309,7 +1309,7 @@ Note: Index0 is fastest-varying (innermost-nested) index, Index2 the outermost.
   vtkDataArray* tempVolumeSpacingDoubleArray = fa->GetArray(VOLUME_SPACING_DOUBLE_ARRAY);
   if (!tempVolumeSpacingDoubleArray)
   {
-    vtkDoubleArray* volumeSpacingDoubleArray = NULL;
+    vtkDoubleArray* volumeSpacingDoubleArray = nullptr;
     volumeSpacingDoubleArray = vtkDoubleArray::New();
     volumeSpacingDoubleArray->SetName(VOLUME_SPACING_DOUBLE_ARRAY);
     volumeSpacingDoubleArray->SetNumberOfValues(3);
@@ -1331,12 +1331,12 @@ Note: Index0 is fastest-varying (innermost-nested) index, Index2 the outermost.
     std::string fileName = this->GetFileName();
 
     // Remove directory part
-    size_t position = fileName.rfind("/");
+    size_t position = fileName.rfind('/');
     if (position != std::string::npos)
     {
       fileName.erase(0, position + 1);
     }
-    position = fileName.rfind("\\");
+    position = fileName.rfind('\\');
     if (position != std::string::npos)
     {
       fileName.erase(0, position + 1);

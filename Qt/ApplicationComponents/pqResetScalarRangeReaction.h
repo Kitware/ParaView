@@ -74,7 +74,7 @@ public:
   /**
   * @deprecated Use resetScalarRangeToData().
   */
-  static void resetScalarRange(pqPipelineRepresentation* repr = NULL)
+  static void resetScalarRange(pqPipelineRepresentation* repr = nullptr)
   {
     pqResetScalarRangeReaction::resetScalarRangeToData(repr);
   }
@@ -87,7 +87,7 @@ public:
   *                 available.
   * @returns `true` if the operation was successful, otherwise `false`.
   */
-  static bool resetScalarRangeToData(pqPipelineRepresentation* repr = NULL);
+  static bool resetScalarRangeToData(pqPipelineRepresentation* repr = nullptr);
 
   /**
   * Reset range to a custom range.
@@ -97,7 +97,7 @@ public:
   *                 representation is used, if available.
   * @returns `true` if the operation was successful, otherwise `false`.
   */
-  static bool resetScalarRangeToCustom(pqPipelineRepresentation* repr = NULL);
+  static bool resetScalarRangeToCustom(pqPipelineRepresentation* repr = nullptr);
 
   /**
    * Reset range to a custom range.
@@ -118,7 +118,7 @@ public:
   *                 available.
   * @returns `true` if the operation was successful, otherwise `false`.
   */
-  static bool resetScalarRangeToDataOverTime(pqPipelineRepresentation* repr = NULL);
+  static bool resetScalarRangeToDataOverTime(pqPipelineRepresentation* repr = nullptr);
 
   /**
   * Reset range to data range for data visible in the view.
@@ -128,7 +128,7 @@ public:
   *                 available.
   * @returns `true` if the operation was successful, otherwise `false`.
   */
-  static bool resetScalarRangeToVisible(pqPipelineRepresentation* repr = NULL);
+  static bool resetScalarRangeToVisible(pqPipelineRepresentation* repr = nullptr);
 
 public Q_SLOTS:
   /**

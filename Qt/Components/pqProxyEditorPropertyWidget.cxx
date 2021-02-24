@@ -60,7 +60,7 @@ pqProxyEditorPropertyWidget::pqProxyEditorPropertyWidget(
   // control that property on the "other" proxy.
   if (vtkPVXMLElement* hints = smproperty->GetHints()
       ? smproperty->GetHints()->FindNestedElementByName("ProxyEditorPropertyWidget")
-      : NULL)
+      : nullptr)
   {
     this->Checkbox = new QCheckBox(this);
     this->Checkbox->setText(tr(smproperty->GetXMLLabel()));
@@ -98,7 +98,7 @@ void pqProxyEditorPropertyWidget::setProxyToEdit(pqSMProxy smproxy)
       this->ProxyToEdit, this->ProxyToEdit->GetProperty(this->PropertyName.toStdString().c_str()));
   }
   this->ProxyToEdit = smproxy;
-  this->Button->setEnabled(smproxy != NULL);
+  this->Button->setEnabled(smproxy != nullptr);
   if (this->Editor && this->Editor->proxy() != smproxy)
   {
     delete this->Editor;
@@ -107,7 +107,7 @@ void pqProxyEditorPropertyWidget::setProxyToEdit(pqSMProxy smproxy)
   if (this->Checkbox)
   {
     if (vtkSMProperty* smproperty =
-          smproxy ? smproxy->GetProperty(this->PropertyName.toStdString().c_str()) : NULL)
+          smproxy ? smproxy->GetProperty(this->PropertyName.toStdString().c_str()) : nullptr)
     {
       this->Checkbox->setEnabled(true);
       this->Checkbox->setToolTip(pqPropertyWidget::getTooltip(smproperty));
@@ -136,7 +136,7 @@ void pqProxyEditorPropertyWidget::buttonClicked()
     return;
   }
 
-  if (this->Editor == NULL)
+  if (this->Editor == nullptr)
   {
     this->Editor = new pqProxyWidgetDialog(this->ProxyToEdit.GetPointer(), this);
     this->Editor->setEnableSearchBar(this->Editor->hasAdvancedProperties());

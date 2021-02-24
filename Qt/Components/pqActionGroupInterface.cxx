@@ -32,11 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqActionGroupInterface.h"
 
 //-----------------------------------------------------------------------------
-pqActionGroupInterface::pqActionGroupInterface()
-{
-}
+pqActionGroupInterface::pqActionGroupInterface() = default;
 
 //-----------------------------------------------------------------------------
-pqActionGroupInterface::~pqActionGroupInterface()
-{
-}
+pqActionGroupInterface::~pqActionGroupInterface() = default;

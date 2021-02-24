@@ -112,13 +112,11 @@ vtkMomentVectors::vtkMomentVectors()
 {
   this->SetInputMoment(vtkDataSetAttributes::SCALARS);
   this->InputMomentIsDensity = 0;
-  this->OutputMomentTotalName = NULL;
-  this->OutputMomentDensityName = NULL;
+  this->OutputMomentTotalName = nullptr;
+  this->OutputMomentDensityName = nullptr;
 }
 
-vtkMomentVectors::~vtkMomentVectors()
-{
-}
+vtkMomentVectors::~vtkMomentVectors() = default;
 
 void vtkMomentVectors::PrintSelf(ostream& os, vtkIndent indent)
 {
@@ -215,7 +213,7 @@ int vtkMomentVectors::RequestData(vtkInformation* vtkNotUsed(request),
 
   vtkDataArray* scalars = this->GetInputArrayToProcess(0, inputVector);
 
-  if (scalars == NULL)
+  if (scalars == nullptr)
   {
     vtkDebugMacro("No input scalars.");
     return 1;
@@ -225,7 +223,7 @@ int vtkMomentVectors::RequestData(vtkInformation* vtkNotUsed(request),
     vtkErrorMacro("Input array must have one component.");
     return 0;
   }
-  if (scalars->GetName() == NULL)
+  if (scalars->GetName() == nullptr)
   {
     vtkErrorMacro("Input array needs a name.");
     return 0;

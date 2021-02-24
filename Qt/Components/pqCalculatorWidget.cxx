@@ -130,7 +130,7 @@ pqCalculatorWidget::pqCalculatorWidget(
 pqCalculatorWidget::~pqCalculatorWidget()
 {
   delete this->Internals;
-  this->Internals = 0;
+  this->Internals = nullptr;
 }
 
 //-----------------------------------------------------------------------------
@@ -169,7 +169,7 @@ void pqCalculatorWidget::updateVariables(const QString& mode)
     this->Internals->ScalarsMenu->addAction("coordsZ");
   }
 
-  vtkPVDataSetAttributesInformation* fdi = NULL;
+  vtkPVDataSetAttributesInformation* fdi = nullptr;
   vtkSMSourceProxy* input = vtkSMSourceProxy::SafeDownCast(
     vtkSMUncheckedPropertyHelper(this->proxy(), "Input").GetAsProxy(0));
   if (!input)

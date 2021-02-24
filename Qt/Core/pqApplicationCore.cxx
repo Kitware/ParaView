@@ -104,7 +104,7 @@ public:
 };
 
 //-----------------------------------------------------------------------------
-pqApplicationCore* pqApplicationCore::Instance = 0;
+pqApplicationCore* pqApplicationCore::Instance = nullptr;
 
 //-----------------------------------------------------------------------------
 pqApplicationCore* pqApplicationCore::instance()
@@ -137,15 +137,15 @@ pqApplicationCore::pqApplicationCore(
 void pqApplicationCore::constructor()
 {
   // Only 1 pqApplicationCore instance can be created.
-  assert(pqApplicationCore::Instance == NULL);
+  assert(pqApplicationCore::Instance == nullptr);
   pqApplicationCore::Instance = this;
 
-  this->UndoStack = NULL;
-  this->RecentlyUsedResourcesList = NULL;
-  this->ServerConfigurations = NULL;
-  this->Settings = NULL;
+  this->UndoStack = nullptr;
+  this->RecentlyUsedResourcesList = nullptr;
+  this->ServerConfigurations = nullptr;
+  this->Settings = nullptr;
 #ifdef PARAVIEW_USE_QTHELP
-  this->HelpEngine = NULL;
+  this->HelpEngine = nullptr;
 #endif
 
   // initialize statics in case we're a static library
@@ -208,38 +208,38 @@ pqApplicationCore::~pqApplicationCore()
 {
   // Ensure that startup plugins get a chance to cleanup before pqApplicationCore is gone.
   delete this->PluginManager;
-  this->PluginManager = 0;
+  this->PluginManager = nullptr;
 
   delete this->InterfaceTracker;
-  this->InterfaceTracker = 0;
+  this->InterfaceTracker = nullptr;
 
   // give chance to save before pqApplicationCore is gone
   delete this->ServerConfigurations;
-  this->ServerConfigurations = 0;
+  this->ServerConfigurations = nullptr;
 
   delete this->LinksModel;
-  this->LinksModel = 0;
+  this->LinksModel = nullptr;
 
   delete this->MainWindowEventManager;
-  this->MainWindowEventManager = 0;
+  this->MainWindowEventManager = nullptr;
 
   delete this->ObjectBuilder;
-  this->ObjectBuilder = 0;
+  this->ObjectBuilder = nullptr;
 
   delete this->ProgressManager;
-  this->ProgressManager = 0;
+  this->ProgressManager = nullptr;
 
   delete this->ServerManagerModel;
-  this->ServerManagerModel = 0;
+  this->ServerManagerModel = nullptr;
 
   delete this->ServerManagerObserver;
-  this->ServerManagerObserver = 0;
+  this->ServerManagerObserver = nullptr;
 
   delete this->RecentlyUsedResourcesList;
-  this->RecentlyUsedResourcesList = 0;
+  this->RecentlyUsedResourcesList = nullptr;
 
   delete this->Settings;
-  this->Settings = 0;
+  this->Settings = nullptr;
 
 #ifdef PARAVIEW_USE_QTHELP
   if (this->HelpEngine)
@@ -248,13 +248,13 @@ pqApplicationCore::~pqApplicationCore()
     delete this->HelpEngine;
     QFile::remove(collectionFile);
   }
-  this->HelpEngine = NULL;
+  this->HelpEngine = nullptr;
 #endif
 
   // We don't call delete on these since we have already setup parent on these
   // correctly so they will be deleted. It's possible that the user calls delete
   // on these explicitly in which case we end up with segfaults.
-  this->UndoStack = 0;
+  this->UndoStack = nullptr;
 
   // Delete all children, which clears up all managers etc. before the server
   // manager application is finalized.
@@ -264,7 +264,7 @@ pqApplicationCore::~pqApplicationCore()
 
   if (pqApplicationCore::Instance == this)
   {
-    pqApplicationCore::Instance = 0;
+    pqApplicationCore::Instance = nullptr;
   }
 
   vtkInitializationHelper::Finalize();
@@ -288,7 +288,7 @@ void pqApplicationCore::setUndoStack(pqUndoStack* stack)
 void pqApplicationCore::registerManager(const QString& function, QObject* _manager)
 {
   if (this->Internal->RegisteredManagers.contains(function) &&
-    this->Internal->RegisteredManagers[function] != 0)
+    this->Internal->RegisteredManagers[function] != nullptr)
   {
     qDebug() << "Replacing existing manager for function : " << function;
   }
@@ -310,7 +310,7 @@ QObject* pqApplicationCore::manager(const QString& function)
   {
     return iter.value();
   }
-  return 0;
+  return nullptr;
 }
 
 //-----------------------------------------------------------------------------

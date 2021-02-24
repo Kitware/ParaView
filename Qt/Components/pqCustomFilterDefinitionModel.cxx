@@ -51,11 +51,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class pqCustomFilterDefinitionModelItem
 {
 public:
-  pqCustomFilterDefinitionModelItem(pqCustomFilterDefinitionModelItem* parent = 0);
+  pqCustomFilterDefinitionModelItem(pqCustomFilterDefinitionModelItem* parent = nullptr);
   virtual ~pqCustomFilterDefinitionModelItem();
 
   virtual QString GetName() const;
-  virtual pqPipelineSource* GetPipelineSource() const { return 0; }
+  virtual pqPipelineSource* GetPipelineSource() const { return nullptr; }
 
   pqCustomFilterDefinitionModel::ItemType Type;
   pqCustomFilterDefinitionModelItem* Parent;
@@ -67,8 +67,8 @@ class pqCustomFilterDefinitionModelSource : public pqCustomFilterDefinitionModel
 {
 public:
   pqCustomFilterDefinitionModelSource(
-    pqCustomFilterDefinitionModelItem* parent = 0, pqPipelineSource* source = 0);
-  ~pqCustomFilterDefinitionModelSource() override {}
+    pqCustomFilterDefinitionModelItem* parent = nullptr, pqPipelineSource* source = nullptr);
+  ~pqCustomFilterDefinitionModelSource() override = default;
 
   QString GetName() const override;
   pqPipelineSource* GetPipelineSource() const override;
@@ -80,9 +80,9 @@ public:
 class pqCustomFilterDefinitionModelLink : public pqCustomFilterDefinitionModelItem
 {
 public:
-  pqCustomFilterDefinitionModelLink(
-    pqCustomFilterDefinitionModelItem* parent = 0, pqCustomFilterDefinitionModelSource* link = 0);
-  ~pqCustomFilterDefinitionModelLink() override {}
+  pqCustomFilterDefinitionModelLink(pqCustomFilterDefinitionModelItem* parent = nullptr,
+    pqCustomFilterDefinitionModelSource* link = nullptr);
+  ~pqCustomFilterDefinitionModelLink() override = default;
 
   QString GetName() const override;
   pqPipelineSource* GetPipelineSource() const override;
@@ -179,7 +179,7 @@ pqPipelineSource* pqCustomFilterDefinitionModelLink::GetPipelineSource() const
     return this->Link->GetPipelineSource();
   }
 
-  return 0;
+  return nullptr;
 }
 
 //-----------------------------------------------------------------------------
@@ -330,9 +330,9 @@ void pqCustomFilterDefinitionModel::setContents(const pqProxySelection& items)
 
   // Connect the items based on inputs.
   int i = 0;
-  pqCustomFilterDefinitionModelLink* link = 0;
-  pqCustomFilterDefinitionModelSource* output = 0;
-  pqCustomFilterDefinitionModelItem* otherItem = 0;
+  pqCustomFilterDefinitionModelLink* link = nullptr;
+  pqCustomFilterDefinitionModelSource* output = nullptr;
+  pqCustomFilterDefinitionModelItem* otherItem = nullptr;
   QList<pqCustomFilterDefinitionModelItem*> fanInList;
   QMap<pqPipelineSource*, pqCustomFilterDefinitionModelSource*>::Iterator jter;
   foreach (pqPipelineSource* source, selectedSources)
@@ -409,7 +409,7 @@ pqPipelineSource* pqCustomFilterDefinitionModel::getSourceFor(const QModelIndex&
     return item->GetPipelineSource();
   }
 
-  return 0;
+  return nullptr;
 }
 
 pqCustomFilterDefinitionModelItem* pqCustomFilterDefinitionModel::getModelItemFor(
@@ -425,7 +425,7 @@ pqCustomFilterDefinitionModelItem* pqCustomFilterDefinitionModel::getModelItemFo
     return reinterpret_cast<pqCustomFilterDefinitionModelItem*>(idx.internalPointer());
   }
 
-  return 0;
+  return nullptr;
 }
 
 pqCustomFilterDefinitionModelItem* pqCustomFilterDefinitionModel::getNextItem(
@@ -433,7 +433,7 @@ pqCustomFilterDefinitionModelItem* pqCustomFilterDefinitionModel::getNextItem(
 {
   if (!item)
   {
-    return 0;
+    return nullptr;
   }
 
   if (item->Children.size() > 0)
@@ -460,5 +460,5 @@ pqCustomFilterDefinitionModelItem* pqCustomFilterDefinitionModel::getNextItem(
     item = item->Parent;
   }
 
-  return 0;
+  return nullptr;
 }

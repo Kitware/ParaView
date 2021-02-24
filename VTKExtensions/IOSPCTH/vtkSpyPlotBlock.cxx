@@ -40,7 +40,7 @@ vtkSpyPlotBlock::vtkSpyPlotBlock()
   : Level(0)
 {
   this->Level = 0;
-  this->XYZArrays[0] = this->XYZArrays[1] = this->XYZArrays[2] = NULL;
+  this->XYZArrays[0] = this->XYZArrays[1] = this->XYZArrays[2] = nullptr;
   this->Dimensions[0] = this->Dimensions[1] = this->Dimensions[2] = 0;
   this->SavedExtents[0] = this->SavedExtents[2] = this->SavedExtents[4] = 1;
   this->SavedExtents[1] = this->SavedExtents[3] = this->SavedExtents[5] = 0;
@@ -264,7 +264,7 @@ int vtkSpyPlotBlock::FixInformation(const vtkBoundingBox& globalBounds, int exte
     {
       if (this->Dimensions[i] == 1)
       {
-        ca[i] = 0;
+        ca[i] = nullptr;
         continue;
       }
       ca[i] = this->XYZArrays[i];
@@ -275,12 +275,12 @@ int vtkSpyPlotBlock::FixInformation(const vtkBoundingBox& globalBounds, int exte
   int i, j, hasBadGhostCells = 0;
   int vectorsWereFixed = 0;
 
-  // vtkDebugWithObjectMacro(NULL, "Vectors for block: ");
-  // vtkDebugWithObjectMacro(NULL, "  X: " << this->XYZArrays[0]->GetNumberOfTuples());
-  // vtkDebugWithObjectMacro(NULL, "  Y: " << this->XYZArrays[1]->GetNumberOfTuples());
-  // vtkDebugWithObjectMacro(NULL, "  Z: " << this->XYZArrays[2]->GetNumberOfTuples());
-  // vtkDebugWithObjectMacro(NULL, " Dims: " << coutVector3(this->Dimensions));
-  // vtkDebugWithObjectMacro(NULL, " Bool: " << this->IsFixed());
+  // vtkDebugWithObjectMacro(nullptr, "Vectors for block: ");
+  // vtkDebugWithObjectMacro(nullptr, "  X: " << this->XYZArrays[0]->GetNumberOfTuples());
+  // vtkDebugWithObjectMacro(nullptr, "  Y: " << this->XYZArrays[1]->GetNumberOfTuples());
+  // vtkDebugWithObjectMacro(nullptr, "  Z: " << this->XYZArrays[2]->GetNumberOfTuples());
+  // vtkDebugWithObjectMacro(nullptr, " Dims: " << coutVector3(this->Dimensions));
+  // vtkDebugWithObjectMacro(nullptr, " Bool: " << this->IsFixed());
 
   double minV, maxV;
   for (i = 0, j = 0; i < 3; i++, j++)
@@ -290,14 +290,14 @@ int vtkSpyPlotBlock::FixInformation(const vtkBoundingBox& globalBounds, int exte
       realExtents[j++] = 0;
       realExtents[j] = 1;
       realDims[i] = 1;
-      ca[i] = 0;
+      ca[i] = nullptr;
       continue;
     }
 
     minV = MinBlockBound(i);
     maxV = MaxBlockBound(i);
     // vtkDebugWithObjectMacro(
-    //  NULL, "Bounds[" << (j) << "] = " << minV << " Bounds[" << (j + 1) << "] = " << maxV);
+    //  nullptr, "Bounds[" << (j) << "] = " << minV << " Bounds[" << (j + 1) << "] = " << maxV);
     ca[i] = this->XYZArrays[i];
     if (minV < minP[i])
     {
@@ -456,7 +456,7 @@ int vtkSpyPlotBlock::Read(int isAMR, int fileVersion, vtkSpyPlotIStream* stream)
       if (this->XYZArrays[i])
       {
         this->XYZArrays[i]->Delete();
-        this->XYZArrays[i] = 0;
+        this->XYZArrays[i] = nullptr;
       }
     }
   }
@@ -625,7 +625,7 @@ void vtkSpyPlotBlock::ComputeDerivedVariables(vtkCellData* data, const int& numb
   for (int i = 0; i < numberOfMaterials; i++)
   {
     // only create density arrays for materials that we have all the needed information for
-    bool validDensity = materialMasses[i] != NULL && materialVolumeFractions[i] != NULL;
+    bool validDensity = materialMasses[i] != nullptr && materialVolumeFractions[i] != nullptr;
     if (validDensity)
     {
       vtkDoubleArray* materialDensity = vtkDoubleArray::New();
@@ -835,7 +835,7 @@ int vtkSpyPlotBlock::SetGeometry(int dir, const unsigned char* encodedInfo, int 
 
   if (!this->XYZArrays[dir])
   {
-    vtkErrorWithObjectMacro(NULL, "Coordinate Array has not been allocated");
+    vtkErrorWithObjectMacro(nullptr, "Coordinate Array has not been allocated");
     return 0;
   }
 
@@ -858,7 +858,7 @@ int vtkSpyPlotBlock::SetGeometry(int dir, const unsigned char* encodedInfo, int 
       {
         if (compIndex >= compSize)
         {
-          vtkErrorWithObjectMacro(NULL, "Problem doing RLD decode. "
+          vtkErrorWithObjectMacro(nullptr, "Problem doing RLD decode. "
               << "Too much data generated. Expected: " << compSize);
           return 0;
         }
@@ -874,7 +874,7 @@ int vtkSpyPlotBlock::SetGeometry(int dir, const unsigned char* encodedInfo, int 
       {
         if (compIndex >= compSize)
         {
-          vtkErrorWithObjectMacro(NULL, "Problem doing RLD decode. "
+          vtkErrorWithObjectMacro(nullptr, "Problem doing RLD decode. "
               << "Too much data generated. Expected: " << compSize);
           return 0;
         }

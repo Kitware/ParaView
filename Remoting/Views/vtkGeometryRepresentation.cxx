@@ -261,7 +261,7 @@ vtkGeometryRepresentation::vtkGeometryRepresentation()
 
   this->SetupDefaults();
 
-  this->PWF = NULL;
+  this->PWF = nullptr;
 
   this->UseDataPartitions = false;
 
@@ -556,7 +556,7 @@ vtkDataObject* vtkGeometryRepresentation::GetRenderedDataObject(int vtkNotUsed(p
   {
     return this->MultiBlockMaker->GetOutputDataObject(0);
   }
-  return NULL;
+  return nullptr;
 }
 
 //----------------------------------------------------------------------------

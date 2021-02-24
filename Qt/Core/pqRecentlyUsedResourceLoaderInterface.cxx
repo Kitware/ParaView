@@ -32,14 +32,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqRecentlyUsedResourceLoaderInterface.h"
 
 //-----------------------------------------------------------------------------
-pqRecentlyUsedResourceLoaderInterface::pqRecentlyUsedResourceLoaderInterface()
-{
-}
+pqRecentlyUsedResourceLoaderInterface::pqRecentlyUsedResourceLoaderInterface() = default;
 
 //-----------------------------------------------------------------------------
-pqRecentlyUsedResourceLoaderInterface::~pqRecentlyUsedResourceLoaderInterface()
-{
-}
+pqRecentlyUsedResourceLoaderInterface::~pqRecentlyUsedResourceLoaderInterface() = default;
 
 //-----------------------------------------------------------------------------
 QIcon pqRecentlyUsedResourceLoaderInterface::icon(const pqServerResource&)

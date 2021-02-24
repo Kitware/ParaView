@@ -61,7 +61,7 @@ public:
   * Note that this class will toggle the visibility of this frame as needed.
   */
   pqSignalAdaptorKeyFrameType(
-    pqKeyFrameTypeWidget* widget, pqPropertyLinks* links, QLabel* valueLabel = NULL);
+    pqKeyFrameTypeWidget* widget, pqPropertyLinks* links, QLabel* valueLabel = nullptr);
   ~pqSignalAdaptorKeyFrameType() override;
 
   /**

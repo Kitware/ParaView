@@ -53,9 +53,7 @@ pqUseSeparateColorMapReaction::pqUseSeparateColorMapReaction(
 }
 
 //-----------------------------------------------------------------------------
-pqUseSeparateColorMapReaction::~pqUseSeparateColorMapReaction()
-{
-}
+pqUseSeparateColorMapReaction::~pqUseSeparateColorMapReaction() = default;
 
 //-----------------------------------------------------------------------------
 void pqUseSeparateColorMapReaction::updateEnableState()
@@ -88,11 +86,11 @@ void pqUseSeparateColorMapReaction::setRepresentation(pqDataRepresentation* repr
   }
 
   // Recover proxy and action
-  vtkSMProxy* reprProxy = repr ? repr->getProxy() : NULL;
+  vtkSMProxy* reprProxy = repr ? repr->getProxy() : nullptr;
   QAction* parent_action = this->parentAction();
 
   // Set action state
-  vtkSMProperty* colorProp = reprProxy ? reprProxy->GetProperty("UseSeparateColorMap") : NULL;
+  vtkSMProperty* colorProp = reprProxy ? reprProxy->GetProperty("UseSeparateColorMap") : nullptr;
   bool can_sep =
     reprProxy && colorProp && vtkSMPVRepresentationProxy::GetUsingScalarColoring(reprProxy);
   parent_action->setEnabled(can_sep);

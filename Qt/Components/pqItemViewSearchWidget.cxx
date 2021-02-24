@@ -56,14 +56,14 @@ class pqItemViewSearchWidget::PIMPL : public Ui::pqItemViewSearchWidget
 public:
   PIMPL(QWidget* parentW)
   {
-    this->BaseWidget = parentW ? qobject_cast<QAbstractItemView*>(parentW) : NULL;
+    this->BaseWidget = parentW ? qobject_cast<QAbstractItemView*>(parentW) : nullptr;
     ;
     this->RedPal.setColor(QPalette::Base, QColor(240, 128, 128));
     this->WhitePal.setColor(QPalette::Base, QColor(Qt::white));
     this->Highlighter = new pqHighlightItemDelegate(QColor(175, 166, 238));
     this->UnHighlighter = new pqHighlightItemDelegate(QColor(Qt::white));
   }
-  ~PIMPL() {}
+  ~PIMPL() = default;
 
   QString SearchString;
   QModelIndex CurrentFound;
@@ -106,7 +106,7 @@ pqItemViewSearchWidget::~pqItemViewSearchWidget()
 // -------------------------------------------------------------------------
 void pqItemViewSearchWidget::setBaseWidget(QWidget* widget)
 {
-  this->Private->BaseWidget = widget ? qobject_cast<QAbstractItemView*>(widget) : NULL;
+  this->Private->BaseWidget = widget ? qobject_cast<QAbstractItemView*>(widget) : nullptr;
   ;
 }
 

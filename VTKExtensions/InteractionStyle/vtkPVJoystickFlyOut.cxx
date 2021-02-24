@@ -25,9 +25,7 @@ vtkPVJoystickFlyOut::vtkPVJoystickFlyOut()
 }
 
 //-------------------------------------------------------------------------
-vtkPVJoystickFlyOut::~vtkPVJoystickFlyOut()
-{
-}
+vtkPVJoystickFlyOut::~vtkPVJoystickFlyOut() = default;
 
 //-------------------------------------------------------------------------
 void vtkPVJoystickFlyOut::PrintSelf(ostream& os, vtkIndent indent)

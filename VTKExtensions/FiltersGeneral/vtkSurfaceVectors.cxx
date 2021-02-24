@@ -43,9 +43,7 @@ vtkSurfaceVectors::vtkSurfaceVectors()
 }
 
 //-----------------------------------------------------------------------------
-vtkSurfaceVectors::~vtkSurfaceVectors()
-{
-}
+vtkSurfaceVectors::~vtkSurfaceVectors() = default;
 
 //-----------------------------------------------------------------------------
 int vtkSurfaceVectors::RequestUpdateExtent(vtkInformation* vtkNotUsed(request),
@@ -106,7 +104,7 @@ int vtkSurfaceVectors::RequestData(vtkInformation* vtkNotUsed(request),
   }
 
   // Helper function to compute the normal of a point
-  const auto ComputeNormal = [&input, &cellIds, &ptIds]() -> const vtkVector3d {
+  const auto ComputeNormal = [&input, &cellIds, &ptIds]() -> vtkVector3d {
     vtkVector3d normal(0.0);
     for (int i = 0; i < cellIds->GetNumberOfIds(); ++i)
     {

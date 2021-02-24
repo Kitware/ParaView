@@ -18,27 +18,23 @@
 #include "vtkSMSessionProxyManager.h"
 
 //----------------------------------------------------------------------------
-vtkSMDeserializer::vtkSMDeserializer()
-{
-}
+vtkSMDeserializer::vtkSMDeserializer() = default;
 
 //----------------------------------------------------------------------------
-vtkSMDeserializer::~vtkSMDeserializer()
-{
-}
+vtkSMDeserializer::~vtkSMDeserializer() = default;
 
 //----------------------------------------------------------------------------
 vtkSMProxy* vtkSMDeserializer::CreateProxy(
   const char* xmlgroup, const char* xmlname, const char* subname)
 {
   vtkSMSessionProxyManager* pxm = this->SessionProxyManager;
-  return pxm ? pxm->NewProxy(xmlgroup, xmlname, subname) : NULL;
+  return pxm ? pxm->NewProxy(xmlgroup, xmlname, subname) : nullptr;
 }
 
 //----------------------------------------------------------------------------
 void vtkSMDeserializer::SetSession(vtkSMSession* session)
 {
-  this->SetSessionProxyManager(session ? session->GetSessionProxyManager() : NULL);
+  this->SetSessionProxyManager(session ? session->GetSessionProxyManager() : nullptr);
 }
 
 //----------------------------------------------------------------------------
@@ -56,7 +52,7 @@ vtkSMSessionProxyManager* vtkSMDeserializer::GetSessionProxyManager()
 //----------------------------------------------------------------------------
 vtkSMSession* vtkSMDeserializer::GetSession()
 {
-  return this->SessionProxyManager ? this->SessionProxyManager->GetSession() : NULL;
+  return this->SessionProxyManager ? this->SessionProxyManager->GetSession() : nullptr;
 }
 
 //----------------------------------------------------------------------------

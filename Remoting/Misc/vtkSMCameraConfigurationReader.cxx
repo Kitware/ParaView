@@ -34,9 +34,7 @@ vtkSMCameraConfigurationReader::vtkSMCameraConfigurationReader()
 }
 
 //-----------------------------------------------------------------------------
-vtkSMCameraConfigurationReader::~vtkSMCameraConfigurationReader()
-{
-}
+vtkSMCameraConfigurationReader::~vtkSMCameraConfigurationReader() = default;
 
 //-----------------------------------------------------------------------------
 void vtkSMCameraConfigurationReader::SetRenderViewProxy(vtkSMProxy* rvProxy)

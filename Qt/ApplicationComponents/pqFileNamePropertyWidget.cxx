@@ -108,9 +108,7 @@ pqFileNamePropertyWidget::pqFileNamePropertyWidget(
 }
 
 //-----------------------------------------------------------------------------
-pqFileNamePropertyWidget::~pqFileNamePropertyWidget()
-{
-}
+pqFileNamePropertyWidget::~pqFileNamePropertyWidget() = default;
 
 //-----------------------------------------------------------------------------
 void pqFileNamePropertyWidget::resetButtonClicked()

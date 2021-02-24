@@ -48,8 +48,8 @@ pqIntRangeWidget::pqIntRangeWidget(QWidget* p)
   this->Value = 0;
   this->Minimum = 0;
   this->Maximum = 1;
-  this->Domain = 0;
-  this->DomainConnection = 0;
+  this->Domain = nullptr;
+  this->DomainConnection = nullptr;
   this->InteractingWithSlider = false;
   this->DeferredValueEdited = false;
 
@@ -195,7 +195,7 @@ void pqIntRangeWidget::setDomain(vtkSMIntRangeDomain* domain)
     if (this->DomainConnection)
     {
       this->DomainConnection->Delete();
-      this->DomainConnection = 0;
+      this->DomainConnection = nullptr;
     }
 
     this->DomainConnection = vtkEventQtSlotConnect::New();

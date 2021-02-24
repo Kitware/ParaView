@@ -183,8 +183,8 @@ void pqCustomFilterManager::exportSelected(const QStringList& files)
   root->SetName("CustomFilterDefinitions");
 
   QString filter;
-  vtkPVXMLElement* element = 0;
-  vtkPVXMLElement* definition = 0;
+  vtkPVXMLElement* element = nullptr;
+  vtkPVXMLElement* definition = nullptr;
   vtkSMSessionProxyManager* proxyManager =
     vtkSMProxyManager::GetProxyManager()->GetActiveSessionProxyManager();
   QModelIndexList::Iterator iter = selection.begin();
@@ -227,8 +227,8 @@ void pqCustomFilterManager::exportSelected(const QStringList& files)
 void pqCustomFilterManager::importFiles()
 {
   // Let the user select a file.
-  pqFileDialog* fileDialog = new pqFileDialog(NULL, this, tr("Open Custom Filter File"), QString(),
-    "Custom Filter Files (*.cpd *.xml);;All Files (*)");
+  pqFileDialog* fileDialog = new pqFileDialog(nullptr, this, tr("Open Custom Filter File"),
+    QString(), "Custom Filter Files (*.cpd *.xml);;All Files (*)");
   fileDialog->setAttribute(Qt::WA_DeleteOnClose);
   fileDialog->setObjectName("FileOpenDialog");
   fileDialog->setFileMode(pqFileDialog::ExistingFile);
@@ -244,8 +244,8 @@ void pqCustomFilterManager::importFiles()
 void pqCustomFilterManager::exportSelected()
 {
   // Let the user select a file to save.
-  pqFileDialog* fileDialog = new pqFileDialog(NULL, this, tr("Save Custom Filter File"), QString(),
-    "Custom Filter Files (*.cpd *.xml);;All Files (*)");
+  pqFileDialog* fileDialog = new pqFileDialog(nullptr, this, tr("Save Custom Filter File"),
+    QString(), "Custom Filter Files (*.cpd *.xml);;All Files (*)");
   fileDialog->setAttribute(Qt::WA_DeleteOnClose);
   fileDialog->setObjectName("FileSaveDialog");
   fileDialog->setFileMode(pqFileDialog::AnyFile);

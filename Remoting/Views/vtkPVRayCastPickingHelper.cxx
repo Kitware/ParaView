@@ -40,8 +40,8 @@ vtkCxxSetObjectMacro(vtkPVRayCastPickingHelper, Selection, vtkAlgorithm);
 //----------------------------------------------------------------------------
 vtkPVRayCastPickingHelper::vtkPVRayCastPickingHelper()
 {
-  this->Selection = NULL;
-  this->Input = NULL;
+  this->Selection = nullptr;
+  this->Input = nullptr;
   this->SnapOnMeshPoint = false;
   this->PointA[0] = this->PointA[1] = this->PointA[2] = 0.0;
   this->PointB[0] = this->PointB[1] = this->PointB[2] = 0.0;
@@ -50,8 +50,8 @@ vtkPVRayCastPickingHelper::vtkPVRayCastPickingHelper()
 //----------------------------------------------------------------------------
 vtkPVRayCastPickingHelper::~vtkPVRayCastPickingHelper()
 {
-  this->SetSelection(NULL);
-  this->SetInput(NULL);
+  this->SetSelection(nullptr);
+  this->SetInput(nullptr);
 }
 
 //----------------------------------------------------------------------------

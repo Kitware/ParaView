@@ -80,7 +80,7 @@ public:
       assert(chartXY);
       return chartXY->AddPlot(vtkChart::LINE);
     }
-    return NULL;
+    return nullptr;
   }
 
   //---------------------------------------------------------------------------
@@ -129,7 +129,7 @@ public:
         std::string columnName = plotInfo.ColumnName;
         vtkTable* table = plot->GetInput();
         vtkDataArray* xarray = self->GetUseIndexForXAxis()
-          ? NULL
+          ? nullptr
           : vtkDataArray::SafeDownCast(table->GetColumnByName(self->GetXAxisSeriesName()));
 
         if (role == "minmax" || role == "q1q3")
@@ -155,7 +155,8 @@ public:
           for (const auto& apair : yNames)
           {
             vtkAbstractArray* yarray = table->GetColumnByName(apair.first.c_str());
-            if (yarray != NULL && added_column_names.find(apair.second) == added_column_names.end())
+            if (yarray != nullptr &&
+              added_column_names.find(apair.second) == added_column_names.end())
             {
               added_column_names.insert(apair.second);
               exporter->AddColumn(yarray, apair.second.c_str(), xarray);
@@ -165,7 +166,8 @@ public:
         }
 
         vtkAbstractArray* yarray = table->GetColumnByName(columnName.c_str());
-        if (yarray != NULL && added_column_names.find(plot->GetLabel()) == added_column_names.end())
+        if (yarray != nullptr &&
+          added_column_names.find(plot->GetLabel()) == added_column_names.end())
         {
           added_column_names.insert(plot->GetLabel());
           exporter->AddColumn(yarray, plot->GetLabel().c_str(), xarray);
@@ -248,9 +250,7 @@ vtkQuartileChartRepresentation::vtkQuartileChartRepresentation()
 }
 
 //----------------------------------------------------------------------------
-vtkQuartileChartRepresentation::~vtkQuartileChartRepresentation()
-{
-}
+vtkQuartileChartRepresentation::~vtkQuartileChartRepresentation() = default;
 
 //----------------------------------------------------------------------------
 std::string vtkQuartileChartRepresentation::GetDefaultSeriesLabel(

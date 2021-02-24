@@ -15,14 +15,10 @@
 #include "vtkCPBaseGridBuilder.h"
 
 //----------------------------------------------------------------------------
-vtkCPBaseGridBuilder::vtkCPBaseGridBuilder()
-{
-}
+vtkCPBaseGridBuilder::vtkCPBaseGridBuilder() = default;
 
 //----------------------------------------------------------------------------
-vtkCPBaseGridBuilder::~vtkCPBaseGridBuilder()
-{
-}
+vtkCPBaseGridBuilder::~vtkCPBaseGridBuilder() = default;
 
 //----------------------------------------------------------------------------
 void vtkCPBaseGridBuilder::PrintSelf(ostream& os, vtkIndent indent)

@@ -53,9 +53,7 @@ pqLoadMaterialsReaction::pqLoadMaterialsReaction(QAction* parentObject)
 }
 
 //-----------------------------------------------------------------------------
-pqLoadMaterialsReaction::~pqLoadMaterialsReaction()
-{
-}
+pqLoadMaterialsReaction::~pqLoadMaterialsReaction() = default;
 
 //-----------------------------------------------------------------------------
 bool pqLoadMaterialsReaction::loadMaterials()
@@ -78,7 +76,7 @@ bool pqLoadMaterialsReaction::loadMaterials(const QString& dbase, pqServer* serv
 #if VTK_MODULE_ENABLE_VTK_RenderingRayTracing
   CLEAR_UNDO_STACK();
 
-  server = (server != NULL) ? server : pqActiveObjects::instance().activeServer();
+  server = (server != nullptr) ? server : pqActiveObjects::instance().activeServer();
 
   vtkSMSession* session = server->session();
   if (session)

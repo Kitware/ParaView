@@ -47,7 +47,7 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqSaveAnimationReaction : public pqReaction
 
 public:
   /**
-  * Constructor. Parent cannot be NULL.
+  * Constructor. Parent cannot be nullptr.
   */
   pqSaveAnimationReaction(QAction* parent);
 

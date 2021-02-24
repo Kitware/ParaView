@@ -12,9 +12,7 @@ PointMap::PointMap(vtkIdType numPoints)
 }
 
 // --------------------------------------
-PointMap::~PointMap()
-{
-}
+PointMap::~PointMap() = default;
 
 // --------------------------------------
 vtkIdType PointMap::GetID(vtkIdType oldID)

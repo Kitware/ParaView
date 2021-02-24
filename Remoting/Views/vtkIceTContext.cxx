@@ -42,16 +42,16 @@ vtkStandardNewMacro(vtkIceTContext);
 
 vtkIceTContext::vtkIceTContext()
 {
-  // This class establishes a constraint that these are both NULL or both valid.
-  this->Controller = NULL;
-  this->Context = NULL;
+  // This class establishes a constraint that these are both nullptr or both valid.
+  this->Controller = nullptr;
+  this->Context = nullptr;
   this->UseOpenGL = 0;
 }
 
 vtkIceTContext::~vtkIceTContext()
 {
   // Class constraint dictates that the context will be deleted as well.
-  this->SetController(NULL);
+  this->SetController(nullptr);
 }
 
 void vtkIceTContext::PrintSelf(ostream& os, vtkIndent indent)
@@ -70,7 +70,7 @@ void vtkIceTContext::SetController(vtkMultiProcessController* controller)
     return;
   }
 
-  vtkIceTContextOpaqueHandle* newContext = NULL;
+  vtkIceTContextOpaqueHandle* newContext = nullptr;
 
   if (controller)
   {
@@ -103,9 +103,9 @@ void vtkIceTContext::SetController(vtkMultiProcessController* controller)
   {
     icetDestroyContext(this->Context->Handle);
     delete this->Context;
-    this->Context = NULL;
+    this->Context = nullptr;
     this->Controller->UnRegister(this);
-    this->Controller = NULL;
+    this->Controller = nullptr;
   }
 
   this->Controller = controller;
@@ -174,5 +174,5 @@ void vtkIceTContext::CopyState(vtkIceTContext* src)
 
 int vtkIceTContext::IsValid()
 {
-  return ((this->Controller != NULL) && (this->Context != NULL));
+  return ((this->Controller != nullptr) && (this->Context != nullptr));
 }

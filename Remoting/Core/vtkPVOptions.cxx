@@ -38,15 +38,15 @@ vtkPVOptions::vtkPVOptions()
   vtksys::SystemInformation sys_info;
   sys_info.RunOSCheck();
   const char* sys_hostname = sys_info.GetHostname() ? sys_info.GetHostname() : "localhost";
-  this->HostName = 0;
+  this->HostName = nullptr;
   this->SetHostName(sys_hostname);
 
   // Initialize vtksys::CommandLineArguments
   this->UseRenderingGroup = 0;
-  this->ParaViewDataName = 0;
-  this->ServersFileName = 0;
-  this->TestPlugins = 0;
-  this->TestPluginPaths = 0;
+  this->ParaViewDataName = nullptr;
+  this->ServersFileName = nullptr;
+  this->TestPlugins = nullptr;
+  this->TestPluginPaths = nullptr;
   this->SetTestPlugins("");
   this->SetTestPluginPaths("");
   this->TileDimensions[0] = 0;
@@ -65,14 +65,14 @@ vtkPVOptions::vtkPVOptions()
   this->EnableStreaming = 0;
   this->SatelliteMessageIds = 0;
   this->PrintMonitors = 0;
-  this->ServerURL = 0;
+  this->ServerURL = nullptr;
   this->ReverseConnection = 0;
   this->UseStereoRendering = 0;
   this->UseOffscreenRendering = 0;
   this->EGLDeviceIndex = -1;
   this->ConnectID = 0;
-  this->LogFileName = 0;
-  this->StereoType = 0;
+  this->LogFileName = nullptr;
+  this->StereoType = nullptr;
   this->SetStereoType("Anaglyph");
   this->Timeout = 0;
   this->EnableStackTrace = 0;
@@ -88,7 +88,7 @@ vtkPVOptions::vtkPVOptions()
   if (this->XMLParser)
   {
     this->XMLParser->Delete();
-    this->XMLParser = 0;
+    this->XMLParser = nullptr;
   }
   this->XMLParser = vtkPVOptionsXMLParser::New();
   this->XMLParser->SetPVOptions(this);
@@ -97,14 +97,14 @@ vtkPVOptions::vtkPVOptions()
 //----------------------------------------------------------------------------
 vtkPVOptions::~vtkPVOptions()
 {
-  this->SetHostName(0);
-  this->SetServersFileName(0);
-  this->SetLogFileName(0);
-  this->SetStereoType(0);
-  this->SetParaViewDataName(0);
-  this->SetServerURL(0);
-  this->SetTestPlugins(0);
-  this->SetTestPluginPaths(0);
+  this->SetHostName(nullptr);
+  this->SetServersFileName(nullptr);
+  this->SetLogFileName(nullptr);
+  this->SetStereoType(nullptr);
+  this->SetParaViewDataName(nullptr);
+  this->SetServerURL(nullptr);
+  this->SetTestPlugins(nullptr);
+  this->SetTestPluginPaths(nullptr);
 }
 
 //----------------------------------------------------------------------------
@@ -152,34 +152,34 @@ void vtkPVOptions::Initialize()
   // On occasion, one would want to force the hostname used by a particular
   // process (overriding the default detected by making System calls). This
   // option makes it possible).
-  this->AddArgument("--hostname", 0, &this->HostName,
+  this->AddArgument("--hostname", nullptr, &this->HostName,
     "Override the hostname to be used to connect to this process. "
     "By default, the hostname is determined using appropriate system calls.",
     vtkPVOptions::ALLPROCESS);
 
-  this->AddArgument(
-    "--cslog", 0, &this->LogFileName, "ClientServerStream log file.", vtkPVOptions::ALLPROCESS);
+  this->AddArgument("--cslog", nullptr, &this->LogFileName, "ClientServerStream log file.",
+    vtkPVOptions::ALLPROCESS);
 
-  this->AddBooleanArgument("--multi-clients", 0, &this->MultiClientMode,
+  this->AddBooleanArgument("--multi-clients", nullptr, &this->MultiClientMode,
     "Allow server to keep listening for several clients to"
     "connect to it and share the same visualization session.",
     vtkPVOptions::PVDATA_SERVER | vtkPVOptions::PVSERVER);
 
-  this->AddBooleanArgument("--multi-clients-debug", 0, &this->MultiClientModeWithErrorMacro,
+  this->AddBooleanArgument("--multi-clients-debug", nullptr, &this->MultiClientModeWithErrorMacro,
     "Allow server to keep listening for several clients to"
     "connect to it and share the same visualization session."
     "While keeping the error macro on the server session for debug.",
     vtkPVOptions::PVDATA_SERVER | vtkPVOptions::PVSERVER);
 
-  this->AddBooleanArgument("--disable-further-connections", 0, &this->DisableFurtherConnections,
-    "Disable further connections after the first client connects."
-    "Does nothing without --multi-clients enabled.",
+  this->AddBooleanArgument("--disable-further-connections", nullptr,
+    &this->DisableFurtherConnections, "Disable further connections after the first client connects."
+                                      "Does nothing without --multi-clients enabled.",
     vtkPVOptions::PVDATA_SERVER | vtkPVOptions::PVSERVER);
 
-  this->AddBooleanArgument("--multi-servers", 0, &this->MultiServerMode,
+  this->AddBooleanArgument("--multi-servers", nullptr, &this->MultiServerMode,
     "Allow client to connect to several pvserver", vtkPVOptions::PVCLIENT);
 
-  this->AddArgument("--data", 0, &this->ParaViewDataName,
+  this->AddArgument("--data", nullptr, &this->ParaViewDataName,
     "Load the specified data. "
     "To specify file series replace the numeral with a '.' eg. "
     "my0.vtk, my1.vtk...myN.vtk becomes my..vtk",
@@ -191,26 +191,26 @@ void vtkPVOptions::Initialize()
     "one of the two options.",
     vtkPVOptions::PVCLIENT | vtkPVOptions::PARAVIEW);
 
-  this->AddArgument("--connect-id", 0, &this->ConnectID,
+  this->AddArgument("--connect-id", nullptr, &this->ConnectID,
     "Set the ID of the server and client to make sure they "
     "match. 0 is reserved to imply none specified.",
     vtkPVOptions::PVCLIENT | vtkPVOptions::PVSERVER | vtkPVOptions::PVRENDER_SERVER |
       vtkPVOptions::PVDATA_SERVER);
-  this->AddBooleanArgument("--use-offscreen-rendering", 0, &this->UseOffscreenRendering,
+  this->AddBooleanArgument("--use-offscreen-rendering", nullptr, &this->UseOffscreenRendering,
     "Render offscreen on the satellite processes."
     " This option only works with software rendering or mangled Mesa on Unix.",
     vtkPVOptions::PVRENDER_SERVER | vtkPVOptions::PVSERVER | vtkPVOptions::PVBATCH);
 #ifdef VTK_OPENGL_HAS_EGL
-  this->AddArgument("--egl-device-index", NULL, &this->EGLDeviceIndex,
+  this->AddArgument("--egl-device-index", nullptr, &this->EGLDeviceIndex,
     "Render offscreen through the Native Platform Interface (EGL) on the graphics card "
     "specified by the device index.",
     vtkPVOptions::PVRENDER_SERVER | vtkPVOptions::PVSERVER | vtkPVOptions::PVBATCH);
 #endif
-  this->AddBooleanArgument("--stereo", 0, &this->UseStereoRendering,
+  this->AddBooleanArgument("--stereo", nullptr, &this->UseStereoRendering,
     "Tell the application to enable stereo rendering",
     vtkPVOptions::PVCLIENT | vtkPVOptions::PARAVIEW | vtkPVOptions::PVRENDER_SERVER |
       vtkPVOptions::PVSERVER | vtkPVOptions::PVBATCH);
-  this->AddArgument("--stereo-type", 0, &this->StereoType,
+  this->AddArgument("--stereo-type", nullptr, &this->StereoType,
     "Specify the stereo type. This valid only when "
     "--stereo is specified. Possible values are "
     "\"Crystal Eyes\", \"Red-Blue\", \"Interlaced\", "
@@ -235,7 +235,7 @@ void vtkPVOptions::Initialize()
     "Size of the gap between rows in the tile display, in pixels.",
     vtkPVOptions::PVRENDER_SERVER | vtkPVOptions::PVSERVER);
 
-  this->AddArgument("--timeout", 0, &this->Timeout,
+  this->AddArgument("--timeout", nullptr, &this->Timeout,
     "Time (in minutes) since connecting with a client "
     "after which the server may timeout. The client typically shows warning "
     "messages before the server times out.",
@@ -244,7 +244,7 @@ void vtkPVOptions::Initialize()
   this->AddBooleanArgument(
     "--version", "-V", &this->TellVersion, "Give the version number and exit.");
 
-  this->AddArgument("--servers-file", 0, &this->ServersFileName,
+  this->AddArgument("--servers-file", nullptr, &this->ServersFileName,
     "Load the specified configuration servers file (.pvsc). This option replaces "
     "the default user's configuration servers file.",
     vtkPVOptions::PVCLIENT | vtkPVOptions::PARAVIEW);
@@ -253,9 +253,10 @@ void vtkPVOptions::Initialize()
     "When specified, the python script is processed symmetrically on all processes.",
     vtkPVOptions::PVBATCH);
 
-  this->AddDeprecatedArgument("--enable-streaming", 0, "DEPRECATED: Since 5.9, use "
-                                                       "settings/preferences dialog to enable or "
-                                                       "disable view-based streaming.",
+  this->AddDeprecatedArgument("--enable-streaming", nullptr,
+    "DEPRECATED: Since 5.9, use "
+    "settings/preferences dialog to enable or "
+    "disable view-based streaming.",
     vtkPVOptions::ALLPROCESS);
 
   this->AddBooleanArgument("--enable-satellite-message-ids", "-satellite",
@@ -263,35 +264,35 @@ void vtkPVOptions::Initialize()
     "When specified, server side messages shown on client show rank of originating process",
     vtkPVOptions::PVSERVER);
 
-  this->AddArgument("--test-plugin", 0, &this->TestPlugins,
+  this->AddArgument("--test-plugin", nullptr, &this->TestPlugins,
     "DEPRECATED: Specify the name of the plugin to load for testing."
     " Use \"--test-plugins\" instead.",
     vtkPVOptions::ALLPROCESS);
 
-  this->AddArgument("--test-plugins", 0, &this->TestPlugins,
+  this->AddArgument("--test-plugins", nullptr, &this->TestPlugins,
     "Specify the names of the plugins as a comma-separated list to load for testing",
     vtkPVOptions::ALLPROCESS);
 
-  this->AddArgument("--test-plugin-path", 0, &this->TestPluginPaths,
+  this->AddArgument("--test-plugin-path", nullptr, &this->TestPluginPaths,
     "DEPRECATED: Specify the path where more plugins can be found."
     "This is typically used when testing plugins. Use \"--test-plugin-paths\" instead.",
     vtkPVOptions::ALLPROCESS);
 
-  this->AddArgument("--test-plugin-paths", 0, &this->TestPluginPaths,
+  this->AddArgument("--test-plugin-paths", nullptr, &this->TestPluginPaths,
     "Specify the paths where more plugins can be found as a comma-separated list."
     "This is typically used when testing plugins.",
     vtkPVOptions::ALLPROCESS);
 
-  this->AddBooleanArgument("--print-monitors", 0, &this->PrintMonitors,
+  this->AddBooleanArgument("--print-monitors", nullptr, &this->PrintMonitors,
     "Print detected monitors and exit (Windows only).");
 
   this->AddBooleanArgument(
-    "--enable-bt", 0, &this->EnableStackTrace, "Enable stack trace signal handler.");
+    "--enable-bt", nullptr, &this->EnableStackTrace, "Enable stack trace signal handler.");
 
   this->AddBooleanArgument("--disable-registry", "-dr", &this->DisableRegistry,
     "Do not use registry when running ParaView (for testing).");
 
-  this->AddBooleanArgument("--disable-xdisplay-test", 0, &this->DisableXDisplayTests,
+  this->AddBooleanArgument("--disable-xdisplay-test", nullptr, &this->DisableXDisplayTests,
     "When specified, all X-display tests and OpenGL version checks are skipped. Use this option if "
     "you are getting remote-rendering disabled errors and you are positive that "
     "the X environment is set up properly and your OpenGL support is adequate (experimental).",
@@ -302,10 +303,10 @@ void vtkPVOptions::Initialize()
   // out. Note the code in vtkProcessModule::Initialize() doesn't really rely on
   // the vtkPVOptions parsing these arguments since vtkPVOptions is called on to
   // parse the arguments only after MPI has been initialized.
-  this->AddBooleanArgument("--mpi", 0, &this->ForceMPIInitOnClient,
+  this->AddBooleanArgument("--mpi", nullptr, &this->ForceMPIInitOnClient,
     "Initialize MPI on processes, if possible. "
     "Cannot be used with --no-mpi.");
-  this->AddBooleanArgument("--no-mpi", 0, &this->ForceNoMPIInitOnClient,
+  this->AddBooleanArgument("--no-mpi", nullptr, &this->ForceNoMPIInitOnClient,
     "Don't initialize MPI on processes. "
     "Cannot be used with --mpi.");
 #endif
@@ -593,13 +594,13 @@ int vtkPVOptions::WrongArgument(const char* argument)
     return 1;
   }
 
-  if (this->ParaViewDataName == NULL && this->GetProcessType() == PVCLIENT)
+  if (this->ParaViewDataName == nullptr && this->GetProcessType() == PVCLIENT)
   {
     // BUG #11199. Assume it's a data file.
     this->SetParaViewDataName(argument);
     if (this->GetUnknownArgument() && strcmp(this->GetUnknownArgument(), argument) == 0)
     {
-      this->SetUnknownArgument(0);
+      this->SetUnknownArgument(nullptr);
     }
     return 1;
   }

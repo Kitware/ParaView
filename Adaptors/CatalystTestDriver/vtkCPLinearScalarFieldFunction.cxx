@@ -29,9 +29,7 @@ vtkCPLinearScalarFieldFunction::vtkCPLinearScalarFieldFunction()
 }
 
 //----------------------------------------------------------------------------
-vtkCPLinearScalarFieldFunction::~vtkCPLinearScalarFieldFunction()
-{
-}
+vtkCPLinearScalarFieldFunction::~vtkCPLinearScalarFieldFunction() = default;
 
 //----------------------------------------------------------------------------
 double vtkCPLinearScalarFieldFunction::ComputeComponenentAtPoint(

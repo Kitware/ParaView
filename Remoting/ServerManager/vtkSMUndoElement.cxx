@@ -23,13 +23,13 @@
 //-----------------------------------------------------------------------------
 vtkSMUndoElement::vtkSMUndoElement()
 {
-  this->Session = 0;
+  this->Session = nullptr;
 }
 
 //-----------------------------------------------------------------------------
 vtkSMUndoElement::~vtkSMUndoElement()
 {
-  this->SetSession(0);
+  this->SetSession(nullptr);
 }
 
 //-----------------------------------------------------------------------------

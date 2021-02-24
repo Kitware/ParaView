@@ -348,7 +348,7 @@ void pqSelectionInputWidget::postAccept()
 {
   // Select proper ProxyManager
   vtkSMProxy* sel_source = this->selection();
-  vtkSMSessionProxyManager* pxm = sel_source ? sel_source->GetSessionProxyManager() : NULL;
+  vtkSMSessionProxyManager* pxm = sel_source ? sel_source->GetSessionProxyManager() : nullptr;
 
   if (!sel_source)
   {
@@ -381,7 +381,7 @@ void pqSelectionInputWidget::preAccept()
 {
   // Select proper ProxyManager
   vtkSMProxy* sel_source = this->selection();
-  vtkSMSessionProxyManager* pxm = sel_source ? sel_source->GetSessionProxyManager() : NULL;
+  vtkSMSessionProxyManager* pxm = sel_source ? sel_source->GetSessionProxyManager() : nullptr;
 
   // Register the new selection proxy.
   if (sel_source && pxm)

@@ -43,7 +43,7 @@ vtkPVGeneralSettings* vtkPVGeneralSettings::New()
 {
   vtkPVGeneralSettings* instance = vtkPVGeneralSettings::GetInstance();
   assert(instance);
-  instance->Register(NULL);
+  instance->Register(nullptr);
   return instance;
 }
 
@@ -52,7 +52,7 @@ vtkPVGeneralSettings::vtkPVGeneralSettings()
   : BlockColorsDistinctValues(7)
   , AutoApply(false)
   , AutoApplyActiveOnly(false)
-  , DefaultViewType(NULL)
+  , DefaultViewType(nullptr)
 #if VTK_MODULE_ENABLE_ParaView_RemotingViews
   , TransferFunctionResetMode(vtkSMTransferFunctionManager::GROW_ON_APPLY)
 #else
@@ -79,7 +79,7 @@ vtkPVGeneralSettings::vtkPVGeneralSettings()
 //----------------------------------------------------------------------------
 vtkPVGeneralSettings::~vtkPVGeneralSettings()
 {
-  this->SetDefaultViewType(NULL);
+  this->SetDefaultViewType(nullptr);
 }
 
 //----------------------------------------------------------------------------

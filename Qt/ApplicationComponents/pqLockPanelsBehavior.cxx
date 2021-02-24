@@ -61,8 +61,8 @@ public:
   pqLockPanelsBehavior* Behavior;
 
 protected:
-  vtkLockDockWidgetsCallback() {}
-  ~vtkLockDockWidgetsCallback() override {}
+  vtkLockDockWidgetsCallback() = default;
+  ~vtkLockDockWidgetsCallback() override = default;
 };
 
 } // anonymous namespace
@@ -81,7 +81,7 @@ public:
   ~pqInternals()
   {
     this->Callback->Delete();
-    this->Callback = NULL;
+    this->Callback = nullptr;
   }
 
   vtkLockDockWidgetsCallback* Callback;

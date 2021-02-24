@@ -47,8 +47,8 @@
  * VTK.
  * \li null_on_empty : if set to 1, whenever the property's value changes to
  * empty i.e. it contains no proxies, the command is called on the VTK object
- * with NULL argument useful when there's no clean_command that can be called on
- * the VTK object to unset the property e.g. SetLookupTable(NULL).
+ * with nullptr argument useful when there's no clean_command that can be called on
+ * the VTK object to unset the property e.g. SetLookupTable(nullptr).
  * \li skip_dependency: obsolete and no longer supported. This was intended for
  * vtkSMRepresentationProxy to distinguish between proxy connections that
  * invalidate representation pipeline (e.g. input) and those that don't (e.g.
@@ -211,7 +211,7 @@ protected:
   /**
    * Fill state property/proxy XML element with proxy info.
    * Return the created proxy XML element that has been added as a child in the
-   * property definition. If prop == NULL, you must Delete yourself the result
+   * property definition. If prop == nullptr, you must Delete yourself the result
    * otherwise prop is olding a reference to the proxy element
    */
   virtual vtkPVXMLElement* AddProxyElementState(vtkPVXMLElement* prop, unsigned int idx);

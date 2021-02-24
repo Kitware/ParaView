@@ -49,7 +49,7 @@ class PQWIDGETS_EXPORT pqCheckBoxPixMaps : public QObject
 
 public:
   /**
-  * parent cannot be NULL.
+  * parent cannot be nullptr.
   */
   pqCheckBoxPixMaps(QWidget* parent);
 

@@ -37,19 +37,19 @@ vtkIceTSynchronizedRenderers::vtkIceTSynchronizedRenderers()
   this->CameraRenderPass = cameraPass;
   this->SetParallelController(vtkMultiProcessController::GetGlobalController());
 
-  this->ImageProcessingPass = NULL;
-  this->RenderPass = NULL;
+  this->ImageProcessingPass = nullptr;
+  this->RenderPass = nullptr;
 }
 
 //----------------------------------------------------------------------------
 vtkIceTSynchronizedRenderers::~vtkIceTSynchronizedRenderers()
 {
-  this->SetImageProcessingPass(0);
-  this->SetRenderPass(0);
+  this->SetImageProcessingPass(nullptr);
+  this->SetRenderPass(nullptr);
   this->IceTCompositePass->Delete();
-  this->IceTCompositePass = 0;
+  this->IceTCompositePass = nullptr;
   this->CameraRenderPass->Delete();
-  this->CameraRenderPass = 0;
+  this->CameraRenderPass = nullptr;
 }
 
 //----------------------------------------------------------------------------
@@ -106,7 +106,7 @@ void vtkIceTSynchronizedRenderers::SetRenderer(vtkRenderer* ren)
 {
   if (this->Renderer && this->Renderer->GetPass() == this->CameraRenderPass)
   {
-    this->Renderer->SetPass(NULL);
+    this->Renderer->SetPass(nullptr);
   }
   this->Superclass::SetRenderer(ren);
   if (ren)

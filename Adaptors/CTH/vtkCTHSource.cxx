@@ -32,16 +32,14 @@
 #include "vtkUnsignedCharArray.h"
 
 //---------------------------------------------------------------------------
-vtkCTHSource::vtkCTHSource()
-{
-}
+vtkCTHSource::vtkCTHSource() = default;
 
 vtkCTHSource::~vtkCTHSource()
 {
   if (NeighborArray)
   {
     NeighborArray->Delete();
-    NeighborArray = 0;
+    NeighborArray = nullptr;
   }
   for (size_t i = 0; i < this->Blocks.size(); i++)
   {
@@ -132,7 +130,7 @@ void vtkCTHSource::SetMaterialFieldName(int field_id, char* field_name, char* co
 void vtkCTHSource::SetCellFieldPointer(int block_id, int field_id, int k, int j, double* istrip)
 {
   Block& b = this->Blocks[block_id];
-  if (b.CFieldData[field_id] != 0)
+  if (b.CFieldData[field_id] != nullptr)
   {
     /// TODO fix for multiple components
     b.CFieldData[field_id]->SetDataPointer(0, k, j, istrip);
@@ -144,7 +142,7 @@ void vtkCTHSource::SetMaterialFieldPointer(
   int block_id, int field_id, int mat, int k, int j, double* istrip)
 {
   Block& b = this->Blocks[block_id];
-  if (b.MFieldData[mat][field_id] != 0)
+  if (b.MFieldData[mat][field_id] != nullptr)
   {
     /// TODO fix for multiple components
     b.MFieldData[mat][field_id]->SetDataPointer(0, k, j, istrip);
@@ -164,7 +162,7 @@ void vtkCTHSource::InitializeBlock(int block_id, int Nx, int Ny, int Nz, double*
   b.allocated = allocated;
   b.active = active;
   b.level = level;
-  b.ug = 0;
+  b.ug = nullptr;
   b.Nx = Nx;
   b.Ny = Ny;
   b.Nz = Nz;
@@ -184,7 +182,7 @@ void vtkCTHSource::InitializeBlock(int block_id, int Nx, int Ny, int Nz, double*
     }
     else
     {
-      b.CFieldData[c] = 0;
+      b.CFieldData[c] = nullptr;
     }
   }
   b.actualMaterials = 0; // so far we've filled none
@@ -204,7 +202,7 @@ void vtkCTHSource::InitializeBlock(int block_id, int Nx, int Ny, int Nz, double*
       }
       else
       {
-        b.MFieldData[m][f] = 0;
+        b.MFieldData[m][f] = nullptr;
       }
     }
   }
@@ -282,7 +280,7 @@ void vtkCTHSource::UpdateRepresentation()
     }
     for (size_t c = 0; c < b.CFieldData.size(); c++)
     {
-      if (b.CFieldData[c] == 0)
+      if (b.CFieldData[c] == nullptr)
         continue;
       b.CFieldData[c]->Modified();
       /*
@@ -302,7 +300,7 @@ void vtkCTHSource::UpdateRepresentation()
     {
       for (size_t f = 0; f < b.MFieldData[m].size(); f++)
       {
-        if (b.MFieldData[m][f] == 0)
+        if (b.MFieldData[m][f] == nullptr)
           continue;
         if (strncmp(b.MFieldData[m][f]->GetName(), "Volume Fraction", 15) != 0)
         {
@@ -364,7 +362,7 @@ int vtkCTHSource::FillInputData(vtkCPInputDataDescription* input)
       if (b.ug)
       {
         b.ug->Delete();
-        b.ug = 0;
+        b.ug = nullptr;
         delete b.box;
       }
       if (b.allocated)
@@ -590,7 +588,7 @@ void vtkCTHSource::AddFieldArrays(Block& b)
 
   for (size_t c = 0; c < b.CFieldData.size(); c++)
   {
-    if (b.CFieldData[c] == 0)
+    if (b.CFieldData[c] == nullptr)
       continue;
     b.CFieldData[c]->UnsetExtents();
     cd->AddArray(b.CFieldData[c]);
@@ -608,7 +606,7 @@ void vtkCTHSource::AddFieldArrays(Block& b)
     // TODO In general for in situ, we should only pull the data we'd actually want.
     for (size_t f = 0; f < b.MFieldData[m].size(); f++)
     {
-      if (b.MFieldData[m][f] == 0)
+      if (b.MFieldData[m][f] == nullptr)
         continue;
       b.MFieldData[m][f]->UnsetExtents();
       if (strncmp(b.MFieldData[m][f]->GetName(), "Volume Fraction", 15) != 0)
@@ -643,7 +641,7 @@ void vtkCTHSource::AddFieldArrays(Block& b, int loCorner[3], int hiCorner[3])
 
   for (size_t c = 0; c < b.CFieldData.size(); c++)
   {
-    if (b.CFieldData[c] == 0)
+    if (b.CFieldData[c] == nullptr)
       continue;
     b.CFieldData[c]->SetExtents(loCorner, hiCorner);
     cd->AddArray(b.CFieldData[c]);
@@ -661,7 +659,7 @@ void vtkCTHSource::AddFieldArrays(Block& b, int loCorner[3], int hiCorner[3])
     // TODO In general for in situ, we should only pull the data we'd actually want.
     for (size_t f = 0; f < b.MFieldData[m].size(); f++)
     {
-      if (b.MFieldData[m][f] == 0)
+      if (b.MFieldData[m][f] == nullptr)
         continue;
       b.MFieldData[m][f]->SetExtents(loCorner, hiCorner);
       if (strncmp(b.MFieldData[m][f]->GetName(), "Volume Fraction", 15) != 0)

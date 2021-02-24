@@ -47,7 +47,7 @@ public:
     TimeSteps.reserve(1024);
     MetaIndexes["time"] = -1;
   }
-  ~MetaInfo() {}
+  ~MetaInfo() = default;
 
   // rough bidirectional map of header index for time
   std::map<std::string, int> MetaIndexes;
@@ -77,12 +77,12 @@ public:
 vtkSpyPlotHistoryReader::vtkSpyPlotHistoryReader()
   : Info(new MetaInfo)
 {
-  this->CachedOutput = NULL;
+  this->CachedOutput = nullptr;
   this->SetNumberOfInputPorts(0);
   this->SetNumberOfOutputPorts(1);
-  this->FileName = 0;
-  this->CommentCharacter = 0;
-  this->Delimeter = 0;
+  this->FileName = nullptr;
+  this->CommentCharacter = nullptr;
+  this->Delimeter = nullptr;
   this->SetCommentCharacter("%");
   this->SetDelimeter(",");
 }
@@ -90,9 +90,9 @@ vtkSpyPlotHistoryReader::vtkSpyPlotHistoryReader()
 //-----------------------------------------------------------------------------
 vtkSpyPlotHistoryReader::~vtkSpyPlotHistoryReader()
 {
-  this->SetFileName(0);
-  this->SetCommentCharacter(0);
-  this->SetDelimeter(0);
+  this->SetFileName(nullptr);
+  this->SetCommentCharacter(nullptr);
+  this->SetDelimeter(nullptr);
 
   delete this->Info;
   if (this->CachedOutput)
@@ -217,7 +217,7 @@ int vtkSpyPlotHistoryReader::RequestData(vtkInformation* vtkNotUsed(request),
     return 1;
   }
 
-  if (this->CachedOutput == NULL)
+  if (this->CachedOutput == nullptr)
   {
     // fill the output on the first request
     this->CachedOutput = new CachedTables();

@@ -77,9 +77,9 @@ public:
   // ********* Access methods **********
 
   // Access methods
-  /// Return the current group name or NULL if Next() was never called.
+  /// Return the current group name or nullptr if Next() was never called.
   virtual const char* GetGroupName() = 0;
-  /// Return the current proxy name or NULL if Next() was never called.
+  /// Return the current proxy name or nullptr if Next() was never called.
   virtual const char* GetProxyName() = 0;
   /// Return true if the current definition has been defined in the Custom scope
   virtual bool IsCustom() { return false; };

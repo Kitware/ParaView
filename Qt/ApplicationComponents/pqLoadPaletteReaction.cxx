@@ -66,7 +66,7 @@ pqLoadPaletteReaction::~pqLoadPaletteReaction()
 {
   if (QAction* pa = this->parentAction())
   {
-    pa->setMenu(NULL);
+    pa->setMenu(nullptr);
   }
   delete this->Menu;
 }
@@ -74,7 +74,7 @@ pqLoadPaletteReaction::~pqLoadPaletteReaction()
 //-----------------------------------------------------------------------------
 void pqLoadPaletteReaction::updateEnableState()
 {
-  this->parentAction()->setEnabled(pqActiveObjects::instance().activeServer() != NULL);
+  this->parentAction()->setEnabled(pqActiveObjects::instance().activeServer() != nullptr);
 }
 
 //-----------------------------------------------------------------------------

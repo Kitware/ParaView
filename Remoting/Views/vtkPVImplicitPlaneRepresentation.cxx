@@ -23,10 +23,10 @@ vtkStandardNewMacro(vtkPVImplicitPlaneRepresentation);
 //----------------------------------------------------------------------------
 vtkPVImplicitPlaneRepresentation::vtkPVImplicitPlaneRepresentation()
 {
-  vtkMultiProcessController* ctrl = NULL;
+  vtkMultiProcessController* ctrl = nullptr;
   ctrl = vtkMultiProcessController::GetGlobalController();
   double opacity = 1;
-  if (ctrl == NULL || ctrl->GetNumberOfProcesses() == 1)
+  if (ctrl == nullptr || ctrl->GetNumberOfProcesses() == 1)
   {
     opacity = 0.25;
   }
@@ -36,9 +36,7 @@ vtkPVImplicitPlaneRepresentation::vtkPVImplicitPlaneRepresentation()
 }
 
 //----------------------------------------------------------------------------
-vtkPVImplicitPlaneRepresentation::~vtkPVImplicitPlaneRepresentation()
-{
-}
+vtkPVImplicitPlaneRepresentation::~vtkPVImplicitPlaneRepresentation() = default;
 
 //----------------------------------------------------------------------------
 void vtkPVImplicitPlaneRepresentation::PrintSelf(ostream& os, vtkIndent indent)

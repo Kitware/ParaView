@@ -54,9 +54,7 @@ pqStandardRecentlyUsedResourceLoaderImplementation::
 
 //-----------------------------------------------------------------------------
 pqStandardRecentlyUsedResourceLoaderImplementation::
-  ~pqStandardRecentlyUsedResourceLoaderImplementation()
-{
-}
+  ~pqStandardRecentlyUsedResourceLoaderImplementation() = default;
 
 //-----------------------------------------------------------------------------
 bool pqStandardRecentlyUsedResourceLoaderImplementation::canLoad(const pqServerResource& resource)

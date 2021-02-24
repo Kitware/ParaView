@@ -44,10 +44,10 @@
 #include <iostream>
 #include <list>
 
-vtkStandardNewMacro(vtkSliceAlongPolyPlane)
+vtkStandardNewMacro(vtkSliceAlongPolyPlane);
 
-  //----------------------------------------------------------------------------
-  void vtkSliceAlongPolyPlane::PrintSelf(ostream& os, vtkIndent indent)
+//----------------------------------------------------------------------------
+void vtkSliceAlongPolyPlane::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
   os << indent << "Tolerance: " << this->Tolerance << endl;
@@ -61,9 +61,7 @@ vtkSliceAlongPolyPlane::vtkSliceAlongPolyPlane()
 }
 
 //----------------------------------------------------------------------------
-vtkSliceAlongPolyPlane::~vtkSliceAlongPolyPlane()
-{
-}
+vtkSliceAlongPolyPlane::~vtkSliceAlongPolyPlane() = default;
 
 //----------------------------------------------------------------------------
 int vtkSliceAlongPolyPlane::RequestDataObject(
@@ -74,7 +72,7 @@ int vtkSliceAlongPolyPlane::RequestDataObject(
   vtkDataObject* inputDO = vtkDataObject::GetData(inputVector[0], 0);
   if (vtkCompositeDataSet::SafeDownCast(inputDO))
   {
-    if (vtkMultiBlockDataSet::GetData(outputVector, 0) == NULL)
+    if (vtkMultiBlockDataSet::GetData(outputVector, 0) == nullptr)
     {
       vtkNew<vtkMultiBlockDataSet> output;
       outputVector->GetInformationObject(0)->Set(vtkDataObject::DATA_OBJECT(), output.GetPointer());
@@ -83,7 +81,7 @@ int vtkSliceAlongPolyPlane::RequestDataObject(
   }
   else if (vtkDataSet::GetData(inputVector[0], 0))
   {
-    if (vtkPolyData::GetData(outputVector, 0) == NULL)
+    if (vtkPolyData::GetData(outputVector, 0) == nullptr)
     {
       vtkNew<vtkPolyData> output;
       outputVector->GetInformationObject(0)->Set(vtkDataObject::DATA_OBJECT(), output.GetPointer());
@@ -247,9 +245,9 @@ void vtkSliceAlongPolyPlane::CleanPolyLine(vtkPolyData* input, vtkPolyData* outp
   output->ShallowCopy(input);
 
   // remove other cell types that we don't care about.
-  output->SetVerts(NULL);
-  output->SetPolys(NULL);
-  output->SetVerts(NULL);
+  output->SetVerts(nullptr);
+  output->SetPolys(nullptr);
+  output->SetVerts(nullptr);
 
   vtkMultiProcessController* controller = vtkMultiProcessController::GetGlobalController();
   if (controller && controller->GetNumberOfProcesses() > 1)
@@ -283,7 +281,7 @@ int vtkSliceAlongPolyPlane::RequestData(vtkInformation* vtkNotUsed(request),
   vtkNew<vtkPolyData> polyLinePD;
   this->CleanPolyLine(vtkPolyData::GetData(inputVector[1], 0), polyLinePD.GetPointer());
 
-  if (vtkPolyLine::SafeDownCast(polyLinePD->GetCell(0)) == NULL)
+  if (vtkPolyLine::SafeDownCast(polyLinePD->GetCell(0)) == nullptr)
   {
     vtkErrorMacro(<< " First cell in input polydata is not a vtkPolyLine.");
     return 0;
@@ -340,7 +338,7 @@ bool vtkSliceAlongPolyPlane::Execute(
   cutter->Update();
 
   vtkDataSet* cutterOutput = vtkDataSet::SafeDownCast(cutter->GetOutputDataObject(0));
-  if (cutterOutput == NULL || cutterOutput->GetNumberOfPoints() == 0)
+  if (cutterOutput == nullptr || cutterOutput->GetNumberOfPoints() == 0)
   {
     // shortcut if the cut produces an empty dataset.
     return 1;

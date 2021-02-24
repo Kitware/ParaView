@@ -71,7 +71,7 @@ pqTraceReaction::pqTraceReaction(
 #if VTK_MODULE_ENABLE_ParaView_pqPython
   this->parentAction()->setEnabled(true);
   this->parentAction()->setText(
-    vtkSMTrace::GetActiveTracer() == NULL ? this->StartTraceLabel : this->StopTraceLabel);
+    vtkSMTrace::GetActiveTracer() == nullptr ? this->StartTraceLabel : this->StopTraceLabel);
 #else
   this->parentAction()->setEnabled(false);
   this->parentAction()->setToolTip(
@@ -94,7 +94,7 @@ pqTraceReaction::~pqTraceReaction()
 //-----------------------------------------------------------------------------
 void pqTraceReaction::onTriggered()
 {
-  if (vtkSMTrace::GetActiveTracer() == NULL)
+  if (vtkSMTrace::GetActiveTracer() == nullptr)
   {
     this->start();
   }
@@ -103,7 +103,7 @@ void pqTraceReaction::onTriggered()
     this->stop();
   }
   this->parentAction()->setText(
-    vtkSMTrace::GetActiveTracer() == NULL ? this->StartTraceLabel : this->StopTraceLabel);
+    vtkSMTrace::GetActiveTracer() == nullptr ? this->StartTraceLabel : this->StopTraceLabel);
 }
 
 //-----------------------------------------------------------------------------

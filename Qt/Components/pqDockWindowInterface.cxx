@@ -32,11 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqDockWindowInterface.h"
 
 //-----------------------------------------------------------------------------
-pqDockWindowInterface::pqDockWindowInterface()
-{
-}
+pqDockWindowInterface::pqDockWindowInterface() = default;
 
 //-----------------------------------------------------------------------------
-pqDockWindowInterface::~pqDockWindowInterface()
-{
-}
+pqDockWindowInterface::~pqDockWindowInterface() = default;

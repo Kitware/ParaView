@@ -36,21 +36,17 @@
 
 vtkStandardNewMacro(vtkSMCoreUtilities);
 //----------------------------------------------------------------------------
-vtkSMCoreUtilities::vtkSMCoreUtilities()
-{
-}
+vtkSMCoreUtilities::vtkSMCoreUtilities() = default;
 
 //----------------------------------------------------------------------------
-vtkSMCoreUtilities::~vtkSMCoreUtilities()
-{
-}
+vtkSMCoreUtilities::~vtkSMCoreUtilities() = default;
 
 //----------------------------------------------------------------------------
 const char* vtkSMCoreUtilities::GetFileNameProperty(vtkSMProxy* proxy)
 {
   if (!proxy)
   {
-    return NULL;
+    return nullptr;
   }
 
   if (proxy->GetHints())
@@ -92,7 +88,7 @@ const char* vtkSMCoreUtilities::GetFileNameProperty(vtkSMProxy* proxy)
     }
     piter->Next();
   }
-  return NULL;
+  return nullptr;
 }
 
 //----------------------------------------------------------------------------
@@ -275,7 +271,7 @@ const char* vtkSMCoreUtilities::GetInputPropertyName(vtkSMProxy* proxy, int port
 {
   if (!proxy)
   {
-    return NULL;
+    return nullptr;
   }
 
   vtkNew<vtkSMOrderedPropertyIterator> piter;
@@ -292,7 +288,7 @@ const char* vtkSMCoreUtilities::GetInputPropertyName(vtkSMProxy* proxy, int port
     }
     piter->Next();
   }
-  return NULL;
+  return nullptr;
 }
 
 //----------------------------------------------------------------------------

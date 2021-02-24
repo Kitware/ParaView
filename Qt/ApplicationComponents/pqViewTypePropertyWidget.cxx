@@ -58,7 +58,7 @@ pqViewTypePropertyWidget::pqViewTypePropertyWidget(
   // fill combo-box.
   vtkSMSessionProxyManager* pxm = pqActiveObjects::instance().activeServer()
     ? pqActiveObjects::instance().activeServer()->proxyManager()
-    : NULL;
+    : nullptr;
 
   QMap<QString, QString> valuesMap; // <-- used to sort the entries.
   if (pxm)
@@ -93,9 +93,7 @@ pqViewTypePropertyWidget::pqViewTypePropertyWidget(
 }
 
 //-----------------------------------------------------------------------------
-pqViewTypePropertyWidget::~pqViewTypePropertyWidget()
-{
-}
+pqViewTypePropertyWidget::~pqViewTypePropertyWidget() = default;
 
 //-----------------------------------------------------------------------------
 QString pqViewTypePropertyWidget::value() const

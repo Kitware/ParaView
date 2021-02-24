@@ -34,7 +34,7 @@ vtkStandardNewMacro(vtkWeightedRedistributePolyData);
 
 vtkWeightedRedistributePolyData::vtkWeightedRedistributePolyData()
 {
-  this->Weights = NULL;
+  this->Weights = nullptr;
 }
 
 //-------------------------------------------------------------------
@@ -68,7 +68,7 @@ void vtkWeightedRedistributePolyData::SetWeights(int startProc, int stopProc, fl
   if (myId == 0)
   {
     int np;
-    if (Weights == NULL)
+    if (Weights == nullptr)
     {
       Weights = new float[numProcs];
       for (np = 0; np < numProcs; np++)
@@ -128,7 +128,7 @@ void vtkWeightedRedistributePolyData::MakeSchedule(vtkPolyData* input, vtkCommSc
   int id;
   if (myId == 0)
   {
-    if (Weights == NULL)
+    if (Weights == nullptr)
     {
       // ... no weights have been set so this is a uniform balance
       //  case ...
@@ -261,8 +261,8 @@ void vtkWeightedRedistributePolyData::MakeSchedule(vtkPolyData* input, vtkCommSc
     int** rsSendTo[NUM_CELL_TYPES];
     vtkIdType** rsSendNum[NUM_CELL_TYPES];
 
-    int* sendToTemp = 0;
-    vtkIdType* sendNumTemp = 0;
+    int* sendToTemp = nullptr;
+    vtkIdType* sendNumTemp = nullptr;
     sendToTemp = new int[numProcs];
     sendNumTemp = new vtkIdType[numProcs];
 
@@ -393,7 +393,7 @@ void vtkWeightedRedistributePolyData::MakeSchedule(vtkPolyData* input, vtkCommSc
       {
         maxCntSend += rsCntSend[type][id];
       }
-      int* tempSend = NULL;
+      int* tempSend = nullptr;
       if (maxCntSend > 0)
       {
         tempSend = new int[maxCntSend];
@@ -463,7 +463,7 @@ void vtkWeightedRedistributePolyData::MakeSchedule(vtkPolyData* input, vtkCommSc
       }   // end loop over number of processors processors sent to
 
       // ... clean up ...
-      if (tempSend != NULL)
+      if (tempSend != nullptr)
       {
         delete[] tempSend;
       }

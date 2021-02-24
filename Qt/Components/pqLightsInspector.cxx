@@ -85,7 +85,7 @@ public:
       this->rview->GetProperty("AdditionalLights")->RemoveObserver(this->observerTag);
     }
     QLayoutItem* child;
-    while ((child = this->Ui.verticalLayout_2->takeAt(0)) != 0)
+    while ((child = this->Ui.verticalLayout_2->takeAt(0)) != nullptr)
     {
       if (child->widget())
       {
@@ -122,7 +122,7 @@ public:
       delete child->widget();
       delete child;
     }
-    while ((child = this->Ui.verticalLayout_2->takeAt(0)) != 0)
+    while ((child = this->Ui.verticalLayout_2->takeAt(0)) != nullptr)
     {
       if (child->widget())
       {
@@ -262,9 +262,7 @@ pqLightsInspector::pqLightsInspector(
 }
 
 //-----------------------------------------------------------------------------
-pqLightsInspector::~pqLightsInspector()
-{
-}
+pqLightsInspector::~pqLightsInspector() = default;
 
 //-----------------------------------------------------------------------------
 void pqLightsInspector::setActiveView(pqView*)

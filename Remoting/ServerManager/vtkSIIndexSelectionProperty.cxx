@@ -28,17 +28,13 @@
 #include <sstream>
 #include <string>
 
-vtkStandardNewMacro(vtkSIIndexSelectionProperty)
-
-  //----------------------------------------------------------------------------
-  vtkSIIndexSelectionProperty::vtkSIIndexSelectionProperty()
-{
-}
+vtkStandardNewMacro(vtkSIIndexSelectionProperty);
 
 //----------------------------------------------------------------------------
-vtkSIIndexSelectionProperty::~vtkSIIndexSelectionProperty()
-{
-}
+vtkSIIndexSelectionProperty::vtkSIIndexSelectionProperty() = default;
+
+//----------------------------------------------------------------------------
+vtkSIIndexSelectionProperty::~vtkSIIndexSelectionProperty() = default;
 
 //----------------------------------------------------------------------------
 void vtkSIIndexSelectionProperty::PrintSelf(ostream& os, vtkIndent indent)
@@ -65,7 +61,7 @@ bool vtkSIIndexSelectionProperty::Pull(vtkSMMessage* msgToFill)
 
   // Get the ID for the reader.
   vtkObjectBase* reader = this->GetVTKObject();
-  if (reader != NULL)
+  if (reader != nullptr)
   {
     std::ostringstream aname;
     aname << "GetNumberOf" << this->Command << "s" << ends;
@@ -105,7 +101,7 @@ bool vtkSIIndexSelectionProperty::Pull(vtkSMMessage* msgToFill)
       }
       if (!pname)
       {
-        // Initializing a std::string to NULL does not have a defined
+        // Initializing a std::string to nullptr does not have a defined
         // behavior.
         break;
       }

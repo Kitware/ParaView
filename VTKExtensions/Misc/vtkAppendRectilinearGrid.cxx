@@ -26,14 +26,10 @@
 
 vtkStandardNewMacro(vtkAppendRectilinearGrid);
 //-----------------------------------------------------------------------------
-vtkAppendRectilinearGrid::vtkAppendRectilinearGrid()
-{
-}
+vtkAppendRectilinearGrid::vtkAppendRectilinearGrid() = default;
 
 //-----------------------------------------------------------------------------
-vtkAppendRectilinearGrid::~vtkAppendRectilinearGrid()
-{
-}
+vtkAppendRectilinearGrid::~vtkAppendRectilinearGrid() = default;
 
 //-----------------------------------------------------------------------------
 int vtkAppendRectilinearGrid::FillInputPortInformation(int, vtkInformation* info)

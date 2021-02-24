@@ -52,7 +52,7 @@ vtkStandardNewMacro(vtkSMTooltipSelectionPipeline);
 
 //----------------------------------------------------------------------------
 vtkSMTooltipSelectionPipeline::vtkSMTooltipSelectionPipeline()
-  : MoveSelectionToClient(NULL)
+  : MoveSelectionToClient(nullptr)
 {
   this->PreviousSelectionId = 0;
   this->SelectionFound = false;
@@ -71,7 +71,7 @@ void vtkSMTooltipSelectionPipeline::ClearCache()
   if (this->MoveSelectionToClient)
   {
     this->MoveSelectionToClient->Delete();
-    this->MoveSelectionToClient = NULL;
+    this->MoveSelectionToClient = nullptr;
   }
   this->Superclass::ClearCache();
 }
@@ -355,7 +355,7 @@ bool vtkSMTooltipSelectionPipeline::CanDisplayTooltip(bool& showTooltip)
 vtkSMTooltipSelectionPipeline* vtkSMTooltipSelectionPipeline::GetInstance()
 {
   static vtkSmartPointer<vtkSMTooltipSelectionPipeline> Instance;
-  if (Instance.GetPointer() == NULL)
+  if (Instance.GetPointer() == nullptr)
   {
     vtkSMTooltipSelectionPipeline* pipeline = vtkSMTooltipSelectionPipeline::New();
     Instance = pipeline;
@@ -407,7 +407,7 @@ vtkDataSet* vtkSMTooltipSelectionPipeline::FindDataSet(
     it->Delete();
     if (!compositeFound)
     {
-      return NULL;
+      return nullptr;
     }
   }
   return ds;

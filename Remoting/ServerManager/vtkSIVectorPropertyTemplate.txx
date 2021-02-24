@@ -147,8 +147,9 @@ bool vtkSIVectorPropertyTemplate<T, force_idtype>::Push(vtkSMMessage* message, i
 
   const Variant* variant = &prop->value();
   std::vector<T> values = VariantToVector<T, force_idtype>(*variant);
-  return (values.size() > 0) ? this->Push(&values[0], static_cast<int>(values.size()))
-                             : this->Push(static_cast<T*>(NULL), static_cast<int>(values.size()));
+  return (values.size() > 0)
+    ? this->Push(&values[0], static_cast<int>(values.size()))
+    : this->Push(static_cast<T*>(nullptr), static_cast<int>(values.size()));
 }
 
 //---------------------------------------------------------------------------

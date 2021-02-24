@@ -143,7 +143,7 @@ vtkPVPluginsInformation::~vtkPVPluginsInformation()
 {
   delete this->Internals;
   this->Internals = nullptr;
-  this->SetSearchPaths(0);
+  this->SetSearchPaths(nullptr);
 }
 
 //----------------------------------------------------------------------------

@@ -46,7 +46,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 pqPropertyWidget::pqPropertyWidget(vtkSMProxy* smProxy, QWidget* parentObject)
   : QWidget(parentObject)
   , Proxy(smProxy)
-  , Property(0)
+  , Property(nullptr)
   , ChangeAvailableAsChangeFinished(true)
   , Selected(false)
   , Timer(new pqTimer())

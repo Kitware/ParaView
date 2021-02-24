@@ -28,9 +28,7 @@ vtkSMPWriterProxy::vtkSMPWriterProxy()
 }
 
 //-----------------------------------------------------------------------------
-vtkSMPWriterProxy::~vtkSMPWriterProxy()
-{
-}
+vtkSMPWriterProxy::~vtkSMPWriterProxy() = default;
 
 //-----------------------------------------------------------------------------
 void vtkSMPWriterProxy::PrintSelf(ostream& os, vtkIndent indent)

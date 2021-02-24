@@ -70,7 +70,7 @@ std::string ListAttachedMonitors()
   return std::string("Monitor detection only implemented for MS Windows.");
 #else  // _WIN32
   std::ostringstream str;
-  EnumDisplayMonitors(NULL, NULL, listMonitorsCallback, reinterpret_cast<LPARAM>(&str));
+  EnumDisplayMonitors(nullptr, nullptr, listMonitorsCallback, reinterpret_cast<LPARAM>(&str));
   return str.str();
 #endif // _WIN32
 }
@@ -132,7 +132,7 @@ const std::string& vtkInitializationHelper::GetApplicationName()
 //----------------------------------------------------------------------------
 void vtkInitializationHelper::Initialize(const char* executable, int type)
 {
-  vtkInitializationHelper::Initialize(executable, type, NULL);
+  vtkInitializationHelper::Initialize(executable, type, nullptr);
 }
 
 //----------------------------------------------------------------------------

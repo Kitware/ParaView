@@ -149,7 +149,7 @@ void vtkVRGrabTransformStyle::PrintSelf(ostream& os, vtkIndent indent)
 //   I would like to get an explanation so we know if we can do the same here.
 vtkCamera* vtkVRGrabTransformStyle::GetCamera()
 {
-  vtkCamera* camera = NULL;
+  vtkCamera* camera = nullptr;
   pqActiveObjects& activeObjs = pqActiveObjects::instance();
 
   /* Alert!  The following conditional uses a lazy assignment/evaluation -- the "=" is not a bug
@@ -183,7 +183,7 @@ void vtkVRGrabTransformStyle::HandleButton(const vtkVREvent& event)
   std::string role = this->GetButtonRole(event.name);
   if (role == "Navigate world")
   {
-    vtkCamera* camera = NULL;
+    vtkCamera* camera = nullptr;
     this->EnableNavigate = event.data.button.state;
     if (!this->EnableNavigate)
     {
@@ -212,7 +212,7 @@ void vtkVRGrabTransformStyle::HandleTracker(const vtkVREvent& event)
 {
   static double lastspeed = -1.0;
 
-  vtkCamera* camera = NULL;
+  vtkCamera* camera = nullptr;
   std::string role = this->GetTrackerRole(event.name);
   if (role != "Tracker")
     return;

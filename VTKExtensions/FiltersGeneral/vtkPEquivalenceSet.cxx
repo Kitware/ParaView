@@ -19,13 +19,9 @@
 
 vtkStandardNewMacro(vtkPEquivalenceSet);
 
-vtkPEquivalenceSet::vtkPEquivalenceSet()
-{
-}
+vtkPEquivalenceSet::vtkPEquivalenceSet() = default;
 
-vtkPEquivalenceSet::~vtkPEquivalenceSet()
-{
-}
+vtkPEquivalenceSet::~vtkPEquivalenceSet() = default;
 
 void vtkPEquivalenceSet::PrintSelf(ostream& os, vtkIndent indent)
 {

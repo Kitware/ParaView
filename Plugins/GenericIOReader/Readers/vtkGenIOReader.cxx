@@ -134,18 +134,18 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "LANL/utils/timer.h"
 */
 
-vtkStandardNewMacro(vtkGenIOReader)
+vtkStandardNewMacro(vtkGenIOReader);
 
-  vtkGenIOReader::vtkGenIOReader()
+vtkGenIOReader::vtkGenIOReader()
 {
-  this->Controller = NULL;
+  this->Controller = nullptr;
   this->Controller = vtkMultiProcessController::GetGlobalController();
 
   this->SetNumberOfInputPorts(0);
   this->SetNumberOfOutputPorts(1);
 
   // data
-  gioReader = NULL;
+  gioReader = nullptr;
   numDataRanks = 0;
   numVars = 0;
   metaDataBuilt = false;
@@ -187,11 +187,11 @@ vtkGenIOReader::~vtkGenIOReader()
   {
     gioReader->close();
     delete gioReader;
-    gioReader = NULL;
+    gioReader = nullptr;
   }
 
   CellDataArraySelection->Delete();
-  CellDataArraySelection = 0;
+  CellDataArraySelection = nullptr;
 }
 
 //
@@ -563,7 +563,7 @@ int vtkGenIOReader::RequestInformation(vtkInformation* /*rqst*/,
   outInfo->Set(CAN_HANDLE_PIECE_REQUEST(), 1);
 
   fullClock.start();
-  if (gioReader != NULL)
+  if (gioReader != nullptr)
   {
     if (currentFilename != dataFilename)
     {
@@ -571,7 +571,7 @@ int vtkGenIOReader::RequestInformation(vtkInformation* /*rqst*/,
              << "\n";
       gioReader->close();
       delete gioReader;
-      gioReader = NULL;
+      gioReader = nullptr;
 
       metaDataBuilt = false; // signal to re-build metadata
       unsigned Method = lanl::gio::GenericIO::FileIOPOSIX;
@@ -581,7 +581,7 @@ int vtkGenIOReader::RequestInformation(vtkInformation* /*rqst*/,
       msgLog << "Opening ... \n";
 
       currentFilename = dataFilename;
-      msgLog << "gioReader != NULL\n";
+      msgLog << "gioReader != nullptr\n";
     }
   }
   else
@@ -594,10 +594,10 @@ int vtkGenIOReader::RequestInformation(vtkInformation* /*rqst*/,
     msgLog << "Opening . .. .\n";
 
     currentFilename = dataFilename;
-    msgLog << "gioReader == NULL\n";
+    msgLog << "gioReader == nullptr\n";
   }
 
-  assert("post: Internal GenericIO reader should not be NULL!" && (this->gioReader != NULL));
+  assert("post: Internal GenericIO reader should not be nullptr!" && (this->gioReader != nullptr));
 
   if (!metaDataBuilt)
   {

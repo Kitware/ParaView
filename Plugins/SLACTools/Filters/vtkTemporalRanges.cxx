@@ -100,9 +100,7 @@ vtkTemporalRanges::vtkTemporalRanges()
   this->CurrentTimeIndex = 0;
 }
 
-vtkTemporalRanges::~vtkTemporalRanges()
-{
-}
+vtkTemporalRanges::~vtkTemporalRanges() = default;
 
 void vtkTemporalRanges::PrintSelf(ostream& os, vtkIndent indent)
 {
@@ -269,7 +267,7 @@ void vtkTemporalRanges::AccumulateArray(vtkDataArray* field, vtkTable* output)
 {
   int numComponents = field->GetNumberOfComponents();
   vtkIdType numTuples = field->GetNumberOfTuples();
-  vtkDoubleArray* magnitudeColumn = NULL;
+  vtkDoubleArray* magnitudeColumn = nullptr;
   std::vector<vtkDoubleArray*> componentColumns(numComponents);
   VTK_CREATE(vtkDoubleArray, magnitudeAccumulate);
   std::vector<vtkSmartPointer<vtkDoubleArray> > componentAccumulate(numComponents);

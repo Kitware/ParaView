@@ -38,9 +38,7 @@ vtkSMPipelineState::vtkSMPipelineState()
 }
 
 //----------------------------------------------------------------------------
-vtkSMPipelineState::~vtkSMPipelineState()
-{
-}
+vtkSMPipelineState::~vtkSMPipelineState() = default;
 
 //----------------------------------------------------------------------------
 const vtkSMMessage* vtkSMPipelineState::GetFullState()

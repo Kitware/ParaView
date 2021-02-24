@@ -89,7 +89,7 @@ pqTextureSelectorPropertyWidget::pqTextureSelectorPropertyWidget(
   // Valid only for a RepresentationProxy
   vtkPVXMLElement* hints = smProperty->GetHints()
     ? smProperty->GetHints()->FindNestedElementByName("TextureSelectorWidget")
-    : NULL;
+    : nullptr;
   if (hints)
   {
     bool checkTCoords = strcmp(hints->GetAttributeOrDefault("check_tcoords", ""), "1") == 0;

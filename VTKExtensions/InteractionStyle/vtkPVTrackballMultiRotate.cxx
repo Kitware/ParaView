@@ -38,12 +38,12 @@ vtkPVTrackballMultiRotate::vtkPVTrackballMultiRotate()
 {
   this->RotateManipulator = vtkPVTrackballRotate::New();
   this->RollManipulator = vtkPVTrackballRoll::New();
-  this->CurrentManipulator = NULL;
+  this->CurrentManipulator = nullptr;
 }
 
 vtkPVTrackballMultiRotate::~vtkPVTrackballMultiRotate()
 {
-  this->CurrentManipulator = NULL;
+  this->CurrentManipulator = nullptr;
   this->RotateManipulator->Delete();
   this->RollManipulator->Delete();
 }

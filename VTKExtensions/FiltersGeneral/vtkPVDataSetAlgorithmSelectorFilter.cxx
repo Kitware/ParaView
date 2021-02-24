@@ -78,7 +78,7 @@ vtkPVDataSetAlgorithmSelectorFilter::~vtkPVDataSetAlgorithmSelectorFilter()
   this->SetActiveFilter(-1);
   this->InternalProgressObserver->Delete();
   delete this->Internal;
-  this->Internal = NULL;
+  this->Internal = nullptr;
 }
 
 //----------------------------------------------------------------------------
@@ -218,7 +218,7 @@ vtkAlgorithm* vtkPVDataSetAlgorithmSelectorFilter::GetFilter(int index)
   {
     return this->Internal->RegisteredFilters.at(index);
   }
-  return NULL;
+  return nullptr;
 }
 
 //----------------------------------------------------------------------------
@@ -251,7 +251,7 @@ vtkAlgorithm* vtkPVDataSetAlgorithmSelectorFilter::SetActiveFilter(int index)
       this->Internal->ActiveFilter = -1;
     }
   }
-  return NULL;
+  return nullptr;
 }
 
 //----------------------------------------------------------------------------

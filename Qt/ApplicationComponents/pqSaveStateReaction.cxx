@@ -70,7 +70,7 @@ pqSaveStateReaction::pqSaveStateReaction(QAction* parentObject)
 void pqSaveStateReaction::updateEnableState()
 {
   pqActiveObjects* activeObjects = &pqActiveObjects::instance();
-  this->parentAction()->setEnabled(activeObjects->activeServer() != NULL);
+  this->parentAction()->setEnabled(activeObjects->activeServer() != nullptr);
 }
 
 //-----------------------------------------------------------------------------
@@ -82,7 +82,7 @@ bool pqSaveStateReaction::saveState()
   QString fileExt = tr("ParaView state file (*.pvsm);;All files (*)");
 #endif
   pqFileDialog fileDialog(
-    NULL, pqCoreUtilities::mainWidget(), tr("Save State File"), QString(), fileExt);
+    nullptr, pqCoreUtilities::mainWidget(), tr("Save State File"), QString(), fileExt);
 
   fileDialog.setObjectName("FileSaveServerStateDialog");
   fileDialog.setFileMode(pqFileDialog::AnyFile);
@@ -127,7 +127,7 @@ bool pqSaveStateReaction::savePythonState(const QString& filename)
 
   vtkSmartPointer<vtkSMProxy> options;
   options.TakeReference(pxm->NewProxy("pythontracing", "PythonStateOptions"));
-  if (options.GetPointer() == NULL)
+  if (options.GetPointer() == nullptr)
   {
     return false;
   }

@@ -22,7 +22,7 @@
 
 .fedora33:
     extends: .linux
-    image: "kitware/paraview:ci-fedora33-20210211"
+    image: "kitware/paraview:ci-fedora33-20210221"
 
 .fedora31_icc:
     extends: .linux
@@ -89,6 +89,15 @@
     variables:
         CMAKE_CONFIGURATION: fedora33_shared_mpi_python_qt
         CMAKE_BUILD_TYPE: Debug
+
+.fedora33_tidy:
+    extends:
+        - .fedora33
+        - .fedora_mpich_addon
+
+    variables:
+        CMAKE_CONFIGURATION: fedora33_shared_mpi_python_qt_tidy
+        CTEST_NO_WARNINGS_ALLOWED: 1
 
 .linux_builder_tags:
     tags:

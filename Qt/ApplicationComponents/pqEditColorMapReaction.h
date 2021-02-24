@@ -58,7 +58,7 @@ public:
   /**
   * Edit active representation's color map (or solid color).
   */
-  static void editColorMap(pqPipelineRepresentation* repr = NULL);
+  static void editColorMap(pqPipelineRepresentation* repr = nullptr);
 
 public Q_SLOTS:
   /**

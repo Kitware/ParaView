@@ -53,9 +53,7 @@ pqCatalystConnectReaction::pqCatalystConnectReaction(QAction* parentObject)
 }
 
 //-----------------------------------------------------------------------------
-pqCatalystConnectReaction::~pqCatalystConnectReaction()
-{
-}
+pqCatalystConnectReaction::~pqCatalystConnectReaction() = default;
 
 //-----------------------------------------------------------------------------
 bool pqCatalystConnectReaction::connect()

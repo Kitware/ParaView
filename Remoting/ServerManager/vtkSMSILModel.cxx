@@ -75,9 +75,9 @@ vtkStandardNewMacro(vtkSMSILModel);
 //-----------------------------------------------------------------------------
 vtkSMSILModel::vtkSMSILModel()
 {
-  this->SIL = 0;
-  this->Property = 0;
-  this->Proxy = 0;
+  this->SIL = nullptr;
+  this->Property = nullptr;
+  this->Proxy = nullptr;
   this->PropertyObserver = vtkMakeMemberFunctionCommand(*this, &vtkSMSILModel::OnPropertyModified);
   this->DomainObserver = vtkMakeMemberFunctionCommand(*this, &vtkSMSILModel::OnDomainModified);
   this->Internals = new vtkInternals();
@@ -87,16 +87,16 @@ vtkSMSILModel::vtkSMSILModel()
 //-----------------------------------------------------------------------------
 vtkSMSILModel::~vtkSMSILModel()
 {
-  this->Initialize(0);
-  this->Initialize(0, 0);
+  this->Initialize(nullptr);
+  this->Initialize(nullptr, nullptr);
 
   vtkMemberFunctionCommand<vtkSMSILModel>::SafeDownCast(this->PropertyObserver)->Reset();
   this->PropertyObserver->Delete();
-  this->PropertyObserver = 0;
+  this->PropertyObserver = nullptr;
 
   vtkMemberFunctionCommand<vtkSMSILModel>::SafeDownCast(this->DomainObserver)->Reset();
   this->DomainObserver->Delete();
-  this->DomainObserver = 0;
+  this->DomainObserver = nullptr;
   delete this->Internals;
 }
 
@@ -136,7 +136,7 @@ void vtkSMSILModel::SetSIL(vtkGraph* sil)
 void vtkSMSILModel::Initialize(vtkGraph* sil)
 {
   // unset the proxy and property, if any.
-  this->Initialize(0, 0);
+  this->Initialize(nullptr, nullptr);
   this->SetSIL(sil);
 }
 
@@ -254,7 +254,7 @@ const char* vtkSMSILModel::GetName(vtkIdType vertex)
   }
 
   vtkErrorMacro("Invalid index: " << vertex);
-  return 0;
+  return nullptr;
 }
 
 //-----------------------------------------------------------------------------

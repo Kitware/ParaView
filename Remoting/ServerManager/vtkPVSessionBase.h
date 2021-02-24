@@ -167,7 +167,7 @@ public:
   virtual void RegisterSIObject(vtkSMMessage* msg);
 
   /**
-   * Return a vtkSMRemoteObject given its global id if any otherwise return NULL;
+   * Return a vtkSMRemoteObject given its global id if any otherwise return nullptr;
    */
   vtkObject* GetRemoteObject(vtkTypeUInt32 globalid);
 

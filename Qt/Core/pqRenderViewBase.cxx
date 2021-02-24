@@ -82,8 +82,8 @@ public:
   bool IsInteractiveDelayActive;
   double TimeLeftBeforeFullResolution;
 
-  pqInternal() {}
-  ~pqInternal() {}
+  pqInternal() = default;
+  ~pqInternal() = default;
 
   void writeToStatusBar(const char* txt)
   {
@@ -128,7 +128,7 @@ public:
 
 //-----------------------------------------------------------------------------
 pqRenderViewBase::pqRenderViewBase(const QString& type, const QString& group, const QString& name,
-  vtkSMViewProxy* renViewProxy, pqServer* server, QObject* _parent /*=NULL*/)
+  vtkSMViewProxy* renViewProxy, pqServer* server, QObject* _parent /*=nullptr*/)
   : Superclass(type, group, name, renViewProxy, server, _parent)
 {
   this->Internal = new pqRenderViewBase::pqInternal();
@@ -183,7 +183,7 @@ void pqRenderViewBase::initializeAfterObjectsCreated()
   // Attach Qt Signal to VTK interactor Delay event
   vtkSMRenderViewProxy* renderViewProxy;
   renderViewProxy = vtkSMRenderViewProxy::SafeDownCast(this->getProxy());
-  if (renderViewProxy != NULL)
+  if (renderViewProxy != nullptr)
   {
     vtkSMViewProxyInteractorHelper* helper = renderViewProxy->GetInteractorHelper();
     assert(helper);

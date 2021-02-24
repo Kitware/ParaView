@@ -173,7 +173,8 @@ public:
         use_unchecked_modified_event, parentObject)
   {
   }
-  ~CConnectionType() override {}
+  ~CConnectionType() override = default;
+
 protected:
   void setServerManagerValue(bool vtkNotUsed(use_unchecked), const QVariant& value) override
   {
@@ -245,7 +246,7 @@ public:
   {
     this->IconSize = std::max(p->style()->pixelMetric(QStyle::PM_SmallIconSize), 16);
   }
-  ~MultiBlockInspectorModel() override {}
+  ~MultiBlockInspectorModel() override = default;
 
   void setRootLabel(const QString& str)
   {
@@ -463,7 +464,7 @@ public:
   {
   }
 
-  ~MultiBlockInspectorSelectionModel() override {}
+  ~MultiBlockInspectorSelectionModel() override = default;
 
   using Superclass::select;
 
@@ -828,9 +829,7 @@ pqMultiBlockInspectorWidget::pqMultiBlockInspectorWidget(
 }
 
 //-----------------------------------------------------------------------------
-pqMultiBlockInspectorWidget::~pqMultiBlockInspectorWidget()
-{
-}
+pqMultiBlockInspectorWidget::~pqMultiBlockInspectorWidget() = default;
 
 //-----------------------------------------------------------------------------
 void pqMultiBlockInspectorWidget::selected(pqOutputPort* port)

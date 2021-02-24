@@ -98,9 +98,7 @@ vtkThickenLayeredCells::vtkThickenLayeredCells()
 }
 
 //----------------------------------------------------------------------------
-vtkThickenLayeredCells::~vtkThickenLayeredCells()
-{
-}
+vtkThickenLayeredCells::~vtkThickenLayeredCells() = default;
 
 //----------------------------------------------------------------------------
 int vtkThickenLayeredCells::RequestData(vtkInformation* vtkNotUsed(request),

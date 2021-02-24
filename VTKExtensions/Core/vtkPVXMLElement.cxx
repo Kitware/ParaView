@@ -55,9 +55,9 @@ static bool vtkIsSpace(const std::string& str)
 //----------------------------------------------------------------------------
 vtkPVXMLElement::vtkPVXMLElement()
 {
-  this->Name = 0;
-  this->Id = 0;
-  this->Parent = 0;
+  this->Name = nullptr;
+  this->Id = nullptr;
+  this->Parent = nullptr;
 
   this->Internal = new vtkPVXMLElementInternals;
 }
@@ -65,8 +65,8 @@ vtkPVXMLElement::vtkPVXMLElement()
 //----------------------------------------------------------------------------
 vtkPVXMLElement::~vtkPVXMLElement()
 {
-  this->SetName(0);
-  this->SetId(0);
+  this->SetName(nullptr);
+  this->SetId(nullptr);
 
   delete this->Internal;
 }
@@ -352,7 +352,7 @@ vtkPVXMLElement* vtkPVXMLElement::GetNestedElement(unsigned int index)
   {
     return this->Internal->NestedElements[index];
   }
-  return 0;
+  return nullptr;
 }
 
 //----------------------------------------------------------------------------
@@ -374,7 +374,7 @@ vtkPVXMLElement* vtkPVXMLElement::FindNestedElement(const char* id)
       return this->Internal->NestedElements[i];
     }
   }
-  return 0;
+  return nullptr;
 }
 
 //----------------------------------------------------------------------------
@@ -390,7 +390,7 @@ vtkPVXMLElement* vtkPVXMLElement::FindNestedElementByName(const char* name)
       return (*iter);
     }
   }
-  return 0;
+  return nullptr;
 }
 
 //----------------------------------------------------------------------------
@@ -438,7 +438,7 @@ vtkPVXMLElement* vtkPVXMLElement::LookupElementUpScope(const char* id)
 
   // Find most closely nested occurrence of first qualifier.
   vtkPVXMLElement* curScope = this;
-  vtkPVXMLElement* start = 0;
+  vtkPVXMLElement* start = nullptr;
   while (curScope && !start)
   {
     start = curScope->FindNestedElement(name);
@@ -694,8 +694,8 @@ void vtkPVXMLElement::Merge(vtkPVXMLElement* element, const char* attributeName)
     for (iter2 = this->Internal->NestedElements.begin();
          iter2 != this->Internal->NestedElements.end(); ++iter2)
     {
-      const char* attr1 = attributeName ? this->GetAttribute(attributeName) : NULL;
-      const char* attr2 = attributeName ? element->GetAttribute(attributeName) : NULL;
+      const char* attr1 = attributeName ? this->GetAttribute(attributeName) : nullptr;
+      const char* attr2 = attributeName ? element->GetAttribute(attributeName) : nullptr;
       if (0 == strcmp((*iter)->Name, (*iter2)->Name) &&
         (!attributeName || (!attr1 || !attr2 || 0 == strcmp(attr1, attr2))))
       {

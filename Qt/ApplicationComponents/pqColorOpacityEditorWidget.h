@@ -215,7 +215,7 @@ public Q_SLOTS:
   /**
   * pick a preset.
   */
-  void choosePreset(const char* presetName = NULL);
+  void choosePreset(const char* presetName = nullptr);
 
   /**
   * save current transfer function as preset.

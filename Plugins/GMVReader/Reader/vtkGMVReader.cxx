@@ -85,10 +85,10 @@ void minmax(C* pointer, size_t len, C& min_out, C& max_out)
 template <class C>
 void cleanup(C** pointer)
 {
-  if ((*pointer) != (C*)NULL)
+  if ((*pointer) != (C*)nullptr)
   {
     free(*pointer);
-    *pointer = (C*)(NULL);
+    *pointer = (C*)(nullptr);
   }
 }
 
@@ -133,7 +133,7 @@ void cleanupAllData(void)
 //----------------------------------------------------------------------------
 vtkGMVReader::vtkGMVReader()
 {
-  this->FileName = NULL;
+  this->FileName = nullptr;
   this->FileNames = vtkStringArray::New();
   this->NumberOfTracersMap.clear();
   this->NumberOfPolygonsMap.clear();
@@ -149,21 +149,21 @@ vtkGMVReader::vtkGMVReader()
   this->NumberOfFieldComponents = 0;
   this->DecrementNodeIds = true; // node numbering starts at 1, in VTK at 0
 
-  this->Mesh = NULL;
-  this->FieldDataTmp = NULL;
+  this->Mesh = nullptr;
+  this->FieldDataTmp = nullptr;
   this->NumberOfNodes = 0;
   this->NumberOfCells = 0;
 
-  this->Tracers = NULL;
+  this->Tracers = nullptr;
   this->NumberOfTracers = 0;
   this->ImportTracers = 1;
 
-  this->Polygons = NULL;
+  this->Polygons = nullptr;
   this->NumberOfPolygons = 0;
   this->ImportPolygons = 0;
 
-  this->NodeDataInfo = NULL;
-  this->CellDataInfo = NULL;
+  this->NodeDataInfo = nullptr;
+  this->CellDataInfo = nullptr;
 
   this->PointDataArraySelection = vtkDataArraySelection::New();
   this->CellDataArraySelection = vtkDataArraySelection::New();
@@ -194,9 +194,9 @@ vtkGMVReader::~vtkGMVReader()
   if (this->FileNames)
   {
     this->FileNames->Delete();
-    this->FileNames = NULL;
+    this->FileNames = nullptr;
   }
-  this->SetFileName(0);
+  this->SetFileName(nullptr);
   this->NumberOfTracersMap.clear();
   this->NumberOfPolygonsMap.clear();
 
@@ -223,7 +223,7 @@ vtkGMVReader::~vtkGMVReader()
     this->Polygons->Delete();
 
 #if VTK_MODULE_ENABLE_VTK_ParallelCore
-  this->SetController(NULL);
+  this->SetController(nullptr);
 #endif
 }
 
@@ -284,7 +284,7 @@ int vtkGMVReader::RequestData(vtkInformation* vtkNotUsed(request),
   int ierr = GMVRead::gmvread_open(this->FileName);
   if (ierr > 0)
   {
-    if (GMVRead::gmv_data.errormsg != NULL)
+    if (GMVRead::gmv_data.errormsg != nullptr)
     {
       vtkErrorMacro("" << GMVRead::gmv_data.errormsg);
     }
@@ -299,33 +299,33 @@ int vtkGMVReader::RequestData(vtkInformation* vtkNotUsed(request),
   if (ierr != -1)
     this->BinaryFile = 1;
 
-  pd = NULL;
+  pd = nullptr;
   keepParsing = true;
   firstPolygonParsed = false;
-  polygonPoints = NULL;
-  polygonCells = NULL;
-  polygonMaterials = NULL;
+  polygonPoints = nullptr;
+  polygonCells = nullptr;
+  polygonMaterials = nullptr;
   polygonMaterialPosInDataArray = -1;
 
   if (this->Mesh)
   {
     this->Mesh->Delete();
-    this->Mesh = NULL;
+    this->Mesh = nullptr;
   }
   if (this->FieldDataTmp)
   {
     this->FieldDataTmp->Delete();
-    this->FieldDataTmp = NULL;
+    this->FieldDataTmp = nullptr;
   }
   if (this->Tracers)
   {
     this->Tracers->Delete();
-    this->Tracers = NULL;
+    this->Tracers = nullptr;
   }
   if (this->Polygons)
   {
     this->Polygons->Delete();
-    this->Polygons = NULL;
+    this->Polygons = nullptr;
   }
 
   while (keepParsing)
@@ -334,7 +334,7 @@ int vtkGMVReader::RequestData(vtkInformation* vtkNotUsed(request),
     switch (GMVRead::gmv_data.keyword)
     {
       case (GMVERROR):
-        if (GMVRead::gmv_data.errormsg != NULL)
+        if (GMVRead::gmv_data.errormsg != nullptr)
         {
           vtkErrorMacro("" << GMVRead::gmv_data.errormsg);
         }
@@ -451,7 +451,7 @@ int vtkGMVReader::RequestData(vtkInformation* vtkNotUsed(request),
             // An i/o error may have occurred
             if (GMVRead::gmv_meshdata.intype == GMVERROR)
             {
-              if (GMVRead::gmv_data.errormsg != NULL)
+              if (GMVRead::gmv_data.errormsg != nullptr)
               {
                 vtkErrorMacro("" << GMVRead::gmv_data.errormsg);
               }
@@ -515,9 +515,9 @@ int vtkGMVReader::RequestData(vtkInformation* vtkNotUsed(request),
               // Catch case that only generic cells are present. Then cellnnode is not set.
               numNodes = 0;
               numFaces = 0;
-              if (GMVRead::gmv_meshdata.cellnnode != NULL)
+              if (GMVRead::gmv_meshdata.cellnnode != nullptr)
                 numNodes = GMVRead::gmv_meshdata.cellnnode[i];
-              if (GMVRead::gmv_meshdata.celltoface != NULL)
+              if (GMVRead::gmv_meshdata.celltoface != nullptr)
                 numFaces =
                   GMVRead::gmv_meshdata.celltoface[i + 1] - GMVRead::gmv_meshdata.celltoface[i];
 
@@ -686,7 +686,7 @@ int vtkGMVReader::RequestData(vtkInformation* vtkNotUsed(request),
 
                   ugrid->InsertNextCell(VTK_POLYGON, numPts, pointIds);
                   delete[] pointIds;
-                  pointIds = NULL;
+                  pointIds = nullptr;
                 }
 
                 else // 3D cell
@@ -699,8 +699,8 @@ int vtkGMVReader::RequestData(vtkInformation* vtkNotUsed(request),
                   std::set<int> auxIds;
                   std::set<int>::iterator auxIt;
 
-                  vtkIdType* face = NULL;
-                  vtkCellArray* faces = NULL;
+                  vtkIdType* face = nullptr;
+                  vtkCellArray* faces = nullptr;
                   faces = vtkCellArray::New();
                   for (unsigned long j = 0; j < numFaces; j++)
                   {
@@ -721,7 +721,7 @@ int vtkGMVReader::RequestData(vtkInformation* vtkNotUsed(request),
                     }
                     faces->InsertNextCell(numVerts, face);
                     delete[] face;
-                    face = NULL;
+                    face = nullptr;
                   }
 
                   // number of unique vertices of generic element i
@@ -736,9 +736,9 @@ int vtkGMVReader::RequestData(vtkInformation* vtkNotUsed(request),
                   ugrid->InsertNextCell(VTK_POLYHEDRON, numPts, pointIds, faces->GetNumberOfCells(),
                     faceData->GetPointer(0));
                   delete[] pointIds;
-                  pointIds = NULL;
+                  pointIds = nullptr;
                   faces->Delete();
-                  faces = NULL;
+                  faces = nullptr;
                 }
               }
               // Unknown/no handler yet
@@ -1986,7 +1986,7 @@ int vtkGMVReader::RequestData(vtkInformation* vtkNotUsed(request),
       newData->Delete();
     }
     this->FieldDataTmp->Delete();
-    this->FieldDataTmp = NULL;
+    this->FieldDataTmp = nullptr;
   }
 
   this->UpdateProgress(1.0);
@@ -2014,7 +2014,7 @@ int vtkGMVReader::RequestInformation(vtkInformation* vtkNotUsed(request),
   vtkInformation* outInfo = outputVector->GetInformationObject(0);
   if (ierr > 0)
   {
-    if (GMVRead::gmv_data.errormsg != NULL)
+    if (GMVRead::gmv_data.errormsg != nullptr)
     {
       vtkErrorMacro("" << GMVRead::gmv_data.errormsg);
     }
@@ -2046,7 +2046,7 @@ int vtkGMVReader::RequestInformation(vtkInformation* vtkNotUsed(request),
     switch (GMVRead::gmv_data.keyword)
     {
       case (GMVERROR):
-        if (GMVRead::gmv_data.errormsg != NULL)
+        if (GMVRead::gmv_data.errormsg != nullptr)
         {
           vtkErrorMacro("" << GMVRead::gmv_data.errormsg);
         }
@@ -2082,7 +2082,7 @@ int vtkGMVReader::RequestInformation(vtkInformation* vtkNotUsed(request),
         // An i/o error may have occurred
         if (GMVRead::gmv_meshdata.intype == GMVERROR)
         {
-          if (GMVRead::gmv_data.errormsg != NULL)
+          if (GMVRead::gmv_data.errormsg != nullptr)
           {
             vtkErrorMacro("" << GMVRead::gmv_data.errormsg);
           }
@@ -2476,7 +2476,7 @@ int vtkGMVReader::CanReadFile(const char* name)
   }
 
   gmvin = fopen(name, "r");
-  if (gmvin == NULL)
+  if (gmvin == nullptr)
   {
     // Cannot open file
     fclose(gmvin);
@@ -2582,7 +2582,7 @@ int vtkGMVReader::GetNumberOfPointArrays()
 const char* vtkGMVReader::GetPointArrayName(int index)
 {
   if (index >= (int)this->NumberOfNodeComponents || index < 0)
-    return NULL;
+    return nullptr;
   else
     return this->PointDataArraySelection->GetArrayName(index);
 }
@@ -2624,7 +2624,7 @@ int vtkGMVReader::GetNumberOfCellArrays()
 const char* vtkGMVReader::GetCellArrayName(int index)
 {
   if (index >= (int)this->NumberOfCellComponents || index < 0)
-    return NULL;
+    return nullptr;
   else
     return this->CellDataArraySelection->GetArrayName(index);
 }
@@ -2666,7 +2666,7 @@ int vtkGMVReader::GetNumberOfFieldArrays()
 const char* vtkGMVReader::GetFieldArrayName(int index)
 {
   if (index >= (int)this->NumberOfFieldComponents || index < 0)
-    return NULL;
+    return nullptr;
   else
     return this->FieldDataArraySelection->GetArrayName(index);
 }

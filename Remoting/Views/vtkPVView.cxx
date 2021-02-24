@@ -128,7 +128,7 @@ protected:
     this->Superclass::SetUseOffScreenBuffers(true);
     this->Superclass::SetShowWindow(false);
   }
-  ~vtkOffscreenOpenGLRenderWindow()
+  ~vtkOffscreenOpenGLRenderWindow() override
   {
     // have to finalize here while GetState() will use this classes
     // vtable. In parent destuctors GetState will return a different

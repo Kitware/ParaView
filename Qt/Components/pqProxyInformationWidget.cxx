@@ -105,7 +105,7 @@ public:
 //-----------------------------------------------------------------------------
 pqProxyInformationWidget::pqProxyInformationWidget(QWidget* p)
   : QWidget(p)
-  , OutputPort(NULL)
+  , OutputPort(nullptr)
 {
   this->VTKConnect = vtkEventQtSlotConnect::New();
   this->Ui = new pqUi(this);
@@ -183,8 +183,8 @@ void pqProxyInformationWidget::updateInformation()
   this->Ui->path->setToolTip(tr("NA"));
   this->Ui->path->setStatusTip(tr("NA"));
 
-  vtkPVDataInformation* dataInformation = NULL;
-  pqPipelineSource* source = NULL;
+  vtkPVDataInformation* dataInformation = nullptr;
+  pqPipelineSource* source = nullptr;
   vtkDataAssembly* assembly = nullptr;
   if (this->OutputPort)
   {
@@ -199,7 +199,7 @@ void pqProxyInformationWidget::updateInformation()
   if (!source || !dataInformation)
   {
     vtkVLogF(PARAVIEW_LOG_APPLICATION_VERBOSITY(), "update-information-panel (nullptr)");
-    this->fillDataInformation(0);
+    this->fillDataInformation(nullptr);
     return;
   }
 

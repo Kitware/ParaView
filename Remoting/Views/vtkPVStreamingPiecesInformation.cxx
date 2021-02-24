@@ -39,7 +39,7 @@ vtkPVStreamingPiecesInformation::vtkPVStreamingPiecesInformation()
 vtkPVStreamingPiecesInformation::~vtkPVStreamingPiecesInformation()
 {
   delete this->Internals;
-  this->Internals = NULL;
+  this->Internals = nullptr;
 }
 
 //----------------------------------------------------------------------------

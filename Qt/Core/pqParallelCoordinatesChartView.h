@@ -51,7 +51,7 @@ public:
   static QString chartViewType() { return "ParallelCoordinatesChartView"; }
 
   pqParallelCoordinatesChartView(const QString& group, const QString& name,
-    vtkSMContextViewProxy* viewModule, pqServer* server, QObject* parent = NULL);
+    vtkSMContextViewProxy* viewModule, pqServer* server, QObject* parent = nullptr);
   ~pqParallelCoordinatesChartView() override;
 
 private:

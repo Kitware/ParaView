@@ -37,13 +37,13 @@ struct vtkSMProxyLinkInternals
     LinkedProxy(vtkSMProxy* proxy, int updateDir)
       : Proxy(proxy)
       , UpdateDirection(updateDir)
-      , Observer(0){};
+      , Observer(nullptr){};
     ~LinkedProxy()
     {
       if (this->Observer && this->Proxy.GetPointer())
       {
         this->Proxy.GetPointer()->RemoveObserver(Observer);
-        this->Observer = 0;
+        this->Observer = nullptr;
       }
     }
     vtkSmartPointer<vtkSMProxy> Proxy;
@@ -166,7 +166,7 @@ vtkSMProxy* vtkSMProxyLink::GetLinkedProxy(int index)
   }
   if (iter == this->Internals->LinkedProxies.end())
   {
-    return NULL;
+    return nullptr;
   }
   return iter->Proxy;
 }
@@ -412,7 +412,7 @@ void vtkSMProxyLink::LoadState(const vtkSMMessage* msg, vtkSMProxyLocator* locat
 //-----------------------------------------------------------------------------
 void vtkSMProxyLink::UpdateState()
 {
-  if (this->Session == NULL)
+  if (this->Session == nullptr)
   {
     return;
   }

@@ -56,12 +56,12 @@ void fv_coprocessorfinalize()
   if (g_coprocessor)
   {
     g_coprocessor->Delete();
-    g_coprocessor = NULL;
+    g_coprocessor = nullptr;
   }
   if (g_coprocessorData)
   {
     g_coprocessorData->Delete();
-    g_coprocessorData = NULL;
+    g_coprocessorData = nullptr;
   }
 }
 } // anonymous namespace
@@ -116,7 +116,7 @@ void fv_create_grid_(int* dim, double* lonCoord, double* latCoord, double* levCo
   {
     vtkGenericWarningMacro(<< "No input data description");
     delete g_grid;
-    g_grid = NULL;
+    g_grid = nullptr;
   }
 
   g_sgrid = new CamAdaptor::Grid<CamAdaptor::SPHERE>();
@@ -136,7 +136,7 @@ void fv_create_grid_(int* dim, double* lonCoord, double* latCoord, double* levCo
   {
     vtkGenericWarningMacro(<< "No input data description");
     delete g_sgrid;
-    g_sgrid = NULL;
+    g_sgrid = nullptr;
   }
 }
 
@@ -211,7 +211,7 @@ int fv_needtocreategrid_()
   // assume that the grid is not changing so that we only build it
   // the first time, otherwise we clear out the field data
   vtkCPInputDataDescription* idd = g_coprocessorData->GetInputDescriptionByName("input");
-  return (idd == NULL || idd->GetGrid() == NULL);
+  return (idd == nullptr || idd->GetGrid() == nullptr);
 }
 
 //------------------------------------------------------------------------------

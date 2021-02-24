@@ -22,14 +22,10 @@
 vtkStandardNewMacro(vtkPVInteractiveViewLinkRepresentation);
 
 //----------------------------------------------------------------------------
-vtkPVInteractiveViewLinkRepresentation::vtkPVInteractiveViewLinkRepresentation()
-{
-}
+vtkPVInteractiveViewLinkRepresentation::vtkPVInteractiveViewLinkRepresentation() = default;
 
 //----------------------------------------------------------------------------
-vtkPVInteractiveViewLinkRepresentation::~vtkPVInteractiveViewLinkRepresentation()
-{
-}
+vtkPVInteractiveViewLinkRepresentation::~vtkPVInteractiveViewLinkRepresentation() = default;
 
 //----------------------------------------------------------------------------
 void vtkPVInteractiveViewLinkRepresentation::PrintSelf(ostream& os, vtkIndent indent)

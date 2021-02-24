@@ -17,9 +17,7 @@ vtkPSciVizDescriptiveStats::vtkPSciVizDescriptiveStats()
   this->SignedDeviations = 0;
 }
 
-vtkPSciVizDescriptiveStats::~vtkPSciVizDescriptiveStats()
-{
-}
+vtkPSciVizDescriptiveStats::~vtkPSciVizDescriptiveStats() = default;
 
 void vtkPSciVizDescriptiveStats::PrintSelf(ostream& os, vtkIndent indent)
 {

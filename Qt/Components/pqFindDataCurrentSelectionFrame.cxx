@@ -60,10 +60,10 @@ class pqFindDataCurrentSelectionFrame::pqInternals
 
   void deleteSpreadSheet()
   {
-    this->ViewProxy = NULL;
-    this->RepresentationProxy = NULL;
+    this->ViewProxy = nullptr;
+    this->RepresentationProxy = nullptr;
     delete this->Model;
-    this->Ui.spreadsheet->setModel(NULL);
+    this->Ui.spreadsheet->setModel(nullptr);
   }
 
 public:
@@ -99,20 +99,20 @@ public:
   // we'll reuse the old one.
   void setupSpreadsheet(pqServer* server)
   {
-    if (server == NULL)
+    if (server == nullptr)
     {
       this->deleteSpreadSheet();
       return;
     }
 
-    assert(server != NULL);
+    assert(server != nullptr);
 
     if (this->ViewProxy && this->ViewProxy->GetSession() != server->session())
     {
       this->deleteSpreadSheet();
     }
 
-    assert(this->ViewProxy == NULL || (this->ViewProxy->GetSession() == server->session()));
+    assert(this->ViewProxy == nullptr || (this->ViewProxy->GetSession() == server->session()));
     if (!this->ViewProxy)
     {
       vtkSMSessionProxyManager* pxm = server->proxyManager();
@@ -158,12 +158,12 @@ public:
       self->connect(
         port->getSource(), SIGNAL(dataUpdated(pqPipelineSource*)), SLOT(updateSpreadSheet()));
     }
-    this->setupSpreadsheet(port ? port->getServer() : NULL);
+    this->setupSpreadsheet(port ? port->getServer() : nullptr);
 
     bool prev = this->Ui.showTypeComboBox->blockSignals(true);
     pqFindDataCreateSelectionFrame::populateSelectionTypeCombo(this->Ui.showTypeComboBox, port);
     this->Ui.showTypeComboBox->blockSignals(prev);
-    this->Ui.invertSelectionCheckBox->setEnabled(port != NULL);
+    this->Ui.invertSelectionCheckBox->setEnabled(port != nullptr);
     if (port)
     {
       vtkSMPropertyHelper(this->RepresentationProxy, "Input")
@@ -236,7 +236,7 @@ pqFindDataCurrentSelectionFrame::pqFindDataCurrentSelectionFrame(
 pqFindDataCurrentSelectionFrame::~pqFindDataCurrentSelectionFrame()
 {
   delete this->Internals;
-  this->Internals = NULL;
+  this->Internals = nullptr;
 }
 
 //-----------------------------------------------------------------------------

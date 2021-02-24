@@ -100,13 +100,13 @@ int vtkUndoSet::Redo()
         vtkUndoElement* elemU = vtkUndoElement::SafeDownCast(this->Collection->GetItemAsObject(rr));
         elemU->SetUndoSetWorkingContext(this->TmpWorkingCollection); // Init
         elemU->Undo();
-        elemU->SetUndoSetWorkingContext(0); // Clear Working context
+        elemU->SetUndoSetWorkingContext(nullptr); // Clear Working context
       }
       // Release ref of tmp objects
       this->TmpWorkingCollection->RemoveAllItems();
       return 0;
     }
-    elem->SetUndoSetWorkingContext(0); // Clear Working context
+    elem->SetUndoSetWorkingContext(nullptr); // Clear Working context
   }
   // Release ref of tmp objects
   this->TmpWorkingCollection->RemoveAllItems();
@@ -132,13 +132,13 @@ int vtkUndoSet::Undo()
         vtkUndoElement* elemR = vtkUndoElement::SafeDownCast(this->Collection->GetItemAsObject(rr));
         elemR->SetUndoSetWorkingContext(this->TmpWorkingCollection); // Init
         elemR->Redo();
-        elemR->SetUndoSetWorkingContext(0); // Clear Working context
+        elemR->SetUndoSetWorkingContext(nullptr); // Clear Working context
       }
       // Release ref of tmp objects
       this->TmpWorkingCollection->RemoveAllItems();
       return 0;
     }
-    elem->SetUndoSetWorkingContext(0); // Clear Working context
+    elem->SetUndoSetWorkingContext(nullptr); // Clear Working context
   }
   // Release ref of tmp objects
   this->TmpWorkingCollection->RemoveAllItems();

@@ -63,14 +63,10 @@ vtkPVProcessWindowSingletonCleaner::~vtkPVProcessWindowSingletonCleaner()
 //============================================================================
 
 //----------------------------------------------------------------------------
-vtkPVProcessWindow::vtkPVProcessWindow()
-{
-}
+vtkPVProcessWindow::vtkPVProcessWindow() = default;
 
 //----------------------------------------------------------------------------
-vtkPVProcessWindow::~vtkPVProcessWindow()
-{
-}
+vtkPVProcessWindow::~vtkPVProcessWindow() = default;
 
 //----------------------------------------------------------------------------
 void vtkPVProcessWindow::PrintSelf(ostream& os, vtkIndent indent)

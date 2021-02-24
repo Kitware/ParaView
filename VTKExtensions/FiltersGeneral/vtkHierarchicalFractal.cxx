@@ -207,7 +207,7 @@ vtkHierarchicalFractal::vtkHierarchicalFractal()
 vtkHierarchicalFractal::~vtkHierarchicalFractal()
 {
   this->Levels->Delete();
-  this->Levels = NULL;
+  this->Levels = nullptr;
 }
 
 //----------------------------------------------------------------------------
@@ -215,7 +215,7 @@ int vtkHierarchicalFractal::RequestDataObject(
   vtkInformation*, vtkInformationVector**, vtkInformationVector* outV)
 {
   vtkInformation* outInfo = outV->GetInformationObject(0);
-  vtkCompositeDataSet* outData = NULL;
+  vtkCompositeDataSet* outData = nullptr;
 
   if (this->GenerateRectilinearGrids)
   {
@@ -551,7 +551,7 @@ int vtkHierarchicalFractal::RequestData(vtkInformation* vtkNotUsed(request),
   vtkCompositeDataSet* output;
   output = vtkCompositeDataSet::SafeDownCast(doOutput);
 
-  if (output == 0)
+  if (output == nullptr)
   {
     vtkErrorMacro("The output is not a HierarchicalDataSet");
     return 0;
@@ -659,7 +659,7 @@ int vtkHierarchicalFractal::RequestData(vtkInformation* vtkNotUsed(request),
   }
   this->AddFractalArray(output);
 
-  this->OutputUtil = NULL;
+  this->OutputUtil = nullptr;
 
   return 1;
 }
@@ -880,7 +880,7 @@ void vtkHierarchicalFractal::Traverse(int& blockId, int level, vtkCompositeDataS
       int realExt[6] = { ext[0], ext[1], ext[2], ext[3], ext[4], ext[5] };
       if (this->BlockCount >= this->StartBlock && this->BlockCount <= this->EndBlock)
       {
-        vtkDataObject* newData(NULL);
+        vtkDataObject* newData(nullptr);
         if (this->GenerateRectilinearGrids)
         {
           vtkRectilinearGrid* grid = vtkRectilinearGrid::New();
@@ -903,7 +903,7 @@ void vtkHierarchicalFractal::Traverse(int& blockId, int level, vtkCompositeDataS
       }
       else if (this->EndBlock != -1)
       {
-        int index = this->OutputUtil->AddDataSet(NULL, level);
+        int index = this->OutputUtil->AddDataSet(nullptr, level);
         if (!this->GenerateRectilinearGrids)
         {
           this->OutputUtil->SetAMRBox(index, realExt);
@@ -974,7 +974,7 @@ void vtkHierarchicalFractal::Traverse(int& blockId, int level, vtkCompositeDataS
     {
       if (this->BlockCount >= this->StartBlock && this->BlockCount <= this->EndBlock)
       {
-        vtkDataObject* newData(NULL);
+        vtkDataObject* newData(nullptr);
         int realExt[6] = { ext[0], ext[1], ext[2], ext[3], ext[4], ext[5] };
         if (this->GenerateRectilinearGrids)
         {

@@ -26,14 +26,10 @@
 vtkStandardNewMacro(vtkBalancedRedistributePolyData);
 
 //----------------------------------------------------------------------------
-vtkBalancedRedistributePolyData::vtkBalancedRedistributePolyData()
-{
-}
+vtkBalancedRedistributePolyData::vtkBalancedRedistributePolyData() = default;
 
 //----------------------------------------------------------------------------
-vtkBalancedRedistributePolyData::~vtkBalancedRedistributePolyData()
-{
-}
+vtkBalancedRedistributePolyData::~vtkBalancedRedistributePolyData() = default;
 
 //----------------------------------------------------------------------------
 void vtkBalancedRedistributePolyData::PrintSelf(ostream& os, vtkIndent indent)

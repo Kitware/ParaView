@@ -17,14 +17,10 @@
 
 vtkStandardNewMacro(vtkPVPythonOptions);
 //----------------------------------------------------------------------------
-vtkPVPythonOptions::vtkPVPythonOptions()
-{
-}
+vtkPVPythonOptions::vtkPVPythonOptions() = default;
 
 //----------------------------------------------------------------------------
-vtkPVPythonOptions::~vtkPVPythonOptions()
-{
-}
+vtkPVPythonOptions::~vtkPVPythonOptions() = default;
 
 //----------------------------------------------------------------------------
 int vtkPVPythonOptions::WrongArgument(const char* argument)

@@ -20,14 +20,10 @@
 
 vtkStandardNewMacro(vtkSMPluginLoaderProxy);
 //----------------------------------------------------------------------------
-vtkSMPluginLoaderProxy::vtkSMPluginLoaderProxy()
-{
-}
+vtkSMPluginLoaderProxy::vtkSMPluginLoaderProxy() = default;
 
 //----------------------------------------------------------------------------
-vtkSMPluginLoaderProxy::~vtkSMPluginLoaderProxy()
-{
-}
+vtkSMPluginLoaderProxy::~vtkSMPluginLoaderProxy() = default;
 
 //----------------------------------------------------------------------------
 bool vtkSMPluginLoaderProxy::LoadPlugin(const char* filename)

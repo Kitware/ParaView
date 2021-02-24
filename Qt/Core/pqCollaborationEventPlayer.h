@@ -47,7 +47,7 @@ class PQCORE_EXPORT pqCollaborationEventPlayer : public pqWidgetEventPlayer
   typedef pqWidgetEventPlayer Superclass;
 
 public:
-  pqCollaborationEventPlayer(QObject* parent = NULL);
+  pqCollaborationEventPlayer(QObject* parent = nullptr);
   ~pqCollaborationEventPlayer() override;
 
   using Superclass::playEvent;

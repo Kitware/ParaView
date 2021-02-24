@@ -41,9 +41,7 @@ pqConsoleWidgetEventPlayer::pqConsoleWidgetEventPlayer(QObject* parentObject)
 }
 
 //-----------------------------------------------------------------------------
-pqConsoleWidgetEventPlayer::~pqConsoleWidgetEventPlayer()
-{
-}
+pqConsoleWidgetEventPlayer::~pqConsoleWidgetEventPlayer() = default;
 
 //-----------------------------------------------------------------------------
 bool pqConsoleWidgetEventPlayer::playEvent(

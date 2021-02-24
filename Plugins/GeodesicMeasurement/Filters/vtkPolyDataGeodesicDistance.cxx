@@ -38,23 +38,23 @@ vtkCxxSetObjectMacro(vtkPolyDataGeodesicDistance, Seeds, vtkIdList);
 vtkPolyDataGeodesicDistance::vtkPolyDataGeodesicDistance()
 {
   this->SetNumberOfInputPorts(1);
-  this->FieldDataName = NULL;
-  this->Seeds = NULL;
+  this->FieldDataName = nullptr;
+  this->Seeds = nullptr;
 }
 
 //-----------------------------------------------------------------------------
 vtkPolyDataGeodesicDistance::~vtkPolyDataGeodesicDistance()
 {
-  this->SetFieldDataName(NULL);
-  this->SetSeeds(NULL);
+  this->SetFieldDataName(nullptr);
+  this->SetSeeds(nullptr);
 }
 
 //-----------------------------------------------------------------------------
 vtkFloatArray* vtkPolyDataGeodesicDistance::GetGeodesicDistanceField(vtkPolyData* pd)
 {
-  if (this->FieldDataName == NULL)
+  if (this->FieldDataName == nullptr)
   {
-    return NULL;
+    return nullptr;
   }
 
   vtkDataArray* arr = pd->GetPointData()->GetArray(this->FieldDataName);
@@ -88,7 +88,7 @@ vtkFloatArray* vtkPolyDataGeodesicDistance::GetGeodesicDistanceField(vtkPolyData
       << "A array with a different datatype already exists with the same name on this polydata");
   }
 
-  return NULL;
+  return nullptr;
 }
 
 //-----------------------------------------------------------------------------

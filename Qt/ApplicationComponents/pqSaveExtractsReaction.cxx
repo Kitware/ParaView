@@ -51,9 +51,7 @@ pqSaveExtractsReaction::pqSaveExtractsReaction(QAction* parentObject)
 }
 
 //-----------------------------------------------------------------------------
-pqSaveExtractsReaction::~pqSaveExtractsReaction()
-{
-}
+pqSaveExtractsReaction::~pqSaveExtractsReaction() = default;
 
 //-----------------------------------------------------------------------------
 bool pqSaveExtractsReaction::generateExtracts()

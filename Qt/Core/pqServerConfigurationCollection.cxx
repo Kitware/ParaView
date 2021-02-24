@@ -307,5 +307,5 @@ const pqServerConfiguration* pqServerConfigurationCollection::configuration(
     return &iter.value();
   }
 
-  return NULL;
+  return nullptr;
 }

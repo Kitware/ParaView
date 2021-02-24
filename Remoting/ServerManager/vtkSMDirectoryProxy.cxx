@@ -22,14 +22,10 @@
 
 vtkStandardNewMacro(vtkSMDirectoryProxy);
 //----------------------------------------------------------------------------
-vtkSMDirectoryProxy::vtkSMDirectoryProxy()
-{
-}
+vtkSMDirectoryProxy::vtkSMDirectoryProxy() = default;
 
 //----------------------------------------------------------------------------
-vtkSMDirectoryProxy::~vtkSMDirectoryProxy()
-{
-}
+vtkSMDirectoryProxy::~vtkSMDirectoryProxy() = default;
 
 //----------------------------------------------------------------------------
 bool vtkSMDirectoryProxy::List(const char* dir)
@@ -71,7 +67,7 @@ bool vtkSMDirectoryProxy::CallDirectoryMethod(
   helper.TakeReference(pxm->NewProxy("misc", "FilePathEncodingHelper"));
   helper->SetLocation(this->GetLocation());
   vtkSMPropertyHelper(helper->GetProperty("ActiveFileName")).Set(path);
-  if (secondaryPath != NULL)
+  if (secondaryPath != nullptr)
   {
     vtkSMPropertyHelper(helper->GetProperty("SecondaryFileName")).Set(secondaryPath);
   }

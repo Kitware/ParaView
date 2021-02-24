@@ -53,9 +53,7 @@ pqDoubleSliderWidget::pqDoubleSliderWidget(QWidget* parent)
 }
 
 //-----------------------------------------------------------------------------
-pqDoubleSliderWidget::~pqDoubleSliderWidget()
-{
-}
+pqDoubleSliderWidget::~pqDoubleSliderWidget() = default;
 
 //-----------------------------------------------------------------------------
 double pqDoubleSliderWidget::value() const

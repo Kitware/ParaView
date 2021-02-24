@@ -45,33 +45,33 @@ vtkCxxSetObjectMacro(vtkSMProperty, Hints, vtkPVXMLElement);
 vtkSMProperty::vtkSMProperty()
 {
   this->StateIgnored = false;
-  this->Command = 0;
+  this->Command = nullptr;
   this->ImmediateUpdate = 0;
   this->Animateable = 2; // By default Animateable in advanced mode only.
   this->PInternals = new vtkSMPropertyInternals;
-  this->XMLName = 0;
-  this->XMLLabel = 0;
-  this->PanelVisibility = 0;
-  this->PanelVisibilityDefaultForRepresentation = 0;
-  this->PanelWidget = 0;
-  this->DisableSubTrace = 0;
+  this->XMLName = nullptr;
+  this->XMLLabel = nullptr;
+  this->PanelVisibility = nullptr;
+  this->PanelVisibilityDefaultForRepresentation = nullptr;
+  this->PanelWidget = nullptr;
+  this->DisableSubTrace = nullptr;
   this->DomainIterator = vtkSMDomainIterator::New();
   this->DomainIterator->SetProperty(this);
-  this->Proxy = 0;
+  this->Proxy = nullptr;
   this->InformationOnly = 0;
-  this->InformationProperty = 0;
+  this->InformationProperty = nullptr;
   this->IsInternal = 0;
   this->NoCustomDefault = 0;
-  this->Documentation = 0;
+  this->Documentation = nullptr;
   this->Repeatable = 0;
   this->IgnoreSynchronization = 0;
-  this->Links = NULL;
+  this->Links = nullptr;
 
-  this->Hints = 0;
+  this->Hints = nullptr;
   this->BlockModifiedEvents = false;
   this->PendingModifiedEvents = false;
 
-  this->Proxy = 0;
+  this->Proxy = nullptr;
 
   // Whenever the property fires UncheckedPropertyModifiedEvent, we update any
   // dependent domains.
@@ -83,23 +83,23 @@ vtkSMProperty::vtkSMProperty()
 vtkSMProperty::~vtkSMProperty()
 {
   this->RemoveFromSourceLink();
-  this->SetCommand(0);
+  this->SetCommand(nullptr);
   delete this->PInternals;
-  this->SetXMLName(0);
-  this->SetXMLLabel(0);
+  this->SetXMLName(nullptr);
+  this->SetXMLLabel(nullptr);
   this->DomainIterator->Delete();
-  this->SetInformationProperty(0);
-  this->SetDocumentation(0);
-  this->SetHints(0);
-  this->SetParent(0);
-  this->SetPanelVisibility(0);
-  this->SetPanelVisibilityDefaultForRepresentation(0);
-  this->SetPanelWidget(0);
-  this->SetDisableSubTrace(0);
+  this->SetInformationProperty(nullptr);
+  this->SetDocumentation(nullptr);
+  this->SetHints(nullptr);
+  this->SetParent(nullptr);
+  this->SetPanelVisibility(nullptr);
+  this->SetPanelVisibilityDefaultForRepresentation(nullptr);
+  this->SetPanelWidget(nullptr);
+  this->SetDisableSubTrace(nullptr);
   if (this->Links)
   {
     this->Links->Delete();
-    this->Links = NULL;
+    this->Links = nullptr;
   }
 }
 
@@ -113,9 +113,9 @@ void vtkSMProperty::UnRegister(vtkObjectBase* obj)
     this->Superclass::UnRegister(obj);
 
     vtkSMDomainIterator* tmp = this->DomainIterator;
-    tmp->Register(0);
-    tmp->SetProperty(0);
-    tmp->UnRegister(0);
+    tmp->Register(nullptr);
+    tmp->SetProperty(nullptr);
+    tmp->UnRegister(nullptr);
     return;
   }
   this->Superclass::UnRegister(obj);
@@ -124,7 +124,7 @@ void vtkSMProperty::UnRegister(vtkObjectBase* obj)
 //---------------------------------------------------------------------------
 int vtkSMProperty::IsInDomains()
 {
-  return this->IsInDomains(NULL);
+  return this->IsInDomains(nullptr);
 }
 
 //---------------------------------------------------------------------------
@@ -156,7 +156,7 @@ void vtkSMProperty::AddDomain(const char* name, vtkSMDomain* domain)
   if (it != this->PInternals->Domains.end())
   {
     vtkWarningMacro("Domain " << name << " already exists. Replacing");
-    it->second->SetProperty(NULL);
+    it->second->SetProperty(nullptr);
   }
 
   this->PInternals->Domains[name] = domain;
@@ -207,7 +207,7 @@ void vtkSMProperty::RemoveFromSourceLink()
   {
     // Remove this instance as a subscriber to the source proxy
     this->PInternals->LinkSourceProperty->RemoveLinkedProperty(this);
-    this->PInternals->LinkSourceProperty = NULL;
+    this->PInternals->LinkSourceProperty = nullptr;
   }
 }
 
@@ -224,7 +224,7 @@ vtkSMDomain* vtkSMProperty::GetDomain(const char* name)
 
   if (it == this->PInternals->Domains.end())
   {
-    return 0;
+    return nullptr;
   }
 
   return it->second.GetPointer();
@@ -242,7 +242,7 @@ vtkSMDomain* vtkSMProperty::FindDomain(const char* classname)
       return iter->GetDomain();
     }
   }
-  return 0;
+  return nullptr;
 }
 
 //---------------------------------------------------------------------------
@@ -302,7 +302,7 @@ vtkSMProperty* vtkSMProperty::NewProperty(const char* name)
 {
   if (!this->Proxy)
   {
-    return 0;
+    return nullptr;
   }
   return this->Proxy->NewProperty(name);
 }
@@ -521,7 +521,7 @@ int vtkSMProperty::ReadXMLAttributes(vtkSMProxy* proxy, vtkPVXMLElement* element
     }
 
     // Everything else is assumed to be a domain element.
-    vtkObjectBase* object = 0;
+    vtkObjectBase* object = nullptr;
     std::ostringstream name;
     name << "vtkSM" << domainEl->GetName() << ends;
     object = vtkClientServerStreamInstantiator::CreateInstance(name.str().c_str());
@@ -689,7 +689,7 @@ int vtkSMProperty::LoadState(vtkPVXMLElement* propertyElement, vtkSMProxyLocator
     if (strcmp(child->GetName(), "Domain") == 0)
     {
       const char* name = child->GetAttribute("name");
-      vtkSMDomain* domain = name ? this->GetDomain(name) : 0;
+      vtkSMDomain* domain = name ? this->GetDomain(name) : nullptr;
       if (domain)
       {
         domain->LoadState(child, loader);

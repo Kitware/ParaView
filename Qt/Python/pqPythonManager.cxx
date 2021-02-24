@@ -87,8 +87,9 @@ public:
   std::string text() const { return this->TextStream.str(); }
   std::string errorText() const { return this->ErrorStream.str(); }
 private:
-  pqPythonManagerOutputWindow() {}
-  ~pqPythonManagerOutputWindow() override {}
+  pqPythonManagerOutputWindow() = default;
+  ~pqPythonManagerOutputWindow() override = default;
+
 private:
   pqPythonManagerOutputWindow(const pqPythonManagerOutputWindow&) = delete;
   void operator=(const pqPythonManagerOutputWindow&) = delete;

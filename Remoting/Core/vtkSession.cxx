@@ -18,14 +18,10 @@
 #include "vtkProcessModule.h"
 
 //----------------------------------------------------------------------------
-vtkSession::vtkSession()
-{
-}
+vtkSession::vtkSession() = default;
 
 //----------------------------------------------------------------------------
-vtkSession::~vtkSession()
-{
-}
+vtkSession::~vtkSession() = default;
 
 //----------------------------------------------------------------------------
 void vtkSession::Activate()

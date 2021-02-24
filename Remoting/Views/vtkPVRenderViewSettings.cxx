@@ -26,7 +26,7 @@ vtkPVRenderViewSettings* vtkPVRenderViewSettings::New()
 {
   vtkPVRenderViewSettings* instance = vtkPVRenderViewSettings::GetInstance();
   assert(instance);
-  instance->Register(NULL);
+  instance->Register(nullptr);
   return instance;
 }
 
@@ -53,9 +53,7 @@ vtkPVRenderViewSettings::vtkPVRenderViewSettings()
 }
 
 //----------------------------------------------------------------------------
-vtkPVRenderViewSettings::~vtkPVRenderViewSettings()
-{
-}
+vtkPVRenderViewSettings::~vtkPVRenderViewSettings() = default;
 
 //----------------------------------------------------------------------------
 void vtkPVRenderViewSettings::SetResolveCoincidentTopology(int mode)

@@ -50,7 +50,7 @@ class PQCOMPONENTS_EXPORT pqKeyFrameTypeWidget : public QWidget
   Q_PROPERTY(QString frequency READ frequency WRITE setFrequency)
 
 public:
-  pqKeyFrameTypeWidget(QWidget* parent = NULL);
+  pqKeyFrameTypeWidget(QWidget* parent = nullptr);
   ~pqKeyFrameTypeWidget() override;
 
 public Q_SLOTS:

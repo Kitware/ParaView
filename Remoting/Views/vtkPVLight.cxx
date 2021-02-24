@@ -27,14 +27,10 @@ vtkInformationKeyMacro(vtkPVLight, LIGHT_NAME, String);
 
 vtkStandardNewMacro(vtkPVLight);
 //----------------------------------------------------------------------------
-vtkPVLight::vtkPVLight()
-{
-}
+vtkPVLight::vtkPVLight() = default;
 
 //----------------------------------------------------------------------------
-vtkPVLight::~vtkPVLight()
-{
-}
+vtkPVLight::~vtkPVLight() = default;
 
 //----------------------------------------------------------------------------
 void vtkPVLight::PrintSelf(ostream& os, vtkIndent indent)

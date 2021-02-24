@@ -57,7 +57,7 @@ public:
     set_to_min_id->SetNumberOfTuples(0);
   }
 
-  ~vtkAMRConnectivityEquivalence() {}
+  ~vtkAMRConnectivityEquivalence() = default;
 
   int AddEquivalence(int id1, int id2)
   {
@@ -239,15 +239,13 @@ public:
 vtkAMRConnectivity::vtkAMRConnectivity()
 {
   this->VolumeFractionSurfaceValue = 0.5;
-  this->Helper = 0;
-  this->Equivalence = 0;
+  this->Helper = nullptr;
+  this->Equivalence = nullptr;
   this->ResolveBlocks = 1;
   this->PropagateGhosts = 0;
 }
 
-vtkAMRConnectivity::~vtkAMRConnectivity()
-{
-}
+vtkAMRConnectivity::~vtkAMRConnectivity() = default;
 
 void vtkAMRConnectivity::PrintSelf(ostream& os, vtkIndent indent)
 {
@@ -445,7 +443,7 @@ int vtkAMRConnectivity::DoRequestData(vtkNonOverlappingAMR* volume, const char* 
         for (int dir = 0; dir < 3; dir++)
         {
           vtkAMRDualGridHelperBlock* neighbor = this->GetBlockNeighbor(block, dir);
-          if (neighbor != 0)
+          if (neighbor != nullptr)
           {
             this->ProcessBoundaryAtBlock(volume, block, neighbor, dir);
             if (neighbor && neighbor->Level > block->Level)
@@ -456,21 +454,21 @@ int vtkAMRConnectivity::DoRequestData(vtkNonOverlappingAMR* volume, const char* 
 
               index[(dir + 1) % 3]++;
               neighbor = this->Helper->GetBlock(n_level, index[0], index[1], index[2]);
-              if (neighbor != 0)
+              if (neighbor != nullptr)
               {
                 this->ProcessBoundaryAtBlock(volume, block, neighbor, dir);
               }
 
               index[(dir + 2) % 3]++;
               neighbor = this->Helper->GetBlock(n_level, index[0], index[1], index[2]);
-              if (neighbor != 0)
+              if (neighbor != nullptr)
               {
                 this->ProcessBoundaryAtBlock(volume, block, neighbor, dir);
               }
 
               index[(dir + 1) % 3]--;
               neighbor = this->Helper->GetBlock(n_level, index[0], index[1], index[2]);
-              if (neighbor != 0)
+              if (neighbor != nullptr)
               {
                 this->ProcessBoundaryAtBlock(volume, block, neighbor, dir);
               }
@@ -523,7 +521,7 @@ int vtkAMRConnectivity::DoRequestData(vtkNonOverlappingAMR* volume, const char* 
           vtkUniformGrid* grid = volume->GetDataSet(block->Level, block->BlockId);
           vtkIdTypeArray* regionIdArray =
             vtkIdTypeArray::SafeDownCast(grid->GetCellData()->GetArray(this->RegionName.c_str()));
-          if (regionIdArray == 0)
+          if (regionIdArray == nullptr)
           {
             vtkErrorMacro("block Image doesn't not contain the regionId just added");
             return 0;
@@ -541,7 +539,7 @@ int vtkAMRConnectivity::DoRequestData(vtkNonOverlappingAMR* volume, const char* 
                 for (size_t p = 0; p < this->NeighborList[block->Level][block->BlockId].size(); p++)
                 {
                   int n = this->NeighborList[block->Level][block->BlockId][p];
-                  if (this->EquivPairs[n] == 0)
+                  if (this->EquivPairs[n] == nullptr)
                   {
                     this->EquivPairs[n] = vtkSmartPointer<vtkIntArray>::New();
                     this->EquivPairs[n]->SetNumberOfComponents(1);
@@ -593,7 +591,7 @@ int vtkAMRConnectivity::DoRequestData(vtkNonOverlappingAMR* volume, const char* 
       // clear out the pairs after sending them.
       for (int i = 0; i < numProcs; i++)
       {
-        if (this->EquivPairs[i] != 0)
+        if (this->EquivPairs[i] != nullptr)
         {
           this->EquivPairs[i]->SetNumberOfTuples(0);
         }
@@ -608,7 +606,7 @@ int vtkAMRConnectivity::DoRequestData(vtkNonOverlappingAMR* volume, const char* 
     vtkTimerLog::MarkEndEvent("Transferring equivalence");
 
     delete this->Equivalence;
-    this->Equivalence = 0;
+    this->Equivalence = nullptr;
   }
 
   if (PropagateGhosts)
@@ -710,15 +708,15 @@ vtkAMRDualGridHelperBlock* vtkAMRConnectivity::GetBlockNeighbor(
   int gridIndex[3] = { block->GridIndex[0], block->GridIndex[1], block->GridIndex[2] };
   gridIndex[dir]++;
 
-  vtkAMRDualGridHelperBlock* neighbor = 0;
+  vtkAMRDualGridHelperBlock* neighbor = nullptr;
   neighbor = this->Helper->GetBlock(block->Level, gridIndex[0], gridIndex[1], gridIndex[2]);
-  if (neighbor != 0)
+  if (neighbor != nullptr)
   {
     return neighbor;
   }
   neighbor = this->Helper->GetBlock(
     block->Level - 1, gridIndex[0] >> 1, gridIndex[1] >> 1, gridIndex[2] >> 1);
-  if (neighbor != 0)
+  if (neighbor != nullptr)
   {
     return neighbor;
   }
@@ -727,19 +725,19 @@ vtkAMRDualGridHelperBlock* vtkAMRConnectivity::GetBlockNeighbor(
   // e.g., 0, 0, 1  and 0, 1, 0 and 0, 1, 1  If it's in the x direction.
   neighbor = this->Helper->GetBlock(
     block->Level + 1, gridIndex[0] << 1, gridIndex[1] << 1, gridIndex[2] << 1);
-  if (neighbor != 0)
+  if (neighbor != nullptr)
   {
     return neighbor;
   }
 
-  return 0;
+  return nullptr;
 }
 
 //----------------------------------------------------------------------------
 void vtkAMRConnectivity::ProcessBoundaryAtBlock(vtkNonOverlappingAMR* volume,
   vtkAMRDualGridHelperBlock* block, vtkAMRDualGridHelperBlock* neighbor, int dir)
 {
-  if (block == 0 || neighbor == 0)
+  if (block == nullptr || neighbor == nullptr)
   {
     vtkErrorMacro("Cannot process undefined blocks");
     return;
@@ -929,7 +927,7 @@ void vtkAMRConnectivity::ProcessBoundaryAtBlock(vtkNonOverlappingAMR* volume,
 //----------------------------------------------------------------------------
 int vtkAMRConnectivity::ExchangeBoundaries(vtkMPIController* controller)
 {
-  if (controller == 0)
+  if (controller == nullptr)
   {
     vtkErrorMacro("vtkAMRConnectivity only works parallel in MPI environment");
     return 0;
@@ -1045,7 +1043,7 @@ int vtkAMRConnectivity::ExchangeBoundaries(vtkMPIController* controller)
 
 int vtkAMRConnectivity::ExchangeEquivPairs(vtkMPIController* controller)
 {
-  if (controller == 0)
+  if (controller == nullptr)
   {
     vtkErrorMacro("vtkAMRConnectivity only works parallel in MPI environment");
     return 0;
@@ -1089,7 +1087,7 @@ int vtkAMRConnectivity::ExchangeEquivPairs(vtkMPIController* controller)
     vtkSmartPointer<vtkIntArray> array = vtkSmartPointer<vtkIntArray>::New();
     array->SetNumberOfComponents(1);
     array->SetNumberOfTuples(1);
-    int size = this->EquivPairs[i] == 0 ? 0 : this->EquivPairs[i]->GetNumberOfTuples();
+    int size = this->EquivPairs[i] == nullptr ? 0 : this->EquivPairs[i]->GetNumberOfTuples();
     array->SetTuple1(0, size);
 
     vtkAMRConnectivityCommRequest request;
@@ -1145,7 +1143,7 @@ int vtkAMRConnectivity::ExchangeEquivPairs(vtkMPIController* controller)
 
   for (size_t i = 0; i < static_cast<unsigned int>(numProcs); i++)
   {
-    if (i == static_cast<unsigned int>(myProc) || this->EquivPairs[i] == 0 ||
+    if (i == static_cast<unsigned int>(myProc) || this->EquivPairs[i] == nullptr ||
       this->EquivPairs[i]->GetNumberOfTuples() == 0)
     {
       continue;

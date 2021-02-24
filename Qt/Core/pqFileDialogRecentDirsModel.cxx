@@ -57,7 +57,7 @@ pqFileDialogRecentDirsModel::pqFileDialogRecentDirsModel(
   this->FileDialogModel = fileDialogModel;
 
   // We need to determine the URI for this server to get the list of recent dirs
-  // from the pqSettings. If server==NULL, we use the "builtin:" resource.
+  // from the pqSettings. If server==nullptr, we use the "builtin:" resource.
   pqServerResource resource = server ? server->getResource() : pqServerResource("builtin:");
 
   QString uri = resource.configuration().URI();
@@ -121,7 +121,7 @@ QVariant pqFileDialogRecentDirsModel::data(const QModelIndex& idx, int role) con
         std::string unix_path = path.toLocal8Bit().data();
         vtksys::SystemTools::ConvertToUnixSlashes(unix_path);
         std::string filename;
-        std::string::size_type slashPos = unix_path.rfind("/");
+        std::string::size_type slashPos = unix_path.rfind('/');
         if (slashPos != std::string::npos)
         {
           filename = unix_path.substr(slashPos + 1);
@@ -192,7 +192,7 @@ void pqFileDialogRecentDirsModel::setChosenFiles(const QList<QStringList>& files
   vtksys::SystemTools::ConvertToUnixSlashes(unix_path);
 
   std::string dirname;
-  std::string::size_type slashPos = unix_path.rfind("/");
+  std::string::size_type slashPos = unix_path.rfind('/');
   if (slashPos == std::string::npos)
   {
     return;

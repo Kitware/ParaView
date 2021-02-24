@@ -63,7 +63,7 @@ void pqCameraReaction::updateEnableState()
   {
     if (this->ReactionMode == ZOOM_TO_DATA || this->ReactionMode == ZOOM_CLOSEST_TO_DATA)
     {
-      this->parentAction()->setEnabled(source != 0);
+      this->parentAction()->setEnabled(source != nullptr);
     }
     else
     {
@@ -73,7 +73,7 @@ void pqCameraReaction::updateEnableState()
       if (hints)
       {
         cameraResetButtonsEnabled =
-          hints->FindNestedElementByName("DisableCameraToolbarButtons") == NULL;
+          hints->FindNestedElementByName("DisableCameraToolbarButtons") == nullptr;
       }
 
       this->parentAction()->setEnabled(cameraResetButtonsEnabled);

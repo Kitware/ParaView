@@ -26,20 +26,16 @@
 
 vtkStandardNewMacro(vtkSMPLYWriterProxyInitializationHelper);
 //----------------------------------------------------------------------------
-vtkSMPLYWriterProxyInitializationHelper::vtkSMPLYWriterProxyInitializationHelper()
-{
-}
+vtkSMPLYWriterProxyInitializationHelper::vtkSMPLYWriterProxyInitializationHelper() = default;
 
 //----------------------------------------------------------------------------
-vtkSMPLYWriterProxyInitializationHelper::~vtkSMPLYWriterProxyInitializationHelper()
-{
-}
+vtkSMPLYWriterProxyInitializationHelper::~vtkSMPLYWriterProxyInitializationHelper() = default;
 
 //----------------------------------------------------------------------------
 void vtkSMPLYWriterProxyInitializationHelper::PostInitializeProxy(
   vtkSMProxy* proxy, vtkPVXMLElement*, vtkMTimeType ts)
 {
-  assert(proxy != NULL);
+  assert(proxy != nullptr);
   if (proxy->GetProperty("ColorArrayName")->GetMTime() > ts ||
     proxy->GetProperty("LookupTable")->GetMTime() > ts)
   {
@@ -48,7 +44,7 @@ void vtkSMPLYWriterProxyInitializationHelper::PostInitializeProxy(
 
   vtkSMPropertyHelper input(proxy, "Input");
   vtkSMSessionProxyManager* pxm = proxy->GetSessionProxyManager();
-  vtkSMViewProxy* activeView = NULL;
+  vtkSMViewProxy* activeView = nullptr;
   if (vtkSMProxySelectionModel* viewSM = pxm->GetSelectionModel("ActiveView"))
   {
     activeView = vtkSMViewProxy::SafeDownCast(viewSM->GetCurrentProxy());

@@ -59,17 +59,17 @@ vtkPVTemporalDataInformation::vtkPVTemporalDataInformation()
 vtkPVTemporalDataInformation::~vtkPVTemporalDataInformation()
 {
   this->PointDataInformation->Delete();
-  this->PointDataInformation = NULL;
+  this->PointDataInformation = nullptr;
   this->CellDataInformation->Delete();
-  this->CellDataInformation = NULL;
+  this->CellDataInformation = nullptr;
   this->FieldDataInformation->Delete();
-  this->FieldDataInformation = NULL;
+  this->FieldDataInformation = nullptr;
   this->VertexDataInformation->Delete();
-  this->VertexDataInformation = NULL;
+  this->VertexDataInformation = nullptr;
   this->EdgeDataInformation->Delete();
-  this->EdgeDataInformation = NULL;
+  this->EdgeDataInformation = nullptr;
   this->RowDataInformation->Delete();
-  this->RowDataInformation = NULL;
+  this->RowDataInformation = nullptr;
 }
 
 //----------------------------------------------------------------------------
@@ -96,7 +96,7 @@ vtkPVDataSetAttributesInformation* vtkPVTemporalDataInformation::GetAttributeInf
       return this->RowDataInformation;
   }
 
-  return NULL;
+  return nullptr;
 }
 
 //----------------------------------------------------------------------------
@@ -410,7 +410,7 @@ vtkPVArrayInformation* vtkPVTemporalDataInformation::GetArrayInformation(
   const char* arrayname, int attribute_type)
 {
   vtkPVDataSetAttributesInformation* attrInfo = this->GetAttributeInformation(attribute_type);
-  return attrInfo ? attrInfo->GetArrayInformation(arrayname) : NULL;
+  return attrInfo ? attrInfo->GetArrayInformation(arrayname) : nullptr;
 }
 
 //----------------------------------------------------------------------------

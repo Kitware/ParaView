@@ -61,7 +61,7 @@ public:
   * If no \c builder is provided a default vtkSMUndoStackBuilder object
   * will be created.
   */
-  pqUndoStack(vtkSMUndoStackBuilder* builder = 0, QObject* parent = NULL);
+  pqUndoStack(vtkSMUndoStackBuilder* builder = 0, QObject* parent = nullptr);
   ~pqUndoStack() override;
 
   /**
@@ -77,12 +77,12 @@ public:
   /**
   * returns the undo label.
   */
-  const QString undoLabel();
+  QString undoLabel();
 
   /**
   * returns the redo label.
   */
-  const QString redoLabel();
+  QString redoLabel();
 
   /**
   * Get the status of the IgnoreAllChanges flag on the

@@ -41,7 +41,7 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /**
-   * Locate a proxy with the given "name". If none can be found returns NULL.
+   * Locate a proxy with the given "name". If none can be found returns nullptr.
    * If a proxy with the name was not previously located, it will ask the
    * Deserializer (if any) to create a new proxy is possible.
    */

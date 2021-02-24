@@ -51,9 +51,7 @@ pqHeaderView::pqHeaderView(Qt::Orientation orientation, QWidget* parentObject)
 }
 
 //-----------------------------------------------------------------------------
-pqHeaderView::~pqHeaderView()
-{
-}
+pqHeaderView::~pqHeaderView() = default;
 
 //-----------------------------------------------------------------------------
 void pqHeaderView::paintSection(QPainter* painter, const QRect& rect, int logicalIndex) const

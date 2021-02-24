@@ -71,7 +71,7 @@ public:
     };
     std::vector<FileEntryHint> FileEntryHints;
 
-    vtkValue() {}
+    vtkValue() = default;
 
     vtkSMSessionProxyManager* GetProxyManager(vtkSMSession* session)
     {
@@ -151,7 +151,7 @@ public:
     // support that.
     bool CanCreatePrototype(vtkSMSession* session)
     {
-      return (this->GetPrototypeProxy(session, this->Group.c_str(), this->Name.c_str()) != NULL);
+      return (this->GetPrototypeProxy(session, this->Group.c_str(), this->Name.c_str()) != nullptr);
     }
 
     // Returns true if the reader can read the file. More correctly, it returns
@@ -306,18 +306,18 @@ vtkSMReaderFactory::vtkSMReaderFactory()
   this->Internals = new vtkInternals();
   this->Internals->Groups.insert("sources");
   this->Readers = vtkStringList::New();
-  this->ReaderName = 0;
-  this->ReaderGroup = 0;
+  this->ReaderName = nullptr;
+  this->ReaderGroup = nullptr;
 }
 
 //----------------------------------------------------------------------------
 vtkSMReaderFactory::~vtkSMReaderFactory()
 {
   delete this->Internals;
-  this->SetReaderName(0);
-  this->SetReaderGroup(0);
+  this->SetReaderName(nullptr);
+  this->SetReaderGroup(nullptr);
   this->Readers->Delete();
-  this->Readers = 0;
+  this->Readers = nullptr;
 }
 
 //----------------------------------------------------------------------------
@@ -415,7 +415,7 @@ void vtkSMReaderFactory::RegisterPrototype(const char* xmlgroup, const char* xml
 //----------------------------------------------------------------------------
 vtkStringList* vtkSMReaderFactory::GetReaders(vtkSMSession* session)
 {
-  return this->GetPossibleReaders(NULL, session);
+  return this->GetPossibleReaders(nullptr, session);
 }
 
 //----------------------------------------------------------------------------
@@ -483,8 +483,8 @@ vtkStringList* vtkSMReaderFactory::GetPossibleReaders(const char* filename, vtkS
 //----------------------------------------------------------------------------
 bool vtkSMReaderFactory::CanReadFile(const char* filename, vtkSMSession* session)
 {
-  this->SetReaderGroup(0);
-  this->SetReaderName(0);
+  this->SetReaderGroup(nullptr);
+  this->SetReaderName(nullptr);
 
   if (!filename || filename[0] == 0)
   {
@@ -689,7 +689,7 @@ void vtkSMReaderFactory::PrintSelf(ostream& os, vtkIndent indent)
 //----------------------------------------------------------------------------
 void vtkSMReaderFactory::AddReaderToWhitelist(const char* readerxmlgroup, const char* readerxmlname)
 {
-  if (readerxmlgroup != NULL && readerxmlname != NULL)
+  if (readerxmlgroup != nullptr && readerxmlname != nullptr)
   {
     vtkSMReaderFactory::vtkInternals::ReaderWhitelist.insert(
       std::pair<std::string, std::string>(readerxmlgroup, readerxmlname));

@@ -62,9 +62,9 @@ vtkStandardNewMacro(vtkPVProminentValuesInformation);
 vtkPVProminentValuesInformation::vtkPVProminentValuesInformation()
 {
   this->PortNumber = 0;
-  this->FieldName = 0;
-  this->FieldAssociation = 0;
-  this->DistinctValues = 0;
+  this->FieldName = nullptr;
+  this->FieldAssociation = nullptr;
+  this->DistinctValues = nullptr;
   this->InitializeParameters();
   this->Initialize();
   this->Force = false;
@@ -82,8 +82,8 @@ vtkPVProminentValuesInformation::~vtkPVProminentValuesInformation()
 void vtkPVProminentValuesInformation::InitializeParameters()
 {
   this->PortNumber = 0;
-  this->SetFieldName(0);
-  this->SetFieldAssociation(0);
+  this->SetFieldName(nullptr);
+  this->SetFieldAssociation(nullptr);
   this->NumberOfComponents = -2;
   this->Uncertainty = -1.;
   this->Fraction = -1.;
@@ -95,7 +95,7 @@ void vtkPVProminentValuesInformation::Initialize()
   if (this->DistinctValues)
   {
     delete this->DistinctValues;
-    this->DistinctValues = 0;
+    this->DistinctValues = nullptr;
   }
 }
 
@@ -171,7 +171,7 @@ void vtkPVProminentValuesInformation::DeepCopy(vtkPVProminentValuesInformation* 
   if (this->DistinctValues && !info->DistinctValues)
   {
     delete this->DistinctValues;
-    this->DistinctValues = 0;
+    this->DistinctValues = nullptr;
   }
   else if (info->DistinctValues)
   {
@@ -186,7 +186,7 @@ void vtkPVProminentValuesInformation::DeepCopy(vtkPVProminentValuesInformation* 
 //----------------------------------------------------------------------------
 int vtkPVProminentValuesInformation::Compare(vtkPVProminentValuesInformation* info)
 {
-  if (info == NULL)
+  if (info == nullptr)
   {
     return 0;
   }
@@ -219,11 +219,11 @@ void vtkPVProminentValuesInformation::CopyFromObject(vtkObject* obj)
     // fully setup yet.
     if (strcmp(algo->GetClassName(), "vtkPVNullSource") == 0)
     {
-      // Don't gather any data information from the hypothetical null source.
+      // Don't gather any data information from the hypothetical nullptr source.
       return;
     }
     auto info = algo->GetExecutive()->GetOutputInformation(this->PortNumber);
-    if (!info || vtkDataObject::GetData(info) == NULL)
+    if (!info || vtkDataObject::GetData(info) == nullptr)
     {
       return;
     }
@@ -621,7 +621,7 @@ void vtkPVProminentValuesInformation::AddDistinctValues(vtkPVProminentValuesInfo
 //-----------------------------------------------------------------------------
 vtkAbstractArray* vtkPVProminentValuesInformation::GetProminentComponentValues(int component)
 {
-  vtkVariantArray* va = 0;
+  vtkVariantArray* va = nullptr;
   vtkInternalDistinctValues::iterator compEntry;
   vtkIdType nt = 0;
   if (component < 0 && this->NumberOfComponents == 1)

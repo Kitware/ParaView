@@ -22,18 +22,18 @@ vtkSMVectorProperty::vtkSMVectorProperty()
   this->RepeatCommand = 0;
   this->NumberOfElementsPerCommand = 1;
   this->UseIndex = 0;
-  this->CleanCommand = 0;
+  this->CleanCommand = nullptr;
   this->IsInternal = 0;
-  this->SetNumberCommand = 0;
-  this->InitialString = 0; // TODO(jpocom) check
+  this->SetNumberCommand = nullptr;
+  this->InitialString = nullptr; // TODO(jpocom) check
 }
 
 //---------------------------------------------------------------------------
 vtkSMVectorProperty::~vtkSMVectorProperty()
 {
-  this->SetCleanCommand(0);
-  this->SetSetNumberCommand(0);
-  this->SetInitialString(0); // TODO(jpocom) check
+  this->SetCleanCommand(nullptr);
+  this->SetSetNumberCommand(nullptr);
+  this->SetInitialString(nullptr); // TODO(jpocom) check
 }
 
 //---------------------------------------------------------------------------
