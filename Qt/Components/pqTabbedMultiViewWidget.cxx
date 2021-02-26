@@ -362,8 +362,7 @@ public:
     }
     else
     {
-      const bool hasAnnotation =
-        vlayout->HasAnnotation(this->FilterAnnotationKey.toLocal8Bit().data());
+      const bool hasAnnotation = vlayout->HasAnnotation(qUtf8Printable(this->FilterAnnotationKey));
       return this->FilterAnnotationMatching ? hasAnnotation : !hasAnnotation;
     }
   }
