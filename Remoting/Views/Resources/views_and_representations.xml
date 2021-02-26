@@ -7904,7 +7904,12 @@
           </RequiredProperties>
         </CompositeTreeDomain>
         <Documentation>This property lists the ids of the blocks to extract
-        from the input multiblock dataset.</Documentation>
+          from the input multiblock dataset.</Documentation>
+        <Hints>
+          <!-- we don't want to show this property, except for MBs. -->
+          <PropertyWidgetDecorator type="InputDataTypeDecorator"
+            mode="visibility" name="vtkMultiBlockDataSet" />
+        </Hints>
       </IntVectorProperty>
       <IntVectorProperty command="SetFieldAssociation"
                          default_values="0"
@@ -8519,6 +8524,11 @@
                       name="Input" />
           </RequiredProperties>
         </CompositeTreeDomain>
+        <Hints>
+          <!-- we don't want to show this property, except for MBs. -->
+          <PropertyWidgetDecorator type="InputDataTypeDecorator"
+            mode="visibility" name="vtkMultiBlockDataSet" />
+        </Hints>
       </IntVectorProperty>
       <IntVectorProperty command="SetFieldAssociation"
                          default_values="0"
@@ -8707,6 +8717,11 @@
             <Property function="Input"
                       name="Input" />
           </RequiredProperties>
+          <Hints>
+            <!-- we don't want to show this property, except for MBs. -->
+            <PropertyWidgetDecorator type="InputDataTypeDecorator"
+              mode="visibility" name="vtkMultiBlockDataSet" />
+          </Hints>
         </CompositeTreeDomain>
       </IntVectorProperty>
       <IntVectorProperty command="SetFieldAssociation"
