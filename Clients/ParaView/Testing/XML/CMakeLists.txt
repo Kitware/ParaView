@@ -1193,7 +1193,6 @@ if(PARAVIEW_USE_PYTHON)
     LiveProgrammableSource.xml
     PythonShellRunScript.xml
     SaveLoadStatePython.xml
-    SelectionLabels.xml
     TraceExodus.xml
     TraceExportAndSaveData.xml
     TraceSaveGeometry.xml
@@ -1451,9 +1450,6 @@ set(CTHAMRClip_DISABLE_CS TRUE)
 set(CTHAMRClip_DISABLE_CRS TRUE)
 set(CTHAMRMaterialInterfaceFilter_DISABLE_CS TRUE)
 set(CTHAMRMaterialInterfaceFilter_DISABLE_CRS TRUE)
-
-# Since this test needs selection, disable in CRS mode.
-set (SelectionLabels_DISABLE_CRS TRUE)
 
 # Add image threshold overrides for tests.
 # Generally all tests with wireframes need higher thresholds.
