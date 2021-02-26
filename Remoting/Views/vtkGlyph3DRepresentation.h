@@ -98,6 +98,8 @@ protected:
   vtkGlyph3DRepresentation();
   ~vtkGlyph3DRepresentation() override;
 
+  void SetupDefaults() override;
+
   /**
    * Fill input port information.
    */

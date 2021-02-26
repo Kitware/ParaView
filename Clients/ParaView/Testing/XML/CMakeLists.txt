@@ -828,7 +828,8 @@ list(APPEND TESTS_WITH_BASELINES
   Calculator.xml
   CalculatorInput.xml
   CategoriesWithNaN.xml
-  ChangeGlyphRepVisibility.xml
+  # Disabled due to #20508
+  # ChangeGlyphRepVisibility.xml
   ChangingTimestepsInStateFiles.xml
   ChartAxisRangeAndLabels.xml
   CheckableHeader.xml

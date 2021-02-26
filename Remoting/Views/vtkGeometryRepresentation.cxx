@@ -1388,20 +1388,15 @@ void vtkGeometryRepresentation::PopulateBlockAttributes(
   }
 
   // Handle visibilities.
-  if (!this->BlockSelectors.empty())
+  attrs->SetBlockVisibility(dtree, false); // start by marking root invisible first.
+  std::vector<std::string> selectors(this->BlockSelectors.begin(), this->BlockSelectors.end());
+  const auto cids = vtkDataAssemblyUtilities::GetSelectedCompositeIds(selectors, hierarchy);
+  for (const auto& id : cids)
   {
-    // if no selectors are specified, we treat it as if no visibility overrides
-    // are provided.
-    attrs->SetBlockVisibility(dtree, false); // start by marking root invisible first.
-    std::vector<std::string> selectors(this->BlockSelectors.begin(), this->BlockSelectors.end());
-    const auto cids = vtkDataAssemblyUtilities::GetSelectedCompositeIds(selectors, hierarchy);
-    for (const auto& id : cids)
+    auto iter = cid_to_dobj.find(id);
+    if (iter != cid_to_dobj.end())
     {
-      auto iter = cid_to_dobj.find(id);
-      if (iter != cid_to_dobj.end())
-      {
-        attrs->SetBlockVisibility(iter->second, true);
-      }
+      attrs->SetBlockVisibility(iter->second, true);
     }
   }
 
