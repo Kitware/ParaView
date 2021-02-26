@@ -242,18 +242,6 @@ vtkGeometryRepresentation::vtkGeometryRepresentation()
   this->Actor = vtkPVLODActor::New();
   this->Property = vtkProperty::New();
 
-  // setup composite display attributes
-  vtkNew<vtkCompositeDataDisplayAttributes> compositeAttributes;
-  vtkCompositePolyDataMapper2::SafeDownCast(this->Mapper)
-    ->SetCompositeDataDisplayAttributes(compositeAttributes);
-
-  vtkNew<vtkCompositeDataDisplayAttributes> compositeAttributesLOD;
-  vtkCompositePolyDataMapper2::SafeDownCast(this->LODMapper)
-    ->SetCompositeDataDisplayAttributes(compositeAttributesLOD);
-
-  vtkNew<vtkSelection> sel;
-  this->Mapper->SetSelection(sel);
-
   this->RequestGhostCellsIfNeeded = true;
   this->RepeatTextures = true;
   this->InterpolateTextures = false;
@@ -296,6 +284,22 @@ vtkGeometryRepresentation::~vtkGeometryRepresentation()
 //----------------------------------------------------------------------------
 void vtkGeometryRepresentation::SetupDefaults()
 {
+  // setup composite display attributes
+  if (auto cpdm = vtkCompositePolyDataMapper2::SafeDownCast(this->Mapper))
+  {
+    vtkNew<vtkCompositeDataDisplayAttributes> compositeAttributes;
+    cpdm->SetCompositeDataDisplayAttributes(compositeAttributes);
+  }
+
+  if (auto cpdm = vtkCompositePolyDataMapper2::SafeDownCast(this->LODMapper))
+  {
+    vtkNew<vtkCompositeDataDisplayAttributes> compositeAttributesLOD;
+    cpdm->SetCompositeDataDisplayAttributes(compositeAttributesLOD);
+  }
+
+  vtkNew<vtkSelection> sel;
+  this->Mapper->SetSelection(sel);
+
   this->Decimator->SetLODFactor(0.5);
 
   this->LODOutlineFilter->SetUseOutline(1);
