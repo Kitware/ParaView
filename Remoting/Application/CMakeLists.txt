@@ -75,6 +75,11 @@ if (TARGET VTK::FiltersCore)
     Resources/sources_filterscore.xml)
 endif ()
 
+if (TARGET VTK::FiltersPoints)
+  list(APPEND xml_files
+    Resources/filters_filterspoints.xml)
+endif ()
+
 if (TARGET VTK::FiltersExtraction)
   list(APPEND xml_files
     Resources/filters_filtersextraction.xml)
