@@ -54,8 +54,8 @@ void pqAxesToolbar::constructor()
   this->Internals = new pqInternals();
   this->Internals->setupUi(this);
 
-  QObject::connect(&pqActiveObjects::instance(), SIGNAL(viewChanged(pqView*)), this,
-    SLOT(setView(pqView*)), Qt::QueuedConnection);
+  QObject::connect(
+    &pqActiveObjects::instance(), SIGNAL(viewChanged(pqView*)), this, SLOT(setView(pqView*)));
   QObject::connect(&pqActiveObjects::instance(), SIGNAL(viewChanged(pqView*)), this,
     SLOT(updateEnabledState()), Qt::QueuedConnection);
 

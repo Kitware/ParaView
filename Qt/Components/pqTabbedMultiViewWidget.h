@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    $RCSfile$
+   Module:  pqTabbedMultiViewWidget.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -96,10 +96,28 @@ public:
    */
   pqMultiViewWidget* findTab(vtkSMViewLayoutProxy*) const;
 
+  //@{
   /**
-   * Set the current active tab.
+   * APIs for filtering of tab widgets. This matches the API exposed by
+   * pqPipelineBrowserWidget.
    */
-  void setCurrentTab(int index);
+  void enableAnnotationFilter(const QString& annotationKey);
+  void disableAnnotationFilter();
+  void setAnnotationFilterMatching(bool matching);
+  //@}
+
+  /**
+   * While generally not necessary to call this, if the annotations for the
+   * layout proxies are changed after they are created, applications can use
+   * this method to refresh the tabs that are visible.
+   */
+  void updateVisibleTabs();
+
+  /**
+   * This is primarily for testing purposes. Returns list of names for visible
+   * tabs.
+   */
+  QList<QString> visibleTabLabels() const;
 
 Q_SIGNALS:
   /**
@@ -112,6 +130,11 @@ public Q_SLOTS:
   virtual int createTab(pqServer*);
   virtual int createTab(vtkSMViewLayoutProxy*);
   virtual void closeTab(int);
+
+  /**
+   * Makes the tab at the given index current.
+   */
+  void setCurrentTab(int index);
 
   //@{
   /**
