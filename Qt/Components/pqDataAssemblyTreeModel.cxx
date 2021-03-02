@@ -115,6 +115,7 @@ public:
     bool isDerived() const { return this->ValueDerived; }
   };
 
+  vtkMTimeType DataAssemblyTimeStamp = 0;
   vtkSmartPointer<vtkDataAssembly> DataAssembly;
 
   QVariant data(int node, int role) const;
@@ -316,12 +317,24 @@ pqDataAssemblyTreeModel::~pqDataAssemblyTreeModel() = default;
 //-----------------------------------------------------------------------------
 void pqDataAssemblyTreeModel::setDataAssembly(vtkDataAssembly* assembly)
 {
-  if (this->Internals->DataAssembly != assembly)
+  auto& internals = (*this->Internals);
+  const auto stamp = assembly ? assembly->GetMTime() : 0;
+  if (internals.DataAssemblyTimeStamp != stamp)
   {
     this->beginResetModel();
-    auto& internals = (*this->Internals);
     internals.clearData();
-    internals.DataAssembly = assembly;
+    if (assembly)
+    {
+      // we keep a copy here since vtkDataAssembly pass in change outside the
+      // model's scope which can cause odd issues with the view. It's better to
+      // keep a deep-copy instead.
+      internals.DataAssembly.TakeReference(vtkDataAssembly::New());
+      internals.DataAssembly->DeepCopy(assembly);
+    }
+    else
+    {
+      internals.DataAssembly = nullptr;
+    }
     this->endResetModel();
   }
 }
