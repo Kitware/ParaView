@@ -4491,6 +4491,9 @@
             <Property name="BlockSelectors" function="Selectors" />
             <Property name="BlockColors"    function="Colors" />
             <Property name="BlockOpacities" function="Opacities" />
+            <Hints>
+              <DataAssemblyPropertyWidget use_inputname_as_header="1" />
+            </Hints>
           </PropertyGroup>
 
         </ExposedProperties>
@@ -9254,6 +9257,9 @@
         panel_visibility="multiblock_inspector">
         <Property name="Assembly" function="ActiveAssembly" />
         <Property name="BlockVisibilities" function="Selectors" />
+        <Hints>
+          <DataAssemblyPropertyWidget use_inputname_as_header="1" />
+        </Hints>
       </PropertyGroup>
 
       <InputProperty command="SetInputConnection"
@@ -12667,6 +12673,9 @@
         <Property name="BlockSelectors" function="Selectors" />
         <Property name="BlockColors"    function="Colors" />
         <Property name="BlockOpacities" function="Opacities" />
+        <Hints>
+          <DataAssemblyPropertyWidget use_inputname_as_header="1" />
+        </Hints>
       </PropertyGroup>
 
       <IntVectorProperty command="SetBlockColorsDistinctValues"

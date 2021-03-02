@@ -765,7 +765,9 @@
         <Property name="Assembly"  function="ActiveAssembly" />
         <Property name="Selectors" function="Selectors" />
         <Hints>
-          <DataAssemblyPropertyWidget is_checkable="0" />
+          <DataAssemblyPropertyWidget
+            is_checkable="0"
+            use_inputname_as_header="1" />
         </Hints>
       </PropertyGroup>
       <!-- end of MultiBlockInspectorHelper -->
@@ -883,7 +885,6 @@
         <Property name="Assembly" function="ActiveAssembly" />
         <Property name="Selectors" function="Selectors" />
         <Hints>
-          <DataAssemblyPropertyWidget show_label="1" />
           <PropertyWidgetDecorator type="InputDataTypeDecorator"
             mode="visibility"
             name="vtkMultiBlockDataSet vtkPartitionedDataSetCollection" />

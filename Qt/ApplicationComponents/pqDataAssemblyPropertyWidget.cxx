@@ -32,11 +32,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqDataAssemblyPropertyWidget.h"
 #include "ui_pqDataAssemblyPropertyWidget.h"
 
+#include "pqApplicationCore.h"
 #include "pqComboBoxDomain.h"
 #include "pqCoreUtilities.h"
 #include "pqDataAssemblyTreeModel.h"
 #include "pqDoubleRangeDialog.h"
+#include "pqOutputPort.h"
 #include "pqPropertyLinks.h"
+#include "pqServerManagerModel.h"
 #include "pqSignalAdaptors.h"
 #include "pqTreeViewExpandState.h"
 #include "pqTreeViewSelectionHelper.h"
@@ -45,9 +48,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVXMLElement.h"
 #include "vtkSMCompositeTreeDomain.h"
 #include "vtkSMDataAssemblyDomain.h"
+#include "vtkSMOutputPort.h"
 #include "vtkSMProperty.h"
 #include "vtkSMPropertyGroup.h"
-#include "vtkSMProxy.h"
+#include "vtkSMPropertyHelper.h"
+#include "vtkSMSourceProxy.h"
 
 #include <QColorDialog>
 #include <QIdentityProxyModel>
@@ -412,6 +417,7 @@ class pqDAPModel : public QIdentityProxyModel
   int PixmapSize = 16;
   using Superclass = QIdentityProxyModel;
 
+  QString HeaderText; // header text for column 0.
 public:
   pqDAPModel(int pixmapSize, QObject* prnt)
     : Superclass(prnt)
@@ -424,6 +430,15 @@ public:
           Q_EMIT this->headerDataChanged(Qt::Horizontal, topLeft.column(), topLeft.column());
         }
       });
+  }
+
+  void setHeaderText(const QString& txt)
+  {
+    if (this->HeaderText != txt)
+    {
+      this->HeaderText = txt;
+      this->headerDataChanged(Qt::Horizontal, 0, 0);
+    }
   }
 
   void setSourceModel(QAbstractItemModel* smodel) override
@@ -457,6 +472,14 @@ public:
       {
         case Qt::TextAlignmentRole:
           return QVariant(Qt::AlignLeft | Qt::AlignVCenter);
+
+        case Qt::DisplayRole:
+        case Qt::ToolTipRole:
+          if (section == 0 && !this->HeaderText.isEmpty())
+          {
+            return this->HeaderText;
+          }
+          VTK_FALLTHROUGH;
         default:
           return this->data(this->index(0, section), role);
       }
@@ -672,6 +695,7 @@ vtkSmartPointer<vtkSMPropertyGroup> createGroup(vtkSMProperty* property)
 {
   vtkNew<vtkSMPropertyGroup> group;
   group->AddProperty("Selectors", property);
+  group->SetXMLLabel(property->GetXMLLabel());
   return group;
 }
 }
@@ -710,6 +734,9 @@ public:
   // this is only supported in composite-indices mode.
   bool LeafNodesOnly = false;
 
+  // Indicates if input's proxy name is being shown as header.
+  bool UseInputNameAsHeader = false;
+
   vtkDataAssembly* assembly() const { return this->AssemblyTreeModel->dataAssembly(); }
 };
 
@@ -738,9 +765,6 @@ pqDataAssemblyPropertyWidget::pqDataAssemblyPropertyWidget(
 
   auto& internals = (*this->Internals);
   internals.Ui.setupUi(this);
-  internals.Ui.label->setVisible(
-    groupHints && groupHints->GetScalarAttribute("show_label", &tempValue) && tempValue == 1);
-  internals.Ui.label->setText(smgroup->GetXMLLabel());
   internals.Ui.hierarchy->header()->setDefaultSectionSize(iconSize + 4);
   internals.Ui.hierarchy->header()->setMinimumSectionSize(iconSize + 4);
 
@@ -749,6 +773,15 @@ pqDataAssemblyPropertyWidget::pqDataAssemblyPropertyWidget(
   // Setup proxy model to add check-state support in the header.
   internals.ProxyModel = new pqDAPModel(iconSize, this);
   internals.ProxyModel->setSourceModel(internals.AssemblyTreeModel);
+  internals.ProxyModel->setHeaderText(smgroup->GetXMLLabel());
+
+  int useInputNameAsHeader = 0;
+  if (groupHints &&
+    groupHints->GetScalarAttribute("use_inputname_as_header", &useInputNameAsHeader) &&
+    useInputNameAsHeader == 1)
+  {
+    internals.UseInputNameAsHeader = true;
+  }
 
   // Add a sort-filter model to enable sorting and filtering of item in the
   // tree.
@@ -1180,13 +1213,14 @@ void pqDataAssemblyPropertyWidget::updateDataAssembly(vtkObject* sender)
     assembly = cdomain->GetHierarchy();
     name = "Hierarchy";
   }
+
   auto& internals = (*this->Internals);
   pqTreeViewExpandState helper;
   helper.save(internals.Ui.hierarchy);
   internals.AssemblyTreeModel->setDataAssembly(assembly);
   internals.AssemblyTreeModel->setCheckedNodes(internals.Selectors);
   internals.Ui.tabWidget->setTabText(0, name);
-  internals.Ui.hierarchy->setRootIndex(internals.Ui.hierarchy->model()->index(0, 0));
+  // internals.Ui.hierarchy->setRootIndex(internals.Ui.hierarchy->model()->index(0, 0));
   internals.Ui.hierarchy->expandToDepth(2);
   helper.restore(internals.Ui.hierarchy);
 
@@ -1201,6 +1235,23 @@ void pqDataAssemblyPropertyWidget::updateDataAssembly(vtkObject* sender)
     this->setSelectors(internals.Selectors);
     this->setSelectorColors(internals.Colors);
     this->setSelectorOpacities(internals.Opacities);
+  }
+
+  auto domain = vtkSMDomain::SafeDownCast(sender);
+  if (internals.UseInputNameAsHeader && domain)
+  {
+    vtkSMPropertyHelper helper(domain->GetRequiredProperty("Input"));
+    auto proxy = vtkSMSourceProxy::SafeDownCast(helper.GetAsProxy(0));
+    auto port = helper.GetOutputPort(0);
+    if (proxy && proxy)
+    {
+      auto smmodel = pqApplicationCore::instance()->getServerManagerModel();
+      auto pqport = smmodel->findItem<pqOutputPort*>(proxy->GetOutputPort(port));
+      if (pqport)
+      {
+        internals.ProxyModel->setHeaderText(pqport->prettyName());
+      }
+    }
   }
 }
 

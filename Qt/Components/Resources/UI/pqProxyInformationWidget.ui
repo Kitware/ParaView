@@ -101,9 +101,6 @@
          <property name="alternatingRowColors">
           <bool>true</bool>
          </property>
-         <property name="rootIsDecorated">
-          <bool>false</bool>
-         </property>
          <property name="uniformRowHeights">
           <bool>true</bool>
          </property>
@@ -138,9 +135,6 @@
         <widget class="pqTreeView" name="assemblyTree">
          <property name="alternatingRowColors">
           <bool>true</bool>
-         </property>
-         <property name="rootIsDecorated">
-          <bool>false</bool>
          </property>
          <property name="uniformRowHeights">
           <bool>true</bool>
