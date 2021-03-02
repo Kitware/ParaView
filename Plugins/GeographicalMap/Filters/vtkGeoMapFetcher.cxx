@@ -195,20 +195,17 @@ int vtkGeoMapFetcher::RequestData(
     url << "&boundingBox=" << bb[1] << "," << bb[2] << "," << bb[0] << "," << bb[3];
     url << "&margin=0";
 
-    vtkImageData* result = this->GetVtkPNG(url.str());
-    if (result == nullptr)
+    if (!this->FetchVtkPNG(url.str(), output))
     {
+      vtkErrorMacro(<< "Couldn't fetch geographical image.");
       return 0;
     }
 
-    output->ShallowCopy(result);
-    int* dims = result->GetDimensions();
+    int* dims = output->GetDimensions();
 
     double spacing[2] = { (bb[1] - bb[0]) / dims[1], (bb[3] - bb[2]) / dims[0] };
     output->SetSpacing(spacing[1], spacing[0], 1.0);
     output->SetOrigin(bb[2], bb[0], 0.0);
-
-    result->Delete();
   }
   else
   {
@@ -217,7 +214,7 @@ int vtkGeoMapFetcher::RequestData(
     if (this->FetchingMethod == BoundingBox)
     {
       vtkWarningMacro(<< "Using the Bounding Box option with the GoogleMap API leads to "
-                      << "approximation as it is not supported by the API.");
+                      << "approximation as it is not supported natively by the API.");
       currentCenter[0] = (this->MapBoundingBox[0] + this->MapBoundingBox[1]) * 0.5;
       currentCenter[1] = (this->MapBoundingBox[2] + this->MapBoundingBox[3]) * 0.5;
       currentZoomLevel = static_cast<int>(std::round(
@@ -226,19 +223,19 @@ int vtkGeoMapFetcher::RequestData(
     url << "&center=" << currentCenter[0] << "," << currentCenter[1];
     url << "&zoom=" << currentZoomLevel;
 
-    vtkImageData* result = this->GetVtkPNG(url.str());
-    if (result == nullptr)
+    if (!this->FetchVtkPNG(url.str(), output))
     {
+      vtkErrorMacro(<< "Couldn't fetch geographical image.");
       return 0;
     }
 
     // Reproject image
-    int* dims = result->GetDimensions();
+    int* dims = output->GetDimensions();
     double origin[2];
     vtkGeoMapFetcher::LatLngToPoint(currentCenter[0], currentCenter[1], origin[0], origin[1]);
 
     // shift to corner
-    int scale = (1 << (currentZoomLevel + (this->Upscale ? 1 : 0)));
+    int scale = (1 << (currentZoomLevel + static_cast<int>(this->Upscale)));
     origin[0] -= 0.5 * dims[0] / scale;
     origin[1] -= 0.5 * dims[1] / scale;
 
@@ -248,18 +245,15 @@ int vtkGeoMapFetcher::RequestData(
     double spacing[2] = { 2.0 * (currentCenter[0] - origin[0]) / dims[1],
       2.0 * (currentCenter[1] - origin[1]) / dims[0] };
 
-    output->ShallowCopy(result);
     output->SetSpacing(spacing[1], spacing[0], 1.0);
     output->SetOrigin(origin[1], origin[0], 0.0);
-
-    result->Delete();
   }
 
   return 1;
 }
 
 //-----------------------------------------------------------------------------
-vtkImageData* vtkGeoMapFetcher::GetVtkPNG(const std::string& url)
+bool vtkGeoMapFetcher::FetchVtkPNG(const std::string& url, vtkImageData* dest)
 {
   // download buffer
   std::vector<char> buffer;
@@ -274,7 +268,7 @@ vtkImageData* vtkGeoMapFetcher::GetVtkPNG(const std::string& url)
   if (strncmp(pngMagic, buffer.data(), 8) != 0)
   {
     vtkErrorMacro("Download failed: " << buffer.data());
-    return nullptr;
+    return false;
   }
 
   // convert to image
@@ -282,19 +276,16 @@ vtkImageData* vtkGeoMapFetcher::GetVtkPNG(const std::string& url)
   pngReader->SetMemoryBufferLength(static_cast<vtkIdType>(buffer.size()));
   pngReader->SetMemoryBuffer(buffer.data());
   pngReader->Update();
+  dest->ShallowCopy(pngReader->GetOutput());
 
-  vtkImageData* result = vtkImageData::New();
-  result->ShallowCopy(pngReader->GetOutput());
-
-  int* dims = result->GetDimensions();
+  int* dims = dest->GetDimensions();
   if (dims[0] < 1 || dims[1] < 1)
   {
     vtkErrorMacro("Error during PNG read.");
-    result->Delete();
-    result = nullptr;
+    return false;
   }
 
-  return result;
+  return true;
 }
 
 //-----------------------------------------------------------------------------

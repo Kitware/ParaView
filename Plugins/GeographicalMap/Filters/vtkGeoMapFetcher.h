@@ -87,8 +87,9 @@ public:
 
   //@{
   /**
-   * Get/Set the dimension of the downloaded map.
-   * Default is 500x500.
+   * Get/Set the bounding box of the downloaded map.
+   * Format is {latMin, latMax, longMin, longMax}
+   * Default is {0,1,0,1}.
    */
   vtkSetVector4Macro(MapBoundingBox, double);
   vtkGetVector4Macro(MapBoundingBox, double);
@@ -182,10 +183,11 @@ protected:
 
 private:
   /**
-   * Get a vtkImageData from an URL. Memory should be handled by the user.
-   * Return nullptr if failed.
+   * Get a vtkImageData from an URL and fetch it into dest.
+   * Return true if imge has been found, else return false.
+   * In this case dest is unchanged.
    */
-  vtkImageData* GetVtkPNG(const std::string& url);
+  bool FetchVtkPNG(const std::string& url, vtkImageData* dest);
 
   vtkGeoMapFetcher(const vtkGeoMapFetcher&) = delete;
   void operator=(const vtkGeoMapFetcher&) = delete;

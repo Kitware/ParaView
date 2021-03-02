@@ -22,70 +22,72 @@
 #include "vtkInformationVector.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
+#include "vtkRectilinearGrid.h"
+#include "vtkRectilinearGridToPointSet.h"
 #include "vtkStructuredGrid.h"
 
 //-----------------------------------------------------------------------------
+constexpr std::array<const char*, static_cast<int>(vtkGeoMapConvertFilter::Custom)>
+  vtkGeoMapConvertFilter::PROJ4Strings;
 vtkStandardNewMacro(vtkGeoMapConvertFilter);
 
 //------------------------------------------------------------------------------
 int vtkGeoMapConvertFilter::FillInputPortInformation(int vtkNotUsed(port), vtkInformation* info)
 {
-  info->Set(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkImageData");
+  info->Set(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkDataSet");
   return 1;
-}
-//------------------------------------------------------------------------------
-void vtkGeoMapConvertFilter::SetPROJ4String(const char* projString)
-{
-  if (projString)
-  {
-    this->PROJ4String = projString;
-  }
-  else
-  {
-    this->PROJ4String.clear();
-  }
-  this->Modified();
 }
 
 //-----------------------------------------------------------------------------
 int vtkGeoMapConvertFilter::RequestData(
   vtkInformation*, vtkInformationVector** inputVectors, vtkInformationVector* outputVector)
 {
-  vtkImageData* input = vtkImageData::GetData(inputVectors[0]);
+  vtkDataSet* input = vtkDataSet::GetData(inputVectors[0]);
   vtkStructuredGrid* output = vtkStructuredGrid::GetData(outputVector);
 
-  vtkNew<vtkImageToStructuredGrid> image2points;
-  image2points->SetInputData(input);
-  image2points->Update();
-
-  output->ShallowCopy(image2points->GetOutput());
-  vtkPoints* points = output->GetPoints();
-
-  // see https://proj.org/usage/projections.html
-  std::string proj4;
-
-  vtkNew<vtkGeoProjection> proj;
-  if (this->Projection == Orthographic)
+  if (vtkImageData* img = vtkImageData::SafeDownCast(input))
   {
-    proj4 = "+proj=ortho +ellps=GRS80";
+    vtkNew<vtkImageToStructuredGrid> image2points;
+    image2points->SetInputData(img);
+    image2points->Update();
+    output->ShallowCopy(image2points->GetOutput());
   }
-  else if (this->Projection == Lambert93)
+  else if (vtkRectilinearGrid* grid = vtkRectilinearGrid::SafeDownCast(input))
   {
-    proj4 =
-      "+proj=lcc +ellps=GRS80 +lon_0=3 +lat_0=46.5 +lat_1=44 +lat_2=49 +x_0=700000 +y_0=6600000";
+    vtkNew<vtkRectilinearGridToPointSet> grid2points;
+    grid2points->SetInputData(grid);
+    grid2points->Update();
+    output->ShallowCopy(grid2points->GetOutput());
   }
   else
   {
-    proj4 = this->PROJ4String;
+    output->DeepCopy(input);
+  }
+  vtkPoints* points = output->GetPoints();
+
+  // see https://proj.org/usage/projections.html
+  vtkNew<vtkGeoProjection> destProj;
+  if (this->DestProjection == Custom)
+  {
+    destProj->SetPROJ4String(this->CustomDestProjection.c_str());
+  }
+  else if (this->DestProjection != LatLong)
+  {
+    destProj->SetPROJ4String(vtkGeoMapConvertFilter::PROJ4Strings[this->DestProjection]);
+  }
+  vtkNew<vtkGeoProjection> sourceProj;
+  if (this->SourceProjection == Custom)
+  {
+    sourceProj->SetPROJ4String(this->CustomDestProjection.c_str());
+  }
+  else if (this->SourceProjection != LatLong)
+  {
+    sourceProj->SetPROJ4String(vtkGeoMapConvertFilter::PROJ4Strings[this->DestProjection]);
   }
 
-  proj->SetPROJ4String(proj4.c_str());
-
   vtkNew<vtkGeoTransform> transform;
-
-  // source is implicit (lat/lon)
-  transform->SetDestinationProjection(proj);
-
+  transform->SetSourceProjection(sourceProj);
+  transform->SetDestinationProjection(destProj);
   transform->TransformPoints(points, points);
 
   return 1;
@@ -95,6 +97,8 @@ int vtkGeoMapConvertFilter::RequestData(
 void vtkGeoMapConvertFilter::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
-  os << "Projection: " << this->Projection << "\n";
-  os << "PROJ4String: " << this->PROJ4String << "\n";
+  os << "Source Projection: " << this->SourceProjection << "\n";
+  os << "Source PROJ4 String: " << this->CustomSourceProjection << "\n";
+  os << "Destination Projection: " << this->DestProjection << "\n";
+  os << "Destination PROJ4 String: " << this->CustomDestProjection << "\n";
 }
