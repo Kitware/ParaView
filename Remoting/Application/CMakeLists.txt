@@ -55,8 +55,12 @@ endif ()
 
 if (TARGET VTK::DomainsChemistry)
   list(APPEND xml_files
-    Resources/filters_domainschemistry.xml
-    Resources/readers_domainschemistry.xml)
+    Resources/filters_domainschemistry.xml)
+endif ()
+
+if (TARGET VTK::IOChemistry)
+  list(APPEND xml_files
+    Resources/readers_iochemistry.xml)
 endif ()
 
 if (TARGET VTK::FiltersAMR)

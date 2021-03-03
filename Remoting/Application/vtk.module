@@ -50,6 +50,7 @@ OPTIONAL_DEPENDS
   VTK::IOADIOS2
   VTK::IOCGNSReader
   VTK::IOFides
+  VTK::IOChemistry
   VTK::IOCityGML
   VTK::IOGDAL
   VTK::IOGeometry
