@@ -332,7 +332,7 @@ def setattr(proxy, pname, value):
                 'The `OSPRayMaterial` control has been renamed in ParaView 5.7 to `Material`.')
 
     if pname == "CompositeDataSetIndex" and proxy.SMProxy.GetXMLName() == "SpreadSheetRepresentation":
-        if paraview.compatibility.GetVersion() < 5.10:
+        if paraview.compatibility.GetVersion() <= 5.9:
             selectors = ["//*[@cid='%s']" % cid for cid in value]
             return proxy.GetProperty("BlockVisibilities").SetData(selectors)
         else:
@@ -342,7 +342,7 @@ def setattr(proxy, pname, value):
 
 
     if pname == "BlockIndices" and proxy.SMProxy.GetXMLName() == "ExtractBlock":
-        if paraview.compatibility.GetVersion() < 5.10:
+        if paraview.compatibility.GetVersion() <= 5.9:
             selectors = ["//*[@cid='%s']" % cid for cid in value]
             return proxy.GetProperty("Selectors").SetData(selectors)
         else:
@@ -351,7 +351,7 @@ def setattr(proxy, pname, value):
                 "supports 'Selectors' to select blocks.")
 
     if pname in ["MaintainStructure", "PruneOutput"] and proxy.SMProxy.GetXMLName() == "ExtractBlock":
-        if paraview.compatibility.GetVersion() < 5.10:
+        if paraview.compatibility.GetVersion() <= 5.9:
             return
         else:
             raise NotSupportedException(
@@ -703,7 +703,7 @@ def getattr(proxy, pname):
     # 5.10 onwards SpreadSheetRepresentation cannot provide a value for
     # CompositeDataSetIndex
     if pname == "CompositeDataSetIndex" and proxy.SMProxy.GetXMLName() == "SpreadSheetRepresentation":
-        if paraview.compatibility.GetVersion() < 5.10:
+        if paraview.compatibility.GetVersion() <= 5.9:
             return []
         else:
             raise NotSupportedException(
@@ -713,21 +713,21 @@ def getattr(proxy, pname):
 
     if proxy.SMProxy.GetXMLName() == "ExtractBlock":
         if pname == "BlockIndices":
-            if paraview.compatibility.GetVersion() < 5.10:
+            if paraview.compatibility.GetVersion() <= 5.9:
                 return []
             else:
                 raise NotSupportedException(
                         "Since ParaView 5.10, 'BlockIndices' on 'ExtractBlock' "
                         "has been replaced by 'Selectors'.")
         elif pname == "PruneOutput":
-            if paraview.compatibility.GetVersion() < 5.10:
+            if paraview.compatibility.GetVersion() <= 5.9:
                 return 1
             else:
                 raise NotSupportedException(
                         "Since ParaView 5.10, 'PruneOutput' on 'ExtractBlock' "
                         "is no longer supported. Simply remove it.")
         elif pname == "MaintainStructure":
-            if paraview.compatibility.GetVersion() < 5.10:
+            if paraview.compatibility.GetVersion() <= 5.9:
                 return 1
             else:
                 raise NotSupportedException(

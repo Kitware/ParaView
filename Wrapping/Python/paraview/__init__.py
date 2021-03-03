@@ -43,7 +43,7 @@ class _version(object):
         if self.minor != None and self.major != None:
             version = float(self.minor)
             while version >= 1.0:
-                version = version / 100.0
+                version = version / 10.0
             version += float(self.major)
             return version
         return None
