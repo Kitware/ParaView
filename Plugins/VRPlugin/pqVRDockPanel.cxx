@@ -526,7 +526,7 @@ void pqVRDockPanel::restoreState()
   QString filename = fileDialog.getSelectedFiles().first();
 
   vtkNew<vtkPVXMLParser> xmlParser;
-  xmlParser->SetFileName(qPrintable(filename));
+  xmlParser->SetFileName(filename.toUtf8().data());
   xmlParser->Parse();
 
   vtkPVXMLElement* root = xmlParser->GetRootElement();

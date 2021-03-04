@@ -362,7 +362,7 @@ public:
     }
     else
     {
-      const bool hasAnnotation = vlayout->HasAnnotation(qUtf8Printable(this->FilterAnnotationKey));
+      const bool hasAnnotation = vlayout->HasAnnotation(this->FilterAnnotationKey.toUtf8().data());
       return this->FilterAnnotationMatching ? hasAnnotation : !hasAnnotation;
     }
   }
