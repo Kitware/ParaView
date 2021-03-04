@@ -67,9 +67,9 @@ static QString systemServers()
 {
   QString settingsRoot;
 #if defined(Q_OS_WIN)
-  settingsRoot = QString::fromLocal8Bit(getenv("COMMON_APPDATA"));
+  settingsRoot = QString::fromUtf8(getenv("COMMON_APPDATA"));
 #else
-  settingsRoot = QString::fromLocal8Bit("/usr/share");
+  settingsRoot = QString::fromUtf8("/usr/share");
 #endif
   QString settingsPath = QString("%2%1%3%1%4");
   settingsPath = settingsPath.arg(QDir::separator());

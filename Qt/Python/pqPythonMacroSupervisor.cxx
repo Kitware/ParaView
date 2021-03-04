@@ -429,7 +429,7 @@ QStringList pqPythonMacroSupervisor::getMacrosFilePaths()
   const char* env = vtksys::SystemTools::GetEnv("PV_MACRO_PATH");
   if (env)
   {
-    QStringList macroPathDirs = QString::fromLocal8Bit(env).split(ENV_PATH_SEP);
+    QStringList macroPathDirs = QString::fromUtf8(env).split(ENV_PATH_SEP);
     macroDirs << macroPathDirs;
   }
 
