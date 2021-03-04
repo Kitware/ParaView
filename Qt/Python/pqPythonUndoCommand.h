@@ -75,7 +75,7 @@ struct pqPythonTextHistoryEntry
   /**
    * @brief Returns true is the entry is empty
    */
-  bool IsEmpty() const { return cursorPosition == -1; }
+  bool isEmpty() const { return cursorPosition == -1; }
 };
 
 /**
@@ -108,7 +108,7 @@ public:
   /**
    * @brief Returns the current history entry
    */
-  const pqPythonTextHistoryEntry& GetCurrentHistoryEntry() const
+  const pqPythonTextHistoryEntry& getCurrentHistoryEntry() const
   {
     return this->CurrentHistoryEntry;
   }
@@ -118,7 +118,7 @@ private:
    * @brief Utility function that mutates the \ref text
    * using the given history value \ref h.
    */
-  void SwapImpl(const pqPythonTextHistoryEntry& h);
+  void swapImpl(const pqPythonTextHistoryEntry& h);
 
   /// @brief The text to do the undo/redo on
   QTextEdit& Text;

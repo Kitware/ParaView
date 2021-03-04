@@ -32,80 +32,81 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPythonScriptEditor.h"
 
 #include "pqApplicationCore.h"
-#include "pqCoreUtilities.h"
-#include "pqFileDialog.h"
 #include "pqPythonManager.h"
 #include "pqPythonSyntaxHighlighter.h"
+#include "pqPythonTabWidget.h"
 #include "pqPythonTextArea.h"
 #include "pqSettings.h"
 
 #include <QAction>
-#include <QApplication>
-#include <QCloseEvent>
-#include <QDebug>
-#include <QFile>
-#include <QFileDialog>
 #include <QFileInfo>
-#include <QFontMetrics>
 #include <QHBoxLayout>
-#include <QHBoxLayout>
-#include <QMenu>
+#include <QLabel>
 #include <QMenuBar>
-#include <QMessageBox>
 #include <QScrollBar>
 #include <QStatusBar>
+#include <QTabBar>
+#include <QTabWidget>
 #include <QTextEdit>
-#include <QTextStream>
+#include <QToolButton>
 
 #include <vtkPythonInterpreter.h>
 
 //-----------------------------------------------------------------------------
 pqPythonScriptEditor::pqPythonScriptEditor(QWidget* p)
   : QMainWindow(p)
-  , TextArea(new pqPythonTextArea(this))
+  , TabWidget(new pqPythonTabWidget(this))
   , pythonManager(nullptr)
 {
-  this->setCentralWidget(this->TextArea);
+  this->setCentralWidget(TabWidget);
 
-  this->createActions();
   this->createMenus();
-  this->createStatusBar();
+
   this->resize(300, 450);
+
   pqApplicationCore::instance()->settings()->restoreState("PythonScriptEditor", *this);
   vtkPythonInterpreter::Initialize();
 
   this->setWindowTitle(tr("ParaView Python Script Editor"));
 
-  const auto StrippedName = [](const QString& s) { return QFileInfo(s).fileName(); };
-
-  connect(this->TextArea, &pqPythonTextArea::FileSavedAsMacro,
-    [this, &StrippedName](const QString& filename) {
+  this->connect(
+    this->TabWidget, &pqPythonTabWidget::fileSavedAsMacro, [this](const QString& filename) {
       if (pythonManager)
       {
         pythonManager->updateMacroList();
       }
 
-      this->setWindowTitle(tr("%1[*] - %2").arg(StrippedName(filename)).arg(tr("Script Editor")));
+      this->setWindowTitle(
+        tr("%1[*] - %2").arg(details::stripFilename(filename)).arg(tr("Script Editor")));
       this->statusBar()->showMessage(tr("File %1 saved as macro").arg(filename), 4000);
     });
 
-  connect(
-    this->TextArea, &pqPythonTextArea::FileSaved, [this, &StrippedName](const QString& filename) {
-      this->setWindowTitle(tr("%1[*] - %2").arg(StrippedName(filename)).arg(tr("Script Editor")));
-      this->statusBar()->showMessage(tr("File %1 saved").arg(filename), 4000);
-    });
+  this->connect(this->TabWidget, &pqPythonTabWidget::fileSaved, [this](const QString& filename) {
+    this->setWindowTitle(
+      tr("%1[*] - %2").arg(details::stripFilename(filename)).arg(tr("Script Editor")));
+    this->statusBar()->showMessage(tr("File %1 saved").arg(filename), 4000);
+  });
 
-  connect(
-    this->TextArea, &pqPythonTextArea::FileOpened, [this, &StrippedName](const QString& filename) {
-      this->setWindowTitle(tr("%1[*] - %2").arg(StrippedName(filename)).arg(tr("Script Editor")));
-      this->statusBar()->showMessage(tr("File %1 opened").arg(filename), 4000);
-    });
+  this->connect(this->TabWidget, &pqPythonTabWidget::fileOpened, [this](const QString& filename) {
+    this->setWindowTitle(
+      tr("%1[*] - %2").arg(details::stripFilename(filename)).arg(tr("Script Editor")));
+    this->statusBar()->showMessage(tr("File %1 opened").arg(filename), 4000);
+  });
+
+  connect(this->TabWidget, &QTabWidget::currentChanged,
+    [this]() { this->TabWidget->updateActions(this->Actions); });
+
+  this->TabWidget->connectActions(this->Actions);
+  this->TabWidget->updateActions(this->Actions);
+  pqPythonEditorActions::connect(this->Actions, this);
+
+  this->createStatusBar();
 }
 
 //-----------------------------------------------------------------------------
 void pqPythonScriptEditor::closeEvent(QCloseEvent* e)
 {
-  if (this->TextArea->SaveOnClose())
+  if (this->TabWidget->saveOnClose())
   {
     pqApplicationCore::instance()->settings()->saveState(*this, "PythonScriptEditor");
     e->accept();
@@ -119,113 +120,48 @@ void pqPythonScriptEditor::closeEvent(QCloseEvent* e)
 //-----------------------------------------------------------------------------
 void pqPythonScriptEditor::open(const QString& filename)
 {
-  this->TextArea->OpenFile(filename);
+  this->TabWidget->addNewTextArea(filename);
 }
 
 //-----------------------------------------------------------------------------
 void pqPythonScriptEditor::setSaveDialogDefaultDirectory(const QString& dir)
 {
-  this->TextArea->SetDefaultSaveDirectory(dir);
+  this->TabWidget->getCurrentTextArea()->setDefaultSaveDirectory(dir);
 }
 
 //-----------------------------------------------------------------------------
 void pqPythonScriptEditor::setPythonManager(pqPythonManager* manager)
 {
   this->pythonManager = manager;
-  this->TextArea->GetSaveFileAsMacroAction()->setEnabled(manager != nullptr);
-}
-
-//-----------------------------------------------------------------------------
-void pqPythonScriptEditor::createActions()
-{
-  QAction* newFileAction = this->TextArea->GetNewFileAction();
-  newFileAction->setText(tr("&New"));
-  newFileAction->setShortcut(tr("CtrL+N"));
-  newFileAction->setStatusTip(tr("Create a new file"));
-
-  QAction* openFileAction = this->TextArea->GetOpenFileAction();
-  openFileAction->setText(tr("&Open..."));
-  openFileAction->setShortcut(tr("CtrL+O"));
-  openFileAction->setStatusTip(tr("Open an existing file"));
-
-  QAction* saveFileAction = this->TextArea->GetSaveFileAction();
-  saveFileAction->setText(tr("&Save"));
-  saveFileAction->setShortcut(tr("CtrL+S"));
-  saveFileAction->setStatusTip(tr("Save the document to disk"));
-
-  QAction* saveFileAsAction = this->TextArea->GetSaveFileAsAction();
-  saveFileAsAction->setText(tr("Save &As..."));
-  saveFileAsAction->setStatusTip(tr("Save the document under a new name"));
-
-  QAction* saveFileAsMacroAction = this->TextArea->GetSaveFileAsMacroAction();
-  saveFileAsMacroAction->setText(tr("Save As &Macro..."));
-  saveFileAsMacroAction->setStatusTip(tr("Save the document as a Macro"));
-  saveFileAsMacroAction->setEnabled(false);
-
-  this->exitAct = new QAction(tr("C&lose"), this);
-  this->exitAct->setShortcut(tr("Ctrl+W"));
-  this->exitAct->setStatusTip(tr("Close the script editor"));
-  this->connect(this->exitAct, SIGNAL(triggered()), this, SLOT(close()));
-
-  this->cutAct = new QAction(tr("Cu&t"), this);
-  this->cutAct->setShortcut(tr("Ctrl+X"));
-  this->cutAct->setStatusTip(tr("Cut the current selection's contents to the "
-                                "clipboard"));
-  this->connect(this->cutAct, SIGNAL(triggered()), this->TextArea->GetTextEdit(), SLOT(cut()));
-
-  this->copyAct = new QAction(tr("&Copy"), this);
-  this->copyAct->setShortcut(tr("Ctrl+C"));
-  this->copyAct->setStatusTip(tr("Copy the current selection's contents to the "
-                                 "clipboard"));
-  this->connect(this->copyAct, SIGNAL(triggered()), this->TextArea->GetTextEdit(), SLOT(copy()));
-
-  this->pasteAct = new QAction(tr("&Paste"), this);
-  this->pasteAct->setShortcut(tr("Ctrl+V"));
-  this->pasteAct->setStatusTip(tr("Paste the clipboard's contents into the current "
-                                  "selection"));
-  this->connect(this->pasteAct, SIGNAL(triggered()), this->TextArea->GetTextEdit(), SLOT(paste()));
-
-  QAction* undoAct = this->TextArea->GetUndoAction();
-  undoAct->setShortcut(tr("Ctrl+Z"));
-  undoAct->setStatusTip(tr("Undo the last edit of the file"));
-
-  QAction* redoAct = this->TextArea->GetRedoAction();
-  redoAct->setShortcut(tr("Ctrl+Y"));
-  redoAct->setStatusTip(tr("Redo the last undo of the file"));
-
-  this->cutAct->setEnabled(false);
-  this->copyAct->setEnabled(false);
-
-  this->connect(this->TextArea->GetTextEdit(), SIGNAL(copyAvailable(bool)), this->cutAct,
-    SLOT(setEnabled(bool)));
-  this->connect(this->TextArea->GetTextEdit(), SIGNAL(copyAvailable(bool)), this->copyAct,
-    SLOT(setEnabled(bool)));
+  this->Actions[pqPythonEditorActions::Action::SaveFileAsMacro].setEnabled(manager != nullptr);
 }
 
 //-----------------------------------------------------------------------------
 void pqPythonScriptEditor::createMenus()
 {
+  using Action = pqPythonEditorActions::Action;
+
   this->menuBar()->setObjectName("PythonScriptEditorMenuBar");
+
   this->fileMenu = menuBar()->addMenu(tr("&File"));
   this->fileMenu->setObjectName("File");
-  this->fileMenu->addAction(this->TextArea->GetNewFileAction());
-  this->fileMenu->addAction(this->TextArea->GetOpenFileAction());
-  this->fileMenu->addAction(this->TextArea->GetSaveFileAction());
-  this->fileMenu->addAction(this->TextArea->GetSaveFileAsAction());
-  this->fileMenu->addAction(this->TextArea->GetSaveFileAsMacroAction());
+  this->fileMenu->addAction(&this->Actions[Action::NewFile]);
+  this->fileMenu->addAction(&this->Actions[Action::OpenFile]);
+  this->fileMenu->addAction(&this->Actions[Action::SaveFile]);
+  this->fileMenu->addAction(&this->Actions[Action::SaveFileAs]);
+  this->fileMenu->addAction(&this->Actions[Action::SaveFileAsMacro]);
   this->fileMenu->addSeparator();
-  this->fileMenu->addAction(this->exitAct);
+  this->fileMenu->addAction(&this->Actions[Action::CloseCurrentTab]);
+  this->fileMenu->addAction(&this->Actions[Action::Exit]);
 
   this->editMenu = menuBar()->addMenu(tr("&Edit"));
   this->editMenu->setObjectName("Edit");
-  this->editMenu->addAction(this->cutAct);
-  this->editMenu->addAction(this->copyAct);
-  this->editMenu->addAction(this->pasteAct);
+  this->editMenu->addAction(&this->Actions[Action::Cut]);
+  this->editMenu->addAction(&this->Actions[Action::Copy]);
+  this->editMenu->addAction(&this->Actions[Action::Paste]);
   this->editMenu->addSeparator();
-  this->editMenu->addAction(this->TextArea->GetUndoAction());
-  this->editMenu->addAction(this->TextArea->GetRedoAction());
-
-  this->menuBar()->addSeparator();
+  this->editMenu->addAction(&this->Actions[Action::Undo]);
+  this->editMenu->addAction(&this->Actions[Action::Redo]);
 }
 
 //-----------------------------------------------------------------------------
@@ -235,14 +171,30 @@ void pqPythonScriptEditor::createStatusBar()
 }
 
 //-----------------------------------------------------------------------------
-void pqPythonScriptEditor::setText(const QString& text)
+void pqPythonScriptEditor::scrollToBottom()
 {
-  this->TextArea->GetTextEdit()->setPlainText(text);
+  this->TabWidget->getCurrentTextArea()->getTextEdit()->verticalScrollBar()->setValue(
+    this->TabWidget->getCurrentTextArea()->getTextEdit()->verticalScrollBar()->maximum());
 }
 
 //-----------------------------------------------------------------------------
-void pqPythonScriptEditor::scrollToBottom()
+void pqPythonScriptEditor::updateMacroList()
 {
-  this->TextArea->GetTextEdit()->verticalScrollBar()->setValue(
-    this->TextArea->GetTextEdit()->verticalScrollBar()->maximum());
+  auto editor = pqPythonScriptEditor::getUniqueInstance();
+  if (editor->pythonManager)
+  {
+    editor->pythonManager->updateMacroList();
+  }
+}
+
+//-----------------------------------------------------------------------------
+void pqPythonScriptEditor::updateTrace(const QString& str)
+{
+  this->TabWidget->updateTrace(str);
+}
+
+//-----------------------------------------------------------------------------
+void pqPythonScriptEditor::stopTrace(const QString& str)
+{
+  this->TabWidget->stopTrace(str);
 }

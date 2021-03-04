@@ -249,7 +249,7 @@ void pqPythonManager::addMacro(const QString& fileName)
 //----------------------------------------------------------------------------
 void pqPythonManager::editMacro(const QString& fileName)
 {
-  pqPythonScriptEditor* pyEditor = pqPythonScriptEditor::GetUniqueInstance();
+  pqPythonScriptEditor* pyEditor = pqPythonScriptEditor::getUniqueInstance();
 
   pyEditor->setPythonManager(this);
   pyEditor->show();

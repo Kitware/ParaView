@@ -51,7 +51,7 @@ public:
 protected slots:
   void onTriggered() override
   {
-    pqPythonScriptEditor* pyEditor = pqPythonScriptEditor::GetUniqueInstance();
+    pqPythonScriptEditor* pyEditor = pqPythonScriptEditor::getUniqueInstance();
     pqPythonManager* pythonManager = pqPVApplicationCore::instance()->pythonManager();
 
     pyEditor->setPythonManager(pythonManager);

@@ -35,13 +35,16 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqPythonModule.h"
 
+#include "pqPythonUtils.h"
+
 #include <QAction>
 #include <QDir>
 #include <QObject>
 #include <QString>
-#include <QTextEdit>
 
-#include <array>
+#include <iostream>
+
+class QTextEdit;
 
 /**
  * @class pqPythonFileIO
@@ -52,25 +55,6 @@ class PQPYTHON_EXPORT pqPythonFileIO : public QObject
 {
   Q_OBJECT
 public:
-  /**
-   * @brief All the \ref pqPythonFileIO QAction
-   * provided by this class.
-   *
-   * @details Each action is connected to
-   * the proper functionality at construction
-   * (ie there is no need to connect them
-   * when using this class)
-   */
-  enum class IOAction : std::uint8_t
-  {
-    NewFile = 0,
-    OpenFile,
-    SaveFile,
-    SaveFileAs,
-    SaveFileAsMacro,
-    END
-  };
-
   /**
    * @brief Default constructor is not valid for this class
    */
@@ -84,11 +68,11 @@ public:
   pqPythonFileIO(QWidget* parent, QTextEdit& text);
 
   /**
-   * @brief Get one of the action listed in \ref IOAction
-   * @param[in] action the wanted action
-   * @returns a pointer to the QAction
+   * @brief Destroy this object.
+   * @details Effectively clears the swap
+   * created by this class
    */
-  QAction* GetAction(const IOAction action) { return &Actions[action]; }
+  ~pqPythonFileIO() override;
 
   /**
    * @brief Saves and close the underlying file
@@ -96,86 +80,108 @@ public:
    * false if the user discarded the saves or if something
    * wrong happened during file I/O
    */
-  bool SaveOnClose();
+  bool saveOnClose();
 
   /**
-   * @brief Opens and load the given file
+   * @brief Opens and load the given file.
    * @param[in] filename the file to be opened
    * @returns false if the file is invalid
    */
-  bool OpenFile(const QString& filename);
+  bool openFile(const QString& filename);
 
   /**
    * @brief Sets the default save directory
    */
-  void SetDefaultSaveDirectory(const QString& dir) { this->DefaultSaveDirectory = dir; }
+  void setDefaultSaveDirectory(const QString& dir) { this->DefaultSaveDirectory = dir; }
+
+  /**
+   * @brief Returns the filename the editor acts on
+   */
+  const QString& getFilename() const { return this->File.Name; }
+
+  /**
+   * @brief Returns true if the buffer content has been saved on the disk
+   */
+  bool isDirty() const;
 
 signals:
   /**
    * @brief Signals that the QTextEdit buffer has been erased
    */
-  void BufferErased();
+  void bufferErased();
 
   /**
    * @brief Signals that a file has been opened
    */
-  void FileOpened(const QString&);
+  void fileOpened(const QString&);
 
   /**
    * @brief Signals that the file has been saved
    */
-  void FileSaved(const QString&);
+  void fileSaved(const QString&);
 
   /**
    * @brief Signals that the file has been saved under
    * the macro directory from Paraview
    */
-  void FileSavedAsMacro(const QString&);
-
-private slots:
-  /**
-   * @brief Creates a new file
-   * @details Save the current buffer if needed
-   * and clears the underlying \ref TextEdit
-   */
-  bool NewFile();
+  void fileSavedAsMacro(const QString&);
 
   /**
-   * @brief Opens a new file
-   * @details Ask the user which file to open
+   * @brief Emitted when the content of the buffer
+   * has changed
    */
-  bool Open();
+  void contentChanged();
+
+public slots:
+  /**
+   * @brief Change the buffer status to modified
+   */
+  void setModified(bool modified);
 
   /**
    * @brief Saves the underlying file
    * @details If no file is associated, ask the
    * user which file to save this buffer in
    */
-  bool Save();
+  bool save();
 
   /**
    * @brief Saves the current file under a new file
    * and opens it in the editor
    */
-  bool SaveAs();
+  bool saveAs();
 
   /**
    * @brief Saves the current file under the macro directory
    */
-  bool SaveAsMacro();
+  bool saveAsMacro();
 
 private:
-  bool LoadFile(const QString& filename);
+  struct PythonFile
+  {
+    PythonFile() = default;
 
-  bool SaveFile(const QString& filename);
+    PythonFile(const QString& str, QTextEdit* textEdit)
+      : Name(str)
+      , Text(textEdit)
+    {
+    }
 
-  /**
-   * @brief Internal utility function that tells if this buffer needs to be saved
-   * @details For now, we use the modified property of the QTextDocument
-   */
-  bool NeedSave() const { return this->TextEdit.document()->isModified(); }
+    bool operator!=(const PythonFile& other) const { return this->Name != other.Name; }
 
-  void SetModified(bool modified) { this->TextEdit.document()->setModified(modified); }
+    bool writeToFile() const;
+
+    bool readFromFile(QString& str) const;
+
+    void start();
+
+    void removeSwap() const;
+
+    QString Name = "";
+    QTextEdit* Text = nullptr;
+  } File;
+
+  bool saveBuffer(const QString& file);
 
   QTextEdit& TextEdit;
 
@@ -183,24 +189,6 @@ private:
    * @brief The default save directory (ie ~/home)
    */
   QString DefaultSaveDirectory = QDir::homePath();
-
-  QString Filename = "";
-
-  /**
-   * @class EnumArray
-   * @brief Static array accessible through an enum
-   */
-  template <typename E, class T, std::size_t N = static_cast<size_t>(E::END)>
-  struct EnumArray : public std::array<T, N>
-  {
-    T& operator[](E e) { return std::array<T, N>::operator[](static_cast<size_t>(e)); }
-  };
-
-  /**
-   * @brief The list of QAction
-   * listed in \ref IOAction
-   */
-  EnumArray<IOAction, QAction> Actions;
 };
 
 #endif // pqPythonTextSave_h

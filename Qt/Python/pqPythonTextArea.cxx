@@ -32,25 +32,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqPythonTextArea.h"
 
-#include "pqPythonFileIO.h"
-#include "pqPythonLineNumberArea.h"
-#include "pqPythonSyntaxHighlighter.h"
-#include "pqPythonUtils.h"
-
-#include <QAbstractTextDocumentLayout>
-#include <QAction>
 #include <QHBoxLayout>
-#include <QPaintEvent>
-#include <QScrollBar>
-#include <QTextBlock>
 
 //-----------------------------------------------------------------------------
 pqPythonTextArea::pqPythonTextArea(QWidget* parent)
   : QWidget(parent)
-  , TextEdit(new QTextEdit(this))
-  , LineNumberArea(new pqPythonLineNumberArea(this, *this->TextEdit))
-  , SyntaxHighlighter(new pqPythonSyntaxHighlighter(this, *this->TextEdit))
-  , FileIO(new pqPythonFileIO(this, *this->TextEdit))
+  , TextEdit(this)
+  , LineNumberArea(this, *this->TextEdit)
+  , SyntaxHighlighter(this, *this->TextEdit)
+  , FileIO(this, *this->TextEdit)
 {
   this->TextEdit->setUndoRedoEnabled(false);
   this->TextEdit->setAcceptDrops(false);
@@ -68,16 +58,16 @@ pqPythonTextArea::pqPythonTextArea(QWidget* parent)
   layout->setSpacing(0);
   this->setLayout(layout);
 
-  connect(this->TextEdit, &QTextEdit::cursorPositionChanged,
+  this->connect(this->TextEdit, &QTextEdit::cursorPositionChanged,
     [this]() { this->LineNumberArea->update(); });
 
-  connect(this->TextEdit->document(), &QTextDocument::blockCountChanged,
+  this->connect(this->TextEdit->document(), &QTextDocument::blockCountChanged,
     [this](int) { this->LineNumberArea->updateGeometry(); });
 
-  connect(this->TextEdit->verticalScrollBar(), &QScrollBar::valueChanged,
+  this->connect(this->TextEdit->verticalScrollBar(), &QScrollBar::valueChanged,
     [this](int) { this->LineNumberArea->update(); });
 
-  connect(this->TextEdit, &QTextEdit::textChanged, [this]() {
+  this->connect(this->TextEdit, &QTextEdit::textChanged, [this]() {
     const QString text = this->TextEdit->toPlainText();
     const int cursorPosition = this->TextEdit->textCursor().position();
 
@@ -93,16 +83,19 @@ pqPythonTextArea::pqPythonTextArea(QWidget* parent)
 
     const int hScrollBarValue = this->TextEdit->horizontalScrollBar()->value();
     this->TextEdit->horizontalScrollBar()->setValue(hScrollBarValue);
+
+    this->FileIO->contentChanged();
   });
 
-  connect(this->FileIO, SIGNAL(FileSavedAsMacro(const QString&)), this,
-    SIGNAL(FileSavedAsMacro(const QString&)));
-  connect(this->FileIO, SIGNAL(FileSaved(const QString&)), this, SIGNAL(FileSaved(const QString&)));
-  connect(
-    this->FileIO, SIGNAL(FileOpened(const QString&)), this, SIGNAL(FileOpened(const QString&)));
-  connect(this->FileIO, SIGNAL(BufferErased()), this, SIGNAL(BufferErased()));
+  this->connect(
+    this->FileIO, &pqPythonFileIO::fileSavedAsMacro, this, &pqPythonTextArea::fileSavedAsMacro);
+  this->connect(this->FileIO, &pqPythonFileIO::fileSaved, this, &pqPythonTextArea::fileSaved);
+  this->connect(this->FileIO, &pqPythonFileIO::fileOpened, this, &pqPythonTextArea::fileOpened);
+  this->connect(this->FileIO, &pqPythonFileIO::bufferErased, this, &pqPythonTextArea::bufferErased);
+  this->connect(
+    this->FileIO, &pqPythonFileIO::contentChanged, this, &pqPythonTextArea::contentChanged);
 
-  connect(this->FileIO, &pqPythonFileIO::BufferErased, [this]() { this->UndoStack.clear(); });
+  this->connect(this->FileIO, &pqPythonFileIO::bufferErased, [this]() { this->UndoStack.clear(); });
 }
 
 //-----------------------------------------------------------------------------
@@ -112,14 +105,16 @@ bool pqPythonTextArea::eventFilter(QObject* obj, QEvent* event)
   if (event->type() == QEvent::KeyPress)
   {
     QKeyEvent* keyEvent = static_cast<QKeyEvent*>(event);
-    if (TEST_SEQUENCE(keyEvent, this->UndoMofidier, this->UndoKey))
+    if (keyEvent->matches(QKeySequence::Undo))
     {
-      this->UndoAction->trigger();
+      this->UndoStack.undo();
+      this->LineNumberArea->update();
       return true;
     }
-    else if (TEST_SEQUENCE(keyEvent, this->RedoMofidier, this->RedoKey))
+    else if (keyEvent->matches(QKeySequence::Redo))
     {
-      this->RedoAction->trigger();
+      this->UndoStack.redo();
+      this->LineNumberArea->update();
       return true;
     }
   }
@@ -129,85 +124,60 @@ bool pqPythonTextArea::eventFilter(QObject* obj, QEvent* event)
 #undef TEST_SEQUENCE
 
 //-----------------------------------------------------------------------------
-QAction* pqPythonTextArea::GetUndoAction()
+bool pqPythonTextArea::saveOnClose()
 {
-  if (UndoAction == nullptr)
-  {
-    this->UndoAction = this->UndoStack.createUndoAction(this, tr("&Undo"));
-
-    // Update the line number area if undo triggers
-    connect(this->UndoAction, &QAction::triggered, [this]() { this->LineNumberArea->update(); });
-  }
-
-  return UndoAction;
+  return this->FileIO->saveOnClose();
 }
 
 //-----------------------------------------------------------------------------
-QAction* pqPythonTextArea::GetRedoAction()
+bool pqPythonTextArea::isEmpty() const
 {
-  if (RedoAction == nullptr)
-  {
-    this->RedoAction = this->UndoStack.createRedoAction(this, tr("&Redo"));
-
-    // Update the line number area if redo triggers
-    connect(this->RedoAction, &QAction::triggered, [this]() { this->LineNumberArea->update(); });
-  }
-
-  return RedoAction;
+  return this->TextEdit->toPlainText().isEmpty();
 }
 
 //-----------------------------------------------------------------------------
-bool pqPythonTextArea::SaveOnClose()
+bool pqPythonTextArea::isDirty() const
 {
-  if (this->FileIO->SaveOnClose())
-  {
-    this->TextEdit->clear();
-    return true;
-  }
-
-  return false;
+  return this->FileIO->isDirty();
 }
 
 //-----------------------------------------------------------------------------
-bool pqPythonTextArea::OpenFile(const QString& filename)
+void pqPythonTextArea::setText(const QString& text)
 {
-  return this->FileIO->OpenFile(filename);
+  this->TextEdit->setPlainText(text);
+  this->FileIO->setModified(true);
 }
 
 //-----------------------------------------------------------------------------
-void pqPythonTextArea::SetDefaultSaveDirectory(const QString& dir)
+bool pqPythonTextArea::openFile(const QString& filename)
 {
-  this->FileIO->SetDefaultSaveDirectory(dir);
-}
-
-using Action = pqPythonFileIO::IOAction;
-
-//-----------------------------------------------------------------------------
-QAction* pqPythonTextArea::GetNewFileAction()
-{
-  return this->FileIO->GetAction(Action::NewFile);
+  return this->FileIO->openFile(filename);
 }
 
 //-----------------------------------------------------------------------------
-QAction* pqPythonTextArea::GetOpenFileAction()
+void pqPythonTextArea::setDefaultSaveDirectory(const QString& dir)
 {
-  return this->FileIO->GetAction(Action::OpenFile);
+  this->FileIO->setDefaultSaveDirectory(dir);
 }
 
 //-----------------------------------------------------------------------------
-QAction* pqPythonTextArea::GetSaveFileAction()
+const QString& pqPythonTextArea::getFilename() const
 {
-  return this->FileIO->GetAction(Action::SaveFile);
+  return this->FileIO->getFilename();
 }
 
 //-----------------------------------------------------------------------------
-QAction* pqPythonTextArea::GetSaveFileAsAction()
+void pqPythonTextArea::connectActions(pqPythonEditorActions& actions)
 {
-  return this->FileIO->GetAction(Action::SaveFileAs);
+  pqPythonEditorActions::connect(actions, this->TextEdit);
+  pqPythonEditorActions::connect(actions, this->FileIO);
+  pqPythonEditorActions::connect(actions, &this->UndoStack);
 }
 
 //-----------------------------------------------------------------------------
-QAction* pqPythonTextArea::GetSaveFileAsMacroAction()
+void pqPythonTextArea::disconnectActions(pqPythonEditorActions& actions)
 {
-  return this->FileIO->GetAction(Action::SaveFileAsMacro);
+  pqPythonEditorActions::disconnect(actions, this->TextEdit);
+  pqPythonEditorActions::disconnect(actions, this->FileIO);
+  pqPythonEditorActions::disconnect(actions, &this->UndoStack);
 }
