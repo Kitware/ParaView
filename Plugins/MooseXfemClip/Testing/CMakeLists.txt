@@ -1,4 +1,4 @@
-if (PARAVIEW_USE_QT)
+if (TARGET ParaView::paraview)
   ExternalData_Expand_Arguments("ParaViewData" _
     "DATA{Data/,REGEX:init_solution_propagation_out\\.e.*}")
 

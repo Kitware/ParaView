@@ -1,4 +1,4 @@
-if (PARAVIEW_USE_QT AND BUILD_SHARED_LIBS)
+if (TARGET ParaView::paraview AND BUILD_SHARED_LIBS)
 
   paraview_add_client_tests(
     LOAD_PLUGIN "FlipBookPlugin"

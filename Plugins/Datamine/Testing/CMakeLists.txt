@@ -1,4 +1,4 @@
-if (PARAVIEW_USE_QT)
+if (TARGET ParaView::paraview)
   ExternalData_Expand_Arguments("ParaViewData" _
     "DATA{Data/datamine_smallpt.dm}"
     "DATA{Data/datamine_smalltr.dm}"
