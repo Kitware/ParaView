@@ -55,7 +55,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace details
 {
 //-----------------------------------------------------------------------------
-const QString GetSwapDir()
+QString GetSwapDir()
 {
   const QString swapDir = pqCoreUtilities::getParaViewUserDirectory() + "/PythonSwap";
   const QDir existCheck(swapDir);
@@ -71,7 +71,7 @@ const QString GetSwapDir()
 }
 
 //-----------------------------------------------------------------------------
-const QString GetSwapFilename(const QString& filepath)
+QString GetSwapFilename(const QString& filepath)
 {
   const QString swapFolder = GetSwapDir();
   if (!swapFolder.isEmpty())
