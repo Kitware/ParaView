@@ -51,9 +51,8 @@ A brief explanation of the terms:
 
 **Onscreen** and **offscreen** support is built by default. Thus ParaView
 binaries available from paraview.org support these modes. **Headless** support
-requires special builds of ParaView with runtime capabilities that are not
-widely available yet. Hence currently (as of ParaView 5.4) one has to build
-ParaView from source with special build flags to enable headless support.
+requires special builds of ParaView which are not compatible with standard
+build options. Both version are available as a binary from our downloads page.
 
 ##OpenGL Implementations##
 
@@ -117,28 +116,27 @@ summarize relevant CMake options available:
 
 * `PARAVIEW_USE_QT` indicates if the desktop Qt client should be built.
 
+`VTK_USE_X` and `VTK_OPENGL_HAS_OSMESA` are mutually exclusive i.e.
+only one of the two can be ON at the same time. This is due to the
+fact that  OSMesa does not support on-screen rendering and
+VTK's OpenGL selection is at build time.
 
-All combinations of above options can be turned on or off independently except that
-presently `VTK_OPENGL_HAS_EGL` and `VTK_OPENGL_HAS_OSMESA` are mutually exclusive i.e.
-only one of the two can be ON at the same time. This is because the current version of Mesa (17.1.5)
-doesn't support EGL for OpenGL, it's only supported for OpenGL-ES.
+`VTK_OPENGL_HAS_EGL` and `VTK_OPENGL_HAS_OSMESA` are mutually exclusive i.e.
+only one of the two can be ON at the same time.
 
 A few things to note:
+* At least one of `VTK_OPENGL_HAS_EGL`, `VTK_OPENGL_HAS_OSMESA` and `VTK_USE_X` must be ON.
 * If `VTK_OPENGL_HAS_EGL` or `VTK_OPENGL_HAS_OSMESA` is ON, the build supports headless rendering, otherwise
   `VTK_USE_X` must be ON and the build does not support headless, but can still support offscreen rendering.
-* If `VTK_USE_X` is OFF, then either `VTK_OPENGL_HAS_OSMESA` or `VTK_OPENGL_HAS_EGL` must be ON. Then the build
-  does not support onscreen rendering, but only headless rendering.
-* If `PARAVIEW_USE_QT` is ON and `VTK_USE_X` is ON, while ParaView command line tools won't
-  link against or use X calls, Qt will and hence an accessible X server is still needed to run the
-  desktop client.
-* If `VTK_OPENGL_HAS_OSMESA` is ON, and `VTK_USE_X` is ON, then all the OpenGL and OSMesa variables
-  should point to the Mesa libraries.
-* Likewise, if `VTK_OPENGL_HAS_EGL` is ON and `VTK_USE_X` is ON, then all the OpenGL and EGL variables should point
+* `PARAVIEW_USE_QT=ON` and `VTK_USE_X=OFF` has limited support.
+   In this configuration, the command-line tools like `pvserver`, `pvrenderserver` will not depend on X.
+   The `paraview` Qt client, however, is not built.
+* If `VTK_OPENGL_HAS_EGL` is ON and `VTK_USE_X` is ON, then all the OpenGL and EGL variables should point
   to the system libraries providing both, typically the NVidia libraries.
 
 ##Default Rendering Modes##
 
-Since now it's possible to build ParaView with onscreen and headless support simultaneously, which type of render window the ParaView
+Depending of the enabled build options, which type of render window the ParaView
 executable creates by default also needs some explanation.
 
 * The ParaView desktop Qt client always creates an onscreen window using GLX calls via Qt.
