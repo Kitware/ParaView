@@ -46,7 +46,7 @@ public:
       });
   }
 
-  ~MainWindow() {}
+  ~MainWindow() override = default;
 
   void setupPipeline()
   {
