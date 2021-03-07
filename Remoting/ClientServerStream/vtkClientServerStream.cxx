@@ -3106,7 +3106,7 @@ int vtkClientServerStream::AddArgumentFromString(
       char* ptr = buffer;
       if (valueEnd - valueBegin + 1 > 128)
       {
-        ptr = new char[valueEnd - valueEnd + 1];
+        ptr = new char[valueEnd - valueBegin + 1];
       }
 
       // Copy the string to the buffer removing escapes.
