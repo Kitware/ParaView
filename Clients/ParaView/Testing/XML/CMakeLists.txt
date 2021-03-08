@@ -11,6 +11,18 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${paraview_test_data_directory_input}/Data/AMReX-MFIX/plt00005/Level_0/,REGEX:.*}"
   "DATA{${paraview_test_data_directory_input}/Data/AMReX-MFIX/plt00005/particles/,REGEX:.*}"
   "DATA{${paraview_test_data_directory_input}/Data/AMReX-MFIX/plt00005/particles/Level_0/,REGEX:.*}"
+  "DATA{${paraview_test_data_directory_input}/Data/double_mach_reflection/plt00000.temp/,REGEX:.*}"
+  "DATA{${paraview_test_data_directory_input}/Data/double_mach_reflection/plt00000.temp/Level_0/,REGEX:.*}"
+  "DATA{${paraview_test_data_directory_input}/Data/double_mach_reflection/plt00010.temp/,REGEX:.*}"
+  "DATA{${paraview_test_data_directory_input}/Data/double_mach_reflection/plt00010.temp/Level_0/,REGEX:.*}"
+  "DATA{${paraview_test_data_directory_input}/Data/double_mach_reflection/plt00020.temp/,REGEX:.*}"
+  "DATA{${paraview_test_data_directory_input}/Data/double_mach_reflection/plt00020.temp/Level_0/,REGEX:.*}"
+  "DATA{${paraview_test_data_directory_input}/Data/double_mach_reflection/plt00030.temp/,REGEX:.*}"
+  "DATA{${paraview_test_data_directory_input}/Data/double_mach_reflection/plt00030.temp/Level_0/,REGEX:.*}"
+  "DATA{${paraview_test_data_directory_input}/Data/double_mach_reflection/plt00040.temp/,REGEX:.*}"
+  "DATA{${paraview_test_data_directory_input}/Data/double_mach_reflection/plt00040.temp/Level_0/,REGEX:.*}"
+  "DATA{${paraview_test_data_directory_input}/Data/double_mach_reflection/plt00050.temp/,REGEX:.*}"
+  "DATA{${paraview_test_data_directory_input}/Data/double_mach_reflection/plt00050.temp/Level_0/,REGEX:.*}"
   "DATA{${paraview_test_data_directory_input}/Data/3GQP.pdb}"
   "DATA{${paraview_test_data_directory_input}/Data/can-restarts/,REGEX:.*}"
   "DATA{${paraview_test_data_directory_input}/Data/CellDataWithNan.vtu}"
@@ -369,6 +381,8 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/ReadPartitionedCGNS_PointData.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/ReadCGNSBCDataset.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/RectilinearVolumeRendering.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/ReloadAMReXGrid-AfterReload.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/ReloadAMReXGrid-BeforeReload.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/ReloadExodusFile-AfterReload.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/ReloadExodusFile-BeforeReload.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/RemoteRenderingSurface.png}"
@@ -631,6 +645,7 @@ SET (TESTS_WITH_INLINE_COMPARES
   ReadPartitionedCGNS.xml
   ReadCGNSBCDataset.xml
   RectilinearFractal.xml
+  ReloadAMReXGrid.xml
   ReloadExodusFile.xml
   RemoteRendering.xml
   RenderNan.xml

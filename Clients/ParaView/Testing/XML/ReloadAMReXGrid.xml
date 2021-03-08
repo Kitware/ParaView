@@ -1,0 +1,41 @@
+<?xml version="1.0" ?>
+<pqevents>
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuSources" />
+  <pqevent object="pqClientMainWindow/menubar/menuSources/Alphabetical" command="activate" arguments="TimeToTextConvertorSource" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/DisplayFrame/ProxyPanel/FontEditor/Bold" command="set_boolean" arguments="true" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/DisplayFrame/ProxyPanel/FontEditor/FontSize" command="set_int" arguments="40" />
+
+  <pqevent object="pqClientMainWindow" command="remove_directory" arguments="$PARAVIEW_TEST_ROOT/ReloadAMReXGrid-$PARAVIEW_PID" />
+  <pqevent object="pqClientMainWindow" command="copy_directory" arguments="$PARAVIEW_DATA_ROOT/Testing/Data/double_mach_reflection/plt00000.temp;$PARAVIEW_TEST_ROOT/ReloadAMReXGrid-$PARAVIEW_PID/plt00000.temp" />
+  <pqevent object="pqClientMainWindow" command="copy_directory" arguments="$PARAVIEW_DATA_ROOT/Testing/Data/double_mach_reflection/plt00010.temp;$PARAVIEW_TEST_ROOT/ReloadAMReXGrid-$PARAVIEW_PID/plt00010.temp" />
+  <pqevent object="pqClientMainWindow" command="copy_directory" arguments="$PARAVIEW_DATA_ROOT/Testing/Data/double_mach_reflection/plt00020.temp;$PARAVIEW_TEST_ROOT/ReloadAMReXGrid-$PARAVIEW_PID/plt00020.temp" />
+  <pqevent object="pqClientMainWindow/MainControlsToolbar/actionOpenData" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/FileOpenDialog" command="filesSelected" arguments="$PARAVIEW_TEST_ROOT/ReloadAMReXGrid-$PARAVIEW_PID/plt..temp" />
+  <pqevent object="pqClientMainWindow/pqSelectReaderDialog/okButton" command="activate" arguments="" />
+
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/CellArrayStatus/ArraySelectionWidget/1QHeaderView0" command="mousePress" arguments="1,1,0,0,0,0" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/CellArrayStatus/ArraySelectionWidget/1QHeaderView0" command="mouseRelease" arguments="1,0,0,0,0,0" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/VCRToolbar/actionVCRLastFrame" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/cameraToolbar/actionResetCamera" command="activate" arguments="" />
+
+  <pqcompareview object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.0/CentralWidgetFrame/Viewport"
+    baseline="$PARAVIEW_DATA_ROOT/Clients/ParaView/Testing/Data/Baseline/ReloadAMReXGrid-BeforeReload.png" width="400" height="400" />
+
+  <!-- copy additional directories over -->
+
+  <pqevent object="pqClientMainWindow" command="copy_directory" arguments="$PARAVIEW_DATA_ROOT/Testing/Data/double_mach_reflection/plt00030.temp;$PARAVIEW_TEST_ROOT/ReloadAMReXGrid-$PARAVIEW_PID/plt00030.temp" />
+  <pqevent object="pqClientMainWindow" command="copy_directory" arguments="$PARAVIEW_DATA_ROOT/Testing/Data/double_mach_reflection/plt00040.temp;$PARAVIEW_TEST_ROOT/ReloadAMReXGrid-$PARAVIEW_PID/plt00040.temp" />
+  <pqevent object="pqClientMainWindow" command="copy_directory" arguments="$PARAVIEW_DATA_ROOT/Testing/Data/double_mach_reflection/plt00050.temp;$PARAVIEW_TEST_ROOT/ReloadAMReXGrid-$PARAVIEW_PID/plt00050.temp" />
+
+  <!-- reload new files -->
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menu_File" />
+  <pqevent object="pqClientMainWindow/menubar/menu_File" command="activate" arguments="actionReloadFiles" />
+  <pqevent object="pqClientMainWindow/reloadOptionsMessageBox/qt_msgbox_buttonbox/findNewFilesButton" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/VCRToolbar/actionVCRLastFrame" command="activate" arguments="" />
+
+  <pqcompareview object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.0/CentralWidgetFrame/Viewport"
+    baseline="$PARAVIEW_DATA_ROOT/Clients/ParaView/Testing/Data/Baseline/ReloadAMReXGrid-AfterReload.png" width="400" height="400" />
+
+</pqevents>
