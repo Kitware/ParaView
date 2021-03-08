@@ -267,40 +267,41 @@ if (PARAVIEW_USE_QT)
 
   foreach (tname IN LISTS names)
     _vtk_test_set_options("${catalyst_options}" "local_" ${_${tname}_options})
+    _vtk_test_parse_name("${tname}" "xml")
 
-    set(ttemp_dir "${CMAKE_BINARY_DIR}/Testing/Temporary/${tname}")
+    set(ttemp_dir "${CMAKE_BINARY_DIR}/Testing/Temporary/${test_name}")
 
     #----------------------------------------------------------------------
     # Fixture setup
     # remove ttemp_dir as first step
-    add_test(NAME Catalyst::Workflow::RemoveOld.${tname}
+    add_test(NAME Catalyst::Workflow::RemoveOld.${test_name}
              COMMAND "${CMAKE_COMMAND}" -E remove_directory "${ttemp_dir}")
 
     # create the ttemp_dir
-    add_test(NAME Catalyst::Workflow::Prepare.${tname}
+    add_test(NAME Catalyst::Workflow::Prepare.${test_name}
              COMMAND "${CMAKE_COMMAND}" -E make_directory "${ttemp_dir}")
 
     set_tests_properties(
-        "Catalyst::Workflow::Prepare.${tname}"
+        "Catalyst::Workflow::Prepare.${test_name}"
       PROPERTIES
-        FIXTURES_SETUP "CatalystWorkflowSetup.${tname}"
-        FIXTURES_REQUIRED "CatalystWorkflowPreSetup.${tname}")
+        FIXTURES_SETUP "CatalystWorkflowSetup.${test_name}"
+        FIXTURES_REQUIRED "CatalystWorkflowPreSetup.${test_name}")
 
     set_tests_properties(
-      "Catalyst::Workflow::RemoveOld.${tname}"
+      "Catalyst::Workflow::RemoveOld.${test_name}"
       PROPERTIES
-        FIXTURES_SETUP "CatalystWorkflowPreSetup.${tname}")
+        FIXTURES_SETUP "CatalystWorkflowPreSetup.${test_name}")
     #----------------------------------------------------------------------
 
     # 1. run GUI to generate the pvsm state file and validate "export now"
     paraview_add_client_tests(
       PREFIX "Catalyst::Workflow::ParaView"
       TEST_DIRECTORY "${ttemp_dir}"
-      TEST_SCRIPTS ${tname}.xml)
+      TEST_SCRIPTS "${test_file}")
 
-    set_tests_properties("Catalyst::Workflow::ParaView.${tname}"
+    set_tests_properties("Catalyst::Workflow::ParaView.${test_name}"
       PROPERTIES
-        FIXTURES_REQUIRED "CatalystWorkflowSetup.${tname}"
+        FIXTURES_REQUIRED "CatalystWorkflowSetup.${test_name}"
         ENVIRONMENT
             PARAVIEW_OVERRIDE_EXTRACTS_OUTPUT_DIRECTORY=${ttemp_dir}/ImmediateExtracts
         )
@@ -311,17 +312,17 @@ if (PARAVIEW_USE_QT)
       ARGS "$<TARGET_FILE:ParaView::pvpython>"
            -dr
            -m paraview.tests.validate_extracts
-           --name "${tname}"
+           --name "${test_name}"
            --root  "${ttemp_dir}"
            --subdir "ImmediateExtracts"
            --baseline-dir "${paraview_test_data_directory_output}/Clients/PythonCatalyst/Testing/Data/Baseline"
            --temp-dir "${CMAKE_BINARY_DIR}/Testing/Temporary"
            --json
-      TEST_SCRIPTS "${CMAKE_CURRENT_SOURCE_DIR}/${tname}.json")
+      TEST_SCRIPTS "${CMAKE_CURRENT_SOURCE_DIR}/${test_name}.json")
 
     set_tests_properties(
-      "Catalyst::Workflow::ParaView::Validate.${tname}"
-      PROPERTIES DEPENDS "Catalyst::Workflow::ParaView.${tname}")
+      "Catalyst::Workflow::ParaView::Validate.${test_name}"
+      PROPERTIES DEPENDS "Catalyst::Workflow::ParaView.${test_name}")
 
     # 2. add test to generate Catalyst Python state. We'll just use pvpython for
     #    this.
@@ -335,15 +336,15 @@ if (PARAVIEW_USE_QT)
       ARGS "$<TARGET_FILE:ParaView::pvpython>"
             -dr
             -m paraview.demos.export_catalyst_state
-            --output "${ttemp_dir}/${tname}.py"
+            --output "${ttemp_dir}/${test_name}.py"
             --extracts-dir "${ttemp_dir}/CoprocessingExtracts"
             ${cinema_args}
             --pvsm
-      TEST_SCRIPTS ${ttemp_dir}/${tname}.pvsm)
+      TEST_SCRIPTS ${ttemp_dir}/${test_name}.pvsm)
 
     set_tests_properties(
-      "Catalyst::Workflow::SaveCatalystState.${tname}"
-      PROPERTIES DEPENDS "Catalyst::Workflow::ParaView.${tname}")
+      "Catalyst::Workflow::SaveCatalystState.${test_name}"
+      PROPERTIES DEPENDS "Catalyst::Workflow::ParaView.${test_name}")
 
     # 3. add test to load catalyst script in pvbatch.
     paraview_add_test_mpi_optional(
@@ -352,16 +353,16 @@ if (PARAVIEW_USE_QT)
         PARAVIEW_OVERRIDE_EXTRACTS_OUTPUT_DIRECTORY=${ttemp_dir}/BatchExtracts
       ARGS "$<TARGET_FILE:ParaView::pvbatch>"
            -dr
-      TEST_SCRIPTS ${ttemp_dir}/${tname}.py)
+      TEST_SCRIPTS ${ttemp_dir}/${test_name}.py)
 
     set_tests_properties(
-      "Catalyst::Workflow::BatchExecute.${tname}"
+      "Catalyst::Workflow::BatchExecute.${test_name}"
       PROPERTIES DEPENDS
-        "Catalyst::Workflow::SaveCatalystState.${tname}")
+        "Catalyst::Workflow::SaveCatalystState.${test_name}")
 
     # 3.1 validate 'BatchExtracts'
     set(json_infix )
-    if (EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/${tname}.MPI.json AND PARAVIEW_USE_MPI)
+    if (EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/${test_name}.MPI.json AND PARAVIEW_USE_MPI)
       # MPI runs sometimes have different files generated. Handle that.
       set(json_infix ".MPI")
     endif()
@@ -371,17 +372,17 @@ if (PARAVIEW_USE_QT)
       ARGS "$<TARGET_FILE:ParaView::pvpython>"
            -dr
            -m paraview.tests.validate_extracts
-           --name "${tname}"
+           --name "${test_name}"
            --root  "${ttemp_dir}"
            --subdir "BatchExtracts"
            --baseline-dir "${paraview_test_data_directory_output}/Clients/PythonCatalyst/Testing/Data/Baseline"
            --temp-dir "${CMAKE_BINARY_DIR}/Testing/Temporary"
            --json
-      TEST_SCRIPTS "${CMAKE_CURRENT_SOURCE_DIR}/${tname}${json_infix}.json")
+      TEST_SCRIPTS "${CMAKE_CURRENT_SOURCE_DIR}/${test_name}${json_infix}.json")
 
     set_tests_properties(
-      "Catalyst::Workflow::BatchExecute::Validate.${tname}"
-      PROPERTIES DEPENDS "Catalyst::Workflow::BatchExecute.${tname}")
+      "Catalyst::Workflow::BatchExecute::Validate.${test_name}"
+      PROPERTIES DEPENDS "Catalyst::Workflow::BatchExecute.${test_name}")
 
     # 4. run with WaveletMiniApp
     paraview_add_test_mpi_optional(
@@ -391,12 +392,12 @@ if (PARAVIEW_USE_QT)
             -sym -m paraview.demos.wavelet_miniapp -t 20 --size 21
             --channel Wavelet1
             -s
-      TEST_SCRIPTS ${ttemp_dir}/${tname}.py)
+      TEST_SCRIPTS ${ttemp_dir}/${test_name}.py)
 
     set_tests_properties(
-      "Catalyst::Workflow::WaveletMiniApp.${tname}"
+      "Catalyst::Workflow::WaveletMiniApp.${test_name}"
       PROPERTIES DEPENDS
-        "Catalyst::Workflow::SaveCatalystState.${tname}")
+        "Catalyst::Workflow::SaveCatalystState.${test_name}")
 
     # 4.1 validate 'CoprocessingExtracts'
     paraview_add_test(
@@ -404,17 +405,17 @@ if (PARAVIEW_USE_QT)
       ARGS "$<TARGET_FILE:ParaView::pvpython>"
            -dr
            -m paraview.tests.validate_extracts
-           --name "${tname}"
+           --name "${test_name}"
            --root  "${ttemp_dir}"
            --subdir "CoprocessingExtracts"
            --baseline-dir "${paraview_test_data_directory_output}/Clients/PythonCatalyst/Testing/Data/Baseline"
            --temp-dir "${CMAKE_BINARY_DIR}/Testing/Temporary"
            --json
-      TEST_SCRIPTS "${CMAKE_CURRENT_SOURCE_DIR}/${tname}${json_infix}.json")
+      TEST_SCRIPTS "${CMAKE_CURRENT_SOURCE_DIR}/${test_name}${json_infix}.json")
 
     set_tests_properties(
-      "Catalyst::Workflow::WaveletMiniApp::Validate.${tname}"
-      PROPERTIES DEPENDS "Catalyst::Workflow::WaveletMiniApp.${tname}")
+      "Catalyst::Workflow::WaveletMiniApp::Validate.${test_name}"
+      PROPERTIES DEPENDS "Catalyst::Workflow::WaveletMiniApp.${test_name}")
   endforeach()
 else()
   message(STATUS "ParaView client not built. Skipping Catalyst workflow tests.")

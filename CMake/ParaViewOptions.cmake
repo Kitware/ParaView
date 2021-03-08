@@ -434,6 +434,7 @@ paraview_require_module(
           VTK::ImagingHybrid
           VTK::ImagingSources
           VTK::IOAsynchronous # needed for cinema
+          VTK::IOChemistry
           VTK::IOGeometry
           VTK::IOImage
           VTK::IOInfovis

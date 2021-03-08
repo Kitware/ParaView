@@ -196,7 +196,7 @@ bool verify(const std::string& protocol, const conduit::Node& n)
       return false;
     }
     vtkVLogF(
-      PARAVIEW_LOG_CATALYST_VERBOSITY(), "'timestep' set to " PRIi64, n["timestep"].as_int64());
+      PARAVIEW_LOG_CATALYST_VERBOSITY(), "'timestep' set to %" PRIi64, n["timestep"].as_int64());
   }
   else if (n.has_child("cycle"))
   {
@@ -205,7 +205,7 @@ bool verify(const std::string& protocol, const conduit::Node& n)
       vtkLogF(ERROR, "'cycle' must be an integer.");
       return false;
     }
-    vtkVLogF(PARAVIEW_LOG_CATALYST_VERBOSITY(), "'cycle' set to " PRIi64, n["cycle"].as_int64());
+    vtkVLogF(PARAVIEW_LOG_CATALYST_VERBOSITY(), "'cycle' set to %" PRIi64, n["cycle"].as_int64());
   }
 
   if (!n.has_child("time"))
