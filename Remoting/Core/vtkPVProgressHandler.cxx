@@ -485,6 +485,10 @@ void vtkPVProgressHandler::RefreshMessage(const char* message, int etype, bool i
 {
   SKIP_IF_DISABLED();
 
+  // to avoid recursive error messages.
+  const auto old_value = vtkObject::GetGlobalWarningDisplay();
+  vtkObject::GlobalWarningDisplayOff();
+
   // On server-root-nodes, send the message to the client.
   vtkMultiProcessController* client_controller = this->Session->GetController(vtkPVSession::CLIENT);
   if (client_controller != nullptr && message != nullptr)
@@ -533,4 +537,6 @@ void vtkPVProgressHandler::RefreshMessage(const char* message, int etype, bool i
         break;
     }
   }
+
+  vtkObject::SetGlobalWarningDisplay(old_value);
 }
