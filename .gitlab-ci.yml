@@ -236,7 +236,7 @@ build:documentation:
     extends:
         - .fedora33
         - .doxygen_build_linux
-        - .linux_builder_tags
+        - .linux_qt_builder_tags
         - .doxygen_log_artifacts
         - .run_scheduled
 
