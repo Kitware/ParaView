@@ -1,0 +1,46 @@
+ <ServerManagerConfiguration>
+  <ProxyGroup name="filters">
+  <!-- ==================================================================== -->
+    <SourceProxy class="vtkConvertToPointCloud"
+                 label="Convert To Point Cloud"
+                 name="ConvertToPointCloud">
+      <Documentation long_help="Convert any dataset to a point cloud with or without cells."
+                     short_help="Convert any dataset to a point cloud.">
+                     The ConvertToPointCloud convert any dataset to a vtkPolyData containing the
+                     points and point data of the input and generate either no cells, a single polyvertex cell
+                     or many vertex cells. It is more efficient with pointset input.
+      </Documentation>
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkDataSet" />
+        </DataTypeDomain>
+        <Documentation>This property specifies the input dataset to the
+        ConvertToPointCloud filter.</Documentation>
+      </InputProperty>
+      <IntVectorProperty command="SetCellGenerationMode"
+                         default_values="1"
+                         number_of_elements="1"
+                         name="CellGenerationMode"
+                         panel_visibility="default">
+        <EnumerationDomain name="enum">
+          <Entry text="No cells"
+                 value="0" />
+          <Entry text="Polyvertex cell"
+                 value="1" />
+          <Entry text="Vertex cells"
+                 value="2" />
+        </EnumerationDomain>
+        <Documentation> Choose if the output should contain either no cells (output may not appear in a render view in that case),
+        a single poly vertex cell and as many vertex cells as there is points.
+        </Documentation>
+      </IntVectorProperty>
+
+      <!-- End of ConvertToPointCloud -->
+    </SourceProxy>
+  </ProxyGroup>
+</ServerManagerConfiguration>
