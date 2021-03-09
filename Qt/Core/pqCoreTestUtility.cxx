@@ -57,6 +57,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqEventDispatcher.h"
 #include "pqFileDialogEventPlayer.h"
 #include "pqFileDialogEventTranslator.h"
+#include "pqFileUtilitiesEventPlayer.h"
 #include "pqFlatTreeViewEventPlayer.h"
 #include "pqFlatTreeViewEventTranslator.h"
 #include "pqImageUtil.h"
@@ -140,6 +141,7 @@ pqCoreTestUtility::pqCoreTestUtility(QObject* p)
   this->eventTranslator()->addWidgetEventTranslator(new pqColorDialogEventTranslator(this));
   this->eventTranslator()->addWidgetEventTranslator(new pqConsoleWidgetEventTranslator(this));
 
+  this->eventPlayer()->addWidgetEventPlayer(new pqFileUtilitiesEventPlayer(this));
   this->eventPlayer()->addWidgetEventPlayer(new pqLineEditEventPlayer(this));
   this->eventPlayer()->addWidgetEventPlayer(new pqQVTKWidgetEventPlayer(this));
   this->eventPlayer()->addWidgetEventPlayer(new pqFileDialogEventPlayer(this));
@@ -459,6 +461,7 @@ QString pqCoreTestUtility::fixPath(const QString& path)
   newpath.replace("$PARAVIEW_TEST_ROOT", pqCoreTestUtility::TestDirectory());
   newpath.replace("$PARAVIEW_TEST_BASELINE_DIR", pqCoreTestUtility::BaselineDirectory());
   newpath.replace("$PARAVIEW_DATA_ROOT", pqCoreTestUtility::DataRoot());
+  newpath.replace("$PARAVIEW_PID", QString::number(QCoreApplication::applicationPid()));
   return newpath;
 }
 

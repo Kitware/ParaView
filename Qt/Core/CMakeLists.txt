@@ -54,6 +54,7 @@ set(classes
   pqFileDialogFilter
   pqFileDialogModel
   pqFileDialogRecentDirsModel
+  pqFileUtilitiesEventPlayer
   pqFlatTreeViewEventPlayer
   pqFlatTreeViewEventTranslator
   pqGraphLayoutStrategyInterface

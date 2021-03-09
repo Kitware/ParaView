@@ -38,8 +38,8 @@ vtkPVFileInformation* vtkFindFileGroupFor(vtkPVFileInformation* info, const std:
   {
     return nullptr;
   }
-  if (info->GetType() != vtkPVFileInformation::FILE_GROUP &&
-    info->GetType() != vtkPVFileInformation::DIRECTORY)
+
+  if (!info->IsGroup() && !info->IsDirectory())
   {
     return nullptr;
   }
@@ -48,19 +48,21 @@ vtkPVFileInformation* vtkFindFileGroupFor(vtkPVFileInformation* info, const std:
   {
     vtkPVFileInformation* item =
       vtkPVFileInformation::SafeDownCast(info->GetContents()->GetItemAsObject(cc));
-    if (item == nullptr)
+    if (item == nullptr || item->GetFullPath() == nullptr)
     {
       continue;
     }
-    if (item->GetType() == vtkPVFileInformation::FILE_GROUP)
+
+    if (vtkPVFileInformation::IsGroup(item->GetType()))
     {
       if (vtkPVFileInformation* found = vtkFindFileGroupFor(item, unixFname))
       {
         return found;
       }
     }
-    else if (item->GetType() == vtkPVFileInformation::SINGLE_FILE &&
-      info->GetType() == vtkPVFileInformation::FILE_GROUP && item->GetFullPath() != nullptr)
+    else if ((item->GetType() == vtkPVFileInformation::SINGLE_FILE &&
+               info->GetType() == vtkPVFileInformation::FILE_GROUP) ||
+      (item->IsDirectory() && info->GetType() == vtkPVFileInformation::DIRECTORY_GROUP))
     {
       std::string unixFullPath(item->GetFullPath());
       vtksys::SystemTools::ConvertToUnixSlashes(unixFullPath);
