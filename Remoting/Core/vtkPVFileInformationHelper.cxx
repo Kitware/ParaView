@@ -88,8 +88,8 @@ std::string vtkPVFileInformationHelper::Utf8ToLocalWin32(const std::string& path
   MultiByteToWideChar(CP_UTF8, 0, path.c_str(), -1, wpath, wlen);
   WideCharToMultiByte(CP_ACP, 0, wpath, -1, lpath, wlen, nullptr, nullptr);
   std::string localPath(lpath);
-  delete wpath;
-  delete lpath;
+  delete[] wpath;
+  delete[] lpath;
   return localPath;
 #else
   return path;
@@ -110,8 +110,8 @@ std::string vtkPVFileInformationHelper::LocalToUtf8Win32(const std::string& path
   int err = MultiByteToWideChar(CP_ACP, 0, path.c_str(), -1, wpath, wlen);
   err = WideCharToMultiByte(CP_UTF8, 0, wpath, -1, lpath, wlen, nullptr, nullptr);
   std::string utfPath(lpath);
-  delete wpath;
-  delete lpath;
+  delete[] wpath;
+  delete[] lpath;
   return utfPath;
 #else
   return path;

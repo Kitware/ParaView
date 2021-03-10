@@ -114,8 +114,8 @@ public:
 
     vtkCueCommand& operator=(const vtkCueCommand& other)
     {
-      delete this->MinValues;
-      delete this->MaxValues;
+      delete[] this->MinValues;
+      delete[] this->MaxValues;
       this->Duplicate(other);
       return *this;
     }
