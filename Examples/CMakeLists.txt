@@ -20,6 +20,8 @@ if (ParaView_BINARY_DIR)
               "-Dshared=${BUILD_SHARED_LIBS}"
               "-Dparaview_dir=${paraview_cmake_build_dir}"
               "-Dctest=${CMAKE_CTEST_COMMAND}"
+              "-Dplatform=${CMAKE_GENERATOR_PLATFORM}"
+              "-Dtoolset=${CMAKE_GENERATOR_TOOLSET}"
               "-Dparaview_binary_dir=${CMAKE_RUNTIME_OUTPUT_DIRECTORY}"
               -P "${CMAKE_CURRENT_LIST_DIR}/RunExample.cmake")
     set_property(TEST "ParaViewExample-${dir}" APPEND

@@ -6,6 +6,16 @@ if (WIN32)
     "${paraview_binary_dir}")
 endif ()
 
+set(cmake_arguments)
+if (platform)
+  list(APPEND cmake_arguments
+    -A "${platform}")
+endif ()
+if (toolset)
+  list(APPEND cmake_arguments
+    -T "${toolset}")
+endif ()
+
 execute_process(
   COMMAND
     "${ctest}"
@@ -15,6 +25,7 @@ execute_process(
       "${source}/${example_dir}"
       "${binary}/${example_dir}"
     --build-options
+      ${cmake_arguments}
       "-DBUILD_TESTING:BOOL=ON"
       "-DCMAKE_BUILD_TYPE:STRING=${build_type}"
       "-DBUILD_SHARED_LIBS:BOOL=${shared}"
