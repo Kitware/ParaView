@@ -2853,6 +2853,22 @@
           <Entry text="9" value="9" info="Maximum compression" />
         </EnumerationDomain>
       </IntVectorProperty>
+      <StringVectorProperty
+        name="MetaData"
+        command="AddText"
+        number_of_elements_per_command="2"
+        element_types="2 2"
+        repeat_command="1"
+        clean_command="ClearText"
+        default_values_delimiter=";"
+        default_values="Application;ParaView"
+        number_of_elements="2"
+        panel_visibility="advanced">
+        <Documentation>
+          This property enables adding meta data as text chunks to the output
+          PNG file in the form of text key/value pairs.
+        </Documentation>
+      </StringVectorProperty>
       <Hints>
         <FormatOptions extensions="png"
           file_description="PNG images" />
