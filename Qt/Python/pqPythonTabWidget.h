@@ -150,6 +150,21 @@ public:
    */
   void stopTrace(const QString& str);
 
+  /**
+   * @brief Link the input QTextEdit to
+   * one of the tab of the editor.
+   * If this objects is already linked within
+   * the editor, switch to that tab otherwise creates
+   * a new one
+   */
+  template <typename T>
+  void linkTo(T* obj)
+  {
+    static_assert(sizeof(T) == 0, "Only specializations of linkTo(T* t) can be used");
+  }
+
+  void loadFile(const QString& filename);
+
 public slots:
   /**
    * @brief Add a new empty text area
@@ -157,8 +172,10 @@ public slots:
   void createNewEmptyTab();
 
   /**
-   * @brief Adds a new tab and opens the given
-   * file.
+   * @brief Loads the content of the file
+   * into the current tab if it's empty
+   * and not linked to another QText.
+   * Otherwise adds a new tab.
    */
   void addNewTextArea(const QString& filename);
 
@@ -194,7 +211,13 @@ private:
   void addNewTabButton();
   void setTabCloseButton(pqPythonTextArea* widget);
   void createParaviewTraceTab();
-  QLabel* getTabLabel(const pqPythonTextArea* widget);
+  QLabel* getTabLabel(const pqPythonTextArea* widget) const;
+
+  /**
+   * @brief Returns -1 if the editor doesn't contain
+   * this file. Otherwise returns the index
+   */
+  int fileIsOpened(const QString& filename) const;
 
   template <typename T>
   T* getWidget(int idx) const
@@ -211,5 +234,7 @@ private:
 
   pqPythonTextArea* TraceWidget = nullptr;
 };
+
+#include "pqPythonTabWidget.txx"
 
 #endif // pqPythonTabWidget_h

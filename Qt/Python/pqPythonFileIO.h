@@ -156,6 +156,11 @@ public slots:
    */
   bool saveAsMacro();
 
+  /**
+   * @brief Saves the current file under the script directory
+   */
+  bool saveAsScript();
+
 private:
   struct PythonFile
   {

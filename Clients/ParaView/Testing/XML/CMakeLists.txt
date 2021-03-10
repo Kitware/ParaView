@@ -591,7 +591,7 @@ endif ()
 if (PARAVIEW_USE_PYTHON)
   list(APPEND TESTS_WITHOUT_BASELINES
     TestPythonConsole.xml
-    TestPopOutWidget.xml # needs programmable filter
+    #TestPopOutWidget.xml
     MultipleNumberOfComponents.xml
     SpreadSheetNullArrayName.xml # needs programmable filter
   )

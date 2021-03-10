@@ -31,16 +31,20 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
 #include "pqPythonTextArea.h"
+#include "pqPythonFileIO.h"
+#include "pqPythonLineNumberArea.h"
+#include "pqPythonSyntaxHighlighter.h"
 
 #include <QHBoxLayout>
+#include <QTextEdit>
 
 //-----------------------------------------------------------------------------
 pqPythonTextArea::pqPythonTextArea(QWidget* parent)
   : QWidget(parent)
-  , TextEdit(this)
-  , LineNumberArea(this, *this->TextEdit)
-  , SyntaxHighlighter(this, *this->TextEdit)
-  , FileIO(this, *this->TextEdit)
+  , TextEdit(new QTextEdit(this))
+  , LineNumberArea(new pqPythonLineNumberArea(this, *this->TextEdit))
+  , SyntaxHighlighter(new pqPythonSyntaxHighlighter(this, *this->TextEdit))
+  , FileIO(new pqPythonFileIO(this, *this->TextEdit))
 {
   this->TextEdit->setUndoRedoEnabled(false);
   this->TextEdit->setAcceptDrops(false);
@@ -169,15 +173,21 @@ const QString& pqPythonTextArea::getFilename() const
 //-----------------------------------------------------------------------------
 void pqPythonTextArea::connectActions(pqPythonEditorActions& actions)
 {
-  pqPythonEditorActions::connect(actions, this->TextEdit);
-  pqPythonEditorActions::connect(actions, this->FileIO);
+  pqPythonEditorActions::connect(actions, this->TextEdit.data());
+  pqPythonEditorActions::connect(actions, this->FileIO.data());
   pqPythonEditorActions::connect(actions, &this->UndoStack);
 }
 
 //-----------------------------------------------------------------------------
 void pqPythonTextArea::disconnectActions(pqPythonEditorActions& actions)
 {
-  pqPythonEditorActions::disconnect(actions, this->TextEdit);
-  pqPythonEditorActions::disconnect(actions, this->FileIO);
+  pqPythonEditorActions::disconnect(actions, this->TextEdit.data());
+  pqPythonEditorActions::disconnect(actions, this->FileIO.data());
   pqPythonEditorActions::disconnect(actions, &this->UndoStack);
+}
+
+//-----------------------------------------------------------------------------
+void pqPythonTextArea::unlink()
+{
+  this->TextLinker = pqTextLinker();
 }

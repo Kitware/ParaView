@@ -75,7 +75,7 @@ struct pqPythonTextHistoryEntry
   /**
    * @brief Returns true is the entry is empty
    */
-  bool isEmpty() const { return cursorPosition == -1; }
+  bool isEmpty() const noexcept { return cursorPosition == -1; }
 };
 
 /**

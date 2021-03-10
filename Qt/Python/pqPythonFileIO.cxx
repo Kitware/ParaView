@@ -47,8 +47,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
   QFile file(FILENAME);                                                                            \
   if (!file.open(FLAGS))                                                                           \
   {                                                                                                \
-    QMessageBox::warning(pqCoreUtilities::mainWidget(), QString("Sorry!"),                         \
-      QString("Cannot open file %1:\n%2.").arg(FILENAME).arg(file.errorString()));                 \
+    QMessageBox::warning(pqCoreUtilities::mainWidget(), QObject::tr("Sorry!"),                     \
+      QObject::tr(qPrintable(                                                                      \
+        QString("Cannot open file %1:\n%2.").arg(FILENAME).arg(file.errorString()))));             \
     return false;                                                                                  \
   }
 
@@ -62,7 +63,8 @@ QString GetSwapDir()
   if (!existCheck.mkpath(swapDir))
   {
     QMessageBox::warning(nullptr, QString("Sorry!"),
-      QString("Could not create user PythonSwap directory: %1.").arg(swapDir));
+      QObject::tr(qPrintable(
+        QString("Could not create user PythonSwap directory: %1.").arg(swapDir))));
 
     return {};
   }
@@ -101,7 +103,7 @@ bool pqPythonFileIO::PythonFile::writeToFile() const
   if (this->Name.isEmpty())
   {
     QMessageBox::warning(
-      pqCoreUtilities::mainWidget(), QString("Error"), QString("No Filename Given!"));
+      pqCoreUtilities::mainWidget(), QObject::tr("Error"), QObject::tr("No Filename Given!"));
     return false;
   }
 
@@ -114,20 +116,16 @@ bool pqPythonFileIO::PythonFile::readFromFile(QString& str) const
   if (this->Name.isEmpty())
   {
     QMessageBox::warning(
-      pqCoreUtilities::mainWidget(), QString("Error"), QString("No Filename Given!"));
+      pqCoreUtilities::mainWidget(), QObject::tr("Error"), QObject::tr("No Filename Given!"));
     return false;
   }
 
   const QString swapFilename = details::GetSwapFilename(this->Name);
   if (QFileInfo::exists(swapFilename))
   {
-    const QMessageBox::StandardButton ret =
-      QMessageBox::warning(pqCoreUtilities::mainWidget(), tr("Script Editor"),
-        tr("Paraview found an old automatic save file %1. Would you like to recover its content?")
-          .arg(swapFilename),
-        QMessageBox::Yes | QMessageBox::Discard | QMessageBox::Cancel);
-
-    switch (ret)
+    switch (pqCoreUtilities::promptUserGeneric(tr("Script Editor"),
+      tr("Paraview found an old automatic save file %1. Would you like to recover its content?"),
+      QMessageBox::Warning, QMessageBox::Yes | QMessageBox::Discard | QMessageBox::Cancel, nullptr))
     {
       case QMessageBox::Yes:
         QFile::remove(this->Name);
@@ -151,6 +149,8 @@ bool pqPythonFileIO::PythonFile::readFromFile(QString& str) const
   QApplication::setOverrideCursor(Qt::WaitCursor);
   str = in.readAll();
   QApplication::restoreOverrideCursor();
+
+  pqPythonScriptEditor::bringFront();
 
   return true;
 }
@@ -204,12 +204,10 @@ bool pqPythonFileIO::saveOnClose()
 {
   if (this->isDirty())
   {
-    const QMessageBox::StandardButton ret =
-      QMessageBox::warning(nullptr, tr("Script Editor"), tr("The document has been modified.\n"
-                                                            "Do you want to save your changes?"),
-        QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel);
-
-    switch (ret)
+    switch (pqCoreUtilities::promptUserGeneric(tr("Script Editor"),
+      tr("The document has been modified.\n Do you want to save your changes?"),
+      QMessageBox::Warning, QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel,
+      nullptr))
     {
       case QMessageBox::Save:
         if (this->save())
@@ -295,18 +293,20 @@ bool pqPythonFileIO::saveAs()
     filename.append(".py");
   }
 
+  pqPythonScriptEditor::bringFront();
+
   return this->saveBuffer(filename);
 }
 
 //-----------------------------------------------------------------------------
 bool pqPythonFileIO::saveAsMacro()
 {
-  const QString userMacroDir = pqCoreUtilities::getParaViewUserDirectory() + "/Macros";
+  const QString userMacroDir = pqPythonScriptEditor::getMacrosDir();
   const QDir existCheck(userMacroDir);
   if (!existCheck.exists() && !existCheck.mkpath(userMacroDir))
   {
-    QMessageBox::warning(nullptr, QString("Sorry!"),
-      QString("Could not create user Macro directory: %1.").arg(userMacroDir));
+    QMessageBox::warning(nullptr, this->tr("Sorry!"),
+      tr(qPrintable(QString("Could not create user Macro directory: %1.").arg(userMacroDir))));
     return false;
   }
 
@@ -314,9 +314,38 @@ bool pqPythonFileIO::saveAsMacro()
     pqFileDialog::getSaveFileName(nullptr, pqPythonScriptEditor::getUniqueInstance(),
       tr("Save As Macro"), userMacroDir, tr("Python script (*.py)"));
 
+  pqPythonScriptEditor::bringFront();
+
   if (this->saveBuffer(filename))
   {
     pqPythonScriptEditor::updateMacroList();
+    return true;
+  }
+
+  return false;
+}
+
+//-----------------------------------------------------------------------------
+bool pqPythonFileIO::saveAsScript()
+{
+  const QString userScriptDir = pqPythonScriptEditor::getScriptsDir();
+  const QDir existCheck(userScriptDir);
+  if (!existCheck.exists() && !existCheck.mkpath(userScriptDir))
+  {
+    QMessageBox::warning(nullptr, this->tr("Sorry!"),
+      tr(qPrintable(QString("Could not create user Script directory: %1.").arg(userScriptDir))));
+    return false;
+  }
+
+  const QString filename =
+    pqFileDialog::getSaveFileName(nullptr, pqPythonScriptEditor::getUniqueInstance(),
+      tr("Save As Script"), userScriptDir, tr("Python script (*.py)"));
+
+  pqPythonScriptEditor::bringFront();
+
+  if (this->saveBuffer(filename))
+  {
+    pqPythonScriptEditor::updateScriptList();
     return true;
   }
 

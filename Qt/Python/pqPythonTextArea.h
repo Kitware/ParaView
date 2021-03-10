@@ -36,16 +36,18 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPythonModule.h"
 
 #include "pqPythonEditorActions.h"
-#include "pqPythonFileIO.h"
-#include "pqPythonLineNumberArea.h"
-#include "pqPythonSyntaxHighlighter.h"
 #include "pqPythonUndoCommand.h"
 #include "pqPythonUtils.h"
+#include "pqTextLinkerPython.h"
 
 #include <QKeyEvent>
-#include <QTextEdit>
 #include <QUndoStack>
 #include <QWidget>
+
+class pqPythonSyntaxHighlighter;
+class pqPythonFileIO;
+class pqPythonLineNumberArea;
+class QTextEdit;
 
 /**
  * @class pqPythonTextArea
@@ -67,8 +69,18 @@ public:
   /**
    * @brief Returns the underlying \ref TextEdit
    */
+  const QTextEdit* getTextEdit() const { return this->TextEdit; }
+
+  /**
+   * @brief Returns the underlying \ref TextEdit
+   */
   QTextEdit* getTextEdit() { return this->TextEdit; }
 
+  const QUndoStack& getUndoStack() const { return this->UndoStack; }
+
+  /**
+   * @brief Returns true if the file has been saved
+   */
   bool saveOnClose();
 
   /**
@@ -118,6 +130,39 @@ public:
    */
   void setText(const QString& text);
 
+  /**
+   * @brief Link the current text area
+   * to an arbitrary QTextEdit like
+   * object
+   */
+  template <typename T>
+  void linkTo(T* obj)
+  {
+    static_assert(sizeof(T) == 0, "Only specializations of linkTo(T* t) can be used");
+  }
+
+  /**
+   * @brief Removes the linked QTextEdit like object
+   */
+  void unlink();
+
+  /**
+   * @brief Returns true if the parameter is linked
+   * to this text area
+   */
+  bool isLinkedTo(const QObject* obj) const { return this->TextLinker.isLinkedTo(obj); }
+
+  /**
+   * @brief Returns true if this text area is linked
+   */
+  bool isLinked() const { return this->TextLinker.isLinked(); }
+
+  /**
+   * @brief Returns the linked text name. Returns an empty string
+   * if nothing is linked
+   */
+  QString getLinkedName() const { return this->TextLinker.getSecondObjectName(); }
+
 signals:
   /**
    * @brief Triggered when the current text
@@ -166,22 +211,24 @@ private:
   /**
    * @brief The editable text area
    */
-  QtStackPointer<QTextEdit> TextEdit;
+  QPointer<QTextEdit> TextEdit;
 
   /**
    * @brief The line number area widget
    */
-  QtStackPointer<pqPythonLineNumberArea> LineNumberArea;
+  QPointer<pqPythonLineNumberArea> LineNumberArea;
 
   /**
    * @brief The syntax highlighter used to color the \ref TextEdit
    */
-  QtStackPointer<pqPythonSyntaxHighlighter> SyntaxHighlighter;
+  QPointer<pqPythonSyntaxHighlighter> SyntaxHighlighter;
 
   /**
    * @brief The IO module used to save the \ref TextEdit
    */
-  QtStackPointer<pqPythonFileIO> FileIO;
+  QPointer<pqPythonFileIO> FileIO;
+
+  pqTextLinker TextLinker;
 
   /**
    * @brief The text QUndoStack
@@ -195,5 +242,7 @@ private:
    */
   pqPythonTextHistoryEntry lastEntry;
 };
+
+#include "pqPythonTextArea.txx"
 
 #endif // pqPythonTextArea_h
