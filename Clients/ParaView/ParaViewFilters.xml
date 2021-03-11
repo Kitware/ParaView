@@ -288,6 +288,7 @@
   <Proxy group="filters" name="ParticlePath" />
   <Proxy group="filters" name="ParticlePathLines" />
   <Proxy group="filters" name="ParticleTracer" />
+  <Proxy group="filters" name="CompositeDataSetGhostCellsGenerator" />
   <Proxy group="filters" name="PassArrays" />
   <Proxy group="filters" name="PlotAttributes" />
   <Proxy group="filters" name="PlotDataOverTime" />

@@ -85,6 +85,35 @@
     </SourceProxy>
 
     <!-- ==================================================================== -->
+    <SourceProxy class="vtkGhostCellsGenerator"
+                 label="Ghost Cells Generator"
+                 name="GhostCellsGenerator">
+      <Documentation short_help="Generate ghosts.">
+        Generate ghost cells and ghost points in a composite data set. Ghosts are exchanged
+        between blocks / partitions of same type. Currently, only vtkImageData, vtkRectilinearGrid
+        and vtkStructuredGrid are implemented.
+      </Documentation>
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkCompositeDataSet" />
+        </DataTypeDomain>
+        <Documentation>This property specifies the input.</Documentation>
+      </InputProperty>
+      <IntVectorProperty command="SetNumberOfGhostLayers"
+                         default_values="1"
+                         name="Number Of Ghost Layers"
+                         number_of_elements="1"
+                         panel_visibility="default">
+      </IntVectorProperty>
+      <!-- End CompositeDataSetGhostCellsGenerator -->
+    </SourceProxy>
+
+    <!-- ==================================================================== -->
     <SourceProxy class="vtkRedistributeDataSetFilter"
                  name="RedistributeDataSet"
                  label="Redistribute DataSet">
