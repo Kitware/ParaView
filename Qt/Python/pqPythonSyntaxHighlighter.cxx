@@ -100,10 +100,13 @@ pqPythonSyntaxHighlighter::pqPythonSyntaxHighlighter(QObject* p, QTextEdit& text
     }
     else
     {
-      qInfo("The ParaView python module didn't load Pygment for the python syntax highlighting"
-            "in the editor. Please verify that you have correctly installed the Python Pygment "
-            "module if you want"
-            "to have the syntax highlighting working in the editor");
+      static bool warnOnce = true;
+      if (warnOnce)
+      {
+        qInfo("Python package 'pygments' is missing. Please install the package for syntax "
+              "highlighting.");
+        warnOnce = false;
+      }
     }
   }
 
