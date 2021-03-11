@@ -33,6 +33,7 @@
 #include <sstream>
 #include <sstream>
 #include <string>
+#include <tuple>
 #include <vector>
 #include <vtk_pugixml.h>
 
