@@ -520,7 +520,7 @@ bool vtkCGNSWriter::vtkPrivate::WriteBase(write_info& info, const char* basename
 bool vtkCGNSWriter::vtkPrivate::WriteStructuredGrid(
   write_info& info, vtkStructuredGrid* sg, const char* zonename, string& error)
 {
-  if (sg->GetNumberOfCells() == 0 and sg->GetNumberOfPoints() == 0)
+  if (sg->GetNumberOfCells() == 0 && sg->GetNumberOfPoints() == 0)
   {
     // don't write anything
     return true;
