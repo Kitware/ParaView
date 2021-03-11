@@ -1403,6 +1403,7 @@ set(SelectionLinkScripting_DISABLE_CRS TRUE)
 set(ExpandSelection_DISABLE_CRS TRUE)
 set(ExportSelectionToCSV_DISABLE_CRS TRUE)
 set(BlockOpacities_DISABLE_CRS TRUE)
+set(SaveExodus_DISABLE_CRS TRUE) # yes, this test does a selection
 
 # These tests cannot be run using ctest -j since they are affected by focus
 # changed events.
