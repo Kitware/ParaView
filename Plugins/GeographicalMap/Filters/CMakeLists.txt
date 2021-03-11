@@ -1,6 +1,7 @@
 set(classes
   vtkGeoMapConvertFilter
-  vtkGeoMapFetcher)
+  vtkGeoMapFetcher
+  vtkGeoMapFetcherMesh)
 
 vtk_module_find_package(
   PACKAGE CURL)

@@ -1,21 +1,7 @@
 <ServerManagerConfiguration>
-  <ProxyGroup name="sources">
-    <SourceProxy class="vtkGeoMapFetcher"
-                 label="Geographical Map Fetcher"
-                 name="GeoMapFetcher">
-      <Documentation long_help="Download an image map from a geolocation provider."
-                     short_help="Download an image">
-                     This source fetches an image from a geolocation provider based on the
-                     coordinates and the zoom level.
-                     An account is required to get an API key from the selected provider.
-      </Documentation>
-      <DoubleVectorProperty command="SetCenter"
-                            name="Center"
-                            number_of_elements="2"
-                            default_values="0 0"
-                            label="Lat/Lon">
-        <Documentation>Latitude and longitude of the center in degrees.</Documentation>
-      </DoubleVectorProperty>
+
+  <ProxyGroup name="geomap_internal">
+    <Proxy name="GeoMapFetcherBase">
       <IntVectorProperty command="SetDimension"
                          name="Dimension"
                          number_of_elements="2"
@@ -26,15 +12,7 @@
           GoogleMap: min 2x2, max 640x640 (2048x2048 for premium plan key).
         </Documentation>
       </IntVectorProperty>
-      <IntVectorProperty command="SetZoomLevel"
-                         name="ZoomLevel"
-                         default_values="4"
-                         number_of_elements="1">
-        <IntRangeDomain min="0" max="18" name="range"/>
-        <Documentation>
-          Defines the zoom level of the map, which determines the magnification level of the map.
-        </Documentation>
-      </IntVectorProperty>
+
       <IntVectorProperty
         name="Provider"
         command="SetProvider"
@@ -50,6 +28,7 @@
           MapQuest: https://developer.mapquest.com/plan_purchase/steps/business_edition/business_edition_free/register
         </Documentation>
       </IntVectorProperty>
+
       <IntVectorProperty
         name="MapType"
         command="SetType"
@@ -65,6 +44,7 @@
           Defines the map format to construct.
         </Documentation>
       </IntVectorProperty>
+
       <IntVectorProperty
         name="Upscale"
         command="SetUpscale"
@@ -76,6 +56,7 @@
           Note that the download of the map can be longer.
         </Documentation>
       </IntVectorProperty>
+
       <StringVectorProperty name="APIKey"
                             command="SetAPIKey"
                             number_of_elements="1"
@@ -85,6 +66,83 @@
           This key can be generated from the provider website when an account has been created.
         </Documentation>
       </StringVectorProperty>
+
+      <IntVectorProperty
+        name="FetchingMethod"
+        command="SetFetchingMethod"
+        number_of_elements="1"
+        default_values="0">
+        <EnumerationDomain name="enum">
+          <Entry value="0" text="Center and Zoom"/>
+          <Entry value="1" text="Bounding Box"/>
+        </EnumerationDomain>
+        <Documentation>
+          Which method is used to localize the data to fetch.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty command="SetZoomLevel"
+                         name="ZoomLevel"
+                         default_values="4"
+                         number_of_elements="1">
+        <IntRangeDomain min="0" max="18" name="range"/>
+        <Documentation>
+          Defines the zoom level of the map, which determines the magnification level of the map.
+        </Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="FetchingMethod"
+                                   value="0" />
+        </Hints>
+      </IntVectorProperty>
+
+    </Proxy>
+  </ProxyGroup>
+
+  <ProxyGroup name="sources">
+    <SourceProxy class="vtkGeoMapFetcher"
+                 label="Geographical Map Fetcher"
+                 base_proxygroup="geomap_internal"
+                 base_proxyname="GeoMapFetcherBase"
+                 name="GeoMapFetcher">
+      <Documentation long_help="Download an image map from a geolocation provider."
+                     short_help="Download an image">
+                     This source fetches an image from a geolocation provider based on the
+                     coordinates and the zoom level.
+                     An account is required to get an API key from the selected provider.
+      </Documentation>
+
+      <DoubleVectorProperty command="SetCenter"
+                            name="Center"
+                            number_of_elements="2"
+                            default_values="0 0"
+                            label="Lat/Lon">
+        <Documentation>Latitude and longitude of the center in degrees.</Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="FetchingMethod"
+                                   value="0" />
+        </Hints>
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty name="MapBoundingBox"
+        command="SetMapBoundingBox"
+        number_of_elements="4"
+        default_values="0 1 0 1">
+        <DoubleRangeDomain name="range" />
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="FetchingMethod"
+                                   value="1" />
+        </Hints>
+        <Documentation>
+          Defines the bounding box of the map.Format is {minLat, maxLat, minLong, maxLong}
+        </Documentation>
+      </DoubleVectorProperty>
+
     </SourceProxy>
   </ProxyGroup>
 
@@ -93,10 +151,10 @@
                  class="vtkGeoMapConvertFilter"
                  label="Geographical Map Conversion">
       <Documentation
-        long_help="Convert an image in Lon/Lat projection to an other projection."
+        long_help="Convert an image from a specific projection to an other."
         short_help="Convert an image to an other projection.">
-        Convert a 2D image data in Lon/Lat projection to structured grid in
-        an other projection supported by PROJ library.
+        Convert a 2D image data from a specific projection to a structured grid in
+        an other projection supported by the PROJ library.
       </Documentation>
       <InputProperty command="SetInputConnection"
                      name="Input">
@@ -105,30 +163,67 @@
           <Group name="filters" />
         </ProxyGroupDomain>
         <DataTypeDomain name="input_type">
-          <DataType value="vtkImageData" />
+          <DataType value="vtkDataSet" />
         </DataTypeDomain>
         <Documentation>
           This property specifies the input to the GeoConversion filter.
         </Documentation>
       </InputProperty>
-      <IntVectorProperty command="SetProjection"
+
+      <IntVectorProperty command="SetSourceProjection"
                          default_values="2"
-                         name="Projection"
+                         name="SourceProjection"
+                         number_of_elements="1"
+                         panel_visibility="advanced">
+        <EnumerationDomain name="enum">
+          <Entry value="0" text="Ortographic"/>
+          <Entry value="1" text="Lambert93"/>
+          <Entry value="2" text="LatLong"/>
+          <Entry value="3" text="Custom"/>
+        </EnumerationDomain>
+        <Documentation>
+          Set the preconfigured source projection.
+          If Custom is selected, a valid PROJ4 string must be provided.
+        </Documentation>
+      </IntVectorProperty>
+
+      <StringVectorProperty name="CustomSourceProjection"
+                            command="SetCustomSourceProjection"
+                            number_of_elements="1"
+                            label="Source PROJ4"
+                            panel_visibility="advanced">
+        <Documentation>
+          PROJ4 String used to configure the source projection.
+          See documentation here: https://proj.org/usage/projections.html
+        </Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="SourceProjection"
+                                   value="3"/>
+        </Hints>
+      </StringVectorProperty>
+
+      <IntVectorProperty command="SetDestProjection"
+                         default_values="1"
+                         name="DestinationProjection"
                          number_of_elements="1">
         <EnumerationDomain name="enum">
-          <Entry value="0" text="Custom"/>
-          <Entry value="1" text="Ortographic"/>
-          <Entry value="2" text="Lambert93"/>
+          <Entry value="0" text="Ortographic"/>
+          <Entry value="1" text="Lambert93"/>
+          <Entry value="2" text="LatLong"/>
+          <Entry value="3" text="Custom"/>
         </EnumerationDomain>
         <Documentation>
           Set the preconfigured destination projection.
           If Custom is selected, a valid PROJ4 string must be provided.
         </Documentation>
       </IntVectorProperty>
-      <StringVectorProperty name="PROJ4String"
-                            command="SetPROJ4String"
+
+      <StringVectorProperty name="CustomDestProjection"
+                            command="SetCustomDestProjection"
                             number_of_elements="1"
-                            label="PROJ4">
+                            label="Destination PROJ4">
         <Documentation>
           PROJ4 String used to configure the destination projection.
           See documentation here: https://proj.org/usage/projections.html
@@ -136,10 +231,72 @@
         <Hints>
           <PropertyWidgetDecorator type="GenericDecorator"
                                    mode="visibility"
-                                   property="Projection"
-                                   value="0"/>
+                                   property="DestinationProjection"
+                                   value="3"/>
         </Hints>
       </StringVectorProperty>
+
+    </SourceProxy>
+
+    <SourceProxy name="GeoMapFetcherMeshFilter"
+                 class="vtkGeoMapFetcherMesh"
+                 base_proxygroup="geomap_internal"
+                 base_proxyname="GeoMapFetcherBase"
+                 label="Geographical Map Mesh Fetcher">
+      <Documentation long_help="Download an image map from a geolocation provided by a mesh."
+                     short_help="Download an image">
+                     This source fetches an image from a geolocation provider based on the
+                     coordinates provided by the bounding box of a mesh.
+                     An account is required to get an API key from the selected provider.
+      </Documentation>
+
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkDataSet" />
+        </DataTypeDomain>
+        <Documentation>
+          This property specifies the input to the GeoMapFetcherMesh filter.
+        </Documentation>
+      </InputProperty>
+
+      <IntVectorProperty command="SetMeshProjection"
+                         default_values="2"
+                         name="MeshProjection"
+                         number_of_elements="1">
+        <EnumerationDomain name="enum">
+          <Entry value="0" text="Ortographic"/>
+          <Entry value="1" text="Lambert93"/>
+          <Entry value="2" text="LatLong"/>
+          <Entry value="3" text="Custom"/>
+        </EnumerationDomain>
+        <Documentation>
+          Set the mesh projection.
+          If Custom is selected, a valid PROJ4 string must be provided.
+        </Documentation>
+      </IntVectorProperty>
+
+      <StringVectorProperty name="CustomMeshProjection"
+                            command="SetCustomMeshProjection"
+                            number_of_elements="1"
+                            label="Mesh PROJ4">
+        <Documentation>
+          PROJ4 String used to configure the mesh projection.
+          See documentation here: https://proj.org/usage/projections.html
+        </Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="MeshProjection"
+                                   value="3"/>
+        </Hints>
+      </StringVectorProperty>
+
     </SourceProxy>
   </ProxyGroup>
+
 </ServerManagerConfiguration>

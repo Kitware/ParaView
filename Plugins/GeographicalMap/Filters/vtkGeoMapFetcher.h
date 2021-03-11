@@ -30,6 +30,8 @@
 #include <string>
 #include <vector>
 
+class vtkImageData;
+
 class VTKGEOGRAPHICALMAP_EXPORT vtkGeoMapFetcher : public vtkImageAlgorithm
 {
 public:
@@ -51,6 +53,20 @@ public:
     MapQuest = 1
   };
 
+  enum FetchingMethod
+  {
+    ZoomCenter = 0,
+    BoundingBox = 1
+  };
+
+  //@{
+  /**
+   * Get/Set the fetching method to use between ZoomCenter and BoundingBox
+   */
+  vtkSetClampMacro(FetchingMethod, int, ZoomCenter, BoundingBox);
+  vtkGetMacro(FetchingMethod, int);
+  //@}
+
   //@{
   /**
    * Get/Set the center point in latitude/longitude coordinates (in degrees).
@@ -62,20 +78,30 @@ public:
 
   //@{
   /**
-   * Get/Set the dimension of the downloaded map.
-   * Default is 500x500.
-   */
-  vtkSetVector2Macro(Dimension, unsigned short);
-  vtkGetVector2Macro(Dimension, unsigned short);
-  //@}
-
-  //@{
-  /**
    * Get/Set the zoom level of the downloaded map.
    * Default is 4.
    */
   vtkSetClampMacro(ZoomLevel, unsigned short, 0, 18);
   vtkGetMacro(ZoomLevel, unsigned short);
+  //@}
+
+  //@{
+  /**
+   * Get/Set the bounding box of the downloaded map.
+   * Format is {latMin, latMax, longMin, longMax}
+   * Default is {0,1,0,1}.
+   */
+  vtkSetVector4Macro(MapBoundingBox, double);
+  vtkGetVector4Macro(MapBoundingBox, double);
+  //@}
+
+  //@{
+  /**
+   * Get/Set the dimension of the downloaded map.
+   * Default is 500x500.
+   */
+  vtkSetVector2Macro(Dimension, unsigned short);
+  vtkGetVector2Macro(Dimension, unsigned short);
   //@}
 
   //@{
@@ -145,15 +171,24 @@ protected:
    */
   bool DownloadData(const std::string& url, std::vector<char>& buffer);
 
+  int FetchingMethod = ZoomCenter;
   double Center[2] = { 0.0, 0.0 };
-  unsigned short Dimension[2] = { 500, 500 };
   unsigned short ZoomLevel = 4;
+  double MapBoundingBox[4] = { 0.0, 1.0, 0.0, 1.0 };
+  unsigned short Dimension[2] = { 500, 500 };
   std::string APIKey = "";
   int Provider = MapQuest;
   int Type = Satellite;
   bool Upscale = true;
 
 private:
+  /**
+   * Get a vtkImageData from an URL and fetch it into dest.
+   * Return true if imge has been found, else return false.
+   * In this case dest is unchanged.
+   */
+  bool FetchVtkPNG(const std::string& url, vtkImageData* dest);
+
   vtkGeoMapFetcher(const vtkGeoMapFetcher&) = delete;
   void operator=(const vtkGeoMapFetcher&) = delete;
 };
