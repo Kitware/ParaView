@@ -2,9 +2,7 @@
 #define CatalystAdaptor_h
 
 #include "FEDataStructures.h"
-#include <catalyst.h>
-#include <conduit.hpp>
-#include <conduit_cpp_to_c.hpp>
+#include <catalyst.hpp>
 
 #include <numeric>
 #include <string>
@@ -22,39 +20,39 @@ namespace CatalystAdaptor
  */
 void Initialize(int argc, char* argv[])
 {
-  conduit::Node node;
+  conduit_cpp::Node node;
   for (int cc = 1; cc < argc; ++cc)
   {
     node["catalyst/scripts/script" + std::to_string(cc - 1)].set_string(argv[cc]);
   }
-  catalyst_initialize(conduit::c_node(&node));
+  catalyst_initialize(conduit_cpp::c_node(&node));
 }
 
 void Execute(int cycle, double time, Grid& grid, Attributes& attribs, Particles& particles)
 {
-  conduit::Node exec_params;
+  conduit_cpp::Node exec_params;
 
   // add time/cycle information
-  auto& state = exec_params["catalyst/state"];
+  auto state = exec_params["catalyst/state"];
   state["timestep"].set(cycle);
   state["time"].set(time);
 
   // Add channels.
   // We have 2 channels here. First once is called 'grid'.
-  auto& channel_grid = exec_params["catalyst/channels/grid"];
+  auto channel_grid = exec_params["catalyst/channels/grid"];
 
   // Since this example is using Conduit Mesh Blueprint to define the mesh,
   // we set the channel_grid's type to "mesh".
   channel_grid["type"].set_string("mesh");
 
   // now create the mesh.
-  auto& mesh_grid = channel_grid["data"];
+  auto mesh_grid = channel_grid["data"];
 
   // start with coordsets (of course, the sequence is not important, just make
   // it easier to think in this order).
   mesh_grid["coordsets/coords/type"].set_string("explicit");
 
-  // We don't use the conduit::Node::set(std::vector<..>) API since that deep
+  // We don't use the conduit_cpp::Node::set(std::vector<..>) API since that deep
   // copies. For zero-copy, we use the set_.._ptr(..) API.
   mesh_grid["coordsets/coords/values/x"].set_external(
     grid.GetPointsArray(), grid.GetNumberOfPoints(), /*offset=*/0, /*stride=*/3 * sizeof(double));
@@ -73,7 +71,7 @@ void Execute(int cycle, double time, Grid& grid, Attributes& attribs, Particles&
     grid.GetCellPoints(0), grid.GetNumberOfCells() * 8);
 
   // Finally, add fields.
-  auto& fields_grid = mesh_grid["fields"];
+  auto fields_grid = mesh_grid["fields"];
   fields_grid["velocity/association"].set_string("vertex");
   fields_grid["velocity/topology"].set_string("mesh");
   fields_grid["velocity/volume_dependent"].set_string("false");
@@ -95,14 +93,14 @@ void Execute(int cycle, double time, Grid& grid, Attributes& attribs, Particles&
   fields_grid["pressure/values"].set_external(attribs.GetPressureArray(), grid.GetNumberOfCells());
 
   // Now add the second channel, called "particles".
-  auto& channel_particles = exec_params["catalyst/channels/particles"];
+  auto channel_particles = exec_params["catalyst/channels/particles"];
 
   // Since this example is using Conduit Mesh Blueprint to define the mesh,
   // we set the channel_particles's type to "mesh".
   channel_particles["type"].set_string("mesh");
 
   // now create the mesh.
-  auto& mesh_particles = channel_particles["data"];
+  auto mesh_particles = channel_particles["data"];
   mesh_particles["coordsets/coords/type"].set_string("explicit");
   mesh_particles["coordsets/coords/values/x"].set_external(particles.GetPointsArray(),
     particles.GetNumberOfPoints(), /*offset=*/0, /*stride=*/3 * sizeof(double));
@@ -120,13 +118,13 @@ void Execute(int cycle, double time, Grid& grid, Attributes& attribs, Particles&
   mesh_particles["topologies/mesh/elements/connectivity"].set_external(
     &connectivity[0], particles.GetNumberOfPoints());
 
-  catalyst_execute(conduit::c_node(&exec_params));
+  catalyst_execute(conduit_cpp::c_node(&exec_params));
 }
 
 void Finalize()
 {
-  conduit::Node node;
-  catalyst_finalize(conduit::c_node(&node));
+  conduit_cpp::Node node;
+  catalyst_finalize(conduit_cpp::c_node(&node));
 }
 }
 
