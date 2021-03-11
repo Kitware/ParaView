@@ -12,11 +12,12 @@ namespace CatalystAdaptor
 {
 
 /**
- * In this example, we show how we can use Conduit's C++ API to
- * create Conduit nodes. This is not required. A C++ adaptor
- * can just as conveniently use the Conduit C API to setup
- * the `conduit_node`. However, this example shows that one can indeed
- * use the C++ API, if the developer so chooses.
+ * In this example, we show how we can use Catalysts's C++
+ * wrapper around conduit's C API to create Conduit nodes.
+ * This is not required. A C++ adaptor can just as
+ * conveniently use the Conduit C API to setup the
+ * `conduit_node`. However, this example shows that one can
+ * indeed use Catalyst's C++ API, if the developer so chooses.
  */
 void Initialize(int argc, char* argv[])
 {
