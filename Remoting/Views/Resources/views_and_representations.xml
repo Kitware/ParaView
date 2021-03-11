@@ -9237,7 +9237,6 @@
                proxygroup="representations"
                proxyname="TextWidgetRepresentation"></Proxy>
         <ExposedProperties>
-
           <!-- properties for Text Position-->
           <PropertyGroup name="TextPosition" label="Text Position" panel_widget="TextLocationEditor">
             <Property name="WindowLocation" />
@@ -9255,28 +9254,6 @@
           <Property name="TextScaleMode" panel_visibility="never" default_values="0"/>
           <Property name="Resizable" panel_visibility="never"/>
 
-          <PropertyGroup label="Text Styling">
-            <Property name="ShowBorder" />
-            <Property name="BorderColor" />
-            <Property name="BorderThickness" />
-            <Property name="CornerRadius" />
-            <Property name="CornerResolution" />
-            <Property name="BackgroundColor" />
-            <Property name="BackgroundOpacity" />
-            <Property name="RightPadding" />
-            <Property name="TopPadding" />
-            <Property name="LineOffset" />
-            <Property name="LineSpacing" />
-            <Property name="CellOffset" />
-
-            <Hints>
-              <PropertyWidgetDecorator type="GenericDecorator"
-                                    mode="visibility"
-                                    property="TextPropMode"
-                                    value="0" />
-            </Hints>
-          </PropertyGroup>
-
           <!-- properties for Text -->
           <Property name="Orientation" panel_visibility="never"/>
           <PropertyGroup label="Font Properties" panel_widget="FontEditor">
@@ -9288,10 +9265,40 @@
             <Property name="Italic" function="Italics" />
             <Property name="Shadow" function="Shadow"/>
             <Property name="FontSize" function="Size"/>
-            <Property name="Justification" function="Justification"/>
+            <Property name="Justification" function="Justification" default_values="1" />
             <Property name="VerticalJustification" function="VerticalJustification"/>
           </PropertyGroup>
 
+          <Property name="ShowBorder" label="Show Background" />
+          <PropertyGroup label="Background Properties">
+            <Property name="BackgroundColor" default_values="1 1 1 0.2"/>
+            <Property name="BorderColor" panel_visibility="advanced"/>
+            <Property name="BorderThickness" panel_visibility="advanced"/>
+            <Property name="CornerRadius" panel_visibility="advanced"/>
+            <Property name="Padding" panel_visibility="advanced" default_values="1" />
+
+            <Hints>
+              <PropertyWidgetDecorator type="GenericDecorator"
+                                    mode="visibility"
+                                    property="TextPropMode"
+                                    value="0" />
+
+              <PropertyWidgetDecorator type="CompositeDecorator">
+                <Expression type="or">
+                  <PropertyWidgetDecorator type="GenericDecorator"
+                    mode="visibility"
+                    property="ShowBorder"
+                    value="1" />
+
+                  <PropertyWidgetDecorator type="GenericDecorator"
+                    mode="visibility"
+                    property="ShowBorder"
+                    value="2" />
+                </Expression>
+              </PropertyWidgetDecorator>
+            </Hints>
+
+          </PropertyGroup>
         </ExposedProperties>
       </SubProxy>
 

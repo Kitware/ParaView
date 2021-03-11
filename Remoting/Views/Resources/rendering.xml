@@ -355,6 +355,13 @@
   </ProxyGroup>
   <ProxyGroup name="properties">
     <Proxy class="vtkTextProperty" name="TextPropertyBase" processes="client|dataserver|renderserver" >
+      <DoubleVectorProperty command="SetBackgroundRGBA"
+                            default_values="0.0 0.0 0.0 0.0"
+                            name="BackgroundRGBA"
+                            number_of_elements="4">
+        <DoubleRangeDomain max="1 1 1 1" min="0 0 0 0" name="range" />
+      </DoubleVectorProperty>
+
       <DoubleVectorProperty animateable="0"
                             command="SetOpacity"
                             default_values="1.0"
