@@ -729,7 +729,7 @@ bool vtkCGNSWriter::vtkPrivate::WriteMultiBlock(
   write_info& info, vtkMultiBlockDataSet* mb, string& error)
 {
   vector<entry> surfaceBlocks, volumeBlocks;
-  if (mb->GetNumberOfCells() == 0 and mb->GetNumberOfPoints() == 0)
+  if (mb->GetNumberOfCells() == 0 && mb->GetNumberOfPoints() == 0)
   {
     // don't write anything
     return true;
