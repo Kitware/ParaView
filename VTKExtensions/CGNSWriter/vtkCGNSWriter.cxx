@@ -315,7 +315,7 @@ bool vtkCGNSWriter::vtkPrivate::WritePointSet(
 {
   const cgsize_t nPts = static_cast<cgsize_t>(grid->GetNumberOfPoints());
   const cgsize_t nCells = static_cast<cgsize_t>(grid->GetNumberOfCells());
-  if (nPts == 0 and nCells == 0)
+  if (nPts == 0 && nCells == 0)
   {
     // don't write anything
     return true;
