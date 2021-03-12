@@ -1520,7 +1520,8 @@
           <DataType value="vtkUnstructuredGrid" />
         </DataTypeDomain>
         <Documentation>This property specifies the input to the remove ghost
-        information filter.</Documentation>
+        information filter. This filter operates only on unstructured grids
+        and polydata since it removes the ghost cells.</Documentation>
       </InputProperty>
     </SourceProxy>
 
