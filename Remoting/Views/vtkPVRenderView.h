@@ -869,48 +869,22 @@ public:
 
   //@{
   /**
-   * Tells view that it should draw a particular array component
-   * to the screen such that the pixels can be read back and
-   * decoded to obtain the values.
+   * Experimental API to grab re-colorable images. Between
+   * BeginValuePassForRendering and EndValuePassForRendering calls, all renders
+   * will end up using vtkValuePass for rendering instead of the standard
+   * rendering passes that generate results on screen.
+   *
+   * GrabValuePassResult must be called between BeginValuePassForRendering and
+   * EndValuePassForRendering. Returns the vtkFloatArray grabbed by
+   * vtkValuePass.
+   *
+   * This API is not intended for remote-rendering use-cases. Thus only supported in client-only and
+   * pvbatch (or in situ) cases. That's the reason why we are exposing this directly on
+   * the vtkPVRenderView rather accessing it via a proxy.
    */
-  void SetDrawCells(bool choice);
-  void SetArrayNameToDraw(const char* name);
-  void SetArrayNumberToDraw(int fieldAttributeType);
-  void SetArrayComponentToDraw(int comp);
-  void SetScalarRange(double min, double max);
-  void BeginValueCapture();
-  void EndValueCapture();
-  //@}
-
-  //@{
-  /**
-   * Current rendering mode of vtkValuePass (float or invertible RGB).
-   * @deprecation Invertible is deprecated, so this currently does nothing and will be removed.
-   */
-  void SetValueRenderingModeCommand(int mode);
-  int GetValueRenderingModeCommand();
-  //@}
-
-  //@{
-  /**
-   * Access to vtkValuePass::FLOATING_POINT mode rendered image. vtkValuePass's
-   * internal FBO is accessed directly when rendering locally. When rendering in
-   * parallel, IceT composites the intermediate results from vtkValuePass and the
-   * final result is accessed through vtkIceTCompositePass. Float value rendering
-   * is only supported in BATCH mode and in CLIENT mode (local rendering). These methods
-   * do nothing if INVERTIBLE_LUT mode is active.
-   */
-  void CaptureValuesFloat();
-  vtkFloatArray* GetCapturedValuesFloat();
-  //@}
-
-  //@{
-  /**
-   * Tells views that it should draw the lighting contributions to the
-   * framebuffer.
-   */
-  void StartCaptureLuminance();
-  void StopCaptureLuminance();
+  bool BeginValuePassForRendering(int fieldAssociation, const char* arrayName, int component);
+  void EndValuePassForRendering();
+  vtkSmartPointer<vtkFloatArray> GrabValuePassResult();
   //@}
 
   //@{

@@ -206,27 +206,6 @@ public:
    */
   vtkFloatArray* CaptureDepthBuffer();
 
-  /**
-   * Access to value-rendered array. Used for deferred color mapping during
-   * in-situ visualization (Cinema).
-   */
-  vtkFloatArray* GetValuesFloat();
-
-  //@{
-
-  /**
-   * Value raster capture controls.
-   */
-  void StartCaptureValues();
-  void StopCaptureValues();
-
-  /**
-   * Access to the current vtkValuePass rendering mode.
-   */
-  int GetValueRenderingMode();
-  void SetValueRenderingMode(int mode);
-  //@}
-
 protected:
   vtkSMRenderViewProxy();
   ~vtkSMRenderViewProxy() override;

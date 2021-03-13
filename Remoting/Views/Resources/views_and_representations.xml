@@ -2707,13 +2707,6 @@
         <DoubleRangeDomain name="range" />
         <Documentation>Set the most conservative clipping range.</Documentation>
       </DoubleVectorProperty>
-      <Property
-          name="CaptureValuesFloat"
-          command="CaptureValuesFloat"
-          >
-        <Documentation>A helper function to get the FLOATING_POINT value
-        buffer from the vtkValuePass.</Documentation>
-      </Property>
       <IntVectorProperty
           name="LockBounds"
           command="SetLockBounds"
@@ -2725,110 +2718,6 @@
         <Documentation>A helper function to force consistent Z buffer
         captures from a RenderView.</Documentation>
       </IntVectorProperty>
-      <Property
-          name="BeginValueCapture"
-          command="BeginValueCapture"
-          >
-        <Documentation>Initiates a render state where RGB colors
-        encode values from a particular array.</Documentation>
-      </Property>
-      <IntVectorProperty
-          name="DrawCells"
-          command="SetDrawCells"
-          default_values="0"
-          animateable="0"
-          number_of_elements="1"
-          >
-        <BooleanDomain name="bool" />
-        <Documentation>RGB colors will come directly from a cell (1)
-        or point (0) aligned array.</Documentation>
-      </IntVectorProperty>
-      <StringVectorProperty
-          name="ArrayNameToDraw"
-          command="SetArrayNameToDraw"
-          default_values=""
-          animateable="0"
-          number_of_elements="1"
-          >
-        <Documentation>RGB colors will come directly from a named
-        array.</Documentation>
-      </StringVectorProperty>
-      <IntVectorProperty
-          name="ArrayNumberToDraw"
-          command="SetArrayNumberToDraw"
-          default_values="0"
-          animateable="0"
-          number_of_elements="1"
-          >
-        <IntRangeDomain name="range" />
-        <Documentation>RGB colors will come directly from the numbered
-        array.</Documentation>
-      </IntVectorProperty>
-      <IntVectorProperty
-          name="ValueRenderingMode"
-          command="SetValueRenderingModeCommand"
-          default_values="1"
-          animateable="0"
-          number_of_elements="1"
-          >
-        <IntRangeDomain name="range" />
-        <Documentation>Select rendering mode of the value pass (either INVERTIBLE_LUT (1) or
-        FLOATING_POINT (2)).</Documentation>
-      </IntVectorProperty>
-      <IntVectorProperty
-          name="ValueRenderingModeGet"
-          command="GetValueRenderingModeCommand"
-          default_values="1"
-          information_only="1"
-          >
-        <Documentation>Get active rendering mode of the value pass (either INVERTIBLE_LUT (1) or
-        FLOATING_POINT (2)).</Documentation>
-      </IntVectorProperty>
-      <IntVectorProperty
-          name="ArrayComponentToDraw"
-          command="SetArrayComponentToDraw"
-          default_values="0"
-          animateable="0"
-          number_of_elements="1"
-          >
-        <IntRangeDomain name="range" />
-        <Documentation>RGB colors will come directly from the numbered
-        component of the array.</Documentation>
-      </IntVectorProperty>
-      <DoubleVectorProperty
-          name="ScalarRange"
-          argument_is_array="0"
-          command="SetScalarRange"
-          default_values="0.0 -1.0"
-          animateable="0"
-          number_of_elements="2"
-          >
-        <DoubleRangeDomain name="range" />
-        <Documentation>Map linearly between the min and max values to
-        produce RGB colors.</Documentation>
-      </DoubleVectorProperty>
-      <Property
-          name="EndValueCapture"
-          command="EndValueCapture"
-          >
-        <Documentation>Terminates the render state where RGB colors
-        encode values from a particular array and returns to normal
-        behavior.</Documentation>
-      </Property>
-      <Property
-          name="StartCaptureLuminance"
-          command="StartCaptureLuminance"
-          >
-        <Documentation>Initiates a render state where lighting contributions are
-        encoded into RGB.</Documentation>
-      </Property>
-      <Property
-          name="StopCaptureLuminance"
-          command="StopCaptureLuminance"
-        >
-        <Documentation>Terminates the render state where lighting contributions
-        are encoded into RGB.</Documentation>
-      </Property>
       <IntVectorProperty name="EnableOSPRay"
           label="Enable Ray Tracing"
           command="SetEnableOSPRay"
@@ -3314,21 +3203,9 @@
       </PropertyGroup>
       <PropertyGroup label="Cinema Export"
                      panel_visibility="never">
-        <Property name="ValueRenderingMode"/>
-        <Property name="ValueRenderingModeGet"/>
         <Property name="CaptureZBuffer"/>
         <Property name="MaxClipBounds"/>
         <Property name="LockBounds"/>
-        <Property name="BeginValueCapture" />
-        <Property name="DrawCells"/>
-        <Property name="ArrayNameToDraw"/>
-        <Property name="ArrayNumberToDraw"/>
-        <Property name="ArrayComponentToDraw"/>
-        <Property name="ScalarRange"/>
-        <Property name="EndValueCapture"/>
-        <Property name="CaptureValuesFloat" />
-        <Property name="StartCaptureLuminance" />
-        <Property name="StopCaptureLuminance" />
       </PropertyGroup>
       <PropertyGroup label="Ray Traced Rendering"
                      panel_visibility="advanced">
