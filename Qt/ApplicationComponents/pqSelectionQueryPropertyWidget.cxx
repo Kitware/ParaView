@@ -430,7 +430,7 @@ protected:
     return static_cast<TermType>(this->Term->currentData(TermTypeRole).toInt());
   }
 
-  const QString currentTerm() const { return this->Term->currentData(NameRole).toString(); }
+  QString currentTerm() const { return this->Term->currentData(NameRole).toString(); }
 
   void setCurrentTerm(const QString& name)
   {
@@ -770,9 +770,7 @@ pqSelectionQueryPropertyWidget::pqSelectionQueryPropertyWidget(
 }
 
 //-----------------------------------------------------------------------------
-pqSelectionQueryPropertyWidget::~pqSelectionQueryPropertyWidget()
-{
-}
+pqSelectionQueryPropertyWidget::~pqSelectionQueryPropertyWidget() = default;
 
 //-----------------------------------------------------------------------------
 void pqSelectionQueryPropertyWidget::setQuery(const QString& value)

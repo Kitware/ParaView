@@ -103,7 +103,6 @@ class pqArraysModel : public QAbstractTableModel
 public:
   pqArraysModel(QObject* parentObj = nullptr)
     : Superclass(parentObj){};
-  ~pqArraysModel() override {}
 
   /**
    * Get/Set the vtkPVDataInformation instance.

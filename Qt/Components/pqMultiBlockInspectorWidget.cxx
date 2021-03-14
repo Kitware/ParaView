@@ -114,7 +114,7 @@ public:
       this->Ui.showHints->setChecked(checked);
     }
   }
-  ~pqInternals()
+  ~pqInternals() override
   {
     if (auto settings = pqApplicationCore::instance()->settings())
     {

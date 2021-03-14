@@ -61,7 +61,7 @@ namespace
 // class as well, just copying this piece of code over.
 void populateSelectionTypeCombo(QComboBox* cbox, pqOutputPort* port)
 {
-  if (port == NULL)
+  if (port == nullptr)
   {
     cbox->clear();
     return;

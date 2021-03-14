@@ -19,14 +19,9 @@
 
 vtkStandardNewMacro(vtkSMDataAssemblyListDomain);
 //----------------------------------------------------------------------------
-vtkSMDataAssemblyListDomain::vtkSMDataAssemblyListDomain()
-{
-}
-
+vtkSMDataAssemblyListDomain::vtkSMDataAssemblyListDomain() = default;
 //----------------------------------------------------------------------------
-vtkSMDataAssemblyListDomain::~vtkSMDataAssemblyListDomain()
-{
-}
+vtkSMDataAssemblyListDomain::~vtkSMDataAssemblyListDomain() = default;
 
 //----------------------------------------------------------------------------
 void vtkSMDataAssemblyListDomain::Update(vtkSMProperty*)

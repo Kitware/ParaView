@@ -84,7 +84,7 @@ public:
   static int selectedElementType(vtkSMProxy* selSource)
   {
     Q_ASSERT(selSource);
-    if (selSource->GetProperty("ElementType") != 0)
+    if (selSource->GetProperty("ElementType") != nullptr)
     {
       return vtkSMPropertyHelper(selSource, "ElementType").GetAsInt();
     }
@@ -350,9 +350,7 @@ pqFindDataWidget::pqFindDataWidget(QWidget* parentObject)
 }
 
 //-----------------------------------------------------------------------------
-pqFindDataWidget::~pqFindDataWidget()
-{
-}
+pqFindDataWidget::~pqFindDataWidget() = default;
 
 //-----------------------------------------------------------------------------
 pqServer* pqFindDataWidget::server() const

@@ -211,7 +211,7 @@ vtkPVDataInformation* vtkSMDomain::GetInputSubsetDataInformation(
   vtkSMProperty* inputProperty = this->GetRequiredProperty(function);
   if (!inputProperty)
   {
-    return NULL;
+    return nullptr;
   }
 
   vtkSMUncheckedPropertyHelper helper(inputProperty);
@@ -224,7 +224,7 @@ vtkPVDataInformation* vtkSMDomain::GetInputSubsetDataInformation(
     }
   }
 
-  return NULL;
+  return nullptr;
 }
 
 //---------------------------------------------------------------------------
@@ -300,7 +300,7 @@ void vtkSMDomain::SetProperty(vtkSMProperty* prop)
 void vtkSMDomain::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
-  os << indent << "XMLName: " << (this->XMLName ? this->XMLName : "(null)") << endl;
+  os << indent << "XMLName: " << (this->XMLName ? this->XMLName : "(nullptr)") << endl;
   os << indent << "IsOptional: " << this->IsOptional << endl;
   os << indent << "Property: " << this->Internals->DomainProperty.GetPointer() << endl;
 }
