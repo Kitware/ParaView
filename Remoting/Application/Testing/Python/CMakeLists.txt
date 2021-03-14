@@ -231,12 +231,14 @@ if (PYTHON_EXECUTABLE AND NOT PARAVIEW_BUILD_SHARED_LIBS)
     )
 endif()
 
-# add test to verify eyedome lighting
-ExternalData_add_test("${_vtk_build_TEST_DATA_TARGET}"
-  NAME "ParaView::RemotingApplicationPython::VerifyEyeDomeLighting"
-  COMMAND $<TARGET_FILE:pvbatch>
-          -dr
-          -m paraview.tests.verify_eyedomelighting
-          -o "${CMAKE_BINARY_DIR}/Testing/Temporary/VerifyEyeDomeLighting.png"
-          -v DATA{${_vtk_build_TEST_INPUT_DATA_DIRECTORY}/Data/Baseline/VerifyEyeDomeLighting.png})
-set_tests_properties("ParaView::RemotingApplicationPython::VerifyEyeDomeLighting" PROPERTIES LABELS "PARAVIEW")
+if (NOT PARAVIEW_SERIAL_TESTS_USE_MPIEXEC)
+  # add test to verify eyedome lighting
+  ExternalData_add_test("${_vtk_build_TEST_DATA_TARGET}"
+    NAME "ParaView::RemotingApplicationPython::VerifyEyeDomeLighting"
+    COMMAND $<TARGET_FILE:pvbatch>
+            -dr
+            -m paraview.tests.verify_eyedomelighting
+            -o "${CMAKE_BINARY_DIR}/Testing/Temporary/VerifyEyeDomeLighting.png"
+            -v DATA{${_vtk_build_TEST_INPUT_DATA_DIRECTORY}/Data/Baseline/VerifyEyeDomeLighting.png})
+  set_tests_properties("ParaView::RemotingApplicationPython::VerifyEyeDomeLighting" PROPERTIES LABELS "PARAVIEW")
+endif()
