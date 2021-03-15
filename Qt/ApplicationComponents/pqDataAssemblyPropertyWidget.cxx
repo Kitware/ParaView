@@ -499,7 +499,7 @@ public:
 
   int columnCount(const QModelIndex& indx = QModelIndex()) const override
   {
-    return this->Superclass::columnCount(indx) + this->ExtraColumns.size();
+    return this->Superclass::columnCount(indx) + static_cast<int>(this->ExtraColumns.size());
   }
 
   QVariant data(const QModelIndex& indx, int role) const override
@@ -1240,9 +1240,9 @@ void pqDataAssemblyPropertyWidget::updateDataAssembly(vtkObject* sender)
   auto domain = vtkSMDomain::SafeDownCast(sender);
   if (internals.UseInputNameAsHeader && domain)
   {
-    vtkSMPropertyHelper helper(domain->GetRequiredProperty("Input"));
-    auto proxy = vtkSMSourceProxy::SafeDownCast(helper.GetAsProxy(0));
-    auto port = helper.GetOutputPort(0);
+    vtkSMPropertyHelper inputHelper(domain->GetRequiredProperty("Input"));
+    auto proxy = vtkSMSourceProxy::SafeDownCast(inputHelper.GetAsProxy(0));
+    auto port = inputHelper.GetOutputPort(0);
     if (proxy && proxy)
     {
       auto smmodel = pqApplicationCore::instance()->getServerManagerModel();
@@ -1319,7 +1319,7 @@ void pqDataAssemblyPropertyWidget::setCompositeIndexColors(const QList<QVariant>
   internals.CompositeIndexColors = values;
 
   QList<QVariant> cidColorSelectors;
-  for (size_t cc = 0; (cc + 3) < values.size(); cc += 4)
+  for (int cc = 0; (cc + 3) < values.size(); cc += 4)
   {
     cidColorSelectors.push_back(QString("//*[@cid=%1]").arg(values[cc].value<unsigned int>()));
     cidColorSelectors.push_back(values[cc + 1]);
@@ -1370,7 +1370,7 @@ void pqDataAssemblyPropertyWidget::setCompositeIndexOpacities(const QList<QVaria
   internals.CompositeIndexOpacities = values;
 
   QList<QVariant> cidOpacitySelectors;
-  for (size_t cc = 0; (cc + 1) < values.size(); cc += 2)
+  for (int cc = 0; (cc + 1) < values.size(); cc += 2)
   {
     cidOpacitySelectors.push_back(QString("//*[@cid=%1]").arg(values[cc].value<unsigned int>()));
     cidOpacitySelectors.push_back(values[cc + 1]);

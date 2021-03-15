@@ -121,7 +121,7 @@ bool pqDefaultContextMenu::contextMenu(QMenu* menu, pqView* viewContext, const Q
   this->PickedRepresentation = nullptr;
   this->PickedBlocks = dataBlockContext;
   this->Position = viewPoint;
-  unsigned int blockIndex = dataBlockContext.empty() ? -1 : dataBlockContext[0];
+  // unsigned int blockIndex = dataBlockContext.empty() ? -1 : dataBlockContext[0];
   auto* repr = dynamic_cast<pqDataRepresentation*>(dataContext);
   if (repr)
   {
@@ -647,6 +647,9 @@ namespace
 const char* findBlockName(
   int flatIndexTarget, int& flatIndexCurrent, vtkPVCompositeDataInformation* currentInfo)
 {
+  (void)flatIndexCurrent;
+  (void)flatIndexTarget;
+  (void)currentInfo;
 // FIXME:
 #if 0
   // An interior block shouldn't be selected, only blocks with geometry can be
