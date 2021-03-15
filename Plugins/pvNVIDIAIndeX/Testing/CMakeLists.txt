@@ -26,4 +26,16 @@ if (TARGET ParaView::paraview OR paraview_will_be_built)
     TEST_DATA_TARGET ParaViewData
     TEST_SCRIPTS ${test_xmls}
   )
+
+  # Some setups may not have a new enough card to run IndeX. Skip the test on
+  # these machines.
+  set(index_tests
+    pv.IndeXRepresentation)
+  if (NOT PARAVIEW_USE_MPI)
+    list(APPEND index_tests
+      pvcs.IndeXRepresentationServer)
+  endif ()
+  set_property(TEST ${index_tests} APPEND
+    PROPERTY
+      SKIP_REGULAR_EXPRESSION "The version of your CUDA driver is .*, but .* is the required minimum")
 endif ()
