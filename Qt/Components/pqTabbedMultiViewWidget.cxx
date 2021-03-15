@@ -393,7 +393,6 @@ public:
 
     if (tabs != visibleWidgets)
     {
-      auto currentWdg = this->TabWidget->currentWidget();
       this->TabWidget->clear();
       for (auto wdg : visibleWidgets)
       {

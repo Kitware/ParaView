@@ -647,8 +647,6 @@ vtkPVDataInformation* pqProxyInformationWidget::dataInformation() const
 void pqProxyInformationWidget::updateUI()
 {
   auto& internals = (*this->Internals);
-  auto& ui = (this->Internals->Ui);
-
   auto proxy = internals.sourceProxy();
   auto dinfo = this->dataInformation();
   internals.setFileName(proxy);
@@ -663,7 +661,6 @@ void pqProxyInformationWidget::updateUI()
 void pqProxyInformationWidget::updateSubsetUI()
 {
   auto& internals = (*this->Internals);
-  auto& ui = (this->Internals->Ui);
 
   // all the following depends on subset data information, if the user chose to
   // see only part of the hierarchy.

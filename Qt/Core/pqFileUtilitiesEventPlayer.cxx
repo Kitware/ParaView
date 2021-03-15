@@ -46,7 +46,7 @@ pqFileUtilitiesEventPlayer::pqFileUtilitiesEventPlayer(QObject* parentObject)
 
 //-----------------------------------------------------------------------------
 bool pqFileUtilitiesEventPlayer::playEvent(
-  QObject* qobject, const QString& command, const QString& args, bool& errorFlag)
+  QObject*, const QString& command, const QString& args, bool& errorFlag)
 {
   if (command == "file_exists")
   {
