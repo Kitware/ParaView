@@ -20,22 +20,23 @@
  * the data object is a data set, then the set is passed through a vtkDataSetTriangleFilter
  * before being output as a vtkUnstructuredGrid.  If the data object is a multiblock
  * dataset with at least one unstructured grid leaf node, then the unstructured grid
- * is extracted using vtkExtractBlock and vtkMergeBlocks.  The TetrahedraOnly
+ * is extracted using vtkExtractBlockUsingDataAssembly and vtkMergeBlocks.  The TetrahedraOnly
  * property may be set and it will be passed to the vtkDataSetTriangleFilter.
  *
  * @sa
- * vtkExtractBlock vtkTriangleFilter
+ * vtkExtractBlockUsingDataAssembly vtkTriangleFilter
 */
 
 #ifndef vtkVolumeRepresentationPreprocessor_h
 #define vtkVolumeRepresentationPreprocessor_h
 
+#include "vtkNew.h"                                   // for vtkNew
 #include "vtkPVVTKExtensionsFiltersRenderingModule.h" // needed for export macro
 #include "vtkSmartPointer.h"                          // for vtkSmartPointer
 #include "vtkUnstructuredGridAlgorithm.h"
 
 class vtkCompositeDataSet;
-class vtkExtractBlock;
+class vtkExtractBlockUsingDataAssembly;
 
 class VTKPVVTKEXTENSIONSFILTERSRENDERING_EXPORT vtkVolumeRepresentationPreprocessor
   : public vtkUnstructuredGridAlgorithm
@@ -56,11 +57,13 @@ public:
 
   //@{
   /**
-   * Sets which block will be extracted for volume rendering.
-   * Ignored if input is not multiblock.  Default is 0.
+   * Forwarded to internal vtkExtractBlockUsingDataAssembly to subset the input
+   * composite dataset. This has no effect if input is not a composite dataset.
    */
-  vtkSetMacro(ExtractedBlockIndex, unsigned int);
-  vtkGetMacro(ExtractedBlockIndex, unsigned int);
+  bool AddSelector(const char* selector);
+  void SetSelector(const char* selector);
+  void ClearSelectors();
+  void SetAssemblyName(const char*);
   //@}
 
 protected:
@@ -74,11 +77,12 @@ protected:
   int FillInputPortInformation(int port, vtkInformation* info) override;
 
   int TetrahedraOnly;
-  unsigned int ExtractedBlockIndex;
 
 private:
   vtkVolumeRepresentationPreprocessor(const vtkVolumeRepresentationPreprocessor&) = delete;
   void operator=(const vtkVolumeRepresentationPreprocessor&) = delete;
+
+  vtkNew<vtkExtractBlockUsingDataAssembly> Extractor;
 };
 
 #endif

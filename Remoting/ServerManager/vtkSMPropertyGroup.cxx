@@ -28,7 +28,7 @@
 class vtkSMPropertyGroupInternals
 {
 public:
-  std::vector<vtkWeakPointer<vtkSMProperty> > Properties;
+  std::vector<std::pair<vtkWeakPointer<vtkSMProperty>, std::string> > Properties;
   typedef std::map<std::string, vtkWeakPointer<vtkSMProperty> > PropertiesMapType;
   PropertiesMapType PropertiesMap;
 };
@@ -78,19 +78,25 @@ bool vtkSMPropertyGroup::IsEmpty() const
 }
 
 //---------------------------------------------------------------------------
-void vtkSMPropertyGroup::AddProperty(const char* function, vtkSMProperty* property)
+void vtkSMPropertyGroup::AddProperty(
+  const char* function, vtkSMProperty* property, const char* name)
 {
-  if (function)
-  {
-    this->Internals->PropertiesMap[function] = property;
-  }
-  this->Internals->Properties.push_back(property);
+  name = name ? name : property->GetXMLName();
+  function = function ? function : name;
+  this->Internals->PropertiesMap[function] = property;
+  this->Internals->Properties.emplace_back(property, name);
+}
+
+//---------------------------------------------------------------------------
+const char* vtkSMPropertyGroup::GetPropertyName(unsigned int index) const
+{
+  return this->Internals->Properties.at(index).second.c_str();
 }
 
 //---------------------------------------------------------------------------
 vtkSMProperty* vtkSMPropertyGroup::GetProperty(unsigned int index) const
 {
-  return this->Internals->Properties[index];
+  return this->Internals->Properties.at(index).first;
 }
 
 //---------------------------------------------------------------------------
@@ -203,7 +209,7 @@ int vtkSMPropertyGroup::ReadXMLAttributes(vtkSMProxy* proxy, vtkPVXMLElement* gr
       {
         functionAttribute = elem->GetAttribute("name");
       }
-      this->AddProperty(functionAttribute, property);
+      this->AddProperty(functionAttribute, property, propname);
     }
   }
   return 1;

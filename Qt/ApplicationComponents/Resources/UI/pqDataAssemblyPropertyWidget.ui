@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>253</width>
-    <height>209</height>
+    <width>288</width>
+    <height>288</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -34,9 +34,9 @@
      <property name="currentIndex">
       <number>0</number>
      </property>
-     <widget class="QWidget" name="tab">
+     <widget class="QWidget" name="hierarchyTab">
       <attribute name="title">
-       <string>Assembly</string>
+       <string>Hierarchy</string>
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout_3">
        <property name="leftMargin">
@@ -52,20 +52,29 @@
         <number>0</number>
        </property>
        <item>
-        <widget class="pqTreeView" name="tree">
+        <widget class="pqTreeView" name="hierarchy">
+         <property name="alternatingRowColors">
+          <bool>true</bool>
+         </property>
          <property name="uniformRowHeights">
           <bool>true</bool>
          </property>
-         <property name="headerHidden">
+         <property name="expandsOnDoubleClick">
           <bool>false</bool>
          </property>
+         <attribute name="headerMinimumSectionSize">
+          <number>16</number>
+         </attribute>
+         <attribute name="headerDefaultSectionSize">
+          <number>16</number>
+         </attribute>
         </widget>
        </item>
       </layout>
      </widget>
-     <widget class="QWidget" name="tab_2">
+     <widget class="QWidget" name="selectorsTab">
       <attribute name="title">
-       <string>Values</string>
+       <string>Selectors</string>
       </attribute>
       <layout class="QHBoxLayout" name="horizontalLayout">
        <property name="spacing">
@@ -172,20 +181,245 @@
        </item>
       </layout>
      </widget>
+     <widget class="QWidget" name="colorsTab">
+      <attribute name="title">
+       <string>Color</string>
+      </attribute>
+      <layout class="QHBoxLayout" name="horizontalLayout_2">
+       <property name="spacing">
+        <number>2</number>
+       </property>
+       <property name="leftMargin">
+        <number>0</number>
+       </property>
+       <property name="topMargin">
+        <number>0</number>
+       </property>
+       <property name="rightMargin">
+        <number>0</number>
+       </property>
+       <property name="bottomMargin">
+        <number>0</number>
+       </property>
+       <item>
+        <widget class="pqExpandableTableView" name="colors">
+         <property name="alternatingRowColors">
+          <bool>true</bool>
+         </property>
+         <property name="maximumRowCountBeforeScrolling" stdset="0">
+          <number>10</number>
+         </property>
+         <attribute name="horizontalHeaderMinimumSectionSize">
+          <number>16</number>
+         </attribute>
+         <attribute name="horizontalHeaderDefaultSectionSize">
+          <number>16</number>
+         </attribute>
+         <attribute name="horizontalHeaderStretchLastSection">
+          <bool>true</bool>
+         </attribute>
+         <attribute name="verticalHeaderVisible">
+          <bool>false</bool>
+         </attribute>
+        </widget>
+       </item>
+       <item>
+        <layout class="QVBoxLayout" name="verticalLayout_4">
+         <property name="spacing">
+          <number>1</number>
+         </property>
+         <item>
+          <widget class="QToolButton" name="addColors">
+           <property name="toolTip">
+            <string>Add new entry</string>
+           </property>
+           <property name="text">
+            <string>...</string>
+           </property>
+           <property name="icon">
+            <iconset resource="../../../Widgets/Resources/QtWidgets.qrc">
+             <normaloff>:/QtWidgets/Icons/pqPlus.svg</normaloff>:/QtWidgets/Icons/pqPlus.svg</iconset>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QToolButton" name="removeColors">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
+           <property name="toolTip">
+            <string>Remove current entry</string>
+           </property>
+           <property name="text">
+            <string>...</string>
+           </property>
+           <property name="icon">
+            <iconset resource="../../../Widgets/Resources/QtWidgets.qrc">
+             <normaloff>:/QtWidgets/Icons/pqMinus.svg</normaloff>:/QtWidgets/Icons/pqMinus.svg</iconset>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <spacer name="verticalSpacer_2">
+           <property name="orientation">
+            <enum>Qt::Vertical</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>0</width>
+             <height>0</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item>
+          <widget class="QToolButton" name="removeAllColors">
+           <property name="toolTip">
+            <string>Remove all entries</string>
+           </property>
+           <property name="text">
+            <string>...</string>
+           </property>
+           <property name="icon">
+            <iconset resource="../../../Widgets/Resources/QtWidgets.qrc">
+             <normaloff>:/QtWidgets/Icons/pqDelete.svg</normaloff>:/QtWidgets/Icons/pqDelete.svg</iconset>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="opacitiesTab">
+      <attribute name="title">
+       <string>Opacity</string>
+      </attribute>
+      <layout class="QHBoxLayout" name="horizontalLayout_3">
+       <property name="spacing">
+        <number>2</number>
+       </property>
+       <property name="leftMargin">
+        <number>0</number>
+       </property>
+       <property name="topMargin">
+        <number>0</number>
+       </property>
+       <property name="rightMargin">
+        <number>0</number>
+       </property>
+       <property name="bottomMargin">
+        <number>0</number>
+       </property>
+       <item>
+        <widget class="pqExpandableTableView" name="opacities">
+         <property name="alternatingRowColors">
+          <bool>true</bool>
+         </property>
+         <property name="maximumRowCountBeforeScrolling" stdset="0">
+          <number>10</number>
+         </property>
+         <attribute name="horizontalHeaderMinimumSectionSize">
+          <number>16</number>
+         </attribute>
+         <attribute name="horizontalHeaderDefaultSectionSize">
+          <number>16</number>
+         </attribute>
+         <attribute name="horizontalHeaderStretchLastSection">
+          <bool>true</bool>
+         </attribute>
+         <attribute name="verticalHeaderVisible">
+          <bool>false</bool>
+         </attribute>
+        </widget>
+       </item>
+       <item>
+        <layout class="QVBoxLayout" name="verticalLayout_5">
+         <property name="spacing">
+          <number>1</number>
+         </property>
+         <item>
+          <widget class="QToolButton" name="addOpacities">
+           <property name="toolTip">
+            <string>Add new entry</string>
+           </property>
+           <property name="text">
+            <string>...</string>
+           </property>
+           <property name="icon">
+            <iconset resource="../../../Widgets/Resources/QtWidgets.qrc">
+             <normaloff>:/QtWidgets/Icons/pqPlus.svg</normaloff>:/QtWidgets/Icons/pqPlus.svg</iconset>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QToolButton" name="removeOpacities">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
+           <property name="toolTip">
+            <string>Remove current entry</string>
+           </property>
+           <property name="text">
+            <string>...</string>
+           </property>
+           <property name="icon">
+            <iconset resource="../../../Widgets/Resources/QtWidgets.qrc">
+             <normaloff>:/QtWidgets/Icons/pqMinus.svg</normaloff>:/QtWidgets/Icons/pqMinus.svg</iconset>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <spacer name="verticalSpacer_3">
+           <property name="orientation">
+            <enum>Qt::Vertical</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>0</width>
+             <height>0</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item>
+          <widget class="QToolButton" name="removeAllOpacities">
+           <property name="toolTip">
+            <string>Remove all entries</string>
+           </property>
+           <property name="text">
+            <string>...</string>
+           </property>
+           <property name="icon">
+            <iconset resource="../../../Widgets/Resources/QtWidgets.qrc">
+             <normaloff>:/QtWidgets/Icons/pqDelete.svg</normaloff>:/QtWidgets/Icons/pqDelete.svg</iconset>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+      </layout>
+     </widget>
+    </widget>
+   </item>
+   <item>
+    <widget class="QComboBox" name="assemblyCombo">
+     <property name="toolTip">
+      <string>Select active assembly to use.</string>
+     </property>
     </widget>
    </item>
   </layout>
  </widget>
  <customwidgets>
   <customwidget>
-   <class>pqExpandableTableView</class>
-   <extends>QTableView</extends>
-   <header>pqExpandableTableView.h</header>
-  </customwidget>
-  <customwidget>
    <class>pqTreeView</class>
    <extends>QTreeView</extends>
    <header>pqTreeView.h</header>
+  </customwidget>
+  <customwidget>
+   <class>pqExpandableTableView</class>
+   <extends>QTableView</extends>
+   <header>pqExpandableTableView.h</header>
   </customwidget>
  </customwidgets>
  <resources>

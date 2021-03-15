@@ -26,20 +26,18 @@
 #ifndef vtkPVDataSetAttributesInformation_h
 #define vtkPVDataSetAttributesInformation_h
 
-#include "vtkDataSetAttributes.h" // needed for NUM_ATTRIBUTES
-#include "vtkPVInformation.h"
+#include "vtkObject.h"
 #include "vtkRemotingCoreModule.h" //needed for exports
 
-class vtkDataSetAttributes;
-class vtkFieldData;
+class vtkClientServerStream;
+class vtkDataObject;
 class vtkPVArrayInformation;
-class vtkGenericAttributeCollection;
 
-class VTKREMOTINGCORE_EXPORT vtkPVDataSetAttributesInformation : public vtkPVInformation
+class VTKREMOTINGCORE_EXPORT vtkPVDataSetAttributesInformation : public vtkObject
 {
 public:
   static vtkPVDataSetAttributesInformation* New();
-  vtkTypeMacro(vtkPVDataSetAttributesInformation, vtkPVInformation);
+  vtkTypeMacro(vtkPVDataSetAttributesInformation, vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
   //@{
@@ -50,79 +48,83 @@ public:
    * vtkDataObject::AttributeTypes.
    */
   vtkGetMacro(FieldAssociation, int);
-  vtkSetMacro(FieldAssociation, int);
-  //@}
-
-  //@{
-  /**
-   * Transfer information about a single vtk data object into
-   * this object.
-   */
-  void CopyFromDataSetAttributes(vtkDataSetAttributes* data);
-  void DeepCopy(vtkPVDataSetAttributesInformation* info);
-  //@}
-
-  void CopyFromFieldData(vtkFieldData* data);
-
-  void CopyFromGenericAttributesOnPoints(vtkGenericAttributeCollection* data);
-  void CopyFromGenericAttributesOnCells(vtkGenericAttributeCollection* data);
-  void CopyFromGenericAttributes(vtkGenericAttributeCollection* data, int centering);
-
-  //@{
-  /**
-   * Intersect information of argument with information currently
-   * in this object.  Arrays must be in both
-   * (same name and number of components)to be in final.
-   */
-  void AddInformation(vtkPVDataSetAttributesInformation* info);
-  void AddInformation(vtkPVInformation* info) override;
   //@}
 
   /**
-   * Remove all infommation. next add will be like a copy.
+   * Initialize this instances to its default state.
    */
   void Initialize();
 
-  //@{
   /**
-   * Access to information.
+   * Returns the number of array informations available in this instance.
    */
   int GetNumberOfArrays() const;
-  // Because not all the arrays have to be the same length:
+
+  /**
+   * Returns the maximum number of tuples in all known arrays.
+   */
   int GetMaximumNumberOfTuples() const;
+
+  //@{
+  /**
+   * Returns array information for the chosen array either by name or by index.
+   */
   vtkPVArrayInformation* GetArrayInformation(int idx) const;
   vtkPVArrayInformation* GetArrayInformation(const char* name) const;
   //@}
 
   /**
-   * For getting default scalars ... (vtkDataSetAttributes::SCALARS).
+   * Returns array information for an array associated with a specific attribute
+   * type. Supported attribute types are `vtkDataSetAttributes::AttributeTypes`.
    */
   vtkPVArrayInformation* GetAttributeInformation(int attributeType);
 
   /**
-   * Mimics data set attribute call.  Returns -1 if array (of index) is
-   * not a standard attribute.  Returns attribute type otherwise.
+   * Returns the attribute type if at the array at the given index is an
+   * attribute.
    */
   int IsArrayAnAttribute(int arrayIndex);
-
-  //@{
-  /**
-   * Manage a serialized version of the information.
-   */
-  void CopyToStream(vtkClientServerStream*) override;
-  void CopyFromStream(const vtkClientServerStream*) override;
-  //@}
 
 protected:
   vtkPVDataSetAttributesInformation();
   ~vtkPVDataSetAttributesInformation() override;
 
-  // Standard cell attributes.
-  int FieldAssociation;
+  friend class vtkPVDataInformation;
+  friend class vtkPVDataInformationAccumulator;
+
+  /**
+   * Set field association.
+   */
+  vtkSetMacro(FieldAssociation, int);
+
+  //@{
+  /**
+   * Manage a serialized version of the information.
+   */
+  void CopyToStream(vtkClientServerStream*);
+  void CopyFromStream(const vtkClientServerStream*);
+  //@}
+
+  /**
+   * Combine with another vtkPVDataSetAttributesInformation instance.
+   */
+  void AddInformation(vtkPVDataSetAttributesInformation*);
+
+  /**
+   * Copies from another vtkPVDataSetAttributesInformation instance.
+   */
+  void DeepCopy(vtkPVDataSetAttributesInformation*);
+
+  /**
+   * Initializes this instance using the data object.
+   */
+  void CopyFromDataObject(vtkDataObject* dobj);
 
 private:
   vtkPVDataSetAttributesInformation(const vtkPVDataSetAttributesInformation&) = delete;
   void operator=(const vtkPVDataSetAttributesInformation&) = delete;
+
+  int FieldAssociation;
 
   class vtkInternals;
   vtkInternals* Internals;

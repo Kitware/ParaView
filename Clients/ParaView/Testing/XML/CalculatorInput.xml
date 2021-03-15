@@ -33,8 +33,8 @@
   <pqevent object="1QMenu0" command="activate" arguments="Acceleration" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/1QTabBar2" command="set_tab_with_text" arguments="Information" />
-  <pqcheck object="pqClientMainWindow/informationDock/informationWidgetFrame/informationScrollArea/qt_scrollarea_viewport/informationWidget/groupBox_2/dataArrays" property="modelItemData" arguments="5.0,Result" />
-  <pqcheck object="pqClientMainWindow/informationDock/informationWidgetFrame/informationScrollArea/qt_scrollarea_viewport/informationWidget/groupBox_2/dataArrays" property="modelItemData" arguments="5.2,[8, 24.8]" />
+  <pqcheck object="pqClientMainWindow/informationDock/informationWidgetFrame/informationScrollArea/qt_scrollarea_viewport/informationWidget/dataArraysTable" property="modelItemData" arguments="5.0,Result" />
+  <pqcheck object="pqClientMainWindow/informationDock/informationWidgetFrame/informationScrollArea/qt_scrollarea_viewport/informationWidget/dataArraysTable" property="modelItemData" arguments="5.2,[8, 24.8]" />
   <!-- cannot take a screenshot of the spreadsheet : focus on 3d view -->
   <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.1/CentralWidgetFrame/Viewport" command="mousePress" arguments="(0.781775,0.193015,1,1,0)" />
   <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.1/CentralWidgetFrame/Viewport" command="mouseMove" arguments="(0.781775,0.193015,1,0,0)" />

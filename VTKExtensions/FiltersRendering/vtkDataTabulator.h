@@ -44,12 +44,17 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
   //@{
+  void AddSelector(const char* selector);
+  void ClearSelectors();
+  //@}
+
+  //@{
   /**
-   * In case of Composite datasets, set the flat index of the subtree to pass.
-   * Default or empty results in passing the entire composite tree.
+   * Get/Set the name of the assembly you use together with the selectors to
+   * subset. Default is Hierarchy.
    */
-  void AddCompositeDataSetIndex(unsigned int index);
-  void RemoveAllCompositeDataSetIndices();
+  vtkSetStringMacro(ActiveAssemblyForSelectors);
+  vtkGetStringMacro(ActiveAssemblyForSelectors);
   //@}
 
   //@{
@@ -143,7 +148,8 @@ private:
   bool GenerateOriginalIds;
   int SplitComponents;
   int SplitComponentsNamingMode;
-  std::set<unsigned int> CompositeDataSetIndices;
+  std::set<std::string> Selectors;
+  char* ActiveAssemblyForSelectors;
 };
 
 #endif

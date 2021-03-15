@@ -43,6 +43,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqUndoStack.h"
 #include "vtkDataObject.h"
 #include "vtkNew.h"
+#include "vtkPVArrayInformation.h"
 #include "vtkPVCatalystChannelInformation.h"
 #include "vtkPVDataInformation.h"
 #include "vtkPVGeneralSettings.h"
@@ -224,17 +225,20 @@ void pqApplyBehavior::applied(pqPropertiesPanel*)
       // If not scalar coloring, we make an attempt to color using
       // 'vtkBlockColors' array, if present.
       if (vtkSMPVRepresentationProxy::SafeDownCast(reprProxy) &&
-        vtkSMPVRepresentationProxy::GetUsingScalarColoring(reprProxy) == false &&
-        reprProxy->GetRepresentedDataInformation()->GetArrayInformation(
-          "vtkBlockColors", vtkDataObject::FIELD) != nullptr &&
-        reprProxy->GetRepresentedDataInformation()->GetNumberOfBlockLeafs(false) > 1)
+        vtkSMPVRepresentationProxy::GetUsingScalarColoring(reprProxy) == false)
       {
-        vtkSMPVRepresentationProxy::SetScalarColoring(
-          reprProxy, "vtkBlockColors", vtkDataObject::FIELD);
-        if (gsettings->GetScalarBarMode() ==
-          vtkPVGeneralSettings::AUTOMATICALLY_SHOW_AND_HIDE_SCALAR_BARS)
+        auto dataInfo = reprProxy->GetRepresentedDataInformation();
+        auto arrayInfo = dataInfo->GetArrayInformation("vtkBlockColors", vtkDataObject::FIELD);
+        if (dataInfo->IsCompositeDataSet() && arrayInfo != nullptr &&
+          arrayInfo->GetComponentRange(0)[1] > 0)
         {
-          vtkSMPVRepresentationProxy::SetScalarBarVisibility(reprProxy, viewProxy, true);
+          vtkSMPVRepresentationProxy::SetScalarColoring(
+            reprProxy, "vtkBlockColors", vtkDataObject::FIELD);
+          if (gsettings->GetScalarBarMode() ==
+            vtkPVGeneralSettings::AUTOMATICALLY_SHOW_AND_HIDE_SCALAR_BARS)
+          {
+            vtkSMPVRepresentationProxy::SetScalarBarVisibility(reprProxy, viewProxy, true);
+          }
         }
       }
     }

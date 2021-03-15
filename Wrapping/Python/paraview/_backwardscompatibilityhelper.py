@@ -331,6 +331,34 @@ def setattr(proxy, pname, value):
             raise NotSupportedException(
                 'The `OSPRayMaterial` control has been renamed in ParaView 5.7 to `Material`.')
 
+    if pname == "CompositeDataSetIndex" and proxy.SMProxy.GetXMLName() == "SpreadSheetRepresentation":
+        if paraview.compatibility.GetVersion() <= 5.9:
+            selectors = ["//*[@cid='%s']" % cid for cid in value]
+            return proxy.GetProperty("BlockVisibilities").SetData(selectors)
+        else:
+            raise NotSupportedException(
+                "SpreadSheetRepresentation no longer uses 'CompositeDataSetIndex' but instead "
+                "supports 'Selectors' to select blocks.")
+
+
+    if pname == "BlockIndices" and proxy.SMProxy.GetXMLName() == "ExtractBlock":
+        if paraview.compatibility.GetVersion() <= 5.9:
+            selectors = ["//*[@cid='%s']" % cid for cid in value]
+            return proxy.GetProperty("Selectors").SetData(selectors)
+        else:
+            raise NotSupportedException(
+                "ExtractBlock no longer uses 'BlockIndices' but instead "
+                "supports 'Selectors' to select blocks.")
+
+    if pname in ["MaintainStructure", "PruneOutput"] and proxy.SMProxy.GetXMLName() == "ExtractBlock":
+        if paraview.compatibility.GetVersion() <= 5.9:
+            return
+        else:
+            raise NotSupportedException(
+                "ExtractBlock no longer supported '%s'. Simply remove it." % pname)
+
+
+
     if not hasattr(proxy, pname):
         raise AttributeError()
     proxy.__dict__[pname] = value
@@ -671,6 +699,40 @@ def getattr(proxy, pname):
                     "'Bases' to choose bases and 'Families' to choose families "
                     "to load instead. 'LoadMesh' and 'LoadPatches' may also be "
                     "used to enable loading of meshes and BC-patches.")
+
+    # 5.10 onwards SpreadSheetRepresentation cannot provide a value for
+    # CompositeDataSetIndex
+    if pname == "CompositeDataSetIndex" and proxy.SMProxy.GetXMLName() == "SpreadSheetRepresentation":
+        if paraview.compatibility.GetVersion() <= 5.9:
+            return []
+        else:
+            raise NotSupportedException(
+                    "Since ParaView 5.10, SpreadSheetRepresentation no longer "
+                    "supports 'CompositeDataSetIndex' and it has been replaced by "
+                    "'BlockVisibilities'.")
+
+    if proxy.SMProxy.GetXMLName() == "ExtractBlock":
+        if pname == "BlockIndices":
+            if paraview.compatibility.GetVersion() <= 5.9:
+                return []
+            else:
+                raise NotSupportedException(
+                        "Since ParaView 5.10, 'BlockIndices' on 'ExtractBlock' "
+                        "has been replaced by 'Selectors'.")
+        elif pname == "PruneOutput":
+            if paraview.compatibility.GetVersion() <= 5.9:
+                return 1
+            else:
+                raise NotSupportedException(
+                        "Since ParaView 5.10, 'PruneOutput' on 'ExtractBlock' "
+                        "is no longer supported. Simply remove it.")
+        elif pname == "MaintainStructure":
+            if paraview.compatibility.GetVersion() <= 5.9:
+                return 1
+            else:
+                raise NotSupportedException(
+                        "Since ParaView 5.10, 'MaintainStructure' on 'ExtractBlock' "
+                        "is no longer supported. Simply remove it.")
     raise Continue()
 
 def GetProxy(module, key, **kwargs):

@@ -17,15 +17,17 @@
 #include "vtkAttributeDataToTableFilter.h"
 #include "vtkCompositeDataSet.h"
 #include "vtkDataObjectTreeIterator.h"
-#include "vtkExtractBlock.h"
+#include "vtkExtractBlockUsingDataAssembly.h"
 #include "vtkFieldData.h"
 #include "vtkInformation.h"
+#include "vtkLogger.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkPartitionedDataSet.h"
 #include "vtkPartitionedDataSetCollection.h"
 #include "vtkSplitColumnComponents.h"
 #include "vtkTable.h"
+#include "vtkUniformGridAMR.h"
 #include "vtkUniformGridAMRDataIterator.h"
 
 #include <cassert>
@@ -81,11 +83,16 @@ vtkDataTabulator::vtkDataTabulator()
   , GenerateOriginalIds(true)
   , SplitComponents(false)
   , SplitComponentsNamingMode(vtkSplitColumnComponents::NAMES_WITH_UNDERSCORES)
+  , ActiveAssemblyForSelectors(nullptr)
 {
+  this->SetActiveAssemblyForSelectors("Hierarchy");
 }
 
 //----------------------------------------------------------------------------
-vtkDataTabulator::~vtkDataTabulator() = default;
+vtkDataTabulator::~vtkDataTabulator()
+{
+  this->SetActiveAssemblyForSelectors(nullptr);
+}
 
 //----------------------------------------------------------------------------
 int vtkDataTabulator::FillOutputPortInformation(int, vtkInformation* info)
@@ -95,20 +102,20 @@ int vtkDataTabulator::FillOutputPortInformation(int, vtkInformation* info)
 }
 
 //----------------------------------------------------------------------------
-void vtkDataTabulator::AddCompositeDataSetIndex(unsigned int index)
+void vtkDataTabulator::AddSelector(const char* selector)
 {
-  if (this->CompositeDataSetIndices.insert(index).second)
+  if (selector && this->Selectors.insert(selector).second)
   {
     this->Modified();
   }
 }
 
 //----------------------------------------------------------------------------
-void vtkDataTabulator::RemoveAllCompositeDataSetIndices()
+void vtkDataTabulator::ClearSelectors()
 {
-  if (this->CompositeDataSetIndices.size() > 0)
+  if (this->Selectors.size() > 0)
   {
-    this->CompositeDataSetIndices.clear();
+    this->Selectors.clear();
     this->Modified();
   }
 }
@@ -122,23 +129,20 @@ int vtkDataTabulator::RequestData(
 
   if (vtkSmartPointer<vtkCompositeDataSet> inputCD = vtkCompositeDataSet::SafeDownCast(inputDO))
   {
-    if (this->CompositeDataSetIndices.size() > 0 &&
-      this->CompositeDataSetIndices.find(0) == this->CompositeDataSetIndices.end())
+    if (this->Selectors.size() > 0)
     {
-      // FIXME: this doesn't work for AMR
-      // need to extract chosen blocks.
-      vtkNew<vtkExtractBlock> eb;
-      eb->SetInputData(inputCD);
-      for (const auto& index : this->CompositeDataSetIndices)
+      vtkNew<vtkExtractBlockUsingDataAssembly> extractor;
+      extractor->SetAssemblyName(this->ActiveAssemblyForSelectors);
+      for (const auto& selector : this->Selectors)
       {
-        eb->AddIndex(index);
+        extractor->AddSelector(selector.c_str());
       }
-      eb->PruneOutputOff();
-      eb->Update();
-      inputCD = vtkCompositeDataSet::SafeDownCast(eb->GetOutputDataObject(0));
+      extractor->SetInputData(inputCD);
+      extractor->Update();
+      inputCD = vtkCompositeDataSet::SafeDownCast(extractor->GetOutputDataObject(0));
     }
 
-    // we need special handling for names for partioned-dataset in a
+    // we need special handling for names for partitioned-dataset in a
     // partitioned-dataset-collection. to handle that we build this map.
     auto nameMap = ::GenerateNameMap(inputDO);
 

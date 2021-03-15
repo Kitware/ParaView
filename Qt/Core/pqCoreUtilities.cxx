@@ -39,6 +39,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QFileInfo>
 #include <QMainWindow>
 #include <QMessageBox>
+#include <QPalette>
 #include <QString>
 #include <QStringList>
 
@@ -285,4 +286,16 @@ QString pqCoreUtilities::number(double value)
   std::ostringstream str;
   str << vtkNumberToString()(value);
   return QString::fromLocal8Bit(str.str().c_str());
+}
+
+//-----------------------------------------------------------------------------
+void pqCoreUtilities::initializeClickMeButton(QAbstractButton* button)
+{
+  if (button)
+  {
+    QPalette applyPalette = button->palette();
+    applyPalette.setColor(QPalette::Active, QPalette::Button, QColor(161, 213, 135));
+    applyPalette.setColor(QPalette::Inactive, QPalette::Button, QColor(161, 213, 135));
+    button->setPalette(applyPalette);
+  }
 }

@@ -160,7 +160,6 @@ set(classes
   vtkSMScalarBarWidgetRepresentationProxy
   vtkSMSelectionHelper
   vtkSMSelectionLink
-  vtkSMSpreadSheetRepresentationInitializationHelper
   vtkSMSpreadSheetRepresentationProxy
   vtkSMSpreadSheetViewProxy
   vtkSMTextWidgetRepresentationProxy

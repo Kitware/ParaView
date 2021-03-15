@@ -16,16 +16,12 @@
   <pqevent object="pqClientMainWindow/FileOpenDialog" command="filesSelected" arguments="$PARAVIEW_TEST_ROOT/test-éàô.vtk" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/1QTabBar2" command="set_tab_with_text" arguments="Information" />
-  <pqcheck object="pqClientMainWindow/informationDock/informationWidgetFrame/informationScrollArea/qt_scrollarea_viewport/informationWidget/properties/filename" property="text" arguments="test-éàô.vtk" />
-  <pqevent object="pqClientMainWindow/currentTimeToolbar/AnimationTimeWidget" command="contextMenu" arguments="" />
+  <pqcheck object="pqClientMainWindow/informationDock/informationWidgetFrame/informationScrollArea/qt_scrollarea_viewport/informationWidget/filename" property="text" arguments="test-éàô.vtk" />
   <pqevent object="pqClientMainWindow/menubar/menu_View" command="activate" arguments="Statistics Inspector" />
   <pqcheck object="pqClientMainWindow/statisticsDock/statisticsView/1QTableView0" property="modelItemData" arguments="0.0,test-éàô.vtk" />
-  <pqevent object="pqClientMainWindow/currentTimeToolbar/AnimationTimeWidget" command="contextMenu" arguments="" />
   <pqevent object="pqClientMainWindow/menubar/menu_View" command="activate" arguments="Statistics Inspector" />
-  <pqevent object="pqClientMainWindow/currentTimeToolbar/AnimationTimeWidget" command="contextMenu" arguments="" />
   <pqevent object="pqClientMainWindow/menubar/menu_View" command="activate" arguments="Animation View" />
   <pqcheck object="pqClientMainWindow/animationViewDock/animationView/pqAnimationWidget/CreateDeleteWidget/ProxyCombo" property="currentText" arguments="test-éàô.vtk" />
-  <pqevent object="pqClientMainWindow/currentTimeToolbar/AnimationTimeWidget" command="contextMenu" arguments="" />
   <pqevent object="pqClientMainWindow/menubar/menu_View" command="activate" arguments="Animation View" />
   <pqevent object="pqClientMainWindow/menubar/menuTools" command="activate" arguments="actionTesting_Window_Size" />
   <pqevent object="pqClientMainWindow/axesToolbar/actionShowOrientationAxes" command="set_boolean" arguments="false" />

@@ -24,6 +24,7 @@
 #include "vtkGlyph3DMapper.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
+#include "vtkLogger.h"
 #include "vtkMPIMoveData.h"
 #include "vtkMatrix4x4.h"
 #include "vtkMultiBlockDataSet.h"
@@ -101,10 +102,7 @@ vtkGlyph3DRepresentation::vtkGlyph3DRepresentation()
   this->GlyphMapper->SetInterpolateScalarsBeforeMapping(0);
   this->LODGlyphMapper->SetInterpolateScalarsBeforeMapping(0);
 
-  vtkCompositeDataDisplayAttributes* compositeAttributes =
-    vtkCompositePolyDataMapper2::SafeDownCast(this->Mapper)->GetCompositeDataDisplayAttributes();
-  this->GlyphMapper->SetBlockAttributes(compositeAttributes);
-  this->LODGlyphMapper->SetBlockAttributes(compositeAttributes);
+  this->SetupDefaults();
 }
 
 //----------------------------------------------------------------------------
@@ -115,6 +113,24 @@ vtkGlyph3DRepresentation::~vtkGlyph3DRepresentation()
   this->LODGlyphMapper->Delete();
   this->GlyphActor->Delete();
   this->DummySource->Delete();
+}
+
+//----------------------------------------------------------------------------
+void vtkGlyph3DRepresentation::SetupDefaults()
+{
+  this->Superclass::SetupDefaults();
+
+  if (auto compositeAttributes = vtkCompositePolyDataMapper2::SafeDownCast(this->Mapper)
+                                   ->GetCompositeDataDisplayAttributes())
+  {
+    this->GlyphMapper->SetBlockAttributes(compositeAttributes);
+  }
+
+  if (auto compositeAttributes = vtkCompositePolyDataMapper2::SafeDownCast(this->LODMapper)
+                                   ->GetCompositeDataDisplayAttributes())
+  {
+    this->LODGlyphMapper->SetBlockAttributes(compositeAttributes);
+  }
 }
 
 //----------------------------------------------------------------------------
@@ -239,6 +255,8 @@ int vtkGlyph3DRepresentation::ProcessViewRequest(
     // nodes, as is correct.
     double bounds[6];
     this->ComputeGlyphBounds(bounds);
+    vtkLogF(TRACE, "glyph-bounds: (%0.2g, %0.2g, %0.2g, %0.2g, %0.2g, %0.2g)", bounds[0], bounds[1],
+      bounds[2], bounds[3], bounds[4], bounds[5]);
 
     vtkNew<vtkMatrix4x4> matrix;
     this->GlyphActor->GetMatrix(matrix.GetPointer());
@@ -249,7 +267,7 @@ int vtkGlyph3DRepresentation::ProcessViewRequest(
   else if (request_type == vtkPVView::REQUEST_UPDATE_LOD())
   {
     vtkPVRenderView::SetPieceLOD(
-      inInfo, this, this->GlyphMultiBlockMaker->GetOutputDataObject(0), 1);
+      inInfo, this, this->GlyphMultiBlockMaker->GetOutputDataObject(0), 0, 1);
   }
 
   if (request_type == vtkPVView::REQUEST_RENDER())

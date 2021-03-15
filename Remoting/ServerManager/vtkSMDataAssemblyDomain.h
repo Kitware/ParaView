@@ -53,8 +53,10 @@
 #include "vtkRemotingServerManagerModule.h" // needed for exports
 #include "vtkSMDomain.h"
 #include "vtkSmartPointer.h" //  needed for vtkSmartPointer
-class vtkDataAssembly;
 
+#include <string> // for std::string
+
+class vtkDataAssembly;
 class VTKREMOTINGSERVERMANAGER_EXPORT vtkSMDataAssemblyDomain : public vtkSMDomain
 {
 public:
@@ -63,9 +65,17 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /**
-   * Provides access to the current data assembly.
+   * Returns the name for the chosen assembly, if any.
    */
-  vtkDataAssembly* GetDataAssembly();
+  const char* GetDataAssemblyName() const
+  {
+    return this->Name.empty() ? nullptr : this->Name.c_str();
+  }
+
+  /**
+   * Provides access to the data assembly.
+   */
+  vtkDataAssembly* GetDataAssembly() const;
 
   void Update(vtkSMProperty* requestingProperty) override;
 
@@ -77,8 +87,10 @@ private:
   vtkSMDataAssemblyDomain(const vtkSMDataAssemblyDomain&) = delete;
   void operator=(const vtkSMDataAssemblyDomain&) = delete;
 
-  bool DataAssemblyValid;
-  vtkSmartPointer<vtkDataAssembly> DataAssembly;
+  void ChooseAssembly(const std::string& name, vtkDataAssembly* assembly);
+
+  vtkSmartPointer<vtkDataAssembly> Assembly;
+  std::string Name;
 };
 
 #endif

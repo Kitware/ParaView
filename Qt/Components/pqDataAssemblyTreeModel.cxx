@@ -92,9 +92,30 @@ vtkStandardNewMacro(CallbackDataVisitor);
 
 class pqDataAssemblyTreeModel::pqInternals
 {
-  std::unordered_map<int, std::unordered_map<int, QVariant> > Data;
-
 public:
+  class DataT
+  {
+    QVariant Value;
+    bool ValueDerived = true;
+
+  public:
+    const QVariant& value() const { return this->Value; };
+
+    template <typename T>
+    T value() const
+    {
+      return this->Value.value<T>();
+    }
+    void setValue(const QVariant& var, bool is_derived)
+    {
+      this->Value = var;
+      this->ValueDerived = is_derived || !var.isValid();
+    }
+
+    bool isDerived() const { return this->ValueDerived; }
+  };
+
+  vtkMTimeType DataAssemblyTimeStamp = 0;
   vtkSmartPointer<vtkDataAssembly> DataAssembly;
 
   QVariant data(int node, int role) const;
@@ -108,15 +129,55 @@ public:
       iter->second.clear();
     }
   }
-  const std::unordered_map<int, QVariant>& data(int role) const { return this->Data.at(role); }
+
+  const std::unordered_map<int, DataT>& data(int role) const { return this->Data.at(role); }
 
   bool updateParentCheckStates(int node);
+
+  void setRoleProperty(int role, pqDataAssemblyTreeModel::RoleProperties property)
+  {
+    this->RoleProperties[role] = property;
+  }
+
+  pqDataAssemblyTreeModel::RoleProperties roleProperty(int role) const
+  {
+    try
+    {
+      return this->RoleProperties.at(role);
+    }
+    catch (std::out_of_range&)
+    {
+      return pqDataAssemblyTreeModel::Standard;
+    }
+  }
+
+  QVariant dataFromParent(int node, int role) const
+  {
+    if (!this->DataAssembly)
+    {
+      return QVariant();
+    }
+    int parent = this->DataAssembly->GetParent(node);
+    return parent != -1 ? this->data(parent, role) : QVariant();
+  }
+
+private:
+  std::unordered_map<int, std::unordered_map<int, DataT> > Data;
+  std::map<int, pqDataAssemblyTreeModel::RoleProperties> RoleProperties;
 };
 
 //-----------------------------------------------------------------------------
 QVariant pqDataAssemblyTreeModel::pqInternals::data(int node, int role) const
 {
-  return this->Data.at(role).at(node);
+  try
+  {
+    return role < 0 ? QVariant(this->Data.at(-role).at(node).isDerived())
+                    : this->Data.at(role).at(node).value();
+  }
+  catch (std::out_of_range&)
+  {
+    return QVariant();
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -128,15 +189,60 @@ bool pqDataAssemblyTreeModel::pqInternals::setData(int node, int role, const QVa
   }
 
   auto& role_map = this->Data[role];
-  auto& cur_value = role_map[node];
-  if (cur_value == value)
+  auto& item = role_map[node];
+  if (item.value() == value && !item.isDerived())
   {
     return false;
   }
 
-  vtkNew<CallbackDataVisitor> vistor;
-  vistor->VisitCallback = [&](int id) { role_map[id] = value; };
-  this->DataAssembly->Visit(node, vistor);
+  // is this a request to clear the value, instead of setting it?
+  const bool clearValue = (value.isValid() == false);
+
+  if (item.isDerived() && clearValue)
+  {
+    // we got a request to clear state, but the value is already not explicitly
+    // specified, so nothing to do.
+    return false;
+  }
+
+  auto rproperty = this->roleProperty(role);
+  if (clearValue && rproperty == RoleProperties::Inherited)
+  {
+    // we clear values until overridden
+    rproperty = RoleProperties::InheritedUntilOverridden;
+  }
+
+  // get a value from parent when clearing a role that's inheritable.
+  const QVariant actualValue =
+    (clearValue && rproperty != RoleProperties::Standard) ? dataFromParent(node, role) : value;
+
+  if (rproperty == RoleProperties::Inherited)
+  {
+    // value is inherited down the whole tree.
+    vtkNew<CallbackDataVisitor> visitor;
+    visitor->VisitCallback = [&](
+      int id) { role_map[id].setValue(actualValue, /*isInherited*/ clearValue || id != node); };
+    this->DataAssembly->Visit(node, visitor);
+  }
+  else if (rproperty == RoleProperties::InheritedUntilOverridden)
+  {
+    // value is inherited till explicitly overridden.
+    vtkNew<CallbackDataVisitor> visitor;
+    visitor->GetTraverseSubtreeCallback = [&](int id) {
+      auto& curItem = role_map[id];
+      if (id == node || curItem.isDerived())
+      {
+        role_map[id].setValue(actualValue, /*isInherited*/ clearValue || id != node);
+        return true; // traverse subtree
+      }
+      return false; // skip subtree.
+    };
+    this->DataAssembly->Visit(node, visitor);
+  }
+  else
+  {
+    item.setValue(actualValue, /*isInherited*/ clearValue);
+  }
   return true;
 }
 
@@ -186,11 +292,11 @@ bool pqDataAssemblyTreeModel::pqInternals::updateParentCheckStates(int node)
       new_state = Qt::Checked;
     }
 
-    if (new_state == role_map[node])
+    if (new_state == role_map[node].value())
     {
       break;
     }
-    role_map[node] = new_state;
+    role_map[node].setValue(new_state, true);
   }
   return true;
 }
@@ -201,6 +307,8 @@ pqDataAssemblyTreeModel::pqDataAssemblyTreeModel(QObject* parentObject)
   , Internals(new pqDataAssemblyTreeModel::pqInternals())
   , UserCheckable(false)
 {
+  // set default to propagage checkstate change to the entire subtree.
+  this->setRoleProperty(Qt::CheckStateRole, pqDataAssemblyTreeModel::Inherited);
 }
 
 //-----------------------------------------------------------------------------
@@ -209,12 +317,24 @@ pqDataAssemblyTreeModel::~pqDataAssemblyTreeModel() = default;
 //-----------------------------------------------------------------------------
 void pqDataAssemblyTreeModel::setDataAssembly(vtkDataAssembly* assembly)
 {
-  if (this->Internals->DataAssembly != assembly)
+  auto& internals = (*this->Internals);
+  const auto stamp = assembly ? assembly->GetMTime() : 0;
+  if (internals.DataAssemblyTimeStamp != stamp)
   {
     this->beginResetModel();
-    auto& internals = (*this->Internals);
     internals.clearData();
-    internals.DataAssembly = assembly;
+    if (assembly)
+    {
+      // we keep a copy here since vtkDataAssembly pass in change outside the
+      // model's scope which can cause odd issues with the view. It's better to
+      // keep a deep-copy instead.
+      internals.DataAssembly.TakeReference(vtkDataAssembly::New());
+      internals.DataAssembly->DeepCopy(assembly);
+    }
+    else
+    {
+      internals.DataAssembly = nullptr;
+    }
     this->endResetModel();
   }
 }
@@ -233,6 +353,21 @@ void pqDataAssemblyTreeModel::setUserCheckable(bool value)
     this->UserCheckable = value;
     this->endResetModel();
   }
+}
+
+//-----------------------------------------------------------------------------
+void pqDataAssemblyTreeModel::setRoleProperty(
+  int role, pqDataAssemblyTreeModel::RoleProperties property)
+{
+  auto& internals = (*this->Internals);
+  internals.setRoleProperty(role, property);
+}
+
+//-----------------------------------------------------------------------------
+pqDataAssemblyTreeModel::RoleProperties pqDataAssemblyTreeModel::roleProperty(int role) const
+{
+  auto& internals = (*this->Internals);
+  return internals.roleProperty(role);
 }
 
 //-----------------------------------------------------------------------------
@@ -310,29 +445,29 @@ QVariant pqDataAssemblyTreeModel::data(const QModelIndex& indx, int role) const
 {
   auto& internals = (*this->Internals);
   const auto assembly = internals.DataAssembly.GetPointer();
+  if (!assembly)
+  {
+    return QVariant();
+  }
+
   const auto node = ::getNodeID(indx);
   switch (role)
   {
     case Qt::DisplayRole:
     case Qt::ToolTipRole:
-      return assembly->GetNodeName(node);
-      break;
+      return assembly->HasAttribute(node, "label")
+        ? assembly->GetAttributeOrDefault(node, "label", "")
+        : assembly->GetNodeName(node);
   }
 
-  try
+  auto value = internals.data(node, role);
+  if (value.isValid() == false && role == Qt::CheckStateRole && this->userCheckable())
   {
-    return internals.data(node, role);
+    return Qt::Unchecked;
   }
-  catch (const std::out_of_range&)
-  {
-    if (this->UserCheckable && role == Qt::CheckStateRole)
-    {
-      return Qt::Unchecked;
-    }
-  }
-
-  return QVariant();
+  return value;
 }
+
 //-----------------------------------------------------------------------------
 bool pqDataAssemblyTreeModel::setData(const QModelIndex& indx, const QVariant& value, int role)
 {
@@ -351,7 +486,7 @@ bool pqDataAssemblyTreeModel::setData(const QModelIndex& indx, const QVariant& v
 
   this->fireDataChanged(indx, { role });
 
-  // checkstate is the only role where we have to travel put the parent chain
+  // checkstate is the only role where we have to travel up the parent chain
   // and update the checkstate.
   if (role == Qt::CheckStateRole && internals.updateParentCheckStates(node))
   {
@@ -403,37 +538,12 @@ void pqDataAssemblyTreeModel::fireDataChanged(const QModelIndex& indx, const QVe
 //-----------------------------------------------------------------------------
 void pqDataAssemblyTreeModel::setCheckedNodes(const QStringList& paths)
 {
-  auto& internals = (*this->Internals);
-  if (const auto assembly = internals.DataAssembly.GetPointer())
+  QList<QPair<QString, QVariant> > pairs;
+  for (const auto& path : paths)
   {
-    std::vector<std::string> path_queries;
-    std::transform(paths.begin(), paths.end(), std::back_inserter(path_queries),
-      [](const QString& qstring) { return qstring.toLocal8Bit().data(); });
-
-    internals.clearData(Qt::CheckStateRole);
-    const QVariant val = Qt::Checked;
-    const auto selectedNodes = assembly->SelectNodes(path_queries);
-    for (const auto& node : selectedNodes)
-    {
-      internals.setData(node, Qt::CheckStateRole, val);
-    }
-
-    // now, update parent check-states.
-    std::set<int> visited_parents;
-    for (const auto& node : selectedNodes)
-    {
-      // update parent node check states
-      const auto prnt = assembly->GetParent(node);
-      if (visited_parents.find(prnt) == visited_parents.end())
-      {
-        internals.updateParentCheckStates(node);
-        visited_parents.insert(prnt);
-      }
-    }
+    pairs.push_back(qMakePair(path, QVariant(Qt::Checked)));
   }
-
-  // fire data changed events
-  this->fireDataChanged(this->index(0, 0), { Qt::CheckStateRole });
+  this->setData(pairs, Qt::CheckStateRole);
 }
 
 //-----------------------------------------------------------------------------
@@ -445,6 +555,11 @@ QStringList pqDataAssemblyTreeModel::checkedNodes() const
   {
     return QStringList();
   }
+
+  /*
+   * We don't simply call `data(Qt::CheckStateRole)` since want to create a more compact
+   * checked nodes list than tracking explicit on/off states.
+   */
 
   const auto node_states = internals.data(Qt::CheckStateRole);
   QStringList paths;
@@ -475,4 +590,92 @@ QStringList pqDataAssemblyTreeModel::checkedNodes() const
 
   assembly->Visit(visitor, vtkDataAssembly::TraversalOrder::BreadthFirst);
   return paths;
+}
+
+//-----------------------------------------------------------------------------
+QList<QPair<QString, QVariant> > pqDataAssemblyTreeModel::data(int role) const
+{
+  auto& internals = (*this->Internals);
+  const auto assembly = internals.DataAssembly.GetPointer();
+  if (!assembly)
+  {
+    return {};
+  }
+
+  QList<QPair<QString, QVariant> > values;
+  for (const auto& pair : internals.data(role))
+  {
+    if (!pair.second.isDerived())
+    {
+      values.push_back(
+        qMakePair(QString::fromStdString(assembly->GetNodePath(pair.first)), pair.second.value()));
+    }
+  }
+  return values;
+}
+
+//-----------------------------------------------------------------------------
+bool pqDataAssemblyTreeModel::setData(const QList<QPair<QString, QVariant> >& values, int role)
+{
+  auto& internals = (*this->Internals);
+  const auto assembly = internals.DataAssembly.GetPointer();
+  if (!assembly)
+  {
+    return false;
+  }
+
+  internals.clearData(role);
+
+  std::vector<int> allSelectedNodes;
+  for (const auto& pair : values)
+  {
+    const auto& selector = pair.first;
+    const auto& value = pair.second;
+    const auto selectedNodes = assembly->SelectNodes({ selector.toStdString() });
+    for (const auto& node : selectedNodes)
+    {
+      internals.setData(node, role, value);
+    }
+
+    if (role == Qt::CheckStateRole)
+    {
+      allSelectedNodes.insert(allSelectedNodes.end(), selectedNodes.begin(), selectedNodes.end());
+    }
+  }
+
+  // now, update parent check-states if role is Qt::CheckStateRole.
+  std::set<int> visited_parents;
+  for (const auto& node : allSelectedNodes)
+  {
+    Q_ASSERT(role == Qt::CheckStateRole);
+
+    // update parent node check states
+    const auto prnt = assembly->GetParent(node);
+    if (visited_parents.find(prnt) == visited_parents.end())
+    {
+      internals.updateParentCheckStates(node);
+      visited_parents.insert(prnt);
+    }
+  }
+
+  // fire data changed events
+  this->fireDataChanged(this->index(0, 0), { role });
+  return true;
+}
+
+//-----------------------------------------------------------------------------
+int pqDataAssemblyTreeModel::nodeId(const QModelIndex& idx) const
+{
+  return ::getNodeID(idx);
+}
+
+//-----------------------------------------------------------------------------
+QList<int> pqDataAssemblyTreeModel::nodeId(const QModelIndexList& idxes) const
+{
+  QList<int> result;
+  for (auto& idx : idxes)
+  {
+    result.push_back(::getNodeID(idx));
+  }
+  return result;
 }

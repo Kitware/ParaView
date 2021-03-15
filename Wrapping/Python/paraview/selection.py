@@ -440,7 +440,16 @@ def QuerySelect(QueryString='', FieldType='POINT', Source=None, InsideOut=False)
     if not Source:
         Source = paraview.simple.GetActiveSource()
 
-    selection = _createSelection('SelectionQuerySource', FieldType=FieldType, QueryString=QueryString, InsideOut=InsideOut)
+    # convert FieldType to ElementType. Eventually, all public API should change
+    # to accepting ElementType but we'll do that after all selection sources use
+    # ElementType consistently.
+    from paraview.vtk import vtkSelectionNode
+    ftype = vtkSelectionNode.GetFieldTypeFromString(FieldType)
+    if ftype == vtkSelectionNode.NUM_FIELD_TYPES:
+        raise ValueError("Invalid FieldType '%s'" % FieldType)
+    ElementType = vtkSelectionNode.ConvertSelectionFieldToAttributeType(ftype)
+    selection = _createSelection('SelectionQuerySource', ElementType=ElementType,
+            QueryString=QueryString, InsideOut=InsideOut)
     if selection:
         Source.SMProxy.SetSelectionInput(0, selection.SMProxy, 0)
     Source.UpdateVTKObjects()

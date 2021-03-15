@@ -18,10 +18,11 @@
 #include "vtkCollection.h"
 #include "vtkCollectionIterator.h"
 #include "vtkCommand.h"
+#include "vtkDataAssembly.h"
+#include "vtkDataAssemblyUtilities.h"
 #include "vtkDataObject.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVClassNameInformation.h"
-#include "vtkPVDataAssemblyInformation.h"
 #include "vtkPVDataInformation.h"
 #include "vtkPVTemporalDataInformation.h"
 #include "vtkPVXMLElement.h"
@@ -41,7 +42,6 @@ vtkSMOutputPort::vtkSMOutputPort()
 {
   this->ClassNameInformation = vtkPVClassNameInformation::New();
   this->DataInformation = vtkPVDataInformation::New();
-  this->DataAssemblyInformation = vtkPVDataAssemblyInformation::New();
   this->TemporalDataInformation = vtkPVTemporalDataInformation::New();
   this->ClassNameInformationValid = 0;
   this->DataInformationValid = false;
@@ -58,7 +58,6 @@ vtkSMOutputPort::~vtkSMOutputPort()
   this->SetSourceProxy(nullptr);
   this->ClassNameInformation->Delete();
   this->DataInformation->Delete();
-  this->DataAssemblyInformation->Delete();
   this->TemporalDataInformation->Delete();
 }
 
@@ -87,13 +86,67 @@ vtkPVTemporalDataInformation* vtkSMOutputPort::GetTemporalDataInformation()
 }
 
 //----------------------------------------------------------------------------
-vtkDataAssembly* vtkSMOutputPort::GetDataAssembly()
+vtkPVDataInformation* vtkSMOutputPort::GetSubsetDataInformation(
+  const char* selector, const char* assemblyName)
 {
-  if (!this->DataInformationValid)
+  auto dinfo = this->GetDataInformation();
+  auto assembly = dinfo->GetDataAssembly(assemblyName);
+  if (assembly == nullptr || selector == nullptr || selector[0] == '\0')
   {
-    this->GetDataInformation();
+    return nullptr;
   }
-  return this->DataAssemblyInformation->GetDataAssembly();
+
+  const auto nodes = assembly->SelectNodes({ selector });
+  if (nodes.size() == 0)
+  {
+    return nullptr;
+  }
+  if (nodes.size() > 1)
+  {
+    vtkWarningMacro(
+      "GetSubsetDataInformation selector matched multiple nodes. Only first one is used.");
+  }
+
+  const std::string key(assemblyName ? assemblyName : "");
+
+  auto iter1 = this->SubsetDataInformations.find(key);
+  if (iter1 != this->SubsetDataInformations.end())
+  {
+    auto iter2 = iter1->second.find(nodes.front());
+    if (iter2 != iter1->second.end())
+    {
+      return iter2->second;
+    }
+  }
+
+  this->SourceProxy->GetSession()->PrepareProgress();
+
+  vtkNew<vtkPVDataInformation> subsetInfo;
+  subsetInfo->Initialize();
+  subsetInfo->SetPortNumber(this->PortIndex);
+  subsetInfo->SetSubsetSelector(selector);
+  subsetInfo->SetSubsetAssemblyName(assemblyName);
+  this->SourceProxy->GatherInformation(subsetInfo);
+
+  this->SubsetDataInformations[key][nodes.front()] = subsetInfo;
+  this->SourceProxy->GetSession()->CleanupPendingProgress();
+  return subsetInfo;
+}
+
+//----------------------------------------------------------------------------
+vtkPVDataInformation* vtkSMOutputPort::GetSubsetDataInformation(unsigned int compositeIndex)
+{
+  auto dinfo = this->GetDataInformation();
+  if (dinfo->DataSetTypeIsA(VTK_MULTIBLOCK_DATA_SET))
+  {
+    auto hierarchy = dinfo->GetHierarchy();
+    return this->GetSubsetDataInformation(
+      vtkDataAssemblyUtilities::GetSelectorForCompositeId(compositeIndex, hierarchy).c_str(),
+      vtkDataAssemblyUtilities::HierarchyName());
+  }
+
+  vtkWarningMacro("GetSelectorForCompositeId(compositeIndex) called for a non-multiblock dataset.");
+  return nullptr;
 }
 
 //----------------------------------------------------------------------------
@@ -118,6 +171,7 @@ void vtkSMOutputPort::InvalidateDataInformation()
   this->DataInformationValid = false;
   this->ClassNameInformationValid = false;
   this->TemporalDataInformationValid = false;
+  this->SubsetDataInformations.clear();
 }
 
 //----------------------------------------------------------------------------
@@ -133,10 +187,8 @@ void vtkSMOutputPort::GatherDataInformation()
   this->DataInformation->Initialize();
   this->DataInformation->SetPortNumber(this->PortIndex);
   this->SourceProxy->GatherInformation(this->DataInformation);
+  this->DataInformation->Modified();
 
-  this->DataAssemblyInformation->Initialize();
-  this->DataAssemblyInformation->SetPortNumber(this->PortIndex);
-  this->SourceProxy->GatherInformation(this->DataAssemblyInformation);
   this->DataInformationValid = true;
   this->SourceProxy->GetSession()->CleanupPendingProgress();
 }
@@ -154,6 +206,7 @@ void vtkSMOutputPort::GatherTemporalDataInformation()
   this->TemporalDataInformation->Initialize();
   this->TemporalDataInformation->SetPortNumber(this->PortIndex);
   this->SourceProxy->GatherInformation(this->TemporalDataInformation);
+  this->TemporalDataInformation->Modified();
 
   this->TemporalDataInformationValid = true;
   this->SourceProxy->GetSession()->CleanupPendingProgress();

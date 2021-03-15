@@ -35,6 +35,7 @@ vtkStandardNewMacro(vtkSMFieldDataDomain);
 vtkSMFieldDataDomain::vtkSMFieldDataDomain()
 {
   this->EnableFieldDataSelection = false;
+  this->UseElementTypes = false;
 }
 
 //---------------------------------------------------------------------------
@@ -45,6 +46,19 @@ const char* vtkSMFieldDataDomain::GetAttributeTypeAsString(int attrType)
 {
   static const char* const vtkSMFieldDataDomainAttributeTypes[] = { "Point Data", "Cell Data",
     "Field Data", nullptr, "Vertex Data", "Edge Data", "Row Data", nullptr };
+
+  if (attrType >= 0 && attrType < vtkDataObject::NUMBER_OF_ATTRIBUTE_TYPES)
+  {
+    return vtkSMFieldDataDomainAttributeTypes[attrType];
+  }
+  return nullptr;
+}
+
+//---------------------------------------------------------------------------
+const char* vtkSMFieldDataDomain::GetElementTypeAsString(int attrType)
+{
+  static const char* const vtkSMFieldDataDomainAttributeTypes[] = { "Point", "Cell", "Field",
+    nullptr, "Vertex", "Edge", "Row", nullptr };
 
   if (attrType >= 0 && attrType < vtkDataObject::NUMBER_OF_ATTRIBUTE_TYPES)
   {
@@ -158,6 +172,13 @@ int vtkSMFieldDataDomain::ReadXMLAttributes(vtkSMProperty* prop, vtkPVXMLElement
   {
     this->EnableFieldDataSelection = (enable_field_data != 0) ? true : false;
   }
+
+  int use_element_types = 0;
+  if (element->GetScalarAttribute("use_element_types", &use_element_types))
+  {
+    this->UseElementTypes = (use_element_types == 1);
+  }
+
   this->Update(prop);
   return 1;
 }
@@ -174,7 +195,8 @@ void vtkSMFieldDataDomain::Update(vtkSMProperty* vtkNotUsed(prop))
   this->RemoveAllEntries();
   for (int idx = 0; idx < vtkSMInputArrayDomain::NUMBER_OF_ATTRIBUTE_TYPES; idx++)
   {
-    auto label = vtkSMFieldDataDomain::GetAttributeTypeAsString(idx);
+    auto label = this->UseElementTypes ? vtkSMFieldDataDomain::GetElementTypeAsString(idx)
+                                       : vtkSMFieldDataDomain::GetAttributeTypeAsString(idx);
     if (!label)
     {
       continue;
@@ -194,7 +216,9 @@ void vtkSMFieldDataDomain::Update(vtkSMProperty* vtkNotUsed(prop))
   if (this->EnableFieldDataSelection &&
     (!dataInfo || dataInfo->IsAttributeValid(vtkDataObject::FIELD)))
   {
-    auto label = vtkSMFieldDataDomain::GetAttributeTypeAsString(vtkDataObject::FIELD);
+    auto label = this->UseElementTypes
+      ? vtkSMFieldDataDomain::GetElementTypeAsString(vtkDataObject::FIELD)
+      : vtkSMFieldDataDomain::GetAttributeTypeAsString(vtkDataObject::FIELD);
     this->AddEntry(label, vtkDataObject::FIELD);
   }
 

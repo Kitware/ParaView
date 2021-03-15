@@ -256,41 +256,23 @@
     <!-- ==================================================================== -->
     <SourceProxy class="vtkQuerySelectionSource"
                  name="SelectionQuerySource">
-      <IntVectorProperty command="SetFieldType"
-                         default_values="0"
-                         name="FieldType"
+      <IntVectorProperty command="SetElementType"
+                         default_values="1"
+                         name="ElementType"
                          number_of_elements="1">
-        <Documentation>The location of the array the selection came from (ex,
-        point, cell).</Documentation>
-        <EnumerationDomain name="enum">
-          <Entry text="CELL"
-                 value="0" />
-          <Entry text="POINT"
-                 value="1" />
-          <Entry text="FIELD"
-                 value="2" />
-          <Entry text="VERTEX"
-                 value="3" />
-          <Entry text="EDGE"
-                 value="4" />
-          <Entry text="ROW"
-                 value="5" />
-        </EnumerationDomain>
+        <Documentation>Select the type of elements to select.</Documentation>
+        <FieldDataDomain name="enum" />
       </IntVectorProperty>
       <StringVectorProperty command="SetQueryString"
                             default_values=""
                             name="QueryString"
                             number_of_elements="1"
                             panel_visibility="default"></StringVectorProperty>
-      <IntVectorProperty command="SetCompositeIndex"
-                         default_values="-1"
-                         name="CompositeIndex"
-                         number_of_elements="1"></IntVectorProperty>
-      <IntVectorProperty command="SetHierarchicalLevel"
+      <IntVectorProperty command="SetAMRLevel"
                          default_values="-1"
                          name="HierarchicalLevel"
                          number_of_elements="1"></IntVectorProperty>
-      <IntVectorProperty command="SetHierarchicalIndex"
+      <IntVectorProperty command="SetAMRIndex"
                          default_values="-1"
                          name="HierarchicalIndex"
                          number_of_elements="1"></IntVectorProperty>
@@ -304,6 +286,25 @@
         <SimpleStringInformationHelper />
         <Documentation>Reconstructs the query as a user friendly text, e.g., "IDs
         &gt;= 12".</Documentation>
+      </StringVectorProperty>
+      <StringVectorProperty name="Assembly"
+                            command="SetAssemblyName"
+                            number_of_elements="1"
+                            default_values="Hierarchy">
+        <Documentation>
+          Select which assembly is used when specify selectors
+          to choose blocks to show for composite datasets.
+        </Documentation>
+      </StringVectorProperty>
+      <StringVectorProperty name="Selectors"
+                            command="AddSelector"
+                            clean_command="ClearSelectors"
+                            repeat_command="1"
+                            number_of_elements_per_command="1">
+        <Documentation>
+          For composite datasets, specify selectors to limit the view
+          to a chosen subset of blocks.
+        </Documentation>
       </StringVectorProperty>
       <IntVectorProperty command="SetInverse"
                          default_values="0"

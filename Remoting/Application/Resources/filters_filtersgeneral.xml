@@ -11,7 +11,7 @@
                      name="Input"
                      panel_widget="input_selector"
                      null_on_empty="1"
-                     panel_visibility="always">
+                     panel_visibility="default">
         <ProxyGroupDomain name="groups">
           <Group name="sources" />
           <Group name="filters" />
@@ -382,7 +382,7 @@
                             label="Faces Array Name"
                             default_values="Face Count"
                             number_of_elements="1"
-                            panel_visibility="always">
+                            panel_visibility="default">
         <Documentation>
           This is the name of the array in the output containing the face counts.
         </Documentation>
@@ -415,7 +415,7 @@
                             label="Vertices Array Name"
                             default_values="Vertex Count"
                             number_of_elements="1"
-                            panel_visibility="always">
+                            panel_visibility="default">
         <Documentation>
           This is the name of the array in the output containing the vertex counts.
         </Documentation>
@@ -526,7 +526,7 @@
                             default_values="%Y-%m-%d %H:%M:%S"
                             name="DateFormat"
                             number_of_elements="1"
-                            panel_visibility="always">
+                            panel_visibility="default">
         <Documentation>
           This property specifies the first format to try using to parse dates. It
           follows the standards of std::get_time.

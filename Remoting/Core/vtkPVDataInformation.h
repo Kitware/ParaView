@@ -13,28 +13,30 @@
 
 =========================================================================*/
 /**
- * @class   vtkPVDataInformation
- * @brief   Light object for holding data information.
+ * @class vtkPVDataInformation
+ * @brief provides meta data about a vtkDataObject subclass.
  *
- * This object is a light weight object.  It has no user interface and
- * does not necessarily last a long time.  It is meant to help collect
- * information about data object and collections of data objects.  It
- * has a PV in the class name because it should never be moved into
- * VTK.
+ * vtkPVDataInformation is a vtkPVInformation subclass intended to collect
+ * information from vtkDataObject and subclasses. It designed to be used by
+ * application in lieu of actual data to glean insight into the data e.g. data
+ * type, number of points, number of cells, arrays, ranges etc.
  *
- * @warning
- * Get polygons only works for poly data and it does not work propelry for the
- * triangle strips.
-*/
+ */
 
 #ifndef vtkPVDataInformation_h
 #define vtkPVDataInformation_h
 
+#include "vtkDataObject.h" // for vtkDataObject::NUMBER_OF_ATTRIBUTE_TYPES
+#include "vtkNew.h"        // for vtkNew
 #include "vtkPVInformation.h"
 #include "vtkRemotingCoreModule.h" //needed for exports
+#include "vtkSmartPointer.h"       // for vtkSmartPointer
+
+#include <vector> // for std::vector
 
 class vtkCollection;
 class vtkCompositeDataSet;
+class vtkDataAssembly;
 class vtkDataObject;
 class vtkDataSet;
 class vtkGenericDataSet;
@@ -43,8 +45,8 @@ class vtkHyperTreeGrid;
 class vtkInformation;
 class vtkPVArrayInformation;
 class vtkPVCompositeDataInformation;
-class vtkPVDataSetAttributesInformation;
 class vtkPVDataInformationHelper;
+class vtkPVDataSetAttributesInformation;
 class vtkSelection;
 class vtkTable;
 
@@ -55,320 +57,444 @@ public:
   vtkTypeMacro(vtkPVDataInformation, vtkPVInformation);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  /**
-   * Method to find and return attribute array information for a particular
-   * array for the given attribute type if one exists.
-   * Returns nullptr if none is found.
-   * \c fieldAssociation can be vtkDataObject::FIELD_ASSOCIATION_POINTS,
-   * vtkDataObject::FIELD_ASSOCIATION_CELLS etc.
-   * (use vtkDataObject::FIELD_ASSOCIATION_NONE for field data) (or
-   * vtkDataObject::POINT, vtkDataObject::CELL, vtkDataObject::FIELD).
-   */
-  vtkPVArrayInformation* GetArrayInformation(const char* arrayname, int fieldAssociation);
-
   //@{
   /**
-   * Port number controls which output port the information is gathered from.
-   * This is the only parameter that can be set on  the client-side before
-   * gathering the information.
+   * Indicates which output port of an algorithm this data should information
+   * should be / has been collected from.
+   *
+   * Default is 0.
    */
   vtkSetMacro(PortNumber, int);
   vtkGetMacro(PortNumber, int);
   //@}
 
-  /**
-   * Transfer information about a single object into this object.
-   */
-  void CopyFromObject(vtkObject*) override;
-
-  /**
-   * Merge another information object. Calls AddInformation(info, 0).
-   */
-  void AddInformation(vtkPVInformation* info) override;
-
-  /**
-   * Merge another information object. If adding information of
-   * 1 part across processors, set addingParts to false. If
-   * adding information of parts, set addingParts to true.
-   */
-  virtual void AddInformation(vtkPVInformation*, int addingParts);
-
   //@{
   /**
-   * Manage a serialized version of the information.
+   * Path if non-null, used to limit blocks from a composite dataset.
+   * For details on support form of selector expressions see
+   * `vtkDataAssembly::SelectNodes`.
    */
-  void CopyToStream(vtkClientServerStream*) override;
-  void CopyFromStream(const vtkClientServerStream*) override;
+  vtkGetStringMacro(SubsetSelector);
+  vtkSetStringMacro(SubsetSelector);
   //@}
 
   //@{
   /**
-   * Serialize/Deserialize the parameters that control how/what information is
-   * gathered. This are different from the ivars that constitute the gathered
-   * information itself. For example, PortNumber on vtkPVDataInformation
-   * controls what output port the data-information is gathered from.
+   * Get/Set the assembly to use for subsetting. To use hierarchy,
+   * set this to `vtkDataAssembly::HierarchyName()` or simply use
+   * `SetSubsetAssemblyNameToHierarchy()`.
    */
+  vtkSetStringMacro(SubsetAssemblyName);
+  vtkGetStringMacro(SubsetAssemblyName);
+  void SetSubsetAssemblyNameToHierarchy();
+  //@}
+
+  /**
+   * Populate vtkPVDataInformation using `object`. The object can be a
+   * `vtkDataObject`, `vtkAlgorithm` or `vtkAlgorithmOutput`.
+   */
+  void CopyFromObject(vtkObject* object) override;
+
+  //@{
+  /**
+   * vtkPVInformation API implementation.
+   */
+  void AddInformation(vtkPVInformation* info) override;
+  void CopyToStream(vtkClientServerStream*) override;
+  void CopyFromStream(const vtkClientServerStream*) override;
   void CopyParametersToStream(vtkMultiProcessStream&) override;
   void CopyParametersFromStream(vtkMultiProcessStream&) override;
   //@}
 
   /**
-   * Remove all information.  The next add will be like a copy.
-   * I might want to put this in the PVInformation superclass.
+   * Initializes and clears all values updated in `CopyFromObject`.
    */
   void Initialize();
 
-  //@{
   /**
-   * Access to information.
+   * Simply copies from another vtkPVDataInformation.
+   */
+  void DeepCopy(vtkPVDataInformation* info);
+
+  /**
+   * Finds and returns array information associated with the chosen array.
+   * `fieldAssociation` must be one of `vtkDataObject::FieldAssociations` or
+   * `vtkDataObject::AttributeTypes`.
+   */
+  vtkPVArrayInformation* GetArrayInformation(const char* arrayname, int fieldAssociation) const;
+
+  /**
+   * Returns the data set type. Returned values are defined in `vtkType.h`.
+   * For composite datasets, this returns the common superclass for all non-null
+   * leaf nodes in the composite dataset.
+   *
+   * `-1` indicates that the information has not be collected yet,
+   * was collected from nullptr data object, or from a composite dataset with
+   * no non-null leaf nodes.
+   *
+   * @sa GetCompositeDataSetType
    */
   vtkGetMacro(DataSetType, int);
+
+  /**
+   * Returns the type flag for composite datasets. For non-composite datasets, this is set
+   * to `-1`.
+   */
   vtkGetMacro(CompositeDataSetType, int);
-  const char* GetDataSetTypeAsString();
-  bool DataSetTypeIsA(const char* type);
-  vtkGetMacro(NumberOfPoints, vtkTypeInt64);
-  vtkGetMacro(NumberOfCells, vtkTypeInt64);
-  vtkGetMacro(NumberOfRows, vtkTypeInt64);
-  vtkGetMacro(NumberOfTrees, vtkTypeInt64);
-  vtkGetMacro(NumberOfVertices, vtkTypeInt64);
-  vtkGetMacro(NumberOfEdges, vtkTypeInt64);
-  vtkGetMacro(NumberOfLeaves, vtkTypeInt64);
-  vtkGetMacro(MemorySize, int);
-  vtkGetMacro(PolygonCount, vtkIdType);
-  vtkGetMacro(NumberOfDataSets, int);
-  vtkGetVector6Macro(Bounds, double);
+
+  /**
+   * Returns true if the data information corresponds to a composite dataset.
+   */
+  bool IsCompositeDataSet() const { return (this->CompositeDataSetType != -1); }
+
+  /**
+   * Returns true if the data information is empty or invalid.
+   */
+  bool IsNull() const { return this->DataSetType == -1 && this->CompositeDataSetType == -1; }
+
+  //@{
+  /**
+   * For a composite dataset, returns a list of unique data set types for all non-null
+   * leaf nodes. May be empty if there are non-null leaf nodes are the dataset is not
+   * a composite dataset.
+   *
+   * @note There is no significance to the order of the types.
+   */
+  const std::vector<int>& GetUniqueBlockTypes() const { return this->UniqueBlockTypes; }
+  unsigned int GetNumberOfUniqueBlockTypes() const
+  {
+    return static_cast<unsigned int>(this->UniqueBlockTypes.size());
+  }
+  int GetUniqueBlockType(unsigned int index) const;
+  //@}
+
+  //@{
+  /**
+   * Returns a string for the given type. This directly returns the classname and hence
+   * may not be user-friendly.
+   *
+   * @sa GetPrettyDataTypeString
+   */
+  static const char* GetDataSetTypeAsString(int type);
+  const char* GetDataSetTypeAsString() const
+  {
+    return vtkPVDataInformation::GetDataSetTypeAsString(this->DataSetType);
+  }
+  const char* GetDataClassName() const
+  {
+    return this->DataSetType != -1 ? this->GetDataSetTypeAsString() : nullptr;
+  }
+  const char* GetCompositeDataClassName() const
+  {
+    return this->CompositeDataSetType != -1
+      ? vtkPVDataInformation::GetDataSetTypeAsString(this->CompositeDataSetType)
+      : nullptr;
+  }
+  //@}
+
+  //@{
+  /**
+   * Returns a user-friendly string describing the datatype.
+   */
+  const char* GetPrettyDataTypeString() const;
+  static const char* GetPrettyDataTypeString(int dtype);
+  //@}
+
+  //@{
+  /**
+   * Returns true if the type is of the requested `classname` (or `typeId`).
+   *
+   * If `this->CompositeDataSetType` is valid i.e. the information represents a
+   * composite dataset, the composite dataset type is first checked. If not,
+   * `this->DataSetType` is checked. Since `this->DataSetType` is set to the
+   * most common data type among all the leaf nodes in the composite dataset,
+   * true implies all datasets in the composite dataset match the type.
+   *
+   * @sa `HasDataSetType`
+   */
+  bool DataSetTypeIsA(const char* classname) const;
+  bool DataSetTypeIsA(int typeId) const;
+  //@}
+
+  //@{
+  /**
+   * Similar to `DataSetTypeIsA` except, in case of composite datasets, returns
+   * true if any of the leaf nodes match the requested type.
+   *
+   * For non-composite datasets, this is same as `DataSetTypeIsA`.
+   */
+  bool HasDataSetType(const char* classname) const;
+  bool HasDataSetType(int typeId) const;
   //@}
 
   /**
-   * Returns the number of elements of the given type where type can
-   * vtkDataObject::POINT, vtkDataObject::CELL, ... etc.
+   * Returns number of elements of the chosen type in the data. For a composite dataset,
+   * this is a sum of the element count across all leaf nodes.
+   *
+   * `elementType` must be `vtkDataObject::AttributeTypes`. For `vtkDataObject::FIELD`,
+   * and `vtkDataObject::POINT_THEN_CELL` returns 0.
    */
-  vtkTypeInt64 GetNumberOfElements(int type);
-
-  /**
-   * Returns a string describing the datatype that can be directly
-   * shown in a user interface.
-   */
-  const char* GetPrettyDataTypeString();
+  vtkTypeInt64 GetNumberOfElements(int elementType) const;
 
   //@{
   /**
-   * Of course Extent is only valid for structured data sets.
-   * Extent is the largest extent that contains all the parts.
+   * Convenience methods that simply call `GetNumberOfElements` with appropriate element type.
+   */
+  vtkTypeInt64 GetNumberOfPoints() const { return this->GetNumberOfElements(vtkDataObject::POINT); }
+  vtkTypeInt64 GetNumberOfCells() const { return this->GetNumberOfElements(vtkDataObject::CELL); }
+  vtkTypeInt64 GetNumberOfVertices() const
+  {
+    return this->GetNumberOfElements(vtkDataObject::VERTEX);
+  }
+  vtkTypeInt64 GetNumberOfEdges() const { return this->GetNumberOfElements(vtkDataObject::EDGE); }
+  vtkTypeInt64 GetNumberOfRows() const { return this->GetNumberOfElements(vtkDataObject::ROW); }
+  //@}
+
+  //@{
+  /**
+   * vtkHyperTreeGrid / vtkUniformHyperTreeGrid specific properties. Will return 0 for all
+   * other data types.
+   */
+  vtkGetMacro(NumberOfTrees, vtkTypeInt64);
+  vtkGetMacro(NumberOfLeaves, vtkTypeInt64);
+  //@}
+
+  /**
+   * For vtkUniformGridAMR and subclasses, this returns the number of
+   * levels
+   */
+  vtkGetMacro(NumberOfAMRLevels, vtkTypeInt64);
+
+  /**
+   * This is count of non-null non-composite datasets.
+   * A count of 0 may mean:
+   * * the data is nullptr
+   * * the data is a composite dataset with no non-null leaf nodes
+   * A count of 1 may mean:
+   * * the data is non-composite dataset
+   * * the data is a composite dataset with exactly 1 non-null leaf node.
+   * A count of > 1 may mean:
+   * * the data is non-composite, but distributed across ranks.
+   * * the data is composite with multiple non-null leaf nodes.
+   */
+  vtkGetMacro(NumberOfDataSets, vtkTypeInt64);
+
+  /**
+   * Returns the memory size as reported by `vtkDataObject::GetActualMemorySize`.
+   * For composite datasets, this is simply a sum of the values returned by
+   * `vtkDataObject::GetActualMemorySize` per non-null leaf node. For datasets that
+   * share internal arrays, this will overestimate the size.
+   */
+  vtkGetMacro(MemorySize, vtkTypeInt64);
+
+  /**
+   * Returns bounds for the dataset. May return an invalid
+   * bounding box for data types where bounds don't make sense. For composite datasets,
+   * this is a bounding box of all valid bounding boxes.
+   */
+  vtkGetVector6Macro(Bounds, double);
+
+  //@{
+  /**
+   * Returns structured extents for the data. These are only valid for structured data types
+   * like vtkStructuredGrid, vtkImageData etc. For composite dataset, these represent
+   * the combined extents for structured datasets in the collection.
    */
   vtkGetVector6Macro(Extent, int);
   //@}
 
   //@{
   /**
-   * Access to information about points. Only valid for subclasses
-   * of vtkPointSet.
+   * Get vtkPVDataSetAttributesInformation information for the given association.
+   * `vtkPVDataSetAttributesInformation` can be used to determine available arrays and get meta-data
+   * about each of the available arrays.
+   *
+   * `fieldAssociation` must be `vtkDataObject::FieldAssociations` (or
+   * `vtkDataObject::AttributeTypes`). vtkDataObject::FIELD_ASSOCIATION_POINTS_THEN_CELLS (or
+   * vtkDataObject::POINT_THEN_CELL) is not supported.
+   */
+  vtkPVDataSetAttributesInformation* GetAttributeInformation(int fieldAssociation) const;
+  //@}
+
+  //@{
+  /**
+   * Convenience methods to get vtkPVDataSetAttributesInformation for specific
+   * field type. Same as calling `GetAttributeInformation` with appropriate type.
+   */
+  vtkPVDataSetAttributesInformation* GetPointDataInformation() const
+  {
+    return this->GetAttributeInformation(vtkDataObject::POINT);
+  }
+  vtkPVDataSetAttributesInformation* GetCellDataInformation() const
+  {
+    return this->GetAttributeInformation(vtkDataObject::CELL);
+  }
+  vtkPVDataSetAttributesInformation* GetVertexDataInformation() const
+  {
+    return this->GetAttributeInformation(vtkDataObject::VERTEX);
+  }
+  vtkPVDataSetAttributesInformation* GetEdgeDataInformation() const
+  {
+    return this->GetAttributeInformation(vtkDataObject::EDGE);
+  }
+  vtkPVDataSetAttributesInformation* GetRowDataInformation() const
+  {
+    return this->GetAttributeInformation(vtkDataObject::ROW);
+  }
+  vtkPVDataSetAttributesInformation* GetFieldDataInformation() const
+  {
+    return this->GetAttributeInformation(vtkDataObject::FIELD);
+  }
+  //@}
+
+  /**
+   * For a vtkPointSet and subclasses, this provides information about the `vtkPoints`
+   * array. For composite datasets, this is the obtained by accumulating
+   * information from all point-sets in the collection.
    */
   vtkGetObjectMacro(PointArrayInformation, vtkPVArrayInformation);
-  //@}
 
   //@{
   /**
-   * Access to information about point/cell/vertex/edge/row data.
+   * Returns `DATA_TIME_STEP`, if any, provided by the information object associated
+   * with data.
    */
-  vtkGetObjectMacro(PointDataInformation, vtkPVDataSetAttributesInformation);
-  vtkGetObjectMacro(CellDataInformation, vtkPVDataSetAttributesInformation);
-  vtkGetObjectMacro(VertexDataInformation, vtkPVDataSetAttributesInformation);
-  vtkGetObjectMacro(EdgeDataInformation, vtkPVDataSetAttributesInformation);
-  vtkGetObjectMacro(RowDataInformation, vtkPVDataSetAttributesInformation);
-  //@}
-
-  //@{
-  /**
-   * Accesse to information about field data, if any.
-   */
-  vtkGetObjectMacro(FieldDataInformation, vtkPVDataSetAttributesInformation);
-  //@}
-
-  /**
-   * Method to access vtkPVDataSetAttributesInformation using field association
-   * type.
-   * \c fieldAssociation can be vtkDataObject::FIELD_ASSOCIATION_POINTS,
-   * vtkDataObject::FIELD_ASSOCIATION_CELLS etc.
-   * (use vtkDataObject::FIELD_ASSOCIATION_NONE for field data).
-   */
-  vtkPVDataSetAttributesInformation* GetAttributeInformation(int fieldAssociation);
-
-  //@{
-  /**
-   * If data is composite, this provides information specific to
-   * composite datasets.
-   */
-  vtkGetObjectMacro(CompositeDataInformation, vtkPVCompositeDataInformation);
-  //@}
-
-  /**
-   * Given the flat-index for a node in a composite dataset, this method returns
-   * the data information for the node, it available.
-   */
-  vtkPVDataInformation* GetDataInformationForCompositeIndex(int index);
-
-  /**
-   * Compute the number of block leaf from this information
-   * multipieces are counted as single block.
-   * The boolean skipEmpty parameter allows to choose to count empty dataset are not
-   * Calling this method with skipEmpty to false will correspond to the vtkBlockColors array
-   * in a multiblock.
-   */
-  unsigned int GetNumberOfBlockLeafs(bool skipEmpty);
-
-  /**
-   * This is same as GetDataInformationForCompositeIndex() however note that the
-   * index will get modified in this method.
-   */
-  vtkPVDataInformation* GetDataInformationForCompositeIndex(int* index);
-
-  //@{
-  /**
-   * ClassName of the data represented by information object.
-   */
-  vtkGetStringMacro(DataClassName);
-  //@}
-
-  //@{
-  /**
-   * The least common class name of composite dataset blocks
-   */
-  vtkGetStringMacro(CompositeDataClassName);
-  //@}
-
-  vtkGetVector2Macro(TimeSpan, double);
-
-  //@{
-  /**
-   * Returns if the Time is set.
-   */
-  vtkGetMacro(HasTime, int);
-  //@}
-
-  //@{
-  /**
-   * Returns the data time if, GetHasTime() return true.
-   */
+  vtkGetMacro(HasTime, bool);
   vtkGetMacro(Time, double);
   //@}
 
   //@{
   /**
-   * Returns the number of time steps.
+   * Strictly speaking, these are not data information since these cannot be obtained
+   * from the data but from the pipeline producing the data. However, they are provided
+   * as part data information for simplicity.
    */
-  vtkGetMacro(NumberOfTimeSteps, int);
+  vtkGetVector2Macro(TimeRange, double);
+  vtkGetMacro(NumberOfTimeSteps, vtkTypeInt64);
+  vtkGetMacro(TimeLabel, std::string);
   //@}
+
+  /**
+   * Returns true if the data is structured i.e. supports i-j-k indexing. For composite
+   * datasets, this returns true if all leaf nodes are structured.
+   */
+  bool IsDataStructured() const;
+
+  /**
+   * Returns true if the data has structured data. For composite datasets, this
+   * returns true if *any* of the datasets are structured.
+   */
+  bool HasStructuredData() const;
+
+  /**
+   * Returns true if the data has unstructured data. For composite datasets, this returns
+   * true if *any* of the datasets are unstructured.
+   */
+  bool HasUnstructuredData() const;
+
+  /**
+   * Returns true if provided fieldAssociation is valid for this dataset,
+   * false otherwise. For composite datasets, this returns true if the attribute type if
+   * valid for any of the datasets in the collection.
+   */
+  bool IsAttributeValid(int fieldAssociation) const;
+
+  /**
+   * Returns the extent type for a given data-object type.
+   */
+  static int GetExtentType(int dataType);
 
   //@{
   /**
-   * Returns the label that should be used instead of "Time" if any.
+   * For composite datasets, this provides access to the information about
+   * the dataset hierarchy and any data assembly associated with it.
+   *
+   * Hierarchy represents the hierarchy of the datatype while assembly
+   * provides access to logical grouping and organization, if any.
    */
-  vtkGetStringMacro(TimeLabel);
+  vtkDataAssembly* GetHierarchy() const;
+  vtkDataAssembly* GetDataAssembly() const;
+  vtkDataAssembly* GetDataAssembly(const char* assemblyName) const;
   //@}
 
   /**
-   * Returns if the data type is structured.
+   * Until multiblock dataset is deprecated, applications often want to locate
+   * the composite-index for the first leaf node.
+   *
+   * Returns 0 if not applicable.
    */
-  bool IsDataStructured();
+  vtkGetMacro(FirstLeafCompositeIndex, vtkTypeUInt64);
 
   /**
-   * Returns true if provided fieldAssociation is valid for this dataset, false otherwise.
-   * Always returns true for composite datasets.
-   * eg, FIELD_ASSOCIATION_EDGES will return false for a vtkPolyData, true for a vtkGraph.
+   * Given a composite index, return the blockname, if any.
+   * Note, this is not reliable if executed on partitioned-dataset collection
+   * since partitioned-dataset collection may have different composite indices
+   * across ranks. Thus, this must only be used in code that is currently only
+   * slated for migration from using composite-ids to selectors and hence does
+   * not encounter partitioned-dataset collections.
+   *
+   * This uses `Hierarchy` and hence it only supported when hierarchy is
+   * defined/available.
+   *
+   * Returns empty string if no name available or cannot be determined.
    */
-  bool IsAttributeValid(int fieldAssociation);
-
-  //@{
-  /**
-   * If this instance of vtkPVDataInformation summarizes a node in a
-   * composite-dataset, and if that node has been given a label in that
-   * composite dataset (using vtkCompositeDataSet::NAME meta-data), then this
-   * will return that name. Returns nullptr if this instance doesn't represent a
-   * node in a composite dataset or doesn't have a label/name associated with
-   * it.
-   */
-  vtkGetStringMacro(CompositeDataSetName);
-  //@}
-
-  /**
-   * Allows run time addition of information getters for new classes
-   */
-  static void RegisterHelper(const char* classname, const char* helperclassname);
+  std::string GetBlockName(vtkTypeUInt64 cid) const;
 
 protected:
   vtkPVDataInformation();
   ~vtkPVDataInformation() override;
 
-  void DeepCopy(vtkPVDataInformation* dataInfo, bool copyCompositeInformation = true);
-
-  void AddFromMultiPieceDataSet(vtkCompositeDataSet* data);
-  void CopyFromCompositeDataSet(vtkCompositeDataSet* data);
-  void CopyFromCompositeDataSetInitialize(vtkCompositeDataSet* data);
-  void CopyFromCompositeDataSetFinalize(vtkCompositeDataSet* data);
-  virtual void CopyFromDataSet(vtkDataSet* data);
-  void CopyFromGenericDataSet(vtkGenericDataSet* data);
-  void CopyFromGraph(vtkGraph* graph);
-  void CopyFromTable(vtkTable* table);
-  void CopyFromHyperTreeGrid(vtkHyperTreeGrid* data);
-  void CopyFromSelection(vtkSelection* selection);
-  void CopyCommonMetaData(vtkDataObject*, vtkInformation*);
-
-  static vtkPVDataInformationHelper* FindHelper(const char* classname);
-
-  // Data information collected from remote processes.
-  int DataSetType = -1;
-  int CompositeDataSetType = -1;
-  int NumberOfDataSets = 0;
-  vtkTypeInt64 NumberOfPoints = 0; // data sets
-  vtkTypeInt64 NumberOfCells = 0;
-  vtkTypeInt64 NumberOfRows = 0;  // tables
-  vtkTypeInt64 NumberOfTrees = 0; // hypertreegrids
-  vtkTypeInt64 NumberOfVertices = 0;
-  vtkTypeInt64 NumberOfEdges = 0; // graphs
-  vtkTypeInt64 NumberOfLeaves = 0;
-  int MemorySize = 0;
-  vtkIdType PolygonCount = 0;
-  double Bounds[6] = { VTK_DOUBLE_MAX, -VTK_DOUBLE_MAX, VTK_DOUBLE_MAX, -VTK_DOUBLE_MAX,
-    VTK_DOUBLE_MAX, -VTK_DOUBLE_MAX };
-  int Extent[6] = { VTK_INT_MAX, -VTK_INT_MAX, VTK_INT_MAX, -VTK_INT_MAX, VTK_INT_MAX,
-    -VTK_INT_MAX };
-  double TimeSpan[2] = { VTK_DOUBLE_MAX, -VTK_DOUBLE_MAX };
-  double Time = 0.0;
-  int HasTime = 0;
-  int NumberOfTimeSteps = 0;
-
-  char* DataClassName = nullptr;
-  vtkSetStringMacro(DataClassName);
-
-  char* TimeLabel = nullptr;
-  vtkSetStringMacro(TimeLabel);
-
-  char* CompositeDataClassName = nullptr;
-  vtkSetStringMacro(CompositeDataClassName);
-
-  char* CompositeDataSetName = nullptr;
-  vtkSetStringMacro(CompositeDataSetName);
-
-  vtkPVDataSetAttributesInformation* PointDataInformation;
-  vtkPVDataSetAttributesInformation* CellDataInformation;
-  vtkPVDataSetAttributesInformation* FieldDataInformation;
-  vtkPVDataSetAttributesInformation* VertexDataInformation;
-  vtkPVDataSetAttributesInformation* EdgeDataInformation;
-  vtkPVDataSetAttributesInformation* RowDataInformation;
-
-  vtkPVCompositeDataInformation* CompositeDataInformation;
-
-  vtkPVArrayInformation* PointArrayInformation;
-
+  /**
+   * Populate information object with contents from producer pipeline's
+   * output port information.
+   */
+  void CopyFromPipelineInformation(vtkInformation* pipelineInfo);
+  void CopyFromDataObject(vtkDataObject* dobj);
   friend class vtkPVDataInformationHelper;
-  friend class vtkPVCompositeDataInformation;
+
+  /**
+   * Extracts selected blocks. Use SubsetSelector and SubsetAssemblyName to extract
+   * chosen part of the composite dataset and returns that.
+   */
+  vtkSmartPointer<vtkDataObject> GetSubset(vtkDataObject* dobj) const;
 
 private:
   vtkPVDataInformation(const vtkPVDataInformation&) = delete;
   void operator=(const vtkPVDataInformation&) = delete;
 
   int PortNumber = -1;
+  char* SubsetSelector = nullptr;
+  char* SubsetAssemblyName = nullptr;
+
+  int DataSetType = -1;
+  int CompositeDataSetType = -1;
+  vtkTypeUInt64 FirstLeafCompositeIndex = 0;
+  vtkTypeInt64 NumberOfTrees = 0;
+  vtkTypeInt64 NumberOfLeaves = 0;
+  vtkTypeInt64 NumberOfAMRLevels = 0;
+  vtkTypeInt64 NumberOfDataSets = 0;
+  vtkTypeInt64 MemorySize = 0;
+  double Bounds[6] = { VTK_DOUBLE_MAX, -VTK_DOUBLE_MAX, VTK_DOUBLE_MAX, -VTK_DOUBLE_MAX,
+    VTK_DOUBLE_MAX, -VTK_DOUBLE_MAX };
+  int Extent[6] = { VTK_INT_MAX, -VTK_INT_MAX, VTK_INT_MAX, -VTK_INT_MAX, VTK_INT_MAX,
+    -VTK_INT_MAX };
+  ;
+  bool HasTime = false;
+  double Time = 0.0;
+  double TimeRange[2] = { VTK_DOUBLE_MAX, -VTK_DOUBLE_MAX };
+  std::string TimeLabel;
+  vtkTypeInt64 NumberOfTimeSteps = 0;
+
+  std::vector<int> UniqueBlockTypes;
+  vtkTypeInt64 NumberOfElements[vtkDataObject::NUMBER_OF_ATTRIBUTE_TYPES] = { 0, 0, 0, 0, 0, 0, 0 };
+  vtkNew<vtkPVDataSetAttributesInformation>
+    AttributeInformations[vtkDataObject::NUMBER_OF_ATTRIBUTE_TYPES];
+  vtkNew<vtkPVArrayInformation> PointArrayInformation;
+
+  vtkNew<vtkDataAssembly> Hierarchy;
+  vtkNew<vtkDataAssembly> DataAssembly;
+
+  friend class vtkPVDataInformationAccumulator;
 };
 
 #endif

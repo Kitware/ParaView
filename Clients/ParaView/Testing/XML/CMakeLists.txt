@@ -251,23 +251,19 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/FidesReader_blocks.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/FileSeries1.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/FileSeries2.png}"
-  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/FindDataDialog1.png}"
-  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/FindDataDialog10.png}"
-  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/FindDataDialog11.png}"
-  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/FindDataDialog12.png}"
-  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/FindDataDialog13.png}"
-  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/FindDataDialog14.png}"
-  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/FindDataDialog15.png}"
-  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/FindDataDialog16.png}"
-  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/FindDataDialog2.png}"
-  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/FindDataDialog3.png}"
-  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/FindDataDialog4.png}"
-  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/FindDataDialog5.png}"
-  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/FindDataDialog6.png}"
-  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/FindDataDialog7.png}"
-  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/FindDataDialog8.png}"
-  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/FindDataDialog9.png}"
-  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/FindDataMultiBlock.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/FindDataTrace.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/FindDataQueries-Cell-GlobalElementId-is.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/FindDataQueries-Cell-GlobalElementId-oneof.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/FindDataQueries-Cell-GlobalElementId-range.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/FindDataQueries-Cell-ID-is.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/FindDataQueries-Point-Temp-ge.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/FindDataQueries-Point-Temp-ge-mean.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/FindDataQueries-Point-Temp-le.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/FindDataQueries-Point-Temp-le-mean.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/FindDataQueries-Point-Temp-max.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/FindDataQueries-Point-Temp-mean.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/FindDataQueries-Point-Temp-min.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/FindDataQueries-Point-MultipleQueries.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/FindDataSelectLocation.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/FindDataSelectLocationMultiblock.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/FindDataDialogNaN.png}"
@@ -473,7 +469,6 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/TestClipCylinder.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/TestColorHistogram.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/TestCompositedGeometryCulling.png}"
-  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/TestFindDataMax.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/TestGeometryBoundsClobber.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/TestIsoVolume1.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/TestIsoVolume2.png}"
@@ -634,7 +629,10 @@ SET (TESTS_WITH_INLINE_COMPARES
   LogColorMapToggle.xml
   MemoryInspectorPanel.xml
   Molecule.xml
-  MultiBlockInspectorSelection.xml
+  # temporary disabling since we don't support
+  # selection in the MB-inspector right now.
+  # (see #20525)
+  # MultiBlockInspectorSelection.xml
   NestedViews.xml
   NonlinearSubdivisionDisplay.xml
   PartitionedDataSet.xml
@@ -830,7 +828,8 @@ list(APPEND TESTS_WITH_BASELINES
   Calculator.xml
   CalculatorInput.xml
   CategoriesWithNaN.xml
-  ChangeGlyphRepVisibility.xml
+  # Disabled due to #20508
+  # ChangeGlyphRepVisibility.xml
   ChangingTimestepsInStateFiles.xml
   ChartAxisRangeAndLabels.xml
   CheckableHeader.xml
@@ -920,7 +919,7 @@ list(APPEND TESTS_WITH_BASELINES
   MergePiecesOnly.xml
   MoleculeBonds.xml
   MoleculeToLines.xml
-  MultiBlockAttributes1.xml
+  # MultiBlockAttributes1.xml
   MultiBlockInspector.xml
   MultiBlockSingleBlock.xml
   MultiBlockVolumeRendering.xml
@@ -1194,7 +1193,6 @@ if(PARAVIEW_USE_PYTHON)
     LiveProgrammableSource.xml
     PythonShellRunScript.xml
     SaveLoadStatePython.xml
-    SelectionLabels.xml
     TraceExodus.xml
     TraceExportAndSaveData.xml
     TraceSaveGeometry.xml
@@ -1234,23 +1232,23 @@ if(PARAVIEW_USE_PYTHON)
       ContextViewSelectionTrace.xml
       ExodusModeShapes.xml
       FindDataPartialArrays.xml
-      FindDataMultiBlock.xml
       FindDataSelectLocation.xml # find data needs python/numpy
       FindDataSelectLocationMultiblock.xml # find data needs python/numpy
+      FindDataNameSanitization.xml
       ForceTimeDiamond.xml
       FreezeQueryMultiblock.xml
       IndexedLookupInitialization.xml # needs Python Calculator/numpy
       ProgrammableAnnotation.xml
       SpreadSheetSelectionTrace.xml
       StructuredGridCellBlanking.xml
-      TestFindDataMax.xml
       VolumeNoMapScalars.xml # needs programmable filter + numpy
       )
     set(SpreadSheetSelectionTrace_DISABLE_CS TRUE)
     set(SpreadSheetSelectionTrace_DISABLE_CRS TRUE)
 
     list(APPEND TESTS_WITH_INLINE_COMPARES
-      FindDataDialog.xml)
+      FindDataTrace.xml
+      FindDataQueries.xml)
 
     # PythonAlgorithm plugin tests.
     configure_file(
@@ -1405,6 +1403,7 @@ set(SelectionLinkScripting_DISABLE_CRS TRUE)
 set(ExpandSelection_DISABLE_CRS TRUE)
 set(ExportSelectionToCSV_DISABLE_CRS TRUE)
 set(BlockOpacities_DISABLE_CRS TRUE)
+set(SaveExodus_DISABLE_CRS TRUE) # yes, this test does a selection
 
 # These tests cannot be run using ctest -j since they are affected by focus
 # changed events.
@@ -1452,9 +1451,6 @@ set(CTHAMRClip_DISABLE_CS TRUE)
 set(CTHAMRClip_DISABLE_CRS TRUE)
 set(CTHAMRMaterialInterfaceFilter_DISABLE_CS TRUE)
 set(CTHAMRMaterialInterfaceFilter_DISABLE_CRS TRUE)
-
-# Since this test needs selection, disable in CRS mode.
-set (SelectionLabels_DISABLE_CRS TRUE)
 
 # Add image threshold overrides for tests.
 # Generally all tests with wireframes need higher thresholds.

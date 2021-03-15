@@ -31,4 +31,4 @@ mb2.GetFieldData().AddArray(arr)
 di = vtkPVDataInformation()
 di.CopyFromObject(mb2)
 assert di.GetFieldDataInformation().GetArrayInformation("Field1").GetIsPartial() == 1 and\
-    di.GetFieldDataInformation().GetArrayInformation("Field2").GetIsPartial() == 0
+    di.GetFieldDataInformation().GetArrayInformation("Field2").GetIsPartial() == 1

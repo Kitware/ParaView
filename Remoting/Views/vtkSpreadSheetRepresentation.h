@@ -60,15 +60,11 @@ public:
 
   //@{
   /**
-   * Select the block indices to extract.
-   * Each node in the multi-block tree is identified by an \c index. The index can
-   * be obtained by performing a preorder traversal of the tree (including empty
-   * nodes). eg. A(B (D, E), C(F, G)).
-   * Inorder traversal yields: A, B, D, E, C, F, G
-   * Index of A is 0, while index of C is 4.
+   * Selectors to extract blocks.
    */
-  void AddCompositeDataSetIndex(unsigned int index);
-  void RemoveAllCompositeDataSetIndices();
+  void AddSelector(const char* selector);
+  void ClearSelectors();
+  void SetActiveAssemblyForSelectors(const char* name);
   //@}
 
 protected:

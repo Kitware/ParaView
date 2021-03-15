@@ -4467,12 +4467,6 @@
                       panel_visibility="advanced" />
             <Property name="NonlinearSubdivisionLevel"
                       panel_visibility="advanced" />
-            <Property name="BlockVisibility"
-                      panel_visibility="never" />
-            <Property name="BlockColor"
-                      panel_visibility="never" />
-            <Property name="BlockOpacity"
-                      panel_visibility="never" />
             <Property name="BlockColorsDistinctValues"
                       panel_visibility="advanced" />
             <Property name="UseDataPartitions"
@@ -4485,6 +4479,21 @@
             <Property name="OSPRayScaleArray" />
             <Property name="OSPRayScaleFunction" />
             <Property name="OSPRayMaterial" />
+          </PropertyGroup>
+
+          <PropertyGroup label="Blocks"
+                         panel_widget="DataAssemblyEditor"
+                         panel_visibility="multiblock_inspector">
+            <!--
+               place holder for future work
+               <Property name="Assembly"       function="ActiveAssembly" />
+            -->
+            <Property name="BlockSelectors" function="Selectors" />
+            <Property name="BlockColors"    function="Colors" />
+            <Property name="BlockOpacities" function="Opacities" />
+            <Hints>
+              <DataAssemblyPropertyWidget use_inputname_as_header="1" />
+            </Hints>
           </PropertyGroup>
 
         </ExposedProperties>
@@ -4762,8 +4771,6 @@
                       panel_visibility="advanced" />
             <Property name="OpacityComponent"
                       panel_visibility="advanced" />
-            <Property name="ExtractedBlockIndex"
-                      panel_visibility="advanced" />
             <Property name="SelectMapper"
                       panel_visibility="advanced"
                       panel_visibility_default_for_representation="volume" />
@@ -4834,8 +4841,6 @@
             <Property name="ScalarOpacityFunction" />
             <Property name="ScalarOpacityUnitDistance"
                       panel_visibility="advanced" />
-            <Property name="ExtractedBlockIndex"
-                      panel_visibility="never" />
             <Property name="SelectMapper"
                       panel_visibility="advanced"
                       panel_visibility_default_for_representation="volume" />
@@ -6014,22 +6019,43 @@
           </PropertyWidgetDecorator>
         </Hints>
       </IntVectorProperty>
-      <IntVectorProperty command="SetExtractedBlockIndex"
-                         default_values="0"
-                         name="ExtractedBlockIndex"
-                         number_of_elements="1">
-        <Documentation>In case of multiblock datasets, choose the index of
-        the dataset to volume render. The index must point to an
-        unstructured grid dataset. If the input is not a multiblock dataset
-        then this index is ignored.</Documentation>
-        <CompositeTreeDomain mode="leaves"
-                             name="tree">
+
+      <StringVectorProperty name="Assembly"
+        command="SetActiveAssembly"
+        number_of_elements="1"
+        default_values="Hierarchy"
+        panel_visibility="multiblock_inspector">
+        <DataAssemblyListDomain name="data_assembly">
           <RequiredProperties>
-            <Property function="Input"
-                      name="Input" />
+            <Property function="Input" name="Input" />
           </RequiredProperties>
-        </CompositeTreeDomain>
-      </IntVectorProperty>
+        </DataAssemblyListDomain>
+        <Documentation>
+          Select which assembly is used when specify selectors
+          to choose block visibilities, block colors, etc. for composite datasets.
+        </Documentation>
+      </StringVectorProperty>
+
+      <StringVectorProperty name="BlockSelectors"
+        command="AddBlockSelector"
+        clean_command="RemoveAllBlockSelectors"
+        repeat_command="1"
+        number_of_elements_per_command="1"
+        panel_visibility="multiblock_inspector"
+        number_of_elements="1"
+        default_values="/">
+        <DataAssemblyDomain name="data_assembly">
+          <RequiredProperties>
+            <Property function="Input" name="Input" />
+            <Property function="ActiveAssembly" name="Assembly" />
+          </RequiredProperties>
+        </DataAssemblyDomain>
+        <Documentation>
+          For composite datasets, specify selectors to limit the view
+          to a chosen subset of blocks.
+        </Documentation>
+      </StringVectorProperty>
+
       <DoubleVectorProperty command="SetPosition"
                             default_values="0 0 0"
                             name="Position"
@@ -7881,7 +7907,12 @@
           </RequiredProperties>
         </CompositeTreeDomain>
         <Documentation>This property lists the ids of the blocks to extract
-        from the input multiblock dataset.</Documentation>
+          from the input multiblock dataset.</Documentation>
+        <Hints>
+          <!-- we don't want to show this property, except for MBs. -->
+          <PropertyWidgetDecorator type="InputDataTypeDecorator"
+            mode="visibility" name="vtkMultiBlockDataSet" />
+        </Hints>
       </IntVectorProperty>
       <IntVectorProperty command="SetFieldAssociation"
                          default_values="0"
@@ -8496,6 +8527,11 @@
                       name="Input" />
           </RequiredProperties>
         </CompositeTreeDomain>
+        <Hints>
+          <!-- we don't want to show this property, except for MBs. -->
+          <PropertyWidgetDecorator type="InputDataTypeDecorator"
+            mode="visibility" name="vtkMultiBlockDataSet" />
+        </Hints>
       </IntVectorProperty>
       <IntVectorProperty command="SetFieldAssociation"
                          default_values="0"
@@ -8684,6 +8720,11 @@
             <Property function="Input"
                       name="Input" />
           </RequiredProperties>
+          <Hints>
+            <!-- we don't want to show this property, except for MBs. -->
+            <PropertyWidgetDecorator type="InputDataTypeDecorator"
+              mode="visibility" name="vtkMultiBlockDataSet" />
+          </Hints>
         </CompositeTreeDomain>
       </IntVectorProperty>
       <IntVectorProperty command="SetFieldAssociation"
@@ -9176,31 +9217,51 @@
         set. If ForcedCacheKey is true, it overrides UseCache and CacheKey.
         Instead, ForcedCacheKey is used.</Documentation>
       </DoubleVectorProperty>
-      <IntVectorProperty clean_command="RemoveAllCompositeDataSetIndices"
-                         command="AddCompositeDataSetIndex"
-                         name="CompositeDataSetIndex"
-                         number_of_elements_per_command="1"
-                         number_of_elements="1"
-                         default_values="0"
-                         panel_visibility="default"
-                         repeat_command="1">
-        <CompositeTreeDomain mode="all" name="tree">
+
+      <StringVectorProperty name="Assembly"
+        command="SetActiveAssemblyForSelectors"
+        number_of_elements="1"
+        default_values="Hierarchy"
+        panel_visibility="multiblock_inspector">
+        <DataAssemblyListDomain name="data_assembly">
           <RequiredProperties>
             <Property function="Input" name="Input" />
           </RequiredProperties>
-        </CompositeTreeDomain>
-        <Hints>
-          <WidgetHeight number_of_rows="20" />
-        </Hints>
+        </DataAssemblyListDomain>
         <Documentation>
-          In case of composite datasets, set the list of flat indices to
-          show in the spreadsheet view. If the input is not a composite dataset
-          the value is ignored. If nothing is selected for composite dataset, it
-          is same as selecting the root node i.e. all blocks in the dataset.
-          Note, then multiple blocks are being shown in the spreadsheet view,
-          partial arrays, if any are skipped.
+          Select which assembly is used when specify selectors
+          to choose blocks to show for composite datasets.
         </Documentation>
-      </IntVectorProperty>
+      </StringVectorProperty>
+
+      <StringVectorProperty name="BlockVisibilities"
+        command="AddSelector"
+        clean_command="ClearSelectors"
+        repeat_command="1"
+        number_of_elements_per_command="1"
+        panel_visibility="multiblock_inspector"
+        default_values="/">
+        <DataAssemblyDomain name="data_assembly">
+          <RequiredProperties>
+            <Property function="Input" name="Input" />
+            <Property function="ActiveAssembly" name="Assembly" />
+          </RequiredProperties>
+        </DataAssemblyDomain>
+        <Documentation>
+          For composite datasets, specify selectors to limit the view
+          to a chosen subset of blocks.
+        </Documentation>
+      </StringVectorProperty>
+
+      <PropertyGroup label="Blocks" panel_widget="DataAssemblyEditor"
+        panel_visibility="multiblock_inspector">
+        <Property name="Assembly" function="ActiveAssembly" />
+        <Property name="BlockVisibilities" function="Selectors" />
+        <Hints>
+          <DataAssemblyPropertyWidget use_inputname_as_header="1" />
+        </Hints>
+      </PropertyGroup>
+
       <InputProperty command="SetInputConnection"
                      is_internal="1"
                      name="InternalInput1"
@@ -9208,9 +9269,6 @@
         <Documentation>Internal property. Please don't touch
         this.</Documentation>
       </InputProperty>
-      <Hints>
-        <InitializationHelper class="vtkSMSpreadSheetRepresentationInitializationHelper" />
-      </Hints>
       <!-- end of SpreadSheetRepresentation -->
     </SpreadSheetRepresentationProxy>
     <!-- =================================================================== -->
@@ -12533,38 +12591,93 @@
                          number_of_elements="1">
         <BooleanDomain name="bool" />
       </IntVectorProperty>
-      <IntVectorProperty name="BlockVisibility"
-                         command="SetBlockVisibility"
-                         clean_command="RemoveBlockVisibilities"
-                         number_of_elements_per_command="2"
-                         repeatable="1">
+
+      <StringVectorProperty name="Assembly"
+        command="SetActiveAssembly"
+        number_of_elements="1"
+        default_values="Hierarchy"
+        panel_visibility="multiblock_inspector">
+        <DataAssemblyListDomain name="data_assembly">
+          <RequiredProperties>
+            <Property function="Input" name="Input" />
+          </RequiredProperties>
+        </DataAssemblyListDomain>
         <Documentation>
-          Set the visibility for blocks. In Python, assign the value from an interleaved
-          list of block indices and visibilities, e.g., [index1, visibility1, index2, visibility2, ...].
-          The list does not need to contain all block indices.
+          Select which assembly is used when specify selectors
+          to choose block visibilities, block colors, etc. for composite datasets.
         </Documentation>
-      </IntVectorProperty>
-      <DoubleMapProperty name="BlockColor"
-                         command="SetBlockColor"
-                         clean_command="RemoveBlockColors"
-                         number_of_components="3"
-                         repeatable="1">
+      </StringVectorProperty>
+
+      <StringVectorProperty name="BlockSelectors"
+        command="AddBlockSelector"
+        clean_command="RemoveAllBlockSelectors"
+        repeat_command="1"
+        number_of_elements_per_command="1"
+        panel_visibility="multiblock_inspector"
+        number_of_elements="1"
+        default_values="/">
+        <DataAssemblyDomain name="data_assembly">
+          <RequiredProperties>
+            <Property function="Input" name="Input" />
+            <Property function="ActiveAssembly" name="Assembly" />
+          </RequiredProperties>
+        </DataAssemblyDomain>
         <Documentation>
-          Set the colors for blocks.
-          In Python, assign the value from a dictionary of the form
-          {index1:, [r1, g1, b1], index2: [r2, g2, b2], ...}.
+          For composite datasets, specify selectors to limit the view
+          to a chosen subset of blocks.
         </Documentation>
-      </DoubleMapProperty>
-      <DoubleMapProperty name="BlockOpacity"
-                         command="SetBlockOpacity"
-                         clean_command="RemoveBlockOpacities"
-                         number_of_components="1"
-                         repeatable="1">
+      </StringVectorProperty>
+
+      <StringVectorProperty name="BlockColors"
+                            command="SetBlockColor"
+                            clean_command="RemoveAllBlockColors"
+                            element_types="2 1 1 1"
+                            number_of_elements_per_command="4"
+                            repeat_command="1"
+                            panel_visibility="multiblock_inspector">
+         <DataAssemblyDomain name="data_assembly">
+          <RequiredProperties>
+            <Property function="Input" name="Input" />
+            <Property function="ActiveAssembly" name="Assembly" />
+          </RequiredProperties>
+        </DataAssemblyDomain>
         <Documentation>
-          Set the opacity for blocks.
-          In Python, assign the value from a dictionary of the form {index1:, [a1], index2: [a2], ...}.
+          For composite datasets, specify colors associated with selectors
+          on the assembly chosen using **Assembly**.
         </Documentation>
-      </DoubleMapProperty>
+      </StringVectorProperty>
+
+      <StringVectorProperty name="BlockOpacities"
+                            command="SetBlockOpacity"
+                            clean_command="RemoveAllBlockOpacities"
+                            element_types="2 1"
+                            number_of_elements_per_command="2"
+                            repeat_command="1"
+                            panel_visibility="multiblock_inspector">
+         <DataAssemblyDomain name="data_assembly">
+          <RequiredProperties>
+            <Property function="Input" name="Input" />
+            <Property function="ActiveAssembly" name="Assembly" />
+          </RequiredProperties>
+        </DataAssemblyDomain>
+        <Documentation>
+          For composite datasets, specify opacities associated with selectors
+          on the assembly chosen using **Assembly**.
+        </Documentation>
+      </StringVectorProperty>
+
+      <PropertyGroup label="Blocks"
+                     panel_widget="DataAssemblyEditor"
+                     panel_visibility="multiblock_inspector">
+        <Property name="Assembly"       function="ActiveAssembly" />
+        <Property name="BlockSelectors" function="Selectors" />
+        <Property name="BlockColors"    function="Colors" />
+        <Property name="BlockOpacities" function="Opacities" />
+        <Hints>
+          <DataAssemblyPropertyWidget use_inputname_as_header="1" />
+        </Hints>
+      </PropertyGroup>
+
       <IntVectorProperty command="SetBlockColorsDistinctValues"
                          default_values="7"
                          name="BlockColorsDistinctValues"

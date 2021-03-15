@@ -13,110 +13,99 @@
 
 =========================================================================*/
 /**
- * @class   vtkPVArrayInformation
- * @brief   Data array information like type.
+ * @class vtkPVArrayInformation
+ * @brief provides meta data about arrays.
  *
- * This objects is for eliminating direct access to vtkDataObjects
- * by the "client".  Only vtkPVPart and vtkPVProcessModule should access
- * the data directly.  At the moment, this object is only a container
- * and has no useful methods for operating on data.
- * Note:  I could just use vtkDataArray objects and store the range
- * as values in the array.  This would eliminate this object.
-*/
+ * vtkPVArrayInformation provides meta-data about individual arrays. It is
+ * accessed through `vtkPVDataInformation` and provides information like ranges,
+ * component names, etc. for array present in a dataset.
+ */
 
 #ifndef vtkPVArrayInformation_h
 #define vtkPVArrayInformation_h
 
-#include "vtkPVInformation.h"
+#include "vtkObject.h"
 #include "vtkRemotingCoreModule.h" //needed for exports
+#include "vtkTuple.h"              // for vtkTuple
 
+#include <set>    // for std::set
 #include <string> // for std::string
 #include <vector> // for std::vector
 
 class vtkAbstractArray;
 class vtkClientServerStream;
-class vtkStringArray;
+class vtkGenericAttribute;
 
-class VTKREMOTINGCORE_EXPORT vtkPVArrayInformation : public vtkPVInformation
+class VTKREMOTINGCORE_EXPORT vtkPVArrayInformation : public vtkObject
 {
 public:
   static vtkPVArrayInformation* New();
-  vtkTypeMacro(vtkPVArrayInformation, vtkPVInformation);
+  vtkTypeMacro(vtkPVArrayInformation, vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  //@{
   /**
-   * DataType is the string name of the data type: VTK_FLOAT ...
-   * the value "VTK_VOID" means that different processes have different types.
+   * Resets to default state.
    */
-  vtkSetMacro(DataType, int);
+  void Initialize();
+
+  /**
+   * Get the type for values in the array e.g. VTK_FLOAT, VTK_DOUBLE etc.
+   */
   vtkGetMacro(DataType, int);
-  //@}
-
-  //@{
-  /**
-   * Set/get array's name
-   */
-  vtkSetStringMacro(Name);
-  vtkGetStringMacro(Name);
-  //@}
-
-  //@{
-  /**
-   * Changing the number of components clears the ranges back to the default.
-   */
-  void SetNumberOfComponents(int numComps);
-  vtkGetMacro(NumberOfComponents, int);
-  //@}
 
   /**
-   * Set the name for a component. Must be >= 1.
+   * Returns a printable string for the array value type.
    */
-  void SetComponentName(vtkIdType component, const char* name);
+  const char* GetDataTypeAsString() const { return vtkImageScalarTypeNameMacro(this->DataType); }
 
   /**
-   * Get the component name for a given component.
-   * Note: the const char* that is returned is only valid
-   * intill the next call to this method!
+   * Returns range as a string. For string arrays, this lists string values
+   * instead.
    */
-  const char* GetComponentName(vtkIdType component);
+  std::string GetRangesAsString() const;
 
-  //@{
   /**
-   * Set/get the array's length
+   * Get array's name
    */
-  vtkSetMacro(NumberOfTuples, vtkTypeInt64);
+  const char* GetName() const { return this->Name.empty() ? nullptr : this->Name.c_str(); }
+
+  /**
+   * Get number of components.
+   */
+  int GetNumberOfComponents() const;
+
+  /**
+   * Returns the name for a component. If none present, a default component
+   * name may be returned.
+   */
+  const char* GetComponentName(int component) const;
+
+  /**
+   * Returns the number of tuples in this array.
+   */
   vtkGetMacro(NumberOfTuples, vtkTypeInt64);
+
+  //@{
+  /**
+   * Returns component range. If component is `-1`, then the range of the
+   * magnitude (L2 norm) over all components will be provided.
+   *
+   * Returns invalid range for non-numeric arrays.
+   */
+  vtkTuple<double, 2> GetComponentRange(int comp) const;
+  void GetComponentRange(int comp, double range[2]) const;
   //@}
 
   //@{
   /**
-   * There is a range for each component.
-   * Range for component -1 is the range of the vector magnitude.
-   * The number of components should be set before these ranges.
+   * Returns the finite range for each component.
+   * If component is `-1`, then the range of the
+   * magnitude (L2 norm) over all components will be provided.
+   *
+   * Returns invalid range for non-numeric arrays.
    */
-  void SetComponentRange(int comp, double min, double max);
-  void SetComponentRange(int comp, double* range)
-  {
-    this->SetComponentRange(comp, range[0], range[1]);
-  }
-  double* GetComponentRange(int component) VTK_SIZEHINT(2);
-  void GetComponentRange(int comp, double range[2]);
-  //@}
-
-  //@{
-  /**
-   * There is a range for each component.
-   * Range for component -1 is the range of the vector magnitude.
-   * The number of components should be set before these ranges.
-   */
-  void SetComponentFiniteRange(int comp, double min, double max);
-  void SetComponentFiniteRange(int comp, double* range)
-  {
-    this->SetComponentFiniteRange(comp, range[0], range[1]);
-  }
-  double* GetComponentFiniteRange(int component);
-  void GetComponentFiniteRange(int comp, double range[2]);
+  vtkTuple<double, 2> GetComponentFiniteRange(int component) const;
+  void GetComponentFiniteRange(int comp, double range[2]) const;
   //@}
 
   /**
@@ -125,33 +114,7 @@ public:
    * data these will return (0,255).
    * Nothing particular for 12bits data is done
    */
-  void GetDataTypeRange(double range[2]);
-
-  /**
-   * Returns 1 if the array can be combined.
-   * It must have the same name and number of components.
-   */
-  int Compare(vtkPVArrayInformation* info);
-
-  void DeepCopy(vtkPVArrayInformation* info);
-
-  /**
-   * Transfer information about a single object into this object.
-   */
-  void CopyFromObject(vtkObject*) override;
-
-  /**
-   * Merge another information object.
-   */
-  void AddInformation(vtkPVInformation*) override;
-
-  //@{
-  /**
-   * Manage a serialized version of the information.
-   */
-  void CopyToStream(vtkClientServerStream*) override;
-  void CopyFromStream(const vtkClientServerStream*) override;
-  //@}
+  void GetDataTypeRange(double range[2]) const;
 
   //@{
   /**
@@ -159,32 +122,17 @@ public:
    * parts of a multi-block dataset. By default, IsPartial is
    * set to 0.
    */
-  vtkSetMacro(IsPartial, int);
-  vtkGetMacro(IsPartial, int);
-  //@}
-
-  /**
-   * Remove all infommation. Next add will be like a copy.
-   */
-  void Initialize();
-
-  //@{
-  /**
-   * Merge (union) keys into this object.
-   */
-  void AddInformationKeys(vtkPVArrayInformation* info);
-  void AddInformationKey(const char* location, const char* name);
-  void AddUniqueInformationKey(const char* location, const char* name);
+  vtkGetMacro(IsPartial, bool);
   //@}
 
   //@{
   /**
    * Get information on the InformationKeys of this array
    */
-  int GetNumberOfInformationKeys();
-  const char* GetInformationKeyLocation(int);
-  const char* GetInformationKeyName(int);
-  int HasInformationKey(const char* location, const char* name);
+  int GetNumberOfInformationKeys() const;
+  const char* GetInformationKeyLocation(int) const;
+  const char* GetInformationKeyName(int) const;
+  bool HasInformationKey(const char* location, const char* name) const;
   //@}
 
   //@{
@@ -195,40 +143,48 @@ public:
   const char* GetStringValue(int);
   //@}
 
+  void CopyFromArray(vtkAbstractArray* array);
+  void CopyFromGenericAttribute(vtkGenericAttribute* array);
+  void CopyToStream(vtkClientServerStream*) const;
+  bool CopyFromStream(const vtkClientServerStream*);
+
 protected:
   vtkPVArrayInformation();
   ~vtkPVArrayInformation() override;
 
-  /**
-   * Merge (union) ranges/values into this object.
-   */
-  void AddRanges(vtkPVArrayInformation* info);
-  void AddFiniteRanges(vtkPVArrayInformation* info);
-  void AddValues(vtkPVArrayInformation* info);
+  friend class vtkPVDataSetAttributesInformation;
+  friend class vtkPVDataInformation;
 
-  int IsPartial;
-  int DataType;
-  int NumberOfComponents;
-  vtkTypeInt64 NumberOfTuples;
-  char* Name;
-  double* Ranges;
-  double* FiniteRanges;
+  //@{
+  /**
+   * API for vtkPVDataSetAttributesInformation.
+   */
+  void DeepCopy(vtkPVArrayInformation* info);
+  void AddInformation(vtkPVArrayInformation*, int fieldAssociation);
+  vtkSetMacro(IsPartial, bool);
+  //@}
+
+  vtkSetMacro(Name, std::string);
+
+private:
+  std::string Name;
+  int DataType = -1;
+  vtkTypeInt64 NumberOfTuples = 0;
+  bool IsPartial = false;
+
+  struct ComponentInfo
+  {
+    vtkTuple<double, 2> Range = vtkTuple<double, 2>({ VTK_DOUBLE_MAX, -VTK_DOUBLE_MAX });
+    vtkTuple<double, 2> FiniteRange = vtkTuple<double, 2>({ VTK_DOUBLE_MAX, -VTK_DOUBLE_MAX });
+    std::string Name;
+    mutable std::string DefaultName;
+  };
+
+  std::vector<ComponentInfo> Components;
   std::vector<std::string> StringValues;
 
   // this array is used to store existing information keys (location/name pairs)
-
-  class vtkInternalInformationKeys;
-  vtkInternalInformationKeys* InformationKeys;
-
-  // this is used by GetComponentName, so that it always return a valid component name
-
-  std::string* DefaultComponentName;
-
-  /// assigns to a string to DefaultComponentName for this component
-  void DetermineDefaultComponentName(const int& component_no, const int& numComps);
-
-  class vtkInternalComponentNames;
-  vtkInternalComponentNames* ComponentNames;
+  std::set<std::pair<std::string, std::string> > InformationKeys;
 
   vtkPVArrayInformation(const vtkPVArrayInformation&) = delete;
   void operator=(const vtkPVArrayInformation&) = delete;

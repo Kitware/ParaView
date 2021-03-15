@@ -61,7 +61,7 @@ void vtkSerialize(vtkClientServerStream& css, vtkDataSetAttributes* dsa)
   for (int cc = 0, max = dsa->GetNumberOfArrays(); cc < max; ++cc)
   {
     vtkNew<vtkPVArrayInformation> arrayInfo;
-    arrayInfo->CopyFromObject(dsa->GetAbstractArray(cc));
+    arrayInfo->CopyFromArray(dsa->GetAbstractArray(cc));
 
     vtkClientServerStream acss;
     arrayInfo->CopyToStream(&acss);

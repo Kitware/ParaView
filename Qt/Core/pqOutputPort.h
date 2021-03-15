@@ -39,7 +39,6 @@ class pqDataRepresentation;
 class pqPipelineSource;
 class pqServer;
 class pqView;
-class vtkDataAssembly;
 class vtkPVDataInformation;
 class vtkPVTemporalDataInformation;
 class vtkSMOutputPort;
@@ -173,10 +172,9 @@ public:
   void setSelectionInput(vtkSMSourceProxy* src, int port);
 
   /**
-   * Returns vtkDataAssembly associated with the current output
-   * dataset on this port, if any.
+   * Returns a user friendly name for this port.
    */
-  vtkDataAssembly* dataAssembly() const;
+  QString prettyName() const;
 
 public Q_SLOTS:
   /**

@@ -4,6 +4,43 @@ Major API Changes             {#MajorAPIChanges}
 This page documents major API/design changes between different versions since we
 started tracking these (starting after version 4.2).
 
+Changes in 5.10
+----------------
+
+###Changes to vtkPVDataInformation###
+
+vtkPVDataInformation no longer builds a complete composite data hierarchy
+information. Thus, `vtkPVCompositeDataInformation` is no longer populated
+and hence removed. This simplifies the logic in vtkPVDataInformation
+considerably.
+
+vtkPVDataInformation now provides access to`vtkDataAssembly`
+representing the hierarchy for composite datasets. This can be used by
+application to support cases where information about the composite
+data hierarchy is needed. For vtkPartitionedDataSetCollection, which can
+have other assemblies associated with it, vtkPVDataInformation also
+collects those.
+
+For composite datasets, vtkPVDataInformation now gathers information
+about all unique leaf datatypes. This is useful for applications to
+determine exactly what type of datasets a composite dataset is comprised
+of.
+
+vtkPVTemporalDataInformation is now simply a subclass of
+vtkPVDataInformation. This is possible since vtkPVDataInformation no
+longer includes vtkPVCompositeDataInformation.
+
+
+###Extract Block###
+
+**Extract Block** filter now internally uses `vtkExtractBlockUsingDataAssembly`
+instead of `vtkExtractBlock`. Thus, the filter now uses selectors to select
+which blocks to extracts instead of composite indices. For applications
+requiring the older form, **ExtractBlockLegacy** proxy is still available. It
+may be worthwhile however to replace the code to use the new selector-based
+extract block filter. A composite index can be converted to a selector string as
+`//*[@cid='%d']` where `%d` is replaced by the actual composite index.
+
 Changes in 5.9
 --------------
 

@@ -31,12 +31,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ========================================================================*/
 #include "pqDataQueryReaction.h"
 
+#include "pqApplicationCore.h"
 #include "pqCoreUtilities.h"
-#include "pqFindDataDialog.h"
 
-#include <QMessageBox>
-
-static QPointer<pqFindDataDialog> pqFindDataSingleton;
+#include <QDockWidget>
 
 //-----------------------------------------------------------------------------
 pqDataQueryReaction::pqDataQueryReaction(QAction* parentObject)
@@ -48,21 +46,19 @@ pqDataQueryReaction::pqDataQueryReaction(QAction* parentObject)
 pqDataQueryReaction::~pqDataQueryReaction() = default;
 
 //-----------------------------------------------------------------------------
-void pqDataQueryReaction::showQueryDialog()
+void pqDataQueryReaction::showQueryPanel()
 {
-#if VTK_MODULE_ENABLE_ParaView_pqPython
-  if (pqFindDataSingleton.isNull())
+  // Raise the color editor is present in the application.
+  QDockWidget* widget =
+    qobject_cast<QDockWidget*>(pqApplicationCore::instance()->manager("FIND_DATA_PANEL"));
+  if (widget)
   {
-    pqFindDataDialog* dialog = new pqFindDataDialog(pqCoreUtilities::mainWidget());
-    pqFindDataSingleton = dialog;
+    widget->setVisible(true);
+    // widget->setFloating(true);
+    widget->raise();
   }
-
-  pqFindDataSingleton->show();
-  pqFindDataSingleton->raise();
-#else
-  QMessageBox::warning(0, "Selection Not Supported",
-    "Error: Find Data requires that ParaView be built with Python enabled. "
-    "To enable Python set the CMake flag 'PARAVIEW_USE_PYTHON' to True "
-    "and ensure that the 'ParaView::pqPython'module is available.");
-#endif
+  else
+  {
+    qDebug("Failed to find 'FIND_DATA_PANEL'.");
+  }
 }

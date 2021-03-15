@@ -205,6 +205,29 @@ vtkPVDataInformation* vtkSMDomain::GetInputDataInformation(const char* function,
 }
 
 //---------------------------------------------------------------------------
+vtkPVDataInformation* vtkSMDomain::GetInputSubsetDataInformation(
+  unsigned int compositeIndex, const char* function, unsigned int index)
+{
+  vtkSMProperty* inputProperty = this->GetRequiredProperty(function);
+  if (!inputProperty)
+  {
+    return nullptr;
+  }
+
+  vtkSMUncheckedPropertyHelper helper(inputProperty);
+  if (helper.GetNumberOfElements() > index)
+  {
+    vtkSMSourceProxy* sp = vtkSMSourceProxy::SafeDownCast(helper.GetAsProxy(index));
+    if (sp)
+    {
+      return sp->GetSubsetDataInformation(helper.GetOutputPort(), compositeIndex);
+    }
+  }
+
+  return nullptr;
+}
+
+//---------------------------------------------------------------------------
 void vtkSMDomain::AddRequiredProperty(vtkSMProperty* prop, const char* function)
 {
   if (!prop)
@@ -277,7 +300,7 @@ void vtkSMDomain::SetProperty(vtkSMProperty* prop)
 void vtkSMDomain::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
-  os << indent << "XMLName: " << (this->XMLName ? this->XMLName : "(null)") << endl;
+  os << indent << "XMLName: " << (this->XMLName ? this->XMLName : "(nullptr)") << endl;
   os << indent << "IsOptional: " << this->IsOptional << endl;
   os << indent << "Property: " << this->Internals->DomainProperty.GetPointer() << endl;
 }

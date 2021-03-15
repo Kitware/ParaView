@@ -133,7 +133,7 @@ private:
     MemorySize,
     GeometrySize,
     Bounds,
-    TimeSpan,
+    TimeRange,
     Max_Columns
   };
 };

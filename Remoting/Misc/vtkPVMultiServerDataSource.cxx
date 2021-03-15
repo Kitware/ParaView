@@ -22,7 +22,6 @@
 #include "vtkInformationVector.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
-#include "vtkPVCompositeDataInformation.h"
 #include "vtkPVDataInformation.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMSessionProxyManager.h"
@@ -56,7 +55,7 @@ struct vtkPVMultiServerDataSource::vtkInternal
     {
       this->OutputPortInformation->AddInformation(this->ExternalProxy->GetDataInformation());
       this->DataTypeToUse = this->OutputPortInformation->GetDataSetType();
-      if (this->OutputPortInformation->GetCompositeDataInformation()->GetDataIsComposite())
+      if (this->OutputPortInformation->IsCompositeDataSet())
       {
         this->DataTypeToUse = this->OutputPortInformation->GetCompositeDataSetType();
       }
@@ -113,7 +112,7 @@ void vtkPVMultiServerDataSource::FetchData(vtkDataObject* dataObjectToFill)
     int datasetType = this->Internal->OutputPortInformation->GetDataSetType();
 
     // Handle custom ones
-    if (this->Internal->OutputPortInformation->GetCompositeDataInformation()->GetDataIsComposite())
+    if (this->Internal->OutputPortInformation->IsCompositeDataSet())
     {
       postGatherHelperName = "vtkMultiBlockDataGroupFilter";
     }

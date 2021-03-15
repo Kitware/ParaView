@@ -79,6 +79,7 @@ set(classes
   vtkSMCompoundSourceProxyDefinitionBuilder
   vtkSMCoreUtilities
   vtkSMDataAssemblyDomain
+  vtkSMDataAssemblyListDomain
   vtkSMDataExtractWriterProxy
   vtkSMDataSourceProxy
   vtkSMDataTypeDomain
@@ -152,6 +153,7 @@ set(classes
   vtkSMReaderReloadHelper
   vtkSMRemoteObject
   vtkSMRemoteObjectUpdateUndoElement
+  vtkSMSelectionQueryDomain
   vtkSMSelfGeneratingSourceProxy
   vtkSMServerStateLocator
   vtkSMSession

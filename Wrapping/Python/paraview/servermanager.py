@@ -2457,20 +2457,20 @@ def Fetch(input, arg1=None, arg2=None, idx=0):
 
     #create the pipeline that reduces and transmits the data
     if arg1 == None:
-        cdinfo = input.GetDataInformation(idx).GetCompositeDataInformation()
-        if cdinfo.GetDataIsComposite():
+        dinfo = input.GetDataInformation(idx)
+        if dinfo.IsCompositeDataSet():
             paraview.print_debug_info("use composite data append")
             reducer.PostGatherHelperName = "vtkMultiBlockDataGroupFilter"
 
-        elif input.GetDataInformation(idx).GetDataClassName() == "vtkPolyData":
+        elif dinfo.GetDataClassName() == "vtkPolyData":
             paraview.print_debug_info("use append poly data filter")
             reducer.PostGatherHelperName = "vtkAppendPolyData"
 
-        elif input.GetDataInformation(idx).GetDataClassName() == "vtkRectilinearGrid":
+        elif dinfo.GetDataClassName() == "vtkRectilinearGrid":
             paraview.print_debug_info("use append rectilinear grid filter")
             reducer.PostGatherHelperName = "vtkAppendRectilinearGrid"
 
-        elif input.GetDataInformation(idx).IsA("vtkDataSet"):
+        elif dinfo.IsA("vtkDataSet"):
             paraview.print_debug_info("use unstructured append filter")
             reducer.PostGatherHelperName = "vtkAppendFilter"
 

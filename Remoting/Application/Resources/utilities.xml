@@ -722,6 +722,178 @@
       <ProxyProperty name="Writer" command="SetWriter" />
     </SourceProxy>
 
+    <!-- ================================================================= -->
+    <Proxy name="MultiBlockInspectorHelper">
+      <Documentation>
+        An internal proxy that is used by pqMultiBlockInspectorWidget
+        to aid in creating appropriate UI for allowing users to inspect
+        composite datasets and view/edit appearance properties.
+      </Documentation>
+
+      <InputProperty name="Input" />
+
+      <StringVectorProperty name="Assembly"
+        number_of_elements="1"
+        default_values="Hierarchy">
+        <DataAssemblyListDomain name="data_assembly_list">
+          <RequiredProperties>
+            <Property function="Input" name="Input" />
+          </RequiredProperties>
+        </DataAssemblyListDomain>
+        <Documentation>
+          Select which assembly is used when specify selectors
+          to choose blocks to show for composite datasets.
+        </Documentation>
+      </StringVectorProperty>
+
+      <StringVectorProperty name="Selectors"
+        repeat_command="1"
+        number_of_elements_per_command="1">
+        <DataAssemblyDomain name="data_assembly">
+          <RequiredProperties>
+            <Property function="Input" name="Input" />
+            <Property function="ActiveAssembly" name="Assembly" />
+          </RequiredProperties>
+        </DataAssemblyDomain>
+        <Documentation>
+          For composite datasets, specify selectors to limit the view
+          to a chosen subset of blocks.
+        </Documentation>
+      </StringVectorProperty>
+
+      <PropertyGroup label="AssemblyOnly" panel_widget="DataAssemblyEditor">
+        <Property name="Assembly"  function="ActiveAssembly" />
+        <Property name="Selectors" function="Selectors" />
+        <Hints>
+          <DataAssemblyPropertyWidget
+            is_checkable="0"
+            use_inputname_as_header="1" />
+        </Hints>
+      </PropertyGroup>
+      <!-- end of MultiBlockInspectorHelper -->
+    </Proxy>
+
+    <!-- ================================================================= -->
+    <Proxy name="FindDataHelper">
+      <!-- Deliberately making the names match the names for properties
+        on (sources, SelectionQuerySource) that way we can simply copy values
+        to it -->
+      <InputProperty name="Input"
+        label="Data Producer"
+        panel_widget="input_selector">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+      </InputProperty>
+
+      <IntVectorProperty name="ElementType"
+        number_of_elements="1"
+        default_values="0">
+        <Documentation>
+          Specify which type of mesh elements to select.
+        </Documentation>
+        <FieldDataDomain name="enum" use_element_types="1" />
+        <Hints>
+          <PropertyWidgetDecorator type="InputDataTypeDecorator"
+            mode="enabled_state" name="vtkDataObject" />
+        </Hints>
+      </IntVectorProperty>
+
+      <StringVectorProperty name="QueryString"
+        number_of_elements="1"
+        default_values=""
+        panel_widget="selection_query">
+        <Documentation>
+          Specify the query string to use to find data.
+        </Documentation>
+        <SelectionQueryDomain name="domain">
+          <RequiredProperties>
+            <Property name="ElementType" function="FieldAssociation" />
+            <Property name="Input" function="Input" />
+          </RequiredProperties>
+        </SelectionQueryDomain>
+      </StringVectorProperty>
+
+      <IntVectorProperty name="InsideOut"
+        label="Invert Selection"
+        number_of_elements="1"
+        default_values="0">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Invert the selection. Find elements that **don't**
+          match the chosen seletion criteria.
+        </Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="InputDataTypeDecorator"
+            mode="enabled_state" name="vtkDataObject" />
+        </Hints>
+      </IntVectorProperty>
+
+      <PropertyGroup label="Selection Criteria">
+        <Property name="Input" />
+        <Property name="ElementType" />
+        <Property name="QueryString" />
+        <Property name="InsideOut" />
+      </PropertyGroup>
+
+      <IntVectorProperty name="ProcessID"
+        default_values="-1"
+        number_of_elements="1">
+        <Hints>
+          <PropertyWidgetDecorator type="SessionTypeDecorator" mode="enabled_state"
+            requires="parallel_data_server" />
+        </Hints>
+      </IntVectorProperty>
+
+      <StringVectorProperty name="Assembly"
+        number_of_elements="1"
+        default_values="Hierarchy" >
+        <DataAssemblyListDomain name="data_assembly">
+          <RequiredProperties>
+            <Property function="Input" name="Input" />
+          </RequiredProperties>
+        </DataAssemblyListDomain>
+        <Documentation>
+          Select which assembly is used when specify selectors
+          to select blocks to extract.
+        </Documentation>
+      </StringVectorProperty>
+
+      <StringVectorProperty name="Selectors"
+        repeat_command="1"
+        number_of_elements_per_command="1"
+        number_of_elements="1"
+        default_values="/">
+        <DataAssemblyDomain name="data_assembly">
+          <RequiredProperties>
+            <Property function="Input" name="Input" />
+            <Property function="ActiveAssembly" name="Assembly" />
+          </RequiredProperties>
+        </DataAssemblyDomain>
+        <Documentation>
+          For composite datasets, specify selectors to limit the view
+          to a chosen subset of blocks.
+        </Documentation>
+      </StringVectorProperty>
+
+      <PropertyGroup label="Selection Qualifiers" >
+        <Property name="ProcessID" />
+      </PropertyGroup>
+
+      <PropertyGroup label="Block Selectors" panel_widget="DataAssemblyEditor">
+        <Property name="Assembly" function="ActiveAssembly" />
+        <Property name="Selectors" function="Selectors" />
+        <Hints>
+          <PropertyWidgetDecorator type="InputDataTypeDecorator"
+            mode="visibility"
+            name="vtkMultiBlockDataSet vtkPartitionedDataSetCollection" />
+        </Hints>
+      </PropertyGroup>
+
+      <!-- end of FindDataHelper -->
+    </Proxy>
+
     <!-- End of group "misc" -->
   </ProxyGroup>
 

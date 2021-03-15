@@ -25,7 +25,6 @@
 #include "vtkInformation.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
-#include "vtkPVCompositeDataInformation.h"
 #include "vtkPVDataInformation.h"
 #include "vtkPVExtractSelection.h"
 #include "vtkPVRenderView.h"
@@ -151,9 +150,7 @@ vtkDataObject* vtkSMTooltipSelectionPipeline::ConnectPVMoveSelectionToClient(
   inputProperty->AddInputConnection(source, sourceOutputPort);
   // set postGatherHelperName
   std::string postGatherHelperName;
-  if (source->GetDataInformation(sourceOutputPort)
-        ->GetCompositeDataInformation()
-        ->GetDataIsComposite())
+  if (source->GetDataInformation(sourceOutputPort)->IsCompositeDataSet())
   {
     postGatherHelperName = "vtkMultiBlockDataGroupFilter";
   }

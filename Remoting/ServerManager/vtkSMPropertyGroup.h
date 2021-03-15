@@ -72,7 +72,12 @@ public:
 
   // Description:
   // Adds \p property to the group. function can be nullptr.
-  void AddProperty(const char* function, vtkSMProperty* property);
+  void AddProperty(const char* function, vtkSMProperty* property, const char* name = nullptr);
+
+  /**
+   * Returns the name for a property at the given index.
+   */
+  const char* GetPropertyName(unsigned int index) const;
 
   // Description:
   // Returns the property at \p index.

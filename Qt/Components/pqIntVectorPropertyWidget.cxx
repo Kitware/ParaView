@@ -48,7 +48,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSmartPointer.h"
 
 #include "pqComboBoxDomain.h"
-#include "pqCompositeTreePropertyWidget.h"
 #include "pqIntRangeWidget.h"
 #include "pqLabel.h"
 #include "pqLineEdit.h"
@@ -168,7 +167,7 @@ pqIntVectorPropertyWidget::pqIntVectorPropertyWidget(
   }
   else if (vtkSMCompositeTreeDomain::SafeDownCast(domain))
   {
-    // Should have been handled by pqCompositeTreePropertyWidget.
+    // Should have been handled by pqDataAssemblyPropertyWidget.
     abort();
   }
   else if (vtkSMIntRangeDomain* range = vtkSMIntRangeDomain::SafeDownCast(domain))
@@ -267,10 +266,5 @@ pqIntVectorPropertyWidget::~pqIntVectorPropertyWidget() = default;
 pqPropertyWidget* pqIntVectorPropertyWidget::createWidget(
   vtkSMIntVectorProperty* smproperty, vtkSMProxy* smproxy, QWidget* parent)
 {
-  if (smproperty != nullptr && smproperty->FindDomain<vtkSMCompositeTreeDomain>() != nullptr)
-  {
-    return new pqCompositeTreePropertyWidget(smproperty, smproxy, parent);
-  }
-
   return new pqIntVectorPropertyWidget(smproperty, smproxy, parent);
 }

@@ -31,8 +31,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ========================================================================*/
 #include "pqIntegrationModelSurfaceHelperWidget.h"
 
+#include "vtkDataAssembly.h"
+#include "vtkDataAssemblyVisitor.h"
+#include "vtkDataObjectTypes.h"
 #include "vtkLagrangianSurfaceHelper.h"
-#include "vtkPVCompositeDataInformation.h"
+#include "vtkObjectFactory.h"
 #include "vtkPVDataInformation.h"
 #include "vtkSMDoubleVectorProperty.h"
 #include "vtkSMInputProperty.h"
@@ -230,43 +233,97 @@ void pqIntegrationModelSurfaceHelperWidget::resetSurfaceWidget(bool force)
   }
 }
 
+namespace
+{
+// This relies on the internals of how  hierarchy is built in
+// vtkDataAssemblyUtilities -- something that I do not like. However, this needs
+// more work to cleanup and hence taking this shortcut for now.
+class LeafVistor : public vtkDataAssemblyVisitor
+{
+public:
+  static LeafVistor* New();
+  vtkTypeMacro(LeafVistor, vtkDataAssemblyVisitor);
+
+  void Visit(int nodeid) override
+  {
+    auto assembly = this->GetAssembly();
+    auto vtk_type = assembly->GetAttributeOrDefault(nodeid, "vtk_type", VTK_DATA_OBJECT);
+    if (!vtkDataObjectTypes::TypeIdIsA(vtk_type, VTK_COMPOSITE_DATA_SET) ||
+      vtkDataObjectTypes::TypeIdIsA(vtk_type, VTK_MULTIPIECE_DATA_SET))
+    {
+      // this is a leaf node; add it's name.
+      this->AppendLeaf(nodeid);
+    }
+  }
+
+  void BeginSubTree(int nodeid) override
+  {
+    auto assembly = this->GetAssembly();
+    const char* label =
+      nodeid == 0 ? nullptr : assembly->GetAttributeOrDefault(nodeid, "label", nullptr);
+    this->Labels.push_back(label ? std::string(label) : std::string());
+  }
+
+  void EndSubTree(int) override { this->Labels.pop_back(); }
+
+  void GetLeaves(vtkStringArray* names) const
+  {
+    for (const auto& leaf : this->Leaves)
+    {
+      names->InsertNextValue(leaf.c_str());
+    }
+  }
+
+protected:
+  LeafVistor() = default;
+
+  void AppendLeaf(int nodeid)
+  {
+    const int index = static_cast<int>(this->Leaves.size());
+    std::ostringstream stream;
+    stream << index << ":";
+    for (const auto& name : this->Labels)
+    {
+      stream << name;
+      if (!name.empty())
+      {
+        stream << "/";
+      }
+    }
+
+    auto assembly = this->GetAssembly();
+    stream << assembly->GetAttributeOrDefault(nodeid, "label", "");
+    this->Leaves.push_back(stream.str());
+  }
+
+private:
+  LeafVistor(const LeafVistor&) = delete;
+  void operator=(const LeafVistor&) = delete;
+
+  std::vector<std::string> Labels;
+  std::vector<std::string> Leaves;
+};
+
+vtkStandardNewMacro(LeafVistor);
+
+} // end of namespace
+
 //-----------------------------------------------------------------------------
 vtkStringArray* pqIntegrationModelSurfaceHelperWidget::fillLeafNames(
   vtkPVDataInformation* info, QString baseName, vtkStringArray* names)
 {
-  vtkPVCompositeDataInformation* cinfo = info->GetCompositeDataInformation();
-  if (cinfo)
+  auto hierarchy = info->GetHierarchy();
+  if (!info->IsCompositeDataSet() || hierarchy == nullptr)
   {
-    if (!cinfo->GetDataIsComposite())
-    {
-      names->InsertNextValue("Single DataSet");
-    }
-    else
-    {
-      // For each child
-      for (unsigned int i = 0; i < cinfo->GetNumberOfChildren(); i++)
-      {
-        vtkPVDataInformation* tmpInfo = cinfo->GetDataInformation(i);
-        if (tmpInfo)
-        {
-          vtkPVCompositeDataInformation* tmpCinfo = tmpInfo->GetCompositeDataInformation();
-          if (tmpCinfo->GetDataIsComposite() && !tmpCinfo->GetDataIsMultiPiece())
-          {
-            // Recursive call if the child is multiblock
-            pqIntegrationModelSurfaceHelperWidget::fillLeafNames(
-              tmpInfo, baseName + QString(cinfo->GetName(i)) + QString("/"), names);
-          }
-          else
-          {
-            // Recover name if the child is not
-            names->InsertNextValue((QString::number(names->GetNumberOfValues()) + QString(":") +
-                                     baseName + cinfo->GetName(i))
-                                     .toStdString());
-          }
-        }
-      }
-    }
+    names->InsertNextValue("Single DataSet");
   }
+  else
+  {
+    vtkNew<LeafVistor> visitor;
+    hierarchy->Visit(visitor, /*traversal_order=*/vtkDataAssembly::TraversalOrder::DepthFirst);
+    visitor->GetLeaves(names);
+  }
+
   return names;
 }
 

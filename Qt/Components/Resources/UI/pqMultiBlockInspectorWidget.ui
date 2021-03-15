@@ -13,27 +13,26 @@
   <property name="windowTitle">
    <string>Multi-block Inspector</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout">
+  <layout class="QVBoxLayout" name="verticalLayout" stretch="1,0,0">
    <property name="spacing">
     <number>2</number>
    </property>
    <item>
-    <widget class="pqTreeView" name="treeView">
-     <property name="contextMenuPolicy">
-      <enum>Qt::CustomContextMenu</enum>
-     </property>
-     <property name="selectionMode">
-      <enum>QAbstractItemView::ExtendedSelection</enum>
-     </property>
-     <property name="uniformRowHeights">
-      <bool>true</bool>
-     </property>
-     <property name="headerHidden">
-      <bool>true</bool>
-     </property>
-     <property name="expandsOnDoubleClick">
-      <bool>false</bool>
-     </property>
+    <widget class="QWidget" name="container" native="true">
+     <layout class="QVBoxLayout" name="containerLayout">
+      <property name="leftMargin">
+       <number>0</number>
+      </property>
+      <property name="topMargin">
+       <number>0</number>
+      </property>
+      <property name="rightMargin">
+       <number>0</number>
+      </property>
+      <property name="bottomMargin">
+       <number>0</number>
+      </property>
+     </layout>
     </widget>
    </item>
    <item>
@@ -88,13 +87,6 @@
    </item>
   </layout>
  </widget>
- <customwidgets>
-  <customwidget>
-   <class>pqTreeView</class>
-   <extends>QTreeView</extends>
-   <header>pqTreeView.h</header>
-  </customwidget>
- </customwidgets>
  <resources>
   <include location="../pqComponents.qrc"/>
  </resources>

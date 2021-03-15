@@ -126,12 +126,16 @@ public:
    */
   vtkSMProperty* GetProperty();
 
+  //@{
   /**
-   * Helper method to get vtkPVDataInformation from input proxy connected to the
+   * Helper methods to get vtkPVDataInformation from input proxy connected to the
    * required property with the given function and provided input index.
    */
   virtual vtkPVDataInformation* GetInputDataInformation(
     const char* function, unsigned int index = 0);
+  virtual vtkPVDataInformation* GetInputSubsetDataInformation(
+    unsigned int compositeIndex, const char* function, unsigned int index = 0);
+  //@}
 
   /**
    * Helper method to get the number of input connections hence the number of available
@@ -139,6 +143,13 @@ public:
    * from input proxy connected to the required property with the given function.
    */
   virtual unsigned int GetNumberOfInputConnections(const char* function);
+
+  /**
+   * Returns a given required property of the given function.
+   * Function is a string associated with the require property
+   * in the XML file.
+   */
+  vtkSMProperty* GetRequiredProperty(const char* function);
 
 protected:
   vtkSMDomain();
@@ -181,13 +192,6 @@ protected:
   virtual int ReadXMLAttributes(vtkSMProperty* prop, vtkPVXMLElement* elem);
 
   friend class vtkSMProperty;
-
-  /**
-   * Returns a given required property of the given function.
-   * Function is a string associated with the require property
-   * in the XML file.
-   */
-  vtkSMProperty* GetRequiredProperty(const char* function);
 
   /**
    * Remove the given property from the required properties list.

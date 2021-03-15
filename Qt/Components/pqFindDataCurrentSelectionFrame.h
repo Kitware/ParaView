@@ -79,12 +79,6 @@ private Q_SLOTS:
   void updateFieldType();
 
   /**
-  * set the value for the "invert selection" property on the extract-selection
-  * source to the one specified.
-  */
-  void invertSelection(bool);
-
-  /**
   * update the data shown in the spreadsheet aka render the spreadsheet.
   */
   void updateSpreadSheet();

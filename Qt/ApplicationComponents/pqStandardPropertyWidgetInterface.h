@@ -76,7 +76,8 @@ public:
    * \li \c viewtype_selector: pqViewTypePropertyWidget
    * \li \c view_resolution: pqViewResolutionPropertyWidget
    * \li \c pause_livesource: pqPauseLiveSourcePropertyWidget
-   * \li \c data_assembly: pqDataAssemblyPropertyWidget
+   * \li \c data_assembly_editor: pqDataAssemblyPropertyWidget
+   * \li \c selection_query : pqSelectionQueryPropertyWidget
    */
   pqPropertyWidget* createWidgetForProperty(
     vtkSMProxy* proxy, vtkSMProperty* property, QWidget* parentWidget) override;
@@ -124,6 +125,7 @@ public:
    * \li \c OSPRayHidingDecorator: pqOSPRayHidingDecorator
    * \li \c MultiComponentsDecorator: pqMultiComponentsDecorator
    * \li \c CompositeDecorator: pqCompositePropertyWidgetDecorator
+   * \li \c SessionTypeDecorator: pqSessionTypeDecorator
    */
   pqPropertyWidgetDecorator* createWidgetDecorator(
     const QString& type, vtkPVXMLElement* config, pqPropertyWidget* widget) override;

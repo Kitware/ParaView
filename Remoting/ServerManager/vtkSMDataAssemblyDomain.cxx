@@ -16,14 +16,12 @@
 
 #include "vtkDataAssembly.h"
 #include "vtkObjectFactory.h"
-#include "vtkSMOutputPort.h"
-#include "vtkSMSourceProxy.h"
+#include "vtkPVDataInformation.h"
 #include "vtkSMUncheckedPropertyHelper.h"
 
 vtkStandardNewMacro(vtkSMDataAssemblyDomain);
 //----------------------------------------------------------------------------
 vtkSMDataAssemblyDomain::vtkSMDataAssemblyDomain()
-  : DataAssemblyValid(false)
 {
 }
 
@@ -31,33 +29,55 @@ vtkSMDataAssemblyDomain::vtkSMDataAssemblyDomain()
 vtkSMDataAssemblyDomain::~vtkSMDataAssemblyDomain() = default;
 
 //----------------------------------------------------------------------------
-void vtkSMDataAssemblyDomain::Update(vtkSMProperty* requestingProperty)
+void vtkSMDataAssemblyDomain::Update(vtkSMProperty*)
 {
-  this->DataAssemblyValid = false;
-  this->Superclass::Update(requestingProperty);
+  auto dinfo = this->GetInputDataInformation("Input");
+  if (!dinfo)
+  {
+    this->ChooseAssembly({}, nullptr);
+  }
+  else
+  {
+    auto activeAssembly = this->GetRequiredProperty("ActiveAssembly");
+    if (!activeAssembly)
+    {
+      this->ChooseAssembly("Hierarchy", dinfo->GetHierarchy());
+    }
+    else
+    {
+      const std::string name{ vtkSMUncheckedPropertyHelper(activeAssembly).GetAsString(0) };
+      if (name == "Hierarchy")
+      {
+        this->ChooseAssembly(name, dinfo->GetHierarchy());
+      }
+      else if (name == "Assembly")
+      {
+        this->ChooseAssembly(name, dinfo->GetDataAssembly());
+      }
+    }
+  }
 }
 
 //----------------------------------------------------------------------------
-vtkDataAssembly* vtkSMDataAssemblyDomain::GetDataAssembly()
+vtkDataAssembly* vtkSMDataAssemblyDomain::GetDataAssembly() const
 {
-  if (this->DataAssemblyValid)
-  {
-    return this->DataAssembly;
-  }
+  return this->Assembly;
+}
 
-  auto inputProperty = this->GetRequiredProperty("Input");
-  this->DataAssembly = nullptr;
-  vtkSMUncheckedPropertyHelper helper(inputProperty);
-  auto proxy = vtkSMSourceProxy::SafeDownCast(helper.GetAsProxy(0));
-  auto port = helper.GetOutputPort(0);
-  this->DataAssembly = (proxy ? proxy->GetOutputPort(port)->GetDataAssembly() : nullptr);
-  this->DataAssemblyValid = true;
-  return this->DataAssembly;
+//----------------------------------------------------------------------------
+void vtkSMDataAssemblyDomain::ChooseAssembly(const std::string& name, vtkDataAssembly* assembly)
+{
+  if (this->Name != name || assembly != this->Assembly ||
+    (assembly != nullptr && assembly->GetMTime() > this->GetMTime()))
+  {
+    this->Name = name;
+    this->Assembly = assembly;
+    this->DomainModified();
+  }
 }
 
 //----------------------------------------------------------------------------
 void vtkSMDataAssemblyDomain::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
-  os << indent << "DataAssembly: " << this->DataAssembly << endl;
 }

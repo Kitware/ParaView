@@ -17,7 +17,6 @@
 #include "vtkMultiBlockDataSet.h"
 #include "vtkNew.h"
 #include "vtkPVArrayInformation.h"
-#include "vtkPVCompositeDataInformation.h"
 #include "vtkPVDataInformation.h"
 #include "vtkPointData.h"
 #include "vtkPolyData.h"
@@ -110,10 +109,12 @@ int TestPartialArraysInformation(int, char* [])
     return EXIT_FAILURE;
   }
 
-  vtkPVDataInformation* b1info = info->GetCompositeDataInformation()
-                                   ->GetDataInformation(0)
-                                   ->GetCompositeDataInformation()
-                                   ->GetDataInformation(1);
+  // Now gather information for a specific block.
+  vtkNew<vtkPVDataInformation> b1info;
+  b1info->SetSubsetAssemblyNameToHierarchy();
+  b1info->SetSubsetSelector("//Block0/Block1");
+  b1info->CopyFromObject(root.Get());
+
   if (b1info->GetArrayInformation("cd0", vtkDataObject::CELL) == nullptr)
   {
     cerr << "ERROR: failed to find `cd0` on block 1." << endl;

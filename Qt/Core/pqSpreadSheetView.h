@@ -88,13 +88,6 @@ protected Q_SLOTS:
   void updateRepresentationVisibility(pqRepresentation* repr, bool visible);
 
   /**
-  * Called at start of every render.
-  * If in "selection-only" mode, and showing composite dataset, we want to make
-  * sure that we are shown a block with non-empty cells/points (if possible).
-  */
-  void onBeginRender();
-
-  /**
   * Called at end of every render. We update the table view.
   */
   void onEndRender();
