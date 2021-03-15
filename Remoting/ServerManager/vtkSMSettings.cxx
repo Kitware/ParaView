@@ -1154,8 +1154,8 @@ bool vtkSMSettings::SaveSettingsToFile(const std::string& filePath)
   bool createdDirectory = vtksys::SystemTools::MakeDirectory(directory.c_str());
   if (!createdDirectory)
   {
-    vtkErrorMacro(<< "Directory '" << directory << "' does not exist and could "
-                  << "not be created.");
+    vtkWarningMacro(<< "Directory '" << directory << "' does not exist and could "
+                    << "not be created.");
     return false;
   }
 

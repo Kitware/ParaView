@@ -82,24 +82,32 @@ set(simple_scripts
   package_test
   package_test_zip.zip)
 
-paraview_add_test(
-  PREFIX "Catalyst::WaveletMiniApp"
-  ARGS   "$<TARGET_FILE:ParaView::pvbatch>" -dr -sym -m paraview.demos.wavelet_miniapp -t 20 --size 21 -s
-  TEST_SCRIPTS ${simple_scripts})
+if (NOT PARAVIEW_SERIAL_TESTS_USE_MPIEXEC)
+  # no need to add these non-MPI tests if serial tests are going to use MPI
+  # anyways. The have another `paraview_add_test_mpi` invocation right after this
+  # to handle it.
+  paraview_add_test(
+    PREFIX "Catalyst::WaveletMiniApp"
+    ARGS   "$<TARGET_FILE:ParaView::pvbatch>" -dr -sym -m paraview.demos.wavelet_miniapp -t 20 --size 21 -s
+    TEST_SCRIPTS ${simple_scripts})
+endif()
+
 paraview_add_test_mpi(
   PREFIX "Catalyst::MPI::WaveletMiniApp"
   ARGS   "$<TARGET_FILE:ParaView::pvbatch>" -dr -sym -m paraview.demos.wavelet_miniapp -t 20 --size 21 -s
   TEST_SCRIPTS ${simple_scripts})
 
 foreach (tname IN LISTS scripts)
+  if (NOT PARAVIEW_SERIAL_TESTS_USE_MPIEXEC)
     set_tests_properties("Catalyst::WaveletMiniApp.${tname}"
       PROPERTIES
         PASS_REGULAR_EXPRESSION "All ok")
-    if (PARAVIEW_USE_MPI)
-        set_tests_properties("Catalyst::MPI::WaveletMiniApp.${tname}"
-          PROPERTIES
-            PASS_REGULAR_EXPRESSION "All ok")
-    endif()
+  endif()
+  if (PARAVIEW_USE_MPI)
+    set_tests_properties("Catalyst::MPI::WaveletMiniApp.${tname}"
+      PROPERTIES
+        PASS_REGULAR_EXPRESSION "All ok")
+  endif()
 endforeach()
 
 #--------------------------------------------------------------------
@@ -149,27 +157,31 @@ set_tests_properties(
 set(filedriver_tests
    ValidateChangingTime.py)
 
-paraview_add_test(
-  PREFIX "Catalyst::FileDriverMiniApp::Wavelet"
-  ARGS  "$<TARGET_FILE:ParaView::pvbatch>" -dr -sym
-        -m paraview.demos.filedriver_miniapp
-        -g "${paraview_test_data_directory_output}/Testing/Data/Wavelet/*.pvti"
-        -s
-  TEST_SCRIPTS ${filedriver_tests})
+if (NOT PARAVIEW_SERIAL_TESTS_USE_MPIEXEC)
+  # if PARAVIEW_SERIAL_TESTS_USE_MPIEXEC, the paraview_add_test_mpi
+  # call and this will be duplicates, so no need to do these here.
+  paraview_add_test(
+    PREFIX "Catalyst::FileDriverMiniApp::Wavelet"
+    ARGS  "$<TARGET_FILE:ParaView::pvbatch>" -dr -sym
+          -m paraview.demos.filedriver_miniapp
+          -g "${paraview_test_data_directory_output}/Testing/Data/Wavelet/*.pvti"
+          -s
+    TEST_SCRIPTS ${filedriver_tests})
+
+  paraview_add_test(
+    PREFIX "Catalyst::FileDriverMiniApp::Can"
+    ARGS  "$<TARGET_FILE:ParaView::pvbatch>" -dr -sym
+          -m paraview.demos.filedriver_miniapp
+          -g "${paraview_test_data_directory_output}/Testing/Data/can_vtm/*.vtm"
+          -s
+    TEST_SCRIPTS ${filedriver_tests})
+endif()
 
 paraview_add_test_mpi(
   PREFIX "Catalyst::MPI::FileDriverMiniApp::Wavelet"
   ARGS  "$<TARGET_FILE:ParaView::pvbatch>" -dr -sym
         -m paraview.demos.filedriver_miniapp
         -g "${paraview_test_data_directory_output}/Testing/Data/Wavelet/*.pvti"
-        -s
-  TEST_SCRIPTS ${filedriver_tests})
-
-paraview_add_test(
-  PREFIX "Catalyst::FileDriverMiniApp::Can"
-  ARGS  "$<TARGET_FILE:ParaView::pvbatch>" -dr -sym
-        -m paraview.demos.filedriver_miniapp
-        -g "${paraview_test_data_directory_output}/Testing/Data/can_vtm/*.vtm"
         -s
   TEST_SCRIPTS ${filedriver_tests})
 
