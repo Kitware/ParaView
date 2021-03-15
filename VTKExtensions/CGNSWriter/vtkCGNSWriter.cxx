@@ -313,8 +313,13 @@ bool vtkCGNSWriter::vtkPrivate::WritePolygonalZone(
 bool vtkCGNSWriter::vtkPrivate::WritePointSet(
   write_info& info, vtkPointSet* grid, const char* zonename, string& error)
 {
-  cgsize_t nPts = static_cast<cgsize_t>(grid->GetNumberOfPoints());
-  cgsize_t nCells = static_cast<cgsize_t>(grid->GetNumberOfCells());
+  const cgsize_t nPts = static_cast<cgsize_t>(grid->GetNumberOfPoints());
+  const cgsize_t nCells = static_cast<cgsize_t>(grid->GetNumberOfCells());
+  if (nPts == 0 && nCells == 0)
+  {
+    // don't write anything
+    return true;
+  }
   cgsize_t dim[3] = { nPts, nCells, 0 };
 
   bool isPolygonal(false);
@@ -515,6 +520,11 @@ bool vtkCGNSWriter::vtkPrivate::WriteBase(write_info& info, const char* basename
 bool vtkCGNSWriter::vtkPrivate::WriteStructuredGrid(
   write_info& info, vtkStructuredGrid* sg, const char* zonename, string& error)
 {
+  if (sg->GetNumberOfCells() == 0 && sg->GetNumberOfPoints() == 0)
+  {
+    // don't write anything
+    return true;
+  }
   cgsize_t dim[9];
 
   // set the dimensions
@@ -719,6 +729,12 @@ bool vtkCGNSWriter::vtkPrivate::WriteMultiBlock(
   write_info& info, vtkMultiBlockDataSet* mb, string& error)
 {
   vector<entry> surfaceBlocks, volumeBlocks;
+  if (mb->GetNumberOfCells() == 0 && mb->GetNumberOfPoints() == 0)
+  {
+    // don't write anything
+    return true;
+  }
+
   Flatten(mb, surfaceBlocks, volumeBlocks, 0);
 
   if (volumeBlocks.size() > 0)
