@@ -41,12 +41,6 @@ if (USE_CATALYST)
     PRIVATE
       catalyst::catalyst)
 
-  # when using Conduit's C++ API to ease creation of conduit nodes, you have
-  # explicitly link against `catalyst::conduit` target.
-  target_link_libraries(CxxImageDataExampleV2
-    PRIVATE
-      catalyst::conduit)
-
   include(CTest)
   if (BUILD_TESTING)
     add_test(
