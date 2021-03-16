@@ -32,6 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef pqMenuReactionUtils_h
 #define pqMenuReactionUtils_h
 
+#include "pqApplicationComponentsModule.h" // for exports
 #include <QString>
 
 class vtkSMDomain;
@@ -50,14 +51,14 @@ namespace pqMenuReactionUtils
 /**
  * Generates a QString with an error helper message for a given vtkSMDomain
  */
-QString getDomainDisplayText(vtkSMDomain* domain);
+PQAPPLICATIONCOMPONENTS_EXPORT QString getDomainDisplayText(vtkSMDomain* domain);
 
 /**
  * Gets the vtkSMInputProperty for a given vtkSMProxy.
  *
  * @return nullptr_t if a proxy has no vtkSMInputProperty
  */
-vtkSMInputProperty* getInputProperty(vtkSMProxy* proxy);
+PQAPPLICATIONCOMPONENTS_EXPORT vtkSMInputProperty* getInputProperty(vtkSMProxy* proxy);
 }
 
 #endif
