@@ -147,15 +147,16 @@ const char* vtkPVArrayInformation::GetComponentName(int component) const
 }
 
 //----------------------------------------------------------------------------
-vtkTuple<double, 2> vtkPVArrayInformation::GetComponentRange(int comp) const
+const double* vtkPVArrayInformation::GetComponentRange(int comp) const
 {
   try
   {
-    return this->Components.at(comp + 1).Range;
+    return this->Components.at(comp + 1).Range.GetData();
   }
   catch (std::out_of_range&)
   {
-    return vtkTuple<double, 2>({ VTK_DOUBLE_MAX, -VTK_DOUBLE_MAX });
+    vtkErrorMacro("Invalid component number " << comp);
+    return nullptr;
   }
 }
 
@@ -168,15 +169,16 @@ void vtkPVArrayInformation::GetComponentRange(int comp, double range[2]) const
 }
 
 //----------------------------------------------------------------------------
-vtkTuple<double, 2> vtkPVArrayInformation::GetComponentFiniteRange(int comp) const
+const double* vtkPVArrayInformation::GetComponentFiniteRange(int comp) const
 {
   try
   {
-    return this->Components.at(comp + 1).FiniteRange;
+    return this->Components.at(comp + 1).FiniteRange.GetData();
   }
   catch (std::out_of_range&)
   {
-    return vtkTuple<double, 2>({ VTK_DOUBLE_MAX, -VTK_DOUBLE_MAX });
+    vtkErrorMacro("Invalid component number " << comp);
+    return nullptr;
   }
 }
 
