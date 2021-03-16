@@ -178,6 +178,10 @@ void pqAboutDialog::AddClientInformation()
   ::addItem(tree, "MPI Enabled", "Off");
 #endif
 
+#ifdef PARAVIEW_BUILD_ID
+  ::addItem(tree, "ParaView Build ID", PARAVIEW_BUILD_ID);
+#endif
+
   ::addItem(tree, "Disable Registry", opts->GetDisableRegistry() ? "On" : "Off");
   ::addItem(tree, "Test Directory", opts->GetTestDirectory());
   ::addItem(tree, "Data Directory", opts->GetDataDirectory());

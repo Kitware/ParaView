@@ -181,6 +181,12 @@ set_property(SOURCE pqComponentsInit.cxx APPEND
   PROPERTY
     COMPILE_DEFINITIONS "BUILD_SHARED_LIBS=${built_shared}")
 
+if (PARAVIEW_BUILD_ID)
+  set_property(SOURCE pqAboutDialog.cxx APPEND
+    PROPERTY
+      COMPILE_DEFINITIONS "PARAVIEW_BUILD_ID=\"${PARAVIEW_BUILD_ID}\"")
+endif ()
+
 set(headers
   pqPluginTreeWidget.h)
 
