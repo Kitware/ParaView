@@ -5,6 +5,8 @@
 
 PROGRAM coproc
   use tcp
+  use catalyst
+  use catalyst_python
   implicit none
   include 'mpif.h'
   integer,parameter :: nx=100,ny=100,nz=100,ntime=10
@@ -17,7 +19,7 @@ PROGRAM coproc
   call mpi_comm_size(MPI_COMM_WORLD, numtasks, ierr)
   call mpi_comm_rank(MPI_COMM_WORLD, rank, ierr)
 
-  call coprocessorinitializewithpython("coproc.py",9)
+  call catalyst_initialize_with_python("coproc.py")
 
   ! partition in the x-direction only
   nxstart=rank*nx/numtasks+1
@@ -50,7 +52,7 @@ PROGRAM coproc
   enddo
   deallocate(psi01)
 
-  call coprocessorfinalize()
+  call catalyst_finalize()
   call mpi_finalize(ierr)
 
 end program coproc

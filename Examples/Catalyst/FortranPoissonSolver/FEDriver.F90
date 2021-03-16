@@ -1,6 +1,7 @@
 PROGRAM coproc
 #ifdef USE_CATALYST
   use CoProcessor               ! ParaView Catalyst adaptor
+  use catalyst                  ! ParaView Catalyst API
 #endif
   use SparseMatrix              ! contains initialize() and finalize()
   use PoissonDiscretization     ! contains fillmatrixandrhs()
@@ -18,7 +19,7 @@ PROGRAM coproc
   call mpi_comm_rank(MPI_COMM_WORLD, rank, ierr)
 
 #ifdef USE_CATALYST
-  call initializecoprocessor()
+  call catalyst_initialize()
 #endif
 
   dimensions(1) = 10
@@ -40,7 +41,7 @@ PROGRAM coproc
   call solve(dimensions, sm, x, rhs)
 
 #ifdef USE_CATALYST
-  call finalizecoprocessor()
+  call catalyst_finalize()
 #endif
 
   deallocate(x, rhs)
