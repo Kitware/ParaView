@@ -68,7 +68,14 @@ add_subdirectory(PythonDolfinExample)
 #add_subdirectory(PythonFullExample)
 add_subdirectory(TemporalCacheExample)
 
-option(BUILD_FORTRAN_EXAMPLES "Build Fortran Catalyst Examples" OFF)
+include(CheckLanguage)
+check_language(Fortran)
+set(fortran_works OFF)
+if (CMAKE_Fortran_COMPILER)
+  enable_language(Fortran)
+  set(fortran_works ON)
+endif ()
+option(BUILD_FORTRAN_EXAMPLES "Build Fortran Catalyst Examples" "${fortran_works}")
 if (BUILD_FORTRAN_EXAMPLES)
   # Theoretically, CheckFortran should not be needed, but
   # enable_language(OPTIONAL) fails with Ninja generator.
