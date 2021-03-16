@@ -1,4 +1,4 @@
-if (PARAVIEW_USE_QT)
+if (TARGET ParaView::paraview)
   set(test_xmls
     IndeXRepresentation.xml
   )

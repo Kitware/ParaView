@@ -1,4 +1,4 @@
-if (PARAVIEW_USE_QT AND BUILD_SHARED_LIBS)
+if (TARGET ParaView::paraview AND BUILD_SHARED_LIBS)
   set (xmls
     NonOrthogonalSliceView.xml
     NonOrthographicOrthographicView.xml

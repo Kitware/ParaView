@@ -1,4 +1,4 @@
-if (PARAVIEW_USE_QT)
+if (TARGET ParaView::paraview)
   set (TestXML_USES_DIRECT_DATA ON)
   paraview_add_client_tests(
     LOAD_PLUGIN ElevationFilter

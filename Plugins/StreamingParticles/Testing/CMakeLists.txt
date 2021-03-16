@@ -1,4 +1,4 @@
-if (PARAVIEW_USE_QT AND PARAVIEW_ENABLE_COSMOTOOLS)
+if (TARGET ParaView::paraview AND PARAVIEW_ENABLE_COSMOTOOLS)
   ExternalData_Expand_Arguments("ParaViewData" _
     "DATA{${CMAKE_CURRENT_SOURCE_DIR}/Data/adaptive-cosmo/,REGEX:.*}"
     "DATA{${CMAKE_CURRENT_SOURCE_DIR}/Data/multiresolution-streaming/,REGEX:.*}"

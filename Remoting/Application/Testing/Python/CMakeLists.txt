@@ -196,7 +196,7 @@ set(paraview_python_state_tests
   ScalarOpacityFunctionPythonState
 )
 foreach(python_state_test ${paraview_python_state_tests})
-  if (PARAVIEW_USE_QT)
+  if (TARGET ParaView::paraview)
     set(tname "ParaView::RemotingApplicationPython-${python_state_test}")
     ExternalData_add_test("${_vtk_build_TEST_DATA_TARGET}" NAME ${tname}
       COMMAND ${CMAKE_COMMAND}

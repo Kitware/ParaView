@@ -1752,7 +1752,7 @@ paraview_add_cave_tests(2 "${CMAKE_CURRENT_SOURCE_DIR}/LeftRight.pvx"
 #------------------------------------------------------------------
 # Add tests that test command line arguments (among other things).
 #------------------------------------------------------------------
-if (TARGET paraview)
+if (TARGET ParaView::paraview)
   # The state file need to point to the correct data file. We do that by
   # configuring the state file.
   configure_file (
