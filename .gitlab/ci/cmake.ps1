@@ -1,7 +1,7 @@
 $erroractionpreference = "stop"
 
-$version = "3.19.4"
-$sha256sum = "24B03DAF75CE59B542DA38C829FE6944D3BF7CF99AFAA8225CF29F7876823899"
+$version = "3.19.7"
+$sha256sum = "E6788D6E23B3026C37FCFA7658075D6B5F9113F26FAE17FE372AD4A7EE62D5FD"
 $filename = "cmake-$version-win64-x64"
 $tarball = "$filename.zip"
 
