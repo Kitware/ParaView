@@ -552,6 +552,13 @@ else ()
     COMPONENT   "license")
 endif ()
 
+# Determine whether the ParaView GUI will be built or not.
+set(paraview_will_be_built 0)
+if (PARAVIEW_USE_QT AND
+    (WIN32 OR VTK_USE_X OR VTK_USE_COCOA))
+  set(paraview_will_be_built 1)
+endif ()
+
 if (NOT PARAVIEW_USE_EXTERNAL_VTK AND PARAVIEW_INSTALL_DEVELOPMENT_FILES)
   include("${CMAKE_CURRENT_SOURCE_DIR}/VTK/CMake/vtkInstallCMakePackage.cmake")
 endif ()
