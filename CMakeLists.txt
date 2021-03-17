@@ -519,7 +519,7 @@ else ()
   mark_as_advanced(VTK_PYTHON_FULL_THREADSAFE)
   cmake_dependent_option(VTK_USE_TK "Build VTK with Tk support" OFF
     "PARAVIEW_USE_PYTHON" OFF)
-  
+
   cmake_dependent_option(PARAVIEW_WINDOWS_PYTHON_DEBUGGABLE
     "Explicitly indicate that the Python library is debuggable" OFF
     "WIN32;PARAVIEW_USE_PYTHON" OFF)
