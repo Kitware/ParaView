@@ -3427,8 +3427,8 @@ Every Nth Point.
                  label="Annotate Global Data"
                  name="AnnotateGlobalData">
       <Documentation short_help="Filter for annotating with global/field data">
-        Generates annotation text from global / field data.
-        provides a simpler API for creating text
+        Generates annotation text from global / field data presumed to be associated
+        with time steps in the source dataset for this filter.
         If the field array chosen has as many elements as number of timesteps,
         the array is assumed to be "temporal" and indexed using the current
         timestep.
@@ -3473,9 +3473,9 @@ Every Nth Point.
                             default_values="%7.5g"
                             name="Format"
                             number_of_elements="1">
-        <Documentation>Text that is used as a format string passed
-          to the Python string formatter (% operator).  Used to format
-          the data.</Documentation>
+        <Documentation>Text that is used as the C format string used by the
+          snprintf string formatter used to convert a global data value to a string.
+        </Documentation>
       </StringVectorProperty>
       <StringVectorProperty command="SetPostfix"
                             default_values=""
