@@ -294,12 +294,17 @@ void vtkPythonProgrammableFilter::Exec(const char* script, const char* funcname)
     {
       if (!paths[cc].empty())
       {
-        pathscript += "if not ";
-        pathscript += paths[cc];
-        pathscript += " in sys.path:\n";
-        pathscript += "  sys.path.insert(0, ";
-        pathscript += paths[cc];
-        pathscript += ")\n";
+        std::string path = paths[cc];
+
+        // Remove any quotes from the path
+        path.erase(std::remove(path.begin(), path.end(), '"'), path.end());
+        path.erase(std::remove(path.begin(), path.end(), '\''), path.end());
+
+        // Re-add qoutes
+        path = "\"" + path + "\"";
+
+        pathscript += "if not " + path + " in sys.path:\n";
+        pathscript += "  sys.path.insert(0, " + path + ")\n";
 
         vtkPythonInterpreter::RunSimpleString(pathscript.c_str());
       }
