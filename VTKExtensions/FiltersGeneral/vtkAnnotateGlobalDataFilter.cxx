@@ -30,10 +30,13 @@
 #include "vtkTable.h"
 
 #include <algorithm>
+#include <array>
 #include <cstdio>
 #include <iterator>
 #include <sstream>
 #include <string>
+
+#include <vtksys/RegularExpression.hxx>
 #include <vtksys/SystemTools.hxx>
 
 namespace
@@ -93,35 +96,90 @@ struct Printer
   {
   }
 
+  std::array<char, 4> StringTypeFormats = { 'c', 'C', 's', 'S' };
+  std::array<char, 2> StringTypes = { VTK_STRING, VTK_UNICODE_STRING };
+  std::array<char, 8> FloatTypeFormats = { 'a', 'A', 'e', 'E', 'f', 'F', 'g', 'G' };
+  std::array<int, 2> FloatTypes = { VTK_FLOAT, VTK_DOUBLE };
+  std::array<char, 6> IntegralTypeFormats = { 'd', 'i', 'o', 'u', 'x', 'X' };
+  std::array<char, 12> IntegralTypes = { VTK_CHAR, VTK_SIGNED_CHAR, VTK_UNSIGNED_CHAR, VTK_SHORT,
+    VTK_UNSIGNED_SHORT, VTK_INT, VTK_UNSIGNED_INT, VTK_LONG, VTK_UNSIGNED_LONG, VTK_ID_TYPE,
+    VTK_LONG_LONG, VTK_UNSIGNED_LONG_LONG };
+
+  // Validate that a format string is valid for a given data type
+  bool IsFormatStringValid(const char* format, int typeID)
+  {
+    vtksys::RegularExpression regex(
+      "(%([-+0 #]?[-+0 #]?[-+0 #]?[-+0 #]?[-+0 "
+      "#]?)([0-9]+)?(\\.([0-9]+))?(h|l|ll|w|II32|I64)?([cCdiouxXeEfgGaAnpsS])|%%)");
+
+    regex.find(format);
+    std::string typeString = regex.match(7);
+
+    bool validType = false;
+    if (std::find(this->StringTypes.begin(), this->StringTypes.end(), typeID) !=
+      this->StringTypes.end())
+    {
+      validType = std::find(this->StringTypeFormats.begin(), this->StringTypeFormats.end(),
+                    typeString[0]) != this->StringTypeFormats.end();
+    }
+    else if (std::find(this->FloatTypes.begin(), this->FloatTypes.end(), typeID) !=
+      this->FloatTypes.end())
+    {
+      validType = std::find(this->FloatTypeFormats.begin(), this->FloatTypeFormats.end(),
+                    typeString[0]) != this->FloatTypeFormats.end();
+    }
+    else if (std::find(this->IntegralTypes.begin(), this->IntegralTypes.end(), typeID) !=
+      this->IntegralTypes.end())
+    {
+      validType = std::find(this->IntegralTypeFormats.begin(), this->IntegralTypeFormats.end(),
+                    typeString[0]) != this->IntegralTypeFormats.end();
+    }
+
+    return validType;
+  }
+
   template <typename ArrayT>
   void operator()(ArrayT* array)
   {
     assert(this->ChosenTuple >= 0 && this->ChosenTuple < array->GetNumberOfTuples());
 
     auto self = this->Self;
-    char buffer[256];
+    int dataType = array->GetDataType();
+    bool formatValid = this->IsFormatStringValid(self->GetFormat(), dataType);
 
     std::ostringstream stream;
     stream << (self->GetPrefix() ? self->GetPrefix() : "");
 
-    vtkDataArrayAccessor<ArrayT> accessor(array);
-    const auto numComps = array->GetNumberOfComponents();
-    if (numComps == 1)
+    if (formatValid)
     {
-      std::snprintf(buffer, 256, self->GetFormat(), accessor.Get(this->ChosenTuple, 0));
-      stream << buffer;
-    }
-    else if (numComps > 1)
-    {
-      stream << "(";
-      for (int cc = 0; cc < numComps; ++cc)
+      char buffer[256];
+      vtkDataArrayAccessor<ArrayT> accessor(array);
+      const auto numComps = array->GetNumberOfComponents();
+      if (numComps == 1)
       {
-        std::snprintf(buffer, 256, self->GetFormat(), accessor.Get(this->ChosenTuple, cc));
-        stream << (cc > 0 ? ", " : " ");
+        std::snprintf(buffer, 256, self->GetFormat(), accessor.Get(this->ChosenTuple, 0));
         stream << buffer;
       }
-      stream << " )";
+      else if (numComps > 1)
+      {
+        stream << "(";
+        for (int cc = 0; cc < numComps; ++cc)
+        {
+          std::snprintf(buffer, 256, self->GetFormat(), accessor.Get(this->ChosenTuple, cc));
+          stream << (cc > 0 ? ", " : " ");
+          stream << buffer;
+        }
+        stream << " )";
+      }
     }
+    else
+    {
+      vtkGenericWarningMacro("Format string '" << self->GetFormat()
+                                               << "' is not valid for data array type "
+                                               << array->GetDataTypeAsString());
+      stream << "(error)";
+    }
+
     stream << (self->GetPostfix() ? self->GetPostfix() : "");
     this->OutputArray->SetValue(0, stream.str());
   }
@@ -131,29 +189,42 @@ struct Printer
     assert(this->ChosenTuple >= 0 && this->ChosenTuple < array->GetNumberOfTuples());
 
     auto self = this->Self;
-    char buffer[256];
+    int dataType = array->GetDataType();
+    bool formatValid = this->IsFormatStringValid(self->GetFormat(), dataType);
 
     std::ostringstream stream;
     stream << (self->GetPrefix() ? self->GetPrefix() : "");
 
-    const auto numComps = array->GetNumberOfComponents();
-    if (numComps == 1)
+    if (formatValid)
     {
-      std::snprintf(buffer, 256, self->GetFormat(), array->GetValue(this->ChosenTuple).c_str());
-      stream << buffer;
-    }
-    else if (numComps > 1)
-    {
-      stream << "(";
-      for (int cc = 0; cc < numComps; ++cc)
+      char buffer[256];
+      const auto numComps = array->GetNumberOfComponents();
+      if (numComps == 1)
       {
-        std::snprintf(buffer, 256, self->GetFormat(),
-          array->GetValue(this->ChosenTuple * numComps + cc).c_str());
-        stream << (cc > 0 ? ", " : " ");
+        std::snprintf(buffer, 256, self->GetFormat(), array->GetValue(this->ChosenTuple).c_str());
         stream << buffer;
       }
-      stream << " )";
+      else if (numComps > 1)
+      {
+        stream << "(";
+        for (int cc = 0; cc < numComps; ++cc)
+        {
+          std::snprintf(buffer, 256, self->GetFormat(),
+            array->GetValue(this->ChosenTuple * numComps + cc).c_str());
+          stream << (cc > 0 ? ", " : " ");
+          stream << buffer;
+        }
+        stream << " )";
+      }
     }
+    else
+    {
+      vtkGenericWarningMacro("Format string '" << self->GetFormat()
+                                               << "' is not valid for data array type "
+                                               << array->GetDataTypeAsString());
+      stream << "(error)";
+    }
+
     stream << (self->GetPostfix() ? self->GetPostfix() : "");
     this->OutputArray->SetValue(0, stream.str());
   }
