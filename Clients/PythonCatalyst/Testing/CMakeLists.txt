@@ -254,7 +254,7 @@ unset(filedriver_tests)
 #    `vtk_module_test_data` call at the start of this file to include the new
 #    baselines.
 #---------------------------------------------------------------------
-if (TARGET ParaView::paraview)
+if (TARGET ParaView::paraview OR paraview_will_be_built)
   include(FindPythonModules)
   find_python_module(pandas pandas_found)
 

@@ -1,4 +1,4 @@
-if (TARGET ParaView::paraview)
+if (TARGET ParaView::paraview OR paraview_will_be_built)
   ExternalData_Expand_Arguments("ParaViewData" _
     "DATA{Data/datamine_smallpt.dm}"
     "DATA{Data/datamine_smalltr.dm}"

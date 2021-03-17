@@ -1,4 +1,4 @@
-if (TARGET ParaView::paraview AND BUILD_SHARED_LIBS)
+if ((TARGET ParaView::paraview OR paraview_will_be_built) AND BUILD_SHARED_LIBS)
 
   ExternalData_Expand_Arguments("ParaViewData" _
     "DATA{Data/Baseline/BagPlotMatrixView_A.png}")

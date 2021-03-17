@@ -1,4 +1,4 @@
-if (TARGET ParaView::paraview)
+if (TARGET ParaView::paraview OR paraview_will_be_built)
   set(test_xmls
     IndeXRepresentation.xml
   )

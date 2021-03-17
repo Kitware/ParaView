@@ -76,7 +76,7 @@ if (PARAVIEW_USE_PYTHON)
   endforeach ()
 endif ()
 
-if (PARAVIEW_USE_QT)
+if (paraview_will_be_built)
   list(APPEND paraview_tools
     paraview)
 endif ()

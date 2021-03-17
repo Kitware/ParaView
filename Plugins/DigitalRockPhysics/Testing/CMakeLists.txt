@@ -1,4 +1,4 @@
-if (TARGET ParaView::paraview)
+if (TARGET ParaView::paraview OR paraview_will_be_built)
   set(_paraview_add_tests_default_test_data_target DigitalRockPhysicsData)
   ExternalData_Expand_Arguments("${_paraview_add_tests_default_test_data_target}" _
     "DATA{Data/rocksample.vti}")

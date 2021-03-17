@@ -8,7 +8,7 @@ set(GMV_READER_TESTS
   GMVReaderInvalidFiles${suffix}.xml
 )
 
-if (TARGET ParaView::paraview)
+if (TARGET ParaView::paraview OR paraview_will_be_built)
   set(_paraview_add_tests_default_test_data_target ParaViewData)
   ExternalData_Expand_Arguments(ParaViewData _
     "DATA{${CMAKE_CURRENT_SOURCE_DIR}/Data/GMV/,REGEX:.*}"
