@@ -92,7 +92,7 @@ public:
    *
    * Returns invalid range for non-numeric arrays.
    */
-  vtkTuple<double, 2> GetComponentRange(int comp) const;
+  const double* GetComponentRange(int comp) const VTK_SIZEHINT(2);
   void GetComponentRange(int comp, double range[2]) const;
   //@}
 
@@ -104,7 +104,7 @@ public:
    *
    * Returns invalid range for non-numeric arrays.
    */
-  vtkTuple<double, 2> GetComponentFiniteRange(int component) const;
+  const double* GetComponentFiniteRange(int component) const VTK_SIZEHINT(2);
   void GetComponentFiniteRange(int comp, double range[2]) const;
   //@}
 

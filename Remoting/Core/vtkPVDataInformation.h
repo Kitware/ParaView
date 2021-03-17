@@ -27,6 +27,7 @@
 #define vtkPVDataInformation_h
 
 #include "vtkDataObject.h" // for vtkDataObject::NUMBER_OF_ATTRIBUTE_TYPES
+#include "vtkLegacy.h"     // for VTK_LEGACY
 #include "vtkNew.h"        // for vtkNew
 #include "vtkPVInformation.h"
 #include "vtkRemotingCoreModule.h" //needed for exports
@@ -439,6 +440,21 @@ public:
    * Returns empty string if no name available or cannot be determined.
    */
   std::string GetBlockName(vtkTypeUInt64 cid) const;
+
+  //@{
+  /**
+   * Deprecated in ParaView 5.10
+   */
+  VTK_LEGACY(vtkTypeUInt64 GetPolygonCount());
+  VTK_LEGACY(void* GetCompositeDataInformation());
+  VTK_LEGACY(vtkPVDataInformation* GetDataInformationForCompositeIndex(int));
+  VTK_LEGACY(unsigned int GetNumberOfBlockLeafs(bool skipEmpty));
+  VTK_LEGACY(vtkPVDataInformation* GetDataInformationForCompositeIndex(int*));
+  VTK_LEGACY(double* GetTimeSpan());
+  VTK_LEGACY(void GetTimeSpan(double&, double&));
+  VTK_LEGACY(void GetTimeSpan(double[2]));
+  VTK_LEGACY(static void RegisterHelper(const char*, const char*));
+  //@}
 
 protected:
   vtkPVDataInformation();
