@@ -214,4 +214,5 @@ If making a non-RC release:
 /cc @ben.boeckel
 /cc @cory.quammen
 /cc @utkarsh.ayachit
+/cc @charles.guenuet
 /label ~"priority:required"

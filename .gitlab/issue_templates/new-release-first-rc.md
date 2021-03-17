@@ -174,4 +174,5 @@ updateMD5sum.sh v@MAJOR@.@MINOR@
 /cc @ben.boeckel
 /cc @cory.quammen
 /cc @utkarsh.ayachit
+/cc @charles.guenuet
 /label ~"priority:required"
