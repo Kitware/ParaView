@@ -26,6 +26,7 @@
 #include "vtkIdTypeArray.h"
 #include "vtkInformation.h"
 #include "vtkIntArray.h"
+#include "vtkLogger.h"
 #include "vtkMath.h"
 #include "vtkMultiProcessController.h"
 #include "vtkNew.h"
@@ -651,9 +652,27 @@ void vtkSMRenderViewProxy::MarkDirty(vtkSMProxy* modifiedProxy)
 {
   vtkSMProxy* cameraProxy = this->GetSubProxy("ActiveCamera");
 
-  // If modified proxy is the camera, we must clear the cache even if we're
+  // if modified proxy is the camera, we must clear the cache even if we're
   // currently in selection mode.
-  this->ClearSelectionCache(/*force=*/modifiedProxy == cameraProxy);
+  bool forceClearCache = (modifiedProxy == cameraProxy);
+
+  // if modified proxy is a source-proxy not part of the selection sub-pipeline,
+  // we have to force clear selection buffers (see #20560).
+  if (!forceClearCache && (vtkSMSourceProxy::SafeDownCast(modifiedProxy) != nullptr))
+  {
+    const bool isPVExtractSelectionFilter = strcmp(modifiedProxy->GetXMLGroup(), "filters") == 0 &&
+      strcmp(modifiedProxy->GetXMLName(), "PVExtractSelection") == 0;
+    const bool isSelectionRepresentation =
+      strcmp(modifiedProxy->GetXMLGroup(), "representations") == 0 &&
+      strcmp(modifiedProxy->GetXMLName(), "SelectionRepresentation") == 0;
+    forceClearCache = !(isPVExtractSelectionFilter || isSelectionRepresentation);
+  }
+
+  const bool cacheCleared = this->ClearSelectionCache(forceClearCache);
+
+  // log for debugging purposes.
+  vtkLogIfF(TRACE, cacheCleared && forceClearCache, "%s: force-cleared selection cache due to %s",
+    this->GetLogNameOrDefault(), modifiedProxy ? modifiedProxy->GetLogNameOrDefault() : nullptr);
 
   // skip modified properties on camera subproxy.
   if (modifiedProxy != cameraProxy)
@@ -1225,7 +1244,7 @@ void vtkSMRenderViewProxy::NewMasterCallback(vtkObject*, unsigned long, void*)
 }
 
 //----------------------------------------------------------------------------
-void vtkSMRenderViewProxy::ClearSelectionCache(bool force /*=false*/)
+bool vtkSMRenderViewProxy::ClearSelectionCache(bool force /*=false*/)
 {
   // We check if we're currently selecting. If that's the case, any non-forced
   // modifications (i.e. those coming through because of proxy-modifications)
@@ -1233,14 +1252,16 @@ void vtkSMRenderViewProxy::ClearSelectionCache(bool force /*=false*/)
   // don't clear the selection cache. While this doesn't help us preserve the
   // cache between separate surface selection invocations, it does help us with
   // reusing the case when in interactive selection mode.
-  if ((this->IsSelectionCached && !this->IsInSelectionMode()) || force)
+  if (this->IsSelectionCached && (!this->IsInSelectionMode() || force))
   {
     this->IsSelectionCached = false;
     vtkClientServerStream stream;
     stream << vtkClientServerStream::Invoke << VTKOBJECT(this) << "InvalidateCachedSelection"
            << vtkClientServerStream::End;
     this->ExecuteStream(stream);
+    return true;
   }
+  return false;
 }
 
 //----------------------------------------------------------------------------
