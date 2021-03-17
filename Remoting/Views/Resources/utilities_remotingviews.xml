@@ -2967,6 +2967,38 @@
       </Hints>
     </Proxy>
 
+    <!-- ================================================================== -->
+    <Proxy name="VTK" class="vtkGenericDataObjectWriter" processes="client|dataserver">
+      <Documentation>
+        Writer for saving screenshots as VTK files.
+      </Documentation>
+
+      <StringVectorProperty name="FileName" command="SetFileName"
+        number_of_elements="1"
+        default_values=""
+        panel_visibility="never">
+      </StringVectorProperty>
+
+      <IntVectorProperty name="FileType"
+        command="SetFileType"
+        number_of_elements="1"
+        default_values="2">
+        <Documentation>
+          Specify the file type (ASCII or Binary).
+        </Documentation>
+        <EnumerationDomain name="enum">
+          <Entry text="ASCII" value="1" />
+          <Entry text="Binary" value="2" />
+        </EnumerationDomain>
+      </IntVectorProperty>
+
+      <Hints>
+        <FormatOptions extensions="vtk"
+          file_description="VTK images" />
+      </Hints>
+
+    </Proxy>
+
     <!-- end of "screenshot_writers" -->
   </ProxyGroup>
 </ServerManagerConfiguration>

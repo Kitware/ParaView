@@ -278,6 +278,109 @@
       <!-- end of CinemaVolumetricPNG -->
     </CinemaVolumetricImageExtractWriterProxy>
 
+    <!-- =================================================================== -->
+    <RecolorableImageExtractWriterProxy name="RecolorableImage"
+      label="Recolorable Image">
+      <StringVectorProperty name="FileName" number_of_elements="1" default_values="%p_%.6ts%cm.vtk">
+        <Documentation>
+          Specify the filename to use.
+        </Documentation>
+      </StringVectorProperty>
+
+      <SubProxy>
+        <Proxy name="Writer" proxygroup="misc" proxyname="SaveScreenshot" />
+        <ExposedProperties>
+          <Property name="View" />
+          <PropertyGroup label="Size and Scaling">
+            <Property name="ImageResolution" />
+          </PropertyGroup>
+          <PropertyGroup label="Image Options">
+            <Property name="Format" panel_visibility="advanced" />
+          </PropertyGroup>
+        </ExposedProperties>
+      </SubProxy>
+
+      <InputProperty name="DataSource"
+        panel_widget="input_selector"
+        panel_visibility="default">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+        </ProxyGroupDomain>
+        <Documentation>
+          Select the primary data producer data values from which are used to generate
+          the recolorable image.
+        </Documentation>
+      </InputProperty>
+
+      <PropertyGroup label="Recolorable Image Parameters">
+        <Property name="DataSource" />
+      </PropertyGroup>
+
+      <IntVectorProperty name="ResetDisplay"
+                         number_of_elements="1"
+                         default_values="0">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          When set, the camera (or viewport) will be reset to ensure all data
+          is visible.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="CameraMode"
+                         number_of_elements="1"
+                         default_values="0">
+        <Documentation>
+          Select whether to the camera should be moved in the the scence to generate
+          images from multiple view points. Default is **Static** which means the camera
+          is not moved. Another option is **Phi-Theta** which results in moving the camera
+          around the focal point over a sphere of radius equal to the focal distance.
+          This is only applicable for views that have a camera i.e. does not apply to
+          chart views and other 2D plotting views.
+        </Documentation>
+        <EnumerationDomain name="enum">
+          <Entry value="0" text="Static" />
+          <Entry value="1" text="Phi-Theta" />
+        </EnumerationDomain>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="PhiResolution"
+                         number_of_elements="1"
+                         default_values="6" >
+        <IntRangeDomain name="range" min="1" max="360" />
+        <Documentation>
+          Number of samples along the phi direction.
+        </Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="CameraMode" value="1" />
+        </Hints>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="ThetaResolution"
+                         number_of_elements="1"
+                         default_values="6" >
+        <IntRangeDomain name="range" min="1" max="360" />
+       <Documentation>
+         Number of samples along the theta direction.
+       </Documentation>
+       <Hints>
+         <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="CameraMode" value="1" />
+       </Hints>
+      </IntVectorProperty>
+
+      <PropertyGroup label="Miscellaneous">
+        <Property name="ResetDisplay" />
+        <Property name="CameraMode" />
+        <Property name="PhiResolution" />
+        <Property name="ThetaResolution" />
+      </PropertyGroup>
+
+      <Hints>
+        <ShowInMenu category="Experimental" />
+      </Hints>
+
+      <!-- end of RecolorableImage -->
+    </RecolorableImageExtractWriterProxy>
+
     <!-- end of 'extract_writers' -->
   </ProxyGroup>
 </ServerManagerConfiguration>

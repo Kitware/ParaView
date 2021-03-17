@@ -96,7 +96,6 @@
 #include "vtkWeakPointer.h"
 #include "vtkWindowToImageFilter.h"
 
-#include "vtkLightingMapPass.h"
 #include "vtkToneMappingPass.h"
 #include "vtkValuePass.h"
 
@@ -116,32 +115,34 @@
 #include <set>
 #include <sstream>
 #include <vector>
+namespace
+{
+struct ValuePassStateT
+{
+  bool OrientationAxesVisibility;
+  bool AnnotationVisibility;
+  bool CenterAxesVisibility;
+};
+}
 
 class vtkPVRenderView::vtkInternals
 {
   std::map<int, vtkWeakPointer<vtkPVDataRepresentation> > PropMap;
 
 public:
-  vtkNew<vtkValuePass> ValuePasses;
-  vtkNew<vtkLightingMapPass> LightingMapPass;
 #if VTK_MODULE_ENABLE_VTK_RenderingRayTracing
   vtkNew<vtkOSPRayPass> OSPRayPass;
 #endif
 
   vtkSmartPointer<vtkImageProcessingPass> SavedImageProcessingPass;
-
   vtkNew<vtkToneMappingPass> ToneMappingPass;
   vtkSmartPointer<vtkRenderPass> SavedRenderPass;
-  int FieldAssociation;
-  int FieldAttributeType;
-  std::string FieldName;
-  bool FieldNameSet;
-  int Component;
-  double ScalarRange[2];
-  bool ScalarRangeSet;
-  bool SavedOrientationState;
-  bool SavedAnnotationState;
-  bool IsInCapture;
+
+  // State variables to maintain flags between BeginValuePassForRendering
+  // and EndValueCapture.
+  vtkNew<vtkValuePass> ValuePasses;
+  std::unique_ptr<ValuePassStateT> ValuePassState;
+
   bool IsInOSPRay;
   bool OSPRayShadows;
   bool OSPRayDenoise;
@@ -333,14 +334,6 @@ vtkPVRenderView::vtkPVRenderView()
   , ServerStereoType(VTK_STEREOTYPE_SAME_AS_CLIENT)
 {
   this->Internals = new vtkInternals();
-  this->Internals->FieldAssociation = VTK_SCALAR_MODE_USE_POINT_FIELD_DATA;
-  this->Internals->FieldNameSet = false;
-  this->Internals->FieldAttributeType = 0;
-  this->Internals->Component = 0;
-  this->Internals->ScalarRangeSet = false;
-  this->Internals->ScalarRange[0] = 0.0;
-  this->Internals->ScalarRange[1] = -1.0;
-  this->Internals->IsInCapture = false;
   this->Internals->IsInOSPRay = false;
   this->Internals->OSPRayShadows = false;
   this->Internals->OSPRayDenoise = true;
@@ -3029,199 +3022,121 @@ void vtkPVRenderView::BuildAnnotationText(ostream& str)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVRenderView::SetDrawCells(bool choice)
+bool vtkPVRenderView::BeginValuePassForRendering(
+  int fieldAssociation, const char* arrayName, int component)
 {
-  bool mod = false;
-  if (choice)
+  // TODO: validate session configuration is supported.
+  auto& internals = (*this->Internals);
+  if (internals.ValuePassState)
   {
-    if (this->Internals->FieldAssociation != VTK_SCALAR_MODE_USE_CELL_FIELD_DATA)
-    {
-      this->Internals->FieldAssociation = VTK_SCALAR_MODE_USE_CELL_FIELD_DATA;
-      mod = true;
-    }
-  }
-  else
-  {
-    if (this->Internals->FieldAssociation != VTK_SCALAR_MODE_USE_POINT_FIELD_DATA)
-    {
-      this->Internals->FieldAssociation = VTK_SCALAR_MODE_USE_POINT_FIELD_DATA;
-      mod = true;
-    }
+    vtkErrorMacro("Nested call to 'BeginValuePassForRendering'!");
+    return false;
   }
 
-  if (mod)
+  if (!arrayName)
   {
-    if (this->Internals->FieldNameSet)
-    {
-      this->Internals->ValuePasses->SetInputArrayToProcess(
-        this->Internals->FieldAssociation, this->Internals->FieldName.c_str());
-    }
-    else
-    {
-      this->Internals->ValuePasses->SetInputArrayToProcess(
-        this->Internals->FieldAssociation, this->Internals->FieldAttributeType);
-    }
-    this->Modified();
-  }
-}
-
-// ----------------------------------------------------------------------------
-void vtkPVRenderView::SetArrayNameToDraw(const char* name)
-{
-  if (!this->Internals->FieldNameSet || (this->Internals->FieldName != name))
-  {
-    this->Internals->FieldName = name;
-    this->Internals->FieldNameSet = true;
-    this->Internals->ValuePasses->SetInputArrayToProcess(
-      this->Internals->FieldAssociation, this->Internals->FieldName.c_str());
-    this->Modified();
-  }
-}
-
-// ----------------------------------------------------------------------------
-void vtkPVRenderView::SetArrayNumberToDraw(int fieldAttributeType)
-{
-  if (this->Internals->FieldNameSet || (this->Internals->FieldAttributeType != fieldAttributeType))
-  {
-    this->Internals->FieldAttributeType = fieldAttributeType;
-    this->Internals->FieldNameSet = false;
-    this->Internals->ValuePasses->SetInputArrayToProcess(
-      this->Internals->FieldAssociation, this->Internals->FieldAttributeType);
-    this->Modified();
-  }
-}
-
-// ----------------------------------------------------------------------------
-void vtkPVRenderView::SetValueRenderingModeCommand(int vtkNotUsed(mode))
-{
-  // The VTK level INVERTIBLE_LUT mode is deprecated, this method will be
-  // removed shortly.
-
-  // Fixes issue with the background (black) when coming back from
-  // FLOATING_POINT mode. FLOATING_POINT mode is only supported in BATCH
-  // mode and single process CLIENT.
-  if (this->GetUseDistributedRenderingForRender() &&
-    vtkProcessModule::GetProcessType() == vtkProcessModule::PROCESS_CLIENT)
-  {
-    vtkWarningMacro("vtkValuePass::FLOATING_POINT mode is only supported in BATCH"
-                    " mode. The result is only available in the root node.");
-    return;
+    vtkErrorMacro("'arrayName' cannot be nullptr!");
+    return false;
   }
 
-  // Rendering mode can only be changed while capturing. TODO while in client
-  // mode?
-  if (!this->Internals->IsInCapture)
+  // in our infinite wisdom, we choose to use a different field association flag
+  // for vtkValuePass, so handle it.
+  int valuePassAssociation = 0;
+  switch (fieldAssociation)
   {
-    return;
+    case vtkDataObject::CELL:
+      valuePassAssociation = VTK_SCALAR_MODE_USE_CELL_FIELD_DATA;
+      break;
+
+    case vtkDataObject::POINT:
+      valuePassAssociation = VTK_SCALAR_MODE_USE_POINT_FIELD_DATA;
+      break;
+    default:
+      vtkErrorMacro("Field association currently not supported: "
+        << vtkDataObject::GetAssociationTypeAsString(fieldAssociation));
+      return false;
   }
+
+  internals.ValuePasses->SetInputArrayToProcess(valuePassAssociation, arrayName);
+  internals.ValuePasses->SetInputComponentToProcess(component);
+
+  // hide various annotations since they interfere with value pass;
+  // preserve state so we can store it.
+  internals.ValuePassState.reset(new ValuePassStateT());
+  internals.ValuePassState->OrientationAxesVisibility = this->OrientationWidget->GetVisibility();
+  internals.ValuePassState->CenterAxesVisibility = (this->CenterAxes->GetVisibility() != 0);
+  internals.ValuePassState->AnnotationVisibility = this->ShowAnnotation;
+  this->SetOrientationAxesVisibility(false);
+  this->SetCenterAxesVisibility(false);
+  this->SetShowAnnotation(false);
+
+  // now change the active pass.
+  internals.SavedRenderPass = this->SynchronizedRenderers->GetRenderPass();
+  this->SynchronizedRenderers->SetRenderPass(internals.ValuePasses);
 
 #if VTK_MODULE_ENABLE_ParaView_icet
+  // Let the IceTPass know FLOATING_POINT is already enabled.
   IceTPassEnableFloatPass(true, this->SynchronizedRenderers);
 #endif
-  // deprecated - this->Internals->ValuePasses->SetRenderingMode(mode);
 
-  this->Modified();
-}
-
-//-----------------------------------------------------------------------------
-int vtkPVRenderView::GetValueRenderingModeCommand()
-{
-  return vtkValuePass::FLOATING_POINT;
-}
-
-// ----------------------------------------------------------------------------
-void vtkPVRenderView::SetArrayComponentToDraw(int comp)
-{
-  if (this->Internals->Component != comp)
-  {
-    this->Internals->Component = comp;
-    this->Internals->ValuePasses->SetInputComponentToProcess(comp);
-    this->Modified();
-  }
-}
-
-// ----------------------------------------------------------------------------
-void vtkPVRenderView::SetScalarRange(double min, double max)
-{
-  if (this->Internals->ScalarRange[0] != min || this->Internals->ScalarRange[1] != max)
-  {
-    this->Internals->ScalarRange[0] = min;
-    this->Internals->ScalarRange[1] = max;
-    // deprecated - this->Internals->ValuePasses->SetScalarRange(min, max);
-    this->Modified();
-  }
+  return true;
 }
 
 //----------------------------------------------------------------------------
-void vtkPVRenderView::BeginValueCapture()
+void vtkPVRenderView::EndValuePassForRendering()
 {
-  if (!this->Internals->IsInCapture)
+  auto& internals = (*this->Internals);
+  if (!internals.ValuePassState)
   {
-#if VTK_MODULE_ENABLE_ParaView_icet
-    // Let the IceTPass know FLOATING_POINT is already enabled.
-    IceTPassEnableFloatPass(true, this->SynchronizedRenderers);
-#endif
-
-    this->Internals->SavedRenderPass = this->SynchronizedRenderers->GetRenderPass();
-    this->Internals->SavedOrientationState = (this->OrientationWidget->GetEnabled() != 0);
-    this->Internals->SavedAnnotationState = this->ShowAnnotation;
-    this->SetOrientationAxesVisibility(false);
-    this->SetShowAnnotation(false);
-    this->Internals->IsInCapture = true;
+    return;
   }
 
-  if (this->Internals->FieldNameSet)
-  {
-    this->Internals->ValuePasses->SetInputArrayToProcess(
-      this->Internals->FieldAssociation, this->Internals->FieldName.c_str());
-  }
-  else
-  {
-    this->Internals->ValuePasses->SetInputArrayToProcess(
-      this->Internals->FieldAssociation, this->Internals->FieldAttributeType);
-  }
-
-  this->SynchronizedRenderers->SetRenderPass(this->Internals->ValuePasses.GetPointer());
-}
-
-//----------------------------------------------------------------------------
-void vtkPVRenderView::EndValueCapture()
-{
 #if VTK_MODULE_ENABLE_ParaView_icet
   // Let the IceTPass know vtkValuePass will be removed.
   IceTPassEnableFloatPass(false, this->SynchronizedRenderers);
 #endif
 
-  this->Internals->IsInCapture = false;
-  this->SynchronizedRenderers->SetRenderPass(this->Internals->SavedRenderPass);
-  this->Internals->SavedRenderPass = nullptr;
-  this->SetOrientationAxesVisibility(this->Internals->SavedOrientationState);
-  this->SetShowAnnotation(this->Internals->SavedAnnotationState);
+  // restore render pass
+  this->SynchronizedRenderers->SetRenderPass(internals.SavedRenderPass);
+  internals.SavedRenderPass = nullptr;
+
+  // restore annotation state
+  this->SetOrientationAxesVisibility(internals.ValuePassState->OrientationAxesVisibility);
+  this->SetCenterAxesVisibility(internals.ValuePassState->CenterAxesVisibility);
+  this->SetShowAnnotation(internals.ValuePassState->AnnotationVisibility);
+  internals.ValuePassState.reset();
 }
 
 //----------------------------------------------------------------------------
-void vtkPVRenderView::StartCaptureLuminance()
+vtkSmartPointer<vtkFloatArray> vtkPVRenderView::GrabValuePassResult()
 {
-  if (!this->Internals->IsInCapture)
+  auto& internals = (*this->Internals);
+  if (!internals.ValuePassState)
   {
-    this->Internals->SavedRenderPass = this->SynchronizedRenderers->GetRenderPass();
-    this->Internals->SavedOrientationState = (this->OrientationWidget->GetEnabled() != 0);
-    this->Internals->SavedAnnotationState = this->ShowAnnotation;
-    this->SetOrientationAxesVisibility(false);
-    this->SetShowAnnotation(false);
-    this->Internals->IsInCapture = true;
+    return nullptr;
   }
-  this->SynchronizedRenderers->SetRenderPass(this->Internals->LightingMapPass.GetPointer());
-}
 
-//----------------------------------------------------------------------------
-void vtkPVRenderView::StopCaptureLuminance()
-{
-  this->Internals->IsInCapture = false;
-  this->SynchronizedRenderers->SetRenderPass(this->Internals->SavedRenderPass);
-  this->Internals->SavedRenderPass = nullptr;
-  this->SetOrientationAxesVisibility(this->Internals->SavedOrientationState);
-  this->SetShowAnnotation(this->Internals->SavedAnnotationState);
+  auto originalValues = internals.ValuePasses->GetFloatImageDataArray(this->GetRenderer());
+  if (!originalValues)
+  {
+    return nullptr;
+  }
+
+  // originalValues may be 1 component or 4 component. When using IceT, they are
+  // 4 component since IceT requires RGBF values. All components are identical,
+  // so we can only care about the 1st component.
+  if (originalValues->GetNumberOfComponents() == 1)
+  {
+    return originalValues;
+  }
+  else
+  {
+    vtkNew<vtkFloatArray> values;
+    values->SetNumberOfComponents(1);
+    values->SetNumberOfTuples(originalValues->GetNumberOfTuples());
+    values->CopyComponent(0, originalValues, 0);
+    return values;
+  }
 }
 
 //----------------------------------------------------------------------------
@@ -3257,55 +3172,6 @@ void vtkPVRenderView::CaptureZBuffer()
 
 //------------------------------------------------------------------------------
 vtkFloatArray* vtkPVRenderView::GetCapturedZBuffer()
-{
-  return this->Internals->ArrayHolder.GetPointer();
-}
-
-//----------------------------------------------------------------------------
-void vtkPVRenderView::CaptureValuesFloat()
-{
-  vtkFloatArray* values = nullptr;
-#if VTK_MODULE_ENABLE_ParaView_icet
-  vtkIceTSynchronizedRenderers* IceTSynchronizedRenderers =
-    vtkIceTSynchronizedRenderers::SafeDownCast(
-      this->SynchronizedRenderers->GetParallelSynchronizer());
-
-  if (IceTSynchronizedRenderers)
-  {
-    vtkIceTCompositePass* iceTPass = IceTSynchronizedRenderers->GetIceTCompositePass();
-    if (iceTPass && iceTPass->GetLastRenderedRGBA32F())
-    {
-      values = iceTPass->GetLastRenderedRGBA32F();
-    }
-  }
-  else
-#endif
-  {
-    if (this->GetUseDistributedRenderingForRender() &&
-      vtkProcessModule::GetProcessType() == vtkProcessModule::PROCESS_CLIENT)
-    {
-      vtkWarningMacro("vtkValuePass::FLOATING_POINT result is only available in the root"
-                      " node.");
-      return;
-    }
-
-    // Non-distributed case
-    values = this->Internals->ValuePasses->GetFloatImageDataArray(this->RenderView->GetRenderer());
-  }
-
-  if (values)
-  {
-    // IceT requires the image format to be RGBA (R32F not supported).
-    // Component 0 is enough from here on so a single component is exposed
-    // (components 1-3 hold the same data).
-    this->Internals->ArrayHolder->SetNumberOfComponents(1);
-    this->Internals->ArrayHolder->SetNumberOfTuples(values->GetNumberOfTuples());
-    this->Internals->ArrayHolder->CopyComponent(0, values, 0);
-  }
-}
-
-//-----------------------------------------------------------------------------
-vtkFloatArray* vtkPVRenderView::GetCapturedValuesFloat()
 {
   return this->Internals->ArrayHolder.GetPointer();
 }

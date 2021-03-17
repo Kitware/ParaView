@@ -1173,45 +1173,11 @@ vtkFloatArray* vtkSMRenderViewProxy::CaptureDepthBuffer()
 }
 
 //----------------------------------------------------------------------------
-vtkFloatArray* vtkSMRenderViewProxy::GetValuesFloat()
-{
-  this->InvokeCommand("CaptureValuesFloat");
-  vtkPVRenderView* view = vtkPVRenderView::SafeDownCast(this->GetClientSideObject());
-  vtkFloatArray* capture = view->GetCapturedValuesFloat();
-  return capture;
-}
-
-//------------------------------------------------------------------------------
-void vtkSMRenderViewProxy::StartCaptureValues()
-{
-  this->InvokeCommand("BeginValueCapture");
-}
-
-//------------------------------------------------------------------------------
-void vtkSMRenderViewProxy::StopCaptureValues()
-{
-  this->InvokeCommand("EndValueCapture");
-}
-
-//------------------------------------------------------------------------------
-int vtkSMRenderViewProxy::GetValueRenderingMode()
-{
-  vtkSMPropertyHelper helper(this, "ValueRenderingModeGet");
-  helper.UpdateValueFromServer();
-  return helper.GetAsInt();
-}
-
-//------------------------------------------------------------------------------
-void vtkSMRenderViewProxy::SetValueRenderingMode(int mode)
-{
-  vtkSMPropertyHelper(this, "ValueRenderingMode").Set(mode);
-}
-
-//----------------------------------------------------------------------------
 void vtkSMRenderViewProxy::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
 }
+
 //----------------------------------------------------------------------------
 void vtkSMRenderViewProxy::NewMasterCallback(vtkObject*, unsigned long, void*)
 {

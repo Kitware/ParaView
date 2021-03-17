@@ -39,6 +39,7 @@ set(PY_TESTS
   PythonSMTraceTest2.py,NO_VALID
   PythonTestBenchmark.py,NO_VALID
   ReaderReload.py,NO_VALID
+  RecolorableImageExtractor.py
   RepresentationTypeHint.py,NO_VALID
   SaveAnimation.py
   SaveScreenshot.py,NO_VALID
@@ -81,7 +82,8 @@ set(ParaView::RemotingApplication_ARGS)
 vtk_module_test_data(
   "${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/SaveAnimation_right.png"
   "${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/MultiView_chart_view.png"
-  "${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/MultiView_render_view.png")
+  "${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/MultiView_render_view.png"
+  "${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/RecolorableImageExtractor_1.png")
 
 set(PVBATCH_TESTS
   AnnotationVisibility.py
@@ -104,6 +106,11 @@ endif()
 # paraview/paraview#17329
 set(PVBATCH_NO_SYMMETRIC_TESTS
   SaveAnimation.py
+  )
+
+# Test tests require symmetric mode
+set(PVBATCH_SYMMETRIC_TESTS
+  RecolorableImageExtractor.py
   )
 
 set(PVBATCH_TESTS_5_RANKS
@@ -129,6 +136,7 @@ IF (MPIEXEC_EXECUTABLE)
   paraview_add_test_pvbatch_mpi(
     JUST_VALID
     ${PVBATCH_TESTS}
+    ${PVBATCH_SYMMETRIC_TESTS}
     )
 
   set(vtkRemotingApplication_NUMPROCS 5)
@@ -152,6 +160,7 @@ else ()
   paraview_add_test_pvbatch(
     JUST_VALID
     ${PVBATCH_TESTS}
+    ${PVBATCH_SYMMETRIC_TESTS}
     )
   unset(paraview_pvbatch_args)
   unset(vtk_test_prefix)

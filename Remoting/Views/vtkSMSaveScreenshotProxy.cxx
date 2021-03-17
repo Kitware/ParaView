@@ -16,24 +16,27 @@
 
 #include "vtkAlgorithm.h"
 #include "vtkErrorCode.h"
+#include "vtkFloatArray.h"
 #include "vtkImageData.h"
 #include "vtkMultiProcessController.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVLogger.h"
+#include "vtkPVRenderView.h"
 #include "vtkPVXMLElement.h"
+#include "vtkPointData.h"
 #include "vtkProcessModule.h"
 #include "vtkRenderWindow.h"
 #include "vtkSMParaViewPipelineControllerWithRendering.h"
 #include "vtkSMProperty.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMProxyListDomain.h"
+#include "vtkSMRenderViewProxy.h"
 #include "vtkSMSession.h"
 #include "vtkSMSessionProxyManager.h"
 #include "vtkSMSourceProxy.h"
 #include "vtkSMTrace.h"
 #include "vtkSMViewLayoutProxy.h"
-#include "vtkSMViewProxy.h"
 #include "vtkSmartPointer.h"
 #include "vtkTimerLog.h"
 #include "vtkVectorOperators.h"
@@ -331,12 +334,15 @@ private:
 class vtkSMSaveScreenshotProxy::vtkStateView : public vtkSMSaveScreenshotProxy::vtkState
 {
   vtkWeakPointer<vtkSMViewProxy> View;
+  bool UseFloatingPointBuffers;
+
   typedef vtkSMSaveScreenshotProxy::vtkState Superclass;
 
 public:
   vtkStateView(vtkSMViewProxy* view)
     : Superclass(view->GetSessionProxyManager())
     , View(view)
+    , UseFloatingPointBuffers(false)
   {
   }
 
@@ -358,11 +364,34 @@ public:
   vtkSmartPointer<vtkImageData> CaptureImage() override
   {
     vtkSmartPointer<vtkImageData> img;
-    img.TakeReference(this->View->CaptureWindow(this->Magnification[0], this->Magnification[1]));
+    auto rv = vtkPVRenderView::SafeDownCast(this->View->GetClientSideObject());
+    if (rv && this->UseFloatingPointBuffers)
+    {
+      this->View->StillRender();
+      auto array = rv->GrabValuePassResult();
+      auto size = this->GetSize();
+      if (array != nullptr && array->GetNumberOfTuples() == (size[0] * size[1]))
+      {
+        img.TakeReference(vtkImageData::New());
+        img->SetDimensions(size[0], size[1], 1);
+        img->GetPointData()->SetScalars(array);
+      }
+      else
+      {
+        vtkLogF(ERROR, "Failed to grab values buffer correctly! array=%p, count=%d, dx=%d, dy=%d",
+          array.GetPointer(), array ? (int)array->GetNumberOfTuples() : 0, size[0], size[1]);
+      }
+    }
+    else
+    {
+      img.TakeReference(this->View->CaptureWindow(this->Magnification[0], this->Magnification[1]));
+    }
     return img;
   }
 
   void SetFontScaling(int mode) override { this->SetViewFontScaling(this->View, mode); }
+
+  void SetUseFloatingPointBuffers(bool value) { this->UseFloatingPointBuffers = value; }
 
 protected:
   void UpdateStereoMode(int mode, bool restoreable) override
@@ -545,6 +574,23 @@ bool vtkSMSaveScreenshotProxy::WriteImage(const char* fname, vtkTypeUInt32 locat
     vtkErrorMacro("Failed to prepare to capture image.");
     return false;
   }
+
+  // Some experimental code to add the ability to capture floating point buffers
+  // instead of RGB(A) images.
+  if (this->UseFloatingPointBuffers)
+  {
+    if (view == nullptr)
+    {
+      vtkErrorMacro("UseFloatingPointBuffers is only supported when using a single view.");
+    }
+    else
+    {
+      auto state = dynamic_cast<vtkStateView*>(this->State);
+      assert(state != nullptr);
+      state->SetUseFloatingPointBuffers(true);
+    }
+  }
+
   auto image_pair = this->CapturePreppedImages();
   this->Cleanup();
 

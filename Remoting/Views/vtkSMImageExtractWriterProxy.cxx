@@ -105,6 +105,12 @@ void vtkSMImageExtractWriterProxy::CreateVTKObjects()
   }
 
   this->Superclass::CreateVTKObjects();
+
+  if (!this->ObjectsCreated || this->IsPrototype())
+  {
+    return;
+  }
+
   if (auto writer = vtkSMSaveScreenshotProxy::SafeDownCast(this->GetSubProxy("Writer")))
   {
     writer->UpdateDefaultsAndVisibilities(vtkSMPropertyHelper(this, "FileName").GetAsString());

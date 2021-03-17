@@ -155,9 +155,13 @@ protected:
    */
   std::string GetStereoFileName(const std::string& filename, bool left);
 
-  friend class pqCatalystExportReaction;  // access to GetView,FormatProxy
-  friend class pqImmediateExportReaction; // access to GetView,FormatProxy
-  friend class pqTemporalExportReaction;  // access to GetView,FormatProxy
+  //@{
+  // vtkSMRecolorableImageExtractWriterProxy uses experimental API
+  // SetUseFloatingPointBuffers.
+  friend class vtkSMRecolorableImageExtractWriterProxy;
+  vtkSetMacro(UseFloatingPointBuffers, bool);
+  //@}
+
 private:
   vtkSMSaveScreenshotProxy(const vtkSMSaveScreenshotProxy&) = delete;
   void operator=(const vtkSMSaveScreenshotProxy&) = delete;
@@ -169,6 +173,7 @@ private:
   class vtkStateView;
   class vtkStateLayout;
   vtkState* State;
+  bool UseFloatingPointBuffers;
 };
 
 #endif
