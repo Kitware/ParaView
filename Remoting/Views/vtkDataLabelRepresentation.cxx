@@ -16,6 +16,7 @@
 
 #include "vtkActor.h"
 #include "vtkActor2D.h"
+#include "vtkAlgorithmOutput.h"
 #include "vtkCallbackCommand.h"
 #include "vtkCellCenters.h"
 #include "vtkInformation.h"
@@ -380,8 +381,19 @@ int vtkDataLabelRepresentation::ProcessViewRequest(
   else if (request_type == vtkPVView::REQUEST_RENDER())
   {
     vtkAlgorithmOutput* producerPort = vtkPVRenderView::GetPieceProducer(inInfo, this);
-    this->PointMask->SetInputConnection(producerPort);
-    this->CellCenters->SetInputConnection(producerPort);
+    auto producerObject = producerPort->GetProducer()->GetOutputDataObject(0);
+    if (producerObject && producerObject->IsA("vtkDataSet"))
+    {
+      this->PointMask->SetInputConnection(producerPort);
+      this->CellCenters->SetInputConnection(producerPort);
+      this->CellLabelActor->SetVisibility(this->CellLabelVisibility);
+    }
+    else
+    {
+      // Turn off visibility if the output from the producer is not acceptable input to
+      // PointMask and vtkCellCenters. Fixes bug #20548.
+      this->CellLabelActor->VisibilityOff();
+    }
   }
 
   return 1;
