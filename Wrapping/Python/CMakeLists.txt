@@ -58,7 +58,10 @@ set(python_files
   paraview/smtesting.py
   paraview/smtrace.py
   paraview/spatiotemporalparallelism.py
+  paraview/tests/basic_rendering.py
   paraview/tests/__init__.py
+  paraview/tests/internals.py
+  paraview/tests/__main__.py
   paraview/tests/validate_extracts.py
   paraview/tests/verify_eyedomelighting.py
   paraview/tpl/__init__.py
