@@ -279,7 +279,7 @@ protected:
   bool IsSelectionCached;
 
   /**
-   * Returns true of the cache clear request was sent to vtkPVRenderView. The
+   * Returns true if the cache clear request was sent to vtkPVRenderView. The
    * return value is primarily intended for debugging/logging purposes.
    */
   bool ClearSelectionCache(bool force = false);
