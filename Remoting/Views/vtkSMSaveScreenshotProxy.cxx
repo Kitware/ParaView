@@ -490,6 +490,7 @@ vtkStandardNewMacro(vtkSMSaveScreenshotProxy);
 //----------------------------------------------------------------------------
 vtkSMSaveScreenshotProxy::vtkSMSaveScreenshotProxy()
   : State(nullptr)
+  , UseFloatingPointBuffers(false)
 {
 }
 
@@ -1054,4 +1055,5 @@ std::string vtkSMSaveScreenshotProxy::GetStereoFileName(const std::string& filen
 void vtkSMSaveScreenshotProxy::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
+  os << indent << "UseFloatingPointBuffers: " << this->UseFloatingPointBuffers << endl;
 }
