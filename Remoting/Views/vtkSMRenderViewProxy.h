@@ -256,7 +256,12 @@ protected:
   bool IsInSelectionMode();
 
   bool IsSelectionCached;
-  void ClearSelectionCache(bool force = false);
+
+  /**
+   * Returns true if the cache clear request was sent to vtkPVRenderView. The
+   * return value is primarily intended for debugging/logging purposes.
+   */
+  bool ClearSelectionCache(bool force = false);
 
   // Internal fields for the observer mechanism that is used to invalidate
   // the cache of selection when the current user became master
