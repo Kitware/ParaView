@@ -1,7 +1,7 @@
 set(module_tests
   GmshIOTest.xml)
 
-if ((TARGET ParaView::paraview OR paraview_will_be_built) AND BUILD_SHARED_LIBS)
+if (BUILD_SHARED_LIBS)
   set(_paraview_add_tests_default_test_data_target ParaViewData)
 
   ExternalData_Expand_Arguments(ParaViewData _

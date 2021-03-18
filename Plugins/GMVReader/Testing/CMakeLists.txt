@@ -8,31 +8,29 @@ set(GMV_READER_TESTS
   GMVReaderInvalidFiles${suffix}.xml
 )
 
-if (TARGET ParaView::paraview OR paraview_will_be_built)
-  set(_paraview_add_tests_default_test_data_target ParaViewData)
-  ExternalData_Expand_Arguments(ParaViewData _
-    "DATA{${CMAKE_CURRENT_SOURCE_DIR}/Data/GMV/,REGEX:.*}"
-    "DATA{${CMAKE_CURRENT_SOURCE_DIR}/Data/GMV/invalid/,REGEX:.*}"
-    "DATA{${CMAKE_CURRENT_SOURCE_DIR}/Data/GMV/partial-pyramid/,REGEX:.*}"
-    "DATA{${CMAKE_CURRENT_SOURCE_DIR}/Data/GMV/quadratic_cells/,REGEX:.*}")
+set(_paraview_add_tests_default_test_data_target ParaViewData)
+ExternalData_Expand_Arguments(ParaViewData _
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/Data/GMV/,REGEX:.*}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/Data/GMV/invalid/,REGEX:.*}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/Data/GMV/partial-pyramid/,REGEX:.*}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/Data/GMV/quadratic_cells/,REGEX:.*}")
 
-  paraview_add_client_tests(
-    BASELINE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/Data/Baseline"
-    TEST_SCRIPTS ${GMV_READER_TESTS}
-    TEST_DATA_TARGET ParaViewData
-    LOAD_PLUGIN "GMVReader"
-  )
-  set_property(TEST "pv.GMVReaderInvalidFiles${suffix}"
-    PROPERTY
-      PASS_REGULAR_EXPRESSION "client0 process exited with code 0")
+paraview_add_client_tests(
+  BASELINE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/Data/Baseline"
+  TEST_SCRIPTS ${GMV_READER_TESTS}
+  TEST_DATA_TARGET ParaViewData
+  LOAD_PLUGIN "GMVReader"
+)
+set_property(TEST "pv.GMVReaderInvalidFiles${suffix}"
+  PROPERTY
+    PASS_REGULAR_EXPRESSION "client0 process exited with code 0")
 
-  paraview_add_client_server_tests(
-    BASELINE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/Data/Baseline"
-    TEST_SCRIPTS ${GMV_READER_TESTS}
-    TEST_DATA_TARGET ParaViewData
-    LOAD_PLUGIN "GMVReader"
-  )
-  set_property(TEST "pvcs.GMVReaderInvalidFiles${suffix}"
-    PROPERTY
-      PASS_REGULAR_EXPRESSION "server process exited with code 0")
-endif ()
+paraview_add_client_server_tests(
+  BASELINE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/Data/Baseline"
+  TEST_SCRIPTS ${GMV_READER_TESTS}
+  TEST_DATA_TARGET ParaViewData
+  LOAD_PLUGIN "GMVReader"
+)
+set_property(TEST "pvcs.GMVReaderInvalidFiles${suffix}"
+  PROPERTY
+    PASS_REGULAR_EXPRESSION "server process exited with code 0")
