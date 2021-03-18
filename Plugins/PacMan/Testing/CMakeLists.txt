@@ -1,10 +1,10 @@
 set(module_tests
-  LoadPlugins.xml)
+  LoadPacManPlugin.xml)
 
 if (BUILD_SHARED_LIBS)
   paraview_add_client_tests("pv"
     BASELINE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/Data/Baseline"
     TEST_DATA_TARGET ParaViewData
-    TEST_SCRIPTS ${MODULE_TESTS}
+    TEST_SCRIPTS ${module_tests}
   )
 endif ()
