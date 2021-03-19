@@ -37,6 +37,7 @@
 #include <cassert>
 #include <map>
 #include <string>
+#include <tuple>
 #include <vector>
 
 #if VTK_MODULE_ENABLE_ParaView_RemotingLive
@@ -73,8 +74,9 @@ public:
   // Collection of views created in this pipeline.
   std::vector<vtkSmartPointer<vtkSMProxy> > Views;
 
-  // Collection of trivial producers created for `vtkCPPythonScriptV2Pipeline`.
-  std::map<std::string, vtkSmartPointer<vtkSMProxy> > TrivialProducers;
+  // Collection of trivial producers created for `vtkCPPythonScriptV2Pipeline`
+  // along with the timestep that they're available at.
+  std::map<std::string, std::tuple<vtkSmartPointer<vtkSMProxy>, vtkIdType> > TrivialProducers;
 
 #if VTK_MODULE_ENABLE_ParaView_RemotingLive
   vtkSmartPointer<vtkLiveInsituLink> LiveLink;
@@ -410,10 +412,17 @@ bool vtkCPPythonScriptV2Helper::CatalystExecute(vtkCPDataDescription* dataDesc)
 {
   assert(dataDesc != nullptr);
   auto& internals = (*this->Internals);
-  for (const auto& pair : internals.TrivialProducers)
+  for (auto& pair : internals.TrivialProducers)
   {
     const auto name = pair.first;
-    const auto producer = pair.second;
+    const vtkIdType timestep = std::get<1>(pair.second);
+    if (timestep == dataDesc->GetTimeStep())
+    {
+      // we've already set the trivial producer for internals.TrivialProducers for this timestep
+      continue;
+    }
+    std::get<1>(pair.second) = dataDesc->GetTimeStep();
+    const auto producer = std::get<0>(pair.second);
     auto ipdesc = dataDesc->GetInputDescriptionByName(name.c_str());
     assert(ipdesc);
 
@@ -457,7 +466,8 @@ bool vtkCPPythonScriptV2Helper::RequestDataDescription(vtkCPDataDescription* dat
   }
 
   vtkPythonScopeGilEnsurer gilEnsurer;
-  vtkSmartPyObject method(PyString_FromString("do_request_data_description"));
+  vtkSmartPyObject method(PyString_FromString(
+    "do_request_data_description")); // calls to Wrapping/Pyhon/paraview/catalyst/v2_internals.py
   vtkSmartPyObject pyarg(vtkPythonUtil::GetObjectFromPointer(dataDesc));
   vtkSmartPyObject result(PyObject_CallMethodObjArgs(
     internals.APIModule, method, internals.Package.GetPointer(), pyarg.GetPointer(), nullptr));
@@ -524,7 +534,7 @@ vtkSMProxy* vtkCPPythonScriptV2Helper::GetTrivialProducer(const char* inputname)
   auto iter = internals.TrivialProducers.find(inputname);
   if (iter != internals.TrivialProducers.end())
   {
-    return iter->second;
+    return std::get<0>(iter->second);
   }
 
   assert(this->DataDescription != nullptr);
@@ -536,14 +546,15 @@ vtkSMProxy* vtkCPPythonScriptV2Helper::GetTrivialProducer(const char* inputname)
   controller->InitializeProxy(producer);
   if (auto tp = vtkPVTrivialProducer::SafeDownCast(producer->GetClientSideObject()))
   {
-    tp->SetOutput(ipdesc->GetGrid(), this->DataDescription->GetTime());
+    tp->SetOutput(ipdesc->GetGrid(), this->DataDescription->GetTime()); // first call
     tp->SetWholeExtent(ipdesc->GetWholeExtent());
   }
   producer->UpdateVTKObjects();
 
   controller->RegisterPipelineProxy(producer, inputname);
   // add it to map.
-  internals.TrivialProducers[inputname].TakeReference(producer);
+  std::get<0>(internals.TrivialProducers[inputname]).TakeReference(producer);
+  std::get<1>(internals.TrivialProducers[inputname]) = this->DataDescription->GetTimeStep();
 
   return producer;
 }
