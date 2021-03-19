@@ -519,7 +519,7 @@ else ()
   mark_as_advanced(VTK_PYTHON_FULL_THREADSAFE)
   cmake_dependent_option(VTK_USE_TK "Build VTK with Tk support" OFF
     "PARAVIEW_USE_PYTHON" OFF)
-  
+
   cmake_dependent_option(PARAVIEW_WINDOWS_PYTHON_DEBUGGABLE
     "Explicitly indicate that the Python library is debuggable" OFF
     "WIN32;PARAVIEW_USE_PYTHON" OFF)
@@ -550,6 +550,13 @@ else ()
     FILES       "${CMAKE_CURRENT_SOURCE_DIR}/VTK/Copyright.txt"
     DESTINATION "${CMAKE_INSTALL_LICENSEDIR}/VTK"
     COMPONENT   "license")
+endif ()
+
+# Determine whether the ParaView GUI will be built or not.
+set(paraview_will_be_built 0)
+if (PARAVIEW_USE_QT AND
+    (WIN32 OR VTK_USE_X OR VTK_USE_COCOA))
+  set(paraview_will_be_built 1)
 endif ()
 
 if (NOT PARAVIEW_USE_EXTERNAL_VTK AND PARAVIEW_INSTALL_DEVELOPMENT_FILES)

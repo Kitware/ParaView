@@ -1,11 +1,5 @@
 ###############################################################################
 # For python scripts for testing.
-#
-# These tests depend on target ParaView::RemotingMisc, which may not
-# exist in the edition being built. Exit
-if (NOT TARGET ParaView::RemotingMisc)
-  return()
-endif ()
 
 # Add python script names here.
 set(PY_TESTS
@@ -205,12 +199,12 @@ set(paraview_python_state_tests
   ScalarOpacityFunctionPythonState
 )
 foreach(python_state_test ${paraview_python_state_tests})
-  if (TARGET ParaView::paraview)
+  if (TARGET ParaView::paraview OR paraview_will_be_built)
     set(tname "ParaView::RemotingApplicationPython-${python_state_test}")
     ExternalData_add_test("${_vtk_build_TEST_DATA_TARGET}" NAME ${tname}
       COMMAND ${CMAKE_COMMAND}
-      -DPARAVIEW_EXECUTABLE:FILEPATH=$<TARGET_FILE:paraview>
-      -DPVPYTHON_EXECUTABLE:FILEPATH=$<TARGET_FILE:pvpython>
+      -DPARAVIEW_EXECUTABLE:FILEPATH=$<TARGET_FILE:ParaView::paraview>
+      -DPVPYTHON_EXECUTABLE:FILEPATH=$<TARGET_FILE:ParaView::pvpython>
       -DPARAVIEW_TEST_OUTPUT_BASELINE_DIR:PATH=${paraview_test_data_directory_output}/Testing/Data/Baseline
       -DTEST_DRIVER:FILEPATH=${CMAKE_CURRENT_SOURCE_DIR}/PythonStateTestDriver.py
       -DTEST_SCRIPT:FILEPATH=${CMAKE_CURRENT_SOURCE_DIR}/${python_state_test}.xml
@@ -244,7 +238,7 @@ if (NOT PARAVIEW_SERIAL_TESTS_USE_MPIEXEC)
   # add test to verify eyedome lighting
   ExternalData_add_test("${_vtk_build_TEST_DATA_TARGET}"
     NAME "ParaView::RemotingApplicationPython::VerifyEyeDomeLighting"
-    COMMAND $<TARGET_FILE:pvbatch>
+    COMMAND $<TARGET_FILE:ParaView::pvbatch>
             -dr
             -m paraview.tests.verify_eyedomelighting
             -o "${CMAKE_BINARY_DIR}/Testing/Temporary/VerifyEyeDomeLighting.png"

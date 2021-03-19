@@ -66,9 +66,6 @@ if ("$ENV{CMAKE_CONFIGURATION}" MATCHES "windows")
     # then GL context errors. Not sure if these are related.
     "^paraviewPython-TestCatalystClient$"
 
-    # Not all machines have a new enough GPU to test IndeX (yet).
-    "^pv\\.IndeXRepresentation$"
-
     # Fails on windows.
     "pqWidgetsHeaderViewCheckState"
     )

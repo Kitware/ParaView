@@ -1,4 +1,4 @@
-if (TARGET ParaView::paraview AND BUILD_SHARED_LIBS)
+if (BUILD_SHARED_LIBS)
   ExternalData_Expand_Arguments("ParaViewData" _
     "DATA{Data/tos_O1_2001-2002.nc}")
 

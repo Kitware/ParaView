@@ -48,6 +48,11 @@ function (_paraview_add_tests function)
   endif ()
 
   if (NOT DEFINED _paraview_add_tests_CLIENT)
+    if (NOT TARGET ParaView::paraview # For external testing.
+        AND NOT paraview_will_be_built) # For use within ParaView itself.
+      return ()
+    endif ()
+
     set(_paraview_add_tests_CLIENT
       "$<TARGET_FILE:ParaView::paraview>")
   endif ()

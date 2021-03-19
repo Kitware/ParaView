@@ -3,8 +3,8 @@
   <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuTools" />
   <pqevent object="pqClientMainWindow/menubar/menuTools" command="activate" arguments="actionManage_Plugins" />
   <pqevent object="pqClientMainWindow" command="process_events" arguments="1000" />
-  <pqevent object="pqClientMainWindow/PluginManagerDialog/localGroup/localPlugins" command="setCurrent" arguments="pvNVIDIAIndeX" />
-  <pqevent object="pqClientMainWindow/PluginManagerDialog/localGroup/loadSelected_Local" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/PluginManagerDialog/splitter/localGroup/localPlugins" command="setCurrent" arguments="pvNVIDIAIndeX" />
+  <pqevent object="pqClientMainWindow/PluginManagerDialog/splitter/localGroup/loadSelected_Local" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/PluginEULADialog/buttonBox/1QPushButton0" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/PluginManagerDialog/buttonBox/1QPushButton0" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuSources" />
