@@ -914,10 +914,16 @@ bool vtkPVDataInformation::IsAttributeValid(int fieldAssociation) const
         return true;
 
       case vtkDataObject::FIELD_ASSOCIATION_POINTS:
-      case vtkDataObject::FIELD_ASSOCIATION_CELLS:
         return vtkDataObjectTypes::TypeIdIsA(dtype, VTK_DATA_SET);
 
+      case vtkDataObject::FIELD_ASSOCIATION_CELLS:
+        return vtkDataObjectTypes::TypeIdIsA(dtype, VTK_DATA_SET) ||
+          vtkDataObjectTypes::TypeIdIsA(dtype, VTK_HYPER_TREE_GRID);
+
       case vtkDataObject::FIELD_ASSOCIATION_VERTICES:
+        return vtkDataObjectTypes::TypeIdIsA(dtype, VTK_GRAPH) ||
+          vtkDataObjectTypes::TypeIdIsA(dtype, VTK_HYPER_TREE_GRID);
+
       case vtkDataObject::FIELD_ASSOCIATION_EDGES:
         return vtkDataObjectTypes::TypeIdIsA(dtype, VTK_GRAPH);
 
