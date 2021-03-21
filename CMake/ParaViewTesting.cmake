@@ -33,7 +33,7 @@ function (_paraview_add_tests function)
   cmake_parse_arguments(_paraview_add_tests
     "FORCE_SERIAL;FORCE_LOCK"
     "LOAD_PLUGIN;PLUGIN_PATH;CLIENT;TEST_DIRECTORY;TEST_DATA_TARGET;PREFIX;SUFFIX;_ENABLE_SUFFIX;_DISABLE_SUFFIX;BASELINE_DIR;DATA_DIRECTORY;NUMPROCS"
-    "_COMMAND_PATTERN;LOAD_PLUGINS;PLUGIN_PATHS;TEST_SCRIPTS;ENVIRONMENT;ARGS;CLIENT_ARGS"
+    "_COMMAND_PATTERN;LOAD_PLUGINS;PLUGIN_PATHS;TEST_SCRIPTS;TEST_NAME;ENVIRONMENT;ARGS;CLIENT_ARGS"
     ${ARGN})
 
   if (_paraview_add_tests_UNPARSED_ARGUMENTS)
@@ -70,6 +70,14 @@ function (_paraview_add_tests function)
     set(_paraview_add_tests_DATA_DIRECTORY
       "${_paraview_add_tests_default_data_directory}")
   endif ()
+
+  if (DEFINED _paraview_add_tests_TEST_SCRIPTS AND DEFINED _paraview_add_tests_TEST_NAME)
+    message(FATAL_ERROR
+      "Only one of `TEST_NAME` or `TEST_SCRIPTS` must be specified.")
+  elseif (NOT DEFINED _paraview_add_tests_TEST_SCRIPTS AND NOT DEFINED _paraview_add_tests_TEST_NAME)
+    message(FATAL_ERROR
+      "Either `TEST_SCRIPTS` or `TEST_NAME` must be specified.")
+  endif()
 
   set(_paraview_add_tests_args
     ${_paraview_add_tests_ARGS})
@@ -113,13 +121,20 @@ function (_paraview_add_tests function)
     _paraview_add_tests__COMMAND_PATTERN
     "${_paraview_add_tests__COMMAND_PATTERN}")
 
-  foreach (_paraview_add_tests_script IN LISTS _paraview_add_tests_TEST_SCRIPTS)
-    if (NOT IS_ABSOLUTE "${_paraview_add_tests_script}")
-      set(_paraview_add_tests_script
-        "${CMAKE_CURRENT_SOURCE_DIR}/${_paraview_add_tests_script}")
-    endif ()
-    get_filename_component(_paraview_add_tests_name "${_paraview_add_tests_script}" NAME_WE)
-    set(_paraview_add_tests_name_base "${_paraview_add_tests_name}")
+  foreach (_paraview_add_tests_script IN LISTS _paraview_add_tests_TEST_SCRIPTS _paraview_add_tests_TEST_NAME)
+    if (DEFINED _paraview_add_tests_TEST_NAME)
+      set(_paraview_add_tests_name "${_paraview_add_tests_script}")
+      set(_paraview_add_tests_name_base "${_paraview_add_tests_name}")
+      set(_paraview_add_tests_script)
+    else()
+      if (NOT IS_ABSOLUTE "${_paraview_add_tests_script}")
+        set(_paraview_add_tests_script
+          "${CMAKE_CURRENT_SOURCE_DIR}/${_paraview_add_tests_script}")
+      endif ()
+      get_filename_component(_paraview_add_tests_name "${_paraview_add_tests_script}" NAME_WE)
+      set(_paraview_add_tests_name_base "${_paraview_add_tests_name}")
+    endif()
+
     string(APPEND _paraview_add_tests_name "${_paraview_add_tests_SUFFIX}")
 
     if (DEFINED _paraview_add_tests__DISABLE_SUFFIX AND ${_paraview_add_tests_name}${_paraview_add_tests__DISABLE_SUFFIX})
@@ -177,12 +192,22 @@ function (_paraview_add_tests function)
         "--data-directory=${_paraview_add_tests_DATA_DIRECTORY}")
     endif ()
 
-    string(REPLACE "__paraview_script__" "--test-script=${_paraview_add_tests_script}"
-      _paraview_add_tests_script_args
-      "${_paraview_add_tests__COMMAND_PATTERN}")
-    string(REPLACE "__paraview_scriptpath__" "${_paraview_add_tests_script}"
-      _paraview_add_tests_script_args
-      "${_paraview_add_tests_script_args}")
+    if (DEFINED _paraview_add_tests_TEST_NAME)
+      string(REPLACE "__paraview_script__" ""
+        _paraview_add_tests_script_args
+        "${_paraview_add_tests__COMMAND_PATTERN}")
+      string(REPLACE "__paraview_scriptpath__" ""
+        _paraview_add_tests_script_args
+        "${_paraview_add_tests_script_args}")
+    else()
+      string(REPLACE "__paraview_script__" "--test-script=${_paraview_add_tests_script}"
+        _paraview_add_tests_script_args
+        "${_paraview_add_tests__COMMAND_PATTERN}")
+      string(REPLACE "__paraview_scriptpath__" "${_paraview_add_tests_script}"
+        _paraview_add_tests_script_args
+        "${_paraview_add_tests_script_args}")
+    endif()
+
     string(REPLACE "__paraview_client_args__" "${_paraview_add_tests_client_args}"
       _paraview_add_tests_script_args
       "${_paraview_add_tests_script_args}")
@@ -216,7 +241,7 @@ function (_paraview_add_tests function)
       set_property(TEST "${_paraview_add_tests_PREFIX}.${_paraview_add_tests_name}"
         PROPERTY
           RUN_SERIAL ON)
-    elseif (EXISTS "${_paraview_add_tests_script}")
+    elseif (NOT DEFINED _paraview_add_tests_TEST_NAME AND EXISTS "${_paraview_add_tests_script}")
       # if the XML test contains PARAVIEW_TEST_ROOT we assume that we may be writing
       # to that file and reading it back in so we add a resource lock on the XML
       # file so that the pv.X, pvcx.X and pvcrs.X tests don't run simultaneously.
