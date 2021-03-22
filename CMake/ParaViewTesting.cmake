@@ -463,7 +463,7 @@ endfunction ()
 function (paraview_add_test_mpi)
   if (PARAVIEW_USE_MPI)
     _get_prefix(chosen_prefix "paraview-mpi" ${ARGN})
-    _paraview_add_tests("paraview_add_test"
+    _paraview_add_tests("paraview_add_test_mpi"
       PREFIX "${chosen_prefix}"
       NUMPROCS 2 # See Utilities/TestDriver/CMakeLists.txt (PARAVIEW_MPI_MAX_NUMPROCS)
       _COMMAND_PATTERN
