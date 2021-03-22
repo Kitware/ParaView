@@ -18,8 +18,8 @@
   Under the terms of Contract DE-AC04-94AL85000 with Sandia Corporation,
   the U.S. Government retains certain rights in this software.
 -------------------------------------------------------------------------*/
-
 #include "pqSLACManager.h"
+#include "ui_pqSLACActionHolder.h"
 
 #include "pqActiveObjects.h"
 #include "pqApplicationCore.h"
@@ -48,14 +48,13 @@
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMSourceProxy.h"
+#include "vtkSMViewProxy.h"
 #include "vtkTable.h"
 #include "vtkTemporalRanges.h"
 
 #include <QMainWindow>
 #include <QPointer>
 #include <QtDebug>
-
-#include "ui_pqSLACActionHolder.h"
 
 //=============================================================================
 class pqSLACManager::pqInternal
@@ -779,7 +778,25 @@ void pqSLACManager::createPlotOverZ()
   plotFilter->updatePipeline();
 
   // Make representation
-  controller->Show(plotFilter->getSourceProxy(), 0, plotView ? plotView->getViewProxy() : nullptr);
+  if (plotView)
+  {
+    controller->Show(plotFilter->getSourceProxy(), 0, plotView->getViewProxy());
+  }
+  else
+  {
+    auto newview = vtkSMViewProxy::SafeDownCast(
+      controller->ShowInPreferredView(plotFilter->getSourceProxy(), 0, nullptr));
+    if (newview)
+    {
+      const auto& activeObjects = pqActiveObjects::instance();
+      controller->AssignViewToLayout(
+        newview, activeObjects.activeLayout(), activeObjects.activeLayoutLocation());
+    }
+    else
+    {
+      qWarning() << "Failed to create 'Plot View'.";
+    }
+  }
 
   this->updatePlotField();
 
