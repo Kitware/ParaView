@@ -81,7 +81,5 @@ OPTIONAL_DEPENDS
   VTK::ParallelMomentInvariants
   VTK::PythonInterpreter
   VTK::RenderingFreeType
-TEST_DEPENDS
-  ParaView::RemotingMisc
 TEST_LABELS
   ParaView
