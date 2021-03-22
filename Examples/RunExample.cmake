@@ -2,8 +2,8 @@ cmake_minimum_required(VERSION 3.12)
 
 if (WIN32)
   # Append the ParaView DLL directory to PATH for the tests.
-  list(APPEND ENV{PATH}
-    "${paraview_binary_dir}")
+  set(ENV{PATH}
+    "$ENV{PATH};${paraview_binary_dir}")
 endif ()
 
 set(cmake_arguments)
