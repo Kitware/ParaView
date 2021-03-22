@@ -13,6 +13,6 @@ if (BUILD_SHARED_LIBS)
   paraview_add_client_tests(
     LOAD_PLUGIN "SLACTools"
     TEST_DATA_TARGET ParaViewData
-    TEST_SCRIPTS ${MODULE_TESTS}
+    TEST_SCRIPTS ${module_tests}
   )
 endif ()
