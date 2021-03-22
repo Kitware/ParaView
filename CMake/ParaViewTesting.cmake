@@ -48,7 +48,8 @@ function (_paraview_add_tests function)
   endif ()
 
   if (NOT DEFINED _paraview_add_tests_CLIENT)
-    if (NOT TARGET ParaView::paraview # For external testing.
+    if ("__paraview_client__" IN_LIST _paraview_add_tests__COMMAND_PATTERN # do we care?
+        AND NOT TARGET ParaView::paraview # For external testing.
         AND NOT paraview_will_be_built) # For use within ParaView itself.
       return ()
     endif ()
