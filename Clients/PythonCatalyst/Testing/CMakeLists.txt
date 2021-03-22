@@ -77,10 +77,14 @@ vtk_module_test_data(
 
 set(simple_scripts
   ValidateChangingInput.py
-  LiveOnly.py
   CatalystScriptCustomCallbackVerifier.py
   package_test
   package_test_zip.zip)
+
+if (TARGET ParaView::RemotingLive)
+  list(APPEND simple_scripts
+      LiveOnly.py)
+endif()
 
 if (NOT PARAVIEW_SERIAL_TESTS_USE_MPIEXEC)
   # no need to add these non-MPI tests if serial tests are going to use MPI
@@ -110,47 +114,48 @@ foreach (tname IN LISTS scripts)
   endif()
 endforeach()
 
-#--------------------------------------------------------------------
-# add test to validate multiple analysis pipelines can be used.
-add_test(NAME Catalyst::WaveletMiniApp::MultiplePipelines::Prepare
-         COMMAND "${CMAKE_COMMAND}" -E remove_directory "${CMAKE_BINARY_DIR}/Testing/Temporary/MultiplePipelines")
-set_tests_properties(
-  "Catalyst::WaveletMiniApp::MultiplePipelines::Prepare"
-  PROPERTIES
-    FIXTURES_SETUP "Catalyst::WaveletMiniApp::MultiplePipelines::Prepare")
-paraview_add_test(
-    PREFIX "Catalyst::WaveletMiniApp::MultiplePipelines::pipeline1"
-    ENVIRONMENT
-      PARAVIEW_OVERRIDE_EXTRACTS_OUTPUT_DIRECTORY=${CMAKE_BINARY_DIR}/Testing/Temporary/MultiplePipelines/
-    ARGS   "$<TARGET_FILE:ParaView::pvbatch>"
-           -sym
-           -dr
-           -m paraview.demos.wavelet_miniapp -t 10 --size 21
-           --channel Wavelet1
-           -s "${CMAKE_CURRENT_SOURCE_DIR}/pipeline1.py"
-           -s
-    TEST_SCRIPTS "${CMAKE_CURRENT_SOURCE_DIR}/pipeline2.py")
-set_tests_properties(
-  "Catalyst::WaveletMiniApp::MultiplePipelines::pipeline1.pipeline2"
-  PROPERTIES
-    FIXTURES_REQUIRED "Catalyst::WaveletMiniApp::MultiplePipelines::Prepare")
+if (TARGET ParaView::RemotingViews)
+  #--------------------------------------------------------------------
+  # add test to validate multiple analysis pipelines can be used.
+  add_test(NAME Catalyst::WaveletMiniApp::MultiplePipelines::Prepare
+           COMMAND "${CMAKE_COMMAND}" -E remove_directory "${CMAKE_BINARY_DIR}/Testing/Temporary/MultiplePipelines")
+  set_tests_properties(
+    "Catalyst::WaveletMiniApp::MultiplePipelines::Prepare"
+    PROPERTIES
+      FIXTURES_SETUP "Catalyst::WaveletMiniApp::MultiplePipelines::Prepare")
+  paraview_add_test(
+      PREFIX "Catalyst::WaveletMiniApp::MultiplePipelines::pipeline1"
+      ENVIRONMENT
+        PARAVIEW_OVERRIDE_EXTRACTS_OUTPUT_DIRECTORY=${CMAKE_BINARY_DIR}/Testing/Temporary/MultiplePipelines/
+      ARGS   "$<TARGET_FILE:ParaView::pvbatch>"
+             -sym
+             -dr
+             -m paraview.demos.wavelet_miniapp -t 10 --size 21
+             --channel Wavelet1
+             -s "${CMAKE_CURRENT_SOURCE_DIR}/pipeline1.py"
+             -s
+      TEST_SCRIPTS "${CMAKE_CURRENT_SOURCE_DIR}/pipeline2.py")
+  set_tests_properties(
+    "Catalyst::WaveletMiniApp::MultiplePipelines::pipeline1.pipeline2"
+    PROPERTIES
+      FIXTURES_REQUIRED "Catalyst::WaveletMiniApp::MultiplePipelines::Prepare")
 
-paraview_add_test(
-    PREFIX "Catalyst::WaveletMiniApp::MultiplePipelines::Validate::pipeline1"
-    ARGS   "$<TARGET_FILE:ParaView::pvpython>"
-           -dr
-           -m paraview.tests.validate_extracts
-           --name MultiplePipelines
-           --root "${CMAKE_BINARY_DIR}/Testing/Temporary/MultiplePipelines"
-           --baseline-dir "${paraview_test_data_directory_output}/Clients/PythonCatalyst/Testing/Data/Baseline"
-           --temp-dir "${CMAKE_BINARY_DIR}/Testing/Temporary"
-           --json
-    TEST_SCRIPTS "${CMAKE_CURRENT_SOURCE_DIR}/pipeline2.json")
-set_tests_properties(
-    "Catalyst::WaveletMiniApp::MultiplePipelines::Validate::pipeline1.pipeline2"
-    PROPERTIES DEPENDS
-      "Catalyst::WaveletMiniApp::MultiplePipelines::pipeline1.pipeline2")
-
+  paraview_add_test(
+      PREFIX "Catalyst::WaveletMiniApp::MultiplePipelines::Validate::pipeline1"
+      ARGS   "$<TARGET_FILE:ParaView::pvpython>"
+             -dr
+             -m paraview.tests.validate_extracts
+             --name MultiplePipelines
+             --root "${CMAKE_BINARY_DIR}/Testing/Temporary/MultiplePipelines"
+             --baseline-dir "${paraview_test_data_directory_output}/Clients/PythonCatalyst/Testing/Data/Baseline"
+             --temp-dir "${CMAKE_BINARY_DIR}/Testing/Temporary"
+             --json
+      TEST_SCRIPTS "${CMAKE_CURRENT_SOURCE_DIR}/pipeline2.json")
+  set_tests_properties(
+      "Catalyst::WaveletMiniApp::MultiplePipelines::Validate::pipeline1.pipeline2"
+      PROPERTIES DEPENDS
+        "Catalyst::WaveletMiniApp::MultiplePipelines::pipeline1.pipeline2")
+endif()
 
 #---------------------------------------------------------------------
 # add tests for filedriver_miniapp

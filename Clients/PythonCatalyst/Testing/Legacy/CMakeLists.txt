@@ -1,18 +1,24 @@
 #---------------------------------------------------------------------
 # Tests for legacy Catalyst analysis pipeline scripts.
 set(legacy_catalyst_pipelines
-  # test to see if the input is changing, i.e. that the initial
-  # pipeline is having it's trivial producer updated with a new grid
-  TestInput.py
-
   # test if a given Catalyst analsyis script can import another Python script
   cpimport.py
 
   # test if we can use a Python programmable filter in a Catalyst Python script
   cpprogrammablefilter.py
 
-  PythonScriptTest.py
   )
+
+if (TARGET ParaView::RemotingViews)
+  list(APPEND legacy_catalyst_pipelines
+    # test to see if the input is changing, i.e. that the initial
+    # pipeline is having it's trivial producer updated with a new grid
+    # Since it uses ClientServerModeData, it needs rendering.
+    TestInput.py
+
+    # This test using RenderView
+    PythonScriptTest.py)
+endif()
 
 if (PARAVIEW_PLUGIN_ENABLE_VTKmFilters AND PARAVIEW_USE_VTKM)
   list(APPEND legacy_catalyst_pipelines
