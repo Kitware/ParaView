@@ -79,10 +79,13 @@ struct GmshReaderInternal
   static const std::unordered_map<GmshPrimitive, std::pair<int, int>, std::hash<GmshPrimitive> >
     TRANSLATE_CELL;
 
-  static constexpr const char* DIM_LABEL[4] = { "0-Points", "1-Curves", "2-Surfaces", "3-Volumes" };
+  static constexpr short NUM_DIM = 4;
+  static constexpr const char* DIM_LABEL[NUM_DIM] = { "0-Points", "1-Curves", "2-Surfaces",
+    "3-Volumes" };
 };
 
-constexpr const char* GmshReaderInternal::DIM_LABEL[4];
+constexpr short GmshReaderInternal::NUM_DIM;
+constexpr const char* GmshReaderInternal::DIM_LABEL[GmshReaderInternal::NUM_DIM];
 
 const std::unordered_map<GmshPrimitive, std::pair<int, int>, std::hash<GmshPrimitive> >
   GmshReaderInternal::TRANSLATE_CELL = { { GmshPrimitive::POINT, { VTK_VERTEX, 1 } },
@@ -213,7 +216,7 @@ void vtkGmshReader::LoadPhysicalGroups()
   // Tag=-1 to get every elements and nodes when requesting data using gmsh API
   if (dimTag.empty())
   {
-    for (int dim = 0; dim < 4; ++dim)
+    for (int dim = 0; dim < GmshReaderInternal::NUM_DIM; ++dim)
     {
       PhysicalGroup currentGrp;
       currentGrp.Dimension = dim;
@@ -625,30 +628,79 @@ int vtkGmshReader::RequestData(
   this->FillOutputTimeInformation(outInfo);
   const double actualTime = this->GetActualTime(outInfo);
   const int nbOfPhysGroups = this->Internal->Groups.size();
-
   vtkMultiBlockDataSet* root =
     vtkMultiBlockDataSet::SafeDownCast(outInfo->Get(vtkDataObject::DATA_OBJECT()));
-  root->SetNumberOfBlocks(nbOfPhysGroups);
-  root->GetInformation()->Set(vtkDataObject::DATA_TIME_STEP(), actualTime);
-  for (int grpIdx = 0; grpIdx < nbOfPhysGroups; ++grpIdx)
-  {
-    vtkNew<vtkUnstructuredGrid> leaf;
-    this->FillGrid(leaf, grpIdx, actualTime);
 
-    if (this->GetCreateGmshDimensionArray())
+  if (this->GroupByDimension)
+  {
+    std::array<std::vector<std::size_t>, GmshReaderInternal::NUM_DIM> groups;
+    for (std::size_t i = 0; i < this->Internal->Groups.size(); ++i)
     {
-      vtkNew<vtkIntArray> dimInfoArray;
-      dimInfoArray->SetName("gmshDimension");
-      dimInfoArray->SetNumberOfComponents(1);
-      dimInfoArray->SetNumberOfTuples(1);
-      dimInfoArray->SetValue(0, this->Internal->Groups[grpIdx].Dimension);
-      leaf->GetFieldData()->AddArray(dimInfoArray);
+      const int dim = this->Internal->Groups[i].Dimension;
+      if (dim > 0 && dim < GmshReaderInternal::NUM_DIM)
+      {
+        groups[dim].emplace_back(i);
+      }
     }
 
-    root->SetBlock(grpIdx, leaf);
-    leaf->GetInformation()->Set(vtkDataObject::DATA_TIME_STEP(), actualTime);
-    root->GetMetaData(grpIdx)->Set(
-      vtkCompositeDataSet::NAME(), this->Internal->Groups[grpIdx].Name);
+    std::array<vtkNew<vtkMultiBlockDataSet>, GmshReaderInternal::NUM_DIM> dimBlocks;
+    root->SetNumberOfBlocks(GmshReaderInternal::NUM_DIM);
+    for (int dim = 0; dim < GmshReaderInternal::NUM_DIM; ++dim)
+    {
+      root->SetBlock(dim, dimBlocks[dim]);
+      root->GetMetaData(dim)->Set(vtkCompositeDataSet::NAME(), GmshReaderInternal::DIM_LABEL[dim]);
+
+      dimBlocks[dim]->GetInformation()->Set(vtkDataObject::DATA_TIME_STEP(), actualTime);
+      dimBlocks[dim]->SetNumberOfBlocks(groups[dim].size());
+      int localLeafIndex = 0;
+      for (const std::size_t& grpIdx : groups[dim])
+      {
+        vtkNew<vtkUnstructuredGrid> leaf;
+        this->FillGrid(leaf, grpIdx, actualTime);
+
+        if (this->GetCreateGmshDimensionArray())
+        {
+          vtkNew<vtkIntArray> dimInfoArray;
+          dimInfoArray->SetName("gmshDimension");
+          dimInfoArray->SetNumberOfComponents(1);
+          dimInfoArray->SetNumberOfTuples(1);
+          dimInfoArray->SetValue(0, dim);
+          leaf->GetFieldData()->AddArray(dimInfoArray);
+        }
+
+        dimBlocks[dim]->SetBlock(localLeafIndex, leaf);
+        leaf->GetInformation()->Set(vtkDataObject::DATA_TIME_STEP(), actualTime);
+        dimBlocks[dim]
+          ->GetMetaData(localLeafIndex)
+          ->Set(vtkCompositeDataSet::NAME(), this->Internal->Groups[grpIdx].Name);
+        localLeafIndex++;
+      }
+    }
+  }
+  else
+  {
+    root->SetNumberOfBlocks(nbOfPhysGroups);
+    root->GetInformation()->Set(vtkDataObject::DATA_TIME_STEP(), actualTime);
+    for (int grpIdx = 0; grpIdx < nbOfPhysGroups; ++grpIdx)
+    {
+      vtkNew<vtkUnstructuredGrid> leaf;
+      this->FillGrid(leaf, grpIdx, actualTime);
+
+      if (this->GetCreateGmshDimensionArray())
+      {
+        vtkNew<vtkIntArray> dimInfoArray;
+        dimInfoArray->SetName("gmshDimension");
+        dimInfoArray->SetNumberOfComponents(1);
+        dimInfoArray->SetNumberOfTuples(1);
+        dimInfoArray->SetValue(0, this->Internal->Groups[grpIdx].Dimension);
+        leaf->GetFieldData()->AddArray(dimInfoArray);
+      }
+
+      root->SetBlock(grpIdx, leaf);
+      leaf->GetInformation()->Set(vtkDataObject::DATA_TIME_STEP(), actualTime);
+      root->GetMetaData(grpIdx)->Set(
+        vtkCompositeDataSet::NAME(), this->Internal->Groups[grpIdx].Name);
+    }
   }
 
   return 1;

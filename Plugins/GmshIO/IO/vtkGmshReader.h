@@ -52,33 +52,47 @@ public:
   //@{
   /**
    * Specify if we create a cell data array containing Gmsh cell IDs.
+   * Default is false.
    */
-  vtkSetMacro(CreateGmshCellIDArray, int);
-  vtkGetMacro(CreateGmshCellIDArray, int);
+  vtkSetMacro(CreateGmshCellIDArray, bool);
+  vtkGetMacro(CreateGmshCellIDArray, bool);
   //@}
 
   //@{
   /**
    * Specify if we create a point data array containing Gmsh node IDs.
+   * Default is false.
    */
-  vtkSetMacro(CreateGmshNodeIDArray, int);
-  vtkGetMacro(CreateGmshNodeIDArray, int);
+  vtkSetMacro(CreateGmshNodeIDArray, bool);
+  vtkGetMacro(CreateGmshNodeIDArray, bool);
   //@}
 
   //@{
   /**
    * Specify if we create a cell data array containing Gmsh entity IDs.
+   * Default is false.
    */
-  vtkSetMacro(CreateGmshEntityIDArray, int);
-  vtkGetMacro(CreateGmshEntityIDArray, int);
+  vtkSetMacro(CreateGmshEntityIDArray, bool);
+  vtkGetMacro(CreateGmshEntityIDArray, bool);
   //@}
 
   //@{
   /**
    * Specify if we create a field data array containing the dimension for a dataset.
+   * Default is false.
    */
-  vtkSetMacro(CreateGmshDimensionArray, int);
-  vtkGetMacro(CreateGmshDimensionArray, int);
+  vtkSetMacro(CreateGmshDimensionArray, bool);
+  vtkGetMacro(CreateGmshDimensionArray, bool);
+  //@}
+
+  //@{
+  /**
+   * If true physical groups will be grouped by dimensions with a vtkMultiBlockDataSet
+   * for each dimension. Else every physical group will be directly under the root node.
+   * Default is true.
+   */
+  vtkSetMacro(GroupByDimension, bool);
+  vtkGetMacro(GroupByDimension, bool);
   //@}
 
 protected:
@@ -104,11 +118,12 @@ private:
   double GetActualTime(vtkInformation* outputVector) const;
 
   char* FileName = nullptr;
-  int CreateGmshCellIDArray = 0;
-  int CreateGmshNodeIDArray = 0;
-  int CreateGmshEntityIDArray = 0;
-  int CreateGmshDimensionArray = 0;
-  GmshReaderInternal* Internal;
+  bool CreateGmshCellIDArray = false;
+  bool CreateGmshNodeIDArray = false;
+  bool CreateGmshEntityIDArray = false;
+  bool CreateGmshDimensionArray = false;
+  bool GroupByDimension = true;
+  GmshReaderInternal* Internal = nullptr;
 
   vtkGmshReader(const vtkGmshReader&) = delete;
   void operator=(const vtkGmshReader&) = delete;
