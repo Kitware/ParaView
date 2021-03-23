@@ -1148,12 +1148,46 @@ vtkSmartPointer<vtkDataObject> vtkPVDataInformation::GetSubset(vtkDataObject* do
     return dobj;
   }
 
-  vtkNew<vtkExtractBlockUsingDataAssembly> extractor;
-  extractor->SetInputDataObject(dobj);
-  extractor->SetAssemblyName(this->SubsetAssemblyName);
-  extractor->SetSelector(this->SubsetSelector);
-  extractor->Update();
-  return extractor->GetOutputDataObject(0);
+  auto activeAssembly = vtkDataAssemblyUtilities::GetDataAssembly(this->SubsetAssemblyName, cd);
+  if (!activeAssembly)
+  {
+    return nullptr;
+  }
+
+  const auto cids = vtkDataAssemblyUtilities::GetSelectedCompositeIds(
+    { this->SubsetSelector }, activeAssembly, vtkPartitionedDataSetCollection::SafeDownCast(cd));
+  if (cids.size() == 0)
+  {
+    return nullptr;
+  }
+
+  if (cids.size() == 1)
+  {
+    vtkSmartPointer<vtkPartitionedDataSetCollection> subset;
+    auto iter = vtkSmartPointer<vtkCompositeDataIterator>::Take(cd->NewIterator());
+    if (auto diter = vtkDataObjectTreeIterator::SafeDownCast(iter))
+    {
+      diter->VisitOnlyLeavesOff();
+      diter->TraverseSubTreeOn();
+    }
+    for (iter->InitTraversal(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
+    {
+      if (iter->GetCurrentFlatIndex() == cids.front())
+      {
+        return iter->GetCurrentDataObject();
+      }
+    }
+    return nullptr;
+  }
+  else
+  {
+    vtkNew<vtkExtractBlockUsingDataAssembly> extractor;
+    extractor->SetInputDataObject(dobj);
+    extractor->SetAssemblyName(this->SubsetAssemblyName);
+    extractor->SetSelector(this->SubsetSelector);
+    extractor->Update();
+    return extractor->GetOutputDataObject(0);
+  }
 }
 
 //----------------------------------------------------------------------------
