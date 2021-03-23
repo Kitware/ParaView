@@ -269,8 +269,8 @@ vtkSmartPointer<vtkDataArray> vtkConduitArrayUtilities::MCArrayToVTKArrayImpl(
     if (dtype0.id() != dtypeCC.id())
     {
       vtkLogF(ERROR,
-        "mismatched component types for component 0 (%s) and %lld (%s); currently not supported.",
-        dtype0.name().c_str(), cc, dtypeCC.name().c_str());
+        "mismatched component types for component 0 (%s) and %d (%s); currently not supported.",
+        dtype0.name().c_str(), static_cast<int>(cc), dtypeCC.name().c_str());
       return nullptr;
     }
   }
