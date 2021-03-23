@@ -19,7 +19,8 @@ dnf install -y --setopt=install_weak_deps=False \
 # Development tools
 dnf install -y --setopt=install_weak_deps=False \
     libasan libtsan libubsan clang-tools-extra \
-    gcc gcc-c++ gcc-gfortran
+    gcc gcc-c++ gcc-gfortran \
+    ninja-build
 
 # External dependencies
 dnf install -y --setopt=install_weak_deps=False \
