@@ -109,10 +109,6 @@ bool vtkSMAnimationSceneWebWriter::SaveInitialize(int vtkNotUsed(startCount))
     }
     return false;
   }
-#else
-  vtkErrorMacro("Python is not enabled, cannot export scene");
-  return false;
-#endif
 
   this->Internals->FrameCounter = 0;
   this->Internals->RootIndexStr << "{\n"
@@ -127,6 +123,10 @@ bool vtkSMAnimationSceneWebWriter::SaveInitialize(int vtkNotUsed(startCount))
                                 << "    \"timeSteps\": [\n";
 
   return true;
+#else
+  vtkErrorMacro("Python is not enabled, cannot export scene");
+  return false;
+#endif
 }
 
 //-----------------------------------------------------------------------------
