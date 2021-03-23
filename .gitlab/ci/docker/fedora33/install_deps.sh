@@ -2,19 +2,19 @@
 
 # Install extra dependencies for ParaView
 dnf install -y --setopt=install_weak_deps=False \
-   bzip2 patch doxygen git-core git-lfs
+    bzip2 patch doxygen git-core git-lfs
 
 # MPI dependencies
 dnf install -y --setopt=install_weak_deps=False \
-   openmpi-devel mpich-devel
+    openmpi-devel mpich-devel
 
 # Qt dependencies
 dnf install -y --setopt=install_weak_deps=False \
-   qt5-qtbase-devel qt5-qttools-devel qt5-qtsvg-devel qt5-qtxmlpatterns-devel
+    qt5-qtbase-devel qt5-qttools-devel qt5-qtsvg-devel qt5-qtxmlpatterns-devel
 
 # Mesa dependencies
 dnf install -y --setopt=install_weak_deps=False \
-   mesa-libOSMesa-devel mesa-libOSMesa
+    mesa-libOSMesa-devel mesa-libOSMesa
 
 # Development tools
 dnf install -y --setopt=install_weak_deps=False \
@@ -30,9 +30,9 @@ dnf install -y --setopt=install_weak_deps=False \
 
 # Python dependencies
 dnf install -y --setopt=install_weak_deps=False \
-   python3-twisted python3-autobahn python3 python3-devel python3-numpy \
-   python3-pandas python3-pandas-datareader python3-sphinx python3-pip \
-   python3-mpi4py-mpich python3-mpi4py-openmpi python3-matplotlib
+    python3-twisted python3-autobahn python3 python3-devel python3-numpy \
+    python3-pandas python3-pandas-datareader python3-sphinx python3-pip \
+    python3-mpi4py-mpich python3-mpi4py-openmpi python3-matplotlib
 
 python3 -m pip install wslink
 
