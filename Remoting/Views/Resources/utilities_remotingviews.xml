@@ -758,7 +758,7 @@
       <IntVectorProperty name="Camera3DManipulators"
         label="Camera 3D Manipulators"
         number_of_elements="9"
-        default_values="4 1 2 3 4 1 2 4 6"
+        default_values="4 1 2 3 4 1 7 4 6"
         panel_widget="camera_manipulator">
         <!-- For now, we are marking this property is_internal so that it won't
         get saved in state files. -->
@@ -773,6 +773,7 @@
           <Entry text="Rotate" value="4" />
           <Entry text="Multi-Rotate" value="5" />
           <Entry text="ZoomToMouse" value="6" />
+          <Entry text="SkyboxRotate" value="7" />
         </EnumerationDomain>
       </IntVectorProperty>
       <DoubleVectorProperty command="SetCamera3DMouseWheelMotionFactor"
