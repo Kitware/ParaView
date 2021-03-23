@@ -13,12 +13,12 @@
 
 =========================================================================*/
 
-#include <fstream>
 #include <iostream>
 #include <sstream>
 #include <string>
 #include <vector>
 #include <vtksys/Base64.h>
+#include <vtksys/FStream.hxx>
 #include <vtksys/RegularExpression.hxx>
 #include <vtksys/SystemTools.hxx>
 
@@ -67,8 +67,9 @@ public:
 
   int ProcessFile(const char* file, const char* title)
   {
-    std::ifstream ifs(file,
-      this->UseBase64Encoding ? (std::ifstream::in | std::ifstream::binary) : std::ifstream::in);
+    vtksys::ifstream ifs(file, this->UseBase64Encoding
+        ? (vtksys::ifstream::in | vtksys::ifstream::binary)
+        : vtksys::ifstream::in);
     if (!ifs)
     {
       std::cerr << "Cannot open file: " << file << std::endl;
@@ -215,7 +216,7 @@ public:
 
 static bool read_option_file(std::vector<std::string>& strings, const char* fname)
 {
-  std::ifstream fp(fname);
+  vtksys::ifstream fp(fname);
   if (!fp)
   {
     return false;
@@ -331,13 +332,13 @@ int main(int argc, char* argv[])
   }
 
   ot.Stream << std::endl << std::endl << "#endif" << std::endl;
-  FILE* fp = fopen(output.c_str(), "w");
-  if (!fp)
+  vtksys::ofstream fout(output.c_str());
+  if (!fout)
   {
     std::cerr << "Cannot open output file: " << output << std::endl;
     return 1;
   }
-  fprintf(fp, "%s", ot.Stream.str().c_str());
-  fclose(fp);
+  fout << ot.Stream.str();
+  fout.close();
   return 0;
 }

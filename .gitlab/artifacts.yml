@@ -64,6 +64,7 @@
             - build/*/*/*/*/*/*.h
             - build/*/*/*/*/*/*/*.h
             - build/*/*/*/*/*/*/*/*.h
+            - build/*/*/*/*/*.hxx
             - build/ExternalData/
             - build/Testing/
             - build/Testing/Temporary/
