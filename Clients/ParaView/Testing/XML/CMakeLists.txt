@@ -1638,6 +1638,15 @@ set (ResetToVisibleRange_DISABLE_CRS TRUE)
 #set (MoleculeColoring_DISABLE_CS TRUE)
 #set (MoleculeColoring_DISABLE_CRS TRUE)
 
+# some glTF tests are not working in CS currently
+# https://gitlab.kitware.com/paraview/paraview/-/issues/20572
+set (glTFReaderToggleDeformation_DISABLE_CS TRUE)
+set (glTFReaderToggleDeformation_DISABLE_CRS TRUE)
+set (glTFReaderMultipleScenes_DISABLE_CS TRUE)
+set (glTFReaderMultipleScenes_DISABLE_CRS TRUE)
+set (glTFReaderMultipleAnimations_DISABLE_CS TRUE)
+set (glTFReaderMultipleAnimations_DISABLE_CRS TRUE)
+
 ##########################################################
 # List of known incompatible tests for Collaboration
 #
