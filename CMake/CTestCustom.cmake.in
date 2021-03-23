@@ -29,6 +29,9 @@ list(APPEND CTEST_CUSTOM_WARNING_EXCEPTION
 
   # compiler optimizations may sometimes lead to this warning
   "assuming signed overflow does not occur when assuming that"
+
+  # Visual Studio STL warnings.
+  "VC.Tools.*include.*: warning"
 )
 
 list(APPEND CTEST_CUSTOM_ERROR_EXCEPTION
