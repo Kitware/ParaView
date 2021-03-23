@@ -27,7 +27,7 @@ dnf install -y --setopt=install_weak_deps=False \
     eigen3-devel double-conversion-devel lz4-devel expat-devel glew-devel \
     hdf5-devel hdf5-mpich-devel hdf5-openmpi-devel hdf5-devel netcdf-devel \
     netcdf-mpich-devel netcdf-openmpi-devel libogg-devel libtheora-devel \
-    jsoncpp-devel gl2ps-devel protobuf-devel boost-devel
+    jsoncpp-devel gl2ps-devel protobuf-devel boost-devel gdal-devel PDAL-devel
 
 # Python dependencies
 dnf install -y --setopt=install_weak_deps=False \
@@ -36,5 +36,9 @@ dnf install -y --setopt=install_weak_deps=False \
     python3-mpi4py-mpich python3-mpi4py-openmpi python3-matplotlib
 
 python3 -m pip install wslink
+
+# Plugin dependencies
+dnf install -y --setopt=install_weak_deps=False \
+    gmsh-4.6.0 libcurl-devel
 
 dnf clean all
