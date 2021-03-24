@@ -527,7 +527,9 @@ bool vtkPVPluginLoader::LoadPluginInternal(const char* file, bool no_errors)
   vtkLibHandle lib = vtkDynamicLoader::OpenLibrary(file, flags);
   if (!lib)
   {
-    vtkPVPluginLoaderErrorMacro(vtkDynamicLoader::LastError());
+    std::stringstream ostr;
+    ostr << file << ": " << vtkDynamicLoader::LastError();
+    vtkPVPluginLoaderErrorMacro(ostr.str().c_str());
     vtkVLogIfF(PARAVIEW_LOG_PLUGIN_VERBOSITY(), this->ErrorString != nullptr,
       "Failed to load the shared library.\n%s", this->ErrorString);
     return false;
