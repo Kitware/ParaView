@@ -1378,7 +1378,7 @@ int checkfromfile()
       gmv_data.datatype = FROMFILE;
       i = (int)strlen(charptr);
       gmv_data.nchardata1 = i;
-      gmv_data.chardata1 = (char *)malloc(i*sizeof(char));
+      gmv_data.chardata1 = (char *)malloc((i+1)*sizeof(char));
       /*  No need for strncpy here because charptr is by design not too long.  */
       strcpy(gmv_data.chardata1,charptr);
       return 0;
@@ -3685,14 +3685,13 @@ void readunits(FILE* gmvin, int ftype)
       strncpy(gmv_data.chardata1, unittype, GMV_MIN(strlen(unittype), 20-1));
       *(gmv_data.chardata1 + GMV_MIN(strlen(unittype), 20-1)) = (char)0;
       gmv_data.nchardata2 = 1;
-      gmv_data.chardata2 = (char *)malloc(20*sizeof(char));
+      gmv_data.chardata2 = (char *)calloc(strlen(unitname), sizeof(char));
       if (gmv_data.chardata2 == NULL)
         {
          gmvrdmemerr();
          return;
         }
-      strncpy(gmv_data.chardata2, unitname, GMV_MIN(strlen(unitname), 20-1));
-      *(gmv_data.chardata2 + GMV_MIN(strlen(unitname), 20-1)) = (char)0;
+      strcpy(gmv_data.chardata2, unitname);
       return;
      }
 
@@ -3744,10 +3743,10 @@ void readunits(FILE* gmvin, int ftype)
             ioerrtst(gmvin);
             *(unitname+16) = (char) 0;
            }
+
          strncpy(&fldstr[i*MAXCUSTOMNAMELENGTH], fldname, GMV_MIN(strlen(fldname), MAXCUSTOMNAMELENGTH-1));
          fldstr[i*MAXCUSTOMNAMELENGTH + GMV_MIN(strlen(fldname), MAXCUSTOMNAMELENGTH-1)] = '\0';
-         strncpy(&unitstr[i*MAXCUSTOMNAMELENGTH], unitname, GMV_MIN(strlen(unitname), MAXCUSTOMNAMELENGTH-1));
-         unitstr[i*MAXCUSTOMNAMELENGTH + GMV_MIN(strlen(unitname), MAXCUSTOMNAMELENGTH-1)] = '\0';
+         strcpy(&unitstr[i*MAXCUSTOMNAMELENGTH], unitname);
         }
 
       if (strncmp(unittype,"nodes",5) == 0)
