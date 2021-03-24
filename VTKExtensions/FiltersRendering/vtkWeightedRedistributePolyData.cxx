@@ -463,10 +463,7 @@ void vtkWeightedRedistributePolyData::MakeSchedule(vtkPolyData* input, vtkCommSc
       }   // end loop over number of processors processors sent to
 
       // ... clean up ...
-      if (tempSend != nullptr)
-      {
-        delete[] tempSend;
-      }
+      delete[] tempSend;
     } // end loop over procs
 
     for (type = 0; type < NUM_CELL_TYPES; type++)

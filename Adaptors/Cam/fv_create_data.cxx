@@ -39,14 +39,8 @@ CamAdaptor::Grid<CamAdaptor::SPHERE>* g_sgrid;     /// structured (spherical) (2
 /// Deletes global data
 void fv_finalize()
 {
-  if (g_grid)
-  {
-    delete g_grid;
-  }
-  if (g_sgrid)
-  {
-    delete g_sgrid;
-  }
+  delete g_grid;
+  delete g_sgrid;
 }
 
 //------------------------------------------------------------------------------

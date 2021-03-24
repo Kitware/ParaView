@@ -38,10 +38,7 @@ vtkTimeStepProgressFilter::vtkTimeStepProgressFilter()
 //----------------------------------------------------------------------------
 vtkTimeStepProgressFilter::~vtkTimeStepProgressFilter()
 {
-  if (this->TimeSteps != nullptr)
-  {
-    delete[] this->TimeSteps;
-  }
+  delete[] this->TimeSteps;
 }
 
 //----------------------------------------------------------------------------
@@ -71,10 +68,7 @@ int vtkTimeStepProgressFilter::RequestInformation(vtkInformation* vtkNotUsed(req
     double* inTimes = inInfo->Get(vtkStreamingDemandDrivenPipeline::TIME_STEPS());
     this->NumTimeSteps = inInfo->Length(vtkStreamingDemandDrivenPipeline::TIME_STEPS());
 
-    if (this->TimeSteps != nullptr)
-    {
-      delete[] this->TimeSteps;
-    }
+    delete[] this->TimeSteps;
     this->TimeSteps = new double[this->NumTimeSteps];
 
     for (int i = 0; i < this->NumTimeSteps; i++)

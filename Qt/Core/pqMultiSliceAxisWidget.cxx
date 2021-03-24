@@ -125,10 +125,7 @@ pqMultiSliceAxisWidget::~pqMultiSliceAxisWidget()
   // will be deleted in the same time as us.
 
   // remove internal data structure
-  if (this->Internal)
-  {
-    delete this->Internal;
-  }
+  delete this->Internal;
 }
 
 // ----------------------------------------------------------------------------

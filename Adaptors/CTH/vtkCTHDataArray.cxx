@@ -72,16 +72,10 @@ void vtkCTHDataArray::Initialize()
   }
   this->Data = nullptr;
 
-  if (this->CopiedData)
-  {
-    delete[] this->CopiedData;
-  }
+  delete[] this->CopiedData;
   this->CopiedData = nullptr;
 
-  if (this->Tuple)
-  {
-    delete[] this->Tuple;
-  }
+  delete[] this->Tuple;
 }
 
 // This one sets the size for the data pointers

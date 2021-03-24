@@ -925,10 +925,7 @@ void vtkFileSeriesReader::UpdateMetaData()
           this->UseJsonMetaFile = true;
           this->MetaFileNameMTime = this->vtkDataObjectAlgorithm::GetMTime();
           size_t len = strlen(fname) + 1;
-          if (this->_MetaFileName)
-          {
-            delete[] this->_MetaFileName;
-          }
+          delete[] this->_MetaFileName;
           this->_MetaFileName = new char[len];
           memcpy(this->_MetaFileName, fname, len);
         }

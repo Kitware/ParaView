@@ -647,10 +647,7 @@ void pqKeyFrameEditor::deleteKeyFrame()
   if (this->Internal->Model.rowCount() == 1)
   {
     QStandardItem* item = this->Internal->Model.takeItem(0, 1);
-    if (item)
-    {
-      delete item;
-    }
+    delete item;
   }
 }
 

@@ -59,13 +59,7 @@ class vtkGeodesicMeshInternals
 public:
   vtkGeodesicMeshInternals() { this->Mesh = nullptr; }
 
-  ~vtkGeodesicMeshInternals()
-  {
-    if (this->Mesh)
-    {
-      delete this->Mesh;
-    }
-  }
+  ~vtkGeodesicMeshInternals() { delete this->Mesh; }
 
   // This callback is called every time a front vertex is visited to check
   // if we should terminate marching.

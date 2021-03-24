@@ -49,14 +49,8 @@ vtkMinMax::vtkMinMax()
 //-----------------------------------------------------------------------------
 vtkMinMax::~vtkMinMax()
 {
-  if (this->CFirstPass)
-  {
-    delete[] this->CFirstPass;
-  }
-  if (this->PFirstPass)
-  {
-    delete[] this->PFirstPass;
-  }
+  delete[] this->CFirstPass;
+  delete[] this->PFirstPass;
 }
 
 //-----------------------------------------------------------------------------
@@ -152,20 +146,14 @@ int vtkMinMax::RequestData(vtkInformation* vtkNotUsed(reqInfo), vtkInformationVe
   // initialize first pass flags for the cell data
   int numComp;
   numComp = ocd->GetNumberOfComponents();
-  if (this->CFirstPass)
-  {
-    delete[] this->CFirstPass;
-  }
+  delete[] this->CFirstPass;
   this->CFirstPass = new char[numComp];
   for (idx = 0; idx < numComp; idx++)
   {
     this->CFirstPass[idx] = 1;
   }
   numComp = ipd->GetNumberOfComponents();
-  if (this->PFirstPass)
-  {
-    delete[] this->PFirstPass;
-  }
+  delete[] this->PFirstPass;
   this->PFirstPass = new char[numComp];
   for (idx = 0; idx < numComp; idx++)
   {

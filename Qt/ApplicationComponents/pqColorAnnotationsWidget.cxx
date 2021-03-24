@@ -1070,10 +1070,7 @@ QModelIndexList pqColorAnnotationsWidget::selectedIndexes()
 //-----------------------------------------------------------------------------
 void pqColorAnnotationsWidget::setAnnotationsModel(pqAnnotationsModel* model)
 {
-  if (this->Internals->Model != nullptr)
-  {
-    delete this->Internals->Model;
-  }
+  delete this->Internals->Model;
 
   auto previousModel = this->Internals->Ui.AnnotationsTable->model();
   auto proxyModel = dynamic_cast<QSortFilterProxyModel*>(previousModel);

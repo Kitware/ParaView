@@ -166,10 +166,7 @@ pqCustomFilterDefinitionWizard::pqCustomFilterDefinitionWizard(
 //-----------------------------------------------------------------------------
 pqCustomFilterDefinitionWizard::~pqCustomFilterDefinitionWizard()
 {
-  if (this->Form)
-  {
-    delete this->Form;
-  }
+  delete this->Form;
 
   if (this->Filter)
   {

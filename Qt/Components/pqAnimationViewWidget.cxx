@@ -373,16 +373,10 @@ void pqAnimationViewWidget::setScene(pqAnimationScene* scene)
     QObject::disconnect(this->Internal->Scene, nullptr, this, nullptr);
 
     pqComboBoxDomain* d0 = this->Internal->PlayMode->findChild<pqComboBoxDomain*>("ComboBoxDomain");
-    if (d0)
-    {
-      delete d0;
-    }
+    delete d0;
     pqSignalAdaptorComboBox* adaptor =
       this->Internal->PlayMode->findChild<pqSignalAdaptorComboBox*>("ComboBoxAdaptor");
-    if (adaptor)
-    {
-      delete adaptor;
-    }
+    delete adaptor;
   }
   this->Internal->Scene = scene;
   if (this->Internal->Scene)
