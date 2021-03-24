@@ -427,7 +427,7 @@ bool vtkCPPythonScriptV2Helper::CatalystExecute(vtkCPDataDescription* dataDesc)
   // We raise a warning if no TrivialProducers are know by this time since it
   // may indicate that the script does not depend on any simulation data at all
   // which it more often than not a bug.
-  if (internals.TrivialProducers.size() == 0)
+  if (internals.TrivialProducers.empty())
   {
     vtkLogF(WARNING, "script may not depend on simulation data; is that expected?");
   }
@@ -635,7 +635,7 @@ void vtkCPPythonScriptV2Helper::DoLive(int timestep, double time)
   vtkVLogScopeFunction(PARAVIEW_LOG_CATALYST_VERBOSITY());
   auto& internals = (*this->Internals);
 
-  if (this->DataDescription && internals.TrivialProducers.size() == 0)
+  if (this->DataDescription && internals.TrivialProducers.empty())
   {
     vtkVLogF(
       PARAVIEW_LOG_CATALYST_VERBOSITY(), "live: create producers since none created in analysis");

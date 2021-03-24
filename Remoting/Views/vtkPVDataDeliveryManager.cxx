@@ -221,8 +221,8 @@ bool vtkPVDataDeliveryManager::NeedsDelivery(
       }
     }
   }
-  vtkVLogIfF(PARAVIEW_LOG_DATA_MOVEMENT_VERBOSITY(), keys_to_deliver.size() == 0, "none");
-  return keys_to_deliver.size() > 0;
+  vtkVLogIfF(PARAVIEW_LOG_DATA_MOVEMENT_VERBOSITY(), keys_to_deliver.empty(), "none");
+  return !keys_to_deliver.empty();
 }
 
 //----------------------------------------------------------------------------

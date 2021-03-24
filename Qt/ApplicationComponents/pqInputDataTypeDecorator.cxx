@@ -127,12 +127,12 @@ bool pqInputDataTypeDecorator::processState() const
     }
     pqOutputPort* cur_input = nullptr;
     QList<pqOutputPort*> ports = source->getOutputPorts();
-    cur_input = ports.size() > 0 ? ports[0] : nullptr;
+    cur_input = ports.empty() ? nullptr : ports[0];
     int exclude = 0;
     this->xml()->GetScalarAttribute("exclude", &exclude);
     std::string dataname = this->xml()->GetAttribute("name");
     std::vector<std::string> parts = vtksys::SystemTools::SplitString(dataname, ' ');
-    if (cur_input && parts.size())
+    if (cur_input && !parts.empty())
     {
       vtkPVDataInformation* dataInfo = cur_input->getDataInformation();
       for (std::size_t i = 0; i < parts.size(); ++i)

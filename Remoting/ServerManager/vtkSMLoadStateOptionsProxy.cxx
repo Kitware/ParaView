@@ -98,7 +98,7 @@ public:
     }
 
     std::set<std::string> filenameProperties = this->LocateFileNameProperties(prototype);
-    if (filenameProperties.size() == 0)
+    if (filenameProperties.empty())
     {
       return;
     }
@@ -293,7 +293,7 @@ bool vtkSMLoadStateOptionsProxy::PrepareToLoad(const char* statefilename)
 bool vtkSMLoadStateOptionsProxy::HasDataFiles()
 {
   // This will always return false until PrepareToLoad has been called
-  return (this->Internals->PropertiesMap.size() > 0);
+  return !this->Internals->PropertiesMap.empty();
 }
 
 //----------------------------------------------------------------------------

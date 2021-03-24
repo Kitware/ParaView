@@ -384,7 +384,7 @@ pqKeyFrameEditor::pqKeyFrameEditor(
     this->Internal->ValueRange.first = this->Internal->TimeRange.first;
     this->Internal->ValueRange.second = this->Internal->TimeRange.second;
   }
-  else if (domain.size())
+  else if (!domain.empty())
   {
     this->Internal->ValueRange.first = domain[0];
     this->Internal->ValueRange.second = domain[1];

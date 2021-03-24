@@ -226,7 +226,7 @@ QPair<double, double> pqScalarsToColors::getScalarRange() const
     vtkSMDoubleVectorProperty::SafeDownCast(this->getProxy()->GetProperty("RGBPoints"));
   QList<QVariant> controlPoints = pqSMAdaptor::getMultipleElementProperty(dvp);
 
-  if (controlPoints.size() == 0)
+  if (controlPoints.empty())
   {
     return QPair<double, double>(0, 0);
   }

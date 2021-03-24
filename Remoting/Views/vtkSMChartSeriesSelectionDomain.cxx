@@ -53,7 +53,7 @@ static std::vector<SeriesVisibilityPair> SeriesVisibilityDefaults;
 static void InitSeriesVisibilityDefaults()
 {
   // initialize SeriesVisibilityDefaults the first time.
-  if (SeriesVisibilityDefaults.size() == 0)
+  if (SeriesVisibilityDefaults.empty())
   {
     const char* defaults[] = { "^arc_length", "^bin_extents", "^FileId", "^GlobalElementId",
       "^GlobalNodeId", "^ObjectId", "^Pedigree.*", "^Points_.*", "^Time", "^vtkOriginal.*",
@@ -462,7 +462,7 @@ void vtkSMChartSeriesSelectionDomain::UpdateDefaultValues(
       continue;
     }
     std::vector<std::string> cur_values = this->GetDefaultValue(domain_strings[cc].c_str());
-    if (cur_values.size() > 0)
+    if (!cur_values.empty())
     {
       values->AddString(domain_strings[cc].c_str());
       for (size_t kk = 0; kk < cur_values.size(); kk++)

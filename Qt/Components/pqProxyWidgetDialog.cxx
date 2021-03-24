@@ -129,8 +129,8 @@ public:
     this->Container = container;
 
     // Set up the widget for the proxy
-    pqProxyWidget* widget = properties.size() > 0 ? new pqProxyWidget(proxy, properties, container)
-                                                  : new pqProxyWidget(proxy, container);
+    pqProxyWidget* widget = properties.empty() ? new pqProxyWidget(proxy, container)
+                                               : new pqProxyWidget(proxy, properties, container);
     widget->setObjectName("ProxyWidget");
     this->HasVisibleWidgets = widget->filterWidgets(true);
     vbox->addWidget(widget);

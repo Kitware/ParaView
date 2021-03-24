@@ -270,7 +270,7 @@ int vtkSpyPlotReader::RequestInformation(
     outInfo2->Set(CAN_HANDLE_PIECE_REQUEST(), 1);
   }
 #endif // PARAVIEW_ENABLE_SPYPLOT_MARKERS
-  if (this->TimeSteps->size() > 0)
+  if (!this->TimeSteps->empty())
   {
     outInfo0->Set(vtkStreamingDemandDrivenPipeline::TIME_STEPS(), &(*this->TimeSteps)[0],
       static_cast<int>(this->TimeSteps->size()));
@@ -305,7 +305,7 @@ int vtkSpyPlotReader::UpdateFile(vtkInformation* request, vtkInformationVector* 
     // If filename hasn't changed since the last time we read the core
     // meta-data, we don't need to re-read it. If the file was processed
     // successfully, then this->Map->Files won't be empty.
-    return (this->Map->Files.size() != 0) ? 1 : 0;
+    return this->Map->Files.empty() ? 0 : 1;
   }
 
   this->FileNameChanged = false;
@@ -334,14 +334,14 @@ int vtkSpyPlotReader::UpdateFile(vtkInformation* request, vtkInformationVector* 
     }
   }
 
-  return this->Map->Files.size() > 0 ? this->UpdateMetaData(request, outputVector) : 0;
+  return this->Map->Files.empty() ? 0 : this->UpdateMetaData(request, outputVector);
 }
 
 //-----------------------------------------------------------------------------
 int vtkSpyPlotReader::UpdateMetaData(
   vtkInformation* vtkNotUsed(request), vtkInformationVector* vtkNotUsed(outputVector))
 {
-  if (this->Map->Files.size() == 0)
+  if (this->Map->Files.empty())
   {
     vtkErrorMacro("The internal file map is empty!");
     return 0;
@@ -490,7 +490,7 @@ int vtkSpyPlotReader::UpdateTimeStep(
   int closestStep = 0;
 
   if (outputInfo->Has(vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEP()) &&
-    (this->TimeSteps->size() > 0))
+    !this->TimeSteps->empty())
   {
     // Get the requested time step. We only support requests of a single time
     // step in this reader right now

@@ -320,7 +320,7 @@ void pqObjectBuilder::destroy(pqPipelineSource* source)
     return;
   }
 
-  if (source->getAllConsumers().size() > 0)
+  if (!source->getAllConsumers().empty())
   {
     qDebug() << "Cannot remove source with consumers.";
     return;
@@ -562,7 +562,7 @@ void pqObjectBuilder::destroySources(pqServer* server)
   {
     for (int i = 0; i < sources.size(); i++)
     {
-      if (sources[i]->getAllConsumers().size() == 0)
+      if (sources[i]->getAllConsumers().empty())
       {
         builder->destroy(sources[i]);
         sources[i] = nullptr;

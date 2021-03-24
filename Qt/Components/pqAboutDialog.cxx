@@ -206,7 +206,7 @@ void pqAboutDialog::AddServerInformation()
   QTreeWidget* tree = this->Ui->ServerInformation;
   pqServerManagerModel* smmodel = pqApplicationCore::instance()->getServerManagerModel();
   QList<pqServer*> servers = smmodel->findItems<pqServer*>();
-  if (servers.size() > 0)
+  if (!servers.empty())
   {
     this->AddServerInformation(servers[0], tree);
     tree->header()->setSectionResizeMode(QHeaderView::ResizeToContents);

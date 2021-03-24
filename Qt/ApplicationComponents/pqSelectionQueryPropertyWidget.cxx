@@ -690,7 +690,7 @@ public:
   void populateUI()
   {
     auto parts = splitTerms(this->Query);
-    if (parts.size() == 0)
+    if (parts.empty())
     {
       // we need at least 1 expression.
       parts.push_back(QString());

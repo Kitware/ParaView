@@ -132,7 +132,7 @@ bool pqDeleteReaction::canDeleteSelected()
   QSet<pqProxy*> selectedSources;
   ::pqDeleteReactionGetSelectedSet(selModel, selectedSources);
 
-  if (selectedSources.size() == 0)
+  if (selectedSources.empty())
   {
     return false;
   }
@@ -204,7 +204,7 @@ void pqDeleteReaction::deleteSource(pqProxy* source)
 //-----------------------------------------------------------------------------
 void pqDeleteReaction::deleteSources(const QSet<pqProxy*>& argSources)
 {
-  if (argSources.size() == 0)
+  if (argSources.empty())
   {
     return;
   }
@@ -241,7 +241,7 @@ void pqDeleteReaction::deleteSources(const QSet<pqProxy*>& argSources)
         break;
       }
     }
-  } while (something_deleted_in_current_iteration && (sources.size() > 0));
+  } while (something_deleted_in_current_iteration && !sources.empty());
 
   // update scalar bars, if needed
   int sbMode = vtkPVGeneralSettings::GetInstance()->GetScalarBarMode();

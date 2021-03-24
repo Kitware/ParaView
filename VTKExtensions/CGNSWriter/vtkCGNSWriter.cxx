@@ -737,7 +737,7 @@ bool vtkCGNSWriter::vtkPrivate::WriteMultiBlock(
 
   Flatten(mb, surfaceBlocks, volumeBlocks, 0);
 
-  if (volumeBlocks.size() > 0)
+  if (!volumeBlocks.empty())
   {
     info.CellDim = 3;
     if (!WriteBase(info, "Base_Volume_Elements", error))
@@ -776,7 +776,7 @@ bool vtkCGNSWriter::vtkPrivate::WriteMultiBlock(
     }
   }
 
-  if (surfaceBlocks.size() > 0)
+  if (!surfaceBlocks.empty())
   {
     info.CellDim = 2;
     if (!WriteBase(info, "Base_Surface_Elements", error))

@@ -199,7 +199,7 @@ void pqComparativeCueWidget::onCellChanged(int rowno, int colno)
   if (this->acceptsMultipleValues())
   {
     QStringList parts = text.split(',', PV_QT_SKIP_EMPTY_PARTS);
-    if (parts.size() > 0)
+    if (!parts.empty())
     {
       double* newvalues = new double[parts.size()];
       double* ptr = newvalues;

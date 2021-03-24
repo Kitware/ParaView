@@ -335,7 +335,7 @@ void vtkCommandOptions::ComputeApplicationPath()
   this->SetApplicationPath(nullptr);
 
   std::string argv0 = this->GetArgv0();
-  if (argv0.size())
+  if (!argv0.empty())
   {
     if (argv0.rfind('/') != std::string::npos || argv0.rfind('\\') != std::string::npos)
     {

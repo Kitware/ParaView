@@ -170,7 +170,7 @@ void pqAnimationScene::onCuesChanged()
     Q_EMIT this->addedCue(cue);
   }
 
-  if (removed.size() > 0 || added.size() > 0)
+  if (!removed.empty() || !added.empty())
   {
     Q_EMIT this->cuesChanged();
   }
@@ -281,7 +281,7 @@ void pqAnimationScene::initializeCue(
       QList<QVariant> currents = pqSMAdaptor::getMultipleElementProperty(prop);
       for (int i = 0; i < currents.size(); i++)
       {
-        if (domains.size() > i && domains[i].size())
+        if (domains.size() > i && !domains[i].empty())
         {
           mins.append(domains[i][0].isValid() ? domains[i][0] : currents[i]);
           maxs.append(domains[i][1].isValid() ? domains[i][1] : currents[i]);
@@ -297,7 +297,7 @@ void pqAnimationScene::initializeCue(
     {
       QList<QVariant> domain = pqSMAdaptor::getMultipleElementPropertyDomain(prop, index);
       QVariant current = pqSMAdaptor::getMultipleElementProperty(prop, index);
-      if (domain.size() && domain[0].isValid())
+      if (!domain.empty() && domain[0].isValid())
       {
         mins.append(domain[0]);
       }
@@ -305,7 +305,7 @@ void pqAnimationScene::initializeCue(
       {
         mins.append(current);
       }
-      if (domain.size() && domain[1].isValid())
+      if (!domain.empty() && domain[1].isValid())
       {
         maxs.append(domain[1]);
       }

@@ -343,7 +343,7 @@ int vtkPVEnSightMasterServerReader2::RequestInformation(vtkInformation* vtkNotUs
     }
   }
 
-  if (this->Internal->TimeSetValues.size() >= 1)
+  if (!this->Internal->TimeSetValues.empty())
   {
     if (vtkPVEnSightMasterServerReader2SyncValues(&this->Internal->TimeSetValues.at(0),
           static_cast<int>(this->Internal->TimeSetValues.size()),
@@ -676,7 +676,7 @@ void vtkPVEnSightMasterServerReader2::SetCaseFileName(const char* fileName)
 //----------------------------------------------------------------------------
 int vtkPVEnSightMasterServerReader2::GetNumberOfPointArrays()
 {
-  return this->Internal->RealReaders.size() == 0
+  return this->Internal->RealReaders.empty()
     ? 0
     : this->Internal->RealReaders[0]->GetNumberOfPointArrays();
 }
@@ -684,7 +684,7 @@ int vtkPVEnSightMasterServerReader2::GetNumberOfPointArrays()
 //----------------------------------------------------------------------------
 int vtkPVEnSightMasterServerReader2::GetNumberOfCellArrays()
 {
-  return this->Internal->RealReaders.size() == 0
+  return this->Internal->RealReaders.empty()
     ? 0
     : this->Internal->RealReaders[0]->GetNumberOfCellArrays();
 }
@@ -692,7 +692,7 @@ int vtkPVEnSightMasterServerReader2::GetNumberOfCellArrays()
 //----------------------------------------------------------------------------
 const char* vtkPVEnSightMasterServerReader2::GetPointArrayName(int index)
 {
-  return this->Internal->RealReaders.size() == 0
+  return this->Internal->RealReaders.empty()
     ? nullptr
     : this->Internal->RealReaders[0]->GetPointArrayName(index);
 }
@@ -700,7 +700,7 @@ const char* vtkPVEnSightMasterServerReader2::GetPointArrayName(int index)
 //----------------------------------------------------------------------------
 const char* vtkPVEnSightMasterServerReader2::GetCellArrayName(int index)
 {
-  return this->Internal->RealReaders.size() == 0
+  return this->Internal->RealReaders.empty()
     ? nullptr
     : this->Internal->RealReaders[0]->GetCellArrayName(index);
 }
@@ -708,7 +708,7 @@ const char* vtkPVEnSightMasterServerReader2::GetCellArrayName(int index)
 //----------------------------------------------------------------------------
 int vtkPVEnSightMasterServerReader2::GetPointArrayStatus(const char* name)
 {
-  return this->Internal->RealReaders.size() == 0
+  return this->Internal->RealReaders.empty()
     ? 0
     : this->Internal->RealReaders[0]->GetPointArrayStatus(name);
 }
@@ -716,7 +716,7 @@ int vtkPVEnSightMasterServerReader2::GetPointArrayStatus(const char* name)
 //----------------------------------------------------------------------------
 int vtkPVEnSightMasterServerReader2::GetCellArrayStatus(const char* name)
 {
-  return this->Internal->RealReaders.size() == 0
+  return this->Internal->RealReaders.empty()
     ? 0
     : this->Internal->RealReaders[0]->GetCellArrayStatus(name);
 }
@@ -779,14 +779,14 @@ void vtkPVEnSightMasterServerReader2::SetByteOrder(int byteOrder)
 //----------------------------------------------------------------------------
 int vtkPVEnSightMasterServerReader2::GetByteOrder()
 {
-  return this->Internal->RealReaders.size() == 0 ? vtkPGenericEnSightReader::FILE_UNKNOWN_ENDIAN
-                                                 : this->Internal->RealReaders[0]->GetByteOrder();
+  return this->Internal->RealReaders.empty() ? vtkPGenericEnSightReader::FILE_UNKNOWN_ENDIAN
+                                             : this->Internal->RealReaders[0]->GetByteOrder();
 }
 
 //----------------------------------------------------------------------------
 const char* vtkPVEnSightMasterServerReader2::GetByteOrderAsString()
 {
-  return this->Internal->RealReaders.size() == 0
+  return this->Internal->RealReaders.empty()
     ? nullptr
     : this->Internal->RealReaders[0]->GetByteOrderAsString();
 }

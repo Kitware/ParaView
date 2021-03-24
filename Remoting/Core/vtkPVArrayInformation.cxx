@@ -470,12 +470,12 @@ bool vtkPVArrayInformation::CopyFromStream(const vtkClientServerStream* css)
 //----------------------------------------------------------------------------
 void vtkPVArrayInformation::AddInformation(vtkPVArrayInformation* other, int fieldAssociation)
 {
-  if (other == nullptr || other->Components.size() == 0)
+  if (other == nullptr || other->Components.empty())
   {
     return;
   }
 
-  if (this->Components.size() == 0)
+  if (this->Components.empty())
   {
     this->DeepCopy(other);
     return;

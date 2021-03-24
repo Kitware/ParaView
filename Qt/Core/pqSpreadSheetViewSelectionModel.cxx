@@ -233,7 +233,7 @@ void pqSpreadSheetViewSelectionModel::select(
     }
   }
 
-  if (ids.size() == 0)
+  if (ids.empty())
   {
     selSource = nullptr;
   }

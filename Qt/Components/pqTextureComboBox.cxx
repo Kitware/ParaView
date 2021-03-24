@@ -147,7 +147,7 @@ void pqTextureComboBox::loadTexture()
   if (dialog.exec())
   {
     QStringList files = dialog.getSelectedFiles();
-    if (files.size() > 0)
+    if (!files.empty())
     {
       if (this->loadTexture(files[0]))
       {

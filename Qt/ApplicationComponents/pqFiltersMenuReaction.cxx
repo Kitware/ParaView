@@ -160,7 +160,7 @@ void pqFiltersMenuReaction::updateEnableState(bool updateOnlyToolbars)
         outputPorts.append(opPort);
       }
     }
-    if (selModel->GetNumberOfSelectedProxies() == 0 || outputPorts.size() == 0)
+    if (selModel->GetNumberOfSelectedProxies() == 0 || outputPorts.empty())
     {
       enabled = false;
     }

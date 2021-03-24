@@ -85,7 +85,7 @@ void pqDataTimeStepBehavior::onReaderCreated(pqPipelineSource* reader)
   {
     vtkSMPropertyHelper helper(readerProxy, "TimeRange");
     std::vector<double> timeRange = helper.GetDoubleArray();
-    if (timeRange.size() > 0)
+    if (!timeRange.empty())
     {
       double newTime = (defaultTimeStep == vtkPVGeneralSettings::DEFAULT_TIME_STEP_FIRST)
         ? timeRange[0]

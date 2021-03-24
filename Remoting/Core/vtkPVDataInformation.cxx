@@ -845,7 +845,7 @@ bool vtkPVDataInformation::IsDataStructured() const
     return true;
   }
 
-  if (this->CompositeDataSetType != -1 && this->UniqueBlockTypes.size() > 0)
+  if (this->CompositeDataSetType != -1 && !this->UniqueBlockTypes.empty())
   {
     for (auto& type : this->UniqueBlockTypes)
     {
@@ -869,7 +869,7 @@ bool vtkPVDataInformation::HasStructuredData() const
     return true;
   }
 
-  if (this->CompositeDataSetType != -1 && this->UniqueBlockTypes.size() > 0)
+  if (this->CompositeDataSetType != -1 && !this->UniqueBlockTypes.empty())
   {
     for (auto& type : this->UniqueBlockTypes)
     {
@@ -891,7 +891,7 @@ bool vtkPVDataInformation::HasUnstructuredData() const
     return true;
   }
 
-  if (this->CompositeDataSetType != -1 && this->UniqueBlockTypes.size() > 0)
+  if (this->CompositeDataSetType != -1 && !this->UniqueBlockTypes.empty())
   {
     for (auto& type : this->UniqueBlockTypes)
     {
@@ -966,7 +966,7 @@ void vtkPVDataInformation::CopyToStream(vtkClientServerStream* css)
                                        vtkDataObject::NUMBER_OF_ATTRIBUTE_TYPES);
 
   *css << static_cast<int>(this->UniqueBlockTypes.size());
-  if (this->UniqueBlockTypes.size() > 0)
+  if (!this->UniqueBlockTypes.empty())
   {
     *css << vtkClientServerStream::InsertArray(
       &this->UniqueBlockTypes.front(), static_cast<int>(this->UniqueBlockTypes.size()));
@@ -1201,7 +1201,7 @@ std::string vtkPVDataInformation::GetBlockName(vtkTypeUInt64 cid) const
     auto hierarchy = this->GetHierarchy();
     const auto selector = vtkDataAssemblyUtilities::GetSelectorForCompositeId(cid, hierarchy);
     const auto nodes = hierarchy->SelectNodes({ selector });
-    if (nodes.size() >= 1)
+    if (!nodes.empty())
     {
       return hierarchy->GetAttributeOrDefault(nodes.front(), "label", "");
     }

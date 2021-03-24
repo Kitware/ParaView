@@ -402,7 +402,7 @@ const char* vtkPVWebApplication::GetWebGLBinaryData(vtkSMViewProxy* view, const 
     return nullptr;
   }
 
-  if (this->Internals->WebGLExporterObjIdMap[webglExporter].size() > 0 &&
+  if (!this->Internals->WebGLExporterObjIdMap[webglExporter].empty() &&
     this->Internals->WebGLExporterObjIdMap[webglExporter].find(id) !=
       this->Internals->WebGLExporterObjIdMap[webglExporter].end())
   {

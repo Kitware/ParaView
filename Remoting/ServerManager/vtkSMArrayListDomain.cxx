@@ -149,7 +149,7 @@ private:
         return true;
       }
     }
-    return (this->DataTypes.size() == 0);
+    return this->DataTypes.empty();
   }
 
   bool AreArrayInformationKeysAcceptable(vtkPVArrayInformation* arrayInfo)
@@ -213,7 +213,7 @@ void vtkSMArrayListDomainInternals::BuildArrayList(
     association = vtkSMInputArrayDomain::ANY;
   }
 
-  if (self->GetNoneString() && result.size() == 0)
+  if (self->GetNoneString() && result.empty())
   {
     vtkSMArrayListDomainArrayInformation info;
     info.ArrayName = self->GetNoneString();
@@ -678,7 +678,7 @@ int vtkSMArrayListDomain::SetDefaultValues(vtkSMProperty* prop, bool use_uncheck
 
   const vtkSMArrayListDomainArrayInformation* info =
     this->ALDInternals->FindAttribute(this->AttributeType);
-  if (info == nullptr && this->ALDInternals->DomainValues.size() > 0)
+  if (info == nullptr && !this->ALDInternals->DomainValues.empty())
   {
     if (this->PickFirstAvailableArrayByDefault == true)
     {

@@ -258,7 +258,7 @@ void pqHierarchicalGridLayout::addItem(QLayoutItem* item)
   // now add the item to the binary tree.
 
   // 1. If tree is empty, simply add the item as the root node.
-  if (internals.SBTree.size() == 0)
+  if (internals.SBTree.empty())
   {
     internals.SBTree.emplace_back(BTNode(item));
     return;

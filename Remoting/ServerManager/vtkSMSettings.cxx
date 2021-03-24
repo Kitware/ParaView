@@ -530,7 +530,7 @@ public:
     }
     else
     {
-      if (previousValues.size() < 1 || previousValues[0] != values[0])
+      if (previousValues.empty() || previousValues[0] != values[0])
       {
         jsonValue[leaf] = values[0];
         this->Modified();
@@ -941,7 +941,7 @@ public:
   // priority is set to DOUBLE_MAX.
   void CreateCollectionIfNeeded()
   {
-    if (this->SettingCollections.size() == 0)
+    if (this->SettingCollections.empty())
     {
       SettingsCollection newCollection;
       newCollection.Priority = VTK_DOUBLE_MAX;
@@ -1012,7 +1012,7 @@ bool vtkSMSettings::AddCollectionFromString(const std::string& settings, double 
   // If the settings string is empty, the JSON parser can't handle it.
   // Replace the empty string with {}
   std::string processedSettings(settings);
-  if (processedSettings == "")
+  if (processedSettings.empty())
   {
     processedSettings.append("{}");
   }
@@ -1138,14 +1138,14 @@ bool vtkSMSettings::DistributeSettings()
 //----------------------------------------------------------------------------
 bool vtkSMSettings::SaveSettingsToFile(const std::string& filePath)
 {
-  if (this->Internal->SettingCollections.size() == 0 || !this->Internal->IsModified)
+  if (this->Internal->SettingCollections.empty() || !this->Internal->IsModified)
   {
     // No settings to save, so we'll always succeed.
     vtkVLogIfF(PARAVIEW_LOG_APPLICATION_VERBOSITY(),
       (this->Internal->SettingCollections.size() != 0 && this->Internal->IsModified == false),
       "settings not modified, hence not saved.");
-    vtkVLogIfF(PARAVIEW_LOG_APPLICATION_VERBOSITY(),
-      (this->Internal->SettingCollections.size() == 0), "settings empty, hence not saved.");
+    vtkVLogIfF(PARAVIEW_LOG_APPLICATION_VERBOSITY(), (this->Internal->SettingCollections.empty()),
+      "settings empty, hence not saved.");
     return true;
   }
 

@@ -105,11 +105,11 @@ void pqFileDialogFilter::setFilter(const QString& filter)
     QString postExtFileSeries("(\\.?\\d+)?$"); // match the .0001 component
     QString extGroup = ".*\\.(?:" % extensions % ")" % postExtFileSeries;
     QString fileGroup = "(?:" % filepatterns % ")" % postExtFileSeries;
-    if (extensions_list.size() > 0 && filepatterns_list.size() > 0)
+    if (!extensions_list.empty() && !filepatterns_list.empty())
     {
       pattern = "(?:" % fileGroup % "|" % extGroup % ")";
     }
-    else if (extensions_list.size() > 0)
+    else if (!extensions_list.empty())
     {
       pattern = extGroup;
     }

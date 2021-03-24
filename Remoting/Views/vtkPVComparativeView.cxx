@@ -159,7 +159,7 @@ public:
    */
   vtkSMProxy* GetBack() const
   {
-    return (this->Items.size() > 0) ? this->Items.back().GetPointer() : nullptr;
+    return (!this->Items.empty()) ? this->Items.back().GetPointer() : nullptr;
   }
 
   /**
@@ -954,7 +954,7 @@ vtkImageData* vtkPVComparativeView::CaptureWindow(int magX, int magY)
     }
   }
 
-  if (images.size() == 0)
+  if (images.empty())
   {
     return nullptr;
   }

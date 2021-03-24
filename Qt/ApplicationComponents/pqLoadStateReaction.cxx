@@ -161,7 +161,7 @@ void pqLoadStateReaction::activateView()
   auto server = pqActiveObjects::instance().activeServer();
   auto smmodel = pqApplicationCore::instance()->getServerManagerModel();
   auto views = smmodel->findItems<pqView*>(server);
-  if (views.size())
+  if (!views.empty())
   {
     pqActiveObjects::instance().setActiveView(views[0]);
   }

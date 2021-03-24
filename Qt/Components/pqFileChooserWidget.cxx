@@ -202,7 +202,7 @@ void pqFileChooserWidget::chooseFile()
     {
       files << selectedFiles;
     }
-    if (files.size())
+    if (!files.empty())
     {
       this->setFilenames(files);
     }

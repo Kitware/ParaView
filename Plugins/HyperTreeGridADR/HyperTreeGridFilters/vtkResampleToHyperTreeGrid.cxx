@@ -339,7 +339,7 @@ int vtkResampleToHyperTreeGrid::RequestData(
   output->SetMask(this->Mask);
   this->Mask->FastDelete();
 
-  if (this->Extrapolate && this->ArrayMeasurements.size() &&
+  if (this->Extrapolate && !this->ArrayMeasurements.empty() &&
     fieldAssociation == vtkDataObject::FIELD_ASSOCIATION_POINTS)
   {
     vtkHyperTreeGrid* htg = vtkHyperTreeGrid::SafeDownCast(output);
@@ -991,7 +991,7 @@ void vtkResampleToHyperTreeGrid::CreateGridOfMultiResolutionGrids(
       double* point = dataSet->GetPoint(pointId);
       // (i, j, k) are the coordinates of the corresponding hyper tree
 
-      if (this->LocalHyperTreeBoundingBox.size())
+      if (!this->LocalHyperTreeBoundingBox.empty())
       {
         // Checking if the considered point is in bounds, i.e. is owned by this process
         vtkIdType bidx = -1;
@@ -1341,7 +1341,7 @@ void vtkResampleToHyperTreeGrid::CreateGridOfMultiResolutionGrids(
     }
   }
 
-  if (this->NoEmptyCells || (this->Extrapolate && this->ArrayMeasurements.size() &&
+  if (this->NoEmptyCells || (this->Extrapolate && !this->ArrayMeasurements.empty() &&
                               fieldAssociation == vtkDataObject::FIELD_ASSOCIATION_POINTS))
   {
     // We allocate weights which are needed to compute the distance between a point and a cell.
@@ -1415,7 +1415,7 @@ void vtkResampleToHyperTreeGrid::CreateGridOfMultiResolutionGrids(
             hyperTreeBounds[5] = this->Bounds[4] +
               (k + 1) * (this->Bounds[5] - this->Bounds[4]) / this->CellDims[2] - boundsEpsilon[2];
 
-            if (this->LocalHyperTreeBoundingBox.size())
+            if (!this->LocalHyperTreeBoundingBox.empty())
             {
               // Checking if the considered point is in bounds, i.e. is owned by this process
               std::size_t bidx = std::numeric_limits<std::size_t>::max();
@@ -1571,7 +1571,7 @@ void vtkResampleToHyperTreeGrid::ExtrapolateValuesOnGaps(vtkHyperTreeGrid* htg)
     this->RecursivelyFillPriorityQueue(superCursor, pq);
   }
   std::vector<PriorityQueueElement> buf;
-  while (pq.size())
+  while (!pq.empty())
   {
     const PriorityQueueElement& qe = pq.top();
     vtkIdType id = qe.Id, key = qe.Key;
@@ -1596,7 +1596,7 @@ void vtkResampleToHyperTreeGrid::ExtrapolateValuesOnGaps(vtkHyperTreeGrid* htg)
       key + static_cast<vtkIdType>(qe.InvalidNeighborIds.size()) - invalidNeighbors, id,
       std::move(means), std::move(qe.InvalidNeighborIds)));
     pq.pop();
-    if (!pq.size() || pq.top().Key != key)
+    if (pq.empty() || pq.top().Key != key)
     {
       for (const PriorityQueueElement& element : buf)
       {
@@ -1650,7 +1650,7 @@ void vtkResampleToHyperTreeGrid::RecursivelyFillPriorityQueue(
         }
       }
     }
-    if (!qe.InvalidNeighborIds.size())
+    if (qe.InvalidNeighborIds.empty())
     {
       for (std::size_t j = 0; j < qe.Means.size(); ++j)
       {
@@ -1691,7 +1691,7 @@ int vtkResampleToHyperTreeGrid::GenerateTrees(vtkHyperTreeGrid* htg)
     {
       for (vtkIdType k = 0; k < htg->GetCellDims()[2]; ++k, ++multiResGridIdx)
       {
-        if (this->GridOfMultiResolutionGrids[multiResGridIdx][0].size())
+        if (!this->GridOfMultiResolutionGrids[multiResGridIdx][0].empty())
         {
           vtkIdType treeId;
           htg->GetIndexFromLevelZeroCoordinates(treeId, i, j, k);
@@ -1728,9 +1728,9 @@ void vtkResampleToHyperTreeGrid::SubdivideLeaves(vtkHyperTreeGridNonOrientedCurs
 
   std::size_t offset = this->ArrayMeasurement != nullptr;
 
-  if (values.size() && it != multiResolutionGrid[level].end())
+  if (!values.empty() && it != multiResolutionGrid[level].end())
   {
-    if (it->second.ArrayMeasurements.size())
+    if (!it->second.ArrayMeasurements.empty())
     {
       if (this->ArrayMeasurement)
       {

@@ -31,7 +31,7 @@ std::vector<double> vtkSMDiscreteDoubleDomain::GetValues()
 //---------------------------------------------------------------------------
 bool vtkSMDiscreteDoubleDomain::GetValuesExists()
 {
-  return this->Values.size() > 0;
+  return !this->Values.empty();
 }
 
 //---------------------------------------------------------------------------

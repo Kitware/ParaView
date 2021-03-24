@@ -237,7 +237,7 @@ bool vtkSMSessionClient::Connect(const char* url, int timeout)
     render_server_url = stream2.str();
   }
 
-  bool need_rcontroller = render_server_url.size() > 0;
+  bool need_rcontroller = !render_server_url.empty();
   vtkNetworkAccessManager* nam = pm->GetNetworkAccessManager();
   vtkMultiProcessController* dcontroller = nam->NewConnection(data_server_url.c_str());
   vtkMultiProcessController* rcontroller =

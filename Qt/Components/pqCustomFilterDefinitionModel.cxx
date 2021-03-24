@@ -299,7 +299,7 @@ void pqCustomFilterDefinitionModel::setContents(const pqProxySelection& items)
   this->beginResetModel();
   delete this->Root;
   this->Root = new pqCustomFilterDefinitionModelItem();
-  if (items.size() == 0)
+  if (items.empty())
   {
     this->endResetModel();
     return;
@@ -436,7 +436,7 @@ pqCustomFilterDefinitionModelItem* pqCustomFilterDefinitionModel::getNextItem(
     return nullptr;
   }
 
-  if (item->Children.size() > 0)
+  if (!item->Children.empty())
   {
     return item->Children.first();
   }

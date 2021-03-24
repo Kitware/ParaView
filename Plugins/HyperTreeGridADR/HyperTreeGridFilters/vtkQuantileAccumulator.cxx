@@ -41,7 +41,7 @@ void vtkQuantileAccumulator::Add(vtkAbstractAccumulator* accumulator)
   vtkQuantileAccumulator* quantileAccumulator = vtkQuantileAccumulator::SafeDownCast(accumulator);
   assert(quantileAccumulator && "Cannot accumulate different accumulators");
 
-  if (this->SortedList->size())
+  if (!this->SortedList->empty())
   {
     std::size_t i = 0;
     ListType out;
@@ -74,7 +74,7 @@ void vtkQuantileAccumulator::Add(vtkAbstractAccumulator* accumulator)
   }
   else
   {
-    if (quantileAccumulator->SortedList->size())
+    if (!quantileAccumulator->SortedList->empty())
     {
       this->TotalWeight = quantileAccumulator->TotalWeight;
       this->PercentileIdx = quantileAccumulator->PercentileIdx;
@@ -88,12 +88,12 @@ void vtkQuantileAccumulator::Add(vtkAbstractAccumulator* accumulator)
 //----------------------------------------------------------------------------
 void vtkQuantileAccumulator::Add(double value, double weight)
 {
-  if (this->SortedList->size() && (*this->SortedList)[this->PercentileIdx].Value >= value)
+  if (!this->SortedList->empty() && (*this->SortedList)[this->PercentileIdx].Value >= value)
   {
     this->PercentileWeight += weight;
     ++this->PercentileIdx;
   }
-  else if (!this->SortedList->size())
+  else if (this->SortedList->empty())
   {
     this->PercentileWeight = weight;
   }
@@ -160,7 +160,7 @@ bool vtkQuantileAccumulator::HasSameParameters(vtkAbstractAccumulator* accumulat
 //----------------------------------------------------------------------------
 double vtkQuantileAccumulator::GetValue() const
 {
-  return this->SortedList->size() ? (*this->SortedList)[this->PercentileIdx].Value : 0.0;
+  return this->SortedList->empty() ? 0.0 : (*this->SortedList)[this->PercentileIdx].Value;
 }
 
 //----------------------------------------------------------------------------

@@ -70,7 +70,7 @@ std::string vtkLoadStateOptions::LocateFileInDirectory(const std::string& filepa
   SystemTools::SplitPath(SystemTools::GetParentDirectory(filepath), pathComponents);
   size_t insertIndex = directoryPathComponents.size();
 
-  while (pathComponents.size() >= 1)
+  while (!pathComponents.empty())
   {
     std::string searchPath = SystemTools::JoinPath(directoryPathComponents);
 

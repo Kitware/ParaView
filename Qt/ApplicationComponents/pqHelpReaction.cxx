@@ -79,7 +79,7 @@ void pqHelpReaction::showHelp(const QString& url)
   // show some home page. Pick the first registered documentation and show its
   // home page.
   QStringList registeredDocumentations = engine->registeredDocumentations();
-  if (registeredDocumentations.size() > 0)
+  if (!registeredDocumentations.empty())
   {
     helpWindow->showHomePage(registeredDocumentations[0]);
   }

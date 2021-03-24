@@ -221,7 +221,7 @@ pqStringVectorPropertyWidget::pqStringVectorPropertyWidget(
         }
       }
     }
-    if (supportedExtensions.size() > 0)
+    if (!supportedExtensions.empty())
     {
       vtkVLogF(PARAVIEW_LOG_APPLICATION_VERBOSITY(), "using extensions `%s`",
         supportedExtensions.join(", ").toLocal8Bit().data());

@@ -318,7 +318,7 @@ protected:
     this->InvalidCoreIterator = true;
     this->InvalidCustomIterator = true;
 
-    if (this->GroupNames.size() == 0)
+    if (this->GroupNames.empty())
     {
       // Look for all name available
       if (this->CoreDefinitionMap)
@@ -340,7 +340,7 @@ protected:
         }
       }
 
-      if (this->GroupNames.size() == 0)
+      if (this->GroupNames.empty())
       {
         // TODO vtkErrorMacro("No definition available for that iterator.");
         return;
@@ -356,7 +356,7 @@ protected:
   //-------------------------------------------------------------------------
   bool IsDoneWithGroupTraversal()
   {
-    return this->GroupNames.size() == 0 || this->GroupNameIterator == this->GroupNames.end();
+    return this->GroupNames.empty() || this->GroupNameIterator == this->GroupNames.end();
   }
   //-------------------------------------------------------------------------
   bool IsDoneWithCoreTraversal()
@@ -949,7 +949,7 @@ vtkPVXMLElement* vtkSIProxyDefinitionManager::GetCollapsedProxyDefinition(
 
       // Build the flattened version of it
       vtkNew<vtkPVXMLElement> newElement;
-      while (classHierarchy.size() > 0)
+      while (!classHierarchy.empty())
       {
         vtkPVXMLElement* currentElement = classHierarchy.back();
         classHierarchy.pop_back();

@@ -372,7 +372,7 @@ void pqFavoritesDialog::onRemoveFavoritePressed()
 {
   QSet<QTreeWidgetItem *> deletedItems, aboveItems, belowItems;
   QList<QTreeWidgetItem*> selected = this->Ui->favorites->selectedItems();
-  if (selected.size() == 0)
+  if (selected.empty())
   {
     return;
   }

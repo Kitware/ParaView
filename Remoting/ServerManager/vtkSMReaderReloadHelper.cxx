@@ -202,7 +202,7 @@ bool vtkSMReaderReloadHelper::ExtendFileSeries(vtkSMSourceProxy* proxy)
 
   std::vector<std::string> files =
     vtkGetFilesInSeries(proxy->GetSessionProxyManager(), svp->GetElement(0));
-  if (files.size() > 0)
+  if (!files.empty())
   {
     svp->SetElements(files);
     proxy->UpdateVTKObjects();

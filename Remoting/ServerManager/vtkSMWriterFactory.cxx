@@ -288,7 +288,7 @@ vtkSMProxy* vtkSMWriterFactory::CreateWriter(
   std::string extension = vtksys::SystemTools::GetFilenameExtension(filename);
   if (!proxybyname)
   {
-    if (extension.size() > 0)
+    if (!extension.empty())
     {
       // Find characters after last "."
       std::string::size_type found = extension.find_last_of('.');
@@ -373,7 +373,7 @@ const char* vtkSMWriterFactory::GetSupportedFileTypes(
     if (iter->second.CanCreatePrototype(source) && iter->second.CanWrite(source, outputport))
     {
       iter->second.FillInformation(source->GetSession());
-      if (iter->second.Extensions.size() > 0)
+      if (!iter->second.Extensions.empty())
       {
         std::string ext_join = ::vtkJoin(iter->second.Extensions, "*.", " ");
         std::ostringstream stream;
@@ -410,7 +410,7 @@ const char* vtkSMWriterFactory::GetSupportedWriterProxies(
     if (iter->second.CanCreatePrototype(source) && iter->second.CanWrite(source, outputport))
     {
       iter->second.FillInformation(source->GetSession());
-      if (iter->second.Extensions.size() > 0)
+      if (!iter->second.Extensions.empty())
       {
         std::ostringstream stream;
         stream << iter->second.Name;

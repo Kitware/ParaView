@@ -185,7 +185,7 @@ bool vtkMultiSliceContextItem::Paint(vtkContext2D* painter)
   axis->Update();
 
   // Draw the slices positions
-  if (this->Internal->Slices.size() > 0)
+  if (!this->Internal->Slices.empty())
   {
     // Fill the triangles
     vtkNew<vtkBrush> brush;

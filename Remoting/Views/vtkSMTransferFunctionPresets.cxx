@@ -404,7 +404,7 @@ std::string vtkSMTransferFunctionPresets::AddUniquePreset(
   }
 
   std::string name = prefix;
-  std::string separator = name.size() > 0 ? " " : "";
+  std::string separator = name.empty() ? "" : " ";
   int suffix = 0;
   while (names.find(name) != names.end())
   {

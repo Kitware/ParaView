@@ -408,7 +408,7 @@ pqScalarValueListPropertyWidget::pqScalarValueListPropertyWidget(
   ui.Remove->setEnabled(false);
   QObject::connect(ui.Table->selectionModel(), &QItemSelectionModel::selectionChanged,
     [&ui](const QItemSelection&, const QItemSelection&) {
-      ui.Remove->setEnabled(ui.Table->selectionModel()->selectedIndexes().size() > 0);
+      ui.Remove->setEnabled(ui.Table->selectionModel()->selectedIndexes().empty() == false);
     });
 
   if (smProperty->GetInformationOnly())
@@ -471,7 +471,7 @@ void pqScalarValueListPropertyWidget::editPastLastRow()
 void pqScalarValueListPropertyWidget::remove()
 {
   QModelIndexList indexes = this->Internals->Ui.Table->selectionModel()->selectedIndexes();
-  if (indexes.size() == 0)
+  if (indexes.empty())
   {
     // Nothing selected. Nothing to remove
     return;

@@ -177,7 +177,7 @@ vtkSMProxy* newCue(vtkSMProxy* proxy, const char* pname, int index)
     }
     double minValue = curValue;
     double maxValue = curValue;
-    if (domain.size() >= 1 && domain[0].isValid())
+    if (!domain.empty() && domain[0].isValid())
     {
       minValue = domain[0].toDouble();
     }

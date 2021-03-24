@@ -93,7 +93,7 @@ bool vtkSIInputProperty::Push(vtkSMMessage* message, int offset)
            << input_connection << this->GetCommand() << vtkClientServerStream::End;
   }
 
-  if (this->NullOnEmpty && this->CleanCommand == nullptr && proxy_ids.size() == 0)
+  if (this->NullOnEmpty && this->CleanCommand == nullptr && proxy_ids.empty())
   {
     stream << vtkClientServerStream::Invoke << this->SIProxyObject << "AddInput" << this->PortIndex
            << static_cast<vtkObjectBase*>(nullptr) << this->GetCommand()

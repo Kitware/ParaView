@@ -113,7 +113,7 @@ void vtkDataTabulator::AddSelector(const char* selector)
 //----------------------------------------------------------------------------
 void vtkDataTabulator::ClearSelectors()
 {
-  if (this->Selectors.size() > 0)
+  if (!this->Selectors.empty())
   {
     this->Selectors.clear();
     this->Modified();
@@ -129,7 +129,7 @@ int vtkDataTabulator::RequestData(
 
   if (vtkSmartPointer<vtkCompositeDataSet> inputCD = vtkCompositeDataSet::SafeDownCast(inputDO))
   {
-    if (this->Selectors.size() > 0)
+    if (!this->Selectors.empty())
     {
       vtkNew<vtkExtractBlockUsingDataAssembly> extractor;
       extractor->SetAssemblyName(this->ActiveAssemblyForSelectors);

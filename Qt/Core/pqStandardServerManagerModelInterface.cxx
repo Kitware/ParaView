@@ -174,7 +174,7 @@ pqProxy* pqStandardServerManagerModelInterface::createPQProxy(
   }
   else if (group == "sources")
   {
-    if (pqPipelineFilter::getInputPorts(proxy).size() > 0)
+    if (!pqPipelineFilter::getInputPorts(proxy).empty())
     {
       return new pqPipelineFilter(name, proxy, server, nullptr);
     }

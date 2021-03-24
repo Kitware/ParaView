@@ -1529,7 +1529,7 @@ void vtkGeometryRepresentation::UpdateShaderReplacements()
 
   props->ClearAllShaderReplacements();
 
-  if (!this->UseShaderReplacements || this->ShaderReplacementsString == "")
+  if (!this->UseShaderReplacements || this->ShaderReplacementsString.empty())
   {
     return;
   }

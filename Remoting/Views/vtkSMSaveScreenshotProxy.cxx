@@ -979,7 +979,7 @@ std::string vtkSMSaveScreenshotProxy::GetFileFormatFilters()
           pxm->GetPrototypeProxy(proxyType.GroupName.c_str(), proxyType.ProxyName.c_str()))
     {
       const auto options = detail::GetFormatOptions(formatProxy);
-      if (options.second.size() == 0)
+      if (options.second.empty())
       {
         continue;
       }
@@ -1009,7 +1009,7 @@ vtkSMProxy* vtkSMSaveScreenshotProxy::GetFormatProxy(const std::string& filename
 {
   auto extension = vtksys::SystemTools::GetFilenameLastExtension(filename);
   extension.erase(0, 1);
-  if (extension.size() == 0)
+  if (extension.empty())
   {
     vtkErrorMacro("Unknown file format for '" << filename << "'.");
   }
@@ -1021,7 +1021,7 @@ vtkSMProxy* vtkSMSaveScreenshotProxy::GetFormatProxy(const std::string& filename
           pxm->GetPrototypeProxy(proxyType.GroupName.c_str(), proxyType.ProxyName.c_str()))
     {
       const auto options = detail::GetFormatOptions(formatProxy);
-      if (options.second.size() > 0)
+      if (!options.second.empty())
       {
         const auto& exts = options.second;
         auto iter = std::find(exts.begin(), exts.end(), extension);

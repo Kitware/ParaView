@@ -462,7 +462,7 @@ int vtkPEnSightReader::RequestInformation(vtkInformation* vtkNotUsed(request),
       }
     }
   }
-  if (timeValues.size() > 0)
+  if (!timeValues.empty())
   {
     std::sort(timeValues.begin(), timeValues.end());
     std::vector<double> uniqueTimeValues(

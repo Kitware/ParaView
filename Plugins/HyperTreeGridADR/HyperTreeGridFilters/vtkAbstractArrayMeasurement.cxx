@@ -136,7 +136,7 @@ void vtkAbstractArrayMeasurement::ShallowCopy(vtkDataObject* o)
     this->GetNumberOfAccumulators() == arrayMeasurement->GetNumberOfAccumulators())
   {
     auto& accumulators = arrayMeasurement->GetAccumulators();
-    if (!this->Accumulators.size() && accumulators.size())
+    if (this->Accumulators.empty() && !accumulators.empty())
     {
       this->Accumulators.resize(accumulators.size());
     }
@@ -164,7 +164,7 @@ void vtkAbstractArrayMeasurement::DeepCopy(vtkDataObject* o)
     this->GetNumberOfAccumulators() == arrayMeasurement->GetNumberOfAccumulators())
   {
     auto& accumulators = arrayMeasurement->GetAccumulators();
-    if (!this->Accumulators.size() && accumulators.size())
+    if (this->Accumulators.empty() && !accumulators.empty())
     {
       this->Accumulators.resize(accumulators.size());
     }

@@ -126,7 +126,7 @@ void vtkSIPVRepresentationProxy::OnVTKObjectModified()
   vtkInternals::RepresentationProxiesType::iterator iter = key
     ? this->Internals->RepresentationProxies.find(key)
     : this->Internals->RepresentationProxies.end();
-  if (iter != this->Internals->RepresentationProxies.end() && iter->second.SubText != "")
+  if (iter != this->Internals->RepresentationProxies.end() && !iter->second.SubText.empty())
   {
     vtkClientServerStream stream;
     stream << vtkClientServerStream::Invoke << iter->second.SubProxy->GetVTKObject()

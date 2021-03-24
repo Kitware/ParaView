@@ -88,7 +88,7 @@ void vtkEnsembleDataReader::SetReader(unsigned int rowIndex, vtkAlgorithm* reade
 //-----------------------------------------------------------------------------
 void vtkEnsembleDataReader::ResetReaders()
 {
-  if (this->Internal->Readers.size() > 0)
+  if (!this->Internal->Readers.empty())
   {
     this->Internal->Readers.clear();
     this->Modified();
@@ -105,7 +105,7 @@ int vtkEnsembleDataReader::ProcessRequest(
     return false;
   }
 
-  if (this->Internal->Readers.size() == 0)
+  if (this->Internal->Readers.empty())
   {
     vtkErrorMacro("No reader have been specified! Things may not work as expected.");
   }

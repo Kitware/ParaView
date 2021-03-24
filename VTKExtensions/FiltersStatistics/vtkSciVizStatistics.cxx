@@ -223,7 +223,7 @@ int vtkSciVizStatistics::RequestData(
     return 1;
   }
 
-  if (!this->P->Buffer.size())
+  if (this->P->Buffer.empty())
   {
     // Silently ignore empty requests.
     return 1;

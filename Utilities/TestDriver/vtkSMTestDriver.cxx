@@ -298,7 +298,7 @@ int vtkSMTestDriver::ProcessCommandLine(int argc, char* argv[])
 void vtkSMTestDriver::CreateCommandLine(std::vector<const char*>& commandLine, const char* paraView,
   vtkSMTestDriver::ProcessType type, const char* numProc, int argStart, int argEnd, char* argv[])
 {
-  if (this->MPIRun.size() && (type != CLIENT || this->ClientUseMPI))
+  if (!this->MPIRun.empty() && (type != CLIENT || this->ClientUseMPI))
   {
     commandLine.push_back(this->MPIRun.c_str());
     commandLine.push_back(this->MPINumProcessFlag.c_str());
@@ -309,7 +309,7 @@ void vtkSMTestDriver::CreateCommandLine(std::vector<const char*>& commandLine, c
     }
   }
 
-  if (this->PVSSHFlags.size() && (type == SERVER || type == DATA_SERVER))
+  if (!this->PVSSHFlags.empty() && (type == SERVER || type == DATA_SERVER))
   {
     {
       // First add the ssh command:
@@ -318,7 +318,7 @@ void vtkSMTestDriver::CreateCommandLine(std::vector<const char*>& commandLine, c
         commandLine.push_back(this->PVSSHFlags[i].c_str());
       }
       // then the paraview initialization:
-      if (this->PVSetupScript.size())
+      if (!this->PVSetupScript.empty())
       {
         commandLine.push_back(this->PVSetupScript.c_str());
       }

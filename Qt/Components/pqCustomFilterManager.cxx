@@ -173,7 +173,7 @@ void pqCustomFilterManager::exportSelected(const QStringList& files)
 {
   // Get the selected custom filters from the list.
   QModelIndexList selection = this->Form->CustomFilterList->selectionModel()->selectedIndexes();
-  if (selection.size() == 0 || files.size() == 0)
+  if (selection.empty() || files.empty())
   {
     return;
   }
@@ -290,7 +290,7 @@ void pqCustomFilterManager::updateButtons(const QItemSelection&, const QItemSele
 {
   // Enable or disable the buttons based on the selection.
   QItemSelectionModel* selection = this->Form->CustomFilterList->selectionModel();
-  bool hasSelected = selection->selection().size() > 0;
+  bool hasSelected = !selection->selection().empty();
   this->Form->ExportButton->setEnabled(hasSelected);
   this->Form->RemoveButton->setEnabled(hasSelected);
 }

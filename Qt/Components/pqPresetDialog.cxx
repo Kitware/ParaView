@@ -785,7 +785,7 @@ void pqPresetDialog::updateEnabledStateForSelection()
     ui.opacities->setEnabled(false);
     ui.annotations->setEnabled(false);
     ui.apply->setEnabled(false);
-    ui.exportPresets->setEnabled(selectedRows.size() > 0);
+    ui.exportPresets->setEnabled(!selectedRows.empty());
     ui.showDefault->setEnabled(false);
 
     bool isEditable = true;
@@ -793,7 +793,7 @@ void pqPresetDialog::updateEnabledStateForSelection()
     {
       isEditable &= this->Internals->ProxyModel->flags(idx).testFlag(Qt::ItemIsEditable);
     }
-    ui.remove->setEnabled((selectedRows.size() > 0) && isEditable);
+    ui.remove->setEnabled((!selectedRows.empty()) && isEditable);
   }
 }
 
@@ -921,7 +921,7 @@ void pqPresetDialog::importPresets()
     "ParaView Color/Opacity Presets (*.json);;Legacy Color Maps (*.xml);;All Files (*)");
   dialog.setObjectName("ImportPresets");
   dialog.setFileMode(pqFileDialog::ExistingFile);
-  if (dialog.exec() == QDialog::Accepted && dialog.getSelectedFiles().size() > 0)
+  if (dialog.exec() == QDialog::Accepted && !dialog.getSelectedFiles().empty())
   {
     QString filename = dialog.getSelectedFiles()[0];
     const pqInternals& internals = *this->Internals;
@@ -956,7 +956,7 @@ void pqPresetDialog::exportPresets()
     "ParaView Color/Opacity Presets (*.json);;All Files (*)");
   dialog.setObjectName("ExportPresets");
   dialog.setFileMode(pqFileDialog::AnyFile);
-  if (dialog.exec() != QDialog::Accepted || dialog.getSelectedFiles().size() == 0)
+  if (dialog.exec() != QDialog::Accepted || dialog.getSelectedFiles().empty())
   {
     return;
   }
@@ -993,7 +993,7 @@ void pqPresetDialog::setPresetIsAdvanced(int newState)
   bool showByDefault = newState == Qt::Checked;
   const pqInternals& internals = *this->Internals;
   QModelIndexList selectedRows = internals.Ui.gradients->selectionModel()->selectedIndexes();
-  if (selectedRows.size() > 1 || selectedRows.size() == 0)
+  if (selectedRows.size() != 1)
   {
     // This doesn't support toggling multiple at once for now.
     // This is more of a sanity check since the checkbox should be disabled anyway.

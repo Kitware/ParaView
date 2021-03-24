@@ -104,7 +104,7 @@ void pqExportReaction::updateEnableState()
     {
       vtkSMViewProxy* viewProxy = view->getViewProxy();
       vtkNew<vtkSMViewExportHelper> helper;
-      enabled = (helper->GetSupportedFileTypes(viewProxy).size() > 0);
+      enabled = !helper->GetSupportedFileTypes(viewProxy).empty();
     }
   }
   this->parentAction()->setEnabled(enabled);
@@ -134,7 +134,7 @@ QString pqExportReaction::exportActiveView()
     nullptr, pqCoreUtilities::mainWidget(), tr("Export View:"), QString(), filters);
   file_dialog.setObjectName("FileExportDialog");
   file_dialog.setFileMode(pqFileDialog::AnyFile);
-  if (file_dialog.exec() == QDialog::Accepted && file_dialog.getSelectedFiles().size() > 0)
+  if (file_dialog.exec() == QDialog::Accepted && !file_dialog.getSelectedFiles().empty())
   {
     QString filename = file_dialog.getSelectedFiles().first();
     vtkSmartPointer<vtkSMExporterProxy> proxy;

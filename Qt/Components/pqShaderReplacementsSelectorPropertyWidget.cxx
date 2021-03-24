@@ -200,7 +200,7 @@ void pqShaderReplacementsSelectorPropertyWidget::onLoad()
   if (dialog.exec())
   {
     QStringList files = dialog.getSelectedFiles();
-    if (files.size() > 0 && this->loadShaderReplacements(files[0]))
+    if (!files.empty() && this->loadShaderReplacements(files[0]))
     {
       if (this->Internal->ComboBox->getPathIndex(files[0]) == 0)
       {
@@ -208,7 +208,7 @@ void pqShaderReplacementsSelectorPropertyWidget::onLoad()
         vtkSMSettings* settings = vtkSMSettings::GetInstance();
         std::string newPaths = settings->GetSettingAsString(
           pqShaderReplacementsComboBox::ShaderReplacementPathsSettings, "");
-        if (newPaths != "")
+        if (!newPaths.empty())
         {
           newPaths += std::string(1, QDir::listSeparator().toLatin1());
         }

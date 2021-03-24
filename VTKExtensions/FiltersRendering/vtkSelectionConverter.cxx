@@ -226,7 +226,7 @@ void vtkSelectionConverter::Convert(
     }
   }
 
-  if (indices.size() == 0)
+  if (indices.empty())
   {
     // nothing was selected.
     return;

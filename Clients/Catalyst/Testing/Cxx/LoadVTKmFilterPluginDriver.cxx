@@ -52,7 +52,7 @@ int LoadVTKmFilterPluginDriver(int argc, char* argv[])
   }
 
 #if VTK_MODULE_ENABLE_ParaView_PythonCatalyst
-  if (scripts.size() > 0)
+  if (!scripts.empty())
   {
     for (auto& scriptfile : scripts)
     {

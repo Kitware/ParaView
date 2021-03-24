@@ -664,7 +664,7 @@ void pqMultiViewWidget::reload()
       assert(viewProxy == nullptr || frame != nullptr);
       if (viewProxy == nullptr && frame == nullptr)
       {
-        if (empty_frames.size() > 0)
+        if (!empty_frames.empty())
         {
           frame = empty_frames.takeLast();
         }

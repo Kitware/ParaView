@@ -79,7 +79,7 @@ void pqResetDefaultSettingsReaction::resetSettingsToDefault()
     case QMessageBox::Save:
     {
       auto backups = this->backupSettings();
-      if (backups.size() == 0)
+      if (backups.empty())
       {
         if (QMessageBox::critical(pqCoreUtilities::mainWidget(), tr("Backups failed!"),
               tr("Failed to generate backup files. Do you want to continue?"),

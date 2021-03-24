@@ -282,7 +282,7 @@ private:
   QVariant status(const QString& key) const
   {
     auto iter = this->GroupedItemsMap.find(key);
-    if (iter == this->GroupedItemsMap.end() || iter->second.size() == 0)
+    if (iter == this->GroupedItemsMap.end() || iter->second.empty())
     {
       return QVariant();
     }

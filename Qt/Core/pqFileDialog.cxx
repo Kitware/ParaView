@@ -262,7 +262,7 @@ public:
     QString path = this->ForwardHistory.takeLast();
     this->BackHistory.append(this->Model->getCurrentPath());
     this->Ui.NavigateBack->setEnabled(true);
-    if (this->ForwardHistory.size() == 0)
+    if (this->ForwardHistory.empty())
     {
       this->Ui.NavigateForward->setEnabled(false);
     }
@@ -586,7 +586,7 @@ void pqFileDialog::emitFilesSelectionDone()
 {
   auto& impl = *this->Implementation;
   Q_EMIT filesSelected(impl.SelectedFiles);
-  if (impl.Mode != this->ExistingFiles && impl.SelectedFiles.size() > 0)
+  if (impl.Mode != this->ExistingFiles && !impl.SelectedFiles.empty())
   {
     Q_EMIT filesSelected(impl.SelectedFiles[0]);
   }
@@ -642,7 +642,7 @@ bool pqFileDialog::acceptExistingFiles()
 
   bool loadedFiles = false;
   QString filename;
-  if (impl.FileNames.size() == 0)
+  if (impl.FileNames.empty())
   {
     // when we have nothing selected in the current selection model, we will
     // attempt to use the default way
@@ -793,7 +793,7 @@ void pqFileDialog::onNavigate(const QString& newpath)
   auto& impl = *this->Implementation;
 
   QString path_to_navigate(newpath);
-  if (newpath.isEmpty() && impl.FileNames.size() > 0)
+  if (newpath.isEmpty() && !impl.FileNames.empty())
   {
     path_to_navigate = impl.FileNames.front();
     path_to_navigate = impl.Model->absoluteFilePath(path_to_navigate);

@@ -431,7 +431,7 @@ void vtkReductionFilter::Reduce(vtkDataObject* input, vtkDataObject* output)
   // vtkReductionFilter::REDUCE_ALL_TO_ALL
   // data_sets has datasets collected from all satellites otherwise
   // it contains the current process's result.
-  if (data_sets.size() > 0)
+  if (!data_sets.empty())
   {
     this->PostProcess(output, &data_sets[0], static_cast<unsigned int>(data_sets.size()));
   }

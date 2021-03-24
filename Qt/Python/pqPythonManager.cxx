@@ -195,13 +195,13 @@ void pqPythonManager::executeScript(const QString& filename)
     interp->RemoveObservers(vtkCommand::UpdateEvent);
 
     auto txt = owindow->text();
-    if (txt.size())
+    if (!txt.empty())
     {
       vtkOutputWindowDisplayText(txt.c_str());
     }
 
     auto errorText = owindow->errorText();
-    if (errorText.size())
+    if (!errorText.empty())
     {
       vtkOutputWindowDisplayErrorText(errorText.c_str());
     }

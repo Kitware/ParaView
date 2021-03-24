@@ -370,7 +370,7 @@ void vtkSMProxySelectionModel::LoadState(const vtkSMMessage* msg, vtkSMProxyLoca
   bool tmp = this->IsLocalPushOnly();
   this->EnableLocalPushOnly();
   this->Select(new_selection, CLEAR_AND_SELECT);
-  this->SetCurrentProxy(currentProxy, new_selection.size() == 0 ? SELECT : NO_UPDATE);
+  this->SetCurrentProxy(currentProxy, new_selection.empty() ? SELECT : NO_UPDATE);
   if (!tmp)
     this->DisableLocalPushOnly();
 }

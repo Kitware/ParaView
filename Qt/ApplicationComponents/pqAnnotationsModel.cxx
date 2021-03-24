@@ -372,7 +372,7 @@ QVariant pqAnnotationsModel::headerData(int section, Qt::Orientation orientation
   }
   else if (orientation == Qt::Horizontal && role == Qt::CheckStateRole && section == VISIBILITY)
   {
-    if (this->Internals->Items.size() == 0)
+    if (this->Internals->Items.empty())
     {
       return Qt::Unchecked;
     }
@@ -581,13 +581,13 @@ QModelIndex pqAnnotationsModel::removeAnnotations(const QModelIndexList& toRemov
     Q_EMIT this->endRemoveRows();
   }
 
-  if (rowsToRemove.size() > 0 &&
+  if (!rowsToRemove.empty() &&
     *rowsToRemove.begin() > static_cast<int>(this->Internals->Items.size()))
   {
     return this->index(*rowsToRemove.begin(), 0);
   }
 
-  if (this->Internals->Items.size() > 0)
+  if (!this->Internals->Items.empty())
   {
     return this->index(static_cast<int>(this->Internals->Items.size()) - 1, 0);
   }
@@ -606,7 +606,7 @@ void pqAnnotationsModel::removeAllAnnotations()
 void pqAnnotationsModel::setAnnotations(
   const std::vector<std::pair<QString, QString> >& newAnnotations)
 {
-  if (newAnnotations.size() == 0)
+  if (newAnnotations.empty())
   {
     this->removeAllAnnotations();
   }
@@ -784,7 +784,7 @@ std::vector<QColor> pqAnnotationsModel::indexedColors() const
 //-----------------------------------------------------------------------------
 bool pqAnnotationsModel::hasColors() const
 {
-  return this->Internals->Colors.size() != 0;
+  return !this->Internals->Colors.empty();
 }
 
 //-----------------------------------------------------------------------------

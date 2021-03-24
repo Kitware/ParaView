@@ -236,7 +236,7 @@ void NotifyClientDataInformationNextTimestep(vtkWeakPointer<vtkPVSessionBase> li
     variant->add_idtype(timeStep);
 
     // Add custom user_data for data information
-    if (information.size() > 0)
+    if (!information.empty())
     {
       ProxyState_UserData* dataInfo = message.AddExtension(ProxyState::user_data);
       dataInfo->set_key("UpdateDataInformation");
@@ -1240,7 +1240,7 @@ bool vtkLiveInsituLink::FilterXMLState(vtkPVXMLElement* xmlState)
   static std::set<std::string> nameSet;
 
   // Fill search set if empty
-  if (groupSet.size() == 0)
+  if (groupSet.empty())
   {
     groupSet.insert("animation");
     groupSet.insert("misc");

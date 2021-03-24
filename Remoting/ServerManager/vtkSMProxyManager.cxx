@@ -349,7 +349,7 @@ std::string vtkSMProxyManager::GetUniqueProxyName(
   }
   iter->Delete();
 
-  if (!groupname || !prefix || pxms.size() == 0)
+  if (!groupname || !prefix || pxms.empty())
   {
     return std::string();
   }

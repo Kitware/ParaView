@@ -200,7 +200,7 @@ protected:
     auto inputs = vtkPVMergeTables::GetTables(inputVector[0]);
 
     const bool has_block_names =
-      (inputs.size() && inputs[0]->GetFieldData()->GetAbstractArray("vtkBlockNames"));
+      (!inputs.empty() && inputs[0]->GetFieldData()->GetAbstractArray("vtkBlockNames"));
     if (!has_block_names)
     {
       return this->Superclass::RequestData(req, inputVector, outputVector);
@@ -345,7 +345,7 @@ public:
 
   vtkIdType GetNumberOfColumns(vtkSpreadSheetView* self)
   {
-    if (this->ActiveRepresentation != nullptr && this->ColumnMetaData.size() == 0)
+    if (this->ActiveRepresentation != nullptr && this->ColumnMetaData.empty())
     {
       this->GetSomeBlock(self);
     }

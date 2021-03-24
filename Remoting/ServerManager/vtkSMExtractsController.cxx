@@ -308,7 +308,7 @@ std::vector<vtkSMProxy*> vtkSMExtractsController::GetSupportedExtractorPrototype
 bool vtkSMExtractsController::CanExtract(
   vtkSMProxy* extractor, const std::vector<vtkSMProxy*>& inputs) const
 {
-  if (!extractor || inputs.size() == 0)
+  if (!extractor || inputs.empty())
   {
     return false;
   }

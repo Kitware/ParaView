@@ -1556,7 +1556,7 @@ bool vtkSMPropertyHelper::CopyInternal(const vtkSMPropertyHelper& source)
 {
   std::vector<T> values = source.GetPropertyArray<T>();
   this->SetPropertyArray<T>(
-    values.size() > 0 ? &values[0] : nullptr, static_cast<unsigned int>(values.size()));
+    !values.empty() ? &values[0] : nullptr, static_cast<unsigned int>(values.size()));
   return true;
 }
 

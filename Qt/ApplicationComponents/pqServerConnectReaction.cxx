@@ -71,7 +71,7 @@ void pqServerConnectReaction::connectToServerWithWarning()
   pqServer* server = pqActiveObjects::instance().activeServer();
 
   if (!vtkProcessModule::GetProcessModule()->GetMultipleSessionsSupport() &&
-    (smmodel->findItems<pqPipelineSource*>(server).size() > 0))
+    !smmodel->findItems<pqPipelineSource*>(server).empty())
   {
     int ret = QMessageBox::warning(pqCoreUtilities::mainWidget(),
       tr("Disconnect from current server?"), tr("Before connecting to a new server, \n"

@@ -63,7 +63,7 @@ bool pqComponentsTestUtility::CompareView(
   {
     // let's find the first view.
     auto views = pqApplicationCore::instance()->getServerManagerModel()->findItems<pqView*>();
-    if (views.size() > 0)
+    if (!views.empty())
     {
       curView = views[0];
     }

@@ -97,7 +97,7 @@ inline vtkSMProperty* GetControlPointsProperty(vtkSMProxy* self)
 bool vtkNormalize(std::vector<vtkTuple<double, 4> >& cntrlPoints, bool log_space,
   vtkTuple<double, 2>* originalRange = nullptr)
 {
-  if (cntrlPoints.size() == 0)
+  if (cntrlPoints.empty())
   {
     // nothing to do, but not an error, so return true.
     return true;
@@ -820,7 +820,7 @@ bool vtkSMTransferFunctionProxy::ApplyPreset(const Json::Value& arg, bool rescal
     Json::Value& pointsValue =
       this->GetProperty("RGBPoints") ? preset["RGBPoints"] : preset["Points"];
     if (pointsValue.isNull() || !pointsValue.isArray() || (pointsValue.size() % 4) != 0 ||
-      pointsValue.size() == 0)
+      pointsValue.empty())
     {
       vtkErrorMacro("Preset may not be valid. Please validate the preset:\n"
         << arg.toStyledString().c_str());
@@ -1255,7 +1255,7 @@ Json::Value vtkSMTransferFunctionProxy::ConvertLegacyColorMapXMLToJSON(vtkPVXMLE
     }
   }
 
-  if (new_annotations.size() > 0)
+  if (!new_annotations.empty())
   {
     Json::Value annotations(Json::arrayValue);
     for (int cc = 0, max = static_cast<int>(new_annotations.size()); cc < max; cc++)
@@ -1266,7 +1266,7 @@ Json::Value vtkSMTransferFunctionProxy::ConvertLegacyColorMapXMLToJSON(vtkPVXMLE
     json["Annotations"] = annotations;
   }
 
-  if (new_points.size() > 0 && indexedLookup)
+  if (!new_points.empty() && indexedLookup)
   {
     Json::Value rgbColors(Json::arrayValue);
     for (int cc = 0, max = static_cast<int>(new_points.size()); cc < max; cc++)
@@ -1277,7 +1277,7 @@ Json::Value vtkSMTransferFunctionProxy::ConvertLegacyColorMapXMLToJSON(vtkPVXMLE
     }
     json["IndexedColors"] = rgbColors;
   }
-  else if (new_points.size() > 0 && !indexedLookup)
+  else if (!new_points.empty() && !indexedLookup)
   {
     // sort the points by x, just in case user didn't add them correctly.
     std::sort(new_points.begin(), new_points.end(), StrictWeakOrdering());

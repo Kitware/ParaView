@@ -78,7 +78,7 @@ int vtkSMBagChartSeriesListDomain::SetDefaultValues(vtkSMProperty* prop, bool us
     }
     iter++;
   }
-  if (hdr != "")
+  if (!hdr.empty())
   {
     std::string x = re.match(3);
     std::string y = re.match(2);

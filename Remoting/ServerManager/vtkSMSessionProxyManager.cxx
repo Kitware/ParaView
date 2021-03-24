@@ -808,7 +808,7 @@ void vtkSMSessionProxyManager::UnRegisterProxy(const char* name)
   }
 
   // Push new state only if changed occurred
-  if (entriesToRemove.size() > 0)
+  if (!entriesToRemove.empty())
   {
     this->TriggerStateUpdate();
   }
@@ -830,7 +830,7 @@ void vtkSMSessionProxyManager::UnRegisterProxy(vtkSMProxy* proxy)
   }
 
   // Push new state only if changed occurred
-  if (tuplesToRemove.size() > 0)
+  if (!tuplesToRemove.empty())
   {
     this->TriggerStateUpdate();
   }
@@ -1206,7 +1206,7 @@ void vtkSMSessionProxyManager::UnMarkProxyAsModified(vtkSMProxy* proxy)
 //---------------------------------------------------------------------------
 int vtkSMSessionProxyManager::AreProxiesModified()
 {
-  return (this->Internals->ModifiedProxies.size() > 0) ? 1 : 0;
+  return this->Internals->ModifiedProxies.empty() ? 0 : 1;
 }
 
 //---------------------------------------------------------------------------

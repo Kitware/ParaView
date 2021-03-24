@@ -159,7 +159,7 @@ void vtkSMMultiSliceViewProxy::InitDefaultSlices(
     std::vector<double> ySlices = vtkSMPropertyHelper(this, "YSlicesValues").GetDoubleArray();
     std::vector<double> zSlices = vtkSMPropertyHelper(this, "ZSlicesValues").GetDoubleArray();
 
-    if (xSlices.size() == 0 && ySlices.size() == 0 && zSlices.size() == 0)
+    if (xSlices.empty() && ySlices.empty() && zSlices.empty())
     {
       xSlices.push_back(center[0]);
       ySlices.push_back(center[1]);

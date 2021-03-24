@@ -290,7 +290,7 @@ void vtkSMTimeKeeper::UpdateTimeSteps()
 
   std::vector<double> timesteps_vector;
   timesteps_vector.insert(timesteps_vector.begin(), timesteps.begin(), timesteps.end());
-  if (timesteps_vector.size() > 0)
+  if (!timesteps_vector.empty())
   {
     vtkSMDoubleVectorProperty::SafeDownCast(this->TimestepValuesProperty)
       ->SetElements(&timesteps_vector[0], static_cast<unsigned int>(timesteps_vector.size()));

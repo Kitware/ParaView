@@ -486,7 +486,7 @@ int vtkPVSelectionSource::RequestData(vtkInformation* vtkNotUsed(request),
         }
         source->AddID(-1, iter->ID);
       }
-      if (this->Internal->PedigreeIDs.size() > 0)
+      if (!this->Internal->PedigreeIDs.empty())
       {
         source->UpdatePiece(piece, npieces, 0);
         vtkSelectionNode* clone = vtkSelectionNode::New();
@@ -520,7 +520,7 @@ int vtkPVSelectionSource::RequestData(vtkInformation* vtkNotUsed(request),
         }
         source->AddStringID(-1, siter->ID.c_str());
       }
-      if (this->Internal->PedigreeStringIDs.size() > 0)
+      if (!this->Internal->PedigreeStringIDs.empty())
       {
         source->UpdatePiece(piece, npieces, 0);
         vtkSelectionNode* clone = vtkSelectionNode::New();
@@ -556,7 +556,7 @@ int vtkPVSelectionSource::RequestData(vtkInformation* vtkNotUsed(request),
         }
         source->AddID(iter->Piece, iter->ID);
       }
-      if (this->Internal->CompositeIDs.size() > 0)
+      if (!this->Internal->CompositeIDs.empty())
       {
         source->UpdatePiece(piece, npieces, 0);
         vtkSelectionNode* clone = vtkSelectionNode::New();
@@ -592,7 +592,7 @@ int vtkPVSelectionSource::RequestData(vtkInformation* vtkNotUsed(request),
         }
         source->AddID(-1, iter->ID);
       }
-      if (this->Internal->HierarchicalIDs.size() > 0)
+      if (!this->Internal->HierarchicalIDs.empty())
       {
         source->UpdatePiece(piece, npieces, 0);
         vtkSelectionNode* clone = vtkSelectionNode::New();
