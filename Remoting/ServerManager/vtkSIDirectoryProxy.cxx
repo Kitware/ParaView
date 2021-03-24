@@ -132,7 +132,7 @@ bool vtkSIDirectoryProxy::ReadXMLProperty(vtkPVXMLElement* propElement)
 {
   // We skip fake properties ;-)
   std::string name = propElement->GetAttributeOrEmpty("name");
-  if (name == "FileList" || name != "DirectoryList")
+  if (name == "FileList" || name == "DirectoryList")
   {
     return true;
   }
