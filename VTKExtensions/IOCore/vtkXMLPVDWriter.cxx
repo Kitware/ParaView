@@ -258,7 +258,7 @@ int vtkXMLPVDWriter::RequestData(
             (this->WriteAllTimeSteps != 0 && this->NumberOfTimeSteps > 1), this->CurrentTimeIndex);
           full = this->Internal->FilePath;
           full += fname;
-          vtksys::SystemTools::RemoveFile(full.c_str());
+          vtksys::SystemTools::RemoveFile(full);
         }
         this->RemoveADirectory(subdir.c_str());
         this->SetErrorCode(vtkErrorCode::OutOfDiskSpaceError);

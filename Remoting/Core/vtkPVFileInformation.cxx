@@ -206,7 +206,7 @@ static int vtkPVFileInformationGetType(const char* path)
   {
     type = vtkPVFileInformation::SINGLE_FILE;
   }
-  if (vtksys::SystemTools::FileIsDirectory(realpath.c_str()))
+  if (vtksys::SystemTools::FileIsDirectory(realpath))
   {
     type = vtkPVFileInformation::DIRECTORY;
   }
@@ -341,7 +341,7 @@ std::string MakeAbsolutePath(const std::string& path, const std::string& working
   if (!IsUncPath(path) && !IsNetworkPath(path))
 #endif
   {
-    ret = vtksys::SystemTools::CollapseFullPath(path.c_str(), working_dir.c_str());
+    ret = vtksys::SystemTools::CollapseFullPath(path, working_dir.c_str());
   }
   return ret;
 }
@@ -415,7 +415,7 @@ void vtkPVFileInformation::CopyFromObject(vtkObject* object)
   this->FastFileTypeDetection = helper->GetFastFileTypeDetection();
   this->ReadDetailedFileInformation = helper->GetReadDetailedFileInformation();
 
-  std::string working_directory = vtksys::SystemTools::GetCurrentWorkingDirectory().c_str();
+  std::string working_directory = vtksys::SystemTools::GetCurrentWorkingDirectory();
   if (helper->GetWorkingDirectory() && helper->GetWorkingDirectory()[0])
   {
     working_directory = helper->GetWorkingDirectory();

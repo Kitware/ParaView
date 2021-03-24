@@ -158,7 +158,7 @@ bool vtkProcessModule::Initialize(ProcessTypes type, int& argc, char**& argv)
     MPI_Init(&argc, &argv);
 
     // restore CWD to what it was before the MPI initialization.
-    vtksys::SystemTools::ChangeDirectory(cwd.c_str());
+    vtksys::SystemTools::ChangeDirectory(cwd);
 
     vtkProcessModule::FinalizeMPI = true;
   } // END if MPI is already initialized

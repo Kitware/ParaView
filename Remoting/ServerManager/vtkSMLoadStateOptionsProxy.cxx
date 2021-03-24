@@ -415,7 +415,7 @@ bool vtkSMLoadStateOptionsProxy::Load()
               .set_value(fIter->c_str());
             if (primaryFilename.empty() && fIter->compare(0, 3, "XML") != 0)
             {
-              primaryFilename = fIter->c_str();
+              primaryFilename = *fIter;
             }
           }
 

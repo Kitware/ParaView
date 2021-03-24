@@ -154,7 +154,7 @@ void pqShaderReplacementsSelectorPropertyWidget::updateShaderReplacements()
 void pqShaderReplacementsSelectorPropertyWidget::textChangedAndEditingFinished()
 {
   std::string currentValue = this->Internal->Property->GetElement(0);
-  std::string newValue = this->Internal->TextEdit->toPlainText().toStdString().c_str();
+  std::string newValue = this->Internal->TextEdit->toPlainText().toStdString();
   if (currentValue == newValue)
   {
     // Don't do anything if property and textedit are already synchronized

@@ -511,7 +511,7 @@ public:
     std::vector<T> previousValues;
     this->GetSetting(settingName, previousValues, VTK_DOUBLE_MAX);
 
-    Json::Path settingPath(root.c_str());
+    Json::Path settingPath(root);
     Json::Value& jsonValue = settingPath.make(this->SettingCollections[0].Value);
     jsonValue[leaf] = Json::Value::nullSingleton();
 
@@ -689,7 +689,7 @@ public:
           sourceSettingString.append(listProxy->GetXMLName());
           sourceSettingString.append(".Selected");
 
-          Json::Path valuePath(sourceSettingString.c_str());
+          Json::Path valuePath(sourceSettingString);
           Json::Value& jsonValue = valuePath.make(this->SettingCollections[0].Value);
           jsonValue = (strcmp(listProxy->GetXMLName(), currentProxyName) == 0);
           this->Modified();
@@ -1150,7 +1150,7 @@ bool vtkSMSettings::SaveSettingsToFile(const std::string& filePath)
   }
 
   // Get directory component of filePath and create it if it doesn't exist.
-  std::string directory = vtksys::SystemTools::GetParentDirectory(filePath.c_str());
+  std::string directory = vtksys::SystemTools::GetParentDirectory(filePath);
   bool createdDirectory = vtksys::SystemTools::MakeDirectory(directory.c_str());
   if (!createdDirectory)
   {

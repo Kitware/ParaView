@@ -446,6 +446,6 @@ void vtkSMProxyLink::UpdateState()
     this->Internals->ExceptionProperties.begin();
   for (; exceptIter != this->Internals->ExceptionProperties.end(); ++exceptIter)
   {
-    this->State->AddExtension(LinkState::exception_property, exceptIter->c_str());
+    this->State->AddExtension(LinkState::exception_property, *exceptIter);
   }
 }

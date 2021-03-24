@@ -289,7 +289,7 @@ void vtkInitializationHelper::Finalize()
     // Write out settings file(s)
     std::string userSettingsFilePath = vtkInitializationHelper::GetUserSettingsFilePath();
     vtkSMSettings* settings = vtkSMSettings::GetInstance();
-    bool savingSucceeded = settings->SaveSettingsToFile(userSettingsFilePath.c_str());
+    bool savingSucceeded = settings->SaveSettingsToFile(userSettingsFilePath);
     if (!savingSucceeded)
     {
       vtkGenericWarningMacro(<< "Saving settings file to '" << userSettingsFilePath << "' failed");
@@ -342,7 +342,7 @@ void vtkInitializationHelper::LoadSettings()
   vtkPVOptions* options = vtkProcessModule::GetProcessModule()->GetOptions();
   const char* app_dir_p = options->GetApplicationPath();
   std::string app_dir = app_dir_p ? app_dir_p : "";
-  app_dir = vtksys::SystemTools::GetProgramPath(app_dir.c_str());
+  app_dir = vtksys::SystemTools::GetProgramPath(app_dir);
 
   // If the application path ends with lib/paraview-X.X, shared
   // forwarding of the executable was used. Remove that part of the

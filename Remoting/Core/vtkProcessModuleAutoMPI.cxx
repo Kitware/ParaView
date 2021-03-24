@@ -222,7 +222,7 @@ int vtkProcessModuleAutoMPIInternals::StartRemoteBuiltInSelf(
 
   // Construct the Command line that will be executed
   std::string serverExe = this->ServerExecutablePath;
-  std::string app_dir = vtksys::SystemTools::GetProgramPath(serverExe.c_str());
+  std::string app_dir = vtksys::SystemTools::GetProgramPath(serverExe);
 
   vtksysProcess_SetWorkingDirectory(server, app_dir.c_str());
 
@@ -275,7 +275,7 @@ bool vtkProcessModuleAutoMPIInternals::SetMPIRun(std::string mpiexec)
   mpiexec = vtksys::SystemTools::GetFilenameName(mpiexec);
   vtkPVOptions* options = vtkProcessModule::GetProcessModule()->GetOptions();
   std::string app_dir = options->GetApplicationPath();
-  app_dir = vtksys::SystemTools::GetProgramPath(app_dir.c_str()) + "/" + mpiexec;
+  app_dir = vtksys::SystemTools::GetProgramPath(app_dir) + "/" + mpiexec;
   if (vtksys::SystemTools::FileExists(app_dir.c_str(), true))
   {
     this->MPIRun = app_dir;

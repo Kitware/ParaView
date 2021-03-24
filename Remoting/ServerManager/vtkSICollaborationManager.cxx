@@ -76,7 +76,7 @@ public:
       const ClientsInformation_ClientInfo* user = &msg->GetExtension(ClientsInformation::user, i);
       int id = user->user();
       findChanges = findChanges || (this->UserNames[id] != user->name());
-      this->UserNames[id] = user->name().c_str();
+      this->UserNames[id] = user->name();
       if (user->is_master() && this->MultiProcessController)
       {
         findChanges = findChanges || (this->MultiProcessController->GetMasterController() != id);
@@ -114,7 +114,7 @@ public:
       {
         std::ostringstream newUserName;
         newUserName << "User " << userId;
-        this->UserNames[userId] = newUserName.str().c_str();
+        this->UserNames[userId] = newUserName.str();
       }
       user->set_name(this->UserNames[userId]);
       if (userId == master)

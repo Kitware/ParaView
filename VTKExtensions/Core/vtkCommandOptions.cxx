@@ -340,12 +340,12 @@ void vtkCommandOptions::ComputeApplicationPath()
     if (argv0.rfind('/') != std::string::npos || argv0.rfind('\\') != std::string::npos)
     {
       // is a relative/absolute path, compute it based on cwd
-      argv0 = vtksys::SystemTools::CollapseFullPath(argv0.c_str());
+      argv0 = vtksys::SystemTools::CollapseFullPath(argv0);
     }
     else
     {
       // no path separator found, search PATH for it
-      argv0 = vtksys::SystemTools::FindProgram(argv0.c_str()).c_str();
+      argv0 = vtksys::SystemTools::FindProgram(argv0.c_str());
     }
     this->SetApplicationPath(argv0.c_str());
   }

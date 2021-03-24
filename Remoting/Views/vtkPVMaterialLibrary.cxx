@@ -87,7 +87,7 @@ vtkPVMaterialLibrary::vtkPVMaterialLibrary()
     {
       paths += ENV_PATH_SEP;
     }
-    paths += resource_dir.c_str();
+    paths += resource_dir;
   }
 
   // now we are ready

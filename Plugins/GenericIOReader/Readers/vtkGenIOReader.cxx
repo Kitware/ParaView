@@ -577,7 +577,7 @@ int vtkGenIOReader::RequestInformation(vtkInformation* /*rqst*/,
       unsigned Method = lanl::gio::GenericIO::FileIOPOSIX;
 
       randomNumGenerated = false;
-      gioReader = new lanl::gio::GenericIO(dataFilename.c_str(), Method);
+      gioReader = new lanl::gio::GenericIO(dataFilename, Method);
       msgLog << "Opening ... \n";
 
       currentFilename = dataFilename;
@@ -590,7 +590,7 @@ int vtkGenIOReader::RequestInformation(vtkInformation* /*rqst*/,
     unsigned Method = lanl::gio::GenericIO::FileIOPOSIX;
 
     randomNumGenerated = false;
-    gioReader = new lanl::gio::GenericIO(dataFilename.c_str(), Method);
+    gioReader = new lanl::gio::GenericIO(dataFilename, Method);
     msgLog << "Opening . .. .\n";
 
     currentFilename = dataFilename;
@@ -976,35 +976,25 @@ int vtkGenIOReader::RequestData(
             readInData[j].allocateMem(1);
 
             if (readInData[j].dataType == "float")
-              gioReader->addVariable(
-                (readInData[j].name).c_str(), (float*)readInData[j].data, true);
+              gioReader->addVariable((readInData[j].name), (float*)readInData[j].data, true);
             else if (readInData[j].dataType == "double")
-              gioReader->addVariable(
-                (readInData[j].name).c_str(), (double*)readInData[j].data, true);
+              gioReader->addVariable((readInData[j].name), (double*)readInData[j].data, true);
             else if (readInData[j].dataType == "int8_t")
-              gioReader->addVariable(
-                (readInData[j].name).c_str(), (int8_t*)readInData[j].data, true);
+              gioReader->addVariable((readInData[j].name), (int8_t*)readInData[j].data, true);
             else if (readInData[j].dataType == "int16_t")
-              gioReader->addVariable(
-                (readInData[j].name).c_str(), (int16_t*)readInData[j].data, true);
+              gioReader->addVariable((readInData[j].name), (int16_t*)readInData[j].data, true);
             else if (readInData[j].dataType == "int32_t")
-              gioReader->addVariable(
-                (readInData[j].name).c_str(), (int32_t*)readInData[j].data, true);
+              gioReader->addVariable((readInData[j].name), (int32_t*)readInData[j].data, true);
             else if (readInData[j].dataType == "int64_t")
-              gioReader->addVariable(
-                (readInData[j].name).c_str(), (int64_t*)readInData[j].data, true);
+              gioReader->addVariable((readInData[j].name), (int64_t*)readInData[j].data, true);
             else if (readInData[j].dataType == "uint8_t")
-              gioReader->addVariable(
-                (readInData[j].name).c_str(), (uint8_t*)readInData[j].data, true);
+              gioReader->addVariable((readInData[j].name), (uint8_t*)readInData[j].data, true);
             else if (readInData[j].dataType == "uint16_t")
-              gioReader->addVariable(
-                (readInData[j].name).c_str(), (uint16_t*)readInData[j].data, true);
+              gioReader->addVariable((readInData[j].name), (uint16_t*)readInData[j].data, true);
             else if (readInData[j].dataType == "uint32_t")
-              gioReader->addVariable(
-                (readInData[j].name).c_str(), (uint32_t*)readInData[j].data, true);
+              gioReader->addVariable((readInData[j].name), (uint32_t*)readInData[j].data, true);
             else if (readInData[j].dataType == "uint64_t")
-              gioReader->addVariable(
-                (readInData[j].name).c_str(), (uint64_t*)readInData[j].data, true);
+              gioReader->addVariable((readInData[j].name), (uint64_t*)readInData[j].data, true);
             else
               msgLog << readInData[j].dataType << " = data type undefined!!!";
           }
@@ -1122,35 +1112,25 @@ int vtkGenIOReader::RequestData(
             readInData[j].allocateMem(1);
 
             if (readInData[j].dataType == "float")
-              gioReader->addVariable(
-                (readInData[j].name).c_str(), (float*)readInData[j].data, true);
+              gioReader->addVariable((readInData[j].name), (float*)readInData[j].data, true);
             else if (readInData[j].dataType == "double")
-              gioReader->addVariable(
-                (readInData[j].name).c_str(), (double*)readInData[j].data, true);
+              gioReader->addVariable((readInData[j].name), (double*)readInData[j].data, true);
             else if (readInData[j].dataType == "int8_t")
-              gioReader->addVariable(
-                (readInData[j].name).c_str(), (int8_t*)readInData[j].data, true);
+              gioReader->addVariable((readInData[j].name), (int8_t*)readInData[j].data, true);
             else if (readInData[j].dataType == "int16_t")
-              gioReader->addVariable(
-                (readInData[j].name).c_str(), (int16_t*)readInData[j].data, true);
+              gioReader->addVariable((readInData[j].name), (int16_t*)readInData[j].data, true);
             else if (readInData[j].dataType == "int32_t")
-              gioReader->addVariable(
-                (readInData[j].name).c_str(), (int32_t*)readInData[j].data, true);
+              gioReader->addVariable((readInData[j].name), (int32_t*)readInData[j].data, true);
             else if (readInData[j].dataType == "int64_t")
-              gioReader->addVariable(
-                (readInData[j].name).c_str(), (int64_t*)readInData[j].data, true);
+              gioReader->addVariable((readInData[j].name), (int64_t*)readInData[j].data, true);
             else if (readInData[j].dataType == "uint8_t")
-              gioReader->addVariable(
-                (readInData[j].name).c_str(), (uint8_t*)readInData[j].data, true);
+              gioReader->addVariable((readInData[j].name), (uint8_t*)readInData[j].data, true);
             else if (readInData[j].dataType == "uint16_t")
-              gioReader->addVariable(
-                (readInData[j].name).c_str(), (uint16_t*)readInData[j].data, true);
+              gioReader->addVariable((readInData[j].name), (uint16_t*)readInData[j].data, true);
             else if (readInData[j].dataType == "uint32_t")
-              gioReader->addVariable(
-                (readInData[j].name).c_str(), (uint32_t*)readInData[j].data, true);
+              gioReader->addVariable((readInData[j].name), (uint32_t*)readInData[j].data, true);
             else if (readInData[j].dataType == "uint64_t")
-              gioReader->addVariable(
-                (readInData[j].name).c_str(), (uint64_t*)readInData[j].data, true);
+              gioReader->addVariable((readInData[j].name), (uint64_t*)readInData[j].data, true);
             else
               msgLog << readInData[j].dataType << " = data type undefined!!!";
           }
