@@ -938,6 +938,7 @@ bool vtkSMSelectionHelper::ToggleSelection(
     for (cc = 0; cc < count; cc++)
     {
       std::vector<vtkIdType> id;
+      id.reserve(selectionTupleSize);
       for (int i = 0; i < selectionTupleSize; i++)
       {
         id.push_back(outputIDs.GetAsIdType(cc * selectionTupleSize + i));
@@ -950,6 +951,7 @@ bool vtkSMSelectionHelper::ToggleSelection(
     for (cc = 0; cc < count; cc++)
     {
       std::vector<vtkIdType> id;
+      id.reserve(selectionTupleSize);
       for (int i = 0; i < selectionTupleSize; i++)
       {
         id.push_back(inputIDs.GetAsIdType(cc * selectionTupleSize + i));
@@ -995,6 +997,7 @@ bool vtkSMSelectionHelper::ToggleSelection(
     for (cc = 0; cc < count; cc++)
     {
       std::vector<vtkIdType> id;
+      id.reserve(selectionTupleSize);
       for (int i = 0; i < selectionTupleSize; i++)
       {
         id.push_back(outputIDs.GetAsIdType(cc * selectionTupleSize + i));
@@ -1007,6 +1010,7 @@ bool vtkSMSelectionHelper::ToggleSelection(
     for (cc = 0; cc < count; cc++)
     {
       std::vector<vtkIdType> id;
+      id.reserve(selectionTupleSize);
       for (int i = 0; i < selectionTupleSize; i++)
       {
         id.push_back(inputIDs.GetAsIdType(cc * selectionTupleSize + i));

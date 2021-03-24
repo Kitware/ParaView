@@ -6,6 +6,7 @@
 #include <vtkSmartPointer.h>
 
 #include <cassert>
+#include <numeric>
 #include <vector>
 
 void SubCommunicatorDriver(MPI_Comm* handle)
@@ -34,11 +35,9 @@ int SubController(int argc, char* argv[])
   MPI_Group orig_group;
   MPI_Comm_group(MPI_COMM_WORLD, &orig_group);
 
-  std::vector<int> subranks;
-  for (int i = 0; i < numprocs / 2; i++)
-  {
-    subranks.push_back(i);
-  }
+  const int numranks = numprocs / 2;
+  std::vector<int> subranks(numranks);
+  std::iota(subranks.begin(), subranks.end(), 0);
   assert(subranks.size() >= 1);
 
   MPI_Group subgroup;

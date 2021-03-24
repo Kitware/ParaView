@@ -360,6 +360,7 @@ vtkSmartPointer<vtkDataArray> vtkConduitArrayUtilities::MCArrayToVTKSOAArray(
   const vtkIdType num_tuples = static_cast<vtkIdType>(dtype0.number_of_elements());
 
   std::vector<void*> ptrs;
+  ptrs.reserve(num_components);
   for (int cc = 0; cc < num_components; ++cc)
   {
     ptrs.push_back(const_cast<void*>(mcarray.child(cc).element_ptr(0)));
