@@ -443,7 +443,6 @@ void vtkCompleteArrays::CompleteArraysOnBlock(vtkDataSet* inputDS, vtkDataSet*& 
     this->Controller->Send(typeAndLength, 2, 0, 389002);
     this->Controller->Send(const_cast<unsigned char*>(data), typeAndLength[1], 0, 389003);
   }
-  return;
 }
 
 //-----------------------------------------------------------------------------

@@ -878,7 +878,6 @@ void pqMemoryInspectorPanel::RenderCompleted()
   }
 
   this->Update();
-  return;
 
   /*
   // This code is for updating on endRender regardless of whether

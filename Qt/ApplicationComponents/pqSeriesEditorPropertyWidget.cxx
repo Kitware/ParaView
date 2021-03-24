@@ -327,7 +327,6 @@ QList<QVariant> pqSeriesEditorPropertyWidget::seriesVisibility() const
 void pqSeriesEditorPropertyWidget::setPresetLabel(const QList<QVariant>& vtkNotUsed(values))
 {
   // handle by `onPresetChanged`.
-  return;
 }
 
 //-----------------------------------------------------------------------------
@@ -352,7 +351,6 @@ QList<QVariant> pqSeriesEditorPropertyWidget::seriesLabel() const
 void pqSeriesEditorPropertyWidget::setPresetColor(const QList<QVariant>& vtkNotUsed(values))
 {
   // handle by `onPresetChanged`.
-  return;
 }
 
 //-----------------------------------------------------------------------------

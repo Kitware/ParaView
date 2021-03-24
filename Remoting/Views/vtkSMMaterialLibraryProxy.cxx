@@ -48,7 +48,6 @@ void vtkSMMaterialLibraryProxy::LoadMaterials(const char* filename)
   this->Synchronize();
 #else
   (void)filename;
-  return;
 #endif
 }
 
@@ -61,8 +60,6 @@ void vtkSMMaterialLibraryProxy::LoadDefaultMaterials()
   stream << vtkClientServerStream::Invoke << VTKOBJECT(this) << "ReadRelativeFile"
          << "ospray_mats.json" << vtkClientServerStream::End;
   this->ExecuteStream(stream, false, vtkPVSession::RENDER_SERVER_ROOT);
-#else
-  return;
 #endif
 }
 
@@ -96,8 +93,6 @@ void vtkSMMaterialLibraryProxy::Synchronize()
   vtkOSPRayMaterialLibrary* ml = vtkOSPRayMaterialLibrary::SafeDownCast(
     vtkPVMaterialLibrary::SafeDownCast(this->GetClientSideObject())->GetMaterialLibrary());
   ml->Fire();
-#else
-  return;
 #endif
 }
 

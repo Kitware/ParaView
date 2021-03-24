@@ -612,8 +612,6 @@ void vtkNIfTIWriter::WriteFileHeader(
   }
   if (!leave_open)
     vtkznzlib::znzclose(fp);
-
-  return;
 }
 
 void vtkNIfTIWriter::WriteFile(

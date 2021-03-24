@@ -1487,7 +1487,6 @@ void vtkUnstructuredPOPReader::GetPiecesNeedingPoint(int iIndex, int jIndex, int
       << iIndex << " " << jIndex << " " << kIndex << " "
       << vtkMultiProcessController::GetGlobalController()->GetLocalProcessId());
   }
-  return;
 }
 
 //-----------------------------------------------------------------------------

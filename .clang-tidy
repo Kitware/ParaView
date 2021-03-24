@@ -109,7 +109,6 @@ readability-*,\
 -readability-named-parameter,\
 -readability-non-const-parameter,\
 -readability-qualified-auto,\
--readability-redundant-control-flow,\
 -readability-redundant-declaration,\
 -readability-redundant-member-init,\
 -readability-redundant-preprocessor,\
