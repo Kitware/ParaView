@@ -929,7 +929,7 @@ void pqAnimationModel::wheelEvent(QGraphicsSceneWheelEvent* wheelEvent)
     return;
   }
 
-  double steps = wheelEvent->delta() / MouseWheelStepsFactor;
+  double steps = static_cast<double>(wheelEvent->delta()) / MouseWheelStepsFactor;
   double newZoomStart;
 
   this->ZoomFactor += steps / 2;

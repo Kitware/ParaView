@@ -1334,7 +1334,7 @@ void vtkPVRenderView::Update()
   const vtkTypeUInt64 lsize = this->GetDeliveryManager()->GetVisibleDataSize(/*low_res*/ false);
   vtkTypeUInt64 gsize;
   this->AllReduce(lsize, gsize, vtkCommunicator::SUM_OP);
-  const double geometry_size = gsize / 1024;
+  const double geometry_size = gsize / 1024.0;
 
   // cout << "Full Geometry size: " << geometry_size << endl;
   // Update decisions about lod-rendering and remote-rendering.
@@ -1401,7 +1401,7 @@ void vtkPVRenderView::UpdateLOD()
   const vtkTypeUInt64 lsize = this->GetDeliveryManager()->GetVisibleDataSize(/*low_res*/ true);
   vtkTypeUInt64 gsize;
   this->AllReduce(lsize, gsize, vtkCommunicator::SUM_OP);
-  const double geometry_size = gsize / 1024;
+  const double geometry_size = gsize / 1024.0;
   // cout << "LOD Geometry size: " << geometry_size << endl;
 
   this->UseDistributedRenderingForLODRender =

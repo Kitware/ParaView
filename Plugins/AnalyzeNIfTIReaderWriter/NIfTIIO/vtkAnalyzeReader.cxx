@@ -363,7 +363,7 @@ Note: Index0 is fastest-varying (innermost-nested) index, Index2 the outermost.
   imageSizeInBytes = (int)(numElts * dataTypeSize);
   if (Type == DT_BINARY)
   {
-    double tempSize = numElts / m_NiftiImage->nz;
+    double tempSize = static_cast<double>(numElts) / m_NiftiImage->nz;
     double tempSliceSize = tempSize * dataTypeSize;
     int tempSliceSizeInt = (int)tempSliceSize;
     if (tempSliceSizeInt < tempSliceSize)

@@ -28472,7 +28472,7 @@ if ( taxis->type == TAXIS_ABSOLUTE )
         {
         int year, month, day;
         cdiDecodeDate(date, &year, &month, &day);
-        timevalue = date/100
+        timevalue = (date/100.0)
             + copysign((double)(day != 0) * 0.5, (double)date);
         }
     else
@@ -28787,7 +28787,7 @@ double f = floor((c - e)/30.6001);
 
 *day  = (int)(c - e - floor(30.6001*f));
 *mon  = (int)(f - 1 - 12*floor(f/14));
-*year = (int)(d - 4715 - floor((7 + *mon)/10));
+*year = (int)(d - 4715 - floor((7 + *mon)/10.0));
 }
 
 

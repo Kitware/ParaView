@@ -306,8 +306,8 @@ void pqCollaborationManager::updateMousePointerLocation(QMouseEvent* e)
                           this->activeCollaborationManager()->GetSession()->GetRemoteObject(
                             widget->getProxyId())) != nullptr);
 
-    double w2 = widget->width() / 2;
-    double h2 = widget->height() / 2;
+    double w2 = widget->width() / 2.0;
+    double h2 = widget->height() / 2.0;
     double px = (e->x() - w2) / (isChartView ? w2 : h2);
     double py = (e->y() - h2) / h2;
 
@@ -347,8 +347,8 @@ void pqCollaborationManager::showMousePointer(
   {
     double xRatioBase = 1;
     double yRatioBase = 1;
-    double w2 = widget->width() / 2;
-    double h2 = widget->height() / 2;
+    double w2 = widget->width() / 2.0;
+    double h2 = widget->height() / 2.0;
     switch (useBothHeightWidth)
     {
       case 0: // both

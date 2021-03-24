@@ -1150,7 +1150,7 @@ public:
 
           structuredIndices->InsertNextTuple3((id % dimensions[3 * pid]),
             (id / dimensions[3 * pid]) % dimensions[3 * pid + 1],
-            (id / (dimensions[3 * pid] * dimensions[3 * pid + 1])));
+            (id / static_cast<double>((dimensions[3 * pid] * dimensions[3 * pid + 1]))));
         }
         output->GetRowData()->AddArray(structuredIndices);
         structuredIndices->FastDelete();
