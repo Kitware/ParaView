@@ -160,10 +160,10 @@ std::string vtkLocatePluginOrConfigFile(const char* plugin, const char* hint, bo
   if (hint && *hint)
   {
     const std::string hintdir = vtksys::SystemTools::GetFilenamePath(hint);
-    auto path = locator->Locate(hintdir + "/" + plugin, landmark);
+    auto path = locator->Locate(std::string(hintdir).append("/").append(plugin), landmark);
     if (!path.empty())
     {
-      return path + "/" + landmark;
+      return std::string(path).append("/").append(landmark);
     }
   }
 
@@ -178,7 +178,7 @@ std::string vtkLocatePluginOrConfigFile(const char* plugin, const char* hint, bo
       auto path = locator->Locate(testPluginPath, landmark);
       if (!path.empty())
       {
-        return path + "/" + landmark;
+        return std::string(path).append("/").append(landmark);
       }
     }
   }
@@ -190,7 +190,7 @@ std::string vtkLocatePluginOrConfigFile(const char* plugin, const char* hint, bo
     auto pluginpath = locator->Locate(exe_dir, prefixes, landmark);
     if (!pluginpath.empty())
     {
-      return pluginpath + "/" + landmark;
+      return std::string(pluginpath).append("/").append(landmark);
     }
   }
 
@@ -356,7 +356,7 @@ void vtkPVPluginTracker::LoadPluginConfigurationXMLConf(
   {
     if (!vtksys::SystemTools::FileIsFullPath(line))
     {
-      line = exe_dir + "/" + line;
+      line = std::string(exe_dir).append("/").append(line);
     }
 
     this->LoadPluginConfigurationXML(line.c_str(), false);

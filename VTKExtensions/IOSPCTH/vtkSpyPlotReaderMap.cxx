@@ -265,7 +265,7 @@ bool vtkSpyPlotReaderMap::InitializeFromCaseFile(const char* filename)
       {
         if (!vtksys::SystemTools::FileIsFullPath(f.c_str()))
         {
-          f = vtksys::SystemTools::GetFilenamePath(filename) + "/" + f;
+          f = vtksys::SystemTools::GetFilenamePath(filename).append("/").append(f);
         }
         this->Files[f.c_str()] = nullptr;
       }

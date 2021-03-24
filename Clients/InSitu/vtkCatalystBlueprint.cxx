@@ -298,7 +298,9 @@ bool verify(const std::string& protocol, const conduit::Node& n)
   {
     iter.next();
     const auto& name = iter.name();
-    if (!channel::verify(protocol + "::channel['" + name + "']", iter.node()))
+    const std::string completeName =
+      std::string(protocol).append("::channel['").append(name).append("']");
+    if (!channel::verify(completeName, iter.node()))
     {
       return false;
     }

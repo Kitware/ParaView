@@ -250,7 +250,7 @@ bool vtkEnsembleDataReader::UpdateMetaData()
     components.push_back(filePath);
 
     // Internal file paths should be relative to the .pve file
-    std::string curFileName = fdir + "/" + filePath;
+    const std::string curFileName = std::string(fdir).append("/").append(filePath);
     this->Internal->FilePaths[row] = curFileName;
   }
 
