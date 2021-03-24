@@ -58,7 +58,6 @@ public:
 vtkStandardNewMacro(vtkUnstructuredGridVolumeRepresentation);
 //----------------------------------------------------------------------------
 vtkUnstructuredGridVolumeRepresentation::vtkUnstructuredGridVolumeRepresentation()
-  : Superclass()
 {
   this->Internals = new vtkInternals();
 

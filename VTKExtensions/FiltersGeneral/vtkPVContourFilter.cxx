@@ -48,7 +48,6 @@ vtkStandardNewMacro(vtkPVContourFilter);
 
 //-----------------------------------------------------------------------------
 vtkPVContourFilter::vtkPVContourFilter()
-  : vtkContourFilter()
 {
 }
 

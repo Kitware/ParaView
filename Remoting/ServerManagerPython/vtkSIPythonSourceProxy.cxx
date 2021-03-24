@@ -352,7 +352,6 @@ vtkStandardNewMacro(vtkSIPythonSourceProxy);
 vtkSIPythonSourceProxy::vtkSIPythonSourceProxy()
   : Internals(nullptr)
   , ReimportModules(false)
-  , Dummy()
 {
   // We want to make sure that we "delete" the Python object on exit.
   // This makes for easier cleanup in Python code since `Py_Finalize()`

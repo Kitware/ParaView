@@ -86,10 +86,7 @@ class vtkXMLCollectionReaderString : public std::string
 {
 public:
   typedef std::string Superclass;
-  vtkXMLCollectionReaderString()
-    : Superclass()
-  {
-  }
+  vtkXMLCollectionReaderString() = default;
   vtkXMLCollectionReaderString(const char* s)
     : Superclass(s)
   {

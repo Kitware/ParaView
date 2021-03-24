@@ -330,8 +330,7 @@ vtkCxxSetObjectMacro(vtkPVRenderView, LastSelection, vtkSelection);
 
 //----------------------------------------------------------------------------
 vtkPVRenderView::vtkPVRenderView()
-  : Annotation()
-  , StereoType(VTK_STEREO_RED_BLUE)
+  : StereoType(VTK_STEREO_RED_BLUE)
   , ServerStereoType(VTK_STEREOTYPE_SAME_AS_CLIENT)
 {
   this->Internals = new vtkInternals();

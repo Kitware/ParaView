@@ -47,6 +47,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /////////////////////////////////////////////////////////////////////
 // Icons
+// NOLINTNEXTLINE(readability-redundant-member-init)
 Q_GLOBAL_STATIC(pqFileDialogModelIconProvider, Icons);
 
 //-----------------------------------------------------------------------------

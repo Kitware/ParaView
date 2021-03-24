@@ -93,7 +93,6 @@ public:
 //-----------------------------------------------------------------------------
 pqCustomFilterDefinitionModelItem::pqCustomFilterDefinitionModelItem(
   pqCustomFilterDefinitionModelItem* parent)
-  : Children()
 {
   this->Type = pqCustomFilterDefinitionModel::Invalid;
   this->Parent = parent;

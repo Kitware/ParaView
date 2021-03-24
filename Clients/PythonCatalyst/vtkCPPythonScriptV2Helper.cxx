@@ -227,7 +227,6 @@ vtkCxxSetObjectMacro(vtkCPPythonScriptV2Helper, Options, vtkSMProxy);
 vtkCPPythonScriptV2Helper::vtkCPPythonScriptV2Helper()
   : Internals(new vtkCPPythonScriptV2Helper::vtkInternals())
   , Options(nullptr)
-  , Filename{}
   , DataDescription(nullptr)
 {
 }

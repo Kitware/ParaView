@@ -110,9 +110,6 @@ public:
 
 //----------------------------------------------------------------------------
 pqFlatTreeViewItem::pqFlatTreeViewItem()
-  : Items()
-  , Index()
-  , Cells()
 {
   this->Parent = nullptr;
   this->ContentsY = 0;
@@ -138,10 +135,7 @@ pqFlatTreeViewItem::~pqFlatTreeViewItem()
 
 //----------------------------------------------------------------------------
 pqFlatTreeViewInternal::pqFlatTreeViewInternal()
-  : ShiftStart()
-  , Index()
-  , LastSearchTime(QTime::currentTime())
-  , KeySearch()
+  : LastSearchTime(QTime::currentTime())
 {
   this->Editor = nullptr;
 }

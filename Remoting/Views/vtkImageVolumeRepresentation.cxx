@@ -110,7 +110,6 @@ void vtkGetNonGhostExtent(int* resultExtent, vtkImageData* dataSet)
 vtkStandardNewMacro(vtkImageVolumeRepresentation);
 //----------------------------------------------------------------------------
 vtkImageVolumeRepresentation::vtkImageVolumeRepresentation()
-  : Superclass()
 {
   this->VolumeMapper.TakeReference(vtkMultiBlockVolumeMapper::New());
 

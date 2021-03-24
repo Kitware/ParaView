@@ -100,7 +100,6 @@ vtkSMExtractsController::vtkSMExtractsController()
   , ExtractsOutputDirectory(nullptr)
   , EnvironmentExtractsOutputDirectory(nullptr)
   , SummaryTable(nullptr)
-  , LastExtractsOutputDirectory{}
   , ExtractsOutputDirectoryValid(false)
 {
   if (vtksys::SystemTools::HasEnv("PARAVIEW_OVERRIDE_EXTRACTS_OUTPUT_DIRECTORY"))
