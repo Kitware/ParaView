@@ -78,7 +78,7 @@ void vtkSMPVMoleculeRepresentationProxy::SetPreset(int preset)
 //----------------------------------------------------------------------------
 void vtkSMPVMoleculeRepresentationProxy::SetPreset(const char* name)
 {
-  for (auto p : this->Presets)
+  for (const auto& p : this->Presets)
   {
     if (std::strcmp(name, p.second.Name.c_str()) == 0)
     {

@@ -575,7 +575,7 @@ const char* vtkSMReaderFactory::GetSupportedFileTypes(vtkSMSession* session)
   }
   all_types << ")";
 
-  for (auto types : sorted_types)
+  for (const auto& types : sorted_types)
   {
     all_types << ";;" << types;
   }

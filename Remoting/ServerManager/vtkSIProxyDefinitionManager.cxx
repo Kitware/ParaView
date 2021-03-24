@@ -1145,12 +1145,12 @@ void vtkSIProxyDefinitionManager::Push(vtkSMMessage* msg)
   }
 
   // restore animation and screenshot writers.
-  for (auto pair : animationWriters)
+  for (const auto& pair : animationWriters)
   {
     this->AddElement("animation_writers", pair.first.c_str(), pair.second);
   }
 
-  for (auto pair : screenshotWriters)
+  for (const auto& pair : screenshotWriters)
   {
     this->AddElement("screenshot_writers", pair.first.c_str(), pair.second);
   }

@@ -400,7 +400,7 @@ struct Process_5_4_to_5_5
       blocksNode.append_attribute("number_of_elements")
         .set_value(static_cast<int>(selectedPaths.size() * 2));
       int index = 0;
-      for (const auto spath : selectedPaths)
+      for (const auto& spath : selectedPaths)
       {
         auto eNode = blocksNode.append_child("Element");
         eNode.append_attribute("index").set_value(index++);

@@ -183,7 +183,7 @@ pqOMETransferFunctionsPropertyWidget::pqOMETransferFunctionsPropertyWidget(
 pqOMETransferFunctionsPropertyWidget::~pqOMETransferFunctionsPropertyWidget()
 {
   auto& internals = (*this->Internals);
-  for (auto page : internals.Pages)
+  for (const auto& page : internals.Pages)
   {
     delete page;
   }
@@ -204,7 +204,7 @@ void pqOMETransferFunctionsPropertyWidget::channelVisibilitiesChanged()
   }
 
   internals.Ui.tabWidget->clear();
-  for (auto page : internals.Pages)
+  for (const auto& page : internals.Pages)
   {
     if (values.find(page->objectName().toLocal8Bit().data()) != values.end())
     {

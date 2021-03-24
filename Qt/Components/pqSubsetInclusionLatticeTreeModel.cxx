@@ -287,7 +287,7 @@ QList<QVariant> pqSubsetInclusionLatticeTreeModel::selection() const
   QList<QVariant> retval;
   const pqInternals& internals = (*this->Internals);
   const auto vtkSel = internals.SIL->GetSelection();
-  for (auto apath : vtkSel)
+  for (const auto& apath : vtkSel)
   {
     retval.push_back(QVariant(apath.first.c_str()));
     retval.push_back(QVariant(apath.second ? 1 : 0));

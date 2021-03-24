@@ -512,7 +512,7 @@ void pqMultiViewWidget::makeFrameActive()
   /// do anything silly here that could cause infinite recursion.
   if (!this->Internals->ActiveFrame)
   {
-    for (auto frame : this->Internals->Frames)
+    for (const auto& frame : this->Internals->Frames)
     {
       if (frame)
       {
@@ -692,7 +692,7 @@ void pqMultiViewWidget::reload()
   }
 
   // delete empty frames no longer needed.
-  for (auto eframe : empty_frames)
+  for (const auto& eframe : empty_frames)
   {
     delete eframe;
   }

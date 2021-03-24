@@ -95,7 +95,7 @@ void pqAddToFavoritesReaction::addToFavorites(QAction* parent)
   }
   QString settingValue = settings->value(key).toString();
   QStringList bmList = settingValue.split("|", PV_QT_SKIP_EMPTY_PARTS);
-  for (QString bm : bmList)
+  for (const QString& bm : bmList)
   {
     if (bm == filterId)
     {

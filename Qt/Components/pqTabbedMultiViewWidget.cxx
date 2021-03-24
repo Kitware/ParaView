@@ -295,7 +295,7 @@ public:
    */
   pqMultiViewWidget* findWidget(vtkSMProxy* vlayout) const
   {
-    for (auto pqmvwidget : this->widgets())
+    for (const auto& pqmvwidget : this->widgets())
     {
       if (pqmvwidget && pqmvwidget->layoutManager() == vlayout)
       {
@@ -333,7 +333,7 @@ public:
   void removeTabs(pqServer* server)
   {
     auto wdgs = this->TabWidgets[server];
-    for (auto widget : wdgs)
+    for (const auto& widget : wdgs)
     {
       if (widget)
       {
@@ -372,7 +372,7 @@ public:
     // build a list of visible tabs and if they are different,
     // that what's shown update the view.
     QList<QWidget*> visibleWidgets;
-    for (auto widget : this->widgets())
+    for (const auto& widget : this->widgets())
     {
       if (widget && this->isVisible(widget->layoutManager()))
       {

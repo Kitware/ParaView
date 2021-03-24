@@ -236,7 +236,7 @@ pqLogViewerDialog::pqLogViewerDialog(QWidget* parent)
 //----------------------------------------------------------------------------
 pqLogViewerDialog::~pqLogViewerDialog()
 {
-  for (auto logRecorderProxy : this->LogRecorderProxies)
+  for (const auto& logRecorderProxy : this->LogRecorderProxies)
   {
     logRecorderProxy->Delete();
   }
@@ -256,7 +256,7 @@ void pqLogViewerDialog::refresh()
 //----------------------------------------------------------------------------
 void pqLogViewerDialog::clear()
 {
-  for (auto logRecorderProxy : this->LogRecorderProxies)
+  for (const auto& logRecorderProxy : this->LogRecorderProxies)
   {
     logRecorderProxy->InvokeCommand("ClearLogs");
   }

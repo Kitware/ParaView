@@ -304,7 +304,7 @@ int vtkResampleToHyperTreeGrid::RequestData(
 
   if (this->ArrayMeasurementDisplay)
   {
-    for (std::string name : this->InputDataArrayNames)
+    for (const std::string& name : this->InputDataArrayNames)
     {
       vtkPointData* pointData = redistributedInput->GetPointData();
       vtkDataArray* array;

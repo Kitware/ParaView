@@ -226,7 +226,7 @@ QString pqServerConfiguration::termCommand()
   QStringList termNames = { "cmd" };
 #endif
 
-  for (auto term : termNames)
+  for (const auto& term : termNames)
   {
     QString termCommand = pqServerConfiguration::lookForCommand(term);
     if (!termCommand.isEmpty())
@@ -248,7 +248,7 @@ QString pqServerConfiguration::sshCommand()
   QStringList sshNames = { "ssh" };
 #endif
 
-  for (auto sshName : sshNames)
+  for (const auto& sshName : sshNames)
   {
     QString sshCommand = pqServerConfiguration::lookForCommand(sshName);
     if (!sshCommand.isEmpty())
