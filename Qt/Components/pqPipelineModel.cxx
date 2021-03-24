@@ -118,7 +118,6 @@ class pqPipelineModelDataItem : public QObject
 public:
   static vtkNew<vtkSMParaViewPipelineControllerWithRendering> Controller;
 
-public:
   pqPipelineModel* Model;
   pqPipelineModelDataItem* Parent;
   QList<pqPipelineModelDataItem*> Children;

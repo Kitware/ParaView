@@ -320,7 +320,6 @@ private:
     return false;
   }
 
-private:
   CaptureHelper(const CaptureHelper&) = delete;
   void operator=(const CaptureHelper&) = delete;
 };

@@ -322,7 +322,6 @@ public:
 private:
   void InitializeMemoryUseWidget(QProgressBar*& loadWidget);
 
-private:
   int Rank;
   long long Pid;
   long long ProcMemoryUse;

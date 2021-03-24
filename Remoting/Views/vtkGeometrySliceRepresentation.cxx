@@ -115,7 +115,6 @@ public:
     return false;
   }
 
-public:
   static vtkGSRGeometryFilter* New();
   vtkTypeMacro(vtkGSRGeometryFilter, vtkPVGeometryFilter);
 

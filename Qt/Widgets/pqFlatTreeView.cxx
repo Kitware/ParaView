@@ -66,7 +66,6 @@ public:
   }
   ~pqFlatTreeViewColumn() = default;
 
-public:
   int Width;
   bool Selected;
 };
@@ -80,7 +79,6 @@ public:
   // ensures that the item has columns matching count.
   void ensureCells(int count) { this->Cells.resize(count); }
 
-public:
   pqFlatTreeViewItem* Parent;
   QList<pqFlatTreeViewItem*> Items;
   QPersistentModelIndex Index;

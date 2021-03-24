@@ -237,7 +237,6 @@ public:
 
   ~vtkSMProxyListDomainInternals() { this->ClearProxies(); }
 
-public:
   std::vector<vtkSMProxyListDomain::ProxyType> ProxyTypeList;
 
 private:
