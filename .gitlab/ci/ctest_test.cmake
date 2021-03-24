@@ -58,6 +58,10 @@ if ("$ENV{CMAKE_CONFIGURATION}" MATCHES "windows")
     "^pvcs\\.SplitViewTrace$"
     "^pvcs-tile-display\\.LinkCameraFromView-1x1$"
 
+    # The generated paths are too long and don't work in MSVC.
+    # See https://gitlab.kitware.com/paraview/paraview/-/issues/20589
+    "^pv\\.TestDevelopmentInstall$"
+
     # This test has some weird rendering artifacts. It looks like the Intel
     # rendering bug, but our machines all use nVidia cards today.
     "^paraviewPython-TestColorHistogram$"
