@@ -300,7 +300,8 @@ endmacro()
 # ensures that VTK::mpi module is rejected when MPI is not enabled.
 paraview_require_module(
   CONDITION PARAVIEW_USE_MPI
-  MODULES   VTK::mpi
+  MODULES   VTK::ParallelMPI
+            VTK::mpi
   EXCLUSIVE)
 
 # ensures VTK::Python module is rejected when Python is not enabled.
