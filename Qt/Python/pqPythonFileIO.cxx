@@ -57,7 +57,7 @@ namespace details
 //-----------------------------------------------------------------------------
 QString GetSwapDir()
 {
-  const QString swapDir = pqCoreUtilities::getParaViewUserDirectory() + "/PythonSwap";
+  QString swapDir = pqCoreUtilities::getParaViewUserDirectory() + "/PythonSwap";
   const QDir existCheck(swapDir);
   if (!existCheck.mkpath(swapDir))
   {
