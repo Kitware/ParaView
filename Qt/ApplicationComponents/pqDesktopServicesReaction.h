@@ -46,6 +46,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 * QAction* action = ...
 * new pqDesktopServicesReaction(QUrl("file:///..../doc/UsersGuide.pdf"), action);
 * @endcode
+*
+* The URL is set as status tip on the parent action.
 */
 class PQAPPLICATIONCOMPONENTS_EXPORT pqDesktopServicesReaction : public pqReaction
 {
