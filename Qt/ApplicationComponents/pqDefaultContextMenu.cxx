@@ -650,7 +650,7 @@ const char* findBlockName(
   (void)flatIndexCurrent;
   (void)flatIndexTarget;
   (void)currentInfo;
-// FIXME:
+// FIXME in the context of https://gitlab.kitware.com/paraview/paraview/-/issues/20081
 #if 0
   // An interior block shouldn't be selected, only blocks with geometry can be
   if (flatIndexCurrent == flatIndexTarget)
@@ -697,7 +697,9 @@ const char* findBlockName(
 //-----------------------------------------------------------------------------
 QString pqDefaultContextMenu::lookupBlockName(unsigned int flatIndex) const
 {
-  return QString(); // FIXME
+  Q_UNUSED(flatIndex);
+  return QString(); // FIXME in the context of
+                    // https://gitlab.kitware.com/paraview/paraview/-/issues/20081
 #if 0
   vtkPVDataInformation* info = this->PickedRepresentation->getRepresentedDataInformation();
   if (!info)
