@@ -140,7 +140,7 @@ bool pqPluginTreeWidgetEventPlayer::playEvent(
   QRegExp regExp1("^([\\d\\.]+),(\\d+)$");
   if (command == "setCheckState" && regExp1.indexIn(arguments) != -1)
   {
-    QString str_index = regExp1.cap(1);
+    const QString& str_index = regExp1.cap(1);
     int check_state = regExp1.cap(2).toInt();
 
     QModelIndex index = ::pqPluginTreeWidgetEventPlayerGetIndex(str_index, treeView, error);
@@ -157,7 +157,7 @@ bool pqPluginTreeWidgetEventPlayer::playEvent(
   }
   else if (command == "expand" || command == "collapse")
   {
-    QString str_index = arguments;
+    const QString& str_index = arguments;
     QModelIndex index = ::pqPluginTreeWidgetEventPlayerGetIndex(str_index, treeView, error);
     if (error)
     {
@@ -168,7 +168,7 @@ bool pqPluginTreeWidgetEventPlayer::playEvent(
   }
   else if (command == "setCurrent")
   {
-    QString columnValue = arguments;
+    const QString& columnValue = arguments;
     QModelIndex index =
       ::pqTreeViewEventPlayerGetIndexByColumnValue(0, columnValue, treeView, error);
     if (error)

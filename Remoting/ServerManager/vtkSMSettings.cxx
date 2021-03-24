@@ -1045,8 +1045,7 @@ bool vtkSMSettings::AddCollectionFromString(const std::string& settings, double 
 //----------------------------------------------------------------------------
 bool vtkSMSettings::AddCollectionFromFile(const std::string& fileName, double priority)
 {
-  std::string settingsFileName(fileName);
-  vtksys::ifstream settingsFile(settingsFileName.c_str(), ios::in | ios::binary | ios::ate);
+  vtksys::ifstream settingsFile(fileName.c_str(), ios::in | ios::binary | ios::ate);
   if (settingsFile.is_open())
   {
     std::streampos size = settingsFile.tellg();

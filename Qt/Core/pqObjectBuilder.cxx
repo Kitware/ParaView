@@ -181,7 +181,7 @@ pqPipelineSource* pqObjectBuilder::createFilter(const QString& sm_group, const Q
   QMap<QString, QList<pqOutputPort*> >::iterator mapIter;
   for (mapIter = namedInputs.begin(); mapIter != namedInputs.end(); ++mapIter)
   {
-    QString input_port_name = mapIter.key();
+    const QString& input_port_name = mapIter.key();
     QList<pqOutputPort*>& inputs = mapIter.value();
 
     vtkSMProperty* prop = proxy->GetProperty(input_port_name.toLocal8Bit().data());
