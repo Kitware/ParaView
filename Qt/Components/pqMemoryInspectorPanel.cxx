@@ -491,9 +491,7 @@ private:
 
 //-----------------------------------------------------------------------------
 HostData::HostData()
-  : GroupName("")
-  , HostName("")
-  , HostMemoryTotal(0)
+  : HostMemoryTotal(0)
   , HostMemoryAvailable(0)
 {
 }

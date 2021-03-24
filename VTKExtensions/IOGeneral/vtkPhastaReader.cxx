@@ -52,8 +52,6 @@ struct vtkPhastaReaderInternal
       : StartIndexInPhastaArray(-1)
       , NumberOfComponents(-1)
       , DataDependency(-1)
-      , DataType("")
-      , PhastaFieldTag("")
     {
     }
   };

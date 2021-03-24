@@ -68,7 +68,7 @@ int vtkSMBagChartSeriesListDomain::SetDefaultValues(vtkSMProperty* prop, bool us
   // Search for an array with a name like HDR (x,y)
   vtksys::RegularExpression re =
     vtksys::RegularExpression("([a-zA-Z0-9]+)[ ]*\\(([a-zA-Z0-9]+),([a-zA-Z0-9]+)\\)");
-  std::string hdr = "";
+  std::string hdr;
   while (iter != strings.end())
   {
     if (re.find(*iter))

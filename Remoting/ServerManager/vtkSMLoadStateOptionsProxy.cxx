@@ -300,7 +300,7 @@ bool vtkSMLoadStateOptionsProxy::HasDataFiles()
 bool vtkSMLoadStateOptionsProxy::LocateFilesInDirectory(
   std::vector<std::string>& filepaths, int path, bool clearFilenameIfNotFound)
 {
-  std::string lastLocatedPath = "";
+  std::string lastLocatedPath;
   int numOfPathMatches = 0;
   std::vector<std::string>::iterator fIter;
   for (fIter = filepaths.begin(); fIter != filepaths.end(); ++fIter)
@@ -318,7 +318,7 @@ bool vtkSMLoadStateOptionsProxy::LocateFilesInDirectory(
              << *fIter << path << vtkClientServerStream::End;
       this->ExecuteStream(stream, false, vtkPVSession::DATA_SERVER_ROOT);
       vtkClientServerStream result = this->GetLastResult();
-      std::string locatedPath = "";
+      std::string locatedPath;
       if (result.GetNumberOfMessages() == 1 && result.GetNumberOfArguments(0) == 1)
       {
         result.GetArgument(0, 0, &locatedPath);
@@ -398,7 +398,7 @@ bool vtkSMLoadStateOptionsProxy::Load()
       for (auto idIter = this->Internals->PropertiesMap.begin();
            idIter != this->Internals->PropertiesMap.end(); idIter++)
       {
-        std::string primaryFilename = "";
+        std::string primaryFilename;
         for (auto pIter = idIter->second.begin(); pIter != idIter->second.end(); pIter++)
         {
           vtkInternals::PropertyInfo& info = pIter->second;
@@ -441,7 +441,7 @@ bool vtkSMLoadStateOptionsProxy::Load()
       for (auto idIter = this->Internals->PropertiesMap.begin();
            idIter != this->Internals->PropertiesMap.end(); idIter++)
       {
-        std::string primaryFilename = "";
+        std::string primaryFilename;
         vtkSMProxy* subProxy = this->GetSubProxy(std::to_string(idIter->first).c_str());
         for (auto pIter = idIter->second.begin(); pIter != idIter->second.end(); pIter++)
         {

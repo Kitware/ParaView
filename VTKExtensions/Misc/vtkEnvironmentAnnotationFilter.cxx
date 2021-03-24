@@ -48,7 +48,7 @@ vtkEnvironmentAnnotationFilter::~vtkEnvironmentAnnotationFilter() = default;
 //----------------------------------------------------------------------------
 void vtkEnvironmentAnnotationFilter::UpdateAnnotationValue()
 {
-  std::string value = "";
+  std::string value;
   if (this->DisplayUserName)
   {
 #if defined(_WIN32)
