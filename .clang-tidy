@@ -21,7 +21,6 @@ bugprone-*,\
 -bugprone-suspicious-include,\
 -bugprone-suspicious-missing-comma,\
 -bugprone-suspicious-semicolon,\
--bugprone-suspicious-string-compare,\
 -bugprone-throw-keyword-missing,\
 -bugprone-unhandled-self-assignment,\
 -bugprone-unused-raii,\

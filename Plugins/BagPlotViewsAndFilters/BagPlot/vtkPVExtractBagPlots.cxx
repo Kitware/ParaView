@@ -250,7 +250,7 @@ int vtkPVExtractBagPlots::RequestData(
   for (vtkIdType i = 0; i < inputTable->GetNumberOfColumns(); i++)
   {
     vtkAbstractArray* arr = inputTable->GetColumn(i);
-    if (strcmp(arr->GetName(), "ColName"))
+    if (strcmp(arr->GetName(), "ColName") != 0)
     {
       pca->EnableAttributeArray(arr->GetName());
     }

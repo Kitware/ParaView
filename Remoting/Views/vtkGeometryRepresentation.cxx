@@ -1509,7 +1509,7 @@ void vtkGeometryRepresentation::SetUseShaderReplacements(bool useShaderRepl)
 //----------------------------------------------------------------------------
 void vtkGeometryRepresentation::SetShaderReplacements(const char* replacementsString)
 {
-  if (strcmp(replacementsString, this->ShaderReplacementsString.c_str()))
+  if (replacementsString != this->ShaderReplacementsString)
   {
     this->ShaderReplacementsString = std::string(replacementsString);
     this->Modified();

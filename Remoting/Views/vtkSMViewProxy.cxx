@@ -808,7 +808,7 @@ bool vtkSMViewProxy::HideOtherRepresentationsIfNeeded(vtkSMProxy* repr)
     this->GetHints()->FindNestedElementByName("ShowOneRepresentationAtATime");
   const char* reprType = oneRepr->GetAttribute("type");
 
-  if (reprType && strcmp(repr->GetXMLName(), reprType))
+  if (reprType && strcmp(repr->GetXMLName(), reprType) != 0)
   {
     return false;
   }

@@ -85,8 +85,9 @@ void vtkCTHSource::Initialize(int vtkNotUsed(igm), int n_blocks, int nmat, int v
 void vtkCTHSource::SetCellFieldName(
   int field_id, char* field_name, char* comment, int vtkNotUsed(matid))
 {
-  if (strncmp(field_name, "P ", 2) && strncmp(field_name, "T ", 2) &&
-    strncmp(field_name, "VX ", 3) && strncmp(field_name, "VY ", 3) && strncmp(field_name, "VZ ", 3))
+  if (strncmp(field_name, "P ", 2) != 0 && strncmp(field_name, "T ", 2) != 0 &&
+    strncmp(field_name, "VX ", 3) != 0 && strncmp(field_name, "VY ", 3) != 0 &&
+    strncmp(field_name, "VZ ", 3) != 0)
   {
     CFieldNames[field_id] = std::string();
   }
@@ -102,8 +103,8 @@ void vtkCTHSource::SetCellFieldName(
 void vtkCTHSource::SetMaterialFieldName(int field_id, char* field_name, char* comment)
 {
   size_t mats = this->MFieldNames.size();
-  if (strncmp(field_name, "VOLM ", 5) && strncmp(field_name, "M ", 2))
-  // if (strncmp (field_name, "VOLM ", 5))
+  if (strncmp(field_name, "VOLM ", 5) != 0 && strncmp(field_name, "M ", 2) != 0)
+  // if (strncmp (field_name, "VOLM ", 5) != 0)
   {
     std::string s;
     for (size_t i = 0; i < mats; i++)

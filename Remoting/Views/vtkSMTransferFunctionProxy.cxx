@@ -1247,7 +1247,7 @@ Json::Value vtkSMTransferFunctionProxy::ConvertLegacyColorMapXMLToJSON(vtkPVXMLE
       }
     }
     else if (pointElement && pointElement->GetName() &&
-      strcmp(pointElement->GetName(), "Annotation") && pointElement->GetAttribute("v") &&
+      strcmp(pointElement->GetName(), "Annotation") != 0 && pointElement->GetAttribute("v") &&
       pointElement->GetAttribute("t"))
     {
       const char* value[2] = { pointElement->GetAttribute("v"), pointElement->GetAttribute("t") };

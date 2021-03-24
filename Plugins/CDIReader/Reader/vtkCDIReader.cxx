@@ -2861,7 +2861,7 @@ int vtkCDIReader::LoadDomainVarData(int variableIndex)
     // for (int l=0; l<6 ; l++)
     //  temp[l] = atof(wordVec.at(2+l).c_str());
 
-    if (strcmp(wordVec.at(1).c_str(), "L"))
+    if (wordVec.at(1) != "L")
     {
       temp[0] = atof(wordVec.at(7).c_str());
     }
