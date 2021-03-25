@@ -38,7 +38,7 @@
 #include "vtkUnstructuredGrid.h"
 #include "vtkUnstructuredGridAlgorithm.h"
 
-#include <assert.h>
+#include <cassert>
 #include <map>
 #include <set>
 #include <vector>

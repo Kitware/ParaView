@@ -22,7 +22,7 @@
 #include "vtkPVContextView.h"
 #include "vtkSelection.h"
 
-#include <assert.h>
+#include <cassert>
 #include <sstream>
 
 vtkStandardNewMacro(vtkChartSelectionRepresentation);

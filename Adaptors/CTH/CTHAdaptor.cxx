@@ -22,11 +22,11 @@
 #include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
 
+#include <csignal>
+#include <cstdio>
+#include <cstdlib>
 #include <cstring>
 #include <fstream>
-#include <signal.h>
-#include <stdio.h>
-#include <stdlib.h>
 
 namespace
 {

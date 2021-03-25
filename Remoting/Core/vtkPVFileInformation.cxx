@@ -30,16 +30,16 @@
 #if defined(_WIN32)
 #define _WIN32_IE 0x0400    // special folder support
 #define _WIN32_WINNT 0x0400 // shared folder support
+#include <cstring>          // for strcasecmp
 #include <direct.h>         // _getcwd
 #include <shlobj.h>         // SHGetFolderPath
-#include <string.h>         // for strcasecmp
 #include <windows.h>        // FindFirstFile, FindNextFile, FindClose, ...
 #define vtkPVServerFileListingGetCWD _getcwd
 #else
+#include <cerrno>      // errno
+#include <cstdlib>     // getenv
+#include <cstring>     // strerror
 #include <dirent.h>    // opendir, readdir, closedir
-#include <errno.h>     // errno
-#include <stdlib.h>    // getenv
-#include <string.h>    // strerror
 #include <sys/types.h> // DIR, struct dirent
 #include <unistd.h>    // access, getcwd
 #define vtkPVServerFileListingGetCWD getcwd
@@ -50,9 +50,9 @@
 #endif
 
 #include <algorithm>
+#include <ctime>
 #include <set>
 #include <string>
-#include <time.h>
 #include <vtksys/RegularExpression.hxx>
 #include <vtksys/SystemTools.hxx>
 

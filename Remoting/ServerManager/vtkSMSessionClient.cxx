@@ -46,7 +46,7 @@
 #include <string>
 #include <vtksys/RegularExpression.hxx>
 
-#include <assert.h>
+#include <cassert>
 #include <set>
 
 //****************************************************************************/

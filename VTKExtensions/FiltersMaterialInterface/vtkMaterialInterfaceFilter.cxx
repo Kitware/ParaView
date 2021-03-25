@@ -81,8 +81,8 @@ using std::vector;
 using std::string;
 #include "algorithm"
 // ansi c
+#include <cmath>
 #include <ctime>
-#include <math.h>
 // other
 #include "vtkMaterialInterfaceUtilities.h"
 

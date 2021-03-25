@@ -49,7 +49,7 @@
 #include "vtkUnsignedCharArray.h"
 #include "vtkWindowToImageFilter.h"
 
-#include <assert.h>
+#include <cassert>
 
 namespace vtkSMViewProxyNS
 {

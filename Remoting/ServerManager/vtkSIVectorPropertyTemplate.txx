@@ -20,7 +20,7 @@
 #include "vtkSIProxy.h"
 #include "vtkSMMessage.h"
 
-#include <assert.h>
+#include <cassert>
 #include <sstream>
 #include <vector>
 

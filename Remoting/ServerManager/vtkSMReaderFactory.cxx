@@ -32,7 +32,7 @@
 #include "vtkStringList.h"
 
 #include <algorithm>
-#include <assert.h>
+#include <cassert>
 #include <list>
 #include <set>
 #include <sstream>

@@ -27,7 +27,7 @@
 #include "vtkNvPipeCompressor.h"
 #endif
 
-#include <assert.h>
+#include <cassert>
 #include <sstream>
 
 vtkStandardNewMacro(vtkPVClientServerSynchronizedRenderers);

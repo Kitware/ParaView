@@ -39,7 +39,7 @@
 #include "vtkWebGLObject.h"
 #include "vtkWebInteractionEvent.h"
 
-#include <assert.h>
+#include <cassert>
 #include <cmath>
 #include <map>
 

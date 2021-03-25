@@ -27,7 +27,7 @@
 #include "vtkSMTrace.h"
 #include "vtkSMTransferFunctionProxy.h"
 
-#include <assert.h>
+#include <cassert>
 #include <set>
 #include <sstream>
 #include <vtksys/RegularExpression.hxx>

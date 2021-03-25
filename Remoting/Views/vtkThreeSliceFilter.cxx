@@ -35,7 +35,7 @@
 #include "vtkSMPTools.h"
 #include "vtkUnsignedIntArray.h"
 
-#include <math.h>
+#include <cmath>
 
 vtkStandardNewMacro(vtkThreeSliceFilter);
 

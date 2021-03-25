@@ -29,7 +29,7 @@
 #include "vtkTrivialProducer.h"
 #include "vtkUnsignedCharArray.h"
 
-#include <assert.h>
+#include <cassert>
 
 vtkStandardNewMacro(vtkExtractsDeliveryHelper);
 //----------------------------------------------------------------------------

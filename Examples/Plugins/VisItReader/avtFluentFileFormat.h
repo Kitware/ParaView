@@ -10,8 +10,8 @@
 #include <vector>
 
 // Fluent plugin
+#include <cstdlib>
 #include <sstream>
-#include <stdlib.h>
 #include <visitstream.h>
 
 #include "vtkConvexPointSet.h"

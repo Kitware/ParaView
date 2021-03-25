@@ -25,7 +25,7 @@
 #include <sstream>
 #include <vector>
 
-#include <assert.h>
+#include <cassert>
 
 //*****************************************************************************
 class vtkSICompoundSourceProxy::vtkInternals

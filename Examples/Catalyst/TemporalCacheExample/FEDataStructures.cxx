@@ -1,10 +1,10 @@
 #include "FEDataStructures.h"
 
-#include <assert.h>
+#include <cassert>
+#include <cmath>
+#include <cstring>
 #include <iostream>
-#include <math.h>
 #include <mpi.h>
-#include <string.h>
 
 #include <vtkMath.h>
 

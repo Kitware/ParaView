@@ -38,7 +38,7 @@
 #include "vtkSMStringVectorProperty.h"
 #include "vtkSmartPointer.h"
 
-#include <assert.h>
+#include <cassert>
 #include <sstream>
 #include <string>
 #include <vector>

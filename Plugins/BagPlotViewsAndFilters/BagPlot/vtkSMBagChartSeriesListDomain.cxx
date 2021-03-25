@@ -18,7 +18,7 @@
 #include "vtkPVXMLElement.h"
 #include "vtkSMPropertyHelper.h"
 
-#include <assert.h>
+#include <cassert>
 #include <vtksys/RegularExpression.hxx>
 
 vtkStandardNewMacro(vtkSMBagChartSeriesListDomain);

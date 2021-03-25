@@ -28,7 +28,7 @@
 #include "vtkPVView.h"
 #include "vtkSmartPointer.h"
 
-#include <assert.h>
+#include <cassert>
 #include <map>
 
 //----------------------------------------------------------------------------

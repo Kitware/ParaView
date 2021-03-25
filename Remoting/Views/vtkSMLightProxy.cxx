@@ -24,7 +24,7 @@
 #include "vtkSMSessionProxyManager.h"
 #include "vtkSmartPointer.h"
 
-#include <assert.h>
+#include <cassert>
 
 class vtkSMLightObserver : public vtkCommand
 {

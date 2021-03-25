@@ -77,8 +77,8 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <mpi.h>
 #endif
 
-#include <stdlib.h>
-#include <time.h>
+#include <cstdlib>
+#include <ctime>
 
 #ifndef _WIN32
 #include <unistd.h>

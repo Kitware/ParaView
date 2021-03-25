@@ -22,7 +22,7 @@
 #include <vtksys/RegularExpression.hxx>
 #include <vtksys/SystemTools.hxx>
 
-#include <assert.h>
+#include <cassert>
 #include <cstring>
 
 class Output

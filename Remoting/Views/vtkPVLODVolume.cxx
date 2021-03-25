@@ -29,7 +29,7 @@
 #include "vtkVolumeMapper.h"
 #include "vtkVolumeProperty.h"
 
-#include <math.h>
+#include <cmath>
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLODVolume);

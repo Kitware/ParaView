@@ -32,7 +32,7 @@
 #include "vtkStreamingDemandDrivenPipeline.h"
 #include "vtkUnstructuredGrid.h"
 
-#include <assert.h>
+#include <cassert>
 
 vtkStandardNewMacro(vtkIsoVolume);
 

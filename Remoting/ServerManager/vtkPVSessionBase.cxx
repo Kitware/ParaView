@@ -24,7 +24,7 @@
 #include "vtkSMMessage.h"
 #include "vtkWeakPointer.h"
 
-#include <assert.h>
+#include <cassert>
 #include <sstream>
 
 //----------------------------------------------------------------------------

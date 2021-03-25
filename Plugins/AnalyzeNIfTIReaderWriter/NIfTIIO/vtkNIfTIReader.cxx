@@ -24,8 +24,8 @@
 #include "vtkObjectFactory.h"
 #include "vtkPointData.h"
 #include "vtk_zlib.h"
-#include <stdio.h>
-#include <stdlib.h>
+#include <cstdio>
+#include <cstdlib>
 #include <string>
 
 #include "vtkStringArray.h"

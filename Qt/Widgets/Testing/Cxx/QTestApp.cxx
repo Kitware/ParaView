@@ -1,7 +1,7 @@
 
 #include "QTestApp.h"
 
-#include <stdio.h>
+#include <cstdio>
 
 #include <QDebug>
 #include <QKeyEvent>

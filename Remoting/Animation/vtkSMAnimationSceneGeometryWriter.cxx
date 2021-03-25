@@ -25,7 +25,7 @@
 #include "vtkSMSessionProxyManager.h"
 #include "vtkSMStringVectorProperty.h"
 
-#include <assert.h>
+#include <cassert>
 
 vtkStandardNewMacro(vtkSMAnimationSceneGeometryWriter);
 vtkCxxSetObjectMacro(vtkSMAnimationSceneGeometryWriter, ViewModule, vtkSMProxy);

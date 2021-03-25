@@ -28,7 +28,7 @@
 #include "vtkTimerLog.h"
 #include "vtkTransform.h"
 
-#include <math.h>
+#include <cmath>
 
 #if VTK_MODULE_ENABLE_VTK_RenderingRayTracing
 #include "vtkOSPRayActorNode.h"

@@ -32,7 +32,7 @@
 #include "vtkSmartPointer.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
 
-#include <assert.h>
+#include <cassert>
 
 vtkStandardNewMacro(vtkPVRayCastPickingHelper);
 vtkCxxSetObjectMacro(vtkPVRayCastPickingHelper, Input, vtkAlgorithm);

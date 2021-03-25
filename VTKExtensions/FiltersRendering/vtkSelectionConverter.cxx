@@ -32,7 +32,7 @@
 #include "vtkSmartPointer.h"
 #include "vtkUnsignedIntArray.h"
 
-#include <assert.h>
+#include <cassert>
 #include <map>
 #include <set>
 

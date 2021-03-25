@@ -39,7 +39,7 @@
 #include <string>
 #include <vector>
 
-#include <ctype.h>
+#include <cctype>
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVEnSightMasterServerReader2);

@@ -24,8 +24,8 @@
 #include "vtkObjectFactory.h"
 #include "vtkSmartPointer.h"
 
+#include <cstring>
 #include <list>
-#include <string.h>
 
 //=============================================================================
 // The static structure holding all of the registered modules.

@@ -42,7 +42,7 @@
 #include "vtkSocketController.h"
 #include "vtkTrivialProducer.h"
 
-#include <assert.h>
+#include <cassert>
 #include <map>
 #include <set>
 #include <sstream>

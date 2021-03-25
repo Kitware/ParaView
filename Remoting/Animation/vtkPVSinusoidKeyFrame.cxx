@@ -21,7 +21,7 @@
 //#include "vtkSMProxy.h"
 //#include "vtkSMVectorProperty.h"
 
-#include <math.h>
+#include <cmath>
 
 vtkStandardNewMacro(vtkPVSinusoidKeyFrame);
 //----------------------------------------------------------------------------

@@ -44,8 +44,8 @@
 #include "vtkUniformGrid.h"
 #include "vtkUnsignedCharArray.h"
 #include "vtkUnstructuredGrid.h"
+#include <cmath>
 #include <ctime>
-#include <math.h>
 
 vtkStandardNewMacro(vtkAMRDualContour);
 

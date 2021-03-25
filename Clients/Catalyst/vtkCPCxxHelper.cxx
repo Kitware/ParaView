@@ -34,7 +34,7 @@
 
 #include "ParaView_paraview_plugins.h"
 
-#include <assert.h>
+#include <cassert>
 #include <sstream>
 #include <string>
 #include <vtksys/SystemTools.hxx>

@@ -53,7 +53,7 @@
 #include <set>
 #include <vector>
 
-#include <float.h>
+#include <cfloat>
 
 #include <sstream>
 #include <string>

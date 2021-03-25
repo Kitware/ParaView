@@ -32,8 +32,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqAnimationModel.h"
 
-#include "assert.h"
-
 #include <QEvent>
 #include <QGraphicsSceneMouseEvent>
 #include <QGraphicsView>

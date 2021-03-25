@@ -36,7 +36,7 @@
 #include "vtksys/String.hxx"
 #include "vtksys/SystemTools.hxx"
 
-#include <assert.h>
+#include <cassert>
 #include <sstream>
 #include <string>
 #include <vector>

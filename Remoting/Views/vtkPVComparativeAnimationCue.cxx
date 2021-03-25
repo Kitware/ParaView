@@ -22,8 +22,8 @@
 #include "vtkSMProxy.h"
 #include "vtkSMVectorProperty.h"
 
+#include <cstring>
 #include <sstream>
-#include <string.h>
 #include <string>
 #include <vector>
 #include <vtksys/SystemTools.hxx>

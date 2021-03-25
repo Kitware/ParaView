@@ -23,7 +23,7 @@
 #include "vtkSMUncheckedPropertyHelper.h"
 #include "vtkWeakPointer.h"
 
-#include <assert.h>
+#include <cassert>
 #include <map>
 
 struct vtkSMDomainInternals

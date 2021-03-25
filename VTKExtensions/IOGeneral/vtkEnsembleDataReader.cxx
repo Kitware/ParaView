@@ -13,7 +13,7 @@
 
 #include <algorithm>
 #include <cassert>
-#include <ctype.h>
+#include <cctype>
 #include <functional>
 #include <vector>
 #include <vtksys/SystemTools.hxx>

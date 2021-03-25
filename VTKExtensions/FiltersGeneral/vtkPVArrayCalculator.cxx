@@ -29,7 +29,7 @@
 #include "vtkTable.h"
 
 #include <algorithm>
-#include <assert.h>
+#include <cassert>
 #include <set>
 #include <sstream>
 #include <string>

@@ -21,7 +21,7 @@
 #include "vtkSMUncheckedPropertyHelper.h"
 #include "vtkSMVectorProperty.h"
 
-#include <assert.h>
+#include <cassert>
 #include <vtksys/SystemTools.hxx>
 
 //-----------------------------------------------------------------------------

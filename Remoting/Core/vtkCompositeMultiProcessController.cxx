@@ -21,7 +21,7 @@
 #include "vtkSocketCommunicator.h"
 #include "vtkWeakPointer.h"
 
-#include <assert.h>
+#include <cassert>
 #include <map>
 #include <vector>
 

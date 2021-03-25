@@ -25,7 +25,7 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkObjectFactory.h"
 #include "vtkPVPostFilterExecutive.h"
 
-#include <assert.h>
+#include <cassert>
 
 vtkStandardNewMacro(vtkPVCompositeDataPipeline);
 //----------------------------------------------------------------------------

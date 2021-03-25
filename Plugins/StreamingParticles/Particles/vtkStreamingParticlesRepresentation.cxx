@@ -39,7 +39,7 @@
 #include "vtkUnsignedIntArray.h"
 
 #include <algorithm>
-#include <assert.h>
+#include <cassert>
 
 static char const BLOCKS_TO_PURGE_ARRAY_NAME[] = "__blocks_to_purge";
 

@@ -38,7 +38,7 @@
 
 #include "vtksys/FStream.hxx"
 
-#include <assert.h>
+#include <cassert>
 #include <set>
 #include <sstream>
 #include <string>

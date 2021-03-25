@@ -31,7 +31,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ========================================================================*/
 #include "pqSpreadSheetViewWidget.h"
 
-#include "assert.h"
 #include "pqNonEditableStyledItemDelegate.h"
 #include "pqSpreadSheetViewModel.h"
 

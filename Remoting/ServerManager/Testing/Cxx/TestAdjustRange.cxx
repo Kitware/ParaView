@@ -16,9 +16,9 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkSMCoreUtilities.h"
 #include "vtkTestUtilities.h"
 
-#include <assert.h>
+#include <cassert>
+#include <cfloat> //for msvc _nextafter
 #include <cmath>
-#include <float.h> //for msvc _nextafter
 #include <limits>
 #include <sstream>
 
