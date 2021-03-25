@@ -424,8 +424,8 @@ void outputFunction(FILE* fp, ClassInfo* data)
   }
 
   /* if the args are OK and it is not a constructor or destructor */
-  if (managableArguments(currentFunction) && strcmp(data->Name, currentFunction->Name) &&
-    strcmp(data->Name, currentFunction->Name + 1))
+  if (managableArguments(currentFunction) && strcmp(data->Name, currentFunction->Name) != 0 &&
+    strcmp(data->Name, currentFunction->Name + 1) != 0)
   {
     if (currentFunction->IsLegacy)
     {
@@ -657,7 +657,7 @@ int managableArguments(FunctionInfo* curFunction)
     {
       /* make exception for "vtkClientServerStream&" */
       if (((argType & VTK_PARSE_BASE_TYPE) != VTK_PARSE_VTK_OBJECT) ||
-        strcmp(curFunction->ArgClasses[i], "vtkClientServerStream"))
+        strcmp(curFunction->ArgClasses[i], "vtkClientServerStream") != 0)
       {
         /* also make exception for "const vtkStdString&" */
         if ((argType & VTK_PARSE_BASE_TYPE) != VTK_PARSE_STRING ||
@@ -726,7 +726,7 @@ int managableArguments(FunctionInfo* curFunction)
   {
     /* make exception for "vtkClientServerStream&" */
     if (((returnType & VTK_PARSE_BASE_TYPE) != VTK_PARSE_VTK_OBJECT) ||
-      strcmp(curFunction->ReturnClass, "vtkClientServerStream"))
+      strcmp(curFunction->ReturnClass, "vtkClientServerStream") != 0)
     {
       /* also make exception for "vtkStdString" */
       if ((returnType & VTK_PARSE_BASE_TYPE) != VTK_PARSE_STRING)
@@ -868,8 +868,8 @@ int extractWrappable(FunctionInfo* from[], int fromSize, FunctionInfo* to[], con
     /* if the function is wrappable and
        args are OK and
        it is not a constructor or destructor */
-    if (!notWrappable(from[i]) && managableArguments(from[i]) && strcmp(ClassName, from[i]->Name) &&
-      strcmp(ClassName, from[i]->Name + 1))
+    if (!notWrappable(from[i]) && managableArguments(from[i]) &&
+      strcmp(ClassName, from[i]->Name) != 0 && strcmp(ClassName, from[i]->Name + 1) != 0)
     {
       to[j] = from[i];
       ++j;

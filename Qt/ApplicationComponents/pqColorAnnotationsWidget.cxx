@@ -811,7 +811,7 @@ bool pqColorAnnotationsWidget::addActiveAnnotationsFromVisibleSources(bool force
       vtkSMPVRepresentationProxy::GetArrayInformationForColorArray(representationProxy);
     if (!activeArrayInfo || !activeArrayInfo->GetName() || !currentArrayInfo ||
       !currentArrayInfo->GetName() ||
-      strcmp(activeArrayInfo->GetName(), currentArrayInfo->GetName()))
+      strcmp(activeArrayInfo->GetName(), currentArrayInfo->GetName()) != 0)
     {
       continue;
     }

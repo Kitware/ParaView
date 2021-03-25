@@ -877,7 +877,7 @@ int vtkRectilinearGridConnectivity::CheckVolumeDataArrays(
   {
     for (i = 0; i < numArays; i++)
     {
-      if (strcmp(aryNames[i], vtkDataSetAttributes::GhostArrayName()))
+      if (strcmp(aryNames[i], vtkDataSetAttributes::GhostArrayName()) != 0)
       {
         // note that the ghost array is a hidden data array
         this->Internal->VolumeDataAttributeNames.push_back(aryNames[i]);

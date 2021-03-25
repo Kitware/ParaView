@@ -271,7 +271,7 @@ void vtkSMTimeKeeper::UpdateTimeSteps()
       iter->GetPointer()->GetProperty("TimeLabelAnnotation"));
     if (svp && svp->GetNumberOfElements() > 0)
     {
-      if (label && strcmp(label, svp->GetElement(0)))
+      if (label && strcmp(label, svp->GetElement(0)) != 0)
       {
         nbDiffCustomLabel++;
       }

@@ -353,7 +353,7 @@ vtkPVProminentValuesInformation* vtkSMRepresentationProxy::GetProminentValuesInf
     this->ProminentValuesInformation->GetNumberOfComponents() != numComponents ||
     this->ProminentValuesInformation->GetFieldName() != name ||
     strcmp(this->ProminentValuesInformation->GetFieldAssociation(),
-      vtkDataObject::GetAssociationTypeAsString(fieldAssoc));
+      vtkDataObject::GetAssociationTypeAsString(fieldAssoc)) != 0;
   bool invalid = this->ProminentValuesFraction < 0. || this->ProminentValuesUncertainty < 0. ||
     this->ProminentValuesFraction > 1. || this->ProminentValuesUncertainty > 1.;
   bool largerFractionOrLessCertain = this->ProminentValuesFraction < fraction ||

@@ -473,7 +473,7 @@ bool vtkPVPluginLoader::LoadPluginInternal(const char* file, bool no_errors)
         continue;
       }
 
-      if (strcmp(file, filename))
+      if (strcmp(file, filename) != 0)
       {
         continue;
       }

@@ -129,7 +129,7 @@ void pqFileNamePropertyWidget::resetButtonClicked()
   }
 
   vtkSMUncheckedPropertyHelper helper(smproperty);
-  if (strcmp(helper.GetAsString(), fileName))
+  if (strcmp(helper.GetAsString(), fileName) != 0)
   {
     vtkSMUncheckedPropertyHelper(smproxy, "FileName").Set(fileName);
     Q_EMIT this->changeAvailable();
