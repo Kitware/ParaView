@@ -644,10 +644,8 @@
           <Property name="BorderThickness" />
           <Property name="CornerRadius" />
           <Property name="CornerResolution" />
-          <Property name="BackgroundColor" />
-          <Property name="BackgroundOpacity" />
-          <Property name="RightPadding" />
-          <Property name="TopPadding" />
+          <Property name="BackgroundColor"/>
+          <Property name="Padding" />
         </ExposedProperties>
       </SubProxy>
       <SubProxy>
@@ -678,6 +676,7 @@
           <Property name="Italic" />
           <Property name="Shadow" />
           <Property name="FontSize" />
+          <Property name="BackgroundRGBA"/>
         </ExposedProperties>
       </SubProxy>
       <SubProxy>
@@ -1825,10 +1824,13 @@
                            min="0 0 0"
                            name="range" />
         <Documentation>Set the color of the border.</Documentation>
+        <Hints>
+          <PropertyLink group="settings" proxy="ColorPalette" property="BorderColor" unlink_if_modified="1" />
+        </Hints>
       </DoubleVectorProperty>
 
       <DoubleVectorProperty command="SetBorderThickness"
-                            default_values="1.0"
+                            default_values="0.0"
                             name="BorderThickness"
                             number_of_elements="1">
         <DoubleRangeDomain max="10"
@@ -1858,48 +1860,23 @@
         <Documentation>Set the number of points that define each round corner.</Documentation>
       </IntVectorProperty>
 
-      <DoubleVectorProperty command="SetPolygonColor"
-                            default_values="1 1 1"
+      <DoubleVectorProperty command="SetPolygonRGBA"
+                            default_values="0 0 0 0"
                             name="BackgroundColor"
                             label="Background Color"
-                            number_of_elements="3"
-                            panel_widget="color_selector_with_palette">
-        <DoubleRangeDomain max="1 1 1"
-                           min="0 0 0"
+                            number_of_elements="4"
+                            panel_widget="color_selector">
+        <DoubleRangeDomain max="1 1 1 1"
+                           min="0 0 0 0"
                            name="range" />
-        <Documentation>Set the color of the text background.</Documentation>
+        <Documentation>Set the color and opacity of the border background.</Documentation>
       </DoubleVectorProperty>
-
-      <DoubleVectorProperty command="SetPolygonOpacity"
-                            default_values="0.0"
-                            name="BackgroundOpacity"
-                            label="Background Opacity"
+      <IntVectorProperty command="SetPadding"
+                            default_values="0"
+                            name="Padding"
                             number_of_elements="1">
-        <DoubleRangeDomain max="1"
-                           min="0"
-                           name="range" />
-        <Documentation>Set the opacity of the text background.</Documentation>
-      </DoubleVectorProperty>
-
-      <IntVectorProperty  command="SetRightPadding"
-                          default_values="0.0"
-                          name="RightPadding"
-                          number_of_elements="1">
-        <IntRangeDomain max="500"
-                        min="0"
-                        name="range"
-                        resolution="2" />
-        <Documentation>Set the padding between the text and the right border in pixels unit.</Documentation>
-      </IntVectorProperty>
-
-      <IntVectorProperty  command="SetTopPadding"
-                          default_values="0.0"
-                          name="TopPadding"
-                          number_of_elements="1">
-        <IntRangeDomain   max="500"
-                          min="0"
-                          name="range"/>
-        <Documentation>Set the padding between the text and the top border in pixels unit.</Documentation>
+        <IntRangeDomain max="500" min="0" name="range" />
+        <Documentation>Set the padding around the text in pixels unit.</Documentation>
       </IntVectorProperty>
 
     </Proxy>

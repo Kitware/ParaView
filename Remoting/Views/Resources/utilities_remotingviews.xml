@@ -855,6 +855,16 @@
 
     <!-- ================================================================== -->
     <SettingsProxy name="ColorPalette" label="Color Palette" serializable="1">
+      <DoubleVectorProperty default_values="1.0 0.0 1.0"
+                            label="Border"
+                            name="BorderColor"
+                            number_of_elements="3"
+                            panel_widget="color_selector">
+        <DoubleRangeDomain max="1 1 1"
+                           min="0 0 0"
+                           name="range" />
+        <Documentation>Color used for border surrounding the text.</Documentation>
+      </DoubleVectorProperty>
       <DoubleVectorProperty default_values="1.0 1.0 1.0"
                             label="Surface"
                             name="SurfaceColor"
