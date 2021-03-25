@@ -71,13 +71,7 @@ using std::string;
 using std::ostringstream;
 using std::istringstream;
 #include <iostream>
-using std::cerr;
 using std::endl;
-using std::left;
-using std::right;
-#include <iomanip>
-using std::setw;
-using std::setfill;
 #include <algorithm>
 using std::min;
 
