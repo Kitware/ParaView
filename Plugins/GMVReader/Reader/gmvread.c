@@ -3752,7 +3752,7 @@ void readunits(FILE* gmvin, int ftype)
 
       if (strncmp(unittype,"nodes",5) == 0)
          gmv_data.datatype = NODE;
-      if (strncmp(unittype,"nodes",5) == 0)
+      if (strncmp(unittype,"cells",5) == 0)
          gmv_data.datatype = CELL;
       if (strncmp(unittype,"faces",5) == 0)
          gmv_data.datatype = FACE;
