@@ -920,10 +920,7 @@ vtkAMRDualGridHelperBlock* vtkAMRDualGridHelperLevel::AddGridBlock(
     memcpy(this->GridExtent, newExt, 6 * sizeof(int));
     this->GridIncY = yInc;
     this->GridIncZ = zInc;
-    if (this->Grid)
-    {
-      delete[] this->Grid;
-    }
+    delete[] this->Grid;
     this->Grid = newGrid;
   }
 

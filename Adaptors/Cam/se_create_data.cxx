@@ -42,10 +42,7 @@ CamAdaptor::Grid<CamAdaptor::CUBE_SPHERE>* g_grid; /// 2d,3d cubed-spheres
 /// Deletes global data
 void se_finalize()
 {
-  if (g_grid)
-  {
-    delete g_grid;
-  }
+  delete g_grid;
 }
 
 //------------------------------------------------------------------------------

@@ -585,10 +585,8 @@ public:
 
   ~Internals() override
   {
-    if (this->LocalSorter)
-      delete this->LocalSorter;
-    if (this->GlobalHistogram)
-      delete this->GlobalHistogram;
+    delete this->LocalSorter;
+    delete this->GlobalHistogram;
   }
 
   // --------------------------------------------------------------------------

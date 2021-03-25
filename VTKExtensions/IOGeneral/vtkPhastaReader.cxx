@@ -499,14 +499,8 @@ vtkPhastaReader::vtkPhastaReader()
 
 vtkPhastaReader::~vtkPhastaReader()
 {
-  if (this->GeometryFileName)
-  {
-    delete[] this->GeometryFileName;
-  }
-  if (this->FieldFileName)
-  {
-    delete[] this->FieldFileName;
-  }
+  delete[] this->GeometryFileName;
+  delete[] this->FieldFileName;
   delete this->Internal;
   this->SetCachedGrid(nullptr);
 }

@@ -53,10 +53,7 @@ vtkPythonRepresentation::~vtkPythonRepresentation()
   {
     this->ClientDataObject->Delete();
   }
-  if (this->Internal)
-  {
-    delete this->Internal;
-  }
+  delete this->Internal;
 }
 
 //----------------------------------------------------------------------------

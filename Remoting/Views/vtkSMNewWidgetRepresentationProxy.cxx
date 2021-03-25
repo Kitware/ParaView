@@ -101,10 +101,7 @@ vtkSMNewWidgetRepresentationProxy::~vtkSMNewWidgetRepresentationProxy()
   this->Observer->Proxy = nullptr;
   this->Observer->Delete();
 
-  if (this->Internal)
-  {
-    delete this->Internal;
-  }
+  delete this->Internal;
 }
 
 //-----------------------------------------------------------------------------

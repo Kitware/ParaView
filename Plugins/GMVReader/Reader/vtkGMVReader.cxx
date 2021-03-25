@@ -200,10 +200,8 @@ vtkGMVReader::~vtkGMVReader()
   this->NumberOfTracersMap.clear();
   this->NumberOfPolygonsMap.clear();
 
-  if (this->NodeDataInfo)
-    delete[] this->NodeDataInfo;
-  if (this->CellDataInfo)
-    delete[] this->CellDataInfo;
+  delete[] this->NodeDataInfo;
+  delete[] this->CellDataInfo;
 
   this->PointDataArraySelection->RemoveObserver(this->SelectionObserver);
   this->PointDataArraySelection->Delete();

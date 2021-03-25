@@ -216,10 +216,7 @@ pqCheckableHeaderView::pqCheckableHeaderView(Qt::Orientation orientation, QWidge
 //----------------------------------------------------------------------------
 pqCheckableHeaderView::~pqCheckableHeaderView()
 {
-  if (this->Internal)
-  {
-    delete this->Internal;
-  }
+  delete this->Internal;
 }
 
 //----------------------------------------------------------------------------

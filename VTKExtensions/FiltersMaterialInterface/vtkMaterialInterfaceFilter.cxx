@@ -1726,10 +1726,7 @@ vtkMaterialInterfaceFilter::~vtkMaterialInterfaceFilter()
 
   this->SelectionObserver->Delete();
 
-  if (this->OutputBaseName != nullptr)
-  {
-    delete[] this->OutputBaseName;
-  }
+  delete[] this->OutputBaseName;
   this->Progress = 0.0;
   this->ProgressMaterialInc = 0.0;
   this->ProgressBlockInc = 0.0;
@@ -2963,10 +2960,7 @@ void vtkMaterialInterfaceFilter::ComputeAndDistributeGhostBlocks(
           dataSize = (ext[1] - ext[0] + 1) * (ext[3] - ext[2] + 1) * (ext[5] - ext[4] + 1);
           if (bufSize < dataSize)
           {
-            if (buf)
-            {
-              delete[] buf;
-            }
+            delete[] buf;
             buf = new unsigned char[dataSize];
             bufSize = dataSize;
           }
@@ -2989,10 +2983,7 @@ void vtkMaterialInterfaceFilter::ComputeAndDistributeGhostBlocks(
       this->Controller->Send(requestMsg, 8, otherProc, 708923);
     }
   }
-  if (buf)
-  {
-    delete[] buf;
-  }
+  delete[] buf;
 }
 
 //----------------------------------------------------------------------------
@@ -3035,10 +3026,7 @@ void vtkMaterialInterfaceFilter::HandleGhostBlockRequests()
       dataSize = (ext[1] - ext[0] + 1) * (ext[3] - ext[2] + 1) * (ext[5] - ext[4] + 1);
       if (bufSize < dataSize)
       {
-        if (buf)
-        {
-          delete[] buf;
-        }
+        delete[] buf;
         buf = new unsigned char[dataSize];
         bufSize = dataSize;
       }
@@ -3047,10 +3035,7 @@ void vtkMaterialInterfaceFilter::HandleGhostBlockRequests()
       this->Controller->Send(buf, dataSize, otherProc, 433240);
     }
   }
-  if (buf)
-  {
-    delete[] buf;
-  }
+  delete[] buf;
 }
 
 //----------------------------------------------------------------------------
@@ -8510,10 +8495,7 @@ void vtkMaterialInterfaceFilter::ReceiveGhostFragmentIds(
         (remoteExt[5] - remoteExt[4] + 1);
       if (bufSize < dataSize)
       {
-        if (buf)
-        {
-          delete[] buf;
-        }
+        delete[] buf;
         buf = new int[dataSize];
         bufSize = dataSize;
       }
@@ -8556,10 +8538,7 @@ void vtkMaterialInterfaceFilter::ReceiveGhostFragmentIds(
       }
     }
   }
-  if (buf)
-  {
-    delete[] buf;
-  }
+  delete[] buf;
 }
 
 //----------------------------------------------------------------------------

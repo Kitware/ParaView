@@ -121,10 +121,7 @@ void vtkPVTimerInformation::Reallocate(int num)
     this->Logs[idx] = nullptr;
   }
 
-  if (this->Logs)
-  {
-    delete[] this->Logs;
-  }
+  delete[] this->Logs;
 
   this->Logs = newLogs;
   this->NumberOfLogs = num;

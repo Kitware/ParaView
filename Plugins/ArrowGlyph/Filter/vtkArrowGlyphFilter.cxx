@@ -72,22 +72,10 @@ vtkArrowGlyphFilter::vtkArrowGlyphFilter()
 //----------------------------------------------------------------------------
 vtkArrowGlyphFilter::~vtkArrowGlyphFilter()
 {
-  if (this->OrientationVectorArray)
-  {
-    delete[] OrientationVectorArray;
-  }
-  if (this->ScaleArray)
-  {
-    delete[] ScaleArray;
-  }
-  if (this->ShaftRadiusArray)
-  {
-    delete[] ShaftRadiusArray;
-  }
-  if (this->TipRadiusArray)
-  {
-    delete[] TipRadiusArray;
-  }
+  delete[] OrientationVectorArray;
+  delete[] ScaleArray;
+  delete[] ShaftRadiusArray;
+  delete[] TipRadiusArray;
   if (this->MaskPoints)
   {
     this->MaskPoints->Delete();

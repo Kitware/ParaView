@@ -421,10 +421,7 @@ void pqFlatTreeView::setSelectionModel(QItemSelectionModel* selectionModel)
     this->HeaderView->setSelectionModel(this->Selection);
   }
 
-  if (toDelete)
-  {
-    delete toDelete;
-  }
+  delete toDelete;
 
   // Update the view highlights based on the new selection model.
   this->changeSelection(this->Selection->selection(), QItemSelection());

@@ -711,10 +711,7 @@ void vtkGridConnectivity::InitializeFaceHash(vtkUnstructuredGrid** inputs, int n
     }
   }
 
-  if (this->FaceHash)
-  {
-    delete this->FaceHash;
-  }
+  delete this->FaceHash;
   this->FaceHash = new vtkGridConnectivityFaceHash;
   this->FaceHash->Initialize(maxId + 1);
 }
@@ -890,11 +887,7 @@ int vtkGridConnectivity::RequestData(
   this->GenerateOutput(output, inputs);
 
   delete[] inputs;
-  // The check is not necessary.  It will always be allocated by this point.
-  if (this->FaceHash)
-  {
-    delete this->FaceHash;
-  }
+  delete this->FaceHash;
   this->FaceHash = nullptr;
   this->EquivalenceSet->Delete();
   this->EquivalenceSet = nullptr;

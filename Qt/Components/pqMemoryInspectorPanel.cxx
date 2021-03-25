@@ -778,10 +778,7 @@ pqMemoryInspectorPanel::~pqMemoryInspectorPanel()
 //-----------------------------------------------------------------------------
 void pqMemoryInspectorPanel::ClearClient()
 {
-  if (this->ClientHost)
-  {
-    delete this->ClientHost;
-  }
+  delete this->ClientHost;
   this->ClientHost = nullptr;
 }
 
