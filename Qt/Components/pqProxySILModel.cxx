@@ -44,7 +44,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // ParaView Includes.
 #include "pqSILModel.h"
 
-#define PQ_INVALID_INDEX -1947
+#define PQ_INVALID_INDEX (-1947)
 
 //-----------------------------------------------------------------------------
 pqProxySILModel::pqProxySILModel(const QString& hierarchyName, QObject* _parent)

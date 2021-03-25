@@ -67,20 +67,24 @@ extern const char* vtkStreamLines_gs;
 extern const char* vtkStreamLines_vs;
 
 //----------------------------------------------------------------------------
-#define RELEASE_VTKGL_OBJECT(_x)                                                                   \
-  if (_x)                                                                                          \
-  {                                                                                                \
-    _x->ReleaseGraphicsResources(renWin);                                                          \
-    _x->Delete();                                                                                  \
-    _x = 0;                                                                                        \
-  }
-#define RELEASE_VTKGL_OBJECT2(_x)                                                                  \
-  if (_x)                                                                                          \
-  {                                                                                                \
-    _x->ReleaseGraphicsResources();                                                                \
-    _x->Delete();                                                                                  \
-    _x = 0;                                                                                        \
-  }
+namespace
+{
+template <class T>
+void ReleaseVTKGLObject(T* object, vtkWindow* renWin)
+{
+  object->ReleaseGraphicsResources(renWin);
+  object->Delete();
+  object = nullptr;
+}
+
+template <class T>
+void ReleaseVTKGLObject(T* object)
+{
+  object->ReleaseGraphicsResources();
+  object->Delete();
+  object = nullptr;
+}
+}
 
 //----------------------------------------------------------------------------
 class vtkStreamLinesMapper::Private : public vtkObject
@@ -90,15 +94,15 @@ public:
 
   void ReleaseGraphicsResources(vtkWindow* renWin)
   {
-    RELEASE_VTKGL_OBJECT(this->VBOs);
-    RELEASE_VTKGL_OBJECT(this->BlendingProgram);
-    RELEASE_VTKGL_OBJECT(this->CurrentBuffer);
-    RELEASE_VTKGL_OBJECT(this->CurrentTexture);
-    RELEASE_VTKGL_OBJECT(this->FrameBuffer);
-    RELEASE_VTKGL_OBJECT(this->FrameTexture);
-    RELEASE_VTKGL_OBJECT(this->Program);
-    RELEASE_VTKGL_OBJECT(this->TextureProgram);
-    RELEASE_VTKGL_OBJECT2(this->IndexBufferObject);
+    ReleaseVTKGLObject(this->VBOs, renWin);
+    ReleaseVTKGLObject(this->BlendingProgram, renWin);
+    ReleaseVTKGLObject(this->CurrentBuffer, renWin);
+    ReleaseVTKGLObject(this->CurrentTexture, renWin);
+    ReleaseVTKGLObject(this->FrameBuffer, renWin);
+    ReleaseVTKGLObject(this->FrameTexture, renWin);
+    ReleaseVTKGLObject(this->Program, renWin);
+    ReleaseVTKGLObject(this->TextureProgram, renWin);
+    ReleaseVTKGLObject(this->IndexBufferObject);
   }
 
   void SetMapper(vtkStreamLinesMapper* mapper) { this->Mapper = mapper; }
@@ -637,7 +641,7 @@ bool vtkStreamLinesMapper::Private::PrepareGLBuffers(vtkRenderer* ren, vtkActor*
     this->ShaderCache->ReleaseCurrentShader();
     if (this->Program)
     {
-      RELEASE_VTKGL_OBJECT(this->Program);
+      ReleaseVTKGLObject(this->Program, renWin);
     }
     this->Program = this->ShaderCache->ReadyShaderProgram(
       vtkStreamLines_vs, vtkStreamLines_fs, this->CreateWideLines ? vtkStreamLines_gs : "");

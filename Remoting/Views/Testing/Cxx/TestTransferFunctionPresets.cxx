@@ -27,11 +27,11 @@ PURPOSE.  See the above copyright notice for more information.
 #define myassert(condition, message)                                                               \
   if ((condition))                                                                                 \
   {                                                                                                \
-    cout << message << " -- SUCCESS" << endl;                                                      \
+    cout << (message) << " -- SUCCESS" << endl;                                                    \
   }                                                                                                \
   else                                                                                             \
   {                                                                                                \
-    cout << message << " -- FAILED" << endl;                                                       \
+    cout << (message) << " -- FAILED" << endl;                                                     \
     return EXIT_FAILURE;                                                                           \
   }
 

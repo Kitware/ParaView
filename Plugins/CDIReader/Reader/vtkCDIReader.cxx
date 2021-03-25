@@ -176,7 +176,7 @@ void cdi_get_part(CDIVar* cdiVar, int start, size_t size, T* buffer, int nlevels
 // Macro to check new didn't return an error
 //----------------------------------------------------------------------------
 #define CHECK_NEW(ptr)                                                                             \
-  if (ptr == nullptr)                                                                              \
+  if ((ptr) == nullptr)                                                                            \
   {                                                                                                \
     vtkErrorMacro("new failed!" << endl);                                                          \
     return 0;                                                                                      \

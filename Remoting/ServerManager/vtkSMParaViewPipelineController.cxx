@@ -132,7 +132,7 @@ private:
 // when unregistering proxies. Any concrete method that unregisters proxies should simply call this
 // macro.
 #define PREPARE_FOR_UNREGISTERING(arg)                                                             \
-  if (!arg)                                                                                        \
+  if (!(arg))                                                                                      \
   {                                                                                                \
     return false;                                                                                  \
   }                                                                                                \

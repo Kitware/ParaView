@@ -289,7 +289,7 @@ void PillarGridGenerator(
   double coef_noise = 0.2;
 
 #define GetZShift(_k, _shift)                                                                      \
-  (shift_faille + _shift + (_k) +                                                                  \
+  (shift_faille + (_shift) + (_k) +                                                                \
     ((k == extent[4] || k >= extent[5] - 2) ? 0. : (coef_noise * rand() / RAND_MAX)))
 #define GetZShift1(_k) GetZShift(_k, shift_z1)
 #define GetZShift2(_k) GetZShift(_k, shift_z2)

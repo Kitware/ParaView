@@ -59,7 +59,7 @@ using namespace std;
 // the macro will set the 'error' (string) variable to the CGNS error
 // and return false.
 #define cg_check_operation(op)                                                                     \
-  if (CG_OK != op)                                                                                 \
+  if (CG_OK != (op))                                                                               \
   {                                                                                                \
     error = cg_get_error();                                                                        \
     return false;                                                                                  \

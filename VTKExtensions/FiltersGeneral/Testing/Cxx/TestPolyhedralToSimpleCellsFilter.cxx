@@ -41,7 +41,7 @@
   (o)->Clear();
 
 #define vtk_observe_has_no_error(o)                                                                \
-  if (o->GetError())                                                                               \
+  if ((o)->GetError())                                                                             \
     return EXIT_FAILURE;
 
 class TestConvertPolyhedra
