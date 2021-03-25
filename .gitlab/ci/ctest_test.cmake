@@ -26,6 +26,10 @@ if ("$ENV{CMAKE_CONFIGURATION}" MATCHES "macos")
     "\\.SliceWithPlaneMultiBlock$"
     "\\.PreviewFontScaling$"
 
+    # https://gitlab.kitware.com/paraview/paraview/-/issues/20594
+    "\\.SelectCellsTrace$"
+    "\\.SelectPointsTrace$"
+
     # Unstructured grid volume rendering (paraview/paraview#19130)
     "\\.MultiBlockVolumeRendering$"
     "\\.UnstructuredVolumeRenderingVectorComponent$")
