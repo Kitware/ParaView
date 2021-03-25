@@ -312,6 +312,8 @@ vtkStandardNewMacro(LeafVistor);
 vtkStringArray* pqIntegrationModelSurfaceHelperWidget::fillLeafNames(
   vtkPVDataInformation* info, QString baseName, vtkStringArray* names)
 {
+  Q_UNUSED(baseName);
+
   auto hierarchy = info->GetHierarchy();
   if (!info->IsCompositeDataSet() || hierarchy == nullptr)
   {
