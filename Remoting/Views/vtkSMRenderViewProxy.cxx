@@ -74,7 +74,6 @@
 vtkStandardNewMacro(vtkSMRenderViewProxy);
 //----------------------------------------------------------------------------
 vtkSMRenderViewProxy::vtkSMRenderViewProxy()
-  : InteractorHelper()
 {
   this->IsSelectionCached = false;
   this->NewMasterObserverId = 0;

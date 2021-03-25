@@ -260,7 +260,6 @@ void vtkCPPythonPipeline::FixEOL(std::string& str)
     str.replace(start_pos, from2.length(), to2);
     start_pos += to.length();
   }
-  return;
 }
 
 //----------------------------------------------------------------------------

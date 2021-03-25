@@ -65,7 +65,7 @@ bool vtkSIStringVectorProperty::Push(vtkSMMessage* message, int offset)
   values.resize(num_elems);
   for (int cc = 0; cc < num_elems; cc++)
   {
-    values[cc] = variant->txt(cc).c_str();
+    values[cc] = variant->txt(cc);
   }
   return this->Push(values);
 }

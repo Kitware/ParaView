@@ -38,7 +38,6 @@ static const char* const vtkSMInputArrayDomainAttributeTypes[] = { "point", "cel
 //---------------------------------------------------------------------------
 vtkSMInputArrayDomain::vtkSMInputArrayDomain()
   : AttributeType(vtkSMInputArrayDomain::ANY_EXCEPT_FIELD)
-  , DataType()
 {
 }
 

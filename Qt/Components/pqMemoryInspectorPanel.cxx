@@ -322,7 +322,6 @@ public:
 private:
   void InitializeMemoryUseWidget(QProgressBar*& loadWidget);
 
-private:
   int Rank;
   long long Pid;
   long long ProcMemoryUse;
@@ -492,9 +491,7 @@ private:
 
 //-----------------------------------------------------------------------------
 HostData::HostData()
-  : GroupName("")
-  , HostName("")
-  , HostMemoryTotal(0)
+  : HostMemoryTotal(0)
   , HostMemoryAvailable(0)
 {
 }
@@ -876,7 +873,6 @@ void pqMemoryInspectorPanel::RenderCompleted()
   }
 
   this->Update();
-  return;
 
   /*
   // This code is for updating on endRender regardless of whether

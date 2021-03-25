@@ -75,8 +75,7 @@ std::string vtkSMViewExportHelper::GetSupportedFileTypes(vtkSMViewProxy* view)
       }
       else
       {
-        helpstream << vtksys::SystemTools::UpperCase(fileExtensionsStream.str().c_str())
-                   << " Files";
+        helpstream << vtksys::SystemTools::UpperCase(fileExtensionsStream.str()) << " Files";
       }
       stream << (count > 0 ? ";;" : "") << helpstream.str() << " (" << fileExtensionsStream.str()
              << ")";

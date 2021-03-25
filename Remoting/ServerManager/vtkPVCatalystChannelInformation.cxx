@@ -71,7 +71,6 @@ void vtkPVCatalystChannelInformation::CopyFromObject(vtkObject* obj)
     }
   }
   this->ChannelName.clear();
-  return;
 }
 
 //----------------------------------------------------------------------------

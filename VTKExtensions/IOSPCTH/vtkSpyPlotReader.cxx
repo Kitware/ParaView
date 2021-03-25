@@ -1513,8 +1513,6 @@ void vtkSpyPlotReader::GetLocalMinLevelAndSpacing(
   // now that we have the block with minimum
   // level, we can get the spacing from him.
   minLevelBlock->GetSpacing(spacing);
-
-  return;
 }
 //
 void vtkSpyPlotReader::SetGlobalMinLevelAndSpacing(vtkSpyPlotBlockIterator* biter)
@@ -1711,7 +1709,6 @@ void vtkSpyPlotReader::SetGlobalBoxSize(vtkSpyPlotBlockIterator* biter)
     default:
       vtkErrorMacro("Invalid flag value verifying that box size is constant.");
   }
-  return;
 }
 
 // This functions return 1 if the bounds have been set
@@ -1775,8 +1772,6 @@ void vtkSpyPlotReader::SetGlobalBounds(vtkSpyPlotBlockIterator* biter, int total
   {
     vtkErrorMacro("Problem occurred getting the global bounds");
   }
-
-  return;
 }
 
 int vtkSpyPlotReader::PrepareAMRData(vtkNonOverlappingAMR* hb, vtkSpyPlotBlock* block, int* level,

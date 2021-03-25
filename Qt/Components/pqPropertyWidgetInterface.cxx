@@ -68,5 +68,4 @@ pqPropertyWidgetDecorator* pqPropertyWidgetInterface::createWidgetDecorator(
 void pqPropertyWidgetInterface::createDefaultWidgetDecorators(pqPropertyWidget* widget)
 {
   Q_UNUSED(widget);
-  return;
 }

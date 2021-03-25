@@ -66,7 +66,6 @@ public:
   }
   ~pqFlatTreeViewColumn() = default;
 
-public:
   int Width;
   bool Selected;
 };
@@ -80,7 +79,6 @@ public:
   // ensures that the item has columns matching count.
   void ensureCells(int count) { this->Cells.resize(count); }
 
-public:
   pqFlatTreeViewItem* Parent;
   QList<pqFlatTreeViewItem*> Items;
   QPersistentModelIndex Index;
@@ -112,9 +110,6 @@ public:
 
 //----------------------------------------------------------------------------
 pqFlatTreeViewItem::pqFlatTreeViewItem()
-  : Items()
-  , Index()
-  , Cells()
 {
   this->Parent = nullptr;
   this->ContentsY = 0;
@@ -140,10 +135,7 @@ pqFlatTreeViewItem::~pqFlatTreeViewItem()
 
 //----------------------------------------------------------------------------
 pqFlatTreeViewInternal::pqFlatTreeViewInternal()
-  : ShiftStart()
-  , Index()
-  , LastSearchTime(QTime::currentTime())
-  , KeySearch()
+  : LastSearchTime(QTime::currentTime())
 {
   this->Editor = nullptr;
 }

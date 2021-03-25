@@ -36,7 +36,7 @@ void vtkLoadStateOptions::PrintSelf(ostream& os, vtkIndent indent)
 //----------------------------------------------------------------------------
 std::string vtkLoadStateOptions::LocateFileInDirectory(const std::string& filepath, int isPath)
 {
-  std::string result = "";
+  std::string result;
   std::string modifiedDataDirectory = this->DataDirectory;
   std::vector<std::string> directoryPathComponents;
 

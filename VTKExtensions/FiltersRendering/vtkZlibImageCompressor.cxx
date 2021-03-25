@@ -75,7 +75,6 @@ private:
   // Copy RGB and add alpha 0xff
   void CopyRGBRestoreA(const unsigned char* in, const unsigned char* inEnd, unsigned char* out);
 
-private:
   unsigned char Mask[7]; // mask used in color space reduction (lossy)
   int MaskId;            // id of above mask
   int StripAlpha;        // if set RGBA->RGB comversion is performed

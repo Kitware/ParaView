@@ -2802,7 +2802,7 @@ int vtkCDIReader::LoadDomainVarData(int variableIndex)
   // This is not very well implemented, also due to the organization of
   // the data available. Needs to be improved together with the modellers.
   vtkDebugMacro("In vtkCDIReader::LoadDomainVarData" << endl);
-  string variable = this->Internals->DomainVars[variableIndex].c_str();
+  string variable = this->Internals->DomainVars[variableIndex];
   this->DomainDataSelected = variableIndex;
 
   // Allocate data array for this variable

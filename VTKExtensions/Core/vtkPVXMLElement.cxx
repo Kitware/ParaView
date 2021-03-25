@@ -593,7 +593,7 @@ void vtkPVXMLElement::GetElementsByName(const char* name, vtkCollection* element
 std::string vtkPVXMLElement::Encode(const char* plaintext)
 {
   // escape any characters that are not allowed in XML
-  std::string sanitized = "";
+  std::string sanitized;
   if (!plaintext)
   {
     return sanitized;

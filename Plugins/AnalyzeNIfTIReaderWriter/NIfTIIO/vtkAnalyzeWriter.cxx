@@ -935,8 +935,6 @@ void vtkAnalyzeWriter::WriteFileHeader(
   }
   if (!leave_open)
     vtkznzlib::znzclose(fp);
-
-  return;
 }
 
 void vtkAnalyzeWriter::WriteFile(

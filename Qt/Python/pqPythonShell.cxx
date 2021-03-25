@@ -121,7 +121,6 @@ public:
 
   pqInternals(pqPythonShell* self)
     : Parent(self)
-    , Interpreter()
     , OldCapture(false)
     , ExecutionCounter(0)
     , InterpreterInitialized(false)

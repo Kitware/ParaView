@@ -73,7 +73,7 @@ int vtkIsoVolume::RequestData(vtkInformation* vtkNotUsed(request),
   vtkDataObject* outObj = outInfo->Get(vtkDataObject::DATA_OBJECT());
 
   // Common vars.
-  std::string arrayName("");
+  std::string arrayName;
   int fieldAssociation(-1);
   // double*       range (0);
   // bool          usingLowerBoundClipDS (false);

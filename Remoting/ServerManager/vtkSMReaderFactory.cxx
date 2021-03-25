@@ -184,7 +184,7 @@ public:
       extension.erase(extension.begin()); // remove the first "."
     }
     std::vector<std::string> parts;
-    vtksys::SystemTools::Split(extension.c_str(), parts, '.');
+    vtksys::SystemTools::Split(extension, parts, '.');
     int num_parts = static_cast<int>(parts.size());
     for (int cc = num_parts - 1; cc >= 0; cc--)
     {

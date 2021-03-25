@@ -184,7 +184,6 @@ public:
     return -1;
   }
 
-public:
   QMap<int, QString> UserNameMap;
   vtkWeakPointer<vtkSMSession> AciveSession;
   vtkWeakPointer<vtkSMCollaborationManager> ActiveCollaborationManager;

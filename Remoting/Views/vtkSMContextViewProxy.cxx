@@ -42,7 +42,6 @@
 vtkStandardNewMacro(vtkSMContextViewProxy);
 //----------------------------------------------------------------------------
 vtkSMContextViewProxy::vtkSMContextViewProxy()
-  : InteractorHelper()
 {
   this->ChartView = nullptr;
   this->SkipPlotableCheck = false;

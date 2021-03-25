@@ -52,8 +52,6 @@ struct vtkPhastaReaderInternal
       : StartIndexInPhastaArray(-1)
       , NumberOfComponents(-1)
       , DataDependency(-1)
-      , DataType("")
-      , PhastaFieldTag("")
     {
     }
   };
@@ -405,8 +403,6 @@ void vtkPhastaReader::readheader(int* fileDescriptor, const char keyphrase[], vo
   {
     LastHeaderNotFound = 1;
   }
-
-  return;
 }
 
 void vtkPhastaReader::readdatablock(int* fileDescriptor, const char keyphrase[], void* valueArray,
@@ -482,8 +478,6 @@ void vtkPhastaReader::readdatablock(int* fileDescriptor, const char keyphrase[],
     }
     delete[] ts1;
   }
-
-  return;
 }
 
 // End of copy from phastaIO

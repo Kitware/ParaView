@@ -130,10 +130,7 @@ public:
 class pqKeyFrameInterpolationItem : public pqKeyFrameItem
 {
 public:
-  pqKeyFrameInterpolationItem()
-    : Widget()
-  {
-  }
+  pqKeyFrameInterpolationItem() = default;
   // get data from combo box on key frame editor
   QVariant data(int role) const override
   {
@@ -151,8 +148,7 @@ class pqCameraKeyFrameItem : public pqKeyFrameItem
 {
 public:
   pqCameraKeyFrameItem()
-    : Widget()
-    , CamWidget(&this->Widget)
+    : CamWidget(&this->Widget)
   {
     QVBoxLayout* l = new QVBoxLayout(&this->Widget);
     l->setMargin(0);

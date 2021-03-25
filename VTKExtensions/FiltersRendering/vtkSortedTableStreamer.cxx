@@ -550,7 +550,6 @@ public:
     }
   };
 
-public:
   Internals()
   {
     // Only used for testing

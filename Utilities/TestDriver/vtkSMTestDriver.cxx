@@ -482,7 +482,7 @@ int vtkSMTestDriver::OutputStringHasError(const char* pname, std::string& output
 
   std::vector<std::string> lines;
   std::vector<std::string>::iterator it;
-  vtksys::SystemTools::Split(output.c_str(), lines);
+  vtksys::SystemTools::Split(output, lines);
 
   int i, j;
 
@@ -1243,7 +1243,7 @@ bool vtkSMTestDriver::SetupClient(vtksysProcess* process, const ExecutableInfo& 
     }
     this->ReportCommand(&clientCommand[0], "client");
     vtksysProcess_SetCommand(process, &clientCommand[0]);
-    vtksysProcess_SetWorkingDirectory(process, this->GetDirectory(info.Executable.c_str()).c_str());
+    vtksysProcess_SetWorkingDirectory(process, this->GetDirectory(info.Executable).c_str());
     return true;
   }
   return false;
@@ -1252,5 +1252,5 @@ bool vtkSMTestDriver::SetupClient(vtksysProcess* process, const ExecutableInfo& 
 //----------------------------------------------------------------------------
 std::string vtkSMTestDriver::GetDirectory(std::string location)
 {
-  return vtksys::SystemTools::GetParentDirectory(location.c_str());
+  return vtksys::SystemTools::GetParentDirectory(location);
 }

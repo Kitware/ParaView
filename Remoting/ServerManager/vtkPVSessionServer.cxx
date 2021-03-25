@@ -327,7 +327,6 @@ private:
 vtkStandardNewMacro(vtkPVSessionServer);
 //----------------------------------------------------------------------------
 vtkPVSessionServer::vtkPVSessionServer()
-  : vtkPVSessionBase()
 {
   this->Internal = new vtkInternals(this);
 

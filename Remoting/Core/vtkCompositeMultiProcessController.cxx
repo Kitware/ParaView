@@ -125,7 +125,6 @@ public:
     std::map<unsigned long, std::vector<unsigned long> > RMICallbackIdMapping;
   };
 
-public:
   vtkCompositeInternals(vtkCompositeMultiProcessController* owner)
   {
     this->ControllerID = 1;

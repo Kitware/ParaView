@@ -238,7 +238,7 @@ static void populateMenu(pqSpreadSheetView* view, QMenu* menu)
         vproxy->UpdateVTKObjects();
         view->render();
 
-        updateAllCheckState(allCheckbox, (*checkboxes.get()));
+        updateAllCheckState(allCheckbox, *checkboxes);
       };
 
       auto cb = addCheckableAction(menu, label.c_str(), checked);
@@ -247,7 +247,7 @@ static void populateMenu(pqSpreadSheetView* view, QMenu* menu)
     }
   }
 
-  updateAllCheckState(allCheckbox, (*checkboxes.get()));
+  updateAllCheckState(allCheckbox, *checkboxes);
   QObject::connect(allCheckbox, &QCheckBox::stateChanged, [view, checkboxes, allCheckbox](
                                                             int checkState) {
     std::vector<std::string> hidden_columns;

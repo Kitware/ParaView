@@ -122,8 +122,6 @@ vtkCxxSetObjectMacro(vtkIceTCompositePass, Controller, vtkMultiProcessController
 //----------------------------------------------------------------------------
 vtkIceTCompositePass::vtkIceTCompositePass()
   : EnableFloatValuePass(false)
-  , LastRenderedDepths()
-  , LastRenderedRGBA32F()
 {
   this->IceTContext = vtkIceTContext::New();
   this->IceTContext->UseOpenGLOn();

@@ -211,7 +211,7 @@ bool vtkSMSessionClient::Connect(const char* url, int timeout)
     std::ostringstream stream;
     stream << "tcp://" << dataserverhost << ":" << dsport << "?" << timeoutString.str()
            << handshake.str();
-    data_server_url = stream.str().c_str();
+    data_server_url = stream.str();
 
     std::ostringstream stream2;
     stream2 << "tcp://" << renderserverhost << ":" << rsport << "?" << timeoutString.str()
@@ -229,7 +229,7 @@ bool vtkSMSessionClient::Connect(const char* url, int timeout)
     std::ostringstream stream;
     stream << "tcp://localhost:" << dsport << "?listen=true&nonblocking=true&"
            << timeoutString.str() << handshake.str();
-    data_server_url = stream.str().c_str();
+    data_server_url = stream.str();
 
     std::ostringstream stream2;
     stream2 << "tcp://localhost:" << rsport << "?listen=true&nonblocking=true&"

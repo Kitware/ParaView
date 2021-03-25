@@ -86,7 +86,7 @@ vtkMultiProcessController* vtkTCPNetworkAccessManager::NewConnection(const char*
     // there some issue with RegularExpression that I cannot extract parameters.
     // hence we do this:
     std::vector<std::string> param_vals =
-      vtksys::SystemTools::SplitString(re_connect.match(3).c_str(), '&');
+      vtksys::SystemTools::SplitString(re_connect.match(3), '&');
     for (size_t cc = 0; cc < param_vals.size(); cc++)
     {
       if (key_val.find(param_vals[cc]))

@@ -177,7 +177,7 @@ void vtkSMCameraLink::PropertyModified(vtkSMProxy* fromProxy, const char* pname)
 //---------------------------------------------------------------------------
 void vtkSMCameraLink::UpdateVTKObjects(vtkSMProxy* vtkNotUsed(fromProxy))
 {
-  return; // do nothing
+  // do nothing
 }
 
 //---------------------------------------------------------------------------

@@ -484,7 +484,7 @@ int vtkPVExtractBagPlots::RequestData(
   outTable = ebp->GetOutput();
 
   double maxHdr = VTK_DOUBLE_MIN;
-  std::string maxHdrCName = "";
+  std::string maxHdrCName;
   vtkDataArray* seriesHdr =
     vtkDataArray::SafeDownCast(outputHDRTable->GetColumnByName("HDR (x1,x0)"));
   vtkStringArray* seriesColName =

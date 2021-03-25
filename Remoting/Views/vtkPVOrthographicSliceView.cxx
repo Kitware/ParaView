@@ -156,12 +156,7 @@ vtkStandardNewMacro(vtkPVOrthographicSliceViewInteractorStyle);
 vtkStandardNewMacro(vtkPVOrthographicSliceView);
 //----------------------------------------------------------------------------
 vtkPVOrthographicSliceView::vtkPVOrthographicSliceView()
-  : Renderers()
-  , OrthographicInteractorStyle()
-  , SlicePositionAxes2D()
-  , SlicePositionAxes3D()
-  , SliceAnnotations()
-  , SliceAnnotationsVisibility(false)
+  : SliceAnnotationsVisibility(false)
   , MouseWheelForwardEventId(0)
   , MouseWheelBackwardEventId(0)
   , GridAxes3DActorsNeedShallowCopy(false)
