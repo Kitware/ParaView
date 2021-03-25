@@ -815,7 +815,7 @@
 
     <!-- ==================================================================== -->
     <SourceProxy class="vtkOutlineSource"
-                 label="Outline"
+                 label="Outline Source"
                  name="OutlineSource">
       <Documentation long_help="3D outline of the specified bounds."
                      short_help="Create an outline from the bounds">The Outline
