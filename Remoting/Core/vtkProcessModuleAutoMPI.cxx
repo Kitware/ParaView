@@ -368,7 +368,7 @@ bool vtkProcessModuleAutoMPIInternals::CollectConfiguredOptions()
 void vtkProcessModuleAutoMPIInternals::CreateCommandLine(
   std::vector<std::string>& commandLine, const char* paraView, const char* numProc, int port)
 {
-  if (this->MPIRun.size())
+  if (!this->MPIRun.empty())
   {
     commandLine.push_back(this->MPIRun.c_str());
 

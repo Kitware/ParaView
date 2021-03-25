@@ -1214,7 +1214,7 @@ void vtkUnstructuredPOPReader::ComputeVerticalVelocity(vtkUnstructuredGrid* grid
     double lastdwdr = dwdr[pointId];
     if (pointIterator.ColumnPieceHasBottomPoint(true) == true)
     {
-      if (w_dep.size() == 0)
+      if (w_dep.empty())
       { // this process needs this array so we read it in now
         int varidp;
         nc_inq_varid(latlonFileId, "w_dep", &varidp);

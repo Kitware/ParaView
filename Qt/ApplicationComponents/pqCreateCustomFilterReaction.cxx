@@ -53,7 +53,7 @@ pqCreateCustomFilterReaction::pqCreateCustomFilterReaction(QAction* parentObject
 //-----------------------------------------------------------------------------
 void pqCreateCustomFilterReaction::updateEnableState()
 {
-  this->parentAction()->setEnabled(pqActiveObjects::instance().selection().size() > 0);
+  this->parentAction()->setEnabled(!pqActiveObjects::instance().selection().empty());
 }
 
 //-----------------------------------------------------------------------------
@@ -63,7 +63,7 @@ void pqCreateCustomFilterReaction::createCustomFilter()
   // if the selection is empty.
   QWidget* mainWin = pqCoreUtilities::mainWidget();
 
-  if (pqActiveObjects::instance().selection().size() == 0)
+  if (pqActiveObjects::instance().selection().empty())
   {
     qCritical() << "No pipeline objects are selected."
                    "To create a new custom filter, select the sources and "

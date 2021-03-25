@@ -589,7 +589,7 @@ public:
     stream << "/Node[@name='SIL']";
     for (size_t cc = 0; cc < parts.size(); ++cc)
     {
-      if (parts[cc].size() == 0)
+      if (parts[cc].empty())
       {
         stream << "/";
       }

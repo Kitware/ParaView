@@ -363,7 +363,7 @@ void vtkPVRenderViewDataDeliveryManager::RedistributeDataForOrderedCompositing(b
     }
   }
 
-  if (this->Cuts.size() == 0)
+  if (this->Cuts.empty())
   {
     return;
   }
@@ -531,7 +531,7 @@ bool vtkPVRenderViewDataDeliveryManager::GetRepresentationsReadyToStreamPieces(
       }
     }
   }
-  return (keys.size() > 0);
+  return !keys.empty();
 }
 
 //----------------------------------------------------------------------------

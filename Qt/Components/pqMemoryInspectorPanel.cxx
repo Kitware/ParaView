@@ -563,7 +563,7 @@ RankData* HostData::AddRankData(int rank, long long pid, long long procMemAvail)
 long long HostData::GetTotalSystemMemoryUse()
 {
   long long load = 0;
-  if (this->Ranks.size())
+  if (!this->Ranks.empty())
   {
     load = this->Ranks[0]->GetHostMemoryUse();
   }
@@ -1195,8 +1195,7 @@ int pqMemoryInspectorPanel::Initialize()
 
   //
   this->ClientOnly = false;
-  if ((this->RenderServerHosts.size() == 0) && (this->DataServerHosts.size() == 0) &&
-    (this->ServerHosts.size() == 0))
+  if (this->RenderServerHosts.empty() && this->DataServerHosts.empty() && this->ServerHosts.empty())
   {
     this->ClientOnly = true;
   }
@@ -1341,7 +1340,7 @@ void pqMemoryInspectorPanel::UpdateRanks()
     switch (infos->GetProcessType((int)i))
     {
       case vtkProcessModule::PROCESS_SERVER:
-        if (this->ServerRanks.size())
+        if (!this->ServerRanks.empty())
         {
           this->ServerRanks[rank]->SetProcMemoryUse(procUse);
           this->ServerRanks[rank]->SetHostMemoryUse(hostUse);
@@ -1350,7 +1349,7 @@ void pqMemoryInspectorPanel::UpdateRanks()
         break;
 
       case vtkProcessModule::PROCESS_DATA_SERVER:
-        if (this->DataServerRanks.size())
+        if (!this->DataServerRanks.empty())
         {
           this->DataServerRanks[rank]->SetProcMemoryUse(procUse);
           this->DataServerRanks[rank]->SetHostMemoryUse(hostUse);
@@ -1359,7 +1358,7 @@ void pqMemoryInspectorPanel::UpdateRanks()
         break;
 
       case vtkProcessModule::PROCESS_RENDER_SERVER:
-        if (this->RenderServerRanks.size())
+        if (!this->RenderServerRanks.empty())
         {
           this->RenderServerRanks[rank]->SetProcMemoryUse(procUse);
           this->RenderServerRanks[rank]->SetHostMemoryUse(hostUse);

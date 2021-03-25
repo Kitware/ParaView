@@ -317,7 +317,7 @@ public:
       return false;
     }
     else if (filterText.isEmpty() == false &&
-      this->SearchTags.filter(filterText, Qt::CaseInsensitive).size() == 0)
+      this->SearchTags.filter(filterText, Qt::CaseInsensitive).empty())
     {
       // skip properties not matching search criteria.
       return false;
@@ -353,7 +353,7 @@ public:
 
   bool isAdvanced(vtkSMProxy* proxy) const
   {
-    if (this->DefaultVisibilityForRepresentations.size() > 0 && proxy &&
+    if (!this->DefaultVisibilityForRepresentations.empty() && proxy &&
       proxy->GetProperty("Representation") &&
       this->DefaultVisibilityForRepresentations.contains(
         vtkSMPropertyHelper(proxy, "Representation").GetAsString(), Qt::CaseInsensitive))
@@ -557,7 +557,7 @@ QWidget* pqProxyWidget::newGroupLabelWidget(
   label->setWordWrap(true);
   label->setAlignment(Qt::AlignBottom | Qt::AlignLeft);
 
-  if (buttons.size() > 0)
+  if (!buttons.empty())
   {
     auto hbox = new QHBoxLayout();
     hbox->setContentsMargins(0, 0, 0, 0);
@@ -730,7 +730,7 @@ pqProxyWidget::pqProxyWidget(vtkSMProxy* smproxy, const QStringList& properties,
   // This is here to keep behaviour consistent with earlier versions of the
   // code. If an explicit lists of properties is provided, we update the panel
   // in the constructor itself.
-  if (properties.size() > 0)
+  if (!properties.empty())
   {
     this->updatePanel();
   }
@@ -1035,7 +1035,7 @@ void pqProxyWidget::createPropertyWidgets(const QStringList& properties)
       (smgroup->GetXMLLabel() ? smgroup->GetXMLLabel() : "(unspecified)"));
     if (smgroup != nullptr && ::skip_group(smgroup, properties, this))
     {
-      if (properties.size() > 0)
+      if (!properties.empty())
       {
         // We're encountering a weird case. The user explicitly listed the
         // properties to create widgets for, however, only one (or some) properties from

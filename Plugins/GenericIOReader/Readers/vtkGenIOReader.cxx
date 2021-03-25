@@ -802,7 +802,7 @@ int vtkGenIOReader::RequestData(
   int numSelections = 0;
   if (sampleType == 3 && selectionChanged == true)
   {
-    if (selections.size() == 0)
+    if (selections.empty())
       selections.push_back(_sel);
     else
     {

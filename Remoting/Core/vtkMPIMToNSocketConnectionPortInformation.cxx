@@ -173,7 +173,7 @@ const char* vtkMPIMToNSocketConnectionPortInformation::GetProcessHostName(
     return nullptr;
   }
 
-  if (this->Internals->Connections[processNumber].HostName.size() == 0)
+  if (this->Internals->Connections[processNumber].HostName.empty())
   {
     return "localhost";
   }

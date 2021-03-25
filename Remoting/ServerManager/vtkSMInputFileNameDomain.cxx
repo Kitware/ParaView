@@ -63,7 +63,7 @@ void vtkSMInputFileNameDomain::Update(vtkSMProperty* vtkNotUsed(prop))
 int vtkSMInputFileNameDomain::SetDefaultValues(vtkSMProperty* prop, bool use_unchecked_values)
 {
   vtkSMStringVectorProperty* svp = vtkSMStringVectorProperty::SafeDownCast(prop);
-  if (svp && this->FileName != "")
+  if (svp && !this->FileName.empty())
   {
     if (use_unchecked_values)
     {

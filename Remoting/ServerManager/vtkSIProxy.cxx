@@ -197,7 +197,7 @@ void vtkSIProxy::Pull(vtkSMMessage* message)
   for (iter = this->Internals->SIProperties.begin(); iter != this->Internals->SIProperties.end();
        ++iter)
   {
-    if (prop_names.size() == 0 || prop_names.find(iter->first) != prop_names.end())
+    if (prop_names.empty() || prop_names.find(iter->first) != prop_names.end())
     {
       if (!iter->second->GetIsInternal())
       {
@@ -245,7 +245,7 @@ void vtkSIProxy::Pull(vtkSMMessage* message)
   // vtkSMViewLayoutProxy's state gets correctly pull in collaboration mode
   // otherwise the non-master client will not get correct layout state on
   // initial pull.
-  if (prop_names.size() == 0 && this->LastPushedMessage &&
+  if (prop_names.empty() && this->LastPushedMessage &&
     this->LastPushedMessage->ExtensionSize(ProxyState::user_data) > 0)
   {
     const int count = this->LastPushedMessage->ExtensionSize(ProxyState::user_data);

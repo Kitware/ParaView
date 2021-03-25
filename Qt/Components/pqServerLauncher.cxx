@@ -695,7 +695,7 @@ bool pqServerLauncher::promptOptions()
 //-----------------------------------------------------------------------------
 void pqServerLauncher::updateOptionsUsingUserSelections()
 {
-  if (this->Internals->ActiveWidgets.size() > 0)
+  if (!this->Internals->ActiveWidgets.empty())
   {
     /// now based on user-chosen values, update the options.
     updateEnvironment(

@@ -180,7 +180,7 @@ void pqFileDialogRecentDirsModel::setChosenDir(const QString& dir)
 //-----------------------------------------------------------------------------
 void pqFileDialogRecentDirsModel::setChosenFiles(const QList<QStringList>& files)
 {
-  if (files.size() <= 0)
+  if (files.empty())
   {
     return;
   }

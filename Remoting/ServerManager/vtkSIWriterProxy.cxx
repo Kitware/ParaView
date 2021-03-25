@@ -142,7 +142,7 @@ void vtkSIWriterProxy::AddInput(int input_port, vtkAlgorithmOutput* connection, 
     pipeline.back()->SetInputConnection(pipeline.front()->GetOutputPort());
   }
 
-  if (pipeline.size() > 0)
+  if (!pipeline.empty())
   {
     pipeline.front()->SetInputConnection(connection);
     this->Superclass::AddInput(input_port, pipeline.back()->GetOutputPort(), method);
@@ -166,7 +166,7 @@ void vtkSIWriterProxy::CleanInputs(const char* method)
     pipeline.push_back(vtkAlgorithm::SafeDownCast(completeArrays->GetVTKObject()));
   }
 
-  if (pipeline.size() > 0)
+  if (!pipeline.empty())
   {
     pipeline.front()->SetInputConnection(nullptr);
     pipeline.back()->SetInputConnection(nullptr);

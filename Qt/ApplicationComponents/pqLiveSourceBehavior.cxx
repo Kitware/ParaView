@@ -116,7 +116,7 @@ public:
   void resume()
   {
     this->updateSources();
-    if (this->LiveSources.size() > 0)
+    if (!this->LiveSources.empty())
     {
       this->Timer.start();
     }
@@ -126,7 +126,7 @@ public:
   {
     this->Timer.stop();
     this->updateSources();
-    if (this->LiveSources.size() == 0)
+    if (this->LiveSources.empty())
     {
       return;
     }

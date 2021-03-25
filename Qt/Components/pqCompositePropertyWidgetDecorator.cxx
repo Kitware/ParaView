@@ -70,7 +70,7 @@ struct Operation : public BaseOperation
 {
   bool canShowWidget(bool show_advanced) const override
   {
-    if (this->Expressions.size() == 0 && this->Decorators.size() == 0)
+    if (this->Expressions.empty() && this->Decorators.empty())
     {
       return default_value;
     }
@@ -92,7 +92,7 @@ struct Operation : public BaseOperation
 
   bool enableWidget() const override
   {
-    if (this->Expressions.size() == 0 && this->Decorators.size() == 0)
+    if (this->Expressions.empty() && this->Decorators.empty())
     {
       return default_value;
     }

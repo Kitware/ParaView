@@ -155,7 +155,7 @@ void pqPluginActionGroupBehavior::addPluginInterface(QObject* iface)
       mainWindow->menuBar()->insertMenu(::findHelpMenuAction(mainWindow->menuBar()), menu);
     }
   }
-  else if (splitName.size())
+  else if (!splitName.empty())
   {
     QString msg = QString("Do not know what action group \"%1\" is").arg(splitName[0]);
     qWarning("%s", msg.toLocal8Bit().data());

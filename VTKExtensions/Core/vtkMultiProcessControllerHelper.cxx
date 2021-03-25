@@ -111,7 +111,7 @@ vtkDataObject* vtkMultiProcessControllerHelper::MergePieces(
 bool vtkMultiProcessControllerHelper::MergePieces(
   std::vector<vtkSmartPointer<vtkDataObject> >& pieces, vtkDataObject* result)
 {
-  if (pieces.size() == 0)
+  if (pieces.empty())
   {
     return false;
   }

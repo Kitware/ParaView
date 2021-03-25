@@ -706,7 +706,7 @@ void pqRenderView::selectOnSurfaceInternal(int rect[4], QList<pqOutputPort*>& pq
     SM_SCOPED_TRACE(CallFunction)
       .arg("SelectSurfacePoints")
       .arg("Rectangle", rectVector)
-      .arg("Modifier", modifier.size() > 0 ? modifier.c_str() : nullptr)
+      .arg("Modifier", modifier.empty() ? nullptr : modifier.c_str())
       .arg("comment", "create a surface points selection");
   }
   else
@@ -722,7 +722,7 @@ void pqRenderView::selectOnSurfaceInternal(int rect[4], QList<pqOutputPort*>& pq
       SM_SCOPED_TRACE(CallFunction)
         .arg("SelectSurfaceBlocks")
         .arg("Rectangle", rectVector)
-        .arg("Modifier", modifier.size() > 0 ? modifier.c_str() : nullptr)
+        .arg("Modifier", modifier.empty() ? nullptr : modifier.c_str())
         .arg("comment", "create a frustum selection of cells");
     }
     else
@@ -730,7 +730,7 @@ void pqRenderView::selectOnSurfaceInternal(int rect[4], QList<pqOutputPort*>& pq
       SM_SCOPED_TRACE(CallFunction)
         .arg("SelectSurfaceCells")
         .arg("Rectangle", rectVector)
-        .arg("Modifier", modifier.size() > 0 ? modifier.c_str() : nullptr)
+        .arg("Modifier", modifier.empty() ? nullptr : modifier.c_str())
         .arg("comment", "create a surface cells selection");
     }
   }
@@ -800,7 +800,7 @@ void pqRenderView::selectPolygonInternal(vtkIntArray* polygon, QList<pqOutputPor
     SM_SCOPED_TRACE(CallFunction)
       .arg("SelectSurfacePoints")
       .arg("Polygon", polygonVector)
-      .arg("Modifier", modifier.size() > 0 ? modifier.c_str() : nullptr)
+      .arg("Modifier", modifier.empty() ? nullptr : modifier.c_str())
       .arg("comment", "create a surface points polygon selection");
   }
   else
@@ -814,7 +814,7 @@ void pqRenderView::selectPolygonInternal(vtkIntArray* polygon, QList<pqOutputPor
     SM_SCOPED_TRACE(CallFunction)
       .arg("SelectSurfaceCells")
       .arg("Polygon", polygonVector)
-      .arg("Modifier", modifier.size() > 0 ? modifier.c_str() : nullptr)
+      .arg("Modifier", modifier.empty() ? nullptr : modifier.c_str())
       .arg("comment", "create a surface cells polygon selection");
   }
 

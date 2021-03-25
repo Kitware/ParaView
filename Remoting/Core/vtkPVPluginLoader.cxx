@@ -265,10 +265,10 @@ vtkPVPluginLoader::vtkPVPluginLoader()
   if (opt)
   {
     std::string appDir = vtkProcessModule::GetProcessModule()->GetSelfDir();
-    if (appDir.size())
+    if (!appDir.empty())
     {
       appDir += "/plugins";
-      if (paths.size())
+      if (!paths.empty())
       {
         paths += ENV_PATH_SEP;
       }

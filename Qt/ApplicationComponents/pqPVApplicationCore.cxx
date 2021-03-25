@@ -126,7 +126,7 @@ void pqPVApplicationCore::registerForQuicklaunch(QWidget* menu)
 void pqPVApplicationCore::quickLaunch()
 {
   Q_EMIT this->aboutToShowQuickLaunch();
-  if (this->QuickLaunchMenus.size() > 0)
+  if (!this->QuickLaunchMenus.empty())
   {
     pqQuickLaunchDialog dialog(pqCoreUtilities::mainWidget());
     foreach (QWidget* menu, this->QuickLaunchMenus)
@@ -138,7 +138,7 @@ void pqPVApplicationCore::quickLaunch()
         // --> BUT pqProxyGroupMenuManager in order to handle multi-server
         //         setting properly add actions into an internal widget so
         //         actions() should be used instead of findChildren()
-        if (menu->findChildren<QAction*>().size() == 0)
+        if (menu->findChildren<QAction*>().empty())
         {
           dialog.addActions(menu->actions());
         }

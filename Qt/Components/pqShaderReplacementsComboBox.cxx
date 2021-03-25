@@ -82,7 +82,7 @@ void pqShaderReplacementsComboBox::populate()
       ->GetSettingAsString(pqShaderReplacementsComboBox::ShaderReplacementPathsSettings, "")
       .c_str());
   QStringList plist = paths.split(QDir::listSeparator());
-  if (plist.size() == 0 || (plist.size() == 1 && plist[0] == ""))
+  if (plist.empty() || (plist.size() == 1 && plist[0] == ""))
   {
     this->addItem(tr("(No preset)"), "");
   }

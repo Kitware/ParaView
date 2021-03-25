@@ -302,7 +302,7 @@ void pqServerConnectDialog::updateConfigurations()
   }
   this->Internals->servers->setSortingEnabled(true);
   this->Internals->servers->blockSignals(old);
-  if (this->Internals->Configurations.size() > 0)
+  if (!this->Internals->Configurations.empty())
   {
     this->Internals->servers->setCurrentCell(0, 0);
   }
@@ -605,7 +605,7 @@ void pqServerConnectDialog::acceptConfigurationPage2()
   // Now, make this newly edited configuration the selected one.
   QList<QTableWidgetItem*> items = this->Internals->servers->findItems(
     this->Internals->ActiveConfiguration.name(), Qt::MatchFixedString);
-  if (items.size() > 0)
+  if (!items.empty())
   {
     this->Internals->servers->setCurrentItem(items[0]);
   }
@@ -716,7 +716,7 @@ bool pqServerConnectDialog::selectServer(pqServerConfiguration& selected_configu
       selected_configuration = configs[0];
       return true;
     }
-    else if (configs.size() == 0)
+    else if (configs.empty())
     {
       // Ne configs found, still add resource so config can be used somehow
       selected_configuration.setResource(selector);
@@ -866,7 +866,7 @@ void pqServerConnectDialog::importError(const QString& /*message*/)
 void pqServerConnectDialog::importServersSelectionChanged()
 {
   this->Internals->importSelected->setEnabled(
-    this->Internals->importServersTable->selectedItems().size() > 0);
+    this->Internals->importServersTable->selectedItems().empty() == false);
 }
 
 //-----------------------------------------------------------------------------

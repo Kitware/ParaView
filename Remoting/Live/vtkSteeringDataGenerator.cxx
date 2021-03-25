@@ -73,7 +73,7 @@ public:
   {
     // ensure all arrays have same number of tuples.
     const vtkIdType numTuples =
-      this->Arrays.size() > 0 ? this->Arrays.begin()->second->GetNumberOfTuples() : 0;
+      this->Arrays.empty() ? 0 : this->Arrays.begin()->second->GetNumberOfTuples();
     for (const auto& pair : this->Arrays)
     {
       if (pair.second->GetNumberOfTuples() != numTuples)

@@ -67,7 +67,7 @@ pqAnimationModel::pqAnimationModel(QGraphicsView* p)
 //-----------------------------------------------------------------------------
 pqAnimationModel::~pqAnimationModel()
 {
-  while (this->Tracks.size())
+  while (!this->Tracks.empty())
   {
     this->removeTrack(this->Tracks[0]);
   }

@@ -118,7 +118,7 @@ void pqPreviewMenuManager::init(const QStringList& defaultItems, QMenu* menu)
   {
     SETUP_ACTION(menu->addAction(txt));
   }
-  if (defaultItems.size() > 0)
+  if (!defaultItems.empty())
   {
     menu->addSeparator();
   }

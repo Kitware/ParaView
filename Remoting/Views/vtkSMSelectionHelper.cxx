@@ -218,7 +218,7 @@ vtkSMProxy* vtkSMSelectionHelper::NewSelectionSourceFromSelectionInternal(vtkSMS
         block_ids.insert(idList->GetValue(cc));
       }
     }
-    if (block_ids.size() > 0)
+    if (!block_ids.empty())
     {
       std::vector<vtkIdType> block_ids_vec(block_ids.size());
       std::copy(block_ids.begin(), block_ids.end(), block_ids_vec.begin());

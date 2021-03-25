@@ -96,7 +96,7 @@ void vtkUnstructuredGridVolumeRepresentation::SetActiveVolumeMapper(const char* 
 //----------------------------------------------------------------------------
 vtkAbstractVolumeMapper* vtkUnstructuredGridVolumeRepresentation::GetActiveVolumeMapper()
 {
-  if (this->Internals->ActiveVolumeMapper != "")
+  if (!this->Internals->ActiveVolumeMapper.empty())
   {
     vtkInternals::MapOfMappers::iterator iter =
       this->Internals->Mappers.find(this->Internals->ActiveVolumeMapper);

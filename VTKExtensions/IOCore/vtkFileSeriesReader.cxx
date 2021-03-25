@@ -182,7 +182,7 @@ int vtkFileSeriesReaderTimeRanges::GetAggregateTimeInfo(vtkInformation* outInfo)
     }
   }
 
-  if (timeSteps.size() > 0)
+  if (!timeSteps.empty())
   {
     outInfo->Set(vtkStreamingDemandDrivenPipeline::TIME_STEPS(), &timeSteps[0],
       static_cast<int>(timeSteps.size()));

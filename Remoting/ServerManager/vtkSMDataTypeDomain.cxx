@@ -98,7 +98,7 @@ int vtkSMDataTypeDomain::IsInDomain(vtkSMSourceProxy* proxy, int outputport /*=0
     return 0;
   }
 
-  if (this->DTInternals->DataTypes.size() == 0)
+  if (this->DTInternals->DataTypes.empty())
   {
     return 1;
   }
@@ -125,7 +125,7 @@ int vtkSMDataTypeDomain::IsInDomain(vtkSMSourceProxy* proxy, int outputport /*=0
   {
     if (info->DataSetTypeIsA(dtype.Type))
     {
-      if (dtype.ChildTypes.size() == 0)
+      if (dtype.ChildTypes.empty())
       {
         return 1;
       }
@@ -154,7 +154,7 @@ int vtkSMDataTypeDomain::IsInDomain(vtkSMSourceProxy* proxy, int outputport /*=0
 std::string vtkSMDataTypeDomain::GetDomainDescription() const
 {
   auto& types = this->DTInternals->DataTypes;
-  if (types.size() == 0)
+  if (types.empty())
   {
     return std::string{};
   }
@@ -162,7 +162,7 @@ std::string vtkSMDataTypeDomain::GetDomainDescription() const
   std::vector<std::string> phrases;
   for (auto& typeInfo : types)
   {
-    if (typeInfo.ChildTypes.size() == 0)
+    if (typeInfo.ChildTypes.empty())
     {
       phrases.push_back(vtkDataObjectTypes::GetClassNameFromTypeId(typeInfo.Type));
     }

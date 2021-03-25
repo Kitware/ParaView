@@ -247,7 +247,7 @@ void pqFlipBookReaction::representationsModified(pqRepresentation* r)
 //-----------------------------------------------------------------------------
 void pqFlipBookReaction::representationVisibilityChanged(pqRepresentation*, bool)
 {
-  if (this->VisibleRepresentations.size() != 0)
+  if (!this->VisibleRepresentations.empty())
   {
     return;
   }

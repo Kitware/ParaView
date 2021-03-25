@@ -175,7 +175,7 @@ int pqOptions::AddTestScript(const char* script)
 //-----------------------------------------------------------------------------
 int pqOptions::SetLastTestBaseline(const char* image)
 {
-  if (this->TestScripts.size() == 0)
+  if (this->TestScripts.empty())
   {
     this->AddTestScript("-not-specified");
   }
@@ -186,7 +186,7 @@ int pqOptions::SetLastTestBaseline(const char* image)
 //-----------------------------------------------------------------------------
 int pqOptions::SetLastTestImageThreshold(int threshold)
 {
-  if (this->TestScripts.size() == 0)
+  if (this->TestScripts.empty())
   {
     this->AddTestScript("-not-specified");
   }

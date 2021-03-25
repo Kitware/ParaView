@@ -289,7 +289,7 @@ public:
   void checkForPastedText()
   {
     QString pastedCommand = this->toPlainText().mid(this->InteractivePosition);
-    if (this->CommandHistory.size() > 0)
+    if (!this->CommandHistory.empty())
     {
       this->commandBuffer() = pastedCommand;
     }

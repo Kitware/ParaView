@@ -97,7 +97,7 @@ vtkPVDataInformation* vtkSMOutputPort::GetSubsetDataInformation(
   }
 
   const auto nodes = assembly->SelectNodes({ selector });
-  if (nodes.size() == 0)
+  if (nodes.empty())
   {
     return nullptr;
   }

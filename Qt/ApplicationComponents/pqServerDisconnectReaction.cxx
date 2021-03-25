@@ -70,7 +70,7 @@ bool pqServerDisconnectReaction::disconnectFromServerWithWarning()
   pqServerManagerModel* smmodel = core->getServerManagerModel();
   pqServer* server = pqActiveObjects::instance().activeServer();
 
-  if (server && smmodel->findItems<pqPipelineSource*>(server).size() > 0)
+  if (server && !smmodel->findItems<pqPipelineSource*>(server).empty())
   {
     int ret = QMessageBox::warning(pqCoreUtilities::mainWidget(),
       tr("Disconnect from current server?"), tr("The current connection will be closed and \n"

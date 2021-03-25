@@ -68,7 +68,7 @@ void vtkBlockDeliveryPreprocessor::AddCompositeDataSetIndex(unsigned int index)
 //----------------------------------------------------------------------------
 void vtkBlockDeliveryPreprocessor::RemoveAllCompositeDataSetIndices()
 {
-  if (this->CompositeDataSetIndices->size() > 0)
+  if (!this->CompositeDataSetIndices->empty())
   {
     this->CompositeDataSetIndices->clear();
     this->Modified();
@@ -177,7 +177,7 @@ int vtkBlockDeliveryPreprocessor::RequestData(
       table->GetFieldData()->PassData(data->GetFieldData());
       data = table;
     }
-    else if (indices.size() != 0 && indices.find(0) == indices.end())
+    else if (!indices.empty() && indices.find(0) == indices.end())
     {
       // need to extract chosen blocks.
       vtkNew<vtkExtractBlock> eb;

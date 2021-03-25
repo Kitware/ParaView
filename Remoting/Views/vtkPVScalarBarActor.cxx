@@ -986,7 +986,7 @@ void vtkPVScalarBarActor::ConfigureTicks()
   }
 
   // Loop range accounts for "fake" min max ticks
-  for (size_t i = 1; ticks.size() > 0 && i < ticks.size() - 1; i++)
+  for (size_t i = 1; !ticks.empty() && i < ticks.size() - 1; i++)
   {
     int labelIdx = tickToLabelId[i - 1];
     if (labelIdx == -1)

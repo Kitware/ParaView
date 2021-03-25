@@ -347,7 +347,7 @@ public:
       iter2++;
     }
 
-    if (controllersToDelete.size() > 0)
+    if (!controllersToDelete.empty())
     {
       this->Owner->InvokeEvent(CompositeMultiProcessControllerChanged);
     }

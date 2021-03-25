@@ -324,7 +324,7 @@ pqOutputPort* pqPipelineFilter::getAnyInput() const
   {
     QString portName = this->getInputPortName(i);
     pqInternal::InputMap::iterator iter = this->Internal->Inputs.find(portName);
-    if (iter != this->Internal->Inputs.end() && iter.value().size() > 0)
+    if (iter != this->Internal->Inputs.end() && !iter.value().empty())
     {
       return iter.value()[0];
     }

@@ -48,7 +48,7 @@ static QModelIndex OldGetIndex(pqFlatTreeView& View, const QString& Name)
   QStringList rows = Name.split('/', PV_QT_SKIP_EMPTY_PARTS);
   QString column;
 
-  if (rows.size())
+  if (!rows.empty())
   {
     column = rows.back().split('|').at(1);
     rows.back() = rows.back().split('|').at(0);
@@ -60,7 +60,7 @@ static QModelIndex OldGetIndex(pqFlatTreeView& View, const QString& Name)
     index = View.getModel()->index(rows[i].toInt(), 0, index);
   }
 
-  if (rows.size() > 0)
+  if (!rows.empty())
   {
     index = View.getModel()->index(rows[rows.size() - 1].toInt(), column.toInt(), index);
   }

@@ -7310,7 +7310,7 @@ int vtkMaterialInterfaceFilter::PrepareToCollectGeometricAttributes(
   }
   // ids
   ids.resize(nProcs, static_cast<int*>(nullptr));
-  if (this->ResolvedFragmentIds[this->MaterialId].size() != 0)
+  if (!this->ResolvedFragmentIds[this->MaterialId].empty())
   {
     ids[myProcId] = &(this->ResolvedFragmentIds[this->MaterialId][0]);
   }
@@ -9496,7 +9496,7 @@ int vtkMaterialInterfaceFilter::WriteGeometryOutputToTextFile()
     assert("Couldn't get the resolved fragnments." && resolvedFragments);
 
     // We don't have any fragments here
-    if (resolvedFragmentIds.size() == 0)
+    if (resolvedFragmentIds.empty())
     {
       continue;
     }

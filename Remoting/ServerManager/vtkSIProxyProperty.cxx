@@ -192,7 +192,7 @@ bool vtkSIProxyProperty::Push(vtkSMMessage* message, int offset)
   }
 
   // Take care of the Empty case
-  if (this->NullOnEmpty && this->CleanCommand == nullptr && new_value.size() == 0)
+  if (this->NullOnEmpty && this->CleanCommand == nullptr && new_value.empty())
   {
     stream << vtkClientServerStream::Invoke << object << this->GetCommand() << vtkClientServerID(0)
            << vtkClientServerStream::End;

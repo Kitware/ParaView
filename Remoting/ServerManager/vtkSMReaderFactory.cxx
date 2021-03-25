@@ -179,7 +179,7 @@ public:
     // gz
     // in that order.
     std::string extension = vtksys::SystemTools::GetFilenameExtension(filename);
-    if (extension.size() > 0)
+    if (!extension.empty())
     {
       extension.erase(extension.begin()); // remove the first "."
     }
@@ -193,7 +193,7 @@ public:
         std::string cur_string;
         for (int ii = kk; ii <= cc; ii++)
         {
-          if (parts[ii].size() == 0)
+          if (parts[ii].empty())
           {
             continue; // skip empty parts.
           }
@@ -545,12 +545,12 @@ const char* vtkSMReaderFactory::GetSupportedFileTypes(vtkSMSession* session)
       for (auto& hint : proto.second.FileEntryHints)
       {
         std::string ext_list;
-        if (hint.Extensions.size() > 0)
+        if (!hint.Extensions.empty())
         {
           ext_list = ::vtkJoin(hint.Extensions, "*.", " ");
         }
 
-        if (hint.FilenameRegExs.size() > 0)
+        if (!hint.FilenameRegExs.empty())
         {
           std::string ext_join = ::vtkJoin(hint.FilenamePatterns, "", " ");
           if (ext_list.size() > 0)
@@ -563,7 +563,7 @@ const char* vtkSMReaderFactory::GetSupportedFileTypes(vtkSMSession* session)
             ext_list = ext_join;
           }
         }
-        if (ext_list.size() > 0)
+        if (!ext_list.empty())
         {
           std::ostringstream stream;
           stream << hint.Description << " (" << ext_list << ")";

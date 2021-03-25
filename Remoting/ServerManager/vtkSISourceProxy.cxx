@@ -174,7 +174,7 @@ void vtkSISourceProxy::RecreateVTKObjects()
   // recreated. Hence we warn and ignore the request.
   // I don't anticipate a whole lot of use-cases where we'll encounter those
   // since all public-facing ParaView proxies will employ a PostFilter.
-  if (this->PortsCreated && this->Internals->PostFilters.size() == 0)
+  if (this->PortsCreated && this->Internals->PostFilters.empty())
   {
     vtkWarningMacro("You have encountered a proxy that currently does not support call to "
                     "RecreateVTKObjects() properly. Please contact the ParaView developers."

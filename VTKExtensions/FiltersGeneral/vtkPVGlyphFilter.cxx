@@ -153,7 +153,7 @@ public:
     {
       vtkNew<vtkIdList> cellPointIds;
       auto& uniformSamplingVector = this->UniformSamplingVectorMap[index];
-      if (uniformSamplingVector.size() == 0)
+      if (uniformSamplingVector.empty())
       {
         vtkErrorWithObjectMacro(self, "Could not find sampling vector");
         return;

@@ -505,7 +505,7 @@ void vtkProcessModule::PopActiveSession(vtkSession* session)
 //----------------------------------------------------------------------------
 vtkSession* vtkProcessModule::GetActiveSession()
 {
-  if (this->Internals->ActiveSessionStack.size() == 0)
+  if (this->Internals->ActiveSessionStack.empty())
   {
     return nullptr;
   }

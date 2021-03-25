@@ -223,7 +223,7 @@ int vtkSMInputArrayDomain::IsArrayAcceptable(vtkPVArrayInformation* arrayInfo)
 
   // Empty AcceptableNumbersOfComponents means any number of components
   // are acceptable
-  if (this->AcceptableNumbersOfComponents.size() == 0)
+  if (this->AcceptableNumbersOfComponents.empty())
   {
     return numberOfComponents;
   }
@@ -411,7 +411,7 @@ void vtkSMInputArrayDomain::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
   os << indent << "AcceptableNumbersOfComponents: ";
-  if (this->AcceptableNumbersOfComponents.size() == 0)
+  if (this->AcceptableNumbersOfComponents.empty())
   {
     os << "0" << endl;
   }

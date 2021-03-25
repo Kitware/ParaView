@@ -659,7 +659,7 @@ static vtkPolyData* vtkPVGeometryFilterMergePieces(vtkPartitionedDataSet* mp)
     }
   }
 
-  if (inputs.size() == 0)
+  if (inputs.empty())
   {
     // not much to do, this is an empty multi-piece.
     return nullptr;

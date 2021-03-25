@@ -298,7 +298,7 @@ public:
     {
       alivedClients.push_back(this->CompositeMultiProcessController->GetControllerId(i));
     }
-    if (alivedClients.size() > 0)
+    if (!alivedClients.empty())
     {
       this->Owner->SessionCore->GarbageCollectSIObject(
         &alivedClients[0], static_cast<int>(alivedClients.size()));

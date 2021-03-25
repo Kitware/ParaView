@@ -338,7 +338,7 @@ vtkSmartPointer<vtkImageData> vtkSMUtilities::MergeImages(
   const std::vector<vtkSmartPointer<vtkImageData> >& images, int borderWidth,
   const unsigned char* borderColorRGB)
 {
-  if (images.size() == 0)
+  if (images.empty())
   {
     return nullptr;
   }

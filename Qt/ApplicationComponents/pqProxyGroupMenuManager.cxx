@@ -580,7 +580,7 @@ void pqProxyGroupMenuManager::populateMenu()
 
   // Add alphabetical list.
   QMenu* alphabeticalMenu = _menu;
-  if (this->Internal->Categories.size() > 0 || this->RecentlyUsedMenuSize > 0)
+  if (!this->Internal->Categories.empty() || this->RecentlyUsedMenuSize > 0)
   {
     alphabeticalMenu = _menu->addMenu("&Alphabetical") << pqSetName("Alphabetical");
   }
@@ -609,7 +609,7 @@ void pqProxyGroupMenuManager::populateMenu()
   for (; categoryIter != this->Internal->Categories.end(); ++categoryIter)
   {
     QList<QAction*> action_list = this->actions(categoryIter.key());
-    if (action_list.size() > 0)
+    if (!action_list.empty())
     {
       QMenu* categoryMenu = _menu->addMenu(categoryIter.value().Label)
         << pqSetName(categoryIter.key());
@@ -697,7 +697,7 @@ QAction* pqProxyGroupMenuManager::getAction(const QString& pgroup, const QString
           action->setShortcut(variant.value<QKeySequence>());
         }
       }
-      if (iter.value().OmitFromToolbar.size() > 0)
+      if (!iter.value().OmitFromToolbar.empty())
       {
         action->setProperty("OmitFromToolbar", iter.value().OmitFromToolbar);
       }
@@ -953,7 +953,7 @@ void pqProxyGroupMenuManager::lookForNewDefinitions()
   vtkSMSessionProxyManager* pxm =
     vtkSMProxyManager::GetProxyManager()->GetActiveSessionProxyManager();
 
-  if (this->Internal->ProxyDefinitionGroupToListen.size() == 0 || pxm == nullptr)
+  if (this->Internal->ProxyDefinitionGroupToListen.empty() || pxm == nullptr)
   {
     return; // Nothing to look into...
   }

@@ -469,7 +469,7 @@ void pqTimeInspectorWidget::setSceneTimeSteps(const QList<QVariant>& val)
       timeSteps.push_back(v.toDouble());
     }
   }
-  if (timeSteps.size() > 0)
+  if (!timeSteps.empty())
   {
     animationModel->setTickMarks(static_cast<int>(timeSteps.size()), &timeSteps[0]);
   }

@@ -447,7 +447,7 @@ void pqCustomizeShortcutsDialog::onEditingFinished()
 {
   auto selectionModel = this->Internals->Ui.treeView->selectionModel();
   auto selectedList = selectionModel->selectedRows(1);
-  if (selectedList.size() == 0)
+  if (selectedList.empty())
   {
     return;
   }
@@ -473,7 +473,7 @@ void pqCustomizeShortcutsDialog::onSelectionChanged()
   };
   auto selectionModel = this->Internals->Ui.treeView->selectionModel();
   auto selectedList = selectionModel->selectedRows(1);
-  if (selectedList.size() == 0)
+  if (selectedList.empty())
   {
     setEnabled(false);
     return;
@@ -510,7 +510,7 @@ void pqCustomizeShortcutsDialog::onClearShortcut()
 {
   auto selectionModel = this->Internals->Ui.treeView->selectionModel();
   auto selectedList = selectionModel->selectedRows(1);
-  if (selectedList.size() == 0)
+  if (selectedList.empty())
   {
     return;
   }
@@ -530,7 +530,7 @@ void pqCustomizeShortcutsDialog::onResetShortcut()
 {
   auto selectionModel = this->Internals->Ui.treeView->selectionModel();
   auto selectedList = selectionModel->selectedRows(1);
-  if (selectedList.size() == 0)
+  if (selectedList.empty())
   {
     return;
   }

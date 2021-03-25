@@ -263,7 +263,7 @@ void pqUndoStack::beginNonUndoableChanges()
 void pqUndoStack::endNonUndoableChanges()
 {
   bool ignore = false;
-  if (this->Implementation->IgnoreAllChangesStack.size() > 0)
+  if (!this->Implementation->IgnoreAllChangesStack.empty())
   {
     ignore = this->Implementation->IgnoreAllChangesStack.takeLast();
   }

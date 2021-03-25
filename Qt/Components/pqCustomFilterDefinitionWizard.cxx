@@ -373,7 +373,7 @@ void pqCustomFilterDefinitionWizard::setupDefaultInputOutput()
         }
 
         iter->Delete();
-        if (inputNames.size() > 0)
+        if (!inputNames.empty())
         {
           // Add the "Input" property if it exists. Otherwise, use the
           // first property.

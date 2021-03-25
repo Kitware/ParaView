@@ -72,7 +72,7 @@ QString getDomainDisplayText(vtkSMDomain* domain)
         ? QString("Requires an attribute array")
         : QString("Requires a %1 attribute array").arg(iad->GetAttributeTypeAsString()));
     std::vector<int> numbersOfComponents = iad->GetAcceptableNumbersOfComponents();
-    if (numbersOfComponents.size() > 0)
+    if (!numbersOfComponents.empty())
     {
       txt += QString(" with ");
       for (unsigned int i = 0; i < numbersOfComponents.size(); i++)

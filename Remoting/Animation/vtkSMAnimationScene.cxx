@@ -62,7 +62,7 @@ public:
 
   void UpdateAllViews()
   {
-    if (this->ViewModules.size() == 0)
+    if (this->ViewModules.empty())
     {
       return;
     }
@@ -302,7 +302,7 @@ void vtkSMAnimationScene::RemoveCue(vtkAnimationCue* cue)
 //----------------------------------------------------------------------------
 void vtkSMAnimationScene::RemoveAllCues()
 {
-  if (this->Internals->AnimationCues.size() > 0)
+  if (!this->Internals->AnimationCues.empty())
   {
     this->Internals->AnimationCues.clear();
     this->Modified();

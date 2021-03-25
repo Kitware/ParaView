@@ -293,7 +293,7 @@ void vtkChartRepresentation::AddCompositeDataSetIndex(unsigned int v)
 //----------------------------------------------------------------------------
 void vtkChartRepresentation::ResetCompositeDataSetIndices()
 {
-  if (this->CompositeIndices.size() > 0)
+  if (!this->CompositeIndices.empty())
   {
     this->CompositeIndices.clear();
     this->MarkModified();
@@ -365,7 +365,7 @@ bool vtkChartRepresentation::GetLocalOutput(vtkChartRepresentation::MapOfTables&
     }
   }
 
-  return (tables.size() > 0);
+  return !tables.empty();
 }
 
 //----------------------------------------------------------------------------

@@ -60,7 +60,7 @@ vtkStandardNewMacro(vtkPVFileInformation);
 
 inline void vtkPVFileInformationAddTerminatingSlash(std::string& name)
 {
-  if (name.size() > 0)
+  if (!name.empty())
   {
     char last = *(name.end() - 1);
     if (last != '/' && last != '\\')

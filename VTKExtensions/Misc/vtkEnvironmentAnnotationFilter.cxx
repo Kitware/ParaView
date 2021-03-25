@@ -78,7 +78,7 @@ void vtkEnvironmentAnnotationFilter::UpdateAnnotationValue()
   }
   if (this->DisplayFileName)
   {
-    if (this->FileName != "")
+    if (!this->FileName.empty())
     {
       if (this->DisplayFilePath)
       {

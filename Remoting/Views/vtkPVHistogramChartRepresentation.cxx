@@ -293,7 +293,7 @@ bool vtkPVHistogramChartRepresentation::MapSelectionToView(vtkSelection* sel)
   }
   sel->RemoveAllNodes();
 
-  if (nodes.size() == 0)
+  if (nodes.empty())
   {
     return true;
   }
@@ -359,7 +359,7 @@ bool vtkPVHistogramChartRepresentation::MapSelectionToView(vtkSelection* sel)
   node->SetFieldType(vtkSelectionNode::POINT);
   vtkNew<vtkIdTypeArray> convertedSelectionList;
   convertedSelectionList->SetNumberOfTuples(static_cast<vtkIdType>(selectedBins.size()));
-  if (selectedBins.size())
+  if (!selectedBins.empty())
   {
     std::copy(selectedBins.begin(), selectedBins.end(), convertedSelectionList->GetPointer(0));
   }

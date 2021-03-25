@@ -397,7 +397,7 @@ bool vtkStreamingParticlesRepresentation::StreamingUpdate(const double view_plan
 
   // FIXME: This will not work in client-server mode.
   // For this demo, we'll just use the local data object.
-  if (this->RenderedData && this->PriorityQueue->GetBlocksToPurge().size() > 0)
+  if (this->RenderedData && !this->PriorityQueue->GetBlocksToPurge().empty())
   {
     // purge blocks that no longer have sufficient coverage in the new
     // view-frustum.
@@ -489,7 +489,7 @@ bool vtkStreamingParticlesRepresentation::DetermineBlocksToStream()
       this->StreamingRequest.push_back(static_cast<int>(cid));
     }
   }
-  return this->StreamingRequest.size() > 0;
+  return !this->StreamingRequest.empty();
 }
 
 //----------------------------------------------------------------------------

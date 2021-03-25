@@ -801,7 +801,7 @@ struct Process_5_7_to_5_8
   {
     pugi::xpath_node_set elements =
       document.select_nodes("//ServerManagerState/Links/GlobalPropertyLink");
-    if (elements.size() == 0)
+    if (elements.empty())
     {
       return true;
     }
@@ -838,7 +838,7 @@ struct Process_5_8_to_5_9
     pugi::xpath_node_set elements =
       document.select_nodes("//ServerManagerState/Proxy[@group='sources' and "
                             "(@type='CGNSSeriesReader')]");
-    if (elements.size() == 0)
+    if (elements.empty())
     {
       return true;
     }

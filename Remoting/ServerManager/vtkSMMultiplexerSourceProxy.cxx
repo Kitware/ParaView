@@ -273,7 +273,7 @@ void vtkSMMultiplexerSourceProxy::SetupSubProxies()
   {
     this->SetupSubProxy(item.Proxy);
   }
-  if ((internals.Items.size() > 0) && (internals.SelectedProxy == nullptr))
+  if (!internals.Items.empty() && (internals.SelectedProxy == nullptr))
   {
     internals.SelectedProxy = internals.Items[0].Proxy;
   }

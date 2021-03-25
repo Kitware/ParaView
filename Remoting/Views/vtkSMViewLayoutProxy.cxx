@@ -1122,7 +1122,7 @@ vtkImageData* vtkSMViewLayoutProxy::CaptureWindow(int magX, int magY)
     }
   }
 
-  if (images.size() == 0)
+  if (images.empty())
   {
     vtkErrorMacro("No view present in the layout.");
     return nullptr;

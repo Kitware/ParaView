@@ -359,7 +359,7 @@ void pqColorAnnotationsWidget::applyPreset(const char* presetName)
   const Json::Value& preset = presets->GetFirstPresetWithName(presetName);
   const Json::Value& indexedColors = preset[INDEXED_COLORS];
   if (indexedColors.isNull() || !indexedColors.isArray() || (indexedColors.size() % 3) != 0 ||
-    indexedColors.size() == 0)
+    indexedColors.empty())
   {
     QString warningMessage = "Could not use " + QString(presetName) + " (size " +
       QString::number(indexedColors.size()) + ")" +
@@ -633,7 +633,7 @@ void pqColorAnnotationsWidget::removeAnnotation()
 {
   auto& internals = (*this->Internals);
   QModelIndexList indexes = internals.Ui.AnnotationsTable->selectionModel()->selectedIndexes();
-  if (indexes.size() == 0)
+  if (indexes.empty())
   {
     // Nothing selected. Nothing to remove
     return;
@@ -914,7 +914,7 @@ void pqColorAnnotationsWidget::saveAsPreset(
   Json::Value cpreset =
     vtkSMTransferFunctionProxy::GetStateAsPreset(this->Internals->LookupTableProxy);
 
-  if (!cpreset[INDEXED_COLORS].size())
+  if (cpreset[INDEXED_COLORS].empty())
   {
     qWarning("Cannot save an empty preset");
     return;

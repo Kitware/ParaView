@@ -641,7 +641,7 @@ void vtkSpyPlotBlock::ComputeDerivedVariables(vtkCellData* data, const int& numb
     }
   }
 
-  if (materialDensityArrays.size() == 0)
+  if (materialDensityArrays.empty())
   {
     // we can't compute derived variables as we have no materials
     return;

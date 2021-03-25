@@ -104,7 +104,7 @@ QString pqSaveScreenshotReaction::promptFileName(
   const QString lastUsedExt = settings->value(skey, defaultExtension).toString();
 
   auto filters = prototype->GetFileFormatFilters();
-  if (filters.size() == 0)
+  if (filters.empty())
   {
     qWarning("No image writers detected.");
     return QString();

@@ -223,7 +223,7 @@ void pqAnimationTimeWidget::pqInternals::render(pqAnimationTimeWidget* self)
   ui.timeValueComboBox->setCurrentIndex(currentIndex);
 
   // update spin-box.
-  if (state.timeSteps().size() > 0)
+  if (!state.timeSteps().empty())
   {
     const int count = static_cast<int>(state.timeSteps().size());
     ui.timestepValue->setMaximum(count - 1);

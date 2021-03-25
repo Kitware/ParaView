@@ -175,7 +175,7 @@ vtkIdType vtkPVDiscretizableColorTransferFunction::SetAnnotationInFullSet(
   {
     return this->SetAnnotationInFullSet(x, annotation);
   }
-  else if (value == "")
+  else if (value.empty())
   {
     // NOTE: This prevents the value "" in vtkStringArrays from being annotated.
     // Hopefully, that isn't a desired use case.

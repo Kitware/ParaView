@@ -122,7 +122,7 @@ void pqFileNamePropertyWidget::resetButtonClicked()
   const char* fileName = "";
   if (auto domain = smproperty->FindDomain<vtkSMInputFileNameDomain>())
   {
-    if (domain->GetFileName() != "")
+    if (!domain->GetFileName().empty())
     {
       fileName = domain->GetFileName().c_str();
     }

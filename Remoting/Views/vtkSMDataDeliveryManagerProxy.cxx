@@ -118,7 +118,7 @@ bool vtkSMDataDeliveryManagerProxy::DeliverStreamedPieces()
 
   std::vector<unsigned int> keys_to_deliver;
   info->GetKeys(keys_to_deliver);
-  if (keys_to_deliver.size() != 0)
+  if (!keys_to_deliver.empty())
   {
     vtkSMSession* session = this->ViewProxy->GetSession();
     vtkClientServerStream stream;
@@ -130,7 +130,7 @@ bool vtkSMDataDeliveryManagerProxy::DeliverStreamedPieces()
     session->ExecuteStream(this->ViewProxy->GetLocation(), stream, false);
   }
 
-  return keys_to_deliver.size() > 0;
+  return !keys_to_deliver.empty();
 }
 
 //----------------------------------------------------------------------------

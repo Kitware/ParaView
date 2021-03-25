@@ -57,7 +57,7 @@ vtkPVCameraCollection::~vtkPVCameraCollection()
 //----------------------------------------------------------------------------
 void vtkPVCameraCollection::RemoveAllCameras()
 {
-  if (this->Internals->Cameras.size() > 0)
+  if (!this->Internals->Cameras.empty())
   {
     this->Internals->Cameras.clear();
     this->Modified();
