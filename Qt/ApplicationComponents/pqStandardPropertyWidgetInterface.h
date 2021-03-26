@@ -109,6 +109,7 @@ public:
    * \li \c PropertyCollection : pqPropertyCollectionWidget
    * \li \c DataAssemblyEditor: pqDataAssemblyPropertyWidget
    * \li \c CheckableProperty : pqCheckableProperty
+   * \li \c EqualizerPropertyWidget : pqEqualizerPropertyWidget
    */
   pqPropertyWidget* createWidgetForPropertyGroup(
     vtkSMProxy* proxy, vtkSMPropertyGroup* group, QWidget* parentWidget) override;
