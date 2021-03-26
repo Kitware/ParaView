@@ -271,7 +271,7 @@ void pqFavoritesDialog::populateFavoritesTree()
   {
     QString settingValue = settings->value(key).toString();
     QStringList bmList = settingValue.split("|", PV_QT_SKIP_EMPTY_PARTS);
-    for (QString bm : bmList)
+    for (const QString& bm : bmList)
     {
       QStringList bmPath = bm.split(";", PV_QT_SKIP_EMPTY_PARTS);
       if (bmPath.size() >= 2)

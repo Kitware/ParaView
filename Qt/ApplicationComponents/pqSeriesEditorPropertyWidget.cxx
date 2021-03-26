@@ -542,7 +542,7 @@ void pqSeriesEditorPropertyWidget::savePropertiesWidgets()
 
   QStringList selectedAnnotations = ui.SeriesTable->selectedAnnotations();
 
-  for (auto key : selectedAnnotations)
+  for (const auto& key : selectedAnnotations)
   {
     // update the parameter corresponding to the modified widget.
     if (ui.Thickness == senderWidget && this->Internals->Thickness[key] != ui.Thickness->value())

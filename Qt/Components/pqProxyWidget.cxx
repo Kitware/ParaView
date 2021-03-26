@@ -134,7 +134,7 @@ void add_decorators(pqPropertyWidget* widget, vtkPVXMLElement* hints)
   if (widget && hints)
   {
     auto xmls = get_decorators(hints);
-    for (auto xml : xmls)
+    for (const auto& xml : xmls)
     {
       assert(xml && xml->GetAttribute("type"));
       pqPropertyWidgetDecorator::create(xml, widget);

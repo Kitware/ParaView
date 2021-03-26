@@ -120,6 +120,7 @@ std::vector<std::pair<QString, QString> > MergeAnnotations(
   // Iterate over existing annotations, backfilling annotation texts/labels
   // from the new_pairs, if old texts were empty.
   std::vector<std::pair<QString, QString> > merged_pairs;
+  merged_pairs.reserve(current_pairs.size() + real_new_pairs.size());
   for (const auto& pair : current_pairs)
   {
     // using old_values to get updated annotation texts, if any.

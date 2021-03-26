@@ -83,14 +83,14 @@ void vtkCPInputDataDescription::AddField(const char* fieldName, int type)
 unsigned int vtkCPInputDataDescription::GetNumberOfFields()
 {
   unsigned int count = 0;
-  for (auto iter : this->Internals->Fields)
+  for (const auto& iter : this->Internals->Fields)
   {
     count += static_cast<unsigned int>(iter.second.size());
   }
   if (count > 2)
   {
     count = 0;
-    for (auto iter : this->Internals->Fields)
+    for (const auto& iter : this->Internals->Fields)
     {
       count += static_cast<unsigned int>(iter.second.size());
     }
@@ -129,7 +129,7 @@ int vtkCPInputDataDescription::GetFieldType(unsigned int fieldIndex)
     return -1;
   }
   size_t count = 0;
-  for (auto iter : this->Internals->Fields)
+  for (const auto& iter : this->Internals->Fields)
   {
     size_t size = iter.second.size();
     if (size + count > static_cast<size_t>(fieldIndex))

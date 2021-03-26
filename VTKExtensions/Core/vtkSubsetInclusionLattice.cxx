@@ -1126,7 +1126,7 @@ void vtkSubsetInclusionLattice::SetSelection(
 {
   vtkInternals& internals = (*this->Internals);
   internals.ResetSelectionState();
-  for (auto s : selection)
+  for (const auto& s : selection)
   {
     if (s.second)
     {

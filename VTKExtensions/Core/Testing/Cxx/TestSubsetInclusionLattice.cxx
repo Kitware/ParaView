@@ -113,7 +113,7 @@ int TestB()
   sil->Deselect("/base/blk-1_proc-0/Grid");
   sil->Print(cout);
 
-  for (auto item : sil->GetSelection())
+  for (const auto& item : sil->GetSelection())
   {
     cout << item.first.c_str() << " : " << item.second << endl;
   }

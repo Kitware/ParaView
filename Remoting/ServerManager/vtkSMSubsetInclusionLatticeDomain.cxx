@@ -55,8 +55,9 @@ void vtkSMSubsetInclusionLatticeDomain::Update(vtkSMProperty*)
       this->SIL->DeepCopy(info->GetSubsetInclusionLattice());
 
       std::vector<std::string> strings;
-      auto selmap = this->SIL->GetSelection();
-      for (auto iter : selmap)
+      const auto selmap = this->SIL->GetSelection();
+      strings.reserve(selmap.size());
+      for (const auto& iter : selmap)
       {
         strings.push_back(iter.first);
       }
@@ -92,7 +93,7 @@ int vtkSMSubsetInclusionLatticeDomain::SetDefaultValues(
 
   std::vector<std::string> strings;
   auto selmap = this->SIL->GetSelection();
-  for (auto iter : selmap)
+  for (const auto& iter : selmap)
   {
     strings.push_back(iter.first);
     strings.push_back(iter.second ? "1" : "0");

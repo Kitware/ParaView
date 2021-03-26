@@ -301,10 +301,10 @@ void vtkPythonProgrammableFilter::Exec(const char* script, const char* funcname)
         path.erase(std::remove(path.begin(), path.end(), '\''), path.end());
 
         // Re-add qoutes
-        path = "\"" + path + "\"";
+        path = std::string("\"").append(path).append("\"");
 
-        pathscript += "if not " + path + " in sys.path:\n";
-        pathscript += "  sys.path.insert(0, " + path + ")\n";
+        pathscript += std::string("if not ").append(path).append(" in sys.path:\n");
+        pathscript += std::string("  sys.path.insert(0, ").append(path).append(")\n");
 
         vtkPythonInterpreter::RunSimpleString(pathscript.c_str());
       }

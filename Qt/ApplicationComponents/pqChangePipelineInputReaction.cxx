@@ -100,7 +100,7 @@ void pqChangePipelineInputReaction::changeInput()
 
   for (iter = input_map.begin(); iter != input_map.end(); iter++)
   {
-    QString inputPortName = iter.key();
+    const QString& inputPortName = iter.key();
     const QList<pqOutputPort*>& inputs = iter.value();
 
     std::vector<vtkSMProxy*> inputPtrs;

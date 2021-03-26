@@ -901,10 +901,9 @@ QStringList pqCameraDialog::CustomViewpointConfigurations()
   pqSettings* settings = pqApplicationCore::instance()->settings();
   settings->beginGroup("CustomViewButtons");
   settings->beginGroup("Configurations");
-  const QStringList configs =
-    getListOfStrings(settings, pqCustomViewpointButtonDialog::DEFAULT_TOOLTIP,
-      pqCustomViewpointButtonDialog::MINIMUM_NUMBER_OF_ITEMS,
-      pqCustomViewpointButtonDialog::MAXIMUM_NUMBER_OF_ITEMS);
+  QStringList configs = getListOfStrings(settings, pqCustomViewpointButtonDialog::DEFAULT_TOOLTIP,
+    pqCustomViewpointButtonDialog::MINIMUM_NUMBER_OF_ITEMS,
+    pqCustomViewpointButtonDialog::MAXIMUM_NUMBER_OF_ITEMS);
   settings->endGroup();
   settings->endGroup();
   return configs;
@@ -917,10 +916,9 @@ QStringList pqCameraDialog::CustomViewpointToolTips()
   pqSettings* settings = pqApplicationCore::instance()->settings();
   settings->beginGroup("CustomViewButtons");
   settings->beginGroup("ToolTips");
-  const QStringList toolTips =
-    getListOfStrings(settings, pqCustomViewpointButtonDialog::DEFAULT_TOOLTIP,
-      pqCustomViewpointButtonDialog::MINIMUM_NUMBER_OF_ITEMS,
-      pqCustomViewpointButtonDialog::MAXIMUM_NUMBER_OF_ITEMS);
+  QStringList toolTips = getListOfStrings(settings, pqCustomViewpointButtonDialog::DEFAULT_TOOLTIP,
+    pqCustomViewpointButtonDialog::MINIMUM_NUMBER_OF_ITEMS,
+    pqCustomViewpointButtonDialog::MAXIMUM_NUMBER_OF_ITEMS);
   settings->endGroup();
   settings->endGroup();
   return toolTips;

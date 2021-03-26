@@ -414,8 +414,8 @@ std::string pqProxy::rstToHtml(const char* rstStr)
       const char* s = htmlStr.c_str();
       std::string listItem(s + re.start(1), re.end(1) - re.start(1));
       std::string afterList(s + re.start(2), re.end(2) - re.start(2));
-      htmlStr.replace(
-        re.start(0), re.end(0) - re.start(0), std::string("<li>") + listItem + "</ul>" + afterList);
+      htmlStr.replace(re.start(0), re.end(0) - re.start(0),
+        std::string("<li>").append(listItem).append("</ul>").append(afterList));
     }
   }
   {

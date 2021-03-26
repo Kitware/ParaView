@@ -168,7 +168,7 @@ void pqPluginDialog::loadPlugin(pqServer* server, bool remote)
   }
 
   QStringList supportsExts;
-  for (const auto apair : exts)
+  for (const auto& apair : exts)
   {
     supportsExts.append(apair.second);
   }
@@ -178,7 +178,7 @@ void pqPluginDialog::loadPlugin(pqServer* server, bool remote)
   QTextStream stream(&filterString, QIODevice::WriteOnly);
 
   stream << tr("Supported plugins") << " (" << supportsExts.join(" ") << ");;";
-  for (const auto apair : exts)
+  for (const auto& apair : exts)
   {
     stream << apair.first << " (" << apair.second.join(" ") << ");;";
   }

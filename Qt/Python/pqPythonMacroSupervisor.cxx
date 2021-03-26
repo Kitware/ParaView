@@ -365,7 +365,7 @@ void pqPythonMacroSupervisor::onMacroTriggered()
   {
     if (itr.value() == action)
     {
-      QString filename = itr.key();
+      const QString& filename = itr.key();
       Q_EMIT this->executeScriptRequested(filename);
     }
   }
@@ -381,7 +381,7 @@ void pqPythonMacroSupervisor::onDeleteMacroTriggered()
   {
     if (itr.value() == action)
     {
-      QString filename = itr.key();
+      const QString& filename = itr.key();
       listOfMacroToDelete.append(filename);
     }
   }
@@ -400,7 +400,7 @@ void pqPythonMacroSupervisor::onEditMacroTriggered()
   {
     if (itr.value() == action)
     {
-      QString filename = itr.key();
+      const QString& filename = itr.key();
       Q_EMIT onEditMacro(filename);
     }
   }

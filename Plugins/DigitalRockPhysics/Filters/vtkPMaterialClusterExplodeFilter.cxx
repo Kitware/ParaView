@@ -210,7 +210,7 @@ struct ExplodeFunctor
 
     vtkIdType totalNbPts = 0;
     vtkIdType totalNbCells = 0;
-    for (auto params : this->LocalData)
+    for (const auto& params : this->LocalData)
     {
       totalNbPts += params.Points->GetNumberOfPoints();
       totalNbCells += params.Cells->GetNumberOfCells();

@@ -143,7 +143,7 @@ void pqRecentFilesMenu::buildMenu()
     QString key;
     if (this->SortByServers)
     {
-      pqServerConfiguration config = resource.configuration();
+      const pqServerConfiguration& config = resource.configuration();
       if (config.isNameDefault())
       {
         pqServerResource hostResource = (resource.scheme() == "session")

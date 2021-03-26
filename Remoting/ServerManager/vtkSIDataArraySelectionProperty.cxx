@@ -110,7 +110,7 @@ bool vtkSIDataArraySelectionProperty::Push(vtkSMMessage* message, int offset)
     {
       for (int cc = 0; (cc + 1) < num_elems; cc += 2)
       {
-        const auto name = variant.txt(cc);
+        const auto& name = variant.txt(cc);
         const int status = variant.txt(cc + 1) == "0" ? 0 : 1;
         selection->SetArraySetting(name.c_str(), status);
       }

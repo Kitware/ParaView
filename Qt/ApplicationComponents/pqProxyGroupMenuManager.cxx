@@ -637,7 +637,7 @@ void pqProxyGroupMenuManager::updateMenuStyle()
     action->setFont(f);
   }
 
-  for (auto bm : this->Internal->Favorites)
+  for (const auto& bm : this->Internal->Favorites)
   {
     QStringList path = bm.second.split(";", PV_QT_SKIP_EMPTY_PARTS);
     QString filter = path.takeLast();

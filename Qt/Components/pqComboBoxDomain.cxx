@@ -248,7 +248,7 @@ void pqComboBoxDomain::internalDomainChanged()
     {
       QList<QVariant> enums;
       enums = pqSMAdaptor::getEnumerationPropertyDomain(this->Internal->Property);
-      for (QVariant var : enums)
+      for (const QVariant& var : enums)
       {
         texts.append(var.toString());
         data.append(var.toString());

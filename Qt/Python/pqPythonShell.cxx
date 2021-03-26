@@ -300,7 +300,7 @@ void pqPythonShell::reset()
 void pqPythonShell::printString(const QString& text, pqPythonShell::PrintMode mode)
 {
   pqConsoleWidget* consoleWidget = this->Internals->Ui.consoleWidget;
-  QString string = text;
+  const QString& string = text;
   if (!string.isEmpty())
   {
     QTextCharFormat format = consoleWidget->getFormat();

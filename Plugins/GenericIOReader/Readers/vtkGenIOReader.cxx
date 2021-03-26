@@ -1045,10 +1045,12 @@ int vtkGenIOReader::RequestData(
         nextHash = numLoadingRows;
 
         std::vector<std::thread> threadPool;
-
+        threadPool.reserve(concurentThreadsSupported);
         for (int t = 0; t < concurentThreadsSupported; t++)
+        {
           threadPool.push_back(std::thread(&vtkGenIOReader::theadedParsing, this, t,
             concurentThreadsSupported, numRowsToSample, numLoadingRows, cells, pnts, -1));
+        }
 
         for (auto& th : threadPool)
           th.join();
@@ -1180,11 +1182,13 @@ int vtkGenIOReader::RequestData(
         nextHash = numLoadingRows;
 
         std::vector<std::thread> threadPool;
-
+        threadPool.reserve(concurentThreadsSupported);
         for (int t = 0; t < concurentThreadsSupported; t++)
+        {
           threadPool.push_back(
             std::thread(&vtkGenIOReader::theadedParsing, this, t, concurentThreadsSupported,
               numRowsToSample, numLoadingRows, cells, pnts, numSelections));
+        }
 
         for (auto& th : threadPool)
           th.join();

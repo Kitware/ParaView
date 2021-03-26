@@ -62,6 +62,7 @@ void vtkSMExtentDomain::Update(vtkSMProxyProperty* pp)
       info->GetExtent(extent);
 
       std::vector<vtkEntry> entries;
+      entries.reserve(3);
       for (int j = 0; j < 3; j++)
       {
         entries.push_back(vtkEntry(extent[2 * j], extent[2 * j + 1]));

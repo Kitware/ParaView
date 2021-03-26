@@ -105,7 +105,7 @@ QStringList splitTerms(const QString& value)
 
 QString fmt(QString str, const std::map<QString, QString>& map)
 {
-  for (auto pair : map)
+  for (const auto& pair : map)
   {
     str.replace(QString("{%1}").arg(pair.first), pair.second);
   }
@@ -114,7 +114,7 @@ QString fmt(QString str, const std::map<QString, QString>& map)
 
 QRegularExpression fmtRegEx(QString str, const std::map<QString, QString>& map)
 {
-  for (auto pair : map)
+  for (const auto& pair : map)
   {
     const auto key = QString("{%1}").arg(pair.first);
     int index = str.indexOf(key);

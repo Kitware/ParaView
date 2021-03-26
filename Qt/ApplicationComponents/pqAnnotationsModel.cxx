@@ -377,7 +377,7 @@ QVariant pqAnnotationsModel::headerData(int section, Qt::Orientation orientation
       return Qt::Unchecked;
     }
     Qt::CheckState ret = this->Internals->Items[0].Visibility;
-    for (const auto item : this->Internals->Items)
+    for (const auto& item : this->Internals->Items)
     {
       if (item.Visibility != ret)
       {
@@ -704,7 +704,7 @@ void pqAnnotationsModel::setVisibilities(
 {
   bool visibilityFlag = false;
 
-  for (auto vis : newVisibilities)
+  for (const auto& vis : newVisibilities)
   {
     auto name = vis.first;
     auto foundItem = std::find_if(this->Internals->Items.begin(), this->Internals->Items.end(),

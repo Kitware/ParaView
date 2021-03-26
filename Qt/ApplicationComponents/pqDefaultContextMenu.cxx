@@ -566,7 +566,7 @@ void pqDefaultContextMenu::unsetBlockColor()
     QMap<unsigned int, QColor>::const_iterator iter2;
     for (iter2 = blockColors.begin(); iter2 != blockColors.end(); iter2++)
     {
-      QColor qcolor = iter2.value();
+      const QColor& qcolor = iter2.value();
       double color[] = { qcolor.redF(), qcolor.greenF(), qcolor.blueF() };
       dmp->SetElements(iter2.key(), color);
     }
