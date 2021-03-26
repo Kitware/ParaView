@@ -267,6 +267,11 @@ if (TARGET VTK::IOFides)
     Resources/proxies_fides.xml)
 endif()
 
+if (TARGET VTK::IOOMF)
+  list(APPEND xml_files
+    Resources/proxies_omf.xml)
+endif()
+
 if (TARGET VTK::IOMotionFX)
   list(APPEND xml_files
     Resources/proxies_motionfx.xml)

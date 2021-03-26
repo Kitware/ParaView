@@ -112,6 +112,7 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${paraview_test_data_directory_input}/Data/multicomb_2.vts}"
   "DATA{${paraview_test_data_directory_input}/Data/non_convex_polygon.vtu}"
   "DATA{${paraview_test_data_directory_input}/Data/office.binary.vtk}"
+  "DATA{${paraview_test_data_directory_input}/Data/OMF/test_file.omf}"
   "DATA{${paraview_test_data_directory_input}/Data/pbrSpheres.vtp}"
   "DATA{${paraview_test_data_directory_input}/Data/pbrSpheresAlbedo.jpg}"
   "DATA{${paraview_test_data_directory_input}/Data/pbrSpheresORM.jpg}"
@@ -353,6 +354,7 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/OBBMediumAxis.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/OBBMinorAxis.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/OffsetSliceWithPlane.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/OMFReader.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/OpacityWidgetRange.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/PartitionedDataSet_Slice.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/PartitionedDataSet_Surface.png}"
@@ -1064,6 +1066,12 @@ if (TARGET VTK::IOFides)
       FidesReader.xml
       )
   endif()
+endif()
+
+if (TARGET VTK::IOOMF)
+  list(APPEND TESTS_WITH_INLINE_COMPARES
+    OMFReader.xml
+    )
 endif()
 
 if(VTK_USE_LARGE_DATA)

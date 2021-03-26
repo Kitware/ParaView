@@ -456,6 +456,7 @@ paraview_require_module(
             VTK::IOH5part
             VTK::IONetCDF
             VTK::IOOggTheora
+            VTK::IOOMF
             VTK::IOParallelExodus
             VTK::IOParallelLSDyna
             VTK::IOPIO
