@@ -488,6 +488,13 @@ public:
         item.second.second->setText(l.toString(dinfo->GetNumberOfElements(item.first)));
         item.second.first->setVisible(true);
         item.second.second->setVisible(true);
+        if (item.first == vtkDataObject::POINT)
+        {
+          auto pointInfo = dinfo->GetPointArrayInformation();
+          auto text = item.second.second->text();
+          text.append(" (").append(pointInfo->GetDataTypeAsString()).append(")");
+          item.second.second->setText(text);
+        }
       }
       else
       {
