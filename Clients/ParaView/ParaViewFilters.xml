@@ -221,6 +221,7 @@
   <Proxy group="filters" name="DistributePoints" />
   <Proxy group="filters" name="ElevationFilter" />
   <Proxy group="filters" name="EnvironmentAnnotation" />
+  <Proxy group="filters" name="EqualizerFilter"/>
   <Proxy group="filters" name="EvenlySpacedStreamlines2D" />
   <Proxy group="filters" name="ExtractBlock" icon=":/pqWidgets/Icons/pqGroupExtract.svg" />
   <Proxy group="filters" name="ExtractCellsAlongLine" />

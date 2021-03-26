@@ -29,6 +29,7 @@
 #
 #==========================================================================
 set(classes
+  vtk2DWidgetRepresentation
   vtk3DWidgetRepresentation
   vtkAMROutlineRepresentation
   vtkAMRStreamingPriorityQueue
@@ -121,6 +122,7 @@ set(classes
   vtkPVSynchronizedRenderer
   vtkPVView
   vtkPVXYChartView
+  vtkPVXYChartViewInteractive
   vtkQuartileChartRepresentation
   vtkRulerSourceRepresentation
   vtkSelectionRepresentation
@@ -147,6 +149,7 @@ set(classes
   vtkSMMaterialDomain
   vtkSMMaterialLibraryProxy
   vtkSMMultiSliceViewProxy
+  vtkSMNew2DWidgetRepresentationProxy
   vtkSMNewWidgetRepresentationProxy
   vtkSMOrthographicSliceViewProxy
   vtkSMParaViewPipelineControllerWithRendering

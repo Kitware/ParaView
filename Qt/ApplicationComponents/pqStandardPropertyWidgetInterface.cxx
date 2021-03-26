@@ -53,6 +53,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqDisplaySizedImplicitPlanePropertyWidget.h"
 #include "pqDoubleRangeSliderPropertyWidget.h"
 #include "pqEnableWidgetDecorator.h"
+#include "pqEqualizerPropertyWidget.h"
 #include "pqFileListPropertyWidget.h"
 #include "pqFileNamePropertyWidget.h"
 #include "pqFontPropertyWidget.h"
@@ -343,6 +344,11 @@ pqPropertyWidget* pqStandardPropertyWidgetInterface::createWidgetForPropertyGrou
   {
     return new pqCheckableProperty(proxy, group, parentWidget);
   }
+  else if (panelWidget == "EqualizerPropertyWidget")
+  {
+    return new pqEqualizerPropertyWidget(proxy, group, parentWidget);
+  }
+
   // *** NOTE: When adding new types, please update the header documentation ***
 
   return nullptr;

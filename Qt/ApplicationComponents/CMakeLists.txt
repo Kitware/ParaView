@@ -98,6 +98,7 @@ set(classes
   pqEditColorMapReaction
   pqEditScalarBarReaction
   pqEnableWidgetDecorator
+  pqEqualizerPropertyWidget
   pqExampleVisualizationsDialog
   pqExampleVisualizationsDialogReaction
   pqExportReaction
@@ -114,6 +115,7 @@ set(classes
   pqImageCompressorWidget
   pqImplicitPlanePropertyWidget
   pqInputDataTypeDecorator
+  pqInteractiveProperty2DWidget
   pqInteractivePropertyWidget
   pqLightPropertyWidget
   pqLinePropertyWidget
