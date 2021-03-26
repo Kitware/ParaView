@@ -1,33 +1,37 @@
 set(interfaces)
-set(sources
-  pqIntegrationModelHelperWidget.cxx
-  pqIntegrationModelHelperWidget.h
-  pqIntegrationModelSeedHelperWidget.cxx
-  pqIntegrationModelSeedHelperWidget.h
-  pqIntegrationModelSurfaceHelperWidget.cxx
-  pqIntegrationModelSurfaceHelperWidget.h)
+set(sources)
 
-paraview_plugin_add_property_widget(
-  KIND WIDGET
-  TYPE "integration_model_seed_helper_widget"
-  CLASS_NAME pqIntegrationModelSeedHelperWidget
-  INTERFACES pwi_interfaces
-  SOURCES pwi_sources)
-list(APPEND interfaces
-  ${pwi_interfaces})
-list(APPEND sources
-  ${pwi_sources})
+if (PARAVIEW_USE_QT)
+  list(APPEND sources
+    pqIntegrationModelHelperWidget.cxx
+    pqIntegrationModelHelperWidget.h
+    pqIntegrationModelSeedHelperWidget.cxx
+    pqIntegrationModelSeedHelperWidget.h
+    pqIntegrationModelSurfaceHelperWidget.cxx
+    pqIntegrationModelSurfaceHelperWidget.h)
 
-paraview_plugin_add_property_widget(
-  KIND WIDGET
-  TYPE "integration_model_surface_helper_widget"
-  CLASS_NAME pqIntegrationModelSurfaceHelperWidget
-  INTERFACES pwi_interfaces
-  SOURCES pwi_sources)
-list(APPEND interfaces
-  ${pwi_interfaces})
-list(APPEND sources
-  ${pwi_sources})
+  paraview_plugin_add_property_widget(
+    KIND WIDGET
+    TYPE "integration_model_seed_helper_widget"
+    CLASS_NAME pqIntegrationModelSeedHelperWidget
+    INTERFACES pwi_interfaces
+    SOURCES pwi_sources)
+  list(APPEND interfaces
+    ${pwi_interfaces})
+  list(APPEND sources
+    ${pwi_sources})
+
+  paraview_plugin_add_property_widget(
+    KIND WIDGET
+    TYPE "integration_model_surface_helper_widget"
+    CLASS_NAME pqIntegrationModelSurfaceHelperWidget
+    INTERFACES pwi_interfaces
+    SOURCES pwi_sources)
+  list(APPEND interfaces
+    ${pwi_interfaces})
+  list(APPEND sources
+    ${pwi_sources})
+endif()
 
 paraview_add_plugin(LagrangianParticleTracker
   REQUIRED_ON_SERVER
@@ -41,9 +45,14 @@ paraview_add_plugin(LagrangianParticleTracker
 target_link_libraries(LagrangianParticleTracker
   PRIVATE
     ParaView::RemotingServerManager
-    VTK::CommonCore
-    VTK::GUISupportQt)
+    VTK::CommonCore)
 
-if (BUILD_TESTING)
-  add_subdirectory(Testing)
-endif ()
+if (PARAVIEW_USE_QT)
+  target_link_libraries(LagrangianParticleTracker
+    PRIVATE
+      VTK::GUISupportQt)
+
+  if (BUILD_TESTING)
+    add_subdirectory(Testing)
+  endif ()
+endif()
