@@ -53,6 +53,7 @@ OPTIONAL_DEPENDS
   VTK::IOGDAL
   VTK::IOGeometry
   VTK::IOH5part
+  VTK::IOH5Rage
   VTK::IOInfovis
   VTK::IOIoss
   VTK::IOLAS

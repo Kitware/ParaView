@@ -448,6 +448,7 @@ paraview_require_module(
             VTK::IOCONVERGECFD
             VTK::IOIoss
             VTK::IOH5part
+            VTK::IOH5Rage
             VTK::IONetCDF
             VTK::IOOggTheora
             VTK::IOParallelExodus
