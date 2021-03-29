@@ -61,6 +61,8 @@ set(classes
   pqImageUtil
   pqInteractiveViewLink
   pqInterfaceTracker
+  pqLinkedObjectInterface
+  pqLinkedObjectQTextEdit
   pqLinkViewWidget
   pqLinksModel
   pqLogViewerWidget
@@ -112,6 +114,7 @@ set(classes
   pqSpreadSheetViewSelectionModel
   pqSpreadSheetViewWidget
   pqStandardServerManagerModelInterface
+  pqTextLinker
   pqTimeKeeper
   pqTreeLayoutStrategyInterface
   pqUndoStack

@@ -56,6 +56,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 QPointer<QWidget> pqCoreUtilities::MainWidget = nullptr;
 
+namespace
+{
+bool ApplicationIsRunningInDashboard()
+{
+  return vtksys::SystemTools::GetEnv("DASHBOARD_TEST_FROM_CTEST") != nullptr;
+}
+}
+
 //-----------------------------------------------------------------------------
 QWidget* pqCoreUtilities::findMainWindow()
 {
@@ -234,10 +242,11 @@ bool pqCoreUtilities::promptUser(const QString& settingsKey, QMessageBox::Icon i
   const QString& title, const QString& message, QMessageBox::StandardButtons buttons,
   QWidget* parentWdg)
 {
-  if (vtksys::SystemTools::GetEnv("DASHBOARD_TEST_FROM_CTEST") != nullptr)
+  if (::ApplicationIsRunningInDashboard())
   {
-    return true;
+    return QMessageBox::Save;
   }
+
   parentWdg = parentWdg ? parentWdg : pqCoreUtilities::mainWidget();
 
   pqSettings* settings = pqApplicationCore::instance()->settings();
@@ -278,6 +287,23 @@ bool pqCoreUtilities::promptUser(const QString& settingsKey, QMessageBox::Icon i
     default:
       return false;
   }
+}
+
+//-----------------------------------------------------------------------------
+QMessageBox::Button pqCoreUtilities::promptUserGeneric(const QString& title, const QString& message,
+  const QMessageBox::Icon icon, QMessageBox::StandardButtons buttons, QWidget* parentWidget)
+{
+  if (::ApplicationIsRunningInDashboard())
+  {
+    return QMessageBox::Save;
+  }
+
+  parentWidget = parentWidget ? parentWidget : pqCoreUtilities::mainWidget();
+
+  QMessageBox mbox(icon, title, message, buttons, parentWidget);
+  Q_UNUSED(mbox.exec());
+
+  return mbox.standardButton(mbox.clickedButton());
 }
 
 //-----------------------------------------------------------------------------

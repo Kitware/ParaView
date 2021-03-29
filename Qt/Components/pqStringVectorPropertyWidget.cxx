@@ -86,6 +86,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <cassert>
 
 #if VTK_MODULE_ENABLE_ParaView_pqPython
+#include "pqPythonScriptEditor.h"
 #include "pqPythonSyntaxHighlighter.h"
 #endif
 
@@ -386,10 +387,18 @@ pqStringVectorPropertyWidget::pqStringVectorPropertyWidget(
       vtkVLogF(PARAVIEW_LOG_APPLICATION_VERBOSITY(), "supports Python syntax highlighter.");
       auto highlighter = new pqPythonSyntaxHighlighter(textEdit, *textEdit);
       highlighter->ConnectHighligter();
+
+      QPushButton* pushButton = new QPushButton(this);
+      pushButton->setIcon(this->style()->standardIcon(QStyle::SP_TitleBarMaxButton));
+      this->connect(pushButton, &QPushButton::clicked, [textEdit]() {
+        pqPythonScriptEditor::linkTo(textEdit);
+        pqPythonScriptEditor::bringFront();
+      });
+      hbox->addWidget(pushButton);
+      vbox->addWidget(textEdit);
 #else
       vtkVLogF(
         PARAVIEW_LOG_APPLICATION_VERBOSITY(), "Python not enabled, no syntax highlighter support.");
-#endif
       pqPopOutWidget* popOut = new pqPopOutWidget(textEdit,
         QString("%1 - %2").arg(smProperty->GetParent()->GetXMLLabel(), smProperty->GetXMLLabel()),
         this);
@@ -397,6 +406,7 @@ pqStringVectorPropertyWidget::pqStringVectorPropertyWidget(
       popOut->setPopOutButton(popToDialogButton);
       hbox->addWidget(popToDialogButton);
       vbox->addWidget(popOut);
+#endif
     }
     else
     {
