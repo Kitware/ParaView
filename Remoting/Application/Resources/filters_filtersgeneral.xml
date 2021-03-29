@@ -1869,6 +1869,60 @@
     </SourceProxy>
 
     <!-- ==================================================================== -->
+    <SourceProxy
+        name="PerlinNoise"
+        class="vtkSampleImplicitFunctionFilter"
+        label="Perlin Noise">
+      <Documentation
+          short_help="Generate a Perlin noise point data array evaluated at points in a dataset."
+          long_help="Generates a Perlin noise point data array according to a deterministic
+          pseudo-random noise function based on the location of each point in the dataset."
+      </Documentation>
+      <InputProperty
+          name="Input"
+          command="SetInputConnection">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources"/>
+          <Group name="filters"/>
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkDataSet"/>
+        </DataTypeDomain>
+      </InputProperty>
+      <ProxyProperty
+          name="ImplicitFunction"
+          command="SetImplicitFunction">
+        <ProxyGroupDomain name="groups">
+          <Group name="implicit_functions" />
+        </ProxyGroupDomain>
+        <ProxyListDomain name="proxy_list">
+          <Proxy group="implicit_functions"
+                 name="PerlinNoise" />
+        </ProxyListDomain>
+      </ProxyProperty>
+      <StringVectorProperty
+          name="ScalarArrayName"
+          command="SetScalarArrayName"
+          number_of_elements="1"
+          default_values="PerlinNoise">
+        <Documentation>
+          Sets the name of the output noise array.
+        </Documentation>
+      </StringVectorProperty>
+      <IntVectorProperty
+          name="ComputeGradients"
+          command="SetComputeGradients"
+          number_of_elements="1"
+          default_values="0"
+          panel_visibility="never">
+        <Documentation>
+          The gradient is not implemented for Perlin noise.
+        </Documentation>
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+    </SourceProxy>
+
+    <!-- ==================================================================== -->
     <SourceProxy class="vtkWarpScalar"
                  label="Warp By Scalar"
                  name="WarpScalar">

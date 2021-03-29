@@ -281,6 +281,7 @@
   <Proxy group="filters" name="OverlappingCellsDetector" />
   <Proxy group="filters" name="OverlappingLevelIdScalars" />
   <Proxy group="filters" name="PCAStatistics" />
+  <Proxy group="filters" name="PerlinNoise" />
   <Proxy group="filters" name="PMergeConnected" />
   <Proxy group="filters" name="PVConnectivityFilter" />
   <Proxy group="filters" name="ParallelComputeMoments" />

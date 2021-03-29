@@ -478,5 +478,47 @@
     </Proxy>
 
     <!-- ================================================================== -->
+    <Proxy class="vtkPerlinNoise" name="PerlinNoise">
+      <InputProperty is_internal="1" name="Input" />
+      <DoubleVectorProperty
+          name="Frequency"
+          command="SetFrequency"
+          number_of_elements="3"
+          default_values="1 1 1">
+        <Documentation>
+          Set the frequency, or physical scale, of the noise function
+          (higher is finer scale).
+        </Documentation>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty
+          name="Phase"
+          command="SetPhase"
+          number_of_elements="3"
+          default_values="0 0 0">
+        <Documentation>
+          This parameter can be used to shift the noise function within
+          space (perhaps to avoid a beat with a noise pattern at another
+          scale). Phase tends to repeat about every unit, so a phase of
+          0.5 is a half-cycle shift.
+        </Documentation>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty
+          name="Amplitude"
+          command="SetAmplitude"
+          number_of_elements="1"
+          default_values="1">
+        <Documentation>
+          Amplitude can be negative. The noise function varies randomly
+          between -|Amplitude| and |Amplitude|.
+        </Documentation>
+      </DoubleVectorProperty>
+      <Hints>
+        <ProxyList>
+          <Link name="Input" with_property="Input" />
+        </ProxyList>
+      </Hints>
+    </Proxy>
+
+    <!-- ================================================================== -->
   </ProxyGroup>
 </ServerManagerConfiguration>
