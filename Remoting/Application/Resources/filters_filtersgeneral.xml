@@ -1874,9 +1874,10 @@
         class="vtkSampleImplicitFunctionFilter"
         label="Perlin Noise">
       <Documentation
-          short_help="Generate a Perlin noise point data array evaluated at points in a dataset."
-          long_help="Generates a Perlin noise point data array according to a deterministic
-          pseudo-random noise function based on the location of each point in the dataset."
+          long_help="Generate a Perlin noise point data array evaluated at points in a dataset."
+          short_help="Generate Perlin noise on a dataset.">
+          Generates a Perlin noise point data array according to a deterministic
+          pseudo-random noise function based on the location of each point in the dataset.
       </Documentation>
       <InputProperty
           name="Input"

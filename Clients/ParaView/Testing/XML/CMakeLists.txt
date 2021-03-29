@@ -684,6 +684,7 @@ SET(TESTS_WITH_BASELINES
   DataAxesGrid.xml
   MoleculeScalarBar.xml
   PassArrays.xml
+  PerlinNoise.xml
   SelectionByArray.xml
   SeriesPreset.xml
   SeriesPresetRegexp.xml
