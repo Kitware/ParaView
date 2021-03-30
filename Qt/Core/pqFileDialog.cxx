@@ -303,7 +303,6 @@ pqFileDialog::pqFileDialog(pqServer* server, QWidget* p, const QString& title,
   impl.Ui.FileName->setCompleter(impl.Completer);
 
   // this is the Navigate button, which is only shown when needed
-  // and that too in ExistingFilesAndDirectories and Directory mode alone.
   impl.Ui.Navigate->hide();
 
   QPixmap back = style()->standardPixmap(QStyle::SP_FileDialogBack);
@@ -538,15 +537,8 @@ void pqFileDialog::setFileMode(pqFileDialog::FileMode mode)
   }
   impl.Ui.Files->setSelectionMode(selectionMode);
 
-  if (mode == Directory || mode == ExistingFilesAndDirectories)
-  {
-    impl.Ui.Navigate->show();
-    impl.Ui.Navigate->setEnabled(false);
-  }
-  else
-  {
-    impl.Ui.Navigate->hide();
-  }
+  impl.Ui.Navigate->show();
+  impl.Ui.Navigate->setEnabled(false);
 }
 
 //-----------------------------------------------------------------------------
@@ -1304,31 +1296,22 @@ void pqFileDialog::updateButtonStates()
     impl.Ui.OK->setEnabled(true);
   }
 
-  if (impl.Mode == Directory || impl.Mode == ExistingFilesAndDirectories)
-  {
-    // show the Navigate button.
-    impl.Ui.Navigate->setVisible(true);
+  // show the Navigate button.
+  impl.Ui.Navigate->setVisible(true);
 
-    // let's see if the Navigate button should be enabled. If the Navigate
-    // button is enabled, it is also made the "default" button i.e. the button
-    // that's triggered when user this the "Enter" key. If Navigate is not
-    // enabled, then the OK button is the "default" button.
-    if (is_dir)
-    {
-      impl.Ui.OK->setDefault(false);
-      impl.Ui.Navigate->setEnabled(true);
-      impl.Ui.Navigate->setDefault(true);
-    }
-    else
-    {
-      impl.Ui.Navigate->setEnabled(false);
-      impl.Ui.Navigate->setDefault(false);
-      impl.Ui.OK->setDefault(true);
-    }
+  // let's see if the Navigate button should be enabled. If the Navigate
+  // button is enabled, it is also made the "default" button i.e. the button
+  // that's triggered when user this the "Enter" key. If Navigate is not
+  // enabled, then the OK button is the "default" button.
+  if (is_dir)
+  {
+    impl.Ui.OK->setDefault(false);
+    impl.Ui.Navigate->setEnabled(true);
+    impl.Ui.Navigate->setDefault(true);
   }
   else
   {
-    impl.Ui.Navigate->setVisible(false);
+    impl.Ui.Navigate->setEnabled(false);
     impl.Ui.Navigate->setDefault(false);
     impl.Ui.OK->setDefault(true);
   }
