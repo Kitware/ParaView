@@ -51,12 +51,12 @@ struct PQCORE_EXPORT pqLinkedObjectInterface
   /**
    * Default constructor
    */
-  pqLinkedObjectInterface() noexcept = default;
+  pqLinkedObjectInterface() = default;
 
   /**
    * Copy constructor needed for the clone method
    */
-  explicit pqLinkedObjectInterface(const pqLinkedObjectInterface&) noexcept = default;
+  explicit pqLinkedObjectInterface(const pqLinkedObjectInterface&) = default;
 
   /**
    * Default virtual destructor
