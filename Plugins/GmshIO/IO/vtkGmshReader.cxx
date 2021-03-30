@@ -28,6 +28,7 @@
 
 #include "gmsh.h"
 
+#include <array>
 #include <set>
 #include <unordered_map>
 #include <utility>
