@@ -306,14 +306,6 @@ vtkSMSourceProxy* pqSpreadSheetViewSelectionModel::getSelectionSource()
   // We may be able to simply update the currently existing selection, if any.
   bool updatable = (selsource != nullptr);
 
-  // If field types differ, not updatable.
-  if (updatable &&
-    pqSMAdaptor::getElementProperty(selsource->GetProperty("FieldType")).toInt() !=
-      selection_field_type)
-  {
-    updatable = false;
-  }
-
   // Determine what selection proxy name we want. If the name differs then not
   // updatable.
   const char* proxyname = "IDSelectionSource";
@@ -324,6 +316,14 @@ vtkSMSourceProxy* pqSpreadSheetViewSelectionModel::getSelectionSource()
   }
 
   if (updatable && strcmp(selsource->GetXMLName(), proxyname) != 0)
+  {
+    updatable = false;
+  }
+
+  // If field types differ, not updatable.
+  if (updatable &&
+    pqSMAdaptor::getElementProperty(selsource->GetProperty("FieldType")).toInt() !=
+      selection_field_type)
   {
     updatable = false;
   }
