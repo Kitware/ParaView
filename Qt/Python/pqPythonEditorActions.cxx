@@ -37,6 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPythonScriptEditor.h"
 #include "pqPythonTabWidget.h"
 #include "pqPythonTextArea.h"
+#include "pqQtDeprecated.h"
 
 #include <QFileDialog>
 #include <QKeySequence>
@@ -128,7 +129,7 @@ void pqPythonEditorActions::updateScriptsList()
 
   for (auto const& script : scripts)
   {
-    const QString filename = script.split(".", Qt::SkipEmptyParts).at(0);
+    const QString filename = script.split(".", PV_QT_SKIP_EMPTY_PARTS).at(0);
     this->ScriptActions.emplace_back(ScriptAction());
     const std::size_t position = this->ScriptActions.size() - 1;
     auto& actions = this->ScriptActions[position];
