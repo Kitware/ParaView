@@ -37,9 +37,16 @@ set(classes
   vtkCPPythonScriptV2Pipeline
   vtkCPPythonStringPipeline)
 
+set(sources)
+
 set(catalyst_fortran_using_mangling)
 
 if (CMAKE_Fortran_COMPILER_WORKS)
+  set(CMAKE_Fortran_MODULE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/Fortran")
+
+  list(APPEND sources
+    FortranPythonAdaptorAPI.f90)
+
   include(FortranCInterface)
   FortranCInterface_HEADER(FortranPythonAdaptorAPIMangling.h
     SYMBOLS
@@ -63,6 +70,7 @@ endif ()
 
 vtk_module_add_module(ParaView::PythonCatalyst
   CLASSES ${classes}
+  SOURCES ${sources}
   HEADERS ${headers})
 vtk_module_client_server_exclude()
 
@@ -70,4 +78,11 @@ if (catalyst_fortran_using_mangling)
   vtk_module_definitions(ParaView::PythonCatalyst
     PRIVATE
       CATALYST_FORTRAN_USING_MANGLING=1)
+endif ()
+
+if (CMAKE_Fortran_COMPILER_WORKS)
+  install(
+    DIRECTORY   "${CMAKE_Fortran_MODULE_DIRECTORY}/"
+    DESTINATION "${_vtk_build_HEADERS_DESTINATION}"
+    COMPONENT   "${_vtk_build_HEADERS_COMPONENT}")
 endif ()

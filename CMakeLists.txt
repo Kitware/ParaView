@@ -844,24 +844,6 @@ if (BUILD_TESTING AND PARAVIEW_INSTALL_DEVELOPMENT_FILES)
 endif()
 #------------------------------------------------------------------------------
 
-#------------------------------------------------------------------------------
-# Test to check that we can process all of the Catalyst editions
-#------------------------------------------------------------------------------
-if (BUILD_TESTING AND PARAVIEW_USE_PYTHON AND UNIX AND NOT APPLE)
-if (FALSE) # XXX(FIXME)
-  # disabling till we Catalyst editions are fixed post modularization
-  add_test( NAME GenerateCatalystEditions
-    COMMAND ${CMAKE_COMMAND}
-    -DPYTHON_EXECUTABLE:FILEPATH=${PYTHON_EXECUTABLE}
-    -DPARAVIEW_SOURCE_DIR:PATH=${CMAKE_SOURCE_DIR}
-    -DPARAVIEW_TEST_DIR:PATH=${CMAKE_BINARY_DIR}/Testing/Temporary
-    -P ${CMAKE_SOURCE_DIR}/CMake/ParaViewTestCatalystCodeGeneration.cmake)
-  set_tests_properties(GenerateCatalystEditions PROPERTIES
-    LABELS "paraview;catalyst")
-endif()
-endif()
-#------------------------------------------------------------------------------
-
 install(
   FILES       "${CMAKE_CURRENT_SOURCE_DIR}/Copyright.txt"
               "${CMAKE_CURRENT_SOURCE_DIR}/License_v1.2.txt"

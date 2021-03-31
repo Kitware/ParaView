@@ -28,6 +28,8 @@ Subroutine CoProcessPV
 ! 17.4d     05/15/2019   Andrew F Nelson replace timer with get_wtime
 !==============================================================================
 use metrics, only: get_wtime
+use catalyst
+use catalyst_python
 
 Implicit None
 
@@ -46,7 +48,8 @@ Real(kind=kreal), Allocatable, Dimension(:,:) :: avg
 Real(kind=ksngl), Allocatable, Dimension(:,:) :: avs
 Real(kind=ksngl), Allocatable, Dimension(:,:,:,:) :: XXs
 
-Integer :: doprocess, status
+Integer :: status
+logical :: doprocess
 
 Character(len=02) :: mtail
 Character(len=40) :: var_label
@@ -95,7 +98,7 @@ call get_wtime(sec0)
 
 ! One time initialize of coprocessor
 if(nfilet .eq. nfile0) then
-  Call CoProcessorInitializeWithPython(PVScript, LEN_TRIM(PVScript)) ! v4.3.1
+  Call catalyst_initialize_with_python(PVScript) ! v5.10.0
 endif
 
 ! One time create of coprocessor geometry
@@ -576,8 +579,8 @@ End Do ! Do m = 1,nmat-1
 
  CPtime = DBLE(nfilet) ! XML readers and writers work fine.  "time" is identical to nfilet and all Group files are read
 !CPtime = DBLE(t) ! XML writers fail to update the time after initialization, which confuses XML readers.
-Call RequestDataDescription(nfilet, CPtime, doprocess)
-Call CoProcess()
+doprocess = catalyst_request_data_description(nfilet, CPtime)
+Call catalyst_process()
 
 if (my_id .eq. 0) then
   INQUIRE(file='gp.tcsh', exist=file_exists)

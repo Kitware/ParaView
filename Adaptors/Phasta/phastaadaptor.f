@@ -33,8 +33,10 @@ c...==============================================================
 
       subroutine phastacoprocessor(itimestep, X, Y, compressibleflow)
       use pointer_data
+      use catalyst
       include "common.h"
-      integer iblk, nenl, npro, j, needflag
+      integer iblk, nenl, npro, j
+      logical needflag
       integer compressibleflow, itimestep
       dimension x(numnp,nsd), y(nshg,ndof)
 
@@ -43,15 +45,15 @@ c...==============================================================
          return
       endif
 c  First check if we even need to coprocess this time step/time
-      call requestdatadescription(itimestep, time, needflag)
-      if(needflag .eq. 0) then
+      needflag = catalyst_request_data_description(itimestep, time)
+      if(not needflag) then
 c  We don't need to do any coprocessing now so we can return
          return
       endif
 
 c  Check if we need to create the grid for the coprocessor
-      call needtocreategrid(needflag)
-      if(needflag .ne. 0) then
+      needflag = catalyst_need_to_create_grid()
+      if(needflag) then
 c     We do need the grid.
          call createpointsandallocatecells(numnp, X, numel)
 
@@ -65,7 +67,7 @@ c     We do need the grid.
 c  Inside addfields we check to see if we really need the field or not
       call addfields(nshg, ndof, Y, compressibleflow)
 
-      call coprocess()
+      call catalyst_process()
 
       return
       end

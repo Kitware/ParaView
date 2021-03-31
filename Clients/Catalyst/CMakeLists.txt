@@ -37,6 +37,7 @@ set(classes
   vtkCPPipeline
   vtkCPProcessor
   vtkCPXMLPWriterPipeline)
+set(sources)
 
 configure_file(
   "${CMAKE_CURRENT_SOURCE_DIR}/vtkCPConfig.h.in"
@@ -48,6 +49,11 @@ set(headers
 set(catalyst_fortran_using_mangling)
 
 if (CMAKE_Fortran_COMPILER_WORKS)
+  set(CMAKE_Fortran_MODULE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/Fortran")
+
+  list(APPEND sources
+    FortranAdaptorAPI.f90)
+
   include(FortranCInterface)
   FortranCInterface_HEADER(FortranAdaptorAPIMangling.h
     SYMBOLS
@@ -74,6 +80,7 @@ endif ()
 
 vtk_module_add_module(ParaView::Catalyst
   CLASSES ${classes}
+  SOURCES ${sources}
   HEADERS ${headers})
 vtk_module_client_server_exclude()
 vtk_module_link(ParaView::Catalyst
@@ -84,4 +91,11 @@ if (catalyst_fortran_using_mangling)
   vtk_module_definitions(ParaView::Catalyst
     PRIVATE
       CATALYST_FORTRAN_USING_MANGLING=1)
+endif ()
+
+if (CMAKE_Fortran_COMPILER_WORKS)
+  install(
+    DIRECTORY   "${CMAKE_Fortran_MODULE_DIRECTORY}/"
+    DESTINATION "${_vtk_build_HEADERS_DESTINATION}"
+    COMPONENT   "${_vtk_build_HEADERS_COMPONENT}")
 endif ()

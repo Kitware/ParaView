@@ -5,34 +5,36 @@ module CoProcessor
 contains
 
   subroutine initializecoprocessor()
+    use catalyst
+    use catalyst_python
     implicit none
     integer :: ilen, i
     character(len=200) :: arg
 
-    call coprocessorinitialize()
+    call catalyst_initialize()
     do i=1, iargc()
        call getarg(i, arg)
-       ilen = len_trim(arg)
-       arg(ilen+1:) = char(0)
-       call coprocessoraddpythonscript(arg, ilen)
+       call catalyst_add_python_script(arg)
     enddo
   end subroutine initializecoprocessor
 
   subroutine runcoprocessor(dimensions, step, time, x)
     use iso_c_binding
+    use catalyst
     implicit none
     integer, intent(in) :: dimensions(3), step
     real(kind=8), dimension(:), intent(in) :: x
     real(kind=8), intent(in) :: time
-    integer :: flag, extent(6)
+    integer :: extent(6)
+    logical :: flag
     real(kind=8), DIMENSION(:), allocatable :: xcp(:)
 
-    call requestdatadescription(step,time,flag)
-    if (flag .ne. 0) then
-       call needtocreategrid(flag)
+    flag = catalyst_request_data_description(step, time)
+    if (flag) then
+       flag = catalyst_need_to_create_grid()
        call getvtkextent(dimensions, extent)
 
-       if (flag .ne. 0) then
+       if (flag) then
           call createcpimagedata(dimensions, extent)
        end if
        ! x is the array with global values, we need just this process's
@@ -43,13 +45,14 @@ contains
        ! adding //char(0) appends the C++ terminating character
        ! to the Fortran array
        call addfield(xcp,"solution"//char(0))
-       call coprocess()
+       call catalyst_process()
        deallocate(xcp)
     end if
   end subroutine runcoprocessor
 
   subroutine finalizecoprocessor()
-    call coprocessorfinalize()
+    use catalyst
+    call catalyst_finalize()
   end subroutine finalizecoprocessor
 
   ! helper methods
