@@ -14,6 +14,7 @@ PURPOSE.  See the above copyright notice for more information.
 =========================================================================*/
 #include "vtkZSpaceInteractorStyle.h"
 
+#include "vtkCamera.h"
 #include "vtkCellData.h"
 #include "vtkCellPicker.h"
 #include "vtkCompositeDataSet.h"
@@ -47,6 +48,10 @@ vtkStandardNewMacro(vtkZSpaceInteractorStyle);
 //----------------------------------------------------------------------------
 vtkZSpaceInteractorStyle::vtkZSpaceInteractorStyle()
 {
+  // This is to ensure our events are processed before the other widgets events
+  // For example to hide the ray when moving a widget with the right button
+  this->SetPriority(1.0);
+
   vtkNew<vtkPolyDataMapper> pdm;
   this->PickActor->SetMapper(pdm);
   this->PickActor->GetProperty()->SetLineWidth(4);
@@ -148,7 +153,29 @@ void vtkZSpaceInteractorStyle::OnPositionProp3D(vtkEventData* edata)
       break;
   }
 }
+
 //----------------------------------------------------------------------------
+void vtkZSpaceInteractorStyle::OnSelect3D(vtkEventData* edata)
+{
+  vtkEventDataDevice3D* edd = edata->GetAsEventDataDevice3D();
+  this->CurrentRenderer = this->Interactor->GetRenderWindow()->GetRenderers()->GetFirstRenderer();
+  if (!edd || !this->CurrentRenderer)
+  {
+    return;
+  }
+
+  // This event is handled in some various widgets to move them
+  // But we want to disable the ray visibility during the interaction
+  switch (edd->GetAction())
+  {
+    case vtkEventDataAction::Press:
+      this->ZSpaceRayActor->SetVisibility(false);
+      break;
+    case vtkEventDataAction::Release:
+      this->ZSpaceRayActor->SetVisibility(true);
+      break;
+  }
+}
 
 //----------------------------------------------------------------------------
 // Interaction entry points
@@ -169,13 +196,13 @@ void vtkZSpaceInteractorStyle::EndPick(vtkEventDataDevice3D* edata)
   vtkDebugMacro("End Pick");
 
   // perform probe
-  this->ProbeData();
+  this->ProbeData(edata);
   this->State = VTKIS_NONE;
   this->UpdateRay(edata);
 }
 
 //----------------------------------------------------------------------------
-bool vtkZSpaceInteractorStyle::HardwareSelect()
+bool vtkZSpaceInteractorStyle::HardwareSelect(const double p0[3])
 {
   vtkDebugMacro("Hardware Select");
 
@@ -184,7 +211,7 @@ bool vtkZSpaceInteractorStyle::HardwareSelect()
     return false;
   }
 
-  this->ZSpaceView->SelectWithRay(this->InteractionProp);
+  this->ZSpaceView->SelectWithRay(p0);
 
   return true;
 }
@@ -220,14 +247,22 @@ void vtkZSpaceInteractorStyle::EndPositionProp(vtkEventDataDevice3D* vtkNotUsed(
 //----------------------------------------------------------------------------
 // Interaction methods
 //----------------------------------------------------------------------------
-void vtkZSpaceInteractorStyle::ProbeData()
+void vtkZSpaceInteractorStyle::ProbeData(vtkEventDataDevice3D* edata)
 {
   vtkDebugMacro("Probe Data");
 
-  // Invoke start pick method if defined
-  this->InvokeEvent(vtkCommand::StartPickEvent, nullptr);
+  if (!edata)
+  {
+    return;
+  }
 
-  if (!this->HardwareSelect())
+  // Invoke start pick method if defined
+  this->InvokeEvent(vtkCommand::StartPickEvent, edata);
+
+  double pos[3];
+  edata->GetWorldPosition(pos);
+
+  if (!this->HardwareSelect(pos))
   {
     return;
   }
@@ -297,12 +332,7 @@ void vtkZSpaceInteractorStyle::PositionProp(
   {
     return;
   }
-
-  // PVRenderView does not support vtkRenderWindowInteractor3D for instance
-  // So give to the InteractorStyle3D the stored LastWorldEventPosition
-  // and LastWorldEventOrientation
-  this->Superclass::PositionProp(ed, this->ZSpaceView->GetLastWorldEventPosition(),
-    this->ZSpaceView->GetLastWorldEventOrientation());
+  this->Superclass::PositionProp(ed);
 }
 
 //----------------------------------------------------------------------------
@@ -355,7 +385,10 @@ void vtkZSpaceInteractorStyle::UpdateRay(vtkEventDataDevice3D* edata)
   stylusT->Translate(p0);
   stylusT->RotateWXYZ(wxyz[0], wxyz[1], wxyz[2], wxyz[3]);
 
-  double rayLength = this->RayMaxLength;
+  // The maximum ray length is the camera zfar
+  const double rayMaxLength = this->ZSpaceView->GetActiveCamera()->GetClippingRange()[1];
+
+  double rayLength = rayMaxLength;
   if (this->State == VTKIS_POSITION_PROP)
   {
     rayLength = this->ZSpaceRayActor->GetLength();
@@ -374,7 +407,7 @@ void vtkZSpaceInteractorStyle::UpdateRay(vtkEventDataDevice3D* edata)
     }
   }
 
-  if (rayLength == this->RayMaxLength)
+  if (rayLength == rayMaxLength)
   {
     this->ZSpaceRayActor->SetNoPick();
   }

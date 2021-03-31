@@ -45,17 +45,9 @@ public:
   virtual vtkMatrix4x4* GetProjectionTransformMatrix(
     double aspect, double nearz, double farz) override;
 
-  /**
-   * Set the zSpaceSDKManager used to get the custom zSpace
-   * view and projection matrix.
-   */
-  vtkSetMacro(ZSpaceSDKManager, vtkZSpaceSDKManager*);
-
 protected:
   vtkZSpaceCamera() = default;
   ~vtkZSpaceCamera() override = default;
-
-  vtkZSpaceSDKManager* ZSpaceSDKManager;
 
 private:
   vtkZSpaceCamera(const vtkZSpaceCamera&) = delete;

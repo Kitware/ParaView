@@ -3,7 +3,8 @@ set(classes
   vtkZSpaceRayActor
   vtkZSpaceSDKManager
   vtkZSpaceInteractorStyle
-  vtkZSpaceCamera)
+  vtkZSpaceCamera
+  vtkZSpaceRenderWindowInteractor)
 
 vtk_module_find_package(
   PACKAGE zSpace)

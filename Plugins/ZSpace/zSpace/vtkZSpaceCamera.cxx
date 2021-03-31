@@ -32,9 +32,11 @@ void vtkZSpaceCamera::PrintSelf(ostream& os, vtkIndent indent)
 //------------------------------------------------------------------------------
 vtkMatrix4x4* vtkZSpaceCamera::GetModelViewTransformMatrix()
 {
+  vtkZSpaceSDKManager* sdkManager = vtkZSpaceSDKManager::GetInstance();
+
   vtkMatrix4x4* zSpaceViewMatrix = this->GetStereo()
-    ? this->ZSpaceSDKManager->GetStereoViewMatrix(this->GetLeftEye())
-    : this->ZSpaceSDKManager->GetCenterEyeViewMatrix();
+    ? sdkManager->GetStereoViewMatrix(this->GetLeftEye())
+    : sdkManager->GetCenterEyeViewMatrix();
 
   this->ViewTransform->SetMatrix(zSpaceViewMatrix);
 
@@ -50,8 +52,10 @@ vtkMatrix4x4* vtkZSpaceCamera::GetModelViewTransformMatrix()
 vtkMatrix4x4* vtkZSpaceCamera::GetProjectionTransformMatrix(
   double vtkNotUsed(aspect), double vtkNotUsed(nearz), double vtkNotUsed(farz))
 {
+  vtkZSpaceSDKManager* sdkManager = vtkZSpaceSDKManager::GetInstance();
+
   vtkMatrix4x4* zSpaceProjectionMatrix = this->GetStereo()
-    ? this->ZSpaceSDKManager->GetStereoProjectionMatrix(this->GetLeftEye())
-    : this->ZSpaceSDKManager->GetCenterEyeProjectionMatrix();
+    ? sdkManager->GetStereoProjectionMatrix(this->GetLeftEye())
+    : sdkManager->GetCenterEyeProjectionMatrix();
   return zSpaceProjectionMatrix;
 }

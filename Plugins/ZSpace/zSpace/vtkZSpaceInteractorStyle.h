@@ -69,6 +69,7 @@ public:
   void OnPick3D(vtkEventData* edata) override;
   void OnPositionProp3D(vtkEventData* edata) override;
   void OnMove3D(vtkEventData* edata) override;
+  void OnSelect3D(vtkEventData* edata) override;
   //@}
 
   //@{
@@ -85,7 +86,7 @@ public:
   /**
    * Methods for interaction.
    */
-  void ProbeData();
+  void ProbeData(vtkEventDataDevice3D*);
   virtual void PositionProp(vtkEventData*, double* lwpos = nullptr, double* lwori = nullptr);
   //@}
 
@@ -117,12 +118,6 @@ public:
    */
   vtkSetMacro(ZSpaceView, vtkPVZSpaceView*);
 
-  /**
-   * Set the ray maximum length. This is given by vtkPVZSpaceView depending
-   * on the viewer scale.
-   */
-  vtkSetMacro(RayMaxLength, double);
-
 protected:
   vtkZSpaceInteractorStyle();
   ~vtkZSpaceInteractorStyle() override;
@@ -145,7 +140,7 @@ protected:
    * Delegate the selection to the PVHardwareSelector of ZSpaceView. If
    * something is picked, this->InteractionProp contains the picked actor.
    */
-  bool HardwareSelect();
+  bool HardwareSelect(const double p0[3]);
 
   /**
    * From the selection 'sel', find the corresponding dataset 'ds' and the point/cell id 'aid'.
@@ -180,7 +175,6 @@ protected:
   void RemovePickActor();
 
   bool InteractivePicking = true;
-  double RayMaxLength = 80.0;
 
   // Used to draw picked cells or points
   vtkNew<vtkActor> PickActor;
