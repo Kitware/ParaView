@@ -1141,7 +1141,7 @@ bool vtkSMSettings::SaveSettingsToFile(const std::string& filePath)
   {
     // No settings to save, so we'll always succeed.
     vtkVLogIfF(PARAVIEW_LOG_APPLICATION_VERBOSITY(),
-      (this->Internal->SettingCollections.size() != 0 && this->Internal->IsModified == false),
+      (!this->Internal->SettingCollections.empty() && this->Internal->IsModified == false),
       "settings not modified, hence not saved.");
     vtkVLogIfF(PARAVIEW_LOG_APPLICATION_VERBOSITY(), (this->Internal->SettingCollections.empty()),
       "settings empty, hence not saved.");

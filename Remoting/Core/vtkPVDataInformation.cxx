@@ -1156,7 +1156,7 @@ vtkSmartPointer<vtkDataObject> vtkPVDataInformation::GetSubset(vtkDataObject* do
 
   const auto cids = vtkDataAssemblyUtilities::GetSelectedCompositeIds(
     { this->SubsetSelector }, activeAssembly, vtkPartitionedDataSetCollection::SafeDownCast(cd));
-  if (cids.size() == 0)
+  if (cids.empty())
   {
     return nullptr;
   }
