@@ -41,7 +41,6 @@ template <>
 inline void pqPythonTabWidget::linkTo<QTextEdit>(QTextEdit* obj)
 {
   const auto FindLinkedWidget = [this](const QObject* obj) -> pqPythonTextArea* {
-    pqPythonTextArea* linkedWidget = nullptr;
     for (int i = 0; i < this->count() - 1; ++i)
     {
       pqPythonTextArea* widget = this->getWidget<pqPythonTextArea>(i);
