@@ -5,7 +5,6 @@ bugprone-*,\
 -bugprone-argument-comment,\
 -bugprone-branch-clone,\
 -bugprone-incorrect-roundings,\
--bugprone-integer-division,\
 -bugprone-macro-parentheses,\
 -bugprone-misplaced-widening-cast,\
 -bugprone-narrowing-conversions,\
