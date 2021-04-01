@@ -466,12 +466,12 @@ vtkSmartPointer<vtkDataSet> vtkResampleToHyperTreeGrid::BroadcastHyperTreeOwners
     boundingBoxes[i].SetBounds(bounds);
     for (std::size_t bidx = 0; bidx < 6; ++bidx)
     {
-      double size = this->Bounds[2 * (bidx / 2) + 1] - this->Bounds[2 * (bidx / 2)];
-      bounds[bidx] = this->Bounds[2 * (bidx / 2)] +
-        size *
-          std::max(0, static_cast<int>(std::floor(
-                        (bounds[bidx] - this->Bounds[2 * (bidx / 2)]) * dim[bidx / 2] / size))) /
-          dim[bidx / 2];
+      const std::size_t halfBidx = bidx / 2;
+      double size = this->Bounds[2 * halfBidx + 1] - this->Bounds[2 * halfBidx];
+      bounds[bidx] = this->Bounds[2 * halfBidx] +
+        size * std::max(0, static_cast<int>(std::floor(
+                             (bounds[bidx] - this->Bounds[2 * halfBidx]) * dim[halfBidx] / size))) /
+          dim[halfBidx];
     }
     for (std::size_t bidx = 1; bidx < 6; bidx += 2)
     {

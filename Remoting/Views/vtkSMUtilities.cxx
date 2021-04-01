@@ -208,7 +208,7 @@ vtkPoints* vtkSMUtilities::CreateOrbit(
   vtkMath::Normalize(normal);
   vtkTransform* transform = vtkTransform::New();
   transform->Identity();
-  transform->RotateWXYZ(360 / resolution, normal);
+  transform->RotateWXYZ(360.0 / resolution, normal);
 
   // Setup initial point location
   double point[3];
