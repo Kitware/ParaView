@@ -701,8 +701,8 @@ vtkIdType* vtkAMRDualClipLocator::GetEdgePointer(int xCell, int yCell, int zCell
       return this->ZEdges + (xp0 + (yp0 * this->YIncrement) + (zp0 * this->ZIncrement));
     }
     default:
-      assert(0 && "Invalid edge index.");
-      return 0;
+      assert(false && "Invalid edge index.");
+      return nullptr;
   }
 }
 
