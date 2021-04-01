@@ -47,13 +47,6 @@ vtkStandardNewMacro(vtkZSpaceInteractorStyle);
 //----------------------------------------------------------------------------
 vtkZSpaceInteractorStyle::vtkZSpaceInteractorStyle()
 {
-  // Map controller inputs to interaction states
-  this->MapInputToAction(
-    vtkEventDataDevice::LeftController, vtkEventDataDeviceInput::Trigger, VTKIS_PICK);
-
-  this->MapInputToAction(
-    vtkEventDataDevice::GenericTracker, vtkEventDataDeviceInput::Trigger, VTKIS_POSITION_PROP);
-
   vtkNew<vtkPolyDataMapper> pdm;
   this->PickActor->SetMapper(pdm);
   this->PickActor->GetProperty()->SetLineWidth(4);
@@ -111,7 +104,7 @@ void vtkZSpaceInteractorStyle::OnMove3D(vtkEventData* edata)
 }
 
 //----------------------------------------------------------------------------
-void vtkZSpaceInteractorStyle::OnButton3D(vtkEventData* edata)
+void vtkZSpaceInteractorStyle::OnPick3D(vtkEventData* edata)
 {
   vtkEventDataDevice3D* edd = edata->GetAsEventDataDevice3D();
   this->CurrentRenderer = this->Interactor->GetRenderWindow()->GetRenderers()->GetFirstRenderer();
@@ -120,11 +113,30 @@ void vtkZSpaceInteractorStyle::OnButton3D(vtkEventData* edata)
     return;
   }
 
-  this->State = this->GetStateByReference(edd->GetDevice(), edd->GetInput());
-  if (this->State == VTKIS_NONE)
+  this->State = VTKIS_PICK;
+
+  switch (edd->GetAction())
+  {
+    case vtkEventDataAction::Press:
+      this->StartAction(this->State, edd);
+      break;
+    case vtkEventDataAction::Release:
+      this->EndAction(this->State, edd);
+      break;
+  }
+}
+
+//----------------------------------------------------------------------------
+void vtkZSpaceInteractorStyle::OnPositionProp3D(vtkEventData* edata)
+{
+  vtkEventDataDevice3D* edd = edata->GetAsEventDataDevice3D();
+  this->CurrentRenderer = this->Interactor->GetRenderWindow()->GetRenderers()->GetFirstRenderer();
+  if (!edd || !this->CurrentRenderer)
   {
     return;
   }
+
+  this->State = VTKIS_POSITION_PROP;
 
   switch (edd->GetAction())
   {
@@ -200,6 +212,7 @@ void vtkZSpaceInteractorStyle::StartPositionProp(vtkEventDataDevice3D* edata)
 void vtkZSpaceInteractorStyle::EndPositionProp(vtkEventDataDevice3D* vtkNotUsed(edata))
 {
   vtkDebugMacro("End Position Prop");
+
   this->State = VTKIS_NONE;
   this->InteractionProp = nullptr;
 }
@@ -295,34 +308,6 @@ void vtkZSpaceInteractorStyle::PositionProp(
 //----------------------------------------------------------------------------
 // Utility routines
 //----------------------------------------------------------------------------
-
-//----------------------------------------------------------------------------
-inline int& vtkZSpaceInteractorStyle::GetStateByReference(
-  const vtkEventDataDevice& device, const vtkEventDataDeviceInput& input)
-{
-  return this
-    ->InputMap[static_cast<int>(device) * vtkEventDataNumberOfInputs + static_cast<int>(input)];
-}
-
-//----------------------------------------------------------------------------
-void vtkZSpaceInteractorStyle::MapInputToAction(
-  vtkEventDataDevice device, vtkEventDataDeviceInput input, int state)
-{
-  if (input >= vtkEventDataDeviceInput::NumberOfInputs || state < VTKIS_NONE)
-  {
-    return;
-  }
-
-  int& storedState = this->GetStateByReference(device, input);
-  if (storedState == state)
-  {
-    return;
-  }
-
-  storedState = state;
-
-  this->Modified();
-}
 
 //----------------------------------------------------------------------------
 void vtkZSpaceInteractorStyle::StartAction(int state, vtkEventDataDevice3D* edata)
@@ -552,6 +537,10 @@ std::string vtkZSpaceInteractorStyle::GetPickedText(vtkDataSet* ds, const vtkIdT
       if (array->GetNumberOfComponents() > 1)
       {
         ssPickedText << ")\n";
+      }
+      else
+      {
+        ssPickedText << "\n";
       }
     }
   }
