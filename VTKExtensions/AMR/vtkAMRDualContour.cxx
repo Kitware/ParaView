@@ -368,7 +368,7 @@ vtkIdType* vtkAMRDualContourEdgeLocator::GetEdgePointer(
       return this->ZEdges + (xp0 + (yp0 * this->YIncrement) + (zp0 * this->ZIncrement));
     }
     default:
-      assert(nullptr && "Invalid edge index.");
+      assert(false && "Invalid edge index.");
       return nullptr;
   }
 }
