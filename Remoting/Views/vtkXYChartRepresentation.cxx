@@ -377,6 +377,7 @@ void vtkXYChartRepresentation::PrepareForRendering()
   // Update plots. This will create new vtkPlot if needed.
   this->Internals->UpdatePlots(this, tables);
   this->Internals->UpdatePlotProperties(this);
+
   assert(this->UseIndexForXAxis == true || this->XAxisSeriesName != nullptr);
 }
 

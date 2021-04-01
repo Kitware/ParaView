@@ -60,11 +60,11 @@ public:
   }
 
   vtkPlot* NewPlot(vtkXYChartRepresentation* self, const std::string& tableName,
-    const std::string& columnName, const std::string& role) override
+    const std::string& columnName, const std::string& role, unsigned int block = 0) override
   {
     if (role == "minmax" || role == "q1q3")
     {
-      vtkPlot* plot = this->Superclass::NewPlot(self, tableName, columnName, role);
+      vtkPlot* plot = this->Superclass::NewPlot(self, tableName, columnName, role, block);
       if (vtkPlotArea* aplot = vtkPlotArea::SafeDownCast(plot))
       {
         aplot->SetLegendVisibility(false);
@@ -78,7 +78,7 @@ public:
       vtkChartXY* chartXY = self->GetChart();
 
       assert(chartXY);
-      return chartXY->AddPlot(vtkChart::LINE);
+      return chartXY->AddPlot(vtkChart::LINE, block);
     }
     return nullptr;
   }
@@ -277,7 +277,7 @@ void vtkQuartileChartRepresentation::PrepareForRendering()
   this->HasOnlyOnePoint = false;
   for (auto itr = tables.begin(); itr != tables.end(); ++itr)
   {
-    vtkTable* table = itr->second;
+    vtkTable* table = itr->second.first;
     vtkAbstractArray* column = table->GetColumnByName("N");
     if (column)
     {

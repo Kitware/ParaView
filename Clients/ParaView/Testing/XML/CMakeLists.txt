@@ -335,6 +335,8 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/Molecule-BallStick.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/Molecule-Custom.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/Molecule-Liquorice.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/MultiBlockChartSelectionPlotView.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/MultiBlockChartSelectionRenderView.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/MultiBlockInspectorSelection-SelectBlock2.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/MultiBlockInspectorSelection-SelectElementBlocks.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/MultiBlockInspectorSelection-HideBlock1.png}"
@@ -635,6 +637,7 @@ SET (TESTS_WITH_INLINE_COMPARES
   # selection in the MB-inspector right now.
   # (see #20525)
   # MultiBlockInspectorSelection.xml
+  MultiBlockChartSelection.xml
   NestedViews.xml
   NonlinearSubdivisionDisplay.xml
   PartitionedDataSet.xml
@@ -1543,6 +1546,10 @@ IF (PARAVIEW_USE_MPI)
   set (LineChartSelection_DISABLE_CS TRUE)
   set (LineChartSelection_DISABLE_CRS TRUE)
 
+  # For the same reasons
+  set (MultiBlockChartSelection_DISABLE_CS TRUE)
+  set (MultiBlockChartSelection_DISABLE_CRS TRUE)
+
   # Selection link may highlight incorrect ID in parallel,
   # hence disable them.
   set(SelectionLinkBasic_DISABLE_CS TRUE)
@@ -1634,6 +1641,7 @@ SET (CutMulti_REVERSE_CONNECT TRUE)
 # Since this involves charts.
 SET(HistogramSelection_THRESHOLD 40)
 SET(LineChartSelection_THRESHOLD 40)
+SET(MultiBlockChartSelection_THRESHOLD 40)
 
 # Increate threshold for this one since the chart axes
 # tends to render slightly differently.

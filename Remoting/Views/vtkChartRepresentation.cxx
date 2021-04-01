@@ -361,7 +361,7 @@ bool vtkChartRepresentation::GetLocalOutput(vtkChartRepresentation::MapOfTables&
         stream << "[" << iter->GetCurrentFlatIndex() << "]";
       }
       assert(tables.find(stream.str()) == tables.end());
-      tables[stream.str()] = table;
+      tables[stream.str()] = { table, iter->GetCurrentFlatIndex() };
     }
   }
 

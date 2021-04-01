@@ -232,7 +232,7 @@ protected:
    */
   virtual vtkSmartPointer<vtkDataObject> TransformTable(vtkSmartPointer<vtkDataObject> table);
 
-  typedef std::map<std::string, vtkSmartPointer<vtkTable> > MapOfTables;
+  typedef std::map<std::string, std::pair<vtkSmartPointer<vtkTable>, unsigned int> > MapOfTables;
   /**
    * Convenience method to get all vtkTable instances with their associated
    * names.

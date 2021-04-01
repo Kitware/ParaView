@@ -39,6 +39,14 @@
 class vtkXYChartRepresentation::vtkInternals
 {
 protected:
+  struct TableInfo
+  {
+    std::string TableName;
+    std::string ColumnName;
+    std::string Role;
+    unsigned int Block;
+  };
+
   struct PlotInfo
   {
     vtkSmartPointer<vtkPlot> Plot;
@@ -250,7 +258,7 @@ public:
    * Add new plot
    */
   virtual vtkPlot* NewPlot(vtkXYChartRepresentation* self, const std::string& tableName,
-    const std::string& columnName, const std::string& role)
+    const std::string& columnName, const std::string& role, unsigned int block = 0)
   {
     (void)tableName;
     (void)columnName;
@@ -260,7 +268,7 @@ public:
     vtkChartXY* chartXY = self->GetChart();
 
     assert(chartXY);
-    return chartXY->AddPlot(self->GetChartType());
+    return chartXY->AddPlot(self->GetChartType(), block);
   }
 
   //---------------------------------------------------------------------------
@@ -280,12 +288,12 @@ public:
     assert(self != nullptr);
     vtkChartXY* chartXY = self->GetChart();
     this->RemoveAllPlots(chartXY);
-    std::multimap<int, std::pair<vtkTable*, std::array<std::string, 3> > > orderMap;
+    std::multimap<int, std::pair<vtkTable*, TableInfo> > orderMap;
     for (MapOfTables::const_iterator tablesIter = tables.begin(); tablesIter != tables.end();
          ++tablesIter)
     {
       const std::string& tableName = tablesIter->first;
-      vtkTable* table = tablesIter->second.GetPointer();
+      vtkTable* table = tablesIter->second.first.GetPointer();
       vtkIdType numCols = table->GetNumberOfColumns();
       for (vtkIdType cc = 0; cc < numCols; ++cc)
       {
@@ -299,11 +307,12 @@ public:
             this->GetSeriesParameter(self, tableName, columnName, role, this->SeriesOrder, -1);
 
           // store all info in a (sorted) map
-          std::array<std::string, 3> mapValue;
-          mapValue[0] = tableName;
-          mapValue[1] = columnName;
-          mapValue[2] = role;
-          orderMap.insert(std::make_pair(order, std::make_pair(table, mapValue)));
+          TableInfo info;
+          info.TableName = tableName;
+          info.ColumnName = columnName;
+          info.Role = role;
+          info.Block = tablesIter->second.second;
+          orderMap.insert(std::make_pair(order, std::make_pair(tablesIter->second.first, info)));
         }
       }
     }
@@ -312,15 +321,14 @@ public:
     for (auto it = orderMap.begin(); it != orderMap.end(); ++it)
     {
       vtkTable* table = it->second.first;
-      const std::string& tableName = it->second.second[0];
-      const std::string& columnName = it->second.second[1];
-      const std::string& role = it->second.second[2];
+      const TableInfo& info = it->second.second;
 
-      vtkSmartPointer<vtkPlot> plot = this->SeriesPlots.GetPlot(self, tableName, columnName, role);
+      vtkSmartPointer<vtkPlot> plot =
+        this->SeriesPlots.GetPlot(self, info.TableName, info.ColumnName, info.Role);
       if (!plot)
       {
         // Create the plot in the right order
-        plot = this->NewPlot(self, tableName, columnName, role);
+        plot = this->NewPlot(self, info.TableName, info.ColumnName, info.Role, info.Block);
         if (!plot)
         {
           continue;
@@ -329,9 +337,10 @@ public:
       plot->SetInputData(table);
       plot->SetUseIndexForXSeries(self->GetUseIndexForXAxis());
       plot->SetInputArray(0, self->GetXAxisSeriesName());
-      plot->SetInputArray(this->GetInputArrayIndex(tableName, columnName, role), columnName);
-      this->SeriesPlots.AddPlot(self, tableName, columnName, role, plot);
-      newPlots.AddPlot(self, tableName, columnName, role, plot);
+      plot->SetInputArray(
+        this->GetInputArrayIndex(info.TableName, info.ColumnName, info.Role), info.ColumnName);
+      this->SeriesPlots.AddPlot(self, info.TableName, info.ColumnName, info.Role, plot);
+      newPlots.AddPlot(self, info.TableName, info.ColumnName, info.Role, plot);
     }
 
     // Remove any plots in this->SeriesPlots that are not in newPlots.
