@@ -316,6 +316,7 @@ void pqApplyBehavior::showData(pqPipelineSource* source, pqView* view)
 
     // reset interaction mode for render views. Not a huge fan, but we'll fix
     // this some other time.
+    // @sa `pqPipelineBrowserWidget` for BUG #20521 fix.
     if (pqRenderView* rview = qobject_cast<pqRenderView*>(pqPreferredView))
     {
       if (rview->getNumberOfVisibleDataRepresentations() == 1)

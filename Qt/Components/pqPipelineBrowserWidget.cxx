@@ -41,6 +41,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPipelineModel.h"
 #include "pqPipelineModelSelectionAdaptor.h"
 #include "pqPipelineSource.h"
+#include "pqRenderView.h"
 #include "pqServer.h"
 #include "pqServerManagerModel.h"
 #include "pqUndoStack.h"
@@ -352,6 +353,8 @@ void pqPipelineBrowserWidget::setVisibility(bool visible, pqOutputPort* port)
         // and also add it to layout.
         viewProxy = vtkSMViewProxy::FindView(repr);
         controller->AssignViewToLayout(viewProxy, activeLayout, location);
+        activeView =
+          pqApplicationCore::instance()->getServerManagerModel()->findItem<pqView*>(viewProxy);
       }
 
       // assign to layout, in case a new view is created.
@@ -385,6 +388,13 @@ void pqPipelineBrowserWidget::setVisibility(bool visible, pqOutputPort* port)
                       << std::endl;
           }
         }
+      }
+
+      // BUG #20521. Toggle interaction mode for 3D views; @sa pqApplyBehavior.
+      auto rview = qobject_cast<pqRenderView*>(activeView);
+      if (visible && rview != nullptr && rview->getNumberOfVisibleDataRepresentations() == 1)
+      {
+        rview->updateInteractionMode(port);
       }
     }
   }
