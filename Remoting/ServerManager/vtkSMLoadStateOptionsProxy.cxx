@@ -28,14 +28,18 @@
 #include "vtkSMProxyManager.h"
 #include "vtkSMSessionProxyManager.h"
 #include "vtkSMTrace.h"
-#include "vtksys/SystemTools.hxx"
+
 #include <vtk_pugixml.h>
+#include <vtksys/RegularExpression.hxx>
+#include <vtksys/SystemTools.hxx>
 
 using namespace vtksys;
 
 #include <algorithm>
+#include <fstream>
 #include <set>
 #include <sstream>
+#include <streambuf>
 
 //---------------------------------------------------------------------------
 class vtkSMLoadStateOptionsProxy::vtkInternals
@@ -192,13 +196,59 @@ vtkPVXMLElement* ConvertXML(vtkPVXMLParser* parser, pugi::xml_node& node)
   parser->Parse(ss.str().c_str());
   return parser->GetRootElement();
 }
+
+// Read contents of a file.
+std::string GetContents(std::ifstream& ifp)
+{
+  std::string str;
+  ifp.seekg(0, std::ios::end);
+  str.reserve(ifp.tellg());
+  ifp.seekg(0, std::ios::beg);
+
+  str.assign((std::istreambuf_iterator<char>(ifp)), std::istreambuf_iterator<char>());
+  return str;
+}
+
+// Replace all "$FOO" with environment variable values, if present. Otherwise
+// they are left unchanged.
+void ReplaceEnvironmentVariables(std::string& contents)
+{
+  std::map<std::string, std::string> varmap;
+  vtksys::RegularExpression regex("\\$([a-zA-Z0-9_-]+)");
+  size_t pos = 0;
+  if (pos < contents.size() && regex.find(contents.c_str() + pos))
+  {
+    std::string envvalue;
+    if (vtksys::SystemTools::GetEnv(regex.match(1), envvalue))
+    {
+      varmap.insert(std::make_pair(regex.match(0), envvalue));
+    }
+    pos = regex.end();
+  }
+
+  for (const auto& pair : varmap)
+  {
+    vtksys::SystemTools::ReplaceString(contents, pair.first, pair.second);
+  }
+}
 }
 
 //----------------------------------------------------------------------------
 bool vtkSMLoadStateOptionsProxy::PrepareToLoad(const char* statefilename)
 {
   this->SetStateFileName(statefilename);
-  pugi::xml_parse_result result = this->Internals->StateXML.load_file(statefilename);
+
+  std::ifstream xmlfile(statefilename);
+  if (!xmlfile.is_open())
+  {
+    vtkErrorMacro("Failed to open state file '" << statefilename << "'.");
+    return false;
+  }
+
+  auto contents = ::GetContents(xmlfile);
+  ::ReplaceEnvironmentVariables(contents);
+
+  pugi::xml_parse_result result = this->Internals->StateXML.load_string(contents.c_str());
 
   if (!result)
   {

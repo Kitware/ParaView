@@ -1782,13 +1782,13 @@ paraview_add_cave_tests(2 "${CMAKE_CURRENT_SOURCE_DIR}/LeftRight.pvx"
 if (TARGET ParaView::paraview)
   # The state file need to point to the correct data file. We do that by
   # configuring the state file.
-  configure_file (
-    "${CMAKE_CURRENT_SOURCE_DIR}/exodusStateFile.3.14.1.pvsm.in"
-    "${CMAKE_CURRENT_BINARY_DIR}/exodusStateFile.3.14.1.pvsm" @ONLY)
   paraview_add_client_tests(
-    ARGS "--state=${CMAKE_CURRENT_BINARY_DIR}/exodusStateFile.3.14.1.pvsm"
+    ARGS "--state=${CMAKE_CURRENT_SOURCE_DIR}/exodusStateFile.3.14.1.pvsm"
     BASELINE_DIR ${PARAVIEW_TEST_BASELINE_DIR}
-    TEST_SCRIPTS LoadExodusStateFile.xml)
+    TEST_SCRIPTS LoadExodusStateFile.xml
+    ENVIRONMENT
+      PARAVIEW_DATA_ROOT=${paraview_test_data_directory_output}
+  )
 
   paraview_add_client_tests(
     ARGS "--state=${CMAKE_CURRENT_SOURCE_DIR}/boxClip.5.6.pvsm"
