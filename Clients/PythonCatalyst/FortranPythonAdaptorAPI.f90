@@ -19,7 +19,7 @@ module catalyst_python
 
 interface
     subroutine coprocessorinitializewithpython(file_name, length) bind(C, name='coprocessorinitializewithpython')
-        use, intrinsic :: iso_c_binding, only : c_char, c_int, c_ptr
+        use, intrinsic :: iso_c_binding, only : c_int, c_ptr
 
         implicit none
 
@@ -28,7 +28,7 @@ interface
     end subroutine coprocessorinitializewithpython
 
     subroutine coprocessoraddpythonscript(file_name, length) bind(C, name='coprocessoraddpythonscript')
-        use, intrinsic :: iso_c_binding, only : c_char, c_int, c_ptr
+        use, intrinsic :: iso_c_binding, only : c_int, c_ptr
 
         implicit none
 
@@ -40,7 +40,7 @@ end interface
 contains
 
 subroutine catalyst_initialize_with_python(file_name)
-    use, intrinsic :: iso_c_binding, only : c_char, c_int, c_loc, c_ptr
+    use, intrinsic :: iso_c_binding, only : c_int, c_loc, c_ptr
 
     implicit none
 
@@ -60,7 +60,7 @@ subroutine catalyst_initialize_with_python(file_name)
 end subroutine catalyst_initialize_with_python
 
 subroutine catalyst_add_python_script(file_name)
-    use, intrinsic :: iso_c_binding, only : c_char, c_int, c_loc, c_ptr
+    use, intrinsic :: iso_c_binding, only : c_int, c_loc, c_ptr
 
     implicit none
 
