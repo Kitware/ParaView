@@ -631,24 +631,45 @@ int vtkPVPlotMatrixView::GetGridVisibility(int plotType)
 }
 
 //----------------------------------------------------------------------------
-double* vtkPVPlotMatrixView::GetBackgroundColor(int plotType)
+bool vtkPVPlotMatrixView::GetBackgroundColor(int plotType, double color[3])
 {
-  return this->PlotMatrix ? this->PlotMatrix->GetBackgroundColor(plotType).Cast<double>().GetData()
-                          : nullptr;
+  if (!this->PlotMatrix)
+  {
+    return false;
+  }
+
+  auto tuple = this->PlotMatrix->GetBackgroundColor(plotType).Cast<double>();
+  double* tmpColor = tuple.GetData();
+  std::copy_n(tmpColor, 3, color);
+  return true;
 }
 
 //----------------------------------------------------------------------------
-double* vtkPVPlotMatrixView::GetAxisColor(int plotType)
+bool vtkPVPlotMatrixView::GetAxisColor(int plotType, double color[3])
 {
-  return this->PlotMatrix ? this->PlotMatrix->GetAxisColor(plotType).Cast<double>().GetData()
-                          : nullptr;
+  if (!this->PlotMatrix)
+  {
+    return false;
+  }
+
+  auto tuple = this->PlotMatrix->GetAxisColor(plotType).Cast<double>();
+  double* tmpColor = tuple.GetData();
+  std::copy_n(tmpColor, 3, color);
+  return true;
 }
 
 //----------------------------------------------------------------------------
-double* vtkPVPlotMatrixView::GetGridColor(int plotType)
+bool vtkPVPlotMatrixView::GetGridColor(int plotType, double color[3])
 {
-  return this->PlotMatrix ? this->PlotMatrix->GetGridColor(plotType).Cast<double>().GetData()
-                          : nullptr;
+  if (!this->PlotMatrix)
+  {
+    return false;
+  }
+
+  auto tuple = this->PlotMatrix->GetGridColor(plotType).Cast<double>();
+  double* tmpColor = tuple.GetData();
+  std::copy_n(tmpColor, 3, color);
+  return true;
 }
 
 //----------------------------------------------------------------------------
@@ -684,10 +705,16 @@ int vtkPVPlotMatrixView::GetAxisLabelFontItalic(int plotType)
 }
 
 //----------------------------------------------------------------------------
-double* vtkPVPlotMatrixView::GetAxisLabelColor(int plotType)
+bool vtkPVPlotMatrixView::GetAxisLabelColor(int plotType, double color[3])
 {
-  return this->PlotMatrix ? this->PlotMatrix->GetAxisLabelProperties(plotType)->GetColor()
-                          : nullptr;
+  if (!this->PlotMatrix)
+  {
+    return false;
+  }
+
+  double* tmpColor = this->PlotMatrix->GetAxisLabelProperties(plotType)->GetColor();
+  std::copy_n(tmpColor, 3, color);
+  return true;
 }
 
 //----------------------------------------------------------------------------
@@ -713,19 +740,31 @@ int vtkPVPlotMatrixView::GetTooltipPrecision(int plotType)
 }
 
 //----------------------------------------------------------------------------
-double* vtkPVPlotMatrixView::GetScatterPlotSelectedRowColumnColor()
+bool vtkPVPlotMatrixView::GetScatterPlotSelectedRowColumnColor(double color[3])
 {
-  return this->PlotMatrix
-    ? this->PlotMatrix->GetScatterPlotSelectedRowColumnColor().Cast<double>().GetData()
-    : nullptr;
+  if (!this->PlotMatrix)
+  {
+    return false;
+  }
+
+  auto tuple = this->PlotMatrix->GetScatterPlotSelectedRowColumnColor().Cast<double>();
+  double* tmpColor = tuple.GetData();
+  std::copy_n(tmpColor, 3, color);
+  return true;
 }
 
 //----------------------------------------------------------------------------
-double* vtkPVPlotMatrixView::GetScatterPlotSelectedActiveColor()
+bool vtkPVPlotMatrixView::GetScatterPlotSelectedActiveColor(double color[3])
 {
-  return this->PlotMatrix
-    ? this->PlotMatrix->GetScatterPlotSelectedActiveColor().Cast<double>().GetData()
-    : nullptr;
+  if (!this->PlotMatrix)
+  {
+    return false;
+  }
+
+  auto tuple = this->PlotMatrix->GetScatterPlotSelectedActiveColor().Cast<double>();
+  double* tmpColor = tuple.GetData();
+  std::copy_n(tmpColor, 3, color);
+  return true;
 }
 
 //----------------------------------------------------------------------------
@@ -738,3 +777,62 @@ void vtkPVPlotMatrixView::Render(bool interactive)
   this->PlotMatrix->SetTitle(this->GetFormattedTitle());
   this->Superclass::Render(interactive);
 }
+
+// Deprecated methods
+#if !defined(VTK_LEGACY_REMOVE)
+//----------------------------------------------------------------------------
+double* vtkPVPlotMatrixView::GetBackgroundColor(int plotType)
+{
+  VTK_LEGACY_REPLACED_BODY("double* vtkPVPlotMatrixView::GetBackgroundColor(int plotType)",
+    "ParaView 5.10", "bool vtkPVPlotMatrixView::GetBackgroundColor(int plotType, double color[3])");
+  static double colorStore[3];
+  return this->GetBackgroundColor(plotType, colorStore) ? colorStore : nullptr;
+}
+
+//----------------------------------------------------------------------------
+double* vtkPVPlotMatrixView::GetAxisColor(int plotType)
+{
+  VTK_LEGACY_REPLACED_BODY("double* vtkPVPlotMatrixView::GetAxisColor(int plotType)",
+    "ParaView 5.10", "bool vtkPVPlotMatrixView::GetAxisColor(int plotType, double color[3])");
+  static double colorStore[3];
+  return this->GetAxisColor(plotType, colorStore) ? colorStore : nullptr;
+}
+
+//----------------------------------------------------------------------------
+double* vtkPVPlotMatrixView::GetGridColor(int plotType)
+{
+  VTK_LEGACY_REPLACED_BODY("double* vtkPVPlotMatrixView::GetGridColor(int plotType)",
+    "ParaView 5.10", "bool vtkPVPlotMatrixView::GetGridColor(int plotType, double color[3])");
+  static double colorStore[3];
+  return this->GetGridColor(plotType, colorStore) ? colorStore : nullptr;
+}
+
+//----------------------------------------------------------------------------
+double* vtkPVPlotMatrixView::GetAxisLabelColor(int plotType)
+{
+  VTK_LEGACY_REPLACED_BODY("double* vtkPVPlotMatrixView::GetAxisLabeldColor(int plotType)",
+    "ParaView 5.10", "bool vtkPVPlotMatrixView::GetAxisLabelColor(int plotType, double color[3])");
+  static double colorStore[3];
+  return this->GetAxisLabelColor(plotType, colorStore) ? colorStore : nullptr;
+}
+
+//----------------------------------------------------------------------------
+double* vtkPVPlotMatrixView::GetScatterPlotSelectedRowColumnColor()
+{
+  VTK_LEGACY_REPLACED_BODY("double* vtkPVPlotMatrixView::GetScatterPlotSelectedRowColumnColor()",
+    "ParaView 5.10",
+    "bool vtkPVPlotMatrixView::GetScatterPlotSelectedRowColumnColor(double color[3])");
+  static double colorStore[3];
+  return this->GetScatterPlotSelectedRowColumnColor(colorStore) ? colorStore : nullptr;
+}
+
+//----------------------------------------------------------------------------
+double* vtkPVPlotMatrixView::GetScatterPlotSelectedActiveColor()
+{
+  VTK_LEGACY_REPLACED_BODY("double* vtkPVPlotMatrixView::GetScatterSelectedActiveColor()",
+    "ParaView 5.10",
+    "bool vtkPVPlotMatrixView::GetScatterPlotSelectedActiveColor(double color[3])");
+  static double colorStore[3];
+  return this->GetScatterPlotSelectedActiveColor(colorStore) ? colorStore : nullptr;
+}
+#endif

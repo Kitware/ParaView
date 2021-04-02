@@ -180,9 +180,10 @@ public:
    * These methods should not be called directly. They are made public only so
    * that the client-server-stream-interpreter can invoke them. Use the
    * corresponding properties to change these values.
+   * The getter return false if the color can't be recovered.
    */
   void SetBackgroundColor(int plotType, double red, double green, double blue, double alpha);
-  double* GetBackgroundColor(int plotType);
+  bool GetBackgroundColor(int plotType, double color[3]);
   GENERATE_PLOT_TYPE_DECLARATION4(BackgroundColor, double, double, double, double);
   //@}
 
@@ -193,9 +194,10 @@ public:
    * These methods should not be called directly. They are made public only so
    * that the client-server-stream-interpreter can invoke them. Use the
    * corresponding properties to change these values.
+   * The getter return false if the color can't be recovered.
    */
   void SetAxisColor(int plotType, double red, double green, double blue);
-  double* GetAxisColor(int plotType);
+  bool GetAxisColor(int plotType, double color[3]);
   GENERATE_PLOT_TYPE_DECLARATION3(AxisColor, double, double, double);
   //@}
 
@@ -206,9 +208,10 @@ public:
    * These methods should not be called directly. They are made public only so
    * that the client-server-stream-interpreter can invoke them. Use the
    * corresponding properties to change these values.
+   * The getter return false if the color can't be recovered.
    */
   void SetGridColor(int plotType, double red, double green, double blue);
-  double* GetGridColor(int plotType);
+  bool GetGridColor(int plotType, double color[3]);
   GENERATE_PLOT_TYPE_DECLARATION3(GridColor, double, double, double);
   //@}
 
@@ -257,10 +260,11 @@ public:
    * These methods should not be called directly. They are made public only so
    * that the client-server-stream-interpreter can invoke them. Use the
    * corresponding properties to change these values.
+   * The getter return false if the color can't be recovered.
    */
   void SetAxisLabelColor(int plotType, double red, double green, double blue);
   GENERATE_PLOT_TYPE_DECLARATION3(AxisLabelColor, double, double, double);
-  double* GetAxisLabelColor(int plotType);
+  bool GetAxisLabelColor(int plotType, double color[3]);
   //@}
 
   //@{
@@ -311,9 +315,10 @@ public:
    * These methods should not be called directly. They are made public only so
    * that the client-server-stream-interpreter can invoke them. Use the
    * corresponding properties to change these values.
+   * The getter return false if the color can't be recovered.
    */
   void SetScatterPlotSelectedRowColumnColor(double red, double green, double blue, double alpha);
-  double* GetScatterPlotSelectedRowColumnColor();
+  bool GetScatterPlotSelectedRowColumnColor(double color[3]);
   //@}
 
   //@{
@@ -322,15 +327,29 @@ public:
    * These methods should not be called directly. They are made public only so
    * that the client-server-stream-interpreter can invoke them. Use the
    * corresponding properties to change these values.
+   * The getter return false if the color can't be recovered.
    */
   void SetScatterPlotSelectedActiveColor(double red, double green, double blue, double alpha);
-  double* GetScatterPlotSelectedActiveColor();
+  bool GetScatterPlotSelectedActiveColor(double color[3]);
   //@}
 
   /**
    * Update all the settings
    */
   void UpdateSettings();
+
+  //@{
+  /**
+    * @deprecated in ParaView 5.10.
+    * Use Get[...]Color([...], double color[3]) methods instead.
+    */
+  VTK_LEGACY(double* GetBackgroundColor(int plotType));
+  VTK_LEGACY(double* GetGridColor(int plotType));
+  VTK_LEGACY(double* GetAxisColor(int plotType));
+  VTK_LEGACY(double* GetAxisLabelColor(int plotType));
+  VTK_LEGACY(double* GetScatterPlotSelectedRowColumnColor());
+  VTK_LEGACY(double* GetScatterPlotSelectedActiveColor());
+  //@}
 
 protected:
   vtkPVPlotMatrixView();
