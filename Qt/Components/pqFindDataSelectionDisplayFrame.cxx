@@ -54,6 +54,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMRenderViewProxy.h"
 #include "vtkSMSessionProxyManager.h"
 #include "vtkSMSourceProxy.h"
+#include "vtkSMTrace.h"
 #include "vtkSmartPointer.h"
 
 #include <QMenu>
@@ -248,30 +249,33 @@ public:
                                                                    : "PointLabelVisibility";
 
     BEGIN_UNDO_SET("Change labels");
-    if (action->isChecked())
     {
-      // selection
-      vtkSMPropertyHelper(selectionProxy, selectionVisibilityName, true).Set(1);
-      vtkSMPropertyHelper(selectionProxy, selectionArrayName, true)
-        .Set(action->data().toString().toLocal8Bit().data());
-      // interactive selection
-      if (iSelectionProxy)
+      SM_SCOPED_TRACE(PropertiesModified).arg("proxy", selectionProxy);
+      if (action->isChecked())
       {
-        vtkSMPropertyHelper(iSelectionProxy, iSelectionVisibilityName, true).Set(1);
-        vtkSMPropertyHelper(iSelectionProxy, iSelectionArrayName, true)
+        // selection
+        vtkSMPropertyHelper(selectionProxy, selectionVisibilityName, true).Set(1);
+        vtkSMPropertyHelper(selectionProxy, selectionArrayName, true)
           .Set(action->data().toString().toLocal8Bit().data());
+        // interactive selection
+        if (iSelectionProxy)
+        {
+          vtkSMPropertyHelper(iSelectionProxy, iSelectionVisibilityName, true).Set(1);
+          vtkSMPropertyHelper(iSelectionProxy, iSelectionArrayName, true)
+            .Set(action->data().toString().toLocal8Bit().data());
+        }
       }
-    }
-    else
-    {
-      // selection
-      vtkSMPropertyHelper(selectionProxy, selectionVisibilityName, true).Set(0);
-      vtkSMPropertyHelper(selectionProxy, selectionArrayName, true).Set("");
-      // interactive selection
-      if (iSelectionProxy)
+      else
       {
-        vtkSMPropertyHelper(iSelectionProxy, iSelectionVisibilityName, true).Set(0);
-        vtkSMPropertyHelper(iSelectionProxy, iSelectionArrayName, true).Set("");
+        // selection
+        vtkSMPropertyHelper(selectionProxy, selectionVisibilityName, true).Set(0);
+        vtkSMPropertyHelper(selectionProxy, selectionArrayName, true).Set("");
+        // interactive selection
+        if (iSelectionProxy)
+        {
+          vtkSMPropertyHelper(iSelectionProxy, iSelectionVisibilityName, true).Set(0);
+          vtkSMPropertyHelper(iSelectionProxy, iSelectionArrayName, true).Set("");
+        }
       }
     }
     selectionProxy->UpdateVTKObjects();
