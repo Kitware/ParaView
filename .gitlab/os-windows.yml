@@ -74,7 +74,6 @@
     - cmake --version
     - ninja --version
     # Support submodule references to the user's fork.
-    - git submodule update --init --recursive
     - git submodule foreach --recursive cmake -P "$pwdpath/.gitlab/ci/fetch_submodule.cmake"
     - git submodule sync --recursive
     - git submodule update --init --recursive
