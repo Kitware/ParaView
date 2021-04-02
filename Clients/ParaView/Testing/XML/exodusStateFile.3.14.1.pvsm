@@ -2284,11 +2284,11 @@
     </Proxy>
     <Proxy group="sources" type="ExodusIIReader" id="8882" servers="1">
       <Property name="FileName" id="8882.FileName" number_of_elements="1">
-        <Element index="0" value="@paraview_test_data_directory_output@/Testing/Data/can.ex2"/>
+        <Element index="0" value="$PARAVIEW_DATA_ROOT/Testing/Data/can.ex2"/>
         <Domain name="files" id="8882.FileName.files"/>
       </Property>
       <Property name="FileNameInfo" id="8882.FileNameInfo" number_of_elements="1">
-        <Element index="0" value="@paraview_test_data_directory_output@/Testing/Data/can.ex2"/>
+        <Element index="0" value="$PARAVIEW_DATA_ROOT/Testing/Data/can.ex2"/>
       </Property>
       <Property name="TimestepValues" id="8882.TimestepValues" number_of_elements="44">
         <Element index="0" value="0"/>
@@ -2435,13 +2435,13 @@
         <Element index="0" value="%s"/>
       </Property>
       <Property name="FilePrefix" id="8882.FilePrefix" number_of_elements="1">
-        <Element index="0" value="@paraview_test_data_directory_output@/Testing/Data/can.ex2"/>
+        <Element index="0" value="$PARAVIEW_DATA_ROOT/Testing/Data/can.ex2"/>
         <Domain name="default_value" id="8882.FilePrefix.default_value">
-          <String text="@paraview_test_data_directory_output@/Testing/Data/can.ex2"/>
+          <String text="$PARAVIEW_DATA_ROOT/Testing/Data/can.ex2"/>
         </Domain>
       </Property>
       <Property name="FilePrefixInfo" id="8882.FilePrefixInfo" number_of_elements="1">
-        <Element index="0" value="@paraview_test_data_directory_output@/Testing/Data/can.ex2"/>
+        <Element index="0" value="$PARAVIEW_DATA_ROOT/Testing/Data/can.ex2"/>
       </Property>
       <Property name="FileRange" id="8882.FileRange" number_of_elements="2">
         <Element index="0" value="0"/>
@@ -2580,13 +2580,13 @@
         <Domain name="array_list" id="8882.SideSetResultArrayStatus.array_list"/>
       </Property>
       <Property name="XMLFileName" id="8882.XMLFileName" number_of_elements="1">
-        <Element index="0" value="@paraview_test_data_directory_output@/Testing/Data/artifact.dta"/>
+        <Element index="0" value="$PARAVIEW_DATA_ROOT/Testing/Data/artifact.dta"/>
         <Domain name="default_value" id="8882.XMLFileName.default_value">
-          <String text="@paraview_test_data_directory_output@/Testing/Data/artifact.dta"/>
+          <String text="$PARAVIEW_DATA_ROOT/Testing/Data/artifact.dta"/>
         </Domain>
       </Property>
       <Property name="XMLFileNameInfo" id="8882.XMLFileNameInfo" number_of_elements="1">
-        <Element index="0" value="@paraview_test_data_directory_output@/Testing/Data/artifact.dta"/>
+        <Element index="0" value="$PARAVIEW_DATA_ROOT/Testing/Data/artifact.dta"/>
       </Property>
     </Proxy>
     <Proxy group="misc" type="TimeKeeper" id="4818" servers="16">
