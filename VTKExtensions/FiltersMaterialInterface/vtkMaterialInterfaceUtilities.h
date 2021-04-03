@@ -36,7 +36,7 @@ using std::vector;
 using std::string;
 #include <algorithm>
 // other
-#include <assert.h>
+#include <cassert>
 
 // some useful functionality that stradles multiple filters
 // and has file scope.

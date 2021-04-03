@@ -31,7 +31,7 @@
 #include "vtkSmartPointer.h"
 #include "vtkStringList.h"
 
-#include <assert.h>
+#include <cassert>
 #include <list>
 #include <set>
 #include <sstream>

@@ -52,7 +52,7 @@ pqFileDialogFilter::pqFileDialogFilter(pqFileDialogModel* model, QObject* Parent
 
 pqFileDialogFilter::~pqFileDialogFilter() = default;
 
-#include <stdio.h>
+#include <cstdio>
 
 void pqFileDialogFilter::setFilter(const QString& filter)
 {

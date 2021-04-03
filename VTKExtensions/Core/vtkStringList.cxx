@@ -17,8 +17,8 @@
 #include "vtkObjectFactory.h"
 
 #include <algorithm>
+#include <cstdarg>
 #include <iterator>
-#include <stdarg.h>
 #include <vector>
 
 class vtkStringList::vtkInternals

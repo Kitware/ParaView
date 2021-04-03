@@ -52,7 +52,7 @@
 #include "vtksys/FStream.hxx"
 #include "vtksys/RegularExpression.hxx"
 
-#include <assert.h>
+#include <cassert>
 #include <map>
 #include <set>
 #include <sstream>

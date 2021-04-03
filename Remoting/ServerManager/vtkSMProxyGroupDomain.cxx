@@ -23,7 +23,7 @@
 #include "vtkSMSessionProxyManager.h"
 #include "vtkSMSourceProxy.h"
 
-#include <assert.h>
+#include <cassert>
 #include <vector>
 
 vtkStandardNewMacro(vtkSMProxyGroupDomain);

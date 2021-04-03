@@ -45,7 +45,7 @@
 
 #include <IceT.h>
 #include <IceTGL.h>
-#include <assert.h>
+#include <cassert>
 
 #include "vtkCompositeZPassFS.h"
 #include "vtkOpenGLHelper.h"

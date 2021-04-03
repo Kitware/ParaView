@@ -49,12 +49,12 @@
 #include "vtkUnsignedCharArray.h"
 #include "vtkWindow.h"
 
-#include <math.h>
+#include <cmath>
 
 #include <algorithm>
 #include <sstream>
 
-#include <stdio.h> // for snprintf
+#include <cstdio> // for snprintf
 
 #if defined(_WIN32) && !defined(__CYGWIN__)
 #define SNPRINTF _snprintf

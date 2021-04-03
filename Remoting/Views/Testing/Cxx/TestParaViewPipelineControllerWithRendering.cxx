@@ -26,7 +26,7 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkSmartPointer.h"
 #include "vtkTestUtilities.h"
 
-#include <assert.h>
+#include <cassert>
 #include <sstream>
 
 // This demonstrates how to put together a simple application with rendering

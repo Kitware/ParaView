@@ -25,7 +25,7 @@
 #include "vtkReservedRemoteObjectIds.h"
 #include "vtkSMMessage.h"
 
-#include <assert.h>
+#include <cassert>
 #include <map>
 #include <sstream>
 #include <string>

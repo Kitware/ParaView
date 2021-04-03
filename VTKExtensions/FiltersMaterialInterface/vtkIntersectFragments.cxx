@@ -62,7 +62,7 @@ using std::vector;
 using std::string;
 #include "algorithm"
 // ansi c
-#include <math.h>
+#include <cmath>
 // other
 #include "vtkMaterialInterfaceUtilities.h"
 

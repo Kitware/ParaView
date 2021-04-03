@@ -6,7 +6,7 @@
 #include "vtksys/FStream.hxx"
 #include "vtksys/SystemTools.hxx"
 
-#include <assert.h>
+#include <cassert>
 
 namespace
 {

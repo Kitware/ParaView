@@ -48,14 +48,14 @@
 #ifdef _WIN32
 #include "vtkDynamicLoader.h"
 #else
-#include <signal.h>
+#include <csignal>
 #endif
 
 // this include is needed to ensure that vtkPVPluginLoader singleton doesn't get
 // destroyed before the process module singleton is cleaned up.
 #include "vtkPVPluginLoader.h"
 
-#include <assert.h>
+#include <cassert>
 #include <clocale> // needed for setlocale()
 #include <sstream>
 #include <stdexcept> // for runtime_error

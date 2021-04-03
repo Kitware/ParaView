@@ -73,7 +73,7 @@ bool WriteCSV(const std::string& fname, int rank)
 #define VERITFY_EQ(x, y, txt)                                                                      \
   if ((x) != (y))                                                                                  \
   {                                                                                                \
-    std::cerr << "ERROR: " << txt << endl                                                          \
+    std::cerr << "ERROR: " << (txt) << endl                                                        \
               << "expected (" << (x) << "), got (" << (y) << ")" << endl;                          \
     return false;                                                                                  \
   }

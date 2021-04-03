@@ -95,7 +95,7 @@ string GetMPILibraryVersion()
 }
 #endif
 
-#define safes(arg) (arg ? ((const char*)arg) : "<null>")
+#define safes(arg) ((arg) ? ((const char*)(arg)) : "<null>")
 
 string GetOpenGLInfo()
 {

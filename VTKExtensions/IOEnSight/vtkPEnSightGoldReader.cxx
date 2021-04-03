@@ -16,7 +16,7 @@
 
 #include "vtksys/FStream.hxx"
 
-#include <ctype.h>
+#include <cctype>
 #include <sstream>
 #include <string>
 #include <vector>

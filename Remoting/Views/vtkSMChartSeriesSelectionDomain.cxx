@@ -35,7 +35,7 @@
 #include <vtk_jsoncpp.h>
 
 #include <algorithm>
-#include <assert.h>
+#include <cassert>
 #include <map>
 #include <set>
 #include <sstream>

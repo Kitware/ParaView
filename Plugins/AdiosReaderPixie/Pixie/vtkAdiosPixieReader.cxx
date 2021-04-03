@@ -33,7 +33,7 @@
 #include <vtkStructuredGrid.h>
 #include <vtksys/SystemTools.hxx>
 
-#include <assert.h>
+#include <cassert>
 #include <map>
 #include <sstream>
 #include <string>

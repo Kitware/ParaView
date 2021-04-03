@@ -32,7 +32,7 @@
 #include "vtkSmartPointer.h"
 #define VTK_CREATE(type, name) vtkSmartPointer<type> name = vtkSmartPointer<type>::New()
 
-#include <math.h>
+#include <cmath>
 
 //=============================================================================
 // Computes the direction of a 1D cell.

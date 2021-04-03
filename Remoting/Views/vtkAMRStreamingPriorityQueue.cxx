@@ -21,7 +21,7 @@
 #include "vtkObjectFactory.h"
 #include "vtkStreamingPriorityQueue.h"
 
-#include <assert.h>
+#include <cassert>
 #include <queue>
 #include <vector>
 

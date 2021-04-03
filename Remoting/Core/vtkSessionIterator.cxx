@@ -18,7 +18,7 @@
 #include "vtkProcessModule.h"
 #include "vtkProcessModuleInternals.h"
 
-#include <assert.h>
+#include <cassert>
 
 class vtkSessionIterator::vtkInternals
 {

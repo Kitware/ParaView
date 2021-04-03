@@ -24,7 +24,7 @@
 #include "vtkStreamingPriorityQueue.h"
 
 #include <algorithm>
-#include <assert.h>
+#include <cassert>
 #include <map>
 #include <queue>
 #include <set>

@@ -17,7 +17,7 @@
 #include "vtkObjectFactory.h"
 #include "vtkPVAnimationCue.h"
 
-#include <math.h>
+#include <cmath>
 
 vtkStandardNewMacro(vtkPVExponentialKeyFrame);
 //----------------------------------------------------------------------------

@@ -1,6 +1,6 @@
 #include "FEAdaptor.h"
+#include <cstdlib>
 #include <iostream>
-#include <stdlib.h>
 
 #include <vtkCPDataDescription.h>
 #include <vtkCPInputDataDescription.h>

@@ -36,7 +36,7 @@
 #include "vtkSMUndoStackBuilder.h"
 #include "vtkWeakPointer.h"
 
-#include <assert.h>
+#include <cassert>
 #include <sstream>
 #include <vtkNew.h>
 

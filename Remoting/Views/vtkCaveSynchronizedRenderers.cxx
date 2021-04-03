@@ -26,7 +26,7 @@
 #include "vtkTransform.h"
 #include "vtkUnsignedCharArray.h"
 
-#include "assert.h"
+#include <cassert>
 #include <cmath>
 #include <vtksys/SystemTools.hxx>
 

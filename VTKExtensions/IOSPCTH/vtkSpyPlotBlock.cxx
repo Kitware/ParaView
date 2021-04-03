@@ -24,7 +24,7 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkSpyPlotIStream.h"
 #include "vtkUnsignedCharArray.h"
 
-#include <assert.h>
+#include <cassert>
 #include <map>
 #include <sstream>
 

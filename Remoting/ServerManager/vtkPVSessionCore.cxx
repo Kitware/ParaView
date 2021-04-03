@@ -38,7 +38,7 @@
 
 #include "vtksys/FStream.hxx"
 
-#include <assert.h>
+#include <cassert>
 #include <set>
 #include <sstream>
 #include <string>
@@ -888,10 +888,10 @@ void vtkPVSessionCore::GatherInformationStatelliteCallback()
 //----------------------------------------------------------------------------
 #define SafeDeleteArray(array_ptr)                                                                 \
   {                                                                                                \
-    if (array_ptr != nullptr)                                                                      \
+    if ((array_ptr) != nullptr)                                                                    \
     {                                                                                              \
-      delete[] array_ptr;                                                                          \
-      array_ptr = nullptr;                                                                         \
+      delete[](array_ptr);                                                                         \
+      (array_ptr) = nullptr;                                                                       \
     }                                                                                              \
   }
 

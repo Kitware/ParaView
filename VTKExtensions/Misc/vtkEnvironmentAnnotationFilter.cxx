@@ -22,7 +22,7 @@
 #include "vtkStringArray.h"
 #include "vtkTable.h"
 
-#include <assert.h>
+#include <cassert>
 #include <map>
 #include <vector>
 

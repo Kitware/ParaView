@@ -23,7 +23,7 @@
 #include "vtkSMProxyManager.h"
 #include "vtkSMUndoStackBuilder.h"
 
-#include <assert.h>
+#include <cassert>
 
 #define GET_PV_COMPARATIVE_VIEW() vtkPVComparativeView::SafeDownCast(this->GetClientSideObject())
 

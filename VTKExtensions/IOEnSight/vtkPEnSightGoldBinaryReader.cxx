@@ -18,7 +18,7 @@
 #include "vtksys/FStream.hxx"
 #include "vtksys/SystemTools.hxx"
 
-#include <ctype.h>
+#include <cctype>
 #include <string>
 
 vtkStandardNewMacro(vtkPEnSightGoldBinaryReader);

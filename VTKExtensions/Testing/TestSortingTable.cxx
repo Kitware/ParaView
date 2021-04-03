@@ -24,7 +24,7 @@
 #include "vtkTestUtilities.h"
 #include "vtkUnsignedCharArray.h"
 
-#include <float.h>
+#include <cfloat>
 // ----------------------------------------------------------------------------
 void fillArray(vtkDoubleArray* array, double* dataPointer, int dataSize, const char* name)
 {

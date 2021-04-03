@@ -21,7 +21,7 @@
 #include "vtkSISourceProxy.h"
 #include "vtkSMMessage.h"
 
-#include <assert.h>
+#include <cassert>
 
 vtkStandardNewMacro(vtkSIInputProperty);
 //----------------------------------------------------------------------------

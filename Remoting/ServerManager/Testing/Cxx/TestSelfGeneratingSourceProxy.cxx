@@ -25,7 +25,7 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkSphereSource.h"
 #include "vtkTestUtilities.h"
 
-#include <assert.h>
+#include <cassert>
 #include <sstream>
 
 const char* testdefinition =

@@ -45,7 +45,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define PQVERIFY2(x, y)                                                                            \
   if (!(x))                                                                                        \
   {                                                                                                \
-    qCritical() << "Failed test: " << y;                                                           \
+    qCritical() << "Failed test: " << (y);                                                         \
     return EXIT_FAILURE;                                                                           \
   }
 

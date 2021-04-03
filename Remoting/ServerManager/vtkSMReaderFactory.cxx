@@ -32,7 +32,7 @@
 #include "vtkStringList.h"
 
 #include <algorithm>
-#include <assert.h>
+#include <cassert>
 #include <list>
 #include <set>
 #include <sstream>
@@ -553,7 +553,7 @@ const char* vtkSMReaderFactory::GetSupportedFileTypes(vtkSMSession* session)
         if (!hint.FilenameRegExs.empty())
         {
           std::string ext_join = ::vtkJoin(hint.FilenamePatterns, "", " ");
-          if (ext_list.size() > 0)
+          if (!ext_list.empty())
           {
             ext_list += " ";
             ext_list += ext_join;

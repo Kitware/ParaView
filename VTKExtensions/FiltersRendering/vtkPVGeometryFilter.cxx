@@ -73,9 +73,9 @@
 #include "vtkUnstructuredGridGeometryFilter.h"
 
 #include <algorithm>
-#include <assert.h>
+#include <cassert>
+#include <cmath>
 #include <map>
-#include <math.h>
 #include <set>
 #include <string>
 #include <vector>

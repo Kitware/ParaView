@@ -31,7 +31,7 @@
 #include "vtkTransform.h"
 #include "vtkVectorText.h"
 
-#include <math.h>
+#include <cmath>
 
 vtkStandardNewMacro(vtkPVAxesActor);
 

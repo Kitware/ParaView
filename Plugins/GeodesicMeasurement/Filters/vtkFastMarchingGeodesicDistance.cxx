@@ -36,7 +36,7 @@
 #include "gw_core/GW_Vertex.h"
 #include "gw_geodesic/GW_GeodesicMesh.h"
 #include "gw_geodesic/GW_GeodesicPath.h"
-#include <assert.h>
+#include <cassert>
 #include <set>
 
 #ifdef _WIN32

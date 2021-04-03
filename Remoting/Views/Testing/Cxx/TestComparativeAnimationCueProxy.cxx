@@ -26,7 +26,7 @@
 #include "vtkPVComparativeAnimationCue.h"
 #include "vtkSMComparativeAnimationCueProxy.h"
 #include "vtkSmartPointer.h"
-#include <assert.h>
+#include <cassert>
 
 #define ERROR(msg)                                                                                 \
   cerr << "ERROR: " msg << endl;                                                                   \

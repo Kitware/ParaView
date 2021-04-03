@@ -31,8 +31,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ========================================================================*/
 #include "pqCheckBoxPixMaps.h"
 
-#include "assert.h"
-
 #include <QPainter>
 #include <QPixmap>
 #include <QStyle>

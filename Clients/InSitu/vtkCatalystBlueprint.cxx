@@ -16,8 +16,8 @@
 
 #include "vtkPVLogger.h"
 
+#include <cinttypes>
 #include <conduit_blueprint.hpp>
-#include <inttypes.h>
 
 namespace initialize
 {

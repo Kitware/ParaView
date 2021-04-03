@@ -46,7 +46,7 @@
 #define VTK_CREATE(type, name) vtkSmartPointer<type> name = vtkSmartPointer<type>::New()
 
 #include <algorithm>
-#include <ctype.h> // for isprint().
+#include <cctype> // for isprint().
 #include <map>
 #include <set>
 #include <string>

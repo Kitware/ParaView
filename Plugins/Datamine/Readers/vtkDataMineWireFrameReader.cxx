@@ -37,9 +37,9 @@ vtkStandardNewMacro(vtkDataMineWireFrameReader);
 // --------------------------------------
 #define vtkSetStringMacroBody(propName, fname)                                                     \
   modified = 0;                                                                                    \
-  if (fname == this->propName)                                                                     \
+  if ((fname) == this->propName)                                                                   \
     return;                                                                                        \
-  if (fname && this->propName && !strcmp(fname, this->propName))                                   \
+  if ((fname) && this->propName && !strcmp((fname), this->propName))                               \
     return;                                                                                        \
   modified = 1;                                                                                    \
   delete[] this->propName;                                                                         \

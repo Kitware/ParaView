@@ -23,7 +23,7 @@
 
 #include <vtksys/SystemTools.hxx>
 
-#include <assert.h>
+#include <cassert>
 #include <string>
 #include <vector>
 

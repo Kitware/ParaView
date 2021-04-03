@@ -75,7 +75,7 @@ QSet<QString> checkedItemNames(const QList<QStandardItem*>& items)
 #define PQVERIFY2(x, y)                                                                            \
   if (!(x))                                                                                        \
   {                                                                                                \
-    qCritical() << "Failed test: " << y;                                                           \
+    qCritical() << "Failed test: " << (y);                                                         \
     return EXIT_FAILURE;                                                                           \
   }
 }

@@ -36,7 +36,7 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkPointDataToCellData.h"
 #endif
 
-#include <assert.h>
+#include <cassert>
 #include <set>
 #include <sstream>
 #include <string>

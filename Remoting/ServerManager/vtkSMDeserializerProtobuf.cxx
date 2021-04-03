@@ -27,13 +27,13 @@
 #define BEFORE_LOAD(proxy)                                                                         \
   if (session && session->IsProcessingRemoteNotification())                                        \
   {                                                                                                \
-    proxy->EnableLocalPushOnly();                                                                  \
+    (proxy)->EnableLocalPushOnly();                                                                \
   }
 
 #define AFTER_LOAD(proxy)                                                                          \
   if (session && session->IsProcessingRemoteNotification())                                        \
   {                                                                                                \
-    proxy->DisableLocalPushOnly();                                                                 \
+    (proxy)->DisableLocalPushOnly();                                                               \
   }
 
 //----------------------------------------------------------------------------

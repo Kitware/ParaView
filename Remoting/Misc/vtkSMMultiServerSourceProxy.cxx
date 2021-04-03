@@ -23,7 +23,7 @@
 #include "vtkSMSession.h"
 #include "vtkSMSourceProxy.h"
 
-#include <assert.h>
+#include <cassert>
 
 //---------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSMMultiServerSourceProxy);

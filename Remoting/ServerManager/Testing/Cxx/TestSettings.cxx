@@ -26,7 +26,7 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkSMSettings.h"
 #include "vtkSmartPointer.h"
 
-#include <assert.h>
+#include <cassert>
 #include <sstream>
 #include <vtk_jsoncpp.h>
 int TestSettings(int argc, char* argv[])

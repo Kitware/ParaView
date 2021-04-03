@@ -7,8 +7,8 @@
 #include "FEAdaptor.h"
 #endif
 
+#include <cstdlib>
 #include <cstring>
-#include <stdlib.h>
 
 // Example of a C++ adaptor for a simulation code
 // where the simulation code has a fixed topology

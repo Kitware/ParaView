@@ -29,7 +29,7 @@
 #include "vtkSmartPointer.h"
 #include "vtkWeakPointer.h"
 
-#include <assert.h>
+#include <cassert>
 #include <map>
 
 class vtkSMPluginManager::vtkInternals

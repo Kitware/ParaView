@@ -43,7 +43,7 @@
 #include <sstream>
 #include <string>
 
-#define CLASSNAME(a) (a ? a->GetClassName() : "None")
+#define CLASSNAME(a) ((a) ? (a)->GetClassName() : "None")
 
 vtkStandardNewMacro(vtkChartRepresentation);
 //----------------------------------------------------------------------------

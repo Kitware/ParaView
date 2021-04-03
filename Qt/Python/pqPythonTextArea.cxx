@@ -103,7 +103,8 @@ pqPythonTextArea::pqPythonTextArea(QWidget* parent)
 }
 
 //-----------------------------------------------------------------------------
-#define TEST_SEQUENCE(EVENT, MODIFIER, KEY) (EVENT->modifiers() & MODIFIER) && EVENT->key() == KEY
+#define TEST_SEQUENCE(EVENT, MODIFIER, KEY)                                                        \
+  ((EVENT)->modifiers() & (MODIFIER)) && (EVENT)->key() == (KEY)
 bool pqPythonTextArea::eventFilter(QObject* obj, QEvent* event)
 {
   if (event->type() == QEvent::KeyPress)

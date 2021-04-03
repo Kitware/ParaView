@@ -21,7 +21,7 @@
 #include "vtkPVCameraCueManipulator.h"
 #include "vtkPVKeyFrame.h"
 
-#include <assert.h>
+#include <cassert>
 
 vtkStandardNewMacro(vtkPVCameraKeyFrame);
 //----------------------------------------------------------------------------

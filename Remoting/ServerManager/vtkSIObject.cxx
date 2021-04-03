@@ -19,7 +19,7 @@
 #include "vtkPVSessionCore.h"
 #include "vtkSMMessage.h"
 
-#include <assert.h>
+#include <cassert>
 
 vtkStandardNewMacro(vtkSIObject);
 //----------------------------------------------------------------------------

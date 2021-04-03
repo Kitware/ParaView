@@ -1,8 +1,8 @@
 #include "FEDataStructures.h"
 
+#include <cstdlib>
 #include <iostream>
 #include <mpi.h>
-#include <stdlib.h>
 
 #include <vtkCPInputDataDescription.h>
 #include <vtkCellData.h>

@@ -28,10 +28,10 @@
 #include "vtkSmartPointer.h"
 
 #include <cassert>
+#include <cctype>
 #include <cmath>
 #include <cstdlib>
 #include <cstring>
-#include <ctype.h>
 #include <sstream>
 
 vtkStandardNewMacro(vtkSMCoreUtilities);

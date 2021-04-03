@@ -51,7 +51,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <cassert>
 
-#define PQ_INVALID_INDEX -1947
+#define PQ_INVALID_INDEX (-1947)
 
 inline bool INDEX_IS_VALID(const QModelIndex& idx)
 {
