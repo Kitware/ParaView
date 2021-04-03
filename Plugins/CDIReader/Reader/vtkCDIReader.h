@@ -284,6 +284,7 @@ protected:
   int ModNumCells;
   int* OrigConnections;
   int* ModConnections;
+  size_t ModConnections_size;
   int* CellMask;
   int* DomainMask;
   double* DomainCellVar;

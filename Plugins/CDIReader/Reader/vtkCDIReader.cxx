@@ -500,6 +500,9 @@ vtkCDIReader::~vtkCDIReader()
   delete[] this->DomainVarDataArray;
   this->DomainVarDataArray = nullptr;
 
+  delete[] this->DomainMask;
+  this->DomainMask = nullptr;
+
   vtkDebugMacro("Destructing other stuff..." << endl);
   if (this->PointDataArraySelection)
   {
@@ -1037,6 +1040,7 @@ void vtkCDIReader::SetDefaults()
   this->PointZ = nullptr;
   this->OrigConnections = nullptr;
   this->ModConnections = nullptr;
+  this->ModConnections_size = 0;
   this->CLon = nullptr;
   this->CLat = nullptr;
   this->BeginCell = 0;
@@ -1881,8 +1885,14 @@ int vtkCDIReader::AllocLatLonGeometry()
     this->ConstructGridGeometry();
   }
 
-  this->ModConnections = new int[this->NumberLocalCells * this->PointsPerCell];
-  CHECK_NEW(this->ModConnections);
+  const size_t newsize = this->NumberLocalCells * this->PointsPerCell;
+  if (this->ModConnections_size != newsize)
+  {
+    delete[] this->ModConnections;
+    this->ModConnections = new int[newsize];
+    CHECK_NEW(this->ModConnections);
+    this->ModConnections_size = newsize;
+  }
 
   if (this->ShowMultilayerView)
   {
@@ -2452,6 +2462,8 @@ void vtkCDIReader::OutputCells(bool init)
   {
     delete[] this->ModConnections;
     this->ModConnections = nullptr;
+    this->ModConnections_size = 0;
+
     delete[] this->OrigConnections;
     this->OrigConnections = nullptr;
   }
