@@ -44,6 +44,13 @@ public:
   vtkGetObjectMacro(Controller, vtkMultiProcessController);
   //@}
 
+  /**
+   * Enable/disable normalization of bin values. Normlizing the histogram divides the value
+   * in each bin by the total number of counts in each bin. Off by default.
+   */
+  vtkSetMacro(Normalize, bool);
+  vtkGetMacro(Normalize, bool);
+
 protected:
   vtkPExtractHistogram();
   ~vtkPExtractHistogram() override;
@@ -58,6 +65,7 @@ protected:
     vtkInformationVector* outputVector) override;
 
   vtkMultiProcessController* Controller;
+  bool Normalize = false;
 
 private:
   vtkPExtractHistogram(const vtkPExtractHistogram&) = delete;
