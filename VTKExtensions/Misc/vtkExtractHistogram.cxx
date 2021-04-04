@@ -30,6 +30,7 @@
 #include "vtkSmartPointer.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
 #include "vtkTable.h"
+#include "vtkUnsignedCharArray.h"
 
 #include <map>
 #include <string>
@@ -138,6 +139,62 @@ vtkFieldData* vtkExtractHistogram::GetInputFieldData(vtkDataObject* input)
 }
 
 //-----------------------------------------------------------------------------
+namespace
+{
+// Local version of GetRange that respects point/cell blankingd
+void GetRange(vtkDataArray* array, vtkFieldData* fieldData, double tRange[2], int component)
+{
+  tRange[0] = VTK_DOUBLE_MAX;
+  tRange[1] = VTK_DOUBLE_MIN;
+
+  // Get blanking array
+  vtkUnsignedCharArray* blanking = nullptr;
+  vtkDataSetAttributes* attributes = vtkDataSetAttributes::SafeDownCast(fieldData);
+  if (attributes)
+  {
+    auto ghostArray = attributes->GetArray(vtkDataSetAttributes::GhostArrayName());
+    blanking = vtkUnsignedCharArray::SafeDownCast(ghostArray);
+  }
+  bool isBlankedPointArray = blanking != nullptr && fieldData->IsA("vtkPointData");
+  bool isBlankedCellArray = blanking != nullptr && fieldData->IsA("vtkCellData");
+
+  vtkIdType numTuples = array->GetNumberOfTuples();
+  for (vtkIdType i = 0; i < numTuples; ++i)
+  {
+
+    // Skip if the array value is blanked.
+    if ((isBlankedPointArray &&
+          blanking->GetTypedComponent(i, 0) & vtkDataSetAttributes::HIDDENPOINT) ||
+      (isBlankedCellArray && blanking->GetTypedComponent(i, 0) & vtkDataSetAttributes::HIDDENCELL))
+    {
+      continue;
+    }
+
+    double value;
+    // if component is equal to the number of components, then the magnitude was requested.
+    if (component == array->GetNumberOfComponents())
+    {
+      value = 0;
+      double comp;
+      for (int j = 0; j < array->GetNumberOfComponents(); ++j)
+      {
+        comp = array->GetComponent(i, j);
+        value += comp * comp;
+      }
+      value = sqrt(value);
+    }
+    else
+    {
+      value = array->GetComponent(i, component);
+    }
+
+    tRange[0] = std::min(tRange[0], value);
+    tRange[1] = std::max(tRange[1], value);
+  }
+}
+}
+
+//-----------------------------------------------------------------------------
 bool vtkExtractHistogram::GetInputArrayRange(vtkInformationVector** inputVector, double range[2])
 {
   range[0] = VTK_DOUBLE_MAX;
@@ -167,11 +224,11 @@ bool vtkExtractHistogram::GetInputArrayRange(vtkInformationVector** inputVector,
         if (this->Component == data_array->GetNumberOfComponents())
         {
           // magnitude
-          data_array->GetRange(tRange, -1);
+          ::GetRange(data_array, this->GetInputFieldData(dObj), tRange, -1);
         }
         else
         {
-          data_array->GetRange(tRange, this->Component);
+          ::GetRange(data_array, this->GetInputFieldData(dObj), tRange, this->Component);
         }
         range[0] = (tRange[0] < range[0]) ? tRange[0] : range[0];
         range[1] = (tRange[1] > range[1]) ? tRange[1] : range[1];
@@ -202,11 +259,11 @@ bool vtkExtractHistogram::GetInputArrayRange(vtkInformationVector** inputVector,
     if (this->Component == data_array->GetNumberOfComponents())
     {
       // magnitude
-      data_array->GetRange(range, -1);
+      ::GetRange(data_array, this->GetInputFieldData(input), range, -1);
     }
     else
     {
-      data_array->GetRange(range, this->Component);
+      ::GetRange(data_array, this->GetInputFieldData(input), range, this->Component);
     }
   }
 
@@ -300,12 +357,32 @@ void vtkExtractHistogram::BinAnArray(
     (max - min) / (this->CenterBinsAroundMinAndMax ? (this->BinCount - 1) : this->BinCount);
   double half_delta = bin_delta / 2.0;
 
+  // Get blanking array
+  vtkUnsignedCharArray* blanking = nullptr;
+  vtkDataSetAttributes* attributes = vtkDataSetAttributes::SafeDownCast(field);
+  if (attributes)
+  {
+    auto ghostArray = attributes->GetArray(vtkDataSetAttributes::GhostArrayName());
+    blanking = vtkUnsignedCharArray::SafeDownCast(ghostArray);
+  }
+  bool isBlankedPointArray = blanking != nullptr && field->IsA("vtkPointData");
+  bool isBlankedCellArray = blanking != nullptr && field->IsA("vtkCellData");
+
   for (int i = 0; i != num_of_tuples; ++i)
   {
     if (i % 1000 == 0)
     {
       this->UpdateProgress(0.10 + 0.90 * i / num_of_tuples);
     }
+
+    // Skip if the array value is blanked.
+    if ((isBlankedPointArray &&
+          blanking->GetTypedComponent(i, 0) & vtkDataSetAttributes::HIDDENPOINT) ||
+      (isBlankedCellArray && blanking->GetTypedComponent(i, 0) & vtkDataSetAttributes::HIDDENCELL))
+    {
+      continue;
+    }
+
     double value;
     // if component is equal to the number of components, then the magnitude was requested.
     if (this->Component == data_array->GetNumberOfComponents())
