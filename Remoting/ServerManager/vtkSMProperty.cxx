@@ -280,6 +280,18 @@ void vtkSMProperty::RemoveAllDependents()
 //---------------------------------------------------------------------------
 void vtkSMProperty::UpdateDomains()
 {
+  // This method gets called when properties on "prototype" proxies are changed
+  // too. So far in ParaView, we've only used prototype proxies to check whether
+  // input is acceptable or to determine list of available properties. For such
+  // use-cases, updating domains can not only cause unnecessary slowdowns, but
+  // also raise issues like #20617. So starting with 5.10, we're skipping
+  // updating dependent domains on prototype properties.
+  auto parent = this->GetParent();
+  if (parent && parent->IsPrototype())
+  {
+    return;
+  }
+
   // I genuinely doubt when a property changes, its domain should change!!
   //// Update own domains
   // this->DomainIterator->Begin();

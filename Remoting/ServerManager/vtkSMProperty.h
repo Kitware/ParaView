@@ -609,6 +609,9 @@ protected:
    * because the domain does not really "depend" on the property.
    * When calling Update() on dependent domains, the property
    * passes itself as the argument.
+   *
+   * @note as of ParaView 5.10, this method skips updating domains for prototype
+   * proxies. See description in .cxx for details behind this change.
    */
   void UpdateDomains();
 
