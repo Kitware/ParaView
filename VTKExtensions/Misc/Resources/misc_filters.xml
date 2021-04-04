@@ -347,6 +347,15 @@
         averages of variables other than the primary variable that fall into
         each bin.</Documentation>
       </IntVectorProperty>
+      <IntVectorProperty command="SetNormalize"
+                         default_values="0"
+                         name="Normalize"
+                         number_of_elements="1"
+                         panel_visibility="advanced">
+        <BooleanDomain name="bool" />
+        <Documentation>Controls whether the values in the output are normalized,
+        i.e., the count in each bin is divided by the sum of counts in each bin.</Documentation>
+      </IntVectorProperty>
       <IntVectorProperty command="SetUseCustomBinRanges"
                          default_values="0"
                          name="UseCustomBinRanges"

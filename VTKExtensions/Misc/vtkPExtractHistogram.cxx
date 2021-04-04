@@ -17,6 +17,7 @@
 #include "vtkAttributeDataReductionFilter.h"
 #include "vtkCellData.h"
 #include "vtkCommunicator.h"
+#include "vtkDataArrayRange.h"
 #include "vtkDataSet.h"
 #include "vtkDoubleArray.h"
 #include "vtkInformation.h"
@@ -80,77 +81,105 @@ int vtkPExtractHistogram::RequestData(
     return 0;
   }
 
-  if (!this->Controller || this->Controller->GetNumberOfProcesses() <= 1)
-  {
-    // Nothing to do for single process.
-    return 1;
-  }
+  bool isRoot = !this->Controller || (this->Controller->GetLocalProcessId() == 0);
 
   vtkTable* output = vtkTable::GetData(outputVector, 0);
-  vtkSmartPointer<vtkDataArray> oldExtents = output->GetRowData()->GetArray("bin_extents");
-  if (oldExtents == nullptr)
-  {
-    // Nothing to do if there is no data
-    return 1;
-  }
-  // Now we need to collect and reduce data from all nodes on the root.
-  vtkSmartPointer<vtkReductionFilter> reduceFilter = vtkSmartPointer<vtkReductionFilter>::New();
-  reduceFilter->SetController(this->Controller);
 
-  bool isRoot = (this->Controller->GetLocalProcessId() == 0);
-  if (isRoot)
+  // Handle > 1 ranks
+  if (this->Controller && this->Controller->GetNumberOfProcesses() > 1)
   {
-    // PostGatherHelper needs to be set only on the root node.
-    vtkSmartPointer<vtkAttributeDataReductionFilter> rf =
-      vtkSmartPointer<vtkAttributeDataReductionFilter>::New();
-    rf->SetAttributeType(vtkAttributeDataReductionFilter::ROW_DATA);
-    rf->SetReductionType(vtkAttributeDataReductionFilter::ADD);
-    reduceFilter->SetPostGatherHelper(rf);
-  }
-
-  vtkSmartPointer<vtkTable> copy = vtkSmartPointer<vtkTable>::New();
-  copy->ShallowCopy(output);
-  reduceFilter->SetInputData(copy);
-  reduceFilter->Update();
-  if (isRoot)
-  {
-    // We save the old bin_extents and then revert to be restored later since
-    // the reduction reduces the bin_extents as well.
-    output->ShallowCopy(reduceFilter->GetOutput());
-    if (output->GetRowData()->GetNumberOfArrays() == 0)
+    vtkSmartPointer<vtkDataArray> oldExtents = output->GetRowData()->GetArray("bin_extents");
+    if (oldExtents == nullptr)
     {
-      vtkErrorMacro(<< "Reduced data has 0 arrays");
-      return 0;
+      // Nothing to do if there is no data
+      return 1;
     }
-    output->GetRowData()->GetArray("bin_extents")->DeepCopy(oldExtents);
-    if (this->CalculateAverages)
+    // Now we need to collect and reduce data from all nodes on the root.
+    vtkSmartPointer<vtkReductionFilter> reduceFilter = vtkSmartPointer<vtkReductionFilter>::New();
+    reduceFilter->SetController(this->Controller);
+
+    if (isRoot)
     {
-      vtkDataArray* bin_values = output->GetRowData()->GetArray("bin_values");
-      vtksys::RegularExpression reg_ex("^(.*)_average$");
-      int numArrays = output->GetRowData()->GetNumberOfArrays();
-      for (int i = 0; i < numArrays; i++)
+      // PostGatherHelper needs to be set only on the root node.
+      vtkSmartPointer<vtkAttributeDataReductionFilter> rf =
+        vtkSmartPointer<vtkAttributeDataReductionFilter>::New();
+      rf->SetAttributeType(vtkAttributeDataReductionFilter::ROW_DATA);
+      rf->SetReductionType(vtkAttributeDataReductionFilter::ADD);
+      reduceFilter->SetPostGatherHelper(rf);
+    }
+
+    vtkSmartPointer<vtkTable> copy = vtkSmartPointer<vtkTable>::New();
+    copy->ShallowCopy(output);
+    reduceFilter->SetInputData(copy);
+    reduceFilter->Update();
+    if (isRoot)
+    {
+      // We save the old bin_extents and then revert to be restored later since
+      // the reduction reduces the bin_extents as well.
+      output->ShallowCopy(reduceFilter->GetOutput());
+      if (output->GetRowData()->GetNumberOfArrays() == 0)
       {
-        vtkDataArray* array = output->GetRowData()->GetArray(i);
-        if (array && reg_ex.find(array->GetName()))
+        vtkErrorMacro(<< "Reduced data has 0 arrays");
+        return 0;
+      }
+      output->GetRowData()->GetArray("bin_extents")->DeepCopy(oldExtents);
+      if (this->CalculateAverages)
+      {
+        vtkDataArray* bin_values = output->GetRowData()->GetArray("bin_values");
+        vtksys::RegularExpression reg_ex("^(.*)_average$");
+        int numArrays = output->GetRowData()->GetNumberOfArrays();
+        for (int i = 0; i < numArrays; i++)
         {
-          int numComps = array->GetNumberOfComponents();
-          std::string name = reg_ex.match(1) + "_total";
-          vtkDataArray* tarray = output->GetRowData()->GetArray(name.c_str());
-          for (vtkIdType idx = 0; idx < this->BinCount; idx++)
+          vtkDataArray* array = output->GetRowData()->GetArray(i);
+          if (array && reg_ex.find(array->GetName()))
           {
-            for (int j = 0; j < numComps; j++)
+            int numComps = array->GetNumberOfComponents();
+            std::string name = reg_ex.match(1) + "_total";
+            vtkDataArray* tarray = output->GetRowData()->GetArray(name.c_str());
+            for (vtkIdType idx = 0; idx < this->BinCount; idx++)
             {
-              array->SetComponent(
-                idx, j, tarray->GetComponent(idx, j) / bin_values->GetTuple1(idx));
+              for (int j = 0; j < numComps; j++)
+              {
+                array->SetComponent(
+                  idx, j, tarray->GetComponent(idx, j) / bin_values->GetTuple1(idx));
+              }
             }
           }
         }
       }
     }
+    else
+    {
+      output->Initialize();
+    }
   }
-  else
+
+  if (this->Normalize && isRoot)
   {
-    output->Initialize();
+    auto rowData = output->GetRowData();
+    vtkDataArray* bin_values = rowData->GetArray("bin_values");
+    vtkNew<vtkDoubleArray> normalized_values;
+    normalized_values->SetName("bin_values");
+    normalized_values->SetNumberOfComponents(bin_values->GetNumberOfComponents());
+    normalized_values->SetNumberOfTuples(bin_values->GetNumberOfTuples());
+
+    auto bin_range = vtk::DataArrayValueRange<1>(bin_values);
+    int sum = 0;
+    for (auto bin_val : bin_range)
+    {
+      sum += bin_val;
+    }
+
+    auto normalized_range = vtk::DataArrayValueRange<1>(normalized_values);
+    auto bin_iter = bin_range.begin();
+    auto normalized_iter = normalized_range.begin();
+    for (; bin_iter != bin_range.end(); ++bin_iter, ++normalized_iter)
+    {
+      *normalized_iter = static_cast<double>(bin_iter[0]) / sum;
+    }
+
+    // Replace the previous bin_values array with the normalized version.
+    rowData->AddArray(normalized_values);
   }
 
   return 1;
