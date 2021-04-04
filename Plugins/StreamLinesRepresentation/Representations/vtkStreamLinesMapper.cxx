@@ -70,19 +70,25 @@ extern const char* vtkStreamLines_vs;
 namespace
 {
 template <class T>
-void ReleaseVTKGLObject(T* object, vtkWindow* renWin)
+void ReleaseVTKGLObject(T*& object, vtkWindow* renWin)
 {
-  object->ReleaseGraphicsResources(renWin);
-  object->Delete();
-  object = nullptr;
+  if (object)
+  {
+    object->ReleaseGraphicsResources(renWin);
+    object->Delete();
+    object = nullptr;
+  }
 }
 
 template <class T>
-void ReleaseVTKGLObject(T* object)
+void ReleaseVTKGLObject(T*& object)
 {
-  object->ReleaseGraphicsResources();
-  object->Delete();
-  object = nullptr;
+  if (object)
+  {
+    object->ReleaseGraphicsResources();
+    object->Delete();
+    object = nullptr;
+  }
 }
 }
 
