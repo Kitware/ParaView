@@ -87,9 +87,9 @@ void vtkGridAxesPlane2DActor::GetActors(vtkPropCollection* props)
         this->UpdateGeometry(vp);
       }
     }
-  }
 
-  props->AddItem(this->Actor.Get());
+    props->AddItem(this->Actor.Get());
+  }
 }
 
 //----------------------------------------------------------------------------

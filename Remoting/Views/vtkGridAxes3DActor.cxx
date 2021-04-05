@@ -107,11 +107,11 @@ void vtkGridAxes3DActor::GetActors(vtkPropCollection* props)
         this->UpdateGeometry(vp);
       }
     }
-  }
 
-  for (int i = 0; i < this->GridAxes2DActors.GetSize(); ++i)
-  {
-    this->GridAxes2DActors[i]->GetActors(props);
+    for (int i = 0; i < this->GridAxes2DActors.GetSize(); ++i)
+    {
+      this->GridAxes2DActors[i]->GetActors(props);
+    }
   }
 }
 
