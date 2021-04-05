@@ -1279,6 +1279,14 @@ void pqFileDialog::updateButtonStates()
 {
   auto& impl = *this->Implementation;
 
+  // We disable buttons if no file in the current folder
+  if (impl.FileNames.size() == 0)
+  {
+    impl.Ui.OK->setEnabled(false);
+    impl.Ui.Navigate->setEnabled(false);
+    return;
+  }
+
   bool is_dir = false;
   if (impl.FileNames.size() == 1)
   {
