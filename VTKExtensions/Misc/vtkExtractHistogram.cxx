@@ -27,11 +27,14 @@
 #include "vtkMath.h"
 #include "vtkObjectFactory.h"
 #include "vtkPointData.h"
+#include "vtkSMPThreadLocal.h"
+#include "vtkSMPTools.h"
 #include "vtkSmartPointer.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
 #include "vtkTable.h"
 #include "vtkUnsignedCharArray.h"
 
+#include <array>
 #include <map>
 #include <string>
 #include <vector>
@@ -141,56 +144,123 @@ vtkFieldData* vtkExtractHistogram::GetInputFieldData(vtkDataObject* input)
 //-----------------------------------------------------------------------------
 namespace
 {
-// Local version of GetRange that respects point/cell blankingd
-void GetRange(vtkDataArray* array, vtkFieldData* fieldData, double tRange[2], int component)
+
+class FiniteMinAndMaxWithBlanking
 {
-  tRange[0] = VTK_DOUBLE_MAX;
-  tRange[1] = VTK_DOUBLE_MIN;
+protected:
+  vtkDataArray* Array;
+  vtkUnsignedCharArray* GhostArray = nullptr;
+  unsigned char HiddenFlag;
+  double ReducedRange[2];
+  int Component;
+  vtkSMPThreadLocal<std::array<double, 2> > TLRange;
 
-  // Get blanking array
-  vtkUnsignedCharArray* blanking = nullptr;
-  vtkDataSetAttributes* attributes = vtkDataSetAttributes::SafeDownCast(fieldData);
-  if (attributes)
+public:
+  FiniteMinAndMaxWithBlanking(
+    vtkDataArray* array, int component, vtkUnsignedCharArray* ghostArray, unsigned char hiddenFlag)
+    : Array(array)
+    , Component(component)
+    , GhostArray(ghostArray)
+    , HiddenFlag(hiddenFlag)
   {
-    auto ghostArray = attributes->GetArray(vtkDataSetAttributes::GhostArrayName());
-    blanking = vtkUnsignedCharArray::SafeDownCast(ghostArray);
   }
-  bool isBlankedPointArray = blanking != nullptr && fieldData->IsA("vtkPointData");
-  bool isBlankedCellArray = blanking != nullptr && fieldData->IsA("vtkCellData");
 
-  vtkIdType numTuples = array->GetNumberOfTuples();
-  for (vtkIdType i = 0; i < numTuples; ++i)
+  void Initialize()
   {
+    auto& range = this->TLRange.Local();
+    range[0] = vtkTypeTraits<double>::Max();
+    range[1] = vtkTypeTraits<double>::Min();
+    this->ReducedRange[0] = vtkTypeTraits<double>::Max();
+    this->ReducedRange[1] = vtkTypeTraits<double>::Min();
+  }
 
-    // Skip if the array value is blanked.
-    if ((isBlankedPointArray &&
-          blanking->GetTypedComponent(i, 0) & vtkDataSetAttributes::HIDDENPOINT) ||
-      (isBlankedCellArray && blanking->GetTypedComponent(i, 0) & vtkDataSetAttributes::HIDDENCELL))
+  void Reduce()
+  {
+    for (auto itr = this->TLRange.begin(); itr != this->TLRange.end(); ++itr)
     {
-      continue;
+      auto& range = *itr;
+      this->ReducedRange[0] = vtkMath::Min(this->ReducedRange[0], range[0]);
+      this->ReducedRange[1] = vtkMath::Max(this->ReducedRange[1], range[1]);
     }
+  }
 
-    double value;
-    // if component is equal to the number of components, then the magnitude was requested.
-    if (component == array->GetNumberOfComponents())
+  void CopyRange(double* ranges)
+  {
+    ranges[0] = this->ReducedRange[0];
+    ranges[1] = this->ReducedRange[1];
+  }
+
+  void operator()(vtkIdType begin, vtkIdType end)
+  {
+    int numComponents = this->Array->GetNumberOfComponents();
+    auto& range = this->TLRange.Local();
+    if (this->Component == this->Array->GetNumberOfComponents())
     {
-      value = 0;
-      double comp;
-      for (int j = 0; j < array->GetNumberOfComponents(); ++j)
+      // Vector magnitude range
+      for (vtkIdType idx = begin; idx < end; ++idx)
       {
-        comp = array->GetComponent(i, j);
-        value += comp * comp;
+        // Skip if the array value is blanked.
+        if (this->GhostArray && this->GhostArray->GetTypedComponent(idx, 0) & this->HiddenFlag)
+        {
+          continue;
+        }
+
+        double sum = 0.0;
+        for (vtkIdType ic = 0; ic < numComponents; ++ic)
+        {
+          double value = this->Array->GetComponent(idx, ic);
+          sum += value * value;
+        }
+
+        if (vtkMath::IsFinite(sum))
+        {
+          double magnitude = std::sqrt(sum);
+
+          range[0] = vtkMath::Min(range[0], magnitude);
+          range[1] = vtkMath::Max(range[1], magnitude);
+        }
       }
-      value = sqrt(value);
     }
     else
     {
-      value = array->GetComponent(i, component);
-    }
+      // Component range
+      for (vtkIdType idx = begin; idx < end; ++idx)
+      {
+        // Skip if the array value is blanked.
+        if (this->GhostArray && this->GhostArray->GetTypedComponent(idx, 0) & this->HiddenFlag)
+        {
+          continue;
+        }
 
-    tRange[0] = std::min(tRange[0], value);
-    tRange[1] = std::max(tRange[1], value);
+        double value = this->Array->GetComponent(idx, this->Component);
+        if (vtkMath::IsFinite(value))
+        {
+          range[0] = vtkMath::Min(range[0], value);
+          range[1] = vtkMath::Max(range[1], value);
+        }
+      }
+    }
   }
+};
+
+// Local version of GetRange that respects point/cell blankingd
+void GetRangeWithBlanking(
+  vtkDataArray* array, vtkFieldData* fieldData, double tRange[2], int component)
+{
+  vtkUnsignedCharArray* ghostArray = nullptr;
+  vtkDataSetAttributes* attributes = vtkDataSetAttributes::SafeDownCast(fieldData);
+  if (attributes)
+  {
+    auto ghostDataArray = attributes->GetArray(vtkDataSetAttributes::GhostArrayName());
+    ghostArray = vtkUnsignedCharArray::SafeDownCast(ghostDataArray);
+  }
+  const unsigned char hiddenFlag = attributes->IsA("vtkPointData")
+    ? vtkDataSetAttributes::HIDDENPOINT
+    : vtkDataSetAttributes::HIDDENCELL;
+
+  FiniteMinAndMaxWithBlanking worker(array, component, ghostArray, hiddenFlag);
+  vtkSMPTools::For(0, array->GetNumberOfTuples(), worker);
+  worker.CopyRange(tRange);
 }
 }
 
@@ -221,15 +291,7 @@ bool vtkExtractHistogram::GetInputArrayRange(vtkInformationVector** inputVector,
       {
         foundone = true;
         double tRange[2];
-        if (this->Component == data_array->GetNumberOfComponents())
-        {
-          // magnitude
-          ::GetRange(data_array, this->GetInputFieldData(dObj), tRange, -1);
-        }
-        else
-        {
-          ::GetRange(data_array, this->GetInputFieldData(dObj), tRange, this->Component);
-        }
+        GetRangeWithBlanking(data_array, this->GetInputFieldData(dObj), tRange, this->Component);
         range[0] = (tRange[0] < range[0]) ? tRange[0] : range[0];
         range[1] = (tRange[1] > range[1]) ? tRange[1] : range[1];
       }
@@ -256,15 +318,8 @@ bool vtkExtractHistogram::GetInputArrayRange(vtkInformationVector** inputVector,
       vtkWarningMacro("Requested component " << this->Component << " is not available.");
       return false;
     }
-    if (this->Component == data_array->GetNumberOfComponents())
-    {
-      // magnitude
-      ::GetRange(data_array, this->GetInputFieldData(input), range, -1);
-    }
-    else
-    {
-      ::GetRange(data_array, this->GetInputFieldData(input), range, this->Component);
-    }
+    vtkFieldData* fieldData = this->GetInputFieldData(input);
+    GetRangeWithBlanking(data_array, fieldData, range, this->Component);
   }
 
   return true;
@@ -365,8 +420,9 @@ void vtkExtractHistogram::BinAnArray(
     auto ghostArray = attributes->GetArray(vtkDataSetAttributes::GhostArrayName());
     blanking = vtkUnsignedCharArray::SafeDownCast(ghostArray);
   }
-  bool isBlankedPointArray = blanking != nullptr && field->IsA("vtkPointData");
-  bool isBlankedCellArray = blanking != nullptr && field->IsA("vtkCellData");
+  const unsigned char ghostIndicator = field->IsA("vtkPointData")
+    ? vtkDataSetAttributes::HIDDENPOINT
+    : vtkDataSetAttributes::HIDDENCELL;
 
   for (int i = 0; i != num_of_tuples; ++i)
   {
@@ -376,9 +432,7 @@ void vtkExtractHistogram::BinAnArray(
     }
 
     // Skip if the array value is blanked.
-    if ((isBlankedPointArray &&
-          blanking->GetTypedComponent(i, 0) & vtkDataSetAttributes::HIDDENPOINT) ||
-      (isBlankedCellArray && blanking->GetTypedComponent(i, 0) & vtkDataSetAttributes::HIDDENCELL))
+    if (blanking && blanking->GetTypedComponent(i, 0) & ghostIndicator)
     {
       continue;
     }
