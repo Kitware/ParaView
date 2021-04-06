@@ -349,6 +349,7 @@ void vtkSMViewProxy::CreateVTKObjects()
 //----------------------------------------------------------------------------
 void vtkSMViewProxy::StillRender()
 {
+  std::cout << "vtkSMViewProxy::StillRender" << std::endl;
   // bug 0013947
   // on Mac OSX don't render into invalid drawable, all subsequent
   // OpenGL calls fail with invalid framebuffer operation.

@@ -1735,6 +1735,7 @@ void vtkPVRenderView::Render(bool interactive, bool skip_rendering)
 //----------------------------------------------------------------------------
 void vtkPVRenderView::Deliver(int use_lod, unsigned int size, unsigned int* representation_ids)
 {
+  std::cout << "vtkPVRenderview::Deliver" << std::endl;
   // if in multi-clients mode, ensure that processes are in the same "state"
   // before doing the data delivery or we may end up with dead-locks due to
   // mismatched representations.

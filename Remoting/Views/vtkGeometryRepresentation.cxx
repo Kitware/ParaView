@@ -445,6 +445,7 @@ int vtkGeometryRepresentation::ProcessViewRequest(
   }
   else if (request_type == vtkPVView::REQUEST_RENDER())
   {
+    std::cout << "REQUEST_RENDER " << std::endl;
     auto data = vtkPVView::GetDeliveredPiece(inInfo, this);
     // vtkLogF(INFO, "%p: %s", (void*)data, this->GetLogName().c_str());
     auto dataLOD = vtkPVView::GetDeliveredPieceLOD(inInfo, this);
@@ -479,6 +480,7 @@ int vtkGeometryRepresentation::ProcessViewRequest(
       }
       this->UpdateBlockAttrLOD = false;
     }
+    std::cout << "end REQUEST_RENDER" << std::endl;
   }
 
   return 1;
@@ -674,6 +676,7 @@ const char* vtkGeometryRepresentation::GetColorArrayName()
 //----------------------------------------------------------------------------
 void vtkGeometryRepresentation::UpdateColoringParameters()
 {
+  std::cout << "vtkGeometryRepresentation::UpdateColoringParameters" << std::endl;
   bool using_scalar_coloring = false;
 
   vtkInformation* info = this->GetInputArrayInformation(0);
@@ -684,6 +687,7 @@ void vtkGeometryRepresentation::UpdateColoringParameters()
     int fieldAssociation = info->Get(vtkDataObject::FIELD_ASSOCIATION());
     if (colorArrayName && colorArrayName[0])
     {
+      std::cout << "Updating coloring for vtkDataSet " << colorArrayName << std::endl;
       this->Mapper->SetScalarVisibility(1);
       this->LODMapper->SetScalarVisibility(1);
       this->Mapper->SelectColorArray(colorArrayName);
@@ -873,6 +877,8 @@ void vtkGeometryRepresentation::PrintSelf(ostream& os, vtkIndent indent)
 //----------------------------------------------------------------------------
 void vtkGeometryRepresentation::SetLookupTable(vtkScalarsToColors* val)
 {
+  std::cout << "vtkGeometryRepresentation::SetLookupTable" << std::endl;
+  // assert(false);
   this->Mapper->SetLookupTable(val);
   this->LODMapper->SetLookupTable(val);
 }
@@ -880,6 +886,7 @@ void vtkGeometryRepresentation::SetLookupTable(vtkScalarsToColors* val)
 //----------------------------------------------------------------------------
 void vtkGeometryRepresentation::SetMapScalars(int val)
 {
+  std::cout << "vtkGeometryRepresentation::SetMapScalars" << std::endl;
   if (val < 0 || val > 1)
   {
     vtkWarningMacro(<< "Invalid parameter for vtkGeometryRepresentation::SetMapScalars: " << val);

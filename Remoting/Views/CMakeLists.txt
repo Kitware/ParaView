@@ -51,6 +51,7 @@ set(classes
   vtkGridAxes3DActor
   vtkGridAxesHelper
   vtkGridAxesPlane2DActor
+  vtkHyperTreeGridRepresentation
   vtkImageSliceRepresentation
   vtkImageVolumeRepresentation
   vtkLogoSourceRepresentation

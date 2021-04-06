@@ -456,13 +456,14 @@ const char* vtkSMRenderViewProxy::GetRepresentationType(vtkSMSourceProxy* produc
 
   vtkSMSessionProxyManager* pxm = this->GetSessionProxyManager();
   const char* representationsToTry[] = { "UnstructuredGridRepresentation",
-    "StructuredGridRepresentation", "AMRRepresentation", "UniformGridRepresentation",
-    "PVMoleculeRepresentation", "GeometryRepresentation", nullptr };
+    "StructuredGridRepresentation", "HyperTreeGridRepresentation", "AMRRepresentation",
+    "UniformGridRepresentation", "PVMoleculeRepresentation", "GeometryRepresentation", nullptr };
   for (int cc = 0; representationsToTry[cc] != nullptr; ++cc)
   {
     vtkSMProxy* prototype = pxm->GetPrototypeProxy("representations", representationsToTry[cc]);
     if (prototype)
     {
+      std::cout << "Loading " << representationsToTry[cc] << std::endl;
       vtkSMProperty* inputProp = prototype->GetProperty("Input");
       vtkSMUncheckedPropertyHelper helper(inputProp);
       helper.Set(producer, outputPort);
@@ -470,6 +471,7 @@ const char* vtkSMRenderViewProxy::GetRepresentationType(vtkSMSourceProxy* produc
       helper.SetNumberOfElements(0);
       if (acceptable)
       {
+        std::cout << "acceptable" << std::endl;
         return representationsToTry[cc];
       }
     }

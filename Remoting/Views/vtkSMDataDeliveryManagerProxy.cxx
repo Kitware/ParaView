@@ -51,6 +51,7 @@ void vtkSMDataDeliveryManagerProxy::SetViewProxy(vtkSMViewProxy* viewproxy)
 //----------------------------------------------------------------------------
 void vtkSMDataDeliveryManagerProxy::Deliver(bool interactive)
 {
+  std::cout << "vtkSMDataDeliveryManagerProxy::Deliver" << std::endl;
   this->CreateVTKObjects();
 
   assert(this->ViewProxy != nullptr);
@@ -67,6 +68,7 @@ void vtkSMDataDeliveryManagerProxy::Deliver(bool interactive)
   // note: this will create new vtkTimeStamp, if needed.
   vtkTimeStamp& timeStamp =
     use_lod ? this->DeliveryTimestampsLOD[dataKey] : this->DeliveryTimestamps[dataKey];
+  std::cout << "#########################" << std::endl;
 
   if (timeStamp > update_ts)
   {
@@ -74,6 +76,7 @@ void vtkSMDataDeliveryManagerProxy::Deliver(bool interactive)
     // chosen data delivery mode. No delivery needs to be done at this time.
     return;
   }
+  std::cout << "#########################" << std::endl;
 
   // Get a list of representations for which we need to delivery data.
   std::vector<unsigned int> keys_to_deliver;
@@ -82,6 +85,7 @@ void vtkSMDataDeliveryManagerProxy::Deliver(bool interactive)
     timeStamp.Modified();
     return;
   }
+  std::cout << "#########################" << std::endl;
 
   vtkClientServerStream stream;
   stream << vtkClientServerStream::Invoke << VTKOBJECT(this->ViewProxy) << "Deliver"

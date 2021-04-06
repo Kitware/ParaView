@@ -939,6 +939,7 @@ vtkDataObject* vtkPVView::GetDeliveredPiece(
 {
   if (auto dm = vtkPVView::GetDeliveryManager(info))
   {
+    std::cout << "has delivery manager " << std::endl;
     return dm->GetDeliveredPiece(repr, false, port);
   }
   return nullptr;

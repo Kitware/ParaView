@@ -183,6 +183,7 @@ int vtkSMPVRepresentationProxy::ReadXMLAttributes(
 //----------------------------------------------------------------------------
 bool vtkSMPVRepresentationProxy::GetUsingScalarColoring()
 {
+  std::cout << "vtkSMPVRepresentationProxy::GetUsingScalarColoring " << std::endl;
   if (this->GetProperty("ColorArrayName"))
   {
     vtkSMPropertyHelper helper(this->GetProperty("ColorArrayName"));
@@ -862,6 +863,7 @@ bool vtkSMPVRepresentationProxy::IsScalarBarVisible(vtkSMProxy* view)
 vtkPVArrayInformation* vtkSMPVRepresentationProxy::GetArrayInformationForColorArray(
   bool checkRepresentedData)
 {
+  std::cout << "vtkSMPVRepresentationProxy::GetArrayInformationForColorArray" << std::endl;
   if (!this->GetUsingScalarColoring())
   {
     return nullptr;

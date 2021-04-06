@@ -165,6 +165,7 @@ vtkDataObject* vtkPVDataDeliveryManager::GetDeliveredPiece(
     this->Internals->GetItem(repr, low_res, port, /*create_if_needed=*/false);
   const int dataKey = this->GetDeliveredDataKey(low_res);
   const auto cacheKey = this->GetCacheKey(repr);
+  std::cout << "item " << item << std::endl;
   return item ? item->GetDeliveredDataObject(dataKey, cacheKey) : nullptr;
 }
 
@@ -204,12 +205,20 @@ bool vtkPVDataDeliveryManager::NeedsDelivery(
   vtkInternals::ItemsMapType::iterator iter;
   for (iter = this->Internals->ItemsMap.begin(); iter != this->Internals->ItemsMap.end(); ++iter)
   {
+    std::cout << "for " << std::endl;
     if (this->Internals->IsRepresentationVisible(iter->first.first))
     {
+      std::cout << "if " << std::endl;
       auto repr = this->GetRepresentation(iter->first.first);
       const auto cacheKey = this->GetCacheKey(repr);
       const int dataKey = this->GetDeliveredDataKey(low_res);
       vtkInternals::vtkItem& item = low_res ? iter->second.second : iter->second.first;
+      std::cout << "low_res " << low_res << std::endl;
+      std::cout << "cacheKey " << cacheKey << std::endl;
+      std::cout << "cached time stamp " << item.GetTimeStamp(cacheKey) << std::endl;
+      std::cout << "time stamp " << timestamp << std::endl;
+      std::cout << "delivery time stamp " << item.GetDeliveryTimeStamp(dataKey, cacheKey)
+                << std::endl;
       if (item.GetTimeStamp(cacheKey) > timestamp ||
         item.GetDeliveryTimeStamp(dataKey, cacheKey) < item.GetTimeStamp(cacheKey))
       {
@@ -242,6 +251,7 @@ void vtkPVDataDeliveryManager::Deliver(int low_res, unsigned int size, unsigned 
 
   assert(size % 2 == 0);
 
+  std::cout << "vtkPVDataDeliveryManager::Deliver" << std::endl;
   vtkVLogScopeF(PARAVIEW_LOG_DATA_MOVEMENT_VERBOSITY(), "%s data migration",
     (low_res ? "low-resolution" : "full resolution"));
   for (unsigned int cc = 0; cc < size; cc += 2)
