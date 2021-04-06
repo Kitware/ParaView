@@ -10,8 +10,10 @@
 
 .run_scheduled:
     rules:
-        - if: '$CI_MERGE_REQUEST_ID'
-          when: manual
+# uncomment these lines manually if you want to test a scheduled builder
+# manually for MRs. disabling these to make it easier to do tests on MRs
+#        - if: '$CI_MERGE_REQUEST_ID'
+#          when: manual
         - if: '$CI_PIPELINE_SOURCE == "schedule" && $CI_PROJECT_PATH == "paraview/paraview"'
           when: on_success
         - when: never

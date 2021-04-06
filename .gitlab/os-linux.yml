@@ -104,6 +104,22 @@
         - linux
         - x11
 
+.linux_qt_builder_tags:
+    tags:
+        - build
+        - docker
+        - linux
+        - linux-3.17 # needed to run Qt binaries from Fedora 33
+        - paraview
+
+.linux_qt_tester_tags:
+    tags:
+        - docker
+        - paraview
+        - linux
+        - linux-3.17
+        - x11
+
 ## Linux-specific scripts
 
 .before_script_linux: &before_script_linux
@@ -119,7 +135,7 @@
     # will be necessary.
     - '[ "$CC" = "icc" ] && dnf install --setopt=install_weak_deps=False -y git-lfs'
     - "git submodule update --init --recursive || :"
-    - git submodule foreach --recursive cmake "-Dusername:STRING=$CI_PROJECT_NAMESPACE" "-Durl_prefix:STRING=https://$CI_SERVER_HOST" -P "$PWD/.gitlab/ci/fetch_submodule.cmake"
+    - git submodule foreach --recursive cmake -P "$PWD/.gitlab/ci/fetch_submodule.cmake"
     - git submodule sync --recursive
     - git submodule update --init --recursive
     # Load any modules that may be necessary.
