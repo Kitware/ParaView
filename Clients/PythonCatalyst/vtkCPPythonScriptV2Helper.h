@@ -25,9 +25,12 @@
 
 #include "vtkObject.h"
 #include "vtkPVPythonCatalystModule.h" // For windows import/export of shared libraries
+#include <string>                      // for std::string
+#include <vector>                      //for std::string
 
 class vtkSMProxy;
 class vtkCPDataDescription;
+class vtkStringList;
 
 class VTKPVPYTHONCATALYST_EXPORT vtkCPPythonScriptV2Helper : public vtkObject
 {
@@ -54,7 +57,7 @@ public:
    *
    * Returns true on success.
    */
-  bool Import();
+  bool Import(const std::vector<std::string>& args = {});
 
   /**
    * Calls `catalyst_initialize`.
@@ -95,6 +98,7 @@ public:
   vtkGetObjectMacro(Options, vtkSMProxy);
   vtkCPDataDescription* GetDataDescription() const { return this->DataDescription; }
   vtkSMProxy* GetTrivialProducer(const char* inputname);
+  vtkStringList* GetArgumentsAsStringList() const;
   //@}
 
 protected:

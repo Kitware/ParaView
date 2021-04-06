@@ -26,6 +26,8 @@
 
 #include "vtkInSituPipeline.h"
 #include "vtkNew.h" //  for vtkNew.
+#include <string>   // for std::string
+#include <vector>   // for std::vector
 
 class vtkCPPythonScriptV2Helper;
 
@@ -47,6 +49,15 @@ public:
 
   //@{
   /**
+   * Get/Set the arguments. The vector is deep copied. Note, changing arguments
+   * after `Initialize` has no effect.
+   */
+  void SetArguments(const std::vector<std::string> args);
+  const std::vector<std::string>& GetArguments() const { return this->Arguments; }
+  //@}
+
+  //@{
+  /**
    * vtkInSituPipeline API implementation.
    */
   bool Initialize() override;
@@ -64,6 +75,7 @@ private:
 
   vtkNew<vtkCPPythonScriptV2Helper> Helper;
   char* FileName;
+  std::vector<std::string> Arguments;
 };
 
 #endif

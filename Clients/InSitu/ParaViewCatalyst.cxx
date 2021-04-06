@@ -23,6 +23,7 @@
 #include "vtkConduitSource.h"
 #include "vtkInSituInitializationHelper.h"
 #include "vtkInSituPipelineIO.h"
+#include "vtkInSituPipelinePython.h"
 #include "vtkPVLogger.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMSessionProxyManager.h"
@@ -71,6 +72,18 @@ static vtkSmartPointer<vtkInSituPipeline> create_precompiled_pipeline(const cond
   }
 }
 
+static bool process_script_args(vtkInSituPipelinePython* pipeline, const conduit::Node& node)
+{
+  std::vector<std::string> args;
+  auto iter = node.children();
+  while (iter.has_next())
+  {
+    args.push_back(iter.next().as_string());
+  }
+  pipeline->SetArguments(args);
+  return true;
+}
+
 //-----------------------------------------------------------------------------
 void catalyst_initialize(const conduit_node* params)
 {
@@ -112,10 +125,19 @@ void catalyst_initialize(const conduit_node* params)
       auto iter = scripts.children();
       while (iter.has_next())
       {
-        iter.next();
-        const std::string script = iter.node().as_string();
-        vtkVLogF(PARAVIEW_LOG_CATALYST_VERBOSITY(), "Analysis script: '%s'", script.c_str());
-        vtkInSituInitializationHelper::AddPipeline(script);
+        auto& script = iter.next();
+        const auto fname =
+          script.dtype().is_string() ? script.as_string() : script["filename"].as_string();
+
+        vtkVLogF(PARAVIEW_LOG_CATALYST_VERBOSITY(), "Analysis script: '%s'", fname.c_str());
+
+        auto pipeline = vtkInSituInitializationHelper::AddPipeline(fname);
+
+        // check for optional 'args'
+        if (script.has_path("args"))
+        {
+          ::process_script_args(vtkInSituPipelinePython::SafeDownCast(pipeline), script["args"]);
+        }
       }
     }
     else

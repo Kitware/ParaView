@@ -53,13 +53,31 @@ vtkInSituPipelinePython::~vtkInSituPipelinePython()
 }
 
 //----------------------------------------------------------------------------
+void vtkInSituPipelinePython::SetArguments(const std::vector<std::string> args)
+{
+  if (args != this->Arguments)
+  {
+#if VTK_MODULE_ENABLE_ParaView_PythonCatalyst
+    if (this->Helper->IsImported())
+    {
+      vtkErrorMacro(
+        "'SetArguments' called after script has been imported. It will have no effect.");
+      return;
+    }
+#endif
+    this->Arguments = args;
+    this->Modified();
+  }
+}
+
+//----------------------------------------------------------------------------
 bool vtkInSituPipelinePython::Initialize()
 {
 #if VTK_MODULE_ENABLE_ParaView_PythonCatalyst
   // call some Python API.
   auto status = Py_IsInitialized();
   (void)status;
-  return this->Helper->PrepareFromScript(this->FileName) && this->Helper->Import() &&
+  return this->Helper->PrepareFromScript(this->FileName) && this->Helper->Import(this->Arguments) &&
     this->Helper->CatalystInitialize();
 #else
   return false;

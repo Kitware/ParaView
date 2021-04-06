@@ -85,7 +85,7 @@ public:
    * can point to a Python script, a directory containing a Python package or a
    * zip-file which containing a Python package.
    */
-  static void AddPipeline(const std::string& path);
+  static vtkInSituPipeline* AddPipeline(const std::string& path);
 
   /**
    * Add a vtkInSituPipeline instance.

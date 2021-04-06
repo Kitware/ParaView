@@ -20,3 +20,16 @@ def log_level():
     from paraview.modules.vtkPVVTKExtensionsCore import vtkPVLogger
     from paraview.detail.loghandler import get_level
     return get_level(vtkPVLogger.GetCatalystVerbosity())
+
+
+def get_args():
+    """For the active pipeline script, returns "args", if any, specified
+    when the script initialized in the Catalyst adaptor.
+
+    This is currently only supported for adaptors that use Catalyst 2.0 Adaptor
+    API. For legacy adaptors, this will simply return an empty list.
+
+    Return value is a list of strings.
+    """
+    from . import v2_internals
+    return v2_internals._get_active_arguments()

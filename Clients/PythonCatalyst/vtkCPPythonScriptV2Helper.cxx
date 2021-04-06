@@ -33,6 +33,7 @@
 #include "vtkSMSessionProxyManager.h"
 #include "vtkSmartPointer.h"
 #include "vtkSmartPyObject.h"
+#include "vtkStringList.h"
 
 #include <cassert>
 #include <map>
@@ -80,6 +81,9 @@ public:
   vtkSmartPointer<vtkLiveInsituLink> LiveLink;
 #endif
 
+  // Keeps track of arguments
+  vtkNew<vtkStringList> ArgumentsList;
+
   // flag that tells us the module has custom "execution" methods.
   bool HasCustomExecutionLogic = false;
 
@@ -99,7 +103,7 @@ public:
   /**
    * Imports the module.
    */
-  bool Import();
+  bool Import(const std::vector<std::string>& args);
 
   /**
    * Returns false is any error had occurred and was flushed, otherwise returns
@@ -170,7 +174,7 @@ bool vtkCPPythonScriptV2Helper::vtkInternals::Prepare(const std::string& fname)
 }
 
 //----------------------------------------------------------------------------
-bool vtkCPPythonScriptV2Helper::vtkInternals::Import()
+bool vtkCPPythonScriptV2Helper::vtkInternals::Import(const std::vector<std::string>& args)
 {
   if (!this->PackageName)
   {
@@ -190,6 +194,13 @@ bool vtkCPPythonScriptV2Helper::vtkInternals::Import()
   {
     // avoid re-importing if it already failed.
     return false;
+  }
+
+  // populate args.
+  this->ArgumentsList->RemoveAllItems();
+  for (auto& argcc : args)
+  {
+    this->ArgumentsList->AddString(argcc.c_str());
   }
 
   vtkPythonScopeGilEnsurer gilEnsurer;
@@ -264,12 +275,12 @@ bool vtkCPPythonScriptV2Helper::IsImported() const
 }
 
 //----------------------------------------------------------------------------
-bool vtkCPPythonScriptV2Helper::Import()
+bool vtkCPPythonScriptV2Helper::Import(const std::vector<std::string>& args /*={}*/)
 {
   vtkScopedSet<vtkCPPythonScriptV2Helper*> scoped(vtkCPPythonScriptV2Helper::ActiveInstance, this);
 
   auto& internals = (*this->Internals);
-  return internals.Import();
+  return internals.Import(args);
 }
 
 //----------------------------------------------------------------------------
@@ -293,12 +304,12 @@ bool vtkCPPythonScriptV2Helper::CatalystInitialize()
 {
   vtkScopedSet<vtkCPPythonScriptV2Helper*> scoped(vtkCPPythonScriptV2Helper::ActiveInstance, this);
 
-  auto& internals = (*this->Internals);
-  if (!internals.Import())
+  if (!this->IsImported())
   {
     return false;
   }
 
+  auto& internals = (*this->Internals);
   vtkPythonScopeGilEnsurer gilEnsurer;
   vtkSmartPyObject method(PyString_FromString("do_catalyst_initialize"));
   vtkSmartPyObject result(PyObject_CallMethodObjArgs(
@@ -362,8 +373,7 @@ bool vtkCPPythonScriptV2Helper::CatalystExecute(int timestep, double time)
 {
   vtkScopedSet<vtkCPPythonScriptV2Helper*> scoped(vtkCPPythonScriptV2Helper::ActiveInstance, this);
 
-  auto& internals = (*this->Internals);
-  if (!internals.Import())
+  if (!this->IsImported())
   {
     return false;
   }
@@ -373,6 +383,8 @@ bool vtkCPPythonScriptV2Helper::CatalystExecute(int timestep, double time)
     // skip calling RequestDataDescription.
     return true;
   }
+
+  auto& internals = (*this->Internals);
 
   // Update ViewTime on each of the views.
   for (auto& view : internals.Views)
@@ -443,8 +455,7 @@ bool vtkCPPythonScriptV2Helper::RequestDataDescription(vtkCPDataDescription* dat
   vtkScopedSet<vtkCPPythonScriptV2Helper*> scoped(vtkCPPythonScriptV2Helper::ActiveInstance, this);
   vtkScopedSet<vtkCPDataDescription*> scopedDD(this->DataDescription, dataDesc);
 
-  auto& internals = (*this->Internals);
-  if (!internals.Import())
+  if (!this->IsImported())
   {
     return false;
   }
@@ -454,6 +465,8 @@ bool vtkCPPythonScriptV2Helper::RequestDataDescription(vtkCPDataDescription* dat
     // skip calling RequestDataDescription.
     return true;
   }
+
+  auto& internals = (*this->Internals);
 
   vtkPythonScopeGilEnsurer gilEnsurer;
   vtkSmartPyObject method(PyString_FromString("do_request_data_description"));
@@ -496,6 +509,13 @@ bool vtkCPPythonScriptV2Helper::RequestDataDescription(vtkCPDataDescription* dat
 vtkCPPythonScriptV2Helper* vtkCPPythonScriptV2Helper::GetActiveInstance()
 {
   return vtkCPPythonScriptV2Helper::ActiveInstance;
+}
+
+//----------------------------------------------------------------------------
+vtkStringList* vtkCPPythonScriptV2Helper::GetArgumentsAsStringList() const
+{
+  auto& internals = (*this->Internals);
+  return internals.ArgumentsList;
 }
 
 //----------------------------------------------------------------------------
