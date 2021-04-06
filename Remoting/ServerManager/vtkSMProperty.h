@@ -343,65 +343,65 @@ public:
    * By default, standard properties have "default" visibility,
    * while information_only properties have "never" visibility.
    */
-  vtkSetStringMacro(PanelVisibility)
-    //@}
+  vtkSetStringMacro(PanelVisibility);
+  //@}
 
-    //@{
-    /**
-     * Returns the panel visibility for the property.
-     */
-    vtkGetStringMacro(PanelVisibility)
-    //@}
+  //@{
+  /**
+   * Returns the panel visibility for the property.
+   */
+  vtkGetStringMacro(PanelVisibility);
+  //@}
 
-    //@{
-    /**
-     * Sets the panel visibility to default if the current
-     * representation type matches \p representation.
-     */
-    vtkSetStringMacro(PanelVisibilityDefaultForRepresentation)
-    //@}
+  //@{
+  /**
+   * Sets the panel visibility to default if the current
+   * representation type matches \p representation.
+   */
+  vtkSetStringMacro(PanelVisibilityDefaultForRepresentation);
+  //@}
 
-    //@{
-    /**
-     * Returns which representation type the property will be shown by
-     * default for.
-     */
-    vtkGetStringMacro(PanelVisibilityDefaultForRepresentation)
-    //@}
+  //@{
+  /**
+   * Returns which representation type the property will be shown by
+   * default for.
+   */
+  vtkGetStringMacro(PanelVisibilityDefaultForRepresentation);
+  //@}
 
-    //@{
-    /**
-     * Sets the name of the custom panel widget to use for the property.
-     */
-    vtkSetStringMacro(PanelWidget)
-    //@}
+  //@{
+  /**
+   * Sets the name of the custom panel widget to use for the property.
+   */
+  vtkSetStringMacro(PanelWidget);
+  //@}
 
-    //@{
-    /**
-     * Returns name of the panel widget for the property.
-     */
-    vtkGetStringMacro(PanelWidget)
-    //@}
+  //@{
+  /**
+   * Returns name of the panel widget for the property.
+   */
+  vtkGetStringMacro(PanelWidget);
+  //@}
 
-    //@{
-    /**
-     * Sets the tracing of sub property of this property
-     */
-    vtkSetStringMacro(DisableSubTrace)
-    //@}
+  //@{
+  /**
+   * Sets the tracing of sub property of this property
+   */
+  vtkSetStringMacro(DisableSubTrace);
+  //@}
 
-    //@{
-    /**
-     * Returns the tracing state of the properties of this property
-     */
-    vtkGetStringMacro(DisableSubTrace)
-    //@}
+  //@{
+  /**
+   * Returns the tracing state of the properties of this property
+   */
+  vtkGetStringMacro(DisableSubTrace);
+  //@}
 
-    /**
-     * Copy all property values. This will copy both checked and unchecked values,
-     * if applicable.
-     */
-    virtual void Copy(vtkSMProperty* src);
+  /**
+   * Copy all property values. This will copy both checked and unchecked values,
+   * if applicable.
+   */
+  virtual void Copy(vtkSMProperty* src);
 
   //@{
   /**
@@ -609,6 +609,9 @@ protected:
    * because the domain does not really "depend" on the property.
    * When calling Update() on dependent domains, the property
    * passes itself as the argument.
+   *
+   * @note as of ParaView 5.10, this method skips updating domains for prototype
+   * proxies. See description in .cxx for details behind this change.
    */
   void UpdateDomains();
 
