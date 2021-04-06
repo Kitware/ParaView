@@ -4,14 +4,15 @@ This page describes how to build and install ParaView. It covers building for
 development, on both Unix-type systems (Linux, HP-UX, Solaris, macOS), and
 Windows. Note that Unix-like environments such as Cygwin and MinGW are not
 officially supported. However, patches to fix problems with these platforms
-will be considered for inclusion.
+will be considered for inclusion. ParaView builds on x86_64, PowerPC, and ARM
+architectures.
 
 ParaView depends on several open source tools and libraries such as Python, Qt,
 CGNS, HDF5, etc. Some of these are included in the ParaView source itself
 (e.g., HDF5), while others are expected to be present on the machine on which
 ParaView is being built (e.g., Python, Qt).
 
-The first chapter is a getting started guide by OS that is very helpful if you have never
+The first section is a getting started guide by OS that is very helpful if you have never
 built ParaView before and do not know which options you need.
 If you are looking for the generic help, please read the [Complete Compilation Guide](#complete-compilation-guide)
 
@@ -19,7 +20,7 @@ If you are looking for the generic help, please read the [Complete Compilation G
 This is a section intended to help those that have never built ParaView before, are not
 experienced with compilation in general or have no idea which option they may need when building ParaView.
 If you follow this guide, you will be able to compile and run a standard version of ParaView
-for your operating system. It will be built with the python wrapping, MPI capabilities and multithread capabilities.
+for your operating system. It will be built with the Python wrapping, MPI capabilities and multithreading capabilities.
 
  * If you are using a Linux distribution, please see [the Linux part](#linux),
  * If you are using Microsoft Windows, please see [the Windows part](#windows),
@@ -42,7 +43,7 @@ CMake 3.12 or higher is needed.
 ###### Others
 `sudo yum install python3-devel openmpi-devel mesa-libGL-devel libX11-devel libXt-devel qt5-qtbase-devel qt5-qtx11extras-devel qt5-qttools-devel qt5-qtxmlpatterns-devel tbb-devel ninja-build git`
 
-###### Environement
+###### Environment
 ```sh
 alias ninja=ninja-build
 export PATH=$PATH:/usr/lib64/openmpi/bin/
@@ -57,7 +58,7 @@ Feel free to then provide it so we can integrate it in this guide by creating an
 
 #### Build
 
-To build ParaView developement version (usually refered as "master"), please run the following commands in a terminal :
+To build ParaView development version (usually refered as "master"), please run the following commands in a terminal:
 ```sh
 git clone --recursive https://gitlab.kitware.com/paraview/paraview.git
 mkdir paraview_build
@@ -79,7 +80,7 @@ ninja
 ```
 
 #### Run
-Double click on the paraview executable in the bin directory or run in the previous terminal
+Double click on the paraview executable in the `/bin` directory or run in the previous terminal
 
 ```sh
 ./bin/paraview
@@ -87,8 +88,8 @@ Double click on the paraview executable in the bin directory or run in the previ
 
 ### Windows
 
-Note: the following steps concerning Visual Studio 2015 can also be applied to Visual Studio 2019.
-If so, beware to use the msvc2019_64 Qt Version and the Developer Command Prompt for VS 2019.
+Note: the following steps concerning Visual Studio 2015 can also be applied to Visual Studio 2017 and 2019.
+If so, be sure to use the msvc2017_64/msvc2019_64 Qt Version and the Developer Command Prompt for VS 2017/2019.
 
 #### Dependencies
  * Download and install [git bash for windows][gitforwindows]
@@ -97,11 +98,11 @@ If so, beware to use the msvc2019_64 Qt Version and the Developer Command Prompt
  * Download [ninja-build][ninja] and drop `ninja.exe` in `C:\Windows\`
  * Download and install both `msmpisetup.exe` and `msmpisdk.msi` from [Microsoft MPI][msmpi]
  * Download and install [Python for windows][pythonwindows], make sure to add the path to your Python installation folder to the `PATH` environnement variable.
- * Download and install [Qt 5.12.3][qt-download-5.12.3] for windows, make sure to check the MSVC 2015 64-bit component during installation, make sure to add `C:\Qt\Qt5.12.3\5.12.3\msvc2015_64\bin` to your `PATH` environnement variable.
+ * Download and install [Qt 5.12.3][qt-download-5.12.3] for Windows, make sure to check the MSVC 2015 64-bit component during installation, make sure to add `C:\Qt\Qt5.12.3\5.12.3\msvc2015_64\bin` to your `PATH` environment variable.
 
 #### Recover the source
  * Open git bash
- * To build ParaView developement version (usually refered as "master"), run the following commands:
+ * To build ParaView development version (usually referred to as `master`), run the following commands:
 
 ```sh
 cd C:
@@ -157,7 +158,7 @@ Makefiles, and Visual Studio generators are the most well-tested however.
 
 #### Prerequisites
 
-ParaView only requires a few packages in order to build in general, however
+ParaView only requires a few packages to build with its basic capabilities. However,
 specific features may require additional packages to be provided to ParaView's
 build configuration.
 
@@ -167,6 +168,8 @@ Required:
     - Version 3.12 or newer, however, the latest version is always recommended
   * Supported compiler
     - GCC 4.8 or newer
+    - Intel 17 or newer
+    - IBM XL 16.1 or newer
     - Clang 4 or newer
     - Xcode 9 or newer
     - Visual Studio 2015 or newer
@@ -176,7 +179,7 @@ Optional dependencies:
   * [Python][python]
     - At least 3.3 is required
   * [Qt5][qt]
-    - Version 5.9 or newer
+    - Version 5.12 or newer
 
 ##### Installing CMake
 
@@ -187,7 +190,7 @@ management utilities. If it is not, there are precompiled binaries available on
 
 ##### Installing Qt
 
-ParaView uses Qt as its GUI library. Precompiled binaries are available on
+ParaView uses Qt to provide its graphical user interface. Precompiled binaries are available on
 [Qt's website][qt-download].
 
 Note that on Windows, the compiler used for building ParaView must match the
@@ -204,7 +207,7 @@ the `plugins/platformthemes` directory has been sufficient in the past.
 
 When the ability to write `.avi` files is desired, and writing these files is
 not supported by the OS, ParaView can use the ffmpeg library. This is generally
-true for Linux. Source code for ffmpeg can be obtained from [the
+true for Linux. Source code for ffmpeg can be obtained from [its
 website][ffmpeg].
 
 ##### MPI
@@ -217,7 +220,7 @@ Linux/Mac, we suggest either [OpenMPI][openmpi] or [MPICH][mpich]. On Windows,
 
 ##### Python
 
-In order to use scripting, [Python][python] is required (version 3.3). Python
+In order to use Python scripting, [Python][python] is required (version 3.3 or later). Python
 is also required in order to build ParaViewWeb support.
 
 ##### OSMesa
@@ -226,8 +229,8 @@ Off-screen Mesa can be used as a software-renderer for running ParaView on a
 server without hardware OpenGL acceleration. This is usually available in
 system packages on Linux. For example, the `libosmesa6-dev` package on Debian
 and Ubuntu. However, for older machines, building a newer version of Mesa is
-likely necessary for bug fixes and support. Its source and build instructions
-can be found on [its website][mesa].
+likely necessary for bug fixes and support for features needed by ParaView.
+Its source and build instructions can be found on [its website][mesa].
 
 ### Creating the Build Environment
 
@@ -246,7 +249,7 @@ can be found on [its website][mesa].
 with the optional Python linking. This case is hard to auto-detect, so if
 undefined symbol errors related to Python symbols arise, setting
 `vtk_undefined_symbols_allowed=OFF` may resolve the errors. If it does not,
-please file a new issue.
+please file a new [issue][paraview-issues].
 
 #### Windows
 
@@ -262,9 +265,11 @@ itself does not support what are known as in-source builds, so the first step
 is to create a build directory.
 
 !!! note
-    On Windows, there have historically been issues with long paths to the
-    build directory. These should have been addressed, but they may appear
-    again. If any are seen, please report them to [the issue
+    On Windows, there have historically been issues if the path to the
+    build directory is too long. These issues should have been addressed in
+    more recent versions of ParaView's build system, but they may appear again. If you
+    see errors related to header files not being found at paths on your file
+    system that do exist, please report them to [the issue
     tracker][paraview-issues].
 
 ```sh
@@ -280,13 +285,13 @@ Command Prompt" available with Visual Studio in the start menu.
 #### Build Settings
 
 ParaView has a number of settings available for its build. These are categorized
-as build options, capability option, feature options and miscellanoues options.
+as build options, capability options, feature options and miscellaneous options.
 
 
 #### Build Options
 
-These options impact the build. These begin with the prefix `PARAVIEW_BUILD_`.
-The common variables to modify include:
+Options that impact the build begin with the prefix `PARAVIEW_BUILD_`.
+Common variables to modify include:
 
   * `PARAVIEW_BUILD_SHARED_LIBS` (default `ON`): If set, shared libraries will
     be built. This is usually what is wanted.
@@ -358,7 +363,7 @@ More advanced / less common options include:
   * `PARAVIEW_ENABLE_VISITBRIDGE` (default `OFF`): Enable support for VisIt
     readers.
   * `PARAVIEW_ENABLE_NVPIPE` (default `OFF`): Use [nvpipe][nvpipe] image
-    compression when communicating the GPU. Requires CUDA and an NVIDIA GPU.
+    compression that uses the GPU when communicating. Requires CUDA and an NVIDIA GPU.
   * `PARAVIEW_ENABLE_GDAL` (default `OFF`): Enable support for reading GDAL
     files.
   * `PARAVIEW_ENABLE_LAS` (default `OFF`): Enable support for reading LAS
@@ -371,7 +376,7 @@ More advanced / less common options include:
     MotionFX files.
   * `PARAVIEW_ENABLE_MOMENTINVARIANTS` (default `OFF`): Enable
     MomentInvariants filters.
-  * `PARAVIEW_ENABLE_LOOKINGGLASS` (default `OFF`): Enable LookingGlass display.
+  * `PARAVIEW_ENABLE_LOOKINGGLASS` (default `OFF`): Enable support for LookingGlass displays.
   * `PARAVIEW_ENABLE_XDMF2` (default `OFF`): Enable support for reading Xdmf2
     files.
   * `PARAVIEW_ENABLE_XDMF3` (default `OFF`): Enable support for reading Xdmf3
@@ -385,7 +390,7 @@ More advanced / less common options include:
 
 #### Plugin settings
 
-ParaView build includes several plugins. These can be enabled / disabled using the
+ParaView includes several optional plugins that can be enabled and disabled using the
 following options:
 
   * `PARAVIEW_PLUGINS_DEFAULT` (default `ON`): Pass this flag to the command
@@ -413,7 +418,7 @@ controlled by the other options provided.
     settings for modules belonging to the named group. Valid values are those
     for the module system's build settings (see below).
 
-For variables which use the module system's build settings, the valid values are as follows:
+For variables that use the module system's build settings, the valid values are as follows:
 
   * `YES`: Require the module to be built.
   * `WANT`: Build the module if possible.
