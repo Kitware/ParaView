@@ -50,5 +50,41 @@
         <FormatOptions extensions="avi" file_description="VFW AVI files" />
       </Hints>
     </Proxy>
+    <Proxy name="MP4Writer" class="vtkMP4Writer" label="MP4 Writer" processes="client">
+      <Documentation>
+        MP4 writer that uses the Microsoft Media Foundation API to write H.264-encoded
+        video files.
+      </Documentation>
+
+      <IntVectorProperty name="BitRate"
+        command="SetBitRate"
+        number_of_elements="1"
+        default_values="10000000">
+        <Documentation>
+          Set the bit-rate of the encoded video file.
+        </Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator" mode="enabled_state" property="Compression" value="1" />
+        </Hints>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="Rate"
+        command="SetRate"
+        number_of_elements="1"
+        default_values="15"
+        panel_visibility="never">
+        <IntRangeDomain name="range" min="1" />
+        <Documentation>
+          Specify the frame rate in frames-per-second.
+        </Documentation>
+        <!-- ideally, this property is not hidden and we remove the "FrameRate"
+             property on "SaveAnimation" proxy. However, the way the frame-window stuff is managed currently
+             makes this hard. We need to rework frame-windowing logic too.
+             -->
+      </IntVectorProperty>
+      <Hints>
+        <FormatOptions extensions="mp4" file_description="MP4 files" />
+      </Hints>
+    </Proxy>
   </ProxyGroup>
 </ServerManagerConfiguration>

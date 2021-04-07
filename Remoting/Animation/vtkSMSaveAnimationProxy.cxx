@@ -300,30 +300,49 @@ vtkSMSaveAnimationProxy::~vtkSMSaveAnimationProxy() = default;
 bool vtkSMSaveAnimationProxy::EnforceSizeRestrictions(const char* filename)
 {
   std::string ext = vtksys::SystemTools::GetFilenameLastExtension(filename ? filename : "");
-  if (vtksys::SystemTools::LowerCase(ext) == ".avi")
+  ext = vtksys::SystemTools::LowerCase(ext);
+  int widthMultiple = 1;
+  int heightMultiple = 1;
+  if (ext == ".avi")
   {
-    vtkVector2i newsize;
-    vtkSMPropertyHelper(this, "ImageResolution").Get(newsize.GetData(), 2);
+    widthMultiple = 4;
+    heightMultiple = 4;
+  }
+  else if (ext == ".mp4")
+  {
+    widthMultiple = 2;
+    heightMultiple = 2;
+  }
 
-    const vtkVector2i size(newsize);
-    if (newsize[0] % 4 != 0)
-    {
-      newsize[0] -= (newsize[0] % 4);
-    }
-    if (newsize[1] % 4 != 0)
-    {
-      newsize[1] -= (newsize[1] % 4);
-    }
+  vtkVector2i newsize;
+  vtkSMPropertyHelper(this, "ImageResolution").Get(newsize.GetData(), 2);
+  const vtkVector2i size(newsize);
 
-    if (newsize != size)
+  if (widthMultiple != 1)
+  {
+    if (newsize[0] % widthMultiple != 0)
     {
-      vtkWarningMacro("The requested resolution '("
-        << size[0] << ", " << size[1] << ")' has been changed to '(" << newsize[0] << ", "
-        << newsize[1] << ")' to match format specification.");
-      vtkSMPropertyHelper(this, "ImageResolution").Set(newsize.GetData(), 2);
-      return true; // size changed.
+      newsize[0] -= (newsize[0] % widthMultiple);
     }
   }
+
+  if (heightMultiple != 1)
+  {
+    if (newsize[1] % heightMultiple != 0)
+    {
+      newsize[1] -= (newsize[1] % heightMultiple);
+    }
+  }
+
+  if (newsize != size)
+  {
+    vtkWarningMacro("The requested resolution '("
+      << size[0] << ", " << size[1] << ")' has been changed to '(" << newsize[0] << ", "
+      << newsize[1] << ")' to match format specification.");
+    vtkSMPropertyHelper(this, "ImageResolution").Set(newsize.GetData(), 2);
+    return true; // size changed.
+  }
+
   // nothing  changed.
   return false;
 }
