@@ -1199,6 +1199,17 @@
         </Documentation>
       </IntVectorProperty>
 
+      <IntVectorProperty command="SetFasterApproximation"
+        name="FasterApproximation"
+        default_values="0"
+        number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          When this option is enabled, the gradient filter used to compute vortex cores will provide
+          a less accurate algorithm that performs fewer derivative calculations and is therefore faster.
+        </Documentation>
+      </IntVectorProperty>
+
     </SourceProxy>
       <!-- End VortexCores -->
   </ProxyGroup>
