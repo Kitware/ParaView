@@ -16,6 +16,7 @@
 
 #include "vtkClientServerStream.h"
 #include "vtkDataArraySelection.h"
+#include "vtkDataSetAttributes.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVXMLElement.h"
 #include "vtkSMMessage.h"
@@ -119,6 +120,14 @@ bool vtkSIDataArraySelectionProperty::Push(vtkSMMessage* message, int offset)
     else if (this->NumberOfElementsPerCommand == 1)
     {
       selection->RemoveAllArrays();
+
+      // Ghost type arrays are kind of oddballs - some filters such as
+      // vtkPassSelectedArrays assume that if a ghost array is not explicitly
+      // marked disabled that it should be treated as enabled. Make sure we
+      // explicitly disable these in a selection. If they are present in the
+      // selection property, they will be re-enabled in the loop below.
+      selection->SetArraySetting(vtkDataSetAttributes::GhostArrayName(), 0);
+
       for (int cc = 0; cc < num_elems; ++cc)
       {
         selection->EnableArray(variant.txt(cc).c_str());

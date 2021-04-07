@@ -655,6 +655,7 @@ SET(TESTS_WITH_BASELINES
   ContourRange.xml
   DataAxesGrid.xml
   MoleculeScalarBar.xml
+  PassArrays.xml
   SelectionByArray.xml
   SeriesPreset.xml
   SeriesPresetRegexp.xml
