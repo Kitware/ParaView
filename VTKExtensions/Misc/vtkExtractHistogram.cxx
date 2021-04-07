@@ -285,8 +285,8 @@ void GetRangeWithBlanking(
     ghostArray = vtkUnsignedCharArray::SafeDownCast(ghostDataArray);
   }
   const unsigned char hiddenFlag = attributes->IsA("vtkPointData")
-    ? vtkDataSetAttributes::HIDDENPOINT
-    : vtkDataSetAttributes::HIDDENCELL;
+    ? (vtkDataSetAttributes::HIDDENPOINT | vtkDataSetAttributes::DUPLICATEPOINT)
+    : (vtkDataSetAttributes::HIDDENCELL | vtkDataSetAttributes::DUPLICATECELL);
 
   using FastArrayTypes = vtkTypeList::Unique<
     vtkTypeList::Create<vtkCharArray, vtkShortArray, vtkIntArray, vtkUnsignedCharArray,
@@ -458,8 +458,8 @@ void vtkExtractHistogram::BinAnArray(
     blanking = vtkUnsignedCharArray::SafeDownCast(ghostArray);
   }
   const unsigned char ghostIndicator = field->IsA("vtkPointData")
-    ? vtkDataSetAttributes::HIDDENPOINT
-    : vtkDataSetAttributes::HIDDENCELL;
+    ? (vtkDataSetAttributes::HIDDENPOINT | vtkDataSetAttributes::DUPLICATEPOINT)
+    : (vtkDataSetAttributes::HIDDENCELL | vtkDataSetAttributes::DUPLICATECELL);
 
   for (int i = 0; i != num_of_tuples; ++i)
   {
