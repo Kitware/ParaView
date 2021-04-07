@@ -9,8 +9,8 @@
                      on the numpy and paraview.vtk modules. To use the parallel
                      functions, mpi4py is also necessary. The expression is
                      evaluated and the resulting scalar value or numpy array is
-                     added to the output as an array. See numpy and
-                     paraview.vtk documentation for the list of available
+                     added to the output as an array. See numpy integration and
+                     python calculator documentation for the list of available
                      functions. This filter tries to make it easy for the user
                      to write expressions by defining certain variables. The
                      filter tries to assign each array to a variable of the
@@ -38,7 +38,9 @@
                             name="Expression"
                             number_of_elements="1">
         <Documentation>The Python expression evaluated during
-        execution.</Documentation>
+        execution. Set of potentially available variables [inputs, points, t_value,
+        t_index, FieldData, PointData, CellData] (i.e.: "Momentum: (%f, %f, %f)" %
+        (XMOM[t_index,0], YMOM[t_index,0], ZMOM[t_index,0]) )</Documentation>
       </StringVectorProperty>
       <IntVectorProperty command="SetArrayAssociation"
                          default_values="0"
@@ -161,8 +163,9 @@ annotation text.
                      use the parallel functions, mpi4py is also necessary. The
                      expression is evaluated and the resulting scalar value or
                      numpy array is added to the output as an array. See numpy
-                     and paraview.vtk documentation for the list of available
-                     functions. This filter tries to make it easy for the user
+                     integration, python annotation and python calculator
+                     documentation for the list of available functions.
+                     This filter tries to make it easy for the user
                      to write expressions by defining certain variables. The
                      filter tries to assign each array to a variable of the
                      same name. If the name of the array is not a valid Python
@@ -203,9 +206,10 @@ annotation text.
                             number_of_elements="1">
         <Documentation>The Python expression evaluated during execution.
         FieldData arrays are directly available through their name. Set of
-        provided variables [inputs, t_value, t_steps, t_range, t_index,
-        FieldData, PointData, CellData] (i.e.: "Momentum: (%f, %f, %f)" %
-        (XMOM[t_index,0], YMOM[t_index,0], ZMOM[t_index,0]) )</Documentation>
+        potentially available variables [inputs, points, t_value, t_steps,
+        t_range, t_index, FieldData, PointData, CellData]
+        (i.e.: "Momentum: (%f, %f, %f)" % (XMOM[t_index,0], YMOM[t_index,0], ZMOM[t_index,0]) )
+        </Documentation>
       </StringVectorProperty>
       <StringVectorProperty command="GetComputedAnnotationValue"
                             information_only="1"
@@ -231,7 +235,8 @@ annotation text.
                      Interpreter to run the script upon the first
                      execution. To execute external python scripts on the ParaView server, use:
                      execfile('full_path/script_name.py'). Documentation is found in the Programmable Filter
-                     chapter of the ParaView Guide.</Documentation>
+                     and numpy integration section of the paraview documentation.
+                     </Documentation>
       <InputProperty clean_command="RemoveAllInputs"
                      command="AddInputConnection"
                      multiple_input="1"
@@ -373,8 +378,8 @@ annotation text.
                      script in Script and creates a python
                      Interpreter to run the script upon the first
                      execution. To execute external python scripts on the ParaView server, use:
-                     execfile('full_path/script_name.py'). Documentation is found in the Programmable Filter
-                     chapter of the ParaView Guide.</Documentation>
+                     execfile('full_path/script_name.py'). Documentation is found in the Programmable Filter and
+                     numpy integration section of the paraview documentation.</Documentation>
       <InputProperty clean_command="RemoveAllInputs"
                      command="AddInputConnection"
                      multiple_input="1"
@@ -407,7 +412,7 @@ annotation text.
         <Documentation>This property contains the text of a python program that
         the programmable filter runs. To execute external python scripts on the ParaView server, use:
         execfile('full_path/script_name.py'). Make sure to output a vtkTable containing a single vtkStringArray,
-        itself containing a single tuple</Documentation>
+        itself containing a single tuple.</Documentation>
       </StringVectorProperty>
       <StringVectorProperty animateable="0"
                             clean_command="ClearParameters"
