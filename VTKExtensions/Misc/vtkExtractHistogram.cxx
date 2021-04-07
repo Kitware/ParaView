@@ -14,11 +14,15 @@
 =========================================================================*/
 #include "vtkExtractHistogram.h"
 
+#include "vtkArrayDispatch.h"
 #include "vtkCellData.h"
+#include "vtkCharArray.h"
 #include "vtkCompositeDataIterator.h"
 #include "vtkCompositeDataSet.h"
+#include "vtkDataArrayRange.h"
 #include "vtkDataSet.h"
 #include "vtkDoubleArray.h"
+#include "vtkFloatArray.h"
 #include "vtkGraph.h"
 #include "vtkIOStream.h"
 #include "vtkInformation.h"
@@ -29,10 +33,13 @@
 #include "vtkPointData.h"
 #include "vtkSMPThreadLocal.h"
 #include "vtkSMPTools.h"
+#include "vtkShortArray.h"
 #include "vtkSmartPointer.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
 #include "vtkTable.h"
 #include "vtkUnsignedCharArray.h"
+#include "vtkUnsignedIntArray.h"
+#include "vtkUnsignedShortArray.h"
 
 #include <array>
 #include <map>
@@ -144,11 +151,11 @@ vtkFieldData* vtkExtractHistogram::GetInputFieldData(vtkDataObject* input)
 //-----------------------------------------------------------------------------
 namespace
 {
-
+template <typename ArrayT>
 class FiniteMinAndMaxWithBlanking
 {
 protected:
-  vtkDataArray* Array;
+  ArrayT* Array;
   vtkUnsignedCharArray* GhostArray = nullptr;
   unsigned char HiddenFlag;
   double ReducedRange[2];
@@ -157,7 +164,7 @@ protected:
 
 public:
   FiniteMinAndMaxWithBlanking(
-    vtkDataArray* array, int component, vtkUnsignedCharArray* ghostArray, unsigned char hiddenFlag)
+    ArrayT* array, int component, vtkUnsignedCharArray* ghostArray, unsigned char hiddenFlag)
     : Array(array)
     , Component(component)
     , GhostArray(ghostArray)
@@ -194,45 +201,32 @@ public:
   {
     int numComponents = this->Array->GetNumberOfComponents();
     auto& range = this->TLRange.Local();
-    if (this->Component == this->Array->GetNumberOfComponents())
+    const auto valueRange = vtk::DataArrayTupleRange(this->Array);
+    bool computeMagnitude = this->Component == this->Array->GetNumberOfComponents();
+
+    if (this->GhostArray)
     {
-      // Vector magnitude range
+      const auto ghostRange = vtk::DataArrayValueRange(this->GhostArray);
       for (vtkIdType idx = begin; idx < end; ++idx)
       {
         // Skip if the array value is blanked.
-        if (this->GhostArray && this->GhostArray->GetTypedComponent(idx, 0) & this->HiddenFlag)
+        if (ghostRange[idx] & this->HiddenFlag)
         {
           continue;
         }
 
-        double sum = 0.0;
-        for (vtkIdType ic = 0; ic < numComponents; ++ic)
+        double value = 0.0;
+        if (computeMagnitude)
         {
-          double value = this->Array->GetComponent(idx, ic);
-          sum += value * value;
+          double sum = static_cast<double>(vtkMath::SquaredNorm(valueRange[idx]));
+          value = std::sqrt(sum);
+        }
+        else
+        {
+          auto tuple = valueRange[idx];
+          value = static_cast<double>(tuple[this->Component]);
         }
 
-        if (vtkMath::IsFinite(sum))
-        {
-          double magnitude = std::sqrt(sum);
-
-          range[0] = vtkMath::Min(range[0], magnitude);
-          range[1] = vtkMath::Max(range[1], magnitude);
-        }
-      }
-    }
-    else
-    {
-      // Component range
-      for (vtkIdType idx = begin; idx < end; ++idx)
-      {
-        // Skip if the array value is blanked.
-        if (this->GhostArray && this->GhostArray->GetTypedComponent(idx, 0) & this->HiddenFlag)
-        {
-          continue;
-        }
-
-        double value = this->Array->GetComponent(idx, this->Component);
         if (vtkMath::IsFinite(value))
         {
           range[0] = vtkMath::Min(range[0], value);
@@ -240,6 +234,42 @@ public:
         }
       }
     }
+    else
+    {
+      for (vtkIdType idx = begin; idx < end; ++idx)
+      {
+        double value = 0.0;
+        if (computeMagnitude)
+        {
+          double sum = static_cast<double>(vtkMath::SquaredNorm(valueRange[idx]));
+          value = std::sqrt(sum);
+        }
+        else
+        {
+          auto tuple = valueRange[idx];
+          value = static_cast<double>(tuple[this->Component]);
+        }
+
+        if (vtkMath::IsFinite(value))
+        {
+          range[0] = vtkMath::Min(range[0], value);
+          range[1] = vtkMath::Max(range[1], value);
+        }
+      }
+    }
+  }
+};
+
+// Functor for array dispatch
+struct GetRangeWithBlankingWorker
+{
+  template <typename ArrayT>
+  void operator()(ArrayT* array, int component, vtkUnsignedCharArray* ghostArray,
+    unsigned char hiddenFlag, double tRange[2])
+  {
+    FiniteMinAndMaxWithBlanking<ArrayT> worker(array, component, ghostArray, hiddenFlag);
+    vtkSMPTools::For(0, array->GetNumberOfTuples(), worker);
+    worker.CopyRange(tRange);
   }
 };
 
@@ -258,9 +288,16 @@ void GetRangeWithBlanking(
     ? vtkDataSetAttributes::HIDDENPOINT
     : vtkDataSetAttributes::HIDDENCELL;
 
-  FiniteMinAndMaxWithBlanking worker(array, component, ghostArray, hiddenFlag);
-  vtkSMPTools::For(0, array->GetNumberOfTuples(), worker);
-  worker.CopyRange(tRange);
+  using FastArrayTypes = vtkTypeList::Unique<
+    vtkTypeList::Create<vtkCharArray, vtkShortArray, vtkIntArray, vtkUnsignedCharArray,
+      vtkUnsignedShortArray, vtkUnsignedIntArray, vtkFloatArray, vtkDoubleArray> >::Result;
+  using GetRangeWithBlankingWorkerDispatch = vtkArrayDispatch::DispatchByArray<FastArrayTypes>;
+  GetRangeWithBlankingWorker worker;
+  if (!GetRangeWithBlankingWorkerDispatch::Execute(
+        array, worker, component, ghostArray, hiddenFlag, tRange))
+  {
+    worker(array, component, ghostArray, hiddenFlag, tRange);
+  }
 }
 }
 
