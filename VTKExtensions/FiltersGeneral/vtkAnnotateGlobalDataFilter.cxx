@@ -101,9 +101,9 @@ struct Printer
   std::array<char, 8> FloatTypeFormats = { { 'a', 'A', 'e', 'E', 'f', 'F', 'g', 'G' } };
   std::array<int, 2> FloatTypes = { { VTK_FLOAT, VTK_DOUBLE } };
   std::array<char, 6> IntegralTypeFormats = { { 'd', 'i', 'o', 'u', 'x', 'X' } };
-  std::array<char, 12> IntegralTypes = { VTK_CHAR, VTK_SIGNED_CHAR, VTK_UNSIGNED_CHAR, VTK_SHORT,
+  std::array<char, 12> IntegralTypes = { { VTK_CHAR, VTK_SIGNED_CHAR, VTK_UNSIGNED_CHAR, VTK_SHORT,
     VTK_UNSIGNED_SHORT, VTK_INT, VTK_UNSIGNED_INT, VTK_LONG, VTK_UNSIGNED_LONG, VTK_ID_TYPE,
-    VTK_LONG_LONG, VTK_UNSIGNED_LONG_LONG };
+    VTK_LONG_LONG, VTK_UNSIGNED_LONG_LONG } };
 
   // Validate that a format string is valid for a given data type
   bool IsFormatStringValid(const char* format, int typeID)
