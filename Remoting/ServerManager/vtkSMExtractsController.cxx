@@ -449,7 +449,7 @@ bool vtkSMExtractsController::CreateExtractsOutputDirectory(vtkSMSessionProxyMan
 
   if (this->LastExtractsOutputDirectory != output_directory)
   {
-    this->ExtractsOutputDirectoryValid = this->CreateDirectory(output_directory, pxm);
+    this->ExtractsOutputDirectoryValid = this->CreateDir(output_directory, pxm);
     this->LastExtractsOutputDirectory = output_directory;
   }
 
@@ -457,7 +457,7 @@ bool vtkSMExtractsController::CreateExtractsOutputDirectory(vtkSMSessionProxyMan
 }
 
 //----------------------------------------------------------------------------
-bool vtkSMExtractsController::CreateDirectory(
+bool vtkSMExtractsController::CreateDir(
   const std::string& dname, vtkSMSessionProxyManager* pxm) const
 {
   if (dname.empty())

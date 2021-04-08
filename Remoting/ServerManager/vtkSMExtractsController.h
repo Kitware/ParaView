@@ -241,7 +241,7 @@ protected:
    * Extract writers should not attempt to write any extracts when that happens.
    */
   bool CreateExtractsOutputDirectory(vtkSMSessionProxyManager* pxm) const;
-  bool CreateDirectory(const std::string& dname, vtkSMSessionProxyManager* pxm) const;
+  bool CreateDir(const std::string& dname, vtkSMSessionProxyManager* pxm) const;
   //@}
 
   /**
