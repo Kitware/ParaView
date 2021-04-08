@@ -176,14 +176,6 @@ public:
 
   //@{
   /**
-   * Use custom labels.
-   */
-  void SetUseCustomLabels(bool useLabels);
-  vtkGetMacro(UseCustomLabels, bool);
-  //@}
-
-  //@{
-  /**
    * Set number of custom labels.
    */
   void SetNumberOfCustomLabels(vtkIdType numLabels);
@@ -282,17 +274,10 @@ private:
    */
   bool DrawTickMarks;
 
-  bool UseCustomLabels;
-
   /**
    * Flag that controls if the whole color legend should be reversed
    */
   bool ReverseLegend;
-
-  /**
-   * Custom label values.
-   */
-  vtkSmartPointer<vtkDoubleArray> CustomLabels;
 
   /**
    * Charts API subclass we use to redirect the Paint() request back
