@@ -79,9 +79,11 @@ public:
   /**
    * Set and get the current time step to process
    */
+  // FIXME: This collides with `windows.h` symbols. It should be renamed.
   int SetCurrentTime(double time);
-  int SetCurrentTimeStep(int timeStep);
   vtkGetMacro(CurrentTime, double);
+
+  int SetCurrentTimeStep(int timeStep);
   vtkGetMacro(CurrentTimeStep, int);
   //@}
 
