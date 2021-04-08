@@ -36,6 +36,12 @@ vtkBumpMapRepresentation::vtkBumpMapRepresentation()
 }
 
 //----------------------------------------------------------------------------
+void vtkBumpMapRepresentation::PrintSelf(ostream& os, vtkIndent indent)
+{
+  this->Superclass::PrintSelf(os, indent);
+}
+
+//----------------------------------------------------------------------------
 void vtkBumpMapRepresentation::SetBumpMappingFactor(double val)
 {
   static_cast<vtkBumpMapMapper*>(this->Mapper)->SetBumpMappingFactor(static_cast<float>(val));

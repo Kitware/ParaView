@@ -32,6 +32,7 @@ class VTKARROWGLYPHFILTER_EXPORT vtkArrowGlyphFilter : public vtkPolyDataAlgorit
 public:
   static vtkArrowGlyphFilter* New();
   vtkTypeMacro(vtkArrowGlyphFilter, vtkPolyDataAlgorithm);
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   // Description:
   // Turn on/off orienting of arrows along vector/normal.

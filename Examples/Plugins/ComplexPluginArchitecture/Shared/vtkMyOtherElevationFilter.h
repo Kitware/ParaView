@@ -29,6 +29,7 @@ class SHARED_EXPORT vtkMyOtherElevationFilter : public vtkElevationFilter
 public:
   static vtkMyOtherElevationFilter* New();
   vtkTypeMacro(vtkMyOtherElevationFilter, vtkElevationFilter);
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
 protected:
   vtkMyOtherElevationFilter() = default;

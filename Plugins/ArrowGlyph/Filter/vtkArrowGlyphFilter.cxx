@@ -84,6 +84,20 @@ vtkArrowGlyphFilter::~vtkArrowGlyphFilter()
 }
 
 //----------------------------------------------------------------------------
+void vtkArrowGlyphFilter::PrintSelf(ostream& os, vtkIndent indent)
+{
+  this->Superclass::PrintSelf(os, indent);
+  os << indent << "ScaleByOrientationVectorMagnitude: " << this->ScaleByOrientationVectorMagnitude
+     << endl;
+  os << indent << "ScaleFactor: " << this->ScaleFactor << endl;
+  os << indent << "ShaftRadiusFactor: " << this->ShaftRadiusFactor << endl;
+  os << indent << "TipRadiusFactor: " << this->TipRadiusFactor << endl;
+  os << indent << "MaximumNumberOfPoints: " << this->MaximumNumberOfPoints << endl;
+  os << indent << "UseMaskPoints: " << this->UseMaskPoints << endl;
+  os << indent << "RandomMode: " << this->RandomMode << endl;
+}
+
+//----------------------------------------------------------------------------
 vtkMTimeType vtkArrowGlyphFilter::GetMTime()
 {
   vtkMTimeType mTime = this->Superclass::GetMTime();

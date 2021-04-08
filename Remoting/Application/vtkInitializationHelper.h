@@ -34,7 +34,7 @@ class VTKREMOTINGAPPLICATION_EXPORT vtkInitializationHelper : public vtkObject
 {
 public:
   vtkTypeMacro(vtkInitializationHelper, vtkObject);
-  void PrintSelf(ostream&, vtkIndent) override;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /**
    * Initializes the server manager. Do not use the server manager

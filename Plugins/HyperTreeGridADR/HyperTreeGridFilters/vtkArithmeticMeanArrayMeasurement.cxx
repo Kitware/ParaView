@@ -31,6 +31,12 @@ vtkArithmeticMeanArrayMeasurement::vtkArithmeticMeanArrayMeasurement()
 }
 
 //----------------------------------------------------------------------------
+void vtkArithmeticMeanArrayMeasurement::PrintSelf(ostream& os, vtkIndent indent)
+{
+  this->Superclass::PrintSelf(os, indent);
+}
+
+//----------------------------------------------------------------------------
 bool vtkArithmeticMeanArrayMeasurement::Measure(vtkAbstractAccumulator** accumulators,
   vtkIdType numberOfAccumulatedData, double totalWeight, double& value)
 {

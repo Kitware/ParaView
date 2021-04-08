@@ -33,6 +33,7 @@ class VTKZSPACEVIEW_EXPORT vtkZSpaceCamera : public vtkOpenGLCamera
 public:
   static vtkZSpaceCamera* New();
   vtkTypeMacro(vtkZSpaceCamera, vtkOpenGLCamera);
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /**
    * Return the model view matrix of model view transform given by zSpace SDK.

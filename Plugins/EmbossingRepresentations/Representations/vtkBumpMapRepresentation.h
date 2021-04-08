@@ -37,6 +37,7 @@ class VTKEMBOSSINGREPRESENTATIONS_EXPORT vtkBumpMapRepresentation
 public:
   static vtkBumpMapRepresentation* New();
   vtkTypeMacro(vtkBumpMapRepresentation, vtkGeometryRepresentationWithFaces);
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /**
    * Bump mapping factor information.

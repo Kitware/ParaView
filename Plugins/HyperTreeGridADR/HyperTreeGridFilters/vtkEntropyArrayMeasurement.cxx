@@ -32,6 +32,12 @@ vtkEntropyArrayMeasurement::vtkEntropyArrayMeasurement()
 }
 
 //----------------------------------------------------------------------------
+void vtkEntropyArrayMeasurement::PrintSelf(ostream& os, vtkIndent indent)
+{
+  this->Superclass::PrintSelf(os, indent);
+}
+
+//----------------------------------------------------------------------------
 bool vtkEntropyArrayMeasurement::Measure(vtkAbstractAccumulator** accumulators,
   vtkIdType numberOfAccumulatedData, double totalWeight, double& value)
 {

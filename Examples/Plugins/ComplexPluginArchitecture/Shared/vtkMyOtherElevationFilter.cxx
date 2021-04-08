@@ -17,3 +17,8 @@
 #include <vtkObjectFactory.h>
 
 vtkStandardNewMacro(vtkMyOtherElevationFilter);
+
+void vtkMyOtherElevationFilter::PrintSelf(ostream& os, vtkIndent indent)
+{
+  this->Superclass::PrintSelf(os, indent);
+}

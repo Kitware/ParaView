@@ -65,7 +65,7 @@ class VTKREMOTINGCLIENTSERVERSTREAM_EXPORT vtkClientServerInterpreter : public v
 public:
   static vtkClientServerInterpreter* New();
   vtkTypeMacro(vtkClientServerInterpreter, vtkObject);
-  void PrintSelf(ostream&, vtkIndent) override;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   //@{
   /**

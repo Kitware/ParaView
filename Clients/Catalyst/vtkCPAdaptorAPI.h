@@ -28,6 +28,7 @@ class VTKPVCATALYST_EXPORT vtkCPAdaptorAPI : public vtkObject
 {
 public:
   vtkTypeMacro(vtkCPAdaptorAPI, vtkObject);
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /// call at the start of the simulation
   static void CoProcessorInitialize();

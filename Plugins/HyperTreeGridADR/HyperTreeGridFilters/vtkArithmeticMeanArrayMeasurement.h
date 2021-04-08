@@ -41,6 +41,7 @@ public:
   static vtkArithmeticMeanArrayMeasurement* New();
 
   vtkTypeMacro(vtkArithmeticMeanArrayMeasurement, vtkAbstractArrayMeasurement);
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   using Superclass::Add;
   using Superclass::CanMeasure;

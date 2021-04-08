@@ -37,6 +37,7 @@ public:
   static vtkStandardDeviationArrayMeasurement* New();
 
   vtkTypeMacro(vtkStandardDeviationArrayMeasurement, vtkAbstractArrayMeasurement);
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   using Superclass::Add;
   using Superclass::CanMeasure;

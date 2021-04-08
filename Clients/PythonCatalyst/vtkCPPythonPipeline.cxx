@@ -95,6 +95,12 @@ vtkCPPythonPipeline::vtkCPPythonPipeline()
 vtkCPPythonPipeline::~vtkCPPythonPipeline() = default;
 
 //----------------------------------------------------------------------------
+void vtkCPPythonPipeline::PrintSelf(ostream& os, vtkIndent indent)
+{
+  this->Superclass::PrintSelf(os, indent);
+}
+
+//----------------------------------------------------------------------------
 int vtkCPPythonPipeline::DetectScriptVersion(const char* fname)
 {
   auto contr = vtkMultiProcessController::GetGlobalController();

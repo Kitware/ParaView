@@ -31,6 +31,7 @@ class VTKPVVTKEXTENSIONSFILTERSGENERAL_EXPORT vtkPVThreshold : public vtkThresho
 {
 public:
   vtkTypeMacro(vtkPVThreshold, vtkThreshold);
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   static vtkPVThreshold* New();
 

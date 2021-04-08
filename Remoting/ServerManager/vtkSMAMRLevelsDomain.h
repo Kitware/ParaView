@@ -38,6 +38,7 @@ class VTKREMOTINGSERVERMANAGER_EXPORT vtkSMAMRLevelsDomain : public vtkSMIntRang
 public:
   static vtkSMAMRLevelsDomain* New();
   vtkTypeMacro(vtkSMAMRLevelsDomain, vtkSMIntRangeDomain);
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /**
    * Update the domain using the "unchecked" values (if available) for all

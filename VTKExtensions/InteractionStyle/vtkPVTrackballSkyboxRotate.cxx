@@ -25,6 +25,17 @@
 
 vtkStandardNewMacro(vtkPVTrackballSkyboxRotate);
 
+//----------------------------------------------------------------------------
+void vtkPVTrackballSkyboxRotate::PrintSelf(ostream& os, vtkIndent indent)
+{
+  this->Superclass::PrintSelf(os, indent);
+  os << indent << "Skybox:" << (this->Skybox ? "" : " (nullptr)") << endl;
+  if (this->Skybox)
+  {
+    this->Skybox->PrintSelf(os, indent.GetNextIndent());
+  }
+}
+
 //-------------------------------------------------------------------------
 void vtkPVTrackballSkyboxRotate::EnvironmentRotate(vtkRenderer* ren, vtkRenderWindowInteractor* rwi)
 {

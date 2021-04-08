@@ -18,6 +18,12 @@
 #include "vtkCPPythonScriptPipeline.h"
 
 //----------------------------------------------------------------------------
+vtkCPPythonAdaptorAPI::vtkCPPythonAdaptorAPI() = default;
+
+//----------------------------------------------------------------------------
+vtkCPPythonAdaptorAPI::~vtkCPPythonAdaptorAPI() = default;
+
+//----------------------------------------------------------------------------
 void vtkCPPythonAdaptorAPI::CoProcessorInitialize(const char* pythonFileName)
 {
   if (!Superclass::CoProcessor)
@@ -35,4 +41,10 @@ void vtkCPPythonAdaptorAPI::CoProcessorInitialize(const char* pythonFileName)
     Superclass::CoProcessor->AddPipeline(pipeline);
     pipeline->FastDelete();
   }
+}
+
+//-----------------------------------------------------------------------------
+void vtkCPPythonAdaptorAPI::PrintSelf(ostream& os, vtkIndent indent)
+{
+  this->Superclass::PrintSelf(os, indent);
 }

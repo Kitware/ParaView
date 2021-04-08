@@ -39,7 +39,7 @@ class VTKPVADAPTORSPARTICLE_EXPORT vtkParticlePipeline : public vtkCPPipeline
 public:
   static vtkParticlePipeline* New();
   vtkTypeMacro(vtkParticlePipeline, vtkCPPipeline);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   virtual int RequestDataDescription(vtkCPDataDescription* desc);
 

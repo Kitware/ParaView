@@ -35,6 +35,12 @@
 vtkStandardNewMacro(vtkPVThreshold);
 
 //----------------------------------------------------------------------------
+void vtkPVThreshold::PrintSelf(ostream& os, vtkIndent indent)
+{
+  this->Superclass::PrintSelf(os, indent);
+}
+
+//----------------------------------------------------------------------------
 int vtkPVThreshold::RequestData(
   vtkInformation* request, vtkInformationVector** inputVector, vtkInformationVector* outputVector)
 {

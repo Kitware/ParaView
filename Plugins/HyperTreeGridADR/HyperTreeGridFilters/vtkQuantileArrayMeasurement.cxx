@@ -30,6 +30,12 @@ vtkQuantileArrayMeasurement::vtkQuantileArrayMeasurement()
 }
 
 //----------------------------------------------------------------------------
+void vtkQuantileArrayMeasurement::PrintSelf(ostream& os, vtkIndent indent)
+{
+  this->Superclass::PrintSelf(os, indent);
+}
+
+//----------------------------------------------------------------------------
 bool vtkQuantileArrayMeasurement::Measure(vtkAbstractAccumulator** accumulators,
   vtkIdType numberOfAccumulatedData, double totalWeight, double& value)
 {

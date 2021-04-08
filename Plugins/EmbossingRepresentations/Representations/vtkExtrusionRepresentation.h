@@ -40,6 +40,7 @@ class VTKEMBOSSINGREPRESENTATIONS_EXPORT vtkExtrusionRepresentation
 public:
   static vtkExtrusionRepresentation* New();
   vtkTypeMacro(vtkExtrusionRepresentation, vtkGeometryRepresentationWithFaces);
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /**
    * Extrusion factor information.

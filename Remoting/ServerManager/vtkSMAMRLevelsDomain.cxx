@@ -26,6 +26,12 @@ vtkSMAMRLevelsDomain::vtkSMAMRLevelsDomain() = default;
 vtkSMAMRLevelsDomain::~vtkSMAMRLevelsDomain() = default;
 
 //----------------------------------------------------------------------------
+void vtkSMAMRLevelsDomain::PrintSelf(ostream& os, vtkIndent indent)
+{
+  this->Superclass::PrintSelf(os, indent);
+}
+
+//----------------------------------------------------------------------------
 void vtkSMAMRLevelsDomain::Update(vtkSMProperty*)
 {
   auto* dataInfo = this->GetInputInformation();

@@ -36,6 +36,12 @@ vtkExtrusionRepresentation::vtkExtrusionRepresentation()
 }
 
 //----------------------------------------------------------------------------
+void vtkExtrusionRepresentation::PrintSelf(ostream& os, vtkIndent indent)
+{
+  this->Superclass::PrintSelf(os, indent);
+}
+
+//----------------------------------------------------------------------------
 void vtkExtrusionRepresentation::SetExtrusionFactor(double val)
 {
   static_cast<vtkExtrusionMapper*>(this->Mapper)->SetExtrusionFactor(static_cast<float>(val));

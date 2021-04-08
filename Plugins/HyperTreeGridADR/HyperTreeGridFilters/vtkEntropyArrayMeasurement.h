@@ -39,6 +39,7 @@ public:
   static vtkEntropyArrayMeasurement* New();
 
   vtkTypeMacro(vtkEntropyArrayMeasurement, vtkAbstractArrayMeasurement);
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   using Superclass::Add;
   using Superclass::CanMeasure;
