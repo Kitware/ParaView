@@ -27,8 +27,8 @@
  * This class was contributed by SciberQuest Inc.
 */
 
-#ifndef vtkSMConfigurationFileInfo_h
-#define vtkSMConfigurationFileInfo_h
+#ifndef vtkSMProxyConfigurationFileInfo_h
+#define vtkSMProxyConfigurationFileInfo_h
 
 #include "vtkObject.h"
 

@@ -13,8 +13,8 @@
 
 =========================================================================*/
 
-#ifndef vtkSMProxyManagerInternals_h
-#define vtkSMProxyManagerInternals_h
+#ifndef vtkSMSessionProxyManagerInternals_h
+#define vtkSMSessionProxyManagerInternals_h
 
 #include "vtkCollection.h"
 #include "vtkCommand.h"

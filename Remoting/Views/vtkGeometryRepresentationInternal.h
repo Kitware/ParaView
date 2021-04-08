@@ -13,6 +13,9 @@
 
 =========================================================================*/
 
+#ifndef vtkGeometryRepresentationInternal_h
+#define vtkGeometryRepresentationInternal_h
+
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
 #include "vtkPolyData.h"
@@ -141,4 +144,7 @@ vtkStandardNewMacro(DecimationFilterType);
 }
 #endif // VTKM_ENABLE_TBB
 #endif // __VTK_WRAP__
+
+#endif
+
 // VTK-HeaderTest-Exclude: vtkGeometryRepresentationInternal.h
