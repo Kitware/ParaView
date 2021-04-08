@@ -40,8 +40,6 @@
 class vtkDataArray;
 class vtkDoubleArray;
 
-#define vtkValueComaNameMacro(value) value, #value
-
 class VTKFILTERSHYPERTREEGRIDADR_EXPORT vtkAbstractAccumulator : public vtkDataObject
 {
 public:
