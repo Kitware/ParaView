@@ -43,7 +43,7 @@ class vtkDoubleArray;
 class VTKFILTERSHYPERTREEGRIDADR_EXPORT vtkAbstractAccumulator : public vtkDataObject
 {
 public:
-  vtkAbstractTypeMacro(vtkAbstractAccumulator, vtkObject);
+  vtkAbstractTypeMacro(vtkAbstractAccumulator, vtkDataObject);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
   static vtkAbstractAccumulator* New();
