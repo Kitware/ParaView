@@ -29,11 +29,12 @@ paraview_add_client_server_tests(
 # Some setups may not have a new enough card to run IndeX. Skip the test on
 # these machines.
 set(index_tests
-  pv.IndeXRepresentation)
-if (NOT PARAVIEW_USE_MPI)
-  list(APPEND index_tests
-    pvcs.IndeXRepresentationServer)
-endif ()
-set_property(TEST ${index_tests} APPEND
-  PROPERTY
-    SKIP_REGULAR_EXPRESSION "The version of your CUDA driver is .*, but .* is the required minimum")
+  pv.IndeXRepresentation
+  pvcs.IndeXRepresentationServer)
+foreach (index_test IN LISTS index_tests)
+  if (TEST "${index_test}")
+    set_property(TEST ${index_test} APPEND
+      PROPERTY
+        SKIP_REGULAR_EXPRESSION "The version of your CUDA driver is .*, but .* is the required minimum")
+  endif ()
+endforeach ()

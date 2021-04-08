@@ -81,6 +81,9 @@ if (catalyst_fortran_using_mangling)
 endif ()
 
 if (CMAKE_Fortran_COMPILER_WORKS)
+  vtk_module_include(ParaView::PythonCatalyst
+    INTERFACE
+      "$<BUILD_INTERFACE:${CMAKE_Fortran_MODULE_DIRECTORY}>")
   install(
     DIRECTORY   "${CMAKE_Fortran_MODULE_DIRECTORY}/"
     DESTINATION "${_vtk_build_HEADERS_DESTINATION}"

@@ -31,9 +31,9 @@ interface
 
         implicit none
 
-        integer(c_int), pointer :: time_step
-        real(c_double), pointer :: time
-        integer(c_int), pointer :: need_to_coprocess_this_time_step
+        integer(c_int) :: time_step
+        real(c_double) :: time
+        integer(c_int) :: need_to_coprocess_this_time_step
     end subroutine requestdatadescription
 
     subroutine needtocreategrid(need_grid) bind(C, name='needtocreategrid')
@@ -41,7 +41,7 @@ interface
 
         implicit none
 
-        integer(c_int), pointer :: need_grid
+        integer(c_int) :: need_grid
     end subroutine needtocreategrid
 
     subroutine coprocess() bind(C, name='coprocess')
@@ -73,18 +73,11 @@ logical(1) function catalyst_request_data_description(time_step, time)
     real(c_double) :: c_time
     integer(c_int) :: c_need_to_coprocess_this_time_step
 
-    integer(c_int), pointer :: p_time_step
-    real(c_double), pointer :: p_time
-    integer(c_int), pointer :: p_need_to_coprocess_this_time_step
-
     c_time_step = time_step
     c_time = time
     c_need_to_coprocess_this_time_step = 0
 
-    p_time_step = loc(c_time_step)
-    p_time = loc(c_time)
-    p_need_to_coprocess_this_time_step = loc(c_need_to_coprocess_this_time_step)
-    call requestdatadescription(p_time_step, p_time, p_need_to_coprocess_this_time_step)
+    call requestdatadescription(c_time_step, c_time, c_need_to_coprocess_this_time_step)
 
     if (c_need_to_coprocess_this_time_step == 0) then
         catalyst_request_data_description = .FALSE.
@@ -100,12 +93,9 @@ logical(1) function catalyst_need_to_create_grid()
 
     integer(c_int) :: c_need_to_create_grid
 
-    integer(c_int), pointer :: p_need_to_create_grid
-
     c_need_to_create_grid = 0
 
-    p_need_to_create_grid = loc(c_need_to_create_grid)
-    call needtocreategrid(p_need_to_create_grid)
+    call needtocreategrid(c_need_to_create_grid)
 
     if (c_need_to_create_grid == 0) then
         catalyst_need_to_create_grid = .FALSE.
