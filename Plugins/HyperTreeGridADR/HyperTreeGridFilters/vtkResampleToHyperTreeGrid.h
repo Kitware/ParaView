@@ -601,8 +601,8 @@ protected:
   vtkMultiProcessController* Controller;
 
 private:
-  vtkResampleToHyperTreeGrid(vtkResampleToHyperTreeGrid&) = delete;
-  void operator=(vtkResampleToHyperTreeGrid&) = delete;
+  vtkResampleToHyperTreeGrid(const vtkResampleToHyperTreeGrid&) = delete;
+  void operator=(const vtkResampleToHyperTreeGrid&) = delete;
 };
 
 #endif

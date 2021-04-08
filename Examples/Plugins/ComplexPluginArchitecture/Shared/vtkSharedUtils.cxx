@@ -23,6 +23,12 @@
 vtkStandardNewMacro(vtkSharedUtils);
 
 //----------------------------------------------------------------------------
+vtkSharedUtils::vtkSharedUtils() = default;
+
+//----------------------------------------------------------------------------
+vtkSharedUtils::~vtkSharedUtils() = default;
+
+//----------------------------------------------------------------------------
 double vtkSharedUtils::Pi()
 {
   return M_PI;

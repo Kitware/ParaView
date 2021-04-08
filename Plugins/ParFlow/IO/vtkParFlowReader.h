@@ -59,6 +59,9 @@ public:
   vtkGetMacro(CLMIrrType, int);
   vtkSetMacro(CLMIrrType, int);
 
+  vtkParFlowReader(const vtkParFlowReader&) = delete;
+  void operator=(const vtkParFlowReader&) = delete;
+
 protected:
   vtkParFlowReader();
   virtual ~vtkParFlowReader();

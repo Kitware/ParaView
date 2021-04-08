@@ -70,8 +70,8 @@ protected:
     vtkInformationVector* outputVector) override;
 
 private:
-  vtkSLACPlaneGlyphs(const vtkSLACPlaneGlyphs&);
-  void operator=(const vtkSLACPlaneGlyphs&);
+  vtkSLACPlaneGlyphs(const vtkSLACPlaneGlyphs&) = delete;
+  void operator=(const vtkSLACPlaneGlyphs&) = delete;
 };
 
 #endif // vtkSLACPlaneGlyphs_h

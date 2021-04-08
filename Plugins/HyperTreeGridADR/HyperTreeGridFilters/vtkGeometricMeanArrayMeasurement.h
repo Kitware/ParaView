@@ -111,8 +111,8 @@ protected:
   //@}
 
 private:
-  vtkGeometricMeanArrayMeasurement(vtkGeometricMeanArrayMeasurement&) = delete;
-  void operator=(vtkGeometricMeanArrayMeasurement&) = delete;
+  vtkGeometricMeanArrayMeasurement(const vtkGeometricMeanArrayMeasurement&) = delete;
+  void operator=(const vtkGeometricMeanArrayMeasurement&) = delete;
 };
 
 #endif

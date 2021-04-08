@@ -111,8 +111,8 @@ protected:
   //@}
 
 private:
-  vtkHarmonicMeanArrayMeasurement(vtkHarmonicMeanArrayMeasurement&) = delete;
-  void operator=(vtkHarmonicMeanArrayMeasurement&) = delete;
+  vtkHarmonicMeanArrayMeasurement(const vtkHarmonicMeanArrayMeasurement&) = delete;
+  void operator=(const vtkHarmonicMeanArrayMeasurement&) = delete;
 };
 
 #endif

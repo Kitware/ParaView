@@ -13,6 +13,9 @@ public:
   vtkTypeMacro(vtkSMMyElevationProxy, vtkSMSourceProxy);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
+  vtkSMMyElevationProxy(const vtkSMMyElevationProxy&) = delete;
+  void operator=(const vtkSMMyElevationProxy&) = delete;
+
 protected:
   vtkSMMyElevationProxy();
   ~vtkSMMyElevationProxy();

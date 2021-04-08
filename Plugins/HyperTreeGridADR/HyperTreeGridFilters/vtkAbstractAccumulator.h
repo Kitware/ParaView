@@ -84,8 +84,8 @@ protected:
   std::function<double(const double*, vtkIdType)> ConvertVectorToScalar;
 
 private:
-  vtkAbstractAccumulator(vtkAbstractAccumulator&) = delete;
-  void operator=(vtkAbstractAccumulator&) = delete;
+  vtkAbstractAccumulator(const vtkAbstractAccumulator&) = delete;
+  void operator=(const vtkAbstractAccumulator&) = delete;
 };
 
 #endif

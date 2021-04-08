@@ -114,8 +114,8 @@ protected:
   //@}
 
 private:
-  vtkArithmeticMeanArrayMeasurement(vtkArithmeticMeanArrayMeasurement&) = delete;
-  void operator=(vtkArithmeticMeanArrayMeasurement&) = delete;
+  vtkArithmeticMeanArrayMeasurement(const vtkArithmeticMeanArrayMeasurement&) = delete;
+  void operator=(const vtkArithmeticMeanArrayMeasurement&) = delete;
 };
 
 #endif

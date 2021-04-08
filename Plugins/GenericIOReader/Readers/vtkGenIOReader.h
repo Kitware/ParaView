@@ -144,6 +144,9 @@ public:
   int GetCellArrayStatus(const char* name) { return CellDataArraySelection->ArrayIsEnabled(name); }
   void SetCellArrayStatus(const char* name, int status);
 
+  vtkGenIOReader(const vtkGenIOReader&) = delete;
+  void operator=(const vtkGenIOReader&) = delete;
+
 protected:
   vtkGenIOReader();
   ~vtkGenIOReader();

@@ -176,8 +176,8 @@ protected:
   ListPointer SortedList;
 
 private:
-  vtkQuantileAccumulator(vtkQuantileAccumulator&) = delete;
-  void operator=(vtkQuantileAccumulator&) = delete;
+  vtkQuantileAccumulator(const vtkQuantileAccumulator&) = delete;
+  void operator=(const vtkQuantileAccumulator&) = delete;
 };
 
 #endif

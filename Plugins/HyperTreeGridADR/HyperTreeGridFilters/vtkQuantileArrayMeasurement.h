@@ -134,8 +134,8 @@ protected:
   //@}
 
 private:
-  vtkQuantileArrayMeasurement(vtkQuantileArrayMeasurement&) = delete;
-  void operator=(vtkQuantileArrayMeasurement&) = delete;
+  vtkQuantileArrayMeasurement(const vtkQuantileArrayMeasurement&) = delete;
+  void operator=(const vtkQuantileArrayMeasurement&) = delete;
 };
 
 #endif

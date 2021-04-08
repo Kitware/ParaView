@@ -118,8 +118,8 @@ protected:
   //@}
 
 private:
-  vtkStandardDeviationArrayMeasurement(vtkStandardDeviationArrayMeasurement&) = delete;
-  void operator=(vtkStandardDeviationArrayMeasurement&) = delete;
+  vtkStandardDeviationArrayMeasurement(const vtkStandardDeviationArrayMeasurement&) = delete;
+  void operator=(const vtkStandardDeviationArrayMeasurement&) = delete;
 };
 
 #endif

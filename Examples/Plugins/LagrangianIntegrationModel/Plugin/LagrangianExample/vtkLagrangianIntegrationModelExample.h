@@ -127,8 +127,8 @@ protected:
 
 private:
   vtkLagrangianIntegrationModelExample(
-    const vtkLagrangianIntegrationModelExample&);              // Not implemented.
-  void operator=(const vtkLagrangianIntegrationModelExample&); // Not implemented.
+    const vtkLagrangianIntegrationModelExample&) = delete;              // Not implemented.
+  void operator=(const vtkLagrangianIntegrationModelExample&) = delete; // Not implemented.
 };
 
 #endif

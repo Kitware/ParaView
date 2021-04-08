@@ -42,6 +42,12 @@ void ClearFieldDataFromGrid(vtkDataSet* grid)
 }
 } // end namespace
 
+//----------------------------------------------------------------------------
+vtkCPAdaptorAPI::vtkCPAdaptorAPI() = default;
+
+//----------------------------------------------------------------------------
+vtkCPAdaptorAPI::~vtkCPAdaptorAPI() = default;
+
 //-----------------------------------------------------------------------------
 void vtkCPAdaptorAPI::PrintSelf(ostream& os, vtkIndent indent)
 {

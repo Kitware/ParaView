@@ -118,8 +118,8 @@ protected:
   //@}
 
 private:
-  vtkEntropyArrayMeasurement(vtkEntropyArrayMeasurement&) = delete;
-  void operator=(vtkEntropyArrayMeasurement&) = delete;
+  vtkEntropyArrayMeasurement(const vtkEntropyArrayMeasurement&) = delete;
+  void operator=(const vtkEntropyArrayMeasurement&) = delete;
 };
 
 #endif

@@ -236,8 +236,8 @@ protected:
   double TotalWeight;
 
 private:
-  vtkAbstractArrayMeasurement(vtkAbstractArrayMeasurement&) = delete;
-  void operator=(vtkAbstractArrayMeasurement&) = delete;
+  vtkAbstractArrayMeasurement(const vtkAbstractArrayMeasurement&) = delete;
+  void operator=(const vtkAbstractArrayMeasurement&) = delete;
 };
 
 #endif

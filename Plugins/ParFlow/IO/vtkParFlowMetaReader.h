@@ -113,6 +113,9 @@ public:
   /// Set whether an array defined on the 2D simulation grid should be loaded.
   bool SetSurfaceVariableArrayStatus(const std::string& array, int status);
 
+  vtkParFlowMetaReader(const vtkParFlowMetaReader&) = delete;
+  void operator=(const vtkParFlowMetaReader&) = delete;
+
 protected:
   vtkParFlowMetaReader();
   virtual ~vtkParFlowMetaReader();
