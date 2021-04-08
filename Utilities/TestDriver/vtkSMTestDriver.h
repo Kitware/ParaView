@@ -136,3 +136,5 @@ private:
 };
 
 #endif
+
+// VTK-HeaderTest-Exclude: vtkSMTestDriver.h

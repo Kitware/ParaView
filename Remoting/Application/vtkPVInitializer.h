@@ -54,3 +54,5 @@ void paraview_initialize()
 }
 
 #endif
+
+// VTK-HeaderTest-Exclude: vtkPVInitializer.h

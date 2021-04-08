@@ -52,4 +52,3 @@ void VTKPVCATALYST_EXPORT coprocess();
 #endif
 
 #endif
-// VTK-HeaderTest-Exclude: CAdaptorAPI.h

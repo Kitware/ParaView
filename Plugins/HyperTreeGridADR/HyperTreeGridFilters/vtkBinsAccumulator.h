@@ -143,3 +143,5 @@ private:
 #include "vtkBinsAccumulator.txx" // template implementations
 
 #endif
+
+// VTK-HeaderTest-Exclude: vtkBinsAccumulator.h

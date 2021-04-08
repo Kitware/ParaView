@@ -62,5 +62,3 @@ private:
   BufferContainer* Buffer;
 };
 #endif
-
-// VTK-HeaderTest-Exclude: vtkMaterialInterfaceProcessRing.h

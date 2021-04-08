@@ -118,3 +118,5 @@ private:
 
 #include "vtkArithmeticAccumulator.txx" // template implementation
 #endif
+
+// VTK-HeaderTest-Exclude: vtkArithmeticAccumulator.h

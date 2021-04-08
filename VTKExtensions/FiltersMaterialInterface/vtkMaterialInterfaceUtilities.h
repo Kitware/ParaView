@@ -563,4 +563,3 @@ void PrintHistogram(vector<TCnt>& bins)
 }
 };
 #endif
-// VTK-HeaderTest-Exclude: vtkMaterialInterfaceUtilities.h

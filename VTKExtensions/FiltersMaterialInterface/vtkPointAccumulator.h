@@ -192,4 +192,3 @@ private:
   vtkIdType NPts;
 };
 #endif
-// VTK-HeaderTest-Exclude: vtkPointAccumulator.h

@@ -53,3 +53,5 @@ private:
 };
 
 #endif
+
+// VTK-HeaderTest-Exclude: vtkCatalystBlueprint.h

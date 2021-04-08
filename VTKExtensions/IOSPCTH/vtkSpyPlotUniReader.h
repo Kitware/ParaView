@@ -332,5 +332,3 @@ inline int vtkSpyPlotUniReader::IsAMR()
 }
 
 #endif
-
-// VTK-HeaderTest-Exclude: vtkSpyPlotUniReader.h

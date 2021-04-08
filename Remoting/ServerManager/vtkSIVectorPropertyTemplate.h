@@ -79,5 +79,3 @@ private:
 };
 
 #endif
-
-// VTK-HeaderTest-Exclude: vtkSIVectorPropertyTemplate.h

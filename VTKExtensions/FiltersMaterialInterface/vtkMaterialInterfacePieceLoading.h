@@ -103,5 +103,3 @@ VTKPVVTKEXTENSIONSFILTERSMATERIALINTERFACE_EXPORT
 void PrintPieceLoadingHistogram(std::vector<std::vector<vtkIdType> >& pla);
 #endif
 //@}
-
-// VTK-HeaderTest-Exclude: vtkMaterialInterfacePieceLoading.h

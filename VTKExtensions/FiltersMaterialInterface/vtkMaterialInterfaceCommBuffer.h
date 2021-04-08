@@ -123,5 +123,3 @@ private:
   vtkIdType* Header;
 };
 #endif
-
-// VTK-HeaderTest-Exclude: vtkMaterialInterfaceCommBuffer.h

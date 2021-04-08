@@ -42,4 +42,3 @@ private:
 };
 
 #endif
-// VTK-HeaderTest-Exclude: vtkCPPythonAdaptorAPI.h

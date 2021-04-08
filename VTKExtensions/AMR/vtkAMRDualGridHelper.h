@@ -349,5 +349,3 @@ private:
 };
 
 #endif
-
-// VTK-HeaderTest-Exclude: vtkAMRDualGridHelper.h

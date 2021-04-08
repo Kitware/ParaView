@@ -211,5 +211,3 @@ private:
 };
 
 #endif
-
-// VTK-HeaderTest-Exclude: vtkPVRenderViewDataDeliveryManager.h

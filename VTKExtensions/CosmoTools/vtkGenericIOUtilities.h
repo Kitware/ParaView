@@ -144,4 +144,3 @@ inline void SafeDeleteString(char*& str)
 }
 
 #endif /* vtkGenericIOUtilities_h */
-// VTK-HeaderTest-Exclude: vtkGenericIOUtilities.h

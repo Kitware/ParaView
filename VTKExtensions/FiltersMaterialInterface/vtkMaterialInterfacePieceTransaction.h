@@ -87,5 +87,3 @@ private:
 VTKPVVTKEXTENSIONSFILTERSMATERIALINTERFACE_EXPORT
 std::ostream& operator<<(std::ostream& sout, const vtkMaterialInterfacePieceTransaction& ta);
 #endif
-
-// VTK-HeaderTest-Exclude: vtkMaterialInterfacePieceTransaction.h

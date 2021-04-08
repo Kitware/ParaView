@@ -34,3 +34,5 @@ void from_json(const nlohmann::json& j, vtkTuple<T, S>& vec)
 }
 
 #endif // vtkVectorJSON_h
+
+// VTK-HeaderTest-Exclude: vtkVectorJSON.h

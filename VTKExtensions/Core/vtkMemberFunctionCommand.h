@@ -181,4 +181,3 @@ vtkMemberFunctionCommand<ClassT>* vtkMakeMemberFunctionCommand(
 
 #endif
 //-----------------------------------------------------------------------------
-// VTK-HeaderTest-Exclude: vtkMemberFunctionCommand.h

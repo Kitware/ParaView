@@ -113,3 +113,5 @@ private:
 };
 
 #endif /* vtkCTHSource_h */
+
+// VTK-HeaderTest-Exclude: vtkCTHSource.h

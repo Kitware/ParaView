@@ -73,4 +73,3 @@ protected:
   static bool IsTimeDataSet;
 };
 #endif
-// VTK-HeaderTest-Exclude: vtkCPAdaptorAPI.h

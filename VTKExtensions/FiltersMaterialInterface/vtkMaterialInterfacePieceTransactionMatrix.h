@@ -143,5 +143,3 @@ inline vtkIdType vtkMaterialInterfacePieceTransactionMatrix::GetNumberOfTransact
   return static_cast<vtkIdType>(nTransactions);
 }
 #endif
-
-// VTK-HeaderTest-Exclude: vtkMaterialInterfacePieceTransactionMatrix.h

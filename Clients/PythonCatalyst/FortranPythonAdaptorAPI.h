@@ -27,4 +27,3 @@
 #include "CPythonAdaptorAPI.h"
 
 #endif
-// VTK-HeaderTest-Exclude: FortranPythonAdaptorAPI.h

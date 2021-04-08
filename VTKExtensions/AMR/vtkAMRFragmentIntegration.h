@@ -65,5 +65,3 @@ private:
 };
 
 #endif /* vtkAMRFragmentIntegration_h */
-//
-// VTK-HeaderTest-Exclude: vtkAMRFragmentIntegration.h

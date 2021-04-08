@@ -115,5 +115,3 @@ std::ostream& operator<<(
   std::ostream& sout, const std::vector<vtkMaterialInterfaceProcessLoading>& vfp);
 #endif
 //@}
-
-// VTK-HeaderTest-Exclude: vtkMaterialInterfaceProcessLoading.h

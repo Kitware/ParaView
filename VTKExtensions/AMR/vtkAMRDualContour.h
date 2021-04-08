@@ -209,5 +209,3 @@ private:
 };
 
 #endif
-
-// VTK-HeaderTest-Exclude: vtkAMRDualContour.h

@@ -1069,3 +1069,5 @@ public:
   }
 };
 #endif
+
+// VTK-HeaderTest-Exclude: vtkAdiosInternals.h
