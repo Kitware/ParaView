@@ -65,7 +65,7 @@ public:
 
   /**
    * Getter to use to get the sequence index string
-   * after calling ParseFileSequence. It can be usefull
+   * after calling ParseFileSequence. It can be useful
    * when sequence index is duplicated.
    */
   vtkGetMacro(SequenceIndexString, std::string);
