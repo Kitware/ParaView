@@ -40,7 +40,7 @@ class GenericIOReader;
 class GenericIOWriter;
 }
 
-namespace vtkGenericIOUtilities
+namespace VTKPVVTKEXTENSIONSCOSMOTOOLS_EXPORT vtkGenericIOUtilities
 {
 
 //==============================================================================
