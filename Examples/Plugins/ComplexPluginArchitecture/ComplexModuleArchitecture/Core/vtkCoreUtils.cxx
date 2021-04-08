@@ -14,23 +14,21 @@
 =========================================================================*/
 #include "vtkCoreUtils.h"
 
+#include <vtkMath.h>
 #include <vtkObjectFactory.h>
-
-#define _USE_MATH_DEFINES
-#include <cmath>
 
 vtkStandardNewMacro(vtkCoreUtils);
 
 //----------------------------------------------------------------------------
 float vtkCoreUtils::RadiansFromDegrees(float x)
 {
-  return x * M_PI / 180.0f;
+  return vtkMath::RadiansFromDegrees(x);
 }
 
 //----------------------------------------------------------------------------
 double vtkCoreUtils::RadiansFromDegrees(double x)
 {
-  return x * M_PI / 180.0;
+  return vtkMath::RadiansFromDegrees(x);
 }
 
 //----------------------------------------------------------------------------
