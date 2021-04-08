@@ -41,9 +41,9 @@
 
 #ifndef vtkIceTConstants_h
 #define vtkIceTConstants_h
-#include "vtkPVVTKExtensionsRenderingModule.h" // needed for export macro
+#include "vtkRemotingViewsModule.h" //needed for exports
 
-class VTKPVVTKEXTENSIONSRENDERING_EXPORT vtkIceTConstants
+class VTKREMOTINGVIEWS_EXPORT vtkIceTConstants
 {
 public:
   enum StrategyType
