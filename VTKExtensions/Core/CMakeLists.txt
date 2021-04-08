@@ -55,9 +55,13 @@ set(classes
 set(headers
   vtkMemberFunctionCommand.h)
 
+set(private_headers
+  vtkUndoStackInternal.h)
+
 vtk_module_add_module(ParaView::VTKExtensionsCore
   CLASSES ${classes}
-  HEADERS ${headers})
+  HEADERS ${headers}
+  PRIVATE_HEADERS ${private_headers})
 
 paraview_add_server_manager_xmls(
   XMLS  Resources/core_sources.xml)
