@@ -30,7 +30,7 @@
 #include "vtkAbstractArrayMeasurement.h"
 #include "vtkFiltersHyperTreeGridADRModule.h" // For export macro
 
-#include <vector>
+#include <vector> // for std::vector
 
 class vtkAbstractAccumulator;
 

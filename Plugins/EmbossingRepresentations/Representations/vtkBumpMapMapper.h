@@ -32,7 +32,7 @@
 #define vtkBumpMapMapper_h
 
 #include "vtkCompositePolyDataMapper2.h"
-#include "vtkEmbossingRepresentationsModule.h"
+#include "vtkEmbossingRepresentationsModule.h" // for export macro
 
 class vtkMultiProcessController;
 

@@ -15,12 +15,12 @@
 #ifndef vtkProcessModuleInternals_h
 #define vtkProcessModuleInternals_h
 
-#include "vtkSession.h"
-#include "vtkSmartPointer.h"
-#include "vtkWeakPointer.h"
+#include "vtkSession.h"      // for vtkSession
+#include "vtkSmartPointer.h" // for vtkSmartPointer
+#include "vtkWeakPointer.h"  // for vtkWeakPointer
 
-#include <map>
-#include <vector>
+#include <map>    // for std::map
+#include <vector> // for std::vector
 
 class vtkProcessModuleInternals
 {

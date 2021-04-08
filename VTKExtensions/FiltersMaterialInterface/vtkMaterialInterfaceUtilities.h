@@ -17,26 +17,24 @@
 #define vtkMaterialInterfaceUtilities_h
 
 // Vtk
-#include <vtkCommunicator.h>
+#include "vtkCommunicator.h" // for vtkCommunicator
 // Vtk containers
-#include <vtkDataArraySelection.h>
-#include <vtkDoubleArray.h>
-#include <vtkFloatArray.h>
-#include <vtkIntArray.h>
-#include <vtkUnsignedIntArray.h>
+#include "vtkDoubleArray.h"      // for vtkDoubleArray
+#include "vtkFloatArray.h"       // for vtkFloatArray
+#include "vtkIntArray.h"         // for vtkIntArray
+#include "vtkUnsignedIntArray.h" // for vtkUnsignedIntArray
 // STL
-#include <fstream>
+#include <fstream> // for file operations
 using std::ofstream;
 using std::ifstream;
-#include <sstream>
+#include <sstream> // for std::ostringstream
 using std::ostringstream;
-#include <vector>
+#include <vector> // for std::vector
 using std::vector;
-#include <string>
+#include <string> // for std::string
 using std::string;
-#include <algorithm>
 // other
-#include <cassert>
+#include <cassert> // for assert
 
 // some useful functionality that stradles multiple filters
 // and has file scope.

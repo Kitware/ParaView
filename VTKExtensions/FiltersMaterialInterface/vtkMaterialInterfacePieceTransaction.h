@@ -29,9 +29,8 @@
 #define vtkMaterialInterfacePieceTransaction_h
 
 #include "vtkPVVTKExtensionsFiltersMaterialInterfaceModule.h" //needed for exports
-#include "vtkSystemIncludes.h"
 
-#include <iostream>
+#include <iostream> // for std::ostream
 
 class VTKPVVTKEXTENSIONSFILTERSMATERIALINTERFACE_EXPORT vtkMaterialInterfacePieceTransaction
 {

@@ -28,8 +28,8 @@
 #ifndef vtkPointAccumulator_h
 #define vtkPointAccumulator_h
 
-#include "vtkPoints.h"
-#include <exception>
+#include "vtkPoints.h" // for vtkPoints
+#include <exception>   // for std::bad_alloc
 
 template <typename T_CPP, class T_VTK>
 class vtkPointAccumulator

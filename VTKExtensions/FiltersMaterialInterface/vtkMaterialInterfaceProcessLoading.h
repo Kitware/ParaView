@@ -24,10 +24,10 @@
 
 #include "vtkPVVTKExtensionsFiltersMaterialInterfaceModule.h" //needed for exports
 
-#include "vtkType.h"
-#include <cassert>
-#include <iostream>
-#include <vector>
+#include "vtkType.h" // for vtkIdType
+#include <cassert>   // for assert
+#include <iostream>  // for std::ostream
+#include <vector>    // for std::vector
 
 class VTKPVVTKEXTENSIONSFILTERSMATERIALINTERFACE_EXPORT vtkMaterialInterfaceProcessLoading
 {

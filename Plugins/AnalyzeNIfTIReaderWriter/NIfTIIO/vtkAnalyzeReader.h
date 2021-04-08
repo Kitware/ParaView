@@ -24,7 +24,7 @@
 #ifndef vtkAnalyzeReader_h
 #define vtkAnalyzeReader_h
 
-#include "vtkAnalyzeNIfTIIOModule.h"
+#include "vtkAnalyzeNIfTIIOModule.h" // for export macro
 #include "vtkImageReader.h"
 
 #define ANALYZE_HEADER_ARRAY "vtkAnalyzeReaderHeaderArray"

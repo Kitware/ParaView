@@ -43,7 +43,7 @@
 
 #include "vtkSMObject.h"
 
-#include <string>
+#include <string> // for std::string
 
 class vtkSMProxy;
 class vtkSMSession;

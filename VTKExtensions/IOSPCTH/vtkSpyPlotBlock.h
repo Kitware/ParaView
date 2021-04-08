@@ -29,7 +29,7 @@ PURPOSE.  See the above copyright notice for more information.
 #define vtkSpyPlotBlock_h
 
 #include "vtkPVVTKExtensionsIOSPCTHModule.h" //needed for exports
-#include "vtkSystemIncludes.h"
+#include "vtkType.h"                         // for vtkIdType
 
 class vtkCellData;
 class vtkDoubleArray;

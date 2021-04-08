@@ -33,8 +33,8 @@
 #include "vtkSMObject.h"
 
 #include "vtkRemotingViewsModule.h" // needed for exports
-#include "vtkSmartPointer.h"
-#include <vtk_jsoncpp_fwd.h> // for forward declarations
+#include "vtkSmartPointer.h"        // for ivars
+#include <vtk_jsoncpp_fwd.h>        // for forward declarations
 
 class vtkPVXMLElement;
 class VTKREMOTINGVIEWS_EXPORT vtkSMTransferFunctionPresets : public vtkSMObject

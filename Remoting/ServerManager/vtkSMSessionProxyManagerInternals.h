@@ -16,28 +16,20 @@
 #ifndef vtkSMSessionProxyManagerInternals_h
 #define vtkSMSessionProxyManagerInternals_h
 
-#include "vtkCollection.h"
-#include "vtkCommand.h"
-#include "vtkDebugLeaks.h"
-#include "vtkNew.h"
-#include "vtkSMCollaborationManager.h"
-#include "vtkSMLink.h"
-#include "vtkSMMessage.h"
-#include "vtkSMOutputPort.h"
-#include "vtkSMProxyLocator.h"
-#include "vtkSMProxyManager.h"
-#include "vtkSMProxySelectionModel.h"
-#include "vtkSMSession.h"
-#include "vtkSMSessionClient.h"
-#include "vtkSMSessionProxyManager.h"
-#include "vtkSMSourceProxy.h"
-#include "vtkSmartPointer.h"
+#include "vtkObjectBase.h"
+#include "vtkSMLink.h"                // for vtkSMLink
+#include "vtkSMMessage.h"             // for vtkSMMessage
+#include "vtkSMProxyLocator.h"        // for vtkSMProxyLocator
+#include "vtkSMProxySelectionModel.h" // for vtkSMProxySelectionModel
+#include "vtkSmartPointer.h"          // for vtkSmartPointer
 
-#include <map>
-#include <set>
-#include <sstream>
-#include <vector>
-#include <vtksys/RegularExpression.hxx>
+#include <map>                          // for std::map
+#include <set>                          // for std::set
+#include <vector>                       // for std::vector
+#include <vtksys/RegularExpression.hxx> // for regexes
+
+class vtkSMProxyLocator;
+class vtkSMSessionProxyManager;
 
 // Sub-classed to avoid symbol length explosion.
 class vtkSMProxyManagerProxyInfo : public vtkObjectBase

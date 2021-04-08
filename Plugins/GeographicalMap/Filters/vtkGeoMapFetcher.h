@@ -24,11 +24,11 @@
 #ifndef vtkGeoMapFetcher_h
 #define vtkGeoMapFetcher_h
 
-#include "vtkGeographicalMapModule.h"
+#include "vtkGeographicalMapModule.h" // for export macro
 #include "vtkImageAlgorithm.h"
 
-#include <string>
-#include <vector>
+#include <string> // for std::string
+#include <vector> // for std::vector
 
 class vtkImageData;
 

@@ -3,11 +3,9 @@
 #define vtkParFlowReader_h
 
 #include "vtkMultiBlockDataSetAlgorithm.h"
-#include "vtkParFlowIOModule.h"
+#include "vtkParFlowIOModule.h" // for export macro
 
-#include "vtkVector.h"
-
-#include <vector>
+#include <vector> // for std::vector
 
 class vtkDoubleArray;
 class vtkImageData;

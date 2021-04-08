@@ -30,7 +30,7 @@
 #include "vtkObject.h"
 #include "vtkPVVTKExtensionsCoreModule.h" //needed for exports
 
-#include <string>
+#include <string> // for std::string
 
 namespace vtksys
 {

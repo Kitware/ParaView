@@ -30,8 +30,7 @@
 
 #include "vtkObject.h"
 #include "vtkPVVTKExtensionsAMRModule.h" //needed for exports
-#include <map>
-#include <vector>
+#include <vector>                        // for std::vector
 
 class vtkDataArray;
 class vtkIntArray;

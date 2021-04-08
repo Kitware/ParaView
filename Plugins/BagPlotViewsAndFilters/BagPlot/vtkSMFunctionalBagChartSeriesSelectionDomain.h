@@ -24,7 +24,7 @@
 #ifndef vtkSMFunctionalBagChartSeriesSelectionDomain_h
 #define vtkSMFunctionalBagChartSeriesSelectionDomain_h
 
-#include "vtkBagPlotViewsAndFiltersBagPlotModule.h"
+#include "vtkBagPlotViewsAndFiltersBagPlotModule.h" // for export macro
 #include "vtkSMChartSeriesSelectionDomain.h"
 
 class VTKBAGPLOTVIEWSANDFILTERSBAGPLOT_EXPORT vtkSMFunctionalBagChartSeriesSelectionDomain

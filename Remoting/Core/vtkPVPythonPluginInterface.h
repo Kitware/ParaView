@@ -22,7 +22,6 @@
 #ifndef vtkPVPythonPluginInterface_h
 #define vtkPVPythonPluginInterface_h
 
-#include "vtkObject.h"
 #include "vtkRemotingCoreModule.h" //needed for exports
 #include <string>                  // STL Header
 #include <vector>                  // STL Header

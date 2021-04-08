@@ -28,7 +28,7 @@
 
 #include "vtkCameraManipulator.h"
 #include "vtkPVVTKExtensionsInteractionStyleModule.h" // needed for export macro
-#include <memory>
+#include <memory>                                     // for std::unique_ptr
 
 class VTKPVVTKEXTENSIONSINTERACTIONSTYLE_EXPORT vtkTrackballPan : public vtkCameraManipulator
 {

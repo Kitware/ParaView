@@ -32,6 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkPVLogInformation.h"
 
+#include "vtkClientServerStream.h"
 #include "vtkLogRecorder.h"
 #include "vtkLogger.h"
 #include "vtkMultiProcessStream.h"

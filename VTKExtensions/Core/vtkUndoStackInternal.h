@@ -16,11 +16,11 @@
 #ifndef vtkUndoStackInternal_h
 #define vtkUndoStackInternal_h
 
-#include "vtkSmartPointer.h"
-#include "vtkUndoSet.h"
+#include "vtkSmartPointer.h" // for vtkSmartPointer
+#include "vtkUndoSet.h"      // for vtkUndoSet
 
-#include <string>
-#include <vector>
+#include <string> // for std::string
+#include <vector> // for std::vector
 
 class vtkUndoStackInternal
 {

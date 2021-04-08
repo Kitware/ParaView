@@ -20,9 +20,9 @@
 #ifndef vtkMyElevationFilter_h
 #define vtkMyElevationFilter_h
 
-#include "FiltersModule.h"
+#include "FiltersModule.h" // for export macro
 
-#include <vtkElevationFilter.h>
+#include "vtkElevationFilter.h"
 
 class FILTERS_EXPORT vtkMyElevationFilter : public vtkElevationFilter
 {

@@ -19,7 +19,7 @@
 #ifndef vtkCoreUtils_h
 #define vtkCoreUtils_h
 
-#include "CoreModule.h"
+#include "CoreModule.h" // For export macro
 
 #include <vtkObject.h>
 

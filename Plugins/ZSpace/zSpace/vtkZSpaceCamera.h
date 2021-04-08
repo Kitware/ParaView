@@ -22,7 +22,6 @@ PURPOSE.  See the above copyright notice for more information.
 #ifndef vtkZSpaceCamera_h
 #define vtkZSpaceCamera_h
 
-#include "vtkNew.h"
 #include "vtkOpenGLCamera.h"
 #include "vtkZSpaceViewModule.h" // for export macro
 

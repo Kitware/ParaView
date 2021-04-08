@@ -20,9 +20,8 @@
 #ifndef vtkArrowGlyphFilter_h
 #define vtkArrowGlyphFilter_h
 
-#include "vtkArrowGlyphFilterModule.h"
+#include "vtkArrowGlyphFilterModule.h" // for export macro
 #include "vtkPolyDataAlgorithm.h"
-#include "vtkSmartPointer.h"
 
 class vtkArrowSource;
 class vtkMaskPoints;

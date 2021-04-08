@@ -30,8 +30,6 @@
 #ifndef vtkSMProxyConfigurationFileInfo_h
 #define vtkSMProxyConfigurationFileInfo_h
 
-#include "vtkObject.h"
-
 class vtkSMProxyConfigurationFileInfo
 {
 public:

@@ -35,7 +35,7 @@
 #include "vtkDataObject.h"
 #include "vtkFiltersHyperTreeGridADRModule.h" // For export macro
 
-#include <functional>
+#include <functional> // for std::function
 
 class vtkDataArray;
 class vtkDoubleArray;

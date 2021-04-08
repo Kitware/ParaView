@@ -63,7 +63,7 @@
 #include "vtkSMObject.h"
 #include "vtkSmartPointer.h" // needed for iVar
 
-#include <vector>
+#include <vector> // for std::vector
 
 class vtkSMProxy;
 class vtkSmartPyObject;

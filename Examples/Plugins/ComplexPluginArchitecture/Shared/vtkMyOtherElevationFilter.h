@@ -20,9 +20,9 @@
 #ifndef vtkMyOtherElevationFilter_h
 #define vtkMyOtherElevationFilter_h
 
-#include "SharedModule.h"
+#include "SharedModule.h" // for export macro
 
-#include <vtkElevationFilter.h>
+#include "vtkElevationFilter.h"
 
 class SHARED_EXPORT vtkMyOtherElevationFilter : public vtkElevationFilter
 {

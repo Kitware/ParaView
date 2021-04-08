@@ -16,9 +16,9 @@
 #ifndef vtkGeometryRepresentationInternal_h
 #define vtkGeometryRepresentationInternal_h
 
-#include "vtkInformation.h"
-#include "vtkInformationVector.h"
-#include "vtkPolyData.h"
+#include "vtkInformation.h"       // for vtkInformation
+#include "vtkInformationVector.h" // for vtkInformationVector
+#include "vtkPolyData.h"          // for vtkPolyData
 
 // We'll use the VTKm decimation filter if TBB is enabled, otherwise we'll
 // fallback to vtkQuadricClustering, since vtkmLevelOfDetail is slow on the
@@ -29,8 +29,8 @@
 #endif
 
 #if defined(VTKM_ENABLE_TBB) && VTK_MODULE_ENABLE_VTK_AcceleratorsVTKmFilters
-#include "vtkCellArray.h"
-#include "vtkQuadricClustering.h"
+#include "vtkCellArray.h"         // for vtkCellArray
+#include "vtkQuadricClustering.h" // for vtkQuadricClustering
 #include "vtkmLevelOfDetail.h"
 namespace vtkGeometryRepresentation_detail
 {

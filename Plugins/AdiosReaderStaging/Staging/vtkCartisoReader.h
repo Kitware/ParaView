@@ -16,7 +16,7 @@
 #define vtkCartisoReader_h
 
 #include "vtkAlgorithm.h"
-#include "vtkPVAdiosReaderStagingModule.h"
+#include "vtkPVAdiosReaderStagingModule.h" // for export macro
 
 class vtkMultiProcessController;
 

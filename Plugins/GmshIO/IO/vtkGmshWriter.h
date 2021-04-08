@@ -24,7 +24,7 @@
 #ifndef vtkGmshWriter_h
 #define vtkGmshWriter_h
 
-#include "vtkGmshIOModule.h"
+#include "vtkGmshIOModule.h" // for export macro
 #include "vtkWriter.h"
 
 struct GmshWriterInternal;

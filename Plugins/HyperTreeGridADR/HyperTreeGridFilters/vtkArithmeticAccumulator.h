@@ -35,11 +35,6 @@
 #include "vtkAbstractAccumulator.h"
 #include "vtkFiltersHyperTreeGridADRModule.h" // For export macro
 
-#include <cassert>
-#include <functional>
-#include <string>
-#include <unordered_map>
-
 template <typename FunctorT>
 class VTKFILTERSHYPERTREEGRIDADR_EXPORT vtkArithmeticAccumulator : public vtkAbstractAccumulator
 {
@@ -121,5 +116,5 @@ private:
   void operator=(vtkArithmeticAccumulator<FunctorT>&) = delete;
 };
 
-#include "vtkArithmeticAccumulator.txx"
+#include "vtkArithmeticAccumulator.txx" // template implementation
 #endif

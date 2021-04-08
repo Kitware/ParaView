@@ -31,7 +31,7 @@
 #ifndef vtkExtrusionRepresentation_h
 #define vtkExtrusionRepresentation_h
 
-#include "vtkEmbossingRepresentationsModule.h"
+#include "vtkEmbossingRepresentationsModule.h" // for export macro
 #include "vtkGeometryRepresentationWithFaces.h"
 
 class VTKEMBOSSINGREPRESENTATIONS_EXPORT vtkExtrusionRepresentation

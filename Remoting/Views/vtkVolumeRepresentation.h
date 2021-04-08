@@ -23,8 +23,8 @@
 
 #include "vtkPVDataRepresentation.h"
 
-#include "vtkNew.h"
-#include "vtkPVLODVolume.h"
+#include "vtkNew.h"                 // for vtkNew
+#include "vtkPVLODVolume.h"         // for ivars
 #include "vtkRemotingViewsModule.h" //needed for exports
 #include "vtkSmartPointer.h"        //needed for vtkSmartPointer
 
@@ -32,7 +32,6 @@ class vtkColorTransferFunction;
 class vtkDataSet;
 class vtkOutlineSource;
 class vtkPiecewiseFunction;
-class vtkPVLODVolume;
 class vtkVolumeProperty;
 
 class VTKREMOTINGVIEWS_EXPORT vtkVolumeRepresentation : public vtkPVDataRepresentation

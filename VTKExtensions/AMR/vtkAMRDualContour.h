@@ -33,8 +33,6 @@
 
 #include "vtkMultiBlockDataSetAlgorithm.h"
 #include "vtkPVVTKExtensionsAMRModule.h" //needed for exports
-#include <string>
-#include <vector>
 
 class vtkDataSet;
 class vtkImageData;

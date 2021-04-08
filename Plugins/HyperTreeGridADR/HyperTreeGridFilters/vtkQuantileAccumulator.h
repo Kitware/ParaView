@@ -30,8 +30,8 @@
 #include "vtkAbstractAccumulator.h"
 #include "vtkFiltersHyperTreeGridADRModule.h" // For export macro
 
-#include <memory>
-#include <vector>
+#include <memory> //for std::shared_ptr
+#include <vector> // for std::vector
 
 class vtkDataObject;
 

@@ -4,7 +4,7 @@
 
 #include "vtkVector.h"
 
-#include "nlohmann/json.hpp"
+#include "nlohmann/json.hpp" // for json
 
 /// Convert a vtkVector (or any vtkTuple) into a json::array.
 template <typename T, int S>

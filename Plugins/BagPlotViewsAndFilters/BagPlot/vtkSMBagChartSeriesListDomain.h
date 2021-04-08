@@ -24,7 +24,7 @@
 #ifndef vtkSMBagChartSeriesListDomain_h
 #define vtkSMBagChartSeriesListDomain_h
 
-#include "vtkBagPlotViewsAndFiltersBagPlotModule.h"
+#include "vtkBagPlotViewsAndFiltersBagPlotModule.h" // for export macro
 #include "vtkSMChartSeriesListDomain.h"
 
 class vtkPVDataInformation;

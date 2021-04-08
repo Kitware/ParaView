@@ -19,9 +19,9 @@
 #ifndef vtkSharedUtils_h
 #define vtkSharedUtils_h
 
-#include "SharedModule.h"
+#include "SharedModule.h" // for export macro
 
-#include <vtkObject.h>
+#include "vtkObject.h"
 
 class SHARED_EXPORT vtkSharedUtils : public vtkObject
 {

@@ -20,6 +20,7 @@
 #include "vtkExtractBlockUsingDataAssembly.h"
 #include "vtkFieldData.h"
 #include "vtkInformation.h"
+#include "vtkInformationIntegerKey.h"
 #include "vtkLogger.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"

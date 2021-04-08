@@ -23,7 +23,7 @@
 #ifndef vtkPVBagChartRepresentation_h
 #define vtkPVBagChartRepresentation_h
 
-#include "vtkBagPlotViewsAndFiltersBagPlotModule.h"
+#include "vtkBagPlotViewsAndFiltersBagPlotModule.h" // for export macro
 #include "vtkChartRepresentation.h"
 
 class vtkChartXY;

@@ -16,13 +16,13 @@
 #ifndef vtkSMPropertyInternals_h
 #define vtkSMPropertyInternals_h
 
-#include "vtkSMDomain.h"
-#include "vtkSMProperty.h"
-#include "vtkSmartPointer.h"
-#include "vtkWeakPointer.h"
+#include "vtkSMDomain.h"     // for vtkSMDomain
+#include "vtkSMProperty.h"   // for vtkSMProperty
+#include "vtkSmartPointer.h" // for vtkSmartPointer
+#include "vtkWeakPointer.h"  // for vtkWeakPointer
 
-#include <map>
-#include <vector>
+#include <map>    // for std::map
+#include <vector> // for std::vector
 
 struct vtkSMPropertyInternals
 {

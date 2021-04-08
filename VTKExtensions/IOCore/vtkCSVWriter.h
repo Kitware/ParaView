@@ -25,7 +25,7 @@
 #include "vtkPVVTKExtensionsIOCoreModule.h" //needed for exports
 #include "vtkWriter.h"
 
-#include <string>
+#include <string> // for std::string
 
 class vtkMultiProcessController;
 class vtkTable;

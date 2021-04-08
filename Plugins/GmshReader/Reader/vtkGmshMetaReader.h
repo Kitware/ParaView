@@ -28,10 +28,9 @@
 #ifndef vtkGmshMetaReader_h
 #define vtkGmshMetaReader_h
 
-#include "vtkGmshReaderModule.h"
+#include "vtkGmshReaderModule.h" // for export macro
 #include "vtkMultiBlockDataSetAlgorithm.h"
-#include "vtkNew.h"
-#include "vtkSmartPointer.h"
+#include "vtkNew.h" // for vtkNew
 
 class vtkCallbackCommand;
 class vtkDataArraySelection;

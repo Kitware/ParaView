@@ -27,8 +27,8 @@
 #ifndef vtkClientServerStream_h
 #define vtkClientServerStream_h
 
-#include "vtkClientServerID.h"
-#include "vtkVariant.h"
+#include "vtkClientServerID.h" // for vtkClientServerID
+#include "vtkVariant.h"        // for vtkVariant
 
 class vtkClientServerStreamInternals;
 

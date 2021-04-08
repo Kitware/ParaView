@@ -28,7 +28,7 @@
 #ifndef vtkGmshReader_h
 #define vtkGmshReader_h
 
-#include "vtkGmshReaderModule.h"
+#include "vtkGmshReaderModule.h" // for export macro
 #include "vtkUnstructuredGridAlgorithm.h"
 
 struct vtkGmshReaderInternal;

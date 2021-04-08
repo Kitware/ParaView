@@ -25,7 +25,7 @@
 #include "vtkObject.h"
 #include "vtkRemotingServerManagerModule.h" //needed for exports
 
-#include <string>
+#include <string> // for std::string
 
 class vtkSMProxy;
 
