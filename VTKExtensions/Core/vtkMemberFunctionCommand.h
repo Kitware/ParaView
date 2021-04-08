@@ -87,7 +87,10 @@ public:
 
   static ThisT* New() { return new ThisT(); }
 
-  void PrintSelf(ostream& os, vtkIndent indent) override { vtkCommand::PrintSelf(os, indent); }
+  void PrintSelf(ostream& os, vtkIndent indent) override
+  {
+    this->Superclass::PrintSelf(os, indent);
+  }
 
   //@{
   /**
