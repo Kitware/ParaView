@@ -35,10 +35,10 @@ class DecimationFilterType : public vtkmLevelOfDetail
 {
 public:
   static DecimationFilterType* New();
-  vtkTypeMacro(DecimationFilterType, vtkmLevelOfDetail)
+  vtkTypeMacro(DecimationFilterType, vtkmLevelOfDetail);
 
-    // See note on the vtkQuadricClustering implementation below.
-    void SetLODFactor(double factor)
+  // See note on the vtkQuadricClustering implementation below.
+  void SetLODFactor(double factor)
   {
     factor = vtkMath::ClampValue(factor, 0., 1.);
 
@@ -111,13 +111,13 @@ class DecimationFilterType : public vtkQuadricClustering
 {
 public:
   static DecimationFilterType* New();
-  vtkTypeMacro(DecimationFilterType, vtkQuadricClustering)
+  vtkTypeMacro(DecimationFilterType, vtkQuadricClustering);
 
-    // This version gets slower as the grid increases, while the VTKM version
-    // scales with number of points. This means we can get away with a much finer
-    // grid with the VTKM filter, so we'll just reduce the mesh quality a bit
-    // here.
-    void SetLODFactor(double factor)
+  // This version gets slower as the grid increases, while the VTKM version
+  // scales with number of points. This means we can get away with a much finer
+  // grid with the VTKM filter, so we'll just reduce the mesh quality a bit
+  // here.
+  void SetLODFactor(double factor)
   {
     factor = vtkMath::ClampValue(factor, 0., 1.);
 

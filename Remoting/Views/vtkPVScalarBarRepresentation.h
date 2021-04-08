@@ -40,8 +40,8 @@
 class VTKREMOTINGVIEWS_EXPORT vtkPVScalarBarRepresentation : public vtkScalarBarRepresentation
 {
 public:
-  vtkTypeMacro(vtkPVScalarBarRepresentation, vtkScalarBarRepresentation) void PrintSelf(
-    ostream& os, vtkIndent indent) override;
+  vtkTypeMacro(vtkPVScalarBarRepresentation, vtkScalarBarRepresentation);
+  void PrintSelf(ostream& os, vtkIndent indent) override;
   static vtkPVScalarBarRepresentation* New();
 
   enum
