@@ -84,6 +84,9 @@
        <string>Hierarchy</string>
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout_5">
+       <property name="spacing">
+        <number>2</number>
+       </property>
        <property name="leftMargin">
         <number>0</number>
        </property>
@@ -112,6 +115,19 @@
          </attribute>
         </widget>
        </item>
+       <item>
+        <widget class="QPlainTextEdit" name="rawCompositeTree">
+         <property name="lineWrapMode">
+          <enum>QPlainTextEdit::NoWrap</enum>
+         </property>
+         <property name="readOnly">
+          <bool>true</bool>
+         </property>
+         <property name="placeholderText">
+          <string>Hierarchy shown here</string>
+         </property>
+        </widget>
+       </item>
       </layout>
      </widget>
      <widget class="QWidget" name="tab_2">
@@ -119,6 +135,9 @@
        <string>Assembly</string>
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout_6">
+       <property name="spacing">
+        <number>2</number>
+       </property>
        <property name="leftMargin">
         <number>0</number>
        </property>
@@ -145,6 +164,19 @@
          <attribute name="headerVisible">
           <bool>false</bool>
          </attribute>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPlainTextEdit" name="rawAssemblyTree">
+         <property name="lineWrapMode">
+          <enum>QPlainTextEdit::NoWrap</enum>
+         </property>
+         <property name="readOnly">
+          <bool>true</bool>
+         </property>
+         <property name="placeholderText">
+          <string>Assembly shown here</string>
+         </property>
         </widget>
        </item>
       </layout>

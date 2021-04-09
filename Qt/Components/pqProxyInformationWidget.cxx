@@ -37,6 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QIcon>
 #include <QItemSelectionModel>
 #include <QLocale>
+#include <QToolButton>
 
 #include "pqActiveObjects.h"
 #include "pqCoreUtilities.h"
@@ -405,6 +406,26 @@ public:
     this->HierarchyModel.setDataAssembly(hierarchy);
     this->AssemblyModel.setDataAssembly(assembly);
 
+    if (hierarchy)
+    {
+      this->Ui.rawCompositeTree->setPlainText(
+        hierarchy->SerializeToXML(vtkIndent().GetNextIndent()).c_str());
+    }
+    else
+    {
+      this->Ui.rawCompositeTree->setPlainText(QString());
+    }
+
+    if (assembly)
+    {
+      this->Ui.rawAssemblyTree->setPlainText(
+        assembly->SerializeToXML(vtkIndent().GetNextIndent()).c_str());
+    }
+    else
+    {
+      this->Ui.rawAssemblyTree->setPlainText(QString());
+    }
+
     // TODO: save/restore expand and selection state if possible.
     this->Ui.compositeTree->expandAll();
     this->Ui.assemblyTree->expandAll();
@@ -583,6 +604,22 @@ pqProxyInformationWidget::pqProxyInformationWidget(QWidget* parentWdg)
   ui.assemblyTree->setModel(&internals.AssemblyModel);
   ui.dataArraysTable->setModel(&internals.ArraysModel);
   ui.timeValues->setModel(&internals.TimestepValuesModel);
+
+  // add corner widget for data-grouping tab box.
+  QToolButton* button = new QToolButton(this);
+  button->setCheckable(true);
+  button->setChecked(false);
+  button->setIcon(QIcon(":/pqWidgets/Icons/pqAdvanced.svg"));
+  button->setObjectName("showRawDataGrouping");
+  button->setToolTip(tr("Show hierarchy / assembly as text"));
+  ui.rawCompositeTree->hide();
+  ui.rawAssemblyTree->hide();
+
+  QObject::connect(button, &QToolButton::toggled, [&ui](bool showRaw) {
+    ui.rawCompositeTree->setVisible(showRaw);
+    ui.rawAssemblyTree->setVisible(showRaw);
+  });
+  ui.dataGroupingTab->setCornerWidget(button);
 
   // monitor active port.
   auto& activeObjects = pqActiveObjects::instance();
