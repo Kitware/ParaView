@@ -132,8 +132,8 @@ vtkContext2DScalarBarActor::vtkContext2DScalarBarActor()
 
   this->DrawTickMarks = true;
 
-  this->UseCustomLabels = false;
-  this->CustomLabels = vtkSmartPointer<vtkDoubleArray>::New();
+  // Create an array for the custom labels
+  this->CustomLabels = vtkDoubleArray::New();
 
   this->ReverseLegend = false;
 
@@ -163,16 +163,6 @@ vtkContext2DScalarBarActor::~vtkContext2DScalarBarActor()
   this->SetLabelTextProperty(nullptr);
   this->Axis->Delete();
   this->SetRangeLabelFormat(nullptr);
-}
-
-//----------------------------------------------------------------------------
-void vtkContext2DScalarBarActor::SetUseCustomLabels(bool useLabels)
-{
-  if (useLabels != this->UseCustomLabels)
-  {
-    this->UseCustomLabels = useLabels;
-    this->Modified();
-  }
 }
 
 //----------------------------------------------------------------------------
