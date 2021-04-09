@@ -125,7 +125,7 @@ public:
   vtkNew<vtkValuePass> ValuePasses;
   vtkNew<vtkLightingMapPass> LightingMapPass;
 #if VTK_MODULE_ENABLE_VTK_RenderingRayTracing
-  vtkNew<vtkOSPRayPass> OSPRayPass;
+  vtkSmartPointer<vtkOSPRayPass> OSPRayPass = nullptr;
 #endif
 
   vtkSmartPointer<vtkImageProcessingPass> SavedImageProcessingPass;
@@ -3290,6 +3290,10 @@ void vtkPVRenderView::SetViewTime(double value)
 void vtkPVRenderView::SetEnableOSPRay(bool v)
 {
 #if VTK_MODULE_ENABLE_VTK_RenderingRayTracing
+  if (v && !this->Internals->OSPRayPass)
+  {
+    this->Internals->OSPRayPass = vtkSmartPointer<vtkOSPRayPass>::New();
+  }
   if (!vtkOSPRayPass::IsSupported())
   {
     vtkWarningMacro(
