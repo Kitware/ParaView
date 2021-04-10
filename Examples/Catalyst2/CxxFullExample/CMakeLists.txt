@@ -49,7 +49,7 @@ if (USE_CATALYST)
               ${CMAKE_CURRENT_SOURCE_DIR}/catalyst_pipeline.py)
     set_tests_properties("CxxFullExampleV2::SimplePipeline"
       PROPERTIES
-        FAIL_REGULAR_EXPRESSION "ERROR:;instances(s)? still around;ERR\\\|"
+        FAIL_REGULAR_EXPRESSION "Err;ERROR:;instances(s)? still around;ERR\\\|"
         SKIP_RETURN_CODE 125)
   endif()
 endif()
