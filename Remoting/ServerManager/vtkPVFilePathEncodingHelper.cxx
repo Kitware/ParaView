@@ -83,11 +83,11 @@ bool vtkPVFilePathEncodingHelper::CallObjectMethod(const char* method, bool igno
 {
   vtkPVSessionBase* session =
     vtkPVSessionBase::SafeDownCast(vtkProcessModule::GetProcessModule()->GetActiveSession());
-  vtkObject* object = vtkObject::SafeDownCast(
-    vtkSIProxy::SafeDownCast(session->GetSessionCore()->GetSIObject(this->ActiveGlobalId))
-      ->GetVTKObject());
-  vtkClientServerInterpreter* interpreter =
-    vtkClientServerInterpreterInitializer::GetGlobalInterpreter();
+
+  auto siProxy =
+    vtkSIProxy::SafeDownCast(session->GetSessionCore()->GetSIObject(this->ActiveGlobalId));
+  auto object = vtkObject::SafeDownCast(siProxy->GetVTKObject());
+  auto interpreter = siProxy->GetInterpreter();
 
   // Build stream request
   vtkClientServerStream stream;
