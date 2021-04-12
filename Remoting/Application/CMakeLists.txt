@@ -319,6 +319,11 @@ if (TARGET VTK::IOH5part)
     Resources/readers_ioh5part.xml)
 endif()
 
+if (TARGET VTK::IOH5Rage)
+  list(APPEND xml_files
+    Resources/readers_ioh5rage.xml)
+endif()
+
 if (TARGET VTK::IOPIO)
   list(APPEND xml_files
     Resources/readers_iopio.xml)
