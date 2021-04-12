@@ -26,6 +26,7 @@
 #include "vtkSelectionSerializer.h"
 
 #include <cassert>
+#include <sstream>
 
 vtkStandardNewMacro(vtkPVContextViewDataDeliveryManager);
 //----------------------------------------------------------------------------

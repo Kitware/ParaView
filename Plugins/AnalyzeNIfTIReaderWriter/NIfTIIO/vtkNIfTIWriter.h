@@ -22,7 +22,7 @@
 #ifndef vtkNIfTIWriter_h
 #define vtkNIfTIWriter_h
 
-#include "vtkAnalyzeNIfTIIOModule.h"
+#include "vtkAnalyzeNIfTIIOModule.h" // for export macro
 #include "vtkImageWriter.h"
 
 #define NIFTI_HEADER_ARRAY "vtkNIfTIReaderHeaderArray"

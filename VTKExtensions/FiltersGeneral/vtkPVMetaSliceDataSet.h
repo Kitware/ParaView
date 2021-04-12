@@ -24,8 +24,6 @@
 #include "vtkPVDataSetAlgorithmSelectorFilter.h"
 #include "vtkPVVTKExtensionsFiltersGeneralModule.h" //needed for exports
 
-#include <iostream>
-
 class vtkImplicitFunction;
 class vtkInformation;
 class vtkInformationVector;

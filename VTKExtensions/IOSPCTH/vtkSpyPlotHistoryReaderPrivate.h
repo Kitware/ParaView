@@ -25,7 +25,7 @@
 #ifndef vtkSpyPlotHistoryReaderPrivate_h
 #define vtkSpyPlotHistoryReaderPrivate_h
 
-#include <vtksys/SystemTools.hxx>
+#include <vtksys/SystemTools.hxx> // for vtksys::SystemTools::LowerCase
 
 #include <map>     // Needed for STL map.
 #include <set>     // Needed for STL set.
@@ -244,4 +244,3 @@ std::vector<std::string> createTableLayoutFromHeader(std::string& header, const 
 }
 
 #endif
-// VTK-HeaderTest-Exclude: vtkSpyPlotHistoryReaderPrivate.h

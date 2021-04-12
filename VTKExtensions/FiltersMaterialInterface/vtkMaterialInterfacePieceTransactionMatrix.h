@@ -29,10 +29,10 @@
 #ifndef vtkMaterialInterfacePieceTransactionMatrix_h
 #define vtkMaterialInterfacePieceTransactionMatrix_h
 
-#include "vtkMaterialInterfacePieceTransaction.h"             //
+#include "vtkMaterialInterfacePieceTransaction.h" // for vtkMaterialInterfacePieceTransaction
 #include "vtkPVVTKExtensionsFiltersMaterialInterfaceModule.h" //needed for exports
-#include "vtkType.h"                                          //
-#include <vector>                                             //
+#include "vtkType.h"                                          // for vtkIdType
+#include <vector>                                             // for std::vector
 
 class vtkCommunicator;
 
@@ -143,5 +143,3 @@ inline vtkIdType vtkMaterialInterfacePieceTransactionMatrix::GetNumberOfTransact
   return static_cast<vtkIdType>(nTransactions);
 }
 #endif
-
-// VTK-HeaderTest-Exclude: vtkMaterialInterfacePieceTransactionMatrix.h

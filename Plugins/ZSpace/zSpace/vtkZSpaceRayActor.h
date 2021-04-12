@@ -22,8 +22,8 @@ PURPOSE.  See the above copyright notice for more information.
 #ifndef vtkZSpaceRayActor_h
 #define vtkZSpaceRayActor_h
 
-#include "vtkNew.h"              // for ivar
-#include "vtkOpenGLActor.h"      // ivar
+#include "vtkNew.h" // for ivar
+#include "vtkOpenGLActor.h"
 #include "vtkZSpaceViewModule.h" // for export macro
 
 class vtkLineSource;

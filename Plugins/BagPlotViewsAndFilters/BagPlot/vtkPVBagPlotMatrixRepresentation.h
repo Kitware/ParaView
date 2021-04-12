@@ -41,8 +41,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef vtkPVBagPlotMatrixRepresentation_h
 #define vtkPVBagPlotMatrixRepresentation_h
 
-#include <vtkBagPlotViewsAndFiltersBagPlotModule.h>
-#include <vtkPVPlotMatrixRepresentation.h>
+#include "vtkBagPlotViewsAndFiltersBagPlotModule.h" // for export macro
+#include "vtkPVPlotMatrixRepresentation.h"
 
 class VTKBAGPLOTVIEWSANDFILTERSBAGPLOT_EXPORT vtkPVBagPlotMatrixRepresentation
   : public vtkPVPlotMatrixRepresentation

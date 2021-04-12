@@ -25,11 +25,10 @@ PURPOSE.  See the above copyright notice for more information.
 #define vtkSpyPlotReaderMap_h
 
 #include "vtkPVVTKExtensionsIOSPCTHModule.h" //needed for exports
-#include "vtkSystemIncludes.h"
 
-#include <map>
-#include <string>
-#include <vector>
+#include <map>    // for std::map
+#include <string> // for std::string
+#include <vector> // for std::vector
 
 class vtkMultiProcessStream;
 class vtkSpyPlotReader;

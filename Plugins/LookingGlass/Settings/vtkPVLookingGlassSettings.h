@@ -26,7 +26,7 @@
 
 #include "vtkObject.h"
 
-#include "vtkPVRenderView.h"
+#include "vtkPVRenderView.h" // for vtkPVRenderView
 
 #include "vtkLookingGlassSettingsModule.h" // for VTKLOOKINGGLASSSETTINGS_EXPORT
 

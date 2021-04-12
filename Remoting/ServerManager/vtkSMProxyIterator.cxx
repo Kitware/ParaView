@@ -15,6 +15,7 @@
 #include "vtkSMProxyIterator.h"
 
 #include "vtkObjectFactory.h"
+#include "vtkSMProxy.h"
 #include "vtkSMSession.h"
 #include "vtkSMSessionProxyManager.h"
 #include "vtkSMSessionProxyManagerInternals.h"

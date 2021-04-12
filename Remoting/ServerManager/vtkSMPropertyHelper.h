@@ -61,10 +61,9 @@
 #define vtkSMPropertyHelper_h
 
 #include "vtkRemotingServerManagerModule.h" //needed for exports
-#include "vtkSMObject.h"
-#include "vtkVariant.h"
+#include "vtkVariant.h"                     // for vtkVariant
 
-#include <vector>
+#include <vector> // for std::vector
 
 #ifdef INT
 #undef INT

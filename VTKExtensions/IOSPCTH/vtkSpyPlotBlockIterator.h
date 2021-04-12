@@ -2,13 +2,12 @@
 #define vtkSpyPlotBlockIterator_h
 #ifndef __VTK_WRAP__
 
-#include "assert.h"
 #include "vtkPVVTKExtensionsIOSPCTHModule.h" //needed for exports
-#include "vtkSpyPlotReaderMap.h"
-#include "vtkSpyPlotUniReader.h"
+#include "vtkSpyPlotReaderMap.h"             // for vtkSpyPlotReaderMap iterator
+#include "vtkSpyPlotUniReader.h"             // for vtkSpyPlotUniReader
 
-class vtkSpyBlock;
-class vtkSpyPlotReaderMap;
+#include <cassert> // for assert
+
 class vtkSpyPlotReader;
 
 //-----------------------------------------------------------------------------

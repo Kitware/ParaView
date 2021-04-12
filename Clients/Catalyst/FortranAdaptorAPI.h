@@ -27,4 +27,3 @@
 #include "CAdaptorAPI.h"
 
 #endif
-// VTK-HeaderTest-Exclude: FortranAdaptorAPI.h

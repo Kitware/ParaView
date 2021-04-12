@@ -26,7 +26,7 @@
 #ifndef vtkGmshReader_h
 #define vtkGmshReader_h
 
-#include "vtkGmshIOModule.h"
+#include "vtkGmshIOModule.h" // for export macro
 #include "vtkMultiBlockDataSetAlgorithm.h"
 
 struct GmshReaderInternal;

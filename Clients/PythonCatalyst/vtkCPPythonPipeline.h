@@ -30,6 +30,7 @@ class VTKPVPYTHONCATALYST_EXPORT vtkCPPythonPipeline : public vtkCPPipeline
 {
 public:
   vtkTypeMacro(vtkCPPythonPipeline, vtkCPPipeline);
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /**
    * Starting with ParaView 5.9, there are two versions of Python scripts

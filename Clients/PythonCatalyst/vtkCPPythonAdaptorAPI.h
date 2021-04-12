@@ -25,6 +25,7 @@ class VTKPVPYTHONCATALYST_EXPORT vtkCPPythonAdaptorAPI : public vtkCPAdaptorAPI
 {
 public:
   vtkTypeMacro(vtkCPPythonAdaptorAPI, vtkCPAdaptorAPI);
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /// Call at the start of the simulation. Users can still call
   /// CoProcessorInitialize() without arguments, in which case Python
@@ -41,4 +42,3 @@ private:
 };
 
 #endif
-// VTK-HeaderTest-Exclude: vtkCPPythonAdaptorAPI.h

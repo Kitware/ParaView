@@ -35,6 +35,9 @@
 // include 2nd
 #include "vtk_protobuf.h"
 
+// include 3rd
+#include "vtkRemotingServerManagerModule.h" // needed for exports
+
 // include last
 #include "vtkPVMessage.pb.h"
 

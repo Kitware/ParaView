@@ -23,12 +23,11 @@
 #define vtkMaterialInterfacePieceLoading_h
 
 #include "vtkPVVTKExtensionsFiltersMaterialInterfaceModule.h" //needed for exports
-#include "vtkSystemIncludes.h"
 
-#include "vtkType.h"
-#include <cassert>
-#include <iostream>
-#include <vector>
+#include "vtkType.h" // for vtkIdType
+#include <cassert>   // for assert
+#include <iostream>  // for std::ostream
+#include <vector>    // for std::vector
 
 class VTKPVVTKEXTENSIONSFILTERSMATERIALINTERFACE_EXPORT vtkMaterialInterfacePieceLoading
 {
@@ -104,5 +103,3 @@ VTKPVVTKEXTENSIONSFILTERSMATERIALINTERFACE_EXPORT
 void PrintPieceLoadingHistogram(std::vector<std::vector<vtkIdType> >& pla);
 #endif
 //@}
-
-// VTK-HeaderTest-Exclude: vtkMaterialInterfacePieceLoading.h

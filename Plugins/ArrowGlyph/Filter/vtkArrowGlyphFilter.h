@@ -20,9 +20,8 @@
 #ifndef vtkArrowGlyphFilter_h
 #define vtkArrowGlyphFilter_h
 
-#include "vtkArrowGlyphFilterModule.h"
+#include "vtkArrowGlyphFilterModule.h" // for export macro
 #include "vtkPolyDataAlgorithm.h"
-#include "vtkSmartPointer.h"
 
 class vtkArrowSource;
 class vtkMaskPoints;
@@ -32,6 +31,7 @@ class VTKARROWGLYPHFILTER_EXPORT vtkArrowGlyphFilter : public vtkPolyDataAlgorit
 public:
   static vtkArrowGlyphFilter* New();
   vtkTypeMacro(vtkArrowGlyphFilter, vtkPolyDataAlgorithm);
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   // Description:
   // Turn on/off orienting of arrows along vector/normal.

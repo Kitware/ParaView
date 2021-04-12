@@ -48,7 +48,7 @@
 #include "vtkDataObject.h"
 #include "vtkFiltersHyperTreeGridADRModule.h" // For export macro
 
-#include <vector>
+#include <vector> // for std::vector
 
 // Macro to implement automatically the pure virtual methods in the subclasses.
 // It assumes a few static methods / attributs are implemented.
@@ -236,8 +236,8 @@ protected:
   double TotalWeight;
 
 private:
-  vtkAbstractArrayMeasurement(vtkAbstractArrayMeasurement&) = delete;
-  void operator=(vtkAbstractArrayMeasurement&) = delete;
+  vtkAbstractArrayMeasurement(const vtkAbstractArrayMeasurement&) = delete;
+  void operator=(const vtkAbstractArrayMeasurement&) = delete;
 };
 
 #endif

@@ -43,6 +43,7 @@ public:
   static vtkQuantileArrayMeasurement* New();
 
   vtkTypeMacro(vtkQuantileArrayMeasurement, vtkAbstractArrayMeasurement);
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   using Superclass::Add;
   using Superclass::CanMeasure;
@@ -133,8 +134,8 @@ protected:
   //@}
 
 private:
-  vtkQuantileArrayMeasurement(vtkQuantileArrayMeasurement&) = delete;
-  void operator=(vtkQuantileArrayMeasurement&) = delete;
+  vtkQuantileArrayMeasurement(const vtkQuantileArrayMeasurement&) = delete;
+  void operator=(const vtkQuantileArrayMeasurement&) = delete;
 };
 
 #endif

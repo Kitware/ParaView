@@ -20,9 +20,9 @@
 #ifndef vtkSMTestDriver_h
 #define vtkSMTestDriver_h
 
-#include <string>
-#include <vector>
-#include <vtksys/Process.h>
+#include <string>           // for std::string
+#include <vector>           // for std::vector
+#include <vtksys/Process.h> // for process implementation
 
 class vtkSMTestDriver
 {
@@ -136,3 +136,5 @@ private:
 };
 
 #endif
+
+// VTK-HeaderTest-Exclude: vtkSMTestDriver.h

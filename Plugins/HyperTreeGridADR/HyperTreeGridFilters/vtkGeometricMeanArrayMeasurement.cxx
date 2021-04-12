@@ -32,6 +32,12 @@ vtkGeometricMeanArrayMeasurement::vtkGeometricMeanArrayMeasurement()
 }
 
 //----------------------------------------------------------------------------
+void vtkGeometricMeanArrayMeasurement::PrintSelf(ostream& os, vtkIndent indent)
+{
+  this->Superclass::PrintSelf(os, indent);
+}
+
+//----------------------------------------------------------------------------
 bool vtkGeometricMeanArrayMeasurement::Measure(vtkAbstractAccumulator** accumulators,
   vtkIdType numberOfAccumulatedData, double totalWeight, double& value)
 {

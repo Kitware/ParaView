@@ -34,7 +34,7 @@ class VTKPVVTKEXTENSIONSFILTERSRENDERING_EXPORT vtkNvPipeCompressor : public vtk
 public:
   static vtkNvPipeCompressor* New();
   vtkTypeMacro(vtkNvPipeCompressor, vtkImageCompressor);
-  void PrintSelf(std::ostream& os, vtkIndent indent) override;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   //@{
   /**

@@ -33,7 +33,7 @@
 
 #include "vtkPVVTKExtensionsCoreModule.h" // needed for export macro
 #include "vtkWeakPointer.h"               // needed for vtkWeakPointer.
-#include <string>
+#include <string>                         // for std::string
 
 class vtkCommunicator;
 class vtkMultiProcessController;
@@ -73,4 +73,3 @@ private:
 };
 
 #endif
-// VTK-HeaderTest-Exclude: vtkCommunicationErrorCatcher.h

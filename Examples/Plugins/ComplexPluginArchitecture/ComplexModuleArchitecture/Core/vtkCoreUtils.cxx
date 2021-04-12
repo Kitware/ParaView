@@ -20,6 +20,12 @@
 vtkStandardNewMacro(vtkCoreUtils);
 
 //----------------------------------------------------------------------------
+vtkCoreUtils::vtkCoreUtils() = default;
+
+//----------------------------------------------------------------------------
+vtkCoreUtils::~vtkCoreUtils() = default;
+
+//----------------------------------------------------------------------------
 float vtkCoreUtils::RadiansFromDegrees(float x)
 {
   return vtkMath::RadiansFromDegrees(x);

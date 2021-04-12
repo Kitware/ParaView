@@ -38,6 +38,7 @@ public:
   static vtkGeometricMeanArrayMeasurement* New();
 
   vtkTypeMacro(vtkGeometricMeanArrayMeasurement, vtkAbstractArrayMeasurement);
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   using Superclass::Add;
   using Superclass::CanMeasure;
@@ -110,8 +111,8 @@ protected:
   //@}
 
 private:
-  vtkGeometricMeanArrayMeasurement(vtkGeometricMeanArrayMeasurement&) = delete;
-  void operator=(vtkGeometricMeanArrayMeasurement&) = delete;
+  vtkGeometricMeanArrayMeasurement(const vtkGeometricMeanArrayMeasurement&) = delete;
+  void operator=(const vtkGeometricMeanArrayMeasurement&) = delete;
 };
 
 #endif

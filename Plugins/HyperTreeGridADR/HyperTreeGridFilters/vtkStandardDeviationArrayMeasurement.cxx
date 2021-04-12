@@ -32,6 +32,12 @@ vtkStandardDeviationArrayMeasurement::vtkStandardDeviationArrayMeasurement()
 }
 
 //----------------------------------------------------------------------------
+void vtkStandardDeviationArrayMeasurement::PrintSelf(ostream& os, vtkIndent indent)
+{
+  this->Superclass::PrintSelf(os, indent);
+}
+
+//----------------------------------------------------------------------------
 bool vtkStandardDeviationArrayMeasurement::Measure(vtkAbstractAccumulator** accumulators,
   vtkIdType numberOfAccumulatedData, double totalWeight, double& value)
 {

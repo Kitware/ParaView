@@ -37,6 +37,7 @@ public:
   static vtkStandardDeviationArrayMeasurement* New();
 
   vtkTypeMacro(vtkStandardDeviationArrayMeasurement, vtkAbstractArrayMeasurement);
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   using Superclass::Add;
   using Superclass::CanMeasure;
@@ -117,8 +118,8 @@ protected:
   //@}
 
 private:
-  vtkStandardDeviationArrayMeasurement(vtkStandardDeviationArrayMeasurement&) = delete;
-  void operator=(vtkStandardDeviationArrayMeasurement&) = delete;
+  vtkStandardDeviationArrayMeasurement(const vtkStandardDeviationArrayMeasurement&) = delete;
+  void operator=(const vtkStandardDeviationArrayMeasurement&) = delete;
 };
 
 #endif

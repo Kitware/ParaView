@@ -21,6 +21,7 @@
 #include "vtkFunctor.h"
 #include "vtkObjectFactory.h"
 
+#include <cassert>
 #include <functional>
 
 template <typename FunctorT>

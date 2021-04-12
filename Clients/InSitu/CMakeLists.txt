@@ -47,7 +47,8 @@ vtk_module_client_server_exclude()
 # stub catalyst build.
 add_library(catalyst SHARED
   ParaViewCatalyst.cxx
-  vtkCatalystBlueprint.cxx)
+  vtkCatalystBlueprint.cxx
+  vtkCatalystBlueprint.h)
 
 target_link_libraries(catalyst
   PRIVATE

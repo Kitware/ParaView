@@ -15,19 +15,20 @@
 #ifndef vtkSMProxyPropertyInternals_h
 #define vtkSMProxyPropertyInternals_h
 
-#include "vtkCommand.h"
-#include "vtkSMMessage.h"
-#include "vtkSMObject.h"
-#include "vtkSMProxy.h"
-#include "vtkSMProxyLocator.h"
-#include "vtkSMSession.h"
-#include "vtkSmartPointer.h"
-#include "vtkWeakPointer.h"
+#include "vtkCommand.h"        // for vtkCommand enums
+#include "vtkSMMessage.h"      // for paraview_protobuf
+#include "vtkSMProxy.h"        // for vtkSMProxy
+#include "vtkSMProxyLocator.h" // for vtkSMProxyLocator
+#include "vtkSMSession.h"      // for vtkSMSession
+#include "vtkSmartPointer.h"   // for vtkSmartPointer
+#include "vtkWeakPointer.h"    // for vtkWeakPointer
 
-#include <algorithm>
-#include <map>
-#include <set>
-#include <vector>
+#include <algorithm> //for std::set_difference
+#include <map>       // for std::map
+#include <set>       // for std::set
+#include <vector>    // for std::vector
+
+class vtkSMProxyLocator;
 
 /// This class is used by vtkSMProxyProperty to keep track of the proxies. It
 /// keeps proxies as well as output port information which is needed for

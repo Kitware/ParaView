@@ -17,10 +17,10 @@
 #define vtkPVInitializer_h
 
 #include "vtkPVPlugin.h"
-#include "vtkPVServerManagerPluginInterface.h"
+#include "vtkPVServerManagerPluginInterface.h" // plugin interface mixin
 
-#include "paraview_client_server.h"
-#include "paraview_server_manager.h"
+#include "paraview_client_server.h"  // client server bindings
+#include "paraview_server_manager.h" // server manager XML data
 
 class vtkClientServerInterpreter;
 
@@ -54,3 +54,5 @@ void paraview_initialize()
 }
 
 #endif
+
+// VTK-HeaderTest-Exclude: vtkPVInitializer.h

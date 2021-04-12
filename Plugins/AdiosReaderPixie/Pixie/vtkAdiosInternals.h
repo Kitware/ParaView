@@ -13,6 +13,9 @@
 
 =========================================================================*/
 
+#ifndef vtkAdiosInternals_h
+#define vtkAdiosInternals_h
+
 // Standard library
 #include <cassert>
 #include <map>
@@ -58,9 +61,6 @@ extern "C" {
 #include <adios_error.h>
 #include <adios_read.h>
 }
-
-#ifndef vtkAdiosInternals_v2_h
-#define vtkAdiosInternals_v2_h
 
 //*****************************************************************************
 class AdiosGlobal;   // Internal class used to handle adios initialization
@@ -1069,3 +1069,5 @@ public:
   }
 };
 #endif
+
+// VTK-HeaderTest-Exclude: vtkAdiosInternals.h

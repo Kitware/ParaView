@@ -23,13 +23,14 @@
 #ifndef vtkGenericIOUtilities_h
 #define vtkGenericIOUtilities_h
 
-#include "vtkType.h"
+#include "vtkPVVTKExtensionsCosmoToolsModule.h" // For export macro
+#include "vtkType.h"                            // for vtkIdType
 
-#include <algorithm>
-#include <functional>
-#include <string>
+#include <algorithm>  // for std::find_if
+#include <functional> // for std::ptr_fun
+#include <string>     // for std::string
 
-#include "vtk_mpi.h"
+#include "vtk_mpi.h" // MPI
 
 class vtkMultiProcessController;
 class vtkDataArray;
@@ -40,7 +41,7 @@ class GenericIOReader;
 class GenericIOWriter;
 }
 
-namespace vtkGenericIOUtilities
+namespace VTKPVVTKEXTENSIONSCOSMOTOOLS_EXPORT vtkGenericIOUtilities
 {
 
 //==============================================================================
@@ -143,4 +144,3 @@ inline void SafeDeleteString(char*& str)
 }
 
 #endif /* vtkGenericIOUtilities_h */
-// VTK-HeaderTest-Exclude: vtkGenericIOUtilities.h

@@ -32,3 +32,5 @@ public:
 };
 Q_DECLARE_INTERFACE(vtkPVGUIPluginInterface, "com.kitware/paraview/guiplugin")
 #endif
+
+// VTK-HeaderTest-Exclude: vtkPVGUIPluginInterface.h

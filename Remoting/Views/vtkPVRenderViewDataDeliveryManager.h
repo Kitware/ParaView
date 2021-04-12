@@ -38,7 +38,7 @@ class vtkMatrix4x4;
 class vtkPVDataRepresentation;
 class vtkPVView;
 
-#include <vector>
+#include <vector> // for std::vector
 
 class VTKREMOTINGVIEWS_EXPORT vtkPVRenderViewDataDeliveryManager : public vtkPVDataDeliveryManager
 {
@@ -211,5 +211,3 @@ private:
 };
 
 #endif
-
-// VTK-HeaderTest-Exclude: vtkPVRenderViewDataDeliveryManager.h

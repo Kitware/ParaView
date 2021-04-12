@@ -47,8 +47,6 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkInteractorStyle3D.h"
 #include "vtkNew.h" // for ivars
 
-#include <array>
-
 class vtkCell;
 class vtkPlane;
 class vtkSelection;

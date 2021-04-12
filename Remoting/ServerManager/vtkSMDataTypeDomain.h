@@ -54,8 +54,7 @@
 #include "vtkRemotingServerManagerModule.h" //needed for exports
 #include "vtkSMDomain.h"
 
-#include <string>
-#include <vector>
+#include <string> // for std::string
 
 class vtkSMSourceProxy;
 

@@ -24,10 +24,9 @@
 #ifndef vtkPVTransform_h
 #define vtkPVTransform_h
 
-#include "vtkNew.h"
+#include "vtkNew.h"                       // for vtkNew
 #include "vtkPVVTKExtensionsMiscModule.h" //needed for exports
 #include "vtkTransform.h"
-class vtkTransform;
 
 class VTKPVVTKEXTENSIONSMISC_EXPORT vtkPVTransform : public vtkTransform
 {

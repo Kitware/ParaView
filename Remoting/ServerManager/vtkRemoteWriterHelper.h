@@ -79,6 +79,9 @@ public:
   vtkGetObjectMacro(Interpreter, vtkClientServerInterpreter);
   //@}
 
+  vtkRemoteWriterHelper(const vtkRemoteWriterHelper&) = delete;
+  void operator=(const vtkRemoteWriterHelper&) = delete;
+
 protected:
   vtkRemoteWriterHelper();
   ~vtkRemoteWriterHelper() override;

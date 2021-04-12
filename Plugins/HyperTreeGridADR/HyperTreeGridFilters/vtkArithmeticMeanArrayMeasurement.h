@@ -30,7 +30,7 @@
 #include "vtkAbstractArrayMeasurement.h"
 #include "vtkFiltersHyperTreeGridADRModule.h" // For export macro
 
-#include <vector>
+#include <vector> // for std::vector
 
 class vtkAbstractAccumulator;
 
@@ -41,6 +41,7 @@ public:
   static vtkArithmeticMeanArrayMeasurement* New();
 
   vtkTypeMacro(vtkArithmeticMeanArrayMeasurement, vtkAbstractArrayMeasurement);
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   using Superclass::Add;
   using Superclass::CanMeasure;
@@ -113,8 +114,8 @@ protected:
   //@}
 
 private:
-  vtkArithmeticMeanArrayMeasurement(vtkArithmeticMeanArrayMeasurement&) = delete;
-  void operator=(vtkArithmeticMeanArrayMeasurement&) = delete;
+  vtkArithmeticMeanArrayMeasurement(const vtkArithmeticMeanArrayMeasurement&) = delete;
+  void operator=(const vtkArithmeticMeanArrayMeasurement&) = delete;
 };
 
 #endif

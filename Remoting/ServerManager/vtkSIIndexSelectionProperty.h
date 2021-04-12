@@ -34,8 +34,8 @@ class VTKREMOTINGSERVERMANAGER_EXPORT vtkSIIndexSelectionProperty : public vtkSI
 {
 public:
   static vtkSIIndexSelectionProperty* New();
-  vtkTypeMacro(vtkSIIndexSelectionProperty, vtkSIProperty) void PrintSelf(
-    ostream& os, vtkIndent indent) override;
+  vtkTypeMacro(vtkSIIndexSelectionProperty, vtkSIProperty);
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
 protected:
   vtkSIIndexSelectionProperty();

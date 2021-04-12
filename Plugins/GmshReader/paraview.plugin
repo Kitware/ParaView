@@ -1,5 +1,7 @@
 NAME
   GmshReader
+CONDITION
+  NOT PARAVIEW_BUILD_LEGACY_REMOVE
 DESCRIPTION
   (Deprecated) Reader for visualization of high-order polynomial solutions under the Gmsh format
 REQUIRES_MODULES

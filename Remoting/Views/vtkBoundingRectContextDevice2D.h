@@ -57,8 +57,8 @@ class vtkAbstractContextItem;
 class VTKREMOTINGVIEWS_EXPORT vtkBoundingRectContextDevice2D : public vtkContextDevice2D
 {
 public:
-  vtkTypeMacro(vtkBoundingRectContextDevice2D, vtkContextDevice2D) void PrintSelf(
-    ostream& os, vtkIndent indent) override;
+  vtkTypeMacro(vtkBoundingRectContextDevice2D, vtkContextDevice2D);
+  void PrintSelf(ostream& os, vtkIndent indent) override;
   static vtkBoundingRectContextDevice2D* New();
 
   /**

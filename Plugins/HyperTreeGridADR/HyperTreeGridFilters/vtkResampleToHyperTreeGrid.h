@@ -44,9 +44,9 @@
 #include "vtkSmartPointer.h"                  // For BroadcastHyperTreeOwnership
 #include "vtkTuple.h"                         // For internal methods
 
-#include <queue>
-#include <unordered_map>
-#include <vector>
+#include <queue>         // for std::priority_queue
+#include <unordered_map> // for std::unordered_map
+#include <vector>        // for std::vector
 
 class vtkAbstractAccumulator;
 class vtkAbstractArrayMeasurement;
@@ -601,8 +601,8 @@ protected:
   vtkMultiProcessController* Controller;
 
 private:
-  vtkResampleToHyperTreeGrid(vtkResampleToHyperTreeGrid&) = delete;
-  void operator=(vtkResampleToHyperTreeGrid&) = delete;
+  vtkResampleToHyperTreeGrid(const vtkResampleToHyperTreeGrid&) = delete;
+  void operator=(const vtkResampleToHyperTreeGrid&) = delete;
 };
 
 #endif

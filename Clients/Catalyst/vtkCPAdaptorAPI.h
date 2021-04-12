@@ -28,6 +28,7 @@ class VTKPVCATALYST_EXPORT vtkCPAdaptorAPI : public vtkObject
 {
 public:
   vtkTypeMacro(vtkCPAdaptorAPI, vtkObject);
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /// call at the start of the simulation
   static void CoProcessorInitialize();
@@ -54,7 +55,13 @@ public:
   /// provides access to the vtkCPProcessor instance.
   static vtkCPProcessor* GetCoProcessor() { return vtkCPAdaptorAPI::CoProcessor; }
 
+  vtkCPAdaptorAPI(const vtkCPAdaptorAPI&) = delete;
+  void operator=(const vtkCPAdaptorAPI&) = delete;
+
 protected:
+  vtkCPAdaptorAPI();
+  ~vtkCPAdaptorAPI();
+
   static vtkCPDataDescription* CoProcessorData;
   static vtkCPProcessor* CoProcessor;
 
@@ -66,4 +73,3 @@ protected:
   static bool IsTimeDataSet;
 };
 #endif
-// VTK-HeaderTest-Exclude: vtkCPAdaptorAPI.h

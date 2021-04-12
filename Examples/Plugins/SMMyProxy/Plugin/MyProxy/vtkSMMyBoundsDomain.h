@@ -17,6 +17,9 @@ public:
   // our way
   void Update(vtkSMProperty* prop) override;
 
+  vtkSMMyBoundsDomain(const vtkSMMyBoundsDomain&) = delete;
+  void operator=(const vtkSMMyBoundsDomain&) = delete;
+
 protected:
   vtkSMMyBoundsDomain();
   ~vtkSMMyBoundsDomain();

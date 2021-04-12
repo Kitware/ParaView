@@ -18,10 +18,10 @@
  * Generators of explicit structured reservoir grids.
  */
 
-#ifndef __vtkExplicitStructuredGridGeneratorSource_h
-#define __vtkExplicitStructuredGridGeneratorSource_h
+#ifndef vtkExplicitStructuredGridGeneratorSource_h
+#define vtkExplicitStructuredGridGeneratorSource_h
 
-#include <vtkExplicitStructuredGridModule.h>
+#include "vtkExplicitStructuredGridModule.h" // for export macro
 
 #include "vtkExplicitStructuredGridAlgorithm.h"
 #include <string> // For cache stamp

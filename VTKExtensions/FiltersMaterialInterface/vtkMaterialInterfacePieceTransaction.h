@@ -29,9 +29,8 @@
 #define vtkMaterialInterfacePieceTransaction_h
 
 #include "vtkPVVTKExtensionsFiltersMaterialInterfaceModule.h" //needed for exports
-#include "vtkSystemIncludes.h"
 
-#include <iostream>
+#include <iostream> // for std::ostream
 
 class VTKPVVTKEXTENSIONSFILTERSMATERIALINTERFACE_EXPORT vtkMaterialInterfacePieceTransaction
 {
@@ -88,5 +87,3 @@ private:
 VTKPVVTKEXTENSIONSFILTERSMATERIALINTERFACE_EXPORT
 std::ostream& operator<<(std::ostream& sout, const vtkMaterialInterfacePieceTransaction& ta);
 #endif
-
-// VTK-HeaderTest-Exclude: vtkMaterialInterfacePieceTransaction.h

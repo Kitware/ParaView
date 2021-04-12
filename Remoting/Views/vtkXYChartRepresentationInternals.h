@@ -21,20 +21,18 @@
 #ifndef vtkXYChartRepresentationInternals_h
 #define vtkXYChartRepresentationInternals_h
 
-#include "vtkCSVExporter.h"
-#include "vtkChartXY.h"
-#include "vtkColor.h"
-#include "vtkDataArray.h"
-#include "vtkPen.h"
-#include "vtkPlotBar.h"
-#include "vtkPlotFunctionalBag.h"
-#include "vtkPlotPoints.h"
-#include "vtkSmartPointer.h"
-#include "vtkTable.h"
+#include "vtkCSVExporter.h"       // for vtkCSVExporter
+#include "vtkChartXY.h"           // for vtkChartXY
+#include "vtkDataArray.h"         // for vtkDataArray
+#include "vtkPen.h"               // for vtkPen enums
+#include "vtkPlotBar.h"           // for vtkPlotBar
+#include "vtkPlotFunctionalBag.h" // for vtkPlotFunctionalBag
+#include "vtkPlotPoints.h"        // for vtkPlotPoints
+#include "vtkSmartPointer.h"      // for vtkSmartPointer
+#include "vtkTable.h"             // for vtkTable
 
-#include <array>
-#include <map>
-#include <string>
+#include <map>    // for std::map
+#include <string> // for std::string
 
 class vtkXYChartRepresentation::vtkInternals
 {
@@ -501,4 +499,3 @@ protected:
 };
 
 #endif
-// VTK-HeaderTest-Exclude: vtkXYChartRepresentationInternals.h

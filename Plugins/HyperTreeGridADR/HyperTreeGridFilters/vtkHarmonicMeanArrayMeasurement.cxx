@@ -31,6 +31,12 @@ vtkHarmonicMeanArrayMeasurement::vtkHarmonicMeanArrayMeasurement()
 }
 
 //----------------------------------------------------------------------------
+void vtkHarmonicMeanArrayMeasurement::PrintSelf(ostream& os, vtkIndent indent)
+{
+  this->Superclass::PrintSelf(os, indent);
+}
+
+//----------------------------------------------------------------------------
 bool vtkHarmonicMeanArrayMeasurement::Measure(vtkAbstractAccumulator** accumulators,
   vtkIdType numberOfAccumulatedData, double totalWeight, double& value)
 {

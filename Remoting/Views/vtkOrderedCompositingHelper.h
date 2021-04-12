@@ -27,7 +27,7 @@
 #include "vtkObject.h"
 #include "vtkRemotingViewsModule.h" //needed for exports
 
-#include <vector>
+#include <vector> // for std::vector
 
 class vtkBoundingBox;
 class vtkCamera;

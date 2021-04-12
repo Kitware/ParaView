@@ -16,23 +16,19 @@
 #define vtkPVDataDeliveryManagerInternals_h
 #ifndef __WRAP__
 
-#include "vtkDataObject.h"
-#include "vtkInformation.h"
-#include "vtkNew.h"
-#include "vtkObjectFactory.h"
+#include "vtkDataObject.h"  // for vtkDataObject
+#include "vtkInformation.h" // for vtkInformation
+#include "vtkNew.h"         // for vtkNew
 #include "vtkPVDataDeliveryManager.h"
-#include "vtkPVDataRepresentation.h"
-#include "vtkPVLogger.h"
-#include "vtkPVTrivialProducer.h"
-#include "vtkSmartPointer.h"
-#include "vtkWeakPointer.h"
+#include "vtkPVDataRepresentation.h" // for vtkPVDataRepresentation
+#include "vtkPVTrivialProducer.h"    // for vtkPVTrivialProducer
+#include "vtkSmartPointer.h"         // for vtkSmartPointer
+#include "vtkWeakPointer.h"          // for vtkWeakPointer
 
-#include <cassert>
-#include <map>
-#include <numeric>
-#include <queue>
-#include <sstream>
-#include <utility>
+#include <cassert> // for assert
+#include <map>     // for std::map
+#include <numeric> // for std::accumulate
+#include <utility> // for std::pair
 
 class vtkPVDataDeliveryManager::vtkInternals
 {
@@ -298,4 +294,3 @@ public:
 
 #endif // __WRAP__
 #endif
-// VTK-HeaderTest-Exclude: vtkPVDataDeliveryManagerInternals.h

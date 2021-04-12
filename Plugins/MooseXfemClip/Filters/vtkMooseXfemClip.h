@@ -38,8 +38,8 @@
  * Will Schroeder, and Bill Lorensen
  */
 
-#ifndef vtkMooseXFEMClip_h
-#define vtkMooseXFEMClip_h
+#ifndef vtkMooseXfemClip_h
+#define vtkMooseXfemClip_h
 
 #include "vtkMooseXfemClipModule.h" // for export macro
 #include "vtkUnstructuredGridAlgorithm.h"

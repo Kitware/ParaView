@@ -35,9 +35,8 @@
 #include "vtkAbstractAccumulator.h"
 #include "vtkFiltersHyperTreeGridADRModule.h" // For export macro
 
-#include <memory>
-#include <string>
-#include <unordered_map>
+#include <memory>        // for std::shared_ptr
+#include <unordered_map> // for std::unordered_map
 
 template <typename FunctorT>
 class VTKFILTERSHYPERTREEGRIDADR_EXPORT vtkBinsAccumulator : public vtkAbstractAccumulator
@@ -141,6 +140,8 @@ private:
   void operator=(vtkBinsAccumulator<FunctorT>&) = delete;
 };
 
-#include "vtkBinsAccumulator.txx"
+#include "vtkBinsAccumulator.txx" // template implementations
 
 #endif
+
+// VTK-HeaderTest-Exclude: vtkBinsAccumulator.h

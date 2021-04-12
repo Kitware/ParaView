@@ -26,8 +26,8 @@
 
 #include "vtkRemotingViewsModule.h" // needed for export macro
 #include "vtkSMProxy.h"
-#include "vtkSmartPointer.h"
-#include "vtkTable.h"
+#include "vtkSmartPointer.h" // for ivars
+#include "vtkTable.h"        // for vtkTable
 
 #include <vtk_jsoncpp_fwd.h> // for forward declarations
 

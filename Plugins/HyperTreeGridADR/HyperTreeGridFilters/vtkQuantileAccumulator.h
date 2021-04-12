@@ -30,8 +30,8 @@
 #include "vtkAbstractAccumulator.h"
 #include "vtkFiltersHyperTreeGridADRModule.h" // For export macro
 
-#include <memory>
-#include <vector>
+#include <memory> //for std::shared_ptr
+#include <vector> // for std::vector
 
 class vtkDataObject;
 
@@ -176,8 +176,8 @@ protected:
   ListPointer SortedList;
 
 private:
-  vtkQuantileAccumulator(vtkQuantileAccumulator&) = delete;
-  void operator=(vtkQuantileAccumulator&) = delete;
+  vtkQuantileAccumulator(const vtkQuantileAccumulator&) = delete;
+  void operator=(const vtkQuantileAccumulator&) = delete;
 };
 
 #endif

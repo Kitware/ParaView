@@ -16,10 +16,9 @@
 #define vtkMaterialInterfaceCommBuffer_h
 
 #include "vtkPVVTKExtensionsFiltersMaterialInterfaceModule.h" //needed for exports
-#include "vtkSystemIncludes.h"
+#include "vtkType.h"                                          // for vtkIdType
 
-#include <vector>
-#include <vtkType.h>
+#include <vector> // for std::vector
 
 class vtkDoubleArray;
 class vtkFloatArray;
@@ -124,5 +123,3 @@ private:
   vtkIdType* Header;
 };
 #endif
-
-// VTK-HeaderTest-Exclude: vtkMaterialInterfaceCommBuffer.h

@@ -28,7 +28,7 @@ template <class T, class force_idtype = int>
 class VTKREMOTINGSERVERMANAGER_EXPORT vtkSIVectorPropertyTemplate : public vtkSIVectorProperty
 {
 public:
-  typedef vtkSIVectorProperty Superclass;
+  vtkTypeMacro(vtkSIVectorPropertyTemplate, vtkSIVectorProperty);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
   //@{
@@ -79,5 +79,3 @@ private:
 };
 
 #endif
-
-// VTK-HeaderTest-Exclude: vtkSIVectorPropertyTemplate.h

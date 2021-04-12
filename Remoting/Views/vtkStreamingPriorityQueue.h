@@ -26,12 +26,11 @@
 #define vtkStreamingPriorityQueue_h
 #ifndef VTK_WRAPPING_CXX
 
-#include "vtkBoundingBox.h"
-#include "vtkMath.h"
-#include "vtkWrappingHints.h"
+#include "vtkBoundingBox.h"   // for vtkBoundingBox
+#include "vtkMath.h"          // for vtkMath
+#include "vtkWrappingHints.h" // for wrapping attributes
 
-#include <algorithm>
-#include <queue>
+#include <queue> // for std::priority_queue
 
 //*****************************************************************************
 namespace
@@ -274,5 +273,3 @@ public:
 };
 #endif
 #endif
-
-// VTK-HeaderTest-Exclude: vtkStreamingPriorityQueue.h

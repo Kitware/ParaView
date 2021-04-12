@@ -24,12 +24,11 @@
 #ifndef vtkExplicitStructuredGridPythonExtractor_h
 #define vtkExplicitStructuredGridPythonExtractor_h
 
-#include <vtkExplicitStructuredGridModule.h>
+#include "vtkExplicitStructuredGridModule.h" // for export macro
 
 #include "vtkExplicitStructuredGridAlgorithm.h"
-#include "vtkFiltersCoreModule.h" // For export macro
 
-#include <vector>
+#include <vector> // for std::vector
 
 class vtkIdList;
 

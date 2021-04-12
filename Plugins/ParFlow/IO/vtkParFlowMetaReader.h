@@ -3,17 +3,16 @@
 #define vtkParFlowMetaReader_h
 
 #include "vtkDataObjectAlgorithm.h"
-#include "vtkParFlowIOModule.h"
+#include "vtkParFlowIOModule.h" // for export macro
 
-#include "vtkSmartPointer.h"
-#include "vtkVector.h"
+#include "vtkSmartPointer.h" // for ivars
 
-#include "nlohmann/json.hpp"
+#include "nlohmann/json.hpp" // for json bits
 
-#include <array>
-#include <set>
-#include <string>
-#include <vector>
+#include <map>    // for std::map
+#include <set>    // for std::set
+#include <string> // for std::string
+#include <vector> // for std::vector
 
 class vtkDataSet;
 class vtkDoubleArray;
@@ -113,6 +112,9 @@ public:
   int GetSurfaceVariableArrayStatus(const std::string& array) const;
   /// Set whether an array defined on the 2D simulation grid should be loaded.
   bool SetSurfaceVariableArrayStatus(const std::string& array, int status);
+
+  vtkParFlowMetaReader(const vtkParFlowMetaReader&) = delete;
+  void operator=(const vtkParFlowMetaReader&) = delete;
 
 protected:
   vtkParFlowMetaReader();

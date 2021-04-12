@@ -95,3 +95,5 @@ struct VTKFILTERSHYPERTREEGRIDADR_EXPORT vtkEntropyFunctor
 #undef vtkDefaultSpecializationFunctorCompMacro
 
 #endif
+
+// VTK-HeaderTest-Exclude: vtkFunctor.h

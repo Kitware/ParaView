@@ -16,8 +16,8 @@
 #ifndef vtkPVBagPlotMatrixView_h
 #define vtkPVBagPlotMatrixView_h
 
-#include <vtkBagPlotViewsAndFiltersBagPlotModule.h>
-#include <vtkPVPlotMatrixView.h>
+#include "vtkBagPlotViewsAndFiltersBagPlotModule.h" // for export macro
+#include "vtkPVPlotMatrixView.h"
 
 class VTKBAGPLOTVIEWSANDFILTERSBAGPLOT_EXPORT vtkPVBagPlotMatrixView : public vtkPVPlotMatrixView
 {

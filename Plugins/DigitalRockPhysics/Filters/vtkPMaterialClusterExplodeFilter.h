@@ -45,7 +45,7 @@
 #ifndef vtkPMaterialClusterExplodeFilter_h
 #define vtkPMaterialClusterExplodeFilter_h
 
-#include "vtkDigitalRocksFiltersModule.h"
+#include "vtkDigitalRocksFiltersModule.h" // for export macro
 #include "vtkPolyDataAlgorithm.h"
 
 class vtkImageData;

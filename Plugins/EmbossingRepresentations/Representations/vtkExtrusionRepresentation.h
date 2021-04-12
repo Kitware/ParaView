@@ -31,7 +31,7 @@
 #ifndef vtkExtrusionRepresentation_h
 #define vtkExtrusionRepresentation_h
 
-#include "vtkEmbossingRepresentationsModule.h"
+#include "vtkEmbossingRepresentationsModule.h" // for export macro
 #include "vtkGeometryRepresentationWithFaces.h"
 
 class VTKEMBOSSINGREPRESENTATIONS_EXPORT vtkExtrusionRepresentation
@@ -40,6 +40,7 @@ class VTKEMBOSSINGREPRESENTATIONS_EXPORT vtkExtrusionRepresentation
 public:
   static vtkExtrusionRepresentation* New();
   vtkTypeMacro(vtkExtrusionRepresentation, vtkGeometryRepresentationWithFaces);
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /**
    * Extrusion factor information.

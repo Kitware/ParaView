@@ -46,4 +46,3 @@ void VTKPVPYTHONCATALYST_EXPORT coprocessoraddpythonscript(
 #endif
 
 #endif
-// VTK-HeaderTest-Exclude: CPythonAdaptorAPI.h

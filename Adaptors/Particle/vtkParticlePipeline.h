@@ -13,8 +13,8 @@
 
 =========================================================================*/
 
-#ifndef vtkParticlePipeline_H
-#define vtkParticlePipeline_H
+#ifndef vtkParticlePipeline_h
+#define vtkParticlePipeline_h
 
 #include "vtkCPPipeline.h"
 #include "vtkPVAdaptorsParticleModule.h" // For export macros
@@ -39,7 +39,7 @@ class VTKPVADAPTORSPARTICLE_EXPORT vtkParticlePipeline : public vtkCPPipeline
 public:
   static vtkParticlePipeline* New();
   vtkTypeMacro(vtkParticlePipeline, vtkCPPipeline);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   virtual int RequestDataDescription(vtkCPDataDescription* desc);
 
@@ -124,4 +124,4 @@ private:
   void operator=(const vtkParticlePipeline&) = delete;
 };
 
-#endif /* vtkParticlePipeline_H */
+#endif /* vtkParticlePipeline_h */

@@ -13,9 +13,12 @@
 
 =========================================================================*/
 
-#include "vtkInformation.h"
-#include "vtkInformationVector.h"
-#include "vtkPolyData.h"
+#ifndef vtkGeometryRepresentationInternal_h
+#define vtkGeometryRepresentationInternal_h
+
+#include "vtkInformation.h"       // for vtkInformation
+#include "vtkInformationVector.h" // for vtkInformationVector
+#include "vtkPolyData.h"          // for vtkPolyData
 
 // We'll use the VTKm decimation filter if TBB is enabled, otherwise we'll
 // fallback to vtkQuadricClustering, since vtkmLevelOfDetail is slow on the
@@ -26,8 +29,8 @@
 #endif
 
 #if defined(VTKM_ENABLE_TBB) && VTK_MODULE_ENABLE_VTK_AcceleratorsVTKmFilters
-#include "vtkCellArray.h"
-#include "vtkQuadricClustering.h"
+#include "vtkCellArray.h"         // for vtkCellArray
+#include "vtkQuadricClustering.h" // for vtkQuadricClustering
 #include "vtkmLevelOfDetail.h"
 namespace vtkGeometryRepresentation_detail
 {
@@ -35,10 +38,10 @@ class DecimationFilterType : public vtkmLevelOfDetail
 {
 public:
   static DecimationFilterType* New();
-  vtkTypeMacro(DecimationFilterType, vtkmLevelOfDetail)
+  vtkTypeMacro(DecimationFilterType, vtkmLevelOfDetail);
 
-    // See note on the vtkQuadricClustering implementation below.
-    void SetLODFactor(double factor)
+  // See note on the vtkQuadricClustering implementation below.
+  void SetLODFactor(double factor)
   {
     factor = vtkMath::ClampValue(factor, 0., 1.);
 
@@ -111,13 +114,13 @@ class DecimationFilterType : public vtkQuadricClustering
 {
 public:
   static DecimationFilterType* New();
-  vtkTypeMacro(DecimationFilterType, vtkQuadricClustering)
+  vtkTypeMacro(DecimationFilterType, vtkQuadricClustering);
 
-    // This version gets slower as the grid increases, while the VTKM version
-    // scales with number of points. This means we can get away with a much finer
-    // grid with the VTKM filter, so we'll just reduce the mesh quality a bit
-    // here.
-    void SetLODFactor(double factor)
+  // This version gets slower as the grid increases, while the VTKM version
+  // scales with number of points. This means we can get away with a much finer
+  // grid with the VTKM filter, so we'll just reduce the mesh quality a bit
+  // here.
+  void SetLODFactor(double factor)
   {
     factor = vtkMath::ClampValue(factor, 0., 1.);
 
@@ -141,4 +144,7 @@ vtkStandardNewMacro(DecimationFilterType);
 }
 #endif // VTKM_ENABLE_TBB
 #endif // __VTK_WRAP__
+
+#endif
+
 // VTK-HeaderTest-Exclude: vtkGeometryRepresentationInternal.h

@@ -38,6 +38,7 @@ public:
   static vtkHarmonicMeanArrayMeasurement* New();
 
   vtkTypeMacro(vtkHarmonicMeanArrayMeasurement, vtkAbstractArrayMeasurement);
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   using Superclass::Add;
   using Superclass::CanMeasure;
@@ -110,8 +111,8 @@ protected:
   //@}
 
 private:
-  vtkHarmonicMeanArrayMeasurement(vtkHarmonicMeanArrayMeasurement&) = delete;
-  void operator=(vtkHarmonicMeanArrayMeasurement&) = delete;
+  vtkHarmonicMeanArrayMeasurement(const vtkHarmonicMeanArrayMeasurement&) = delete;
+  void operator=(const vtkHarmonicMeanArrayMeasurement&) = delete;
 };
 
 #endif

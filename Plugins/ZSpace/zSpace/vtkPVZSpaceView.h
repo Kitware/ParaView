@@ -46,8 +46,8 @@
 #ifndef vtkPVZSpaceView_h
 #define vtkPVZSpaceView_h
 
-#include "vtkDataObject.h"
-#include "vtkNew.h" // for vtkNew
+#include "vtkDataObject.h" // for vtkDataObject enums
+#include "vtkNew.h"        // for vtkNew
 #include "vtkPVRenderView.h"
 #include "vtkZSpaceViewModule.h" // for export macro
 

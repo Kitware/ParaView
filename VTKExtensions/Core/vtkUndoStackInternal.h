@@ -12,11 +12,15 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-#include "vtkSmartPointer.h"
-#include "vtkUndoSet.h"
 
-#include <string>
-#include <vector>
+#ifndef vtkUndoStackInternal_h
+#define vtkUndoStackInternal_h
+
+#include "vtkSmartPointer.h" // for vtkSmartPointer
+#include "vtkUndoSet.h"      // for vtkUndoSet
+
+#include <string> // for std::string
+#include <vector> // for std::vector
 
 class vtkUndoStackInternal
 {
@@ -39,5 +43,6 @@ public:
   VectorOfElements UndoStack;
   VectorOfElements RedoStack;
 };
+
+#endif
 //****************************************************************************
-// VTK-HeaderTest-Exclude: vtkUndoStackInternal.h

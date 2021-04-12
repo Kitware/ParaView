@@ -23,7 +23,7 @@
 #ifndef vtkNIfTIReader_h
 #define vtkNIfTIReader_h
 
-#include "vtkAnalyzeNIfTIIOModule.h"
+#include "vtkAnalyzeNIfTIIOModule.h" // for export macro
 #include "vtkImageReader.h"
 
 #define NIFTI_HEADER_ARRAY "vtkNIfTIReaderHeaderArray"

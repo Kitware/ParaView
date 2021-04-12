@@ -31,11 +31,10 @@
 #ifndef vtkPVPlugin_h
 #define vtkPVPlugin_h
 
-#include "vtkObject.h"
 #include "vtkPVConfig.h"           // needed for PARAVIEW_VERSION
 #include "vtkRemotingCoreModule.h" //needed for exports
-#include <string>
-#include <vector>
+#include <string>                  // for std::string
+#include <vector>                  // for std::vector
 
 #ifdef _WIN32
 // __cdecl gives an unmangled name

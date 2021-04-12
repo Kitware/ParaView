@@ -29,6 +29,7 @@
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkOrderedCompositeDistributor.h"
+#include "vtkPVLogger.h"
 #include "vtkPVRenderView.h"
 #include "vtkPVStreamingMacros.h"
 #include "vtkStreamingDemandDrivenPipeline.h"

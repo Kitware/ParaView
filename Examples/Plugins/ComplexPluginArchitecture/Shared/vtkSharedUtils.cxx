@@ -12,14 +12,21 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
+#define _USE_MATH_DEFINES
+
 #include "vtkSharedUtils.h"
 
 #include <vtkObjectFactory.h>
 
-#define _USE_MATH_DEFINES
 #include <cmath>
 
 vtkStandardNewMacro(vtkSharedUtils);
+
+//----------------------------------------------------------------------------
+vtkSharedUtils::vtkSharedUtils() = default;
+
+//----------------------------------------------------------------------------
+vtkSharedUtils::~vtkSharedUtils() = default;
 
 //----------------------------------------------------------------------------
 double vtkSharedUtils::Pi()

@@ -26,11 +26,11 @@
 #ifndef vtkGeoMapConvertFilter_h
 #define vtkGeoMapConvertFilter_h
 
-#include "vtkGeographicalMapModule.h"
+#include "vtkGeographicalMapModule.h" // for export macro
 #include "vtkStructuredGridAlgorithm.h"
 
-#include <array>
-#include <string>
+#include <array>  // for std::array
+#include <string> // for std::string
 
 class VTKGEOGRAPHICALMAP_EXPORT vtkGeoMapConvertFilter : public vtkStructuredGridAlgorithm
 {

@@ -42,7 +42,7 @@ class vtkInformation;
 class vtkPVDataRepresentation;
 class vtkPVView;
 
-#include <vector>
+#include <vector> // for std::vector
 
 class VTKREMOTINGVIEWS_EXPORT vtkPVDataDeliveryManager : public vtkObject
 {
@@ -192,5 +192,3 @@ private:
 };
 
 #endif
-
-// VTK-HeaderTest-Exclude: vtkPVDataDeliveryManager.h

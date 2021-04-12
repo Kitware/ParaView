@@ -184,6 +184,9 @@ public:
   int GetNumberOfPointArrays();
   const char* GetPointArrayName(int);
 
+  vtkVDFReader(const vtkVDFReader&) = delete;
+  void operator=(const vtkVDFReader&) = delete;
+
 protected:
   vtkVDFReader();
   ~vtkVDFReader();

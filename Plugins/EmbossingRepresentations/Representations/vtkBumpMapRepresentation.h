@@ -28,7 +28,7 @@
 #ifndef vtkBumpMapRepresentation_h
 #define vtkBumpMapRepresentation_h
 
-#include "vtkEmbossingRepresentationsModule.h"
+#include "vtkEmbossingRepresentationsModule.h" // for export macro
 #include "vtkGeometryRepresentationWithFaces.h"
 
 class VTKEMBOSSINGREPRESENTATIONS_EXPORT vtkBumpMapRepresentation
@@ -37,6 +37,7 @@ class VTKEMBOSSINGREPRESENTATIONS_EXPORT vtkBumpMapRepresentation
 public:
   static vtkBumpMapRepresentation* New();
   vtkTypeMacro(vtkBumpMapRepresentation, vtkGeometryRepresentationWithFaces);
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /**
    * Bump mapping factor information.

@@ -153,5 +153,3 @@ private:
 };
 
 #endif
-
-// VTK-HeaderTest-Exclude: vtkPVPluginTracker.h

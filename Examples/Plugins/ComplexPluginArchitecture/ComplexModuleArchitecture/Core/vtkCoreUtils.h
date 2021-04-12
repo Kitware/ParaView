@@ -19,7 +19,7 @@
 #ifndef vtkCoreUtils_h
 #define vtkCoreUtils_h
 
-#include "CoreModule.h"
+#include "CoreModule.h" // For export macro
 
 #include <vtkObject.h>
 
@@ -37,5 +37,12 @@ public:
   static float RadiansFromDegrees(float degrees);
   static double RadiansFromDegrees(double degrees);
   //@}
+
+  vtkCoreUtils(const vtkCoreUtils&) = delete;
+  void operator=(const vtkCoreUtils&) = delete;
+
+protected:
+  vtkCoreUtils();
+  ~vtkCoreUtils();
 };
 #endif

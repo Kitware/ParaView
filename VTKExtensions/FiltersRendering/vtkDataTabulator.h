@@ -27,13 +27,14 @@
 #define vtkDataTabulator_h
 
 #include "vtkDataObjectAlgorithm.h"
-#include "vtkInformationIntegerKey.h"
 #include "vtkPVVTKExtensionsFiltersRenderingModule.h" // needed for export macro
-#include "vtkSmartPointer.h"
-#include "vtkSplitColumnComponents.h"
+#include "vtkSmartPointer.h"                          // for ivars
+#include "vtkSplitColumnComponents.h"                 // for vtkSplitColumnComponents enums
 
-#include <set>
+#include <set>    // for std::set
+#include <string> // for std::string
 
+class vtkInformationIntegerKey;
 class vtkPartitionedDataSet;
 
 class VTKPVVTKEXTENSIONSFILTERSRENDERING_EXPORT vtkDataTabulator : public vtkDataObjectAlgorithm

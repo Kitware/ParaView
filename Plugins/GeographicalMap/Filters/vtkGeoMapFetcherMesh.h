@@ -26,10 +26,12 @@
 #ifndef vtkGeoMapFetcherMesh_h
 #define vtkGeoMapFetcherMesh_h
 
+#include "vtkGeographicalMapModule.h" // for export macro
 #include "vtkStructuredGridAlgorithm.h"
 
-#include "vtkGeoMapConvertFilter.h"
-#include "vtkGeoMapFetcher.h"
+#include "vtkGeoMapConvertFilter.h" // for vtkGeoMapConvertFilter enums
+#include "vtkGeoMapFetcher.h"       // for vtkGeoMapFetcher
+#include "vtkNew.h"                 // for vtkNew
 
 class VTKGEOGRAPHICALMAP_EXPORT vtkGeoMapFetcherMesh : public vtkStructuredGridAlgorithm
 {

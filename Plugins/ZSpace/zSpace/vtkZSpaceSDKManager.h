@@ -33,13 +33,12 @@ PURPOSE.  See the above copyright notice for more information.
 #ifndef vtkZSpaceSDKManager_h
 #define vtkZSpaceSDKManager_h
 
-#include "vtkNew.h"
+#include "vtkNew.h" // for vtkNew
 #include "vtkObject.h"
-#include "vtkSmartPointer.h"
 #include "vtkZSpaceViewModule.h" // for export macro
 
-#include <vector>
-#include <zspace.h>
+#include <vector>   // for std::vector
+#include <zspace.h> // zspace header
 
 class vtkRenderWindow;
 class vtkCamera;

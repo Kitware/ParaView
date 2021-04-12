@@ -23,6 +23,12 @@ PURPOSE.  See the above copyright notice for more information.
 
 vtkStandardNewMacro(vtkZSpaceCamera);
 
+//----------------------------------------------------------------------------
+void vtkZSpaceCamera::PrintSelf(ostream& os, vtkIndent indent)
+{
+  this->Superclass::PrintSelf(os, indent);
+}
+
 //------------------------------------------------------------------------------
 vtkMatrix4x4* vtkZSpaceCamera::GetModelViewTransformMatrix()
 {

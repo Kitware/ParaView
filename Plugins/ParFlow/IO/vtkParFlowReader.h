@@ -3,11 +3,9 @@
 #define vtkParFlowReader_h
 
 #include "vtkMultiBlockDataSetAlgorithm.h"
-#include "vtkParFlowIOModule.h"
+#include "vtkParFlowIOModule.h" // for export macro
 
-#include "vtkVector.h"
-
-#include <vector>
+#include <vector> // for std::vector
 
 class vtkDoubleArray;
 class vtkImageData;
@@ -60,6 +58,9 @@ public:
   /// The default is 0.
   vtkGetMacro(CLMIrrType, int);
   vtkSetMacro(CLMIrrType, int);
+
+  vtkParFlowReader(const vtkParFlowReader&) = delete;
+  void operator=(const vtkParFlowReader&) = delete;
 
 protected:
   vtkParFlowReader();

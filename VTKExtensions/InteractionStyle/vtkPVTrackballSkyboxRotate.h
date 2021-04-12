@@ -34,6 +34,7 @@ class VTKPVVTKEXTENSIONSINTERACTIONSTYLE_EXPORT vtkPVTrackballSkyboxRotate
 public:
   static vtkPVTrackballSkyboxRotate* New();
   vtkTypeMacro(vtkPVTrackballSkyboxRotate, vtkCameraManipulator);
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   //@{
   /**
