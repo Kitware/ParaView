@@ -1,6 +1,0 @@
-NAME
-  IOSSReader
-DESCRIPTION
-  Reader for Exodus files using IOSS library
-REQUIRES_MODULES
-  VTK::IOIoss
