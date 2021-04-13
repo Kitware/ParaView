@@ -228,6 +228,8 @@ QProcessEnvironment getDefaultEnvironment(const pqServerConfiguration& configura
   options.insert("PV_CLIENT_PLATFORM", "Unknown");
 #endif
 
+  options.insert("PV_APPLICATION_DIR", QCoreApplication::applicationDirPath());
+  options.insert("PV_APPLICATION_NAME", QCoreApplication::applicationName());
   return options;
 }
 
