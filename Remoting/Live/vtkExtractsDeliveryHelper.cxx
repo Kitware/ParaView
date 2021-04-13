@@ -250,17 +250,20 @@ bool vtkExtractsDeliveryHelper::Update()
         // Composite dataset need to convey their data structure across
         // processes, let's create those empty data object with the proper
         // data structure to share ONLY if needed.
-        if (extract->IsA("vtkCompositeDataSet"))
+        if (extract != nullptr)
         {
-          vtkCompositeDataSet* dsToShare = vtkCompositeDataSet::SafeDownCast(
-            vtkDataObjectTypes::NewDataObject(extract->GetClassName()));
-          compositeDSToShare.push_back(dsToShare);
-          dsToShare->CopyStructure(vtkCompositeDataSet::SafeDownCast(extract));
-          dsToShare->FastDelete();
-          needToShare = 1;
+          if (extract->IsA("vtkCompositeDataSet"))
+          {
+            vtkCompositeDataSet* dsToShare = vtkCompositeDataSet::SafeDownCast(
+              vtkDataObjectTypes::NewDataObject(extract->GetClassName()));
+            compositeDSToShare.push_back(dsToShare);
+            dsToShare->CopyStructure(vtkCompositeDataSet::SafeDownCast(extract));
+            dsToShare->FastDelete();
+            needToShare = 1;
+          }
+          data_types_stream << key.c_str() << extract->GetClassName() << needToShare;
+          extract->Delete();
         }
-        data_types_stream << key.c_str() << extract->GetClassName() << needToShare;
-        extract->Delete();
       }
       data_types_stream << "null";
       this->ParallelController->Broadcast(data_types_stream, 0);
