@@ -60,6 +60,10 @@
 #include "vtknvindex_sparse_volume_importer.h"
 #include "vtknvindex_volume_compute.h"
 
+#ifdef __APPLE__
+#define VTKNVINDEX_REMOTE_RENDERING_ONLY
+#endif
+
 namespace
 {
 
@@ -222,7 +226,7 @@ vtknvindex_instance* vtknvindex_instance::get()
 void vtknvindex_instance::init_index()
 {
   // Start one IndeX instance per host (running on the local rank 0)
-  if (m_nvindex_interface && !is_index_initialized() && is_index_rank())
+  if (m_nvindex_interface && !m_is_index_initialized && is_index_rank())
   {
     // Setup NVIDIA IndeX
     if (!setup_nvindex())
@@ -242,8 +246,31 @@ void vtknvindex_instance::init_index()
 }
 
 //-------------------------------------------------------------------------------------------------
-bool vtknvindex_instance::is_index_initialized() const
+bool vtknvindex_instance::ensure_index_initialized() const
 {
+  static bool first = true;
+  if (!m_is_index_initialized && first)
+  {
+    first = false;
+#ifdef VTKNVINDEX_REMOTE_RENDERING_ONLY
+
+#ifdef __APPLE__
+    const char* platform = "macOS";
+#else
+    const char* platform = "this platform";
+#endif
+
+    ERROR_LOG
+      << "The NVIDIA IndeX plugin does not support local rendering on " << platform << ". "
+      << "You can however connect to a remote pvserver running NVIDIA IndeX on another host.";
+
+#else // VTKNVINDEX_REMOTE_RENDERING_ONLY
+
+    ERROR_LOG << "The NVIDIA IndeX plugin was not initialized! See the log output for details.";
+
+#endif // VTKNVINDEX_REMOTE_RENDERING_ONLY
+  }
+
   return m_is_index_initialized;
 }
 
@@ -348,6 +375,12 @@ void vtknvindex_instance::build_cluster_info()
 //-------------------------------------------------------------------------------------------------
 bool vtknvindex_instance::load_nvindex()
 {
+#ifdef VTKNVINDEX_REMOTE_RENDERING_ONLY
+
+  return false;
+
+#else // VTKNVINDEX_REMOTE_RENDERING_ONLY
+
   // Load shared libraries.
   const char* lib_name = "libnvindex" MI_BASE_DLL_FILE_EXT;
   const char* entry_point_name = "nv_index_factory";
@@ -503,11 +536,19 @@ bool vtknvindex_instance::load_nvindex()
            << library_revision_full_str << ").";
 
   return true;
+
+#endif // VTKNVINDEX_REMOTE_RENDERING_ONLY
 }
 
 //-------------------------------------------------------------------------------------------------
 bool vtknvindex_instance::unload_nvindex()
 {
+#ifdef VTKNVINDEX_REMOTE_RENDERING_ONLY
+
+  return false;
+
+#else // VTKNVINDEX_REMOTE_RENDERING_ONLY
+
   assert(m_p_handle != 0);
 
 #ifdef _WIN32
@@ -527,6 +568,8 @@ bool vtknvindex_instance::unload_nvindex()
 #endif // _WIN32
 
   return true;
+
+#endif // VTKNVINDEX_REMOTE_RENDERING_ONLY
 }
 
 //-------------------------------------------------------------------------------------------------

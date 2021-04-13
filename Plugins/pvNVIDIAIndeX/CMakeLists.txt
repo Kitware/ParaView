@@ -15,7 +15,7 @@ install(
   DESTINATION "${CMAKE_INSTALL_DATAROOTDIR}/paraview${paraview_version_suffix}/kernels_nvidia_index"
   COMPONENT   runtime)
 
-if (UNIX)
+if (UNIX AND NOT APPLE)
   set_target_properties(pvNVIDIAIndeX PROPERTIES LINK_FLAGS "-Wl,--as-needed")
 endif ()
 

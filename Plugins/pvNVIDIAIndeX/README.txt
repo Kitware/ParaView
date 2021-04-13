@@ -25,6 +25,7 @@ The NVIDIA IndeX for ParaView Plugin is compatible with:
     The NVIDIA IndeX for ParaView Plugin will typically also run on other Linux
     distributions.
   - Microsoft Windows 10.
+  - macOS (remote rendering only, see "Known Limitations" below).
 
 #-------------------------------------------------------------------------------
 # Features and Licensing
@@ -98,6 +99,10 @@ nvidia-index@nvidia.com.
 * The Windows version of the NVIDIA IndeX plugin for ParaView is restricted
   to run on a single workstation/computer only, i.e., cluster rendering
   is not supported on Windows platforms.
+
+* The macOS version of the NVIDIA IndeX plugin for ParaView does not support
+  local rendering. However, it can be used for remote rendering together with
+  a Linux host that runs pvserver.
 
 * When loading an older state file with both volumetric and geometry data
   without the NVIDIA IndeX representation saved in it, the first frame will show
