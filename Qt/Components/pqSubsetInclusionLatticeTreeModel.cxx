@@ -301,7 +301,7 @@ void pqSubsetInclusionLatticeTreeModel::setSelection(const QList<QVariant>& qtSe
   std::map<std::string, bool> vtkSel;
   for (int cc = 0, max = qtSel.size(); (cc + 1) < max; cc += 2)
   {
-    vtkSel[qtSel[cc].toString().toUtf8().constData()] = qtSel[cc + 1].toBool();
+    vtkSel[qtSel[cc].toString().toUtf8().toStdString()] = qtSel[cc + 1].toBool();
   }
 
   pqInternals& internals = (*this->Internals);

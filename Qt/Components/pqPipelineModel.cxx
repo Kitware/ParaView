@@ -869,7 +869,7 @@ QVariant pqPipelineModel::data(const QModelIndex& idx, int role) const
       if (!this->FilterRoleAnnotationKey.isEmpty() && proxy)
       {
         bool hasAnnotation =
-          proxy->getProxy()->HasAnnotation(this->FilterRoleAnnotationKey.toLocal8Bit().data());
+          proxy->getProxy()->HasAnnotation(this->FilterRoleAnnotationKey.toUtf8().data());
         return (this->FilterAnnotationMatching ? hasAnnotation : !hasAnnotation);
       }
       return QVariant(true);

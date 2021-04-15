@@ -1530,11 +1530,11 @@ void pqSMAdaptor::setMultipleElementProperty(
     {
       if (Type == CHECKED)
       {
-        svp->SetElement(Index, v.toUtf8().constData());
+        svp->SetElement(Index, v.toUtf8().data());
       }
       else if (Type == UNCHECKED)
       {
-        svp->SetUncheckedElement(Index, v.toUtf8().constData());
+        svp->SetUncheckedElement(Index, v.toUtf8().data());
       }
     }
   }

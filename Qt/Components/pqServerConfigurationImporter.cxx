@@ -274,7 +274,7 @@ void pqServerConfigurationImporter::readCurrentData()
 bool pqServerConfigurationImporter::processDownloadedContents()
 {
   vtkNew<vtkPVXMLParser> parser;
-  if (!parser->Parse(this->Internals->ActiveFetchedData.toLocal8Bit().data()))
+  if (!parser->Parse(this->Internals->ActiveFetchedData.toUtf8().data()))
   {
     return false;
   }

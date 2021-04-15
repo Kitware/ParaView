@@ -191,7 +191,7 @@ bool pqSaveDataReaction::saveActiveData(const QString& filename)
 
   SM_SCOPED_TRACE(SaveData)
     .arg("writer", writer)
-    .arg("filename", filename.toLocal8Bit().data())
+    .arg("filename", filename.toUtf8().data())
     .arg("source", port->getSource()->getProxy())
     .arg("port", port->getPortNumber());
   return true;

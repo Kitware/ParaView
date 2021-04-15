@@ -64,7 +64,7 @@ pqUsageLoggingBehavior::pqUsageLoggingBehavior(QObject* parentObject)
       if (doc.isNull())
       {
         vtkLogF(ERROR, "Invalid usage-logging config '%s'. Not be a valid json string:\n %s",
-          fname.toLocal8Bit().data(), error.errorString().toLocal8Bit().data());
+          fname.toUtf8().data(), error.errorString().toUtf8().data());
       }
       else
       {
@@ -99,10 +99,10 @@ QString pqUsageLoggingBehavior::configurationFile() const
   locator->SetLogVerbosity(vtkPVLogger::GetApplicationVerbosity());
 
   auto configFName = pqUsageLoggingBehavior::configFileName();
-  auto path = locator->Locate(vtk_libs, prefixes, configFName.toLocal8Bit().data());
+  auto path = locator->Locate(vtk_libs, prefixes, configFName.toUtf8().toStdString());
   if (!path.empty())
   {
-    return vtksys::SystemTools::CollapseFullPath(configFName.toLocal8Bit().data(), path).c_str();
+    return vtksys::SystemTools::CollapseFullPath(configFName.toUtf8().toStdString(), path).c_str();
   }
   return QString();
 }
@@ -132,8 +132,8 @@ void pqUsageLoggingBehavior::logUsage(const QJsonObject& config)
       query.addQueryItem(iter.key(), pqUsageLoggingBehavior::substitute(iter.value().toString()));
     }
   }
-  vtkVLogF(PARAVIEW_LOG_APPLICATION_VERBOSITY(), "query-params: %s",
-    query.toString().toLocal8Bit().data());
+  vtkVLogF(
+    PARAVIEW_LOG_APPLICATION_VERBOSITY(), "query-params: %s", query.toString().toUtf8().data());
 
   auto networkManager = new QNetworkAccessManager(this);
   QNetworkRequest networkRequest(serviceUrl);

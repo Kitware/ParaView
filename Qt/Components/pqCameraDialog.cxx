@@ -742,7 +742,7 @@ bool pqCameraDialog::applyCustomViewpoint(int CustomViewpointIndex, vtkSMRenderV
 
   vtkNew<vtkPVXMLParser> parser;
   parser->InitializeParser();
-  parser->ParseChunk(config.toLocal8Bit().data(), static_cast<unsigned int>(config.size()));
+  parser->ParseChunk(config.toUtf8().data(), static_cast<unsigned int>(config.size()));
   parser->CleanupParser();
 
   vtkPVXMLElement* xmlStream = parser->GetRootElement();

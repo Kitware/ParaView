@@ -168,7 +168,7 @@ static void populateMenu(pqSpreadSheetView* view, QMenu* menu)
     else
     {
       const std::string label =
-        model->headerData(col, Qt::Horizontal, Qt::DisplayRole).toString().toLatin1().data();
+        model->headerData(col, Qt::Horizontal, Qt::DisplayRole).toString().toUtf8().data();
       bool checked =
         model->headerData(col, Qt::Horizontal, pqSpreadSheetViewModel::SectionVisible).toBool();
       if (columnLabelsSet.insert(label).second == true)
@@ -258,7 +258,7 @@ static void populateMenu(pqSpreadSheetView* view, QMenu* menu)
       if (checkState != Qt::Checked)
       {
         // all columns are hidden.
-        hidden_columns.push_back(cb->text().toLocal8Bit().data());
+        hidden_columns.push_back(cb->text().toUtf8().toStdString());
       }
     }
 

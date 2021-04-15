@@ -362,7 +362,7 @@ public:
     }
     else
     {
-      const bool hasAnnotation = vlayout->HasAnnotation(qUtf8Printable(this->FilterAnnotationKey));
+      const bool hasAnnotation = vlayout->HasAnnotation(this->FilterAnnotationKey.toUtf8().data());
       return this->FilterAnnotationMatching ? hasAnnotation : !hasAnnotation;
     }
   }
@@ -855,7 +855,7 @@ void pqTabbedMultiViewWidget::contextMenuRequested(const QPoint& point)
     {
       SM_SCOPED_TRACE(CallFunction)
         .arg("RenameLayout")
-        .arg(newName.toLocal8Bit().data())
+        .arg(newName.toUtf8().data())
         .arg((vtkObject*)proxy->getProxy());
 
       proxy->rename(newName);

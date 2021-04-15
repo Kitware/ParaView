@@ -146,8 +146,8 @@ void pqColorChooserButtonWithPalettes::actionTriggered(QAction* action)
     vtkSMProxy* globalProps = this->colorPalette();
     assert(globalProps);
 
-    vtkSMDoubleVectorProperty* dvp = vtkSMDoubleVectorProperty::SafeDownCast(
-      globalProps->GetProperty(prop_name.toLocal8Bit().data()));
+    vtkSMDoubleVectorProperty* dvp =
+      vtkSMDoubleVectorProperty::SafeDownCast(globalProps->GetProperty(prop_name.toUtf8().data()));
     color.setRgbF(dvp->GetElement(0), dvp->GetElement(1), dvp->GetElement(2));
     pqColorPaletteLinkHelper* helper = this->findChild<pqColorPaletteLinkHelper*>();
     if (helper)
@@ -191,13 +191,12 @@ void pqColorPaletteLinkHelper::setSelectedPaletteColor(const QString& colorName)
   if (palette && this->SMProxy)
   {
     auto oldLink =
-      palette->GetSourcePropertyName(this->SMProxy, this->SMPropertyName.toLocal8Bit().data());
+      palette->GetSourcePropertyName(this->SMProxy, this->SMPropertyName.toUtf8().data());
     if (oldLink)
     {
-      palette->RemoveLink(oldLink, this->SMProxy, this->SMPropertyName.toLocal8Bit().data());
+      palette->RemoveLink(oldLink, this->SMProxy, this->SMPropertyName.toUtf8().data());
     }
-    palette->AddLink(colorName.toLocal8Bit().data(), this->SMProxy,
-      this->SMPropertyName.toLocal8Bit().data(),
+    palette->AddLink(colorName.toUtf8().data(), this->SMProxy, this->SMPropertyName.toUtf8().data(),
       /*unlink_if_modified=*/true);
   }
 }
@@ -212,7 +211,7 @@ QString pqColorPaletteLinkHelper::selectedPaletteColor() const
   vtkSMSettingsProxy* palette = button->colorPalette();
   if (palette && this->SMProxy)
   {
-    return palette->GetSourcePropertyName(this->SMProxy, this->SMPropertyName.toLocal8Bit().data());
+    return palette->GetSourcePropertyName(this->SMProxy, this->SMPropertyName.toUtf8().data());
   }
 
   return QString();

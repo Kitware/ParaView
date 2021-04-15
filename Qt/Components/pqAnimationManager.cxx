@@ -218,13 +218,13 @@ bool pqAnimationManager::saveGeometry(const QString& filename, pqView* view)
 
   SM_SCOPED_TRACE(CallFunction)
     .arg("WriteAnimationGeometry")
-    .arg(filename.toLocal8Bit().data())
+    .arg(filename.toUtf8().data())
     .arg("view", view->getProxy())
     .arg("comment", "save animation geometry from a view");
 
   vtkSMProxy* sceneProxy = scene->getProxy();
   vtkSMAnimationSceneGeometryWriter* writer = vtkSMAnimationSceneGeometryWriter::New();
-  writer->SetFileName(filename.toLocal8Bit().data());
+  writer->SetFileName(filename.toUtf8().data());
   writer->SetAnimationScene(sceneProxy);
   writer->SetViewModule(view->getProxy());
   bool status = writer->Save();

@@ -377,7 +377,7 @@ void pqSLACManager::checkActionEnabled()
 //-----------------------------------------------------------------------------
 void pqSLACManager::showField(QString name)
 {
-  this->showField(name.toLocal8Bit().data());
+  this->showField(name.toUtf8().data());
 }
 
 void pqSLACManager::showField(const char* name)
@@ -459,7 +459,7 @@ void pqSLACManager::showField(const char* name)
     if (!rangeData)
     {
       QString magName = QString("%1_M").arg(name);
-      rangeData = ranges->GetColumnByName(magName.toLocal8Bit().data());
+      rangeData = ranges->GetColumnByName(magName.toUtf8().data());
     }
 
     this->CurrentFieldRangeKnown = true;
@@ -552,14 +552,12 @@ void pqSLACManager::updatePlotField()
       visibility << seriesName << 1;
 
       double color[3] = { 0.0, 0.0, 0.0 };
-      vtkSMPropertyHelper(reprProxy, "SeriesColor")
-        .SetStatus(seriesName.toLocal8Bit().data(), color, 3);
+      vtkSMPropertyHelper(reprProxy, "SeriesColor").SetStatus(seriesName.toUtf8().data(), color, 3);
 
       vtkSMPropertyHelper(reprProxy, "SeriesLineThickness")
-        .SetStatus(seriesName.toLocal8Bit().data(), 1);
+        .SetStatus(seriesName.toUtf8().data(), 1);
 
-      vtkSMPropertyHelper(reprProxy, "SeriesLineStyle")
-        .SetStatus(seriesName.toLocal8Bit().data(), 1);
+      vtkSMPropertyHelper(reprProxy, "SeriesLineStyle").SetStatus(seriesName.toUtf8().data(), 1);
     }
     else
     {

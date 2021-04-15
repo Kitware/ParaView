@@ -258,14 +258,14 @@ QList<QVariant> pqIntegrationModelSeedHelperWidget::arrayToGenerate() const
       {
         for (unsigned int i = 0; i < nComponents; i++)
         {
-          str << lines[i]->text().toLatin1().data() << ";";
+          str << lines[i]->text().toUtf8().data() << ";";
         }
         values.push_back(str.str().c_str());
       }
       else
       {
         str << cbArray->itemData(cbArray->currentIndex()).toInt() << ';'
-            << cbArray->currentText().toLatin1().data();
+            << cbArray->currentText().toUtf8().data();
         values.push_back(str.str().c_str());
       }
     }

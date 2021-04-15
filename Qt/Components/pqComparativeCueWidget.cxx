@@ -151,7 +151,7 @@ void pqComparativeCueWidget::updateGUI()
   {
     char a = 'A';
     a += cc;
-    hlabels.push_back(QString::fromLocal8Bit(&a, 1));
+    hlabels.push_back(QString::fromUtf8(&a, 1));
   }
   this->setHorizontalHeaderLabels(hlabels);
 

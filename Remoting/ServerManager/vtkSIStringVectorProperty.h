@@ -67,7 +67,6 @@ private:
 
   bool Push(const vtkVectorOfStrings& values);
   vtkVectorOfInts* ElementTypes;
-  bool NeedReencoding;
 };
 
 #endif

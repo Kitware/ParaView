@@ -360,11 +360,11 @@ QList<QVariant> pqIntegrationModelSurfaceHelperWidget::arrayToGenerate() const
               QComboBox* cmb = qobject_cast<QComboBox*>(table->indexWidget(model->index(i, j)));
               if (cmb)
               {
-                str << cmb->itemData(cmb->currentIndex()).toString().toLatin1().data() << ";";
+                str << cmb->itemData(cmb->currentIndex()).toString().toUtf8().data() << ";";
               }
               else
               {
-                str << model->item(i, j)->text().toLatin1().data() << ";";
+                str << model->item(i, j)->text().toUtf8().data() << ";";
               }
             }
           }

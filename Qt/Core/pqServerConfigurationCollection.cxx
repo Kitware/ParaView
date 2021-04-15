@@ -67,9 +67,9 @@ static QString systemServers()
 {
   QString settingsRoot;
 #if defined(Q_OS_WIN)
-  settingsRoot = QString::fromLocal8Bit(getenv("COMMON_APPDATA"));
+  settingsRoot = QString::fromUtf8(getenv("COMMON_APPDATA"));
 #else
-  settingsRoot = QString::fromLocal8Bit("/usr/share");
+  settingsRoot = QString::fromUtf8("/usr/share");
 #endif
   QString settingsPath = QString("%2%1%3%1%4");
   settingsPath = settingsPath.arg(QDir::separator());
@@ -167,7 +167,7 @@ bool pqServerConfigurationCollection::save(const QString& filename, bool only_mu
   QFile file(filename);
   if (!contents.isEmpty() && file.open(QIODevice::WriteOnly))
   {
-    file.write(contents.toLocal8Bit().data());
+    file.write(contents.toUtf8().data());
     file.close();
     return true;
   }
@@ -178,7 +178,7 @@ bool pqServerConfigurationCollection::save(const QString& filename, bool only_mu
 bool pqServerConfigurationCollection::loadContents(const QString& contents, bool mutable_configs)
 {
   vtkNew<vtkPVXMLParser> parser;
-  if (!parser->Parse(contents.toLocal8Bit().data()))
+  if (!parser->Parse(contents.toUtf8().data()))
   {
     qWarning() << "Configuration not a valid xml.";
     return false;

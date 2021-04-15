@@ -101,7 +101,7 @@ QString getName(vtkSMProxy* proxy)
   pq_proxy = pqProxy::findProxyWithHelper(proxy, helper_key);
   if (pq_proxy)
   {
-    vtkSMProperty* prop = pq_proxy->getProxy()->GetProperty(helper_key.toLocal8Bit().data());
+    vtkSMProperty* prop = pq_proxy->getProxy()->GetProperty(helper_key.toUtf8().data());
     if (prop)
     {
       return QString("%1 - %2").arg(pq_proxy->getSMName()).arg(prop->GetXMLLabel());
@@ -365,7 +365,7 @@ void pqComparativeVisPanel::addParameter()
     BEGIN_UNDO_SET(
       QString("Add parameter %1 : %2")
         .arg(pqComparativeVisPanelNS::getName(realProxy))
-        .arg(pqComparativeVisPanelNS::getName(realProxy, pname.toLocal8Bit().data(), pindex)));
+        .arg(pqComparativeVisPanelNS::getName(realProxy, pname.toUtf8().data(), pindex)));
   }
   else
   {
@@ -373,8 +373,7 @@ void pqComparativeVisPanel::addParameter()
   }
 
   // Add new cue.
-  vtkSMProxy* cueProxy =
-    pqComparativeVisPanelNS::newCue(realProxy, pname.toLocal8Bit().data(), pindex);
+  vtkSMProxy* cueProxy = pqComparativeVisPanelNS::newCue(realProxy, pname.toUtf8().data(), pindex);
   vtkSMPropertyHelper(this->view()->getProxy(), "Cues").Add(cueProxy);
   cueProxy->Delete();
   this->view()->getProxy()->UpdateVTKObjects();

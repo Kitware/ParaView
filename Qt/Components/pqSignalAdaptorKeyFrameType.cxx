@@ -115,7 +115,7 @@ vtkSMProxy* pqSignalAdaptorKeyFrameType::getKeyFrameProxy() const
 void pqSignalAdaptorKeyFrameType::onTypeChanged()
 {
   QString text = this->currentData().toString();
-  int type = vtkPVCompositeKeyFrame::GetTypeFromString(text.toLocal8Bit().data());
+  int type = vtkPVCompositeKeyFrame::GetTypeFromString(text.toUtf8().data());
   if (type == vtkPVCompositeKeyFrame::NONE)
   {
     qDebug() << "Unknown type chosen in the combox: " << text;

@@ -117,18 +117,6 @@ public:
    */
   bool GetActiveFileIsDirectory();
 
-  /**
-   * Transform local code page string to UTF8 string
-   * on windows only, pass through otherwise
-   */
-  static std::string LocalToUtf8Win32(const std::string& path);
-
-  /**
-   * Transform utf8 string to local code page string
-   * on windows only, pass through otherwise
-   */
-  static std::string Utf8ToLocalWin32(const std::string& path);
-
   //@{
   /**
    * When off, while listing a directory we skip the expensive fstat call on every file

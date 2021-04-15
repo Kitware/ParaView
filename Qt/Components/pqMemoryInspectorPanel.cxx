@@ -1480,8 +1480,8 @@ void pqMemoryInspectorPanel::ExecuteRemoteCommand()
       case ITEM_DATA_CLIENT_RANK:
       case ITEM_DATA_SERVER_RANK:
       {
-        string host((const char*)item->data(0, ITEM_KEY_HOST_NAME).toString().toLocal8Bit());
-        string pid((const char*)item->data(0, ITEM_KEY_PID).toString().toLocal8Bit());
+        string host(item->data(0, ITEM_KEY_HOST_NAME).toString().toUtf8().toStdString());
+        string pid(item->data(0, ITEM_KEY_PID).toString().toUtf8().toStdString());
 
         int serverSystemType = item->data(0, ITEM_KEY_SYSTEM_TYPE).toInt();
 

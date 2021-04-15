@@ -366,7 +366,7 @@ void pqLogViewerWidget::exportLog()
   }
 
   QString filename = fileDialog.getSelectedFiles().first();
-  QByteArray filename_ba = filename.toLocal8Bit();
+  QByteArray filename_ba = filename.toUtf8();
   std::ofstream fileStream;
   fileStream.open(filename_ba.data());
   if (fileStream.is_open())

@@ -147,7 +147,7 @@ protected:
     vtkSMProxy* oldLutProxy = vtkSMPropertyHelper(reprProxy, "LookupTable", true).GetAsProxy();
 
     vtkSMPVRepresentationProxy::SetScalarColoring(
-      reprProxy, arrayName.toLocal8Bit().data(), association);
+      reprProxy, arrayName.toUtf8().data(), association);
 
     vtkNew<vtkSMTransferFunctionManager> tmgr;
     pqDisplayColorWidget* widget = qobject_cast<pqDisplayColorWidget*>(this->objectQt());
@@ -558,9 +558,9 @@ void pqDisplayColorWidget::componentNumberChanged()
     { // To make sure the trace is done before other calls.
       SM_SCOPED_TRACE(SetScalarColoring)
         .arg("display", this->Representation->getProxy())
-        .arg("arrayname", arrayName.toLatin1().data())
+        .arg("arrayname", arrayName.toUtf8().data())
         .arg("attribute_type", association)
-        .arg("component", this->Components->itemText(number + 1).toLatin1().data())
+        .arg("component", this->Components->itemText(number + 1).toUtf8().data())
         .arg("lut", this->ColorTransferFunction->getProxy());
     }
 
@@ -597,13 +597,12 @@ void pqDisplayColorWidget::refreshComponents()
 
   vtkPVDataInformation* dataInfo = this->Representation->getInputDataInformation();
   vtkPVArrayInformation* arrayInfo =
-    dataInfo ? dataInfo->GetArrayInformation(arrayName.toLocal8Bit().data(), association) : nullptr;
+    dataInfo ? dataInfo->GetArrayInformation(arrayName.toUtf8().data(), association) : nullptr;
   if (!arrayInfo)
   {
     vtkPVDataInformation* reprInfo = this->Representation->getRepresentedDataInformation();
-    arrayInfo = reprInfo
-      ? reprInfo->GetArrayInformation(arrayName.toLocal8Bit().data(), association)
-      : nullptr;
+    arrayInfo =
+      reprInfo ? reprInfo->GetArrayInformation(arrayName.toUtf8().data(), association) : nullptr;
   }
 
   if (!arrayInfo || arrayInfo->GetNumberOfComponents() <= 1)

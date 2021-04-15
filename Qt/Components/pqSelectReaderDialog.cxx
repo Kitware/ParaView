@@ -85,8 +85,7 @@ pqSelectReaderDialog::pqSelectReaderDialog(
     QString("A reader for \"%1\" could not be found. Please choose one:").arg(file));
 
   // populate the list view with readers
-  vtkStringList* readers =
-    readerFactory->GetPossibleReaders(file.toLocal8Bit().data(), s->session());
+  vtkStringList* readers = readerFactory->GetPossibleReaders(file.toUtf8().data(), s->session());
   this->Internal->updateList(readers);
 };
 

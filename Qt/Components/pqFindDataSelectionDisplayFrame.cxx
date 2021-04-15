@@ -203,10 +203,10 @@ public:
       : "SelectionPointLabelVisibility";
 
     QString cur_array;
-    if (vtkSMPropertyHelper(repr->getProxy(), vname.toLocal8Bit().data(), true).GetAsInt() != 0)
+    if (vtkSMPropertyHelper(repr->getProxy(), vname.toUtf8().data(), true).GetAsInt() != 0)
     {
-      cur_array = vtkSMPropertyHelper(repr->getProxy(), pname.toLocal8Bit().data(), /*quiet=*/true)
-                    .GetAsString();
+      cur_array =
+        vtkSMPropertyHelper(repr->getProxy(), pname.toUtf8().data(), /*quiet=*/true).GetAsString();
     }
 
     foreach (QAction* action, menu.actions())
@@ -256,13 +256,13 @@ public:
         // selection
         vtkSMPropertyHelper(selectionProxy, selectionVisibilityName, true).Set(1);
         vtkSMPropertyHelper(selectionProxy, selectionArrayName, true)
-          .Set(action->data().toString().toLocal8Bit().data());
+          .Set(action->data().toString().toUtf8().data());
         // interactive selection
         if (iSelectionProxy)
         {
           vtkSMPropertyHelper(iSelectionProxy, iSelectionVisibilityName, true).Set(1);
           vtkSMPropertyHelper(iSelectionProxy, iSelectionArrayName, true)
-            .Set(action->data().toString().toLocal8Bit().data());
+            .Set(action->data().toString().toUtf8().data());
         }
       }
       else

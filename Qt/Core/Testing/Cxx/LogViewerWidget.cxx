@@ -362,7 +362,7 @@ void LogViewerWidgetTester::basic()
   QFile f("/tmp/info.log");
   if (f.open(QIODevice::ReadOnly | QIODevice::Text))
   {
-    widget.setLog(QString::fromLocal8Bit(f.readAll()));
+    widget.setLog(QString::fromUtf8(f.readAll()));
   }
 }
 

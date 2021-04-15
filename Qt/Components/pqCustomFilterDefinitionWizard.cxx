@@ -210,7 +210,7 @@ void pqCustomFilterDefinitionWizard::createCustomFilter()
         this->Filter->SetLocation(source->getProxy()->GetLocation());
         first = false;
       }
-      this->Filter->AddProxy(source->getSMName().toLocal8Bit().data(), source->getProxy());
+      this->Filter->AddProxy(source->getSMName().toUtf8().data(), source->getProxy());
     }
 
     index = this->Model->getNextIndex(index);
@@ -223,9 +223,9 @@ void pqCustomFilterDefinitionWizard::createCustomFilter()
   for (; i < numInputs; i++)
   {
     item = this->Form->InputPorts->topLevelItem(i);
-    this->Filter->ExposeProperty(item->text(0).toLocal8Bit().data(),
-      this->Form->LabelToNamePropertyMap[item->text(0)][item->text(1)].toLocal8Bit().data(),
-      item->text(2).toLocal8Bit().data());
+    this->Filter->ExposeProperty(item->text(0).toUtf8().data(),
+      this->Form->LabelToNamePropertyMap[item->text(0)][item->text(1)].toUtf8().data(),
+      item->text(2).toUtf8().data());
   }
 
   // Set the output proxies.
@@ -236,8 +236,8 @@ void pqCustomFilterDefinitionWizard::createCustomFilter()
     pqOutputPort* port = qobject_cast<pqOutputPort*>(item->data(0, Qt::UserRole).value<QObject*>());
     if (port)
     {
-      this->Filter->ExposeOutputPort(port->getSource()->getSMName().toLocal8Bit().data(),
-        port->getPortNumber(), item->text(1).toLocal8Bit().data());
+      this->Filter->ExposeOutputPort(port->getSource()->getSMName().toUtf8().data(),
+        port->getPortNumber(), item->text(1).toUtf8().data());
     }
   }
 
@@ -246,9 +246,9 @@ void pqCustomFilterDefinitionWizard::createCustomFilter()
   for (i = 0; i < total; i++)
   {
     item = this->Form->PropertyList->topLevelItem(i);
-    this->Filter->ExposeProperty(item->text(0).toLocal8Bit().data(),
-      this->Form->LabelToNamePropertyMap[item->text(0)][item->text(1)].toLocal8Bit().data(),
-      item->text(2).toLocal8Bit().data());
+    this->Filter->ExposeProperty(item->text(0).toUtf8().data(),
+      this->Form->LabelToNamePropertyMap[item->text(0)][item->text(1)].toUtf8().data(),
+      item->text(2).toUtf8().data());
   }
 
   // Include any internal proxies.
@@ -260,12 +260,12 @@ void pqCustomFilterDefinitionWizard::createCustomFilter()
   if (numInputs > 0)
   {
     proxyManager->RegisterCustomProxyDefinition(
-      "filters", this->Form->CustomFilterName->text().toLocal8Bit().data(), root);
+      "filters", this->Form->CustomFilterName->text().toUtf8().data(), root);
   }
   else
   {
     proxyManager->RegisterCustomProxyDefinition(
-      "sources", this->Form->CustomFilterName->text().toLocal8Bit().data(), root);
+      "sources", this->Form->CustomFilterName->text().toUtf8().data(), root);
   }
   root->Delete();
 }
@@ -308,7 +308,7 @@ void pqCustomFilterDefinitionWizard::addAutoIncludedProxies()
   {
     QString name = "auto_";
     name += proxy->GetGlobalIDAsString();
-    this->Filter->AddProxy(name.toLocal8Bit().data(), proxy);
+    this->Filter->AddProxy(name.toUtf8().data(), proxy);
   }
 }
 
@@ -331,8 +331,8 @@ bool pqCustomFilterDefinitionWizard::validateCustomFilterName()
     vtkSMProxyManager::GetProxyManager()->GetActiveSessionProxyManager();
   if (!this->OverwriteOK)
   {
-    if (proxyManager->GetProxyDefinition("filters", filterName.toLocal8Bit().data()) ||
-      proxyManager->GetProxyDefinition("sources", filterName.toLocal8Bit().data()))
+    if (proxyManager->GetProxyDefinition("filters", filterName.toUtf8().data()) ||
+      proxyManager->GetProxyDefinition("sources", filterName.toUtf8().data()))
     {
       QMessageBox::warning(this, "Duplicate Name", "This filter name already exists.\n"
                                                    "Please enter a different name.",

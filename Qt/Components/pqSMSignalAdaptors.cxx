@@ -68,7 +68,7 @@ QVariant pqSignalAdaptorProxy::proxy() const
   QString str = this->parent()->property(this->PropertyName).toString();
   vtkSMSessionProxyManager* pm =
     vtkSMProxyManager::GetProxyManager()->GetActiveSessionProxyManager();
-  pqSMProxy p = pm->GetProxy(str.toLocal8Bit().data());
+  pqSMProxy p = pm->GetProxy(str.toUtf8().data());
   QVariant ret;
   ret.setValue(p);
   return ret;

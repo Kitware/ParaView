@@ -191,13 +191,13 @@ pqProxyGroupMenuManager::~pqProxyGroupMenuManager()
 //-----------------------------------------------------------------------------
 void pqProxyGroupMenuManager::addProxy(const QString& xmlgroup, const QString& xmlname)
 {
-  this->Internal->addProxy(xmlgroup.toLocal8Bit().data(), xmlname.toLocal8Bit().data(), QString());
+  this->Internal->addProxy(xmlgroup.toUtf8().data(), xmlname.toUtf8().data(), QString());
 }
 
 //-----------------------------------------------------------------------------
 void pqProxyGroupMenuManager::removeProxy(const QString& xmlgroup, const QString& xmlname)
 {
-  this->Internal->removeProxy(xmlgroup.toLocal8Bit().data(), xmlname.toLocal8Bit().data());
+  this->Internal->removeProxy(xmlgroup.toUtf8().data(), xmlname.toUtf8().data());
 }
 
 //-----------------------------------------------------------------------------
@@ -245,8 +245,7 @@ void pqProxyGroupMenuManager::loadConfiguration(vtkPVXMLElement* root)
   }
   if (this->ResourceTagName != root->GetName())
   {
-    this->loadConfiguration(
-      root->FindNestedElementByName(this->ResourceTagName.toLocal8Bit().data()));
+    this->loadConfiguration(root->FindNestedElementByName(this->ResourceTagName.toUtf8().data()));
     return;
   }
 
@@ -674,8 +673,7 @@ QAction* pqProxyGroupMenuManager::getAction(const QString& pgroup, const QString
   {
     return nullptr;
   }
-  vtkSMProxy* prototype =
-    pxm->GetPrototypeProxy(pgroup.toLocal8Bit().data(), pname.toLocal8Bit().data());
+  vtkSMProxy* prototype = pxm->GetPrototypeProxy(pgroup.toUtf8().data(), pname.toUtf8().data());
   if (prototype)
   {
     QString label = prototype->GetXMLLabel() ? prototype->GetXMLLabel() : pname;
@@ -808,7 +806,7 @@ vtkSMProxy* pqProxyGroupMenuManager::getPrototype(QAction* action) const
   QPair<QString, QString> key(data_list[0], data_list[1]);
   vtkSMSessionProxyManager* pxm =
     vtkSMProxyManager::GetProxyManager()->GetActiveSessionProxyManager();
-  return pxm->GetPrototypeProxy(key.first.toLocal8Bit().data(), key.second.toLocal8Bit().data());
+  return pxm->GetPrototypeProxy(key.first.toUtf8().data(), key.second.toUtf8().data());
 }
 
 //-----------------------------------------------------------------------------
@@ -964,7 +962,7 @@ void pqProxyGroupMenuManager::lookForNewDefinitions()
   iter.TakeReference(pxdm->NewIterator());
   foreach (QString groupName, this->Internal->ProxyDefinitionGroupToListen)
   {
-    iter->AddTraversalGroupName(groupName.toLocal8Bit().data());
+    iter->AddTraversalGroupName(groupName.toUtf8().data());
   }
 
   // Loop over proxy that should be inserted inside the UI

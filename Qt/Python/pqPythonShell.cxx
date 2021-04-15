@@ -216,7 +216,7 @@ private:
     {
       this->Parent->prompt();
       this->Parent->printString(line + "\n");
-      this->Interpreter->Push(line.toLocal8Bit().data());
+      this->Interpreter->Push(line.toUtf8().data());
     }
     this->Parent->prompt();
 
@@ -382,7 +382,7 @@ void pqPythonShell::executeScript(const QString& script)
   command.replace("\r", "\n");
 
   this->Internals->begin();
-  this->Internals->interpreter()->RunStringWithConsoleLocals(command.toLocal8Bit().data());
+  this->Internals->interpreter()->RunStringWithConsoleLocals(command.toUtf8().data());
   this->Internals->end();
 
   CLEAR_UNDO_STACK();
@@ -401,7 +401,7 @@ void pqPythonShell::pushScript(const QString& script)
   this->Internals->begin();
   foreach (QString line, lines)
   {
-    bool isMultilineStatement = this->Internals->interpreter()->Push(line.toLocal8Bit().data());
+    bool isMultilineStatement = this->Internals->interpreter()->Push(line.toUtf8().data());
     this->Prompt = isMultilineStatement ? pqPythonShell::PS2() : pqPythonShell::PS1();
   }
   this->Internals->end();
@@ -472,7 +472,7 @@ void pqPythonShell::runScript()
         code.append(file.readAll());
         code.append("\n");
         code.append("del __file__\n");
-        this->executeScript(code.toLocal8Bit().data());
+        this->executeScript(code.toUtf8().data());
       }
       else
       {

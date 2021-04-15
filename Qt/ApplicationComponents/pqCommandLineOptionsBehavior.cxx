@@ -134,7 +134,7 @@ void pqCommandLineOptionsBehavior::processCommandLineOptions()
   // check for --data option.
   if (options->GetParaViewDataName())
   {
-    QString path = QString::fromLocal8Bit(options->GetParaViewDataName());
+    QString path = QString::fromUtf8(options->GetParaViewDataName());
     // Check if dataname has a state file extension.
     // This allows to pass a state file as last argument without --state option.
     if (path.endsWith(".pvsm", Qt::CaseInsensitive))
@@ -149,7 +149,7 @@ void pqCommandLineOptionsBehavior::processCommandLineOptions()
       pqFileDialog dialog(pqActiveObjects::instance().activeServer(), pqCoreUtilities::mainWidget(),
         tr("Internal Open File"), QString(), QString());
       dialog.setFileMode(pqFileDialog::ExistingFiles);
-      if (!dialog.selectFile(QString::fromLocal8Bit(options->GetParaViewDataName())))
+      if (!dialog.selectFile(QString::fromUtf8(options->GetParaViewDataName())))
       {
         qCritical() << "Cannot open data file \"" << options->GetParaViewDataName() << "\"";
       }
@@ -271,7 +271,7 @@ void pqCommandLineOptionsBehavior::playTests()
     // Play the test script if specified.
     pqTestUtility* testUtility = pqApplicationCore::instance()->testUtility();
     options->SetCurrentImageThreshold(options->GetTestImageThreshold(cc));
-    cout << "Playing: " << options->GetTestScript(cc).toLocal8Bit().data() << endl;
+    cout << "Playing: " << options->GetTestScript(cc).toUtf8().data() << endl;
     success = testUtility->playTests(options->GetTestScript(cc));
 
     if (success && !options->GetTestBaseline(cc).isEmpty())

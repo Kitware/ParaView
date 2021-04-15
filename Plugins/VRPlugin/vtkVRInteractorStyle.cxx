@@ -254,7 +254,7 @@ vtkPVXMLElement* vtkVRInteractorStyle::SaveConfiguration() const
   pqServerManagerModel* model = core->getServerManagerModel();
   pqProxy* pqControlledProxy = model->findItem<pqProxy*>(this->ControlledProxy);
   QString name = pqControlledProxy ? pqControlledProxy->getSMName() : QString("(unknown)");
-  child->AddAttribute("proxyName", qPrintable(name));
+  child->AddAttribute("proxyName", name.toUtf8().data());
 
   child->AddAttribute(
     "proxy", this->ControlledProxy ? this->ControlledProxy->GetGlobalIDAsString() : "0");

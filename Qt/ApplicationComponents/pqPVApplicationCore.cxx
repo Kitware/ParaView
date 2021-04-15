@@ -233,7 +233,7 @@ bool pqPVApplicationCore::eventFilter(QObject* obj, QEvent* event_)
       {
         // If the application has not yet started, treat it as a --data argument
         // to be processed after the application starts.
-        this->Options->SetParaViewDataName(files[0].toLocal8Bit().data());
+        this->Options->SetParaViewDataName(files[0].toUtf8().data());
       }
     }
     return false;

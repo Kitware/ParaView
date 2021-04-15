@@ -334,7 +334,7 @@ QVariant pqAnnotationsModel::data(const QModelIndex& idx, int role) const
     {
       auto value = this->Internals->Items[idx.row()].Value;
       unsigned int unused = 0;
-      res = this->VisibilityDomain->IsInDomain(value.toLocal8Bit().data(), unused) != 0;
+      res = this->VisibilityDomain->IsInDomain(value.toUtf8().data(), unused) != 0;
     }
 
     return res ? true : false;

@@ -217,7 +217,7 @@ void pqChangeInputDialog::inputPortToggled(bool checked)
   }
 
   vtkSMInputProperty* inputProp = vtkSMInputProperty::SafeDownCast(
-    this->Internals->Proxy->GetProperty(input_prop_name.toLocal8Bit().data()));
+    this->Internals->Proxy->GetProperty(input_prop_name.toUtf8().data()));
 
   QModelIndex root = this->Internals->pipelineView->getRootIndex();
   QModelIndex index = this->Internals->PipelineModel->getNextIndex(root, root);

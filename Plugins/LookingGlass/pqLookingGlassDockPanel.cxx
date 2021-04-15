@@ -415,7 +415,7 @@ void pqLookingGlassDockPanel::onRenderOnLookingGlassClicked()
 
   // See if we have a settings proxy yet
   auto pxm = view->getProxy()->GetSession()->GetSessionProxyManager();
-  bool firstRender = pxm->GetProxy("looking_glass", qPrintable(settingsName)) == nullptr;
+  bool firstRender = pxm->GetProxy("looking_glass", settingsName.toUtf8().data()) == nullptr;
 
   this->setView(view);
   this->RenderNextFrame = true;
@@ -586,7 +586,7 @@ vtkSMProxy* pqLookingGlassDockPanel::getSettingsForView(pqRenderView* view)
 
   // See if we have a settings proxy yet
   auto pxm = view->getProxy()->GetSession()->GetSessionProxyManager();
-  auto settings = pxm->GetProxy("looking_glass", qPrintable(settingsName));
+  auto settings = pxm->GetProxy("looking_glass", settingsName.toUtf8().data());
   if (!settings)
   {
     // Create a Looking Glass settings proxy for this view
@@ -598,7 +598,7 @@ vtkSMProxy* pqLookingGlassDockPanel::getSettingsForView(pqRenderView* view)
     controller->PreInitializeProxy(settings);
     vtkSMPropertyHelper(settings, "View").Set(view->getProxy());
     controller->PostInitializeProxy(settings);
-    pxm->RegisterProxy("looking_glass", qPrintable(settingsName), settings);
+    pxm->RegisterProxy("looking_glass", settingsName.toUtf8().data(), settings);
 
     // Set up a connection to remove the settings when the associated view is deleted
     pqServerManagerModel* smmodel = pqApplicationCore::instance()->getServerManagerModel();

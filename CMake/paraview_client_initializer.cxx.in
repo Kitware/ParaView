@@ -137,10 +137,10 @@ pq@_paraview_client_NAME@Initializer::Status pq@_paraview_client_NAME@Initialize
   QStringList plugin_list = plugin_string.split(';',PV_QT_SKIP_EMPTY_PARTS);
   foreach (const QString plugin_name, plugin_list)
   {
-    if (!loader->LoadPluginByName(plugin_name.toLatin1().data()))
+    if (!loader->LoadPluginByName(plugin_name.toUtf8().data()))
     {
       std::cerr << "warning: failed to load required plugin "
-        << plugin_name.toLatin1().data() << std::endl;
+        << plugin_name.toUtf8().data() << std::endl;
     }
   }
   vtkLogEndScope("req-plugins");
@@ -151,10 +151,10 @@ pq@_paraview_client_NAME@Initializer::Status pq@_paraview_client_NAME@Initialize
   plugin_list = plugin_string.split(';', PV_QT_SKIP_EMPTY_PARTS);
   foreach (const QString plugin_name, plugin_list)
   {
-    if (!loader->LoadPluginByName(plugin_name.toLatin1().data()))
+    if (!loader->LoadPluginByName(plugin_name.toUtf8().data()))
     {
       std::cerr << "info: failed to load optional plugin "
-        << plugin_name.toLatin1().data() << std::endl;
+        << plugin_name.toUtf8().data() << std::endl;
     }
   }
   vtkLogEndScope("opt-plugins");

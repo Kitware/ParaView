@@ -1,4 +1,5 @@
 #include "pqOpenVRControls.h"
+
 #include "pqAnimationManager.h"
 #include "pqPVApplicationCore.h"
 #include "pqParaViewMenuBuilders.h"
@@ -65,7 +66,7 @@ void pqOpenVRControls::constructor(vtkPVOpenVRHelper* val)
 
   QObject::connect(
     this->Internals->rightTrigger, &QComboBox::currentTextChanged, [&](QString const& text) {
-      std::string mode = text.toLocal8Bit().constData();
+      std::string mode = text.toUtf8().toStdString();
       this->Helper->SetRightTriggerMode(mode);
     });
 
@@ -101,7 +102,7 @@ void pqOpenVRControls::constructor(vtkPVOpenVRHelper* val)
     QOverload<const QString&>::of(&QComboBox::activated), [=](QString const& text) {
       if (!this->NoForward && text.length())
       {
-        this->Helper->SetScaleFactor(std::stof(text.toLocal8Bit().constData()));
+        this->Helper->SetScaleFactor(std::stof(text.toUtf8().toStdString()));
       }
     });
 
@@ -109,7 +110,7 @@ void pqOpenVRControls::constructor(vtkPVOpenVRHelper* val)
     QOverload<const QString&>::of(&QComboBox::activated), [=](QString const& text) {
       if (!this->NoForward && text.length())
       {
-        this->Helper->SetMotionFactor(std::stof(text.toLocal8Bit().constData()));
+        this->Helper->SetMotionFactor(std::stof(text.toUtf8().toStdString()));
       }
     });
 
@@ -117,7 +118,7 @@ void pqOpenVRControls::constructor(vtkPVOpenVRHelper* val)
     QOverload<const QString&>::of(&QComboBox::activated), [=](QString const& text) {
       if (!this->NoForward && text.length())
       {
-        this->Helper->LoadCameraPose(std::stoi(text.toLocal8Bit().constData()));
+        this->Helper->LoadCameraPose(std::stoi(text.toUtf8().toStdString()));
       }
     });
 
@@ -125,7 +126,7 @@ void pqOpenVRControls::constructor(vtkPVOpenVRHelper* val)
     QOverload<const QString&>::of(&QComboBox::activated), [=](QString const& text) {
       if (text.length())
       {
-        this->Helper->SaveCameraPose(std::stoi(text.toLocal8Bit().constData()));
+        this->Helper->SaveCameraPose(std::stoi(text.toUtf8().toStdString()));
       }
     });
 
@@ -148,7 +149,7 @@ void pqOpenVRControls::resetPositions()
 void pqOpenVRControls::assignFieldValue()
 {
   // get the current combo setting
-  std::string val = this->Internals->fieldValueCombo->currentText().toLocal8Bit().constData();
+  std::string val = this->Internals->fieldValueCombo->currentText().toUtf8().toStdString();
 
   this->Helper->SetEditableFieldValue(val);
 }

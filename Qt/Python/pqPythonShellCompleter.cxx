@@ -125,7 +125,7 @@ QStringList pqPythonShellCompleter::getPythonAttributes(const QString& pythonObj
     QStringList tmpNames = pythonObjectName.split('.');
     for (int i = 0; i < tmpNames.size() && object; ++i)
     {
-      QByteArray tmpName = tmpNames.at(i).toLocal8Bit();
+      QByteArray tmpName = tmpNames.at(i).toUtf8();
       PyObject* prevObj = object;
       if (PyDict_Check(object))
       {
