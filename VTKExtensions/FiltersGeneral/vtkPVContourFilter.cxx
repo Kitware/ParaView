@@ -47,9 +47,7 @@
 vtkStandardNewMacro(vtkPVContourFilter);
 
 //-----------------------------------------------------------------------------
-vtkPVContourFilter::vtkPVContourFilter()
-{
-}
+vtkPVContourFilter::vtkPVContourFilter() = default;
 
 //-----------------------------------------------------------------------------
 vtkPVContourFilter::~vtkPVContourFilter() = default;
