@@ -716,8 +716,7 @@ void vtkPVFileInformation::GetWindowsDirectoryListing()
     FormatMessageW(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM, nullptr,
       GetLastError(), MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPWSTR)&lpMsgBuf, 0, nullptr);
     std::string message = vtksys::Encoding::ToNarrow((LPWSTR)&lpMsgBuf);
-    vtkErrorMacro(
-      "Error calling FindFirstFile : " << message.c_str() << "\nDirectory: " << prefix.c_str());
+    vtkErrorMacro("Error calling FindFirstFile : " << message << "\nDirectory: " << prefix);
     LocalFree(lpMsgBuf);
     return;
   }
@@ -795,8 +794,7 @@ void vtkPVFileInformation::GetWindowsDirectoryListing()
     FormatMessageW(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM, nullptr,
       GetLastError(), MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPWSTR)&lpMsgBuf, 0, nullptr);
     std::string message = vtksys::Encoding::ToNarrow((LPWSTR)&lpMsgBuf);
-    vtkErrorMacro(
-      "Error calling FindNextFile : " << message.c_str() << "\nDirectory: " << prefix.c_str());
+    vtkErrorMacro("Error calling FindNextFile : " << message << "\nDirectory: " << prefix);
     LocalFree(lpMsgBuf);
   }
 
