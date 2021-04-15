@@ -648,9 +648,7 @@ pqProxyInformationWidget::pqProxyInformationWidget(QWidget* parentWdg)
 }
 
 //-----------------------------------------------------------------------------
-pqProxyInformationWidget::~pqProxyInformationWidget()
-{
-}
+pqProxyInformationWidget::~pqProxyInformationWidget() = default;
 
 //-----------------------------------------------------------------------------
 void pqProxyInformationWidget::setOutputPort(pqOutputPort* port)

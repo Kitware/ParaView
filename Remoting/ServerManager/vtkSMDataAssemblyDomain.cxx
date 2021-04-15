@@ -21,9 +21,7 @@
 
 vtkStandardNewMacro(vtkSMDataAssemblyDomain);
 //----------------------------------------------------------------------------
-vtkSMDataAssemblyDomain::vtkSMDataAssemblyDomain()
-{
-}
+vtkSMDataAssemblyDomain::vtkSMDataAssemblyDomain() = default;
 
 //----------------------------------------------------------------------------
 vtkSMDataAssemblyDomain::~vtkSMDataAssemblyDomain() = default;
