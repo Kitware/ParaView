@@ -556,7 +556,7 @@ void vtkPVOpenVRHelper::AddPointToSource(double const* pnt)
   {
     return;
   }
-  std::string name = psrc->getSMName().toLatin1().data();
+  std::string name = psrc->getSMName().toUtf8().data();
 
   this->collabAddPointToSource(name, pnt);
 

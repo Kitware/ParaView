@@ -558,9 +558,9 @@ void pqDisplayColorWidget::componentNumberChanged()
     { // To make sure the trace is done before other calls.
       SM_SCOPED_TRACE(SetScalarColoring)
         .arg("display", this->Representation->getProxy())
-        .arg("arrayname", arrayName.toLatin1().data())
+        .arg("arrayname", arrayName.toUtf8().data())
         .arg("attribute_type", association)
-        .arg("component", this->Components->itemText(number + 1).toLatin1().data())
+        .arg("component", this->Components->itemText(number + 1).toUtf8().data())
         .arg("lut", this->ColorTransferFunction->getProxy());
     }
 

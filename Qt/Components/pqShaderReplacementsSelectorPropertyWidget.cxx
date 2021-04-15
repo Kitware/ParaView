@@ -206,15 +206,16 @@ void pqShaderReplacementsSelectorPropertyWidget::onLoad()
       {
         // Selected file is not in the current preset list, add it
         vtkSMSettings* settings = vtkSMSettings::GetInstance();
-        std::string newPaths = settings->GetSettingAsString(
-          pqShaderReplacementsComboBox::ShaderReplacementPathsSettings, "");
-        if (!newPaths.empty())
+        QString newPaths = QString::fromStdString(settings->GetSettingAsString(
+          pqShaderReplacementsComboBox::ShaderReplacementPathsSettings, ""));
+        if (!newPaths.isEmpty())
         {
-          newPaths += std::string(1, QDir::listSeparator().toLatin1());
+          newPaths += QDir::listSeparator();
         }
-        newPaths += files[0].toStdString();
-        settings->SetSetting(
-          pqShaderReplacementsComboBox::ShaderReplacementPathsSettings, newPaths);
+        newPaths += files[0];
+
+        settings->SetSetting(pqShaderReplacementsComboBox::ShaderReplacementPathsSettings,
+          newPaths.toUtf8().toStdString());
 
         // Refresh the combobox with new preset entry
         this->Internal->ComboBox->populate();
@@ -252,11 +253,10 @@ void pqShaderReplacementsSelectorPropertyWidget::onDelete()
   {
     // A preset is currently selected, remove it from the saved presets
     vtkSMSettings* settings = vtkSMSettings::GetInstance();
-    QString paths(
-      settings->GetSettingAsString(pqShaderReplacementsComboBox::ShaderReplacementPathsSettings, "")
-        .c_str());
+    QString paths = QString::fromStdString(settings->GetSettingAsString(
+      pqShaderReplacementsComboBox::ShaderReplacementPathsSettings, ""));
     QStringList plist = paths.split(QDir::listSeparator());
-    std::string newPaths;
+    QString newPaths;
     int count = 0;
     foreach (QString p, plist)
     {
@@ -264,12 +264,13 @@ void pqShaderReplacementsSelectorPropertyWidget::onDelete()
       {
         if (count > 0)
         {
-          newPaths += std::string(1, QDir::listSeparator().toLatin1());
+          newPaths += QDir::listSeparator();
         }
-        newPaths += p.toStdString();
+        newPaths += p;
       }
     }
-    settings->SetSetting(pqShaderReplacementsComboBox::ShaderReplacementPathsSettings, newPaths);
+    settings->SetSetting(pqShaderReplacementsComboBox::ShaderReplacementPathsSettings,
+      newPaths.toUtf8().toStdString());
   }
   else
   {

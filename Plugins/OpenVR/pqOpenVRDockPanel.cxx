@@ -123,7 +123,7 @@ void pqOpenVRDockPanel::constructor()
       {
         this->Helper->GetWidgets()->GetImagoImageryTypes(vals);
         std::string oldValue =
-          this->Internals->imagoImageryTypeCombo->currentText().toLatin1().data();
+          this->Internals->imagoImageryTypeCombo->currentText().toUtf8().data();
         this->Internals->imagoImageryTypeCombo->clear();
         QStringList list;
         list << QString("Any");
@@ -139,8 +139,7 @@ void pqOpenVRDockPanel::constructor()
 
       {
         this->Helper->GetWidgets()->GetImagoImageTypes(vals);
-        std::string oldValue =
-          this->Internals->imagoImageTypeCombo->currentText().toLatin1().data();
+        std::string oldValue = this->Internals->imagoImageTypeCombo->currentText().toUtf8().data();
         this->Internals->imagoImageTypeCombo->clear();
         QStringList list;
         list << QString("Any");
@@ -156,7 +155,7 @@ void pqOpenVRDockPanel::constructor()
 
       {
         this->Helper->GetWidgets()->GetImagoDatasets(vals);
-        std::string oldValue = this->Internals->imagoDatasetCombo->currentText().toLatin1().data();
+        std::string oldValue = this->Internals->imagoDatasetCombo->currentText().toUtf8().data();
         this->Internals->imagoDatasetCombo->clear();
         QStringList list;
         list << QString("Any");
@@ -172,8 +171,7 @@ void pqOpenVRDockPanel::constructor()
 
       {
         this->Helper->GetWidgets()->GetImagoWorkspaces(vals);
-        std::string oldValue =
-          this->Internals->imagoWorkspaceCombo->currentText().toLatin1().data();
+        std::string oldValue = this->Internals->imagoWorkspaceCombo->currentText().toUtf8().data();
         this->Internals->imagoWorkspaceCombo->clear();
         QStringList list;
         list << QString("Any");
@@ -229,12 +227,12 @@ void pqOpenVRDockPanel::constructor()
 
 void pqOpenVRDockPanel::editableFieldChanged(const QString& text)
 {
-  this->Helper->SetEditableField(text.toLatin1().data());
+  this->Helper->SetEditableField(text.toUtf8().data());
 }
 
 void pqOpenVRDockPanel::fieldValuesChanged(const QString& text)
 {
-  this->OpenVRControls->SetFieldValues(text.toLatin1().data());
+  this->OpenVRControls->SetFieldValues(text.toUtf8().data());
 }
 
 void pqOpenVRDockPanel::sendToOpenVR()
@@ -312,9 +310,9 @@ void pqOpenVRDockPanel::collaborationConnect()
     cc->SetLogCallback(std::bind(&pqOpenVRDockPanel::collaborationCallback, this,
                          std::placeholders::_1, std::placeholders::_2),
       nullptr);
-    cc->SetCollabHost(this->Internals->cServerValue->text().toLatin1().data());
-    cc->SetCollabSession(this->Internals->cSessionValue->text().toLatin1().data());
-    cc->SetCollabName(this->Internals->cNameValue->text().toLatin1().data());
+    cc->SetCollabHost(this->Internals->cServerValue->text().toUtf8().data());
+    cc->SetCollabSession(this->Internals->cSessionValue->text().toUtf8().data());
+    cc->SetCollabName(this->Internals->cNameValue->text().toUtf8().data());
     cc->SetCollabPort(this->Internals->cPortValue->text().toInt());
     if (this->Helper->CollaborationConnect())
     {
@@ -486,27 +484,27 @@ void pqOpenVRDockPanel::saveState(vtkPVXMLElement* root)
   vtkNew<vtkPVXMLElement> e;
   e->SetName("OpenVR");
 
-  e->AddAttribute("EditableField", this->Internals->editableField->text().toLatin1().data());
-  e->AddAttribute("FieldValues", this->Internals->fieldValues->text().toLatin1().data());
+  e->AddAttribute("EditableField", this->Internals->editableField->text().toUtf8().data());
+  e->AddAttribute("FieldValues", this->Internals->fieldValues->text().toUtf8().data());
 
   e->AddAttribute("BaseStationVisibility", this->Helper->GetBaseStationVisibility() ? 1 : 0);
   e->AddAttribute("MultiSample", this->Helper->GetMultiSample() ? 1 : 0);
 
   e->AddAttribute("DefaultCropThickness", this->Helper->GetDefaultCropThickness());
 
-  e->AddAttribute("CollaborationServer", this->Internals->cServerValue->text().toLatin1().data());
-  e->AddAttribute("CollaborationSession", this->Internals->cSessionValue->text().toLatin1().data());
-  e->AddAttribute("CollaborationPort", this->Internals->cPortValue->text().toLatin1().data());
+  e->AddAttribute("CollaborationServer", this->Internals->cServerValue->text().toUtf8().data());
+  e->AddAttribute("CollaborationSession", this->Internals->cSessionValue->text().toUtf8().data());
+  e->AddAttribute("CollaborationPort", this->Internals->cPortValue->text().toUtf8().data());
 
-  e->AddAttribute("ImagoUser", this->Internals->imagoUserValue->text().toLatin1().data());
+  e->AddAttribute("ImagoUser", this->Internals->imagoUserValue->text().toUtf8().data());
   e->AddAttribute(
-    "ImagoWorkspace", this->Internals->imagoWorkspaceCombo->currentText().toLatin1().data());
+    "ImagoWorkspace", this->Internals->imagoWorkspaceCombo->currentText().toUtf8().data());
   e->AddAttribute(
-    "ImagoDataset", this->Internals->imagoDatasetCombo->currentText().toLatin1().data());
+    "ImagoDataset", this->Internals->imagoDatasetCombo->currentText().toUtf8().data());
   e->AddAttribute(
-    "ImagoImageryType", this->Internals->imagoImageryTypeCombo->currentText().toLatin1().data());
+    "ImagoImageryType", this->Internals->imagoImageryTypeCombo->currentText().toUtf8().data());
   e->AddAttribute(
-    "ImagoImageType", this->Internals->imagoImageTypeCombo->currentText().toLatin1().data());
+    "ImagoImageType", this->Internals->imagoImageTypeCombo->currentText().toUtf8().data());
 
   this->Helper->SaveState(e);
 
