@@ -39,7 +39,6 @@ vtkStandardNewMacro(vtkSIStringVectorProperty);
 vtkSIStringVectorProperty::vtkSIStringVectorProperty()
 {
   this->ElementTypes = new vtkVectorOfInts();
-  this->NeedReencoding = false;
 }
 
 //----------------------------------------------------------------------------
@@ -130,16 +129,7 @@ bool vtkSIStringVectorProperty::Pull(vtkSMMessage* message)
     }
     else
     {
-      if (this->NeedReencoding)
-      {
-        // certain type of string needs to be converted to utf8
-        // to be sent back to client
-        var->add_txt(vtkPVFileInformationHelper::LocalToUtf8Win32(arg).c_str());
-      }
-      else
-      {
-        var->add_txt(arg);
-      }
+      var->add_txt(arg);
     }
   }
   return true;
@@ -222,28 +212,6 @@ bool vtkSIStringVectorProperty::ReadXMLAttributes(vtkSIProxy* proxy, vtkPVXMLEle
     }
   }
 
-  // Detect if this property needs utf8 -> Local encoding conversion
-  // Only filenames or filepaths need it.
-  // It can be a StringVectorProperty called FileName (all writers, see writers.xml)
-  // Or FileNameInfo for information property.
-  // Or it can be a StringVectorProperty with a fileListDomain.
-  const char* name = element->GetAttributeOrEmpty("name");
-  if (strcmp(name, "FileName") == 0 || strcmp(name, "FileNameInfo") == 0)
-  {
-    this->NeedReencoding = true;
-  }
-  else
-  {
-    for (unsigned int i = 0; i < element->GetNumberOfNestedElements(); i++)
-    {
-      vtkPVXMLElement* nested = element->GetNestedElement(i);
-      if (strcmp(nested->GetName(), "FileListDomain") == 0)
-      {
-        this->NeedReencoding = true;
-      }
-    }
-  }
-
   // We only push if a default value has been set otherwise we might trigger
   // unwanted behaviour underneath.
   if (hasDefaultValues)
@@ -299,15 +267,7 @@ bool vtkSIStringVectorProperty::Push(const vtkVectorOfStrings& values)
           stream << atof(values[i].c_str());
           break;
         case STRING:
-          if (this->NeedReencoding)
-          {
-            // Some received strings are UTF8 encoded and need conversion to local
-            stream << vtkPVFileInformationHelper::Utf8ToLocalWin32(values[i]).c_str();
-          }
-          else
-          {
-            stream << values[i].c_str();
-          }
+          stream << values[i].c_str();
           break;
       }
     }
@@ -350,17 +310,7 @@ bool vtkSIStringVectorProperty::Push(const vtkVectorOfStrings& values)
             stream << atof(values[i * this->NumberOfElementsPerCommand + j].c_str());
             break;
           case STRING:
-            if (this->NeedReencoding)
-            {
-              // Some received strings are UTF8 encoded and need conversion to local
-              stream << vtkPVFileInformationHelper::Utf8ToLocalWin32(
-                          values[i * this->NumberOfElementsPerCommand + j])
-                          .c_str();
-            }
-            else
-            {
-              stream << values[i * this->NumberOfElementsPerCommand + j].c_str();
-            }
+            stream << values[i * this->NumberOfElementsPerCommand + j].c_str();
             break;
         }
       }
