@@ -210,7 +210,7 @@ void pqCustomFilterManagerModel::importCustomFiltersFromSettings()
   }
 
   vtkPVXMLParser* parser = vtkPVXMLParser::New();
-  parser->Parse(state.toLocal8Bit().data());
+  parser->Parse(state.toUtf8().data());
 
   proxyManager->LoadCustomProxyDefinitions(parser->GetRootElement());
 

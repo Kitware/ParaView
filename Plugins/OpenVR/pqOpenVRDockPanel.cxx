@@ -109,8 +109,8 @@ void pqOpenVRDockPanel::constructor()
 // hide/show widgets based on Imago support
 #ifdef OPENVR_HAS_IMAGO_SUPPORT
   QObject::connect(this->Internals->imagoLoginButton, &QPushButton::clicked, [&]() {
-    std::string uid = this->Internals->imagoUserValue->text().toLocal8Bit().constData();
-    std::string pw = this->Internals->imagoPasswordValue->text().toLocal8Bit().constData();
+    std::string uid = this->Internals->imagoUserValue->text().toUtf8().toStdString();
+    std::string pw = this->Internals->imagoPasswordValue->text().toUtf8().toStdString();
     if (this->Helper->GetWidgets()->LoginToImago(uid, pw))
     {
       // set the background of the login button to light green
@@ -197,28 +197,28 @@ void pqOpenVRDockPanel::constructor()
     QOverload<const QString&>::of(&QComboBox::activated), [=](QString const& text) {
       if (text.length())
       {
-        this->Helper->GetWidgets()->SetImagoWorkspace(text.toLocal8Bit().constData());
+        this->Helper->GetWidgets()->SetImagoWorkspace(text.toUtf8().toStdString());
       }
     });
   QObject::connect(this->Internals->imagoDatasetCombo,
     QOverload<const QString&>::of(&QComboBox::activated), [=](QString const& text) {
       if (text.length())
       {
-        this->Helper->GetWidgets()->SetImagoDataset(text.toLocal8Bit().constData());
+        this->Helper->GetWidgets()->SetImagoDataset(text.toUtf8().toStdString());
       }
     });
   QObject::connect(this->Internals->imagoImageryTypeCombo,
     QOverload<const QString&>::of(&QComboBox::activated), [=](QString const& text) {
       if (text.length())
       {
-        this->Helper->GetWidgets()->SetImagoImageryType(text.toLocal8Bit().constData());
+        this->Helper->GetWidgets()->SetImagoImageryType(text.toUtf8().toStdString());
       }
     });
   QObject::connect(this->Internals->imagoImageTypeCombo,
     QOverload<const QString&>::of(&QComboBox::activated), [=](QString const& text) {
       if (text.length())
       {
-        this->Helper->GetWidgets()->SetImagoImageType(text.toLocal8Bit().constData());
+        this->Helper->GetWidgets()->SetImagoImageType(text.toUtf8().toStdString());
       }
     });
 #else

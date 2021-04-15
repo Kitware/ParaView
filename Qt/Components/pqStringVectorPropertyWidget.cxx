@@ -225,7 +225,7 @@ pqStringVectorPropertyWidget::pqStringVectorPropertyWidget(
     if (!supportedExtensions.empty())
     {
       vtkVLogF(PARAVIEW_LOG_APPLICATION_VERBOSITY(), "using extensions `%s`",
-        supportedExtensions.join(", ").toLocal8Bit().data());
+        supportedExtensions.join(", ").toUtf8().data());
       chooser->setExtension(supportedExtensions.join(";;"));
     }
 

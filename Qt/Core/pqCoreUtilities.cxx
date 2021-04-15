@@ -309,9 +309,9 @@ QMessageBox::Button pqCoreUtilities::promptUserGeneric(const QString& title, con
 //-----------------------------------------------------------------------------
 QString pqCoreUtilities::number(double value)
 {
-  std::ostringstream str;
-  str << vtkNumberToString()(value);
-  return QString::fromLocal8Bit(str.str().c_str());
+  std::ostringstream stream;
+  stream << vtkNumberToString()(value);
+  return QString::fromStdString(stream.str());
 }
 
 //-----------------------------------------------------------------------------

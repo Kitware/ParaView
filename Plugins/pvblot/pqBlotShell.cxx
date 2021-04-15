@@ -135,7 +135,7 @@ void pqBlotShell::executePythonCommand(const QString& command)
 {
   Q_EMIT this->executing(true);
   // this->printMessage(command);
-  this->Interpretor->RunSimpleString(command.toLocal8Bit().data());
+  this->Interpretor->RunSimpleString(command.toUtf8().data());
   Q_EMIT this->executing(false);
 }
 

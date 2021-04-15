@@ -139,7 +139,7 @@ void pqAnimatedExportReaction::Export(const QString& filename)
 
   { // Save file
     vtkNew<vtkSMAnimationSceneWebWriter> writer;
-    writer->SetFileName(filename.toLocal8Bit().data());
+    writer->SetFileName(filename.toUtf8().data());
     writer->SetAnimationScene(scene->getProxy());
     writer->SetRenderView(rview->getRenderViewProxy());
     if (!writer->Save())

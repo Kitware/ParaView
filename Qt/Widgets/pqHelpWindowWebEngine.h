@@ -85,7 +85,7 @@ public:
     buffer->setData(array);
     buffer->open(QIODevice::ReadOnly);
     connect(buffer, &QIODevice::aboutToClose, buffer, &QObject::deleteLater);
-    request->reply(content_type.toLocal8Bit(), buffer);
+    request->reply(content_type.toUtf8(), buffer);
   }
 
 private:

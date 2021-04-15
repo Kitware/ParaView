@@ -167,7 +167,7 @@ bool pqServerConfigurationCollection::save(const QString& filename, bool only_mu
   QFile file(filename);
   if (!contents.isEmpty() && file.open(QIODevice::WriteOnly))
   {
-    file.write(contents.toLocal8Bit().data());
+    file.write(contents.toUtf8().data());
     file.close();
     return true;
   }
@@ -178,7 +178,7 @@ bool pqServerConfigurationCollection::save(const QString& filename, bool only_mu
 bool pqServerConfigurationCollection::loadContents(const QString& contents, bool mutable_configs)
 {
   vtkNew<vtkPVXMLParser> parser;
-  if (!parser->Parse(contents.toLocal8Bit().data()))
+  if (!parser->Parse(contents.toUtf8().data()))
   {
     qWarning() << "Configuration not a valid xml.";
     return false;

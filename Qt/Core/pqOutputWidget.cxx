@@ -145,30 +145,30 @@ MessageHandler* MessageHandler::instance()
 
 void MessageHandler::displayMessage(QtMsgType type, const QString& msg)
 {
-  QByteArray localMsg = msg.toLocal8Bit();
+  QByteArray localMsg = msg.toUtf8();
   vtkOutputWindow* vtkWindow = vtkOutputWindow::GetInstance();
   if (vtkWindow)
   {
     switch (type)
     {
       case QtDebugMsg:
-        vtkWindow->DisplayDebugText(localMsg.constData());
+        vtkWindow->DisplayDebugText(localMsg.data());
         break;
 
       case QtInfoMsg:
-        vtkWindow->DisplayText(localMsg.constData());
+        vtkWindow->DisplayText(localMsg.data());
         break;
 
       case QtWarningMsg:
-        vtkWindow->DisplayWarningText(localMsg.constData());
+        vtkWindow->DisplayWarningText(localMsg.data());
         break;
 
       case QtCriticalMsg:
-        vtkWindow->DisplayErrorText(localMsg.constData());
+        vtkWindow->DisplayErrorText(localMsg.data());
         break;
 
       case QtFatalMsg:
-        vtkWindow->DisplayErrorText(localMsg.constData());
+        vtkWindow->DisplayErrorText(localMsg.data());
         abort();
         break;
     }
@@ -455,7 +455,7 @@ void pqOutputWidget::saveToFile()
   }
 
   QString filename = fileDialog.getSelectedFiles().first();
-  QByteArray filename_ba = filename.toLocal8Bit();
+  QByteArray filename_ba = filename.toUtf8();
   std::ofstream fileStream;
   fileStream.open(filename_ba.data());
   if (fileStream.is_open())

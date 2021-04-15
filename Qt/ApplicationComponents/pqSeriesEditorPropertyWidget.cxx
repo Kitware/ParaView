@@ -633,7 +633,7 @@ void pqSeriesEditorPropertyWidget::onPresetChanged(const QString& name)
     int idx = -1;
     if (presetAnnotations->GetLength() > 0)
     {
-      QByteArray nameArray = currentAnnotations.at(i).toString().toLocal8Bit();
+      QByteArray nameArray = currentAnnotations.at(i).toString().toUtf8();
       const char* seriesName = nameArray.data();
 
       auto seriesStringlist = QStringList(seriesName);

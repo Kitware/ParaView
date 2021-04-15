@@ -74,7 +74,7 @@ void SourceToolbarActions::onAction(QAction* a)
     {
       stack->beginUndoSet(QString("Create %1").arg(source_type));
     }
-    builder->createSource("sources", source_type.toLocal8Bit().data(), s);
+    builder->createSource("sources", source_type.toUtf8().data(), s);
     if (stack)
     {
       stack->endUndoSet();

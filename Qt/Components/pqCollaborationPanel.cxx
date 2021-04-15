@@ -226,7 +226,7 @@ void pqCollaborationPanel::itemChanged(QTableWidgetItem* item)
         QString userName = item->text();
         if (userName != collab->GetUserLabel(id))
         {
-          collab->SetUserLabel(id, userName.toLocal8Bit().data());
+          collab->SetUserLabel(id, userName.toUtf8().data());
         }
       }
     }

@@ -134,7 +134,7 @@ void pqSaveAnimationReaction::saveAnimation()
   vtkSMPropertyHelper(ahProxy, "View").Set(viewProxy);
   vtkSMPropertyHelper(ahProxy, "Layout").Set(layout);
   vtkSMPropertyHelper(ahProxy, "AnimationScene").Set(scene);
-  ahProxy->UpdateDefaultsAndVisibilities(filename.toLocal8Bit().data());
+  ahProxy->UpdateDefaultsAndVisibilities(filename.toUtf8().data());
   controller->PostInitializeProxy(ahProxy);
 
   if (layout)

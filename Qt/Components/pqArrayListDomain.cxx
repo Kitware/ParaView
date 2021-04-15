@@ -96,5 +96,5 @@ void pqArrayListDomain::domainChanged()
   QVariant variantVal;
   variantVal.setValue(newVal);
 
-  this->parent()->setProperty(this->Internals->QProperty.toLocal8Bit().data(), variantVal);
+  this->parent()->setProperty(this->Internals->QProperty.toUtf8().data(), variantVal);
 }

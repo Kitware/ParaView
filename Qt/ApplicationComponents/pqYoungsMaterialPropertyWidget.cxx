@@ -263,10 +263,10 @@ void pqYoungsMaterialPropertyWidget::updateComboBoxes()
   // check if there's a normal and ordering array already defined for this
   // volume-fraction array. If so, show it.
   const char* orderingArray = vtkSMUncheckedPropertyHelper(this->proxy(), "OrderingArrays")
-                                .GetStatus(label.toLocal8Bit().data(), "");
+                                .GetStatus(label.toUtf8().data(), "");
 
   const char* normalArray = vtkSMUncheckedPropertyHelper(this->proxy(), "NormalArrays")
-                              .GetStatus(label.toLocal8Bit().data(), "");
+                              .GetStatus(label.toUtf8().data(), "");
 
   if (orderingArray == nullptr || strlen(orderingArray) == 0)
   {

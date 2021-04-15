@@ -347,7 +347,7 @@ bool pqIndexSelectionWidget::eventFilter(QObject* obj, QEvent* e)
 //------------------------------------------------------------------------------
 void pqIndexSelectionWidget::propertyChanged()
 {
-  QVariant propVar = this->property(this->PushPropertyName.constData());
+  QVariant propVar = this->property(this->PushPropertyName.data());
   QList<QVariant> prop = propVar.toList();
   if (prop.size() % 2 != 0)
   {
@@ -405,7 +405,7 @@ void pqIndexSelectionWidget::updatePropertyImpl()
   }
 
   this->IgnorePushPropertyUpdates = true;
-  this->setProperty(this->PushPropertyName.constData(), newProp);
+  this->setProperty(this->PushPropertyName.data(), newProp);
   this->IgnorePushPropertyUpdates = false;
   Q_EMIT widgetModified();
 }

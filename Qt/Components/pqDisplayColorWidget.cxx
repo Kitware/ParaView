@@ -147,7 +147,7 @@ protected:
     vtkSMProxy* oldLutProxy = vtkSMPropertyHelper(reprProxy, "LookupTable", true).GetAsProxy();
 
     vtkSMPVRepresentationProxy::SetScalarColoring(
-      reprProxy, arrayName.toLocal8Bit().data(), association);
+      reprProxy, arrayName.toUtf8().data(), association);
 
     vtkNew<vtkSMTransferFunctionManager> tmgr;
     pqDisplayColorWidget* widget = qobject_cast<pqDisplayColorWidget*>(this->objectQt());
@@ -597,13 +597,12 @@ void pqDisplayColorWidget::refreshComponents()
 
   vtkPVDataInformation* dataInfo = this->Representation->getInputDataInformation();
   vtkPVArrayInformation* arrayInfo =
-    dataInfo ? dataInfo->GetArrayInformation(arrayName.toLocal8Bit().data(), association) : nullptr;
+    dataInfo ? dataInfo->GetArrayInformation(arrayName.toUtf8().data(), association) : nullptr;
   if (!arrayInfo)
   {
     vtkPVDataInformation* reprInfo = this->Representation->getRepresentedDataInformation();
-    arrayInfo = reprInfo
-      ? reprInfo->GetArrayInformation(arrayName.toLocal8Bit().data(), association)
-      : nullptr;
+    arrayInfo =
+      reprInfo ? reprInfo->GetArrayInformation(arrayName.toUtf8().data(), association) : nullptr;
   }
 
   if (!arrayInfo || arrayInfo->GetNumberOfComponents() <= 1)

@@ -415,7 +415,7 @@ void pqServerManagerModel::onProxyUnRegistered(
   // If so, we are simply renaming the proxy.
   vtkSmartPointer<vtkStringList> names = vtkSmartPointer<vtkStringList>::New();
   vtkSMSessionProxyManager* pxm = proxy->GetSessionProxyManager();
-  pxm->GetProxyNames(group.toLocal8Bit().data(), proxy, names);
+  pxm->GetProxyNames(group.toUtf8().data(), proxy, names);
   for (int cc = 0; cc < names->GetLength(); cc++)
   {
     if (name == names->GetString(cc))
@@ -588,7 +588,7 @@ void pqServerManagerModel::updateSettingsFromQSettings(pqServer* server)
       }
       else if (vtkSMStringVectorProperty* svp = vtkSMStringVectorProperty::SafeDownCast(prop))
       {
-        svp->SetElement(0, value.toString().toLocal8Bit().data());
+        svp->SetElement(0, value.toString().toUtf8().data());
       }
       else
       {

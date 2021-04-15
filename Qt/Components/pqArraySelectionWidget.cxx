@@ -485,7 +485,7 @@ void pqArraySelectionWidget::propertyChanged(const QString& pname)
   auto amodel = this->realModel();
   assert(amodel);
 
-  QVariant value = this->property(pname.toLocal8Bit().data());
+  QVariant value = this->property(pname.toUtf8().data());
   if (!value.isValid())
   {
     // dynamic property is being removed, clear it from the model.
@@ -526,7 +526,7 @@ void pqArraySelectionWidget::updateProperty(const QString& pname, const QVariant
   // for scope
   {
     QScopedValueRollback<bool> rollback(this->UpdatingProperty, true);
-    this->setProperty(pname.toLocal8Bit().data(), value);
+    this->setProperty(pname.toUtf8().data(), value);
   }
   Q_EMIT this->widgetModified();
 }

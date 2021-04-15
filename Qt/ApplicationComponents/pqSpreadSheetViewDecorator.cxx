@@ -258,7 +258,7 @@ static void populateMenu(pqSpreadSheetView* view, QMenu* menu)
       if (checkState != Qt::Checked)
       {
         // all columns are hidden.
-        hidden_columns.push_back(cb->text().toLocal8Bit().data());
+        hidden_columns.push_back(cb->text().toUtf8().toStdString());
       }
     }
 

@@ -111,7 +111,7 @@ bool pqFileDialogEventPlayer::playEvent(
   if (Command == "remove")
   {
     // Delete the file.
-    vtksys::SystemTools::RemoveFile(fileString.toLocal8Bit().data());
+    vtksys::SystemTools::RemoveFile(fileString.toUtf8().toStdString());
     return true;
   }
   if (Command == "copy")
@@ -140,7 +140,7 @@ bool pqFileDialogEventPlayer::playEvent(
   }
   if (Command == "makeDir")
   {
-    return vtksys::SystemTools::MakeDirectory(fileString.toLocal8Bit().data());
+    return vtksys::SystemTools::MakeDirectory(fileString.toUtf8().toStdString());
   }
   if (!this->Superclass::playEvent(Object, Command, Arguments, Error))
   {

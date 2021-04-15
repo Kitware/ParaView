@@ -302,7 +302,7 @@ void pqDefaultContextMenu::colorMenuTriggered(QAction* action)
     vtkSMProxy* oldLutProxy = vtkSMPropertyHelper(reprProxy, "LookupTable", true).GetAsProxy();
 
     vtkSMPVRepresentationProxy::SetScalarColoring(
-      reprProxy, array.second.toLocal8Bit().data(), array.first);
+      reprProxy, array.second.toUtf8().data(), array.first);
 
     vtkNew<vtkSMTransferFunctionManager> tmgr;
 

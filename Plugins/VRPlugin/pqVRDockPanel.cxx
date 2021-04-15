@@ -322,7 +322,7 @@ void pqVRDockPanel::removeConnection()
 void pqVRDockPanel::addStyle()
 {
   vtkSMProxy* proxy = this->Internals->propertyCombo->getCurrentProxy();
-  QByteArray property = this->Internals->propertyCombo->getCurrentPropertyName().toLocal8Bit();
+  QByteArray property = this->Internals->propertyCombo->getCurrentPropertyName().toUtf8();
   QString styleString = this->Internals->stylesCombo->currentText();
 
   vtkVRInteractorStyleFactory* styleFactory = vtkVRInteractorStyleFactory::GetInstance();
@@ -504,9 +504,7 @@ void pqVRDockPanel::saveState()
     queueHandler->saveStylesConfiguration(root.GetPointer());
   }
 
-  // Avoid temporary QByteArrays in QString --> const char * conversion:
-  QByteArray filename_ba = filename.toLocal8Bit();
-  vtksys::ofstream os(filename_ba.constData(), ios::out);
+  vtksys::ofstream os(filename.toUtf8().data(), ios::out);
   root->PrintXML(os, vtkIndent());
 }
 

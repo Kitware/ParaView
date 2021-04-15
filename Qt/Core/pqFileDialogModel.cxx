@@ -331,7 +331,7 @@ public:
       helper->UpdatePropertyInformation();
       QString separator =
         pqSMAdaptor::getElementProperty(helper->GetProperty("PathSeparator")).toString();
-      this->Separator = separator.toLocal8Bit().data()[0];
+      this->Separator = separator.toUtf8().data()[0];
       // Since this isn't going through the proxy widget we have to manually restore the setting
       vtkSMPropertyHelper(helper, "ReadDetailedFileInformation")
         .Set(getShowDetailedInformationSetting());
@@ -717,7 +717,7 @@ bool pqFileDialogModel::mkdir(const QString& dirName)
   else
   {
     // File system is local.
-    ret = (vtkDirectory::MakeDirectory(dirPath.toLocal8Bit().data()) != 0);
+    ret = (vtkDirectory::MakeDirectory(dirPath.toUtf8().data()) != 0);
   }
 
   this->beginResetModel();
@@ -751,7 +751,7 @@ bool pqFileDialogModel::rmdir(const QString& dirName)
   else
   {
     // File system is local.
-    ret = (vtkDirectory::DeleteDirectory(dirPath.toLocal8Bit().data()) != 0);
+    ret = (vtkDirectory::DeleteDirectory(dirPath.toUtf8().data()) != 0);
   }
 
   this->beginResetModel();
@@ -805,7 +805,7 @@ bool pqFileDialogModel::rename(const QString& oldname, const QString& newname)
   }
   else
   {
-    ret = (vtkDirectory::Rename(oldPath.toLocal8Bit().data(), newPath.toLocal8Bit().data()) != 0);
+    ret = (vtkDirectory::Rename(oldPath.toUtf8().data(), newPath.toUtf8().data()) != 0);
   }
 
   this->beginResetModel();

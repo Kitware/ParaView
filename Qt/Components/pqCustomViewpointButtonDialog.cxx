@@ -321,7 +321,7 @@ void pqCustomViewpointButtonDialog::importConfigurations()
     filename = dialog.getSelectedFiles()[0];
 
     pugi::xml_document doc;
-    auto result = doc.load_file(filename.toLocal8Bit().data());
+    auto result = doc.load_file(filename.toUtf8().data());
     if (!result)
     {
       qCritical() << "XML Parsing errors (" << filename << ")\n\n"
@@ -460,7 +460,7 @@ void pqCustomViewpointButtonDialog::exportConfigurations()
         config.append_copy(camConfigDoc.first_child());
       }
     }
-    if (!doc.save_file(filename.toLocal8Bit().data(), /*indent =*/"  "))
+    if (!doc.save_file(filename.toUtf8().data(), /*indent =*/"  "))
     {
       qCritical() << "Failed to save '" << filename << "'.";
     }

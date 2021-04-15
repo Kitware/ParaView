@@ -320,7 +320,7 @@ bool pqApplicationCore::saveState(const QString& filename)
   vtkSMSessionProxyManager* pxm =
     vtkSMProxyManager::GetProxyManager()->GetActiveSessionProxyManager();
 
-  return pxm->SaveXMLState(filename.toLocal8Bit().data());
+  return pxm->SaveXMLState(filename.toUtf8().data());
 }
 
 //-----------------------------------------------------------------------------
@@ -421,7 +421,7 @@ void pqApplicationCore::loadStateIncremental(
     return;
   }
   vtkPVXMLParser* parser = vtkPVXMLParser::New();
-  parser->SetFileName(filename.toLocal8Bit().data());
+  parser->SetFileName(filename.toUtf8().data());
   parser->Parse();
   this->loadStateIncremental(parser->GetRootElement(), server, loader);
   parser->Delete();
@@ -465,7 +465,7 @@ void pqApplicationCore::onStateSaved(vtkPVXMLElement* root)
   {
     // Change root element to match the application name.
     QString valid_name = QApplication::applicationName().replace(QRegExp("\\W"), "_");
-    root->SetName(valid_name.toLocal8Bit().data());
+    root->SetName(valid_name.toUtf8().data());
   }
   Q_EMIT this->stateSaved(root);
 }
@@ -517,7 +517,7 @@ pqSettings* pqApplicationCore::settings()
     else
     {
       vtkVLogF(PARAVIEW_LOG_APPLICATION_VERBOSITY(), "loading Qt settings from '%s'",
-        settings->fileName().toLocal8Bit().data());
+        settings->fileName().toUtf8().data());
     }
     // now settings are ready!
 

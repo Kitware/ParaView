@@ -361,7 +361,7 @@ pqAnimationCue* pqAnimationScene::createCueInternal(
 
   pqObjectBuilder* builder = core->getObjectBuilder();
   vtkSMProxy* cueProxy =
-    builder->createProxy("animation", cuetype.toLocal8Bit().data(), this->getServer(), "animation");
+    builder->createProxy("animation", cuetype.toUtf8().data(), this->getServer(), "animation");
   pqAnimationCue* cue = smmodel->findItem<pqAnimationCue*>(cueProxy);
   if (!cue)
   {

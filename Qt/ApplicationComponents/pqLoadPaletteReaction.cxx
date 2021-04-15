@@ -126,14 +126,14 @@ void pqLoadPaletteReaction::actionTriggered(QAction* actn)
 
     vtkSMProxy* paletteProxy = pxm->GetProxy("settings", "ColorPalette");
 
-    vtkSMProxy* palettePrototype = pxm->GetPrototypeProxy(
-      "palettes", actn->property("PV_XML_NAME").toString().toLocal8Bit().data());
+    vtkSMProxy* palettePrototype =
+      pxm->GetPrototypeProxy("palettes", actn->property("PV_XML_NAME").toString().toUtf8().data());
     assert(palettePrototype);
 
     BEGIN_UNDO_SET("Load color palette");
     SM_SCOPED_TRACE(CallFunction)
       .arg("LoadPalette")
-      .arg("paletteName", actn->property("PV_XML_NAME").toString().toLocal8Bit().data());
+      .arg("paletteName", actn->property("PV_XML_NAME").toString().toUtf8().data());
     paletteProxy->Copy(palettePrototype);
     paletteProxy->UpdateVTKObjects();
     END_UNDO_SET();

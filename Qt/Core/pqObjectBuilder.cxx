@@ -152,7 +152,7 @@ pqPipelineSource* pqObjectBuilder::createSource(
   vtkNew<vtkSMParaViewPipelineController> controller;
   vtkSMSessionProxyManager* pxm = server->proxyManager();
   vtkSmartPointer<vtkSMProxy> proxy;
-  proxy.TakeReference(pxm->NewProxy(sm_group.toLocal8Bit().data(), sm_name.toLocal8Bit().data()));
+  proxy.TakeReference(pxm->NewProxy(sm_group.toUtf8().data(), sm_name.toUtf8().data()));
   if (!pqObjectBuilderNS::preCreatePipelineProxy(controller, proxy))
   {
     return nullptr;
@@ -171,7 +171,7 @@ pqPipelineSource* pqObjectBuilder::createFilter(const QString& sm_group, const Q
   vtkNew<vtkSMParaViewPipelineController> controller;
   vtkSMSessionProxyManager* pxm = server->proxyManager();
   vtkSmartPointer<vtkSMProxy> proxy;
-  proxy.TakeReference(pxm->NewProxy(sm_group.toLocal8Bit().data(), sm_name.toLocal8Bit().data()));
+  proxy.TakeReference(pxm->NewProxy(sm_group.toUtf8().data(), sm_name.toUtf8().data()));
   if (!pqObjectBuilderNS::preCreatePipelineProxy(controller, proxy))
   {
     return nullptr;
@@ -184,7 +184,7 @@ pqPipelineSource* pqObjectBuilder::createFilter(const QString& sm_group, const Q
     const QString& input_port_name = mapIter.key();
     QList<pqOutputPort*>& inputs = mapIter.value();
 
-    vtkSMProperty* prop = proxy->GetProperty(input_port_name.toLocal8Bit().data());
+    vtkSMProperty* prop = proxy->GetProperty(input_port_name.toUtf8().data());
     if (!prop)
     {
       qCritical() << "Failed to locate input property " << input_port_name;
@@ -343,7 +343,7 @@ pqView* pqObjectBuilder::createView(const QString& type, pqServer* server)
 
   vtkSMSessionProxyManager* pxm = server->proxyManager();
   vtkSmartPointer<vtkSMProxy> proxy;
-  proxy.TakeReference(pxm->NewProxy("views", type.toLocal8Bit().data()));
+  proxy.TakeReference(pxm->NewProxy("views", type.toUtf8().data()));
   if (!proxy)
   {
     qDebug() << "Failed to create a proxy for the requested view type:" << type;
@@ -430,8 +430,7 @@ pqDataRepresentation* pqObjectBuilder::createDataRepresentation(
   QString srcProxyName = source->getProxy()->GetXMLName();
   if (representationType != "")
   {
-    reprProxy.TakeReference(
-      pxm->NewProxy("representations", representationType.toLocal8Bit().data()));
+    reprProxy.TakeReference(pxm->NewProxy("representations", representationType.toUtf8().data()));
   }
   else
   {
@@ -487,7 +486,7 @@ vtkSMProxy* pqObjectBuilder::createProxy(
 
   vtkSMSessionProxyManager* pxm = server->proxyManager();
   vtkSmartPointer<vtkSMProxy> proxy;
-  proxy.TakeReference(pxm->NewProxy(sm_group.toLocal8Bit().data(), sm_name.toLocal8Bit().data()));
+  proxy.TakeReference(pxm->NewProxy(sm_group.toUtf8().data(), sm_name.toUtf8().data()));
   if (!proxy.GetPointer())
   {
     qCritical() << "Failed to create proxy: " << sm_group << ", " << sm_name;
@@ -500,7 +499,7 @@ vtkSMProxy* pqObjectBuilder::createProxy(
     proxy->SetPrototype(true);
   }
 
-  pxm->RegisterProxy(reg_group.toLocal8Bit().data(), proxy);
+  pxm->RegisterProxy(reg_group.toUtf8().data(), proxy);
   return proxy;
 }
 
@@ -617,8 +616,8 @@ void pqObjectBuilder::destroyProxyInternal(pqProxy* proxy)
   if (proxy)
   {
     vtkSMSessionProxyManager* pxm = proxy->proxyManager();
-    pxm->UnRegisterProxy(proxy->getSMGroup().toLocal8Bit().data(),
-      proxy->getSMName().toLocal8Bit().data(), proxy->getProxy());
+    pxm->UnRegisterProxy(
+      proxy->getSMGroup().toUtf8().data(), proxy->getSMName().toUtf8().data(), proxy->getProxy());
   }
 }
 
@@ -690,7 +689,7 @@ pqServer* pqObjectBuilder::createServer(const pqServerResource& resource, int co
   else if (server_resource.scheme() == "cs")
   {
     id = vtkSMSession::ConnectToRemote(
-      resource.host().toLocal8Bit().data(), resource.port(11111), connectionTimeout);
+      resource.host().toUtf8().data(), resource.port(11111), connectionTimeout);
   }
   else if (server_resource.scheme() == "csrc")
   {
@@ -700,9 +699,8 @@ pqServer* pqObjectBuilder::createServer(const pqServerResource& resource, int co
   }
   else if (server_resource.scheme() == "cdsrs")
   {
-    id = vtkSMSession::ConnectToRemote(server_resource.dataServerHost().toLocal8Bit().data(),
-      server_resource.dataServerPort(11111),
-      server_resource.renderServerHost().toLocal8Bit().data(),
+    id = vtkSMSession::ConnectToRemote(server_resource.dataServerHost().toUtf8().data(),
+      server_resource.dataServerPort(11111), server_resource.renderServerHost().toUtf8().data(),
       server_resource.renderServerPort(22221), connectionTimeout);
   }
   else if (server_resource.scheme() == "cdsrsrc")
