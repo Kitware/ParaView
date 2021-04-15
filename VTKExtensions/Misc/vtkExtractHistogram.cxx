@@ -199,7 +199,6 @@ public:
 
   void operator()(vtkIdType begin, vtkIdType end)
   {
-    int numComponents = this->Array->GetNumberOfComponents();
     auto& range = this->TLRange.Local();
     const auto valueRange = vtk::DataArrayTupleRange(this->Array);
     bool computeMagnitude = this->Component == this->Array->GetNumberOfComponents();
