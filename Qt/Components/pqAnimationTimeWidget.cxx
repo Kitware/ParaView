@@ -485,7 +485,7 @@ void pqAnimationTimeWidget::setTimeNotation(const QChar& val)
   VTK_LEGACY_REPLACED_BODY(
     pqAnimationTimeWidget::setTimeNotation, "ParaView 5.9", pqAnimationTimeWidget::setNotation);
   auto nval = RealNumberNotation::MixedNotation;
-  switch (val.toUtf8())
+  switch (val.toLatin1())
   {
     case 'f':
     case 'F':
