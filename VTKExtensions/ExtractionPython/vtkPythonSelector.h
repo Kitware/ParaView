@@ -41,14 +41,14 @@ protected:
   vtkPythonSelector();
   ~vtkPythonSelector() override;
 
-  /**
-   * Implementing this is required by the superclass.
-   */
-  bool ComputeSelectedElements(vtkDataObject*, vtkSignedCharArray*) override { return false; }
+  bool ComputeSelectedElements(vtkDataObject*, vtkSignedCharArray*) override;
 
 private:
   vtkPythonSelector(const vtkPythonSelector&) = delete;
   void operator=(const vtkPythonSelector&) = delete;
+
+  class vtkInternals;
+  vtkInternals* Internals;
 };
 
 #endif

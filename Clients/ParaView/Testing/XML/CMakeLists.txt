@@ -1246,10 +1246,11 @@ if(PARAVIEW_USE_PYTHON)
     list(APPEND TESTS_WITH_BASELINES
       ContextViewSelectionTrace.xml
       ExodusModeShapes.xml
-      FindDataPartialArrays.xml
-      FindDataSelectLocation.xml # find data needs python/numpy
-      FindDataSelectLocationMultiblock.xml # find data needs python/numpy
       FindDataNameSanitization.xml
+      FindDataPartialArrays.xml
+      FindDataSelectLocationMultiblock.xml # find data needs python/numpy
+      FindDataSelectLocation.xml # find data needs python/numpy
+      FindDataSelectors.xml
       ForceTimeDiamond.xml
       FreezeQueryMultiblock.xml
       IndexedLookupInitialization.xml # needs Python Calculator/numpy
