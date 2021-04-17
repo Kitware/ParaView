@@ -1545,6 +1545,29 @@ found and the point will be rejected.</Documentation>
         <BooleanDomain name="bool" />
       </IntVectorProperty>
 
+      <IntVectorProperty command="SetPassPartialArrays"
+                         default_values="0"
+                         name="PassPartialArrays"
+                         number_of_elements="1"
+                         panel_visibility="advanced">
+        <Documentation>
+        Set whether to partial data arrays from the Input i.e. the input
+        providing the geometry to the output. Off by default.
+        </Documentation>
+        <BooleanDomain name="bool" />
+        <Hints>
+          <PropertyWidgetDecorator type="CompositeDecorator">
+            <Expression type="or">
+              <PropertyWidgetDecorator type="GenericDecorator" mode="enabled_state" property="PassCellArrays" value="1" inverse="0" />
+              <PropertyWidgetDecorator type="GenericDecorator" mode="enabled_state" property="PassPointArrays" value="1" inverse="0" />
+              <PropertyWidgetDecorator type="GenericDecorator" mode="enabled_state" property="PassFieldArrays" value="1" inverse="0" />
+            </Expression>
+          </PropertyWidgetDecorator>
+          <!-- show this widget when PassCellArrays, PassPointArrays, or PassFieldArrays is on -->
+
+        </Hints>
+      </IntVectorProperty>
+
       <IntVectorProperty command="SetComputeTolerance"
                          default_values="1"
                          name="ComputeTolerance"
