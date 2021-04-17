@@ -1,6 +1,26 @@
 <ServerManagerConfiguration>
   <ProxyGroup name="sources">
     <!-- ==================================================================== -->
+    <SourceProxy class="vtkPartitionedDataSetCollectionSource"
+      label="PartitionedDataSetCollection Source"
+      name="PartitionedDataSetCollectionSource">
+      <Documentation short_help="Create vtkPartitionedDataSetCollection">
+      This source can be used to createa  `vtkPartitionedDataSetCollection` for testing purposes.
+      </Documentation>
+      <IntVectorProperty name="NumberOfShapes"
+        command="SetNumberOfShapes"
+        default_values="1"
+        number_of_elements="1">
+        <IntRangeDomain name="range" min="0" max="12" />
+        <Documentation>
+          Select number of shapes to generate in the output. Each shape is created as
+          a vtkPartitionedDataSet in the output data.
+        </Documentation>
+      </IntVectorProperty>
+      <!-- end of PartitionedDataSetCollectionSource -->
+    </SourceProxy>
+
+    <!-- ==================================================================== -->
     <SourceProxy class="vtkArrowSource"
                  label="Arrow"
                  name="ArrowSource">
