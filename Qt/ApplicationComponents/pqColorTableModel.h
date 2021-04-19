@@ -49,7 +49,7 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqColorTableModel : public QAbstractTableMo
 public:
   pqColorTableModel(pqColorOpacityEditorWidget* widget, QObject* parentObject = 0);
 
-  ~pqColorTableModel() override {}
+  ~pqColorTableModel() override;
 
   /**
   * All columns are editable. The first and last value in the first column

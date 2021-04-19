@@ -59,6 +59,12 @@ pqColorTableModel::pqColorTableModel(pqColorOpacityEditorWidget* widget, QObject
 }
 
 //-----------------------------------------------------------------------------
+pqColorTableModel::~pqColorTableModel()
+{
+  delete this->Internals;
+}
+
+//-----------------------------------------------------------------------------
 Qt::ItemFlags pqColorTableModel::flags(const QModelIndex& idx) const
 {
   Qt::ItemFlags parentFlags = this->Superclass::flags(idx);
