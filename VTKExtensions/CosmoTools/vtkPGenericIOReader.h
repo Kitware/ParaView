@@ -63,7 +63,7 @@ public:
 
   static vtkPGenericIOReader* New();
   vtkTypeMacro(vtkPGenericIOReader, vtkUnstructuredGridAlgorithm);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   //@{
   /**
@@ -253,8 +253,8 @@ protected:
   virtual ~vtkPGenericIOReader();
 
   // Pipeline methods
-  virtual int RequestInformation(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
-  virtual int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
+  int RequestInformation(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
+  int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
 
   /**
    * Loads the GenericIO metadata from the file.
