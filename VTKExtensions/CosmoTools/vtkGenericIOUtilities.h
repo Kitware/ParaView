@@ -23,8 +23,7 @@
 #ifndef vtkGenericIOUtilities_h
 #define vtkGenericIOUtilities_h
 
-#include "vtkPVVTKExtensionsCosmoToolsModule.h" // For export macro
-#include "vtkType.h"                            // for vtkIdType
+#include "vtkType.h" // for vtkIdType
 
 #include <algorithm>  // for std::find_if
 #include <functional> // for std::ptr_fun
@@ -41,7 +40,7 @@ class GenericIOReader;
 class GenericIOWriter;
 }
 
-namespace VTKPVVTKEXTENSIONSCOSMOTOOLS_EXPORT vtkGenericIOUtilities
+namespace vtkGenericIOUtilities
 {
 
 //==============================================================================
@@ -144,3 +143,4 @@ inline void SafeDeleteString(char*& str)
 }
 
 #endif /* vtkGenericIOUtilities_h */
+// VTK-HeaderTest-Exclude: vtkGenericIOUtilities.h

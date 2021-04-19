@@ -4,6 +4,7 @@
 
 #include "vtkMultiBlockDataSetAlgorithm.h"
 #include "vtkParFlowIOModule.h" // for export macro
+#include "vtkVector.h"          // for vtkVector*
 
 #include <vector> // for std::vector
 
