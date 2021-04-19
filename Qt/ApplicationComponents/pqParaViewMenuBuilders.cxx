@@ -253,7 +253,9 @@ void pqParaViewMenuBuilders::buildFiltersMenu(
   QMenu& menu, QMainWindow* mainWindow, bool hideDisabled, bool quickLaunchable)
 {
   // Make sure disabled actions are still considered active
-  menu.setStyle(new pqActiveDisabledStyle);
+  auto* style = new pqActiveDisabledStyle;
+  style->setParent(&menu);
+  menu.setStyle(style);
 
   pqProxyGroupMenuManager* mgr =
     new pqProxyGroupMenuManager(&menu, "ParaViewFilters", quickLaunchable);
@@ -285,7 +287,9 @@ void pqParaViewMenuBuilders::buildExtractorsMenu(
   QMenu& menu, QMainWindow* mainWindow, bool hideDisabled, bool quickLaunchable)
 {
   // Make sure disabled actions are still considered active
-  menu.setStyle(new pqActiveDisabledStyle);
+  auto* style = new pqActiveDisabledStyle;
+  style->setParent(&menu);
+  menu.setStyle(style);
 
   pqProxyGroupMenuManager* mgr =
     new pqProxyGroupMenuManager(&menu, "ParaViewExtractWriters", quickLaunchable);
