@@ -1247,6 +1247,7 @@ if(PARAVIEW_USE_PYTHON)
       ContextViewSelectionTrace.xml
       ExodusModeShapes.xml
       FindDataNameSanitization.xml
+      FindDataNonDistributedData.xml
       FindDataPartialArrays.xml
       FindDataSelectLocationMultiblock.xml # find data needs python/numpy
       FindDataSelectLocation.xml # find data needs python/numpy
