@@ -6,6 +6,7 @@
 #include "vtkParFlowIOModule.h" // for export macro
 
 #include "vtkSmartPointer.h" // for ivars
+#include "vtkVector.h"       // for vtkVector*
 
 #include "nlohmann/json.hpp" // for json bits
 
