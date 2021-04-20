@@ -26,7 +26,11 @@
 #include "vtkSMSessionProxyManager.h"
 #include "vtkSmartPointer.h"
 
-#include "vtkSMParaViewPipelineController.h"
+#include "vtkImageData.h"
+#include "vtkPVTrivialProducer.h"
+#include "vtkSMInputProperty.h"
+#include "vtkSMSourceProxy.h"
+#include "vtkTexture.h"
 
 #include <numeric>
 
@@ -144,27 +148,29 @@ void vtkSMMaterialLibraryProxy::Synchronize()
     // Add all the texture
     for (auto& varName : texList)
     {
+      // Get the texture loaded by the material library
+      vtkTexture* texture = ml->GetTexture(matName, varName);
+
+      // Create a producer and set its input to the texture image data
+      vtkSmartPointer<vtkSMSourceProxy> producer;
+      producer.TakeReference(vtkSMSourceProxy::SafeDownCast(
+        pxm->NewProxy("sources", "PVTrivialProducerOnAllProcesses")));
+      auto realProducer = vtkPVTrivialProducer::SafeDownCast(producer->GetClientSideObject());
+      realProducer->SetOutput(texture->GetInput());
+
+      // Create the texture proxy and add the producer to its input
+      vtkSmartPointer<vtkSMProxy> textureProxy;
+      textureProxy.TakeReference(pxm->NewProxy("textures", "ImageDataTexture"));
+      vtkSMInputProperty::SafeDownCast(textureProxy->GetProperty("Input"))
+        ->SetInputConnection(0, producer, 0);
+
+      // Todo: get the name of the texture from the ospray material library
+      // (VTK Change)
+      std::string proxyName = pxm->GetUniqueProxyName("textures", "myTextureName", false);
+      textureProxy->UpdateVTKObjects();
+      pxm->RegisterProxy("textures", proxyName.c_str(), textureProxy);
+
       vtkSMPropertyHelper(matProxy, "DoubleVariables").Set(currentIndex++, varName.c_str());
-
-      // vtkTexture* texture = ml->GetTexture(matName, varName);
-      // Todo get the name of the texture / load it
-
-      // We need to get the filename to register the proxy
-      // std::string filename = "/home/lfxpaul/dev/materials/textures/brushed.jpg";
-
-      // //vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
-      // vtkSMProxy* texture = pxm->NewProxy("textures", "ImageTexture");
-
-      // pxm->RegisterProxy("textures", texture);
-
-      // vtkSMPropertyHelper(texture, "FileName").Set(filename.c_str());
-
-      // vtkNew<vtkSMParaViewPipelineController> controller;
-      // controller->RegisterTextureProxy(texture, filename.c_str());
-
-      // Could we register / create proxy ImageTexture here ?
-
-      // vtkSMPropertyHelper(matProxy, "DoubleVariables").Set(currentIndex++, filename.c_str());
       vtkSMPropertyHelper(matProxy, "DoubleVariables").Set(currentIndex++, "None");
     }
 
@@ -173,10 +179,4 @@ void vtkSMMaterialLibraryProxy::Synchronize()
 
   this->UpdateVTKObjects();
 #endif
-}
-
-//-----------------------------------------------------------------------------
-void vtkSMMaterialLibraryProxy::PrintSelf(ostream& os, vtkIndent indent)
-{
-  this->Superclass::PrintSelf(os, indent);
 }

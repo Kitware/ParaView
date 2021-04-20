@@ -32,7 +32,6 @@ class VTKREMOTINGVIEWS_EXPORT vtkSMMaterialLibraryProxy : public vtkSMProxy
 public:
   static vtkSMMaterialLibraryProxy* New();
   vtkTypeMacro(vtkSMMaterialLibraryProxy, vtkSMProxy);
-  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /**
    * Copies the Material library on the root node of server to the client.

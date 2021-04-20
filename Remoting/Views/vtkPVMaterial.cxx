@@ -68,6 +68,10 @@ void vtkPVMaterial::AddVariable(const char* paramName, const char* value)
       // Our CurrentTexture hold the current texture selected in the
       // corresponding pqTextureSelectorPropertyWidget
       // created in pqMaterialAttributesDelegate
+      if (this->CurrentTexture)
+      {
+        this->CurrentTexture->Update();
+      }
       lib->AddTexture(this->Name, paramName, this->CurrentTexture);
     }
     else
