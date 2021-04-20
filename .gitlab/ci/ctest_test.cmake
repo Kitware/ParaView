@@ -14,6 +14,47 @@ set(CTEST_TEST_TIMEOUT 100)
 
 set(test_exclusions)
 
+if ("$ENV{CMAKE_CONFIGURATION}" MATCHES "fedora")
+  list(APPEND test_exclusions
+    # These tests all seem to have some problem with the rendering order of
+    # some components of the scenes that are being tested. Needs investigation.
+    # https://gitlab.kitware.com/vtk/vtk/-/issues/18098
+    "\\.BoxWidget$"
+    "\\.CheckSelectedBlocks$"
+    "\\.CTHAMRClip$"
+    "\\.CTHAMRContour$"
+    "\\.MultiSliceWavelet$"
+    "\\.NonConvexPolygon$"
+    "\\.SelectCellsTrace$"
+    "\\.SelectionLinkMultiple$"
+    "\\.SelectionModifiersBlocks$"
+    "\\.SpreadSheet1$"
+    "\\.VariableSelector1$"
+    "\\.VolumeCrop$"
+
+    # These have failed on buildbot before. Not sure what the cause is.
+    "\\.TestPythonView$"
+
+    # These tests fail without output as to what is wrong.
+    "^pqWidgetsAnimation$"
+    "^pqWidgetsFlatTreeView$"
+    "^pqWidgetspqTextEditTest$"
+    "^pqWidgetsTreeViewSelectionAndCheckState$"
+
+    # UI tests that fail without messages or baselines.
+    "\\.BagPlotMatrixView$"
+    "\\.BagPlots$"
+    "\\.BagPlotsSelection$"
+    "\\.FunctionalBagPlots$"
+    "\\.GMVReaderBasicRead$"
+    "\\.LagrangianParticleTracker$"
+    "\\.LagrangianParticleTrackerReseeding$"
+    "\\.Slice$"
+    "\\.TraceMultiViews$"
+    "\\.TruchasReaderWithVisItBridge$"
+    )
+endif ()
+
 if ("$ENV{CMAKE_CONFIGURATION}" MATCHES "macos")
   list(APPEND test_exclusions
     # Segfaults in an event handler

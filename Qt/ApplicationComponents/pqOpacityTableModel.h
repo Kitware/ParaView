@@ -47,7 +47,7 @@ class pqOpacityTableModel : public QAbstractTableModel
 public:
   pqOpacityTableModel(pqColorOpacityEditorWidget* widget, QObject* parentObject = 0);
 
-  ~pqOpacityTableModel() override {}
+  ~pqOpacityTableModel() override;
 
   /**
   * All columns are editable.

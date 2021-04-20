@@ -134,6 +134,10 @@ void pqDoubleSliderWidget::editingFinished()
 //-----------------------------------------------------------------------------
 void pqDoubleSliderWidget::setValidator(QDoubleValidator* validator)
 {
+  if (validator && !validator->parent())
+  {
+    validator->setParent(this); // adopt the validator to avoid leaking it
+  }
   this->DoubleLineEdit->setValidator(validator);
 }
 
