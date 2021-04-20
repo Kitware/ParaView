@@ -15,5 +15,5 @@ pandas==1.1.3
 
 # ParaViewWeb
 Twisted==20.3.0
-autobahn==20.7.1
+autobahn==20.12.3
 wslink==0.2.0
