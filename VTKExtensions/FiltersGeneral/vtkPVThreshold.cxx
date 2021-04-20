@@ -16,18 +16,14 @@
 #include "vtkPVThreshold.h"
 
 #include "vtkAppendFilter.h"
-#include "vtkDataObject.h"
 #include "vtkDataSet.h"
-#include "vtkDataSetAttributes.h"
 #include "vtkDemandDrivenPipeline.h"
 #include "vtkHyperTreeGrid.h"
 #include "vtkHyperTreeGridThreshold.h"
 #include "vtkInformation.h"
-#include "vtkInformationStringVectorKey.h"
 #include "vtkInformationVector.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
-#include "vtkSetGet.h"
 #include "vtkUnstructuredGrid.h"
 
 #include <limits>
@@ -112,14 +108,11 @@ int vtkPVThreshold::RequestData(
 int vtkPVThreshold::ProcessRequest(
   vtkInformation* request, vtkInformationVector** inputVector, vtkInformationVector* outputVector)
 {
-  // create the output
+  // this is needed since vtkUnstructuredGridAlgorithm does not have a
+  // `RequestDataObject`.
   if (request->Has(vtkDemandDrivenPipeline::REQUEST_DATA_OBJECT()))
   {
     return this->RequestDataObject(request, inputVector, outputVector);
-  }
-  if (request->Has(vtkDemandDrivenPipeline::REQUEST_DATA()))
-  {
-    return this->RequestData(request, inputVector, outputVector);
   }
 
   return this->Superclass::ProcessRequest(request, inputVector, outputVector);
@@ -170,9 +163,7 @@ int vtkPVThreshold::RequestDataObject(vtkInformation* vtkNotUsed(request),
 int vtkPVThreshold::FillInputPortInformation(int port, vtkInformation* info)
 {
   this->Superclass::FillInputPortInformation(port, info);
-  vtkInformationStringVectorKey::SafeDownCast(
-    info->GetKey(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE()))
-    ->Append(info, "vtkHyperTreeGrid");
+  info->Append(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkHyperTreeGrid");
   return 1;
 }
 
