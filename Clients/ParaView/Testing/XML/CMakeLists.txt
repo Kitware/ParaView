@@ -872,7 +872,6 @@ list(APPEND TESTS_WITH_BASELINES
   EnSightTensorInversionBin.xml
   ExodusGlobalDataWithRestarts.xml
   ExodusSingleTimeStep.xml
-  ExodusXML.xml
   ExpandSelection.xml
   ExportLinePlotToCSV.xml
   ExportLinePlotToTSV.xml
