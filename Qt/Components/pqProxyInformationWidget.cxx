@@ -541,7 +541,7 @@ public:
                            .arg(bds[1] - bds[0])
                            .arg(bds[2])
                            .arg(bds[3])
-                           .arg(bds[3] - bds[1])
+                           .arg(bds[3] - bds[2])
                            .arg(bds[4])
                            .arg(bds[5])
                            .arg(bds[5] - bds[4]));
@@ -567,7 +567,7 @@ public:
                             .arg(l.toString(exts[1] - exts[0] + 1))
                             .arg(l.toString(exts[2]))
                             .arg(l.toString(exts[3]))
-                            .arg(l.toString(exts[3] - exts[1] + 1))
+                            .arg(l.toString(exts[3] - exts[2] + 1))
                             .arg(l.toString(exts[4]))
                             .arg(l.toString(exts[5]))
                             .arg(l.toString(exts[5] - exts[4] + 1)));

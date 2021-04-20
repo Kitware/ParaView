@@ -569,6 +569,7 @@ SET (TESTS_WITHOUT_BASELINES
   ExportSpreadsheetFormatting.xml
   FavoritesFilters.xml
   FindWidget.xml
+  InformationPanel.xml
   LogViewer.xml
   ModifyGUIWindowTitle.xml
   OpacityWidgetRange.xml
