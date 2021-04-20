@@ -59,6 +59,7 @@ int TestValidateProxies(int argc, char* argv[])
   exceptions.insert(PairType("internal_readers", "VisItSeriesReaderBase"));
   exceptions.insert(PairType("extract_writers", "JPG"));
   exceptions.insert(PairType("extract_writers", "PNG"));
+  exceptions.insert(PairType("extract_writers", "RecolorableImage"));
   if (!pdm->HasDefinition("writers", "PPLYWriter"))
   {
     exceptions.insert(PairType("extract_writers", "PLY"));
