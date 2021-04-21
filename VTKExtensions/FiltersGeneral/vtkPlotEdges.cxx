@@ -533,7 +533,6 @@ double vtkPlotEdges::Node::ComputeConnectionScore(Segment* segment1, Segment* se
 
 vtkStandardNewMacro(vtkPlotEdges);
 
-// Construct object with MaximumLength set to 1000.
 vtkPlotEdges::vtkPlotEdges()
 {
   this->SetNumberOfOutputPorts(1);
@@ -545,9 +544,10 @@ int vtkPlotEdges::FillInputPortInformation(int port, vtkInformation* info)
 {
   if (port == 0)
   {
-    info->Remove(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE());
-    info->Append(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkPolyData");
+    info->Set(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkPolyData");
     info->Append(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkMultiBlockDataSet");
+    info->Append(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkPartitionedDataSet");
+    info->Append(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkPartitionedDataSetCollection");
     return 1;
   }
   return 0;
@@ -608,6 +608,8 @@ int vtkPlotEdges::RequestData(vtkInformation* vtkNotUsed(request),
     return 1;
   }
 
+  auto inputDO = vtkDataObject::GetData(inInfo);
+  vtkErrorMacro("Input data type of '" << inputDO->GetClassName() << "' is not supported yet.");
   return 0;
 }
 
