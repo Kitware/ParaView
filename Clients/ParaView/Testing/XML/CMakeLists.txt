@@ -1434,7 +1434,6 @@ set (LogColorMapToggle_FORCE_SERIAL TRUE) # since this pops up output window
 set (ColorOpacityTableEditing_FORCE_SERIAL TRUE) # since this uses popup-menu
 set (SimpleInteraction_FORCE_SERIAL TRUE) # since this uses popup-menu
 set (ExportFilteredColumnsSpreadsheet_FORCE_SERIAL TRUE) # since this uses popup-menu
-set (FindWidget_FORCE_SERIAL TRUE) # Uses inline edit popups
 set (PropertyLink_FORCE_SERIAL TRUE)
 set (TestPythonView_FORCE_SERIAL TRUE) # Seems to work better in serial.
 set (SaveColorMap_FORCE_SERIAL TRUE) # Uses inline edit popups
