@@ -1210,7 +1210,7 @@ if(PARAVIEW_USE_PYTHON)
     TraceExodus.xml
     TraceExportAndSaveData.xml
     TraceSaveGeometry.xml
-    TraceStatisticsFilter.xml
+    # TraceStatisticsFilter.xml (see paraview/paraview#20661)
     TraceSupplementalProxiesFully.xml
     TraceTimeControls.xml
     TraceWithoutRenderingComponents.xml
