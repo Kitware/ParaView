@@ -1,6 +1,6 @@
 <ServerManagerConfiguration>
   <ProxyGroup name="sources">
-    <SourceProxy class="vtkIossReader" label="Ioss Reader" name="IossReader" executive="vtkReaderExecutive" >
+    <SourceProxy class="vtkIossReader" label="Ioss Reader" name="IossReader">
       <StringVectorProperty clean_command="ClearFileNames"
                             command="AddFileName"
                             name="FileName"
