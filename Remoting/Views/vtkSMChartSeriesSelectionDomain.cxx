@@ -289,7 +289,7 @@ void vtkSMChartSeriesSelectionDomain::PopulateAvailableArrays(const std::string&
   //   (dataInfo->GetCompositeDataInformation()->GetDataIsMultiPiece() == 0));
   vtkChartRepresentation* chartRepr =
     vtkChartRepresentation::SafeDownCast(this->GetProperty()->GetParent()->GetClientSideObject());
-  if (!chartRepr)
+  if (!chartRepr || !dataInfo)
   {
     return;
   }
