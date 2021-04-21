@@ -1020,7 +1020,7 @@ list(APPEND TESTS_WITH_BASELINES
   TensorGlyph.xml
   TemporalInterpolator.xml
   TemporalShiftScale.xml
-  TestGroupDataFromTimeSeries.xml
+  # TestGroupDataFromTimeSeries.xml paraview/paraview#20660
   TestSelectionOnMultipiece.xml
   TimeInspector.xml
   TimeStepProgressBar.xml
