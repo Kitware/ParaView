@@ -2,10 +2,11 @@
 <pqevents>
   <pqevent object="pqClientMainWindow/MainControlsToolbar/actionOpenData" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/FileOpenDialog" command="filesSelected" arguments="$PARAVIEW_DATA_ROOT/Testing/Data/can.ex2" />
-  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/SearchBox/SearchLineEdit" command="set_string" arguments="mo" />
-  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/HasModeShapes/CheckBox" command="set_boolean" arguments="true" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuFilters" />
+  <pqevent object="pqClientMainWindow/menubar/menuFilters/Alphabetical" command="activate" arguments="AnimateModes" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/SelectInputVectors/ComboBox" command="activated" arguments="displ" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/ModeShape/IntRangeWidget/LineEdit" command="set_string" arguments="35" />
-  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/ModeShape/IntRangeWidget/LineEdit" command="key" arguments="16777221" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/SearchBox/SearchLineEdit" command="set_string" arguments="" />
   <pqevent object="pqClientMainWindow/VCRToolbar/actionVCRNextFrame" command="activate" arguments="" />
@@ -14,13 +15,6 @@
   <pqevent object="pqClientMainWindow/VCRToolbar/actionVCRNextFrame" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/VCRToolbar/actionVCRNextFrame" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/cameraToolbar/actionPositiveY" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/variableToolbar/displayColor/Variables" command="set_string" arguments="ObjectId" />
-  <pqevent object="pqClientMainWindow/variableToolbar/actionScalarBarVisibility" command="set_boolean" arguments="false" />
-
-  <!-- Create the AnnotateGlobalData filter to test that works with Mode Shapes -->
-  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/ArrayStatus/SelectionWidget/1QHeaderView0" command="mousePress" arguments="1,1,0,0,0,0" />
-  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/ArrayStatus/SelectionWidget/1QHeaderView0" command="mouseRelease" arguments="1,0,0,0,0,0" />
-  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
 
   <!-- Lets try to test paraview/paraview#17416 -->
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/DisplayFrame/ProxyPanel/Opacity/DoubleRangeWidget/DoubleLineEdit" command="set_string" arguments="0.5" />
@@ -31,9 +25,10 @@
   -->
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/DisplayFrame/ProxyPanel/Opacity/DoubleRangeWidget/DoubleLineEdit" command="set_string" arguments="1.0" />
 
+  <!-- Create the AnnotateGlobalData filter to test that works with Mode Shapes -->
   <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuFilters" />
   <pqevent object="pqClientMainWindow/menubar/menuFilters/Annotation" command="activate" arguments="AnnotateGlobalData" />
-  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/SelectArrays/ComboBox" command="set_string" arguments="KE" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/SelectArrays/ComboBox" command="set_string" arguments="ke" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/Prefix/Prefix" command="set_string" arguments="KE is: " />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/Format/Format" command="set_string" arguments="%8.1f" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />

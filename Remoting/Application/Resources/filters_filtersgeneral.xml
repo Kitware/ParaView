@@ -2289,5 +2289,100 @@
       <!-- End WarpVector -->
     </SourceProxy>
 
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkAnimateModes" name="AnimateModes" label="Animate Modes">
+      <Documentation short_help="Animate mode shapes">
+         For certain file formats, like Exodus, simulation codes may use the timesteps
+         and time values to represent quantities other than time. For example, for
+         modal analysis, the natural frequency for each mode may be used as the time
+         value. vtkAnimateModes can be used to reinterpret time as mode shapes.
+         The filter can also animate vibrations for each mode shape (when
+         AnimateVibrations is set to true). In that case, the time requested by the
+         downstream pipeline is used to scale the displacement magnitude
+         for a mode shape in a sinusoidal pattern, `cos(2*pi * requested-time)`.
+      </Documentation>
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkDataSet" />
+        </DataTypeDomain>
+        <InputArrayDomain attribute_type="point"
+                          name="input_array"
+                          number_of_components="3" />
+        <Documentation>This property specifies the input to the filter.</Documentation>
+      </InputProperty>
+
+      <StringVectorProperty command="SetInputArrayToProcess"
+                            element_types="0 0 0 0 2"
+                            label="Vectors"
+                            name="SelectInputVectors"
+                            number_of_elements="5"
+                            panel_visibility="default">
+        <ArrayListDomain attribute_type="DisplacementVectors" name="array_list">
+          <RequiredProperties>
+            <Property function="Input" name="Input" />
+          </RequiredProperties>
+        </ArrayListDomain>
+        <Documentation>Specify the displacement vectors array</Documentation>
+      </StringVectorProperty>
+
+
+      <IntVectorProperty command="GetModeShapesRange"
+                         information_only="1"
+                         name="ModeShapesRangeInfo" />
+
+      <IntVectorProperty command="SetModeShape"
+                         name="ModeShape"
+                         number_of_elements="1"
+                         default_values="1">
+        <IntRangeDomain name="range" default_mode="min">
+          <RequiredProperties>
+            <Property function="Range" name="ModeShapesRangeInfo" />
+          </RequiredProperties>
+        </IntRangeDomain>
+        <Documentation>Specify which mode shape to animate.</Documentation>
+      </IntVectorProperty>
+
+      <DoubleVectorProperty name="DisplacementMagnitude"
+                            command="SetDisplacementMagnitude"
+                            number_of_elements="1"
+                            default_values="1.0">
+        <DoubleRangeDomain name="range" />
+        <Documentation>
+          Specify a scale factor to apply the displacements.
+        </Documentation>
+      </DoubleVectorProperty>
+
+      <IntVectorProperty name="AnimateVibrations"
+        command="SetAnimateVibrations"
+        number_of_elements="1"
+        default_values="1">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Specify whether the filter should animate the vibrations.
+          When set, the requested time is used compute
+          displacements for the chosen mode shape.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="DisplacementPreapplied"
+                         command="SetDisplacementPreapplied"
+                         number_of_elements="1"
+                         default_values="1">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Specify whether displacements are pre-applied.
+        </Documentation>
+      </IntVectorProperty>
+
+      <DoubleVectorProperty information_only="1"
+                            name="TimeRange"
+                            command="GetTimeRange" />
+      <!-- end of "AnimateModes" -->
+    </SourceProxy>
   </ProxyGroup>
 </ServerManagerConfiguration>
