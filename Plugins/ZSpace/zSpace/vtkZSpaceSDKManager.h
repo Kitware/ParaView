@@ -54,6 +54,11 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /**
+   * Return the singleton instance with no reference counting.
+   */
+  static vtkZSpaceSDKManager* GetInstance();
+
+  /**
    * Initialize the zSpace SDK and check for zSpace devices :
    * the display, the stylus and the head trackers.
    */

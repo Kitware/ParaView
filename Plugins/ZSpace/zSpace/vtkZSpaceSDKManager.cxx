@@ -32,6 +32,18 @@ vtkStandardNewMacro(vtkZSpaceSDKManager);
     vtkErrorMacro(<< "vtkZSpaceSDKManager::" << #fn << " error : " << errorString);                \
   }
 
+//----------------------------------------------------------------------------
+vtkZSpaceSDKManager* vtkZSpaceSDKManager::GetInstance()
+{
+  static vtkSmartPointer<vtkZSpaceSDKManager> instance = nullptr;
+  if (instance.GetPointer() == nullptr)
+  {
+    instance = vtkSmartPointer<vtkZSpaceSDKManager>::New();
+  }
+
+  return instance;
+}
+
 //------------------------------------------------------------------------------
 vtkZSpaceSDKManager::vtkZSpaceSDKManager()
 {
@@ -55,6 +67,13 @@ void vtkZSpaceSDKManager::InitializeZSpace()
   // calling any other zSpace API.
   error = zcInitialize(&this->ZSpaceContext);
   ZSPACE_CHECK_ERROR(zcInitialize, error);
+
+  // Check the SDK version
+  ZSInt32 major, minor, patch;
+  error = zcGetRuntimeVersion(this->ZSpaceContext, &major, &minor, &patch);
+  ZSPACE_CHECK_ERROR(zcGetRuntimeVersion, error);
+
+  vtkDebugMacro(<< "zSpace SDK version: " << major << "." << minor << "." << patch);
 
   int numDisplays;
   error = zcGetNumDisplays(this->ZSpaceContext, &numDisplays);

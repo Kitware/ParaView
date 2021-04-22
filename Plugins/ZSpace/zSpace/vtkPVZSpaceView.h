@@ -24,7 +24,8 @@
  *
  * This only works on Windows as the zSpace SDK is only available on this OS.
  *
- * This class holds a vtkZSpaceSDKManager object to communicate with the zSpace SDK :
+ * This class uses the singleton class vtkZSpaceSDKManager object to communicate with the zSpace SDK
+ * :
  * -  get the camera view and projection matrix from the zSpace sdk and give it to the
  *    actual camera
  * -  handle interactions by getting stylus state from zSpace sdk and invoking event for the zSpace
@@ -106,7 +107,7 @@ public:
    * the viewport.
    * Restore previous camera settings at the end.
    */
-  void SelectWithRay(vtkProp3D* prop = nullptr);
+  void SelectWithRay(const double pos[3]);
 
   //@{
   /**
@@ -116,28 +117,6 @@ public:
   vtkSetClampMacro(PickingFieldAssociation, int, vtkDataObject::FIELD_ASSOCIATION_POINTS,
     vtkDataObject::FIELD_ASSOCIATION_CELLS);
   vtkGetMacro(PickingFieldAssociation, int);
-  //@}
-
-  //@{
-  /**
-   * Get/Set the current world event position and orientation.
-   * This is needed to simulate the RenderWindowInteractor3D behavior.
-   */
-  vtkGetVector3Macro(WorldEventPosition, double);
-  vtkSetVector3Macro(WorldEventPosition, double);
-  vtkGetVector4Macro(WorldEventOrientation, double);
-  vtkSetVector4Macro(WorldEventOrientation, double);
-  //@}
-
-  //@{
-  /**
-   * Get/Set the last world event position and orientation.
-   * This is needed to simulate the RenderWindowInteractor3D behavior.
-   */
-  vtkGetVector3Macro(LastWorldEventPosition, double);
-  vtkSetVector3Macro(LastWorldEventPosition, double);
-  vtkGetVector4Macro(LastWorldEventOrientation, double);
-  vtkSetVector4Macro(LastWorldEventOrientation, double);
   //@}
 
   /**
@@ -168,46 +147,7 @@ protected:
    */
   void ResetCameraClippingRange() override{};
 
-  /**
-   * Update WorldEventPosition and WorldEventOrientation, then
-   * call event functions depending on the zSpace buttons states.
-   */
-  void HandleInteractions();
-
-  //@{
-  /**
-   * LeftButton event function (invoke Button3DEvent)
-   * Initiate a clip : choose a clipping plane origin
-   * and normal with the stylus.
-   */
-  void OnLeftButtonDown(vtkEventDataDevice3D*);
-  void OnLeftButtonUp(vtkEventDataDevice3D*);
-  //@}
-
-  //@{
-  /**
-   * MiddleButton event function (invoke Button3DEvent)
-   * Allows to position a prop with the stylus.
-   */
-  void OnMiddleButtonDown(vtkEventDataDevice3D*);
-  void OnMiddleButtonUp(vtkEventDataDevice3D*);
-  //@}
-
-  //@{
-  /**
-   * LeftButton event function (invoke Button3DEvent)
-   * Perform an hardware picking with the stylus
-   * and show picked data if ShowPickedData is true.
-   */
-  void OnRightButtonDown(vtkEventDataDevice3D*);
-  void OnRightButtonUp(vtkEventDataDevice3D*);
-  //@}
-
-  /**
-   * Invoke a Move3DEvent
-   * Called at each step.
-   */
-  void OnStylusMove();
+  void SetupInteractor(vtkRenderWindowInteractor*) override;
 
 private:
   vtkPVZSpaceView(const vtkPVZSpaceView&) = delete;
@@ -215,7 +155,6 @@ private:
 
   friend class vtkPVZSpaceViewInteractorStyle;
 
-  vtkNew<vtkZSpaceSDKManager> ZSpaceSDKManager;
   vtkNew<vtkZSpaceInteractorStyle> ZSpaceInteractorStyle;
   vtkNew<vtkZSpaceRayActor> StylusRayActor;
   vtkNew<vtkZSpaceCamera> ZSpaceCamera;
@@ -224,12 +163,6 @@ private:
 
   // The field association used when picking with the ray
   int PickingFieldAssociation = vtkDataObject::FIELD_ASSOCIATION_POINTS;
-
-  double WorldEventPosition[3] = {};
-  double WorldEventOrientation[4] = {};
-
-  double LastWorldEventPosition[3] = {};
-  double LastWorldEventOrientation[4] = {};
 };
 
 #endif
