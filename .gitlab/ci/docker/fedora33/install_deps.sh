@@ -50,4 +50,11 @@ dnf config-manager --add-repo https://download.opensuse.org/repositories/science
 dnf install -y --setopt=install_weak_deps=False \
     openturns-libs openturns-devel
 
+# RPMFusion
+dnf install -y --setopt=install_weak_deps=False \
+    https://mirrors.rpmfusion.org/free/fedora/rpmfusion-free-release-33.noarch.rpm
+
+dnf install -y --setopt=install_weak_deps=False \
+    ffmpeg-devel
+
 dnf clean all
