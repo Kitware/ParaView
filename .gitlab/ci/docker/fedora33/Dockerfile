@@ -12,3 +12,6 @@ RUN sh /root/install_adios.sh
 
 COPY install_openvr.sh /root/install_openvr.sh
 RUN sh /root/install_openvr.sh
+
+COPY install_index.sh /root/install_index.sh
+RUN sh /root/install_index.sh
