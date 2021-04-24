@@ -20,6 +20,7 @@
 #include "vtkCleanPolyData.h"
 #include "vtkCompositeDataIterator.h"
 #include "vtkCutter.h"
+#include "vtkDataObjectTree.h"
 #include "vtkDataSetSurfaceFilter.h"
 #include "vtkFloatArray.h"
 #include "vtkInformation.h"
@@ -70,12 +71,14 @@ int vtkSliceAlongPolyPlane::RequestDataObject(
   // If input is vtkCompositeDataSet, output will be a vtkMultiBlockDataSet
   // otherwise it will be a vtkPolyData.
   vtkDataObject* inputDO = vtkDataObject::GetData(inputVector[0], 0);
-  if (vtkCompositeDataSet::SafeDownCast(inputDO))
+  if (auto inputDT = vtkDataObjectTree::GetData(inputVector[0], 0))
   {
-    if (vtkMultiBlockDataSet::GetData(outputVector, 0) == nullptr)
+    auto output = vtkDataObject::GetData(outputVector, 0);
+    if (output == nullptr || !output->IsA(inputDT->GetClassName()))
     {
-      vtkNew<vtkMultiBlockDataSet> output;
-      outputVector->GetInformationObject(0)->Set(vtkDataObject::DATA_OBJECT(), output.GetPointer());
+      auto clone = inputDT->NewInstance();
+      outputVector->GetInformationObject(0)->Set(vtkDataObject::DATA_OBJECT(), clone);
+      clone->FastDelete();
     }
     return 1;
   }
