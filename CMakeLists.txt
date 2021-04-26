@@ -263,6 +263,7 @@ set(paraview_default_plugins
   GMVReader
   HyperTreeGridADR
   LagrangianParticleTracker
+  LegacyExodusReader
   Moments
   MooseXfemClip
   NetCDFTimeAnnotationPlugin
