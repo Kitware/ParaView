@@ -162,30 +162,31 @@ void vtkInSituInitializationHelper::Finalize()
 }
 
 //----------------------------------------------------------------------------
-void vtkInSituInitializationHelper::AddPipeline(const std::string& path)
+vtkInSituPipeline* vtkInSituInitializationHelper::AddPipeline(const std::string& path)
 {
   if (vtkInSituInitializationHelper::Internals == nullptr)
   {
     vtkLogF(
       ERROR, "'vtkInSituInitializationHelper::AddPipeline' cannot be called before 'Initialize'.");
-    return;
+    return nullptr;
   }
 
   if (path.empty())
   {
     vtkLogF(WARNING, "Empty path specified.");
-    return;
+    return nullptr;
   }
 
   if (!vtkPSystemTools::FileExists(path.c_str()))
   {
     vtkLogF(WARNING, "File/path does not exist: '%s'. Skipping", path.c_str());
-    return;
+    return nullptr;
   }
 
   vtkNew<vtkInSituPipelinePython> pipeline;
   pipeline->SetFileName(path.c_str());
   vtkInSituInitializationHelper::AddPipeline(pipeline);
+  return pipeline;
 }
 
 //----------------------------------------------------------------------------

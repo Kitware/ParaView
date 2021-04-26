@@ -23,6 +23,39 @@ namespace initialize
 {
 namespace scripts
 {
+
+namespace args
+{
+bool verify(const std::string& protocol, const conduit::Node& n)
+{
+  vtkVLogScopeF(PARAVIEW_LOG_CATALYST_VERBOSITY(), "%s::verify", protocol.c_str());
+  if (!n.dtype().is_list())
+  {
+    vtkLogF(ERROR, "node must be a 'list'.");
+    return false;
+  }
+
+  if (n.number_of_children() == 0)
+  {
+    vtkVLogF(PARAVIEW_LOG_CATALYST_VERBOSITY(), "empty node provided.");
+  }
+
+  auto iter = n.children();
+  while (iter.has_next())
+  {
+    auto& param = iter.next();
+    if (!param.dtype().is_string())
+    {
+      vtkLogF(ERROR, "unsupported type '%s'; only string types are supported.",
+        param.dtype().name().c_str());
+      return false;
+    }
+  }
+
+  return true;
+}
+}
+
 bool verify(const std::string& protocol, const conduit::Node& n)
 {
   vtkVLogScopeF(PARAVIEW_LOG_CATALYST_VERBOSITY(), "%s: verify", protocol.c_str());
@@ -35,19 +68,50 @@ bool verify(const std::string& protocol, const conduit::Node& n)
   {
     vtkVLogF(PARAVIEW_LOG_CATALYST_VERBOSITY(), "empty 'n' provided.");
   }
+  int index = 0;
   auto iter = n.children();
   while (iter.has_next())
   {
     auto& script = iter.next();
-    if (!script.dtype().is_string())
+    if (script.dtype().is_string())
     {
-      vtkLogF(ERROR, "child-node must be a 'string'.");
-      return false;
+      // all's well, child node directly a string which is interpreted
+      // as filename.
+      vtkVLogF(PARAVIEW_LOG_CATALYST_VERBOSITY(), "script: '%s'", script.as_string().c_str());
+    }
+    else if (script.dtype().is_object())
+    {
+      if (!script.has_path("filename"))
+      {
+        vtkLogF(ERROR, "'script/%s' missing required 'filename'", iter.name().c_str());
+        return false;
+      }
+
+      if (!script["filename"].dtype().is_string())
+      {
+        vtkLogF(ERROR, "'script/%s/filename' must be a 'string'.", iter.name().c_str());
+        return false;
+      }
+
+      vtkVLogF(PARAVIEW_LOG_CATALYST_VERBOSITY(), "script (%s): '%s'",
+        n.dtype().is_object() ? iter.name().c_str() : std::to_string(index).c_str(),
+        script["filename"].as_string().c_str());
+
+      // let's verify "args", if any.
+      if (script.has_path("args"))
+      {
+        if (!args::verify(protocol + "::scripts::args", script["args"]))
+        {
+          return false;
+        }
+      }
     }
     else
     {
-      vtkVLogF(PARAVIEW_LOG_CATALYST_VERBOSITY(), "script: '%s'", script.as_string().c_str());
+      vtkLogF(ERROR, "child-node must be a 'string' or 'object'");
+      return false;
     }
+    ++index;
   }
   return true;
 }
@@ -196,7 +260,7 @@ bool verify(const std::string& protocol, const conduit::Node& n)
       return false;
     }
     vtkVLogF(
-      PARAVIEW_LOG_CATALYST_VERBOSITY(), "'timestep' set to %" PRIi64, n["timestep"].as_int64());
+      PARAVIEW_LOG_CATALYST_VERBOSITY(), "'timestep' set to %" PRIi64, n["timestep"].to_int64());
   }
   else if (n.has_child("cycle"))
   {
@@ -205,7 +269,7 @@ bool verify(const std::string& protocol, const conduit::Node& n)
       vtkLogF(ERROR, "'cycle' must be an integer.");
       return false;
     }
-    vtkVLogF(PARAVIEW_LOG_CATALYST_VERBOSITY(), "'cycle' set to %" PRIi64, n["cycle"].as_int64());
+    vtkVLogF(PARAVIEW_LOG_CATALYST_VERBOSITY(), "'cycle' set to %" PRIi64, n["cycle"].to_int64());
   }
 
   if (!n.has_child("time"))
@@ -220,7 +284,7 @@ bool verify(const std::string& protocol, const conduit::Node& n)
   }
   else
   {
-    vtkVLogF(PARAVIEW_LOG_CATALYST_VERBOSITY(), "'time' set to %lf", n["time"].as_float64());
+    vtkVLogF(PARAVIEW_LOG_CATALYST_VERBOSITY(), "'time' set to %lf", n["time"].to_float64());
   }
   return true;
 }

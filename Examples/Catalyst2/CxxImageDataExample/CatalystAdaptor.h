@@ -31,7 +31,16 @@ void Initialize(int argc, char* argv[])
     }
     else
     {
-      node["catalyst/scripts/script" + std::to_string(cc - 1)].set_string(argv[cc]);
+      const auto path = std::string(argv[cc]);
+      // note: one can simply add the script file as follows:
+      // node["catalyst/scripts/script" + std::to_string(cc - 1)].set_string(path);
+
+      // alternatively, use this form to pass optional parameters to the script.
+      const auto name = "catalyst/scripts/script" + std::to_string(cc - 1);
+      node[name + "/filename"].set_string(path);
+      node[name + "/args"].append().set_string("argument0");
+      node[name + "/args"].append().set_string("argument1=12");
+      node[name + "/args"].append().set_string("--argument3");
     }
   }
   catalyst_initialize(conduit_cpp::c_node(&node));

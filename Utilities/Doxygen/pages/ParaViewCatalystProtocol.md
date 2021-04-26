@@ -63,6 +63,14 @@ analysis.
   node with child nodes that provides paths to the Python scripts to load for
   in situ analysis.
 
+* catalyst/scripts/[name]: (optional) if present can be a 'string' or 'object'.
+  If string, it is interpreted as path to the Python script. If 'object', can
+  have following attributes.
+
+  * catalyst/scripts/[name]/filename: path to the Python script
+  * catalyst/scripts/[name]/args: (optional) if present must be of type
+  'list' with each child node of type 'string'.
+
 Additionally, one can provide a list of pre-compiled pipelines to use.
 
 * catalyst/pipelines: (optional) if present must be a 'list' or 'object' node

@@ -80,12 +80,6 @@ class CatalystV2Information:
 def import_and_validate(modulename):
     import importlib
 
-    # to support multiple pipelines, we create a container
-    # that keeps all proxies (extractors, and producers) needed by this pipeline
-    # in this helper container.
-    class Container:
-        pass
-
     m = importlib.import_module(modulename)
     _validate_and_initialize(m)
     return m
@@ -136,6 +130,14 @@ def do_catalyst_execute(module):
 def _get_active_data_description():
     helper = vtkCPPythonScriptV2Helper.GetActiveInstance()
     return helper.GetDataDescription()
+
+def _get_active_arguments():
+    helper = vtkCPPythonScriptV2Helper.GetActiveInstance()
+    slist = helper.GetArgumentsAsStringList()
+    args = []
+    for cc in range(slist.GetLength()):
+        args.append(slist.GetString(cc))
+    return args
 
 def has_customized_execution(module):
     return hasattr(module, "catalyst_execute") or \
