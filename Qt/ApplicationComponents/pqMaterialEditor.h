@@ -160,6 +160,9 @@ protected slots:
 
   void addMaterial();
   void removeMaterial();
+  void attachMaterial();
+
+  void synchronizeClientToServ();
 
   void addProperty();
   void removeProperty();

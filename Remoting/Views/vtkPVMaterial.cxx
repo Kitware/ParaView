@@ -18,6 +18,9 @@
 #include "vtkObjectFactory.h"
 
 #include "vtkTexture.h"
+#include <vtkSMProxy.h>
+#include <vtkSMProxyManager.h>
+#include <vtkSMSessionProxyManager.h>
 
 #if VTK_MODULE_ENABLE_VTK_RenderingRayTracing
 #include "vtkOSPRayMaterialLibrary.h"
@@ -58,6 +61,7 @@ const std::string& vtkPVMaterial::GetType()
 void vtkPVMaterial::AddVariable(const char* paramName, const char* value)
 {
   vtkOSPRayMaterialLibrary* lib = vtkOSPRayMaterialLibrary::SafeDownCast(this->Library);
+
   if (lib)
   {
     auto& dic = vtkOSPRayMaterialLibrary::GetParametersDictionary();
@@ -65,14 +69,25 @@ void vtkPVMaterial::AddVariable(const char* paramName, const char* value)
 
     if (paramType == vtkOSPRayMaterialLibrary::ParameterType::TEXTURE)
     {
-      // Our CurrentTexture hold the current texture selected in the
-      // corresponding pqTextureSelectorPropertyWidget
-      // created in pqMaterialAttributesDelegate
-      if (this->CurrentTexture)
+      // Find the texture by name stored in value
+      vtkSMProxyManager* proxyManager = vtkSMProxyManager::GetProxyManager();
+      vtkSMSessionProxyManager* pxm = proxyManager->GetActiveSessionProxyManager();
+      vtkSMProxy* textureProxy = pxm->GetProxy("textures", value);
+
+      if (textureProxy)
       {
-        this->CurrentTexture->Update();
+        textureProxy->UpdateVTKObjects();
+        vtkTexture* texture = vtkTexture::SafeDownCast(textureProxy->GetClientSideObject());
+        if (texture)
+        {
+          texture->Update();
+          lib->AddTexture(this->Name, paramName, texture, value);
+        }
+        else
+        {
+          vtkWarningMacro(<< "Could not find a texture with name : " << value);
+        }
       }
-      lib->AddTexture(this->Name, paramName, this->CurrentTexture);
     }
     else
     {

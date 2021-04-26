@@ -252,7 +252,8 @@
   </ProxyGroup>
   <ProxyGroup name="textures">
     <SourceProxy class="vtkTexture"
-                 name="Texture">
+                 name="Texture"
+                 processes="client|renderserver|dataserver">
       <InputProperty command="SetInputConnection"
                      name="Input">
         <ProxyGroupDomain name="groups">
@@ -304,23 +305,6 @@
         while equivalent to Map Scalars for 16-bits textures. In the case of Map Scalars, all the
         values are mapped to a generic color map.</Documentation>
       </IntVectorProperty>
-    </Proxy>
-    <Proxy class="vtkTexture"
-           name="ImageDataTexture"
-           si_class="vtkSIImageTextureProxy"
-           processes="client|renderserver|dataserver">
-      <Documentation>This is a proxy for a vtkTexture that includes an image
-        algorithm. In contrast to proxy ImageTexture, ImageDataTexture allows
-        to pass a vtkImageData directly without reading a file and transmit it
-        to the client/render server to be used for texturing. </Documentation>
-      <SubProxy>
-        <Proxy name="Source"
-               proxygroup="sources"
-               proxyname="NetworkImageData" />
-        <ExposedProperties>
-          <Property name="Input" />
-        </ExposedProperties>
-      </SubProxy>
     </Proxy>
   </ProxyGroup>
   <ProxyGroup name="props">
@@ -806,12 +790,6 @@
                  panel_visibility="never"
                  repeat_command="1">
       </StringVectorProperty>
-      <ProxyProperty command="SetTexture"
-                     name="CurrentTexture">
-        <ProxyGroupDomain name="groups">
-          <Group name="textures" />
-        </ProxyGroupDomain>
-      </ProxyProperty>
     </Proxy>
 
     <MaterialLibraryProxy class="vtkPVMaterialLibrary"
@@ -821,6 +799,12 @@
                      name="Materials"
                      remove_command="RemoveMaterial"
                      repeatable="1">
+      </ProxyProperty>
+      <ProxyProperty command="SetDummyTexture"
+                     name="DummyTexture">
+        <ProxyGroupDomain name="groups">
+          <Group name="textures" />
+        </ProxyGroupDomain>
       </ProxyProperty>
     </MaterialLibraryProxy>
   </ProxyGroup>

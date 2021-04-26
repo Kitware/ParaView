@@ -13,22 +13,5 @@
       </StringVectorProperty>
       <!-- End of NetworkImageSource -->
     </SourceProxy>
-
-    <SourceProxy class="vtkNetworkImageData"
-                 name="NetworkImageData"
-                 post_push="UpdateBuffer"
-                 processes="client|renderserver">
-      <InputProperty command="SetInputConnection"
-                     name="Input">
-        <ProxyGroupDomain name="groups">
-          <Group name="sources" />
-          <Group name="filters" />
-        </ProxyGroupDomain>
-        <DataTypeDomain name="input_type">
-          <DataType value="vtkImageData" />
-        </DataTypeDomain>
-      </InputProperty>
-    <!-- End of NetworkImageData -->
-    </SourceProxy>
   </ProxyGroup>
 </ServerManagerConfiguration>

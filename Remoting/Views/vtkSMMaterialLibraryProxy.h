@@ -24,6 +24,7 @@
 #ifndef vtkSMMaterialLibraryProxy_h
 #define vtkSMMaterialLibraryProxy_h
 
+#include "vtkPVSession.h"
 #include "vtkRemotingViewsModule.h" //needed for exports
 #include "vtkSMProxy.h"
 
@@ -34,9 +35,11 @@ public:
   vtkTypeMacro(vtkSMMaterialLibraryProxy, vtkSMProxy);
 
   /**
-   * Copies the Material library on the root node of server to the client.
+   * Copies the Material library on the root node of server to the client by default.
+   * You can also specify the start and end location with \p from and \p to arguments.
    */
-  void Synchronize();
+  void Synchronize(vtkPVSession::ServerFlags from = vtkPVSession::RENDER_SERVER_ROOT,
+    vtkPVSession::ServerFlags to = vtkPVSession::CLIENT);
 
   /**
    * Reads default materials on the process.
@@ -47,6 +50,12 @@ public:
    * Reads and specified materials.
    */
   void LoadMaterials(const char*);
+
+  /**
+   * After loading materials in the OSPRay material library, this function is used to
+   * iterate over all stored materials and create the material proxy accordingly.
+   */
+  void CreateProxies();
 
 protected:
   vtkSMMaterialLibraryProxy() = default;

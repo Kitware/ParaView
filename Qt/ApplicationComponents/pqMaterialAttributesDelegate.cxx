@@ -259,27 +259,16 @@ QWidget* pqMaterialAttributesDelegate::createEditor(
       case vtkOSPRayMaterialLibrary::ParameterType::TEXTURE:
       {
         pqServer* server = pqActiveObjects::instance().activeServer();
+        vtkSMProxy* proxy =
+          server->proxyManager()->FindProxy("materiallibrary", "materials", "MaterialLibrary");
 
-        // Let's find the vtkPVMaterial proxy that corresponds to the current material
-        pqMaterialEditor* matEditor = qobject_cast<pqMaterialEditor*>(this->parent());
-        if (matEditor)
-        {
-          vtkSMProxy* matProxy = matEditor->materialProxy(matEditor->currentMaterialName());
-
-          // now link its current texture to the texture selector
-          vtkSMProxy* textureProxy =
-            server->proxyManager()->GetProxy(variant.toString().toLocal8Bit().data());
-
-          // CurrentTexture will hold the selected texture from the TextureSelector
-          vtkSMPropertyHelper(matProxy, "CurrentTexture").Set(textureProxy);
-
-          pqTextureSelectorPropertyWidget* widget = new pqTextureSelectorPropertyWidget(
-            matProxy, matProxy->GetProperty("CurrentTexture"), parent);
-          return widget;
-        }
-
-        // Else return nullptr
-        return nullptr;
+        // dummy texture is used to set the default value of the combobox
+        vtkSMProxy* textureProxy =
+          server->proxyManager()->GetProxy(variant.toString().toLocal8Bit().data());
+        vtkSMPropertyHelper(proxy, "DummyTexture").Set(textureProxy);
+        pqTextureSelectorPropertyWidget* widget =
+          new pqTextureSelectorPropertyWidget(proxy, proxy->GetProperty("DummyTexture"), parent);
+        return widget;
       }
     }
   }

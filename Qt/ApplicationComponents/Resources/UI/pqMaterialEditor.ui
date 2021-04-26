@@ -26,7 +26,11 @@
       <number>2</number>
      </property>
      <item>
-      <widget class="QComboBox" name="SelectMaterial"/>
+      <widget class="QComboBox" name="SelectMaterial">
+       <property name="toolTip">
+        <string>Browse through the currently loaded materials</string>
+       </property>
+      </widget>
      </item>
      <item>
       <widget class="QToolButton" name="AddMaterial">
@@ -82,6 +86,9 @@
          <bold>false</bold>
         </font>
        </property>
+       <property name="toolTip">
+        <string>OSPRay specific type of material</string>
+       </property>
        <property name="text">
         <string>Material Type: &lt;none&gt;</string>
        </property>
@@ -103,6 +110,25 @@
        </property>
       </spacer>
      </item>
+     <item>
+      <widget class="QPushButton" name="AttachMaterial">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="focusPolicy">
+        <enum>Qt::TabFocus</enum>
+       </property>
+       <property name="toolTip">
+        <string>Attach current material to the active selection in the active view</string>
+       </property>
+       <property name="text">
+        <string>Attach</string>
+       </property>
+      </widget>
+     </item>
     </layout>
    </item>
    <item>
@@ -121,8 +147,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>462</width>
-        <height>116</height>
+        <width>456</width>
+        <height>112</height>
        </rect>
       </property>
       <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,0">
@@ -145,6 +171,9 @@
         <layout class="QVBoxLayout" name="verticalLayoutToolbar">
          <item>
           <widget class="QToolButton" name="AddProperty">
+           <property name="toolTip">
+            <string>Add new shader variable</string>
+           </property>
            <property name="text">
             <string/>
            </property>
@@ -156,6 +185,9 @@
          </item>
          <item>
           <widget class="QToolButton" name="RemoveProperty">
+           <property name="toolTip">
+            <string>Remove selected shader variable. This reset the value to its default value.</string>
+           </property>
            <property name="text">
             <string/>
            </property>
@@ -180,6 +212,9 @@
          </item>
          <item>
           <widget class="QToolButton" name="DeleteProperties">
+           <property name="toolTip">
+            <string>Remove all shader variables of the current material and reset them to their default value.</string>
+           </property>
            <property name="text">
             <string/>
            </property>

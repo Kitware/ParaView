@@ -37,6 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkMath.h"
 #include "vtkPVMaterial.h"
 #include "vtkPVMaterialLibrary.h"
+#include "vtkPVRenderView.h"
 #include "vtkProcessModule.h"
 #include "vtkSMMaterialLibraryProxy.h"
 #include "vtkSMPropertyHelper.h"
@@ -323,6 +324,8 @@ pqMaterialEditor::pqMaterialEditor(QWidget* parentObject)
     this->Internals->Ui.RemoveMaterial, SIGNAL(clicked()), this, SLOT(removeMaterial()));
   QObject::connect(
     this->Internals->Ui.LoadMaterials, SIGNAL(clicked()), this, SLOT(loadMaterials()));
+  QObject::connect(
+    this->Internals->Ui.AttachMaterial, SIGNAL(clicked()), this, SLOT(attachMaterial()));
 
   // attributes
   QObject::connect(this->Internals->Ui.SelectMaterial, SIGNAL(currentIndexChanged(const QString&)),
@@ -492,6 +495,64 @@ void pqMaterialEditor::removeMaterial()
 }
 
 //-----------------------------------------------------------------------------
+void pqMaterialEditor::attachMaterial()
+{
+  QString currentMaterial = this->currentMaterialName();
+  if (currentMaterial.isEmpty())
+  {
+    return;
+  }
+
+  pqPipelineSource* activeObject = pqActiveObjects::instance().activeSource();
+  if (!activeObject)
+  {
+    vtkGenericWarningMacro("An active source should exist to be able to attach a material to it.");
+    return;
+  }
+
+  pqView* activeView = pqActiveObjects::instance().activeView();
+  vtkPVRenderView* activeRenderView = nullptr;
+  if (activeView)
+  {
+    activeRenderView = vtkPVRenderView::SafeDownCast(activeView->getClientSideView());
+    if (!activeRenderView || !activeRenderView->GetEnableOSPRay())
+    {
+      vtkGenericWarningMacro("A valid active render view should exist with OSPRay enabled.");
+      return;
+    }
+  }
+
+  auto* activeRepresentation = activeObject->getRepresentation(activeView);
+  if (activeRepresentation)
+  {
+    vtkSMProxy* representationProxy = activeRepresentation->getProxy();
+    if (representationProxy && representationProxy->GetProperty("OSPRayMaterial"))
+    {
+      vtkSMPropertyHelper(representationProxy, "OSPRayMaterial")
+        .Set(currentMaterial.toStdString().c_str());
+      representationProxy->UpdateProperty("OSPRayMaterial");
+      activeView->render();
+    }
+    else
+    {
+      vtkGenericWarningMacro("Current representation is not compatible with OSPRay materials.");
+    }
+  }
+}
+
+//-----------------------------------------------------------------------------
+void pqMaterialEditor::synchronizeClientToServ()
+{
+  vtkSMMaterialLibraryProxy* ml =
+    vtkSMMaterialLibraryProxy::SafeDownCast(this->materialLibraryProxy());
+
+  if (ml)
+  {
+    ml->Synchronize(vtkPVSession::CLIENT, vtkPVSession::RENDER_SERVER_ROOT);
+  }
+}
+
+//-----------------------------------------------------------------------------
 std::vector<std::string> pqMaterialEditor::availableParameters()
 {
   std::vector<std::string> availableList;
@@ -622,7 +683,6 @@ void pqMaterialEditor::removeProperties(vtkSMProxy* proxy, const QSet<QString>& 
 //-----------------------------------------------------------------------------
 void pqMaterialEditor::removeProperty()
 {
-  // Tache 8.1.? : RemoveProperty reset all properties
   vtkOSPRayMaterialLibrary* ml = this->materialLibrary();
 
   if (ml)
@@ -703,6 +763,9 @@ void pqMaterialEditor::propertyChanged(const QModelIndex& topLeft, const QModelI
     }
   }
 
+  // Synchronize
+  this->synchronizeClientToServ();
+
   if (needRender)
   {
     pqApplicationCore* app = pqApplicationCore::instance();
@@ -734,6 +797,8 @@ void pqMaterialEditor::updateMaterialList()
         vtkSMPropertyHelper(matProxy, "Name").GetAsString());
     }
   }
+
+  this->synchronizeClientToServ();
 }
 
 //-----------------------------------------------------------------------------
@@ -760,5 +825,6 @@ void pqMaterialEditor::updateCurrentMaterial(const QString& label)
   this->Internals->AttributesModel.setProxy(proxy);
   this->Internals->AttributesModel.reset();
   this->propertyChanged(QModelIndex(), QModelIndex());
+  this->synchronizeClientToServ();
 #endif
 }

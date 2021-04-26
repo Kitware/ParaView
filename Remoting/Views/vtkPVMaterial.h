@@ -29,8 +29,6 @@
 #include <initializer_list>
 #include <string>
 
-class vtkTexture;
-
 class VTKREMOTINGVIEWS_EXPORT vtkPVMaterial : public vtkObject
 {
 public:
@@ -47,7 +45,6 @@ public:
   void RemoveAllVariables();
 
   void SetLibrary(vtkObject* lib);
-  void SetTexture(vtkTexture* tex) { this->CurrentTexture = tex; }
 
 protected:
   vtkPVMaterial() = default;
@@ -56,7 +53,6 @@ protected:
   std::string Name;
   std::string Type;
   vtkObject* Library = nullptr;
-  vtkTexture* CurrentTexture = nullptr;
 
 private:
   vtkPVMaterial(const vtkPVMaterial&) = delete;

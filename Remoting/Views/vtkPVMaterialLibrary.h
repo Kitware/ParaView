@@ -28,6 +28,7 @@
 #include "vtkObject.h"
 
 class vtkPVMaterial;
+class vtkTexture;
 
 class VTKREMOTINGVIEWS_EXPORT vtkPVMaterialLibrary : public vtkObject
 {
