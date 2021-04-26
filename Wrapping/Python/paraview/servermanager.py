@@ -1973,6 +1973,7 @@ class ProxyDefinitionIterator(object):
             self.SMIterator.InitTraversal()
         self.Group = None
         self.Key = None
+        self.XML = None
 
     def __iter__(self):
         return self
@@ -1984,8 +1985,9 @@ class ProxyDefinitionIterator(object):
             raise StopIteration
         self.Group = self.SMIterator.GetGroupName()
         self.Key = self.SMIterator.GetProxyName()
+        self.XML = self.SMIterator.GetProxyDefinition()
         self.SMIterator.GoToNextItem()
-        return {"group": self.Group, "key":self.Key }
+        return {"group" : self.Group, "key" : self.Key, "xml" : self.XML}
 
     def GetProxyName(self):
         """Returns the key for the proxy definition last returned by the call
@@ -1996,6 +1998,10 @@ class ProxyDefinitionIterator(object):
         """Returns the group for the proxy definition last returned by the
         call to '__next__()' """
         return self.Group
+
+    def GetXML(self):
+        """Returns the proxy definition XML (as vtkPVXMLElement)"""
+        return self.XML
 
     def __getattr__(self, name):
         """returns attributes from the vtkPVProxyDefinitionIterator."""
@@ -2051,17 +2057,6 @@ class ProxyIterator(object):
 
 # Caution: Observers must be global methods otherwise we run into memory
 #          leak when the interpreter get reset from the C++ layer.
-def _update_definitions_callback(self):
-    def _update_definitions(caller, event):
-        global ActiveConnection
-        # HACK: updateModules() works on ActiveConnection, hence we trick it
-        # for now.
-        old_activeconnection = ActiveConnection
-        ActiveConnection = self
-        updateModules(self.Modules)
-        ActiveConnection = old_activeconnection
-    return _update_definitions
-
 class Connection(object):
     """
       This is a python representation for a session/connection.
@@ -2072,7 +2067,6 @@ class Connection(object):
         global ActiveConnection
         self.ID = connectionId
         self.Session = session
-        self.Modules = PVModule()
         self.Alive = True
         self.DefinitionObserverTag = 0
         self.CustomDefinitionObserverTag = 0
@@ -2081,10 +2075,7 @@ class Connection(object):
         ActiveConnection = self
 
         # Build the list of available proxies for this connection.
-        _createModules(self.Modules)
-
-        # additionally, if the proxy definitions change, we monitor them.
-        self.AttachDefinitionUpdater()
+        self.ProxiesNS = ConnectionProxyNamespaces(self.Session)
 
         ActiveConnection = None
         #SetActiveConnection(self)
@@ -2114,15 +2105,6 @@ class Connection(object):
         """Returns the number of partitions on the data server for this
            connection"""
         return self.Session.GetServerInformation().GetNumberOfProcesses()
-
-    def AttachDefinitionUpdater(self):
-        """Attach observer to automatically update modules when needed."""
-        dfnMgr = self.Session.GetProxyDefinitionManager()
-        self.DefinitionObserverTag = dfnMgr.AddObserver(
-            dfnMgr.ProxyDefinitionsUpdated, _update_definitions_callback(self))
-        self.CustomDefinitionObserverTag = dfnMgr.AddObserver(
-            dfnMgr.CompoundProxyDefinitionsUpdated, _update_definitions_callback(self))
-        pass
 
     def close(self):
         if self.DefinitionObserverTag:
@@ -2411,9 +2393,6 @@ def LoadPlugin(filename,  remote=True, connection=None):
     # shouldn't the extension check happen before attempting to load the plugin?
     if not status:
         raise RuntimeError ("Problem loading plugin %s" % (filename))
-    else:
-        # we should never have to call this. The modules should update automatically.
-        updateModules(connection.Modules)
 
 def Fetch(input, arg1=None, arg2=None, idx=0):
     """
@@ -2586,44 +2565,27 @@ def _getPyProxy(smproxy, outputPort=0):
     first checks if there is already such an object by looking in the
     _pyproxies group and returns it if found. Otherwise, it creates a
     new one. Proxies register themselves in _pyproxies upon creation."""
+    global ActiveConnection, _pyproxies
+
     if isinstance(smproxy, Proxy):
         # if already a pyproxy, do nothing.
         return smproxy
+
     if not smproxy:
         return None
+
     if smproxy.IsA("vtkSMOutputPort"):
         return _getPyProxy(smproxy.GetSourceProxy(), smproxy.GetPortIndex())
-    try:
-        # is argument is already a Proxy instance, this takes care of it.
-        return _getPyProxy(smproxy.SMProxy, outputPort)
-    except AttributeError:
-        pass
+
     if (smproxy, outputPort) in _pyproxies:
         return _pyproxies[(smproxy, outputPort)]()
 
-    xmlName = smproxy.GetXMLName()
-    if paraview.compatibility.GetVersion() >= 3.5:
-        if smproxy.GetXMLLabel():
-            xmlName = smproxy.GetXMLLabel()
-    classForProxy = _findClassForProxy(_make_name_valid(xmlName), smproxy.GetXMLGroup())
-    if classForProxy:
-        retVal = classForProxy(proxy=smproxy, port=outputPort)
-    else:
-        # Since the class for this proxy, doesn't exist yet, we attempt to
-        # create a new class definition for it, if possible and then add it
-        # to the "misc" module. This is essential since the Python property
-        # variables for a proxy are only setup whne the Proxy class is created
-        # (in _createClass).
-        # NOTE: _createClass() takes the xml group and name, not the xml label,
-        # hence we don't pass xmlName variable.
-        classForProxy = _createClass(smproxy.GetXMLGroup(), smproxy.GetXMLName())
-        if classForProxy:
-            global misc
-            misc.__dict__[classForProxy.__name__] = classForProxy
-            retVal = classForProxy(proxy=smproxy, port=outputPort)
-        else:
-            retVal = Proxy(proxy=smproxy, port=outputPort)
-    return retVal
+    classForProxy = ActiveConnection.ProxiesNS.getClass(smproxy)
+    if not classForProxy:
+        raise RuntimeError("Failed to locate proxy class for proxy (%s, %s)" % \
+                (smproxy.GetXMLGroup(), smproxy.GetXMLName()))
+
+    return classForProxy(proxy=smproxy, port=outputPort)
 
 def _createInitialize(group, name):
     """Internal method to create an Initialize() method for the sub-classes
@@ -2659,33 +2621,6 @@ def _createSetProperty(pName):
         return self.SetPropertyWithName(propName, value)
     return setProperty
 
-def _findClassForProxy(xmlName, xmlGroup):
-    """Given the xmlName for a proxy, returns a Proxy class. Note
-    that if there are duplicates, the first one is returned."""
-    global sources, filters, writers, rendering, animation, implicit_functions,\
-           piecewise_functions, extended_sources, misc
-    if not xmlName:
-        return None
-    if xmlGroup == "sources":
-        return sources.__dict__[xmlName]
-    elif xmlGroup == "filters":
-        return filters.__dict__[xmlName]
-    elif xmlGroup == "implicit_functions":
-        return implicit_functions.__dict__[xmlName]
-    elif xmlGroup == "piecewise_functions":
-        return piecewise_functions.__dict__[xmlName]
-    elif xmlGroup == "writers":
-        return writers.__dict__[xmlName]
-    elif xmlGroup == "extended_sources":
-        return extended_sources.__dict__[xmlName]
-    elif xmlName in rendering.__dict__:
-        return rendering.__dict__[xmlName]
-    elif xmlName in animation.__dict__:
-        return animation.__dict__[xmlName]
-    elif xmlName in misc.__dict__:
-        return misc.__dict__[xmlName]
-    else:
-        return None
 
 def _printProgress(caller, event):
     """The default event handler for progress. Prints algorithm
@@ -2715,52 +2650,176 @@ def _printProgress(caller, event):
         currentAlgorithm = None
         currentProgress = 0
 
-def updateModules(m):
-    """Called when a plugin is loaded, this method updates
-    the proxy class object in all known modules."""
-
-    createModule("sources", m.sources)
-    createModule("filters", m.filters)
-    createModule("writers", m.writers)
-    createModule("representations", m.rendering)
-    createModule("views", m.rendering)
-    createModule("lookup_tables", m.rendering)
-    createModule("textures", m.rendering)
-    createModule('cameramanipulators', m.rendering)
-    createModule('annotations', m.rendering)
-    createModule("animation", m.animation)
-    createModule("misc", m.misc)
-    createModule('animation_keyframes', m.animation)
-    createModule('implicit_functions', m.implicit_functions)
-    createModule('piecewise_functions', m.piecewise_functions)
-    createModule("extended_sources", m.extended_sources)
-    createModule("incremental_point_locators", m.misc)
-    createModule("point_locators", m.misc)
-
-def _createModules(m):
-    """Called when the module is loaded, this creates sub-
-    modules for all know proxy groups."""
-
-    m.sources = createModule('sources')
-    m.filters = createModule('filters')
-    m.writers = createModule('writers')
-    m.rendering = createModule('representations')
-    createModule('views', m.rendering)
-    createModule("lookup_tables", m.rendering)
-    createModule("textures", m.rendering)
-    createModule('cameramanipulators', m.rendering)
-    createModule('annotations', m.rendering)
-    m.animation = createModule('animation')
-    createModule('animation_keyframes', m.animation)
-    m.implicit_functions = createModule('implicit_functions')
-    m.piecewise_functions = createModule('piecewise_functions')
-    m.extended_sources = createModule("extended_sources")
-    m.misc = createModule("misc")
-    createModule("incremental_point_locators", m.misc)
-    createModule("point_locators", m.misc)
-
-class PVModule(object):
+def updateModules(m=None):
+    """Deprecated. Not needed since 5.10."""
     pass
+
+class ProxyNamespace:
+    """
+    This class is a container for class types representing known proxies types.
+    Conceptually, one can think of this a Python eguivalent for a proxy group,
+    however, due to legacy reasons, it can represent proxies in more than one
+    proxy-group.
+
+    Class types are created on demand. All known proxies types can be determined
+    using `dir()` call on this instance. This avoids having to define classes
+    for all proxy types during initialization, thus speeding up initialization.
+    """
+    def __init__(self, xmlGroups, session):
+        self.xmlGroups = set(xmlGroups) if xmlGroups else set()
+        self.session = session
+
+    @staticmethod
+    def _getPyName(xml=None, smproxy=None):
+        """In ProxyNamespace, the proxies are named not using their XML name as
+        provided in the definition, but using a sanitized version of their
+        label. This change happened in ParaView 3.5. This method returns the
+        name to use given a proxy definition XML or a proxy itself based on the
+        compatibility version set."""
+        assert xml or smproxy
+        if paraview.compatibility.GetVersion() >= 3.5:
+            if xml:
+                name = xml.GetAttributeOrDefault("label", xml.GetAttribute("name"))
+            elif smproxy:
+                name = smproxy.GetXMLLabel()
+        else:
+            if xml:
+                name = xml.GetAttribute("name")
+            elif smproxy:
+                name = smproxy.GetXMLName()
+        assert name
+        return _make_name_valid(name)
+
+    def _findProxy(self, name=None, xmlname=None):
+        assert name or xmlname
+        pdm = self.session.GetProxyDefinitionManager()
+        for group in self.xmlGroups:
+            pditer = ProxyDefinitionIterator(pdm.NewSingleGroupIterator(group, pdm.ALL_DEFINITIONS))
+            for item in pditer:
+                pname = self._getPyName(xml=item["xml"])
+                if name and pname == name:
+                    return item
+                elif xmlname and xmlname == item["key"]:
+                    return item
+        return None
+
+    def __dir__(self):
+        s = set()
+        pdm = self.session.GetProxyDefinitionManager()
+        for group in self.xmlGroups:
+            pditer = ProxyDefinitionIterator(pdm.NewSingleGroupIterator(group, pdm.ALL_DEFINITIONS))
+            for item in pditer:
+                s.add(self._getPyName(xml=item["xml"]))
+        return s
+
+    def __getattr__(self, name):
+        """called when default lookup has failed; this implies that a Proxy type
+        is requested which has not been created yet.
+        """
+        ptype = self._findProxy(name=name)
+        if not ptype:
+            raise AttributeError("No Proxy type named '%s' found." % name)
+        cls = _createClass(ptype["group"], ptype["key"], apxm = self.session.GetSessionProxyManager())
+        # store class definition to avoid creating new type for each proxy.
+        setattr(self, name, cls)
+        return cls
+
+    def getDocumentation(self, name):
+        ptype = self._findProxy(name=name)
+        if not ptype:
+            raise RuntimeError("Invalid proxy '%s'" % name)
+        xml = ptype["xml"]
+        doc = xml.FindNestedElementByName("Documentation")
+        return doc.GetCharacterData() if doc and doc.GetCharacterData() else ""
+
+
+    def findClass(self, smproxy):
+        """Given a vtkSMProxy, returns the class type to use for this proxy
+        under this namespace."""
+
+        # shortcut. if the proxy's XML group is not something we are responsible
+        # for, skip it.
+        if self.xmlGroups and smproxy.GetXMLGroup() not in self.xmlGroups:
+            return None
+
+        # determine the 'name' that will be used for the class type for this proxy.
+        pname = self._getPyName(smproxy=smproxy)
+
+        # now, attempt to access it.
+        return getattr(self, pname) if pname else None
+
+class ConnectionProxyNamespaces(object):
+    """
+    This class stores class types for all known proxies on a particular session.
+    The classes are maintained in separate namespaces accessible as read-only properties
+    on an instance of this class.
+    """
+
+    def __init__(self, session):
+        self._session = session
+        self._namespaces = {}
+
+    def _get_proxy_types(self, name, xmlGroups=None):
+        if name not in self._namespaces:
+            groups = xmlGroups if xmlGroups else [ name ]
+            self._namespaces[name] = ProxyNamespace(groups, self._session)
+        return self._namespaces[name]
+
+    @classmethod
+    def _getNamespaceNames(cls):
+        return [item[0] for item in vars(cls).items() if type(item[1]) == property]
+
+    def getNamespaces(self):
+        retval = {}
+        for n in self._getNamespaceNames():
+            retval[n] = getattr(self, n)
+        return retval
+
+    def getClass(self, smproxy):
+        """
+        Given a vtkSMProxy returns a `Proxy` class subclass type appropriate for
+        the proxy. This will atttempt to reuse the class type is already seen,
+        otherwise a new one will be created.
+        """
+        for name in self._getNamespaceNames():
+            ns = getattr(self, name)
+            cls = ns.findClass(smproxy)
+            if cls:
+                return cls
+
+        nsname = smproxy.GetXMLGroup()
+
+        # if not found in prefined collections, create a new collection for the
+        # group. note, this modifies the class so all existing instances will
+        # inherit the new property being added, but that's perfectly acceptable.
+        cls = self.__class__
+        assert not hasattr(cls, nsname)
+        setattr(cls, nsname, property(lambda self: self._get_proxy_types(nsname),
+            doc = "%s proxies" % nsname))
+        ns = getattr(self, nsname)
+        return ns.findClass(smproxy)
+
+    # Here, we have some predefined proxy groups for which we setup standard
+    # namespaces. Besides the groups which had defined that combine multiple xml
+    # groups e.g. rendering, animation, and the ones used to create functions
+    # e.g sources, filters, writers, I am not sure this necessary anymore.
+    sources = property(lambda self: self._get_proxy_types("sources"), doc="source proxies")
+    filters = property(lambda self: self._get_proxy_types("filters"), doc="filter proxies")
+    writers = property(lambda self: self._get_proxy_types("writers"), doc="writers proxies")
+    rendering = property(lambda self: self._get_proxy_types("rendering",
+        ["annotations", "cameramanipulators", "lookup_tables", "representations", "textures", "views"]),
+        doc="rendering proxies")
+    animation = property(lambda self: self._get_proxy_types("animation",
+        ["animation", "animation_keyframes"]), doc="animation proxies")
+    implicit_functions = property(lambda self: self._get_proxy_types("implicit_functions"),
+            doc="implicit function proxies")
+    piecewise_functions = property(lambda self: self._get_proxy_types("piecewise_functions"),
+            doc = "piece-wise functions")
+    extended_sources = property(lambda self: self._get_proxy_types("extended_sources"),
+            doc = "extented sources")
+    misc = property(lambda self: self._get_proxy_types("misc",
+        ["misc", "incremental_point_locators", "point_locators"]),
+        doc = "miscellaneous proxies")
 
 def _make_name_valid(name):
     return paraview.make_name_valid(name)
@@ -2836,37 +2895,6 @@ def _createClass(groupName, proxyName, apxm=None, prototype=None):
 
     cobj = type(pname, superclasses, cdict)
     return cobj
-
-def createModule(groupName, mdl=None):
-    """Populates a module with proxy classes defined in the given group.
-    If mdl is not specified, it also creates the module"""
-    global ActiveConnection
-
-    if not ActiveConnection:
-      raise RuntimeError ("Please connect to a server using \"Connect\"")
-
-    pxm = ProxyManager()
-    # Use prototypes to find all proxy types.
-    pxm.InstantiateGroupPrototypes(groupName)
-
-    debug = False
-    if not mdl:
-        debug = True
-        mdl = PVModule()
-    definitionIter = pxm.NewDefinitionIterator(groupName)
-    for i in definitionIter:
-        proxyName = i['key']
-        cobj = _createClass(groupName, proxyName, apxm=pxm)
-        if cobj:
-            pname = cobj.__name__
-            if pname in mdl.__dict__ and debug:
-                paraview.print_warning(\
-                        "Warning: %s is being overwritten."\
-                        " This may point to an issue in the ParaView configuration files"\
-                        % pname)
-            # Add it to the modules dictionary
-            mdl.__dict__[pname] = cobj
-    return mdl
 
 def __determineGroup(proxy):
     """Internal method"""
@@ -3321,10 +3349,6 @@ if not paraview.fromGUI:
 
 _pyproxies = {}
 
-# Create needed sub-modules
-# We can no longer create modules, unless we have connected to a server.
-# _createModules()
-
 # Set up our custom importer (if possible)
 finder = ParaViewMetaPathFinder()
 sys.meta_path.append(finder)
@@ -3336,8 +3360,12 @@ def __exposeActiveModules__():
 
     # Expose all active module to the current servermanager module
     if ActiveConnection:
-       for m in [mName for mName in dir(ActiveConnection.Modules) if mName[0] != '_' ]:
-          exec ("global %s;%s = ActiveConnection.Modules.%s" % (m,m,m))
+        g = globals()
+        for item in ActiveConnection.ProxiesNS.getNamespaces().items():
+            g[item[0]] = item[1]
+    # need to delete obsolete groups? that will never happen since when a
+    # group is registered, it gets registered for all ConnectionProxyNamespaces
+    # instances.
 
 def GetConnectionFromId(id):
     """Returns the Connection object corresponding a connection identified by

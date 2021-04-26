@@ -10,6 +10,7 @@ message.
 """
 
 import paraview
+import builtins
 
 NotSupportedException = paraview.NotSupportedException
 
@@ -739,17 +740,17 @@ def GetProxy(module, key, **kwargs):
     version = paraview.compatibility.GetVersion()
     if version < 5.2:
         if key == "ResampleWithDataset":
-            return module.__dict__["LegacyResampleWithDataset"](**kwargs)
+            return builtins.getattr(module, "LegacyResampleWithDataset")(**kwargs)
     if version < 5.3:
         if key == "PLYReader":
             # note the case. The old reader didn't support `FileNames` property,
             # only `FileName`.
-            return module.__dict__["plyreader"](**kwargs)
+            return builtins.getattr(module, "plyreader")(**kwargs)
     if version < 5.5:
         if key == "Clip":
             # in PV 5.5 we changed the default for Clip's InsideOut property to 1 instead of 0
             # also InsideOut was changed to Invert in 5.5
-            clip = module.__dict__[key](**kwargs)
+            clip = builtins.getattr(module, key)(**kwargs)
             clip.Invert = 0
             return clip
     if version < 5.6:
@@ -758,7 +759,7 @@ def GetProxy(module, key, **kwargs):
             # different set of properties. The previous implementation was renamed to
             # GlyphLegacy.
             print("Creating GlyphLegacy")
-            glyph = module.__dict__["GlyphLegacy"](**kwargs)
+            glyph = builtins.getattr(module, "GlyphLegacy")(**kwargs)
             print(glyph)
             return glyph
     if version < 5.6:
@@ -767,17 +768,17 @@ def GetProxy(module, key, **kwargs):
             # different set of properties. The previous implementation was renamed to
             # GlyphLegacy.
             print("Creating GlyphLegacy")
-            glyph = module.__dict__["GlyphLegacy"](**kwargs)
+            glyph = builtins.getattr(module, "GlyphLegacy")(**kwargs)
             print(glyph)
             return glyph
     if version < 5.7:
         if key == "ExodusRestartReader" or key == "ExodusIIReader":
             # in 5.7, we changed the names for blocks, this preserves old
             # behavior
-            reader = module.__dict__[key](**kwargs)
+            reader = builtins.getattr(module, key)(**kwargs)
             reader.UseLegacyBlockNamesWithElementTypes = 1
             return reader
-    return module.__dict__[key](**kwargs)
+    return builtins.getattr(module, key)(**kwargs)
 
 def lookupTableUpdate(lutName):
     """

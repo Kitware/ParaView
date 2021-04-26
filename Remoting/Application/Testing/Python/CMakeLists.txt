@@ -14,9 +14,10 @@ set(PY_TESTS
   AxesGridTestGridLines.py
   CellIntegrator.py,NO_VALID
   ChangeTimeSteps.py
-  CompositeDataFieldArraysInformation.py,NO_VALID
   ColorAttributeTypeBackwardsCompatibility.py,NO_VALID
   ColorPaletteInStateFile.py
+  CompositeDataFieldArraysInformation.py,NO_VALID
+  ConnectionProxyNamespaces.py,NO_VALID
   CSVWriterReader.py,NO_VALID
   GenerateIdScalarsBackwardsCompatibility.py,NO_VALID
   GetActiveCamera.py,NO_VALID
