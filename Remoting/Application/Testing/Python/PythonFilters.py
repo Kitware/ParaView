@@ -281,14 +281,6 @@ def main () :
     test0('eigenvalue',   ['tensor'], 1, ['point', 'cell'])
     test0('eigenvector',  ['tensor'], 1, ['point', 'cell'])
 
-    # The global_* requires Batch tests
-    test0('global_mean', ['scalar', 'vector', 'tensor'], 1, ['point', 'cell'])
-    test0('global_max',  ['scalar', 'vector', 'tensor'], 1, ['point', 'cell'])
-    test0('global_min',  ['scalar', 'vector', 'tensor'], 1, ['point', 'cell'])
-    test0('global_mean', ['scalar'], 1, ['point', 'cell'], testComposite=True)
-    test0('global_max',  ['scalar'], 1, ['point', 'cell'], testComposite=True)
-    test0('global_min',  ['scalar'], 1, ['point', 'cell'], testComposite=True)
-
     test0('gradient',       ['scalar', 'vector'], 1, ['point', 'cell'])
     test0('inverse' ,       ['tensor'], 1, ['point', 'cell'])
     test1('jacobian',       ['quad', 'tet', 'hex'], ['cell'])
