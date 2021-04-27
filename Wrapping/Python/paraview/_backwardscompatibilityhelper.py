@@ -411,8 +411,6 @@ def setattr_fix_value(proxy, pname, value, setter_func):
     # Always keep this line last
     raise ValueError("'%s' is not a valid value for %s!" % (value, pname))
 
-_fgetattr = getattr
-
 def getattr(proxy, pname):
     """
     Attempts to emulate getattr() when called using a deprecated property name
@@ -459,7 +457,7 @@ def getattr(proxy, pname):
     global _ACubeAxesHelper
     if proxy.SMProxy.IsA("vtkSMPVRepresentationProxy") and hasattr(_ACubeAxesHelper, pname):
         if version <= 5.0:
-            return _fgetattr(_ACubeAxesHelper, pname)
+            return builtins.getattr(_ACubeAxesHelper, pname)
         else:
             raise NotSupportedException(
                     'Cube Axes and related properties are now obsolete. Please '\
