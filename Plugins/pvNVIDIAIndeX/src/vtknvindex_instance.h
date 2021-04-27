@@ -44,7 +44,6 @@ public:
   ~vtknvindex_instance();
 
   static vtknvindex_instance* get();
-  static vtknvindex_instance* create();
 
   bool is_index_viewer() const;
   bool is_index_rank() const;
@@ -108,7 +107,7 @@ private:
   bool setup_nvindex();
 
   // Shutting down NVIDIA IndeX library.
-  bool shutdown_nvindex();
+  void shutdown_nvindex();
 
   // Initialize IndeX session
   void initialize_session();
@@ -138,9 +137,6 @@ private:
 
   // Colormaps manager
   vtknvindex_colormap* m_nvindex_colormaps; // NVIDIA IndeX colormaps manager.
-
-  // IndeX instance
-  static vtknvindex_instance* s_index_instance;
 
   // Name of the configuration file for the plugin.
   static const std::string s_config_filename;
