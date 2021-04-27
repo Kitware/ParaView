@@ -1,4 +1,4 @@
-/* Copyright 2020 NVIDIA Corporation. All rights reserved.
+/* Copyright 2021 NVIDIA Corporation. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -321,7 +321,7 @@ bool vtknvindex_volumemapper::initialize_mapper(vtkVolume* vol)
 
     if (matches_whole_bounds)
     {
-      WARN_LOG << "Parallel rendering disabled, only a single GPU will be used! "
+      WARN_LOG << "Parallel rendering disabled, only a single rank will be used! "
                << "The extent of the volume piece on MPI rank " << cur_global_rank << " (of "
                << m_controller->GetNumberOfProcesses() << ") "
                << "is equal to the extent of the entire volume: [" << extent[0] << " " << extent[2]

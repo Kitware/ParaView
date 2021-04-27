@@ -1,4 +1,4 @@
-/* Copyright 2020 NVIDIA Corporation. All rights reserved.
+/* Copyright 2021 NVIDIA Corporation. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -575,13 +575,7 @@ mi::Sint32 vtknvindex_instance::authenticate_nvindex()
   // No explicit license was specified, fall back to default license.
   if (!found_license)
   {
-#if (NVIDIA_INDEX_LIBRARY_REVISION_MAJOR > 327600)
     return 0;
-#else
-    index_vendor_key =
-      "NVIDIA IndeX License for Paraview IndeX:PV:Free:v1 - 20200427 (oem:retail_cloud.20220630)";
-    index_secret_key = "10e9ce315607f2d230e82647682d250a176ddd4e3d05c49401b5556a6794c72c";
-#endif
   }
 
   // Retrieve Flex license path.
@@ -866,13 +860,20 @@ bool vtknvindex_instance::setup_nvindex()
     idebug_configuration->set_option("integration_flags=8");
 #endif
 
+#if (NVIDIA_INDEX_LIBRARY_REVISION_MAJOR > 329100 ||                                               \
+  (NVIDIA_INDEX_LIBRARY_REVISION_MAJOR == 329100 && NVIDIA_INDEX_LIBRARY_REVISION_MINOR == 8100 && \
+       NVIDIA_INDEX_LIBRARY_REVISION_SUBMINOR > 3009))
+    // Disable features not used by the plugin
+    idebug_configuration->set_option("disable_picking=1");
+#endif
+
     // Don't pre-allocate buffers for rasterizer
     idebug_configuration->set_option("rasterizer_memory_allocation=-1");
 
     // Disable timeseries data prefetch.
     idebug_configuration->set_option("timeseries_data_prefetch_disable=1");
 
-    // Disable IndeX parallel importing, given importeres are already parallelized.
+    // Disable IndeX parallel importing, given importers are already parallelized.
     idebug_configuration->set_option("async_subset_load=0");
 
     // Use strict domain subdivision only with multiple ranks.
@@ -1151,7 +1152,7 @@ void vtknvindex_instance::init_scene_graph()
 //-------------------------------------------------------------------------------------------------
 const char* vtknvindex_instance::get_version() const
 {
-  return "5.9";
+  return "5.9.1";
 }
 
 //-------------------------------------------------------------------------------------------------
