@@ -2534,6 +2534,8 @@ def _create_func(key, module, skipRegisteration=False):
                controller.RegisterAnimationProxy(px)
         return px
 
+    # add special tag to detect these functions in _remove_functions
+    CreateObject.__paraview_create_object_tag = True
     return CreateObject
 
 # -----------------------------------------------------------------------------
@@ -2586,7 +2588,6 @@ def _add_functions(g):
                 #print "add %s function" % key
                 f = _create_func(key, m, skipRegisteration)
                 f.__name__ = key
-                f.__paraview_simple_func = True
                 f.__doc__ = _create_doc(m.getDocumentation(key), f.__doc__)
                 g[key] = f
 
@@ -2601,14 +2602,11 @@ def _get_generated_proxies():
 # -----------------------------------------------------------------------------
 
 def _remove_functions(g):
-    to_remove = []
-    for item in g.items():
-        if hasattr(item[0], "__paraview_simple_func"):
-            to_remove.append(item[0])
-
+    to_remove = [item[0] for item in g.items() \
+            if hasattr(item[1], '__paraview_create_object_tag')]
     for key in to_remove:
         del g[key]
-        #print "remove %s function" % key
+        # paraview.print_info("remove %s", key)
 
 # -----------------------------------------------------------------------------
 

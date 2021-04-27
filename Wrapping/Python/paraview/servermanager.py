@@ -2336,9 +2336,10 @@ def CreateRepresentation(aProxy, view, **extraArgs):
         display.UnRegister(None)
     if not display:
         return None
-    extraArgs['proxy'] = display
-    proxy = rendering.__dict__[display.GetXMLName()](**extraArgs)
+    proxy = _getPyProxy(display)
     proxy.Input = aProxy
+    for param in extraArgs.items():
+        setattr(proxy, items[0], items[1])
     proxy.UpdateVTKObjects()
     view.Representations.append(proxy)
     return proxy
@@ -2923,76 +2924,6 @@ def __determineGroup(proxy):
     elif xmlgroup == "animation_keyframes":
         return "animation"
     return xmlgroup
-
-__nameCounter = {}
-def __determineName(proxy, group):
-    global __nameCounter
-    name = _make_name_valid(proxy.GetXMLLabel())
-    if not name:
-        return None
-    if name not in __nameCounter:
-        __nameCounter[name] = 1
-        val = 1
-    else:
-        __nameCounter[name] += 1
-        val = __nameCounter[name]
-    return "%s%d" % (name, val)
-
-def __getName(proxy, group):
-    pxm = ProxyManager(proxy.GetSession())
-    if isinstance(proxy, Proxy):
-        proxy = proxy.SMProxy
-    return pxm.GetProxyName(group, proxy)
-
-class MissingRegistrationInformation(Exception):
-    """Exception for missing registration information. Raised when a name or group
-    is not specified or when a group cannot be deduced."""
-    pass
-
-class MissingProxy(Exception):
-    """Exception fired when the requested proxy is missing."""
-    pass
-
-def Register(proxy, **extraArgs):
-    """Registers a proxy with the proxy manager. If no 'registrationGroup' is
-    specified, then the group is inferred from the type of the proxy.
-    'registrationName' may be specified to register with a particular name
-    otherwise a default name will be created."""
-    # TODO: handle duplicate registration
-    if "registrationGroup" in extraArgs:
-        registrationGroup = extraArgs["registrationGroup"]
-    else:
-        registrationGroup = __determineGroup(proxy)
-
-    if "registrationName" in extraArgs:
-        registrationName = extraArgs["registrationName"]
-    else:
-        registrationName = __determineName(proxy, registrationGroup)
-    if registrationGroup and registrationName:
-        pxm = ProxyManager()
-        pxm.RegisterProxy(registrationGroup, registrationName, proxy)
-    else:
-        raise MissingRegistrationInformation ("Registration error %s %s." % (registrationGroup, registrationName))
-    return (registrationGroup, registrationName)
-
-def UnRegister(proxy, **extraArgs):
-    """UnRegisters proxies registered using Register()."""
-    if "registrationGroup" in extraArgs:
-        registrationGroup = extraArgs["registrationGroup"]
-    else:
-        registrationGroup = __determineGroup(proxy)
-
-    if "registrationName" in extraArgs:
-        registrationName = extraArgs["registrationName"]
-    else:
-        registrationName = __getName(proxy, registrationGroup)
-
-    if registrationGroup and registrationName:
-        pxm = ProxyManager()
-        pxm.UnRegisterProxy(registrationGroup, registrationName, proxy)
-    else:
-        raise RuntimeError ("UnRegistration error.")
-    return (registrationGroup, registrationName)
 
 def ResetSession():
     """Reset the session in the active connection to its initial state."""
