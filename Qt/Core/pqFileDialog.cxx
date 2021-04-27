@@ -795,6 +795,7 @@ void pqFileDialog::onNavigate(const QString& newpath)
   impl.setCurrentPath(path_to_navigate);
   this->updateButtonStates();
   impl.Ui.FileName->clear();
+  impl.Ui.FileName->setFocus(Qt::OtherFocusReason);
 }
 
 //-----------------------------------------------------------------------------
