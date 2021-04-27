@@ -65,6 +65,9 @@ public:
   // Returns true when the buffer is allocated.
   bool is_buffer_allocated() const;
 
+  // Returns true when the buffer can be used.
+  bool is_valid() const;
+
   // Get the pixel index. Assume that the buffer size is less than 2GB.
   static inline mi::Sint32 get_pixel_index(mi::Sint32 width, mi::Sint32 height, mi::Sint32 channel,
     mi::Sint32 x, mi::Sint32 y, mi::Sint32 rgba)
