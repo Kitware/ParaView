@@ -2658,7 +2658,7 @@ def updateModules(m=None):
 class ProxyNamespace:
     """
     This class is a container for class types representing known proxies types.
-    Conceptually, one can think of this a Python eguivalent for a proxy group,
+    Conceptually, one can think of this a Python equivalent for a proxy group,
     however, due to legacy reasons, it can represent proxies in more than one
     proxy-group.
 

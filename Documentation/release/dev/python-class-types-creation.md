@@ -6,7 +6,7 @@ was imported or a connection was initialized. Creation of these class types is
 now deferred until they are needed. This helps speed up ParaView Python
 initialization.
 
-This change should be large transparent to users except for those who were
+This change should be largely transparent to users except for those who were
 directly accessing proxy types from the `paraview.servermanager` as follows:
 
     # will no longer work
