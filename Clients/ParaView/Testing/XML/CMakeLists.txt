@@ -1083,7 +1083,6 @@ if(VTK_USE_LARGE_DATA)
   ExternalData_Expand_Arguments(ParaViewData _
     "DATA{${paraview_test_data_directory_input}/Data/bake/bake.e}")
   list(APPEND TESTS_WITH_BASELINES
-    CheckSelectedBlocks.xml
     RestoreBlockColorDefaultTransferFunction.xml
     )
 endif()
@@ -1406,7 +1405,6 @@ set(InteractiveSelection_DISABLE_CRS TRUE)
 set(NonConvexPolygon_DISABLE_CRS TRUE)
 set(QuartilePlot_DISABLE_CRS TRUE)
 set(TestSelectionOnMultipiece_DISABLE_CRS TRUE)
-set(CheckSelectedBlocks_DISABLE_CRS TRUE)
 set(SelectionModifiersCells_DISABLE_CRS TRUE)
 set(SelectionModifiersBlocks_DISABLE_CRS TRUE)
 set(SelectionModifiersPoints_DISABLE_CRS TRUE)
