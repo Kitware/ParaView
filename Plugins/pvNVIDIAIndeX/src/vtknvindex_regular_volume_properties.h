@@ -51,11 +51,12 @@ public:
   void set_scalar_type(std::string scalar_type);
   void get_scalar_type(std::string& scalar_type) const;
 
-  // Voxel range of the volumetric (vtkImageData) dataset.
+  // Voxel range of the volumetric (vtkImageData) dataset, i.e. the range of actual data values.
   void set_voxel_range(mi::math::Vector<mi::Float32, 2> voxel_range);
   void get_voxel_range(mi::math::Vector<mi::Float32, 2>& voxel_range) const;
 
-  // Scalar range of the volumetric (vtkImageData) dataset.
+  // Scalar range of the volumetric (vtkImageData) dataset, i.e. the possible range of the native
+  // data type.
   void set_scalar_range(mi::math::Vector<mi::Float32, 2> scalar_range);
   void get_scalar_range(mi::math::Vector<mi::Float32, 2>& scalar_range) const;
 
