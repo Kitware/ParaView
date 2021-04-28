@@ -73,3 +73,4 @@ private:
 };
 
 #endif
+// VTK-HeaderTest-Exclude: vtkCommunicationErrorCatcher.h

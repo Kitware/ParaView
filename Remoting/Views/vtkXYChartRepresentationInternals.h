@@ -499,3 +499,4 @@ protected:
 };
 
 #endif
+// VTK-HeaderTest-Exclude: vtkXYChartRepresentationInternals.h

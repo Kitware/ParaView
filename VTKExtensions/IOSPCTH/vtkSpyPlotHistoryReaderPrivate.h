@@ -244,3 +244,4 @@ std::vector<std::string> createTableLayoutFromHeader(std::string& header, const 
 }
 
 #endif
+// VTK-HeaderTest-Exclude: vtkSpyPlotHistoryReaderPrivate.h
