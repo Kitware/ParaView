@@ -942,7 +942,7 @@ list(APPEND TESTS_WITH_BASELINES
   OrthographicView.xml
   OutOfRangeColors.xml
   PBRSpheres.xml
-  ParallelCoordinatesView.xml
+  # ParallelCoordinatesView.xml see paraview/paraview#20679
   PlotDataOverTime-NonDistributed.xml
   PlotEdges2.xml
   # PlotEdges.xml see paraview/paraview#20659
