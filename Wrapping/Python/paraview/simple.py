@@ -2534,6 +2534,8 @@ def _create_func(key, module, skipRegisteration=False):
                controller.RegisterAnimationProxy(px)
         return px
 
+    # add special tag to detect these functions in _remove_functions
+    CreateObject.__paraview_create_object_tag = True
     return CreateObject
 
 # -----------------------------------------------------------------------------
@@ -2567,8 +2569,8 @@ def _get_proxymodules_to_import(connection):
     used in _add_functions, _get_generated_proxies, and _remove_functions to get
     modules to import proxies from.
     """
-    if connection and connection.Modules:
-        modules = connection.Modules
+    if connection and connection.ProxiesNS:
+        modules = connection.ProxiesNS
         return [modules.filters, modules.sources, modules.writers, modules.animation]
     else:
         return []
@@ -2577,41 +2579,34 @@ def _add_functions(g):
     if not servermanager.ActiveConnection:
         return
 
-    activeModule = servermanager.ActiveConnection.Modules
+    activeModule = servermanager.ActiveConnection.ProxiesNS
     for m in _get_proxymodules_to_import(servermanager.ActiveConnection):
         # Skip registering proxies in certain modules (currently only writers)
         skipRegisteration = m is activeModule.writers
-        dt = m.__dict__
-        for key in dt.keys():
-            cl = dt[key]
-            if not isinstance(cl, str):
-                if not key in g and _func_name_valid(key):
-                    #print "add %s function" % key
-                    g[key] = _create_func(key, m, skipRegisteration)
-                    exec ("g[key].__doc__ = _create_doc(m.%s.__doc__, g[key].__doc__)" % key)
+        for key in dir(m):
+            if not key in g and _func_name_valid(key):
+                #print "add %s function" % key
+                f = _create_func(key, m, skipRegisteration)
+                f.__name__ = key
+                f.__doc__ = _create_doc(m.getDocumentation(key), f.__doc__)
+                g[key] = f
 
 # -----------------------------------------------------------------------------
 
 def _get_generated_proxies():
     proxies = []
     for m in _get_proxymodules_to_import(servermanager.ActiveConnection):
-        dt = m.__dict__
-        for key in dt.keys():
-            cl = dt[key]
-            if not isinstance(cl, str):
-                if _func_name_valid(key):
-                    proxies.append(key)
+        for key in dir(m):
+            proxies.append(key)
     return proxies
 # -----------------------------------------------------------------------------
 
 def _remove_functions(g):
-    for m in _get_proxymodules_to_import(servermanager.ActiveConnection):
-        dt = m.__dict__
-        for key in dt.keys():
-            cl = dt[key]
-            if not isinstance(cl, str) and key in g:
-                g.pop(key)
-                #print "remove %s function" % key
+    to_remove = [item[0] for item in g.items() \
+            if hasattr(item[1], '__paraview_create_object_tag')]
+    for key in to_remove:
+        del g[key]
+        # paraview.print_info("remove %s", key)
 
 # -----------------------------------------------------------------------------
 

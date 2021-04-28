@@ -1,19 +1,19 @@
 """This is a test to test the paraview proxy manager API."""
-from paraview import servermanager
+from paraview import servermanager, print_info, print_error
+
 import sys
 
 servermanager.Connect()
-sources = servermanager.sources.__dict__
 
-for source in sources:
-  try:
-    sys.stderr.write('Creating %s...'%(source))
-    if source in ["GenericIOReader", 'EnsembleDataReader', 'openPMDReader']:
-        print(sys.stderr.write("...skipping (in exclusion list).\n"))
-        continue
-    s = sources[source]()
-    s.UpdateVTKObjects()
-    sys.stderr.write('ok\n')
-  except:
-    sys.stderr.write('failed\n')
-    raise RuntimeError('ERROR: Failed to create %s'%(source))
+for source in dir(servermanager.sources):
+    try:
+        print_info('Creating %s ...' % source)
+        if source in ["GenericIOReader", 'EnsembleDataReader', 'openPMDReader']:
+            print_info("...skipping (in exclusion list)")
+        else:
+            s = getattr(servermanager.sources, source)()
+            s.UpdateVTKObjects()
+            print_info("...... ok")
+    except:
+        print_error("failed!")
+        raise RuntimeError('Failed to create %s' % source)
