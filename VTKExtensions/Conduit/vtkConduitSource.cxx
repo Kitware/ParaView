@@ -15,6 +15,7 @@
 #include "vtkConduitSource.h"
 
 #include "vtkCellArray.h"
+#include "vtkCellArrayIterator.h"
 #include "vtkConduitArrayUtilities.h"
 #include "vtkDataArray.h"
 #include "vtkDataSetAttributes.h"
@@ -85,6 +86,10 @@ int GetCellType(const std::string& shape)
   {
     return VTK_HEXAHEDRON;
   }
+  else if (shape == "polyhedral")
+  {
+    return VTK_POLYHEDRON;
+  }
   else
   {
     throw std::runtime_error("unsupported shape " + shape);
@@ -138,6 +143,65 @@ vtkSmartPointer<vtkPoints> CreatePoints(const conduit::Node& coords)
   vtkNew<vtkPoints> pts;
   pts->SetData(array);
   return pts;
+}
+
+//----------------------------------------------------------------------------
+void SetPolyhedralCells(
+  vtkUnstructuredGrid* grid, vtkCellArray* elements, vtkCellArray* subelements)
+{
+  vtkNew<vtkCellArray> connectivity;
+  vtkNew<vtkIdTypeArray> faces;
+  vtkNew<vtkIdTypeArray> faceLocations;
+
+  connectivity->AllocateEstimate(elements->GetNumberOfCells(), 10);
+  faces->Allocate(subelements->GetConnectivityArray()->GetNumberOfTuples());
+  faceLocations->Allocate(elements->GetNumberOfCells());
+
+  auto eIter = vtk::TakeSmartPointer(elements->NewIterator());
+  auto seIter = vtk::TakeSmartPointer(subelements->NewIterator());
+
+  std::vector<vtkIdType> cellPoints;
+  for (eIter->GoToFirstCell(); !eIter->IsDoneWithTraversal(); eIter->GoToNextCell())
+  {
+    // init;
+    cellPoints.clear();
+
+    // get cell from 'elements'.
+    vtkIdType size;
+    vtkIdType const* seIds;
+    eIter->GetCurrentCell(size, seIds);
+
+    faceLocations->InsertNextValue(faces->GetNumberOfTuples());
+    faces->InsertNextValue(size); // number-of-cell-faces.
+    for (vtkIdType fIdx = 0; fIdx < size; ++fIdx)
+    {
+      seIter->GoToCell(seIds[fIdx]);
+
+      vtkIdType ptSize;
+      vtkIdType const* ptIds;
+      seIter->GetCurrentCell(ptSize, ptIds);
+      faces->InsertNextValue(ptSize); // number-of-face-points.
+      for (vtkIdType ptIdx = 0; ptIdx < ptSize; ++ptIdx)
+      {
+        faces->InsertNextValue(ptIds[ptIdx]);
+      }
+
+      // accumulate pts from all faces in this cell to build the 'connectivity' array.
+      std::copy(ptIds, ptIds + ptSize, std::back_inserter(cellPoints));
+    }
+
+    connectivity->InsertNextCell(
+      static_cast<vtkIdType>(cellPoints.size()), cellPoints.empty() ? nullptr : &cellPoints[0]);
+  }
+
+  connectivity->Squeeze();
+  faces->Squeeze();
+  faceLocations->Squeeze();
+
+  vtkNew<vtkUnsignedCharArray> cellTypes;
+  cellTypes->SetNumberOfTuples(connectivity->GetNumberOfCells());
+  cellTypes->FillValue(static_cast<unsigned char>(VTK_POLYHEDRON));
+  grid->SetCells(cellTypes, connectivity, faceLocations, faces);
 }
 
 //----------------------------------------------------------------------------
@@ -207,10 +271,26 @@ vtkSmartPointer<vtkDataSet> GetMesh(
     vtkNew<vtkUnstructuredGrid> ug;
     ug->SetPoints(CreatePoints(coords));
     const auto vtk_cell_type = GetCellType(topologyNode["elements/shape"].as_string());
-    const auto cell_size = GetNumberOfPointsInCellType(vtk_cell_type);
-    auto cellArray = vtkConduitArrayUtilities::MCArrayToVTKCellArray(
-      cell_size, &topologyNode["elements/connectivity"]);
-    ug->SetCells(vtk_cell_type, cellArray);
+    if (vtk_cell_type == VTK_POLYHEDRON)
+    {
+      // polyhedra uses O2M and not M2C arrays, so need to process it
+      // differently.
+      auto elements = vtkConduitArrayUtilities::O2MRelationToVTKCellArray(
+        &topologyNode["elements"], "connectivity");
+      auto subelements = vtkConduitArrayUtilities::O2MRelationToVTKCellArray(
+        &topologyNode["subelements"], "connectivity");
+
+      // currently, this is an ugly deep-copy. Once vtkUnstructuredGrid is modified
+      // as proposed here (vtk/vtk#18190), this will get simpler.
+      SetPolyhedralCells(ug, elements, subelements);
+    }
+    else
+    {
+      const auto cell_size = GetNumberOfPointsInCellType(vtk_cell_type);
+      auto cellArray = vtkConduitArrayUtilities::MCArrayToVTKCellArray(
+        cell_size, &topologyNode["elements/connectivity"]);
+      ug->SetCells(vtk_cell_type, cellArray);
+    }
     return ug;
   }
   else
