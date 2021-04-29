@@ -447,6 +447,80 @@ vtkSmartPointer<vtkCellArray> vtkConduitArrayUtilities::MCArrayToVTKCellArray(
   return cellArray;
 }
 
+namespace
+{
+
+struct O2MRelationToVTKCellArrayWorker
+{
+  vtkNew<vtkCellArray> Cells;
+
+  template <typename ElementsArray, typename SizesArray, typename OffsetsArray>
+  void operator()(ElementsArray* elements, SizesArray* sizes, OffsetsArray* offsets)
+  {
+    VTK_ASSUME(elements->GetNumberOfComponents() == 1);
+    VTK_ASSUME(sizes->GetNumberOfComponents() == 1);
+    VTK_ASSUME(offsets->GetNumberOfComponents() == 1);
+
+    auto& cellArray = this->Cells;
+    cellArray->AllocateEstimate(offsets->GetNumberOfTuples(),
+      std::max(static_cast<vtkIdType>(sizes->GetRange(0)[1]), vtkIdType(1)));
+
+    vtkDataArrayAccessor<ElementsArray> e(elements);
+    vtkDataArrayAccessor<SizesArray> s(sizes);
+    vtkDataArrayAccessor<OffsetsArray> o(offsets);
+
+    const auto numElements = sizes->GetNumberOfTuples();
+    for (vtkIdType id = 0; id < numElements; ++id)
+    {
+      const auto offset = static_cast<vtkIdType>(o.Get(id, 0));
+      const auto size = static_cast<vtkIdType>(s.Get(id, 0));
+
+      cellArray->InsertNextCell(size);
+      for (vtkIdType cc = 0; cc < size; ++cc)
+      {
+        cellArray->InsertCellPoint(e.Get(offset + cc, 0));
+      }
+    }
+  }
+};
+}
+//----------------------------------------------------------------------------
+vtkSmartPointer<vtkCellArray> vtkConduitArrayUtilities::O2MRelationToVTKCellArray(
+  const conduit_node* c_o2mrelation, const std::string& leafname)
+{
+  const conduit::Node& o2mrelation = (*conduit::cpp_node(c_o2mrelation));
+  auto elements = vtkConduitArrayUtilities::MCArrayToVTKArrayImpl(
+    conduit::c_node(&o2mrelation[leafname]), /*force_signed*/ true);
+  if (!elements)
+  {
+    return nullptr;
+  }
+
+  if (o2mrelation.has_child("indices"))
+  {
+    vtkLogF(WARNING, "'indices' in a O2MRelation are currently ignored.");
+  }
+
+  auto sizes = vtkConduitArrayUtilities::MCArrayToVTKArrayImpl(
+    conduit::c_node(&o2mrelation["sizes"]), /*force_signed*/ true);
+  auto offsets = vtkConduitArrayUtilities::MCArrayToVTKArrayImpl(
+    conduit::c_node(&o2mrelation["offsets"]), /*force_signed*/ true);
+
+  O2MRelationToVTKCellArrayWorker worker;
+
+  // Using a reduced type list for typical id types.
+  using TypeList =
+    vtkTypeList::Unique<vtkTypeList::Create<vtkTypeInt32, vtkTypeInt64, vtkIdType> >::Result;
+
+  using Dispatcher = vtkArrayDispatch::Dispatch3ByValueType<TypeList, TypeList, TypeList>;
+  if (!Dispatcher::Execute(elements.GetPointer(), sizes.GetPointer(), offsets.GetPointer(), worker))
+  {
+    worker(elements.GetPointer(), sizes.GetPointer(), offsets.GetPointer());
+  }
+
+  return worker.Cells;
+}
+
 //----------------------------------------------------------------------------
 void vtkConduitArrayUtilities::PrintSelf(ostream& os, vtkIndent indent)
 {
