@@ -36,7 +36,7 @@ by ADIOS. For our purposes, the cmake variable `ENABLE_ADIOS` should be `ON`,
 whereas `ENABLE_HDF5`, `ENABLE_PVTI`, `ENABLE_PVTP` can be `OFF`.
 
 **Plugin:** This plugin is part of ParaView. While configuring ParaView
-build, set the `PARAVIEW_BUILD_PLUGIN_AdiosStagingReader` cmake variable
+build, set the `PARAVIEW_PLUGIN_ENABLE_AdiosStagingReader` cmake variable
 to `ON`. To automatically load the plugin with ParaView set
 `PARAVIEW_AUTOLOAD_PLUGIN_AdiosStagingReader` to `ON`. You may also need
 to set the `ADIOS_CONFIG` variable as mentioned for cartiso.
