@@ -34,10 +34,8 @@ from paraview.vtk.util.misc import vtkGetDataRoot
 import os.path
 dataToLoad = os.path.join(vtkGetDataRoot(), 'Testing/Data/can.ex2')
 
-
 # Load data file
 reader = OpenDataFile(dataToLoad)
-reader.GlobalVariables = ['KE', 'XMOM', 'YMOM', 'ZMOM', 'NSTEPS', 'TMSTEP']
 reader.UpdatePipeline()
 
 # Time management
@@ -51,7 +49,7 @@ time = timesteps[5]
 
 # Annotation filter
 annotation = PythonAnnotation()
-annotation.Expression = '"%f %f %f" % (XMOM[t_index], YMOM[t_index], ZMOM[t_index])'
+annotation.Expression = '"%f %f %f" % (xmom, ymom, zmom)'
 
 # Update time and trigger pipeline execution
 time = timesteps[5]
