@@ -86,8 +86,8 @@
 
     <!-- ==================================================================== -->
     <SourceProxy class="vtkGhostCellsGenerator"
-                 label="Ghost Cells Generator"
-                 name="GhostCellsGenerator">
+                 label="Universal Ghost Cells Generator"
+                 name="UniversalGhostCellsGenerator">
       <Documentation short_help="Generate ghosts.">
         Generate ghost cells and ghost points in a composite data set. Ghosts are exchanged
         between blocks / partitions of same type. Currently, only vtkImageData, vtkRectilinearGrid

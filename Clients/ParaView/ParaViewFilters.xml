@@ -289,7 +289,6 @@
   <Proxy group="filters" name="ParticlePath" />
   <Proxy group="filters" name="ParticlePathLines" />
   <Proxy group="filters" name="ParticleTracer" />
-  <Proxy group="filters" name="CompositeDataSetGhostCellsGenerator" />
   <Proxy group="filters" name="PassArrays" />
   <Proxy group="filters" name="PlotAttributes" />
   <Proxy group="filters" name="PlotDataOverTime" />
@@ -361,6 +360,7 @@
   <Proxy group="filters" name="TransposeTable" />
   <Proxy group="filters" name="TriangleFilter" />
   <Proxy group="filters" name="TubeFilter" />
+  <Proxy group="filters" name="UniversalGhostCellsGenerator" />
   <Proxy group="filters" name="UnstructuredGradient" />
   <Proxy group="filters" name="ValidateCells" />
   <Proxy group="filters" name="VortexCores" />
