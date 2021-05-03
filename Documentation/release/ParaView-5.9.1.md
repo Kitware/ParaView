@@ -68,3 +68,15 @@ Bug fixes made since ParaView 5.9.0 are listed in this document. The full list o
 * Updated `vtkSphereTree` to use thread-safe method to get cell IDs [(details)](https://gitlab.kitware.com/vtk/vtk/-/merge_requests/7636).
 
 * Fixed some compiler errors on IBM XLC compilers [(details)](https://gitlab.kitware.com/vtk/vtk/-/merge_requests/7591).
+
+* NVIDIA IndeX plugin bugfixes [(details)](https://gitlab.kitware.com/paraview/paraview/-/merge_requests/4910)
+
+  * Fixed loading of the NVIDIA IndeX plugin in `pvbatch` when `PV_PLUGIN_PATH` is set [(details)](https://gitlab.kitware.com/paraview/paraview/-/issues/20487).
+
+  * Fixed "z-buffer precision" error message in the NVIDIA IndeX plugin when the Axes Grid was enabled.
+
+  * Fixed NVIDIA IndeX rendering  when the color map was rescaled to a custom range.
+
+  * Runtime compilation of NVIDIA IndeX Visual Elements is now faster.
+
+  * Prevent runtime issues in the NVIDIA IndeX library when a stub version of `libcuda.so.1` is in the library search path.

@@ -1,4 +1,4 @@
-/* Copyright 2020 NVIDIA Corporation. All rights reserved.
+/* Copyright 2021 NVIDIA Corporation. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -381,8 +381,8 @@ bool vtknvindex_irregular_volume_mapper::initialize_mapper(vtkRenderer* /*ren*/,
     dataset_parameters.scalar_type = scalar_type;
     dataset_parameters.voxel_range[0] = static_cast<mi::Float32>(m_scalar_array->GetRange(0)[0]);
     dataset_parameters.voxel_range[1] = static_cast<mi::Float32>(m_scalar_array->GetRange(0)[1]);
-    dataset_parameters.scalar_range[0] = static_cast<mi::Float32>(m_scalar_array->GetRange()[0]);
-    dataset_parameters.scalar_range[1] = static_cast<mi::Float32>(m_scalar_array->GetRange()[1]);
+    dataset_parameters.scalar_range[0] = static_cast<mi::Float32>(m_scalar_array->GetDataTypeMin());
+    dataset_parameters.scalar_range[1] = static_cast<mi::Float32>(m_scalar_array->GetDataTypeMax());
 
     dataset_parameters.bounds[0] = m_volume_data.subregion_bbox.min.x;
     dataset_parameters.bounds[1] = m_volume_data.subregion_bbox.max.x;
@@ -482,16 +482,22 @@ void vtknvindex_irregular_volume_mapper::update_canvas(vtkRenderer* ren)
 
   if (ren->GetNumberOfPropsRendered())
   {
-    m_index_instance->m_opengl_app_buffer.resize_buffer(main_window_resolution);
+    vtkOpenGLRenderWindow* vtk_gl_render_window = vtkOpenGLRenderWindow::SafeDownCast(win);
+    const mi::Sint32 depth_bits = vtk_gl_render_window->GetDepthBufferSize();
+    if (depth_bits > 0)
+    {
+      m_index_instance->m_opengl_app_buffer.set_z_buffer_precision(depth_bits);
+      m_index_instance->m_opengl_app_buffer.resize_buffer(main_window_resolution);
 
-    vtkOpenGLRenderWindow* vtk_gl_render_window =
-      vtkOpenGLRenderWindow::SafeDownCast(ren->GetVTKWindow());
-    mi::Sint32 depth_bits = vtk_gl_render_window->GetDepthBufferSize();
-    m_index_instance->m_opengl_app_buffer.set_z_buffer_precision(depth_bits);
-
-    mi::Uint32* pv_z_buffer = m_index_instance->m_opengl_app_buffer.get_z_buffer_ptr();
-    glReadPixels(
-      0, 0, window_size[0], window_size[1], GL_DEPTH_COMPONENT, GL_UNSIGNED_INT, pv_z_buffer);
+      mi::Uint32* pv_z_buffer = m_index_instance->m_opengl_app_buffer.get_z_buffer_ptr();
+      glReadPixels(
+        0, 0, window_size[0], window_size[1], GL_DEPTH_COMPONENT, GL_UNSIGNED_INT, pv_z_buffer);
+    }
+    else
+    {
+      // This can happen when enabling "Axes Grid", as those are rendered without a depth buffer.
+      m_index_instance->m_opengl_app_buffer.set_z_buffer_precision(0);
+    }
   }
 
   reset_orthogonal_projection_matrix(window_size[0], window_size[1]);
@@ -694,6 +700,10 @@ void vtknvindex_irregular_volume_mapper::Render(vtkRenderer* ren, vtkVolume* vol
         m_index_instance->m_iindex_session->update(
           m_index_instance->m_session_tag, dice_transaction.get());
 
+        // Use ParaView depth buffer, if present.
+        const bool use_depth_buffer =
+          (ren->GetNumberOfPropsRendered() > 0 && m_index_instance->m_opengl_app_buffer.is_valid());
+
         // NVIDIA IndeX render call returns frame results
         mi::base::Handle<nv::index::IFrame_results> frame_results(
           m_index_instance->m_iindex_rendering->render(m_index_instance->m_session_tag,
@@ -702,9 +712,7 @@ void vtknvindex_irregular_volume_mapper::Render(vtkRenderer* ren, vtkVolume* vol
             0,    // No progress_callback.
             0,    // No Frame information
             true, // = g_immediate_final_parallel_compositing
-            ren->GetNumberOfPropsRendered() ? &(m_index_instance->m_opengl_app_buffer)
-                                            : NULL) // ParaView depth buffer, if present.
-          );
+            use_depth_buffer ? &m_index_instance->m_opengl_app_buffer : nullptr));
 
         const mi::base::Handle<nv::index::IError_set> err_set(frame_results->get_error_set());
         if (err_set->any_errors())

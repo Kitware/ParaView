@@ -1,4 +1,4 @@
-/* Copyright 2020 NVIDIA Corporation. All rights reserved.
+/* Copyright 2021 NVIDIA Corporation. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without
 * modification, are permitted provided that the following conditions
@@ -32,7 +32,7 @@
 //-----------------------------------------------------------------------------
 vtknvindex_opengl_app_buffer::vtknvindex_opengl_app_buffer()
   : m_z_buffer(0)
-  , m_z_buffer_precision(24)
+  , m_z_buffer_precision(0)
   , m_resolution(-1, -1)
 {
   // empty
@@ -63,14 +63,26 @@ mi::Uint32* vtknvindex_opengl_app_buffer::get_z_buffer_ptr()
 //-----------------------------------------------------------------------------
 void vtknvindex_opengl_app_buffer::set_z_buffer_precision(mi::Uint32 precision)
 {
-  if (precision != 24 && precision != 32)
+  // Precision == 0 can happen when ParaView renderes its geometry without a depth buffer (e.g. Axes
+  // Grid), it effectively disables OpenGL integration.
+  if (precision != 0 && precision != 24 && precision != 32)
   {
-    ERROR_LOG << "Trying to set unsupported z-buffer precision " << precision
-              << ". Please verify the status of the X-server when the precision is reported as 0.";
-    return;
-  }
+    static bool already = false;
+    if (!already)
+    {
+      ERROR_LOG << "Trying to set unsupported OpenGL z-buffer precision " << precision
+                << ", the depth-correct blending of NVIDIA IndeX rendering "
+                << "with other geometry may not work. "
+                << "This message will only be printed once.";
+      already = true;
+    }
 
-  m_z_buffer_precision = precision;
+    m_z_buffer_precision = 0;
+  }
+  else
+  {
+    m_z_buffer_precision = precision;
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -108,10 +120,16 @@ void vtknvindex_opengl_app_buffer::clear_buffer()
 //-----------------------------------------------------------------------------
 bool vtknvindex_opengl_app_buffer::is_buffer_allocated() const
 {
-  if ((m_resolution.x > 0) && (m_resolution.y > 0) && (m_z_buffer != 0))
+  if ((m_resolution.x > 0) && (m_resolution.y > 0) && (m_z_buffer != nullptr))
     return true;
 
   return false;
+}
+
+//-----------------------------------------------------------------------------
+bool vtknvindex_opengl_app_buffer::is_valid() const
+{
+  return (is_buffer_allocated() && get_z_buffer_precision() > 0);
 }
 
 //-----------------------------------------------------------------------------
