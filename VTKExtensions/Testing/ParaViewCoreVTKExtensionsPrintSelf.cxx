@@ -43,7 +43,6 @@
 #include "vtkFileSeriesWriter.h"
 #include "vtkFlashContour.h"
 //#include "vtkFlashReader.h"
-#include "vtkGridConnectivity.h"
 #include "vtkHierarchicalFractal.h"
 #include "vtkImageCompressor.h"
 #include "vtkIntegrateAttributes.h"
@@ -220,7 +219,6 @@ int ParaViewCoreVTKExtensionsPrintSelf(int, char* [])
   PRINT_SELF(vtkFileSeriesWriter);
   PRINT_SELF(vtkFlashContour);
   // PRINT_SELF(vtkFlashReader);
-  PRINT_SELF(vtkGridConnectivity);
   PRINT_SELF(vtkHierarchicalFractal);
   PRINT_SELF(vtkImageCompressor);
   PRINT_SELF(vtkIntegrateAttributes);
