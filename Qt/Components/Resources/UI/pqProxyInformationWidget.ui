@@ -79,7 +79,7 @@
      <property name="currentIndex">
       <number>0</number>
      </property>
-     <widget class="QWidget" name="tab">
+     <widget class="QWidget" name="hierarchyTab">
       <attribute name="title">
        <string>Hierarchy</string>
       </attribute>
@@ -130,7 +130,7 @@
        </item>
       </layout>
      </widget>
-     <widget class="QWidget" name="tab_2">
+     <widget class="QWidget" name="assemblyTab">
       <attribute name="title">
        <string>Assembly</string>
       </attribute>
