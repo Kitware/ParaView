@@ -1841,7 +1841,9 @@ class ParaViewWebProxyManager(ParaViewWebProtocol):
                        'id_type',         # 12
                        'unspecified',     # 13
                        'unspecified',     # 14
-                       'signed_char' ]    # 15
+                       'signed_char',     # 15
+                       'long_long',       # 16
+                       'unsigned_long_long' ] #17
 
     def __init__(self, allowedProxiesFile=None, baseDir=None, fileToLoad=None, allowUnconfiguredReaders=True, groupProxyEditorWidgets=True, respectPropertyGroups=True, **kwargs):
         """
