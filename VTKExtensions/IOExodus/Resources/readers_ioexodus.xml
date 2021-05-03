@@ -954,9 +954,11 @@
         <TimeStepsInformationHelper />
       </DoubleVectorProperty>
       <Hints>
+        <!--
         <ReaderFactory extensions="g e h gc ex2 ex2v2 exo gen par exoII exii frq"
                        file_description="ExodusII"
-                       filename_patterns="*e-s*" />
+          filename_patterns="*e-s*" />
+        -->
       </Hints>
       <!-- ExodusIIReader -->
     </SourceProxy>
@@ -1094,8 +1096,10 @@
         <TimeStepsInformationHelper />
       </DoubleVectorProperty>
       <Hints>
+        <!--
         <ReaderFactory extensions="ex-timeseries"
-                       file_description="Metafile for restarted exodus outputs" />
+          file_description="Metafile for restarted exodus outputs" />
+        -->
       </Hints>
       <!-- ExodusRestartReader -->
     </SourceProxy>

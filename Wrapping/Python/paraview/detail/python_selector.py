@@ -38,8 +38,8 @@ def _create_id_array(dataobject, attributeType):
             ids.append(_create_id_array(ds, attributeType))
         return dsa.VTKCompositeDataArray(ids)
     else:
-        return dsa.VTKArray(\
-                np.arange(dataobject.GetNumberOfElements(attributeType)))
+        numElems = dataobject.GetNumberOfElements(attributeType)
+        return dsa.VTKArray(np.arange(numElems)) if numElems > 0 else dsa.NoneArray
 
 def maskarray_is_valid(maskArray):
     """Validates that the maskArray is either a VTKArray,

@@ -53,6 +53,7 @@
 #include "vtkOutlineSource.h"
 #include "vtkPVRecoverGeometryWireframe.h"
 #include "vtkPVTrivialProducer.h"
+#include "vtkPartitionedDataSetCollection.h"
 #include "vtkPointData.h"
 #include "vtkPolyData.h"
 #include "vtkPolygon.h"
@@ -1018,6 +1019,27 @@ int vtkPVGeometryFilter::RequestDataObjectTree(
   for (auto piece : pieces_to_merge)
   {
     vtkPVGeometryFilterMergePieces(piece);
+  }
+
+  if (this->Controller && this->Controller->GetNumberOfProcesses() > 1 &&
+    !pieces_to_merge.empty() && (vtkPartitionedDataSet::SafeDownCast(input) ||
+                                  vtkPartitionedDataSetCollection::SafeDownCast(input)))
+  {
+    // since output of this filter is MB, and not a PDC or PD, we need to ensure
+    // the number of pieces are same on all ranks (fixes #20654).
+    std::vector<unsigned int> counts;
+    counts.reserve(pieces_to_merge.size());
+    for (auto& multipiece : pieces_to_merge)
+    {
+      counts.push_back(multipiece->GetNumberOfPartitions());
+    }
+    std::vector<unsigned int> gcounts(counts.size());
+    this->Controller->AllReduce(
+      &counts[0], &gcounts[0], static_cast<vtkIdType>(counts.size()), vtkCommunicator::MAX_OP);
+    for (size_t cc = 0; cc < gcounts.size(); ++cc)
+    {
+      pieces_to_merge[cc]->SetNumberOfPartitions(gcounts[cc]);
+    }
   }
 
   if (this->Controller && this->Controller->GetNumberOfProcesses() > 1)

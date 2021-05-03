@@ -9,16 +9,16 @@ args = parser.parse_args(sys.argv[1:])
 
 expected_columns = [
     '"Time"',
-    '"avg DISPL (Magnitude) ( block=2)"',
-    '"min DISPL (Magnitude) ( block=2)"',
-    '"max DISPL (Magnitude) ( block=2)"',
-    '"q1 DISPL (Magnitude) ( block=2)"',
-    '"q3 DISPL (Magnitude) ( block=2)"',
-    '"avg VEL (Magnitude) ( block=2)"',
-    '"min VEL (Magnitude) ( block=2)"',
-    '"max VEL (Magnitude) ( block=2)"',
-    '"q1 VEL (Magnitude) ( block=2)"',
-    '"q3 VEL (Magnitude) ( block=2)"'
+    '"avg displ (Magnitude) ( block=2)"',
+    '"min displ (Magnitude) ( block=2)"',
+    '"max displ (Magnitude) ( block=2)"',
+    '"q1 displ (Magnitude) ( block=2)"',
+    '"q3 displ (Magnitude) ( block=2)"',
+    '"avg vel (Magnitude) ( block=2)"',
+    '"min vel (Magnitude) ( block=2)"',
+    '"max vel (Magnitude) ( block=2)"',
+    '"q1 vel (Magnitude) ( block=2)"',
+    '"q3 vel (Magnitude) ( block=2)"'
     ]
 
 # Open CSV file written by the XML test and verify the column names.

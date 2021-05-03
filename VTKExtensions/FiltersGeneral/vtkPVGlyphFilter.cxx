@@ -42,6 +42,7 @@
 #include "vtkTriangleFilter.h"
 #include "vtkTuple.h"
 #include "vtkUniformGrid.h"
+#include "vtkUniformGridAMR.h"
 #include "vtkUnsignedCharArray.h"
 #include "vtkUnstructuredGrid.h"
 
@@ -609,14 +610,25 @@ int vtkPVGlyphFilter::ProcessRequest(
 int vtkPVGlyphFilter::RequestDataObject(
   vtkInformation*, vtkInformationVector** inputVector, vtkInformationVector* outputVector)
 {
-  if (vtkCompositeDataSet::GetData(inputVector[0], 0))
+  if (auto inputDT = vtkDataObjectTree::GetData(inputVector[0], 0))
   {
-    vtkMultiBlockDataSet* mds = vtkMultiBlockDataSet::GetData(outputVector, 0);
-    if (mds == nullptr)
+    auto output = vtkDataObjectTree::GetData(outputVector, 0);
+    if (output == nullptr || !output->IsA(inputDT->GetClassName()))
     {
-      mds = vtkMultiBlockDataSet::New();
-      outputVector->GetInformationObject(0)->Set(vtkDataObject::DATA_OBJECT(), mds);
-      mds->FastDelete();
+      auto clone = inputDT->NewInstance();
+      outputVector->GetInformationObject(0)->Set(vtkDataObject::DATA_OBJECT(), clone);
+      clone->FastDelete();
+    }
+  }
+  else if (auto inputAMR = vtkUniformGridAMR::GetData(inputVector[0], 0))
+  {
+    // eventually, this will be PDC.
+    auto output = vtkMultiBlockDataSet::GetData(outputVector, 0);
+    if (!output)
+    {
+      output = vtkMultiBlockDataSet::New();
+      outputVector->GetInformationObject(0)->Set(vtkDataObject::DATA_OBJECT(), output);
+      output->FastDelete();
     }
   }
   else
@@ -658,11 +670,12 @@ int vtkPVGlyphFilter::RequestData(vtkInformation* vtkNotUsed(request),
   }
   else if (cds)
   {
-    vtkMultiBlockDataSet* outputMD = vtkMultiBlockDataSet::GetData(outputVector);
-    assert(outputMD);
-    outputMD->CopyStructure(cds);
+    auto outputDT = vtkDataObjectTree::GetData(outputVector);
+    assert(outputDT != nullptr);
+    outputDT->CopyStructure(cds);
 
-    vtkNew<vtkMultiBlockDataSet> cdsCopy;
+    vtkSmartPointer<vtkDataObjectTree> cdsCopy;
+    cdsCopy.TakeReference(outputDT->NewInstance());
     cdsCopy->ShallowCopy(cds);
 
     vtkSmartPointer<vtkCompositeDataIterator> iter;
@@ -676,6 +689,7 @@ int vtkPVGlyphFilter::RequestData(vtkInformation* vtkNotUsed(request),
         cdsCopy->SetDataSet(iter, current);
       }
     }
+
     this->Internals->SynchronizeGlobalInformation(this);
 
     for (iter->InitTraversal(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
@@ -698,7 +712,7 @@ int vtkPVGlyphFilter::RequestData(vtkInformation* vtkNotUsed(request),
           this->Internals->Reset();
           return 0;
         }
-        outputMD->SetDataSet(iter, outputPD.GetPointer());
+        outputDT->SetDataSet(iter, outputPD.GetPointer());
       }
     }
   }

@@ -1,0 +1,29 @@
+<ServerManagerConfiguration>
+  <ProxyGroup name="sources">
+    <SourceProxy class="vtkExodusFileSeriesReader"
+                 file_name_method="SetFileName"
+                 name="LegacyExodusIIReader"
+                 label="Legacy Exodus II Reader"
+                 si_class="vtkSIMetaReaderProxy"
+                 base_proxygroup="sources"
+                 base_proxyname="ExodusIIReader">
+       <Hints>
+        <ReaderFactory extensions="g e h gc ex2 ex2v2 exo gen par exoII exii frq"
+                       file_description="ExodusII"
+                       filename_patterns="*e-s*" />
+      </Hints>
+    </SourceProxy>
+    <SourceProxy class="vtkExodusFileSeriesReader"
+                 file_name_method="SetFileName"
+                 label="Legacy Restarted Sim Exodus Reader"
+                 si_class="vtkSIMetaReaderProxy"
+                 name="LegacyExodusRestartReader"
+                 base_proxygroup="sources"
+                 base_proxyname="ExodusRestartReader">
+      <Hints>
+        <ReaderFactory extensions="ex-timeseries"
+          file_description="Metafile for restarted exodus outputs" />
+      </Hints>
+    </SourceProxy>
+  </ProxyGroup>
+</ServerManagerConfiguration>

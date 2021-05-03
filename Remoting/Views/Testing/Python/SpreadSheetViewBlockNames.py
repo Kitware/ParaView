@@ -12,7 +12,7 @@ Render()
 pvview = view.GetClientSideObject()
 
 assert pvview.GetColumnLabel(0) == "Block Name"
-assert pvview.GetValue(0, 0).ToString() == "Unnamed block ID: 1"
-assert pvview.GetValue(6723, 0).ToString() == "Unnamed block ID: 1"
-assert pvview.GetValue(6724, 0).ToString() == "Unnamed block ID: 2"
-assert pvview.GetValue(10087, 0).ToString() == "Unnamed block ID: 2"
+assert pvview.GetValue(0, 0).ToString() == "block_1"
+assert pvview.GetValue(6723, 0).ToString() == "block_1"
+assert pvview.GetValue(6724, 0).ToString() == "block_2"
+assert pvview.GetValue(10087, 0).ToString() == "block_2"

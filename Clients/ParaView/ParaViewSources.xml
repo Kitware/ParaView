@@ -63,6 +63,7 @@
   <Proxy group="sources" name="LiveProgrammableSource" icon=":/pqWidgets/Icons/pqProgrammableFilter.svg" />
   <Proxy group="sources" name="LogoSource" />
   <Proxy group="sources" name="OutlineSource" />
+  <Proxy group="sources" name="PartitionedDataSetCollectionSource" />
   <Proxy group="sources" name="PlaneSource" />
   <Proxy group="sources" name="PointSource" />
   <Proxy group="sources" name="PolyLineSource" />

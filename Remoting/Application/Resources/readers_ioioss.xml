@@ -1,6 +1,6 @@
 <ServerManagerConfiguration>
   <ProxyGroup name="sources">
-    <SourceProxy class="vtkIossReader" label="Ioss Reader" name="IossReader" executive="vtkReaderExecutive" >
+    <SourceProxy class="vtkIossReader" label="Ioss Reader" name="IossReader">
       <StringVectorProperty clean_command="ClearFileNames"
                             command="AddFileName"
                             name="FileName"
@@ -561,7 +561,7 @@
       <Hints>
         <ReaderFactory extensions="g e h gc ex2 ex2v2 exo gen par exoII exii ex-timeseries"
                        file_description="Ioss Exodus Files"
-                       filename_patterns="*e-s*" />
+                       filename_patterns="*.e-s*" />
       </Hints>
     </SourceProxy>
   </ProxyGroup>

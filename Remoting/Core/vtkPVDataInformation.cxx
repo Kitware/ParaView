@@ -598,7 +598,7 @@ void vtkPVDataInformation::AddInformation(vtkPVInformation* oinfo)
   {
     if (this->HasTime && this->Time != other->Time)
     {
-      vtkLogF(WARNING, "time mismatch: %lf != %lf", this->Time, other->Time);
+      vtkLogF(TRACE, "time mismatch: %lf != %lf", this->Time, other->Time);
     }
     this->HasTime = other->HasTime;
     this->Time = other->Time;
@@ -608,7 +608,7 @@ void vtkPVDataInformation::AddInformation(vtkPVInformation* oinfo)
   {
     if (!this->TimeLabel.empty() && this->TimeLabel != other->TimeLabel)
     {
-      vtkLogF(WARNING, "time-label mismatch: '%s' != '%s'", this->TimeLabel.c_str(),
+      vtkLogF(TRACE, "time-label mismatch: '%s' != '%s'", this->TimeLabel.c_str(),
         other->TimeLabel.c_str());
     }
     this->TimeLabel = other->TimeLabel;

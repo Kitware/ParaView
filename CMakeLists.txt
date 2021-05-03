@@ -262,8 +262,8 @@ set(paraview_default_plugins
   GeodesicMeasurement
   GMVReader
   HyperTreeGridADR
-  IOSSReader
   LagrangianParticleTracker
+  LegacyExodusReader
   Moments
   MooseXfemClip
   NetCDFTimeAnnotationPlugin

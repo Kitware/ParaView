@@ -16,11 +16,11 @@
 
 #include "vtkBoundingBox.h"
 #include "vtkCompositeDataIterator.h"
+#include "vtkDataObjectTree.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
 #include "vtkLineSource.h"
 #include "vtkMath.h"
-#include "vtkMultiBlockDataSet.h"
 #include "vtkMultiProcessController.h"
 #include "vtkNew.h"
 #include "vtkOBBTree.h"
@@ -49,7 +49,7 @@ void vtkRulerLineForInput::PrintSelf(ostream& os, vtkIndent indent)
 int vtkRulerLineForInput::FillInputPortInformation(int, vtkInformation* info)
 {
   info->Set(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkDataSet");
-  info->Append(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkMultiBlockDataSet");
+  info->Append(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkCompositeDataSet");
   return 1;
 }
 
@@ -58,102 +58,60 @@ int vtkRulerLineForInput::RequestInformation(vtkInformation* vtkNotUsed(request)
 {
   vtkInformation* outInfo = outVector->GetInformationObject(0);
   outInfo->Set(CAN_HANDLE_PIECE_REQUEST(), 1);
-
   return 1;
 }
 
 int vtkRulerLineForInput::RequestData(vtkInformation* vtkNotUsed(request),
   vtkInformationVector** inVectors, vtkInformationVector* outVector)
 {
-  vtkDataObject* inputData = vtkDataObject::GetData(inVectors[0], 0);
-  vtkBoundingBox bbox;
-  vtkDataSet* dataset;
+  auto inputDO = vtkDataObject::GetData(inVectors[0], 0);
 
-  if ((dataset = vtkDataSet::SafeDownCast(inputData)))
+  vtkBoundingBox localBox;
+  for (auto dataset : vtkCompositeDataSet::GetDataSets<vtkDataSet>(inputDO))
   {
     double bounds[6];
     dataset->GetBounds(bounds);
-    bbox.AddBounds(bounds);
+    localBox.AddBounds(bounds);
   }
-  else
+
+  vtkBoundingBox globalBox(localBox);
+  if (this->Controller && this->Controller->GetNumberOfProcesses() > 1)
   {
-    vtkMultiBlockDataSet* multiBlock = vtkMultiBlockDataSet::SafeDownCast(inputData);
-    assert(multiBlock);
-    vtkSmartPointer<vtkCompositeDataIterator> itr =
-      vtkSmartPointer<vtkCompositeDataIterator>::Take(multiBlock->NewIterator());
-    for (itr->InitTraversal(); !itr->IsDoneWithTraversal(); itr->GoToNextItem())
-    {
-      vtkDataObject* block = itr->GetCurrentDataObject();
-      vtkDataSet* blockAsDataset = vtkDataSet::SafeDownCast(block);
-      if (blockAsDataset)
-      {
-        double tmpBounds[6];
-        blockAsDataset->GetBounds(tmpBounds);
-        bbox.AddBounds(tmpBounds);
-      }
-    }
+    this->Controller->AllReduce(localBox, globalBox);
   }
 
   double globalBounds[6];
-  if (this->Controller)
-  {
-    double processBounds[6];
-    bbox.GetBounds(processBounds);
-    for (int i = 0; i < 3; ++i)
-    {
-      processBounds[2 * i] *= -1;
-    }
-    this->Controller->Reduce(&processBounds[0], &globalBounds[0], 6, vtkCommunicator::MAX_OP, 0);
-    for (int i = 0; i < 3; ++i)
-    {
-      globalBounds[2 * i] *= -1;
-    }
-  }
-  else
-  {
-    bbox.GetBounds(globalBounds);
-  }
+  globalBox.GetBounds(globalBounds);
 
   double corner[3], max[3], mid[3], min[3], size[3];
-  vtkSmartPointer<vtkPoints> points;
+  vtkNew<vtkPoints> points;
   if (this->Axis >= 3 && this->Axis <= 5)
   {
-    auto pointSet = vtkPointSet::SafeDownCast(inputData);
-    if (pointSet)
+    auto pointsets = vtkCompositeDataSet::GetDataSets<vtkPointSet>(inputDO);
+    if (pointsets.size() == 1)
     {
-      points = pointSet->GetPoints();
-      if (!points)
-      {
-        points = vtkSmartPointer<vtkPoints>::New();
-      }
+      // just shallow copy the data.
+      points->ShallowCopy(pointsets[0]->GetPoints());
     }
-    else if (auto mbds = vtkMultiBlockDataSet::SafeDownCast(inputData))
+    else if (pointsets.size() > 1)
     {
-      // Merge points from blocks into a new vtkPointsObject.
-      points = vtkSmartPointer<vtkPoints>::New();
-      vtkSmartPointer<vtkCompositeDataIterator> itr;
-      itr.TakeReference(mbds->NewIterator());
-      for (itr->InitTraversal(); !itr->IsDoneWithTraversal(); itr->GoToNextItem())
+      for (auto block : pointsets)
       {
-        auto pointSetBlock = vtkPointSet::SafeDownCast(mbds->GetDataSet(itr));
-        if (!pointSetBlock)
+        // Merge points from blocks into a new vtkPointsObject.
+        if (auto srcPoints = block->GetPoints())
         {
-          // No points, skip.
-          continue;
-        }
-        auto srcPoints = pointSetBlock->GetPoints();
-        if (srcPoints)
-        {
-          points->InsertPoints(
-            points->GetNumberOfPoints(), srcPoints->GetNumberOfPoints(), 0, srcPoints);
+          const auto count = points->GetNumberOfPoints();
+          if (count == 0)
+          {
+            points->SetDataType(srcPoints->GetDataType());
+            points->DeepCopy(srcPoints);
+          }
+          else
+          {
+            points->InsertPoints(count, srcPoints->GetNumberOfPoints(), 0, srcPoints);
+          }
         }
       }
-    }
-    else
-    {
-      vtkErrorMacro(<< "Input data set of type " << inputData->GetClassName()
-                    << " is not currently supported.");
-      return 0;
     }
 
     // Fetch all points across ranks.

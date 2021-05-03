@@ -872,7 +872,6 @@ list(APPEND TESTS_WITH_BASELINES
   EnSightTensorInversionBin.xml
   ExodusGlobalDataWithRestarts.xml
   ExodusSingleTimeStep.xml
-  ExodusXML.xml
   ExpandSelection.xml
   ExportLinePlotToCSV.xml
   ExportLinePlotToTSV.xml
@@ -943,10 +942,10 @@ list(APPEND TESTS_WITH_BASELINES
   OrthographicView.xml
   OutOfRangeColors.xml
   PBRSpheres.xml
-  ParallelCoordinatesView.xml
+  # ParallelCoordinatesView.xml see paraview/paraview#20679
   PlotDataOverTime-NonDistributed.xml
   PlotEdges2.xml
-  PlotEdges.xml
+  # PlotEdges.xml see paraview/paraview#20659
   PlotGlobalVariablesOverTime.xml
   PlotOverTimeAutoApply.xml
   PolygonCellSelection.xml
@@ -1021,7 +1020,7 @@ list(APPEND TESTS_WITH_BASELINES
   TensorGlyph.xml
   TemporalInterpolator.xml
   TemporalShiftScale.xml
-  TestGroupDataFromTimeSeries.xml
+  # TestGroupDataFromTimeSeries.xml paraview/paraview#20660
   TestSelectionOnMultipiece.xml
   TimeInspector.xml
   TimeStepProgressBar.xml
@@ -1084,7 +1083,6 @@ if(VTK_USE_LARGE_DATA)
   ExternalData_Expand_Arguments(ParaViewData _
     "DATA{${paraview_test_data_directory_input}/Data/bake/bake.e}")
   list(APPEND TESTS_WITH_BASELINES
-    CheckSelectedBlocks.xml
     RestoreBlockColorDefaultTransferFunction.xml
     )
 endif()
@@ -1211,7 +1209,7 @@ if(PARAVIEW_USE_PYTHON)
     TraceExodus.xml
     TraceExportAndSaveData.xml
     TraceSaveGeometry.xml
-    TraceStatisticsFilter.xml
+    # TraceStatisticsFilter.xml (see paraview/paraview#20661)
     TraceSupplementalProxiesFully.xml
     TraceTimeControls.xml
     TraceWithoutRenderingComponents.xml
@@ -1246,10 +1244,12 @@ if(PARAVIEW_USE_PYTHON)
     list(APPEND TESTS_WITH_BASELINES
       ContextViewSelectionTrace.xml
       ExodusModeShapes.xml
-      FindDataPartialArrays.xml
-      FindDataSelectLocation.xml # find data needs python/numpy
-      FindDataSelectLocationMultiblock.xml # find data needs python/numpy
       FindDataNameSanitization.xml
+      FindDataNonDistributedData.xml
+      FindDataPartialArrays.xml
+      FindDataSelectLocationMultiblock.xml # find data needs python/numpy
+      FindDataSelectLocation.xml # find data needs python/numpy
+      FindDataSelectors.xml
       ForceTimeDiamond.xml
       FreezeQueryMultiblock.xml
       IndexedLookupInitialization.xml # needs Python Calculator/numpy
@@ -1405,7 +1405,6 @@ set(InteractiveSelection_DISABLE_CRS TRUE)
 set(NonConvexPolygon_DISABLE_CRS TRUE)
 set(QuartilePlot_DISABLE_CRS TRUE)
 set(TestSelectionOnMultipiece_DISABLE_CRS TRUE)
-set(CheckSelectedBlocks_DISABLE_CRS TRUE)
 set(SelectionModifiersCells_DISABLE_CRS TRUE)
 set(SelectionModifiersBlocks_DISABLE_CRS TRUE)
 set(SelectionModifiersPoints_DISABLE_CRS TRUE)
@@ -1433,7 +1432,6 @@ set (LogColorMapToggle_FORCE_SERIAL TRUE) # since this pops up output window
 set (ColorOpacityTableEditing_FORCE_SERIAL TRUE) # since this uses popup-menu
 set (SimpleInteraction_FORCE_SERIAL TRUE) # since this uses popup-menu
 set (ExportFilteredColumnsSpreadsheet_FORCE_SERIAL TRUE) # since this uses popup-menu
-set (FindWidget_FORCE_SERIAL TRUE) # Uses inline edit popups
 set (PropertyLink_FORCE_SERIAL TRUE)
 set (TestPythonView_FORCE_SERIAL TRUE) # Seems to work better in serial.
 set (SaveColorMap_FORCE_SERIAL TRUE) # Uses inline edit popups

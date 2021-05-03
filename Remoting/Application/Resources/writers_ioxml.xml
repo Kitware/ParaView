@@ -94,7 +94,7 @@
     <!-- ================================================================= -->
     <PWriterProxy base_proxygroup="internal_writers"
                   base_proxyname="XMLDataObjectWriterCore"
-                  class="vtkXMLPPartitionedDataSetWriter"
+                  class="vtkXMLPartitionedDataSetWriter"
                   name="XMLPPartitionedDataSetWriterCore">
       <Documentation>Internal proxy used by XMLPPartitionedDataSetWriter.</Documentation>
       <!-- End of XMLPPartitionedDataSetWriterCore -->

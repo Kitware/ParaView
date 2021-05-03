@@ -43,3 +43,4 @@ public:
 //@}
 
 #endif // vtkPVInformationKeys_h
+// VTK-HeaderTest-Exclude: vtkPVInformationKeys.h

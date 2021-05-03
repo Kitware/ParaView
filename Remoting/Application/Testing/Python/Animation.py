@@ -7,16 +7,11 @@ smtesting.ProcessCommandLineArguments()
 
 filename = smtesting.DataDir + '/Testing/Data/can.ex2'
 can_ex2 = OpenDataFile(filename)
+can_ex2.ApplyDisplacements = 0
 
 AnimationScene1 = GetAnimationScene()
 AnimationScene1.EndTime = 0.004299988504499197
 AnimationScene1.PlayMode = 'Snap To TimeSteps'
-
-can_ex2.PointVariables = ['ACCL', 'DISPL', 'VEL']
-can_ex2.ElementVariables = ['EQPS']
-can_ex2.GlobalVariables = ['KE', 'NSTEPS', 'TMSTEP', 'XMOM', 'YMOM', 'ZMOM']
-can_ex2.ApplyDisplacements = 0
-can_ex2.ElementBlocks = ['Unnamed block ID: 1 Type: HEX Size: 4800', 'Unnamed block ID: 2 Type: HEX Size: 2352']
 
 RenderView1 = GetRenderView()
 DataRepresentation1 = Show()

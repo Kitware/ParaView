@@ -1,0 +1,7 @@
+NAME
+  LegacyExodusReader
+DESCRIPTION
+  Legacy reader for Exodus files
+REQUIRES_MODULES
+  VTK::IOParallelExodus
+  ParaView::VTKExtensionsIOExodus

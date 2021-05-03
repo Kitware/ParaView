@@ -46,3 +46,4 @@ public:
 
 #endif
 //****************************************************************************
+// VTK-HeaderTest-Exclude: vtkUndoStackInternal.h

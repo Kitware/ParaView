@@ -273,3 +273,4 @@ public:
 };
 #endif
 #endif
+// VTK-HeaderTest-Exclude: vtkStreamingPriorityQueue.h

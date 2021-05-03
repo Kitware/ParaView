@@ -356,8 +356,7 @@
     <!-- ================================================================== -->
     <SourceProxy class="vtkMultiBlockPLOT3DReader"
                  label="PLOT3D Reader"
-                 name="P3DReader"
-                 executive="vtkReaderExecutive">
+                 name="P3DReader" >
       <Documentation long_help="Reads ASCII or binary PLOT3D files."
                      short_help="Read PLOT3D files.">PLOT3D is a plotting
                      package developed at NASA. The PLOT3D reader can read both

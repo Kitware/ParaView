@@ -18,21 +18,66 @@
 #include "vtkPythonUtil.h"
 
 #include "vtkCompositeDataSet.h"
+#include "vtkFieldData.h"
+#include "vtkLogger.h"
 #include "vtkObjectFactory.h"
 #include "vtkPythonInterpreter.h"
 #include "vtkSelectionNode.h"
+#include "vtkSignedCharArray.h"
 #include "vtkSmartPyObject.h"
 
 #include <cassert>
+#include <map>
 #include <sstream>
 
+class vtkPythonSelector::vtkInternals
+{
+  std::map<void*, vtkSmartPointer<vtkDataArray> > Map;
+
+public:
+  static constexpr const char* MASK_ARRAYNAME = "__vtkPythonSelector__internal__array__";
+  void Reset() { this->Map.clear(); }
+  void RegisterMaskArray(vtkDataObject* input, vtkDataObject* output, int association)
+  {
+    auto inDatasets = vtkCompositeDataSet::GetDataSets<vtkDataObject>(input);
+    auto outDatasets = vtkCompositeDataSet::GetDataSets<vtkDataObject>(output);
+    assert(inDatasets.size() == outDatasets.size());
+    for (size_t cc = 0; cc < inDatasets.size(); ++cc)
+    {
+      auto in = inDatasets[cc];
+      auto out = outDatasets[cc];
+      if (in && out)
+      {
+        auto dsa = out->GetAttributesAsFieldData(association);
+        if (auto array = dsa ? dsa->GetArray(MASK_ARRAYNAME) : nullptr)
+        {
+          this->Map[in] = array;
+          dsa->RemoveArray(MASK_ARRAYNAME);
+        }
+      }
+    }
+  }
+
+  vtkDataArray* GetMaskArray(vtkDataObject* input) const
+  {
+    auto iter = this->Map.find(input);
+    return iter != this->Map.end() ? iter->second.GetPointer() : nullptr;
+  }
+};
+
 vtkStandardNewMacro(vtkPythonSelector);
+//----------------------------------------------------------------------------
+vtkPythonSelector::vtkPythonSelector()
+  : Internals(new vtkPythonSelector::vtkInternals())
+{
+}
 
 //----------------------------------------------------------------------------
-vtkPythonSelector::vtkPythonSelector() = default;
-
-//----------------------------------------------------------------------------
-vtkPythonSelector::~vtkPythonSelector() = default;
+vtkPythonSelector::~vtkPythonSelector()
+{
+  delete this->Internals;
+  this->Internals = nullptr;
+}
 
 //----------------------------------------------------------------------------
 void vtkPythonSelector::Execute(vtkDataObject* input, vtkDataObject* output)
@@ -61,9 +106,8 @@ void vtkPythonSelector::Execute(vtkDataObject* input, vtkDataObject* output)
   vtkSmartPyObject functionName(PyString_FromString("execute"));
   vtkSmartPyObject inputObj(vtkPythonUtil::GetObjectFromPointer(input));
   vtkSmartPyObject nodeObj(vtkPythonUtil::GetObjectFromPointer(this->Node));
-  vtkSmartPyObject arrayNameObj(PyString_FromString(this->InsidednessArrayName.c_str()));
+  vtkSmartPyObject arrayNameObj(PyString_FromString(vtkInternals::MASK_ARRAYNAME));
   vtkSmartPyObject outputObj(vtkPythonUtil::GetObjectFromPointer(output));
-
   vtkSmartPyObject retVal(
     PyObject_CallMethodObjArgs(psModule, functionName.GetPointer(), inputObj.GetPointer(),
       nodeObj.GetPointer(), arrayNameObj.GetPointer(), outputObj.GetPointer(), nullptr));
@@ -76,6 +120,33 @@ void vtkPythonSelector::Execute(vtkDataObject* input, vtkDataObject* output)
       PyErr_Clear();
     }
   }
+  else
+  {
+    auto& internals = (*this->Internals);
+    const int association =
+      vtkSelectionNode::ConvertSelectionFieldToAttributeType(this->Node->GetFieldType());
+    internals.RegisterMaskArray(input, output, association);
+    this->Superclass::Execute(input, output);
+    internals.Reset();
+  }
+}
+
+//----------------------------------------------------------------------------
+bool vtkPythonSelector::ComputeSelectedElements(
+  vtkDataObject* inputDO, vtkSignedCharArray* insidednessArray)
+{
+  assert(vtkCompositeDataSet::SafeDownCast(inputDO) == nullptr);
+  assert(insidednessArray != nullptr);
+  auto& internals = (*this->Internals);
+  if (auto array = internals.GetMaskArray(inputDO))
+  {
+    insidednessArray->ShallowCopy(array);
+    // restore name.
+    insidednessArray->SetName(this->InsidednessArrayName.c_str());
+    return true;
+  }
+
+  return false;
 }
 
 //----------------------------------------------------------------------------
