@@ -1,4 +1,4 @@
-/* Copyright 2020 NVIDIA Corporation. All rights reserved.
+/* Copyright 2021 NVIDIA Corporation. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -321,7 +321,7 @@ bool vtknvindex_volumemapper::initialize_mapper(vtkVolume* vol)
 
     if (matches_whole_bounds)
     {
-      WARN_LOG << "Parallel rendering disabled, only a single GPU will be used! "
+      WARN_LOG << "Parallel rendering disabled, only a single rank will be used! "
                << "The extent of the volume piece on MPI rank " << cur_global_rank << " (of "
                << m_controller->GetNumberOfProcesses() << ") "
                << "is equal to the extent of the entire volume: [" << extent[0] << " " << extent[2]
@@ -405,15 +405,22 @@ void vtknvindex_volumemapper::update_canvas(vtkRenderer* ren)
 
   if (ren->GetNumberOfPropsRendered())
   {
-    m_index_instance->m_opengl_app_buffer.resize_buffer(main_window_resolution);
-
     vtkOpenGLRenderWindow* vtk_gl_render_window = vtkOpenGLRenderWindow::SafeDownCast(win);
-    mi::Sint32 depth_bits = vtk_gl_render_window->GetDepthBufferSize();
-    m_index_instance->m_opengl_app_buffer.set_z_buffer_precision(depth_bits);
+    const mi::Sint32 depth_bits = vtk_gl_render_window->GetDepthBufferSize();
+    if (depth_bits > 0)
+    {
+      m_index_instance->m_opengl_app_buffer.set_z_buffer_precision(depth_bits);
+      m_index_instance->m_opengl_app_buffer.resize_buffer(main_window_resolution);
 
-    mi::Uint32* pv_z_buffer = m_index_instance->m_opengl_app_buffer.get_z_buffer_ptr();
-    glReadPixels(
-      0, 0, window_size[0], window_size[1], GL_DEPTH_COMPONENT, GL_UNSIGNED_INT, pv_z_buffer);
+      mi::Uint32* pv_z_buffer = m_index_instance->m_opengl_app_buffer.get_z_buffer_ptr();
+      glReadPixels(
+        0, 0, window_size[0], window_size[1], GL_DEPTH_COMPONENT, GL_UNSIGNED_INT, pv_z_buffer);
+    }
+    else
+    {
+      // This can happen when enabling "Axes Grid", as those are rendered without a depth buffer.
+      m_index_instance->m_opengl_app_buffer.set_z_buffer_precision(0);
+    }
   }
 
   reset_orthogonal_projection_matrix(window_size[0], window_size[1]);
@@ -650,6 +657,10 @@ void vtknvindex_volumemapper::Render(vtkRenderer* ren, vtkVolume* vol)
         m_index_instance->m_iindex_session->update(
           m_index_instance->m_session_tag, dice_transaction.get());
 
+        // Use ParaView depth buffer, if present.
+        const bool use_depth_buffer =
+          (ren->GetNumberOfPropsRendered() > 0 && m_index_instance->m_opengl_app_buffer.is_valid());
+
         // NVIDIA IndeX render call returns frame results
         mi::base::Handle<nv::index::IFrame_results> frame_results(
           m_index_instance->m_iindex_rendering->render(m_index_instance->m_session_tag,
@@ -658,9 +669,7 @@ void vtknvindex_volumemapper::Render(vtkRenderer* ren, vtkVolume* vol)
             0,    // No progress_callback.
             0,    // No Frame information.
             true, // = g_immediate_final_parallel_compositing
-            ren->GetNumberOfPropsRendered() ? &(m_index_instance->m_opengl_app_buffer)
-                                            : NULL) // ParaView depth buffer, if present.
-          );
+            use_depth_buffer ? &m_index_instance->m_opengl_app_buffer : nullptr));
 
         // check for errors during rendering
         const mi::base::Handle<nv::index::IError_set> err_set(frame_results->get_error_set());

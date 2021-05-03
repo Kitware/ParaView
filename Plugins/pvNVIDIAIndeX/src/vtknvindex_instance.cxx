@@ -1,4 +1,4 @@
-/* Copyright 2020 NVIDIA Corporation. All rights reserved.
+/* Copyright 2021 NVIDIA Corporation. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -150,6 +150,19 @@ vtknvindex_instance::~vtknvindex_instance()
 {
   if (is_index_rank() && m_nvindex_interface)
   {
+    {
+      // Reduce log level for shutdown
+      mi::base::Handle<mi::neuraylib::ILogging_configuration> logging_configuration(
+        m_nvindex_interface->get_api_component<mi::neuraylib::ILogging_configuration>());
+      logging_configuration->set_log_level(mi::base::MESSAGE_SEVERITY_WARNING);
+
+      // Reduce log level even more when running with old library version, to hide harmless warnings
+      if (std::string(m_nvindex_interface->get_revision()).find("329100.8100.3009,") == 0)
+      {
+        logging_configuration->set_log_level(mi::base::MESSAGE_SEVERITY_FATAL);
+      }
+    }
+
     // Shut down forwarding logger.
     vtknvindex::logger::vtknvindex_forwarding_logger_factory::delete_instance();
 
@@ -160,10 +173,7 @@ vtknvindex_instance::~vtknvindex_instance()
     unload_nvindex();
   }
 
-  if (m_is_index_viewer && m_nvindex_colormaps)
-    delete m_nvindex_colormaps;
-
-  delete s_index_instance;
+  delete m_nvindex_colormaps;
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -204,13 +214,8 @@ mi::Sint32 vtknvindex_instance::get_cur_local_rank_id() const
 //-------------------------------------------------------------------------------------------------
 vtknvindex_instance* vtknvindex_instance::get()
 {
-  return s_index_instance;
-}
-
-//-------------------------------------------------------------------------------------------------
-vtknvindex_instance* vtknvindex_instance::create()
-{
-  return new vtknvindex_instance();
+  static vtknvindex_instance instance; // Meyers' singleton
+  return &instance;
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -575,13 +580,7 @@ mi::Sint32 vtknvindex_instance::authenticate_nvindex()
   // No explicit license was specified, fall back to default license.
   if (!found_license)
   {
-#if (NVIDIA_INDEX_LIBRARY_REVISION_MAJOR > 327600)
     return 0;
-#else
-    index_vendor_key =
-      "NVIDIA IndeX License for Paraview IndeX:PV:Free:v1 - 20200427 (oem:retail_cloud.20220630)";
-    index_secret_key = "10e9ce315607f2d230e82647682d250a176ddd4e3d05c49401b5556a6794c72c";
-#endif
   }
 
   // Retrieve Flex license path.
@@ -866,13 +865,28 @@ bool vtknvindex_instance::setup_nvindex()
     idebug_configuration->set_option("integration_flags=8");
 #endif
 
+#if (NVIDIA_INDEX_LIBRARY_REVISION_MAJOR > 329100 ||                                               \
+  (NVIDIA_INDEX_LIBRARY_REVISION_MAJOR == 329100 && NVIDIA_INDEX_LIBRARY_REVISION_MINOR == 8100 && \
+       NVIDIA_INDEX_LIBRARY_REVISION_SUBMINOR > 3009))
+
+    // Skip when running with the old library version, as that would trigger a runtime warning
+    if (std::string(m_nvindex_interface->get_revision()).find("329100.8100.3009,") != 0)
+    {
+      // Disable features not used by the plugin
+      idebug_configuration->set_option("disable_picking=1");
+    }
+#endif
+
     // Don't pre-allocate buffers for rasterizer
     idebug_configuration->set_option("rasterizer_memory_allocation=-1");
+
+    // No need to reset CUDA devices on shutdown
+    idebug_configuration->set_option("cuda_device_reset_disable=1");
 
     // Disable timeseries data prefetch.
     idebug_configuration->set_option("timeseries_data_prefetch_disable=1");
 
-    // Disable IndeX parallel importing, given importeres are already parallelized.
+    // Disable IndeX parallel importing, given importers are already parallelized.
     idebug_configuration->set_option("async_subset_load=0");
 
     // Use strict domain subdivision only with multiple ranks.
@@ -990,7 +1004,7 @@ bool vtknvindex_instance::setup_nvindex()
 }
 
 //-------------------------------------------------------------------------------------------------
-bool vtknvindex_instance::shutdown_nvindex()
+void vtknvindex_instance::shutdown_nvindex()
 {
   if (m_nvindex_interface.is_valid_interface())
   {
@@ -1008,14 +1022,8 @@ bool vtknvindex_instance::shutdown_nvindex()
   m_iindex_debug_configuration = 0;
   m_session_tag = mi::neuraylib::NULL_TAG;
 
-  const mi::Sint32 nvindex_shutdown = m_nvindex_interface->shutdown();
-
-  if (nvindex_shutdown != 0)
-    ERROR_LOG << "Failed to shutdown the NVIDIA IndeX library (code: " << nvindex_shutdown << ").";
-
+  m_nvindex_interface->shutdown();
   m_nvindex_interface = 0;
-
-  return nvindex_shutdown == 0;
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -1151,8 +1159,5 @@ void vtknvindex_instance::init_scene_graph()
 //-------------------------------------------------------------------------------------------------
 const char* vtknvindex_instance::get_version() const
 {
-  return "5.9";
+  return "5.9.1";
 }
-
-//-------------------------------------------------------------------------------------------------
-vtknvindex_instance* vtknvindex_instance::s_index_instance = vtknvindex_instance::create();

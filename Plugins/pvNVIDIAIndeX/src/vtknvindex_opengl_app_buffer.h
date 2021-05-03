@@ -1,4 +1,4 @@
-/* Copyright 2020 NVIDIA Corporation. All rights reserved.
+/* Copyright 2021 NVIDIA Corporation. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without
 * modification, are permitted provided that the following conditions
@@ -65,13 +65,8 @@ public:
   // Returns true when the buffer is allocated.
   bool is_buffer_allocated() const;
 
-  // Get the pixel index. Assume that the buffer size is less than 2GB.
-  static inline mi::Sint32 get_pixel_index(mi::Sint32 width, mi::Sint32 height, mi::Sint32 channel,
-    mi::Sint32 x, mi::Sint32 y, mi::Sint32 rgba)
-  {
-    if ((0 <= x) && (x < width) && (0 <= y) && (y < height) && (0 <= rgba) && (rgba < channel))
-      return ((channel * (x + (y * width))) + rgba);
-  }
+  // Returns true when the buffer can be used.
+  bool is_valid() const;
 
 private:
   vtknvindex_opengl_app_buffer(vtknvindex_opengl_app_buffer const&) = delete;

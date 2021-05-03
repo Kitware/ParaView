@@ -1,4 +1,4 @@
-/* Copyright 2020 NVIDIA Corporation. All rights reserved.
+/* Copyright 2021 NVIDIA Corporation. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -932,6 +932,7 @@ void vtknvindex_scene::update_rtc_kernel(
         case RTC_KERNELS_EDGE_ENHANCEMENT:
           rtc_program->set_program_source(rtc_param_buffer.kernel_program.c_str());
           rtc_program->set_enabled(true);
+          break;
         case RTC_KERNELS_CUSTOM:
           // use default program in case the custom kernel doesn't exist yet.
           if (rtc_param_buffer.kernel_program == "")

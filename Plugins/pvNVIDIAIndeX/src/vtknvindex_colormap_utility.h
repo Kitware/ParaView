@@ -1,4 +1,4 @@
-/* Copyright 2020 NVIDIA Corporation. All rights reserved.
+/* Copyright 2021 NVIDIA Corporation. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without
 * modification, are permitted provided that the following conditions
@@ -67,16 +67,6 @@ public:
 private:
   vtknvindex_colormap(const vtknvindex_colormap&) = delete;
   void operator=(const vtknvindex_colormap&) = delete;
-
-  // Normalize input range to scale range.
-  void normalize(const mi::math::Vector<mi::Float32, 2>& input_range,
-    const mi::math::Vector<mi::Float32, 2>& scale_range,
-    mi::math::Vector<mi::Float32, 2>& output_range);
-
-  // Get ParaView's transfer function and write it to an IndeX colormap.
-  void get_paraview_colormap(vtkVolume* vol,
-    vtknvindex_regular_volume_properties* regular_volume_properties,
-    mi::base::Handle<nv::index::IColormap>& colormap);
 
   // Get ParaView's transfer function and write it to an IndeX colormap including slices.
   void get_paraview_colormaps(vtkVolume* vol,
