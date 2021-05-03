@@ -99,7 +99,6 @@
         si_class="vtkSIDataArrayProperty" />
       <StringVectorProperty command="SetActiveTimeDataArrayName"
                             element_types="str"
-                            information_property="TimeArrayInfo"
                             label="Time Array"
                             default_values="SimulationTime"
                             name="TimeArray"
