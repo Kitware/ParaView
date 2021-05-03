@@ -3068,7 +3068,7 @@ bool vtkPVRenderView::BeginValuePassForRendering(
 
   // hide various annotations since they interfere with value pass;
   // preserve state so we can store it.
-  internals.ValuePassState.reset(new ValuePassStateT());
+  internals.ValuePassState = std::make_unique<ValuePassStateT>();
   internals.ValuePassState->OrientationAxesVisibility = this->OrientationWidget->GetVisibility();
   internals.ValuePassState->CenterAxesVisibility = (this->CenterAxes->GetVisibility() != 0);
   internals.ValuePassState->AnnotationVisibility = this->ShowAnnotation;
