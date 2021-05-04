@@ -747,7 +747,7 @@
     </SourceProxy>
 
     <!-- ==================================================================== -->
-    <SourceProxy class="vtkMultiBlockFromTimeSeriesFilter"
+    <SourceProxy class="vtkGroupTimeStepsFilter"
                  label="Group Time Steps"
                  name="GroupTimeSteps">
       <Documentation long_help="Group data set over time."
