@@ -32,6 +32,12 @@ if ("$ENV{CMAKE_CONFIGURATION}" MATCHES "fedora")
     "\\.VariableSelector1$"
     "\\.VolumeCrop$"
 
+    # "Structure does not match. You must use CopyStructure before calling this
+    # method."
+    # https://gitlab.kitware.com/paraview/paraview/-/issues/20692
+    "\\.VisItBridgeLAMMPSDump$"
+    "\\.VisItBridgeLAMMPSDump2$"
+
     # These have failed on buildbot before. Not sure what the cause is.
     "\\.TestPythonView$"
 
