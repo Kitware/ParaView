@@ -1878,3 +1878,20 @@ if (PARAVIEW_USE_PYTHON)
     set_tests_properties(${tname} PROPERTIES LABELS "paraview")
   endforeach()
 endif()
+
+#----------------------------------------------------------------------
+# Very small texture size limits on mesa cause error messages for some tests that
+# include coloring by cell data. Let's skip those.
+set(texture_buffer_exceeding_hardware_tests
+  CONVERGECFDReader
+  CONVERGECFDReaderWithVisItBridge
+)
+
+foreach(test_name IN LISTS texture_buffer_exceeding_hardware_tests)
+  foreach(prefix IN LISTS pv pvcs pvcrs)
+    if (TEST "${prefix}.${test_name}")
+      set_property(TEST "${prefix}.${test_name}" APPEND PROPERTY
+        SKIP_REGULAR_EXPRESSION "Attempt to use a texture buffer exceeding your hardware")
+    endif()
+  endforeach()
+endforeach()
