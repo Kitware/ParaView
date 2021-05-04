@@ -241,7 +241,6 @@
   <Proxy group="filters" name="Glyph" icon=":/pqWidgets/Icons/pqGlyph.svg" />
   <Proxy group="filters" name="GlyphWithCustomSource" icon=":/pqWidgets/Icons/pqGlyph.svg" />
   <Proxy group="filters" name="Gradient" />
-  <Proxy group="filters" name="GridConnectivity" />
   <Proxy group="filters" name="GroupDataSets" icon=":/pqWidgets/Icons/pqGroup.svg" />
   <Proxy group="filters" name="GroupTimeSteps" />
   <Proxy group="filters" name="HyperTreeGridAxisReflection" />

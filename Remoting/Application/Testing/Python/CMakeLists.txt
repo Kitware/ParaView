@@ -245,34 +245,37 @@ endif()
 #----------------------------------------------------------------------
 # Module tests using pvpython
 #----------------------------------------------------------------------
-paraview_add_test(
-  PREFIX "ParaView::RemotingApplicationPython::Module::pvpython::paraview"
-  ARGS   "$<TARGET_FILE:ParaView::pvpython>"
-         -dr
-         --force-offscreen-rendering
-         -m paraview.tests
-         -o "${CMAKE_BINARY_DIR}/Temporary/Temporary/paraview_tests_results"
-  TEST_NAME "tests")
+if (NOT PARAVIEW_SERIAL_TESTS_USE_MPIEXEC)
+  # for HPC, we only test pvbatch, and that's adequate.
+  paraview_add_test(
+    PREFIX "ParaView::RemotingApplicationPython::Module::pvpython::paraview"
+    ARGS   "$<TARGET_FILE:ParaView::pvpython>"
+           -dr
+           --force-offscreen-rendering
+           -m paraview.tests
+           -o "${CMAKE_BINARY_DIR}/Temporary/Temporary/paraview_tests_results"
+    TEST_NAME "tests")
 
-paraview_add_test(
-  PREFIX "ParaView::RemotingApplicationPython::Module::pvpython::paraview.tests"
-  ARGS   "$<TARGET_FILE:ParaView::pvpython>"
-         -dr
-         --force-offscreen-rendering
-         -m paraview.tests.verify_eyedomelighting
-         -o "${CMAKE_BINARY_DIR}/Testing/Temporary/VerifyEyeDomeLighting.png"
-         -v DATA{${_vtk_build_TEST_INPUT_DATA_DIRECTORY}/Data/Baseline/VerifyEyeDomeLighting.png}
-  TEST_NAME "verify_eyedomelighting")
+  paraview_add_test(
+    PREFIX "ParaView::RemotingApplicationPython::Module::pvpython::paraview.tests"
+    ARGS   "$<TARGET_FILE:ParaView::pvpython>"
+           -dr
+           --force-offscreen-rendering
+           -m paraview.tests.verify_eyedomelighting
+           -o "${CMAKE_BINARY_DIR}/Testing/Temporary/VerifyEyeDomeLighting.png"
+           -v DATA{${_vtk_build_TEST_INPUT_DATA_DIRECTORY}/Data/Baseline/VerifyEyeDomeLighting.png}
+    TEST_NAME "verify_eyedomelighting")
 
-paraview_add_test(
-  PREFIX "ParaView::RemotingApplicationPython::Module::pvpython::paraview.tests"
-  ARGS   "$<TARGET_FILE:ParaView::pvpython>"
-         -dr
-         --force-offscreen-rendering
-         -m paraview.tests.basic_rendering
-         -o "${CMAKE_BINARY_DIR}/Testing/Temporary/BasicRendering.png"
-         -v DATA{${_vtk_build_TEST_INPUT_DATA_DIRECTORY}/Data/Baseline/BasicRendering.png}
-  TEST_NAME "basic_rendering")
+  paraview_add_test(
+    PREFIX "ParaView::RemotingApplicationPython::Module::pvpython::paraview.tests"
+    ARGS   "$<TARGET_FILE:ParaView::pvpython>"
+           -dr
+           --force-offscreen-rendering
+           -m paraview.tests.basic_rendering
+           -o "${CMAKE_BINARY_DIR}/Testing/Temporary/BasicRendering.png"
+           -v DATA{${_vtk_build_TEST_INPUT_DATA_DIRECTORY}/Data/Baseline/BasicRendering.png}
+    TEST_NAME "basic_rendering")
+endif()
 
 #----------------------------------------------------------------------
 # Module tests using pvbatch (with or without MPI)

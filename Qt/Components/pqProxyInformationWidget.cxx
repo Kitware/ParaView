@@ -426,6 +426,17 @@ public:
       this->Ui.rawAssemblyTree->setPlainText(QString());
     }
 
+    // if assembly doesn't exists, hide the "Assembly" tab.
+    const auto idxOf = this->Ui.dataGroupingTab->indexOf(this->Ui.assemblyTab);
+    if (idxOf == -1 && assembly != nullptr)
+    {
+      this->Ui.dataGroupingTab->addTab(this->Ui.assemblyTab, "Assembly");
+    }
+    else if (idxOf != -1 && assembly == nullptr)
+    {
+      this->Ui.dataGroupingTab->removeTab(idxOf);
+    }
+
     // TODO: save/restore expand and selection state if possible.
     this->Ui.compositeTree->expandAll();
     this->Ui.assemblyTree->expandAll();

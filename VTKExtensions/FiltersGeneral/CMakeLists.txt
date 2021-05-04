@@ -37,7 +37,6 @@ set(classes
   vtkEquivalenceSet
   vtkExtractScatterPlot
   vtkFlashContour
-  vtkGridConnectivity
   vtkHierarchicalFractal
   vtkHybridProbeFilter
   vtkImageSimpleSource

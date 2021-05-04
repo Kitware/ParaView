@@ -1110,9 +1110,6 @@ if (PARAVIEW_USE_MPI)
     # Test uses D3 which is available in MPI only builds.
     D3SmallCells.xml
 
-    # Test uses D3 which is available in MPI only builds.
-    GridConnectivity.xml
-
     EDLWithSubsampling.xml
 
     # Test uses D3 which is available in MPI only builds.
