@@ -65,6 +65,7 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${paraview_test_data_directory_input}/Data/TestMultipleNumberOfComponentsPlugin.xml}"
   "DATA{${paraview_test_data_directory_input}/Data/VisItBridge/,REGEX:.*}"
   "DATA{${paraview_test_data_directory_input}/Data/amr/,REGEX:.*}"
+  "DATA{${paraview_test_data_directory_input}/Data/amr/wavelet/,REGEX:.*}"
   "DATA{${paraview_test_data_directory_input}/Data/artifact.dta}"
   "DATA{${paraview_test_data_directory_input}/Data/blow.vtk}"
   "DATA{${paraview_test_data_directory_input}/Data/blow_data.myvtk}"
@@ -813,6 +814,7 @@ list(APPEND TESTS_WITH_BASELINES
   4AxesContextView.xml
   AccentuatedFilename.xml
   AdaptiveResampleToImage.xml
+  AMRArraySelection.xml
   AMRCutPlane.xml
   AMReXParticlesReader.xml
   AnimationUseCamera.xml
