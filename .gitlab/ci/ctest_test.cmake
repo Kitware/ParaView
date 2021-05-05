@@ -41,6 +41,10 @@ if ("$ENV{CMAKE_CONFIGURATION}" MATCHES "fedora")
     # These have failed on buildbot before. Not sure what the cause is.
     "\\.TestPythonView$"
 
+    # X races
+    # https://gitlab.kitware.com/paraview/paraview/-/issues/20697
+    "\\.ComparativeViewOverlay"
+
     # These tests fail without output as to what is wrong.
     "^pqWidgetsAnimation$"
     "^pqWidgetsFlatTreeView$"
