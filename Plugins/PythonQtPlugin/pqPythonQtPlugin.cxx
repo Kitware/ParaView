@@ -30,6 +30,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
+#define QT_NO_KEYWORDS
+
 #include "pqPythonQtPlugin.h"
 
 #include <vtkPython.h>

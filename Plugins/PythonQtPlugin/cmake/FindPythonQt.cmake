@@ -32,13 +32,13 @@ if (PythonQt_FOUND)
         IMPORTED_LOCATION "${PythonQt_LIBRARY}"
         INTERFACE_INCLUDE_DIRECTORIES "${PythonQt_INCLUDE_DIR}")
   endif ()
-  if (NOT TARGET PythonQt::PythonQt_QtAll)
-    if(PythonQt_QtAll_LIBRARY)
+  if (PythonQt_QtAll_LIBRARY)
+    if (NOT TARGET PythonQt::PythonQt_QtAll)
       add_library(PythonQt::PythonQt_QtAll UNKNOWN IMPORTED)
       set_target_properties(PythonQt::PythonQt_QtAll
         PROPERTIES
           IMPORTED_LOCATION "${PythonQt_QtAll_LIBRARY}"
           INTERFACE_INCLUDE_DIRECTORIES "${PythonQt_INCLUDE_DIR}")
-    endif()
+    endif ()
   endif ()
 endif ()

@@ -15,7 +15,6 @@ set(sources
   pqPythonQtWrapperFactory.cxx
   pqPythonQtWrapperFactory.h
   "${decorator_file}")
-
 set(interfaces)
 paraview_plugin_add_auto_start(
   CLASS_NAME "pqPythonQtPlugin"
@@ -42,13 +41,14 @@ target_link_libraries(PythonQtPlugin
     ParaView::pqPython
     PythonQt::PythonQt)
 
-if(TARGET PythonQt::PythonQt_QtAll)    
+if(TARGET PythonQt::PythonQt_QtAll)
   target_link_libraries(PythonQtPlugin
     PRIVATE
       PythonQt::PythonQt_QtAll)
 endif()
 
-target_compile_definitions(PythonQtPlugin PRIVATE WITH_QtAll=$<TARGET_EXISTS:PythonQt::PythonQt_QtAll>)
+target_compile_definitions(PythonQtPlugin PRIVATE
+  WITH_QtAll=$<TARGET_EXISTS:PythonQt::PythonQt_QtAll>)
 
 target_include_directories(PythonQtPlugin
   PRIVATE ${CMAKE_CURRENT_BINARY_DIR})
@@ -56,8 +56,8 @@ target_include_directories(PythonQtPlugin
 find_package("Python3" QUIET REQUIRED COMPONENTS Interpreter)
 
 add_custom_command(
-  OUTPUT ${decorator_file}
-  COMMAND "Python3::Interpreter"
+  OUTPUT  "${decorator_file}"
+  COMMAND "$<TARGET_FILE:Python3::Interpreter>"
           "${CMAKE_CURRENT_SOURCE_DIR}/WrapPythonQt.py"
           -i "${CMAKE_CURRENT_SOURCE_DIR}/wrapped_methods.txt"
           -o "${decorator_file}"
