@@ -1088,6 +1088,48 @@
           method.  Set this to 0 to imply no limit. Default is 0.
         </Documentation>
       </IntVectorProperty>
+      <StringVectorProperty information_only="1"
+                            name="CellArrayInfo">
+        <ArraySelectionInformationHelper attribute_name="Cell" />
+      </StringVectorProperty>
+      <StringVectorProperty command="SetCellArrayStatus"
+                            element_types="2 0"
+                            information_property="CellArrayInfo"
+                            label="Cell Arrays"
+                            name="CellArrayStatus"
+                            number_of_elements="0"
+                            number_of_elements_per_command="2"
+                            repeat_command="1">
+        <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+            <Property function="ArrayList"
+                      name="CellArrayInfo" />
+          </RequiredProperties>
+        </ArraySelectionDomain>
+        <Documentation>This property lists which cell-centered arrays to
+        read.</Documentation>
+      </StringVectorProperty>
+      <StringVectorProperty information_only="1"
+                            name="PointArrayInfo">
+        <ArraySelectionInformationHelper attribute_name="Point" />
+      </StringVectorProperty>
+      <StringVectorProperty command="SetPointArrayStatus"
+                            element_types="2 0"
+                            information_property="PointArrayInfo"
+                            label="Point Arrays"
+                            name="PointArrayStatus"
+                            number_of_elements="0"
+                            number_of_elements_per_command="2"
+                            repeat_command="1">
+        <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+            <Property function="ArrayList"
+                      name="PointArrayInfo" />
+          </RequiredProperties>
+        </ArraySelectionDomain>
+        <Documentation>This property lists which point-centered arrays to
+        read.</Documentation>
+      </StringVectorProperty>
       <StringVectorProperty name="TimeArrayInfo"
         command="GetTimeDataStringArray"
         information_only="1"
@@ -2382,6 +2424,15 @@
                proxyname="XMLUniformGridAMRReaderCore">
         </Proxy>
         <ExposedProperties>
+          <PropertyGroup label="Cell/Point Array Status"
+                         name="CellPointArrayStatus"
+                         panel_visibility="default"
+                         panel_widget="ArrayStatus">
+            <Property name="CellArrayInfo" />
+            <Property name="CellArrayStatus" />
+            <Property name="PointArrayInfo" />
+            <Property name="PointArrayStatus" />
+          </PropertyGroup>
           <Property name="DefaultNumberOfLevels" />
           <Property name="TimeArrayInfo" />
           <Property name="TimeArray" />

@@ -9,7 +9,8 @@ mark_as_advanced(smooth_flash)
 
 vtk_add_test_cxx(vtkPVVTKExtensionsRenderingCxxTests tests
   NO_VALID NO_OUTPUT
-# This was basically ignored in the previous version.
+# This was basically ignored in the previous version. 
+# https://gitlab.kitware.com/paraview/paraview/-/issues/20691
 #  TestResampledAMRImageSourceWithPointData.cxx
   TestImageCompressors.cxx
   TestDataTabulator.cxx
