@@ -14,7 +14,7 @@ set(sources
   pqPythonQtPlugin.h
   pqPythonQtWrapperFactory.cxx
   pqPythonQtWrapperFactory.h
-  ${decorator_file})
+  "${decorator_file}")
 
 set(interfaces)
 paraview_plugin_add_auto_start(
@@ -40,8 +40,15 @@ target_link_libraries(PythonQtPlugin
     VTK::WrappingPythonCore
     ParaView::pqApplicationComponents
     ParaView::pqPython
-    PythonQt::PythonQt
-    PythonQt::PythonQt_QtAll)
+    PythonQt::PythonQt)
+
+if(TARGET PythonQt::PythonQt_QtAll)    
+  target_link_libraries(PythonQtPlugin
+    PRIVATE
+      PythonQt::PythonQt_QtAll)
+endif()
+
+target_compile_definitions(PythonQtPlugin PRIVATE WITH_QtAll=$<TARGET_EXISTS:PythonQt::PythonQt_QtAll>)
 
 target_include_directories(PythonQtPlugin
   PRIVATE ${CMAKE_CURRENT_BINARY_DIR})
