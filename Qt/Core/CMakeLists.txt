@@ -191,10 +191,5 @@ if (PARAVIEW_USE_QTHELP)
       Qt5::Help)
 endif ()
 
-if (PARAVIEW_USE_PYTHON)
-  vtk_module_definitions(ParaView::pqCore
-    PRIVATE PARAVIEW_PQCORE_ENABLE_PYTHON=1)
-else ()
-  vtk_module_definitions(ParaView::pqCore
-    PRIVATE PARAVIEW_PQCORE_ENABLE_PYTHON=0)
-endif()
+vtk_module_definitions(ParaView::pqCore
+  PRIVATE "PARAVIEW_PQCORE_ENABLE_PYTHON=$<BOOL:${PARAVIEW_USE_PYTHON}>")
