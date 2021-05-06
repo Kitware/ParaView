@@ -173,13 +173,9 @@ set(classes
   pqViewManager
   pqWidgetRangeDomain)
 
-set(built_shared 0)
-if (BUILD_SHARED_LIBS)
-  set(built_shared 1)
-endif ()
 set_property(SOURCE pqComponentsInit.cxx APPEND
   PROPERTY
-    COMPILE_DEFINITIONS "BUILD_SHARED_LIBS=${built_shared}")
+    COMPILE_DEFINITIONS "BUILD_SHARED_LIBS=$<BOOL:${BUILD_SHARED_LIBS}>")
 
 if (PARAVIEW_BUILD_ID)
   set_property(SOURCE pqAboutDialog.cxx APPEND
