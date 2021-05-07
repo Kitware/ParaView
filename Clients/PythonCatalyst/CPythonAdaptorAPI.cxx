@@ -15,7 +15,7 @@
 #include "CPythonAdaptorAPI.h"
 #include "vtkCPProcessor.h"
 #include "vtkCPPythonAdaptorAPI.h"
-#include "vtkCPPythonScriptPipeline.h"
+#include "vtkCPPythonPipeline.h"
 
 void coprocessorinitializewithpython(char* pythonFileName, int* pythonFileNameLength)
 {
@@ -39,9 +39,8 @@ void coprocessoraddpythonscript(char* pythonFileName, int* pythonFileNameLength)
   memcpy(cPythonFileName, pythonFileName, sizeof(char) * length);
   cPythonFileName[length] = 0;
 
-  vtkCPPythonScriptPipeline* pipeline = vtkCPPythonScriptPipeline::New();
-  pipeline->Initialize(cPythonFileName);
-
-  vtkCPPythonAdaptorAPI::GetCoProcessor()->AddPipeline(pipeline);
-  pipeline->FastDelete();
+  if (auto pipeline = vtkCPPythonPipeline::CreateAndInitializePipeline(cPythonFileName))
+  {
+    vtkCPPythonAdaptorAPI::GetCoProcessor()->AddPipeline(pipeline);
+  }
 }
