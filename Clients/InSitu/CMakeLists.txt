@@ -61,14 +61,10 @@ if (TARGET VTK::ParallelMPI)
   target_link_libraries(catalyst
     PRIVATE
       VTK::ParallelMPI)
-  target_compile_definitions(catalyst
-    PRIVATE
-      VTK_MODULE_ENABLE_VTK_ParallelMPI=1)
-else()
-  target_compile_definitions(catalyst
-    PRIVATE
-      VTK_MODULE_ENABLE_VTK_ParallelMPI=0)
 endif()
+target_compile_definitions(catalyst
+  PRIVATE
+    "VTK_MODULE_ENABLE_VTK_ParallelMPI=$<TARGET_EXISTS:VTK::ParallelMPI>")
 
 if (TARGET VTK::WrappingPythonCore AND VTK_PYTHON_OPTIONAL_LINK)
   # if Python is enabled and optionally linking with Python,

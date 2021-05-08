@@ -39,10 +39,6 @@ if (PARAVIEW_USE_QT)
   target_link_libraries(vtkRemotingServerManagerCxxTests PRIVATE Qt5::Test)
 endif ()
 
-set(built_shared 0)
-if (BUILD_SHARED_LIBS)
-  set(built_shared 1)
-endif ()
 set_property(SOURCE TestValidateProxies.cxx APPEND
   PROPERTY
-    COMPILE_DEFINITIONS "BUILD_SHARED_LIBS=${built_shared}")
+    COMPILE_DEFINITIONS "BUILD_SHARED_LIBS=$<BOOL:${BUILD_SHARED_LIBS}>")

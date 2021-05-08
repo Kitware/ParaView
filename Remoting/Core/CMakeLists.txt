@@ -90,13 +90,9 @@ if (APPLE)
     vtkPVMacFileInformationHelper.h)
 endif ()
 
-set(built_shared 0)
-if (BUILD_SHARED_LIBS)
-  set(built_shared 1)
-endif ()
 set_property(SOURCE vtkPVPluginLoader.cxx APPEND
   PROPERTY
-    COMPILE_DEFINITIONS "BUILD_SHARED_LIBS=${built_shared}")
+    COMPILE_DEFINITIONS "BUILD_SHARED_LIBS=$<BOOL:${BUILD_SHARED_LIBS}>")
 
 if (WIN32)
   set(libdir_relpath ".")
@@ -108,11 +104,11 @@ endif ()
 set_property(SOURCE vtkPVPluginTracker.cxx APPEND
   PROPERTY
     COMPILE_DEFINITIONS
-      "BUILD_SHARED_LIBS=${built_shared}"
+      "BUILD_SHARED_LIBS=$<BOOL:${BUILD_SHARED_LIBS}>"
       "PARAVIEW_RELATIVE_LIBPATH=\"${libdir_relpath}\""
       "PARAVIEW_SUBDIR=\"paraview${paraview_version_suffix}/plugins\"")
 
-set(vtkProcessModule_defines "BUILD_SHARED_LIBS=${built_shared}")
+set(vtkProcessModule_defines "BUILD_SHARED_LIBS=$<BOOL:${BUILD_SHARED_LIBS}>")
 if (PARAVIEW_INITIALIZE_MPI_ON_CLIENT)
   list(APPEND vtkProcessModule_defines
     PARAVIEW_INITIALIZE_MPI_ON_CLIENT)
