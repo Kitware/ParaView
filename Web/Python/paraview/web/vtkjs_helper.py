@@ -29,15 +29,6 @@ def getAllNames():
 
 # -----------------------------------------------------------------------------
 
-def findName(names, actor, defaultName):
-    for name in names:
-        if actor == names[name]:
-            return name
-    return defaultName
-
-
-# -----------------------------------------------------------------------------
-
 def getRenameMap():
     renameMap = {}
     names = getAllNames()
@@ -51,26 +42,28 @@ def getRenameMap():
             continue
         if not viewProp.GetVisibility():
             continue
-        bounds = viewProp.GetBounds()
-        if bounds[0] > bounds[1]:
-            continue
         # The mapping will fail for multiblock that are composed of several blocks
         # Merge block should be used to solve the renaming issue for now
         # as the id is based on the a valid block vs representation.
         strIdx = '%s' % idx
-        renameMap[strIdx] = findName(names, viewProp, strIdx)
-        idx += 1
+        # Prop is valid if we can find it in the current sources
+        for name, actor in names.items():
+            if viewProp == actor:
+                renameMap[strIdx] = name
+                idx += 1
+                break
+
     for volume in volumes:
         if not volume.IsA('vtkVolume'):
             continue
         if not volume.GetVisibility():
             continue
-        bounds = volume.GetBounds()
-        if bounds[0] > bounds[1]:
-            continue
         strIdx = '%s' % idx
-        renameMap[strIdx] = findName(names, volume, strIdx)
-        idx += 1
+        for name, actor in names.items():
+            if viewProp == actor:
+                renameMap[strIdx] = name
+                idx += 1
+                break
 
     return renameMap
 
