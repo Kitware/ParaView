@@ -111,7 +111,7 @@
         - docker
         - paraview
         - linux
-        - x11
+        - x11-gnome
 
 .linux_qt_builder_tags:
     tags:
@@ -127,7 +127,7 @@
         - paraview
         - linux
         - linux-3.17
-        - x11
+        - x11-gnome
 
 ## Linux-specific scripts
 
