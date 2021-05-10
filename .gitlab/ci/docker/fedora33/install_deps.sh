@@ -12,6 +12,10 @@ dnf install -y --setopt=install_weak_deps=False \
 dnf install -y --setopt=install_weak_deps=False \
     qt5-qtbase-devel qt5-qttools-devel qt5-qtsvg-devel qt5-qtxmlpatterns-devel
 
+# GNOME theme requirements
+dnf install -y --setopt=install_weak_deps=False \
+    abattis-cantarell-fonts
+
 # Mesa dependencies
 dnf install -y --setopt=install_weak_deps=False \
     mesa-libOSMesa-devel mesa-libOSMesa
