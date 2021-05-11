@@ -296,6 +296,10 @@
         </Hints>
       </StringVectorProperty>
 
+      <Hints>
+        <Visibility replace_input="0" />
+      </Hints>
+
     </SourceProxy>
   </ProxyGroup>
 

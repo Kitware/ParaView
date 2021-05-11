@@ -21,6 +21,7 @@
 #include "vtkInformationVector.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
+#include "vtkPointData.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
 #include "vtkStructuredGrid.h"
 
@@ -100,6 +101,8 @@ int vtkGeoMapFetcherMesh::RequestData(
 
     output->ShallowCopy(image2points->GetOutput());
   }
+
+  output->GetPointData()->SetActiveScalars("PNGImage");
 
   return 1;
 }

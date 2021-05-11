@@ -101,7 +101,7 @@ protected:
    */
   static constexpr std::array<const char*, static_cast<int>(Custom)> PROJ4Strings = {
     "+proj=ortho +ellps=GRS80",
-    "+proj=lcc +ellps=GRS80 +lon_0=3 +lat_0=46.5 +lat_1=44 +lat_2=49 +x_0=700000 +y_0=6600000",
+    "+proj=lcc +ellps=GRS80 +lon_0=3 +lat_0=46.5 +lat_1=49 +lat_2=44 +x_0=700000 +y_0=6600000",
     ""
   };
   // clang-format on
