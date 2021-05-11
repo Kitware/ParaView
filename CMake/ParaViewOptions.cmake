@@ -27,6 +27,8 @@ mark_as_advanced(PARAVIEW_BUILD_WITH_EXTERNAL)
 
 option(PARAVIEW_BUILD_ALL_MODULES "Build all modules by default" OFF)
 mark_as_advanced(PARAVIEW_BUILD_ALL_MODULES)
+set(_vtk_module_reason_WANT_BY_DEFAULT
+  "via `PARAVIEW_BUILD_ALL_MODULES`")
 
 option(PARAVIEW_BUILD_EXAMPLES "Enable ParaView examples" OFF)
 set(PARAVIEW_BUILD_TESTING "OFF"
@@ -287,14 +289,24 @@ macro (paraview_require_module)
   if (${pem_CONDITION})
     # message("${pem_CONDITION} == TRUE")
     list(APPEND paraview_requested_modules ${pem_MODULES})
+    foreach (_pem_module IN LISTS _pem_MODULES)
+      set("_vtk_module_reason_${_pem_module}"
+        "via `${pem_CONDITION}`")
+    endforeach ()
   elseif (pem_EXCLUSIVE)
     # message("${pem_CONDITION} == FALSE")
     list(APPEND paraview_rejected_modules ${pem_MODULES})
+    foreach (_pem_module IN LISTS _pem_MODULES)
+      set("_vtk_module_reason_${_pem_module}"
+        "via `${pem_CONDITION}`")
+    endforeach ()
   endif()
+
   unset(pem_EXCLUSIVE)
   unset(pem_CONDITION)
   unset(pem_MODULES)
   unset(pem_UNPARSED_ARGUMENTS)
+  unset(_pem_module)
 endmacro()
 
 # ensures that VTK::mpi module is rejected when MPI is not enabled.
@@ -501,7 +513,7 @@ paraview_require_module(
 if (NOT PARAVIEW_ENABLE_NONESSENTIAL)
   # This ensures that we don't ever enable certain problematic
   # modules when PARAVIEW_ENABLE_NONESSENTIAL is OFF.
-  list(APPEND paraview_rejected_modules
+  set(nonessential_modules
     VTK::cgns
     VTK::hdf5
     VTK::netcdf
@@ -509,14 +521,26 @@ if (NOT PARAVIEW_ENABLE_NONESSENTIAL)
     VTK::theora
     VTK::xdmf2
     VTK::xdmf3)
+  list(APPEND paraview_rejected_modules
+    ${nonessential_modules})
+  foreach (nonessential_module IN LISTS nonessential_modules)
+    set("_vtk_module_reason_${nonessential_module}"
+      "via `PARAVIEW_ENABLE_NONESSENTIAL` (via `PARAVIEW_BUILD_EDITION=${PARAVIEW_BUILD_EDITION}`)")
+  endforeach ()
 endif()
 
 if (NOT PARAVIEW_ENABLE_RENDERING)
   # This ensures that we don't ever enable OpenGL
   # modules when PARAVIEW_ENABLE_RENDERING is OFF.
-  list(APPEND paraview_rejected_modules
+  set(rendering_modules
     VTK::glew
     VTK::opengl)
+  list(APPEND paraview_rejected_modules
+    ${rendering_modules})
+  foreach (rendering_module IN LISTS rendering_modules)
+    set("_vtk_module_reason_${rendering_module}"
+      "via `PARAVIEW_ENABLE_RENDERING` (via `PARAVIEW_BUILD_EDITION=${PARAVIEW_BUILD_EDITION}`)")
+  endforeach ()
 endif()
 
 if (paraview_requested_modules)
