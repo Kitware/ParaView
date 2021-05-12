@@ -1887,6 +1887,7 @@ endif()
 set(texture_buffer_exceeding_hardware_tests
   CONVERGECFDReader
   CONVERGECFDReaderWithVisItBridge
+  TestGroupDataFromTimeSeries
 )
 
 foreach(test_name IN LISTS texture_buffer_exceeding_hardware_tests)
