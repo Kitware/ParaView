@@ -527,6 +527,27 @@ if (NOT PARAVIEW_ENABLE_NONESSENTIAL)
     set("_vtk_module_reason_${nonessential_module}"
       "via `PARAVIEW_ENABLE_NONESSENTIAL` (via `PARAVIEW_BUILD_EDITION=${PARAVIEW_BUILD_EDITION}`)")
   endforeach ()
+
+  function (_paraview_io_option_conflict option name)
+    if (${option})
+      message(FATAL_ERROR
+        "ParaView is configured without I/O support (via the "
+        "${PARAVIEW_BUILD_EDITION} edition) which is incompatible with the "
+        "request for ${name} support (via the `${option}` configure option)")
+    endif ()
+  endfunction ()
+
+  _paraview_io_option_conflict(PARAVIEW_ENABLE_ADIOS2 "ADIOS 2.x")
+  _paraview_io_option_conflict(PARAVIEW_ENABLE_FFMPEG FFmpeg)
+  _paraview_io_option_conflict(PARAVIEW_ENABLE_FIDES Fides)
+  _paraview_io_option_conflict(PARAVIEW_ENABLE_GDAL GDAL)
+  _paraview_io_option_conflict(PARAVIEW_ENABLE_LAS LAS)
+  _paraview_io_option_conflict(PARAVIEW_ENABLE_MOTIONFX MotionFX)
+  _paraview_io_option_conflict(PARAVIEW_ENABLE_OPENTURNS OpenTURNS)
+  _paraview_io_option_conflict(PARAVIEW_ENABLE_PDAL PDAL)
+  _paraview_io_option_conflict(PARAVIEW_ENABLE_VISITBRIDGE VisItBridge)
+  _paraview_io_option_conflict(PARAVIEW_ENABLE_XDMF2 xdmf2)
+  _paraview_io_option_conflict(PARAVIEW_ENABLE_XDMF3 xdmf3)
 endif()
 
 if (NOT PARAVIEW_ENABLE_RENDERING)
@@ -541,6 +562,18 @@ if (NOT PARAVIEW_ENABLE_RENDERING)
     set("_vtk_module_reason_${rendering_module}"
       "via `PARAVIEW_ENABLE_RENDERING` (via `PARAVIEW_BUILD_EDITION=${PARAVIEW_BUILD_EDITION}`)")
   endforeach ()
+
+  function (_paraview_rendering_option_conflict option name)
+    if (${option})
+      message(FATAL_ERROR
+        "ParaView is configured without Rendering support (via the "
+        "${PARAVIEW_BUILD_EDITION} edition) which is incompatible with the "
+        "request for ${name} support (via the `${option}` configure option)")
+    endif ()
+  endfunction ()
+
+  _paraview_rendering_option_conflict(PARAVIEW_ENABLE_RAYTRACING raytracing)
+  _paraview_rendering_option_conflict(PARAVIEW_USE_QT Qt)
 endif()
 
 if (paraview_requested_modules)
