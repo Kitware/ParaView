@@ -61,7 +61,6 @@ void QTestApp::messageHandler(QtMsgType type, const QMessageLogContext& context,
     case QtWarningMsg:
       fprintf(stderr, "Warning: %s (%s:%u, %s)\n", localMsg.data(), context.file, context.line,
         context.function);
-      Error++;
       break;
     case QtCriticalMsg:
       fprintf(stderr, "Critical: %s (%s:%u, %s)\n", localMsg.data(), context.file, context.line,

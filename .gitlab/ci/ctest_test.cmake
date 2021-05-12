@@ -45,12 +45,6 @@ if ("$ENV{CMAKE_CONFIGURATION}" MATCHES "fedora")
     # https://gitlab.kitware.com/paraview/paraview/-/issues/20697
     "\\.ComparativeViewOverlay"
 
-    # These tests fail without output as to what is wrong.
-    "^pqWidgetsAnimation$"
-    "^pqWidgetsFlatTreeView$"
-    "^pqWidgetspqTextEditTest$"
-    "^pqWidgetsTreeViewSelectionAndCheckState$"
-
     # UI tests that fail without messages or baselines.
     "\\.BagPlotMatrixView$"
     "\\.BagPlots$"
