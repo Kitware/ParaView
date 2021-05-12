@@ -38,6 +38,31 @@ if ("$ENV{CMAKE_CONFIGURATION}" MATCHES "fedora")
     "\\.VisItBridgeLAMMPSDump$"
     "\\.VisItBridgeLAMMPSDump2$"
 
+    # Invalid reading in parallel
+    # https://gitlab.kitware.com/paraview/paraview/-/issues/20713
+    "pvcs\\.VisItBridgeNek$"
+    "pvcrs\\.VisItBridgeNek$"
+
+    # Hangs in parallel
+    # https://gitlab.kitware.com/paraview/paraview/-/issues/20714
+    "pvcs\\.ComparativeVisPanel$"
+    "pvcrs\\.ComparaitiveVisPanel$"
+    # https://gitlab.kitware.com/paraview/paraview/-/issues/20716
+    "pvcs\\.RescaleToTemporal$"
+    "pvcrs\\.RescaleToTemporal$"
+    # https://gitlab.kitware.com/paraview/paraview/-/issues/20718
+    "pvcs\\.ExportSelectionToCSV$"
+    "pvcrs\\.ExportSelectionToCSV$"
+
+    # Ioss issue
+    # https://gitlab.kitware.com/paraview/paraview/-/issues/20719
+    "\\.SaveExodus$"
+
+    # errors in parallel
+    # https://gitlab.kitware.com/paraview/paraview/-/issues/20715i
+    "pvcs\\.Flow2$"
+    "pvcrs\\.Flow2$"
+
     # These have failed on buildbot before. Not sure what the cause is.
     "\\.TestPythonView$"
 
@@ -56,6 +81,15 @@ if ("$ENV{CMAKE_CONFIGURATION}" MATCHES "fedora")
     "\\.Slice$"
     "\\.TraceMultiViews$"
     "\\.TruchasReaderWithVisItBridge$"
+
+    # Some X sync issue causing the images to be capture with
+    # incorrect size, ignore for now.
+    "\\.MultiSliceMultiBlock$"
+
+    # Failures due to texture limit being hit
+    # https://gitlab.kitware.com/paraview/paraview/-/issues/20717
+    "\\.TestGroupDataFromTimeSeries$"
+    "\\.CONVERGECFDReaderWithVisItBridge$"
     )
 endif ()
 
