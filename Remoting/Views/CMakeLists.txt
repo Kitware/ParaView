@@ -94,6 +94,7 @@ set(classes
   vtkPVLODActor
   vtkPVLODVolume
   vtkPVLogoSource
+  vtkPVMaterial
   vtkPVMaterialLibrary
   vtkPVMultiSliceView
   vtkPVOpenGLInformation
@@ -192,11 +193,6 @@ set(private_headers
 set(headers
   vtkStreamingPriorityQueue.h)
 set(sources)
-
-if (PARAVIEW_ENABLE_RAYTRACING AND VTK_ENABLE_OSPRAY)
-  list(APPEND classes
-    vtkPVMaterial)
-endif ()
 
 if (TARGET ParaView::icet)
   list(APPEND classes

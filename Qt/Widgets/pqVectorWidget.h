@@ -63,6 +63,11 @@ signals:
   void valueChanged(const QVariant&);
 
 public slots:
+
+  /**
+   * Set the value at index \p index of the QVariant with \p value.
+   * Must be overidden to cast to the specialized QVariant.
+   */
   virtual void setValue(int index, float value) = 0;
 
 protected:
@@ -110,7 +115,5 @@ protected:
 
 using pqVector2DWidget = pqVectorWidgetImpl<QVector2D, 2>;
 using pqVector3DWidget = pqVectorWidgetImpl<QVector3D, 3>;
-// using pqVector4DWidget = pqVectorWidgetImpl<QVector4D, 4>;
-// using pqQuaternionWidget = pqVectorWidgetImpl<QQuaternion, 4>;
 
 #endif

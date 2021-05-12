@@ -40,19 +40,16 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqTextureSelectorPropertyWidget.h"
 #include "pqVectorWidget.h"
 
+#include "vtkOSPRayMaterialLibrary.h"
+#include "vtkSMPropertyHelper.h"
+#include "vtkSMSessionProxyManager.h"
+
 #include <QCheckBox>
 #include <QComboBox>
 #include <QMetaProperty>
 #include <QPainter>
 #include <QVector2D>
 #include <QVector3D>
-
-#include <vtkSMPropertyHelper.h>
-#include <vtkSMSessionProxyManager.h>
-
-#if VTK_MODULE_ENABLE_VTK_RenderingRayTracing
-#include "vtkOSPRayMaterialLibrary.h"
-#endif
 
 //-----------------------------------------------------------------------------
 pqMaterialAttributesDelegate::pqMaterialAttributesDelegate(QObject* parent)
@@ -66,13 +63,12 @@ void pqMaterialAttributesDelegate::paint(
 {
   QStyleOptionViewItem modOption = option;
 
-#if VTK_MODULE_ENABLE_VTK_RenderingRayTracing
   if (index.column() == 1)
   {
     QString attrName = index.sibling(index.row(), 0).data(Qt::EditRole).toString();
     QString matType =
       index.sibling(index.row(), 0)
-        .data(static_cast<int>(pqMaterialProxyModel::ExtendedItemDataRole::PropertyValue))
+        .data(static_cast<int>(pqMaterialEditor::ExtendedItemDataRole::PropertyValue))
         .toString();
 
     auto& dic = vtkOSPRayMaterialLibrary::GetParametersDictionary();
@@ -80,7 +76,7 @@ void pqMaterialAttributesDelegate::paint(
     auto paramType = dic.at(matType.toStdString()).at(attrName.toStdString());
 
     QVariant variant =
-      index.data(static_cast<int>(pqMaterialProxyModel::ExtendedItemDataRole::PropertyValue));
+      index.data(static_cast<int>(pqMaterialEditor::ExtendedItemDataRole::PropertyValue));
 
     switch (paramType)
     {
@@ -155,7 +151,6 @@ void pqMaterialAttributesDelegate::paint(
         break;
     }
   }
-#endif
   QStyledItemDelegate::paint(painter, modOption, index);
 }
 
@@ -163,7 +158,6 @@ void pqMaterialAttributesDelegate::paint(
 QWidget* pqMaterialAttributesDelegate::createEditor(
   QWidget* parent, const QStyleOptionViewItem& option, const QModelIndex& index) const
 {
-#if VTK_MODULE_ENABLE_VTK_RenderingRayTracing
   if (index.column() == 0)
   {
     QComboBox* combo = new QComboBox(parent);
@@ -191,14 +185,14 @@ QWidget* pqMaterialAttributesDelegate::createEditor(
     QModelIndex sibling = index.sibling(index.row(), 0);
     QString attrName = sibling.data(Qt::EditRole).toString();
     QString matType =
-      sibling.data(static_cast<int>(pqMaterialProxyModel::ExtendedItemDataRole::PropertyValue))
+      sibling.data(static_cast<int>(pqMaterialEditor::ExtendedItemDataRole::PropertyValue))
         .toString();
 
     auto& dic = vtkOSPRayMaterialLibrary::GetParametersDictionary();
     auto paramType = dic.at(matType.toStdString()).at(attrName.toStdString());
 
     QVariant variant =
-      index.data(static_cast<int>(pqMaterialProxyModel::ExtendedItemDataRole::PropertyValue));
+      index.data(static_cast<int>(pqMaterialEditor::ExtendedItemDataRole::PropertyValue));
 
     switch (paramType)
     {
@@ -272,21 +266,13 @@ QWidget* pqMaterialAttributesDelegate::createEditor(
       }
     }
   }
-#endif
   return QStyledItemDelegate::createEditor(parent, option, index);
-}
-
-//-----------------------------------------------------------------------------
-void pqMaterialAttributesDelegate::setEditorData(QWidget* editor, const QModelIndex& index) const
-{
-  // do nothing, everything is handled in createEditor method
 }
 
 //-----------------------------------------------------------------------------
 void pqMaterialAttributesDelegate::setModelData(
   QWidget* editor, QAbstractItemModel* model, const QModelIndex& index) const
 {
-#if VTK_MODULE_ENABLE_VTK_RenderingRayTracing
   QVariant newValue = editor->property(editor->metaObject()->userProperty().name());
 
   if (index.column() == 0)
@@ -298,7 +284,7 @@ void pqMaterialAttributesDelegate::setModelData(
     QModelIndex sibling = index.sibling(index.row(), 0);
     QString attrName = sibling.data(Qt::EditRole).toString();
     QString matType =
-      sibling.data(static_cast<int>(pqMaterialProxyModel::ExtendedItemDataRole::PropertyValue))
+      sibling.data(static_cast<int>(pqMaterialEditor::ExtendedItemDataRole::PropertyValue))
         .toString();
 
     auto& dic = vtkOSPRayMaterialLibrary::GetParametersDictionary();
@@ -310,7 +296,6 @@ void pqMaterialAttributesDelegate::setModelData(
     }
 
     model->setData(
-      index, newValue, static_cast<int>(pqMaterialProxyModel::ExtendedItemDataRole::PropertyValue));
+      index, newValue, static_cast<int>(pqMaterialEditor::ExtendedItemDataRole::PropertyValue));
   }
-#endif
 }

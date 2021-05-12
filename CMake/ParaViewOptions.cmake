@@ -152,6 +152,12 @@ if (PARAVIEW_USE_QTHELP AND NOT PARAVIEW_USE_QTWEBENGINE)
   message(STATUS "Using 'QtHelp' without 'QtWebEngine' will ignore embedded javascript and *.js files for documentation")
 endif()
 
+if (PARAVIEW_ENABLE_RAYTRACING AND VTK_ENABLE_OSPRAY)
+  set(PARAVIEW_USE_MATERIALEDITOR ON)
+
+  message(STATUS "Enabling OSPRayMaterialEditor widget")
+endif ()
+
 #========================================================================
 # FEATURE OPTIONS:
 # Options that toggle features. These should begin with `PARAVIEW_ENABLE_`.

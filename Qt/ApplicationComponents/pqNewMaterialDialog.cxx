@@ -32,9 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqNewMaterialDialog.h"
 #include "ui_pqNewMaterialDialog.h"
 
-#if VTK_MODULE_ENABLE_VTK_RenderingRayTracing
 #include "vtkOSPRayMaterialLibrary.h"
-#endif
 
 //-----------------------------------------------------------------------------
 class pqNewMaterialDialog::pqInternals
@@ -55,12 +53,10 @@ pqNewMaterialDialog::pqNewMaterialDialog(QWidget* parentObject, Qt::WindowFlags 
   // set the material type list
   QStringList typesList;
 
-#if VTK_MODULE_ENABLE_VTK_RenderingRayTracing
   for (auto& type : vtkOSPRayMaterialLibrary::GetParametersDictionary())
   {
     typesList << type.first.c_str();
   }
-#endif
 
   this->Internals->Ui.MaterialType->insertItems(0, typesList);
 
@@ -73,7 +69,6 @@ pqNewMaterialDialog::pqNewMaterialDialog(QWidget* parentObject, Qt::WindowFlags 
 //-----------------------------------------------------------------------------
 void pqNewMaterialDialog::accept()
 {
-#if VTK_MODULE_ENABLE_VTK_RenderingRayTracing
   if (!this->MaterialLibrary)
   {
     this->done(Rejected);
@@ -94,7 +89,6 @@ void pqNewMaterialDialog::accept()
   }
 
   this->Type = this->Internals->Ui.MaterialType->currentText();
-#endif
 
   this->done(Accepted);
 }

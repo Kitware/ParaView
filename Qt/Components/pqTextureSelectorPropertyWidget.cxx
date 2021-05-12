@@ -162,6 +162,7 @@ void pqTextureSelectorPropertyWidget::checkAttributes(bool tcoords, bool tangent
   }
 }
 
+//-----------------------------------------------------------------------------
 const QString& pqTextureSelectorPropertyWidget::selectedName() const
 {
   return this->SelectedName;

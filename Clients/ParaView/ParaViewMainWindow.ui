@@ -276,13 +276,41 @@
    <property name="allowedAreas">
     <set>Qt::LeftDockWidgetArea|Qt::RightDockWidgetArea</set>
    </property>
-   <property name="windowTitle">
-    <string>Material Editor</string>
+   <property name="sizePolicy">
+    <sizepolicy hsizetype="Preferred" vsizetype="MinimumExpanding">
+     <horstretch>0</horstretch>
+     <verstretch>0</verstretch>
+    </sizepolicy>
    </property>
    <attribute name="dockWidgetArea">
     <number>2</number>
    </attribute>
-   <widget class="pqMaterialEditor" name="materialEditorPanel"/>
+   <property name="windowTitle">
+    <string>Material Editor</string>
+   </property>
+   <property name="visible">
+      <bool>false</bool>
+   </property>
+   <widget class="QWidget" name="materialEditorDummy">
+    <property name="sizePolicy">
+     <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
+      <horstretch>0</horstretch>
+      <verstretch>0</verstretch>
+     </sizepolicy>
+    </property>
+    <layout class="QHBoxLayout" name="horizontalLayout1">
+     <item>
+      <widget class="QLabel" name="label1">
+       <property name="text">
+        <string>OSPRay support not available!</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignCenter</set>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </widget>
   </widget>
   <widget class="QDockWidget" name="displayPropertiesDock">
    <property name="allowedAreas">
@@ -502,12 +530,6 @@
    <class>pqOutputWidget</class>
    <extends>QWidget</extends>
    <header>pqOutputWidget.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>pqMaterialEditor</class>
-   <extends>QWidget</extends>
-   <header>pqMaterialEditor.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>

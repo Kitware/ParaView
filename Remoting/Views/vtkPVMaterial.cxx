@@ -32,34 +32,9 @@
 vtkStandardNewMacro(vtkPVMaterial);
 
 //-----------------------------------------------------------------------------
-void vtkPVMaterial::SetName(const std::string& name)
-{
-  this->Name = name;
-  this->Modified();
-}
-
-//-----------------------------------------------------------------------------
-const std::string& vtkPVMaterial::GetName()
-{
-  return this->Name;
-}
-
-//-----------------------------------------------------------------------------
-void vtkPVMaterial::SetType(const std::string& type)
-{
-  this->Type = type;
-  this->Modified();
-}
-
-//-----------------------------------------------------------------------------
-const std::string& vtkPVMaterial::GetType()
-{
-  return this->Type;
-}
-
-//-----------------------------------------------------------------------------
 void vtkPVMaterial::AddVariable(const char* paramName, const char* value)
 {
+#if VTK_MODULE_ENABLE_VTK_RenderingRayTracing
   vtkOSPRayMaterialLibrary* lib = vtkOSPRayMaterialLibrary::SafeDownCast(this->Library);
 
   if (lib)
@@ -103,11 +78,18 @@ void vtkPVMaterial::AddVariable(const char* paramName, const char* value)
 
     this->Modified();
   }
+#else
+  (void)paramName;
+  (void)value;
+
+  vtkWarningMacro(<< "vtkPVMaterial::AddVariable won't do anything as RayTracing is disabled");
+#endif
 }
 
 //-----------------------------------------------------------------------------
 void vtkPVMaterial::RemoveAllVariables()
 {
+#if VTK_MODULE_ENABLE_VTK_RenderingRayTracing
   vtkOSPRayMaterialLibrary* lib = vtkOSPRayMaterialLibrary::SafeDownCast(this->Library);
   if (lib)
   {
@@ -115,6 +97,10 @@ void vtkPVMaterial::RemoveAllVariables()
     lib->RemoveAllTextures(this->Name);
     this->Modified();
   }
+#else
+  vtkWarningMacro(
+    << "vtkPVMaterial::RemoveAllVariables won't do anything as RayTracing is disabled");
+#endif
 }
 
 //-----------------------------------------------------------------------------

@@ -35,6 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkCollection.h"
 #include "vtkCommand.h"
 #include "vtkMath.h"
+#include "vtkOSPRayMaterialLibrary.h"
 #include "vtkPVMaterial.h"
 #include "vtkPVMaterialLibrary.h"
 #include "vtkPVRenderView.h"
@@ -43,10 +44,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMSessionProxyManager.h"
-
-#if VTK_MODULE_ENABLE_VTK_RenderingRayTracing
-#include "vtkOSPRayMaterialLibrary.h"
-#endif
 
 #include "pqActiveObjects.h"
 #include "pqApplicationCore.h"
@@ -58,6 +55,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqServerManagerModel.h"
 #include "pqView.h"
 
+#include <QAbstractTableModel>
 #include <QMetaProperty>
 #include <QSet>
 #include <QStandardItemModel>
@@ -67,7 +65,85 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <sstream>
 
-#if VTK_MODULE_ENABLE_VTK_RenderingRayTracing
+/**
+ * The Qt model associated with the 2D array representation of the material properties
+ */
+class pqMaterialProxyModel : public QAbstractTableModel
+{
+public:
+  /**
+   * Default constructor initialize the Qt hierarchy
+   */
+  pqMaterialProxyModel(QObject* p = nullptr);
+
+  /**
+   * Defaulted destructor for inheritance
+   */
+  ~pqMaterialProxyModel() override = default;
+
+  /**
+   * Sets the material proxy whose property will be displayed
+   */
+  void setProxy(vtkSMProxy* proxy) { this->Proxy = proxy; }
+
+  /**
+   * Returns the flags associated with this model
+   */
+  Qt::ItemFlags flags(const QModelIndex& idx) const override
+  {
+    return QAbstractTableModel::flags(idx) | Qt::ItemIsEditable;
+  }
+
+  /**
+   * Triggers a global update of all the elements within the 2D array
+   */
+  void reset();
+
+  /**
+   * Construct the header data for this model
+   */
+  QVariant headerData(int section, Qt::Orientation orientation, int role) const override;
+
+  /**
+   * Returns the row count of the 2D array. This corresponds to the number of properties holded by
+   * the material
+   */
+  int rowCount(const QModelIndex& parent = QModelIndex()) const override;
+
+  /**
+   * Returns the number of columns (two in our case)
+   */
+  int columnCount(const QModelIndex& parent = QModelIndex()) const override { return 2; }
+
+  /**
+   * Returns the material attribute name at row
+   */
+  std::string getMaterialAttributeName(const int row) const;
+
+  /**
+   * Query the proxy to get the material type
+   */
+  std::string getMaterialType() const;
+
+  /**
+   * Return the data at index with role
+   */
+  QVariant data(const QModelIndex& index, int role) const override;
+
+  /**
+   * Overrides the data at index and role with the input variant
+   */
+  bool setData(const QModelIndex& index, const QVariant& variant, int role) override;
+
+private:
+  bool IsSameRole(int role1, pqMaterialEditor::ExtendedItemDataRole role2) const
+  {
+    return role1 == static_cast<int>(role2);
+  }
+
+  vtkSMProxy* Proxy = nullptr;
+};
+
 //-----------------------------------------------------------------------------
 pqMaterialProxyModel::pqMaterialProxyModel(QObject* p)
   : QAbstractTableModel(p)
@@ -129,12 +205,13 @@ QVariant pqMaterialProxyModel::data(const QModelIndex& index, int role) const
     {
       return QString(this->getMaterialAttributeName(index.row()).c_str());
     }
-    if (this->IsSameRole(role, ExtendedItemDataRole::PropertyValue))
+    if (this->IsSameRole(role, pqMaterialEditor::ExtendedItemDataRole::PropertyValue))
     {
       return QString(this->getMaterialType().c_str());
     }
   }
-  if (index.column() == 1 && this->IsSameRole(role, ExtendedItemDataRole::PropertyValue))
+  if (index.column() == 1 &&
+    this->IsSameRole(role, pqMaterialEditor::ExtendedItemDataRole::PropertyValue))
   {
     std::string attName = this->getMaterialAttributeName(index.row());
 
@@ -223,7 +300,8 @@ bool pqMaterialProxyModel::setData(const QModelIndex& index, const QVariant& var
     emit this->dataChanged(index, sibling);
     return true;
   }
-  if (index.column() == 1 && this->IsSameRole(role, ExtendedItemDataRole::PropertyValue))
+  if (index.column() == 1 &&
+    this->IsSameRole(role, pqMaterialEditor::ExtendedItemDataRole::PropertyValue))
   {
     std::stringstream ss;
     switch (static_cast<QMetaType::Type>(variant.type()))
@@ -258,8 +336,10 @@ bool pqMaterialProxyModel::setData(const QModelIndex& index, const QVariant& var
   }
   return QAbstractTableModel::setData(index, variant, role);
 }
-#endif
 
+/**
+ * This vtkCommand set the material library to any new material proxy registered.
+ */
 class vtkSMProxyManagerRegisterObserver : public vtkCommand
 {
 public:
@@ -270,7 +350,6 @@ public:
 
   void Execute(vtkObject* vtkNotUsed(obj), unsigned long vtkNotUsed(event), void* data) override
   {
-#if VTK_MODULE_ENABLE_VTK_RenderingRayTracing
     vtkSMProxyManager::RegisteredProxyInformation* info =
       static_cast<vtkSMProxyManager::RegisteredProxyInformation*>(data);
     if (strcmp(info->GroupName, "materials") == 0)
@@ -279,7 +358,6 @@ public:
         ->SetLibrary(this->Editor->materialLibrary());
       this->Editor->updateMaterialList();
     }
-#endif
   }
 
   pqMaterialEditor* Editor;
@@ -291,17 +369,13 @@ class pqMaterialEditor::pqInternals
 public:
   Ui::MaterialEditor Ui;
 
-#if VTK_MODULE_ENABLE_VTK_RenderingRayTracing
   pqMaterialProxyModel AttributesModel;
-#endif
 
   pqInternals(pqMaterialEditor* self)
   {
     this->Ui.setupUi(self);
 
-#if VTK_MODULE_ENABLE_VTK_RenderingRayTracing
     this->Ui.PropertiesView->setModel(&this->AttributesModel);
-#endif
     this->Ui.PropertiesView->horizontalHeader()->setHighlightSections(false);
     this->Ui.PropertiesView->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
     this->Ui.PropertiesView->horizontalHeader()->setStretchLastSection(true);
@@ -319,31 +393,31 @@ pqMaterialEditor::pqMaterialEditor(QWidget* parentObject)
   this->Internals->Ui.PropertiesView->setItemDelegate(new pqMaterialAttributesDelegate(this));
 
   // materials
-  QObject::connect(this->Internals->Ui.AddMaterial, SIGNAL(clicked()), this, SLOT(addMaterial()));
   QObject::connect(
-    this->Internals->Ui.RemoveMaterial, SIGNAL(clicked()), this, SLOT(removeMaterial()));
-  QObject::connect(
-    this->Internals->Ui.LoadMaterials, SIGNAL(clicked()), this, SLOT(loadMaterials()));
-  QObject::connect(
-    this->Internals->Ui.AttachMaterial, SIGNAL(clicked()), this, SLOT(attachMaterial()));
+    this->Internals->Ui.AddMaterial, &QPushButton::clicked, this, &pqMaterialEditor::addMaterial);
+  QObject::connect(this->Internals->Ui.RemoveMaterial, &QPushButton::clicked, this,
+    &pqMaterialEditor::removeMaterial);
+  QObject::connect(this->Internals->Ui.LoadMaterials, &QPushButton::clicked, this,
+    &pqMaterialEditor::loadMaterials);
+  QObject::connect(this->Internals->Ui.AttachMaterial, &QPushButton::clicked, this,
+    &pqMaterialEditor::attachMaterial);
 
   // attributes
-  QObject::connect(this->Internals->Ui.SelectMaterial, SIGNAL(currentIndexChanged(const QString&)),
-    this, SLOT(updateCurrentMaterial(const QString&)));
-  QObject::connect(this->Internals->Ui.AddProperty, SIGNAL(clicked()), this, SLOT(addProperty()));
+  QObject::connect(this->Internals->Ui.SelectMaterial,
+    QOverload<int>::of(&QComboBox::currentIndexChanged), this,
+    &pqMaterialEditor::updateCurrentMaterialWithIndex);
   QObject::connect(
-    this->Internals->Ui.RemoveProperty, SIGNAL(clicked()), this, SLOT(removeProperty()));
-  QObject::connect(
-    this->Internals->Ui.DeleteProperties, SIGNAL(clicked()), this, SLOT(removeAllProperties()));
+    this->Internals->Ui.AddProperty, &QPushButton::clicked, this, &pqMaterialEditor::addProperty);
+  QObject::connect(this->Internals->Ui.RemoveProperty, &QPushButton::clicked, this,
+    &pqMaterialEditor::removeProperty);
+  QObject::connect(this->Internals->Ui.DeleteProperties, &QPushButton::clicked, this,
+    &pqMaterialEditor::removeAllProperties);
 
-#if VTK_MODULE_ENABLE_VTK_RenderingRayTracing
-  QObject::connect(&this->Internals->AttributesModel,
-    SIGNAL(dataChanged(const QModelIndex&, const QModelIndex&)), this,
-    SLOT(propertyChanged(const QModelIndex&, const QModelIndex&)));
-#endif
+  QObject::connect(&this->Internals->AttributesModel, &QAbstractTableModel::dataChanged, this,
+    &pqMaterialEditor::propertyChanged);
 
   QObject::connect(
-    &pqActiveObjects::instance(), &pqActiveObjects::serverChanged, [=](pqServer* server) {
+    &pqActiveObjects::instance(), &pqActiveObjects::serverChanged, [this](pqServer* server) {
       if (server)
       {
         vtkNew<vtkSMProxyManagerRegisterObserver> observer;
@@ -373,7 +447,6 @@ QString pqMaterialEditor::currentMaterialName()
 //-----------------------------------------------------------------------------
 vtkOSPRayMaterialLibrary* pqMaterialEditor::materialLibrary()
 {
-#if VTK_MODULE_ENABLE_VTK_RenderingRayTracing
   vtkSMMaterialLibraryProxy* mlp =
     vtkSMMaterialLibraryProxy::SafeDownCast(this->materialLibraryProxy());
   if (mlp)
@@ -381,7 +454,6 @@ vtkOSPRayMaterialLibrary* pqMaterialEditor::materialLibrary()
     return vtkOSPRayMaterialLibrary::SafeDownCast(
       vtkPVMaterialLibrary::SafeDownCast(mlp->GetClientSideObject())->GetMaterialLibrary());
   }
-#endif
   return nullptr;
 }
 
@@ -557,7 +629,6 @@ std::vector<std::string> pqMaterialEditor::availableParameters()
 {
   std::vector<std::string> availableList;
 
-#if VTK_MODULE_ENABLE_VTK_RenderingRayTracing
   vtkOSPRayMaterialLibrary* ml = this->materialLibrary();
 
   const QString& currentText = this->currentMaterialName();
@@ -581,7 +652,6 @@ std::vector<std::string> pqMaterialEditor::availableParameters()
       }
     }
   }
-#endif
   return availableList;
 }
 
@@ -594,7 +664,6 @@ void pqMaterialEditor::loadMaterials()
 //-----------------------------------------------------------------------------
 void pqMaterialEditor::addNewProperty(vtkSMProxy* proxy, const QString& prop)
 {
-#if VTK_MODULE_ENABLE_VTK_RenderingRayTracing
   auto& dic = vtkOSPRayMaterialLibrary::GetParametersDictionary();
 
   unsigned int nbElem = vtkSMPropertyHelper(proxy, "DoubleVariables").GetNumberOfElements();
@@ -635,7 +704,6 @@ void pqMaterialEditor::addNewProperty(vtkSMProxy* proxy, const QString& prop)
   }
 
   this->Internals->AttributesModel.reset();
-#endif
 }
 
 //-----------------------------------------------------------------------------
@@ -659,7 +727,6 @@ void pqMaterialEditor::addProperty()
 //-----------------------------------------------------------------------------
 void pqMaterialEditor::removeProperties(vtkSMProxy* proxy, const QSet<QString>& variables)
 {
-#if VTK_MODULE_ENABLE_VTK_RenderingRayTracing
   unsigned int nbElem = vtkSMPropertyHelper(proxy, "DoubleVariables").GetNumberOfElements();
   unsigned int newNbElem = 0;
   for (unsigned int i = 0; i < nbElem; i += 2)
@@ -677,7 +744,6 @@ void pqMaterialEditor::removeProperties(vtkSMProxy* proxy, const QSet<QString>& 
   vtkSMPropertyHelper(proxy, "DoubleVariables").SetNumberOfElements(newNbElem);
 
   proxy->UpdateVTKObjects();
-#endif
 }
 
 //-----------------------------------------------------------------------------
@@ -797,8 +863,12 @@ void pqMaterialEditor::updateMaterialList()
         vtkSMPropertyHelper(matProxy, "Name").GetAsString());
     }
   }
+}
 
-  this->synchronizeClientToServ();
+void pqMaterialEditor::updateCurrentMaterialWithIndex(int index)
+{
+  const QString& label = this->Internals->Ui.SelectMaterial->itemText(index);
+  this->updateCurrentMaterial(label);
 }
 
 //-----------------------------------------------------------------------------
@@ -821,10 +891,7 @@ void pqMaterialEditor::updateCurrentMaterial(const QString& label)
 
   this->Internals->Ui.TypeLabel->setText(materialTypeLabel.c_str());
 
-#if VTK_MODULE_ENABLE_VTK_RenderingRayTracing
   this->Internals->AttributesModel.setProxy(proxy);
   this->Internals->AttributesModel.reset();
   this->propertyChanged(QModelIndex(), QModelIndex());
-  this->synchronizeClientToServ();
-#endif
 }

@@ -37,6 +37,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class vtkOSPRayMaterialLibrary;
 
+/**
+ * @brief pqNewMaterialDialog is a dialog window that is used to create a new
+ * material in the material editor widget.
+ */
 class PQAPPLICATIONCOMPONENTS_EXPORT pqNewMaterialDialog : public pqDialog
 {
   Q_OBJECT
@@ -46,12 +50,26 @@ public:
   pqNewMaterialDialog(QWidget* parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags());
   ~pqNewMaterialDialog() override;
 
+  /**
+   * Set the OSPRay material library used to check if the material name is
+   * available in OSPRay.
+   */
   void setMaterialLibrary(vtkOSPRayMaterialLibrary* lib);
-
+  /**
+   * Return the name of the material
+   */
   const QString& name() { return this->Name; }
+  /**
+   * Return the type of the material
+   */
   const QString& type() { return this->Type; }
 
 public slots:
+  /**
+   * Store the name and type of the material after accept.
+   * This slot is connected in pqMaterialEditor to add a new material to
+   * the library.
+   */
   void accept() override;
 
 protected:

@@ -101,6 +101,13 @@ if (PARAVIEW_USE_PYTHON)
       ParaView::PythonInitializer)
 endif ()
 
+if (PARAVIEW_USE_MATERIALEDITOR)
+  target_compile_definitions(paraview
+    PRIVATE
+      PARAVIEW_USE_MATERIALEDITOR)
+endif ()
+
+
 if (PARAVIEW_INSTALL_DEVELOPMENT_FILES)
   export(
     EXPORT    ParaViewClient

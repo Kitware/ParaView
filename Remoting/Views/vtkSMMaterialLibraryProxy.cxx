@@ -15,22 +15,20 @@
 #include "vtkSMMaterialLibraryProxy.h"
 
 #include "vtkClientServerStream.h"
+#include "vtkImageData.h"
 #include "vtkObjectFactory.h"
-#include "vtkPVConfig.h"
 #include "vtkPVMaterialLibrary.h"
 #include "vtkPVSession.h"
+#include "vtkPVTrivialProducer.h"
 #include "vtkProcessModule.h"
+#include "vtkSMInputProperty.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMProxyInternals.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMSession.h"
 #include "vtkSMSessionProxyManager.h"
-#include "vtkSmartPointer.h"
-
-#include "vtkImageData.h"
-#include "vtkPVTrivialProducer.h"
-#include "vtkSMInputProperty.h"
 #include "vtkSMSourceProxy.h"
+#include "vtkSmartPointer.h"
 #include "vtkTexture.h"
 
 #include <numeric>
@@ -69,6 +67,12 @@ void vtkSMMaterialLibraryProxy::LoadDefaultMaterials()
   stream << vtkClientServerStream::Invoke << VTKOBJECT(this) << "ReadRelativeFile"
          << "ospray_mats.json" << vtkClientServerStream::End;
   this->ExecuteStream(stream, false, vtkPVSession::RENDER_SERVER_ROOT);
+
+  // Synchronize from server to client
+  this->Synchronize();
+
+  // materials are loaded, create the proxies accordingly
+  this->CreateProxies();
 #endif
 }
 
@@ -105,7 +109,9 @@ void vtkSMMaterialLibraryProxy::Synchronize(
   vtkOSPRayMaterialLibrary* ml = vtkOSPRayMaterialLibrary::SafeDownCast(
     vtkPVMaterialLibrary::SafeDownCast(this->GetClientSideObject())->GetMaterialLibrary());
   ml->Fire();
-
+#else
+  (void)from;
+  (void)to;
 #endif
 }
 

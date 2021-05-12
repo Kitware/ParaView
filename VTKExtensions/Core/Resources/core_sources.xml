@@ -7,8 +7,7 @@
 
     <!-- ==================================================================== -->
     <SourceProxy class="vtkPVTrivialProducer"
-                 name="PVTrivialProducer"
-                 processes="client|dataserver|renderserver">
+                 name="PVTrivialProducer">
       <IntVectorProperty command="SetWholeExtent"
                          default_values="0 -1 0 -1 0 -1"
                          name="WholeExtent"

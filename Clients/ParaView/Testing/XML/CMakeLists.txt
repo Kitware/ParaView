@@ -643,8 +643,6 @@ SET (TESTS_WITH_INLINE_COMPARES
   LoadStateMultiView.xml
   LogColorMap.xml
   LogColorMapToggle.xml
-  MaterialEditorCreateMaterials.xml
-  MaterialEditorLoadMaterials.xml
   MemoryInspectorPanel.xml
   Molecule.xml
   # temporary disabling since we don't support
@@ -1405,6 +1403,14 @@ if(PARAVIEW_SSH_SERVERS_TESTING)
 endif(PARAVIEW_SSH_SERVERS_TESTING)
 
 #------------------------------------------------------------------------------
+
+# Add tests for OSPRay material editor 
+if(PARAVIEW_USE_MATERIALEDITOR) 
+  list(APPEND TESTS_WITH_INLINE_COMPARES
+    MaterialEditorCreateMaterials.xml
+    MaterialEditorLoadMaterials.xml
+  )
+endif()
 
 # Probe picking does not work in render server mode
 

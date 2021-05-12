@@ -50,10 +50,21 @@ public:
   void paint(
     QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& index) const override;
 
+  /**
+   * Create the editor with two columns : one for the property selection and one to modify the
+   * value of the property.
+   */
   QWidget* createEditor(
     QWidget* parent, const QStyleOptionViewItem& option, const QModelIndex& index) const override;
 
-  void setEditorData(QWidget* editor, const QModelIndex& index) const override;
+  /**
+   * do nothing, everything is handled in createEditor method
+   */
+  void setEditorData(QWidget* editor, const QModelIndex& index) const override{};
+
+  /**
+   * Gets data from the editor widget and stores it in the specified model at the item index
+   */
   void setModelData(
     QWidget* editor, QAbstractItemModel* model, const QModelIndex& index) const override;
 

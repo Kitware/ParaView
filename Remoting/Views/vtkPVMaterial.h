@@ -17,6 +17,9 @@
  * @brief   manages material definitions
  *
  * vtkPVMaterial helps ParaView to keep track of material instances.
+ *
+ * This class does nothing without raytracing (module VTK_MODULE_ENABLE_VTK_RenderingRayTracing
+ * disabled).
  */
 
 #ifndef vtkPVMaterial_h
@@ -25,6 +28,7 @@
 #include "vtkRemotingViewsModule.h" //needed for exports
 
 #include "vtkObject.h"
+#include "vtkSetGet.h"
 
 #include <initializer_list>
 #include <string>
@@ -35,15 +39,37 @@ public:
   static vtkPVMaterial* New();
   vtkTypeMacro(vtkPVMaterial, vtkObject);
 
-  void SetName(const std::string& name);
-  const std::string& GetName();
+  //@{
 
-  void SetType(const std::string& type);
-  const std::string& GetType();
+  /**
+   * The name of this material.
+   */
+  vtkSetMacro(Name, std::string);
+  vtkGetMacro(Name, std::string);
+  //@}
+  //@{
+  /**
+   * The type of this material.
+   */
+  vtkSetMacro(Type, std::string);
+  vtkGetMacro(Type, std::string);
+  //@}
 
+  /**
+   * Add a variable to the OSPRayMaterialLibrary for this material.
+   * \p paramName is the name of the parameter and \p value is a string containing
+   * its values.
+   */
   void AddVariable(const char* paramName, const char* value);
+
+  /**
+   * Removes all the shader variables and textures for this material in the OSPRayMaterialLibrary
+   */
   void RemoveAllVariables();
 
+  /**
+   * Set the vtkOSPRayMaterialLibrary used to add and remove variables
+   */
   void SetLibrary(vtkObject* lib);
 
 protected:
