@@ -179,7 +179,7 @@ struct PQCORE_EXPORT pqTextLinker
   }
 
 private:
-  std::array<std::unique_ptr<pqLinkedObjectInterface>, 2> Objs = { nullptr, nullptr };
+  std::array<std::unique_ptr<pqLinkedObjectInterface>, 2> Objs = { { nullptr, nullptr } };
 };
 
 #include "pqTextLinker.txx"
