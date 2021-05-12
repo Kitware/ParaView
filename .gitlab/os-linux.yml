@@ -170,6 +170,8 @@
 
     script:
         - *before_script_linux
+        # For libnvindex.so
+        - export LD_LIBRARY_PATH=/usr/local/lib
         - ctest -V --output-on-failure -S .gitlab/ci/ctest_test.cmake
 
     interruptible: true
