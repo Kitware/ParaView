@@ -256,6 +256,13 @@ function (_paraview_add_tests function)
             RESOURCE_LOCK "${_paraview_add_tests_script}")
       endif ()
     endif ()
+
+    # XXX(gitlab-ci): Prevent tests from timing out after a long time. As to
+    # why the tests hang in this situation is not yet known. May be related to
+    # https://gitlab.kitware.com/paraview/paraview/-/issues/20697
+    set_property(TEST "${_paraview_add_tests_PREFIX}.${_paraview_add_tests_name}"
+      PROPERTY
+        TIMEOUT_AFTER_MATCH "5" "Couldn't find object")
   endforeach ()
 endfunction ()
 

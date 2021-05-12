@@ -269,10 +269,11 @@ if (TARGET ParaView::paraview OR paraview_will_be_built)
 
   if (pandas_found)
     list(APPEND catalyst_tests
-      WaveletPhiThetaExtractsWithCinema.xml,CINEMA,
+      WaveletPhiThetaExtractsWithCinema.xml,CINEMA
       WaveletVolumeRenderWithCinema.xml,CINEMA)
   else ()
-    message(WARNING "'pandas' is missing. Skipping Cinema tests")
+    message(AUTHOR_WARNING
+      "'pandas' is missing. Skipping Cinema tests")
   endif()
 
   set(catalyst_options

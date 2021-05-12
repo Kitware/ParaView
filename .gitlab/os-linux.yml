@@ -22,7 +22,7 @@
 
 .fedora33:
     extends: .linux
-    image: "kitware/paraview:ci-fedora33-20210221"
+    image: "kitware/paraview:ci-fedora33-20210510"
 
 .fedora31_icc:
     extends: .linux
@@ -111,7 +111,7 @@
         - docker
         - paraview
         - linux
-        - x11
+        - x11-gnome
 
 .linux_qt_builder_tags:
     tags:
@@ -127,7 +127,7 @@
         - paraview
         - linux
         - linux-3.17
-        - x11
+        - x11-gnome
 
 ## Linux-specific scripts
 
