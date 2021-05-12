@@ -60,7 +60,7 @@
   <pqevent object="pqClientMainWindow/materialEditorDock/materialEditorPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesView/qt_scrollarea_viewport/1pqTextureSelectorPropertyWidget0/1pqTextureComboBox0" command="activated" arguments="Load ..." />
   <!-- end manually added -->
   <!-- <pqevent object="pqClientMainWindow/materialEditorDock/materialEditorPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesView/qt_scrollarea_viewport/1pqTextureSelectorPropertyWidget0/1pqTextureComboBox0/LoadTextureDialog" command="filesSelected" arguments="$PARAVIEW_DATA_ROOT/Testing/Data/ParaView_Mark.png" /> -->
-  <pqevent object="pqClientMainWindow/materialEditorDock/materialEditorPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesView/qt_scrollarea_viewport/1pqTextureSelectorPropertyWidget0/1pqTextureComboBox0/LoadTextureDialog" command="filesSelected" arguments="/home/lfxpaul/dev/pv3/build/ExternalData/Testing/Data/ParaView_Mark.png" />
+  <pqevent object="pqClientMainWindow/materialEditorDock/materialEditorPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesView/qt_scrollarea_viewport/1pqTextureSelectorPropertyWidget0/1pqTextureComboBox0/LoadTextureDialog" command="filesSelected" arguments="$PARAVIEW_DATA_ROOT/Testing/Data/ParaView_Mark.png" />
   <pqevent object="pqClientMainWindow/materialEditorDock/materialEditorPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesView/qt_scrollarea_viewport/1pqTextureSelectorPropertyWidget0/1pqTextureComboBox0" command="activated" arguments="ParaView_Mark" />
   <!-- select an other property just to update the modified property -->
   <!-- because the properties are modified/updated only when focus goes out.. -->
@@ -82,7 +82,7 @@
   <!-- manually added -->
   <pqevent object="pqClientMainWindow/materialEditorDock/materialEditorPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesView/qt_scrollarea_viewport/1pqTextureSelectorPropertyWidget0/1pqTextureComboBox0" command="activated" arguments="Load ..." />
   <!-- end manually added -->
-  <pqevent object="pqClientMainWindow/materialEditorDock/materialEditorPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesView/qt_scrollarea_viewport/1pqTextureSelectorPropertyWidget0/1pqTextureComboBox0/LoadTextureDialog" command="filesSelected" arguments="/home/lfxpaul/dev/pv3/build/ExternalData/Testing/Data/pbrSpheresORM.jpg" />
+  <pqevent object="pqClientMainWindow/materialEditorDock/materialEditorPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesView/qt_scrollarea_viewport/1pqTextureSelectorPropertyWidget0/1pqTextureComboBox0/LoadTextureDialog" command="filesSelected" arguments="$PARAVIEW_DATA_ROOT/Testing/Data/pbrSpheresORM.jpg" />
   <pqevent object="pqClientMainWindow/materialEditorDock/materialEditorPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesView/qt_scrollarea_viewport/1pqTextureSelectorPropertyWidget0/1pqTextureComboBox0" command="activated" arguments="pbrSpheresORM" />
   <!-- select an other property just to update the modified property -->
   <!-- because the properties are modified/updated only when focus goes out.. -->
@@ -101,91 +101,9 @@
 
   <pqcompareview object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.0/CentralWidgetFrame/Viewport" baseline="$PARAVIEW_DATA_ROOT/Clients/ParaView/Testing/Data/Baseline/MaterialEditorCreateMaterials2.png" width="400" height="400" />
 
-  <!-- Add another material of same name with type alloy -->
-  <pqevent object="pqClientMainWindow/materialEditorDock/materialEditorPanel/AddMaterial" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/NewMaterial/MaterialType" command="activated" arguments="alloy" />
-  <pqevent object="pqClientMainWindow/NewMaterial" command="key" arguments="16777248" />
-  <pqevent object="pqClientMainWindow/NewMaterial/MaterialName" command="key" arguments="16777248" />
-  <pqevent object="pqClientMainWindow/NewMaterial/MaterialName" command="set_string" arguments="mat1" />
-  <pqevent object="pqClientMainWindow/NewMaterial/ButtonBox/0QPushButton0" command="activate" arguments="" />
-  <!-- add a new color property and set to red -->
-  <pqevent object="pqClientMainWindow/materialEditorDock/materialEditorPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/AddProperty" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/materialEditorDock/materialEditorPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesView" command="setCurrent" arguments="0.0" />
-  <pqevent object="pqClientMainWindow/materialEditorDock/materialEditorPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesView" command="setSelection" arguments="0.0,0.0" />
-  <pqevent object="pqClientMainWindow/materialEditorDock/materialEditorPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesView" command="doubleClick" arguments="0.0" />
-  <pqevent object="pqClientMainWindow/materialEditorDock/materialEditorPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesView" command="edit" arguments="0.0" />
-  <pqevent object="pqClientMainWindow/materialEditorDock/materialEditorPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesView/qt_scrollarea_viewport/1QComboBox0" command="activated" arguments="color" />
-  <pqevent object="pqClientMainWindow/materialEditorDock/materialEditorPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesView" command="setCurrent" arguments="0.1" />
-  <pqevent object="pqClientMainWindow/materialEditorDock/materialEditorPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesView" command="setSelection" arguments="0.1,0.1" />
-  <pqevent object="pqClientMainWindow/materialEditorDock/materialEditorPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesView" command="doubleClick" arguments="0.1" />
-  <pqevent object="pqClientMainWindow/materialEditorDock/materialEditorPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesView" command="edit" arguments="0.1" />
-  <pqevent object="pqClientMainWindow/materialEditorDock/materialEditorPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesView/qt_scrollarea_viewport/1pqColorChooserButton0" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/materialEditorDock/materialEditorPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesView/qt_scrollarea_viewport/1pqColorChooserButton0/1QColorDialog0" command="setChosenColor" arguments="255,0,0" />
-  <pqevent object="pqClientMainWindow/materialEditorDock/materialEditorPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesView/qt_scrollarea_viewport/1pqColorChooserButton0/1QColorDialog0" command="done" arguments="1" />
-  <!-- select an other property just to update the modified property -->
-  <!-- because the properties are modified/updated only when focus goes out.. -->
-  <pqevent object="pqClientMainWindow/materialEditorDock/materialEditorPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesView" command="setCurrent" arguments="0.0" />
-  <pqevent object="pqClientMainWindow/materialEditorDock/materialEditorPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesView" command="setSelection" arguments="0.0,0.0" />
-  <!-- end useless input to update property -->
-  <!-- Add property rougness and set to 0 -->
-  <pqevent object="pqClientMainWindow/materialEditorDock/materialEditorPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/AddProperty" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/materialEditorDock/materialEditorPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesView" command="setCurrent" arguments="1.0" />
-  <pqevent object="pqClientMainWindow/materialEditorDock/materialEditorPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesView" command="setSelection" arguments="1.0,1.0" />
-  <pqevent object="pqClientMainWindow/materialEditorDock/materialEditorPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesView" command="doubleClick" arguments="1.0" />
-  <pqevent object="pqClientMainWindow/materialEditorDock/materialEditorPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesView" command="edit" arguments="1.0" />
-  <pqevent object="pqClientMainWindow/materialEditorDock/materialEditorPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesView/qt_scrollarea_viewport/1QComboBox0" command="activated" arguments="roughness" />
-  <pqevent object="pqClientMainWindow/materialEditorDock/materialEditorPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesView" command="setCurrent" arguments="1.1" />
-  <pqevent object="pqClientMainWindow/materialEditorDock/materialEditorPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesView" command="setSelection" arguments="1.1,1.1" />
-  <pqevent object="pqClientMainWindow/materialEditorDock/materialEditorPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesView" command="doubleClick" arguments="1.1" />
-  <pqevent object="pqClientMainWindow/materialEditorDock/materialEditorPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesView" command="edit" arguments="1.1" />
-  <pqevent object="pqClientMainWindow/materialEditorDock/materialEditorPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesView/qt_scrollarea_viewport/1pqDoubleSliderWidget0/Slider" command="set_int" arguments="0" />
-  <!-- select an other property just to update the modified property -->
-  <!-- because the properties are modified/updated only when focus goes out.. -->
-  <pqevent object="pqClientMainWindow/materialEditorDock/materialEditorPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesView" command="setCurrent" arguments="0.0" />
-  <pqevent object="pqClientMainWindow/materialEditorDock/materialEditorPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesView" command="setSelection" arguments="0.0,0.0" />
-  <!-- end useless input to update property -->
-  <!-- add property edgeColor to blue -->
-  <pqevent object="pqClientMainWindow/materialEditorDock/materialEditorPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/AddProperty" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/materialEditorDock/materialEditorPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesView" command="setCurrent" arguments="2.1" />
-  <pqevent object="pqClientMainWindow/materialEditorDock/materialEditorPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesView" command="setSelection" arguments="2.1,2.1" />
-  <pqevent object="pqClientMainWindow/materialEditorDock/materialEditorPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesView" command="doubleClick" arguments="2.1" />
-  <pqevent object="pqClientMainWindow/materialEditorDock/materialEditorPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesView" command="edit" arguments="2.1" />
-  <pqevent object="pqClientMainWindow/materialEditorDock/materialEditorPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesView/qt_scrollarea_viewport/0QComboBox0" command="activated" arguments="edgeColor" />
-  <pqevent object="pqClientMainWindow/materialEditorDock/materialEditorPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesView" command="setCurrent" arguments="2.1" />
-  <pqevent object="pqClientMainWindow/materialEditorDock/materialEditorPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesView" command="setSelection" arguments="2.1,2.1" />
-  <pqevent object="pqClientMainWindow/materialEditorDock/materialEditorPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesView" command="doubleClick" arguments="2.1" />
-  <pqevent object="pqClientMainWindow/materialEditorDock/materialEditorPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesView" command="edit" arguments="2.1" />
-  <pqevent object="pqClientMainWindow/materialEditorDock/materialEditorPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesView/qt_scrollarea_viewport/1pqColorChooserButton0" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/materialEditorDock/materialEditorPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesView/qt_scrollarea_viewport/1pqColorChooserButton0/1QColorDialog0" command="setChosenColor" arguments="0,0,255" />
-  <pqevent object="pqClientMainWindow/materialEditorDock/materialEditorPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesView/qt_scrollarea_viewport/1pqColorChooserButton0/1QColorDialog0" command="done" arguments="1" />
-  <!-- select an other property just to update the modified property -->
-  <!-- because the properties are modified/updated only when focus goes out.. -->
-  <pqevent object="pqClientMainWindow/materialEditorDock/materialEditorPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesView" command="setCurrent" arguments="2.0" />
-  <pqevent object="pqClientMainWindow/materialEditorDock/materialEditorPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesView" command="setSelection" arguments="2.0,2.0" />
-  <!-- end useless input to update property -->
-
-  <!-- Attach this material to the active source -->
-  <pqevent object="pqClientMainWindow/materialEditorDock/materialEditorPanel/AttachMaterial" command="activate" arguments="" />
-
-  <!-- Change camera angle -->
-  <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.0/actionAdjustCamera" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/pqCameraDialog" command="key" arguments="16777248" />
-  <pqevent object="pqClientMainWindow/pqCameraDialog/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents_2/elevationAngle" command="set_double" arguments="20" />
-  <pqevent object="pqClientMainWindow/pqCameraDialog/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents_2/elevationAngle" command="key" arguments="16777248" />
-  <pqevent object="pqClientMainWindow/pqCameraDialog/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents_2/elevationButton" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/pqCameraDialog/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents_2/azimuthAngle" command="set_double" arguments="20" />
-  <pqevent object="pqClientMainWindow/pqCameraDialog/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents_2/azimuthAngle" command="key" arguments="16777248" />
-  <pqevent object="pqClientMainWindow/pqCameraDialog/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents_2/azimuthButton" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/pqCameraDialog/buttonBox/1QPushButton0" command="activate" arguments="" />
+  <!-- Remove all properties -->
+  <pqevent object="pqClientMainWindow/materialEditorDock/materialEditorPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/DeleteProperties" command="activate" arguments="" />
 
   <pqcompareview object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.0/CentralWidgetFrame/Viewport" baseline="$PARAVIEW_DATA_ROOT/Clients/ParaView/Testing/Data/Baseline/MaterialEditorCreateMaterials3.png" width="400" height="400" />
 
-  <!-- Remove material -->
-
-
-
-  <!-- TODO load materials (other test ?) -->
-
-<!-- "$PARAVIEW_DATA_ROOT/Testing/Data/ParaView_Mark.png" -->
-<!-- "$PARAVIEW_DATA_ROOT/Testing/Data/pbrSpheresORM.jpg" -->
 </pqevents>

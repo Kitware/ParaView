@@ -115,6 +115,7 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${paraview_test_data_directory_input}/Data/non_convex_polygon.vtu}"
   "DATA{${paraview_test_data_directory_input}/Data/office.binary.vtk}"
   "DATA{${paraview_test_data_directory_input}/Data/OMF/test_file.omf}"
+  "DATA{${paraview_test_data_directory_input}/Data/OSPRayMaterials/materials.json}"
   "DATA{${paraview_test_data_directory_input}/Data/pbrSpheres.vtp}"
   "DATA{${paraview_test_data_directory_input}/Data/pbrSpheresAlbedo.jpg}"
   "DATA{${paraview_test_data_directory_input}/Data/pbrSpheresORM.jpg}"
@@ -336,6 +337,8 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/MaterialEditorCreateMaterials1.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/MaterialEditorCreateMaterials2.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/MaterialEditorCreateMaterials3.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/MaterialEditorLoadMaterials1.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/MaterialEditorLoadMaterials2.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/MathTextColumn.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/MergePointBlocks.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/Molecule-BallStick.png}"
@@ -641,6 +644,7 @@ SET (TESTS_WITH_INLINE_COMPARES
   LogColorMap.xml
   LogColorMapToggle.xml
   MaterialEditorCreateMaterials.xml
+  MaterialEditorLoadMaterials.xml
   MemoryInspectorPanel.xml
   Molecule.xml
   # temporary disabling since we don't support

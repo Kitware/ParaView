@@ -172,28 +172,26 @@ void vtkSMMaterialLibraryProxy::CreateProxies()
       vtkSmartPointer<vtkSMSourceProxy> producer;
       producer.TakeReference(vtkSMSourceProxy::SafeDownCast(
         pxm->NewProxy("sources", "PVTrivialProducerOnAllProcesses")));
-        vtkSMSourceProxy::SafeDownCast(pxm->NewProxy("sources", "PVTrivialProducer")));
-        auto realProducer = vtkPVTrivialProducer::SafeDownCast(producer->GetClientSideObject());
-        realProducer->SetOutput(osprayTexture->GetInput());
+      auto realProducer = vtkPVTrivialProducer::SafeDownCast(producer->GetClientSideObject());
+      realProducer->SetOutput(osprayTexture->GetInput());
 
-        // Connect the producer to the input of Texture
-        vtkSmartPointer<vtkSMSourceProxy> texture;
-        texture.TakeReference(vtkSMSourceProxy::SafeDownCast(pxm->NewProxy("textures", "Texture")));
-        vtkSMPropertyHelper(texture, "Input").Set(producer);
-        texture->UpdateVTKObjects();
-        texture->UpdatePipeline();
+      // Connect the producer to the input of Texture
+      vtkSmartPointer<vtkSMSourceProxy> texture;
+      texture.TakeReference(vtkSMSourceProxy::SafeDownCast(pxm->NewProxy("textures", "Texture")));
+      vtkSMPropertyHelper(texture, "Input").Set(producer);
+      texture->UpdateVTKObjects();
+      texture->UpdatePipeline();
 
-        // Get the name of the texture from the ospray material library
-        std::string osprayTextureName = ml->GetTextureName(matName, varName);
+      // Get the name of the texture from the ospray material library
+      std::string osprayTextureName = ml->GetTextureName(matName, varName);
 
-        // Generate an unique name
-        std::string proxyName =
-          pxm->GetUniqueProxyName("textures", osprayTextureName.c_str(), false);
+      // Generate an unique name
+      std::string proxyName = pxm->GetUniqueProxyName("textures", osprayTextureName.c_str(), false);
 
-        // Now, register the proxy and update the vtkPVMaterial object
-        pxm->RegisterProxy("textures", proxyName.c_str(), texture);
-        vtkSMPropertyHelper(matProxy, "DoubleVariables").Set(currentIndex++, varName.c_str());
-        vtkSMPropertyHelper(matProxy, "DoubleVariables").Set(currentIndex++, proxyName.c_str());
+      // Now, register the proxy and update the vtkPVMaterial object
+      pxm->RegisterProxy("textures", proxyName.c_str(), texture);
+      vtkSMPropertyHelper(matProxy, "DoubleVariables").Set(currentIndex++, varName.c_str());
+      vtkSMPropertyHelper(matProxy, "DoubleVariables").Set(currentIndex++, proxyName.c_str());
     }
 
     matProxy->UpdateVTKObjects();
