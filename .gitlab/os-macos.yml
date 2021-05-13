@@ -59,6 +59,7 @@
 
     script:
         - *before_script_macos
+        - .gitlab/ci/sccache.sh
         # Build and activate the venv
         - python3 -m venv build/ci-venv
         - . ./build/ci-venv/bin/activate
