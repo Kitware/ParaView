@@ -844,6 +844,7 @@ list(APPEND TESTS_WITH_BASELINES
   Calculator.xml
   CalculatorInput.xml
   CategoriesWithNaN.xml
+  CGNSIOSSReader.xml
   # Disabled due to #20508
   # ChangeGlyphRepVisibility.xml
   ChangingTimestepsInStateFiles.xml
