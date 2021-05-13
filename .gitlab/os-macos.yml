@@ -60,7 +60,7 @@
     script:
         - *before_script_macos
         # Build and activate the venv
-        - python3 -m venv $pwdpath\build\ci-venv
+        - python3 -m venv build/ci-venv
         - . ./build/ci-venv/bin/activate
         - pip install -qq -r .gitlab/ci/requirements-phase1.txt
         - pip install -qq -r .gitlab/ci/requirements-phase2.txt
