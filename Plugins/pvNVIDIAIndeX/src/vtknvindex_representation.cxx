@@ -61,6 +61,7 @@
 // Enable ghosting in VTK to provide border data for regular volumes
 // #define VTKNVINDEX_REGULAR_VOLUME_FORCE_VTK_GHOSTING
 
+// NOLINTNEXTLINE(modernize-use-equals-default)
 vtknvindex_representation_initializer::vtknvindex_representation_initializer()
 {
 #ifdef VTKNVINDEX_REGULAR_VOLUME_FORCE_VTK_GHOSTING
@@ -76,9 +77,7 @@ vtknvindex_representation_initializer::vtknvindex_representation_initializer()
 #endif // VTKNVINDEX_REGULAR_VOLUME_FORCE_VTK_GHOSTING
 }
 
-vtknvindex_representation_initializer::~vtknvindex_representation_initializer()
-{
-}
+vtknvindex_representation_initializer::~vtknvindex_representation_initializer() = default;
 
 vtkStandardNewMacro(vtknvindex_representation);
 

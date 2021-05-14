@@ -51,10 +51,7 @@ vtknvindex_regular_volume_properties::vtknvindex_regular_volume_properties()
 }
 
 // ------------------------------------------------------------------------------------------------
-vtknvindex_regular_volume_properties::~vtknvindex_regular_volume_properties()
-{
-  // empty
-}
+vtknvindex_regular_volume_properties::~vtknvindex_regular_volume_properties() = default;
 
 // ------------------------------------------------------------------------------------------------
 void vtknvindex_regular_volume_properties::set_scalar_type(std::string scalar_type)

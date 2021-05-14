@@ -100,10 +100,7 @@ vtknvindex_volumemapper::vtknvindex_volumemapper()
 }
 
 //----------------------------------------------------------------------------
-vtknvindex_volumemapper::~vtknvindex_volumemapper()
-{
-  // empty
-}
+vtknvindex_volumemapper::~vtknvindex_volumemapper() = default;
 
 //----------------------------------------------------------------------------
 double* vtknvindex_volumemapper::GetBounds()

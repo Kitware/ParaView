@@ -53,16 +53,10 @@ vtknvindex_irregular_volume_importer::vtknvindex_irregular_volume_importer(
 }
 
 //-------------------------------------------------------------------------------------------------
-vtknvindex_irregular_volume_importer::vtknvindex_irregular_volume_importer()
-{
-  // empty
-}
+vtknvindex_irregular_volume_importer::vtknvindex_irregular_volume_importer() = default;
 
 //-------------------------------------------------------------------------------------------------
-vtknvindex_irregular_volume_importer::~vtknvindex_irregular_volume_importer()
-{
-  // empty
-}
+vtknvindex_irregular_volume_importer::~vtknvindex_irregular_volume_importer() = default;
 
 //-------------------------------------------------------------------------------------------------
 mi::Size vtknvindex_irregular_volume_importer::estimate(

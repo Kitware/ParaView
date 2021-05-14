@@ -335,10 +335,7 @@ vtknvindex_volume_neighbor_data::vtknvindex_volume_neighbor_data(
 }
 
 //-------------------------------------------------------------------------------------------------
-vtknvindex_volume_neighbor_data::vtknvindex_volume_neighbor_data()
-{
-  // empty
-}
+vtknvindex_volume_neighbor_data::vtknvindex_volume_neighbor_data() = default;
 
 //-------------------------------------------------------------------------------------------------
 vtknvindex_volume_neighbor_data::~vtknvindex_volume_neighbor_data()
@@ -399,10 +396,7 @@ vtknvindex_host_properties::vtknvindex_host_properties(
 }
 
 // ------------------------------------------------------------------------------------------------
-vtknvindex_host_properties::~vtknvindex_host_properties()
-{
-  // empty
-}
+vtknvindex_host_properties::~vtknvindex_host_properties() = default;
 
 // ------------------------------------------------------------------------------------------------
 void vtknvindex_host_properties::shm_cleanup(bool reset)

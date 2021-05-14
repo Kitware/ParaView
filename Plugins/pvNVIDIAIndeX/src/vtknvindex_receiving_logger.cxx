@@ -35,10 +35,7 @@
 #include <nv/index/version.h>
 
 //----------------------------------------------------------------------
-vtknvindex_receiving_logger::vtknvindex_receiving_logger()
-{
-  // empty
-}
+vtknvindex_receiving_logger::vtknvindex_receiving_logger() = default;
 
 //----------------------------------------------------------------------
 void vtknvindex_receiving_logger::message(mi::base::Message_severity level, const char* category,

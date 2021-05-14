@@ -97,10 +97,7 @@ vtknvindex_irregular_volume_mapper::vtknvindex_irregular_volume_mapper()
 }
 
 //----------------------------------------------------------------------------
-vtknvindex_irregular_volume_mapper::~vtknvindex_irregular_volume_mapper()
-{
-  // empty
-}
+vtknvindex_irregular_volume_mapper::~vtknvindex_irregular_volume_mapper() = default;
 
 //----------------------------------------------------------------------------
 double* vtknvindex_irregular_volume_mapper::GetBounds()

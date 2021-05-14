@@ -54,10 +54,7 @@ vtknvindex_opengl_canvas::vtknvindex_opengl_canvas()
 }
 
 //-------------------------------------------------------------------------------------------------
-vtknvindex_opengl_canvas::~vtknvindex_opengl_canvas()
-{
-  // empty
-}
+vtknvindex_opengl_canvas::~vtknvindex_opengl_canvas() = default;
 
 //-------------------------------------------------------------------------------------------------
 bool vtknvindex_opengl_canvas::is_multi_thread_capable() const

@@ -102,10 +102,7 @@ bool vtknvindex_xml_config_parser::open_config_file(const std::string& config_fi
 }
 
 //-------------------------------------------------------------------------------------------------
-vtknvindex_xml_config_parser::~vtknvindex_xml_config_parser()
-{
-  // empty
-}
+vtknvindex_xml_config_parser::~vtknvindex_xml_config_parser() = default;
 
 //-------------------------------------------------------------------------------------------------
 bool vtknvindex_xml_config_parser::get_license_strings(
@@ -328,10 +325,7 @@ vtknvindex_config_settings::vtknvindex_config_settings()
 }
 
 //-------------------------------------------------------------------------------------------------
-vtknvindex_config_settings::~vtknvindex_config_settings()
-{
-  // empty
-}
+vtknvindex_config_settings::~vtknvindex_config_settings() = default;
 
 //-------------------------------------------------------------------------------------------------
 void vtknvindex_config_settings::set_region_of_interest(
