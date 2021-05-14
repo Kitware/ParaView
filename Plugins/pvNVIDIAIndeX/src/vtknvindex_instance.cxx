@@ -691,7 +691,7 @@ bool vtknvindex_instance::setup_nvindex()
             else
             {
               // Use default discovery address: first host in the host list
-              const std::string discovery_address = std::string(m_host_list[0].c_str()) + ":5555";
+              const std::string discovery_address = m_host_list[0] + ":5555";
               inetwork_configuration->set_discovery_address(discovery_address.c_str());
             }
           }
