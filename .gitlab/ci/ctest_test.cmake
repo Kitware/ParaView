@@ -48,10 +48,6 @@ if ("$ENV{CMAKE_CONFIGURATION}" MATCHES "fedora")
     "pvcs\\.VisItBridgeNek$"
     "pvcrs\\.VisItBridgeNek$"
 
-    # https://gitlab.kitware.com/paraview/paraview/-/issues/20718
-    "pvcs\\.ExportSelectionToCSV$"
-    "pvcrs\\.ExportSelectionToCSV$"
-
     # Ioss issue
     # https://gitlab.kitware.com/paraview/paraview/-/issues/20719
     "\\.SaveExodus$"
