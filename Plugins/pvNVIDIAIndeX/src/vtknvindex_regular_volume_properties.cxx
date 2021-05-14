@@ -431,6 +431,7 @@ bool vtknvindex_regular_volume_properties::write_shared_memory(
     mi::math::Vector<mi::Float64, 3> point_pv;
     ugrid->GetPoint(i, point_pv.begin());
     const mi::math::Vector<mi::Float32, 3> point_index(point_pv);
+    // NOLINTNEXTLINE(bugprone-undefined-memory-manipulation)
     memcpy(shm_offset, &point_index, size_elm);
     shm_offset += size_elm;
   }
