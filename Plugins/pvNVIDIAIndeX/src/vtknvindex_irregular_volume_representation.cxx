@@ -132,7 +132,7 @@ void vtknvindex_irregular_volume_representation::SetActiveVolumeMapper(const cha
 //----------------------------------------------------------------------------
 vtkUnstructuredGridVolumeMapper* vtknvindex_irregular_volume_representation::GetActiveVolumeMapper()
 {
-  if (this->Internals->ActiveVolumeMapper != "")
+  if (!this->Internals->ActiveVolumeMapper.empty())
   {
     vtkInternals::MapOfMappers::iterator iter =
       this->Internals->Mappers.find(this->Internals->ActiveVolumeMapper);
@@ -309,7 +309,7 @@ int vtknvindex_irregular_volume_representation::ProcessViewRequest(
 #endif // VTKNVINDEX_USE_KDTREE
 
     // Retrieve ParaView's kd-tree in order to obtain domain subdivision bounding boxes.
-    if (ddm->GetCuts().size() > 0 && controller != nullptr &&
+    if (!ddm->GetCuts().empty() && controller != nullptr &&
       controller->GetLocalProcessId() < static_cast<int>(ddm->GetCuts().size()))
     {
       DefaultMapper->set_subregion_bounds(ddm->GetCuts()[controller->GetLocalProcessId()]);
