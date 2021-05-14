@@ -55,7 +55,6 @@ vtknvindex_volume_compute::vtknvindex_volume_compute()
   : m_enabled(false)
   , m_border_size(0)
   , m_ghost_levels(0)
-  , m_scalar_type("")
   , m_cluster_properties(nullptr)
 {
   // empty

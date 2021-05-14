@@ -72,7 +72,6 @@ vtkStandardNewMacro(vtknvindex_irregular_volume_representation);
 
 //----------------------------------------------------------------------------
 vtknvindex_irregular_volume_representation::vtknvindex_irregular_volume_representation()
-  : Superclass()
 {
   m_controller = vtkMultiProcessController::GetGlobalController();
 

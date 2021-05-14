@@ -45,9 +45,7 @@ vtknvindex_forwarding_logger_factory*
 
 //-------------------------------------------------------------------------------------------------
 vtknvindex_forwarding_logger::vtknvindex_forwarding_logger()
-  : m_os()
-  , m_level(mi::base::MESSAGE_SEVERITY_INFO)
-  , m_forwarding_logger()
+  : m_level(mi::base::MESSAGE_SEVERITY_INFO)
 {
   // The forwarding logger pointer must be captured by a handle,
   // otherwise it leaks some memory.
@@ -173,9 +171,7 @@ std::string vtknvindex_forwarding_logger::level_to_string(mi::base::Message_seve
 
 //-------------------------------------------------------------------------------------------------
 vtknvindex_forwarding_logger_factory::vtknvindex_forwarding_logger_factory()
-  : m_header_str("")
-  , m_iindex_if()
-  , m_fallback_severity_level(mi::base::MESSAGE_SEVERITY_INFO)
+  : m_fallback_severity_level(mi::base::MESSAGE_SEVERITY_INFO)
 {
   // empty
 }
