@@ -48,13 +48,6 @@ if ("$ENV{CMAKE_CONFIGURATION}" MATCHES "fedora")
     "pvcs\\.VisItBridgeNek$"
     "pvcrs\\.VisItBridgeNek$"
 
-    # Hangs in parallel
-    # https://gitlab.kitware.com/paraview/paraview/-/issues/20714
-    "pvcs\\.ComparativeVisPanel$"
-    "pvcrs\\.ComparaitiveVisPanel$"
-    # https://gitlab.kitware.com/paraview/paraview/-/issues/20716
-    "pvcs\\.RescaleToTemporal$"
-    "pvcrs\\.RescaleToTemporal$"
     # https://gitlab.kitware.com/paraview/paraview/-/issues/20718
     "pvcs\\.ExportSelectionToCSV$"
     "pvcrs\\.ExportSelectionToCSV$"
