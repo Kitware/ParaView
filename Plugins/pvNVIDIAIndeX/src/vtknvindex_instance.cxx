@@ -74,7 +74,7 @@ static std::string get_last_error_as_str()
     LPVOID lpMsgBuf;
     DWORD bufLen = FormatMessage(
       FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
-      NULL, error, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPTSTR)&lpMsgBuf, 0, NULL);
+      nullptr, error, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPTSTR)&lpMsgBuf, 0, nullptr);
 
     if (bufLen)
     {
@@ -99,15 +99,16 @@ std::string get_interface_address(const std::string interface_name, bool ipv6 = 
   {
     for (ifaddrs* i = if_list; i; i = i->ifa_next)
     {
-      if (i->ifa_addr != 0 && i->ifa_name != 0 && ((i->ifa_addr->sa_family == AF_INET && !ipv6) ||
-                                                    (i->ifa_addr->sa_family == AF_INET6 && ipv6)) &&
+      if (i->ifa_addr != nullptr && i->ifa_name != nullptr &&
+        ((i->ifa_addr->sa_family == AF_INET && !ipv6) ||
+            (i->ifa_addr->sa_family == AF_INET6 && ipv6)) &&
         std::string(i->ifa_name) == interface_name)
       {
         char buf[1025];
         int s = getnameinfo(i->ifa_addr,
           (i->ifa_addr->sa_family == AF_INET) ? sizeof(struct sockaddr_in)
                                               : sizeof(struct sockaddr_in6),
-          buf, 1025, 0, 0, NI_NUMERICHOST);
+          buf, 1025, nullptr, 0, NI_NUMERICHOST);
         if (s == 0)
         {
           result = buf;
@@ -1011,19 +1012,19 @@ void vtknvindex_instance::shutdown_nvindex()
     // Unregister receiving logger.
     mi::base::Handle<mi::neuraylib::ILogging_configuration> logging_configuration(
       m_nvindex_interface->get_api_component<mi::neuraylib::ILogging_configuration>());
-    logging_configuration->set_receiving_logger(0);
+    logging_configuration->set_receiving_logger(nullptr);
   }
 
-  m_database = 0;
-  m_global_scope = 0;
-  m_iindex_session = 0;
-  m_iindex_rendering = 0;
-  m_icluster_configuration = 0;
-  m_iindex_debug_configuration = 0;
+  m_database = nullptr;
+  m_global_scope = nullptr;
+  m_iindex_session = nullptr;
+  m_iindex_rendering = nullptr;
+  m_icluster_configuration = nullptr;
+  m_iindex_debug_configuration = nullptr;
   m_session_tag = mi::neuraylib::NULL_TAG;
 
   m_nvindex_interface->shutdown();
-  m_nvindex_interface = 0;
+  m_nvindex_interface = nullptr;
 }
 
 //-------------------------------------------------------------------------------------------------

@@ -31,7 +31,7 @@
 
 //-----------------------------------------------------------------------------
 vtknvindex_opengl_app_buffer::vtknvindex_opengl_app_buffer()
-  : m_z_buffer(0)
+  : m_z_buffer(nullptr)
   , m_z_buffer_precision(0)
   , m_resolution(-1, -1)
 {
@@ -107,7 +107,7 @@ void vtknvindex_opengl_app_buffer::resize_buffer(
 //-----------------------------------------------------------------------------
 void vtknvindex_opengl_app_buffer::clear_buffer()
 {
-  if (m_z_buffer == 0)
+  if (m_z_buffer == nullptr)
     return;
 
   if (this->is_buffer_allocated())
@@ -136,10 +136,10 @@ bool vtknvindex_opengl_app_buffer::is_valid() const
 void vtknvindex_opengl_app_buffer::delete_memory()
 {
   m_resolution = mi::math::Vector<mi::Sint32, 2>(-1, -1);
-  if (m_z_buffer != 0)
+  if (m_z_buffer != nullptr)
   {
     delete[] m_z_buffer;
-    m_z_buffer = 0;
+    m_z_buffer = nullptr;
   }
 }
 

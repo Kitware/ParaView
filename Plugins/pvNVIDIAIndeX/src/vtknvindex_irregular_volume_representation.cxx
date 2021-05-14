@@ -111,7 +111,7 @@ vtknvindex_irregular_volume_representation::~vtknvindex_irregular_volume_represe
   this->DefaultMapper->shutdown();
 
   delete this->Internals;
-  this->Internals = 0;
+  this->Internals = nullptr;
 
   delete m_cluster_properties;
 }
@@ -376,7 +376,7 @@ bool vtknvindex_irregular_volume_representation::RemoveFromView(vtkView* view)
 void vtknvindex_irregular_volume_representation::UpdateMapperParameters()
 {
   vtkUnstructuredGridVolumeMapper* activeMapper = this->GetActiveVolumeMapper();
-  const char* colorArrayName = NULL;
+  const char* colorArrayName = nullptr;
   int fieldAssociation = vtkDataObject::FIELD_ASSOCIATION_POINTS;
 
   vtkInformation* info = this->GetInputArrayInformation(0);
@@ -593,7 +593,7 @@ void vtknvindex_irregular_volume_representation::update_current_kernel()
     case RTC_KERNELS_NONE:
     default:
       static_cast<vtknvindex_irregular_volume_mapper*>(this->DefaultMapper)
-        ->rtc_kernel_changed(RTC_KERNELS_NONE, "", 0, 0);
+        ->rtc_kernel_changed(RTC_KERNELS_NONE, "", nullptr, 0);
       break;
   }
 }

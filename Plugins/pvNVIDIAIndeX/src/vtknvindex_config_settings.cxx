@@ -50,7 +50,7 @@ vtknvindex_slice_params::vtknvindex_slice_params()
 //-------------------------------------------------------------------------------------------------
 vtknvindex_xml_config_parser::vtknvindex_xml_config_parser()
 {
-  m_root_elm = NULL;
+  m_root_elm = nullptr;
   m_parser = vtkSmartPointer<vtkXMLDataParser>::New();
   m_parser->SetIgnoreCharacterData(0);
 }
@@ -58,7 +58,7 @@ vtknvindex_xml_config_parser::vtknvindex_xml_config_parser()
 //-------------------------------------------------------------------------------------------------
 bool vtknvindex_xml_config_parser::open_config_file(const std::string& config_filename, bool create)
 {
-  m_root_elm = NULL;
+  m_root_elm = nullptr;
 
   const std::string config_full_path = get_config_full_path(config_filename);
   if (config_full_path.empty())
@@ -201,7 +201,7 @@ bool vtknvindex_xml_config_parser::get_home_path(std::string& home_path)
   // get home path from environment
   const char* env_home_path = getenv("NVINDEX_PVPLUGIN_HOME");
 
-  if (env_home_path != NULL)
+  if (env_home_path != nullptr)
   {
     home_path = std::string(env_home_path);
 
@@ -231,7 +231,7 @@ bool vtknvindex_xml_config_parser::get_home_path(std::string& home_path)
 // get home path from ParaView configuration folder
 #ifdef _WIN32
   TCHAR app_data_path[MAX_PATH];
-  if (SUCCEEDED(SHGetFolderPath(NULL, CSIDL_APPDATA, NULL, 0, app_data_path)))
+  if (SUCCEEDED(SHGetFolderPath(nullptr, CSIDL_APPDATA, nullptr, 0, app_data_path)))
   {
     home_path = std::string(app_data_path) + "\\ParaView\\";
     return true;
@@ -239,7 +239,7 @@ bool vtknvindex_xml_config_parser::get_home_path(std::string& home_path)
 #else
   const char* home = getenv("HOME");
 
-  if (home != NULL && strlen(home) > 0)
+  if (home != nullptr && strlen(home) > 0)
   {
     home_path = std::string(home) + std::string("/.config/ParaView/");
     return true;
@@ -271,16 +271,16 @@ bool vtknvindex_xml_config_parser::get_temp_path(std::string& temp_path)
   temp_path = "/tmp";
 
   char* path = getenv("TMPDIR");
-  if (path == NULL || strlen(path) == 0)
+  if (path == nullptr || strlen(path) == 0)
   {
     path = getenv("TEMP");
-    if (path == NULL || strlen(path) == 0)
+    if (path == nullptr || strlen(path) == 0)
     {
       path = getenv("TEMPDIR");
     }
   }
 
-  if (path != NULL || strlen(path) > 0)
+  if (path != nullptr || strlen(path) > 0)
   {
     temp_path = path;
   }

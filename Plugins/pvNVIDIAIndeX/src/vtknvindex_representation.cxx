@@ -408,12 +408,12 @@ int vtknvindex_representation::RequestData(
 
   vtkDataObject* input = vtkDataObject::GetData(inputVector[0], 0);
   (void)input;
-  assert(input != NULL);
+  assert(input != nullptr);
 
   vtknvindex_cached_bounds* cached_bounds =
-    has_time_steps ? get_cached_bounds(cur_time_step) : NULL;
+    has_time_steps ? get_cached_bounds(cur_time_step) : nullptr;
 
-  bool using_cache = (cached_bounds != NULL); // this->CacheKeeper->GetCachingEnabled();
+  bool using_cache = (cached_bounds != nullptr); // this->CacheKeeper->GetCachingEnabled();
 
   static_cast<vtknvindex_volumemapper*>(this->VolumeMapper.GetPointer())->is_caching(using_cache);
   static_cast<vtknvindex_lod_volume*>(this->Actor.GetPointer())->set_caching_pass(using_cache);
@@ -620,7 +620,7 @@ vtknvindex_cached_bounds* vtknvindex_representation::get_cached_bounds(mi::Sint3
   std::map<mi::Sint32, vtknvindex_cached_bounds>::iterator it = m_time_to_cached_bounds.find(time);
 
   if (it == m_time_to_cached_bounds.end())
-    return NULL;
+    return nullptr;
 
   return &(it->second);
 }
@@ -908,7 +908,7 @@ void vtknvindex_representation::update_current_kernel()
     case RTC_KERNELS_NONE:
     default:
       static_cast<vtknvindex_volumemapper*>(this->VolumeMapper.GetPointer())
-        ->rtc_kernel_changed(RTC_KERNELS_NONE, "", 0, 0);
+        ->rtc_kernel_changed(RTC_KERNELS_NONE, "", nullptr, 0);
       break;
   }
 }

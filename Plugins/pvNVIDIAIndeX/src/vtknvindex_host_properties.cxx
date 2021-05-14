@@ -562,7 +562,7 @@ vtknvindex_host_properties::shm_info* vtknvindex_host_properties::get_shminfo(
                  "available for the time step: "
               << time_step << ".";
 
-    return NULL;
+    return nullptr;
   }
 
   std::vector<shm_info>& shmlist = shmit->second;
@@ -570,7 +570,7 @@ vtknvindex_host_properties::shm_info* vtknvindex_host_properties::get_shminfo(
   if (shmlist.empty())
   {
     ERROR_LOG << "The shared memory list in vtknvindex_host_properties::get_shminfo is empty.";
-    return NULL;
+    return nullptr;
   }
 
   for (mi::Uint32 i = 0; i < shmlist.size(); ++i)
@@ -582,7 +582,7 @@ vtknvindex_host_properties::shm_info* vtknvindex_host_properties::get_shminfo(
       return current_shm;
     }
   }
-  return NULL;
+  return nullptr;
 }
 
 // ------------------------------------------------------------------------------------------------
