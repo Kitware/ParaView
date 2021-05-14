@@ -138,7 +138,7 @@ vtkIceTCompositePass::vtkIceTCompositePass()
   this->RenderEmptyImages = false;
   this->UseOrderedCompositing = false;
 
-  this->LastRenderedRGBAColors = std::make_unique<vtkSynchronizedRenderers::vtkRawImage>();
+  this->LastRenderedRGBAColors.reset(new vtkSynchronizedRenderers::vtkRawImage());
 
   this->PBO = nullptr;
   this->ZTexture = nullptr;
