@@ -47,7 +47,10 @@ See Copyright.txt or http://www.paraview.org/HTML/Copyright.html for details.
 #include "vtkToolkits.h" // for VTK_USE_PARALLEL
 #include "vtkUnstructuredGrid.h"
 
+// .clang-format off
 #include "vtk_cgns.h"
+#include VTK_CGNS(cgnslib.h)
+// .clang-format on
 
 #include <map>
 #include <set>
