@@ -191,6 +191,8 @@
   <Proxy group="filters" name="ContingencyStatistics" />
   <Proxy group="filters" name="Contour" icon=":/pqWidgets/Icons/pqIsosurface.svg" />
   <Proxy group="filters" name="ConvertPolyhedra" />
+  <Proxy group="filters" name="ConvertToMultiBlock" />
+  <Proxy group="filters" name="ConvertToPartitionedDataSetCollection" />
   <Proxy group="filters" name="ConvertToPointCloud" />
   <Proxy group="filters" name="CountCellFaces" />
   <Proxy group="filters" name="CountCellVertices" />

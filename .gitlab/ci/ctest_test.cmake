@@ -48,10 +48,6 @@ if ("$ENV{CMAKE_CONFIGURATION}" MATCHES "fedora")
     "pvcs\\.VisItBridgeNek$"
     "pvcrs\\.VisItBridgeNek$"
 
-    # Ioss issue
-    # https://gitlab.kitware.com/paraview/paraview/-/issues/20719
-    "\\.SaveExodus$"
-
     # errors in parallel
     # https://gitlab.kitware.com/paraview/paraview/-/issues/20715i
     "pvcs\\.Flow2$"
