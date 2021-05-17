@@ -12,7 +12,7 @@
 #include "vtkInformation.h"
 #include "vtkInformationIntegerKey.h"
 #include "vtkInformationVector.h"
-#include "vtkMath.h"
+#include "vtkMinimalStandardRandomSequence.h"
 #include "vtkMultiBlockDataSet.h"
 #include "vtkNew.h"
 #include "vtkPointData.h"
@@ -607,9 +607,11 @@ int vtkSciVizStatistics::PrepareTrainingTable(
   std::set<vtkIdType> trainRows;
   vtkIdType N = fullDataTable->GetNumberOfRows();
   double frac = static_cast<double>(M) / static_cast<double>(N);
+  vtkNew<vtkMinimalStandardRandomSequence> rand;
   for (vtkIdType i = 0; i < N; ++i)
   {
-    if (vtkMath::Random() < frac)
+    rand->Next();
+    if (rand->GetValue() < frac)
     {
       trainRows.insert(i);
     }
@@ -618,12 +620,14 @@ int vtkSciVizStatistics::PrepareTrainingTable(
   N = N - 1;
   while (static_cast<vtkIdType>(trainRows.size()) > M)
   {
-    vtkIdType rec = static_cast<vtkIdType>(vtkMath::Random(0, N));
+    rand->Next();
+    vtkIdType rec = static_cast<vtkIdType>(rand->GetRangeValue(0, N));
     trainRows.erase(rec);
   }
   while (static_cast<vtkIdType>(trainRows.size()) < M)
   {
-    vtkIdType rec = static_cast<vtkIdType>(vtkMath::Random(0, N));
+    rand->Next();
+    vtkIdType rec = static_cast<vtkIdType>(rand->GetRangeValue(0, N));
     trainRows.insert(rec);
   }
   // Finally, copy the subset into the training table

@@ -25,7 +25,7 @@
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
 #include "vtkIntArray.h"
-#include "vtkMath.h"
+#include "vtkMinimalStandardRandomSequence.h"
 #include "vtkMultiBlockDataSet.h"
 #include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
@@ -386,7 +386,8 @@ void vtkHierarchicalFractal::SetRBlockInfo(
 
   vtkDoubleArray* coords[3];
 
-  vtkMath::RandomSeed(1234);
+  vtkNew<vtkMinimalStandardRandomSequence> rand;
+  rand->Initialize(1234);
   int coord = 0;
   while (coord < 3)
   {
@@ -421,7 +422,8 @@ void vtkHierarchicalFractal::SetRBlockInfo(
     {
       uniformCoordinate += spacing[coord];
       // get a random number about 1/5 of the uniform spacing.
-      double epsilon = (vtkMath::Random() - 0.5) * spacing[coord] * 0.4;
+      rand->Next();
+      double epsilon = (rand->GetValue() - 0.5) * spacing[coord] * 0.4;
       coords[coord]->InsertNextValue(uniformCoordinate + epsilon);
       ++i;
     }
