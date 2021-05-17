@@ -267,6 +267,7 @@ set(paraview_default_plugins
   Moments
   MooseXfemClip
   NetCDFTimeAnnotationPlugin
+  NodeEditor
   NonOrthogonalSource
   PacMan
   PanoramicProjectionView
