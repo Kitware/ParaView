@@ -54,10 +54,7 @@ vtknvindex_colormap::vtknvindex_colormap(
 }
 
 //-------------------------------------------------------------------------------------------------
-vtknvindex_colormap::~vtknvindex_colormap()
-{
-  // empty
-}
+vtknvindex_colormap::~vtknvindex_colormap() = default;
 
 //-------------------------------------------------------------------------------------------------
 void vtknvindex_colormap::dump_colormap(mi::base::Handle<const nv::index::IColormap> const& cmap)

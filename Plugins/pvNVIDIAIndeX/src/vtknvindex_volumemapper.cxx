@@ -100,10 +100,7 @@ vtknvindex_volumemapper::vtknvindex_volumemapper()
 }
 
 //----------------------------------------------------------------------------
-vtknvindex_volumemapper::~vtknvindex_volumemapper()
-{
-  // empty
-}
+vtknvindex_volumemapper::~vtknvindex_volumemapper() = default;
 
 //----------------------------------------------------------------------------
 double* vtknvindex_volumemapper::GetBounds()
@@ -165,7 +162,7 @@ bool vtknvindex_volumemapper::prepare_data(mi::Sint32 time_step)
   if (m_cluster_properties->get_regular_volume_properties()->is_timeseries_data())
   {
     // Get the input
-    if (image_piece == NULL)
+    if (image_piece == nullptr)
     {
       ERROR_LOG << "vtkImageData in representation is invalid!";
       return false;
@@ -222,7 +219,7 @@ bool vtknvindex_volumemapper::initialize_mapper(vtkVolume* vol)
 
   // Get the input.
   vtkImageData* image_piece = vtkImageData::SafeDownCast(this->GetInput());
-  if (image_piece == NULL)
+  if (image_piece == nullptr)
   {
     ERROR_LOG << "vtkImageData in representation is invalid.";
     return false;
@@ -666,9 +663,9 @@ void vtknvindex_volumemapper::Render(vtkRenderer* ren, vtkVolume* vol)
           m_index_instance->m_iindex_rendering->render(m_index_instance->m_session_tag,
             &(m_index_instance->m_opengl_canvas), // Opengl canvas.
             dice_transaction.get(),
-            0,    // No progress_callback.
-            0,    // No Frame information.
-            true, // = g_immediate_final_parallel_compositing
+            nullptr, // No progress_callback.
+            nullptr, // No Frame information.
+            true,    // = g_immediate_final_parallel_compositing
             use_depth_buffer ? &m_index_instance->m_opengl_app_buffer : nullptr));
 
         // check for errors during rendering

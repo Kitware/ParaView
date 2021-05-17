@@ -72,7 +72,6 @@ vtkStandardNewMacro(vtknvindex_irregular_volume_representation);
 
 //----------------------------------------------------------------------------
 vtknvindex_irregular_volume_representation::vtknvindex_irregular_volume_representation()
-  : Superclass()
 {
   m_controller = vtkMultiProcessController::GetGlobalController();
 
@@ -111,7 +110,7 @@ vtknvindex_irregular_volume_representation::~vtknvindex_irregular_volume_represe
   this->DefaultMapper->shutdown();
 
   delete this->Internals;
-  this->Internals = 0;
+  this->Internals = nullptr;
 
   delete m_cluster_properties;
 }
@@ -133,7 +132,7 @@ void vtknvindex_irregular_volume_representation::SetActiveVolumeMapper(const cha
 //----------------------------------------------------------------------------
 vtkUnstructuredGridVolumeMapper* vtknvindex_irregular_volume_representation::GetActiveVolumeMapper()
 {
-  if (this->Internals->ActiveVolumeMapper != "")
+  if (!this->Internals->ActiveVolumeMapper.empty())
   {
     vtkInternals::MapOfMappers::iterator iter =
       this->Internals->Mappers.find(this->Internals->ActiveVolumeMapper);
@@ -310,7 +309,7 @@ int vtknvindex_irregular_volume_representation::ProcessViewRequest(
 #endif // VTKNVINDEX_USE_KDTREE
 
     // Retrieve ParaView's kd-tree in order to obtain domain subdivision bounding boxes.
-    if (ddm->GetCuts().size() > 0 && controller != nullptr &&
+    if (!ddm->GetCuts().empty() && controller != nullptr &&
       controller->GetLocalProcessId() < static_cast<int>(ddm->GetCuts().size()))
     {
       DefaultMapper->set_subregion_bounds(ddm->GetCuts()[controller->GetLocalProcessId()]);
@@ -376,7 +375,7 @@ bool vtknvindex_irregular_volume_representation::RemoveFromView(vtkView* view)
 void vtknvindex_irregular_volume_representation::UpdateMapperParameters()
 {
   vtkUnstructuredGridVolumeMapper* activeMapper = this->GetActiveVolumeMapper();
-  const char* colorArrayName = NULL;
+  const char* colorArrayName = nullptr;
   int fieldAssociation = vtkDataObject::FIELD_ASSOCIATION_POINTS;
 
   vtkInformation* info = this->GetInputArrayInformation(0);
@@ -593,7 +592,7 @@ void vtknvindex_irregular_volume_representation::update_current_kernel()
     case RTC_KERNELS_NONE:
     default:
       static_cast<vtknvindex_irregular_volume_mapper*>(this->DefaultMapper)
-        ->rtc_kernel_changed(RTC_KERNELS_NONE, "", 0, 0);
+        ->rtc_kernel_changed(RTC_KERNELS_NONE, "", nullptr, 0);
       break;
   }
 }

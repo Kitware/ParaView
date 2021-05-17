@@ -906,7 +906,7 @@ void vtknvindex_scene::update_rtc_kernel(
           break;
         case RTC_KERNELS_CUSTOM:
           // use default program in case the custom kernel doesn't exist yet.
-          if (rtc_param_buffer.kernel_program == "")
+          if (rtc_param_buffer.kernel_program.empty())
           {
             rtc_program->set_enabled(false);
           }
@@ -935,7 +935,7 @@ void vtknvindex_scene::update_rtc_kernel(
           break;
         case RTC_KERNELS_CUSTOM:
           // use default program in case the custom kernel doesn't exist yet.
-          if (rtc_param_buffer.kernel_program == "")
+          if (rtc_param_buffer.kernel_program.empty())
           {
             rtc_program->set_enabled(false);
           }

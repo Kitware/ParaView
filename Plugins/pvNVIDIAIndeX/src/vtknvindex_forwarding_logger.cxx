@@ -41,13 +41,11 @@ namespace logger
 
 // Singleton instance.
 vtknvindex_forwarding_logger_factory*
-  vtknvindex_forwarding_logger_factory::G_p_forwarding_logger_factory = 0;
+  vtknvindex_forwarding_logger_factory::G_p_forwarding_logger_factory = nullptr;
 
 //-------------------------------------------------------------------------------------------------
 vtknvindex_forwarding_logger::vtknvindex_forwarding_logger()
-  : m_os()
-  , m_level(mi::base::MESSAGE_SEVERITY_INFO)
-  , m_forwarding_logger()
+  : m_level(mi::base::MESSAGE_SEVERITY_INFO)
 {
   // The forwarding logger pointer must be captured by a handle,
   // otherwise it leaks some memory.
@@ -144,7 +142,7 @@ vtknvindex_forwarding_logger::~vtknvindex_forwarding_logger()
   }
 #endif
   // The m_forwarding_logger is destructed and ref-count is down here.
-  m_forwarding_logger = 0;
+  m_forwarding_logger = nullptr;
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -158,7 +156,7 @@ std::ostringstream& vtknvindex_forwarding_logger::get_message(mi::base::Message_
 std::string vtknvindex_forwarding_logger::level_to_string(mi::base::Message_severity level)
 {
   static const char* const g_buffer[] = {
-    "fatal", "error", "warn", "info", "verbose", "debug", 0,
+    "fatal", "error", "warn", "info", "verbose", "debug", nullptr,
   };
 
   assert(0 <= level);
@@ -173,9 +171,7 @@ std::string vtknvindex_forwarding_logger::level_to_string(mi::base::Message_seve
 
 //-------------------------------------------------------------------------------------------------
 vtknvindex_forwarding_logger_factory::vtknvindex_forwarding_logger_factory()
-  : m_header_str("")
-  , m_iindex_if()
-  , m_fallback_severity_level(mi::base::MESSAGE_SEVERITY_INFO)
+  : m_fallback_severity_level(mi::base::MESSAGE_SEVERITY_INFO)
 {
   // empty
 }
@@ -214,7 +210,7 @@ bool vtknvindex_forwarding_logger_factory::shutdown()
   if (!this->is_enabled())
     return false;
 
-  m_iindex_if = 0;
+  m_iindex_if = nullptr;
   return true;
 }
 
@@ -231,7 +227,7 @@ mi::base::ILogger* vtknvindex_forwarding_logger_factory::get_forwarding_logger()
   {
     fprintf(stdout, "Error: The forwarding logger factory has not been initialized. Please note "
                     "that this may cause to a segmentation fault.\n");
-    return 0;
+    return nullptr;
   }
   return m_iindex_if->get_forwarding_logger();
 }

@@ -53,16 +53,10 @@ vtknvindex_irregular_volume_importer::vtknvindex_irregular_volume_importer(
 }
 
 //-------------------------------------------------------------------------------------------------
-vtknvindex_irregular_volume_importer::vtknvindex_irregular_volume_importer()
-{
-  // empty
-}
+vtknvindex_irregular_volume_importer::vtknvindex_irregular_volume_importer() = default;
 
 //-------------------------------------------------------------------------------------------------
-vtknvindex_irregular_volume_importer::~vtknvindex_irregular_volume_importer()
-{
-  // empty
-}
+vtknvindex_irregular_volume_importer::~vtknvindex_irregular_volume_importer() = default;
 
 //-------------------------------------------------------------------------------------------------
 mi::Size vtknvindex_irregular_volume_importer::estimate(
@@ -444,6 +438,7 @@ nv::index::IDistributed_data_subset* vtknvindex_irregular_volume_importer::creat
   }
 
   // Copy vertices.
+  // NOLINTNEXTLINE(bugprone-undefined-memory-manipulation)
   memcpy(mesh_storage.vertices, subset_vertices.data(),
     subset_vertices.size() * sizeof(mesh_storage.vertices[0]));
 

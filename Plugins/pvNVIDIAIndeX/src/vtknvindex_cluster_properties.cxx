@@ -188,12 +188,12 @@ vtknvindex_host_properties* vtknvindex_cluster_properties::get_host_properties(
 {
   std::map<mi::Sint32, mi::Uint32>::const_iterator rankit = m_rankid_to_hostid.find(rankid);
   if (rankit == m_rankid_to_hostid.end())
-    return NULL;
+    return nullptr;
 
   std::map<mi::Uint32, vtknvindex_host_properties*>::const_iterator shmit =
     m_hostinfo.find(rankit->second);
   if (shmit == m_hostinfo.end())
-    return NULL;
+    return nullptr;
 
   return shmit->second;
 }

@@ -46,10 +46,7 @@ vtknvindex_performance_values::vtknvindex_performance_values()
 }
 
 //-------------------------------------------------------------------------------------------------
-vtknvindex_performance_values::~vtknvindex_performance_values()
-{
-  // empty
-}
+vtknvindex_performance_values::~vtknvindex_performance_values() = default;
 
 //-------------------------------------------------------------------------------------------------
 void vtknvindex_performance_values::print_perf_values(

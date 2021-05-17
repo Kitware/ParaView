@@ -166,7 +166,7 @@ public:
 
   // Set the shared memory data for the current bounding box and the time step.
   void set_shminfo(mi::Uint32 time_step, mi::Sint32 rank_id, std::string shmname,
-    mi::math::Bbox<mi::Float32, 3> shmbbox, mi::Uint64 shmsize, void* subset_ptr = NULL);
+    mi::math::Bbox<mi::Float32, 3> shmbbox, mi::Uint64 shmsize, void* subset_ptr = nullptr);
 
   void set_read_flag(mi::Uint32 time_step, std::string shmname);
 

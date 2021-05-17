@@ -33,10 +33,7 @@
 #include <cassert>
 
 // ------------------------------------------------------------------------------------------------
-vtknvindex_affinity::vtknvindex_affinity()
-{
-  // empty
-}
+vtknvindex_affinity::vtknvindex_affinity() = default;
 
 // ------------------------------------------------------------------------------------------------
 mi::Uint32 vtknvindex_affinity::get_nb_subregions() const
@@ -148,10 +145,7 @@ void vtknvindex_affinity::deserialize(mi::neuraylib::IDeserializer* deserializer
 }
 
 // ------------------------------------------------------------------------------------------------
-vtknvindex_KDTree_affinity::vtknvindex_KDTree_affinity()
-{
-  // empty
-}
+vtknvindex_KDTree_affinity::vtknvindex_KDTree_affinity() = default;
 
 // ------------------------------------------------------------------------------------------------
 void vtknvindex_KDTree_affinity::reset_affinity()

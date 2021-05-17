@@ -46,7 +46,7 @@ public:
   mi::math::Vector_struct<mi::Uint32, 2> get_resolution() const override;
 
   // Get the pointer to the Z-buffer, same structure as OpenGL Z-buffer.
-  // Returns NULL if not initialized.
+  // Returns nullptr if not initialized.
   // This returns writable raw pointer. Use with care.
   // Depth value is in the range [0, maxuint].
   // Returns pointer to the top address of mi::Uint32[pixel_count].

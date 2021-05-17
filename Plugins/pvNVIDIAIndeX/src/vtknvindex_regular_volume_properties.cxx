@@ -51,10 +51,7 @@ vtknvindex_regular_volume_properties::vtknvindex_regular_volume_properties()
 }
 
 // ------------------------------------------------------------------------------------------------
-vtknvindex_regular_volume_properties::~vtknvindex_regular_volume_properties()
-{
-  // empty
-}
+vtknvindex_regular_volume_properties::~vtknvindex_regular_volume_properties() = default;
 
 // ------------------------------------------------------------------------------------------------
 void vtknvindex_regular_volume_properties::set_scalar_type(std::string scalar_type)
@@ -237,7 +234,7 @@ template <typename T>
 void vtknvindex_regular_volume_properties::transform_zyx_to_xyz(
   T* pv_volume, T* shm_volume, mi::Sint32* bounds) const
 {
-  if (shm_volume == NULL || pv_volume == NULL)
+  if (shm_volume == nullptr || pv_volume == nullptr)
     return;
 
   mi::Uint64 dx = bounds[1] - bounds[0] + 1;
@@ -369,7 +366,7 @@ bool vtknvindex_regular_volume_properties::write_shared_memory(
   std::string shm_memory_name;
   mi::math::Bbox<mi::Float32, 3> shm_bbox;
   mi::Uint64 shm_size = 0;
-  void* subset_ptr = NULL;
+  void* subset_ptr = nullptr;
 
   if (!host_properties->get_shminfo(ivol_data->subregion_bbox, shm_memory_name, shm_bbox, shm_size,
         &subset_ptr, current_timestep))
@@ -434,6 +431,7 @@ bool vtknvindex_regular_volume_properties::write_shared_memory(
     mi::math::Vector<mi::Float64, 3> point_pv;
     ugrid->GetPoint(i, point_pv.begin());
     const mi::math::Vector<mi::Float32, 3> point_index(point_pv);
+    // NOLINTNEXTLINE(bugprone-undefined-memory-manipulation)
     memcpy(shm_offset, &point_index, size_elm);
     shm_offset += size_elm;
   }
