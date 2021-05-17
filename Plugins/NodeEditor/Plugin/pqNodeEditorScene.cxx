@@ -28,12 +28,11 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#include <Scene.h>
+#include "pqNodeEditorScene.h"
 
-// node editor includes
-#include <Edge.h>
-#include <Node.h>
-#include <Utils.h>
+#include "pqNodeEditorEdge.h"
+#include "pqNodeEditorNode.h"
+#include "pqNodeEditorUtils.h"
 
 // qt includes
 #include <QPainter>
@@ -46,26 +45,27 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <limits>
 #include <sstream>
 
-NE::Scene::Scene(QObject* parent)
+#if NodeEditor_ENABLE_GRAPHVIZ
+#include <graphviz/cgraph.h>
+#include <graphviz/gvc.h>
+#endif // NodeEditor_ENABLE_GRAPHVIZ
+
+// ----------------------------------------------------------------------------
+pqNodeEditorScene::pqNodeEditorScene(QObject* parent)
   : QGraphicsScene(parent)
 {
 }
 
-NE::Scene::~Scene()
+// ----------------------------------------------------------------------------
+pqNodeEditorScene::~pqNodeEditorScene() = default;
+
+// ----------------------------------------------------------------------------
+int pqNodeEditorScene::computeLayout(std::unordered_map<int, pqNodeEditorNode*>& nodes,
+  std::unordered_map<int, std::vector<pqNodeEditorEdge*> >& edges)
 {
-}
+  pqNodeEditorUtils::log("Computing Graph Layout");
 
-#if NE_ENABLE_GRAPHVIZ
-#include <graphviz/cgraph.h>
-#include <graphviz/gvc.h>
-#endif
-
-int NE::Scene::computeLayout(std::unordered_map<int, NE::Node*>& nodes,
-  std::unordered_map<int, std::vector<NE::Edge*> >& edges)
-{
-  NE::log("Computing Graph Layout");
-
-#if NE_ENABLE_GRAPHVIZ
+#if NodeEditor_ENABLE_GRAPHVIZ
 
   // compute dot string
   qreal maxHeight = 0.0;
@@ -80,32 +80,36 @@ int NE::Scene::computeLayout(std::unordered_map<int, NE::Node*>& nodes,
     {
       auto proxyAsView = dynamic_cast<pqView*>(it.second->getProxy());
       if (proxyAsView)
+      {
         continue;
+      }
 
       const auto& b = it.second->boundingRect();
       qreal width = b.width() / 100.0;
       qreal height = b.height() / 100.0;
       if (maxHeight < height)
+      {
         maxHeight = height;
+      }
 
-      nodeString << NE::getID(it.second->getProxy()) << "["
+      nodeString << pqNodeEditorUtils::getID(it.second->getProxy()) << "["
                  << "label=\"\","
                  << "shape=box,"
                  << "width=" << width << ","
                  << "height=" << height << ""
                  << "];\n";
 
-      for (auto edge : edges[NE::getID(it.second->getProxy())])
+      for (auto edge : edges[pqNodeEditorUtils::getID(it.second->getProxy())])
       {
-        edgeString << NE::getID(edge->getProducer()->getProxy()) << " -> "
-                   << NE::getID(edge->getConsumer()->getProxy()) << ";\n";
+        edgeString << pqNodeEditorUtils::getID(edge->getProducer()->getProxy()) << " -> "
+                   << pqNodeEditorUtils::getID(edge->getConsumer()->getProxy()) << ";\n";
       }
     }
 
     dotString += std::string("") + "digraph g {\n" +
       "rankdir=LR;graph[pad=\"0\", ranksep=\"2\", nodesep=\"" + std::to_string(maxHeight) +
       "\"];\n" + nodeString.str() + edgeString.str() + "\n}";
-    // NE::log(dotString);
+    // pqNodeEditorUtils::log(dotString);
   }
 
   std::vector<qreal> coords(2 * nodes.size(), 0.0);
@@ -125,9 +129,12 @@ int NE::Scene::computeLayout(std::unordered_map<int, NE::Node*>& nodes,
 
       auto proxyAsView = dynamic_cast<pqView*>(proxy);
       if (proxyAsView)
+      {
         continue;
+      }
 
-      Agnode_t* n = agnode(G, const_cast<char*>(std::to_string(NE::getID(proxy)).data()), 0);
+      Agnode_t* n =
+        agnode(G, const_cast<char*>(std::to_string(pqNodeEditorUtils::getID(proxy)).data()), 0);
       if (n != nullptr)
       {
         auto& coord = ND_coord(n);
@@ -136,10 +143,14 @@ int NE::Scene::computeLayout(std::unordered_map<int, NE::Node*>& nodes,
         coords[i + 1] = coord.y;
 
         if (minY > coord.y)
+        {
           minY = coord.y;
+        }
 
         if (maxY < coord.y)
+        {
           maxY = coord.y;
+        }
       }
     }
 
@@ -158,29 +169,35 @@ int NE::Scene::computeLayout(std::unordered_map<int, NE::Node*>& nodes,
 
       auto proxyAsView = dynamic_cast<pqView*>(it.second->getProxy());
       if (proxyAsView)
+      {
         continue;
+      }
 
       it.second->setPos(coords[i], coords[i + 1] - minY);
     }
   }
 
   // compute initial x position for all views
-  std::vector<std::pair<Node*, qreal> > viewXMap;
+  std::vector<std::pair<pqNodeEditorNode*, qreal> > viewXMap;
   for (auto it : nodes)
   {
     auto proxyAsView = dynamic_cast<pqView*>(it.second->getProxy());
     if (!proxyAsView)
+    {
       continue;
+    }
 
     qreal avgX = 0;
-    auto edgesIt = edges.find(NE::getID(proxyAsView));
+    auto edgesIt = edges.find(pqNodeEditorUtils::getID(proxyAsView));
     if (edgesIt != edges.end())
     {
       int nEdges = edgesIt->second.size();
       if (nEdges > 0)
       {
         for (auto edge : edgesIt->second)
+        {
           avgX += edge->getProducer()->pos().x();
+        }
         avgX /= nEdges;
       }
     }
@@ -190,7 +207,7 @@ int NE::Scene::computeLayout(std::unordered_map<int, NE::Node*>& nodes,
 
   // sort views by current x coord
   std::sort(viewXMap.begin(), viewXMap.end(),
-    [](const std::pair<Node*, qreal>& a, const std::pair<Node*, qreal>& b) {
+    [](const std::pair<pqNodeEditorNode*, qreal>& a, const std::pair<pqNodeEditorNode*, qreal>& b) {
       return a.second < b.second;
     });
 
@@ -201,19 +218,22 @@ int NE::Scene::computeLayout(std::unordered_map<int, NE::Node*>& nodes,
     const qreal width = it.first->boundingRect().width();
     qreal x = it.second;
     if (lastX + width > x)
+    {
       x = lastX + width + 10.0;
+    }
     it.first->setPos(x, maxY + maxHeight * 100.0 + 10.0);
     lastX = x;
   }
 
   return 1;
-#else
-  NE::log("ERROR: GraphViz support disabled!", true);
+#else  // NodeEditor_ENABLE_GRAPHVIZ
+  pqNodeEditorUtils::log("ERROR: GraphViz support disabled!", true);
   return 0;
-#endif
+#endif // NodeEditor_ENABLE_GRAPHVIZ
 }
 
-QRect NE::Scene::getBoundingRect(std::unordered_map<int, NE::Node*>& nodes)
+// ----------------------------------------------------------------------------
+QRect pqNodeEditorScene::getBoundingRect(std::unordered_map<int, pqNodeEditorNode*>& nodes)
 {
   int x0 = std::numeric_limits<int>::max();
   int x1 = std::numeric_limits<int>::min();
@@ -225,19 +245,28 @@ QRect NE::Scene::getBoundingRect(std::unordered_map<int, NE::Node*>& nodes)
     auto p = it.second->pos();
     auto b = it.second->boundingRect();
     if (x0 > p.x() + b.left())
+    {
       x0 = p.x() + b.left();
+    }
     if (x1 < p.x() + b.right())
+    {
       x1 = p.x() + b.right();
+    }
     if (y0 > p.y() + b.top())
+    {
       y0 = p.y() + b.top();
+    }
     if (y1 < p.y() + b.bottom())
+    {
       y1 = p.y() + b.bottom();
+    }
   }
 
   return QRect(x0, y0, x1 - x0, y1 - y0);
 }
 
-void NE::Scene::drawBackground(QPainter* painter, const QRectF& rect)
+// ----------------------------------------------------------------------------
+void pqNodeEditorScene::drawBackground(QPainter* painter, const QRectF& rect)
 {
   const int gridSize = 25;
 
@@ -247,9 +276,13 @@ void NE::Scene::drawBackground(QPainter* painter, const QRectF& rect)
   QVarLengthArray<QLineF, 100> lines;
 
   for (qreal x = left; x < rect.right(); x += gridSize)
+  {
     lines.append(QLineF(x, rect.top(), x, rect.bottom()));
+  }
   for (qreal y = top; y < rect.bottom(); y += gridSize)
+  {
     lines.append(QLineF(rect.left(), y, rect.right(), y));
+  }
 
   painter->setRenderHints(QPainter::HighQualityAntialiasing);
   painter->setPen(QColor(60, 60, 60));

@@ -28,12 +28,11 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#pragma once
+#ifndef pqNodeEditorNode_h
+#define pqNodeEditorNode_h
 
-// QT includes
 #include <QGraphicsItem>
 
-// forward declarations
 class pqProxy;
 class pqProxyWidget;
 class pqView;
@@ -41,46 +40,39 @@ class pqPipelineSource;
 class QGraphicsScene;
 class QGraphicsSceneMouseEvent;
 
-namespace NE
-{
-class Port;
-}
+class pqNodeEditorPort;
 
-namespace NE
-{
-class Node : public QObject, public QGraphicsItem
+class pqNodeEditorNode : public QObject, public QGraphicsItem
 {
   Q_OBJECT
   Q_INTERFACES(QGraphicsItem)
 
 public:
-  Node(QGraphicsScene* scene, pqProxy* proxy, QGraphicsItem* parent = nullptr);
+  pqNodeEditorNode(QGraphicsScene* scene, pqProxy* proxy, QGraphicsItem* parent = nullptr);
 
-  /// Creates a node for a pqPipelineSource that consists of
-  /// * an encapsulating rectangle
-  /// * input and output ports
-  /// * a widgetContainer for properties
-  Node(QGraphicsScene* scene, pqPipelineSource* source, QGraphicsItem* parent = nullptr);
+  /**
+   * Creates a node for a pqPipelineSource that consists of
+   * an encapsulating rectangle
+   * input and output ports
+   * a widgetContainer for properties
+   */
+  pqNodeEditorNode(
+    QGraphicsScene* scene, pqPipelineSource* source, QGraphicsItem* parent = nullptr);
 
   /// TODO
-  Node(QGraphicsScene* scene, pqView* view, QGraphicsItem* parent = nullptr);
+  pqNodeEditorNode(QGraphicsScene* scene, pqView* view, QGraphicsItem* parent = nullptr);
 
   /// Destructor
-  ~Node();
-
-  /// Delete copy constructor.
-  Node(const Node&) = delete;
-  /// Delete copy constructor.
-  Node& operator=(const Node&) = delete;
+  ~pqNodeEditorNode();
 
   /// Get corresponding pqProxy of the node.
   pqProxy* getProxy() { return this->proxy; }
 
   /// Get input ports of the node.
-  std::vector<NE::Port*>& getInputPorts() { return this->iPorts; }
+  std::vector<pqNodeEditorPort*>& getInputPorts() { return this->iPorts; }
 
   /// Get output ports of the node.
-  std::vector<NE::Port*>& getOutputPorts() { return this->oPorts; }
+  std::vector<pqNodeEditorPort*>& getOutputPorts() { return this->oPorts; }
 
   /// Get widget container of the node.
   pqProxyWidget* getProxyProperties() { return this->proxyProperties; }
@@ -119,8 +111,8 @@ private:
   QWidget* widgetContainer;
   QGraphicsTextItem* label;
 
-  std::vector<NE::Port*> iPorts;
-  std::vector<NE::Port*> oPorts;
+  std::vector<pqNodeEditorPort*> iPorts;
+  std::vector<pqNodeEditorPort*> oPorts;
 
   int outlineStyle{ 0 };    // 0: normal, 1: selected filter, 2: selected view
   int backgroundStyle{ 0 }; // 0: normal, 1: modified
@@ -134,4 +126,5 @@ private:
   int widgetContainerHeight{ 0 };
   int widgetContainerWidth{ 0 };
 };
-}
+
+#endif // pqNodeEditorNode_h

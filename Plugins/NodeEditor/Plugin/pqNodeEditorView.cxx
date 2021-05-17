@@ -28,7 +28,7 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#include <View.h>
+#include "pqNodeEditorView.h"
 
 #include <pqDeleteReaction.h>
 
@@ -37,10 +37,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QKeyEvent>
 #include <QWheelEvent>
 
-NE::View::View(QWidget* parent)
-  : QGraphicsView(parent){};
+// ----------------------------------------------------------------------------
+pqNodeEditorView::pqNodeEditorView(QWidget* parent)
+  : QGraphicsView(parent)
+{
+}
 
-NE::View::View(QGraphicsScene* scene, QWidget* parent)
+// ----------------------------------------------------------------------------
+pqNodeEditorView::pqNodeEditorView(QGraphicsScene* scene, QWidget* parent)
   : QGraphicsView(scene, parent)
   , deleteAction(new QAction(this))
 {
@@ -50,9 +54,11 @@ NE::View::View(QGraphicsScene* scene, QWidget* parent)
   this->setRenderHint(QPainter::Antialiasing);
 }
 
-NE::View::~View() = default;
+// ----------------------------------------------------------------------------
+pqNodeEditorView::~pqNodeEditorView() = default;
 
-void NE::View::wheelEvent(QWheelEvent* event)
+// ----------------------------------------------------------------------------
+void pqNodeEditorView::wheelEvent(QWheelEvent* event)
 {
   const ViewportAnchor anchor = this->transformationAnchor();
   this->setTransformationAnchor(QGraphicsView::AnchorUnderMouse);
@@ -62,7 +68,8 @@ void NE::View::wheelEvent(QWheelEvent* event)
   this->setTransformationAnchor(anchor);
 }
 
-void NE::View::keyReleaseEvent(QKeyEvent* event)
+// ----------------------------------------------------------------------------
+void pqNodeEditorView::keyReleaseEvent(QKeyEvent* event)
 {
   if (event->key() == Qt::Key_Delete)
   {

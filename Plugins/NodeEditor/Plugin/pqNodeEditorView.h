@@ -28,40 +28,31 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#pragma once
+#ifndef pqNodeEditorView_h
+#define pqNodeEditorView_h
 
-// QT includes
-#include <QGraphicsItem>
+// qt includes
+#include <QGraphicsView>
 
-class QGraphicsEllipseItem;
-class QGraphicsTextItem;
+// forward declarations
+class QWheelEvent;
+class QKeyEvent;
+class QAction;
 
-namespace NE
+// This class extends QGraphicsView to rehandle MouseWheelEvents for zooming.
+class pqNodeEditorView : public QGraphicsView
 {
-/// Every instance of this class corresponds to an edge between an output port
-/// and an input port. This class internally detects if the positions of the
-/// corresponding ports change and updates itself automatically.
-class Port : public QGraphicsItem
-{
-
 public:
-  Port(int type, QString name = "", QGraphicsItem* parent = nullptr);
-  ~Port();
-
-  QGraphicsEllipseItem* getDisc() { return this->disc; }
-  QGraphicsTextItem* getLabel() { return this->label; }
-
-  int setStyle(int style);
+  pqNodeEditorView(QWidget* parent = nullptr);
+  pqNodeEditorView(QGraphicsScene* scene, QWidget* parent = nullptr);
+  ~pqNodeEditorView();
 
 protected:
-  QRectF boundingRect() const override;
-  void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget) override;
+  void wheelEvent(QWheelEvent* event);
+  void keyReleaseEvent(QKeyEvent* event);
 
 private:
-  QGraphicsEllipseItem* disc;
-  QGraphicsTextItem* label;
-
-  int borderWidth{ 4 };
-  int portRadius{ 8 };
+  QAction* deleteAction{ nullptr };
 };
-}
+
+#endif // pqNodeEditorView_h

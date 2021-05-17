@@ -28,12 +28,13 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#include <Utils.h>
+#include <pqNodeEditorUtils.h>
 
 #include <pqProxy.h>
 #include <vtkSMProxy.h>
 
 #include <QColor>
+
 #include <iostream>
 
 #ifdef _WIN32
@@ -51,44 +52,56 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <unistd.h>
 #endif
 
-// bool   NE::CONSTS::DEBUG = true;
-bool NE::CONSTS::DEBUG = false;
-int NE::CONSTS::NODE_WIDTH = 300;
-int NE::CONSTS::NODE_BORDER_WIDTH = 4;
-int NE::CONSTS::NODE_BORDER_RADIUS = 6;
-int NE::CONSTS::NODE_DEFAULT_VERBOSITY = 1;
-int NE::CONSTS::EDGE_WIDTH = 5;
-QColor NE::CONSTS::COLOR_ORANGE = QColor("#e9763d");
-QColor NE::CONSTS::COLOR_GREEN = QColor("#049a0a");
-double NE::CONSTS::DOUBLE_CLICK_DELAY = 0.3;
+// ----------------------------------------------------------------------------
+bool pqNodeEditorUtils::CONSTS::DEBUG = false;
+int pqNodeEditorUtils::CONSTS::NODE_WIDTH = 300;
+int pqNodeEditorUtils::CONSTS::NODE_BORDER_WIDTH = 4;
+int pqNodeEditorUtils::CONSTS::NODE_BORDER_RADIUS = 6;
+int pqNodeEditorUtils::CONSTS::NODE_DEFAULT_VERBOSITY = 1;
+int pqNodeEditorUtils::CONSTS::EDGE_WIDTH = 5;
+QColor pqNodeEditorUtils::CONSTS::COLOR_ORANGE = QColor("#e9763d");
+QColor pqNodeEditorUtils::CONSTS::COLOR_GREEN = QColor("#049a0a");
+double pqNodeEditorUtils::CONSTS::DOUBLE_CLICK_DELAY = 0.3;
 
-void NE::log(std::string content, bool force)
+// ----------------------------------------------------------------------------
+void pqNodeEditorUtils::log(std::string content, bool force)
 {
-  if (!force && !NE::CONSTS::DEBUG)
+  if (!force && !CONSTS::DEBUG)
+  {
     return;
+  }
 
   std::cout << content << std::endl;
 };
 
-int NE::getID(pqProxy* proxy)
+// ----------------------------------------------------------------------------
+int pqNodeEditorUtils::getID(pqProxy* proxy)
 {
   if (proxy == nullptr)
+  {
     return -1;
+  }
   auto smProxy = proxy->getProxy();
   if (smProxy == nullptr)
+  {
     return -1;
+  }
   return smProxy->GetGlobalID();
 };
 
-std::string NE::getLabel(pqProxy* proxy)
+// ----------------------------------------------------------------------------
+std::string pqNodeEditorUtils::getLabel(pqProxy* proxy)
 {
   if (!proxy)
+  {
     return "PROXY IS NULL";
+  }
 
-  return proxy->getSMName().toStdString() + "<" + std::to_string(NE::getID(proxy)) + ">";
+  return proxy->getSMName().toStdString() + "<" + std::to_string(getID(proxy)) + ">";
 };
 
-double NE::getTimeStamp()
+// ----------------------------------------------------------------------------
+double pqNodeEditorUtils::getTimeStamp()
 {
 #ifdef _WIN32
   LARGE_INTEGER frequency;
@@ -113,16 +126,19 @@ double NE::getTimeStamp()
 #endif
 };
 
-double t0{ 0 };
-double NE::getTimeDelta()
+// ----------------------------------------------------------------------------
+double pqNodeEditorUtils::getTimeDelta()
 {
-  double t1 = NE::getTimeStamp();
+  static double t0{ 0 };
+
+  double t1 = getTimeStamp();
   double delta = t1 - t0;
   t0 = t1;
   return delta;
 };
 
-bool NE::isDoubleClick()
+// ----------------------------------------------------------------------------
+bool pqNodeEditorUtils::isDoubleClick()
 {
-  return NE::getTimeDelta() < NE::CONSTS::DOUBLE_CLICK_DELAY;
+  return getTimeDelta() < pqNodeEditorUtils::CONSTS::DOUBLE_CLICK_DELAY;
 };

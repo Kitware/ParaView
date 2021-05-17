@@ -28,60 +28,40 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#pragma once
+#ifndef pqNodeEditorScene_h
+#define pqNodeEditorScene_h
 
-// QT includes
-#include <QGraphicsPathItem>
 #include <QGraphicsScene>
 
-// forward declarations
-namespace NE
-{
-class Node;
-}
+#include <unordered_map>
 
-namespace NE
-{
-/// Every instance of this class corresponds to an edge between an output port
-/// and an input port. This class internally detects if the positions of the
-/// corresponding ports change and updates itself automatically.
-class Edge : public QObject, public QGraphicsPathItem
+class pqNodeEditorNode;
+class pqNodeEditorEdge;
+
+/**
+ * This class extends QGraphicsScene to
+ * draw a grid background;
+ * monitor the creation/modification/destruction of proxies to automatically
+ * modify the scene accordingly;
+ * manage the instances of nodes and edges;
+ */
+class pqNodeEditorScene : public QGraphicsScene
 {
   Q_OBJECT
 
 public:
-  Edge(QGraphicsScene* scene, NE::Node* producer, int producerOutputPortIdx, NE::Node* consumer,
-    int consumerInputPortIdx, int type = 0, QGraphicsItem* parent = nullptr);
-  ~Edge();
+  pqNodeEditorScene(QObject* parent = nullptr);
+  ~pqNodeEditorScene();
 
-  // sets the state of the edge (0:normal edge, 1: view edge)
-  int setType(int type);
-  int getType() { return this->type; };
-
-  NE::Node* getProducer() { return this->producer; };
-  NE::Node* getConsumer() { return this->consumer; };
-
-  /// Print edge information.
-  std::string toString();
+  QRect getBoundingRect(std::unordered_map<int, pqNodeEditorNode*>& nodes);
 
 public slots:
-  int updatePoints();
+  int computeLayout(std::unordered_map<int, pqNodeEditorNode*>& nodes,
+    std::unordered_map<int, std::vector<pqNodeEditorEdge*> >& edges);
 
 protected:
-  QRectF boundingRect() const override;
-  void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget) override;
-
-private:
-  QGraphicsScene* scene;
-
-  int type{ 0 };
-  QPointF oPoint;
-  QPointF cPoint;
-  QPointF iPoint;
-
-  NE::Node* producer;
-  int producerOutputPortIdx;
-  NE::Node* consumer;
-  int consumerInputPortIdx;
+  /// Draws a grid background.
+  void drawBackground(QPainter* painter, const QRectF& rect);
 };
-}
+
+#endif // pqNodeEditorScene_h

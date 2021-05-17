@@ -2,24 +2,24 @@ find_package(Qt5 REQUIRED COMPONENTS Widgets)
 
 set(interfaces)
 set(sources
-  Utils.h
-  Utils.cxx
-  Node.h
-  Node.cxx
-  Port.h
-  Port.cxx
-  Edge.h
-  Edge.cxx
-  NodeEditor.cxx
-  NodeEditor.h
-  View.cxx
-  View.h
-  Scene.cxx
-  Scene.h
+  pqNodeEditorUtils.h
+  pqNodeEditorUtils.cxx
+  pqNodeEditorNode.h
+  pqNodeEditorNode.cxx
+  pqNodeEditorPort.h
+  pqNodeEditorPort.cxx
+  pqNodeEditorEdge.h
+  pqNodeEditorEdge.cxx
+  pqNodeEditorWidget.cxx
+  pqNodeEditorWidget.h
+  pqNodeEditorView.cxx
+  pqNodeEditorView.h
+  pqNodeEditorScene.cxx
+  pqNodeEditorScene.h
 )
 
 paraview_plugin_add_dock_window(
-  CLASS_NAME NodeEditor
+  CLASS_NAME pqNodeEditorWidget
   DOCK_AREA Right
   INTERFACES dock_interfaces
   SOURCES dock_sources)
@@ -40,6 +40,7 @@ find_path(GRAPHVIZ_INCLUDE_DIR
   HINTS
     ${_GRAPHVIZ_INCLUDE_DIR}
     )
+mark_as_advanced(GRAPHVIZ_INCLUDE_DIR)
 
 find_library(GRAPHVIZ_CDT_LIBRARY
   NAMES
@@ -47,6 +48,7 @@ find_library(GRAPHVIZ_CDT_LIBRARY
   HINTS
     ${_GRAPHVIZ_LIBRARY_DIR}
     )
+mark_as_advanced(GRAPHVIZ_CDT_LIBRARY)
 
 find_library(GRAPHVIZ_GVC_LIBRARY
   NAMES
@@ -54,6 +56,7 @@ find_library(GRAPHVIZ_GVC_LIBRARY
   HINTS
     ${_GRAPHVIZ_LIBRARY_DIR}
     )
+mark_as_advanced(GRAPHVIZ_GVC_LIBRARY)
 
 find_library(GRAPHVIZ_CGRAPH_LIBRARY
   NAMES
@@ -61,6 +64,7 @@ find_library(GRAPHVIZ_CGRAPH_LIBRARY
   HINTS
     ${_GRAPHVIZ_LIBRARY_DIR}
     )
+mark_as_advanced(GRAPHVIZ_CGRAPH_LIBRARY)
 
 find_library(GRAPHVIZ_PATHPLAN_LIBRARY
   NAMES
@@ -68,6 +72,7 @@ find_library(GRAPHVIZ_PATHPLAN_LIBRARY
   HINTS
     ${_GRAPHVIZ_LIBRARY_DIR}
     )
+mark_as_advanced(GRAPHVIZ_PATHPLAN_LIBRARY)
 
 if(GRAPHVIZ_INCLUDE_DIR
     AND GRAPHVIZ_CDT_LIBRARY
@@ -75,21 +80,21 @@ if(GRAPHVIZ_INCLUDE_DIR
     AND GRAPHVIZ_CGRAPH_LIBRARY
     AND GRAPHVIZ_PATHPLAN_LIBRARY
     )
-  option(NE_ENABLE_GRAPHVIZ "Enable GraphViz Support" ON)
-  message(STATUS "GraphViz found")
+  set(NodeEditor_ENABLE_GRAPHVIZ "Enable GraphViz Support" ON INTERNAL)
+  message(STATUS "NodeEditor Plugin: GraphViz found")
 else()
-  option(NE_ENABLE_GRAPHVIZ "Enable GraphViz Support" OFF)
-  message(STATUS "GraphViz NOT FOUND!")
+  set(NodeEditor_ENABLE_GRAPHVIZ "Enable GraphViz Support" OFF INTERNAL)
+  message(STATUS "NodeEditor Plugin: GraphViz NOT FOUND!")
 endif()
 
 target_compile_definitions(NodeEditor
-    PUBLIC
-        NE_ENABLE_GRAPHVIZ
+  PUBLIC
+    NodeEditor_ENABLE_GRAPHVIZ
 )
 
 target_include_directories(NodeEditor
-    PUBLIC
-        ${GRAPHVIZ_INCLUDE_DIR}
+  PUBLIC
+    ${GRAPHVIZ_INCLUDE_DIR}
 )
 
 target_link_libraries(NodeEditor
@@ -99,5 +104,6 @@ target_link_libraries(NodeEditor
     ${GRAPHVIZ_CGRAPH_LIBRARY}
     ${GRAPHVIZ_PATHPLAN_LIBRARY}
     ParaView::RemotingViews
+    ParaView::pqApplicationComponents
     Qt5::Widgets
 )

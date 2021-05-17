@@ -28,11 +28,10 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#include <Node.h>
+#include "pqNodeEditorNode.h"
 
-// node editor includes
-#include <Port.h>
-#include <Utils.h>
+#include "pqNodeEditorPort.h"
+#include "pqNodeEditorUtils.h"
 
 // qt includes
 #include <QApplication>
@@ -47,26 +46,25 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QVBoxLayout>
 
 // paraview/vtk includes
-#include <pqProxyWidget.h>
-
 #include <pqDataRepresentation.h>
 #include <pqOutputPort.h>
 #include <pqPipelineFilter.h>
 #include <pqPipelineSource.h>
 #include <pqProxiesWidget.h>
+#include <pqProxyWidget.h>
 #include <pqServerManagerModel.h>
 #include <pqView.h>
+#include <vtkSMPropertyGroup.h>
 #include <vtkSMProxy.h>
 
-#include <vtkSMPropertyGroup.h>
-
-NE::Node::Node(QGraphicsScene* scene, pqProxy* proxy, QGraphicsItem* parent)
+// ----------------------------------------------------------------------------
+pqNodeEditorNode::pqNodeEditorNode(QGraphicsScene* scene, pqProxy* proxy, QGraphicsItem* parent)
   : QObject()
   , QGraphicsItem(parent)
   , scene(scene)
   , proxy(proxy)
 {
-  NE::log("  +Node: " + NE::getLabel(proxy));
+  pqNodeEditorUtils::log("  +Node: " + pqNodeEditorUtils::getLabel(proxy));
 
   // set options
   this->setFlag(ItemIsMovable);
@@ -104,7 +102,7 @@ NE::Node::Node(QGraphicsScene* scene, pqProxy* proxy, QGraphicsItem* parent)
     auto nameChangeFunc = [=]() {
       this->label->setPlainText(proxy->getSMName());
       auto br = this->label->boundingRect();
-      this->label->setPos(0.5 * (NE::CONSTS::NODE_WIDTH - br.width()),
+      this->label->setPos(0.5 * (pqNodeEditorUtils::CONSTS::NODE_WIDTH - br.width()),
         -this->portContainerHeight - this->labelHeight);
     };
 
@@ -116,14 +114,16 @@ NE::Node::Node(QGraphicsScene* scene, pqProxy* proxy, QGraphicsItem* parent)
   // create a widget container for property and display widgets
   {
     this->widgetContainer = new QWidget;
-    this->widgetContainer->setMinimumWidth(NE::CONSTS::NODE_WIDTH);
-    this->widgetContainer->setMaximumWidth(NE::CONSTS::NODE_WIDTH);
+    this->widgetContainer->setMinimumWidth(pqNodeEditorUtils::CONSTS::NODE_WIDTH);
+    this->widgetContainer->setMaximumWidth(pqNodeEditorUtils::CONSTS::NODE_WIDTH);
 
     // install resize event filter
-    this->widgetContainer->installEventFilter(
-      NE::createInterceptor(this->widgetContainer, [=](QObject* object, QEvent* event) {
+    this->widgetContainer->installEventFilter(pqNodeEditorUtils::createInterceptor(
+      this->widgetContainer, [=](QObject* object, QEvent* event) {
         if (event->type() == QEvent::LayoutRequest)
+        {
           this->updateSize();
+        }
         return false;
       }));
   }
@@ -141,7 +141,7 @@ NE::Node::Node(QGraphicsScene* scene, pqProxy* proxy, QGraphicsItem* parent)
     this->proxyProperties->updatePanel();
     containerLayout->addWidget(this->proxyProperties);
 
-    this->setVerbosity(NE::CONSTS::NODE_DEFAULT_VERBOSITY);
+    this->setVerbosity(pqNodeEditorUtils::CONSTS::NODE_DEFAULT_VERBOSITY);
 
     this->updateSize();
   }
@@ -149,20 +149,22 @@ NE::Node::Node(QGraphicsScene* scene, pqProxy* proxy, QGraphicsItem* parent)
   this->scene->addItem(this);
 }
 
-NE::Node::Node(QGraphicsScene* scene, pqPipelineSource* proxy, QGraphicsItem* parent)
-  : Node(scene, (pqProxy*)proxy, parent)
+// ----------------------------------------------------------------------------
+pqNodeEditorNode::pqNodeEditorNode(
+  QGraphicsScene* scene, pqPipelineSource* proxy, QGraphicsItem* parent)
+  : pqNodeEditorNode(scene, (pqProxy*)proxy, parent)
 {
   // create ports
   {
     auto br = this->boundingRect();
-    auto adjust = 0.5 * NE::CONSTS::NODE_BORDER_WIDTH;
+    auto adjust = 0.5 * pqNodeEditorUtils::CONSTS::NODE_BORDER_WIDTH;
     br.adjust(adjust, adjust, -adjust, -adjust);
 
     if (auto proxyAsFilter = dynamic_cast<pqPipelineFilter*>(proxy))
     {
       for (int i = 0; i < proxyAsFilter->getNumberOfInputPorts(); i++)
       {
-        auto iPort = new Port(0, proxyAsFilter->getInputPortName(i), this);
+        auto iPort = new pqNodeEditorPort(0, proxyAsFilter->getInputPortName(i), this);
         iPort->setPos(br.left(), -this->portContainerHeight + (i + 0.5) * this->portHeight);
         this->iPorts.push_back(iPort);
       }
@@ -170,7 +172,7 @@ NE::Node::Node(QGraphicsScene* scene, pqPipelineSource* proxy, QGraphicsItem* pa
 
     for (int i = 0; i < proxy->getNumberOfOutputPorts(); i++)
     {
-      auto oPort = new Port(1, proxy->getOutputPort(i)->getPortName(), this);
+      auto oPort = new pqNodeEditorPort(1, proxy->getOutputPort(i)->getPortName(), this);
       oPort->setPos(br.right(), -this->portContainerHeight + (i + 0.5) * this->portHeight);
       this->oPorts.push_back(oPort);
     }
@@ -178,47 +180,55 @@ NE::Node::Node(QGraphicsScene* scene, pqPipelineSource* proxy, QGraphicsItem* pa
 
   // create property widgets
   QObject::connect(this->proxyProperties, &pqProxyWidget::changeFinished, this, [=]() {
-    NE::log("Source/Filter Property Modified: " + NE::getLabel(this->proxy));
+    pqNodeEditorUtils::log(
+      "Source/Filter Property Modified: " + pqNodeEditorUtils::getLabel(this->proxy));
     this->proxy->setModifiedState(pqProxy::MODIFIED);
     return 1;
   });
   QObject::connect(this->proxy, &pqProxy::modifiedStateChanged, this, [=]() {
     if (this->proxy->modifiedState() == pqProxy::ModifiedState::MODIFIED)
+    {
       this->setBackgroundStyle(1);
+    }
     else
+    {
       this->setBackgroundStyle(0);
+    }
     return 1;
   });
 }
 
-NE::Node::Node(QGraphicsScene* scene, pqView* proxy, QGraphicsItem* parent)
-  : Node(scene, (pqProxy*)proxy, parent)
+// ----------------------------------------------------------------------------
+pqNodeEditorNode::pqNodeEditorNode(QGraphicsScene* scene, pqView* proxy, QGraphicsItem* parent)
+  : pqNodeEditorNode(scene, (pqProxy*)proxy, parent)
 {
   auto br = this->boundingRect();
-  auto adjust = 0.5 * NE::CONSTS::NODE_BORDER_WIDTH;
+  auto adjust = 0.5 * pqNodeEditorUtils::CONSTS::NODE_BORDER_WIDTH;
   br.adjust(adjust, adjust, -adjust, -adjust);
 
   // create port
-  auto iPort = new Port(2, "", this);
+  auto iPort = new pqNodeEditorPort(2, "", this);
   iPort->setPos(br.center().x(), br.top());
   this->iPorts.push_back(iPort);
 
   // create property widgets
   QObject::connect(this->proxyProperties, &pqProxyWidget::changeFinished, this, [=]() {
-    NE::log("View Property Modified: " + NE::getLabel(this->proxy));
+    pqNodeEditorUtils::log("View Property Modified: " + pqNodeEditorUtils::getLabel(this->proxy));
     this->proxy->setModifiedState(pqProxy::MODIFIED);
     this->proxyProperties->apply();
     ((pqView*)this->proxy)->render();
   });
 }
 
-NE::Node::~Node()
+// ----------------------------------------------------------------------------
+pqNodeEditorNode::~pqNodeEditorNode()
 {
-  NE::log(" -Node: " + NE::getLabel(this->proxy));
+  pqNodeEditorUtils::log(" -Node: " + pqNodeEditorUtils::getLabel(this->proxy));
   this->scene->removeItem(this);
 }
 
-int NE::Node::updateSize()
+// ----------------------------------------------------------------------------
+int pqNodeEditorNode::updateSize()
 {
   this->widgetContainer->resize(this->widgetContainer->layout()->sizeHint());
 
@@ -232,41 +242,54 @@ int NE::Node::updateSize()
   return 1;
 }
 
-int NE::Node::setOutlineStyle(int style)
+// ----------------------------------------------------------------------------
+int pqNodeEditorNode::setOutlineStyle(int style)
 {
   this->outlineStyle = style;
   this->update(this->boundingRect());
   return 1;
 }
-int NE::Node::setBackgroundStyle(int style)
+// ----------------------------------------------------------------------------
+int pqNodeEditorNode::setBackgroundStyle(int style)
 {
   this->backgroundStyle = style;
   this->update(this->boundingRect());
   return 1;
 }
 
-int NE::Node::getVerbosity()
+// ----------------------------------------------------------------------------
+int pqNodeEditorNode::getVerbosity()
 {
   return this->verbosity;
 }
 
-int NE::Node::setVerbosity(int verbosity)
+// ----------------------------------------------------------------------------
+int pqNodeEditorNode::setVerbosity(int verbosity)
 {
   this->verbosity = std::max(verbosity, 0);
   if (this->verbosity > 2)
+  {
     this->verbosity = 0;
+  }
 
   if (this->verbosity == 0)
+  {
     this->proxyProperties->filterWidgets(false, "%%%%%%%%%%%%%%");
+  }
   else if (this->verbosity == 1)
+  {
     this->proxyProperties->filterWidgets(false);
+  }
   else
+  {
     this->proxyProperties->filterWidgets(true);
+  }
 
   return 1;
 }
 
-QVariant NE::Node::itemChange(GraphicsItemChange change, const QVariant& value)
+// ----------------------------------------------------------------------------
+QVariant pqNodeEditorNode::itemChange(GraphicsItemChange change, const QVariant& value)
 {
   switch (change)
   {
@@ -280,33 +303,37 @@ QVariant NE::Node::itemChange(GraphicsItemChange change, const QVariant& value)
   return QGraphicsItem::itemChange(change, value);
 }
 
-QRectF NE::Node::boundingRect() const
+// ----------------------------------------------------------------------------
+QRectF pqNodeEditorNode::boundingRect() const
 {
-  auto offset = NE::CONSTS::NODE_BORDER_WIDTH;
+  auto offset = pqNodeEditorUtils::CONSTS::NODE_BORDER_WIDTH;
   auto br = QRectF(-offset, -offset - this->portContainerHeight - this->labelHeight,
     this->widgetContainerWidth + 2 * offset,
     this->widgetContainerHeight + 2 * offset + this->portContainerHeight + this->labelHeight);
-  br.adjust(0, 0, 0, NE::CONSTS::NODE_BORDER_RADIUS);
+  br.adjust(0, 0, 0, pqNodeEditorUtils::CONSTS::NODE_BORDER_RADIUS);
 
   return br;
 }
 
-void NE::Node::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget*)
+// ----------------------------------------------------------------------------
+void pqNodeEditorNode::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget*)
 {
   auto palette = QApplication::palette();
 
   QPainterPath path;
-  int offset = 0.5 * NE::CONSTS::NODE_BORDER_WIDTH;
+  int offset = 0.5 * pqNodeEditorUtils::CONSTS::NODE_BORDER_WIDTH;
   auto br = this->boundingRect();
   br.adjust(offset, offset, -offset, -offset);
-  path.addRoundedRect(br, NE::CONSTS::NODE_BORDER_RADIUS, NE::CONSTS::NODE_BORDER_RADIUS);
+  path.addRoundedRect(br, pqNodeEditorUtils::CONSTS::NODE_BORDER_RADIUS,
+    pqNodeEditorUtils::CONSTS::NODE_BORDER_RADIUS);
 
   QPen pen(this->outlineStyle == 0 ? palette.light() : this->outlineStyle == 1
         ? palette.highlight()
-        : NE::CONSTS::COLOR_ORANGE,
-    NE::CONSTS::NODE_BORDER_WIDTH);
+        : pqNodeEditorUtils::CONSTS::COLOR_ORANGE,
+    pqNodeEditorUtils::CONSTS::NODE_BORDER_WIDTH);
 
   painter->setPen(pen);
-  painter->fillPath(path, this->backgroundStyle == 1 ? NE::CONSTS::COLOR_GREEN : palette.window());
+  painter->fillPath(
+    path, this->backgroundStyle == 1 ? pqNodeEditorUtils::CONSTS::COLOR_GREEN : palette.window());
   painter->drawPath(path);
 }

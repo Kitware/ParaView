@@ -28,29 +28,27 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#include <Edge.h>
+#include "pqNodeEditorEdge.h"
 
-// node editor includes
-#include <Node.h>
-#include <Port.h>
-#include <Scene.h>
-#include <Utils.h>
+#include "pqNodeEditorNode.h"
+#include "pqNodeEditorPort.h"
+#include "pqNodeEditorScene.h"
+#include "pqNodeEditorUtils.h"
 
-// paraview/vtk includes
 #include <pqPipelineSource.h>
 #include <vtkSMProxy.h>
 
-// qt includes
 #include <QApplication>
 #include <QGraphicsScene>
 #include <QPainter>
 #include <QStyleOptionGraphicsItem>
 
-// std includes
 #include <sstream>
 
-NE::Edge::Edge(QGraphicsScene* scene, Node* producer, int producerOutputPortIdx, Node* consumer,
-  int consumerInputPortIdx, int type, QGraphicsItem* parent)
+// ----------------------------------------------------------------------------
+pqNodeEditorEdge::pqNodeEditorEdge(QGraphicsScene* scene, pqNodeEditorNode* producer,
+  int producerOutputPortIdx, pqNodeEditorNode* consumer, int consumerInputPortIdx, int type,
+  QGraphicsItem* parent)
   : QObject()
   , QGraphicsPathItem(parent)
   , scene(scene)
@@ -60,12 +58,16 @@ NE::Edge::Edge(QGraphicsScene* scene, Node* producer, int producerOutputPortIdx,
   , consumerInputPortIdx(consumerInputPortIdx)
   , type(type)
 {
-  NE::log("  +Edge: " + this->toString());
+  pqNodeEditorUtils::log("  +pqNodeEditorEdge: " + this->toString());
 
-  this->connect(this->producer, &Node::nodeMoved, this, &Edge::updatePoints);
-  this->connect(this->consumer, &Node::nodeMoved, this, &Edge::updatePoints);
-  this->connect(this->producer, &Node::nodeResized, this, &Edge::updatePoints);
-  this->connect(this->consumer, &Node::nodeResized, this, &Edge::updatePoints);
+  this->connect(
+    this->producer, &pqNodeEditorNode::nodeMoved, this, &pqNodeEditorEdge::updatePoints);
+  this->connect(
+    this->consumer, &pqNodeEditorNode::nodeMoved, this, &pqNodeEditorEdge::updatePoints);
+  this->connect(
+    this->producer, &pqNodeEditorNode::nodeResized, this, &pqNodeEditorEdge::updatePoints);
+  this->connect(
+    this->consumer, &pqNodeEditorNode::nodeResized, this, &pqNodeEditorEdge::updatePoints);
 
   this->setAcceptedMouseButtons(Qt::NoButton);
   this->setZValue(type > 0 ? 3 : 2);
@@ -75,30 +77,35 @@ NE::Edge::Edge(QGraphicsScene* scene, Node* producer, int producerOutputPortIdx,
   this->scene->addItem(this);
 }
 
-NE::Edge::~Edge()
+// ----------------------------------------------------------------------------
+pqNodeEditorEdge::~pqNodeEditorEdge()
 {
-  NE::log("  -Edge: " + this->toString());
+  pqNodeEditorUtils::log("  -pqNodeEditorEdge: " + this->toString());
   this->scene->removeItem(this);
 }
 
-int NE::Edge::setType(int type)
+// ----------------------------------------------------------------------------
+int pqNodeEditorEdge::setType(int type)
 {
   this->type = type;
   this->update(this->boundingRect());
   return this->type;
 }
 
-std::string NE::Edge::toString()
+// ----------------------------------------------------------------------------
+std::string pqNodeEditorEdge::toString()
 {
   std::stringstream ss;
 
-  ss << NE::getLabel(this->producer->getProxy()) << "[" << this->producerOutputPortIdx << "]"
-     << " -> " << NE::getLabel(this->consumer->getProxy()) << "[" << this->consumerInputPortIdx
-     << "]";
+  ss << pqNodeEditorUtils::getLabel(this->producer->getProxy()) << "["
+     << this->producerOutputPortIdx << "]"
+     << " -> " << pqNodeEditorUtils::getLabel(this->consumer->getProxy()) << "["
+     << this->consumerInputPortIdx << "]";
   return ss.str();
 }
 
-QRectF NE::Edge::boundingRect() const
+// ----------------------------------------------------------------------------
+QRectF pqNodeEditorEdge::boundingRect() const
 {
   qreal x0 = std::min(this->oPoint.x(), std::min(this->cPoint.x(), this->iPoint.x()));
   qreal y0 = std::min(this->oPoint.y(), std::min(this->cPoint.y(), this->iPoint.y()));
@@ -109,7 +116,8 @@ QRectF NE::Edge::boundingRect() const
   return QRectF(x0, y0, x1 - x0, y1 - y0).adjusted(-extra, -extra, extra, extra);
 }
 
-int NE::Edge::updatePoints()
+// ----------------------------------------------------------------------------
+int pqNodeEditorEdge::updatePoints()
 {
 
   auto nProducerOutputPorts = this->producer->getOutputPorts().size();
@@ -129,7 +137,8 @@ int NE::Edge::updatePoints()
   return 1;
 }
 
-void NE::Edge::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget*)
+// ----------------------------------------------------------------------------
+void pqNodeEditorEdge::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget*)
 {
   QLineF line(this->oPoint, this->iPoint);
 
@@ -150,9 +159,9 @@ void NE::Edge::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, 
       this->cPoint.y() + yt, this->iPoint.x(), this->iPoint.y());
   }
 
-  painter->setPen(
-    QPen(this->type == 0 ? QApplication::palette().highlight().color() : NE::CONSTS::COLOR_ORANGE,
-      NE::CONSTS::EDGE_WIDTH, this->type == 0 ? Qt::SolidLine : Qt::DashDotLine, Qt::RoundCap,
-      Qt::RoundJoin));
+  painter->setPen(QPen(this->type == 0 ? QApplication::palette().highlight().color()
+                                       : pqNodeEditorUtils::CONSTS::COLOR_ORANGE,
+    pqNodeEditorUtils::CONSTS::EDGE_WIDTH, this->type == 0 ? Qt::SolidLine : Qt::DashDotLine,
+    Qt::RoundCap, Qt::RoundJoin));
   painter->drawPath(path);
 }

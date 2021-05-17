@@ -28,7 +28,8 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#pragma once
+#ifndef pqNodeEditorWidget_h
+#define pqNodeEditorWidget_h
 
 // qt includes
 #include <QDockWidget>
@@ -46,28 +47,25 @@ class pqRepresentation;
 class pqOutputPort;
 class pqView;
 
-namespace NE
-{
-class Node;
-class Edge;
-class Scene;
-class View;
-}
+class pqNodeEditorNode;
+class pqNodeEditorEdge;
+class pqNodeEditorScene;
+class pqNodeEditorView;
 
 /// This is the root widget of the node editor that can be docked in ParaView.
 /// It currently only contains the node editor canvas, but in the future one
 /// can also add a toolbar.
-class NodeEditor : public QDockWidget
+class pqNodeEditorWidget : public QDockWidget
 {
   Q_OBJECT
 
 public:
-  NodeEditor(QWidget* parent = nullptr);
-  NodeEditor(const QString& title, QWidget* parent = nullptr);
-  ~NodeEditor();
+  pqNodeEditorWidget(QWidget* parent = nullptr);
+  pqNodeEditorWidget(const QString& title, QWidget* parent = nullptr);
+  ~pqNodeEditorWidget();
 
 protected:
-  NE::Node* createNode(pqProxy* proxy);
+  pqNodeEditorNode* createNode(pqProxy* proxy);
 
   int initializeActions();
   int createToolbar(QLayout* layout);
@@ -98,8 +96,8 @@ public slots:
   int collapseAllNodes();
 
 private:
-  NE::Scene* scene;
-  NE::View* view;
+  pqNodeEditorScene* scene;
+  pqNodeEditorView* view;
 
   bool autoUpdateLayout{ true };
   QAction* actionZoom;
@@ -111,9 +109,11 @@ private:
 
   /// The node registry stores a node for each source/filter/view proxy
   /// The key is the global identifier of the node proxy.
-  std::unordered_map<int, NE::Node*> nodeRegistry;
+  std::unordered_map<int, pqNodeEditorNode*> nodeRegistry;
 
   /// The edge registry stores all incoming edges of a node.
   /// The key is the global identifier of the node proxy.
-  std::unordered_map<int, std::vector<NE::Edge*> > edgeRegistry;
+  std::unordered_map<int, std::vector<pqNodeEditorEdge*> > edgeRegistry;
 };
+
+#endif // pqNodeEditorWidget_h

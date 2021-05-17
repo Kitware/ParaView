@@ -28,21 +28,17 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#pragma once
+#ifndef pqNodeEditorUtils_h
+#define pqNodeEditorUtils_h
 
 #include <QObject>
 
+// forward declarations
 class QColor;
 class pqProxy;
 
-// forward declarations
-namespace NE
+namespace pqNodeEditorUtils
 {
-
-void log(std::string content, bool force = false);
-int getID(pqProxy* proxy);
-std::string getLabel(pqProxy* proxy);
-
 namespace CONSTS
 {
 extern bool DEBUG;
@@ -79,8 +75,14 @@ Interceptor<F>* createInterceptor(QObject* parent, F functor)
   return new Interceptor<F>(parent, functor);
 };
 
+void log(std::string content, bool force = false);
+int getID(pqProxy* proxy);
+std::string getLabel(pqProxy* proxy);
+
 double getTimeDelta();
 double getTimeStamp();
 
 bool isDoubleClick();
-}
+};
+
+#endif // pqNodeEditorUtils_h

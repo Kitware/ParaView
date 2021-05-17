@@ -28,9 +28,9 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#include <Port.h>
+#include "pqNodeEditorPort.h"
 
-#include <Utils.h>
+#include "pqNodeEditorUtils.h"
 
 // qt includes
 #include <QApplication>
@@ -42,6 +42,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <iostream>
 
+// ----------------------------------------------------------------------------
+namespace details
+{
 class PortLabel : public QGraphicsTextItem
 {
 public:
@@ -50,7 +53,7 @@ public:
   {
     this->setCursor(Qt::PointingHandCursor);
   };
-  ~PortLabel() {}
+  ~PortLabel() = default;
   void hoverEnterEvent(QGraphicsSceneHoverEvent* event) override
   {
     auto font = this->font();
@@ -64,11 +67,13 @@ public:
     this->setFont(font);
   };
 };
+}
 
-NE::Port::Port(int type, QString name, QGraphicsItem* parent)
+// ----------------------------------------------------------------------------
+pqNodeEditorPort::pqNodeEditorPort(int type, QString name, QGraphicsItem* parent)
   : QGraphicsItem(parent)
 {
-  this->label = new PortLabel(name, this);
+  this->label = new details::PortLabel(name, this);
   this->label->setPos(
     type == 0 ? this->portRadius + 3 : -this->portRadius - 3 - this->label->boundingRect().width(),
     -0.5 * this->label->boundingRect().height());
@@ -79,11 +84,11 @@ NE::Port::Port(int type, QString name, QGraphicsItem* parent)
   this->setStyle(0);
 }
 
-NE::Port::~Port()
-{
-}
+// ----------------------------------------------------------------------------
+pqNodeEditorPort::~pqNodeEditorPort() = default;
 
-int NE::Port::setStyle(int style)
+// ----------------------------------------------------------------------------
+int pqNodeEditorPort::setStyle(int style)
 {
   this->disc->setPen(
     QPen(style == 1 ? QApplication::palette().highlight() : QApplication::palette().light(),
@@ -91,11 +96,13 @@ int NE::Port::setStyle(int style)
   return 1;
 }
 
-QRectF NE::Port::boundingRect() const
+// ----------------------------------------------------------------------------
+QRectF pqNodeEditorPort::boundingRect() const
 {
   return QRectF(0, 0, 0, 0);
 }
 
-void NE::Port::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget*)
+// ----------------------------------------------------------------------------
+void pqNodeEditorPort::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget*)
 {
 }
