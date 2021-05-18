@@ -51,7 +51,9 @@ public:
 
   // Initialize IndeX
   void init_index();
-  bool is_index_initialized() const;
+
+  // Returns if IndeX is initialized and logs and error if it is not
+  bool ensure_index_initialized() const;
 
   // Cameras
   mi::neuraylib::Tag get_perspective_camera() const;

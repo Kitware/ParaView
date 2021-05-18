@@ -614,7 +614,7 @@ void vtknvindex_irregular_volume_mapper::Render(vtkRenderer* ren, vtkVolume* vol
   // Wait all ranks finish to write volume data before the render starts.
   m_controller->Barrier();
 
-  if (m_index_instance->is_index_viewer() && m_index_instance->is_index_initialized())
+  if (m_index_instance->is_index_viewer() && m_index_instance->ensure_index_initialized())
   {
     vtkTimerLog::MarkStartEvent("NVIDIA-IndeX: Rendering");
 
@@ -736,13 +736,6 @@ void vtknvindex_irregular_volume_mapper::Render(vtkRenderer* ren, vtkVolume* vol
     }
 
     vtkTimerLog::MarkEndEvent("NVIDIA-IndeX: Rendering");
-  }
-  else if (m_index_instance->is_index_viewer())
-  {
-    static bool first = true;
-    if (first)
-      ERROR_LOG << "The NVIDIA IndeX plugin was not initialized! See the log output for details.";
-    first = false;
   }
 
   m_volume_changed = false;
