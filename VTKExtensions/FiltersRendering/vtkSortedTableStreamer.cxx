@@ -44,6 +44,7 @@
 #include "vtkDoubleArray.h"
 #include "vtkIntArray.h"
 #include "vtkMath.h"
+#include "vtkMinimalStandardRandomSequence.h"
 #include "vtkMultiBlockDataSet.h"
 #include "vtkMultiProcessController.h"
 #include "vtkUnsignedIntArray.h"
@@ -1171,11 +1172,20 @@ public:
     dataB->SetName("B");
     dataB->SetNumberOfComponents(3);
 
+    vtkNew<vtkMinimalStandardRandomSequence> rand;
+
     // Fill data with values
     for (int i = 0; i < 2048; i++) // 2048 is bigger than histogram
     {
-      dataA->InsertNextTuple1(vtkMath::Random());
-      dataB->InsertNextTuple3(vtkMath::Random(), vtkMath::Random(), vtkMath::Random());
+      rand->Next();
+      dataA->InsertNextTuple1(rand->GetValue());
+      rand->Next();
+      double a = rand->GetValue();
+      rand->Next();
+      double b = rand->GetValue();
+      rand->Next();
+      double c = rand->GetValue();
+      dataB->InsertNextTuple3(a, b, c);
     }
 
     input->GetRowData()->AddArray(dataA.GetPointer());

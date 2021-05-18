@@ -42,7 +42,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqServerResource.h"
 #include "pqSettings.h"
 #include "vtkCommand.h"
-#include "vtkMath.h"
+#include "vtkMinimalStandardRandomSequence.h"
 #include "vtkNetworkAccessManager.h"
 #include "vtkPVConfig.h"
 #include "vtkPVOptions.h"
@@ -303,8 +303,9 @@ bool createWidgets(QMap<QString, pqWidget*>& widgets, QDialog& dialog,
         {
           rseed += tc[ic];
         }
-        vtkMath::RandomSeed(rseed);
-        noise = vtkMath::Random();
+        vtkNew<vtkMinimalStandardRandomSequence> rand;
+        rand->Initialize(rseed);
+        noise = rand->GetValue();
       }
 
       // obtain default value from settings if available.

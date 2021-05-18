@@ -6,7 +6,8 @@
 #include <iostream>
 #include <mpi.h>
 
-#include <vtkMath.h>
+#include <vtkMinimalStandardRandomSequence.h>
+#include <vtkNew.h>
 
 class particle
 {
@@ -282,7 +283,8 @@ void Attributes::Initialize(Grid* grid)
 
 // a tuning parameter which keeps sizes relatively good in cases I've tried
 #define ADJF 1.5
-  vtkMath::RandomSeed(42);
+  vtkNew<vtkMinimalStandardRandomSequence> rand;
+  rand->Initialize(42);
   // every rank has every particle just to keep the simulation simple
   // in real life you would want the particles to live with the processes
   for (int i = 0; i < this->NumParticles; i++)
@@ -298,13 +300,20 @@ void Attributes::Initialize(Grid* grid)
           z1, 0.0, 0.0, -cellsize * 0.5 * ADJF);
         break;
       default:
-        double r = vtkMath::Random() * 1.5 * cellsize * ADJF;
-        double x = vtkMath::Random() * (x1 - x0) + x0;
-        double y = vtkMath::Random() * (y1 - y0) + y0;
-        double z = vtkMath::Random() * (z1 - z0) + z0;
-        double vx = (2.0 * vtkMath::Random() - 1.0) * cellsize * 2.0 * ADJF;
-        double vy = (2.0 * vtkMath::Random() - 1.0) * cellsize * 2.0 * ADJF;
-        double vz = (2.0 * vtkMath::Random() - 1.0) * cellsize * 2.0 * ADJF;
+        rand->Next();
+        double r = rand->GetValue() * 1.5 * cellsize * ADJF;
+        rand->Next();
+        double x = rand->GetValue() * (x1 - x0) + x0;
+        rand->Next();
+        double y = rand->GetValue() * (y1 - y0) + y0;
+        rand->Next();
+        double z = rand->GetValue() * (z1 - z0) + z0;
+        rand->Next();
+        double vx = (2.0 * rand->GetValue() - 1.0) * cellsize * 2.0 * ADJF;
+        rand->Next();
+        double vy = (2.0 * rand->GetValue() - 1.0) * cellsize * 2.0 * ADJF;
+        rand->Next();
+        double vz = (2.0 * rand->GetValue() - 1.0) * cellsize * 2.0 * ADJF;
         this->MyParticles[i] = new particle(i, r, x, y, z, vx, vy, vz);
     }
   }
