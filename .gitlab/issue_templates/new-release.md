@@ -9,6 +9,8 @@ following strings with the associated values:
   - `@RC@` - for release candidates, replace with "-RC?". For final, replace with "".
   - `@MAJOR@` - replace with major version number
   - `@MINOR@` - replace with minor version number
+  - `@BASEBRANCH@`: The branch to create the release on (for `x.y.0-RC1`,
+    `master`, otherwise `release`)
 
 Please remove this comment.
 -->
@@ -30,11 +32,14 @@ Please remove this comment.
 
 # Update ParaView
 
-  - [ ] Update `release` branch for **paraview**
+If making the first RC for a `.0` release, `@BASEBRANCH@` is `master`, otherwise
+it is `release`.
+
+  - [ ] Update @BASEBRANCH@ branch for **paraview**
 ```
 git fetch origin
-git checkout release
-git merge --ff-only origin/release
+git checkout @BASEBRANCH@
+git merge --ff-only origin/@BASEBRANCH@
 git submodule update --recursive --init
 ```
   - [ ] Update `version.txt` and tag the commit
@@ -56,11 +61,11 @@ git tag -a -m 'ParaView @VERSION@@RC@' v@VERSION@@RC@ HEAD
 
 # Update ParaView-Superbuild
 
-  - [ ] Update `release` branch for **paraview/paraview-superbuild**
+  - [ ] Update @BASEBRANCH@ branch for **paraview-superbuild**
 ```
 git fetch origin
-git checkout release
-git merge --ff-only origin/release
+git checkout @BASEBRANCH@
+git merge --ff-only origin/@BASEBRANCH@
 git submodule update --recursive --init
 git checkout -b update-to-v@VERSION@@RC@
 ```
