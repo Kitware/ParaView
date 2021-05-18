@@ -1,7 +1,4 @@
 <!--
-Use this template when making a second or higher release candidate or final version.
-If creating a first release candidate , use the `new-release-first-rc.md` template instead.
-
 This template is for tracking a release of ParaView. Please replace the
 following strings with the associated values:
 
