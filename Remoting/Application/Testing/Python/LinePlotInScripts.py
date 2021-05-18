@@ -13,9 +13,11 @@ smtesting.ProcessCommandLineArguments()
 
 w = Wavelet()
 UpdatePipeline()
-p = PlotOverLine(Source='Line')
-p.Source.Point1 = [-10.0, -10.0, -10.0]
-p.Source.Point2 = [10.0, 10.0, 10.0]
+p = PlotOverLine()
+p.Point1 = [-10.0, -10.0, -10.0]
+p.Point2 = [10.0, 10.0, 10.0]
+p.Resolution = 1000
+p.SamplingPattern = 2 # UNIFORM_SAMPLING
 
 d = Show()
 d.SeriesVisibility = ['RTData']

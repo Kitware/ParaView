@@ -776,6 +776,12 @@ def GetProxy(module, key, **kwargs):
             reader = builtins.getattr(module, key)(**kwargs)
             reader.UseLegacyBlockNamesWithElementTypes = 1
             return reader
+    if version <= 5.9:
+        if key == "PlotOverLine":
+            ## in 5.10, we changed the backend of Plot Over Line
+            ## This restores the previous backend.
+            probeLine = builtins.getattr(module, "PlotOverLineLegacy")(**kwargs)
+            return probeLine
     return builtins.getattr(module, key)(**kwargs)
 
 def lookupTableUpdate(lutName):

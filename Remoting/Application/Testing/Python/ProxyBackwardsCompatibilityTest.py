@@ -33,3 +33,22 @@ renderView1.ResetCamera()
 
 # update the view to ensure updated data information
 renderView1.Update()
+
+print("")
+print("Testing Plot Over Line Legacy")
+
+ResetSession()
+
+paraview.compatibility.major = 5
+paraview.compatibility.minor = 9
+
+# Create plot over line proxy
+p3 = PlotOverLine(Input=sourceDs)
+
+# Check that its XML name is the one of the legacy
+assert p3.GetXMLName() == "ProbeLineLegacy"
+
+# Do a display pipeline
+lineChartView1 = GetActiveViewOrCreate('XYChartView')
+plot1Display = Show(p3, lineChartView1, 'XYChartRepresentation')
+lineChartView1.Update()

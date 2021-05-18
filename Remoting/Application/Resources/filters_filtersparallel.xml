@@ -3,7 +3,11 @@
   <ProxyGroup name="internal_filters">
     <!-- ==================================================================== -->
     <SourceProxy class="vtkPProbeFilter"
-                 name="ProbeLine">
+                 name="ProbeLineLegacy">
+      <Deprecated deprecated_in="5.10" to_remove_in="5.11">
+        This has been replaced by 'ProbeLine'. Please consider
+        using that instead.
+      </Deprecated>
       <Documentation>Internal filter used by (filters, ProbeLine). The Plot
       Over Line filter samples the data set attributes of the current data set
       at the points along a line. The values of the point-centered variables
@@ -117,7 +121,7 @@
         <Documentation>Set the tolerance to use for
         vtkDataSet::FindCell</Documentation>
       </DoubleVectorProperty>
-      <!-- End ProbeLine -->
+      <!-- End ProbeLineLegacy -->
     </SourceProxy>
   </ProxyGroup>
   <ProxyGroup name="filters">
@@ -208,8 +212,8 @@
       <!-- End ProbePoint -->
     </SourceProxy>
     <!-- ==================================================================== -->
-    <CompoundSourceProxy label="Plot Over Line"
-                         name="ProbeLine">
+    <CompoundSourceProxy label="Plot Over Line Legacy"
+                         name="ProbeLineLegacy">
       <Documentation long_help="Sample data attributes at the points along a line.  Probed lines will be displayed in a graph of the attributes."
                      short_help="Sample data values at the points along a line.">
                      The Plot Over Line filter samples the data set attributes
@@ -220,11 +224,15 @@
                      point, whether or not it lies at an input point. The Probe
                      filter operates on any type of data and produces polygonal
                      output (a line).</Documentation>
+      <Deprecated deprecated_in="5.10" to_remove_in="5.11">
+        This has been replaced by 'ProbeLine'. Please consider
+        using that instead.
+      </Deprecated>
       <Proxy compound_name="PlotOverLine1"
              group="internal_filters"
              id="491"
              servers="1"
-             type="ProbeLine" />
+             type="ProbeLineLegacy" />
       <Proxy compound_name="AppendArcLength1"
              group="filters"
              id="588"
@@ -257,6 +265,174 @@
       <OutputPort name="Output"
                   port_index="0"
                   proxy="AppendArcLength1" />
+      <!-- End ProbeLineLegacy -->
+    </CompoundSourceProxy>
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkProbeLineFilter"
+                 label="Plot Over Line"
+                 name="ProbeLine">
+      <Documentation>Internal filter used by (filters, ProbeLine). The Plot
+      Over Line filter samples the data set attributes of the current data set
+      at the points along a line. The values of the point-centered variables
+      along that line will be displayed in an XY Plot. This filter uses
+      interpolation to determine the values at the selected point, whether or
+      not it lies at an input point. The Probe filter operates on any type of
+      data and produces polygonal output (a line). One can use different sampling patterns
+      with this filter. "Sample At Cell Boundaries" gives the most accurate plots,
+      "Sample At Segment Centers" provides one sample per probed cells,
+      and "Sample Uniformally" samples uniformally along the input line.</Documentation>
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkDataSet" />
+          <DataType value="vtkCompositeDataSet" />
+        </DataTypeDomain>
+        <InputArrayDomain name="input_array" />
+        <Documentation>This property specifies the dataset from which to obtain
+        probe values.</Documentation>
+      </InputProperty>
+      <DoubleVectorProperty animateable="1"
+                            command="SetPoint1"
+                            default_values="0.0 0.0 0.0"
+                            name="Point1"
+                            number_of_elements="3">
+        <BoundsDomain default_mode="min"
+                      mode="normal"
+                      name="range">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input" />
+          </RequiredProperties>
+        </BoundsDomain>
+        <Documentation>This property controls the coordinates of the first
+        endpoint of the line.</Documentation>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty animateable="1"
+                            command="SetPoint2"
+                            default_values="0.0 0.0 0.0"
+                            name="Point2"
+                            number_of_elements="3">
+        <BoundsDomain default_mode="max"
+                      mode="normal"
+                      name="range">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input" />
+          </RequiredProperties>
+        </BoundsDomain>
+        <Documentation>This property controls the coordinates of the second
+        endpoint of the line.</Documentation>
+      </DoubleVectorProperty>
+      <IntVectorProperty command="SetSamplingPattern"
+                         name="SamplingPattern"
+                         default_values="2"
+                         number_of_elements="1">
+        <EnumerationDomain name="enum">
+          <Entry text="Sample At Cell Boundaries"
+                 value="0" />
+          <Entry text="Sample At Segment Centers"
+                 value="1" />
+          <Entry text="Sample Uniformly"
+                 value="2" />
+        </EnumerationDomain>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetLineResolution"
+                         name="Resolution"
+                         default_values="1000"
+                         number_of_elements="1">
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="SamplingPattern"
+                                   value="2" />
+          <!-- show this widget when SamplingPattern==2 -->
+        </Hints>
+        <Documentation>This property sets the line resolution if sampling pattern is set to
+          "Sample Uniformly".</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetPassPartialArrays"
+                         default_values="1"
+                         name="PassPartialArrays"
+                         number_of_elements="1"
+                         panel_visibility="advanced">
+        <Documentation>When dealing with composite datasets, partial arrays are
+        common i.e. data-arrays that are not available in all of the blocks. By
+        default, this filter only passes those point and cell data-arrays that
+        are available in all the blocks i.e. partial array are removed. When
+        PassPartialArrays is turned on, this behavior is changed to take a
+        union of all arrays present thus partial arrays are passed as well.
+        However, for composite dataset input, this filter still produces a
+        non-composite output. For all those locations in a block of where a
+        particular data array is missing, this filter uses vtkMath::Nan() for
+        double and float arrays, while 0 for all other types of arrays i.e int,
+        char etc.</Documentation>
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+      <IntVectorProperty command="SetPassCellArrays"
+                         default_values="0"
+                         name="PassCellArrays"
+                         number_of_elements="1"
+                         panel_visibility="advanced">
+        <Documentation>
+        When set the input's cell data arrays are shallow copied to the output.
+        </Documentation>
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+      <IntVectorProperty command="SetPassPointArrays"
+                         default_values="0"
+                         name="PassPointArrays"
+                         number_of_elements="1"
+                         panel_visibility="advanced">
+        <Documentation>
+        When set the input's point data arrays are shallow copied to the output.
+        </Documentation>
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+      <IntVectorProperty command="SetPassFieldArrays"
+                         default_values="1"
+                         name="PassFieldArrays"
+                         number_of_elements="1"
+                         panel_visibility="advanced">
+        <Documentation>
+        Set whether to pass the field-data arrays from the Input i.e. the input
+        providing the geometry to the output. On by default.
+        </Documentation>
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+      <IntVectorProperty command="SetComputeTolerance"
+                         default_values="1"
+                         name="ComputeTolerance"
+                         number_of_elements="1"
+                         panel_visibility="advanced">
+        <Documentation>
+        Set whether to compute the tolerance or to use a user provided
+        value. On by default.
+        </Documentation>
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+      <DoubleVectorProperty command="SetTolerance"
+                            default_values="2.2204460492503131e-16"
+                            name="Tolerance"
+                            number_of_elements="1"
+                            panel_visibility="advanced">
+        <DoubleRangeDomain min="2.2204460492503131e-16"
+                           name="range" />
+        <Hints>
+          <PropertyWidgetDecorator type="ShowWidgetDecorator">
+            <Property name="ComputeTolerance" function="boolean_invert" />
+          </PropertyWidgetDecorator>
+        </Hints>
+        <Documentation>Set the tolerance to use for
+        vtkDataSet::FindCell</Documentation>
+      </DoubleVectorProperty>
+      <PropertyGroup label="Line Parameters" panel_widget="InteractiveLine">
+          <Property function="Point1WorldPosition" name="Point1" />
+          <Property function="Point2WorldPosition" name="Point2" />
+      </PropertyGroup>
       <Hints>
         <Visibility replace_input="0" />
         <!-- View can be used to specify the preferred view for the proxy -->
@@ -264,7 +440,7 @@
         <Plotable />
       </Hints>
       <!-- End ProbeLine -->
-    </CompoundSourceProxy>
+    </SourceProxy>
     <!-- ==================================================================== -->
     <SourceProxy class="vtkPProbeFilter"
                  label="Legacy Resample With Dataset"
