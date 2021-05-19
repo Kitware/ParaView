@@ -1,39 +1,41 @@
 /*=========================================================================
-Copyright (c) 2021, Jonas Lukasczyk
-All rights reserved.
 
-Redistribution and use in source and binary forms, with or without
-modification, are permitted provided that the following conditions are met:
+  Program:   ParaView
+  Plugin:    NodeEditor
 
-1. Redistributions of source code must retain the above copyright notice, this
-   list of conditions and the following disclaimer.
+  Copyright (c) Kitware, Inc.
+  All rights reserved.
+  See Copyright.txt or http://www.paraview.org/HTML/Copyright.html for details.
 
-2. Redistributions in binary form must reproduce the above copyright notice,
-   this list of conditions and the following disclaimer in the documentation
-   and/or other materials provided with the distribution.
+     This software is distributed WITHOUT ANY WARRANTY; without even
+     the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+     PURPOSE.  See the above copyright notice for more information.
 
-3. Neither the name of the copyright holder nor the names of its
-   contributors may be used to endorse or promote products derived from
-   this software without specific prior written permission.
-
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
-FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
-DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
-SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
-CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
-OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
+/*-------------------------------------------------------------------------
+  ParaViewPluginsNodeEditor - BSD 3-Clause License - Copyright (C) 2021 Jonas Lukasczyk
+
+  See the Copyright.txt file provided
+  with ParaViewPluginsNodeEditor for license information.
+-------------------------------------------------------------------------*/
 
 #include "pqNodeEditorNode.h"
 
 #include "pqNodeEditorPort.h"
 #include "pqNodeEditorUtils.h"
 
-// qt includes
+#include <pqDataRepresentation.h>
+#include <pqOutputPort.h>
+#include <pqPipelineFilter.h>
+#include <pqPipelineSource.h>
+#include <pqProxiesWidget.h>
+#include <pqProxyWidget.h>
+#include <pqServerManagerModel.h>
+#include <pqView.h>
+
+#include <vtkSMPropertyGroup.h>
+#include <vtkSMProxy.h>
+
 #include <QApplication>
 #include <QGraphicsEllipseItem>
 #include <QGraphicsProxyWidget>
@@ -45,47 +47,33 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QStyleOptionGraphicsItem>
 #include <QVBoxLayout>
 
-// paraview/vtk includes
-#include <pqDataRepresentation.h>
-#include <pqOutputPort.h>
-#include <pqPipelineFilter.h>
-#include <pqPipelineSource.h>
-#include <pqProxiesWidget.h>
-#include <pqProxyWidget.h>
-#include <pqServerManagerModel.h>
-#include <pqView.h>
-#include <vtkSMPropertyGroup.h>
-#include <vtkSMProxy.h>
+#include <pqActiveObjects.h>
+#include <pqProxySelection.h>
 
 // ----------------------------------------------------------------------------
 pqNodeEditorNode::pqNodeEditorNode(QGraphicsScene* scene, pqProxy* proxy, QGraphicsItem* parent)
-  : QObject()
-  , QGraphicsItem(parent)
+  : QGraphicsItem(parent)
   , scene(scene)
   , proxy(proxy)
+  , widgetContainer(new QWidget)
+  , label(new QGraphicsTextItem("", this))
 {
-  pqNodeEditorUtils::log("  +Node: " + pqNodeEditorUtils::getLabel(proxy));
-
   // set options
   this->setFlag(ItemIsMovable);
   this->setFlag(ItemSendsGeometryChanges);
   this->setCacheMode(DeviceCoordinateCache);
   this->setCursor(Qt::ArrowCursor);
-  this->setZValue(1);
+  this->setZValue(pqNodeEditorUtils::CONSTS::NODE_LAYER);
   this->setObjectName(QString("node") + proxy->getSMName());
 
   // determine port height
-  auto proxyAsView = dynamic_cast<pqView*>(proxy);
-  auto proxyAsFilter = dynamic_cast<pqPipelineFilter*>(proxy);
-  auto proxyAsSource = dynamic_cast<pqPipelineSource*>(proxy);
-
-  if (proxyAsFilter)
+  if (auto* proxyAsFilter = dynamic_cast<pqPipelineFilter*>(proxy))
   {
     this->portContainerHeight =
       std::max(proxyAsFilter->getNumberOfInputPorts(), proxyAsFilter->getNumberOfOutputPorts()) *
       this->portHeight;
   }
-  else if (proxyAsSource)
+  else if (auto* proxyAsSource = dynamic_cast<pqPipelineSource*>(proxy))
   {
     this->portContainerHeight = proxyAsSource->getNumberOfOutputPorts() * this->portHeight;
   }
@@ -97,16 +85,17 @@ pqNodeEditorNode::pqNodeEditorNode(QGraphicsScene* scene, pqProxy* proxy, QGraph
 
     QFont font;
     font.setBold(true);
-    font.setPointSize(13);
+    font.setPointSize(pqNodeEditorUtils::CONSTS::NODE_FONT_SIZE);
     this->label->setFont(font);
 
+    // Get the name from the linked proxy and place it in the middle of the GUI
+    // Function is connected to be called each time the proxy get renamed.
     auto nameChangeFunc = [=]() {
       this->label->setPlainText(proxy->getSMName());
       auto br = this->label->boundingRect();
       this->label->setPos(0.5 * (pqNodeEditorUtils::CONSTS::NODE_WIDTH - br.width()),
         -this->portContainerHeight - this->labelHeight);
     };
-
     QObject::connect(proxy, &pqPipelineSource::nameChanged, this->label, nameChangeFunc);
 
     nameChangeFunc();
@@ -120,7 +109,7 @@ pqNodeEditorNode::pqNodeEditorNode(QGraphicsScene* scene, pqProxy* proxy, QGraph
 
     // install resize event filter
     this->widgetContainer->installEventFilter(pqNodeEditorUtils::createInterceptor(
-      this->widgetContainer, [=](QObject* object, QEvent* event) {
+      this->widgetContainer, [this](QObject* /*object*/, QEvent* event) {
         if (event->type() == QEvent::LayoutRequest)
         {
           this->updateSize();
@@ -144,7 +133,8 @@ pqNodeEditorNode::pqNodeEditorNode(QGraphicsScene* scene, pqProxy* proxy, QGraph
     this->proxyProperties->updatePanel();
     containerLayout->addWidget(this->proxyProperties);
 
-    this->setVerbosity(pqNodeEditorUtils::CONSTS::NODE_DEFAULT_VERBOSITY);
+    this->setVerbosity(
+      static_cast<pqNodeEditorNode::Verbosity>(pqNodeEditorUtils::CONSTS::NODE_DEFAULT_VERBOSITY));
 
     this->updateSize();
   }
@@ -167,7 +157,8 @@ pqNodeEditorNode::pqNodeEditorNode(
     {
       for (int i = 0; i < proxyAsFilter->getNumberOfInputPorts(); i++)
       {
-        auto iPort = new pqNodeEditorPort(0, proxyAsFilter->getInputPortName(i), this);
+        auto iPort = new pqNodeEditorPort(
+          pqNodeEditorPort::NodeType::INPUT, proxyAsFilter->getInputPortName(i), this);
         iPort->setPos(br.left(), -this->portContainerHeight + (i + 0.5) * this->portHeight);
         this->iPorts.push_back(iPort);
       }
@@ -175,28 +166,22 @@ pqNodeEditorNode::pqNodeEditorNode(
 
     for (int i = 0; i < proxy->getNumberOfOutputPorts(); i++)
     {
-      auto oPort = new pqNodeEditorPort(1, proxy->getOutputPort(i)->getPortName(), this);
+      auto oPort = new pqNodeEditorPort(
+        pqNodeEditorPort::NodeType::OUTPUT, proxy->getOutputPort(i)->getPortName(), this);
       oPort->setPos(br.right(), -this->portContainerHeight + (i + 0.5) * this->portHeight);
       this->oPorts.push_back(oPort);
     }
   }
 
   // create property widgets
-  QObject::connect(this->proxyProperties, &pqProxyWidget::changeFinished, this, [=]() {
-    pqNodeEditorUtils::log(
-      "Source/Filter Property Modified: " + pqNodeEditorUtils::getLabel(this->proxy));
+  QObject::connect(this->proxyProperties, &pqProxyWidget::changeFinished, this, [this]() {
     this->proxy->setModifiedState(pqProxy::MODIFIED);
     return 1;
   });
-  QObject::connect(this->proxy, &pqProxy::modifiedStateChanged, this, [=]() {
-    if (this->proxy->modifiedState() == pqProxy::ModifiedState::MODIFIED)
-    {
-      this->setBackgroundStyle(1);
-    }
-    else
-    {
-      this->setBackgroundStyle(0);
-    }
+  QObject::connect(this->proxy, &pqProxy::modifiedStateChanged, this, [this]() {
+    this->setBackgroundStyle(this->proxy->modifiedState() == pqProxy::ModifiedState::MODIFIED
+        ? BackgroundStyle::DIRTY
+        : BackgroundStyle::NORMAL);
     return 1;
   });
 }
@@ -210,23 +195,21 @@ pqNodeEditorNode::pqNodeEditorNode(QGraphicsScene* scene, pqView* proxy, QGraphi
   br.adjust(adjust, adjust, -adjust, -adjust);
 
   // create port
-  auto iPort = new pqNodeEditorPort(2, "", this);
+  auto iPort = new pqNodeEditorPort(pqNodeEditorPort::NodeType::INPUT, "", this);
   iPort->setPos(br.center().x(), br.top());
   this->iPorts.push_back(iPort);
 
   // create property widgets
-  QObject::connect(this->proxyProperties, &pqProxyWidget::changeFinished, this, [=]() {
-    pqNodeEditorUtils::log("View Property Modified: " + pqNodeEditorUtils::getLabel(this->proxy));
+  QObject::connect(this->proxyProperties, &pqProxyWidget::changeFinished, this, [this]() {
     this->proxy->setModifiedState(pqProxy::MODIFIED);
     this->proxyProperties->apply();
-    ((pqView*)this->proxy)->render();
+    qobject_cast<pqView*>(this->proxy)->render();
   });
 }
 
 // ----------------------------------------------------------------------------
 pqNodeEditorNode::~pqNodeEditorNode()
 {
-  pqNodeEditorUtils::log(" -Node: " + pqNodeEditorUtils::getLabel(this->proxy));
   this->scene->removeItem(this);
 }
 
@@ -246,62 +229,60 @@ int pqNodeEditorNode::updateSize()
 }
 
 // ----------------------------------------------------------------------------
-int pqNodeEditorNode::setOutlineStyle(int style)
+void pqNodeEditorNode::setOutlineStyle(OutlineStyle style)
 {
   this->outlineStyle = style;
   this->update(this->boundingRect());
-  return 1;
 }
 // ----------------------------------------------------------------------------
-int pqNodeEditorNode::setBackgroundStyle(int style)
+void pqNodeEditorNode::setBackgroundStyle(BackgroundStyle style)
 {
   this->backgroundStyle = style;
   this->update(this->boundingRect());
-  return 1;
 }
 
 // ----------------------------------------------------------------------------
-int pqNodeEditorNode::getVerbosity()
+void pqNodeEditorNode::setVerbosity(Verbosity _verbosity)
 {
-  return this->verbosity;
+  // this string is used to filter out every widget that does not contains such string as a tag.
+  // Since we're pretty sure no one will ever name or a document a property with such a string
+  // we'll use this value.
+  constexpr const char* NO_PROPERTIES_FILTER = "%%%%%%%%%%%%%%";
+
+  this->verbosity = _verbosity;
+  switch (this->verbosity)
+  {
+    case Verbosity::EMPTY:
+      this->proxyProperties->filterWidgets(false, NO_PROPERTIES_FILTER);
+      break;
+    case Verbosity::SIMPLE:
+      this->proxyProperties->filterWidgets(false);
+      break;
+    case Verbosity::ADVANCED:
+      this->proxyProperties->filterWidgets(true);
+      break;
+    default:
+      break;
+  }
 }
 
 // ----------------------------------------------------------------------------
-int pqNodeEditorNode::setVerbosity(int verbosity)
+int pqNodeEditorNode::incrementVerbosity()
 {
-  this->verbosity = std::max(verbosity, 0);
-  if (this->verbosity > 2)
-  {
-    this->verbosity = 0;
-  }
-
-  if (this->verbosity == 0)
-  {
-    this->proxyProperties->filterWidgets(false, "%%%%%%%%%%%%%%");
-  }
-  else if (this->verbosity == 1)
-  {
-    this->proxyProperties->filterWidgets(false);
-  }
-  else
-  {
-    this->proxyProperties->filterWidgets(true);
-  }
-
-  return 1;
+  int next = static_cast<int>(this->verbosity) + 1;
+  Verbosity verb =
+    next > static_cast<int>(Verbosity::ADVANCED) ? Verbosity::EMPTY : static_cast<Verbosity>(next);
+  this->setVerbosity(verb);
+  return this->getVerbosity();
 }
 
 // ----------------------------------------------------------------------------
 QVariant pqNodeEditorNode::itemChange(GraphicsItemChange change, const QVariant& value)
 {
-  switch (change)
+  if (change == GraphicsItemChange::ItemPositionHasChanged)
   {
-    case ItemPositionHasChanged:
-      emit this->nodeMoved();
-      break;
-    default:
-      break;
-  };
+    emit this->nodeMoved();
+  }
 
   return QGraphicsItem::itemChange(change, value);
 }
@@ -319,7 +300,7 @@ QRectF pqNodeEditorNode::boundingRect() const
 }
 
 // ----------------------------------------------------------------------------
-void pqNodeEditorNode::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget*)
+void pqNodeEditorNode::paint(QPainter* painter, const QStyleOptionGraphicsItem*, QWidget*)
 {
   auto palette = QApplication::palette();
 
@@ -330,13 +311,26 @@ void pqNodeEditorNode::paint(QPainter* painter, const QStyleOptionGraphicsItem* 
   path.addRoundedRect(br, pqNodeEditorUtils::CONSTS::NODE_BORDER_RADIUS,
     pqNodeEditorUtils::CONSTS::NODE_BORDER_RADIUS);
 
-  QPen pen(this->outlineStyle == 0 ? palette.light() : this->outlineStyle == 1
-        ? palette.highlight()
-        : pqNodeEditorUtils::CONSTS::COLOR_ORANGE,
-    pqNodeEditorUtils::CONSTS::NODE_BORDER_WIDTH);
+  QPen pen;
+  pen.setWidth(pqNodeEditorUtils::CONSTS::NODE_BORDER_WIDTH);
+  switch (this->outlineStyle)
+  {
+    case OutlineStyle::NORMAL:
+      pen.setBrush(palette.base());
+      break;
+    case OutlineStyle::SELECTED_FILTER:
+      pen.setBrush(palette.highlight());
+      break;
+    case OutlineStyle::SELECTED_VIEW:
+      pen.setBrush(palette.linkVisited());
+      break;
+    default:
+      break;
+  }
 
   painter->setPen(pen);
-  painter->fillPath(
-    path, this->backgroundStyle == 1 ? pqNodeEditorUtils::CONSTS::COLOR_GREEN : palette.window());
+  painter->fillPath(path, this->backgroundStyle == BackgroundStyle::DIRTY
+      ? pqNodeEditorUtils::CONSTS::COLOR_SWEET_GREEN
+      : palette.window().color());
   painter->drawPath(path);
 }

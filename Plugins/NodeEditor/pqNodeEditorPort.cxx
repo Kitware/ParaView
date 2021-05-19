@@ -1,32 +1,23 @@
 /*=========================================================================
-Copyright (c) 2021, Jonas Lukasczyk
-All rights reserved.
 
-Redistribution and use in source and binary forms, with or without
-modification, are permitted provided that the following conditions are met:
+  Program:   ParaView
+  Plugin:    NodeEditor
 
-1. Redistributions of source code must retain the above copyright notice, this
-   list of conditions and the following disclaimer.
+  Copyright (c) Kitware, Inc.
+  All rights reserved.
+  See Copyright.txt or http://www.paraview.org/HTML/Copyright.html for details.
 
-2. Redistributions in binary form must reproduce the above copyright notice,
-   this list of conditions and the following disclaimer in the documentation
-   and/or other materials provided with the distribution.
+     This software is distributed WITHOUT ANY WARRANTY; without even
+     the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+     PURPOSE.  See the above copyright notice for more information.
 
-3. Neither the name of the copyright holder nor the names of its
-   contributors may be used to endorse or promote products derived from
-   this software without specific prior written permission.
-
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
-FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
-DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
-SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
-CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
-OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
+/*-------------------------------------------------------------------------
+  ParaViewPluginsNodeEditor - BSD 3-Clause License - Copyright (C) 2021 Jonas Lukasczyk
+
+  See the Copyright.txt file provided
+  with ParaViewPluginsNodeEditor for license information.
+-------------------------------------------------------------------------*/
 
 #include "pqNodeEditorPort.h"
 
@@ -45,6 +36,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // ----------------------------------------------------------------------------
 namespace details
 {
+/**
+ * Custom class for handling the port label with the right font and mouse shape.
+ */
 class PortLabel : public QGraphicsTextItem
 {
 public:
@@ -53,14 +47,17 @@ public:
   {
     this->setCursor(Qt::PointingHandCursor);
   };
-  ~PortLabel() = default;
-  void hoverEnterEvent(QGraphicsSceneHoverEvent* event) override
+
+  ~PortLabel() override = default;
+
+  void hoverEnterEvent(QGraphicsSceneHoverEvent* /*event*/) override
   {
     auto font = this->font();
     font.setBold(true);
     this->setFont(font);
   };
-  void hoverLeaveEvent(QGraphicsSceneHoverEvent* event) override
+
+  void hoverLeaveEvent(QGraphicsSceneHoverEvent* /*event*/) override
   {
     auto font = this->font();
     font.setBold(false);
@@ -70,29 +67,31 @@ public:
 }
 
 // ----------------------------------------------------------------------------
-pqNodeEditorPort::pqNodeEditorPort(int type, QString name, QGraphicsItem* parent)
+pqNodeEditorPort::pqNodeEditorPort(NodeType type, QString name, QGraphicsItem* parent)
   : QGraphicsItem(parent)
 {
   this->label = new details::PortLabel(name, this);
-  this->label->setPos(
-    type == 0 ? this->portRadius + 3 : -this->portRadius - 3 - this->label->boundingRect().width(),
-    -0.5 * this->label->boundingRect().height());
+
+  // Set the port label at the right of the actual port for input ports and at the left
+  // for output ports. Use an offset to not make the label too close of the node border.
+  constexpr qreal LABEL_OFFSET = 3.0;
+  const qreal xpos = (type == NodeType::INPUT)
+    ? this->portRadius + LABEL_OFFSET
+    : -this->portRadius - LABEL_OFFSET - this->label->boundingRect().width();
+  this->label->setPos(xpos, -0.5 * this->label->boundingRect().height());
 
   this->disc = new QGraphicsEllipseItem(
-    -this->portRadius, -this->portRadius, 2 * this->portRadius, 2 * this->portRadius, this);
+    -this->portRadius, -this->portRadius, 2.0 * this->portRadius, 2.0 * this->portRadius, this);
   this->disc->setBrush(QApplication::palette().dark());
-  this->setStyle(0);
+  this->setStyle(NodeStyle::NORMAL);
 }
 
 // ----------------------------------------------------------------------------
-pqNodeEditorPort::~pqNodeEditorPort() = default;
-
-// ----------------------------------------------------------------------------
-int pqNodeEditorPort::setStyle(int style)
+int pqNodeEditorPort::setStyle(NodeStyle style)
 {
-  this->disc->setPen(
-    QPen(style == 1 ? QApplication::palette().highlight() : QApplication::palette().light(),
-      this->borderWidth));
+  this->disc->setPen(QPen(style == NodeStyle::SELECTED ? QApplication::palette().highlight()
+                                                       : QApplication::palette().light(),
+    this->borderWidth));
   return 1;
 }
 
@@ -100,9 +99,4 @@ int pqNodeEditorPort::setStyle(int style)
 QRectF pqNodeEditorPort::boundingRect() const
 {
   return QRectF(0, 0, 0, 0);
-}
-
-// ----------------------------------------------------------------------------
-void pqNodeEditorPort::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget*)
-{
 }

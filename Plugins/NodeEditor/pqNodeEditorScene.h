@@ -1,32 +1,23 @@
 /*=========================================================================
-Copyright (c) 2021, Jonas Lukasczyk
-All rights reserved.
 
-Redistribution and use in source and binary forms, with or without
-modification, are permitted provided that the following conditions are met:
+  Program:   ParaView
+  Plugin:    NodeEditor
 
-1. Redistributions of source code must retain the above copyright notice, this
-   list of conditions and the following disclaimer.
+  Copyright (c) Kitware, Inc.
+  All rights reserved.
+  See Copyright.txt or http://www.paraview.org/HTML/Copyright.html for details.
 
-2. Redistributions in binary form must reproduce the above copyright notice,
-   this list of conditions and the following disclaimer in the documentation
-   and/or other materials provided with the distribution.
+     This software is distributed WITHOUT ANY WARRANTY; without even
+     the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+     PURPOSE.  See the above copyright notice for more information.
 
-3. Neither the name of the copyright holder nor the names of its
-   contributors may be used to endorse or promote products derived from
-   this software without specific prior written permission.
-
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
-FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
-DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
-SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
-CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
-OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
+/*-------------------------------------------------------------------------
+  ParaViewPluginsNodeEditor - BSD 3-Clause License - Copyright (C) 2021 Jonas Lukasczyk
+
+  See the Copyright.txt file provided
+  with ParaViewPluginsNodeEditor for license information.
+-------------------------------------------------------------------------*/
 
 #ifndef pqNodeEditorScene_h
 #define pqNodeEditorScene_h
@@ -39,11 +30,9 @@ class pqNodeEditorNode;
 class pqNodeEditorEdge;
 
 /**
- * This class extends QGraphicsScene to
- * draw a grid background;
+ * This class extends QGraphicsScene to draw a grid background;
  * monitor the creation/modification/destruction of proxies to automatically
- * modify the scene accordingly;
- * manage the instances of nodes and edges;
+ * modify the scene accordingly; and manage the instances of nodes and edges.
  */
 class pqNodeEditorScene : public QGraphicsScene
 {
@@ -51,16 +40,28 @@ class pqNodeEditorScene : public QGraphicsScene
 
 public:
   pqNodeEditorScene(QObject* parent = nullptr);
-  ~pqNodeEditorScene();
+  virtual ~pqNodeEditorScene() = default;
 
-  QRect getBoundingRect(std::unordered_map<int, pqNodeEditorNode*>& nodes);
+  /**
+   * Given a list of nodes, return the bounding box englobing all of these nodes.
+   * The bounding box is expressed in coordinates relative to the scene.
+   */
+  static QRect getBoundingRect(const std::unordered_map<int, pqNodeEditorNode*>& nodes);
 
 public slots:
-  int computeLayout(std::unordered_map<int, pqNodeEditorNode*>& nodes,
+  /**
+   * Compute an optimized layout for the nodes in the scene.
+   * Return 1 if success, 0 else.
+   *
+   * If GraphViz has not been at the compilation this function will do nothing.
+   */
+  int computeLayout(const std::unordered_map<int, pqNodeEditorNode*>& nodes,
     std::unordered_map<int, std::vector<pqNodeEditorEdge*> >& edges);
 
 protected:
-  /// Draws a grid background.
+  /**
+   *  Draws a grid background.
+   */
   void drawBackground(QPainter* painter, const QRectF& rect);
 };
 

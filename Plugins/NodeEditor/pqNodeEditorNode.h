@@ -1,32 +1,23 @@
 /*=========================================================================
-Copyright (c) 2021, Jonas Lukasczyk
-All rights reserved.
 
-Redistribution and use in source and binary forms, with or without
-modification, are permitted provided that the following conditions are met:
+  Program:   ParaView
+  Plugin:    NodeEditor
 
-1. Redistributions of source code must retain the above copyright notice, this
-   list of conditions and the following disclaimer.
+  Copyright (c) Kitware, Inc.
+  All rights reserved.
+  See Copyright.txt or http://www.paraview.org/HTML/Copyright.html for details.
 
-2. Redistributions in binary form must reproduce the above copyright notice,
-   this list of conditions and the following disclaimer in the documentation
-   and/or other materials provided with the distribution.
+     This software is distributed WITHOUT ANY WARRANTY; without even
+     the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+     PURPOSE.  See the above copyright notice for more information.
 
-3. Neither the name of the copyright holder nor the names of its
-   contributors may be used to endorse or promote products derived from
-   this software without specific prior written permission.
-
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
-FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
-DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
-SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
-CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
-OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
+/*-------------------------------------------------------------------------
+  ParaViewPluginsNodeEditor - BSD 3-Clause License - Copyright (C) 2021 Jonas Lukasczyk
+
+  See the Copyright.txt file provided
+  with ParaViewPluginsNodeEditor for license information.
+-------------------------------------------------------------------------*/
 
 #ifndef pqNodeEditorNode_h
 #define pqNodeEditorNode_h
@@ -42,57 +33,143 @@ class QGraphicsSceneMouseEvent;
 
 class pqNodeEditorPort;
 
+/**
+ * Every instance of this class corresponds to a node representing either a source, a filter
+ * or a render view. They have severals input and output pqNodeEditorPort, allowing them
+ * to connect to each other.
+ *
+ * See :
+ * @sa pqNodeEditorPort
+ */
 class pqNodeEditorNode : public QObject, public QGraphicsItem
 {
   Q_OBJECT
   Q_INTERFACES(QGraphicsItem)
 
 public:
-  pqNodeEditorNode(QGraphicsScene* scene, pqProxy* proxy, QGraphicsItem* parent = nullptr);
-
   /**
-   * Creates a node for a pqPipelineSource that consists of
-   * an encapsulating rectangle
-   * input and output ports
-   * a widgetContainer for properties
+   * Creates a node for the given pqPipelineSource instance. This will also create the input/ouput
+   * ports on the left/right of the node.
    */
   pqNodeEditorNode(
     QGraphicsScene* scene, pqPipelineSource* source, QGraphicsItem* parent = nullptr);
 
-  /// TODO
+  /**
+   *  Create a node and its input port representing the given @c view.
+   */
   pqNodeEditorNode(QGraphicsScene* scene, pqView* view, QGraphicsItem* parent = nullptr);
 
-  /// Destructor
-  ~pqNodeEditorNode();
+  /**
+   * Remove the node from the scene it has been added to.
+   */
+  virtual ~pqNodeEditorNode();
 
-  /// Get corresponding pqProxy of the node.
+  /**
+   * Enum for the verbosity style of the nodes in the node editor scene.
+   * EMPTY : no properties displayed
+   * SIMPLE : default properties displayed
+   * ADVANCED : default and advanced properties displayed
+   */
+  enum class Verbosity : int
+  {
+    EMPTY = 0,
+    SIMPLE,
+    ADVANCED
+  };
+
+  /**
+   * Enum for the outline style of the nodes in the node editor scene.
+   * NORMAL : node is not selected
+   * SELECTED_FILTER : node represent a filter and is selected
+   * SELECTED_VIEW : node represent a view and is selected
+   */
+  enum class OutlineStyle : int
+  {
+    NORMAL = 0,
+    SELECTED_FILTER,
+    SELECTED_VIEW
+  };
+
+  /**
+   * Enum for the background style of the nodes in the node editor scene.
+   * NORMAL : node has not been modified since last Apply
+   * DIRTY : node properties has been modified
+   */
+  enum class BackgroundStyle : int
+  {
+    NORMAL = 0,
+    DIRTY
+  };
+
+  /**
+   *  Get corresponding pqProxy of the node.
+   */
   pqProxy* getProxy() { return this->proxy; }
 
-  /// Get input ports of the node.
+  /**
+   *  Get input ports of the node.
+   */
   std::vector<pqNodeEditorPort*>& getInputPorts() { return this->iPorts; }
 
-  /// Get output ports of the node.
+  /**
+   * Get output ports of the node.
+   */
   std::vector<pqNodeEditorPort*>& getOutputPorts() { return this->oPorts; }
 
-  /// Get widget container of the node.
+  /**
+   * Get widget container of the node.
+   */
   pqProxyWidget* getProxyProperties() { return this->proxyProperties; }
 
-  /// Get widget container of the node.
+  /**
+   *  Get widget container of the node.
+   */
   QGraphicsTextItem* getLabel() { return this->label; }
 
-  /// Update the size of the node to fit its contents.
+  /**
+   *  Update the size of the node to fit its contents.
+   */
   int updateSize();
 
-  int getVerbosity();
-  int setVerbosity(int i);
+  //@{
+  /**
+   * Get/Set the verbosity level of the node, that is the amount of properties
+   * displayed in the node. It can be either empty, simple or advandeced (every properties).
+   * Update the style accordingly.
+   */
+  void setVerbosity(Verbosity i);
+  int getVerbosity() { return static_cast<int>(this->verbosity); };
+  //@}
 
-  // sets the type of the node (0:normal, 1: selected filter, 2: selected view)
-  int setOutlineStyle(int style);
-  int getOutlineStyle() { return this->outlineStyle; };
+  /**
+   * Increment verbosity of the displayed properties of the node. If we try to increment
+   * past the last level of verbosity we go back to the first level.
+   * Update the style accordingly and return the new verbosity level.
+   */
+  int incrementVerbosity();
 
-  int setBackgroundStyle(int style);
-  int getBackgroundStyle() { return this->backgroundStyle; };
+  //@{
+  /**
+   * Get/Set the type of the node. It can be either NORMAL (unselected), SELECTED_FILTER
+   * (for the active source) or SELECTED_VIEW (for the active view). Update the style accordingly.
+   */
+  void setOutlineStyle(OutlineStyle style);
+  int getOutlineStyle() { return static_cast<int>(this->outlineStyle); };
+  //@}
 
+  //@{
+  /**
+   * Get/Set the background style for this node, wether the filter is dirty or not.
+   * Update the style accordingly.
+   * 0: BackgroundStyle::NORMAL, 1: BackgroundStyle::DIRTY
+   */
+  void setBackgroundStyle(BackgroundStyle style);
+  int getBackgroundStyle() { return static_cast<int>(this->backgroundStyle); };
+  //@}
+
+  /**
+   * Get the bounding box of the node, which includes the border width and the label.
+   */
   QRectF boundingRect() const override;
 
 signals:
@@ -105,18 +182,24 @@ protected:
   void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget) override;
 
 private:
+  /**
+   * Internal constructor used by the public ones for initializing the node regardless
+   * of what the proxy represents. Initialize things such as the dimensions, the label, etc.
+   */
+  pqNodeEditorNode(QGraphicsScene* scene, pqProxy* proxy, QGraphicsItem* parent = nullptr);
+
   QGraphicsScene* scene;
   pqProxy* proxy;
-  pqProxyWidget* proxyProperties;
+  pqProxyWidget* proxyProperties = nullptr;
   QWidget* widgetContainer;
   QGraphicsTextItem* label;
 
   std::vector<pqNodeEditorPort*> iPorts;
   std::vector<pqNodeEditorPort*> oPorts;
 
-  int outlineStyle{ 0 };    // 0: normal, 1: selected filter, 2: selected view
-  int backgroundStyle{ 0 }; // 0: normal, 1: modified
-  int verbosity{ 0 };       // 0: empty, 1: non-advanced, 2: advanced
+  OutlineStyle outlineStyle{ OutlineStyle::NORMAL };
+  BackgroundStyle backgroundStyle{ BackgroundStyle::NORMAL };
+  Verbosity verbosity{ Verbosity::EMPTY };
 
   int labelHeight{ 30 };
 

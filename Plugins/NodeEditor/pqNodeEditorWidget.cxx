@@ -1,32 +1,23 @@
 /*=========================================================================
-Copyright (c) 2021, Jonas Lukasczyk
-All rights reserved.
 
-Redistribution and use in source and binary forms, with or without
-modification, are permitted provided that the following conditions are met:
+  Program:   ParaView
+  Plugin:    NodeEditor
 
-1. Redistributions of source code must retain the above copyright notice, this
-   list of conditions and the following disclaimer.
+  Copyright (c) Kitware, Inc.
+  All rights reserved.
+  See Copyright.txt or http://www.paraview.org/HTML/Copyright.html for details.
 
-2. Redistributions in binary form must reproduce the above copyright notice,
-   this list of conditions and the following disclaimer in the documentation
-   and/or other materials provided with the distribution.
+     This software is distributed WITHOUT ANY WARRANTY; without even
+     the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+     PURPOSE.  See the above copyright notice for more information.
 
-3. Neither the name of the copyright holder nor the names of its
-   contributors may be used to endorse or promote products derived from
-   this software without specific prior written permission.
-
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
-FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
-DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
-SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
-CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
-OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
+/*-------------------------------------------------------------------------
+  ParaViewPluginsNodeEditor - BSD 3-Clause License - Copyright (C) 2021 Jonas Lukasczyk
+
+  See the Copyright.txt file provided
+  with ParaViewPluginsNodeEditor for license information.
+-------------------------------------------------------------------------*/
 
 #include "pqNodeEditorWidget.h"
 
@@ -37,18 +28,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqNodeEditorUtils.h"
 #include "pqNodeEditorView.h"
 
-// qt includes
-#include <QAction>
-#include <QCheckBox>
-#include <QEvent>
-#include <QGraphicsSceneMouseEvent>
-#include <QGraphicsView>
-#include <QHBoxLayout>
-#include <QPushButton>
-#include <QSpacerItem>
-#include <QVBoxLayout>
-
-// paraview includes
 #include <pqActiveObjects.h>
 #include <pqApplicationCore.h>
 #include <pqOutputPort.h>
@@ -61,22 +40,26 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <pqUndoStack.h>
 #include <pqView.h>
 
+#include <vtkPVXMLElement.h>
 #include <vtkSMInputProperty.h>
 #include <vtkSMParaViewPipelineControllerWithRendering.h>
 #include <vtkSMProxy.h>
+#include <vtkSMProxyLocator.h>
 #include <vtkSMSourceProxy.h>
 #include <vtkSMTrace.h>
 #include <vtkSMViewProxy.h>
 
-// for state files
-#include <vtkPVXMLElement.h>
-#include <vtkSMProxyLocator.h>
+#include <QAction>
+#include <QCheckBox>
+#include <QEvent>
+#include <QGraphicsSceneMouseEvent>
+#include <QGraphicsView>
+#include <QHBoxLayout>
+#include <QPushButton>
+#include <QSpacerItem>
+#include <QVBoxLayout>
 
-// std include
 #include <iostream>
-
-// TODO
-#include <vtkSMPropertyIterator.h>
 
 // ----------------------------------------------------------------------------
 pqNodeEditorWidget::pqNodeEditorWidget(const QString& title, QWidget* parent)
@@ -97,7 +80,8 @@ pqNodeEditorWidget::pqNodeEditorWidget(const QString& title, QWidget* parent)
   this->view = new pqNodeEditorView(this->scene, this);
   this->view->setObjectName("viewNE");
   this->view->setDragMode(QGraphicsView::ScrollHandDrag);
-  this->view->setSceneRect(-10000, -10000, 30000, 30000);
+  const QRectF MAX_SCENE_SIZE{ -1e4, -1e4, 3e4, 3e4 };
+  this->view->setSceneRect(MAX_SCENE_SIZE);
   layout->addWidget(this->view);
 
   this->initializeActions();
@@ -115,38 +99,17 @@ pqNodeEditorWidget::pqNodeEditorWidget(QWidget* parent)
 }
 
 // ----------------------------------------------------------------------------
-pqNodeEditorWidget::~pqNodeEditorWidget() = default;
-
-// ----------------------------------------------------------------------------
 int pqNodeEditorWidget::apply()
 {
   auto nodes = this->nodeRegistry;
   for (auto it : nodes)
   {
-    auto proxy = dynamic_cast<pqPipelineSource*>(it.second->getProxy());
-    if (proxy)
+    auto source = dynamic_cast<pqPipelineSource*>(it.second->getProxy());
+    if (source)
     {
-      pqNodeEditorUtils::log("Apply Properties: " + pqNodeEditorUtils::getLabel(proxy));
       it.second->getProxyProperties()->apply();
-      proxy->setModifiedState(pqProxy::ModifiedState::UNMODIFIED);
-    }
-  }
-  for (auto it : nodes)
-  {
-    auto proxy = dynamic_cast<pqPipelineSource*>(it.second->getProxy());
-    if (proxy)
-    {
-      pqNodeEditorUtils::log("Update Pipeline: " + pqNodeEditorUtils::getLabel(proxy));
-      proxy->updatePipeline();
-    }
-  }
-  for (auto it : nodes)
-  {
-    auto proxy = dynamic_cast<pqView*>(it.second->getProxy());
-    if (proxy)
-    {
-      pqNodeEditorUtils::log("Update View: " + pqNodeEditorUtils::getLabel(proxy));
-      proxy->render();
+      source->setModifiedState(pqProxy::ModifiedState::UNMODIFIED);
+      source->updatePipeline();
     }
   }
 
@@ -193,7 +156,6 @@ int pqNodeEditorWidget::reset()
     auto proxy = dynamic_cast<pqPipelineSource*>(it.second->getProxy());
     if (proxy)
     {
-      pqNodeEditorUtils::log("Reset Properties: " + pqNodeEditorUtils::getLabel(proxy));
       it.second->getProxyProperties()->reset();
       proxy->setModifiedState(pqProxy::ModifiedState::UNMODIFIED);
     }
@@ -204,9 +166,10 @@ int pqNodeEditorWidget::reset()
 // ----------------------------------------------------------------------------
 int pqNodeEditorWidget::zoom()
 {
-  const int padding = 20;
-  auto viewPort = this->scene->getBoundingRect(this->nodeRegistry);
-  viewPort.adjust(-padding, -padding, padding, padding);
+  constexpr int PADDING = 20;
+
+  QRect viewPort = pqNodeEditorScene::getBoundingRect(this->nodeRegistry);
+  viewPort.adjust(-PADDING, -PADDING, PADDING, PADDING);
   this->view->fitInView(viewPort, Qt::KeepAspectRatio);
   return 1;
 }
@@ -224,13 +187,13 @@ int pqNodeEditorWidget::initializeActions()
   QObject::connect(this->actionZoom, &QAction::triggered, this, &pqNodeEditorWidget::zoom);
 
   this->actionLayout = new QAction(this);
-  QObject::connect(this->actionLayout, &QAction::triggered, this->scene, [=]() {
+  QObject::connect(this->actionLayout, &QAction::triggered, this->scene, [this]() {
     this->scene->computeLayout(this->nodeRegistry, this->edgeRegistry);
     return 1;
   });
 
   this->actionAutoLayout = new QAction(this);
-  QObject::connect(this->actionAutoLayout, &QAction::triggered, this->scene, [=]() {
+  QObject::connect(this->actionAutoLayout, &QAction::triggered, this->scene, [this]() {
     if (this->autoUpdateLayout)
     {
       this->actionLayout->trigger();
@@ -266,33 +229,20 @@ int pqNodeEditorWidget::createToolbar(QLayout* layout)
 
   addButton("Apply", this->actionApply);
   addButton("Reset", this->actionReset);
-
   addButton("Layout", this->actionLayout);
   {
     auto checkBox = new QCheckBox("Auto Layout");
     checkBox->setObjectName("autolayoutCheckbox");
     checkBox->setCheckState(this->autoUpdateLayout ? Qt::Checked : Qt::Unchecked);
-    this->connect(checkBox, &QCheckBox::stateChanged, this, [=](int state) {
+    this->connect(checkBox, &QCheckBox::stateChanged, this, [this](int state) {
       this->autoUpdateLayout = state;
       this->actionAutoLayout->trigger();
       return 1;
     });
     toolbarLayout->addWidget(checkBox);
   }
-
-  addButton("Zoom", actionZoom);
-
-  {
-    auto checkBox = new QCheckBox("Debug");
-    checkBox->setCheckState(pqNodeEditorUtils::CONSTS::DEBUG ? Qt::Checked : Qt::Unchecked);
-    this->connect(checkBox, &QCheckBox::stateChanged, this, [=](int state) {
-      pqNodeEditorUtils::CONSTS::DEBUG = state;
-      return 1;
-    });
-    toolbarLayout->addWidget(checkBox);
-  }
-
-  addButton("Collapse All", actionCollapseAllNodes);
+  addButton("Zoom", this->actionZoom);
+  addButton("Collapse All", this->actionCollapseAllNodes);
 
   // add spacer
   toolbarLayout->addItem(new QSpacerItem(0, 0, QSizePolicy::Expanding));
@@ -303,17 +253,13 @@ int pqNodeEditorWidget::createToolbar(QLayout* layout)
 // ----------------------------------------------------------------------------
 int pqNodeEditorWidget::attachServerManagerListeners()
 {
-
   // retrieve server manager model (used for listening to proxy events)
   auto appCore = pqApplicationCore::instance();
   auto smm = appCore->getServerManagerModel();
 
   // state loaded
-  this->connect(appCore, &pqApplicationCore::aboutToLoadState, this, [=](vtkPVXMLElement* root) {
-    // PV BUG: does not fire
-  });
   this->connect(appCore, &pqApplicationCore::stateLoaded, this,
-    [=](vtkPVXMLElement* root, vtkSMProxyLocator* locator) {
+    [this](vtkPVXMLElement* /*root*/, vtkSMProxyLocator* /*locator*/) {
       this->actionLayout->trigger();
       this->actionZoom->trigger();
     });
@@ -336,7 +282,7 @@ int pqNodeEditorWidget::attachServerManagerListeners()
   this->connect(smm,
     static_cast<void (pqServerManagerModel::*)(pqPipelineSource*, pqPipelineSource*, int)>(
                   &pqServerManagerModel::connectionRemoved),
-    this, [=](pqPipelineSource* source, pqPipelineSource* consumer, int srcOutputPort) {
+    this, [this](pqPipelineSource* /*source*/, pqPipelineSource* consumer, int /*oPort*/) {
       return this->updatePipelineEdges(consumer);
     });
 
@@ -344,7 +290,7 @@ int pqNodeEditorWidget::attachServerManagerListeners()
   this->connect(smm,
     static_cast<void (pqServerManagerModel::*)(pqPipelineSource*, pqPipelineSource*, int)>(
                   &pqServerManagerModel::connectionAdded),
-    this, [=](pqPipelineSource* source, pqPipelineSource* consumer, int srcOutputPort) {
+    this, [this](pqPipelineSource* /*source*/, pqPipelineSource* consumer, int /*oPort*/) {
       return this->updatePipelineEdges(consumer);
     });
 
@@ -359,7 +305,7 @@ int pqNodeEditorWidget::attachServerManagerListeners()
   this->connect(
     activeObjects, &pqActiveObjects::viewChanged, this, &pqNodeEditorWidget::updateActiveView);
 
-  // init node editor scene with exisiting views
+  // init node editor scene with existing views
   {
     for (auto proxy : smm->findItems<pqPipelineSource*>())
     {
@@ -381,34 +327,32 @@ int pqNodeEditorWidget::attachServerManagerListeners()
 // ----------------------------------------------------------------------------
 int pqNodeEditorWidget::updateActiveView()
 {
-  pqNodeEditorUtils::log("Update Active View");
-
-  auto view = pqActiveObjects::instance().activeView();
+  auto aView = pqActiveObjects::instance().activeView();
 
   for (auto it : this->nodeRegistry)
   {
     if (dynamic_cast<pqView*>(it.second->getProxy()))
     {
-      it.second->setOutlineStyle(0);
+      it.second->setOutlineStyle(pqNodeEditorNode::OutlineStyle::NORMAL);
     }
     else
     {
-      it.second->getProxyProperties()->setView(view);
+      it.second->getProxyProperties()->setView(aView);
     }
   }
 
-  if (!view)
+  if (!aView)
   {
     return 1;
   }
 
-  auto nodeIt = this->nodeRegistry.find(pqNodeEditorUtils::getID(view));
+  auto nodeIt = this->nodeRegistry.find(pqNodeEditorUtils::getID(aView));
   if (nodeIt == this->nodeRegistry.end())
   {
     return 1;
   }
 
-  nodeIt->second->setOutlineStyle(2);
+  nodeIt->second->setOutlineStyle(pqNodeEditorNode::OutlineStyle::SELECTED_VIEW);
 
   return 1;
 }
@@ -416,8 +360,6 @@ int pqNodeEditorWidget::updateActiveView()
 // ----------------------------------------------------------------------------
 int pqNodeEditorWidget::updateActiveSourcesAndPorts()
 {
-  pqNodeEditorUtils::log("Selection Changed:");
-
   // unselect all nodes
   for (auto it : this->nodeRegistry)
   {
@@ -426,10 +368,10 @@ int pqNodeEditorWidget::updateActiveSourcesAndPorts()
       continue;
     }
 
-    it.second->setOutlineStyle(0);
+    it.second->setOutlineStyle(pqNodeEditorNode::OutlineStyle::NORMAL);
     for (auto oPort : it.second->getOutputPorts())
     {
-      oPort->setStyle(0);
+      oPort->setStyle(pqNodeEditorPort::NodeStyle::NORMAL);
     }
   }
 
@@ -440,33 +382,31 @@ int pqNodeEditorWidget::updateActiveSourcesAndPorts()
   {
     if (auto source = dynamic_cast<pqPipelineSource*>(it))
     {
-      pqNodeEditorUtils::log("    -> source/filter");
-
       auto nodeIt = this->nodeRegistry.find(pqNodeEditorUtils::getID(source));
       if (nodeIt == this->nodeRegistry.end())
       {
         continue;
       }
 
-      nodeIt->second->setOutlineStyle(1);
+      nodeIt->second->setOutlineStyle(pqNodeEditorNode::OutlineStyle::SELECTED_FILTER);
 
       auto oPorts = nodeIt->second->getOutputPorts();
-      if (oPorts.size() > 0)
+      if (!oPorts.empty())
       {
-        oPorts[0]->setStyle(1);
+        oPorts[0]->setStyle(pqNodeEditorPort::NodeStyle::SELECTED);
       }
     }
     else if (auto port = dynamic_cast<pqOutputPort*>(it))
     {
-      pqNodeEditorUtils::log("    -> port");
       auto nodeIt = this->nodeRegistry.find(pqNodeEditorUtils::getID(port->getSource()));
       if (nodeIt == this->nodeRegistry.end())
       {
         continue;
       }
 
-      nodeIt->second->setOutlineStyle(1);
-      nodeIt->second->getOutputPorts()[port->getPortNumber()]->setStyle(1);
+      nodeIt->second->setOutlineStyle(pqNodeEditorNode::OutlineStyle::SELECTED_FILTER);
+      nodeIt->second->getOutputPorts()[port->getPortNumber()]->setStyle(
+        pqNodeEditorPort::NodeStyle::SELECTED);
     }
   }
 
@@ -476,21 +416,22 @@ int pqNodeEditorWidget::updateActiveSourcesAndPorts()
 // ----------------------------------------------------------------------------
 pqNodeEditorNode* pqNodeEditorWidget::createNode(pqProxy* proxy)
 {
-  pqNodeEditorUtils::log("Proxy Added: " + pqNodeEditorUtils::getLabel(proxy));
+  constexpr int DEFAULT_X_OFFSET = 350;
 
   auto id = pqNodeEditorUtils::getID(proxy);
 
   // insert new node into registry
-  auto proxyAsView = dynamic_cast<pqView*>(proxy);
-  auto proxyAsSource = dynamic_cast<pqPipelineSource*>(proxy);
+  auto* proxyAsView = dynamic_cast<pqView*>(proxy);
+  auto* proxyAsSource = dynamic_cast<pqPipelineSource*>(proxy);
 
-  auto node = proxyAsView ? new pqNodeEditorNode(this->scene, proxyAsView) : proxyAsSource
+  auto* node = proxyAsView ? new pqNodeEditorNode(this->scene, proxyAsView) : proxyAsSource
       ? new pqNodeEditorNode(this->scene, proxyAsSource)
       : nullptr;
 
   if (!node)
   {
-    pqNodeEditorUtils::log("ERROR: Unable to create node for pqProxy.", true);
+    vtkGenericWarningMacro(
+      "NodeEditor: Unable to create node for proxy " << pqNodeEditorUtils::getLabel(proxy));
     return nullptr;
   }
 
@@ -499,14 +440,14 @@ pqNodeEditorNode* pqNodeEditorWidget::createNode(pqProxy* proxy)
 
   QObject::connect(node, &pqNodeEditorNode::nodeResized, this->actionAutoLayout, &QAction::trigger);
 
-  auto activeProxy = pqActiveObjects::instance().activeSource();
+  pqPipelineSource* activeProxy = pqActiveObjects::instance().activeSource();
   if (activeProxy)
   {
     auto prevNodeIt = this->nodeRegistry.find(pqNodeEditorUtils::getID(activeProxy));
     if (prevNodeIt != this->nodeRegistry.end())
     {
-      auto prevPos = prevNodeIt->second->pos();
-      node->setPos(prevPos.x() + 350, prevPos.y());
+      QPointF prevPos = prevNodeIt->second->pos();
+      node->setPos(prevPos.x() + DEFAULT_X_OFFSET, prevPos.y());
     }
   }
 
@@ -522,8 +463,8 @@ int pqNodeEditorWidget::createNodeForSource(pqPipelineSource* proxy)
 
   // update proxy selection
   {
-    node->getLabel()->installEventFilter(
-      pqNodeEditorUtils::createInterceptor(node->getLabel(), [=](QObject* object, QEvent* event) {
+    node->getLabel()->installEventFilter(pqNodeEditorUtils::createInterceptor(
+      node->getLabel(), [=](QObject* /*object*/, QEvent* event) {
         if (event->type() != QEvent::GraphicsSceneMousePress)
         {
           return false;
@@ -531,7 +472,7 @@ int pqNodeEditorWidget::createNodeForSource(pqPipelineSource* proxy)
         auto eventMDC = static_cast<QGraphicsSceneMouseEvent*>(event);
 
         // double left click
-        if (eventMDC->button() == 1 && pqNodeEditorUtils::isDoubleClick())
+        if (eventMDC->button() == Qt::MouseButton::LeftButton && pqNodeEditorUtils::isDoubleClick())
         {
           auto activeObjects = &pqActiveObjects::instance();
 
@@ -545,26 +486,15 @@ int pqNodeEditorWidget::createNodeForSource(pqPipelineSource* proxy)
           else
           {
             activeObjects->setActiveSource(proxy);
-            // TODO
-            // auto temp = proxy->getProxy();
-            // temp->InvokeCommand("ShowWidget");
-
-            // auto it = temp->NewPropertyIterator();
-            // it->SetTraverseSubProxies(1);
-            // it->Begin();
-            // while(!it->IsAtEnd()){
-            //     it->GetProxy()->InvokeCommand("ShowWidget");
-            //     it->Next();
-            // }
           }
 
           return false;
         }
 
         // single right click
-        if (eventMDC->button() == 2)
+        if (eventMDC->button() == Qt::MouseButton::RightButton)
         {
-          node->setVerbosity(node->getVerbosity() + 1);
+          node->incrementVerbosity();
           return false;
         }
 
@@ -579,7 +509,7 @@ int pqNodeEditorWidget::createNodeForSource(pqPipelineSource* proxy)
     {
       auto nodePort = node->getInputPorts()[idx];
       nodePort->getLabel()->installEventFilter(pqNodeEditorUtils::createInterceptor(
-        nodePort->getLabel(), [=](QObject* object, QEvent* event) {
+        nodePort->getLabel(), [=](QObject* /*object*/, QEvent* event) {
           if (event->type() != QEvent::GraphicsSceneMousePress)
           {
             return false;
@@ -588,7 +518,8 @@ int pqNodeEditorWidget::createNodeForSource(pqPipelineSource* proxy)
           auto eventMDC = static_cast<QGraphicsSceneMouseEvent*>(event);
           if (pqNodeEditorUtils::isDoubleClick())
           {
-            this->setInput(proxy, idx, eventMDC->modifiers() == Qt::ControlModifier);
+            this->setInput(
+              proxy, static_cast<int>(idx), eventMDC->modifiers() == Qt::ControlModifier);
           }
 
           return false;
@@ -602,7 +533,7 @@ int pqNodeEditorWidget::createNodeForSource(pqPipelineSource* proxy)
     {
       auto nodePort = node->getOutputPorts()[idx];
       nodePort->getLabel()->installEventFilter(pqNodeEditorUtils::createInterceptor(
-        nodePort->getLabel(), [=](QObject* object, QEvent* event) {
+        nodePort->getLabel(), [=](QObject* /*object*/, QEvent* event) {
           if (event->type() != QEvent::GraphicsSceneMousePress)
           {
             return false;
@@ -610,10 +541,11 @@ int pqNodeEditorWidget::createNodeForSource(pqPipelineSource* proxy)
 
           auto eventMDC = static_cast<QGraphicsSceneMouseEvent*>(event);
 
-          auto portProxy = proxy->getOutputPort(idx);
+          auto portProxy = proxy->getOutputPort(static_cast<int>(idx));
 
           // double left click
-          if (eventMDC->button() == 1 && pqNodeEditorUtils::isDoubleClick())
+          if (eventMDC->button() == Qt::MouseButton::LeftButton &&
+            pqNodeEditorUtils::isDoubleClick())
           {
             auto activeObjects = &pqActiveObjects::instance();
 
@@ -633,18 +565,16 @@ int pqNodeEditorWidget::createNodeForSource(pqPipelineSource* proxy)
           }
 
           // toggle visibility
-          if (eventMDC->button() == 1 && eventMDC->modifiers() & Qt::ShiftModifier)
+          if (eventMDC->button() == Qt::MouseButton::LeftButton &&
+            eventMDC->modifiers() & Qt::ShiftModifier)
           {
-            pqNodeEditorUtils::log("Change Visibility of Port:");
-            pqNodeEditorUtils::log("    " + std::to_string(idx));
-
             // exclusive
             if (eventMDC->modifiers() & Qt::ControlModifier)
             {
               this->hideAllInActiveView();
             }
 
-            this->toggleInActiveView(proxy->getOutputPort(idx));
+            this->toggleInActiveView(proxy->getOutputPort(static_cast<int>(idx)));
 
             return true;
           }
@@ -664,11 +594,13 @@ int pqNodeEditorWidget::createNodeForView(pqView* proxy)
 
   // update representation link
   QObject::connect(proxy, &pqView::representationVisibilityChanged, node,
-    [=](pqRepresentation* rep, bool visible) { return this->updateVisibilityEdges(proxy); });
+    [=](pqRepresentation* /*rep*/, bool /*visible*/) {
+      return this->updateVisibilityEdges(proxy);
+    });
 
   // update proxy selection
   node->getLabel()->installEventFilter(
-    pqNodeEditorUtils::createInterceptor(node->getLabel(), [=](QObject* object, QEvent* event) {
+    pqNodeEditorUtils::createInterceptor(node->getLabel(), [=](QObject* /*object*/, QEvent* event) {
       if (event->type() != QEvent::GraphicsSceneMousePress)
       {
         return false;
@@ -677,15 +609,15 @@ int pqNodeEditorWidget::createNodeForView(pqView* proxy)
       auto eventMDC = static_cast<QGraphicsSceneMouseEvent*>(event);
 
       // double left click
-      if (eventMDC->button() == 1 && pqNodeEditorUtils::isDoubleClick())
+      if (eventMDC->button() == Qt::MouseButton::LeftButton && pqNodeEditorUtils::isDoubleClick())
       {
         pqActiveObjects::instance().setActiveView(proxy);
       }
 
       // single right click
-      if (eventMDC->button() == 2)
+      if (eventMDC->button() == Qt::MouseButton::RightButton)
       {
-        node->setVerbosity(node->getVerbosity() + 1);
+        node->incrementVerbosity();
         return false;
       }
 
@@ -716,13 +648,11 @@ int pqNodeEditorWidget::removeIncomingEdges(pqProxy* proxy)
 // ----------------------------------------------------------------------------
 int pqNodeEditorWidget::removeNode(pqProxy* proxy)
 {
-  pqNodeEditorUtils::log("Proxy Removed: " + pqNodeEditorUtils::getLabel(proxy));
-
   // remove all visibility edges
   auto smm = pqApplicationCore::instance()->getServerManagerModel();
-  for (auto view : smm->findItems<pqView*>())
+  for (auto cview : smm->findItems<pqView*>())
   {
-    this->removeIncomingEdges(view);
+    this->removeIncomingEdges(cview);
   }
 
   // get id
@@ -753,9 +683,9 @@ int pqNodeEditorWidget::removeNode(pqProxy* proxy)
   this->nodeRegistry.erase(proxyId);
 
   // update visibility edges
-  for (auto view : smm->findItems<pqView*>())
+  for (auto cview : smm->findItems<pqView*>())
   {
-    this->updateVisibilityEdges(view);
+    this->updateVisibilityEdges(cview);
   }
 
   this->actionAutoLayout->trigger();
@@ -766,17 +696,6 @@ int pqNodeEditorWidget::removeNode(pqProxy* proxy)
 // ----------------------------------------------------------------------------
 int pqNodeEditorWidget::setInput(pqPipelineSource* consumer, int idx, bool clear)
 {
-  if (clear)
-  {
-    pqNodeEditorUtils::log(
-      "Clear Input: " + pqNodeEditorUtils::getLabel(consumer) + "[" + std::to_string(idx) + "]");
-  }
-  else
-  {
-    pqNodeEditorUtils::log("Set Active Ports as Input: " + pqNodeEditorUtils::getLabel(consumer) +
-      "[" + std::to_string(idx) + "]");
-  }
-
   auto consumerAsFilter = dynamic_cast<pqPipelineFilter*>(consumer);
   if (!consumerAsFilter)
   {
@@ -784,7 +703,6 @@ int pqNodeEditorWidget::setInput(pqPipelineSource* consumer, int idx, bool clear
   }
 
   BEGIN_UNDO_SET(QString("Change Input for %1").arg(consumerAsFilter->getSMName()));
-  SM_SCOPED_TRACE(PropertiesModified).arg("proxy", consumerAsFilter->getProxy());
 
   std::vector<vtkSMProxy*> inputPtrs;
   std::vector<unsigned int> inputPorts;
@@ -828,13 +746,13 @@ int pqNodeEditorWidget::setInput(pqPipelineSource* consumer, int idx, bool clear
 // ----------------------------------------------------------------------------
 int pqNodeEditorWidget::toggleInActiveView(pqOutputPort* port)
 {
-  auto view = pqActiveObjects::instance().activeView();
-  if (!view)
+  auto aView = pqActiveObjects::instance().activeView();
+  if (!aView)
   {
     return 0;
   }
 
-  auto viewSMProxy = static_cast<vtkSMViewProxy*>(view->getProxy());
+  auto viewSMProxy = static_cast<vtkSMViewProxy*>(aView->getProxy());
   vtkNew<vtkSMParaViewPipelineControllerWithRendering> controller;
 
   auto state =
@@ -842,7 +760,7 @@ int pqNodeEditorWidget::toggleInActiveView(pqOutputPort* port)
 
   controller->SetVisibility(port->getSourceProxy(), port->getPortNumber(), viewSMProxy, !state);
 
-  view->render();
+  aView->render();
 
   return 1;
 };
@@ -850,13 +768,13 @@ int pqNodeEditorWidget::toggleInActiveView(pqOutputPort* port)
 // ----------------------------------------------------------------------------
 int pqNodeEditorWidget::hideAllInActiveView()
 {
-  auto view = pqActiveObjects::instance().activeView();
-  if (!view)
+  auto aView = pqActiveObjects::instance().activeView();
+  if (!aView)
   {
     return 0;
   }
 
-  auto viewSMProxy = static_cast<vtkSMViewProxy*>(view->getProxy());
+  auto viewSMProxy = static_cast<vtkSMViewProxy*>(aView->getProxy());
   vtkNew<vtkSMParaViewPipelineControllerWithRendering> controller;
 
   for (auto nodeIt : this->nodeRegistry)
@@ -866,12 +784,12 @@ int pqNodeEditorWidget::hideAllInActiveView()
     {
       for (size_t jdx = 0; jdx < proxy->GetNumberOfOutputPorts(); jdx++)
       {
-        controller->SetVisibility(proxy, jdx, viewSMProxy, false);
+        controller->SetVisibility(proxy, static_cast<int>(jdx), viewSMProxy, false);
       }
     }
   }
 
-  view->render();
+  aView->render();
 
   return 1;
 };
@@ -881,7 +799,7 @@ int pqNodeEditorWidget::collapseAllNodes()
 {
   for (auto nodeIt : this->nodeRegistry)
   {
-    nodeIt.second->setVerbosity(0);
+    nodeIt.second->setVerbosity(pqNodeEditorNode::Verbosity::EMPTY);
   }
 
   return 1;
@@ -890,9 +808,6 @@ int pqNodeEditorWidget::collapseAllNodes()
 // ----------------------------------------------------------------------------
 int pqNodeEditorWidget::updateVisibilityEdges(pqView* proxy)
 {
-  pqNodeEditorUtils::log(
-    "Updating Visibility Pipeline Edges: " + pqNodeEditorUtils::getLabel(proxy));
-
   this->removeIncomingEdges(proxy);
 
   auto viewEdgesIt = this->edgeRegistry.find(pqNodeEditorUtils::getID(proxy));
@@ -929,8 +844,8 @@ int pqNodeEditorWidget::updateVisibilityEdges(pqView* proxy)
     }
 
     // create edge
-    viewEdgesIt->second.push_back(new pqNodeEditorEdge(
-      this->scene, producerIt->second, producerPort->getPortNumber(), viewIt->second, 0, 1));
+    viewEdgesIt->second.push_back(new pqNodeEditorEdge(this->scene, producerIt->second,
+      producerPort->getPortNumber(), viewIt->second, 0, pqNodeEditorEdge::EdgeType::VIEW));
   }
 
   this->actionAutoLayout->trigger();
@@ -941,9 +856,6 @@ int pqNodeEditorWidget::updateVisibilityEdges(pqView* proxy)
 // ----------------------------------------------------------------------------
 int pqNodeEditorWidget::updatePipelineEdges(pqPipelineSource* consumer)
 {
-  pqNodeEditorUtils::log(
-    "Updating Incoming Pipeline Edges: " + pqNodeEditorUtils::getLabel(consumer));
-
   // check if consumer is actually a filter
   auto consumerAsFilter = dynamic_cast<pqPipelineFilter*>(consumer);
   if (!consumerAsFilter)

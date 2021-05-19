@@ -1,3 +1,6 @@
+list(INSERT CMAKE_MODULE_PATH 0
+  "${CMAKE_CURRENT_SOURCE_DIR}/CMake")
+
 set(interfaces)
 set(sources)
 
@@ -34,76 +37,35 @@ if (PARAVIEW_USE_QT)
     UI_INTERFACES ${interfaces}
     SOURCES ${sources})
 
-  # START_FIND_GRAPHVIZ
-  find_path(GRAPHVIZ_INCLUDE_DIR
-    NAMES
-      graphviz/cgraph.h
-    HINTS
-      ${_GRAPHVIZ_INCLUDE_DIR}
-      )
-  mark_as_advanced(GRAPHVIZ_INCLUDE_DIR)
+  find_package(GRAPHVIZ QUIET)
 
-  find_library(GRAPHVIZ_CDT_LIBRARY
-    NAMES
-      cdt
-    HINTS
-      ${_GRAPHVIZ_LIBRARY_DIR}
-      )
-  mark_as_advanced(GRAPHVIZ_CDT_LIBRARY)
+  if(GRAPHVIZ_FOUND)
+    message(STATUS "NodeEditor Plugin: GraphViz found, auto layout enabled")
 
-  find_library(GRAPHVIZ_GVC_LIBRARY
-    NAMES
-      gvc
-    HINTS
-      ${_GRAPHVIZ_LIBRARY_DIR}
-      )
-  mark_as_advanced(GRAPHVIZ_GVC_LIBRARY)
+    target_include_directories(NodeEditor
+      PRIVATE
+        ${GRAPHVIZ_INCLUDE_DIR}
+    )
 
-  find_library(GRAPHVIZ_CGRAPH_LIBRARY
-    NAMES
-      cgraph
-    HINTS
-      ${_GRAPHVIZ_LIBRARY_DIR}
-      )
-  mark_as_advanced(GRAPHVIZ_CGRAPH_LIBRARY)
+    target_link_libraries(NodeEditor
+      PRIVATE
+        ${GRAPHVIZ_CDT_LIBRARY}
+        ${GRAPHVIZ_GVC_LIBRARY}
+        ${GRAPHVIZ_CGRAPH_LIBRARY}
+        ${GRAPHVIZ_PATHPLAN_LIBRARY}
+    )
 
-  find_library(GRAPHVIZ_PATHPLAN_LIBRARY
-    NAMES
-      pathplan
-    HINTS
-      ${_GRAPHVIZ_LIBRARY_DIR}
-      )
-  mark_as_advanced(GRAPHVIZ_PATHPLAN_LIBRARY)
+    target_compile_definitions(NodeEditor
+      PRIVATE
+        NodeEditor_ENABLE_GRAPHVIZ
+    )
 
-  if(GRAPHVIZ_INCLUDE_DIR
-      AND GRAPHVIZ_CDT_LIBRARY
-      AND GRAPHVIZ_GVC_LIBRARY
-      AND GRAPHVIZ_CGRAPH_LIBRARY
-      AND GRAPHVIZ_PATHPLAN_LIBRARY
-      )
-    set(NodeEditor_ENABLE_GRAPHVIZ "Enable GraphViz Support" ON INTERNAL)
-    message(STATUS "NodeEditor Plugin: GraphViz found")
   else()
-    set(NodeEditor_ENABLE_GRAPHVIZ "Enable GraphViz Support" OFF INTERNAL)
-    message(STATUS "NodeEditor Plugin: GraphViz NOT FOUND!")
+    message(STATUS "NodeEditor Plugin: Graphviz not found, auto layout disabled")
   endif()
-
-  target_compile_definitions(NodeEditor
-    PUBLIC
-      NodeEditor_ENABLE_GRAPHVIZ
-  )
-
-  target_include_directories(NodeEditor
-    PUBLIC
-      ${GRAPHVIZ_INCLUDE_DIR}
-  )
 
   target_link_libraries(NodeEditor
     PRIVATE
-      ${GRAPHVIZ_CDT_LIBRARY}
-      ${GRAPHVIZ_GVC_LIBRARY}
-      ${GRAPHVIZ_CGRAPH_LIBRARY}
-      ${GRAPHVIZ_PATHPLAN_LIBRARY}
       ParaView::RemotingViews
       ParaView::pqApplicationComponents
   )

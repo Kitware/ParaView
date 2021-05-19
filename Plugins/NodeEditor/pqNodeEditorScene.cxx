@@ -1,32 +1,23 @@
 /*=========================================================================
-Copyright (c) 2021, Jonas Lukasczyk
-All rights reserved.
 
-Redistribution and use in source and binary forms, with or without
-modification, are permitted provided that the following conditions are met:
+  Program:   ParaView
+  Plugin:    NodeEditor
 
-1. Redistributions of source code must retain the above copyright notice, this
-   list of conditions and the following disclaimer.
+  Copyright (c) Kitware, Inc.
+  All rights reserved.
+  See Copyright.txt or http://www.paraview.org/HTML/Copyright.html for details.
 
-2. Redistributions in binary form must reproduce the above copyright notice,
-   this list of conditions and the following disclaimer in the documentation
-   and/or other materials provided with the distribution.
+     This software is distributed WITHOUT ANY WARRANTY; without even
+     the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+     PURPOSE.  See the above copyright notice for more information.
 
-3. Neither the name of the copyright holder nor the names of its
-   contributors may be used to endorse or promote products derived from
-   this software without specific prior written permission.
-
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
-FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
-DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
-SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
-CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
-OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
+/*-------------------------------------------------------------------------
+  ParaViewPluginsNodeEditor - BSD 3-Clause License - Copyright (C) 2021 Jonas Lukasczyk
+
+  See the Copyright.txt file provided
+  with ParaViewPluginsNodeEditor for license information.
+-------------------------------------------------------------------------*/
 
 #include "pqNodeEditorScene.h"
 
@@ -34,18 +25,17 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqNodeEditorNode.h"
 #include "pqNodeEditorUtils.h"
 
-// qt includes
-#include <QPainter>
-
-// paraview/vtk includes
 #include <pqPipelineSource.h>
 #include <pqView.h>
 
-// std includes
+#include <vtkLogger.h>
+
+#include <QPainter>
+
 #include <limits>
 #include <sstream>
 
-#if NodeEditor_ENABLE_GRAPHVIZ
+#ifdef NodeEditor_ENABLE_GRAPHVIZ
 #include <graphviz/cgraph.h>
 #include <graphviz/gvc.h>
 #endif // NodeEditor_ENABLE_GRAPHVIZ
@@ -57,15 +47,12 @@ pqNodeEditorScene::pqNodeEditorScene(QObject* parent)
 }
 
 // ----------------------------------------------------------------------------
-pqNodeEditorScene::~pqNodeEditorScene() = default;
-
-// ----------------------------------------------------------------------------
-int pqNodeEditorScene::computeLayout(std::unordered_map<int, pqNodeEditorNode*>& nodes,
+int pqNodeEditorScene::computeLayout(const std::unordered_map<int, pqNodeEditorNode*>& nodes,
   std::unordered_map<int, std::vector<pqNodeEditorEdge*> >& edges)
 {
-  pqNodeEditorUtils::log("Computing Graph Layout");
-
-#if NodeEditor_ENABLE_GRAPHVIZ
+#ifdef NodeEditor_ENABLE_GRAPHVIZ
+  // Scale factor between graphviz and Qt coordinates
+  constexpr double GRAPHVIZ_SCALE_FACTOR = 100.0;
 
   // compute dot string
   qreal maxHeight = 0.0;
@@ -76,40 +63,46 @@ int pqNodeEditorScene::computeLayout(std::unordered_map<int, pqNodeEditorNode*>&
     std::stringstream nodeString;
     std::stringstream edgeString;
 
-    for (auto it : nodes)
+    for (const auto& it : nodes)
     {
-      auto proxyAsView = dynamic_cast<pqView*>(it.second->getProxy());
-      if (proxyAsView)
+      pqProxy* proxy = it.second->getProxy();
+      int proxyId = pqNodeEditorUtils::getID(proxy);
+      if (dynamic_cast<pqView*>(proxy) != nullptr)
       {
         continue;
       }
 
-      const auto& b = it.second->boundingRect();
-      qreal width = b.width() / 100.0;
-      qreal height = b.height() / 100.0;
+      const QRectF& b = it.second->boundingRect();
+      qreal width = b.width() / GRAPHVIZ_SCALE_FACTOR;
+      qreal height = b.height() / GRAPHVIZ_SCALE_FACTOR;
       if (maxHeight < height)
       {
         maxHeight = height;
       }
 
-      nodeString << pqNodeEditorUtils::getID(it.second->getProxy()) << "["
+      // Construct the string representing a node in the text-based graphviz representation of the
+      // graph.
+      // See https://www.graphviz.org/pdf/libguide.pdf for more detail
+      nodeString << proxyId << "["
                  << "label=\"\","
                  << "shape=box,"
                  << "width=" << width << ","
                  << "height=" << height << ""
                  << "];\n";
 
-      for (auto edge : edges[pqNodeEditorUtils::getID(it.second->getProxy())])
+      // Construct the string representing all edges in the graph
+      // See https://www.graphviz.org/pdf/libguide.pdf for more detail
+      for (pqNodeEditorEdge* edge : edges[proxyId])
       {
         edgeString << pqNodeEditorUtils::getID(edge->getProducer()->getProxy()) << " -> "
                    << pqNodeEditorUtils::getID(edge->getConsumer()->getProxy()) << ";\n";
       }
     }
 
-    dotString += std::string("") + "digraph g {\n" +
-      "rankdir=LR;graph[pad=\"0\", ranksep=\"2\", nodesep=\"" + std::to_string(maxHeight) +
-      "\"];\n" + nodeString.str() + edgeString.str() + "\n}";
-    // pqNodeEditorUtils::log(dotString);
+    // describe the overall look of the graph. For example : rankdir=LR -> Left To Right layout
+    // See https://www.graphviz.org/pdf/libguide.pdf for more detail
+    dotString += "digraph g {\nrankdir=LR;graph[pad=\"0\", ranksep=\"2\", nodesep=\"" +
+      std::to_string(maxHeight) + "\"];\n" + nodeString.str() + edgeString.str() + "\n}";
   }
 
   std::vector<qreal> coords(2 * nodes.size(), 0.0);
@@ -117,18 +110,20 @@ int pqNodeEditorScene::computeLayout(std::unordered_map<int, pqNodeEditorNode*>&
   {
     Agraph_t* G = agmemread(dotString.data());
     GVC_t* gvc = gvContext();
-    gvLayout(gvc, G, "dot");
+    if (!G || !gvc || gvLayout(gvc, G, "dot"))
+    {
+      vtkLogF(ERROR, "[NodeEditorPlugin] Cannot intialize Graphviz context.");
+      return 0;
+    }
 
     // read layout
     int i = -2;
-    for (auto it : nodes)
+    for (const auto& it : nodes)
     {
       i += 2;
 
-      auto proxy = it.second->getProxy();
-
-      auto proxyAsView = dynamic_cast<pqView*>(proxy);
-      if (proxyAsView)
+      pqProxy* proxy = it.second->getProxy();
+      if (dynamic_cast<pqView*>(proxy) != nullptr)
       {
         continue;
       }
@@ -155,20 +150,23 @@ int pqNodeEditorScene::computeLayout(std::unordered_map<int, pqNodeEditorNode*>&
     }
 
     // free memory
-    gvFreeLayout(gvc, G);
-    agclose(G);
-    gvFreeContext(gvc);
+    int status = gvFreeLayout(gvc, G);
+    status += agclose(G);
+    status += gvFreeContext(gvc);
+    if (status)
+    {
+      vtkLogF(WARNING, "Error when freeing Graphviz ressources.");
+    }
   }
 
   // set positions
   {
     int i = -2;
-    for (auto it : nodes)
+    for (const auto& it : nodes)
     {
       i += 2;
 
-      auto proxyAsView = dynamic_cast<pqView*>(it.second->getProxy());
-      if (proxyAsView)
+      if (dynamic_cast<pqView*>(it.second->getProxy()) != nullptr)
       {
         continue;
       }
@@ -179,9 +177,9 @@ int pqNodeEditorScene::computeLayout(std::unordered_map<int, pqNodeEditorNode*>&
 
   // compute initial x position for all views
   std::vector<std::pair<pqNodeEditorNode*, qreal> > viewXMap;
-  for (auto it : nodes)
+  for (const auto& it : nodes)
   {
-    auto proxyAsView = dynamic_cast<pqView*>(it.second->getProxy());
+    auto* proxyAsView = dynamic_cast<pqView*>(it.second->getProxy());
     if (!proxyAsView)
     {
       continue;
@@ -194,7 +192,7 @@ int pqNodeEditorScene::computeLayout(std::unordered_map<int, pqNodeEditorNode*>&
       int nEdges = edgesIt->second.size();
       if (nEdges > 0)
       {
-        for (auto edge : edgesIt->second)
+        for (pqNodeEditorEdge* edge : edgesIt->second)
         {
           avgX += edge->getProducer()->pos().x();
         }
@@ -213,7 +211,7 @@ int pqNodeEditorScene::computeLayout(std::unordered_map<int, pqNodeEditorNode*>&
 
   // make sure all views have enough space
   qreal lastX = 0.0;
-  for (auto it : viewXMap)
+  for (const auto& it : viewXMap)
   {
     const qreal width = it.first->boundingRect().width();
     qreal x = it.second;
@@ -221,29 +219,30 @@ int pqNodeEditorScene::computeLayout(std::unordered_map<int, pqNodeEditorNode*>&
     {
       x = lastX + width + 10.0;
     }
-    it.first->setPos(x, maxY + maxHeight * 100.0 + 10.0);
+    it.first->setPos(x, maxY + maxHeight * GRAPHVIZ_SCALE_FACTOR + 10.0);
     lastX = x;
   }
 
   return 1;
 #else  // NodeEditor_ENABLE_GRAPHVIZ
-  pqNodeEditorUtils::log("ERROR: GraphViz support disabled!", true);
+  (void)nodes;
+  (void)edges;
   return 0;
 #endif // NodeEditor_ENABLE_GRAPHVIZ
 }
 
 // ----------------------------------------------------------------------------
-QRect pqNodeEditorScene::getBoundingRect(std::unordered_map<int, pqNodeEditorNode*>& nodes)
+QRect pqNodeEditorScene::getBoundingRect(const std::unordered_map<int, pqNodeEditorNode*>& nodes)
 {
   int x0 = std::numeric_limits<int>::max();
   int x1 = std::numeric_limits<int>::min();
   int y0 = std::numeric_limits<int>::max();
   int y1 = std::numeric_limits<int>::min();
 
-  for (auto it : nodes)
+  for (const auto& it : nodes)
   {
-    auto p = it.second->pos();
-    auto b = it.second->boundingRect();
+    QPointF p = it.second->pos();
+    QRectF b = it.second->boundingRect();
     if (x0 > p.x() + b.left())
     {
       x0 = p.x() + b.left();
@@ -268,23 +267,23 @@ QRect pqNodeEditorScene::getBoundingRect(std::unordered_map<int, pqNodeEditorNod
 // ----------------------------------------------------------------------------
 void pqNodeEditorScene::drawBackground(QPainter* painter, const QRectF& rect)
 {
-  const int gridSize = 25;
+  constexpr int GRID_SIZE = 25;
 
-  qreal left = int(rect.left()) - (int(rect.left()) % gridSize);
-  qreal top = int(rect.top()) - (int(rect.top()) % gridSize);
+  qreal left = int(rect.left()) - (int(rect.left()) % GRID_SIZE);
+  qreal top = int(rect.top()) - (int(rect.top()) % GRID_SIZE);
 
   QVarLengthArray<QLineF, 100> lines;
 
-  for (qreal x = left; x < rect.right(); x += gridSize)
+  for (qreal x = left; x < rect.right(); x += GRID_SIZE)
   {
     lines.append(QLineF(x, rect.top(), x, rect.bottom()));
   }
-  for (qreal y = top; y < rect.bottom(); y += gridSize)
+  for (qreal y = top; y < rect.bottom(); y += GRID_SIZE)
   {
     lines.append(QLineF(rect.left(), y, rect.right(), y));
   }
 
-  painter->setRenderHints(QPainter::HighQualityAntialiasing);
+  painter->setRenderHints(QPainter::Antialiasing);
   painter->setPen(QColor(60, 60, 60));
   painter->drawLines(lines.data(), lines.size());
 }

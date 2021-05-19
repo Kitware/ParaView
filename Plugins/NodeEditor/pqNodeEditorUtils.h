@@ -1,88 +1,102 @@
 /*=========================================================================
-Copyright (c) 2021, Jonas Lukasczyk
-All rights reserved.
 
-Redistribution and use in source and binary forms, with or without
-modification, are permitted provided that the following conditions are met:
+  Program:   ParaView
+  Plugin:    NodeEditor
 
-1. Redistributions of source code must retain the above copyright notice, this
-   list of conditions and the following disclaimer.
+  Copyright (c) Kitware, Inc.
+  All rights reserved.
+  See Copyright.txt or http://www.paraview.org/HTML/Copyright.html for details.
 
-2. Redistributions in binary form must reproduce the above copyright notice,
-   this list of conditions and the following disclaimer in the documentation
-   and/or other materials provided with the distribution.
+     This software is distributed WITHOUT ANY WARRANTY; without even
+     the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+     PURPOSE.  See the above copyright notice for more information.
 
-3. Neither the name of the copyright holder nor the names of its
-   contributors may be used to endorse or promote products derived from
-   this software without specific prior written permission.
-
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
-FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
-DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
-SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
-CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
-OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
+/*-------------------------------------------------------------------------
+  ParaViewPluginsNodeEditor - BSD 3-Clause License - Copyright (C) 2021 Jonas Lukasczyk
+
+  See the Copyright.txt file provided
+  with ParaViewPluginsNodeEditor for license information.
+-------------------------------------------------------------------------*/
 
 #ifndef pqNodeEditorUtils_h
 #define pqNodeEditorUtils_h
 
+#include <QColor>
 #include <QObject>
 
-// forward declarations
-class QColor;
 class pqProxy;
 
 namespace pqNodeEditorUtils
 {
 namespace CONSTS
 {
-extern bool DEBUG;
-extern int NODE_WIDTH;
-extern int NODE_PADDING;
-extern int NODE_BORDER_WIDTH;
-extern int NODE_BORDER_RADIUS;
-extern int NODE_BR_PADDING;
-extern int NODE_DEFAULT_VERBOSITY;
-extern int EDGE_WIDTH;
-extern QColor COLOR_ORANGE;
-extern QColor COLOR_GREEN;
-extern double DOUBLE_CLICK_DELAY;
+constexpr int NODE_WIDTH = 300;
+constexpr int NODE_BORDER_WIDTH = 4;
+constexpr int NODE_BORDER_RADIUS = 6;
+constexpr int NODE_DEFAULT_VERBOSITY = 1;
+constexpr int NODE_FONT_SIZE = 13;
+constexpr int EDGE_WIDTH = 5;
+const QColor COLOR_SWEET_GREEN = QColor("#3fb55d");
+
+constexpr int NODE_LAYER = 1;
+constexpr int EDGE_LAYER = 2;
+constexpr int FOREGROUND_LAYER = 9;
+
+constexpr unsigned long DOUBLE_CLICK_DELAY = 2.5e8;
 };
 
 template <typename F>
-class Interceptor : public QObject
+/**
+ * Intercept all events from a particular QObject and process them using the
+ * given @c functor. This is usually used with the QObjects::installEventFilter()
+ * function.
+ */
+class Interceptor final : public QObject
 {
 public:
-  F functor;
+  /**
+   * Create an Interceptor that process all events of @c parent using @c functor.
+   */
   Interceptor(QObject* parent, F functor)
     : QObject(parent)
     , functor(functor)
   {
   }
-  ~Interceptor() {}
+  ~Interceptor() = default;
 
+protected:
+  /**
+   * Filters events if this object has been installed as an event filter for the watched object.
+   */
   bool eventFilter(QObject* object, QEvent* event) { return this->functor(object, event); }
+
+  F functor;
 };
 
+/**
+ * Create a new Interceptor instance.
+ */
 template <typename F>
 Interceptor<F>* createInterceptor(QObject* parent, F functor)
 {
   return new Interceptor<F>(parent, functor);
 };
 
-void log(std::string content, bool force = false);
 int getID(pqProxy* proxy);
+
 std::string getLabel(pqProxy* proxy);
 
-double getTimeDelta();
-double getTimeStamp();
-
+//@{
+/**
+ * Utility function for custom double click capabilities.
+ *
+ * XXX: One could investiguate if it's possible / worth it to use
+ * Qt capabilities for handling double click event in our case.
+ */
+unsigned long getTimeDelta();
 bool isDoubleClick();
+//@}
 };
 
 #endif // pqNodeEditorUtils_h

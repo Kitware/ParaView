@@ -1,32 +1,23 @@
 /*=========================================================================
-Copyright (c) 2021, Jonas Lukasczyk
-All rights reserved.
 
-Redistribution and use in source and binary forms, with or without
-modification, are permitted provided that the following conditions are met:
+  Program:   ParaView
+  Plugin:    NodeEditor
 
-1. Redistributions of source code must retain the above copyright notice, this
-   list of conditions and the following disclaimer.
+  Copyright (c) Kitware, Inc.
+  All rights reserved.
+  See Copyright.txt or http://www.paraview.org/HTML/Copyright.html for details.
 
-2. Redistributions in binary form must reproduce the above copyright notice,
-   this list of conditions and the following disclaimer in the documentation
-   and/or other materials provided with the distribution.
+     This software is distributed WITHOUT ANY WARRANTY; without even
+     the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+     PURPOSE.  See the above copyright notice for more information.
 
-3. Neither the name of the copyright holder nor the names of its
-   contributors may be used to endorse or promote products derived from
-   this software without specific prior written permission.
-
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
-FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
-DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
-SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
-CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
-OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
+/*-------------------------------------------------------------------------
+  ParaViewPluginsNodeEditor - BSD 3-Clause License - Copyright (C) 2021 Jonas Lukasczyk
+
+  See the Copyright.txt file provided
+  with ParaViewPluginsNodeEditor for license information.
+-------------------------------------------------------------------------*/
 
 #include "pqNodeEditorEdge.h"
 
@@ -47,10 +38,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // ----------------------------------------------------------------------------
 pqNodeEditorEdge::pqNodeEditorEdge(QGraphicsScene* scene, pqNodeEditorNode* producer,
-  int producerOutputPortIdx, pqNodeEditorNode* consumer, int consumerInputPortIdx, int type,
+  int producerOutputPortIdx, pqNodeEditorNode* consumer, int consumerInputPortIdx, EdgeType type,
   QGraphicsItem* parent)
-  : QObject()
-  , QGraphicsPathItem(parent)
+  : QGraphicsPathItem(parent)
   , scene(scene)
   , producer(producer)
   , producerOutputPortIdx(producerOutputPortIdx)
@@ -58,8 +48,6 @@ pqNodeEditorEdge::pqNodeEditorEdge(QGraphicsScene* scene, pqNodeEditorNode* prod
   , consumerInputPortIdx(consumerInputPortIdx)
   , type(type)
 {
-  pqNodeEditorUtils::log("  +pqNodeEditorEdge: " + this->toString());
-
   this->connect(
     this->producer, &pqNodeEditorNode::nodeMoved, this, &pqNodeEditorEdge::updatePoints);
   this->connect(
@@ -70,7 +58,8 @@ pqNodeEditorEdge::pqNodeEditorEdge(QGraphicsScene* scene, pqNodeEditorNode* prod
     this->consumer, &pqNodeEditorNode::nodeResized, this, &pqNodeEditorEdge::updatePoints);
 
   this->setAcceptedMouseButtons(Qt::NoButton);
-  this->setZValue(type > 0 ? 3 : 2);
+  this->setZValue(type != EdgeType::NORMAL ? pqNodeEditorUtils::CONSTS::FOREGROUND_LAYER
+                                           : pqNodeEditorUtils::CONSTS::EDGE_LAYER);
 
   this->updatePoints();
 
@@ -80,16 +69,14 @@ pqNodeEditorEdge::pqNodeEditorEdge(QGraphicsScene* scene, pqNodeEditorNode* prod
 // ----------------------------------------------------------------------------
 pqNodeEditorEdge::~pqNodeEditorEdge()
 {
-  pqNodeEditorUtils::log("  -pqNodeEditorEdge: " + this->toString());
   this->scene->removeItem(this);
 }
 
 // ----------------------------------------------------------------------------
-int pqNodeEditorEdge::setType(int type)
+void pqNodeEditorEdge::setType(EdgeType _type)
 {
-  this->type = type;
+  this->type = _type;
   this->update(this->boundingRect());
-  return this->type;
 }
 
 // ----------------------------------------------------------------------------
@@ -112,16 +99,14 @@ QRectF pqNodeEditorEdge::boundingRect() const
   qreal x1 = std::max(this->oPoint.x(), std::max(this->cPoint.x(), this->iPoint.x()));
   qreal y1 = std::max(this->oPoint.y(), std::max(this->cPoint.y(), this->iPoint.y()));
 
-  const qreal extra = 4.0;
-  return QRectF(x0, y0, x1 - x0, y1 - y0).adjusted(-extra, -extra, extra, extra);
+  constexpr qreal BB_MARGIN = 4.0;
+  return QRectF(x0, y0, x1 - x0, y1 - y0).adjusted(-BB_MARGIN, -BB_MARGIN, BB_MARGIN, BB_MARGIN);
 }
 
 // ----------------------------------------------------------------------------
 int pqNodeEditorEdge::updatePoints()
 {
-
   auto nProducerOutputPorts = this->producer->getOutputPorts().size();
-  auto b = this->producer->boundingRect();
 
   this->prepareGeometryChange();
 
@@ -130,28 +115,37 @@ int pqNodeEditorEdge::updatePoints()
   this->iPoint = QGraphicsItem::mapFromItem(
     this->consumer->getInputPorts()[this->consumerInputPortIdx]->getDisc(), 0, 0);
 
-  this->cPoint =
-    this->type == 0 ? this->oPoint : this->mapFromItem(this->producer, b.bottomRight()) +
-      QPointF((nProducerOutputPorts - this->producerOutputPortIdx) * 15, 0);
+  this->cPoint = this->oPoint;
+  if (this->type == EdgeType::VIEW)
+  {
+    const auto& bb = this->producer->boundingRect();
+    QPointF bottomRight =
+      bb.bottomRight() + QPointF((nProducerOutputPorts - this->producerOutputPortIdx) * 15, 0);
+    QPointF iPort = this->mapToItem(this->producer, this->iPoint);
+    if (bottomRight.y() < iPort.y())
+    {
+      this->cPoint = this->mapFromItem(this->producer, bottomRight);
+    }
+  }
 
   return 1;
 }
 
 // ----------------------------------------------------------------------------
-void pqNodeEditorEdge::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget*)
+void pqNodeEditorEdge::paint(QPainter* painter, const QStyleOptionGraphicsItem*, QWidget*)
 {
   QLineF line(this->oPoint, this->iPoint);
 
   QPainterPath path;
   path.moveTo(this->oPoint);
 
-  if (this->type == 0)
+  if (this->type == EdgeType::NORMAL)
   {
     path.lineTo(this->iPoint);
   }
   else
   {
-    path.quadTo(this->cPoint.x(), this->oPoint.y(), this->cPoint.x(), this->oPoint.y() + 40);
+    path.quadTo(this->cPoint.x(), this->oPoint.y(), this->cPoint.x(), this->oPoint.y());
     path.lineTo(this->cPoint);
     auto xt = 0.5 * (this->cPoint.x() - this->iPoint.x());
     auto yt = 0.5 * (this->iPoint.y() - this->cPoint.y());
@@ -159,9 +153,10 @@ void pqNodeEditorEdge::paint(QPainter* painter, const QStyleOptionGraphicsItem* 
       this->cPoint.y() + yt, this->iPoint.x(), this->iPoint.y());
   }
 
-  painter->setPen(QPen(this->type == 0 ? QApplication::palette().highlight().color()
-                                       : pqNodeEditorUtils::CONSTS::COLOR_ORANGE,
-    pqNodeEditorUtils::CONSTS::EDGE_WIDTH, this->type == 0 ? Qt::SolidLine : Qt::DashDotLine,
-    Qt::RoundCap, Qt::RoundJoin));
+  const QBrush& penColor = (this->type == EdgeType::NORMAL) ? QApplication::palette().highlight()
+                                                            : QApplication::palette().linkVisited();
+  Qt::PenStyle penStyle = (this->type == EdgeType::NORMAL) ? Qt::SolidLine : Qt::DashDotLine;
+  painter->setPen(
+    QPen(penColor, pqNodeEditorUtils::CONSTS::EDGE_WIDTH, penStyle, Qt::RoundCap, Qt::RoundJoin));
   painter->drawPath(path);
 }

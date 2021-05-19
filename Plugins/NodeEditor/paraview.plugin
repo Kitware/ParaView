@@ -1,7 +1,7 @@
 NAME
   NodeEditor
 DESCRIPTION
-  Widget to visualize and edit the pipeline ase a node graph
+  DockWidget to visualize and edit the pipeline as a node graph
 CONDITION
   PARAVIEW_USE_QT
 REQUIRES_MODULES

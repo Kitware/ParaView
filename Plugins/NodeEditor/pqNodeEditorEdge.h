@@ -1,41 +1,31 @@
 /*=========================================================================
-Copyright (c) 2021, Jonas Lukasczyk
-All rights reserved.
 
-Redistribution and use in source and binary forms, with or without
-modification, are permitted provided that the following conditions are met:
+  Program:   ParaView
+  Plugin:    NodeEditor
 
-1. Redistributions of source code must retain the above copyright notice, this
-   list of conditions and the following disclaimer.
+  Copyright (c) Kitware, Inc.
+  All rights reserved.
+  See Copyright.txt or http://www.paraview.org/HTML/Copyright.html for details.
 
-2. Redistributions in binary form must reproduce the above copyright notice,
-   this list of conditions and the following disclaimer in the documentation
-   and/or other materials provided with the distribution.
+     This software is distributed WITHOUT ANY WARRANTY; without even
+     the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+     PURPOSE.  See the above copyright notice for more information.
 
-3. Neither the name of the copyright holder nor the names of its
-   contributors may be used to endorse or promote products derived from
-   this software without specific prior written permission.
-
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
-FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
-DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
-SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
-CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
-OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
+/*-------------------------------------------------------------------------
+  ParaViewPluginsNodeEditor - BSD 3-Clause License - Copyright (C) 2021 Jonas Lukasczyk
+
+  See the Copyright.txt file provided
+  with ParaViewPluginsNodeEditor for license information.
+-------------------------------------------------------------------------*/
 
 #ifndef pqNodeEditorEdge_h
 #define pqNodeEditorEdge_h
 
 #include <QGraphicsPathItem>
-#include <QGraphicsScene>
 
-// forward declarations
 class pqNodeEditorNode;
+class QGraphicsScene;
 
 /**
  * Every instance of this class corresponds to an edge between an output port
@@ -47,17 +37,36 @@ class pqNodeEditorEdge : public QObject, public QGraphicsPathItem
   Q_OBJECT
 
 public:
+  /**
+   * Edge style enumeration. NORMAL is for an edge between 2 sources and VIEW is for an edge between
+   * a source and a view node.
+   */
+  enum class EdgeType : int
+  {
+    NORMAL = 0,
+    VIEW
+  };
+
+  /**
+   * Create an edge from the @c producer node to the @c consumer, linking their specified ports.
+   * The edge is created and added into the specified @c scene.
+   * One can also set its type and parent.
+   */
   pqNodeEditorEdge(QGraphicsScene* scene, pqNodeEditorNode* producer, int producerOutputPortIdx,
-    pqNodeEditorNode* consumer, int consumerInputPortIdx, int type = 0,
+    pqNodeEditorNode* consumer, int consumerInputPortIdx, EdgeType type = EdgeType::NORMAL,
     QGraphicsItem* parent = nullptr);
-  ~pqNodeEditorEdge();
+
+  /**
+   * Remove the edge from the scene it has been added to.
+   */
+  virtual ~pqNodeEditorEdge();
 
   //@{
   /*
-   * Get/Set the state of the edge (0:normal edge, 1: view edge)
+   * Get/Set the type of the edge (0:normal edge, 1: view edge). Update the style accordingly.
    */
-  int setType(int type);
-  int getType() { return this->type; };
+  void setType(EdgeType type);
+  int getType() { return static_cast<int>(this->type); };
   //@}
 
   //@{
@@ -69,11 +78,15 @@ public:
   //@}
 
   /*
-   * Print edge information.
+   * Get edge information as string.
    */
   std::string toString();
 
 public slots:
+  /**
+   * Recompute the points where the edge should pass by.
+   * Should be called whenever one of the port the edge is attached to move.
+   */
   int updatePoints();
 
 protected:
@@ -83,7 +96,7 @@ protected:
 private:
   QGraphicsScene* scene;
 
-  int type{ 0 };
+  EdgeType type{ EdgeType::NORMAL };
   QPointF oPoint;
   QPointF cPoint;
   QPointF iPoint;

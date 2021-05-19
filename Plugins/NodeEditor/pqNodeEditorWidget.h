@@ -1,32 +1,23 @@
 /*=========================================================================
-Copyright (c) 2021, Jonas Lukasczyk
-All rights reserved.
 
-Redistribution and use in source and binary forms, with or without
-modification, are permitted provided that the following conditions are met:
+  Program:   ParaView
+  Plugin:    NodeEditor
 
-1. Redistributions of source code must retain the above copyright notice, this
-   list of conditions and the following disclaimer.
+  Copyright (c) Kitware, Inc.
+  All rights reserved.
+  See Copyright.txt or http://www.paraview.org/HTML/Copyright.html for details.
 
-2. Redistributions in binary form must reproduce the above copyright notice,
-   this list of conditions and the following disclaimer in the documentation
-   and/or other materials provided with the distribution.
+     This software is distributed WITHOUT ANY WARRANTY; without even
+     the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+     PURPOSE.  See the above copyright notice for more information.
 
-3. Neither the name of the copyright holder nor the names of its
-   contributors may be used to endorse or promote products derived from
-   this software without specific prior written permission.
-
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
-FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
-DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
-SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
-CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
-OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
+/*-------------------------------------------------------------------------
+  ParaViewPluginsNodeEditor - BSD 3-Clause License - Copyright (C) 2021 Jonas Lukasczyk
+
+  See the Copyright.txt file provided
+  with ParaViewPluginsNodeEditor for license information.
+-------------------------------------------------------------------------*/
 
 #ifndef pqNodeEditorWidget_h
 #define pqNodeEditorWidget_h
@@ -52,9 +43,10 @@ class pqNodeEditorEdge;
 class pqNodeEditorScene;
 class pqNodeEditorView;
 
-/// This is the root widget of the node editor that can be docked in ParaView.
-/// It currently only contains the node editor canvas, but in the future one
-/// can also add a toolbar.
+/**
+ * This is the root widget of the node editor that can be docked in ParaView.
+ * It contains the canvas where nodes are drawn, and a toolbar to access severals tools.
+ */
 class pqNodeEditorWidget : public QDockWidget
 {
   Q_OBJECT
@@ -62,7 +54,78 @@ class pqNodeEditorWidget : public QDockWidget
 public:
   pqNodeEditorWidget(QWidget* parent = nullptr);
   pqNodeEditorWidget(const QString& title, QWidget* parent = nullptr);
-  ~pqNodeEditorWidget();
+  virtual ~pqNodeEditorWidget() = default;
+
+public slots:
+  /**
+   * Update ParaView pipeline and views
+   */
+  int apply();
+
+  /**
+   * Reset the properties of all nodes to there previous Apply values.
+   */
+  int reset();
+
+  /**
+   * Auto zoom to have all the nodes and edges in the node editor scene viewport
+   */
+  int zoom();
+
+  //@{
+  /**
+   * Create/Remove the node corresponding to the given proxy
+   */
+  int createNodeForSource(pqPipelineSource* proxy);
+  int createNodeForView(pqView* proxy);
+  int removeNode(pqProxy* proxy);
+  //@}
+
+  /**
+   * Given a consumer, set its input port @c idx to be connected with the
+   * currently selected output ports.
+   */
+  int setInput(pqPipelineSource* consumer, int idx, bool clear);
+
+  /**
+   * Update style for the view nodes.
+   */
+  int updateActiveView();
+
+  /**
+   * Update style for ports and sources according to the current selection and active objects.
+   */
+  int updateActiveSourcesAndPorts();
+
+  /**
+   * Given a proxy, remove every edges connected to its input ports.
+   */
+  int removeIncomingEdges(pqProxy* proxy);
+
+  /**
+   * Rebuild every input edges of a given source proxy.
+   */
+  int updatePipelineEdges(pqPipelineSource* consumer);
+
+  /**
+   * Rebuild every input edges of a given view proxy.
+   */
+  int updateVisibilityEdges(pqView* proxy);
+
+  /**
+   * Toggle the visibility of the given output port int the active view.
+   */
+  int toggleInActiveView(pqOutputPort* port);
+
+  /**
+   * Hide every actors in the active view
+   */
+  int hideAllInActiveView();
+
+  /**
+   * Set the style to EMPTY (no property displayed) for all nodes
+   */
+  int collapseAllNodes();
 
 protected:
   pqNodeEditorNode* createNode(pqProxy* proxy);
@@ -70,30 +133,6 @@ protected:
   int initializeActions();
   int createToolbar(QLayout* layout);
   int attachServerManagerListeners();
-
-public slots:
-  int apply();
-  int reset();
-  int zoom();
-  int layout();
-
-  int createNodeForSource(pqPipelineSource* proxy);
-  int createNodeForView(pqView* proxy);
-  int removeNode(pqProxy* proxy);
-
-  int setInput(pqPipelineSource* consumer, int idx, bool clear);
-
-  int updateActiveView();
-  int updateActiveSourcesAndPorts();
-
-  int removeIncomingEdges(pqProxy* proxy);
-  int updatePipelineEdges(pqPipelineSource* consumer);
-  int updateVisibilityEdges(pqView* proxy);
-
-  int toggleInActiveView(pqOutputPort* port);
-  int hideAllInActiveView();
-
-  int collapseAllNodes();
 
 private:
   pqNodeEditorScene* scene;
@@ -107,12 +146,16 @@ private:
   QAction* actionAutoLayout;
   QAction* actionCollapseAllNodes;
 
-  /// The node registry stores a node for each source/filter/view proxy
-  /// The key is the global identifier of the node proxy.
+  /**
+   *  The node registry stores a node for each source/filter/view proxy
+   *  The key is the global identifier of the node proxy.
+   */
   std::unordered_map<int, pqNodeEditorNode*> nodeRegistry;
 
-  /// The edge registry stores all incoming edges of a node.
-  /// The key is the global identifier of the node proxy.
+  /**
+   *  The edge registry stores all incoming edges of a node.
+   *  The key is the global identifier of the node proxy.
+   */
   std::unordered_map<int, std::vector<pqNodeEditorEdge*> > edgeRegistry;
 };
 
