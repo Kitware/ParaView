@@ -39,7 +39,7 @@ To report an issue.
    **Assignee**, **Milestone**, or **Labels**. These get set by members of the
    development team.
 4. If developers need more information on an issue, they will add the
-   `triage:needinfo` label as add a comment for the reporter soliciting more
+   `triage:needinfo` label and add a comment for the reporter soliciting more
    information. Once the reporter has provided the necessary information, he/she
    should remove the `triage:needinfo` label from the issue to notify the
    development team.
