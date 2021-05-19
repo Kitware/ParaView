@@ -1,0 +1,10 @@
+{
+    "release_user": "kwrobot.release.paraview",
+    "project": "paraview/paraview",
+    "maintainers": [
+        "ben.boeckel",
+        "cory.quammen",
+        "utkarsh.ayachit",
+        "vbolea"
+    ]
+}
