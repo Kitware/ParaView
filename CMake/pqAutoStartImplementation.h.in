@@ -45,7 +45,7 @@ class @_paraview_auto_start_CLASS_NAME@Implementation : public QObject, public p
   Q_OBJECT
   Q_INTERFACES(pqAutoStartInterface)
 public:
-  @_paraview_auto_start_CLASS_NAME@Implementation(QObject* p=0);
+  @_paraview_auto_start_CLASS_NAME@Implementation(QObject* p=nullptr);
   ~@_paraview_auto_start_CLASS_NAME@Implementation() override;
 
   /// Called once after the ParaView starts. If ParaView is already running when
