@@ -112,6 +112,7 @@ git add versions.cmake CMakeLists.txt Scripts/docker/ubuntu/development/Dockerfi
 git commit -m "Update the default version to @VERSION@@RC@"
 git gitlab-push
 ```
+
     - Make a commit for each of these `release`-only changes
       - [ ] Update `.gitlab/ci/cdash-groups.json` to track the `release` CDash
             groups (if `@BASEBRANCH@` is `master`)
@@ -119,6 +120,7 @@ git gitlab-push
 ```
 git commit --allow-empty -m "paraview: add release @VERSION@"
 ```
+
     - Create a merge request targeting `release`
       - [ ] Obtain a GitLab API token for the `kwrobot.release.paraview` user
             (ask @ben.boeckel if you do not have one)
@@ -138,6 +140,7 @@ git commit --allow-empty -m "paraview: add release @VERSION@"
 ```
 git tag -a -m 'ParaView superbuild @VERSION@@RC@' v@VERSION@@RC@ HEAD
 ```
+
       - [ ] `git push origin v@VERSION@`
   - Software process updates (these can all be done independently)
     - [ ] Update kwrobot with the new `release` branch rules (@ben.boeckel)
