@@ -107,41 +107,32 @@ git commit -m 'Update version number to @VERSION@@RC@' version.txt
         - [ ] ARG SUPERBUILD_TAG=v@VERSION@@RC@
         - [ ] ARG PARAVIEW_VERSION_STRING=paraview-@MAJOR@.@MINOR@
       - [ ] Commit changes and push to GitLab
-```
-git add versions.cmake CMakeLists.txt Scripts/docker/ubuntu/development/Dockerfile
-git commit -m "Update the default version to @VERSION@@RC@"
-git gitlab-push
-```
-
-    - Make a commit for each of these `release`-only changes
-      - [ ] Update `.gitlab/ci/cdash-groups.json` to track the `release` CDash
-            groups (if `@BASEBRANCH@` is `master`)
-    - Create a commit which will be tagged:
-```
-git commit --allow-empty -m "paraview: add release @VERSION@"
-```
-
-    - Create a merge request targeting `release`
-      - [ ] Obtain a GitLab API token for the `kwrobot.release.paraview` user
-            (ask @ben.boeckel if you do not have one)
-      - [ ] Add the `kwrobot.release.paraview` user to your fork with at least
-            `Developer` privileges (so it can open MRs)
-      - [ ] Use [the `release-mr`][release-mr] script to open the create the
-            Merge Request (see script for usage)
-        - Pull the script for each release; it may have been updated since it
-          was last used
-    - [ ] Build binaries
-      - [ ] Build binaries (start all pipelines)
-      - [ ] Download the binaries that have been generated from the Pipeline
-            build products. They will be deleted within 24 hours.
-    - [ ] Get positive review
-    - [ ] `Do: merge`
-    - [ ] Push the tag to the main repository
-```
-git tag -a -m 'ParaView superbuild @VERSION@@RC@' v@VERSION@@RC@ HEAD
-```
-
-      - [ ] `git push origin v@VERSION@`
+        - [ ] `git add versions.cmake CMakeLists.txt Scripts/docker/ubuntu/development/Dockerfile`
+        - [ ] `git commit -m "Update the default version to @VERSION@@RC@"`
+        - [ ] `git gitlab-push`
+  - Make a commit for each of these `release`-only changes
+    - [ ] Update `.gitlab/ci/cdash-groups.json` to track the `release` CDash
+          groups (if `@BASEBRANCH@` is `master`)
+  - Create a commit which will be tagged:
+    - [ ] `git commit --allow-empty -m "paraview: add release @VERSION@"`
+  - Create a merge request targeting `release`
+    - [ ] Obtain a GitLab API token for the `kwrobot.release.paraview` user
+          (ask @ben.boeckel if you do not have one)
+    - [ ] Add the `kwrobot.release.paraview` user to your fork with at least
+          `Developer` privileges (so it can open MRs)
+    - [ ] Use [the `release-mr`][release-mr] script to open the create the
+          Merge Request (see script for usage)
+      - Pull the script for each release; it may have been updated since it
+        was last used
+  - [ ] Build binaries
+    - [ ] Build binaries (start all pipelines)
+    - [ ] Download the binaries that have been generated from the Pipeline
+          build products. They will be deleted within 24 hours.
+  - [ ] Get positive review
+  - [ ] `Do: merge`
+  - [ ] Push the tag to the main repository
+    - [ ] `git tag -a -m 'ParaView superbuild @VERSION@@RC@' v@VERSION@@RC@ HEAD`
+    - [ ] `git push origin v@VERSION@`
   - Software process updates (these can all be done independently)
     - [ ] Update kwrobot with the new `release` branch rules (@ben.boeckel)
     - [ ] Run [this script][cdash-update-groups] to update the CDash groups
