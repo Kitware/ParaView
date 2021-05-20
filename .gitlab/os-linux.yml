@@ -245,7 +245,7 @@
         - $LAUNCHER cmake -DCMAKE_PREFIX_PATH=/usr/lib64/openmpi -DPARAVIEW_USE_PYTHON=ON -DVTK_WRAP_PYTHON=ON \
           -DVTK_ENABLE_WRAPPING=ON -DPARAVIEW_BUILD_DEVELOPER_DOCUMENTATION=ON -DPARAVIEW_USE_MPI=ON \
           -DPARAVIEW_BUILD_EDITION=CATALYST -DDOCUMENTATION_HTML_TARZ=ON ..
-        - cmake --build . -j &> $GIT_CLONE_PATH/compile_output.log
+        - cmake --build . -j $(nproc) &> $GIT_CLONE_PATH/compile_output.log
         - make ParaViewDoc-TGZ &> $GIT_CLONE_PATH/doxygen_output.log
         - cd $GIT_CLONE_PATH/paraview-docs
         - test -n "$CI_COMMIT_TAG" && CURRENT_RELEASE="$CI_COMMIT_TAG"
