@@ -15,8 +15,8 @@
 #include "vtkSMContextViewProxy.h"
 
 #include "vtkAxis.h"
+#include "vtkChart.h"
 #include "vtkChartLegend.h"
-#include "vtkChartXY.h"
 #include "vtkClientServerStream.h"
 #include "vtkContextInteractorStyle.h"
 #include "vtkContextScene.h"
@@ -161,18 +161,18 @@ static void update_property(vtkAxis* axis, vtkSMProperty* propMin, vtkSMProperty
 //----------------------------------------------------------------------------
 void vtkSMContextViewProxy::CopyAxisRangesFromChart()
 {
-  vtkChartXY* chartXY = vtkChartXY::SafeDownCast(this->GetContextItem());
-  if (chartXY)
+  vtkChart* chart = vtkChart::SafeDownCast(this->GetContextItem());
+  if (chart)
   {
-    update_property(chartXY->GetAxis(vtkAxis::LEFT), this->GetProperty("LeftAxisRangeMinimum"),
+    update_property(chart->GetAxis(vtkAxis::LEFT), this->GetProperty("LeftAxisRangeMinimum"),
       this->GetProperty("LeftAxisRangeMaximum"));
-    update_property(chartXY->GetAxis(vtkAxis::BOTTOM), this->GetProperty("BottomAxisRangeMinimum"),
+    update_property(chart->GetAxis(vtkAxis::BOTTOM), this->GetProperty("BottomAxisRangeMinimum"),
       this->GetProperty("BottomAxisRangeMaximum"));
     if (this->XYChartViewBase4Axes)
     {
-      update_property(chartXY->GetAxis(vtkAxis::RIGHT), this->GetProperty("RightAxisRangeMinimum"),
+      update_property(chart->GetAxis(vtkAxis::RIGHT), this->GetProperty("RightAxisRangeMinimum"),
         this->GetProperty("RightAxisRangeMaximum"));
-      update_property(chartXY->GetAxis(vtkAxis::TOP), this->GetProperty("TopAxisRangeMinimum"),
+      update_property(chart->GetAxis(vtkAxis::TOP), this->GetProperty("TopAxisRangeMinimum"),
         this->GetProperty("TopAxisRangeMaximum"));
     }
 
@@ -190,36 +190,32 @@ void vtkSMContextViewProxy::CopyAxisRangesFromChart()
 //----------------------------------------------------------------------------
 void vtkSMContextViewProxy::OnInteractionEvent()
 {
-  vtkChartXY* chartXY = vtkChartXY::SafeDownCast(this->GetContextItem());
-  if (chartXY)
+  // Charts by default update axes ranges as needed. On interaction, we force
+  // the chart to preserve the user-selected ranges.
+  this->CopyAxisRangesFromChart();
+  vtkSMPropertyHelper(this, "LeftAxisUseCustomRange").Set(1);
+  vtkSMPropertyHelper(this, "BottomAxisUseCustomRange").Set(1);
+  if (this->XYChartViewBase4Axes)
   {
-    // Charts by default update axes ranges as needed. On interaction, we force
-    // the chart to preserve the user-selected ranges.
-    this->CopyAxisRangesFromChart();
-    vtkSMPropertyHelper(this, "LeftAxisUseCustomRange").Set(1);
-    vtkSMPropertyHelper(this, "BottomAxisUseCustomRange").Set(1);
-    if (this->XYChartViewBase4Axes)
-    {
-      vtkSMPropertyHelper(this, "RightAxisUseCustomRange").Set(1);
-      vtkSMPropertyHelper(this, "TopAxisUseCustomRange").Set(1);
-    }
-    this->UpdateVTKObjects();
-    this->InvokeEvent(vtkCommand::InteractionEvent);
-
-    // Note: OnInteractionEvent gets called before this->StillRender() gets called
-    // as a consequence of this interaction.
+    vtkSMPropertyHelper(this, "RightAxisUseCustomRange").Set(1);
+    vtkSMPropertyHelper(this, "TopAxisUseCustomRange").Set(1);
   }
+  this->UpdateVTKObjects();
+  this->InvokeEvent(vtkCommand::InteractionEvent);
+
+  // Note: OnInteractionEvent gets called before this->StillRender() gets called
+  // as a consequence of this interaction.
 }
 
 //----------------------------------------------------------------------------
 void vtkSMContextViewProxy::OnLeftButtonReleaseEvent()
 {
-  vtkChartXY* chartXY = vtkChartXY::SafeDownCast(this->GetContextItem());
-  if (chartXY)
+  vtkChart* chart = vtkChart::SafeDownCast(this->GetContextItem());
+  if (chart)
   {
     int pos[2];
-    pos[0] = static_cast<int>(chartXY->GetLegend()->GetPointVector().GetX());
-    pos[1] = static_cast<int>(chartXY->GetLegend()->GetPointVector().GetY());
+    pos[0] = static_cast<int>(chart->GetLegend()->GetPointVector().GetX());
+    pos[1] = static_cast<int>(chart->GetLegend()->GetPointVector().GetY());
     vtkSMPropertyHelper(this, "LegendPosition", true).Set(pos, 2);
     this->UpdateVTKObjects();
   }
@@ -238,20 +234,16 @@ void vtkSMContextViewProxy::PostRender(bool interactive)
 //-----------------------------------------------------------------------------
 void vtkSMContextViewProxy::ResetDisplay()
 {
-  vtkChartXY* chartXY = vtkChartXY::SafeDownCast(this->GetContextItem());
-  if (chartXY)
+  // simply unlock all the axes ranges. That results in the chart determine
+  // new ranges to use in the Update call.
+  vtkSMPropertyHelper(this, "LeftAxisUseCustomRange").Set(0);
+  vtkSMPropertyHelper(this, "BottomAxisUseCustomRange").Set(0);
+  if (this->XYChartViewBase4Axes)
   {
-    // simply unlock all the axes ranges. That results in the chart determine
-    // new ranges to use in the Update call.
-    vtkSMPropertyHelper(this, "LeftAxisUseCustomRange").Set(0);
-    vtkSMPropertyHelper(this, "BottomAxisUseCustomRange").Set(0);
-    if (this->XYChartViewBase4Axes)
-    {
-      vtkSMPropertyHelper(this, "RightAxisUseCustomRange").Set(0);
-      vtkSMPropertyHelper(this, "TopAxisUseCustomRange").Set(0);
-    }
-    this->UpdateVTKObjects();
+    vtkSMPropertyHelper(this, "RightAxisUseCustomRange").Set(0);
+    vtkSMPropertyHelper(this, "TopAxisUseCustomRange").Set(0);
   }
+  this->UpdateVTKObjects();
 }
 
 //----------------------------------------------------------------------------
