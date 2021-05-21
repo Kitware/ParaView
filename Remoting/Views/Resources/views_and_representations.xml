@@ -4249,6 +4249,15 @@
             <Property name="EdgeTint"
                       panel_widget="color_selector"
                       panel_visibility="advanced"/>
+            <Property name="Anisotropy" panel_visibility="advanced"/>
+            <Property name="AnisotropyRotation" panel_visibility="advanced"/>
+            <Property name="BaseIOR" panel_visibility="advanced"/>
+            <Property name="CoatStrength" panel_visibility="advanced"/>
+            <Property name="CoatIOR" panel_visibility="advanced"/>
+            <Property name="CoatRoughness" panel_visibility="advanced"/>
+            <Property name="CoatColor"
+                      panel_widget="color_selector"
+                      panel_visibility="advanced" />
             <Property name="SelectTCoordArray" panel_visibility="advanced"/>
             <Property name="SelectNormalArray" panel_visibility="advanced"/>
             <Property name="SelectTangentArray" panel_visibility="advanced"/>
@@ -4261,8 +4270,11 @@
             <Property name="BaseColorTexture" panel_visibility="advanced"/>
             <Property name="NormalTexture" panel_visibility="advanced"/>
             <Property name="NormalScale" panel_visibility="advanced"/>
+            <Property name="CoatNormalTexture" panel_visibility="advanced"/>
+            <Property name="CoatNormalScale" panel_visibility="advanced"/>
             <Property name="MaterialTexture" panel_visibility="advanced"/>
             <Property name="OcclusionStrength" panel_visibility="advanced"/>
+            <Property name="AnisotropyTexture" panel_visibility="advanced"/>
             <Property name="EmissiveTexture" panel_visibility="advanced"/>
             <Property name="EmissiveFactor" panel_visibility="advanced"/>
             <Property name="FlipTextures" panel_visibility="advanced"/>
@@ -11874,7 +11886,7 @@
                             name="Roughness"
                             number_of_elements="1">
         <Documentation>
-          Set how rough is the surface
+          Set how rough is the surface.
         </Documentation>
         <DoubleRangeDomain max="1"
                            min="0"
@@ -11912,12 +11924,135 @@
         </Documentation>
         <DoubleRangeDomain max="1 1 1"
                            min="0 0 0"
+                          name="range" />
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="Interpolation"
+                                   value="3" />
+        </Hints>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetBaseIOR"
+                            default_values="1.5"
+                            name="BaseIOR"
+                            number_of_elements="1">
+        <Documentation>
+          Set the index of refraction of the base layer.
+        </Documentation>
+        <DoubleRangeDomain max="4"
+                           min="1"
                            name="range" />
         <Hints>
           <PropertyWidgetDecorator type="GenericDecorator"
                                    mode="visibility"
                                    property="Interpolation"
                                    value="3" />
+        </Hints>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetCoatIOR"
+                            default_values="2.0"
+                            name="CoatIOR"
+                            number_of_elements="1">
+        <Documentation>
+          Set the index of refraction of the coat layer.
+        </Documentation>
+        <DoubleRangeDomain max="4"
+                           min="1"
+                           name="range" />
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="Interpolation"
+                                   value="3" />
+        </Hints>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetCoatStrength"
+                            default_values="0.0"
+                            name="CoatStrength"
+                            number_of_elements="1">
+        <Documentation>
+          Set the strength of the coat layer.
+        </Documentation>
+        <DoubleRangeDomain max="1"
+                           min="0"
+                           name="range" />
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="Interpolation"
+                                   value="3" />
+        </Hints>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetCoatRoughness"
+                            default_values="0.0"
+                            name="CoatRoughness"
+                            number_of_elements="1">
+        <Documentation>
+          Set the roughness of the coat layer.
+        </Documentation>
+        <DoubleRangeDomain max="1"
+                           min="0"
+                           name="range" />
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="Interpolation"
+                                   value="3" />
+        </Hints>
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty command="SetCoatColor"
+                            default_values="1.0 1.0 1.0"
+                            name="CoatColor"
+                            number_of_elements="3">
+        <DoubleRangeDomain max="1 1 1"
+                           min="0 0 0"
+                           name="range" />
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="Interpolation"
+                                   value="3" />
+        </Hints>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetAnisotropy"
+                            default_values="0.0"
+                            name="Anisotropy"
+                            number_of_elements="1">
+        <Documentation>
+          Set the anisotropy coefficient of the surface.
+        </Documentation>
+        <DoubleRangeDomain max="1"
+                           min="0"
+                           name="range" />
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="Interpolation"
+                                   value="3" />
+          <!-- Enable widget only if normals and tangents are here -->
+          <PropertyWidgetDecorator type="GenericDecorator" mode="enabled_state" property="SelectNormalArray" value="None" inverse="1"/>
+          <PropertyWidgetDecorator type="GenericDecorator" mode="enabled_state" property="SelectTangentArray" value="None" inverse="1"/>
+        </Hints>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetAnisotropyRotation"
+                            default_values="0.0"
+                            name="AnisotropyRotation"
+                            number_of_elements="1">
+        <Documentation>
+          Set the anisotropy rotation coefficient of the surface.
+        </Documentation>
+        <DoubleRangeDomain max="1"
+                           min="0"
+                           name="range" />
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="Interpolation"
+                                   value="3" />
+          <!-- Enable widget only if normals and tangents are here -->
+          <PropertyWidgetDecorator type="GenericDecorator" mode="enabled_state" property="SelectNormalArray" value="None" inverse="1"/>
+          <PropertyWidgetDecorator type="GenericDecorator" mode="enabled_state" property="SelectTangentArray" value="None" inverse="1"/>
         </Hints>
       </DoubleVectorProperty>
       <ProxyProperty command="SetTexture"
@@ -12017,6 +12152,26 @@
           <!-- enable the texture selector only when tcoords is available. -->
         </Hints>
       </ProxyProperty>
+      <ProxyProperty command="SetAnisotropyTexture"
+                     name="AnisotropyTexture"
+                     panel_widget="texture_selector"
+                     null_on_empty="1" >
+        <Documentation>
+          Set the anisotropy texture. This texture encodes anisotropy strength on the red and anisotropy rotation
+          on the green channel.
+        </Documentation>
+        <ProxyGroupDomain name="groups">
+          <Group name="textures" />
+        </ProxyGroupDomain>
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="Interpolation"
+                                   value="3" />
+          <TextureSelectorWidget check_tcoords="1" check_tangents="1" />
+          <!-- enable the texture selector only when tcoords and tangents are available. -->
+        </Hints>
+      </ProxyProperty>
       <DoubleVectorProperty command="SetOcclusionStrength"
                             default_values="1.0"
                             name="OcclusionStrength"
@@ -12069,6 +12224,44 @@
           <PropertyWidgetDecorator type="GenericDecorator"
                                    mode="visibility"
                                    property="NormalTexture"
+                                   value="null"
+                                   inverse="1" />
+        </Hints>
+      </DoubleVectorProperty>
+      <ProxyProperty command="SetCoatNormalTexture"
+                     name="CoatNormalTexture"
+                     panel_widget="texture_selector"
+                     null_on_empty="1" >
+        <Documentation>
+          Set the coat normal mapping texture.
+        </Documentation>
+        <ProxyGroupDomain name="groups">
+          <Group name="textures" />
+        </ProxyGroupDomain>
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="Interpolation"
+                                   value="0"
+                                   inverse="1" />
+          <TextureSelectorWidget check_tcoords="1" check_tangents="1" />
+          <!-- enable the texture selector only when tcoords is available. -->
+        </Hints>
+      </ProxyProperty>
+      <DoubleVectorProperty command="SetCoatNormalScale"
+                            default_values="1.0"
+                            name="CoatNormalScale"
+                            number_of_elements="1">
+        <Documentation>
+          Set the scale of coat normal mapping deviation.
+        </Documentation>
+        <DoubleRangeDomain max="5"
+                           min="0"
+                           name="range" />
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="CoatNormalTexture"
                                    value="null"
                                    inverse="1" />
         </Hints>

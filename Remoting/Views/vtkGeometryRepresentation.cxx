@@ -958,9 +958,57 @@ void vtkGeometryRepresentation::SetMetallic(double val)
 }
 
 //----------------------------------------------------------------------------
+void vtkGeometryRepresentation::SetBaseIOR(double val)
+{
+  this->Property->SetBaseIOR(val);
+}
+
+//----------------------------------------------------------------------------
+void vtkGeometryRepresentation::SetCoatIOR(double val)
+{
+  this->Property->SetCoatIOR(val);
+}
+
+//----------------------------------------------------------------------------
+void vtkGeometryRepresentation::SetCoatStrength(double val)
+{
+  this->Property->SetCoatStrength(val);
+}
+
+//----------------------------------------------------------------------------
+void vtkGeometryRepresentation::SetCoatRoughness(double val)
+{
+  this->Property->SetCoatRoughness(val);
+}
+
+//----------------------------------------------------------------------------
+void vtkGeometryRepresentation::SetCoatNormalScale(double val)
+{
+  this->Property->SetCoatNormalScale(val);
+}
+
+//----------------------------------------------------------------------------
+void vtkGeometryRepresentation::SetCoatColor(double r, double g, double b)
+{
+  this->Property->SetCoatColor(r, g, b);
+}
+
+//----------------------------------------------------------------------------
 void vtkGeometryRepresentation::SetEdgeTint(double r, double g, double b)
 {
   this->Property->SetEdgeTint(r, g, b);
+}
+
+//----------------------------------------------------------------------------
+void vtkGeometryRepresentation::SetAnisotropy(double val)
+{
+  this->Property->SetAnisotropy(val);
+}
+
+//----------------------------------------------------------------------------
+void vtkGeometryRepresentation::SetAnisotropyRotation(double val)
+{
+  this->Property->SetAnisotropyRotation(val);
 }
 
 //----------------------------------------------------------------------------
@@ -990,6 +1038,19 @@ void vtkGeometryRepresentation::SetMaterialTexture(vtkTexture* tex)
 }
 
 //----------------------------------------------------------------------------
+void vtkGeometryRepresentation::SetAnisotropyTexture(vtkTexture* tex)
+{
+  if (tex)
+  {
+    tex->UseSRGBColorSpaceOff();
+    tex->SetInterpolate(this->InterpolateTextures);
+    tex->SetRepeat(this->RepeatTextures);
+    tex->SetMipmap(this->UseMipmapTextures);
+  }
+  this->Property->SetAnisotropyTexture(tex);
+}
+
+//----------------------------------------------------------------------------
 void vtkGeometryRepresentation::SetNormalTexture(vtkTexture* tex)
 {
   if (tex)
@@ -1000,6 +1061,19 @@ void vtkGeometryRepresentation::SetNormalTexture(vtkTexture* tex)
     tex->SetMipmap(this->UseMipmapTextures);
   }
   this->Property->SetNormalTexture(tex);
+}
+
+//----------------------------------------------------------------------------
+void vtkGeometryRepresentation::SetCoatNormalTexture(vtkTexture* tex)
+{
+  if (tex)
+  {
+    tex->UseSRGBColorSpaceOff();
+    tex->SetInterpolate(this->InterpolateTextures);
+    tex->SetRepeat(this->RepeatTextures);
+    tex->SetMipmap(this->UseMipmapTextures);
+  }
+  this->Property->SetCoatNormalTexture(tex);
 }
 
 //----------------------------------------------------------------------------
