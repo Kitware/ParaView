@@ -165,25 +165,45 @@ build:fedora33-tidy:
 
 # macOS
 
-build:macos-python-qt:
+build:macos-arm64-python-qt:
     extends:
-        - .macos_python_qt
+        - .macos_arm64_python_qt
+        - .cmake_build_macos
+        - .macos_arm64_builder_tags
+        - .cmake_build_artifacts
+        - .run_manually
+
+test:macos-arm64-python-qt:
+    extends:
+        - .macos_arm64_python_qt
+        - .cmake_test_macos
+        - .macos_arm64_builder_tags
+        - .cmake_test_artifacts
+        - .run_automatically
+    dependencies:
+        - build:macos-arm64-python-qt
+    needs:
+        - build:macos-arm64-python-qt
+
+build:macos-x86_64-python-qt:
+    extends:
+        - .macos_x86_64_python_qt
         - .cmake_build_macos
         - .macos_builder_tags
         - .cmake_build_artifacts
         - .run_manually
 
-test:macos-python-qt:
+test:macos-x86_64-python-qt:
     extends:
-        - .macos_python_qt
+        - .macos_x86_64_python_qt
         - .cmake_test_macos
         - .macos_builder_tags
         - .cmake_test_artifacts
         - .run_automatically
     dependencies:
-        - build:macos-python-qt
+        - build:macos-x86_64-python-qt
     needs:
-        - build:macos-python-qt
+        - build:macos-x86_64-python-qt
 
 # Windows
 

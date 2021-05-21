@@ -112,6 +112,12 @@ if ("$ENV{CMAKE_CONFIGURATION}" MATCHES "macos")
     "\\.UnstructuredVolumeRenderingVectorComponent$")
 endif ()
 
+if ("$ENV{CMAKE_CONFIGURATION}" MATCHES "macos_arm64")
+  list(APPEND test_exclusions
+    # https://gitlab.kitware.com/paraview/paraview/-/issues/20743
+    "^pv\\.ExtrusionRepresentationCellData$")
+endif ()
+
 if ("$ENV{CMAKE_CONFIGURATION}" MATCHES "windows")
   list(APPEND test_exclusions
     # Known-bad https://gitlab.kitware.com/paraview/paraview/-/issues/17433
