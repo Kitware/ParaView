@@ -82,7 +82,7 @@ static QString systemServers()
 static QString defaultServers()
 {
   auto vtk_libs = vtkGetLibraryPathForSymbol(GetVTKVersion);
-  std::vector<std::string> prefixes = { ".", "bin", "lib" };
+  std::vector<std::string> prefixes = { ".", "bin", "lib", "MacOS" };
 
   vtkNew<vtkResourceFileLocator> locator;
   locator->SetLogVerbosity(vtkPVLogger::GetApplicationVerbosity());
