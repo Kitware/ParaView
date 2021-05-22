@@ -96,6 +96,10 @@ public:
       }
     }
 
+    // a still render is required; this is necessary since vtkValuePass depends on buffers created
+    // by mapper during a standard render.
+    view->StillRender();
+
     int component = 0; // FIXME: pick the component to export.
     vtkSMPropertyHelper colorArrayName(repr, "ColorArrayName");
     if (renderView->BeginValuePassForRendering(colorArrayName.GetInputArrayAssociation(),
