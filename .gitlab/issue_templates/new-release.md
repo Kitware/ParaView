@@ -178,7 +178,8 @@ Show(Text(Text="$A^2$"))
 
 
 Binary checklist
-  - [ ] macOS
+  - [ ] macOS arm64
+  - [ ] macOS x86\_64
   - [ ] Linux
   - [ ] Linux osmesa
   - [ ] Windows MPI (.exe)
