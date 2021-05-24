@@ -51,6 +51,13 @@ git tag -a -m 'ParaView @VERSION@@RC@' v@VERSION@@RC@ HEAD
   - Integrate changes.
     - Make a commit for each of these `release`-only changes (if `@BASEBRANCH@`
       is `master`)
+      - [ ] Update VTK's `paraview/release` branch. The
+            [`release-mr`][release-mr]  script should be used to do this. Pass
+            `-c .kitware-release-paraview.json` to use the appropriate
+            configuration file.
+        - [ ] Merge the VTK `paraview/release` update MR
+        - [ ] Update kwrobot with the new `paraview/release` branch rules (@ben.boeckel)
+      - [ ] `.gitmodules` to track the `paraview/release` branch of VTK
       - [ ] Update `.gitlab/ci/cdash-groups.json` to track the `release` CDash
             groups
     - Create a merge request targeting `release`
