@@ -238,7 +238,7 @@ build:documentation:
         - .doxygen_build_linux
         - .linux_qt_builder_tags
         - .doxygen_log_artifacts
-        - .run_scheduled
+        - .doxygen_only
 
 # Triggers
 
