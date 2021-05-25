@@ -135,8 +135,11 @@ void vtkSMViewProxyInteractorHelper::Execute(vtkObject* caller, unsigned long ev
       double delay = vtkSMPropertyHelper(
                        this->ViewProxy, "WindowResizeNonInteractiveRenderDelay", /*quiet*/ true)
                        .GetAsDouble();
-      this->Interacting = true;
-      this->EndWindowResizeTimerId = iren->CreateOneShotTimer(delay * 1000);
+      if (delay > 0.0)
+      {
+        this->Interacting = true;
+        this->EndWindowResizeTimerId = iren->CreateOneShotTimer(delay * 1000);
+      }
 
       break;
     }
