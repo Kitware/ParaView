@@ -756,23 +756,15 @@ void pqSLACManager::createPlotOverZ()
   // Set up the line for the plot.  The line is one of the inputs to the filter
   // which is implicitly set up through a proxy list domain.
   vtkSMProxy* plotProxy = plotFilter->getProxy();
-  pqSMProxy lineProxy = pqSMAdaptor::getProxyProperty(plotProxy->GetProperty("Source"));
-  if (!lineProxy)
-  {
-    qWarning() << "Could not retrieve plot line source.  "
-               << "Plot not set up correctly.";
-  }
-  else
-  {
-    QList<QVariant> minPoint;
-    minPoint << 0.0 << 0.0 << bounds[4];
-    pqSMAdaptor::setMultipleElementProperty(lineProxy->GetProperty("Point1"), minPoint);
-    QList<QVariant> maxPoint;
-    maxPoint << 0.0 << 0.0 << bounds[5];
-    pqSMAdaptor::setMultipleElementProperty(lineProxy->GetProperty("Point2"), maxPoint);
-    pqSMAdaptor::setElementProperty(lineProxy->GetProperty("Resolution"), 1000);
-    lineProxy->UpdateVTKObjects();
-  }
+  QList<QVariant> minPoint;
+  minPoint << 0.0 << 0.0 << bounds[4];
+  pqSMAdaptor::setMultipleElementProperty(plotProxy->GetProperty("Point1"), minPoint);
+  QList<QVariant> maxPoint;
+  maxPoint << 0.0 << 0.0 << bounds[5];
+  pqSMAdaptor::setMultipleElementProperty(plotProxy->GetProperty("Point2"), maxPoint);
+  pqSMAdaptor::setElementProperty(plotProxy->GetProperty("SamplingPattern"), 2);
+  pqSMAdaptor::setElementProperty(plotProxy->GetProperty("Resolution"), 1000);
+  plotProxy->UpdateVTKObjects();
   plotFilter->updatePipeline();
 
   // Make representation

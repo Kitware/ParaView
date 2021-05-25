@@ -862,7 +862,7 @@ struct Process_5_9_to_5_10
     return HandleSpreadsheetRepresentationCompositeDataSetIndex(document) &&
       HandleExtractBlock(document) && HandleRepresentationBlockVisibility(document) &&
       HandleRepresentationBlockColor(document) && HandleRepresentationBlockOpacity(document) &&
-      HandleSelectionQuerySource(document);
+      HandleSelectionQuerySource(document) && ConvertProbeLine(document);
   }
 
   static std::string GetSelector(unsigned int cid)
@@ -1091,6 +1091,30 @@ struct Process_5_9_to_5_10
       value.set_value(vtkSelectionNode::ConvertSelectionFieldToAttributeType(value.as_int()));
     }
 
+    return true;
+  }
+
+  static bool ConvertProbeLine(xml_document& document)
+  {
+    bool warn = false;
+
+    pugi::xpath_node_set glyph_elements =
+      document.select_nodes("//ServerManagerState/Proxy[@group='filters' and @type='ProbeLine']");
+    for (pugi::xpath_node_set::const_iterator iter = glyph_elements.begin();
+         iter != glyph_elements.end(); ++iter)
+    {
+      iter->node().attribute("type").set_value("ProbeLineLegacy");
+      warn = true;
+    }
+    if (warn)
+    {
+      vtkGenericWarningMacro(
+        "The state file uses the old 'ProbeLine' filter implementation. "
+        "The implementation has changed in ParaView 5.10. "
+        "Consider replacing the Probe line filter with a new Probe line filter. The old "
+        "implementation "
+        "is still available as 'Probe Line Legacy' and will be used for loading this state file.");
+    }
     return true;
   }
 };
