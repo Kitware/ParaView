@@ -1913,6 +1913,17 @@
           wants to manage renders explicitly, set this to 0 (Off). 1 (On) by default.
         </Documentation>
       </IntVectorProperty>
+      <DoubleVectorProperty default_values="0.3"
+                         name="WindowResizeNonInteractiveRenderDelay"
+                         panel_visibility="never"
+                         number_of_elements="1">
+        <Documentation>Set the delay (in seconds) before doing a full resolution render after the last resize of the window.</Documentation>
+        <Hints>
+          <PropertyLink group="settings"
+                        proxy="RenderViewSettings"
+                        property="WindowResizeNonInteractiveRenderDelay"/>
+        </Hints>
+      </DoubleVectorProperty>
       <IntVectorProperty name="Camera3DManipulators"
         command="SetCamera3DManipulators"
         argument_is_array="1"
@@ -10909,6 +10920,7 @@
           <Property name="RotationFactor" panel_visibility="never"/>
           <Property name="NonInteractiveRenderDelay" panel_visibility="never"/>
           <Property name="EnableRenderOnInteraction" panel_visibility="never"/>
+          <Property name="WindowResizeNonInteractiveRenderDelay" panel_visibility="never"/>
           <!-- Renderer -->
           <PropertyGroup label="Stereo">
             <Property name="StereoRender"/>

@@ -543,6 +543,17 @@
         </Documentation>
       </DoubleVectorProperty>
 
+      <DoubleVectorProperty name="WindowResizeNonInteractiveRenderDelay"
+        default_values="0.3"
+        number_of_elements="1"
+        panel_visibility="advanced">
+        <DoubleRangeDomain name="range" min="0" max="10" />
+        <Documentation>
+          Set the delay (in seconds) before doing a full resolution render
+          after the last resize of the window.
+        </Documentation>
+      </DoubleVectorProperty>
+
       <IntVectorProperty name="UseOutlineForLODRendering"
         label="Use Outline For LOD Rendering"
         default_values="0"
@@ -728,6 +739,7 @@
         <Property name="LODResolution" />
         <Property name="NonInteractiveRenderDelay" />
         <Property name="UseOutlineForLODRendering" />
+        <Property name="WindowResizeNonInteractiveRenderDelay" />
       </PropertyGroup>
 
       <PropertyGroup label="Remote/Parallel Rendering Options">
