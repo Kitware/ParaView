@@ -24,6 +24,7 @@
 #ifndef vtkSMTransferFunctionProxy_h
 #define vtkSMTransferFunctionProxy_h
 
+#include "vtkImageData.h"           // for vtkImageData
 #include "vtkRemotingViewsModule.h" // needed for export macro
 #include "vtkSMProxy.h"
 #include "vtkSmartPointer.h" // for ivars
@@ -315,6 +316,19 @@ public:
   {
     vtkSMTransferFunctionProxy* self = vtkSMTransferFunctionProxy::SafeDownCast(proxy);
     return self ? self->GetHistogramTableCache() : nullptr;
+  }
+  //@}
+
+  //@{
+  /**
+   * Helper method used to recover the last histogram computed by ComputeDataHistogram2D
+   * Returns the histogram as a vtkImageData if available, nullptr otherwise.
+   */
+  virtual vtkImageData* GetHistogram2DCache() { return this->Histogram2DCache; }
+  static vtkImageData* GetHistogram2DCache(vtkSMProxy* proxy)
+  {
+    vtkSMTransferFunctionProxy* self = vtkSMTransferFunctionProxy::SafeDownCast(proxy);
+    return self ? self->GetHistogram2DCache() : nullptr;
   }
   //@}
 

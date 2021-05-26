@@ -164,6 +164,7 @@ set(classes
   pqToolBarInterface
   pqToolTipTrapper
   pqTransferFunctionWidget
+  pqTransferFunction2DWidget
   pqTriggerOnIdleHelper
   pqUndoStackBuilder
   pqVCRController

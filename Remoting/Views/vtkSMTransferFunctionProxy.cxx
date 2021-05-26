@@ -24,6 +24,7 @@
 #include "vtkPVProminentValuesInformation.h"
 #include "vtkPVXMLElement.h"
 #include "vtkPVXMLParser.h"
+#include "vtkPointData.h"
 #include "vtkSMCoreUtilities.h"
 #include "vtkSMNamedPropertyIterator.h"
 #include "vtkSMPVRepresentationProxy.h"
@@ -682,6 +683,7 @@ vtkImageData* vtkSMTransferFunctionProxy::ComputeDataHistogram2D(int numberOfBin
   int arrayAsso = -1;
   bool hasData = false;
   std::set<vtkSMProxy*> usedProxy;
+  vtkSMSourceProxy* input = nullptr;
   for (unsigned int cc = 0, max = this->GetNumberOfConsumers(); cc < max; ++cc)
   {
     vtkSMProxy* proxy = this->GetConsumerProxy(cc);
@@ -756,6 +758,7 @@ vtkImageData* vtkSMTransferFunctionProxy::ComputeDataHistogram2D(int numberOfBin
 
       usedProxy.insert(consumer);
       // Found the consumer.
+      input = vtkSMSourceProxy::SafeDownCast(vtkSMPropertyHelper(consumer, "Input").GetAsProxy());
       hasData = true;
       break;
       // Add consumer to group filter
@@ -774,18 +777,71 @@ vtkImageData* vtkSMTransferFunctionProxy::ComputeDataHistogram2D(int numberOfBin
   }
 
   // Compute the histogram
+  vtkSMSessionProxyManager* pxm =
+    vtkSMProxyManager::GetProxyManager()->GetActiveSessionProxyManager();
+  vtkSmartPointer<vtkSMSourceProxy> histo;
+  histo.TakeReference(
+    vtkSMSourceProxy::SafeDownCast(pxm->NewProxy("filters", "ExtractHistogram2D")));
+  vtkSMPropertyHelper(histo, "Input").Set(input);
+  vtkSMPropertyHelper(histo, "SelectInputArray1")
+    .SetInputArrayToProcess(arrayAsso, arrayName.c_str());
+  vtkSMPropertyHelper(histo, "Component0").Set(component);
+  vtkSMPropertyHelper(histo, "SelectInputArray2")
+    .SetInputArrayToProcess(arrayAsso, arrayName.c_str());
+  vtkSMPropertyHelper(histo, "Component1").Set(component);
+  int numBins[2];
+  numBins[0] = numberOfBins;
+  numBins[1] = numberOfBins;
+  vtkSMPropertyHelper(histo, "NumberOfBins").Set(numBins, 2);
+  histo->UpdateVTKObjects();
+
+  // Reduce it
+  vtkSmartPointer<vtkSMSourceProxy> reducer;
+  reducer.TakeReference(
+    vtkSMSourceProxy::SafeDownCast(pxm->NewProxy("filters", "ReductionFilter")));
+  vtkSMPropertyHelper(reducer, "Input").Set(histo);
+  vtkSMPropertyHelper(reducer, "PostGatherHelperName").Set("vtkImageAppend");
+  reducer->UpdateVTKObjects();
+
+  // Move it from server to client and save it to the case
+  vtkSmartPointer<vtkSMSourceProxy> mover;
+  mover.TakeReference(
+    vtkSMSourceProxy::SafeDownCast(pxm->NewProxy("filters", "ClientServerMoveData")));
+  vtkSMPropertyHelper(mover, "Input").Set(reducer);
+  vtkSMPropertyHelper(mover, "OutputDataType").Set(VTK_IMAGE_DATA);
+  mover->UpdateVTKObjects();
+  mover->UpdatePipeline();
+  vtkImageData* hist2D = vtkImageData::SafeDownCast(
+    vtkAlgorithm::SafeDownCast(mover->GetClientSideObject())->GetOutputDataObject(0));
   this->Histogram2DCache = vtkSmartPointer<vtkImageData>::New();
+  this->Histogram2DCache->ShallowCopy(hist2D);
+
+  // Sanity check
+  if (this->Histogram2DCache->GetNumberOfPoints() < numberOfBins * numberOfBins)
+  {
+    vtkErrorMacro("Histogram2D did not produce enough data");
+    this->Histogram2DCache = nullptr;
+    return this->Histogram2DCache;
+  }
+  vtkDoubleArray* valueArray =
+    vtkDoubleArray::SafeDownCast(this->Histogram2DCache->GetPointData()->GetScalars());
+  if (!valueArray)
+  {
+    vtkErrorMacro("Histogram2D is not producing the values as expected");
+    this->Histogram2DCache = nullptr;
+    return this->Histogram2DCache;
+  }
+  return this->Histogram2DCache;
 
   //  vtkSmartPointer<vtkSMSourceProxy> grad;
   //  grad.TakeReference(vtkSMSourceProxy::SafeDownCast(pxm->NewProxy("filters",
-  //  "GradientMagnitude")));
-  //  vtkSMPropertyHelper(grad, "Input").Set(consumer);
+  //  "GradientMagnitude"))); vtkSMPropertyHelper(grad, "Input").Set(consumer);
   //  vtkSMPropertyHelper(grad, "Dimensionality").Set(3);
   //  grad->UpdateVTKObjects();
   //
   //  // Append it to the input
   //  vtkSmartPointer<vtkSMSourceProxy> append;
-  return this->Histogram2DCache;
+  // return this->Histogram2DCache;
 }
 
 //----------------------------------------------------------------------------

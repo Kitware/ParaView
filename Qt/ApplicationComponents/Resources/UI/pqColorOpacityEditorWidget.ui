@@ -10,6 +10,12 @@
     <height>774</height>
    </rect>
   </property>
+  <property name="minimumSize">
+   <size>
+    <width>0</width>
+    <height>80</height>
+   </size>
+  </property>
   <property name="windowTitle">
    <string>Form</string>
   </property>
@@ -30,7 +36,7 @@
       <number>0</number>
      </property>
      <item>
-      <layout class="QVBoxLayout" name="verticalLayout" stretch="1,0">
+      <layout class="QVBoxLayout" name="verticalLayout" stretch="1,0,1">
        <property name="spacing">
         <number>0</number>
        </property>
@@ -44,6 +50,9 @@
            <width>0</width>
            <height>80</height>
           </size>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0, stop:0 rgba(9, 41, 4, 255), stop:0.085 rgba(2, 79, 0, 255), stop:0.19 rgba(50, 147, 22, 255), stop:0.275 rgba(236, 191, 49, 255), stop:0.39 rgba(243, 61, 34, 255), stop:0.555 rgba(135, 81, 60, 255), stop:0.667 rgba(121, 75, 255, 255), stop:0.825 rgba(164, 255, 244, 255), stop:0.885 rgba(104, 222, 71, 255), stop:1 rgba(93, 128, 0, 255));</string>
          </property>
         </widget>
        </item>
@@ -66,6 +75,20 @@
            <width>16777215</width>
            <height>40</height>
           </size>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0, stop:0 rgba(255, 0, 0, 255), stop:0.166 rgba(255, 255, 0, 255), stop:0.333 rgba(0, 255, 0, 255), stop:0.5 rgba(0, 255, 255, 255), stop:0.666 rgba(0, 0, 255, 255), stop:0.833 rgba(255, 0, 255, 255), stop:1 rgba(255, 0, 0, 255));</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="pqTransferFunction2DWidget" name="Transfer2DEditor" native="true">
+         <property name="visible">
+          <bool>false</bool>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">gridline-color: rgb(46, 95, 255);
+background-image: url(:/pqWidgets/Icons/pqEdgeCenterData.svg);</string>
          </property>
         </widget>
        </item>
@@ -195,13 +218,9 @@
          <property name="text">
           <string/>
          </property>
-         <property name="enabled">
-          <bool>false</bool>
-         </property>
          <property name="icon">
           <iconset resource="../../../Components/Resources/pqComponents.qrc">
-           <normaloff>:/pqWidgets/Icons/pqHistogramReload24.png</normaloff>
-          </iconset>
+           <normaloff>:/pqWidgets/Icons/pqHistogramReload24.png</normaloff>:/pqWidgets/Icons/pqHistogramReload24.png</iconset>
          </property>
         </widget>
        </item>
@@ -250,7 +269,7 @@
    <item>
     <widget class="QCheckBox" name="UseOpacityControlPointsFreehandDrawing">
      <property name="toolTip">
-      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;When checked, the control point of the opacity transfer fonction can be "drawn" instead of being placed one by one.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;When checked, the control point of the opacity transfer fonction can be &quot;drawn&quot; instead of being placed one by one.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
      </property>
      <property name="text">
       <string>Enable Freehand Drawing Of Opacity Transfer Function</string>
@@ -281,6 +300,13 @@
      </property>
      <property name="text">
       <string>Use Log Scale When Mapping Data To Opacity</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QCheckBox" name="Use2DTransferFunction">
+     <property name="text">
+      <string>Edit 2D Transfer Function</string>
      </property>
     </widget>
    </item>
@@ -346,11 +372,11 @@
        <property name="text">
         <string>&lt;html&gt;&lt;b&gt;Data Histogram&lt;/b&gt;&lt;/html&gt;</string>
        </property>
+       <property name="alignment">
+        <set>Qt::AlignBottom|Qt::AlignLeading|Qt::AlignLeft</set>
+       </property>
        <property name="wordWrap">
         <bool>true</bool>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignBottom|Qt::AlignLeft</set>
        </property>
       </widget>
      </item>
@@ -400,10 +426,10 @@
          <verstretch>0</verstretch>
         </sizepolicy>
        </property>
-       <property name="minimum">
+       <property name="minimum" stdset="0">
         <number>1</number>
        </property>
-       <property name="maximum">
+       <property name="maximum" stdset="0">
         <number>256</number>
        </property>
       </widget>
@@ -439,6 +465,12 @@
    <extends>QToolButton</extends>
    <header>pqHighlightableToolButton.h</header>
   </customwidget>
+  <customwidget>
+   <class>pqTransferFunction2DWidget</class>
+   <extends>QWidget</extends>
+   <header>pqTransferFunction2DWidget.h</header>
+   <container>1</container>
+  </customwidget>
  </customwidgets>
  <resources>
   <include location="../../../Components/Resources/pqComponents.qrc"/>
@@ -457,6 +489,70 @@
     <hint type="destinationlabel">
      <x>166</x>
      <y>305</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>Use2DTransferFunction</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>ShowDataHistogram</receiver>
+   <slot>setDisabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>166</x>
+     <y>354</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>166</x>
+     <y>705</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>Use2DTransferFunction</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>ColorEditor</receiver>
+   <slot>setHidden(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>166</x>
+     <y>354</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>154</x>
+     <y>197</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>Use2DTransferFunction</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>OpacityEditor</receiver>
+   <slot>setHidden(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>166</x>
+     <y>354</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>154</x>
+     <y>94</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>Use2DTransferFunction</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>Transfer2DEditor</receiver>
+   <slot>setVisible(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>166</x>
+     <y>354</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>154</x>
+     <y>177</y>
     </hint>
    </hints>
   </connection>
