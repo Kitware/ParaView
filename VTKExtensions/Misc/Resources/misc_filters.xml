@@ -598,7 +598,7 @@
                          default_values="0"
                          name="Component0"
                          number_of_elements="1">
-        <NumberOfComponentsDomain name="comp0" enable_magnitude="1">
+        <NumberOfComponentsDomain name="comp0" enable_magnitude="0">
           <RequiredProperties>
             <Property function="Input"
                       name="Input" />
@@ -642,14 +642,26 @@
         </NumberOfComponentsDomain>
         <Documentation>The value of this property specifies the array component
         from which the histogram should be computed.</Documentation>
-        </IntVectorProperty>
+      </IntVectorProperty>
       <IntVectorProperty animateable="0"
                          command="SetNumberOfBins"
                          default_values="256 256"
                          name="NumberOfBins"
                          label="Number of Bins"
                          number_of_elements="2">
-        </IntVectorProperty>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetUseGradientForYAxis"
+                         default_values="1"
+                         name="UseGradientForYAxis"
+                         label="Use Gradient as Y-Axis Array"
+                         number_of_elements="1"
+                         panel_visibility="advanced">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          If this property is on, the gradient of the input scalar array will be used for the Y
+          axis of the 2D histogram.
+        </Documentation>
+      </IntVectorProperty>
       <!-- End ExtractHistogram2D -->
     </SourceProxy>
   </ProxyGroup>

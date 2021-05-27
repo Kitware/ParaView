@@ -125,14 +125,33 @@ void vtkPVExtractHistogram2D::GetInputArrays(vtkInformationVector** inputVector)
   // TODO: Handle a composite dataset
 
   this->ComponentArrayCache[0] = this->GetInputArrayToProcess(0, inputVector);
-  vtkInformationVector* inArrayVec = this->Information->Get(INPUT_ARRAYS_TO_PROCESS());
-  if (inArrayVec->GetNumberOfInformationObjects() > 1)
+
+  // Figure out if we are using the gradient magnitude for the Y axis
+  if (this->UseGradientForYAxis)
   {
-    this->ComponentArrayCache[1] = this->GetInputArrayToProcess(1, inputVector);
+    vtkInformation* inInfo = inputVector[0]->GetInformationObject(0);
+    vtkDataObject* input = inInfo->Get(vtkDataObject::DATA_OBJECT());
+    this->ComputeGradient(input);
   }
   else
   {
-    this->ComponentArrayCache[1] = this->ComponentArrayCache[0];
+    if (this->ComponentArrayCache[1])
+    {
+      if (!strcmp(this->ComponentArrayCache[1]->GetName(), "GradientMag"))
+      {
+        this->ComponentArrayCache[1]->UnRegister(this);
+        this->ComponentArrayCache[1] = nullptr;
+      }
+    }
+    vtkInformationVector* inArrayVec = this->Information->Get(INPUT_ARRAYS_TO_PROCESS());
+    if (inArrayVec->GetNumberOfInformationObjects() > 1)
+    {
+      this->ComponentArrayCache[1] = this->GetInputArrayToProcess(1, inputVector);
+    }
+    else
+    {
+      this->ComponentArrayCache[1] = this->ComponentArrayCache[0];
+    }
   }
 }
 
@@ -247,10 +266,27 @@ void vtkPVExtractHistogram2D::ComputeGradient(vtkDataObject* input)
   const auto gradientArrRange = vtk::DataArrayTupleRange(gradientArray);
   const vtk::TupleIdType numTuples = gradientArrRange.size();
 
+  if (this->ComponentArrayCache[1])
+  {
+    if (!strcmp(this->ComponentArrayCache[1]->GetName(), "GradientMag"))
+    {
+      this->ComponentArrayCache[1]->UnRegister(this);
+      this->ComponentArrayCache[1] = nullptr;
+    }
+  }
+
+  this->ComponentArrayCache[1] = vtkDoubleArray::New();
+  this->ComponentArrayCache[1]->Register(this);
+  this->ComponentArrayCache[1]->SetName("GradientMag");
+  this->ComponentArrayCache[1]->SetNumberOfComponents(1);
+  this->ComponentArrayCache[1]->SetNumberOfTuples(numTuples);
+
+  auto gradMagRange = vtk::DataArrayTupleRange(this->ComponentArrayCache[1]);
+
   for (vtk::TupleIdType tupleId = 0; tupleId < numTuples; ++tupleId)
   {
     double grad[3];
     gradientArrRange[tupleId].GetTuple(grad);
-    double gradMag = vtkMath::Norm(grad);
+    gradMagRange[tupleId][0] = vtkMath::Norm(grad);
   }
 }

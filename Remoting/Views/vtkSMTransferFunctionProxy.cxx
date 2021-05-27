@@ -819,6 +819,7 @@ vtkImageData* vtkSMTransferFunctionProxy::ComputeDataHistogram2D(int numberOfBin
   numBins[0] = numberOfBins;
   numBins[1] = numberOfBins;
   vtkSMPropertyHelper(histo, "NumberOfBins").Set(numBins, 2);
+  vtkSMPropertyHelper(histo, "UseGradientForYAxis").Set(useGradientAsY);
   histo->UpdateVTKObjects();
 
   // Reduce it
@@ -858,16 +859,6 @@ vtkImageData* vtkSMTransferFunctionProxy::ComputeDataHistogram2D(int numberOfBin
     return this->Histogram2DCache;
   }
   return this->Histogram2DCache;
-
-  //  vtkSmartPointer<vtkSMSourceProxy> grad;
-  //  grad.TakeReference(vtkSMSourceProxy::SafeDownCast(pxm->NewProxy("filters",
-  //  "GradientMagnitude"))); vtkSMPropertyHelper(grad, "Input").Set(consumer);
-  //  vtkSMPropertyHelper(grad, "Dimensionality").Set(3);
-  //  grad->UpdateVTKObjects();
-  //
-  //  // Append it to the input
-  //  vtkSmartPointer<vtkSMSourceProxy> append;
-  // return this->Histogram2DCache;
 }
 
 //----------------------------------------------------------------------------
