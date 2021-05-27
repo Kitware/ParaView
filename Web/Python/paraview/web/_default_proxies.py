@@ -42,7 +42,9 @@ __defaultProxiesJSON = """
 }
 """
 
+
 def getDefaultProxies():
     """Returns the JSON object for the default proxies configuration"""
     import json
+
     return json.loads(__defaultProxiesJSON)
