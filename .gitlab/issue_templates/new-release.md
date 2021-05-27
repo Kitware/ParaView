@@ -6,6 +6,7 @@ following strings with the associated values:
   - `@RC@` - for release candidates, replace with "-RC?". For final, replace with "".
   - `@MAJOR@` - replace with major version number
   - `@MINOR@` - replace with minor version number
+  - `@PATCH@` - replace with patch version number
   - `@BASEBRANCH@`: The branch to create the release on (for `x.y.0-RC1`,
     `master`, otherwise `release`)
   - `@BRANCHPOINT@`: The commit where the release should be started
