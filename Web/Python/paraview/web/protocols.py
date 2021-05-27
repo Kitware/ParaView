@@ -870,6 +870,9 @@ class ParaViewWebPublishImageDelivery(ParaViewWebProtocol):
 
     @exportRpc("viewport.image.push.original.size")
     def setViewSize(self, viewId, width, height):
+        if width < 10 or height < 10:
+            return {"result": "size skip"}
+
         sView = self.getView(viewId)
         if not sView:
             return {"error": "Unable to get view with id %s" % viewId}
@@ -972,6 +975,9 @@ class ParaViewWebPublishImageDelivery(ParaViewWebProtocol):
         """
         RPC Callback for mouse interactions.
         """
+        if "x" not in event or "y" not in event:
+            return 0
+
         view = self.getView(event["view"])
 
         if hasattr(view, "UseInteractiveRenderingForScreenshots"):
@@ -1203,11 +1209,10 @@ class ParaViewWebViewPortGeometryDelivery(ParaViewWebProtocol):
 class ParaViewWebLocalRendering(ParaViewWebProtocol):
     def __init__(self, **kwargs):
         super(ParaViewWebLocalRendering, self).__init__()
+        initializeSerializers()
         self.context = SynchronizationContext()
         self.trackingViews = {}
         self.mtime = 0
-
-        initializeSerializers()
 
     # RpcName: getArray => viewport.geometry.array.get
     @exportRpc("viewport.geometry.array.get")
