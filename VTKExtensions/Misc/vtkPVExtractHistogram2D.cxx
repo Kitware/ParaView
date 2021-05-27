@@ -9,9 +9,11 @@ Copyright and License information
 #include "vtkDataArrayRange.h"
 #include "vtkDataObject.h"
 #include "vtkDoubleArray.h"
+#include "vtkGradientFilter.h"
 #include "vtkImageData.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
+#include "vtkMath.h"
 #include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
 #include "vtkPointData.h"
@@ -192,7 +194,7 @@ void vtkPVExtractHistogram2D::ComputeComponentRange()
 //------------------------------------------------------------------------------------------------
 void vtkPVExtractHistogram2D::ComputeHistogram2D(vtkImageData* histogram)
 {
-  if (!this->ComponentArrayCache[0])
+  if (!this->ComponentArrayCache[0] || !histogram)
   {
     return;
   }
@@ -222,4 +224,33 @@ void vtkPVExtractHistogram2D::ComputeHistogram2D(vtkImageData* histogram)
     histArray->SetTuple1(histIndex, histArray->GetTuple1(histIndex) + 1);
   }
   return;
+}
+
+//------------------------------------------------------------------------------------------------
+void vtkPVExtractHistogram2D::ComputeGradient(vtkDataObject* input)
+{
+  if (!input)
+  {
+    return;
+  }
+
+  vtkNew<vtkGradientFilter> gf;
+  gf->SetInputData(input);
+  gf->SetComputeGradient(true);
+  gf->SetComputeVorticity(false);
+  gf->SetComputeDivergence(false);
+  gf->SetComputeQCriterion(false);
+  gf->SetResultArrayName("Gradient");
+  gf->Update();
+
+  const auto gradientArray = gf->GetOutput()->GetPointData()->GetArray("Gradient");
+  const auto gradientArrRange = vtk::DataArrayTupleRange(gradientArray);
+  const vtk::TupleIdType numTuples = gradientArrRange.size();
+
+  for (vtk::TupleIdType tupleId = 0; tupleId < numTuples; ++tupleId)
+  {
+    double grad[3];
+    gradientArrRange[tupleId].GetTuple(grad);
+    double gradMag = vtkMath::Norm(grad);
+  }
 }

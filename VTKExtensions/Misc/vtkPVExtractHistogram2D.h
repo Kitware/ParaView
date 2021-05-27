@@ -85,6 +85,15 @@ public:
   vtkBooleanMacro(UseCustomBinRanges1, bool);
   ///@}
 
+  ///@{
+  /**
+   * Set/Get whether to use the gradient of the scalar array as the Y-axis of the 2D histogram
+   */
+  vtkSetMacro(UseGradientForYAxis, bool);
+  vtkGetMacro(UseGradientForYAxis, bool);
+  vtkBooleanMacro(UseGradientForYAxis, bool);
+  ///@}
+
 protected:
   vtkPVExtractHistogram2D();
   ~vtkPVExtractHistogram2D() override;
@@ -97,11 +106,13 @@ protected:
 
   int FillInputPortInformation(int port, vtkInformation* info) override;
 
-  void ComputeHistogram2D(vtkImageData* image);
+  void ComputeHistogram2D(vtkImageData* histogram);
+  void ComputeGradient(vtkDataObject* input);
 
   int Component0 = 0;
   int Component1 = 0;
   int NumberOfBins[2] = { 256, 256 };
+  bool UseGradientForYAxis = false;
 
   double CustomBinRanges0[2];
   double CustomBinRanges1[2];

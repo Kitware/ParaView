@@ -21,6 +21,7 @@
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVArrayInformation.h"
+#include "vtkPVDataInformation.h"
 #include "vtkPVProminentValuesInformation.h"
 #include "vtkPVXMLElement.h"
 #include "vtkPVXMLParser.h"
@@ -684,6 +685,10 @@ vtkImageData* vtkSMTransferFunctionProxy::ComputeDataHistogram2D(int numberOfBin
   bool hasData = false;
   std::set<vtkSMProxy*> usedProxy;
   vtkSMSourceProxy* input = nullptr;
+  bool useGradientAsY = true;
+  std::string array2Name;
+  int array2Asso = -1;
+  int array2Component = 0;
   for (unsigned int cc = 0, max = this->GetNumberOfConsumers(); cc < max; ++cc)
   {
     vtkSMProxy* proxy = this->GetConsumerProxy(cc);
@@ -730,6 +735,27 @@ vtkImageData* vtkSMTransferFunctionProxy::ComputeDataHistogram2D(int numberOfBin
         vtkSMPropertyHelper colorArrayHelper(consumer, "ColorArrayName");
         arrayAsso = colorArrayHelper.GetInputArrayAssociation();
         arrayName = colorArrayHelper.GetInputArrayNameToProcess();
+
+        useGradientAsY =
+          (vtkSMPropertyHelper(consumer, "UseGradientForTransfer2D", true).GetAsInt() == 1);
+        if (!useGradientAsY)
+        {
+          vtkSMPropertyHelper colorArray2Helper(consumer, "ColorArray2Name");
+          array2Asso = colorArray2Helper.GetInputArrayAssociation();
+          array2Name = colorArray2Helper.GetInputArrayNameToProcess();
+          vtkSMPropertyHelper inputHelper(consumer, "Input");
+          vtkSMSourceProxy* input = vtkSMSourceProxy::SafeDownCast(inputHelper.GetAsProxy());
+          unsigned int port = inputHelper.GetOutputPort();
+          vtkPVArrayInformation* arrayInfoFromData =
+            input->GetDataInformation(port)->GetArrayInformation(
+              colorArray2Helper.GetInputArrayNameToProcess(),
+              colorArray2Helper.GetInputArrayAssociation());
+          if (arrayInfoFromData && arrayInfoFromData->GetNumberOfComponents() > 1)
+          {
+            array2Component =
+              vtkSMPropertyHelper(consumer, "SelectColorArray2Component", true).GetAsInt();
+          }
+        }
       }
       else
       {
@@ -787,8 +813,8 @@ vtkImageData* vtkSMTransferFunctionProxy::ComputeDataHistogram2D(int numberOfBin
     .SetInputArrayToProcess(arrayAsso, arrayName.c_str());
   vtkSMPropertyHelper(histo, "Component0").Set(component);
   vtkSMPropertyHelper(histo, "SelectInputArray2")
-    .SetInputArrayToProcess(arrayAsso, arrayName.c_str());
-  vtkSMPropertyHelper(histo, "Component1").Set(component);
+    .SetInputArrayToProcess(array2Asso, array2Name.c_str());
+  vtkSMPropertyHelper(histo, "Component1").Set(array2Component);
   int numBins[2];
   numBins[0] = numberOfBins;
   numBins[1] = numberOfBins;
