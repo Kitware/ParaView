@@ -73,6 +73,11 @@ git commit -m 'Update version number to @VERSION@@RC@' version.txt
             Merge Request (see script for usage)
         - Pull the script for each release; it may have been updated since it
           was last used
+        - The script outputs the information it will be using to create the
+          merge request. Please verify that it is all correct before creating
+          the merge request. See usage at the top of the script to provide
+          information that is either missing or incorrect (e.g., if its data
+          extraction heuristics fail).
     - [ ] Get positive review
     - [ ] `Do: merge`
     - [ ] Push the tag to the main repository
