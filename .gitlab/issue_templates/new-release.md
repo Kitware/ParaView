@@ -26,32 +26,34 @@ Please remove this comment.
     - Getting Started Guide
       - [ ] Rename to ParaViewGettingStarted-@VERSION@.pdf
       - [ ] Upload to www.paraview.org/files/v@MAJOR@.@MINOR@
-    - Assemble release notes into `Documentation/release/ParaView-@VERSION@`.
-      - [ ] Get positive review and merge.
 
 # Update ParaView
 
-If making the first RC for a `.0` release, `@BASEBRANCH@` is `master`, otherwise
-it is `release`.
-
-  - [ ] Update @BASEBRANCH@ branch for **paraview**
+  - Update the local copy of `@BASEBRANCH@`.
+    - If `@PATCH@@RC@` is `0-RC1`, update `master`
+    - Otherwise, update `release`
 ```
 git fetch origin
 git checkout @BASEBRANCH@
-git merge --ff-only origin/@BASEBRANCH@
+git merge --ff-only origin/@BASEBRANCH@ # if this fails, there are local commits that need to be removed
 git submodule update --recursive --init
 ```
-  - [ ] Update `version.txt` and tag the commit
+    - If `@BASEBRANCH@` is not `master`, ensure merge requests which should be
+      in the release have been merged. The [`backport-mrs.py`][backport-mrs]
+      script can be used to find and ensure that merge requests assigned to the
+      associated milestone are available on the `release` branch.
+
+  - Integrate changes.
+    - Make a commit for each of these `release`-only changes on a single topic
+      (suggested branch name: `update-to-v@VERSION@`):
+      - Assemble release notes into `Documentation/release/ParaView-@VERSION@.md`.
+        - [ ] If `PATCH` is greater than 0, add items to the end of this file.
+      - [ ] Update `version.txt` and tag the commit (tag this commit below)
 ```
 git checkout -b update-to-v@VERSION@@RC@ @BRANCHPOINT@
 echo @VERSION@@RC@ > version.txt
 git commit -m 'Update version number to @VERSION@@RC@' version.txt
-git tag -a -m 'ParaView @VERSION@@RC@' v@VERSION@@RC@ HEAD
 ```
-
-  - Integrate changes.
-    - Make a commit for each of these `release`-only changes (if `@BASEBRANCH@`
-      is `master`)
       - [ ] Update VTK's `paraview/release` branch. The
             [`release-mr`][release-mr]  script should be used to do this. Pass
             `-c .kitware-release-paraview.json` to use the appropriate
@@ -61,6 +63,7 @@ git tag -a -m 'ParaView @VERSION@@RC@' v@VERSION@@RC@ HEAD
       - [ ] `.gitmodules` to track the `paraview/release` branch of VTK
       - [ ] Update `.gitlab/ci/cdash-groups.json` to track the `release` CDash
             groups
+
     - Create a merge request targeting `release`
       - [ ] Obtain a GitLab API token for the `kwrobot.release.paraview` user
             (ask @ben.boeckel if you do not have one)
@@ -73,7 +76,8 @@ git tag -a -m 'ParaView @VERSION@@RC@' v@VERSION@@RC@ HEAD
     - [ ] Get positive review
     - [ ] `Do: merge`
     - [ ] Push the tag to the main repository
-      - [ ] `git push origin v@VERSION@`
+      - [ ] `git tag -a -m 'ParaView @VERSION@@RC@' v@VERSION@@RC@ commit-that-updated-version.txt`
+      - [ ] `git push origin v@VERSION@@RC@`
   - Create tarballs
     - [ ] ParaView (`Utilities/Maintenance/create_tarballs.bash --txz --tgz --zip -v v@VERSION@@RC@`)
   - Upload tarballs to `paraview.org`
@@ -87,6 +91,7 @@ git tag -a -m 'ParaView @VERSION@@RC@' v@VERSION@@RC@ HEAD
     - [ ] Add (or update if `@BASEBRANCH@` is `release`) version selection entry
           in paraview-superbuild
 
+[backport-mrs]: https://gitlab.kitware.com/utils/release-utils/-/blob/master/backport-mrs.py
 [release-mr]: https://gitlab.kitware.com/utils/release-utils/-/blob/master/release-mr.py
 [cdash-update-groups]: https://gitlab.kitware.com/utils/cdash-utils/-/blob/master/cdash-update-groups.py
 
