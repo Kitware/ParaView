@@ -4841,6 +4841,14 @@
                       panel_visibility="advanced" />
             <Property name="OpacityComponent"
                       panel_visibility="advanced" />
+            <Property name="UseTransfer2D"
+                      panel_visibility="advanced" />
+            <Property name="UseGradientForTransfer2D"
+                      panel_visibility="advanced" />
+            <Property name="ColorArray2Name"
+                      panel_visibility="advanced" />
+            <Property name="ColorArray2Component"
+                      panel_visibility="advanced" />
             <Property name="VolumeRenderingMode"
                       panel_visibility="advanced"
                       panel_visibility_default_for_representation="volume" />
@@ -5320,6 +5328,87 @@
           </RequiredProperties>
         </RepresentedArrayListDomain>
       </StringVectorProperty>
+      <IntVectorProperty command="SetUseTransfer2D"
+                         default_values="0"
+                         name="UseTransfer2D"
+                         label="Use 2D Transfer Function"
+                         number_of_elements="1"
+                         panel_visibility="advanced">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          If this property is on, a 2D transfer function will be used for volume rendering instead
+          of two 1D piecewise functions.
+        </Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetUseGradientForTransfer2D"
+                         default_values="1"
+                         name="UseGradientForTransfer2D"
+                         label="Use Gradient as Y-Axis Array"
+                         number_of_elements="1"
+                         panel_visibility="advanced">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          If this property is on, the gradient of the input scalar array will be used for the Y
+          axis of the 2D transfer function.
+        </Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="ShowWidgetDecorator">
+            <Property name="UseTransfer2D" function="boolean" />
+          </PropertyWidgetDecorator>
+        </Hints>
+      </IntVectorProperty>
+      <StringVectorProperty name="ColorArray2Name"
+                            command="SelectColorArray2"
+                            number_of_elements="5"
+                            element_types="0 0 0 0 2"
+                            label="2D Transfer Function Y-Axis Array"
+                            panel_visibility="advanced">
+        <ArrayListDomain name="array_list"
+          input_domain_name="input_point_array">
+          <RequiredProperties>
+            <Property name="Input" function="Input"/>
+          </RequiredProperties>
+        </ArrayListDomain>
+        <Documentation>
+          Set the second array to color with. This would be used when a 2D transfer function is
+          enabled and if the use_gradient property is set to false.
+        </Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="ShowWidgetDecorator">
+            <Property name="UseTransfer2D" function="boolean" />
+          </PropertyWidgetDecorator>
+          <PropertyWidgetDecorator type="ShowWidgetDecorator">
+            <Property name="UseGradientForTransfer2D" function="boolean_invert" />
+          </PropertyWidgetDecorator>
+        </Hints>
+      </StringVectorProperty>
+      <IntVectorProperty animateable="0"
+                         command="SelectColorArray2Component"
+                         default_values="0"
+                         name="ColorArray2Component"
+                         label="2D Transfer Function Y-Axis Array Component"
+                         number_of_elements="1">
+        <NumberOfComponentsDomain name="comps" enable_magnitude="0">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input" />
+            <Property function="ArraySelection"
+                      name="ColorArray2Name" />
+          </RequiredProperties>
+        </NumberOfComponentsDomain>
+        <Documentation>
+          This property indicates the component of the array to be used for Y-axis of the volume 2D
+          transfer function.
+        </Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="ShowWidgetDecorator">
+            <Property name="UseTransfer2D" function="boolean" />
+          </PropertyWidgetDecorator>
+          <PropertyWidgetDecorator type="ShowWidgetDecorator">
+            <Property name="UseGradientForTransfer2D" function="boolean_invert" />
+          </PropertyWidgetDecorator>
+        </Hints>
+      </IntVectorProperty>
       <IntVectorProperty command="SetUseSeparateOpacityArray"
                          default_values="0"
                          name="UseSeparateOpacityArray"

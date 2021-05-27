@@ -430,6 +430,11 @@ void vtkImageVolumeRepresentation::PrintSelf(ostream& os, vtkIndent indent)
      << ", " << this->CroppingOrigin[2] << endl;
   os << indent << "Cropping Scale: " << this->CroppingScale[0] << ", " << this->CroppingScale[1]
      << ", " << this->CroppingScale[2] << endl;
+  os << indent << "UseTransfer2D: " << this->UseTransfer2D << endl;
+  os << indent << "UseGradientForTransfer2D: " << this->UseGradientForTransfer2D << endl;
+  os << indent << "ColorArray2Name: " << this->ColorArray2Name << endl;
+  os << indent << "ColorArray2FieldAssociation: " << this->ColorArray2FieldAssociation << endl;
+  os << indent << "ColorArray2Component: " << this->ColorArray2Component << endl;
 }
 
 //----------------------------------------------------------------------------
@@ -504,4 +509,57 @@ void vtkImageVolumeRepresentation::SetIsosurfaceValue(int i, double value)
 void vtkImageVolumeRepresentation::SetNumberOfIsosurfaces(int number)
 {
   this->Property->GetIsoSurfaceValues()->SetNumberOfContours(number);
+}
+
+//----------------------------------------------------------------------------
+void vtkImageVolumeRepresentation::SetUseTransfer2D(bool value)
+{
+  if (this->UseTransfer2D != value)
+  {
+    this->UseTransfer2D = value;
+    this->MarkModified();
+  }
+}
+
+//----------------------------------------------------------------------------
+void vtkImageVolumeRepresentation::SetUseGradientForTransfer2D(bool value)
+{
+  if (this->UseGradientForTransfer2D != value)
+  {
+    this->UseGradientForTransfer2D = value;
+    this->MarkModified();
+  }
+}
+
+//----------------------------------------------------------------------------
+void vtkImageVolumeRepresentation::SelectColorArray2(
+  int, int, int, int fieldAssociation, const char* name)
+{
+  std::string newName;
+  if (name)
+  {
+    newName = std::string(name);
+  }
+
+  if (this->ColorArray2Name != newName)
+  {
+    this->ColorArray2Name = newName;
+    this->MarkModified();
+  }
+
+  if (this->ColorArray2FieldAssociation != fieldAssociation)
+  {
+    this->ColorArray2FieldAssociation = fieldAssociation;
+    this->MarkModified();
+  }
+}
+
+//----------------------------------------------------------------------------
+void vtkImageVolumeRepresentation::SelectColorArray2Component(int component)
+{
+  if (this->ColorArray2Component != component)
+  {
+    this->ColorArray2Component = component;
+    this->MarkModified();
+  }
 }

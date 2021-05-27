@@ -110,6 +110,13 @@ public:
   vtkGetVector3Macro(CroppingScale, double);
   //@}
 
+  //***************************************************************************
+  // For 2D transfer functions
+  void SetUseTransfer2D(bool);
+  void SetUseGradientForTransfer2D(bool);
+  void SelectColorArray2(int, int, int, int, const char* name);
+  void SelectColorArray2Component(int component);
+
 protected:
   vtkImageVolumeRepresentation();
   ~vtkImageVolumeRepresentation() override;
@@ -153,6 +160,13 @@ protected:
   int WholeExtent[6] = { 0, -1, 0, -1, 0, -1 };
   double CroppingOrigin[3] = { 0, 0, 0 };
   double CroppingScale[3] = { 1, 1, 1 };
+
+  // 2D transfer function support
+  bool UseTransfer2D = false;
+  bool UseGradientForTransfer2D = true;
+  int ColorArray2FieldAssociation = -1;
+  int ColorArray2Component = -1;
+  std::string ColorArray2Name;
 
 private:
   vtkImageVolumeRepresentation(const vtkImageVolumeRepresentation&) = delete;
