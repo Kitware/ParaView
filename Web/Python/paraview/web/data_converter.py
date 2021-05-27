@@ -3,10 +3,10 @@ from vtkmodules.vtkCommonCore import vtkFloatArray, vtkUnsignedCharArray
 from vtkmodules.vtkCommonDataModel import vtkImageData
 from vtkmodules.vtkIOLegacy import vtkDataSetWriter
 
-from vtkmodules.web.camera import *
-from vtkmodules.web import iteritems, buffer
+from vtkmodules.web.camera import normalize, vectProduct, dotProduct
+from vtkmodules.web import iteritems
 
-import json, os, math, gzip, shutil, array
+import json, os, math, array
 
 # -----------------------------------------------------------------------------
 # Helper function
@@ -44,7 +44,7 @@ def convertImageToFloat(srcPngImage, destFile, scalarRange=[0.0, 1.0]):
 
     # Write float file
     with open(destFile, "wb") as f:
-        f.write(buffer(outputArray))
+        f.write(memoryview(outputArray))
 
     return size
 
@@ -185,7 +185,7 @@ class ConvertCompositeSpriteToSortedStack(object):
 
         # Write order (sorted order way)
         with open(os.path.join(directory, "order.uint8"), "wb") as f:
-            f.write(buffer(orderArray))
+            f.write(memoryview(orderArray))
             self.data.append(
                 {"name": "order", "type": "array", "fileName": "/order.uint8"}
             )
@@ -299,7 +299,7 @@ class ConvertCompositeSpriteToSortedStack(object):
 
             # Write the sorted data
             with open(os.path.join(directory, "normal.uint8"), "wb") as f:
-                f.write(buffer(sortedNormal))
+                f.write(memoryview(sortedNormal))
                 self.data.append(
                     {
                         "name": "normal",
@@ -330,7 +330,7 @@ class ConvertCompositeSpriteToSortedStack(object):
                     )
 
             with open(os.path.join(directory, "intensity.uint8"), "wb") as f:
-                f.write(buffer(sortedIntensity))
+                f.write(memoryview(sortedIntensity))
                 self.data.append(
                     {
                         "name": "intensity",
@@ -371,7 +371,7 @@ class ConvertCompositeSpriteToSortedStack(object):
                         os.path.join(directory, "%d_%s.float32" % (layerIdx, scalar)),
                         "wb",
                     ) as f:
-                        f.write(buffer(scalarArray))
+                        f.write(memoryview(scalarArray))
                         self.data.append(
                             {
                                 "name": "%d_%s" % (layerIdx, scalar),
@@ -457,7 +457,7 @@ class ConvertCompositeDataToSortedStack(object):
 
         # Write order (sorted order way)
         with open(os.path.join(directory, "order.uint8"), "wb") as f:
-            f.write(buffer(orderArray))
+            f.write(memoryview(orderArray))
             self.data.append(
                 {"name": "order", "type": "array", "fileName": "/order.uint8"}
             )
@@ -584,7 +584,7 @@ class ConvertCompositeDataToSortedStack(object):
 
             # Write the sorted data
             with open(os.path.join(directory, "normal.uint8"), "wb") as f:
-                f.write(buffer(sortedNormal))
+                f.write(memoryview(sortedNormal))
                 self.data.append(
                     {
                         "name": "normal",
@@ -629,7 +629,7 @@ class ConvertCompositeDataToSortedStack(object):
                     sortedIntensity.SetValue(idx, intensityLayers[layerIdx][imageIdx])
 
             with open(os.path.join(directory, "intensity.uint8"), "wb") as f:
-                f.write(buffer(sortedIntensity))
+                f.write(memoryview(sortedIntensity))
                 self.data.append(
                     {
                         "name": "intensity",

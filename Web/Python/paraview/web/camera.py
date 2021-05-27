@@ -1,5 +1,5 @@
 from paraview import simple
-from vtk.web import camera
+from vtkmodules.web import camera
 
 
 def update_camera(viewProxy, cameraData):

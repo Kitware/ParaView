@@ -1,10 +1,9 @@
-from vtkmodules.web import camera
-from paraview.web import data_writer
-from paraview.web import data_converter
+from vtkmodules.web import camera, javascriptMapping, arrayTypesMapping
+from paraview.web import data_writer, data_converter
 
-from vtkmodules.web.query_data_model import *
-from paraview.web.camera import *
-from vtkmodules.web import iteritems, buffer
+from vtkmodules.web.query_data_model import DataHandler
+from paraview.web.camera import update_camera
+from vtkmodules.web import iteritems
 from paraview import simple
 from paraview import servermanager
 
@@ -20,19 +19,6 @@ import json, os, math, gzip, shutil, hashlib
 
 # Global helper variables
 encode_codes = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-arrayTypesMapping = "  bBhHiIlLfd"
-jsMapping = {
-    "b": "Int8Array",
-    "B": "Uint8Array",
-    "h": "Int16Array",
-    "H": "Int16Array",
-    "i": "Int32Array",
-    "I": "Uint32Array",
-    "l": "Int32Array",
-    "L": "Uint32Array",
-    "f": "Float32Array",
-    "d": "Float64Array",
-}
 
 # -----------------------------------------------------------------------------
 # Basic Dataset Builder
@@ -207,7 +193,7 @@ class DataProberDataSetBuilder(DataSetBuilder):
                     with open(
                         self.dataHandler.getDataAbsoluteFilePath(field), "wb"
                     ) as f:
-                        f.write(buffer(array))
+                        f.write(memoryview(array))
 
                     self.expandRange(array)
                 else:
@@ -227,7 +213,7 @@ class DataProberDataSetBuilder(DataSetBuilder):
                     with open(
                         self.dataHandler.getDataAbsoluteFilePath(field), "wb"
                     ) as f:
-                        f.write(buffer(magarray))
+                        f.write(memoryview(magarray))
 
                     self.expandRange(magarray)
             else:
@@ -244,7 +230,7 @@ class DataProberDataSetBuilder(DataSetBuilder):
 
     def expandRange(self, array):
         field = array.GetName()
-        self.DataProber["types"][field] = jsMapping[
+        self.DataProber["types"][field] = javascriptMapping[
             arrayTypesMapping[array.GetDataType()]
         ]
 
@@ -691,7 +677,7 @@ class CompositeDataSetBuilder(DataSetBuilder):
                 with open(
                     os.path.join(dest_path, "depth_%d.float32" % compositeIdx), "wb"
                 ) as f:
-                    f.write(buffer(zBuffer))
+                    f.write(memoryview(zBuffer))
 
                 # Prevent color interference
                 rep.DiffuseColor = [1, 1, 1]
@@ -725,7 +711,7 @@ class CompositeDataSetBuilder(DataSetBuilder):
                             ),
                             "wb",
                         ) as f:
-                            f.write(buffer(specularComponent))
+                            f.write(memoryview(specularComponent))
 
                         # Free memory
                         image.UnRegister(None)
@@ -754,7 +740,7 @@ class CompositeDataSetBuilder(DataSetBuilder):
                                     ),
                                     "wb",
                                 ) as f:
-                                    f.write(buffer(tmpNormalArray))
+                                    f.write(memoryview(tmpNormalArray))
                         else:
                             for comp in range(3):
                                 # Configure view to handle POINT_DATA / CELL_DATA
@@ -778,7 +764,7 @@ class CompositeDataSetBuilder(DataSetBuilder):
                                     ),
                                     "wb",
                                 ) as f:
-                                    f.write(buffer(floatArray))
+                                    f.write(memoryview(floatArray))
 
                                 # Free memory
                                 image.UnRegister(None)
@@ -814,7 +800,7 @@ class CompositeDataSetBuilder(DataSetBuilder):
                         ),
                         "wb",
                     ) as f:
-                        f.write(buffer(floatArray))
+                        f.write(memoryview(floatArray))
                         self.dataHandler.registerData(
                             name="%d_%s" % (compositeIdx, fieldName),
                             fileName="/%d_%s.float32" % (compositeIdx, fieldName),
@@ -842,7 +828,7 @@ def writeCellArray(dataHandler, currentData, cellName, inputCellArray):
     for valueIdx in range(nbValues):
         outputCells.SetValue(valueIdx, inputCellArray.GetValue(valueIdx))
 
-    iBuffer = buffer(outputCells)
+    iBuffer = memoryview(outputCells)
     iMd5 = hashlib.md5(iBuffer).hexdigest()
     iPath = os.path.join(dataHandler.getBasePath(), "data", "%s.Uint32Array" % iMd5)
     currentData["polys"] = "data/%s.Uint32Array" % iMd5
@@ -969,7 +955,7 @@ class VTKGeometryDataSetBuilder(DataSetBuilder):
                 coord = originalPoints.GetPoint(idx)
                 points.SetTuple3(idx, coord[0], coord[1], coord[2])
 
-            pBuffer = buffer(points)
+            pBuffer = memoryview(points)
             pMd5 = hashlib.md5(pBuffer).hexdigest()
             pPath = os.path.join(
                 self.dataHandler.getBasePath(), "data", "%s.Float32Array" % pMd5
@@ -1005,7 +991,7 @@ class VTKGeometryDataSetBuilder(DataSetBuilder):
                     array = ds.GetPointData().GetArray(fieldName)
                 elif "CELL_DATA" in fieldInfo["location"]:
                     array = ds.GetCellData().GetArray(fieldName)
-                jsType = jsMapping[arrayTypesMapping[array.GetDataType()]]
+                jsType = javascriptMapping[arrayTypesMapping[array.GetDataType()]]
                 arrayRange = array.GetRange(-1)
                 tupleSize = array.GetNumberOfComponents()
                 arraySize = array.GetNumberOfTuples()
@@ -1023,7 +1009,7 @@ class VTKGeometryDataSetBuilder(DataSetBuilder):
 
                         outputField.SetValue(i, math.sqrt(magnitude))
 
-                fBuffer = buffer(outputField)
+                fBuffer = memoryview(outputField)
                 fMd5 = hashlib.md5(fBuffer).hexdigest()
                 fPath = os.path.join(
                     self.dataHandler.getBasePath(),
@@ -1205,7 +1191,7 @@ class GeometryDataSetBuilder(DataSetBuilder):
                 coord = originalPoints.GetPoint(idx)
                 points.SetTuple3(idx, coord[0], coord[1], coord[2])
 
-            pBuffer = buffer(points)
+            pBuffer = memoryview(points)
             pMd5 = hashlib.md5(pBuffer).hexdigest()
             pPath = os.path.join(
                 self.dataHandler.getBasePath(), "points", "%s.Float32Array" % pMd5
@@ -1240,7 +1226,7 @@ class GeometryDataSetBuilder(DataSetBuilder):
                 else:
                     print("Cell size of", cellSize, "not supported")
 
-            iBuffer = buffer(topo)
+            iBuffer = memoryview(topo)
             iMd5 = hashlib.md5(iBuffer).hexdigest()
             iPath = os.path.join(
                 self.dataHandler.getBasePath(), "index", "%s.Uint32Array" % iMd5
@@ -1277,7 +1263,7 @@ class GeometryDataSetBuilder(DataSetBuilder):
 
                         outputField.SetValue(i, math.sqrt(magnitude))
 
-                fBuffer = buffer(outputField)
+                fBuffer = memoryview(outputField)
                 fMd5 = hashlib.md5(fBuffer).hexdigest()
                 fPath = os.path.join(
                     self.dataHandler.getBasePath(),

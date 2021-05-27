@@ -1,8 +1,3 @@
-import sys
-
-if sys.version_info >= (3,):
-    xrange = range
-
 # --------------------------------------------------------------------------
 # Handle BooleanDomain
 # --------------------------------------------------------------------------
@@ -188,7 +183,7 @@ def proxyListDomainDecorator(props, xmlProps, uiProps, domain):
     uiProps["type"] = "proxy"
     values = {}
 
-    for i in xrange(domain.GetNumberOfProxies()):
+    for i in range(domain.GetNumberOfProxies()):
         nextProxy = domain.GetProxy(i)
         values[nextProxy.GetXMLLabel()] = nextProxy.GetGlobalIDAsString()
 

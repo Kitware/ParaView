@@ -1,11 +1,9 @@
-import os, math
+import os
 
 from paraview import simple
 
 from vtkmodules.vtkIOImage import vtkPNGReader
 from vtkmodules.vtkCommonCore import vtkFloatArray, vtkUnsignedCharArray
-
-from vtkmodules.web import buffer
 
 VTK_DATA_TYPES = [
     "void",  # 0
@@ -74,7 +72,7 @@ class ScalarRenderer(object):
                 rawArray.SetTuple1(idx, light)
 
             with open(path, "wb") as f:
-                f.write(buffer(rawArray))
+                f.write(memoryview(rawArray))
 
             # Delete temporary file
             if self.cleanAfterMe:
@@ -111,7 +109,7 @@ class ScalarRenderer(object):
                 rawArray.SetTuple1(idx, light)
 
             with open(path, "wb") as f:
-                f.write(buffer(rawArray))
+                f.write(memoryview(rawArray))
 
             # Delete temporary file
             if self.cleanAfterMe:
@@ -189,7 +187,7 @@ class ScalarRenderer(object):
             # print ('Array bounds', minValue, maxValue, 'compare to', dataRange)
 
             with open(path, "wb") as f:
-                f.write(buffer(rawArray))
+                f.write(memoryview(rawArray))
 
             # Delete temporary file
             if self.cleanAfterMe:

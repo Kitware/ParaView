@@ -2,7 +2,6 @@ r"""web_helper is a module that provides access to functions that helps to build
 new protocols and process ParaView data structure into web friendly ones.
 """
 
-import types
 import sys
 import os
 import traceback
@@ -11,15 +10,8 @@ import traceback
 import paraview
 
 from paraview import simple, servermanager
-from paraview.servermanager import ProxyProperty, InputProperty
+from paraview.servermanager import ProxyProperty
 from paraview.modules.vtkRemotingViews import vtkSMPVRepresentationProxy
-
-PY3 = False
-if sys.version_info >= (3,):
-    xrange = range
-    PY3 = True
-
-from vtkmodules.web import buffer
 
 # =============================================================================
 # Pipeline management
@@ -299,7 +291,7 @@ def getProxyAsState(id):
                 listdomain = prop.FindDomain("vtkSMProxyListDomain")
                 if listdomain:
                     proxyPropertyValue = prop.GetProxy(0)
-                    for i in xrange(listdomain.GetNumberOfProxies()):
+                    for i in range(listdomain.GetNumberOfProxies()):
                         if listdomain.GetProxy(i) == proxyPropertyValue:
                             properties[propertyName] = proxyList[i]
                             # Add selected proxy in list of prop to edit
@@ -362,16 +354,6 @@ def updateProxyProperties(proxy, properties):
 
 
 def removeUnicode(value):
-    # python 3 is using str everywhere already.
-    if PY3:
-        return value
-    if type(value) == unicode:
-        return str(value)
-    if type(value) == list:
-        result = []
-        for v in value:
-            result.append(removeUnicode(v))
-        return result
     return value
 
 
@@ -554,7 +536,7 @@ def apply_domains(parentProxy, proxy_id):
                 if len(prop.Available) and prop.GetNumberOfProxies() == 1:
                     listdomain = prop.FindDomain("vtkSMProxyListDomain")
                     if listdomain:
-                        for i in xrange(listdomain.GetNumberOfProxies()):
+                        for i in range(listdomain.GetNumberOfProxies()):
                             internal_proxy = listdomain.GetProxy(i)
                             apply_domains(
                                 parentProxy, internal_proxy.GetGlobalIDAsString()

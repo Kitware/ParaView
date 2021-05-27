@@ -5,42 +5,57 @@ very specific web application.
 
 from __future__ import absolute_import, division, print_function
 
-import os, sys, types, inspect, traceback, logging, re, json, fnmatch, time
-
-# import Twisted reactor for later callback
-from twisted.internet import reactor
-
-# import RPC annotation
-from wslink import register as exportRpc
+import base64
+import fnmatch
+import json
+import os
+import re
+import sys
+import time
 
 # import paraview modules.
 import paraview
-
-from paraview import simple, servermanager
-from paraview.servermanager import ProxyProperty, InputProperty
+from paraview import servermanager, simple
+from paraview.servermanager import (
+    InputProperty,
+    ProxyProperty,
+    vtkPVRenderView,
+    vtkSMPVRepresentationProxy,
+    vtkSMTransferFunctionManager,
+    vtkSMTransferFunctionProxy,
+)
 from paraview.web import helper
-from vtkmodules.web import protocols as vtk_protocols
+from paraview.web.decorators import (
+    arrayListDomainDecorator,
+    arraySelectionDomainDecorator,
+    booleanDomainDecorator,
+    clipScalarDecorator,
+    enumerationDomainDecorator,
+    genericDecorator,
+    multiLineDecorator,
+    numberRangeDomainDecorator,
+    proxyEditorPropertyWidgetDecorator,
+    proxyListDomainDecorator,
+    stringListDomainDecorator,
+    treeDomainDecorator,
+)
+
+# import Twisted reactor for later callback
+from twisted.internet import reactor
+from vtkmodules.vtkCommonCore import vtkCollection, vtkUnsignedCharArray
+from vtkmodules.vtkCommonDataModel import vtkDataObject, vtkImageData
+from vtkmodules.vtkWebCore import vtkDataEncoder, vtkWebInteractionEvent
 from vtkmodules.web import iteritems
+from vtkmodules.web import protocols as vtk_protocols
 from vtkmodules.web.render_window_serializer import (
     SynchronizationContext,
+    getReferenceId,
     initializeSerializers,
     serializeInstance,
-    getReferenceId,
 )
-from paraview.web.decorators import *
 
-from vtkmodules.vtkCommonDataModel import vtkImageData, vtkDataObject
-from vtkmodules.vtkCommonCore import vtkUnsignedCharArray, vtkCollection
-from vtkmodules.vtkWebCore import vtkDataEncoder, vtkWebInteractionEvent
-
-from paraview.servermanager import (
-    vtkSMPVRepresentationProxy,
-    vtkSMTransferFunctionProxy,
-    vtkSMTransferFunctionManager,
-    vtkSMProxyManager,
-    vtkProcessModule,
-    vtkPVRenderView,
-)
+# import RPC annotation
+from wslink import register as exportRpc
 
 if sys.version_info >= (3,):
     xrange = range
@@ -1946,8 +1961,8 @@ class ParaViewWebProxyManager(ParaViewWebProtocol):
         "unspecified",  # 14
         "signed_char",  # 15
         "long_long",  # 16
-        "unsigned_long_long",
-    ]  # 17
+        "unsigned_long_long",  # 17
+    ]
 
     def __init__(
         self,
@@ -3822,10 +3837,6 @@ class ParaViewWebFileListing(ParaViewWebProtocol):
 # Handle Data Selection
 #
 # =============================================================================
-from paraview.modules.vtkRemotingCore import *
-from vtkmodules.vtkCommonCore import *
-
-
 class ParaViewWebSelectionHandler(ParaViewWebProtocol):
     def __init__(self, **kwargs):
         self.active_view = None
