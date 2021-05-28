@@ -153,8 +153,8 @@ static void update_property(vtkAxis* axis, vtkSMProperty* propMin, vtkSMProperty
   {
     double range[2];
     axis->GetUnscaledRange(range);
-    vtkSMPropertyHelper(propMin).Set(range[0]);
-    vtkSMPropertyHelper(propMax).Set(range[1]);
+    vtkSMPropertyHelper(propMin, true).Set(range[0]);
+    vtkSMPropertyHelper(propMax, true).Set(range[1]);
   }
 }
 
@@ -193,12 +193,12 @@ void vtkSMContextViewProxy::OnInteractionEvent()
   // Charts by default update axes ranges as needed. On interaction, we force
   // the chart to preserve the user-selected ranges.
   this->CopyAxisRangesFromChart();
-  vtkSMPropertyHelper(this, "LeftAxisUseCustomRange").Set(1);
-  vtkSMPropertyHelper(this, "BottomAxisUseCustomRange").Set(1);
+  vtkSMPropertyHelper(this, "LeftAxisUseCustomRange", true).Set(1);
+  vtkSMPropertyHelper(this, "BottomAxisUseCustomRange", true).Set(1);
   if (this->XYChartViewBase4Axes)
   {
-    vtkSMPropertyHelper(this, "RightAxisUseCustomRange").Set(1);
-    vtkSMPropertyHelper(this, "TopAxisUseCustomRange").Set(1);
+    vtkSMPropertyHelper(this, "RightAxisUseCustomRange", true).Set(1);
+    vtkSMPropertyHelper(this, "TopAxisUseCustomRange", true).Set(1);
   }
   this->UpdateVTKObjects();
   this->InvokeEvent(vtkCommand::InteractionEvent);
@@ -236,12 +236,12 @@ void vtkSMContextViewProxy::ResetDisplay()
 {
   // simply unlock all the axes ranges. That results in the chart determine
   // new ranges to use in the Update call.
-  vtkSMPropertyHelper(this, "LeftAxisUseCustomRange").Set(0);
-  vtkSMPropertyHelper(this, "BottomAxisUseCustomRange").Set(0);
+  vtkSMPropertyHelper(this, "LeftAxisUseCustomRange", true).Set(0);
+  vtkSMPropertyHelper(this, "BottomAxisUseCustomRange", true).Set(0);
   if (this->XYChartViewBase4Axes)
   {
-    vtkSMPropertyHelper(this, "RightAxisUseCustomRange").Set(0);
-    vtkSMPropertyHelper(this, "TopAxisUseCustomRange").Set(0);
+    vtkSMPropertyHelper(this, "RightAxisUseCustomRange", true).Set(0);
+    vtkSMPropertyHelper(this, "TopAxisUseCustomRange", true).Set(0);
   }
   this->UpdateVTKObjects();
 }
