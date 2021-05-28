@@ -41,6 +41,11 @@ public:
    */
   void SetBox(const double x, const double y, const double width, const double height);
 
+  /**
+   * Get access to the texture of this box item
+   */
+  vtkSmartPointer<vtkImageData> GetTexture() const;
+
 protected:
   vtkTransfer2DBoxItem();
   ~vtkTransfer2DBoxItem();

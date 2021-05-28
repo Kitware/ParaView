@@ -116,6 +116,7 @@ public:
   void SetUseGradientForTransfer2D(bool);
   void SelectColorArray2(int, int, int, int, const char* name);
   void SelectColorArray2Component(int component);
+  void SetTransferFunction2D(vtkImageData* transfer2d);
 
 protected:
   vtkImageVolumeRepresentation();

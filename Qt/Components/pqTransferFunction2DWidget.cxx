@@ -42,6 +42,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkControlPointsItem.h"
 #include "vtkDataArray.h"
 #include "vtkEventQtSlotConnect.h"
+#include "vtkFloatArray.h"
 #include "vtkGenericOpenGLRenderWindow.h"
 #include "vtkImageData.h"
 #include "vtkObjectFactory.h"
@@ -146,6 +147,90 @@ public:
 
       boxItem->SetValidBounds(xMin, xMax, yMin, yMax);
     }
+  }
+
+  vtkSmartPointer<vtkImageData> GetTransfer2D()
+  {
+    if (!this->IsInitialized())
+    {
+      return nullptr;
+    }
+    const vtkIdType numPlots = GetNumberOfPlots();
+    if (numPlots < 2)
+    {
+      // the first plot will be the histogram plot
+      // i.e. no transfer2D boxes
+      return nullptr;
+    }
+
+    vtkSmartPointer<vtkImageData> histogram =
+      vtkPlotHistogram2D::SafeDownCast(this->GetPlot(0))->GetInputImageData();
+    if (!histogram)
+    {
+      return nullptr;
+    }
+
+    double spacing[3];
+    histogram->GetSpacing(spacing);
+    double origin[3];
+    histogram->GetOrigin(origin);
+    int dims[3];
+    histogram->GetDimensions(dims);
+
+    vtkNew<vtkImageData> im;
+    im->SetOrigin(origin);
+    im->SetSpacing(spacing);
+    im->SetDimensions(dims);
+    im->AllocateScalars(VTK_FLOAT, 4);
+    auto arr = vtkFloatArray::SafeDownCast(im->GetPointData()->GetScalars());
+    const auto dataPtr = arr->GetVoidPointer(0);
+    memset(dataPtr, 0, 256 * 256 * 4 * sizeof(unsigned char));
+
+    for (vtkIdType i = 0; i < numPlots; ++i)
+    {
+      auto boxItem = vtkTransfer2DBoxItem::SafeDownCast(GetPlot(i));
+      const vtkRectd box = boxItem->GetBox();
+      vtkIdType width = static_cast<vtkIdType>(box.GetWidth() / spacing[0]);
+      vtkIdType height = static_cast<vtkIdType>(box.GetHeight() / spacing[1]);
+      if (width <= 0 || height <= 0)
+      {
+        continue;
+      }
+      vtkIdType x0 = static_cast<vtkIdType>((box.GetX() - origin[0]) / spacing[0]);
+      vtkIdType y0 = static_cast<vtkIdType>((box.GetY() - origin[1]) / spacing[1]);
+      vtkSmartPointer<vtkImageData> boxTexture = boxItem->GetTexture();
+      int boxDims[3];
+      boxTexture->GetDimensions(boxDims);
+      double boxSpacing[3] = { 1, 1, 1 };
+      boxSpacing[0] = box.GetWidth() / boxDims[0];
+      boxSpacing[1] = box.GetHeight() / boxDims[1];
+      for (vtkIdType ii = x0; ii < width; ++ii)
+      {
+        for (vtkIdType jj = y0; jj < height; ++jj)
+        {
+          int boxCoord[3] = { 0, 0, 0 };
+          boxCoord[0] = (ii - x0) * spacing[0] / boxSpacing[0];
+          boxCoord[1] = (jj - y0) * spacing[1] / boxSpacing[1];
+          unsigned char* ptr = static_cast<unsigned char*>(boxTexture->GetScalarPointer(boxCoord));
+          float fptr[4];
+          for (int tp = 0; tp < 4; ++tp)
+          {
+            fptr[tp] = ptr[tp] / 255.0;
+          }
+          // composite this color with the current color
+          float* c = static_cast<float*>(im->GetScalarPointer(ii, jj, 0));
+          for (int tp = 0; tp < 3; ++tp)
+          {
+            c[tp] = c[tp] * c[3] + fptr[tp] * fptr[3];
+            c[tp] = c[tp] > 1.0 ? 1.0 : c[tp];
+          }
+          c[3] = c[3] + fptr[3];
+          c[3] = c[3] > 1.0 ? 1.0 : c[3];
+        }
+      }
+    }
+
+    return im;
   }
 
 protected:

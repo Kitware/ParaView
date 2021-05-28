@@ -397,27 +397,35 @@ void vtkImageVolumeRepresentation::UpdateMapperParameters()
       this->Property->SetIndependentComponents(false);
     }
 
-    // Update the mapper's vector mode
-    vtkColorTransferFunction* ctf = this->Property->GetRGBTransferFunction(0);
-
-    // When vtkScalarsToColors::MAGNITUDE mode is active, vtkSmartVolumeMapper
-    // uses an internally generated (single-component) dataset.  However,
-    // unchecking MapScalars (e.g. IndependentComponents == 0) requires 2C or 4C
-    // data. In that case, vtkScalarsToColors::COMPONENT is forced in order to
-    // make vtkSmartVolumeMapper use the original multiple-component dataset.
-    int const indep = this->Property->GetIndependentComponents();
-    int const mode = indep ? ctf->GetVectorMode() : vtkScalarsToColors::COMPONENT;
-    int const comp = indep ? ctf->GetVectorComponent() : 0;
-
-    if (auto smartVolumeMapper = vtkSmartVolumeMapper::SafeDownCast(this->VolumeMapper))
+    if (this->UseTransfer2D)
     {
-      smartVolumeMapper->SetVectorMode(mode);
-      smartVolumeMapper->SetVectorComponent(comp);
+      this->Property->SetTransferFunctionMode(vtkVolumeProperty::TF_2D);
     }
-    else if (auto mbMapper = vtkMultiBlockVolumeMapper::SafeDownCast(this->VolumeMapper))
+    else
     {
-      mbMapper->SetVectorMode(mode);
-      mbMapper->SetVectorComponent(comp);
+      this->Property->SetTransferFunctionMode(vtkVolumeProperty::TF_1D);
+      // Update the mapper's vector mode
+      vtkColorTransferFunction* ctf = this->Property->GetRGBTransferFunction(0);
+
+      // When vtkScalarsToColors::MAGNITUDE mode is active, vtkSmartVolumeMapper
+      // uses an internally generated (single-component) dataset.  However,
+      // unchecking MapScalars (e.g. IndependentComponents == 0) requires 2C or 4C
+      // data. In that case, vtkScalarsToColors::COMPONENT is forced in order to
+      // make vtkSmartVolumeMapper use the original multiple-component dataset.
+      int const indep = this->Property->GetIndependentComponents();
+      int const mode = indep ? ctf->GetVectorMode() : vtkScalarsToColors::COMPONENT;
+      int const comp = indep ? ctf->GetVectorComponent() : 0;
+
+      if (auto smartVolumeMapper = vtkSmartVolumeMapper::SafeDownCast(this->VolumeMapper))
+      {
+        smartVolumeMapper->SetVectorMode(mode);
+        smartVolumeMapper->SetVectorComponent(comp);
+      }
+      else if (auto mbMapper = vtkMultiBlockVolumeMapper::SafeDownCast(this->VolumeMapper))
+      {
+        mbMapper->SetVectorMode(mode);
+        mbMapper->SetVectorComponent(comp);
+      }
     }
   }
 }
@@ -562,4 +570,10 @@ void vtkImageVolumeRepresentation::SelectColorArray2Component(int component)
     this->ColorArray2Component = component;
     this->MarkModified();
   }
+}
+
+//----------------------------------------------------------------------------
+void vtkImageVolumeRepresentation::SetTransferFunction2D(vtkImageData* transfer2D)
+{
+  this->Property->SetTransferFunction2D(transfer2D);
 }

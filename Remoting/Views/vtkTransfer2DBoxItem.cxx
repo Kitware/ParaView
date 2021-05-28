@@ -30,6 +30,7 @@
 #include "vtkUnsignedCharArray.h"
 #include "vtkVectorOperators.h"
 
+//-------------------------------------------------------------------------------------------------
 namespace
 {
 inline bool PointIsWithinBounds2D(double point[2], double bounds[4], const double delta[2])
@@ -50,7 +51,7 @@ inline bool PointIsWithinBounds2D(double point[2], double bounds[4], const doubl
 }
 }
 
-////////////////////////////////////////////////////////////////////////////////
+//-------------------------------------------------------------------------------------------------
 vtkStandardNewMacro(vtkTransfer2DBoxItem)
 
   vtkTransfer2DBoxItem::vtkTransfer2DBoxItem()
@@ -83,8 +84,10 @@ vtkStandardNewMacro(vtkTransfer2DBoxItem)
   memset(dataPtr, 0, texSize * texSize * 4 * sizeof(unsigned char));
 }
 
+//-------------------------------------------------------------------------------------------------
 vtkTransfer2DBoxItem::~vtkTransfer2DBoxItem() = default;
 
+//-------------------------------------------------------------------------------------------------
 void vtkTransfer2DBoxItem::DragBox(const double deltaX, const double deltaY)
 {
   this->StartChanges();
@@ -102,6 +105,7 @@ void vtkTransfer2DBoxItem::DragBox(const double deltaX, const double deltaY)
   this->InvokeEvent(vtkCommand::SelectionChangedEvent);
 }
 
+//-------------------------------------------------------------------------------------------------
 bool vtkTransfer2DBoxItem::BoxIsWithinBounds(const double deltaX, const double deltaY)
 {
   double bounds[4];
@@ -120,6 +124,7 @@ bool vtkTransfer2DBoxItem::BoxIsWithinBounds(const double deltaX, const double d
   return true;
 }
 
+//-------------------------------------------------------------------------------------------------
 void vtkTransfer2DBoxItem::MovePoint(vtkIdType pointId, const double deltaX, const double deltaY)
 {
   double pos[2];
@@ -131,12 +136,14 @@ void vtkTransfer2DBoxItem::MovePoint(vtkIdType pointId, const double deltaX, con
   this->BoxPoints->SetPoint(pointId, newPos[0], newPos[1]);
 }
 
+//-------------------------------------------------------------------------------------------------
 vtkIdType vtkTransfer2DBoxItem::AddPoint(const double x, const double y)
 {
   double pos[2] = { x, y };
   return this->AddPoint(pos);
 }
 
+//-------------------------------------------------------------------------------------------------
 vtkIdType vtkTransfer2DBoxItem::AddPoint(double* pos)
 {
   if (this->BoxPoints->GetNumberOfPoints() >= 4)
@@ -154,6 +161,7 @@ vtkIdType vtkTransfer2DBoxItem::AddPoint(double* pos)
   return id;
 }
 
+//-------------------------------------------------------------------------------------------------
 void vtkTransfer2DBoxItem::DragCorner(const vtkIdType cornerId, const double* delta)
 {
   if (cornerId < 0 || cornerId > 3)
@@ -206,6 +214,7 @@ void vtkTransfer2DBoxItem::DragCorner(const vtkIdType cornerId, const double* de
   this->InvokeEvent(vtkCommand::SelectionChangedEvent);
 }
 
+//-------------------------------------------------------------------------------------------------
 bool vtkTransfer2DBoxItem::ArePointsCrossing(
   const vtkIdType pointA, const double* deltaA, const vtkIdType pointB)
 {
@@ -232,23 +241,27 @@ bool vtkTransfer2DBoxItem::ArePointsCrossing(
   return false;
 }
 
+//-------------------------------------------------------------------------------------------------
 vtkIdType vtkTransfer2DBoxItem::RemovePoint(double* vtkNotUsed(pos))
 {
   // This method does nothing as this item has a fixed number of points (4).
   return 0;
 }
 
+//-------------------------------------------------------------------------------------------------
 void vtkTransfer2DBoxItem::SetControlPoint(vtkIdType vtkNotUsed(index), double* vtkNotUsed(point))
 {
   // This method does nothing as this item has a fixed number of points (4).
   return;
 }
 
+//-------------------------------------------------------------------------------------------------
 vtkIdType vtkTransfer2DBoxItem::GetNumberOfPoints() const
 {
   return static_cast<vtkIdType>(this->NumPoints);
 }
 
+//-------------------------------------------------------------------------------------------------
 void vtkTransfer2DBoxItem::GetControlPoint(vtkIdType index, double* point) const
 {
   if (index >= this->NumPoints)
@@ -259,16 +272,19 @@ void vtkTransfer2DBoxItem::GetControlPoint(vtkIdType index, double* point) const
   this->BoxPoints->GetPoint(index, point);
 }
 
+//-------------------------------------------------------------------------------------------------
 vtkMTimeType vtkTransfer2DBoxItem::GetControlPointsMTime()
 {
   return this->GetMTime();
 }
 
+//-------------------------------------------------------------------------------------------------
 void vtkTransfer2DBoxItem::emitEvent(unsigned long event, void* params)
 {
   this->InvokeEvent(event, params);
 }
 
+//-------------------------------------------------------------------------------------------------
 bool vtkTransfer2DBoxItem::Paint(vtkContext2D* painter)
 {
   // Prepare brush
@@ -290,6 +306,7 @@ bool vtkTransfer2DBoxItem::Paint(vtkContext2D* painter)
   return Superclass::Paint(painter);
 }
 
+//-------------------------------------------------------------------------------------------------
 void vtkTransfer2DBoxItem::ComputeTexture()
 {
   double colorC[3] = { 255 * vtkMath::Random(), 255 * vtkMath::Random(), 255 * vtkMath::Random() };
@@ -310,6 +327,7 @@ void vtkTransfer2DBoxItem::ComputeTexture()
   this->Texture->Modified();
 }
 
+//-------------------------------------------------------------------------------------------------
 bool vtkTransfer2DBoxItem::Hit(const vtkContextMouseEvent& mouse)
 {
   vtkVector2f vpos = mouse.GetPos();
@@ -340,6 +358,7 @@ bool vtkTransfer2DBoxItem::Hit(const vtkContextMouseEvent& mouse)
   return isWithinBox || isOverPoint;
 }
 
+//-------------------------------------------------------------------------------------------------
 bool vtkTransfer2DBoxItem::MouseButtonPressEvent(const vtkContextMouseEvent& mouse)
 {
   this->MouseMoved = false;
@@ -369,16 +388,19 @@ bool vtkTransfer2DBoxItem::MouseButtonPressEvent(const vtkContextMouseEvent& mou
   return false;
 }
 
+//-------------------------------------------------------------------------------------------------
 bool vtkTransfer2DBoxItem::MouseButtonReleaseEvent(const vtkContextMouseEvent& mouse)
 {
   return Superclass::MouseButtonReleaseEvent(mouse);
 }
 
+//-------------------------------------------------------------------------------------------------
 bool vtkTransfer2DBoxItem::MouseDoubleClickEvent(const vtkContextMouseEvent& mouse)
 {
   return Superclass::MouseDoubleClickEvent(mouse);
 }
 
+//-------------------------------------------------------------------------------------------------
 bool vtkTransfer2DBoxItem::MouseMoveEvent(const vtkContextMouseEvent& mouse)
 {
   switch (mouse.GetButton())
@@ -409,6 +431,7 @@ bool vtkTransfer2DBoxItem::MouseMoveEvent(const vtkContextMouseEvent& mouse)
   return false;
 }
 
+//-------------------------------------------------------------------------------------------------
 void vtkTransfer2DBoxItem::ClampToValidPosition(double pos[2])
 {
   double bounds[4];
@@ -417,16 +440,19 @@ void vtkTransfer2DBoxItem::ClampToValidPosition(double pos[2])
   pos[1] = vtkMath::ClampValue(pos[1], bounds[2], bounds[3]);
 }
 
+//-------------------------------------------------------------------------------------------------
 bool vtkTransfer2DBoxItem::KeyPressEvent(const vtkContextKeyEvent& key)
 {
   return Superclass::KeyPressEvent(key);
 }
 
+//-------------------------------------------------------------------------------------------------
 bool vtkTransfer2DBoxItem::KeyReleaseEvent(const vtkContextKeyEvent& key)
 {
   return Superclass::KeyPressEvent(key);
 }
 
+//-------------------------------------------------------------------------------------------------
 void vtkTransfer2DBoxItem::PrintSelf(ostream& os, vtkIndent indent)
 {
   Superclass::PrintSelf(os, indent);
@@ -435,6 +461,7 @@ void vtkTransfer2DBoxItem::PrintSelf(ostream& os, vtkIndent indent)
      << ", " << this->Box.GetWidth() << ", " << this->Box.GetHeight() << "]\n";
 }
 
+//-------------------------------------------------------------------------------------------------
 const vtkRectd& vtkTransfer2DBoxItem::GetBox()
 {
   double lowerBound[2];
@@ -451,6 +478,7 @@ const vtkRectd& vtkTransfer2DBoxItem::GetBox()
   return this->Box;
 }
 
+//-------------------------------------------------------------------------------------------------
 void vtkTransfer2DBoxItem::SetBox(
   const double x, const double y, const double width, const double height)
 {
@@ -473,6 +501,7 @@ void vtkTransfer2DBoxItem::SetBox(
   this->DragCorner(TOP_RIGHT, deltaSize);
 }
 
+//-------------------------------------------------------------------------------------------------
 // bool vtkTransfer2DBoxItem::NeedsTextureUpdate()
 //{
 //  auto tex = this->Texture.GetPointer();
@@ -529,7 +558,14 @@ vtkIdType vtkTransfer2DBoxItem::FindBoxPoint(double* _pos)
   }
   return pointId;
 }
-//
+
+//-------------------------------------------------------------------------------------------------
+vtkSmartPointer<vtkImageData> vtkTransfer2DBoxItem::GetTexture() const
+{
+  return this->Texture;
+}
+
+//-------------------------------------------------------------------------------------------------
 // void vtkTransfer2DBoxItem::rasterTransferFunction2DBox(vtkImageData* histogram2D,
 //  const vtkRectd& box, vtkImageData* transferFunction, vtkColorTransferFunction* colorFunc,
 //  vtkPiecewiseFunction* opacFunc)
