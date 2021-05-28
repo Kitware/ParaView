@@ -189,6 +189,7 @@ set(classes
   vtkTextSourceRepresentation
   vtkThreeSliceFilter
   vtkTilesHelper
+  vtkTransfer2DBoxItem
   vtkUnstructuredGridVolumeRepresentation
   vtkViewLayout
   vtkVolumeRepresentation
