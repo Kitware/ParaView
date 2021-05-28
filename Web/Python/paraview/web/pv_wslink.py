@@ -6,8 +6,8 @@ from vtkmodules.web import wslink as vtk_wslink
 from paraview.modules.vtkPVClientWeb import vtkPVWebApplication
 from paraview.web import protocols as pv_protocols
 
-class PVServerProtocol(vtk_wslink.ServerProtocol):
 
+class PVServerProtocol(vtk_wslink.ServerProtocol):
     def __init__(self):
         vtk_wslink.ServerProtocol.__init__(self)
         # if (vtk_wslink.imageCapture):

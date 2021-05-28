@@ -1,36 +1,37 @@
-import os, math
+import os
 
 from paraview import simple
 
 from vtkmodules.vtkIOImage import vtkPNGReader
 from vtkmodules.vtkCommonCore import vtkFloatArray, vtkUnsignedCharArray
 
-from vtkmodules.web import buffer
-
-VTK_DATA_TYPES = [ 'void',            # 0
-                   'bit',             # 1
-                   'char',            # 2
-                   'unsigned_char',   # 3
-                   'short',           # 4
-                   'unsigned_short',  # 5
-                   'int',             # 6
-                   'unsigned_int',    # 7
-                   'long',            # 8
-                   'unsigned_long',   # 9
-                   'float',           # 10
-                   'double',          # 11
-                   'id_type',         # 12
-                   'unspecified',     # 13
-                   'unspecified',     # 14
-                   'signed_char' ]
+VTK_DATA_TYPES = [
+    "void",  # 0
+    "bit",  # 1
+    "char",  # 2
+    "unsigned_char",  # 3
+    "short",  # 4
+    "unsigned_short",  # 5
+    "int",  # 6
+    "unsigned_int",  # 7
+    "long",  # 8
+    "unsigned_long",  # 9
+    "float",  # 10
+    "double",  # 11
+    "id_type",  # 12
+    "unspecified",  # 13
+    "unspecified",  # 14
+    "signed_char",
+]
 
 # -----------------------------------------------------------------------------
 # Scalar Value to File
 # -----------------------------------------------------------------------------
 
+
 class ScalarRenderer(object):
     def __init__(self, isWriter=True, removePNG=True):
-        self.view = simple.CreateView('RenderView')
+        self.view = simple.CreateView("RenderView")
         self.view.Background = [0.0, 0.0, 0.0]
         self.view.CenterAxesVisibility = 0
         self.view.OrientationAxesVisibility = 0
@@ -45,12 +46,12 @@ class ScalarRenderer(object):
 
     def writeLightArray(self, path, source):
         rep = simple.Show(source, self.view)
-        rep.Representation = 'Surface'
-        rep.DiffuseColor = [1,1,1]
-        simple.ColorBy(rep, ('POINTS', None))
+        rep.Representation = "Surface"
+        rep.DiffuseColor = [1, 1, 1]
+        simple.ColorBy(rep, ("POINTS", None))
 
         # Grab data
-        tmpFileName = path + '__.png'
+        tmpFileName = path + "__.png"
         self.view.LockBounds = 1
         simple.SaveScreenshot(tmpFileName, self.view)
         self.view.LockBounds = 0
@@ -70,8 +71,8 @@ class ScalarRenderer(object):
                 light = rgbArray.GetTuple3(idx)[0]
                 rawArray.SetTuple1(idx, light)
 
-            with open(path, 'wb') as f:
-                f.write(buffer(rawArray))
+            with open(path, "wb") as f:
+                f.write(memoryview(rawArray))
 
             # Delete temporary file
             if self.cleanAfterMe:
@@ -81,13 +82,13 @@ class ScalarRenderer(object):
 
     def writeMeshArray(self, path, source):
         rep = simple.Show(source, self.view)
-        rep.Representation = 'Surface With Edges'
-        rep.DiffuseColor = [0,0,0]
+        rep.Representation = "Surface With Edges"
+        rep.DiffuseColor = [0, 0, 0]
         rep.EdgeColor = [1.0, 1.0, 1.0]
-        simple.ColorBy(rep, ('POINTS', None))
+        simple.ColorBy(rep, ("POINTS", None))
 
         # Grab data
-        tmpFileName = path + '__.png'
+        tmpFileName = path + "__.png"
         self.view.LockBounds = 1
         simple.SaveScreenshot(tmpFileName, self.view)
         self.view.LockBounds = 0
@@ -107,8 +108,8 @@ class ScalarRenderer(object):
                 light = rgbArray.GetTuple3(idx)[0]
                 rawArray.SetTuple1(idx, light)
 
-            with open(path, 'wb') as f:
-                f.write(buffer(rawArray))
+            with open(path, "wb") as f:
+                f.write(memoryview(rawArray))
 
             # Delete temporary file
             if self.cleanAfterMe:
@@ -118,11 +119,11 @@ class ScalarRenderer(object):
 
     def writeArray(self, path, source, name, component=0):
         rep = simple.Show(source, self.view)
-        rep.Representation = 'Surface'
-        rep.DiffuseColor = [1,1,1]
+        rep.Representation = "Surface"
+        rep.DiffuseColor = [1, 1, 1]
 
         dataRange = [0.0, 1.0]
-        fieldToColorBy = ['POINTS', name]
+        fieldToColorBy = ["POINTS", name]
 
         self.view.ArrayNameToDraw = name
         self.view.ArrayComponentToDraw = component
@@ -133,23 +134,23 @@ class ScalarRenderer(object):
         if pdi.GetArray(name):
             self.view.DrawCells = 0
             dataRange = pdi.GetArray(name).GetRange(component)
-            fieldToColorBy[0] = 'POINTS'
+            fieldToColorBy[0] = "POINTS"
         elif cdi.GetArray(name):
             self.view.DrawCells = 1
             dataRange = cdi.GetArray(name).GetRange(component)
-            fieldToColorBy[0] = 'CELLS'
+            fieldToColorBy[0] = "CELLS"
         else:
-            print ("No array with that name", name)
+            print("No array with that name", name)
             return
 
         realRange = dataRange
         if dataRange[0] == dataRange[1]:
-          dataRange = [dataRange[0] - 0.1, dataRange[1] + 0.1]
+            dataRange = [dataRange[0] - 0.1, dataRange[1] + 0.1]
 
         simple.ColorBy(rep, fieldToColorBy)
 
         # Grab data
-        tmpFileName = path + '__.png'
+        tmpFileName = path + "__.png"
         self.view.ScalarRange = dataRange
         self.view.LockBounds = 1
         self.view.StartCaptureValues()
@@ -170,25 +171,27 @@ class ScalarRenderer(object):
 
             minValue = 10000.0
             maxValue = -100000.0
-            delta = (dataRange[1] - dataRange[0]) / 16777215.0 # 2^24 - 1 => 16,777,215
+            delta = (dataRange[1] - dataRange[0]) / 16777215.0  # 2^24 - 1 => 16,777,215
             for idx in range(arraySize):
                 rgb = rgbArray.GetTuple3(idx)
                 if rgb[0] != 0 or rgb[1] != 0 or rgb[2] != 0:
-                    value = dataRange[0] + delta * float(rgb[0]*65536 + rgb[1]*256 + rgb[2] - 1)
+                    value = dataRange[0] + delta * float(
+                        rgb[0] * 65536 + rgb[1] * 256 + rgb[2] - 1
+                    )
                     rawArray.SetTuple1(idx, value)
                     minValue = min(value, minValue)
                     maxValue = max(value, maxValue)
                 else:
-                    rawArray.SetTuple1(idx, float('NaN'))
+                    rawArray.SetTuple1(idx, float("NaN"))
 
             # print ('Array bounds', minValue, maxValue, 'compare to', dataRange)
 
-            with open(path, 'wb') as f:
-                f.write(buffer(rawArray))
+            with open(path, "wb") as f:
+                f.write(memoryview(rawArray))
 
             # Delete temporary file
             if self.cleanAfterMe:
-              os.remove(tmpFileName)
+                os.remove(tmpFileName)
 
         # Remove representation from view
         simple.Hide(source, self.view)
