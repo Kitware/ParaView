@@ -105,9 +105,12 @@ void pqHelpReaction::showProxyHelp(const QString& group, const QString& name)
     QString basename = QFileInfo(doc_namespace).baseName();
     QString url =
       QString("qthelp://%1/%2/%3.%4.html").arg(doc_namespace).arg(basename).arg(group).arg(name);
-    if (engine->findFile(url).isValid())
+
+    // If URL actually point to an existing file
+    if (!engine->fileData(url).isEmpty())
     {
       pqHelpReaction::showHelp(url);
+      break;
     }
   }
 }
