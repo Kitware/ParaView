@@ -19,6 +19,19 @@ set(CTEST_TEST_TIMEOUT 100)
 
 set(test_exclusions)
 
+if ("$ENV{CMAKE_CONFIGURATION}" MATCHES "_mpi")
+  # tests that have issues in parallel
+  list(APPEND test_exclusions
+    # see paraview/paraview#20740
+    "pvcs\\.ExplicitStructuredGridReal$"
+    "pvcrs\\.ExplicitStructuredGridReal$"
+
+    # see paraview/paraview#20741
+    "pvcs\\.CategoricalAutomaticAnnotations$"
+    "pvcrs\\.CategoricalAutomaticAnnotations$"
+  )
+endif()
+
 if ("$ENV{CMAKE_CONFIGURATION}" MATCHES "fedora")
   list(APPEND test_exclusions
     # These tests all seem to have some problem with the rendering order of
@@ -140,6 +153,12 @@ if ("$ENV{CMAKE_CONFIGURATION}" MATCHES "windows")
 
     # Fails on windows.
     "pqWidgetsHeaderViewCheckState"
+
+    # Fails sporadically (paraview/paraview#20702)
+    "^pv\\.TestPythonConsole$"
+
+    # Fails consistently, needs debugging (paraview/paraview#20742)
+    "^pv\\.PythonAlgorithmPlugin$"
     )
 endif ()
 
