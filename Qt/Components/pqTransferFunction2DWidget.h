@@ -62,6 +62,11 @@ public:
   virtual void setHistogram(vtkImageData*);
   //@}
 
+  /**
+   * Initialize the pqTransferFunction2DWidget with a default box item.
+   */
+  void initialize();
+
 protected:
 private:
   Q_DISABLE_COPY(pqTransferFunction2DWidget)

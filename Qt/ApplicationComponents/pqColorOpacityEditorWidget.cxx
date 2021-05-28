@@ -1309,7 +1309,11 @@ void pqColorOpacityEditorWidget::realShow2DHistogram()
       }
     }
   }
-  this->Internals->Ui.Transfer2DEditor->setHistogram(hist2D);
+  else
+  {
+    this->Internals->Ui.Transfer2DEditor->setHistogram(hist2D);
+  }
+  this->Internals->Ui.Transfer2DEditor->initialize();
 }
 
 //-----------------------------------------------------------------------------

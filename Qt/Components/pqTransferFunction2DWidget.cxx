@@ -47,6 +47,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkObjectFactory.h"
 #include "vtkPlotHistogram2D.h"
 #include "vtkPointData.h"
+#include "vtkTransfer2DBoxItem.h"
 
 // Qt includes
 #include <QVBoxLayout>
@@ -58,6 +59,51 @@ class vtkTransferFunctionChartHistogram2D : public vtkChartHistogram2D
 public:
   static vtkTransferFunctionChartHistogram2D* New();
   vtkTypeMacro(vtkTransferFunctionChartHistogram2D, vtkChartHistogram2D);
+
+  bool IsInitialized()
+  {
+    auto plot = vtkPlotHistogram2D::SafeDownCast(this->GetPlot(0));
+    if (!plot)
+    {
+      return false;
+    }
+    if (plot->GetInputImageData())
+    {
+      return true;
+    }
+    return false;
+  }
+
+  bool MouseDoubleClickEvent(const vtkContextMouseEvent& mouse) override
+  {
+    if (this->IsInitialized())
+    {
+      this->AddNewBox();
+    }
+    return Superclass::MouseDoubleClickEvent(mouse);
+  }
+
+  vtkSmartPointer<vtkTransfer2DBoxItem> AddNewBox()
+  {
+    double xRange[2];
+    auto bottomAxis = this->GetAxis(vtkAxis::BOTTOM);
+    bottomAxis->GetRange(xRange);
+
+    double yRange[2];
+    auto leftAxis = this->GetAxis(vtkAxis::LEFT);
+    leftAxis->GetRange(yRange);
+
+    vtkNew<vtkTransfer2DBoxItem> boxItem;
+    // Set bounds in the box item so that it can only move within the
+    // histogram's range.
+    boxItem->SetValidBounds(xRange[0], xRange[1], yRange[0], yRange[1]);
+    const double width = (xRange[1] - xRange[0]) / 3.0;
+    const double height = (yRange[1] - yRange[0]) / 3.0;
+    boxItem->SetBox(xRange[0] + width, yRange[0] + height, width, height);
+    // boxItem->AddObserver(vtkCommand::SelectionChangedEvent, Callback.GetPointer());
+    this->AddPlot(boxItem);
+    return boxItem;
+  }
 
   void SetInputData(vtkImageData* data, vtkIdType z = 0) override
   {
@@ -184,6 +230,16 @@ public:
     this->Chart->ClearPlots();
   }
 
+  void initialize()
+  {
+    if (this->Chart->IsInitialized())
+    {
+      return;
+    }
+
+    this->Chart->AddNewBox();
+  }
+
   void setHistogram(vtkImageData* histogram)
   {
     this->Chart->SetInputData(histogram);
@@ -251,4 +307,15 @@ vtkImageData* pqTransferFunction2DWidget::histogram() const
 void pqTransferFunction2DWidget::setHistogram(vtkImageData* histogram)
 {
   this->Internals->setHistogram(histogram);
+}
+
+//-----------------------------------------------------------------------------
+void pqTransferFunction2DWidget::initialize()
+{
+  if (!this->histogram())
+  {
+    return;
+  }
+
+  this->Internals->initialize();
 }

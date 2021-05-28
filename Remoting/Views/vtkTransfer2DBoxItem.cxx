@@ -76,11 +76,11 @@ vtkStandardNewMacro(vtkTransfer2DBoxItem)
   // Initialize texture
   auto tex = this->Texture.GetPointer();
   const int texSize = 256;
-  tex->SetDimensions(texSize, 1, 1);
+  tex->SetDimensions(texSize, texSize, 1);
   tex->AllocateScalars(VTK_UNSIGNED_CHAR, 4);
   auto arr = vtkUnsignedCharArray::SafeDownCast(tex->GetPointData()->GetScalars());
   const auto dataPtr = arr->GetVoidPointer(0);
-  memset(dataPtr, 0, texSize * 4 * sizeof(unsigned char));
+  memset(dataPtr, 0, texSize * texSize * 4 * sizeof(unsigned char));
 }
 
 vtkTransfer2DBoxItem::~vtkTransfer2DBoxItem() = default;
@@ -292,7 +292,7 @@ bool vtkTransfer2DBoxItem::Paint(vtkContext2D* painter)
 
 void vtkTransfer2DBoxItem::ComputeTexture()
 {
-  double colorC[3] = { 1, 0, 0 };
+  double colorC[3] = { 255 * vtkMath::Random(), 255 * vtkMath::Random(), 255 * vtkMath::Random() };
   auto arr = vtkUnsignedCharArray::SafeDownCast(this->Texture->GetPointData()->GetScalars());
 
   for (vtkIdType i = 0; i < 256; ++i)
@@ -300,7 +300,7 @@ void vtkTransfer2DBoxItem::ComputeTexture()
     for (vtkIdType j = 0; j < 256; ++j)
     {
       double color[4] = { colorC[0], colorC[1], colorC[2], 0.0 };
-      double sigma = 1.0;
+      double sigma = 80.0;
       double e = -1.0 * ((i - 128) * (i - 128) + (j - 128) * (j - 128)) / (2 * sigma * sigma);
       double amp = 255.0;
       color[3] = amp * std::exp(e);
