@@ -19,6 +19,12 @@
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/variableToolbar/displayColor/Variables" command="activated" arguments="Solid Color" />
 
+  <!-- convert to multiblock, since Exodus writer doesn't support PDC yet -->
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuFilters" />
+  <pqevent object="pqClientMainWindow/menubar/menuFilters/Alphabetical" command="activate" arguments="ConvertToMultiBlock" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/variableToolbar/displayColor/Variables" command="activated" arguments="Solid Color" />
+
   <!-- Make sure the file can be saved to an exodus file. -->
   <pqevent object="pqClientMainWindow/menubar/menu_File" command="activate" arguments="actionFileSaveData" />
   <pqevent object="pqClientMainWindow/FileSaveDialog" command="filesSelected" arguments="$PARAVIEW_TEST_ROOT/exodusSave.ex2" />

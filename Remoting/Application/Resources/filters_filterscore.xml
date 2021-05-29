@@ -2153,5 +2153,55 @@ found and the point will be rejected.</Documentation>
       <!-- End TubeFilter -->
     </SourceProxy>
 
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkConvertToMultiBlockDataSet"
+      name="ConvertToMultiBlock"
+      label="Convert To MultiBlock">
+      <Documentation>
+        Convert any dataset to vtkMultiBlockDataSet.
+      </Documentation>
+      <InputProperty command="SetInputConnection" name="Input">
+        <Documentation>
+          Specify the input.
+        </Documentation>
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkCompositeDataSet" />
+          <DataType value="vtkDataSet" />
+          <DataType value="vtkTable" />
+          <DataType value="vtkGraph" />
+        </DataTypeDomain>
+        <Documentation>The input.</Documentation>
+      </InputProperty>
+    </SourceProxy>
+
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkConvertToPartitionedDataSetCollection"
+      name="ConvertToPartitionedDataSetCollection"
+      label="Convert To PartitionedDataSetCollection">
+      <Documentation>
+        Convert any dataset to vtkPartitionedDataSetCollection.
+      </Documentation>
+      <InputProperty command="SetInputConnection" name="Input">
+        <Documentation>
+          Specify the input.
+        </Documentation>
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkCompositeDataSet" />
+          <DataType value="vtkDataSet" />
+          <DataType value="vtkTable" />
+          <DataType value="vtkGraph" />
+        </DataTypeDomain>
+        <Documentation>The input.</Documentation>
+      </InputProperty>
+    </SourceProxy>
+
   </ProxyGroup>
 </ServerManagerConfiguration>

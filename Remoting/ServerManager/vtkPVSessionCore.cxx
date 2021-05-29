@@ -815,25 +815,22 @@ bool vtkPVSessionCore::GatherInformationInternal(
 bool vtkPVSessionCore::GatherInformation(
   vtkTypeUInt32 location, vtkPVInformation* information, vtkTypeUInt32 globalid)
 {
-  // This can only be called on the root node.
-  assert(this->ParallelController == nullptr ||
-    this->ParallelController->GetLocalProcessId() == 0 || this->SymmetricMPIMode);
+  auto controller = this->ParallelController;
+  const int nranks = controller ? controller->GetNumberOfProcesses() : 1;
+  const int rank = controller ? controller->GetLocalProcessId() : 0;
 
-  if (!this->GatherInformationInternal(information, globalid))
-  {
-    return false;
-  }
+  // This can only be called on the root node (or in symmetric MPI mode)
+  assert(rank == 0 || this->SymmetricMPIMode);
 
-  if (information->GetRootOnly() || (location & vtkProcessModule::SERVERS) == 0 ||
-    this->SymmetricMPIMode)
-  {
-    return true;
-  }
+  // determine if we don't need to communicate this requests to the satellites.
+  const bool skip_satellites = (information->GetRootOnly() ||
+    (location & vtkProcessModule::SERVERS) == 0 || this->SymmetricMPIMode);
 
   // send message to satellites and then start processing.
-
-  if (this->ParallelController && this->ParallelController->GetNumberOfProcesses() > 1 &&
-    this->ParallelController->GetLocalProcessId() == 0 && !this->SymmetricMPIMode)
+  // this must be done before calling `GatherInformationInternal` on this process to
+  // avoid deadlocks if the gather results in pipeline updates
+  // (see paraview/paraview#20714).
+  if (nranks > 1 && rank == 0 && skip_satellites == false)
   {
     // Forward the message to the satellites if the object is expected to exist
     // on the satellites.
@@ -855,7 +852,10 @@ bool vtkPVSessionCore::GatherInformation(
     this->ParallelController->Broadcast(stream, 0);
   }
 
-  return this->CollectInformation(information);
+  // Now collect local information.
+  const bool status = this->GatherInformationInternal(information, globalid);
+
+  return (skip_satellites || this->CollectInformation(information)) && status;
 }
 
 //----------------------------------------------------------------------------
