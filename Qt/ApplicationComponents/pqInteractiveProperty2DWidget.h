@@ -16,18 +16,19 @@
 #define pqInteractiveProperty2DWidget_h
 
 #include "pqApplicationComponentsModule.h"
-#include "pqPropertyWidget.h"
+#include "pqInteractivePropertyWidgetAbstract.h"
 #include "pqSMProxy.h"
 #include "vtkBoundingBox.h"
+#include "vtkSMNew2DWidgetRepresentationProxy.h"
+
 #include <QScopedPointer>
 
 class vtkObject;
-class vtkSMNew2DWidgetRepresentationProxy;
 class vtkSMPropertyGroup;
 
 /**
- * pqInteractiveProperty2DWidget is an abstract pqPropertyWidget subclass
- * designed to serve as the superclass for all pqPropertyWidget types that have
+ * pqInteractiveProperty2DWidget is an abstract pqInteractivePropertyWidgetAbstract subclass
+ * designed to serve as the superclass for all pqInteractivePropertyWidgetAbstract types that have
  * interactive widget (also called 2D Widgets) associated with them.
  *
  * pqInteractiveProperty2DWidget is intended to provide a Qt widget (along with an
@@ -39,10 +40,11 @@ class vtkSMPropertyGroup;
  * pqInteractiveProperty2DWidget same as pqInteractivePropertyWidget but use
  * vtkSMNew2DWidgetRepresentationProxy instead vtkSMNewWidgetRepresentationProxy
  */
-class PQAPPLICATIONCOMPONENTS_EXPORT pqInteractiveProperty2DWidget : public pqPropertyWidget
+class PQAPPLICATIONCOMPONENTS_EXPORT pqInteractiveProperty2DWidget
+  : public pqInteractivePropertyWidgetAbstract
 {
   Q_OBJECT
-  typedef pqPropertyWidget Superclass;
+  typedef pqInteractivePropertyWidgetAbstract Superclass;
   Q_PROPERTY(pqSMProxy dataSource READ dataSource WRITE setDataSource);
 
 public:
@@ -51,14 +53,9 @@ public:
   ~pqInteractiveProperty2DWidget() override;
 
   /**
-   * Overridden to call this->render() to ensure that the widget is redrawn.
-   */
-  void reset() override;
-
-  /**
    * Returns the proxy for the interactive widget.
    */
-  vtkSMNew2DWidgetRepresentationProxy* widgetProxy() const;
+  vtkSMNew2DWidgetRepresentationProxy* widgetProxy() const { return this->WidgetProxy; };
 
   /**
    * Overridden to show the widget proxy in the new view.
@@ -78,13 +75,6 @@ public:
    * Returns the data source.
    */
   vtkSMProxy* dataSource() const;
-
-  /**
-   * In these methods, we show/hide the widget since the interactive widget is not
-   * supposed to be visible except when the panel is "active" or "selected".
-   */
-  void select() override;
-  void deselect() override;
 
   /**
    * Returns bounds from the dataSource, if possible. May return invalid bounds
@@ -113,7 +103,7 @@ public Q_SLOTS:
    * pqPropertyWidget's selected state controls whether the widget proxy is
    * visible in a view.
    */
-  void setWidgetVisible(bool val);
+  void setWidgetVisible(bool val) override;
 
   /**
    * DataSource is used by interactive widgets to determine now to place the
@@ -161,19 +151,17 @@ private Q_SLOTS:
    * properties on the widget based on the state of isWidgetVisible() and
    * isSelected().
    */
-  void updateWidgetVisibility();
+  void updateWidgetVisibility() override;
 
-protected:
-  bool VisibleState = true;
-
-private:
-  void handleUserEvent(vtkObject*, unsigned long, void*);
+  /**
+   * Get the internal instance of the widget proxy.
+   */
+  vtkSMNewWidgetRepresentationProxyAbstract* _widgetProxy() final { return this->WidgetProxy; };
 
 private:
   Q_DISABLE_COPY(pqInteractiveProperty2DWidget)
 
-  class pqInternals;
-  QScopedPointer<pqInternals> Internals;
+  vtkSmartPointer<vtkSMNew2DWidgetRepresentationProxy> WidgetProxy;
 };
 
 #endif

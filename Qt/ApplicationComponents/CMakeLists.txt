@@ -117,6 +117,7 @@ set(classes
   pqInputDataTypeDecorator
   pqInteractiveProperty2DWidget
   pqInteractivePropertyWidget
+  pqInteractivePropertyWidgetAbstract
   pqLightPropertyWidget
   pqLinePropertyWidget
   pqLinkSelectionReaction
