@@ -37,10 +37,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkAxis.h"
 #include "vtkChartHistogram2D.h"
 #include "vtkColorTransferFunction.h"
+#include "vtkContextMouseEvent.h"
 #include "vtkContextScene.h"
 #include "vtkContextView.h"
 #include "vtkControlPointsItem.h"
 #include "vtkDataArray.h"
+#include "vtkDataArrayRange.h"
 #include "vtkEventQtSlotConnect.h"
 #include "vtkFloatArray.h"
 #include "vtkGenericOpenGLRenderWindow.h"
@@ -49,6 +51,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPlotHistogram2D.h"
 #include "vtkPointData.h"
 #include "vtkTransfer2DBoxItem.h"
+#include "vtkXMLImageDataWriter.h"
 
 // Qt includes
 #include <QVBoxLayout>
@@ -82,6 +85,25 @@ public:
       this->AddNewBox();
     }
     return Superclass::MouseDoubleClickEvent(mouse);
+  }
+
+  bool MouseButtonPressEvent(const vtkContextMouseEvent& mouse) override
+  {
+    if (this->IsInitialized())
+    {
+      if (mouse.GetButton() == vtkContextMouseEvent::RIGHT_BUTTON)
+      {
+        vtkSmartPointer<vtkImageData> im = this->GetTransfer2D();
+        if (im)
+        {
+          vtkNew<vtkXMLImageDataWriter> w;
+          w->SetInputData(im);
+          w->SetFileName("Transfer2D.vti");
+          w->Write();
+        }
+      }
+    }
+    return Superclass::MouseButtonPressEvent(mouse);
   }
 
   vtkSmartPointer<vtkTransfer2DBoxItem> AddNewBox()
@@ -155,7 +177,7 @@ public:
     {
       return nullptr;
     }
-    const vtkIdType numPlots = GetNumberOfPlots();
+    const vtkIdType numPlots = this->GetNumberOfPlots();
     if (numPlots < 2)
     {
       // the first plot will be the histogram plot
@@ -178,17 +200,21 @@ public:
     histogram->GetDimensions(dims);
 
     vtkNew<vtkImageData> im;
-    im->SetOrigin(origin);
-    im->SetSpacing(spacing);
+    // im->SetOrigin(origin);
+    // im->SetSpacing(spacing);
     im->SetDimensions(dims);
     im->AllocateScalars(VTK_FLOAT, 4);
     auto arr = vtkFloatArray::SafeDownCast(im->GetPointData()->GetScalars());
-    const auto dataPtr = arr->GetVoidPointer(0);
-    memset(dataPtr, 0, 256 * 256 * 4 * sizeof(unsigned char));
+    auto arrRange = vtk::DataArrayValueRange(arr);
+    std::fill(arrRange.begin(), arrRange.end(), 0.0);
 
     for (vtkIdType i = 0; i < numPlots; ++i)
     {
-      auto boxItem = vtkTransfer2DBoxItem::SafeDownCast(GetPlot(i));
+      auto boxItem = vtkTransfer2DBoxItem::SafeDownCast(this->GetPlot(i));
+      if (!boxItem)
+      {
+        continue;
+      }
       const vtkRectd box = boxItem->GetBox();
       vtkIdType width = static_cast<vtkIdType>(box.GetWidth() / spacing[0]);
       vtkIdType height = static_cast<vtkIdType>(box.GetHeight() / spacing[1]);
@@ -204,9 +230,9 @@ public:
       double boxSpacing[3] = { 1, 1, 1 };
       boxSpacing[0] = box.GetWidth() / boxDims[0];
       boxSpacing[1] = box.GetHeight() / boxDims[1];
-      for (vtkIdType ii = x0; ii < width; ++ii)
+      for (vtkIdType ii = x0; ii < x0 + width; ++ii)
       {
-        for (vtkIdType jj = y0; jj < height; ++jj)
+        for (vtkIdType jj = y0; jj < y0 + height; ++jj)
         {
           int boxCoord[3] = { 0, 0, 0 };
           boxCoord[0] = (ii - x0) * spacing[0] / boxSpacing[0];
@@ -219,13 +245,14 @@ public:
           }
           // composite this color with the current color
           float* c = static_cast<float*>(im->GetScalarPointer(ii, jj, 0));
+          float opacity = c[3] + fptr[3] * (1 - c[3]);
+          opacity = opacity > 1.0 ? 1.0 : opacity;
           for (int tp = 0; tp < 3; ++tp)
           {
-            c[tp] = c[tp] * c[3] + fptr[tp] * fptr[3];
+            c[tp] = (fptr[tp] * fptr[3] + c[tp] * c[3] * (1 - fptr[tp])) / opacity;
             c[tp] = c[tp] > 1.0 ? 1.0 : c[tp];
           }
-          c[3] = c[3] + fptr[3];
-          c[3] = c[3] > 1.0 ? 1.0 : c[3];
+          c[3] = opacity;
         }
       }
     }
