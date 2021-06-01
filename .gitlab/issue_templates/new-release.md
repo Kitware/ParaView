@@ -1,7 +1,4 @@
 <!--
-Use this template when making a second or higher release candidate or final version.
-If creating a first release candidate , use the `new-release-first-rc.md` template instead.
-
 This template is for tracking a release of ParaView. Please replace the
 following strings with the associated values:
 
@@ -9,6 +6,10 @@ following strings with the associated values:
   - `@RC@` - for release candidates, replace with "-RC?". For final, replace with "".
   - `@MAJOR@` - replace with major version number
   - `@MINOR@` - replace with minor version number
+  - `@PATCH@` - replace with patch version number
+  - `@BASEBRANCH@`: The branch to create the release on (for `x.y.0-RC1`,
+    `master`, otherwise `release`)
+  - `@BRANCHPOINT@`: The commit where the release should be started
 
 Please remove this comment.
 -->
@@ -25,84 +26,139 @@ Please remove this comment.
     - Getting Started Guide
       - [ ] Rename to ParaViewGettingStarted-@VERSION@.pdf
       - [ ] Upload to www.paraview.org/files/v@MAJOR@.@MINOR@
-    - Assemble release notes into `Documentation/release/ParaView-@VERSION@`.
-      - [ ] Get positive review and merge.
 
 # Update ParaView
 
-  - [ ] Update `release` branch for **paraview**
+  - Update the local copy of `@BASEBRANCH@`.
+    - If `@PATCH@@RC@` is `0-RC1`, update `master`
+    - Otherwise, update `release`
 ```
 git fetch origin
-git checkout release
-git merge --ff-only origin/release
+git checkout @BASEBRANCH@
+git merge --ff-only origin/@BASEBRANCH@ # if this fails, there are local commits that need to be removed
 git submodule update --recursive --init
 ```
-  - [ ] Update `version.txt` and tag the commit
+    - If `@BASEBRANCH@` is not `master`, ensure merge requests which should be
+      in the release have been merged. The [`backport-mrs.py`][backport-mrs]
+      script can be used to find and ensure that merge requests assigned to the
+      associated milestone are available on the `release` branch.
+
+  - Integrate changes.
+    - Make a commit for each of these `release`-only changes on a single topic
+      (suggested branch name: `update-to-v@VERSION@`):
+      - Assemble release notes into `Documentation/release/ParaView-@VERSION@.md`.
+        - [ ] If `PATCH` is greater than 0, add items to the end of this file.
+      - [ ] Update `version.txt` and tag the commit (tag this commit below)
 ```
-git checkout -b update-to-v@VERSION@@RC@
+git checkout -b update-to-v@VERSION@@RC@ @BRANCHPOINT@
 echo @VERSION@@RC@ > version.txt
 git commit -m 'Update version number to @VERSION@@RC@' version.txt
-git tag -a -m 'ParaView @VERSION@@RC@' v@VERSION@@RC@ HEAD
 ```
-  - Integrate changes to `master` branch
-    - [ ] Create a merge request targeting `master` (do *not* add `Backport: release`)
+      - [ ] Update VTK's `paraview/release` branch. The
+            [`release-mr`][release-mr]  script should be used to do this. Pass
+            `-c .kitware-release-paraview.json` to use the appropriate
+            configuration file.
+        - [ ] Merge the VTK `paraview/release` update MR
+        - [ ] Update kwrobot with the new `paraview/release` branch rules (@ben.boeckel)
+      - [ ] `.gitmodules` to track the `paraview/release` branch of VTK
+      - [ ] Update `.gitlab/ci/cdash-groups.json` to track the `release` CDash
+            groups
+
+    - Create a merge request targeting `release`
+      - [ ] Obtain a GitLab API token for the `kwrobot.release.paraview` user
+            (ask @ben.boeckel if you do not have one)
+      - [ ] Add the `kwrobot.release.paraview` user to your fork with at least
+            `Developer` privileges (so it can open MRs)
+      - [ ] Use [the `release-mr`][release-mr] script to open the create the
+            Merge Request (see script for usage)
+        - Pull the script for each release; it may have been updated since it
+          was last used
+        - The script outputs the information it will be using to create the
+          merge request. Please verify that it is all correct before creating
+          the merge request. See usage at the top of the script to provide
+          information that is either missing or incorrect (e.g., if its data
+          extraction heuristics fail).
+    - [ ] Get positive review
     - [ ] `Do: merge`
-  - Integrate changes to `release` branch (push the `update-to-v@version@@RC@` branch to be the new `release` branch)
-    - [ ] `git push origin update-to-v@VERSION@@RC@:release`
+    - [ ] Push the tag to the main repository
+      - [ ] `git tag -a -m 'ParaView @VERSION@@RC@' v@VERSION@@RC@ commit-that-updated-version.txt`
+      - [ ] `git push origin v@VERSION@@RC@`
   - Create tarballs
     - [ ] ParaView (`Utilities/Maintenance/create_tarballs.bash --txz --tgz --zip -v v@VERSION@@RC@`)
   - Upload tarballs to `paraview.org`
     - [ ] `rsync -rptv $tarballs user@host:ParaView_Release/v@MAJOR@.@MINOR@/`
+  - Software process updates (these can all be done independently)
+    - [ ] Update kwrobot with the new `release` branch rules (@ben.boeckel)
+    - [ ] Run [this script][cdash-update-groups] to update the CDash groups
+      - This must be done after a nightly run to ensure all builds are in the
+        `release` group
+      - See the script itself for usage documentation
+    - [ ] Add (or update if `@BASEBRANCH@` is `release`) version selection entry
+          in paraview-superbuild
+
+[backport-mrs]: https://gitlab.kitware.com/utils/release-utils/-/blob/master/backport-mrs.py
+[release-mr]: https://gitlab.kitware.com/utils/release-utils/-/blob/master/release-mr.py
+[cdash-update-groups]: https://gitlab.kitware.com/utils/cdash-utils/-/blob/master/cdash-update-groups.py
 
 # Update ParaView-Superbuild
 
-  - [ ] Update `release` branch for **paraview/paraview-superbuild**
+  - [ ] Update @BASEBRANCH@ branch for **paraview-superbuild**
 ```
 git fetch origin
-git checkout release
-git merge --ff-only origin/release
+git checkout @BASEBRANCH@
+git merge --ff-only origin/@BASEBRANCH@
 git submodule update --recursive --init
-git checkout -b update-to-v@VERSION@@RC@
 ```
-  - Update `CMakeLists.txt`
-    - [ ] Update PARAVIEW_VERSION_DEFAULT to the release version (without RC*)
-    - [ ] Set ParaView source selections in `CMakeLists.txt` and force explicit
-      version in `CMakeLists.txt`:
+  - [ ] Update `version.txt` and tag the commit
 ```
-# Force source selection setting here.
-set(paraview_SOURCE_SELECTION "@VERSION@@RC@" CACHE STRING "Force version to @VERSION@@RC@" FORCE)
-set(paraview_FROM_SOURCE_DIR OFF CACHE BOOL "Force source dir off" FORCE)
+git checkout -b update-to-v@VERSION@@RC@ @BRANCHPOINT@
+echo @VERSION@@RC@ > version.txt
+git commit -m 'Update version number to @VERSION@@RC@' version.txt
 ```
-  - Update versions
-    - [ ] Guide selections in `versions.cmake`
-    - [ ] `paraview_SOURCE_SELECTION` version in `README.md`
-    - [ ] Docker: update default tag strings (in `Scripts/docker/ubuntu/development/Dockerfile`)
-      - [ ] ARG PARAVIEW_TAG=v@VERSION@@RC@
-      - [ ] ARG SUPERBUILD_TAG=v@VERSION@@RC@
-      - [ ] ARG PARAVIEW_VERSION_STRING=paraview-@MAJOR@.@MINOR@
-    - [ ] Commit changes and push to GitLab
-```
-git add versions.cmake CMakeLists.txt Scripts/docker/ubuntu/development/Dockerfile
-git commit -m "Update the default version to @VERSION@@RC@"
-git gitlab-push
-```
-  - Integrate changes to `master` branch
-    - [ ] Create a merge request targeting `master`, title beginning with WIP (do *not* add `Backport: release` to description)
+
+  - Integrate changes.
+    - Update versions
+      - [ ] Guide selections in `versions.cmake`
+      - [ ] `paraview_SOURCE_SELECTION` version in `README.md`
+      - [ ] Docker: update default tag strings (in `Scripts/docker/ubuntu/development/Dockerfile`)
+        - [ ] ARG PARAVIEW_TAG=v@VERSION@@RC@
+        - [ ] ARG SUPERBUILD_TAG=v@VERSION@@RC@
+        - [ ] ARG PARAVIEW_VERSION_STRING=paraview-@MAJOR@.@MINOR@
+      - [ ] Commit changes and push to GitLab
+        - [ ] `git add versions.cmake CMakeLists.txt Scripts/docker/ubuntu/development/Dockerfile`
+        - [ ] `git commit -m "Update the default version to @VERSION@@RC@"`
+        - [ ] `git gitlab-push`
+  - Make a commit for each of these `release`-only changes
+    - [ ] Update `.gitlab/ci/cdash-groups.json` to track the `release` CDash
+          groups (if `@BASEBRANCH@` is `master`)
+  - Create a commit which will be tagged:
+    - [ ] `git commit --allow-empty -m "paraview: add release @VERSION@"`
+  - Create a merge request targeting `release`
+    - [ ] Obtain a GitLab API token for the `kwrobot.release.paraview` user
+          (ask @ben.boeckel if you do not have one)
+    - [ ] Add the `kwrobot.release.paraview` user to your fork with at least
+          `Developer` privileges (so it can open MRs)
+    - [ ] Use [the `release-mr`][release-mr] script to open the create the
+          Merge Request (see script for usage)
+      - Pull the script for each release; it may have been updated since it
+        was last used
+  - [ ] Build binaries
     - [ ] Build binaries (start all pipelines)
-    - [ ] Download the binaries that have been generated from the Pipeline build products. They will be deleted within 24 hours.
-    - [ ] Remove explicit version forcing added in `CMakeLists.txt` and force push
-```
-git add CMakeLists.txt
-git commit --amend --no-edit
-git gitlab-push -f
-```
-  - Finalize merge request
-    - [ ] Remove WIP from merge request title
-    - [ ] Get positive review
-    - [ ] `Do: merge`
+    - [ ] Download the binaries that have been generated from the Pipeline
+          build products. They will be deleted within 24 hours.
+  - [ ] Get positive review
+  - [ ] `Do: merge`
+  - [ ] Push the tag to the main repository
     - [ ] `git tag -a -m 'ParaView superbuild @VERSION@@RC@' v@VERSION@@RC@ HEAD`
-  - Integrate changes to `release` branch
-    - [ ] `git push origin update-to-v@VERSION@@RC@:release`
+    - [ ] `git push origin v@VERSION@`
+  - Software process updates (these can all be done independently)
+    - [ ] Update kwrobot with the new `release` branch rules (@ben.boeckel)
+    - [ ] Run [this script][cdash-update-groups] to update the CDash groups
+      - This must be done after a nightly run to ensure all builds are in the
+        `release` group
+      - See the script itself for usage documentation
+    - [ ] Add (or update if `@BASEBRANCH@` is `release`) version selection entry
+          in paraview-superbuild
 
 # Sign macOS binaries
 
@@ -133,7 +189,8 @@ Show(Text(Text="$A^2$"))
 
 
 Binary checklist
-  - [ ] macOS
+  - [ ] macOS arm64
+  - [ ] macOS x86\_64
   - [ ] Linux
   - [ ] Linux osmesa
   - [ ] Windows MPI (.exe)
@@ -158,7 +215,7 @@ updateMD5sum.sh v@MAJOR@.@MINOR@
  - [ ] In the `paraview` repository, run `git push origin v@VERSION@@RC@`.
  - [ ] In the `paraview-superbuild` repository, run `git push origin v@VERSION@@RC@`.
 
- # Spack
+# Spack
 
  - [ ] Update Spack package: https://github.com/spack/spack/blob/develop/var/spack/repos/builtin/packages/paraview/package.py
 
