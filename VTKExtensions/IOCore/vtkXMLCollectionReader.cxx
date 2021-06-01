@@ -324,35 +324,45 @@ vtkXMLReader* vtkXMLCollectionReader::SetupReader(const std::string& filePath, i
 
   // Get the file extension.
   std::string ext = vtksys::SystemTools::GetFilenameLastExtension(fileName);
-  // remove "." from extension.
-  ext.erase(ext.begin());
 
-  // Search for the reader matching this extension.
-  auto iter = this->Internal->ReaderConstructors.find(ext);
-  // If a reader was found, allocate an instance of it for this output.
-  if (iter != this->Internal->ReaderConstructors.end())
+  if (ext.empty())
   {
-    const std::string& rname = iter->second.first;
-    if (!(this->Internal->Readers[index].GetPointer() &&
-          rname == this->Internal->Readers[index]->GetClassName()))
-    {
-      // Use the instantiator to create the reader.
-      vtkXMLReader* reader = (*iter->second.second)();
-      this->Internal->Readers[index] = reader;
-      if (reader)
-      {
-        reader->Delete();
-      }
-      else
-      {
-        // The class was not registered with the instantiator.
-        vtkErrorMacro("Error creating \"" << rname << "\".");
-      }
-    }
+    vtkErrorMacro(
+      "Filename " << fileName << " does not contain an extension, no reader can be created.");
+    this->Internal->Readers[index] = nullptr;
   }
   else
   {
-    this->Internal->Readers[index] = nullptr;
+    // remove "." from extension.
+    ext.erase(ext.begin());
+
+    // Search for the reader matching this extension.
+    auto iter = this->Internal->ReaderConstructors.find(ext);
+    // If a reader was found, allocate an instance of it for this output.
+    if (iter != this->Internal->ReaderConstructors.end())
+    {
+      const std::string& rname = iter->second.first;
+      if (!(this->Internal->Readers[index].GetPointer() &&
+            rname == this->Internal->Readers[index]->GetClassName()))
+      {
+        // Use the instantiator to create the reader.
+        vtkXMLReader* reader = (*iter->second.second)();
+        this->Internal->Readers[index] = reader;
+        if (reader)
+        {
+          reader->Delete();
+        }
+        else
+        {
+          // The class was not registered with the instantiator.
+          vtkErrorMacro("Error creating \"" << rname << "\".");
+        }
+      }
+    }
+    else
+    {
+      this->Internal->Readers[index] = nullptr;
+    }
   }
 
   // If we have a reader for this output, connect its output to our
