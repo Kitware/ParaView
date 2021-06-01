@@ -15,6 +15,7 @@
 #include "vtkPEnSightReader.h"
 
 #include "vtkDataArrayCollection.h"
+#include "vtkExtentTranslator.h"
 #include "vtkFloatArray.h"
 #include "vtkIdList.h"
 #include "vtkIdListCollection.h"
@@ -30,6 +31,7 @@
 #include "vtkRectilinearGrid.h"
 #include "vtkSmartPointer.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
+#include "vtkStructuredData.h"
 #include "vtkStructuredGrid.h"
 #include "vtkStructuredPoints.h"
 #include "vtkUnsignedCharArray.h"
@@ -2389,11 +2391,39 @@ void vtkPEnSightReader::PrepareStructuredDimensionsForDistribution(int partId, i
   // Cells
   int mpiLocalProcessId = this->GetMultiProcessLocalProcessId();
   int mpiNumberOfProcesses = this->GetMultiProcessNumberOfProcesses();
+
+  vtkNew<vtkExtentTranslator> splitter;
+  splitter->SetWholeExtent(
+    0, oldDimensions[0] - 1, 0, oldDimensions[1] - 1, 0, oldDimensions[2] - 1);
+  splitter->SetPiece(mpiLocalProcessId);
+  splitter->SetNumberOfPieces(mpiNumberOfProcesses);
+  splitter->SetGhostLevel(0); // ghostLevel;
+  switch (*splitDimension)
+  {
+    case 0:
+      splitter->SetSplitModeToXSlab();
+      break;
+
+    case 1:
+      splitter->SetSplitModeToYSlab();
+      break;
+
+    case 2:
+      splitter->SetSplitModeToZSlab();
+      break;
+  }
+  splitter->PieceToExtent();
+
+  int newExtent[6], newCellExtent[6];
+  splitter->GetExtent(newExtent);
+  vtkStructuredData::GetCellExtentFromPointExtent(newExtent, newCellExtent);
+  int newCellDims[3];
+  vtkStructuredData::GetDimensionsFromExtent(newCellExtent, newCellDims);
+
   int oldCellDimension = oldDimensions[*splitDimension] - 1;
-  int newCellDimension = (oldCellDimension / mpiNumberOfProcesses) + 1;
-  int cellBeginIndex = mpiLocalProcessId * newCellDimension;
-  if ((cellBeginIndex + newCellDimension) > oldCellDimension)
-    newCellDimension = oldCellDimension - cellBeginIndex;
+  int newCellDimension = newCellDims[*splitDimension];
+
+  int cellBeginIndex = newExtent[2 * *splitDimension];
 
   int oldCellDimensions[3];
   oldCellDimensions[0] = (oldDimensions[0] == 1) ? 1 : (oldDimensions[0] - 1);
