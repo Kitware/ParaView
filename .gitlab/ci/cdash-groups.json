@@ -23,7 +23,12 @@
         {
             "group": "master",
             "site": "gitlab-ci",
-            "buildname": "[macos_python_qt]"
+            "buildname": "[macos_arm64_python_qt]"
+        },
+        {
+            "group": "master",
+            "site": "gitlab-ci",
+            "buildname": "[macos_x86_64_python_qt]"
         },
         {
             "group": "master",
