@@ -78,7 +78,6 @@ int vtkSurfaceVectors::RequestData(vtkInformation* vtkNotUsed(request),
 
   if (!inVectors || numPoints == 0)
   {
-    vtkErrorMacro("The input is empty");
     output->ShallowCopy(input);
     return 1;
   }
