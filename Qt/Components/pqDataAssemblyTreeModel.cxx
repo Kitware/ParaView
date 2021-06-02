@@ -206,17 +206,18 @@ bool pqDataAssemblyTreeModel::pqInternals::setData(int node, int role, const QVa
   }
 
   auto rproperty = this->roleProperty(role);
-  if (clearValue && rproperty == RoleProperties::Inherited)
+  if (clearValue && rproperty == pqDataAssemblyTreeModel::Inherited)
   {
     // we clear values until overridden
-    rproperty = RoleProperties::InheritedUntilOverridden;
+    rproperty = pqDataAssemblyTreeModel::InheritedUntilOverridden;
   }
 
   // get a value from parent when clearing a role that's inheritable.
-  const QVariant actualValue =
-    (clearValue && rproperty != RoleProperties::Standard) ? dataFromParent(node, role) : value;
+  const QVariant actualValue = (clearValue && rproperty != pqDataAssemblyTreeModel::Standard)
+    ? dataFromParent(node, role)
+    : value;
 
-  if (rproperty == RoleProperties::Inherited)
+  if (rproperty == pqDataAssemblyTreeModel::Inherited)
   {
     // value is inherited down the whole tree.
     vtkNew<CallbackDataVisitor> visitor;
@@ -224,7 +225,7 @@ bool pqDataAssemblyTreeModel::pqInternals::setData(int node, int role, const QVa
       int id) { role_map[id].setValue(actualValue, /*isInherited*/ clearValue || id != node); };
     this->DataAssembly->Visit(node, visitor);
   }
-  else if (rproperty == RoleProperties::InheritedUntilOverridden)
+  else if (rproperty == pqDataAssemblyTreeModel::InheritedUntilOverridden)
   {
     // value is inherited till explicitly overridden.
     vtkNew<CallbackDataVisitor> visitor;
