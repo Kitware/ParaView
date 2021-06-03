@@ -33,3 +33,15 @@ def get_args():
     """
     from . import v2_internals
     return v2_internals._get_active_arguments()
+
+def get_execute_params():
+    """For the active pipeline script, returns "parameters", if any, specified
+    during the execute phase in the Catalyst adaptor.
+
+    This is currently only supported for adaptors that use Catalyst 2.0 Adaptor
+    API. For legacy adaptors, this will simply return an empty list.
+
+    Return value is a list of strings.
+    """
+    from . import v2_internals
+    return v2_internals._get_execute_parameters()

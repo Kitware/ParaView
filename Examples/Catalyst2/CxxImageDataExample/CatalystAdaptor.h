@@ -55,6 +55,12 @@ void Execute(int cycle, double time, Grid& grid, Attributes& attribs)
   state["timestep"].set(cycle);
   state["time"].set(time);
 
+  // add optional execution parameters
+  state["parameters"].append().set_string("parameter0");
+  state["parameters"].append().set_string("parameter1=42");
+  state["parameters"].append().set_string("parameter2=doThing");
+  state["parameters"].append().set_string("timeParam=" + std::to_string(time));
+
   // Add channels.
   // We only have 1 channel here. Let's name it 'grid'.
   auto channel = exec_params["catalyst/channels/grid"];

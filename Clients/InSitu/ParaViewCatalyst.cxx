@@ -246,7 +246,17 @@ void catalyst_execute(const conduit_node* params)
                                                 "No meshes will be processed.");
   }
 
-  vtkInSituInitializationHelper::ExecutePipelines(timestep, time);
+  // check for optional 'parameters'
+  std::vector<std::string> parameters = {};
+  if (root.has_path("state/parameters"))
+  {
+    auto iter = root["state/parameters"].children();
+    while (iter.has_next())
+    {
+      parameters.push_back(iter.next().as_string());
+    }
+  }
+  vtkInSituInitializationHelper::ExecutePipelines(timestep, time, parameters);
 }
 
 //-----------------------------------------------------------------------------

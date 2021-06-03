@@ -139,6 +139,14 @@ def _get_active_arguments():
         args.append(slist.GetString(cc))
     return args
 
+def _get_execute_parameters():
+    helper = vtkCPPythonScriptV2Helper.GetActiveInstance()
+    slist = helper.GetParametersAsStringList()
+    params = []
+    for cc in range(slist.GetLength()):
+        params.append(slist.GetString(cc))
+    return params
+
 def has_customized_execution(module):
     return hasattr(module, "catalyst_execute") or \
         hasattr(module, "RequestDataDescription") or \

@@ -51,6 +51,7 @@ class vtkInSituPipeline;
 class vtkSMSourceProxy;
 
 #include <string> // for std::string
+#include <vector> // for std::vector
 
 class VTKPVINSITU_EXPORT vtkInSituInitializationHelper : public vtkObject
 {
@@ -123,7 +124,7 @@ public:
   /**
    * Executes pipelines.
    */
-  static bool ExecutePipelines(int timestep, double time);
+  static bool ExecutePipelines(int timestep, double time, std::vector<std::string> parameters = {});
 
   //@{
   /**
