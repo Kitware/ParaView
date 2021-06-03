@@ -162,7 +162,7 @@ private:
   void operator=(const vtkSMContextViewProxy&) = delete;
 
   /**
-   * Copies axis ranges from each of the vtkAxis on the vtkChartXY to the
+   * Copies axis ranges from each of the vtkAxis on the vtkChart to the
    * SMproperties.
    */
   void CopyAxisRangesFromChart();
