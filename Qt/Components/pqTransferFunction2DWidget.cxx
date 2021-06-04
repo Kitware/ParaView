@@ -96,11 +96,11 @@ public:
     {
       if (mouse.GetButton() == vtkContextMouseEvent::RIGHT_BUTTON)
       {
-        vtkSmartPointer<vtkImageData> im = this->GetTransfer2D();
-        if (im)
+        this->GenerateTransfer2D();
+        if (this->TransferFunction2D)
         {
           vtkNew<vtkXMLImageDataWriter> w;
-          w->SetInputData(im);
+          w->SetInputData(this->TransferFunction2D);
           w->SetFileName("Transfer2D.vti");
           w->Write();
         }
@@ -161,6 +161,9 @@ public:
   }
 
   //-----------------------------------------------------------------------------
+  void SetTransferFunction2D(vtkImageData* transfer2D) { this->TransferFunction2D = transfer2D; }
+
+  //-----------------------------------------------------------------------------
   void UpdateItemsBounds(const double xMin, const double xMax, const double yMin, const double yMax)
   {
     // Set the new bounds to its current box items (plots).
@@ -178,25 +181,30 @@ public:
   }
 
   //-----------------------------------------------------------------------------
-  vtkSmartPointer<vtkImageData> GetTransfer2D()
+  void GenerateTransfer2D()
   {
     if (!this->IsInitialized())
     {
-      return nullptr;
+      return;
     }
     const vtkIdType numPlots = this->GetNumberOfPlots();
     if (numPlots < 2)
     {
       // the first plot will be the histogram plot
       // i.e. no transfer2D boxes
-      return nullptr;
+      return;
     }
 
     vtkSmartPointer<vtkImageData> histogram =
       vtkPlotHistogram2D::SafeDownCast(this->GetPlot(0))->GetInputImageData();
     if (!histogram)
     {
-      return nullptr;
+      return;
+    }
+
+    if (!this->TransferFunction2D)
+    {
+      return;
     }
 
     double spacing[3];
@@ -206,12 +214,11 @@ public:
     int dims[3];
     histogram->GetDimensions(dims);
 
-    vtkNew<vtkImageData> im;
     // im->SetOrigin(origin);
     // im->SetSpacing(spacing);
-    im->SetDimensions(dims);
-    im->AllocateScalars(VTK_FLOAT, 4);
-    auto arr = vtkFloatArray::SafeDownCast(im->GetPointData()->GetScalars());
+    this->TransferFunction2D->SetDimensions(dims);
+    this->TransferFunction2D->AllocateScalars(VTK_FLOAT, 4);
+    auto arr = vtkFloatArray::SafeDownCast(this->TransferFunction2D->GetPointData()->GetScalars());
     auto arrRange = vtk::DataArrayValueRange(arr);
     std::fill(arrRange.begin(), arrRange.end(), 0.0);
 
@@ -251,7 +258,7 @@ public:
             fptr[tp] = ptr[tp] / 255.0;
           }
           // composite this color with the current color
-          float* c = static_cast<float*>(im->GetScalarPointer(ii, jj, 0));
+          float* c = static_cast<float*>(this->TransferFunction2D->GetScalarPointer(ii, jj, 0));
           float opacity = c[3] + fptr[3] * (1 - c[3]);
           opacity = opacity > 1.0 ? 1.0 : opacity;
           for (int tp = 0; tp < 3; ++tp)
@@ -263,8 +270,6 @@ public:
         }
       }
     }
-
-    return im;
   }
 
 protected:
@@ -272,6 +277,7 @@ protected:
   ~vtkTransferFunctionChartHistogram2D() override = default;
 
   // Member variables;
+  vtkWeakPointer<vtkImageData> TransferFunction2D;
 
 private:
   vtkTransferFunctionChartHistogram2D(const vtkTransferFunctionChartHistogram2D&);
@@ -349,14 +355,13 @@ public:
     this->Chart->ClearPlots();
   }
 
-  void initialize()
+  void initialize(vtkImageData* transfer2D)
   {
+    this->Chart->SetTransferFunction2D(transfer2D);
     if (this->Chart->IsInitialized())
     {
-      return;
+      this->Chart->AddNewBox();
     }
-
-    this->Chart->AddNewBox();
   }
 
   void setHistogram(vtkImageData* histogram)
@@ -429,12 +434,10 @@ void pqTransferFunction2DWidget::setHistogram(vtkImageData* histogram)
 }
 
 //-----------------------------------------------------------------------------
-void pqTransferFunction2DWidget::initialize()
+void pqTransferFunction2DWidget::initialize(vtkImageData* transfer2D)
 {
-  if (!this->histogram())
-  {
-    return;
-  }
+  this->Internals->initialize(transfer2D);
 
-  this->Internals->initialize();
+  pqCoreUtilities::connect(
+    this->Internals->Chart, vtkCommand::MouseMoveEvent, this, SLOT(showUsageStatus()));
 }

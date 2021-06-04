@@ -65,7 +65,7 @@ public:
   /**
    * Initialize the pqTransferFunction2DWidget with a default box item.
    */
-  void initialize();
+  void initialize(vtkImageData*);
 
 protected:
 private:
