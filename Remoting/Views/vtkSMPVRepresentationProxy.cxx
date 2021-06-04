@@ -653,6 +653,13 @@ bool vtkSMPVRepresentationProxy::SetScalarColoringInternal(
     vtkSMPropertyHelper(sofProperty).Set(sofProxy);
   }
 
+  if (vtkSMProperty* tf2dProperty = this->GetProperty("TransferFunction2D"))
+  {
+    vtkSMProxy* tf2dProxy =
+      mgr->GetTransferFunction2D(decoratedArrayName.c_str(), this->GetSessionProxyManager());
+    vtkSMPropertyHelper(tf2dProperty).Set(tf2dProxy);
+  }
+
   this->UpdateVTKObjects();
   return true;
 }
