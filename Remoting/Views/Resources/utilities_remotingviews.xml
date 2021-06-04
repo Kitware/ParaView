@@ -1519,6 +1519,14 @@
     <!-- end of "transfer_functions" -->
   </ProxyGroup>
 
+  <ProxyGroup name="transfer_2d_functions">
+    <TransferFunctionProxy class="vtkImageData"
+                           name="ImageData"
+                           processes="client|renderserver|dataserver">
+    </TransferFunctionProxy>
+    <!-- end of "transfer_2d_functions" -->
+  </ProxyGroup>
+
   <!-- ==================================================================== -->
   <ProxyGroup name="piecewise_functions">
     <!-- ================================================================== -->
