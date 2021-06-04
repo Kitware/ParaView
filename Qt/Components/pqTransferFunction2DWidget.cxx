@@ -64,6 +64,7 @@ public:
   static vtkTransferFunctionChartHistogram2D* New();
   vtkTypeMacro(vtkTransferFunctionChartHistogram2D, vtkChartHistogram2D);
 
+  //-----------------------------------------------------------------------------
   bool IsInitialized()
   {
     auto plot = vtkPlotHistogram2D::SafeDownCast(this->GetPlot(0));
@@ -78,6 +79,7 @@ public:
     return false;
   }
 
+  //-----------------------------------------------------------------------------
   bool MouseDoubleClickEvent(const vtkContextMouseEvent& mouse) override
   {
     if (this->IsInitialized())
@@ -87,6 +89,7 @@ public:
     return Superclass::MouseDoubleClickEvent(mouse);
   }
 
+  //-----------------------------------------------------------------------------
   bool MouseButtonPressEvent(const vtkContextMouseEvent& mouse) override
   {
     if (this->IsInitialized())
@@ -106,6 +109,7 @@ public:
     return Superclass::MouseButtonPressEvent(mouse);
   }
 
+  //-----------------------------------------------------------------------------
   vtkSmartPointer<vtkTransfer2DBoxItem> AddNewBox()
   {
     double xRange[2];
@@ -128,6 +132,7 @@ public:
     return boxItem;
   }
 
+  //-----------------------------------------------------------------------------
   void SetInputData(vtkImageData* data, vtkIdType z = 0) override
   {
     if (data)
@@ -155,6 +160,7 @@ public:
     vtkChartHistogram2D::SetInputData(data, z);
   }
 
+  //-----------------------------------------------------------------------------
   void UpdateItemsBounds(const double xMin, const double xMax, const double yMin, const double yMax)
   {
     // Set the new bounds to its current box items (plots).
@@ -171,6 +177,7 @@ public:
     }
   }
 
+  //-----------------------------------------------------------------------------
   vtkSmartPointer<vtkImageData> GetTransfer2D()
   {
     if (!this->IsInitialized())
