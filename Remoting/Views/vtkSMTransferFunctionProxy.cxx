@@ -665,12 +665,6 @@ vtkTable* vtkSMTransferFunctionProxy::ComputeDataHistogramTable(int numberOfBins
 //----------------------------------------------------------------------------
 vtkImageData* vtkSMTransferFunctionProxy::ComputeDataHistogram2D(int numberOfBins)
 {
-  if (this->Histogram2DCache)
-  {
-    this->Histogram2DCache->Delete();
-    this->Histogram2DCache = nullptr;
-  }
-
   // Recover component property
   int component = -1;
   if (vtkSMPropertyHelper(this, "VectorMode").GetAsInt() == vtkScalarsToColors::COMPONENT)
