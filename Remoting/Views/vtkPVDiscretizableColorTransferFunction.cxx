@@ -15,6 +15,7 @@
 #include "vtkPVDiscretizableColorTransferFunction.h"
 
 #include "vtkDoubleArray.h"
+#include "vtkImageData.h"
 #include "vtkLookupTable.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
@@ -22,6 +23,7 @@
 #include "vtkVariantArray.h"
 
 vtkStandardNewMacro(vtkPVDiscretizableColorTransferFunction);
+vtkCxxSetObjectMacro(vtkPVDiscretizableColorTransferFunction, TransferFunction2D, vtkImageData);
 
 //-------------------------------------------------------------------------
 vtkPVDiscretizableColorTransferFunction::vtkPVDiscretizableColorTransferFunction()
@@ -36,6 +38,8 @@ vtkPVDiscretizableColorTransferFunction::vtkPVDiscretizableColorTransferFunction
   this->ActiveAnnotatedValues = vtkVariantArray::New();
 
   this->UseActiveValues = 1;
+
+  this->TransferFunction2D = nullptr;
 }
 
 //-------------------------------------------------------------------------
@@ -65,6 +69,8 @@ vtkPVDiscretizableColorTransferFunction::~vtkPVDiscretizableColorTransferFunctio
   {
     this->ActiveAnnotatedValues->Delete();
   }
+
+  this->SetTransferFunction2D(nullptr);
 }
 
 //-------------------------------------------------------------------------
@@ -390,6 +396,12 @@ void vtkPVDiscretizableColorTransferFunction::Build()
   this->Superclass::Build();
 
   this->BuildTime.Modified();
+}
+
+//-------------------------------------------------------------------------
+vtkImageData* vtkPVDiscretizableColorTransferFunction::GetTransferFunction2D() const
+{
+  return this->TransferFunction2D;
 }
 
 //-------------------------------------------------------------------------

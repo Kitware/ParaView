@@ -33,6 +33,7 @@
 class vtkAbstractArray;
 class vtkDoubleArray;
 class vtkVariantArray;
+class vtkImageData;
 
 class VTKREMOTINGVIEWS_EXPORT vtkPVDiscretizableColorTransferFunction
   : public vtkDiscretizableColorTransferFunction
@@ -83,9 +84,19 @@ public:
    */
   void Build() override;
 
+  ///@{
+  /**
+   * Set/get the 2D transfer function.
+   */
+  virtual void SetTransferFunction2D(vtkImageData* f);
+  virtual vtkImageData* GetTransferFunction2D() const;
+  ///@}
+
 protected:
   vtkPVDiscretizableColorTransferFunction();
   ~vtkPVDiscretizableColorTransferFunction() override;
+
+  vtkSmartPointer<vtkImageData> TransferFunction2D;
 
 private:
   vtkPVDiscretizableColorTransferFunction(const vtkPVDiscretizableColorTransferFunction&) = delete;

@@ -1164,6 +1164,22 @@
         </Hints>
       </ProxyProperty>
 
+      <ProxyProperty command="SetTransferFunction2D"
+                     name="TransferFunction2D" >
+        <ProxyGroupDomain name="groups">
+          <Group name="transfer_2d_functions" />
+        </ProxyGroupDomain>
+        <Documentation>
+          Proxy property used by the ColorOpacityWidget to store a 2D transfer function (vtkImageData).
+        </Documentation>
+        <Hints>
+          <!-- when resetting to XML defaults, we don't want this property to
+               get reset. This is managed explicitly. So let's just skip this
+               from the default mechanism -->
+          <NoDefault />
+        </Hints>
+      </ProxyProperty>
+
       <DoubleVectorProperty clean_command="RemoveAllPoints"
                             command="AddRGBPoint"
                             name="RGBPoints"
@@ -1427,6 +1443,7 @@
         <Property name="EnableOpacityMapping" function="EnableOpacityMapping" />
         <Property name="RGBPoints" function="XRGBPoints" />
         <Property name="ScalarOpacityFunction" function="ScalarOpacityFunction" />
+        <Property name="TransferFunction2D" function="TransferFunction2D" />
         <Property name="UseLogScale" function="UseLogScale" />
         <Property name="UseOpacityControlPointsFreehandDrawing" function="UseOpacityControlPointsFreehandDrawing" />
         <Property name="ShowDataHistogram" function="ShowDataHistogram" />
