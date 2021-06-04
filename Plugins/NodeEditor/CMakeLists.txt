@@ -1,32 +1,114 @@
-cmake_minimum_required(VERSION 3.8)
-project(NodeEditor)
+set(interfaces)
+set(sources)
 
-find_package(ParaView REQUIRED)
+if (PARAVIEW_USE_QT)
+  list(APPEND sources
+    pqNodeEditorUtils.h
+    pqNodeEditorUtils.cxx
+    pqNodeEditorNode.h
+    pqNodeEditorNode.cxx
+    pqNodeEditorPort.h
+    pqNodeEditorPort.cxx
+    pqNodeEditorEdge.h
+    pqNodeEditorEdge.cxx
+    pqNodeEditorWidget.cxx
+    pqNodeEditorWidget.h
+    pqNodeEditorView.cxx
+    pqNodeEditorView.h
+    pqNodeEditorScene.cxx
+    pqNodeEditorScene.h
+  )
 
-option(BUILD_SHARED_LIBS "Build shared libraries" ON)
+  paraview_plugin_add_dock_window(
+    CLASS_NAME pqNodeEditorWidget
+    DOCK_AREA Right
+    INTERFACES dock_interfaces
+    SOURCES dock_sources)
+  list(APPEND interfaces
+    ${dock_interfaces})
+  list(APPEND sources
+    ${dock_sources})
 
-include(GNUInstallDirs)
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_BINDIR}")
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_LIBDIR}")
-set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_LIBDIR}")
+  paraview_add_plugin(NodeEditor
+    VERSION "1.0"
+    UI_INTERFACES ${interfaces}
+    SOURCES ${sources})
 
-set("_paraview_plugin_default_${CMAKE_PROJECT_NAME}" ON)
-paraview_plugin_scan(
-  PLUGIN_FILES      "${CMAKE_CURRENT_SOURCE_DIR}/Plugin/paraview.plugin"
-  PROVIDES_PLUGINS  plugins
-  REQUIRES_MODULES  required_modules)
+  # START_FIND_GRAPHVIZ
+  find_path(GRAPHVIZ_INCLUDE_DIR
+    NAMES
+      graphviz/cgraph.h
+    HINTS
+      ${_GRAPHVIZ_INCLUDE_DIR}
+      )
+  mark_as_advanced(GRAPHVIZ_INCLUDE_DIR)
 
-foreach (module IN LISTS required_modules)
-  if (NOT TARGET "${module}")
-    message(#FATAL_ERROR
-      "Skipping example ${CMAKE_PROJECT_NAME}: Missing required module: "
-      "${module}")
-    return ()
+  find_library(GRAPHVIZ_CDT_LIBRARY
+    NAMES
+      cdt
+    HINTS
+      ${_GRAPHVIZ_LIBRARY_DIR}
+      )
+  mark_as_advanced(GRAPHVIZ_CDT_LIBRARY)
+
+  find_library(GRAPHVIZ_GVC_LIBRARY
+    NAMES
+      gvc
+    HINTS
+      ${_GRAPHVIZ_LIBRARY_DIR}
+      )
+  mark_as_advanced(GRAPHVIZ_GVC_LIBRARY)
+
+  find_library(GRAPHVIZ_CGRAPH_LIBRARY
+    NAMES
+      cgraph
+    HINTS
+      ${_GRAPHVIZ_LIBRARY_DIR}
+      )
+  mark_as_advanced(GRAPHVIZ_CGRAPH_LIBRARY)
+
+  find_library(GRAPHVIZ_PATHPLAN_LIBRARY
+    NAMES
+      pathplan
+    HINTS
+      ${_GRAPHVIZ_LIBRARY_DIR}
+      )
+  mark_as_advanced(GRAPHVIZ_PATHPLAN_LIBRARY)
+
+  if(GRAPHVIZ_INCLUDE_DIR
+      AND GRAPHVIZ_CDT_LIBRARY
+      AND GRAPHVIZ_GVC_LIBRARY
+      AND GRAPHVIZ_CGRAPH_LIBRARY
+      AND GRAPHVIZ_PATHPLAN_LIBRARY
+      )
+    set(NodeEditor_ENABLE_GRAPHVIZ "Enable GraphViz Support" ON INTERNAL)
+    message(STATUS "NodeEditor Plugin: GraphViz found")
+  else()
+    set(NodeEditor_ENABLE_GRAPHVIZ "Enable GraphViz Support" OFF INTERNAL)
+    message(STATUS "NodeEditor Plugin: GraphViz NOT FOUND!")
+  endif()
+
+  target_compile_definitions(NodeEditor
+    PUBLIC
+      NodeEditor_ENABLE_GRAPHVIZ
+  )
+
+  target_include_directories(NodeEditor
+    PUBLIC
+      ${GRAPHVIZ_INCLUDE_DIR}
+  )
+
+  target_link_libraries(NodeEditor
+    PRIVATE
+      ${GRAPHVIZ_CDT_LIBRARY}
+      ${GRAPHVIZ_GVC_LIBRARY}
+      ${GRAPHVIZ_CGRAPH_LIBRARY}
+      ${GRAPHVIZ_PATHPLAN_LIBRARY}
+      ParaView::RemotingViews
+      ParaView::pqApplicationComponents
+  )
+
+  if (BUILD_TESTING)
+    add_subdirectory(Testing)
   endif ()
-endforeach ()
-
-paraview_plugin_build(
-  RUNTIME_DESTINATION "${CMAKE_INSTALL_BINDIR}"
-  LIBRARY_DESTINATION "${CMAKE_INSTALL_LIBDIR}"
-  LIBRARY_SUBDIRECTORY "${PARAVIEW_PLUGIN_SUBDIR}"
-  PLUGINS ${plugins})
+endif()

@@ -72,6 +72,7 @@ pqNodeEditorNode::pqNodeEditorNode(QGraphicsScene* scene, pqProxy* proxy, QGraph
   this->setCacheMode(DeviceCoordinateCache);
   this->setCursor(Qt::ArrowCursor);
   this->setZValue(1);
+  this->setObjectName(QString("node") + proxy->getSMName());
 
   // determine port height
   auto proxyAsView = dynamic_cast<pqView*>(proxy);
@@ -91,7 +92,7 @@ pqNodeEditorNode::pqNodeEditorNode(QGraphicsScene* scene, pqProxy* proxy, QGraph
 
   // init label
   {
-    this->label = new QGraphicsTextItem("", this);
+    this->label->setObjectName("nodeLabel");
     this->label->setCursor(Qt::PointingHandCursor);
 
     QFont font;
@@ -113,7 +114,7 @@ pqNodeEditorNode::pqNodeEditorNode(QGraphicsScene* scene, pqProxy* proxy, QGraph
 
   // create a widget container for property and display widgets
   {
-    this->widgetContainer = new QWidget;
+    this->widgetContainer->setObjectName("nodeContainer");
     this->widgetContainer->setMinimumWidth(pqNodeEditorUtils::CONSTS::NODE_WIDTH);
     this->widgetContainer->setMaximumWidth(pqNodeEditorUtils::CONSTS::NODE_WIDTH);
 
@@ -134,10 +135,12 @@ pqNodeEditorNode::pqNodeEditorNode(QGraphicsScene* scene, pqProxy* proxy, QGraph
     this->widgetContainer->setLayout(containerLayout);
 
     auto graphicsProxyWidget = new QGraphicsProxyWidget(this);
+    graphicsProxyWidget->setObjectName("graphicsProxyWidget");
     graphicsProxyWidget->setWidget(this->widgetContainer);
     graphicsProxyWidget->setSizePolicy(QSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed));
 
     this->proxyProperties = new pqProxyWidget(this->proxy->getProxy());
+    this->proxyProperties->setObjectName("proxyPropertiesWidget");
     this->proxyProperties->updatePanel();
     containerLayout->addWidget(this->proxyProperties);
 

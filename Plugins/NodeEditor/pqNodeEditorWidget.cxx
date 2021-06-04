@@ -84,14 +84,18 @@ pqNodeEditorWidget::pqNodeEditorWidget(const QString& title, QWidget* parent)
 {
   // create widget
   auto widget = new QWidget(this);
+  widget->setObjectName("nodeEditorWidget");
 
   // create layout
   auto layout = new QVBoxLayout;
+  layout->setObjectName("vlayoutNE");
   widget->setLayout(layout);
 
   // create node editor scene and view
   this->scene = new pqNodeEditorScene(this);
+  this->scene->setObjectName("sceneNE");
   this->view = new pqNodeEditorView(this->scene, this);
+  this->view->setObjectName("viewNE");
   this->view->setDragMode(QGraphicsView::ScrollHandDrag);
   this->view->setSceneRect(-10000, -10000, 30000, 30000);
   layout->addWidget(this->view);
@@ -245,13 +249,16 @@ int pqNodeEditorWidget::initializeActions()
 int pqNodeEditorWidget::createToolbar(QLayout* layout)
 {
   auto toolbar = new QWidget(this);
+  toolbar->setObjectName("toolbar");
   layout->addWidget(toolbar);
 
   auto toolbarLayout = new QHBoxLayout;
+  toolbarLayout->setObjectName("HLayout");
   toolbar->setLayout(toolbarLayout);
 
   auto addButton = [=](QString label, QAction* action) {
     auto button = new QPushButton(label);
+    button->setObjectName(label.simplified().remove(' ') + "Button");
     this->connect(button, &QPushButton::released, action, &QAction::trigger);
     toolbarLayout->addWidget(button);
     return 1;
@@ -263,6 +270,7 @@ int pqNodeEditorWidget::createToolbar(QLayout* layout)
   addButton("Layout", this->actionLayout);
   {
     auto checkBox = new QCheckBox("Auto Layout");
+    checkBox->setObjectName("autolayoutCheckbox");
     checkBox->setCheckState(this->autoUpdateLayout ? Qt::Checked : Qt::Unchecked);
     this->connect(checkBox, &QCheckBox::stateChanged, this, [=](int state) {
       this->autoUpdateLayout = state;
