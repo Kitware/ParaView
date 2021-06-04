@@ -54,6 +54,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkXMLImageDataWriter.h"
 
 // Qt includes
+#include <QMainWindow>
+#include <QStatusBar>
 #include <QVBoxLayout>
 
 namespace paraviewTransfer2D
@@ -445,4 +447,15 @@ void pqTransferFunction2DWidget::render()
 {
   this->Internals->Timer.start();
 }
+
+//-----------------------------------------------------------------------------
+void pqTransferFunction2DWidget::showUsageStatus()
+{
+  QMainWindow* mainWindow = qobject_cast<QMainWindow*>(pqCoreUtilities::mainWidget());
+  if (mainWindow)
+  {
+    mainWindow->statusBar()->showMessage(tr("Double click to add a box."
+                                            "Grab and drag to move the mox."),
+      2000);
+  }
 }

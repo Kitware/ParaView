@@ -75,6 +75,12 @@ public Q_SLOTS:
   void render();
 
 protected:
+protected Q_SLOTS:
+  /**
+   * Show usage info in the application status bar.
+   */
+  void showUsageStatus();
+
 private:
   Q_DISABLE_COPY(pqTransferFunction2DWidget)
 
