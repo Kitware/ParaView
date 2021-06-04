@@ -1364,7 +1364,6 @@ void pqColorOpacityEditorWidget::realShow2DHistogram()
   {
     this->Internals->Ui.Transfer2DEditor->setHistogram(hist2D);
   }
-  this->Internals->Ui.Transfer2DEditor->initialize();
 }
 
 //-----------------------------------------------------------------------------
@@ -1420,4 +1419,11 @@ void pqColorOpacityEditorWidget::onRangeHandlesRangeChanged(double rangeMin, dou
   vtkSMTransferFunctionProxy::RescaleTransferFunction(opacityProxy, range);
   this->Internals->render();
   Q_EMIT this->changeFinished();
+}
+
+//-----------------------------------------------------------------------------
+void pqColorOpacityEditorWidget::initializeTransfer2DEditor(vtkImageData* t2d)
+{
+  Ui::ColorOpacityEditorWidget& ui = this->Internals->Ui;
+  ui.Transfer2DEditor->initialize(t2d);
 }

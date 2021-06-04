@@ -431,6 +431,11 @@ protected: // NOLINT(readability-redundant-access-specifiers)
    */
   void initializeOpacityEditor(vtkPiecewiseFunction* pwf);
 
+  /**
+   * Initialize the 2D transfer function editor
+   */
+  void initializeTransfer2DEditor(vtkImageData* im);
+
 private:
   Q_DISABLE_COPY(pqColorOpacityEditorWidget)
 
