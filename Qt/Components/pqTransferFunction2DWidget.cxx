@@ -370,7 +370,6 @@ public:
 
     if (!histogram)
     {
-      this->ContextView->Render();
       return;
     }
     vtkDataArray* arr = histogram->GetPointData()->GetScalars();
@@ -390,8 +389,6 @@ public:
     transferFunction->SetScaleToLog10();
     transferFunction->Build();
     this->Chart->SetTransferFunction(transferFunction);
-
-    this->ContextView->Render();
   }
 };
 
@@ -401,13 +398,13 @@ pqTransferFunction2DWidget::pqTransferFunction2DWidget(QWidget* parent)
   , Internals(new pqInternals(this))
 {
   // whenever the rendering timer times out, we render the widget.
-  /*QObject::connect(&this->Internals->Timer, &QTimer::timeout, [this]() {
+  QObject::connect(&this->Internals->Timer, &QTimer::timeout, [this]() {
     auto renWin = this->Internals->ContextView->GetRenderWindow();
     if (this->isVisible())
     {
       renWin->Render();
     }
-  });*/
+  });
 }
 
 //-----------------------------------------------------------------------------
@@ -431,6 +428,7 @@ vtkImageData* pqTransferFunction2DWidget::histogram() const
 void pqTransferFunction2DWidget::setHistogram(vtkImageData* histogram)
 {
   this->Internals->setHistogram(histogram);
+  this->render();
 }
 
 //-----------------------------------------------------------------------------
@@ -440,4 +438,11 @@ void pqTransferFunction2DWidget::initialize(vtkImageData* transfer2D)
 
   pqCoreUtilities::connect(
     this->Internals->Chart, vtkCommand::MouseMoveEvent, this, SLOT(showUsageStatus()));
+}
+
+//-----------------------------------------------------------------------------
+void pqTransferFunction2DWidget::render()
+{
+  this->Internals->Timer.start();
+}
 }

@@ -67,6 +67,13 @@ public:
    */
   void initialize(vtkImageData*);
 
+public Q_SLOTS:
+  /**
+   * re-renders the transfer function view. This doesn't render immediately,
+   * schedules a render.
+   */
+  void render();
+
 protected:
 private:
   Q_DISABLE_COPY(pqTransferFunction2DWidget)
