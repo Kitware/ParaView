@@ -124,7 +124,8 @@ public:
   /**
    * Executes pipelines.
    */
-  static bool ExecutePipelines(int timestep, double time, std::vector<std::string> parameters = {});
+  static bool ExecutePipelines(
+    int timestep, double time, const std::vector<std::string>& parameters = {});
 
   //@{
   /**

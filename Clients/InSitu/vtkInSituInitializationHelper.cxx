@@ -286,7 +286,7 @@ void vtkInSituInitializationHelper::MarkProducerModified(vtkSMSourceProxy* produ
 
 //----------------------------------------------------------------------------
 bool vtkInSituInitializationHelper::ExecutePipelines(
-  int timestep, double time, std::vector<std::string> parameters)
+  int timestep, double time, const std::vector<std::string>& parameters)
 {
   if (vtkInSituInitializationHelper::Internals == nullptr)
   {

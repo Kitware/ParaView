@@ -53,7 +53,7 @@ vtkInSituPipelinePython::~vtkInSituPipelinePython()
 }
 
 //----------------------------------------------------------------------------
-void vtkInSituPipelinePython::SetArguments(const std::vector<std::string> args)
+void vtkInSituPipelinePython::SetArguments(const std::vector<std::string>& args)
 {
   if (args != this->Arguments)
   {
@@ -71,7 +71,7 @@ void vtkInSituPipelinePython::SetArguments(const std::vector<std::string> args)
 }
 
 //----------------------------------------------------------------------------
-void vtkInSituPipelinePython::SetParameters(const std::vector<std::string> params)
+void vtkInSituPipelinePython::SetParameters(const std::vector<std::string>& params)
 {
   if (params != this->Parameters)
   {

@@ -373,7 +373,7 @@ bool vtkCPPythonScriptV2Helper::CatalystFinalize()
 
 //----------------------------------------------------------------------------
 bool vtkCPPythonScriptV2Helper::CatalystExecute(
-  int timestep, double time, std::vector<std::string> params)
+  int timestep, double time, const std::vector<std::string>& params)
 {
   vtkScopedSet<vtkCPPythonScriptV2Helper*> scoped(vtkCPPythonScriptV2Helper::ActiveInstance, this);
 

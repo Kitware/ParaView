@@ -72,7 +72,7 @@ public:
   /**
    * Calls `catalyst_execute`.
    */
-  bool CatalystExecute(int timestep, double time, std::vector<std::string> params = {});
+  bool CatalystExecute(int timestep, double time, const std::vector<std::string>& params = {});
 
   //@{
   /**
