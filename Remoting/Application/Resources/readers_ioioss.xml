@@ -89,6 +89,30 @@
         <Documentation>Select the element blocks to read.</Documentation>
       </StringVectorProperty>
 
+      <StringVectorProperty name="StructuredBlockInfo"
+        command="GetStructuredBlockSelection"
+        number_of_elements_per_command="2"
+        information_only="1"
+        si_class="vtkSIDataArraySelectionProperty" />
+
+      <StringVectorProperty name="StructuredBlocks"
+        command="GetStructuredBlockSelection"
+        information_property="StructuredBlockInfo"
+        number_of_elements_per_command="2"
+        element_types="2 0"
+        repeat_command="1"
+        si_class="vtkSIDataArraySelectionProperty">
+        <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+            <Property function="ArrayList" name="StructuredBlockInfo" />
+          </RequiredProperties>
+        </ArraySelectionDomain>
+        <Hints>
+          <ArraySelectionWidget icon_type="cell" />
+        </Hints>
+        <Documentation>Select the structured blocks to read.</Documentation>
+      </StringVectorProperty>
+
       <StringVectorProperty name="NodeBlockFieldInfo"
         command="GetNodeBlockFieldSelection"
         number_of_elements_per_command="2"
@@ -183,6 +207,30 @@
           <ArraySelectionWidget icon_type="cell" />
         </Hints>
         <Documentation>Select the element blocks fields / arrays to read.</Documentation>
+      </StringVectorProperty>
+
+      <StringVectorProperty name="StructuredBlockFieldInfo"
+        command="GetStructuredBlockFieldSelection"
+        number_of_elements_per_command="2"
+        information_only="1"
+        si_class="vtkSIDataArraySelectionProperty" />
+
+      <StringVectorProperty name="StructuredBlockFields"
+        command="GetStructuredBlockFieldSelection"
+        information_property="StructuredBlockFieldInfo"
+        number_of_elements_per_command="2"
+        element_types="2 0"
+        repeat_command="1"
+        si_class="vtkSIDataArraySelectionProperty">
+        <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+            <Property function="ArrayList" name="StructuredBlockFieldInfo" />
+          </RequiredProperties>
+        </ArraySelectionDomain>
+        <Hints>
+          <ArraySelectionWidget icon_type="cell" />
+        </Hints>
+        <Documentation>Select the structured blocks fields / arrays to read.</Documentation>
       </StringVectorProperty>
 
       <StringVectorProperty name="NodeSetInfo"
@@ -515,6 +563,7 @@
         name="Blocks"
         panel_widget="ArrayStatus">
         <Property name="ElementBlocks" />
+        <Property name="StructuredBlocks" />
         <Property name="EdgeBlocks" />
         <Property name="FaceBlocks" />
       </PropertyGroup>
@@ -524,6 +573,7 @@
         panel_widget="ArrayStatus">
         <Property name="NodeBlockFields" />
         <Property name="ElementBlockFields" />
+        <Property name="StructuredBlockFields" />
         <Property name="EdgeBlockFields" />
         <Property name="FaceBlockFields" />
       </PropertyGroup>
@@ -559,8 +609,8 @@
       </PropertyGroup>
 
       <Hints>
-        <ReaderFactory extensions="g e h gc ex2 ex2v2 exo gen par exoII exii ex-timeseries"
-                       file_description="Ioss Exodus Files"
+        <ReaderFactory extensions="g e h gc ex2 ex2v2 exo gen par exoII exii ex-timeseries cgns"
+                       file_description="IOSS Files"
                        filename_patterns="*.e-s*" />
       </Hints>
     </SourceProxy>
