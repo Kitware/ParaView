@@ -360,6 +360,10 @@ bool verify(const std::string& protocol, const conduit_cpp::Node& n)
     }
     vtkVLogScopeF(PARAVIEW_LOG_CATALYST_VERBOSITY(), "multimesh blueprint verified.");
   }
+  else if (type == "ioss")
+  {
+    // no additional verification at this time.
+  }
   else
   {
     vtkLogF(ERROR, "unsupported channel type '%s' specified.", type.c_str());
