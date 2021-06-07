@@ -42,7 +42,6 @@
 #include "vtkUniformGrid.h"
 #include "vtkUnsignedCharArray.h"
 #include "vtkVolumeProperty.h"
-#include "vtkXMLImageDataReader.h"
 
 #include <algorithm>
 #include <map>
@@ -401,13 +400,6 @@ void vtkImageVolumeRepresentation::UpdateMapperParameters()
     if (this->UseTransfer2D)
     {
       this->Property->SetTransferFunctionMode(vtkVolumeProperty::TF_2D);
-      vtkNew<vtkXMLImageDataReader> r;
-      if (r->CanReadFile("Transfer2D.vti"))
-      {
-        r->SetFileName("Transfer2D.vti");
-        r->Update();
-        this->Property->SetTransferFunction2D(r->GetOutput());
-      }
     }
     else
     {

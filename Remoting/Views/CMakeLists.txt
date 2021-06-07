@@ -61,9 +61,6 @@ set(classes
   vtkMultiSliceContextItem
   vtkOrderedCompositingHelper
   vtkOutlineRepresentation
-  vtkPointGaussianRepresentation
-  vtkPolarAxesRepresentation
-  vtkProgressBarSourceRepresentation
   vtkPVAxesActor
   vtkPVAxesWidget
   vtkPVBoxChartRepresentation
@@ -93,10 +90,10 @@ set(classes
   vtkPVImplicitCylinderRepresentation
   vtkPVImplicitPlaneRepresentation
   vtkPVInteractiveViewLinkRepresentation
-  vtkPVLastSelectionInformation
-  vtkPVLight
   vtkPVLODActor
   vtkPVLODVolume
+  vtkPVLastSelectionInformation
+  vtkPVLight
   vtkPVLogoSource
   vtkPVMaterialLibrary
   vtkPVMultiSliceView
@@ -109,11 +106,11 @@ set(classes
   vtkPVProcessWindow
   vtkPVProminentValuesInformation
   vtkPVRayCastPickingHelper
-  vtkPVRenderingCapabilitiesInformation
   vtkPVRenderView
   vtkPVRenderViewDataDeliveryManager
   vtkPVRenderViewSettings
   vtkPVRenderViewWithEDL
+  vtkPVRenderingCapabilitiesInformation
   vtkPVRepresentedArrayListSettings
   vtkPVRepresentedDataInformation
   vtkPVScalarBarActor
@@ -123,9 +120,11 @@ set(classes
   vtkPVSynchronizedRenderer
   vtkPVView
   vtkPVXYChartView
+  vtkPointGaussianRepresentation
+  vtkPolarAxesRepresentation
+  vtkProgressBarSourceRepresentation
   vtkQuartileChartRepresentation
   vtkRulerSourceRepresentation
-  vtkSelectionRepresentation
   vtkSIImageTextureProxy
   vtkSIPVRepresentationProxy
   vtkSIUnstructuredGridVolumeRepresentationProxy
@@ -154,14 +153,14 @@ set(classes
   vtkSMNewWidgetRepresentationProxy
   vtkSMNewWidgetRepresentationProxyAbstract
   vtkSMOrthographicSliceViewProxy
-  vtkSMParaViewPipelineControllerWithRendering
-  vtkSMPlotMatrixViewProxy
   vtkSMPVMoleculeRepresentationProxy
   vtkSMPVRepresentationProxy
+  vtkSMParaViewPipelineControllerWithRendering
+  vtkSMPlotMatrixViewProxy
   vtkSMRangedTransferFunctionDomain
   vtkSMRecolorableImageExtractWriterProxy
-  vtkSMRendererDomain
   vtkSMRenderViewProxy
+  vtkSMRendererDomain
   vtkSMRepresentationProxy
   vtkSMRepresentationTypeDomain
   vtkSMRepresentedArrayListDomain
@@ -182,6 +181,7 @@ set(classes
   vtkSMViewResolutionDomain
   vtkSMWidgetRepresentationProxy
   vtkSMXYChartRepresentationInitializationHelper
+  vtkSelectionRepresentation
   vtkSpreadSheetRepresentation
   vtkSpreadSheetView
   vtkStructuredGridVolumeRepresentation
@@ -189,7 +189,8 @@ set(classes
   vtkTextSourceRepresentation
   vtkThreeSliceFilter
   vtkTilesHelper
-  vtkTransfer2DBoxItem
+  vtkTransferFunctionBoxItem
+  vtkTransferFunctionChartHistogram2D
   vtkUnstructuredGridVolumeRepresentation
   vtkViewLayout
   vtkVolumeRepresentation

@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   ParaView
-  Module:    vtkTransfer2DBoxItem.h
+  Module:    vtkTransferFunctionBoxItem.h
 
   Copyright (c) Kitware, Inc.
   All rights reserved.
@@ -12,8 +12,8 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-#ifndef vtkTransfer2DBoxItem_h
-#define vtkTransfer2DBoxItem_h
+#ifndef vtkTransferFunctionBoxItem_h
+#define vtkTransferFunctionBoxItem_h
 
 #include "vtkControlPointsItem.h"
 
@@ -24,12 +24,22 @@ class vtkImageData;
 class vtkPen;
 class vtkPoints2D;
 
-class VTKREMOTINGVIEWS_EXPORT vtkTransfer2DBoxItem : public vtkControlPointsItem
+class VTKREMOTINGVIEWS_EXPORT vtkTransferFunctionBoxItem : public vtkControlPointsItem
 {
 public:
-  static vtkTransfer2DBoxItem* New();
-  vtkTypeMacro(vtkTransfer2DBoxItem, vtkControlPointsItem);
+  static vtkTransferFunctionBoxItem* New();
+  vtkTypeMacro(vtkTransferFunctionBoxItem, vtkControlPointsItem);
   void PrintSelf(ostream& os, vtkIndent indent) override;
+
+  // Events fires by this class (and subclasses).
+  // \li BoxAddEvent is fired when this box item is added to a chart.
+  // \li BoxEditEvent is fired when this box item is edited, either by dragging the whole box or
+  // editing the corner points.
+  enum
+  {
+    BoxAddEvent = vtkCommand::UserEvent + 100,
+    BoxEditEvent
+  };
 
   /**
    * Returns the curren box as [x0, y0, width, height].
@@ -47,8 +57,8 @@ public:
   vtkSmartPointer<vtkImageData> GetTexture() const;
 
 protected:
-  vtkTransfer2DBoxItem();
-  ~vtkTransfer2DBoxItem();
+  vtkTransferFunctionBoxItem();
+  ~vtkTransferFunctionBoxItem();
 
   vtkIdType AddPoint(const double x, const double y);
   vtkIdType AddPoint(double* pos) override;
@@ -167,4 +177,4 @@ private:
   bool Initialized = false;
 };
 
-#endif
+#endif // vtkTransferFunctionBoxItem_h
