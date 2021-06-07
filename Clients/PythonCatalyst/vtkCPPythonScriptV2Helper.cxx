@@ -84,6 +84,9 @@ public:
   // Keeps track of arguments
   vtkNew<vtkStringList> ArgumentsList;
 
+  // Keeps track of execute parameters
+  vtkNew<vtkStringList> ParametersList;
+
   // flag that tells us the module has custom "execution" methods.
   bool HasCustomExecutionLogic = false;
 
@@ -369,7 +372,8 @@ bool vtkCPPythonScriptV2Helper::CatalystFinalize()
 }
 
 //----------------------------------------------------------------------------
-bool vtkCPPythonScriptV2Helper::CatalystExecute(int timestep, double time)
+bool vtkCPPythonScriptV2Helper::CatalystExecute(
+  int timestep, double time, const std::vector<std::string>& params)
 {
   vtkScopedSet<vtkCPPythonScriptV2Helper*> scoped(vtkCPPythonScriptV2Helper::ActiveInstance, this);
 
@@ -385,6 +389,13 @@ bool vtkCPPythonScriptV2Helper::CatalystExecute(int timestep, double time)
   }
 
   auto& internals = (*this->Internals);
+
+  // populate execute parameters.
+  internals.ParametersList->RemoveAllItems();
+  for (auto& param : params)
+  {
+    internals.ParametersList->AddString(param.c_str());
+  }
 
   // Update ViewTime on each of the views.
   for (auto& view : internals.Views)
@@ -518,6 +529,11 @@ vtkStringList* vtkCPPythonScriptV2Helper::GetArgumentsAsStringList() const
   return internals.ArgumentsList;
 }
 
+vtkStringList* vtkCPPythonScriptV2Helper::GetParametersAsStringList() const
+{
+  auto& internals = (*this->Internals);
+  return internals.ParametersList;
+}
 //----------------------------------------------------------------------------
 void vtkCPPythonScriptV2Helper::RegisterExtractor(vtkSMProxy* extractor)
 {

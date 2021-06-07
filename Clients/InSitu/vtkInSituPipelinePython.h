@@ -52,8 +52,16 @@ public:
    * Get/Set the arguments. The vector is deep copied. Note, changing arguments
    * after `Initialize` has no effect.
    */
-  void SetArguments(const std::vector<std::string> args);
+  void SetArguments(const std::vector<std::string>& args);
   const std::vector<std::string>& GetArguments() const { return this->Arguments; }
+  //@}
+
+  //@{
+  /**
+   * Get/Set the execute parameters. The vector is deep copied.
+   */
+  void SetParameters(const std::vector<std::string>& params);
+  const std::vector<std::string>& GetParameters() const { return this->Parameters; }
   //@}
 
   //@{
@@ -76,6 +84,7 @@ private:
   vtkNew<vtkCPPythonScriptV2Helper> Helper;
   char* FileName;
   std::vector<std::string> Arguments;
+  std::vector<std::string> Parameters;
 };
 
 #endif

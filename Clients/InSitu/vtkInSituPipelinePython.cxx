@@ -53,7 +53,7 @@ vtkInSituPipelinePython::~vtkInSituPipelinePython()
 }
 
 //----------------------------------------------------------------------------
-void vtkInSituPipelinePython::SetArguments(const std::vector<std::string> args)
+void vtkInSituPipelinePython::SetArguments(const std::vector<std::string>& args)
 {
   if (args != this->Arguments)
   {
@@ -66,6 +66,16 @@ void vtkInSituPipelinePython::SetArguments(const std::vector<std::string> args)
     }
 #endif
     this->Arguments = args;
+    this->Modified();
+  }
+}
+
+//----------------------------------------------------------------------------
+void vtkInSituPipelinePython::SetParameters(const std::vector<std::string>& params)
+{
+  if (params != this->Parameters)
+  {
+    this->Parameters = params;
     this->Modified();
   }
 }
@@ -88,7 +98,7 @@ bool vtkInSituPipelinePython::Initialize()
 bool vtkInSituPipelinePython::Execute(int timestep, double time)
 {
 #if VTK_MODULE_ENABLE_ParaView_PythonCatalyst
-  return this->Helper->CatalystExecute(timestep, time);
+  return this->Helper->CatalystExecute(timestep, time, this->Parameters);
 #else
   (void)time;
   (void)timestep;

@@ -285,7 +285,8 @@ void vtkInSituInitializationHelper::MarkProducerModified(vtkSMSourceProxy* produ
 }
 
 //----------------------------------------------------------------------------
-bool vtkInSituInitializationHelper::ExecutePipelines(int timestep, double time)
+bool vtkInSituInitializationHelper::ExecutePipelines(
+  int timestep, double time, const std::vector<std::string>& parameters)
 {
   if (vtkInSituInitializationHelper::Internals == nullptr)
   {
@@ -315,6 +316,12 @@ bool vtkInSituInitializationHelper::ExecutePipelines(int timestep, double time)
 
     if (!item.InitializationFailed && !item.ExecuteFailed)
     {
+      // set the execute parameters for this pipeline
+      auto pipeline = vtkInSituPipelinePython::SafeDownCast(item.Pipeline);
+      if (pipeline)
+      {
+        pipeline->SetParameters(parameters);
+      }
       // If `Initialize` failed, don't call `Execute` on the Pipeline.
       // If Execute fails even once, we no longer call Execute on this pipeline
       // in subsequent calls to `ExecutePipelines`.

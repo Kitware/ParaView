@@ -72,7 +72,7 @@ public:
   /**
    * Calls `catalyst_execute`.
    */
-  bool CatalystExecute(int timestep, double time);
+  bool CatalystExecute(int timestep, double time, const std::vector<std::string>& params = {});
 
   //@{
   /**
@@ -99,6 +99,7 @@ public:
   vtkCPDataDescription* GetDataDescription() const { return this->DataDescription; }
   vtkSMProxy* GetTrivialProducer(const char* inputname);
   vtkStringList* GetArgumentsAsStringList() const;
+  vtkStringList* GetParametersAsStringList() const;
   //@}
 
 protected:

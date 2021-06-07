@@ -99,6 +99,8 @@ invocation.
   specified, 0 is assumed.
 * catalyst/state/time: (optional) float64 value for current time, if not specified,
   0.0 is assumed.
+* catalyst/state/parameters: (optional) list of optional runtime parameters. If present,
+  they must be of type 'list' with each child node of type 'string'.
 
 **channels**: channels are used to communicate simulation data. The **channels**
 node can have one or more children, each corresponding to a named channel. A
