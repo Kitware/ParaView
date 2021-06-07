@@ -835,7 +835,10 @@ vtkImageData* vtkSMTransferFunctionProxy::ComputeDataHistogram2D(int numberOfBin
   mover->UpdatePipeline();
   vtkImageData* hist2D = vtkImageData::SafeDownCast(
     vtkAlgorithm::SafeDownCast(mover->GetClientSideObject())->GetOutputDataObject(0));
-  this->Histogram2DCache = vtkSmartPointer<vtkImageData>::New();
+  if (!this->Histogram2DCache)
+  {
+    this->Histogram2DCache = vtkSmartPointer<vtkImageData>::New();
+  }
   this->Histogram2DCache->ShallowCopy(hist2D);
 
   // Sanity check

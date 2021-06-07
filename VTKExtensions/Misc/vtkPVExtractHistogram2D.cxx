@@ -286,7 +286,6 @@ void vtkPVExtractHistogram2D::ComputeGradient(vtkDataObject* input)
   }
 
   this->ComponentArrayCache[1] = vtkDoubleArray::New();
-  this->ComponentArrayCache[1]->Register(this);
   this->ComponentArrayCache[1]->SetName("GradientMag");
   this->ComponentArrayCache[1]->SetNumberOfComponents(1);
   this->ComponentArrayCache[1]->SetNumberOfTuples(numTuples);
