@@ -43,7 +43,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMProperty.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMProxy.h"
-#include "vtkSMSILDomain.h"
 #include "vtkSMStringListDomain.h"
 #include "vtkSMStringVectorProperty.h"
 
@@ -56,10 +55,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqFileChooserWidget.h"
 #include "pqLineEdit.h"
 #include "pqPopOutWidget.h"
-#include "pqProxySILModel.h"
 #include "pqQtDeprecated.h"
-#include "pqSILModel.h"
-#include "pqSILWidget.h"
 #include "pqSMAdaptor.h"
 #include "pqScalarValueListPropertyWidget.h"
 #include "pqServerManagerModel.h"
@@ -129,7 +125,6 @@ pqStringVectorPropertyWidget::pqStringVectorPropertyWidget(
   vtkSMFileListDomain* fileListDomain = nullptr;
   vtkSMArrayListDomain* arrayListDomain = nullptr;
   vtkSMStringListDomain* stringListDomain = nullptr;
-  vtkSMSILDomain* silDomain = nullptr;
   vtkSMArraySelectionDomain* arraySelectionDomain = nullptr;
 
   vtkSMDomainIterator* domainIter = svp->NewDomainIterator();
@@ -141,7 +136,6 @@ pqStringVectorPropertyWidget::pqStringVectorPropertyWidget(
     fileListDomain = fileListDomain ? fileListDomain : vtkSMFileListDomain::SafeDownCast(domain);
     arrayListDomain =
       arrayListDomain ? arrayListDomain : vtkSMArrayListDomain::SafeDownCast(domain);
-    silDomain = silDomain ? silDomain : vtkSMSILDomain::SafeDownCast(domain);
     arraySelectionDomain =
       arraySelectionDomain ? arraySelectionDomain : vtkSMArraySelectionDomain::SafeDownCast(domain);
     stringListDomain =
@@ -274,28 +268,6 @@ pqStringVectorPropertyWidget::pqStringVectorPropertyWidget(
     }
     this->addPropertyLink(selectorWidget, property_name, SIGNAL(widgetModified()), smProperty);
     this->setChangeAvailableAsChangeFinished(true);
-  }
-  else if (silDomain)
-  {
-    vtkVLogF(PARAVIEW_LOG_APPLICATION_VERBOSITY(), "use `pqSILWidget`.");
-    pqSILWidget* tree = new pqSILWidget(silDomain->GetSubTree(), this);
-    tree->setObjectName("BlockSelectionWidget");
-
-    pqSILModel* silModel = new pqSILModel(tree);
-
-    // FIXME: This needs to be automated, we want the model to automatically
-    // fetch the SIL when the domain is updated.
-    silModel->setSILDomain(silDomain);
-    silModel->update();
-    tree->setModel(silModel);
-
-    this->addPropertyLink(tree->activeModel(), "values", SIGNAL(valuesChanged()), smProperty);
-    this->setChangeAvailableAsChangeFinished(true);
-
-    // hide widget label
-    setShowLabel(false);
-
-    vbox->addWidget(tree);
   }
   else if (arraySelectionDomain)
   {

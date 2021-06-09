@@ -68,7 +68,6 @@ set(classes
   vtkPVServerManagerPluginInterface
   vtkPVServerOptions
   vtkPVSession
-  vtkPVSILInformation
   vtkPVSystemConfigInformation
   vtkPVSystemInformation
   vtkPVTemporalDataInformation

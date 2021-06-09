@@ -150,7 +150,6 @@ QVariant pqPropertyLinksConnection::currentServerManagerValue(bool use_unchecked
 
     case pqSMAdaptor::MULTIPLE_ELEMENTS:
     case pqSMAdaptor::COMPOSITE_TREE:
-    case pqSMAdaptor::SIL:
       if (this->IndexSM == -1)
       {
         currentSMValue = pqSMAdaptor::getMultipleElementProperty(this->PropertySM, value_type);
@@ -235,7 +234,6 @@ void pqPropertyLinksConnection::setServerManagerValue(bool use_unchecked, const 
       }
       break;
 
-    case pqSMAdaptor::SIL:
     case pqSMAdaptor::MULTIPLE_ELEMENTS:
     case pqSMAdaptor::COMPOSITE_TREE:
       if (this->IndexSM == -1)

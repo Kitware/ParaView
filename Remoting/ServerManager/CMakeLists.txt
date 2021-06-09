@@ -58,7 +58,6 @@ set(classes
   vtkSIProxy
   vtkSIProxyDefinitionManager
   vtkSIProxyProperty
-  vtkSISILProperty
   vtkSISourceProxy
   vtkSIStringVectorProperty
   vtkSITimeLabelProperty
@@ -162,8 +161,6 @@ set(classes
   vtkSMSessionProxyManager
   vtkSMSettings
   vtkSMSettingsProxy
-  vtkSMSILDomain
-  vtkSMSILModel
   vtkSMSourceProxy
   vtkSMStateLoader
   vtkSMStateLocator

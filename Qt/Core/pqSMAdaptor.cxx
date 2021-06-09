@@ -68,7 +68,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMProxyGroupDomain.h"
 #include "vtkSMProxyListDomain.h"
 #include "vtkSMProxyProperty.h"
-#include "vtkSMSILDomain.h"
 #include "vtkSMSessionProxyManager.h"
 #include "vtkSMSourceProxy.h"
 #include "vtkSMStringListDomain.h"
@@ -148,16 +147,11 @@ pqSMAdaptor::PropertyType pqSMAdaptor::getPropertyType(vtkSMProperty* Property)
     vtkSMFileListDomain* fileListDomain = nullptr;
     vtkSMStringListDomain* stringListDomain = nullptr;
     vtkSMCompositeTreeDomain* compositeTreeDomain = nullptr;
-    vtkSMSILDomain* silDomain = nullptr;
     vtkSMChartSeriesSelectionDomain* chartSeriesSelectionDomain = nullptr;
 
     vtkSMDomainIterator* iter = Property->NewDomainIterator();
     for (iter->Begin(); !iter->IsAtEnd(); iter->Next())
     {
-      if (!silDomain)
-      {
-        silDomain = vtkSMSILDomain::SafeDownCast(iter->GetDomain());
-      }
       if (!booleanDomain)
       {
         booleanDomain = vtkSMBooleanDomain::SafeDownCast(iter->GetDomain());
@@ -198,16 +192,12 @@ pqSMAdaptor::PropertyType pqSMAdaptor::getPropertyType(vtkSMProperty* Property)
     {
       type = pqSMAdaptor::COMPOSITE_TREE;
     }
-    else if (silDomain)
-    {
-      type = pqSMAdaptor::SIL;
-    }
     else if (chartSeriesSelectionDomain)
     {
       type = pqSMAdaptor::MULTIPLE_ELEMENTS;
     }
-    else if (!silDomain && ((VectorProperty && VectorProperty->GetRepeatable() &&
-                             (stringListDomain || enumerationDomain))))
+    else if (VectorProperty && VectorProperty->GetRepeatable() &&
+      (stringListDomain || enumerationDomain))
     {
       type = pqSMAdaptor::SELECTION;
     }

@@ -126,38 +126,22 @@
         (triangular, bilinear quadrilateral, etc.) and have the same variables
         defined over them.</Documentation>
       </StringVectorProperty>
-      <IntVectorProperty command="GetSILUpdateStamp"
-                         information_only="1"
-                         name="SILUpdateStamp">
-        <SimpleIntInformationHelper />
-        <Documentation>Information property indicating the update stamp of the
-        SIL. Every time the SIL is rebuilt, this time stamp is
-        changed.</Documentation>
-      </IntVectorProperty>
-      <StringVectorProperty command="GetSIL"
-                            information_only="1"
-                            name="ElementBlocksInfo"
-                            si_class="vtkSISILProperty"
-                            subtree="Blocks" />
-      <IdTypeVectorProperty command="GetSILUpdateStamp"
-                            default_values="0"
-                            information_only="1"
-                            name="SILTimeStamp"
-                            number_of_elements="1" />
+      <StringVectorProperty information_only="1"
+                            name="ElementBlocksInfo">
+        <ArraySelectionInformationHelper attribute_name="ElementBlock" />
+      </StringVectorProperty>
       <StringVectorProperty command="SetElementBlockArrayStatus"
                             element_types="2 0"
+                            information_property="ElementBlocksInfo"
                             name="ElementBlocks"
                             number_of_elements_per_command="2"
                             repeat_command="1">
-        <SILDomain name="array_list"
-                   subtree="Blocks">
+        <ArraySelectionDomain name="array_list">
           <RequiredProperties>
             <Property function="ArrayList"
                       name="ElementBlocksInfo" />
-            <Property function="TimeStamp"
-                      name="SILTimeStamp" />
           </RequiredProperties>
-        </SILDomain>
+        </ArraySelectionDomain>
         <Documentation>Use this property to select which blocks of elements
         (cells) should be loaded. All elements (cells) in the same block will
         have the same interpolant (tetrahedral, triangular, trilinear
@@ -884,6 +868,7 @@
           <Property name="EdgeSetResultArrayInfo" />
           <Property name="EdgeVariablesInfo" />
           <Property name="ElementBlocks" />
+          <Property name="ElementBlocksInfo" />
           <Property name="ElementMapInfo" />
           <Property name="ElementSetInfo" />
           <Property name="ElementSetResultArrayInfo" />
@@ -901,7 +886,6 @@
           <Property name="PointVariablesInfo" />
           <Property name="SideSetInfo" />
           <Property name="SideSetResultArrayInfo" />
-          <Property name="SILUpdateStamp" />
           <PropertyGroup label="Mode Shapes">
             <Property name="HasModeShapes" panel_visibility="advanced" />
             <Property name="ModeShape" panel_visibility="advanced" />
@@ -1029,6 +1013,7 @@
           <Property name="EdgeSetInfo" />
           <Property name="EdgeSetResultArrayInfo" />
           <Property name="EdgeVariablesInfo" />
+          <Property name="ElementBlocksInfo" />
           <Property name="ElementBlocks" />
           <Property name="ElementMapInfo" />
           <Property name="ElementSetInfo" />
@@ -1047,7 +1032,6 @@
           <Property name="PointVariablesInfo" />
           <Property name="SideSetInfo" />
           <Property name="SideSetResultArrayInfo" />
-          <Property name="SILUpdateStamp" />
           <PropertyGroup label="Mode Shapes">
             <Property name="HasModeShapes" panel_visibility="advanced" />
             <Property name="ModeShape" panel_visibility="advanced" />

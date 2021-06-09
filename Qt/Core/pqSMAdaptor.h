@@ -70,7 +70,6 @@ public:
     MULTIPLE_ELEMENTS,
     FILE_LIST,
     COMPOSITE_TREE,
-    SIL,
   };
 
   enum PropertyValueType
