@@ -45,6 +45,54 @@
  * </SourceProxy>
  * @endcode
  *
+ * vtkSMDataAssemblyDomain can also be used on readers. In that case, it uses
+ * vtkPVDataAssemblyInformation to obtain the data assembly from the reader. The
+ * following snippet shows how this domain can be used on a reader. Note, the
+ * 'Tag' required property is essential to use this domain on a reader. It is
+ * used to determine when to fetch the vtkDataAssembly from the reader.
+ *
+ * @code{xml}
+ *
+ * <SourceProxy ...>
+ * ...
+ *   <IntVectorProperty name="AssemblyTag"
+ *     command="GetAssemblyTag"
+ *     information_only="1">
+ *     <Documentation>
+ *       This is simply an int that changes whenever a new assembly is built
+ *       by the reader. This can be used to determine if the assembly should be fetched from
+ *       the reader whenever the reader is updated.
+ *     </Documentation>
+ *   </IntVectorProperty>
+ *
+ *   <StringVectorProperty name="AssemmblySelectors"
+ *     command="AddSelector"
+ *     clean_command="ClearSelectors"
+ *     repeat_command="1"
+ *     number_of_elements_per_command="1"
+ *     panel_widget="data_assembly_editor" >
+ *     <DataAssemblyDomain name="data_assembly">
+ *       <RequiredProperties>
+ *         <Property function="Tag" name="AssemblyTag" />
+ *       </RequiredProperties>
+ *     </DataAssemblyDomain>
+ *     <Documentation>
+ *       Specify the selectors for the data assembly chosen using **Assembly**
+ *       to choose the blocks to extract from the input dataset.
+ *     </Documentation>
+ *     <Hints>
+ *       <!-- AssemblyTag == 0 implies there's no assembly in the file,
+ *       in which case, we want to hide this widget entirely -->
+ *       <PropertyWidgetDecorator type="GenericDecorator"
+ *         mode="visibility"
+ *         property="AssemblyTag"
+ *         value="0"
+ *         inverse="1" />
+ *     </Hints>
+ *   </StringVectorProperty>
+ *
+ * </SourceProxy>
+ * @endcode
  */
 
 #ifndef vtkSMDataAssemblyDomain_h
@@ -88,6 +136,9 @@ private:
   void operator=(const vtkSMDataAssemblyDomain&) = delete;
 
   void ChooseAssembly(const std::string& name, vtkDataAssembly* assembly);
+  void FetchAssembly(int tag);
+
+  int LastTag = 0;
 
   vtkSmartPointer<vtkDataAssembly> Assembly;
   std::string Name;
