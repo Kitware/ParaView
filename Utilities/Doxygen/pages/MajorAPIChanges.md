@@ -7,6 +7,14 @@ started tracking these (starting after version 4.2).
 Changes in 5.10
 ----------------
 
+###vtkSubsetInclusionLattice###
+
+`vtkSubsetInclusionLattice` and related classes have been removed. The only
+reader that used this when this was introduced was CGNS reader which since
+stopped used these classes for performance reasons. IOSS reader (`vtkIossReader`)
+demonstrates a newer away of representing assemblies using `vtkDataAssembly`
+and using that for selecting blocks to read on the reader.
+
 ###Changes to vtkPVDataInformation###
 
 vtkPVDataInformation no longer builds a complete composite data hierarchy

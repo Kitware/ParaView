@@ -73,7 +73,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMSourceProxy.h"
 #include "vtkSMStringListDomain.h"
 #include "vtkSMStringVectorProperty.h"
-#include "vtkSMSubsetInclusionLatticeDomain.h"
 #include "vtkSMUncheckedPropertyHelper.h"
 #include "vtkSMVectorProperty.h"
 
@@ -150,7 +149,6 @@ pqSMAdaptor::PropertyType pqSMAdaptor::getPropertyType(vtkSMProperty* Property)
     vtkSMStringListDomain* stringListDomain = nullptr;
     vtkSMCompositeTreeDomain* compositeTreeDomain = nullptr;
     vtkSMSILDomain* silDomain = nullptr;
-    vtkSMSubsetInclusionLatticeDomain* silDomain2 = nullptr;
     vtkSMChartSeriesSelectionDomain* chartSeriesSelectionDomain = nullptr;
 
     vtkSMDomainIterator* iter = Property->NewDomainIterator();
@@ -159,10 +157,6 @@ pqSMAdaptor::PropertyType pqSMAdaptor::getPropertyType(vtkSMProperty* Property)
       if (!silDomain)
       {
         silDomain = vtkSMSILDomain::SafeDownCast(iter->GetDomain());
-      }
-      if (!silDomain2)
-      {
-        silDomain2 = vtkSMSubsetInclusionLatticeDomain::SafeDownCast(iter->GetDomain());
       }
       if (!booleanDomain)
       {
@@ -204,7 +198,7 @@ pqSMAdaptor::PropertyType pqSMAdaptor::getPropertyType(vtkSMProperty* Property)
     {
       type = pqSMAdaptor::COMPOSITE_TREE;
     }
-    else if (silDomain || silDomain2)
+    else if (silDomain)
     {
       type = pqSMAdaptor::SIL;
     }

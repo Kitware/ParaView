@@ -156,8 +156,6 @@ set(classes
   pqSignalAdaptorSelectionTreeWidget
   pqSignalAdaptorTreeWidget
   pqStringVectorPropertyWidget
-  pqSubsetInclusionLatticeTreeModel
-  pqSubsetInclusionLatticeWidget
   pqTabbedMultiViewWidget
   pqTextureComboBox
   pqTextureSelectorPropertyWidget

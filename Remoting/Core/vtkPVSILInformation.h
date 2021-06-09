@@ -17,14 +17,11 @@
  * @brief vtkPVInformation subclass to fetch SIL.
  *
  * Information object used to retrieve the SIL from an algorithm. It supports
- * both legacy representation of SIL (using a vtkGraph) or the newer form (using
- * vtkSubsetInclusionLattice or subclass).
+ * both legacy representation of SIL (using a vtkGraph).
  *
- * If `CopyFromObject` is called with vtkAlgorithmOutput as the argument, it
- * looks for presence of `vtkSubsetInclusionLattice::SUBSET_INCLUSION_LATTICE()`
- * or `vtkDataObject::SIL()` (for legacy SIL) key in the output information for
- * the corresponding `vtkAlgorithm`.
-*/
+ * This is largely obsolete. Refer to vtkPVDataAssemblyInformation instead for
+ * newer code for similar use-cases.
+ */
 
 #ifndef vtkPVSILInformation_h
 #define vtkPVSILInformation_h
@@ -34,7 +31,6 @@
 #include "vtkSmartPointer.h"       // needed for vtkSmartPointer.
 
 class vtkGraph;
-class vtkSubsetInclusionLattice;
 
 class VTKREMOTINGCORE_EXPORT vtkPVSILInformation : public vtkPVInformation
 {
@@ -63,20 +59,12 @@ public:
   vtkGetObjectMacro(SIL, vtkGraph);
   //@}
 
-  //@{
-  /**
-   * Returns the SIL represented using vtkSubsetInclusionLattice.
-   */
-  vtkSubsetInclusionLattice* GetSubsetInclusionLattice() const;
-  //@}
-
 protected:
   vtkPVSILInformation();
   ~vtkPVSILInformation() override;
 
   void SetSIL(vtkGraph*);
   vtkGraph* SIL;
-  vtkSmartPointer<vtkSubsetInclusionLattice> SubsetInclusionLattice;
 
 private:
   vtkPVSILInformation(const vtkPVSILInformation&) = delete;

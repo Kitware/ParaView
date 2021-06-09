@@ -47,8 +47,7 @@ class QSortFilterProxyModel;
  * @class pqSILWidget
  * @brief a QWidget subclass to show legacy SIL (vtkGraph-based SIL)
  *
- * pqSILWidget is designed to show a legacy SIL (represented using vtkGraph, as
- * against ones using vtkSubsetInclusionLattice or subclass).
+ * pqSILWidget is designed to show a legacy SIL (represented using vtkGraph).
  *
  * For top-level nodes in the SIL, it creates tabs for each and then shows
  * subtrees for each in a separate pqTreeView under the tabs.
@@ -57,9 +56,8 @@ class QSortFilterProxyModel;
  *
  * While not deprecated, this class exists to support readers that use legacy
  * representation for SIL which used a `vtkGraph` to represent the SIL. It is
- * recommended that newer code uses vtkSubsetInclusionLattice (or subclass) to
- * represent the SIL. In that case, you should use
- * `pqSubsetInclusionLatticeWidget` instead.
+ * recommended that newer code uses vtkDataAssembly. See `vtkIossReader` for how
+ * this can be done.
  */
 class PQCOMPONENTS_EXPORT pqSILWidget : public QWidget
 {

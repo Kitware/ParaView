@@ -43,7 +43,6 @@ Page | Description
 -----|---------------------------------------------------------------
 [Slice View](@ref DesignSliceView) | Implementing the **Slice View**
 [String Encoding](@ref DesignStringEncoding) | How to encode string when developing for ParaView
-[Subset Inclusion Lattice](@ref SubsetInclusionLattice) | Selecting blocks to read or process
 
 Developer notes
 ----------------

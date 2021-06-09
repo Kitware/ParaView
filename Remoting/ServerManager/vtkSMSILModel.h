@@ -35,9 +35,8 @@
  *
  * While not deprecated, this class exists to support readers that use legacy
  * representation for SIL which used a `vtkGraph` to represent the SIL. It is
- * recommended that newer code uses vtkSubsetInclusionLattice (or subclass) to
- * represent the SIL. In that case, there is no need for such a helper class as
- * similar API is exposed on vtkSubsetInclusionLattice and subclasses.
+ * recommended that newer code uses vtkDataAssembly to
+ * represent the SIL.
  *
  */
 

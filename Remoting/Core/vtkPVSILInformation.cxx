@@ -24,7 +24,6 @@
 #include "vtkGraphWriter.h"
 #include "vtkInformation.h"
 #include "vtkObjectFactory.h"
-#include "vtkSubsetInclusionLattice.h"
 
 vtkStandardNewMacro(vtkPVSILInformation);
 vtkCxxSetObjectMacro(vtkPVSILInformation, SIL, vtkGraph);
@@ -45,7 +44,6 @@ vtkPVSILInformation::~vtkPVSILInformation()
 void vtkPVSILInformation::CopyFromObject(vtkObject* obj)
 {
   this->SetSIL(nullptr);
-  this->SubsetInclusionLattice = nullptr;
 
   vtkAlgorithmOutput* algOutput = vtkAlgorithmOutput::SafeDownCast(obj);
   if (!algOutput)
@@ -77,11 +75,6 @@ void vtkPVSILInformation::CopyFromObject(vtkObject* obj)
   {
     this->SetSIL(vtkGraph::SafeDownCast(info->Get(vtkDataObject::SIL())));
   }
-  else if (info && info->Has(vtkSubsetInclusionLattice::SUBSET_INCLUSION_LATTICE()))
-  {
-    this->SubsetInclusionLattice = vtkSubsetInclusionLattice::SafeDownCast(
-      info->Get(vtkSubsetInclusionLattice::SUBSET_INCLUSION_LATTICE()));
-  }
 }
 
 //----------------------------------------------------------------------------
@@ -111,17 +104,6 @@ void vtkPVSILInformation::CopyToStream(vtkClientServerStream* css)
   {
     *css << vtkClientServerStream::InsertArray(static_cast<unsigned char*>(nullptr), 0);
   }
-
-  if (this->SubsetInclusionLattice)
-  {
-    *css << this->SubsetInclusionLattice->GetClassName();
-    *css << this->SubsetInclusionLattice->Serialize();
-  }
-  else
-  {
-    *css << ""
-         << "";
-  }
   *css << vtkClientServerStream::End;
 }
 
@@ -129,7 +111,6 @@ void vtkPVSILInformation::CopyToStream(vtkClientServerStream* css)
 void vtkPVSILInformation::CopyFromStream(const vtkClientServerStream* css)
 {
   this->SetSIL(nullptr);
-  this->SubsetInclusionLattice = nullptr;
   vtkTypeUInt32 length;
   if (css->GetArgumentLength(0, 0, &length) && length > 0)
   {
@@ -143,30 +124,6 @@ void vtkPVSILInformation::CopyFromStream(const vtkClientServerStream* css)
     this->SetSIL(reader->GetOutput());
     reader->Delete();
   }
-  if (css->GetNumberOfArguments(0) == 3)
-  {
-    std::string classname, data;
-    css->GetArgument(0, 1, &classname);
-    css->GetArgument(0, 2, &data);
-
-    vtkSmartPointer<vtkObjectBase> obj;
-    obj.TakeReference(vtkClientServerStreamInstantiator::CreateInstance(classname.c_str()));
-    if (vtkSubsetInclusionLattice* sil = vtkSubsetInclusionLattice::SafeDownCast(obj))
-    {
-      this->SubsetInclusionLattice = sil;
-    }
-    else
-    {
-      this->SubsetInclusionLattice = vtkSmartPointer<vtkSubsetInclusionLattice>::New();
-    }
-    this->SubsetInclusionLattice->Deserialize(data);
-  }
-}
-
-//----------------------------------------------------------------------------
-vtkSubsetInclusionLattice* vtkPVSILInformation::GetSubsetInclusionLattice() const
-{
-  return this->SubsetInclusionLattice.GetPointer();
 }
 
 //----------------------------------------------------------------------------

@@ -46,7 +46,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMSILDomain.h"
 #include "vtkSMStringListDomain.h"
 #include "vtkSMStringVectorProperty.h"
-#include "vtkSMSubsetInclusionLatticeDomain.h"
 
 #include "pqApplicationCore.h"
 #include "pqArrayListDomain.h"
@@ -65,8 +64,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqScalarValueListPropertyWidget.h"
 #include "pqServerManagerModel.h"
 #include "pqSignalAdaptors.h"
-#include "pqSubsetInclusionLatticeTreeModel.h"
-#include "pqSubsetInclusionLatticeWidget.h"
 #include "pqTextEdit.h"
 #include "pqTreeView.h"
 #include "pqTreeViewSelectionHelper.h"
@@ -134,7 +131,6 @@ pqStringVectorPropertyWidget::pqStringVectorPropertyWidget(
   vtkSMStringListDomain* stringListDomain = nullptr;
   vtkSMSILDomain* silDomain = nullptr;
   vtkSMArraySelectionDomain* arraySelectionDomain = nullptr;
-  vtkSMSubsetInclusionLatticeDomain* silDomain2 = nullptr;
 
   vtkSMDomainIterator* domainIter = svp->NewDomainIterator();
   for (domainIter->Begin(); !domainIter->IsAtEnd(); domainIter->Next())
@@ -146,7 +142,6 @@ pqStringVectorPropertyWidget::pqStringVectorPropertyWidget(
     arrayListDomain =
       arrayListDomain ? arrayListDomain : vtkSMArrayListDomain::SafeDownCast(domain);
     silDomain = silDomain ? silDomain : vtkSMSILDomain::SafeDownCast(domain);
-    silDomain2 = silDomain2 ? silDomain2 : vtkSMSubsetInclusionLatticeDomain::SafeDownCast(domain);
     arraySelectionDomain =
       arraySelectionDomain ? arraySelectionDomain : vtkSMArraySelectionDomain::SafeDownCast(domain);
     stringListDomain =
@@ -301,19 +296,6 @@ pqStringVectorPropertyWidget::pqStringVectorPropertyWidget(
     setShowLabel(false);
 
     vbox->addWidget(tree);
-  }
-  else if (silDomain2)
-  {
-    this->setShowLabel(false);
-
-    vtkVLogF(PARAVIEW_LOG_APPLICATION_VERBOSITY(), "use `pqSubsetInclusionLatticeWidget`.");
-    auto model = new pqSubsetInclusionLatticeTreeModel(this);
-
-    model->setSubsetInclusionLattice(silDomain2->GetSIL());
-    pqSubsetInclusionLatticeWidget* silWidget = new pqSubsetInclusionLatticeWidget(model, this);
-    vbox->addWidget(silWidget);
-    this->addPropertyLink(model, "selection", SIGNAL(selectionModified()), smProperty);
-    this->setChangeAvailableAsChangeFinished(true);
   }
   else if (arraySelectionDomain)
   {

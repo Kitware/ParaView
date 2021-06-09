@@ -54,9 +54,8 @@ class vtkSMSILModel;
  *
  * While not deprecated, this class exists to support readers that use legacy
  * representation for SIL which used a `vtkGraph` to represent the SIL. It is
- * recommended that newer code uses vtkSubsetInclusionLattice (or subclass) to
- * represent the SIL. In that case, you should use
- * `pqSubsetInclusionLatticeTreeModel` instead.
+ * recommended that newer code uses vtkDataAssembly. See `vtkIossReader` for how
+ * this can be done.
  */
 class PQCOMPONENTS_EXPORT pqSILModel : public QAbstractItemModel
 {

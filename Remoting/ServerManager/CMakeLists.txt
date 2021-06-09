@@ -170,7 +170,6 @@ set(classes
   vtkSMStateVersionController
   vtkSMStringListDomain
   vtkSMStringVectorProperty
-  vtkSMSubsetInclusionLatticeDomain
   vtkSMTimeKeeper
   vtkSMTimeKeeperProxy
   vtkSMTimeStepIndexDomain

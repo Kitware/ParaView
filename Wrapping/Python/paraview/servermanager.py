@@ -94,7 +94,6 @@ def _wrap_property(proxy, smproperty):
       smproperty.IsA("vtkSMStringVectorProperty"):
         arraySelectionDomain = smproperty.FindDomain("vtkSMArraySelectionDomain")
         chartSeriesSelectionDomain = smproperty.FindDomain("vtkSMChartSeriesSelectionDomain")
-        subsetInclusionLatticeDomain = smproperty.FindDomain("vtkSMSubsetInclusionLatticeDomain")
         arrayListDomain = smproperty.FindDomain("vtkSMArrayListDomain")
         fileListDomain = smproperty.FindDomain("vtkSMFileListDomain")
         stringListDomain = smproperty.FindDomain("vtkSMStringListDomain")
@@ -103,8 +102,6 @@ def _wrap_property(proxy, smproperty):
         elif chartSeriesSelectionDomain and smproperty.GetRepeatable() and \
           chartSeriesSelectionDomain.GetDefaultMode() == 1:
             property = ArrayListProperty(proxy, smproperty)
-        elif subsetInclusionLatticeDomain and smproperty.GetRepeatable():
-            property = SubsetInclusionLatticeProperty(proxy, smproperty)
         elif arrayListDomain and smproperty.GetRepeatable():
             # if it is repeatable, then it is not a single array selection... and if it happens
             # to have 5 elements in the repeatable proxy, avoid an exception by testing this case
@@ -1228,13 +1225,6 @@ class ArrayListProperty(VectorProperty):
             if self.GetElement(i+1) != '0':
                 self.__arrays.append(self.GetElement(i))
         return list(self.__arrays)
-
-class SubsetInclusionLatticeProperty(ArrayListProperty):
-    """This property provides a simpler interface for selecting blocks on a
-    property with a `vtkSMSubsetInclusionLatticeDomain`."""
-    # currently, there's nothing more here. eventually, we'll add support to
-    # forward select/deselect requests to a vtkSubsetInclusionLattice instance.
-    pass
 
 class ProxyProperty(Property):
     """A ProxyProperty provides access to one or more proxies. You can use
