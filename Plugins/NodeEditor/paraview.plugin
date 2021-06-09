@@ -1,0 +1,10 @@
+NAME
+  NodeEditor
+DESCRIPTION
+  DockWidget to visualize and edit the pipeline as a node graph
+CONDITION
+  PARAVIEW_USE_QT
+REQUIRES_MODULES
+  ParaView::pqComponents
+  ParaView::pqApplicationComponents
+  ParaView::RemotingViews

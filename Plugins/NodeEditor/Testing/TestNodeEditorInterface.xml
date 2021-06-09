@@ -1,0 +1,27 @@
+<?xml version="1.0" ?>
+<pqevents>
+  <!-- Enforce viewport size (even though it should already be 300x300) -->
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuTools" />
+  <pqevent object="pqClientMainWindow/menubar/menuTools" command="activate" arguments="actionTesting_Window_Size_Custom" />
+  <pqevent object="pqClientMainWindow/pqLockViewSizeCustomDialog/Width" command="set_string" arguments="300" />
+  <pqevent object="pqClientMainWindow/pqLockViewSizeCustomDialog/Height" command="set_string" arguments="300" />
+  <pqevent object="pqClientMainWindow/pqLockViewSizeCustomDialog/ButtonBox/0QPushButton0" command="activate" arguments="" />
+
+  <!-- Create Sphere -->
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuSources" />
+  <pqevent object="pqClientMainWindow/menubar/menuSources/Alphabetical" command="activate" arguments="SphereSource" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
+
+  <!-- Test node editor toolbar -->
+  <pqevent object="pqClientMainWindow/pqNodeEditorWidget/nodeEditorWidget/toolbar/ZoomButton" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/pqNodeEditorWidget/nodeEditorWidget/toolbar/LayoutButton" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/pqNodeEditorWidget/nodeEditorWidget/toolbar/CollapseAllButton" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/pqNodeEditorWidget/nodeEditorWidget/toolbar/autolayoutCheckbox" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/pqNodeEditorWidget/nodeEditorWidget/toolbar/ResetButton" command="activate" arguments="" />
+
+  <!-- Change property of the sphere from the classic tab (not testable from the node editor yet) -->
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/EndTheta/DoubleRangeWidget/DoubleLineEdit" command="set_string" arguments="180" />
+
+  <!-- Apply from node editor -->
+  <pqevent object="pqClientMainWindow/pqNodeEditorWidget/nodeEditorWidget/toolbar/ApplyButton" command="activate" arguments="" />
+</pqevents>
