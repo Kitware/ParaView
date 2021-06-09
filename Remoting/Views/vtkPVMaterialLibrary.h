@@ -18,6 +18,9 @@
  *
  * vtkPVMaterialLibrary helps ParaView to load visual material definition
  * files from known, generally process relative, locations on the sever.
+ *
+ * This class does nothing without raytracing (module VTK_MODULE_ENABLE_VTK_RenderingRayTracing
+ * disabled)
 */
 
 #ifndef vtkPVMaterialLibrary_h
@@ -26,6 +29,10 @@
 #include "vtkRemotingViewsModule.h" //needed for exports
 
 #include "vtkObject.h"
+
+class vtkPVMaterial;
+class vtkTexture;
+
 class VTKREMOTINGVIEWS_EXPORT vtkPVMaterialLibrary : public vtkObject
 {
 public:
@@ -65,6 +72,23 @@ public:
    * Defer to contained MaterialLibrary
    */
   bool ReadBuffer(const char*);
+
+  /**
+   * Adds a material to the material library.
+   */
+  void AddMaterial(vtkPVMaterial* material);
+
+  /**
+   * Removes a material from the material library.
+   */
+  void RemoveMaterial(vtkPVMaterial* material);
+
+  /**
+   * This method is used to link this proxy property to
+   * the pqTextureSelectorPropertyWidget created in
+   * pqMaterialAttributesDelegate
+   */
+  void SetDummyTexture(vtkTexture*) {}
 
 protected:
   vtkPVMaterialLibrary();

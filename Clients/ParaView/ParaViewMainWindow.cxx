@@ -70,6 +70,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ParaViewDocumentationInitializer.h"
 #endif
 
+#ifdef PARAVIEW_USE_MATERIALEDITOR
+#include "pqMaterialEditor.h"
+#endif
+
 #ifdef PARAVIEW_USE_PYTHON
 #include "pqPythonDebugLeaksView.h"
 #include "pqPythonShell.h"
@@ -121,6 +125,7 @@ ParaViewMainWindow::ParaViewMainWindow()
   this->Internals->setupUi(this);
   this->Internals->outputWidgetDock->hide();
   this->Internals->pythonShellDock->hide();
+  this->Internals->materialEditorDock->hide();
 #ifdef PARAVIEW_USE_PYTHON
   pqPythonShell* shell = new pqPythonShell(this);
   shell->setObjectName("pythonShell");
@@ -129,6 +134,12 @@ ParaViewMainWindow::ParaViewMainWindow()
   {
     leaksView->setShell(shell);
   }
+#endif
+
+#ifdef PARAVIEW_USE_MATERIALEDITOR
+  pqMaterialEditor* materialEditor = new pqMaterialEditor(this);
+  materialEditor->setObjectName("materialEditorPanel");
+  this->Internals->materialEditorDock->setWidget(materialEditor);
 #endif
 
   // show output widget if we received an error message.

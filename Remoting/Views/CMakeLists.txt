@@ -94,6 +94,7 @@ set(classes
   vtkPVLODActor
   vtkPVLODVolume
   vtkPVLogoSource
+  vtkPVMaterial
   vtkPVMaterialLibrary
   vtkPVMultiSliceView
   vtkPVOpenGLInformation
@@ -192,6 +193,7 @@ set(private_headers
 set(headers
   vtkStreamingPriorityQueue.h)
 set(sources)
+
 if (TARGET ParaView::icet)
   list(APPEND classes
     vtkIceTCompositePass

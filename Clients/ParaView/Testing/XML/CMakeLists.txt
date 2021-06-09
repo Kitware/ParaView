@@ -115,6 +115,7 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${paraview_test_data_directory_input}/Data/non_convex_polygon.vtu}"
   "DATA{${paraview_test_data_directory_input}/Data/office.binary.vtk}"
   "DATA{${paraview_test_data_directory_input}/Data/OMF/test_file.omf}"
+  "DATA{${paraview_test_data_directory_input}/Data/OSPRayMaterials/materials.json}"
   "DATA{${paraview_test_data_directory_input}/Data/pbrSpheres.vtp}"
   "DATA{${paraview_test_data_directory_input}/Data/pbrSpheresAlbedo.jpg}"
   "DATA{${paraview_test_data_directory_input}/Data/pbrSpheresORM.jpg}"
@@ -333,6 +334,11 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/LogColorMap7.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/LogColorMapToggle1.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/LogColorMapToggle2.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/MaterialEditorCreateMaterials1.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/MaterialEditorCreateMaterials2.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/MaterialEditorCreateMaterials3.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/MaterialEditorLoadMaterials1.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/MaterialEditorLoadMaterials2.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/MathTextColumn.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/MergePointBlocks.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/Molecule-BallStick.png}"
@@ -1397,6 +1403,14 @@ if(PARAVIEW_SSH_SERVERS_TESTING)
 endif(PARAVIEW_SSH_SERVERS_TESTING)
 
 #------------------------------------------------------------------------------
+
+# Add tests for OSPRay material editor 
+if(PARAVIEW_USE_MATERIALEDITOR) 
+  list(APPEND TESTS_WITH_INLINE_COMPARES
+    MaterialEditorCreateMaterials.xml
+    MaterialEditorLoadMaterials.xml
+  )
+endif()
 
 # Probe picking does not work in render server mode
 
