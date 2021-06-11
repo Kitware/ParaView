@@ -151,3 +151,10 @@ void vtkCompositeAnimationPlayer::SetFramesPerTimestep(int val)
 {
   this->TimestepsAnimationPlayer->SetFramesPerTimestep(val);
 }
+
+//----------------------------------------------------------------------------
+void vtkCompositeAnimationPlayer::SetStride(int _val)
+{
+  this->TimestepsAnimationPlayer->SetStride(_val);
+  this->SequenceAnimationPlayer->SetStride(_val);
+}

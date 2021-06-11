@@ -71,6 +71,13 @@ public:
   void SetFramesPerTimestep(int val);
   //@}
 
+  //@{
+  /**
+   * Forwarded to vtkTimestepsAnimationPlayer.and vtkSequenceAnimationPlayer.
+   */
+  void SetStride(int _val) override;
+  //@}
+
 protected:
   vtkCompositeAnimationPlayer();
   ~vtkCompositeAnimationPlayer() override;

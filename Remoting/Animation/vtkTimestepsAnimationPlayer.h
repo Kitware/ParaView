@@ -106,6 +106,8 @@ private:
   vtkTimestepsAnimationPlayer(const vtkTimestepsAnimationPlayer&) = delete;
   void operator=(const vtkTimestepsAnimationPlayer&) = delete;
 
+  double GetNextInternal(double time, double defaultVal);
+
   vtkTimestepsAnimationPlayerSetOfDouble* TimeSteps;
 };
 

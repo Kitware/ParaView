@@ -69,7 +69,7 @@ double vtkSequenceAnimationPlayer::GetNextTime(double curtime)
                       0.5) +
       1;
   }
-  this->FrameNo++;
+  this->FrameNo += this->GetStride();
   if (this->StartTime >= this->EndTime && this->FrameNo >= this->MaxFrameWindow)
   {
     return VTK_DOUBLE_MAX;
@@ -84,14 +84,16 @@ double vtkSequenceAnimationPlayer::GetNextTime(double curtime)
 double vtkSequenceAnimationPlayer::GoToNext(double start, double end, double curtime)
 {
   double delta = static_cast<double>(end - start) / (this->NumberOfFrames - 1);
-  return (curtime + delta);
+  double res = curtime + delta * this->GetStride();
+  return (res > end) ? curtime : res;
 }
 
 //----------------------------------------------------------------------------
 double vtkSequenceAnimationPlayer::GoToPrevious(double start, double end, double curtime)
 {
   double delta = static_cast<double>(end - start) / (this->NumberOfFrames - 1);
-  return (curtime - delta);
+  double res = curtime - delta * this->GetStride();
+  return (res < start) ? curtime : res;
 }
 
 //----------------------------------------------------------------------------

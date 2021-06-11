@@ -86,6 +86,17 @@ public:
    */
   void GoToLast();
 
+  //@{
+  /**
+   * Get/Set the stride value fot the animation player. This will cause the player to skip
+   * (n - 1) when GetNextTime, GoToNext and GoToPrevious are previous are called.
+   *
+   * Stride is clamped between 1 and the number of frames of the current animation scene.
+   */
+  vtkGetMacro(Stride, int);
+  vtkSetClampMacro(Stride, int, 1, VTK_INT_MAX);
+  //@}
+
 protected:
   vtkAnimationPlayer();
   ~vtkAnimationPlayer() override;
@@ -113,6 +124,7 @@ private:
   bool StopPlay;
   bool Loop;
   double CurrentTime;
+  int Stride = 1;
 };
 
 #endif

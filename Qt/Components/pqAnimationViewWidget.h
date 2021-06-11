@@ -96,6 +96,9 @@ protected Q_SLOTS:
   // called when play mode changes
   void updatePlayMode();
 
+  // called when number of keyframe/timesteps changed
+  void updateStrideRange();
+
   /**
   * Called to toggle a track's enabled state.
   */
@@ -133,6 +136,8 @@ protected Q_SLOTS:
   void changeDataProxyDialogAccepted();
 
   void generalSettingsChanged();
+
+  void onStrideChanged();
 
 private:
   Q_DISABLE_COPY(pqAnimationViewWidget)
