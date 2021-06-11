@@ -960,6 +960,21 @@
         </Documentation>
       </IntVectorProperty>
       <DoubleVectorProperty default_values="0.32 0.34 0.43"
+                            label="Background Upper"
+                            name="BackgroundColor2"
+                            number_of_elements="3"
+                            panel_widget="color_selector">
+        <DoubleRangeDomain max="1 1 1"
+                           min="0 0 0"
+                           name="range" />
+        <Documentation>Color used as the uppper/top color for gradient backgrounds.</Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="EnableWidgetDecorator">
+            <Property name="UseGradientBackground" function="boolean" />
+          </PropertyWidgetDecorator>
+        </Hints>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty default_values="0.32 0.34 0.43"
                             label="Background"
                             name="BackgroundColor"
                             number_of_elements="3"
@@ -967,22 +982,10 @@
         <DoubleRangeDomain max="1 1 1"
                            min="0 0 0"
                            name="range" />
-        <Documentation>Color used as background for the view.</Documentation>
-      </DoubleVectorProperty>
-      <DoubleVectorProperty default_values="0.32 0.34 0.43"
-                            label="Background 2"
-                            name="BackgroundColor2"
-                            number_of_elements="3"
-                            panel_widget="color_selector">
-        <DoubleRangeDomain max="1 1 1"
-                           min="0 0 0"
-                           name="range" />
-        <Documentation>Color used as the 2nd color for gradient backgrounds.</Documentation>
-        <Hints>
-          <PropertyWidgetDecorator type="EnableWidgetDecorator">
-            <Property name="UseGradientBackground" function="boolean" />
-          </PropertyWidgetDecorator>
-        </Hints>
+        <Documentation>
+            Color used as background for the view. When using gradient backgrounds,
+            this is the color used for the lower section of the viewport.
+        </Documentation>
       </DoubleVectorProperty>
 
       <PropertyGroup label="Selection">
