@@ -169,6 +169,11 @@ protected Q_SLOTS:
    */
   void showUsageStatus();
 
+  /**
+   * Show color dialog to edit color for a specific control point.
+   */
+  void editColorAtCurrentControlPoint();
+
 protected:
   /**
   * callback called when vtkControlPointsItem fires
