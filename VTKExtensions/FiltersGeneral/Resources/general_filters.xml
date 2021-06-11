@@ -3986,6 +3986,10 @@ Every Nth Point.
      </Documentation>
      <InputProperty command="SetInputConnection"
                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources"/>
+          <Group name="filters"/>
+        </ProxyGroupDomain>
         <DataTypeDomain name="input_type">
           <DataType value="vtkDataSet"/>
         </DataTypeDomain>
@@ -4211,20 +4215,29 @@ Every Nth Point.
       <Documentation>This property defines the interactive points of the equalizer.</Documentation>
     </StringVectorProperty>
 
-
-    <PropertyGroup panel_widget="EqualizerPropertyWidget">
+    <PropertyGroup name="Equilizer Filtering Points" panel_widget="EqualizerPropertyWidget">
       <Property function="EqualizerPointsFunc" name="EqualizerPoints" />
       <Property function="Input" name="Input" />
-    </PropertyGroup>-->
+      <Hints>
+        <WidgetVisibilityLink port="2" />
+      </Hints>
+    </PropertyGroup>
 
     <OutputPort index="0" name="Spectrum" />
     <OutputPort index="1" name="Result" />
     <OutputPort index="2" name="Normalized Spectrum" />
 
     <Hints>
-      <PipelineIcon name="XYChartView" />
-      <!--<View type="XYChartView" />-->
-      <Plotable />
+      <PipelineIcon port="0" name="XYChartView" />
+      <View port="0" type="None" />
+
+      <PipelineIcon port="1" name="XYChartView" />
+      <View port="1" type="None" />
+
+      <PipelineIcon port="2" name="XYChartView" />
+      <View port="2" type="XYChartView" />
+
+      <RepresentationType view="XYChartView" type="XYChartRepresentation" />
     </Hints>
 
     </SourceProxy>

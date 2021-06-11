@@ -94,9 +94,12 @@ public:
   /**
    * In these methods, we show/hide the widget since the interactive widget is not
    * supposed to be visible except when the panel is "active" or "selected".
+   * selectPort(int) allows to make the selection only if the given port index
+   * is linked with the vtkSMPropertyGroup this interactive widget represents.
    */
   void select() override;
   void deselect() override;
+  void selectPort(int portIndex) final;
   //@}
 
   /**
@@ -179,9 +182,9 @@ protected:
   /**
    * Get the internal instance of the widget proxy. Subclasses should implement this
    * function and handle the instance of their own widget, wich will be exposed internally
-   * via this class.
+   * via this function.
    */
-  virtual vtkSMNewWidgetRepresentationProxyAbstract* _widgetProxy() = 0;
+  virtual vtkSMNewWidgetRepresentationProxyAbstract* internalWidgetProxy() = 0;
 
   /**
    * Setup all the links and events for the given widget and SM property group.
@@ -194,6 +197,7 @@ protected:
 
   bool VisibleState = true;
   bool WidgetVisibility = false;
+  int LinkedPortIndex = -1;
 
 private:
   Q_DISABLE_COPY(pqInteractivePropertyWidgetAbstract)

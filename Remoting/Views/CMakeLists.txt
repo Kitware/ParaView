@@ -122,7 +122,6 @@ set(classes
   vtkPVSynchronizedRenderer
   vtkPVView
   vtkPVXYChartView
-  vtkPVXYChartViewInteractive
   vtkQuartileChartRepresentation
   vtkRulerSourceRepresentation
   vtkSelectionRepresentation
@@ -250,7 +249,8 @@ vtk_module_add_module(ParaView::RemotingViews
   PRIVATE_HEADERS ${vtk_object_factory_header} ${private_headers})
 
 paraview_add_server_manager_xmls(
-  XMLS Resources/3dwidgets_remotingviews.xml
+  XMLS Resources/2dwidgets_remotingviews.xml
+       Resources/3dwidgets_remotingviews.xml
        Resources/extractors_remotingviews.xml
        Resources/rendering.xml
        Resources/sources_remotingviews.xml

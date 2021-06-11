@@ -49,7 +49,7 @@ public:
   /**
    * Get/Set whether the widget is enabled.
    */
-  void SetEnabled(bool);
+  vtkSetMacro(Enabled, bool);
   vtkGetMacro(Enabled, bool);
   vtkBooleanMacro(Enabled, bool);
   //@}

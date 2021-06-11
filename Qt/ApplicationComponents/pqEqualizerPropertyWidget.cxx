@@ -40,6 +40,7 @@
 #include <QGridLayout>
 #include <QPushButton>
 
+//-----------------------------------------------------------------------------
 class pqEqualizerPropertyWidget::pqInternals
 {
 public:
@@ -51,6 +52,7 @@ public:
   vtkWeakPointer<vtkEqualizerContextItem> EqualizerItem;
 };
 
+//-----------------------------------------------------------------------------
 pqEqualizerPropertyWidget::pqEqualizerPropertyWidget(
   vtkSMProxy* proxy, vtkSMPropertyGroup* smgroup, QWidget* parent)
   : Superclass("representations", "EqualizerWidgetRepresentation", proxy, smgroup, parent)
@@ -59,32 +61,38 @@ pqEqualizerPropertyWidget::pqEqualizerPropertyWidget(
   Init(proxy, smgroup);
 }
 
+//-----------------------------------------------------------------------------
 pqEqualizerPropertyWidget::~pqEqualizerPropertyWidget()
 {
   delete this->Internals;
 }
 
+//-----------------------------------------------------------------------------
 void pqEqualizerPropertyWidget::placeWidget()
 {
   vtkSMNew2DWidgetRepresentationProxy* wdgProxy = this->widgetProxy();
   wdgProxy->UpdateVTKObjects();
 }
 
+//-----------------------------------------------------------------------------
 void pqEqualizerPropertyWidget::onStartInteraction()
 {
   UpdatePosition();
 }
 
+//-----------------------------------------------------------------------------
 void pqEqualizerPropertyWidget::onInteraction()
 {
   UpdatePosition();
 }
 
+//-----------------------------------------------------------------------------
 void pqEqualizerPropertyWidget::onEndInteraction()
 {
   UpdatePosition();
 }
 
+//-----------------------------------------------------------------------------
 void pqEqualizerPropertyWidget::saveEqualizer()
 {
   pqFileDialog dialog(
@@ -107,6 +115,7 @@ void pqEqualizerPropertyWidget::saveEqualizer()
   }
 }
 
+//-----------------------------------------------------------------------------
 void pqEqualizerPropertyWidget::loadEqualizer()
 {
   pqFileDialog dialog(
@@ -140,6 +149,7 @@ void pqEqualizerPropertyWidget::loadEqualizer()
   }
 }
 
+//-----------------------------------------------------------------------------
 void pqEqualizerPropertyWidget::resetEqualizer()
 {
   if (!this->Internals->pointsLE)
@@ -164,6 +174,7 @@ void pqEqualizerPropertyWidget::resetEqualizer()
   Q_EMIT changeAvailable();
 }
 
+//-----------------------------------------------------------------------------
 void pqEqualizerPropertyWidget::Init(vtkSMProxy* proxy, vtkSMPropertyGroup* smgroup)
 {
   vtkSMSourceProxy* input = vtkSMSourceProxy::SafeDownCast(
@@ -185,8 +196,9 @@ void pqEqualizerPropertyWidget::Init(vtkSMProxy* proxy, vtkSMPropertyGroup* smgr
   layout->addWidget(visibility);
   ++rowId;
 
-  this->WidgetLinks.addPropertyLink(
-    visibility, "checked", SIGNAL(toggled(bool)), wdgProxy, wdgProxy->GetProperty("Visibility"));
+  this->connect(visibility, SIGNAL(toggled(bool)), SLOT(setWidgetVisible(bool)));
+  visibility->connect(this, SIGNAL(widgetVisibilityToggled(bool)), SLOT(setChecked(bool)));
+  this->setWidgetVisible(visibility->isChecked());
 
   this->Internals->savePB = new QPushButton(tr("Save"), this);
   this->Internals->loadPB = new QPushButton(tr("Load"), this);
@@ -260,6 +272,7 @@ void pqEqualizerPropertyWidget::Init(vtkSMProxy* proxy, vtkSMPropertyGroup* smgr
   });
 }
 
+//-----------------------------------------------------------------------------
 void pqEqualizerPropertyWidget::UpdatePosition()
 {
   if (!this->Internals->EqualizerItem)

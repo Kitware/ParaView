@@ -37,8 +37,8 @@ class vtkSMPropertyGroup;
  * Subclasses are free to determine which interactive widget to create and how
  * to setup the UI for it.
  *
- * pqInteractiveProperty2DWidget same as pqInteractivePropertyWidget but use
- * vtkSMNew2DWidgetRepresentationProxy instead vtkSMNewWidgetRepresentationProxy
+ * pqInteractiveProperty2DWidget is basically the same as pqInteractivePropertyWidget
+ * but use vtkSMNew2DWidgetRepresentationProxy instead vtkSMNewWidgetRepresentationProxy
  */
 class PQAPPLICATIONCOMPONENTS_EXPORT pqInteractiveProperty2DWidget
   : public pqInteractivePropertyWidgetAbstract
@@ -53,14 +53,9 @@ public:
   ~pqInteractiveProperty2DWidget() override;
 
   /**
-   * Returns the proxy for the interactive widget.
+   * Returns the proxy for the interactive 2D widget.
    */
   vtkSMNew2DWidgetRepresentationProxy* widgetProxy() const { return this->WidgetProxy; };
-
-  /**
-   * Overridden to show the widget proxy in the new view.
-   */
-  void setView(pqView* view) override;
 
   /**
    * Returns the interactive widget's visibility. Note that the widget may
@@ -70,11 +65,6 @@ public:
    * is of the right type.
    */
   bool isWidgetVisible() const;
-
-  /**
-   * Returns the data source.
-   */
-  vtkSMProxy* dataSource() const;
 
   /**
    * Returns bounds from the dataSource, if possible. May return invalid bounds
@@ -87,16 +77,6 @@ public:
    */
   vtkSMPropertyGroup* propertyGroup() const;
 
-  /**
-   * Overriden in order to hide the VTK widget.
-   */
-  void hideEvent(QHideEvent*) override;
-
-  /**
-   * Overriden in order to show the VTK widget.
-   */
-  void showEvent(QShowEvent*) override;
-
 public Q_SLOTS:
   /**
    * Toggle the interactive widget's visibility. This, along with
@@ -104,13 +84,6 @@ public Q_SLOTS:
    * visible in a view.
    */
   void setWidgetVisible(bool val) override;
-
-  /**
-   * DataSource is used by interactive widgets to determine now to place the
-   * widget in the view e.g. the bounds to use for placing the widget or when
-   * re-centering the interactive widget.
-   */
-  void setDataSource(vtkSMProxy* dataSource);
 
 protected Q_SLOTS:
   /**
@@ -156,7 +129,10 @@ private Q_SLOTS:
   /**
    * Get the internal instance of the widget proxy.
    */
-  vtkSMNewWidgetRepresentationProxyAbstract* _widgetProxy() final { return this->WidgetProxy; };
+  vtkSMNewWidgetRepresentationProxyAbstract* internalWidgetProxy() final
+  {
+    return this->WidgetProxy;
+  };
 
 private:
   Q_DISABLE_COPY(pqInteractiveProperty2DWidget)

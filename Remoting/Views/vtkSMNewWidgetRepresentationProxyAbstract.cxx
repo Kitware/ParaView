@@ -52,7 +52,7 @@ void vtkSMNewWidgetRepresentationProxyAbstract::vtkSMWidgetObserver::Execute(
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSMNewWidgetRepresentationProxyAbstract);
 
-//----------------------------------------------------------------------------
+//============================================================================
 vtkSMNewWidgetRepresentationProxyAbstract::vtkSMNewWidgetRepresentationProxyAbstract()
 {
   this->Observer->Proxy = this;
