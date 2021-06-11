@@ -158,7 +158,7 @@ bool vtkBinsAccumulator<FunctorT>::HasSameParameters(vtkAbstractAccumulator* acc
 
 //----------------------------------------------------------------------------
 template <typename FunctorT>
-void vtkBinsAccumulator<FunctorT>::ShallowCopy(vtkDataObject* accumulator)
+void vtkBinsAccumulator<FunctorT>::ShallowCopy(vtkObject* accumulator)
 {
   this->Superclass::ShallowCopy(accumulator);
   vtkBinsAccumulator* binsAccumulator = vtkBinsAccumulator::SafeDownCast(accumulator);
@@ -176,7 +176,7 @@ void vtkBinsAccumulator<FunctorT>::ShallowCopy(vtkDataObject* accumulator)
 
 //----------------------------------------------------------------------------
 template <typename FunctorT>
-void vtkBinsAccumulator<FunctorT>::DeepCopy(vtkDataObject* accumulator)
+void vtkBinsAccumulator<FunctorT>::DeepCopy(vtkObject* accumulator)
 {
   this->Superclass::DeepCopy(accumulator);
   vtkBinsAccumulator* binsAccumulator = vtkBinsAccumulator::SafeDownCast(accumulator);

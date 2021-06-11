@@ -177,7 +177,7 @@ vtkQuantileAccumulator::ListElement::ListElement(double value, double weight)
 }
 
 //----------------------------------------------------------------------------
-void vtkQuantileAccumulator::ShallowCopy(vtkDataObject* accumulator)
+void vtkQuantileAccumulator::ShallowCopy(vtkObject* accumulator)
 {
   this->Superclass::ShallowCopy(accumulator);
   vtkQuantileAccumulator* quantileAccumulator = vtkQuantileAccumulator::SafeDownCast(accumulator);
@@ -193,7 +193,7 @@ void vtkQuantileAccumulator::ShallowCopy(vtkDataObject* accumulator)
 }
 
 //----------------------------------------------------------------------------
-void vtkQuantileAccumulator::DeepCopy(vtkDataObject* accumulator)
+void vtkQuantileAccumulator::DeepCopy(vtkObject* accumulator)
 {
   this->Superclass::DeepCopy(accumulator);
   vtkQuantileAccumulator* quantileAccumulator = vtkQuantileAccumulator::SafeDownCast(accumulator);

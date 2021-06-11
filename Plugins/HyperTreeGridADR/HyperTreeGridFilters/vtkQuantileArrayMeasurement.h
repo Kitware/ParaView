@@ -107,12 +107,12 @@ public:
   /**
    * ShallowCopy implementation.
    */
-  void ShallowCopy(vtkDataObject* o) override;
+  void ShallowCopy(vtkObject* o) override;
 
   /**
    * DeepCopy implementation.
    */
-  void DeepCopy(vtkDataObject* o) override;
+  void DeepCopy(vtkObject* o) override;
 
   //@{
   /**
