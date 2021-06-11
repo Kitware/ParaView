@@ -188,6 +188,8 @@ public Q_SLOTS:
    */
   bool filterWidgets(bool show_advanced = false, const QString& filterText = QString());
 
+  void showLinkedInteractiveWidget(int portIndex, bool show);
+
   /**
    * Accepts the property widget changes changes.
    */

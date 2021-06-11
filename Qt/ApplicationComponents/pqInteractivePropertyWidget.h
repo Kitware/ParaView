@@ -66,7 +66,7 @@ public:
   ~pqInteractivePropertyWidget() override;
 
   /**
-   * Returns the proxy for the interactive widget.
+   * Returns the proxy for the 3D interactive widget.
    */
   vtkSMNewWidgetRepresentationProxy* widgetProxy() const { return this->WidgetProxy; };
 
@@ -88,8 +88,12 @@ protected:
   /**
    * Get the internal instance of the widget proxy.
    */
-  vtkSMNewWidgetRepresentationProxyAbstract* _widgetProxy() final { return this->WidgetProxy; };
+  vtkSMNewWidgetRepresentationProxyAbstract* internalWidgetProxy() final
+  {
+    return this->WidgetProxy;
+  };
 
+private:
   Q_DISABLE_COPY(pqInteractivePropertyWidget)
 
   vtkSmartPointer<vtkSMNewWidgetRepresentationProxy> WidgetProxy;

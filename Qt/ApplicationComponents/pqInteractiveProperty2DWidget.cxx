@@ -71,42 +71,7 @@ pqInteractiveProperty2DWidget::pqInteractiveProperty2DWidget(const char* widget_
   assert(wdgProxy);
   this->WidgetProxy = wdgProxy;
 
-  vtkNew<vtkSMParaViewPipelineController> controller;
-  controller->InitializeProxy(wdgProxy);
-
-  // Setup links between the proxy that the widget is going to be controlling
-  wdgProxy->LinkProperties(smproxy, smgroup);
-
-  wdgProxy->UpdateVTKObjects();
-
-  // Marking this as a prototype ensures that the undo/redo system doesn't track
-  // changes to the widget.
-  wdgProxy->PrototypeOn();
-
-  pqCoreUtilities::connect(wdgProxy, vtkCommand::InteractionEvent, this, SIGNAL(changeAvailable()));
-  pqCoreUtilities::connect(
-    wdgProxy, vtkCommand::EndInteractionEvent, this, SIGNAL(changeFinished()));
-
-  pqCoreUtilities::connect(
-    wdgProxy, vtkCommand::StartInteractionEvent, this, SIGNAL(startInteraction()));
-  pqCoreUtilities::connect(
-    wdgProxy, vtkCommand::StartInteractionEvent, this, SIGNAL(changeAvailable()));
-  pqCoreUtilities::connect(wdgProxy, vtkCommand::InteractionEvent, this, SIGNAL(interaction()));
-  pqCoreUtilities::connect(
-    wdgProxy, vtkCommand::EndInteractionEvent, this, SIGNAL(endInteraction()));
-
-  if (vtkSMProperty* input = smgroup->GetProperty("Input"))
-  {
-    this->addPropertyLink(this, "dataSource", SIGNAL(dummySignal()), input);
-  }
-  else
-  {
-    this->setDataSource(nullptr);
-  }
-
-  // This ensures that when the user changes the Qt widget, we re-render to show
-  // the update widget.
-  this->connect(&this->links(), SIGNAL(qtWidgetChanged()), SLOT(render()));
+  this->setupConnections(this->WidgetProxy, smgroup, smproxy);
 
   END_UNDO_EXCLUDE();
 
@@ -117,18 +82,6 @@ pqInteractiveProperty2DWidget::pqInteractiveProperty2DWidget(const char* widget_
 pqInteractiveProperty2DWidget::~pqInteractiveProperty2DWidget()
 {
   // ensures that the widget proxy is removed from the active view, if any.
-  this->setView(nullptr);
-}
-
-//-----------------------------------------------------------------------------
-void pqInteractiveProperty2DWidget::setView(pqView* pqview)
-{
-  if (pqview != nullptr && pqview->getServer()->session() != this->widgetProxy()->GetSession())
-  {
-    pqview = nullptr;
-  }
-
-  pqView* rview = qobject_cast<pqContextView*>(pqview);
   pqView* oldview = this->view();
   if (oldview != nullptr)
   {
@@ -136,7 +89,6 @@ void pqInteractiveProperty2DWidget::setView(pqView* pqview)
     oldview->getProxy()->UpdateVTKObjects();
 
     this->pqPropertyWidget::setView(nullptr);
-    this->updateWidgetVisibility();
   }
 }
 
@@ -154,51 +106,14 @@ void pqInteractiveProperty2DWidget::setWidgetVisible(bool val)
 //-----------------------------------------------------------------------------
 void pqInteractiveProperty2DWidget::updateWidgetVisibility()
 {
-  bool visible = this->isWidgetVisible() && this->view();
-  bool enabled = this->isSelected() && this->isWidgetVisible() && this->view();
+  bool visible = this->isSelected() && this->isWidgetVisible() && this->view();
   vtkSMProxy* wdgProxy = this->WidgetProxy;
   assert(wdgProxy);
 
-  vtkSMPropertyHelper(wdgProxy, "Enabled", true).Set(enabled);
+  vtkSMPropertyHelper(wdgProxy, "Enabled", true).Set(visible);
+  vtkSMPropertyHelper(wdgProxy, "Visibility", true).Set(visible);
   wdgProxy->UpdateVTKObjects();
+
   this->render();
   Q_EMIT this->widgetVisibilityUpdated(visible);
-}
-
-//-----------------------------------------------------------------------------
-vtkBoundingBox pqInteractiveProperty2DWidget::dataBounds() const
-{
-  if (vtkSMSourceProxy* dsrc = vtkSMSourceProxy::SafeDownCast(this->dataSource()))
-  {
-    // FIXME: we need to get the output port number correctly. For now, just use
-    // 0.
-    vtkPVDataInformation* dataInfo = dsrc->GetDataInformation(0);
-    vtkBoundingBox bbox(dataInfo->GetBounds());
-    return bbox;
-  }
-  else
-  {
-    vtkBoundingBox bbox;
-    return bbox;
-  }
-}
-
-void pqInteractiveProperty2DWidget::hideEvent(QHideEvent*)
-{
-  this->VisibleState = vtkSMPropertyHelper(this->widgetProxy(), "Visibility").GetAsInt() != 0;
-  this->setWidgetVisible(false);
-}
-
-void pqInteractiveProperty2DWidget::showEvent(QShowEvent*)
-{
-  this->setWidgetVisible(this->VisibleState);
-}
-
-//-----------------------------------------------------------------------------
-void pqInteractiveProperty2DWidget::render()
-{
-  if (pqView* pqview = this->view())
-  {
-    pqview->render();
-  }
 }

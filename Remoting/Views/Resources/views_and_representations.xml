@@ -933,9 +933,11 @@
                      name="HiddenRepresentations"
                      remove_command="RemoveRepresentation"
                      repeatable="1">
-        <Documentation>This property is meant for adding/removing
-        representation secretly. e.g. 2D widgets etc. This property is not
-        saved in states nor it recorded by undo-redo.</Documentation>
+        <Documentation>
+          This property is meant for adding/removing
+          representation secretly. e.g. 2D widgets etc. This property is not
+          saved in states nor it recorded by undo-redo.
+        </Documentation>
       </ProxyProperty>
 
     </ContextViewProxy>
@@ -3379,18 +3381,6 @@
                       class="vtkPVXYChartView"
                       name="XYChartView"
                       label="Line Chart View"
-                      processes="client|renderserver|dataserver"
-                      representation_name="XYChartRepresentation"
-                      post_creation="SetChartTypeToLine" >
-      <Documentation>This is the proxy for the XY line chart
-      view.</Documentation>
-    </ContextViewProxy>
-    <!-- ================================================================== -->
-    <ContextViewProxy base_proxygroup="internal_views"
-                      base_proxyname="XYChartViewBase4Axes"
-                      class="vtkPVXYChartViewInteractive"
-                      name="XYChartViewInteractive"
-                      label="Interactive Line Chart View"
                       processes="client|renderserver|dataserver"
                       representation_name="XYChartRepresentation"
                       post_creation="SetChartTypeToLine" >

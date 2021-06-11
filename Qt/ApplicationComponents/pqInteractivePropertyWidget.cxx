@@ -101,7 +101,6 @@ pqInteractivePropertyWidget::~pqInteractivePropertyWidget()
     oldview->getProxy()->UpdateVTKObjects();
 
     this->pqPropertyWidget::setView(nullptr);
-    this->updateWidgetVisibility();
   }
 }
 

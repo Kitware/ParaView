@@ -38,6 +38,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkCommand.h"
 #include "vtkNew.h"
 #include "vtkPVDataInformation.h"
+#include "vtkPVXMLElement.h"
 #include "vtkSMNewWidgetRepresentationProxyAbstract.h"
 #include "vtkSMParaViewPipelineController.h"
 #include "vtkSMPropertyGroup.h"
@@ -49,20 +50,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkWeakPointer.h"
 
 #include <cassert>
+#include <string>
 
-class pqInteractivePropertyWidgetAbstract::pqInternals
+struct pqInteractivePropertyWidgetAbstract::pqInternals
 {
-public:
   vtkWeakPointer<vtkSMProxy> DataSource;
   vtkSmartPointer<vtkSMPropertyGroup> SMGroup;
-  bool WidgetVisibility;
-  unsigned long UserEventObserverId;
-
-  pqInternals()
-    : WidgetVisibility(false)
-    , UserEventObserverId(0)
-  {
-  }
+  unsigned long UserEventObserverId = 0;
 };
 
 //-----------------------------------------------------------------------------
@@ -76,9 +70,24 @@ pqInteractivePropertyWidgetAbstract::pqInteractivePropertyWidgetAbstract(const c
   assert(widget_smname);
   assert(smproxy);
   assert(smgroup);
+  this->Internals->SMGroup = smgroup;
 
-  pqInternals& internals = (*this->Internals);
-  internals.SMGroup = smgroup;
+  auto* hints = smgroup->GetHints();
+  vtkPVXMLElement* visLink = nullptr;
+  if (hints && (visLink = hints->FindNestedElementByName("WidgetVisibilityLink")))
+  {
+    if (const char* portIndex = visLink->GetAttribute("port"))
+    {
+      try
+      {
+        this->LinkedPortIndex = std::stoi(portIndex);
+      }
+      catch (const std::exception&)
+      {
+        this->LinkedPortIndex = -1;
+      }
+    }
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -149,7 +158,7 @@ vtkSMPropertyGroup* pqInteractivePropertyWidgetAbstract::propertyGroup() const
 //-----------------------------------------------------------------------------
 void pqInteractivePropertyWidgetAbstract::setView(pqView* pqview)
 {
-  vtkSMNewWidgetRepresentationProxyAbstract* widgetProxy = this->_widgetProxy();
+  vtkSMNewWidgetRepresentationProxyAbstract* widgetProxy = this->internalWidgetProxy();
 
   if (pqview != nullptr && pqview->getServer()->session() != widgetProxy->GetSession())
   {
@@ -164,15 +173,17 @@ void pqInteractivePropertyWidgetAbstract::setView(pqView* pqview)
     return;
   }
 
+  // Use vtkSMPropertyHelper in quiet mode so incompatible views (spreadsheet
+  // view for example) stops complaining
   if (oldview)
   {
-    vtkSMPropertyHelper(oldview->getProxy(), "HiddenRepresentations").Remove(widgetProxy);
+    vtkSMPropertyHelper(oldview->getProxy(), "HiddenRepresentations", true).Remove(widgetProxy);
     oldview->getProxy()->UpdateVTKObjects();
   }
   this->Superclass::setView(rview);
   if (rview)
   {
-    vtkSMPropertyHelper(rview->getProxy(), "HiddenRepresentations").Add(widgetProxy);
+    vtkSMPropertyHelper(rview->getProxy(), "HiddenRepresentations", true).Add(widgetProxy);
     rview->getProxy()->UpdateVTKObjects();
   }
   this->updateWidgetVisibility();
@@ -184,6 +195,19 @@ void pqInteractivePropertyWidgetAbstract::select()
   this->Superclass::select();
   this->placeWidget();
   this->updateWidgetVisibility();
+}
+
+//-----------------------------------------------------------------------------
+void pqInteractivePropertyWidgetAbstract::selectPort(int portIndex)
+{
+  if (this->LinkedPortIndex < 0 || this->LinkedPortIndex == portIndex)
+  {
+    this->select();
+  }
+  else
+  {
+    this->deselect();
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -269,7 +293,7 @@ void pqInteractivePropertyWidgetAbstract::handleUserEvent(
 //-----------------------------------------------------------------------------
 void pqInteractivePropertyWidgetAbstract::hideEvent(QHideEvent*)
 {
-  vtkSMNewWidgetRepresentationProxyAbstract* widgetProxy = this->_widgetProxy();
+  vtkSMNewWidgetRepresentationProxyAbstract* widgetProxy = this->internalWidgetProxy();
 
   this->VisibleState = vtkSMPropertyHelper(widgetProxy, "Visibility").GetAsInt() != 0;
   this->setWidgetVisible(false);
