@@ -2640,6 +2640,16 @@
         </Documentation>
       </IntVectorProperty>
 
+      <IntVectorProperty command="SetUseRenderViewSettingsForBackground"
+                         name="UseColorPaletteForBackground"
+                         number_of_elements="1"
+                         default_values="1">
+        <BooleanDomain name="bool" />
+        <Documentation>
+            When set, the view uses the background color settings as specified in
+            global color palette.
+        </Documentation>
+      </IntVectorProperty>
       <IntVectorProperty command="SetBackgroundColorMode"
                          name="BackgroundColorMode"
                          number_of_elements="1"
@@ -2653,6 +2663,10 @@
         <Documentation>
           Select the background for the view.
         </Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator" mode="enabled_state"
+            property="UseColorPaletteForBackground" values="0" />
+        </Hints>
       </IntVectorProperty>
       <ProxyProperty command="SetBackgroundTexture"
                      name="BackgroundTexture" panel_widget="texture_selector">
@@ -2663,20 +2677,23 @@
           <!-- hide widget unless mode is "Texture" or "Skybox" -->
           <PropertyWidgetDecorator type="GenericDecorator" mode="visibility"
             property="BackgroundColorMode" values="2 3" />
+          <PropertyWidgetDecorator type="GenericDecorator" mode="enabled_state"
+            property="UseColorPaletteForBackground" values="0" />
         </Hints>
       </ProxyProperty>
       <DoubleVectorProperty command="SetBackground2"
                             default_values="0 0 0.165"
                             name="Background2"
-                            panel_widget="color_selector_with_palette"
+                            label="Background 2"
+                            panel_widget="color_selector"
                             number_of_elements="3">
         <DoubleRangeDomain max="1 1 1" min="0 0 0" name="range" />
         <Hints>
-          <PropertyLink group="settings" proxy="ColorPalette" property="BackgroundColor2" unlink_if_modified="1" />
-
           <!-- hide widget unless mode is "Gradient" -->
           <PropertyWidgetDecorator type="GenericDecorator" mode="visibility"
             property="BackgroundColorMode" value="1" />
+          <PropertyWidgetDecorator type="GenericDecorator" mode="enabled_state"
+            property="UseColorPaletteForBackground" values="0" />
         </Hints>
         <Documentation>
           Specify the color to use for the upper half of the viewport when using **Gradient**
@@ -2686,13 +2703,14 @@
       <DoubleVectorProperty command="SetBackground"
                             default_values="0.329 0.349 0.427"
                             name="Background"
-                            panel_widget="color_selector_with_palette"
+                            panel_widget="color_selector"
                             number_of_elements="3">
         <DoubleRangeDomain max="1 1 1"
                            min="0 0 0"
                            name="range" />
         <Hints>
-          <PropertyLink group="settings" proxy="ColorPalette" property="BackgroundColor" unlink_if_modified="1" />
+          <PropertyWidgetDecorator type="GenericDecorator" mode="enabled_state"
+            property="UseColorPaletteForBackground" values="0" />
         </Hints>
       </DoubleVectorProperty>
       <IntVectorProperty command="SetUseEnvironmentLighting"
@@ -2707,6 +2725,8 @@
           <!-- hide widget unless mode is "Skybox" -->
           <PropertyWidgetDecorator type="GenericDecorator" mode="visibility"
             property="BackgroundColorMode" value="3" />
+          <PropertyWidgetDecorator type="GenericDecorator" mode="enabled_state"
+            property="UseColorPaletteForBackground" values="0" />
         </Hints>
       </IntVectorProperty>
       <Property
@@ -3207,11 +3227,12 @@
         <Property name="MaintainLuminance"/>
       </PropertyGroup>
       <PropertyGroup label="Background" >
-        <Property function="Mode" name="BackgroundColorMode" />
-        <Property function="Color2" name="Background2"/>
-        <Property function="Color1" name="Background"/>
-        <Property function="Texture" name="BackgroundTexture"/>
-        <Property function="UseEnvironmentLighting" name="UseEnvironmentLighting"/>
+        <Property name="UseColorPaletteForBackground" />
+        <Property name="BackgroundColorMode" />
+        <Property name="Background2"/>
+        <Property name="Background"/>
+        <Property name="BackgroundTexture"/>
+        <Property name="UseEnvironmentLighting"/>
       </PropertyGroup>
       <PropertyGroup label="Stereo">
         <Property name="StereoCapableWindow" />
@@ -10889,12 +10910,13 @@
                     panel_visibility="advanced"/>
           <Property name="EyeAngle" panel_visibility="never"/>
 
-          <PropertyGroup label="Background" panel_widget="BackgroundColorEditor" panel_visibility="advanced">
-            <Property function="Mode" name="BackgroundColorMode" />
-            <Property function="Color2" name="Background2"/>
-            <Property function="Color1" name="Background"/>
-            <Property function="Texture" name="BackgroundTexture"/>
-            <Property function="UseEnvironmentLighting" name="UseEnvironmentLighting"/>
+          <PropertyGroup label="Background">
+            <Property name="UseColorPaletteForBackground" />
+            <Property name="BackgroundColorMode" />
+            <Property name="Background2"/>
+            <Property name="Background"/>
+            <Property name="BackgroundTexture"/>
+            <Property name="UseEnvironmentLighting"/>
           </PropertyGroup>
 
           <PropertyGroup label="Render Passes">

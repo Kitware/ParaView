@@ -812,6 +812,11 @@ def GetProxy(module, key, **kwargs):
             ## This restores the previous backend.
             probeLine = builtins.getattr(module, "PlotOverLineLegacy")(**kwargs)
             return probeLine
+        if key in ["RenderView", "OrthographicSliceView", "ComparativeRenderView"]:
+            view = builtins.getattr(module, key)(**kwargs)
+            view.UseColorPaletteForBackground = 0
+            return view
+        print(key)
     return builtins.getattr(module, key)(**kwargs)
 
 def lookupTableUpdate(lutName):

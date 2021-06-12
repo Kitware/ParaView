@@ -97,8 +97,6 @@ public:
   void SetCenterAxesVisibility(bool) override {}
 
   //*****************************************************************
-  void SetBackground(double r, double g, double b) override;
-  void SetBackground2(double r, double g, double b) override;
   void SetBackgroundTexture(vtkTexture* val) override;
 
   /**

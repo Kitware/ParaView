@@ -661,10 +661,16 @@ public:
   virtual void SetUseDepthPeeling(int val);
   virtual void SetUseDepthPeelingForVolumes(bool val);
   virtual void SetMaximumNumberOfPeels(int val);
-  virtual void SetBackground(double r, double g, double b);
-  virtual void SetBackground2(double r, double g, double b);
   virtual void SetBackgroundTexture(vtkTexture* val);
-  virtual void SetUseEnvironmentLighting(bool val);
+
+  //@{
+  /**
+   * When set, background color and mode will be obtained from
+   * vtkPVRenderViewSettings.
+   */
+  vtkSetMacro(UseRenderViewSettingsForBackground, bool);
+  vtkGetMacro(UseRenderViewSettingsForBackground, bool);
+  ///@}
 
   enum BackgroundMode
   {
@@ -674,10 +680,17 @@ public:
     SKYBOX,
   };
 
+  ///@{
   /**
-   * Choose how the background color is specified.
+   * API for background color selection.
    */
-  virtual void SetBackgroundColorMode(int mode);
+  vtkSetClampMacro(BackgroundColorMode, int, DEFAULT, SKYBOX);
+  vtkSetVector3Macro(Background, double);
+  vtkGetVector3Macro(Background, double);
+  vtkSetVector3Macro(Background2, double);
+  vtkGetVector3Macro(Background2, double);
+  vtkSetMacro(UseEnvironmentLighting, bool);
+  ///@}
 
   //*****************************************************************
   // Entry point for environmental backgrounds
@@ -1280,6 +1293,9 @@ private:
 
   int BackgroundColorMode;
   bool UseEnvironmentLighting;
+  bool UseRenderViewSettingsForBackground;
+  double Background[3];
+  double Background2[3];
 
   vtkSmartPointer<vtkCuller> Culler;
   vtkNew<vtkTimerLog> Timer;

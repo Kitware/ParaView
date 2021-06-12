@@ -20,6 +20,7 @@ view = servermanager.CreateRenderView();
 # using offscreen avoids issues with overlapping windows and such.
 view.UseOffscreenRendering = 1
 view.Background = (.5,.1,.5)
+view.UseColorPaletteForBackground = 0
 if view.GetProperty("RemoteRenderThreshold"):
     view.RemoteRenderThreshold = 100;
 

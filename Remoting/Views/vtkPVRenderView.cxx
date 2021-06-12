@@ -65,6 +65,7 @@
 #include "vtkPVMaterialLibrary.h"
 #include "vtkPVOptions.h"
 #include "vtkPVRenderViewDataDeliveryManager.h"
+#include "vtkPVRenderViewSettings.h"
 #include "vtkPVServerInformation.h"
 #include "vtkPVSession.h"
 #include "vtkPVStreamingMacros.h"
@@ -124,6 +125,13 @@ struct ValuePassStateT
   bool AnnotationVisibility;
   bool CenterAxesVisibility;
 };
+
+struct BackgroundColorStateT
+{
+  vtkTuple<double, 3> ColorLower;
+  vtkTuple<double, 3> ColorUpper;
+  vtkPVRenderView::BackgroundMode Mode;
+};
 }
 
 class vtkPVRenderView::vtkInternals
@@ -134,6 +142,9 @@ public:
 #if VTK_MODULE_ENABLE_VTK_RenderingRayTracing
   vtkSmartPointer<vtkOSPRayPass> OSPRayPass = nullptr;
 #endif
+
+  BackgroundColorStateT BackgroundColorState;
+  BackgroundColorStateT PaletteColorState;
 
   vtkSmartPointer<vtkImageProcessingPass> SavedImageProcessingPass;
   vtkNew<vtkToneMappingPass> ToneMappingPass;
@@ -397,6 +408,7 @@ vtkPVRenderView::vtkPVRenderView()
   this->SuppressRendering = false;
   this->BackgroundColorMode = vtkPVRenderView::DEFAULT;
   this->UseEnvironmentLighting = false;
+  this->UseRenderViewSettingsForBackground = true;
 
   auto window = this->GetRenderWindow();
   assert(window);
@@ -506,6 +518,10 @@ vtkPVRenderView::vtkPVRenderView()
   this->SynchronizedRenderers = vtkPVSynchronizedRenderer::New();
   this->SynchronizedRenderers->Initialize(this->GetSession());
   this->SynchronizedRenderers->SetRenderer(this->RenderView->GetRenderer());
+
+  // Add skybox actor.
+  this->GetRenderer()->AddActor(this->Skybox);
+  this->Skybox->SetVisibility(0);
 }
 
 //----------------------------------------------------------------------------
@@ -1466,6 +1482,9 @@ void vtkPVRenderView::Render(bool interactive, bool skip_rendering)
     (interactive ? "true" : "false"), (skip_rendering ? "true" : "false"));
 
   this->UpdateStereoProperties();
+
+  // Update background.
+  this->UpdateBackground();
 
   if ((!interactive && this->UseDistributedRenderingForRender) ||
     (interactive && this->UseDistributedRenderingForLODRender))
@@ -2572,20 +2591,24 @@ void vtkPVRenderView::SetMaximumNumberOfPeels(int val)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVRenderView::SetBackgroundColorMode(int mode)
-{
-  if (this->BackgroundColorMode != mode)
-  {
-    this->BackgroundColorMode = mode;
-    this->UpdateBackground();
-  }
-}
-
-//----------------------------------------------------------------------------
 void vtkPVRenderView::UpdateBackground(vtkRenderer* renderer /*=nullptr*/)
 {
   renderer = renderer ? renderer : this->GetRenderer();
-  switch (this->BackgroundColorMode)
+
+  double color[3], color2[3];
+  int mode = this->BackgroundColorMode;
+  this->GetBackground(color);
+  this->GetBackground2(color2);
+
+  if (this->UseRenderViewSettingsForBackground)
+  {
+    auto settings = vtkPVRenderViewSettings::GetInstance();
+    mode = settings->GetBackgroundColorMode();
+    settings->GetBackgroundColor(color);
+    settings->GetBackground2Color(color2);
+  }
+
+  switch (mode)
   {
     case DEFAULT:
       renderer->SetTexturedBackground(false);
@@ -2615,6 +2638,9 @@ void vtkPVRenderView::UpdateBackground(vtkRenderer* renderer /*=nullptr*/)
       break;
   }
 
+  renderer->SetBackground(color);
+  renderer->SetBackground2(color2);
+
   // update skybox texture.
   vtkTexture* texture = renderer->GetBackgroundTexture();
   if (this->BackgroundColorMode == vtkPVRenderView::SKYBOX && texture != nullptr)
@@ -2628,43 +2654,20 @@ void vtkPVRenderView::UpdateBackground(vtkRenderer* renderer /*=nullptr*/)
     /**
      * Choose how the background color is specified.
      */
-    renderer->AddActor(this->Skybox);
+    this->Skybox->SetVisibility(1);
     renderer->SetEnvironmentTexture(texture);
   }
   else
   {
-    // remove existing skybox
-    renderer->RemoveActor(this->Skybox);
+    this->Skybox->SetVisibility(0);
     renderer->SetEnvironmentTexture(nullptr);
   }
-}
-
-//----------------------------------------------------------------------------
-void vtkPVRenderView::SetBackground(double r, double g, double b)
-{
-  this->GetRenderer()->SetBackground(r, g, b);
-}
-//----------------------------------------------------------------------------
-void vtkPVRenderView::SetBackground2(double r, double g, double b)
-{
-  this->GetRenderer()->SetBackground2(r, g, b);
 }
 
 //----------------------------------------------------------------------------
 void vtkPVRenderView::SetBackgroundTexture(vtkTexture* texture)
 {
   this->GetRenderer()->SetBackgroundTexture(texture);
-  this->UpdateBackground();
-}
-
-//----------------------------------------------------------------------------
-void vtkPVRenderView::SetUseEnvironmentLighting(bool val)
-{
-  if (this->UseEnvironmentLighting != val)
-  {
-    this->UseEnvironmentLighting = val;
-    this->UpdateBackground();
-  }
 }
 
 //----------------------------------------------------------------------------

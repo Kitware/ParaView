@@ -1166,6 +1166,21 @@ struct Process_5_9_to_5_10
       node.remove_child(useGradienBackground.parent());
       node.remove_child(useTexturedBackground.parent());
       node.remove_child(useSkyboxBackground.parent());
+
+      // in 5.10, we added a new property that affects if background colors
+      // specified on the view is respected at all. It's tricky to determine if
+      // the user did override background in state file. Hence, we treat them as
+      // overridden to respect background color in state.
+      auto useColorPaletteForBackground = node.append_child("Property");
+      useColorPaletteForBackground.append_attribute("name").set_value(
+        "UseColorPaletteForBackground");
+      useColorPaletteForBackground.append_attribute("number_of_elements").set_value(1);
+      useColorPaletteForBackground.append_attribute("id").set_value(
+        (id + ".UseColorPaletteForBackground").c_str());
+
+      elementNode = useColorPaletteForBackground.append_child("Element");
+      elementNode.append_attribute("index").set_value(0);
+      elementNode.append_attribute("value").set_value(0);
     }
 
     return true;

@@ -36,7 +36,6 @@ renderView1.UseGradientBackground = 1
 assert(renderView1.BackgroundColorMode == "Gradient")
 assert(renderView1.UseGradientBackground == 1)
 
-
 renderView1.UseTexturedBackground = 1
 assert(renderView1.BackgroundColorMode == "Texture")
 assert(renderView1.UseTexturedBackground == 1)

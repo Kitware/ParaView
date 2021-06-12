@@ -544,26 +544,6 @@ void vtkPVOrthographicSliceView::MoveSlicePosition(vtkRenderer* ren, double posi
 }
 
 //----------------------------------------------------------------------------
-void vtkPVOrthographicSliceView::SetBackground(double r, double g, double b)
-{
-  this->Superclass::SetBackground(r, g, b);
-  for (int cc = 0; cc < 3; cc++)
-  {
-    this->Renderers[cc]->SetBackground(r, g, b);
-  }
-}
-
-//----------------------------------------------------------------------------
-void vtkPVOrthographicSliceView::SetBackground2(double r, double g, double b)
-{
-  this->Superclass::SetBackground2(r, g, b);
-  for (int cc = 0; cc < 3; cc++)
-  {
-    this->Renderers[cc]->SetBackground2(r, g, b);
-  }
-}
-
-//----------------------------------------------------------------------------
 void vtkPVOrthographicSliceView::SetBackgroundTexture(vtkTexture* val)
 {
   this->Superclass::SetBackgroundTexture(val);
