@@ -395,6 +395,8 @@ vtkPVRenderView::vtkPVRenderView()
   this->ForceDataDistributionMode = -1;
   this->PreviousDiscreteCameraIndex = -1;
   this->SuppressRendering = false;
+  this->BackgroundColorMode = vtkPVRenderView::DEFAULT;
+  this->UseEnvironmentLighting = false;
 
   auto window = this->GetRenderWindow();
   assert(window);
@@ -2570,6 +2572,74 @@ void vtkPVRenderView::SetMaximumNumberOfPeels(int val)
 }
 
 //----------------------------------------------------------------------------
+void vtkPVRenderView::SetBackgroundColorMode(int mode)
+{
+  if (this->BackgroundColorMode != mode)
+  {
+    this->BackgroundColorMode = mode;
+    this->UpdateBackground();
+  }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVRenderView::UpdateBackground(vtkRenderer* renderer /*=nullptr*/)
+{
+  renderer = renderer ? renderer : this->GetRenderer();
+  switch (this->BackgroundColorMode)
+  {
+    case DEFAULT:
+      renderer->SetTexturedBackground(false);
+      renderer->SetGradientBackground(false);
+      renderer->SetUseImageBasedLighting(false);
+      break;
+
+    case GRADIENT:
+      renderer->SetTexturedBackground(false);
+      renderer->SetGradientBackground(true);
+      renderer->SetUseImageBasedLighting(false);
+      break;
+
+    case IMAGE:
+      renderer->SetTexturedBackground(true);
+      renderer->SetGradientBackground(false);
+      renderer->SetUseImageBasedLighting(this->UseEnvironmentLighting);
+      break;
+
+    case SKYBOX:
+      renderer->SetTexturedBackground(false);
+      renderer->SetGradientBackground(false);
+      renderer->SetUseImageBasedLighting(this->UseEnvironmentLighting);
+      break;
+
+    default:
+      break;
+  }
+
+  // update skybox texture.
+  vtkTexture* texture = renderer->GetBackgroundTexture();
+  if (this->BackgroundColorMode == vtkPVRenderView::SKYBOX && texture != nullptr)
+  {
+    this->ConfigureTexture(texture);
+
+    this->Skybox->GammaCorrectOn();
+    this->Skybox->SetProjection(vtkSkybox::Sphere);
+    this->Skybox->SetFloorRight(0.0, 0.0, 1.0);
+    this->Skybox->SetTexture(texture);
+    /**
+     * Choose how the background color is specified.
+     */
+    renderer->AddActor(this->Skybox);
+    renderer->SetEnvironmentTexture(texture);
+  }
+  else
+  {
+    // remove existing skybox
+    renderer->RemoveActor(this->Skybox);
+    renderer->SetEnvironmentTexture(nullptr);
+  }
+}
+
+//----------------------------------------------------------------------------
 void vtkPVRenderView::SetBackground(double r, double g, double b)
 {
   this->GetRenderer()->SetBackground(r, g, b);
@@ -2584,52 +2654,16 @@ void vtkPVRenderView::SetBackground2(double r, double g, double b)
 void vtkPVRenderView::SetBackgroundTexture(vtkTexture* texture)
 {
   this->GetRenderer()->SetBackgroundTexture(texture);
-  this->UpdateSkybox();
+  this->UpdateBackground();
 }
 
 //----------------------------------------------------------------------------
-void vtkPVRenderView::SetGradientBackground(int val)
+void vtkPVRenderView::SetUseEnvironmentLighting(bool val)
 {
-  this->GetRenderer()->SetGradientBackground(val ? true : false);
-}
-
-//----------------------------------------------------------------------------
-void vtkPVRenderView::SetTexturedBackground(int val)
-{
-  this->GetRenderer()->SetTexturedBackground(val ? true : false);
-}
-
-//----------------------------------------------------------------------------
-void vtkPVRenderView::SetSkyboxBackground(int val)
-{
-  this->NeedSkybox = val != 0;
-  this->UpdateSkybox();
-}
-
-//----------------------------------------------------------------------------
-void vtkPVRenderView::UpdateSkybox()
-{
-  // remove existing skybox
-  this->GetRenderer()->RemoveActor(this->Skybox);
-
-  vtkTexture* texture = this->GetRenderer()->GetBackgroundTexture();
-
-  if (this->NeedSkybox && texture != nullptr)
+  if (this->UseEnvironmentLighting != val)
   {
-    this->ConfigureTexture(texture);
-
-    this->Skybox->GammaCorrectOn();
-    this->Skybox->SetProjection(vtkSkybox::Sphere);
-    this->Skybox->SetFloorRight(0.0, 0.0, 1.0);
-    this->Skybox->SetTexture(texture);
-
-    this->GetRenderer()->AddActor(this->Skybox);
-
-    this->GetRenderer()->SetEnvironmentTexture(texture);
-  }
-  else
-  {
-    this->GetRenderer()->SetEnvironmentTexture(nullptr);
+    this->UseEnvironmentLighting = val;
+    this->UpdateBackground();
   }
 }
 
@@ -2650,12 +2684,6 @@ void vtkPVRenderView::ConfigureTexture(vtkTexture* texture)
       texture->InterpolateOn();
     }
   }
-}
-
-//----------------------------------------------------------------------------
-void vtkPVRenderView::SetUseEnvironmentLighting(bool val)
-{
-  this->GetRenderer()->SetUseImageBasedLighting(val);
 }
 
 //----------------------------------------------------------------------------

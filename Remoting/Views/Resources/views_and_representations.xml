@@ -2640,6 +2640,49 @@
         </Documentation>
       </IntVectorProperty>
 
+      <IntVectorProperty command="SetBackgroundColorMode"
+                         name="BackgroundColorMode"
+                         number_of_elements="1"
+                         default_values="0">
+        <EnumerationDomain name="enum">
+          <Entry text="Single Color" value="0" />
+          <Entry text="Gradient" value="1" />
+          <Entry text="Texture" value="2" />
+          <Entry text="Skybox" value="3" />
+        </EnumerationDomain>
+        <Documentation>
+          Select the background for the view.
+        </Documentation>
+      </IntVectorProperty>
+      <ProxyProperty command="SetBackgroundTexture"
+                     name="BackgroundTexture" panel_widget="texture_selector">
+        <ProxyGroupDomain name="groups">
+          <Group name="textures" />
+        </ProxyGroupDomain>
+        <Hints>
+          <!-- hide widget unless mode is "Texture" or "Skybox" -->
+          <PropertyWidgetDecorator type="GenericDecorator" mode="visibility"
+            property="BackgroundColorMode" values="2 3" />
+        </Hints>
+      </ProxyProperty>
+      <DoubleVectorProperty command="SetBackground2"
+                            default_values="0 0 0.165"
+                            name="Background2"
+                            panel_widget="color_selector_with_palette"
+                            number_of_elements="3">
+        <DoubleRangeDomain max="1 1 1" min="0 0 0" name="range" />
+        <Hints>
+          <PropertyLink group="settings" proxy="ColorPalette" property="BackgroundColor2" unlink_if_modified="1" />
+
+          <!-- hide widget unless mode is "Gradient" -->
+          <PropertyWidgetDecorator type="GenericDecorator" mode="visibility"
+            property="BackgroundColorMode" value="1" />
+        </Hints>
+        <Documentation>
+          Specify the color to use for the upper half of the viewport when using **Gradient**
+          background color mode.
+        </Documentation>
+      </DoubleVectorProperty>
       <DoubleVectorProperty command="SetBackground"
                             default_values="0.329 0.349 0.427"
                             name="Background"
@@ -2652,40 +2695,6 @@
           <PropertyLink group="settings" proxy="ColorPalette" property="BackgroundColor" unlink_if_modified="1" />
         </Hints>
       </DoubleVectorProperty>
-      <DoubleVectorProperty command="SetBackground2"
-                            default_values="0 0 0.165"
-                            name="Background2"
-                            panel_widget="color_selector"
-                            number_of_elements="3">
-        <DoubleRangeDomain max="1 1 1"
-                           min="0 0 0"
-                           name="range" />
-      </DoubleVectorProperty>
-      <IntVectorProperty command="SetGradientBackground"
-                         default_values="0"
-                         name="UseGradientBackground"
-                         number_of_elements="1">
-        <BooleanDomain name="bool" />
-        <Hints>
-          <PropertyLink group="settings" proxy="ColorPalette" property="UseGradientBackground"
-            unlink_if_modified="1" />
-        </Hints>
-      </IntVectorProperty>
-      <IntVectorProperty command="SetTexturedBackground"
-                         default_values="0"
-                         name="UseTexturedBackground"
-                         number_of_elements="1">
-        <BooleanDomain name="bool" />
-      </IntVectorProperty>
-      <IntVectorProperty command="SetSkyboxBackground"
-                         default_values="0"
-                         name="UseSkyboxBackground"
-                         number_of_elements="1">
-        <Documentation>
-          Enable skybox texture.
-        </Documentation>
-        <BooleanDomain name="bool" />
-      </IntVectorProperty>
       <IntVectorProperty command="SetUseEnvironmentLighting"
                          default_values="0"
                          name="UseEnvironmentLighting"
@@ -2694,13 +2703,12 @@
           Enable skybox light contribution. This feature is only compatible with PBR interpolation.
         </Documentation>
         <BooleanDomain name="bool" />
+        <Hints>
+          <!-- hide widget unless mode is "Skybox" -->
+          <PropertyWidgetDecorator type="GenericDecorator" mode="visibility"
+            property="BackgroundColorMode" value="3" />
+        </Hints>
       </IntVectorProperty>
-      <ProxyProperty command="SetBackgroundTexture"
-                     name="BackgroundTexture" panel_widget="texture_selector">
-        <ProxyGroupDomain name="groups">
-          <Group name="textures" />
-        </ProxyGroupDomain>
-      </ProxyProperty>
       <Property
           name="CaptureZBuffer"
           command="CaptureZBuffer"
@@ -3198,14 +3206,12 @@
         <Property name="HeadLightK:H Ratio"/>
         <Property name="MaintainLuminance"/>
       </PropertyGroup>
-      <PropertyGroup label="Background" panel_widget="BackgroundEditor" panel_visibility="advanced">
-        <Property name="Background"/>
-        <Property name="Background2"/>
-        <Property name="UseGradientBackground"/>
-        <Property name="UseTexturedBackground"/>
-        <Property name="UseSkyboxBackground"/>
-        <Property name="UseEnvironmentLighting"/>
-        <Property name="BackgroundTexture"/>
+      <PropertyGroup label="Background" >
+        <Property function="Mode" name="BackgroundColorMode" />
+        <Property function="Color2" name="Background2"/>
+        <Property function="Color1" name="Background"/>
+        <Property function="Texture" name="BackgroundTexture"/>
+        <Property function="UseEnvironmentLighting" name="UseEnvironmentLighting"/>
       </PropertyGroup>
       <PropertyGroup label="Stereo">
         <Property name="StereoCapableWindow" />
@@ -10883,14 +10889,12 @@
                     panel_visibility="advanced"/>
           <Property name="EyeAngle" panel_visibility="never"/>
 
-          <PropertyGroup label="Background" panel_widget="BackgroundEditor" panel_visibility="advanced">
-            <Property name="Background"/>
-            <Property name="Background2"/>
-            <Property name="UseGradientBackground"/>
-            <Property name="UseTexturedBackground"/>
-            <Property name="UseSkyboxBackground"/>
-            <Property name="UseEnvironmentLighting"/>
-            <Property name="BackgroundTexture"/>
+          <PropertyGroup label="Background" panel_widget="BackgroundColorEditor" panel_visibility="advanced">
+            <Property function="Mode" name="BackgroundColorMode" />
+            <Property function="Color2" name="Background2"/>
+            <Property function="Color1" name="Background"/>
+            <Property function="Texture" name="BackgroundTexture"/>
+            <Property function="UseEnvironmentLighting" name="UseEnvironmentLighting"/>
           </PropertyGroup>
 
           <PropertyGroup label="Render Passes">

@@ -17,6 +17,7 @@
 // Don't include vtkAxis. Cannot add dependency on vtkChartsCore in
 // vtkPVServerManagerCore.
 // #include "vtkAxis.h"
+#include "vtkLogger.h"
 #include "vtkMath.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
@@ -862,7 +863,8 @@ struct Process_5_9_to_5_10
     return HandleSpreadsheetRepresentationCompositeDataSetIndex(document) &&
       HandleExtractBlock(document) && HandleRepresentationBlockVisibility(document) &&
       HandleRepresentationBlockColor(document) && HandleRepresentationBlockOpacity(document) &&
-      HandleSelectionQuerySource(document) && ConvertProbeLine(document);
+      HandleSelectionQuerySource(document) && ConvertProbeLine(document) &&
+      HandleBackgroundColor(document);
   }
 
   static std::string GetSelector(unsigned int cid)
@@ -1115,6 +1117,57 @@ struct Process_5_9_to_5_10
         "implementation "
         "is still available as 'Probe Line Legacy' and will be used for loading this state file.");
     }
+    return true;
+  }
+
+  static bool HandleBackgroundColor(xml_document& document)
+  {
+    // We added a single BackgroundColorMode property that combined multiple
+    // properties that potentially conflicted causing issues.
+    auto views = document.select_nodes("//ServerManagerState/Proxy[@group='views']");
+    for (const auto& item : views)
+    {
+      auto node = item.node();
+      auto useGradienBackground =
+        node.select_node("//Property[@name='UseGradientBackground']/Element[@index='0']").node();
+      auto useTexturedBackground =
+        node.select_node("//Property[@name='UseTexturedBackground']/Element[@index='0']").node();
+      auto useSkyboxBackground =
+        node.select_node("//Property[@name='UseSkyboxBackground']/Element[@index='0']").node();
+
+      if (!useGradienBackground && !useTexturedBackground && !useSkyboxBackground)
+      {
+        continue;
+      }
+
+      int mode = 0; // vtkPVRenderView::DEFAULT;
+      if (useSkyboxBackground.attribute("value").as_int(0) == 1)
+      {
+        mode = 3; // vtkPVRenderView::SKYBOX;
+      }
+      else if (useTexturedBackground.attribute("value").as_int(0) == 1)
+      {
+        mode = 2; // vtkPVRenderView::IMAGE;
+      }
+      else if (useGradienBackground.attribute("value").as_int(0) == 1)
+      {
+        mode = 1; // vtkPVRenderView::GRADIENT;
+      }
+
+      const std::string id(node.attribute("id").value());
+      auto backgroundColorMode = node.append_child("Property");
+      backgroundColorMode.append_attribute("name").set_value("BackgroundColorMode");
+      backgroundColorMode.append_attribute("number_of_elements").set_value(1);
+      backgroundColorMode.append_attribute("id").set_value((id + ".BackgroundColorMode").c_str());
+      auto elementNode = backgroundColorMode.append_child("Element");
+      elementNode.append_attribute("index").set_value(0);
+      elementNode.append_attribute("value").set_value(mode);
+
+      node.remove_child(useGradienBackground.parent());
+      node.remove_child(useTexturedBackground.parent());
+      node.remove_child(useSkyboxBackground.parent());
+    }
+
     return true;
   }
 };

@@ -12,6 +12,7 @@ set(PY_TESTS
   Animation.py
   AnimationCache.py,NO_VALID
   AxesGridTestGridLines.py
+  BackgroundColorBackwardsCompatibilityTest.py,NO_VALID
   CellIntegrator.py,NO_VALID
   ChangeTimeSteps.py
   ColorAttributeTypeBackwardsCompatibility.py,NO_VALID
