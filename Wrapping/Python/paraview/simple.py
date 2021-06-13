@@ -565,24 +565,96 @@ def SaveExtracts(**kwargs):
 # XML State management
 #==============================================================================
 
-def LoadState(filename, connection=None, **extraArgs):
+def LoadState(statefile, data_directory = None, restrict_to_data_directory = False,
+        filenames = None, *args, **kwargs):
+    """
+    Load PVSM state file.
+
+    This will load the state specified in the `statefile`.
+
+    ParaView can update absolute paths for data-files used in the state which
+    can be useful to portably load state file across different systems.
+
+    If `data_directory` is not None, then ParaView searches for files matching
+    those used in the state under the specified directory and if found, replaces
+    the state to use the found files instead. If `restrict_to_data_directory` is True,
+    if a file is not found under the `data_directory`, it will raise an error,
+    otherwise it is left unchanged.
+
+    Alternatively, `filenames` can be used to specify a list of updated
+    filesnames explicitly. This must be list of the following form:
+
+        [
+            {
+              # either 'name' or 'id' are required. if both are provided, 'id'
+              # is checked first.
+              "name" : "[reader name shown in pipeline browser]",
+              "id"   : "[reader id used in the pvsm state file]",
+
+              # all modified filename-like properties on this reader
+              "FileName" : ...
+              ....
+            },
+
+            ...
+        ]
+
+    Presence of other positional or keyword arguments is used to indicate that this
+    invocation uses the legacy signature of this function and forwards to
+    `_LoadStateLegacy`.
+    """
+    if kwargs:
+        return _LoadStateLegacy(statefile, *args, **kwargs)
+
     RemoveViewsAndLayouts()
 
     pxm = servermanager.ProxyManager()
-    smproxy = pxm.SMProxyManager.NewProxy('options', 'LoadStateOptions')
-    smproxy.UnRegister(None)
+    pyproxy = servermanager._getPyProxy(pxm.NewProxy('options', 'LoadStateOptions'))
+    if pyproxy.PrepareToLoad(statefile):
+        pyproxy.LoadStateDataFileOptions = pyproxy.SMProxy.USE_FILES_FROM_STATE
+        if pyproxy.HasDataFiles():
+            if data_directory is not None:
+                pyproxy.LoadStateDataFileOptions = pyproxy.SMProxy.USE_DATA_DIRECTORY
+                pyproxy.DataDirectory = data_directory
+                if restrict_to_data_directory:
+                    pyproxy.OnlyUseFilesInDataDirectory = 1
+            elif filenames is not None:
+                pyproxy.LoadStateDataFileOptions = pyproxy.SMProxy.CHOOSE_FILES_EXPLICITLY
+                for item in filenames:
+                    for pname in item.keys():
+                        if pname == "name" or pname == "id":
+                            continue
+                        smprop = pyproxy.FindProperty(item.get("name"), int(item.get("id")), pname)
+                        if not smprop:
+                            raise RuntimeError("Invalid item specified in 'filenames': %s", item)
+                        prop = servermanager._wrap_property(pyproxy, smprop)
+                        prop.SetData(item[pname])
+        pyproxy.Load()
 
-    if (smproxy is not None) and smproxy.PrepareToLoad(filename):
-        if smproxy.HasDataFiles() and (extraArgs is not None):
-            # always create a brand new class since the properties
-            # may change based on the state file being loaded.
-            customclass = servermanager._createClass(smproxy.GetXMLGroup(),
-                    smproxy.GetXMLName(), prototype=smproxy)
-            pyproxy = customclass(proxy=smproxy)
-            SetProperties(pyproxy, **extraArgs)
-            del pyproxy
-            del customclass
-        smproxy.Load()
+    # Try to set the new view active
+    if len(GetRenderViews()) > 0:
+        SetActiveView(GetRenderViews()[0])
+
+def _LoadStateLegacy(filename, connection=None, **extraArgs):
+    """Python scripts from version < 5.9 used a different signature. This
+    function supports that.
+    """
+    RemoveViewsAndLayouts()
+
+    pxm = servermanager.ProxyManager()
+    pyproxy = servermanager._getPyProxy(pxm.NewProxy('options', 'LoadStateOptions'))
+    if (pyproxy is not None) and pyproxy.PrepareToLoad(filename):
+        if pyproxy.HasDataFiles() and (extraArgs is not None):
+            for pname, value in extraArgs.items():
+                smprop = pyproxy.FindLegacyProperty(pname)
+                if smprop:
+                    if not smprop:
+                        raise RuntimeError("Invalid argument '%s'", pname)
+                    prop = servermanager._wrap_property(pyproxy, smprop)
+                    prop.SetData(value)
+                else:
+                    pyproxy.__setattr__(pname, value)
+        pyproxy.Load()
 
     # Try to set the new view active
     if len(GetRenderViews()) > 0:

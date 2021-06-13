@@ -31,8 +31,8 @@
   <pqevent object="pqClientMainWindow/FileLoadServerStateDialog" command="filesSelected" arguments="$PARAVIEW_TEST_ROOT/LoadSaveStateAnimationTemp.pvsm" />
   <pqevent object="LoadStateOptionsDialog/scrollArea/qt_scrollarea_viewport/Container/ProxyWidget/LoadStateDataFileOptions/ComboBox" command="activated" arguments="Choose File Names" />
   <!-- change to dataset with 10 timesteps, with end time > 4 -->
-  <pqevent object="LoadStateOptionsDialog/scrollArea/qt_scrollarea_viewport/Container/ProxyWidget/dualSphereAnimationpvd.FileName/FileChooser/FileButton" command="activate" arguments="" />
-  <pqevent object="LoadStateOptionsDialog/scrollArea/qt_scrollarea_viewport/Container/ProxyWidget/dualSphereAnimationpvd.FileName/FileChooser/pqFileDialog" command="filesSelected" arguments="$PARAVIEW_DATA_ROOT/Testing/Data/dualSphereAnimation.clone.pvd" />
+  <pqevent object="LoadStateOptionsDialog/scrollArea/qt_scrollarea_viewport/Container/ProxyWidget/dualSphereAnimationpvdFileName/FileChooser/FileButton" command="activate" arguments="" />
+  <pqevent object="LoadStateOptionsDialog/scrollArea/qt_scrollarea_viewport/Container/ProxyWidget/dualSphereAnimationpvdFileName/FileChooser/pqFileDialog" command="filesSelected" arguments="$PARAVIEW_DATA_ROOT/Testing/Data/dualSphereAnimation.clone.pvd" />
   <pqevent object="LoadStateOptionsDialog/widget/OKButton" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/VCRToolbar/actionVCRPreviousFrame" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/VCRToolbar/actionVCRPreviousFrame" command="activate" arguments="" />

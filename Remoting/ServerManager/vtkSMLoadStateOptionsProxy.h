@@ -74,6 +74,28 @@ public:
     CHOOSE_FILES_EXPLICITLY = 2
   };
 
+  /**
+   * Helper for Python API. Returns vtkSMProperty for the chosen name/id.
+   */
+  vtkSMProperty* FindProperty(const char* name, int id, const char* pname);
+
+  /**
+   * Helper for Python API to return a property using its named used in old
+   * traces (pre 5.9)
+   */
+  vtkSMProperty* FindLegacyProperty(const char* sanitizedName);
+
+  /**
+   * Returns true if the property has been modified.
+   */
+  bool IsPropertyModified(int id, const char* pname);
+
+  /**
+   * Helper for Python trace generating code to get an name for a proxy given
+   * its id
+   */
+  std::string GetReaderName(int id) const;
+
 protected:
   vtkSMLoadStateOptionsProxy();
   ~vtkSMLoadStateOptionsProxy() override;

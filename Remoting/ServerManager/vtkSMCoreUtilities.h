@@ -26,6 +26,7 @@
 #include "vtkRemotingServerManagerModule.h" //needed for exports
 
 #include <string> // for std::string
+#include <vector> // for std::vector
 
 class vtkSMProxy;
 
@@ -44,9 +45,19 @@ public:
   static const char* GetFileNameProperty(vtkSMProxy*);
 
   /**
+   * Returns list of all properties that accept filenames in order that they are
+   * defined.
+   */
+  static std::vector<std::string> GetFileNameProperties(vtkSMProxy* proxy);
+
+  /**
    * Sanitize a label/name to be remove spaces, delimiters etc.
    */
   static std::string SanitizeName(const char*);
+  static std::string SanitizeName(const std::string& name)
+  {
+    return vtkSMCoreUtilities::SanitizeName(name.c_str());
+  }
 
   //@{
   /**

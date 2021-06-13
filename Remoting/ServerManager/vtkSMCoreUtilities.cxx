@@ -20,6 +20,7 @@
 #include "vtkPVXMLElement.h"
 #include "vtkSMDomain.h"
 #include "vtkSMDomainIterator.h"
+#include "vtkSMFileListDomain.h"
 #include "vtkSMInputProperty.h"
 #include "vtkSMOrderedPropertyIterator.h"
 #include "vtkSMProperty.h"
@@ -89,6 +90,31 @@ const char* vtkSMCoreUtilities::GetFileNameProperty(vtkSMProxy* proxy)
     piter->Next();
   }
   return nullptr;
+}
+
+//----------------------------------------------------------------------------
+std::vector<std::string> vtkSMCoreUtilities::GetFileNameProperties(vtkSMProxy* proxy)
+{
+  std::vector<std::string> result;
+  if (!proxy)
+  {
+    return result;
+    ;
+  }
+
+  vtkNew<vtkSMOrderedPropertyIterator> piter;
+  piter->SetProxy(proxy);
+  for (piter->Begin(); !piter->IsAtEnd(); piter->Next())
+  {
+    if (auto property = piter->GetProperty())
+    {
+      if (property->FindDomain<vtkSMFileListDomain>() != nullptr)
+      {
+        result.push_back(piter->GetKey());
+      }
+    }
+  }
+  return result;
 }
 
 //----------------------------------------------------------------------------
