@@ -96,7 +96,7 @@ bool vtkArithmeticAccumulator<FunctorT>::HasSameParameters(
 
 //----------------------------------------------------------------------------
 template <typename FunctorT>
-void vtkArithmeticAccumulator<FunctorT>::ShallowCopy(vtkDataObject* accumulator)
+void vtkArithmeticAccumulator<FunctorT>::ShallowCopy(vtkObject* accumulator)
 {
   this->Superclass::ShallowCopy(accumulator);
   vtkArithmeticAccumulator* arithmeticAccumulator =
@@ -115,7 +115,7 @@ void vtkArithmeticAccumulator<FunctorT>::ShallowCopy(vtkDataObject* accumulator)
 
 //----------------------------------------------------------------------------
 template <typename FunctorT>
-void vtkArithmeticAccumulator<FunctorT>::DeepCopy(vtkDataObject* accumulator)
+void vtkArithmeticAccumulator<FunctorT>::DeepCopy(vtkObject* accumulator)
 {
   this->Superclass::DeepCopy(accumulator);
   vtkArithmeticAccumulator* arithmeticAccumulator =

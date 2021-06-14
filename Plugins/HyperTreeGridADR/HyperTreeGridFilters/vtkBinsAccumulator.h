@@ -82,12 +82,12 @@ public:
   /**
    * ShallowCopy implementation, both object then share the same Bins.
    */
-  void DeepCopy(vtkDataObject* accumulator) override;
+  void DeepCopy(vtkObject* accumulator) override;
 
   /**
    * DeepCopy implementation.
    */
-  void ShallowCopy(vtkDataObject* accumulator) override;
+  void ShallowCopy(vtkObject* accumulator) override;
 
   /**
    * Returns true if the parameters of accumulator is the same as the ones of this

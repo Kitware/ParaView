@@ -32,18 +32,18 @@
 #ifndef vtkAbstractAccumulator_h
 #define vtkAbstractAccumulator_h
 
-#include "vtkDataObject.h"
 #include "vtkFiltersHyperTreeGridADRModule.h" // For export macro
+#include "vtkObject.h"
 
 #include <functional> // for std::function
 
 class vtkDataArray;
 class vtkDoubleArray;
 
-class VTKFILTERSHYPERTREEGRIDADR_EXPORT vtkAbstractAccumulator : public vtkDataObject
+class VTKFILTERSHYPERTREEGRIDADR_EXPORT vtkAbstractAccumulator : public vtkObject
 {
 public:
-  vtkAbstractTypeMacro(vtkAbstractAccumulator, vtkDataObject);
+  vtkAbstractTypeMacro(vtkAbstractAccumulator, vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
   static vtkAbstractAccumulator* New();
@@ -68,6 +68,10 @@ public:
    * Accessor on the accumulated value.
    */
   virtual double GetValue() const = 0;
+
+  virtual void DeepCopy(vtkObject*) {}
+  virtual void ShallowCopy(vtkObject*) {}
+  virtual void Initialize() {}
 
 protected:
   //@{

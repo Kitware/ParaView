@@ -128,9 +128,8 @@ void vtkAbstractArrayMeasurement::Initialize()
 }
 
 //----------------------------------------------------------------------------
-void vtkAbstractArrayMeasurement::ShallowCopy(vtkDataObject* o)
+void vtkAbstractArrayMeasurement::ShallowCopy(vtkObject* o)
 {
-  this->Superclass::ShallowCopy(o);
   vtkAbstractArrayMeasurement* arrayMeasurement = vtkAbstractArrayMeasurement::SafeDownCast(o);
   if (arrayMeasurement &&
     this->GetNumberOfAccumulators() == arrayMeasurement->GetNumberOfAccumulators())
@@ -156,9 +155,8 @@ void vtkAbstractArrayMeasurement::ShallowCopy(vtkDataObject* o)
 }
 
 //----------------------------------------------------------------------------
-void vtkAbstractArrayMeasurement::DeepCopy(vtkDataObject* o)
+void vtkAbstractArrayMeasurement::DeepCopy(vtkObject* o)
 {
-  this->Superclass::DeepCopy(o);
   vtkAbstractArrayMeasurement* arrayMeasurement = vtkAbstractArrayMeasurement::SafeDownCast(o);
   if (arrayMeasurement &&
     this->GetNumberOfAccumulators() == arrayMeasurement->GetNumberOfAccumulators())

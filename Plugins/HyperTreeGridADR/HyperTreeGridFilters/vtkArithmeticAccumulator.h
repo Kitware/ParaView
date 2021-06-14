@@ -69,12 +69,12 @@ public:
   /**
    * Shallow copy of the accumulator.
    */
-  void ShallowCopy(vtkDataObject* accumulator) override;
+  void ShallowCopy(vtkObject* accumulator) override;
 
   /**
    * Deep copy of the accumulator.
    */
-  void DeepCopy(vtkDataObject* accumulator) override;
+  void DeepCopy(vtkObject* accumulator) override;
 
   /**
    * Returns true if the parameters of accumulator is the same as the ones of this

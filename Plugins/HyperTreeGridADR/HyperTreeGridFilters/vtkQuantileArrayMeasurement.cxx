@@ -79,7 +79,7 @@ void vtkQuantileArrayMeasurement::SetPercentile(double percentile)
 }
 
 //----------------------------------------------------------------------------
-void vtkQuantileArrayMeasurement::ShallowCopy(vtkDataObject* o)
+void vtkQuantileArrayMeasurement::ShallowCopy(vtkObject* o)
 {
   this->Superclass::ShallowCopy(o);
   vtkQuantileArrayMeasurement* quantileArrayMeasurement =
@@ -96,7 +96,7 @@ void vtkQuantileArrayMeasurement::ShallowCopy(vtkDataObject* o)
 }
 
 //----------------------------------------------------------------------------
-void vtkQuantileArrayMeasurement::DeepCopy(vtkDataObject* o)
+void vtkQuantileArrayMeasurement::DeepCopy(vtkObject* o)
 {
   this->Superclass::DeepCopy(o);
   vtkQuantileArrayMeasurement* quantileArrayMeasurement =
