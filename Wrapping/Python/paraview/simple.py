@@ -174,6 +174,10 @@ def CreateView(view_xml_name, detachedFromLayout=None, **params):
         # layout.
         controller.AssignViewToLayout(view)
 
+    if paraview.compatibility.GetVersion() <= 5.9:
+        if hasattr(view, "UseColorPaletteForBackground"):
+            view.UseColorPaletteForBackground = 0
+
     # setup an interactor if current process support interaction if an
     # interactor hasn't already been set. This overcomes the problem where VTK
     # segfaults if the interactor is created after the window was created.

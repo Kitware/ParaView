@@ -866,7 +866,9 @@
     </SettingsProxy>
 
     <!-- ================================================================== -->
-    <SettingsProxy name="ColorPalette" label="Color Palette" serializable="1">
+    <SettingsProxy name="ColorPalette" label="Color Palette" serializable="1"
+                   processes="client|dataserver|renderserver"
+                   class="vtkPVRenderViewSettings">
       <DoubleVectorProperty default_values="1.0 0.0 1.0"
                             label="Border"
                             name="BorderColor"
@@ -950,26 +952,20 @@
                            name="range" />
         <Documentation>Color used for showing interactive widget.</Documentation>
       </DoubleVectorProperty>
-      <IntVectorProperty name="UseGradientBackground"
-                         label="Use Gradient Background"
+      <IntVectorProperty command="SetBackgroundColorMode"
+                         name="BackgroundColorMode"
                          number_of_elements="1"
                          default_values="0">
-        <BooleanDomain name="bool" />
+        <EnumerationDomain name="enum">
+          <Entry text="Single Color" value="0" />
+          <Entry text="Gradient" value="1" />
+        </EnumerationDomain>
         <Documentation>
-          Enable gradient background.
+          Select the background color mode.
         </Documentation>
       </IntVectorProperty>
-      <DoubleVectorProperty default_values="0.32 0.34 0.43"
-                            label="Background"
-                            name="BackgroundColor"
-                            number_of_elements="3"
-                            panel_widget="color_selector">
-        <DoubleRangeDomain max="1 1 1"
-                           min="0 0 0"
-                           name="range" />
-        <Documentation>Color used as background for the view.</Documentation>
-      </DoubleVectorProperty>
-      <DoubleVectorProperty default_values="0.32 0.34 0.43"
+      <DoubleVectorProperty default_values="0.0 0.0 0.16"
+                            command="SetBackground2Color"
                             label="Background 2"
                             name="BackgroundColor2"
                             number_of_elements="3"
@@ -977,12 +973,27 @@
         <DoubleRangeDomain max="1 1 1"
                            min="0 0 0"
                            name="range" />
-        <Documentation>Color used as the 2nd color for gradient backgrounds.</Documentation>
+        <Documentation>Color used for the top section for gradient backgrounds.</Documentation>
         <Hints>
-          <PropertyWidgetDecorator type="EnableWidgetDecorator">
-            <Property name="UseGradientBackground" function="boolean" />
-          </PropertyWidgetDecorator>
+          <PropertyWidgetDecorator type="GenericDecorator"
+            mode="enabled_state"
+            property="BackgroundColorMode"
+            value="1" />
         </Hints>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty default_values="0.32 0.34 0.43"
+                            label="Background"
+                            command="SetBackgroundColor"
+                            name="BackgroundColor"
+                            number_of_elements="3"
+                            panel_widget="color_selector">
+        <DoubleRangeDomain max="1 1 1"
+                           min="0 0 0"
+                           name="range" />
+        <Documentation>
+            Color used as background for the view. When using gradient backgrounds,
+            this is the color used for the lower section of the viewport.
+        </Documentation>
       </DoubleVectorProperty>
 
       <PropertyGroup label="Selection">
@@ -991,9 +1002,9 @@
       </PropertyGroup>
 
       <PropertyGroup label="Background">
-        <Property name="UseGradientBackground" />
-        <Property name="BackgroundColor" />
+        <Property name="BackgroundColorMode" />
         <Property name="BackgroundColor2" />
+        <Property name="BackgroundColor" />
       </PropertyGroup>
 
       <Property name="LoadPalette"

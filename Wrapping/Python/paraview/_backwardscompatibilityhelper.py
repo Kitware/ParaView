@@ -359,6 +359,31 @@ def setattr(proxy, pname, value):
                 "ExtractBlock no longer supported '%s'. Simply remove it." % pname)
 
 
+    if pname in ["UseGradientBackground", "UseTexturedBackground",
+            "UseSkyboxBackground"] and proxy.SMProxy.GetXMLGroup() == "views" \
+                    and proxy.SMProxy.GetProperty("BackgroundColorMode"):
+        if paraview.compatibility.GetVersion() <= 5.9:
+            mode = proxy.GetProperty("BackgroundColorMode").GetData()
+            if pname == "UseGradientBackground":
+                if value == 1 and mode != "Gradient":
+                    proxy.BackgroundColorMode = "Gradient"
+                elif value == 0 and mode == "Gradient":
+                    proxy.BackgroundColorMode = "Single Color"
+            elif pname == "UseTexturedBackground":
+                if value == 1 and mode != "Texture":
+                    proxy.BackgroundColorMode = "Texture"
+                elif value == 0 and mode == "Texture":
+                    proxy.BackgroundColorMode = "Single Color"
+            elif pname == "UseSkyboxBackground":
+                if value == 1 and mode != "Skybox":
+                    proxy.BackgroundColorMode = "Skybox"
+                elif value == 0 and mode == "Skybox":
+                    proxy.BackgroundColorMode = "Single Color"
+            raise Continue()
+        else:
+            raise NotSupportedException("'%s' is no longer supported. Use "
+            "'BackgroundColorMode' instead to choose background color mode." % pname)
+
 
     if not hasattr(proxy, pname):
         raise AttributeError()
@@ -732,6 +757,22 @@ def getattr(proxy, pname):
                 raise NotSupportedException(
                         "Since ParaView 5.10, 'MaintainStructure' on 'ExtractBlock' "
                         "is no longer supported. Simply remove it.")
+
+    if pname in ["UseGradientBackground", "UseTexturedBackground",
+            "UseSkyboxBackground"] and proxy.SMProxy.GetXMLGroup() == "views" \
+                    and proxy.SMProxy.GetProperty("BackgroundColorMode"):
+        if paraview.compatibility.GetVersion() <= 5.9:
+            mode = proxy.GetProperty("BackgroundColorMode").GetData()
+            if pname == "UseGradientBackground":
+                return 1 if mode == "Gradient" else 0
+            if pname == "UseTexturedBackground":
+                return 1 if mode == "Texture" else 0
+            if pname == "UseSkyboxBackground":
+                return 1 if mode == "Skybox" else 0
+        else:
+            raise NotSupportedException(
+                    "Since ParaView 5.10, '%s' is no longer supported. Use "
+                    "'BackgroundColorMode' instead." % pname)
     raise Continue()
 
 def GetProxy(module, key, **kwargs):
@@ -771,6 +812,11 @@ def GetProxy(module, key, **kwargs):
             ## This restores the previous backend.
             probeLine = builtins.getattr(module, "PlotOverLineLegacy")(**kwargs)
             return probeLine
+        if key in ["RenderView", "OrthographicSliceView", "ComparativeRenderView"]:
+            view = builtins.getattr(module, key)(**kwargs)
+            view.UseColorPaletteForBackground = 0
+            return view
+        print(key)
     return builtins.getattr(module, key)(**kwargs)
 
 def lookupTableUpdate(lutName):

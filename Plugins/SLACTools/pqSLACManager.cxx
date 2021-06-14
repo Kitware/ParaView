@@ -820,15 +820,18 @@ void pqSLACManager::toggleBackgroundBW()
   {
     color[0] = color[1] = color[2] = 1.0;
     helper.Set(color, 3);
+    vtkSMPropertyHelper(viewProxy, "UseColorPaletteForBackground").Set(0);
   }
   else if ((color[0] == 1.0) && (color[1] == 1.0) && (color[2] == 1.0))
   {
     smProperty->ResetToXMLDefaults();
+    vtkSMPropertyHelper(viewProxy, "UseColorPaletteForBackground").Set(1);
   }
   else
   {
     color[0] = color[1] = color[2] = 0.0;
     helper.Set(color, 3);
+    vtkSMPropertyHelper(viewProxy, "UseColorPaletteForBackground").Set(0);
   }
   viewProxy->UpdateVTKObjects();
   view->render();

@@ -1,6 +1,24 @@
 API Changes between ParaView versions
 =====================================
 
+
+Changes in 5.10
+---------------
+
+Render View Background Color
+---------------------------
+
+`UseGradientBackground`, `UseTexturedBackground` and `UseSkyboxBackground`
+properties have been replaced by `BackgroundColorMode` which is an
+enumeration which lets user choose how to render the background. Supported
+values are `"Single Color"`, `"Gradient"`, `"Texture"` and `"Skybox"`.
+
+Additionally, a new boolean property `UseColorPaletteForBackground` is now
+available. Unless this property is set to `0`, the view will ignore
+background color overrides specified on the view and instead use the global
+color palette.
+
+
 Changes in 5.7
 --------------
 

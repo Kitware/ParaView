@@ -42,6 +42,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMProxy.h"
 #include "vtkSMProxyDefinitionManager.h"
 #include "vtkSMSessionProxyManager.h"
+#include "vtkSMSettings.h"
 #include "vtkSMTrace.h"
 #include "vtkSmartPointer.h"
 
@@ -138,6 +139,10 @@ void pqLoadPaletteReaction::actionTriggered(QAction* actn)
     paletteProxy->UpdateVTKObjects();
     END_UNDO_SET();
 
+    // Also save to settings to ensure the palette loaded is preserved on
+    // restart.
+    vtkSMSettings* settings = vtkSMSettings::GetInstance();
+    settings->SetProxySettings(paletteProxy, nullptr);
     pqApplicationCore::instance()->render();
   }
   else

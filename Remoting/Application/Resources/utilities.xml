@@ -919,7 +919,7 @@
                             name="EdgeColor"
                             number_of_elements="3"></DoubleVectorProperty>
       <IntVectorProperty    default_values="0"
-                            name="UseGradientBackground"
+                            name="BackgroundColorMode"
                             number_of_elements="1"></IntVectorProperty>
     </Proxy>
 
@@ -944,7 +944,7 @@
                             name="EdgeColor"
                             number_of_elements="3"></DoubleVectorProperty>
       <IntVectorProperty    default_values="0"
-                            name="UseGradientBackground"
+                            name="BackgroundColorMode"
                             number_of_elements="1"></IntVectorProperty>
       <!-- End of (palettes, Print) -->
     </Proxy>
@@ -978,7 +978,7 @@
                             name="EdgeColor"
                             number_of_elements="3"></DoubleVectorProperty>
       <IntVectorProperty    default_values="0"
-                            name="UseGradientBackground"
+                            name="BackgroundColorMode"
                             number_of_elements="1"></IntVectorProperty>
     </Proxy>
 
@@ -1006,7 +1006,7 @@
                             name="EdgeColor"
                             number_of_elements="3"></DoubleVectorProperty>
       <IntVectorProperty    default_values="1"
-                            name="UseGradientBackground"
+                            name="BackgroundColorMode"
                             number_of_elements="1"></IntVectorProperty>
     </Proxy>
 

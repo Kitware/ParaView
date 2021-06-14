@@ -657,16 +657,40 @@ public:
 
   //*****************************************************************
   // Forward to 3D renderer.
-  vtkSetMacro(UseHiddenLineRemoval, bool) virtual void SetUseDepthPeeling(int val);
+  vtkSetMacro(UseHiddenLineRemoval, bool);
+  virtual void SetUseDepthPeeling(int val);
   virtual void SetUseDepthPeelingForVolumes(bool val);
   virtual void SetMaximumNumberOfPeels(int val);
-  virtual void SetBackground(double r, double g, double b);
-  virtual void SetBackground2(double r, double g, double b);
   virtual void SetBackgroundTexture(vtkTexture* val);
-  virtual void SetGradientBackground(int val);
-  virtual void SetTexturedBackground(int val);
-  virtual void SetSkyboxBackground(int val);
-  virtual void SetUseEnvironmentLighting(bool val);
+
+  //@{
+  /**
+   * When set, background color and mode will be obtained from
+   * vtkPVRenderViewSettings.
+   */
+  vtkSetMacro(UseRenderViewSettingsForBackground, bool);
+  vtkGetMacro(UseRenderViewSettingsForBackground, bool);
+  ///@}
+
+  enum BackgroundMode
+  {
+    DEFAULT,
+    GRADIENT,
+    IMAGE,
+    SKYBOX,
+  };
+
+  ///@{
+  /**
+   * API for background color selection.
+   */
+  vtkSetClampMacro(BackgroundColorMode, int, DEFAULT, SKYBOX);
+  vtkSetVector3Macro(Background, double);
+  vtkGetVector3Macro(Background, double);
+  vtkSetVector3Macro(Background2, double);
+  vtkGetVector3Macro(Background2, double);
+  vtkSetMacro(UseEnvironmentLighting, bool);
+  ///@}
 
   //*****************************************************************
   // Entry point for environmental backgrounds
@@ -1135,9 +1159,10 @@ protected:
   void PostSelect(vtkSelection* sel, const char* array = nullptr);
 
   /**
-   * Update skybox actor
+   * Updates background color. If no renderer is specified, then the default
+   * renderer returned by `GetRenderer` is used.
    */
-  void UpdateSkybox();
+  virtual void UpdateBackground(vtkRenderer* renderer = nullptr);
 
   /**
    * Configure texture based on scalar type
@@ -1158,7 +1183,6 @@ protected:
   vtkSelection* LastSelection;
   vtkSmartPointer<vtkPVGridAxes3DActor> GridAxes3DActor;
   vtkNew<vtkSkybox> Skybox;
-  bool NeedSkybox = false;
 
   int StillRenderImageReductionFactor;
   int InteractiveRenderImageReductionFactor;
@@ -1266,6 +1290,12 @@ private:
   int StereoType;
   int ServerStereoType;
   void UpdateStereoProperties();
+
+  int BackgroundColorMode;
+  bool UseEnvironmentLighting;
+  bool UseRenderViewSettingsForBackground;
+  double Background[3];
+  double Background2[3];
 
   vtkSmartPointer<vtkCuller> Culler;
   vtkNew<vtkTimerLog> Timer;

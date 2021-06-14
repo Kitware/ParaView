@@ -97,11 +97,7 @@ public:
   void SetCenterAxesVisibility(bool) override {}
 
   //*****************************************************************
-  void SetBackground(double r, double g, double b) override;
-  void SetBackground2(double r, double g, double b) override;
   void SetBackgroundTexture(vtkTexture* val) override;
-  void SetGradientBackground(int val) override;
-  void SetTexturedBackground(int val) override;
 
   /**
    * Overridden to scale the projection viewports appropriately.
@@ -124,6 +120,11 @@ protected:
    * Set the vtkPVGridAxes3DActor to use for the view.
    */
   void SetGridAxes3DActor(vtkPVGridAxes3DActor*) override;
+
+  /**
+   * Overridden to ensure all internal renderers are updated.
+   */
+  void UpdateBackground(vtkRenderer* renderer = nullptr) override;
 
   enum
   {

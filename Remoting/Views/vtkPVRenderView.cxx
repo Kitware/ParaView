@@ -65,6 +65,7 @@
 #include "vtkPVMaterialLibrary.h"
 #include "vtkPVOptions.h"
 #include "vtkPVRenderViewDataDeliveryManager.h"
+#include "vtkPVRenderViewSettings.h"
 #include "vtkPVServerInformation.h"
 #include "vtkPVSession.h"
 #include "vtkPVStreamingMacros.h"
@@ -395,6 +396,11 @@ vtkPVRenderView::vtkPVRenderView()
   this->ForceDataDistributionMode = -1;
   this->PreviousDiscreteCameraIndex = -1;
   this->SuppressRendering = false;
+  this->BackgroundColorMode = vtkPVRenderView::DEFAULT;
+  this->UseEnvironmentLighting = false;
+  this->UseRenderViewSettingsForBackground = true;
+  this->Background[0] = this->Background[1] = this->Background[2] = 0.0;
+  this->Background2[0] = this->Background2[1] = this->Background2[2] = 0.0;
 
   auto window = this->GetRenderWindow();
   assert(window);
@@ -504,6 +510,10 @@ vtkPVRenderView::vtkPVRenderView()
   this->SynchronizedRenderers = vtkPVSynchronizedRenderer::New();
   this->SynchronizedRenderers->Initialize(this->GetSession());
   this->SynchronizedRenderers->SetRenderer(this->RenderView->GetRenderer());
+
+  // Add skybox actor.
+  this->GetRenderer()->AddActor(this->Skybox);
+  this->Skybox->SetVisibility(0);
 }
 
 //----------------------------------------------------------------------------
@@ -1464,6 +1474,9 @@ void vtkPVRenderView::Render(bool interactive, bool skip_rendering)
     (interactive ? "true" : "false"), (skip_rendering ? "true" : "false"));
 
   this->UpdateStereoProperties();
+
+  // Update background.
+  this->UpdateBackground();
 
   if ((!interactive && this->UseDistributedRenderingForRender) ||
     (interactive && this->UseDistributedRenderingForLODRender))
@@ -2570,51 +2583,59 @@ void vtkPVRenderView::SetMaximumNumberOfPeels(int val)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVRenderView::SetBackground(double r, double g, double b)
+void vtkPVRenderView::UpdateBackground(vtkRenderer* renderer /*=nullptr*/)
 {
-  this->GetRenderer()->SetBackground(r, g, b);
-}
-//----------------------------------------------------------------------------
-void vtkPVRenderView::SetBackground2(double r, double g, double b)
-{
-  this->GetRenderer()->SetBackground2(r, g, b);
-}
+  renderer = renderer ? renderer : this->GetRenderer();
 
-//----------------------------------------------------------------------------
-void vtkPVRenderView::SetBackgroundTexture(vtkTexture* texture)
-{
-  this->GetRenderer()->SetBackgroundTexture(texture);
-  this->UpdateSkybox();
-}
+  double color[3], color2[3];
+  int mode = this->BackgroundColorMode;
+  this->GetBackground(color);
+  this->GetBackground2(color2);
 
-//----------------------------------------------------------------------------
-void vtkPVRenderView::SetGradientBackground(int val)
-{
-  this->GetRenderer()->SetGradientBackground(val ? true : false);
-}
+  if (this->UseRenderViewSettingsForBackground)
+  {
+    auto settings = vtkPVRenderViewSettings::GetInstance();
+    mode = settings->GetBackgroundColorMode();
+    settings->GetBackgroundColor(color);
+    settings->GetBackground2Color(color2);
+  }
 
-//----------------------------------------------------------------------------
-void vtkPVRenderView::SetTexturedBackground(int val)
-{
-  this->GetRenderer()->SetTexturedBackground(val ? true : false);
-}
+  switch (mode)
+  {
+    case DEFAULT:
+      renderer->SetTexturedBackground(false);
+      renderer->SetGradientBackground(false);
+      renderer->SetUseImageBasedLighting(false);
+      break;
 
-//----------------------------------------------------------------------------
-void vtkPVRenderView::SetSkyboxBackground(int val)
-{
-  this->NeedSkybox = val != 0;
-  this->UpdateSkybox();
-}
+    case GRADIENT:
+      renderer->SetTexturedBackground(false);
+      renderer->SetGradientBackground(true);
+      renderer->SetUseImageBasedLighting(false);
+      break;
 
-//----------------------------------------------------------------------------
-void vtkPVRenderView::UpdateSkybox()
-{
-  // remove existing skybox
-  this->GetRenderer()->RemoveActor(this->Skybox);
+    case IMAGE:
+      renderer->SetTexturedBackground(true);
+      renderer->SetGradientBackground(false);
+      renderer->SetUseImageBasedLighting(this->UseEnvironmentLighting);
+      break;
 
-  vtkTexture* texture = this->GetRenderer()->GetBackgroundTexture();
+    case SKYBOX:
+      renderer->SetTexturedBackground(false);
+      renderer->SetGradientBackground(false);
+      renderer->SetUseImageBasedLighting(this->UseEnvironmentLighting);
+      break;
 
-  if (this->NeedSkybox && texture != nullptr)
+    default:
+      break;
+  }
+
+  renderer->SetBackground(color);
+  renderer->SetBackground2(color2);
+
+  // update skybox texture.
+  vtkTexture* texture = renderer->GetBackgroundTexture();
+  if (this->BackgroundColorMode == vtkPVRenderView::SKYBOX && texture != nullptr)
   {
     this->ConfigureTexture(texture);
 
@@ -2622,15 +2643,20 @@ void vtkPVRenderView::UpdateSkybox()
     this->Skybox->SetProjection(vtkSkybox::Sphere);
     this->Skybox->SetFloorRight(0.0, 0.0, 1.0);
     this->Skybox->SetTexture(texture);
-
-    this->GetRenderer()->AddActor(this->Skybox);
-
-    this->GetRenderer()->SetEnvironmentTexture(texture);
+    this->Skybox->SetVisibility(1);
+    renderer->SetEnvironmentTexture(texture);
   }
   else
   {
-    this->GetRenderer()->SetEnvironmentTexture(nullptr);
+    this->Skybox->SetVisibility(0);
+    renderer->SetEnvironmentTexture(nullptr);
   }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVRenderView::SetBackgroundTexture(vtkTexture* texture)
+{
+  this->GetRenderer()->SetBackgroundTexture(texture);
 }
 
 //----------------------------------------------------------------------------
@@ -2650,12 +2676,6 @@ void vtkPVRenderView::ConfigureTexture(vtkTexture* texture)
       texture->InterpolateOn();
     }
   }
-}
-
-//----------------------------------------------------------------------------
-void vtkPVRenderView::SetUseEnvironmentLighting(bool val)
-{
-  this->GetRenderer()->SetUseImageBasedLighting(val);
 }
 
 //----------------------------------------------------------------------------

@@ -1,3 +1,7 @@
+import paraview
+paraview.compatibility.major = 5
+paraview.compatibility.minor = 9
+
 from paraview import simple
 from paraview import smtesting
 
