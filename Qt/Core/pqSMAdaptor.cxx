@@ -68,12 +68,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMProxyGroupDomain.h"
 #include "vtkSMProxyListDomain.h"
 #include "vtkSMProxyProperty.h"
-#include "vtkSMSILDomain.h"
 #include "vtkSMSessionProxyManager.h"
 #include "vtkSMSourceProxy.h"
 #include "vtkSMStringListDomain.h"
 #include "vtkSMStringVectorProperty.h"
-#include "vtkSMSubsetInclusionLatticeDomain.h"
 #include "vtkSMUncheckedPropertyHelper.h"
 #include "vtkSMVectorProperty.h"
 
@@ -149,21 +147,11 @@ pqSMAdaptor::PropertyType pqSMAdaptor::getPropertyType(vtkSMProperty* Property)
     vtkSMFileListDomain* fileListDomain = nullptr;
     vtkSMStringListDomain* stringListDomain = nullptr;
     vtkSMCompositeTreeDomain* compositeTreeDomain = nullptr;
-    vtkSMSILDomain* silDomain = nullptr;
-    vtkSMSubsetInclusionLatticeDomain* silDomain2 = nullptr;
     vtkSMChartSeriesSelectionDomain* chartSeriesSelectionDomain = nullptr;
 
     vtkSMDomainIterator* iter = Property->NewDomainIterator();
     for (iter->Begin(); !iter->IsAtEnd(); iter->Next())
     {
-      if (!silDomain)
-      {
-        silDomain = vtkSMSILDomain::SafeDownCast(iter->GetDomain());
-      }
-      if (!silDomain2)
-      {
-        silDomain2 = vtkSMSubsetInclusionLatticeDomain::SafeDownCast(iter->GetDomain());
-      }
       if (!booleanDomain)
       {
         booleanDomain = vtkSMBooleanDomain::SafeDownCast(iter->GetDomain());
@@ -204,16 +192,12 @@ pqSMAdaptor::PropertyType pqSMAdaptor::getPropertyType(vtkSMProperty* Property)
     {
       type = pqSMAdaptor::COMPOSITE_TREE;
     }
-    else if (silDomain || silDomain2)
-    {
-      type = pqSMAdaptor::SIL;
-    }
     else if (chartSeriesSelectionDomain)
     {
       type = pqSMAdaptor::MULTIPLE_ELEMENTS;
     }
-    else if (!silDomain && ((VectorProperty && VectorProperty->GetRepeatable() &&
-                             (stringListDomain || enumerationDomain))))
+    else if (VectorProperty && VectorProperty->GetRepeatable() &&
+      (stringListDomain || enumerationDomain))
     {
       type = pqSMAdaptor::SELECTION;
     }

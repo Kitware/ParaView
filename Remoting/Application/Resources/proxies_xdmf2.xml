@@ -72,31 +72,22 @@
         <Documentation>Select the sets to be loaded from the dataset, if
         any.</Documentation>
       </StringVectorProperty>
-      <StringVectorProperty command="GetSIL"
-                            information_only="1"
-                            name="GridInfo"
-                            si_class="vtkSISILProperty"
-                            subtree="Blocks" />
-      <IdTypeVectorProperty command="GetSILUpdateStamp"
-                            default_values="0"
-                            information_only="1"
-                            name="SILTimeStamp"
-                            number_of_elements="1" />
+      <StringVectorProperty information_only="1"
+                            name="GridInfo">
+        <ArraySelectionInformationHelper attribute_name="Grid" />
+      </StringVectorProperty>
       <StringVectorProperty command="SetGridStatus"
                             element_types="2 0"
                             label="Grids"
+                            information_property="GridInfo"
                             name="GridStatus"
                             number_of_elements_per_command="2"
                             repeat_command="1">
-        <SILDomain name="array_list"
-                   subtree="Blocks">
+        <ArraySelectionDomain name="array_list">
           <RequiredProperties>
-            <Property function="ArrayList"
-                      name="GridInfo" />
-            <Property function="TimeStamp"
-                      name="SILTimeStamp" />
+            <Property function="ArrayList" name="GridInfo" />
           </RequiredProperties>
-        </SILDomain>
+        </ArraySelectionDomain>
         <Documentation>Controls which particular data sets to read from a file
         that contains many data sets inside a composite data set
         collection.</Documentation>
@@ -146,7 +137,6 @@
           <Property name="GridInfo" />
           <Property name="GridStatus" />
           <Property name="Stride" />
-          <Property name="SILTimeStamp" />
         </ExposedProperties>
       </SubProxy>
       <StringVectorProperty command="GetCurrentFileName"

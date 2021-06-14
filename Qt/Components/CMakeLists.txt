@@ -125,7 +125,6 @@ set(classes
   pqProxyEditorPropertyWidget
   pqProxyInformationWidget
   pqProxyPropertyWidget
-  pqProxySILModel
   pqProxySelectionWidget
   pqProxyWidget
   pqProxyWidgetDialog
@@ -133,8 +132,6 @@ set(classes
   pqRemoteCommandDialog
   pqRemoteCommandTemplateDialog
   pqRescaleRange
-  pqSILModel
-  pqSILWidget
   pqSingleLogViewerWidget
   pqSMSignalAdaptors
   pqScalarSetModel
@@ -156,8 +153,6 @@ set(classes
   pqSignalAdaptorSelectionTreeWidget
   pqSignalAdaptorTreeWidget
   pqStringVectorPropertyWidget
-  pqSubsetInclusionLatticeTreeModel
-  pqSubsetInclusionLatticeWidget
   pqTabbedMultiViewWidget
   pqTextureComboBox
   pqTextureSelectorPropertyWidget

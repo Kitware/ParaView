@@ -16,7 +16,10 @@
 
 #include "vtkDataAssembly.h"
 #include "vtkObjectFactory.h"
+#include "vtkPVDataAssemblyInformation.h"
 #include "vtkPVDataInformation.h"
+#include "vtkSMProperty.h"
+#include "vtkSMProxy.h"
 #include "vtkSMUncheckedPropertyHelper.h"
 
 vtkStandardNewMacro(vtkSMDataAssemblyDomain);
@@ -29,28 +32,37 @@ vtkSMDataAssemblyDomain::~vtkSMDataAssemblyDomain() = default;
 //----------------------------------------------------------------------------
 void vtkSMDataAssemblyDomain::Update(vtkSMProperty*)
 {
-  auto dinfo = this->GetInputDataInformation("Input");
-  if (!dinfo)
+  if (auto tagProperty = this->GetRequiredProperty("Tag"))
   {
-    this->ChooseAssembly({}, nullptr);
+    // we're in "reader" mode.
+    this->FetchAssembly(vtkSMPropertyHelper(tagProperty).GetAsInt());
   }
   else
   {
-    auto activeAssembly = this->GetRequiredProperty("ActiveAssembly");
-    if (!activeAssembly)
+    // we're in "filter" mode.
+    auto dinfo = this->GetInputDataInformation("Input");
+    if (!dinfo)
     {
-      this->ChooseAssembly("Hierarchy", dinfo->GetHierarchy());
+      this->ChooseAssembly({}, nullptr);
     }
     else
     {
-      const std::string name{ vtkSMUncheckedPropertyHelper(activeAssembly).GetAsString(0) };
-      if (name == "Hierarchy")
+      auto activeAssembly = this->GetRequiredProperty("ActiveAssembly");
+      if (!activeAssembly)
       {
-        this->ChooseAssembly(name, dinfo->GetHierarchy());
+        this->ChooseAssembly("Hierarchy", dinfo->GetHierarchy());
       }
-      else if (name == "Assembly")
+      else
       {
-        this->ChooseAssembly(name, dinfo->GetDataAssembly());
+        const std::string name{ vtkSMUncheckedPropertyHelper(activeAssembly).GetAsString(0) };
+        if (name == "Hierarchy")
+        {
+          this->ChooseAssembly(name, dinfo->GetHierarchy());
+        }
+        else if (name == "Assembly")
+        {
+          this->ChooseAssembly(name, dinfo->GetDataAssembly());
+        }
       }
     }
   }
@@ -71,6 +83,25 @@ void vtkSMDataAssemblyDomain::ChooseAssembly(const std::string& name, vtkDataAss
     this->Name = name;
     this->Assembly = assembly;
     this->DomainModified();
+  }
+}
+
+//----------------------------------------------------------------------------
+void vtkSMDataAssemblyDomain::FetchAssembly(int tag)
+{
+  if (tag == 0)
+  {
+    this->LastTag = 0;
+    this->ChooseAssembly({}, nullptr);
+  }
+  else if (tag != this->LastTag)
+  {
+    this->LastTag = tag;
+
+    vtkNew<vtkPVDataAssemblyInformation> info;
+    info->SetMethodName("GetAssembly"); // todo: make this configurable.
+    this->GetProperty()->GetParent()->GatherInformation(info);
+    this->ChooseAssembly("Assembly", info->GetDataAssembly());
   }
 }
 

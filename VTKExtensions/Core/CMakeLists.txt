@@ -47,7 +47,6 @@ set(classes
   vtkPVXMLElement
   vtkPVXMLParser
   vtkStringList
-  vtkSubsetInclusionLattice
   vtkUndoElement
   vtkUndoSet
   vtkUndoStack)
