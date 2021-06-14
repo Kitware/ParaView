@@ -125,13 +125,6 @@ struct ValuePassStateT
   bool AnnotationVisibility;
   bool CenterAxesVisibility;
 };
-
-struct BackgroundColorStateT
-{
-  vtkTuple<double, 3> ColorLower;
-  vtkTuple<double, 3> ColorUpper;
-  vtkPVRenderView::BackgroundMode Mode;
-};
 }
 
 class vtkPVRenderView::vtkInternals
@@ -142,9 +135,6 @@ public:
 #if VTK_MODULE_ENABLE_VTK_RenderingRayTracing
   vtkSmartPointer<vtkOSPRayPass> OSPRayPass = nullptr;
 #endif
-
-  BackgroundColorStateT BackgroundColorState;
-  BackgroundColorStateT PaletteColorState;
 
   vtkSmartPointer<vtkImageProcessingPass> SavedImageProcessingPass;
   vtkNew<vtkToneMappingPass> ToneMappingPass;
@@ -409,6 +399,8 @@ vtkPVRenderView::vtkPVRenderView()
   this->BackgroundColorMode = vtkPVRenderView::DEFAULT;
   this->UseEnvironmentLighting = false;
   this->UseRenderViewSettingsForBackground = true;
+  this->Background[0] = this->Background[1] = this->Background[2] = 0.0;
+  this->Background2[0] = this->Background2[1] = this->Background2[2] = 0.0;
 
   auto window = this->GetRenderWindow();
   assert(window);
@@ -2651,9 +2643,6 @@ void vtkPVRenderView::UpdateBackground(vtkRenderer* renderer /*=nullptr*/)
     this->Skybox->SetProjection(vtkSkybox::Sphere);
     this->Skybox->SetFloorRight(0.0, 0.0, 1.0);
     this->Skybox->SetTexture(texture);
-    /**
-     * Choose how the background color is specified.
-     */
     this->Skybox->SetVisibility(1);
     renderer->SetEnvironmentTexture(texture);
   }
