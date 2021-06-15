@@ -8,6 +8,14 @@ endif ()
 
 _vtk_module_write_import_prefix("${paraview_cmake_build_dir}/paraview-prefix.cmake" "${paraview_cmake_destination}")
 
+set(paraview_has_catalyst 0)
+set(paraview_catalyst_directory "")
+if (TARGET ParaView::catalyst-paraview)
+  set(paraview_has_catalyst 1)
+  get_property(paraview_catalyst_directory GLOBAL
+    PROPERTY paraview_catalyst_directory)
+endif ()
+
 configure_file(
   "${paraview_cmake_dir}/paraview-config.cmake.in"
   "${paraview_cmake_build_dir}/paraview-config.cmake"

@@ -26,6 +26,8 @@ else ()
     "${catalyst_rel_rpath}")
 endif ()
 
+set_property(GLOBAL PROPERTY paraview_catalyst_directory "${catalyst_library_destination}")
+
 catalyst_implementation(
   NAME    paraview
   TARGET  catalyst-paraview
@@ -35,6 +37,7 @@ catalyst_implementation(
     ParaViewCatalyst.cxx
     vtkCatalystBlueprint.cxx
     vtkCatalystBlueprint.h)
+add_library(ParaView::catalyst-paraview ALIAS catalyst-paraview)
 
 target_link_libraries(catalyst-paraview
   PRIVATE
