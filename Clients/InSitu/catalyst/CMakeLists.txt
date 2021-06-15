@@ -5,9 +5,32 @@ if (NOT BUILD_SHARED_LIBS)
   set(BUILD_SHARED_LIBS ON)
 endif ()
 
+if (WIN32)
+  set(catalyst_library_destination
+    "${_vtk_build_RUNTIME_DESTINATION}")
+else ()
+  set(catalyst_library_destination
+    "${_vtk_build_LIBRARY_DESTINATION}/catalyst")
+  file(RELATIVE_PATH _catalyst_impl_relpath
+    "/prefix/${catalyst_library_destination}"
+    "/prefix/${_vtk_build_LIBRARY_DESTINATION}")
+  if (APPLE)
+    set(catalyst_rel_rpath
+      "@loader_path/${_catalyst_impl_relpath}")
+  else ()
+    set(catalyst_rel_rpath
+      "$ORIGIN/${_catalyst_impl_relpath}")
+  endif ()
+
+  list(APPEND CMAKE_INSTALL_RPATH
+    "${catalyst_rel_rpath}")
+endif ()
+
 catalyst_implementation(
   NAME    paraview
   TARGET  catalyst-paraview
+  LIBRARY_DESTINATION
+    "${catalyst_library_destination}"
   SOURCES
     ParaViewCatalyst.cxx
     vtkCatalystBlueprint.cxx
