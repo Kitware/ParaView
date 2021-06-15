@@ -19,8 +19,15 @@ void do_catalyst_initialization(int argc, char* argv[])
     snprintf(buf, 256, "catalyst/scripts/script%d", (cc - 1));
     conduit_node_set_path_char8_str(catalyst_init_params, buf, argv[cc]);
   }
-  catalyst_initialize(catalyst_init_params);
+  conduit_node_set_path_char8_str(catalyst_init_params, "catalyst_load/implementation", "paraview");
+  conduit_node_set_path_char8_str(
+    catalyst_init_params, "catalyst_load/search_paths/paraview", PARAVIEW_IMPL_DIR);
+  enum catalyst_error err = catalyst_initialize(catalyst_init_params);
   conduit_node_destroy(catalyst_init_params);
+  if (err != catalyst_error_ok)
+  {
+    printf("Failed to initialize Catalyst: %d\n", err);
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -107,7 +114,11 @@ void do_catalyt_execute(int cycle, double time, Grid* grid, Attributes* attribs)
   conduit_node_destroy(info);
 #endif
 
-  catalyst_execute(catalyst_exec_params);
+  enum catalyst_error err = catalyst_execute(catalyst_exec_params);
+  if (err != catalyst_error_ok)
+  {
+    printf("Failed to execute Catalyst: %d\n", err);
+  }
   conduit_node_destroy(catalyst_exec_params);
   conduit_node_destroy(mesh);
 }
@@ -120,7 +131,11 @@ void do_catalyt_execute(int cycle, double time, Grid* grid, Attributes* attribs)
 void do_catalyt_finalization()
 {
   conduit_node* catalyst_fini_params = conduit_node_create();
-  catalyst_finalize(catalyst_fini_params);
+  enum catalyst_error err = catalyst_finalize(catalyst_fini_params);
+  if (err != catalyst_error_ok)
+  {
+    printf("Failed to execute Catalyst: %d\n", err);
+  }
   conduit_node_destroy(catalyst_fini_params);
 }
 

@@ -39,6 +39,7 @@ if (USE_CATALYST)
     PATHS "${ParaView_DIR}/catalyst")
   target_compile_definitions(CxxPolyhedraV2
     PRIVATE
+      "PARAVIEW_IMPL_DIR=\"${ParaView_CATALYST_DIR}\""
       USE_CATALYST=1)
   target_link_libraries(CxxPolyhedraV2
     PRIVATE

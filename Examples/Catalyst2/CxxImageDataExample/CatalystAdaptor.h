@@ -4,6 +4,7 @@
 #include "FEDataStructures.h"
 #include <catalyst.hpp>
 #include <cstring>
+#include <iostream>
 #include <string>
 
 namespace CatalystAdaptor
@@ -43,7 +44,11 @@ void Initialize(int argc, char* argv[])
       node[name + "/args"].append().set_string("--argument3");
     }
   }
-  catalyst_initialize(conduit_cpp::c_node(&node));
+  catalyst_error err = catalyst_initialize(conduit_cpp::c_node(&node));
+  if (err != catalyst_error_ok)
+  {
+    std::cerr << "Failed to initialize Catalyst: " << err << std::endl;
+  }
 }
 
 void Execute(int cycle, double time, Grid& grid, Attributes& attribs)
@@ -118,13 +123,21 @@ void Execute(int cycle, double time, Grid& grid, Attributes& attribs)
   fields["pressure/volume_dependent"].set("false");
   fields["pressure/values"].set_external(attribs.GetPressureArray(), grid.GetNumberOfLocalCells());
 
-  catalyst_execute(conduit_cpp::c_node(&exec_params));
+  catalyst_error err = catalyst_execute(conduit_cpp::c_node(&exec_params));
+  if (err != catalyst_error_ok)
+  {
+    std::cerr << "Failed to execute Catalyst: " << err << std::endl;
+  }
 }
 
 void Finalize()
 {
   conduit_cpp::Node node;
-  catalyst_finalize(conduit_cpp::c_node(&node));
+  catalyst_error err = catalyst_finalize(conduit_cpp::c_node(&node));
+  if (err != catalyst_error_ok)
+  {
+    std::cerr << "Failed to finalize Catalyst: " << err << std::endl;
+  }
 }
 }
 

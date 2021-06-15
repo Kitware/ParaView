@@ -4,6 +4,7 @@
 #include "FEDataStructures.h"
 #include <catalyst.hpp>
 
+#include <iostream>
 #include <numeric>
 #include <string>
 #include <vector>
@@ -26,7 +27,13 @@ void Initialize(int argc, char* argv[])
   {
     node["catalyst/scripts/script" + std::to_string(cc - 1)].set_string(argv[cc]);
   }
-  catalyst_initialize(conduit_cpp::c_node(&node));
+  node["catalyst_load/implementation"] = "paraview";
+  node["catalyst_load/search_paths/paraview"] = PARAVIEW_IMPL_DIR;
+  catalyst_error err = catalyst_initialize(conduit_cpp::c_node(&node));
+  if (err != catalyst_error_ok)
+  {
+    std::cerr << "Failed to initialize Catalyst: " << err << std::endl;
+  }
 }
 
 void Execute(int cycle, double time, Grid& grid, Attributes& attribs, Particles& particles)
@@ -119,13 +126,21 @@ void Execute(int cycle, double time, Grid& grid, Attributes& attribs, Particles&
   mesh_particles["topologies/mesh/elements/connectivity"].set_external(
     &connectivity[0], particles.GetNumberOfPoints());
 
-  catalyst_execute(conduit_cpp::c_node(&exec_params));
+  catalyst_error err = catalyst_execute(conduit_cpp::c_node(&exec_params));
+  if (err != catalyst_error_ok)
+  {
+    std::cerr << "Failed to execute Catalyst: " << err << std::endl;
+  }
 }
 
 void Finalize()
 {
   conduit_cpp::Node node;
-  catalyst_finalize(conduit_cpp::c_node(&node));
+  catalyst_error err = catalyst_finalize(conduit_cpp::c_node(&node));
+  if (err != catalyst_error_ok)
+  {
+    std::cerr << "Failed to finalize Catalyst: " << err << std::endl;
+  }
 }
 }
 
