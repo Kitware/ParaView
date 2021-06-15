@@ -33,6 +33,8 @@
 #include "vtkMPI.h"
 #endif
 
+#include "catalyst_impl_paraview.h"
+
 static bool update_producer_mesh_blueprint(
   const std::string& channel_name, const conduit::Node* node, const conduit::Node* global_fields)
 {
@@ -84,8 +86,14 @@ static bool process_script_args(vtkInSituPipelinePython* pipeline, const conduit
   return true;
 }
 
+enum paraview_catalyst_error
+{
+  paraview_catalyst_error_invalid_node = 100,
+};
+#define pvcatalyst_err(name) static_cast<enum catalyst_error>(paraview_catalyst_error_##name)
+
 //-----------------------------------------------------------------------------
-void catalyst_initialize(const conduit_node* params)
+enum catalyst_error catalyst_initialize_paraview(const conduit_node* params)
 {
   vtkLogger::Init();
   vtkVLogScopeFunction(PARAVIEW_LOG_CATALYST_VERBOSITY());
@@ -101,7 +109,7 @@ void catalyst_initialize(const conduit_node* params)
   {
     vtkLogF(
       ERROR, "invalid 'catalyst' node passed to 'catalyst_initialize'. Initialization failed.");
-    return;
+    return pvcatalyst_err(invalid_node);
   }
 
 #if VTK_MODULE_ENABLE_VTK_ParallelMPI
@@ -167,10 +175,12 @@ void catalyst_initialize(const conduit_node* params)
                                                 "pipelines specified. No analysis pipelines will "
                                                 "be executed.");
   }
+
+  return catalyst_error_ok;
 }
 
 //-----------------------------------------------------------------------------
-void catalyst_execute(const conduit_node* params)
+enum catalyst_error catalyst_execute_paraview(const conduit_node* params)
 {
   vtkVLogScopeFunction(PARAVIEW_LOG_CATALYST_VERBOSITY());
 
@@ -178,14 +188,14 @@ void catalyst_execute(const conduit_node* params)
   if (!cpp_params.has_path("catalyst"))
   {
     vtkVLogF(PARAVIEW_LOG_CATALYST_VERBOSITY(), "Path 'catalyst' is not provided. Skipping.");
-    return;
+    return pvcatalyst_err(invalid_node);
   }
 
   const auto& root = cpp_params["catalyst"];
   if (!vtkCatalystBlueprint::Verify("execute", root))
   {
     vtkLogF(ERROR, "invalid 'catalyst' node passed to 'catalyst_execute'. Execution failed.");
-    return;
+    return pvcatalyst_err(invalid_node);
   }
 
   // catalyst/timestep or catalyst/cycle is used to indicate the timestep
@@ -257,10 +267,12 @@ void catalyst_execute(const conduit_node* params)
     }
   }
   vtkInSituInitializationHelper::ExecutePipelines(timestep, time, parameters);
+
+  return catalyst_error_ok;
 }
 
 //-----------------------------------------------------------------------------
-void catalyst_finalize(const conduit_node* params)
+enum catalyst_error catalyst_finalize_paraview(const conduit_node* params)
 {
   vtkVLogScopeFunction(PARAVIEW_LOG_CATALYST_VERBOSITY());
 
@@ -272,10 +284,12 @@ void catalyst_finalize(const conduit_node* params)
   }
 
   vtkInSituInitializationHelper::Finalize();
+
+  return catalyst_error_ok;
 }
 
 //-----------------------------------------------------------------------------
-void catalyst_about(conduit_node* params)
+enum catalyst_error catalyst_about_paraview(conduit_node* params)
 {
   catalyst_stub_about(params);
   auto& cpp_params = (*conduit::cpp_node(params));
@@ -285,4 +299,6 @@ void catalyst_about(conduit_node* params)
     cpp_params["catalyst"]["capabilities"].append().set("python");
   }
   cpp_params["catalyst"]["implementation"] = "ParaView Catalyst";
+
+  return catalyst_error_ok;
 }
