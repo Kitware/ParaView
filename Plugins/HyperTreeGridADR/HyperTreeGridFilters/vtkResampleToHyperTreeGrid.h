@@ -441,7 +441,7 @@ protected:
    * resolution grids
    * matching the subdivision scheme of the output hyper tree grid.
    */
-  void CreateGridOfMultiResolutionGrids(vtkDataSet* dataSet, int fieldAssociation);
+  void CreateGridOfMultiResolutionGrids(std::vector<vtkDataSet*>& dataSet, int fieldAssociation);
 
   //@{
   /**
@@ -529,15 +529,6 @@ protected:
   GridOfMultiResGridsType GridOfMultiResolutionGrids;
   //@}
 
-  //@{
-  /**
-   * Buffer to store the pointers of the correct accumulator when measuring.
-   * We only use them if this->ArrayMeasurementDisplay != nullptr
-   */
-  std::vector<vtkAbstractAccumulator*> ArrayMeasurementAccumulators;
-  std::vector<vtkAbstractAccumulator*> ArrayMeasurementDisplayAccumulators;
-  //@}
-
   /**
    * Method which will forbid subdividing cells if they have an empty children intersecting
    * a cell of the input.
@@ -571,7 +562,8 @@ protected:
    * Method retristributing points and cells of the input so hyper trees are not split
    * between processes.
    */
-  vtkSmartPointer<vtkDataSet> BroadcastHyperTreeOwnership(vtkDataSet* ds, vtkIdType processId);
+  vtkSmartPointer<vtkDataObject> BroadcastHyperTreeOwnership(
+    vtkDataObject* input, vtkIdType processId);
 
   /**
    * Cache used to handle SetMaxState(bool) and SetMinState(bool)
@@ -588,7 +580,7 @@ protected:
    * Collection of input point data arrays to resample, deducted from
    * InputDataArrayNames.
    */
-  std::vector<vtkDataArray*> InputPointDataArrays;
+  std::vector<std::vector<vtkDataArray*> > InputPointDataArrays;
 
   /**
    * Collection of input scalar field names to resample.
