@@ -61,5 +61,11 @@ if (TARGET VTK::WrappingPythonCore AND VTK_PYTHON_OPTIONAL_LINK)
       Python3::Python)
 endif()
 
+# Clear the `-pvVERSION` suffix (if any).
+set(_vtk_build_LIBRARY_NAME_SUFFIX "")
+# Clear version information.
+set(_vtk_build_VERSION "")
+set(_vtk_build_SOVERSION "")
+
 _vtk_module_install(catalyst-paraview)
 _vtk_module_apply_properties(catalyst-paraview)
