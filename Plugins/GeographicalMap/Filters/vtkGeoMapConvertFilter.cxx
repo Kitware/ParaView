@@ -78,11 +78,11 @@ int vtkGeoMapConvertFilter::RequestData(
   vtkNew<vtkGeoProjection> sourceProj;
   if (this->SourceProjection == Custom)
   {
-    sourceProj->SetPROJ4String(this->CustomDestProjection.c_str());
+    sourceProj->SetPROJ4String(this->CustomSourceProjection.c_str());
   }
   else if (this->SourceProjection != LatLong)
   {
-    sourceProj->SetPROJ4String(vtkGeoMapConvertFilter::PROJ4Strings[this->DestProjection]);
+    sourceProj->SetPROJ4String(vtkGeoMapConvertFilter::PROJ4Strings[this->SourceProjection]);
   }
 
   vtkNew<vtkGeoTransform> transform;
