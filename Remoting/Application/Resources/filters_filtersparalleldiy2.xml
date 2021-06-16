@@ -101,6 +101,7 @@
         </ProxyGroupDomain>
         <DataTypeDomain name="input_type">
           <DataType value="vtkCompositeDataSet" />
+          <DataType value="vtkDataSet" />
         </DataTypeDomain>
         <Documentation>This property specifies the input.</Documentation>
       </InputProperty>
