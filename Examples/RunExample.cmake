@@ -33,6 +33,7 @@ execute_process(
     --test-command
       "${ctest}"
         -C ${config}
+        --output-on-failure
   RESULT_VARIABLE res)
 
 if (res)

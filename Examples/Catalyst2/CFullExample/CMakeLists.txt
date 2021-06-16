@@ -1,5 +1,6 @@
 cmake_minimum_required(VERSION 3.13)
-project(CFullExampleV2 LANGUAGES C)
+# The CXX language is required in order to link statically.
+project(CFullExampleV2 LANGUAGES C CXX)
 
 include (GNUInstallDirs)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_BINDIR}")
@@ -29,6 +30,7 @@ if (USE_CATALYST)
     PATHS "${ParaView_DIR}/catalyst")
   target_compile_definitions(CFullExampleV2
     PRIVATE
+      "PARAVIEW_IMPL_DIR=\"${ParaView_CATALYST_DIR}\""
       USE_CATALYST=1)
   target_link_libraries(CFullExampleV2
     PRIVATE

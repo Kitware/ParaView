@@ -25,8 +25,6 @@ vtk_module_add_module(ParaView::vtkcatalyst
   HEADER_ONLY)
 vtk_module_link(ParaView::vtkcatalyst
   INTERFACE
-    catalyst::core
-    catalyst::conduit
-    catalyst::blueprint)
+    catalyst::catalyst)
 
 set(_catalyst_macros_path "${CMAKE_CURRENT_SOURCE_DIR}/catalyst/cmake" CACHE INTERNAL "")

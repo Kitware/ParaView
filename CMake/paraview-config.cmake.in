@@ -21,6 +21,8 @@ The following variables are provided by this module:
     `OPTIONAL_COMPONENTS`. This may be used in `MODULES` arguments in the API
     (e.g., `vtk_module_autoinit`). All modules are also targets and may be
     linked to using `target_link_libraries`.
+  * `ParaView_CATALYST_DIR`: The directory to the ParaView Catalyst
+    implementation (if present).
 #]==]
 
 set(${CMAKE_FIND_PACKAGE_NAME}_CMAKE_MODULE_PATH_save "${CMAKE_MODULE_PATH}")
@@ -96,6 +98,11 @@ include("${CMAKE_CURRENT_LIST_DIR}/ParaViewPlugin.cmake")
 include("${CMAKE_CURRENT_LIST_DIR}/ParaViewServerManager.cmake")
 include("${CMAKE_CURRENT_LIST_DIR}/ParaViewTesting.cmake")
 include("${CMAKE_CURRENT_LIST_DIR}/vtkModuleWrapClientServer.cmake")
+
+if (@paraview_has_catalyst@) # paraview_has_catalyst
+  set("${CMAKE_FIND_PACKAGE_NAME}_CATALYST_DIR"
+    "${${CMAKE_FIND_PACKAGE_NAME}_PREFIX_PATH}/@paraview_catalyst_directory@")
+endif ()
 
 if (@PARAVIEW_USE_PYTHON@) # PARAVIEW_USE_PYTHON
   include("${CMAKE_CURRENT_LIST_DIR}/paraview.modules-vtk-python-module-properties.cmake")
