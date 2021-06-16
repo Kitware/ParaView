@@ -5,7 +5,11 @@ This file is used by CMake when finding ParaView.
 
 The following variables are provided by this module:
 
-  * `ParaView_VERSION`: The version of ParaView found.
+  * `ParaView_VERSION`: The full version of ParaView found.
+  * `ParaView_VERSION_SIMPLE`: The simple version of ParaView found (eg: 5.9.1).
+  * `ParaView_VERSION_MAJOR`: The major version of ParaView found.
+  * `ParaView_VERSION_MINOR`: The minor version of ParaView found.
+  * `ParaView_VERSION_PATCH`: The patch version of ParaView found.
   * `ParaView_PREFIX_PATH`: Install prefix for ParaView.
   * `PARAVIEW_USE_QT`: If ParaView's Qt GUI is available.
   * `PARAVIEW_USE_MPI`: If ParaView is built with MPI support.
@@ -38,6 +42,10 @@ list(INSERT CMAKE_PREFIX_PATH 0
   "${${CMAKE_FIND_PACKAGE_NAME}_PREFIX_PATH}")
 
 set("${CMAKE_FIND_PACKAGE_NAME}_VERSION" "@PARAVIEW_VERSION_FULL@")
+set("${CMAKE_FIND_PACKAGE_NAME}_VERSION_SIMPLE" "@PARAVIEW_VERSION@")
+set("${CMAKE_FIND_PACKAGE_NAME}_VERSION_MAJOR" "@PARAVIEW_VERSION_MAJOR@")
+set("${CMAKE_FIND_PACKAGE_NAME}_VERSION_MINOR" "@PARAVIEW_VERSION_MINOR@")
+set("${CMAKE_FIND_PACKAGE_NAME}_VERSION_PATCH" "@PARAVIEW_VERSION_PATCH@")
 
 unset("${CMAKE_FIND_PACKAGE_NAME}_FOUND")
 
