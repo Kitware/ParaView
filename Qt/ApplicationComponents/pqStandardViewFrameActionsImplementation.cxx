@@ -36,6 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqApplicationCore.h"
 #include "pqCameraUndoRedoReaction.h"
 #include "pqChartSelectionReaction.h"
+#include "pqColorOverlay.h"
 #include "pqContextView.h"
 #include "pqCoreUtilities.h"
 #include "pqDataQueryReaction.h"
@@ -69,10 +70,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QGuiApplication>
 #include <QKeyEvent>
 #include <QMenu>
+#include <QPropertyAnimation>
 #include <QPushButton>
 #include <QSet>
 #include <QShortcut>
 #include <QStyle>
+#include <QToolTip>
 
 #include <algorithm>
 #include <cassert>
@@ -352,7 +355,7 @@ void pqStandardViewFrameActionsImplementation::addGenericActions(pqViewFrame* fr
       QAction* captureViewAction = frame->addTitleBarAction(
         QIcon(":/pqWidgets/Icons/pqCaptureScreenshot.svg"), "Capture to Clipboard or File");
       captureViewAction->setObjectName("actionCaptureView");
-      captureViewAction->setToolTip("Capture screenshot to the clipboard or to a file if a "
+      captureViewAction->setToolTip("Capture screenshot to a file or to the clipboard if a "
                                     "modifier key (Ctrl, Alt or Shift) is pressed.");
       this->connect(captureViewAction, SIGNAL(triggered(bool)), SLOT(captureViewTriggered()));
     }
@@ -911,7 +914,30 @@ void pqStandardViewFrameActionsImplementation::captureViewTriggered()
   {
     // If a modifier key is enabled, let's save screenshot to a file, otherwise
     // copy the screenshot to the clipboard.
-    bool clipboardMode = QGuiApplication::queryKeyboardModifiers() == 0;
-    pqSaveScreenshotReaction::saveScreenshot(clipboardMode);
+    bool clipboardMode = QGuiApplication::queryKeyboardModifiers() != Qt::NoModifier;
+    bool captured = pqSaveScreenshotReaction::saveScreenshot(clipboardMode);
+    if (clipboardMode && captured)
+    {
+      auto viewWidget = pqActiveObjects::instance().activeView()->widget();
+      auto overlay = new pqColorOverlay(viewWidget);
+      overlay->resize(viewWidget->size());
+      // Light blue
+      overlay->setRgb(171, 223, 255);
+      overlay->show();
+
+      // Makes the overlay appear then disappear quickly to indicate a screenshot was taken
+      auto animation = new QPropertyAnimation(overlay, "opacity");
+
+      animation->setEasingCurve(QEasingCurve::OutQuad);
+      animation->setDuration(250);
+
+      animation->setKeyValueAt(0, 0);
+      animation->setKeyValueAt(0.1, 192);
+      animation->setKeyValueAt(1, 0);
+
+      animation->start();
+
+      this->connect(animation, &QPropertyAnimation::finished, [=] { overlay->deleteLater(); });
+    }
   }
 }

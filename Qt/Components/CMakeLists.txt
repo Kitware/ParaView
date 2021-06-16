@@ -49,6 +49,7 @@ set(classes
   pqChangeInputDialog
   pqCollaborationPanel
   pqColorChooserButtonWithPalettes
+  pqColorOverlay
   pqComboBoxDomain
   pqCommandPropertyWidget
   pqComparativeCueWidget
