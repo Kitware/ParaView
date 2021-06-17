@@ -5,6 +5,8 @@ set(classes
   vtkEntropyArrayMeasurement
   vtkGeometricMeanArrayMeasurement
   vtkHarmonicMeanArrayMeasurement
+  vtkMaxAccumulator
+  vtkMaxArrayMeasurement
   vtkQuantileAccumulator
   vtkQuantileArrayMeasurement
   vtkResampleToHyperTreeGrid

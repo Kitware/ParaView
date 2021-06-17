@@ -46,6 +46,15 @@
         </Documentation>
       </DoubleVectorProperty>
     </Proxy>
+    <Proxy class="vtkMaxArrayMeasurement"
+           name="Max">
+      <Hints>
+        <ProxyList>
+          <Link name="Input"
+                with_property="Input" />
+        </ProxyList>
+      </Hints>
+    </Proxy>
     <Proxy class="vtkEntropyArrayMeasurement"
            name="Entropy">
       <Hints>
@@ -250,6 +259,8 @@
           <Proxy group="array_measurement"
                  name="Harmonic Mean" />
           <Proxy group="array_measurement"
+                 name="Max" />
+          <Proxy group="array_measurement"
                  name="Quantile" />
           <Proxy group="array_measurement"
                  name="Standard Deviation" />
@@ -276,6 +287,8 @@
                  name="Geometric Mean" />
           <Proxy group="array_measurement"
                  name="Harmonic Mean" />
+          <Proxy group="array_measurement"
+                 name="Max" />
           <Proxy group="array_measurement"
                  name="Quantile" />
           <Proxy group="array_measurement"
