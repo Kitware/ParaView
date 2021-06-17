@@ -26,6 +26,7 @@
 #include "vtkCellData.h"
 #include "vtkCommand.h"
 #include "vtkCommunicator.h"
+#include "vtkCompositeDataSet.h"
 #include "vtkDIYKdTreeUtilities.h"
 #include "vtkDIYUtilities.h"
 #include "vtkDataArray.h"
@@ -44,6 +45,8 @@
 #include "vtkMathUtilities.h"
 #include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
+#include "vtkPartitionedDataSet.h"
+#include "vtkPartitionedDataSetCollection.h"
 #include "vtkPointData.h"
 #include "vtkPoints.h"
 #include "vtkPolygon.h"
@@ -136,9 +139,8 @@ void vtkResampleToHyperTreeGrid::PrintSelf(ostream& os, vtkIndent indent)
 //----------------------------------------------------------------------------
 int vtkResampleToHyperTreeGrid::FillInputPortInformation(int, vtkInformation* info)
 {
-  // This filter uses the vtkDataSet cell traversal methods so it
-  // suppors any data set type as input.
   info->Set(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkDataSet");
+  info->Set(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkCompositeDataSet");
   return 1;
 }
 
@@ -170,8 +172,8 @@ int vtkResampleToHyperTreeGrid::RequestData(
 {
   this->UpdateProgress(0.0);
 
-  // Get input and output data.
-  vtkDataSet* input = vtkDataSet::GetData(inputVector[0]);
+  vtkDataObject* inputDO = vtkDataObject::GetData(inputVector[0]);
+
   vtkDataObject* outputDO = vtkDataObject::GetData(outputVector, 0);
   vtkHyperTreeGrid* output = vtkHyperTreeGrid::SafeDownCast(outputDO);
   if (!output)
@@ -181,23 +183,32 @@ int vtkResampleToHyperTreeGrid::RequestData(
   }
 
   int numberOfProcesses = this->Controller ? this->Controller->GetNumberOfProcesses() : 1;
-  int fieldAssociation = this->GetInputArrayAssociation(0, inputVector);
+
+  vtkInformationVector* inArrayVec = this->Information->Get(INPUT_ARRAYS_TO_PROCESS());
+  vtkInformation* inArrayInfo = inArrayVec->GetInformationObject(0);
+  int fieldAssociation = inArrayInfo->Get(vtkDataObject::FIELD_ASSOCIATION());
   int processId = this->Controller->GetLocalProcessId();
 
-  input->GetBounds(this->Bounds);
-
-  vtkSmartPointer<vtkDataSet> redistributedInput = numberOfProcesses > 1
-    ? (this->BroadcastHyperTreeOwnership(input, processId))
-    : vtkSmartPointer<vtkDataSet>(input);
-
-  // Skip execution if there is no input geometry.
-  vtkIdType numCells = redistributedInput->GetNumberOfCells();
-  vtkIdType numPts = redistributedInput->GetNumberOfPoints();
-  if (numCells < 1 && numPts < 1)
+  if (vtkDataSet* ds = vtkDataSet::SafeDownCast(inputDO))
   {
-    vtkWarningMacro("Input must have points or cells");
-    return 1;
+    ds->GetBounds(this->Bounds);
   }
+  else if (vtkCompositeDataSet* cds = vtkCompositeDataSet::SafeDownCast(inputDO))
+  {
+    cds->GetBounds(this->Bounds);
+  }
+  else
+  {
+    vtkErrorMacro("Input type is " << inputDO->GetClassName() << ". Only vtkDataSet "
+                                   << "and vtkCompositeDataSet inputs are accepted.");
+    return 0;
+  }
+
+  vtkSmartPointer<vtkDataObject> redistributedInputDO = numberOfProcesses > 1
+    ? (this->BroadcastHyperTreeOwnership(inputDO, processId))
+    : vtkSmartPointer<vtkDataObject>(inputDO);
+
+  std::vector<vtkDataSet*> inputs = vtkCompositeDataSet::GetDataSets(redistributedInputDO);
 
   output->Initialize();
   output->SetBranchFactor(this->BranchFactor);
@@ -272,52 +283,69 @@ int vtkResampleToHyperTreeGrid::RequestData(
 
   // Linking input scalar fields
   const char* dataName = this->GetInputArrayInformation(0)->Get(vtkDataObject::FIELD_NAME());
-  vtkDataArray* data;
 
-  switch (fieldAssociation)
+  this->InputPointDataArrays.resize(inputs.size());
+
+  for (int inputId = 0; inputId < static_cast<int>(inputs.size()); ++inputId)
   {
-    case vtkDataObject::FIELD_ASSOCIATION_POINTS:
-      data = redistributedInput->GetPointData()->GetArray(dataName);
-      break;
-    case vtkDataObject::FIELD_ASSOCIATION_CELLS:
-      data = redistributedInput->GetCellData()->GetArray(dataName);
-      vtkErrorMacro("Cell data is currently disabled, aborting");
-      return 0;
-    default:
-      data = nullptr;
-      break;
-  }
+    vtkDataSet* input = inputs[inputId];
+    vtkDataArray* data;
 
-  if (this->ArrayMeasurement)
-  {
-    this->InputPointDataArrays.emplace_back(data);
-    vtkNew<vtkDoubleArray> scalarField;
-    scalarField->SetName((std::string(dataName) + std::string("_measure")).c_str());
-    output->GetCellData()->AddArray(scalarField);
-    this->ScalarFields.emplace_back(scalarField);
-
-    vtkAbstractArrayMeasurement* tmp = this->ArrayMeasurement->NewInstance();
-    tmp->DeepCopy(this->ArrayMeasurement);
-
-    this->ArrayMeasurements.emplace_back(vtkSmartPointer<vtkAbstractArrayMeasurement>::Take(tmp));
-  }
-
-  if (this->ArrayMeasurementDisplay)
-  {
-    for (const std::string& name : this->InputDataArrayNames)
+    switch (fieldAssociation)
     {
-      vtkPointData* pointData = redistributedInput->GetPointData();
-      vtkDataArray* array;
-      if ((array = pointData->GetArray(name.c_str())))
-      {
-        this->InputPointDataArrays.emplace_back(array);
-        vtkNew<vtkDoubleArray> scalarFieldDisplay;
-        scalarFieldDisplay->SetName(name.c_str());
-        output->GetCellData()->AddArray(scalarFieldDisplay);
-        this->ScalarFields.emplace_back(scalarFieldDisplay);
 
-        vtkAbstractArrayMeasurement* tmp = this->ArrayMeasurementDisplay->NewInstance();
-        tmp->DeepCopy(this->ArrayMeasurementDisplay);
+      case vtkDataObject::FIELD_ASSOCIATION_POINTS:
+        data = input->GetPointData()->GetArray(dataName);
+        break;
+      case vtkDataObject::FIELD_ASSOCIATION_CELLS:
+        data = input->GetCellData()->GetArray(dataName);
+        vtkErrorMacro("Cell data is currently disabled, aborting");
+        return 0;
+      default:
+        data = nullptr;
+        break;
+    }
+
+    if (this->ArrayMeasurementDisplay)
+    {
+      for (const std::string& name : this->InputDataArrayNames)
+      {
+        vtkPointData* pointData = input->GetPointData();
+        vtkDataArray* array;
+        if ((array = pointData->GetArray(name.c_str())))
+        {
+          this->InputPointDataArrays[inputId].emplace_back(array);
+
+          if (inputId == 0)
+          {
+            vtkNew<vtkDoubleArray> scalarFieldDisplay;
+            scalarFieldDisplay->SetName(name.c_str());
+            output->GetCellData()->AddArray(scalarFieldDisplay);
+            this->ScalarFields.emplace_back(scalarFieldDisplay);
+
+            vtkAbstractArrayMeasurement* tmp = this->ArrayMeasurementDisplay->NewInstance();
+            tmp->DeepCopy(this->ArrayMeasurementDisplay);
+
+            this->ArrayMeasurements.emplace_back(
+              vtkSmartPointer<vtkAbstractArrayMeasurement>::Take(tmp));
+          }
+        }
+      }
+    }
+
+    if (this->ArrayMeasurement)
+    {
+      this->InputPointDataArrays[inputId].emplace_back(data);
+
+      if (inputId == 0)
+      {
+        vtkNew<vtkDoubleArray> scalarField;
+        scalarField->SetName((std::string(dataName) + std::string("_measure")).c_str());
+        output->GetCellData()->AddArray(scalarField);
+        this->ScalarFields.emplace_back(scalarField);
+
+        vtkAbstractArrayMeasurement* tmp = this->ArrayMeasurement->NewInstance();
+        tmp->DeepCopy(this->ArrayMeasurement);
 
         this->ArrayMeasurements.emplace_back(
           vtkSmartPointer<vtkAbstractArrayMeasurement>::Take(tmp));
@@ -329,7 +357,7 @@ int vtkResampleToHyperTreeGrid::RequestData(
   // This multi resolution grid has the inner structure of the hyper tree grid
   // without its indexing. This is a bottom-up algorithm, which would be impossible
   // to process directly using a hyper tree grid because of its top-down structure.
-  this->CreateGridOfMultiResolutionGrids(redistributedInput, fieldAssociation);
+  this->CreateGridOfMultiResolutionGrids(inputs, fieldAssociation);
 
   if (!this->GenerateTrees(output))
   {
@@ -347,9 +375,9 @@ int vtkResampleToHyperTreeGrid::RequestData(
   }
 
   this->ScalarFields.clear();
-  this->InputPointDataArrays.clear();
   this->ArrayMeasurements.clear();
   this->GridOfMultiResolutionGrids.clear();
+  this->InputPointDataArrays.clear();
 
   this->LocalHyperTreeBoundingBox.clear();
 
@@ -387,12 +415,12 @@ vtkResampleToHyperTreeGrid::GridElement::~GridElement()
 }
 
 //----------------------------------------------------------------------------
-vtkSmartPointer<vtkDataSet> vtkResampleToHyperTreeGrid::BroadcastHyperTreeOwnership(
-  vtkDataSet* ds, vtkIdType processId)
+vtkSmartPointer<vtkDataObject> vtkResampleToHyperTreeGrid::BroadcastHyperTreeOwnership(
+  vtkDataObject* inputDO, vtkIdType processId)
 {
-  double pt[3], localBounds[6];
-  ds->GetBounds(localBounds);
-  if (!vtkBoundingBox(localBounds).IsValid())
+  double pt[3], localBounds[6] = { -this->Bounds[0], this->Bounds[1], -this->Bounds[2],
+    this->Bounds[3], -this->Bounds[4], this->Bounds[5] };
+  if (!vtkBoundingBox(this->Bounds).IsValid())
   {
     localBounds[0] = -std::numeric_limits<double>::infinity();
     localBounds[1] = -std::numeric_limits<double>::infinity();
@@ -400,12 +428,6 @@ vtkSmartPointer<vtkDataSet> vtkResampleToHyperTreeGrid::BroadcastHyperTreeOwners
     localBounds[3] = -std::numeric_limits<double>::infinity();
     localBounds[4] = -std::numeric_limits<double>::infinity();
     localBounds[5] = -std::numeric_limits<double>::infinity();
-  }
-  else
-  {
-    localBounds[0] = -localBounds[0];
-    localBounds[2] = -localBounds[2];
-    localBounds[4] = -localBounds[4];
   }
   this->Controller->AllReduce(localBounds, this->Bounds, 6, vtkCommunicator::MAX_OP);
   this->Bounds[0] = -this->Bounds[0];
@@ -423,20 +445,27 @@ vtkSmartPointer<vtkDataSet> vtkResampleToHyperTreeGrid::BroadcastHyperTreeOwners
   vtkIdType numberOfTrees = dim[0] * dim[1] * dim[2];
   std::vector<vtkIdType> localNumberOfPointsPerTree(numberOfTrees, 0),
     maxNumberOfPointsPerTree(numberOfTrees);
-  for (vtkIdType ptId = 0; ptId < ds->GetNumberOfPoints(); ++ptId)
+
+  std::vector<vtkDataSet*> inputs = vtkCompositeDataSet::GetDataSets(inputDO);
+
+  for (int dsId = 0; dsId < static_cast<int>(inputs.size()); ++dsId)
   {
-    ds->GetPoint(ptId, pt);
-    ++(localNumberOfPointsPerTree[(dim[2] - 1) *
-        ((pt[2] - this->Bounds[4]) / (this->Bounds[5] - this->Bounds[4])) +
-      (dim[2] - 1) * (dim[1] - 1) *
-        ((pt[1] - this->Bounds[2]) / (this->Bounds[3] - this->Bounds[2])) +
-      (dim[2] - 1) * (dim[1] - 1) * (dim[0] - 1) *
-        ((pt[0] - this->Bounds[0]) / (this->Bounds[1] - this->Bounds[0]))]);
+    vtkDataSet* ds = inputs[dsId];
+    for (vtkIdType ptId = 0; ptId < ds->GetNumberOfPoints(); ++ptId)
+    {
+      ds->GetPoint(ptId, pt);
+      ++(localNumberOfPointsPerTree[(dim[2] - 1) *
+          ((pt[2] - this->Bounds[4]) / (this->Bounds[5] - this->Bounds[4])) +
+        (dim[2] - 1) * (dim[1] - 1) *
+          ((pt[1] - this->Bounds[2]) / (this->Bounds[3] - this->Bounds[2])) +
+        (dim[2] - 1) * (dim[1] - 1) * (dim[0] - 1) *
+          ((pt[0] - this->Bounds[0]) / (this->Bounds[1] - this->Bounds[0]))]);
+    }
   }
   this->Controller->AllReduce(localNumberOfPointsPerTree.data(), maxNumberOfPointsPerTree.data(),
     numberOfTrees, vtkCommunicator::MAX_OP);
 
-  // Now, we set the following rule: the process having the nost point in one hyper tree
+  // Now, we set the following rule: the process having the most point in one hyper tree
   // owns this hyper tree. If 2 or more processes have the same number of points,
   // the process of highest rank owns the hyper tree.
   std::vector<vtkIdType> localProcessDistributionGrid(maxNumberOfPointsPerTree.size(), -1),
@@ -454,7 +483,7 @@ vtkSmartPointer<vtkDataSet> vtkResampleToHyperTreeGrid::BroadcastHyperTreeOwners
 
   // We compute a kd-tree to redistribute processes
   std::vector<vtkBoundingBox> boundingBoxes = vtkDIYKdTreeUtilities::GenerateCuts(
-    ds, this->Controller->GetNumberOfProcesses(), /*use_cell_centers=*/true, this->Controller);
+    inputDO, this->Controller->GetNumberOfProcesses(), /*use_cell_centers=*/true, this->Controller);
 
   // Then, we snap each kd-tree leaf to the nearest hypertree bound of the output.
   // We do that because we need hypertrees to not be shared accross processes to construct the
@@ -502,7 +531,7 @@ vtkSmartPointer<vtkDataSet> vtkResampleToHyperTreeGrid::BroadcastHyperTreeOwners
   // Using the shared knowledge of who owns who, we can use vtkRedistributeData
   // so each hyper tree is own by no more than one process.
   vtkNew<vtkRedistributeDataSetFilter> redistributeFilter;
-  redistributeFilter->SetInputDataObject(ds);
+  redistributeFilter->SetInputDataObject(inputDO);
   redistributeFilter->SetAssigner(std::make_shared<vtkDIYExplicitAssigner>(assigner));
   redistributeFilter->UseExplicitCutsOn();
   redistributeFilter->SetExplicitCuts(boundingBoxes);
@@ -519,7 +548,7 @@ vtkSmartPointer<vtkDataSet> vtkResampleToHyperTreeGrid::BroadcastHyperTreeOwners
     }
   }
 
-  return vtkDataSet::SafeDownCast(redistributeFilter->GetOutputDataObject(0));
+  return redistributeFilter->GetOutputDataObject(0);
 }
 
 //----------------------------------------------------------------------------
@@ -970,7 +999,7 @@ bool vtkResampleToHyperTreeGrid::IntersectedVolume(const double bboxBounds[6], v
 
 //----------------------------------------------------------------------------
 void vtkResampleToHyperTreeGrid::CreateGridOfMultiResolutionGrids(
-  vtkDataSet* dataSet, int fieldAssociation)
+  std::vector<vtkDataSet*>& dataSets, int fieldAssociation)
 {
   // Creating the grid of multi resolution grids
   this->GridOfMultiResolutionGrids.resize(
@@ -981,249 +1010,257 @@ void vtkResampleToHyperTreeGrid::CreateGridOfMultiResolutionGrids(
     this->GridOfMultiResolutionGrids[multiResGridIdx].resize(this->MaxDepth + 1);
   }
 
-  auto datas = this->InputPointDataArrays;
-
-  // First pass, we fill the highest resolution grid with input values
-  if (fieldAssociation == vtkDataObject::FIELD_ASSOCIATION_POINTS)
+  for (int inputId = 0; inputId < static_cast<int>(dataSets.size()); ++inputId)
   {
-    for (vtkIdType pointId = 0; pointId < dataSet->GetNumberOfPoints(); ++pointId)
+    vtkDataSet* dataSet = dataSets[inputId];
+    std::vector<vtkDataArray*>& dataList = this->InputPointDataArrays[inputId];
+
+    // First pass, we fill the highest resolution grid with input values
+    if (fieldAssociation == vtkDataObject::FIELD_ASSOCIATION_POINTS)
     {
-      double* point = dataSet->GetPoint(pointId);
-      // (i, j, k) are the coordinates of the corresponding hyper tree
-
-      if (!this->LocalHyperTreeBoundingBox.empty())
+      for (vtkIdType pointId = 0; pointId < dataSet->GetNumberOfPoints(); ++pointId)
       {
-        // Checking if the considered point is in bounds, i.e. is owned by this process
-        vtkIdType bidx = -1;
-        while (static_cast<std::size_t>(++bidx) != this->LocalHyperTreeBoundingBox.size() &&
-          (this->LocalHyperTreeBoundingBox[bidx].GetBound(0) > point[0] ||
-                 this->LocalHyperTreeBoundingBox[bidx].GetBound(1) < point[0] ||
-                 this->LocalHyperTreeBoundingBox[bidx].GetBound(2) > point[1] ||
-                 this->LocalHyperTreeBoundingBox[bidx].GetBound(3) < point[1] ||
-                 this->LocalHyperTreeBoundingBox[bidx].GetBound(4) > point[2] ||
-                 this->LocalHyperTreeBoundingBox[bidx].GetBound(5) < point[2]))
+        double* point = dataSet->GetPoint(pointId);
+        // (i, j, k) are the coordinates of the corresponding hyper tree
+
+        if (!this->LocalHyperTreeBoundingBox.empty())
         {
-        }
-        if (static_cast<std::size_t>(bidx) == this->LocalHyperTreeBoundingBox.size())
-        {
-          continue;
-        }
-      }
-
-      vtkIdType i = std::floor<vtkIdType>(std::min<double>((point[0] - this->Bounds[0]) /
-                    (this->Bounds[1] - this->Bounds[0]) * this->CellDims[0] *
-                    this->MaxResolutionPerTree,
-                  this->MaxResolutionPerTree * this->CellDims[0] - 1)),
-                j = std::floor<vtkIdType>(std::min<double>((point[1] - this->Bounds[2]) /
-                    (this->Bounds[3] - this->Bounds[2]) * this->CellDims[1] *
-                    this->MaxResolutionPerTree,
-                  this->MaxResolutionPerTree * this->CellDims[1] - 1)),
-                k = std::floor<vtkIdType>(std::min<double>((point[2] - this->Bounds[4]) /
-                    (this->Bounds[5] - this->Bounds[4]) * this->CellDims[2] *
-                    this->MaxResolutionPerTree,
-                  this->MaxResolutionPerTree * this->CellDims[2] - 1));
-
-      // We bijectively convert the local coordinates within a hyper tree grid to an integer to pass
-      // it to the std::unordered_map at highest resolution
-      vtkIdType idx = this->MultiResGridCoordinatesToIndex(i % this->MaxResolutionPerTree,
-        j % this->MaxResolutionPerTree, k % this->MaxResolutionPerTree, this->MaxDepth);
-
-      vtkIdType gridIdx = this->GridCoordinatesToIndex(i / this->MaxResolutionPerTree,
-        j / this->MaxResolutionPerTree, k / this->MaxResolutionPerTree);
-
-      auto& grid = this->GridOfMultiResolutionGrids[gridIdx][this->MaxDepth];
-
-      auto it = grid.find(idx);
-      // if this is the first time we pass by this grid location, we create a new ArrayMeasurement
-      // instance
-      // NOTE: GridElement::CanSubdivide does not need to be set at the highest resolution
-      if (it == grid.end())
-      {
-        GridElement& element = grid[idx];
-        element.NumberOfLeavesInSubtree = 1;
-        element.NumberOfPointsInSubtree = 1;
-        element.AccumulatedWeight = 1.0;
-        element.UnmaskedChildrenHaveNoMaskedLeaves = true;
-        for (std::size_t l = 0; l < this->ArrayMeasurements.size(); ++l)
-        {
-          element.ArrayMeasurements.emplace_back(vtkSmartPointer<vtkAbstractArrayMeasurement>::Take(
-            this->ArrayMeasurements[l]->NewInstance()));
-          element.ArrayMeasurements[l]->DeepCopy(this->ArrayMeasurements[l]);
-          element.ArrayMeasurements[l]->Add(
-            datas[l]->GetTuple(pointId), datas[l]->GetNumberOfComponents());
-        }
-      }
-      // if not, then the grid location is already created, just need to add the element into it
-      else
-      {
-        for (std::size_t l = 0; l < datas.size(); ++l)
-        {
-          it->second.ArrayMeasurements[l]->Add(
-            datas[l]->GetTuple(pointId), datas[l]->GetNumberOfComponents());
-        }
-        ++(it->second.NumberOfPointsInSubtree);
-        ++(it->second.AccumulatedWeight);
-      }
-    }
-  }
-  else if (fieldAssociation == vtkDataObject::FIELD_ASSOCIATION_CELLS)
-  {
-    // We allocate weights which are needed to compute the distance between a point and a cell.
-    vtkIdType maxNumberOfPoints = 0;
-    for (vtkIdType cellId = 0; cellId < dataSet->GetNumberOfCells(); ++cellId)
-    {
-      vtkCell* cell = dataSet->GetCell(cellId);
-      maxNumberOfPoints = maxNumberOfPoints > cell->GetNumberOfPoints() ? maxNumberOfPoints
-                                                                        : cell->GetNumberOfPoints();
-    }
-
-    // We allocate those variables to avoid unnecessary allocation inside the recursive function.
-    // Those are used to check the distance between a point and the cell.
-    double* weights = new double[maxNumberOfPoints];
-
-    double volumeUnit = 1.0;
-    for (vtkIdType cellId = 0; cellId < dataSet->GetNumberOfCells(); ++cellId)
-    {
-      vtkCell* cell = dataSet->GetCell(cellId);
-      double* cellBounds = cell->GetBounds();
-      std::size_t depth = static_cast<std::size_t>(~0);
-      vtkIdType imin, imax, jmin, jmax, kmin, kmax;
-      do
-      {
-        ++depth;
-        imin = std::floor<vtkIdType>(
-          std::min<double>((cellBounds[0] - this->Bounds[0]) * this->ResolutionPerTree[depth] *
-              this->CellDims[0] / (this->Bounds[1] - this->Bounds[0]),
-            this->MaxResolutionPerTree * this->CellDims[0] - 1));
-        imax = std::floor<vtkIdType>(
-          std::min<double>((cellBounds[1] - this->Bounds[0]) * this->ResolutionPerTree[depth] *
-              this->CellDims[0] / (this->Bounds[1] - this->Bounds[0]),
-            this->MaxResolutionPerTree * this->CellDims[0] - 1));
-        jmin = std::floor<vtkIdType>(
-          std::min<double>((cellBounds[2] - this->Bounds[2]) * this->ResolutionPerTree[depth] *
-              this->CellDims[0] / (this->Bounds[3] - this->Bounds[2]),
-            this->MaxResolutionPerTree * this->CellDims[0] - 1));
-        jmax = std::floor<vtkIdType>(
-          std::min<double>((cellBounds[3] - this->Bounds[2]) * this->ResolutionPerTree[depth] *
-              this->CellDims[0] / (this->Bounds[3] - this->Bounds[2]),
-            this->MaxResolutionPerTree * this->CellDims[0] - 1));
-        kmin = std::floor<vtkIdType>(
-          std::min<double>((cellBounds[4] - this->Bounds[4]) * this->ResolutionPerTree[depth] *
-              this->CellDims[0] / (this->Bounds[5] - this->Bounds[4]),
-            this->MaxResolutionPerTree * this->CellDims[0] - 1));
-        kmax = std::floor<vtkIdType>(
-          std::min<double>((cellBounds[5] - this->Bounds[4]) * this->ResolutionPerTree[depth] *
-              this->CellDims[0] / (this->Bounds[5] - this->Bounds[4]),
-            this->MaxResolutionPerTree * this->CellDims[0] - 1));
-      } while ((imin == imax || jmin == jmax || kmin == kmax) && depth != this->MaxDepth);
-
-      vtkIdType igridmin = imin / this->ResolutionPerTree[depth],
-                igridmax = imax / this->ResolutionPerTree[depth],
-                jgridmin = jmin / this->ResolutionPerTree[depth],
-                jgridmax = jmax / this->ResolutionPerTree[depth],
-                kgridmin = kmin / this->ResolutionPerTree[depth],
-                kgridmax = kmax / this->ResolutionPerTree[depth];
-
-      for (vtkIdType igrid = igridmin; igrid <= igridmax; ++igrid)
-      {
-        for (vtkIdType jgrid = jgridmin; jgrid <= jgridmax; ++jgrid)
-        {
-          for (vtkIdType kgrid = kgridmin; kgrid <= kgridmax; ++kgrid)
+          // Checking if the considered point is in bounds, i.e. is owned by this process
+          vtkIdType bidx = -1;
+          while (static_cast<std::size_t>(++bidx) != this->LocalHyperTreeBoundingBox.size() &&
+            (this->LocalHyperTreeBoundingBox[bidx].GetBound(0) > point[0] ||
+                   this->LocalHyperTreeBoundingBox[bidx].GetBound(1) < point[0] ||
+                   this->LocalHyperTreeBoundingBox[bidx].GetBound(2) > point[1] ||
+                   this->LocalHyperTreeBoundingBox[bidx].GetBound(3) < point[1] ||
+                   this->LocalHyperTreeBoundingBox[bidx].GetBound(4) > point[2] ||
+                   this->LocalHyperTreeBoundingBox[bidx].GetBound(5) < point[2]))
           {
-            auto& grid =
-              this->GridOfMultiResolutionGrids[this->GridCoordinatesToIndex(igrid, jgrid, kgrid)]
-                                              [depth];
+          }
+          if (static_cast<std::size_t>(bidx) == this->LocalHyperTreeBoundingBox.size())
+          {
+            continue;
+          }
+        }
 
-            for (vtkIdType ii = (igrid == igridmin ? imin % this->ResolutionPerTree[depth] : 0);
-                 ii <= (igrid == igridmax ? imax % this->ResolutionPerTree[depth]
-                                          : this->ResolutionPerTree[depth] - 1);
-                 ++ii)
+        vtkIdType i = std::floor<vtkIdType>(std::min<double>((point[0] - this->Bounds[0]) /
+                      (this->Bounds[1] - this->Bounds[0]) * this->CellDims[0] *
+                      this->MaxResolutionPerTree,
+                    this->MaxResolutionPerTree * this->CellDims[0] - 1)),
+                  j = std::floor<vtkIdType>(std::min<double>((point[1] - this->Bounds[2]) /
+                      (this->Bounds[3] - this->Bounds[2]) * this->CellDims[1] *
+                      this->MaxResolutionPerTree,
+                    this->MaxResolutionPerTree * this->CellDims[1] - 1)),
+                  k = std::floor<vtkIdType>(std::min<double>((point[2] - this->Bounds[4]) /
+                      (this->Bounds[5] - this->Bounds[4]) * this->CellDims[2] *
+                      this->MaxResolutionPerTree,
+                    this->MaxResolutionPerTree * this->CellDims[2] - 1));
+
+        // We bijectively convert the local coordinates within a hyper tree grid to an integer to
+        // pass
+        // it to the std::unordered_map at highest resolution
+        vtkIdType idx = this->MultiResGridCoordinatesToIndex(i % this->MaxResolutionPerTree,
+          j % this->MaxResolutionPerTree, k % this->MaxResolutionPerTree, this->MaxDepth);
+
+        vtkIdType gridIdx = this->GridCoordinatesToIndex(i / this->MaxResolutionPerTree,
+          j / this->MaxResolutionPerTree, k / this->MaxResolutionPerTree);
+
+        auto& grid = this->GridOfMultiResolutionGrids[gridIdx][this->MaxDepth];
+
+        auto it = grid.find(idx);
+        // if this is the first time we pass by this grid location, we create a new ArrayMeasurement
+        // instance
+        // NOTE: GridElement::CanSubdivide does not need to be set at the highest resolution
+        if (it == grid.end())
+        {
+          GridElement& element = grid[idx];
+          element.NumberOfLeavesInSubtree = 1;
+          element.NumberOfPointsInSubtree = 1;
+          element.AccumulatedWeight = 1.0;
+          element.UnmaskedChildrenHaveNoMaskedLeaves = true;
+          for (std::size_t l = 0; l < this->ArrayMeasurements.size(); ++l)
+          {
+            element.ArrayMeasurements.emplace_back(
+              vtkSmartPointer<vtkAbstractArrayMeasurement>::Take(
+                this->ArrayMeasurements[l]->NewInstance()));
+            element.ArrayMeasurements[l]->DeepCopy(this->ArrayMeasurements[l]);
+            element.ArrayMeasurements[l]->Add(
+              dataList[l]->GetTuple(pointId), dataList[l]->GetNumberOfComponents());
+          }
+        }
+        // if not, then the grid location is already created, just need to add the element into it
+        else
+        {
+          for (std::size_t l = 0; l < dataList.size(); ++l)
+          {
+            it->second.ArrayMeasurements[l]->Add(
+              dataList[l]->GetTuple(pointId), dataList[l]->GetNumberOfComponents());
+          }
+          ++(it->second.NumberOfPointsInSubtree);
+          ++(it->second.AccumulatedWeight);
+        }
+      }
+    }
+    else if (fieldAssociation == vtkDataObject::FIELD_ASSOCIATION_CELLS)
+    {
+      // We allocate weights which are needed to compute the distance between a point and a cell.
+      vtkIdType maxNumberOfPoints = 0;
+      for (vtkIdType cellId = 0; cellId < dataSet->GetNumberOfCells(); ++cellId)
+      {
+        vtkCell* cell = dataSet->GetCell(cellId);
+        maxNumberOfPoints = maxNumberOfPoints > cell->GetNumberOfPoints()
+          ? maxNumberOfPoints
+          : cell->GetNumberOfPoints();
+      }
+
+      // We allocate those variables to avoid unnecessary allocation inside the recursive function.
+      // Those are used to check the distance between a point and the cell.
+      double* weights = new double[maxNumberOfPoints];
+
+      double volumeUnit = 1.0;
+      for (vtkIdType cellId = 0; cellId < dataSet->GetNumberOfCells(); ++cellId)
+      {
+        vtkCell* cell = dataSet->GetCell(cellId);
+        double* cellBounds = cell->GetBounds();
+        std::size_t depth = static_cast<std::size_t>(~0);
+        vtkIdType imin, imax, jmin, jmax, kmin, kmax;
+        do
+        {
+          ++depth;
+          imin = std::floor<vtkIdType>(
+            std::min<double>((cellBounds[0] - this->Bounds[0]) * this->ResolutionPerTree[depth] *
+                this->CellDims[0] / (this->Bounds[1] - this->Bounds[0]),
+              this->MaxResolutionPerTree * this->CellDims[0] - 1));
+          imax = std::floor<vtkIdType>(
+            std::min<double>((cellBounds[1] - this->Bounds[0]) * this->ResolutionPerTree[depth] *
+                this->CellDims[0] / (this->Bounds[1] - this->Bounds[0]),
+              this->MaxResolutionPerTree * this->CellDims[0] - 1));
+          jmin = std::floor<vtkIdType>(
+            std::min<double>((cellBounds[2] - this->Bounds[2]) * this->ResolutionPerTree[depth] *
+                this->CellDims[0] / (this->Bounds[3] - this->Bounds[2]),
+              this->MaxResolutionPerTree * this->CellDims[0] - 1));
+          jmax = std::floor<vtkIdType>(
+            std::min<double>((cellBounds[3] - this->Bounds[2]) * this->ResolutionPerTree[depth] *
+                this->CellDims[0] / (this->Bounds[3] - this->Bounds[2]),
+              this->MaxResolutionPerTree * this->CellDims[0] - 1));
+          kmin = std::floor<vtkIdType>(
+            std::min<double>((cellBounds[4] - this->Bounds[4]) * this->ResolutionPerTree[depth] *
+                this->CellDims[0] / (this->Bounds[5] - this->Bounds[4]),
+              this->MaxResolutionPerTree * this->CellDims[0] - 1));
+          kmax = std::floor<vtkIdType>(
+            std::min<double>((cellBounds[5] - this->Bounds[4]) * this->ResolutionPerTree[depth] *
+                this->CellDims[0] / (this->Bounds[5] - this->Bounds[4]),
+              this->MaxResolutionPerTree * this->CellDims[0] - 1));
+        } while ((imin == imax || jmin == jmax || kmin == kmax) && depth != this->MaxDepth);
+
+        vtkIdType igridmin = imin / this->ResolutionPerTree[depth],
+                  igridmax = imax / this->ResolutionPerTree[depth],
+                  jgridmin = jmin / this->ResolutionPerTree[depth],
+                  jgridmax = jmax / this->ResolutionPerTree[depth],
+                  kgridmin = kmin / this->ResolutionPerTree[depth],
+                  kgridmax = kmax / this->ResolutionPerTree[depth];
+
+        for (vtkIdType igrid = igridmin; igrid <= igridmax; ++igrid)
+        {
+          for (vtkIdType jgrid = jgridmin; jgrid <= jgridmax; ++jgrid)
+          {
+            for (vtkIdType kgrid = kgridmin; kgrid <= kgridmax; ++kgrid)
             {
-              for (vtkIdType jj = (jgrid == jgridmin ? jmin % this->ResolutionPerTree[depth] : 0);
-                   jj <= (jgrid == jgridmax ? jmax % this->ResolutionPerTree[depth]
+              auto& grid =
+                this->GridOfMultiResolutionGrids[this->GridCoordinatesToIndex(igrid, jgrid, kgrid)]
+                                                [depth];
+
+              for (vtkIdType ii = (igrid == igridmin ? imin % this->ResolutionPerTree[depth] : 0);
+                   ii <= (igrid == igridmax ? imax % this->ResolutionPerTree[depth]
                                             : this->ResolutionPerTree[depth] - 1);
-                   ++jj)
+                   ++ii)
               {
-                for (vtkIdType kk = (kgrid == kgridmin ? kmin % this->ResolutionPerTree[depth] : 0);
-                     kk <= (kgrid == kgridmax ? kmax % this->ResolutionPerTree[depth]
+                for (vtkIdType jj = (jgrid == jgridmin ? jmin % this->ResolutionPerTree[depth] : 0);
+                     jj <= (jgrid == jgridmax ? jmax % this->ResolutionPerTree[depth]
                                               : this->ResolutionPerTree[depth] - 1);
-                     ++kk)
+                     ++jj)
                 {
-                  vtkIdType ires = ii + igrid * this->ResolutionPerTree[depth];
-                  vtkIdType jres = jj + jgrid * this->ResolutionPerTree[depth];
-                  vtkIdType kres = kk + kgrid * this->ResolutionPerTree[depth];
-
-                  double boxBounds[6] = { this->Bounds[0] +
-                      (0.0 + ires) / (this->CellDims[0] * this->ResolutionPerTree[depth]) *
-                        (this->Bounds[1] - this->Bounds[0]),
-                    this->Bounds[0] +
-                      (1.0 + ires) / (this->CellDims[0] * this->ResolutionPerTree[depth]) *
-                        (this->Bounds[1] - this->Bounds[0]),
-                    this->Bounds[2] +
-                      (0.0 + jres) / (this->CellDims[1] * this->ResolutionPerTree[depth]) *
-                        (this->Bounds[3] - this->Bounds[2]),
-                    this->Bounds[2] +
-                      (1.0 + jres) / (this->CellDims[1] * this->ResolutionPerTree[depth]) *
-                        (this->Bounds[3] - this->Bounds[2]),
-                    this->Bounds[4] +
-                      (0.0 + kres) / (this->CellDims[2] * this->ResolutionPerTree[depth]) *
-                        (this->Bounds[5] - this->Bounds[4]),
-                    this->Bounds[4] +
-                      (1.0 + kres) / (this->CellDims[2] * this->ResolutionPerTree[depth]) *
-                        (this->Bounds[5] - this->Bounds[4]) };
-
-                  double volume = 0.0;
-                  bool nonZeroVolume = false;
-
-                  vtkCell3D* cell3D = vtkCell3D::SafeDownCast(cell);
-                  vtkVoxel* voxel = vtkVoxel::SafeDownCast(cell);
-
-                  if (voxel)
+                  for (vtkIdType kk =
+                         (kgrid == kgridmin ? kmin % this->ResolutionPerTree[depth] : 0);
+                       kk <= (kgrid == kgridmax ? kmax % this->ResolutionPerTree[depth]
+                                                : this->ResolutionPerTree[depth] - 1);
+                       ++kk)
                   {
-                    nonZeroVolume = this->IntersectedVolume(boxBounds, voxel, volumeUnit, volume);
-                  }
-                  else if (cell3D)
-                  {
-                    nonZeroVolume =
-                      this->IntersectedVolume(boxBounds, cell3D, volumeUnit, volume, weights);
-                  }
-                  else
-                  {
-                    vtkErrorMacro(<< "cell type " << cell->GetClassName() << " not supported");
-                  }
+                    vtkIdType ires = ii + igrid * this->ResolutionPerTree[depth];
+                    vtkIdType jres = jj + jgrid * this->ResolutionPerTree[depth];
+                    vtkIdType kres = kk + kgrid * this->ResolutionPerTree[depth];
 
-                  if (nonZeroVolume)
-                  {
-                    vtkIdType gridIdx = this->MultiResGridCoordinatesToIndex(ii, jj, kk, depth);
-                    auto it = grid.find(gridIdx);
-                    if (it == grid.end())
+                    double boxBounds[6] = { this->Bounds[0] +
+                        (0.0 + ires) / (this->CellDims[0] * this->ResolutionPerTree[depth]) *
+                          (this->Bounds[1] - this->Bounds[0]),
+                      this->Bounds[0] +
+                        (1.0 + ires) / (this->CellDims[0] * this->ResolutionPerTree[depth]) *
+                          (this->Bounds[1] - this->Bounds[0]),
+                      this->Bounds[2] +
+                        (0.0 + jres) / (this->CellDims[1] * this->ResolutionPerTree[depth]) *
+                          (this->Bounds[3] - this->Bounds[2]),
+                      this->Bounds[2] +
+                        (1.0 + jres) / (this->CellDims[1] * this->ResolutionPerTree[depth]) *
+                          (this->Bounds[3] - this->Bounds[2]),
+                      this->Bounds[4] +
+                        (0.0 + kres) / (this->CellDims[2] * this->ResolutionPerTree[depth]) *
+                          (this->Bounds[5] - this->Bounds[4]),
+                      this->Bounds[4] +
+                        (1.0 + kres) / (this->CellDims[2] * this->ResolutionPerTree[depth]) *
+                          (this->Bounds[5] - this->Bounds[4]) };
+
+                    double volume = 0.0;
+                    bool nonZeroVolume = false;
+
+                    vtkCell3D* cell3D = vtkCell3D::SafeDownCast(cell);
+                    vtkVoxel* voxel = vtkVoxel::SafeDownCast(cell);
+
+                    if (voxel)
                     {
-                      GridElement& element = grid[gridIdx];
-                      element.NumberOfLeavesInSubtree = 1;
-                      element.NumberOfPointsInSubtree = 1;
-                      element.UnmaskedChildrenHaveNoMaskedLeaves = true;
-                      element.AccumulatedWeight = volume;
-                      for (std::size_t l = 0; l < this->ArrayMeasurements.size(); ++l)
-                      {
-                        element.ArrayMeasurements.emplace_back(
-                          vtkSmartPointer<vtkAbstractArrayMeasurement>::Take(
-                            this->ArrayMeasurements[l]->NewInstance()));
-                        element.ArrayMeasurements[l]->DeepCopy(this->ArrayMeasurements[l]);
-                        element.ArrayMeasurements[l]->Add(
-                          datas[l]->GetTuple(cellId), datas[l]->GetNumberOfComponents(), volume);
-                      }
+                      nonZeroVolume = this->IntersectedVolume(boxBounds, voxel, volumeUnit, volume);
                     }
-                    // if not, then the grid location is already created, just need to add the
-                    // element into it
+                    else if (cell3D)
+                    {
+                      nonZeroVolume =
+                        this->IntersectedVolume(boxBounds, cell3D, volumeUnit, volume, weights);
+                    }
                     else
                     {
-                      for (std::size_t l = 0; l < datas.size(); ++l)
+                      vtkErrorMacro(<< "cell type " << cell->GetClassName() << " not supported");
+                    }
+
+                    if (nonZeroVolume)
+                    {
+                      vtkIdType gridIdx = this->MultiResGridCoordinatesToIndex(ii, jj, kk, depth);
+                      auto it = grid.find(gridIdx);
+                      if (it == grid.end())
                       {
-                        it->second.ArrayMeasurements[l]->Add(
-                          datas[l]->GetTuple(cellId), datas[l]->GetNumberOfComponents(), volume);
+                        GridElement& element = grid[gridIdx];
+                        element.NumberOfLeavesInSubtree = 1;
+                        element.NumberOfPointsInSubtree = 1;
+                        element.UnmaskedChildrenHaveNoMaskedLeaves = true;
+                        element.AccumulatedWeight = volume;
+                        for (std::size_t l = 0; l < this->ArrayMeasurements.size(); ++l)
+                        {
+                          element.ArrayMeasurements.emplace_back(
+                            vtkSmartPointer<vtkAbstractArrayMeasurement>::Take(
+                              this->ArrayMeasurements[l]->NewInstance()));
+                          element.ArrayMeasurements[l]->DeepCopy(this->ArrayMeasurements[l]);
+                          element.ArrayMeasurements[l]->Add(dataList[l]->GetTuple(cellId),
+                            dataList[l]->GetNumberOfComponents(), volume);
+                        }
                       }
-                      ++(it->second.NumberOfPointsInSubtree);
-                      it->second.AccumulatedWeight += volume;
+                      // if not, then the grid location is already created, just need to add the
+                      // element into it
+                      else
+                      {
+                        for (std::size_t l = 0; l < dataList.size(); ++l)
+                        {
+                          it->second.ArrayMeasurements[l]->Add(dataList[l]->GetTuple(cellId),
+                            dataList[l]->GetNumberOfComponents(), volume);
+                        }
+                        ++(it->second.NumberOfPointsInSubtree);
+                        it->second.AccumulatedWeight += volume;
+                      }
                     }
                   }
                 }
@@ -1232,12 +1269,12 @@ void vtkResampleToHyperTreeGrid::CreateGridOfMultiResolutionGrids(
           }
         }
       }
+      delete[] weights;
     }
-    delete[] weights;
-  }
-  else
-  {
-    vtkWarningMacro(<< "Unknown field association. Supported are points and cells");
+    else
+    {
+      vtkWarningMacro(<< "Unknown field association. Supported are points and cells");
+    }
   }
 
   // Now, we fill the multi-resolution grid bottom-up
@@ -1344,99 +1381,106 @@ void vtkResampleToHyperTreeGrid::CreateGridOfMultiResolutionGrids(
   if (this->NoEmptyCells || (this->Extrapolate && !this->ArrayMeasurements.empty() &&
                               fieldAssociation == vtkDataObject::FIELD_ASSOCIATION_POINTS))
   {
-    // We allocate weights which are needed to compute the distance between a point and a cell.
-    vtkIdType maxNumberOfPoints = 0;
-    for (vtkIdType cellId = 0; cellId < dataSet->GetNumberOfCells(); ++cellId)
+    for (int inputId = 0; inputId < static_cast<int>(dataSets.size()); ++inputId)
     {
-      vtkCell* cell = dataSet->GetCell(cellId);
-      maxNumberOfPoints = maxNumberOfPoints > cell->GetNumberOfPoints() ? maxNumberOfPoints
-                                                                        : cell->GetNumberOfPoints();
-    }
+      vtkDataSet* dataSet = dataSets[inputId];
 
-    // We allocate those variables to avoid unnecessary allocation inside the recursive function.
-    // Those are used to check the distance between a point and the cell.
-    double x[3], pcoords[3], closestPoint[3];
-    double* weights = new double[maxNumberOfPoints];
-
-    double boundsEpsilon[3] = { std::max(std::fabs(this->Bounds[0]), std::fabs(this->Bounds[1])) *
-        VTK_DBL_EPSILON,
-      std::max(std::fabs(this->Bounds[2]), std::fabs(this->Bounds[3])) * VTK_DBL_EPSILON,
-      std::max(std::fabs(this->Bounds[4]), std::fabs(this->Bounds[5])) * VTK_DBL_EPSILON };
-
-    // We forbid subdividing if a child is masked and has geometry passing through it.
-    for (vtkIdType cellId = 0; cellId < dataSet->GetNumberOfCells(); ++cellId)
-    {
-      this->UpdateProgress((double)cellId / dataSet->GetNumberOfCells());
-
-      // The strategy is the following:
-      // We go through all the coordinates in the multi resolution grid
-      // that intersect the bounding box of the input cell.
-      // Then we check if the corresponding position in near enough to the cell.
-      // If it it, we forbid subdivision with GridElement::CanSubdivide
-      vtkCell* cell = dataSet->GetCell(cellId);
-      double* cellBounds = cell->GetBounds();
-      vtkIdType imin = static_cast<vtkIdType>((cellBounds[0] - this->Bounds[0]) *
-                  this->CellDims[0] / (this->Bounds[1] - this->Bounds[0])),
-                imax =
-                  static_cast<vtkIdType>(((cellBounds[1] - this->Bounds[0]) * this->CellDims[0] /
-                                           (this->Bounds[1] - this->Bounds[0])) *
-                    (1.0 - VTK_DBL_EPSILON)),
-                jmin = static_cast<vtkIdType>((cellBounds[2] - this->Bounds[2]) *
-                  this->CellDims[1] / (this->Bounds[3] - this->Bounds[2])),
-                jmax =
-                  static_cast<vtkIdType>(((cellBounds[3] - this->Bounds[2]) * this->CellDims[1] /
-                                           (this->Bounds[3] - this->Bounds[2])) *
-                    (1.0 - VTK_DBL_EPSILON)),
-                kmin = static_cast<vtkIdType>((cellBounds[4] - this->Bounds[4]) *
-                  this->CellDims[2] / (this->Bounds[5] - this->Bounds[4])),
-                kmax =
-                  static_cast<vtkIdType>(((cellBounds[5] - this->Bounds[4]) * this->CellDims[2] /
-                                           (this->Bounds[5] - this->Bounds[4])) *
-                    (1.0 - VTK_DBL_EPSILON));
-      double hyperTreeBounds[6];
-
-      // For each hyper tree intersecting the bounding box
-      for (vtkIdType i = imin; i <= imax; ++i)
+      // We allocate weights which are needed to compute the distance between a point and a cell.
+      vtkIdType maxNumberOfPoints = 0;
+      for (vtkIdType cellId = 0; cellId < dataSet->GetNumberOfCells(); ++cellId)
       {
-        hyperTreeBounds[0] = this->Bounds[0] +
-          i * (this->Bounds[1] - this->Bounds[0]) / this->CellDims[0] + boundsEpsilon[0];
-        hyperTreeBounds[1] = this->Bounds[0] +
-          (i + 1) * (this->Bounds[1] - this->Bounds[0]) / this->CellDims[0] - boundsEpsilon[0];
-        for (vtkIdType j = jmin; j <= jmax; ++j)
+        vtkCell* cell = dataSet->GetCell(cellId);
+        maxNumberOfPoints = maxNumberOfPoints > cell->GetNumberOfPoints()
+          ? maxNumberOfPoints
+          : cell->GetNumberOfPoints();
+      }
+
+      // We allocate those variables to avoid unnecessary allocation inside the recursive function.
+      // Those are used to check the distance between a point and the cell.
+      double x[3], pcoords[3], closestPoint[3];
+      double* weights = new double[maxNumberOfPoints];
+
+      double boundsEpsilon[3] = { std::max(std::fabs(this->Bounds[0]), std::fabs(this->Bounds[1])) *
+          VTK_DBL_EPSILON,
+        std::max(std::fabs(this->Bounds[2]), std::fabs(this->Bounds[3])) * VTK_DBL_EPSILON,
+        std::max(std::fabs(this->Bounds[4]), std::fabs(this->Bounds[5])) * VTK_DBL_EPSILON };
+
+      // We forbid subdividing if a child is masked and has geometry passing through it.
+      for (vtkIdType cellId = 0; cellId < dataSet->GetNumberOfCells(); ++cellId)
+      {
+        this->UpdateProgress((double)cellId / dataSet->GetNumberOfCells());
+
+        // The strategy is the following:
+        // We go through all the coordinates in the multi resolution grid
+        // that intersect the bounding box of the input cell.
+        // Then we check if the corresponding position in near enough to the cell.
+        // If it it, we forbid subdivision with GridElement::CanSubdivide
+        vtkCell* cell = dataSet->GetCell(cellId);
+        double* cellBounds = cell->GetBounds();
+        vtkIdType imin = static_cast<vtkIdType>((cellBounds[0] - this->Bounds[0]) *
+                    this->CellDims[0] / (this->Bounds[1] - this->Bounds[0])),
+                  imax =
+                    static_cast<vtkIdType>(((cellBounds[1] - this->Bounds[0]) * this->CellDims[0] /
+                                             (this->Bounds[1] - this->Bounds[0])) *
+                      (1.0 - VTK_DBL_EPSILON)),
+                  jmin = static_cast<vtkIdType>((cellBounds[2] - this->Bounds[2]) *
+                    this->CellDims[1] / (this->Bounds[3] - this->Bounds[2])),
+                  jmax =
+                    static_cast<vtkIdType>(((cellBounds[3] - this->Bounds[2]) * this->CellDims[1] /
+                                             (this->Bounds[3] - this->Bounds[2])) *
+                      (1.0 - VTK_DBL_EPSILON)),
+                  kmin = static_cast<vtkIdType>((cellBounds[4] - this->Bounds[4]) *
+                    this->CellDims[2] / (this->Bounds[5] - this->Bounds[4])),
+                  kmax =
+                    static_cast<vtkIdType>(((cellBounds[5] - this->Bounds[4]) * this->CellDims[2] /
+                                             (this->Bounds[5] - this->Bounds[4])) *
+                      (1.0 - VTK_DBL_EPSILON));
+        double hyperTreeBounds[6];
+
+        // For each hyper tree intersecting the bounding box
+        for (vtkIdType i = imin; i <= imax; ++i)
         {
-          hyperTreeBounds[2] = this->Bounds[2] +
-            j * (this->Bounds[3] - this->Bounds[2]) / this->CellDims[1] + boundsEpsilon[1];
-          hyperTreeBounds[3] = this->Bounds[2] +
-            (j + 1) * (this->Bounds[3] - this->Bounds[2]) / this->CellDims[1] - boundsEpsilon[1];
-          for (vtkIdType k = kmin; k <= kmax; ++k)
+          hyperTreeBounds[0] = this->Bounds[0] +
+            i * (this->Bounds[1] - this->Bounds[0]) / this->CellDims[0] + boundsEpsilon[0];
+          hyperTreeBounds[1] = this->Bounds[0] +
+            (i + 1) * (this->Bounds[1] - this->Bounds[0]) / this->CellDims[0] - boundsEpsilon[0];
+          for (vtkIdType j = jmin; j <= jmax; ++j)
           {
-            hyperTreeBounds[4] = this->Bounds[4] +
-              k * (this->Bounds[5] - this->Bounds[4]) / this->CellDims[2] + boundsEpsilon[2];
-            hyperTreeBounds[5] = this->Bounds[4] +
-              (k + 1) * (this->Bounds[5] - this->Bounds[4]) / this->CellDims[2] - boundsEpsilon[2];
-
-            if (!this->LocalHyperTreeBoundingBox.empty())
+            hyperTreeBounds[2] = this->Bounds[2] +
+              j * (this->Bounds[3] - this->Bounds[2]) / this->CellDims[1] + boundsEpsilon[1];
+            hyperTreeBounds[3] = this->Bounds[2] +
+              (j + 1) * (this->Bounds[3] - this->Bounds[2]) / this->CellDims[1] - boundsEpsilon[1];
+            for (vtkIdType k = kmin; k <= kmax; ++k)
             {
-              // Checking if the considered point is in bounds, i.e. is owned by this process
-              std::size_t bidx = std::numeric_limits<std::size_t>::max();
-              while (++bidx != this->LocalHyperTreeBoundingBox.size() &&
-                !this->LocalHyperTreeBoundingBox[bidx].Contains(hyperTreeBounds))
-              {
-              }
-              if (bidx == this->LocalHyperTreeBoundingBox.size())
-              {
-                continue;
-              }
-            }
+              hyperTreeBounds[4] = this->Bounds[4] +
+                k * (this->Bounds[5] - this->Bounds[4]) / this->CellDims[2] + boundsEpsilon[2];
+              hyperTreeBounds[5] = this->Bounds[4] +
+                (k + 1) * (this->Bounds[5] - this->Bounds[4]) / this->CellDims[2] -
+                boundsEpsilon[2];
 
-            this->RecursivelyFillGaps(cell, this->Bounds, cellBounds, i, j, k, x, closestPoint,
-              pcoords, weights,
-              this->Extrapolate && fieldAssociation == vtkDataObject::FIELD_ASSOCIATION_POINTS);
+              if (!this->LocalHyperTreeBoundingBox.empty())
+              {
+                // Checking if the considered point is in bounds, i.e. is owned by this process
+                std::size_t bidx = std::numeric_limits<std::size_t>::max();
+                while (++bidx != this->LocalHyperTreeBoundingBox.size() &&
+                  !this->LocalHyperTreeBoundingBox[bidx].Contains(hyperTreeBounds))
+                {
+                }
+                if (bidx == this->LocalHyperTreeBoundingBox.size())
+                {
+                  continue;
+                }
+              }
+
+              this->RecursivelyFillGaps(cell, this->Bounds, cellBounds, i, j, k, x, closestPoint,
+                pcoords, weights,
+                this->Extrapolate && fieldAssociation == vtkDataObject::FIELD_ASSOCIATION_POINTS);
+            }
           }
         }
       }
+      delete[] weights;
     }
-    delete[] weights;
   }
 }
 
