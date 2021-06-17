@@ -102,7 +102,7 @@ public:
   {
   }
 
-  QValidator::State validate(QString& s, int&) const
+  QValidator::State validate(QString& s, int&) const override
   {
     if (s.isEmpty() || s == "-")
     {

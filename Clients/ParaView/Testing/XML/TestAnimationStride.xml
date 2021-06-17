@@ -1,0 +1,60 @@
+<?xml version="1.0" ?>
+<pqevents>
+  <!-- Test Snap-To-Timesteps mode -->
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuSources" />
+  <pqevent object="pqClientMainWindow/menubar/menuSources/Alphabetical" command="activate" arguments="TimeSource" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/animationViewDock/animationView/Stride" command="key" arguments="16777219" />
+  <pqevent object="pqClientMainWindow/animationViewDock/animationView/Stride" command="set_string" arguments="2" />
+  <pqevent object="pqClientMainWindow/animationViewDock/animationView/Stride" command="key" arguments="16777220" />
+
+  <pqevent object="pqClientMainWindow/VCRToolbar/actionVCRNextFrame" command="activate" arguments="" />
+  <pqcheck object="pqClientMainWindow/currentTimeToolbar/AnimationTimeWidget/timestepValue" property="value" arguments="2" />
+
+  <pqevent object="pqClientMainWindow/VCRToolbar/actionVCRNextFrame" command="activate" arguments="" />
+  <pqcheck object="pqClientMainWindow/currentTimeToolbar/AnimationTimeWidget/timestepValue" property="value" arguments="4" />
+
+  <pqevent object="pqClientMainWindow/animationViewDock/animationView/AnimationTimeWidget/timeValueComboBox" command="activated" arguments="0.56" />
+  <pqcheck object="pqClientMainWindow/currentTimeToolbar/AnimationTimeWidget/timestepValue" property="value" arguments="5" />
+
+  <pqevent object="pqClientMainWindow/VCRToolbar/actionVCRPreviousFrame" command="activate" arguments="" />
+  <pqcheck object="pqClientMainWindow/currentTimeToolbar/AnimationTimeWidget/timestepValue" property="value" arguments="3" />
+
+  <pqevent object="pqClientMainWindow/VCRToolbar/actionVCRPreviousFrame" command="activate" arguments="" />
+  <pqcheck object="pqClientMainWindow/currentTimeToolbar/AnimationTimeWidget/timestepValue" property="value" arguments="1" />
+
+  <pqevent object="pqClientMainWindow/VCRToolbar/actionVCRPreviousFrame" command="activate" arguments="" />
+  <pqcheck object="pqClientMainWindow/currentTimeToolbar/AnimationTimeWidget/timestepValue" property="value" arguments="1" />
+
+  <pqevent object="pqClientMainWindow/animationViewDock/animationView/PlayMode" command="activated" arguments="Sequence" />
+  <pqevent object="pqClientMainWindow/animationViewDock/animationView/Stride" command="key" arguments="16777219" />
+  <pqevent object="pqClientMainWindow/animationViewDock/animationView/Stride" command="set_string" arguments="2" />
+  <pqevent object="pqClientMainWindow/animationViewDock/animationView/Stride" command="key" arguments="16777220" />
+  <pqevent object="pqClientMainWindow/VCRToolbar/actionVCRNextFrame" command="activate" arguments="" />
+
+  <!-- Test Sequence mode -->
+  <pqevent object="pqClientMainWindow/VCRToolbar/actionVCRFirstFrame" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/animationViewDock/animationView/PlayMode" command="activated" arguments="Sequence" />
+
+  <pqevent object="pqClientMainWindow/animationViewDock/animationView/Stride" command="set_string" arguments="2" />
+  <pqevent object="pqClientMainWindow/animationViewDock/animationView/Stride" command="key" arguments="16777220" />
+  <pqcheck object="pqClientMainWindow/animationViewDock/animationView/AnimationTimeWidget/timeValue" property="text" arguments="0" />
+
+  <pqevent object="pqClientMainWindow/VCRToolbar/actionVCRNextFrame" command="activate" arguments="" />
+  <pqcheck object="pqClientMainWindow/animationViewDock/animationView/AnimationTimeWidget/timeValue" property="text" arguments="0.2222222222222222" />
+
+  <pqevent object="pqClientMainWindow/VCRToolbar/actionVCRNextFrame" command="activate" arguments="" />
+  <pqcheck object="pqClientMainWindow/animationViewDock/animationView/AnimationTimeWidget/timeValue" property="text" arguments="0.4444444444444444" />
+
+  <pqevent object="pqClientMainWindow/VCRToolbar/actionVCRNextFrame" command="activate" arguments="" />
+  <pqcheck object="pqClientMainWindow/animationViewDock/animationView/AnimationTimeWidget/timeValue" property="text" arguments="0.6666666666666666" />
+
+  <pqevent object="pqClientMainWindow/VCRToolbar/actionVCRNextFrame" command="activate" arguments="" />
+  <pqcheck object="pqClientMainWindow/animationViewDock/animationView/AnimationTimeWidget/timeValue" property="text" arguments="0.8888888888888888" />
+
+  <pqevent object="pqClientMainWindow/VCRToolbar/actionVCRNextFrame" command="activate" arguments="" />
+  <pqcheck object="pqClientMainWindow/animationViewDock/animationView/AnimationTimeWidget/timeValue" property="text" arguments="0.8888888888888888" />
+
+  <pqevent object="pqClientMainWindow/VCRToolbar/actionVCRPreviousFrame" command="activate" arguments="" />
+  <pqcheck object="pqClientMainWindow/animationViewDock/animationView/AnimationTimeWidget/timeValue" property="text" arguments="0.6666666666666666" />
+</pqevents>

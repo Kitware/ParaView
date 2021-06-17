@@ -593,6 +593,7 @@ SET (TESTS_WITHOUT_BASELINES
   SpreadSheetSelectedCellConnectivity.xml
   StringInLineChartView.xml
   TableHistogram.xml
+  TestAnimationStride.xml
   TestCompositePropertyWidgetDecorator.xml
   TextSource.xml
 )
@@ -1404,8 +1405,8 @@ endif(PARAVIEW_SSH_SERVERS_TESTING)
 
 #------------------------------------------------------------------------------
 
-# Add tests for OSPRay material editor 
-if(PARAVIEW_USE_MATERIALEDITOR) 
+# Add tests for OSPRay material editor
+if(PARAVIEW_USE_MATERIALEDITOR)
   list(APPEND TESTS_WITH_INLINE_COMPARES
     MaterialEditorCreateMaterials.xml
     MaterialEditorLoadMaterials.xml
