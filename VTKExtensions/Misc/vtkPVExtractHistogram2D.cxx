@@ -270,6 +270,8 @@ void vtkPVExtractHistogram2D::ComputeGradient(vtkDataObject* input)
   gf->SetComputeDivergence(false);
   gf->SetComputeQCriterion(false);
   gf->SetResultArrayName("Gradient");
+  gf->SetInputArrayToProcess(
+    0, 0, 0, this->GetInputArrayAssociation(0, input), this->ComponentArrayCache[0]->GetName());
   gf->Update();
 
   const auto gradientArray = gf->GetOutput()->GetPointData()->GetArray("Gradient");
