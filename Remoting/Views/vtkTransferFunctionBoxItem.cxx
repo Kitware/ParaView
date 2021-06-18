@@ -58,17 +58,21 @@ vtkStandardNewMacro(vtkTransferFunctionBoxItem)
   vtkTransferFunctionBoxItem::vtkTransferFunctionBoxItem()
   : Superclass()
 {
+  this->ValidBounds[0] = 0.0;
+  this->ValidBounds[1] = 1.0;
+  this->ValidBounds[2] = 0.0;
+  this->ValidBounds[3] = 1.0;
   // Initialize box, points are ordered as:
   //     3 ----- 2
   //     |       |
   // (4) 0 ----- 1
+  this->AddPoint(0.0, 0.0);
+  this->AddPoint(1.0, 0.0);
   this->AddPoint(1.0, 1.0);
-  this->AddPoint(20.0, 1.0);
-  this->AddPoint(20.0, 20.0);
-  this->AddPoint(1.0, 20.0);
+  this->AddPoint(0.0, 1.0);
 
   // Point 0 is repeated for rendering purposes
-  this->BoxPoints->InsertNextPoint(1.0, 1.0);
+  this->BoxPoints->InsertNextPoint(0.0, 0.0);
 
   // Initialize outline
   this->Pen->SetWidth(2.);
@@ -486,23 +490,32 @@ const vtkRectd& vtkTransferFunctionBoxItem::GetBox()
 void vtkTransferFunctionBoxItem::SetBox(
   const double x, const double y, const double width, const double height)
 {
-  // Delta position
-  double posBottomLeft[2];
-  this->BoxPoints->GetPoint(BOTTOM_LEFT, posBottomLeft);
+  this->StartChanges();
+  double pos[2];
+  pos[0] = x;
+  pos[1] = y;
 
-  vtkVector2f deltaPos(x - posBottomLeft[0], y - posBottomLeft[1]);
-  this->TransformDataToScreen(deltaPos, deltaPos);
+  this->ClampToValidPosition(pos);
+  this->BoxPoints->SetPoint(0, pos);
+  this->BoxPoints->SetPoint(4, pos);
 
-  // Delta dimensions
-  double posTopRight[2];
-  this->BoxPoints->GetPoint(TOP_RIGHT, posTopRight);
+  pos[0] = x + width;
+  pos[1] = y;
+  this->ClampToValidPosition(pos);
+  this->BoxPoints->SetPoint(1, pos);
 
-  double deltaSize[2];
-  deltaSize[0] = width - (posTopRight[0] - posBottomLeft[0]);
-  deltaSize[1] = height - (posTopRight[1] - posBottomLeft[1]);
+  pos[0] = x + width;
+  pos[1] = y + height;
+  this->ClampToValidPosition(pos);
+  this->BoxPoints->SetPoint(2, pos);
 
-  this->DragBox(deltaPos.GetX(), deltaPos.GetY());
-  this->DragCorner(TOP_RIGHT, deltaSize);
+  pos[0] = x;
+  pos[1] = y + height;
+  this->ClampToValidPosition(pos);
+  this->BoxPoints->SetPoint(3, pos);
+
+  this->EndChanges();
+  this->InvokeEvent(vtkTransferFunctionBoxItem::BoxEditEvent);
 }
 
 vtkIdType vtkTransferFunctionBoxItem::FindBoxPoint(double* _pos)
@@ -554,4 +567,28 @@ vtkIdType vtkTransferFunctionBoxItem::FindBoxPoint(double* _pos)
 vtkSmartPointer<vtkImageData> vtkTransferFunctionBoxItem::GetTexture() const
 {
   return this->Texture;
+}
+
+//-------------------------------------------------------------------------------------------------
+void vtkTransferFunctionBoxItem::SetValidBounds(double x0, double x1, double y0, double y1)
+{
+  if (this->ValidBounds[0] == x0 && this->ValidBounds[1] == x1 && this->ValidBounds[2] == y0 &&
+    this->ValidBounds[3] == y1)
+  {
+    return;
+  }
+
+  for (vtkIdType id = 0; id < this->NumPoints; id++)
+  {
+    double pos[2];
+    this->BoxPoints->GetPoint(id, pos);
+    pos[0] =
+      (pos[0] - this->ValidBounds[0]) * (x1 - x0) / (this->ValidBounds[1] - this->ValidBounds[0]) +
+      x0;
+    pos[1] =
+      (pos[1] - this->ValidBounds[2]) * (y1 - y0) / (this->ValidBounds[3] - this->ValidBounds[2]) +
+      y0;
+    this->BoxPoints->SetPoint(id, pos);
+  }
+  this->Superclass::SetValidBounds(x0, x1, y0, y1);
 }

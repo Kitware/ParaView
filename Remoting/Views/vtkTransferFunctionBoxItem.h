@@ -56,6 +56,11 @@ public:
    */
   vtkSmartPointer<vtkImageData> GetTexture() const;
 
+  /*
+   * Override to rescale box corners when the valid bounds have changed.
+   */
+  virtual void SetValidBounds(double x0, double x1, double y0, double y1) override;
+
 protected:
   vtkTransferFunctionBoxItem();
   ~vtkTransferFunctionBoxItem();
