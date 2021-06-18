@@ -739,10 +739,10 @@ vtkImageData* vtkSMTransferFunctionProxy::ComputeDataHistogram2D(int numberOfBin
           array2Asso = colorArray2Helper.GetInputArrayAssociation();
           array2Name = colorArray2Helper.GetInputArrayNameToProcess();
           vtkSMPropertyHelper inputHelper(consumer, "Input");
-          vtkSMSourceProxy* input = vtkSMSourceProxy::SafeDownCast(inputHelper.GetAsProxy());
+          vtkSMSourceProxy* inputProxy = vtkSMSourceProxy::SafeDownCast(inputHelper.GetAsProxy());
           unsigned int port = inputHelper.GetOutputPort();
           vtkPVArrayInformation* arrayInfoFromData =
-            input->GetDataInformation(port)->GetArrayInformation(
+            inputProxy->GetDataInformation(port)->GetArrayInformation(
               colorArray2Helper.GetInputArrayNameToProcess(),
               colorArray2Helper.GetInputArrayAssociation());
           if (arrayInfoFromData && arrayInfoFromData->GetNumberOfComponents() > 1)
@@ -833,7 +833,7 @@ vtkImageData* vtkSMTransferFunctionProxy::ComputeDataHistogram2D(int numberOfBin
   vtkSMPropertyHelper(mover, "OutputDataType").Set(VTK_IMAGE_DATA);
   mover->UpdateVTKObjects();
   mover->UpdatePipeline();
-  vtkImageData* hist2D = vtkImageData::SafeDownCast(
+  vtkSmartPointer<vtkImageData> hist2D = vtkImageData::SafeDownCast(
     vtkAlgorithm::SafeDownCast(mover->GetClientSideObject())->GetOutputDataObject(0));
   if (!this->Histogram2DCache)
   {
@@ -848,7 +848,7 @@ vtkImageData* vtkSMTransferFunctionProxy::ComputeDataHistogram2D(int numberOfBin
     this->Histogram2DCache = nullptr;
     return this->Histogram2DCache;
   }
-  vtkDoubleArray* valueArray =
+  vtkSmartPointer<vtkDoubleArray> valueArray =
     vtkDoubleArray::SafeDownCast(this->Histogram2DCache->GetPointData()->GetScalars());
   if (!valueArray)
   {
