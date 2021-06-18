@@ -663,7 +663,7 @@ vtkTable* vtkSMTransferFunctionProxy::ComputeDataHistogramTable(int numberOfBins
 }
 
 //----------------------------------------------------------------------------
-vtkImageData* vtkSMTransferFunctionProxy::ComputeDataHistogram2D(int numberOfBins)
+vtkSmartPointer<vtkImageData> vtkSMTransferFunctionProxy::ComputeDataHistogram2D(int numberOfBins)
 {
   // Recover component property
   int component = -1;
@@ -839,7 +839,7 @@ vtkImageData* vtkSMTransferFunctionProxy::ComputeDataHistogram2D(int numberOfBin
   {
     this->Histogram2DCache = vtkSmartPointer<vtkImageData>::New();
   }
-  this->Histogram2DCache->ShallowCopy(hist2D);
+  this->Histogram2DCache->DeepCopy(hist2D);
 
   // Sanity check
   if (this->Histogram2DCache->GetNumberOfPoints() < numberOfBins * numberOfBins)

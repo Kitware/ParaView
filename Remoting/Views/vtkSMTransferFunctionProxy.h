@@ -298,8 +298,8 @@ public:
    * If successful, returns the histogram as a vtkImageData of type double.
    * If not, returns nullptr.
    */
-  virtual vtkImageData* ComputeDataHistogram2D(int numberOfBins);
-  static vtkImageData* ComputeDataHistogram2D(vtkSMProxy* proxy, int numberOfBins)
+  virtual vtkSmartPointer<vtkImageData> ComputeDataHistogram2D(int numberOfBins);
+  static vtkSmartPointer<vtkImageData> ComputeDataHistogram2D(vtkSMProxy* proxy, int numberOfBins)
   {
     vtkSMTransferFunctionProxy* self = vtkSMTransferFunctionProxy::SafeDownCast(proxy);
     return self ? self->ComputeDataHistogram2D(numberOfBins) : nullptr;
