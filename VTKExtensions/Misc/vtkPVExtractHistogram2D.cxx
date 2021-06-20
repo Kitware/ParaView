@@ -244,11 +244,13 @@ void vtkPVExtractHistogram2D::ComputeHistogram2D(vtkImageData* histogram)
   for (vtk::TupleIdType tupleId = 0; tupleId < numTuples; ++tupleId)
   {
     const auto a1 = arr1Range[tupleId][this->ComponentIndexCache[0]];
-    vtkIdType bin1 = static_cast<vtkIdType>((a1 - this->ComponentRangeCache[0][0]) *
-      this->NumberOfBins[0] / (this->ComponentRangeCache[0][1] - this->ComponentRangeCache[0][0]));
+    vtkIdType bin1 =
+      static_cast<vtkIdType>((a1 - this->ComponentRangeCache[0][0]) * (this->NumberOfBins[0] - 1) /
+        (this->ComponentRangeCache[0][1] - this->ComponentRangeCache[0][0]));
     const auto a2 = arr2Range[tupleId][this->ComponentIndexCache[1]];
-    vtkIdType bin2 = static_cast<vtkIdType>((a2 - this->ComponentRangeCache[1][0]) *
-      this->NumberOfBins[1] / (this->ComponentRangeCache[1][1] - this->ComponentRangeCache[1][0]));
+    vtkIdType bin2 =
+      static_cast<vtkIdType>((a2 - this->ComponentRangeCache[1][0]) * (this->NumberOfBins[1] - 1) /
+        (this->ComponentRangeCache[1][1] - this->ComponentRangeCache[1][0]));
     vtkIdType histIndex = bin2 * this->NumberOfBins[0] + bin1;
     histArray->SetTuple1(histIndex, histArray->GetTuple1(histIndex) + 1);
   }
