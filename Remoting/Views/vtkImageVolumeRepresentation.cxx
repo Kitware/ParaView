@@ -400,6 +400,17 @@ void vtkImageVolumeRepresentation::UpdateMapperParameters()
     if (this->UseTransfer2D)
     {
       this->Property->SetTransferFunctionMode(vtkVolumeProperty::TF_2D);
+      if (auto mbMapper = vtkMultiBlockVolumeMapper::SafeDownCast(this->VolumeMapper))
+      {
+        if (!this->UseGradientForTransfer2D && !this->ColorArray2Name.empty())
+        {
+          mbMapper->SetTransfer2DYAxisArray(this->ColorArray2Name.c_str());
+        }
+        else
+        {
+          mbMapper->SetTransfer2DYAxisArray(nullptr);
+        }
+      }
     }
     else
     {
