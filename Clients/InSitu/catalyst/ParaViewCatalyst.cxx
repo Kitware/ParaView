@@ -301,3 +301,9 @@ enum catalyst_error catalyst_about_paraview(conduit_node* params)
 
   return catalyst_error_ok;
 }
+
+//-----------------------------------------------------------------------------
+enum catalyst_error catalyst_results_paraview(conduit_node* params)
+{
+  return catalyst_stub_results(params);
+}
