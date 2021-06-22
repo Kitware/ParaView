@@ -18,8 +18,8 @@
 #include "vtkFunctor.h"
 #include "vtkObjectFactory.h"
 
+#include <algorithm>
 #include <cassert>
-#include <functional>
 #include <limits>
 
 vtkStandardNewMacro(vtkMaxAccumulator);
