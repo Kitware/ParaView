@@ -20,17 +20,6 @@ set(sources
   vtkPVOpenVRWidgets.h
   )
 
-
-# if we build the openvr plugin then look to add collaboration
-# for collaboration we leverage mineview.
-#-----------------------------------------------------------------------------
-if (WIN32 AND
-    PARAVIEW_MINEVIEW_SOURCE_DIR AND
-    PARAVIEW_OpenVR_COLLABORATION)
-  list(APPEND sources "${PARAVIEW_MINEVIEW_SOURCE_DIR}/mvCollaborationClient.cxx")
-endif()
-
-
 paraview_plugin_add_dock_window(
   CLASS_NAME pqOpenVRDockPanel
   DOCK_AREA Right
@@ -58,9 +47,6 @@ paraview_add_plugin(OpenVR
 
 #-----------------------------------------------------------------------------
 if (WIN32 AND PARAVIEW_PLUGIN_ENABLE_OpenVR)
-  option(PARAVIEW_OpenVR_COLLABORATION
-    "Turn on collaboration support for the openVR plugin, requires mineview source tree" OFF)
-  mark_as_advanced(PARAVIEW_OpenVR_COLLABORATION)
   option(PARAVIEW_OpenVR_Imago_Support
     "Turn on support for the Imago Image Loading" OFF)
   mark_as_advanced(PARAVIEW_OpenVR_Imago_Support)
@@ -75,19 +61,7 @@ if (PARAVIEW_OpenVR_Imago_Support)
       COMPILE_DEFINITIONS OPENVR_HAS_IMAGO_SUPPORT)
 endif()
 
-if (PARAVIEW_OpenVR_COLLABORATION)
-  find_path(PARAVIEW_MINEVIEW_SOURCE_DIR mvLobby.h
-    DOC "Location of your mineview source tree. See https://gitlab.kitware.com/ken-martin/mineview")
-endif()
-
-if (PARAVIEW_OpenVR_COLLABORATION AND PARAVIEW_MINEVIEW_SOURCE_DIR)
-  set_property(TARGET OpenVR APPEND PROPERTY INCLUDE_DIRECTORIES
-    "${PARAVIEW_MINEVIEW_SOURCE_DIR}/zeromq/release"
-    "${PARAVIEW_MINEVIEW_SOURCE_DIR}"
-    )
-  set_property(TARGET OpenVR APPEND PROPERTY LINK_LIBRARIES
-    "${PARAVIEW_MINEVIEW_SOURCE_DIR}/zeromq/release/libzmq-mt-4_3_1.lib"
-    )
+if (VTK_ENABLE_OPENVR_COLLABORATION)
   set_property(SOURCE vtkPVOpenVRCollaborationClient.cxx APPEND PROPERTY
     COMPILE_DEFINITIONS OPENVR_HAS_COLLABORATION
     )

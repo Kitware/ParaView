@@ -21,6 +21,7 @@
 #define vtkPVOpenVRCollaborationClient_h
 
 #include "vtkEventData.h"
+#include "vtkLogger.h" // for Verbosity enum
 #include "vtkObject.h"
 #include <functional> // for method
 #include <set>        // for ivar
@@ -56,7 +57,8 @@ public:
 
   void GoToSavedLocation(int pos);
   void SetCurrentLocation(int val) { this->CurrentLocation = val; }
-  void SetLogCallback(std::function<void(std::string const& data, void* cd)> cb, void* clientData);
+  void SetLogCallback(
+    std::function<void(std::string const& data, vtkLogger::Verbosity verbosity)> cb);
   void GoToPose(vtkOpenVRCameraPose const& pose, double* collabTrans, double* collabDir);
 
   void RemoveAllCropPlanes();

@@ -19,6 +19,7 @@
  * OpenVR settings and controls.
  */
 
+#include "vtkLogger.h" // for Verbosity enum
 #include <QDockWidget>
 
 class pqOpenVRControls;
@@ -75,7 +76,7 @@ protected Q_SLOTS:
   void onViewRemoved(pqView*);
 
   void collaborationConnect();
-  void collaborationCallback(std::string const& data, void* cd);
+  void collaborationCallback(std::string const& data, vtkLogger::Verbosity verbosity);
 
   void editableFieldChanged(const QString& text);
   void fieldValuesChanged(const QString& text);
