@@ -43,6 +43,20 @@
     </widget>
    </item>
    <item>
+    <widget class="QPushButton" name="SaveQuilt">
+     <property name="text">
+      <string>Save Quilt</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QPushButton" name="RecordQuilt">
+     <property name="text">
+      <string>Record Quilt</string>
+     </property>
+    </widget>
+   </item>
+   <item>
     <spacer name="verticalSpacer">
      <property name="orientation">
       <enum>Qt::Vertical</enum>
