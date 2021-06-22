@@ -289,6 +289,8 @@ vtkSmartPointer<vtkDataArray> vtkConduitArrayUtilities::MCArrayToVTKArrayImpl(
     vtkLogF(ERROR, "unsupported array layout.");
     return nullptr;
   }
+
+  return nullptr;
 }
 
 //----------------------------------------------------------------------------
