@@ -16,8 +16,8 @@
 
 #include "vtkPVLogger.h"
 
+#include <catalyst_conduit_blueprint.hpp>
 #include <cinttypes>
-#include <conduit_blueprint.hpp>
 
 namespace initialize
 {
@@ -26,7 +26,7 @@ namespace scripts
 
 namespace args
 {
-bool verify(const std::string& protocol, const conduit::Node& n)
+bool verify(const std::string& protocol, const conduit_cpp::Node& n)
 {
   vtkVLogScopeF(PARAVIEW_LOG_CATALYST_VERBOSITY(), "%s::verify", protocol.c_str());
   if (!n.dtype().is_list())
@@ -40,10 +40,10 @@ bool verify(const std::string& protocol, const conduit::Node& n)
     vtkVLogF(PARAVIEW_LOG_CATALYST_VERBOSITY(), "empty node provided.");
   }
 
-  auto iter = n.children();
-  while (iter.has_next())
+  conduit_index_t nchildren = n.number_of_children();
+  for (conduit_index_t i = 0; i < nchildren; ++i)
   {
-    auto& param = iter.next();
+    const auto param = n.child(i);
     if (!param.dtype().is_string())
     {
       vtkLogF(ERROR, "unsupported type '%s'; only string types are supported.",
@@ -56,7 +56,7 @@ bool verify(const std::string& protocol, const conduit::Node& n)
 }
 }
 
-bool verify(const std::string& protocol, const conduit::Node& n)
+bool verify(const std::string& protocol, const conduit_cpp::Node& n)
 {
   vtkVLogScopeF(PARAVIEW_LOG_CATALYST_VERBOSITY(), "%s: verify", protocol.c_str());
   if (!n.dtype().is_object() && !n.dtype().is_list())
@@ -69,10 +69,10 @@ bool verify(const std::string& protocol, const conduit::Node& n)
     vtkVLogF(PARAVIEW_LOG_CATALYST_VERBOSITY(), "empty 'n' provided.");
   }
   int index = 0;
-  auto iter = n.children();
-  while (iter.has_next())
+  conduit_index_t nchildren = n.number_of_children();
+  for (conduit_index_t i = 0; i < nchildren; ++i)
   {
-    auto& script = iter.next();
+    const auto script = n.child(i);
     if (script.dtype().is_string())
     {
       // all's well, child node directly a string which is interpreted
@@ -83,18 +83,18 @@ bool verify(const std::string& protocol, const conduit::Node& n)
     {
       if (!script.has_path("filename"))
       {
-        vtkLogF(ERROR, "'script/%s' missing required 'filename'", iter.name().c_str());
+        vtkLogF(ERROR, "'script/%s' missing required 'filename'", script.name().c_str());
         return false;
       }
 
       if (!script["filename"].dtype().is_string())
       {
-        vtkLogF(ERROR, "'script/%s/filename' must be a 'string'.", iter.name().c_str());
+        vtkLogF(ERROR, "'script/%s/filename' must be a 'string'.", script.name().c_str());
         return false;
       }
 
       vtkVLogF(PARAVIEW_LOG_CATALYST_VERBOSITY(), "script (%s): '%s'",
-        n.dtype().is_object() ? iter.name().c_str() : std::to_string(index).c_str(),
+        n.dtype().is_object() ? script.name().c_str() : std::to_string(index).c_str(),
         script["filename"].as_string().c_str());
 
       // let's verify "args", if any.
@@ -119,7 +119,7 @@ bool verify(const std::string& protocol, const conduit::Node& n)
 
 namespace pipeline
 {
-bool verify(const std::string& protocol, const conduit::Node& n)
+bool verify(const std::string& protocol, const conduit_cpp::Node& n)
 {
   vtkVLogScopeF(PARAVIEW_LOG_CATALYST_VERBOSITY(), "%s: verify", protocol.c_str());
   if (!n.dtype().is_object())
@@ -165,7 +165,7 @@ bool verify(const std::string& protocol, const conduit::Node& n)
 } // namespace pipeline
 namespace pipelines
 {
-bool verify(const std::string& protocol, const conduit::Node& n)
+bool verify(const std::string& protocol, const conduit_cpp::Node& n)
 {
   vtkVLogScopeF(PARAVIEW_LOG_CATALYST_VERBOSITY(), "%s: verify", protocol.c_str());
   if (!n.dtype().is_object() && !n.dtype().is_list())
@@ -177,10 +177,10 @@ bool verify(const std::string& protocol, const conduit::Node& n)
   {
     vtkVLogF(PARAVIEW_LOG_CATALYST_VERBOSITY(), "empty 'n' provided.");
   }
-  auto iter = n.children();
-  while (iter.has_next())
+  conduit_index_t nchildren = n.number_of_children();
+  for (conduit_index_t i = 0; i < nchildren; ++i)
   {
-    auto& pipeline = iter.next();
+    const auto pipeline = n.child(i);
     if (!pipeline::verify(protocol + "::pipeline", pipeline))
     {
       return false;
@@ -190,7 +190,7 @@ bool verify(const std::string& protocol, const conduit::Node& n)
 }
 } // namespace pipelines
 
-bool verify(const std::string& protocol, const conduit::Node& n)
+bool verify(const std::string& protocol, const conduit_cpp::Node& n)
 {
   vtkVLogScopeF(PARAVIEW_LOG_CATALYST_VERBOSITY(), "%s: verify", protocol.c_str());
   if (n.dtype().is_empty())
@@ -238,7 +238,7 @@ namespace execute
 {
 namespace state
 {
-bool verify(const std::string& protocol, const conduit::Node& n)
+bool verify(const std::string& protocol, const conduit_cpp::Node& n)
 {
   vtkVLogF(PARAVIEW_LOG_CATALYST_VERBOSITY(), "%s: verify", protocol.c_str());
   if (!n.dtype().is_object())
@@ -292,7 +292,7 @@ bool verify(const std::string& protocol, const conduit::Node& n)
 
 namespace channel
 {
-bool verify(const std::string& protocol, const conduit::Node& n)
+bool verify(const std::string& protocol, const conduit_cpp::Node& n)
 {
   vtkVLogScopeF(PARAVIEW_LOG_CATALYST_VERBOSITY(), "%s: verify", protocol.c_str());
   if (!n.dtype().is_object())
@@ -326,15 +326,15 @@ bool verify(const std::string& protocol, const conduit::Node& n)
   auto type = n["type"].as_string();
   if (type == "mesh")
   {
-    conduit::Node info;
-    if (conduit::blueprint::verify("mesh", n["data"], info))
+    conduit_cpp::Node info;
+    if (conduit_cpp::Blueprint::verify("mesh", n["data"], info))
     {
       vtkVLogScopeF(PARAVIEW_LOG_CATALYST_VERBOSITY(), "Conduit Mesh blueprint verified.");
     }
     else
     {
       vtkLogF(ERROR, "Conduit Mesh blueprint validate failed!");
-      vtkVLog(PARAVIEW_LOG_CATALYST_VERBOSITY(), << info.to_json());
+      /* vtkVLog(PARAVIEW_LOG_CATALYST_VERBOSITY(), << info.to_json()); */
       return false;
     }
   }
@@ -348,7 +348,7 @@ bool verify(const std::string& protocol, const conduit::Node& n)
 }
 namespace channels
 {
-bool verify(const std::string& protocol, const conduit::Node& n)
+bool verify(const std::string& protocol, const conduit_cpp::Node& n)
 {
   vtkVLogScopeF(PARAVIEW_LOG_CATALYST_VERBOSITY(), "%s: verify", protocol.c_str());
   if (!n.dtype().is_object())
@@ -357,14 +357,14 @@ bool verify(const std::string& protocol, const conduit::Node& n)
     return false;
   }
 
-  auto iter = n.children();
-  while (iter.has_next())
+  conduit_index_t nchildren = n.number_of_children();
+  for (conduit_index_t i = 0; i < nchildren; ++i)
   {
-    iter.next();
-    const auto& name = iter.name();
+    const auto channel = n.child(i);
+    const auto& name = channel.name();
     const std::string completeName =
       std::string(protocol).append("::channel['").append(name).append("']");
-    if (!channel::verify(completeName, iter.node()))
+    if (!channel::verify(completeName, channel))
     {
       return false;
     }
@@ -373,7 +373,7 @@ bool verify(const std::string& protocol, const conduit::Node& n)
 }
 
 } // namespace channels
-bool verify(const std::string& protocol, const conduit::Node& n)
+bool verify(const std::string& protocol, const conduit_cpp::Node& n)
 {
   vtkVLogScopeF(PARAVIEW_LOG_CATALYST_VERBOSITY(), "%s: verify", protocol.c_str());
   if (!n.dtype().is_object())
@@ -412,7 +412,7 @@ vtkCatalystBlueprint::vtkCatalystBlueprint() = default;
 vtkCatalystBlueprint::~vtkCatalystBlueprint() = default;
 
 //----------------------------------------------------------------------------
-bool vtkCatalystBlueprint::Verify(const std::string& protocol, const conduit::Node& n)
+bool vtkCatalystBlueprint::Verify(const std::string& protocol, const conduit_cpp::Node& n)
 {
   bool res = false;
   if (protocol == "initialize")

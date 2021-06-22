@@ -14,10 +14,9 @@
 =========================================================================*/
 
 #include <catalyst.h>
+#include <catalyst_conduit.hpp>
+#include <catalyst_conduit_blueprint.hpp>
 #include <catalyst_stub.h>
-#include <conduit.hpp>
-#include <conduit_blueprint.hpp>
-#include <conduit_cpp_to_c.hpp>
 
 #include "vtkCatalystBlueprint.h"
 #include "vtkConduitSource.h"
@@ -35,8 +34,8 @@
 
 #include "catalyst_impl_paraview.h"
 
-static bool update_producer_mesh_blueprint(
-  const std::string& channel_name, const conduit::Node* node, const conduit::Node* global_fields)
+static bool update_producer_mesh_blueprint(const std::string& channel_name,
+  const conduit_cpp::Node* node, const conduit_cpp::Node* global_fields)
 {
   auto producer = vtkInSituInitializationHelper::GetProducer(channel_name);
   if (producer == nullptr)
@@ -59,7 +58,7 @@ static bool update_producer_mesh_blueprint(
   return true;
 }
 
-static vtkSmartPointer<vtkInSituPipeline> create_precompiled_pipeline(const conduit::Node& node)
+static vtkSmartPointer<vtkInSituPipeline> create_precompiled_pipeline(const conduit_cpp::Node& node)
 {
   if (node["type"].as_string() == "io")
   {
@@ -74,13 +73,13 @@ static vtkSmartPointer<vtkInSituPipeline> create_precompiled_pipeline(const cond
   }
 }
 
-static bool process_script_args(vtkInSituPipelinePython* pipeline, const conduit::Node& node)
+static bool process_script_args(vtkInSituPipelinePython* pipeline, const conduit_cpp::Node& node)
 {
   std::vector<std::string> args;
-  auto iter = node.children();
-  while (iter.has_next())
+  conduit_index_t nchildren = node.number_of_children();
+  for (conduit_index_t i = 0; i < nchildren; ++i)
   {
-    args.push_back(iter.next().as_string());
+    args.push_back(node.child(i).as_string());
   }
   pipeline->SetArguments(args);
   return true;
@@ -98,7 +97,7 @@ enum catalyst_error catalyst_initialize_paraview(const conduit_node* params)
   vtkLogger::Init();
   vtkVLogScopeFunction(PARAVIEW_LOG_CATALYST_VERBOSITY());
 
-  const auto& cpp_params = (*conduit::cpp_node(params));
+  const conduit_cpp::Node cpp_params = conduit_cpp::cpp_node(const_cast<conduit_node*>(params));
   if (!cpp_params.has_path("catalyst"))
   {
     // no catalyst params specified, right now, am not sure if this is a error.
@@ -130,10 +129,10 @@ enum catalyst_error catalyst_initialize_paraview(const conduit_node* params)
     if (vtkInSituInitializationHelper::IsPythonSupported())
     {
       auto& scripts = cpp_params["catalyst/scripts"];
-      auto iter = scripts.children();
-      while (iter.has_next())
+      conduit_index_t nchildren = scripts.number_of_children();
+      for (conduit_index_t i = 0; i < nchildren; ++i)
       {
-        auto& script = iter.next();
+        auto script = scripts.child(i);
         const auto fname =
           script.dtype().is_string() ? script.as_string() : script["filename"].as_string();
 
@@ -157,11 +156,10 @@ enum catalyst_error catalyst_initialize_paraview(const conduit_node* params)
   if (cpp_params.has_path("catalyst/pipelines"))
   {
     auto& pipelines = cpp_params["catalyst/pipelines"];
-    auto iter = pipelines.children();
-    while (iter.has_next())
+    conduit_index_t nchildren = pipelines.number_of_children();
+    for (conduit_index_t i = 0; i < nchildren; ++i)
     {
-      iter.next();
-      if (auto p = create_precompiled_pipeline(iter.node()))
+      if (auto p = create_precompiled_pipeline(pipelines.child(i)))
       {
         vtkInSituInitializationHelper::AddPipeline(p);
       }
@@ -184,7 +182,7 @@ enum catalyst_error catalyst_execute_paraview(const conduit_node* params)
 {
   vtkVLogScopeFunction(PARAVIEW_LOG_CATALYST_VERBOSITY());
 
-  const auto& cpp_params = (*conduit::cpp_node(params));
+  const conduit_cpp::Node cpp_params = conduit_cpp::cpp_node(const_cast<conduit_node*>(params));
   if (!cpp_params.has_path("catalyst"))
   {
     vtkVLogF(PARAVIEW_LOG_CATALYST_VERBOSITY(), "Path 'catalyst' is not provided. Skipping.");
@@ -208,28 +206,28 @@ enum catalyst_error catalyst_execute_paraview(const conduit_node* params)
   vtkVLogScopeF(
     PARAVIEW_LOG_CATALYST_VERBOSITY(), "co-processing for timestep=%d, time=%f", timestep, time);
 
-  conduit::Node globalFields;
+  conduit_cpp::Node globalFields;
 
   // catalyst/channels are used to communicate meshes.
   if (root.has_child("channels"))
   {
-    auto iter = root["channels"].children();
-    while (iter.has_next())
+    const auto channels = root["channels"];
+    conduit_index_t nchildren = channels.number_of_children();
+    for (conduit_index_t i = 0; i < nchildren; ++i)
     {
-      iter.next();
-      const std::string channel_name = iter.name();
-      const auto& channel_node = iter.node();
+      const auto channel_node = channels.child(i);
+      const std::string channel_name = channel_node.name();
       const std::string type = channel_node["type"].as_string();
       if (type == "mesh")
       {
         auto& mesh_node = channel_node["data"];
-        conduit::Node info;
-        if (conduit::blueprint::verify("mesh", mesh_node, info))
+        conduit_cpp::Node info;
+        if (conduit_cpp::Blueprint::verify("mesh", mesh_node, info))
         {
           vtkVLogF(PARAVIEW_LOG_CATALYST_VERBOSITY(),
             "Conduit Mesh blueprint validation succeeded for channel (%s)", channel_name.c_str());
 
-          auto& fields = globalFields[channel_name];
+          auto fields = globalFields[channel_name];
           fields["time"].set(time);
           fields["timestep"].set(timestep);
           fields["cycle"].set(timestep);
@@ -260,10 +258,11 @@ enum catalyst_error catalyst_execute_paraview(const conduit_node* params)
   std::vector<std::string> parameters = {};
   if (root.has_path("state/parameters"))
   {
-    auto iter = root["state/parameters"].children();
-    while (iter.has_next())
+    const auto stat_parameters = root["stat/parameters"];
+    conduit_index_t nchildren = stat_parameters.number_of_children();
+    for (conduit_index_t i = 0; i < nchildren; ++i)
     {
-      parameters.push_back(iter.next().as_string());
+      parameters.push_back(stat_parameters.child(i).as_string());
     }
   }
   vtkInSituInitializationHelper::ExecutePipelines(timestep, time, parameters);
@@ -276,7 +275,7 @@ enum catalyst_error catalyst_finalize_paraview(const conduit_node* params)
 {
   vtkVLogScopeFunction(PARAVIEW_LOG_CATALYST_VERBOSITY());
 
-  const auto& cpp_params = (*conduit::cpp_node(params));
+  const conduit_cpp::Node cpp_params = conduit_cpp::cpp_node(const_cast<conduit_node*>(params));
   if (cpp_params.has_path("catalyst") &&
     !vtkCatalystBlueprint::Verify("finalize", cpp_params["catalyst"]))
   {
@@ -292,7 +291,7 @@ enum catalyst_error catalyst_finalize_paraview(const conduit_node* params)
 enum catalyst_error catalyst_about_paraview(conduit_node* params)
 {
   catalyst_stub_about(params);
-  auto& cpp_params = (*conduit::cpp_node(params));
+  conduit_cpp::Node cpp_params = conduit_cpp::cpp_node(params);
   cpp_params["catalyst"]["capabilities"].append().set("paraview");
   if (vtkInSituInitializationHelper::IsPythonSupported())
   {
