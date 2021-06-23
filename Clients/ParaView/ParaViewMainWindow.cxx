@@ -29,7 +29,7 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifdef PARAVIEW_USE_PYTHON
+#if PARAVIEW_USE_PYTHON
 #include "pvpythonmodules.h"
 #endif
 
@@ -66,15 +66,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QTextCodec>
 #include <QtDebug>
 
-#ifdef PARAVIEW_ENABLE_EMBEDDED_DOCUMENTATION
+#if PARAVIEW_ENABLE_EMBEDDED_DOCUMENTATION
 #include "ParaViewDocumentationInitializer.h"
 #endif
 
-#ifdef PARAVIEW_USE_MATERIALEDITOR
+#if PARAVIEW_USE_MATERIALEDITOR
 #include "pqMaterialEditor.h"
 #endif
 
-#ifdef PARAVIEW_USE_PYTHON
+#if PARAVIEW_USE_PYTHON
 #include "pqPythonDebugLeaksView.h"
 #include "pqPythonShell.h"
 typedef pqPythonDebugLeaksView DebugLeaksViewType;
@@ -112,11 +112,11 @@ ParaViewMainWindow::ParaViewMainWindow()
     leaksView->show();
   }
 
-#ifdef PARAVIEW_USE_PYTHON
+#if PARAVIEW_USE_PYTHON
   pvpythonmodules_load();
 #endif
 
-#ifdef PARAVIEW_ENABLE_EMBEDDED_DOCUMENTATION
+#if PARAVIEW_ENABLE_EMBEDDED_DOCUMENTATION
   // init the ParaView embedded documentation.
   paraview_documentation_initialize();
 #endif
@@ -126,7 +126,7 @@ ParaViewMainWindow::ParaViewMainWindow()
   this->Internals->outputWidgetDock->hide();
   this->Internals->pythonShellDock->hide();
   this->Internals->materialEditorDock->hide();
-#ifdef PARAVIEW_USE_PYTHON
+#if PARAVIEW_USE_PYTHON
   pqPythonShell* shell = new pqPythonShell(this);
   shell->setObjectName("pythonShell");
   this->Internals->pythonShellDock->setWidget(shell);
@@ -136,7 +136,7 @@ ParaViewMainWindow::ParaViewMainWindow()
   }
 #endif
 
-#ifdef PARAVIEW_USE_MATERIALEDITOR
+#if PARAVIEW_USE_MATERIALEDITOR
   pqMaterialEditor* materialEditor = new pqMaterialEditor(this);
   materialEditor->setObjectName("materialEditorPanel");
   this->Internals->materialEditorDock->setWidget(materialEditor);
@@ -388,7 +388,7 @@ void ParaViewMainWindow::updateFontSize()
   }
 
 // Console font size
-#ifdef PARAVIEW_USE_PYTHON
+#if PARAVIEW_USE_PYTHON
   pqPythonShell* shell = qobject_cast<pqPythonShell*>(this->Internals->pythonShellDock->widget());
   shell->setFontSize(fontSize);
 #endif

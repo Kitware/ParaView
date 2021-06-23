@@ -81,19 +81,19 @@ target_link_libraries(paraview
     Qt5::Core
     Qt5::Widgets)
 
+target_compile_definitions(paraview
+  PRIVATE
+    "PARAVIEW_ENABLE_EMBEDDED_DOCUMENTATION=$<BOOL:${PARAVIEW_ENABLE_EMBEDDED_DOCUMENTATION}>")
 if (PARAVIEW_ENABLE_EMBEDDED_DOCUMENTATION)
-  target_compile_definitions(paraview
-    PRIVATE
-      PARAVIEW_ENABLE_EMBEDDED_DOCUMENTATION)
   target_link_libraries(paraview
     PRIVATE
       vtkParaViewDocumentation)
 endif ()
 
+target_compile_definitions(paraview
+  PRIVATE
+    "PARAVIEW_USE_PYTHON=$<BOOL:${PARAVIEW_USE_PYTHON}>")
 if (PARAVIEW_USE_PYTHON)
-  target_compile_definitions(paraview
-    PRIVATE
-      PARAVIEW_USE_PYTHON)
   target_link_libraries(paraview
     PRIVATE
       ParaView::pvpythonmodules
@@ -101,12 +101,9 @@ if (PARAVIEW_USE_PYTHON)
       ParaView::PythonInitializer)
 endif ()
 
-if (paraview_use_materialeditor)
-  target_compile_definitions(paraview
-    PRIVATE
-      PARAVIEW_USE_MATERIALEDITOR)
-endif ()
-
+target_compile_definitions(paraview
+  PRIVATE
+    "PARAVIEW_USE_MATERIALEDITOR=$<BOOL:${paraview_use_materialeditor}>")
 
 if (PARAVIEW_INSTALL_DEVELOPMENT_FILES)
   export(
