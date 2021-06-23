@@ -215,6 +215,7 @@ public:
   virtual void SetNormalScale(double val);
   virtual void SetOcclusionStrength(double val);
   virtual void SetEmissiveFactor(double rval, double gval, double bval);
+  virtual void SetShowTexturesOnBackface(bool);
 
   //***************************************************************************
   // Forwarded to Actor.

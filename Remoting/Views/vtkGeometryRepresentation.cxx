@@ -1155,6 +1155,11 @@ void vtkGeometryRepresentation::SetSpecularPower(double val)
   this->Property->SetSpecularPower(val);
 }
 
+void vtkGeometryRepresentation::SetShowTexturesOnBackface(bool val)
+{
+  this->Property->SetShowTexturesOnBackface(val);
+}
+
 //----------------------------------------------------------------------------
 void vtkGeometryRepresentation::SetOrientation(double x, double y, double z)
 {
