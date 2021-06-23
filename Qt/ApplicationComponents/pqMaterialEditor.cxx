@@ -63,6 +63,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QVector3D>
 #include <QVector>
 
+#include <array>
 #include <sstream>
 
 /**
