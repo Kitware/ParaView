@@ -1291,6 +1291,9 @@ void pqColorOpacityEditorWidget::show2DHistogram(bool show)
   ui.UseLogScaleOpacity->setEnabled(!show);
   ui.UseOpacityControlPointsFreehandDrawing->setEnabled(!show);
   ui.EnableOpacityMapping->setEnabled(!show);
+  ui.ChoosePreset->setEnabled(!show);
+  ui.SaveAsPreset->setEnabled(!show);
+  ui.InvertTransferFunctions->setEnabled(!show);
 
   ui.AutomaticDataHistogramComputation->setEnabled(show);
   ui.Transfer2DEditor->setVisible(show);
