@@ -815,6 +815,8 @@ vtkSmartPointer<vtkImageData> vtkSMTransferFunctionProxy::ComputeDataHistogram2D
   numBins[1] = numberOfBins;
   vtkSMPropertyHelper(histo, "NumberOfBins").Set(numBins, 2);
   vtkSMPropertyHelper(histo, "UseGradientForYAxis").Set(useGradientAsY);
+  vtkSMPropertyHelper(histo, "UseCustomBinRangesX").Set(true);
+  vtkSMPropertyHelper(histo, "CustomBinRangesX").Set(this->LastRange, 2);
   histo->UpdateVTKObjects();
 
   // Reduce it
