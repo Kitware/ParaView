@@ -4305,6 +4305,7 @@
             <Property name="SeamlessU" panel_visibility="advanced"/>
             <Property name="SeamlessV" panel_visibility="advanced"/>
             <Property name="UseMipmapTextures" panel_visibility="advanced"/>
+            <Property name="ShowTexturesOnBackface" panel_visibility="advanced"/>
             <Property name="BaseColorTexture" panel_visibility="advanced"/>
             <Property name="NormalTexture" panel_visibility="advanced"/>
             <Property name="NormalScale" panel_visibility="advanced"/>
@@ -12149,6 +12150,15 @@
                                    property="InterpolateTextures"
                                    value="1" />
         </Hints>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetShowTexturesOnBackface"
+                         default_values="1"
+                         name="ShowTexturesOnBackface"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Should textures be applied to the backface of a surface.
+        </Documentation>
       </IntVectorProperty>
       <ProxyProperty command="SetBaseColorTexture"
                      name="BaseColorTexture"
