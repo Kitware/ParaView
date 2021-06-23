@@ -25,35 +25,26 @@
 #include "vtkOpenVRRenderer.h"
 #include "vtkPVOpenVRHelper.h"
 #include "vtkTransform.h"
+#include <sstream>
 
 #ifdef OPENVR_HAS_COLLABORATION
-#include "mvCollaborationClient.h"
+#include "vtkOpenVRCollaborationClient.h"
 #include "vtkOpenVRPolyfill.h"
-#include "zhelpers.hpp"
 
-#define mvLog(x)                                                                                   \
-  if (this->Callback)                                                                              \
-  {                                                                                                \
-    std::ostringstream ss;                                                                         \
-    ss << x;                                                                                       \
-    this->Callback(ss.str(), this->CallbackClientData);                                            \
-  }                                                                                                \
-  else                                                                                             \
-  {                                                                                                \
-    std::cout << x;                                                                                \
-  }
-
-class vtkPVOpenVRCollaborationClientInternal : public mvCollaborationClient
+class vtkPVOpenVRCollaborationClientInternal : public vtkOpenVRCollaborationClient
 {
 public:
+  static vtkPVOpenVRCollaborationClientInternal* New();
+  vtkTypeMacro(vtkPVOpenVRCollaborationClientInternal, vtkOpenVRCollaborationClient);
   void SetHelper(vtkPVOpenVRHelper* l) { this->Helper = l; }
 
   vtkPVOpenVRCollaborationClientInternal()
   {
     // override the scale callback to use polyfill
     // so that desktop views look reasonable
-    this->ScaleCallback = [this](
-      void*) { return this->Helper->GetOpenVRPolyfill()->GetPhysicalScale(); };
+    this->ScaleCallback = [this]() {
+      return this->Helper->GetOpenVRPolyfill()->GetPhysicalScale();
+    };
   }
 
 protected:
@@ -62,19 +53,29 @@ protected:
     if (type == "P")
     {
       // change pose.
-      zmq::message_t update;
+      std::vector<Argument> args = this->GetMessageArguments();
+
       int viewIndex = 0;
+      std::vector<double> uTrans;
+      std::vector<double> uDir;
+      if (args.size() != 3 || !args[0].GetInt32(viewIndex) || !args[1].GetDoubleVector(uTrans) ||
+        !args[2].GetDoubleVector(uDir))
+      {
+        this->Log(vtkLogger::VERBOSITY_ERROR,
+          "Incorrect arguments for P (avatar pose) collaboration message");
+        return;
+      }
+
       double updateTranslation[3] = { 0 };
       double updateDirection[3] = { 0.0 };
 
-      this->Subscriber.recv(&update);
-      memcpy(&viewIndex, update.data(), sizeof(viewIndex));
-      this->Subscriber.recv(&update);
-      memcpy(&updateTranslation[0], update.data(), sizeof(updateTranslation));
-      this->Subscriber.recv(&update);
-      memcpy(&updateDirection[0], update.data(), sizeof(updateDirection));
-      mvLog("Collab " << otherID << ", Pose: " << viewIndex << " " << updateTranslation[0] << " "
-                      << updateTranslation[1] << " " << updateTranslation[2] << " " << std::endl);
+      memcpy(&updateTranslation[0], uTrans.data(), sizeof(updateTranslation));
+      memcpy(&updateDirection[0], uDir.data(), sizeof(updateDirection));
+
+      std::ostringstream ss;
+      ss << "Collab " << otherID << ", Pose: " << viewIndex << " " << updateTranslation[0] << " "
+         << updateTranslation[1] << " " << updateTranslation[2] << " " << std::endl;
+      this->Log(vtkLogger::VERBOSITY_INFO, ss.str());
 
       // only want to change if it's from someone else.
       if (otherID != this->CollabID)
@@ -89,16 +90,14 @@ protected:
       // only want to change if it's from someone else.
       if (otherID != this->CollabID)
       {
-        zmq::message_t update;
-        int count = 0;
-
-        this->Subscriber.recv(&update);
-        memcpy(&count, update.data(), sizeof(count));
+        std::vector<Argument> args = this->GetMessageArguments();
 
         std::vector<double> dvec;
-        dvec.resize(count);
-        this->Subscriber.recv(&update);
-        memcpy(dvec.data(), update.data(), dvec.size() * sizeof(decltype(dvec)::value_type));
+        if (args.size() != 1 || !args[0].GetDoubleVector(dvec))
+        {
+          this->Log(vtkLogger::VERBOSITY_ERROR, "Incorrect arguments for PO collaboration message");
+          return;
+        }
 
         vtkOpenVRCameraPose pose;
         auto it = dvec.begin();
@@ -142,7 +141,7 @@ protected:
       std::vector<double> dvec; // second arg is double[3] location
       if (args.size() != 2 || !args[0].GetString(name) || !args[1].GetDoubleVector(dvec))
       {
-        mvLog("Incorrect arguments for PSA collaboration message" << std::endl);
+        this->Log(vtkLogger::VERBOSITY_ERROR, "Incorrect arguments for PSA collaboration message");
         return;
       }
 
@@ -175,7 +174,7 @@ protected:
       if (args.size() != 3 || !args[0].GetInt32(index) || !args[1].GetDoubleVector(origin) ||
         !args[2].GetDoubleVector(normal))
       {
-        mvLog("Incorrect arguments for UCP collaboration message" << std::endl);
+        this->Log(vtkLogger::VERBOSITY_ERROR, "Incorrect arguments for UCP collaboration message");
         return;
       }
 
@@ -202,7 +201,7 @@ protected:
       std::vector<double> matrix;
       if (args.size() != 2 || !args[0].GetInt32(index) || !args[1].GetDoubleVector(matrix))
       {
-        mvLog("Incorrect arguments for UTC collaboration message" << std::endl);
+        this->Log(vtkLogger::VERBOSITY_ERROR, "Incorrect arguments for UTC collaboration message");
         return;
       }
 
@@ -214,10 +213,20 @@ protected:
     }
     else if (type == "SB")
     {
-      std::string text = s_recv(this->Subscriber);
-      std::string update = s_recv(this->Subscriber);
-      std::string file = s_recv(this->Subscriber);
-      std::string end = s_recv(this->Subscriber);
+      std::vector<Argument> args = this->GetMessageArguments();
+
+      std::vector<std::string> vals;
+      if (args.size() != 1 || !args[0].GetStringVector(vals) || vals.size() < 4)
+      {
+        this->Log(vtkLogger::VERBOSITY_ERROR,
+          "Incorrect arguments for SB (show billboard) collaboration message");
+        return;
+      }
+
+      std::string text = vals[0];
+      std::string update = vals[1];
+      std::string file = vals[2];
+      std::string end = vals[3];
 
       // only want to change if it's from someone else.
       if (otherID != this->CollabID)
@@ -235,31 +244,35 @@ protected:
     }
     else
     {
-      this->mvCollaborationClient::HandleBroadcastMessage(otherID, type);
+      this->vtkOpenVRCollaborationClient::HandleBroadcastMessage(otherID, type);
     }
   }
 
   vtkPVOpenVRHelper* Helper;
 };
 #else
-class vtkPVOpenVRCollaborationClientInternal
+class vtkPVOpenVRCollaborationClientInternal : public vtkObject
 {
+public:
+  static vtkPVOpenVRCollaborationClientInternal* New();
+  vtkTypeMacro(vtkPVOpenVRCollaborationClientInternal, vtkObject);
 };
 #endif
 
+vtkStandardNewMacro(vtkPVOpenVRCollaborationClientInternal);
 vtkStandardNewMacro(vtkPVOpenVRCollaborationClient);
 
 //----------------------------------------------------------------------------
 vtkPVOpenVRCollaborationClient::vtkPVOpenVRCollaborationClient()
   : CurrentLocation(-1)
 {
-  this->Internal = new vtkPVOpenVRCollaborationClientInternal();
+  this->Internal = vtkPVOpenVRCollaborationClientInternal::New();
 }
 
 //----------------------------------------------------------------------------
 vtkPVOpenVRCollaborationClient::~vtkPVOpenVRCollaborationClient()
 {
-  delete this->Internal;
+  this->Internal->Delete();
 }
 
 bool vtkPVOpenVRCollaborationClient::SupportsCollaboration()
@@ -315,9 +328,9 @@ void vtkPVOpenVRCollaborationClient::SetCollabPort(int val)
   this->Internal->SetCollabPort(val);
 }
 void vtkPVOpenVRCollaborationClient::SetLogCallback(
-  std::function<void(std::string const& data, void* cd)> cb, void* clientData)
+  std::function<void(std::string const& data, vtkLogger::Verbosity verbosity)> cb)
 {
-  this->Internal->SetLogCallback(cb, clientData);
+  this->Internal->SetLogCallback(cb);
 }
 void vtkPVOpenVRCollaborationClient::GoToSavedLocation(int index)
 {
@@ -330,7 +343,7 @@ void vtkPVOpenVRCollaborationClient::GoToSavedLocation(int index)
         vtkOpenVRRenderWindow::SafeDownCast(this->Internal->GetRenderer()->GetVTKWindow());
       if (renWin)
       {
-        this->Internal->SendMessage(
+        this->Internal->SendPoseMessage(
           "P", index, renWin->GetPhysicalTranslation(), renWin->GetPhysicalViewDirection());
       }
     }
@@ -358,14 +371,17 @@ void vtkPVOpenVRCollaborationClient::GoToPose(
   dvec.insert(dvec.end(), collabTrans, collabTrans + 3);
   dvec.insert(dvec.end(), collabDir, collabDir + 3);
 
-  this->Internal->SendMessage("PO", dvec);
+  std::vector<vtkOpenVRCollaborationClient::Argument> args;
+  args.resize(1);
+  args[0].SetDoubleVector(dvec.data(), static_cast<uint16_t>(dvec.size()));
+  this->Internal->SendAMessage("PO", args);
 }
 
 void vtkPVOpenVRCollaborationClient::RemoveAllCropPlanes()
 {
   if (this->Internal->GetConnected())
   {
-    this->Internal->SendMessage("RCP");
+    this->Internal->SendAMessage("RCP");
   }
 }
 
@@ -373,7 +389,7 @@ void vtkPVOpenVRCollaborationClient::RemoveAllThickCrops()
 {
   if (this->Internal->GetConnected())
   {
-    this->Internal->SendMessage("RTC");
+    this->Internal->SendAMessage("RTC");
   }
 }
 
@@ -384,12 +400,12 @@ void vtkPVOpenVRCollaborationClient::UpdateCropPlane(size_t i, vtkImplicitPlaneW
     vtkImplicitPlaneRepresentation* rep =
       static_cast<vtkImplicitPlaneRepresentation*>(widget->GetRepresentation());
 
-    std::vector<mvCollaborationClient::Argument> args;
+    std::vector<vtkOpenVRCollaborationClient::Argument> args;
     args.resize(3);
     args[0].SetInt32(static_cast<int32_t>(i));
     args[1].SetDoubleVector(rep->GetOrigin(), 3);
     args[2].SetDoubleVector(rep->GetNormal(), 3);
-    this->Internal->SendMessage("UCP", args);
+    this->Internal->SendAMessage("UCP", args);
   }
 }
 
@@ -401,11 +417,11 @@ void vtkPVOpenVRCollaborationClient::UpdateThickCrop(size_t i, vtkBoxWidget2* wi
     vtkNew<vtkTransform> t;
     rep->GetTransform(t);
 
-    std::vector<mvCollaborationClient::Argument> args;
+    std::vector<vtkOpenVRCollaborationClient::Argument> args;
     args.resize(2);
     args[0].SetInt32(static_cast<int32_t>(i));
     args[1].SetDoubleVector(t->GetMatrix()->GetData(), 16);
-    this->Internal->SendMessage("UTC", args);
+    this->Internal->SendAMessage("UTC", args);
   }
 }
 
@@ -413,29 +429,35 @@ void vtkPVOpenVRCollaborationClient::UpdateRay(vtkOpenVRModel* model, vtkEventDa
 {
   if (this->Internal->GetConnected())
   {
-    this->Internal->SendMessage(model->GetRay()->GetShow() ? "SR" : "HR", static_cast<int>(dev));
+    std::vector<vtkOpenVRCollaborationClient::Argument> args;
+    args.resize(1);
+    args[0].SetInt32(static_cast<int32_t>(dev));
+    this->Internal->SendAMessage(model->GetRay()->GetShow() ? "SR" : "HR", args);
   }
 }
 
 void vtkPVOpenVRCollaborationClient::ShowBillboard(std::vector<std::string> const& vals)
 {
-  this->Internal->SendMessage("SB", vals);
+  std::vector<vtkOpenVRCollaborationClient::Argument> args;
+  args.resize(1);
+  args[0].SetStringVector(vals);
+  this->Internal->SendAMessage("SB", args);
 }
 
 void vtkPVOpenVRCollaborationClient::HideBillboard()
 {
-  this->Internal->SendMessage("HB");
+  this->Internal->SendAMessage("HB");
 }
 
 void vtkPVOpenVRCollaborationClient::AddPointToSource(std::string const& name, double const* pt)
 {
   if (this->Internal->GetConnected())
   {
-    std::vector<mvCollaborationClient::Argument> args;
+    std::vector<vtkOpenVRCollaborationClient::Argument> args;
     args.resize(2);
     args[0].SetString(name);
     args[1].SetDoubleVector(pt, 3);
-    this->Internal->SendMessage("PSA", args);
+    this->Internal->SendAMessage("PSA", args);
   }
 }
 
@@ -443,7 +465,7 @@ void vtkPVOpenVRCollaborationClient::ClearPointSource()
 {
   if (this->Internal->GetConnected())
   {
-    this->Internal->SendMessage("PSC");
+    this->Internal->SendAMessage("PSC");
   }
 }
 
@@ -464,7 +486,7 @@ void vtkPVOpenVRCollaborationClient::SetCollabPort(int)
 {
 }
 void vtkPVOpenVRCollaborationClient::SetLogCallback(
-  std::function<void(std::string const&, void*)>, void*)
+  std::function<void(std::string const& data, vtkLogger::Verbosity verbosity)>)
 {
 }
 void vtkPVOpenVRCollaborationClient::GoToSavedLocation(int)

@@ -104,6 +104,7 @@ void pqOpenVRDockPanel::constructor()
     this->Internals->cServerLabel->hide();
     this->Internals->cServerValue->hide();
     this->Internals->cHeader->hide();
+    this->Internals->outputWindow->hide();
   }
 
 // hide/show widgets based on Imago support
@@ -308,8 +309,7 @@ void pqOpenVRDockPanel::collaborationConnect()
   {
     vtkPVOpenVRCollaborationClient* cc = this->Helper->GetCollaborationClient();
     cc->SetLogCallback(std::bind(&pqOpenVRDockPanel::collaborationCallback, this,
-                         std::placeholders::_1, std::placeholders::_2),
-      nullptr);
+      std::placeholders::_1, std::placeholders::_2));
     cc->SetCollabHost(this->Internals->cServerValue->text().toUtf8().data());
     cc->SetCollabSession(this->Internals->cSessionValue->text().toUtf8().data());
     cc->SetCollabName(this->Internals->cNameValue->text().toUtf8().data());
@@ -326,7 +326,8 @@ void pqOpenVRDockPanel::collaborationConnect()
   }
 }
 
-void pqOpenVRDockPanel::collaborationCallback(std::string const& msg, void*)
+void pqOpenVRDockPanel::collaborationCallback(
+  std::string const& msg, vtkLogger::Verbosity /*verbosity*/)
 {
   // send message if any to text window
   if (!msg.length())
