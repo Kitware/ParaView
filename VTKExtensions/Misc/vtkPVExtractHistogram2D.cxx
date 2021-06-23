@@ -202,7 +202,7 @@ void vtkPVExtractHistogram2D::ComputeComponentRange()
     this->ComponentRangeCache[0][1] = this->ComponentRangeCache[0][0];
     this->ComponentRangeCache[0][0] = tmp;
   }
-  if (!this->UseCustomBinRanges1)
+  if (this->UseGradientForYAxis && !this->UseCustomBinRanges1)
   {
     this->ComponentArrayCache[1]->GetFiniteRange(
       this->ComponentRangeCache[1], this->ComponentIndexCache[1]);
