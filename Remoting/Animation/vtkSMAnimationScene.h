@@ -163,6 +163,7 @@ public:
   void SetNumberOfFrames(int val);
   void SetDuration(int val);
   void SetFramesPerTimestep(int val);
+  void SetStride(int val);
   //@}
 
   enum

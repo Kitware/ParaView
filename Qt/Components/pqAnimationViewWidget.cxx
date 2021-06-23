@@ -90,6 +90,33 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endif
 
 //-----------------------------------------------------------------------------
+/**
+ * Small custom class to clamp the displayed string according to the range when input is
+ * outside the range.
+ */
+class pqIntClampedValidator : public QIntValidator
+{
+public:
+  pqIntClampedValidator(double bottom, double top, QObject* parent)
+    : QIntValidator(bottom, top, parent)
+  {
+  }
+
+  QValidator::State validate(QString& s, int&) const override
+  {
+    if (s.isEmpty() || s == "-")
+    {
+      return QValidator::Intermediate;
+    }
+
+    QLocale locale;
+    bool ok;
+    int d = locale.toInt(s, &ok);
+    return (ok && d >= bottom() && d <= top()) ? QValidator::Acceptable : QValidator::Invalid;
+  }
+};
+
+//-----------------------------------------------------------------------------
 class pqAnimationViewWidget::pqInternal
 {
 public:
@@ -110,6 +137,8 @@ public:
   QLabel* EndTimeLabel = nullptr;
   QLabel* DurationLabel = nullptr;
   QLineEdit* Duration = nullptr;
+  QLabel* StrideLabel = nullptr;
+  QLineEdit* Stride = nullptr;
   pqPropertyLinks Links;
   pqPropertyLinks DurationLink;
   pqAnimatableProxyComboBox* CreateSource = nullptr;
@@ -118,6 +147,8 @@ public:
   QToolButton* LockStartTime = nullptr;
   vtkSMProxy* SelectedCueProxy = nullptr;
   vtkSMProxy* SelectedDataProxy = nullptr;
+  int SequenceStrideCache = 1;
+  int TimestepStrideCache = 1;
 
   pqAnimationTrack* findTrack(pqAnimationCue* cue)
   {
@@ -293,6 +324,13 @@ pqAnimationViewWidget::pqAnimationViewWidget(QWidget* _parent)
   this->Internal->Duration->setValidator(
     new QIntValidator(1, static_cast<int>(~0u >> 1), this->Internal->Duration));
   hboxlayout->addWidget(this->Internal->Duration);
+  hboxlayout->addSpacing(5);
+  this->Internal->StrideLabel = new QLabel("Stride", this);
+  hboxlayout->addWidget(this->Internal->StrideLabel);
+  this->Internal->Stride = new QLineEdit("1", this) << pqSetName("Stride");
+  this->Internal->Stride->setMinimumWidth(30);
+  this->Internal->Stride->setValidator(new pqIntClampedValidator(1, 1, this->Internal->Stride));
+  hboxlayout->addWidget(this->Internal->Stride, 1, Qt::AlignLeft);
   hboxlayout->addStretch();
 
   this->Internal->AnimationWidget = new pqAnimationWidget(this) << pqSetName("pqAnimationWidget");
@@ -349,6 +387,11 @@ pqAnimationViewWidget::pqAnimationViewWidget(QWidget* _parent)
   QObject::connect(this->Internal->CreateSource, SIGNAL(currentProxyChanged(vtkSMProxy*)), this,
     SLOT(setCurrentProxy(vtkSMProxy*)));
 
+  QObject::connect(this->Internal->Stride, &QLineEdit::editingFinished, this,
+    &pqAnimationViewWidget::onStrideChanged);
+  QObject::connect(this->Internal->Duration, &QLineEdit::editingFinished, this,
+    &pqAnimationViewWidget::updateStrideRange);
+
   pqTimelineScrollbar* timelineScrollbar = new pqTimelineScrollbar(this);
   timelineScrollbar->linkSpacing(this->Internal->AnimationWidget);
   timelineScrollbar->setAnimationModel(this->Internal->AnimationWidget->animationModel());
@@ -404,21 +447,33 @@ void pqAnimationViewWidget::setScene(pqAnimationScene* scene)
     this->Internal->Links.addTraceablePropertyLink(this->Internal->LockEndTime, "checked",
       SIGNAL(toggled(bool)), scene->getProxy(), scene->getProxy()->GetProperty("LockEndTime"));
 
-    QObject::connect(scene, SIGNAL(cuesChanged()), this, SLOT(onSceneCuesChanged()));
-    QObject::connect(scene, SIGNAL(clockTimeRangesChanged()), this, SLOT(updateSceneTimeRange()));
-    QObject::connect(scene, SIGNAL(timeStepsChanged()), this, SLOT(updateTicks()));
-    QObject::connect(scene, SIGNAL(frameCountChanged()), this, SLOT(updateTicks()));
-    QObject::connect(scene, SIGNAL(animationTime(double)), this, SLOT(updateSceneTime()));
-    QObject::connect(scene, SIGNAL(playModeChanged()), this, SLOT(updatePlayMode()));
-    QObject::connect(scene, SIGNAL(playModeChanged()), this, SLOT(updateTicks()));
-    QObject::connect(scene, SIGNAL(playModeChanged()), this, SLOT(updateSceneTime()));
-    QObject::connect(scene, SIGNAL(timeLabelChanged()), this, SLOT(onTimeLabelChanged()));
+    QObject::connect(
+      scene, &pqAnimationScene::cuesChanged, this, &pqAnimationViewWidget::onSceneCuesChanged);
+    QObject::connect(scene, &pqAnimationScene::clockTimeRangesChanged, this,
+      &pqAnimationViewWidget::updateSceneTimeRange);
+    QObject::connect(
+      scene, &pqAnimationScene::timeStepsChanged, this, &pqAnimationViewWidget::updateTicks);
+    QObject::connect(
+      scene, &pqAnimationScene::timeStepsChanged, this, &pqAnimationViewWidget::updateStrideRange);
+    QObject::connect(
+      scene, &pqAnimationScene::frameCountChanged, this, &pqAnimationViewWidget::updateTicks);
+    QObject::connect(
+      scene, &pqAnimationScene::animationTime, this, &pqAnimationViewWidget::updateSceneTime);
+    QObject::connect(
+      scene, &pqAnimationScene::playModeChanged, this, &pqAnimationViewWidget::updatePlayMode);
+    QObject::connect(
+      scene, &pqAnimationScene::playModeChanged, this, &pqAnimationViewWidget::updateTicks);
+    QObject::connect(
+      scene, &pqAnimationScene::playModeChanged, this, &pqAnimationViewWidget::updateSceneTime);
+    QObject::connect(
+      scene, &pqAnimationScene::timeLabelChanged, this, &pqAnimationViewWidget::onTimeLabelChanged);
 
     this->updateSceneTimeRange();
     this->updateSceneTime();
     this->updatePlayMode();
     this->updateTicks();
     this->onTimeLabelChanged();
+    this->updateStrideRange();
   }
 }
 
@@ -712,6 +767,8 @@ void pqAnimationViewWidget::updatePlayMode()
   {
     animModel->setMode(pqAnimationModel::Real);
 
+    this->Internal->Stride->setVisible(false);
+    this->Internal->StrideLabel->setVisible(false);
     this->Internal->Duration->setVisible(true);
     this->Internal->DurationLabel->setVisible(true);
     this->Internal->StartTime->setVisible(true);
@@ -726,6 +783,9 @@ void pqAnimationViewWidget::updatePlayMode()
     this->Internal->AnimationTimeWidget->setEnabled(true);
     this->Internal->Duration->setEnabled(true);
     this->Internal->DurationLabel->setEnabled(true);
+    this->Internal->StrideLabel->setEnabled(false);
+    this->Internal->Stride->setEnabled(false);
+
     this->Internal->DurationLabel->setText("Duration (s):");
     this->Internal->DurationLink.addTraceablePropertyLink(this->Internal->Duration, "text",
       SIGNAL(editingFinished()), this->Internal->Scene->getProxy(),
@@ -735,6 +795,8 @@ void pqAnimationViewWidget::updatePlayMode()
   {
     animModel->setMode(pqAnimationModel::Sequence);
 
+    this->Internal->Stride->setVisible(true);
+    this->Internal->StrideLabel->setVisible(true);
     this->Internal->Duration->setVisible(true);
     this->Internal->DurationLabel->setVisible(true);
     this->Internal->StartTime->setVisible(true);
@@ -748,15 +810,22 @@ void pqAnimationViewWidget::updatePlayMode()
     this->Internal->EndTime->setEnabled(true);
     this->Internal->Duration->setEnabled(true);
     this->Internal->DurationLabel->setEnabled(true);
+    this->Internal->StrideLabel->setEnabled(true);
+    this->Internal->Stride->setEnabled(true);
+
     this->Internal->DurationLabel->setText("No. Frames:");
     this->Internal->DurationLink.addTraceablePropertyLink(this->Internal->Duration, "text",
       SIGNAL(editingFinished()), this->Internal->Scene->getProxy(),
       this->Internal->Scene->getProxy()->GetProperty("NumberOfFrames"));
+    this->Internal->Stride->setText(QString::number(this->Internal->SequenceStrideCache));
+    emit this->Internal->Stride->editingFinished();
   }
   else if (mode == "Snap To TimeSteps")
   {
     animModel->setMode(pqAnimationModel::Custom);
 
+    this->Internal->Stride->setVisible(true);
+    this->Internal->StrideLabel->setVisible(true);
     this->Internal->Duration->setVisible(false);
     this->Internal->DurationLabel->setVisible(false);
     this->Internal->StartTime->setVisible(false);
@@ -766,10 +835,15 @@ void pqAnimationViewWidget::updatePlayMode()
     this->Internal->LockStartTime->setVisible(false);
     this->Internal->LockEndTime->setVisible(false);
 
+    this->Internal->Stride->setEnabled(true);
+    this->Internal->StrideLabel->setEnabled(true);
     this->Internal->Duration->setEnabled(false);
     this->Internal->DurationLabel->setEnabled(false);
     this->Internal->StartTime->setEnabled(false);
     this->Internal->EndTime->setEnabled(false);
+
+    this->Internal->Stride->setText(QString::number(this->Internal->TimestepStrideCache));
+    emit this->Internal->Stride->editingFinished();
   }
   else
   {
@@ -796,6 +870,23 @@ void pqAnimationViewWidget::updateTicks()
   {
     animModel->setTicks(this->Internal->numberOfTicks());
   }
+}
+
+//-----------------------------------------------------------------------------
+void pqAnimationViewWidget::updateStrideRange()
+{
+  int newMax = 1;
+  const QString& mode = this->Internal->PlayMode->currentText();
+  if (mode == "Sequence")
+  {
+    newMax = this->Internal->Duration->text().toInt();
+  }
+  else if (mode == "Snap To TimeSteps")
+  {
+    newMax = this->Internal->Scene->getTimeSteps().size();
+  }
+  auto* widget = this->Internal->Stride;
+  widget->setValidator(new pqIntClampedValidator(1, newMax, widget));
 }
 
 //-----------------------------------------------------------------------------
@@ -1051,4 +1142,23 @@ void pqAnimationViewWidget::generalSettingsChanged()
     vtkPVGeneralSettings::GetInstance()->GetAnimationTimePrecision());
   this->Internal->AnimationWidget->animationModel()->setTimeNotation(
     vtkPVGeneralSettings::GetInstance()->GetAnimationTimeNotation());
+}
+
+//-----------------------------------------------------------------------------
+void pqAnimationViewWidget::onStrideChanged()
+{
+  int strideValue = this->Internal->Stride->text().toInt();
+  vtkSMProxy* proxy = this->Internal->Scene->getProxy();
+  vtkSMPropertyHelper(proxy->GetProperty("Stride"), false).Set(strideValue);
+  proxy->UpdateProperty("Stride");
+
+  const QString& mode = this->Internal->PlayMode->currentText();
+  if (mode == "Sequence")
+  {
+    this->Internal->SequenceStrideCache = strideValue;
+  }
+  else if (mode == "Snap To TimeSteps")
+  {
+    this->Internal->TimestepStrideCache = strideValue;
+  }
 }

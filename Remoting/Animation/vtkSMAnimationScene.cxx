@@ -591,3 +591,9 @@ void vtkSMAnimationScene::SetFramesPerTimestep(int val)
 {
   this->AnimationPlayer->SetFramesPerTimestep(val);
 }
+
+//----------------------------------------------------------------------------
+void vtkSMAnimationScene::SetStride(int val)
+{
+  this->AnimationPlayer->SetStride(val);
+}

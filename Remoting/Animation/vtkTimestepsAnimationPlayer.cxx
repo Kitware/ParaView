@@ -76,29 +76,41 @@ void vtkTimestepsAnimationPlayer::StartLoop(double, double, double, double* play
 //-----------------------------------------------------------------------------
 double vtkTimestepsAnimationPlayer::GetNextTime(double currentime)
 {
-  this->Count++;
+  this->Count += this->GetStride();
   if (this->Count < this->FramesPerTimestep)
   {
     return currentime;
   }
-
   this->Count = 0;
-  vtkTimestepsAnimationPlayerSetOfDouble::iterator iter = this->TimeSteps->upper_bound(currentime);
-  if (iter == this->TimeSteps->end() || currentime >= this->PlaybackWindow[1])
+  if (currentime >= this->PlaybackWindow[1])
   {
     return VTK_DOUBLE_MAX;
   }
 
-  return (*iter);
+  return this->GetNextInternal(currentime, VTK_DOUBLE_MAX);
 }
 
 //-----------------------------------------------------------------------------
 double vtkTimestepsAnimationPlayer::GetNextTimeStep(double timestep)
 {
-  vtkTimestepsAnimationPlayerSetOfDouble::iterator iter = this->TimeSteps->upper_bound(timestep);
+  return this->GetNextInternal(timestep, timestep);
+}
+
+//-----------------------------------------------------------------------------
+double vtkTimestepsAnimationPlayer::GetNextInternal(double time, double defaultVal)
+{
+  vtkTimestepsAnimationPlayerSetOfDouble::iterator iter = this->TimeSteps->upper_bound(time);
   if (iter == this->TimeSteps->end())
   {
-    return timestep;
+    return defaultVal;
+  }
+  for (int i = 1; i < this->GetStride(); ++i)
+  {
+    ++iter;
+    if (iter == this->TimeSteps->end())
+    {
+      return defaultVal;
+    }
   }
   return (*iter);
 }
@@ -106,17 +118,21 @@ double vtkTimestepsAnimationPlayer::GetNextTimeStep(double timestep)
 //-----------------------------------------------------------------------------
 double vtkTimestepsAnimationPlayer::GetPreviousTimeStep(double timestep)
 {
-  double value = timestep;
-  vtkTimestepsAnimationPlayerSetOfDouble::iterator iter = this->TimeSteps->begin();
-  for (; iter != this->TimeSteps->end(); ++iter)
+  vtkTimestepsAnimationPlayerSetOfDouble::iterator iter = this->TimeSteps->lower_bound(timestep);
+  if (iter == this->TimeSteps->end())
   {
-    if ((*iter) >= timestep)
-    {
-      return value;
-    }
-    value = (*iter);
+    return *(this->TimeSteps->end()--);
   }
-  return value;
+
+  for (int i = 0; i < this->GetStride(); ++i)
+  {
+    if (iter == this->TimeSteps->begin())
+    {
+      return timestep;
+    }
+    --iter;
+  }
+  return (*iter);
 }
 
 //-----------------------------------------------------------------------------

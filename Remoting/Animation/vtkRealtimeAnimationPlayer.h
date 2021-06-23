@@ -40,6 +40,16 @@ public:
   vtkSetMacro(Duration, unsigned long);
   //@}
 
+  //@{
+  /**
+   * Setter is noop, getter return 1.
+   *
+   * Stride is not relevant for realtime animation so let it be always 1.
+   */
+  void SetStride(int) override final{};
+  int GetStride() override final { return 1; }
+  //@}
+
 protected:
   vtkRealtimeAnimationPlayer();
   ~vtkRealtimeAnimationPlayer() override;

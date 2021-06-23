@@ -296,6 +296,15 @@
                         name="range" />
         <Documentation>The number of frames per timestep.</Documentation>
       </IntVectorProperty>
+      <IntVectorProperty command="SetStride"
+                         default_values="1"
+                         name="Stride"
+                         number_of_elements="1">
+        <IntRangeDomain min="1"
+                        name="range" />
+        <Documentation>Set the frame stride when playing the animation
+        and going to the next/previous step.</Documentation>
+      </IntVectorProperty>
       <!-- End of AnimationScene -->
     </AnimationSceneProxy>
     <!-- End of animation -->
