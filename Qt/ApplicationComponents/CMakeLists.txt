@@ -289,7 +289,7 @@ if (PARAVIEW_USE_MATERIALEDITOR)
     pqMaterialEditor
     pqNewMaterialDialog)
 
-  list (APPEND ui_files
+  list(APPEND ui_files
     Resources/UI/pqMaterialEditor.ui
     Resources/UI/pqNewMaterialDialog.ui)
 endif ()
