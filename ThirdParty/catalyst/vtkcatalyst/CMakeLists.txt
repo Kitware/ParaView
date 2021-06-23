@@ -7,9 +7,8 @@ endif()
 set(CATALYST_BUILD_SHARED_LIBS "${BUILD_SHARED_LIBS}")
 set(CATALYST_BUILD_TESTING OFF)
 
-# essential to turn of STUB implementation otherwise we may end up overwriting
-# the ParaView Catalyst library.
-set(CATALYST_BUILD_STUB_IMPLEMENTATION OFF)
+# Always ship the stub implementation.
+set(CATALYST_BUILD_STUB_IMPLEMENTATION ON)
 
 set(CATALYST_BUILD_REPLAY OFF CACHE INTERNAL "")
 
