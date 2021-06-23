@@ -154,8 +154,6 @@ endif()
 
 if (PARAVIEW_ENABLE_RAYTRACING AND VTK_ENABLE_OSPRAY)
   set(PARAVIEW_USE_MATERIALEDITOR ON)
-
-  message(STATUS "Enabling OSPRayMaterialEditor widget")
 endif ()
 
 #========================================================================
