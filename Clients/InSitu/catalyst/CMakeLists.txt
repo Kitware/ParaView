@@ -70,5 +70,4 @@ set(_vtk_build_LIBRARY_NAME_SUFFIX "")
 set(_vtk_build_VERSION "")
 set(_vtk_build_SOVERSION "")
 
-_vtk_module_install(catalyst-paraview)
 _vtk_module_apply_properties(catalyst-paraview)
