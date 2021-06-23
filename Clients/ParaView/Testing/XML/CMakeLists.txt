@@ -986,6 +986,7 @@ list(APPEND TESTS_WITH_BASELINES
   ReverseLegend.xml
   RotateAroundOriginTransform.xml
   RotateCamera90.xml
+  RotationalExtrusionFilter.xml
 #  SaveAnimationGeometry.xml
   SaveColorMap.xml
   SaveCSV.xml
