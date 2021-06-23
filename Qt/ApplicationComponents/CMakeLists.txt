@@ -283,7 +283,7 @@ set(qt_components
   Widgets
   Svg)
 
-if (PARAVIEW_USE_MATERIALEDITOR)
+if (paraview_use_materialeditor)
   list(APPEND classes
     pqMaterialAttributesDelegate
     pqMaterialEditor

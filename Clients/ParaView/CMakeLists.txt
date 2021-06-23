@@ -101,7 +101,7 @@ if (PARAVIEW_USE_PYTHON)
       ParaView::PythonInitializer)
 endif ()
 
-if (PARAVIEW_USE_MATERIALEDITOR)
+if (paraview_use_materialeditor)
   target_compile_definitions(paraview
     PRIVATE
       PARAVIEW_USE_MATERIALEDITOR)
