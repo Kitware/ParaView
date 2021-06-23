@@ -26,7 +26,7 @@
 #include "vtkVector.h"
 #include "vtkVectorOperators.h"
 
-#include <conduit_blueprint.hpp>
+#include <catalyst_conduit_blueprint.hpp>
 
 #define VERIFY(x, ...)                                                                             \
   if ((x) == false)                                                                                \
@@ -38,18 +38,18 @@
 namespace
 {
 
-vtkSmartPointer<vtkDataObject> Convert(const conduit::Node& node)
+vtkSmartPointer<vtkDataObject> Convert(const conduit_cpp::Node& node)
 {
   vtkNew<vtkConduitSource> source;
-  source->SetNode(&node);
+  source->SetNode(conduit_cpp::c_node(&node));
   source->Update();
   return source->GetOutputDataObject(0);
 }
 
 bool ValidateMeshTypeUniform()
 {
-  conduit::Node mesh;
-  conduit::blueprint::mesh::examples::basic("uniform", 3, 3, 3, mesh);
+  conduit_cpp::Node mesh;
+  conduit_cpp::BlueprintMesh::Example::basic("uniform", 3, 3, 3, mesh);
   auto data = Convert(mesh);
   VERIFY(vtkPartitionedDataSet::SafeDownCast(data) != nullptr,
     "incorrect data type, expected vtkPartitionedDataSet, got %s", vtkLogIdentifier(data));
@@ -67,8 +67,8 @@ bool ValidateMeshTypeUniform()
 
 bool ValidateMeshTypeRectilinear()
 {
-  conduit::Node mesh;
-  conduit::blueprint::mesh::examples::basic("rectilinear", 3, 3, 3, mesh);
+  conduit_cpp::Node mesh;
+  conduit_cpp::BlueprintMesh::Example::basic("rectilinear", 3, 3, 3, mesh);
   auto data = Convert(mesh);
   VERIFY(vtkPartitionedDataSet::SafeDownCast(data) != nullptr,
     "incorrect data type, expected vtkPartitionedDataSet, got %s", vtkLogIdentifier(data));
@@ -86,8 +86,8 @@ bool ValidateMeshTypeRectilinear()
 
 bool ValidateMeshTypeStructured()
 {
-  conduit::Node mesh;
-  conduit::blueprint::mesh::examples::basic("structured", 3, 3, 3, mesh);
+  conduit_cpp::Node mesh;
+  conduit_cpp::BlueprintMesh::Example::basic("structured", 3, 3, 3, mesh);
   auto data = Convert(mesh);
   VERIFY(vtkPartitionedDataSet::SafeDownCast(data) != nullptr,
     "incorrect data type, expected vtkPartitionedDataSet, got %s", vtkLogIdentifier(data));
@@ -105,9 +105,9 @@ bool ValidateMeshTypeStructured()
 
 bool ValidateMeshTypeUnstructured()
 {
-  conduit::Node mesh;
+  conduit_cpp::Node mesh;
   // generate simple explicit tri-based 2d 'basic' mesh
-  conduit::blueprint::mesh::examples::basic("tris", 3, 3, 0, mesh);
+  conduit_cpp::BlueprintMesh::Example::basic("tris", 3, 3, 0, mesh);
 
   auto data = Convert(mesh);
   VERIFY(vtkPartitionedDataSet::SafeDownCast(data) != nullptr,

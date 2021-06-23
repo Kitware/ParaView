@@ -36,11 +36,12 @@
 #include "vtkStructuredGrid.h"
 #include "vtkUnstructuredGrid.h"
 
-#include <conduit.hpp>
-#include <conduit_blueprint.hpp>
-#include <conduit_cpp_to_c.hpp>
+#include <catalyst_conduit.hpp>
+#include <catalyst_conduit_blueprint.hpp>
 
 #include <algorithm>
+#include <map>
+
 namespace internals
 {
 
@@ -119,14 +120,15 @@ static vtkIdType GetNumberOfPointsInCellType(int vtk_cell_type)
 }
 
 //----------------------------------------------------------------------------
-vtkSmartPointer<vtkPoints> CreatePoints(const conduit::Node& coords)
+vtkSmartPointer<vtkPoints> CreatePoints(const conduit_cpp::Node& coords)
 {
   if (coords["type"].as_string() != "explicit")
   {
     throw std::runtime_error("invalid node!");
   }
 
-  auto array = vtkConduitArrayUtilities::MCArrayToVTKArray(&coords["values"], "coords");
+  conduit_cpp::Node values = coords["values"];
+  auto array = vtkConduitArrayUtilities::MCArrayToVTKArray(conduit_cpp::c_node(&values), "coords");
   if (array == nullptr)
   {
     throw std::runtime_error("failed to convert to VTK array!");
@@ -206,10 +208,10 @@ void SetPolyhedralCells(
 
 //----------------------------------------------------------------------------
 vtkSmartPointer<vtkDataSet> GetMesh(
-  const conduit::Node& topologyNode, const conduit::Node& coordsets)
+  const conduit_cpp::Node& topologyNode, const conduit_cpp::Node& coordsets)
 {
   // get the coordset for this topology element.
-  auto& coords = coordsets[topologyNode["coordset"].as_string()];
+  auto coords = coordsets[topologyNode["coordset"].as_string()];
   if (topologyNode["type"].as_string() == "uniform" && coords["type"].as_string() == "uniform")
   {
     vtkNew<vtkImageData> img;
@@ -243,9 +245,15 @@ vtkSmartPointer<vtkDataSet> GetMesh(
     coords["type"].as_string() == "rectilinear")
   {
     vtkNew<vtkRectilinearGrid> rg;
-    auto xArray = vtkConduitArrayUtilities::MCArrayToVTKArray(&coords["values/x"], "xcoords");
-    auto yArray = vtkConduitArrayUtilities::MCArrayToVTKArray(&coords["values/y"], "ycoords");
-    auto zArray = vtkConduitArrayUtilities::MCArrayToVTKArray(&coords["values/z"], "zcoords");
+    conduit_cpp::Node values_x = coords["values/x"];
+    conduit_cpp::Node values_y = coords["values/y"];
+    conduit_cpp::Node values_z = coords["values/z"];
+    auto xArray =
+      vtkConduitArrayUtilities::MCArrayToVTKArray(conduit_cpp::c_node(&values_x), "xcoords");
+    auto yArray =
+      vtkConduitArrayUtilities::MCArrayToVTKArray(conduit_cpp::c_node(&values_y), "ycoords");
+    auto zArray =
+      vtkConduitArrayUtilities::MCArrayToVTKArray(conduit_cpp::c_node(&values_z), "zcoords");
     rg->SetDimensions(
       xArray->GetNumberOfTuples(), yArray->GetNumberOfTuples(), zArray->GetNumberOfTuples());
     rg->SetXCoordinates(xArray);
@@ -275,10 +283,12 @@ vtkSmartPointer<vtkDataSet> GetMesh(
     {
       // polyhedra uses O2M and not M2C arrays, so need to process it
       // differently.
+      conduit_cpp::Node t_elements = topologyNode["elements"];
+      conduit_cpp::Node t_subelements = topologyNode["subelements"];
       auto elements = vtkConduitArrayUtilities::O2MRelationToVTKCellArray(
-        &topologyNode["elements"], "connectivity");
+        conduit_cpp::c_node(&t_elements), "connectivity");
       auto subelements = vtkConduitArrayUtilities::O2MRelationToVTKCellArray(
-        &topologyNode["subelements"], "connectivity");
+        conduit_cpp::c_node(&t_subelements), "connectivity");
 
       // currently, this is an ugly deep-copy. Once vtkUnstructuredGrid is modified
       // as proposed here (vtk/vtk#18190), this will get simpler.
@@ -287,8 +297,9 @@ vtkSmartPointer<vtkDataSet> GetMesh(
     else
     {
       const auto cell_size = GetNumberOfPointsInCellType(vtk_cell_type);
+      conduit_cpp::Node connectivity = topologyNode["elements/connectivity"];
       auto cellArray = vtkConduitArrayUtilities::MCArrayToVTKCellArray(
-        cell_size, &topologyNode["elements/connectivity"]);
+        cell_size, conduit_cpp::c_node(&connectivity));
       ug->SetCells(vtk_cell_type, cellArray);
     }
     return ug;
@@ -304,8 +315,9 @@ vtkSmartPointer<vtkDataSet> GetMesh(
 class vtkConduitSource::vtkInternals
 {
 public:
-  const conduit::Node* Node = nullptr;
-  const conduit::Node* GlobalFieldsNode = nullptr;
+  conduit_cpp::Node Node;
+  conduit_cpp::Node GlobalFieldsNode;
+  bool GlobalFieldsNodeValid{ false };
 };
 
 vtkStandardNewMacro(vtkConduitSource);
@@ -323,25 +335,25 @@ vtkConduitSource::~vtkConduitSource() = default;
 //----------------------------------------------------------------------------
 void vtkConduitSource::SetNode(const conduit_node* node)
 {
-  const conduit::Node* cpp_node = conduit::cpp_node(node);
-  auto& internals = (*this->Internals);
-  if (internals.Node != cpp_node)
+  if (conduit_cpp::c_node(&this->Internals->Node) == node)
   {
-    internals.Node = cpp_node;
-    this->Modified();
+    return;
   }
+  this->Internals->Node = conduit_cpp::cpp_node(const_cast<conduit_node*>(node));
+  this->Modified();
 }
 
 //----------------------------------------------------------------------------
 void vtkConduitSource::SetGlobalFieldsNode(const conduit_node* node)
 {
-  const conduit::Node* cpp_node = conduit::cpp_node(node);
-  auto& internals = (*this->Internals);
-  if (internals.GlobalFieldsNode != cpp_node)
+  if (this->Internals->GlobalFieldsNodeValid &&
+    conduit_cpp::c_node(&this->Internals->GlobalFieldsNode) == node)
   {
-    internals.GlobalFieldsNode = cpp_node;
-    this->Modified();
+    return;
   }
+  this->Internals->GlobalFieldsNode = conduit_cpp::cpp_node(const_cast<conduit_node*>(node));
+  this->Internals->GlobalFieldsNodeValid = true;
+  this->Modified();
 }
 
 //----------------------------------------------------------------------------
@@ -357,42 +369,36 @@ int vtkConduitSource::RequestData(
   vtkInformation*, vtkInformationVector**, vtkInformationVector* outputVector)
 {
   auto output = vtkPartitionedDataSet::GetData(outputVector, 0);
-  auto& internals = (*this->Internals);
-  if (internals.Node == nullptr)
-  {
-    vtkWarningMacro("Missing Conduit Node!");
-    return 1;
-  }
 
-  auto& node = (*internals.Node);
-  conduit::Node info;
-  if (!conduit::blueprint::mesh::verify(node, info))
+  auto& node = this->Internals->Node;
+  conduit_cpp::Node info;
+  if (!conduit_cpp::BlueprintMesh::verify(node, info))
   {
-    vtkLogF(ERROR, "Mesh blueprint verification failed!\nDetails:\n%s", info.to_json().c_str());
+    vtkLogF(ERROR, "Mesh blueprint verification failed!");
     return 0;
   }
 
   std::map<std::string, vtkSmartPointer<vtkDataSet> > datasets;
 
   // process "topologies".
-  auto& topologies = node["topologies"];
-  auto iter = topologies.children();
-  while (iter.has_next())
+  auto topologies = node["topologies"];
+  conduit_index_t nchildren = topologies.number_of_children();
+  for (conduit_index_t i = 0; i < nchildren; ++i)
   {
-    iter.next();
+    auto child = topologies.child(i);
     try
     {
-      if (auto ds = internals::GetMesh(iter.node(), node["coordsets"]))
+      if (auto ds = internals::GetMesh(child, node["coordsets"]))
       {
         auto idx = output->GetNumberOfPartitions();
         output->SetPartition(idx, ds);
-        output->GetMetaData(idx)->Set(vtkCompositeDataSet::NAME(), iter.name().c_str());
-        datasets[iter.name()] = ds;
+        output->GetMetaData(idx)->Set(vtkCompositeDataSet::NAME(), child.name().c_str());
+        datasets[child.name()] = ds;
       }
     }
     catch (std::exception& e)
     {
-      vtkLogF(ERROR, "failed to process '../topologies/%s'.", iter.name().c_str());
+      vtkLogF(ERROR, "failed to process '../topologies/%s'.", child.name().c_str());
       vtkLogF(ERROR, "ERROR: \n%s\n", e.what());
       return 0;
     }
@@ -404,18 +410,20 @@ int vtkConduitSource::RequestData(
     return 1;
   }
 
-  auto& fields = node["fields"];
-  iter = fields.children();
-  while (iter.has_next())
+  auto fields = node["fields"];
+  nchildren = fields.number_of_children();
+  for (conduit_index_t i = 0; i < nchildren; ++i)
   {
-    auto& fieldNode = iter.next();
-    const auto fieldname = iter.name();
+    auto fieldNode = fields.child(i);
+    const auto fieldname = fieldNode.name();
     try
     {
       auto dataset = datasets.at(fieldNode["topology"].as_string());
       const auto vtk_association = internals::GetAssociation(fieldNode["association"].as_string());
       auto dsa = dataset->GetAttributes(vtk_association);
-      auto array = vtkConduitArrayUtilities::MCArrayToVTKArray(&fieldNode["values"], fieldname);
+      auto values = fieldNode["values"];
+      auto array =
+        vtkConduitArrayUtilities::MCArrayToVTKArray(conduit_cpp::c_node(&values), fieldname);
       if (array->GetNumberOfTuples() != dataset->GetNumberOfElements(vtk_association))
       {
         throw std::runtime_error("mismatched tuple count!");
@@ -430,10 +438,10 @@ int vtkConduitSource::RequestData(
     }
   }
 
-  if (internals.GlobalFieldsNode)
+  if (this->Internals->GlobalFieldsNodeValid)
   {
     auto fd = output->GetFieldData();
-    auto& globalFields = (*internals.GlobalFieldsNode);
+    auto& globalFields = this->Internals->GlobalFieldsNode;
     // this can be made very generic. For now, I am only processing known
     // fields.
     if (globalFields.has_path("time"))
@@ -495,13 +503,12 @@ int vtkConduitSource::RequestInformation(
   vtkInformation* outInfo = outputVector->GetInformationObject(0);
   outInfo->Set(CAN_HANDLE_PIECE_REQUEST(), 1);
 
-  auto& internals = (*this->Internals);
-  if (internals.GlobalFieldsNode == nullptr)
+  if (!this->Internals->GlobalFieldsNodeValid)
   {
     return 1;
   }
 
-  auto& node = (*internals.GlobalFieldsNode);
+  auto& node = this->Internals->GlobalFieldsNode;
   if (node.has_path("time"))
   {
     double time = node["time"].to_float64();

@@ -27,7 +27,7 @@
 
 #include "vtkObject.h"
 
-#include <conduit.hpp> // for conduit::Node
+#include <catalyst_conduit.hpp> // for conduit_cpp::Node
 
 class vtkCatalystBlueprint : public vtkObject
 {
@@ -41,7 +41,7 @@ public:
    * Supported `protocol` values are "initialize", "execute", and "finalize"
    * each corresponding to the appropriate call in the Catalyst API.
    */
-  static bool Verify(const std::string& protocol, const conduit::Node& n);
+  static bool Verify(const std::string& protocol, const conduit_cpp::Node& n);
 
 protected:
   vtkCatalystBlueprint();
