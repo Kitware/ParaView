@@ -377,8 +377,6 @@ pqColorOpacityEditorWidget::pqColorOpacityEditorWidget(
   QObject::connect(ui.SaveAsPreset, SIGNAL(clicked()), this, SLOT(saveAsPreset()));
   QObject::connect(
     ui.ComputeDataHistogram, SIGNAL(clicked()), this, SLOT(showDataHistogramClicked()));
-  QObject::connect(
-    ui.Use2DTransferFunction, SIGNAL(toggled(bool)), this, SLOT(show2DHistogram(bool)));
   QObject::connect(ui.AdvancedButton, SIGNAL(clicked()), this, SLOT(updatePanel()));
 
   QObject::connect(
@@ -423,6 +421,12 @@ pqColorOpacityEditorWidget::pqColorOpacityEditorWidget(
   {
     this->addPropertyLink(
       this, "transferFunction2DProxy", SIGNAL(transferFunction2DProxyChanged()), smproperty);
+    QObject::connect(
+      ui.Use2DTransferFunction, SIGNAL(toggled(bool)), this, SLOT(show2DHistogram(bool)));
+  }
+  else
+  {
+    ui.Use2DTransferFunction->hide();
   }
 
   smproperty = smgroup->GetProperty("EnableOpacityMapping");
@@ -1278,6 +1282,20 @@ void pqColorOpacityEditorWidget::show2DHistogram(bool show)
   {
     this->Internals->Ui.Transfer2DEditor->setHistogram(nullptr);
   }
+  Ui::ColorOpacityEditorWidget& ui = this->Internals->Ui;
+  ui.ColorEditor->setVisible(!show);
+  ui.ColorTable->setEnabled(!show);
+  ui.OpacityTable->setEnabled(!show);
+  ui.OpacityEditor->setVisible(!show);
+  ui.UseLogScale->setEnabled(!show);
+  ui.UseLogScaleOpacity->setEnabled(!show);
+  ui.UseOpacityControlPointsFreehandDrawing->setEnabled(!show);
+  ui.EnableOpacityMapping->setEnabled(!show);
+
+  ui.AutomaticDataHistogramComputation->setEnabled(show);
+  ui.Transfer2DEditor->setVisible(show);
+  ui.ShowDataHistogram->setEnabled(!show);
+  ui.DataHistogramNumberOfBins->setEnabled(show);
 }
 
 //-----------------------------------------------------------------------------
@@ -1375,7 +1393,14 @@ void pqColorOpacityEditorWidget::automaticDataHistogramComputationClicked(bool v
 {
   if (val)
   {
-    this->showDataHistogramClicked(true);
+    if (this->Internals->Ui.Use2DTransferFunction->isChecked())
+    {
+      this->show2DHistogram(true);
+    }
+    else
+    {
+      this->showDataHistogramClicked(true);
+    }
   }
   this->updateDataHistogramEnableState();
   Q_EMIT this->automaticDataHistogramComputationChanged();
@@ -1394,7 +1419,14 @@ void pqColorOpacityEditorWidget::setHistogramOutdated()
   this->Internals->HistogramOutdated = true;
   if (this->Internals->Ui.AutomaticDataHistogramComputation->isChecked())
   {
-    this->showDataHistogramClicked(this->showDataHistogram());
+    if (this->Internals->Ui.Use2DTransferFunction->isChecked())
+    {
+      this->show2DHistogram(true);
+    }
+    else
+    {
+      this->showDataHistogramClicked(this->showDataHistogram());
+    }
   }
   else
   {
@@ -1405,6 +1437,10 @@ void pqColorOpacityEditorWidget::setHistogramOutdated()
 //-----------------------------------------------------------------------------
 void pqColorOpacityEditorWidget::updateDataHistogramEnableState()
 {
+  if (this->Internals->Ui.Use2DTransferFunction->isChecked())
+  {
+    return;
+  }
   bool showDataHistogram = this->Internals->Ui.ShowDataHistogram->isChecked();
   this->Internals->Ui.AutomaticDataHistogramComputation->setEnabled(showDataHistogram);
   this->Internals->Ui.DataHistogramNumberOfBins->setEnabled(showDataHistogram);
