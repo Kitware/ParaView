@@ -52,12 +52,11 @@ if(GRAPHVIZ_FOUND)
       ${GRAPHVIZ_PATHPLAN_LIBRARY}
   )
 
-  target_compile_definitions(NodeEditor
-    PRIVATE
-      NodeEditor_ENABLE_GRAPHVIZ
-  )
 endif()
 
+set_property(SOURCE pqNodeEditorScene.cxx APPEND
+  PROPERTY
+    COMPILE_DEFINITIONS "NodeEditor_ENABLE_GRAPHVIZ=$<BOOL:${GRAPHVIZ_FOUND}>")
 target_link_libraries(NodeEditor
   PRIVATE
     ParaView::RemotingViews
