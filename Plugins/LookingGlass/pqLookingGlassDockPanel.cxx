@@ -289,6 +289,10 @@ void pqLookingGlassDockPanel::onRender()
     this->DisplayWindow->AddObserver(vtkCommand::RenderEvent, this->EndObserver);
 
     this->updateSaveRecordVisibility();
+
+    // Update the GUI with the interface values
+    auto& ui = this->Internal->Ui;
+    ui.QuiltExportMagnification->setValue(this->Interface->GetQuiltExportMagnification());
   }
 
   vtkCollectionSimpleIterator rsit;
@@ -561,9 +565,11 @@ void pqLookingGlassDockPanel::updateSaveRecordVisibility()
 {
   bool visible = this->Interface && this->DisplayWindow;
 
-  Ui::pqLookingGlassDockPanel& ui = this->Internal->Ui;
+  auto& ui = this->Internal->Ui;
   ui.SaveQuilt->setVisible(visible);
   ui.RecordQuilt->setVisible(visible);
+  ui.QuiltExportMagnificationLabel->setVisible(visible);
+  ui.QuiltExportMagnification->setVisible(visible);
 }
 
 QString pqLookingGlassDockPanel::getQuiltFileSuffix()
@@ -576,6 +582,10 @@ QString pqLookingGlassDockPanel::getQuiltFileSuffix()
 
 void pqLookingGlassDockPanel::saveQuilt()
 {
+  // Update the interface with the GUI values
+  auto& ui = this->Internal->Ui;
+  this->Interface->SetQuiltExportMagnification(ui.QuiltExportMagnification->value());
+
   auto filename = "quilt" + this->getQuiltFileSuffix() + ".png";
   this->Interface->SaveQuilt(this->DisplayWindow, filename.toUtf8().data());
 
@@ -585,7 +595,7 @@ void pqLookingGlassDockPanel::saveQuilt()
 
 void pqLookingGlassDockPanel::onRecordQuiltClicked()
 {
-  Ui::pqLookingGlassDockPanel& ui = this->Internal->Ui;
+  auto& ui = this->Internal->Ui;
 
   if (!this->IsRecording)
   {
@@ -606,6 +616,12 @@ void pqLookingGlassDockPanel::startRecordingQuilt()
     return;
   }
 
+  // Update the interface with the GUI values
+  auto& ui = this->Internal->Ui;
+  this->Interface->SetQuiltExportMagnification(ui.QuiltExportMagnification->value());
+  ui.QuiltExportMagnificationLabel->setEnabled(false);
+  ui.QuiltExportMagnification->setEnabled(false);
+
   auto suffix = this->getQuiltFileSuffix();
   auto extension = this->Interface->MovieFileExtension();
   auto filename = QString("quilt%1.%2").arg(suffix).arg(extension);
@@ -623,6 +639,10 @@ void pqLookingGlassDockPanel::stopRecordingQuilt()
   {
     return;
   }
+
+  auto& ui = this->Internal->Ui;
+  ui.QuiltExportMagnificationLabel->setEnabled(true);
+  ui.QuiltExportMagnification->setEnabled(true);
 
   this->Interface->StopRecordingQuilt();
   this->IsRecording = false;
