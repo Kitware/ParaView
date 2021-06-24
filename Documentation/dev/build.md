@@ -433,9 +433,8 @@ More advanced options:
 
   * `PARAVIEW_INITIALIZE_MPI_ON_CLIENT` (default `ON`; requires
     `PARAVIEW_USE_MPI`): Initialize MPI on client processes by default.
-  * `PARAVIEW_USE_QTHELP` (default `ON`; requires
-    `PARAVIEW_USE_QT`): Use Qt's help infrastructure for runtime
-    documentation.
+  * `PARAVIEW_USE_QTHELP` (default `ON`; requires `PARAVIEW_USE_QT`): Use Qt's
+    help infrastructure for runtime documentation.
   * `PARAVIEW_VERSIONED_INSTALL` (default `ON`): Whether to add version numbers
     to ParaView's include and plugin directories in the install tree.
   * `PARAVIEW_CUSTOM_LIBRARY_SUFFIX` (default depends on

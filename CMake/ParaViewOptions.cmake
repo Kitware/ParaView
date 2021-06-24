@@ -153,9 +153,9 @@ if (PARAVIEW_USE_QTHELP AND NOT PARAVIEW_USE_QTWEBENGINE)
 endif()
 
 if (PARAVIEW_ENABLE_RAYTRACING AND VTK_ENABLE_OSPRAY)
-  set(PARAVIEW_USE_MATERIALEDITOR ON)
-
-  message(STATUS "Enabling OSPRayMaterialEditor widget")
+  set(paraview_use_materialeditor ON)
+else ()
+  set(paraview_use_materialeditor OFF)
 endif ()
 
 #========================================================================
