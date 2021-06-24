@@ -89,7 +89,7 @@ private:
 * to be used with QVector classes or QQuaternion.
 */
 template <class T, unsigned int S>
-class PQWIDGETS_EXPORT pqVectorWidgetImpl : public pqVectorWidget
+class pqVectorWidgetImpl : public pqVectorWidget
 {
 public:
   pqVectorWidgetImpl(const T& value, QWidget* parent = nullptr)
