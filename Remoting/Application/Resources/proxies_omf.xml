@@ -17,6 +17,15 @@
           This property sets the OMF file to be read.
         </Documentation>
       </StringVectorProperty>
+      <IntVectorProperty command="SetColumnMajorOrdering"
+                         default_values="0"
+                         name="ColumnMajorOrdering"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Are volumes written in column major data order as opposed to standard row major order.
+        </Documentation>
+      </IntVectorProperty>
       <Hints>
         <ReaderFactory extensions="omf"
                        file_description="Open Mining Format (.omf) Files" />
