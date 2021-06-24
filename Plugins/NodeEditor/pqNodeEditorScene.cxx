@@ -35,9 +35,9 @@
 #include <limits>
 #include <sstream>
 
-#ifdef NodeEditor_ENABLE_GRAPHVIZ
-#include <graphviz/cgraph.h>
-#include <graphviz/gvc.h>
+#if NodeEditor_ENABLE_GRAPHVIZ
+#include <cgraph.h>
+#include <gvc.h>
 #endif // NodeEditor_ENABLE_GRAPHVIZ
 
 // ----------------------------------------------------------------------------
@@ -50,7 +50,7 @@ pqNodeEditorScene::pqNodeEditorScene(QObject* parent)
 int pqNodeEditorScene::computeLayout(const std::unordered_map<int, pqNodeEditorNode*>& nodes,
   std::unordered_map<int, std::vector<pqNodeEditorEdge*> >& edges)
 {
-#ifdef NodeEditor_ENABLE_GRAPHVIZ
+#if NodeEditor_ENABLE_GRAPHVIZ
   // Scale factor between graphviz and Qt coordinates
   constexpr double GRAPHVIZ_SCALE_FACTOR = 100.0;
 
