@@ -1,6 +1,8 @@
 find_path(GRAPHVIZ_INCLUDE_DIR
   NAMES
-    graphviz/cgraph.h
+    cgraph.h
+  PATH_SUFFIXES
+    graphviz
   HINTS
     ${_GRAPHVIZ_INCLUDE_DIR}
     )

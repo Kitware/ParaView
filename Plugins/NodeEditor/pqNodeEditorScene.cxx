@@ -36,8 +36,8 @@
 #include <sstream>
 
 #ifdef NodeEditor_ENABLE_GRAPHVIZ
-#include <graphviz/cgraph.h>
-#include <graphviz/gvc.h>
+#include <cgraph.h>
+#include <gvc.h>
 #endif // NodeEditor_ENABLE_GRAPHVIZ
 
 // ----------------------------------------------------------------------------
