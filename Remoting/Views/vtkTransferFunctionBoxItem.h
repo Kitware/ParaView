@@ -174,7 +174,7 @@ private:
   vtkIdType FindBoxPoint(double* _pos);
 
   vtkNew<vtkPoints2D> BoxPoints;
-  const int NumPoints = 4;
+  const int NumPoints = 5;
   vtkRectd Box;
 
   vtkNew<vtkPen> Pen;
