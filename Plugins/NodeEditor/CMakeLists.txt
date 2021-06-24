@@ -37,22 +37,12 @@ paraview_add_plugin(NodeEditor
   SOURCES ${sources})
 
 find_package(Graphviz QUIET)
-
-if(Graphviz_FOUND)
-  target_include_directories(NodeEditor
-    PRIVATE
-      ${Graphviz_INCLUDE_DIR}
-  )
-
+if (Graphviz_FOUND)
   target_link_libraries(NodeEditor
     PRIVATE
-      ${Graphviz_CDT_LIBRARY}
-      ${Graphviz_GVC_LIBRARY}
-      ${Graphviz_CGRAPH_LIBRARY}
-      ${Graphviz_PATHPLAN_LIBRARY}
-  )
-
-endif()
+      Graphviz::cgraph
+      Graphviz::gvc)
+endif ()
 
 set_property(SOURCE pqNodeEditorScene.cxx APPEND
   PROPERTY
