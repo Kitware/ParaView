@@ -28,6 +28,11 @@ endif ()
 
 set_property(GLOBAL PROPERTY paraview_catalyst_directory "${catalyst_library_destination}")
 
+# Transport the variable needed for Catalyst's CMake API from
+# `ThirdParty/catalyst/CMakeLists.txt`.
+get_property(_catalyst_macro_directory GLOBAL
+  PROPERTY paraview_catalyst_macro_directory)
+
 catalyst_implementation(
   NAME    paraview
   TARGET  catalyst-paraview

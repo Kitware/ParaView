@@ -33,3 +33,16 @@ vtk_module_third_party_internal(
   LICENSE_FILES "vtkcatalyst/catalyst/License.txt"
   SUBDIRECTORY vtkcatalyst
   INTERFACE)
+
+# Store the variable we need for Catalyst implementations inside of ParaView.
+# This is needed because the `find_package(catalyst)` isn't at the right scope
+# for its usage in ParaView's minimum CMake version. This (and usages of
+# `paraview_catalyst_macro_directory`) can be removed once CMake 3.17 is
+# required.
+if (VTK_MODULE_USE_EXTERNAL_ParaView_catalyst)
+  set_property(GLOBAL PROPERTY
+      paraview_catalyst_macro_directory "${_catalyst_macro_directory}")
+else ()
+  set_property(GLOBAL PROPERTY
+      paraview_catalyst_macro_directory "${CMAKE_CURRENT_SOURCE_DIR}/vtkcatalyst/catalyst/cmake")
+endif ()
