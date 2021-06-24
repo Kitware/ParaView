@@ -3,40 +3,30 @@ find_path(GRAPHVIZ_INCLUDE_DIR
     cgraph.h
   PATH_SUFFIXES
     graphviz
-  HINTS
-    ${_GRAPHVIZ_INCLUDE_DIR}
     )
 mark_as_advanced(GRAPHVIZ_INCLUDE_DIR)
 
 find_library(GRAPHVIZ_CDT_LIBRARY
   NAMES
     cdt
-  HINTS
-    ${_GRAPHVIZ_LIBRARY_DIR}
     )
 mark_as_advanced(GRAPHVIZ_CDT_LIBRARY)
 
 find_library(GRAPHVIZ_GVC_LIBRARY
   NAMES
     gvc
-  HINTS
-    ${_GRAPHVIZ_LIBRARY_DIR}
     )
 mark_as_advanced(GRAPHVIZ_GVC_LIBRARY)
 
 find_library(GRAPHVIZ_CGRAPH_LIBRARY
   NAMES
     cgraph
-  HINTS
-    ${_GRAPHVIZ_LIBRARY_DIR}
     )
 mark_as_advanced(GRAPHVIZ_CGRAPH_LIBRARY)
 
 find_library(GRAPHVIZ_PATHPLAN_LIBRARY
   NAMES
     pathplan
-  HINTS
-    ${_GRAPHVIZ_LIBRARY_DIR}
     )
 mark_as_advanced(GRAPHVIZ_PATHPLAN_LIBRARY)
 
