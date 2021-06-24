@@ -36,27 +36,27 @@ paraview_add_plugin(NodeEditor
   UI_INTERFACES ${interfaces}
   SOURCES ${sources})
 
-find_package(GRAPHVIZ QUIET)
+find_package(Graphviz QUIET)
 
-if(GRAPHVIZ_FOUND)
+if(Graphviz_FOUND)
   target_include_directories(NodeEditor
     PRIVATE
-      ${GRAPHVIZ_INCLUDE_DIR}
+      ${Graphviz_INCLUDE_DIR}
   )
 
   target_link_libraries(NodeEditor
     PRIVATE
-      ${GRAPHVIZ_CDT_LIBRARY}
-      ${GRAPHVIZ_GVC_LIBRARY}
-      ${GRAPHVIZ_CGRAPH_LIBRARY}
-      ${GRAPHVIZ_PATHPLAN_LIBRARY}
+      ${Graphviz_CDT_LIBRARY}
+      ${Graphviz_GVC_LIBRARY}
+      ${Graphviz_CGRAPH_LIBRARY}
+      ${Graphviz_PATHPLAN_LIBRARY}
   )
 
 endif()
 
 set_property(SOURCE pqNodeEditorScene.cxx APPEND
   PROPERTY
-    COMPILE_DEFINITIONS "NodeEditor_ENABLE_GRAPHVIZ=$<BOOL:${GRAPHVIZ_FOUND}>")
+    COMPILE_DEFINITIONS "NodeEditor_ENABLE_GRAPHVIZ=$<BOOL:${Graphviz_FOUND}>")
 target_link_libraries(NodeEditor
   PRIVATE
     ParaView::RemotingViews
