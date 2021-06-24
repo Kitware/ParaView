@@ -39,8 +39,6 @@ paraview_add_plugin(NodeEditor
 find_package(GRAPHVIZ QUIET)
 
 if(GRAPHVIZ_FOUND)
-  message(STATUS "NodeEditor Plugin: GraphViz found, auto layout enabled")
-
   target_include_directories(NodeEditor
     PRIVATE
       ${GRAPHVIZ_INCLUDE_DIR}
@@ -58,9 +56,6 @@ if(GRAPHVIZ_FOUND)
     PRIVATE
       NodeEditor_ENABLE_GRAPHVIZ
   )
-
-else()
-  message(STATUS "NodeEditor Plugin: Graphviz not found, auto layout disabled")
 endif()
 
 target_link_libraries(NodeEditor
