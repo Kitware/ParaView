@@ -515,6 +515,19 @@ following flags:
   * `ParaView_DEBUG_MODULE_testing` (default `OFF`): Log testing for VTK
     modules.
 
+### ParaView Plugins
+
+ParaView's plugin system has a similar setup:
+
+  * `ParaView_DEBUG_PLUGINS` (default `OFF`): If enabled, debugging is enabled.
+    Specific portions of the plugin system may be debugged using the other
+    flags.
+  * `ParaView_DEBUG_PLUGINS_ALL` (default `OFF`): Enable all debugging messages.
+  * `ParaView_DEBUG_PLUGINS_building` (default `OFF`): Log when plugins are
+    being built.
+  * `ParaView_DEBUG_PLUGINS_plugin` (default `OFF`): Log information about
+    discovered plugins.
+
 ### Building documentation
 
 The following targets are used to build documentation for ParaView:
