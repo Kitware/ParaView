@@ -119,6 +119,123 @@
     </SourceProxy>
 
     <SourceProxy name="BoundedVolumeSource" class="vtkBoundedVolumeSource" label="Bounded Volume">
+      <InputProperty name="Input"
+        command="SetInputConnection"
+        panel_visibility="never">
+      </InputProperty>
+
+      <IntVectorProperty name="UseInputBounds"
+        command="SetUseInputBounds"
+        number_of_elements="1"
+        default_values="1">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          When set, the input dataset's bounds are used to determine the bounds for the volumetric box
+          generated.
+        </Documentation>
+      </IntVectorProperty>
+
+      <DoubleVectorProperty command="SetBoundingBox"
+        name="BoundingBox"
+        default_values="0 1 0 1 0 1"
+        number_of_elements="6">
+        <Documentation>Set the bounding box for the volume. This is only used when *UseInputBounds* is
+          not selected.
+        </Documentation>
+        <BoundsDomain mode="data_bounds" name="range">
+          <RequiredProperties>
+            <Property function="Input" name="Input" />
+          </RequiredProperties>
+        </BoundsDomain>
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="UseInputBounds"
+                                   value="0" />
+        </Hints>
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty command="SetPadding"
+        name="Padding"
+        default_values="0"
+        number_of_elements="1">
+        <DoubleRangeDomain name="range" min="0" />
+        <Documentation>
+          Specify a padding to use to inflate the bounds in all directions
+          before generating the plane.
+        </Documentation>
+      </DoubleVectorProperty>
+
+      <IntVectorProperty name="RefinementMode"
+        command="SetRefinementMode"
+        number_of_elements="1"
+        default_values="0">
+        <Documentation>
+          Specify how refinement is computed.
+        </Documentation>
+        <EnumerationDomain name="enum">
+          <Entry text="Use resolution" value="0" />
+          <Entry text="Use cell-size" value="1" />
+        </EnumerationDomain>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="Resolution"
+        command="SetResolution"
+        number_of_elements="3"
+        default_values="100 100 100">
+        <IntRangeDomain name="range" min="1 1 1" />
+        <Documentation>
+          Set the sampling resolution for the generated volume.
+        </Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="RefinementMode"
+                                   value="0" />
+        </Hints>
+      </IntVectorProperty>
+
+      <DoubleVectorProperty name="CellSize"
+        command="SetCellSize"
+        default_values="1.0"
+        number_of_elements="1">
+        <Documentation>Specify the cell size to use to compute plane refinement.</Documentation>
+        <DoubleRangeDomain name="range" min= "1" />
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="RefinementMode"
+                                   value="1" />
+        </Hints>
+      </DoubleVectorProperty>
+
+      <PropertyGroup label="Volume Parameters">
+        <Property name="UseInputBounds" />
+        <Property name="BoundingBox" />
+        <Property name="Padding" />
+      </PropertyGroup>
+
+      <PropertyGroup label="Volume Refinement">
+        <Property name="RefinementMode" />
+        <Property name="Resolution" />
+        <Property name="CellSize" />
+      </PropertyGroup>
+      <Hints>
+        <ProxyList>
+          <Link name="Input" with_property="Input" />
+        </ProxyList>
+      </Hints>
+    </SourceProxy>
+
+    <SourceProxy name="BoundedVolumeSourceLegacy" class="vtkBoundedVolumeSource" label="Bounded Volume (Legacy)">
+      <IntVectorProperty name="UseOriginScale"
+        command="SetUseOriginScale"
+        number_of_elements="1"
+        default_values="1"
+        panel_visibility="never">
+        <!-- internal property to force the source in "legacy" mode. -->
+      </IntVectorProperty>
+
       <DoubleVectorProperty name="Origin"
         command="SetOrigin"
         number_of_elements="3"
