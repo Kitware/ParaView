@@ -7,6 +7,35 @@ set(_ParaViewPlugin_cmake_dir "${CMAKE_CURRENT_LIST_DIR}")
 
 #]==]
 
+#[==[
+## Conditionally output debug statements
+
+The `_paraview_plugin_debug` function is provided to assist in debugging. It is
+controlled by the `_paraview_plugin_log` variable which contains a list of
+"domains" to debug.
+
+~~~
+_paraview_plugin_debug(<domain> <format>)
+~~~
+
+If the `domain` is enabled for debugging, the `format` argument is configured
+and printed. It should contain `@` variable expansions to replace rather than
+it being done outside. This helps to avoid the cost of generating large strings
+when debugging is disabled.
+#]==]
+function (_paraview_plugin_debug domain format)
+  if (NOT _paraview_plugin_log STREQUAL "ALL" AND
+      NOT domain IN_LIST _paraview_plugin_log)
+    return ()
+  endif ()
+
+  string(CONFIGURE "${format}" _paraview_plugin_debug_msg)
+  if (_paraview_plugin_debug_msg)
+    message(STATUS
+      "ParaView plugin debug ${domain}: ${_paraview_plugin_debug_msg}")
+  endif ()
+endfunction ()
+
 #[==[.md
 ## Finding plugins
 
@@ -170,6 +199,7 @@ function (paraview_plugin_scan)
     # Use argument splitting.
     string(REGEX REPLACE "( |\n)+" ";" _paraview_scan_plugin_args "${_paraview_scan_plugin_args}")
     _paraview_plugin_parse_args(_paraview_scan_plugin_name ${_paraview_scan_plugin_args})
+    _paraview_plugin_debug(plugin "@_paraview_scan_plugin_name@ declared by @_paraview_scan_plugin_file@")
 
     list(APPEND _paraview_scan_all_plugins
       "${_paraview_scan_plugin_name}")
@@ -195,11 +225,13 @@ function (paraview_plugin_scan)
             PROPERTY
               TYPE INTERNAL)
         endif ()
+        _paraview_plugin_debug(plugin "@_paraview_scan_plugin_name@ hidden by its `CONDITION`")
         continue ()
       endif ()
     endif ()
 
     if (_paraview_scan_enable_${_paraview_scan_plugin_name})
+      _paraview_plugin_debug(plugin "@_paraview_scan_plugin_name@ requested via cache value")
       list(APPEND _paraview_scan_provided_plugins
         "${_paraview_scan_plugin_name}")
       list(APPEND _paraview_scan_required_modules
@@ -415,6 +447,8 @@ function (paraview_plugin_build)
       message(FATAL_ERROR
         "The requested ${_paraview_build_plugin} plugin is not a ParaView plugin.")
     endif ()
+
+    _paraview_plugin_debug(building "@_paraview_build_plugin@ is being built")
 
     # Make a variable for where the plugin should go.
     set(_paraview_build_plugin_directory
