@@ -39,6 +39,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkJPEGReader.h"
 #include "vtkMath.h"
 #include "vtkOSPRayMaterialLibrary.h"
+#include "vtkOSPRayRendererNode.h"
 #include "vtkPNGReader.h"
 #include "vtkPNMReader.h"
 #include "vtkPVMaterialLibrary.h"
@@ -48,6 +49,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMSessionProxyManager.h"
+#include "vtkShaderBallScene.h"
 #include "vtkTexture.h"
 
 #include "pqActiveObjects.h"
@@ -62,6 +64,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqView.h"
 
 #include <QAbstractTableModel>
+#include <QDockWidget>
 #include <QMetaProperty>
 #include <QSet>
 #include <QStandardItemModel>
@@ -454,11 +457,19 @@ public:
   pqMaterialProxyModel AttributesModel;
   vtkOSPRayMaterialLibrary* MaterialLibrary = nullptr;
 
+  vtkNew<vtkShaderBallScene> ShaderBall;
+
   pqInternals(pqMaterialEditor* self)
   {
     this->Ui.setupUi(self);
 
     this->Ui.PropertiesView->setModel(&this->AttributesModel);
+
+    this->Ui.RenderWidget->setRenderWindow(this->ShaderBall->GetWindow());
+    this->Ui.RenderWidget->setEnableHiDPI(true);
+
+    this->Ui.RenderWidget->hide();
+
     this->Ui.PropertiesView->horizontalHeader()->setHighlightSections(false);
     this->Ui.PropertiesView->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
     this->Ui.PropertiesView->horizontalHeader()->setStretchLastSection(true);
@@ -467,10 +478,19 @@ public:
   }
 
   ~pqInternals() = default;
+
+  vtkRenderer* getRenderer() const noexcept { return this->ShaderBall->GetRenderer(); }
+
+  void setMaterialName(const char* matName) { this->ShaderBall->SetMaterialName(matName); }
+
+  void resetShaderBall() { this->ShaderBall->ResetPass(); }
+
+public Q_SLOTS:
+  void Render() { this->ShaderBall->Render(); }
 };
 
 //-----------------------------------------------------------------------------
-pqMaterialEditor::pqMaterialEditor(QWidget* parentObject)
+pqMaterialEditor::pqMaterialEditor(QWidget* parentObject, QDockWidget* dockWidget)
   : Superclass(parentObject)
   , Internals(new pqMaterialEditor::pqInternals(this))
 {
@@ -499,6 +519,23 @@ pqMaterialEditor::pqMaterialEditor(QWidget* parentObject)
 
   QObject::connect(&this->Internals->AttributesModel, &QAbstractTableModel::dataChanged, this,
     &pqMaterialEditor::propertyChanged);
+
+  // Shader Ball
+  QObject::connect(this->Internals->Ui.SelectMaterial,
+    QOverload<int>::of(&QComboBox::currentIndexChanged), [this]() { this->Internals->Render(); });
+  QObject::connect(&this->Internals->AttributesModel, &pqMaterialProxyModel::dataChanged,
+    [this]() { this->Internals->ShaderBall->Modified(); });
+  QObject::connect(this->Internals->Ui.ShowShaderBall, &QCheckBox::stateChanged, [this](int state) {
+    this->Internals->Ui.RenderWidget->setVisible(state);
+    this->Internals->ShaderBall->SetVisible(state);
+  });
+  QObject::connect(
+    this->Internals->Ui.ShaderBallNumberOfSamples, &QSpinBox::editingFinished, [this]() {
+      this->Internals->ShaderBall->SetNumberOfSamples(
+        this->Internals->Ui.ShaderBallNumberOfSamples->value());
+    });
+  QObject::connect(
+    dockWidget, &QDockWidget::topLevelChanged, [this]() { this->Internals->resetShaderBall(); });
 
   QObject::connect(
     &pqActiveObjects::instance(), &pqActiveObjects::serverChanged, [this](pqServer* server) {
@@ -574,6 +611,7 @@ void pqMaterialEditor::addMaterial()
   dialog->setMaterialLibrary(ml);
   dialog->setAttribute(Qt::WA_DeleteOnClose);
   dialog->show();
+
   QObject::connect(dialog, &pqNewMaterialDialog::accepted, [=]() {
     const std::string matName = dialog->name().toStdString();
     ml->AddMaterial(matName, dialog->type().toUtf8().data());
@@ -742,6 +780,9 @@ void pqMaterialEditor::addProperty()
     std::string matName = this->currentMaterialName().toStdString();
     ::AddDefaultValue(ml, matName, params[0]);
     this->Internals->AttributesModel.setMaterial(ml, matName);
+
+    this->updateCurrentMaterial(matName);
+    this->Internals->ShaderBall->Modified();
   }
 }
 
@@ -788,6 +829,7 @@ void pqMaterialEditor::removeAllProperties()
     ml->RemoveAllTextures(matName);
 
     this->updateCurrentMaterial(matName);
+    this->Internals->ShaderBall->Modified();
   }
 }
 

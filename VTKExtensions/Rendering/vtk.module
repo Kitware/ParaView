@@ -1,0 +1,17 @@
+NAME
+  ParaView::VTKExtensionsRendering
+LIBRARY_NAME
+  vtkExtensionsRendering
+KIT
+  ParaView::CoreKit
+GROUPS
+  Rendering
+DEPENDS
+  VTK::CommonCore
+PRIVATE_DEPENDS
+  VTK::FiltersSources
+  VTK::IOImage
+  VTK::RenderingCore
+  VTK::RenderingOpenGL2
+  VTK::RenderingRayTracing
+  VTK::IOXML

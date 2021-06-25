@@ -40,6 +40,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class vtkOSPRayMaterialLibrary;
 class vtkSMProxy;
+class QDockWidget;
 
 /**
  * @brief pqMaterialEditor is a widget that can be used to edit the OSPRay materials.
@@ -56,7 +57,7 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqMaterialEditor : public QWidget
   typedef QWidget Superclass;
 
 public:
-  pqMaterialEditor(QWidget* parent = nullptr);
+  pqMaterialEditor(QWidget* parent = nullptr, QDockWidget* dockWidget = nullptr);
   ~pqMaterialEditor() override;
 
   /**
@@ -98,7 +99,7 @@ protected Q_SLOTS:
   void removeProperty();
   void removeAllProperties();
 
-  void propertyChanged(const QModelIndex& topLeft, const QModelIndex& bottomRight);
+  void propertyChanged(const QModelIndex& topLeft, const QModelIndex& botRight);
 
 protected:
   /**

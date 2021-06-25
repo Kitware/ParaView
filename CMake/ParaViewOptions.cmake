@@ -164,9 +164,9 @@ if (PARAVIEW_USE_QTHELP AND NOT PARAVIEW_USE_QTWEBENGINE)
 endif()
 
 if (PARAVIEW_ENABLE_RAYTRACING AND VTK_ENABLE_OSPRAY)
-  set(paraview_use_materialeditor ON)
+  set(PARAVIEW_USE_MATERIALEDITOR ON)
 else ()
-  set(paraview_use_materialeditor OFF)
+  set(PARAVIEW_USE_MATERIALEDITOR OFF)
 endif ()
 
 #========================================================================
@@ -362,6 +362,11 @@ paraview_require_module(
 paraview_require_module(
   CONDITION PARAVIEW_ENABLE_RAYTRACING AND PARAVIEW_ENABLE_RENDERING
   MODULES   VTK::RenderingRayTracing
+  EXCLUSIVE)
+
+paraview_require_module(
+  CONDITION PARAVIEW_ENABLE_RAYTRACING AND VTK_ENABLE_OSPRAY
+  MODULES   ParaView::VTKExtensionsRendering
   EXCLUSIVE)
 
 paraview_require_module(
