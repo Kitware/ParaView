@@ -482,8 +482,21 @@ this using the `PARAVIEW_BUILD_EDITION` setting. Supported values for this setti
 ## Debugging facilities
 
 ParaView's build is fairly complicated, so a few debugging facilities are
-provided. VTK's module system debugging facilities may be controlled by using
-the following flags:
+provided.
+
+### General CMake
+
+CMake provides the `--trace-expand` flag which causes CMake to log all commands
+that it executes with variables expanded. This can help to trace logic and data
+through the configure step.
+
+Debugging `Find` modules can be done using the `--debug-find` flag (introduced
+in CMake 3.17) to determine what CMake's `find_` commands are doing.
+
+### VTK Modules
+
+VTK's module system debugging facilities may be controlled by using the
+following flags:
 
   * `ParaView_DEBUG_MODULE` (default `OFF`): If enabled, debugging is enabled.
     Specific portions of the module system may be debugged using the other
