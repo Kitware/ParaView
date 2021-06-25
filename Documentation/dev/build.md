@@ -461,6 +461,7 @@ These variables should be documented once they're effective again.
     VTK. Note that ParaView has fairly narrow requirements for the VTK it can
     use, so only very recent versions are likely to work.
 -->
+
 ## Building editions
 
 A typical ParaView build includes several modules and dependencies. While these
@@ -478,6 +479,54 @@ this using the `PARAVIEW_BUILD_EDITION` setting. Supported values for this setti
 * `CATALYST_RENDERING`: Same as `CATALYST` but with rendering supported added.
 * `CANONICAL` (default): Build modules necessary for standard ParaView build.
 
+## Debugging facilities
+
+ParaView's build is fairly complicated, so a few debugging facilities are
+provided.
+
+### General CMake
+
+CMake provides the `--trace-expand` flag which causes CMake to log all commands
+that it executes with variables expanded. This can help to trace logic and data
+through the configure step.
+
+Debugging `Find` modules can be done using the `--debug-find` flag (introduced
+in CMake 3.17) to determine what CMake's `find_` commands are doing.
+
+### VTK Modules
+
+VTK's module system debugging facilities may be controlled by using the
+following flags:
+
+  * `ParaView_DEBUG_MODULE` (default `OFF`): If enabled, debugging is enabled.
+    Specific portions of the module system may be debugged using the other
+    flags.
+  * `ParaView_DEBUG_MODULE_ALL` (default `OFF`): Enable all debugging messages.
+  * `ParaView_DEBUG_MODULE_building` (default `OFF`): Log when modules are
+    being built.
+  * `ParaView_DEBUG_MODULE_enable` (default `OFF`): Log why modules are
+    enabled.
+  * `ParaView_DEBUG_MODULE_kit` (default `OFF`): Log information about
+    discovered kits.
+  * `ParaView_DEBUG_MODULE_module` (default `OFF`): Log information about
+    discovered modules.
+  * `ParaView_DEBUG_MODULE_provide` (default `OFF`): Log why a module is being
+    built or not.
+  * `ParaView_DEBUG_MODULE_testing` (default `OFF`): Log testing for VTK
+    modules.
+
+### ParaView Plugins
+
+ParaView's plugin system has a similar setup:
+
+  * `ParaView_DEBUG_PLUGINS` (default `OFF`): If enabled, debugging is enabled.
+    Specific portions of the plugin system may be debugged using the other
+    flags.
+  * `ParaView_DEBUG_PLUGINS_ALL` (default `OFF`): Enable all debugging messages.
+  * `ParaView_DEBUG_PLUGINS_building` (default `OFF`): Log when plugins are
+    being built.
+  * `ParaView_DEBUG_PLUGINS_plugin` (default `OFF`): Log information about
+    discovered plugins.
 
 ### Building documentation
 
