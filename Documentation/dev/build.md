@@ -461,6 +461,7 @@ These variables should be documented once they're effective again.
     VTK. Note that ParaView has fairly narrow requirements for the VTK it can
     use, so only very recent versions are likely to work.
 -->
+
 ## Building editions
 
 A typical ParaView build includes several modules and dependencies. While these
@@ -478,6 +479,28 @@ this using the `PARAVIEW_BUILD_EDITION` setting. Supported values for this setti
 * `CATALYST_RENDERING`: Same as `CATALYST` but with rendering supported added.
 * `CANONICAL` (default): Build modules necessary for standard ParaView build.
 
+## Debugging facilities
+
+ParaView's build is fairly complicated, so a few debugging facilities are
+provided. VTK's module system debugging facilities may be controlled by using
+the following flags:
+
+  * `ParaView_DEBUG_MODULE` (default `OFF`): If enabled, debugging is enabled.
+    Specific portions of the module system may be debugged using the other
+    flags.
+  * `ParaView_DEBUG_MODULE_ALL` (default `OFF`): Enable all debugging messages.
+  * `ParaView_DEBUG_MODULE_building` (default `OFF`): Log when modules are
+    being built.
+  * `ParaView_DEBUG_MODULE_enable` (default `OFF`): Log why modules are
+    enabled.
+  * `ParaView_DEBUG_MODULE_kit` (default `OFF`): Log information about
+    discovered kits.
+  * `ParaView_DEBUG_MODULE_module` (default `OFF`): Log information about
+    discovered modules.
+  * `ParaView_DEBUG_MODULE_provide` (default `OFF`): Log why a module is being
+    built or not.
+  * `ParaView_DEBUG_MODULE_testing` (default `OFF`): Log testing for VTK
+    modules.
 
 ### Building documentation
 
