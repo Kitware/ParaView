@@ -80,6 +80,8 @@ int vtkPVExtractHistogram2D::RequestInformation(vtkInformation* vtkNotUsed(reque
   double o[3] = { this->ComponentRangeCache[0][0], this->ComponentRangeCache[1][0], 0 };
   outInfo->Set(vtkDataObject::ORIGIN(), o, 3);
 
+  outInfo->Set(vtkStreamingDemandDrivenPipeline::UNRESTRICTED_UPDATE_EXTENT(), 1);
+
   vtkDataObject::SetPointDataActiveScalarInfo(outInfo, VTK_DOUBLE, 1);
   return 1;
 }
