@@ -514,9 +514,16 @@ pqColorOpacityEditorWidget::pqColorOpacityEditorWidget(
   // When creating the widget, we consider that the cost of recomputing the histogram table
   // can be paid systematically
   // We hide it to avoid seeing it before the timer ends and triggers the actual computation
-  this->updateDataHistogramEnableState();
-  this->Internals->Ui.OpacityEditor->setVisible(!ui.ShowDataHistogram->isChecked());
-  this->showDataHistogramClicked(ui.ShowDataHistogram->isChecked());
+  if (this->Internals->Ui.Use2DTransferFunction->isChecked())
+  {
+    this->show2DHistogram(true);
+  }
+  else
+  {
+    this->updateDataHistogramEnableState();
+    this->Internals->Ui.OpacityEditor->setVisible(!ui.ShowDataHistogram->isChecked());
+    this->showDataHistogramClicked(ui.ShowDataHistogram->isChecked());
+  }
 
   // if proxy has a property named IndexedLookup, we hide this entire widget
   // when IndexedLookup is ON.
@@ -645,7 +652,7 @@ void pqColorOpacityEditorWidget::setScalarOpacityFunctionProxy(pqSMProxy sofProx
       internals.ScalarOpacityFunctionProxy,
       internals.ScalarOpacityFunctionProxy->GetProperty("UseLogScale"));
   }
-  ui.OpacityEditor->setVisible(newSofProxy != nullptr);
+  ui.OpacityEditor->setVisible(newSofProxy != nullptr && !ui.Use2DTransferFunction->isChecked());
 }
 
 //-----------------------------------------------------------------------------
