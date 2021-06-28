@@ -1,54 +1,24 @@
-coProcessor = None
+from paraview.catalyst import bridge
 
 def initialize():
-    global coProcessor
-
-    import paraview
-    import paraview.vtk as vtk
-    import paraview.simple
-    from paraview import servermanager
-    from paraview.modules import vtkPVCatalyst as catalyst
-
-    from mpi4py import MPI
-    import os, sys
-
-    paraview.options.batch = True
-    paraview.options.symmetric = True
-
-    if not servermanager.vtkProcessModule.GetProcessModule():
-        pvoptions = None
-        if paraview.options.batch:
-            pvoptions = servermanager.vtkPVOptions();
-            pvoptions.SetProcessType(servermanager.vtkPVOptions.PVBATCH)
-            if paraview.options.symmetric:
-                pvoptions.SetSymmetricMPIMode(True)
-        servermanager.vtkInitializationHelper.Initialize(sys.executable, servermanager.vtkProcessModule.PROCESS_BATCH, pvoptions)
-
-    coProcessor = catalyst.vtkCPProcessor()
-    pm = paraview.servermanager.vtkProcessModule.GetProcessModule()
+    # initialize ParaView Catalyst.
+    bridge.initialize()
 
 def finalize():
-    global coProcessor
-    coProcessor.Finalize()
-    # if we are running through Python we need to finalize extra stuff
-    # to avoid memory leak messages.
-    import sys, ntpath
-    if ntpath.basename(sys.executable) == 'python':
-        servermanager.vtkInitializationHelper.Finalize()
+    # finalize ParaView Catalyst.
+    bridge.finalize()
 
-def addscript(name):
-    global coProcessor
-    from paraview.modules import vtkPVPythonCatalyst as pythoncatalyst
-    pipeline = pythoncatalyst.vtkCPPythonScriptPipeline()
-    pipeline.Initialize(name)
-    coProcessor.AddPipeline(pipeline)
+def addscript(filename):
+    bridge.add_pipeline(filename)
 
 def coprocess(time, timeStep, grid, attributes):
-    global coProcessor
-    import vtk
+    from paraview import vtk
     from paraview.modules import vtkPVCatalyst as catalyst
-    import paraview
     from paraview.vtk.util import numpy_support
+
+    # access coprocessor from the bridge
+    coProcessor = bridge.coprocessor
+
     dataDescription = catalyst.vtkCPDataDescription()
     dataDescription.SetTimeData(time, timeStep)
     dataDescription.AddInput("input")
