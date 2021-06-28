@@ -24,11 +24,11 @@
 #include "vtkPVClientServerSynchronizedRenderers.h"
 #include "vtkPVConfig.h"
 #include "vtkPVDefaultPass.h"
-#include "vtkPVOptions.h"
 #include "vtkPVRenderViewSettings.h"
 #include "vtkPVServerInformation.h"
 #include "vtkPVSession.h"
 #include "vtkProcessModule.h"
+#include "vtkRemotingCoreConfiguration.h"
 #include "vtkRenderer.h"
 #include "vtkSocketController.h"
 
@@ -78,13 +78,8 @@ void vtkPVSynchronizedRenderer::Initialize(vtkPVSession* session)
 
   auto serverInfo = session->GetServerInformation();
 
-  int tile_dims[2] = { 0, 0 };
-  int tile_mullions[2] = { 0, 0 };
-  serverInfo->GetTileDimensions(tile_dims);
-  serverInfo->GetTileMullions(tile_mullions);
-
-  this->InTileDisplayMode = (tile_dims[0] > 0 || tile_dims[1] > 0);
-  this->InCAVEMode = !this->InTileDisplayMode ? (serverInfo->GetNumberOfMachines() > 0) : false;
+  this->InTileDisplayMode = serverInfo->GetIsInTileDisplay();
+  this->InCAVEMode = serverInfo->GetIsInCave();
 
   switch (pm->GetProcessType())
   {
@@ -127,6 +122,11 @@ void vtkPVSynchronizedRenderer::Initialize(vtkPVSession* session)
 #if VTK_MODULE_ENABLE_ParaView_icet
         if (!this->DisableIceT)
         {
+          auto localConfig = vtkRemotingCoreConfiguration::GetInstance();
+          int tile_dims[2], tile_mullions[2];
+          localConfig->GetTileDimensions(tile_dims);
+          localConfig->GetTileMullions(tile_mullions);
+
           vtkIceTSynchronizedRenderers* isr = vtkIceTSynchronizedRenderers::New();
           isr->SetTileDimensions(std::max(tile_dims[0], 1), std::max(tile_dims[1], 1));
           isr->SetTileMullions(tile_mullions[0], tile_mullions[1]);

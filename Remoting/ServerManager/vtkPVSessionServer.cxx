@@ -25,9 +25,9 @@
 #include "vtkObjectFactory.h"
 #include "vtkPVConfig.h"
 #include "vtkPVInformation.h"
-#include "vtkPVServerOptions.h"
 #include "vtkPVSessionCore.h"
 #include "vtkProcessModule.h"
+#include "vtkRemotingCoreConfiguration.h"
 #include "vtkReservedRemoteObjectIds.h"
 #include "vtkSIProxy.h"
 #include "vtkSIProxyDefinitionManager.h"
@@ -123,8 +123,7 @@ public:
   //-----------------------------------------------------------------
   std::string ComputeURL(const char* url)
   {
-    vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-    vtkPVOptions* options = pm->GetOptions();
+    auto options = vtkRemotingCoreConfiguration::GetInstance();
 
     vtksys::RegularExpression pvserver("^cs://([^:]+)?(:([0-9]+))?");
     vtksys::RegularExpression pvserver_reverse("^csrc://([^:]+)(:([0-9]+))?");
@@ -228,8 +227,7 @@ public:
   //-----------------------------------------------------------------
   void SetConnectID(int newConnectID)
   {
-    vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-    vtkPVOptions* options = pm->GetOptions();
+    auto options = vtkRemotingCoreConfiguration::GetInstance();
     if (options->GetConnectID() != newConnectID)
     {
       options->SetConnectID(newConnectID);
@@ -377,52 +375,45 @@ bool vtkPVSessionServer::Connect()
     return true;
   }
 
-  vtkPVServerOptions* options = vtkPVServerOptions::SafeDownCast(pm->GetOptions());
-  if (!options)
-  {
-    vtkErrorMacro("Missing vtkPVServerOptions. "
-                  "Process must use vtkPVServerOptions (or subclass).");
-    return false;
-  }
-
+  auto config = vtkRemotingCoreConfiguration::GetInstance();
   switch (pm->GetProcessType())
   {
     case vtkProcessModule::PROCESS_SERVER:
-      if (options->GetReverseConnection())
+      if (config->GetReverseConnection())
       {
         url << "csrc://";
-        url << options->GetClientHostName() << ":" << options->GetServerPort();
+        url << config->GetClientHostName().c_str() << ":" << config->GetServerPort();
       }
       else
       {
         url << "cs://";
-        url << options->GetHostName() << ":" << options->GetServerPort();
+        url << config->GetHostName().c_str() << ":" << config->GetServerPort();
       }
       break;
 
     case vtkProcessModule::PROCESS_RENDER_SERVER:
-      if (options->GetReverseConnection())
+      if (config->GetReverseConnection())
       {
-        url << "cdsrsrc://" << options->GetClientHostName() << ":11111" // default ds-port
-            << "/" << options->GetClientHostName() << ":" << options->GetServerPort();
+        url << "cdsrsrc://" << config->GetClientHostName().c_str() << ":11111" // default ds-port
+            << "/" << config->GetClientHostName().c_str() << ":" << config->GetServerPort();
       }
       else
       {
         url << "cdsrs://"
             << "<data-server-hostname>:11111"
-            << "/" << options->GetHostName() << ":" << options->GetServerPort();
+            << "/" << config->GetHostName() << ":" << config->GetServerPort();
       }
       break;
 
     case vtkProcessModule::PROCESS_DATA_SERVER:
-      if (options->GetReverseConnection())
+      if (config->GetReverseConnection())
       {
-        url << "cdsrsrc://" << options->GetClientHostName() << ":" << options->GetServerPort()
-            << "/" << options->GetClientHostName() << ":22221"; // default rs-port
+        url << "cdsrsrc://" << config->GetClientHostName().c_str() << ":" << config->GetServerPort()
+            << "/" << config->GetClientHostName().c_str() << ":22221"; // default rs-port
       }
       else
       {
-        url << "cdsrs://" << options->GetHostName() << ":" << options->GetServerPort() << "/"
+        url << "cdsrs://" << config->GetHostName().c_str() << ":" << config->GetServerPort() << "/"
             << "<render-server-hostname>:22221";
       }
       break;
@@ -489,9 +480,9 @@ void vtkPVSessionServer::SetDisableFurtherConnections(bool disable)
     this->DisableFurtherConnections = disable;
     this->Internal->UpdateClientURL();
 
+    auto options = vtkRemotingCoreConfiguration::GetInstance();
     vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
     vtkNetworkAccessManager* nam = pm->GetNetworkAccessManager();
-    vtkPVServerOptions* options = vtkPVServerOptions::SafeDownCast(pm->GetOptions());
     int port = options->GetServerPort();
     nam->DisableFurtherConnections(port, disable);
 
@@ -518,8 +509,7 @@ void vtkPVSessionServer::SetConnectID(int newConnectID)
 //----------------------------------------------------------------------------
 int vtkPVSessionServer::GetConnectID()
 {
-  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-  vtkPVOptions* options = pm->GetOptions();
+  auto options = vtkRemotingCoreConfiguration::GetInstance();
   return options->GetConnectID();
 }
 

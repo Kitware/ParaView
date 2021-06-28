@@ -214,11 +214,9 @@ std::string vtkRemotingCoreConfiguration::GetDisplay()
       const int index = (r < mod) ? r : (mod + (rank - (div + 1) * mod) / div);
       return this->Displays.at(index);
     }
-    break;
-
-    default:
-      return {};
   }
+
+  return {};
 }
 
 //----------------------------------------------------------------------------
@@ -290,8 +288,6 @@ bool vtkRemotingCoreConfiguration::PopulatePluginOptions(
   groupPlugins->add_option("--test-plugin-path,--test-plugin-paths", this->PluginSearchPaths,
     "Use '--plugin-search-paths' instead.");
   CLI::deprecate_option(groupPlugins, "--test-plugin");
-  CLI::deprecate_option(groupPlugins, "--test-plugins");
-  CLI::deprecate_option(groupPlugins, "--test-plugin-paths");
   CLI::deprecate_option(groupPlugins, "--test-plugin-path");
 
   return true;
@@ -423,21 +419,12 @@ bool vtkRemotingCoreConfiguration::PopulateRenderingOptions(
     "you are getting remote-rendering disabled errors and you are positive that "
     "the X environment is set up properly and your OpenGL support is adequate (experimental).");
 
-  displayGroup->add_option("--displays",
-    [this](const CLI::results_t& results) {
-      std::vector<std::string> parts;
-      for (const auto& arg : results)
-      {
-        auto names = vtksys::SystemTools::SplitString(arg, ',');
-        parts.insert(parts.end(), names.begin(), names.end());
-      }
-      this->Displays = parts;
-      return !parts.empty();
-    },
-    "Specify a comma separated list of rendering display or device ids. For X-based "
+  displayGroup->add_option("--displays", this->Displays,
+    "Specify a list of rendering display or device ids either as a comma-separated string "
+    "or simply specifying the option multiple times. For X-based "
     "systems, this can be the value to set for the DISPLAY environment. For EGL-based "
     "systems, these are the available EGL device indices. When specified these are distributed "
-    "among the number of rendering ranks using the '--displays-assignment-mode=' specified.");
+    "among the number of rendering ranks using '--displays-assignment-mode' specified.");
 
   displayGroup
     ->add_option("--displays-assignment-mode", this->DisplaysAssignmentMode,
@@ -454,7 +441,8 @@ bool vtkRemotingCoreConfiguration::PopulateRenderingOptions(
       }
       throw CLI::ValidationError("Invalid displays-assignment-mode specified.");
     })
-    ->needs("--displays");
+    ->needs("--displays")
+    ->default_str("round-robin");
 
   // Stereo
   auto stereoGroup = app->add_option_group("Stereo", "Stereo rendering options");

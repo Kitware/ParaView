@@ -25,7 +25,6 @@
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVLogger.h"
-#include "vtkPVOptions.h"
 #include "vtkPVView.h"
 #include "vtkPVXMLElement.h"
 #include "vtkPointData.h"
@@ -749,7 +748,7 @@ int vtkSMViewProxy::WriteImage(const char* filename, const char* writerName, int
   shot.TakeReference(this->CaptureWindow(magX, magY));
 
   vtkVLogScopeF(PARAVIEW_LOG_RENDERING_VERBOSITY(), "Save image to disk");
-  if (vtkProcessModule::GetProcessModule()->GetOptions()->GetSymmetricMPIMode())
+  if (vtkProcessModule::GetProcessModule()->GetSymmetricMPIMode())
   {
     return vtkSMUtilities::SaveImageOnProcessZero(shot, filename, writerName);
   }

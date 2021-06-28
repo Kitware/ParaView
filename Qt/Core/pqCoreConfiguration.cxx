@@ -66,58 +66,68 @@ bool pqCoreConfiguration::populateOptions(vtkCLIOptions* options)
     ->add_option(
       "--data-directory", this->DataDirectory, "Directory containing data files for tests.")
     ->envname("PARAVIEW_DATA_ROOT");
-  groupTesting->add_option("--test-script",
-    [this](const CLI::results_t& args) {
-      if (this->TestScripts.empty())
-      {
-        this->TestScripts.resize(args.size());
-      }
-      if (this->TestScripts.size() != args.size())
-      {
-        return false;
-      }
-      for (size_t cc = 0; cc < args.size(); ++cc)
-      {
-        this->TestScripts[cc].FileName = args[cc];
-      }
-      return true;
-    },
-    "Test scripts to execute in order specified on the command line.");
-  groupTesting->add_option("--test-baseline",
-    [this](const CLI::results_t& args) {
-      if (this->TestScripts.empty())
-      {
-        this->TestScripts.resize(args.size());
-      }
-      if (this->TestScripts.size() != args.size())
-      {
-        return false;
-      }
-      for (size_t cc = 0; cc < args.size(); ++cc)
-      {
-        this->TestScripts[cc].Baseline = args[cc];
-      }
-      return true;
-    },
-    "Test baseline for tests script provided.");
+  groupTesting
+    ->add_option("--test-script",
+      [this](const CLI::results_t& args) {
+        if (this->TestScripts.empty())
+        {
+          this->TestScripts.resize(args.size());
+        }
+        if (this->TestScripts.size() != args.size())
+        {
+          return false;
+        }
+        for (size_t cc = 0; cc < args.size(); ++cc)
+        {
+          this->TestScripts[cc].FileName = args[cc];
+        }
+        return true;
+      },
+      "Test scripts to execute in order specified on the command line.")
+    ->type_name("TEXT:filename ...")
+    ->multi_option_policy(CLI::MultiOptionPolicy::TakeAll);
 
-  groupTesting->add_option("--test-threshold",
-    [this](const CLI::results_t& args) {
-      if (this->TestScripts.empty())
-      {
-        this->TestScripts.resize(args.size());
-      }
-      if (this->TestScripts.size() != args.size())
-      {
-        return false;
-      }
-      for (size_t cc = 0; cc < args.size(); ++cc)
-      {
-        this->TestScripts[cc].Threshold = std::atoi(args[cc].c_str());
-      }
-      return true;
-    },
-    "Test image comparison threshold for test scripts provided.");
+  groupTesting
+    ->add_option("--test-baseline",
+      [this](const CLI::results_t& args) {
+        if (this->TestScripts.empty())
+        {
+          this->TestScripts.resize(args.size());
+        }
+        if (this->TestScripts.size() != args.size())
+        {
+          return false;
+        }
+        for (size_t cc = 0; cc < args.size(); ++cc)
+        {
+          this->TestScripts[cc].Baseline = args[cc];
+        }
+        return true;
+      },
+      "Test baseline for tests script provided.")
+    ->type_name("TEXT:filename ...")
+    ->multi_option_policy(CLI::MultiOptionPolicy::TakeAll);
+
+  groupTesting
+    ->add_option("--test-threshold",
+      [this](const CLI::results_t& args) {
+        if (this->TestScripts.empty())
+        {
+          this->TestScripts.resize(args.size());
+        }
+        if (this->TestScripts.size() != args.size())
+        {
+          return false;
+        }
+        for (size_t cc = 0; cc < args.size(); ++cc)
+        {
+          this->TestScripts[cc].Threshold = std::atoi(args[cc].c_str());
+        }
+        return true;
+      },
+      "Test image comparison threshold for test scripts provided.")
+    ->type_name("INT ...")
+    ->multi_option_policy(CLI::MultiOptionPolicy::TakeAll);
 
   groupTesting->add_flag(
     "--exit", this->ExitAppWhenTestsDone, "Exit application when tests are finished.");

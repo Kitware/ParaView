@@ -351,7 +351,7 @@ void vtkSMTestDriver::CreateCommandLine(std::vector<const char*>& commandLine, c
 #if !defined(__APPLE__)
   if (this->TestRemoteRendering && (type == SERVER || type == RENDER_SERVER))
   {
-    commandLine.push_back("--use-offscreen-rendering");
+    commandLine.push_back("--force-offscreen-rendering");
   }
 #endif
 
@@ -373,15 +373,15 @@ void vtkSMTestDriver::CreateCommandLine(std::vector<const char*>& commandLine, c
     // tell the server to pick a random port number.
     if (type == DATA_SERVER)
     {
-      commandLine.push_back("-dsp=0");
+      commandLine.push_back("--dsp=0");
     }
     else if (type == SERVER)
     {
-      commandLine.push_back("-sp=0");
+      commandLine.push_back("--sp=0");
     }
     else if (type == RENDER_SERVER)
     {
-      commandLine.push_back("-rsp=0");
+      commandLine.push_back("--rsp=0");
     }
   }
 #endif
@@ -734,7 +734,7 @@ int vtkSMTestDriver::Main(int argc, char* argv[])
       std::string rs_host("localhost"), ds_host("localhost");
       int rs_port(22221), ds_port(11111);
       std::ostringstream stream;
-      stream << "-url=";
+      stream << "--url=";
       for (int i = 0; i < this->NumberOfServers; i++)
       {
         GetHostAndPort(rs_connection_infos[i], rs_host, rs_port);
@@ -753,7 +753,7 @@ int vtkSMTestDriver::Main(int argc, char* argv[])
       std::string host("localhost");
       int port(11111);
       std::ostringstream stream;
-      stream << "-url=";
+      stream << "--url=";
       for (int i = 0; i < this->NumberOfServers; i++)
       {
         GetHostAndPort(s_connection_infos[i], host, port);

@@ -30,11 +30,11 @@
 #include "vtkOpenGLState.h"
 #include "vtkPNGWriter.h"
 #include "vtkPVLogger.h"
-#include "vtkPVOptions.h"
 #include "vtkPVProcessWindow.h"
 #include "vtkPVView.h"
 #include "vtkProcessModule.h"
 #include "vtkProp.h"
+#include "vtkRemotingCoreConfiguration.h"
 #include "vtkRendererCollection.h"
 #include "vtkSmartPointer.h"
 #include "vtkTilesHelper.h"
@@ -119,21 +119,21 @@ vtkViewLayout::vtkViewLayout()
     auto ren = processWindow->GetRenderers()->GetFirstRenderer();
     ren->AddActor(this->Prop);
 
-    auto options = vtkProcessModule::GetProcessModule()->GetOptions();
-    if (options->GetIsInTileDisplay())
+    auto config = vtkRemotingCoreConfiguration::GetInstance();
+    if (config->GetIsInTileDisplay())
     {
       this->InTileDisplay = true;
-      this->SetTileMullions(options->GetTileMullions());
-      this->SetTileDimensions(options->GetTileDimensions());
+      this->SetTileMullions(config->GetTileMullions());
+      this->SetTileDimensions(config->GetTileDimensions());
       // TODO: skip paste-back on extra ranks if not debugging.
     }
-    else if (options->GetIsInCave())
+    else if (config->GetIsInCave())
     {
       this->InCave = true;
     }
 
     this->DisplayResults =
-      this->InCave || this->InTileDisplay || options->GetForceOnscreenRendering();
+      this->InCave || this->InTileDisplay || config->GetForceOnscreenRendering();
   }
 }
 

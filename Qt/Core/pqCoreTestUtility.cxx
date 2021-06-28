@@ -54,6 +54,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqColorDialogEventTranslator.h"
 #include "pqConsoleWidgetEventPlayer.h"
 #include "pqConsoleWidgetEventTranslator.h"
+#include "pqCoreConfiguration.h"
 #include "pqEventDispatcher.h"
 #include "pqFileDialogEventPlayer.h"
 #include "pqFileDialogEventTranslator.h"
@@ -62,7 +63,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqFlatTreeViewEventTranslator.h"
 #include "pqImageUtil.h"
 #include "pqLineEditEventPlayer.h"
-#include "pqOptions.h"
 #include "pqQVTKWidget.h"
 #include "pqQVTKWidgetEventPlayer.h"
 #include "pqQVTKWidgetEventTranslator.h"
@@ -158,54 +158,49 @@ pqCoreTestUtility::~pqCoreTestUtility() = default;
 //-----------------------------------------------------------------------------
 QString pqCoreTestUtility::DataRoot()
 {
-  QString result;
-  if (pqOptions* const options =
-        pqOptions::SafeDownCast(vtkProcessModule::GetProcessModule()->GetOptions()))
-  {
-    result = options->GetDataDirectory();
-  }
-
-  // Let the user override the defaults by setting an environment variable ...
-  if (result.isEmpty())
-  {
-    result = vtksys::SystemTools::GetEnv("PARAVIEW_DATA_ROOT");
-  }
-
-  return result.isEmpty() ? result : QDir::cleanPath(result);
+  return pqCoreTestUtility::cleanPath(
+    QString::fromStdString(pqCoreConfiguration::instance()->dataDirectory()));
 }
 
 //-----------------------------------------------------------------------------
 QString pqCoreTestUtility::BaselineDirectory()
 {
-  QString result;
-  if (pqOptions* const options =
-        pqOptions::SafeDownCast(vtkProcessModule::GetProcessModule()->GetOptions()))
+  auto dir = QString::fromStdString(pqCoreConfiguration::instance()->baselineDirectory());
+  if (dir.isEmpty())
   {
-    result = options->GetBaselineDirectory();
-  }
-
-  // Let the user override the defaults by setting an environment variable ...
-  if (result.isEmpty())
-  {
-    result = vtksys::SystemTools::GetEnv("PARAVIEW_TEST_BASELINE_DIR");
-  }
-
-  // Finally use the xml file location if an instance is available
-  if (result.isEmpty())
-  {
+    // Finally use the xml file location if an instance is available
     pqApplicationCore* core = pqApplicationCore::instance();
     if (core != nullptr)
     {
       pqTestUtility* testUtil = core->testUtility();
-      result = QFileInfo(testUtil->filename()).path();
+      dir = QFileInfo(testUtil->filename()).path();
     }
   }
 
-  // Use current repo in case non are provided
-  if (result.isEmpty())
+  if (dir.isEmpty())
   {
-    result = ".";
+    // Use current CWD in case none is provided
+    dir = ".";
   }
+
+  return pqCoreTestUtility::cleanPath(dir);
+}
+
+//-----------------------------------------------------------------------------
+QString pqCoreTestUtility::TestDirectory()
+{
+  return pqCoreTestUtility::cleanPath(
+    QString::fromStdString(pqCoreConfiguration::instance()->testDirectory()));
+}
+
+//-----------------------------------------------------------------------------
+QString pqCoreTestUtility::cleanPath(const QString& arg)
+{
+  if (arg.isEmpty())
+  {
+    return arg;
+  }
+  auto result = QDir::cleanPath(arg);
 
   // Ensure all slashes face forward ...
   result.replace('\\', '/');
@@ -218,7 +213,6 @@ QString pqCoreTestUtility::BaselineDirectory()
 
   // Trim excess whitespace ...
   result = result.trimmed();
-
   return result;
 }
 
@@ -405,37 +399,6 @@ bool pqCoreTestUtility::CompareView(pqView* curView, const QString& referenceIma
   bool ret =
     pqCoreTestUtility::CompareImage(test_image, referenceImage, threshold, cout, tempDirectory);
   return ret;
-}
-
-//-----------------------------------------------------------------------------
-QString pqCoreTestUtility::TestDirectory()
-{
-  QString result;
-  if (pqOptions* const options =
-        pqOptions::SafeDownCast(vtkProcessModule::GetProcessModule()->GetOptions()))
-  {
-    result = options->GetTestDirectory();
-  }
-
-  // Let the user override the defaults by setting an environment variable ...
-  if (result.isEmpty())
-  {
-    result = vtksys::SystemTools::GetEnv("PARAVIEW_TEST_DIR");
-  }
-
-  // Ensure all slashes face forward ...
-  result.replace('\\', '/');
-
-  // Remove any trailing slashes ...
-  if (result.size() && result.at(result.size() - 1) == '/')
-  {
-    result.chop(1);
-  }
-
-  // Trim excess whitespace ...
-  result = result.trimmed();
-
-  return result;
 }
 
 //-----------------------------------------------------------------------------

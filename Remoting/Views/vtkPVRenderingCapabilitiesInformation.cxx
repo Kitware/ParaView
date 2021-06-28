@@ -16,8 +16,7 @@
 
 #include "vtkClientServerStream.h"
 #include "vtkObjectFactory.h"
-#include "vtkPVOptions.h"
-#include "vtkProcessModule.h"
+#include "vtkRemotingCoreConfiguration.h"
 #include "vtkRenderWindow.h"
 #include "vtkSmartPointer.h"
 #include "vtksys/SystemTools.hxx"
@@ -43,10 +42,8 @@ namespace
 {
 bool SkipDisplayTest()
 {
-  vtkPVOptions* options = vtkProcessModule::GetProcessModule()
-    ? vtkProcessModule::GetProcessModule()->GetOptions()
-    : nullptr;
-  return options ? (options->GetDisableXDisplayTests() != 0) : false;
+  auto config = vtkRemotingCoreConfiguration::GetInstance();
+  return config->GetDisableXDisplayTests();
 }
 
 bool SkipOpenGLTest()
@@ -58,10 +55,8 @@ bool SkipOpenGLTest()
 #if defined(VTK_OPENGL_HAS_EGL)
 int GetEGLDeviceIndex()
 {
-  vtkPVOptions* options = vtkProcessModule::GetProcessModule()
-    ? vtkProcessModule::GetProcessModule()->GetOptions()
-    : nullptr;
-  return options ? options->GetEGLDeviceIndex() : -1;
+  auto config = vtkRemotingCoreConfiguration::GetInstance();
+  return config->GetEGLDeviceIndex();
 }
 #endif
 }

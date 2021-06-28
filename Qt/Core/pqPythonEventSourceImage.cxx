@@ -53,8 +53,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkProcessModule.h"
 
 // pqCore includes
+#include "pqCoreConfiguration.h"
 #include "pqCoreTestUtility.h"
-#include "pqOptions.h"
 
 // since we have only one instance at a time
 static pqPythonEventSourceImage* Instance = 0;
@@ -167,10 +167,7 @@ void pqPythonEventSourceImage::doComparison()
   baseline_image += "/Baseline/";
   baseline_image += SnapshotBaseline;
 
-  pqOptions* const options =
-    pqOptions::SafeDownCast(vtkProcessModule::GetProcessModule()->GetOptions());
-  int threshold = options->GetCurrentImageThreshold();
-
+  const int threshold = pqCoreConfiguration::instance()->testThreshold();
   QString test_directory = pqCoreTestUtility::TestDirectory();
   if (test_directory.isNull())
   {

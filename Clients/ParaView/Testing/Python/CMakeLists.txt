@@ -197,7 +197,7 @@ unset(paraview_python_args)
 if (PARAVIEW_USE_MPI AND MPIEXEC_EXECUTABLE)
   set(_vtk_testing_python_exe "$<TARGET_FILE:ParaView::smTestDriver>")
   set(_vtk_test_python_args
-    --script $<TARGET_FILE:ParaView::pvbatch> -sym
+    --script $<TARGET_FILE:ParaView::pvbatch> --sym
       -m paraview.demos.wavelet_miniapp
       -s ${CMAKE_CURRENT_SOURCE_DIR}/DoLive.py
       -t 10

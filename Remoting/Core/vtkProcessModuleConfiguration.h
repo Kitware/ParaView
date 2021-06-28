@@ -23,6 +23,7 @@
 #ifndef vtkProcessModuleConfiguration_h
 #define vtkProcessModuleConfiguration_h
 
+#include "vtkLogger.h" // for vtkLogger::Verbosity
 #include "vtkObject.h"
 #include "vtkProcessModule.h"      // for vtkProcessModule::ProcessTypes
 #include "vtkRemotingCoreModule.h" //needed for exports
@@ -79,7 +80,7 @@ public:
    * In other words, all messages at the chosen level and higher are posted to
    * `stderr`. Default is `vtkLogger::VERBOSITY_INVALID`.
    */
-  vtkGetMacro(LogStdErrVerbosity, int);
+  vtkGetMacro(LogStdErrVerbosity, vtkLogger::Verbosity);
 
   /**
    * Get the filename to use to generate client-server-stream logs, if any.
@@ -97,7 +98,10 @@ public:
   /**
    * Returns a vector of pairs for log files requested.
    */
-  const std::vector<std::pair<std::string, int> >& GetLogFiles() const { return this->LogFiles; }
+  const std::vector<std::pair<std::string, vtkLogger::Verbosity> >& GetLogFiles() const
+  {
+    return this->LogFiles;
+  }
 
   /**
    * Populate command line options.
@@ -105,6 +109,13 @@ public:
    * being setup for. That may affect available options.
    */
   bool PopulateOptions(vtkCLIOptions* options, vtkProcessModule::ProcessTypes processType);
+
+  /**
+   * A helper function to add a rank number to the filename, if needed. This is
+   * useful to create a separate log file per rank, for example, when executing
+   * in parallel. If number of ranks is 1, the filename is unchanged.
+   */
+  static std::string GetRankAnnotatedFileName(const std::string& fname);
 
 protected:
   vtkProcessModuleConfiguration();
@@ -119,10 +130,9 @@ private:
   bool UseMPISSend = false;
   bool SymmetricMPIMode = false;
   bool EnableStackTrace = false;
-  int LogStdErrVerbosity = 0;
+  vtkLogger::Verbosity LogStdErrVerbosity = vtkLogger::VERBOSITY_INVALID;
   std::string CSLogFileName;
-  std::vector<std::pair<std::string, int> > LogFiles;
-
+  std::vector<std::pair<std::string, vtkLogger::Verbosity> > LogFiles;
   static vtkProcessModuleConfiguration* New();
 };
 

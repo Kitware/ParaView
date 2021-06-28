@@ -28,7 +28,6 @@
 #include "vtkObjectFactory.h"
 #include "vtkPVContextInteractorStyle.h"
 #include "vtkPVDataRepresentation.h"
-#include "vtkPVOptions.h"
 #include "vtkPVSession.h"
 #include "vtkProcessModule.h"
 #include "vtkRenderWindow.h"

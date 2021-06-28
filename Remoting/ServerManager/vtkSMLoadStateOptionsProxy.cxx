@@ -174,7 +174,7 @@ public:
       }
 
       auto properties = vtkSMCoreUtilities::GetFileNameProperties(prototype);
-      if (properties.size() == 0)
+      if (properties.empty())
       {
         continue;
       }

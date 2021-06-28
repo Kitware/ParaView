@@ -43,7 +43,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqCoreUtilities.h"
 #include "pqDeleteReaction.h"
 #include "pqMainWindowEventManager.h"
-#include "pqOptions.h"
 #include "pqParaViewBehaviors.h"
 #include "pqParaViewMenuBuilders.h"
 #include "pqSaveStateReaction.h"
@@ -53,6 +52,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkCommand.h"
 #include "vtkPVGeneralSettings.h"
 #include "vtkProcessModule.h"
+#include "vtkRemotingCoreConfiguration.h"
 #include "vtkSMSettings.h"
 #include "vtksys/SystemTools.hxx"
 
@@ -335,9 +335,9 @@ void ParaViewMainWindow::showEvent(QShowEvent* evt)
   if (this->Internals->FirstShow)
   {
     this->Internals->FirstShow = false;
-    pqApplicationCore* core = pqApplicationCore::instance();
-    if (!core->getOptions()->GetDisableRegistry())
+    if (!vtkRemotingCoreConfiguration::GetInstance()->GetDisableRegistry())
     {
+      auto core = pqApplicationCore::instance();
       if (core->settings()->value("GeneralSettings.ShowWelcomeDialog", true).toBool())
       {
         pqTimer::singleShot(1000, this, SLOT(showWelcomeDialog()));

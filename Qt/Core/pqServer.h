@@ -35,7 +35,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class vtkObject;
 class pqTimeKeeper;
 class vtkProcessModule;
-class vtkPVOptions;
 class vtkPVServerInformation;
 class vtkPVXMLElement;
 class vtkSMApplication;
@@ -65,7 +64,7 @@ class PQCORE_EXPORT pqServer : public pqServerManagerModelItem
 {
   Q_OBJECT
 public:
-  pqServer(vtkIdType connectionId, vtkPVOptions*, QObject* parent = nullptr);
+  pqServer(vtkIdType connectionId, QObject* parent = nullptr);
   ~pqServer() override;
 
   const pqServerResource& getResource();
@@ -133,11 +132,6 @@ public:
   * Returns the time keeper for this connection.
   */
   pqTimeKeeper* getTimeKeeper() const;
-
-  /**
-  * Returns the PVOptions for this connection. These are client side options.
-  */
-  vtkPVOptions* getOptions() const;
 
   /**
   * Returns the vtkPVServerInformation object which contains information about
@@ -279,11 +273,6 @@ private:
   pqServerResource Resource;
   vtkIdType ConnectionID;
   vtkWeakPointer<vtkSMSession> Session;
-
-  // TODO:
-  // Each connection will eventually have a PVOptions object.
-  // For now, this is same as the vtkProcessModule::Options.
-  vtkSmartPointer<vtkPVOptions> Options;
 
   pqTimer IdleCollaborationTimer;
 

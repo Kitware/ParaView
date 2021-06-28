@@ -14,16 +14,21 @@ PURPOSE.  See the above copyright notice for more information.
 =========================================================================*/
 #include "vtkInitializationHelper.h"
 
+#include "vtkCLIOptions.h"
 #include "vtkClientServerInterpreter.h"
 #include "vtkClientServerInterpreterInitializer.h"
+#include "vtkMultiProcessController.h"
 #include "vtkNew.h"
 #include "vtkOutputWindow.h"
 #include "vtkPVConfig.h"
 #include "vtkPVInitializer.h"
+#include "vtkPVLogger.h"
 #include "vtkPVOptions.h"
 #include "vtkPVPluginLoader.h"
 #include "vtkPVSession.h"
 #include "vtkProcessModule.h"
+#include "vtkProcessModuleConfiguration.h"
+#include "vtkRemotingCoreConfiguration.h"
 #include "vtkSMMessage.h"
 #include "vtkSMProperty.h"
 #include "vtkSMProxyManager.h"
@@ -77,12 +82,13 @@ std::string ListAttachedMonitors()
 
 } // end anon namespace
 
+//----------------------------------------------------------------------------
+// Initialize statics.
 bool vtkInitializationHelper::LoadSettingsFilesDuringInitialization = true;
-
 bool vtkInitializationHelper::SaveUserSettingsFileDuringFinalization = false;
-
 std::string vtkInitializationHelper::OrganizationName = "ParaView";
 std::string vtkInitializationHelper::ApplicationName = "GenericParaViewApplication";
+int vtkInitializationHelper::ExitCode = 0;
 
 //----------------------------------------------------------------------------
 void vtkInitializationHelper::SetLoadSettingsFilesDuringInitialization(bool val)
@@ -130,106 +136,111 @@ const std::string& vtkInitializationHelper::GetApplicationName()
 }
 
 //----------------------------------------------------------------------------
-void vtkInitializationHelper::Initialize(const char* executable, int type)
+bool vtkInitializationHelper::Initialize(const char* executable, int type)
 {
-  vtkInitializationHelper::Initialize(executable, type, nullptr);
-}
-
-//----------------------------------------------------------------------------
-void vtkInitializationHelper::Initialize(const char* executable, int type, vtkPVOptions* options)
-{
-  if (!executable)
+  if (!executable || !executable[0])
   {
-    vtkGenericWarningMacro("Executable name has to be defined.");
-    return;
-  }
-
-  // Pass the program name to make option parser happier
-  vtkSmartPointer<vtkPVOptions> newoptions = options;
-  if (!options)
-  {
-    newoptions = vtkSmartPointer<vtkPVOptions>::New();
+    vtkLogF(ERROR, "Executable name must be specified!");
+    return false;
   }
 
   std::vector<char*> argv;
   argv.push_back(vtksys::SystemTools::DuplicateString(executable));
-  if (newoptions->GetForceNoMPIInitOnClient())
-  {
-    argv.push_back(vtksys::SystemTools::DuplicateString("--no-mpi"));
-  }
-  if (newoptions->GetForceMPIInitOnClient())
-  {
-    argv.push_back(vtksys::SystemTools::DuplicateString("--mpi"));
-  }
-
   argv.push_back(nullptr);
-  vtkInitializationHelper::Initialize(
-    static_cast<int>(argv.size()) - 1, &argv[0], type, newoptions);
-
-  for (auto tofree : argv)
-  {
-    delete[] tofree;
-  }
+  return vtkInitializationHelper::Initialize(static_cast<int>(argv.size()) - 1, &argv[0], type);
 }
 
 //----------------------------------------------------------------------------
-void vtkInitializationHelper::Initialize(int argc, char** argv, int type, vtkPVOptions* options)
+#if !defined(VTK_LEGACY_REMOVE)
+void vtkInitializationHelper::Initialize(const char* executable, int type, vtkPVOptions*)
+{
+  vtkInitializationHelper::Initialize(executable, type);
+}
+#endif
+
+//----------------------------------------------------------------------------
+bool vtkInitializationHelper::Initialize(
+  int argc, char** argv, int type, vtkCLIOptions* options, bool addStandardArgs)
 {
   if (vtkProcessModule::GetProcessModule())
   {
-    vtkGenericWarningMacro("Process already initialize. Skipping.");
-    return;
+    vtkLogF(ERROR, "Process already initialize! `Initialize` should only be called once.");
+    vtkInitializationHelper::ExitCode = EXIT_FAILURE;
+    return false;
   }
 
-  if (!options)
-  {
-    vtkGenericWarningMacro("vtkPVOptions must be specified.");
-    return;
-  }
+  vtkNew<vtkCLIOptions> tmpoptions;
+  options = options ? options : tmpoptions;
+
+  const auto processType = static_cast<vtkProcessModule::ProcessTypes>(type);
 
   // Verify that the version of the library that we linked against is
   // compatible with the version of the headers we compiled against.
   GOOGLE_PROTOBUF_VERIFY_VERSION;
 
-  vtkProcessModule::Initialize(static_cast<vtkProcessModule::ProcessTypes>(type), argc, argv);
+  vtkProcessModule::Initialize(processType, argc, argv);
 
-  std::ostringstream sscerr;
-  if (argv && !options->Parse(argc, argv))
+  // Populate options (unless told otherwise).
+  auto coreConfig = vtkRemotingCoreConfiguration::GetInstance();
+  if (addStandardArgs)
   {
-    if (options->GetUnknownArgument())
+    auto pmConfig = vtkProcessModuleConfiguration::GetInstance();
+    pmConfig->PopulateOptions(options, processType);
+    coreConfig->PopulateOptions(options, processType);
+  }
+
+  auto controller = vtkMultiProcessController::GetGlobalController();
+  const auto rank0 = (controller == nullptr || controller->GetLocalProcessId() == 0);
+
+  if (!options->Parse(argc, argv))
+  {
+    if (rank0)
     {
-      sscerr << "Got unknown argument: " << options->GetUnknownArgument()
-             << ". Could you have misspelled your Python file path or name?" << endl;
+      // report error.
+      std::ostringstream str;
+      str << options->GetLastErrorMessage().c_str() << endl
+          << options->GetUsage().c_str() << "Try `--help` for more more information." << endl;
+      vtkOutputWindow::GetInstance()->DisplayText(str.str().c_str());
     }
-    if (options->GetErrorMessage())
+    vtkProcessModule::Finalize();
+    vtkInitializationHelper::ExitCode = EXIT_FAILURE;
+    return false;
+  }
+  else if (options->GetHelpRequested())
+  {
+    if (rank0)
     {
-      sscerr << "Error: " << options->GetErrorMessage() << endl;
+      std::ostringstream str;
+      str << options->GetHelp() << endl;
+      vtkOutputWindow::GetInstance()->DisplayText(str.str().c_str());
     }
-    options->SetHelpSelected(1);
+    vtkProcessModule::Finalize();
+    vtkInitializationHelper::ExitCode = EXIT_SUCCESS;
+    return false;
   }
-  if (options->GetHelpSelected())
+  else if (coreConfig->GetTellVersion())
   {
-    sscerr << options->GetHelp() << endl;
-    vtkOutputWindow::GetInstance()->DisplayText(sscerr.str().c_str());
-    // TODO: indicate to the caller that application must quit.
+    if (rank0)
+    {
+      std::ostringstream str;
+      str << "paraview version " << PARAVIEW_VERSION_FULL << "\n";
+      vtkOutputWindow::GetInstance()->DisplayText(str.str().c_str());
+    }
+    vtkProcessModule::Finalize();
+    vtkInitializationHelper::ExitCode = EXIT_SUCCESS;
+    return false;
   }
-
-  if (options->GetTellVersion())
+  else if (coreConfig->GetPrintMonitors())
   {
-    std::ostringstream str;
-    str << "paraview version " << PARAVIEW_VERSION_FULL << "\n";
-    vtkOutputWindow::GetInstance()->DisplayText(str.str().c_str());
-    // TODO: indicate to the caller that application must quit.
+    if (rank0)
+    {
+      const std::string monitors = ListAttachedMonitors();
+      vtkOutputWindow::GetInstance()->DisplayText(monitors.c_str());
+    }
+    vtkProcessModule::Finalize();
+    vtkInitializationHelper::ExitCode = EXIT_SUCCESS;
+    return false;
   }
-
-  if (options->GetPrintMonitors())
-  {
-    std::string monitors = ListAttachedMonitors();
-    vtkOutputWindow::GetInstance()->DisplayText(monitors.c_str());
-    // TODO: indicate to the caller that application must quit.
-  }
-
-  vtkProcessModule::GetProcessModule()->SetOptions(options);
 
   // this has to happen after process module is initialized and options have
   // been set.
@@ -237,7 +248,7 @@ void vtkInitializationHelper::Initialize(int argc, char** argv, int type, vtkPVO
 
   // Set multi-server flag to vtkProcessModule
   vtkProcessModule::GetProcessModule()->SetMultipleSessionsSupport(
-    options->GetMultiServerMode() != 0);
+    coreConfig->GetMultiServerMode());
 
   // Make sure the ProxyManager get created...
   vtkSMProxyManager::GetProxyManager();
@@ -250,7 +261,7 @@ void vtkInitializationHelper::Initialize(int argc, char** argv, int type, vtkPVO
 
   vtkInitializationHelper::SaveUserSettingsFileDuringFinalization = false;
   // Load settings files on client-processes.
-  if (!options->GetDisableRegistry() && type != vtkProcessModule::PROCESS_SERVER &&
+  if (!coreConfig->GetDisableRegistry() && type != vtkProcessModule::PROCESS_SERVER &&
     type != vtkProcessModule::PROCESS_DATA_SERVER &&
     type != vtkProcessModule::PROCESS_RENDER_SERVER)
   {
@@ -271,7 +282,18 @@ void vtkInitializationHelper::Initialize(int argc, char** argv, int type, vtkPVO
   {
     cout << "Process started" << endl;
   }
+
+  vtkInitializationHelper::ExitCode = EXIT_SUCCESS;
+  return true;
 }
+
+//----------------------------------------------------------------------------
+#if !defined(VTK_LEGACY_REMOVE)
+void vtkInitializationHelper::Initialize(int argc, char** argv, int type, vtkPVOptions*)
+{
+  vtkInitializationHelper::Initialize(argc, argv, type);
+}
+#endif
 
 //----------------------------------------------------------------------------
 void vtkInitializationHelper::StandaloneInitialize()
@@ -339,10 +361,7 @@ void vtkInitializationHelper::LoadSettings()
   }
 
   // Load site-level settings
-  vtkPVOptions* options = vtkProcessModule::GetProcessModule()->GetOptions();
-  const char* app_dir_p = options->GetApplicationPath();
-  std::string app_dir = app_dir_p ? app_dir_p : "";
-  app_dir = vtksys::SystemTools::GetProgramPath(app_dir);
+  const auto& app_dir = vtkProcessModule::GetProcessModule()->GetSelfDir();
 
   // If the application path ends with lib/paraview-X.X, shared
   // forwarding of the executable was used. Remove that part of the

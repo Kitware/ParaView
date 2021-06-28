@@ -16,19 +16,13 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkSMPropertyHelperTest.h"
 
 #include "vtkInitializationHelper.h"
-#include "vtkPVOptions.h"
 #include "vtkProcessModule.h"
 
 int TestSMPropertyHelper(int argc, char* argv[])
 {
-  vtkPVOptions* options = vtkPVOptions::New();
-  vtkInitializationHelper::Initialize(argc, argv, vtkProcessModule::PROCESS_CLIENT, options);
-
+  vtkInitializationHelper::Initialize(argc, argv, vtkProcessModule::PROCESS_CLIENT);
   vtkSMPropertyHelperTest test;
   int ret = QTest::qExec(&test, argc, argv);
-
   vtkInitializationHelper::Finalize();
-  options->Delete();
-
   return ret;
 }

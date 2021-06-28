@@ -32,7 +32,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqServerConfigurationCollection.h"
 
 #include "pqCoreUtilities.h"
-#include "pqOptions.h"
 #include "pqServerConfiguration.h"
 #include "pqServerResource.h"
 #include "vtkNew.h"
@@ -40,6 +39,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVXMLElement.h"
 #include "vtkPVXMLParser.h"
 #include "vtkProcessModule.h"
+#include "vtkRemotingCoreConfiguration.h"
 #include "vtkResourceFileLocator.h"
 
 #include <vtksys/SystemTools.hxx>
@@ -55,13 +55,13 @@ namespace
 // get path to user-servers
 static QString userServers()
 {
-  const char* serversFileName =
-    vtkProcessModule::GetProcessModule()->GetOptions()->GetServersFileName();
-
-  return serversFileName ? serversFileName
-                         : pqCoreUtilities::getParaViewUserDirectory() + "/servers.pvsc";
+  return pqCoreUtilities::getParaViewUserDirectory() + "/servers.pvsc";
 }
 
+static const std::vector<std::string>& customServers()
+{
+  return vtkRemotingCoreConfiguration::GetInstance()->GetServerConfigurationsFiles();
+}
 // get path to shared system servers.
 static QString systemServers()
 {
@@ -107,11 +107,14 @@ pqServerConfigurationCollection::pqServerConfigurationCollection(QObject* parent
   config.setMutable(false);
   this->Configurations["builtin"] = config;
 
-  pqOptions* options = pqOptions::SafeDownCast(vtkProcessModule::GetProcessModule()->GetOptions());
-  if (!options || !options->GetDisableRegistry())
+  if (!vtkRemotingCoreConfiguration::GetInstance()->GetDisableRegistry())
   {
     this->load(defaultServers(), false);
     this->load(systemServers(), false);
+    for (auto& fname : customServers())
+    {
+      this->load(fname.c_str(), false);
+    }
     this->load(userServers(), true);
   }
 }
@@ -119,8 +122,8 @@ pqServerConfigurationCollection::pqServerConfigurationCollection(QObject* parent
 //-----------------------------------------------------------------------------
 pqServerConfigurationCollection::~pqServerConfigurationCollection()
 {
-  pqOptions* options = pqOptions::SafeDownCast(vtkProcessModule::GetProcessModule()->GetOptions());
-  if (!options || !options->GetDisableRegistry())
+  auto config = vtkRemotingCoreConfiguration::GetInstance();
+  if (!config->GetDisableRegistry())
   {
     this->save(userServers(), true);
   }
@@ -143,8 +146,9 @@ bool pqServerConfigurationCollection::load(const QString& filename, bool mutable
 //-----------------------------------------------------------------------------
 bool pqServerConfigurationCollection::saveNow()
 {
-  pqOptions* options = pqOptions::SafeDownCast(vtkProcessModule::GetProcessModule()->GetOptions());
-  if (!options || !options->GetDisableRegistry())
+  auto config = vtkRemotingCoreConfiguration::GetInstance();
+  if (!config->GetDisableRegistry())
+
   {
     return this->save(userServers(), true);
   }
@@ -153,7 +157,7 @@ bool pqServerConfigurationCollection::saveNow()
     static bool warned = false;
     if (!warned)
     {
-      qWarning() << "When running with the -dr flag the server settings will not be saved.";
+      qWarning() << "When running with the `--dr` flag the server settings will not be saved.";
       warned = true;
     }
     return true;

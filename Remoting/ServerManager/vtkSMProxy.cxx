@@ -25,7 +25,6 @@
 #include "vtkObjectFactory.h"
 #include "vtkPVInformation.h"
 #include "vtkPVLogger.h"
-#include "vtkPVOptions.h"
 #include "vtkPVXMLElement.h"
 #include "vtkProcessModule.h"
 #include "vtkSIProxy.h"

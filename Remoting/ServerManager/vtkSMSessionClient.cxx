@@ -24,11 +24,11 @@
 #include "vtkObjectFactory.h"
 #include "vtkPVConfig.h"
 #include "vtkPVMultiClientsInformation.h"
-#include "vtkPVOptions.h"
 #include "vtkPVProgressHandler.h"
 #include "vtkPVServerInformation.h"
 #include "vtkPVSessionServer.h"
 #include "vtkProcessModule.h"
+#include "vtkRemotingCoreConfiguration.h"
 #include "vtkReservedRemoteObjectIds.h"
 #include "vtkSMCollaborationManager.h"
 #include "vtkSMMessage.h"
@@ -158,7 +158,7 @@ bool vtkSMSessionClient::Connect(const char* url, int timeout)
     "^cdsrsrc://(([^:]+)?(:([0-9]+))?/([^:]+)?(:([0-9]+))?)?");
 
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-  vtkPVOptions* options = pm->GetOptions();
+  auto options = vtkRemotingCoreConfiguration::GetInstance();
 
   // generate timeout string in seconds.
   std::ostringstream timeoutString;
@@ -1024,8 +1024,7 @@ vtkSMCollaborationManager* vtkSMSessionClient::GetCollaborationManager()
 //-----------------------------------------------------------------------------
 int vtkSMSessionClient::GetConnectID()
 {
-  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-  vtkPVOptions* options = pm->GetOptions();
+  auto options = vtkRemotingCoreConfiguration::GetInstance();
   return options->GetConnectID();
 }
 

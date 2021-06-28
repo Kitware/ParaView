@@ -568,7 +568,7 @@ To run in parallel using mpi, make sure that you use pvbatch in symmetric mode
 as follows:
 
 ```
-> mpirun -np [num ranks] .../pvbatch -sym -m paraview.demos.wavelet_miniapp ....
+> mpirun -np [num ranks] .../pvbatch --sym -- -m paraview.demos.wavelet_miniapp ....
 
 ```
 

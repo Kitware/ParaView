@@ -12,7 +12,7 @@ system paths for using Catalyst.
 
 When running, Catalyst scripts must be added in on the command line. For example:
 </path/to/pvpython> fedriver.py cpscript.py
-mpirun -np 4 </path/to/pvbatch> -sym fedriver.py cpscript.py
+mpirun -np 4 </path/to/pvbatch> --sym fedriver.py cpscript.py
 """
 import numpy
 import sys

@@ -21,7 +21,6 @@
 #include "vtkPSystemTools.h"
 #include "vtkPVConfig.h"
 #include "vtkPVLogger.h"
-#include "vtkPVOptions.h"
 #include "vtkPVPlugin.h"
 #include "vtkPVPluginLoader.h"
 #include "vtkPVPythonModule.h"
@@ -30,6 +29,7 @@
 #include "vtkPVXMLElement.h"
 #include "vtkPVXMLParser.h"
 #include "vtkProcessModule.h"
+#include "vtkRemotingCoreConfiguration.h"
 #include "vtkVersion.h"
 
 #include "vtksys/FStream.hxx"
@@ -167,19 +167,14 @@ std::string vtkLocatePluginOrConfigFile(const char* plugin, const char* hint, bo
     }
   }
 
-  // First try the test plugin path, if it exists.
-  vtkPVOptions* options = pm->GetOptions();
-  if (options && options->GetTestPluginPaths() && strlen(options->GetTestPluginPaths()) > 0)
+  // First try the plugin search paths, if any.
+  for (const auto& spath : vtkRemotingCoreConfiguration::GetInstance()->GetPluginSearchPaths())
   {
-    std::vector<std::string> testPluginPaths = tokenize(options->GetTestPluginPaths(), ',');
-    for (const auto& testPluginPath : testPluginPaths)
+    vtkVLogF(PARAVIEW_LOG_PLUGIN_VERBOSITY(), "check `plugin-search-path` first.");
+    auto path = locator->Locate(spath, landmark);
+    if (!path.empty())
     {
-      vtkVLogF(PARAVIEW_LOG_PLUGIN_VERBOSITY(), "check `test-plugin-path` first.");
-      auto path = locator->Locate(testPluginPath, landmark);
-      if (!path.empty())
-      {
-        return std::string(path).append("/").append(landmark);
-      }
+      return std::string(path).append("/").append(landmark);
     }
   }
 

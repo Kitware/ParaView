@@ -14,13 +14,18 @@ PURPOSE.  See the above copyright notice for more information.
 =========================================================================*/
 #include "vtkPVConfig.h"
 
+#include "vtkCLIOptions.h"
 #include "vtkInitializationHelper.h"
+#include "vtkLogger.h"
 #include "vtkMultiProcessController.h"
 #include "vtkNetworkAccessManager.h"
 #include "vtkPVPluginTracker.h"
-#include "vtkPVServerOptions.h"
 #include "vtkPVSessionServer.h"
 #include "vtkProcessModule.h"
+#include "vtkProcessModuleConfiguration.h"
+#include "vtkRemotingCoreConfiguration.h"
+#include "vtkSMProxyManager.h"
+#include "vtkSmartPointer.h"
 
 #ifdef PARAVIEW_USE_PYTHON
 extern "C" {
@@ -30,22 +35,61 @@ void vtkPVInitializePythonModules();
 
 #include "ParaView_paraview_plugins.h"
 
-static bool RealMain(int argc, char* argv[], vtkProcessModule::ProcessTypes type)
+static int RealMain(int argc, char* argv[], vtkProcessModule::ProcessTypes type)
 {
-  // Marking this static avoids the false leak messages from vtkDebugLeaks when
-  // using mpich. It appears that the root process which spawns all the
-  // main processes waits in MPI_Init() and calls exit() when
-  // the others are done, causing apparent memory leaks for any non-static objects
-  // created before MPI_Init().
-  static vtkSmartPointer<vtkPVServerOptions> options = vtkSmartPointer<vtkPVServerOptions>::New();
+  auto cliApp = vtk::TakeSmartPointer(vtkCLIOptions::New());
+  cliApp->SetAllowExtras(false);
+  cliApp->SetStopOnUnrecognizedArgument(false);
+  switch (type)
+  {
+    case vtkProcessModule::PROCESS_DATA_SERVER:
+      cliApp->SetDescription(
+        "pvdataserver: the ParaView data-server\n"
+        "=============================\n"
+        "This is the ParaView data-server executable. Together with the render-server "
+        "(pvrenderserver), "
+        "this can be used for client-server use-cases. "
+        "This process handles all the rendering requests. \n\n"
+        "Typically, one connects a ParaView client (either a graphical client, or a Python-based "
+        "client) to this process to drive the data analysis and visualization pipelines.");
+      break;
+
+    case vtkProcessModule::PROCESS_RENDER_SERVER:
+      cliApp->SetDescription(
+        "pvrenderserver: the ParaView render-server\n"
+        "=============================\n"
+        "This is the ParaView render-server executable. Together with the data-server "
+        "(pvdataserver), "
+        "this can be used for client-server use-cases. "
+        "This process handles all the data-processing requests. \n\n"
+        "Typically, one connects a ParaView client (either a graphical client, or a Python-based "
+        "client) to this process to drive the data analysis and visualization pipelines.");
+      break;
+
+    case vtkProcessModule::PROCESS_SERVER:
+      cliApp->SetDescription(
+        "pvserver: the ParaView server\n"
+        "=============================\n"
+        "This is the ParaView server executable. This is intended for client-server use-cases "
+        "which require the client and server to be on different processes, potentially on "
+        "different systems.\n\n"
+        "Typically, one connects a ParaView client (either a graphical client, or a Python-based "
+        "client) to this process to drive the data analysis and visualization pipelines.");
+      break;
+    default:
+      vtkLogF(ERROR, "process type not supported!");
+      abort();
+  }
 
   // Init current process type
-  vtkInitializationHelper::Initialize(argc, argv, type, options);
-  if (options->GetTellVersion() || options->GetHelpSelected() || options->GetPrintMonitors())
+  auto status = vtkInitializationHelper::Initialize(argc, argv, type, cliApp);
+  cliApp = nullptr;
+  if (!status)
   {
-    vtkInitializationHelper::Finalize();
-    return true;
+    return vtkInitializationHelper::GetExitCode();
   }
+
+  auto config = vtkRemotingCoreConfiguration::GetInstance();
 
 #ifdef PARAVIEW_USE_PYTHON
   // register callback to initialize modules statically. The callback is
@@ -62,14 +106,14 @@ static bool RealMain(int argc, char* argv[], vtkProcessModule::ProcessTypes type
   vtkMultiProcessController* controller = pm->GetGlobalController();
 
   vtkPVSessionServer* session = vtkPVSessionServer::New();
-  session->SetMultipleConnection(options->GetMultiClientMode() != 0);
-  session->SetDisableFurtherConnections(options->GetDisableFurtherConnections() != 0);
+  session->SetMultipleConnection(config->GetMultiClientMode());
+  session->SetDisableFurtherConnections(config->GetDisableFurtherConnections());
 
   int process_id = controller->GetLocalProcessId();
   if (process_id == 0)
   {
     // Report status:
-    if (options->GetReverseConnection())
+    if (config->GetReverseConnection())
     {
       cout << "Connecting to client (reverse connection requested)..." << endl;
     }
@@ -100,5 +144,5 @@ static bool RealMain(int argc, char* argv[], vtkProcessModule::ProcessTypes type
   session->Delete();
   // Exit application
   vtkInitializationHelper::Finalize();
-  return success;
+  return success ? vtkInitializationHelper::GetExitCode() : EXIT_FAILURE;
 }

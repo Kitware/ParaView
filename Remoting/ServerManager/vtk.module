@@ -16,6 +16,7 @@ PRIVATE_DEPENDS
   VTK::CommonSystem
   VTK::vtksys
   VTK::pugixml
+  VTK::cli11
   VTK::doubleconversion
 OPTIONAL_DEPENDS
   VTK::Python

@@ -24,7 +24,6 @@
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkOutputWindow.h"
-#include "vtkPVOptions.h"
 #include "vtkPVSession.h"
 #include "vtkProcessModule.h"
 #include "vtkTimerLog.h"

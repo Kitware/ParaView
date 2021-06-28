@@ -54,7 +54,6 @@ set(classes
   vtkPVInformation
   vtkPVLogInformation
   vtkPVMemoryUseInformation
-  vtkPVMultiClientsInformation
   vtkPVOptions
   vtkPVOptionsXMLParser
   vtkPVPlugin
@@ -64,11 +63,9 @@ set(classes
   vtkPVProgressHandler
   vtkPVPythonInformation
   vtkPVPythonModule
-  vtkPVPythonOptions
   vtkPVPythonPluginInterface
   vtkPVServerInformation
   vtkPVServerManagerPluginInterface
-  vtkPVServerOptions
   vtkPVSession
   vtkPVSystemConfigInformation
   vtkPVSystemInformation
@@ -81,8 +78,7 @@ set(classes
 
 set(sources)
 set(private_headers
-  vtkProcessModuleInternals.h
-  vtkPVServerOptionsInternals.h)
+  vtkProcessModuleInternals.h)
 
 set(headers
   vtkReservedRemoteObjectIds.h)

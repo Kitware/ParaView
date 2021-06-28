@@ -50,14 +50,16 @@ bool vtkProcessModuleConfiguration::PopulateOptions(
     ->add_option("-v,--verbosity", this->LogStdErrVerbosity,
       "Log verbosity on stderr as an integer in range [-9, 9] "
       "or INFO, WARNING, ERROR, or OFF. Defaults to INFO(0).")
-    ->transform([](const std::string& value) {
-      auto xformedValue = vtkLogger::ConvertToVerbosity(value.c_str());
-      if (xformedValue == vtkLogger::VERBOSITY_INVALID)
-      {
-        throw CLI::ValidationError("Invalid verbosity specified!");
-      }
-      return std::to_string(xformedValue);
-    });
+    ->transform(
+      [](const std::string& value) {
+        auto xformedValue = vtkLogger::ConvertToVerbosity(value.c_str());
+        if (xformedValue == vtkLogger::VERBOSITY_INVALID)
+        {
+          throw CLI::ValidationError("Invalid verbosity specified!");
+        }
+        return std::to_string(xformedValue);
+      },
+      "verbosity");
 
   auto groupLogging = app->add_option_group("Debugging / Logging", "Logging and debugging options");
 
@@ -70,17 +72,38 @@ bool vtkProcessModuleConfiguration::PopulateOptions(
     ->check([](const std::string&) { return std::string(); }, "filename", "filename");
 
   groupLogging
-    ->add_option("-l,--log", this->LogFiles,
+    ->add_option("-l,--log",
+      [this](const CLI::results_t& results) {
+        for (const auto& value : results)
+        {
+          const auto separator = value.find_last_of(',');
+          if (separator != std::string::npos)
+          {
+            const auto verbosityString = value.substr(separator + 1);
+            const auto verbosity = vtkLogger::ConvertToVerbosity(verbosityString.c_str());
+            if (verbosity == vtkLogger::VERBOSITY_INVALID)
+            {
+              vtkLogF(ERROR, "Invalid verbosity specified '%s'", verbosityString.c_str());
+              // invalid verbosity specified.
+              return false;
+            }
+            // remove the ",..." part from filename.
+            this->LogFiles.emplace_back(value.substr(0, separator), verbosity);
+          }
+          else
+          {
+            this->LogFiles.emplace_back(value, vtkLogger::VERBOSITY_INFO);
+          }
+        }
+        return true;
+      },
       "Additional log files to generate. Can be specified multiple times. "
       "By default, log verbosity is set to INFO(0) and may be "
       "overridden per file by adding suffix `,verbosity` where verbosity values "
       "are same as those accepted for `--verbosity` argument.")
-    ->transform([](const std::string& args) {
-      auto verbosity = vtkLogger::ConvertToVerbosity(args.c_str());
-      return (verbosity != vtkLogger::VERBOSITY_INVALID)
-        ? std::to_string(static_cast<int>(verbosity))
-        : args;
-    });
+    ->delimiter('+') // reset delimiter. For log files ',' is used to separate verbosity.
+    ->multi_option_policy(CLI::MultiOptionPolicy::TakeAll)
+    ->type_name("TEXT:filename[,ENUM:verbosity] ...");
 
   auto group = app->add_option_group("MPI", "MPI-specific options");
   auto mpi = group->add_flag(
@@ -107,15 +130,21 @@ bool vtkProcessModuleConfiguration::PopulateOptions(
 //----------------------------------------------------------------------------
 std::string vtkProcessModuleConfiguration::GetCSLogFileName() const
 {
-  if (this->CSLogFileName.empty())
+  return vtkProcessModuleConfiguration::GetRankAnnotatedFileName(this->CSLogFileName);
+}
+
+//----------------------------------------------------------------------------
+std::string vtkProcessModuleConfiguration::GetRankAnnotatedFileName(const std::string& fname)
+{
+  if (fname.empty())
   {
     return {};
   }
 
   auto controller = vtkMultiProcessController::GetGlobalController();
   return (controller && controller->GetNumberOfProcesses() > 1)
-    ? this->CSLogFileName + "." + std::to_string(controller->GetLocalProcessId())
-    : this->CSLogFileName;
+    ? fname + "." + std::to_string(controller->GetLocalProcessId())
+    : fname;
 }
 
 //----------------------------------------------------------------------------

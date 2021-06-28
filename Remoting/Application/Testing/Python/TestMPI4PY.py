@@ -1,6 +1,5 @@
 from paraview.servermanager import vtkProcessModule
-pvoptions = vtkProcessModule.GetProcessModule().GetOptions()
-if pvoptions.GetSymmetricMPIMode() == False:
+if vtkProcessModule.GetSymmetricMPIMode() == False:
     print("ERROR: Please run ParaView in SymmetricMPI mode.")
     import sys
     sys.exit(1)

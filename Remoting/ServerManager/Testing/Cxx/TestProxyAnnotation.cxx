@@ -16,7 +16,6 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkMultiProcessController.h"
 #include "vtkNetworkAccessManager.h"
 #include "vtkPVDataInformation.h"
-#include "vtkPVOptions.h"
 #include "vtkProcessModule.h"
 #include "vtkSMMessage.h"
 #include "vtkSMPropertyHelper.h"
@@ -32,9 +31,8 @@ PURPOSE.  See the above copyright notice for more information.
 int TestProxyAnnotation(int argc, char* argv[])
 {
   int ret_val = EXIT_SUCCESS;
-  vtkPVOptions* options = vtkPVOptions::New();
   bool success = true;
-  vtkInitializationHelper::Initialize(argc, argv, vtkProcessModule::PROCESS_CLIENT, options);
+  vtkInitializationHelper::Initialize(argc, argv, vtkProcessModule::PROCESS_CLIENT);
   if (!success)
   {
     return -1;
@@ -247,6 +245,5 @@ int TestProxyAnnotation(int argc, char* argv[])
   cout << "Exiting..." << endl;
 
   vtkInitializationHelper::Finalize();
-  options->Delete();
   return ret_val;
 }

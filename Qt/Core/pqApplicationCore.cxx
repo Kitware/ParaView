@@ -49,6 +49,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // ParaView includes.
 #include "pqAnimationScene.h"
+#include "pqCoreConfiguration.h"
 #include "pqCoreInit.h"
 #include "pqCoreTestUtility.h"
 #include "pqCoreUtilities.h"
@@ -58,7 +59,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqLinksModel.h"
 #include "pqMainWindowEventManager.h"
 #include "pqObjectBuilder.h"
-#include "pqOptions.h"
 #include "pqPipelineFilter.h"
 #include "pqPluginManager.h"
 #include "pqProgressManager.h"
@@ -73,6 +73,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqStandardServerManagerModelInterface.h"
 #include "pqUndoStack.h"
 #include "pqXMLUtil.h"
+#include "vtkCLIOptions.h"
 #include "vtkCommand.h"
 #include "vtkInitializationHelper.h"
 #include "vtkPVGeneralSettings.h"
@@ -83,6 +84,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVXMLParser.h"
 #include "vtkProcessModule.h"
 #include "vtkProcessModuleAutoMPI.h"
+#include "vtkRemotingCoreConfiguration.h"
 #include "vtkSMProperty.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMPropertyIterator.h"
@@ -95,6 +97,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSmartPointer.h"
 
 #include <cassert>
+
+#if !defined(VTK_LEGACY_REMOVE)
+#include "pqOptions.h"
+#endif
 
 //-----------------------------------------------------------------------------
 class pqApplicationCore::pqInternals
@@ -113,23 +119,48 @@ pqApplicationCore* pqApplicationCore::instance()
 }
 
 //-----------------------------------------------------------------------------
+#if !defined(VTK_LEGACY_REMOVE)
 pqApplicationCore::pqApplicationCore(
   int& argc, char** argv, pqOptions* options, QObject* parentObject)
+  : pqApplicationCore(argc, argv, static_cast<vtkCLIOptions*>(nullptr), true, parentObject)
+{
+  this->Options = options;
+  vtkProcessModule::GetProcessModule()->SetOptions(this->Options);
+}
+#endif
+
+//-----------------------------------------------------------------------------
+pqApplicationCore::pqApplicationCore(int& argc, char** argv, vtkCLIOptions* options /*=nullptr*/,
+  bool addStandardArgs /*=true*/, QObject* parentObject /*=nullptr*/)
   : QObject(parentObject)
 {
-  vtkPVView::SetUseGenericOpenGLRenderWindow(true);
-
-  vtkSmartPointer<pqOptions> defaultOptions;
-  if (!options)
+  auto cliOptions = vtk::MakeSmartPointer(options);
+  if (!cliOptions)
   {
-    defaultOptions = vtkSmartPointer<pqOptions>::New();
-    options = defaultOptions;
+    cliOptions = vtk::TakeSmartPointer(vtkCLIOptions::New());
   }
-  this->Options = options;
 
+  if (addStandardArgs)
+  {
+    // fill up with pqCoreConfiguration options.
+    pqCoreConfiguration::instance()->populateOptions(cliOptions);
+  }
+
+  vtkPVView::SetUseGenericOpenGLRenderWindow(true);
   vtkInitializationHelper::SetOrganizationName(QApplication::organizationName().toStdString());
   vtkInitializationHelper::SetApplicationName(QApplication::applicationName().toStdString());
-  vtkInitializationHelper::Initialize(argc, argv, vtkProcessModule::PROCESS_CLIENT, options);
+  if (!vtkInitializationHelper::Initialize(
+        argc, argv, vtkProcessModule::PROCESS_CLIENT, cliOptions, addStandardArgs))
+  {
+    // initialization short-circuited. throw exception to exit the application.
+    throw pqApplicationCoreExitCode(vtkInitializationHelper::GetExitCode());
+  }
+
+#if !defined(VTK_LEGACY_REMOVE)
+  this->Options = vtk::TakeSmartPointer(pqOptions::New());
+  vtkProcessModule::GetProcessModule()->SetOptions(this->Options);
+#endif
+
   this->constructor();
 }
 
@@ -269,6 +300,15 @@ pqApplicationCore::~pqApplicationCore()
 
   vtkInitializationHelper::Finalize();
 }
+
+//-----------------------------------------------------------------------------
+#if !defined(VTK_LEGACY_REMOVE)
+pqOptions* pqApplicationCore::getOptions() const
+{
+  VTK_LEGACY_BODY(pqApplicationCore::getOptions, "ParaView 5.10");
+  return this->Options;
+}
+#endif
 
 //-----------------------------------------------------------------------------
 void pqApplicationCore::setUndoStack(pqUndoStack* stack)
@@ -497,8 +537,7 @@ pqSettings* pqApplicationCore::settings()
 {
   if (!this->Settings)
   {
-    auto options = pqOptions::SafeDownCast(vtkProcessModule::GetProcessModule()->GetOptions());
-    bool disable_settings = (options && options->GetDisableRegistry());
+    const bool disable_settings = vtkRemotingCoreConfiguration::GetInstance()->GetDisableRegistry();
 
     const QString settingsOrg = QApplication::organizationName();
     const QString settingsApp =

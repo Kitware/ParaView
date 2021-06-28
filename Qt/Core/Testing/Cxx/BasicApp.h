@@ -9,8 +9,7 @@ class MainWindow : public QMainWindow
   Q_OBJECT
 public:
   MainWindow();
-  bool compareView(
-    const QString& referenceImage, double threshold, ostream& output, const QString& tempDirectory);
+  bool compareView(const QString& referenceImage, double threshold, const QString& tempDirectory);
   QPointer<pqRenderView> RenderView;
 public Q_SLOTS:
   void processTest();

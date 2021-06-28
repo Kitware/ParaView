@@ -251,8 +251,9 @@ if (NOT PARAVIEW_SERIAL_TESTS_USE_MPIEXEC)
   paraview_add_test(
     PREFIX "ParaView::RemotingApplicationPython::Module::pvpython::paraview"
     ARGS   "$<TARGET_FILE:ParaView::pvpython>"
-           -dr
+           --dr
            --force-offscreen-rendering
+           --
            -m paraview.tests
            -o "${CMAKE_BINARY_DIR}/Temporary/Temporary/paraview_tests_results"
     TEST_NAME "tests")
@@ -260,8 +261,9 @@ if (NOT PARAVIEW_SERIAL_TESTS_USE_MPIEXEC)
   paraview_add_test(
     PREFIX "ParaView::RemotingApplicationPython::Module::pvpython::paraview.tests"
     ARGS   "$<TARGET_FILE:ParaView::pvpython>"
-           -dr
+           --dr
            --force-offscreen-rendering
+           --
            -m paraview.tests.verify_eyedomelighting
            -o "${CMAKE_BINARY_DIR}/Testing/Temporary/VerifyEyeDomeLighting.png"
            -v DATA{${_vtk_build_TEST_INPUT_DATA_DIRECTORY}/Data/Baseline/VerifyEyeDomeLighting.png}
@@ -270,8 +272,9 @@ if (NOT PARAVIEW_SERIAL_TESTS_USE_MPIEXEC)
   paraview_add_test(
     PREFIX "ParaView::RemotingApplicationPython::Module::pvpython::paraview.tests"
     ARGS   "$<TARGET_FILE:ParaView::pvpython>"
-           -dr
+           --dr
            --force-offscreen-rendering
+           --
            -m paraview.tests.basic_rendering
            -o "${CMAKE_BINARY_DIR}/Testing/Temporary/BasicRendering.png"
            -v DATA{${_vtk_build_TEST_INPUT_DATA_DIRECTORY}/Data/Baseline/BasicRendering.png}
@@ -284,7 +287,8 @@ endif()
 paraview_add_test_mpi_optional(
   PREFIX "ParaView::RemotingApplicationPython::Module::pvbatch::paraview"
   ARGS   "$<TARGET_FILE:ParaView::pvbatch>"
-         -dr
+         --dr
+         --
          -m paraview.tests
          -o "${CMAKE_BINARY_DIR}/Temporary/Temporary/paraview_tests_results"
   TEST_NAME "tests")
@@ -292,7 +296,8 @@ paraview_add_test_mpi_optional(
 paraview_add_test_mpi_optional(
   PREFIX "ParaView::RemotingApplicationPython::Module::pvbatch::paraview.tests"
   ARGS   "$<TARGET_FILE:ParaView::pvbatch>"
-         -dr
+         --dr
+         --
          -m paraview.tests.verify_eyedomelighting
          -o "${CMAKE_BINARY_DIR}/Testing/Temporary/VerifyEyeDomeLighting.png"
          -v DATA{${_vtk_build_TEST_INPUT_DATA_DIRECTORY}/Data/Baseline/VerifyEyeDomeLighting.png}
@@ -301,7 +306,8 @@ paraview_add_test_mpi_optional(
 paraview_add_test_mpi_optional(
   PREFIX "ParaView::RemotingApplicationPython::Module::pvbatch::paraview.tests"
   ARGS   "$<TARGET_FILE:ParaView::pvbatch>"
-         -dr
+         --dr
+         --
          -m paraview.tests.basic_rendering
          -o "${CMAKE_BINARY_DIR}/Testing/Temporary/BasicRendering.png"
          -v DATA{${_vtk_build_TEST_INPUT_DATA_DIRECTORY}/Data/Baseline/BasicRendering.png}
@@ -313,8 +319,9 @@ paraview_add_test_mpi_optional(
 paraview_add_test_mpi(
   PREFIX "ParaView::RemotingApplicationPython::Module::pvbatch.sym::paraview"
   ARGS   "$<TARGET_FILE:ParaView::pvbatch>"
-         -dr
-         -sym
+         --dr
+         --sym
+         --
          -m paraview.tests
          -o "${CMAKE_BINARY_DIR}/Temporary/Temporary/paraview_tests_results"
   TEST_NAME "tests")
@@ -322,8 +329,9 @@ paraview_add_test_mpi(
 paraview_add_test_mpi(
   PREFIX "ParaView::RemotingApplicationPython::Module::pvbatch.sym::paraview.tests"
   ARGS   "$<TARGET_FILE:ParaView::pvbatch>"
-         -dr
-         -sym
+         --dr
+         --sym
+         --
          -m paraview.tests.verify_eyedomelighting
          -o "${CMAKE_BINARY_DIR}/Testing/Temporary/VerifyEyeDomeLighting.png"
          -v DATA{${_vtk_build_TEST_INPUT_DATA_DIRECTORY}/Data/Baseline/VerifyEyeDomeLighting.png}
@@ -332,8 +340,9 @@ paraview_add_test_mpi(
 paraview_add_test_mpi(
   PREFIX "ParaView::RemotingApplicationPython::Module::pvbatch.sym::paraview.tests"
   ARGS   "$<TARGET_FILE:ParaView::pvbatch>"
-         -dr
-         -sym
+         --dr
+         --sym
+         --
          -m paraview.tests.basic_rendering
          -o "${CMAKE_BINARY_DIR}/Testing/Temporary/BasicRendering.png"
          -v DATA{${_vtk_build_TEST_INPUT_DATA_DIRECTORY}/Data/Baseline/BasicRendering.png}

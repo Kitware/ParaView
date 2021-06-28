@@ -35,9 +35,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "QtTestingConfigure.h"
 #include "pqApplicationCore.h"
+#include "pqCoreConfiguration.h"
 #include "pqCoreUtilities.h"
 #include "pqFileDialog.h"
-#include "pqOptions.h"
 #include "pqServer.h"
 #include "pqServerManagerModel.h"
 #include "pqServerResource.h"
@@ -48,6 +48,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVRenderingCapabilitiesInformation.h"
 #include "vtkPVServerInformation.h"
 #include "vtkProcessModule.h"
+#include "vtkRemotingCoreConfiguration.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMSession.h"
 #include "vtkSMViewProxy.h"
@@ -77,33 +78,10 @@ pqAboutDialog::pqAboutDialog(QWidget* Parent)
   }
 
   // get extra information and put it in
-  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-  pqOptions* opts = pqOptions::SafeDownCast(pm->GetOptions());
-
-  std::ostringstream str;
-  vtkIndent indent;
-  opts->PrintSelf(str, indent.GetNextIndent());
-  str << ends;
-  QString info = str.str().c_str();
-  int idx = info.indexOf("Runtime information:");
-  info = info.remove(0, idx);
-
   this->Ui->VersionLabel->setText(
     QString("<html><b>Version: <i>%1</i></b></html>").arg(QString(PARAVIEW_VERSION_FULL)));
-
   this->AddClientInformation();
   this->AddServerInformation();
-
-  // this->Ui->ClientInformation->append("<a
-  // href=\"http://www.paraview.org\">www.paraview.org</a>");
-  //  this->Ui->ClientInformation->append("<a href=\"http://www.kitware.com\">www.kitware.com</a>");
-
-  // For now, don't add any runtime information, it's
-  // incorrect for PV3 (made sense of PV2).
-  // this->Ui->Information->append("\n");
-  // this->Ui->Information->append(info);
-  // this->Ui->ClientInformation->moveCursor(QTextCursor::Start);
-  // this->Ui->ClientInformation->viewport()->setBackgroundRole(QPalette::Window);
 }
 
 //-----------------------------------------------------------------------------
@@ -127,8 +105,6 @@ inline void addItem(QTreeWidget* tree, const QString& key, int value)
 //-----------------------------------------------------------------------------
 void pqAboutDialog::AddClientInformation()
 {
-  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-  pqOptions* opts = pqOptions::SafeDownCast(pm->GetOptions());
 
   QTreeWidget* tree = this->Ui->ClientInformation;
 
@@ -182,9 +158,11 @@ void pqAboutDialog::AddClientInformation()
   ::addItem(tree, "ParaView Build ID", PARAVIEW_BUILD_ID);
 #endif
 
-  ::addItem(tree, "Disable Registry", opts->GetDisableRegistry() ? "On" : "Off");
-  ::addItem(tree, "Test Directory", opts->GetTestDirectory());
-  ::addItem(tree, "Data Directory", opts->GetDataDirectory());
+  auto coreConfig = vtkRemotingCoreConfiguration::GetInstance();
+  auto pqConfig = pqCoreConfiguration::instance();
+  ::addItem(tree, "Disable Registry", coreConfig->GetDisableRegistry() ? "On" : "Off");
+  ::addItem(tree, "Test Directory", QString::fromStdString(pqConfig->testDirectory()));
+  ::addItem(tree, "Data Directory", QString::fromStdString(pqConfig->dataDirectory()));
 
   // For local OpenGL info, we ask Qt, as that's more truthful anyways.
   QOpenGLContext* ctx = QOpenGLContext::currentContext();
@@ -237,15 +215,9 @@ void pqAboutDialog::AddServerInformation(pqServer* server, QTreeWidget* tree)
   ::addItem(tree, "Disable Remote Rendering", serverInfo->GetRemoteRendering() ? "Off" : "On");
   ::addItem(tree, "IceT", serverInfo->GetUseIceT() ? "On" : "Off");
 
-  if (serverInfo->GetTileDimensions()[0] > 0)
+  if (serverInfo->GetIsInTileDisplay())
   {
     ::addItem(tree, "Tile Display", "On");
-    ::addItem(tree, "Tile Dimensions", QString("(%1, %2)")
-                                         .arg(serverInfo->GetTileDimensions()[0])
-                                         .arg(serverInfo->GetTileDimensions()[1]));
-    ::addItem(tree, "Tile Mullions", QString("(%1, %2)")
-                                       .arg(serverInfo->GetTileMullions()[0])
-                                       .arg(serverInfo->GetTileMullions()[1]));
   }
   else
   {

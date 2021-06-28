@@ -13,12 +13,12 @@
 
 =========================================================================*/
 #include "vtkProcessModuleAutoMPI.h"
+
 #include "vtkMultiThreader.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVConfig.h"
-#include "vtkPVConfig.h"
-#include "vtkPVOptions.h"
 #include "vtkProcessModule.h"
+#include "vtkRemotingCoreConfiguration.h"
 #include "vtkSocket.h"
 #include <vtksys/SystemTools.hxx>
 
@@ -273,9 +273,8 @@ int vtkProcessModuleAutoMPIInternals::StartRemoteBuiltInSelf(
 bool vtkProcessModuleAutoMPIInternals::SetMPIRun(std::string mpiexec)
 {
   mpiexec = vtksys::SystemTools::GetFilenameName(mpiexec);
-  vtkPVOptions* options = vtkProcessModule::GetProcessModule()->GetOptions();
-  std::string app_dir = options->GetApplicationPath();
-  app_dir = vtksys::SystemTools::GetProgramPath(app_dir) + "/" + mpiexec;
+  auto pm = vtkProcessModule::GetProcessModule();
+  std::string app_dir = pm->GetSelfDir() + "/" + mpiexec;
   if (vtksys::SystemTools::FileExists(app_dir.c_str(), true))
   {
     this->MPIRun = app_dir;
@@ -298,13 +297,13 @@ bool vtkProcessModuleAutoMPIInternals::CollectConfiguredOptions()
 {
   if (this->ServerExecutablePath.empty())
   {
-    vtkPVOptions* options = vtkProcessModule::GetProcessModule()->GetOptions();
+    auto pm = vtkProcessModule::GetProcessModule();
 
     // Determine the path to 'pvserver'.
     std::vector<std::string> search_paths;
 
     // same location as the client executable.
-    std::string binary_dir = vtksys::SystemTools::GetProgramPath(options->GetApplicationPath());
+    std::string binary_dir = pm->GetSelfDir();
 
     search_paths.push_back(binary_dir);
 
@@ -387,10 +386,11 @@ void vtkProcessModuleAutoMPIInternals::CreateCommandLine(
     commandLine.push_back(this->MPIPostFlags[i].c_str());
   }
 
-  if (vtkProcessModule::GetProcessModule()->GetOptions()->GetConnectID() != 0)
+  auto config = vtkRemotingCoreConfiguration::GetInstance();
+  if (config->GetConnectID() != 0)
   {
     std::ostringstream stream;
-    stream << "--connect-id=" << vtkProcessModule::GetProcessModule()->GetOptions()->GetConnectID();
+    stream << "--connect-id=" << config->GetConnectID();
     commandLine.push_back(stream.str());
   }
 

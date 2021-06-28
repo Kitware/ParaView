@@ -34,13 +34,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define pqOptions_h
 
 #include "pqCoreModule.h"
+#include "vtkLegacy.h" // for VTK_LEGACY
 #include <QStringList>
 #include <vtkPVOptions.h>
-
 /** \brief Command line options for pqClient.
  *
- * pqOptions extends vtkPVOptions to handle pqClient specific command line
- * options.
+ * @deprecated in ParaView 5.10. See `pqCoreConfiguration`, `vtkCLIOptions`
+ * instead.
  */
 class PQCORE_EXPORT pqOptions : public vtkPVOptions
 {
@@ -49,103 +49,25 @@ public:
   vtkTypeMacro(pqOptions, vtkPVOptions);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  vtkGetStringMacro(BaselineDirectory);
-  vtkGetStringMacro(TestDirectory);
-  vtkGetStringMacro(DataDirectory);
-
-  //@{
-  /**
-   * State file to load on startup.
-   */
-  // See Bug #5711
-  vtkGetStringMacro(StateFileName);
-  //@}
-
-  vtkGetMacro(ExitAppWhenTestsDone, int);
-
-  // Returns the test scripts as a list.
-  QStringList GetTestScripts();
-
-  /**
-  * Returns the server resource name specified
-  * to load.
-  */
-  vtkGetStringMacro(ServerResourceName);
-
-  vtkSetStringMacro(BaselineDirectory);
-  vtkSetStringMacro(TestDirectory);
-  vtkSetStringMacro(DataDirectory);
-
-  int GetNumberOfTestScripts() { return this->TestScripts.size(); }
-  QString GetTestScript(int cc) { return this->TestScripts[cc].TestFile; }
-  QString GetTestBaseline(int cc) { return this->TestScripts[cc].TestBaseline; }
-  int GetTestImageThreshold(int cc) { return this->TestScripts[cc].ImageThreshold; }
-
-  /**
-  * HACK: When playing back tests, this variable is set to make it easier to locate
-  * the test image threshold for the current test. This is updated by the
-  * test playback code.
-  */
-  vtkSetMacro(CurrentImageThreshold, int);
-  vtkGetMacro(CurrentImageThreshold, int);
-
-  // Description:
-  // These flags are used for testing multi-clients configurations.
-  vtkGetMacro(TestMaster, int);
-  vtkGetMacro(TestSlave, int);
-
-  // Description:
-  // Using --script option, user can specify a python script to be run on
-  // startup. This have any effect only when ParaView is built with Python
-  // support.
-  vtkGetStringMacro(PythonScript);
-
-  // DO NOT CALL. Public for internal callbacks.
-  int AddTestScript(const char*);
-  int SetLastTestBaseline(const char*);
-  int SetLastTestImageThreshold(int);
+  VTK_LEGACY(const char* GetBaselineDirectory());
+  VTK_LEGACY(const char* GetTestDirectory());
+  VTK_LEGACY(const char* GetDataDirectory());
+  VTK_LEGACY(const char* GetStateFileName());
+  VTK_LEGACY(const char* GetPythonScript());
+  VTK_LEGACY(int GetExitAppWhenTestsDone());
+  VTK_LEGACY(const char* GetServerResourceName());
+  VTK_LEGACY(QStringList GetTestScripts());
+  VTK_LEGACY(int GetNumberOfTestScripts());
+  VTK_LEGACY(QString GetTestScript(int cc));
+  VTK_LEGACY(QString GetTestBaseline(int cc));
+  VTK_LEGACY(int GetTestImageThreshold(int cc));
+  VTK_LEGACY(int GetCurrentImageThreshold());
+  VTK_LEGACY(int GetTestMaster());
+  VTK_LEGACY(int GetTestSlave());
 
 protected:
   pqOptions();
   ~pqOptions() override;
-
-  void Initialize() override;
-  int PostProcess(int argc, const char* const* argv) override;
-
-  char* BaselineDirectory;
-  char* TestDirectory;
-  char* DataDirectory;
-  char* ServerResourceName;
-  char* StateFileName; // loading state file(Bug #5711)
-
-  int ExitAppWhenTestsDone;
-  int DisableRegistry;
-  int CurrentImageThreshold;
-  int TestMaster;
-  int TestSlave;
-  char* PythonScript;
-
-  vtkSetStringMacro(PythonScript);
-  vtkSetStringMacro(ServerResourceName);
-  vtkSetStringMacro(StateFileName);
-
-  struct TestInfo
-  {
-    QString TestFile;
-    QString TestBaseline;
-    int ImageThreshold;
-    TestInfo()
-      : ImageThreshold(12)
-    {
-    }
-  };
-
-  QList<TestInfo> TestScripts;
-
-  // Description:
-  // This method is called when wrong argument is found. If it returns 0, then
-  // the parsing will fail.
-  int WrongArgument(const char* argument) override;
 
 private:
   pqOptions(const pqOptions&);

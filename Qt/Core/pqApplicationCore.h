@@ -33,9 +33,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define pqApplicationCore_h
 
 #include "pqCoreModule.h"
-#include "vtkPVConfig.h" // for PARAVIEW_USE_QTHELP
+#include "vtkLegacy.h"       // for VTK_LEGACY
+#include "vtkPVConfig.h"     // for PARAVIEW_USE_QTHELP
+#include "vtkSmartPointer.h" // for vtkSmartPointer
 #include <QObject>
 #include <QPointer>
+#include <exception> // for std::exception
 
 class pqInterfaceTracker;
 class pqLinksModel;
@@ -62,6 +65,19 @@ class QStringList;
 class vtkPVXMLElement;
 class vtkSMProxyLocator;
 class vtkSMStateLoader;
+class vtkCLIOptions;
+
+class PQCORE_EXPORT pqApplicationCoreExitCode : public std::exception
+{
+  int Code = 0;
+
+public:
+  pqApplicationCoreExitCode(int ecode)
+    : Code(ecode)
+  {
+  }
+  int code() const { return this->Code; }
+};
 
 /**
 * This class is the crux of the ParaView application. It creates
@@ -83,18 +99,31 @@ public:
   static pqApplicationCore* instance();
 
   /**
-  * Preferred constructor. Initializes the server-manager engine and sets up
-  * the core functionality. If application supports special command line
-  * options, pass an instance of pqOptions subclass to the constructor,
-  * otherwise a new instance of pqOptions with standard ParaView command line
-  * options will be created.
-  */
-  pqApplicationCore(int& argc, char** argv, pqOptions* options = 0, QObject* parent = 0);
+   * Initializes the ParaView application engine. `vtkCLIOptions` may be provide
+   * if the application wants to customize command line argument processing. By
+   * default all standard ParaView-specific command line arguments will be
+   * supported. To avoid that, simply pass `addStandardArgs=false`.
+   *
+   * @note This constructor may raise `pqApplicationCoreExitCode` exception
+   * if the initialization process was short circuited and the application should
+   * simply quit.
+   *
+   * @note If `options` is nullptr, an vtkCLIOptions instance will be
+   * created and used. It is also setup to accept extra / unknown arguments
+   * without raising errors.
+   */
+  pqApplicationCore(int& argc, char** argv, vtkCLIOptions* options = nullptr,
+    bool addStandardArgs = true, QObject* parent = nullptr);
 
+  ///@{
   /**
-  * Provides access to the command line options object.
-  */
-  pqOptions* getOptions() const { return this->Options; }
+   * @deprecated in ParaView 5.10. pqOptions has been replaced by vtkCLIOptions
+   * based command line parsing.
+   */
+  VTK_LEGACY(
+    pqApplicationCore(int& argc, char** argv, pqOptions* options, QObject* parent = nullptr));
+  VTK_LEGACY(pqOptions* getOptions() const);
+  ///@}
 
   /**
   * Get the Object Builder. Object Buider must be used
@@ -390,7 +419,9 @@ private Q_SLOTS:
 protected:
   bool LoadingState;
 
-  pqOptions* Options;
+#if !defined(VTK_LEGACY_REMOVE)
+  vtkSmartPointer<pqOptions> Options;
+#endif
   pqLinksModel* LinksModel;
   pqObjectBuilder* ObjectBuilder;
   pqInterfaceTracker* InterfaceTracker;

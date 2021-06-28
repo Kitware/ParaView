@@ -39,9 +39,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QWidget>
 #include <QtDebug>
 
+#include "pqCoreConfiguration.h"
 #include "pqCoreTestUtility.h"
 #include "pqObjectNaming.h"
-#include "pqOptions.h"
 #include "vtkPVXMLElement.h"
 #include "vtkPVXMLParser.h"
 #include "vtkProcessModule.h"
@@ -113,8 +113,7 @@ int pqXMLEventSource::getNextEvent(
   int index = this->Implementation->CurrentEvent;
   this->Implementation->CurrentEvent++;
 
-  auto options = pqOptions::SafeDownCast(vtkProcessModule::GetProcessModule()->GetOptions());
-
+  auto config = pqCoreConfiguration::instance();
   vtkPVXMLElement* elem = this->Implementation->XML->GetNestedElement(index);
 
   // First handle specific cases
@@ -145,7 +144,7 @@ int pqXMLEventSource::getNextEvent(
     }
     else
     {
-      threshold = options->GetCurrentImageThreshold();
+      threshold = config->testThreshold();
     }
 
     // Find widget to screenshot with
@@ -216,8 +215,8 @@ int pqXMLEventSource::getNextEvent(
 
     QString baseline = pqCoreTestUtility::fixPath(elem->GetAttribute("baseline"));
 
-    if (!pqCoreTestUtility::CompareImage(image, baseline, options->GetCurrentImageThreshold(),
-          std::cerr, pqCoreTestUtility::TestDirectory()))
+    if (!pqCoreTestUtility::CompareImage(
+          image, baseline, config->testThreshold(), std::cerr, pqCoreTestUtility::TestDirectory()))
     {
       qCritical()
         << "ERROR: The following event FAILED !!! Yet will continue with the rest of the test.";
@@ -260,7 +259,7 @@ int pqXMLEventSource::getNextEvent(
     int threshold = 0;
     if (!elem->GetScalarAttribute("threshold", &threshold))
     {
-      threshold = options->GetCurrentImageThreshold();
+      threshold = config->testThreshold();
     }
 
     if (!pqCoreTestUtility::CompareTile(widget, rank, tdx, tdy, baseline, threshold, std::cerr,

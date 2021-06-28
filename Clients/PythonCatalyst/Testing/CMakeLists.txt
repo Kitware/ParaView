@@ -92,13 +92,13 @@ if (NOT PARAVIEW_SERIAL_TESTS_USE_MPIEXEC)
   # to handle it.
   paraview_add_test(
     PREFIX "Catalyst::WaveletMiniApp"
-    ARGS   "$<TARGET_FILE:ParaView::pvbatch>" -dr -sym -m paraview.demos.wavelet_miniapp -t 20 --size 21 -s
+    ARGS   "$<TARGET_FILE:ParaView::pvbatch>" --dr --sym -- -m paraview.demos.wavelet_miniapp -t 20 --size 21 -s
     TEST_SCRIPTS ${simple_scripts})
 endif()
 
 paraview_add_test_mpi(
   PREFIX "Catalyst::MPI::WaveletMiniApp"
-  ARGS   "$<TARGET_FILE:ParaView::pvbatch>" -dr -sym -m paraview.demos.wavelet_miniapp -t 20 --size 21 -s
+  ARGS   "$<TARGET_FILE:ParaView::pvbatch>" --dr --sym -- -m paraview.demos.wavelet_miniapp -t 20 --size 21 -s
   TEST_SCRIPTS ${simple_scripts})
 
 foreach (tname IN LISTS scripts)
@@ -128,8 +128,9 @@ if (TARGET ParaView::RemotingViews)
       ENVIRONMENT
         PARAVIEW_OVERRIDE_EXTRACTS_OUTPUT_DIRECTORY=${CMAKE_BINARY_DIR}/Testing/Temporary/MultiplePipelines/
       ARGS   "$<TARGET_FILE:ParaView::pvbatch>"
-             -sym
-             -dr
+             --sym
+             --dr
+             --
              -m paraview.demos.wavelet_miniapp -t 10 --size 21
              --channel Wavelet1
              -s "${CMAKE_CURRENT_SOURCE_DIR}/pipeline1.py"
@@ -143,7 +144,8 @@ if (TARGET ParaView::RemotingViews)
   paraview_add_test(
       PREFIX "Catalyst::WaveletMiniApp::MultiplePipelines::Validate::pipeline1"
       ARGS   "$<TARGET_FILE:ParaView::pvpython>"
-             -dr
+             --dr
+             --
              -m paraview.tests.validate_extracts
              --name MultiplePipelines
              --root "${CMAKE_BINARY_DIR}/Testing/Temporary/MultiplePipelines"
@@ -167,7 +169,7 @@ if (NOT PARAVIEW_SERIAL_TESTS_USE_MPIEXEC)
   # call and this will be duplicates, so no need to do these here.
   paraview_add_test(
     PREFIX "Catalyst::FileDriverMiniApp::Wavelet"
-    ARGS  "$<TARGET_FILE:ParaView::pvbatch>" -dr -sym
+    ARGS  "$<TARGET_FILE:ParaView::pvbatch>" --dr --sym --
           -m paraview.demos.filedriver_miniapp
           -g "${paraview_test_data_directory_output}/Testing/Data/Wavelet/*.pvti"
           -s
@@ -175,7 +177,7 @@ if (NOT PARAVIEW_SERIAL_TESTS_USE_MPIEXEC)
 
   paraview_add_test(
     PREFIX "Catalyst::FileDriverMiniApp::Can"
-    ARGS  "$<TARGET_FILE:ParaView::pvbatch>" -dr -sym
+    ARGS  "$<TARGET_FILE:ParaView::pvbatch>" --dr --sym --
           -m paraview.demos.filedriver_miniapp
           -g "${paraview_test_data_directory_output}/Testing/Data/can_vtm/*.vtm"
           -s
@@ -184,7 +186,7 @@ endif()
 
 paraview_add_test_mpi(
   PREFIX "Catalyst::MPI::FileDriverMiniApp::Wavelet"
-  ARGS  "$<TARGET_FILE:ParaView::pvbatch>" -dr -sym
+  ARGS  "$<TARGET_FILE:ParaView::pvbatch>" --dr --sym --
         -m paraview.demos.filedriver_miniapp
         -g "${paraview_test_data_directory_output}/Testing/Data/Wavelet/*.pvti"
         -s
@@ -192,7 +194,7 @@ paraview_add_test_mpi(
 
 paraview_add_test_mpi(
   PREFIX "Catalyst::MPI::FileDriverMiniApp::Can"
-  ARGS  "$<TARGET_FILE:ParaView::pvbatch>" -dr -sym
+  ARGS  "$<TARGET_FILE:ParaView::pvbatch>" --dr --sym --
         -m paraview.demos.filedriver_miniapp
         -g "${paraview_test_data_directory_output}/Testing/Data/can_vtm/*.vtm"
         -s
@@ -328,7 +330,8 @@ if (TARGET ParaView::paraview OR paraview_will_be_built)
     paraview_add_test(
       PREFIX "Catalyst::Workflow::ParaView::Validate"
       ARGS "$<TARGET_FILE:ParaView::pvpython>"
-           -dr
+           --dr
+           --
            -m paraview.tests.validate_extracts
            --name "${test_name}"
            --root  "${ttemp_dir}"
@@ -352,7 +355,8 @@ if (TARGET ParaView::paraview OR paraview_will_be_built)
     paraview_add_test(
       PREFIX "Catalyst::Workflow::SaveCatalystState"
       ARGS "$<TARGET_FILE:ParaView::pvpython>"
-            -dr
+            --dr
+            --
             -m paraview.demos.export_catalyst_state
             --output "${ttemp_dir}/${test_name}.py"
             --extracts-dir "${ttemp_dir}/CoprocessingExtracts"
@@ -370,7 +374,7 @@ if (TARGET ParaView::paraview OR paraview_will_be_built)
       ENVIRONMENT
         PARAVIEW_OVERRIDE_EXTRACTS_OUTPUT_DIRECTORY=${ttemp_dir}/BatchExtracts
       ARGS "$<TARGET_FILE:ParaView::pvbatch>"
-           -dr
+           --dr
       TEST_SCRIPTS ${ttemp_dir}/${test_name}.py)
 
     set_tests_properties(
@@ -388,7 +392,8 @@ if (TARGET ParaView::paraview OR paraview_will_be_built)
     paraview_add_test(
       PREFIX "Catalyst::Workflow::BatchExecute::Validate"
       ARGS "$<TARGET_FILE:ParaView::pvpython>"
-           -dr
+           --dr
+           --
            -m paraview.tests.validate_extracts
            --name "${test_name}"
            --root  "${ttemp_dir}"
@@ -406,8 +411,9 @@ if (TARGET ParaView::paraview OR paraview_will_be_built)
     paraview_add_test_mpi_optional(
       PREFIX "Catalyst::Workflow::WaveletMiniApp"
       ARGS "$<TARGET_FILE:ParaView::pvbatch>"
-            -dr
-            -sym -m paraview.demos.wavelet_miniapp -t 20 --size 21
+            --dr
+            --sym --
+            -m paraview.demos.wavelet_miniapp -t 20 --size 21
             --channel Wavelet1
             -s
       TEST_SCRIPTS ${ttemp_dir}/${test_name}.py)
@@ -421,7 +427,8 @@ if (TARGET ParaView::paraview OR paraview_will_be_built)
     paraview_add_test(
       PREFIX "Catalyst::Workflow::WaveletMiniApp::Validate"
       ARGS "$<TARGET_FILE:ParaView::pvpython>"
-           -dr
+           --dr
+           --
            -m paraview.tests.validate_extracts
            --name "${test_name}"
            --root  "${ttemp_dir}"

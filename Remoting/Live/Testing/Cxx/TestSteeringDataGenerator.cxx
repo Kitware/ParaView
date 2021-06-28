@@ -13,6 +13,7 @@ PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
 #include "vtkAlgorithm.h"
+#include "vtkCLIOptions.h"
 #include "vtkIdTypeArray.h"
 #include "vtkInitializationHelper.h"
 #include "vtkIntArray.h"
@@ -20,7 +21,6 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkMultiBlockDataSet.h"
 #include "vtkNew.h"
 #include "vtkPVDataInformation.h"
-#include "vtkPVOptions.h"
 #include "vtkPointData.h"
 #include "vtkPolyData.h"
 #include "vtkProcessModule.h"
@@ -82,8 +82,7 @@ const char* test_xml = R"(
 //----------------------------------------------------------------------------
 int TestSteeringDataGenerator(int argc, char* argv[])
 {
-  vtkNew<vtkPVOptions> options;
-  vtkInitializationHelper::Initialize(argc, argv, vtkProcessModule::PROCESS_CLIENT, options);
+  vtkInitializationHelper::Initialize(argc, argv, vtkProcessModule::PROCESS_CLIENT);
 
   auto session = vtkSMSession::New();
   auto pxm = session->GetSessionProxyManager();

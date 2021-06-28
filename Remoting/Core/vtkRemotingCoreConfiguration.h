@@ -316,7 +316,7 @@ private:
   bool ForceOnscreenRendering = false;
   bool ForceOffscreenRendering = false;
   int EGLDeviceIndex = -1;
-  int DisplaysAssignmentMode = ROUNDROBIN;
+  DisplaysAssignmentModeEnum DisplaysAssignmentMode = ROUNDROBIN;
   bool MultiServerMode = false;
   bool MultiClientMode = false;
   bool DisableFurtherConnections = false;
