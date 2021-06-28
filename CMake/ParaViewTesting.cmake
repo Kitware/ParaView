@@ -336,35 +336,6 @@ function (paraview_add_client_server_render_tests)
     ${ARGN})
 endfunction ()
 
-function (paraview_add_multi_client_tests)
-  _get_prefix(chosen_prefix "pvcs-multi-clients" ${ARGN})
-  _paraview_add_tests("paraview_add_multi_client_tests"
-    PREFIX "${chosen_prefix}"
-    _ENABLE_SUFFIX "_ENABLE_MULTI_CLIENT"
-    FORCE_SERIAL
-    _COMMAND_PATTERN
-      --test-multi-clients
-      --server "$<TARGET_FILE:ParaView::pvserver>"
-        --enable-bt
-        __paraview_args__
-      --client __paraview_client__
-        --enable-bt
-        __paraview_args__
-        __paraview_script__
-        __paraview_client_args__
-        --test-master
-        -dr
-        --exit
-      --client __paraview_client__
-        --enable-bt
-        __paraview_args__
-        __paraview_client_args__
-        --test-slave
-        -dr
-        --exit
-    ${ARGN})
-endfunction ()
-
 function (paraview_add_multi_server_tests count)
   _get_prefix(chosen_prefix "pvcs-multi-servers" ${ARGN})
   _paraview_add_tests("paraview_add_multi_server_tests"
