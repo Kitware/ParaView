@@ -22,6 +22,7 @@ vtk_add_test_cxx(vtkRemotingServerManagerCxxTests tests
   TestMultiplexerSourceProxy.cxx
   TestProxyAnnotation.cxx
   TestRecreateVTKObjects.cxx
+  TestRemotingCoreConfiguration.cxx
   TestSelfGeneratingSourceProxy.cxx
   TestSessionProxyManager.cxx
   TestSettings.cxx

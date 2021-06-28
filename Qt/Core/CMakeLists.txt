@@ -42,6 +42,7 @@ set(classes
   pqComparativeXYBarChartView
   pqComparativeXYChartView
   pqContextView
+  pqCoreConfiguration
   pqCoreInit
   pqCoreTestUtility
   pqCoreUtilities

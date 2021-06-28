@@ -30,12 +30,14 @@
 #==========================================================================
 set(classes
   vtkCompositeMultiProcessController
+  vtkDisplayConfiguration
   vtkMPIMToNSocketConnection
   vtkMPIMToNSocketConnectionPortInformation
   vtkNetworkAccessManager
   vtkPResourceFileLocator
   vtkProcessModule
   vtkProcessModuleAutoMPI
+  vtkProcessModuleConfiguration
   vtkPVAlgorithmPortsInformation
   vtkPVArrayInformation
   vtkPVClassNameInformation
@@ -72,6 +74,7 @@ set(classes
   vtkPVSystemInformation
   vtkPVTemporalDataInformation
   vtkPVTimerInformation
+  vtkRemotingCoreConfiguration
   vtkSession
   vtkSessionIterator
   vtkTCPNetworkAccessManager)
