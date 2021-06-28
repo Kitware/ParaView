@@ -338,6 +338,28 @@ bool verify(const std::string& protocol, const conduit_cpp::Node& n)
       return false;
     }
   }
+  else if (type == "multimesh")
+  {
+    const auto data = n["data"];
+    const conduit_index_t nchildren = data.number_of_children();
+    for (conduit_index_t i = 0; i < nchildren; ++i)
+    {
+      auto child = data.child(i);
+      conduit_cpp::Node info;
+      if (conduit_cpp::Blueprint::verify("mesh", child, info))
+      {
+        vtkVLogScopeF(PARAVIEW_LOG_CATALYST_VERBOSITY(), "%s: Conduit Mesh blueprint verified.",
+          child.name().c_str());
+      }
+      else
+      {
+        vtkLogF(ERROR, "%s: Conduit Mesh blueprint validate failed!", child.name().c_str());
+        /* vtkVLog(PARAVIEW_LOG_CATALYST_VERBOSITY(), << info.to_json()); */
+        return false;
+      }
+    }
+    vtkVLogScopeF(PARAVIEW_LOG_CATALYST_VERBOSITY(), "multimesh blueprint verified.");
+  }
   else
   {
     vtkLogF(ERROR, "unsupported channel type '%s' specified.", type.c_str());
