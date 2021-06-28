@@ -152,7 +152,9 @@ public:
    *
    * @arg \c selector the selector expression
    * @arg \c assemblyName name of the assembly to use to apply the selector
-   *         to to determine the subset. If none specified, hierarchy is assumed.
+   *         to to determine the subset. If none specified, then default data-assembly
+   *         is used. For hierarchy, use
+   *         `vtkDataAssemblyUtilities::HierarchyName()`.
    */
   vtkPVDataInformation* GetSubsetDataInformation(
     unsigned int outputIdx, const char* selector, const char* assemblyName = nullptr);
