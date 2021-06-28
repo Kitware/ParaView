@@ -29,6 +29,7 @@
 #
 #==========================================================================
 set(classes
+  vtkCLIOptions
   vtkCommandOptions
   vtkCommandOptionsXMLParser
   vtkCommunicationErrorCatcher
