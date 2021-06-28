@@ -874,7 +874,6 @@ list(APPEND TESTS_WITH_BASELINES
   # disabling overlay test for now. It has issues with Time 0.
   #  ComparativeOverlay.xml
   CompositeSurfaceSelection.xml
-  CreateDelete.xml
   CustomFilter.xml
   CustomSourceProbe.xml
   CustomViewpoints.xml
@@ -1690,49 +1689,6 @@ set (glTFReaderMultipleScenes_DISABLE_CRS TRUE)
 set (glTFReaderMultipleAnimations_DISABLE_CS TRUE)
 set (glTFReaderMultipleAnimations_DISABLE_CRS TRUE)
 
-##########################################################
-# List of known incompatible tests for Collaboration
-#
-#   Contains Undo/Redo actions:
-#     - Clip, UndoRedo, UndoRedo[1-8]
-#
-#   Contains Plugin Loading actions:
-#     - LoadPlugins, NiftiReaderWriterPlugin
-#
-#   Does not work in CS or CRS mode
-#     - ViewSettingsDialog, RectilinearFractal, NewColorEditor
-#
-#   Does not work because a disconnection is involved
-#     - ExportX3dPOVVRML
-#
-#   Don't want to support for now
-#     - ComparativeVisPanel
-#     - LoadSaveStateAnimation: The time get reset by collab
-#
-#   Timing issues (Works on speedy computer)
-#     - 3DWidgetInCustomFilter, CustomFilter
-#
-##########################################################
-
-OPTION(PARAVIEW_MULTI_CLIENT_TESTING
-    "Add Collaboration testing"
-    ON)
-MARK_AS_ADVANCED(PARAVIEW_MULTI_CLIENT_TESTING)
-
-# The create/delete test was only meant for collaboration
-SET (CreateDelete_DISABLE_C TRUE)
-SET (CreateDelete_DISABLE_CS TRUE)
-SET (CreateDelete_DISABLE_CRS TRUE)
-
-# List of test Enable for collaboration
-set (Contour_ENABLE_MULTI_CLIENT ${PARAVIEW_MULTI_CLIENT_TESTING})
-set (CreateDelete_ENABLE_MULTI_CLIENT ${PARAVIEW_MULTI_CLIENT_TESTING})
-set (PropertyConversion1_ENABLE_MULTI_CLIENT ${PARAVIEW_MULTI_CLIENT_TESTING})
-set (VariableSelector_ENABLE_MULTI_CLIENT ${PARAVIEW_MULTI_CLIENT_TESTING})
-set (VariableSelector1_ENABLE_MULTI_CLIENT ${PARAVIEW_MULTI_CLIENT_TESTING})
-set (XdmfRead_ENABLE_MULTI_CLIENT ${PARAVIEW_MULTI_CLIENT_TESTING})
-set (ZLibXDMF_ENABLE_MULTI_CLIENT ${PARAVIEW_MULTI_CLIENT_TESTING})
-
 set(TESTS_WITH_MULTI_SERVERS_3
   TestMultiServer3.xml
 )
@@ -1776,10 +1732,6 @@ if (PARAVIEW_CLIENT_RENDER_SERVER_TESTS)
 endif ()
 
 # TODO: remote rendering tests and reverse connect tests.
-
-paraview_add_multi_client_tests(
-  BASELINE_DIR ${PARAVIEW_TEST_BASELINE_DIR}
-  TEST_SCRIPTS ${TESTS_WITH_BASELINES})
 
 paraview_add_multi_server_tests(3
    BASELINE_DIR ${PARAVIEW_TEST_BASELINE_DIR}
