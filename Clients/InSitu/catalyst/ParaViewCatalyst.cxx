@@ -52,8 +52,8 @@ static bool update_producer_mesh_blueprint(const std::string& channel_name,
   }
 
   auto algo = vtkConduitSource::SafeDownCast(producer->GetClientSideObject());
-  algo->SetNode(node);
-  algo->SetGlobalFieldsNode(global_fields);
+  algo->SetNode(conduit_cpp::c_node(node));
+  algo->SetGlobalFieldsNode(conduit_cpp::c_node(global_fields));
   vtkInSituInitializationHelper::MarkProducerModified(channel_name);
   return true;
 }
