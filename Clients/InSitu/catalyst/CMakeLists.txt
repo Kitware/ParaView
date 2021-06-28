@@ -60,14 +60,17 @@ target_compile_definitions(catalyst-paraview
   PRIVATE
     "VTK_MODULE_ENABLE_VTK_ParallelMPI=$<TARGET_EXISTS:VTK::ParallelMPI>")
 
-if (TARGET VTK::WrappingPythonCore AND VTK_PYTHON_OPTIONAL_LINK)
-  # if Python is enabled and optionally linking with Python,
-  # we need to link against Python non-optionally here.
-  find_package(Python3 COMPONENTS Development)
+if (TARGET VTK::Python)
+  # Simulations loading the ParaView Catalyst implementation might not have
+  # their own Python, so we need to ensure that it is brought in when loaded by
+  # libcatalyst.
+  set_property(TARGET catalyst-paraview
+    PROPERTY
+      INTERFACE_vtk_python_direct_link 1)
   target_link_libraries(catalyst-paraview
     PRIVATE
-      Python3::Python)
-endif()
+      VTK::PythonUsed)
+endif ()
 
 # Clear the `-pvVERSION` suffix (if any).
 set(_vtk_build_LIBRARY_NAME_SUFFIX "")
