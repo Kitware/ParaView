@@ -32,6 +32,7 @@
 #include "vtkSMRenderViewProxy.h"
 #include "vtkSMScalarBarWidgetRepresentationProxy.h"
 #include "vtkSMSessionProxyManager.h"
+#include "vtkSMSettings.h"
 #include "vtkSMStringVectorProperty.h"
 #include "vtkSMTrace.h"
 #include "vtkSMTransferFunctionManager.h"
@@ -787,8 +788,20 @@ bool vtkSMPVRepresentationProxy::SetScalarBarVisibility(vtkSMProxy* view, bool v
   vtkSMProperty* compProp = sbSMProxy->GetProperty("ComponentTitle");
   if (titleProp && compProp && titleProp->IsValueDefault() && compProp->IsValueDefault())
   {
+    vtkSMSettings* settings = vtkSMSettings::GetInstance();
+
     vtkSMPropertyHelper colorArrayHelper(this, "ColorArrayName");
-    vtkSMPropertyHelper(titleProp).Set(colorArrayHelper.GetInputArrayNameToProcess());
+    std::string arrayName(colorArrayHelper.GetInputArrayNameToProcess());
+
+    // Look up array-specific title for scalar bar
+    std::ostringstream prefix;
+    prefix << ".array_lookup_tables"
+           << "." << arrayName << ".Title";
+
+    std::string arrayTitle = settings->GetSettingAsString(prefix.str().c_str(), arrayName);
+
+    vtkSMPropertyHelper(titleProp).Set(arrayTitle.c_str());
+
     // now, determine a name for it if possible.
     vtkPVArrayInformation* arrayInfo = this->GetArrayInformationForColorArray();
     vtkSMScalarBarWidgetRepresentationProxy::UpdateComponentTitle(sbSMProxy, arrayInfo);
