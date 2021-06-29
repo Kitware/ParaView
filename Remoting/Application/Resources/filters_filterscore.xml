@@ -1631,6 +1631,50 @@ found and the point will be rejected.</Documentation>
     </SourceProxy>
 
     <!-- ==================================================================== -->
+    <SourceProxy class="vtkReverseSense"
+      label="Reverse Sense"
+      name="ReverseSense">
+      <Documentation short_help="Reverse the ordering of vertices in polygons.">
+          This filter reverses vertex ordering or normals for cells. In graphics 2d cells
+          have a notion of front or back face. If you use the right hand rule and wind
+          the vertices of a cell counter-clockwise (how your right fungers coil) then
+          the front face is in the direction of your thumb (the normal aligns with
+          your right thumb). If you need to reverse the normals, or change the winding
+          order of a polydata this filter can be used.
+      </Documentation>
+      <InputProperty command="SetInputConnection"
+        name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkPolyData" />
+        </DataTypeDomain>
+        <Documentation>Set the input to the ReverseSense filter.</Documentation>
+      </InputProperty>
+      <IntVectorProperty name="ReverseCells"
+        label="Reverse Cells"
+        command="SetReverseCells"
+        number_of_elements="1"
+        default_values="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Flag controls whether to reverse cell ordering.
+        </Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty name="ReverseNormals"
+        label="Reverse Normals"
+        command="SetReverseNormals"
+        number_of_elements="1"
+        default_values="0">
+        <BooleanDomain name="bool" />
+        <Documentation>Flag controls whether to reverse normal orientation.
+        </Documentation>
+      </IntVectorProperty>
+      <!-- End ReverseSense -->
+    </SourceProxy>
+
+    <!-- ==================================================================== -->
     <SourceProxy class="vtkSmoothPolyDataFilter"
                  label="Smooth"
                  name="SmoothPolyDataFilter">
