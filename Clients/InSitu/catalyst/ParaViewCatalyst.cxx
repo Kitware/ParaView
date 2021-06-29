@@ -278,14 +278,14 @@ enum catalyst_error catalyst_execute_paraview(const conduit_node* params)
   }
 
   // check for optional 'parameters'
-  std::vector<std::string> parameters = {};
+  std::vector<std::string> parameters;
   if (root.has_path("state/parameters"))
   {
-    const auto stat_parameters = root["stat/parameters"];
-    conduit_index_t nchildren = stat_parameters.number_of_children();
+    const auto state_parameters = root["state/parameters"];
+    const conduit_index_t nchildren = state_parameters.number_of_children();
     for (conduit_index_t i = 0; i < nchildren; ++i)
     {
-      parameters.push_back(stat_parameters.child(i).as_string());
+      parameters.push_back(state_parameters.child(i).as_string());
     }
   }
   vtkInSituInitializationHelper::ExecutePipelines(timestep, time, parameters);
