@@ -28,6 +28,7 @@
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkPartitionedDataSet.h"
+#include "vtkPartitionedDataSetCollection.h"
 #include "vtkPoints.h"
 #include "vtkRectilinearGrid.h"
 #include "vtkSmartPointer.h"
@@ -42,7 +43,7 @@
 #include <algorithm>
 #include <map>
 
-namespace internals
+namespace detail
 {
 
 //----------------------------------------------------------------------------
@@ -310,7 +311,132 @@ vtkSmartPointer<vtkDataSet> GetMesh(
   }
 }
 
-} // namespace internals
+//----------------------------------------------------------------------------
+bool RequestMesh(vtkPartitionedDataSet* output, const conduit_cpp::Node& node)
+{
+  conduit_cpp::Node info;
+  if (!conduit_cpp::BlueprintMesh::verify(node, info))
+  {
+    vtkLogF(ERROR, "Mesh blueprint verification failed!");
+    return false;
+  }
+
+  std::map<std::string, vtkSmartPointer<vtkDataSet> > datasets;
+
+  // process "topologies".
+  auto topologies = node["topologies"];
+  conduit_index_t nchildren = topologies.number_of_children();
+  for (conduit_index_t i = 0; i < nchildren; ++i)
+  {
+    auto child = topologies.child(i);
+    try
+    {
+      if (auto ds = detail::GetMesh(child, node["coordsets"]))
+      {
+        auto idx = output->GetNumberOfPartitions();
+        output->SetPartition(idx, ds);
+        output->GetMetaData(idx)->Set(vtkCompositeDataSet::NAME(), child.name().c_str());
+        datasets[child.name()] = ds;
+      }
+    }
+    catch (std::exception& e)
+    {
+      vtkLogF(ERROR, "failed to process '../topologies/%s'.", child.name().c_str());
+      vtkLogF(ERROR, "ERROR: \n%s\n", e.what());
+      return false;
+    }
+  }
+
+  // process "fields"
+  if (!node.has_path("fields"))
+  {
+    return true;
+  }
+
+  auto fields = node["fields"];
+  nchildren = fields.number_of_children();
+  for (conduit_index_t i = 0; i < nchildren; ++i)
+  {
+    auto fieldNode = fields.child(i);
+    const auto fieldname = fieldNode.name();
+    try
+    {
+      auto dataset = datasets.at(fieldNode["topology"].as_string());
+      const auto vtk_association = detail::GetAssociation(fieldNode["association"].as_string());
+      auto dsa = dataset->GetAttributes(vtk_association);
+      auto values = fieldNode["values"];
+      auto array =
+        vtkConduitArrayUtilities::MCArrayToVTKArray(conduit_cpp::c_node(&values), fieldname);
+      if (array->GetNumberOfTuples() != dataset->GetNumberOfElements(vtk_association))
+      {
+        throw std::runtime_error("mismatched tuple count!");
+      }
+      dsa->AddArray(array);
+    }
+    catch (std::exception& e)
+    {
+      vtkLogF(ERROR, "failed to process '../fields/%s'.", fieldname.c_str());
+      vtkLogF(ERROR, "ERROR: \n%s\n", e.what());
+      return false;
+    }
+  }
+
+  return true;
+}
+
+bool AddGlobalData(vtkDataObject* output, const conduit_cpp::Node& globalFields)
+{
+  auto fd = output->GetFieldData();
+
+  // this can be made very generic. For now, I am only processing known
+  // fields.
+  if (globalFields.has_path("time"))
+  {
+    // for compatibility with older Catalyst scripts.
+    vtkNew<vtkDoubleArray> timeValue;
+    timeValue->SetName("TimeValue");
+    timeValue->SetNumberOfTuples(1);
+    timeValue->SetTypedComponent(0, 0, globalFields["time"].to_float64());
+    fd->AddArray(timeValue);
+
+    // "time" is a better name than "TimeValue"
+    vtkNew<vtkDoubleArray> time;
+    time->SetName("time");
+    time->SetNumberOfTuples(1);
+    time->SetTypedComponent(0, 0, globalFields["time"].to_float64());
+    fd->AddArray(time);
+
+    // let's also set DATA_TIME_STEP.
+    output->GetInformation()->Set(
+      vtkDataObject::DATA_TIME_STEP(), globalFields["time"].to_float64());
+  }
+  if (globalFields.has_path("cycle"))
+  {
+    vtkNew<vtkIntArray> cycle;
+    cycle->SetName("cycle");
+    cycle->SetNumberOfTuples(1);
+    cycle->SetTypedComponent(0, 0, globalFields["cycle"].to_int64());
+    fd->AddArray(cycle);
+  }
+  if (globalFields.has_path("timestep"))
+  {
+    vtkNew<vtkIntArray> timestep;
+    timestep->SetName("timestep");
+    timestep->SetNumberOfTuples(1);
+    timestep->SetTypedComponent(0, 0, globalFields["timestep"].to_int64());
+    fd->AddArray(timestep);
+  }
+  if (globalFields.has_path("channel"))
+  {
+    vtkNew<vtkStringArray> channel;
+    channel->SetName("__CatalystChannel__");
+    channel->InsertNextValue(globalFields["channel"].as_string().c_str());
+    fd->AddArray(channel);
+  }
+  return true;
+}
+
+} // namespace detail
 
 class vtkConduitSource::vtkInternals
 {
@@ -324,6 +450,7 @@ vtkStandardNewMacro(vtkConduitSource);
 //----------------------------------------------------------------------------
 vtkConduitSource::vtkConduitSource()
   : Internals(new vtkConduitSource::vtkInternals())
+  , UseMultiMeshProtocol(false)
 {
   this->SetNumberOfInputPorts(0);
   this->SetNumberOfOutputPorts(1);
@@ -357,136 +484,59 @@ void vtkConduitSource::SetGlobalFieldsNode(const conduit_node* node)
 }
 
 //----------------------------------------------------------------------------
-int vtkConduitSource::FillOutputPortInformation(int, vtkInformation* info)
+int vtkConduitSource::RequestDataObject(
+  vtkInformation*, vtkInformationVector**, vtkInformationVector* outputVector)
 {
-  // now add our info
-  info->Set(vtkDataObject::DATA_TYPE_NAME(), "vtkPartitionedDataSet");
-  return 1;
+  const int dataType =
+    this->UseMultiMeshProtocol ? VTK_PARTITIONED_DATA_SET_COLLECTION : VTK_PARTITIONED_DATA_SET;
+  return this->SetOutputDataObject(dataType, outputVector->GetInformationObject(0), /*exact=*/true)
+    ? 1
+    : 0;
 }
 
 //----------------------------------------------------------------------------
 int vtkConduitSource::RequestData(
   vtkInformation*, vtkInformationVector**, vtkInformationVector* outputVector)
 {
-  auto output = vtkPartitionedDataSet::GetData(outputVector, 0);
-
-  auto& node = this->Internals->Node;
-  conduit_cpp::Node info;
-  if (!conduit_cpp::BlueprintMesh::verify(node, info))
+  auto& internals = (*this->Internals);
+  if (this->UseMultiMeshProtocol)
   {
-    vtkLogF(ERROR, "Mesh blueprint verification failed!");
-    return 0;
-  }
+    auto output = vtkPartitionedDataSetCollection::GetData(outputVector, 0);
+    assert(output != nullptr);
 
-  std::map<std::string, vtkSmartPointer<vtkDataSet> > datasets;
-
-  // process "topologies".
-  auto topologies = node["topologies"];
-  conduit_index_t nchildren = topologies.number_of_children();
-  for (conduit_index_t i = 0; i < nchildren; ++i)
-  {
-    auto child = topologies.child(i);
-    try
+    const auto& node = internals.Node;
+    const auto count = node.number_of_children();
+    output->SetNumberOfPartitionedDataSets(static_cast<unsigned int>(count));
+    for (conduit_index_t cc = 0; cc < count; ++cc)
     {
-      if (auto ds = internals::GetMesh(child, node["coordsets"]))
+      const auto child = node.child(cc);
+      auto pd = output->GetPartitionedDataSet(static_cast<unsigned int>(cc));
+      assert(pd != nullptr);
+      if (!detail::RequestMesh(pd, child))
       {
-        auto idx = output->GetNumberOfPartitions();
-        output->SetPartition(idx, ds);
-        output->GetMetaData(idx)->Set(vtkCompositeDataSet::NAME(), child.name().c_str());
-        datasets[child.name()] = ds;
+        vtkLogF(ERROR, "Failed reading mesh '%s'", child.name().c_str());
+        output->Initialize();
+        return 0;
       }
+
+      // set the mesh name.
+      output->GetMetaData(cc)->Set(vtkCompositeDataSet::NAME(), child.name().c_str());
     }
-    catch (std::exception& e)
+  }
+  else
+  {
+    auto output = vtkPartitionedDataSet::GetData(outputVector, 0);
+    assert(output != nullptr);
+    if (!detail::RequestMesh(output, internals.Node))
     {
-      vtkLogF(ERROR, "failed to process '../topologies/%s'.", child.name().c_str());
-      vtkLogF(ERROR, "ERROR: \n%s\n", e.what());
       return 0;
     }
   }
 
-  // process "fields"
-  if (!node.has_path("fields"))
+  auto dobj = vtkDataObject::GetData(outputVector, 0);
+  if (internals.GlobalFieldsNodeValid)
   {
-    return 1;
-  }
-
-  auto fields = node["fields"];
-  nchildren = fields.number_of_children();
-  for (conduit_index_t i = 0; i < nchildren; ++i)
-  {
-    auto fieldNode = fields.child(i);
-    const auto fieldname = fieldNode.name();
-    try
-    {
-      auto dataset = datasets.at(fieldNode["topology"].as_string());
-      const auto vtk_association = internals::GetAssociation(fieldNode["association"].as_string());
-      auto dsa = dataset->GetAttributes(vtk_association);
-      auto values = fieldNode["values"];
-      auto array =
-        vtkConduitArrayUtilities::MCArrayToVTKArray(conduit_cpp::c_node(&values), fieldname);
-      if (array->GetNumberOfTuples() != dataset->GetNumberOfElements(vtk_association))
-      {
-        throw std::runtime_error("mismatched tuple count!");
-      }
-      dsa->AddArray(array);
-    }
-    catch (std::exception& e)
-    {
-      vtkLogF(ERROR, "failed to process '../fields/%s'.", fieldname.c_str());
-      vtkLogF(ERROR, "ERROR: \n%s\n", e.what());
-      return 0;
-    }
-  }
-
-  if (this->Internals->GlobalFieldsNodeValid)
-  {
-    auto fd = output->GetFieldData();
-    auto& globalFields = this->Internals->GlobalFieldsNode;
-    // this can be made very generic. For now, I am only processing known
-    // fields.
-    if (globalFields.has_path("time"))
-    {
-      // for compatibility with older Catalyst scripts.
-      vtkNew<vtkDoubleArray> timeValue;
-      timeValue->SetName("TimeValue");
-      timeValue->SetNumberOfTuples(1);
-      timeValue->SetTypedComponent(0, 0, globalFields["time"].to_float64());
-      fd->AddArray(timeValue);
-
-      // "time" is a better name than "TimeValue"
-      vtkNew<vtkDoubleArray> time;
-      time->SetName("time");
-      time->SetNumberOfTuples(1);
-      time->SetTypedComponent(0, 0, globalFields["time"].to_float64());
-      fd->AddArray(time);
-
-      // let's also set DATA_TIME_STEP.
-      output->GetInformation()->Set(
-        vtkDataObject::DATA_TIME_STEP(), globalFields["time"].to_float64());
-    }
-    if (globalFields.has_path("cycle"))
-    {
-      vtkNew<vtkIntArray> cycle;
-      cycle->SetName("cycle");
-      cycle->SetNumberOfTuples(1);
-      cycle->SetTypedComponent(0, 0, globalFields["cycle"].to_int64());
-      fd->AddArray(cycle);
-    }
-    if (globalFields.has_path("timestep"))
-    {
-      vtkNew<vtkIntArray> timestep;
-      timestep->SetName("timestep");
-      timestep->SetNumberOfTuples(1);
-      timestep->SetTypedComponent(0, 0, globalFields["timestep"].to_int64());
-      fd->AddArray(timestep);
-    }
-    if (globalFields.has_path("channel"))
-    {
-      vtkNew<vtkStringArray> channel;
-      channel->SetName("__CatalystChannel__");
-      channel->InsertNextValue(globalFields["channel"].as_string().c_str());
-      fd->AddArray(channel);
-    }
+    detail::AddGlobalData(dobj, internals.GlobalFieldsNode);
   }
   return 1;
 }

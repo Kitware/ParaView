@@ -22,8 +22,8 @@
  * Blueprint](https://llnl-conduit.readthedocs.io/en/latest/blueprint_mesh.html#)
  * to describe computational mesh and associated meta-data.
  *
- * vtkConduitSource currently produces a `vtkParitionedDataSet`. This makes it
- * easier to support mesh definitions with sub-domains.
+ * vtkConduitSource currently produces a `vtkParitionedDataSet` or
+ * `vtkPartitionedDataSetCollection`
  *
  * @sa vtkConduitArrayUtilities
  */
@@ -43,6 +43,16 @@ public:
   static vtkConduitSource* New();
   vtkTypeMacro(vtkConduitSource, vtkDataObjectAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent) override;
+
+  ///@{
+  /**
+   * vtkConduitSource supports single 'mesh' and multiple 'mesh' (aka 'multimesh') protocols.
+   * Set this to true if the source is handling multimesh (default is false).
+   */
+  vtkSetMacro(UseMultiMeshProtocol, bool);
+  vtkGetMacro(UseMultiMeshProtocol, bool);
+  vtkBooleanMacro(UseMultiMeshProtocol, bool);
+  ///@}
 
   //@{
   /**
@@ -67,7 +77,7 @@ protected:
   vtkConduitSource();
   ~vtkConduitSource();
 
-  int FillOutputPortInformation(int port, vtkInformation* info) override;
+  int RequestDataObject(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
   int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
   int RequestInformation(vtkInformation* request, vtkInformationVector** inputVector,
     vtkInformationVector* outputVector) override;
@@ -78,6 +88,7 @@ private:
 
   class vtkInternals;
   std::unique_ptr<vtkInternals> Internals;
+  bool UseMultiMeshProtocol;
 };
 
 #endif

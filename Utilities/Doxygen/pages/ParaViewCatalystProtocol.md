@@ -114,9 +114,14 @@ data being produced by the simulation code.
 The 'channel' protocol is as follows:
 
 * channel/type: (required) a string representing the channel type. Currently,
-  the only supported value is "mesh". It is used to indicate that this channel
-  is specified in accordance to the
-  [Conduit Mesh](https://llnl-conduit.readthedocs.io/en/latest/blueprint_mesh.html#) protocol.
+  the only supported values are "mesh" and "multimesh".
+
+  "mesh" is used to indicate that this channel is specified in accordance to the
+  [Conduit Mesh](https://llnl-conduit.readthedocs.io/en/latest/blueprint_mesh.html#)
+  protocol.
+
+  "multimesh" is an extension for multi-domain meshes (also called multiblocks)
+  and is described later.
 
 * channel/data: (required) an object node used to communicate the simulation
   data on this channel. This node must match the protocol requirements
@@ -141,3 +146,15 @@ When 'type' is 'io', the following attributes are supported.
   to determine which supported writer to use for saving the data.
 
 * channel: (required) a string identifying the channel by its name.
+
+
+### protocol: 'multimesh'
+
+This is the protocol used for the 'channel/data' when the 'channel/type' is set
+to "multimesh".
+
+* channel/data/[block-name]: (protocol: 'mesh'): (optional) if present, represents an
+  individual mesh/block described using the
+  [Conduit Mesh](https://llnl-conduit.readthedocs.io/en/latest/blueprint_mesh.html#)
+  protocol. This can be repeated for multiple blocks. 'block-name' must be unique for
+  each blocks.
