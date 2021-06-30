@@ -22,8 +22,7 @@
 // dp = "0";        // depth -- start depth or enddepth
 // da = dataset name
 
-#include "vtkImageClip.h"
-#include "vtkImagePermute.h"
+#include "vtkTIFFReader.h"
 #include <future>
 #include <iostream>
 #include <list>
@@ -61,6 +60,12 @@ public:
   {
     this->UserName = uname;
     this->Password = pw;
+    // clear structures
+    std::lock_guard<std::mutex> lock(this->Mutex);
+    this->APIToken.clear();
+    this->CollectionMap.clear();
+    this->ImageryMap.clear();
+    this->ContextJSON.clear();
     if (!this->Connect() || !this->AcquireToken() || !this->GetContext())
     {
       return false;
@@ -87,6 +92,7 @@ protected:
     std::string const& collection, std::string const& dataset, Json::Value& resultJSON);
   bool GetImagery(
     std::string const& collection, std::string const& dataset, Json::Value& resultJSON);
+  bool ImageryHasDepth(Json::Value imageryJSON, double targetDepth);
 
   HINTERNET Session = nullptr;
   HINTERNET Connection = nullptr;
@@ -691,6 +697,27 @@ bool vtkImagoLoader::GetImagery(
   return true;
 }
 
+bool vtkImagoLoader::ImageryHasDepth(Json::Value imageryJSON, double targetDepth)
+{
+  // find the image we want based on the depth
+  for (auto& i : imageryJSON["imageries"])
+  {
+    double startDepth = i["startDepth"].asDouble();
+    double endDepth = i["endDepth"].asDouble();
+    if (targetDepth >= startDepth && targetDepth < endDepth)
+    {
+      std::string imageryID = i["id"].asString();
+      // finally get the image
+      if (imageryID.size())
+      {
+        return true;
+      }
+      break;
+    }
+  }
+  return false;
+}
+
 bool vtkImagoLoader::GetImage(std::string const& workspace, std::string const& dataset,
   std::string const& collection, std::string const& imageryType, std::string const& imageType,
   std::string const& depth, std::future<vtkImageData*>& future)
@@ -796,14 +823,20 @@ bool vtkImagoLoader::GetImage(std::string const& workspace, std::string const& d
       std::string imageTypeID;
       std::string imageryTypeID;
       Json::Value imageryJSON;
+      double targetDepth = std::stod(depth.c_str());
       for (size_t i = 0; i < imageryTypeIDs.size(); ++i)
       {
         Json::Value tmpJSON;
         if (this->GetImagery(collectionID, imageryTypeIDs[i], tmpJSON))
         {
-          imageryTypeID = imageryTypeIDs[i];
-          imageTypeID = imageTypeIDs[i];
-          imageryJSON = tmpJSON;
+          // does it have the depth we are looking for?
+          if (this->ImageryHasDepth(tmpJSON, targetDepth))
+          {
+            imageryTypeID = imageryTypeIDs[i];
+            imageTypeID = imageTypeIDs[i];
+            imageryJSON = tmpJSON;
+            break;
+          }
         }
       }
 
@@ -816,8 +849,7 @@ bool vtkImagoLoader::GetImage(std::string const& workspace, std::string const& d
         return nullptr;
       }
 
-      // find the image we want based on the depth
-      double targetDepth = std::stod(depth.c_str());
+      // get info on the image we want based on the depth
       double startDepth = 0.0;
       double endDepth = 0.0;
       // record last depth requested
@@ -861,7 +893,7 @@ bool vtkImagoLoader::GetImage(std::string const& workspace, std::string const& d
         }
       }
 
-      if (mimeType != "image/jpeg")
+      if (mimeType != "image/jpeg" && mimeType != "image/tiff")
       {
         vtkGenericWarningMacro("Format not supported for type " << mimeType);
         return nullptr;
@@ -878,7 +910,7 @@ bool vtkImagoLoader::GetImage(std::string const& workspace, std::string const& d
       }
 
       std::vector<std::string> headers;
-      headers.push_back("Content-Type: image/jpeg\r\n");
+      headers.push_back("Content-Type: " + mimeType + "\r\n");
       headers.push_back("imago-api-token: " + this->APIToken + "\r\n");
 
       std::string frmdata;
@@ -898,15 +930,31 @@ bool vtkImagoLoader::GetImage(std::string const& workspace, std::string const& d
         if (fileSize == result.size())
         {
           // stick it into a reader
-          vtkNew<vtkJPEGReader> rdr;
-          rdr->SetMemoryBuffer(result.data());
-          rdr->SetMemoryBufferLength(result.size());
-          rdr->Update();
-          if (rdr->GetErrorCode() == 0)
+          if (mimeType == "image/jpeg")
           {
-            imageData = rdr->GetOutput();
-            imageData->Register(nullptr);
-            success = true;
+            vtkNew<vtkJPEGReader> rdr;
+            rdr->SetMemoryBuffer(result.data());
+            rdr->SetMemoryBufferLength(result.size());
+            rdr->Update();
+            if (rdr->GetErrorCode() == 0)
+            {
+              imageData = rdr->GetOutput();
+              imageData->Register(nullptr);
+              success = true;
+            }
+          }
+          if (mimeType == "image/tiff")
+          {
+            vtkNew<vtkTIFFReader> rdr;
+            rdr->SetMemoryBuffer(result.data());
+            rdr->SetMemoryBufferLength(result.size());
+            rdr->Update();
+            if (rdr->GetErrorCode() == 0)
+            {
+              imageData = rdr->GetOutput();
+              imageData->Register(nullptr);
+              success = true;
+            }
           }
         }
         tries++;
