@@ -4632,6 +4632,13 @@
           <DataType value="vtkDataSet" />
           <DataType value="vtkGenericDataSet" />
           <DataType value="vtkHyperTreeGrid" />
+
+          <!-- for MB, we want to match if any of the leaf nodes is of the following type -->
+          <DataType value="vtkDataObjectTree" child_match="any">
+            <DataType value="vtkDataSet" />
+            <DataType value="vtkGenericDataSet" />
+            <DataType value="vtkHyperTreeGrid" />
+          </DataType>
         </DataTypeDomain>
         <InputArrayDomain attribute_type="cell"
                           name="input_array_cell"

@@ -564,6 +564,10 @@ void vtkPVDataInformation::CopyFromDataObject(vtkDataObject* dobj)
     // for vtkHyperTreeGrid, leaves and trees are counted specially.
     this->NumberOfTrees = htg->GetMaxNumberOfTrees();
     this->NumberOfLeaves = htg->GetNumberOfLeaves();
+
+    // I don't understand this clunkiness; why doesn't HTG return number of
+    // vertices when GetNumberOfElements(vtkDataObject::VERTEX) is called? Oh well.
+    this->NumberOfElements[vtkDataObject::VERTEX] = htg->GetNumberOfVertices();
   }
 }
 

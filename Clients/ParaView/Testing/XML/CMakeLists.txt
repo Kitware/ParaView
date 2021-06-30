@@ -143,6 +143,10 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${paraview_test_data_directory_input}/Data/testxmlpartds.vtpd}"
   "DATA{${paraview_test_data_directory_input}/Data/time_source.pvsm}"
   "DATA{${paraview_test_data_directory_input}/Data/timestep_0_15.vts}"
+  "DATA{${paraview_test_data_directory_input}/Data/todd2_small/todd2_htg.pio}"
+  "DATA{${paraview_test_data_directory_input}/Data/todd2_small/todd2_ug.pio}"
+  "DATA{${paraview_test_data_directory_input}/Data/todd2_small/dumps/3D_nomix_diff-dmp000000}"
+  "DATA{${paraview_test_data_directory_input}/Data/todd2_small/dumps/3D_nomix_diff-dmp000010}"
   "DATA{${paraview_test_data_directory_input}/Data/tube.exo}"
   "DATA{${paraview_test_data_directory_input}/Data/vehicle_data.csv}"
   "DATA{${paraview_test_data_directory_input}/Data/viscoplastic-ring.h5}"
@@ -978,6 +982,7 @@ list(APPEND TESTS_WITH_BASELINES
   PropertyConversion3.xml
   PropertyLink.xml
   QuadraticGhostCells.xml
+  ReadPIOWithHTG.xml
   ReadXMLPolyDataFileSeries.xml
   RectilinearVolumeRendering.xml
   RedistributeDataSetFilter.xml
