@@ -1,3 +1,6 @@
+cmake_policy(PUSH)
+cmake_policy(SET CMP0057 NEW)
+
 set(_ParaViewPlugin_cmake_dir "${CMAKE_CURRENT_LIST_DIR}")
 
 #[==[.md
@@ -2162,3 +2165,5 @@ function (paraview_plugin_add_proxy)
     "${CMAKE_CURRENT_BINARY_DIR}/${_paraview_proxy_NAME}ServerManagerModelImplementation.h"
     PARENT_SCOPE)
 endfunction ()
+
+cmake_policy(POP)
