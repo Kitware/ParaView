@@ -278,7 +278,7 @@
                             number_of_elements="1">
         <DoubleRangeDomain name="range" />
         <Documentation>The value of this property specifies the total amount of
-        translation along the Z axis during the sweep process. Specifying a
+        translation along the rotation axis during the sweep process. Specifying a
         non-zero value for this property allows you to create a corkscrew
         (value of DeltaRadius &gt; 0) or spring effect.</Documentation>
       </DoubleVectorProperty>
@@ -289,6 +289,15 @@
         <DoubleRangeDomain name="range" />
         <Documentation>The value of this property specifies the change in
         radius during the sweep process.</Documentation>
+      </DoubleVectorProperty>
+            <DoubleVectorProperty command="SetRotationAxis"
+                            default_values="0.0 0.0 1.0"
+                            name="RotationAxis"
+                            number_of_elements="3"
+                            panel_visibility="default">
+        <DoubleRangeDomain name="range" />
+        <Documentation>The values of this property set the direction of the axis
+        around which the rotation is done.</Documentation>
       </DoubleVectorProperty>
       <!-- End RotationalExtrusionFilter -->
     </SourceProxy>
