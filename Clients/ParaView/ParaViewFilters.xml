@@ -322,6 +322,7 @@
   <Proxy group="filters" name="RemoveGhostInformation" />
   <Proxy group="filters" name="ResampleToImage" />
   <Proxy group="filters" name="ResampleWithDataset" />
+  <Proxy group="filters" name="ReverseSense" />
   <Proxy group="filters" name="RibbonFilter" />
   <Proxy group="filters" name="RotationalExtrusionFilter" />
   <Proxy group="filters" name="RulerFilter" icon=":/pqWidgets/Icons/pqRuler.svg" />

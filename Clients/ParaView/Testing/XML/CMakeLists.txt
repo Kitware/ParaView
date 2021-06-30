@@ -701,6 +701,7 @@ SET(TESTS_WITH_BASELINES
   MoleculeScalarBar.xml
   PassArrays.xml
   PerlinNoise.xml
+  ReverseSense.xml
   SelectionByArray.xml
   SeriesPreset.xml
   SeriesPresetRegexp.xml
