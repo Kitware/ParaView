@@ -1219,8 +1219,7 @@ void vtkPVOpenVRHelper::LoadLocationState(int slot)
   vtkSMPropertyHelper helper(this->SMView, "Representations");
   for (unsigned int i = 0; i < helper.GetNumberOfElements(); i++)
   {
-    vtkSMPVRepresentationProxy* repr =
-      vtkSMPVRepresentationProxy::SafeDownCast(helper.GetAsProxy(i));
+    vtkSMProxy* repr = helper.GetAsProxy(i);
     vtkSMProperty* prop = repr ? repr->GetProperty("Visibility") : nullptr;
     if (prop)
     {
@@ -1273,8 +1272,7 @@ void vtkPVOpenVRHelper::SaveLocationState(int slot)
   vtkSMPropertyHelper helper(this->SMView, "Representations");
   for (unsigned int i = 0; i < helper.GetNumberOfElements(); i++)
   {
-    vtkSMPVRepresentationProxy* repr =
-      vtkSMPVRepresentationProxy::SafeDownCast(helper.GetAsProxy(i));
+    vtkSMProxy* repr = helper.GetAsProxy(i);
     vtkSMProperty* prop = repr ? repr->GetProperty("Visibility") : nullptr;
     if (prop)
     {
