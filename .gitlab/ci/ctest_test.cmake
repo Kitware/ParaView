@@ -61,11 +61,6 @@ if ("$ENV{CMAKE_CONFIGURATION}" MATCHES "fedora")
     "pvcs\\.VisItBridgeNek$"
     "pvcrs\\.VisItBridgeNek$"
 
-    # errors in parallel
-    # https://gitlab.kitware.com/paraview/paraview/-/issues/20715i
-    "pvcs\\.Flow2$"
-    "pvcrs\\.Flow2$"
-
     # These have failed on buildbot before. Not sure what the cause is.
     "\\.TestPythonView$"
 
