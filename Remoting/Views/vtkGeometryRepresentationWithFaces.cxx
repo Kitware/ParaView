@@ -207,6 +207,7 @@ void vtkGeometryRepresentationWithFaces::UpdateColoringParameters()
     this->BackfaceProperty->SetPointSize(this->Property->GetPointSize());
     this->BackfaceProperty->SetSpecularColor(this->Property->GetSpecularColor());
     this->BackfaceProperty->SetSpecularPower(this->Property->GetSpecularPower());
+    this->BackfaceProperty->SetShowTexturesOnBackface(this->Property->GetShowTexturesOnBackface());
 
     // Copy parameters from this->Actor
     this->BackfaceActor->SetOrientation(this->Actor->GetOrientation());
