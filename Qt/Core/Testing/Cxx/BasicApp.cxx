@@ -7,15 +7,16 @@
 #include <QTimer>
 
 #include "pqApplicationCore.h"
+#include "pqCoreConfiguration.h"
 #include "pqCoreTestUtility.h"
 #include "pqObjectBuilder.h"
-#include "pqOptions.h"
 #include "pqQVTKWidget.h"
 #include "pqRenderView.h"
 #include "pqServer.h"
 #include "pqServerManagerModel.h"
 
 #include "QVTKRenderWindowAdapter.h"
+#include "vtkLogger.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkProcessModule.h"
@@ -82,36 +83,35 @@ MainWindow::MainWindow()
 
 void MainWindow::processTest()
 {
-  if (pqOptions* const options = pqApplicationCore::instance()->getOptions())
+  // make sure the widget had enough time to become valid
+  pqQVTKWidget* qwdg = qobject_cast<pqQVTKWidget*>(this->RenderView->widget());
+  if (qwdg != nullptr && !qwdg->isValid())
   {
-    // make sure the widget had enough time to become valid
-    pqQVTKWidget* qwdg = qobject_cast<pqQVTKWidget*>(this->RenderView->widget());
-    if (qwdg != nullptr && !qwdg->isValid())
-    {
-      QTimer::singleShot(100, this, SLOT(processTest()));
-      return;
-    }
+    QTimer::singleShot(100, this, SLOT(processTest()));
+    return;
+  }
 
-    bool comparison_succeeded = true;
-    if ((options->GetNumberOfTestScripts() > 0) && (options->GetTestBaseline(0) != nullptr))
-    {
-      comparison_succeeded = this->compareView(options->GetTestBaseline(0),
-        options->GetTestImageThreshold(0), cout, options->GetTestDirectory());
-    }
-    if (options->GetExitAppWhenTestsDone())
-    {
-      QApplication::instance()->exit(comparison_succeeded ? 0 : 1);
-    }
+  auto config = pqCoreConfiguration::instance();
+  bool comparison_succeeded = true;
+  if (config->testScriptCount() == 1 && !config->testBaseline(0).empty())
+  {
+    comparison_succeeded = this->compareView(QString::fromStdString(config->testBaseline(0)),
+      config->testThreshold(0), QString::fromStdString(config->testDirectory()));
+  }
+
+  if (config->exitApplicationWhenTestsDone())
+  {
+    QApplication::instance()->exit(comparison_succeeded ? 0 : 1);
   }
 }
 
 bool MainWindow::compareView(
-  const QString& referenceImage, double threshold, ostream& output, const QString& tempDirectory)
+  const QString& referenceImage, double threshold, const QString& tempDirectory)
 {
   pqRenderView* renModule = this->RenderView;
   if (!renModule)
   {
-    output << "ERROR: Could not locate the render module." << endl;
+    vtkLogF(ERROR, "ERROR: Could not locate the render module.");
     return false;
   }
 
@@ -127,9 +127,16 @@ int main(int argc, char** argv)
     QVTKRenderWindowAdapter::defaultFormat(/*supports_stereo=*/false));
 
   QApplication app(argc, argv);
-  pqApplicationCore appCore(argc, argv);
-  MainWindow window;
-  window.resize(200, 150);
-  window.show();
-  return app.exec();
+  try
+  {
+    pqApplicationCore appCore(argc, argv);
+    MainWindow window;
+    window.resize(200, 150);
+    window.show();
+    return app.exec();
+  }
+  catch (pqApplicationCoreExitCode& e)
+  {
+    return e.code();
+  }
 }

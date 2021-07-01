@@ -38,9 +38,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "QVTKOpenGLNativeWidget.h"
 #include "pqApplicationCore.h"
 #include "pqEventDispatcher.h"
-#include "pqOptions.h"
 #include "pqUndoStack.h"
 #include "vtkPVLogger.h"
+#include "vtkRemotingCoreConfiguration.h"
 #include "vtkRenderWindow.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMSession.h"
@@ -53,7 +53,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //----------------------------------------------------------------------------
 pqQVTKWidget::pqQVTKWidget(QWidget* parentObject, Qt::WindowFlags f)
   : pqQVTKWidget(
-      parentObject, f, pqApplicationCore::instance()->getOptions()->GetUseStereoRendering())
+      parentObject, f, vtkRemotingCoreConfiguration::GetInstance()->GetUseStereoRendering())
 {
 }
 
@@ -63,7 +63,6 @@ pqQVTKWidget::pqQVTKWidget(QWidget* parentObject, Qt::WindowFlags f, bool isSter
   , SizePropertyName("ViewSize")
   , useStereo(isStereo)
 {
-  auto options = pqApplicationCore::instance()->getOptions();
   auto* layout = new QVBoxLayout();
   layout->setMargin(0);
 
@@ -99,7 +98,8 @@ pqQVTKWidget::pqQVTKWidget(QWidget* parentObject, Qt::WindowFlags f, bool isSter
   }
 
   // if active stereo requested, then we need to request appropriate context.
-  if (options->GetStereoType() && strcmp(options->GetStereoType(), "Crystal Eyes") == 0)
+  auto config = vtkRemotingCoreConfiguration::GetInstance();
+  if (config->GetStereoType() == VTK_STEREO_CRYSTAL_EYES)
   {
 #if PARAVIEW_USING_QVTKOPENGLSTEREOWIDGET
     auto fmt = baseClass.value<pqQVTKWidgetBase*>()->defaultFormat(/*supports_stereo =*/true);

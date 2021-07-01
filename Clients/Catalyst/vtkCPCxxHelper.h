@@ -20,8 +20,6 @@
 #include "vtkSmartPointer.h"     // needed for vtkSmartPointer.
 #include "vtkWeakPointer.h"      // needed for vtkWeakPointer.
 
-class vtkPVOptions;
-
 /// @ingroup CoProcessing
 /// Singleton class for initializing without python.
 /// The vtkCPCxxHelper instance is created on the first call to
@@ -44,8 +42,6 @@ protected:
 private:
   vtkCPCxxHelper(const vtkCPCxxHelper&) = delete;
   void operator=(const vtkCPCxxHelper&) = delete;
-
-  vtkSmartPointer<vtkPVOptions> Options;
 
   /// The singleton instance of the class.
   static vtkWeakPointer<vtkCPCxxHelper> Instance;

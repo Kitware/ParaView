@@ -7,6 +7,20 @@ started tracking these (starting after version 4.2).
 Changes in 5.10
 ----------------
 
+###Command line options###
+
+The command line parsing code in ParaView has been refactored entirely.
+Previously, `vtkPVOptions` and its subclasses handled both parsing / processing
+of the command line options and keeping the state for those selections. This
+made it quite inflexible. This is now split into separate classes.
+`vtkCLIOptions` is the class that handles parsing of command line options (and
+internally uses CLI11, a 3-rd party library) while the state for the options is
+maintained by singletons like `vtkProcessModuleConfiguration`,
+`vtkRemotingCoreConfiguration`, and `pqCoreConfiguration`.
+Application code that wants to test value for any of the command-line options
+can use these singletons to check them instead of using vtkPVOptions or
+subclasses.
+
 ###vtkSubsetInclusionLattice and SIL###
 
 `vtkSubsetInclusionLattice` and related classes have been removed. The only

@@ -772,7 +772,7 @@ macro(ADD_CATALYST_LIVE_TEST test_name duration command_line_connect_command)
   set ("${test_name}_FORCE_SERIAL" TRUE)
   add_pv_test("pv" "_DISABLE_C"
     COMMAND
-    --script-ignore-output-errors --script $<TARGET_FILE:ParaView::pvbatch> -sym
+    --script-ignore-output-errors --script $<TARGET_FILE:ParaView::pvbatch> --sym
     ${CMAKE_CURRENT_SOURCE_DIR}/${CATALYST_SIMULATION}
     ${INSITU_SCRIPT} "${duration}"
 
@@ -788,7 +788,7 @@ macro(ADD_CATALYST_LIVE_TEST test_name duration command_line_connect_command)
   add_pv_test(pvcs "_DISABLE_CS"
     COMMAND
     --script-np 5 --script-ignore-output-errors
-    --script $<TARGET_FILE:ParaView::pvbatch> -sym
+    --script $<TARGET_FILE:ParaView::pvbatch> --sym
     ${CMAKE_CURRENT_SOURCE_DIR}/${CATALYST_SIMULATION}
     ${INSITU_SCRIPT} "${duration}"
 

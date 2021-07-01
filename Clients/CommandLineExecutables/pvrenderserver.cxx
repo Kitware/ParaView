@@ -18,5 +18,5 @@ PURPOSE.  See the above copyright notice for more information.
 int main(int argc, char* argv[])
 {
   // Init current process type
-  return RealMain(argc, argv, vtkProcessModule::PROCESS_RENDER_SERVER) ? 0 : 1;
+  return RealMain(argc, argv, vtkProcessModule::PROCESS_RENDER_SERVER);
 }

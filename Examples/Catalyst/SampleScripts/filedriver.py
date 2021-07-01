@@ -6,7 +6,7 @@ it's coming in as simulation computed values.
 
 This script must be run with pvbatch, either in serial or in parallel.
 The arguments are as follows :
-* -sym if run with more than a single MPI process so that pvbatch will
+* --sym if run with more than a single MPI process so that pvbatch will
        have all processes run the script.
 * a list of files in quotes (wildcards are acceptable) but these are
   treated as a single argument to the script.
@@ -16,7 +16,7 @@ eg, in serial :
 <path>/pvbatch filedriver.py "temporalFile.ex2" gridwriter.py
 
 eg, in parallel
-mpirun -np 5 <path>/pvbatch -sym filedriver.py "input_*.pvtu" makeanimage.py makeaslice.py
+mpirun -np 5 <path>/pvbatch --sym filedriver.py "input_*.pvtu" makeanimage.py makeaslice.py
 
 This script currently only handles a single channel. It will try to find
 an appropriate reader for the list of filenames and loop through the timesteps.
@@ -59,12 +59,12 @@ reader = pvsimple.OpenDataFile(files)
 
 if pm.GetSymmetricMPIMode() == False and nranks > 1:
     if rank == 0:
-        print("ERROR: must run pvbatch with -sym when running with more than a single MPI process")
+        print("ERROR: must run pvbatch with --sym when running with more than a single MPI process")
     sys.exit(1)
 
 catalyst = vtkPVCatalyst.vtkCPProcessor()
 # We don't need to initialize Catalyst since we run from pvbatch
-# with the -sym argument which acts exactly like we're running
+# with the --sym argument which acts exactly like we're running
 # Catalyst from a simulation code.
 #catalyst.Initialize()
 

@@ -28,7 +28,6 @@
 #include "vtkRemotingCoreModule.h" //needed for exports
 
 class vtkClientServerStream;
-class vtkPVServerOptionsInternals;
 
 class VTKREMOTINGCORE_EXPORT vtkPVServerInformation : public vtkPVInformation
 {
@@ -48,6 +47,16 @@ public:
   vtkGetMacro(RemoteRendering, int);
   //@}
 
+  /**
+   * Returns true if server is in tile-display mode.
+   */
+  vtkGetMacro(IsInTileDisplay, bool);
+
+  /**
+   * Returns true if server is in CAVE mode.
+   */
+  vtkGetMacro(IsInCave, bool);
+
   void DeepCopy(vtkPVServerInformation* info);
 
   /**
@@ -66,16 +75,6 @@ public:
    */
   void CopyToStream(vtkClientServerStream*) override;
   void CopyFromStream(const vtkClientServerStream*) override;
-  //@}
-
-  //@{
-  /**
-   * Variables (command line argurments) set to render to a tiled display.
-   */
-  vtkSetVector2Macro(TileDimensions, int);
-  vtkGetVector2Macro(TileDimensions, int);
-  vtkSetVector2Macro(TileMullions, int);
-  vtkGetVector2Macro(TileMullions, int);
   //@}
 
   //@{
@@ -102,88 +101,10 @@ public:
   vtkGetMacro(Timeout, int);
   //@}
 
-  //@{
   /**
-   * Set/Get the EyeSeparation on server
+   * When in tile display mode, returns the tile dimensions.
    */
-  void SetEyeSeparation(double value);
-  double GetEyeSeparation() const;
-  //@}
-
-  //@{
-  /**
-   * Number of machines to use in data or render server
-   * Setting the number of machines has the side effect of wiping out any
-   * machine parameters previously set.
-   */
-  void SetNumberOfMachines(unsigned int num);
-  unsigned int GetNumberOfMachines() const;
-  //@}
-
-  //@{
-  /**
-   * Value of DISPLAY environment variable for this cave node
-   */
-  void SetEnvironment(unsigned int idx, const char* name);
-  const char* GetEnvironment(unsigned int idx) const;
-  //@}
-
-  //@{
-  /**
-   * Window geometry for server, specified as x, y, width, height. This is only
-   * used if FullScreen is false.
-   */
-  void SetGeometry(unsigned int idx, int geo[4]);
-  int* GetGeometry(unsigned int idx) const;
-  //@}
-
-  //@{
-  /**
-   * Whether to show the server window as fullscreen.
-   */
-  void SetFullScreen(unsigned int idx, bool fullscreen);
-  bool GetFullScreen(unsigned int idx) const;
-  //@}
-
-  //@{
-  /**
-   * Whether to show the server window with window decorations.
-   */
-  void SetShowBorders(unsigned int idx, bool borders);
-  bool GetShowBorders(unsigned int idx) const;
-  //@}
-
-  //@{
-  /**
-   * Get the stereo-type specified in the pvx. -1=no-specified, 0=no-stereo.
-   */
-  int GetStereoType(unsigned int idx) const;
-  void SetStereoType(unsigned int idx, int type);
-  //@}
-
-  //@{
-  /**
-   * Coordinates of lower left corner of this cave display
-   */
-  void SetLowerLeft(unsigned int idx, double coord[3]);
-  double* GetLowerLeft(unsigned int idx) const;
-  //@}
-
-  //@{
-  /**
-   * Coordinates of lower right corner of this cave display
-   */
-  void SetLowerRight(unsigned int idx, double coord[3]);
-  double* GetLowerRight(unsigned int idx) const;
-  //@}
-
-  //@{
-  /**
-   * Coordinates of lower left corner of this cave display
-   */
-  void SetUpperRight(unsigned int idx, double coord[3]);
-  double* GetUpperRight(unsigned int idx) const;
-  //@}
+  vtkGetVector2Macro(TileDimensions, int);
 
   //@{
   /**
@@ -229,16 +150,16 @@ protected:
   int AVISupport;
   bool NVPipeSupport;
   int RemoteRendering;
-  int TileDimensions[2];
-  int TileMullions[2];
   int Timeout;
   int UseIceT;
   int MultiClientsEnable;
   int ClientId;
   int IdTypeSize;
+  bool IsInTileDisplay;
+  bool IsInCave;
+  int TileDimensions[2];
 
-  vtkPVServerOptionsInternals* MachinesInternals;
-
+private:
   vtkPVServerInformation(const vtkPVServerInformation&) = delete;
   void operator=(const vtkPVServerInformation&) = delete;
 };

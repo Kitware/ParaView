@@ -30,13 +30,13 @@
 #include "vtkPVDataDeliveryManager.h"
 #include "vtkPVDataRepresentation.h"
 #include "vtkPVLogger.h"
-#include "vtkPVOptions.h"
 #include "vtkPVProcessWindow.h"
 #include "vtkPVRenderingCapabilitiesInformation.h"
 #include "vtkPVServerInformation.h"
 #include "vtkPVSession.h"
 #include "vtkPVStreamingMacros.h"
 #include "vtkProcessModule.h"
+#include "vtkRemotingCoreConfiguration.h"
 #include "vtkRenderWindow.h"
 #include "vtkRendererCollection.h"
 #include "vtkTimerLog.h"
@@ -192,13 +192,6 @@ vtkPVView::vtkPVView(bool create_render_window)
     abort();
   }
 
-  // enable/disable streaming. This doesn't need to done on every constructor
-  // call, but no harm even if it is done.
-  if (auto options = pm->GetOptions())
-  {
-    vtkPVView::SetEnableStreaming(options->GetEnableStreaming() != 0);
-  }
-
   vtkStreamingStatusMacro("View Streaming  Status: " << vtkPVView::GetEnableStreaming());
 
   vtkPVSession* activeSession = vtkPVSession::SafeDownCast(pm->GetActiveSession());
@@ -249,7 +242,11 @@ vtkPVView::~vtkPVView()
 vtkRenderWindow* vtkPVView::NewRenderWindow()
 {
   auto pm = vtkProcessModule::GetProcessModule();
-  auto options = pm->GetOptions();
+  auto config = vtkRemotingCoreConfiguration::GetInstance();
+
+  // A little bit of a hack. I am not what's a good place to setup the display
+  // environment for this rank. So doing it here.
+  config->HandleDisplayEnvironment();
 
   vtkSmartPointer<vtkRenderWindow> window;
   switch (pm->GetProcessType())
@@ -263,7 +260,7 @@ vtkRenderWindow* vtkPVView::NewRenderWindow()
       {
         window = vtkSmartPointer<vtkGenericOpenGLRenderWindow>::New();
       }
-      else if (options->GetForceOffscreenRendering())
+      else if (config->GetForceOffscreenRendering())
       {
         // this may be a headless window if ParaView was built with headless
         // capabilities.
@@ -390,14 +387,14 @@ void vtkPVView::SetViewTime(double time)
 bool vtkPVView::InTileDisplayMode()
 {
   auto serverInfo = this->Session->GetServerInformation();
-  return (serverInfo->GetTileDimensions()[0] > 0 || serverInfo->GetTileDimensions()[1] > 0);
+  return serverInfo->GetIsInTileDisplay();
 }
 
 //----------------------------------------------------------------------------
 bool vtkPVView::InCaveDisplayMode()
 {
   auto serverInfo = this->Session->GetServerInformation();
-  return (serverInfo->GetNumberOfMachines() > 0) && !this->InTileDisplayMode();
+  return serverInfo->GetIsInCave();
 }
 
 //----------------------------------------------------------------------------

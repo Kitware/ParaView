@@ -15,10 +15,11 @@
 #include "vtkPVProcessWindow.h"
 
 #include "vtkCallbackCommand.h"
+#include "vtkDisplayConfiguration.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVRenderingCapabilitiesInformation.h"
-#include "vtkPVServerOptions.h"
 #include "vtkProcessModule.h"
+#include "vtkRemotingCoreConfiguration.h"
 #include "vtkRenderWindow.h"
 #include "vtkRenderer.h"
 #include <vtksys/SystemTools.hxx>
@@ -121,18 +122,18 @@ vtkRenderWindow* vtkPVProcessWindow::NewWindow()
       return nullptr;
   }
 
-  auto pvoptions = pm->GetOptions();
+  auto config = vtkRemotingCoreConfiguration::GetInstance();
 
   vtkRenderWindow* window = nullptr;
-  if (pvoptions->GetIsInTileDisplay())
+  if (config->GetIsInTileDisplay())
   {
     window = vtkPVProcessWindow::NewTileDisplayWindow();
   }
-  else if (pvoptions->GetIsInCave())
+  else if (config->GetIsInCave())
   {
     window = vtkPVProcessWindow::NewCAVEWindow();
   }
-  else if (!pvoptions->GetForceOnscreenRendering() || pvoptions->GetForceOffscreenRendering())
+  else if (!config->GetForceOnscreenRendering() || config->GetForceOffscreenRendering())
   {
     // this may be a headless window if ParaView was built with headless
     // capabilities.
@@ -147,8 +148,7 @@ vtkRenderWindow* vtkPVProcessWindow::NewWindow()
   }
 
   // if active-stereo is requested, let's create a stereo capable window.
-  if (pvoptions->GetUseStereoRendering() && pvoptions->GetStereoType() != nullptr &&
-    strcmp(pvoptions->GetStereoType(), "Crystal Eyes") == 0)
+  if (config->GetUseStereoRendering() && config->GetStereoType() == VTK_STEREO_CRYSTAL_EYES)
   {
     window->SetStereoCapableWindow(true);
     window->SetStereoType(VTK_STEREO_CRYSTAL_EYES);
@@ -192,10 +192,10 @@ vtkRenderWindow* vtkPVProcessWindow::NewWindow()
 vtkRenderWindow* vtkPVProcessWindow::NewTileDisplayWindow()
 {
   auto pm = vtkProcessModule::GetProcessModule();
-  auto pvoptions = pm->GetOptions();
+  auto config = vtkRemotingCoreConfiguration::GetInstance();
 
   int tile_dims[2];
-  pvoptions->GetTileDimensions(tile_dims);
+  config->GetTileDimensions(tile_dims);
 
   vtkRenderWindow* window = nullptr;
 
@@ -203,8 +203,8 @@ vtkRenderWindow* vtkPVProcessWindow::NewTileDisplayWindow()
   // don't create an on-screen window for those extra ranks unless explicitly
   // requested.
   if (((pm->GetPartitionId() < tile_dims[0] * tile_dims[1]) &&
-        !pvoptions->GetForceOffscreenRendering()) ||
-    pvoptions->GetForceOnscreenRendering())
+        !config->GetForceOffscreenRendering()) ||
+    config->GetForceOnscreenRendering())
   {
     window = vtkRenderWindow::New();
   }
@@ -246,12 +246,12 @@ vtkRenderWindow* vtkPVProcessWindow::NewTileDisplayWindow()
 vtkRenderWindow* vtkPVProcessWindow::NewCAVEWindow()
 {
   auto pm = vtkProcessModule::GetProcessModule();
-  auto pvserveroptions = vtkPVServerOptions::SafeDownCast(pm->GetOptions());
-  assert(pvserveroptions != nullptr);
+  auto config = vtkRemotingCoreConfiguration::GetInstance();
+  auto caveConfig = config->GetDisplayConfiguration();
 
   vtkRenderWindow* window = nullptr;
   // unless forced offscreen, create an on-screen window.
-  if (pvserveroptions->GetForceOffscreenRendering())
+  if (config->GetForceOffscreenRendering())
   {
     vtkSmartPointer<vtkRenderWindow> renWindow =
       vtkPVRenderingCapabilitiesInformation::NewOffscreenRenderWindow();
@@ -264,22 +264,17 @@ vtkRenderWindow* vtkPVProcessWindow::NewCAVEWindow()
   }
 
   // Check if a custom window geometry was requested
-  int* geometry = nullptr;
+  vtkTuple<int, 4> geometry(0);
   const int idx = pm->GetPartitionId();
-  const bool fullscreen = pvserveroptions->GetFullScreen(idx);
-  const bool showborders = pvserveroptions->GetShowBorders(idx);
+  const bool fullscreen = caveConfig->GetFullScreen();
+  const bool showborders = caveConfig->GetShowBorders();
   if (!fullscreen)
   {
-    geometry = pvserveroptions->GetGeometry(idx);
-    // If the geometry has not been defined, it will be 0 0 0 0. Unset the
-    // geometry pointer in this case.
-    if (geometry[0] <= 0 && geometry[1] <= 0 && geometry[2] <= 0 && geometry[3] <= 0)
-    {
-      geometry = nullptr;
-    }
+    geometry = caveConfig->GetGeometry(idx);
   }
+  const bool geometryValid = geometry[2] > 0 && geometry[3] > 0;
 
-  const int stereoType = pvserveroptions->GetStereoType(idx);
+  const int stereoType = config->GetStereoType();
   if (stereoType != -1)
   {
     if (stereoType > 0)
@@ -319,10 +314,10 @@ vtkRenderWindow* vtkPVProcessWindow::NewCAVEWindow()
   else
   {
     // Use the specified geometry
-    int x = geometry ? geometry[0] : 0;
-    int y = geometry ? geometry[1] : 0;
-    int w = geometry ? geometry[2] : 400;
-    int h = geometry ? geometry[3] : 400;
+    const int x = geometryValid ? geometry[0] : 0;
+    const int y = geometryValid ? geometry[1] : 0;
+    const int w = geometryValid ? geometry[2] : 400;
+    const int h = geometryValid ? geometry[3] : 400;
     window->SetFullScreen(0);
     window->SetPosition(x, y);
     window->SetSize(w, h);

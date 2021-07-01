@@ -30,186 +30,184 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-
 #include "pqOptions.h"
 
+#include "pqCoreConfiguration.h"
+#include "vtkRemotingCoreConfiguration.h"
 #include <string>
 #include <vtkObjectFactory.h>
 
 vtkStandardNewMacro(pqOptions);
-
-static int AddTestScript(const char*, const char* value, void* call_data)
-{
-  pqOptions* self = reinterpret_cast<pqOptions*>(call_data);
-  if (self)
-  {
-    return self->AddTestScript(value);
-  }
-  return 0;
-}
-
-static int AddTestBaseline(const char*, const char* value, void* call_data)
-{
-  pqOptions* self = reinterpret_cast<pqOptions*>(call_data);
-  if (self)
-  {
-    return self->SetLastTestBaseline(value);
-  }
-  return 0;
-}
-
-static int AddTestImageThreshold(const char*, const char* value, void* call_data)
-{
-  pqOptions* self = reinterpret_cast<pqOptions*>(call_data);
-  if (self)
-  {
-    return self->SetLastTestImageThreshold(QString(value).toInt());
-  }
-  return 0;
-}
+//-----------------------------------------------------------------------------
+pqOptions::pqOptions() = default;
 
 //-----------------------------------------------------------------------------
-pqOptions::pqOptions()
-{
-  this->BaselineDirectory = nullptr;
-  this->TestDirectory = nullptr;
-  this->DataDirectory = nullptr;
-  this->ExitAppWhenTestsDone = 0;
-  this->ServerResourceName = nullptr;
-  this->StateFileName = nullptr;
-  this->CurrentImageThreshold = 12;
-  this->PythonScript = nullptr;
-  this->TestMaster = 0;
-  this->TestSlave = 0;
-}
+pqOptions::~pqOptions() = default;
 
 //-----------------------------------------------------------------------------
-pqOptions::~pqOptions()
+#if !defined(VTK_LEGACY_REMOVE)
+const char* pqOptions::GetBaselineDirectory()
 {
-  this->SetBaselineDirectory(nullptr);
-  this->SetTestDirectory(nullptr);
-  this->SetDataDirectory(nullptr);
-  this->SetServerResourceName(nullptr);
-  this->SetStateFileName(nullptr);
-  this->SetPythonScript(nullptr);
+  VTK_LEGACY_REPLACED_BODY(
+    pqOptions::GetBaselineDirectory, "ParaView 5.10", pqCoreConfiguration::baselineDirectory);
+  const auto& dir = pqCoreConfiguration::instance()->baselineDirectory();
+  return dir.empty() ? nullptr : dir.c_str();
 }
+#endif
 
 //-----------------------------------------------------------------------------
-void pqOptions::Initialize()
+#if !defined(VTK_LEGACY_REMOVE)
+const char* pqOptions::GetTestDirectory()
 {
-  this->Superclass::Initialize();
-
-  this->AddArgument("--baseline-directory", nullptr, &this->TestDirectory,
-    "Set the baseline directory where test recorder will store baseline images.");
-
-  this->AddArgument("--test-directory", nullptr, &this->TestDirectory,
-    "Set the temporary directory where test-case output will be stored.");
-
-  this->AddArgument("--data-directory", nullptr, &this->DataDirectory,
-    "Set the data directory where test-case data are located.");
-
-  this->AddBooleanArgument("--exit", nullptr, &this->ExitAppWhenTestsDone,
-    "Exit application when testing is done. Use for testing.");
-
-  this->AddArgument("--server", "-s", &this->ServerResourceName,
-    "Set the name of the server resource to connect to when the client starts.");
-
-  // add new Command Option for loading StateFile (Bug #5711)
-  this->AddArgument(
-    "--state", nullptr, &this->StateFileName, "Load the specified statefile (.pvsm or .py).");
-
-  this->AddCallback("--test-script", nullptr, &::AddTestScript, this,
-    "Add test script. Can be used multiple times to "
-    "specify multiple tests.");
-  this->AddCallback("--test-baseline", nullptr, &::AddTestBaseline, this,
-    "Add test baseline. Can be used multiple times to specify "
-    "multiple baselines for multiple tests, in order.");
-  this->AddCallback("--test-threshold", nullptr, &::AddTestImageThreshold, this,
-    "Add test image threshold. "
-    "Can be used multiple times to specify multiple image thresholds for "
-    "multiple tests in order. When recording test can be a directory to record image in");
-
-  this->AddArgument(
-    "--script", nullptr, &this->PythonScript, "Set a python script to be evaluated on startup.");
-
-  this->AddBooleanArgument("--test-master", nullptr, &this->TestMaster,
-    "(For testing) When present, tests master configuration.");
-
-  this->AddBooleanArgument("--test-slave", nullptr, &this->TestSlave,
-    "(For testing) When present, tests slave configuration.");
-
-  this->AddArgument("--live", nullptr, &this->CatalystLivePort, "Set the Catalyst Live port");
+  VTK_LEGACY_REPLACED_BODY(
+    pqOptions::GetTestDirectory, "ParaView 5.10", pqCoreConfiguration::testDirectory);
+  const auto& dir = pqCoreConfiguration::instance()->testDirectory();
+  return dir.empty() ? nullptr : dir.c_str();
 }
+#endif
 
 //-----------------------------------------------------------------------------
+#if !defined(VTK_LEGACY_REMOVE)
+const char* pqOptions::GetDataDirectory()
+{
+  VTK_LEGACY_REPLACED_BODY(
+    pqOptions::GetDataDirectory, "ParaView 5.10", pqCoreConfiguration::dataDirectory);
+  const auto& dir = pqCoreConfiguration::instance()->dataDirectory();
+  return dir.empty() ? nullptr : dir.c_str();
+}
+#endif
+
+//-----------------------------------------------------------------------------
+#if !defined(VTK_LEGACY_REMOVE)
+const char* pqOptions::GetStateFileName()
+{
+  VTK_LEGACY_REPLACED_BODY(
+    pqOptions::GetStateFileName, "ParaView 5.10", pqCoreConfiguration::stateFileName);
+  const auto& dir = pqCoreConfiguration::instance()->stateFileName();
+  return dir.empty() ? nullptr : dir.c_str();
+}
+#endif
+
+//-----------------------------------------------------------------------------
+#if !defined(VTK_LEGACY_REMOVE)
+const char* pqOptions::GetPythonScript()
+{
+  VTK_LEGACY_REPLACED_BODY(
+    pqOptions::GetPythonScript, "ParaView 5.10", pqCoreConfiguration::pythonScript);
+  const auto& dir = pqCoreConfiguration::instance()->pythonScript();
+  return dir.empty() ? nullptr : dir.c_str();
+}
+#endif
+
+//-----------------------------------------------------------------------------
+#if !defined(VTK_LEGACY_REMOVE)
+const char* pqOptions::GetServerResourceName()
+{
+  VTK_LEGACY_REPLACED_BODY(pqOptions::GetServerResourceName, "ParaView 5.10",
+    vtkRemotingCoreConfiguration::GetServerResourceName);
+  const auto& dir = vtkRemotingCoreConfiguration::GetInstance()->GetServerResourceName();
+  return dir.empty() ? nullptr : dir.c_str();
+}
+#endif
+
+//-----------------------------------------------------------------------------
+#if !defined(VTK_LEGACY_REMOVE)
+int pqOptions::GetExitAppWhenTestsDone()
+{
+  VTK_LEGACY_REPLACED_BODY(pqOptions::GetExitAppWhenTestsDone, "ParaView 5.10",
+    pqCoreConfiguration::exitApplicationWhenTestsDone);
+  return pqCoreConfiguration::instance()->exitApplicationWhenTestsDone() ? 1 : 0;
+}
+#endif
+
+//-----------------------------------------------------------------------------
+#if !defined(VTK_LEGACY_REMOVE)
 QStringList pqOptions::GetTestScripts()
 {
-  QStringList list;
-  for (int cc = 0; cc < this->GetNumberOfTestScripts(); cc++)
+  VTK_LEGACY_REPLACED_BODY(
+    pqOptions::GetTestScripts, "ParaView 5.10", pqCoreConfiguration::testScript);
+
+  auto config = pqCoreConfiguration::instance();
+  QStringList result;
+  for (int cc = 0, max = config->testScriptCount(); cc < max; ++cc)
   {
-    list << this->GetTestScript(cc);
+    result.push_back(config->testScript(cc).c_str());
   }
-  return list;
+  return result;
 }
+#endif
 
 //-----------------------------------------------------------------------------
-int pqOptions::PostProcess(int argc, const char* const* argv)
+#if !defined(VTK_LEGACY_REMOVE)
+int pqOptions::GetNumberOfTestScripts()
 {
-  return this->Superclass::PostProcess(argc, argv);
+  VTK_LEGACY_REPLACED_BODY(
+    pqOptions::GetNumberOfTestScripts, "ParaView 5.10", pqCoreConfiguration::testScriptCount);
+  return pqCoreConfiguration::instance()->testScriptCount();
 }
+#endif
 
 //-----------------------------------------------------------------------------
-int pqOptions::WrongArgument(const char* arg)
+#if !defined(VTK_LEGACY_REMOVE)
+QString pqOptions::GetTestScript(int cc)
 {
-  return this->Superclass::WrongArgument(arg);
+  VTK_LEGACY_REPLACED_BODY(
+    pqOptions::GetTestScript, "ParaView 5.10", pqCoreConfiguration::testScript);
+  return pqCoreConfiguration::instance()->testScript(cc).c_str();
 }
+#endif
 
 //-----------------------------------------------------------------------------
-int pqOptions::AddTestScript(const char* script)
+#if !defined(VTK_LEGACY_REMOVE)
+QString pqOptions::GetTestBaseline(int cc)
 {
-  TestInfo info;
-  info.TestFile = script;
-  this->TestScripts.push_back(info);
-  return 1;
+  VTK_LEGACY_REPLACED_BODY(
+    pqOptions::GetTestBaseline, "ParaView 5.10", pqCoreConfiguration::testBaseline);
+  return pqCoreConfiguration::instance()->testBaseline(cc).c_str();
 }
-//-----------------------------------------------------------------------------
-int pqOptions::SetLastTestBaseline(const char* image)
-{
-  if (this->TestScripts.empty())
-  {
-    this->AddTestScript("-not-specified");
-  }
-  this->TestScripts.last().TestBaseline = image;
-  return 1;
-}
+#endif
 
 //-----------------------------------------------------------------------------
-int pqOptions::SetLastTestImageThreshold(int threshold)
+#if !defined(VTK_LEGACY_REMOVE)
+int pqOptions::GetTestImageThreshold(int cc)
 {
-  if (this->TestScripts.empty())
-  {
-    this->AddTestScript("-not-specified");
-  }
-  this->TestScripts.last().ImageThreshold = threshold;
-  return 1;
+  VTK_LEGACY_REPLACED_BODY(
+    pqOptions::GetTestImageThreshold, "ParaView 5.10", pqCoreConfiguration::testThreshold);
+  return pqCoreConfiguration::instance()->testThreshold(cc);
 }
+#endif
+
+//-----------------------------------------------------------------------------
+#if !defined(VTK_LEGACY_REMOVE)
+int pqOptions::GetCurrentImageThreshold()
+{
+  VTK_LEGACY_REPLACED_BODY(
+    pqOptions::GetCurrentImageThreshold, "ParaView 5.10", pqCoreConfiguration::testThreshold);
+  return pqCoreConfiguration::instance()->testThreshold();
+}
+#endif
+
+//-----------------------------------------------------------------------------
+#if !defined(VTK_LEGACY_REMOVE)
+int pqOptions::GetTestMaster()
+{
+  VTK_LEGACY_REPLACED_BODY(
+    pqOptions::GetTestMaster, "ParaView 5.10", pqCoreConfiguration::testMaster);
+  return pqCoreConfiguration::instance()->testMaster() ? 1 : 0;
+}
+#endif
+
+//-----------------------------------------------------------------------------
+#if !defined(VTK_LEGACY_REMOVE)
+int pqOptions::GetTestSlave()
+{
+  VTK_LEGACY_REPLACED_BODY(pqOptions::GetTestSlave, "ParaView 5.10", pqCoreConfiguration::testSlave)
+  return pqCoreConfiguration::instance()->testSlave() ? 1 : 0;
+}
+#endif
 
 //-----------------------------------------------------------------------------
 void pqOptions::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
-
-  os << indent << "TestDirectory: " << (this->TestDirectory ? this->TestDirectory : "(none)")
-     << endl;
-  os << indent << "DataDirectory: " << (this->DataDirectory ? this->DataDirectory : "(none)")
-     << endl;
-
-  os << indent
-     << "ServerResourceName: " << (this->ServerResourceName ? this->ServerResourceName : "(none)")
-     << endl;
-
-  os << indent << "StateFileName: " << (this->StateFileName ? this->StateFileName : "(none)")
-     << endl;
-
-  os << indent << "PythonScript: " << (this->PythonScript ? this->PythonScript : "(none)") << endl;
 }

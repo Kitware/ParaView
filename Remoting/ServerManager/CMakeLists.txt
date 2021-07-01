@@ -34,6 +34,7 @@ set(classes
   vtkPVCatalystChannelInformation
   vtkPVCatalystSessionCore
   vtkPVFilePathEncodingHelper
+  vtkPVMultiClientsInformation
   vtkPVProxyDefinitionIterator
   vtkPVSessionBase
   vtkPVSessionCore

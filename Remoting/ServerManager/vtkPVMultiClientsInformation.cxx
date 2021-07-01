@@ -19,10 +19,9 @@
 #include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVConfig.h"
-#include "vtkPVServerOptions.h"
-#include "vtkPVServerOptionsInternals.h"
 #include "vtkPVSession.h"
 #include "vtkProcessModule.h"
+#include "vtkRemotingCoreConfiguration.h"
 #include "vtkToolkits.h"
 
 vtkStandardNewMacro(vtkPVMultiClientsInformation);
@@ -94,9 +93,9 @@ void vtkPVMultiClientsInformation::CopyFromObject(vtkObject* vtkNotUsed(obj))
     vtkWarningMacro("ProcessModule is not available.");
     return;
   }
-  vtkPVOptions* options = pm->GetOptions();
-  vtkPVServerOptions* serverOptions = vtkPVServerOptions::SafeDownCast(options);
-  this->MultiClientEnable = serverOptions ? serverOptions->GetMultiClientMode() : 0;
+
+  auto config = vtkRemotingCoreConfiguration::GetInstance();
+  this->MultiClientEnable = config->GetMultiClientMode() ? 1 : 0;
 
   // Retrieve the current client connection ID
   vtkPVSession* session = vtkPVSession::SafeDownCast(pm->GetSession());

@@ -34,7 +34,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqApplicationCore.h"
 #include "pqExtractor.h"
 #include "pqInterfaceTracker.h"
-#include "pqOptions.h"
 #include "pqOutputPort.h"
 #include "pqPipelineSource.h"
 #include "pqProxy.h"
@@ -489,7 +488,7 @@ void pqServerManagerModel::onConnectionCreated(vtkIdType id)
   }
 
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-  pqServer* server = new pqServer(id, pm->GetOptions(), this);
+  pqServer* server = new pqServer(id, this);
 
   // Make sure the server resource is valid otherwise use session URL information
   // (this is used when we connect from Python in multi-server mode)

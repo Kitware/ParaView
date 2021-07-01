@@ -18,8 +18,8 @@
 #include "vtkMPIMToNSocketConnectionPortInformation.h"
 #include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
-#include "vtkPVServerOptions.h"
 #include "vtkProcessModule.h"
+#include "vtkRemotingCoreConfiguration.h"
 #include "vtkServerSocket.h"
 #include "vtkSocketCommunicator.h"
 
@@ -99,13 +99,9 @@ void vtkMPIMToNSocketConnection::PrintSelf(ostream& os, vtkIndent indent)
 //------------------------------------------------------------------------------
 void vtkMPIMToNSocketConnection::Initialize(int waiting_process_type)
 {
-  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-  vtkPVOptions* options = pm->GetOptions();
-  assert(options != nullptr);
-
+  auto pm = vtkProcessModule::GetProcessModule();
   this->SetController(pm->GetGlobalController());
-  this->Internals->SelfHostName = options->GetHostName();
-
+  this->Internals->SelfHostName = vtkRemotingCoreConfiguration::GetInstance()->GetHostName();
   this->IsWaiting = (waiting_process_type == pm->GetProcessType());
   if (this->IsWaiting)
   {

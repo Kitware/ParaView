@@ -267,7 +267,7 @@ def main(argv):
 
     args = parser.parse_args(argv)
 
-    options = servermanager.vtkProcessModule.GetProcessModule().GetOptions()
+    options = servermanager.vtkRemotingCoreConfiguration.GetInstance()
     url = options.GetServerURL()
     if url:
         import re

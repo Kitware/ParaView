@@ -415,19 +415,14 @@ unsigned int vtkSMSession::GetRenderClientMode()
 {
   if (this->GetIsAutoMPI())
   {
-    return vtkSMSession::RENDERING_SPLIT;
+    return vtkSMSession::RENDERING_UNIFIED;
   }
+
   if (this->GetController(vtkPVSession::DATA_SERVER_ROOT) !=
     this->GetController(vtkPVSession::RENDER_SERVER_ROOT))
   {
     // when the two controller are different, we have a separate render-server
     // and data-server session.
-    return vtkSMSession::RENDERING_SPLIT;
-  }
-
-  vtkPVServerInformation* server_info = this->GetServerInformation();
-  if (server_info && server_info->GetNumberOfMachines() > 0)
-  {
     return vtkSMSession::RENDERING_SPLIT;
   }
 

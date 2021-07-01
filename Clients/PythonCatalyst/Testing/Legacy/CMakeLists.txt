@@ -27,13 +27,13 @@ endif()
 
 paraview_add_test(
   PREFIX "Catalyst::Legacy::WaveletMiniApp"
-  ARGS "$<TARGET_FILE:ParaView::pvbatch>" -sym -m paraview.demos.wavelet_miniapp -t 4 --size 21 -s
+  ARGS "$<TARGET_FILE:ParaView::pvbatch>" --sym -- -m paraview.demos.wavelet_miniapp -t 4 --size 21 -s
   TEST_SCRIPTS ${legacy_catalyst_pipelines})
 
 if (PARAVIEW_USE_MPI)
   paraview_add_test_mpi(
     PREFIX "Catalyst::Legacy::MPI::WaveletMiniApp"
-    ARGS "$<TARGET_FILE:ParaView::pvbatch>" -sym -m paraview.demos.wavelet_miniapp -t 4 --size 21 -s
+    ARGS "$<TARGET_FILE:ParaView::pvbatch>" --sym -- -m paraview.demos.wavelet_miniapp -t 4 --size 21 -s
     TEST_SCRIPTS ${legacy_catalyst_pipelines})
 endif()
 

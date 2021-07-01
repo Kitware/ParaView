@@ -34,7 +34,7 @@ def testScript(programmableFilter, script):
 
 def runTest():
 
-    options = servermanager.vtkProcessModule.GetProcessModule().GetOptions()
+    options = servermanager.vtkRemotingCoreConfiguration.GetInstance()
     url = options.GetServerURL()
 
     smp.Connect(getHost(url), getPort(url))

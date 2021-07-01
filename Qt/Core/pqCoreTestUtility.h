@@ -124,6 +124,11 @@ public:
   static bool CompareTile(pqView* widget, int rank, int tdx, int tdy, const QString& baseline,
     double threshold, ostream& output, const QString& tempDirectory);
 
+  /**
+   * Cleans a path string
+   */
+  static QString cleanPath(const QString&);
+
 private:
   QStringList TestFilenames;
 };

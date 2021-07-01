@@ -37,10 +37,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqApplicationComponentsInit.h"
 #include "pqApplicationCore.h"
 #include "pqComponentsTestUtility.h"
+#include "pqCoreConfiguration.h"
 #include "pqCoreUtilities.h"
 #include "pqItemViewSearchWidget.h"
 #include "pqLoadDataReaction.h"
-#include "pqOptions.h"
 #include "pqPresetGroupsManager.h"
 #include "pqPropertiesPanel.h"
 #include "pqQuickLaunchDialog.h"
@@ -63,8 +63,17 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QShortcut>
 
 //-----------------------------------------------------------------------------
+#if !defined(VTK_LEGACY_REMOVE)
 pqPVApplicationCore::pqPVApplicationCore(int& argc, char** argv, pqOptions* options)
-  : Superclass(argc, argv, options)
+  : pqPVApplicationCore(argc, argv, options)
+{
+}
+#endif
+
+//-----------------------------------------------------------------------------
+pqPVApplicationCore::pqPVApplicationCore(int& argc, char** argv, vtkCLIOptions* options,
+  bool addStandardArgs /*=true*/, QObject* parentObject /*=nullptr*/)
+  : Superclass(argc, argv, options, addStandardArgs, parentObject)
 {
   // Initialize pqComponents resources.
   pqApplicationComponentsInit();
@@ -233,7 +242,7 @@ bool pqPVApplicationCore::eventFilter(QObject* obj, QEvent* event_)
       {
         // If the application has not yet started, treat it as a --data argument
         // to be processed after the application starts.
-        this->Options->SetParaViewDataName(files[0].toUtf8().data());
+        pqCoreConfiguration::instance()->addDataFile(files[0].toUtf8().data());
       }
     }
     return false;

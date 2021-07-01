@@ -18,17 +18,17 @@
  *
  * This objects is used by the client to get the number of multi-clients server
  * as well as their ids.
-*/
+ */
 
 #ifndef vtkPVMultiClientsInformation_h
 #define vtkPVMultiClientsInformation_h
 
 #include "vtkPVInformation.h"
-#include "vtkRemotingCoreModule.h" //needed for exports
+#include "vtkRemotingServerManagerModule.h" //needed for exports
 
 class vtkClientServerStream;
 
-class VTKREMOTINGCORE_EXPORT vtkPVMultiClientsInformation : public vtkPVInformation
+class VTKREMOTINGSERVERMANAGER_EXPORT vtkPVMultiClientsInformation : public vtkPVInformation
 {
 public:
   static vtkPVMultiClientsInformation* New();

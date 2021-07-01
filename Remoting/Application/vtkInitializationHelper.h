@@ -25,10 +25,13 @@
 #ifndef vtkInitializationHelper_h
 #define vtkInitializationHelper_h
 
+#include "vtkLegacy.h" // for VTK_LEGACY
 #include "vtkObject.h"
 #include "vtkRemotingApplicationModule.h" // needed for exports
 #include <string>                         // needed for std::string
+
 class vtkPVOptions;
+class vtkCLIOptions;
 
 class VTKREMOTINGAPPLICATION_EXPORT vtkInitializationHelper : public vtkObject
 {
@@ -37,35 +40,33 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /**
-   * Initializes the server manager. Do not use the server manager
-   * before calling this.
-   */
-  static void Initialize(const char* executable, int type);
-
-  /**
-   * Initializes the server manager. Do not use the server manager
-   * before calling this. In this variant, one passes in a vtkPVOptions
-   * instance.
+   * Initializes ParaView engine. Returns `true` on success, `false` otherwise.
+   * When `false`, use `GetExitCode` to obtain the exit code. Note, for requests
+   * like `--help`, `--version` etc, this method returns `false` with exit-code
+   * set to 0.
    *
-   * @note `--no-mpi` and `--mpi` options are handled specially, by this call.
-   * If you want to pass those to vtkProcessModule so it doesn't (or does)
-   * initialize MPI, set the corresponding ivars on the `options` object passed
-   * in.
+   * If vtkCLIOptions is nullptr, then this method internally creates and uses
+   * an internal vtkCLIOptions instance. In that case, extra / unknown arguments
+   * are simply ignored.
    */
-  static void Initialize(const char* executable, int type, vtkPVOptions* options);
+  static bool Initialize(int argc, char** argv, int processType, vtkCLIOptions* options = nullptr,
+    bool enableStandardArgs = true);
 
   /**
-   * Alternative API to initialize the server manager. This takes in  the
-   * command line arguments and the vtkPVOptions instance to use to process the
-   * command line options.
+   * An overload that does not take argc/argv for convenience.
    */
-  static void Initialize(int argc, char** argv, int type, vtkPVOptions* options);
+  static bool Initialize(const char* executable, int type);
 
   /**
    * Finalizes the server manager. Do not use the server manager
    * after calling this.
    */
   static void Finalize();
+
+  /**
+   * Returns the exit code after `Initialize`.
+   */
+  static int GetExitCode() { return vtkInitializationHelper::ExitCode; }
 
   //@{
   /**
@@ -117,6 +118,13 @@ public:
    */
   static std::string GetUserSettingsFilePath();
 
+  /**
+   * @deprecated in ParaView 5.10. `vtkPVOptions` is deprecated in ParaView 5.10
+   * and hence these functions are also deprecated.
+   */
+  VTK_LEGACY(static void Initialize(const char* executable, int type, vtkPVOptions* options));
+  VTK_LEGACY(static void Initialize(int argc, char** argv, int type, vtkPVOptions* options));
+
 protected:
   vtkInitializationHelper(){};
   ~vtkInitializationHelper() override{};
@@ -131,11 +139,10 @@ private:
   void operator=(const vtkInitializationHelper&) = delete;
 
   static bool LoadSettingsFilesDuringInitialization;
-
   static bool SaveUserSettingsFileDuringFinalization;
-
   static std::string OrganizationName;
   static std::string ApplicationName;
+  static int ExitCode;
 };
 
 #endif

@@ -35,19 +35,18 @@
 #include "vtkPVDataInformation.h"
 #include "vtkPVEncodeSelectionForServer.h"
 #include "vtkPVLastSelectionInformation.h"
-#include "vtkPVOptions.h"
 #include "vtkPVRenderView.h"
 #include "vtkPVRenderingCapabilitiesInformation.h"
 #include "vtkPVServerInformation.h"
 #include "vtkPVXMLElement.h"
 #include "vtkPointData.h"
 #include "vtkProcessModule.h"
+#include "vtkRemotingCoreConfiguration.h"
 #include "vtkRenderWindow.h"
 #include "vtkRenderWindowInteractor.h"
 #include "vtkRenderer.h"
 #include "vtkSMCollaborationManager.h"
 #include "vtkSMDataDeliveryManagerProxy.h"
-#include "vtkSMEnumerationDomain.h"
 #include "vtkSMInputProperty.h"
 #include "vtkSMMaterialLibraryProxy.h"
 #include "vtkSMOutputPort.h"
@@ -133,7 +132,7 @@ const char* vtkSMRenderViewProxy::IsSelectVisibleCellsAvailable()
   }
 
   vtkPVServerInformation* server_info = session->GetServerInformation();
-  if (server_info && server_info->GetNumberOfMachines() > 0)
+  if (server_info && server_info->GetIsInCave() > 0)
   {
     return "Cannot support selection in CAVE mode.";
   }
@@ -367,18 +366,12 @@ void vtkSMRenderViewProxy::CreateVTKObjects()
   // We'll do this for now. But we need to not do this here. I am leaning
   // towards not making stereo a command line option as mentioned by a very
   // not-too-pleased user on the mailing list a while ago.
-  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-  vtkPVOptions* pvoptions = pm->GetOptions();
-  if (pvoptions->GetUseStereoRendering())
+  auto config = vtkRemotingCoreConfiguration::GetInstance();
+  if (config->GetUseStereoRendering())
   {
     vtkSMPropertyHelper(this, "StereoCapableWindow").Set(1);
     vtkSMPropertyHelper(this, "StereoRender").Set(1);
-    auto domain = this->GetProperty("StereoType")->FindDomain<vtkSMEnumerationDomain>();
-    if (domain && domain->HasEntryText(pvoptions->GetStereoType()))
-    {
-      vtkSMPropertyHelper(this, "StereoType")
-        .Set(domain->GetEntryValueForText(pvoptions->GetStereoType()));
-    }
+    vtkSMPropertyHelper(this, "StereoType").Set(config->GetStereoType());
   }
 
   bool remote_rendering_available = true;

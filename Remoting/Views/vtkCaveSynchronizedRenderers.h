@@ -24,7 +24,7 @@
  * This code was previously in class vtkCaveRenderManager.
  *
  * In case of a single display, if the cave bounds are not set, we compute these values
- * from vtkPVServerOptions::Geometry and the client camera view angle.
+ * from vtkDisplayConfiguration::Geometry and the client camera view angle.
  */
 
 #ifndef vtkCaveSynchronizedRenderers_h

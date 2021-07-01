@@ -20,7 +20,6 @@
 #include "vtkPDirectory.h"
 #include "vtkPVConfig.h"
 #include "vtkPVLogger.h"
-#include "vtkPVOptions.h"
 #include "vtkPVPlugin.h"
 #include "vtkPVPluginTracker.h"
 #include "vtkPVPythonPluginInterface.h"
@@ -260,11 +259,9 @@ vtkPVPluginLoader::vtkPVPluginLoader()
     PARAVIEW_PLUGIN_LOADER_PATHS);
 #endif
 
-  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-  vtkPVOptions* opt = pm ? pm->GetOptions() : nullptr;
-  if (opt)
+  if (auto pm = vtkProcessModule::GetProcessModule())
   {
-    std::string appDir = vtkProcessModule::GetProcessModule()->GetSelfDir();
+    std::string appDir = pm->GetSelfDir();
     if (!appDir.empty())
     {
       appDir += "/plugins";

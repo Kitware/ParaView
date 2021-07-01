@@ -63,7 +63,6 @@
 #include "vtkPVInteractorStyle.h"
 #include "vtkPVLogger.h"
 #include "vtkPVMaterialLibrary.h"
-#include "vtkPVOptions.h"
 #include "vtkPVRenderViewDataDeliveryManager.h"
 #include "vtkPVRenderViewSettings.h"
 #include "vtkPVServerInformation.h"
@@ -76,6 +75,7 @@
 #include "vtkPVTrackballSkyboxRotate.h"
 #include "vtkPVTrackballZoom.h"
 #include "vtkPVTrackballZoomToMouse.h"
+#include "vtkPVView.h"
 #include "vtkPointData.h"
 #include "vtkProcessModule.h"
 #include "vtkRenderViewBase.h"
@@ -3408,17 +3408,11 @@ void vtkPVRenderView::SetMaxFrames(int v)
   vtkRenderer* ren = this->GetRenderer();
   vtkOSPRayRendererNode::SetMaxFrames(v, ren);
   static bool warned_once = false;
-  if (!warned_once && v > 1)
+  if (!warned_once && v > 1 && vtkPVView::GetEnableStreaming() == false)
   {
-    vtkPVOptions* options = vtkProcessModule::GetProcessModule()
-      ? vtkProcessModule::GetProcessModule()->GetOptions()
-      : nullptr;
-    if (options && !options->GetEnableStreaming())
-    {
-      vtkWarningMacro(
-        "You must enable streaming in Edit->Settings/Preferences for iterative refinement.");
-      warned_once = true;
-    }
+    vtkWarningMacro(
+      "You must enable streaming in Edit->Settings/Preferences for iterative refinement.");
+    warned_once = true;
   }
 #else
   (void)v;

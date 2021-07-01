@@ -1,19 +1,19 @@
 function (paraview_add_test_python)
   set(_vtk_testing_python_exe "$<TARGET_FILE:ParaView::pvpython>")
-  set(_vtk_test_python_args -dr ${paraview_python_args})
+  set(_vtk_test_python_args --dr ${paraview_python_args})
   vtk_add_test_python(${ARGN})
 endfunction ()
 
 function (paraview_add_test_pvbatch)
   set(_vtk_testing_python_exe "$<TARGET_FILE:ParaView::pvbatch>")
-  set(_vtk_test_python_args -dr ${paraview_pvbatch_args})
+  set(_vtk_test_python_args --dr ${paraview_pvbatch_args})
   set(vtk_test_prefix "Batch-${vtk_test_prefix}")
   vtk_add_test_python(${ARGN})
 endfunction ()
 
 function (paraview_add_test_pvbatch_mpi)
   set(_vtk_testing_python_exe "$<TARGET_FILE:ParaView::pvbatch>")
-  set(_vtk_test_python_args -dr ${paraview_pvbatch_args})
+  set(_vtk_test_python_args --dr ${paraview_pvbatch_args})
   set(vtk_test_prefix "Batch-${vtk_test_prefix}")
   vtk_add_test_python_mpi(${ARGN})
 endfunction ()
@@ -25,7 +25,7 @@ function(paraview_add_test_driven)
   set(_vtk_testing_python_exe "$<TARGET_FILE:ParaView::smTestDriver>")
   set(_vtk_test_python_args
     --server $<TARGET_FILE:ParaView::pvserver>
-    --client $<TARGET_FILE:ParaView::pvpython> -dr)
+    --client $<TARGET_FILE:ParaView::pvpython> --dr)
   vtk_add_test_python(${ARGN})
 endfunction ()
 
@@ -84,35 +84,25 @@ function (_paraview_add_tests function)
     ${_paraview_add_tests_ARGS})
 
   if (DEFINED _paraview_add_tests_PLUGIN_PATH)
-    if (DEFINED _paraview_add_tests_PLUGIN_PATHS)
-      message(FATAL_ERROR
-        "The `PLUGIN_PATH` argument is incompatible "
-        "with `PLUGIN_PATHS`.")
-    endif ()
     list(APPEND _paraview_add_tests_args
-      "--test-plugin-path=${_paraview_add_tests_PLUGIN_PATH}")
+      "--plugin-search-paths=${_paraview_add_tests_PLUGIN_PATH}")
   endif ()
 
   if (DEFINED _paraview_add_tests_PLUGIN_PATHS)
     string(REPLACE ";" "," _plugin_paths "${_paraview_add_tests_PLUGIN_PATHS}")
     list(APPEND _paraview_add_tests_args
-      "--test-plugin-paths=${_plugin_paths}")
+      "--plugin-search-paths=${_plugin_paths}")
   endif ()
 
   if (DEFINED _paraview_add_tests_LOAD_PLUGIN)
-    if (DEFINED _paraview_add_tests_LOAD_PLUGINS)
-      message(FATAL_ERROR
-        "The `LOAD_PLUGIN` argument is incompatible "
-        "with `LOAD_PLUGINS`.")
-    endif ()
     list(APPEND _paraview_add_tests_args
-      "--test-plugin=${_paraview_add_tests_LOAD_PLUGIN}")
+      "--plugins=${_paraview_add_tests_LOAD_PLUGIN}")
   endif ()
 
   if (DEFINED _paraview_add_tests_LOAD_PLUGINS)
     string(REPLACE ";" "," _load_plugins "${_paraview_add_tests_LOAD_PLUGINS}")
     list(APPEND _paraview_add_tests_args
-      "--test-plugins=${_load_plugins}")
+      "--plugins=${_load_plugins}")
   endif ()
 
   string(REPLACE "__paraview_args__" "${_paraview_add_tests_args}"
@@ -290,7 +280,7 @@ function (paraview_add_client_tests)
         __paraview_args__
         __paraview_script__
         __paraview_client_args__
-        -dr
+        --dr
         --exit
     ${ARGN})
 endfunction ()
@@ -309,7 +299,7 @@ function (paraview_add_client_server_tests)
         __paraview_args__
         __paraview_script__
         __paraview_client_args__
-        -dr
+        --dr
         --exit
     ${ARGN})
 endfunction ()
@@ -331,7 +321,7 @@ function (paraview_add_client_server_render_tests)
         __paraview_args__
         __paraview_script__
         __paraview_client_args__
-        -dr
+        --dr
         --exit
     ${ARGN})
 endfunction ()
@@ -350,7 +340,7 @@ function (paraview_add_multi_server_tests count)
         __paraview_args__
         __paraview_script__
         __paraview_client_args__
-        -dr
+        --dr
         --exit
     ${ARGN})
 endfunction ()
@@ -374,8 +364,8 @@ function (paraview_add_tile_display_tests width height)
     _COMMAND_PATTERN
       --server "$<TARGET_FILE:ParaView::pvserver>"
         --enable-bt
-        -tdx=${width}
-        -tdy=${height}
+        --tdx=${width}
+        --tdy=${height}
         # using offscreen to avoid clobbering display (although should not be
         # necessary) when running tests in parallel.
         --force-offscreen-rendering
@@ -384,7 +374,7 @@ function (paraview_add_tile_display_tests width height)
         __paraview_args__
         __paraview_script__
         __paraview_client_args__
-        -dr
+        --dr
         --exit
     ${ARGN})
 endfunction ()
@@ -410,13 +400,14 @@ function (paraview_add_cave_tests num_ranks config)
         # using offscreen to avoid clobbering display (although should not be
         # necessary) when running tests in parallel.
         --force-offscreen-rendering
+        --pvx
         ${config}
       --client __paraview_client__
         --enable-bt
         __paraview_args__
         __paraview_script__
         __paraview_client_args__
-        -dr
+        --dr
         --exit
     ${ARGN})
 endfunction ()

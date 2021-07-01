@@ -34,6 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqActiveObjects.h"
 #include "pqCollaborationEventPlayer.h"
 #include "pqComponentsTestUtility.h"
+#include "pqCoreConfiguration.h"
 #include "pqCoreUtilities.h"
 #include "pqDeleteReaction.h"
 #include "pqEventDispatcher.h"
@@ -42,7 +43,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqLoadDataReaction.h"
 #include "pqLoadStateReaction.h"
 #include "pqObjectBuilder.h"
-#include "pqOptions.h"
 #include "pqPVApplicationCore.h"
 #include "pqPersistentMainWindowStateBehavior.h"
 #include "pqQtDeprecated.h"
@@ -57,6 +57,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqUndoStack.h"
 #include "vtkPVConfig.h"
 #include "vtkProcessModule.h"
+#include "vtkRemotingCoreConfiguration.h"
 #include "vtkSMPluginManager.h"
 #include "vtkSMProxy.h"
 #include "vtkSMProxyManager.h"
@@ -86,27 +87,73 @@ pqCommandLineOptionsBehavior::pqCommandLineOptionsBehavior(QObject* parentObject
 //-----------------------------------------------------------------------------
 void pqCommandLineOptionsBehavior::processCommandLineOptions()
 {
-  pqOptions* options = pqOptions::SafeDownCast(vtkProcessModule::GetProcessModule()->GetOptions());
+  // Handle server connection.
+  this->processServerConnection();
+
+  // Handle plugins to load at startup.
+  this->processPlugins();
+
+  // Handle data.
+  this->processData();
+
+  // Handle state file.
+  this->processState();
+
+  // Handle script.
+  this->processScript();
+
+  // Process live
+  this->processLive();
+
+  auto rcConfig = vtkRemotingCoreConfiguration::GetInstance();
+  if (rcConfig->GetDisableRegistry())
+  {
+    // a cout for test playback.
+    cout << "Process started" << endl;
+  }
+
+  // Process tests.
+  const bool success = this->processTests();
+  if (pqCoreConfiguration::instance()->exitApplicationWhenTestsDone())
+  {
+    if (pqCoreConfiguration::instance()->testMaster())
+    {
+      pqCollaborationEventPlayer::wait(1000);
+    }
+
+    // Make sure that the pqApplicationCore::prepareForQuit() method
+    // get called
+    QApplication::closeAllWindows();
+    QApplication::instance()->exit(success ? 0 : 1);
+  }
+}
+
+//-----------------------------------------------------------------------------
+void pqCommandLineOptionsBehavior::processServerConnection()
+{
+  auto rcConfig = vtkRemotingCoreConfiguration::GetInstance();
 
   // check for --server.
-  const char* serverresource_name = options->GetServerResourceName();
+  const auto serverResourceName = QString::fromStdString(rcConfig->GetServerResourceName());
+
   // (server-url gets lower priority than --server).
-  const char* server_url = options->GetServerURL();
-  if (serverresource_name)
+  const auto serverURL = QString::fromStdString(rcConfig->GetServerURL());
+  if (!serverResourceName.isEmpty())
   {
-    if (!pqServerConnectReaction::connectToServerUsingConfigurationName(serverresource_name))
+    if (!pqServerConnectReaction::connectToServerUsingConfigurationName(
+          qPrintable(serverResourceName)))
     {
-      qCritical() << "Could not connect to requested server \"" << serverresource_name
+      qCritical() << "Could not connect to requested server \"" << serverResourceName
                   << "\". Creating default builtin connection.";
     }
   }
-  else if (server_url)
+  else if (!serverURL.isEmpty())
   {
-    if (strchr(server_url, '|') != nullptr)
+    if (serverURL.indexOf('|') != -1)
     {
       // We should connect multiple times
-      QStringList urls = QString(server_url).split(QRegExp("\\|"), PV_QT_SKIP_EMPTY_PARTS);
-      foreach (QString url, urls)
+      const QStringList urls = serverURL.split(QRegExp("\\|"), PV_QT_SKIP_EMPTY_PARTS);
+      for (const QString& url : urls)
       {
         if (!pqServerConnectReaction::connectToServer(pqServerResource(url)))
         {
@@ -115,12 +162,14 @@ void pqCommandLineOptionsBehavior::processCommandLineOptions()
         }
       }
     }
-    else if (!pqServerConnectReaction::connectToServer(pqServerResource(server_url)))
+    else if (!pqServerConnectReaction::connectToServer(pqServerResource(serverURL)))
     {
-      qCritical() << "Could not connect to requested server \"" << server_url
+      qCritical() << "Could not connect to requested server \"" << serverURL
                   << "\". Creating default builtin connection.";
     }
   }
+
+  // Connect to builtin, if none present.
   if (pqActiveObjects::instance().activeServer() == nullptr)
   {
     pqServerConnectReaction::connectToServer(pqServerResource("builtin:"));
@@ -129,54 +178,66 @@ void pqCommandLineOptionsBehavior::processCommandLineOptions()
   // Now we are assured that some default server connection has been made
   // (either the one requested by the user on the command line or simply the
   // default one).
-  assert(pqActiveObjects::instance().activeServer() != 0);
+  assert(pqActiveObjects::instance().activeServer() != nullptr);
+}
 
+//-----------------------------------------------------------------------------
+void pqCommandLineOptionsBehavior::processData()
+{
+  auto cConfig = pqCoreConfiguration::instance();
   // check for --data option.
-  if (options->GetParaViewDataName())
+  if (cConfig->dataFileNames().empty())
   {
-    QString path = QString::fromUtf8(options->GetParaViewDataName());
-    // Check if dataname has a state file extension.
-    // This allows to pass a state file as last argument without --state option.
-    if (path.endsWith(".pvsm", Qt::CaseInsensitive))
+    return;
+  }
+
+  for (const auto& fname : cConfig->dataFileNames())
+  {
+    QString path = QString::fromUtf8(fname.c_str());
+
+    // We don't directly set the data file name instead use the dialog. This
+    // makes it possible to select a file group.
+    pqFileDialog dialog(pqActiveObjects::instance().activeServer(), pqCoreUtilities::mainWidget(),
+      tr("Internal Open File"), QString(), QString());
+    dialog.setFileMode(pqFileDialog::ExistingFiles);
+
+    if (!dialog.selectFile(path))
     {
-      // Load state file without fix-filenames dialog.
-      pqLoadStateReaction::loadState(path, true);
+      qCritical() << "Cannot open data file \"" << path << "\"";
     }
-    else
+    QList<QStringList> files = dialog.getAllSelectedFiles();
+    QStringList file;
+    foreach (file, files)
     {
-      // We don't directly set the data file name instead use the dialog. This
-      // makes it possible to select a file group.
-      pqFileDialog dialog(pqActiveObjects::instance().activeServer(), pqCoreUtilities::mainWidget(),
-        tr("Internal Open File"), QString(), QString());
-      dialog.setFileMode(pqFileDialog::ExistingFiles);
-      if (!dialog.selectFile(QString::fromUtf8(options->GetParaViewDataName())))
+      if (pqLoadDataReaction::loadData(file) == nullptr)
       {
-        qCritical() << "Cannot open data file \"" << options->GetParaViewDataName() << "\"";
-      }
-      QList<QStringList> files = dialog.getAllSelectedFiles();
-      QStringList file;
-      foreach (file, files)
-      {
-        if (pqLoadDataReaction::loadData(file) == nullptr)
-        {
-          qCritical() << "Failed to load data file: " << options->GetParaViewDataName();
-        }
+        qCritical() << "Failed to load data file: " << path;
       }
     }
   }
-  else if (options->GetStateFileName())
-  {
-    // check for --state option. (Bug #5711)
-    // NOTE: --data and --state cannot be specified at the same time.
+}
 
+//-----------------------------------------------------------------------------
+void pqCommandLineOptionsBehavior::processState()
+{
+  auto cConfig = pqCoreConfiguration::instance();
+  const auto& fname = cConfig->stateFileName();
+  if (!fname.empty())
+  {
     // Load state file without fix-filenames dialog.
-    pqLoadStateReaction::loadState(options->GetStateFileName(), true);
+    pqLoadStateReaction::loadState(QString::fromStdString(fname), true);
   }
+}
 
-  if (options->GetPythonScript())
+//-----------------------------------------------------------------------------
+void pqCommandLineOptionsBehavior::processScript()
+{
+  auto cConfig = pqCoreConfiguration::instance();
+  const auto& fname = cConfig->pythonScript();
+  if (!fname.empty())
   {
 #if VTK_MODULE_ENABLE_VTK_PythonInterpreter
-    QFile file(options->GetPythonScript());
+    QFile file(QString::fromStdString(fname));
     if (file.open(QIODevice::ReadOnly))
     {
       QByteArray code = file.readAll();
@@ -184,116 +245,105 @@ void pqCommandLineOptionsBehavior::processCommandLineOptions()
     }
     else
     {
-      qCritical() << "Cannot open Python script specified: '" << options->GetPythonScript() << "'";
+      qCritical() << "Cannot open Python script specified: '" << fname.c_str() << "'";
     }
 #else
     qCritical() << "Python support not enabled. Cannot run python scripts.";
 #endif
   }
+}
+
+//-----------------------------------------------------------------------------
+void pqCommandLineOptionsBehavior::processLive()
+{
+  auto cConfig = pqCoreConfiguration::instance();
 
   // check if a Catalyst Live port was passed in that we should automatically attempt
   // to establish a connection to.
-  if (options->GetCatalystLivePort() != -1)
+  if (cConfig->catalystLivePort() != -1)
   {
     pqLiveInsituManager* insituManager = pqLiveInsituManager::instance();
-    insituManager->connect(
-      pqActiveObjects::instance().activeServer(), options->GetCatalystLivePort());
-  }
-
-  if (options->GetDisableRegistry())
-  {
-    // a cout for test playback.
-    cout << "Process started" << endl;
-  }
-
-  if (options->GetNumberOfTestScripts() > 0)
-  {
-    this->playTests();
+    insituManager->connect(pqActiveObjects::instance().activeServer(), cConfig->catalystLivePort());
   }
 }
 
 //-----------------------------------------------------------------------------
-void pqCommandLineOptionsBehavior::playTests()
+void pqCommandLineOptionsBehavior::processPlugins()
 {
-  pqOptions* options = pqOptions::SafeDownCast(vtkProcessModule::GetProcessModule()->GetOptions());
+  // Load the test plugins specified at the command line
+  vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
+  vtkSMPluginManager* pluginManager = pxm->GetPluginManager();
+  vtkSMSession* activeSession = pxm->GetActiveSession();
+
+  const auto& plugins = vtkRemotingCoreConfiguration::GetInstance()->GetPlugins();
+  for (const auto& plugin : plugins)
+  {
+    // Make in-code plugin XML
+    auto xml =
+      QString("<Plugins><Plugin name=\"%1\" auto_load=\"1\"/></Plugins>").arg(plugin.c_str());
+
+    // Load the plugin into the plugin manager. Local and remote
+    // loading is done here.
+    pluginManager->LoadPluginConfigurationXMLFromString(qPrintable(xml), activeSession, true);
+    pluginManager->LoadPluginConfigurationXMLFromString(qPrintable(xml), activeSession, false);
+  }
+}
+
+//-----------------------------------------------------------------------------
+bool pqCommandLineOptionsBehavior::processTests()
+{
+  auto cConfig = pqCoreConfiguration::instance();
+  if (cConfig->testScriptCount() <= 0)
+  {
+    return true;
+  }
 
   QMainWindow* mainWindow = qobject_cast<QMainWindow*>(pqCoreUtilities::mainWidget());
   pqPersistentMainWindowStateBehavior::saveState(mainWindow);
 
-  bool success = true;
-  for (int cc = 0; success && cc < options->GetNumberOfTestScripts(); cc++)
+  for (int cc = 0, max = cConfig->testScriptCount(); cc < max; ++cc)
   {
+    // let the world know which test we're current running.
+    cConfig->setActiveTestIndex(cc);
+
     if (cc > 0)
     {
       pqPersistentMainWindowStateBehavior::restoreState(mainWindow);
-      this->resetApplication();
+      pqCommandLineOptionsBehavior::resetApplication();
     }
     else if (cc == 0)
     {
-      if (options->GetTestMaster())
+      if (cConfig->testMaster())
       {
         pqCollaborationEventPlayer::waitForConnections(2);
       }
-      else if (options->GetTestSlave())
+      else if (cConfig->testSlave())
       {
         pqCollaborationEventPlayer::waitForMaster(5000);
       }
     }
 
-    // Load the test plugins specified at the command line
-    QString pluginsArg(options->GetTestPlugins());
-    if (pluginsArg.size())
-    {
-      // RegEx for ','
-      QRegExp rx("(\\,)");
-      QStringList plugins = pluginsArg.split(rx);
-
-      for (const auto& plugin : plugins)
-      {
-        // Make in-code plugin XML
-        std::string plugin_xml;
-        plugin_xml += "<Plugins><Plugin name=\"";
-        plugin_xml += plugin.toStdString();
-        plugin_xml += "\" auto_load=\"1\" /></Plugins>\n";
-
-        // Load the plugin into the plugin manager. Local and remote
-        // loading is done here.
-        vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
-        vtkSMPluginManager* pluginManager = pxm->GetPluginManager();
-        vtkSMSession* activeSession = pxm->GetActiveSession();
-        pluginManager->LoadPluginConfigurationXMLFromString(
-          plugin_xml.c_str(), activeSession, true);
-        pluginManager->LoadPluginConfigurationXMLFromString(
-          plugin_xml.c_str(), activeSession, false);
-      }
-    }
+    const auto script = QString::fromStdString(cConfig->testScript());
+    const auto baseline = QString::fromStdString(cConfig->testBaseline());
+    const auto threshold = cConfig->testThreshold();
+    const auto tempDir = QString::fromStdString(cConfig->testDirectory());
 
     // Play the test script if specified.
     pqTestUtility* testUtility = pqApplicationCore::instance()->testUtility();
-    options->SetCurrentImageThreshold(options->GetTestImageThreshold(cc));
-    cout << "Playing: " << options->GetTestScript(cc).toUtf8().data() << endl;
-    success = testUtility->playTests(options->GetTestScript(cc));
-
-    if (success && !options->GetTestBaseline(cc).isEmpty())
+    cout << "Playing: " << qPrintable(script) << endl;
+    bool success = testUtility->playTests(script);
+    if (success && !baseline.isEmpty())
     {
-      success = pqComponentsTestUtility::CompareView(options->GetTestBaseline(cc),
-        options->GetTestImageThreshold(cc), options->GetTestDirectory());
+      success = pqComponentsTestUtility::CompareView(baseline, threshold, tempDir);
+    }
+
+    if (!success)
+    {
+      return false;
     }
   }
 
-  if (options->GetExitAppWhenTestsDone())
-  {
-    if (options->GetTestMaster())
-    {
-      pqCollaborationEventPlayer::wait(1000);
-    }
-
-    // Make sure that the pqApplicationCore::prepareForQuit() method
-    // get called
-    QApplication::closeAllWindows();
-
-    QApplication::instance()->exit(success ? 0 : 1);
-  }
+  return true;
 }
 
 //-----------------------------------------------------------------------------

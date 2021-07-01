@@ -14,13 +14,12 @@
 #include <QWidget>
 
 #include "vtkObjectFactory.h"
-#include "vtkProcessModule.h"
 #include "vtkSmartPointer.h"
 
 #include "pqApplicationCore.h"
+#include "pqCoreConfiguration.h"
 #include "pqFileDialog.h"
 #include "pqObjectBuilder.h"
-#include "pqOptions.h"
 #include "pqServer.h"
 #include "pqTestUtility.h"
 
@@ -31,18 +30,23 @@ pqFileDialogTestUtility::~pqFileDialogTestUtility()
   this->cleanupFiles();
 }
 
-void pqFileDialogTestUtility::playTheTests(const QStringList& files)
+void pqFileDialogTestUtility::playTheTests()
 {
+  auto config = pqCoreConfiguration::instance();
+  QStringList files;
+  for (int cc = 0, max = config->testScriptCount(); cc < max; ++cc)
+  {
+    files.push_back(QString::fromStdString(config->testScript(cc)));
+  }
   this->playTests(files);
 }
+
 bool pqFileDialogTestUtility::playTests(const QStringList& filenames)
 {
   this->setupFiles();
   bool val = this->pqTestUtility::playTests(filenames);
 
-  pqOptions* const options =
-    pqOptions::SafeDownCast(vtkProcessModule::GetProcessModule()->GetOptions());
-  if (options && options->GetExitAppWhenTestsDone())
+  if (pqCoreConfiguration::instance()->exitApplicationWhenTestsDone())
   {
     QApplication::exit(val ? 0 : 1);
   }
@@ -60,9 +64,8 @@ static void CreateEmptyFile(const QString& f)
 
 void pqFileDialogTestUtility::setupFiles()
 {
-  pqOptions* const options =
-    pqOptions::SafeDownCast(vtkProcessModule::GetProcessModule()->GetOptions());
-  QString testDirName = options ? options->GetTestDirectory() : QString();
+  auto config = pqCoreConfiguration::instance();
+  QString testDirName = QString::fromStdString(config->testDirectory());
   if (!testDirName.isEmpty())
   {
     QDir testDir(testDirName);
@@ -89,9 +92,8 @@ void pqFileDialogTestUtility::setupFiles()
 
 void pqFileDialogTestUtility::cleanupFiles()
 {
-  pqOptions* const options =
-    pqOptions::SafeDownCast(vtkProcessModule::GetProcessModule()->GetOptions());
-  QString testDirName = options ? options->GetTestDirectory() : QString();
+  auto config = pqCoreConfiguration::instance();
+  QString testDirName = QString::fromStdString(config->testDirectory());
   if (!testDirName.isEmpty())
   {
     QDir testDir(testDirName);
@@ -166,9 +168,8 @@ pqFileDialogTestWidget::pqFileDialogTestWidget()
 
 void pqFileDialogTestWidget::openFileDialog()
 {
-  pqOptions* const options =
-    pqOptions::SafeDownCast(vtkProcessModule::GetProcessModule()->GetOptions());
-  QString testDirName = options ? options->GetTestDirectory() : QString();
+  auto config = pqCoreConfiguration::instance();
+  QString testDirName = QString::fromStdString(config->testDirectory());
   QDir testDir(testDirName);
   if (testDir.exists())
   {
@@ -214,15 +215,17 @@ void pqFileDialogTestWidget::record()
 
 int main(int argc, char** argv)
 {
-  QApplication app(argc, argv);
-  pqOptions* options = pqOptions::New();
-  pqApplicationCore appCore(argc, argv, options);
-  options->Delete();
-
-  pqFileDialogTestWidget mainWidget;
-  mainWidget.show();
-
-  QMetaObject::invokeMethod(mainWidget.Tester(), "playTheTests", Qt::QueuedConnection,
-    Q_ARG(QStringList, options->GetTestScripts()));
-  return app.exec();
+  try
+  {
+    QApplication app(argc, argv);
+    pqApplicationCore appCore(argc, argv);
+    pqFileDialogTestWidget mainWidget;
+    mainWidget.show();
+    QMetaObject::invokeMethod(mainWidget.Tester(), "playTheTests", Qt::QueuedConnection);
+    return app.exec();
+  }
+  catch (pqApplicationCoreExitCode& e)
+  {
+    return e.code();
+  }
 }

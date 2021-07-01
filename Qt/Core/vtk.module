@@ -19,6 +19,7 @@ PRIVATE_DEPENDS
   ParaView::RemotingSettings
   ParaView::RemotingViews
   ParaView::VTKExtensionsFiltersRendering
+  VTK::cli11
   VTK::CommonSystem
   VTK::ImagingCore
   VTK::IOImage

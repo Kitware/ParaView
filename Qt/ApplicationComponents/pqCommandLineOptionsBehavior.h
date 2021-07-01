@@ -55,9 +55,44 @@ public:
   */
   static void resetApplication();
 
+  /**
+   * Handle server connection options. Processes `--server` and `--server-url`
+   * command line arguments. In none provided, connect to the builtin server.
+   */
+  static void processServerConnection();
+
+  /**
+   * Handle plugins.
+   */
+  static void processPlugins();
+
+  /**
+   * Handle open data file requests (i.e. `--data`).
+   */
+  static void processData();
+
+  /**
+   * Handle state loading request (i.e. `--state`).
+   */
+  static void processState();
+
+  /**
+   * Handle script loading request (i.e. `--script`).
+   */
+  static void processScript();
+
+  /**
+   * Handle Catalyst live session connection request (i.e. `--live`).
+   */
+  static void processLive();
+
+  /**
+   * Returns test playback status.
+   */
+  static bool processTests();
+
 protected Q_SLOTS:
   void processCommandLineOptions();
-  void playTests();
 
 private:
   Q_DISABLE_COPY(pqCommandLineOptionsBehavior)

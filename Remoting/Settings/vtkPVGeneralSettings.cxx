@@ -15,7 +15,6 @@
 #include "vtkPVGeneralSettings.h"
 
 #include "vtkObjectFactory.h"
-#include "vtkPVOptions.h"
 #include "vtkProcessModule.h"
 #include "vtkProcessModuleAutoMPI.h"
 #include "vtkSISourceProxy.h"
@@ -28,6 +27,7 @@
 #endif
 
 #if VTK_MODULE_ENABLE_ParaView_RemotingViews
+#include "vtkPVView.h"
 #include "vtkPVXYChartView.h"
 #include "vtkSMChartSeriesSelectionDomain.h"
 #include "vtkSMParaViewPipelineControllerWithRendering.h"
@@ -280,14 +280,10 @@ void vtkPVGeneralSettings::SetEnableStreaming(bool val)
 {
   if (this->GetEnableStreaming() != val)
   {
-    vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-    if (!pm)
-    {
-      vtkErrorMacro("vtkProcessModule not initialized. Igoring streaming change.");
-      return;
-    }
-    auto options = pm->GetOptions();
-    options->SetEnableStreaming(val);
+    this->EnableStreaming = val;
+#if VTK_MODULE_ENABLE_ParaView_RemotingViews
+    vtkPVView::SetEnableStreaming(val);
+#endif
     this->Modified();
   }
 }

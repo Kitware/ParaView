@@ -1,28 +1,29 @@
 // A Test of a very simple app based on pqCore
 #include "FilteredPipelineBrowserApp.h"
 
+#include <QAction>
 #include <QApplication>
 #include <QDebug>
 #include <QStringList>
 #include <QTimer>
+#include <QToolBar>
 #include <QVBoxLayout>
 
-#include "vtkObjectFactory.h"
-#include "vtkSMPropertyHelper.h"
-#include "vtkSMSourceProxy.h"
-#include "vtkSmartPointer.h"
-
+#include "pqActiveObjects.h"
 #include "pqApplicationCore.h"
+#include "pqCoreConfiguration.h"
 #include "pqCoreTestUtility.h"
 #include "pqObjectBuilder.h"
-#include "pqOptions.h"
 #include "pqPipelineAnnotationFilterModel.h"
 #include "pqPipelineSource.h"
+#include "pqProxyWidgetDialog.h"
 #include "pqServer.h"
+#include "vtkObjectFactory.h"
 #include "vtkProcessModule.h"
-
-#include <QAction>
-#include <QToolBar>
+#include "vtkSMPropertyHelper.h"
+#include "vtkSMSessionProxyManager.h"
+#include "vtkSMSourceProxy.h"
+#include "vtkSmartPointer.h"
 
 MainPipelineWindow::MainPipelineWindow()
 {
@@ -98,18 +99,16 @@ void MainPipelineWindow::updateSelectedFilter(int filterIndex)
 //-----------------------------------------------------------------------------
 void MainPipelineWindow::processTest()
 {
-  if (pqOptions* const options = pqApplicationCore::instance()->getOptions())
+  auto config = pqCoreConfiguration::instance();
+  bool test_succeeded = true;
+
+  // ---- Do the testing here ----
+
+  // ---- Do the testing here ----
+
+  if (config->exitApplicationWhenTestsDone())
   {
-    bool test_succeeded = true;
-
-    // ---- Do the testing here ----
-
-    // ---- Do the testing here ----
-
-    if (options->GetExitAppWhenTestsDone())
-    {
-      QApplication::instance()->exit(test_succeeded ? 0 : 1);
-    }
+    QApplication::instance()->exit(test_succeeded ? 0 : 1);
   }
 }
 //-----------------------------------------------------------------------------
@@ -170,10 +169,6 @@ void MainPipelineWindow::createPipelineWithAnnotation(pqServer* server)
   append->getProxy()->SetAnnotation("tooltip", "2+3");
   groupDS->getProxy()->SetAnnotation("tooltip", "2");
 }
-
-#include "pqActiveObjects.h"
-#include "pqProxyWidgetDialog.h"
-#include "vtkSMSessionProxyManager.h"
 
 //-----------------------------------------------------------------------------
 void MainPipelineWindow::showSettings()

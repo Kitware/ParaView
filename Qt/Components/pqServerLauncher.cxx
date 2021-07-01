@@ -45,9 +45,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkMinimalStandardRandomSequence.h"
 #include "vtkNetworkAccessManager.h"
 #include "vtkPVConfig.h"
-#include "vtkPVOptions.h"
 #include "vtkPVXMLElement.h"
 #include "vtkProcessModule.h"
+#include "vtkRemotingCoreConfiguration.h"
 #include "vtkTimerLog.h"
 
 #include <QCheckBox>
@@ -591,12 +591,12 @@ bool pqServerLauncher::connectToServer()
 
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   vtkNetworkAccessManager* nam = pm->GetNetworkAccessManager();
-  vtkPVOptions* options = pm->GetOptions();
+  vtkRemotingCoreConfiguration* config = vtkRemotingCoreConfiguration::GetInstance();
   QDialog dialog(pqCoreUtilities::mainWidget(), Qt::WindowStaysOnTopHint);
   Ui::pqConnectIdDialog ui;
   ui.setupUi(&dialog);
   ui.connectId->setMaximum(VTK_INT_MAX);
-  ui.connectId->setValue(options->GetConnectID());
+  ui.connectId->setValue(config->GetConnectID());
 
   pqObjectBuilder* builder = pqApplicationCore::instance()->getObjectBuilder();
   bool force = builder->forceWaitingForConnection(true);
@@ -604,7 +604,7 @@ bool pqServerLauncher::connectToServer()
   while (!(launched = this->connectToPrelaunchedServer()) && nam->GetWrongConnectID() &&
     dialog.exec() == QDialog::Accepted)
   {
-    options->SetConnectID(ui.connectId->value());
+    config->SetConnectID(ui.connectId->value());
   }
   builder->forceWaitingForConnection(force);
   return launched;
@@ -676,15 +676,12 @@ bool pqServerLauncher::promptOptions()
 
   this->updateOptionsUsingUserSelections();
 
-  // if options contains PV_CONNECT_ID. We need to update the pqOptions to
-  // give it the correct connection-id.
+  // if options contains PV_CONNECT_ID. We need to update the
+  // vtkRemotingCoreConfiguration to give it the correct connection-id.
   if (options.contains("PV_CONNECT_ID"))
   {
-    vtkPVOptions* pvoptions = vtkProcessModule::GetProcessModule()->GetOptions();
-    if (pvoptions)
-    {
-      pvoptions->SetConnectID(options.value("PV_CONNECT_ID").toInt());
-    }
+    vtkRemotingCoreConfiguration* config = vtkRemotingCoreConfiguration::GetInstance();
+    config->SetConnectID(options.value("PV_CONNECT_ID").toInt());
   }
 
   widgets.clear();

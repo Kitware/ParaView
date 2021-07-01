@@ -15,12 +15,13 @@
 #include "vtkCaveSynchronizedRenderers.h"
 
 #include "vtkCamera.h"
+#include "vtkDisplayConfiguration.h"
 #include "vtkMath.h"
 #include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
-#include "vtkPVServerOptions.h"
 #include "vtkPerspectiveTransform.h"
 #include "vtkProcessModule.h"
+#include "vtkRemotingCoreConfiguration.h"
 #include "vtkRenderer.h"
 #include "vtkTimerLog.h"
 #include "vtkTransform.h"
@@ -52,30 +53,32 @@ vtkCaveSynchronizedRenderers::vtkCaveSynchronizedRenderers()
   this->SetParallelController(vtkMultiProcessController::GetGlobalController());
 
   // Initialize using pvx file specified on the command line options.
-  vtkPVServerOptions* options =
-    vtkPVServerOptions::SafeDownCast(vtkProcessModule::GetProcessModule()->GetOptions());
-  if (!options)
+  auto config = vtkRemotingCoreConfiguration::GetInstance();
+  auto displayConfig = vtkRemotingCoreConfiguration::GetInstance()->GetDisplayConfiguration();
+  if (!displayConfig)
   {
     vtkErrorMacro("Are you sure vtkCaveSynchronizedRenderers is created on "
                   "an appropriate processes?");
   }
   else
   {
-    this->SetNumberOfDisplays(options->GetNumberOfMachines());
-    for (int cc = 0; cc < this->NumberOfDisplays; cc++)
+    this->SetNumberOfDisplays(displayConfig->GetNumberOfDisplays());
+    const auto rank = this->ParallelController ? this->ParallelController->GetLocalProcessId() : -1;
+    if (rank >= 0 && rank < this->NumberOfDisplays)
     {
-      if (options->GetDisplayName(cc))
+      if (auto env = displayConfig->GetEnvironment(rank))
       {
-        if (this->ParallelController && this->ParallelController->GetLocalProcessId() == cc)
-        {
-          // PutEnv() avoids memory leak.
-          vtksys::SystemTools::PutEnv(options->GetDisplayName(cc));
-        }
+        // PutEnv() avoids memory leak.
+        vtksys::SystemTools::PutEnv(env);
       }
-      this->DefineDisplay(
-        cc, options->GetLowerLeft(cc), options->GetLowerRight(cc), options->GetUpperRight(cc));
+      if (displayConfig->GetHasCorners(rank))
+      {
+        this->DefineDisplay(rank, displayConfig->GetLowerLeft(rank).GetData(),
+          displayConfig->GetLowerRight(rank).GetData(),
+          displayConfig->GetUpperRight(rank).GetData());
+      }
     }
-    this->SetEyeSeparation(options->GetEyeSeparation());
+    this->SetEyeSeparation(config->GetEyeSeparation());
   }
 }
 
@@ -226,16 +229,15 @@ void vtkCaveSynchronizedRenderers::SetRenderer(vtkRenderer* renderer)
     return;
   }
 
-  vtkPVServerOptions* options =
-    vtkPVServerOptions::SafeDownCast(vtkProcessModule::GetProcessModule()->GetOptions());
-  if (!options)
+  auto config = vtkRemotingCoreConfiguration::GetInstance();
+  auto displayConfig = vtkRemotingCoreConfiguration::GetInstance()->GetDisplayConfiguration();
+  if (displayConfig->GetNumberOfDisplays() != 1)
   {
-    vtkErrorMacro("Can not load the server options.");
     return;
   }
 
-  int* geometry = options->GetGeometry(0);
-  if (!options->GetCaveBoundsSet(0) && geometry && geometry[2] != 0)
+  const auto geometry = displayConfig->GetGeometry(0);
+  if (!displayConfig->GetHasCorners(0) && geometry[2] != 0)
   {
     vtkCamera* camera = this->GetRenderer() ? this->GetRenderer()->GetActiveCamera() : nullptr;
     double angle = camera ? camera->GetViewAngle() / 2. : 15.;

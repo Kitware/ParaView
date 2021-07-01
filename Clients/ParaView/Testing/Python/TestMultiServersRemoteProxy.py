@@ -20,7 +20,7 @@ def getPort(url):
 
 print ("Start multi-server testing")
 
-options = servermanager.vtkProcessModule.GetProcessModule().GetOptions()
+options = servermanager.vtkRemotingCoreConfiguration.GetInstance()
 available_server_urls = options.GetServerURL().split('|')
 built_in_connection = servermanager.ActiveConnection
 

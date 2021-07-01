@@ -23,6 +23,7 @@
 #ifndef vtkProcessModule_h
 #define vtkProcessModule_h
 
+#include "vtkLegacy.h" // needed for vtkLegacy
 #include "vtkObject.h"
 #include "vtkRemotingCoreModule.h" //needed for exports
 #include "vtkSmartPointer.h"       // needed for vtkSmartPointer.
@@ -33,9 +34,12 @@ class vtkInformation;
 class vtkMultiProcessController;
 class vtkNetworkAccessManager;
 class vtkProcessModuleInternals;
-class vtkPVOptions;
 class vtkSession;
 class vtkSessionIterator;
+
+#if !defined(VTK_LEGACY_REMOVE)
+class vtkPVOptions;
+#endif
 
 class VTKREMOTINGCORE_EXPORT vtkProcessModule : public vtkObject
 {
@@ -193,12 +197,12 @@ public:
 
   //@{
   /**
-   * Set/Get the application command line options object.
-   * Note that this has to be explicitly set. vtkProcessModule::Initialize()
-   * does not initialize the vtkPVOptions.
+   * @deprecated in ParaView 5.10. vtkPVOptions is now replaced by
+   * vtkCLIOptions for command line parsing and various configuration e.g
+   * vtkProcessModuleConfiguration, vtkRemotingCoreConfiguration, etc.
    */
-  vtkGetObjectMacro(Options, vtkPVOptions);
-  void SetOptions(vtkPVOptions* op);
+  VTK_LEGACY(vtkPVOptions* GetOptions());
+  VTK_LEGACY(void SetOptions(vtkPVOptions*));
   //@}
 
   //********** ACCESSORS FOR VARIOUS HELPERS *****************************
@@ -247,12 +251,7 @@ public:
   //@}
 
   //@{
-  /**
-   * Returns true if ParaView is to be run in symmetric mode. Symmetric mode
-   * implies that satellites process same code as the root node. This is
-   * applicable only for PROCESS_BATCH.
-   */
-  vtkGetMacro(SymmetricMPIMode, bool);
+  static bool GetSymmetricMPIMode();
   //@}
 
   /**
@@ -296,8 +295,6 @@ protected:
   vtkProcessModule();
   ~vtkProcessModule() override;
 
-  vtkSetMacro(SymmetricMPIMode, bool);
-
   //@{
   /**
    * Push/Pop the active session.
@@ -313,7 +310,6 @@ protected:
   friend class vtkSession;
 
   vtkNetworkAccessManager* NetworkAccessManager;
-  vtkPVOptions* Options;
 
   /**
    * Used to keep track of maximum session used. Only used to ensure that no
@@ -359,8 +355,6 @@ private:
   static vtkSmartPointer<vtkProcessModule> Singleton;
   static vtkSmartPointer<vtkMultiProcessController> GlobalController;
 
-  bool SymmetricMPIMode;
-
   bool MultipleSessionsSupport;
 
   vtkIdType EventCallDataSessionId;
@@ -370,6 +364,10 @@ private:
 
   static int DefaultMinimumGhostLevelsToRequestForStructuredPipelines;
   static int DefaultMinimumGhostLevelsToRequestForUnstructuredPipelines;
+
+#if !defined(VTK_LEGACY_REMOVE)
+  vtkPVOptions* Options;
+#endif
 };
 
 #endif // vtkProcessModule_h

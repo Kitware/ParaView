@@ -18,13 +18,16 @@ extern "C" {
 void vtkPVInitializePythonModules();
 }
 
+#include "vtkCLIOptions.h"
 #include "vtkInitializationHelper.h"
 #include "vtkLogger.h"
 #include "vtkMultiProcessController.h"
 #include "vtkPVPluginTracker.h"
-#include "vtkPVPythonOptions.h"
 #include "vtkProcessModule.h"
+#include "vtkProcessModuleConfiguration.h"
 #include "vtkPythonInterpreter.h"
+#include "vtkRemotingCoreConfiguration.h"
+#include "vtkSMProxyManager.h"
 #include "vtkSMSession.h"
 
 #include <vector>
@@ -38,38 +41,39 @@ namespace ParaViewPython
 //---------------------------------------------------------------------------
 
 void ProcessArgsForPython(
-  std::vector<char*>& pythonArgs, const char* first_unknown_arg, int argc, char* argv[])
+  std::vector<char*>& pythonArgs, const std::vector<std::string>& args, int argc, char** argv)
 {
   pythonArgs.clear();
+
+  // push the executable name first.
   pythonArgs.push_back(vtksys::SystemTools::DuplicateString(argv[0]));
-  if (first_unknown_arg && strcmp(first_unknown_arg, "--") == 0)
-  {
-    // `--` causes ParaView to not process the arguments anymore and simply
-    // pass them to the Python interpreter.
-  }
-  else if (first_unknown_arg && strlen(first_unknown_arg) > 0)
-  {
-    // here we handle a special case when the filename specified is a zip
-    // archive.
-    if (vtksys::SystemTools::GetFilenameLastExtension(first_unknown_arg) == ".zip")
-    {
-      // add the archive to sys.path
-      vtkPythonInterpreter::PrependPythonPath(first_unknown_arg);
-      pythonArgs.push_back(vtksys::SystemTools::DuplicateString("-m"));
 
-      std::string modulename = vtksys::SystemTools::GetFilenameWithoutLastExtension(
-        vtksys::SystemTools::GetFilenameName(first_unknown_arg));
-      pythonArgs.push_back(vtksys::SystemTools::DuplicateString(modulename.c_str()));
-    }
-    else
-    {
-      pythonArgs.push_back(vtksys::SystemTools::DuplicateString(first_unknown_arg));
-    }
+  // now push the unparsed arguments.
+  if (args.empty())
+  {
+    return;
   }
 
-  for (int cc = 1; cc < argc; cc++)
+  // here we handle a special case when the filename specified is a zip
+  // archive.
+  if (vtksys::SystemTools::GetFilenameLastExtension(args[0]) == ".zip")
   {
-    pythonArgs.push_back(vtksys::SystemTools::DuplicateString(argv[cc]));
+    // add the archive to sys.path
+    vtkPythonInterpreter::PrependPythonPath(args[0].c_str());
+    pythonArgs.push_back(vtksys::SystemTools::DuplicateString("-m"));
+
+    std::string modulename = vtksys::SystemTools::GetFilenameWithoutLastExtension(
+      vtksys::SystemTools::GetFilenameName(args[0].c_str()));
+    pythonArgs.push_back(vtksys::SystemTools::DuplicateString(modulename.c_str()));
+  }
+  else
+  {
+    pythonArgs.push_back(vtksys::SystemTools::DuplicateString(args[0].c_str()));
+  }
+
+  for (size_t cc = 1, max = args.size(); cc < max; ++cc)
+  {
+    pythonArgs.push_back(vtksys::SystemTools::DuplicateString(args[cc].c_str()));
   }
 }
 
@@ -77,25 +81,18 @@ void ProcessArgsForPython(
 int Run(int processType, int argc, char* argv[])
 {
   // Setup options
-  // Marking this static avoids the false leak messages from vtkDebugLeaks when
-  // using mpich. It appears that the root process which spawns all the
-  // main processes waits in MPI_Init() and calls exit() when
-  // the others are done, causing apparent memory leaks for any non-static objects
-  // created before MPI_Init().
   vtkInitializationHelper::SetApplicationName("ParaView");
-  static vtkSmartPointer<vtkPVPythonOptions> options = vtkSmartPointer<vtkPVPythonOptions>::New();
-  vtkInitializationHelper::Initialize(argc, argv, processType, options);
-  if (options->GetTellVersion() || options->GetHelpSelected() || options->GetPrintMonitors())
+
+  auto options = vtk::TakeSmartPointer(vtkCLIOptions::New());
+  const auto status = vtkInitializationHelper::Initialize(argc, argv, processType, options);
+  if (!status)
   {
-    vtkInitializationHelper::Finalize();
-    return EXIT_SUCCESS;
+    return vtkInitializationHelper::GetExitCode();
   }
 
-  if (processType == vtkProcessModule::PROCESS_BATCH && options->GetUnknownArgument() == nullptr)
+  if (processType == vtkProcessModule::PROCESS_BATCH && options->GetExtraArguments().empty())
   {
-    vtkGenericWarningMacro("No script specified. "
-                           "Please specify a batch script or use 'pvpython'.");
-    vtkInitializationHelper::Finalize();
+    vtkLogF(ERROR, "No script specified. Please specify a batch script or use 'pvpython'.");
     return EXIT_FAILURE;
   }
 
@@ -119,19 +116,16 @@ int Run(int processType, int argc, char* argv[])
   }
   else
   {
-    int remaining_argc;
-    char** remaining_argv;
-    options->GetRemainingArguments(&remaining_argc, &remaining_argv);
-
     // Process arguments
     std::vector<char*> pythonArgs;
-    ProcessArgsForPython(pythonArgs, options->GetUnknownArgument(), remaining_argc, remaining_argv);
+    ProcessArgsForPython(pythonArgs, options->GetExtraArguments(), argc, argv);
     pythonArgs.push_back(nullptr);
 
     // if user specified verbosity option on command line, then we make vtkPythonInterpreter post
     // log information as INFO, otherwise we leave it at default which is TRACE.
+    auto pmConfig = vtkProcessModuleConfiguration::GetInstance();
     vtkPythonInterpreter::SetLogVerbosity(
-      options->GetLogStdErrVerbosity() != vtkLogger::VERBOSITY_INVALID
+      pmConfig->GetLogStdErrVerbosity() != vtkLogger::VERBOSITY_INVALID
         ? vtkLogger::VERBOSITY_INFO
         : vtkLogger::VERBOSITY_TRACE);
 
@@ -139,14 +133,12 @@ int Run(int processType, int argc, char* argv[])
     vtkPythonInterpreter::Initialize();
 
     ret_val =
-      vtkPythonInterpreter::PyMain(static_cast<int>(pythonArgs.size()) - 1, &*pythonArgs.begin());
+      vtkPythonInterpreter::PyMain(static_cast<int>(pythonArgs.size()) - 1, &pythonArgs.front());
 
     // Free python args
-    std::vector<char*>::iterator it = pythonArgs.begin();
-    while (it != pythonArgs.end())
+    for (auto& ptr : pythonArgs)
     {
-      delete[] * it;
-      ++it;
+      delete[] ptr;
     }
   }
   // Exit application
