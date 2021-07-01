@@ -113,7 +113,4 @@ protected:
   float getValue(int index) override { return this->Vector.template value<T>()[index]; }
 };
 
-using pqVector2DWidget = pqVectorWidgetImpl<QVector2D, 2>;
-using pqVector3DWidget = pqVectorWidgetImpl<QVector3D, 3>;
-
 #endif
