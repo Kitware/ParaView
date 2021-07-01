@@ -421,6 +421,7 @@ protected:
 
 #if !defined(VTK_LEGACY_REMOVE)
   vtkSmartPointer<pqOptions> Options;
+  void setOptions(pqOptions* options);
 #endif
   pqLinksModel* LinksModel;
   pqObjectBuilder* ObjectBuilder;

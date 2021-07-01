@@ -124,9 +124,18 @@ pqApplicationCore::pqApplicationCore(
   int& argc, char** argv, pqOptions* options, QObject* parentObject)
   : pqApplicationCore(argc, argv, static_cast<vtkCLIOptions*>(nullptr), true, parentObject)
 {
+  this->setOptions(options);
+}
+#endif
+
+#if !defined(VTK_LEGACY_REMOVE)
+//-----------------------------------------------------------------------------
+void pqApplicationCore::setOptions(pqOptions* options)
+{
   this->Options = options;
   vtkProcessModule::GetProcessModule()->SetOptions(this->Options);
 }
+
 #endif
 
 //-----------------------------------------------------------------------------
