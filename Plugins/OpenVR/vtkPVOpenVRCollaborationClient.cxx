@@ -216,7 +216,7 @@ protected:
       std::vector<Argument> args = this->GetMessageArguments();
 
       std::vector<std::string> vals;
-      if (args.size() != 1 || !args[0].GetStringVector(vals) || vals.size() < 4)
+      if (args.size() != 1 || !args[0].GetStringVector(vals) || vals.size() < 2)
       {
         this->Log(vtkLogger::VERBOSITY_ERROR,
           "Incorrect arguments for SB (show billboard) collaboration message");
@@ -225,8 +225,11 @@ protected:
 
       std::string text = vals[0];
       std::string update = vals[1];
-      std::string file = vals[2];
-      std::string end = vals[3];
+      std::string file = "";
+      if (vals.size() > 2)
+      {
+        file = vals[2];
+      }
 
       // only want to change if it's from someone else.
       if (otherID != this->CollabID)
