@@ -201,7 +201,8 @@ int pqOptions::GetTestMaster()
 #if !defined(VTK_LEGACY_REMOVE)
 int pqOptions::GetTestSlave()
 {
-  VTK_LEGACY_REPLACED_BODY(pqOptions::GetTestSlave, "ParaView 5.10", pqCoreConfiguration::testSlave)
+  VTK_LEGACY_REPLACED_BODY(
+    pqOptions::GetTestSlave, "ParaView 5.10", pqCoreConfiguration::testSlave);
   return pqCoreConfiguration::instance()->testSlave() ? 1 : 0;
 }
 #endif

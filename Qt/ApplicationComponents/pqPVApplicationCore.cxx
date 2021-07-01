@@ -65,8 +65,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //-----------------------------------------------------------------------------
 #if !defined(VTK_LEGACY_REMOVE)
 pqPVApplicationCore::pqPVApplicationCore(int& argc, char** argv, pqOptions* options)
-  : pqPVApplicationCore(argc, argv, options)
+  : pqPVApplicationCore(argc, argv, static_cast<vtkCLIOptions*>(nullptr), true, nullptr)
 {
+  this->setOptions(options);
 }
 #endif
 
