@@ -240,12 +240,14 @@ QWidget* pqMaterialAttributesDelegate::createEditor(
       }
       case vtkOSPRayMaterialLibrary::ParameterType::VEC2:
       {
-        pqVector2DWidget* widget = new pqVector2DWidget(variant.value<QVector2D>(), parent);
+        pqVectorWidgetImpl<QVector2D, 2>* widget =
+          new pqVectorWidgetImpl<QVector2D, 2>(variant.value<QVector2D>(), parent);
         return widget;
       }
       case vtkOSPRayMaterialLibrary::ParameterType::VEC3:
       {
-        pqVector3DWidget* widget = new pqVector3DWidget(variant.value<QVector3D>(), parent);
+        pqVectorWidgetImpl<QVector3D, 3>* widget =
+          new pqVectorWidgetImpl<QVector3D, 3>(variant.value<QVector3D>(), parent);
         return widget;
       }
       case vtkOSPRayMaterialLibrary::ParameterType::FLOAT_DATA:

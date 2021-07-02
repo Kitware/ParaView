@@ -89,7 +89,7 @@ private:
 * to be used with QVector classes or QQuaternion.
 */
 template <class T, unsigned int S>
-class PQWIDGETS_EXPORT pqVectorWidgetImpl : public pqVectorWidget
+class pqVectorWidgetImpl : public pqVectorWidget
 {
 public:
   pqVectorWidgetImpl(const T& value, QWidget* parent = nullptr)
@@ -112,8 +112,5 @@ public:
 protected:
   float getValue(int index) override { return this->Vector.template value<T>()[index]; }
 };
-
-using pqVector2DWidget = pqVectorWidgetImpl<QVector2D, 2>;
-using pqVector3DWidget = pqVectorWidgetImpl<QVector3D, 3>;
 
 #endif
