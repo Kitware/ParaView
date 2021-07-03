@@ -3469,8 +3469,11 @@ Every Nth Point.
                  label="Merge Vector Components"
                  name="MergeVectorComponents">
      <Documentation
-        long_help="Create point attribute array by projecting points onto an elevation vector."
-        short_help="Create a point array representing elevation.">
+        long_help="Merge three 1-component arrays of the same attribute type (point-data or cell-data)
+                   into one 3-component vector."
+        short_help="Merge three 1-component arrays into one 3-component vector.">
+        The MergeVectorComponents filter can be used to merge 1-component arrays of
+        the same attribute type (point-data or cell-data) into one 3-component vector.
      </Documentation>
      <InputProperty command="SetInputConnection"
                     name="Input">
@@ -3503,7 +3506,6 @@ Every Nth Point.
                             label="X Array"
                             number_of_elements="1">
         <ArrayListDomain name="array_list"
-                         attribute_type="Scalars"
                          input_domain_name="scale_array">
           <RequiredProperties>
             <Property function="Input"
@@ -3521,7 +3523,6 @@ Every Nth Point.
                             label="Y Array"
                             number_of_elements="1">
         <ArrayListDomain name="array_list"
-                         attribute_type="Scalars"
                          input_domain_name="scale_array">
           <RequiredProperties>
             <Property function="Input"
@@ -3539,7 +3540,6 @@ Every Nth Point.
                             label="Z Array"
                             number_of_elements="1">
         <ArrayListDomain name="array_list"
-                         attribute_type="Scalars"
                          input_domain_name="scale_array">
           <RequiredProperties>
             <Property function="Input"
@@ -3553,7 +3553,7 @@ Every Nth Point.
         </Documentation>
       </StringVectorProperty>
       <StringVectorProperty command="SetOutputVectorName"
-                            default_values="combinationVector"
+                            default_values="Vector"
                             name="OutputVectorName"
                             number_of_elements="1">
         <Documentation>This property contains the name for the output vector
