@@ -112,12 +112,12 @@ void pqDoubleRangeWidget::updateValidator()
 #if !defined(VTK_LEGACY_REMOVE)
   if (this->StrictRange)
   {
-    this->setValidator(new QDoubleValidator(this->minimum(), this->maximum(), 100));
+    this->setValidator(new QDoubleValidator(this->minimum(), this->maximum(), 100, this));
   }
   else
 #endif
   {
-    this->setValidator(new QDoubleValidator());
+    this->setValidator(new QDoubleValidator(this));
   }
 }
 
