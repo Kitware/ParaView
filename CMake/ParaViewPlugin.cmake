@@ -939,7 +939,7 @@ paraview_add_plugin(<name>
     before the plugin is initialized at runtime.
   * `XML_DOCUMENTATION`: (Defaults to `ON`) If set, documentation will be
     generated for the associated XML files.
-  * `DOCUMENTATION_DIR`: If specified, `*.html`, `*.css`, `*.png`, and `*.jpg`
+  * `DOCUMENTATION_DIR`: If specified, `*.html`, `*.css`, `*.png`, `*.js`, and `*.jpg`
     files in this directory will be copied and made available to the
     documentation.
   * `EXPORT`: (Deprecated) Use `paraview_plugin_build(INSTALL_EXPORT)` instead.
