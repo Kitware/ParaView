@@ -222,6 +222,16 @@ enum catalyst_error catalyst_execute_paraview(const conduit_node* params)
 
       const auto data_node = channel_node["data"];
       bool is_valid = true;
+
+      // check for optional channel state data
+      const int channel_timestep = channel_node.has_path("state/timestep")
+        ? channel_node["state/timestep"].to_int64()
+        : (channel_node.has_path("state/cycle") ? channel_node["state/cycle"].to_int64()
+                                                : timestep);
+
+      const double channel_time =
+        channel_node.has_path("state/time") ? channel_node["state/time"].to_float64() : time;
+
       if (type == "mesh")
       {
         conduit_cpp::Node info;
@@ -261,9 +271,9 @@ enum catalyst_error catalyst_execute_paraview(const conduit_node* params)
 
       // populate field data node for this channel.
       auto fields = globalFields[channel_name];
-      fields["time"].set(time);
-      fields["timestep"].set(timestep);
-      fields["cycle"].set(timestep);
+      fields["time"].set(channel_time);
+      fields["timestep"].set(channel_timestep);
+      fields["cycle"].set(channel_timestep);
       fields["channel"].set(channel_name);
       if (type == "mesh" || type == "multimesh")
       {
@@ -302,7 +312,7 @@ enum catalyst_error catalyst_finalize_paraview(const conduit_node* params)
   if (cpp_params.has_path("catalyst") &&
     !vtkCatalystBlueprint::Verify("finalize", cpp_params["catalyst"]))
   {
-    vtkLogF(ERROR, "invalid 'catalyst' node passed to 'catalyst_finalize'. Finalization mayfail.");
+    vtkLogF(ERROR, "invalid 'catalyst' node passed to 'catalyst_finalize'. Finalization may fail.");
   }
 
   vtkInSituInitializationHelper::Finalize();

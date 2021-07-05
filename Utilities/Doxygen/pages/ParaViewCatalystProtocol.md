@@ -127,6 +127,13 @@ The 'channel' protocol is as follows:
   data on this channel. This node must match the protocol requirements
   identified by the 'channel/type'.
 
+* channel/state: (optional) fields to optionally override the catalyst/state temporal information
+  channel/state/timestep: (optional) if present, overrides catalyst/state/timestep for this channel
+  channel/state/cycle: (optional) if present, overrides catalyst/state/cycle for this channel
+  channel/state/time: (optional) if present, overrides catalyst/state/time for this channel
+  a channel will default to using the catalyst/state/ values for these parameters for each
+  channel/state parameter not specified.
+
 ### protocol: 'finalize'
 
 Currently, this is empty.
