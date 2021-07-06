@@ -3463,5 +3463,103 @@ Every Nth Point.
       </Hints>
       <!-- End AnnotateGlobalData -->
     </SourceProxy>
+
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkMergeVectorComponents"
+                 label="Merge Vector Components"
+                 name="MergeVectorComponents">
+     <Documentation
+        long_help="Merge three 1-component arrays of the same attribute type (point-data or cell-data)
+                   into one 3-component vector."
+        short_help="Merge three 1-component arrays into one 3-component vector.">
+        The MergeVectorComponents filter can be used to merge 1-component arrays of
+        the same attribute type (point-data or cell-data) into one 3-component vector.
+     </Documentation>
+     <InputProperty command="SetInputConnection"
+                    name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources"/>
+          <Group name="filters"/>
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkDataSet"/>
+        </DataTypeDomain>
+       <InputArrayDomain name="scale_array"
+                         number_of_components="1"
+                         optional="1" />
+     </InputProperty>
+      <IntVectorProperty command="SetAttributeType"
+                         default_values="0"
+                         name="AttributeType"
+                         number_of_elements="1">
+        <FieldDataDomain name="enum">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input" />
+          </RequiredProperties>
+        </FieldDataDomain>
+        <Documentation>This property determines on which types of field data the computation is to
+        be performed on.</Documentation>
+      </IntVectorProperty>
+      <StringVectorProperty command="SetXArrayName"
+                            name="XArrayName"
+                            label="X Array"
+                            number_of_elements="1">
+        <ArrayListDomain name="array_list"
+                         input_domain_name="scale_array">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input" />
+            <Property function="FieldDataSelection"
+                      name="AttributeType" />
+          </RequiredProperties>
+        </ArrayListDomain>
+        <Documentation>
+          This property indicates the name of the array with the X component.
+        </Documentation>
+      </StringVectorProperty>
+      <StringVectorProperty command="SetYArrayName"
+                            name="YArrayName"
+                            label="Y Array"
+                            number_of_elements="1">
+        <ArrayListDomain name="array_list"
+                         input_domain_name="scale_array">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input" />
+            <Property function="FieldDataSelection"
+                      name="AttributeType" />
+          </RequiredProperties>
+        </ArrayListDomain>
+        <Documentation>
+          This property indicates the name of the array with the Y component.
+        </Documentation>
+      </StringVectorProperty>
+      <StringVectorProperty command="SetZArrayName"
+                            name="ZArrayName"
+                            label="Z Array"
+                            number_of_elements="1">
+        <ArrayListDomain name="array_list"
+                         input_domain_name="scale_array">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input" />
+            <Property function="FieldDataSelection"
+                      name="AttributeType" />
+          </RequiredProperties>
+        </ArrayListDomain>
+        <Documentation>
+          This property indicates the name of the array with the Z component.
+        </Documentation>
+      </StringVectorProperty>
+      <StringVectorProperty command="SetOutputVectorName"
+                            default_values="Vector"
+                            name="OutputVectorName"
+                            number_of_elements="1">
+        <Documentation>This property contains the name for the output vector
+        containing the result of the merging.</Documentation>
+      </StringVectorProperty>
+      <!-- End MergeVectorComponents -->
+   </SourceProxy>
   </ProxyGroup>
 </ServerManagerConfiguration>
