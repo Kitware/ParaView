@@ -65,6 +65,12 @@ protected Q_SLOTS:
   void resetToCenterOfRotation();
   void pushFocalPlaneBack();
   void pullFocalPlaneForward();
+  void updateSaveRecordVisibility();
+  void saveQuilt();
+  void onRecordQuiltClicked();
+
+  void startRecordingQuilt();
+  void stopRecordingQuilt();
 
   void reset();
 
@@ -85,12 +91,18 @@ protected:
   vtkOpenGLRenderWindow* DisplayWindow = nullptr;
 
   bool RenderNextFrame = false;
+  bool IsRecording = false;
 
   QMap<pqRenderView*, vtkSMProxy*> ViewToSettingsMap;
 
   vtkSMProxy* getActiveCamera();
 
   vtkRenderWindow* getRenderWindow();
+
+  // Get the recommended suffix (without the extension) for a quilt
+  // file name, based upon the number of tiles. Example: "_qs5x9".
+  // This communicates the tile information to the LG software.
+  QString getQuiltFileSuffix();
 
   // Get the Looking Glass settings for the displayed view
   vtkSMProxy* getSettingsForView(pqRenderView* view);

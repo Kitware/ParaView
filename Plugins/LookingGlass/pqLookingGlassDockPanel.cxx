@@ -25,6 +25,7 @@
 
 #include "QVTKOpenGLWindow.h"
 #include <QDebug>
+#include <QMessageBox>
 #include <QOpenGLContext>
 #include <QOpenGLExtraFunctions>
 
@@ -122,15 +123,24 @@ void pqLookingGlassDockPanel::constructor()
   this->connect(ui.PushFocalPlaneBackButton, SIGNAL(clicked(bool)), SLOT(pushFocalPlaneBack()));
   this->connect(
     ui.PullFocalPlaneForwardButton, SIGNAL(clicked(bool)), SLOT(pullFocalPlaneForward()));
+  this->connect(ui.SaveQuilt, SIGNAL(clicked(bool)), SLOT(saveQuilt()));
+  this->connect(ui.RecordQuilt, SIGNAL(clicked(bool)), SLOT(onRecordQuiltClicked()));
 
   this->connect(activeObjects, SIGNAL(serverChanged(pqServer*)), SLOT(reset()));
 
   // Disable button if active view is not compatible with LG
   this->connect(activeObjects, SIGNAL(viewChanged(pqView*)), SLOT(activeViewChanged(pqView*)));
+
+  this->updateSaveRecordVisibility();
 }
 
 pqLookingGlassDockPanel::~pqLookingGlassDockPanel()
 {
+  if (this->IsRecording)
+  {
+    this->stopRecordingQuilt();
+  }
+
   this->freeDisplayWindowResources();
 
   auto pxm = pqActiveObjects::instance().proxyManager();
@@ -277,6 +287,12 @@ void pqLookingGlassDockPanel::onRender()
     endObserver->CopyTexture = this->CopyTexture;
     this->EndObserver = endObserver;
     this->DisplayWindow->AddObserver(vtkCommand::RenderEvent, this->EndObserver);
+
+    this->updateSaveRecordVisibility();
+
+    // Update the GUI with the interface values
+    auto& ui = this->Internal->Ui;
+    ui.QuiltExportMagnification->setValue(this->Interface->GetQuiltExportMagnification());
   }
 
   vtkCollectionSimpleIterator rsit;
@@ -381,6 +397,11 @@ void pqLookingGlassDockPanel::onRender()
     }
     f->glBlitFramebuffer(0, 0, renderSize[0], renderSize[1], destPos[0], destPos[1],
       destPos[0] + renderSize[0], destPos[1] + renderSize[1], GL_COLOR_BUFFER_BIT, GL_LINEAR);
+  }
+
+  if (this->IsRecording)
+  {
+    this->Interface->WriteQuiltMovieFrame();
   }
 
   // restore the original size
@@ -538,6 +559,99 @@ void pqLookingGlassDockPanel::pullFocalPlaneForward()
   //  focalPlaneMovementFactor * cameraDistance * (1.0 - nearClippingLimit));
   viewProxy->UpdateVTKObjects();
   this->View->render();
+}
+
+void pqLookingGlassDockPanel::updateSaveRecordVisibility()
+{
+  bool visible = this->Interface && this->DisplayWindow;
+
+  auto& ui = this->Internal->Ui;
+  ui.SaveQuilt->setVisible(visible);
+  ui.RecordQuilt->setVisible(visible);
+  ui.QuiltExportMagnificationLabel->setVisible(visible);
+  ui.QuiltExportMagnification->setVisible(visible);
+}
+
+QString pqLookingGlassDockPanel::getQuiltFileSuffix()
+{
+  int tiles[2];
+  this->Interface->GetQuiltTiles(tiles);
+
+  return QString("_qs%1x%2").arg(tiles[0]).arg(tiles[1]);
+}
+
+void pqLookingGlassDockPanel::saveQuilt()
+{
+  // Update the interface with the GUI values
+  auto& ui = this->Internal->Ui;
+  this->Interface->SetQuiltExportMagnification(ui.QuiltExportMagnification->value());
+
+  auto filename = "quilt" + this->getQuiltFileSuffix() + ".png";
+  this->Interface->SaveQuilt(this->DisplayWindow, filename.toUtf8().data());
+
+  auto text = QString("Saved to \"%1\"").arg(filename);
+  QMessageBox::information(this, "Quilt Saved", text);
+}
+
+void pqLookingGlassDockPanel::onRecordQuiltClicked()
+{
+  auto& ui = this->Internal->Ui;
+
+  if (!this->IsRecording)
+  {
+    this->startRecordingQuilt();
+    ui.RecordQuilt->setText("Stop Recording Quilt");
+  }
+  else
+  {
+    this->stopRecordingQuilt();
+    ui.RecordQuilt->setText("Record Quilt");
+  }
+}
+
+void pqLookingGlassDockPanel::startRecordingQuilt()
+{
+  if (!this->Interface || !this->DisplayWindow || this->IsRecording)
+  {
+    return;
+  }
+
+  // Update the interface with the GUI values
+  auto& ui = this->Internal->Ui;
+  this->Interface->SetQuiltExportMagnification(ui.QuiltExportMagnification->value());
+  ui.QuiltExportMagnificationLabel->setEnabled(false);
+  ui.QuiltExportMagnification->setEnabled(false);
+
+  auto suffix = this->getQuiltFileSuffix();
+  auto extension = this->Interface->MovieFileExtension();
+  auto filename = QString("quilt%1.%2").arg(suffix).arg(extension);
+
+  this->Interface->StartRecordingQuilt(this->DisplayWindow, filename.toUtf8().data());
+  this->IsRecording = true;
+
+  // Record the first frame...
+  onRender();
+}
+
+void pqLookingGlassDockPanel::stopRecordingQuilt()
+{
+  if (!this->Interface || !this->IsRecording)
+  {
+    return;
+  }
+
+  auto& ui = this->Internal->Ui;
+  ui.QuiltExportMagnificationLabel->setEnabled(true);
+  ui.QuiltExportMagnification->setEnabled(true);
+
+  this->Interface->StopRecordingQuilt();
+  this->IsRecording = false;
+
+  auto suffix = this->getQuiltFileSuffix();
+  auto extension = this->Interface->MovieFileExtension();
+  auto filename = QString("quilt%1.%2").arg(suffix).arg(extension);
+  auto text = QString("Saved to \"%1\"").arg(filename);
+  QMessageBox::information(this, "Quilt Saved", text);
 }
 
 vtkSMProxy* pqLookingGlassDockPanel::getActiveCamera()

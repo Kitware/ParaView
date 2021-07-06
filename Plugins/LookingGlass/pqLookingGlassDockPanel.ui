@@ -43,6 +43,55 @@
     </widget>
    </item>
    <item>
+    <widget class="QPushButton" name="SaveQuilt">
+     <property name="text">
+      <string>Save Quilt</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QPushButton" name="RecordQuilt">
+     <property name="text">
+      <string>Record Quilt</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="QuiltExportMagnificationLayout">
+     <item>
+      <widget class="QLabel" name="QuiltExportMagnificationLabel">
+       <property name="toolTip">
+        <string>Set the magnification for saving/recording quilts.
+
+Higher magnification will produce higher resolution files.
+
+The default is 2.</string>
+       </property>
+       <property name="text">
+        <string>Quilt Export Magnification:</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QSpinBox" name="QuiltExportMagnification">
+       <property name="toolTip">
+        <string>Set the magnification for saving/recording quilts.
+
+Higher magnification will produce higher resolution files.
+
+The default is 2.</string>
+       </property>
+       <property name="minimum">
+        <number>1</number>
+       </property>
+       <property name="value">
+        <number>2</number>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
     <spacer name="verticalSpacer">
      <property name="orientation">
       <enum>Qt::Vertical</enum>
