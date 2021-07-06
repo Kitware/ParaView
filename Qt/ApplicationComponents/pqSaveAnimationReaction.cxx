@@ -197,9 +197,4 @@ void pqSaveAnimationReaction::saveAnimation()
     widthLink->RemoveAllLinks();
     colorLink->RemoveAllLinks();
   }
-
-  // This should not be needed as image capturing code only affects back buffer,
-  // however it is currently needed due to paraview/paraview#17256. Once that's
-  // fixed, we should remove this.
-  pqApplicationCore::instance()->render();
 }

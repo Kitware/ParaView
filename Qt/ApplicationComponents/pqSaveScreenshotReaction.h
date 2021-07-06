@@ -65,7 +65,7 @@ public:
   * If clipboardMode is true, no advanced options are requested and the
   * screenshot is copied to the clipboard
   */
-  static void saveScreenshot(bool clipboardMode = false);
+  static bool saveScreenshot(bool clipboardMode = false);
 
   /**
   * Save a screenshot given the filename and image properties.

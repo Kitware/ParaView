@@ -127,20 +127,19 @@ QString pqSaveScreenshotReaction::promptFileName(
 }
 
 //-----------------------------------------------------------------------------
-void pqSaveScreenshotReaction::saveScreenshot(bool clipboardMode)
+bool pqSaveScreenshotReaction::saveScreenshot(bool clipboardMode)
 {
   SCOPED_UNDO_EXCLUDE();
   pqView* view = pqActiveObjects::instance().activeView();
   if (!view)
   {
     qDebug() << "Cannot save image. No active view.";
-    return;
+    return false;
   }
 
   if (clipboardMode)
   {
-    pqSaveScreenshotReaction::copyScreenshotToClipboard(view->getSize(), false);
-    return;
+    return pqSaveScreenshotReaction::copyScreenshotToClipboard(view->getSize(), false);
   }
 
   vtkSMViewProxy* viewProxy = view->getViewProxy();
@@ -152,14 +151,14 @@ void pqSaveScreenshotReaction::saveScreenshot(bool clipboardMode)
   if (!shProxy)
   {
     qCritical() << "Incorrect type for `SaveScreenshot` proxy.";
-    return;
+    return false;
   }
 
   // Get the filename first, this will determine some of the options shown.
   QString filename = pqSaveScreenshotReaction::promptFileName(shProxy, "*.png");
   if (filename.isEmpty())
   {
-    return;
+    return false;
   }
 
   bool restorePreviewMode = false;
@@ -234,10 +233,8 @@ void pqSaveScreenshotReaction::saveScreenshot(bool clipboardMode)
     widthLink->RemoveAllLinks();
     colorLink->RemoveAllLinks();
   }
-  // This should not be needed as image capturing code only affects back buffer,
-  // however it is currently needed due to paraview/paraview#17256. Once that's
-  // fixed, we should remove this.
-  pqApplicationCore::instance()->render();
+
+  return true;
 }
 
 //-----------------------------------------------------------------------------
