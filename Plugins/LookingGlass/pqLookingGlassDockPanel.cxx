@@ -25,6 +25,7 @@
 
 #include "QVTKOpenGLWindow.h"
 #include <QDebug>
+#include <QFileDialog>
 #include <QMessageBox>
 #include <QOpenGLContext>
 #include <QOpenGLExtraFunctions>
@@ -582,15 +583,51 @@ QString pqLookingGlassDockPanel::getQuiltFileSuffix()
 
 void pqLookingGlassDockPanel::saveQuilt()
 {
+  // Don't confirm overwrite, since we will be checking that later, after
+  // we ensure the right suffix is attached...
+  QString extension = ".png";
+  auto filepath = QFileDialog::getSaveFileName(this, "Save Quilt Image", "",
+    QString("Images (*%1)").arg(extension), nullptr, QFileDialog::DontConfirmOverwrite);
+  if (filepath.isEmpty())
+  {
+    // User canceled
+    return;
+  }
+
+  auto suffix = this->getQuiltFileSuffix() + extension;
+  if (!filepath.endsWith(suffix))
+  {
+    // We will add the suffix
+    if (filepath.endsWith(extension))
+    {
+      // Remove the extension, if it exists
+      filepath.chop(extension.size());
+    }
+    // Add the suffix
+    filepath += suffix;
+  }
+
+  if (QFile(filepath).exists())
+  {
+    auto title = QString("Overwrite file?");
+    auto text = QString("\"%1\" already exists.\n\n"
+                        "Would you like to overwrite it?")
+                  .arg(filepath);
+    if (QMessageBox::question(this, title, text) == QMessageBox::No)
+    {
+      // User does not want to over-write the file...
+      return;
+    }
+  }
+
   // Update the interface with the GUI values
   auto& ui = this->Internal->Ui;
   this->Interface->SetQuiltExportMagnification(ui.QuiltExportMagnification->value());
 
-  auto filename = "quilt" + this->getQuiltFileSuffix() + ".png";
-  this->Interface->SaveQuilt(this->DisplayWindow, filename.toUtf8().data());
+  this->Interface->SaveQuilt(this->DisplayWindow, filepath.toUtf8().data());
 
-  auto text = QString("Saved to \"%1\"").arg(filename);
-  QMessageBox::information(this, "Quilt Saved", text);
+  auto text = QString("Saved to \"%1\"").arg(filepath);
+  QMessageBox::information(this, "Quilt Saved", filepath);
 }
 
 void pqLookingGlassDockPanel::onRecordQuiltClicked()
@@ -600,11 +637,20 @@ void pqLookingGlassDockPanel::onRecordQuiltClicked()
   if (!this->IsRecording)
   {
     this->startRecordingQuilt();
-    ui.RecordQuilt->setText("Stop Recording Quilt");
   }
   else
   {
     this->stopRecordingQuilt();
+  }
+
+  // Update the text in a separate logic block, so we can see
+  // if the recording state actually changed.
+  if (this->IsRecording)
+  {
+    ui.RecordQuilt->setText("Stop Recording Quilt");
+  }
+  else
+  {
     ui.RecordQuilt->setText("Record Quilt");
   }
 }
@@ -616,18 +662,53 @@ void pqLookingGlassDockPanel::startRecordingQuilt()
     return;
   }
 
+  auto extension = QString(".%1").arg(this->Interface->MovieFileExtension());
+
+  // Don't confirm overwrite, since we will be checking that later, after
+  // we ensure the right suffix is attached...
+  auto filepath = QFileDialog::getSaveFileName(this, "Save Quilt Movie", "",
+    QString("Movies (*%1)").arg(extension), nullptr, QFileDialog::DontConfirmOverwrite);
+  if (filepath.isEmpty())
+  {
+    // User canceled
+    return;
+  }
+
+  auto suffix = this->getQuiltFileSuffix() + extension;
+  if (!filepath.endsWith(suffix))
+  {
+    // We will add the suffix
+    if (filepath.endsWith(extension))
+    {
+      // Remove the extension, if it exists
+      filepath.chop(extension.size());
+    }
+    // Add the suffix
+    filepath += suffix;
+  }
+
+  if (QFile(filepath).exists())
+  {
+    auto title = QString("Overwrite file?");
+    auto text = QString("\"%1\" already exists.\n\n"
+                        "Would you like to overwrite it?")
+                  .arg(filepath);
+    if (QMessageBox::question(this, title, text) == QMessageBox::No)
+    {
+      // User does not want to over-write the file...
+      return;
+    }
+  }
+
   // Update the interface with the GUI values
   auto& ui = this->Internal->Ui;
   this->Interface->SetQuiltExportMagnification(ui.QuiltExportMagnification->value());
   ui.QuiltExportMagnificationLabel->setEnabled(false);
   ui.QuiltExportMagnification->setEnabled(false);
 
-  auto suffix = this->getQuiltFileSuffix();
-  auto extension = this->Interface->MovieFileExtension();
-  auto filename = QString("quilt%1.%2").arg(suffix).arg(extension);
-
-  this->Interface->StartRecordingQuilt(this->DisplayWindow, filename.toUtf8().data());
+  this->Interface->StartRecordingQuilt(this->DisplayWindow, filepath.toUtf8().data());
   this->IsRecording = true;
+  this->MovieFilepath = filepath;
 
   // Record the first frame...
   onRender();
@@ -646,11 +727,10 @@ void pqLookingGlassDockPanel::stopRecordingQuilt()
 
   this->Interface->StopRecordingQuilt();
   this->IsRecording = false;
+  auto filepath = this->MovieFilepath;
+  this->MovieFilepath.clear();
 
-  auto suffix = this->getQuiltFileSuffix();
-  auto extension = this->Interface->MovieFileExtension();
-  auto filename = QString("quilt%1.%2").arg(suffix).arg(extension);
-  auto text = QString("Saved to \"%1\"").arg(filename);
+  auto text = QString("Saved to \"%1\"").arg(filepath);
   QMessageBox::information(this, "Quilt Saved", text);
 }
 

@@ -92,6 +92,7 @@ protected:
 
   bool RenderNextFrame = false;
   bool IsRecording = false;
+  QString MovieFilepath;
 
   QMap<pqRenderView*, vtkSMProxy*> ViewToSettingsMap;
 
