@@ -187,7 +187,7 @@
       <string>Edit interactive selection label properties</string>
      </property>
      <property name="text">
-      <string>Edit Label Properties</string>
+      <string>Edit Interactive Label Properties</string>
      </property>
      <property name="icon">
       <iconset resource="../pqComponents.qrc">

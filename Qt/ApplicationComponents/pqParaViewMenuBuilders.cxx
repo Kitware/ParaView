@@ -642,13 +642,13 @@ void pqParaViewMenuBuilders::buildHelpMenu(QMenu& menu)
                           .arg(vtkSMProxyManager::GetVersionMajor())
                           .arg(vtkSMProxyManager::GetVersionMinor())
                           .arg(vtkSMProxyManager::GetVersionPatch());
-  new pqDesktopServicesReaction(
-    QUrl(tutorialURL), (menu.addAction(QIcon(":/pqWidgets/Icons/pdf.png"), "ParaView Tutorial")
-                         << pqSetName("actionTutorialNotes")));
+  new pqDesktopServicesReaction(QUrl(tutorialURL),
+    (menu.addAction(QIcon(":/pqWidgets/Icons/pdf.png"), "ParaView Self-directed Tutorial")
+                                  << pqSetName("actionTutorialNotes")));
 
   // Sandia National Labs Tutorials
   new pqDesktopServicesReaction(QUrl("http://www.paraview.org/Wiki/SNL_ParaView_4_Tutorials"),
-    (menu.addAction("Sandia National Labs Tutorials") << pqSetName("actionSNLTutorial")));
+    (menu.addAction("ParaView Classroom Tutorials") << pqSetName("actionClassroomTutorial")));
 
   // Example Data Sets
 
