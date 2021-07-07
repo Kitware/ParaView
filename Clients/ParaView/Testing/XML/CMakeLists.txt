@@ -1878,7 +1878,7 @@ set(texture_buffer_exceeding_hardware_tests
 )
 
 foreach(test_name IN LISTS texture_buffer_exceeding_hardware_tests)
-  foreach(prefix IN LISTS pv pvcs pvcrs)
+  foreach(prefix IN ITEMS pv pvcs pvcrs)
     if (TEST "${prefix}.${test_name}")
       set_property(TEST "${prefix}.${test_name}" APPEND PROPERTY
         SKIP_REGULAR_EXPRESSION "Attempt to use a texture buffer exceeding your hardware")
