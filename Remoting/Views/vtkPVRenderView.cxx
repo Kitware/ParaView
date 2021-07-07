@@ -2626,6 +2626,12 @@ void vtkPVRenderView::UpdateBackground(vtkRenderer* renderer /*=nullptr*/)
       renderer->SetUseImageBasedLighting(this->UseEnvironmentLighting);
       break;
 
+    case STEREO_SKYBOX:
+      renderer->SetTexturedBackground(false);
+      renderer->SetGradientBackground(false);
+      renderer->SetUseImageBasedLighting(this->UseEnvironmentLighting);
+      break;
+
     default:
       break;
   }
@@ -2635,12 +2641,16 @@ void vtkPVRenderView::UpdateBackground(vtkRenderer* renderer /*=nullptr*/)
 
   // update skybox texture.
   vtkTexture* texture = renderer->GetBackgroundTexture();
-  if (this->BackgroundColorMode == vtkPVRenderView::SKYBOX && texture != nullptr)
+  if ((this->BackgroundColorMode == vtkPVRenderView::STEREO_SKYBOX ||
+        this->BackgroundColorMode == vtkPVRenderView::SKYBOX) &&
+    texture != nullptr)
   {
     this->ConfigureTexture(texture);
 
     this->Skybox->GammaCorrectOn();
-    this->Skybox->SetProjection(vtkSkybox::Sphere);
+    this->Skybox->SetProjection(this->BackgroundColorMode == vtkPVRenderView::SKYBOX
+        ? vtkSkybox::Sphere
+        : vtkSkybox::StereoSphere);
     this->Skybox->SetFloorRight(0.0, 0.0, 1.0);
     this->Skybox->SetTexture(texture);
     this->Skybox->SetVisibility(1);

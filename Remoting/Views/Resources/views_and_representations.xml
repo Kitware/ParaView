@@ -2659,6 +2659,7 @@
           <Entry text="Gradient" value="1" />
           <Entry text="Texture" value="2" />
           <Entry text="Skybox" value="3" />
+          <Entry text="Stereo Skybox" value="4" />
         </EnumerationDomain>
         <Documentation>
           Select the background for the view.
@@ -2676,7 +2677,7 @@
         <Hints>
           <!-- hide widget unless mode is "Texture" or "Skybox" -->
           <PropertyWidgetDecorator type="GenericDecorator" mode="visibility"
-            property="BackgroundColorMode" values="2 3" />
+            property="BackgroundColorMode" values="2 3 4" />
           <PropertyWidgetDecorator type="GenericDecorator" mode="enabled_state"
             property="UseColorPaletteForBackground" values="0" />
         </Hints>
