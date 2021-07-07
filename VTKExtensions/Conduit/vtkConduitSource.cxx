@@ -92,6 +92,10 @@ int GetCellType(const std::string& shape)
   {
     return VTK_POLYHEDRON;
   }
+  else if (shape == "polygonal")
+  {
+    return VTK_POLYGON;
+  }
   else
   {
     throw std::runtime_error("unsupported shape " + shape);
@@ -294,6 +298,15 @@ vtkSmartPointer<vtkDataSet> GetMesh(
       // currently, this is an ugly deep-copy. Once vtkUnstructuredGrid is modified
       // as proposed here (vtk/vtk#18190), this will get simpler.
       SetPolyhedralCells(ug, elements, subelements);
+    }
+    else if (vtk_cell_type == VTK_POLYGON)
+    {
+      // polygons use O2M and not M2C arrays, so need to process it
+      // differently.
+      conduit_cpp::Node t_elements = topologyNode["elements"];
+      auto cellArray = vtkConduitArrayUtilities::O2MRelationToVTKCellArray(
+        conduit_cpp::c_node(&t_elements), "connectivity");
+      ug->SetCells(vtk_cell_type, cellArray);
     }
     else
     {
