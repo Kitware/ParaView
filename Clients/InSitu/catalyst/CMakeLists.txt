@@ -1,9 +1,6 @@
-if (NOT BUILD_SHARED_LIBS)
-  message(AUTHOR_WARNING
-    "Compiling the Catalyst implementation as shared due to a lack of static "
-    "build support in Catalyst itself..")
-  set(BUILD_SHARED_LIBS ON)
-endif ()
+# XXX(catalyst-static): Catalyst does not implement the logic to build and
+# import plugins statically yet. Force shared libraries for now.
+set(BUILD_SHARED_LIBS ON)
 
 if (WIN32)
   set(catalyst_library_destination

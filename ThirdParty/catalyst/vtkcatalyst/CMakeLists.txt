@@ -4,7 +4,10 @@ if (NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/catalyst/CMakeLists.txt")
     "run 'git submodule update --init --recursive' in the source directory.")
 endif()
 
-set(CATALYST_BUILD_SHARED_LIBS "${BUILD_SHARED_LIBS}")
+# XXX(catalyst-static): Catalyst does not implement the logic to build and
+# import plugins statically yet. Force shared libraries for now.
+#set(CATALYST_BUILD_SHARED_LIBS "${BUILD_SHARED_LIBS}")
+set(CATALYST_BUILD_SHARED_LIBS ON)
 set(CATALYST_BUILD_TESTING OFF)
 
 # Always ship the stub implementation.
