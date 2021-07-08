@@ -43,6 +43,14 @@ if (BUILD_TESTING)
   include(CTest)
 endif()
 
+# Static builds take a lot of memory to link. Avoid stampeding them all at
+# once.
+if (NOT BUILD_SHARED_LIBS)
+  set_property(GLOBAL APPEND PROPERTY
+    JOB_POOLS serialize=1)
+  set(CMAKE_JOB_POOL_LINK serialize)
+endif ()
+
 add_subdirectory(CFullExample)
 add_subdirectory(CFullExample2)
 add_subdirectory(CxxFullExample)
