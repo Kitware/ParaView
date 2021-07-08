@@ -909,6 +909,9 @@ paraview_add_plugin(<name>
   [EULA <eula>]
   [XML_DOCUMENTATION <ON|OFF>]
   [DOCUMENTATION_DIR <directory>]
+  [DOCUMENTATION_ADD_PATTERNS <pattern>...]
+  [DOCUMENTATION_TOC <string>]
+  [DOCUMENTATION_DEPENDENCIES <target>...]
 
   [FORCE_STATIC <ON|OFF>])
 ```
@@ -939,9 +942,15 @@ paraview_add_plugin(<name>
     before the plugin is initialized at runtime.
   * `XML_DOCUMENTATION`: (Defaults to `ON`) If set, documentation will be
     generated for the associated XML files.
-  * `DOCUMENTATION_DIR`: If specified, `*.html`, `*.css`, `*.png`, and `*.jpg`
+  * `DOCUMENTATION_DIR`: If specified, `*.html`, `*.css`, `*.png`, `*.js`, and `*.jpg`
     files in this directory will be copied and made available to the
     documentation.
+  * `DOCUMENTATION_ADD_PATTERNS`: If specified, adds patterns for the documentation files
+    within `DOCUMENTATION_DIR` other than the default ones (see `DOCUMENTATION_DIR` help)
+  * `DOCUMENTATION_TOC`: If specified, use this string for describing the table of
+    content for the documentation.
+  * `DOCUMENTATION_DEPENDENCIES`: Targets that are needed to be built before
+    building the documentation.
   * `EXPORT`: (Deprecated) Use `paraview_plugin_build(INSTALL_EXPORT)` instead.
   * `FORCE_STATIC`: (Defaults to `OFF`) If set, the plugin will be built
     statically so that it can be embedded into an application.
@@ -955,8 +964,8 @@ function (paraview_add_plugin name)
 
   cmake_parse_arguments(_paraview_add_plugin
     "REQUIRED_ON_SERVER;REQUIRED_ON_CLIENT"
-    "VERSION;EULA;EXPORT;MODULE_INSTALL_EXPORT;XML_DOCUMENTATION;DOCUMENTATION_DIR;FORCE_STATIC"
-    "REQUIRED_PLUGINS;SERVER_MANAGER_XML;SOURCES;MODULES;UI_INTERFACES;UI_RESOURCES;UI_FILES;PYTHON_MODULES;MODULE_FILES;MODULE_ARGS"
+    "VERSION;EULA;EXPORT;MODULE_INSTALL_EXPORT;XML_DOCUMENTATION;DOCUMENTATION_DIR;FORCE_STATIC;DOCUMENTATION_TOC"
+    "REQUIRED_PLUGINS;SERVER_MANAGER_XML;SOURCES;MODULES;UI_INTERFACES;UI_RESOURCES;UI_FILES;PYTHON_MODULES;MODULE_FILES;MODULE_ARGS;DOCUMENTATION_ADD_PATTERNS;DOCUMENTATION_DEPENDENCIES"
     ${ARGN})
 
   if (_paraview_add_plugin_UNPARSED_ARGUMENTS)
@@ -1183,13 +1192,16 @@ function (paraview_add_plugin name)
     endif ()
 
     paraview_client_generate_help(
-      NAME        "${_paraview_build_plugin}"
-      OUTPUT_PATH _paraview_build_plugin_qch_path
-      OUTPUT_DIR  "${_paraview_build_plugin_docdir}"
-      TARGET      "${_paraview_build_plugin}_qch"
-      ${_paraview_build_plugin_doc_source_args}
-      DEPENDS     "${_paraview_build_plugin}_doc"
-      PATTERNS    "*.html" "*.css" "*.png" "*.jpg" "*.js")
+      NAME              "${_paraview_build_plugin}"
+      OUTPUT_PATH        _paraview_build_plugin_qch_path
+      OUTPUT_DIR        "${_paraview_build_plugin_docdir}"
+      TARGET            "${_paraview_build_plugin}_qch"
+                        ${_paraview_build_plugin_doc_source_args}
+      TABLE_OF_CONTENTS "${_paraview_add_plugin_DOCUMENTATION_TOC}"
+      DEPENDS           "${_paraview_build_plugin}_doc"
+                        "${_paraview_add_plugin_DOCUMENTATION_DEPENDENCIES}"
+      PATTERNS          "*.html" "*.css" "*.png" "*.jpg" "*.js"
+                        ${_paraview_add_plugin_DOCUMENTATION_ADD_PATTERNS})
 
     list(APPEND _paraview_add_plugin_extra_include_dirs
       "${CMAKE_CURRENT_BINARY_DIR}")
