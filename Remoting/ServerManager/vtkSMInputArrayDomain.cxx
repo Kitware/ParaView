@@ -141,26 +141,15 @@ bool vtkSMInputArrayDomain::IsAttributeTypeAcceptable(
     *acceptable_as_type = attribute_type;
   }
 
-  if (required_type == ANY)
+  if (required_type == ANY_EXCEPT_FIELD && attribute_type == FIELD)
+  {
+    return false;
+  }
+
+  if (required_type == ANY || required_type == ANY_EXCEPT_FIELD)
   {
     return attribute_type == POINT || attribute_type == CELL || attribute_type == FIELD ||
       attribute_type == EDGE || attribute_type == VERTEX || attribute_type == ROW;
-  }
-
-  if (required_type == ANY_EXCEPT_FIELD)
-  {
-    // Try out all attribute types except field data sequentially.
-    int attribute_types_to_try[] = { vtkDataObject::POINT, vtkDataObject::CELL,
-      vtkDataObject::VERTEX, vtkDataObject::EDGE, vtkDataObject::ROW, -1 };
-    for (int cc = 0; attribute_types_to_try[cc] != -1; ++cc)
-    {
-      if (vtkSMInputArrayDomain::IsAttributeTypeAcceptable(
-            attribute_types_to_try[cc], attribute_type, acceptable_as_type))
-      {
-        return true;
-      }
-    }
-    return false;
   }
 
   switch (attribute_type)
