@@ -330,7 +330,7 @@ enum catalyst_error catalyst_about_paraview(conduit_node* params)
   {
     cpp_params["catalyst"]["capabilities"].append().set("python");
   }
-  cpp_params["catalyst"]["implementation"] = "ParaView Catalyst";
+  cpp_params["catalyst"]["implementation"] = "paraview";
 
   return catalyst_error_ok;
 }
