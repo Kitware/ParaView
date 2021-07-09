@@ -253,7 +253,7 @@ void vtkVRGrabTransformStyle::HandleTracker(const vtkVREvent& event)
       this->SavedInverseWandMatrix->DeepCopy(event.data.tracker.matrix);
 
 #if 1
-      if (isnan(speed))
+      if (std::isnan(speed))
       {
         fprintf(stderr, "Hey, 'speed' is not-a-number! -- last value was %f\n", lastspeed);
       }
@@ -283,7 +283,7 @@ void vtkVRGrabTransformStyle::HandleTracker(const vtkVREvent& event)
       vtkNew<vtkMatrix4x4> transformMatrix;
       transformMatrix->DeepCopy(event.data.tracker.matrix);
 #if 1
-      if (isnan(speed))
+      if (std::isnan(speed))
       {
         fprintf(stderr, "Hey, 'speed' is not-a-number! -- last value was %f\n", lastspeed);
       }
