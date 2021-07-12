@@ -14,16 +14,32 @@
 =========================================================================*/
 #include "vtkInSituInitializationHelper.h"
 
+#include "vtkArrayDispatch.h"
 #include "vtkCPCxxHelper.h"
+#include "vtkCallbackCommand.h"
+#include "vtkConduitSource.h"
+#include "vtkDataArrayAccessor.h"
+#include "vtkFieldData.h"
 #include "vtkInSituPipelinePython.h"
+#include "vtkMultiBlockDataSet.h"
 #include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
 #include "vtkPSystemTools.h"
 #include "vtkPVLogger.h"
+#include "vtkPVXMLElement.h"
+#include "vtkPartitionedDataSet.h"
+#include "vtkPointSet.h"
+#include "vtkSMDoubleVectorProperty.h"
+#include "vtkSMIdTypeVectorProperty.h"
+#include "vtkSMIntVectorProperty.h"
 #include "vtkSMParaViewPipelineController.h"
+#include "vtkSMProxyManager.h"
+#include "vtkSMSessionProxyManager.h"
 #include "vtkSMSourceProxy.h"
 #include "vtkSmartPointer.h"
+#include "vtkSteeringDataGenerator.h"
 
+#include <algorithm>
 #include <map>
 #include <string>
 
@@ -55,11 +71,89 @@ public:
   vtkSmartPointer<vtkCPCxxHelper> CPCxxHelper;
   std::map<std::string, vtkSmartPointer<vtkSMSourceProxy> > Producers;
   std::vector<PipelineInfo> Pipelines;
+  std::map<vtkSMProxy*, std::string> SteerableProxies;
 
   bool InExecutePipelines = false;
   int TimeStep = 0;
   double Time = 0.0;
+
+  vtkNew<vtkCallbackCommand> ProxyRegistered;
+  vtkNew<vtkCallbackCommand> ProxyUnregistered;
 };
+
+bool is_proxy_prototype(const std::string& group_name)
+{
+  return group_name.size() > 11 && group_name.substr(group_name.size() - 11, 11) == "_prototypes";
+}
+
+void proxy_registered(vtkObject*, unsigned long, void* clientdata, void* calldata)
+{
+  if (auto proxy_info = static_cast<vtkSMProxyManager::RegisteredProxyInformation*>(calldata))
+  {
+    if (auto proxy = proxy_info->Proxy)
+    {
+      if (auto className = proxy->GetVTKClassName())
+      {
+        if (std::string(className) == "vtkSteeringDataGenerator" &&
+          !is_proxy_prototype(proxy_info->GroupName))
+        {
+          vtkInSituInitializationHelper::AddSteerableProxy(proxy, proxy_info->ProxyName);
+        }
+      }
+    }
+  }
+}
+
+void proxy_unregistered(vtkObject*, unsigned long, void* clientdata, void* calldata)
+{
+  if (auto proxy_info = static_cast<vtkSMProxyManager::RegisteredProxyInformation*>(calldata))
+  {
+    if (auto proxy = proxy_info->Proxy)
+    {
+      if (auto className = proxy->GetVTKClassName())
+      {
+        if (std::string(className) == "vtkSteeringDataGenerator")
+        {
+          vtkInSituInitializationHelper::RemoveSteerableProxy(proxy);
+        }
+      }
+    }
+  }
+}
+
+template <typename PropertyType>
+struct PropertyCopier
+{
+  PropertyType* SMProperty = nullptr;
+
+  template <typename ArrayType>
+  void operator()(ArrayType* array)
+  {
+    const vtkIdType numTuples = array->GetNumberOfTuples();
+    const int numComponents = array->GetNumberOfComponents();
+    this->SMProperty->SetNumberOfElements(static_cast<unsigned int>(numTuples * numComponents));
+    vtkDataArrayAccessor<ArrayType> a(array);
+    for (vtkIdType cc = 0; cc < numTuples; ++cc)
+    {
+      for (int comp = 0; comp < numComponents; ++comp)
+      {
+        this->SMProperty->SetElement(cc * numComponents + comp, a.Get(cc, comp));
+      }
+    }
+  }
+};
+
+template <typename T>
+void SetPropertyValue(T* prop, vtkDataArray* array)
+{
+  PropertyCopier<T> copier;
+  copier.SMProperty = prop;
+  using Dispatcher = vtkArrayDispatch::DispatchByValueType<vtkArrayDispatch::AllTypes>;
+  if (!Dispatcher::Execute(array, copier))
+  {
+    copier(array);
+  }
+}
 
 int vtkInSituInitializationHelper::WasInitializedOnce;
 int vtkInSituInitializationHelper::WasFinalizedOnce;
@@ -118,6 +212,16 @@ void vtkInSituInitializationHelper::Initialize(vtkTypeUInt64 comm)
   // for now, I am using vtkCPCxxHelper; that class should be removed when we
   // deprecate Legacy Catalyst API.
   internals.CPCxxHelper.TakeReference(vtkCPCxxHelper::New());
+
+  auto session_proxy_manager = vtkSMProxyManager::GetProxyManager()->GetActiveSessionProxyManager();
+
+  internals.ProxyRegistered->SetClientData(&internals);
+  internals.ProxyRegistered->SetCallback(proxy_registered);
+  session_proxy_manager->AddObserver(vtkCommand::RegisterEvent, internals.ProxyRegistered);
+
+  internals.ProxyUnregistered->SetClientData(&internals);
+  internals.ProxyUnregistered->SetCallback(proxy_unregistered);
+  session_proxy_manager->AddObserver(vtkCommand::UnRegisterEvent, internals.ProxyUnregistered);
 
 #if VTK_MODULE_ENABLE_ParaView_PythonCatalyst
   // register static Python modules built, if any.
@@ -329,8 +433,167 @@ bool vtkInSituInitializationHelper::ExecutePipelines(
     }
   }
 
+  UpdateSteerableProxies();
+
   internals.InExecutePipelines = false;
   return true;
+}
+
+//----------------------------------------------------------------------------
+int vtkInSituInitializationHelper::GetAttributeTypeFromString(std::string assocStr, int& assoc)
+{
+  unsigned int n = assocStr.size();
+  for (unsigned int i = 0; i < n; ++i)
+    assocStr[i] = tolower(assocStr[i]);
+
+  if (assocStr == "point")
+  {
+    assoc = vtkDataObject::POINT;
+    return 0;
+  }
+  else if (assocStr == "cell")
+  {
+    assoc = vtkDataObject::CELL;
+    return 0;
+  }
+  else if (assocStr == "field")
+  {
+    assoc = vtkDataObject::FIELD;
+    return 0;
+  }
+
+  vtkLog(ERROR, "Invalid association \"" << assocStr << "\"") return -1;
+}
+
+//----------------------------------------------------------------------------
+void vtkInSituInitializationHelper::UpdateSteerableProxies()
+{
+  auto& internals = (*vtkInSituInitializationHelper::Internals);
+
+  for (auto& steerable_proxies : internals.SteerableProxies)
+  {
+    auto hints = steerable_proxies.first->GetHints();
+    if (!hints)
+    {
+      continue;
+    }
+    auto mesh_hint = hints->FindNestedElementByName("CatalystInitializePropertiesWithMesh");
+    if (!mesh_hint)
+    {
+      continue;
+    }
+
+    auto mesh_name = mesh_hint->GetAttribute("mesh");
+    if (!mesh_name)
+    {
+      vtkLog(ERROR, "`CatalystInitializePropertiesWithMesh` missing 'mesh' attribute.");
+      continue;
+    }
+
+    auto source_iterator = internals.Producers.find(mesh_name);
+    if (source_iterator == internals.Producers.end())
+    {
+      vtkLog(ERROR, << "No mesh named '" << mesh_name << "' present.");
+      continue;
+    }
+
+    auto conduit_source =
+      vtkConduitSource::SafeDownCast(source_iterator->second->GetClientSideObject());
+    if (!conduit_source)
+    {
+      vtkLog(ERROR, << "No vtkConduitSource proxy!");
+      continue;
+    }
+
+    conduit_source->Update();
+
+    auto partitioned_data_set = vtkPartitionedDataSet::SafeDownCast(conduit_source->GetOutput());
+    if (!partitioned_data_set)
+    {
+      vtkLog(ERROR, << "No vtkMultiBlockDataSet mesh.");
+      continue;
+    }
+
+    if (partitioned_data_set->GetNumberOfPartitions() == 0)
+    {
+      vtkLog(ERROR, "Empty partitioned data set '" << mesh_name << "'.");
+      continue;
+    }
+
+    auto grid = partitioned_data_set->GetPartition(0);
+    if (!grid)
+    {
+      vtkLog(ERROR, "Empty grid received for mesh named '" << mesh_name << "'.");
+      continue;
+    }
+
+    for (unsigned int cc = 0, max = mesh_hint->GetNumberOfNestedElements(); cc < max; ++cc)
+    {
+      auto child = mesh_hint->GetNestedElement(cc);
+      if (child == nullptr || child->GetName() == nullptr ||
+        strcmp(child->GetName(), "Property") != 0)
+      {
+        continue;
+      }
+      if (!child->GetAttribute("name") || !child->GetAttribute("array"))
+      {
+        vtkLog(ERROR, "Missing required attribute on `Property` element. Skipping.");
+        continue;
+      }
+
+      auto property = steerable_proxies.first->GetProperty(child->GetAttribute("name"));
+      if (!property)
+      {
+        vtkLog(ERROR, "No property named '" << child->GetAttribute("name")
+                                            << "' "
+                                               "present on proxy. Skipping.");
+        continue;
+      }
+
+      int assoc = 0;
+      if (GetAttributeTypeFromString(child->GetAttributeOrDefault("association", "point"), assoc))
+      {
+        vtkLog(ERROR, "Invalid 'association' specified. Skipping.");
+        continue;
+      }
+      auto arrayname = child->GetAttribute("array");
+      auto fd = grid->GetAttributesAsFieldData(assoc);
+      vtkDataArray* array = fd ? fd->GetArray(arrayname) : nullptr;
+      if (strcmp(arrayname, "coords") == 0 && vtkPointSet::SafeDownCast(grid) &&
+        assoc == vtkDataObject::POINT)
+      {
+        array = vtkPointSet::SafeDownCast(grid)->GetPoints()->GetData();
+      }
+      if (!array)
+      {
+        vtkLog(ERROR, "No array named '" << arrayname << "' present. Skipping.");
+        continue;
+      }
+
+      if (array)
+      {
+        if (auto dp = vtkSMDoubleVectorProperty::SafeDownCast(property))
+        {
+          SetPropertyValue<vtkSMDoubleVectorProperty>(dp, array);
+        }
+        else if (auto ip = vtkSMIntVectorProperty::SafeDownCast(property))
+        {
+          SetPropertyValue<vtkSMIntVectorProperty>(ip, array);
+        }
+        else if (auto idp = vtkSMIdTypeVectorProperty::SafeDownCast(property))
+        {
+          SetPropertyValue<vtkSMIdTypeVectorProperty>(idp, array);
+        }
+        else
+        {
+          vtkLog(ERROR, "Properties of type '" << property->GetClassName()
+                                               << "' "
+                                                  "are not supported. Skipping.");
+          continue;
+        }
+      }
+    }
+  }
 }
 
 //----------------------------------------------------------------------------
@@ -405,4 +668,48 @@ bool vtkInSituInitializationHelper::IsPythonSupported()
 void vtkInSituInitializationHelper::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
+}
+
+//----------------------------------------------------------------------------
+void vtkInSituInitializationHelper::AddSteerableProxy(
+  vtkSMProxy* steeringDataGenerator, const char* name)
+{
+  if (vtkInSituInitializationHelper::Internals != nullptr && steeringDataGenerator != nullptr)
+  {
+    vtkInSituInitializationHelper::Internals->SteerableProxies.insert(
+      std::make_pair(steeringDataGenerator, std::string(name)));
+  }
+}
+
+//----------------------------------------------------------------------------
+void vtkInSituInitializationHelper::RemoveSteerableProxy(vtkSMProxy* steeringDataGenerator)
+{
+  if (vtkInSituInitializationHelper::Internals != nullptr && steeringDataGenerator != nullptr)
+  {
+    auto internals = vtkInSituInitializationHelper::Internals;
+    /*auto iterator = std::find(internals->SteerableProxies.begin(),
+      internals->SteerableProxies.end(), steeringDataGenerator);*/
+    auto iterator = internals->SteerableProxies.find(steeringDataGenerator);
+    if (iterator != internals->SteerableProxies.end())
+    {
+      internals->SteerableProxies.erase(iterator);
+    }
+  }
+}
+
+//----------------------------------------------------------------------------
+void vtkInSituInitializationHelper::GetSteerableProxies(
+  std::vector<std::pair<std::string, vtkSMProxy*> >& proxies)
+{
+  if (vtkInSituInitializationHelper::Internals != nullptr)
+  {
+    auto internals = vtkInSituInitializationHelper::Internals;
+    proxies.reserve(internals->SteerableProxies.size());
+    for (auto& proxy : internals->SteerableProxies)
+    {
+      proxies.push_back(std::make_pair(proxy.second, proxy.first));
+    }
+    /*std::copy(
+      internals->SteerableProxies.begin(), internals->SteerableProxies.end(), proxies.begin());*/
+  }
 }

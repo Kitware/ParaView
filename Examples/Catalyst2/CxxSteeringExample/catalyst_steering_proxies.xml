@@ -1,0 +1,106 @@
+<ServerManagerConfiguration>
+  <!-- <ProxyGroup name="sensei_internals">
+    <Proxy name="OscillatorPrototype" label="Oscillator" >
+      <DoubleVectorProperty name="Center"
+                            number_of_elements="3"
+                            default_values="0 0 0">
+        <DoubleRangeDomain name="range" />
+        <Documentation>
+          Specify center for the oscillator.
+        </Documentation>
+      </DoubleVectorProperty>
+
+      <IntVectorProperty name="Type"
+                         number_of_elements="1"
+                         default_values="0">
+        <EnumerationDomain name="enum">
+          <Entry text="damped" value="0" />
+          <Entry text="decaying" value="1" />
+          <Entry text="periodic" value="2" />
+        </EnumerationDomain>
+      </IntVectorProperty>
+
+      <DoubleVectorProperty name="Radius"
+                            number_of_elements="1"
+                            default_values="0">
+        <DoubleRangeDomain name="range"/>
+        <Documentation>
+          Radius for the oscillator.
+        </Documentation>
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty name="Omega0"
+                            number_of_elements="1"
+                            default_values="0">
+        <DoubleRangeDomain name="range"/>
+        <Documentation>
+          Omega0 for the oscillator.
+        </Documentation>
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty name="Zeta"
+                            number_of_elements="1"
+                            default_values="0">
+        <DoubleRangeDomain name="range"/>
+        <Documentation>
+          Zeta for the oscillator.
+        </Documentation>
+      </DoubleVectorProperty>
+    </Proxy>
+  </ProxyGroup>-->
+
+  <ProxyGroup name="sources">
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkSteeringDataGenerator" name="SteerableParameters">
+
+      <IntVectorProperty name="PartitionType"
+                         command="SetPartitionType"
+                         number_of_elements="1"
+                         default_values="0"
+                         panel_visibility="never">
+      </IntVectorProperty>
+
+      <IntVectorProperty name="FieldAssociation"
+                         command="SetFieldAssociation"
+                         number_of_elements="1"
+                         default_values="0"
+                         panel_visibility="never">
+      </IntVectorProperty>
+
+      <DoubleVectorProperty name="TestProperty"
+                      command="SetTuple1Double"
+                      use_index="1"
+                      clean_command="Clear"
+                      initial_string="timestep"
+                      number_of_elements_per_command="1"
+                      default_values="100"/>
+<!--
+        <DoubleVectorProperty name="Center"
+                              command="SetTuple3Double"
+                              use_index="1"
+                              clean_command="Clear"
+                              initial_string="coords"
+                              number_of_elements_per_command="3" />
+
+        <IdTypeVectorProperty name="Id"
+                              command="SetTuple2IdType"
+                              clean_command="Clear"
+                              use_index="1"
+                              initial_string="Id"
+                              number_of_elements_per_command="2" />
+
+        <IntVectorProperty name="Type"
+                           command="SetTuple1Int"
+                           clean_command="Clear"
+                           use_index="1"
+                           initial_string="Type"
+                           number_of_elements_per_command="1" />-->
+       <Hints>
+         <CatalystInitializePropertiesWithMesh mesh="steerable">
+           <Property name="TestProperty" association="cell" array="steerable" />
+         </CatalystInitializePropertiesWithMesh>
+       </Hints>
+
+    </SourceProxy>
+  </ProxyGroup>
+</ServerManagerConfiguration>
