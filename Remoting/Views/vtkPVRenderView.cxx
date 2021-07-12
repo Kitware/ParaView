@@ -69,10 +69,10 @@
 #include "vtkPVSession.h"
 #include "vtkPVStreamingMacros.h"
 #include "vtkPVSynchronizedRenderer.h"
+#include "vtkPVTrackballEnvironmentRotate.h"
 #include "vtkPVTrackballMultiRotate.h"
 #include "vtkPVTrackballRoll.h"
 #include "vtkPVTrackballRotate.h"
-#include "vtkPVTrackballSkyboxRotate.h"
 #include "vtkPVTrackballZoom.h"
 #include "vtkPVTrackballZoomToMouse.h"
 #include "vtkPVView.h"
@@ -513,6 +513,7 @@ vtkPVRenderView::vtkPVRenderView()
 
   // Add skybox actor.
   this->GetRenderer()->AddActor(this->Skybox);
+  this->Skybox->GammaCorrectOn();
   this->Skybox->SetVisibility(0);
 }
 
@@ -2649,11 +2650,16 @@ void vtkPVRenderView::UpdateBackground(vtkRenderer* renderer /*=nullptr*/)
   {
     this->ConfigureTexture(texture);
 
-    this->Skybox->GammaCorrectOn();
     this->Skybox->SetProjection(this->BackgroundColorMode == vtkPVRenderView::SKYBOX
         ? vtkSkybox::Sphere
         : vtkSkybox::StereoSphere);
-    this->Skybox->SetFloorRight(0.0, 0.0, 1.0);
+    // Update skybox orientation from renderer orientation
+    double* up = renderer->GetEnvironmentUp();
+    double* right = renderer->GetEnvironmentRight();
+    double front[3];
+    vtkMath::Cross(right, up, front);
+    this->Skybox->SetFloorRight(front[0], front[1], front[2]);
+
     this->Skybox->SetTexture(texture);
     this->Skybox->SetVisibility(1);
     renderer->SetEnvironmentTexture(texture);
@@ -2972,9 +2978,7 @@ void vtkPVRenderView::SetCameraManipulators(vtkPVInteractorStyle* style, const i
           cameraManipulator = vtkSmartPointer<vtkPVTrackballZoomToMouse>::New();
           break;
         case SKYBOX_ROTATE:
-          auto skyboxRotate = vtkSmartPointer<vtkPVTrackballSkyboxRotate>::New();
-          skyboxRotate->SetSkybox(this->Skybox);
-          cameraManipulator = skyboxRotate;
+          cameraManipulator = vtkSmartPointer<vtkPVTrackballEnvironmentRotate>::New();
           break;
       }
       if (cameraManipulator)
