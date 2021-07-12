@@ -673,6 +673,34 @@
       <!-- End of TimerLog -->
     </Proxy>
 
+    <Proxy class="vtkCommandLineProcess"
+           name="CommandLineProcess"
+           processes="client|dataserver|renderserver">
+      <Documentation>Execute a process on server side.</Documentation>
+      <Property command="Execute"
+                name="Execute">
+        <Documentation>Resets the log on all processes.</Documentation>
+      </Property>
+      <StringVectorProperty command="SetCommand"
+                        default_values=""
+                        name="Command">
+        <Documentation>Set the command to execute.</Documentation>
+      </StringVectorProperty>
+      <StringVectorProperty command="GetStdOut"
+                        name="StdOut"
+                        number_of_elements="1"
+                        information_only="1">
+        <Documentation>Get the standard output of the command.</Documentation>
+      </StringVectorProperty>
+      <StringVectorProperty command="GetStdErr"
+                        name="StdErr"
+                        number_of_elements="1"
+                        information_only="1">
+        <Documentation>Get the error output of the command.</Documentation>
+      </StringVectorProperty>
+      <!-- End of CommandLineProcess -->
+    </Proxy>
+
     <!-- ================================================================= -->
     <Proxy name="LogRecorder" class="vtkLogRecorder">
       <IntVectorProperty name="RankEnabled"
