@@ -282,40 +282,47 @@ vtkSmartPointer<vtkDataSet> GetMesh(
     coords["type"].as_string() == "explicit")
   {
     vtkNew<vtkUnstructuredGrid> ug;
-    ug->SetPoints(CreatePoints(coords));
-    const auto vtk_cell_type = GetCellType(topologyNode["elements/shape"].as_string());
-    if (vtk_cell_type == VTK_POLYHEDRON)
+    conduit_cpp::Node connectivity = topologyNode["elements/connectivity"];
+    const conduit_cpp::DataType dtype0 = connectivity.dtype();
+    const auto nb_cells = dtype0.number_of_elements();
+    if (nb_cells > 0)
     {
-      // polyhedra uses O2M and not M2C arrays, so need to process it
-      // differently.
-      conduit_cpp::Node t_elements = topologyNode["elements"];
-      conduit_cpp::Node t_subelements = topologyNode["subelements"];
-      auto elements = vtkConduitArrayUtilities::O2MRelationToVTKCellArray(
-        conduit_cpp::c_node(&t_elements), "connectivity");
-      auto subelements = vtkConduitArrayUtilities::O2MRelationToVTKCellArray(
-        conduit_cpp::c_node(&t_subelements), "connectivity");
+      ug->SetPoints(CreatePoints(coords));
+      const auto vtk_cell_type = GetCellType(topologyNode["elements/shape"].as_string());
+      if (vtk_cell_type == VTK_POLYHEDRON)
+      {
+        // polyhedra uses O2M and not M2C arrays, so need to process it
+        // differently.
+        conduit_cpp::Node t_elements = topologyNode["elements"];
+        conduit_cpp::Node t_subelements = topologyNode["subelements"];
+        auto elements = vtkConduitArrayUtilities::O2MRelationToVTKCellArray(
+          conduit_cpp::c_node(&t_elements), "connectivity");
+        auto subelements = vtkConduitArrayUtilities::O2MRelationToVTKCellArray(
+          conduit_cpp::c_node(&t_subelements), "connectivity");
 
-      // currently, this is an ugly deep-copy. Once vtkUnstructuredGrid is modified
-      // as proposed here (vtk/vtk#18190), this will get simpler.
-      SetPolyhedralCells(ug, elements, subelements);
+        // currently, this is an ugly deep-copy. Once vtkUnstructuredGrid is modified
+        // as proposed here (vtk/vtk#18190), this will get simpler.
+        SetPolyhedralCells(ug, elements, subelements);
+      }
+      else if (vtk_cell_type == VTK_POLYGON)
+      {
+        // polygons use O2M and not M2C arrays, so need to process it
+        // differently.
+        conduit_cpp::Node t_elements = topologyNode["elements"];
+        auto cellArray = vtkConduitArrayUtilities::O2MRelationToVTKCellArray(
+          conduit_cpp::c_node(&t_elements), "connectivity");
+        ug->SetCells(vtk_cell_type, cellArray);
+      }
+      else
+      {
+        const auto cell_size = GetNumberOfPointsInCellType(vtk_cell_type);
+        conduit_cpp::Node connectivity = topologyNode["elements/connectivity"];
+        auto cellArray = vtkConduitArrayUtilities::MCArrayToVTKCellArray(
+          cell_size, conduit_cpp::c_node(&connectivity));
+        ug->SetCells(vtk_cell_type, cellArray);
+      }
     }
-    else if (vtk_cell_type == VTK_POLYGON)
-    {
-      // polygons use O2M and not M2C arrays, so need to process it
-      // differently.
-      conduit_cpp::Node t_elements = topologyNode["elements"];
-      auto cellArray = vtkConduitArrayUtilities::O2MRelationToVTKCellArray(
-        conduit_cpp::c_node(&t_elements), "connectivity");
-      ug->SetCells(vtk_cell_type, cellArray);
-    }
-    else
-    {
-      const auto cell_size = GetNumberOfPointsInCellType(vtk_cell_type);
-      conduit_cpp::Node connectivity = topologyNode["elements/connectivity"];
-      auto cellArray = vtkConduitArrayUtilities::MCArrayToVTKCellArray(
-        cell_size, conduit_cpp::c_node(&connectivity));
-      ug->SetCells(vtk_cell_type, cellArray);
-    }
+    // if there are no cells in the Conduit mesh, return an empty ug
     return ug;
   }
   else
@@ -378,13 +385,25 @@ bool RequestMesh(vtkPartitionedDataSet* output, const conduit_cpp::Node& node)
       const auto vtk_association = detail::GetAssociation(fieldNode["association"].as_string());
       auto dsa = dataset->GetAttributes(vtk_association);
       auto values = fieldNode["values"];
-      auto array =
-        vtkConduitArrayUtilities::MCArrayToVTKArray(conduit_cpp::c_node(&values), fieldname);
-      if (array->GetNumberOfTuples() != dataset->GetNumberOfElements(vtk_association))
+      size_t dataset_size;
+      if (values.number_of_children() == 0)
       {
-        throw std::runtime_error("mismatched tuple count!");
+        dataset_size = values.dtype().number_of_elements();
       }
-      dsa->AddArray(array);
+      else
+      {
+        dataset_size = values.child(0).dtype().number_of_elements();
+      }
+      if (dataset_size > 0)
+      {
+        auto array =
+          vtkConduitArrayUtilities::MCArrayToVTKArray(conduit_cpp::c_node(&values), fieldname);
+        if (array->GetNumberOfTuples() != dataset->GetNumberOfElements(vtk_association))
+        {
+          throw std::runtime_error("mismatched tuple count!");
+        }
+        dsa->AddArray(array);
+      }
     }
     catch (std::exception& e)
     {

@@ -288,6 +288,11 @@ vtkSmartPointer<vtkDataArray> vtkConduitArrayUtilities::MCArrayToVTKArrayImpl(
     return vtkConduitArrayUtilities::MCArrayToVTKSOAArray(
       conduit_cpp::c_node(&mcarray), force_signed);
   }
+  else if (mcarray.dtype().number_of_elements() == 1)
+  {
+    return vtkConduitArrayUtilities::MCArrayToVTKSOAArray(
+      conduit_cpp::c_node(&mcarray), force_signed);
+  }
   else
   {
     // TODO: we can do a deep-copy in this case, so we can still handle it quite easily when needed.
