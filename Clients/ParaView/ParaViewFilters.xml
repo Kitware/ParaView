@@ -363,7 +363,6 @@
   <Proxy group="filters" name="TransposeTable" />
   <Proxy group="filters" name="TriangleFilter" />
   <Proxy group="filters" name="TubeFilter" />
-  <Proxy group="filters" name="UniversalGhostCellsGenerator" />
   <Proxy group="filters" name="UnstructuredGradient" />
   <Proxy group="filters" name="ValidateCells" />
   <Proxy group="filters" name="VortexCores" />
