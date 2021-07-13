@@ -982,6 +982,7 @@ list(APPEND TESTS_WITH_BASELINES
   PropertyConversion1.xml
   PropertyConversion2.xml
   PropertyConversion3.xml
+  PropertyConversion4.xml
   PropertyLink.xml
   QuadraticGhostCells.xml
   ReadPIOWithHTG.xml
