@@ -32,13 +32,14 @@
 #include "vtkObject.h"
 #include "vtkRemotingViewsModule.h" //needed for exports
 
+class vtkFXAAOptions;
 class vtkIceTSynchronizedRenderers;
 class vtkImageProcessingPass;
 class vtkOpenGLRenderer;
 class vtkOrderedCompositingHelper;
 class vtkPVSession;
-class vtkRenderer;
 class vtkRenderPass;
+class vtkRenderer;
 class vtkSynchronizedRenderers;
 
 class VTKREMOTINGVIEWS_EXPORT vtkPVSynchronizedRenderer : public vtkObject
@@ -179,6 +180,22 @@ public:
   vtkGetObjectMacro(CSSynchronizer, vtkSynchronizedRenderers);
   //@}
 
+  //@{
+  /**
+   * Enable/disable FXAA antialiasing.
+   */
+  virtual void SetUseFXAA(bool use);
+  vtkGetMacro(UseFXAA, bool);
+  //@}
+
+  //@
+  /**
+   * Set/Get FXAA options.
+   */
+  vtkGetObjectMacro(FXAAOptions, vtkFXAAOptions);
+  virtual void SetFXAAOptions(vtkFXAAOptions*);
+  //@}
+
 protected:
   vtkPVSynchronizedRenderer();
   ~vtkPVSynchronizedRenderer() override;
@@ -206,6 +223,9 @@ protected:
 
   bool EnableRayTracing;
   bool EnablePathTracing;
+
+  bool UseFXAA = false;
+  vtkFXAAOptions* FXAAOptions = nullptr;
 
 private:
   vtkPVSynchronizedRenderer(const vtkPVSynchronizedRenderer&) = delete;

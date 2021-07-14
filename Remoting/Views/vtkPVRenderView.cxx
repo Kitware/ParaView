@@ -1625,6 +1625,8 @@ void vtkPVRenderView::Render(bool interactive, bool skip_rendering)
   bool use_fxaa = this->UseFXAA && !this->MakingSelection;
   this->RenderView->GetRenderer()->SetUseFXAA(use_fxaa);
   this->RenderView->GetRenderer()->SetFXAAOptions(this->FXAAOptions);
+  this->SynchronizedRenderers->SetUseFXAA(use_fxaa);
+  this->SynchronizedRenderers->SetFXAAOptions(this->FXAAOptions);
   if (this->SynchronizedRenderers->GetEnabled())
   {
     // Force opaque rendering for the GridAxes. Needed so that the grid axes
