@@ -291,7 +291,7 @@ int main(int argc, char* argv[])
     std::string moduleName = vtksys::SystemTools::GetFilenameWithoutLastExtension(fname);
     if (moduleName.empty())
     {
-      std::cerr << "Cannot extract module name from the file: " << args[argv_offset + cc].c_str()
+      std::cerr << "Cannot extract module name from the file: " << args[argv_offset + cc]
                 << std::endl;
       return 1;
     }
