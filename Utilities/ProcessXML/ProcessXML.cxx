@@ -317,7 +317,7 @@ int main(int argc, char* argv[])
                    << ", res + offset); offset += len" << kk << ";" << std::endl;
     }
     ot.Stream << "// Get single string" << std::endl
-              << "char* " << ot.Prefix << moduleName << args[argv_offset + 4].c_str() << "()"
+              << "inline char* " << ot.Prefix << moduleName << args[argv_offset + 4] << "()"
               << std::endl
               << "{" << std::endl
               << prelenstr.str() << std::endl
