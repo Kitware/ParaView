@@ -279,7 +279,7 @@ int main(int argc, char* argv[])
             << "#ifndef " << output_file_name << "_h" << std::endl
             << "#define " << output_file_name << "_h" << std::endl
             << std::endl
-            << "#include <string.h>" << std::endl
+            << "#include <cstring>" << std::endl
             << "#include <cassert>" << std::endl
             << "#include <algorithm>" << std::endl
             << std::endl;
