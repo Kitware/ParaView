@@ -81,6 +81,9 @@
         expire_in: 1d
         # Tests failing should still upload the artifact for further testing.
         when: always
+        reports:
+            junit:
+                - build/junit.xml
         paths:
             # Debugging logs
             - build/Testing/Temporary/Last*.log
