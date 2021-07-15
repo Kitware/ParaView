@@ -410,6 +410,8 @@ bool vtkInSituInitializationHelper::ExecutePipelines(
   internals.TimeStep = timestep;
   internals.Time = time;
 
+  UpdateSteerableProxies();
+
   for (auto& item : internals.Pipelines)
   {
     if (!item.Initialized)
@@ -432,8 +434,6 @@ bool vtkInSituInitializationHelper::ExecutePipelines(
       item.ExecuteFailed = !item.Pipeline->Execute(timestep, time);
     }
   }
-
-  UpdateSteerableProxies();
 
   internals.InExecutePipelines = false;
   return true;

@@ -25,6 +25,7 @@
 #include "vtkInSituInitializationHelper.h"
 #include "vtkInSituPipelineIO.h"
 #include "vtkInSituPipelinePython.h"
+#include "vtkMultiBlockDataSet.h"
 #include "vtkPVLogger.h"
 #include "vtkSMPluginManager.h"
 #include "vtkSMProxyManager.h"
@@ -98,10 +99,16 @@ static bool convert_to_blueprint_mesh(
     if (auto steeringDataGenerator =
           vtkSteeringDataGenerator::SafeDownCast(proxy->GetClientSideObject()))
     {
+      steeringDataGenerator->Update();
       if (vtkDataObject* outputDataObject = steeringDataGenerator->GetOutput())
       {
         auto channel = node[name];
-        // TODO: conversion to blueprint mesh.
+
+        if (auto multi_block = vtkMultiBlockDataSet::SafeDownCast(outputDataObject))
+        {
+          auto data_set = multi_block->GetBlock(0);
+          // TODO: conversion to blueprint mesh.
+        }
       }
     }
   }

@@ -112,6 +112,7 @@ void AddSteerableChannel(conduit_cpp::Node& exec_params)
   steerable_mesh["coordsets/coords/type"].set_string("explicit");
   steerable_mesh["coordsets/coords/values/x"].set_float64_vector({ 1 });
   steerable_mesh["coordsets/coords/values/y"].set_float64_vector({ 2 });
+  steerable_mesh["coordsets/coords/values/z"].set_float64_vector({ 3 });
   steerable_mesh["topologies/mesh/type"].set("unstructured");
   steerable_mesh["topologies/mesh/coordset"].set("coords");
   steerable_mesh["topologies/mesh/elements/shape"].set("point");
@@ -119,7 +120,7 @@ void AddSteerableChannel(conduit_cpp::Node& exec_params)
   steerable_mesh["fields/steerable/association"].set("element");
   steerable_mesh["fields/steerable/topology"].set("mesh");
   steerable_mesh["fields/steerable/volume_dependent"].set("false");
-  steerable_mesh["fields/steerable/values"].set_float64_vector({ 10.0 });
+  steerable_mesh["fields/steerable/values"].set_int32_vector({ 2 });
 }
 
 void Execute(int cycle, double time, Grid& grid, Attributes& attribs)
