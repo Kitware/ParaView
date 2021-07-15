@@ -976,7 +976,6 @@ list(APPEND TESTS_WITH_BASELINES
   PointGaussianNoScaleTransferFunction.xml
   PointGaussianScaleOpacityArray.xml
   PointInterpolator.xml
-  PointVolumeInterpolator.xml
   PolarAxes.xml
   PolyLineAndSplineSources.xml
   PropertyConversion.xml
@@ -1220,8 +1219,6 @@ if (PARAVIEW_USE_MPI)
   # PointInterpolator only works in non-distributed modes.
   set(PointInterpolator_DISABLE_CRS TRUE)
   set(PointInterpolator_DISABLE_CS TRUE)
-  set(PointVolumeInterpolator_DISABLE_CRS TRUE)
-  set(PointVolumeInterpolator_DISABLE_CS TRUE)
 endif()
 if(PARAVIEW_USE_PYTHON)
   list(APPEND TESTS_WITH_BASELINES

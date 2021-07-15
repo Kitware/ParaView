@@ -28,7 +28,6 @@
 #include "vtkVector.h"                      // for vtkVector
 
 class vtkBoundingBox;
-class vtkMultiProcessController;
 
 class VTKPVVTKEXTENSIONSPOINTS_EXPORT vtkBoundedVolumeSource : public vtkImageAlgorithm
 {
@@ -36,36 +35,6 @@ public:
   static vtkBoundedVolumeSource* New();
   vtkTypeMacro(vtkBoundedVolumeSource, vtkImageAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent) override;
-
-  ///@{
-  /**
-   * When checked, the source operates in legacy mode where the Origin/Scale are
-   * specified instead of UseInputBounds and/or BoundingBox.
-   */
-  vtkSetMacro(UseOriginScale, bool);
-  vtkGetMacro(UseOriginScale, bool);
-  vtkBooleanMacro(UseOriginScale, bool);
-  ///@}
-
-  ///@{
-  /**
-   * When checked, input bounds are used. Used only when UseOriginScale is
-   * false.
-   */
-  vtkSetMacro(UseInputBounds, bool);
-  vtkGetMacro(UseInputBounds, bool);
-  vtkBooleanMacro(UseInputBounds, bool);
-  ///@}
-
-  ///@{
-  /**
-   * Get/Set the bounding box. Used only when UseOriginScale is false, and
-   * UseInputBounds is false.
-   */
-  ///@}
-  vtkSetVector6Macro(BoundingBox, double);
-  vtkGetVector3Macro(BoundingBox, double);
-  ///@}
 
   //@{
   /**
@@ -134,36 +103,20 @@ public:
     vtkImageData* image, const vtkBoundingBox& bbox, const double cellSize);
   //@}
 
-  ///@{
-  /**
-   * Get/Set the parallel controller.
-   */
-  vtkGetObjectMacro(Controller, vtkMultiProcessController);
-  void SetController(vtkMultiProcessController*);
-  ///@}
 protected:
   vtkBoundedVolumeSource();
   ~vtkBoundedVolumeSource() override;
 
-  int FillInputPortInformation(int port, vtkInformation* info) override;
   int RequestInformation(vtkInformation* request, vtkInformationVector** inputVector,
     vtkInformationVector* outputVector) override;
-  int RequestData(vtkInformation* request, vtkInformationVector** inputVector,
-    vtkInformationVector* outputVector) override;
+  void ExecuteDataWithInformation(vtkDataObject* data, vtkInformation* outInfo) override;
 
-  bool UseOriginScale;
-  // Old style
   double Origin[3];
   double Scale[3];
-  // New style
-  bool UseInputBounds;
-  double BoundingBox[6];
-
   int RefinementMode;
   int Resolution[3];
   double CellSize;
   double Padding;
-  vtkMultiProcessController* Controller;
 
 private:
   vtkBoundedVolumeSource(const vtkBoundedVolumeSource&) = delete;

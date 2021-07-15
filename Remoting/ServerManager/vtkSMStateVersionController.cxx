@@ -864,7 +864,7 @@ struct Process_5_9_to_5_10
       HandleExtractBlock(document) && HandleRepresentationBlockVisibility(document) &&
       HandleRepresentationBlockColor(document) && HandleRepresentationBlockOpacity(document) &&
       HandleSelectionQuerySource(document) && ConvertProbeLine(document) &&
-      HandleBackgroundColor(document) && HandleBoundedVolumeSource(document);
+      HandleBackgroundColor(document);
   }
 
   static std::string GetSelector(unsigned int cid)
@@ -1197,21 +1197,6 @@ struct Process_5_9_to_5_10
       elementNode.append_attribute("value").set_value(0);
     }
 
-    return true;
-  }
-
-  static bool HandleBoundedVolumeSource(xml_document& document)
-  {
-    auto sources = document.select_nodes(
-      "//ServerManagerState/Proxy[@group='extended_sources' and @type='BoundedVolumeSource']");
-    for (const auto& item : sources)
-    {
-      auto node = item.node();
-      if (!node.select_node("/Property[@name='UseInputBounds']"))
-      {
-        node.attribute("name").set_value("BoundedVolumeSourceLegacy");
-      }
-    }
     return true;
   }
 };
