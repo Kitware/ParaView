@@ -164,13 +164,13 @@ pqBoxPropertyWidget::pqBoxPropertyWidget(
     ui.zmin->hide();
     ui.zmax->hide();
 
-    // if `ReferenceBounds` or `UseReferenceBounds` is not present, which is the
-    // case for `Transform`, the box is providing params relative to the input
-    // bounds.
+    // if `ReferenceBounds` or `UseReferenceBounds` is not present,
+    // the box is either using the input bounds as reference (e.g. Transform) or
+    // isn't i.e relative to unit box.  To determine that, let's if "Input" is part
+    // of the property group.
+    this->BoxIsRelativeToInput = (smgroup->GetProperty("Input") != nullptr);
     vtkSMPropertyHelper(wdgProxy, "UseReferenceBounds").Set(0);
     wdgProxy->UpdateVTKObjects();
-
-    this->BoxIsRelativeToInput = true;
   }
 
   if (hideReferenceBounds)
