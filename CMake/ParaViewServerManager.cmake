@@ -287,7 +287,7 @@ void ${_paraview_sm_process_files_TARGET}_initialize(std::vector<std::string>& x
     string(APPEND _paraview_sm_process_files_init_content
       "  {
     char *init_string = ${_paraview_sm_process_files_TARGET}${_paraview_sm_process_files_name}GetInterfaces();
-    xmls.push_back(init_string);
+    xmls.emplace_back(init_string);
     delete [] init_string;
   }\n")
   endforeach ()

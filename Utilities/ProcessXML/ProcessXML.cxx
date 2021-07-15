@@ -279,7 +279,7 @@ int main(int argc, char* argv[])
             << "#ifndef " << output_file_name << "_h" << std::endl
             << "#define " << output_file_name << "_h" << std::endl
             << std::endl
-            << "#include <string.h>" << std::endl
+            << "#include <cstring>" << std::endl
             << "#include <cassert>" << std::endl
             << "#include <algorithm>" << std::endl
             << std::endl;
@@ -291,7 +291,7 @@ int main(int argc, char* argv[])
     std::string moduleName = vtksys::SystemTools::GetFilenameWithoutLastExtension(fname);
     if (moduleName.empty())
     {
-      std::cerr << "Cannot extract module name from the file: " << args[argv_offset + cc].c_str()
+      std::cerr << "Cannot extract module name from the file: " << args[argv_offset + cc]
                 << std::endl;
       return 1;
     }
@@ -317,7 +317,7 @@ int main(int argc, char* argv[])
                    << ", res + offset); offset += len" << kk << ";" << std::endl;
     }
     ot.Stream << "// Get single string" << std::endl
-              << "char* " << ot.Prefix << moduleName << args[argv_offset + 4].c_str() << "()"
+              << "inline char* " << ot.Prefix << moduleName << args[argv_offset + 4] << "()"
               << std::endl
               << "{" << std::endl
               << prelenstr.str() << std::endl

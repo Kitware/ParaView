@@ -361,7 +361,7 @@ function (vtk_module_wrap_client_server)
 #include \"vtkClientServerInterpreter.h\"
 
 ${_vtk_client_server_declarations}
-void ${_vtk_client_server_FUNCTION_NAME}(vtkClientServerInterpreter* csi)
+inline void ${_vtk_client_server_FUNCTION_NAME}(vtkClientServerInterpreter* csi)
 {
   (void)csi;
 ${_vtk_client_server_calls}}

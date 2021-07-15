@@ -514,7 +514,7 @@ function (paraview_plugin_build)
     return true;
   }\n\n")
         string(APPEND _paraview_build_names
-          "  names.push_back(\"${_paraview_build_plugin}\");\n")
+          "  names.emplace_back(\"${_paraview_build_plugin}\");\n")
       endforeach ()
 
       set(_paraview_build_include_content
