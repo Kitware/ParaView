@@ -32,6 +32,7 @@
 
 class vtkPVOptions;
 class vtkCLIOptions;
+class vtkStringList;
 
 class VTKREMOTINGAPPLICATION_EXPORT vtkInitializationHelper : public vtkObject
 {
@@ -51,6 +52,11 @@ public:
    */
   static bool Initialize(int argc, char** argv, int processType, vtkCLIOptions* options = nullptr,
     bool enableStandardArgs = true);
+
+  /**
+   * Overload primary intended for Python wrapping.
+   */
+  static bool Initialize(vtkStringList* argv, int processType);
 
   /**
    * An overload that does not take argc/argv for convenience.

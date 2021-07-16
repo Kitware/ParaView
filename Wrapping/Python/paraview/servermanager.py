@@ -3232,29 +3232,30 @@ def SetActiveConnection(connection=None):
 # servermanager.Finalize() may also be needed to exit properly without
 # VTK_DEBUG_LEAKS reporting memory leaks.
 if not vtkProcessModule.GetProcessModule():
-    pvoptions = vtkPVOptions();
-    if paraview.options.batch:
-      pvoptions.SetProcessType(vtkPVOptions.PVBATCH)
-      if paraview.options.symmetric:
-        pvoptions.SetSymmetricMPIMode(True)
-      vtkInitializationHelper.Initialize(sys.executable,
-          vtkProcessModule.PROCESS_BATCH, pvoptions)
+    slist = vtkStringList()
+    slist.AddString(sys.executable)
 
-      # In case of Non-Symetric mode and we are a satelite
-      # We should lock right away and wait for the requests
-      # from master
-      pm = vtkProcessModule.GetProcessModule()
-      if not paraview.options.symmetric and pm.GetPartitionId() != 0:
+    if paraview.options.batch:
+        ptype = vtkProcessModule.PROCESS_BATCH
+        if paraview.options.symmetric:
+            slist.AddString("--symmetric")
+    else:
+        ptype = vtkProcessModule.PROCESS_CLIENT
+        # ensure that we don't init MPI on the client process
+        slist.AddString("--no-mpi")
+
+    if not vtkInitializationHelper.Initialize(slist, ptype):
+        raise RuntimeError("Failed to initialize ParaView engine!")
+
+    # In case of non-symetric mode, if we are a satelite,
+    # we should lock right away and wait for the requests
+    # from master
+    pm = vtkProcessModule.GetProcessModule()
+    if not pm.GetSymmetricMPIMode() and pm.GetPartitionId() > 0:
         paraview.options.satelite = True
         sid = vtkSMSession.ConnectToSelf()
         pm.GetGlobalController().ProcessRMIs()
         pm.UnRegisterSession(sid)
-
-    else:
-      pvoptions.SetProcessType(vtkPVOptions.PVCLIENT)
-      pvoptions.SetForceNoMPIInitOnClient(1)
-      vtkInitializationHelper.Initialize(sys.executable,
-          vtkProcessModule.PROCESS_CLIENT, pvoptions)
 
     # since we initialized paraview, lets ensure that we finalize it too
     import atexit
