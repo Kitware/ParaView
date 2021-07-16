@@ -34,6 +34,7 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkSMProxyManager.h"
 #include "vtkSMSettings.h"
 #include "vtkSmartPointer.h"
+#include "vtkStringList.h"
 
 #include <sstream>
 #include <string>
@@ -157,6 +158,18 @@ void vtkInitializationHelper::Initialize(const char* executable, int type, vtkPV
   vtkInitializationHelper::Initialize(executable, type);
 }
 #endif
+
+//----------------------------------------------------------------------------
+bool vtkInitializationHelper::Initialize(vtkStringList* slist, int type)
+{
+  std::vector<char*> argv;
+  for (int cc = 0, max = slist->GetLength(); cc < max; ++cc)
+  {
+    argv.push_back(const_cast<char*>(slist->GetString(cc)));
+  }
+  argv.push_back(nullptr);
+  return vtkInitializationHelper::Initialize(static_cast<int>(argv.size()) - 1, &argv[0], type);
+}
 
 //----------------------------------------------------------------------------
 bool vtkInitializationHelper::Initialize(

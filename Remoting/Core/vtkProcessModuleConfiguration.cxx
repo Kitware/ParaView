@@ -109,8 +109,8 @@ bool vtkProcessModuleConfiguration::PopulateOptions(
   auto mpi = group->add_flag(
     "--mpi", this->ForceMPIInit, "Initialize MPI on current process, even if not necessary.");
   group
-    ->add_flag(
-      "--no-mpi", this->ForceMPIInit, "Skip initializing MPI on current process, if not required.")
+    ->add_flag("--no-mpi", this->ForceNoMPIInit,
+      "Skip initializing MPI on current process, if not required.")
     ->excludes(mpi);
   group
     ->add_flag("--use-mpi-ssend", this->UseMPISSend,
