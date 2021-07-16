@@ -86,12 +86,15 @@
 
     <!-- ==================================================================== -->
     <SourceProxy class="vtkGhostCellsGenerator"
-                 label="Universal Ghost Cells Generator"
-                 name="UniversalGhostCellsGenerator">
+                 label="Ghost Cells Generator"
+                 name="GhostCellsGenerator">
       <Documentation short_help="Generate ghosts.">
         Generate ghost cells and ghost points in a composite data set. Ghosts are exchanged
-        between blocks / partitions of same type. Currently, only vtkImageData, vtkRectilinearGrid
-        and vtkStructuredGrid are implemented.
+        between blocks / partitions of same type. Currently, vtkImageData, vtkRectilinearGrid,
+        vtkStructuredGrid and vtkUnstructuredGrid are supported. Those input types can be
+        dispatched in vtkPartitionedDataSet or vtkPartitionedDataSetCollection. Inside a,
+        collection, 2 partitioned data sets do not exchange ghosts, but partitions inside a
+        partitioned data set do.
       </Documentation>
       <InputProperty command="SetInputConnection"
                      name="Input">
@@ -107,9 +110,34 @@
       </InputProperty>
       <IntVectorProperty command="SetNumberOfGhostLayers"
                          default_values="1"
-                         name="Number Of Ghost Layers"
+                         name="MinimumNumberOfGhosts"
                          number_of_elements="1"
                          panel_visibility="default">
+        <Documentation>
+          When **BuildIfRequired** if off, use this to specify the minimum number of
+          ghost cells to request. The filter may request more ghost levels than indicated if a
+          downstream filter asked for more ghost levels.
+        </Documentation>
+        <IntRangeDomain name="range" min="1" max="100"/>
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="BuildIfRequired"
+                                   value="0">
+          </PropertyWidgetDecorator>
+        </Hints>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetBuildIfRequired"
+                         default_values="0"
+                         name="BuildIfRequired"
+                        number_of_elements="1">
+      <Documentation>
+        Specify if the filter must generate the ghost cells only
+        if required by the pipeline downstream. To force at least a fixed level
+        of ghosts, this must be set to 0 (unchecked).
+      </Documentation>
+                         panel_visibility="advanced">
+        <BooleanDomain name="bool" />
       </IntVectorProperty>
       <!-- End CompositeDataSetGhostCellsGenerator -->
     </SourceProxy>
