@@ -566,7 +566,8 @@ def SaveExtracts(**kwargs):
     return proxy.SaveExtracts()
 
 def UpdateSteerableParameters(steerable_proxy, steerable_source):
-    pass
+    helper = paraview.modules.vtkPVInSitu.vtkInSituInitializationHelper
+    helper.UpdateSteerableParameters(steerable_proxy.SMProxy, steerable_source.SMProxy)
 
 #==============================================================================
 # XML State management

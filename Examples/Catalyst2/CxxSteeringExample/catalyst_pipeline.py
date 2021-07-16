@@ -5,6 +5,7 @@ from paraview.simple import *
 producer = TrivialProducer(registrationName="grid")
 steerable_source = TrivialProducer(registrationName="steerable")
 steerable_parameters = SteerableParameters(registrationName="SteerableParameters")
+UpdateSteerableParameters(steerable_parameters, steerable_source)
 
 from paraview import catalyst
 

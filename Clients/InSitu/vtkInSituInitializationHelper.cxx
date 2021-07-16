@@ -76,50 +76,7 @@ public:
   bool InExecutePipelines = false;
   int TimeStep = 0;
   double Time = 0.0;
-
-  vtkNew<vtkCallbackCommand> ProxyRegistered;
-  vtkNew<vtkCallbackCommand> ProxyUnregistered;
 };
-
-bool is_proxy_prototype(const std::string& group_name)
-{
-  return group_name.size() > 11 && group_name.substr(group_name.size() - 11, 11) == "_prototypes";
-}
-
-void proxy_registered(vtkObject*, unsigned long, void* clientdata, void* calldata)
-{
-  if (auto proxy_info = static_cast<vtkSMProxyManager::RegisteredProxyInformation*>(calldata))
-  {
-    if (auto proxy = proxy_info->Proxy)
-    {
-      if (auto className = proxy->GetVTKClassName())
-      {
-        if (std::string(className) == "vtkSteeringDataGenerator" &&
-          !is_proxy_prototype(proxy_info->GroupName))
-        {
-          vtkInSituInitializationHelper::AddSteerableProxy(proxy, proxy_info->ProxyName);
-        }
-      }
-    }
-  }
-}
-
-void proxy_unregistered(vtkObject*, unsigned long, void* clientdata, void* calldata)
-{
-  if (auto proxy_info = static_cast<vtkSMProxyManager::RegisteredProxyInformation*>(calldata))
-  {
-    if (auto proxy = proxy_info->Proxy)
-    {
-      if (auto className = proxy->GetVTKClassName())
-      {
-        if (std::string(className) == "vtkSteeringDataGenerator")
-        {
-          vtkInSituInitializationHelper::RemoveSteerableProxy(proxy);
-        }
-      }
-    }
-  }
-}
 
 template <typename PropertyType>
 struct PropertyCopier
@@ -212,16 +169,6 @@ void vtkInSituInitializationHelper::Initialize(vtkTypeUInt64 comm)
   // for now, I am using vtkCPCxxHelper; that class should be removed when we
   // deprecate Legacy Catalyst API.
   internals.CPCxxHelper.TakeReference(vtkCPCxxHelper::New());
-
-  auto session_proxy_manager = vtkSMProxyManager::GetProxyManager()->GetActiveSessionProxyManager();
-
-  internals.ProxyRegistered->SetClientData(&internals);
-  internals.ProxyRegistered->SetCallback(proxy_registered);
-  session_proxy_manager->AddObserver(vtkCommand::RegisterEvent, internals.ProxyRegistered);
-
-  internals.ProxyUnregistered->SetClientData(&internals);
-  internals.ProxyUnregistered->SetCallback(proxy_unregistered);
-  session_proxy_manager->AddObserver(vtkCommand::UnRegisterEvent, internals.ProxyUnregistered);
 
 #if VTK_MODULE_ENABLE_ParaView_PythonCatalyst
   // register static Python modules built, if any.
@@ -671,33 +618,6 @@ void vtkInSituInitializationHelper::PrintSelf(ostream& os, vtkIndent indent)
 }
 
 //----------------------------------------------------------------------------
-void vtkInSituInitializationHelper::AddSteerableProxy(
-  vtkSMProxy* steeringDataGenerator, const char* name)
-{
-  if (vtkInSituInitializationHelper::Internals != nullptr && steeringDataGenerator != nullptr)
-  {
-    vtkInSituInitializationHelper::Internals->SteerableProxies.insert(
-      std::make_pair(steeringDataGenerator, std::string(name)));
-  }
-}
-
-//----------------------------------------------------------------------------
-void vtkInSituInitializationHelper::RemoveSteerableProxy(vtkSMProxy* steeringDataGenerator)
-{
-  if (vtkInSituInitializationHelper::Internals != nullptr && steeringDataGenerator != nullptr)
-  {
-    auto internals = vtkInSituInitializationHelper::Internals;
-    /*auto iterator = std::find(internals->SteerableProxies.begin(),
-      internals->SteerableProxies.end(), steeringDataGenerator);*/
-    auto iterator = internals->SteerableProxies.find(steeringDataGenerator);
-    if (iterator != internals->SteerableProxies.end())
-    {
-      internals->SteerableProxies.erase(iterator);
-    }
-  }
-}
-
-//----------------------------------------------------------------------------
 void vtkInSituInitializationHelper::GetSteerableProxies(
   std::vector<std::pair<std::string, vtkSMProxy*> >& proxies)
 {
@@ -709,7 +629,29 @@ void vtkInSituInitializationHelper::GetSteerableProxies(
     {
       proxies.push_back(std::make_pair(proxy.second, proxy.first));
     }
-    /*std::copy(
-      internals->SteerableProxies.begin(), internals->SteerableProxies.end(), proxies.begin());*/
+  }
+}
+
+//----------------------------------------------------------------------------
+void vtkInSituInitializationHelper::UpdateSteerableParameters(
+  vtkSMProxy* steerableProxy, vtkSMProxy* steerableSource)
+{
+  if (steerableProxy == nullptr || steerableSource == nullptr)
+  {
+    return;
+  }
+
+  if (vtkInSituInitializationHelper::Internals != nullptr)
+  {
+    auto internals = vtkInSituInitializationHelper::Internals;
+
+    auto proxyIterator = internals->SteerableProxies.find(steerableProxy);
+    if (proxyIterator == internals->SteerableProxies.end())
+    {
+      internals->SteerableProxies.insert(
+        std::make_pair(steerableProxy, steerableProxy->GetGlobalIDAsString()));
+    }
+
+    UpdateSteerableProxies();
   }
 }
