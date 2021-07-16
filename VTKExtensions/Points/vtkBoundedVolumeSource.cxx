@@ -15,47 +15,29 @@
 #include "vtkBoundedVolumeSource.h"
 
 #include "vtkBoundingBox.h"
-#include "vtkCompositeDataSet.h"
 #include "vtkImageData.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
-#include "vtkMultiProcessController.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
 #include "vtkVectorOperators.h"
 
 vtkStandardNewMacro(vtkBoundedVolumeSource);
-vtkCxxSetObjectMacro(vtkBoundedVolumeSource, Controller, vtkMultiProcessController);
 //----------------------------------------------------------------------------
 vtkBoundedVolumeSource::vtkBoundedVolumeSource()
 {
-  this->SetNumberOfInputPorts(1);
+  this->SetNumberOfInputPorts(0);
   this->Origin[0] = this->Origin[1] = this->Origin[2] = 0.0;
   this->Scale[0] = this->Scale[1] = this->Scale[2] = 1.0;
   this->Resolution[0] = this->Resolution[1] = this->Resolution[2] = 64;
   this->RefinementMode = USE_RESOLUTION;
   this->CellSize = 1.0;
   this->Padding = 0;
-  this->Controller = nullptr;
-  this->SetController(vtkMultiProcessController::GetGlobalController());
-  this->UseOriginScale = false;
 }
 
 //----------------------------------------------------------------------------
-vtkBoundedVolumeSource::~vtkBoundedVolumeSource()
-{
-  this->SetController(nullptr);
-}
-
-//------------------------------------------------------------------------------
-int vtkBoundedVolumeSource::FillInputPortInformation(int vtkNotUsed(port), vtkInformation* info)
-{
-  info->Set(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkDataSet");
-  info->Append(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkCompositeDataSet");
-  info->Set(vtkAlgorithm::INPUT_IS_OPTIONAL(), 1);
-  return 1;
-}
+vtkBoundedVolumeSource::~vtkBoundedVolumeSource() = default;
 
 //----------------------------------------------------------------------------
 int vtkBoundedVolumeSource::RequestInformation(
@@ -91,50 +73,20 @@ int vtkBoundedVolumeSource::RequestInformation(
 }
 
 //----------------------------------------------------------------------------
-int vtkBoundedVolumeSource::RequestData(
-  vtkInformation* request, vtkInformationVector** inputVector, vtkInformationVector* outputVector)
+void vtkBoundedVolumeSource::ExecuteDataWithInformation(
+  vtkDataObject* vtkNotUsed(odata), vtkInformation* outInfo)
 {
-  vtkBoundingBox bbox;
-  if (this->UseOriginScale)
-  {
-    bbox.SetBounds(this->Origin[0], this->Origin[0] + this->Scale[0], this->Origin[1],
-      this->Origin[1] + this->Scale[1], this->Origin[2], this->Origin[2] + this->Scale[2]);
-  }
-  else if (this->UseInputBounds)
-  {
-    double bds[6];
-    auto inputDO = vtkDataObject::GetData(inputVector[0], 0);
-    if (auto ds = vtkDataSet::SafeDownCast(inputDO))
-    {
-      ds->GetBounds(bds);
-      bbox.SetBounds(bds);
-    }
-    else if (auto cd = vtkCompositeDataSet::SafeDownCast(inputDO))
-    {
-      cd->GetBounds(bds);
-      bbox.SetBounds(bds);
-    }
-    if (this->Controller && this->Controller->GetNumberOfProcesses() > 1)
-    {
-      vtkBoundingBox result;
-      this->Controller->AllReduce(bbox, result);
-      bbox = result;
-    }
-  }
-  else
-  {
-    bbox.SetBounds(this->BoundingBox);
-  }
-
+  vtkBoundingBox bbox(this->Origin[0], this->Origin[0] + this->Scale[0], this->Origin[1],
+    this->Origin[1] + this->Scale[1], this->Origin[2], this->Origin[2] + this->Scale[2]);
   bbox.Inflate(this->Padding);
 
-  vtkImageData* data = vtkImageData::GetData(outputVector, 0);
+  vtkImageData* data = vtkImageData::GetData(outInfo);
   if (this->RefinementMode == USE_RESOLUTION)
   {
     if (!vtkBoundedVolumeSource::SetImageParameters(data, bbox, vtkVector3i(this->Resolution)))
     {
       vtkErrorMacro("Failed to determine image parameters.");
-      return 0;
+      return;
     }
   }
   else
@@ -142,15 +94,13 @@ int vtkBoundedVolumeSource::RequestData(
     if (!vtkBoundedVolumeSource::SetImageParameters(data, bbox, this->CellSize))
     {
       vtkErrorMacro("Failed to determine image parameters.");
-      return 0;
+      return;
     }
   }
 
   // limit extent to update extent.
-  auto outInfo = outputVector->GetInformationObject(0);
   int* updateExt = outInfo->Get(vtkStreamingDemandDrivenPipeline::UPDATE_EXTENT());
   data->SetExtent(updateExt);
-  return 1;
 }
 
 //----------------------------------------------------------------------------
@@ -225,9 +175,4 @@ void vtkBoundedVolumeSource::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "Resolution: " << this->Resolution[0] << ", " << this->Resolution[1] << ", "
      << this->Resolution[2] << endl;
   os << indent << "CellSize: " << this->CellSize << endl;
-  os << indent << "UseOriginScale: " << this->UseOriginScale << endl;
-  os << indent << "UseInputBounds: " << this->UseInputBounds << endl;
-  os << indent << "BoundingBox: " << this->BoundingBox[0] << this->BoundingBox[1]
-     << this->BoundingBox[2] << this->BoundingBox[3] << this->BoundingBox[4] << this->BoundingBox[5]
-     << endl;
 }

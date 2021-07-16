@@ -10,6 +10,5 @@ DEPENDS
   VTK::FiltersPoints
 PRIVATE_DEPENDS
   VTK::FiltersCore
-  VTK::ParallelCore
 TEST_LABELS
   ParaView
