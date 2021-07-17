@@ -43,6 +43,8 @@ public:
    */
   pqNodeEditorView(QGraphicsScene* scene, QWidget* parent = nullptr);
 
+  void triggerDeleteAction() const;
+
   virtual ~pqNodeEditorView() = default;
 
 protected:
@@ -50,7 +52,7 @@ protected:
   void keyReleaseEvent(QKeyEvent* event);
 
 private:
-  QAction* deleteAction{ nullptr };
+  QAction* deleteAction;
 };
 
 #endif // pqNodeEditorView_h

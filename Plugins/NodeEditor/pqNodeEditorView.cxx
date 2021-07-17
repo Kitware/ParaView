@@ -70,3 +70,9 @@ void pqNodeEditorView::keyReleaseEvent(QKeyEvent* event)
 
   return QWidget::keyReleaseEvent(event);
 }
+
+// ----------------------------------------------------------------------------
+void pqNodeEditorView::triggerDeleteAction() const
+{
+  this->deleteAction->trigger();
+}

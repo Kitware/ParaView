@@ -19,33 +19,37 @@
   with ParaViewPluginsNodeEditor for license information.
 -------------------------------------------------------------------------*/
 
-#include <pqNodeEditorUtils.h>
+#include "pqNodeEditorLabel.h"
 
-#include <pqProxy.h>
-
-#include <vtkSMProxy.h>
-
-#include <chrono>
-#include <iostream>
+#include <QCursor>
+#include <QString>
 
 // ----------------------------------------------------------------------------
-vtkIdType pqNodeEditorUtils::getID(pqProxy* proxy)
+pqNodeEditorLabel::pqNodeEditorLabel(QString label, QGraphicsItem* parent, bool cursor)
+  : QGraphicsTextItem(label, parent)
 {
-  if (proxy == nullptr)
+  if (cursor)
   {
-    return -1;
+    this->setCursor(Qt::PointingHandCursor);
   }
-  auto smProxy = proxy->getProxy();
-  return smProxy ? smProxy->GetGlobalID() : -1;
-};
+}
 
 // ----------------------------------------------------------------------------
-std::string pqNodeEditorUtils::getLabel(pqProxy* proxy)
+void pqNodeEditorLabel::setMousePressEventCallback(
+  const std::function<void(QGraphicsSceneMouseEvent*)>& callback)
 {
-  if (!proxy)
-  {
-    return "nullptr Proxy";
-  }
+  this->mousePressCallback = callback;
+}
 
-  return proxy->getSMName().toStdString() + "<" + std::to_string(getID(proxy)) + ">";
-};
+// ----------------------------------------------------------------------------
+void pqNodeEditorLabel::mousePressEvent(QGraphicsSceneMouseEvent* event)
+{
+  // Let the superclass also handle how the mouse interact with the label
+  // (allows drag-dropping nodes with the mouse on the label for example)
+  this->QGraphicsTextItem::mousePressEvent(event);
+
+  if (this->mousePressCallback)
+  {
+    this->mousePressCallback(event);
+  }
+}

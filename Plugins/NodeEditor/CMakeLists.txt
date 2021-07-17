@@ -19,6 +19,8 @@ list(APPEND sources
   pqNodeEditorView.h
   pqNodeEditorScene.cxx
   pqNodeEditorScene.h
+  pqNodeEditorLabel.cxx
+  pqNodeEditorLabel.h
 )
 
 paraview_plugin_add_dock_window(
