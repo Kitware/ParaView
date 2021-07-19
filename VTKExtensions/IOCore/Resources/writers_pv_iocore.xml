@@ -335,7 +335,7 @@
       </Documentation>
       <StringVectorProperty name="FileName"
                             number_of_elements="1"
-                            default_values="dataset_%.6ts.csv">
+                            default_values="dataset_{timestep:06d}.csv">
         <Documentation>
           Specify the filename to use.
         </Documentation>

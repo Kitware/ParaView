@@ -64,25 +64,15 @@ protected:
   vtkSMExtractWriterProxy();
   ~vtkSMExtractWriterProxy() override;
 
-  //@{
   /**
-   * Subclasses can use these methods to convert a filename for data or image
-   * extracts.
+   * Adds the output directory to the filename, replaces, in case of need, the old string format,
+   * and returns the formatted string using vtkPVStringFormatter.
    */
-  static std::string GenerateDataExtractsFileName(
-    const std::string& fname, vtkSMExtractsController* extractor);
-  static std::string GenerateImageExtractsFileName(
-    const std::string& fname, vtkSMExtractsController* extractor);
-  static std::string GenerateImageExtractsFileName(
-    const std::string& fname, const std::string& cameraparams, vtkSMExtractsController* extractor);
-  //@}
+  static std::string GenerateExtractsFileName(const std::string& filename, const char* outDir);
 
 private:
   vtkSMExtractWriterProxy(const vtkSMExtractWriterProxy&) = delete;
   void operator=(const vtkSMExtractWriterProxy&) = delete;
-
-  static std::string GenerateExtractsFileName(
-    const std::string& fname, vtkSMExtractsController* extractor, const char* rootdir);
 };
 
 #endif

@@ -21,6 +21,7 @@
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVProxyDefinitionIterator.h"
+#include "vtkPVStringFormatter.h"
 #include "vtkProcessModule.h"
 #include "vtkRemoteWriterHelper.h"
 #include "vtkSMExtractTriggerProxy.h"
@@ -87,7 +88,7 @@ std::string DefaultFilenamePrefix(vtkSMProxy* input)
 std::string DefaultFilename(vtkSMProxy* input, std::string pattern)
 {
   const auto prefix = DefaultFilenamePrefix(input);
-  vtksys::SystemTools::ReplaceString(pattern, "%p", prefix);
+  vtksys::SystemTools::ReplaceString(pattern, "{prefix}", prefix);
   return pattern;
 }
 }
@@ -173,7 +174,13 @@ bool vtkSMExtractsController::Extract(vtkSMProxy* extractor)
   if (auto writer = vtkSMExtractWriterProxy::SafeDownCast(
         vtkSMPropertyHelper(extractor, "Writer").GetAsProxy(0)))
   {
-    if (!writer->Write(this))
+    // define scope of arguments of extract controller
+    PV_STRING_FORMATTER_NAMED_SCOPE(
+      "EXTRACT", fmt::arg("timestep", this->GetTimeStep()), fmt::arg("time", this->GetTime()));
+
+    bool extractResult = writer->Write(this);
+
+    if (!extractResult)
     {
       vtkErrorMacro("Write failed! Extracts may not be generated correctly!");
       return false;

@@ -26,6 +26,7 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkPVOptions.h"
 #include "vtkPVPluginLoader.h"
 #include "vtkPVSession.h"
+#include "vtkPVStringFormatter.h"
 #include "vtkProcessModule.h"
 #include "vtkProcessModuleConfiguration.h"
 #include "vtkRemotingCoreConfiguration.h"
@@ -36,6 +37,7 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkSmartPointer.h"
 #include "vtkStringList.h"
 
+#include "vtksys/SystemInformation.hxx"
 #include <sstream>
 #include <string>
 #include <vector>
@@ -288,6 +290,23 @@ bool vtkInitializationHelper::Initialize(
                                     "} }",
     0.0);
 
+  // push the initial argument scope which includes global and environment arguments
+  std::string username;
+#if defined(_WIN16) || defined(_WIN32) || defined(_WIN64)
+  username = std::string(getenv("USERNAME"));
+#else
+  username = std::string(getenv("USER"));
+#endif
+  vtksys::SystemInformation sysInfo;
+  sysInfo.RunOSCheck();
+
+  vtkPVStringFormatter::PushScope("ENV", fmt::arg("username", username),
+    fmt::arg("hostname", std::string(sysInfo.GetHostname())),
+    fmt::arg("os", std::string(sysInfo.GetOSName())));
+  vtkPVStringFormatter::PushScope("GLOBAL", fmt::arg("date", std::chrono::system_clock::now()),
+    fmt::arg("appname", vtkInitializationHelper::ApplicationName),
+    fmt::arg("appversion", std::string(PARAVIEW_VERSION_FULL)));
+
   // until we replace PARAVIEW_SMTESTDRIVER with something cleaner, we have
   // to print this greeting out when the process is launched from
   // smTestDriver
@@ -330,6 +349,11 @@ void vtkInitializationHelper::Finalize()
       vtkGenericWarningMacro(<< "Saving settings file to '" << userSettingsFilePath << "' failed");
     }
   }
+
+  // pop GLOBAL scope
+  vtkPVStringFormatter::PopScope();
+  // pop ENV scope
+  vtkPVStringFormatter::PopScope();
 
   vtkSMProxyManager::Finalize();
   vtkProcessModule::Finalize();

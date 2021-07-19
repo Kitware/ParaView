@@ -17,6 +17,7 @@
 #include "vtkCamera.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVSession.h"
+#include "vtkPVStringFormatter.h"
 #include "vtkSMContextViewProxy.h"
 #include "vtkSMExtractsController.h"
 #include "vtkSMPropertyHelper.h"
@@ -294,12 +295,17 @@ bool vtkSMImageExtractWriterProxy::WriteImage(
   {
     sparams << this->GetShortName(pair.first) << "=" << pair.second;
   }
-  auto convertedname = this->GenerateImageExtractsFileName(fname, sparams.str(), extractor);
-  const bool status = writer->WriteImage(convertedname.c_str(), vtkPVSession::DATA_SERVER_ROOT);
+  // define scope of arguments with camera params
+  PV_STRING_FORMATTER_NAMED_SCOPE("EXTRACT", fmt::arg("camera", sparams.str()));
+
+  auto convertedName =
+    this->GenerateExtractsFileName(fname, extractor->GetRealExtractsOutputDirectory());
+
+  const bool status = writer->WriteImage(convertedName.c_str(), vtkPVSession::DATA_SERVER_ROOT);
   if (status)
   {
     // add to summary
-    extractor->AddSummaryEntry(this, convertedname, cameraParams);
+    extractor->AddSummaryEntry(this, convertedName, cameraParams);
   }
   return status;
 }

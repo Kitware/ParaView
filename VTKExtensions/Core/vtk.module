@@ -12,6 +12,7 @@ DEPENDS
   VTK::CommonExecutionModel
   VTK::IOXML
   VTK::cli11
+  VTK::fmt
 OPTIONAL_DEPENDS
   VTK::FiltersCore
 PRIVATE_DEPENDS

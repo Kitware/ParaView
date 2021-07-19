@@ -2,7 +2,7 @@
   <ProxyGroup name="extract_writers">
     <!-- =================================================================== -->
     <ImageExtractWriterProxy name="PNG">
-      <StringVectorProperty name="FileName" number_of_elements="1" default_values="%p_%.6ts%cm.png">
+      <StringVectorProperty name="FileName" number_of_elements="1" default_values="{prefix}_{timestep:06d}{camera}.png">
         <Documentation>
           Specify the filename to use.
         </Documentation>
@@ -92,7 +92,7 @@
 
     <!-- =================================================================== -->
     <ImageExtractWriterProxy name="JPG">
-      <StringVectorProperty name="FileName" number_of_elements="1" default_values="%p_%.6ts%cm.jpg">
+      <StringVectorProperty name="FileName" number_of_elements="1" default_values="{prefix}_{timestep:06d}{camera}.jpg">
         <Documentation>
           Specify the filename to use.
         </Documentation>
@@ -281,7 +281,7 @@
     <!-- =================================================================== -->
     <RecolorableImageExtractWriterProxy name="RecolorableImage"
       label="Recolorable Image">
-      <StringVectorProperty name="FileName" number_of_elements="1" default_values="%p_%.6ts%cm.vtk">
+      <StringVectorProperty name="FileName" number_of_elements="1" default_values="{prefix}_{timestep:06d}{camera}.vtk">
         <Documentation>
           Specify the filename to use.
         </Documentation>
