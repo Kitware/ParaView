@@ -22,6 +22,7 @@
 #include "vtkCatalystBlueprint.h"
 #include "vtkCommand.h"
 #include "vtkConduitSource.h"
+#include "vtkDataObjectToConduit.h"
 #include "vtkInSituInitializationHelper.h"
 #include "vtkInSituPipelineIO.h"
 #include "vtkInSituPipelinePython.h"
@@ -106,8 +107,10 @@ static bool convert_to_blueprint_mesh(
 
         if (auto multi_block = vtkMultiBlockDataSet::SafeDownCast(outputDataObject))
         {
-          auto data_set = multi_block->GetBlock(0);
-          // TODO: conversion to blueprint mesh.
+          if (auto data_object = multi_block->GetBlock(0))
+          {
+            return vtkDataObjectToConduit::FillConduitNode(data_object, channel);
+          }
         }
       }
     }
