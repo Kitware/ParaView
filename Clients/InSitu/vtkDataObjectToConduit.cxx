@@ -23,6 +23,7 @@
 #include "vtkImageData.h"
 #include "vtkLogger.h"
 #include "vtkPointData.h"
+#include "vtkRectilinearGrid.h"
 #include "vtkSOADataArrayTemplate.h"
 #include "vtkTypeFloat32Array.h"
 #include "vtkTypeFloat64Array.h"
@@ -72,6 +73,8 @@ bool vtkDataObjectToConduit::FillConduitNode(vtkDataSet* data_set, conduit_cpp::
 //----------------------------------------------------------------------------
 bool vtkDataObjectToConduit::FillTopology(vtkDataSet* data_set, conduit_cpp::Node& conduit_node)
 {
+  bool is_success = true;
+
   if (auto imageData = vtkImageData::SafeDownCast(data_set))
   {
     auto coords_node = conduit_node["coordsets/coords"];
@@ -97,12 +100,38 @@ bool vtkDataObjectToConduit::FillTopology(vtkDataSet* data_set, conduit_cpp::Nod
     topologies_node["type"] = "uniform";
     topologies_node["coordset"] = "coords";
   }
+  else if (auto rectilinear_grid = vtkRectilinearGrid::SafeDownCast(data_set))
+  {
+    auto coords_node = conduit_node["coordsets/coords"];
+
+    coords_node["type"] = "rectilinear";
+
+    auto x_values_node = coords_node["values/x"];
+    is_success = ConvertDataArrayToMCArray(rectilinear_grid->GetXCoordinates(), x_values_node);
+    if (is_success)
+    {
+      auto y_values_node = coords_node["values/y"];
+      is_success = ConvertDataArrayToMCArray(rectilinear_grid->GetYCoordinates(), y_values_node);
+    }
+    if (is_success)
+    {
+      auto z_values_node = coords_node["values/z"];
+      is_success = ConvertDataArrayToMCArray(rectilinear_grid->GetZCoordinates(), z_values_node);
+    }
+
+    if (is_success)
+    {
+      auto topologies_node = conduit_node["topologies/mesh"];
+      topologies_node["type"] = "rectilinear";
+      topologies_node["coordset"] = "coords";
+    }
+  }
   else
   {
     vtkLogF(ERROR, "Unsupported type.");
-    return false;
+    is_success = false;
   }
-  return true;
+  return is_success;
 }
 
 //----------------------------------------------------------------------------
