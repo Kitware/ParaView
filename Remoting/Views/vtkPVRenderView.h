@@ -678,13 +678,14 @@ public:
     GRADIENT,
     IMAGE,
     SKYBOX,
+    STEREO_SKYBOX,
   };
 
   ///@{
   /**
    * API for background color selection.
    */
-  vtkSetClampMacro(BackgroundColorMode, int, DEFAULT, SKYBOX);
+  vtkSetClampMacro(BackgroundColorMode, int, DEFAULT, STEREO_SKYBOX);
   vtkSetVector3Macro(Background, double);
   vtkGetVector3Macro(Background, double);
   vtkSetVector3Macro(Background2, double);
