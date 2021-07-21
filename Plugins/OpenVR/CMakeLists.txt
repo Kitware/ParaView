@@ -1,107 +1,32 @@
-find_package(Qt5 REQUIRED COMPONENTS Widgets Network)
+cmake_minimum_required(VERSION 3.8)
+project(OpenVRPlugin)
 
-set(interfaces)
-set(sources
-  pqOpenVRControls.cxx
-  pqOpenVRControls.h
-  pqOpenVRDockPanel.cxx
-  pqOpenVRDockPanel.h
-  vtkOpenVRPolyfill.h
-  vtkOpenVRPolyfill.cxx
-  vtkPVOpenVRCollaborationClient.cxx
-  vtkPVOpenVRCollaborationClient.h
-  vtkPVOpenVRExporter.cxx
-  vtkPVOpenVRExporter.h
-  vtkPVOpenVRHelper.cxx
-  vtkPVOpenVRHelper.h
-  vtkPVOpenVRPluginLocation.cxx
-  vtkPVOpenVRPluginLocation.h
-  vtkPVOpenVRWidgets.cxx
-  vtkPVOpenVRWidgets.h
-  )
+find_package(ParaView REQUIRED)
 
-paraview_plugin_add_dock_window(
-  CLASS_NAME pqOpenVRDockPanel
-  DOCK_AREA Right
-  INTERFACES dock_interfaces
-  SOURCES dock_sources)
+option(BUILD_SHARED_LIBS "Build shared libraries" ON)
 
-paraview_plugin_add_location(
-  CLASS_NAME vtkPVOpenVRPluginLocation
-  INTERFACES location_interfaces
-  SOURCES location_sources
-  )
+include(GNUInstallDirs)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_BINDIR}")
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_LIBDIR}")
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_LIBDIR}")
 
-list(APPEND interfaces
-  ${dock_interfaces} ${location_interfaces})
-list(APPEND sources
-  ${dock_sources} ${location_sources})
+set("_paraview_plugin_default_${CMAKE_PROJECT_NAME}" ON)
+paraview_plugin_scan(
+  PLUGIN_FILES      "${CMAKE_CURRENT_SOURCE_DIR}/Plugin/paraview.plugin"
+  PROVIDES_PLUGINS  plugins
+  REQUIRES_MODULES  required_modules)
 
-paraview_add_plugin(OpenVR
-  VERSION "1.2"
-  UI_FILES pqOpenVRDockPanel.ui pqOpenVRControls.ui
-  UI_INTERFACES ${interfaces}
-  SOURCES ${sources}
-  )
+foreach (module IN LISTS required_modules)
+  if (NOT TARGET "${module}")
+    message(#FATAL_ERROR
+      "Skipping example ${CMAKE_PROJECT_NAME}: Missing required module: "
+      "${module}")
+    return ()
+  endif ()
+endforeach ()
 
-
-#-----------------------------------------------------------------------------
-if (WIN32 AND PARAVIEW_PLUGIN_ENABLE_OpenVR)
-  option(PARAVIEW_OpenVR_Imago_Support
-    "Turn on support for the Imago Image Loading" OFF)
-  mark_as_advanced(PARAVIEW_OpenVR_Imago_Support)
-endif()
-
-if (PARAVIEW_OpenVR_Imago_Support)
-  set_property(
-    SOURCE
-      pqOpenVRDockPanel.cxx
-      vtkPVOpenVRWidgets.cxx
-    APPEND PROPERTY
-      COMPILE_DEFINITIONS OPENVR_HAS_IMAGO_SUPPORT)
-endif()
-
-if (VTK_ENABLE_OPENVR_COLLABORATION)
-  set_property(SOURCE vtkPVOpenVRCollaborationClient.cxx APPEND PROPERTY
-    COMPILE_DEFINITIONS OPENVR_HAS_COLLABORATION
-    )
-endif()
-
-set(openvr_input_files
-  pv_openvr_actions.json
-  pv_openvr_binding_hpmotioncontroller.json
-  pv_openvr_binding_vive_controller.json
-  pv_openvr_binding_oculus_touch.json
-)
-
-foreach(inputfile IN LISTS openvr_input_files)
-  configure_file(
-    ${CMAKE_CURRENT_SOURCE_DIR}/${inputfile}
-    "${CMAKE_BINARY_DIR}/${_paraview_build_plugin_directory}/${inputfile}"
-    COPYONLY)
-endforeach()
-
-install(
-  FILES ${openvr_input_files}
-  DESTINATION ${_paraview_build_plugin_directory}
-  COMPONENT   ${_paraview_build_PLUGINS_COMPONENT}
-)
-
-target_link_libraries(OpenVR
-  PRIVATE
-    ParaView::pqApplicationComponents
-    ParaView::RemotingCore
-    ParaView::RemotingServerManager
-    ParaView::RemotingViews
-    VTK::CommonCore
-    VTK::CommonDataModel
-    VTK::CommonSystem
-    VTK::IOCore
-    VTK::IOImage
-    VTK::IOXML
-    VTK::IOXMLParser
-    VTK::InteractionWidgets
-    VTK::RenderingCore
-    VTK::RenderingOpenGL2
-    VTK::RenderingOpenVR
-    VTK::ViewsCore)
+paraview_plugin_build(
+  RUNTIME_DESTINATION "${CMAKE_INSTALL_BINDIR}"
+  LIBRARY_DESTINATION "${CMAKE_INSTALL_LIBDIR}"
+  LIBRARY_SUBDIRECTORY "${PARAVIEW_PLUGIN_SUBDIR}"
+  PLUGINS ${plugins})

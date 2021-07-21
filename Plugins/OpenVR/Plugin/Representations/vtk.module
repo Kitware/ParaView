@@ -1,0 +1,7 @@
+NAME
+  OpenVR::vtkOpenVRRepresentations
+DEPENDS
+  ParaView::RemotingViews
+  VTK::RenderingOpenVR
+PRIVATE_DEPENDS
+  VTK::CommonCore

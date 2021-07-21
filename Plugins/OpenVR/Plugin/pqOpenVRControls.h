@@ -32,7 +32,7 @@ class pqOpenVRControls : public QWidget
   typedef QWidget Superclass;
 
 public:
-  pqOpenVRControls(vtkPVOpenVRHelper* val, QWidget* p = 0)
+  pqOpenVRControls(vtkPVOpenVRHelper* val, QWidget* p = nullptr)
     : Superclass(p)
   {
     this->constructor(val);

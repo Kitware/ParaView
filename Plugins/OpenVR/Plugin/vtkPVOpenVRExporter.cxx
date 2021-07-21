@@ -1,7 +1,6 @@
 /*=========================================================================
 
   Program:   ParaView
-  Module:    $RCSfile$
 
   Copyright (c) Kitware, Inc.
   All rights reserved.
