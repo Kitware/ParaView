@@ -28,21 +28,40 @@
 #  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 #==========================================================================
-vtk_module_third_party_internal(
-  VERSION "master"
-  LICENSE_FILES "vtkcatalyst/catalyst/License.txt"
-  SUBDIRECTORY vtkcatalyst
-  INTERFACE)
+vtk_module_third_party(
+  INTERNAL
+    VERSION "master"
+    LICENSE_FILES "vtkcatalyst/catalyst/License.txt"
+    SUBDIRECTORY vtkcatalyst
+    INTERFACE
+  EXTERNAL
+    PACKAGE catalyst
+    VERSION "2.0"
+    COMPONENTS SDK
+    CONFIG_MODE
+    TARGETS catalyst::catalyst
+    USE_VARIABLES _catalyst_macro_directory)
+
+# Catalyst cannot be mangled since it is a plugin API, so there is no
+# `vtk_catalyst.h` trampoline header. Instead, any other third party package
+# which may bring in its own `libcatalyst` will need to be verified at some
+# point (after the top-level `vtk_module_build` is the only reliable place for
+# this). To this end, the discovered `catalyst` package is provided here for
+# verification elsewhere.
+if (VTK_MODULE_USE_EXTERNAL_ParaView_vtkcatalyst)
+  set_property(GLOBAL PROPERTY
+    paraview_catalyst_dir_primary "${catalyst_DIR}")
+endif ()
 
 # Store the variable we need for Catalyst implementations inside of ParaView.
 # This is needed because the `find_package(catalyst)` isn't at the right scope
 # for its usage in ParaView's minimum CMake version. This (and usages of
 # `paraview_catalyst_macro_directory`) can be removed once CMake 3.17 is
 # required.
-if (VTK_MODULE_USE_EXTERNAL_ParaView_catalyst)
+if (VTK_MODULE_USE_EXTERNAL_ParaView_vtkcatalyst)
   set_property(GLOBAL PROPERTY
-      paraview_catalyst_macro_directory "${_catalyst_macro_directory}")
+    paraview_catalyst_macro_directory "${_catalyst_macro_directory}")
 else ()
   set_property(GLOBAL PROPERTY
-      paraview_catalyst_macro_directory "${CMAKE_CURRENT_SOURCE_DIR}/vtkcatalyst/catalyst/cmake")
+    paraview_catalyst_macro_directory "${CMAKE_CURRENT_SOURCE_DIR}/vtkcatalyst/catalyst/cmake")
 endif ()
