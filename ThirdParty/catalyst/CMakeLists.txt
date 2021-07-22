@@ -39,7 +39,7 @@ vtk_module_third_party_internal(
 # for its usage in ParaView's minimum CMake version. This (and usages of
 # `paraview_catalyst_macro_directory`) can be removed once CMake 3.17 is
 # required.
-if (VTK_MODULE_USE_EXTERNAL_ParaView_catalyst)
+if (VTK_MODULE_USE_EXTERNAL_ParaView_vtkcatalyst)
   set_property(GLOBAL PROPERTY
     paraview_catalyst_macro_directory "${_catalyst_macro_directory}")
 else ()
