@@ -28,11 +28,19 @@
 #  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 #==========================================================================
-vtk_module_third_party_internal(
-  VERSION "master"
-  LICENSE_FILES "vtkcatalyst/catalyst/License.txt"
-  SUBDIRECTORY vtkcatalyst
-  INTERFACE)
+vtk_module_third_party(
+  INTERNAL
+    VERSION "master"
+    LICENSE_FILES "vtkcatalyst/catalyst/License.txt"
+    SUBDIRECTORY vtkcatalyst
+    INTERFACE
+  EXTERNAL
+    PACKAGE catalyst
+    VERSION "2.0"
+    COMPONENTS SDK
+    CONFIG_MODE
+    TARGETS catalyst::catalyst
+    USE_VARIABLES _catalyst_macro_directory)
 
 # Store the variable we need for Catalyst implementations inside of ParaView.
 # This is needed because the `find_package(catalyst)` isn't at the right scope
