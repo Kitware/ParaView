@@ -41,8 +41,8 @@ vtk_module_third_party_internal(
 # required.
 if (VTK_MODULE_USE_EXTERNAL_ParaView_catalyst)
   set_property(GLOBAL PROPERTY
-      paraview_catalyst_macro_directory "${_catalyst_macro_directory}")
+    paraview_catalyst_macro_directory "${_catalyst_macro_directory}")
 else ()
   set_property(GLOBAL PROPERTY
-      paraview_catalyst_macro_directory "${CMAKE_CURRENT_SOURCE_DIR}/vtkcatalyst/catalyst/cmake")
+    paraview_catalyst_macro_directory "${CMAKE_CURRENT_SOURCE_DIR}/vtkcatalyst/catalyst/cmake")
 endif ()
