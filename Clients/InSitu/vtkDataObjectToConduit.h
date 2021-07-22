@@ -33,6 +33,8 @@ class vtkDataObject;
 class vtkDataSet;
 class vtkFieldData;
 class vtkDataArray;
+class vtkPoints;
+class vtkUnstructuredGrid;
 
 class VTKPVINSITU_EXPORT vtkDataObjectToConduit : public vtkObject
 {
@@ -62,6 +64,14 @@ private:
   static bool FillFields(
     vtkFieldData* field_data, const std::string& association, conduit_cpp::Node& conduit_node);
   static bool ConvertDataArrayToMCArray(vtkDataArray* data_array, conduit_cpp::Node& conduit_node);
+  static bool ConvertDataArrayToMCArray(
+    vtkDataArray* data_array, int offset, int stride, conduit_cpp::Node& conduit_node);
+  static bool ConvertPoints(vtkPoints* points, conduit_cpp::Node& x_values_node,
+    conduit_cpp::Node& y_values_node, conduit_cpp::Node& z_values_node);
+  static bool IsMixedShape(vtkUnstructuredGrid* unstructured_grid);
+  static bool IsSignedIntegralType(int data_type);
+  static bool IsUnsignedIntegralType(int data_type);
+  static bool IsFloatType(int data_type);
 };
 
 #endif
