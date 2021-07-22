@@ -592,6 +592,36 @@ vtk_module_build(
   TEST_INPUT_DATA_DIRECTORY   "${paraview_test_data_directory_input}"
   TEST_OUTPUT_DATA_DIRECTORY  "${paraview_test_data_directory_output}")
 
+# Catalyst sanity check. See `ThirdParty/catalyst/CMakeLists.txt` for details.
+if (TARGET ParaView::vtkcatalyst)
+  get_property(catalyst_dir_primary GLOBAL PROPERTY paraview_catalyst_dir_primary)
+  set(catalyst_using_modules)
+  foreach (catalyst_using_module IN LISTS catalyst_using_modules)
+    get_property(catalyst_dir_module GLOBAL PROPERTY "paraview_catalyst_dir_${catalyst_using_module}")
+    if (NOT catalyst_using_module)
+      continue ()
+    endif ()
+
+    if (NOT catalyst_dir_primary)
+      message(FATAL_ERROR
+        "ParaView's `catalyst` module is using its internal catalyst but the "
+        "`${catalyst_using_module}` is using a copy from "
+        "`${catalyst_dir_module}`. Due to the way `libcatalyst` works, all "
+        "modules which use it must agree on a single installation of it. "
+        "Either ParaView must use an external catalyst (using "
+        "`VTK_MODULE_USE_EXTERNAL_ParaView_vtkcatalyst`) or external packages "
+        "must be configured without `libcatalyst` support.")
+    elseif (NOT catalyst_dir_primary STREQUAL catalyst_dir_module)
+      message(FATAL_ERROR
+        "ParaView's `catalyst` module is using an external catalyst from "
+        "`${catalyst_dir_primary}` but the `${catalyst_using_module}` found "
+        "its copy at `${catalyst_dir_module}`. Due to the way `libcatalyst` "
+        "works, all modules which use it must agree on a single installation "
+        "of it.")
+    endif ()
+  endforeach ()
+endif ()
+
 vtk_module_build(
   MODULES             ${paraview_client_modules}
   KITS                ${paraview_client_kits}
