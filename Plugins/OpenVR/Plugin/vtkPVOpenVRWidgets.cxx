@@ -1,7 +1,6 @@
 /*=========================================================================
 
   Program:   ParaView
-  Module:    $RCSfile$
 
   Copyright (c) Kitware, Inc.
   All rights reserved.
@@ -747,13 +746,13 @@ void vtkPVOpenVRWidgets::UpdateTexture()
       texture->MipmapOn();
       texture->SetInputData(id);
       id->UnRegister(nullptr);
-      // use constant area of 0.5 m^2
+      // use constant area of 2.0 m^2
       int* dims = id->GetDimensions();
-      double xsize = sqrt(0.5 * dims[0] / dims[1]);
-      double ysize = 0.5 / xsize;
-      this->ImagePlane->SetOrigin(-xsize - 0.01, 0.0, 0.0);
-      this->ImagePlane->SetPoint1(-0.01, 0.0, 0.0);
-      this->ImagePlane->SetPoint2(-xsize - 0.01, ysize, 0.0);
+      double xsize = sqrt(2.0 * dims[0] / dims[1]);
+      double ysize = 2.0 / xsize;
+      this->ImagePlane->SetOrigin(-xsize * 0.5, -ysize * 0.5, 0.0);
+      this->ImagePlane->SetPoint1(xsize * 0.5, -ysize * 0.5, 0.0);
+      this->ImagePlane->SetPoint2(-xsize * 0.5, ysize * 0.5, 0.0);
       this->ImageActor->SetTexture(texture);
     }
   }
@@ -821,12 +820,14 @@ void vtkPVOpenVRWidgets::ShowBillboard(
     rot->Transpose();
     vtkTransform::GetOrientation(orient, rot);
     this->TextActor3D->SetOrientation(orient);
-    this->TextActor3D->RotateX(-30.0);
+    this->TextActor3D->RotateY(-60.0);
+    this->TextActor3D->RotateX(-10.0);
 
+    double bbPos[3] = { 0.7, 0.9, -0.4 };
     ren->GetActiveCamera()->GetPosition(tpos);
-    tpos[0] += (0.7 * scale * dop[0] - 0.1 * scale * vr[0] - 0.4 * scale * vup[0]);
-    tpos[1] += (0.7 * scale * dop[1] - 0.1 * scale * vr[1] - 0.4 * scale * vup[1]);
-    tpos[2] += (0.7 * scale * dop[2] - 0.1 * scale * vr[2] - 0.4 * scale * vup[2]);
+    tpos[0] += (bbPos[0] * scale * dop[0] + bbPos[1] * scale * vr[0] + bbPos[2] * scale * vup[0]);
+    tpos[1] += (bbPos[0] * scale * dop[1] + bbPos[1] * scale * vr[1] + bbPos[2] * scale * vup[1]);
+    tpos[2] += (bbPos[0] * scale * dop[2] + bbPos[1] * scale * vr[2] + bbPos[2] * scale * vup[2]);
     this->TextActor3D->SetPosition(tpos);
     // scale should cover 10% of FOV
     double fov = ren->GetActiveCamera()->GetViewAngle();
@@ -835,8 +836,13 @@ void vtkPVOpenVRWidgets::ShowBillboard(
     tsize *= scale;
     this->TextActor3D->SetScale(tsize, tsize, tsize);
 
+    double iaPos[3] = { 1.0, 0.0, -0.3 };
+    ren->GetActiveCamera()->GetPosition(tpos);
+    tpos[0] += (iaPos[0] * scale * dop[0] + iaPos[1] * scale * vr[0] + iaPos[2] * scale * vup[0]);
+    tpos[1] += (iaPos[0] * scale * dop[1] + iaPos[1] * scale * vr[1] + iaPos[2] * scale * vup[1]);
+    tpos[2] += (iaPos[0] * scale * dop[2] + iaPos[1] * scale * vr[2] + iaPos[2] * scale * vup[2]);
     this->ImageActor->SetOrientation(orient);
-    this->ImageActor->RotateX(-30.0);
+    this->ImageActor->RotateX(-10.0);
     this->ImageActor->SetPosition(tpos);
     this->ImageActor->SetScale(scale, scale, scale);
   }
@@ -879,13 +885,13 @@ void vtkPVOpenVRWidgets::ShowBillboard(
         texture->InterpolateOn();
         texture->MipmapOn();
 
-        // use constant area of 0.5 m^2
+        // use constant area of 2.0 m^2
         int* dims = texture->GetInput()->GetDimensions();
-        double xsize = sqrt(0.5 * dims[0] / dims[1]);
-        double ysize = 0.5 / xsize;
-        this->ImagePlane->SetOrigin(-xsize - 0.01, 0.0, 0.0);
-        this->ImagePlane->SetPoint1(-0.01, 0.0, 0.0);
-        this->ImagePlane->SetPoint2(-xsize - 0.01, ysize, 0.0);
+        double xsize = sqrt(2.0 * dims[0] / dims[1]);
+        double ysize = 2.0 / xsize;
+        this->ImagePlane->SetOrigin(-xsize * 0.5, -ysize * 0.5, 0.0);
+        this->ImagePlane->SetPoint1(xsize * 0.5, -ysize * 0.5, 0.0);
+        this->ImagePlane->SetPoint2(-xsize * 0.5, ysize * 0.5, 0.0);
 
         this->ImageActor->SetTexture(texture);
 
@@ -909,9 +915,9 @@ void vtkPVOpenVRWidgets::ShowBillboard(
       if (success)
       {
         this->ImageActor->SetTexture(nullptr);
-        this->ImagePlane->SetOrigin(-0.2 - 0.01, 0.0, 0.0);
-        this->ImagePlane->SetPoint1(-0.01, 0.0, 0.0);
-        this->ImagePlane->SetPoint2(-0.2 - 0.01, 0.2, 0.0);
+        this->ImagePlane->SetOrigin(-0.2, -0.002, 0.0);
+        this->ImagePlane->SetPoint1(0.2, -0.002, 0.0);
+        this->ImagePlane->SetPoint2(-0.2, 0.002, 0.0);
         this->WaitingForImage = true;
         this->RenderObserver =
           ren->AddObserver(vtkCommand::StartEvent, this, &vtkPVOpenVRWidgets::UpdateTexture);
