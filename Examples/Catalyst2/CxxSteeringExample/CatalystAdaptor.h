@@ -117,7 +117,7 @@ void AddSteerableChannel(conduit_cpp::Node& exec_params)
   steerable_mesh["topologies/mesh/coordset"].set("coords");
   steerable_mesh["topologies/mesh/elements/shape"].set("point");
   steerable_mesh["topologies/mesh/elements/connectivity"].set_int32_vector({ 0 });
-  steerable_mesh["fields/steerable/association"].set("element");
+  steerable_mesh["fields/steerable/association"].set("vertex");
   steerable_mesh["fields/steerable/topology"].set("mesh");
   steerable_mesh["fields/steerable/volume_dependent"].set("false");
   steerable_mesh["fields/steerable/values"].set_int32_vector({ 2 });
@@ -145,6 +145,10 @@ void Results()
   if (err != catalyst_error_ok)
   {
     std::cerr << "Failed to execute Catalyst: " << err << std::endl;
+  }
+  else
+  {
+    results.print();
   }
 }
 

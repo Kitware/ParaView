@@ -5,7 +5,7 @@ from paraview.simple import *
 producer = TrivialProducer(registrationName="grid")
 steerable_source = TrivialProducer(registrationName="steerable")
 steerable_parameters = SteerableParameters(registrationName="SteerableParameters")
-UpdateSteerableParameters(steerable_parameters, steerable_source)
+UpdateSteerableParameters(steerable_parameters, "steerable")
 
 from paraview import catalyst
 
@@ -21,13 +21,5 @@ def catalyst_execute(info):
     print("velocity-magnitude-range:", producer.PointData["velocity"].GetRange(-1))
     print("pressure-range:", producer.CellData["pressure"].GetRange(0))
     print("timestep: ", producer.FieldData["timestep"].GetRange(0)[0])
-
-    #global steerable_source
-    #global steerable_parameters
-    #steerable_source = TrivialProducer(registrationName="steerable")
-    #steerable_parameters = SteerableParameters(registrationName="SteerableParameters")
-    #print(steerable_parameters)
-
-    #UpdateSteerableParameters(steerable_parameters, steerable_source)
 
     SaveExtractsUsingCatalystOptions(options)

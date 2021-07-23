@@ -70,7 +70,6 @@ bool vtkDataObjectToConduit::FillConduitNode(vtkDataSet* data_set, conduit_cpp::
   {
     is_success = FillFields(data_set, conduit_node);
   }
-
   return is_success;
 }
 
@@ -193,7 +192,14 @@ bool vtkDataObjectToConduit::FillTopology(vtkDataSet* data_set, conduit_cpp::Nod
       topologies_node["type"] = "unstructured";
       topologies_node["coordset"] = "coords";
 
-      switch (unstructured_grid->GetCellType(0))
+      int cell_type = VTK_VERTEX;
+      auto number_of_cells = unstructured_grid->GetNumberOfCells();
+      if (number_of_cells > 0)
+      {
+        cell_type = unstructured_grid->GetCellType(0);
+      }
+
+      switch (cell_type)
       {
         case VTK_HEXAHEDRON:
           topologies_node["elements/shape"] = "hex";
@@ -219,7 +225,7 @@ bool vtkDataObjectToConduit::FillTopology(vtkDataSet* data_set, conduit_cpp::Nod
           topologies_node["elements/shape"] = "point";
           break;
         default:
-          vtkLogF(ERROR, "Unsupported cell type in unstructured grid.");
+          vtkLog(ERROR, << "Unsupported cell type in unstructured grid. Cell type: " << cell_type);
           break;
       }
 
@@ -234,6 +240,7 @@ bool vtkDataObjectToConduit::FillTopology(vtkDataSet* data_set, conduit_cpp::Nod
     vtkLogF(ERROR, "Unsupported type.");
     is_success = false;
   }
+
   return is_success;
 }
 
@@ -259,7 +266,7 @@ bool vtkDataObjectToConduit::FillFields(vtkDataSet* data_set, conduit_cpp::Node&
   {
     if (auto field_data = data_set->GetFieldData())
     {
-      // Ignore them for now.
+      // field without associated topology is not supported by conduit...
     }
   }
 

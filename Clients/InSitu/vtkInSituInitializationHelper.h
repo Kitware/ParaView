@@ -149,7 +149,8 @@ public:
   static bool IsPythonSupported();
 
   static void GetSteerableProxies(std::vector<std::pair<std::string, vtkSMProxy*> >& proxies);
-  static void UpdateSteerableParameters(vtkSMProxy* steerableProxy, vtkSMProxy* steerableSource);
+  static void UpdateSteerableParameters(
+    vtkSMProxy* steerableProxy, const char* steerableSourceName);
 
 protected:
   vtkInSituInitializationHelper();

@@ -634,9 +634,9 @@ void vtkInSituInitializationHelper::GetSteerableProxies(
 
 //----------------------------------------------------------------------------
 void vtkInSituInitializationHelper::UpdateSteerableParameters(
-  vtkSMProxy* steerableProxy, vtkSMProxy* steerableSource)
+  vtkSMProxy* steerableProxy, const char* steerableSourceName)
 {
-  if (steerableProxy == nullptr || steerableSource == nullptr)
+  if (steerableProxy == nullptr || steerableSourceName == nullptr)
   {
     return;
   }
@@ -649,7 +649,7 @@ void vtkInSituInitializationHelper::UpdateSteerableParameters(
     if (proxyIterator == internals->SteerableProxies.end())
     {
       internals->SteerableProxies.insert(
-        std::make_pair(steerableProxy, steerableProxy->GetGlobalIDAsString()));
+        std::make_pair(steerableProxy, std::string(steerableSourceName)));
     }
 
     UpdateSteerableProxies();
