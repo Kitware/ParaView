@@ -18,8 +18,10 @@
 #include "vtkBoundingBox.h"
 #include "vtkCameraPass.h"
 #include "vtkCaveSynchronizedRenderers.h"
+#include "vtkFXAAOptions.h"
 #include "vtkImageProcessingPass.h"
 #include "vtkObjectFactory.h"
+#include "vtkOpenGLFXAAPass.h"
 #include "vtkOpenGLRenderer.h"
 #include "vtkPVClientServerSynchronizedRenderers.h"
 #include "vtkPVConfig.h"
@@ -221,6 +223,7 @@ vtkPVSynchronizedRenderer::~vtkPVSynchronizedRenderer()
   }
   this->SetImageProcessingPass(nullptr);
   this->SetRenderPass(nullptr);
+  this->SetFXAAOptions(nullptr);
 }
 
 //----------------------------------------------------------------------------
@@ -345,10 +348,23 @@ void vtkPVSynchronizedRenderer::SetupPasses()
   {
     return;
   }
-  vtkCameraPass* cameraPass = vtkCameraPass::New();
+  vtkNew<vtkOpenGLFXAAPass> fxaaPass;
+  fxaaPass->SetFXAAOptions(this->GetFXAAOptions());
+  vtkNew<vtkCameraPass> cameraPass;
+  if (this->GetUseFXAA())
+  {
+    this->Renderer->SetPass(fxaaPass);
+  }
   if (this->ImageProcessingPass)
   {
-    this->Renderer->SetPass(this->ImageProcessingPass);
+    if (this->GetUseFXAA())
+    {
+      fxaaPass->SetDelegatePass(this->ImageProcessingPass);
+    }
+    else
+    {
+      this->Renderer->SetPass(this->ImageProcessingPass);
+    }
     this->ImageProcessingPass->SetDelegatePass(cameraPass);
   }
   else
@@ -362,11 +378,9 @@ void vtkPVSynchronizedRenderer::SetupPasses()
   }
   else
   {
-    vtkPVDefaultPass* defaultPass = vtkPVDefaultPass::New();
+    vtkNew<vtkPVDefaultPass> defaultPass;
     cameraPass->SetDelegatePass(defaultPass);
-    defaultPass->Delete();
   }
-  cameraPass->Delete();
 }
 
 //----------------------------------------------------------------------------
@@ -498,4 +512,26 @@ void vtkPVSynchronizedRenderer::UpdateFixBackgroundState()
     const bool fix_background = !(this->EnableRayTracing && this->EnablePathTracing);
     this->ParallelSynchronizer->SetFixBackground(fix_background);
   }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVSynchronizedRenderer::SetUseFXAA(bool use)
+{
+  if (this->UseFXAA == use)
+  {
+    return;
+  }
+  this->UseFXAA = use;
+  this->SetupPasses();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVSynchronizedRenderer::SetFXAAOptions(vtkFXAAOptions* options)
+{
+  if (this->FXAAOptions == options)
+  {
+    return;
+  }
+  vtkSetObjectBodyMacro(FXAAOptions, vtkFXAAOptions, options);
+  this->SetupPasses();
 }
