@@ -565,9 +565,24 @@ def SaveExtracts(**kwargs):
     SetProperties(proxy, **kwargs)
     return proxy.SaveExtracts()
 
+
+def CreateSteerableParameters(steerable_proxy_type_name,
+                              steerable_proxy_registration_name=
+                              "SteeringParameters",
+                              result_mesh_name="steerable"):
+    pxm = servermanager.ProxyManager()
+    steerable_proxy = pxm.NewProxy("sources", steerable_proxy_type_name)
+    pxm.RegisterProxy("sources", steerable_proxy_registration_name,
+                      steerable_proxy)
+    steerable_proxy_wrapper = servermanager._getPyProxy(steerable_proxy)
+    UpdateSteerableParameters(steerable_proxy_wrapper, result_mesh_name)
+    return steerable_proxy_wrapper
+
+
 def UpdateSteerableParameters(steerable_proxy, steerable_source_name):
     helper = paraview.modules.vtkPVInSitu.vtkInSituInitializationHelper
-    helper.UpdateSteerableParameters(steerable_proxy.SMProxy, steerable_source_name)
+    helper.UpdateSteerableParameters(steerable_proxy.SMProxy,
+                                     steerable_source_name)
 
 #==============================================================================
 # XML State management

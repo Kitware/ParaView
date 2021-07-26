@@ -3,9 +3,7 @@ from paraview.simple import *
 # registrationName must match the channel name used in the
 # 'CatalystAdaptor'.
 producer = TrivialProducer(registrationName="grid")
-steerable_source = TrivialProducer(registrationName="steerable")
-steerable_parameters = SteerableParameters(registrationName="SteerableParameters")
-UpdateSteerableParameters(steerable_parameters, "steerable")
+steerable_parameters = CreateSteerableParameters("SteerableParameters")
 
 from paraview import catalyst
 
