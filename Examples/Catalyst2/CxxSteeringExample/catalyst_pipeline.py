@@ -1,7 +1,5 @@
 from paraview.simple import *
 
-# registrationName must match the channel name used in the
-# 'CatalystAdaptor'.
 producer = TrivialProducer(registrationName="grid")
 steerable_parameters = CreateSteerableParameters("SteerableParameters")
 
@@ -21,3 +19,11 @@ def catalyst_execute(info):
     print("timestep: ", producer.FieldData["timestep"].GetRange(0)[0])
 
     SaveExtractsUsingCatalystOptions(options)
+
+    global steerable_parameters
+
+    # Emulate user modification of the Proxy:
+    steerable_parameters.Center[0] = info.time
+    steerable_parameters.Center[1] = info.time
+    steerable_parameters.Center[2] = info.time
+    steerable_parameters.Type[0] = int(info.time * 10) % 3
