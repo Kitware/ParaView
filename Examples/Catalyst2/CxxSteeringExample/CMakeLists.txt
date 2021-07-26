@@ -52,7 +52,8 @@ if (USE_CATALYST)
     add_test(
       NAME CxxSteeringExample::SimplePipeline
       COMMAND CxxSteeringExample
-              ${CMAKE_CURRENT_SOURCE_DIR}/catalyst_pipeline.py)
+              ${CMAKE_CURRENT_SOURCE_DIR}/catalyst_pipeline.py
+              ${CMAKE_CURRENT_SOURCE_DIR}/catalyst_steering_proxies.xml)
     set_tests_properties("CxxSteeringExample::SimplePipeline"
       PROPERTIES
         FAIL_REGULAR_EXPRESSION "Err;ERROR:;instances(s)? still around;ERR\\\|"

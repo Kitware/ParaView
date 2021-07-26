@@ -207,11 +207,6 @@ bool vtkDataObjectToConduit::FillTopology(vtkDataSet* data_set, conduit_cpp::Nod
         case VTK_TETRA:
           topologies_node["elements/shape"] = "tet";
           break;
-          // case VTK_POLYGON:
-          // topologies_node["elements/shape"] = "polygonal";
-          // auto faces = unstructured_grid->GetFaces();
-          // TODO: add more
-          break;
         case VTK_QUAD:
           topologies_node["elements/shape"] = "quad";
           break;
