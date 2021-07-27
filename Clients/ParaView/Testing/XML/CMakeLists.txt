@@ -407,6 +407,9 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/RenderNanGUIColor.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/RenderNanPresetColor.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/ResampleToHyperTreeGridBranching_3.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/ResampleToHyperTreeGrid2DX.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/ResampleToHyperTreeGrid2DY.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/ResampleToHyperTreeGrid2DZ.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/ResampleWithDataset_A.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/ResampleWithDataset_B.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/ResampleWithDataset_C.png}"
@@ -1711,8 +1714,7 @@ list(APPEND TESTS_WITHOUT_BASELINES
 
 # ResampleToHyperTreeGrid only works in client mode
 paraview_add_client_tests(
-  BASELINE_DIR ${PARAVIEW_TEST_BASELINE_DIR}
-  TEST_SCRIPTS ResampleToHyperTreeGridBranching_3.xml
+  TEST_SCRIPTS ResampleToHyperTreeGrid.xml
 )
 
 paraview_add_client_tests(
