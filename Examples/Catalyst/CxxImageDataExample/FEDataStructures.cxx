@@ -49,7 +49,7 @@ unsigned int Grid::GetNumberOfLocalCells()
 
 void Grid::GetLocalPoint(unsigned int pointId, double* point)
 {
-  unsigned int logicalX = pointId % (this->Extent[1] - this->Extent[0] + 1);
+  unsigned int logicalX = this->Extent[0] + pointId % (this->Extent[1] - this->Extent[0] + 1);
   assert(logicalX <= this->Extent[1]);
   point[0] = this->Spacing[0] * logicalX;
   unsigned int logicalY =
