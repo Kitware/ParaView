@@ -40,8 +40,6 @@ from paraview.web.decorators import (
     treeDomainDecorator,
 )
 
-# import Twisted reactor for later callback
-from twisted.internet import reactor
 from vtkmodules.vtkCommonCore import vtkCollection, vtkUnsignedCharArray
 from vtkmodules.vtkCommonDataModel import vtkDataObject, vtkImageData
 from vtkmodules.vtkWebCore import vtkDataEncoder, vtkWebInteractionEvent
@@ -53,6 +51,11 @@ from vtkmodules.web.render_window_serializer import (
     initializeSerializers,
     serializeInstance,
 )
+
+try:
+    from wslink import schedule_callback
+except:
+    from twisted.internet.reactor import callLater as schedule_callback
 
 # import RPC annotation
 from wslink import register as exportRpc
@@ -560,7 +563,7 @@ class ParaViewWebPublishImageDelivery(ParaViewWebProtocol):
             self.lastStaleTime[vId] = time.time()
             if self.staleHandlerCount[vId] == 0:
                 self.staleHandlerCount[vId] += 1
-                reactor.callLater(
+                schedule_callback(
                     self.deltaStaleTimeBeforeRender,
                     lambda: self.renderStaleImage(vId, staleCount),
                 )
@@ -579,7 +582,7 @@ class ParaViewWebPublishImageDelivery(ParaViewWebProtocol):
                     self.pushRender(vId, False, staleCount + 1)
                 elif delta < self.deltaStaleTimeBeforeRender:
                     self.staleHandlerCount[vId] += 1
-                    reactor.callLater(
+                    schedule_callback(
                         self.deltaStaleTimeBeforeRender - delta + 0.001,
                         lambda: self.renderStaleImage(vId, staleCount),
                     )
@@ -612,15 +615,15 @@ class ParaViewWebPublishImageDelivery(ParaViewWebProtocol):
             if self.activeViewId:
                 # If active view, prioritize that one over the others
                 # -> Divide by 2 the refresh rate of the other views
-                reactor.callLater(0.001, lambda: self.animate(not renderAllViews))
+                schedule_callback(0.001, lambda: self.animate(not renderAllViews))
             else:
                 # Keep animating at the best rate we can
-                reactor.callLater(0.001, lambda: self.animate())
+                schedule_callback(0.001, lambda: self.animate())
         else:
             # We have time so let's render all
             if self.targetFrameRate < self.maxFrameRate and nextAnimateTime > 0.005:
                 self.targetFrameRate += 1.0
-            reactor.callLater(nextAnimateTime, lambda: self.animate())
+            schedule_callback(nextAnimateTime, lambda: self.animate())
 
     @exportRpc("viewport.image.animation.fps.max")
     def setMaxFrameRate(self, fps=30):
@@ -658,7 +661,7 @@ class ParaViewWebPublishImageDelivery(ParaViewWebProtocol):
             return
 
         if sView.GetSession().GetPendingProgress():
-            reactor.callLater(
+            schedule_callback(
                 self.deltaStaleTimeBeforeRender, lambda: self.progressiveRender(viewId)
             )
         else:
@@ -666,7 +669,7 @@ class ParaViewWebPublishImageDelivery(ParaViewWebProtocol):
             self.pushRender(realViewId, True)
 
             if again:
-                reactor.callLater(0.001, lambda: self.progressiveRender(viewId))
+                schedule_callback(0.001, lambda: self.progressiveRender(viewId))
 
     @exportRpc("viewport.image.push")
     def imagePush(self, options):
@@ -1340,7 +1343,7 @@ class ParaViewWebTimeHandler(ParaViewWebProtocol):
     def nextPlay(self):
         self.updateTime("next")
         if self.playing:
-            reactor.callLater(self.playTime, self.nextPlay)
+            schedule_callback(self.playTime, self.nextPlay)
 
     # RpcName: updateTime => pv.vcr.action
     @exportRpc("pv.vcr.action")
