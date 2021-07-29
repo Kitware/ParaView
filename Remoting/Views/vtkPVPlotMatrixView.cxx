@@ -20,9 +20,12 @@
 #include "vtkContextScene.h"
 #include "vtkContextView.h"
 #include "vtkObjectFactory.h"
+#include "vtkPVStringFormatter.h"
 #include "vtkRenderWindow.h"
 #include "vtkScatterPlotMatrix.h"
 #include "vtkTextProperty.h"
+
+#include "vtksys/SystemTools.hxx"
 
 vtkStandardNewMacro(vtkPVPlotMatrixView);
 
@@ -774,7 +777,27 @@ void vtkPVPlotMatrixView::Render(bool interactive)
   {
     return;
   }
+
+  // define scope with time
+  PV_STRING_FORMATTER_NAMED_SCOPE("VIEW", fmt::arg("time", this->GetViewTime()));
+
+  // check for old format
+  if (this->GetTitle())
+  {
+    std::string formattedTitle = this->GetTitle();
+    std::string possibleOldFormatString = formattedTitle;
+    vtksys::SystemTools::ReplaceString(formattedTitle, "${TIME}", "{time}");
+    if (possibleOldFormatString != formattedTitle)
+    {
+      vtkLogF(WARNING, "Legacy formatting pattern detected."
+                       "Please replace '%s' with '%s'.",
+        possibleOldFormatString.c_str(), formattedTitle.c_str());
+    }
+    this->SetTitle(formattedTitle.c_str());
+  }
+
   this->PlotMatrix->SetTitle(this->GetFormattedTitle());
+
   this->Superclass::Render(interactive);
 }
 

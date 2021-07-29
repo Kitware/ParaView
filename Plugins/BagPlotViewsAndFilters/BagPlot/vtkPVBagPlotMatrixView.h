@@ -31,12 +31,9 @@ protected:
   ~vtkPVBagPlotMatrixView() override = default;
 
   /**
-   *
-   * Method to get the Formatted title after replacing some key strings
-   * After calling the parent class,
-   * this replace the key ${VARIANCE} by its actual value
+   * Rendering implementation.
    */
-  std::string GetFormattedTitle() override;
+  void Render(bool interactive) override;
 
 private:
   vtkPVBagPlotMatrixView(const vtkPVBagPlotMatrixView&) = delete;

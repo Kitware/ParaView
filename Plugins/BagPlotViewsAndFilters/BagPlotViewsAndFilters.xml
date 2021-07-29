@@ -711,13 +711,13 @@
                             name="ChartTitle"
                             number_of_elements="1"
                             override="1"
-                            default_values="Explained Variance: ${VARIANCE}%">
+                            default_values="Explained Variance: {variance}%">
         <Documentation>
           Set the title to use for the bag plot matrix view.
-          Use ${VARIANCE} to display the explained variance and ${TIME} to display the current time.
+          Use {variance} to display the explained variance and {time} to display the current time.
         </Documentation>
         <Hints>
-          <PlaceholderText>Use ${VARIANCE} to display explained variance</PlaceholderText>
+          <PlaceholderText>Use {variance} to display explained variance</PlaceholderText>
         </Hints>
       </StringVectorProperty>
     </PlotMatrixViewProxy>
