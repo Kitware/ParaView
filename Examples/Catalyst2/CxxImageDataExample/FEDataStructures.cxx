@@ -26,6 +26,7 @@ void Grid::Initialize(const unsigned int numPoints[3], const double spacing[3])
   MPI_Comm_size(MPI_COMM_WORLD, &mpiSize);
   this->Extent[0] = mpiRank * numPoints[0] / mpiSize;
   this->Extent[1] = (mpiRank + 1) * numPoints[0] / mpiSize;
+
   if (mpiSize != mpiRank + 1)
   {
     this->Extent[1]++;
@@ -49,7 +50,7 @@ unsigned int Grid::GetNumberOfLocalCells()
 
 void Grid::GetLocalPoint(unsigned int pointId, double* point)
 {
-  unsigned int logicalX = pointId % (this->Extent[1] - this->Extent[0] + 1);
+  unsigned int logicalX = this->Extent[0] + pointId % (this->Extent[1] - this->Extent[0] + 1);
   assert(logicalX <= this->Extent[1]);
   point[0] = this->Spacing[0] * logicalX;
   unsigned int logicalY =

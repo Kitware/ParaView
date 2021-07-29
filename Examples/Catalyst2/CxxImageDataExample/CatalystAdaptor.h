@@ -86,11 +86,11 @@ void Execute(int cycle, double time, Grid& grid, Attributes& attribs)
   mesh["coordsets/coords/dims/j"].set(ext[3] - ext[2] + 1);
   mesh["coordsets/coords/dims/k"].set(ext[5] - ext[4] + 1);
 
-  double origin[3];
-  grid.GetLocalPoint(0, origin);
-  mesh["coordsets/coords/origin/x"].set(origin[0]);
-  mesh["coordsets/coords/origin/y"].set(origin[1]);
-  mesh["coordsets/coords/origin/z"].set(origin[2]);
+  double localOrigin[3];
+  grid.GetLocalPoint(0, localOrigin);
+  mesh["coordsets/coords/origin/x"].set(localOrigin[0]);
+  mesh["coordsets/coords/origin/y"].set(localOrigin[1]);
+  mesh["coordsets/coords/origin/z"].set(localOrigin[2]);
 
   const auto spacing = grid.GetSpacing();
   mesh["coordsets/coords/spacing/x"].set(spacing[0]);
