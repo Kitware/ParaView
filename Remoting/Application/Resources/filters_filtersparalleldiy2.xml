@@ -91,8 +91,8 @@
       <Documentation short_help="Generate ghosts.">
         Generate ghost cells and ghost points in a composite data set. Ghosts are exchanged
         between blocks / partitions of same type. Currently, vtkImageData, vtkRectilinearGrid,
-        vtkStructuredGrid and vtkUnstructuredGrid are supported. Those input types can be
-        dispatched in vtkPartitionedDataSet or vtkPartitionedDataSetCollection. Inside a,
+        vtkStructuredGrid, vtkPolyData and vtkUnstructuredGrid are supported. Those input types can
+        be dispatched in vtkPartitionedDataSet or vtkPartitionedDataSetCollection. Inside a,
         collection, 2 partitioned data sets do not exchange ghosts, but partitions inside a
         partitioned data set do.
       </Documentation>
