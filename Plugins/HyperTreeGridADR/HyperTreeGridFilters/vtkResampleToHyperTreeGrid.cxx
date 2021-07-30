@@ -213,14 +213,16 @@ int vtkResampleToHyperTreeGrid::RequestData(
   output->Initialize();
   output->SetBranchFactor(this->BranchFactor);
 
+  int dims[3] = { this->Dimensions[0] < 1 ? 1 : this->Dimensions[0],
+    this->Dimensions[1] < 1 ? 1 : this->Dimensions[1],
+    this->Dimensions[2] < 1 ? 1 : this->Dimensions[2] };
+
   // Setting the point locations for the hyper tree grid
   {
     vtkNew<vtkDoubleArray> coords;
-    coords->SetNumberOfValues(this->Dimensions[0]);
-    double step = this->Dimensions[0] > 1
-      ? (this->Bounds[1] - this->Bounds[0]) / (this->Dimensions[0] - 1)
-      : 0.0;
-    for (int i = 0; i < this->Dimensions[0]; ++i)
+    coords->SetNumberOfValues(dims[0]);
+    double step = dims[0] > 1 ? (this->Bounds[1] - this->Bounds[0]) / (dims[0] - 1) : 0.0;
+    for (int i = 0; i < dims[0]; ++i)
     {
       coords->SetValue(i, this->Bounds[0] + step * i);
     }
@@ -229,11 +231,9 @@ int vtkResampleToHyperTreeGrid::RequestData(
 
   {
     vtkNew<vtkDoubleArray> coords;
-    coords->SetNumberOfValues(this->Dimensions[1]);
-    double step = this->Dimensions[1] > 1
-      ? (this->Bounds[3] - this->Bounds[2]) / (this->Dimensions[1] - 1)
-      : 0.0;
-    for (int i = 0; i < this->Dimensions[1]; ++i)
+    coords->SetNumberOfValues(dims[1]);
+    double step = dims[1] > 1 ? (this->Bounds[3] - this->Bounds[2]) / (dims[1] - 1) : 0.0;
+    for (int i = 0; i < dims[1]; ++i)
     {
       coords->SetValue(i, this->Bounds[2] + step * i);
     }
@@ -242,18 +242,16 @@ int vtkResampleToHyperTreeGrid::RequestData(
 
   {
     vtkNew<vtkDoubleArray> coords;
-    coords->SetNumberOfValues(this->Dimensions[2]);
-    double step = this->Dimensions[2] > 1
-      ? (this->Bounds[5] - this->Bounds[4]) / (this->Dimensions[2] - 1)
-      : 0.0;
-    for (int i = 0; i < this->Dimensions[2]; ++i)
+    coords->SetNumberOfValues(dims[2]);
+    double step = dims[2] > 1 ? (this->Bounds[5] - this->Bounds[4]) / (dims[2] - 1) : 0.0;
+    for (int i = 0; i < dims[2]; ++i)
     {
       coords->SetValue(i, this->Bounds[4] + step * i);
     }
     output->SetZCoordinates(coords);
   }
 
-  output->SetDimensions(this->Dimensions);
+  output->SetDimensions(dims);
   output->GetCellDims(this->CellDims);
 
   // Setting up a few useful values during the pipeline
@@ -1042,18 +1040,24 @@ void vtkResampleToHyperTreeGrid::CreateGridOfMultiResolutionGrids(
           }
         }
 
-        vtkIdType i = std::floor<vtkIdType>(std::min<double>((point[0] - this->Bounds[0]) /
-                      (this->Bounds[1] - this->Bounds[0]) * this->CellDims[0] *
-                      this->MaxResolutionPerTree,
-                    this->MaxResolutionPerTree * this->CellDims[0] - 1)),
-                  j = std::floor<vtkIdType>(std::min<double>((point[1] - this->Bounds[2]) /
-                      (this->Bounds[3] - this->Bounds[2]) * this->CellDims[1] *
-                      this->MaxResolutionPerTree,
-                    this->MaxResolutionPerTree * this->CellDims[1] - 1)),
-                  k = std::floor<vtkIdType>(std::min<double>((point[2] - this->Bounds[4]) /
-                      (this->Bounds[5] - this->Bounds[4]) * this->CellDims[2] *
-                      this->MaxResolutionPerTree,
-                    this->MaxResolutionPerTree * this->CellDims[2] - 1));
+        vtkIdType i = this->CellDims[0] == 1
+          ? 0
+          : std::floor<vtkIdType>(
+              std::min<double>((point[0] - this->Bounds[0]) / (this->Bounds[1] - this->Bounds[0]) *
+                  this->CellDims[0] * this->MaxResolutionPerTree,
+                this->MaxResolutionPerTree * this->CellDims[0] - 1)),
+                  j = this->CellDims[1] == 1
+          ? 0
+          : std::floor<vtkIdType>(std::min<double>((point[1] - this->Bounds[2]) /
+                (this->Bounds[3] - this->Bounds[2]) * this->CellDims[1] *
+                this->MaxResolutionPerTree,
+              this->MaxResolutionPerTree * this->CellDims[1] - 1)),
+                  k = this->CellDims[2] == 1
+          ? 0
+          : std::floor<vtkIdType>(std::min<double>((point[2] - this->Bounds[4]) /
+                (this->Bounds[5] - this->Bounds[4]) * this->CellDims[2] *
+                this->MaxResolutionPerTree,
+              this->MaxResolutionPerTree * this->CellDims[2] - 1));
 
         // We bijectively convert the local coordinates within a hyper tree grid to an integer to
         // pass
@@ -1417,24 +1421,33 @@ void vtkResampleToHyperTreeGrid::CreateGridOfMultiResolutionGrids(
         // If it it, we forbid subdivision with GridElement::CanSubdivide
         vtkCell* cell = dataSet->GetCell(cellId);
         double* cellBounds = cell->GetBounds();
-        vtkIdType imin = static_cast<vtkIdType>((cellBounds[0] - this->Bounds[0]) *
-                    this->CellDims[0] / (this->Bounds[1] - this->Bounds[0])),
-                  imax =
-                    static_cast<vtkIdType>(((cellBounds[1] - this->Bounds[0]) * this->CellDims[0] /
-                                             (this->Bounds[1] - this->Bounds[0])) *
-                      (1.0 - VTK_DBL_EPSILON)),
-                  jmin = static_cast<vtkIdType>((cellBounds[2] - this->Bounds[2]) *
-                    this->CellDims[1] / (this->Bounds[3] - this->Bounds[2])),
-                  jmax =
-                    static_cast<vtkIdType>(((cellBounds[3] - this->Bounds[2]) * this->CellDims[1] /
-                                             (this->Bounds[3] - this->Bounds[2])) *
-                      (1.0 - VTK_DBL_EPSILON)),
-                  kmin = static_cast<vtkIdType>((cellBounds[4] - this->Bounds[4]) *
-                    this->CellDims[2] / (this->Bounds[5] - this->Bounds[4])),
-                  kmax =
-                    static_cast<vtkIdType>(((cellBounds[5] - this->Bounds[4]) * this->CellDims[2] /
-                                             (this->Bounds[5] - this->Bounds[4])) *
-                      (1.0 - VTK_DBL_EPSILON));
+        vtkIdType imin = this->CellDims[0] == 1
+          ? 0
+          : static_cast<vtkIdType>((cellBounds[0] - this->Bounds[0]) * this->CellDims[0] /
+              (this->Bounds[1] - this->Bounds[0])),
+                  imax = this->CellDims[0] == 1
+          ? 0
+          : static_cast<vtkIdType>(((cellBounds[1] - this->Bounds[0]) * this->CellDims[0] /
+                                     (this->Bounds[1] - this->Bounds[0])) *
+                    (1.0 - VTK_DBL_EPSILON)),
+                  jmin = this->CellDims[1] == 1
+          ? 0
+          : static_cast<vtkIdType>((cellBounds[2] - this->Bounds[2]) * this->CellDims[1] /
+                    (this->Bounds[3] - this->Bounds[2])),
+                  jmax = this->CellDims[1] == 1
+          ? 0
+          : static_cast<vtkIdType>(((cellBounds[3] - this->Bounds[2]) * this->CellDims[1] /
+                                     (this->Bounds[3] - this->Bounds[2])) *
+                    (1.0 - VTK_DBL_EPSILON)),
+                  kmin = this->CellDims[2] == 1
+          ? 0
+          : static_cast<vtkIdType>((cellBounds[4] - this->Bounds[4]) * this->CellDims[2] /
+                    (this->Bounds[5] - this->Bounds[4])),
+                  kmax = this->CellDims[2] == 1
+          ? 0
+          : static_cast<vtkIdType>(((cellBounds[5] - this->Bounds[4]) * this->CellDims[2] /
+                                     (this->Bounds[5] - this->Bounds[4])) *
+                    (1.0 - VTK_DBL_EPSILON));
         double hyperTreeBounds[6];
 
         // For each hyper tree intersecting the bounding box
@@ -1827,11 +1840,22 @@ void vtkResampleToHyperTreeGrid::SubdivideLeaves(vtkHyperTreeGridNonOrientedCurs
       j * tree->GetBranchFactor() + jj, k * tree->GetBranchFactor() + kk, multiResolutionGrid);
     cursor->ToParent();
 
-    if (++ii == tree->GetBranchFactor())
+    if (this->CellDims[0] != 1)
     {
-      if (++jj == tree->GetBranchFactor())
+      ++ii;
+    }
+    if (ii == tree->GetBranchFactor() || this->CellDims[0] == 1)
+    {
+      if (this->CellDims[1] != 1)
       {
-        ++kk;
+        ++jj;
+      }
+      if (jj == tree->GetBranchFactor() || this->CellDims[1] == 1)
+      {
+        if (this->CellDims[2] != 1)
+        {
+          ++kk;
+        }
         jj = 0;
       }
       ii = 0;
