@@ -517,12 +517,7 @@ void vtkSIProxyDefinitionManager::AddElement(
 vtkPVXMLElement* vtkSIProxyDefinitionManager::GetProxyDefinition(
   const char* groupName, const char* proxyName, const bool throwError)
 {
-  vtkPVXMLElement* element = nullptr;
-  if (std::string(proxyName) == "SteerableSource")
-  {
-    element = this->Internals->GetProxyElement(groupName, proxyName);
-  }
-  element = this->Internals->GetProxyElement(groupName, proxyName);
+  vtkPVXMLElement* element = this->Internals->GetProxyElement(groupName, proxyName);
   if (!throwError || element)
   {
     return element;
