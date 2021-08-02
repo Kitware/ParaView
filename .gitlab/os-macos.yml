@@ -88,6 +88,7 @@
         - sccache --show-stats
 
     interruptible: true
+    timeout: 2 hours
 
 .cmake_test_macos:
     stage: test
