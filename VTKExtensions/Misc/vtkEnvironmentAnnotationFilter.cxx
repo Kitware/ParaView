@@ -14,21 +14,15 @@
 =========================================================================*/
 #include "vtkEnvironmentAnnotationFilter.h"
 
-#include "vtkDataObjectTypes.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
 #include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
+#include "vtkPVStringFormatter.h"
 #include "vtkStringArray.h"
 #include "vtkTable.h"
 
-#include <cassert>
-#include <map>
-#include <vector>
-
-#include "vtksys/SystemInformation.hxx"
 #include "vtksys/SystemTools.hxx"
-#include <sstream>
 
 vtkStandardNewMacro(vtkEnvironmentAnnotationFilter);
 //----------------------------------------------------------------------------
@@ -48,51 +42,45 @@ vtkEnvironmentAnnotationFilter::~vtkEnvironmentAnnotationFilter() = default;
 //----------------------------------------------------------------------------
 void vtkEnvironmentAnnotationFilter::UpdateAnnotationValue()
 {
-  std::string value;
+  std::string formattedString;
   if (this->DisplayUserName)
   {
-#if defined(_WIN32)
-    value += std::string(getenv("USERNAME")) + "\n";
-#elif defined(_WIN16)
-    value += std::string(getenv("USERNAME")) + "\n";
-#else
-    value += std::string(getenv("USER")) + "\n";
-#endif
+    formattedString += "{ENV_username}\n";
   }
   if (this->DisplaySystemName)
   {
-#if defined(_WIN32)
-    value += "Windows\n";
-#elif defined(_WIN16)
-    value += "Windows 16bit\n"
-#elif defined(__APPLE_CC__)
-    value += "Mac OS X\n";
-#elif defined(__linux__)
-    value += "Linux\n";
-#endif
+    formattedString += "{ENV_os}\n";
   }
   if (this->DisplayDate)
   {
-    std::string date = vtksys::SystemTools::GetCurrentDateTime("%c");
-    value += date + "\n";
+    formattedString += "{GLOBAL_date:%a %m %b %Y %I:%M:%S %p %Z}\n";
   }
   if (this->DisplayFileName)
   {
     if (!this->FileName.empty())
     {
+      std::string filenameArgument;
       if (this->DisplayFilePath)
       {
         std::string path = vtksys::SystemTools::GetFilenamePath(this->FileName);
         if (!path.empty())
         {
-          value += path + "/";
+          filenameArgument += path + "/";
         }
       }
-      value += vtksys::SystemTools::GetFilenameName(this->FileName);
+      filenameArgument += vtksys::SystemTools::GetFilenameName(this->FileName);
+
+      vtkPVStringFormatter::PushScope(fmt::arg("filename", filenameArgument));
+      formattedString += "{filename}";
     }
   }
 
-  this->AnnotationValue = value;
+  this->AnnotationValue = vtkPVStringFormatter::Format(formattedString);
+
+  if (this->DisplayFileName && !this->FileName.empty())
+  {
+    vtkPVStringFormatter::PopScope();
+  }
 }
 
 //----------------------------------------------------------------------------
