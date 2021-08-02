@@ -121,6 +121,7 @@ static bool convert_to_blueprint_mesh(
 enum paraview_catalyst_error
 {
   paraview_catalyst_error_invalid_node = 100,
+  paraview_catalyst_error_results = 101,
 };
 #define pvcatalyst_err(name) static_cast<enum catalyst_error>(paraview_catalyst_error_##name)
 
@@ -393,17 +394,25 @@ enum catalyst_error catalyst_about_paraview(conduit_node* params)
 //-----------------------------------------------------------------------------
 enum catalyst_error catalyst_results_paraview(conduit_node* params)
 {
-  bool isSuccess = true;
+  auto stub_error_status = catalyst_stub_results(params);
+
+  if (stub_error_status != catalyst_error_ok)
+  {
+    return stub_error_status;
+  }
 
   conduit_cpp::Node cpp_params = conduit_cpp::cpp_node(params);
   auto catalyst_node = cpp_params["catalyst"];
 
+  bool is_success = true;
   std::vector<std::pair<std::string, vtkSMProxy*> > steerableProxies;
   vtkInSituInitializationHelper::GetSteerableProxies(steerableProxies);
-  for (auto& steerableProxy : steerableProxies)
+  for (auto proxyIterator = steerableProxies.begin();
+       is_success && proxyIterator != steerableProxies.end(); ++proxyIterator)
   {
-    convert_to_blueprint_mesh(steerableProxy.second, steerableProxy.first, catalyst_node);
+    is_success =
+      convert_to_blueprint_mesh(proxyIterator->second, proxyIterator->first, catalyst_node);
   }
 
-  return isSuccess ? catalyst_error_ok : pvcatalyst_err(invalid_node);
+  return is_success ? catalyst_error_ok : pvcatalyst_err(results);
 }
