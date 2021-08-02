@@ -39,7 +39,7 @@ int main(int argc, char* argv[])
     attributes.UpdateFields(time);
 #ifdef USE_CATALYST
     CatalystAdaptor::Execute(timeStep, time, grid, attributes);
-    CatalystAdaptor::Results();
+    CatalystAdaptor::Results(timeStep);
 #endif
   }
 

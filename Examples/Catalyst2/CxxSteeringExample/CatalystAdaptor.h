@@ -138,7 +138,7 @@ void Execute(int cycle, double time, Grid& grid, Attributes& attribs)
   }
 }
 
-void Results()
+void Results(unsigned int timeStep)
 {
   conduit_cpp::Node results;
   catalyst_error err = catalyst_results(conduit_cpp::c_node(&results));
@@ -148,7 +148,38 @@ void Results()
   }
   else
   {
+    std::cout << "Result Node dump:" << std::endl;
     results.print();
+
+    const std::string x_value_path = "catalyst/steerable/coordsets/coords/values/x";
+    if (results.has_path(x_value_path))
+    {
+      double expected_value = timeStep * 0.1;
+      auto node = results[x_value_path].as_float64_ptr();
+      if (node[0] != expected_value)
+      {
+        std::cerr << "Wrong value: " << node[0] << " expected: " << expected_value << std::endl;
+      }
+    }
+    else
+    {
+      std::cerr << "key: [" << x_value_path << "] not found!" << std::endl;
+    }
+
+    const std::string field_values_path = "catalyst/steerable/fields/type/values";
+    if (results.has_path(field_values_path))
+    {
+      int expected_value = timeStep % 3;
+      auto node = results[field_values_path].as_int_ptr();
+      if (node[0] != expected_value)
+      {
+        std::cerr << "Wrong value: " << node[0] << " expected: " << expected_value << std::endl;
+      }
+    }
+    else
+    {
+      std::cerr << "key: [" << field_values_path << "] not found!" << std::endl;
+    }
   }
 }
 
