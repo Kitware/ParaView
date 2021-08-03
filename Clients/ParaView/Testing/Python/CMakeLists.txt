@@ -22,6 +22,7 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/TestPythonViewNumpyScript.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/TestCatalystClient.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/FontSize.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/SaveTransparentImages.png}"
   )
 
 # only enable TestPythonAnnotationFilter test if numpy is available
@@ -69,6 +70,7 @@ paraview_add_test_python(
   ColorBy.py
   PartialArrayIndication.py
   ResetSession.py
+  SaveTransparentImages.py
   TestClipCylinder.py
   TestColorHistogram.py
   TestGeometryBoundsClobber.py

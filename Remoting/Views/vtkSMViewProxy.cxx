@@ -33,6 +33,7 @@
 #include "vtkRenderer.h"
 #include "vtkRendererCollection.h"
 #include "vtkSMDataDeliveryManagerProxy.h"
+#include "vtkSMNamedPropertyIterator.h"
 #include "vtkSMParaViewPipelineControllerWithRendering.h"
 #include "vtkSMProperty.h"
 #include "vtkSMProxyIterator.h"
@@ -46,6 +47,7 @@
 #include "vtkSmartPointer.h"
 #include "vtkStereoCompositor.h"
 #include "vtkUnsignedCharArray.h"
+#include "vtkVector.h"
 #include "vtkWindowToImageFilter.h"
 
 #include <cassert>
@@ -206,29 +208,37 @@ private:
   vtkSmartPointer<vtkImageData> TranslucentCapture(int magX, int magY)
   {
     auto self = this->Self;
-    vtkRenderWindow* window = self->GetRenderWindow();
-    if (window && vtkSMViewProxy::GetTransparentBackground())
+    if (vtkSMViewProxy::GetTransparentBackground() && self->GetProperty("Background") != nullptr)
     {
-      if (auto renderer = this->FindBackgroundRenderer(window))
-      {
-        std::unique_ptr<RendererSaverRAII> rsaver(new RendererSaverRAII(renderer));
-        renderer->SetGradientBackground(false);
-        renderer->SetTexturedBackground(false);
-        renderer->SetBackground(1.0, 1.0, 1.0);
-        auto whiteImage = this->Capture(magX, magY);
-        renderer->SetBackground(0, 0, 0);
-        auto blackImage = this->Capture(magX, magY);
-        rsaver.reset();
+      vtkNew<vtkSMNamedPropertyIterator> piter;
+      piter->SetProxy(self);
+      piter->SetPropertyNames(
+        { "UseColorPaletteForBackground", "Background", "BackgroundColorMode" });
 
-        vtkNew<vtkImageTransparencyFilter> tfilter;
-        tfilter->AddInputData(whiteImage);
-        tfilter->AddInputData(blackImage);
-        tfilter->Update();
+      // Save current state.
+      auto state = vtk::TakeSmartPointer(self->SaveXMLState(nullptr, piter));
+      vtkSMPropertyHelper(self, "UseColorPaletteForBackground", /*quiet*/ true).Set(0);
+      vtkSMPropertyHelper(self, "BackgroundColorMode", true).Set(0); // single-color.
 
-        vtkSmartPointer<vtkImageData> result;
-        result = tfilter->GetOutput();
-        return result;
-      }
+      vtkSMPropertyHelper(self, "Background").Set(vtkVector3d(1.0).GetData(), 3);
+      self->UpdateVTKObjects();
+      auto whiteImage = this->Capture(magX, magY);
+      vtkSMPropertyHelper(self, "Background").Set(vtkVector3d(0.0).GetData(), 3);
+      self->UpdateVTKObjects();
+      auto blackImage = this->Capture(magX, magY);
+
+      // restore state.
+      self->LoadXMLState(state, nullptr);
+      self->UpdateVTKObjects();
+
+      vtkNew<vtkImageTransparencyFilter> tfilter;
+      tfilter->AddInputData(whiteImage);
+      tfilter->AddInputData(blackImage);
+      tfilter->Update();
+
+      vtkSmartPointer<vtkImageData> result;
+      result = tfilter->GetOutput();
+      return result;
     }
 
     return this->Capture(magX, magY);
@@ -238,47 +248,6 @@ private:
   {
     return vtkSmartPointer<vtkImageData>::Take(this->Self->CaptureWindowSingle(magX, magY));
   }
-
-  vtkRenderer* FindBackgroundRenderer(vtkRenderWindow* window) const
-  {
-    vtkCollectionSimpleIterator cookie;
-    auto renderers = window->GetRenderers();
-    renderers->InitTraversal(cookie);
-    while (auto renderer = renderers->GetNextRenderer(cookie))
-    {
-      if (renderer->GetErase())
-      {
-        // Found a background-writing renderer.
-        return renderer;
-      }
-    }
-
-    return nullptr;
-  }
-
-  class RendererSaverRAII
-  {
-    vtkRenderer* Renderer;
-    const bool Gradient;
-    const bool Textured;
-    const double Background[3];
-
-  public:
-    RendererSaverRAII(vtkRenderer* ren)
-      : Renderer(ren)
-      , Gradient(ren->GetGradientBackground())
-      , Textured(ren->GetTexturedBackground())
-      , Background{ ren->GetBackground()[0], ren->GetBackground()[1], ren->GetBackground()[2] }
-    {
-    }
-
-    ~RendererSaverRAII()
-    {
-      this->Renderer->SetGradientBackground(this->Gradient);
-      this->Renderer->SetTexturedBackground(this->Textured);
-      this->Renderer->SetBackground(const_cast<double*>(this->Background));
-    }
-  };
 
   bool StereoCompose(int type, vtkImageData* leftNResult, vtkImageData* right)
   {
