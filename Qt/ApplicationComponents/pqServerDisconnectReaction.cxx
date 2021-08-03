@@ -90,11 +90,23 @@ bool pqServerDisconnectReaction::disconnectFromServerWithWarning()
 //-----------------------------------------------------------------------------
 void pqServerDisconnectReaction::disconnectFromServer()
 {
+  auto& activeObjects = pqActiveObjects::instance();
   pqApplicationCore* core = pqApplicationCore::instance();
-  pqServer* server = pqActiveObjects::instance().activeServer();
+  pqServer* server = activeObjects.activeServer();
   if (server)
   {
     core->getObjectBuilder()->removeServer(server);
+
+    // set some other server active.
+    if (activeObjects.activeServer() == nullptr)
+    {
+      auto smmodel = core->getServerManagerModel();
+      auto allServers = smmodel->findItems<pqServer*>();
+      if (!allServers.isEmpty())
+      {
+        pqActiveObjects::instance().setActiveServer(allServers[0]);
+      }
+    }
   }
 }
 
