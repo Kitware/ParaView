@@ -52,6 +52,7 @@ vtkSIProxyProperty::vtkSIProxyProperty()
   this->RemoveCommand = nullptr;
   this->ArgumentType = vtkSIProxyProperty::VTK;
   this->NullOnEmpty = false;
+  this->SkipValidCheck = false;
 }
 
 //----------------------------------------------------------------------------
@@ -103,6 +104,12 @@ bool vtkSIProxyProperty::ReadXMLAttributes(vtkSIProxy* proxyhelper, vtkPVXMLElem
   if (element->GetScalarAttribute("null_on_empty", &null_on_empty))
   {
     this->SetNullOnEmpty(null_on_empty != 0);
+  }
+
+  int skip_valid_check;
+  if (element->GetScalarAttribute("skip_valid_check", &skip_valid_check))
+  {
+    this->SkipValidCheck = skip_valid_check != 0;
   }
 
   if (this->InformationOnly)
@@ -233,7 +240,7 @@ vtkObjectBase* vtkSIProxyProperty::GetObjectBase(vtkTypeUInt32 globalId)
 //----------------------------------------------------------------------------
 bool vtkSIProxyProperty::IsValidNull(vtkTypeUInt32 globalId)
 {
-  if (globalId == 0)
+  if (globalId == 0 || this->SkipValidCheck)
   {
     return true;
   }

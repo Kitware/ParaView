@@ -127,6 +127,8 @@ private:
 
   class vtkObjectCache;
   vtkObjectCache* ObjectCache;
+
+  bool SkipValidCheck;
 };
 
 #endif

@@ -1662,6 +1662,62 @@ def WriteAnimationGeometry(filename, view=None):
     writer.SetViewModule(view.SMProxy)
     writer.Save()
 
+def FetchData(proxy=None, **kwargs):
+    """Fetches data from the specified data producer for processing locally. Use this
+    function with caution since this can cause large amounts of data to be
+    gathered and delivered to the client.
+
+    If no producer is specified, the active source is used.
+
+    **Basic Usage**
+
+
+        # to fetch data from port 0
+        dataMap = FetchData(producer)
+
+        # to fetch data from a specific port
+        dataMap = FetchData(OutputPort(producer, 1))
+
+
+    `FetchData()` does not explicitly update the pipeline. It is expected that the
+    pipeline is already updated. This will simply deliver the current data.
+
+    Returns a map where the key is an integer representing a rank and value is
+    the dataset fetched from that rank.
+
+    **Keyword Parameters**
+
+    The following keyword parameters can be used to customize the fetchs.
+
+        GatherOnAllRanks (bool/int, optional):
+            This is used only in symmetric batch (or ParaView-Catalyst) mode.
+            If True, then FetchData() will gather the data on all ranks. Default
+            is to only gather the data on the root node.
+
+        SourceRanks (list(int), optional):
+            List of ints to specity explicitly the ranks from which to fetch
+            data. By default, data from all ranks is fetched.
+    """
+    if proxy is None:
+        proxy = GetActiveSource()
+
+    if not proxy:
+        raise RuntimeError("Cannot fetch data from invalid proxy")
+
+    dataMover = servermanager.misc.DataMover()
+    dataMover.Producer = proxy
+    dataMover.PortNumber = proxy.Port
+    # set properties on dataMover
+    SetProperties(dataMover, **kwargs)
+    dataMover.SMProxy.InvokeCommand("Execute")
+
+    vtkObj = dataMover.GetClientSideObject()
+    result = {}
+    for i in range(vtkObj.GetNumberOfDataSets()):
+        result[vtkObj.GetDataSetRank(i)] = vtkObj.GetDataSetAtIndex(i)
+    del dataMover
+    return result
+
 #==============================================================================
 # Lookup Table / Scalarbar methods
 #==============================================================================
