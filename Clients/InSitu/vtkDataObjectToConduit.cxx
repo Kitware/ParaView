@@ -249,20 +249,26 @@ bool vtkDataObjectToConduit::FillFields(vtkDataSet* data_set, conduit_cpp::Node&
     is_success = FillFields(cell_data, "element", conduit_node);
   }
 
-  if (is_success)
+  if (!is_success)
   {
-    if (auto point_data = data_set->GetPointData())
-    {
-      is_success = FillFields(point_data, "vertex", conduit_node);
-    }
+    vtkVLog(vtkLogger::VERBOSITY_ERROR, "FillFields with element failed.");
+    return is_success;
   }
 
-  if (is_success)
+  if (auto point_data = data_set->GetPointData())
   {
-    if (auto field_data = data_set->GetFieldData())
-    {
-      // field without associated topology is not supported by conduit...
-    }
+    is_success = FillFields(point_data, "vertex", conduit_node);
+  }
+
+  if (!is_success)
+  {
+    vtkVLog(vtkLogger::VERBOSITY_ERROR, "FillFields with vertex failed.");
+    return is_success;
+  }
+
+  if (auto field_data = data_set->GetFieldData())
+  {
+    // field without associated topology is not supported by conduit...
   }
 
   return is_success;
@@ -285,7 +291,7 @@ bool vtkDataObjectToConduit::FillFields(
       continue;
     }
 
-    auto field_node = conduit_node["fields"][array->GetName()];
+    auto field_node = conduit_node["fields"][name];
     field_node["association"] = association;
     field_node["topology"] = "mesh";
     field_node["volume_dependent"] = "false";
@@ -308,8 +314,6 @@ bool vtkDataObjectToConduit::ConvertDataArrayToMCArray(
 bool vtkDataObjectToConduit::ConvertDataArrayToMCArray(
   vtkDataArray* data_array, int offset, int stride, conduit_cpp::Node& conduit_node)
 {
-  bool is_success = true;
-
   stride = std::max(stride, 1);
   conduit_index_t number_of_elements = data_array->GetNumberOfValues() / stride;
 
@@ -320,193 +324,146 @@ bool vtkDataObjectToConduit::ConvertDataArrayToMCArray(
   bool is_supported = true;
   if (IsSignedIntegralType(data_type))
   {
-    if (data_type_size == 1)
+    switch (data_type_size)
     {
-      if (array_type == vtkAbstractArray::AoSDataArrayTemplate)
-      {
-        conduit_node.set_external_int8_ptr((conduit_int8*)data_array->GetVoidPointer(0),
-          number_of_elements, offset * sizeof(conduit_int8), stride * sizeof(conduit_int8));
-      }
-      else if (array_type == vtkAbstractArray::SoADataArrayTemplate)
-      {
-        conduit_node.set_external_int8_ptr((conduit_int8*)data_array->GetVoidPointer(0),
-          number_of_elements, offset * sizeof(conduit_int8), stride * sizeof(conduit_int8));
-      }
-      else
-      {
+      case 1:
+        if (array_type == vtkAbstractArray::AoSDataArrayTemplate)
+        {
+          conduit_node.set_external_int8_ptr((conduit_int8*)data_array->GetVoidPointer(0),
+            number_of_elements, offset * sizeof(conduit_int8), stride * sizeof(conduit_int8));
+        }
+        else
+        {
+          is_supported = false;
+        }
+        break;
+
+      case 2:
+        if (array_type == vtkAbstractArray::AoSDataArrayTemplate)
+        {
+          conduit_node.set_external_int16_ptr((conduit_int16*)data_array->GetVoidPointer(0),
+            number_of_elements, offset * sizeof(conduit_int16), stride * sizeof(conduit_int16));
+        }
+        else
+        {
+          is_supported = false;
+        }
+        break;
+
+      case 4:
+        if (array_type == vtkAbstractArray::AoSDataArrayTemplate)
+        {
+          conduit_node.set_external_int32_ptr((conduit_int32*)data_array->GetVoidPointer(0),
+            number_of_elements, offset * sizeof(conduit_int32), stride * sizeof(conduit_int32));
+        }
+        else
+        {
+          is_supported = false;
+        }
+        break;
+
+      case 8:
+        if (array_type == vtkAbstractArray::AoSDataArrayTemplate)
+        {
+          conduit_node.set_external_int64_ptr((conduit_int64*)data_array->GetVoidPointer(0),
+            number_of_elements, offset * sizeof(conduit_int64), stride * sizeof(conduit_int64));
+        }
+        else
+        {
+          is_supported = false;
+        }
+        break;
+
+      default:
         is_supported = false;
-      }
-    }
-    else if (data_type_size == 2)
-    {
-      if (array_type == vtkAbstractArray::AoSDataArrayTemplate)
-      {
-        conduit_node.set_external_int16_ptr((conduit_int16*)data_array->GetVoidPointer(0),
-          number_of_elements, offset * sizeof(conduit_int16), stride * sizeof(conduit_int16));
-      }
-      else if (array_type == vtkAbstractArray::SoADataArrayTemplate)
-      {
-        conduit_node.set_external_int16_ptr((conduit_int16*)data_array->GetVoidPointer(0),
-          number_of_elements, offset * sizeof(conduit_int16), stride * sizeof(conduit_int16));
-      }
-      else
-      {
-        is_supported = false;
-      }
-    }
-    else if (data_type_size == 4)
-    {
-      if (array_type == vtkAbstractArray::AoSDataArrayTemplate)
-      {
-        conduit_node.set_external_int32_ptr((conduit_int32*)data_array->GetVoidPointer(0),
-          number_of_elements, offset * sizeof(conduit_int32), stride * sizeof(conduit_int32));
-      }
-      else if (array_type == vtkAbstractArray::SoADataArrayTemplate)
-      {
-        conduit_node.set_external_int32_ptr((conduit_int32*)data_array->GetVoidPointer(0),
-          number_of_elements, offset * sizeof(conduit_int32), stride * sizeof(conduit_int32));
-      }
-      else
-      {
-        is_supported = false;
-      }
-    }
-    else if (data_type_size == 8)
-    {
-      if (array_type == vtkAbstractArray::AoSDataArrayTemplate)
-      {
-        conduit_node.set_external_int64_ptr((conduit_int64*)data_array->GetVoidPointer(0),
-          number_of_elements, offset * sizeof(conduit_int64), stride * sizeof(conduit_int64));
-      }
-      else if (array_type == vtkAbstractArray::SoADataArrayTemplate)
-      {
-        conduit_node.set_external_int64_ptr((conduit_int64*)data_array->GetVoidPointer(0),
-          number_of_elements, offset * sizeof(conduit_int64), stride * sizeof(conduit_int64));
-      }
-      else
-      {
-        is_supported = false;
-      }
-    }
-    else
-    {
-      is_supported = false;
     }
   }
   else if (IsUnsignedIntegralType(data_type))
   {
-    if (data_type_size == 1)
+    switch (data_type_size)
     {
-      if (array_type == vtkAbstractArray::AoSDataArrayTemplate)
-      {
-        conduit_node.set_external_uint8_ptr((conduit_uint8*)data_array->GetVoidPointer(0),
-          number_of_elements, offset * sizeof(conduit_uint8), stride * sizeof(conduit_uint8));
-      }
-      else if (array_type == vtkAbstractArray::SoADataArrayTemplate)
-      {
-        conduit_node.set_external_uint8_ptr((conduit_uint8*)data_array->GetVoidPointer(0),
-          number_of_elements, offset * sizeof(conduit_uint8), stride * sizeof(conduit_uint8));
-      }
-      else
-      {
+      case 1:
+        if (array_type == vtkAbstractArray::AoSDataArrayTemplate)
+        {
+          conduit_node.set_external_uint8_ptr((conduit_uint8*)data_array->GetVoidPointer(0),
+            number_of_elements, offset * sizeof(conduit_uint8), stride * sizeof(conduit_uint8));
+        }
+        else
+        {
+          is_supported = false;
+        }
+        break;
+
+      case 2:
+        if (array_type == vtkAbstractArray::AoSDataArrayTemplate)
+        {
+          conduit_node.set_external_uint16_ptr((conduit_uint16*)data_array->GetVoidPointer(0),
+            number_of_elements, offset * sizeof(conduit_uint16), stride * sizeof(conduit_uint16));
+        }
+        else
+        {
+          is_supported = false;
+        }
+        break;
+
+      case 4:
+        if (array_type == vtkAbstractArray::AoSDataArrayTemplate)
+        {
+          conduit_node.set_external_uint32_ptr((conduit_uint32*)data_array->GetVoidPointer(0),
+            number_of_elements, offset * sizeof(conduit_uint32), stride * sizeof(conduit_uint32));
+        }
+        else
+        {
+          is_supported = false;
+        }
+        break;
+
+      case 8:
+        if (array_type == vtkAbstractArray::AoSDataArrayTemplate)
+        {
+          conduit_node.set_external_uint64_ptr((conduit_uint64*)data_array->GetVoidPointer(0),
+            number_of_elements, offset * sizeof(conduit_uint64), stride * sizeof(conduit_uint64));
+        }
+        else
+        {
+          is_supported = false;
+        }
+        break;
+
+      default:
         is_supported = false;
-      }
-    }
-    else if (data_type_size == 2)
-    {
-      if (array_type == vtkAbstractArray::AoSDataArrayTemplate)
-      {
-        conduit_node.set_external_uint16_ptr((conduit_uint16*)data_array->GetVoidPointer(0),
-          number_of_elements, offset * sizeof(conduit_uint16), stride * sizeof(conduit_uint16));
-      }
-      else if (array_type == vtkAbstractArray::SoADataArrayTemplate)
-      {
-        conduit_node.set_external_uint16_ptr((conduit_uint16*)data_array->GetVoidPointer(0),
-          number_of_elements, offset * sizeof(conduit_uint16), stride * sizeof(conduit_uint16));
-      }
-      else
-      {
-        is_supported = false;
-      }
-    }
-    else if (data_type_size == 4)
-    {
-      if (array_type == vtkAbstractArray::AoSDataArrayTemplate)
-      {
-        conduit_node.set_external_uint32_ptr((conduit_uint32*)data_array->GetVoidPointer(0),
-          number_of_elements, offset * sizeof(conduit_uint32), stride * sizeof(conduit_uint32));
-      }
-      else if (array_type == vtkAbstractArray::SoADataArrayTemplate)
-      {
-        conduit_node.set_external_uint32_ptr((conduit_uint32*)data_array->GetVoidPointer(0),
-          number_of_elements, offset * sizeof(conduit_uint32), stride * sizeof(conduit_uint32));
-      }
-      else
-      {
-        is_supported = false;
-      }
-    }
-    else if (data_type_size == 8)
-    {
-      if (array_type == vtkAbstractArray::AoSDataArrayTemplate)
-      {
-        conduit_node.set_external_uint64_ptr((conduit_uint64*)data_array->GetVoidPointer(0),
-          number_of_elements, offset * sizeof(conduit_uint64), stride * sizeof(conduit_uint64));
-      }
-      else if (array_type == vtkAbstractArray::SoADataArrayTemplate)
-      {
-        conduit_node.set_external_uint64_ptr((conduit_uint64*)data_array->GetVoidPointer(0),
-          number_of_elements, offset * sizeof(conduit_uint64), stride * sizeof(conduit_uint64));
-      }
-      else
-      {
-        is_supported = false;
-      }
-    }
-    else
-    {
-      is_supported = false;
     }
   }
   else if (IsFloatType(data_type))
   {
-    if (data_type_size == 4)
+    switch (data_type_size)
     {
-      if (array_type == vtkAbstractArray::AoSDataArrayTemplate)
-      {
-        conduit_node.set_external_float32_ptr((conduit_float32*)data_array->GetVoidPointer(0),
-          number_of_elements, offset * sizeof(conduit_float32), stride * sizeof(conduit_float32));
-      }
-      else if (array_type == vtkAbstractArray::SoADataArrayTemplate)
-      {
-        conduit_node.set_external_float32_ptr((conduit_float32*)data_array->GetVoidPointer(0),
-          number_of_elements, offset * sizeof(conduit_float32), stride * sizeof(conduit_float32));
-      }
-      else
-      {
+      case 4:
+        if (array_type == vtkAbstractArray::AoSDataArrayTemplate)
+        {
+          conduit_node.set_external_float32_ptr((conduit_float32*)data_array->GetVoidPointer(0),
+            number_of_elements, offset * sizeof(conduit_float32), stride * sizeof(conduit_float32));
+        }
+        else
+        {
+          is_supported = false;
+        }
+        break;
+
+      case 8:
+        if (array_type == vtkAbstractArray::AoSDataArrayTemplate)
+        {
+          conduit_node.set_external_float64_ptr((conduit_float64*)data_array->GetVoidPointer(0),
+            number_of_elements, offset * sizeof(conduit_float64), stride * sizeof(conduit_float64));
+        }
+        else
+        {
+          is_supported = false;
+        }
+        break;
+
+      default:
         is_supported = false;
-      }
-    }
-    else if (data_type_size == 8)
-    {
-      if (array_type == vtkAbstractArray::AoSDataArrayTemplate)
-      {
-        conduit_node.set_external_float64_ptr((conduit_float64*)data_array->GetVoidPointer(0),
-          number_of_elements, offset * sizeof(conduit_float64), stride * sizeof(conduit_float64));
-      }
-      else if (array_type == vtkAbstractArray::SoADataArrayTemplate)
-      {
-        conduit_node.set_external_float64_ptr((conduit_float64*)data_array->GetVoidPointer(0),
-          number_of_elements, offset * sizeof(conduit_float64), stride * sizeof(conduit_float64));
-      }
-      else
-      {
-        is_supported = false;
-      }
-    }
-    else
-    {
-      is_supported = false;
     }
   }
 
@@ -514,9 +471,10 @@ bool vtkDataObjectToConduit::ConvertDataArrayToMCArray(
   {
     vtkLog(ERROR, "Unsupported data array type: " << data_array->GetDataTypeAsString() << " size: "
                                                   << data_type_size << " type: " << array_type);
-    is_success = false;
+    return false;
   }
-  return is_success;
+
+  return true;
 }
 
 //----------------------------------------------------------------------------
@@ -557,33 +515,22 @@ bool vtkDataObjectToConduit::IsMixedShape(vtkUnstructuredGrid* unstructured_grid
 //----------------------------------------------------------------------------
 bool vtkDataObjectToConduit::IsSignedIntegralType(int data_type)
 {
-#if (CHAR_MIN == SCHAR_MIN && CHAR_MAX == SCHAR_MAX)
-  // the char type is signed on this compiler
-  return ((data_type == VTK_CHAR) || (data_type == VTK_SIGNED_CHAR) || (data_type == VTK_SHORT) ||
-    (data_type == VTK_INT) || (data_type == VTK_LONG) || (data_type == VTK_ID_TYPE) ||
-    (data_type == VTK_LONG_LONG) || (data_type == VTK_TYPE_INT64));
-#else
-  // char is unsigned
-  return ((data_type == VTK_SIGNED_CHAR) || (data_type == VTK_SHORT) || (data_type == VTK_INT) ||
-    (data_type == VTK_LONG) || (data_type == VTK_ID_TYPE) || (data_type == VTK_LONG_LONG) ||
-    (data_type == VTK_TYPE_INT64));
-#endif
+  constexpr bool is_char_type_signed = (CHAR_MIN == SCHAR_MIN) && (CHAR_MAX == SCHAR_MAX);
+
+  return (is_char_type_signed && (data_type == VTK_CHAR)) || (data_type == VTK_SIGNED_CHAR) ||
+    (data_type == VTK_SHORT) || (data_type == VTK_INT) || (data_type == VTK_LONG) ||
+    (data_type == VTK_ID_TYPE) || (data_type == VTK_LONG_LONG) || (data_type == VTK_TYPE_INT64);
 }
 
 //----------------------------------------------------------------------------
 bool vtkDataObjectToConduit::IsUnsignedIntegralType(int data_type)
 {
-#if (CHAR_MIN == SCHAR_MIN && CHAR_MAX == SCHAR_MAX)
-  // the char type is signed on this compiler
-  return ((data_type == VTK_UNSIGNED_CHAR) || (data_type == VTK_UNSIGNED_SHORT) ||
-    (data_type == VTK_UNSIGNED_INT) || (data_type == VTK_UNSIGNED_LONG) ||
-    (data_type == VTK_ID_TYPE) || (data_type == VTK_UNSIGNED_LONG_LONG));
-#else
-  // char is unsigned
-  return ((data_type == VTK_CHAR) || (data_type == VTK_UNSIGNED_CHAR) || (data_type == VTK_SHORT) ||
-    (data_type == VTK_INT) || (data_type == VTK_LONG) || (data_type == VTK_ID_TYPE) ||
-    (data_type == VTK_LONG_LONG) || (data_type == VTK_TYPE_INT64));
-#endif
+  constexpr bool is_char_type_signed = (CHAR_MIN == SCHAR_MIN) && (CHAR_MAX == SCHAR_MAX);
+
+  return (!is_char_type_signed && (data_type == VTK_CHAR)) || (data_type == VTK_UNSIGNED_CHAR) ||
+    (data_type == VTK_UNSIGNED_SHORT) || (data_type == VTK_UNSIGNED_INT) ||
+    (data_type == VTK_UNSIGNED_LONG) || (data_type == VTK_ID_TYPE) ||
+    (data_type == VTK_UNSIGNED_LONG_LONG);
 }
 
 //----------------------------------------------------------------------------

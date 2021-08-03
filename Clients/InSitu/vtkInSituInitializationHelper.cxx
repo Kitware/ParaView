@@ -89,12 +89,12 @@ struct PropertyCopier
     const vtkIdType numTuples = array->GetNumberOfTuples();
     const int numComponents = array->GetNumberOfComponents();
     this->SMProperty->SetNumberOfElements(static_cast<unsigned int>(numTuples * numComponents));
-    vtkDataArrayAccessor<ArrayType> a(array);
+    vtkDataArrayAccessor<ArrayType> accessor(array);
     for (vtkIdType cc = 0; cc < numTuples; ++cc)
     {
       for (int comp = 0; comp < numComponents; ++comp)
       {
-        this->SMProperty->SetElement(cc * numComponents + comp, a.Get(cc, comp));
+        this->SMProperty->SetElement(cc * numComponents + comp, accessor.Get(cc, comp));
       }
     }
   }
@@ -409,7 +409,8 @@ int vtkInSituInitializationHelper::GetAttributeTypeFromString(std::string assocS
     return 0;
   }
 
-  vtkLog(ERROR, "Invalid association \"" << assocStr << "\"") return -1;
+  vtkLog(ERROR, "Invalid association \"" << assocStr << "\"");
+  return -1;
 }
 
 //----------------------------------------------------------------------------
@@ -492,8 +493,7 @@ void vtkInSituInitializationHelper::UpdateSteerableProxies()
       if (!property)
       {
         vtkLog(ERROR, "No property named '" << child->GetAttribute("name")
-                                            << "' "
-                                               "present on proxy. Skipping.");
+                                            << "' present on proxy. Skipping.");
         continue;
       }
 
@@ -511,13 +511,13 @@ void vtkInSituInitializationHelper::UpdateSteerableProxies()
       {
         array = vtkPointSet::SafeDownCast(grid)->GetPoints()->GetData();
       }
+
       if (!array)
       {
         vtkLog(ERROR, "No array named '" << arrayname << "' present. Skipping.");
         continue;
       }
-
-      if (array)
+      else
       {
         if (auto dp = vtkSMDoubleVectorProperty::SafeDownCast(property))
         {
@@ -534,8 +534,7 @@ void vtkInSituInitializationHelper::UpdateSteerableProxies()
         else
         {
           vtkLog(ERROR, "Properties of type '" << property->GetClassName()
-                                               << "' "
-                                                  "are not supported. Skipping.");
+                                               << "' are not supported. Skipping.");
           continue;
         }
       }
@@ -627,7 +626,7 @@ void vtkInSituInitializationHelper::GetSteerableProxies(
     proxies.reserve(internals->SteerableProxies.size());
     for (auto& proxy : internals->SteerableProxies)
     {
-      proxies.push_back(std::make_pair(proxy.second, proxy.first));
+      proxies.emplace_back(proxy.second, proxy.first);
     }
   }
 }

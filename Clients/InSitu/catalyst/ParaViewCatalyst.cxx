@@ -191,7 +191,7 @@ enum catalyst_error catalyst_initialize_paraview(const conduit_node* params)
   {
     auto plmgr = vtkSMProxyManager::GetProxyManager()->GetPluginManager();
 
-    auto& proxies = cpp_params["catalyst/proxies"];
+    const auto& proxies = cpp_params["catalyst/proxies"];
     conduit_index_t nchildren = proxies.number_of_children();
     for (conduit_index_t i = 0; i < nchildren; ++i)
     {
@@ -407,11 +407,9 @@ enum catalyst_error catalyst_results_paraview(conduit_node* params)
   bool is_success = true;
   std::vector<std::pair<std::string, vtkSMProxy*> > steerableProxies;
   vtkInSituInitializationHelper::GetSteerableProxies(steerableProxies);
-  for (auto proxyIterator = steerableProxies.begin();
-       is_success && proxyIterator != steerableProxies.end(); ++proxyIterator)
+  for (auto& proxy : steerableProxies)
   {
-    is_success =
-      convert_to_blueprint_mesh(proxyIterator->second, proxyIterator->first, catalyst_node);
+    is_success &= convert_to_blueprint_mesh(proxy.second, proxy.first, catalyst_node);
   }
 
   return is_success ? catalyst_error_ok : pvcatalyst_err(results);

@@ -4,9 +4,7 @@
 #include <iterator>
 #include <mpi.h>
 
-Grid::Grid()
-{
-}
+Grid::Grid() = default;
 
 void Grid::Initialize(const unsigned int numPoints[3], const double spacing[3])
 {
@@ -29,15 +27,15 @@ void Grid::Initialize(const unsigned int numPoints[3], const double spacing[3])
 
   // create the points -- slowest in the x and fastest in the z directions
   double coord[3] = { 0, 0, 0 };
-  for (unsigned int i = startXPoint; i < endXPoint; i++)
+  for (unsigned int x = startXPoint; x < endXPoint; x++)
   {
-    coord[0] = i * spacing[0];
-    for (unsigned int j = 0; j < numPoints[1]; j++)
+    coord[0] = x * spacing[0];
+    for (unsigned int y = 0; y < numPoints[1]; y++)
     {
-      coord[1] = j * spacing[1];
-      for (unsigned int k = 0; k < numPoints[2]; k++)
+      coord[1] = y * spacing[1];
+      for (unsigned int z = 0; z < numPoints[2]; z++)
       {
-        coord[2] = k * spacing[2];
+        coord[2] = z * spacing[2];
         // add the coordinate to the end of the vector
         std::copy(coord, coord + 3, std::back_inserter(this->Points));
       }
@@ -82,7 +80,7 @@ double* Grid::GetPointsArray()
   {
     return nullptr;
   }
-  return &(this->Points[0]);
+  return this->Points.data();
 }
 
 double* Grid::GetPoint(size_t pointId)

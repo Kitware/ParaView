@@ -51,7 +51,7 @@ public:
 
 protected:
   vtkDataObjectToConduit();
-  ~vtkDataObjectToConduit();
+  virtual ~vtkDataObjectToConduit();
 
 private:
   vtkDataObjectToConduit(const vtkDataObjectToConduit&) = delete;

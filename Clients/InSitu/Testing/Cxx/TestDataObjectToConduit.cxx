@@ -60,8 +60,7 @@ bool TestImageData()
     {
       for (int x = 0; x < dims[0]; x++)
       {
-        int* pixel = static_cast<int*>(image->GetScalarPointer(x, y, z));
-        pixel[0] = 2;
+        image->SetScalarComponentFromFloat(x, y, z, 0, 2);
       }
     }
   }
@@ -69,40 +68,43 @@ bool TestImageData()
   bool is_success =
     vtkDataObjectToConduit::FillConduitNode(vtkDataObject::SafeDownCast(image), node);
 
-  if (is_success)
+  if (!is_success)
   {
-    conduit_cpp::Node expected_node;
-    auto coords_node = expected_node["coordsets/coords"];
-    coords_node["type"] = "uniform";
-    coords_node["dims/i"] = 2;
-    coords_node["dims/j"] = 3;
-    coords_node["dims/k"] = 1;
-    coords_node["origin/x"] = -1.0;
-    coords_node["origin/y"] = -2.0;
-    coords_node["origin/z"] = -3.0;
-    coords_node["spacing/dx"] = 10.0;
-    coords_node["spacing/dy"] = 20.0;
-    coords_node["spacing/dz"] = 30.0;
-
-    auto topologies_node = expected_node["topologies/mesh"];
-    topologies_node["type"] = "uniform";
-    topologies_node["coordset"] = "coords";
-
-    auto field_node = expected_node["fields/ImageScalars"];
-    field_node["association"] = "vertex";
-    field_node["topology"] = "mesh";
-    field_node["volume_dependent"] = "false";
-    field_node["values"] = std::vector<int>{ 2, 2, 2, 2, 2, 2 };
-
-    conduit_cpp::Node diff_info;
-    bool are_nodes_different = node.diff(expected_node, diff_info, 1e-6);
-    if (are_nodes_different)
-    {
-      diff_info.print();
-    }
-
-    is_success = !are_nodes_different;
+    std::cerr << "FillConduitNode failed for TestImageData" << std::endl;
+    return is_success;
   }
+
+  conduit_cpp::Node expected_node;
+  auto coords_node = expected_node["coordsets/coords"];
+  coords_node["type"] = "uniform";
+  coords_node["dims/i"] = image->GetDimensions()[0];
+  coords_node["dims/j"] = image->GetDimensions()[1];
+  coords_node["dims/k"] = image->GetDimensions()[2];
+  coords_node["origin/x"] = image->GetOrigin()[0];
+  coords_node["origin/y"] = image->GetOrigin()[1];
+  coords_node["origin/z"] = image->GetOrigin()[2];
+  coords_node["spacing/dx"] = image->GetSpacing()[0];
+  coords_node["spacing/dy"] = image->GetSpacing()[1];
+  coords_node["spacing/dz"] = image->GetSpacing()[2];
+
+  auto topologies_node = expected_node["topologies/mesh"];
+  topologies_node["type"] = "uniform";
+  topologies_node["coordset"] = "coords";
+
+  auto field_node = expected_node["fields/ImageScalars"];
+  field_node["association"] = "vertex";
+  field_node["topology"] = "mesh";
+  field_node["volume_dependent"] = "false";
+  field_node["values"] = std::vector<int>{ 2, 2, 2, 2, 2, 2 };
+
+  conduit_cpp::Node diff_info;
+  bool are_nodes_different = node.diff(expected_node, diff_info, 1e-6);
+  if (are_nodes_different)
+  {
+    diff_info.print();
+  }
+
+  is_success = !are_nodes_different;
 
   return is_success;
 }
@@ -143,34 +145,37 @@ bool TestRectilinearGrid()
   bool is_success =
     vtkDataObjectToConduit::FillConduitNode(vtkDataObject::SafeDownCast(rectilinear_grid), node);
 
-  if (is_success)
+  if (!is_success)
   {
-    conduit_cpp::Node expected_node;
-    auto coords_node = expected_node["coordsets/coords"];
-    coords_node["type"] = "rectilinear";
-    coords_node["values/x"] = std::vector<double>{ 0, 2 };
-    coords_node["values/y"] = std::vector<double>{ 0, 1, 2 };
-    coords_node["values/z"] = std::vector<double>{ 0 };
-
-    auto topologies_node = expected_node["topologies/mesh"];
-    topologies_node["type"] = "rectilinear";
-    topologies_node["coordset"] = "coords";
-
-    auto field_node = expected_node["fields/rectilinear_field"];
-    field_node["association"] = "vertex";
-    field_node["topology"] = "mesh";
-    field_node["volume_dependent"] = "false";
-    field_node["values"] = std::vector<double>{ 0, 0, 1, 2, 2, 4, 3, 6, 4, 8, 5, 10 };
-
-    conduit_cpp::Node diff_info;
-    bool are_nodes_different = node.diff(expected_node, diff_info, 1e-6);
-    if (are_nodes_different)
-    {
-      diff_info.print();
-    }
-
-    is_success = !are_nodes_different;
+    std::cerr << "FillConduitNode failed for TestRectilinearGrid" << std::endl;
+    return is_success;
   }
+
+  conduit_cpp::Node expected_node;
+  auto coords_node = expected_node["coordsets/coords"];
+  coords_node["type"] = "rectilinear";
+  coords_node["values/x"] = std::vector<double>{ 0, 2 };
+  coords_node["values/y"] = std::vector<double>{ 0, 1, 2 };
+  coords_node["values/z"] = std::vector<double>{ 0 };
+
+  auto topologies_node = expected_node["topologies/mesh"];
+  topologies_node["type"] = "rectilinear";
+  topologies_node["coordset"] = "coords";
+
+  auto field_node = expected_node["fields/rectilinear_field"];
+  field_node["association"] = "vertex";
+  field_node["topology"] = "mesh";
+  field_node["volume_dependent"] = "false";
+  field_node["values"] = std::vector<double>{ 0, 0, 1, 2, 2, 4, 3, 6, 4, 8, 5, 10 };
+
+  conduit_cpp::Node diff_info;
+  bool are_nodes_different = node.diff(expected_node, diff_info, 1e-6);
+  if (are_nodes_different)
+  {
+    diff_info.print();
+  }
+
+  is_success = !are_nodes_different;
 
   return is_success;
 }
@@ -180,13 +185,13 @@ bool TestStructuredGrid()
   conduit_cpp::Node node;
   vtkNew<vtkStructuredGrid> structured_grid;
 
-  size_t nx = 2, ny = 3, nz = 2;
+  vtkIdType nx = 2, ny = 3, nz = 2;
   auto dataSize = nx * ny * nz;
 
   vtkNew<vtkDoubleArray> pointValues;
   pointValues->SetNumberOfComponents(1);
   pointValues->SetNumberOfTuples(dataSize);
-  for (size_t i = 0; i < dataSize; ++i)
+  for (vtkIdType i = 0; i < dataSize; ++i)
   {
     pointValues->SetValue(i, i);
   }
@@ -195,7 +200,7 @@ bool TestStructuredGrid()
   auto numberOfCells = (nx - 1) * (ny - 1) * (nz - 1);
   vtkNew<vtkDoubleArray> cellValues;
   cellValues->SetNumberOfTuples(numberOfCells);
-  for (size_t i = 0; i < numberOfCells; ++i)
+  for (vtkIdType i = 0; i < numberOfCells; ++i)
   {
     cellValues->SetValue(i, i * 2.0);
   }
@@ -227,44 +232,47 @@ bool TestStructuredGrid()
   bool is_success =
     vtkDataObjectToConduit::FillConduitNode(vtkDataObject::SafeDownCast(structured_grid), node);
 
-  if (is_success)
+  if (!is_success)
   {
-    conduit_cpp::Node expected_node;
-    auto coords_node = expected_node["coordsets/coords"];
-    coords_node["type"] = "explicit";
-    coords_node["values/x"] =
-      std::vector<float>{ 0.5, 1, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 4.5, 5.0, 5.5, 6.0 };
-    coords_node["values/y"] = std::vector<float>{ 1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6 };
-    coords_node["values/z"] = std::vector<float>{ 2, 2, 2, 2, 2, 2, 4, 4, 4, 4, 4, 4 };
-
-    auto topologies_node = expected_node["topologies/mesh"];
-    topologies_node["type"] = "structured";
-    topologies_node["coordset"] = "coords";
-    topologies_node["elements/dims/i"] = 2;
-    topologies_node["elements/dims/j"] = 3;
-    topologies_node["elements/dims/k"] = 2;
-
-    auto point_field_node = expected_node["fields/point_field"];
-    point_field_node["association"] = "vertex";
-    point_field_node["topology"] = "mesh";
-    point_field_node["volume_dependent"] = "false";
-    point_field_node["values"] = std::vector<double>{ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11 };
-
-    auto cell_field_node = expected_node["fields/cell_field"];
-    cell_field_node["association"] = "element";
-    cell_field_node["topology"] = "mesh";
-    cell_field_node["volume_dependent"] = "false";
-    cell_field_node["values"] = std::vector<double>{ 0, 2 };
-
-    conduit_cpp::Node diff_info;
-    bool are_nodes_different = node.diff(expected_node, diff_info, 1e-6);
-    if (are_nodes_different)
-    {
-      diff_info.print();
-    }
-
-    is_success = !are_nodes_different;
+    std::cerr << "FillConduitNode failed for TestStructuredGrid" << std::endl;
+    return is_success;
   }
+
+  conduit_cpp::Node expected_node;
+  auto coords_node = expected_node["coordsets/coords"];
+  coords_node["type"] = "explicit";
+  coords_node["values/x"] =
+    std::vector<float>{ 0.5, 1, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 4.5, 5.0, 5.5, 6.0 };
+  coords_node["values/y"] = std::vector<float>{ 1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6 };
+  coords_node["values/z"] = std::vector<float>{ 2, 2, 2, 2, 2, 2, 4, 4, 4, 4, 4, 4 };
+
+  auto topologies_node = expected_node["topologies/mesh"];
+  topologies_node["type"] = "structured";
+  topologies_node["coordset"] = "coords";
+  topologies_node["elements/dims/i"] = 2;
+  topologies_node["elements/dims/j"] = 3;
+  topologies_node["elements/dims/k"] = 2;
+
+  auto point_field_node = expected_node["fields/point_field"];
+  point_field_node["association"] = "vertex";
+  point_field_node["topology"] = "mesh";
+  point_field_node["volume_dependent"] = "false";
+  point_field_node["values"] = std::vector<double>{ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11 };
+
+  auto cell_field_node = expected_node["fields/cell_field"];
+  cell_field_node["association"] = "element";
+  cell_field_node["topology"] = "mesh";
+  cell_field_node["volume_dependent"] = "false";
+  cell_field_node["values"] = std::vector<double>{ 0, 2 };
+
+  conduit_cpp::Node diff_info;
+  bool are_nodes_different = node.diff(expected_node, diff_info, 1e-6);
+  if (are_nodes_different)
+  {
+    diff_info.print();
+  }
+
+  is_success = !are_nodes_different;
 
   return is_success;
 }
@@ -343,41 +351,44 @@ bool TestHexahedronUnstructuredGrid()
   bool is_success =
     vtkDataObjectToConduit::FillConduitNode(vtkDataObject::SafeDownCast(unstructured_grid), node);
 
-  if (is_success)
+  if (!is_success)
   {
-    conduit_cpp::Node expected_node;
-    auto coords_node = expected_node["coordsets/coords"];
-    coords_node["type"] = "explicit";
-    coords_node["values/x"] = std::vector<float>{ 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1,
-      2, 0, 1, 2, 0, 1, 2, 0, 1, 2 };
-    coords_node["values/y"] = std::vector<float>{ 0, 0, 0, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1,
-      1, 1, 1, 1, 1, 1, 1, 1, 1, 1 };
-    coords_node["values/z"] = std::vector<float>{
-      0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 2, 2, 2, 3, 3, 3, 4, 4, 4, 5, 5, 5, 6, 6, 6,
-    };
-
-    auto topologies_node0 = expected_node["topologies/mesh"];
-    topologies_node0["type"] = "unstructured";
-    topologies_node0["coordset"] = "coords";
-    topologies_node0["elements/shape"] = "hex";
-    topologies_node0["elements/connectivity"] =
-      std::vector<long>{ 0, 1, 4, 3, 6, 7, 10, 9, 1, 2, 5, 4, 7, 8, 11, 10 };
-
-    auto cell_field_node = expected_node["fields/cell_field"];
-    cell_field_node["association"] = "element";
-    cell_field_node["topology"] = "mesh";
-    cell_field_node["volume_dependent"] = "false";
-    cell_field_node["values"] = std::vector<double>{ 10, -10 };
-
-    conduit_cpp::Node diff_info;
-    bool are_nodes_different = node.diff(expected_node, diff_info, 1e-6);
-    if (are_nodes_different)
-    {
-      diff_info.print();
-    }
-
-    is_success = !are_nodes_different;
+    std::cerr << "FillConduitNode failed for TestHexahedronUnstructuredGrid" << std::endl;
+    return is_success;
   }
+
+  conduit_cpp::Node expected_node;
+  auto coords_node = expected_node["coordsets/coords"];
+  coords_node["type"] = "explicit";
+  coords_node["values/x"] = std::vector<float>{ 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1,
+    2, 0, 1, 2, 0, 1, 2, 0, 1, 2 };
+  coords_node["values/y"] = std::vector<float>{ 0, 0, 0, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1,
+    1, 1, 1, 1, 1, 1, 1, 1, 1, 1 };
+  coords_node["values/z"] = std::vector<float>{
+    0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 2, 2, 2, 3, 3, 3, 4, 4, 4, 5, 5, 5, 6, 6, 6,
+  };
+
+  auto topologies_node0 = expected_node["topologies/mesh"];
+  topologies_node0["type"] = "unstructured";
+  topologies_node0["coordset"] = "coords";
+  topologies_node0["elements/shape"] = "hex";
+  topologies_node0["elements/connectivity"] =
+    std::vector<long>{ 0, 1, 4, 3, 6, 7, 10, 9, 1, 2, 5, 4, 7, 8, 11, 10 };
+
+  auto cell_field_node = expected_node["fields/cell_field"];
+  cell_field_node["association"] = "element";
+  cell_field_node["topology"] = "mesh";
+  cell_field_node["volume_dependent"] = "false";
+  cell_field_node["values"] = std::vector<double>{ 10, -10 };
+
+  conduit_cpp::Node diff_info;
+  bool are_nodes_different = node.diff(expected_node, diff_info, 1e-6);
+  if (are_nodes_different)
+  {
+    diff_info.print();
+  }
+
+  is_success = !are_nodes_different;
 
   return is_success;
 }
@@ -406,40 +417,43 @@ bool TestTetrahedronUnstructuredGrid()
   bool is_success =
     vtkDataObjectToConduit::FillConduitNode(vtkDataObject::SafeDownCast(unstructured_grid), node);
 
-  if (is_success)
+  if (!is_success)
   {
-    conduit_cpp::Node expected_node;
-    auto coords_node = expected_node["coordsets/coords"];
-    coords_node["type"] = "explicit";
-    coords_node["values/x"] = std::vector<float>{ 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1,
-      2, 0, 1, 2, 0, 1, 2, 0, 1, 2 };
-    coords_node["values/y"] = std::vector<float>{ 0, 0, 0, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1,
-      1, 1, 1, 1, 1, 1, 1, 1, 1, 1 };
-    coords_node["values/z"] = std::vector<float>{
-      0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 2, 2, 2, 3, 3, 3, 4, 4, 4, 5, 5, 5, 6, 6, 6,
-    };
-
-    auto topologies_node = expected_node["topologies/mesh"];
-    topologies_node["type"] = "unstructured";
-    topologies_node["coordset"] = "coords";
-    topologies_node["elements/shape"] = "tet";
-    topologies_node["elements/connectivity"] = std::vector<long>{ 6, 10, 9, 12, 8, 11, 10, 14 };
-
-    auto cell_field_node = expected_node["fields/cell_field"];
-    cell_field_node["association"] = "element";
-    cell_field_node["topology"] = "mesh";
-    cell_field_node["volume_dependent"] = "false";
-    cell_field_node["values"] = std::vector<double>{ 10, -10 };
-
-    conduit_cpp::Node diff_info;
-    bool are_nodes_different = node.diff(expected_node, diff_info, 1e-6);
-    if (are_nodes_different)
-    {
-      diff_info.print();
-    }
-
-    is_success = !are_nodes_different;
+    std::cerr << "FillConduitNode failed for TestTetrahedronUnstructuredGrid" << std::endl;
+    return is_success;
   }
+
+  conduit_cpp::Node expected_node;
+  auto coords_node = expected_node["coordsets/coords"];
+  coords_node["type"] = "explicit";
+  coords_node["values/x"] = std::vector<float>{ 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1,
+    2, 0, 1, 2, 0, 1, 2, 0, 1, 2 };
+  coords_node["values/y"] = std::vector<float>{ 0, 0, 0, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1,
+    1, 1, 1, 1, 1, 1, 1, 1, 1, 1 };
+  coords_node["values/z"] = std::vector<float>{
+    0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 2, 2, 2, 3, 3, 3, 4, 4, 4, 5, 5, 5, 6, 6, 6,
+  };
+
+  auto topologies_node = expected_node["topologies/mesh"];
+  topologies_node["type"] = "unstructured";
+  topologies_node["coordset"] = "coords";
+  topologies_node["elements/shape"] = "tet";
+  topologies_node["elements/connectivity"] = std::vector<long>{ 6, 10, 9, 12, 8, 11, 10, 14 };
+
+  auto cell_field_node = expected_node["fields/cell_field"];
+  cell_field_node["association"] = "element";
+  cell_field_node["topology"] = "mesh";
+  cell_field_node["volume_dependent"] = "false";
+  cell_field_node["values"] = std::vector<double>{ 10, -10 };
+
+  conduit_cpp::Node diff_info;
+  bool are_nodes_different = node.diff(expected_node, diff_info, 1e-6);
+  if (are_nodes_different)
+  {
+    diff_info.print();
+  }
+
+  is_success = !are_nodes_different;
 
   return is_success;
 }
@@ -469,40 +483,43 @@ bool TestQuadUnstructuredGrid()
   bool is_success =
     vtkDataObjectToConduit::FillConduitNode(vtkDataObject::SafeDownCast(unstructured_grid), node);
 
-  if (is_success)
+  if (!is_success)
   {
-    conduit_cpp::Node expected_node;
-    auto coords_node = expected_node["coordsets/coords"];
-    coords_node["type"] = "explicit";
-    coords_node["values/x"] = std::vector<float>{ 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1,
-      2, 0, 1, 2, 0, 1, 2, 0, 1, 2 };
-    coords_node["values/y"] = std::vector<float>{ 0, 0, 0, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1,
-      1, 1, 1, 1, 1, 1, 1, 1, 1, 1 };
-    coords_node["values/z"] = std::vector<float>{
-      0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 2, 2, 2, 3, 3, 3, 4, 4, 4, 5, 5, 5, 6, 6, 6,
-    };
-
-    auto topologies_node = expected_node["topologies/mesh"];
-    topologies_node["type"] = "unstructured";
-    topologies_node["coordset"] = "coords";
-    topologies_node["elements/shape"] = "quad";
-    topologies_node["elements/connectivity"] = std::vector<long>{ 22, 23, 20, 19 };
-
-    auto cell_field_node = expected_node["fields/point_field"];
-    cell_field_node["association"] = "vertex";
-    cell_field_node["topology"] = "mesh";
-    cell_field_node["volume_dependent"] = "false";
-    cell_field_node["values"] = std::vector<double>{ 10, -10, 20, -20 };
-
-    conduit_cpp::Node diff_info;
-    bool are_nodes_different = node.diff(expected_node, diff_info, 1e-6);
-    if (are_nodes_different)
-    {
-      diff_info.print();
-    }
-
-    is_success = !are_nodes_different;
+    std::cerr << "FillConduitNode failed for TestQuadUnstructuredGrid" << std::endl;
+    return is_success;
   }
+
+  conduit_cpp::Node expected_node;
+  auto coords_node = expected_node["coordsets/coords"];
+  coords_node["type"] = "explicit";
+  coords_node["values/x"] = std::vector<float>{ 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1,
+    2, 0, 1, 2, 0, 1, 2, 0, 1, 2 };
+  coords_node["values/y"] = std::vector<float>{ 0, 0, 0, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1,
+    1, 1, 1, 1, 1, 1, 1, 1, 1, 1 };
+  coords_node["values/z"] = std::vector<float>{
+    0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 2, 2, 2, 3, 3, 3, 4, 4, 4, 5, 5, 5, 6, 6, 6,
+  };
+
+  auto topologies_node = expected_node["topologies/mesh"];
+  topologies_node["type"] = "unstructured";
+  topologies_node["coordset"] = "coords";
+  topologies_node["elements/shape"] = "quad";
+  topologies_node["elements/connectivity"] = std::vector<long>{ 22, 23, 20, 19 };
+
+  auto cell_field_node = expected_node["fields/point_field"];
+  cell_field_node["association"] = "vertex";
+  cell_field_node["topology"] = "mesh";
+  cell_field_node["volume_dependent"] = "false";
+  cell_field_node["values"] = std::vector<double>{ 10, -10, 20, -20 };
+
+  conduit_cpp::Node diff_info;
+  bool are_nodes_different = node.diff(expected_node, diff_info, 1e-6);
+  if (are_nodes_different)
+  {
+    diff_info.print();
+  }
+
+  is_success = !are_nodes_different;
 
   return is_success;
 }
@@ -531,40 +548,43 @@ bool TestTriangleUnstructuredGrid()
   bool is_success =
     vtkDataObjectToConduit::FillConduitNode(vtkDataObject::SafeDownCast(unstructured_grid), node);
 
-  if (is_success)
+  if (!is_success)
   {
-    conduit_cpp::Node expected_node;
-    auto coords_node = expected_node["coordsets/coords"];
-    coords_node["type"] = "explicit";
-    coords_node["values/x"] = std::vector<float>{ 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1,
-      2, 0, 1, 2, 0, 1, 2, 0, 1, 2 };
-    coords_node["values/y"] = std::vector<float>{ 0, 0, 0, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1,
-      1, 1, 1, 1, 1, 1, 1, 1, 1, 1 };
-    coords_node["values/z"] = std::vector<float>{
-      0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 2, 2, 2, 3, 3, 3, 4, 4, 4, 5, 5, 5, 6, 6, 6,
-    };
-
-    auto topologies_node = expected_node["topologies/mesh"];
-    topologies_node["type"] = "unstructured";
-    topologies_node["coordset"] = "coords";
-    topologies_node["elements/shape"] = "tri";
-    topologies_node["elements/connectivity"] = std::vector<long>{ 21, 22, 18, 22, 19, 18 };
-
-    auto cell_field_node = expected_node["fields/cell_field"];
-    cell_field_node["association"] = "element";
-    cell_field_node["topology"] = "mesh";
-    cell_field_node["volume_dependent"] = "false";
-    cell_field_node["values"] = std::vector<double>{ 10, -10 };
-
-    conduit_cpp::Node diff_info;
-    bool are_nodes_different = node.diff(expected_node, diff_info, 1e-6);
-    if (are_nodes_different)
-    {
-      diff_info.print();
-    }
-
-    is_success = !are_nodes_different;
+    std::cerr << "FillConduitNode failed for TestTriangleUnstructuredGrid" << std::endl;
+    return is_success;
   }
+
+  conduit_cpp::Node expected_node;
+  auto coords_node = expected_node["coordsets/coords"];
+  coords_node["type"] = "explicit";
+  coords_node["values/x"] = std::vector<float>{ 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1,
+    2, 0, 1, 2, 0, 1, 2, 0, 1, 2 };
+  coords_node["values/y"] = std::vector<float>{ 0, 0, 0, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1,
+    1, 1, 1, 1, 1, 1, 1, 1, 1, 1 };
+  coords_node["values/z"] = std::vector<float>{
+    0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 2, 2, 2, 3, 3, 3, 4, 4, 4, 5, 5, 5, 6, 6, 6,
+  };
+
+  auto topologies_node = expected_node["topologies/mesh"];
+  topologies_node["type"] = "unstructured";
+  topologies_node["coordset"] = "coords";
+  topologies_node["elements/shape"] = "tri";
+  topologies_node["elements/connectivity"] = std::vector<long>{ 21, 22, 18, 22, 19, 18 };
+
+  auto cell_field_node = expected_node["fields/cell_field"];
+  cell_field_node["association"] = "element";
+  cell_field_node["topology"] = "mesh";
+  cell_field_node["volume_dependent"] = "false";
+  cell_field_node["values"] = std::vector<double>{ 10, -10 };
+
+  conduit_cpp::Node diff_info;
+  bool are_nodes_different = node.diff(expected_node, diff_info, 1e-6);
+  if (are_nodes_different)
+  {
+    diff_info.print();
+  }
+
+  is_success = !are_nodes_different;
 
   return is_success;
 }
@@ -593,46 +613,49 @@ bool TestLineUnstructuredGrid()
   bool is_success =
     vtkDataObjectToConduit::FillConduitNode(vtkDataObject::SafeDownCast(unstructured_grid), node);
 
-  if (is_success)
+  if (!is_success)
   {
-    conduit_cpp::Node expected_node;
-    auto coords_node = expected_node["coordsets/coords"];
-    coords_node["type"] = "explicit";
-    coords_node["values/x"] = std::vector<float>{ 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1,
-      2, 0, 1, 2, 0, 1, 2, 0, 1, 2 };
-    coords_node["values/y"] = std::vector<float>{ 0, 0, 0, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1,
-      1, 1, 1, 1, 1, 1, 1, 1, 1, 1 };
-    coords_node["values/z"] = std::vector<float>{
-      0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 2, 2, 2, 3, 3, 3, 4, 4, 4, 5, 5, 5, 6, 6, 6,
-    };
-
-    auto topologies_node = expected_node["topologies/mesh"];
-    topologies_node["type"] = "unstructured";
-    topologies_node["coordset"] = "coords";
-    topologies_node["elements/shape"] = "line";
-    topologies_node["elements/connectivity"] = std::vector<long>{ 23, 26, 21, 24 };
-
-    //    auto topologies_node6 = expected_node["topologies/mesh6"];
-    //    topologies_node6["type"] = "unstructured";
-    //    topologies_node6["coordset"] = "coords";
-    //    topologies_node6["elements/shape"] = "point";
-    //    topologies_node6["elements/connectivity"] = std::vector<int>{ 25 };
-
-    auto cell_field_node = expected_node["fields/cell_field"];
-    cell_field_node["association"] = "element";
-    cell_field_node["topology"] = "mesh";
-    cell_field_node["volume_dependent"] = "false";
-    cell_field_node["values"] = std::vector<double>{ 10, -10 };
-
-    conduit_cpp::Node diff_info;
-    bool are_nodes_different = node.diff(expected_node, diff_info, 1e-6);
-    if (are_nodes_different)
-    {
-      diff_info.print();
-    }
-
-    is_success = !are_nodes_different;
+    std::cerr << "FillConduitNode failed for TestLineUnstructuredGrid" << std::endl;
+    return is_success;
   }
+
+  conduit_cpp::Node expected_node;
+  auto coords_node = expected_node["coordsets/coords"];
+  coords_node["type"] = "explicit";
+  coords_node["values/x"] = std::vector<float>{ 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1,
+    2, 0, 1, 2, 0, 1, 2, 0, 1, 2 };
+  coords_node["values/y"] = std::vector<float>{ 0, 0, 0, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1,
+    1, 1, 1, 1, 1, 1, 1, 1, 1, 1 };
+  coords_node["values/z"] = std::vector<float>{
+    0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 2, 2, 2, 3, 3, 3, 4, 4, 4, 5, 5, 5, 6, 6, 6,
+  };
+
+  auto topologies_node = expected_node["topologies/mesh"];
+  topologies_node["type"] = "unstructured";
+  topologies_node["coordset"] = "coords";
+  topologies_node["elements/shape"] = "line";
+  topologies_node["elements/connectivity"] = std::vector<long>{ 23, 26, 21, 24 };
+
+  //    auto topologies_node6 = expected_node["topologies/mesh6"];
+  //    topologies_node6["type"] = "unstructured";
+  //    topologies_node6["coordset"] = "coords";
+  //    topologies_node6["elements/shape"] = "point";
+  //    topologies_node6["elements/connectivity"] = std::vector<int>{ 25 };
+
+  auto cell_field_node = expected_node["fields/cell_field"];
+  cell_field_node["association"] = "element";
+  cell_field_node["topology"] = "mesh";
+  cell_field_node["volume_dependent"] = "false";
+  cell_field_node["values"] = std::vector<double>{ 10, -10 };
+
+  conduit_cpp::Node diff_info;
+  bool are_nodes_different = node.diff(expected_node, diff_info, 1e-6);
+  if (are_nodes_different)
+  {
+    diff_info.print();
+  }
+
+  is_success = !are_nodes_different;
 
   return is_success;
 }
@@ -659,40 +682,43 @@ bool TestPointUnstructuredGrid()
   bool is_success =
     vtkDataObjectToConduit::FillConduitNode(vtkDataObject::SafeDownCast(unstructured_grid), node);
 
-  if (is_success)
+  if (!is_success)
   {
-    conduit_cpp::Node expected_node;
-    auto coords_node = expected_node["coordsets/coords"];
-    coords_node["type"] = "explicit";
-    coords_node["values/x"] = std::vector<float>{ 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1,
-      2, 0, 1, 2, 0, 1, 2, 0, 1, 2 };
-    coords_node["values/y"] = std::vector<float>{ 0, 0, 0, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1,
-      1, 1, 1, 1, 1, 1, 1, 1, 1, 1 };
-    coords_node["values/z"] = std::vector<float>{
-      0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 2, 2, 2, 3, 3, 3, 4, 4, 4, 5, 5, 5, 6, 6, 6,
-    };
-
-    auto topologies_node = expected_node["topologies/mesh"];
-    topologies_node["type"] = "unstructured";
-    topologies_node["coordset"] = "coords";
-    topologies_node["elements/shape"] = "point";
-    topologies_node["elements/connectivity"] = std::vector<long>{ 25 };
-
-    auto cell_field_node = expected_node["fields/cell_field"];
-    cell_field_node["association"] = "element";
-    cell_field_node["topology"] = "mesh";
-    cell_field_node["volume_dependent"] = "false";
-    cell_field_node["values"] = std::vector<double>{ 10 };
-
-    conduit_cpp::Node diff_info;
-    bool are_nodes_different = node.diff(expected_node, diff_info, 1e-6);
-    if (are_nodes_different)
-    {
-      diff_info.print();
-    }
-
-    is_success = !are_nodes_different;
+    std::cerr << "FillConduitNode failed for TestPointUnstructuredGrid" << std::endl;
+    return is_success;
   }
+
+  conduit_cpp::Node expected_node;
+  auto coords_node = expected_node["coordsets/coords"];
+  coords_node["type"] = "explicit";
+  coords_node["values/x"] = std::vector<float>{ 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1,
+    2, 0, 1, 2, 0, 1, 2, 0, 1, 2 };
+  coords_node["values/y"] = std::vector<float>{ 0, 0, 0, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1,
+    1, 1, 1, 1, 1, 1, 1, 1, 1, 1 };
+  coords_node["values/z"] = std::vector<float>{
+    0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 2, 2, 2, 3, 3, 3, 4, 4, 4, 5, 5, 5, 6, 6, 6,
+  };
+
+  auto topologies_node = expected_node["topologies/mesh"];
+  topologies_node["type"] = "unstructured";
+  topologies_node["coordset"] = "coords";
+  topologies_node["elements/shape"] = "point";
+  topologies_node["elements/connectivity"] = std::vector<long>{ 25 };
+
+  auto cell_field_node = expected_node["fields/cell_field"];
+  cell_field_node["association"] = "element";
+  cell_field_node["topology"] = "mesh";
+  cell_field_node["volume_dependent"] = "false";
+  cell_field_node["values"] = std::vector<double>{ 10 };
+
+  conduit_cpp::Node diff_info;
+  bool are_nodes_different = node.diff(expected_node, diff_info, 1e-6);
+  if (are_nodes_different)
+  {
+    diff_info.print();
+  }
+
+  is_success = !are_nodes_different;
 
   return is_success;
 }
@@ -712,16 +738,6 @@ bool TestUnstructuredGrid()
   return is_success;
 }
 
-bool TestPolydata()
-{
-  return true;
-}
-
-bool TestExplicitStructuredGrid()
-{
-  return true;
-}
-
 int TestDataObjectToConduit(int, char* [])
 {
   bool is_success = true;
@@ -731,8 +747,6 @@ int TestDataObjectToConduit(int, char* [])
   is_success &= TestRectilinearGrid();
   is_success &= TestStructuredGrid();
   is_success &= TestUnstructuredGrid();
-  is_success &= TestPolydata();
-  is_success &= TestExplicitStructuredGrid();
 
   return is_success ? EXIT_SUCCESS : EXIT_FAILURE;
 }
