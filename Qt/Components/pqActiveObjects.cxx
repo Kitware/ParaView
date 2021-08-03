@@ -42,6 +42,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMSession.h"
 #include "vtkSMViewLayoutProxy.h"
 
+#include <QSignalBlocker>
 #include <algorithm>
 
 namespace
@@ -334,17 +335,16 @@ void pqActiveObjects::setActiveServer(pqServer* server)
     return;
   }
 
-  bool prev = this->blockSignals(true);
+  QSignalBlocker blocker(this);
 
   this->VTKConnector->Disconnect();
+  this->ActiveServer = server;
+  vtkSMProxyManager::GetProxyManager()->SetActiveSession(server ? server->session() : nullptr);
 
   // Need to connect it back to know if python is changing the active one
   this->VTKConnector->Connect(vtkSMProxyManager::GetProxyManager(),
     vtkSMProxyManager::ActiveSessionChanged, this, SLOT(onActiveServerChanged()));
 
-  this->ActiveServer = server;
-
-  vtkSMProxyManager::GetProxyManager()->SetActiveSession(server ? server->session() : nullptr);
   if (server && server->activeSourcesSelectionModel() && server->activeViewSelectionModel())
   {
     this->VTKConnector->Connect(server->activeSourcesSelectionModel(),
@@ -361,7 +361,7 @@ void pqActiveObjects::setActiveServer(pqServer* server)
   this->sourceSelectionChanged();
   this->viewSelectionChanged();
 
-  this->blockSignals(prev);
+  blocker.unblock();
   this->triggerSignals();
 }
 
