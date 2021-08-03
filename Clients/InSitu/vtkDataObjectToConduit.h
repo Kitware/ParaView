@@ -23,7 +23,6 @@
 #include "vtkObject.h"
 #include "vtkPVInSituModule.h" // For windows import/export of shared libraries
 
-//#include <catalyst_conduit.hpp> // for conduit_cpp::Node
 namespace conduit_cpp
 {
 class Node;

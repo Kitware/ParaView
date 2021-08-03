@@ -29,11 +29,11 @@
 #
 #==========================================================================
 set(classes
+  vtkDataObjectToConduit
   vtkInSituPipeline
   vtkInSituPipelineIO
   vtkInSituPipelinePython
-  vtkInSituInitializationHelper
-  vtkDataObjectToConduit)
+  vtkInSituInitializationHelper)
 
 vtk_module_add_module(ParaView::InSitu
   CLASSES ${classes})

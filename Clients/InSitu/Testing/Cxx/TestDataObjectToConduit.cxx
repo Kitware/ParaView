@@ -734,5 +734,5 @@ int TestDataObjectToConduit(int, char* [])
   is_success &= TestPolydata();
   is_success &= TestExplicitStructuredGrid();
 
-  return is_success ? 0 : 1;
+  return is_success ? EXIT_SUCCESS : EXIT_FAILURE;
 }
