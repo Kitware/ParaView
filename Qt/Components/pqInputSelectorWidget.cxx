@@ -152,6 +152,8 @@ pqSMProxy pqInputSelectorWidget::selectedInput() const
 void pqInputSelectorWidget::updateComboBox()
 {
   const QSignalBlocker blocker(this->ComboBox);
+  this->ComboBox->clear();
+  this->ComboBox->addItem("(none)", QVariant::fromValue<void*>(nullptr));
 
   auto smmodel = pqApplicationCore::instance()->getServerManagerModel();
   auto smproxy = this->proxy();
@@ -160,7 +162,10 @@ void pqInputSelectorWidget::updateComboBox()
   Q_ASSERT(smproperty && smproxy && smmodel);
 
   auto server = smmodel->findServer(smproxy->GetSession());
-  Q_ASSERT(server);
+  if (!server)
+  {
+    return;
+  }
 
   auto pxm = server->proxyManager();
   auto prototype = pxm->GetPrototypeProxy(smproxy->GetXMLGroup(), smproxy->GetXMLName());
@@ -170,9 +175,6 @@ void pqInputSelectorWidget::updateComboBox()
   Q_ASSERT(protoProperty);
 
   vtkSMPropertyHelper helper(protoProperty);
-
-  this->ComboBox->clear();
-  this->ComboBox->addItem("(none)", QVariant::fromValue<void*>(nullptr));
 
   const auto sources = smmodel->findItems<pqPipelineSource*>(server);
   for (auto& source : sources)
