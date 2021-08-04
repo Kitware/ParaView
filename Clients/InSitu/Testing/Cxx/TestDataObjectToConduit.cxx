@@ -116,19 +116,19 @@ bool TestRectilinearGrid()
 
   rectilinear_grid->SetDimensions(2, 3, 1);
 
+  std::vector<double> x_coordinates = { 0, 2 };
   vtkNew<vtkDoubleArray> xArray;
-  xArray->InsertNextValue(0.0);
-  xArray->InsertNextValue(2.0);
+  xArray->SetArray(x_coordinates.data(), x_coordinates.size(), 1);
   rectilinear_grid->SetXCoordinates(xArray);
 
+  std::vector<double> y_coordinates = { 0, 1, 2 };
   vtkNew<vtkDoubleArray> yArray;
-  yArray->InsertNextValue(0.0);
-  yArray->InsertNextValue(1.0);
-  yArray->InsertNextValue(2.0);
+  yArray->SetArray(y_coordinates.data(), y_coordinates.size(), 1);
   rectilinear_grid->SetYCoordinates(yArray);
 
+  std::vector<double> z_coordinates = { 0 };
   vtkNew<vtkDoubleArray> zArray;
-  zArray->InsertNextValue(0.0);
+  zArray->SetArray(z_coordinates.data(), z_coordinates.size(), 1);
   rectilinear_grid->SetZCoordinates(zArray);
 
   vtkNew<vtkDoubleArray> fieldArray;
@@ -154,9 +154,9 @@ bool TestRectilinearGrid()
   conduit_cpp::Node expected_node;
   auto coords_node = expected_node["coordsets/coords"];
   coords_node["type"] = "rectilinear";
-  coords_node["values/x"] = std::vector<double>{ 0, 2 };
-  coords_node["values/y"] = std::vector<double>{ 0, 1, 2 };
-  coords_node["values/z"] = std::vector<double>{ 0 };
+  coords_node["values/x"] = x_coordinates;
+  coords_node["values/y"] = y_coordinates;
+  coords_node["values/z"] = z_coordinates;
 
   auto topologies_node = expected_node["topologies/mesh"];
   topologies_node["type"] = "rectilinear";
