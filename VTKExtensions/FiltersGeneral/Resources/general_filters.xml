@@ -349,14 +349,12 @@ using the ( and ) buttons.
 - x^y: Raise one scalar to the power of another scalar. The operands for
   this function are not required to be enclosed in parentheses.
 - sqrt: Compute the square root of a scalar.
-- e^x: Raise e to the power of a scalar.
-- log: Compute the logarithm of a scalar (deprecated. same as log10).
-- log10: Compute the logarithm of a scalar to the base 10.
+- exp: Raise e to the power of a scalar.
 - ln: Compute the logarithm of a scalar to the base 'e'.
+- log10: Compute the logarithm of a scalar to the base 10.
 - ceil: Compute the ceiling of a scalar. floor: Compute the floor of a scalar.
 - abs: Compute the absolute value of a scalar.
-- v1.v2: Compute the dot product of two vectors. The operands for this
-  function are not required to be enclosed in parentheses.
+- dot: Compute the dot product of two vectors.
 - cross: Compute cross product of two vectors.
 - mag: Compute the magnitude of a vector.
 - norm: Normalize a vector.

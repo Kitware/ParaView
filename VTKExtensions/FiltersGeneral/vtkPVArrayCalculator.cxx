@@ -19,7 +19,6 @@
 #include "vtkCompositeDataSet.h"
 #include "vtkDataObject.h"
 #include "vtkDataSet.h"
-#include "vtkFunctionParser.h"
 #include "vtkGraph.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
@@ -49,6 +48,11 @@ std::string vtkQuoteString(const std::string& s)
   std::ostringstream stream;
   stream << '\"' << s << '\"';
   return stream.str();
+}
+
+bool vtkInQuotes(const char* s)
+{
+  return s[0] == '\"' && s[strlen(s) - 1] == '\"';
 }
 
 class add_scalar_variables
@@ -112,9 +116,6 @@ int vtkPVArrayCalculator::GetAttributeTypeFromInput(vtkDataObject* input)
 // ----------------------------------------------------------------------------
 void vtkPVArrayCalculator::ResetArrayAndVariableNames()
 {
-  // Make sure we reparse the function based on the current array order
-  this->FunctionParser->InvalidateFunction();
-
   // Look at the data-arrays available in the input and register them as
   // variables with the superclass.
   // It's safe to call these methods in RequestData() since they don't call
@@ -137,52 +138,73 @@ void vtkPVArrayCalculator::AddArrayAndVariableNames(
   vtkDataObject* vtkNotUsed(theInputObj), vtkDataSetAttributes* inDataAttrs)
 {
   // add non-coordinate scalar and vector variables
-  int numberArays = inDataAttrs->GetNumberOfArrays(); // the input
-  for (int j = 0; j < numberArays; j++)
+  int numberOfArrays = inDataAttrs->GetNumberOfArrays(); // the input
+  for (int j = 0; j < numberOfArrays; j++)
   {
     vtkAbstractArray* array = inDataAttrs->GetAbstractArray(j);
-    const char* array_name = array->GetName();
+    const char* arrayName = array->GetName();
 
     int numberComps = array->GetNumberOfComponents();
 
     if (numberComps == 1)
     {
-      this->AddScalarVariable(array_name, array_name, 0);
-      this->AddScalarVariable(vtkQuoteString(array_name).c_str(), array_name);
+      std::string validVariableName = vtkArrayCalculator::CheckValidVariableName(arrayName);
+      this->AddScalarVariable(validVariableName.c_str(), arrayName);
+      if (validVariableName == arrayName && !vtkInQuotes(arrayName))
+      {
+        this->AddScalarVariable(vtkQuoteString(arrayName).c_str(), arrayName);
+      }
     }
     else
     {
       for (int i = 0; i < numberComps; i++)
       {
-        std::set<std::string> possible_names;
+        std::set<std::string> possibleNames;
 
         if (array->GetComponentName(i))
         {
-          std::string name(vtkJoinToString(array_name, array->GetComponentName(i)));
-          possible_names.insert(name);
-          possible_names.insert(vtkQuoteString(name).c_str());
+          std::string name = vtkJoinToString(arrayName, array->GetComponentName(i));
+          std::string validVariableName = vtkArrayCalculator::CheckValidVariableName(name.c_str());
+          possibleNames.insert(validVariableName);
+          if (validVariableName == name && !vtkInQuotes(name.c_str()))
+          {
+            possibleNames.insert(vtkQuoteString(name));
+          }
         }
-        std::string name(
-          vtkJoinToString(array_name, vtkPVPostFilter::DefaultComponentName(i, numberComps)));
-        possible_names.insert(name);
-        possible_names.insert(vtkQuoteString(name).c_str());
+        std::string name =
+          vtkJoinToString(arrayName, vtkPVPostFilter::DefaultComponentName(i, numberComps));
+        std::string validVariableName = vtkArrayCalculator::CheckValidVariableName(name.c_str());
+        possibleNames.insert(validVariableName);
+        if (validVariableName == name && !vtkInQuotes(name.c_str()))
+        {
+          possibleNames.insert(vtkQuoteString(name));
+        }
 
         // also put a <ArrayName>_<ComponentNumber> to handle past versions of
         // vtkPVArrayCalculator when component names were not used and index was
         // used e.g. state files prior to fixing of BUG #12951.
-        std::string default_name = vtkJoinToString(array_name, i);
+        std::string defaultName = vtkJoinToString(arrayName, i);
 
-        possible_names.insert(default_name);
-        possible_names.insert(vtkQuoteString(default_name).c_str());
+        std::string defaultValidVariableName =
+          vtkArrayCalculator::CheckValidVariableName(defaultName.c_str());
+        possibleNames.insert(defaultValidVariableName);
+        if (defaultValidVariableName == defaultName && !vtkInQuotes(defaultName.c_str()))
+        {
+          possibleNames.insert(vtkQuoteString(defaultName));
+        }
 
         std::for_each(
-          possible_names.begin(), possible_names.end(), add_scalar_variables(this, array_name, i));
+          possibleNames.begin(), possibleNames.end(), add_scalar_variables(this, arrayName, i));
       }
 
       if (numberComps == 3)
       {
-        this->AddVectorArrayName(array_name, 0, 1, 2);
-        this->AddVectorVariable(vtkQuoteString(array_name).c_str(), array_name, 0, 1, 2);
+        std::string validVariableName = vtkArrayCalculator::CheckValidVariableName(arrayName);
+        this->AddVectorVariable(validVariableName.c_str(), arrayName);
+        if (validVariableName == arrayName && !vtkInQuotes(arrayName))
+        {
+          this->AddVectorVariable(vtkQuoteString(arrayName).c_str(), arrayName);
+        }
       }
     }
   }

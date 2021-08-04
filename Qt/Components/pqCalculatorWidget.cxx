@@ -33,19 +33,16 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ui_pqCalculatorWidget.h"
 
 #include "pqOutputPort.h"
-#include "pqPipelineFilter.h"
 #include "vtkPVArrayInformation.h"
 #include "vtkPVDataInformation.h"
 #include "vtkPVDataSetAttributesInformation.h"
+#include "vtkSMCoreUtilities.h"
 #include "vtkSMSourceProxy.h"
 #include "vtkSMUncheckedPropertyHelper.h"
 
 #include <QMenu>
 #include <QPointer>
 #include <QRegularExpression>
-#include <QtDebug>
-
-#include <cmath>
 
 class pqCalculatorWidget::pqInternals : public Ui::CalculatorWidget
 {
@@ -114,7 +111,7 @@ pqCalculatorWidget::pqCalculatorWidget(
   QObject::connect(
     this->Internals->xy, &QToolButton::pressed, this, [=]() { this->buttonPressed("^"); });
   QObject::connect(
-    this->Internals->v1v2, &QToolButton::pressed, this, [=]() { this->buttonPressed("."); });
+    this->Internals->dot, &QToolButton::pressed, this, [=]() { this->buttonPressed("dot"); });
 
   //--------------------------------------------------------------------------
 
@@ -212,22 +209,41 @@ void pqCalculatorWidget::updateVariables(const QString& mode)
     }
 
     int numComponents = arrayInfo->GetNumberOfComponents();
-    QString name = arrayInfo->GetName();
+    // the following check is performed to ensure that the user will use an acceptable
+    // name (function-wise) for the desired array
+    bool arrayNameSanitized =
+      vtkSMCoreUtilities::SanitizeName(arrayInfo->GetName()) == arrayInfo->GetName();
 
     for (int j = 0; j < numComponents; j++)
     {
       if (numComponents == 1)
       {
+        QString name = arrayNameSanitized
+          ? arrayInfo->GetName()
+          : std::string('\"' + std::string(arrayInfo->GetName()) + '\"').c_str();
         this->Internals->ScalarsMenu->addAction(name);
       }
       else
       {
-        QString compName(arrayInfo->GetComponentName(j));
-        QString n = name + QString("_%1").arg(compName);
+        bool componentNameSanitized = vtkSMCoreUtilities::SanitizeName(arrayInfo->GetComponentName(
+                                        j)) == arrayInfo->GetComponentName(j);
+        QString n;
+        if (!arrayNameSanitized || !componentNameSanitized)
+        {
+          n = QString("\"") + QString(arrayInfo->GetName()) +
+            QString("_%1").arg(arrayInfo->GetComponentName(j)) + QString("\"");
+        }
+        else
+        {
+          n = QString(arrayInfo->GetName()) + QString("_%1").arg(arrayInfo->GetComponentName(j));
+        }
+        QAction* a = new QAction(n, this->Internals->ScalarsMenu);
         QStringList d;
+        QString name = arrayNameSanitized
+          ? arrayInfo->GetName()
+          : std::string('\"' + std::string(arrayInfo->GetName()) + '\"').c_str();
         d.append(name);
         d.append(QString("%1").arg(j));
-        QAction* a = new QAction(n, this->Internals->ScalarsMenu);
         a->setData(d);
         this->Internals->ScalarsMenu->addAction(a);
       }
@@ -235,6 +251,9 @@ void pqCalculatorWidget::updateVariables(const QString& mode)
 
     if (numComponents == 3)
     {
+      QString name = arrayNameSanitized
+        ? arrayInfo->GetName()
+        : std::string('\"' + std::string(arrayInfo->GetName()) + '\"').c_str();
       this->Internals->VectorsMenu->addAction(name);
     }
   }
