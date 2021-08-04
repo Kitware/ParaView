@@ -372,8 +372,16 @@ bool TestHexahedronUnstructuredGrid()
   topologies_node0["type"] = "unstructured";
   topologies_node0["coordset"] = "coords";
   topologies_node0["elements/shape"] = "hex";
-  topologies_node0["elements/connectivity"] =
-    std::vector<long>{ 0, 1, 4, 3, 6, 7, 10, 9, 1, 2, 5, 4, 7, 8, 11, 10 };
+  if (unstructured_grid->GetCells()->IsStorage64Bit())
+  {
+    topologies_node0["elements/connectivity"] =
+      std::vector<conduit_int64>{ 0, 1, 4, 3, 6, 7, 10, 9, 1, 2, 5, 4, 7, 8, 11, 10 };
+  }
+  else
+  {
+    topologies_node0["elements/connectivity"] =
+      std::vector<conduit_int32>{ 0, 1, 4, 3, 6, 7, 10, 9, 1, 2, 5, 4, 7, 8, 11, 10 };
+  }
 
   auto cell_field_node = expected_node["fields/cell_field"];
   cell_field_node["association"] = "element";
@@ -438,7 +446,16 @@ bool TestTetrahedronUnstructuredGrid()
   topologies_node["type"] = "unstructured";
   topologies_node["coordset"] = "coords";
   topologies_node["elements/shape"] = "tet";
-  topologies_node["elements/connectivity"] = std::vector<long>{ 6, 10, 9, 12, 8, 11, 10, 14 };
+  if (unstructured_grid->GetCells()->IsStorage64Bit())
+  {
+    topologies_node["elements/connectivity"] =
+      std::vector<conduit_int64>{ 6, 10, 9, 12, 8, 11, 10, 14 };
+  }
+  else
+  {
+    topologies_node["elements/connectivity"] =
+      std::vector<conduit_int32>{ 6, 10, 9, 12, 8, 11, 10, 14 };
+  }
 
   auto cell_field_node = expected_node["fields/cell_field"];
   cell_field_node["association"] = "element";
@@ -504,7 +521,14 @@ bool TestQuadUnstructuredGrid()
   topologies_node["type"] = "unstructured";
   topologies_node["coordset"] = "coords";
   topologies_node["elements/shape"] = "quad";
-  topologies_node["elements/connectivity"] = std::vector<long>{ 22, 23, 20, 19 };
+  if (unstructured_grid->GetCells()->IsStorage64Bit())
+  {
+    topologies_node["elements/connectivity"] = std::vector<conduit_int64>{ 22, 23, 20, 19 };
+  }
+  else
+  {
+    topologies_node["elements/connectivity"] = std::vector<conduit_int32>{ 22, 23, 20, 19 };
+  }
 
   auto cell_field_node = expected_node["fields/point_field"];
   cell_field_node["association"] = "vertex";
@@ -569,7 +593,14 @@ bool TestTriangleUnstructuredGrid()
   topologies_node["type"] = "unstructured";
   topologies_node["coordset"] = "coords";
   topologies_node["elements/shape"] = "tri";
-  topologies_node["elements/connectivity"] = std::vector<long>{ 21, 22, 18, 22, 19, 18 };
+  if (unstructured_grid->GetCells()->IsStorage64Bit())
+  {
+    topologies_node["elements/connectivity"] = std::vector<conduit_int64>{ 21, 22, 18, 22, 19, 18 };
+  }
+  else
+  {
+    topologies_node["elements/connectivity"] = std::vector<conduit_int32>{ 21, 22, 18, 22, 19, 18 };
+  }
 
   auto cell_field_node = expected_node["fields/cell_field"];
   cell_field_node["association"] = "element";
@@ -634,13 +665,14 @@ bool TestLineUnstructuredGrid()
   topologies_node["type"] = "unstructured";
   topologies_node["coordset"] = "coords";
   topologies_node["elements/shape"] = "line";
-  topologies_node["elements/connectivity"] = std::vector<long>{ 23, 26, 21, 24 };
-
-  //    auto topologies_node6 = expected_node["topologies/mesh6"];
-  //    topologies_node6["type"] = "unstructured";
-  //    topologies_node6["coordset"] = "coords";
-  //    topologies_node6["elements/shape"] = "point";
-  //    topologies_node6["elements/connectivity"] = std::vector<int>{ 25 };
+  if (unstructured_grid->GetCells()->IsStorage64Bit())
+  {
+    topologies_node["elements/connectivity"] = std::vector<conduit_int64>{ 23, 26, 21, 24 };
+  }
+  else
+  {
+    topologies_node["elements/connectivity"] = std::vector<conduit_int32>{ 23, 26, 21, 24 };
+  }
 
   auto cell_field_node = expected_node["fields/cell_field"];
   cell_field_node["association"] = "element";
@@ -703,7 +735,14 @@ bool TestPointUnstructuredGrid()
   topologies_node["type"] = "unstructured";
   topologies_node["coordset"] = "coords";
   topologies_node["elements/shape"] = "point";
-  topologies_node["elements/connectivity"] = std::vector<long>{ 25 };
+  if (unstructured_grid->GetCells()->IsStorage64Bit())
+  {
+    topologies_node["elements/connectivity"] = std::vector<conduit_int64>{ 25 };
+  }
+  else
+  {
+    topologies_node["elements/connectivity"] = std::vector<conduit_int32>{ 25 };
+  }
 
   auto cell_field_node = expected_node["fields/cell_field"];
   cell_field_node["association"] = "element";
