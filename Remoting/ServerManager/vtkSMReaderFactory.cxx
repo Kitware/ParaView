@@ -125,7 +125,7 @@ public:
           {
             ::string_replace(item, '.', "\\.");
             ::string_replace(item, '?', ".");
-            ::string_replace(item, '*', ".?");
+            ::string_replace(item, '*', ".*");
             hint.FilenameRegExs.emplace_back(vtksys::RegularExpression(item.c_str()));
           }
         }
