@@ -21,6 +21,7 @@ Page | Description
 [Community Atmosphere Model (CAM5) Catalyst Adaptor](@ref Cam5Adaptor) | Analyze Cam5 output with ParaView Catalyst.
 [ParaView and Offscreen Rendering](@ref Offscreen) | Configuring and using ParaView in offscreen and/or headless environments.
 [Anatomy of Catalyst Python Module (Version 2.0)](@ref CatalystPythonScriptsV2) | Understanding Catalyst Python modules.
+[String Formatting Arguments](@ref StringFormattingArguments) | String formatting arguments that are used for formatting formattable strings.
 
 
 ParaView Catalyst
