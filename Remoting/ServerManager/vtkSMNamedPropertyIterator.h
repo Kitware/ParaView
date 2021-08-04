@@ -35,6 +35,9 @@
 #include "vtkRemotingServerManagerModule.h" //needed for exports
 #include "vtkSMPropertyIterator.h"
 
+#include <string> // for std::string
+#include <vector> // for std::vector
+
 class vtkSMProperty;
 class vtkSMProxy;
 class vtkStringList;
@@ -46,10 +49,13 @@ public:
   vtkTypeMacro(vtkSMNamedPropertyIterator, vtkSMPropertyIterator);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
+  ///@{
   /**
    * Set the names of properties to iterate over.
    */
   void SetPropertyNames(vtkStringList* names);
+  void SetPropertyNames(const std::vector<std::string>& names);
+  ///@}
 
   /**
    * Go to the first property.

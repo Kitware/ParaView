@@ -19,11 +19,11 @@
 #include "vtkSMProxyInternals.h"
 #include "vtkStringList.h"
 
-vtkStandardNewMacro(vtkSMNamedPropertyIterator);
-
 typedef vtkSMProxyInternals::PropertyInfoMap::iterator PropertyIterator;
 typedef vtkSMProxyInternals::ExposedPropertyInfoMap::iterator ExposedPropertyIterator;
 
+vtkStandardNewMacro(vtkSMNamedPropertyIterator);
+vtkCxxSetObjectMacro(vtkSMNamedPropertyIterator, PropertyNames, vtkStringList);
 //---------------------------------------------------------------------------
 vtkSMNamedPropertyIterator::vtkSMNamedPropertyIterator()
   : PropertyNames(nullptr)
@@ -38,7 +38,15 @@ vtkSMNamedPropertyIterator::~vtkSMNamedPropertyIterator()
 }
 
 //---------------------------------------------------------------------------
-vtkCxxSetObjectMacro(vtkSMNamedPropertyIterator, PropertyNames, vtkStringList);
+void vtkSMNamedPropertyIterator::SetPropertyNames(const std::vector<std::string>& names)
+{
+  vtkNew<vtkStringList> sList;
+  for (const auto& name : names)
+  {
+    sList->AddString(name.c_str());
+  }
+  this->SetPropertyNames(sList);
+}
 
 //---------------------------------------------------------------------------
 void vtkSMNamedPropertyIterator::Begin()
