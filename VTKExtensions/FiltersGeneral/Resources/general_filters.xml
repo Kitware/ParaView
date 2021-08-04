@@ -2696,21 +2696,13 @@ Every Nth Point.
                      dataset whose scalars lie within the specified range. This
                      filter operates on either point-centered or cell-centered
                      data. This filter operates on any type of dataset and
-                     produces unstructured grid output. To select between these
-                     two options, select either Point Data or Cell Data from
-                     the Attribute Mode menu. Once the Attribute Mode has been
-                     selected, choose the scalar array from which to threshold
-                     the data from the Scalars menu. The Lower Threshold and
-                     Upper Threshold sliders determine the range of the scalars
-                     to retain in the output. The All Scalars check box only
-                     takes effect when the Attribute Mode is set to Point Data.
-                     If the All Scalars option is checked, then a cell will
-                     only be passed to the output if the scalar values of all
-                     of its points lie within the range indicated by the Lower
-                     Threshold and Upper Threshold sliders. If unchecked, then
-                     a cell will be added to the output if the specified scalar
-                     value for any of its points is within the chosen
-                     range.</Documentation>
+                     produces unstructured grid output. The scalar array from
+                     which to threshold the data from can be selected in the
+                     Scalars menu. The Lower Threshold and Upper Threshold
+                     sliders determine the range of the scalars to retain in
+                     the output. The threshold method can be selected from the
+                     Threshold Method menu.
+      </Documentation>
       <InputProperty command="SetInputConnection"
                      name="Input">
         <ProxyGroupDomain name="groups">
@@ -2742,13 +2734,13 @@ Every Nth Point.
         <Documentation>The value of this property contains the name of the
         scalar array from which to perform thresholding.</Documentation>
       </StringVectorProperty>
-      <DoubleVectorProperty command="ThresholdBetween"
-                            default_values="0 0"
-                            label="Threshold Range"
-                            name="ThresholdBetween"
-                            number_of_elements="2"
-                            panel_widget="double_range">
-        <ArrayRangeDomain name="range">
+      <DoubleVectorProperty command="SetLowerThreshold"
+                            default_values="0"
+                            label="Lower Threshold"
+                            name="LowerThreshold"
+                            number_of_elements="1">
+        <ArrayRangeDomain name="range"
+                          default_mode="min">
           <RequiredProperties>
             <Property function="Input"
                       name="Input" />
@@ -2756,9 +2748,60 @@ Every Nth Point.
                       name="SelectInputScalars" />
           </RequiredProperties>
         </ArrayRangeDomain>
-        <Documentation>The values of this property specify the upper and lower
-        bounds of the thresholding operation.</Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="CompositeDecorator">
+            <Expression type="or">
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="ThresholdMethod" value="0" />
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="ThresholdMethod" value="1" />
+            </Expression>
+          </PropertyWidgetDecorator>
+        </Hints>
+        <Documentation>
+          The value of this property specifies the lower bound of the
+          thresholding operation.
+        </Documentation>
       </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetUpperThreshold"
+                            default_values="0"
+                            label="Upper Threshold"
+                            name="UpperThreshold"
+                            number_of_elements="1">
+        <ArrayRangeDomain name="range"
+                          default_mode="max">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input" />
+            <Property function="ArraySelection"
+                      name="SelectInputScalars" />
+          </RequiredProperties>
+        </ArrayRangeDomain>
+        <Hints>
+          <PropertyWidgetDecorator type="CompositeDecorator">
+            <Expression type="or">
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="ThresholdMethod" value="0" />
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="ThresholdMethod" value="2" />
+            </Expression>
+          </PropertyWidgetDecorator>
+        </Hints>
+        <Documentation>
+          The value of this property specifies the upper bound of the
+          thresholding operation.
+        </Documentation>
+      </DoubleVectorProperty>
+      <IntVectorProperty command="SetThresholdFunction"
+                         default_values="0"
+                         name="ThresholdMethod"
+                         number_of_elements="1"
+                         panel_visibility="default">
+        <EnumerationDomain name="enum">
+          <Entry text="Between" value="0"/>
+          <Entry text="Below Lower Threshold" value="1"/>
+          <Entry text="Above Upper Threshold" value="2"/>
+        </EnumerationDomain>
+        <Documentation>
+          This property indicates the threshold method.
+        </Documentation>
+      </IntVectorProperty>
       <IntVectorProperty command="SetAllScalars"
                          default_values="1"
                          name="AllScalars"

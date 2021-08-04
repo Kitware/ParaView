@@ -70,16 +70,17 @@ int vtkPVThreshold::RequestData(
 
   if (vtkHyperTreeGrid::SafeDownCast(inDataObj))
   {
+    // Match behavior from vtkThreshold
     vtkNew<vtkHyperTreeGridThreshold> thresholdFilter;
     if (this->ThresholdFunction == &vtkThreshold::Lower)
     {
       thresholdFilter->ThresholdBetween(
-        this->LowerThreshold, std::numeric_limits<double>::infinity());
+        -std::numeric_limits<double>::infinity(), this->LowerThreshold);
     }
     else if (this->ThresholdFunction == &vtkThreshold::Upper)
     {
       thresholdFilter->ThresholdBetween(
-        -std::numeric_limits<double>::infinity(), this->UpperThreshold);
+        this->UpperThreshold, std::numeric_limits<double>::infinity());
     }
     else if (this->ThresholdFunction == &vtkThreshold::Between)
     {
