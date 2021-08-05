@@ -153,10 +153,6 @@ protected Q_SLOTS:
 
   void setPresetIsAdvanced(int newState);
 
-protected:
-  void showEvent(QShowEvent* e) override;
-  void closeEvent(QCloseEvent* e) override;
-
 private Q_SLOTS:
   void updateGroups();
 

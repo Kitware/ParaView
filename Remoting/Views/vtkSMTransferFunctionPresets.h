@@ -34,7 +34,8 @@
 
 #include "vtkRemotingViewsModule.h" // needed for exports
 #include "vtkSmartPointer.h"        // for ivars
-#include <vtk_jsoncpp_fwd.h>        // for forward declarations
+#include <vector>
+#include <vtk_jsoncpp_fwd.h> // for forward declarations
 
 class vtkPVXMLElement;
 class VTKREMOTINGVIEWS_EXPORT vtkSMTransferFunctionPresets : public vtkSMObject
@@ -168,7 +169,7 @@ public:
    * If the filename ends with a .xml, it's assumed to be a legacy color map XML
    * and will be converted to the new format before processing.
    */
-  bool ImportPresets(const char* filename);
+  bool ImportPresets(const char* filename, std::vector<std::string>* importedNames = nullptr);
   bool ImportPresets(const Json::Value& presets);
   //@}
 

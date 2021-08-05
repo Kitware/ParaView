@@ -301,6 +301,11 @@ protected Q_SLOTS:
   void presetApplied();
 
   /**
+   * Updates the default presets combo box when the list changes
+   */
+  void updateDefaultPresetsList();
+
+  /**
   * Ensures that the color-swatches for indexedColors are shown only when this
   * is set to true.
   */

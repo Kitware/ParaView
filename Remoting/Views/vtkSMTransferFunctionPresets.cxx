@@ -140,7 +140,7 @@ public:
     return false;
   }
 
-  bool ImportPresets(const char* filename)
+  bool ImportPresets(const char* filename, std::vector<std::string>* importedNames)
   {
     Json::CharReaderBuilder builder;
     builder["collectComments"] = false;
@@ -161,6 +161,11 @@ public:
     {
       vtkGenericWarningMacro("File may not contain presets: " << filename);
       return false;
+    }
+    if (importedNames != nullptr)
+    {
+      std::transform(root.begin(), root.end(), std::back_inserter(*importedNames),
+        [&](Json::Value const& preset) { return preset.get("Name", "").asString(); });
     }
     return this->ImportPresets(root);
   }
@@ -452,6 +457,7 @@ bool vtkSMTransferFunctionPresets::GetPresetHasAnnotations(const Json::Value& pr
   return (!preset.empty() && preset.isMember("Annotations"));
 }
 
+// TODO check if this still makes sense, but probably not
 //----------------------------------------------------------------------------
 bool vtkSMTransferFunctionPresets::IsPresetDefault(const Json::Value& preset)
 {
@@ -475,7 +481,8 @@ bool vtkSMTransferFunctionPresets::IsPresetBuiltin(unsigned int index)
 }
 
 //----------------------------------------------------------------------------
-bool vtkSMTransferFunctionPresets::ImportPresets(const char* filename)
+bool vtkSMTransferFunctionPresets::ImportPresets(
+  const char* filename, std::vector<std::string>* importedNames)
 {
   if (!filename)
   {
@@ -504,7 +511,7 @@ bool vtkSMTransferFunctionPresets::ImportPresets(const char* filename)
   }
   else
   {
-    return this->Internals->ImportPresets(filename);
+    return this->Internals->ImportPresets(filename, importedNames);
   }
 }
 

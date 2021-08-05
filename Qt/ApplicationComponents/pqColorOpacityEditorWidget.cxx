@@ -40,6 +40,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqDataRepresentation.h"
 #include "pqOpacityTableModel.h"
 #include "pqPipelineRepresentation.h"
+#include "pqPresetGroupsManager.h"
+#include "pqPresetToPixmap.h"
 #include "pqPropertiesPanel.h"
 #include "pqPropertyWidgetDecorator.h"
 #include "pqResetScalarRangeReaction.h"
@@ -68,7 +70,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtk_jsoncpp.h"
 
 #include <QMessageBox>
+#include <QPainter>
 #include <QPointer>
+#include <QStyledItemDelegate>
 #include <QTimer>
 #include <QVBoxLayout>
 #include <QtDebug>
@@ -110,6 +114,64 @@ public:
 
 private:
   Q_DISABLE_COPY(pqColorOpacityEditorWidgetDecorator)
+};
+
+class pqColorMapDelegate : public QStyledItemDelegate
+{
+public:
+  pqColorMapDelegate(QObject* parent = nullptr)
+    : QStyledItemDelegate(parent)
+  {
+  }
+
+  void paint(
+    QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& index) const override
+  {
+    painter->save();
+    auto opt = option;
+    this->initStyleOption(&opt, index);
+
+    // The pixmap takes 3/4 of the height and 1/2 of the width of the item, and the text takes 1/2
+    // of the height and 1/2 of the width of the item
+    auto const pixmapHorizontalMargins = 5;
+    auto const pixmapRect =
+      QRect(opt.rect.x() + pixmapHorizontalMargins, opt.rect.y() + 0.125 * opt.rect.height(),
+        opt.rect.width() / 2 - 2 * pixmapHorizontalMargins, opt.rect.height() * 0.75);
+    auto const textRect = QRect(
+      opt.rect.x() + opt.rect.width() / 2, opt.rect.y(), opt.rect.width() / 2, opt.rect.height());
+
+    if (opt.state & QStyle::State_Selected)
+    {
+      // Fill the backround of the selected item with a blue color
+      painter->fillRect(opt.rect, opt.palette.color(QPalette::Highlight));
+
+      auto pen = painter->pen();
+
+      pen.setColor(opt.palette.color(QPalette::HighlightedText));
+      painter->setPen(pen);
+    }
+    else
+    {
+      painter->fillRect(opt.rect, painter->brush());
+    }
+    painter->drawText(QRectF(textRect), Qt::AlignVCenter, index.data().toString());
+
+    auto transferFunctionPresets = vtkSMTransferFunctionPresets::GetInstance();
+    auto pixmap = PresetToPixmap.render(
+      transferFunctionPresets->GetPreset(index.data(Qt::UserRole).toInt()), opt.rect.size());
+
+    painter->drawPixmap(pixmapRect, pixmap);
+
+    painter->restore();
+  }
+
+  QSize sizeHint(const QStyleOptionViewItem& option, const QModelIndex&) const
+  {
+    return QSize{ option.rect.width(), option.fontMetrics.height() * 2 };
+  }
+
+private:
+  pqPresetToPixmap PresetToPixmap;
 };
 
 } // end anonymous namespace
@@ -160,6 +222,13 @@ public:
 
     QObject::connect(this->ChoosePresetReaction.data(), SIGNAL(presetApplied(const QString&)), self,
       SLOT(presetApplied()));
+    QObject::connect(this->ChoosePresetReaction.data(), &pqChooseColorPresetReaction::presetApplied,
+      [=](const QString& presetName) {
+        auto& defaultPresetsComboBox = this->Ui.DefaultPresetsComboBox;
+        defaultPresetsComboBox->blockSignals(true);
+        defaultPresetsComboBox->setCurrentIndex(defaultPresetsComboBox->findText(presetName));
+        defaultPresetsComboBox->blockSignals(false);
+      });
 
     this->HistogramTimer.setSingleShot(true);
     this->HistogramTimer.setInterval(1);
@@ -207,6 +276,24 @@ pqColorOpacityEditorWidget::pqColorOpacityEditorWidget(
     this, SLOT(representationOrViewChanged()));
   QObject::connect(&pqActiveObjects::instance(), SIGNAL(viewChanged(pqView*)), this,
     SLOT(representationOrViewChanged()));
+
+  ui.DefaultPresetsComboBox->setItemDelegate(new pqColorMapDelegate(ui.DefaultPresetsComboBox));
+  this->updateDefaultPresetsList();
+
+  QObject::connect(
+    ui.DefaultPresetsComboBox, &QComboBox::currentTextChanged, [=](const QString& presetName) {
+      bool presetApplied =
+        vtkSMTransferFunctionProxy::ApplyPreset(smproxy, presetName.toStdString().c_str());
+      if (presetApplied)
+      {
+        Q_EMIT this->presetApplied();
+      }
+    });
+
+  auto groupManager = qobject_cast<pqPresetGroupsManager*>(
+    pqApplicationCore::instance()->manager("PRESET_GROUP_MANAGER"));
+  this->connect(groupManager, &pqPresetGroupsManager::groupsUpdated, this,
+    &pqColorOpacityEditorWidget::updateDefaultPresetsList);
 
   // To avoid color editor widget movement when hidden
   QSizePolicy sp_retain = ui.OpacityEditor->sizePolicy();
@@ -961,6 +1048,26 @@ void pqColorOpacityEditorWidget::presetApplied()
   // Assume the color map and opacity have changed and refresh
   Q_EMIT this->xrgbPointsChanged();
   Q_EMIT this->xvmsPointsChanged();
+}
+
+//-----------------------------------------------------------------------------
+void pqColorOpacityEditorWidget::updateDefaultPresetsList()
+{
+  auto& defaultPresetsComboBox = this->Internals->Ui.DefaultPresetsComboBox;
+  auto transferFunctionPresets = vtkSMTransferFunctionPresets::GetInstance();
+  auto groupManager = qobject_cast<pqPresetGroupsManager*>(
+    pqApplicationCore::instance()->manager("PRESET_GROUP_MANAGER"));
+  defaultPresetsComboBox->blockSignals(true);
+  defaultPresetsComboBox->clear();
+  for (unsigned int index = 0; index < transferFunctionPresets->GetNumberOfPresets(); ++index)
+  {
+    auto presetName = QString::fromStdString(transferFunctionPresets->GetPresetName(index));
+    if (groupManager->presetRankInGroup(presetName, "Default") != -1)
+    {
+      defaultPresetsComboBox->addItem(presetName, index);
+    }
+  }
+  defaultPresetsComboBox->blockSignals(false);
 }
 
 //-----------------------------------------------------------------------------

@@ -106,7 +106,16 @@ public:
   void importPresets(const QString& filename)
   {
     this->beginResetModel();
-    this->Presets->ImportPresets(filename.toStdString().c_str());
+    std::vector<std::string> importedNames;
+    bool imported = this->Presets->ImportPresets(filename.toStdString().c_str(), &importedNames);
+    if (imported)
+    {
+      for (std::string const& importedName : importedNames)
+      {
+        GroupManager->addToGroup("User", QString::fromStdString(importedName));
+        GroupManager->addToGroup("Default", QString::fromStdString(importedName));
+      }
+    }
     this->endResetModel();
   }
 
@@ -122,8 +131,10 @@ public:
   void removePreset(unsigned int idx)
   {
     this->beginRemoveRows(QModelIndex(), idx, idx);
+    auto presetName = this->Presets->GetPresetName(idx);
     this->Presets->RemovePreset(idx);
     this->Pixmaps.removeAt(idx);
+    this->GroupManager->removeFromAllGroups(QString::fromStdString(presetName));
     this->endRemoveRows();
   }
 
@@ -178,13 +189,22 @@ public:
         case Qt::FontRole:
           QFont font;
           // Find the column in this model for the default group.
-          auto column = this->GroupManager->groupNames().indexOf("Default") + 1;
+          auto defaultColumn = this->GroupManager->groupNames().indexOf("Default") + 1;
           // if this is a default preset, bold and underline the name
-          if (column != 0 && this->data(this->index(idx.row(), column), Qt::DisplayRole) != -1)
+          if (defaultColumn != 0 &&
+            this->data(this->index(idx.row(), defaultColumn), Qt::DisplayRole) != -1)
           {
             font.setBold(true);
             font.setUnderline(true);
           }
+
+          auto userColumn = this->GroupManager->groupNames().indexOf("User") + 1;
+          if (userColumn != 0 &&
+            this->data(this->index(idx.row(), userColumn), Qt::DisplayRole) != -1)
+          {
+            font.setItalic(true);
+          }
+
           return font;
       }
     }
@@ -197,20 +217,7 @@ public:
           auto name = this->Presets->GetPresetName(idx.row());
           auto applicationGroupIndex =
             this->GroupManager->presetRankInGroup(name.c_str(), groupName);
-          if (groupName != "Default")
-          {
-            return applicationGroupIndex;
-          }
-          else
-          {
-            pqSettings settings;
-            auto userChosenPresets =
-              settings.value("pqSettingdDialog/userChosenPresets", QStringList()).toStringList();
-            auto presetIdx = userChosenPresets.indexOf(QRegExp(QRegExp::escape(name.c_str())));
-            return (presetIdx != -1)
-              ? presetIdx + this->GroupManager->numberOfPresetsInGroup(groupName)
-              : applicationGroupIndex;
-          }
+          return applicationGroupIndex;
       }
     }
     return QVariant();
@@ -222,18 +229,12 @@ public:
     {
       return;
     }
+
     QString presetName = this->Presets->GetPresetName(idx.row()).c_str();
-    pqSettings settings;
-    auto userChosenPresets =
-      settings.value("pqSettingdDialog/userChosenPresets", QStringList()).toStringList();
-    if (!userChosenPresets.contains(presetName))
-    {
-      userChosenPresets.push_back(presetName);
-      settings.setValue("pqSettingdDialog/userChosenPresets", userChosenPresets);
-      auto changedIndexStart = this->index(idx.row(), 0);
-      auto changedIndexEnd = this->index(idx.row(), this->columnCount(idx) - 1);
-      Q_EMIT this->dataChanged(changedIndexStart, changedIndexEnd);
-    }
+    this->GroupManager->addToGroup("Default", presetName);
+    auto changedIndexStart = this->index(idx.row(), 0);
+    auto changedIndexEnd = this->index(idx.row(), this->columnCount(idx) - 1);
+    Q_EMIT this->dataChanged(changedIndexStart, changedIndexEnd);
   }
 
   void removePresetFromDefaults(const QModelIndex& idx)
@@ -242,18 +243,12 @@ public:
     {
       return;
     }
+
     QString presetName = this->Presets->GetPresetName(idx.row()).c_str();
-    pqSettings settings;
-    auto userChosenPresets =
-      settings.value("pqSettingdDialog/userChosenPresets", QStringList()).toStringList();
-    if (userChosenPresets.contains(presetName))
-    {
-      userChosenPresets.removeOne(presetName);
-      settings.setValue("pqSettingdDialog/userChosenPresets", userChosenPresets);
-      auto changedIndexStart = this->index(idx.row(), 0);
-      auto changedIndexEnd = this->index(idx.row(), this->columnCount(idx) - 1);
-      Q_EMIT this->dataChanged(changedIndexStart, changedIndexEnd);
-    }
+    this->GroupManager->removeFromGroup("Default", presetName);
+    auto changedIndexStart = this->index(idx.row(), 0);
+    auto changedIndexEnd = this->index(idx.row(), this->columnCount(idx) - 1);
+    Q_EMIT this->dataChanged(changedIndexStart, changedIndexEnd);
   }
 
   bool setData(const QModelIndex& idx, const QVariant& value, int role) override
@@ -264,8 +259,13 @@ public:
       return false;
     }
 
-    if (this->Presets->RenamePreset(idx.row(), value.toString().toStdString().c_str()))
+    std::string const previousName = this->Presets->GetPresetName(idx.row());
+    std::string const newName = value.toString().toStdString();
+    if (this->Presets->RenamePreset(idx.row(), newName.c_str()))
     {
+      GroupManager->removeFromAllGroups(QString::fromStdString(previousName));
+      GroupManager->addToGroup("User", QString::fromStdString(newName));
+      GroupManager->addToGroup("Default", QString::fromStdString(newName));
       Q_EMIT this->dataChanged(idx, idx);
       return true;
     }
@@ -443,65 +443,6 @@ private:
   Q_DISABLE_COPY(pqPresetDialogReflowModel);
 };
 
-namespace
-{
-class pqPresetDialogFakeModality : public QObject
-{
-public:
-  pqPresetDialogFakeModality(pqPresetDialog* p)
-    : QObject(p)
-    , Self(p)
-  {
-  }
-  bool eventFilter(QObject* obj, QEvent* event) override
-  {
-    if (!dynamic_cast<QInputEvent*>(event))
-    {
-      // if the event is not an input event let it through
-      return false;
-    }
-    // The event filter is called multiple times for each event.  The first time
-    // is for the Window the event is within.  We have to let theset through so
-    // that the event filter will be called again on the event with the widget
-    // that will recieve it.
-    //
-    // VTK gets events from the QVTKOpenGLWidow so we don't even need to let the
-    // pqQVTKWidget accept events.  This prevents it from popping up a context
-    // menu too.
-    if (obj->inherits("QWidgetWindow") || obj->inherits("QVTKOpenGLWindow"))
-    {
-      return false;
-    }
-    while (obj != nullptr)
-    {
-      if (obj == this->Self)
-      {
-        // if the event is on a child of the preset dialog let it go through
-        return false;
-      }
-      else if (obj->inherits("QMenu"))
-      {
-        // Future proofing: it is really bad if you have a context menu up and
-        // all events to it are blocked.  It locks X completely.
-        return false;
-      }
-      else if (obj->inherits("QListView") && obj->parent() == nullptr)
-      {
-        // This is the list that pops up in the export/import file dialog to
-        // complete the filename you have started typing.  Similar to the QMenu,
-        // if not handled it locks X completely.
-        return false;
-      }
-      obj = obj->parent();
-    }
-    return true;
-  }
-
-private:
-  pqPresetDialog* Self;
-};
-}
-
 class pqPresetDialog::pqInternals
 {
 public:
@@ -509,14 +450,12 @@ public:
   QPointer<pqPresetDialogTableModel> Model;
   QPointer<pqPresetDialogProxyModel> ProxyModel;
   QPointer<pqPresetDialogReflowModel> ReflowModel;
-  QScopedPointer<QObject> EventFilter;
   int CurrentGroupColumn;
 
   pqInternals(pqPresetDialog::Modes mode, pqPresetDialog* self)
     : Model(new pqPresetDialogTableModel(self))
     , ProxyModel(new pqPresetDialogProxyModel(mode, self))
     , ReflowModel(new pqPresetDialogReflowModel(2, self))
-    , EventFilter(new pqPresetDialogFakeModality(self))
   {
     this->Ui.setupUi(self);
     this->Ui.gridLayout->setVerticalSpacing(pqPropertiesPanel::suggestedVerticalSpacing());
@@ -647,20 +586,6 @@ pqPresetDialog::pqPresetDialog(QWidget* parentObject, pqPresetDialog::Modes mode
 
 //-----------------------------------------------------------------------------
 pqPresetDialog::~pqPresetDialog() = default;
-
-//-----------------------------------------------------------------------------
-void pqPresetDialog::showEvent(QShowEvent* e)
-{
-  QApplication::instance()->installEventFilter(this->Internals->EventFilter.data());
-  QDialog::showEvent(e);
-}
-
-//-----------------------------------------------------------------------------
-void pqPresetDialog::closeEvent(QCloseEvent* e)
-{
-  QApplication::instance()->removeEventFilter(this->Internals->EventFilter.data());
-  QDialog::closeEvent(e);
-}
 
 //-----------------------------------------------------------------------------
 void pqPresetDialog::updateGroups()
@@ -814,8 +739,8 @@ void pqPresetDialog::updateForSelectedIndex(const QModelIndex& proxyIndex)
 
   const Ui::pqPresetDialog& ui = internals.Ui;
 
+  ui.showDefault->setEnabled(true);
   ui.showDefault->setChecked(defaultPosition != -1);
-  ui.showDefault->setEnabled(defaultPosition == -1 || defaultPosition >= numDefaultPresets);
   ui.colors->setEnabled(true);
   ui.usePresetRange->setEnabled(!internals.Model->Presets->GetPresetHasIndexedColors(preset));
   ui.opacities->setEnabled(internals.Model->Presets->GetPresetHasOpacities(preset));
