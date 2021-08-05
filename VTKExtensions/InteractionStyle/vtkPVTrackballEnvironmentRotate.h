@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   ParaView
-  Module:    vtkPVTrackballSkyboxRotate.h
+  Module:    vtkPVTrackballEnvironmentRotate.h
 
   Copyright (c) Kitware, Inc.
   All rights reserved.
@@ -13,28 +13,24 @@
 
 =========================================================================*/
 /**
- * @class   vtkPVTrackballSkyboxRotate
- * @brief   Rotates the environment skybox with xy mouse movement.
+ * @class   vtkPVTrackballEnvironmentRotate
+ * @brief   Rotates the environment with xy mouse movement.
  *
- * vtkPVTrackballSkyboxRotate allows the user to rotate a
- * Skybox in a renderer.
+ * vtkPVTrackballEnvironmentRotate allows the user to rotate the renderer environment.
 */
 
-#ifndef vtkPVTrackballSkyboxRotate_h
-#define vtkPVTrackballSkyboxRotate_h
+#ifndef vtkPVTrackballEnvironmentRotate_h
+#define vtkPVTrackballEnvironmentRotate_h
 
 #include "vtkCameraManipulator.h"
 #include "vtkPVVTKExtensionsInteractionStyleModule.h" // needed for export macro
 
-class vtkSkybox;
-
-class VTKPVVTKEXTENSIONSINTERACTIONSTYLE_EXPORT vtkPVTrackballSkyboxRotate
+class VTKPVVTKEXTENSIONSINTERACTIONSTYLE_EXPORT vtkPVTrackballEnvironmentRotate
   : public vtkCameraManipulator
 {
 public:
-  static vtkPVTrackballSkyboxRotate* New();
-  vtkTypeMacro(vtkPVTrackballSkyboxRotate, vtkCameraManipulator);
-  void PrintSelf(ostream& os, vtkIndent indent) override;
+  static vtkPVTrackballEnvironmentRotate* New();
+  vtkTypeMacro(vtkPVTrackballEnvironmentRotate, vtkCameraManipulator);
 
   //@{
   /**
@@ -44,21 +40,14 @@ public:
   void OnMouseMove(int x, int y, vtkRenderer* ren, vtkRenderWindowInteractor* rwi) override;
   //@}
 
-  /**
-   * Set the skybox that will be rotated.
-   */
-  vtkSetMacro(Skybox, vtkSkybox*);
-
 protected:
-  vtkPVTrackballSkyboxRotate() = default;
-  ~vtkPVTrackballSkyboxRotate() override = default;
+  vtkPVTrackballEnvironmentRotate() = default;
+  ~vtkPVTrackballEnvironmentRotate() override = default;
 
-  vtkPVTrackballSkyboxRotate(const vtkPVTrackballSkyboxRotate&) = delete;
-  void operator=(const vtkPVTrackballSkyboxRotate&) = delete;
+  vtkPVTrackballEnvironmentRotate(const vtkPVTrackballEnvironmentRotate&) = delete;
+  void operator=(const vtkPVTrackballEnvironmentRotate&) = delete;
 
   void EnvironmentRotate(vtkRenderer* ren, vtkRenderWindowInteractor* rwi);
-
-  vtkSkybox* Skybox = nullptr;
 };
 
 #endif

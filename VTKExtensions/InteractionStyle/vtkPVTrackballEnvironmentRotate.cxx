@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   ParaView
-  Module:    vtkPVTrackballSkyboxRotate.cxx
+  Module:    vtkPVTrackballEnvironmentRotate.cxx
 
   Copyright (c) Kitware, Inc.
   All rights reserved.
@@ -12,7 +12,7 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-#include "vtkPVTrackballSkyboxRotate.h"
+#include "vtkPVTrackballEnvironmentRotate.h"
 
 #include "vtkMath.h"
 #include "vtkMatrix3x3.h"
@@ -20,24 +20,13 @@
 #include "vtkRenderWindow.h"
 #include "vtkRenderWindowInteractor.h"
 #include "vtkRenderer.h"
-#include "vtkSkybox.h"
 #include "vtkTransform.h"
 
-vtkStandardNewMacro(vtkPVTrackballSkyboxRotate);
-
-//----------------------------------------------------------------------------
-void vtkPVTrackballSkyboxRotate::PrintSelf(ostream& os, vtkIndent indent)
-{
-  this->Superclass::PrintSelf(os, indent);
-  os << indent << "Skybox:" << (this->Skybox ? "" : " (nullptr)") << endl;
-  if (this->Skybox)
-  {
-    this->Skybox->PrintSelf(os, indent.GetNextIndent());
-  }
-}
+vtkStandardNewMacro(vtkPVTrackballEnvironmentRotate);
 
 //-------------------------------------------------------------------------
-void vtkPVTrackballSkyboxRotate::EnvironmentRotate(vtkRenderer* ren, vtkRenderWindowInteractor* rwi)
+void vtkPVTrackballEnvironmentRotate::EnvironmentRotate(
+  vtkRenderer* ren, vtkRenderWindowInteractor* rwi)
 {
   int dx = rwi->GetEventPosition()[0] - rwi->GetLastEventPosition()[0];
   int sizeX = ren->GetRenderWindow()->GetSize()[0];
@@ -83,26 +72,16 @@ void vtkPVTrackballSkyboxRotate::EnvironmentRotate(vtkRenderer* ren, vtkRenderWi
 }
 
 //-------------------------------------------------------------------------
-void vtkPVTrackballSkyboxRotate::OnMouseMove(
+void vtkPVTrackballEnvironmentRotate::OnMouseMove(
   int vtkNotUsed(x), int vtkNotUsed(y), vtkRenderer* ren, vtkRenderWindowInteractor* rwi)
 {
-  if (ren == nullptr || this->Skybox == nullptr)
+  if (ren == nullptr)
   {
     return;
   }
 
   // Update environment orientation
   this->EnvironmentRotate(ren, rwi);
-
-  // Update skybox orientation
-  double* up = ren->GetEnvironmentUp();
-  double* right = ren->GetEnvironmentRight();
-
-  double front[3];
-  vtkMath::Cross(right, up, front);
-
-  this->Skybox->SetFloorPlane(up[0], up[1], up[2], 0.0);
-  this->Skybox->SetFloorRight(front[0], front[1], front[2]);
 
   rwi->Render();
 }
