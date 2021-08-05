@@ -32,7 +32,6 @@
 #include "vtkSMProxyManager.h"
 #include "vtkSMSessionProxyManager.h"
 #include "vtkSMSourceProxy.h"
-#include "vtkSteeringDataGenerator.h"
 
 #if VTK_MODULE_ENABLE_VTK_ParallelMPI
 #include "vtkMPI.h"
@@ -97,11 +96,10 @@ static bool convert_to_blueprint_mesh(
 {
   if (proxy != nullptr)
   {
-    if (auto steeringDataGenerator =
-          vtkSteeringDataGenerator::SafeDownCast(proxy->GetClientSideObject()))
+    if (auto steeringDataGenerator = vtkAlgorithm::SafeDownCast(proxy->GetClientSideObject()))
     {
       steeringDataGenerator->Update();
-      if (vtkDataObject* outputDataObject = steeringDataGenerator->GetOutput())
+      if (vtkDataObject* outputDataObject = steeringDataGenerator->GetOutputDataObject(0))
       {
         auto channel = node[name];
 
