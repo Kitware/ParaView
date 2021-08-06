@@ -9,7 +9,7 @@
   <pqevent object="pqClientMainWindow/variableToolbar/actionScalarBarVisibility" command="set_boolean" arguments="false" />
   <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuExtractors" />
   <pqevent object="pqClientMainWindow/menubar/menuExtractors/Experimental" command="activate" arguments="CinemaVolumetricPNG" />
-  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/Writer/ProxySelectionWidget/frame/ChosenProxyWidget/FileName/FileName" command="set_string" arguments="image_%.6ts%cm.png" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/Writer/ProxySelectionWidget/frame/ChosenProxyWidget/FileName/FileName" command="set_string" arguments="image_{timestep:06d}{camera}.png" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/Writer/ProxySelectionWidget/frame/ChosenProxyWidget/ImageResolution/width" command="set_string" arguments="400" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/Writer/ProxySelectionWidget/frame/ChosenProxyWidget/ImageResolution/height" command="set_string" arguments="400" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/Writer/ProxySelectionWidget/frame/ChosenProxyWidget/SingleFunctionOnly/CheckBox" command="set_boolean" arguments="true" />
