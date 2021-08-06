@@ -131,14 +131,12 @@ bool TestRectilinearGrid()
   zArray->SetArray(z_coordinates.data(), z_coordinates.size(), 1);
   rectilinear_grid->SetZCoordinates(zArray);
 
+  std::vector<double> field_values = { 0, 0, 1, 2, 2, 4, 3, 6, 4, 8, 5, 10 };
   vtkNew<vtkDoubleArray> fieldArray;
   fieldArray->SetName("rectilinear_field");
   fieldArray->SetNumberOfComponents(2);
   fieldArray->SetNumberOfTuples(6);
-  for (int tuple_index = 0; tuple_index < 6; ++tuple_index)
-  {
-    fieldArray->SetTuple2(tuple_index, tuple_index, tuple_index * 2);
-  }
+  fieldArray->SetArray(field_values.data(), field_values.size(), 1);
 
   rectilinear_grid->GetPointData()->AddArray(fieldArray);
 
@@ -166,7 +164,7 @@ bool TestRectilinearGrid()
   field_node["association"] = "vertex";
   field_node["topology"] = "mesh";
   field_node["volume_dependent"] = "false";
-  field_node["values"] = std::vector<double>{ 0, 0, 1, 2, 2, 4, 3, 6, 4, 8, 5, 10 };
+  field_node["values"] = field_values;
 
   conduit_cpp::Node diff_info;
   bool are_nodes_different = node.diff(expected_node, diff_info, 1e-6);

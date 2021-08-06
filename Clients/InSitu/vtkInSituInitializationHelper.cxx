@@ -504,7 +504,7 @@ void vtkInSituInitializationHelper::UpdateSteerableProxies()
         continue;
       }
       auto arrayname = child->GetAttribute("array");
-      auto fd = grid->GetAttributesAsFieldData(assoc);
+      auto* fd = grid->GetAttributesAsFieldData(assoc);
       vtkDataArray* array = fd ? fd->GetArray(arrayname) : nullptr;
       if (strcmp(arrayname, "coords") == 0 && vtkPointSet::SafeDownCast(grid) &&
         assoc == vtkDataObject::POINT)
@@ -647,8 +647,7 @@ void vtkInSituInitializationHelper::UpdateSteerableParameters(
     auto proxyIterator = internals->SteerableProxies.find(steerableProxy);
     if (proxyIterator == internals->SteerableProxies.end())
     {
-      internals->SteerableProxies.insert(
-        std::make_pair(steerableProxy, std::string(steerableSourceName)));
+      internals->SteerableProxies.emplace(steerableProxy, std::string(steerableSourceName));
     }
 
     UpdateSteerableProxies();

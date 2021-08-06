@@ -65,12 +65,7 @@ bool vtkDataObjectToConduit::FillConduitNode(
 //----------------------------------------------------------------------------
 bool vtkDataObjectToConduit::FillConduitNode(vtkDataSet* data_set, conduit_cpp::Node& conduit_node)
 {
-  bool is_success = FillTopology(data_set, conduit_node);
-  if (is_success)
-  {
-    is_success = FillFields(data_set, conduit_node);
-  }
-  return is_success;
+  return FillTopology(data_set, conduit_node) && FillFields(data_set, conduit_node);
 }
 
 //----------------------------------------------------------------------------
@@ -195,7 +190,7 @@ bool vtkDataObjectToConduit::FillTopology(vtkDataSet* data_set, conduit_cpp::Nod
     topologies_node["coordset"] = "coords";
 
     int cell_type = VTK_VERTEX;
-    auto number_of_cells = unstructured_grid->GetNumberOfCells();
+    const auto number_of_cells = unstructured_grid->GetNumberOfCells();
     if (number_of_cells > 0)
     {
       cell_type = unstructured_grid->GetCellType(0);
@@ -267,7 +262,11 @@ bool vtkDataObjectToConduit::FillFields(vtkDataSet* data_set, conduit_cpp::Node&
 
   if (auto field_data = data_set->GetFieldData())
   {
-    // field without associated topology is not supported by conduit...
+    if (field_data->GetNumberOfArrays() > 0)
+    {
+      vtkVLog(vtkLogger::VERBOSITY_WARNING,
+        "Field without associated topology is not supported by conduit. Will be ignored.");
+    }
   }
 
   return true;
@@ -320,57 +319,35 @@ bool vtkDataObjectToConduit::ConvertDataArrayToMCArray(
   int data_type_size = data_array->GetDataTypeSize();
   int array_type = data_array->GetArrayType();
 
+  if (array_type != vtkAbstractArray::AoSDataArrayTemplate)
+  {
+    vtkLog(ERROR, "Unsupported data array type: " << data_array->GetDataTypeAsString());
+    return false;
+  }
+
   bool is_supported = true;
   if (IsSignedIntegralType(data_type))
   {
     switch (data_type_size)
     {
       case 1:
-        if (array_type == vtkAbstractArray::AoSDataArrayTemplate)
-        {
-          conduit_node.set_external_int8_ptr((conduit_int8*)data_array->GetVoidPointer(0),
-            number_of_elements, offset * sizeof(conduit_int8), stride * sizeof(conduit_int8));
-        }
-        else
-        {
-          is_supported = false;
-        }
+        conduit_node.set_external_int8_ptr((conduit_int8*)data_array->GetVoidPointer(0),
+          number_of_elements, offset * sizeof(conduit_int8), stride * sizeof(conduit_int8));
         break;
 
       case 2:
-        if (array_type == vtkAbstractArray::AoSDataArrayTemplate)
-        {
-          conduit_node.set_external_int16_ptr((conduit_int16*)data_array->GetVoidPointer(0),
-            number_of_elements, offset * sizeof(conduit_int16), stride * sizeof(conduit_int16));
-        }
-        else
-        {
-          is_supported = false;
-        }
+        conduit_node.set_external_int16_ptr((conduit_int16*)data_array->GetVoidPointer(0),
+          number_of_elements, offset * sizeof(conduit_int16), stride * sizeof(conduit_int16));
         break;
 
       case 4:
-        if (array_type == vtkAbstractArray::AoSDataArrayTemplate)
-        {
-          conduit_node.set_external_int32_ptr((conduit_int32*)data_array->GetVoidPointer(0),
-            number_of_elements, offset * sizeof(conduit_int32), stride * sizeof(conduit_int32));
-        }
-        else
-        {
-          is_supported = false;
-        }
+        conduit_node.set_external_int32_ptr((conduit_int32*)data_array->GetVoidPointer(0),
+          number_of_elements, offset * sizeof(conduit_int32), stride * sizeof(conduit_int32));
         break;
 
       case 8:
-        if (array_type == vtkAbstractArray::AoSDataArrayTemplate)
-        {
-          conduit_node.set_external_int64_ptr((conduit_int64*)data_array->GetVoidPointer(0),
-            number_of_elements, offset * sizeof(conduit_int64), stride * sizeof(conduit_int64));
-        }
-        else
-        {
-          is_supported = false;
-        }
+        conduit_node.set_external_int64_ptr((conduit_int64*)data_array->GetVoidPointer(0),
+          number_of_elements, offset * sizeof(conduit_int64), stride * sizeof(conduit_int64));
         break;
 
       default:
@@ -382,51 +359,23 @@ bool vtkDataObjectToConduit::ConvertDataArrayToMCArray(
     switch (data_type_size)
     {
       case 1:
-        if (array_type == vtkAbstractArray::AoSDataArrayTemplate)
-        {
-          conduit_node.set_external_uint8_ptr((conduit_uint8*)data_array->GetVoidPointer(0),
-            number_of_elements, offset * sizeof(conduit_uint8), stride * sizeof(conduit_uint8));
-        }
-        else
-        {
-          is_supported = false;
-        }
+        conduit_node.set_external_uint8_ptr((conduit_uint8*)data_array->GetVoidPointer(0),
+          number_of_elements, offset * sizeof(conduit_uint8), stride * sizeof(conduit_uint8));
         break;
 
       case 2:
-        if (array_type == vtkAbstractArray::AoSDataArrayTemplate)
-        {
-          conduit_node.set_external_uint16_ptr((conduit_uint16*)data_array->GetVoidPointer(0),
-            number_of_elements, offset * sizeof(conduit_uint16), stride * sizeof(conduit_uint16));
-        }
-        else
-        {
-          is_supported = false;
-        }
+        conduit_node.set_external_uint16_ptr((conduit_uint16*)data_array->GetVoidPointer(0),
+          number_of_elements, offset * sizeof(conduit_uint16), stride * sizeof(conduit_uint16));
         break;
 
       case 4:
-        if (array_type == vtkAbstractArray::AoSDataArrayTemplate)
-        {
-          conduit_node.set_external_uint32_ptr((conduit_uint32*)data_array->GetVoidPointer(0),
-            number_of_elements, offset * sizeof(conduit_uint32), stride * sizeof(conduit_uint32));
-        }
-        else
-        {
-          is_supported = false;
-        }
+        conduit_node.set_external_uint32_ptr((conduit_uint32*)data_array->GetVoidPointer(0),
+          number_of_elements, offset * sizeof(conduit_uint32), stride * sizeof(conduit_uint32));
         break;
 
       case 8:
-        if (array_type == vtkAbstractArray::AoSDataArrayTemplate)
-        {
-          conduit_node.set_external_uint64_ptr((conduit_uint64*)data_array->GetVoidPointer(0),
-            number_of_elements, offset * sizeof(conduit_uint64), stride * sizeof(conduit_uint64));
-        }
-        else
-        {
-          is_supported = false;
-        }
+        conduit_node.set_external_uint64_ptr((conduit_uint64*)data_array->GetVoidPointer(0),
+          number_of_elements, offset * sizeof(conduit_uint64), stride * sizeof(conduit_uint64));
         break;
 
       default:
@@ -438,27 +387,13 @@ bool vtkDataObjectToConduit::ConvertDataArrayToMCArray(
     switch (data_type_size)
     {
       case 4:
-        if (array_type == vtkAbstractArray::AoSDataArrayTemplate)
-        {
-          conduit_node.set_external_float32_ptr((conduit_float32*)data_array->GetVoidPointer(0),
-            number_of_elements, offset * sizeof(conduit_float32), stride * sizeof(conduit_float32));
-        }
-        else
-        {
-          is_supported = false;
-        }
+        conduit_node.set_external_float32_ptr((conduit_float32*)data_array->GetVoidPointer(0),
+          number_of_elements, offset * sizeof(conduit_float32), stride * sizeof(conduit_float32));
         break;
 
       case 8:
-        if (array_type == vtkAbstractArray::AoSDataArrayTemplate)
-        {
-          conduit_node.set_external_float64_ptr((conduit_float64*)data_array->GetVoidPointer(0),
-            number_of_elements, offset * sizeof(conduit_float64), stride * sizeof(conduit_float64));
-        }
-        else
-        {
-          is_supported = false;
-        }
+        conduit_node.set_external_float64_ptr((conduit_float64*)data_array->GetVoidPointer(0),
+          number_of_elements, offset * sizeof(conduit_float64), stride * sizeof(conduit_float64));
         break;
 
       default:
@@ -480,24 +415,14 @@ bool vtkDataObjectToConduit::ConvertDataArrayToMCArray(
 bool vtkDataObjectToConduit::ConvertPoints(vtkPoints* points, conduit_cpp::Node& x_values_node,
   conduit_cpp::Node& y_values_node, conduit_cpp::Node& z_values_node)
 {
-  bool is_success = true;
-
   auto data_array = points->GetData();
-  is_success = data_array;
+  bool is_success = data_array;
 
   if (is_success)
   {
-    is_success = ConvertDataArrayToMCArray(data_array, 0, 3, x_values_node);
-  }
-
-  if (is_success)
-  {
-    is_success = ConvertDataArrayToMCArray(data_array, 1, 3, y_values_node);
-  }
-
-  if (is_success)
-  {
-    is_success = ConvertDataArrayToMCArray(data_array, 2, 3, z_values_node);
+    is_success = ConvertDataArrayToMCArray(data_array, 0, 3, x_values_node) &&
+      ConvertDataArrayToMCArray(data_array, 1, 3, y_values_node) &&
+      ConvertDataArrayToMCArray(data_array, 2, 3, z_values_node);
   }
 
   return is_success;
