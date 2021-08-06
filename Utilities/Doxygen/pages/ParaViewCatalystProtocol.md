@@ -147,9 +147,9 @@ Defines type and parameters for a hard-coded pipeline.
 
 When 'type' is 'io', the following attributes are supported.
 
-* filename: (required) a string representing a filename. `%ts` may be used to
-  replace with timestep or `%t` may be used to replace with time value. You can
-  use `printf` style format specifiers e.g. `%03t` etc. The filename may be used
+* filename: (required) a string representing a filename. `{timestep}` may be used to
+  replace with timestep or `{time}` may be used to replace with time value. You can
+  use `fmt` style format specifiers e.g. `{time:03f}` etc. The filename may be used
   to determine which supported writer to use for saving the data.
 
 * channel: (required) a string identifying the channel by its name.
