@@ -2210,7 +2210,7 @@ def LoadDistributedPlugin(pluginname, remote=True, ns=None):
         info = plm.GetLocalInformation()
     for cc in range(0, info.GetNumberOfPlugins()):
         if info.GetPluginName(cc) == pluginname:
-            return LoadPlugin(info.GetPluginFileName(cc), do_remote, ns)
+            return LoadPlugin(info.GetPluginFileName(cc), remote=do_remote, ns=ns)
     raise RuntimeError ("Plugin '%s' not found" % pluginname)
 
 #==============================================================================
