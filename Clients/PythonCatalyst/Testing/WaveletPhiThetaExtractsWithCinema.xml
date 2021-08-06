@@ -13,7 +13,7 @@
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/Writer/ProxySelectionWidget/frame/ChosenProxyWidget/ResetDisplay/CheckBox" command="set_boolean" arguments="true" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/Writer/ProxySelectionWidget/frame/ChosenProxyWidget/CameraMode/ComboBox" command="activated" arguments="Phi-Theta" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/Writer/ProxySelectionWidget/frame/ChosenProxyWidget/PhiResolution/IntRangeWidget/LineEdit" command="set_string" arguments="1" />
-  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/Writer/ProxySelectionWidget/frame/ChosenProxyWidget/FileName/FileName" command="set_string" arguments="image_%.6ts%cm.png" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/Writer/ProxySelectionWidget/frame/ChosenProxyWidget/FileName/FileName" command="set_string" arguments="image_{timestep:06d}{camera}.png" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
 
   <!-- save pvsm state -->
