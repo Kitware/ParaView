@@ -144,7 +144,7 @@ rTDataPWF.ScalarRangeInitialized = 1
 pNG1 = CreateExtractor('PNG', renderView1, registrationName='PNG1')
 # trace defaults for the extractor.
 # init the 'PNG' selected for 'Writer'
-pNG1.Writer.FileName = 'pipeline1_%.6ts%cm.png'
+pNG1.Writer.FileName = 'pipeline1_{timestep:06d}{camera}.png'
 pNG1.Writer.ImageResolution = [400, 400]
 pNG1.Writer.Format = 'PNG'
 
