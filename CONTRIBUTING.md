@@ -167,7 +167,7 @@ and to provide support.
 [developer setup script]: /Utilities/SetupForDevelopment.sh
 [Setup]: Documentation/dev/git/develop.md#Setup
 [Build Paraview]: Documentation/dev/build.md
-[Create a Topic][]: Documentation/dev/git/develop.md#create-a-topic
+[Create a Topic]: Documentation/dev/git/develop.md#create-a-topic
 [Share a Topic]: Documentation/dev/git/develop.md#share-a-topic
 [Create a Merge Request]: Documentation/dev/git/develop.md#create-a-merge-request
 [Review a Merge Request]: Documentation/dev/git/develop.md#review-a-merge-request
