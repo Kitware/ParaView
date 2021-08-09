@@ -106,14 +106,25 @@ public:
   void importPresets(const QString& filename)
   {
     this->beginResetModel();
-    std::vector<std::string> importedNames;
-    bool imported = this->Presets->ImportPresets(filename.toStdString().c_str(), &importedNames);
+    std::vector<vtkSMTransferFunctionPresets::ImportedPreset> importedPresets;
+    bool imported = this->Presets->ImportPresets(filename.toStdString().c_str(), &importedPresets);
     if (imported)
     {
-      for (std::string const& importedName : importedNames)
+      for (auto const& importedPreset : importedPresets)
       {
-        GroupManager->addToGroup("User", QString::fromStdString(importedName));
-        GroupManager->addToGroup("Default", QString::fromStdString(importedName));
+        auto const presetName = QString::fromStdString(importedPreset.name);
+        if (importedPreset.maybeGroups.isValid)
+        {
+          for (auto const& groupName : importedPreset.maybeGroups.groups)
+          {
+            GroupManager->addToGroup(QString::fromStdString(groupName), presetName);
+          }
+        }
+        else
+        {
+          GroupManager->addToGroup("User", presetName);
+          GroupManager->addToGroup("Default", presetName);
+        }
       }
     }
     this->endResetModel();

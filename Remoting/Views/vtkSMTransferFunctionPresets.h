@@ -41,6 +41,17 @@ class vtkPVXMLElement;
 class VTKREMOTINGVIEWS_EXPORT vtkSMTransferFunctionPresets : public vtkSMObject
 {
 public:
+  // Used to return informations about the imported presets to the caller of ImportPresets
+  struct ImportedPreset
+  {
+    std::string name;
+    struct
+    {
+      bool isValid = false;
+      std::vector<std::string> groups;
+    } maybeGroups;
+  };
+
   static vtkSMTransferFunctionPresets* New();
   vtkTypeMacro(vtkSMTransferFunctionPresets, vtkSMObject);
   void PrintSelf(ostream& os, vtkIndent indent) override;
@@ -169,8 +180,9 @@ public:
    * If the filename ends with a .xml, it's assumed to be a legacy color map XML
    * and will be converted to the new format before processing.
    */
-  bool ImportPresets(const char* filename, std::vector<std::string>* importedNames = nullptr);
-  bool ImportPresets(const Json::Value& presets);
+  bool ImportPresets(const char* filename, std::vector<ImportedPreset>* importedPresets = nullptr);
+  bool ImportPresets(
+    const Json::Value& presets, std::vector<ImportedPreset>* importedPresets = nullptr);
   //@}
 
   /**

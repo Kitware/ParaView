@@ -140,7 +140,7 @@ public:
     return false;
   }
 
-  bool ImportPresets(const char* filename, std::vector<std::string>* importedNames)
+  bool ImportPresets(const char* filename, std::vector<ImportedPreset>* importedPresets)
   {
     Json::CharReaderBuilder builder;
     builder["collectComments"] = false;
@@ -162,16 +162,34 @@ public:
       vtkGenericWarningMacro("File may not contain presets: " << filename);
       return false;
     }
-    if (importedNames != nullptr)
-    {
-      std::transform(root.begin(), root.end(), std::back_inserter(*importedNames),
-        [&](Json::Value const& preset) { return preset.get("Name", "").asString(); });
-    }
-    return this->ImportPresets(root);
+
+    return this->ImportPresets(root, importedPresets);
   }
 
-  bool ImportPresets(const Json::Value& root)
+  bool ImportPresets(const Json::Value& root,
+    std::vector<vtkSMTransferFunctionPresets::ImportedPreset>* importedPresets)
   {
+    if (importedPresets != nullptr)
+    {
+      std::transform(root.begin(), root.end(), std::back_inserter(*importedPresets),
+        [&](Json::Value const& preset) {
+          auto result = vtkSMTransferFunctionPresets::ImportedPreset{};
+          result.name = preset.get("Name", "").asString();
+          auto groups = preset.get("Groups", Json::Value());
+          if (groups.isArray())
+          {
+            result.maybeGroups.isValid = true;
+            std::transform(groups.begin(), groups.end(),
+              std::back_inserter(result.maybeGroups.groups),
+              [&](Json::Value const& groupName) { return groupName.asString(); });
+          }
+          else
+          {
+            result.maybeGroups.isValid = false;
+          }
+          return result;
+        });
+    }
     this->LoadCustomPresets();
     this->CustomPresets.insert(this->CustomPresets.end(), root.begin(), root.end());
     this->SaveToSettings();
@@ -482,7 +500,7 @@ bool vtkSMTransferFunctionPresets::IsPresetBuiltin(unsigned int index)
 
 //----------------------------------------------------------------------------
 bool vtkSMTransferFunctionPresets::ImportPresets(
-  const char* filename, std::vector<std::string>* importedNames)
+  const char* filename, std::vector<ImportedPreset>* importedPresets)
 {
   if (!filename)
   {
@@ -511,14 +529,15 @@ bool vtkSMTransferFunctionPresets::ImportPresets(
   }
   else
   {
-    return this->Internals->ImportPresets(filename, importedNames);
+    return this->Internals->ImportPresets(filename, importedPresets);
   }
 }
 
 //----------------------------------------------------------------------------
-bool vtkSMTransferFunctionPresets::ImportPresets(const Json::Value& presets)
+bool vtkSMTransferFunctionPresets::ImportPresets(
+  const Json::Value& presets, std::vector<ImportedPreset>* importedPresets)
 {
-  return this->Internals->ImportPresets(presets);
+  return this->Internals->ImportPresets(presets, importedPresets);
 }
 
 //----------------------------------------------------------------------------
