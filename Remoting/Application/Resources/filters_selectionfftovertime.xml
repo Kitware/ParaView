@@ -76,6 +76,13 @@
             <DataType value="vtkTable" />
           </Domain>
         </Property>
+        <Property id="812.CreateFrequencyColumn"
+                  name="CreateFrequencyColumn"
+                  number_of_elements="1">
+          <Element index="0" value="0" />
+          <Domain id="812.CreateFrequencyColumn.bool"
+                  name="bool" />
+        </Property>
       </Proxy>
       <Proxy compound_name="auto_742"
              group="sources"

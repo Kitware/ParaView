@@ -343,6 +343,7 @@
   <Proxy group="filters" name="Subdivide" />
   <Proxy group="filters" name="SurfaceVectors" />
   <Proxy group="filters" name="SynchronizeTime" />
+  <Proxy group="filters" name="TableFFT" />
   <Proxy group="filters" name="TableToPolyData" />
   <Proxy group="filters" name="TableToStructuredGrid" />
   <Proxy group="filters" name="TemporalArrayOperator" />

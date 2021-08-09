@@ -2384,5 +2384,135 @@
                             command="GetTimeRange" />
       <!-- end of "AnimateModes" -->
     </SourceProxy>
+
+    <!-- ================================================================== -->
+    <SourceProxy class="vtkTableFFT" name="TableFFT" label="Table FFT" >
+      <Documentation>
+        Performs the Fast Fourier Transform on the columns of a table.
+      </Documentation>
+
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkTable" />
+        </DataTypeDomain>
+        <InputArrayDomain attribute_type="row"
+                          name="input_array"
+                          number_of_components="1" />
+        <Documentation>This property specifies the input to the filter.</Documentation>
+      </InputProperty>
+
+      <IntVectorProperty name="CreateFrequencyColumn"
+                         command="SetCreateFrequencyColumn"
+                         number_of_elements="1"
+                         default_values="1">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Specify if the filter should create a frequency column based on a column
+          named "time" (not case sensitive). An evenly-spaced time array is expected.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="WindowingFunction"
+                         command="SetWindowingFunction"
+                         number_of_elements="1"
+                         default_values="4">
+        <EnumerationDomain name="enum">
+          <Entry value="4" text="Rectangular (passthrough)"/>
+          <Entry value="0" text="Hanning"/>
+          <Entry value="1" text="Bartlett"/>
+          <Entry value="2" text="Sine"/>
+          <Entry value="3" text="Blackman"/>
+        </EnumerationDomain>
+        <Documentation>
+          Specify the windowing function to apply on the input. This allows to better process
+          data that is not periodic. When NumberOfBlocks > 1, the windowing function is applied
+          to each block.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="OptimizeForRealInput"
+                         command="SetOptimizeForRealInput"
+                         panel_visibility="advanced"
+                         number_of_elements="1"
+                         default_values="0">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Specify if the filter should use the optimized discrete fourier transform for
+          real values. This will cause output columns to have from n to ((n / 2) + 1) rows.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="Normalize"
+                         command="SetNormalize"
+                         panel_visibility="advanced"
+                         number_of_elements="1"
+                         default_values="0">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Specify if the output should be normalized.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="AverageFft"
+                         command="SetAverageFft"
+                         label="Average FFT per block"
+                         panel_visibility="advanced"
+                         number_of_elements="1"
+                         default_values="0">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Specify if the input should be split in multiple blocks to compute
+          an average fft across all blocks.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="NumberOfBlock"
+                         command="SetNumberOfBlock"
+                         panel_visibility="advanced"
+                         number_of_elements="1"
+                         default_values="2">
+        <Documentation>
+          Specify the number of blocks to use when computing the average fft over
+          the whole input sample array. If NumberOfBlock == 1, no average is done
+          and we only compute the fft on the first BlockSize samples of the input data.
+        </Documentation>
+
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="AverageFft"
+                                   value="1" />
+        </Hints>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="BlockSize"
+                         command="SetBlockSize"
+                         panel_visibility="advanced"
+                         number_of_elements="1"
+                         default_values="1024">
+        <Documentation>
+          Specify the number of samples to use for each block. This should be a power of 2.
+          If not, the closest power of two will be used anyway.
+        </Documentation>
+
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="AverageFft"
+                                   value="1" />
+        </Hints>
+      </IntVectorProperty>
+
+      <Hints>
+        <PipelineIcon name="XYChartView" />
+        <View type="XYChartView" />
+      </Hints>
+
+    </SourceProxy>
   </ProxyGroup>
 </ServerManagerConfiguration>

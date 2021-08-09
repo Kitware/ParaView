@@ -1,0 +1,42 @@
+<?xml version="1.0" ?>
+<pqevents>
+  <!-- Create dummy table -->
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuSources" />
+  <pqevent object="pqClientMainWindow/menubar/menuSources/Alphabetical" command="activate" arguments="ProgrammableSource" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/OutputDataSetType/ComboBox" command="activated" arguments="vtkTable" />
+  <!-- Create a table. Script is :
+obj = self.GetTableOutput()
+time = vtk.vtkDoubleArray()
+time.SetName("Time")
+data = vtk.vtkDoubleArray()
+data.SetName("Data")
+obj.AddColumn(time)
+obj.AddColumn(data)
+gc = vtk.vtkMultiProcessController.GetGlobalController()
+if gc.GetLocalProcessId() == 0:
+    time.InsertNextValue(0.0)
+    time.InsertNextValue(0.2)
+    time.InsertNextValue(0.4)
+    time.InsertNextValue(0.6)
+    data.InsertNextValue(1.0)
+    data.InsertNextValue(1.0)
+    data.InsertNextValue(1.0)
+    data.InsertNextValue(1.0)
+  -->
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/Script/Script"
+           command="set_string"
+           arguments="obj = self.GetTableOutput()&#xA;time = vtk.vtkDoubleArray()&#xA;time.SetName(&quot;Time&quot;)&#xA;data = vtk.vtkDoubleArray()&#xA;data.SetName(&quot;Data&quot;)&#xA;obj.AddColumn(time)&#xA;obj.AddColumn(data)&#xA;gc = vtk.vtkMultiProcessController.GetGlobalController()&#xA;if gc.GetLocalProcessId() == 0:&#xA;  time.InsertNextValue(0.0)&#xA;  time.InsertNextValue(0.2)&#xA;  time.InsertNextValue(0.4)&#xA;  time.InsertNextValue(0.6)&#xA;  data.InsertNextValue(1.0)&#xA;  data.InsertNextValue(1.0)&#xA;  data.InsertNextValue(1.0)&#xA;  data.InsertNextValue(1.0)"/>
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.1/Close" command="activate" arguments="" />
+
+  <!-- Apply FFT -->
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuFilters" />
+  <pqevent object="pqClientMainWindow/menubar/menuFilters/Alphabetical" command="activate" arguments="TableFFT" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
+  <pqcompareview object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.2/CentralWidgetFrame/Viewport" baseline="$PARAVIEW_DATA_ROOT/Clients/ParaView/Testing/Data/Baseline/TableFFT1.png" width="400" height="400" />
+
+  <!-- Check optimize for real input otion -->
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/OptimizeForRealInput/CheckBox" command="set_boolean" arguments="true" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
+  <pqcompareview object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.2/CentralWidgetFrame/Viewport" baseline="$PARAVIEW_DATA_ROOT/Clients/ParaView/Testing/Data/Baseline/TableFFT2.png" width="400" height="400" />
+</pqevents>
