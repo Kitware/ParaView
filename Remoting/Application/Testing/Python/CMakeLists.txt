@@ -57,10 +57,7 @@ if (numpy_found)
   list(APPEND PY_TESTS PythonSelection.py)
 endif ()
 
-if (BUILD_SHARED_LIBS
-  AND PARAVIEW_PLUGIN_ENABLE_SurfaceLIC
-  AND PARAVIEW_PLUGIN_ENABLE_Moments
-  AND PARAVIEW_PLUGIN_ENABLE_SLACTools)
+if (PARAVIEW_PLUGIN_ENABLE_SurfaceLIC AND PARAVIEW_PLUGIN_ENABLE_Moments)
   list(APPEND PY_TESTS
     Plugins.py,NO_VALID)
 endif ()
@@ -104,6 +101,11 @@ if (numpy_found AND PARAVIEW_USE_MPI)
   list(APPEND PVBATCH_TESTS
     D3CellsWithNegativeVolumes.py,NO_VALID)
 endif()
+
+if (PARAVIEW_PLUGIN_ENABLE_SurfaceLIC AND PARAVIEW_PLUGIN_ENABLE_Moments)
+  list(APPEND PVBATCH_TESTS
+    Plugins.py,NO_VALID)
+endif ()
 
 # Saving animation currently doesn't work in symmetric mode.
 # paraview/paraview#17329

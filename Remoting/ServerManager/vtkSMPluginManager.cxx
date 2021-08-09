@@ -16,9 +16,11 @@
 
 #include "vtkCommand.h"
 #include "vtkObjectFactory.h"
+#include "vtkPVLogger.h"
 #include "vtkPVPluginLoader.h"
 #include "vtkPVPluginTracker.h"
 #include "vtkPVPluginsInformation.h"
+#include "vtkProcessModule.h"
 #include "vtkSMPluginLoaderProxy.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMProxyDefinitionManager.h"
@@ -137,12 +139,32 @@ vtkPVPluginsInformation* vtkSMPluginManager::GetRemoteInformation(vtkSMSession* 
 bool vtkSMPluginManager::LoadLocalPlugin(const char* filename)
 {
   SM_SCOPED_TRACE(LoadPlugin).arg(filename).arg("remote", false);
-  vtkFlagStateUpdated stateUpdater(this->InLoadPlugin);
 
-  vtkPVPluginLoader* loader = vtkPVPluginLoader::New();
-  bool ret_val = loader->LoadPlugin(filename);
-  loader->Delete();
-  if (ret_val)
+  bool status = false;
+  if (vtkProcessModule::GetProcessType() == vtkProcessModule::PROCESS_BATCH &&
+    !vtkProcessModule::GetSymmetricMPIMode())
+  {
+    // In non-symmetric mode, local-plugin needs to be loaded on all satellites
+    // too. That's best doing using the same code as "LoadRemotePlugin".
+    if (auto session = vtkSMProxyManager::GetProxyManager()->GetActiveSession())
+    {
+      status = this->LoadRemotePlugin(filename, session);
+    }
+    else
+    {
+      vtkLogF(WARNING, "no session found. Will simply load plugin on local process.");
+    }
+  }
+
+  if (!status)
+  {
+    vtkFlagStateUpdated stateUpdater(this->InLoadPlugin);
+    vtkPVPluginLoader* loader = vtkPVPluginLoader::New();
+    status = loader->LoadPlugin(filename);
+    loader->Delete();
+  }
+
+  if (status)
   {
     // Update local-plugin information.
     vtkPVPluginsInformation* temp = vtkPVPluginsInformation::New();
@@ -156,9 +178,9 @@ bool vtkSMPluginManager::LoadLocalPlugin(const char* filename)
     this->InvokeEvent(vtkSMPluginManager::LocalPluginLoadedEvent, (void*)filename);
   }
 
-  // We don't report the error here if ret_val == false since vtkPVPluginLoader
+  // We don't report the error here if status == false since vtkPVPluginLoader
   // already reports those errors using vtkErrorMacro.
-  return ret_val;
+  return status;
 }
 
 //----------------------------------------------------------------------------
