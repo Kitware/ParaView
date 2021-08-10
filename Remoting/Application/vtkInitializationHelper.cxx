@@ -290,22 +290,29 @@ bool vtkInitializationHelper::Initialize(
                                     "} }",
     0.0);
 
-  // push the initial argument scope which includes global and environment arguments
+  const char* undefined = "Undefined";
+
+  // push the ENV argument scope which includes environment arguments
   std::string username;
 #if defined(_WIN16) || defined(_WIN32) || defined(_WIN64)
-  username = std::string(getenv("USERNAME"));
+  username = getenv("USERNAME") != nullptr ? getenv("USERNAME") : "Not defined";
 #else
-  username = std::string(getenv("USER"));
+  username = getenv("USER") != nullptr ? getenv("USER") : undefined;
 #endif
   vtksys::SystemInformation sysInfo;
   sysInfo.RunOSCheck();
+  std::string hostname = sysInfo.GetHostname() != nullptr ? sysInfo.GetHostname() : undefined;
+  std::string os = sysInfo.GetOSName() != nullptr ? sysInfo.GetOSName() : undefined;
 
-  vtkPVStringFormatter::PushScope("ENV", fmt::arg("username", username),
-    fmt::arg("hostname", std::string(sysInfo.GetHostname())),
-    fmt::arg("os", std::string(sysInfo.GetOSName())));
+  vtkPVStringFormatter::PushScope(
+    "ENV", fmt::arg("username", username), fmt::arg("hostname", hostname), fmt::arg("os", os));
+
+  // push the GLOBAL argument scope which includes global arguments
+  std::string appVersion = PARAVIEW_VERSION_FULL != nullptr ? PARAVIEW_VERSION_FULL : undefined;
+
   vtkPVStringFormatter::PushScope("GLOBAL", fmt::arg("date", std::chrono::system_clock::now()),
     fmt::arg("appname", vtkInitializationHelper::ApplicationName),
-    fmt::arg("appversion", std::string(PARAVIEW_VERSION_FULL)));
+    fmt::arg("appversion", appVersion));
 
   // until we replace PARAVIEW_SMTESTDRIVER with something cleaner, we have
   // to print this greeting out when the process is launched from
