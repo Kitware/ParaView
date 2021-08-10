@@ -157,6 +157,8 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${paraview_test_data_directory_input}/Data/waveletElevation.vti}"
   "DATA{${paraview_test_data_directory_input}/Data/waveletMaterial.vti}"
   "DATA{${paraview_test_data_directory_input}/Data/WaveletThresholdLegacy.pvsm}"
+  "DATA{${paraview_test_data_directory_input}/Data/x_ray_copy_1.json}"
+  "DATA{${paraview_test_data_directory_input}/Data/x_ray_copy_2.json}"
   "DATA{${paraview_test_data_directory_input}/Data/YoungsMaterialInterface/youngs.vtm}"
   "DATA{${paraview_test_data_directory_input}/Data/YoungsMaterialInterface/youngs/youngs_0.vtu}"
   "DATA{${paraview_test_data_directory_input}/Data/YoungsMaterialInterface/youngs/youngs_1.vtu}"
@@ -466,6 +468,7 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/SelectCellsTrace.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/SelectCellsTrace_1.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/SelectCellsTrace_2.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/SelectColorMapFromComboBox_A.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/SelectionByArray.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/SelectionLinkParallelCoordinatesView.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/SelectionLinkScriptingA.png}"
@@ -604,6 +607,7 @@ SET (TESTS_WITHOUT_BASELINES
   ExportSpreadsheetFormatting.xml
   FavoritesFilters.xml
   FindWidget.xml
+  ImportCustomPresets.xml
   InformationPanel.xml
   LogViewer.xml
   MergeTime.xml
@@ -700,6 +704,7 @@ SET (TESTS_WITH_INLINE_COMPARES
   Ruler.xml
   SaveExodus.xml
   SaveLargeScreenshot.xml
+  SelectColorMapFromComboBox.xml
   SelectionLinkParallelCoordinatesView.xml
   SeparateOpacityArray.xml
   Slice.xml
