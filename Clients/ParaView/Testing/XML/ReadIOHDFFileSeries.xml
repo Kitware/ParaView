@@ -1,0 +1,15 @@
+<?xml version="1.0" ?>
+<pqevents>
+  <pqevent object="pqClientMainWindow/MainControlsToolbar/actionOpenData" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/FileOpenDialog" command="filesSelected" arguments="$PARAVIEW_DATA_ROOT/Testing/Data/FileSeries/can_..hdf" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/outputWidgetDock/qt_dockwidget_closebutton" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/VCRToolbar/actionVCRLastFrame" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/variableToolbar/displayColor/Variables" command="activated" arguments="EQPS" />
+  <pqcompareview object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.0/CentralWidgetFrame/Viewport" baseline="$PARAVIEW_DATA_ROOT/Clients/ParaView/Testing/Data/Baseline/ReadIOHDFFileSeries2.png" width="300" height="300" />
+  <pqevent object="pqClientMainWindow/VCRToolbar/actionVCRPreviousFrame" command="activate" arguments="" />
+  <pqcompareview object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.0/CentralWidgetFrame/Viewport" baseline="$PARAVIEW_DATA_ROOT/Clients/ParaView/Testing/Data/Baseline/ReadIOHDFFileSeries1.png" width="300" height="300" />
+  <pqevent object="pqClientMainWindow/VCRToolbar/actionVCRPreviousFrame" command="activate" arguments="" />
+  <pqcompareview object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.0/CentralWidgetFrame/Viewport" baseline="$PARAVIEW_DATA_ROOT/Clients/ParaView/Testing/Data/Baseline/ReadIOHDFFileSeries0.png" width="300" height="300" />
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuTools" />
+</pqevents>
