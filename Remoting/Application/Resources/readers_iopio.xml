@@ -9,8 +9,9 @@
                      (.pio) opened by the PIO reader is an ASCII description
                      of the data files within a dump directory numbered by cycle.
                      The reader uses a PIOData class to read the file and a PIOAdaptor
-                     to build an unstructured or hypertree grid from the data.  Requested
-                     data is filled into the structures. </Documentation>
+                     to build an unstructured or hypertree grid from the data. Requested
+                     data is filled into the structures. This is a distributed reader.
+      </Documentation>
       <StringVectorProperty animateable="0"
                             command="SetFileName"
                             name="FileName"

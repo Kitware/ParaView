@@ -570,7 +570,7 @@
     <SourceProxy name="AMReXParticlesReaderCore"
       class="vtkAMReXParticlesReader">
       <Documentation short_help="Reader for AMReX particle data">
-        Internal reader proxy for AMReX particles.
+        Internal reader proxy for AMReX particles. This is a distributed reader.
       </Documentation>
 
       <StringVectorProperty name="ParticleType"
@@ -950,7 +950,7 @@
       label="AMReX/BoxLib Particles Reader"
       si_class="vtkSIMetaReaderProxy">
       <Documentation short_help="Reader for AMReX particle data">
-        Reads particle data from AMReX plotfiles.
+        Reads particle data from AMReX plotfiles. This is a distributed reader.
       </Documentation>
 
       <SubProxy>

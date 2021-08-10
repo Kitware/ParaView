@@ -115,8 +115,10 @@
                      short_help="Read OpenFOAM data files.">The OpenFOAM reader
                      reads OpenFOAM data files and outputs multiblock
                      datasets. Mesh information and time dependent data are
-                     supported. The OpenFOAM format is described fully at
-                     http://www.openfoam.com/docs/user/basic-file-format.php</Documentation>
+                     supported. This is a distributed reader. The OpenFOAM format
+                     is described fully at
+                     http://www.openfoam.com/docs/user/basic-file-format.php.
+      </Documentation>
       <StringVectorProperty animateable="0"
                             command="SetFileName"
                             name="FileName"
@@ -364,7 +366,8 @@
                      for the geometry files is .xyz, and the default file
                      extension for the solution files is .q. The output of this
                      reader is a multiblock dataset containing curvilinear
-                     (structured grid) datasets.</Documentation>
+                     (structured grid) datasets. This is a distributed reader.
+                     </Documentation>
       <StringVectorProperty command="GetCurrentFileName"
                             information_only="1"
                             name="FileNameInfo">

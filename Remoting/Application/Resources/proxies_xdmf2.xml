@@ -5,7 +5,7 @@
     <SourceProxy class="vtkXdmfReader" name="XdmfReaderCore">
       <Documentation>
         The actual reader proxy for Xdmf Reader. Make internal since it doesn't
-        support file-series.
+        support file-series. This is a distributed reader.
       </Documentation>
       <StringVectorProperty information_only="1"
                             name="PointArrayInfo">
@@ -122,7 +122,8 @@
                      and large attribute arrays are stored in a corresponding
                      HDF5 file. The output may be unstructured grid, structured
                      grid, or rectiliner grid. See http://www.xdmf.org for a
-                     description of the file format.</Documentation>
+                     description of the file format. This is a distributed reader.
+      </Documentation>
       <SubProxy>
         <Proxy name="Reader"
                proxygroup="internal_sources"

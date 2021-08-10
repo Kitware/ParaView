@@ -8,7 +8,7 @@
                      long_help="Read files stored in CGNS format.">
         The CGNS reader reads files stored in CGNS format.
         The default file extension is .cgns. The output of this reader is
-        a multi-block dataset.
+        a multi-block dataset. This is a distributed reader.
       </Documentation>
 
       <StringVectorProperty name="BaseInfo"
@@ -230,7 +230,7 @@
          long_help="Read binary files stored in CGNS format.">
         The CGNS reader reads binary files stored in CGNS format.
         The default file extension is .cgns. The output of this reader is
-        a multi-block dataset.
+        a multi-block dataset. This is a distributed reader.
         This reader also supports file series.
       </Documentation>
 

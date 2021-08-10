@@ -15,7 +15,8 @@
                      Plot reader loads an ASCII meta-file called the "case"
                      file (extension .spcth). The case file lists all the
                      binary files containing the dataset. This reader produces
-                     hierarchical datasets.</Documentation>
+                     hierarchical datasets. This is a distributed reader.
+      </Documentation>
       <OutputPort index="0"
                   name="Volume Data" />
       <OutputPort index="1"
@@ -164,7 +165,9 @@
                      visualization, you often want to string these file sets
                      together as if it was one continuous dump of files. This
                      reader allows you to specify a metadata file that will
-                     implicitly string the files together.</Documentation>
+                     implicitly string the files together. This is a
+                     distributed reader.
+      </Documentation>
       <OutputPort index="0"
                   name="Volume Data" />
       <OutputPort index="1"

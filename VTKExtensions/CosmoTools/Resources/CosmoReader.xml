@@ -65,7 +65,7 @@
                      reads a binary file of particle location, velocity, and id
                      creating a vtkUnstructuredGrid. The default file extension
                      is .cosmo64. Reads LANL Cosmo format or Gadget
-                     format.
+                     format. This is a distributed reader.
       </Documentation>
       <SubProxy>
         <Proxy name="Reader"

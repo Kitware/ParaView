@@ -9,7 +9,8 @@
                      files in the format produced by CEI's EnSight. EnSight 6
                      and Gold files (both ASCII and binary) are supported. The
                      default extension is .case. The output of this reader is a
-                     multiblock dataset.</Documentation>
+                     multiblock dataset. This is a distributed reader.
+      </Documentation>
       <StringVectorProperty animateable="0"
                             command="SetCaseFileName"
                             name="CaseFileName"
@@ -82,7 +83,8 @@
                      Master Server reader reads EnSight's parallel files. The
                      master file usually has a .sos extension and may point to
                      multiple .case files. The output is a multiblock
-                     dataset.</Documentation>
+                     dataset. This is a distributed reader.
+      </Documentation>
       <StringVectorProperty animateable="0"
                             command="SetCaseFileName"
                             name="CaseFileName"

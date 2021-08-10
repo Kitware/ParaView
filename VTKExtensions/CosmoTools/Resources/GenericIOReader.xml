@@ -300,7 +300,7 @@
                mpi_required="1" >
     <Documentation long_help="Reads a cosmology file into a vtkUnstructuredGrid."
                    short_help="Read a cosmology file.">
-                   Reads GenericIO
+                   Reads GenericIO. This is a distributed reader.
     </Documentation>
     <SubProxy>
       <Proxy name="Reader"
@@ -361,6 +361,7 @@
     <Documentation long_help="Reads a cosmology file into a vtkMultiBlockDataSet."
                    short_help="Read a cosmology file.">
                    Reads GenericIO files into a vtkMultiBlockDataSet of unstructured grids.
+                   This is a distributed reader.
     </Documentation>
     <SubProxy>
       <Proxy name="Reader"

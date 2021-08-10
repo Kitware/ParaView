@@ -12,7 +12,8 @@
                      processor, per category and per time step. These are
                      arranged in subdirectories per category (field data and
                      hydrology data) and then in time step
-                     subdirectories.</Documentation>
+                     subdirectories. This is a distributed reader.
+      </Documentation>
       <StringVectorProperty animateable="0"
                             command="SetFileName"
                             name="FileName"

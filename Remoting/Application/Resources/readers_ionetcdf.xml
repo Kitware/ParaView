@@ -797,7 +797,8 @@
       Standford Linear Accelerator Center (SLAC). The underlying
       format uses NetCDF to store arrays, but also imposes several
       conventions to form an unstructured grid of
-      elements.</Documentation>
+      elements. This is a distributed reader.
+      </Documentation>
       <OutputPort index="0"
                   name="External Surface" />
       <OutputPort index="1"
