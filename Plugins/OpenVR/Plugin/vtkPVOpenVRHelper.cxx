@@ -28,6 +28,7 @@
 #include "vtkCullerCollection.h"
 #include "vtkDataSet.h"
 #include "vtkGenericOpenGLRenderWindow.h"
+#include "vtkImplicitPlaneRepresentation.h"
 #include "vtkInformation.h"
 #include "vtkLight.h"
 #include "vtkLightCollection.h"
@@ -1877,6 +1878,7 @@ void vtkPVOpenVRHelper::SendToOpenVR(vtkSMViewProxy* smview)
     // this->RenderWindow->MakeCurrent();
     // this->RenderWindow->GetState()->ResetFramebufferBindings();
 
+    this->Widgets->UpdateWidgetsFromParaView();
     this->DoOneEvent(); // calls render()
     this->RenderVRView();
 
@@ -1991,6 +1993,14 @@ void vtkPVOpenVRHelper::UpdateProps()
     this->AddedProps->RemoveAllItems();
     for (pcol->InitTraversal(pit); (prop = pcol->GetNextProp(pit));)
     {
+      // look for plane widgets and do not add them as we will be
+      // creating copies for VR so that we can interact with them.
+      auto* impPlane = vtkImplicitPlaneRepresentation::SafeDownCast(prop);
+      if (impPlane)
+      {
+        continue;
+      }
+
       this->AddedProps->AddItem(prop);
       // if in VR add props to VR rnderer
       if (this->Renderer != pvRenderer)

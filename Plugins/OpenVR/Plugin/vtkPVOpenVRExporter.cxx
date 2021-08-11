@@ -34,6 +34,7 @@
 #include "vtkSMViewProxy.h"
 #include "vtkScalarsToColors.h"
 #include "vtkShaderProperty.h"
+#include "vtkSkybox.h"
 #include "vtkTexture.h"
 #include "vtkWindowToImageFilter.h"
 #include "vtkXMLDataElement.h"
@@ -298,6 +299,9 @@ void vtkPVOpenVRExporter::ExportLocationsAsView(vtkPVOpenVRHelper* helper, vtkSM
     topel->SetIntAttribute("EnvironmentTexture", static_cast<int>(textures[cubetex]));
   }
 
+  // save floagpole and skybox locations
+  std::map<vtkActor*, std::vector<int> > specialActorLocations;
+
   vtkNew<vtkXMLDataElement> posesel;
   posesel->SetName("CameraPoses");
   int count = 0;
@@ -341,9 +345,10 @@ void vtkPVOpenVRExporter::ExportLocationsAsView(vtkPVOpenVRHelper* helper, vtkSM
         continue;
       }
 
-      // handle flagpoles in the extra file
-      if (vtkFlagpoleLabel::SafeDownCast(actor))
+      // handle flagpoles and skyboxes in the extra file
+      if (vtkFlagpoleLabel::SafeDownCast(actor) || vtkSkybox::SafeDownCast(actor))
       {
+        specialActorLocations[actor].push_back(static_cast<int>(count + 1));
         continue;
       }
 
@@ -610,11 +615,77 @@ void vtkPVOpenVRExporter::ExportLocationsAsView(vtkPVOpenVRHelper* helper, vtkSM
   }
   topel2->AddNestedElement(fsel);
 
+  // write out photospheres
+  std::map<int, std::string> defaultSkyboxes;
   vtkNew<vtkXMLDataElement> psel;
   psel->SetName("PhotoSpheres");
+  count = 0;
+  for (auto it : specialActorLocations)
+  {
+    vtkSkybox* skybox = vtkSkybox::SafeDownCast(it.first);
+
+    if (!skybox)
+    {
+      continue;
+    }
+    count++;
+
+    vtkNew<vtkXMLDataElement> flagel;
+    flagel->SetName("PhotoSphere");
+
+    if (skybox->GetTexture() && skybox->GetTexture()->GetInput())
+    {
+      vtkTexture* texture = skybox->GetTexture();
+      vtkNew<vtkJPEGWriter> jpeg;
+      jpeg->SetInputConnection(texture->GetInputConnection(0, 0));
+      std::string fname = "data/skyboxImage";
+      fname += std::to_string(count);
+      fname += ".jpg";
+      flagel->SetAttribute("TextureFile", fname.c_str());
+      defaultSkyboxes[it.second[0]] = fname;
+      fname = datadir + "skyboxImage";
+      fname += std::to_string(count);
+      fname += ".jpg";
+      jpeg->SetFileName(fname.c_str());
+      jpeg->Write();
+    }
+
+    // cross to the the front vector
+    float front[3];
+    vtkMath::Cross(skybox->GetFloorPlane(), skybox->GetFloorRight(), front);
+    flagel->SetVectorAttribute("Front", 3, front);
+
+    flagel->SetIntAttribute("Stereo3D", skybox->GetProjection() == vtkSkybox::StereoSphere ? 1 : 0);
+    flagel->SetIntAttribute(
+      "NumberOfLocations", static_cast<int>(specialActorLocations[skybox].size()));
+    flagel->SetVectorAttribute("Locations", static_cast<int>(it.second.size()), it.second.data());
+
+    psel->AddNestedElement(flagel);
+  }
+  topel2->AddNestedElement(psel);
+
   vtkNew<vtkXMLDataElement> cpel;
   cpel->SetName("CameraPoses");
-  topel2->AddNestedElement(psel);
+  count = 0;
+  for (auto& loci : locations)
+  {
+    auto& loc = loci.second;
+    if (!loc.Pose->Loaded)
+    {
+      continue;
+    }
+
+    vtkNew<vtkXMLDataElement> poseel;
+    poseel->SetName("CameraPose");
+    poseel->SetIntAttribute("PoseNumber", static_cast<int>(count + 1));
+    // if there is a photosphere here add it as a default
+    if (defaultSkyboxes.find(count + 1) != defaultSkyboxes.end())
+    {
+      poseel->SetAttribute("ShowPhotoSphere", defaultSkyboxes[count + 1].c_str());
+    }
+    cpel->AddNestedElement(poseel);
+    count++;
+  }
   topel2->AddNestedElement(cpel);
   vtkXMLUtilities::WriteElementToFile(topel2, "pv-view/extra.xml", &indent);
 }

@@ -13,6 +13,7 @@
 =========================================================================*/
 #include "vtkPVOpenVRWidgets.h"
 
+#include "vtk3DWidgetRepresentation.h"
 #include "vtkAbstractVolumeMapper.h"
 #include "vtkAssemblyPath.h"
 #include "vtkBoxRepresentation.h"
@@ -1588,4 +1589,129 @@ void vtkPVOpenVRWidgets::HandlePickEvent(vtkObject*, void* calldata)
   this->SelectedCells.push_back(aid);
   this->LastPickedProp = prop;
   this->UpdateBillboard(true);
+}
+
+void vtkPVOpenVRWidgets::UpdateWidgetsFromParaView()
+{
+  // do a mark approach to find any widgets that have been removed
+  std::set<vtkSMProxy*> found;
+
+  // look for new widgets
+  vtkSMPropertyHelper helper(this->Helper->GetSMView(), "HiddenRepresentations");
+  for (unsigned int i = 0; i < helper.GetNumberOfElements(); i++)
+  {
+    vtkSMProxy* repr = helper.GetAsProxy(i);
+    if (!repr)
+    {
+      continue;
+    }
+
+    auto* widgetRep = vtk3DWidgetRepresentation::SafeDownCast(repr->GetClientSideObject());
+    if (!widgetRep)
+    {
+      continue;
+    }
+
+    auto* pvwidget = vtkImplicitPlaneWidget2::SafeDownCast(widgetRep->GetWidget());
+    if (!pvwidget)
+    {
+      continue;
+    }
+
+    vtkImplicitPlaneRepresentation* pvrep =
+      vtkImplicitPlaneRepresentation::SafeDownCast(pvwidget->GetRepresentation());
+    if (!pvrep || !pvrep->GetVisibility())
+    {
+      continue;
+    }
+
+    // mark it
+    found.insert(repr);
+
+    // if we already know about this widgetRep then continue
+    auto idx = this->WidgetsFromParaView.find(repr);
+    if (idx != this->WidgetsFromParaView.end())
+    {
+      continue;
+    }
+
+    // we have a new widget in ParaView, create a copy in the VR window
+    // so we can interact with it in VR
+    vtkNew<vtkImplicitPlaneRepresentation> rep;
+    rep->SetHandleSize(15.0);
+    rep->SetDrawOutline(0);
+    rep->GetPlaneProperty()->SetOpacity(0.01);
+    rep->ConstrainToWidgetBoundsOff();
+    rep->SetCropPlaneToBoundingBox(false);
+    rep->SetSnapToAxes(this->GetCropSnapping());
+
+    auto* ren = this->Helper->GetRenderer();
+    vtkOpenGLRenderWindow* renWin = vtkOpenGLRenderWindow::SafeDownCast(ren->GetVTKWindow());
+
+    double scale = 1.0;
+    double* fp = ren->GetActiveCamera()->GetFocalPoint();
+
+    auto ovr_rw = vtkOpenVRRenderWindow::SafeDownCast(renWin);
+    if (ovr_rw)
+    {
+      scale = ovr_rw->GetPhysicalScale();
+    }
+    double bnds[6] = { fp[0] - scale * 0.5, fp[0] + scale * 0.5, fp[1] - scale * 0.5,
+      fp[1] + scale * 0.5, fp[2] - scale * 0.5, fp[2] + scale * 0.5 };
+    rep->PlaceWidget(bnds);
+    rep->SetOrigin(pvrep->GetOrigin());
+    rep->SetNormal(pvrep->GetNormal());
+
+    vtkNew<vtkImplicitPlaneWidget2> ps;
+    // this->CropPlanes.push_back(ps.Get());
+    ps->Register(this);
+
+    ps->SetRepresentation(rep.Get());
+    ps->SetInteractor(renWin->GetInteractor());
+    ps->SetEnabled(1);
+    this->WidgetsFromParaView[repr] = ps;
+  }
+
+  // remove any widgets that are no longer in ParaView
+  // and update origin and normal between any that are still there
+  for (auto it = this->WidgetsFromParaView.begin(); it != this->WidgetsFromParaView.end();)
+  {
+    if (found.find(it->first) == found.end())
+    {
+      it->second->SetEnabled(0);
+      it->second->Delete();
+      this->WidgetsFromParaView.erase(it++);
+    }
+    else
+    {
+      auto* widgetRep = vtk3DWidgetRepresentation::SafeDownCast(it->first->GetClientSideObject());
+      auto* pvRep = vtkImplicitPlaneRepresentation::SafeDownCast(widgetRep->GetRepresentation());
+      auto* rep = vtkImplicitPlaneRepresentation::SafeDownCast(it->second->GetRepresentation());
+      if (!std::equal(pvRep->GetOrigin(), pvRep->GetOrigin() + 3, rep->GetOrigin()) ||
+        !std::equal(pvRep->GetNormal(), pvRep->GetNormal() + 3, rep->GetNormal()))
+      {
+        if (pvRep->GetMTime() < rep->GetMTime())
+        {
+          auto* origin = rep->GetOrigin();
+          auto* normal = rep->GetNormal();
+          pvRep->SetOrigin(origin);
+          pvRep->SetNormal(normal);
+          widgetRep->GetWidget()->InvokeEvent(vtkCommand::InteractionEvent, nullptr);
+          // set the properties on the Rep
+          // vtkSMPropertyHelper rephelper(it->first, "Origin");
+          // rephelper.SetNumberOfElements(3);
+          // rephelper.Set(origin, 3);
+          // vtkSMPropertyHelper rephelper2(it->first, "Normal");
+          // rephelper2.SetNumberOfElements(3);
+          // rephelper2.Set(normal, 3);
+        }
+        else
+        {
+          rep->SetOrigin(pvRep->GetOrigin());
+          rep->SetNormal(pvRep->GetNormal());
+        }
+      }
+      it++;
+    }
+  }
 }
