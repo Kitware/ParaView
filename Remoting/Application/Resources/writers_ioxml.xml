@@ -1072,7 +1072,7 @@
       </Documentation>
       <StringVectorProperty name="FileName"
                             number_of_elements="1"
-                            default_values="%p_%.6ts.ply">
+                            default_values="{prefix}_{timestep:06d}.ply">
         <Documentation>
           Specify the filename to use.
         </Documentation>
@@ -1098,7 +1098,7 @@
       </Documentation>
       <StringVectorProperty name="FileName"
                             number_of_elements="1"
-                            default_values="%p_%.6ts.pvtp">
+                            default_values="{prefix}_{timestep:06d}.pvtp">
         <Documentation>
           Specify the filename to use.
         </Documentation>
@@ -1128,7 +1128,7 @@
       </Documentation>
       <StringVectorProperty name="FileName"
                             number_of_elements="1"
-                            default_values="%p_%.6ts.pvtu">
+                            default_values="{prefix}_{timestep:06d}.pvtu">
         <Documentation>
           Specify the filename to use.
         </Documentation>
@@ -1158,7 +1158,7 @@
       </Documentation>
       <StringVectorProperty name="FileName"
                             number_of_elements="1"
-                            default_values="%p_%.6ts.phtg">
+                            default_values="{prefix}_{timestep:06d}.phtg">
         <Documentation>
           Specify the filename to use.
         </Documentation>
@@ -1187,7 +1187,7 @@
       </Documentation>
       <StringVectorProperty name="FileName"
                             number_of_elements="1"
-                            default_values="%p_%.6ts.pvts">
+                            default_values="{prefix}_{timestep:06d}.pvts">
         <Documentation>
           Specify the filename to use.
         </Documentation>
@@ -1216,7 +1216,7 @@
       </Documentation>
       <StringVectorProperty name="FileName"
                             number_of_elements="1"
-                            default_values="%p_%.6ts.pvtr">
+                            default_values="{prefix}_{timestep:06d}.pvtr">
         <Documentation>
           Specify the filename to use.
         </Documentation>
@@ -1245,7 +1245,7 @@
       </Documentation>
       <StringVectorProperty name="FileName"
                             number_of_elements="1"
-                            default_values="%p_%.6ts.pvti">
+                            default_values="{prefix}_{timestep:06d}.pvti">
         <Documentation>
           Specify the filename to use.
         </Documentation>
@@ -1274,7 +1274,7 @@
       </Documentation>
       <StringVectorProperty name="FileName"
                             number_of_elements="1"
-                            default_values="%p_%.6ts.vtm">
+                            default_values="{prefix}_{timestep:06d}.vtm">
         <Documentation>
           Specify the filename to use.
         </Documentation>
@@ -1303,7 +1303,7 @@
       </Documentation>
       <StringVectorProperty name="FileName"
                             number_of_elements="1"
-                            default_values="%p_%.6ts.vtpd">
+                            default_values="{prefix}_{timestep:06d}.vtpd">
         <Documentation>
           Specify the filename to use.
         </Documentation>
@@ -1332,7 +1332,7 @@
       </Documentation>
       <StringVectorProperty name="FileName"
                             number_of_elements="1"
-                            default_values="%p_%.6ts.vtpc">
+                            default_values="{prefix}_{timestep:06d}.vtpc">
         <Documentation>
           Specify the filename to use.
         </Documentation>
@@ -1361,7 +1361,7 @@
       </Documentation>
       <StringVectorProperty name="FileName"
                             number_of_elements="1"
-                            default_values="%p_%.6ts.vth">
+                            default_values="{prefix}_{timestep:06d}.vth">
         <Documentation>
           Specify the filename to use.
         </Documentation>

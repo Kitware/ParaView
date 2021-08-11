@@ -60,7 +60,7 @@
       </Documentation>
       <StringVectorProperty name="FileName"
                             number_of_elements="1"
-                            default_values="dataset_%.6ts.ex2">
+                            default_values="dataset_{timestep:06d}.ex2">
         <Documentation>
           Specify the filename to use.
         </Documentation>

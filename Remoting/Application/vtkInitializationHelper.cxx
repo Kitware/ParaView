@@ -26,6 +26,7 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkPVOptions.h"
 #include "vtkPVPluginLoader.h"
 #include "vtkPVSession.h"
+#include "vtkPVStringFormatter.h"
 #include "vtkProcessModule.h"
 #include "vtkProcessModuleConfiguration.h"
 #include "vtkRemotingCoreConfiguration.h"
@@ -36,6 +37,7 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkSmartPointer.h"
 #include "vtkStringList.h"
 
+#include "vtksys/SystemInformation.hxx"
 #include <sstream>
 #include <string>
 #include <vector>
@@ -288,6 +290,30 @@ bool vtkInitializationHelper::Initialize(
                                     "} }",
     0.0);
 
+  const char* undefined = "Undefined";
+
+  // push the ENV argument scope which includes environment arguments
+  std::string username;
+#if defined(_WIN16) || defined(_WIN32) || defined(_WIN64)
+  username = getenv("USERNAME") != nullptr ? getenv("USERNAME") : "Not defined";
+#else
+  username = getenv("USER") != nullptr ? getenv("USER") : undefined;
+#endif
+  vtksys::SystemInformation sysInfo;
+  sysInfo.RunOSCheck();
+  std::string hostname = sysInfo.GetHostname() != nullptr ? sysInfo.GetHostname() : undefined;
+  std::string os = sysInfo.GetOSName() != nullptr ? sysInfo.GetOSName() : undefined;
+
+  vtkPVStringFormatter::PushScope(
+    "ENV", fmt::arg("username", username), fmt::arg("hostname", hostname), fmt::arg("os", os));
+
+  // push the GLOBAL argument scope which includes global arguments
+  std::string appVersion = PARAVIEW_VERSION_FULL != nullptr ? PARAVIEW_VERSION_FULL : undefined;
+
+  vtkPVStringFormatter::PushScope("GLOBAL", fmt::arg("date", std::chrono::system_clock::now()),
+    fmt::arg("appname", vtkInitializationHelper::ApplicationName),
+    fmt::arg("appversion", appVersion));
+
   // until we replace PARAVIEW_SMTESTDRIVER with something cleaner, we have
   // to print this greeting out when the process is launched from
   // smTestDriver
@@ -330,6 +356,11 @@ void vtkInitializationHelper::Finalize()
       vtkGenericWarningMacro(<< "Saving settings file to '" << userSettingsFilePath << "' failed");
     }
   }
+
+  // pop GLOBAL scope
+  vtkPVStringFormatter::PopScope();
+  // pop ENV scope
+  vtkPVStringFormatter::PopScope();
 
   vtkSMProxyManager::Finalize();
   vtkProcessModule::Finalize();

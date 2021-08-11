@@ -3211,13 +3211,13 @@ Every Nth Point.
         display the time.</Documentation>
       </InputProperty>
       <StringVectorProperty command="SetFormat"
-                            default_values="Time: %f"
+                            default_values="Time: {time:f}"
                             name="Format"
                             number_of_elements="1"
                             panel_visibility="default">
         <Documentation>The value of this property is a format string used to
-        display the input time. The format string is specified using printf
-        style.</Documentation>
+        display the input time. The format string is specified using fmt style
+        </Documentation>
       </StringVectorProperty>
       <DoubleVectorProperty command="SetShift"
                             default_values="0.0"

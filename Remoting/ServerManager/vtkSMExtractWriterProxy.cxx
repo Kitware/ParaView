@@ -16,12 +16,12 @@
 
 #include "vtkLogger.h"
 #include "vtkObjectFactory.h"
+#include "vtkPVStringFormatter.h"
 #include "vtkSMExtractsController.h"
 
 #include <vtksys/RegularExpression.hxx>
 #include <vtksys/SystemTools.hxx>
 
-#include <cstdio>
 #include <string>
 
 //----------------------------------------------------------------------------
@@ -31,61 +31,38 @@ vtkSMExtractWriterProxy::vtkSMExtractWriterProxy() = default;
 vtkSMExtractWriterProxy::~vtkSMExtractWriterProxy() = default;
 
 //----------------------------------------------------------------------------
-std::string vtkSMExtractWriterProxy::GenerateDataExtractsFileName(
-  const std::string& fname, vtkSMExtractsController* extractor)
-{
-  return vtkSMExtractWriterProxy::GenerateExtractsFileName(
-    fname, extractor, extractor->GetRealExtractsOutputDirectory());
-}
-
-//----------------------------------------------------------------------------
-std::string vtkSMExtractWriterProxy::GenerateImageExtractsFileName(
-  const std::string& fname, vtkSMExtractsController* extractor)
-{
-  return vtkSMExtractWriterProxy::GenerateImageExtractsFileName(fname, std::string(), extractor);
-}
-
-//----------------------------------------------------------------------------
-std::string vtkSMExtractWriterProxy::GenerateImageExtractsFileName(
-  const std::string& fname, const std::string& cameraparams, vtkSMExtractsController* extractor)
-{
-  auto str = vtkSMExtractWriterProxy::GenerateExtractsFileName(
-    fname, extractor, extractor->GetRealExtractsOutputDirectory());
-  size_t pos = 0;
-  while ((pos = str.find("%cm", pos)) != std::string::npos)
-  {
-    str.replace(pos, 3, cameraparams);
-    pos += cameraparams.size();
-  }
-  return str;
-}
-
-//----------------------------------------------------------------------------
 std::string vtkSMExtractWriterProxy::GenerateExtractsFileName(
-  const std::string& fname, vtkSMExtractsController* extractor, const char* rootdir)
+  const std::string& filename, const char* outDir)
 {
+  // `FileIsFullPath` check helps us support absolute paths provided on
+  // individual extractor.
+  std::string name = vtksys::SystemTools::FileIsFullPath(filename)
+    ? filename
+    : vtksys::SystemTools::JoinPath({ outDir, "/" + filename });
+
+  // check for old format for ts and t
+  bool oldFormatUsed = false;
   // clang-format off
   vtksys::RegularExpression regex(R"=((%[.0-9]*)((ts)|(t)))=");
   // clang-format on
-
-  // `FileIsFullPath` check helps us support absolute paths provided on
-  // individual extractor.
-  std::string name = vtksys::SystemTools::FileIsFullPath(fname)
-    ? fname
-    : vtksys::SystemTools::JoinPath({ rootdir, "/" + fname });
+  std::string possibleOldFormatString1 = name;
   while (regex.find(name))
   {
     if (regex.match(2) == "ts")
     {
-      char buffer[256];
-      std::snprintf(buffer, 256, (regex.match(1) + "d").c_str(), extractor->GetTimeStep());
-      name.replace(regex.start(), regex.end() - regex.start(), buffer);
+      oldFormatUsed = true;
+      // assume that precision information will always have the format, eg %.[0-9]*
+      std::string formatString = "0" + regex.match(1).substr(2) + "d";
+      std::string replacement = "{timestep:" + formatString + "}";
+      name.replace(regex.start(), regex.end() - regex.start(), replacement);
     }
     else if (regex.match(2) == "t")
     {
-      char buffer[256];
-      std::snprintf(buffer, 256, (regex.match(1) + "f").c_str(), extractor->GetTime());
-      name.replace(regex.start(), regex.end() - regex.start(), buffer);
+      oldFormatUsed = true;
+      // remove the % symbol from the formatString
+      std::string formatString = regex.match(1).substr(1) + "f";
+      std::string replacement = "{time:" + formatString + "}";
+      name.replace(regex.start(), regex.end() - regex.start(), replacement);
     }
     else
     {
@@ -96,8 +73,17 @@ std::string vtkSMExtractWriterProxy::GenerateExtractsFileName(
     }
   }
 
-  vtkLogF(TRACE, "%s --> %s", fname.c_str(), name.c_str());
-  return name;
+  // check for old format for cm
+  std::string possibleOldFormatString2 = name;
+  vtksys::SystemTools::ReplaceString(name, "%cm", "{camera}");
+  if (possibleOldFormatString2 != name || oldFormatUsed)
+  {
+    vtkLogF(WARNING, "Legacy formatting pattern detected."
+                     "Please replace '%s' with '%s'.",
+      possibleOldFormatString1.c_str(), name.c_str());
+  }
+
+  return vtkPVStringFormatter::Format(name);
 }
 
 //----------------------------------------------------------------------------

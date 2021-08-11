@@ -199,17 +199,18 @@
     <SourceProxy class="vtkTimeToTextConvertor"
                  label="Annotate Time"
                  name="TimeToTextConvertorSource">
-      <Documentation long_help="Shows the animation time as text annnotation in the view."
+      <Documentation long_help="Shows the animation time as text annotation in the view."
                      short_help="Show animation time as text">The Annotate Time
                      source can be used to show the animation time in text
                      annotation.</Documentation>
       <StringVectorProperty command="SetFormat"
-                            default_values="Time: %f"
+                            default_values="Time: {time:f}"
                             name="Format"
                             number_of_elements="1"
                             panel_visibility="default">
-        <Documentation>This property specifies the format used to display the
-        input time (using printf style).</Documentation>
+        <Documentation>The value of this property is a format string used to
+          display the input time. The format string is specified using fmt style.
+        </Documentation>
       </StringVectorProperty>
       <Hints>
         <OutputPort index="0"

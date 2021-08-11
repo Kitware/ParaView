@@ -15,13 +15,14 @@
 
 #include "vtkPVBagPlotMatrixView.h"
 
-#include <vtkDataObject.h>
-#include <vtkDataRepresentation.h>
-#include <vtkObjectFactory.h>
+#include "vtkDataObject.h"
+#include "vtkDataRepresentation.h"
+#include "vtkObjectFactory.h"
+#include "vtkPVBagPlotMatrixRepresentation.h"
+#include "vtkPVStringFormatter.h"
 
 #include <sstream>
-
-#include "vtkPVBagPlotMatrixRepresentation.h"
+#include <vtksys/SystemTools.hxx>
 
 vtkStandardNewMacro(vtkPVBagPlotMatrixView);
 
@@ -32,24 +33,37 @@ void vtkPVBagPlotMatrixView::PrintSelf(ostream& os, vtkIndent indent)
 }
 
 //----------------------------------------------------------------------------
-std::string vtkPVBagPlotMatrixView::GetFormattedTitle()
+void vtkPVBagPlotMatrixView::Render(bool interactive)
 {
-  std::string formattedTitle = this->Superclass::GetFormattedTitle();
+  std::string formattedTitle = this->GetTitle();
+
+  // push scope with variance
   if (this->GetNumberOfRepresentations() > 0)
   {
     // A representation is available, format the variance in the title
     vtkPVBagPlotMatrixRepresentation* repr =
       vtkPVBagPlotMatrixRepresentation::SafeDownCast(this->GetRepresentation());
-    std::string key = "${VARIANCE}";
-    size_t pos = formattedTitle.find(key);
-    if (pos != std::string::npos)
-    {
-      std::ostringstream stream;
-      stream << formattedTitle.substr(0, pos)
-             << static_cast<int>(repr->GetExtractedExplainedVariance())
-             << formattedTitle.substr(pos + key.length());
-      formattedTitle = stream.str();
-    }
+    auto variance = static_cast<int>(repr->GetExtractedExplainedVariance());
+    vtkPVStringFormatter::PushScope("VIEW", fmt::arg("variance", variance));
   }
-  return formattedTitle;
+  else
+  {
+    vtkPVStringFormatter::PushScope("VIEW", fmt::arg("variance", std::ref("")));
+  }
+
+  // check for old format
+  std::string possibleOldFormatString = formattedTitle;
+  vtksys::SystemTools::ReplaceString(formattedTitle, "${VARIANCE}", "{variance}");
+  if (possibleOldFormatString != formattedTitle)
+  {
+    vtkLogF(WARNING, "Legacy formatting pattern detected."
+                     "Please replace '%s' with '%s'.",
+      possibleOldFormatString.c_str(), formattedTitle.c_str());
+  }
+  this->SetTitle(formattedTitle.c_str());
+
+  this->Superclass::Render(interactive);
+
+  // pop scope with variance
+  vtkPVStringFormatter::PopScope();
 }

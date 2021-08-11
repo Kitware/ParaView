@@ -30,12 +30,14 @@
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVPlotTime.h"
+#include "vtkPVStringFormatter.h"
 #include "vtkPen.h"
 #include "vtkStringArray.h"
 #include "vtkTextProperty.h"
 #include "vtkXYChartRepresentation.h"
 
 #include <cmath>
+#include <vtksys/SystemTools.hxx>
 
 bool vtkPVXYChartView::IgnoreNegativeLogAxisWarning = false;
 
@@ -797,6 +799,29 @@ void vtkPVXYChartView::Render(bool interactive)
   {
     return;
   }
+
+  // define scope with time
+  PV_STRING_FORMATTER_NAMED_SCOPE("VIEW", fmt::arg("time", this->GetViewTime()));
+
+  // check for old format
+  if (this->GetTitle())
+  {
+    std::string formattedTitle = this->GetTitle();
+    std::string possibleOldFormatString = formattedTitle;
+    vtksys::SystemTools::ReplaceString(formattedTitle, "${TIME}", "{time}");
+    if (possibleOldFormatString != formattedTitle)
+    {
+      vtkLogF(WARNING, "Legacy formatting pattern detected."
+                       "Please replace '%s' with '%s'.",
+        possibleOldFormatString.c_str(), formattedTitle.c_str());
+    }
+    if (possibleOldFormatString != formattedTitle)
+    {
+      vtkLogF(WARNING, "Old string-format was used");
+    }
+    this->SetTitle(formattedTitle.c_str());
+  }
+
   this->Chart->SetTitle(this->GetFormattedTitle());
 
   this->PlotTime->SetTime(this->GetViewTime());

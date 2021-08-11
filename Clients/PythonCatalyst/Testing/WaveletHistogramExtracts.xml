@@ -23,13 +23,13 @@
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/Trigger/ProxySelectionWidget/frame/ChosenProxyWidget/Frequency/LineEdit0" command="set_string" arguments="5" />
   <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuExtractors" />
   <pqevent object="pqClientMainWindow/menubar/menuExtractors/Alphabetical" command="activate" arguments="PNG" />
-  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/Writer/ProxySelectionWidget/frame/ChosenProxyWidget/FileName/FileName" command="set_string" arguments="histogram_%03t.png" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/Writer/ProxySelectionWidget/frame/ChosenProxyWidget/FileName/FileName" command="set_string" arguments="histogram_{time:f}.png" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.1/TitleBar" command="mousePress" arguments="1,1,0,37,6" />
   <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.1/TitleBar" command="mouseRelease" arguments="1,0,0,37,6" />
   <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuExtractors" />
   <pqevent object="pqClientMainWindow/menubar/menuExtractors/Image" command="activate" arguments="PNG" />
-  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/Writer/ProxySelectionWidget/frame/ChosenProxyWidget/FileName/FileName" command="set_string" arguments="renderview_%04ts.png" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/Writer/ProxySelectionWidget/frame/ChosenProxyWidget/FileName/FileName" command="set_string" arguments="renderview_{timestep:04d}.png" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/Trigger/ProxySelectionWidget/frame/ChosenProxyWidget/Frequency/LineEdit0" command="set_string" arguments="2" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser" command="mousePress" arguments="1,1,0,60,4,/0:0/1:0" />

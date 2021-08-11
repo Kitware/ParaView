@@ -17,9 +17,12 @@
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
 #include "vtkObjectFactory.h"
+#include "vtkPVStringFormatter.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
 #include "vtkStringArray.h"
 #include "vtkTable.h"
+
+#include <vtksys/SystemTools.hxx>
 
 vtkStandardNewMacro(vtkTimeToTextConvertor);
 //----------------------------------------------------------------------------
@@ -28,7 +31,7 @@ vtkTimeToTextConvertor::vtkTimeToTextConvertor()
   this->Format = nullptr;
   this->Shift = 0.0;
   this->Scale = 1.0;
-  this->SetFormat("Time: %f");
+  this->SetFormat("Time: {time:f}");
 }
 
 //----------------------------------------------------------------------------
@@ -73,34 +76,53 @@ int vtkTimeToTextConvertor::RequestData(vtkInformation* vtkNotUsed(request),
   vtkDataObject* input = vtkDataObject::GetData(inputVector[0]);
   vtkTable* output = vtkTable::GetData(outputVector);
 
-  char* buffer = new char[strlen(this->Format) + 1024];
-  strcpy(buffer, "?");
+  std::string result = "?";
 
   vtkInformation* inputInfo = input ? input->GetInformation() : nullptr;
   vtkInformation* outputInfo = outputVector->GetInformationObject(0);
 
+  bool timeArgumentPushed = false;
   if (inputInfo && inputInfo->Has(vtkDataObject::DATA_TIME_STEP()) && this->Format)
   {
+    timeArgumentPushed = true;
     double time = inputInfo->Get(vtkDataObject::DATA_TIME_STEP());
     time = vtkTimeToTextConvertor_ForwardConvert(time, this->Shift, this->Scale);
-    sprintf(buffer, this->Format, time);
+    vtkPVStringFormatter::PushScope("TEXT", fmt::arg("time", time));
   }
   else if (outputInfo && outputInfo->Has(vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEP()) &&
     this->Format)
   {
+    timeArgumentPushed = true;
     double time = outputInfo->Get(vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEP());
     time = vtkTimeToTextConvertor_ForwardConvert(time, this->Shift, this->Scale);
-    sprintf(buffer, this->Format, time);
+    vtkPVStringFormatter::PushScope("TEXT", fmt::arg("time", time));
+  }
+
+  if (timeArgumentPushed)
+  {
+    // check for old format
+    std::string formattedTitle = this->Format;
+    std::string possibleOldFormatString = formattedTitle;
+    vtksys::SystemTools::ReplaceString(formattedTitle, "%f", "{time:f}");
+    if (possibleOldFormatString != formattedTitle)
+    {
+      vtkLogF(WARNING, "Legacy formatting pattern detected."
+                       "Please replace '%s' with '%s'.",
+        possibleOldFormatString.c_str(), formattedTitle.c_str());
+    }
+
+    result = vtkPVStringFormatter::Format(formattedTitle);
+
+    vtkPVStringFormatter::PopScope();
   }
 
   vtkStringArray* data = vtkStringArray::New();
   data->SetName("Text");
   data->SetNumberOfComponents(1);
-  data->InsertNextValue(buffer);
+  data->InsertNextValue(result.c_str());
   output->AddColumn(data);
   data->Delete();
 
-  delete[] buffer;
   return 1;
 }
 

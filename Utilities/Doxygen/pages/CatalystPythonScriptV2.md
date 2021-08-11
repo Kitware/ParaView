@@ -343,7 +343,7 @@ sliceDisplay = Show(slice1)
 extractor1 = CreateExtractor('PNG', view, registrationName='PNG1')
 # trace defaults for the extractor.
 # init the 'PNG' selected for 'Writer'
-extractor1.Writer.FileName = '/tmp/output-%ts.png'
+extractor1.Writer.FileName = '/tmp/output-{timestep}.png'
 extractor1.Writer.ImageResolution = [800, 880]
 ```
 

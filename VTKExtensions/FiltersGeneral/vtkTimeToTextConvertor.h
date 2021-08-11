@@ -38,8 +38,8 @@ public:
   //@{
   /**
    * Get/Set the format in which the to display the
-   * input update time. Use printf formatting.
-   * Default is "Time: %f".
+   * input update time. Use fmt formatting.
+   * Default is "Time: {time:f}".
    */
   vtkSetStringMacro(Format);
   vtkGetStringMacro(Format);
