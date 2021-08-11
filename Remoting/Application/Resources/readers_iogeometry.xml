@@ -615,7 +615,8 @@
                      It also can deal with turning wind turbines from other
                      time step data files which gives polygon positions of
                      segments of the blades and data for each
-                     segment.</Documentation>
+                     segment. This is a distributed reader.
+      </Documentation>
       <OutputPort index="0"
                   name="Field" />
       <OutputPort index="1"

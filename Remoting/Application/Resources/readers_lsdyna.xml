@@ -5,7 +5,8 @@
                  name="LSDynaReader">
       <Documentation long_help="Read LS-Dyna databases (d3plot)."
                      short_help="Read LS-Dyna databases (d3plot).">This reader
-                     reads LS-Dyna databases.</Documentation>
+                     reads LS-Dyna databases. This is a distributed reader.
+      </Documentation>
       <StringVectorProperty animateable="0"
                             command="SetFileName"
                             name="FileName"

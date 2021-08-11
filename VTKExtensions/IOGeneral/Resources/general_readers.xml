@@ -7,7 +7,8 @@
                      short_help="Read rectlinear grid data from a NetCDF file in the POP format and converts it into unstructured data.">
       The reader reads regular rectilinear grid (image/volume) data from a
       NetCDF file and turns it into an unstructured spherical
-      grid.</Documentation>
+      grid. This is a distributed reader.
+      </Documentation>
       <StringVectorProperty animateable="0"
                             command="SetFileName"
                             name="FileName"
@@ -98,7 +99,8 @@
                      short_help="Read rectlinear grid data from a NetCDF file in the POP format and converts it into unstructured data.">
       The reader reads regular rectilinear grid (image/volume) data from a
       NetCDF file and turns it into an unstructured spherical
-      grid.</Documentation>
+      grid. This is a distributed reader.
+      </Documentation>
       <SubProxy>
         <Proxy name="Reader"
                proxygroup="internal_sources"
