@@ -152,6 +152,7 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${paraview_test_data_directory_input}/Data/viscoplastic-ring.h5}"
   "DATA{${paraview_test_data_directory_input}/Data/waveletElevation.vti}"
   "DATA{${paraview_test_data_directory_input}/Data/waveletMaterial.vti}"
+  "DATA{${paraview_test_data_directory_input}/Data/WaveletThresholdLegacy.pvsm}"
   "DATA{${paraview_test_data_directory_input}/Data/YoungsMaterialInterface/youngs.vtm}"
   "DATA{${paraview_test_data_directory_input}/Data/YoungsMaterialInterface/youngs/youngs_0.vtu}"
   "DATA{${paraview_test_data_directory_input}/Data/YoungsMaterialInterface/youngs/youngs_1.vtu}"
@@ -609,6 +610,7 @@ SET (TESTS_WITHOUT_BASELINES
   TestAnimationStride.xml
   TestCompositePropertyWidgetDecorator.xml
   TextSource.xml
+  ThresholdBackwardsCompatibility.xml
 )
 
 if (PARAVIEW_PLUGIN_ENABLE_EULATestPlugin)
