@@ -24,8 +24,10 @@
 #include "vtkObject.h"
 #include "vtkSmartPointer.h" // for ivars
 #include <future>            // for ivar
+#include <map>               // for ivar
 #include <vector>            // for ivar
 
+class vtkAbstractWidget;
 class vtkActor;
 class vtkBoxWidget2;
 class vtkDataSet;
@@ -48,6 +50,7 @@ class vtkStringArray;
 class vtkTexture;
 class vtkTransform;
 class vtkTextActor3D;
+class vtkSMProxy;
 
 class vtkPVOpenVRWidgets : public vtkObject
 {
@@ -123,6 +126,8 @@ public:
   void GetImagoImageryTypes(std::vector<std::string>& vals);
   void GetImagoImageTypes(std::vector<std::string>& vals);
 
+  void UpdateWidgetsFromParaView();
+
 protected:
   vtkPVOpenVRWidgets();
   ~vtkPVOpenVRWidgets();
@@ -166,6 +171,8 @@ protected:
   bool EventCallback(vtkObject* object, unsigned long event, void* calldata);
 
   vtkImagoLoader* ImagoLoader;
+
+  std::map<vtkSMProxy*, vtkAbstractWidget*> WidgetsFromParaView;
 
 private:
   vtkPVOpenVRWidgets(const vtkPVOpenVRWidgets&) = delete;
