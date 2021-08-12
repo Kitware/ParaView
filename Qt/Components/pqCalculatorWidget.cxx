@@ -79,7 +79,7 @@ pqCalculatorWidget::pqCalculatorWidget(
   // doesn't take focus will cause the line edit to have focus
   this->setFocusProxy(this->Internals->Function);
 
-  // before the menus are poped up, fill them up with the list of available
+  // before the menus are popped up, fill them up with the list of available
   // arrays.
   QObject::connect(
     this->Internals->ScalarsMenu, SIGNAL(aboutToShow()), this, SLOT(updateVariableNames()));
