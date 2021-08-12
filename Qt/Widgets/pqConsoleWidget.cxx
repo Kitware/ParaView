@@ -275,7 +275,7 @@ public:
   /// overridden to handle middle-button click pasting in *nix
   void mouseReleaseEvent(QMouseEvent* e) override
   {
-    if (e->button() == Qt::MidButton)
+    if (e->button() == Qt::MiddleButton)
     {
       QTextEdit::mouseReleaseEvent(e);
       checkForPastedText();

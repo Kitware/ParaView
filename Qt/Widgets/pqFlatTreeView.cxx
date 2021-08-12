@@ -2128,7 +2128,7 @@ void pqFlatTreeView::keyboardSearch(const QString& search)
 
 void pqFlatTreeView::mousePressEvent(QMouseEvent* e)
 {
-  if (!this->HeaderView || !this->Model || e->button() == Qt::MidButton)
+  if (!this->HeaderView || !this->Model || e->button() == Qt::MiddleButton)
   {
     e->ignore();
     return;
