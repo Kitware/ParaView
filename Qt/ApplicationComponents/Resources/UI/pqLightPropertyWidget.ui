@@ -29,7 +29,7 @@
    <item row="3" column="0">
     <widget class="QLabel" name="focalPointLabel">
      <property name="text">
-      <string>FocalPoint</string>
+      <string>Focal Point</string>
      </property>
     </widget>
    </item>
@@ -65,7 +65,7 @@
    <item row="4" column="0">
     <widget class="QLabel" name="coneAngleLabel">
      <property name="text">
-      <string>ConeAngle</string>
+      <string>Cone Angle</string>
      </property>
     </widget>
    </item>
