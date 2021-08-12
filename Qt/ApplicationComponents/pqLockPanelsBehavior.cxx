@@ -144,7 +144,8 @@ void pqLockPanelsBehavior::toggleLockPanels()
 //-----------------------------------------------------------------------------
 void pqLockPanelsBehavior::lockPanels(bool lock)
 {
-  QDockWidget::DockWidgetFeatures features = QDockWidget::AllDockWidgetFeatures;
+  QDockWidget::DockWidgetFeatures features = QDockWidget::DockWidgetClosable |
+    QDockWidget::DockWidgetMovable | QDockWidget::DockWidgetFloatable;
   if (lock)
   {
     features = QDockWidget::DockWidgetClosable;
