@@ -31,6 +31,8 @@
   ```
   In this case, `CustomGroup1` does not exist beforehand so it will be created on import. If the `Groups` field does not exist, the preset is added to the `Default` and `User` groups.
 
+* The `DefaultMap` field is no longer used as it is redundant with the new `Groups` field.
+
 * Any preset can now be added or removed from the `Default` group.
 
 * Make the presets dialog non-modal

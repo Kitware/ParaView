@@ -34,14 +34,14 @@
 
 #include "vtkRemotingViewsModule.h" // needed for exports
 #include "vtkSmartPointer.h"        // for ivars
-#include <vector>
-#include <vtk_jsoncpp_fwd.h> // for forward declarations
+#include <vector>                   // for vector
+#include <vtk_jsoncpp_fwd.h>        // for forward declarations
 
 class vtkPVXMLElement;
 class VTKREMOTINGVIEWS_EXPORT vtkSMTransferFunctionPresets : public vtkSMObject
 {
 public:
-  // Used to return informations about the imported presets to the caller of ImportPresets
+  // Used to return information about the imported presets to the caller of ImportPresets
   struct ImportedPreset
   {
     std::string name;
@@ -49,7 +49,7 @@ public:
     {
       bool isValid = false;
       std::vector<std::string> groups;
-    } maybeGroups;
+    } potentialGroups;
   };
 
   static vtkSMTransferFunctionPresets* New();
@@ -137,13 +137,6 @@ public:
   {
     return this->GetPresetHasAnnotations(this->GetPreset(index));
   }
-
-  /**
-   * Returns the preset's JSON-defined default position (if any)
-   * or -1 if none.
-   */
-  bool IsPresetDefault(const Json::Value& preset);
-  bool IsPresetDefault(unsigned int index) { return this->IsPresetDefault(this->GetPreset(index)); }
 
   /**
    * Set the Json::Value object for preset 'name' if such a preset was found in the custom presets.

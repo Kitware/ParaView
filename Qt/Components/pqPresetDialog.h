@@ -155,6 +155,7 @@ protected Q_SLOTS:
 
 private Q_SLOTS:
   void updateGroups();
+  void updateFiltering();
 
 private:
   Q_DISABLE_COPY(pqPresetDialog)

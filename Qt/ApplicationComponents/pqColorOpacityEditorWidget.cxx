@@ -46,6 +46,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPropertyWidgetDecorator.h"
 #include "pqResetScalarRangeReaction.h"
 #include "pqSettings.h"
+#include "pqSignalsBlocker.h"
 #include "pqTimer.h"
 #include "pqTransferFunctionWidget.h"
 #include "pqUndoStack.h"
@@ -72,6 +73,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QMessageBox>
 #include <QPainter>
 #include <QPointer>
+#include <QStandardItem>
+#include <QStandardItemModel>
 #include <QStyledItemDelegate>
 #include <QTimer>
 #include <QVBoxLayout>
@@ -133,7 +136,7 @@ public:
 
     // The pixmap takes 3/4 of the height and 1/2 of the width of the item, and the text takes 1/2
     // of the height and 1/2 of the width of the item
-    auto const pixmapHorizontalMargins = 5;
+    int const pixmapHorizontalMargins = 5;
     auto const pixmapRect =
       QRect(opt.rect.x() + pixmapHorizontalMargins, opt.rect.y() + 0.125 * opt.rect.height(),
         opt.rect.width() / 2 - 2 * pixmapHorizontalMargins, opt.rect.height() * 0.75);
@@ -142,10 +145,10 @@ public:
 
     if (opt.state & QStyle::State_Selected)
     {
-      // Fill the backround of the selected item with a blue color
+      // Fill the background of the selected item with a blue color
       painter->fillRect(opt.rect, opt.palette.color(QPalette::Highlight));
 
-      auto pen = painter->pen();
+      QPen pen = painter->pen();
 
       pen.setColor(opt.palette.color(QPalette::HighlightedText));
       painter->setPen(pen);
@@ -154,18 +157,27 @@ public:
     {
       painter->fillRect(opt.rect, painter->brush());
     }
-    painter->drawText(QRectF(textRect), Qt::AlignVCenter, index.data().toString());
 
-    auto transferFunctionPresets = vtkSMTransferFunctionPresets::GetInstance();
-    auto pixmap = PresetToPixmap.render(
-      transferFunctionPresets->GetPreset(index.data(Qt::UserRole).toInt()), opt.rect.size());
+    // First element is used as a placeholder, so drawing is different
+    if (index.row() != 0)
+    {
+      painter->drawText(QRectF(textRect), Qt::AlignVCenter, index.data().toString());
 
-    painter->drawPixmap(pixmapRect, pixmap);
+      auto transferFunctionPresets = vtkSMTransferFunctionPresets::GetInstance();
+      QPixmap pixmap = PresetToPixmap.render(
+        transferFunctionPresets->GetPreset(index.data(Qt::UserRole).toInt()), opt.rect.size());
+
+      painter->drawPixmap(pixmapRect, pixmap);
+    }
+    else
+    {
+      painter->drawText(opt.rect, Qt::AlignVCenter, index.data().toString());
+    }
 
     painter->restore();
   }
 
-  QSize sizeHint(const QStyleOptionViewItem& option, const QModelIndex&) const
+  QSize sizeHint(const QStyleOptionViewItem& option, const QModelIndex&) const override
   {
     return QSize{ option.rect.width(), option.fontMetrics.height() * 2 };
   }
@@ -188,10 +200,12 @@ public:
   vtkWeakPointer<vtkSMProxy> ScalarOpacityFunctionProxy;
   QScopedPointer<QAction> TempAction;
   QScopedPointer<pqChooseColorPresetReaction> ChoosePresetReaction;
+  QScopedPointer<pqSignalsBlocker> SignalsBlocker;
 
   // We use this pqPropertyLinks instance to simply monitor smproperty changes.
   pqPropertyLinks LinksForMonitoringChanges;
   vtkNew<vtkEventQtSlotConnect> TransferFunctionConnector;
+  vtkNew<vtkEventQtSlotConnect> TransferFunctionModifiedConnector;
   vtkNew<vtkEventQtSlotConnect> RangeConnector;
   vtkNew<vtkEventQtSlotConnect> ConsumerConnector;
 
@@ -204,6 +218,7 @@ public:
     , PropertyGroup(group)
     , TempAction(new QAction(self))
     , ChoosePresetReaction(new pqChooseColorPresetReaction(this->TempAction.data(), false))
+    , SignalsBlocker(new pqSignalsBlocker(self))
   {
     this->Ui.setupUi(self);
     this->Ui.mainLayout->setMargin(pqPropertiesPanel::suggestedMargin());
@@ -225,9 +240,12 @@ public:
     QObject::connect(this->ChoosePresetReaction.data(), &pqChooseColorPresetReaction::presetApplied,
       [=](const QString& presetName) {
         auto& defaultPresetsComboBox = this->Ui.DefaultPresetsComboBox;
+        int newIndex = defaultPresetsComboBox->findText(presetName);
+        this->SignalsBlocker->blockSignals(true);
         defaultPresetsComboBox->blockSignals(true);
-        defaultPresetsComboBox->setCurrentIndex(defaultPresetsComboBox->findText(presetName));
+        defaultPresetsComboBox->setCurrentIndex(newIndex != -1 ? newIndex : 0);
         defaultPresetsComboBox->blockSignals(false);
+        this->SignalsBlocker->blockSignals(false);
       });
 
     this->HistogramTimer.setSingleShot(true);
@@ -282,8 +300,14 @@ pqColorOpacityEditorWidget::pqColorOpacityEditorWidget(
 
   QObject::connect(
     ui.DefaultPresetsComboBox, &QComboBox::currentTextChanged, [=](const QString& presetName) {
+      if (ui.DefaultPresetsComboBox->currentIndex() == 0)
+      {
+        return;
+      }
+      this->Internals->SignalsBlocker->blockSignals(true);
       bool presetApplied =
         vtkSMTransferFunctionProxy::ApplyPreset(smproxy, presetName.toStdString().c_str());
+      this->Internals->SignalsBlocker->blockSignals(false);
       if (presetApplied)
       {
         Q_EMIT this->presetApplied();
@@ -490,6 +514,14 @@ pqColorOpacityEditorWidget::pqColorOpacityEditorWidget(
     this->Internals->Ui.AdvancedButton->setChecked(
       settings->value("showAdvancedPropertiesColorOpacityEditorWidget", false).toBool());
   }
+
+  // Connect with the SignalsBlocker in between to be able to call QObject::blockSignals on it
+  // because otherwise no QObject would be emiting a signal, meaning it could not be blocked
+  // to avoid loops
+  this->Internals->TransferFunctionModifiedConnector->Connect(
+    stc, vtkCommand::ModifiedEvent, this->Internals->SignalsBlocker.get(), SIGNAL(passSignal()));
+  QObject::connect(this->Internals->SignalsBlocker.get(), &pqSignalsBlocker::passSignal, this,
+    &pqColorOpacityEditorWidget::resetColorMapComboBox);
 
   this->updateCurrentData();
   this->updatePanel();
@@ -1057,8 +1089,16 @@ void pqColorOpacityEditorWidget::updateDefaultPresetsList()
   auto transferFunctionPresets = vtkSMTransferFunctionPresets::GetInstance();
   auto groupManager = qobject_cast<pqPresetGroupsManager*>(
     pqApplicationCore::instance()->manager("PRESET_GROUP_MANAGER"));
+  QString const currentPreset = defaultPresetsComboBox->currentText();
   defaultPresetsComboBox->blockSignals(true);
   defaultPresetsComboBox->clear();
+  // QComboBox::setPlaceHolder is a Qt5.15 function, so until the
+  // minimum version is upgraded, we have to do this workaround.
+  defaultPresetsComboBox->addItem("Select a color map from default presets", -1);
+  QStandardItemModel* model = qobject_cast<QStandardItemModel*>(defaultPresetsComboBox->model());
+  QStandardItem* item = model->item(0);
+  // Disable the "placeholder"
+  item->setFlags(item->flags() & ~Qt::ItemIsEnabled);
   for (unsigned int index = 0; index < transferFunctionPresets->GetNumberOfPresets(); ++index)
   {
     auto presetName = QString::fromStdString(transferFunctionPresets->GetPresetName(index));
@@ -1067,6 +1107,8 @@ void pqColorOpacityEditorWidget::updateDefaultPresetsList()
       defaultPresetsComboBox->addItem(presetName, index);
     }
   }
+  int currentPresetIndex = defaultPresetsComboBox->findText(currentPreset);
+  defaultPresetsComboBox->setCurrentIndex(currentPresetIndex == -1 ? 0 : currentPresetIndex);
   defaultPresetsComboBox->blockSignals(false);
 }
 
@@ -1107,7 +1149,17 @@ void pqColorOpacityEditorWidget::saveAsPreset()
   std::string presetName;
   auto presets = vtkSMTransferFunctionPresets::GetInstance();
   presetName = presets->AddUniquePreset(preset, ui.presetName->text().toUtf8().data());
+  auto groupManager = qobject_cast<pqPresetGroupsManager*>(
+    pqApplicationCore::instance()->manager("PRESET_GROUP_MANAGER"));
+  groupManager->addToGroup("Default", QString::fromStdString(presetName));
+  groupManager->addToGroup("User", QString::fromStdString(presetName));
   this->choosePreset(presetName.c_str());
+}
+
+//-----------------------------------------------------------------------------
+void pqColorOpacityEditorWidget::resetColorMapComboBox()
+{
+  this->Internals->Ui.DefaultPresetsComboBox->setCurrentIndex(0);
 }
 
 //-----------------------------------------------------------------------------

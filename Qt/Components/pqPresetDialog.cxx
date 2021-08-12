@@ -113,17 +113,17 @@ public:
       for (auto const& importedPreset : importedPresets)
       {
         auto const presetName = QString::fromStdString(importedPreset.name);
-        if (importedPreset.maybeGroups.isValid)
+        if (importedPreset.potentialGroups.isValid)
         {
-          for (auto const& groupName : importedPreset.maybeGroups.groups)
+          for (auto const& groupName : importedPreset.potentialGroups.groups)
           {
-            GroupManager->addToGroup(QString::fromStdString(groupName), presetName);
+            this->GroupManager->addToGroup(QString::fromStdString(groupName), presetName);
           }
         }
         else
         {
-          GroupManager->addToGroup("User", presetName);
-          GroupManager->addToGroup("Default", presetName);
+          this->GroupManager->addToGroup("User", presetName);
+          this->GroupManager->addToGroup("Default", presetName);
         }
       }
     }
@@ -143,9 +143,9 @@ public:
   {
     this->beginRemoveRows(QModelIndex(), idx, idx);
     auto presetName = this->Presets->GetPresetName(idx);
+    this->GroupManager->removeFromAllGroups(QString::fromStdString(presetName));
     this->Presets->RemovePreset(idx);
     this->Pixmaps.removeAt(idx);
-    this->GroupManager->removeFromAllGroups(QString::fromStdString(presetName));
     this->endRemoveRows();
   }
 
@@ -209,9 +209,7 @@ public:
             font.setUnderline(true);
           }
 
-          auto userColumn = this->GroupManager->groupNames().indexOf("User") + 1;
-          if (userColumn != 0 &&
-            this->data(this->index(idx.row(), userColumn), Qt::DisplayRole) != -1)
+          if (!this->Presets->IsPresetBuiltin(idx.row()))
           {
             font.setItalic(true);
           }
@@ -274,9 +272,23 @@ public:
     std::string const newName = value.toString().toStdString();
     if (this->Presets->RenamePreset(idx.row(), newName.c_str()))
     {
-      GroupManager->removeFromAllGroups(QString::fromStdString(previousName));
-      GroupManager->addToGroup("User", QString::fromStdString(newName));
-      GroupManager->addToGroup("Default", QString::fromStdString(newName));
+      auto const previousNameQString = QString::fromStdString(previousName);
+      auto const newNameQString = QString::fromStdString(newName);
+      QStringList groupNames;
+
+      for (auto const& groupName : this->GroupManager->groupNames())
+      {
+        if (this->GroupManager->presetRankInGroup(previousNameQString, groupName) != -1)
+        {
+          groupNames.push_back(groupName);
+        }
+      }
+
+      this->GroupManager->removeFromAllGroups(previousNameQString);
+      for (auto const& groupName : groupNames)
+      {
+        this->GroupManager->addToGroup(groupName, newNameQString);
+      }
       Q_EMIT this->dataChanged(idx, idx);
       return true;
     }
@@ -573,20 +585,7 @@ pqPresetDialog::pqPresetDialog(QWidget* parentObject, pqPresetDialog::Modes mode
       this->Internals->CurrentGroupColumn = index;
     });
   this->Internals->ProxyModel->connect(
-    ui.searchBox, &pqSearchBox::textChanged, [this](const QString& text) {
-      if (!text.isEmpty())
-      {
-        this->Internals->ProxyModel->setCurrentGroupColumn(0);
-        this->updateEnabledStateForSelection();
-        this->Internals->Ui.groupChooser->setEnabled(false);
-      }
-      else
-      {
-        this->Internals->ProxyModel->setCurrentGroupColumn(this->Internals->CurrentGroupColumn);
-        this->updateEnabledStateForSelection();
-        this->Internals->Ui.groupChooser->setEnabled(true);
-      }
-    });
+    ui.searchBox, &pqSearchBox::textChanged, this, &pqPresetDialog::updateFiltering);
   this->connect(ui.showDefault, SIGNAL(stateChanged(int)), SLOT(setPresetIsAdvanced(int)));
   auto groupMgr = this->Internals->Model->GroupManager;
   this->connect(
@@ -602,6 +601,7 @@ pqPresetDialog::~pqPresetDialog() = default;
 void pqPresetDialog::updateGroups()
 {
   auto groupChooser = this->Internals->Ui.groupChooser;
+  QString const currentGroup = groupChooser->currentText();
   groupChooser->clear();
   groupChooser->insertItem(0, "All");
   auto groupMgr = this->Internals->Model->GroupManager;
@@ -613,9 +613,40 @@ void pqPresetDialog::updateGroups()
   }
   else
   {
-    auto defaultColumn = groupMgr->groupNames().indexOf("Default") + 1;
-    this->Internals->Ui.groupChooser->setCurrentIndex(defaultColumn);
-    this->Internals->CurrentGroupColumn = defaultColumn;
+    int const currentGroupIndex = groupChooser->findText(currentGroup);
+
+    if (currentGroupIndex != -1)
+    {
+      groupChooser->setCurrentIndex(currentGroupIndex);
+      this->Internals->CurrentGroupColumn = currentGroupIndex;
+    }
+    else
+    {
+      auto defaultColumn = groupMgr->groupNames().indexOf("Default") + 1;
+      this->Internals->Ui.groupChooser->setCurrentIndex(defaultColumn);
+      this->Internals->CurrentGroupColumn = defaultColumn;
+    }
+  }
+
+  this->updateFiltering();
+}
+
+//-----------------------------------------------------------------------------
+void pqPresetDialog::updateFiltering()
+{
+  QString const text = this->Internals->Ui.searchBox->text();
+
+  if (!text.isEmpty())
+  {
+    this->Internals->ProxyModel->setCurrentGroupColumn(0);
+    this->updateEnabledStateForSelection();
+    this->Internals->Ui.groupChooser->setEnabled(false);
+  }
+  else
+  {
+    this->Internals->ProxyModel->setCurrentGroupColumn(this->Internals->CurrentGroupColumn);
+    this->updateEnabledStateForSelection();
+    this->Internals->Ui.groupChooser->setEnabled(true);
   }
 }
 
@@ -746,7 +777,6 @@ void pqPresetDialog::updateForSelectedIndex(const QModelIndex& proxyIndex)
   QModelIndex defaultColumnIndex = internals.Model->index(idx.row(), column);
 
   int defaultPosition = internals.Model->data(defaultColumnIndex, Qt::DisplayRole).toInt();
-  int numDefaultPresets = internals.Model->GroupManager->numberOfPresetsInGroup("Default");
 
   const Ui::pqPresetDialog& ui = internals.Ui;
 
@@ -940,8 +970,8 @@ void pqPresetDialog::setPresetIsAdvanced(int newState)
   idx = internals.ReflowModel->mapToSource(idx);
   idx = internals.ProxyModel->mapToSource(idx);
 
-  auto column = internals.Model->GroupManager->groupNames().indexOf("Default") + 1;
-  QModelIndex defaultColumnIndex = internals.Model->index(idx.row(), column);
+  auto defaultColumn = internals.Model->GroupManager->groupNames().indexOf("Default") + 1;
+  QModelIndex defaultColumnIndex = internals.Model->index(idx.row(), defaultColumn);
 
   int defaultPosition = internals.Model->data(defaultColumnIndex, Qt::DisplayRole).toInt();
 
@@ -949,11 +979,16 @@ void pqPresetDialog::setPresetIsAdvanced(int newState)
   {
     internals.Model->addPresetToDefaults(idx);
     internals.Ui.gradients->update(selectedRows[0]);
+    internals.Ui.gradients->setCurrentIndex(selectedRows[0]);
   }
   else if (!showByDefault && defaultPosition != -1)
   {
     internals.Model->removePresetFromDefaults(idx);
     internals.Ui.gradients->update(selectedRows[0]);
+    if (this->Internals->CurrentGroupColumn != defaultColumn)
+    {
+      internals.Ui.gradients->setCurrentIndex(selectedRows[0]);
+    }
   }
 }
 

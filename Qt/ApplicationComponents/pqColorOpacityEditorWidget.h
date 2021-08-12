@@ -224,6 +224,12 @@ public Q_SLOTS:
 
   void onRangeHandlesRangeChanged(double rangeMin, double rangeMax);
 
+  /**
+   * Resets the color map combo box by setting its index
+   * to -1 which sets its text to an empty string
+   */
+  void resetColorMapComboBox();
+
 Q_SIGNALS:
   /**
   * Signal fired when the xrgbPoints change.

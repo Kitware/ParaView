@@ -18,7 +18,11 @@
     <number>6</number>
    </property>
    <item>
-    <widget class="QComboBox" name="DefaultPresetsComboBox"/>
+    <widget class="QComboBox" name="DefaultPresetsComboBox">
+     <property name="toolTip">
+      <string>Select a color map from default presets</string>
+     </property>
+    </widget>
    </item>
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="1,0">

@@ -22,6 +22,7 @@
   <pqevent object="pqClientMainWindow/pqPresetDialog/gradients" command="setCurrent" arguments="0.0" />
   <pqevent object="pqClientMainWindow/pqPresetDialog/importPresets" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/pqPresetDialog/ImportPresets" command="filesSelected" arguments="$PARAVIEW_DATA_ROOT/Testing/Data/x_ray_copy_2.json" />
+  <pqevent object="pqClientMainWindow/pqPresetDialog/widget/groupChooser" command="activated" arguments="Default" />
   <pqevent object="pqClientMainWindow/pqPresetDialog/gradients" command="setSelection" arguments="8.1,8.1" />
   <pqevent object="pqClientMainWindow/pqPresetDialog/gradients" command="setCurrent" arguments="8.1" />
   <pqcheck object="pqClientMainWindow/pqPresetDialog/gradients" property="modelItemData" arguments="8.1,X_Ray_Copy_2" />
