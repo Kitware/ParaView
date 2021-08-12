@@ -1300,6 +1300,59 @@
     </SourceProxy>
 
     <!-- ==================================================================== -->
+    <SourceProxy class="vtkMergeTimeFilter"
+                 label="Merge Time"
+                 name="MergeTime">
+    <Documentation short_help="Union or intersection of inputs timesteps, without duplicate">
+        Merge all inputs timestep list. Remove duplicate using a Tolerance,
+        either absolute or relative. The resulting timesteps list can be an union or an
+    intersection of the inputs ones.</Documentation>
+      <InputProperty clean_command="RemoveAllInputs"
+                     command="AddInputConnection"
+                     multiple_input="1"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain composite_data_supported="1"
+                        name="input_type">
+          <DataType value="vtkDataObject" />
+        </DataTypeDomain>
+        <Documentation>This property indicates the the inputs to the Group
+        Datasets filter.</Documentation>
+      </InputProperty>
+      <IntVectorProperty
+          name="RelativeTolerance"
+          command="SetUseRelativeTolerance"
+          number_of_elements="1"
+          default_values="0">
+        <Documentation>Use Relative (resp. absolute) tolerance to determine if timesteps are duplicate.</Documentation>
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+      <DoubleVectorProperty
+          name="Tolerance"
+          command="SetTolerance"
+          number_of_elements="1"
+          default_values="0.00001">
+        <Documentation>Tolerance used to determine if timesteps are duplicate.</Documentation>
+      </DoubleVectorProperty>
+      <IntVectorProperty
+          name="Intersection"
+          command="SetUseIntersection"
+          number_of_elements="1"
+          default_values="0">
+        <Documentation>Keep the intersection instead of the union of timesteps from each input.</Documentation>
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+      <DoubleVectorProperty information_only="1"
+                            name="TimestepValues">
+        <TimeStepsInformationHelper />
+      </DoubleVectorProperty>
+      <!-- End vtkSynchronizeTimeFilter -->
+    </SourceProxy>
+
+    <!-- ==================================================================== -->
     <SourceProxy class="vtkSynchronizeTimeFilter"
                  label="Synchronize Time"
                  name="SynchronizeTime">
