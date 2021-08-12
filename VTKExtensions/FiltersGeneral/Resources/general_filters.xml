@@ -2695,13 +2695,18 @@ Every Nth Point.
                      The Threshold filter extracts the portions of the input
                      dataset whose scalars lie within the specified range. This
                      filter operates on either point-centered or cell-centered
-                     data. This filter operates on any type of dataset and
-                     produces unstructured grid output. The scalar array from
-                     which to threshold the data from can be selected in the
-                     Scalars menu. The Lower Threshold and Upper Threshold
-                     sliders determine the range of the scalars to retain in
-                     the output. The threshold method can be selected from the
-                     Threshold Method menu.
+                     data. It operates on any type of dataset and produces
+                     unstructured grid output.
+                     The scalar array from which to threshold the data can be selected
+                     in the 'Scalars' menu.
+                     The 'Lower Threshold' and 'Upper Threshold' sliders determine
+                     the range of the scalars to retain in the output.
+                     The threshold method can be selected from the 'Threshold Method' menu.
+                     The 'All Scalars' option only applies to Point Data. When this
+                     option is on, a cell will only be passed to the output if the
+                     scalar values of all of its points lie within the chosen range.
+                     When off, a cell will be added to the output if the specified
+                     scalar value for any of its points is within the chosen range.
       </Documentation>
       <InputProperty command="SetInputConnection"
                      name="Input">
