@@ -40,8 +40,8 @@ namespace ParaViewPython
 
 //---------------------------------------------------------------------------
 
-void ProcessArgsForPython(
-  std::vector<char*>& pythonArgs, const std::vector<std::string>& args, int argc, char** argv)
+void ProcessArgsForPython(std::vector<char*>& pythonArgs, const std::vector<std::string>& args,
+  int vtkNotUsed(argc), char** argv)
 {
   pythonArgs.clear();
 

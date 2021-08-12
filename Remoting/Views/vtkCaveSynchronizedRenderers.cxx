@@ -229,7 +229,6 @@ void vtkCaveSynchronizedRenderers::SetRenderer(vtkRenderer* renderer)
     return;
   }
 
-  auto config = vtkRemotingCoreConfiguration::GetInstance();
   auto displayConfig = vtkRemotingCoreConfiguration::GetInstance()->GetDisplayConfiguration();
   if (displayConfig->GetNumberOfDisplays() != 1)
   {

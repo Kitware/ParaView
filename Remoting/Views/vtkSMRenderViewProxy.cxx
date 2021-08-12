@@ -132,7 +132,7 @@ const char* vtkSMRenderViewProxy::IsSelectVisibleCellsAvailable()
   }
 
   vtkPVServerInformation* server_info = session->GetServerInformation();
-  if (server_info && server_info->GetIsInCave() > 0)
+  if (server_info && server_info->GetIsInCave())
   {
     return "Cannot support selection in CAVE mode.";
   }
