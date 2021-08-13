@@ -864,7 +864,7 @@ struct Process_5_9_to_5_10
       HandleExtractBlock(document) && HandleRepresentationBlockVisibility(document) &&
       HandleRepresentationBlockColor(document) && HandleRepresentationBlockOpacity(document) &&
       HandleSelectionQuerySource(document) && ConvertProbeLine(document) &&
-      HandleBackgroundColor(document);
+      HandleBackgroundColor(document) && HandleCalculatorParserType(document);
   }
 
   static std::string GetSelector(unsigned int cid)
@@ -1195,6 +1195,37 @@ struct Process_5_9_to_5_10
       elementNode = useColorPaletteForBackground.append_child("Element");
       elementNode.append_attribute("index").set_value(0);
       elementNode.append_attribute("value").set_value(0);
+    }
+
+    return true;
+  }
+
+  static bool HandleCalculatorParserType(xml_document& document)
+  {
+    // ParaView 5.10's Calculator has a new function parser that differs
+    // slightly in the syntax it supports that is enabled by default.
+    // For pre-5.10 state files, we switch back to the old function parser.
+
+    auto calculators = document.select_nodes("//ServerManagerState/Proxy[@group='filters'"
+                                             "and @type='Calculator']");
+
+    for (auto xnode : calculators)
+    {
+      auto proxyNode = xnode.node();
+      std::string idString(proxyNode.attribute("id").value());
+
+      // Insert FunctionParserTypeProperty XML
+      //<Property name="FunctionParserType" id="id.FunctionParserType" number_of_elements="1">
+      //  <Element index="0" value="0"/>
+      //</Property>
+      auto propertyNode = proxyNode.append_child("Property");
+      propertyNode.append_attribute("name").set_value("FunctionParserType");
+      std::string newIDString = idString + ".FunctionParserType";
+      propertyNode.append_attribute("id").set_value(newIDString.c_str());
+      propertyNode.append_attribute("number_of_elements").set_value("1");
+      auto elementNode = propertyNode.append_child("Element");
+      elementNode.append_attribute("index").set_value("0");
+      elementNode.append_attribute("value").set_value("0");
     }
 
     return true;

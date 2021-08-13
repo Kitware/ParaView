@@ -773,6 +773,7 @@ def getattr(proxy, pname):
             raise NotSupportedException(
                     "Since ParaView 5.10, '%s' is no longer supported. Use "
                     "'BackgroundColorMode' instead." % pname)
+
     raise Continue()
 
 def GetProxy(module, key, **kwargs):
@@ -816,7 +817,14 @@ def GetProxy(module, key, **kwargs):
             view = builtins.getattr(module, key)(**kwargs)
             view.UseColorPaletteForBackground = 0
             return view
-        print(key)
+        if key == "Calculator":
+            # In 5.10, we changed the array calculator's parser.
+            # This restores the previous calculator expression parser
+            # to handle syntax it supports.
+            calculator = builtins.getattr(module, key)(**kwargs)
+            calculator.FunctionParserType = 0
+            return calculator
+
     return builtins.getattr(module, key)(**kwargs)
 
 def lookupTableUpdate(lutName):
