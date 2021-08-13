@@ -71,6 +71,11 @@ protected Q_SLOTS:
   void updateVariableNames();
   void updateVariables(const QString& mode);
 
+  /**
+   * Update button labels based on which function parser is active.
+   */
+  void updateButtons();
+
 private:
   Q_DISABLE_COPY(pqCalculatorWidget)
 

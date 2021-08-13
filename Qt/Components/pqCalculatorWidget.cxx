@@ -121,6 +121,8 @@ pqCalculatorWidget::pqCalculatorWidget(
   // now when editing is finished, we will fire the changeFinished() signal.
   this->connect(this->Internals->Function, SIGNAL(textChangedAndEditingFinished()), this,
     SIGNAL(changeFinished()));
+
+  this->updateButtons();
 }
 
 //-----------------------------------------------------------------------------
@@ -256,5 +258,19 @@ void pqCalculatorWidget::updateVariables(const QString& mode)
         : std::string('\"' + std::string(arrayInfo->GetName()) + '\"').c_str();
       this->Internals->VectorsMenu->addAction(name);
     }
+  }
+}
+
+//-----------------------------------------------------------------------------
+void pqCalculatorWidget::updateButtons()
+{
+  vtkSMUncheckedPropertyHelper parserType(this->proxy(), "FunctionParserType");
+  if (parserType.GetAsInt() == 1)
+  {
+    this->Internals->dot->setText("dot");
+  }
+  else
+  {
+    this->Internals->dot->setText("v1.v2");
   }
 }
