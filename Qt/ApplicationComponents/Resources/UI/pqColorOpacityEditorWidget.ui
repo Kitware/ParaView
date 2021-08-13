@@ -246,7 +246,7 @@
       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;When checked, the control point of the opacity transfer fonction can be "drawn" instead of being placed one by one.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
      </property>
      <property name="text">
-      <string>Enable freehand drawing of opacity transfer function</string>
+      <string>Enable Freehand Drawing Of Opacity Transfer Function</string>
      </property>
     </widget>
    </item>
@@ -256,14 +256,14 @@
       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;When checked, the mapping from data to colors is done using a log-scale. Note that this does not affect the mapping of data to opacity.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
      </property>
      <property name="text">
-      <string>Use log scale when mapping data to colors</string>
+      <string>Use Log Scale When Mapping Data To Colors</string>
      </property>
     </widget>
    </item>
    <item>
     <widget class="QCheckBox" name="EnableOpacityMapping">
      <property name="text">
-      <string>Enable opacity mapping for surfaces</string>
+      <string>Enable Opacity Mapping For Surfaces</string>
      </property>
     </widget>
    </item>
@@ -273,7 +273,7 @@
       <bool>false</bool>
      </property>
      <property name="text">
-      <string>Use log scale when mapping data to opacity</string>
+      <string>Use Log Scale When Mapping Data To Opacity</string>
      </property>
     </widget>
    </item>
@@ -362,7 +362,7 @@
       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;When checked, a data histogram will be shown below the opacity function. Please update it by clicking on its dedicated button when needed.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
      </property>
      <property name="text">
-      <string>Display data histogram</string>
+      <string>Display Data Histogram</string>
      </property>
     </widget>
    </item>
@@ -381,7 +381,7 @@
      <item>
       <widget class="QLabel" name="label1">
        <property name="text">
-        <string>Number of bins:</string>
+        <string>Number of Bins:</string>
        </property>
       </widget>
      </item>
