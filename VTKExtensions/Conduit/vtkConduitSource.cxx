@@ -316,7 +316,6 @@ vtkSmartPointer<vtkDataSet> GetMesh(
       else
       {
         const auto cell_size = GetNumberOfPointsInCellType(vtk_cell_type);
-        conduit_cpp::Node connectivity = topologyNode["elements/connectivity"];
         auto cellArray = vtkConduitArrayUtilities::MCArrayToVTKCellArray(
           cell_size, conduit_cpp::c_node(&connectivity));
         ug->SetCells(vtk_cell_type, cellArray);

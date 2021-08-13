@@ -308,7 +308,7 @@ bool vtkInitializationHelper::Initialize(
     "ENV", fmt::arg("username", username), fmt::arg("hostname", hostname), fmt::arg("os", os));
 
   // push the GLOBAL argument scope which includes global arguments
-  std::string appVersion = PARAVIEW_VERSION_FULL != nullptr ? PARAVIEW_VERSION_FULL : undefined;
+  std::string appVersion = PARAVIEW_VERSION_FULL;
 
   vtkPVStringFormatter::PushScope("GLOBAL", fmt::arg("date", std::chrono::system_clock::now()),
     fmt::arg("appname", vtkInitializationHelper::ApplicationName),

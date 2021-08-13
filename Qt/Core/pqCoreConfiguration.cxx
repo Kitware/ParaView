@@ -71,15 +71,15 @@ bool pqCoreConfiguration::populateOptions(vtkCLIOptions* options)
       [this](const CLI::results_t& args) {
         if (this->TestScripts.empty())
         {
-          this->TestScripts.resize(args.size());
+          this->TestScripts.resize(static_cast<int>(args.size()));
         }
-        if (this->TestScripts.size() != args.size())
+        if (this->TestScripts.size() != static_cast<int>(args.size()))
         {
           return false;
         }
         for (size_t cc = 0; cc < args.size(); ++cc)
         {
-          this->TestScripts[cc].FileName = args[cc];
+          this->TestScripts[static_cast<int>(cc)].FileName = args[cc];
         }
         return true;
       },
@@ -92,15 +92,15 @@ bool pqCoreConfiguration::populateOptions(vtkCLIOptions* options)
       [this](const CLI::results_t& args) {
         if (this->TestScripts.empty())
         {
-          this->TestScripts.resize(args.size());
+          this->TestScripts.resize(static_cast<int>(args.size()));
         }
-        if (this->TestScripts.size() != args.size())
+        if (this->TestScripts.size() != static_cast<int>(args.size()))
         {
           return false;
         }
         for (size_t cc = 0; cc < args.size(); ++cc)
         {
-          this->TestScripts[cc].Baseline = args[cc];
+          this->TestScripts[static_cast<int>(cc)].Baseline = args[cc];
         }
         return true;
       },
@@ -113,15 +113,15 @@ bool pqCoreConfiguration::populateOptions(vtkCLIOptions* options)
       [this](const CLI::results_t& args) {
         if (this->TestScripts.empty())
         {
-          this->TestScripts.resize(args.size());
+          this->TestScripts.resize(static_cast<int>(args.size()));
         }
-        if (this->TestScripts.size() != args.size())
+        if (this->TestScripts.size() != static_cast<int>(args.size()))
         {
           return false;
         }
         for (size_t cc = 0; cc < args.size(); ++cc)
         {
-          this->TestScripts[cc].Threshold = std::atoi(args[cc].c_str());
+          this->TestScripts[static_cast<int>(cc)].Threshold = std::atoi(args[cc].c_str());
         }
         return true;
       },

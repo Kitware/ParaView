@@ -70,7 +70,6 @@ int vtkSliceAlongPolyPlane::RequestDataObject(
 {
   // If input is vtkCompositeDataSet, output will be a vtkMultiBlockDataSet
   // otherwise it will be a vtkPolyData.
-  vtkDataObject* inputDO = vtkDataObject::GetData(inputVector[0], 0);
   if (auto inputDT = vtkDataObjectTree::GetData(inputVector[0], 0))
   {
     auto output = vtkDataObject::GetData(outputVector, 0);

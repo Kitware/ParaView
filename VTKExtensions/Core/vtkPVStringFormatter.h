@@ -213,7 +213,7 @@ private:
   /**
    * Default case of an argument push to an argument scope.
    */
-  static void Push(vtkArgumentScope& scope) {}
+  static void Push(vtkArgumentScope& vtkNotUsed(scope)) {}
 
   /**
    * Push an argument into an argument scope.
@@ -228,7 +228,7 @@ private:
   /**
    * Default case of an argument push to an argument scope with a name.
    */
-  static void Push(vtkArgumentScope& scope, const char* scopeName) {}
+  static void Push(vtkArgumentScope& vtkNotUsed(scope), const char* vtkNotUsed(scopeName)) {}
 
   /**
    * Push an argument into an argument scope with a name.
