@@ -506,6 +506,14 @@ array.
         <Documentation>This property determines what array type to output.
         The default is a vtkDoubleArray.</Documentation>
       </IntVectorProperty>
+      <IntVectorProperty name="FunctionParserType"
+                         command="SetFunctionParserTypeFromInt"
+                         default_values="1"
+                         number_of_elements="1"
+                         panel_visibility="never">
+        <Documentation>Hidden property that specifies whether the old (ParaView 5.9 and before)
+        expression parser or new (ParaView 5.10) vtkPVLinearExtrusionFilter is used.</Documentation>
+      </IntVectorProperty>
       <!-- End Calculator -->
     </SourceProxy>
 
