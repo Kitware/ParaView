@@ -140,7 +140,7 @@ bool pqFileDialogEventPlayer::playEvent(
   }
   if (Command == "makeDir")
   {
-    return vtksys::SystemTools::MakeDirectory(fileString.toUtf8().toStdString());
+    return vtksys::SystemTools::MakeDirectory(fileString.toUtf8().toStdString()).IsSuccess();
   }
   if (!this->Superclass::playEvent(Object, Command, Arguments, Error))
   {

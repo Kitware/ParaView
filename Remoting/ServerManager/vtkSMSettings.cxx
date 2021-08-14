@@ -1150,8 +1150,8 @@ bool vtkSMSettings::SaveSettingsToFile(const std::string& filePath)
 
   // Get directory component of filePath and create it if it doesn't exist.
   std::string directory = vtksys::SystemTools::GetParentDirectory(filePath);
-  bool createdDirectory = vtksys::SystemTools::MakeDirectory(directory.c_str());
-  if (!createdDirectory)
+  vtksys::Status createdDirectory = vtksys::SystemTools::MakeDirectory(directory.c_str());
+  if (!createdDirectory.IsSuccess())
   {
     vtkWarningMacro(<< "Directory '" << directory << "' does not exist and could "
                     << "not be created.");

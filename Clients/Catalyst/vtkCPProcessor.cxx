@@ -161,7 +161,7 @@ int vtkCPProcessor::Initialize(const char* workingDirectory)
     int success = 1;
     if (controller == nullptr || controller->GetLocalProcessId() == 0)
     {
-      success = vtksys::SystemTools::MakeDirectory(workingDirectory) == true ? 1 : 0;
+      success = vtksys::SystemTools::MakeDirectory(workingDirectory).IsSuccess() ? 1 : 0;
       if (success == 0)
       {
         vtkWarningMacro("Could not make "
