@@ -33,6 +33,7 @@ set(classes
   vtkRemoteWriterHelper
   vtkPVCatalystChannelInformation
   vtkPVCatalystSessionCore
+  vtkPVDataMover
   vtkPVFilePathEncodingHelper
   vtkPVMultiClientsInformation
   vtkPVProxyDefinitionIterator

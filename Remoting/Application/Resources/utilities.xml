@@ -894,6 +894,24 @@
       <!-- end of FindDataHelper -->
     </Proxy>
 
+    <Proxy name="DataMover" class="vtkPVDataMover" processes="client|dataserver">
+      <Documentation>
+        Internal proxy used to implement "FetchData". Do not use directly. API may change
+        without warning.
+      </Documentation>
+      <ProxyProperty name="Producer" command="SetProducer" skip_valid_check="1"/>
+      <IntVectorProperty name="PortNumber" default_values="1"
+        number_of_elements="1" command="SetPortNumber" />
+      <IntVectorProperty name="GatherOnAllRanks" command="SetGatherOnAllRanks"
+        number_of_elements="1" default_values="0" />
+      <IntVectorProperty name="SourceRanks"
+        command="AddSourceRank"
+        clean_command="ClearAllSourceRanks"
+        number_of_elements_per_command="1"
+        repeat_command="1" />
+       <Property name="Execute" command="Execute" />
+    </Proxy>
+
     <!-- End of group "misc" -->
   </ProxyGroup>
 
