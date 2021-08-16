@@ -62,7 +62,7 @@ pqPythonTextArea::pqPythonTextArea(QWidget* parent)
   layout->setSpacing(0);
   this->setLayout(layout);
 
-  this->connect(this->TextEdit, &QTextEdit::cursorPositionChanged,
+  this->connect(this->TextEdit.data(), &QTextEdit::cursorPositionChanged,
     [this]() { this->LineNumberArea->update(); });
 
   this->connect(this->TextEdit->document(), &QTextDocument::blockCountChanged,
@@ -71,7 +71,7 @@ pqPythonTextArea::pqPythonTextArea(QWidget* parent)
   this->connect(this->TextEdit->verticalScrollBar(), &QScrollBar::valueChanged,
     [this](int) { this->LineNumberArea->update(); });
 
-  this->connect(this->TextEdit, &QTextEdit::textChanged, [this]() {
+  this->connect(this->TextEdit.data(), &QTextEdit::textChanged, [this]() {
     const QString text = this->TextEdit->toPlainText();
     const int cursorPosition = this->TextEdit->textCursor().position();
 
@@ -91,15 +91,19 @@ pqPythonTextArea::pqPythonTextArea(QWidget* parent)
     this->FileIO->contentChanged();
   });
 
+  this->connect(this->FileIO.data(), &pqPythonFileIO::fileSavedAsMacro, this,
+    &pqPythonTextArea::fileSavedAsMacro);
   this->connect(
-    this->FileIO, &pqPythonFileIO::fileSavedAsMacro, this, &pqPythonTextArea::fileSavedAsMacro);
-  this->connect(this->FileIO, &pqPythonFileIO::fileSaved, this, &pqPythonTextArea::fileSaved);
-  this->connect(this->FileIO, &pqPythonFileIO::fileOpened, this, &pqPythonTextArea::fileOpened);
-  this->connect(this->FileIO, &pqPythonFileIO::bufferErased, this, &pqPythonTextArea::bufferErased);
+    this->FileIO.data(), &pqPythonFileIO::fileSaved, this, &pqPythonTextArea::fileSaved);
   this->connect(
-    this->FileIO, &pqPythonFileIO::contentChanged, this, &pqPythonTextArea::contentChanged);
+    this->FileIO.data(), &pqPythonFileIO::fileOpened, this, &pqPythonTextArea::fileOpened);
+  this->connect(
+    this->FileIO.data(), &pqPythonFileIO::bufferErased, this, &pqPythonTextArea::bufferErased);
+  this->connect(
+    this->FileIO.data(), &pqPythonFileIO::contentChanged, this, &pqPythonTextArea::contentChanged);
 
-  this->connect(this->FileIO, &pqPythonFileIO::bufferErased, [this]() { this->UndoStack.clear(); });
+  this->connect(
+    this->FileIO.data(), &pqPythonFileIO::bufferErased, [this]() { this->UndoStack.clear(); });
 }
 
 //-----------------------------------------------------------------------------
