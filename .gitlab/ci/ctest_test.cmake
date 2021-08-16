@@ -56,11 +56,6 @@ if ("$ENV{CMAKE_CONFIGURATION}" MATCHES "fedora")
     "\\.VisItBridgeLAMMPSDump$"
     "\\.VisItBridgeLAMMPSDump2$"
 
-    # Invalid reading in parallel
-    # https://gitlab.kitware.com/paraview/paraview/-/issues/20713
-    "pvcs\\.VisItBridgeNek$"
-    "pvcrs\\.VisItBridgeNek$"
-
     # These have failed on buildbot before. Not sure what the cause is.
     "\\.TestPythonView$"
 
