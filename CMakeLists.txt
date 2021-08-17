@@ -442,6 +442,8 @@ else ()
   set(VTK_USE_CUDA "${PARAVIEW_USE_CUDA}")
   # Forward Memkind option to VTK.
   set(VTK_USE_MEMKIND "${PARAVIEW_USE_MEMKIND}")
+  # Forward OpenVDB option to VTK.
+  set(VTK_ENABLE_OPENVDB "${PARAVIEW_ENABLE_OPENVDB}")
 
   # Forward logging option to VTK.
   set(VTK_ENABLE_LOGGING ON)

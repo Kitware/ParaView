@@ -401,6 +401,11 @@ if (TARGET VTK::IOIoss)
     Resources/readers_ioioss.xml)
 endif()
 
+if (TARGET VTK::IOOpenVDB)
+  list(APPEND xml_files
+    Resources/writers_ioopenvdb.xml)
+endif()
+
 if (PARAVIEW_USE_PYTHON)
   list(APPEND xml_files
     Resources/readers_openpmd.xml)

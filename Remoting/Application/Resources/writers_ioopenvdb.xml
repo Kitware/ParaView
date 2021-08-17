@@ -1,0 +1,128 @@
+<ServerManagerConfiguration>
+  <ProxyGroup name="writers">
+
+    <!-- ================================================================= -->
+    <WriterProxy class="vtkOpenVDBWriter"
+                 name="OpenVDBWriter"
+                 supports_parallel="1">
+      <Documentation short_help="Write OpenVDB file.">Writer to
+      write an OpenVDB file."</Documentation>
+      <InputProperty command="SetInputConnection"
+                     panel_visibility="never"
+                     name="Input">
+        <DataTypeDomain composite_data_supported="0"
+                        name="input_type">
+          <DataType value="vtkImageData" />
+          <DataType value="vtkPointSet" />
+        </DataTypeDomain>
+        <Documentation>The input filter/source whose output dataset is to
+        written to the file.</Documentation>
+      </InputProperty>
+      <StringVectorProperty command="SetFileName"
+                            name="FileName"
+                            panel_visibility="never"
+                            number_of_elements="1">
+        <Documentation>The name of the file to be written.</Documentation>
+      </StringVectorProperty>
+      <IntVectorProperty command="SetWriteAllTimeSteps"
+                         default_values="0"
+                         name="WriteTimeSteps"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>When WriteTimeSteps is turned ON, the writer is
+        executed once for each timestep available from its input.</Documentation>
+      </IntVectorProperty>
+
+      <InputProperty name="DummyInput" panel_visibility="never">
+        <InputArrayDomain attribute_type="any" name="input_array" />
+      </InputProperty>
+
+      <IntVectorProperty name="EnableColoring"
+                         command="SetEnableColoring"
+                         number_of_elements="1"
+                         default_values="0">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Specify whether color information should be saved in the VDB file.
+          If enabled, the data source's array to color with from the active view will be used.
+        </Documentation>
+        <Hints>
+        <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="enabled_state"
+                                   property="LookupTable"
+                                   inverse="1"
+                                   value="null" />
+        </Hints>
+      </IntVectorProperty>
+      <IntVectorProperty name="EnableAlpha"
+                         command="SetEnableAlpha"
+                         number_of_elements="1"
+                         default_values="0">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Specify whether alpha channel information should be saved in the VDB file.
+          If enabled, the data source's transfer function from the active view will be used.
+          This property is disabled if EnableColoring isn't enabled.
+        </Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="enabled_state"
+                                   property="EnableColoring"
+                                   value="1" />
+        </Hints>
+      </IntVectorProperty>
+      <StringVectorProperty command="SetInputArrayToProcess"
+                            element_types="0 0 0 0 2"
+                            name="ColorArrayName"
+                            no_custom_default="1"
+                            number_of_elements="5">
+        <Documentation>
+          The array that will be used for saving color information when
+          **Enable Coloring** is ON.
+        </Documentation>
+        <ArrayListDomain name="array_list">
+          <RequiredProperties>
+            <Property function="Input" name="DummyInput" />
+          </RequiredProperties>
+        </ArrayListDomain>
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="EnableColoring"
+                                   value="-1" />
+          <!-- I am keeping this widget always hidden since I don't want the
+               user to be able to change the array in the Writer's dialog.
+               User should change the data's coloring properties in the active view
+               instead -->
+        </Hints>
+      </StringVectorProperty>
+      <ProxyProperty command="SetLookupTable" name="LookupTable" >
+        <Documentation>Set the lookup table to use for scalar
+        mapping.</Documentation>
+        <ProxyGroupDomain name="groups">
+          <Group name="lookup_tables" />
+        </ProxyGroupDomain>
+      </ProxyProperty>
+
+      <Hints>
+        <Property name="Input"
+                  show="0" />
+        <Property name="FileName"
+                  show="0" />
+        <Property name="WriteTimeSteps"
+                  show="1" />
+        <!-- We use the same helper for the OpenVDB writer as we do for the
+             PLY writer since both writers can optionally use the color and
+             opacity from the transfer function to output extra information
+             for later use. The PLY writer was the first to do this so we
+             just repurpose that helper class. -->
+        <InitializationHelper class="vtkSMPLYWriterProxyInitializationHelper" />
+
+       <WriterFactory extensions="vdb"
+                      file_description="OpenVDB File Format" />
+      </Hints>
+      <!-- End of OpenVDBWriter -->
+    </WriterProxy>
+
+  </ProxyGroup>
+</ServerManagerConfiguration>
