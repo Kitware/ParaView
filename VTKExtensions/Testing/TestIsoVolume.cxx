@@ -53,7 +53,9 @@ int main(int argc, char* argv[])
 
   vtkPVThresholdRefPtr pvt1(vtkPVThresholdRefPtr::New());
   pvt1->SetInputConnection(source1->GetOutputPort());
-  pvt1->ThresholdBetween(100, 150);
+  pvt1->SetThresholdFunction(vtkThreshold::THRESHOLD_BETWEEN);
+  pvt1->SetLowerThreshold(100.0);
+  pvt1->SetUpperThreshold(150.0);
   pvt1->Update();
 
   vtkDataSetSurfaceFilterRefPtr sf1(vtkDataSetSurfaceFilterRefPtr::New());

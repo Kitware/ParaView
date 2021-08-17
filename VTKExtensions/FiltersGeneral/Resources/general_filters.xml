@@ -2741,7 +2741,6 @@ Every Nth Point.
       </StringVectorProperty>
       <DoubleVectorProperty command="SetLowerThreshold"
                             default_values="0"
-                            label="Lower Threshold"
                             name="LowerThreshold"
                             number_of_elements="1">
         <ArrayRangeDomain name="range"
@@ -2768,7 +2767,6 @@ Every Nth Point.
       </DoubleVectorProperty>
       <DoubleVectorProperty command="SetUpperThreshold"
                             default_values="0"
-                            label="Upper Threshold"
                             name="UpperThreshold"
                             number_of_elements="1">
         <ArrayRangeDomain name="range"

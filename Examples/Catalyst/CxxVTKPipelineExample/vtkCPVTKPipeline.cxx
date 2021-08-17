@@ -109,7 +109,9 @@ int vtkCPVTKPipeline::CoProcess(vtkCPDataDescription* dataDescription)
   threshold->SetInputConnection(calculator->GetOutputPort());
   threshold->SetInputArrayToProcess(
     0, 0, 0, "vtkDataObject::FIELD_ASSOCIATION_POINTS", "velocity magnitude");
-  threshold->ThresholdBetween(0.9 * globalRange[1], globalRange[1]);
+  threshold->SetThresholdFunction(vtkThreshold::THRESHOLD_BETWEEN);
+  threshold->SetLowerThreshold(0.9 * globalRange[1]);
+  threshold->SetUpperThreshold(globalRange[1]);
 
   // If process 0 doesn't have any points or cells, the writer may
   // have problems in parallel so we use completeArrays to fill in

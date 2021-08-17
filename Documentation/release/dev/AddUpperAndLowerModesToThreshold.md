@@ -8,8 +8,4 @@ New thresholding methods have been added to the `Threshold` filter:
 
 Previously, it was only possible to threshold between two values.
 
-The Python API is also impacted given that the property `ThresholdBetween` has been removed. Instead, the following three properties have been added:
-
-- `SetLowerThreshold`: Accepts a double.
-- `SetUpperThreshold`: Accepts a double.
-- `SetThresholdFunction`: Accepts enumeration values `vtkThreshold.THRESHOLD_BETWEEN`, `vtkThreshold.THRESHOLD_LOWER` and `vtkThreshold.THRESHOLD_UPPER`.
+Accordingly, the property `ThresholdBetween` has been removed. Instead, the following three properties have been added: `LowerThreshold`, `UpperThreshold` and `ThresholdMethod`.

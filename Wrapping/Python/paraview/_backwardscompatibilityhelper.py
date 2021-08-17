@@ -397,8 +397,9 @@ def setattr(proxy, pname, value):
             raise NotSupportedException("The 'ThresholdRange' property has been "
                     "removed in ParaView 5.10. Please set the lower and upper "
                     "thresholds using the 'LowerThreshold' and 'UpperThreshold' "
-                    "properties, then set the 'ThresholdMethod' property to 0"
-                    "to threshold between the lower and upper thresholds.")
+                    "properties, then set the 'ThresholdMethod' property to "
+                    "'vtkThreshold.THRESHOLD_BETWEEN' to threshold between the "
+                    "lower and upper thresholds.")
 
     if not hasattr(proxy, pname):
         raise AttributeError()
@@ -800,8 +801,9 @@ def getattr(proxy, pname):
             raise NotSupportedException("The 'ThresholdRange' property has been "
                     "removed in ParaView 5.10. Please set the lower and upper "
                     "thresholds using the 'LowerThreshold' and 'UpperThreshold' "
-                    "properties, then set the 'ThresholdMethod' property to 0"
-                    "to threshold between the lower and upper thresholds.")
+                    "properties, then set the 'ThresholdMethod' property to "
+                    "'vtkThreshold.THRESHOLD_BETWEEN' to threshold between the "
+                    "lower and upper thresholds.")
 
     raise Continue()
 
