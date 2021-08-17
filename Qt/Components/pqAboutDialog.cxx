@@ -254,31 +254,37 @@ void pqAboutDialog::AddServerInformation(pqServer* server, QTreeWidget* tree)
     }
   }
 
-  vtkNew<vtkPVOpenGLInformation> OpenGLInfo;
-  session->GatherInformation(vtkPVSession::RENDER_SERVER, OpenGLInfo.GetPointer(), 0);
-  ::addItem(tree, "OpenGL Vendor", QString::fromStdString(OpenGLInfo->GetVendor()));
-  ::addItem(tree, "OpenGL Version", QString::fromStdString(OpenGLInfo->GetVersion()));
-  ::addItem(tree, "OpenGL Renderer", QString::fromStdString(OpenGLInfo->GetRenderer()));
-
   vtkNew<vtkPVRenderingCapabilitiesInformation> renInfo;
   session->GatherInformation(vtkPVSession::RENDER_SERVER, renInfo.GetPointer(), 0);
-
-  if (renInfo->Supports(vtkPVRenderingCapabilitiesInformation::HEADLESS_RENDERING))
+  if (renInfo->Supports(vtkPVRenderingCapabilitiesInformation::RENDERING))
   {
-    std::ostringstream headlessModes;
-    if (renInfo->Supports(vtkPVRenderingCapabilitiesInformation::HEADLESS_RENDERING_USES_EGL))
+    vtkNew<vtkPVOpenGLInformation> OpenGLInfo;
+    session->GatherInformation(vtkPVSession::RENDER_SERVER, OpenGLInfo.GetPointer(), 0);
+    ::addItem(tree, "OpenGL Vendor", QString::fromStdString(OpenGLInfo->GetVendor()));
+    ::addItem(tree, "OpenGL Version", QString::fromStdString(OpenGLInfo->GetVersion()));
+    ::addItem(tree, "OpenGL Renderer", QString::fromStdString(OpenGLInfo->GetRenderer()));
+
+    if (renInfo->Supports(vtkPVRenderingCapabilitiesInformation::HEADLESS_RENDERING))
     {
-      headlessModes << "EGL ";
+      std::ostringstream headlessModes;
+      if (renInfo->Supports(vtkPVRenderingCapabilitiesInformation::HEADLESS_RENDERING_USES_EGL))
+      {
+        headlessModes << "EGL ";
+      }
+      if (renInfo->Supports(vtkPVRenderingCapabilitiesInformation::HEADLESS_RENDERING_USES_OSMESA))
+      {
+        headlessModes << "OSMesa";
+      }
+      ::addItem(tree, "Headless support", QString::fromStdString(headlessModes.str()));
     }
-    if (renInfo->Supports(vtkPVRenderingCapabilitiesInformation::HEADLESS_RENDERING_USES_OSMESA))
+    else
     {
-      headlessModes << "OSMesa";
+      ::addItem(tree, "Headless support", "None");
     }
-    ::addItem(tree, "Headless support", QString::fromStdString(headlessModes.str()));
   }
   else
   {
-    ::addItem(tree, "Headless support", "None");
+    ::addItem(tree, "OpenGL", "Not supported");
   }
 }
 
