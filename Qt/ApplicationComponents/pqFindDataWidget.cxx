@@ -393,14 +393,15 @@ void pqFindDataWidget::setServer(pqServer* aserver)
   proxy->FastDelete();
 
   // enable buttons on modification.
-  QObject::connect(internals.ProxyWidget, &pqProxyWidget::changeAvailable, [&internals, proxy]() {
-    vtkSMUncheckedPropertyHelper helper(proxy, "Input");
-    const bool hasInput = (helper.GetAsProxy(0) != nullptr);
-    internals.Ui.findData->setEnabled(hasInput);
+  QObject::connect(
+    internals.ProxyWidget.data(), &pqProxyWidget::changeAvailable, [&internals, proxy]() {
+      vtkSMUncheckedPropertyHelper helper(proxy, "Input");
+      const bool hasInput = (helper.GetAsProxy(0) != nullptr);
+      internals.Ui.findData->setEnabled(hasInput);
 
-    internals.Ui.reset->setEnabled(true);
-    internals.Ui.clear->setEnabled(true);
-  });
+      internals.Ui.reset->setEnabled(true);
+      internals.Ui.clear->setEnabled(true);
+    });
 }
 
 //-----------------------------------------------------------------------------
