@@ -168,6 +168,9 @@ vtkPVGeometryFilter::vtkPVGeometryFilter()
   this->NonlinearSubdivisionLevel = 1;
 
   this->DataSetSurfaceFilter = vtkDataSetSurfaceFilter::New();
+  // we're prepping geometry for rendering
+  // fast mode is adequate.
+  this->DataSetSurfaceFilter->SetFastMode(true);
   this->GenericGeometryFilter = vtkGenericGeometryFilter::New();
   this->UnstructuredGridGeometryFilter = vtkUnstructuredGridGeometryFilter::New();
   this->RecoverWireframeFilter = vtkPVRecoverGeometryWireframe::New();
