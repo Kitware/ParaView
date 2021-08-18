@@ -510,8 +510,24 @@ bool pqSelectionQueryPropertyWidget::pqQueryWidget::populateTerms(vtkSMProperty*
     for (int cc = 0, max = attrInfo->GetNumberOfArrays(); cc < max; ++cc)
     {
       auto arrayInfo = attrInfo->GetArrayInformation(cc);
-      this->addTerm(icon, arrayInfo->GetName(), TermType::ARRAY,
-        vtkSMCoreUtilities::SanitizeName(arrayInfo->GetName()).c_str());
+      const int numComponents = arrayInfo->GetNumberOfComponents();
+      const char* arrayName = arrayInfo->GetName();
+      const std::string sanitizedArrayName = vtkSMCoreUtilities::SanitizeName(arrayName);
+      if (numComponents == 1)
+      {
+        this->addTerm(icon, arrayName, TermType::ARRAY, sanitizedArrayName.c_str());
+      }
+      else if (numComponents > 1)
+      {
+        this->addTerm(icon, QString("%1 (magnitude)").arg(arrayName), TermType::ARRAY,
+          QString("mag(%1)").arg(sanitizedArrayName.c_str()));
+        for (int comp = 0; comp < numComponents; ++comp)
+        {
+          this->addTerm(icon,
+            QString("%1 (%2)").arg(arrayName).arg(arrayInfo->GetComponentName(comp)),
+            TermType::ARRAY, QString("%1[:,%2]").arg(sanitizedArrayName.c_str()).arg(comp));
+        }
+      }
     }
 
     if (elementType == vtkDataObject::POINT)
