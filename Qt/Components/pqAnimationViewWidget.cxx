@@ -765,6 +765,12 @@ void pqAnimationViewWidget::updatePlayMode()
 
   if (mode == "Real Time")
   {
+    QString promptMessage(
+      "'Real time' mode is deprecated and maybe removed in a near future.\n Prefer 'Snap to "
+      "Timestep' or 'Sequence' if you need to interpolate between existing timesteps.");
+    pqCoreUtilities::promptUser("pqAnimationViewWidget::updatePlayMode", QMessageBox::Warning,
+      "Real Time mode is deprecated.", promptMessage, QMessageBox::Ok | QMessageBox::Save);
+
     animModel->setMode(pqAnimationModel::Real);
 
     this->Internal->Stride->setVisible(false);
