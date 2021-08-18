@@ -353,7 +353,8 @@ public:
   {
     vtkSMProxyManager::RegisteredProxyInformation* info =
       static_cast<vtkSMProxyManager::RegisteredProxyInformation*>(data);
-    if (strcmp(info->GroupName, "materials") == 0)
+    if (info->Type == vtkSMProxyManager::RegisteredProxyInformation::PROXY && info->GroupName &&
+      strcmp(info->GroupName, "materials") == 0)
     {
       vtkPVMaterial::SafeDownCast(info->Proxy->GetClientSideObject())
         ->SetLibrary(this->Editor->materialLibrary());
