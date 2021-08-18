@@ -1378,15 +1378,7 @@ void vtkPVGeometryFilter::StructuredGridExecute(vtkStructuredGrid* input, vtkPol
   {
     if (input->GetNumberOfCells() > 0)
     {
-      if (input->HasAnyBlankCells())
-      {
-        this->DataSetSurfaceFilter->StructuredWithBlankingExecute(input, output);
-      }
-      else
-      {
-        this->DataSetSurfaceFilter->StructuredExecute(
-          input, output, input->GetExtent(), wholeExtent);
-      }
+      this->DataSetSurfaceFilter->StructuredExecute(input, output, input->GetExtent(), wholeExtent);
     }
     this->OutlineFlag = 0;
     return;
