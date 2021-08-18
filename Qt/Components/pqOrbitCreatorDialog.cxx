@@ -64,9 +64,19 @@ pqOrbitCreatorDialog::pqOrbitCreatorDialog(QWidget* parentObject)
   this->Internals->origin1->setValidator(new QDoubleValidator(this));
   this->Internals->origin2->setValidator(new QDoubleValidator(this));
 
-  QObject::connect(this->Internals->resetBounds, SIGNAL(clicked()), this, SLOT(resetBounds()));
+  QObject::connect(this->Internals->resetCenter, SIGNAL(clicked()), this, SLOT(resetCenter()));
 
-  this->resetBounds();
+  this->Internals->normal0->setText("0");
+  this->Internals->normal1->setText("1");
+  this->Internals->normal2->setText("0");
+  this->Internals->origin0->setText("0");
+  this->Internals->origin1->setText("0");
+  this->Internals->origin2->setText("10");
+  this->Internals->center0->setText("0");
+  this->Internals->center1->setText("0");
+  this->Internals->center2->setText("0");
+
+  this->resetCenter();
 }
 
 //-----------------------------------------------------------------------------
@@ -98,7 +108,7 @@ void pqOrbitCreatorDialog::setCenter(double xyz[3])
 }
 
 //-----------------------------------------------------------------------------
-void pqOrbitCreatorDialog::resetBounds()
+void pqOrbitCreatorDialog::resetCenter()
 {
   double input_bounds[6];
   vtkSMProxySelectionModel* selModel =
@@ -109,16 +119,9 @@ void pqOrbitCreatorDialog::resetBounds()
     box.SetBounds(input_bounds);
     double box_center[3];
     box.GetCenter(box_center);
-    box.Scale(5, 5, 5);
     this->Internals->center0->setText(QString::number(box_center[0]));
     this->Internals->center1->setText(QString::number(box_center[1]));
     this->Internals->center2->setText(QString::number(box_center[2]));
-    this->Internals->normal0->setText("0");
-    this->Internals->normal1->setText("1");
-    this->Internals->normal2->setText("0");
-    this->Internals->origin0->setText("0");
-    this->Internals->origin1->setText("0");
-    this->Internals->origin2->setText("10");
   }
 }
 

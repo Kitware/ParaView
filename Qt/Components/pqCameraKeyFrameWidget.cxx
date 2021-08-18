@@ -35,6 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqActiveObjects.h"
 #include "pqApplicationCore.h"
 #include "pqProxyWidget.h"
+#include "pqSMAdaptor.h"
 #include "pqServer.h"
 #include "vtkCamera.h"
 #include "vtkPVSession.h"
@@ -185,6 +186,7 @@ pqCameraKeyFrameWidget::pqCameraKeyFrameWidget(QWidget* parentObject)
 
   this->Internal->PSplineProxy.TakeReference(pxm->NewProxy("parametric_functions", "Spline"));
   this->Internal->PSplineProxy->SetLocation(vtkPVSession::CLIENT);
+  vtkSMPropertyHelper(this->Internal->PSplineProxy, "Closed").Set(1);
   this->Internal->PSplineProxy->UpdateVTKObjects();
 
   this->Internal->PSplineWidget = new pqProxyWidget(this->Internal->PSplineProxy, this);
@@ -227,6 +229,38 @@ void pqCameraKeyFrameWidget::setUsePathBasedMode(bool use_paths)
 bool pqCameraKeyFrameWidget::usePathBasedMode() const
 {
   return (this->Internal->stackedWidgetMode->currentIndex() == 0);
+}
+
+//-----------------------------------------------------------------------------
+void pqCameraKeyFrameWidget::setPositionPoints(const std::vector<double>& positions)
+{
+  this->Internal->setPosition(positions.data());
+
+  QList<QVariant> varPos;
+  for (auto pos : positions)
+  {
+    varPos << pos;
+  }
+  pqSMAdaptor::setMultipleElementProperty(
+    this->Internal->PSplineProxy->GetProperty("Points"), varPos);
+
+  this->Internal->PSplineProxy->UpdateVTKObjects();
+}
+
+//-----------------------------------------------------------------------------
+void pqCameraKeyFrameWidget::setFocalPoints(const std::vector<double>& focals)
+{
+  this->Internal->setFocalPoint(focals.data());
+
+  QList<QVariant> varFocus;
+  for (auto focus : focals)
+  {
+    varFocus << focus;
+  }
+  pqSMAdaptor::setMultipleElementProperty(
+    this->Internal->FSplineProxy->GetProperty("FocalPoints"), varFocus);
+
+  this->Internal->FSplineProxy->UpdateVTKObjects();
 }
 
 //-----------------------------------------------------------------------------

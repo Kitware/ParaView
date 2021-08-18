@@ -61,7 +61,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqComboBoxDomain.h"
 #include "pqCoreUtilities.h"
 #include "pqKeyFrameEditor.h"
-#include "pqOrbitCreatorDialog.h"
 #include "pqPipelineTimeKeyFrameEditor.h"
 #include "pqPropertyLinks.h"
 #include "pqRenderView.h"
@@ -972,7 +971,6 @@ void pqAnimationViewWidget::setCurrentProxy(vtkSMProxy* pxy)
     this->Internal->CreateProperty->setSourceWithoutProperties(pxy);
     // add camera animation modes as properties for creating the camera
     // animation track.
-    this->Internal->CreateProperty->addSMProperty("Orbit", "orbit", 0);
     this->Internal->CreateProperty->addSMProperty("Follow Path", "path", 0);
     this->Internal->CreateProperty->addSMProperty("Follow Data", "data", 0);
     this->Internal->CreateProperty->addSMProperty(
@@ -1033,20 +1031,6 @@ void pqAnimationViewWidget::createTrack()
     }
   }
 
-  pqOrbitCreatorDialog creator(this);
-
-  // if mode=="orbit" show up a dialog allowing the user to customize the
-  // orbit.
-  if (ren && mode == "orbit")
-  {
-    creator.setNormal(ren->GetActiveCamera()->GetViewUp());
-    creator.setOrigin(ren->GetActiveCamera()->GetPosition());
-    if (creator.exec() != QDialog::Accepted)
-    {
-      return;
-    }
-  }
-
   BEGIN_UNDO_SET("Add Animation Track");
 
   // This will create the cue and initialize it with default keyframes.
@@ -1057,7 +1041,7 @@ void pqAnimationViewWidget::createTrack()
 
   if (ren)
   {
-    if (mode == "path" || mode == "orbit")
+    if (mode == "path")
     {
       // Setup default animation to revolve around the selected objects (if any)
       // in a plane normal to the current view-up vector.
@@ -1086,18 +1070,6 @@ void pqAnimationViewWidget::createTrack()
         cue->getProxy()->GetProperty("Interpolation"), (mode == "camera") ? 1 : 0);
     }
     cue->getProxy()->UpdateVTKObjects();
-
-    if (mode == "orbit")
-    {
-      // update key frame parameters based on the orbit points.
-      vtkSMProxy* kf = cue->getKeyFrame(0);
-      SM_SCOPED_TRACE(PropertiesModified).arg(kf);
-      pqSMAdaptor::setMultipleElementProperty(
-        kf->GetProperty("PositionPathPoints"), creator.orbitPoints(7));
-      pqSMAdaptor::setMultipleElementProperty(kf->GetProperty("FocalPathPoints"), creator.center());
-      pqSMAdaptor::setElementProperty(kf->GetProperty("ClosedPositionPath"), 1);
-      kf->UpdateVTKObjects();
-    }
   }
 
   END_UNDO_SET();

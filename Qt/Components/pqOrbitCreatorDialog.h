@@ -67,7 +67,7 @@ public:
   void setOrigin(double xyz[3]);
 
 protected Q_SLOTS:
-  void resetBounds();
+  void resetCenter();
 
 private:
   Q_DISABLE_COPY(pqOrbitCreatorDialog)
