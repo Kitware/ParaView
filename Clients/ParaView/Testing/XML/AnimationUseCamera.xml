@@ -24,5 +24,10 @@
   <pqevent object="1QDialog0/pqKeyFrameEditor/tableView" command="edit" arguments="0.1" />
   <pqevent object="1QDialog0/pqKeyFrameEditor/tableView/qt_scrollarea_viewport/1pqKeyFrameEditorDialog0/1QWidget0/CameraKeyFrameWidget/stackedWidgetMode/page_5/updateCurrent" command="activate" arguments="" />
   <pqevent object="1QDialog0/pqKeyFrameEditor/tableView/qt_scrollarea_viewport/1pqKeyFrameEditorDialog0/1QDialogButtonBox0/1QPushButton0" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/cameraToolbar/actionRotate90degCW" command="activate" arguments="" />
+  <pqevent object="1QDialog0/pqKeyFrameEditor/tableView" command="setCurrent" arguments="1.1" />
+  <pqevent object="1QDialog0/pqKeyFrameEditor/pbUseCurrentCamera" command="activate" arguments="" />
+  <pqevent object="1QDialog0/pqKeyFrameEditor/tableView" command="setCurrent" arguments="0.1" />
+  <pqevent object="1QDialog0/pqKeyFrameEditor/pbApplyToCamera" command="activate" arguments="" />
   <pqevent object="1QDialog0/1QDialogButtonBox0/1QPushButton0" command="activate" arguments="" />
 </pqevents>

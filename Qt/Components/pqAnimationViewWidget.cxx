@@ -175,6 +175,13 @@ public:
   {
     if (this->cameraCue(cue))
     {
+      vtkSMProxy* pxy = cue->getAnimatedProxy();
+      pqServerManagerModel* model = pqApplicationCore::instance()->getServerManagerModel();
+      if (pqProxy* animation_pqproxy = model->findItem<pqProxy*>(pxy))
+      {
+        return QString("Camera - %1").arg(animation_pqproxy->getSMName());
+      }
+
       return "Camera";
     }
     else if (this->pythonCue(cue))
@@ -735,7 +742,14 @@ void pqAnimationViewWidget::trackSelected(pqAnimationTrack* track)
 
       l->addWidget(editor);
 
+      auto apply = buttons->addButton(QDialogButtonBox::Apply);
+
       connect(this->Internal->Editor, SIGNAL(accepted()), editor, SLOT(writeKeyFrameData()));
+      QObject::connect(apply, &QPushButton::clicked, editor, &pqKeyFrameEditor::writeKeyFrameData);
+
+      QObject::connect(apply, &QPushButton::clicked, [=]() { apply->setEnabled(false); });
+      QObject::connect(editor, &pqKeyFrameEditor::modified, [=]() { apply->setEnabled(true); });
+
       this->Internal->Editor->setWindowTitle(tr("Animation Keyframes"));
       this->Internal->Editor->resize(600, 400);
     }

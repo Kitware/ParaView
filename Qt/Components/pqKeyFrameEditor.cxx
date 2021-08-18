@@ -404,6 +404,10 @@ pqKeyFrameEditor::pqKeyFrameEditor(
   connect(this->Internal->Ui.pbNew, SIGNAL(clicked(bool)), this, SLOT(newKeyFrame()));
   connect(this->Internal->Ui.pbDelete, SIGNAL(clicked(bool)), this, SLOT(deleteKeyFrame()));
   connect(this->Internal->Ui.pbDeleteAll, SIGNAL(clicked(bool)), this, SLOT(deleteAllKeyFrames()));
+  connect(this->Internal->Ui.pbUseCurrentCamera, SIGNAL(clicked(bool)), this,
+    SLOT(useCurrentCameraForSelected()));
+  connect(this->Internal->Ui.pbApplyToCamera, SIGNAL(clicked(bool)), this,
+    SLOT(updateCurrentCameraWithSelected()));
 
   if (label != QString())
   {
@@ -415,6 +419,22 @@ pqKeyFrameEditor::pqKeyFrameEditor(
   }
 
   this->readKeyFrameData();
+
+  this->Internal->Ui.pbUseCurrentCamera->hide();
+  this->Internal->Ui.pbApplyToCamera->hide();
+  if (this->Internal->cameraCue())
+  {
+    bool pathBased = pqSMAdaptor::getEnumerationProperty(
+                       this->Internal->Cue->getProxy()->GetProperty("Mode")) == "Path-based";
+    if (!pathBased)
+    {
+      this->Internal->Ui.pbUseCurrentCamera->show();
+      this->Internal->Ui.pbApplyToCamera->show();
+    }
+  }
+
+  QObject::connect(
+    &this->Internal->Model, &QStandardItemModel::itemChanged, this, &pqKeyFrameEditor::modified);
 }
 
 //-----------------------------------------------------------------------------
@@ -667,26 +687,57 @@ void pqKeyFrameEditor::deleteAllKeyFrames()
 }
 
 //-----------------------------------------------------------------------------
-void pqKeyFrameEditor::useCurrentCamera(QObject* o)
+void pqKeyFrameEditor::useCurrentCamera(QStandardItem* item)
 {
-  pqCameraKeyFrameItem* item = static_cast<pqCameraKeyFrameItem*>(o);
+  pqCameraKeyFrameItem* cameraItem = dynamic_cast<pqCameraKeyFrameItem*>(item);
+
+  if (!cameraItem)
+  {
+    return;
+  }
 
   vtkSMProxy* pxy = this->Internal->Cue->getAnimatedProxy();
 
   vtkSMRenderViewProxy* ren = vtkSMRenderViewProxy::SafeDownCast(pxy);
   ren->SynchronizeCameraProperties();
-  item->CamWidget.initializeUsingCamera(ren->GetActiveCamera());
+  cameraItem->CamWidget.initializeUsingCamera(ren->GetActiveCamera());
 }
 
 //-----------------------------------------------------------------------------
-void pqKeyFrameEditor::updateCurrentCamera(QObject* o)
+void pqKeyFrameEditor::useCurrentCameraForSelected()
 {
-  pqCameraKeyFrameItem* item = static_cast<pqCameraKeyFrameItem*>(o);
+  QModelIndex index = this->Internal->Ui.tableView->selectionModel()->currentIndex();
+
+  const QStandardItemModel* model = qobject_cast<const QStandardItemModel*>(index.model());
+  QStandardItem* item = model->item(index.row(), 1);
+
+  this->useCurrentCamera(item);
+}
+
+//-----------------------------------------------------------------------------
+void pqKeyFrameEditor::updateCurrentCamera(QStandardItem* item)
+{
+  pqCameraKeyFrameItem* cameraItem = dynamic_cast<pqCameraKeyFrameItem*>(item);
+  if (!cameraItem)
+  {
+    return;
+  }
 
   vtkSMProxy* pxy = this->Internal->Cue->getAnimatedProxy();
 
   vtkSMRenderViewProxy* ren = vtkSMRenderViewProxy::SafeDownCast(pxy);
   ren->SynchronizeCameraProperties();
-  item->CamWidget.applyToCamera(ren->GetActiveCamera());
+  cameraItem->CamWidget.applyToCamera(ren->GetActiveCamera());
   ren->StillRender();
+}
+
+//-----------------------------------------------------------------------------
+void pqKeyFrameEditor::updateCurrentCameraWithSelected()
+{
+  QModelIndex index = this->Internal->Ui.tableView->selectionModel()->currentIndex();
+
+  const QStandardItemModel* model = qobject_cast<const QStandardItemModel*>(index.model());
+  QStandardItem* item = model->item(index.row(), 1);
+
+  this->updateCurrentCamera(item);
 }
