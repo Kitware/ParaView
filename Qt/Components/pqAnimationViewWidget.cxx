@@ -973,10 +973,7 @@ void pqAnimationViewWidget::setCurrentProxy(vtkSMProxy* pxy)
     // animation track.
     this->Internal->CreateProperty->addSMProperty("Follow Path", "path", 0);
     this->Internal->CreateProperty->addSMProperty("Follow Data", "data", 0);
-    this->Internal->CreateProperty->addSMProperty(
-      "Interpolate camera locations (spline)", "camera", 0);
-    this->Internal->CreateProperty->addSMProperty(
-      "Interpolate camera locations (linear)", "linearCamera", 0);
+    this->Internal->CreateProperty->addSMProperty("Interpolate cameras", "camera", 0);
   }
   else
   {
@@ -1066,8 +1063,7 @@ void pqAnimationViewWidget::createTrack()
       pqSMAdaptor::setElementProperty(
         cue->getProxy()->GetProperty("Mode"), 0); // non-PATH-based animation.
 
-      pqSMAdaptor::setElementProperty(
-        cue->getProxy()->GetProperty("Interpolation"), (mode == "camera") ? 1 : 0);
+      pqSMAdaptor::setElementProperty(cue->getProxy()->GetProperty("Interpolation"), 1);
     }
     cue->getProxy()->UpdateVTKObjects();
   }

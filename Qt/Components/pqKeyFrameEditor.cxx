@@ -416,6 +416,7 @@ pqKeyFrameEditor::pqKeyFrameEditor(
     SLOT(useCurrentCameraForSelected()));
   connect(this->Internal->Ui.pbApplyToCamera, SIGNAL(clicked(bool)), this,
     SLOT(updateCurrentCameraWithSelected()));
+  connect(this->Internal->Ui.pbUseSpline, SIGNAL(clicked(bool)), this, SLOT(updateSplineMode()));
 
   connect(this->Internal->Ui.tableView->selectionModel(),
     SIGNAL(currentChanged(const QModelIndex&, const QModelIndex&)), this, SLOT(updateButtons()));
@@ -713,10 +714,15 @@ void pqKeyFrameEditor::updateButtons()
   this->Internal->Ui.pbUseCurrentCamera->setEnabled(index.isValid());
   this->Internal->Ui.pbApplyToCamera->setEnabled(index.isValid());
 
-  int useSpline =
-    pqSMAdaptor::getElementProperty(this->Internal->Cue->getProxy()->GetProperty("Interpolation"))
-      .toInt();
-  this->Internal->Ui.pbUseSpline->setChecked(useSpline == 1);
+  QStandardItem* item = this->Internal->Model.item(0, 1);
+  pqCameraKeyFrameItem* cameraItem = dynamic_cast<pqCameraKeyFrameItem*>(item);
+  if (cameraItem)
+  {
+    int useSpline =
+      pqSMAdaptor::getElementProperty(this->Internal->Cue->getProxy()->GetProperty("Interpolation"))
+        .toInt();
+    this->Internal->Ui.pbUseSpline->setChecked(useSpline == 1);
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -827,5 +833,15 @@ void pqKeyFrameEditor::createOrbitalKeyFrame()
   camItem->CamWidget.setPositionPoints(pos);
 
   this->Internal->Cue->triggerKeyFramesModified();
+  this->Internal->Cue->getProxy()->UpdateVTKObjects();
+}
+
+//-----------------------------------------------------------------------------
+void pqKeyFrameEditor::updateSplineMode()
+{
+  assert(this->Internal->cameraCue());
+  bool useSpline = this->Internal->Ui.pbUseSpline->isChecked();
+  pqSMAdaptor::setElementProperty(
+    this->Internal->Cue->getProxy()->GetProperty("Interpolation"), useSpline ? 1 : 0);
   this->Internal->Cue->getProxy()->UpdateVTKObjects();
 }
