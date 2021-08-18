@@ -525,6 +525,30 @@
         </Documentation>
       </IntVectorProperty>
 
+      <IntVectorProperty name="FileRange"
+        command="SetFileRange"
+        number_of_elements="2"
+        default_values="0 -1"
+        panel_visibility="advanced">
+        <Documentation>
+          To limit reading a subset of files in spatial file-series,
+          specify a valid range. You may also use **FileStride** to step over
+          files in this range.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="FileStride"
+        command="SetFileStride"
+        number_of_elements="1"
+        default_values="1"
+        panel_visibility="advanced">
+        <IntRangeDomain name="range" min="1" max="100" />
+        <Documentation>
+          Specify the stride to use when reading a subset of files
+          as dictated by the **FileRange**.
+        </Documentation>
+      </IntVectorProperty>
+
       <IntVectorProperty command="SetApplyDisplacements"
                          default_values="1"
                          name="ApplyDisplacements"
@@ -536,6 +560,7 @@
           can explicitly add them by applying a warp filter.
         </Documentation>
       </IntVectorProperty>
+
 
       <IntVectorProperty name="RemoveUnusedPoints"
         command="SetRemoveUnusedPoints"
@@ -637,8 +662,13 @@
         <Property name="SideSetFields" />
       </PropertyGroup>
 
-      <PropertyGroup label="Miscellaneous">
+      <PropertyGroup label="Files">
         <Property name="ScanForRelatedFiles" />
+        <Property name="FileRange" />
+        <Property name="FileStride" />
+      </PropertyGroup>
+
+      <PropertyGroup label="Miscellaneous">
         <Property name="ApplyDisplacements" />
         <Property name="RemoveUnusedPoints" />
         <Property name="GenerateFileId" />
