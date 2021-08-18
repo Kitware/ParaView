@@ -116,8 +116,8 @@ protected:
   /**
    * An utility method to execute a command using a QProcess
    */
-  bool processCommand(
-    QString command, double timeout, double delay, const QProcessEnvironment* options = nullptr);
+  bool processCommand(QString command, double processWait, double delay,
+    const QProcessEnvironment* options = nullptr);
 
   virtual bool connectToPrelaunchedServer();
 

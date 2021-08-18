@@ -366,10 +366,8 @@ void pqServerConfiguration::parseSshPortForwardingXML()
 }
 
 //-----------------------------------------------------------------------------
-QString pqServerConfiguration::command(double& timeout, double& delay) const
+QString pqServerConfiguration::command(double& processWait, double& delay) const
 {
-  timeout = 0;
-  delay = 0;
   if (this->startupType() != COMMAND)
   {
     return QString();
@@ -379,7 +377,7 @@ QString pqServerConfiguration::command(double& timeout, double& delay) const
   QTextStream stream(&reply);
 
   // Recover exec command
-  QString execCommand = this->execCommand(timeout, delay);
+  QString execCommand = this->execCommand(processWait, delay);
 
   if (this->SSHCommand)
   {
@@ -535,10 +533,8 @@ QString pqServerConfiguration::sshFullCommand(
 }
 
 //-----------------------------------------------------------------------------
-QString pqServerConfiguration::execCommand(double& timeout, double& delay) const
+QString pqServerConfiguration::execCommand(double& processWait, double& delay) const
 {
-  timeout = 0;
-  delay = 0;
   if (this->startupType() != COMMAND)
   {
     return QString();
@@ -563,7 +559,16 @@ QString pqServerConfiguration::execCommand(double& timeout, double& delay) const
   QString reply;
   QTextStream stream(&reply);
 
-  commandXML->GetScalarAttribute("timeout", &timeout);
+  processWait = 0;
+  delay = 0;
+
+  if (commandXML->GetScalarAttribute("timeout", &processWait))
+  {
+    qWarning("timeout attribute in Command and SSHCommand element has been deprecated, please use "
+             "process_wait attribute instead");
+  }
+
+  commandXML->GetScalarAttribute("process_wait", &processWait);
   commandXML->GetScalarAttribute("delay", &delay);
 
   stream << commandXML->GetAttributeOrDefault("exec", "");
@@ -608,7 +613,7 @@ void pqServerConfiguration::setStartupToManual()
 
 //-----------------------------------------------------------------------------
 void pqServerConfiguration::setStartupToCommand(
-  double timeout, double delay, const QString& command_str)
+  double processWait, double delay, const QString& command_str)
 {
   // we try to preserve any existing options.
   vtkPVXMLElement* startupElement = this->startupXML();
@@ -638,7 +643,7 @@ void pqServerConfiguration::setStartupToCommand(
   assert(commandList.size() >= 1);
 
   xmlCommand->SetAttribute("exec", commandList[0].toUtf8().data());
-  xmlCommand->SetAttribute("timeout", QString::number(timeout).toUtf8().data());
+  xmlCommand->SetAttribute("process_wait", QString::number(processWait).toUtf8().data());
   xmlCommand->SetAttribute("delay", QString::number(delay).toUtf8().data());
 
   vtkPVXMLElement* oldArguments = xmlCommand->FindNestedElementByName("Arguments");

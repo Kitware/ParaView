@@ -722,8 +722,8 @@ void pqServerLauncher::launchServerForReverseConnection()
 bool pqServerLauncher::launchServer(bool show_status_dialog)
 {
   // We need launch the server.
-  double timeout, delay;
-  QString command = this->Internals->Configuration.command(timeout, delay);
+  double processWait, delay;
+  QString command = this->Internals->Configuration.command(processWait, delay);
   if (command.isEmpty())
   {
     qCritical() << "Could not determine command to launch the server.";
@@ -755,12 +755,12 @@ bool pqServerLauncher::launchServer(bool show_status_dialog)
     command.replace(before, after);
   }
 
-  return this->processCommand(command, timeout, delay, &this->Internals->Options);
+  return this->processCommand(command, processWait, delay, &this->Internals->Options);
 }
 
 //-----------------------------------------------------------------------------
 bool pqServerLauncher::processCommand(
-  QString command, double timeout, double delay, const QProcessEnvironment* options)
+  QString command, double processWait, double delay, const QProcessEnvironment* options)
 {
   QProcess* process = new QProcess(pqApplicationCore::instance());
 
@@ -779,7 +779,8 @@ bool pqServerLauncher::processCommand(
   // wait for process to start.
   // waitForStarted() may block until the process starts. That is generally a short
   // span of time, hence we don't worry about it too much.
-  if (process->waitForStarted(timeout > 0. ? static_cast<int>(timeout * 1000.) : -1) == false)
+  if (process->waitForStarted(processWait > 0. ? static_cast<int>(processWait * 1000.) : -1) ==
+    false)
   {
     qCritical() << "Command launch timed out.";
     process->kill();

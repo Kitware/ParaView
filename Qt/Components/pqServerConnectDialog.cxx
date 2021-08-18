@@ -564,9 +564,9 @@ void pqServerConnectDialog::editServerStartup()
   {
     case pqServerConfiguration::COMMAND:
     {
-      double delay, timeout;
+      double delay, processWait;
       this->Internals->startup_type->setCurrentIndex(1);
-      this->Internals->commandLine->setText(config.execCommand(timeout, delay));
+      this->Internals->commandLine->setText(config.execCommand(processWait, delay));
       this->Internals->delay->setValue(delay);
     }
     break;
