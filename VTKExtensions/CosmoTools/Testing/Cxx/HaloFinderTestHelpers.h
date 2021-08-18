@@ -147,7 +147,8 @@ inline HaloFinderTestVTKObjects SetupHaloFinderTest(int argc, char* argv[],
   testObjects.onlyPointsInHalos->SetInputConnection(testObjects.haloFinder->GetOutputPort(0));
   testObjects.onlyPointsInHalos->SetInputArrayToProcess(
     0, 0, 0, vtkDataObject::FIELD_ASSOCIATION_POINTS, "fof_halo_tag");
-  testObjects.onlyPointsInHalos->ThresholdByUpper(0.0);
+  testObjects.onlyPointsInHalos->SetThresholdFunction(vtkThreshold::THRESHOLD_UPPER);
+  testObjects.onlyPointsInHalos->SetUpperThreshold(0.0);
   testObjects.onlyPointsInHalos->Update();
 
   testObjects.maskPoints->SetInputConnection(testObjects.onlyPointsInHalos->GetOutputPort());

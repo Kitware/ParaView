@@ -384,6 +384,22 @@ def setattr(proxy, pname, value):
             raise NotSupportedException("'%s' is no longer supported. Use "
             "'BackgroundColorMode' instead to choose background color mode." % pname)
 
+    if pname == "ThresholdRange" and proxy.SMProxy.GetXMLName() == "Threshold":
+        # From ParaView 5.10, the Threshold filter now offers additional
+        # thresholding methods besides ThresholdBetween. The lower and upper
+        # threshold values are also set separately.
+        if paraview.compatibility.GetVersion() <= 5.9:
+            proxy.GetProperty("ThresholdMethod").SetData(0)
+            proxy.GetProperty("LowerThreshold").SetData(value[0])
+            proxy.GetProperty("UpperThreshold").SetData(value[1])
+            raise Continue()
+        else:
+            raise NotSupportedException("The 'ThresholdRange' property has been "
+                    "removed in ParaView 5.10. Please set the lower and upper "
+                    "thresholds using the 'LowerThreshold' and 'UpperThreshold' "
+                    "properties, then set the 'ThresholdMethod' property to "
+                    "'vtkThreshold.THRESHOLD_BETWEEN' to threshold between the "
+                    "lower and upper thresholds.")
 
     if not hasattr(proxy, pname):
         raise AttributeError()
@@ -773,6 +789,21 @@ def getattr(proxy, pname):
             raise NotSupportedException(
                     "Since ParaView 5.10, '%s' is no longer supported. Use "
                     "'BackgroundColorMode' instead." % pname)
+
+    if pname == "ThresholdRange" and proxy.SMProxy.GetXMLName() == "Threshold":
+        # The Threshold filter now offers additional thresholding methods
+        # besides ThresholdBetween. The lower and upper threshold values
+        # are also set separately.
+        if paraview.compatibility.GetVersion() <= 5.9:
+            return [proxy.GetProperty("LowerThreshold").GetData(),
+                    proxy.GetProperty("UpperThreshold").GetData()]
+        else:
+            raise NotSupportedException("The 'ThresholdRange' property has been "
+                    "removed in ParaView 5.10. Please set the lower and upper "
+                    "thresholds using the 'LowerThreshold' and 'UpperThreshold' "
+                    "properties, then set the 'ThresholdMethod' property to "
+                    "'vtkThreshold.THRESHOLD_BETWEEN' to threshold between the "
+                    "lower and upper thresholds.")
 
     raise Continue()
 

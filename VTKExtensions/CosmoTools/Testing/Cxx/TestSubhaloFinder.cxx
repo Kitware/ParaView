@@ -76,7 +76,8 @@ int runSubhaloFinderTest(int argc, char* argv[])
   threshold->SetInputConnection(haloFinder->GetOutputPort(0));
   threshold->SetInputArrayToProcess(
     0, 0, 0, vtkDataObject::FIELD_ASSOCIATION_POINTS, "subhalo_tag");
-  threshold->ThresholdByUpper(0.0);
+  threshold->SetThresholdFunction(vtkThreshold::THRESHOLD_UPPER);
+  threshold->SetUpperThreshold(0.0);
   threshold->Update();
 
   vtkNew<vtkMaskPoints> maskPoints;

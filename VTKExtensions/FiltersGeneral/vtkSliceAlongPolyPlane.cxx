@@ -381,7 +381,9 @@ bool vtkSliceAlongPolyPlane::Execute(
   threshold->SetInputData(combinationPolyData.GetPointer());
   threshold->SetInputArrayToProcess(
     0, 0, 0, vtkDataObject::FIELD_ASSOCIATION_POINTS, "vtkValidPointMaskArrayName");
-  threshold->ThresholdBetween(0.5, 1.5);
+  threshold->SetThresholdFunction(vtkThreshold::THRESHOLD_BETWEEN);
+  threshold->SetLowerThreshold(0.5);
+  threshold->SetUpperThreshold(1.5);
   threshold->Update();
 
   vtkNew<vtkDataSetSurfaceFilter> toPolyData;

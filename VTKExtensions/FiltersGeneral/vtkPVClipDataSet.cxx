@@ -312,11 +312,13 @@ int vtkPVClipDataSet::ClipUsingThreshold(
 
   if (this->GetInsideOut())
   {
-    threshold->ThresholdByLower(this->GetValue());
+    threshold->SetThresholdFunction(vtkThreshold::THRESHOLD_LOWER);
+    threshold->SetLowerThreshold(this->GetValue());
   }
   else
   {
-    threshold->ThresholdByUpper(this->GetValue());
+    threshold->SetThresholdFunction(vtkThreshold::THRESHOLD_UPPER);
+    threshold->SetUpperThreshold(this->GetValue());
   }
 
   threshold->Update();

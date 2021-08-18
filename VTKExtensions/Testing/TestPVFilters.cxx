@@ -85,7 +85,9 @@ int TestPVFilters(int argc, char* argv[])
 
   vtkThreshold* threshold = vtkThreshold::New();
   threshold->SetInputConnection(ribbon->GetOutputPort());
-  threshold->ThresholdBetween(0.25, 0.75);
+  threshold->SetThresholdFunction(vtkThreshold::THRESHOLD_BETWEEN);
+  threshold->SetLowerThreshold(0.25);
+  threshold->SetUpperThreshold(0.75);
 
   vtkWarpScalar* warp = vtkWarpScalar::New();
   warp->SetInputConnection(threshold->GetOutputPort());

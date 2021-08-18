@@ -70,7 +70,8 @@ int runHaloFinderTest(int argc, char* argv[])
 
   to.onlyPointsInHalos->SetInputArrayToProcess(
     0, 0, 0, vtkDataObject::FIELD_ASSOCIATION_POINTS, "subhalo_tag");
-  to.onlyPointsInHalos->ThresholdByUpper(0.0);
+  to.onlyPointsInHalos->SetThresholdFunction(vtkThreshold::THRESHOLD_UPPER);
+  to.onlyPointsInHalos->SetUpperThreshold(0.0);
   to.onlyPointsInHalos->Update();
 
   double range[2];
