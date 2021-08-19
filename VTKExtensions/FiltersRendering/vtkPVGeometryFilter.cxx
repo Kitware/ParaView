@@ -168,6 +168,9 @@ vtkPVGeometryFilter::vtkPVGeometryFilter()
   this->NonlinearSubdivisionLevel = 1;
 
   this->DataSetSurfaceFilter = vtkDataSetSurfaceFilter::New();
+  // we're prepping geometry for rendering
+  // fast mode is adequate.
+  this->DataSetSurfaceFilter->SetFastMode(true);
   this->GenericGeometryFilter = vtkGenericGeometryFilter::New();
   this->UnstructuredGridGeometryFilter = vtkUnstructuredGridGeometryFilter::New();
   this->RecoverWireframeFilter = vtkPVRecoverGeometryWireframe::New();
@@ -1378,15 +1381,7 @@ void vtkPVGeometryFilter::StructuredGridExecute(vtkStructuredGrid* input, vtkPol
   {
     if (input->GetNumberOfCells() > 0)
     {
-      if (input->HasAnyBlankCells())
-      {
-        this->DataSetSurfaceFilter->StructuredWithBlankingExecute(input, output);
-      }
-      else
-      {
-        this->DataSetSurfaceFilter->StructuredExecute(
-          input, output, input->GetExtent(), wholeExtent);
-      }
+      this->DataSetSurfaceFilter->StructuredExecute(input, output, input->GetExtent(), wholeExtent);
     }
     this->OutlineFlag = 0;
     return;

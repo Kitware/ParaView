@@ -154,6 +154,32 @@
         quadratic faces exist. This option has no effect if the input is not an
         unstructured grid.</Documentation>
       </IntVectorProperty>
+
+      <IntVectorProperty command="SetFastMode"
+                         default_values="0"
+                         name="FastMode"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          When enabled, the filter may use approxiamte algorithm for extracting
+          the exterior surface at the risk not being highly accurate.
+          This may miss interior faces, for example, for structured data with blanking
+          for better speed.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty command="SetDelegation"
+                         default_values="0"
+                         name="UseGeometryFilter"
+                         number_of_elements="1"
+                         panel_visibility="advanced" >
+        <BooleanDomain name="bool" />
+        <Documentation>
+          When enabled, the filter may use `vtkGeometryFilter` internally to generate
+          the surface.
+        </Documentation>
+      </IntVectorProperty>
+
       <!-- End DataSetSurfaceFilter -->
     </SourceProxy>
 
