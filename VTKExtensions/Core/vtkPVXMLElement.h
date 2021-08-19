@@ -85,7 +85,7 @@ public:
   //@{
   /**
    * Get the attribute with the given name converted to a scalar
-   * value.  Returns whether value was extracted.
+   * value.  Returns 1 if a value was extracted.
    */
   int GetScalarAttribute(const char* name, int* value);
   int GetScalarAttribute(const char* name, float* value);
