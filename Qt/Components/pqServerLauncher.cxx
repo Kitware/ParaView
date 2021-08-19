@@ -616,34 +616,42 @@ bool pqServerLauncher::connectToPrelaunchedServer()
 {
   pqObjectBuilder* builder = pqApplicationCore::instance()->getObjectBuilder();
 
-  QDialog dialog(pqCoreUtilities::mainWidget(), Qt::WindowStaysOnTopHint);
-  QObject::connect(&dialog, SIGNAL(rejected()), builder, SLOT(abortPendingConnections()));
-
-  Ui::pqServerLauncherDialog ui;
-  ui.setupUi(&dialog);
-
-  if (this->isReverseConnection())
+  do
   {
-    ui.message->setText(QString("Establishing connection to '%1' \n"
-                                "Waiting for server to connect.")
-                          .arg(this->Internals->Configuration.name()));
-    dialog.setWindowTitle("Waiting for Server Connection");
-  }
-  else
-  {
-    ui.message->setText(QString("Establishing connection to '%1' \n"
-                                "Waiting for connection success.")
-                          .arg(this->Internals->Configuration.name()));
-    dialog.setWindowTitle("Waiting for Connection to Server");
-  }
+    QDialog dialog(pqCoreUtilities::mainWidget(), Qt::WindowStaysOnTopHint);
+    QObject::connect(&dialog, SIGNAL(rejected()), builder, SLOT(abortPendingConnections()));
 
-  dialog.show();
-  dialog.raise();
-  dialog.activateWindow();
+    Ui::pqServerLauncherDialog ui;
+    ui.setupUi(&dialog);
 
-  const pqServerResource& resource = this->Internals->Configuration.actualResource();
-  this->Internals->Server =
-    builder->createServer(resource, this->Internals->Configuration.connectionTimeout());
+    if (this->isReverseConnection())
+    {
+      ui.message->setText(QString("Establishing connection to '%1' \n"
+                                  "Waiting for server to connect.")
+                            .arg(this->Internals->Configuration.name()));
+      dialog.setWindowTitle("Waiting for Server Connection");
+    }
+    else
+    {
+      ui.message->setText(QString("Establishing connection to '%1' \n"
+                                  "Waiting %1 seconds for connection to server.")
+                            .arg(this->Internals->Configuration.name()));
+      dialog.setWindowTitle("Waiting for Connection to Server");
+    }
+
+    dialog.show();
+    dialog.raise();
+    dialog.activateWindow();
+
+    const pqServerResource& resource = this->Internals->Configuration.actualResource();
+    this->Internals->Server =
+      builder->createServer(resource, this->Internals->Configuration.connectionTimeout());
+  }
+  // TODO not superb, question will be asked even when aborting
+  while (QMessageBox::question(pqCoreUtilities::mainWidget(), QString("Connection Failed"),
+           QString("Unable to connect sucessfully, would you like to try again for %1 seconds ?")
+             .arg(this->Internals->Configuration.connectionTimeout())) == QMessageBox::Yes);
+
   return this->Internals->Server != nullptr;
 }
 
