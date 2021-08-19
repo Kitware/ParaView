@@ -32,77 +32,25 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPipelineContextMenuBehavior.h"
 
 #include "pqActiveObjects.h"
-#include "pqApplicationCore.h"
 #include "pqContextMenuInterface.h"
-#include "pqCoreUtilities.h"
 #include "pqDefaultContextMenu.h"
-#include "pqDoubleRangeDialog.h"
 #include "pqEditColorMapReaction.h"
 #include "pqInterfaceTracker.h"
 #include "pqPVApplicationCore.h"
-#include "pqPipelineRepresentation.h"
 #include "pqRenderView.h"
-#include "pqSMAdaptor.h"
 #include "pqScalarsToColors.h"
 #include "pqSelectionManager.h"
 #include "pqServerManagerModel.h"
 #include "pqSetName.h"
-#include "pqTabbedMultiViewWidget.h"
-#include "pqUndoStack.h"
-#include "vtkDataObject.h"
-#include "vtkNew.h"
-#include "vtkPVDataInformation.h"
-#include "vtkPVGeneralSettings.h"
-#include "vtkSMArrayListDomain.h"
-#include "vtkSMDoubleMapProperty.h"
-#include "vtkSMDoubleMapPropertyIterator.h"
-#include "vtkSMIntVectorProperty.h"
-#include "vtkSMPVRepresentationProxy.h"
-#include "vtkSMProperty.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMSourceProxy.h"
-#include "vtkSMTransferFunctionManager.h"
-#include "vtkSMViewProxy.h"
 #include "vtksys/SystemTools.hxx"
 
 #include <QAction>
 #include <QApplication>
-#include <QColorDialog>
 #include <QMenu>
 #include <QMouseEvent>
-#include <QPair>
 #include <QWidget>
-
-#include <cassert>
-
-namespace
-{
-// converts array association/name pair to QVariant.
-QVariant convert(const QPair<int, QString>& array)
-{
-  if (!array.second.isEmpty())
-  {
-    QStringList val;
-    val << QString::number(array.first) << array.second;
-    return val;
-  }
-  return QVariant();
-}
-
-// converts QVariant to array association/name pair.
-QPair<int, QString> convert(const QVariant& val)
-{
-  QPair<int, QString> result;
-  if (val.canConvert<QStringList>())
-  {
-    QStringList list = val.toStringList();
-    assert(list.size() == 2);
-    result.first = list[0].toInt();
-    result.second = list[1];
-  }
-  return result;
-}
-}
 
 //-----------------------------------------------------------------------------
 pqPipelineContextMenuBehavior::pqPipelineContextMenuBehavior(QObject* parentObject)
