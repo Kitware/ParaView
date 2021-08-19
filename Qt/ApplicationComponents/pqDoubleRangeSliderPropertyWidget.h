@@ -37,7 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /**
 * pqDoubleRangeSliderPropertyWidget is a widget used for properties such as
-* the "ThresholdRange" property on the Threshold filter's panel. It provides
+* the "ThresholdRange" property on the IsoVolume filter's panel. It provides
 * two double sliders, one for min and one for max and has logic to ensure that
 * the min <= max.
 *
