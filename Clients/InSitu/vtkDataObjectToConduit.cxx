@@ -42,34 +42,174 @@
 
 #include <catalyst_conduit.hpp>
 
-//----------------------------------------------------------------------------
-vtkDataObjectToConduit::vtkDataObjectToConduit() = default;
-
-//----------------------------------------------------------------------------
-vtkDataObjectToConduit::~vtkDataObjectToConduit() = default;
-
-//----------------------------------------------------------------------------
-bool vtkDataObjectToConduit::FillConduitNode(
-  vtkDataObject* data_object, conduit_cpp::Node& conduit_node)
+namespace vtkDataObjectToConduit
 {
-  auto data_set = vtkDataSet::SafeDownCast(data_object);
-  if (!data_set)
+namespace details
+{
+
+//----------------------------------------------------------------------------
+bool IsMixedShape(vtkUnstructuredGrid* unstructured_grid)
+{
+  vtkNew<vtkCellTypes> cell_types;
+  unstructured_grid->GetCellTypes(cell_types);
+  return cell_types->GetNumberOfTypes() > 1;
+}
+
+//----------------------------------------------------------------------------
+bool IsSignedIntegralType(int data_type)
+{
+  constexpr bool is_char_type_signed = (CHAR_MIN == SCHAR_MIN) && (CHAR_MAX == SCHAR_MAX);
+
+  return (is_char_type_signed && (data_type == VTK_CHAR)) || (data_type == VTK_SIGNED_CHAR) ||
+    (data_type == VTK_SHORT) || (data_type == VTK_INT) || (data_type == VTK_LONG) ||
+    (data_type == VTK_ID_TYPE) || (data_type == VTK_LONG_LONG) || (data_type == VTK_TYPE_INT64);
+}
+
+//----------------------------------------------------------------------------
+bool IsUnsignedIntegralType(int data_type)
+{
+  constexpr bool is_char_type_signed = (CHAR_MIN == SCHAR_MIN) && (CHAR_MAX == SCHAR_MAX);
+
+  return (!is_char_type_signed && (data_type == VTK_CHAR)) || (data_type == VTK_UNSIGNED_CHAR) ||
+    (data_type == VTK_UNSIGNED_SHORT) || (data_type == VTK_UNSIGNED_INT) ||
+    (data_type == VTK_UNSIGNED_LONG) || (data_type == VTK_ID_TYPE) ||
+    (data_type == VTK_UNSIGNED_LONG_LONG);
+}
+
+//----------------------------------------------------------------------------
+bool IsFloatType(int data_type)
+{
+  return ((data_type == VTK_FLOAT) || (data_type == VTK_DOUBLE));
+}
+
+//----------------------------------------------------------------------------
+bool ConvertDataArrayToMCArray(
+  vtkDataArray* data_array, int offset, int stride, conduit_cpp::Node& conduit_node)
+{
+  stride = std::max(stride, 1);
+  conduit_index_t number_of_elements = data_array->GetNumberOfValues() / stride;
+
+  int data_type = data_array->GetDataType();
+  int data_type_size = data_array->GetDataTypeSize();
+  int array_type = data_array->GetArrayType();
+
+  if (array_type != vtkAbstractArray::AoSDataArrayTemplate)
   {
-    vtkLogF(ERROR, "Only Data Set objects are supported in vtkDataObjectToConduit.");
+    vtkLog(ERROR, "Unsupported data array type: " << data_array->GetDataTypeAsString());
     return false;
   }
 
-  return FillConduitNode(data_set, conduit_node);
+  bool is_supported = true;
+  if (IsSignedIntegralType(data_type))
+  {
+    switch (data_type_size)
+    {
+      case 1:
+        conduit_node.set_external_int8_ptr((conduit_int8*)data_array->GetVoidPointer(0),
+          number_of_elements, offset * sizeof(conduit_int8), stride * sizeof(conduit_int8));
+        break;
+
+      case 2:
+        conduit_node.set_external_int16_ptr((conduit_int16*)data_array->GetVoidPointer(0),
+          number_of_elements, offset * sizeof(conduit_int16), stride * sizeof(conduit_int16));
+        break;
+
+      case 4:
+        conduit_node.set_external_int32_ptr((conduit_int32*)data_array->GetVoidPointer(0),
+          number_of_elements, offset * sizeof(conduit_int32), stride * sizeof(conduit_int32));
+        break;
+
+      case 8:
+        conduit_node.set_external_int64_ptr((conduit_int64*)data_array->GetVoidPointer(0),
+          number_of_elements, offset * sizeof(conduit_int64), stride * sizeof(conduit_int64));
+        break;
+
+      default:
+        is_supported = false;
+    }
+  }
+  else if (IsUnsignedIntegralType(data_type))
+  {
+    switch (data_type_size)
+    {
+      case 1:
+        conduit_node.set_external_uint8_ptr((conduit_uint8*)data_array->GetVoidPointer(0),
+          number_of_elements, offset * sizeof(conduit_uint8), stride * sizeof(conduit_uint8));
+        break;
+
+      case 2:
+        conduit_node.set_external_uint16_ptr((conduit_uint16*)data_array->GetVoidPointer(0),
+          number_of_elements, offset * sizeof(conduit_uint16), stride * sizeof(conduit_uint16));
+        break;
+
+      case 4:
+        conduit_node.set_external_uint32_ptr((conduit_uint32*)data_array->GetVoidPointer(0),
+          number_of_elements, offset * sizeof(conduit_uint32), stride * sizeof(conduit_uint32));
+        break;
+
+      case 8:
+        conduit_node.set_external_uint64_ptr((conduit_uint64*)data_array->GetVoidPointer(0),
+          number_of_elements, offset * sizeof(conduit_uint64), stride * sizeof(conduit_uint64));
+        break;
+
+      default:
+        is_supported = false;
+    }
+  }
+  else if (IsFloatType(data_type))
+  {
+    switch (data_type_size)
+    {
+      case 4:
+        conduit_node.set_external_float32_ptr((conduit_float32*)data_array->GetVoidPointer(0),
+          number_of_elements, offset * sizeof(conduit_float32), stride * sizeof(conduit_float32));
+        break;
+
+      case 8:
+        conduit_node.set_external_float64_ptr((conduit_float64*)data_array->GetVoidPointer(0),
+          number_of_elements, offset * sizeof(conduit_float64), stride * sizeof(conduit_float64));
+        break;
+
+      default:
+        is_supported = false;
+    }
+  }
+
+  if (!is_supported)
+  {
+    vtkLog(ERROR, "Unsupported data array type: " << data_array->GetDataTypeAsString() << " size: "
+                                                  << data_type_size << " type: " << array_type);
+    return false;
+  }
+
+  return true;
 }
 
 //----------------------------------------------------------------------------
-bool vtkDataObjectToConduit::FillConduitNode(vtkDataSet* data_set, conduit_cpp::Node& conduit_node)
+bool ConvertDataArrayToMCArray(vtkDataArray* data_array, conduit_cpp::Node& conduit_node)
 {
-  return FillTopology(data_set, conduit_node) && FillFields(data_set, conduit_node);
+  return ConvertDataArrayToMCArray(data_array, 0, 0, conduit_node);
 }
 
 //----------------------------------------------------------------------------
-bool vtkDataObjectToConduit::FillTopology(vtkDataSet* data_set, conduit_cpp::Node& conduit_node)
+bool ConvertPoints(vtkPoints* points, conduit_cpp::Node& x_values_node,
+  conduit_cpp::Node& y_values_node, conduit_cpp::Node& z_values_node)
+{
+  auto data_array = points->GetData();
+  bool is_success = data_array;
+
+  if (is_success)
+  {
+    is_success = ConvertDataArrayToMCArray(data_array, 0, 3, x_values_node) &&
+      ConvertDataArrayToMCArray(data_array, 1, 3, y_values_node) &&
+      ConvertDataArrayToMCArray(data_array, 2, 3, z_values_node);
+  }
+
+  return is_success;
+}
+
+//----------------------------------------------------------------------------
+bool FillTopology(vtkDataSet* data_set, conduit_cpp::Node& conduit_node)
 {
   if (auto imageData = vtkImageData::SafeDownCast(data_set))
   {
@@ -240,7 +380,36 @@ bool vtkDataObjectToConduit::FillTopology(vtkDataSet* data_set, conduit_cpp::Nod
 }
 
 //----------------------------------------------------------------------------
-bool vtkDataObjectToConduit::FillFields(vtkDataSet* data_set, conduit_cpp::Node& conduit_node)
+bool FillFields(
+  vtkFieldData* field_data, const std::string& association, conduit_cpp::Node& conduit_node)
+{
+  bool is_success = true;
+
+  int array_count = field_data->GetNumberOfArrays();
+  for (int array_index = 0; is_success && array_index < array_count; ++array_index)
+  {
+    auto array = field_data->GetArray(array_index);
+    auto name = array->GetName();
+    if (!name)
+    {
+      vtkLogF(WARNING, "Unamed array, it will be ignored.");
+      continue;
+    }
+
+    auto field_node = conduit_node["fields"][name];
+    field_node["association"] = association;
+    field_node["topology"] = "mesh";
+    field_node["volume_dependent"] = "false";
+
+    auto values_node = field_node["values"];
+    is_success = ConvertDataArrayToMCArray(array, values_node);
+  }
+
+  return is_success;
+}
+
+//----------------------------------------------------------------------------
+bool FillFields(vtkDataSet* data_set, conduit_cpp::Node& conduit_node)
 {
   if (auto cell_data = data_set->GetCellData())
   {
@@ -273,198 +442,24 @@ bool vtkDataObjectToConduit::FillFields(vtkDataSet* data_set, conduit_cpp::Node&
 }
 
 //----------------------------------------------------------------------------
-bool vtkDataObjectToConduit::FillFields(
-  vtkFieldData* field_data, const std::string& association, conduit_cpp::Node& conduit_node)
+bool FillConduitNode(vtkDataSet* data_set, conduit_cpp::Node& conduit_node)
 {
-  bool is_success = true;
-
-  int array_count = field_data->GetNumberOfArrays();
-  for (int array_index = 0; is_success && array_index < array_count; ++array_index)
-  {
-    auto array = field_data->GetArray(array_index);
-    auto name = array->GetName();
-    if (!name)
-    {
-      vtkLogF(WARNING, "Unamed array, it will be ignored.");
-      continue;
-    }
-
-    auto field_node = conduit_node["fields"][name];
-    field_node["association"] = association;
-    field_node["topology"] = "mesh";
-    field_node["volume_dependent"] = "false";
-
-    auto values_node = field_node["values"];
-    is_success = ConvertDataArrayToMCArray(array, values_node);
-  }
-
-  return is_success;
+  return FillTopology(data_set, conduit_node) && FillFields(data_set, conduit_node);
 }
 
-//----------------------------------------------------------------------------
-bool vtkDataObjectToConduit::ConvertDataArrayToMCArray(
-  vtkDataArray* data_array, conduit_cpp::Node& conduit_node)
-{
-  return ConvertDataArrayToMCArray(data_array, 0, 0, conduit_node);
-}
+} // details namespace
 
 //----------------------------------------------------------------------------
-bool vtkDataObjectToConduit::ConvertDataArrayToMCArray(
-  vtkDataArray* data_array, int offset, int stride, conduit_cpp::Node& conduit_node)
+bool FillConduitNode(vtkDataObject* data_object, conduit_cpp::Node& conduit_node)
 {
-  stride = std::max(stride, 1);
-  conduit_index_t number_of_elements = data_array->GetNumberOfValues() / stride;
-
-  int data_type = data_array->GetDataType();
-  int data_type_size = data_array->GetDataTypeSize();
-  int array_type = data_array->GetArrayType();
-
-  if (array_type != vtkAbstractArray::AoSDataArrayTemplate)
+  auto data_set = vtkDataSet::SafeDownCast(data_object);
+  if (!data_set)
   {
-    vtkLog(ERROR, "Unsupported data array type: " << data_array->GetDataTypeAsString());
+    vtkLogF(ERROR, "Only Data Set objects are supported in vtkDataObjectToConduit.");
     return false;
   }
 
-  bool is_supported = true;
-  if (IsSignedIntegralType(data_type))
-  {
-    switch (data_type_size)
-    {
-      case 1:
-        conduit_node.set_external_int8_ptr((conduit_int8*)data_array->GetVoidPointer(0),
-          number_of_elements, offset * sizeof(conduit_int8), stride * sizeof(conduit_int8));
-        break;
-
-      case 2:
-        conduit_node.set_external_int16_ptr((conduit_int16*)data_array->GetVoidPointer(0),
-          number_of_elements, offset * sizeof(conduit_int16), stride * sizeof(conduit_int16));
-        break;
-
-      case 4:
-        conduit_node.set_external_int32_ptr((conduit_int32*)data_array->GetVoidPointer(0),
-          number_of_elements, offset * sizeof(conduit_int32), stride * sizeof(conduit_int32));
-        break;
-
-      case 8:
-        conduit_node.set_external_int64_ptr((conduit_int64*)data_array->GetVoidPointer(0),
-          number_of_elements, offset * sizeof(conduit_int64), stride * sizeof(conduit_int64));
-        break;
-
-      default:
-        is_supported = false;
-    }
-  }
-  else if (IsUnsignedIntegralType(data_type))
-  {
-    switch (data_type_size)
-    {
-      case 1:
-        conduit_node.set_external_uint8_ptr((conduit_uint8*)data_array->GetVoidPointer(0),
-          number_of_elements, offset * sizeof(conduit_uint8), stride * sizeof(conduit_uint8));
-        break;
-
-      case 2:
-        conduit_node.set_external_uint16_ptr((conduit_uint16*)data_array->GetVoidPointer(0),
-          number_of_elements, offset * sizeof(conduit_uint16), stride * sizeof(conduit_uint16));
-        break;
-
-      case 4:
-        conduit_node.set_external_uint32_ptr((conduit_uint32*)data_array->GetVoidPointer(0),
-          number_of_elements, offset * sizeof(conduit_uint32), stride * sizeof(conduit_uint32));
-        break;
-
-      case 8:
-        conduit_node.set_external_uint64_ptr((conduit_uint64*)data_array->GetVoidPointer(0),
-          number_of_elements, offset * sizeof(conduit_uint64), stride * sizeof(conduit_uint64));
-        break;
-
-      default:
-        is_supported = false;
-    }
-  }
-  else if (IsFloatType(data_type))
-  {
-    switch (data_type_size)
-    {
-      case 4:
-        conduit_node.set_external_float32_ptr((conduit_float32*)data_array->GetVoidPointer(0),
-          number_of_elements, offset * sizeof(conduit_float32), stride * sizeof(conduit_float32));
-        break;
-
-      case 8:
-        conduit_node.set_external_float64_ptr((conduit_float64*)data_array->GetVoidPointer(0),
-          number_of_elements, offset * sizeof(conduit_float64), stride * sizeof(conduit_float64));
-        break;
-
-      default:
-        is_supported = false;
-    }
-  }
-
-  if (!is_supported)
-  {
-    vtkLog(ERROR, "Unsupported data array type: " << data_array->GetDataTypeAsString() << " size: "
-                                                  << data_type_size << " type: " << array_type);
-    return false;
-  }
-
-  return true;
+  return details::FillConduitNode(data_set, conduit_node);
 }
 
-//----------------------------------------------------------------------------
-bool vtkDataObjectToConduit::ConvertPoints(vtkPoints* points, conduit_cpp::Node& x_values_node,
-  conduit_cpp::Node& y_values_node, conduit_cpp::Node& z_values_node)
-{
-  auto data_array = points->GetData();
-  bool is_success = data_array;
-
-  if (is_success)
-  {
-    is_success = ConvertDataArrayToMCArray(data_array, 0, 3, x_values_node) &&
-      ConvertDataArrayToMCArray(data_array, 1, 3, y_values_node) &&
-      ConvertDataArrayToMCArray(data_array, 2, 3, z_values_node);
-  }
-
-  return is_success;
-}
-
-//----------------------------------------------------------------------------
-bool vtkDataObjectToConduit::IsMixedShape(vtkUnstructuredGrid* unstructured_grid)
-{
-  vtkNew<vtkCellTypes> cell_types;
-  unstructured_grid->GetCellTypes(cell_types);
-  return cell_types->GetNumberOfTypes() > 1;
-}
-
-//----------------------------------------------------------------------------
-bool vtkDataObjectToConduit::IsSignedIntegralType(int data_type)
-{
-  constexpr bool is_char_type_signed = (CHAR_MIN == SCHAR_MIN) && (CHAR_MAX == SCHAR_MAX);
-
-  return (is_char_type_signed && (data_type == VTK_CHAR)) || (data_type == VTK_SIGNED_CHAR) ||
-    (data_type == VTK_SHORT) || (data_type == VTK_INT) || (data_type == VTK_LONG) ||
-    (data_type == VTK_ID_TYPE) || (data_type == VTK_LONG_LONG) || (data_type == VTK_TYPE_INT64);
-}
-
-//----------------------------------------------------------------------------
-bool vtkDataObjectToConduit::IsUnsignedIntegralType(int data_type)
-{
-  constexpr bool is_char_type_signed = (CHAR_MIN == SCHAR_MIN) && (CHAR_MAX == SCHAR_MAX);
-
-  return (!is_char_type_signed && (data_type == VTK_CHAR)) || (data_type == VTK_UNSIGNED_CHAR) ||
-    (data_type == VTK_UNSIGNED_SHORT) || (data_type == VTK_UNSIGNED_INT) ||
-    (data_type == VTK_UNSIGNED_LONG) || (data_type == VTK_ID_TYPE) ||
-    (data_type == VTK_UNSIGNED_LONG_LONG);
-}
-
-//----------------------------------------------------------------------------
-bool vtkDataObjectToConduit::IsFloatType(int data_type)
-{
-  return ((data_type == VTK_FLOAT) || (data_type == VTK_DOUBLE));
-}
-
-//----------------------------------------------------------------------------
-void vtkDataObjectToConduit::PrintSelf(ostream& os, vtkIndent indent)
-{
-  this->Superclass::PrintSelf(os, indent);
-}
+} // vtkDataObjectToConduit namespace
