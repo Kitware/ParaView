@@ -147,7 +147,40 @@ vtkMultiProcessController* vtkSMSessionClient::GetController(ServerFlags process
 }
 
 //----------------------------------------------------------------------------
-bool vtkSMSessionClient::Connect(const char* url, int timeout)
+namespace
+{
+class vtkTemp
+{
+public:
+  bool (*Callback)();
+  vtkNetworkAccessManager* Nam;
+  vtkSMSessionClient* Session;
+  vtkTemp()
+  {
+    this->Callback = nullptr;
+    this->Nam = nullptr;
+    this->Session = nullptr;
+  }
+  void OnEvent()
+  {
+    if (this->Callback != nullptr)
+    {
+      bool continue_waiting = (*this->Callback)();
+      if (!continue_waiting && this->Nam)
+      {
+        this->Nam->AbortPendingConnection();
+      }
+      if (!continue_waiting && this->Session)
+      {
+        this->Session->SetAbortConnect(true);
+      }
+    }
+  }
+};
+}
+
+//----------------------------------------------------------------------------
+bool vtkSMSessionClient::Connect(const char* url, int timeout, bool (*callback)())
 {
   this->SetURI(url);
   vtksys::RegularExpression pvserver("^cs://([^:]+)(:([0-9]+))?");
@@ -239,6 +272,14 @@ bool vtkSMSessionClient::Connect(const char* url, int timeout)
 
   bool need_rcontroller = !render_server_url.empty();
   vtkNetworkAccessManager* nam = pm->GetNetworkAccessManager();
+
+  vtkTemp temp;
+  temp.Callback = callback;
+  temp.Nam = nam;
+  temp.Session = this;
+  unsigned long sid = this->AddObserver(vtkCommand::ProgressEvent, &temp, &vtkTemp::OnEvent);
+  unsigned long nid = nam->AddObserver(vtkCommand::ProgressEvent, &temp, &vtkTemp::OnEvent);
+
   vtkMultiProcessController* dcontroller = nam->NewConnection(data_server_url.c_str());
   vtkMultiProcessController* rcontroller =
     need_rcontroller ? nam->NewConnection(render_server_url.c_str()) : nullptr;
@@ -265,6 +306,10 @@ bool vtkSMSessionClient::Connect(const char* url, int timeout)
       break;
     }
   }
+
+  this->RemoveObserver(nid);
+  this->RemoveObserver(sid);
+
   if (dcontroller)
   {
     this->SetDataServerController(dcontroller);

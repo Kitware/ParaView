@@ -621,17 +621,25 @@ bool pqServerLauncher::connectToPrelaunchedServer()
 
   Ui::pqServerLauncherDialog ui;
   ui.setupUi(&dialog);
-  ui.message->setText(QString("Establishing connection to '%1' \n"
-                              "Waiting for server to connect.")
-                        .arg(this->Internals->Configuration.name()));
-  dialog.setWindowTitle("Waiting for Server Connection");
+
   if (this->isReverseConnection())
   {
-    // using reverse connect, popup the dialog.
-    dialog.show();
-    dialog.raise();
-    dialog.activateWindow();
+    ui.message->setText(QString("Establishing connection to '%1' \n"
+                                "Waiting for server to connect.")
+                          .arg(this->Internals->Configuration.name()));
+    dialog.setWindowTitle("Waiting for Server Connection");
   }
+  else
+  {
+    ui.message->setText(QString("Establishing connection to '%1' \n"
+                                "Waiting for connection success.")
+                          .arg(this->Internals->Configuration.name()));
+    dialog.setWindowTitle("Waiting for Connection to Server");
+  }
+
+  dialog.show();
+  dialog.raise();
+  dialog.activateWindow();
 
   const pqServerResource& resource = this->Internals->Configuration.actualResource();
   this->Internals->Server =

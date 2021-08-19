@@ -109,13 +109,10 @@ vtkMultiProcessController* vtkTCPNetworkAccessManager::NewConnection(const char*
 
     this->WrongConnectID = false;
 
-    if (parameters["listen"] == "true" && parameters["multiple"] == "true")
+    if (parameters["listen"] == "true")
     {
-      return this->WaitForConnection(port, false, handshake, parameters["nonblocking"] == "true");
-    }
-    else if (parameters["listen"] == "true")
-    {
-      return this->WaitForConnection(port, true, handshake, parameters["nonblocking"] == "true");
+      return this->WaitForConnection(
+        port, !(parameters["multiple"] == "true"), handshake, parameters["nonblocking"] == "true");
     }
     else
     {
@@ -377,8 +374,18 @@ vtkMultiProcessController* vtkTCPNetworkAccessManager::ConnectToRemote(
   vtkSmartPointer<vtkClientSocket> cs = vtkSmartPointer<vtkClientSocket>::New();
   vtkSmartPointer<vtkTimerLog> timer = vtkSmartPointer<vtkTimerLog>::New();
   timer->StartTimer();
+
+  this->AbortPendingConnectionFlag = false;
   while (1)
   {
+    double progress = 0.5;
+    this->InvokeEvent(vtkCommand::ProgressEvent, &progress);
+    if (this->AbortPendingConnectionFlag)
+    {
+      vtkErrorMacro(<< "Connect aborted.");
+      return nullptr;
+    }
+
     if (cs->ConnectToServer(hostname, port) != -1)
     {
       break;
@@ -396,7 +403,7 @@ vtkMultiProcessController* vtkTCPNetworkAccessManager::ConnectToRemote(
     }
     else
     {
-      vtkWarningMacro("Connect failed.  Retrying.");
+      vtkWarningMacro("Connect failed. Retrying.");
     }
     vtksys::SystemTools::Delay(1000);
   }

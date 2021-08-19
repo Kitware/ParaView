@@ -684,12 +684,12 @@ pqServer* pqObjectBuilder::createServer(const pqServerResource& resource, int co
   vtkIdType id = 0;
   if (server_resource.scheme() == "builtin")
   {
-    id = vtkSMSession::ConnectToSelf(connectionTimeout);
+    id = vtkSMSession::ConnectToSelf(connectionTimeout, &pqObjectBuilderNS::processEvents);
   }
   else if (server_resource.scheme() == "cs")
   {
-    id = vtkSMSession::ConnectToRemote(
-      resource.host().toUtf8().data(), resource.port(11111), connectionTimeout);
+    id = vtkSMSession::ConnectToRemote(resource.host().toUtf8().data(), resource.port(11111),
+      connectionTimeout, &pqObjectBuilderNS::processEvents);
   }
   else if (server_resource.scheme() == "csrc")
   {
@@ -701,7 +701,8 @@ pqServer* pqObjectBuilder::createServer(const pqServerResource& resource, int co
   {
     id = vtkSMSession::ConnectToRemote(server_resource.dataServerHost().toUtf8().data(),
       server_resource.dataServerPort(11111), server_resource.renderServerHost().toUtf8().data(),
-      server_resource.renderServerPort(22221), connectionTimeout);
+      server_resource.renderServerPort(22221), connectionTimeout,
+      &pqObjectBuilderNS::processEvents);
   }
   else if (server_resource.scheme() == "cdsrsrc")
   {
