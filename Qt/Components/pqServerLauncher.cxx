@@ -774,7 +774,14 @@ bool pqServerLauncher::processCommand(
   QObject::connect(process, SIGNAL(readyReadStandardError()), this, SLOT(readStandardError()));
   QObject::connect(process, SIGNAL(readyReadStandardOutput()), this, SLOT(readStandardOutput()));
 
+// QProcess::start(QString) has been deprecated in Qt 5.15
+#if QT_VERSION < QT_VERSION_CHECK(5, 15, 0)
   process->start(command);
+#else
+  QStringList splitCommand = QProcess::splitCommand(command);
+  QString program = splitCommand.takeAt(0);
+  process->start(program, splitCommand);
+#endif
 
   // wait for process to start.
   // waitForStarted() may block until the process starts. That is generally a short
