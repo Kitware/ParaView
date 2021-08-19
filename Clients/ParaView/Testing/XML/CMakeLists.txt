@@ -792,7 +792,7 @@ macro(ADD_CATALYST_LIVE_TEST test_name duration command_line_connect_command)
     --client ${CLIENT_EXECUTABLE}
     --enable-bt
     ${command_line_connect_command}
-    -dr
+    --dr
     --test-directory=${PARAVIEW_TEST_DIR}
     BASELINE_DIR ${PARAVIEW_TEST_BASELINE_DIR}
     TEST_SCRIPTS ${test_name}.xml
@@ -811,7 +811,7 @@ macro(ADD_CATALYST_LIVE_TEST test_name duration command_line_connect_command)
     --client ${CLIENT_EXECUTABLE}
     --enable-bt
     ${command_line_connect_command}
-    -dr
+    --dr
     --test-directory=${PARAVIEW_TEST_DIR}
     BASELINE_DIR ${PARAVIEW_TEST_BASELINE_DIR}
     TEST_SCRIPTS ${test_name}.xml
@@ -1350,7 +1350,7 @@ if (EXISTS "${smooth_flash}")
     add_pv_test("pv" "_DISABLE_C"
       COMMAND --client ${CLIENT_EXECUTABLE}
               --enable-bt
-              -dr
+              --dr
               --enable-streaming
               --test-directory=${PARAVIEW_TEST_DIR}
 
@@ -1364,7 +1364,7 @@ if (EXISTS "${smooth_flash}")
          --enable-streaming
          --client ${CLIENT_EXECUTABLE}
          --enable-bt
-         -dr
+         --dr
          --enable-streaming
          --test-directory=${PARAVIEW_TEST_DIR}
       BASELINE_DIR ${PARAVIEW_TEST_BASELINE_DIR}
