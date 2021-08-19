@@ -56,21 +56,20 @@ pqServerConfiguration::pqServerConfiguration()
   vtkNew<vtkPVXMLParser> parser;
   parser->Parse("<Server name='" SERVER_CONFIGURATION_DEFAULT_NAME
                 "' configuration=''><ManualStartup/></Server>");
-  this->constructor(parser->GetRootElement(), 60);
+  this->constructor(parser->GetRootElement());
 }
 
 //-----------------------------------------------------------------------------
-pqServerConfiguration::pqServerConfiguration(vtkPVXMLElement* xml, int connectionTimeout)
+pqServerConfiguration::pqServerConfiguration(vtkPVXMLElement* xml)
 {
-  this->constructor(xml, connectionTimeout);
+  this->constructor(xml);
 }
 
 //-----------------------------------------------------------------------------
-void pqServerConfiguration::constructor(vtkPVXMLElement* xml, int connectionTimeout)
+void pqServerConfiguration::constructor(vtkPVXMLElement* xml)
 {
   assert(xml && xml->GetName() && strcmp(xml->GetName(), "Server") == 0);
   this->XML = xml;
-  this->ConnectionTimeout = connectionTimeout;
   this->Mutable = true;
   this->parseSshPortForwardingXML();
 }
@@ -132,13 +131,13 @@ void pqServerConfiguration::setResource(const QString& str)
 //-----------------------------------------------------------------------------
 int pqServerConfiguration::connectionTimeout() const
 {
-  return this->ConnectionTimeout;
+  return QString(this->XML->GetAttributeOrDefault("timeout", "60")).toInt();
 }
 
 //-----------------------------------------------------------------------------
 void pqServerConfiguration::setConnectionTimeout(int connectionTimeout)
 {
-  this->ConnectionTimeout = connectionTimeout;
+  this->XML->SetAttribute("timeout", QString::number(connectionTimeout).toUtf8().data());
 }
 
 //-----------------------------------------------------------------------------
@@ -678,5 +677,5 @@ pqServerConfiguration pqServerConfiguration::clone() const
 {
   vtkNew<vtkPVXMLElement> xml;
   this->XML->CopyTo(xml.GetPointer());
-  return pqServerConfiguration(xml.GetPointer(), this->ConnectionTimeout);
+  return pqServerConfiguration(xml.GetPointer());
 }

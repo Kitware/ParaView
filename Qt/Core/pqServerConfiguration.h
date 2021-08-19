@@ -53,10 +53,9 @@ public:
   ~pqServerConfiguration();
 
   /**
-   * Create a server configuration with the provided xml and timeout.
-   * the timeout is in seconds, 0 means no retry and -1 means infinite retries.
+   * Create a server configuration with the provided xml.
    */
-  pqServerConfiguration(vtkPVXMLElement* xml, int connectionTimeout = 60);
+  pqServerConfiguration(vtkPVXMLElement* xml);
 
   /**
    * Get/Set whether the configuration is mutable. This variable is not
@@ -104,6 +103,7 @@ public:
   /**
    * Get/Set the timeout in seconds that will be used when connecting
    * 0 means no retry and -1 means infinite retries.
+   * If not set in the XML, default is 60.
    */
   int connectionTimeout() const;
   void setConnectionTimeout(int connectionTimeout);
@@ -200,9 +200,8 @@ protected:
   static QString lookForCommand(QString command);
 
 private:
-  void constructor(vtkPVXMLElement*, int connectionTimeout = 60);
+  void constructor(vtkPVXMLElement*);
   bool Mutable;
-  int ConnectionTimeout;
   vtkSmartPointer<vtkPVXMLElement> XML;
   bool PortForwarding;
   bool SSHCommand;

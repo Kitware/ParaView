@@ -355,6 +355,8 @@ void pqServerConnectDialog::updateButtons()
     this->Internals->connect->setEnabled(true);
     this->Internals->timeoutLabel->setVisible(!isReverse);
     this->Internals->timeoutSpinBox->setVisible(!isReverse);
+    this->Internals->timeoutSpinBox->setValue(
+      this->Internals->Configurations[original_index].connectionTimeout());
   }
 }
 
