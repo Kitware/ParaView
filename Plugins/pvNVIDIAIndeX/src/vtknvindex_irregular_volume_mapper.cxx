@@ -220,7 +220,8 @@ bool vtknvindex_irregular_volume_mapper::initialize_mapper(vtkRenderer* /*ren*/,
 
   // Check for valid data types
   const std::string scalar_type = m_scalar_array->GetDataTypeAsString();
-  if (scalar_type != "unsigned char" && scalar_type != "unsigned short" && scalar_type != "float" &&
+  if (scalar_type != "unsigned char" && scalar_type != "unsigned short" &&
+    scalar_type != "unsigned int" && scalar_type != "int" && scalar_type != "float" &&
     scalar_type != "double")
   {
     ERROR_LOG << "The data array '" << this->ArrayName << "' uses the scalar type '" << scalar_type
@@ -230,12 +231,15 @@ bool vtknvindex_irregular_volume_mapper::initialize_mapper(vtkRenderer* /*ren*/,
   else if (scalar_type == "double" && is_data_supported)
   {
     // Only print the warning once per data array, and do not repeat when switching between arrays.
+    // No warning for "unsigned int" because there is no memory overhead and only minimal CPU
+    // overhead.
     if (m_data_array_warning_printed.find(this->ArrayName) == m_data_array_warning_printed.end())
     {
-      WARN_LOG << "The data array '" << this->ArrayName << "' has scalar values "
-               << "in double precision format, which is not natively supported by NVIDIA IndeX. "
-               << "The plugin will proceed to convert the values from double to float with the "
-               << "corresponding overhead.";
+      WARN_LOG << "The data array '" << this->ArrayName << "' has scalar "
+               << "values  in " << scalar_type << " format, which is not natively "
+               << "supported by NVIDIA IndeX for unstructured grids. "
+               << "The plugin will proceed to convert the values from " << scalar_type << " "
+               << "to float with the corresponding overhead.";
       m_data_array_warning_printed.emplace(this->ArrayName);
     }
   }

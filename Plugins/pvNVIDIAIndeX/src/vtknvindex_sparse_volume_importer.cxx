@@ -55,6 +55,11 @@ inline nv::index::Sparse_volume_voxel_format match_volume_format(const std::stri
   {
     return nv::index::SPARSE_VOLUME_VOXEL_FORMAT_SINT16;
   }
+  else if (fmt_string == "int" || fmt_string == "unsigned int")
+  {
+    // IndeX doesn't support (unsigned) int, will be converted to float
+    return nv::index::SPARSE_VOLUME_VOXEL_FORMAT_FLOAT32;
+  }
   else if (fmt_string == "float" || fmt_string == "double")
   {
     return nv::index::SPARSE_VOLUME_VOXEL_FORMAT_FLOAT32;
@@ -87,12 +92,14 @@ inline mi::Size volume_format_size(const nv::index::Sparse_volume_voxel_format f
 vtknvindex_import_bricks::vtknvindex_import_bricks(
   const nv::index::ISparse_volume_subset_data_descriptor* subset_data_descriptor,
   nv::index::ISparse_volume_subset* volume_subset, const mi::Uint8* source_buffer,
-  mi::Size vol_fmt_size, mi::Sint32 border_size, mi::Sint32 ghost_levels,
-  const vtknvindex::util::Bbox3i& source_bbox, const vtknvindex_volume_neighbor_data* neighbor_data)
+  mi::Size vol_fmt_size, const std::string& source_scalar_type, mi::Sint32 border_size,
+  mi::Sint32 ghost_levels, const vtknvindex::util::Bbox3i& source_bbox,
+  const vtknvindex_volume_neighbor_data* neighbor_data)
   : m_subset_data_descriptor(subset_data_descriptor)
   , m_volume_subset(volume_subset)
   , m_source_buffer(source_buffer)
   , m_vol_fmt_size(vol_fmt_size)
+  , m_source_scalar_type(source_scalar_type)
   , m_border_size(border_size)
   , m_ghost_levels(ghost_levels)
   , m_source_bbox(source_bbox)
@@ -489,6 +496,27 @@ void vtknvindex_import_bricks::execute_fragment(
     //
     clamp_to_border(dest_brick_bbox, dest_brick_bbox_clipped_with_border_inner,
       dest_brick_bbox_clipped_with_border, svol_brick_data_raw, m_vol_fmt_size);
+
+    // In-place conversion of (unsigned) int data to float
+    mi::Float32* dst = reinterpret_cast<mi::Float32*>(svol_brick_data_raw);
+    const mi::Size size =
+      static_cast<mi::Size>(dest_brick_dims.x) * dest_brick_dims.y * dest_brick_dims.y;
+    if (m_source_scalar_type == "int")
+    {
+      const mi::Sint32* src = reinterpret_cast<mi::Sint32*>(svol_brick_data_raw);
+      for (mi::Size i = 0; i < size; ++i)
+      {
+        dst[i] = static_cast<mi::Float32>(src[i]);
+      }
+    }
+    else if (m_source_scalar_type == "unsigned int")
+    {
+      const mi::Uint32* src = reinterpret_cast<mi::Uint32*>(svol_brick_data_raw);
+      for (mi::Size i = 0; i < size; ++i)
+      {
+        dst[i] = static_cast<mi::Float32>(src[i]);
+      }
+    }
   }
 }
 
@@ -665,17 +693,18 @@ nv::index::IDistributed_data_subset* vtknvindex_sparse_volume_importer::create(
     shm_info->m_neighbors->fetch_data(host_props, time_step);
   }
 
+  const bool converted =
+    (m_scalar_type == "double" || m_scalar_type == "int" || m_scalar_type == "unsigned int");
   INFO_LOG << "Importing volume data from " << (rankid == shm_info->m_rank_id ? "local" : "shared")
            << " "
            << "memory (" << shm_info->m_shm_name << ") on rank " << rankid << ", "
-           << (m_scalar_type == "double" ? "converted to float, " : "") << "data bbox " << shm_bbox
-           << ", "
+           << (converted ? "converted to float, " : "") << "data bbox " << shm_bbox << ", "
            << "importer bbox " << bounding_box << ", border " << m_ghost_levels << "/"
            << m_border_size << ".";
 
   // Import all bricks for the subregion in parallel
   vtknvindex_import_bricks import_bricks_job(svol_subset_desc.get(), svol_data_subset.get(),
-    subset_data_buffer, vol_fmt_size, m_border_size, m_ghost_levels, shm_bbox,
+    subset_data_buffer, vol_fmt_size, m_scalar_type, m_border_size, m_ghost_levels, shm_bbox,
     shm_info->m_neighbors.get());
 
   dice_transaction->execute_fragmented(&import_bricks_job, import_bricks_job.get_nb_fragments());

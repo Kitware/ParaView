@@ -261,12 +261,15 @@ bool vtknvindex_volumemapper::initialize_mapper(vtkVolume* vol)
   else if (scalar_type == "double" && is_data_supported)
   {
     // Only print the warning once per data array, and do not repeat when switching between arrays.
+    // No warning for "int" and "unsigned int" because there is no memory overhead and only minimal
+    // CPU overhead.
     if (m_data_array_warning_printed.find(this->ArrayName) == m_data_array_warning_printed.end())
     {
       WARN_LOG << "The data array '" << this->ArrayName << "' has scalar values "
-               << "in double precision format, which is not natively supported by NVIDIA IndeX. "
-               << "The plugin will proceed to convert the values from double to float with the "
-               << "corresponding overhead.";
+               << "in " << scalar_type << " format, which is not natively "
+               << "supported by NVIDIA IndeX. "
+               << "The plugin will proceed to convert the values from " << scalar_type << " "
+               << "to float with the corresponding overhead.";
       m_data_array_warning_printed.emplace(this->ArrayName);
     }
   }

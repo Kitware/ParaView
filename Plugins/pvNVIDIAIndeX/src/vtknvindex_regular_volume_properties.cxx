@@ -554,6 +554,10 @@ mi::Size vtknvindex_regular_volume_properties::get_scalar_size(const std::string
   {
     scalar_size = sizeof(mi::Uint16);
   }
+  else if (scalar_type == "int" || scalar_type == "unsigned int")
+  {
+    scalar_size = sizeof(mi::Uint32);
+  }
   else if (scalar_type == "float")
   {
     scalar_size = sizeof(mi::Float32);

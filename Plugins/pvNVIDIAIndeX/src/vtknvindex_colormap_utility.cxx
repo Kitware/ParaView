@@ -117,8 +117,10 @@ void vtknvindex_colormap::get_paraview_colormaps(vtkVolume* vol,
   std::vector<mi::Float32> opacity_array;
 
   mi::math::Vector<mi::Float32, 2> domain_range;
-  if (scalar_type != "float" && scalar_type != "double")
+  if (scalar_type != "float" && scalar_type != "double" && scalar_type != "int" &&
+    scalar_type != "unsigned int")
   {
+    // The scalar type is float or is internally converted to float (e.g. for "int")
     mi::math::Vector<mi::Float32, 2> scalar_range;
     regular_volume_properties->get_scalar_range(scalar_range);
 

@@ -39,13 +39,12 @@ class vtknvindex_import_bricks
   : public mi::neuraylib::Fragmented_job<0x6538523c, 0xba06, 0x4227, 0xbe, 0xb4, 0x2, 0xdf, 0x9,
       0xb6, 0x69, 0xa4>
 {
-
 public:
   vtknvindex_import_bricks(
     const nv::index::ISparse_volume_subset_data_descriptor* subset_data_descriptor,
     nv::index::ISparse_volume_subset* volume_subset, const mi::Uint8* source_buffer,
-    mi::Size vol_fmt_size, mi::Sint32 border_size, mi::Sint32 ghost_levels,
-    const vtknvindex::util::Bbox3i& source_bbox,
+    mi::Size vol_fmt_size, const std::string& source_scalar_type, mi::Sint32 border_size,
+    mi::Sint32 ghost_levels, const vtknvindex::util::Bbox3i& source_bbox,
     const vtknvindex_volume_neighbor_data* neighbor_data);
 
   void execute_fragment(mi::neuraylib::IDice_transaction* dice_transaction, mi::Size index,
@@ -58,6 +57,7 @@ private:
   nv::index::ISparse_volume_subset* m_volume_subset;
   const mi::Uint8* m_source_buffer;
   mi::Size m_vol_fmt_size;
+  std::string m_source_scalar_type;
   mi::Sint32 m_border_size;
   mi::Sint32 m_ghost_levels;
   mi::Size m_nb_fragments;

@@ -54,6 +54,10 @@ size_t vtknvindex_irregular_volume_data::get_memory_size(const std::string& scal
   {
     scalar_size = sizeof(mi::Uint16);
   }
+  else if (scalar_type == "int" || scalar_type == "unsigned int")
+  {
+    scalar_size = sizeof(mi::Uint32);
+  }
   else if (scalar_type == "float")
   {
     scalar_size = sizeof(mi::Float32);
@@ -330,7 +334,8 @@ bool vtknvindex_cluster_properties::retrieve_process_configuration(
       }
       else
       {
-        ERROR_LOG << "The scalar type: " << scalar_type << " is not supported by NVIDIA IndeX.";
+        ERROR_LOG << "The scalar type " << scalar_type
+                  << " is not supported by NVIDIA IndeX for structured grids.";
         return false;
       }
 
@@ -346,13 +351,18 @@ bool vtknvindex_cluster_properties::retrieve_process_configuration(
         ;
       else if (scalar_type == "unsigned short")
         ;
+      else if (scalar_type == "unsigned int")
+        ;
+      else if (scalar_type == "int")
+        ;
       else if (scalar_type == "float")
         ;
       else if (scalar_type == "double")
         ;
       else
       {
-        ERROR_LOG << "The scalar type: " << scalar_type << " is not supported by NVIDIA IndeX.";
+        ERROR_LOG << "The scalar type " << scalar_type
+                  << " is not supported by NVIDIA IndeX for unstructured grids.";
         return false;
       }
 
