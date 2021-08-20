@@ -199,11 +199,11 @@ enum catalyst_error catalyst_initialize_paraview(const conduit_node* params)
 
       if (!plmgr->LoadLocalPlugin(proxyFilename.c_str()))
       {
-        vtkLog(ERROR, "Failed to load plugin xml " << proxyFilename.c_str());
+        vtkLog(ERROR, "Failed to load plugin xml " << proxyFilename);
       }
       else
       {
-        vtkLog(INFO, "Catalyst plugin loaded: " << proxyFilename.c_str());
+        vtkLog(INFO, "Catalyst plugin loaded: " << proxyFilename);
       }
     }
   }

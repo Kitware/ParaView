@@ -307,22 +307,21 @@ bool FillTopology(vtkDataSet* data_set, conduit_cpp::Node& conduit_node)
     auto y_values_node = coords_node["values/y"];
     auto z_values_node = coords_node["values/z"];
 
-    auto points = unstructured_grid->GetPoints();
+    auto* points = unstructured_grid->GetPoints();
 
-    if (!points)
+    if (points)
     {
-      x_values_node = std::vector<float>();
-      y_values_node = std::vector<float>();
-      z_values_node = std::vector<float>();
-    }
-    else
-    {
-      if (!ConvertPoints(
-            unstructured_grid->GetPoints(), x_values_node, y_values_node, z_values_node))
+      if (!ConvertPoints(points, x_values_node, y_values_node, z_values_node))
       {
         vtkLogF(ERROR, "ConvertPoints failed for unstructured grid.");
         return false;
       }
+    }
+    else
+    {
+      x_values_node = std::vector<float>();
+      y_values_node = std::vector<float>();
+      z_values_node = std::vector<float>();
     }
 
     auto topologies_node = conduit_node["topologies/mesh"];
@@ -357,7 +356,8 @@ bool FillTopology(vtkDataSet* data_set, conduit_cpp::Node& conduit_node)
         topologies_node["elements/shape"] = "point";
         break;
       default:
-        vtkLog(ERROR, << "Unsupported cell type in unstructured grid. Cell type: " << cell_type);
+        vtkLog(ERROR, << "Unsupported cell type in unstructured grid. Cell type: "
+                      << vtkCellTypes::GetClassNameFromTypeId(cell_type));
         return false;
     }
 
@@ -372,7 +372,7 @@ bool FillTopology(vtkDataSet* data_set, conduit_cpp::Node& conduit_node)
   }
   else
   {
-    vtkLogF(ERROR, "Unsupported type.");
+    vtkLog(ERROR, "Unsupported data set type: " << data_set->GetClassName());
     return false;
   }
 

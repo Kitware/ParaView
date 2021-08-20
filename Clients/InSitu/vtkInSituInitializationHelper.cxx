@@ -387,29 +387,30 @@ bool vtkInSituInitializationHelper::ExecutePipelines(
 }
 
 //----------------------------------------------------------------------------
-int vtkInSituInitializationHelper::GetAttributeTypeFromString(std::string assocStr, int& assoc)
+int vtkInSituInitializationHelper::GetAttributeTypeFromString(
+  const std::string& associationString, int& assoc)
 {
-  unsigned int n = assocStr.size();
-  for (unsigned int i = 0; i < n; ++i)
-    assocStr[i] = tolower(assocStr[i]);
+  std::string lower_case_string = associationString;
+  std::transform(associationString.begin(), associationString.end(), lower_case_string.begin(),
+    [](char character) -> char { return tolower(character); });
 
-  if (assocStr == "point")
+  if (lower_case_string == "point")
   {
     assoc = vtkDataObject::POINT;
     return 0;
   }
-  else if (assocStr == "cell")
+  else if (lower_case_string == "cell")
   {
     assoc = vtkDataObject::CELL;
     return 0;
   }
-  else if (assocStr == "field")
+  else if (lower_case_string == "field")
   {
     assoc = vtkDataObject::FIELD;
     return 0;
   }
 
-  vtkLog(ERROR, "Invalid association \"" << assocStr << "\"");
+  vtkLog(ERROR, "Invalid association \"" << associationString << "\"");
   return -1;
 }
 
@@ -644,10 +645,10 @@ void vtkInSituInitializationHelper::UpdateSteerableParameters(
   {
     auto internals = vtkInSituInitializationHelper::Internals;
 
-    auto proxyIterator = internals->SteerableProxies.find(steerableProxy);
-    if (proxyIterator == internals->SteerableProxies.end())
+    auto it = internals->SteerableProxies.lower_bound(steerableProxy);
+    if (it == internals->SteerableProxies.end() || it->first != steerableProxy)
     {
-      internals->SteerableProxies.emplace(steerableProxy, std::string(steerableSourceName));
+      internals->SteerableProxies.emplace_hint(it, steerableProxy, steerableSourceName);
     }
 
     UpdateSteerableProxies();
