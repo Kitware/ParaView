@@ -107,6 +107,8 @@ if (UNIX AND NOT APPLE)
   option(PARAVIEW_USE_MEMKIND  "Build support for extended memory" OFF)
 endif ()
 
+option(PARAVIEW_ENABLE_OPENVDB  "Enable the OpenVDB Writer" OFF)
+
 # Add option to disable Fortran
 if (NOT WIN32)
   include(CheckFortran)
