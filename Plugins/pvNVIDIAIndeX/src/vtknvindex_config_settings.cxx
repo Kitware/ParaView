@@ -335,10 +335,9 @@ void vtknvindex_config_settings::set_region_of_interest(
 }
 
 //-------------------------------------------------------------------------------------------------
-void vtknvindex_config_settings::get_region_of_interest(
-  mi::math::Bbox_struct<mi::Float32, 3>& region_of_interest) const
+mi::math::Bbox<mi::Float32, 3> vtknvindex_config_settings::get_region_of_interest() const
 {
-  region_of_interest = m_region_of_interest;
+  return m_region_of_interest;
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -349,10 +348,9 @@ void vtknvindex_config_settings::set_subcube_size(
 }
 
 //-------------------------------------------------------------------------------------------------
-void vtknvindex_config_settings::get_subcube_size(
-  mi::math::Vector_struct<mi::Uint32, 3>& subcube_size) const
+mi::math::Vector<mi::Uint32, 3> vtknvindex_config_settings::get_subcube_size() const
 {
-  subcube_size = m_subcube_size;
+  return m_subcube_size;
 }
 
 //-------------------------------------------------------------------------------------------------

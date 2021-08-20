@@ -151,14 +151,14 @@ vtknvindex_representation::vtknvindex_representation()
   static_cast<vtknvindex_volumemapper*>(this->VolumeMapper.GetPointer())
     ->set_cluster_properties(m_cluster_properties);
 
-  // TODO: These values should be communicated by ParaView.
-  //       Currently there is no way to do this.
+  // Deprecated
   m_roi_range_I[0] = -100.0;
   m_roi_range_I[1] = 100.0;
   m_roi_range_J[0] = -100.0;
   m_roi_range_J[1] = 100.0;
   m_roi_range_K[0] = -100.0;
   m_roi_range_K[1] = 100.0;
+  m_roi_gui = mi::math::Bbox<mi::Float32, 3>(0.f, 0.f, 0.f, 1.f, 1.f, 1.f);
 
   m_still_image_reduction_factor = 1;
   m_interactive_image_reduction_factor = 2;
@@ -461,7 +461,7 @@ int vtknvindex_representation::RequestData(
     {
       ds->GetBounds(this->DataBounds);
 
-      // Calculate global extends by gathering extents of all the pieces.
+      // Calculate global extents by gathering extents of all the pieces.
       // mi::Sint32 num_processes = m_controller->GetNumberOfProcesses();
       mi::Float64* all_rank_bounds = new mi::Float64[6 * num_processes];
 
@@ -522,8 +522,6 @@ int vtknvindex_representation::RequestData(
       // Cache bounds only for time varying datasets.
       if (has_time_steps)
         set_cached_bounds(cur_time_step);
-
-      update_index_roi();
     }
   }
   else
@@ -602,8 +600,6 @@ void vtknvindex_representation::SetInputArrayToProcess(
 void vtknvindex_representation::SetVisibility(bool val)
 {
   static_cast<vtknvindex_volumemapper*>(this->VolumeMapper.GetPointer())->set_visibility(val);
-  update_index_roi();
-
   this->Superclass::SetVisibility(val);
 }
 
@@ -725,18 +721,8 @@ void vtknvindex_representation::set_opacity_reference(double opacity_reference)
 //----------------------------------------------------------------------------
 void vtknvindex_representation::update_index_roi()
 {
-  // Set region of interest.
-  mi::math::Bbox<mi::Float32, 3> roi;
-
-  roi.min.x = (m_volume_size.x - 1) * m_roi_gui.min.x;
-  roi.max.x = (m_volume_size.x - 1) * m_roi_gui.max.x;
-  roi.min.y = (m_volume_size.y - 1) * m_roi_gui.min.y;
-  roi.max.y = (m_volume_size.y - 1) * m_roi_gui.max.y;
-  roi.min.z = (m_volume_size.z - 1) * m_roi_gui.min.z;
-  roi.max.z = (m_volume_size.z - 1) * m_roi_gui.max.z;
-
-  m_app_config_settings->set_region_of_interest(roi);
-  static_cast<vtknvindex_volumemapper*>(this->VolumeMapper.GetPointer())->config_settings_changed();
+  static_cast<vtknvindex_volumemapper*>(this->VolumeMapper.GetPointer())
+    ->set_region_of_interest_deprecated(m_roi_gui);
 }
 
 //----------------------------------------------------------------------------

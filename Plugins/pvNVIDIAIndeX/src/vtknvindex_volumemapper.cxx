@@ -91,6 +91,7 @@ vtknvindex_volumemapper::vtknvindex_volumemapper()
   , m_prev_vector_component(-1)
   , m_prev_vector_mode(-1)
   , m_is_mpi_rendering(false)
+  , m_region_of_interest_deprecated_warning_printed(false)
 
 {
   m_index_instance = vtknvindex_instance::get();
@@ -110,7 +111,7 @@ double* vtknvindex_volumemapper::GetBounds()
 }
 
 //----------------------------------------------------------------------------
-void vtknvindex_volumemapper::set_whole_bounds(const mi::math::Bbox<mi::Float64, 3> bounds)
+void vtknvindex_volumemapper::set_whole_bounds(const mi::math::Bbox<mi::Float64, 3>& bounds)
 {
   m_whole_bounds[0] = bounds.min.x;
   m_whole_bounds[1] = bounds.max.x;
@@ -615,6 +616,7 @@ void vtknvindex_volumemapper::Render(vtkRenderer* ren, vtkVolume* vol)
   if (m_index_instance->is_index_viewer() && m_index_instance->ensure_index_initialized())
   {
     vtkTimerLog::MarkStartEvent("NVIDIA-IndeX: Rendering");
+    bool skip_rendering = false;
 
     {
       // DiCE database access
@@ -641,6 +643,71 @@ void vtknvindex_volumemapper::Render(vtkRenderer* ren, vtkVolume* vol)
         m_config_settings_changed = true; // force setting region-of-interest
       }
 
+      {
+        // Handle cropping
+        const mi::math::Bbox<mi::Float32, 3> whole_bounds(m_whole_bounds[0], m_whole_bounds[2],
+          m_whole_bounds[4], m_whole_bounds[1], m_whole_bounds[3], m_whole_bounds[5]);
+
+        mi::math::Bbox<mi::Sint32, 3> volume_extents;
+        m_cluster_properties->get_regular_volume_properties()->get_volume_extents(volume_extents);
+        const mi::math::Vector<mi::Float32, 3> volume_size(
+          volume_extents.max - volume_extents.min); // in voxels
+
+        mi::math::Bbox<mi::Float32, 3> roi;
+        if (this->Cropping)
+        {
+          roi = mi::math::Bbox<mi::Float32, 3>(this->CroppingRegionPlanes[0],
+            this->CroppingRegionPlanes[2], this->CroppingRegionPlanes[4],
+            this->CroppingRegionPlanes[1], this->CroppingRegionPlanes[3],
+            this->CroppingRegionPlanes[5]);
+
+          roi = mi::math::clip(roi, whole_bounds); // Limit to bounds of the volume
+
+          // Translate to origin
+          roi.min -= whole_bounds.min;
+          roi.max -= whole_bounds.min;
+
+          // Transform to volume size in voxels
+          roi.min = (roi.min / (whole_bounds.max - whole_bounds.min)) * volume_size;
+          roi.max = (roi.max / (whole_bounds.max - whole_bounds.min)) * volume_size;
+        }
+        else if (!m_region_of_interest_deprecated.empty())
+        {
+          // Backward-compatibility: Apply deprecated "region of interest" if set
+          roi = mi::math::Bbox<mi::Float32, 3>(volume_size * m_region_of_interest_deprecated.min,
+            volume_size * m_region_of_interest_deprecated.max);
+
+          if (!m_region_of_interest_deprecated_warning_printed)
+          {
+            const mi::math::Vector<mi::Float32, 3> scale(
+              m_region_of_interest_deprecated.max - m_region_of_interest_deprecated.min);
+            const mi::math::Vector<mi::Float32, 3> origin(
+              (whole_bounds.min - whole_bounds.min * scale) +
+              (whole_bounds.max - whole_bounds.min) * m_region_of_interest_deprecated.min);
+
+            ERROR_LOG << "The 'NVIDIA IndeX Region of Interest' setting is deprecated, "
+                      << "please use 'Cropping' instead (origin: " << origin << ", scale: " << scale
+                      << ").";
+            m_region_of_interest_deprecated_warning_printed = true;
+          }
+        }
+        else
+        {
+          // No cropping, show entire volume
+          roi = mi::math::Bbox<mi::Float32, 3>(mi::math::Vector<mi::Float32, 3>(0.f), volume_size);
+        }
+
+        if (roi.is_volume())
+        {
+          m_cluster_properties->get_config_settings()->set_region_of_interest(roi);
+        }
+        else
+        {
+          // Nothing to render
+          skip_rendering = true;
+        }
+      }
+
       // Update scene parameters
       m_scene.update_scene(
         ren, vol, dice_transaction, m_config_settings_changed, m_opacity_changed, m_slices_changed);
@@ -665,6 +732,7 @@ void vtknvindex_volumemapper::Render(vtkRenderer* ren, vtkVolume* vol)
     }
 
     // Render the scene
+    if (!skip_rendering)
     {
       // DiCE database access
       mi::base::Handle<mi::neuraylib::IDice_transaction> dice_transaction(
@@ -802,4 +870,21 @@ vtkDataArray* vtknvindex_volumemapper::convert_scalar_array(vtkDataArray* scalar
   }
 
   return converted_array;
+}
+
+//-------------------------------------------------------------------------------------------------
+void vtknvindex_volumemapper::set_region_of_interest_deprecated(
+  const mi::math::Bbox<mi::Float32, 3>& roi)
+{
+  if (m_region_of_interest_deprecated.empty())
+  {
+    const mi::math::Bbox<mi::Float32, 3> unit_bbox(0.f, 0.f, 0.f, 1.f, 1.f, 1.f);
+    if (roi.empty() || roi == unit_bbox)
+    {
+      // Nothing will be cropped
+      return;
+    }
+  }
+
+  m_region_of_interest_deprecated = roi;
 }

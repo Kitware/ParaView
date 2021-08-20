@@ -847,6 +847,23 @@ void vtknvindex_scene::update_scene(vtkRenderer* ren, vtkVolume* vol,
   // Update colormap.
   update_colormap(vol, dice_transaction, m_cluster_properties->get_regular_volume_properties());
 
+  {
+    // Detect changed region of interest (cropping).
+    mi::base::Handle<const nv::index::ISession> session(
+      dice_transaction->access<nv::index::ISession>(m_index_instance->m_session_tag));
+    mi::base::Handle<const nv::index::IScene> scene(
+      dice_transaction->access<nv::index::IScene>(session->get_scene()));
+
+    const mi::math::Bbox<mi::Float32, 3> roi_new =
+      m_cluster_properties->get_config_settings()->get_region_of_interest();
+
+    const mi::math::Bbox<mi::Float32, 3> roi_old = scene->get_clipped_bounding_box();
+    if (roi_new != roi_old)
+    {
+      config_settings_changed = true; // scene will be updated with new ROI below
+    }
+  }
+
   // Update config settings.
   if (config_settings_changed)
     update_config_settings(dice_transaction);
@@ -1155,9 +1172,7 @@ void vtknvindex_scene::update_config_settings(
   vtknvindex_config_settings* pv_config_settings = m_cluster_properties->get_config_settings();
 
   // Set region of interest.
-  mi::math::Bbox_struct<mi::Float32, 3> region_of_interest;
-  pv_config_settings->get_region_of_interest(region_of_interest);
-  scene->set_clipped_bounding_box(region_of_interest);
+  scene->set_clipped_bounding_box(pv_config_settings->get_region_of_interest());
 
   // Access (edit mode) the global configurations.
   mi::base::Handle<nv::index::IConfig_settings> config_settings(
@@ -1208,8 +1223,7 @@ void vtknvindex_scene::update_config_settings(
     mi::Uint32 subcube_border_size = pv_config_settings->get_subcube_border();
 
     // Subcube size
-    mi::math::Vector_struct<mi::Uint32, 3> subcube_size;
-    pv_config_settings->get_subcube_size(subcube_size);
+    mi::math::Vector<mi::Uint32, 3> subcube_size = pv_config_settings->get_subcube_size();
 
     // Adding padding to subcube size in order to build a
     // subcube size multiple of the volume size when border size is present.

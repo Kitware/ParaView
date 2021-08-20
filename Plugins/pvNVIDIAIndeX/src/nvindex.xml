@@ -40,6 +40,7 @@
                 NVIDIA IndeX mapper.
             </Documentation>
 
+          <!-- Region of interest: Deprecated, just for backward-compatibility with old state files. Use "Cropping" instead. -->
           <DoubleVectorProperty
                 command="Getm_roi_range_I"
                 information_only="1"
@@ -1702,7 +1703,8 @@
         </ShareProperties>
 
         <ExposedProperties>
-            <PropertyGroup label="NVIDIA IndeX Region of Interest">
+            <!-- Region of interest: Deprecated, just for backward-compatibility with old state files, hence hidden. Use "Cropping" instead. -->
+            <PropertyGroup label="NVIDIA IndeX Region of Interest" panel_visibility="never">
                   <Property name="Min I"/>
                   <Property name="Max I"/>
                   <Property name="Min J"/>

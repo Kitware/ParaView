@@ -188,7 +188,7 @@ public:
   void set_custom_pint_3(int ci3);
   void set_custom_pint_4(int ci4);
 
-  // Set region of interest.
+  // Set region of interest: Deprecated, use "Cropping" instead.
   void update_index_roi();
 
   void set_roi_minI(double val);
@@ -232,9 +232,9 @@ private:
   vtkMultiProcessController* m_controller;           // MPI controller from ParaView.
   vtknvindex_config_settings* m_app_config_settings; // Application side config settings.
   vtknvindex_cluster_properties*
-    m_cluster_properties; // Cluster wide properties, refer class documentation.
-  mi::math::Bbox_struct<mi::Float32, 3> m_roi_gui; // Region of interest set in the GUI.
-  mi::math::Vector<mi::Uint32, 3> m_volume_size;   // Cached volume size.
+    m_cluster_properties;                   // Cluster wide properties, refer class documentation.
+  mi::math::Bbox<mi::Float32, 3> m_roi_gui; // Region of interest set in the GUI.
+  mi::math::Vector<mi::Uint32, 3> m_volume_size; // Cached volume size.
 
   // backup of original Image Reduction Factors
   mi::Sint32 m_still_image_reduction_factor;

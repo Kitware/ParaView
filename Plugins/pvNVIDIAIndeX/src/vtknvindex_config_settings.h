@@ -113,7 +113,7 @@ public:
 
   // Set region of interest.
   void set_region_of_interest(const mi::math::Bbox_struct<mi::Float32, 3>& region_of_interest);
-  void get_region_of_interest(mi::math::Bbox_struct<mi::Float32, 3>& region_of_interest) const;
+  mi::math::Bbox<mi::Float32, 3> get_region_of_interest() const;
 
   // Set/get horizontal slice position.
   void set_hslice_position(mi::Float32 slice_pos);
@@ -121,7 +121,7 @@ public:
 
   // Set/get subcube size.
   void set_subcube_size(const mi::math::Vector_struct<mi::Uint32, 3>& subcube_size);
-  void get_subcube_size(mi::math::Vector_struct<mi::Uint32, 3>& subcube_size) const;
+  mi::math::Vector<mi::Uint32, 3> get_subcube_size() const;
 
   // Set/get subcube border size.
   void set_subcube_border(mi::Sint32 border);

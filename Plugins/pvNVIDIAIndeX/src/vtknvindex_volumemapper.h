@@ -72,7 +72,7 @@ public:
   using Superclass::GetBounds;
 
   // Set the whole volume bounds.
-  void set_whole_bounds(const mi::math::Bbox<mi::Float64, 3> bounds);
+  void set_whole_bounds(const mi::math::Bbox<mi::Float64, 3>& bounds);
 
   // Shutdown forward loggers, NVIDIA IndeX library and unload libraries.
   void shutdown();
@@ -118,6 +118,10 @@ public:
   // Set volume visibility
   void set_visibility(bool visibility);
 
+  // Region of interest used when cropping is disabled and "roi" is not empty. For
+  // backward-compatibility with old state files.
+  void set_region_of_interest_deprecated(const mi::math::Bbox<mi::Float32, 3>& roi);
+
 private:
   vtknvindex_volumemapper(const vtknvindex_volumemapper&) = delete;
   void operator=(const vtknvindex_volumemapper&) = delete;
@@ -158,13 +162,15 @@ private:
   // Entries will be null if no conversion took place (and m_scalar_array can be used directly).
   std::vector<vtkSmartPointer<vtkDataArray>> m_converted_scalar_arrays;
 
-  mi::Float64 m_whole_bounds[6]; // Whole volume bounds.
+  mi::Float64 m_whole_bounds[6];                                  // Whole volume bounds.
+  mi::math::Bbox<mi::Float32, 3> m_region_of_interest_deprecated; // For backward-compatibility.
+  bool m_region_of_interest_deprecated_warning_printed;           // A warning was already printed.
 
-  std::set<std::string> m_data_array_warning_printed; // A warning was already printed for these
+  std::set<std::string> m_data_array_warning_printed; // A warning was already printed for these.
 
   vtknvindex_rtc_params_buffer m_volume_rtc_kernel; // The CUDA code applied to the current volume.
 
-  vtknvindex_instance* m_index_instance; // global index instance pointer
+  vtknvindex_instance* m_index_instance; // Global index instance pointer.
 };
 
 #endif
