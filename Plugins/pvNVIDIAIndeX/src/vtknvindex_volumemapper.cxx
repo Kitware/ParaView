@@ -71,6 +71,7 @@
 
 #include "vtknvindex_cluster_properties.h"
 #include "vtknvindex_forwarding_logger.h"
+#include "vtknvindex_global_settings.h"
 #include "vtknvindex_instance.h"
 #include "vtknvindex_utilities.h"
 #include "vtknvindex_volumemapper.h"
@@ -693,9 +694,9 @@ void vtknvindex_volumemapper::Render(vtkRenderer* ren, vtkVolume* vol)
               (whole_bounds.min - whole_bounds.min * scale) +
               (whole_bounds.max - whole_bounds.min) * m_region_of_interest_deprecated.min);
 
-            ERROR_LOG << "The 'NVIDIA IndeX Region of Interest' setting is deprecated, "
-                      << "please use 'Cropping' instead (origin: " << origin << ", scale: " << scale
-                      << ").";
+            WARN_LOG << "The 'NVIDIA IndeX Region of Interest' setting is deprecated, "
+                     << "please use 'Cropping' instead (origin: " << origin << ", scale: " << scale
+                     << ").";
             m_region_of_interest_deprecated_warning_printed = true;
           }
         }
@@ -796,7 +797,7 @@ void vtknvindex_volumemapper::Render(vtkRenderer* ren, vtkVolume* vol)
         }
 
         // log performance values if requested
-        if (m_cluster_properties->get_config_settings()->is_log_performance())
+        if (vtknvindex_global_settings::GetInstance()->GetOutputPerformanceValues())
           m_performance_values.print_perf_values(frame_results, cur_time_step);
       }
 

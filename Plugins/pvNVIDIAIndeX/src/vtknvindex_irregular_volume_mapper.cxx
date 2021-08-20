@@ -68,6 +68,7 @@
 
 #include "vtknvindex_cluster_properties.h"
 #include "vtknvindex_forwarding_logger.h"
+#include "vtknvindex_global_settings.h"
 #include "vtknvindex_instance.h"
 #include "vtknvindex_irregular_volume_mapper.h"
 #include "vtknvindex_utilities.h"
@@ -740,7 +741,8 @@ void vtknvindex_irregular_volume_mapper::Render(vtkRenderer* ren, vtkVolume* vol
                     << os.str();
         }
 
-        if (m_cluster_properties->get_config_settings()->is_log_performance())
+        // log performance values if requested
+        if (vtknvindex_global_settings::GetInstance()->GetOutputPerformanceValues())
           m_performance_values.print_perf_values(frame_results);
       }
 

@@ -125,12 +125,6 @@ public:
   // Set opacity reference.
   void set_opacity_reference(double opacity_reference);
 
-  // Set dump internal state of NVIDIA IndeX.
-  void set_dump_internal_state(bool is_dump);
-
-  // Set flag to log performance values.
-  void set_log_performance(bool is_log);
-
   // Set slice parameters.
   void show_volume(bool enable);
   void set_selected_slice(int selected_slice);

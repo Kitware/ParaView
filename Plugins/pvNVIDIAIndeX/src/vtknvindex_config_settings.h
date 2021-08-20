@@ -143,14 +143,6 @@ public:
   void set_ivol_step_size(mi::Float32 step_size);
   mi::Float32 get_ivol_step_size() const;
 
-  // Set/get flag for performance logging.
-  void set_log_performance(bool is_dump);
-  bool is_log_performance() const;
-
-  // Set/get flag to dump internal state.
-  void set_dump_internal_state(bool is_dump);
-  bool is_dump_internal_state() const;
-
   // Set/get play forward/backward time series animation.
   void animation_play_forward(bool play_forward);
   bool animation_play_forward() const;
@@ -185,8 +177,6 @@ private:
   void operator=(const vtknvindex_config_settings&) = delete;
 
   bool m_enable_preintegration;                               // Use pre-integration tables.
-  bool m_dump_internal_state;                                 // Dump scene to file.
-  bool m_log_performance;                                     // Log performance values to file.
   bool m_animation_play_forward;                              // Animation is running.
   mi::Uint32 m_animation_interval_max;                        // The max animation interval.
   nv::index::Sparse_volume_filter_mode m_filter_mode;         // Volume filtering mode.

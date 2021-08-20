@@ -1,4 +1,5 @@
 set(classes
+  vtknvindex_global_settings
   vtknvindex_irregular_volume_mapper
   vtknvindex_irregular_volume_representation
   vtknvindex_performance_values

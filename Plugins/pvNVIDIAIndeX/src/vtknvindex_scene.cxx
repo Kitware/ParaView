@@ -53,6 +53,7 @@
 #include "vtknvindex_clock_pulse_generator.h"
 #include "vtknvindex_cluster_properties.h"
 #include "vtknvindex_forwarding_logger.h"
+#include "vtknvindex_global_settings.h"
 #include "vtknvindex_instance.h"
 #include "vtknvindex_irregular_volume_importer.h"
 #include "vtknvindex_rtc_kernel_params.h"
@@ -862,6 +863,21 @@ void vtknvindex_scene::update_scene(vtkRenderer* ren, vtkVolume* vol,
     {
       config_settings_changed = true; // scene will be updated with new ROI below
     }
+
+    // Performance logging.
+    vtknvindex_global_settings* settings = vtknvindex_global_settings::GetInstance();
+    mi::base::Handle<const nv::index::IConfig_settings> config_settings(
+      dice_transaction->access<nv::index::IConfig_settings>(session->get_config()));
+    if (config_settings->is_monitor_performance_values() != settings->GetOutputPerformanceValues())
+    {
+      config_settings_changed = true;
+    }
+
+    // Dump internal state.
+    if (settings->GetExportSession())
+    {
+      export_session(settings->GetExportSessionFilename());
+    }
   }
 
   // Update config settings.
@@ -1289,15 +1305,9 @@ void vtknvindex_scene::update_config_settings(
     config_settings->set_data_transfer_config(data_transfer_config);
   }
 
-  // Logging performance values.
-  if (m_cluster_properties->get_config_settings()->is_log_performance())
-    config_settings->set_monitor_performance_values(true);
-  else
-    config_settings->set_monitor_performance_values(false);
-
-  // Dump internal state.
-  if (pv_config_settings->is_dump_internal_state())
-    export_session();
+  // Enable generation of performance values if needed.
+  config_settings->set_monitor_performance_values(
+    vtknvindex_global_settings::GetInstance()->GetOutputPerformanceValues());
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -1399,7 +1409,7 @@ void vtknvindex_scene::set_cluster_properties(vtknvindex_cluster_properties* clu
 }
 
 //-------------------------------------------------------------------------------------------------
-void vtknvindex_scene::export_session()
+void vtknvindex_scene::export_session(const char* filename)
 {
   // TODO: Add scene lock here before accessing the export file.
   mi::base::Handle<mi::neuraylib::IDice_transaction> dice_transaction(
@@ -1421,9 +1431,11 @@ void vtknvindex_scene::export_session()
     std::ostringstream s;
     s << str->get_c_str();
 
-    std::string output_filename = "nvindex_pvplugin.prj";
-    if (output_filename.empty() || output_filename == "stdout")
+    std::string output_filename = (filename ? filename : "");
+    if (output_filename.empty())
     {
+      WARN_LOG << "Exporting NVIDIA IndeX session to standard output. This can be disabled in the "
+                  "'Settings' dialog.";
       std::cout << "\n"
                 << "----------------8<-------------[ cut here ]------------------\n"
                 << s.str() << "----------------8<-------------[ cut here ]------------------\n"
@@ -1431,12 +1443,8 @@ void vtknvindex_scene::export_session()
     }
     else
     {
-      std::vector<std::string> path_components;
-      path_components.push_back(vtksys::SystemTools::GetCurrentWorkingDirectory() + "/");
-      path_components.push_back(output_filename);
-
-      INFO_LOG << "Writing export session to file '"
-               << vtksys::SystemTools::JoinPath(path_components) << "'";
+      WARN_LOG << "Exporting NVIDIA IndeX session to file '" << output_filename
+               << "'. This can be disabled in the 'Settings' dialog.";
 
       vtksys::ofstream f(output_filename.c_str());
       f << s.str();

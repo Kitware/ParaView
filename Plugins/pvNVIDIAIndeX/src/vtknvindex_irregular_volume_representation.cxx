@@ -546,20 +546,6 @@ void vtknvindex_irregular_volume_representation::set_roi_maxK(double val)
 }
 
 //----------------------------------------------------------------------------
-void vtknvindex_irregular_volume_representation::set_log_performance(bool is_log)
-{
-  m_app_config_settings->set_log_performance(is_log);
-  DefaultMapper->config_settings_changed();
-}
-
-//----------------------------------------------------------------------------
-void vtknvindex_irregular_volume_representation::set_dump_internal_state(bool is_dump)
-{
-  m_app_config_settings->set_dump_internal_state(is_dump);
-  DefaultMapper->config_settings_changed();
-}
-
-//----------------------------------------------------------------------------
 bool vtknvindex_irregular_volume_representation::update_current_kernel()
 {
   bool force_render = false;

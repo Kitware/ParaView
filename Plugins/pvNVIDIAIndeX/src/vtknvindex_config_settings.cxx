@@ -309,8 +309,6 @@ bool vtknvindex_xml_config_parser::create_config_file(const std::string& filenam
 //-------------------------------------------------------------------------------------------------
 vtknvindex_config_settings::vtknvindex_config_settings()
   : m_enable_preintegration(false)
-  , m_dump_internal_state(false)
-  , m_log_performance(false)
   , m_animation_play_forward(true)
   , m_animation_interval_max(1)
   , m_filter_mode(nv::index::SPARSE_VOLUME_FILTER_TRILINEAR_POST)
@@ -410,30 +408,6 @@ void vtknvindex_config_settings::set_ivol_step_size(mi::Float32 step_size)
 mi::Float32 vtknvindex_config_settings::get_ivol_step_size() const
 {
   return m_ivol_step_size;
-}
-
-//-------------------------------------------------------------------------------------------------
-void vtknvindex_config_settings::set_dump_internal_state(bool is_dump)
-{
-  m_dump_internal_state = is_dump;
-}
-
-//-------------------------------------------------------------------------------------------------
-bool vtknvindex_config_settings::is_dump_internal_state() const
-{
-  return m_dump_internal_state;
-}
-
-//-------------------------------------------------------------------------------------------------
-void vtknvindex_config_settings::set_log_performance(bool is_log)
-{
-  m_log_performance = is_log;
-}
-
-//-------------------------------------------------------------------------------------------------
-bool vtknvindex_config_settings::is_log_performance() const
-{
-  return m_log_performance;
 }
 
 //-------------------------------------------------------------------------------------------------

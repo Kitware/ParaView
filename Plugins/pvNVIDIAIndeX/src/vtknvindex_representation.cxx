@@ -357,7 +357,7 @@ int vtknvindex_representation::RequestData(
     return 1;
   }
 
-  // Cache IndeX timse series animation params.
+  // Cache IndeX time series animation params.
   vtkPolyData* polyData = this->OutlineGeometry;
   vtkNew<vtkIntArray> index_animation_params;
   index_animation_params->SetName("index_animation_params");
@@ -765,20 +765,6 @@ void vtknvindex_representation::set_roi_maxK(double val)
 {
   m_roi_gui.max.z = (val + 100.0) / 200.0;
   update_index_roi();
-}
-
-//----------------------------------------------------------------------------
-void vtknvindex_representation::set_log_performance(bool is_log)
-{
-  m_app_config_settings->set_log_performance(is_log);
-  static_cast<vtknvindex_volumemapper*>(this->VolumeMapper.GetPointer())->config_settings_changed();
-}
-
-//----------------------------------------------------------------------------
-void vtknvindex_representation::set_dump_internal_state(bool is_dump)
-{
-  m_app_config_settings->set_dump_internal_state(is_dump);
-  static_cast<vtknvindex_volumemapper*>(this->VolumeMapper.GetPointer())->config_settings_changed();
 }
 
 //----------------------------------------------------------------------------
