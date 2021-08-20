@@ -41,7 +41,9 @@ g.GlyphType.GlyphType = 'Vertex'
 
 t = Threshold()
 t.Scalars = ['POINTS', 'ParticleAge']
-t.ThresholdRange = [0.71, 0.73]
+t.LowerThreshold = 0.71
+t.UpperThreshold = 0.73
+t.ThresholdMethod = "Between"
 t.UpdatePipeline()
 
 grid = servermanager.Fetch(t)
@@ -52,7 +54,9 @@ if grid.GetNumberOfPoints() != 7:
 r.FileName = sys.argv[1]+'/particles_80.pvtp'
 
 # threshold to get the seeds that were originally injected only
-t.ThresholdRange = [1.43, 1.45]
+t.LowerThreshold = 1.43
+t.UpperThreshold = 1.45
+t.ThresholdMethod = "Between"
 t.UpdatePipeline()
 bounds = t.GetDataInformation().DataInformation.GetBounds()
 if bounds[0] < 2. or bounds[0] > 2.1 or \
@@ -71,7 +75,9 @@ if grid.GetNumberOfPoints() != 7:
 
 # threshold to get the seeds that were injected at time step 70
 t.Scalars = ['POINTS', 'InjectionStepId']
-t.ThresholdRange = [69, 71]
+t.LowerThreshold = 69
+t.UpperThreshold = 71
+t.ThresholdMethod = "Between"
 t.UpdatePipeline()
 
 bounds = t.GetDataInformation().DataInformation.GetBounds()

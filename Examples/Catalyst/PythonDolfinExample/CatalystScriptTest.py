@@ -35,7 +35,9 @@ def CreateCoProcessor():
       Source = coprocessor.CreateProducer( datadescription, "input" )
       threshold1 = Threshold( Source )
       threshold1.Scalars = ['POINTS', 'Pressure']
-      threshold1.ThresholdRange = [0.0, 0.5]
+      threshold1.LowerThreshold = 0.0
+      threshold1.UpperThreshold = 0.5
+      threshold1.ThresholdMethod = "Between"
       # ----------------------------------------------------------------
       # setup color maps and opacity mapes used in the visualization
       # note: the Get..() functions create a new object, if needed
