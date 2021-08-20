@@ -161,7 +161,7 @@ private:
   void operator=(const vtkInSituInitializationHelper&) = delete;
 
   static void UpdateSteerableProxies();
-  static int GetAttributeTypeFromString(const std::string& associationString, int& assoc);
+  static int GetAttributeTypeFromString(const std::string& associationString);
 
   static int WasInitializedOnce;
   static int WasFinalizedOnce;

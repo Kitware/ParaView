@@ -387,8 +387,7 @@ bool vtkInSituInitializationHelper::ExecutePipelines(
 }
 
 //----------------------------------------------------------------------------
-int vtkInSituInitializationHelper::GetAttributeTypeFromString(
-  const std::string& associationString, int& assoc)
+int vtkInSituInitializationHelper::GetAttributeTypeFromString(const std::string& associationString)
 {
   std::string lower_case_string = associationString;
   std::transform(associationString.begin(), associationString.end(), lower_case_string.begin(),
@@ -396,18 +395,15 @@ int vtkInSituInitializationHelper::GetAttributeTypeFromString(
 
   if (lower_case_string == "point")
   {
-    assoc = vtkDataObject::POINT;
-    return 0;
+    return vtkDataObject::POINT;
   }
   else if (lower_case_string == "cell")
   {
-    assoc = vtkDataObject::CELL;
-    return 0;
+    return vtkDataObject::CELL;
   }
   else if (lower_case_string == "field")
   {
-    assoc = vtkDataObject::FIELD;
-    return 0;
+    return vtkDataObject::FIELD;
   }
 
   vtkLog(ERROR, "Invalid association \"" << associationString << "\"");
@@ -498,8 +494,8 @@ void vtkInSituInitializationHelper::UpdateSteerableProxies()
         continue;
       }
 
-      int assoc = 0;
-      if (GetAttributeTypeFromString(child->GetAttributeOrDefault("association", "point"), assoc))
+      int assoc = GetAttributeTypeFromString(child->GetAttributeOrDefault("association", "point"));
+      if (assoc < 0)
       {
         vtkLog(ERROR, "Invalid 'association' specified. Skipping.");
         continue;
