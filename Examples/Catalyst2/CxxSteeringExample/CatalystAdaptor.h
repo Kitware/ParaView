@@ -1,3 +1,18 @@
+/*=========================================================================
+
+  Program:   ParaView
+  Module:    vtkDataObjectToConduit.h
+
+  Copyright (c) Kitware, Inc.
+  All rights reserved.
+  See Copyright.txt or http://www.paraview.org/HTML/Copyright.html for details.
+
+     This software is distributed WITHOUT ANY WARRANTY; without even
+     the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+     PURPOSE.  See the above copyright notice for more information.
+
+=========================================================================*/
+
 #ifndef CatalystAdaptor_h
 #define CatalystAdaptor_h
 
@@ -24,7 +39,7 @@ void Initialize(int argc, char* argv[])
   for (int cc = 1; cc < argc; ++cc)
   {
     std::string file_path = argv[cc];
-    if (file_path.substr(file_path.size() - 4, 4) == ".xml")
+    if (file_path.size() > 4 && file_path.substr(file_path.size() - 4, 4) == ".xml")
     {
       node["catalyst/proxies/proxy" + std::to_string(cc - 1)].set_string(argv[cc]);
     }

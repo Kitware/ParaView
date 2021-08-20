@@ -1,3 +1,18 @@
+/*=========================================================================
+
+  Program:   ParaView
+  Module:    vtkDataObjectToConduit.h
+
+  Copyright (c) Kitware, Inc.
+  All rights reserved.
+  See Copyright.txt or http://www.paraview.org/HTML/Copyright.html for details.
+
+     This software is distributed WITHOUT ANY WARRANTY; without even
+     the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+     PURPOSE.  See the above copyright notice for more information.
+
+=========================================================================*/
+
 #include "FEDataStructures.h"
 
 #include <iostream>
@@ -10,7 +25,7 @@ void Grid::Initialize(const unsigned int numPoints[3], const double spacing[3])
 {
   if (numPoints[0] == 0 || numPoints[1] == 0 || numPoints[2] == 0)
   {
-    std::cerr << "Must have a non-zero amount of points in each direction.\n";
+    std::cerr << "Must have a non-zero amount of points in each dimension.\n";
   }
   // in parallel, we do a simple partitioning in the x-direction.
   int mpiSize = 1;
@@ -85,7 +100,7 @@ double* Grid::GetPointsArray()
 
 double* Grid::GetPoint(size_t pointId)
 {
-  if (pointId >= this->Points.size())
+  if (pointId >= this->GetNumberOfPoints())
   {
     return nullptr;
   }
@@ -94,11 +109,11 @@ double* Grid::GetPoint(size_t pointId)
 
 unsigned int* Grid::GetCellPoints(size_t cellId)
 {
-  if (cellId >= this->Cells.size())
+  if (cellId >= this->GetNumberOfCells())
   {
     return nullptr;
   }
-  return &(this->Cells[cellId * 8]);
+  return this->Cells.data() + cellId * 8;
 }
 
 Attributes::Attributes()
