@@ -523,13 +523,31 @@ bool vtknvindex_instance::load_nvindex()
   {
     mi::base::Handle<mi::neuraylib::ILogging_configuration> logging_configuration(
       m_nvindex_interface->get_api_component<mi::neuraylib::ILogging_configuration>());
-    assert(logging_configuration.is_valid_interface());
 
     logging_configuration->set_log_locally(true); // local logging
 
+    // Create verbose log output, even when it will not be shown with the default log level
+    // configured of the receiving logger.
+    const mi::base::Message_severity log_level = mi::base::MESSAGE_SEVERITY_VERBOSE;
+    logging_configuration->set_log_level(log_level);
+    logging_configuration->set_log_level_by_category("MAIN", log_level);
+
+    vtknvindex_global_settings* settings = vtknvindex_global_settings::GetInstance();
+    mi::Uint32 log_prefix = logging_configuration->get_log_prefix();
+    if (settings->GetLogTimestamp())
+    {
+      log_prefix |= mi::neuraylib::LOG_PREFIX_TIME;
+    }
+
+    if (settings->GetLogHostname())
+    {
+      log_prefix |= mi::neuraylib::LOG_PREFIX_HOST_NAME;
+    }
+
+    logging_configuration->set_log_prefix(log_prefix);
+
     // Install the receiving logger.
     mi::base::Handle<mi::base::ILogger> receiving_logger(new vtknvindex_receiving_logger());
-    assert(receiving_logger.is_valid_interface());
     logging_configuration->set_receiving_logger(receiving_logger.get());
   }
 

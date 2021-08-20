@@ -49,6 +49,27 @@ public:
   static vtknvindex_global_settings* GetInstance();
   static void InitializeSettings(vtkObject*, unsigned long, void* clientdata, void*);
 
+  // Logging
+
+  // These match mi::base::MESSAGE_SEVERITY_WARNING, etc.
+  enum LogLevels
+  {
+    LOG_DISABLE = 0,
+    LOG_ERROR = 1,
+    LOG_WARNING = 2,
+    LOG_INFO = 3,
+    LOG_VERBOSE = 4
+  };
+
+  vtkGetMacro(LogLevel, int);
+  vtkSetMacro(LogLevel, int);
+  vtkGetMacro(LogLevelStandardOutput, int);
+  vtkSetMacro(LogLevelStandardOutput, int);
+  vtkGetMacro(LogTimestamp, bool);
+  vtkSetMacro(LogTimestamp, bool);
+  vtkGetMacro(LogHostname, bool);
+  vtkSetMacro(LogHostname, bool);
+
   // Network Configuration
 
   enum ClusterModes
@@ -112,6 +133,11 @@ public:
 protected:
   vtknvindex_global_settings();
   ~vtknvindex_global_settings();
+
+  int LogLevel = LOG_WARNING;
+  int LogLevelStandardOutput = LOG_INFO;
+  bool LogTimestamp = false;
+  bool LogHostname = false;
 
   int ClusterMode = CLUSTER_TCP;
   char* ClusterInterfaceAddress = nullptr;

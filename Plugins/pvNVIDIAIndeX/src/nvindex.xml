@@ -1794,6 +1794,72 @@
                        class="vtknvindex_global_settings">
             <Documentation>General settings for the NVIDIA IndeX plugin.</Documentation>
 
+            <!-- Logging -->
+
+            <IntVectorProperty
+                name="LogLevel"
+                label="Log Level For 'Output Messages'"
+                command="SetLogLevel"
+                number_of_elements="1"
+                default_values="2"
+                panel_visibility="default">
+                <EnumerationDomain name="enum">
+                    <Entry value="0" text="Disable logging"/>
+                    <Entry value="1" text="Error"/>
+                    <Entry value="2" text="Warning (default)"/>
+                    <Entry value="3" text="Info"/>
+                    <Entry value="4" text="Verbose"/>
+                </EnumerationDomain>
+                <Documentation>
+                    NVIDIA IndeX log messages with this severity level or higher
+                    will appear in the 'Output Messages' window.
+                </Documentation>
+            </IntVectorProperty>
+
+            <IntVectorProperty
+                name="LogLevelStandardOutput"
+                label="Log Level For Standard Output"
+                command="SetLogLevelStandardOutput"
+                number_of_elements="1"
+                default_values="3"
+                panel_visibility="default">
+                <EnumerationDomain name="enum">
+                    <Entry value="0" text="Disable logging"/>
+                    <Entry value="1" text="Error"/>
+                    <Entry value="2" text="Warning"/>
+                    <Entry value="3" text="Info (default)"/>
+                    <Entry value="4" text="Verbose"/>
+                </EnumerationDomain>
+                <Documentation>
+                    NVIDIA IndeX log messages with the severity level or higher
+                    will be written to standard output (console). Log message
+                    written to the 'Output Messages' window will typically also
+                    appear on standard output.
+                </Documentation>
+            </IntVectorProperty>
+
+            <IntVectorProperty
+                name="LogTimestamp"
+                command="SetLogTimestamp"
+                number_of_elements="1"
+                default_values="0"
+                panel_visibility="default">
+                <BooleanDomain name="bool" />
+                <Hints><RestartRequired/></Hints>
+                <Documentation>Add a timestamp to each log message.</Documentation>
+            </IntVectorProperty>
+
+            <IntVectorProperty
+                name="LogHostname"
+                command="SetLogHostname"
+                number_of_elements="1"
+                default_values="0"
+                panel_visibility="default">
+                <BooleanDomain name="bool" />
+                <Hints><RestartRequired/></Hints>
+                <Documentation>Add the hostname to each log message.</Documentation>
+            </IntVectorProperty>
+
             <!-- Performance tracking -->
 
             <IntVectorProperty
@@ -2023,6 +2089,13 @@
             </StringVectorProperty>
 
             <!-- Property Groups -->
+
+            <PropertyGroup label="NVIDIA IndeX Logging">
+                <Property name="LogLevel" />
+                <Property name="LogLevelStandardOutput" />
+                <Property name="LogTimestamp" />
+                <Property name="LogHostname" />
+            </PropertyGroup>
 
             <PropertyGroup label="NVIDIA IndeX Performance Tracking">
                 <Property name="OutputPerformanceValues" />
