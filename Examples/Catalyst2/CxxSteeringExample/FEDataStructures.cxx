@@ -57,7 +57,6 @@ void Grid::Initialize(const unsigned int numPoints[3], const double spacing[3])
     }
   }
   // create the hex cells
-  unsigned int cellPoints[8];
   unsigned int numXPoints = endXPoint - startXPoint;
   for (unsigned int i = 0; i < numXPoints - 1; i++)
   {
@@ -65,14 +64,14 @@ void Grid::Initialize(const unsigned int numPoints[3], const double spacing[3])
     {
       for (unsigned int k = 0; k < numPoints[2] - 1; k++)
       {
-        cellPoints[0] = i * numPoints[1] * numPoints[2] + j * numPoints[2] + k;
-        cellPoints[1] = (i + 1) * numPoints[1] * numPoints[2] + j * numPoints[2] + k;
-        cellPoints[2] = (i + 1) * numPoints[1] * numPoints[2] + (j + 1) * numPoints[2] + k;
-        cellPoints[3] = i * numPoints[1] * numPoints[2] + (j + 1) * numPoints[2] + k;
-        cellPoints[4] = i * numPoints[1] * numPoints[2] + j * numPoints[2] + k + 1;
-        cellPoints[5] = (i + 1) * numPoints[1] * numPoints[2] + j * numPoints[2] + k + 1;
-        cellPoints[6] = (i + 1) * numPoints[1] * numPoints[2] + (j + 1) * numPoints[2] + k + 1;
-        cellPoints[7] = i * numPoints[1] * numPoints[2] + (j + 1) * numPoints[2] + k + 1;
+        unsigned int cellPoints[8] = { i * numPoints[1] * numPoints[2] + j * numPoints[2] + k,
+          (i + 1) * numPoints[1] * numPoints[2] + j * numPoints[2] + k,
+          (i + 1) * numPoints[1] * numPoints[2] + (j + 1) * numPoints[2] + k,
+          i * numPoints[1] * numPoints[2] + (j + 1) * numPoints[2] + k,
+          i * numPoints[1] * numPoints[2] + j * numPoints[2] + k + 1,
+          (i + 1) * numPoints[1] * numPoints[2] + j * numPoints[2] + k + 1,
+          (i + 1) * numPoints[1] * numPoints[2] + (j + 1) * numPoints[2] + k + 1,
+          i * numPoints[1] * numPoints[2] + (j + 1) * numPoints[2] + k + 1 };
         std::copy(cellPoints, cellPoints + 8, std::back_inserter(this->Cells));
       }
     }
