@@ -224,6 +224,7 @@ bool vtknvindex_cluster_properties::retrieve_process_configuration(
 {
   // Volume general properties.
   m_regular_vol_properties->set_scalar_type(dataset_parameters.scalar_type);
+  m_regular_vol_properties->set_scalar_components(dataset_parameters.scalar_components);
   m_regular_vol_properties->set_voxel_range(mi::math::Vector<mi::Float32, 2>(
     dataset_parameters.voxel_range[0], dataset_parameters.voxel_range[1]));
   m_regular_vol_properties->set_scalar_range(mi::math::Vector<mi::Float32, 2>(

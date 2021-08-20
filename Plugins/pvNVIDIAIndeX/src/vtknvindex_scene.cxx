@@ -246,8 +246,7 @@ void vtknvindex_scene::create_scene(vtkRenderer* ren, vtkVolume* vol,
     vtknvindex_regular_volume_properties* regular_volume_properties =
       m_cluster_properties->get_regular_volume_properties();
 
-    std::string scalar_type;
-    regular_volume_properties->get_scalar_type(scalar_type);
+    const std::string scalar_type = regular_volume_properties->get_scalar_type();
 
     // Scene contains a regular volume.
     if (volume_type == VOLUME_TYPE_REGULAR)
@@ -257,7 +256,8 @@ void vtknvindex_scene::create_scene(vtkRenderer* ren, vtkVolume* vol,
 
       // Create shared memory regular volume data importer.
       vtknvindex_sparse_volume_importer* volume_importer = new vtknvindex_sparse_volume_importer(
-        volume_size, subcube_border, regular_volume_properties->get_ghost_levels(), scalar_type);
+        volume_size, subcube_border, regular_volume_properties->get_ghost_levels(), scalar_type,
+        regular_volume_properties->get_scalar_components());
 
       assert(volume_importer);
 
@@ -522,9 +522,9 @@ void vtknvindex_scene::create_scene(vtkRenderer* ren, vtkVolume* vol,
         mi::math::Vector_struct<mi::Uint32, 3> volume_size;
         regular_volume_properties->get_volume_size(volume_size);
 
-        mi::base::Handle<vtknvindex_volume_compute> vol_compute(
-          new vtknvindex_volume_compute(volume_size, subcube_border,
-            regular_volume_properties->get_ghost_levels(), scalar_type, m_cluster_properties));
+        mi::base::Handle<vtknvindex_volume_compute> vol_compute(new vtknvindex_volume_compute(
+          volume_size, subcube_border, regular_volume_properties->get_ghost_levels(), scalar_type,
+          regular_volume_properties->get_scalar_components(), m_cluster_properties));
         assert(vol_compute.is_valid_interface());
 
         vol_compute->set_enabled(false);
@@ -734,8 +734,7 @@ void vtknvindex_scene::update_volume(
     vtknvindex_regular_volume_properties* regular_volume_properties =
       m_cluster_properties->get_regular_volume_properties();
 
-    std::string scalar_type;
-    regular_volume_properties->get_scalar_type(scalar_type);
+    const std::string scalar_type = regular_volume_properties->get_scalar_type();
 
     // Remove previous volume.
     mi::base::Handle<nv::index::IStatic_scene_group> static_group_edit(
@@ -754,7 +753,8 @@ void vtknvindex_scene::update_volume(
 
       // Create shared memory regular volume data importer.
       vtknvindex_sparse_volume_importer* volume_importer = new vtknvindex_sparse_volume_importer(
-        volume_size, subcube_border, regular_volume_properties->get_ghost_levels(), scalar_type);
+        volume_size, subcube_border, regular_volume_properties->get_ghost_levels(), scalar_type,
+        regular_volume_properties->get_scalar_components());
       assert(volume_importer);
 
       volume_importer->set_cluster_properties(m_cluster_properties);

@@ -529,11 +529,12 @@ mi::Size vtknvindex_import_bricks::get_nb_fragments() const
 //-------------------------------------------------------------------------------------------------
 vtknvindex_sparse_volume_importer::vtknvindex_sparse_volume_importer(
   const mi::math::Vector_struct<mi::Uint32, 3>& volume_size, mi::Sint32 border_size,
-  mi::Sint32 ghost_levels, const std::string& scalar_type)
+  mi::Sint32 ghost_levels, const std::string& scalar_type, mi::Sint32 scalar_components)
   : m_border_size(border_size)
   , m_ghost_levels(ghost_levels)
   , m_volume_size(volume_size)
   , m_scalar_type(scalar_type)
+  , m_scalar_components(scalar_components)
   , m_cluster_properties(nullptr)
 {
   // empty
@@ -693,12 +694,21 @@ nv::index::IDistributed_data_subset* vtknvindex_sparse_volume_importer::create(
     shm_info->m_neighbors->fetch_data(host_props, time_step);
   }
 
-  const bool converted =
-    (m_scalar_type == "double" || m_scalar_type == "int" || m_scalar_type == "unsigned int");
+  std::string converted_msg;
+  if (m_scalar_components < 0)
+  {
+    // A single component was extracted out of the original multi-component volume
+    converted_msg += "single component, ";
+  }
+  if (m_scalar_type == "double" || m_scalar_type == "int" || m_scalar_type == "unsigned int")
+  {
+    converted_msg += "converted to float, ";
+  }
+
   INFO_LOG << "Importing volume data from " << (rankid == shm_info->m_rank_id ? "local" : "shared")
            << " "
-           << "memory (" << shm_info->m_shm_name << ") on rank " << rankid << ", "
-           << (converted ? "converted to float, " : "") << "data bbox " << shm_bbox << ", "
+           << "memory (" << shm_info->m_shm_name << ") on rank " << rankid << ", " << converted_msg
+           << "data bbox " << shm_bbox << ", "
            << "importer bbox " << bounding_box << ", border " << m_ghost_levels << "/"
            << m_border_size << ".";
 
@@ -741,6 +751,7 @@ void vtknvindex_sparse_volume_importer::set_cluster_properties(
 void vtknvindex_sparse_volume_importer::serialize(mi::neuraylib::ISerializer* serializer) const
 {
   vtknvindex::util::serialize(serializer, m_scalar_type);
+  serializer->write(&m_scalar_components);
   serializer->write(&m_volume_size.x, 3);
   serializer->write(&m_border_size);
   serializer->write(&m_ghost_levels);
@@ -753,6 +764,7 @@ void vtknvindex_sparse_volume_importer::serialize(mi::neuraylib::ISerializer* se
 void vtknvindex_sparse_volume_importer::deserialize(mi::neuraylib::IDeserializer* deserializer)
 {
   vtknvindex::util::deserialize(deserializer, m_scalar_type);
+  deserializer->read(&m_scalar_components);
   deserializer->read(&m_volume_size.x, 3);
   deserializer->read(&m_border_size);
   deserializer->read(&m_ghost_levels);

@@ -106,8 +106,7 @@ void vtknvindex_colormap::get_paraview_colormaps(vtkVolume* vol,
 
   // Normalize the range only if it is not floating point data.
   // If float, set the domain values as-is from ParaView.
-  std::string scalar_type;
-  regular_volume_properties->get_scalar_type(scalar_type);
+  const std::string scalar_type = regular_volume_properties->get_scalar_type();
 
   // Colormap size used by ParaView
   // see vtkOpenGLVolumeRGBTable

@@ -68,8 +68,7 @@ private:
 };
 
 // The class vtknvindex_sparse_volume_importer represents a distributed data importer for NVIDIA
-// IndeX
-// to load subsets of a sparse volume dataset based shared memory.
+// IndeX to load subsets of a sparse volume dataset based shared memory.
 class vtknvindex_sparse_volume_importer
   : public nv::index::Distributed_discrete_data_import_callback<0x5c35b7ce, 0x496c, 0x4342, 0xa3,
       0x5f, 0x9d, 0x85, 0x4, 0xa1, 0x69, 0x7e>
@@ -78,7 +77,8 @@ public:
   vtknvindex_sparse_volume_importer();
 
   vtknvindex_sparse_volume_importer(const mi::math::Vector_struct<mi::Uint32, 3>& volume_size,
-    mi::Sint32 border_size, mi::Sint32 ghost_levels, const std::string& scalar_type);
+    mi::Sint32 border_size, mi::Sint32 ghost_levels, const std::string& scalar_type,
+    mi::Sint32 scalar_components);
 
   // Estimates the volume data size inside the bounding box (in bytes).
   mi::Size estimate(const mi::math::Bbox_struct<mi::Sint32, 3>& bounding_box,
@@ -107,10 +107,11 @@ public:
   mi::base::Uuid subset_id() const override;
 
 private:
-  mi::Sint32 m_border_size;                            // IndeX subcube border size.
-  mi::Sint32 m_ghost_levels;                           // VTK ghost levels.
-  mi::math::Vector<mi::Uint32, 3> m_volume_size;       // Volume size.
-  std::string m_scalar_type;                           // Volume scalar type as string.
+  mi::Sint32 m_border_size;                      // IndeX subcube border size.
+  mi::Sint32 m_ghost_levels;                     // VTK ghost levels.
+  mi::math::Vector<mi::Uint32, 3> m_volume_size; // Volume size.
+  std::string m_scalar_type;                     // Volume scalar type as string.
+  mi::Sint32 m_scalar_components;
   vtknvindex_cluster_properties* m_cluster_properties; // Cluster properties.
 };
 

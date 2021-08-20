@@ -63,13 +63,14 @@ vtknvindex_volume_compute::vtknvindex_volume_compute()
 //-------------------------------------------------------------------------------------------------
 vtknvindex_volume_compute::vtknvindex_volume_compute(
   const mi::math::Vector_struct<mi::Uint32, 3>& volume_size, mi::Sint32 border_size,
-  const mi::Sint32& ghost_levels, std::string scalar_type,
+  const mi::Sint32& ghost_levels, std::string scalar_type, mi::Sint32 scalar_components,
   vtknvindex_cluster_properties* cluster_properties)
   : m_volume_size(volume_size)
   , m_enabled(false)
   , m_border_size(border_size)
   , m_ghost_levels(ghost_levels)
   , m_scalar_type(scalar_type)
+  , m_scalar_components(scalar_components)
   , m_cluster_properties(cluster_properties)
 {
   // empty
@@ -188,12 +189,21 @@ void vtknvindex_volume_compute::launch_compute(mi::neuraylib::IDice_transaction*
     shm_info->m_neighbors->fetch_data(host_props, time_step);
   }
 
-  const bool converted =
-    (m_scalar_type == "double" || m_scalar_type == "int" || m_scalar_type == "unsigned int");
-  INFO_LOG << "Updating volume data from " << (rankid == shm_info->m_rank_id ? "local" : "shared")
+  std::string converted_msg;
+  if (m_scalar_components < 0)
+  {
+    // A single component was extracted out of the original multi-component volume
+    converted_msg += "single component, ";
+  }
+  if (m_scalar_type == "double" || m_scalar_type == "int" || m_scalar_type == "unsigned int")
+  {
+    converted_msg += "converted to float, ";
+  }
+
+  INFO_LOG << "Importing volume data from " << (rankid == shm_info->m_rank_id ? "local" : "shared")
            << " "
-           << "memory (" << shm_info->m_shm_name << ") on rank " << rankid << ", "
-           << (converted ? "converted to float, " : "") << "data bbox " << shm_bbox << ", "
+           << "memory (" << shm_info->m_shm_name << ") on rank " << rankid << ", " << converted_msg
+           << "data bbox " << shm_bbox << ", "
            << "subset bbox " << subset_subregion_bbox << ", border " << m_ghost_levels << "/"
            << m_border_size << ".";
 
@@ -234,6 +244,7 @@ mi::neuraylib::IElement* vtknvindex_volume_compute::copy() const
   other->m_border_size = this->m_border_size;
   other->m_ghost_levels = this->m_ghost_levels;
   other->m_scalar_type = this->m_scalar_type;
+  other->m_scalar_components = this->m_scalar_components;
   other->m_cluster_properties = this->m_cluster_properties;
   other->m_volume_size = this->m_volume_size;
 
@@ -250,6 +261,7 @@ const char* vtknvindex_volume_compute::get_class_name() const
 void vtknvindex_volume_compute::serialize(mi::neuraylib::ISerializer* serializer) const
 {
   vtknvindex::util::serialize(serializer, m_scalar_type);
+  serializer->write(&m_scalar_components);
   serializer->write(&m_enabled);
   serializer->write(&m_border_size);
   serializer->write(&m_ghost_levels);
@@ -263,6 +275,7 @@ void vtknvindex_volume_compute::serialize(mi::neuraylib::ISerializer* serializer
 void vtknvindex_volume_compute::deserialize(mi::neuraylib::IDeserializer* deserializer)
 {
   vtknvindex::util::deserialize(deserializer, m_scalar_type);
+  deserializer->read(&m_scalar_components);
   deserializer->read(&m_enabled);
   deserializer->read(&m_border_size);
   deserializer->read(&m_ghost_levels);

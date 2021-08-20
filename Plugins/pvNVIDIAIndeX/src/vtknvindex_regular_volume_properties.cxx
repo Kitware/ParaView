@@ -42,6 +42,8 @@ vtknvindex_regular_volume_properties::vtknvindex_regular_volume_properties()
   , m_time_steps_written(0)
   , m_nb_time_steps(1)
   , m_current_time_step(0)
+  , m_time_step_start(0)
+  , m_scalar_components(1)
   , m_ghost_levels(0)
 
 {
@@ -60,9 +62,21 @@ void vtknvindex_regular_volume_properties::set_scalar_type(std::string scalar_ty
 }
 
 // ------------------------------------------------------------------------------------------------
-void vtknvindex_regular_volume_properties::get_scalar_type(std::string& scalar_type) const
+std::string vtknvindex_regular_volume_properties::get_scalar_type() const
 {
-  scalar_type = m_scalar_type;
+  return m_scalar_type;
+}
+
+// ------------------------------------------------------------------------------------------------
+void vtknvindex_regular_volume_properties::set_scalar_components(mi::Sint32 components)
+{
+  m_scalar_components = components;
+}
+
+// ------------------------------------------------------------------------------------------------
+mi::Sint32 vtknvindex_regular_volume_properties::get_scalar_components() const
+{
+  return m_scalar_components;
 }
 
 // ------------------------------------------------------------------------------------------------
@@ -332,6 +346,7 @@ bool vtknvindex_regular_volume_properties::write_shared_memory(vtkDataArray* sca
   }
   else
   {
+    // Disabled intentionally in r318862:
     // shm_info->m_subset_ptr = scalar_array->GetVoidPointer(0);
   }
 
@@ -507,6 +522,15 @@ bool vtknvindex_regular_volume_properties::write_shared_memory(
 void vtknvindex_regular_volume_properties::print_info() const
 {
   INFO_LOG << "Scalar type: " << m_scalar_type;
+  if (m_scalar_components > 1)
+  {
+    INFO_LOG << "Components:  " << m_scalar_components;
+  }
+  else if (m_scalar_components < 0)
+  {
+    INFO_LOG << "Original components: " << std::abs(m_scalar_components)
+             << " (only one will be used)";
+  }
   INFO_LOG << "Volume bbox: " << m_ivol_volume_extents;
   INFO_LOG << "Volume size: " << m_ivol_volume_extents.max - m_ivol_volume_extents.min;
   INFO_LOG << "Data values: " << m_voxel_range;
@@ -521,6 +545,7 @@ void vtknvindex_regular_volume_properties::serialize(mi::neuraylib::ISerializer*
   serializer->write(&scalar_typename_size);
   serializer->write(
     reinterpret_cast<const mi::Uint8*>(m_scalar_type.c_str()), scalar_typename_size);
+  serializer->write(&m_scalar_components);
 
   serializer->write(&m_voxel_range.x, 2);
 
@@ -535,6 +560,7 @@ void vtknvindex_regular_volume_properties::deserialize(mi::neuraylib::IDeseriali
   deserializer->read(&scalar_typename_size);
   m_scalar_type.resize(scalar_typename_size);
   deserializer->read(reinterpret_cast<mi::Uint8*>(&m_scalar_type[0]), scalar_typename_size);
+  deserializer->read(&m_scalar_components);
 
   deserializer->read(&m_voxel_range.x, 2);
 

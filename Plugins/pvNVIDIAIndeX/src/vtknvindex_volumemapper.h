@@ -125,6 +125,10 @@ private:
   // Is data prepared for given time step?
   bool is_data_prepared(mi::Sint32 time_step);
 
+  // Converts scalar array to a compatible format, returns nullptr if no conversion necessary or
+  // possible.
+  vtkDataArray* convert_scalar_array(vtkDataArray* scalar_array) const;
+
   bool m_is_caching;              // True when ParaView is caching data on animation loops.
   bool m_is_mapper_initialized;   // True if mapper was initialized.
   bool m_config_settings_changed; // True if some parameter changed on the GUI.
@@ -135,8 +139,10 @@ private:
   bool m_rtc_kernel_changed; // True when switching between CUDA code.
   bool m_rtc_param_changed;  // True when a kernel parameter changed.
 
-  vtkMTimeType m_last_MTime;   // last MTime when volume was modified
-  std::string m_prev_property; // Volume property that was rendered.
+  vtkMTimeType m_last_MTime;     // last MTime when volume was modified
+  std::string m_prev_array_name; // Volume array name used for last rendering.
+  int m_prev_vector_component;   // Vector component used for last rendering.
+  int m_prev_vector_mode;        // Vector mode used for last rendering.
 
   std::map<mi::Sint32, bool>
     m_time_step_data_prepared; // Is data for given frame ready for importer?
@@ -147,6 +153,10 @@ private:
   bool m_is_mpi_rendering;          // True when multiple MPI ranks are used for rendering.
   vtkDataArray* m_scalar_array;     // Scalar array containing actual data.
   std::vector<void*> m_subset_ptrs; // Array with pointers to scalars data for all time steps.
+
+  // Converted scalar arrays for all time steps, m_subset_ptrs will point to their scalar data.
+  // Entries will be null if no conversion took place (and m_scalar_array can be used directly).
+  std::vector<vtkSmartPointer<vtkDataArray>> m_converted_scalar_arrays;
 
   mi::Float64 m_whole_bounds[6]; // Whole volume bounds.
 
