@@ -80,9 +80,6 @@ public:
   // Retrieve license string from the xml file.
   bool get_license_strings(std::string& vendor_key, std::string& secret_key);
 
-  // Retrieve Flex license path.
-  bool get_flex_license_path(std::string& path);
-
   // Retrieve all parameters from a given section.
   bool get_section_settings(
     std::map<std::string, std::string>& params, const std::string& section) const;

@@ -663,28 +663,9 @@ mi::Sint32 vtknvindex_instance::authenticate_nvindex()
     return 0;
   }
 
-  // Retrieve Flex license path.
-  std::string flexnet_lic_path;
-
-  // Try reading Flex license path from environment.
-  const char* env_flexnet_lic_path = vtksys::SystemTools::GetEnv("NVINDEX_FLEXNET_PATH");
-  if (env_flexnet_lic_path != nullptr)
-  {
-    flexnet_lic_path = env_flexnet_lic_path;
-  }
-  else // Try reading Flex license path from config file.
-  {
-    vtknvindex_xml_config_parser xml_parser;
-    if (xml_parser.open_config_file(s_config_filename))
-    {
-      xml_parser.get_flex_license_path(flexnet_lic_path);
-    }
-  }
-
   return m_nvindex_interface->authenticate(index_vendor_key.c_str(),
     static_cast<mi::Sint32>(index_vendor_key.length()), index_secret_key.c_str(),
-    static_cast<mi::Sint32>(index_secret_key.length()), flexnet_lic_path.c_str(),
-    static_cast<mi::Sint32>(flexnet_lic_path.length()));
+    static_cast<mi::Sint32>(index_secret_key.length()), nullptr, 0);
 }
 
 namespace
@@ -1397,5 +1378,5 @@ void vtknvindex_instance::init_scene_graph()
 //-------------------------------------------------------------------------------------------------
 const char* vtknvindex_instance::get_version() const
 {
-  return "5.9.1";
+  return "5.10";
 }

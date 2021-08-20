@@ -135,8 +135,8 @@ void vtknvindex_colormap::get_paraview_colormaps(vtkVolume* vol,
   // Read color values from ParaView.
   color_array.resize(3 * array_size);
 
-  // using Logarithmic scale?
-  if (app_color_transfer_function->GetScale())
+  // Using logarithmic scale?
+  if (app_color_transfer_function->UsingLogScale())
   {
     double color[3];
     for (mi::Uint32 i = 0; i < array_size; i++)

@@ -174,7 +174,8 @@
                 name="Subcube Size"
                 command="set_subcube_size"
                 number_of_elements="3"
-                default_values="512 512 512">
+                default_values="512 512 512"
+                panel_visibility="advanced">
                 <Documentation>Set subcube size. This can only be set once before the first rendering</Documentation>
             </IntVectorProperty>
 
@@ -182,7 +183,8 @@
                 name="Subcube Border"
                 command="set_subcube_border"
                 number_of_elements="1"
-                default_values="2">
+                default_values="2"
+                panel_visibility="advanced">
                 <Documentation>Set subcube border size,
                     multiplied by 2 internally</Documentation>
             </IntVectorProperty>
@@ -286,7 +288,7 @@
             </IntVectorProperty>
 
             <IntVectorProperty
-                label="Enabled"
+                label="Enable Slice 1"
                 name="Enable Slice 1"
                 command="enable_slice1"
                 number_of_elements="1"
@@ -341,7 +343,7 @@
             </DoubleVectorProperty>
 
             <IntVectorProperty
-                label="Enabled"
+                label="Enable Slice 2"
                 name="Enable Slice 2"
                 command="enable_slice2"
                 number_of_elements="1"
@@ -396,7 +398,7 @@
             </DoubleVectorProperty>
 
             <IntVectorProperty
-                label="Enabled"
+                label="Enable Slice 3"
                 name="Enable Slice 3"
                 command="enable_slice3"
                 number_of_elements="1"
@@ -1120,7 +1122,8 @@
                 name="Subcube Size"
                 command="set_subcube_size"
                 number_of_elements="3"
-                default_values="512 512 512">
+                default_values="512 512 512"
+                panel_visibility="advanced">
                 <Documentation>Set subcube size. This can only be set once before the first rendering</Documentation>
             </IntVectorProperty>
 
@@ -1128,7 +1131,8 @@
                 name="Subcube Border"
                 command="set_subcube_border"
                 number_of_elements="1"
-                default_values="0">
+                default_values="0"
+                panel_visibility="advanced">
                 <Documentation>Set subcube border size,
                     multiplied by 2 internally</Documentation>
             </IntVectorProperty>
@@ -1634,7 +1638,6 @@
             </Hints>
           </Property>
 
-
           <!-- End of NvidiaIndexRegularVolumeRepresentation -->
         </RepresentationProxy>
 
@@ -1668,6 +1671,7 @@
             </PropertyGroup>
             <PropertyGroup label="NVIDIA IndeX Volume">
                   <Property name="Subcube Size"/>
+                  <Property name="Subcube Border"/>
                   <Property name="Pre-integration"/>
                   <Property name="Filtering"/>
                   <Property name="volume_step_size"/>
@@ -1748,6 +1752,7 @@
             </PropertyGroup>
             <PropertyGroup label="NVIDIA IndeX Volume">
                     <Property name="Subcube Size"/>
+                    <Property name="Subcube Border"/>
             </PropertyGroup>
             <PropertyGroup label="NVIDIA IndeX Visual Elements">
               <Property name="Filter"/>

@@ -134,27 +134,6 @@ bool vtknvindex_xml_config_parser::get_license_strings(
 }
 
 //-------------------------------------------------------------------------------------------------
-bool vtknvindex_xml_config_parser::get_flex_license_path(std::string& path)
-{
-  vtkXMLDataElement* license_elm = m_root_elm->LookupElementWithName("license");
-  if (!license_elm)
-  {
-    return false;
-  }
-
-  vtkXMLDataElement* flex_license_path_elm =
-    license_elm->FindNestedElementWithName("flex_license_path");
-  if (!flex_license_path_elm)
-  {
-    return false;
-  }
-
-  path = std::string(flex_license_path_elm->GetCharacterData());
-
-  return true;
-}
-
-//-------------------------------------------------------------------------------------------------
 bool vtknvindex_xml_config_parser::get_section_settings(
   std::map<std::string, std::string>& params, const std::string& section) const
 {
