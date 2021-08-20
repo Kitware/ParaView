@@ -1,12 +1,13 @@
 include(FindPythonModules)
-find_python_module(twisted twisted_found)
+find_python_module(wslink wslink_found)
 
 # Make sure we can start the DataProber server
-if (twisted_found)
+if (wslink_found)
     add_test(NAME pvweb-StartTest
       COMMAND
         "$<TARGET_FILE:ParaView::pvpython>"
         -m paraview.web.test_server
         --port 9739
+        --host 0.0.0.0
         --timeout 1)
 endif()
