@@ -560,8 +560,10 @@ void vtknvindex_irregular_volume_representation::set_dump_internal_state(bool is
 }
 
 //----------------------------------------------------------------------------
-void vtknvindex_irregular_volume_representation::update_current_kernel()
+bool vtknvindex_irregular_volume_representation::update_current_kernel()
 {
+  bool force_render = false;
+
   switch (m_app_config_settings->get_rtc_kernel())
   {
     case RTC_KERNELS_ISOSURFACE:
@@ -584,9 +586,9 @@ void vtknvindex_irregular_volume_representation::update_current_kernel()
       break;
 
     case RTC_KERNELS_CUSTOM:
-      static_cast<vtknvindex_irregular_volume_mapper*>(this->DefaultMapper)
-        ->rtc_kernel_changed(RTC_KERNELS_CUSTOM, m_custom_kernel_program,
-          reinterpret_cast<void*>(&m_custom_params), sizeof(m_custom_params));
+      force_render = static_cast<vtknvindex_irregular_volume_mapper*>(this->DefaultMapper)
+                       ->rtc_kernel_changed(RTC_KERNELS_CUSTOM, m_custom_kernel_program,
+                         reinterpret_cast<void*>(&m_custom_params), sizeof(m_custom_params));
       break;
 
     case RTC_KERNELS_NONE:
@@ -594,6 +596,38 @@ void vtknvindex_irregular_volume_representation::update_current_kernel()
       static_cast<vtknvindex_irregular_volume_mapper*>(this->DefaultMapper)
         ->rtc_kernel_changed(RTC_KERNELS_NONE, "", nullptr, 0);
       break;
+  }
+
+  return force_render;
+}
+
+//----------------------------------------------------------------------------
+void vtknvindex_irregular_volume_representation::update_current_kernel_source(
+  bool need_force_render)
+{
+  if (m_custom_kernel_filename.empty())
+  {
+    m_custom_kernel_program.clear();
+  }
+  else
+  {
+    std::ifstream is(m_custom_kernel_filename);
+    m_custom_kernel_program =
+      std::string((std::istreambuf_iterator<char>(is)), std::istreambuf_iterator<char>());
+  }
+
+  if (m_app_config_settings->get_rtc_kernel() == RTC_KERNELS_CUSTOM)
+  {
+    if (update_current_kernel() && need_force_render)
+    {
+      // Pressing the "Update kernel" button does not update the property and therefore does not
+      // trigger rendering, hence do that explicitly here.
+      vtkPVRenderView* rview = vtkPVRenderView::SafeDownCast(this->GetView());
+      if (rview)
+      {
+        rview->StillRender();
+      }
+    }
   }
 }
 
@@ -808,18 +842,14 @@ void vtknvindex_irregular_volume_representation::set_edge_samples(int edge_sampl
 //----------------------------------------------------------------------------
 void vtknvindex_irregular_volume_representation::set_kernel_filename(const char* kernel_filename)
 {
-  m_custom_kernel_filename = std::string(kernel_filename);
-  set_kernel_update();
+  m_custom_kernel_filename = kernel_filename;
+  update_current_kernel_source();
 }
 
 //----------------------------------------------------------------------------
 void vtknvindex_irregular_volume_representation::set_kernel_update()
 {
-  std::ifstream is(m_custom_kernel_filename);
-  m_custom_kernel_program =
-    std::string((std::istreambuf_iterator<char>(is)), std::istreambuf_iterator<char>());
-  if (m_app_config_settings->get_rtc_kernel() == RTC_KERNELS_CUSTOM)
-    update_current_kernel();
+  update_current_kernel_source(true);
 }
 
 //----------------------------------------------------------------------------

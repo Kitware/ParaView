@@ -855,45 +855,74 @@ void vtknvindex_representation::set_slice_pos3(double pos)
 }
 
 //----------------------------------------------------------------------------
-void vtknvindex_representation::update_current_kernel()
+bool vtknvindex_representation::update_current_kernel()
 {
+  vtknvindex_volumemapper* mapper =
+    static_cast<vtknvindex_volumemapper*>(this->VolumeMapper.GetPointer());
+  bool force_render = false;
+
   switch (m_app_config_settings->get_rtc_kernel())
   {
     case RTC_KERNELS_ISOSURFACE:
-      static_cast<vtknvindex_volumemapper*>(this->VolumeMapper.GetPointer())
-        ->rtc_kernel_changed(RTC_KERNELS_ISOSURFACE, KERNEL_ISOSURFACE_STRING,
-          reinterpret_cast<void*>(&m_isosurface_params), sizeof(m_isosurface_params));
+      mapper->rtc_kernel_changed(RTC_KERNELS_ISOSURFACE, KERNEL_ISOSURFACE_STRING,
+        reinterpret_cast<void*>(&m_isosurface_params), sizeof(m_isosurface_params));
       break;
 
     case RTC_KERNELS_DEPTH_ENHANCEMENT:
-      static_cast<vtknvindex_volumemapper*>(this->VolumeMapper.GetPointer())
-        ->rtc_kernel_changed(RTC_KERNELS_DEPTH_ENHANCEMENT, KERNEL_DEPTH_ENHANCEMENT_STRING,
-          reinterpret_cast<void*>(&m_depth_enhancement_params), sizeof(m_depth_enhancement_params));
+      mapper->rtc_kernel_changed(RTC_KERNELS_DEPTH_ENHANCEMENT, KERNEL_DEPTH_ENHANCEMENT_STRING,
+        reinterpret_cast<void*>(&m_depth_enhancement_params), sizeof(m_depth_enhancement_params));
       break;
 
     case RTC_KERNELS_EDGE_ENHANCEMENT:
-      static_cast<vtknvindex_volumemapper*>(this->VolumeMapper.GetPointer())
-        ->rtc_kernel_changed(RTC_KERNELS_EDGE_ENHANCEMENT, KERNEL_EDGE_ENHANCEMENT_STRING,
-          reinterpret_cast<void*>(&m_edge_enhancement_params), sizeof(m_edge_enhancement_params));
+      mapper->rtc_kernel_changed(RTC_KERNELS_EDGE_ENHANCEMENT, KERNEL_EDGE_ENHANCEMENT_STRING,
+        reinterpret_cast<void*>(&m_edge_enhancement_params), sizeof(m_edge_enhancement_params));
       break;
 
     case RTC_KERNELS_GRADIENT:
-      static_cast<vtknvindex_volumemapper*>(this->VolumeMapper.GetPointer())
-        ->rtc_kernel_changed(RTC_KERNELS_GRADIENT, KERNEL_GRADIENT_STRING,
-          reinterpret_cast<void*>(&m_gradient_params), sizeof(m_gradient_params));
+      mapper->rtc_kernel_changed(RTC_KERNELS_GRADIENT, KERNEL_GRADIENT_STRING,
+        reinterpret_cast<void*>(&m_gradient_params), sizeof(m_gradient_params));
       break;
 
     case RTC_KERNELS_CUSTOM:
-      static_cast<vtknvindex_volumemapper*>(this->VolumeMapper.GetPointer())
-        ->rtc_kernel_changed(RTC_KERNELS_CUSTOM, m_custom_kernel_program,
-          reinterpret_cast<void*>(&m_custom_params), sizeof(m_custom_params));
+      force_render = mapper->rtc_kernel_changed(RTC_KERNELS_CUSTOM, m_custom_kernel_program,
+        reinterpret_cast<void*>(&m_custom_params), sizeof(m_custom_params));
       break;
 
     case RTC_KERNELS_NONE:
     default:
-      static_cast<vtknvindex_volumemapper*>(this->VolumeMapper.GetPointer())
-        ->rtc_kernel_changed(RTC_KERNELS_NONE, "", nullptr, 0);
+      mapper->rtc_kernel_changed(RTC_KERNELS_NONE, "", nullptr, 0);
       break;
+  }
+
+  return force_render;
+}
+
+//----------------------------------------------------------------------------
+void vtknvindex_representation::update_current_kernel_source(bool need_force_render)
+{
+  if (m_custom_kernel_filename.empty())
+  {
+    m_custom_kernel_program.clear();
+  }
+  else
+  {
+    std::ifstream is(m_custom_kernel_filename);
+    m_custom_kernel_program =
+      std::string((std::istreambuf_iterator<char>(is)), std::istreambuf_iterator<char>());
+  }
+
+  if (m_app_config_settings->get_rtc_kernel() == RTC_KERNELS_CUSTOM)
+  {
+    if (update_current_kernel() && need_force_render)
+    {
+      // Pressing the "Update kernel" button does not update the property and therefore does not
+      // trigger rendering, hence do that explicitly here.
+      vtkPVRenderView* rview = vtkPVRenderView::SafeDownCast(this->GetView());
+      if (rview)
+      {
+        rview->StillRender();
+      }
+    }
   }
 }
 
@@ -1111,18 +1140,14 @@ void vtknvindex_representation::set_gradient_scale(double gradient_scale)
 //----------------------------------------------------------------------------
 void vtknvindex_representation::set_kernel_filename(const char* kernel_filename)
 {
-  m_custom_kernel_filename = std::string(kernel_filename);
-  set_kernel_update();
+  m_custom_kernel_filename = kernel_filename;
+  update_current_kernel_source();
 }
 
 //----------------------------------------------------------------------------
 void vtknvindex_representation::set_kernel_update()
 {
-  std::ifstream is(m_custom_kernel_filename);
-  m_custom_kernel_program =
-    std::string((std::istreambuf_iterator<char>(is)), std::istreambuf_iterator<char>());
-  if (m_app_config_settings->get_rtc_kernel() == RTC_KERNELS_CUSTOM)
-    update_current_kernel();
+  update_current_kernel_source(true);
 }
 
 //----------------------------------------------------------------------------

@@ -222,7 +222,10 @@ private:
     mi::Float64 time, const mi::Float64* time_steps, mi::Sint32 nb_tsteps) const;
 
   // Update current kernel
-  void update_current_kernel();
+  bool update_current_kernel();
+
+  // Update current kernel source code.
+  void update_current_kernel_source(bool need_force_render = false);
 
   // For the GUI
   double m_roi_range_I[2];

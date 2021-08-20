@@ -517,24 +517,32 @@ void vtknvindex_irregular_volume_mapper::opacity_changed()
 }
 
 //-------------------------------------------------------------------------------------------------
-void vtknvindex_irregular_volume_mapper::rtc_kernel_changed(vtknvindex_rtc_kernels kernel,
+bool vtknvindex_irregular_volume_mapper::rtc_kernel_changed(vtknvindex_rtc_kernels kernel,
   const std::string& kernel_program, const void* params_buffer, mi::Uint32 buffer_size)
 {
+  bool kernel_changed = false;
   if (kernel != m_volume_rtc_kernel.rtc_kernel)
   {
     m_volume_rtc_kernel.rtc_kernel = kernel;
-    m_rtc_kernel_changed = true;
+    kernel_changed = true;
   }
 
   if (kernel_program != m_volume_rtc_kernel.kernel_program)
   {
     m_volume_rtc_kernel.kernel_program = kernel_program;
+    kernel_changed = true;
+  }
+
+  if (kernel_changed)
+  {
     m_rtc_kernel_changed = true;
   }
 
   m_volume_rtc_kernel.params_buffer = params_buffer;
   m_volume_rtc_kernel.buffer_size = buffer_size;
   m_rtc_param_changed = true;
+
+  return kernel_changed;
 }
 
 //-------------------------------------------------------------------------------------------------

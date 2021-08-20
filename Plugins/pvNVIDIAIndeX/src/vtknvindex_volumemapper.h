@@ -105,7 +105,7 @@ public:
   void slices_changed();
 
   // The CUDA code need to be updated on changes applied in the GUI.
-  void rtc_kernel_changed(vtknvindex_rtc_kernels kernel, const std::string& kernel_program,
+  bool rtc_kernel_changed(vtknvindex_rtc_kernels kernel, const std::string& kernel_program,
     const void* params_buffer, mi::Uint32 buffer_size);
 
   // Initialize the mapper.

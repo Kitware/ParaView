@@ -228,7 +228,10 @@ private:
   void operator=(const vtknvindex_irregular_volume_representation&) = delete;
 
   // Update current kernel
-  void update_current_kernel();
+  bool update_current_kernel();
+
+  // Update current kernel source code.
+  void update_current_kernel_source(bool need_force_render = false);
 
   class vtkInternals;
   vtkInternals* Internals;
