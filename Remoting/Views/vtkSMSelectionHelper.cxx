@@ -43,6 +43,7 @@
 #include "vtkSelectionNode.h"
 #include "vtkSelectionSerializer.h"
 #include "vtkSmartPointer.h"
+#include "vtkStringArray.h"
 #include "vtkUnsignedIntArray.h"
 #include "vtkView.h"
 
@@ -121,6 +122,10 @@ vtkSMProxy* vtkSMSelectionHelper::NewSelectionSourceFromSelectionInternal(vtkSMS
 
     case vtkSelectionNode::BLOCKS:
       proxyname = "BlockSelectionSource";
+      break;
+
+    case vtkSelectionNode::BLOCK_SELECTORS:
+      proxyname = "BlockSelectorsSelectionSource";
       break;
 
     case vtkSelectionNode::THRESHOLDS:
@@ -227,6 +232,23 @@ vtkSMProxy* vtkSMSelectionHelper::NewSelectionSourceFromSelectionInternal(vtkSMS
     else
     {
       blocks->SetNumberOfElements(0);
+    }
+  }
+  else if (contentType == vtkSelectionNode::BLOCK_SELECTORS)
+  {
+    auto sarray = vtkStringArray::SafeDownCast(selection->GetSelectionList());
+    const unsigned int count = sarray ? static_cast<unsigned int>(sarray->GetNumberOfValues()) : 0;
+
+    vtkSMPropertyHelper helper(selSource, "BlockSelectors");
+    const auto offset = helper.GetNumberOfElements();
+    helper.SetNumberOfElements(count + offset);
+    for (unsigned int cc = 0; cc < count; ++cc)
+    {
+      helper.Set(cc + offset, sarray->GetValue(cc).c_str());
+    }
+    if (const char* aname = sarray ? sarray->GetName() : nullptr)
+    {
+      vtkSMPropertyHelper(selSource, "BlockSelectorsAssemblyName").Set(aname);
     }
   }
   else if (contentType == vtkSelectionNode::INDICES)
@@ -380,6 +402,10 @@ vtkSMProxy* vtkSMSelectionHelper::ConvertSelection(
       outproxyname = "BlockSelectionSource";
       break;
 
+    case vtkSelectionNode::BLOCK_SELECTORS:
+      outproxyname = "BlockSelectorsSelectionSource";
+      break;
+
     case vtkSelectionNode::INDICES:
     {
       const char* dataName = dataSource->GetOutputPort(dataPort)->GetDataClassName();
@@ -399,7 +425,8 @@ vtkSMProxy* vtkSMSelectionHelper::ConvertSelection(
     break;
 
     default:
-      vtkGenericWarningMacro("Cannot convert to type : " << outputType);
+      vtkGenericWarningMacro(
+        "Cannot convert to type : " << vtkSelectionNode::GetContentTypeAsString(outputType));
       return nullptr;
   }
 
@@ -439,14 +466,14 @@ vtkSMProxy* vtkSMSelectionHelper::ConvertSelection(
         vtkSelectionNode::GLOBALIDS);
     }
   }
-  else if (outputType == vtkSelectionNode::BLOCKS && selectionSourceProxy &&
-    (strcmp(inproxyname, "GlobalIDSelectionSource") == 0 ||
-             strcmp(inproxyname, "HierarchicalDataIDSelectionSource") == 0 ||
-             strcmp(inproxyname, "CompositeDataIDSelectionSource") == 0))
+  else if ((outputType == vtkSelectionNode::BLOCKS ||
+             outputType == vtkSelectionNode::BLOCK_SELECTORS) &&
+    selectionSourceProxy && (strcmp(inproxyname, "GlobalIDSelectionSource") == 0 ||
+                              strcmp(inproxyname, "HierarchicalDataIDSelectionSource") == 0 ||
+                              strcmp(inproxyname, "CompositeDataIDSelectionSource") == 0))
   {
     return vtkSMSelectionHelper::ConvertInternal(
-      vtkSMSourceProxy::SafeDownCast(selectionSourceProxy), dataSource, dataPort,
-      vtkSelectionNode::BLOCKS);
+      vtkSMSourceProxy::SafeDownCast(selectionSourceProxy), dataSource, dataPort, outputType);
   }
 
   // Conversion not possible, so simply create a new proxy of the requested

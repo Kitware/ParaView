@@ -125,7 +125,7 @@ public:
    * For threshold and value selection, this controls the name of the
    * scalar array that will be thresholded within.
    */
-  void SetArrayName(const char* arrayName);
+  vtkSetStringMacro(ArrayName);
 
   //@{
   /**
@@ -134,6 +134,15 @@ public:
   void AddLocation(double x, double y, double z);
   void RemoveAllLocations();
   //@}
+
+  ///@{
+  /**
+   * Add/Remove block-selectors to make selections with
+   * vtkSelectionNode::BLOCK_SELECTORS as the content-type.
+   */
+  void AddBlockSelector(const char* selector);
+  void RemoveAllBlockSelectors();
+  ///@}
 
   //@{
   /**
@@ -193,9 +202,10 @@ protected:
     THRESHOLDS,
     LOCATIONS,
     BLOCKS,
+    BLOCK_SELECTORS,
     PEDIGREEIDS,
     QUERY,
-    VALUES
+    VALUES,
   };
 
   Modes Mode;

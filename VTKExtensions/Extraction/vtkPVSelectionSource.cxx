@@ -155,6 +155,7 @@ public:
   SetOfPedigreeStringIDType PedigreeStringIDs;
   VectorOfDoubles Locations;
   VectorOfDoubles Thresholds;
+  std::vector<std::string> BlockSelectors;
 };
 
 vtkStandardNewMacro(vtkPVSelectionSource);
@@ -352,36 +353,6 @@ void vtkPVSelectionSource::RemoveAllThresholds()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVSelectionSource::SetArrayName(const char* arrayName)
-{
-  if (this->ArrayName == nullptr && arrayName == nullptr)
-  {
-    return;
-  }
-
-  if (this->ArrayName && arrayName && strcmp(this->ArrayName, arrayName) == 0)
-  {
-    return;
-  }
-
-  delete[] this->ArrayName;
-  this->ArrayName = nullptr;
-  if (arrayName)
-  {
-    size_t n = strlen(arrayName) + 1;
-    char* cp1 = new char[n];
-    const char* cp2 = (arrayName);
-    this->ArrayName = cp1;
-    do
-    {
-      *cp1++ = *cp2++;
-    } while (--n);
-  }
-
-  this->Modified();
-}
-
-//----------------------------------------------------------------------------
 void vtkPVSelectionSource::AddLocation(double x, double y, double z)
 {
   this->Mode = LOCATIONS;
@@ -396,6 +367,24 @@ void vtkPVSelectionSource::RemoveAllLocations()
 {
   this->Mode = LOCATIONS;
   this->Internal->Locations.clear();
+  this->Modified();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVSelectionSource::AddBlockSelector(const char* selector)
+{
+  if (selector)
+  {
+    this->Mode = BLOCK_SELECTORS;
+    this->Internal->BlockSelectors.push_back(selector);
+    this->Modified();
+  }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVSelectionSource::RemoveAllBlockSelectors()
+{
+  this->Internal->BlockSelectors.clear();
   this->Modified();
 }
 
@@ -647,6 +636,18 @@ int vtkPVSelectionSource::RequestData(vtkInformation* vtkNotUsed(request),
       for (iter = this->Internal->Blocks.begin(); iter != this->Internal->Blocks.end(); ++iter)
       {
         source->AddBlock(*iter);
+      }
+      source->UpdatePiece(piece, npieces, 0);
+      output->ShallowCopy(source->GetOutput());
+    }
+    break;
+
+    case BLOCK_SELECTORS:
+    {
+      source->SetContentType(vtkSelectionNode::BLOCK_SELECTORS);
+      for (const auto& selector : this->Internal->BlockSelectors)
+      {
+        source->AddBlockSelector(selector.c_str());
       }
       source->UpdatePiece(piece, npieces, 0);
       output->ShallowCopy(source->GetOutput());

@@ -403,6 +403,32 @@
     <SourceProxy base_proxygroup="sources"
                  base_proxyname="SelectionSourceBase"
                  class="vtkPVSelectionSource"
+                 name="BlockSelectorsSelectionSource"
+                 processes="client|renderserver|dataserver">
+      <Documentation>BlockSelectorsSelectionSource is a source producing a block-based
+      selection used to select blocks from a composite dataset using selectors.</Documentation>
+      <StringVectorProperty clean_command="RemoveAllBlockSelectors"
+                            command="AddBlockSelector"
+                            label="Block Selectors"
+                            name="BlockSelectors"
+                            number_of_elements="0"
+                            number_of_elements_per_command="1"
+                            repeat_command="1">
+        <Documentation>The list of blocks selectors that will be added to the selection
+          produced by the selection source.
+        </Documentation>
+      </StringVectorProperty>
+
+      <StringVectorProperty command="SetArrayName"
+                            name="BlockSelectorsAssemblyName"
+                            number_of_elements="1"
+                            default_values="Hierarchy" />
+      <!-- End of BlockSelectionSource -->
+    </SourceProxy>
+    <!-- ==================================================================== -->
+    <SourceProxy base_proxygroup="sources"
+                 base_proxyname="SelectionSourceBase"
+                 class="vtkPVSelectionSource"
                  name="FrustumSelectionSource"
                  processes="client|renderserver|dataserver">
       <Documentation>FrustumSelectionSource is a source producing a frustum
