@@ -227,6 +227,18 @@ void pqSelectionInputWidget::updateLabels()
       columnValues << value.toString() << QT_ENDL;
     }
   }
+  else if (strcmp(xmlname, "BlockSelectorsSelectionSource") == 0)
+  {
+    columnValues << "Block Selection" << QT_ENDL << "Elements: " << fieldTypeAsString << QT_ENDL
+                 << QT_ENDL << QT_ENDL;
+    columnValues << "Block Selectors" << QT_ENDL;
+    vtkSMProperty* prop = this->SelectionSource->GetProperty("BlockSelectors");
+    QList<QVariant> values = pqSMAdaptor::getMultipleElementProperty(prop);
+    foreach (const QVariant& value, values)
+    {
+      columnValues << value.toString() << QT_ENDL;
+    }
+  }
   else if (strcmp(xmlname, "ThresholdSelectionSource") == 0)
   {
     columnValues << "Threshold Selection" << QT_ENDL;
