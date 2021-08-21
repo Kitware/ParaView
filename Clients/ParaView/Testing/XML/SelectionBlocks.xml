@@ -1,0 +1,30 @@
+<?xml version="1.0" ?>
+<pqevents>
+  <!-- test to select a block from  partitioned dataset with multiple partitions
+    ensures that all paritions get selected when user attempts to select a block since
+    all partitions form the "block"
+    paraview/paraview#20904
+  -->
+  <pqevent object="pqClientMainWindow/MainControlsToolbar/actionOpenData" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/FileOpenDialog" command="filesSelected" arguments="$PARAVIEW_DATA_ROOT/Testing/Data/can.e.4/can.e.4.0" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/SearchBox/SearchLineEdit" command="set_string" arguments="fil" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/GenerateFileId/CheckBox" command="set_boolean" arguments="true" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/variableToolbar/displayColor/Variables" command="activated" arguments="file_id" />
+  <pqevent object="pqClientMainWindow/variableToolbar/actionEditColorMap" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/colorMapEditorDock/colorMapEditorPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/Properties/IndexedLookup/CheckBox" command="set_boolean" arguments="true" />
+  <pqevent object="pqClientMainWindow/colorMapEditorDock/qt_dockwidget_closebutton" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/cameraToolbar/actionNegativeY" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuTools" />
+  <pqevent object="pqClientMainWindow/menubar/menuTools" command="activate" arguments="actionTesting_Window_Size" />
+  <pqevent object="pqClientMainWindow/cameraToolbar/actionResetCamera" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.0/actionSelectBlock" command="set_boolean" arguments="true" />
+  <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.0/CentralWidgetFrame/Viewport/1QVTKOpenGLNativeWidget0" command="mousePress" arguments="(0.5,0.583333,1,1,0)" />
+  <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.0/CentralWidgetFrame/Viewport/1QVTKOpenGLNativeWidget0" command="mouseMove" arguments="(0.5,0.583333,1,0,0)" />
+  <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.0/CentralWidgetFrame/Viewport/1QVTKOpenGLNativeWidget0" command="mouseRelease" arguments="(0.5,0.583333,1,0,0)" />
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuFilters" />
+  <pqevent object="pqClientMainWindow/menubar/menuFilters/Alphabetical" command="activate" arguments="ExtractSelection" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/cameraToolbar/actionResetCamera" command="activate" arguments="" />
+</pqevents>

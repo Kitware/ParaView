@@ -72,6 +72,10 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${paraview_test_data_directory_input}/Data/blow_data.myvtk}"
   "DATA{${paraview_test_data_directory_input}/Data/bluntfin.vts}"
   "DATA{${paraview_test_data_directory_input}/Data/can.ex2}"
+  "DATA{${paraview_test_data_directory_input}/Data/can.e.4/can.e.4.0}"
+  "DATA{${paraview_test_data_directory_input}/Data/can.e.4/can.e.4.1}"
+  "DATA{${paraview_test_data_directory_input}/Data/can.e.4/can.e.4.2}"
+  "DATA{${paraview_test_data_directory_input}/Data/can.e.4/can.e.4.3}"
   "DATA{${paraview_test_data_directory_input}/Data/cgns_np01/,REGEX:.*}"
   "DATA{${paraview_test_data_directory_input}/Data/cgns_np04/,REGEX:.*}"
   "DATA{${paraview_test_data_directory_input}/Data/bc_struct.cgns}"
@@ -1017,6 +1021,7 @@ list(APPEND TESTS_WITH_BASELINES
   SaveTSV.xml
   SaveTXT.xml
   SelectedProxyPanelVisibility.xml
+  SelectionBlocks.xml
   SelectionModifiersCells.xml
   SelectionModifiersPoints.xml
   SelectionModifiersBlocks.xml
@@ -1450,6 +1455,7 @@ set(InteractiveSelection_DISABLE_CRS TRUE)
 set(NonConvexPolygon_DISABLE_CRS TRUE)
 set(QuartilePlot_DISABLE_CRS TRUE)
 set(TestSelectionOnMultipiece_DISABLE_CRS TRUE)
+set(SelectionBlocks_DISABLE_CRS TRUE)
 set(SelectionModifiersCells_DISABLE_CRS TRUE)
 set(SelectionModifiersBlocks_DISABLE_CRS TRUE)
 set(SelectionModifiersPoints_DISABLE_CRS TRUE)
