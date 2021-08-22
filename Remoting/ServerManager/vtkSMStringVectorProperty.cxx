@@ -363,9 +363,24 @@ const char* vtkSMStringVectorProperty::GetDefaultValue(int idx)
   return this->Internals->GetDefaultValue(idx).c_str();
 }
 
+//---------------------------------------------------------------------------
 void vtkSMStringVectorProperty::ClearUncheckedElements()
 {
   this->Internals->ClearUncheckedElements();
+}
+
+//---------------------------------------------------------------------------
+const std::vector<std::string>& vtkSMStringVectorProperty::GetElements() const
+{
+  auto& internals = (*this->Internals);
+  return internals.Values;
+}
+
+//---------------------------------------------------------------------------
+const std::vector<std::string>& vtkSMStringVectorProperty::GetUncheckedElements() const
+{
+  auto& internals = (*this->Internals);
+  return internals.UncheckedValues;
 }
 
 //---------------------------------------------------------------------------

@@ -263,6 +263,18 @@ void vtkSMIdTypeVectorProperty::ClearUncheckedElements()
 }
 
 //---------------------------------------------------------------------------
+const std::vector<vtkIdType>& vtkSMIdTypeVectorProperty::GetElements() const
+{
+  return this->Internals->Values;
+}
+
+//---------------------------------------------------------------------------
+const std::vector<vtkIdType>& vtkSMIdTypeVectorProperty::GetUncheckedElements() const
+{
+  return this->Internals->UncheckedValues;
+}
+
+//---------------------------------------------------------------------------
 void vtkSMIdTypeVectorProperty::ResetToXMLDefaults()
 {
   this->Internals->ResetToXMLDefaults();
