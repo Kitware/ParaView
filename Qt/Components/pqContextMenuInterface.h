@@ -75,7 +75,16 @@ public:
   /// multiblock data, the dataBlockContext is a list of
   /// block IDs to which the menu actions should apply.
   virtual bool contextMenu(QMenu* menu, pqView* viewContext, const QPoint& viewPoint,
-    pqRepresentation* dataContext, const QList<unsigned int>& dataBlockContext) const = 0;
+    pqRepresentation* dataContext, const QList<unsigned int>& dataBlockContext) const;
+
+  /**
+   * This is a newer variant of the contextMenu where the dataBlockContext is
+   * provided as selectors instead of composite ids. Selectors are more reliable
+   * especially when dealing with partitioned datasets and their collections in
+   * distributed mode and hence should be preferred.
+   */
+  virtual bool contextMenu(QMenu* menu, pqView* viewContext, const QPoint& viewPoint,
+    pqRepresentation* dataContext, const QStringList& dataBlockContext) const;
 
   /// This method's return value is used to set the precedence of the interface.
   ///

@@ -591,11 +591,11 @@ pqDataRepresentation* pqRenderView::pick(int pos[2])
 }
 
 //-----------------------------------------------------------------------------
-pqDataRepresentation* pqRenderView::pickBlock(int pos[2], unsigned int& flatIndex)
+pqDataRepresentation* pqRenderView::pickBlock(int pos[2], unsigned int& flatIndex, int& rank)
 {
   BEGIN_UNDO_EXCLUDE();
   vtkSMRenderViewProxy* renderView = this->getRenderViewProxy();
-  vtkSMRepresentationProxy* repr = renderView->PickBlock(pos[0], pos[1], flatIndex);
+  vtkSMRepresentationProxy* repr = renderView->PickBlock(pos[0], pos[1], flatIndex, rank);
   pqDataRepresentation* pq_repr = findRepresentationFromProxy(repr);
   END_UNDO_EXCLUDE();
   if (pq_repr)

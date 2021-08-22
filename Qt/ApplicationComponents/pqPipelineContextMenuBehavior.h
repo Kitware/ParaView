@@ -73,11 +73,16 @@ protected Q_SLOTS:
 
 protected:
   /**
-  * called to build the context menu for the given representation. If the
-  * picked representation was a composite data set the block index of the
-  * selected block will be passed in blockIndex.
-  */
-  virtual void buildMenu(pqDataRepresentation* repr, unsigned int blockIndex);
+   * called to build the context menu for the given representation. If the
+   * picked representation was a composite data set the block index of the
+   * selected block will be passed in blockIndex.
+   *
+   * With introduction on vtkPartitionedDataSetCollection and
+   * vtkPartitionedDataSet, flatIndex is no longer consistent across ranks and
+   * hence rank is also returned. Unless dealing with these data types, rank can
+   * be ignored.
+   */
+  virtual void buildMenu(pqDataRepresentation* repr, unsigned int blockIndex, int rank);
 
   /**
   * event filter to capture the right-click. We don't directly use mechanisms

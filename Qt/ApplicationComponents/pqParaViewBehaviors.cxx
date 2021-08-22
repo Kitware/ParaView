@@ -35,6 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqApplicationCore.h"
 #include "pqApplyBehavior.h"
 #include "pqAutoLoadPluginXMLBehavior.h"
+#include "pqBlockContextMenu.h"
 #include "pqCollaborationBehavior.h"
 #include "pqCommandLineOptionsBehavior.h"
 #include "pqCoreTestUtility.h"
@@ -135,6 +136,7 @@ PQ_BEHAVIOR_DEFINE_FLAG(StandardRecentlyUsedResourceLoader, true);
 PQ_BEHAVIOR_DEFINE_FLAG(DataTimeStepBehavior, true);
 PQ_BEHAVIOR_DEFINE_FLAG(SpreadSheetVisibilityBehavior, true);
 PQ_BEHAVIOR_DEFINE_FLAG(PipelineContextMenuBehavior, true);
+PQ_BEHAVIOR_DEFINE_FLAG(BlockContentMenu, true);
 PQ_BEHAVIOR_DEFINE_FLAG(ObjectPickingBehavior, false);
 PQ_BEHAVIOR_DEFINE_FLAG(DefaultViewBehavior, true);
 PQ_BEHAVIOR_DEFINE_FLAG(UndoRedoBehavior, true);
@@ -204,6 +206,12 @@ pqParaViewBehaviors::pqParaViewBehaviors(QMainWindow* mainWindow, QObject* paren
   if (PQ_IS_BEHAVIOR_ENABLED(PipelineContextMenuBehavior))
   {
     new pqPipelineContextMenuBehavior(this);
+
+    // this only makes sense when pqPipelineContextMenuBehavior is enabled.
+    if (PQ_IS_BEHAVIOR_ENABLED(BlockContentMenu))
+    {
+      pgm->addInterface(new pqBlockContextMenu(pgm));
+    }
   }
   if (PQ_IS_BEHAVIOR_ENABLED(ObjectPickingBehavior))
   {

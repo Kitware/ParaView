@@ -87,6 +87,7 @@ public:
   PQ_BEHAVIOR_DEFINE_METHODS(DataTimeStepBehavior);
   PQ_BEHAVIOR_DEFINE_METHODS(SpreadSheetVisibilityBehavior);
   PQ_BEHAVIOR_DEFINE_METHODS(PipelineContextMenuBehavior);
+  PQ_BEHAVIOR_DEFINE_METHODS(BlockContentMenu);
   PQ_BEHAVIOR_DEFINE_METHODS(ObjectPickingBehavior);
   PQ_BEHAVIOR_DEFINE_METHODS(DefaultViewBehavior);
   PQ_BEHAVIOR_DEFINE_METHODS(UndoRedoBehavior);
@@ -150,6 +151,7 @@ private:
   PQ_BEHAVIOR_DECLARE_FLAG(DataTimeStepBehavior);
   PQ_BEHAVIOR_DECLARE_FLAG(SpreadSheetVisibilityBehavior);
   PQ_BEHAVIOR_DECLARE_FLAG(PipelineContextMenuBehavior);
+  PQ_BEHAVIOR_DECLARE_FLAG(BlockContentMenu);
   PQ_BEHAVIOR_DECLARE_FLAG(ObjectPickingBehavior);
   PQ_BEHAVIOR_DECLARE_FLAG(DefaultViewBehavior);
   PQ_BEHAVIOR_DECLARE_FLAG(UndoRedoBehavior);

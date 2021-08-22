@@ -696,8 +696,12 @@ vtkSMRepresentationProxy* vtkSMRenderViewProxy::Pick(int x, int y)
 }
 
 //-----------------------------------------------------------------------------
-vtkSMRepresentationProxy* vtkSMRenderViewProxy::PickBlock(int x, int y, unsigned int& flatIndex)
+vtkSMRepresentationProxy* vtkSMRenderViewProxy::PickBlock(
+  int x, int y, unsigned int& flatIndex, int& rank)
 {
+  flatIndex = 0;
+  rank = 0;
+
   vtkSMRepresentationProxy* repr = nullptr;
   vtkSmartPointer<vtkCollection> reprs = vtkSmartPointer<vtkCollection>::New();
   vtkSmartPointer<vtkCollection> sources = vtkSmartPointer<vtkCollection>::New();
@@ -717,26 +721,46 @@ vtkSMRepresentationProxy* vtkSMRenderViewProxy::PickBlock(int x, int y, unsigned
   }
 
   // get data information
-  vtkPVDataInformation* info = repr->GetRepresentedDataInformation();
+  auto input = vtkSMPropertyHelper(repr, "Input", /*quiet*/ true).GetAsOutputPort();
+  auto info = input ? input->GetDataInformation() : nullptr;
 
   // get selection in order to determine which block of the data set
   // set was selected (if it is a composite data set)
-  if (info->IsCompositeDataSet())
+  if (info && info->IsCompositeDataSet())
   {
-    vtkSMProxy* selectionSource = vtkSMProxy::SafeDownCast(sources->GetItemAsObject(0));
+    auto selectionSource = vtkSMProxy::SafeDownCast(sources->GetItemAsObject(0));
 
-    vtkSMPropertyHelper inputHelper(repr, "Input");
-    // get representation input data
-    vtkSMSourceProxy* reprInput = vtkSMSourceProxy::SafeDownCast(inputHelper.GetAsProxy());
+    // since SelectSurfaceCells can ever only return a
+    // `CompositeDataIDSelectionSource` or `HierarchicalDataIDSelectionSource`
+    // for composite datasets, we use the following trick to extract the
+    // block/rank information quickly.
+    if (strcmp(selectionSource->GetXMLName(), "CompositeDataIDSelectionSource") == 0)
+    {
+      vtkSMPropertyHelper ids(selectionSource, "IDs");
+      if (ids.GetNumberOfElements() >= 3) // we expect 3-tuples
+      {
+        flatIndex = ids.GetAsInt(0);
+        rank = ids.GetAsInt(1);
+      }
+    }
+    else if (strcmp(selectionSource->GetXMLName(), "HierarchicalDataIDSelectionSource") == 0)
+    {
+      vtkSMPropertyHelper ids(selectionSource, "IDs");
+      if (ids.GetNumberOfElements() >= 3) // we expect 3-tuples
+      {
+        unsigned int level = ids.GetAsInt(0);
+        unsigned int index = ids.GetAsInt(1);
 
-    // convert cell selection to block selection
-    vtkSMProxy* blockSelection = vtkSMSelectionHelper::ConvertSelection(
-      vtkSelectionNode::BLOCKS, selectionSource, reprInput, inputHelper.GetOutputPort());
-
-    // set block index
-    vtkSMPropertyHelper helper(blockSelection, "Blocks");
-    flatIndex = (helper.GetNumberOfElements() > 0) ? helper.GetAsInt() : 0;
-    blockSelection->Delete();
+        // convert level,index to flat index.
+        flatIndex = info->ComputeCompositeIndexForAMR(level, index);
+        rank = 0; // doesn't matter since flatIndex is consistent on all ranks for AMR.
+      }
+    }
+    else
+    {
+      vtkErrorMacro("Unexpected selection source: " << selectionSource->GetXMLName());
+      return nullptr;
+    }
   }
 
   // return selected representation

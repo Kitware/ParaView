@@ -38,19 +38,101 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqInterfaceTracker.h"
 #include "pqPVApplicationCore.h"
 #include "pqRenderView.h"
-#include "pqScalarsToColors.h"
 #include "pqSelectionManager.h"
 #include "pqServerManagerModel.h"
-#include "pqSetName.h"
+#include "vtkDataAssemblyUtilities.h"
+#include "vtkPVDataInformation.h"
+#include "vtkSMIdTypeVectorProperty.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMSourceProxy.h"
+#include "vtkSMStringVectorProperty.h"
 #include "vtksys/SystemTools.hxx"
 
 #include <QAction>
 #include <QApplication>
 #include <QMenu>
 #include <QMouseEvent>
-#include <QWidget>
+#include <QtDebug>
+
+#include <tuple>
+
+namespace
+{
+/**
+ * Returns true if the selection source is a block selection producer.
+ */
+bool isBlockSelection(vtkSMSourceProxy* source)
+{
+  return (source && (strcmp(source->GetXMLName(), "BlockSelectorsSelectionSource") == 0 ||
+                      strcmp(source->GetXMLName(), "BlockSelectionSource") == 0));
+}
+
+std::pair<QList<unsigned int>, QStringList> getSelectedBlocks(
+  pqDataRepresentation* repr, unsigned int blockIndex, int rank)
+{
+  auto producerPort = repr ? repr->getOutputPortFromInput() : nullptr;
+  auto dataInfo = producerPort ? producerPort->getDataInformation() : nullptr;
+  if (producerPort == nullptr || !dataInfo->IsCompositeDataSet())
+  {
+    return std::pair<QList<unsigned int>, QStringList>();
+  }
+
+  QList<unsigned int> legacyPickedBlocks;
+  QStringList pickedSelectors;
+  if (!isBlockSelection(producerPort->getSelectionInput()))
+  {
+    // If active selection is not block selection, the blocks will be simply the
+    // one the user clicked on.
+    legacyPickedBlocks.push_back(blockIndex);
+    auto rankDataInfo = producerPort->getRankDataInformation(rank);
+    auto selector =
+      vtkDataAssemblyUtilities::GetSelectorForCompositeId(blockIndex, rankDataInfo->GetHierarchy());
+    if (!selector.empty())
+    {
+      pickedSelectors.push_back(QString::fromStdString(selector));
+    }
+    return std::make_pair(legacyPickedBlocks, pickedSelectors);
+  }
+
+  // if actively selected data a block-type of selection, then we show properties
+  // for the selected set of blocks.
+  auto selectionProducer = producerPort->getSelectionInput();
+  if (strcmp(selectionProducer->GetXMLName(), "BlockSelectorsSelectionSource") == 0)
+  {
+    auto svp =
+      vtkSMStringVectorProperty::SafeDownCast(selectionProducer->GetProperty("BlockSelectors"));
+    const auto& elements = svp->GetElements();
+    std::transform(elements.begin(), elements.end(), std::back_inserter(pickedSelectors),
+      [](const std::string& str) { return QString::fromStdString(str); });
+
+    // convert selectors to ids (should we do this only for MBs, since it's
+    // going to be incorrect for PDCs or PDCs in parallel?
+    auto ids =
+      vtkDataAssemblyUtilities::GetSelectedCompositeIds(elements, dataInfo->GetHierarchy());
+    std::copy(ids.begin(), ids.end(), std::back_inserter(legacyPickedBlocks));
+  }
+  else if (strcmp(selectionProducer->GetXMLName(), "BlockSelectionSource") == 0)
+  {
+    auto idvp = vtkSMIdTypeVectorProperty::SafeDownCast(selectionProducer->GetProperty("Blocks"));
+    const auto& elements = idvp->GetElements();
+    std::copy(elements.begin(), elements.end(), std::back_inserter(legacyPickedBlocks));
+
+    // convert ids to selectors; should we only do this for PDCs?
+    const auto selectors = vtkDataAssemblyUtilities::GetSelectorsForCompositeIds(
+      std::vector<unsigned int>(elements.begin(), elements.end()), dataInfo->GetHierarchy());
+    std::transform(selectors.begin(), selectors.end(), std::back_inserter(pickedSelectors),
+      [](const std::string& str) { return QString::fromStdString(str); });
+  }
+  else
+  {
+    // should never happen!
+    qCritical() << "Unexpected selectionProducer: " << selectionProducer->GetXMLName();
+  }
+
+  return std::make_pair(legacyPickedBlocks, pickedSelectors);
+}
+
+} // end of namespace {}
 
 //-----------------------------------------------------------------------------
 pqPipelineContextMenuBehavior::pqPipelineContextMenuBehavior(QObject* parentObject)
@@ -59,7 +141,7 @@ pqPipelineContextMenuBehavior::pqPipelineContextMenuBehavior(QObject* parentObje
   QObject::connect(pqApplicationCore::instance()->getServerManagerModel(),
     SIGNAL(viewAdded(pqView*)), this, SLOT(onViewAdded(pqView*)));
   this->Menu = new QMenu();
-  this->Menu << pqSetName("PipelineContextMenu");
+  this->Menu->setObjectName("PipelineContextMenu");
 
   auto ifaceTracker = pqApplicationCore::instance()->interfaceTracker();
   ifaceTracker->addInterface(new pqDefaultContextMenu());
@@ -117,9 +199,10 @@ bool pqPipelineContextMenuBehavior::eventFilter(QObject* caller, QEvent* e)
             pos[1] = pos[1] * devicePixelRatioF;
           }
           unsigned int blockIndex = 0;
+          int rank = 0;
           QPointer<pqDataRepresentation> pickedRepresentation;
-          pickedRepresentation = view->pickBlock(pos, blockIndex);
-          this->buildMenu(pickedRepresentation, blockIndex);
+          pickedRepresentation = view->pickBlock(pos, blockIndex, rank);
+          this->buildMenu(pickedRepresentation, blockIndex, rank);
           this->Menu->popup(senderWidget->mapToGlobal(newPos));
         }
       }
@@ -131,48 +214,14 @@ bool pqPipelineContextMenuBehavior::eventFilter(QObject* caller, QEvent* e)
 }
 
 //-----------------------------------------------------------------------------
-void pqPipelineContextMenuBehavior::buildMenu(pqDataRepresentation* repr, unsigned int blockIndex)
+void pqPipelineContextMenuBehavior::buildMenu(
+  pqDataRepresentation* repr, unsigned int blockIndex, int rank)
 {
   pqRenderView* view = qobject_cast<pqRenderView*>(pqActiveObjects::instance().activeView());
 
-  QList<unsigned int> pickedBlocks;
-
-  bool picked_block_in_selected_blocks = false;
-  pqSelectionManager* selectionManager = pqPVApplicationCore::instance()->selectionManager();
-  if (selectionManager)
-  {
-    pqOutputPort* port = selectionManager->getSelectedPort();
-    if (port)
-    {
-      vtkSMSourceProxy* activeSelection = port->getSelectionInput();
-      if (activeSelection && strcmp(activeSelection->GetXMLName(), "BlockSelectionSource") == 0)
-      {
-        vtkSMPropertyHelper blocksProp(activeSelection, "Blocks");
-        QVector<vtkIdType> vblocks;
-        vblocks.resize(blocksProp.GetNumberOfElements());
-        blocksProp.Get(&vblocks[0], blocksProp.GetNumberOfElements());
-        foreach (const vtkIdType& index, vblocks)
-        {
-          if (index >= 0)
-          {
-            if (static_cast<unsigned int>(index) == blockIndex)
-            {
-              picked_block_in_selected_blocks = true;
-            }
-            pickedBlocks.push_back(static_cast<unsigned int>(index));
-          }
-        }
-      }
-    }
-  }
-
-  if (!picked_block_in_selected_blocks)
-  {
-    // the block that was clicked on is not one of the currently selected
-    // block so actions should only affect that block
-    pickedBlocks.clear();
-    pickedBlocks.append(static_cast<unsigned int>(blockIndex));
-  }
+  QList<unsigned int> legacyPickedBlocks;
+  QStringList pickedSelectors;
+  std::tie(legacyPickedBlocks, pickedSelectors) = ::getSelectedBlocks(repr, blockIndex, rank);
 
   this->Menu->clear();
 
@@ -185,7 +234,8 @@ void pqPipelineContextMenuBehavior::buildMenu(pqDataRepresentation* repr, unsign
     });
   for (auto mbldr : interfaces)
   {
-    if (mbldr && mbldr->contextMenu(this->Menu, view, this->Position, repr, pickedBlocks))
+    if (mbldr && (mbldr->contextMenu(this->Menu, view, this->Position, repr, legacyPickedBlocks) ||
+                   mbldr->contextMenu(this->Menu, view, this->Position, repr, pickedSelectors)))
     {
       break;
     }

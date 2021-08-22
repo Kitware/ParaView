@@ -199,11 +199,16 @@ public:
   virtual pqDataRepresentation* pick(int pos[2]);
 
   /**
-  * Picks the representation at the given position. Furthermore, if the
-  * picked representation is a multi-block data set the picked block will
-  * be returned in the flatIndex variable.
-  */
-  virtual pqDataRepresentation* pickBlock(int pos[2], unsigned int& flatIndex);
+   * Picks the representation at the given position. Furthermore, if the
+   * picked representation is a multi-block data set the picked block will
+   * be returned in the flatIndex variable.
+   *
+   * With introduction on vtkPartitionedDataSetCollection and
+   * vtkPartitionedDataSet, flatIndex is no longer consistent across ranks and
+   * hence rank is also returned. Unless dealing with these data types, rank can
+   * be ignored.
+   */
+  virtual pqDataRepresentation* pickBlock(int pos[2], unsigned int& flatIndex, int& rank);
 
   /**
   * Creates a new frustum selection given the rectangle in display
