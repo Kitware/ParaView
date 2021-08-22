@@ -1437,6 +1437,48 @@ int vtkSMPropertyHelper::GetStatus(const int key, const int default_value) const
 }
 
 //----------------------------------------------------------------------------
+void vtkSMPropertyHelper::RemoveStatus(const char* key)
+{
+  if (key == nullptr)
+  {
+    return;
+  }
+
+  if (this->Type != vtkSMPropertyHelper::STRING)
+  {
+    vtkSMPropertyHelperWarningMacro("Status properties can only be vtkSMStringVectorProperty.");
+    return;
+  }
+
+  const std::string skey(key);
+  auto svp = vtkSMStringVectorProperty::SafeDownCast(this->Property);
+  std::vector<std::string> values =
+    (this->UseUnchecked ? svp->GetUncheckedElements() : svp->GetElements());
+  const int step_size = svp->GetNumberOfElementsPerCommand();
+  if (step_size <= 0)
+  {
+    return;
+  }
+  for (int cc = 0; (cc + step_size) <= static_cast<int>(values.size()); cc += step_size)
+  {
+    if (values[cc] == skey)
+    {
+      values.erase(values.begin() + cc, values.begin() + cc + step_size);
+      break;
+    }
+  }
+
+  if (this->UseUnchecked)
+  {
+    svp->SetUncheckedElements(values);
+  }
+  else
+  {
+    svp->SetElements(values);
+  }
+}
+
+//----------------------------------------------------------------------------
 void vtkSMPropertyHelper::SetInputArrayToProcess(int fieldAssociation, const char* arrayName)
 {
   if (this->Type != vtkSMPropertyHelper::STRING)

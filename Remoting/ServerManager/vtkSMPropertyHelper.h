@@ -253,6 +253,11 @@ public:
   const char* GetStatus(const char* key, const char* default_value) const;
   //@}
 
+  /**
+   * Removes the status value specified for the given key, if any.
+   */
+  void RemoveStatus(const char* key);
+
   //@{
   /**
    * This API is useful for setting values on vtkSMIntVectorProperty that is
