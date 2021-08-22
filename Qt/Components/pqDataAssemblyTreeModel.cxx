@@ -680,3 +680,37 @@ QList<int> pqDataAssemblyTreeModel::nodeId(const QModelIndexList& idxes) const
   }
   return result;
 }
+
+//-----------------------------------------------------------------------------
+QModelIndex pqDataAssemblyTreeModel::index(int nodeId) const
+{
+  const auto assembly = this->Internals->DataAssembly.GetPointer();
+  if (assembly == nullptr || nodeId < 0)
+  {
+    return QModelIndex();
+  }
+  if (nodeId == 0)
+  {
+    return this->createIndex(0, 0, static_cast<quintptr>(0));
+  }
+
+  const auto parentNodeId = assembly->GetParent(nodeId);
+  return parentNodeId == -1 ? QModelIndex()
+                            : this->createIndex(assembly->GetChildIndex(parentNodeId, nodeId), 0,
+                                static_cast<quintptr>(nodeId));
+}
+
+//-----------------------------------------------------------------------------
+QModelIndexList pqDataAssemblyTreeModel::index(const QList<int>& nodeIds) const
+{
+  QModelIndexList result;
+  for (const auto& id : nodeIds)
+  {
+    auto idx = this->index(id);
+    if (idx.isValid())
+    {
+      result.push_back(idx);
+    }
+  }
+  return result;
+}

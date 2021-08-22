@@ -87,6 +87,14 @@ public:
 
   //@{
   /**
+   * Get a node id, returns the QModelIndex for the same.
+   */
+  QModelIndex index(int nodeId) const;
+  QModelIndexList index(const QList<int>& nodeIds) const;
+  //@}
+
+  //@{
+  /**
    * Get/Set the check state for Qt::Checked for nodes selected using the path
    * names specified.
    *
