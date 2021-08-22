@@ -110,6 +110,19 @@ vtkPVDataInformation* pqOutputPort::getDataInformation() const
 }
 
 //-----------------------------------------------------------------------------
+vtkPVDataInformation* pqOutputPort::getRankDataInformation(int rank) const
+{
+  vtkSMSourceProxy* source = vtkSMSourceProxy::SafeDownCast(this->getSource()->getProxy());
+
+  if (!source)
+  {
+    return nullptr;
+  }
+
+  return source->GetRankDataInformation(this->PortNumber, rank);
+}
+
+//-----------------------------------------------------------------------------
 vtkPVTemporalDataInformation* pqOutputPort::getTemporalDataInformation()
 {
   return this->getOutputPortProxy()->GetTemporalDataInformation();

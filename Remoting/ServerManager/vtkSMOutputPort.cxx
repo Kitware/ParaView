@@ -150,6 +150,42 @@ vtkPVDataInformation* vtkSMOutputPort::GetSubsetDataInformation(unsigned int com
 }
 
 //----------------------------------------------------------------------------
+vtkPVDataInformation* vtkSMOutputPort::GetRankDataInformation(int rank)
+{
+  auto session = this->GetSession();
+  const auto numRanks = session->GetNumberOfProcesses(this->GetSourceProxy()->GetLocation());
+  if (rank < 0 || (numRanks == 1 && rank == 0))
+  {
+    // same as regular data information.
+    return this->GetDataInformation();
+  }
+
+  if (rank >= numRanks)
+  {
+    // raise an error, since this may not be what the developer expected.
+    vtkErrorMacro("Incorrect rank requested!");
+    return this->GetDataInformation();
+  }
+
+  auto iter = this->RankDataInformations.find(rank);
+  if (iter != this->RankDataInformations.end())
+  {
+    return iter->second;
+  }
+
+  this->SourceProxy->GetSession()->PrepareProgress();
+
+  vtkNew<vtkPVDataInformation> rankInfo;
+  rankInfo->Initialize();
+  rankInfo->SetPortNumber(this->PortIndex);
+  rankInfo->SetRank(rank);
+  this->SourceProxy->GatherInformation(rankInfo);
+  this->RankDataInformations[rank] = rankInfo;
+  this->SourceProxy->GetSession()->CleanupPendingProgress();
+  return rankInfo;
+}
+
+//----------------------------------------------------------------------------
 vtkPVClassNameInformation* vtkSMOutputPort::GetClassNameInformation()
 {
   if (this->ClassNameInformationValid == 0)
@@ -172,6 +208,7 @@ void vtkSMOutputPort::InvalidateDataInformation()
   this->ClassNameInformationValid = false;
   this->TemporalDataInformationValid = false;
   this->SubsetDataInformations.clear();
+  this->RankDataInformations.clear();
 }
 
 //----------------------------------------------------------------------------

@@ -251,6 +251,17 @@ vtkPVTemporalDataInformation* pqDataRepresentation::getInputTemporalDataInformat
 }
 
 //-----------------------------------------------------------------------------
+vtkPVDataInformation* pqDataRepresentation::getInputRankDataInformation(int rank) const
+{
+  if (!this->getOutputPortFromInput())
+  {
+    return nullptr;
+  }
+
+  return this->getOutputPortFromInput()->getRankDataInformation(rank);
+}
+
+//-----------------------------------------------------------------------------
 pqDataRepresentation* pqDataRepresentation::getRepresentationForUpstreamSource() const
 {
   pqPipelineFilter* filter = qobject_cast<pqPipelineFilter*>(this->getInput());

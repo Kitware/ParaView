@@ -134,6 +134,11 @@ public:
   vtkPVDataInformation* getDataInformation() const;
 
   /**
+  * Returns rank-specific data information.
+  */
+  vtkPVDataInformation* getRankDataInformation(int rank) const;
+
+  /**
   * Collects data information over time. This can potentially be a very slow
   * process, so use with caution.
   */
