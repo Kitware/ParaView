@@ -86,54 +86,6 @@ protected Q_SLOTS:
   void hide();
 
   /**
-  * called to hide the block. the action which emits the signal will
-  * contain the block index in its data().
-  */
-  void hideBlock();
-
-  /**
-  * called to show only the selected block. the action which emits the
-  * signal will contain the block index in its data().
-  */
-  void showOnlyBlock();
-
-  /**
-  * called to show all blocks.
-  */
-  void showAllBlocks();
-
-  /**
-  * called to unset the visibility flag for the block. after this call the
-  * block will inherit the visibility from its parent. the action which
-  * emits the signal will contain the block index in its data()
-  */
-  void unsetBlockVisibility();
-
-  /**
-  * called to set the color for the block. the action which emits the
-  * signal will contain the block index in its data()
-  */
-  void setBlockColor();
-
-  /**
-  * called to unset the color for the block. the action which emits the
-  * signal will contain the block index in its data()
-  */
-  void unsetBlockColor();
-
-  /**
-  * called to set the opacity for the block. the action which emits the
-  * signal will contain the block index in its data()
-  */
-  void setBlockOpacity();
-
-  /**
-  * called to unset the opacity for the block. the action which emits the
-  * signal will contain the block index in its data()
-  */
-  void unsetBlockOpacity();
-
-  /**
   * called to change the representation type.
   */
   void reprTypeChanged(QAction* action);
@@ -149,14 +101,8 @@ protected:
   */
   virtual void buildColorFieldsMenu(pqPipelineRepresentation* pipelineRepr, QMenu* menu) const;
 
-  /**
-  * return the name of the block from its flat index
-  */
-  QString lookupBlockName(unsigned int flatIndex) const;
-
   mutable QPoint Position;
   mutable QPointer<pqDataRepresentation> PickedRepresentation;
-  mutable QList<unsigned int> PickedBlocks;
 
 private:
   Q_DISABLE_COPY(pqDefaultContextMenu)
