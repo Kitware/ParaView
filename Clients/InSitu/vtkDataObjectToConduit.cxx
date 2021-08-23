@@ -42,9 +42,7 @@
 
 #include <catalyst_conduit.hpp>
 
-namespace vtkDataObjectToConduit
-{
-namespace details
+namespace
 {
 
 //----------------------------------------------------------------------------
@@ -452,12 +450,15 @@ bool FillFields(vtkDataSet* data_set, conduit_cpp::Node& conduit_node)
 }
 
 //----------------------------------------------------------------------------
-bool FillConduitNode(vtkDataSet* data_set, conduit_cpp::Node& conduit_node)
+bool FillConduitNodeFromDataSet(vtkDataSet* data_set, conduit_cpp::Node& conduit_node)
 {
   return FillTopology(data_set, conduit_node) && FillFields(data_set, conduit_node);
 }
 
-} // details namespace
+} // anonymous namespace
+
+namespace vtkDataObjectToConduit
+{
 
 //----------------------------------------------------------------------------
 bool FillConduitNode(vtkDataObject* data_object, conduit_cpp::Node& conduit_node)
@@ -469,7 +470,7 @@ bool FillConduitNode(vtkDataObject* data_object, conduit_cpp::Node& conduit_node
     return false;
   }
 
-  return details::FillConduitNode(data_set, conduit_node);
+  return FillConduitNodeFromDataSet(data_set, conduit_node);
 }
 
 } // vtkDataObjectToConduit namespace
