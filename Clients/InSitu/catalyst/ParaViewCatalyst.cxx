@@ -101,12 +101,11 @@ static bool convert_to_blueprint_mesh(
       steeringDataGenerator->Update();
       if (vtkDataObject* outputDataObject = steeringDataGenerator->GetOutputDataObject(0))
       {
-        auto channel = node[name];
-
         if (auto multi_block = vtkMultiBlockDataSet::SafeDownCast(outputDataObject))
         {
           if (auto data_object = multi_block->GetBlock(0))
           {
+            auto channel = node[name];
             return vtkDataObjectToConduit::FillConduitNode(data_object, channel);
           }
         }
