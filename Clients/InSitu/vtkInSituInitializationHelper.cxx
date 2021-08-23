@@ -391,7 +391,7 @@ int vtkInSituInitializationHelper::GetAttributeTypeFromString(const std::string&
 {
   std::string lower_case_string = associationString;
   std::transform(associationString.begin(), associationString.end(), lower_case_string.begin(),
-    [](char character) { return tolower(character); });
+    [](char character) { return std::tolower(character); });
 
   if (lower_case_string == "point")
   {
