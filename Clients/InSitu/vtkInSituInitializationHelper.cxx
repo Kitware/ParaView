@@ -620,7 +620,7 @@ void vtkInSituInitializationHelper::GetSteerableProxies(
   if (vtkInSituInitializationHelper::Internals != nullptr)
   {
     auto internals = vtkInSituInitializationHelper::Internals;
-    proxies.reserve(internals->SteerableProxies.size());
+    proxies.reserve(proxies.size() + internals->SteerableProxies.size());
     for (auto& proxy : internals->SteerableProxies)
     {
       proxies.emplace_back(proxy.second, proxy.first);
