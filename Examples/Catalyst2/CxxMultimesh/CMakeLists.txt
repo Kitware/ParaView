@@ -51,9 +51,17 @@ if (USE_CATALYST)
       NAME CxxMultimeshV2::SimplePipeline
       COMMAND CxxMultimeshV2
               ${CMAKE_CURRENT_SOURCE_DIR}/catalyst_pipeline.py)
+
+    set(_vtk_fail_regex
+      # vtkLogger
+      "(\n|^)ERROR: "
+      "ERR\\|"
+      # vtkDebugLeaks
+      "instance(s)? still around")
+
     set_tests_properties("CxxMultimeshV2::SimplePipeline"
       PROPERTIES
-        FAIL_REGULAR_EXPRESSION "Err;ERROR:;instances(s)? still around;ERR\\\|"
+        FAIL_REGULAR_EXPRESSION "${_vtk_fail_regex}"
         SKIP_RETURN_CODE 125)
   endif()
 endif()
