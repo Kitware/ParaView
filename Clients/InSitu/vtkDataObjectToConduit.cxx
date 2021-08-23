@@ -178,10 +178,9 @@ bool ConvertDataArrayToMCArray(
   {
     vtkLog(ERROR, "Unsupported data array type: " << data_array->GetDataTypeAsString() << " size: "
                                                   << data_type_size << " type: " << array_type);
-    return false;
   }
 
-  return true;
+  return is_supported;
 }
 
 //----------------------------------------------------------------------------
