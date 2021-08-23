@@ -280,11 +280,22 @@ static double unstructured_grid_points_coordinates[27][3] = { { 0, 0, 0 }, { 1, 
   { 1, 1, 1 }, { 2, 1, 1 }, { 0, 1, 2 }, { 1, 1, 2 }, { 2, 1, 2 }, { 0, 1, 3 }, { 1, 1, 3 },
   { 2, 1, 3 }, { 0, 1, 4 }, { 1, 1, 4 }, { 2, 1, 4 }, { 0, 1, 5 }, { 1, 1, 5 }, { 2, 1, 5 },
   { 0, 1, 6 }, { 1, 1, 6 }, { 2, 1, 6 } };
-static vtkIdType unstructured_grid_cell_connectivities[12][8] = { { 0, 1, 4, 3, 6, 7, 10, 9 },
+/*static vtkIdType unstructured_grid_cell_connectivities[12][8] = { { 0, 1, 4, 3, 6, 7, 10, 9 },
   { 1, 2, 5, 4, 7, 8, 11, 10 }, { 6, 10, 9, 12, 0, 0, 0, 0 }, { 8, 11, 10, 14, 0, 0, 0, 0 },
   { 16, 17, 14, 13, 12, 15, 0, 0 }, { 18, 15, 19, 16, 20, 17, 0, 0 },
   { 22, 23, 20, 19, 0, 0, 0, 0 }, { 21, 22, 18, 0, 0, 0, 0, 0 }, { 22, 19, 18, 0, 0, 0, 0, 0 },
-  { 23, 26, 0, 0, 0, 0, 0, 0 }, { 21, 24, 0, 0, 0, 0, 0, 0 }, { 25, 0, 0, 0, 0, 0, 0, 0 } };
+  { 23, 26, 0, 0, 0, 0, 0, 0 }, { 21, 24, 0, 0, 0, 0, 0, 0 }, { 25, 0, 0, 0, 0, 0, 0, 0 } };*/
+
+static struct
+{
+  VTKCellType cell_type;
+  std::vector<vtkIdType> connectivity;
+} unstructured_grid_cell_connectivities[] = { { VTK_HEXAHEDRON, { 0, 1, 4, 3, 6, 7, 10, 9 } },
+  { VTK_HEXAHEDRON, { 1, 2, 5, 4, 7, 8, 11, 10 } }, { VTK_TETRA, { 6, 10, 9, 12 } },
+  { VTK_TETRA, { 8, 11, 10, 14 } }, { VTK_POLYGON, { 16, 17, 14, 13, 12, 15 } },
+  { VTK_TRIANGLE_STRIP, { 18, 15, 19, 16, 20, 17 } }, { VTK_QUAD, { 22, 23, 20, 19 } },
+  { VTK_TRIANGLE, { 21, 22, 18 } }, { VTK_TRIANGLE, { 22, 19, 18 } }, { VTK_LINE, { 23, 26 } },
+  { VTK_LINE, { 21, 24 } }, { VTK_VERTEX, { 25 } }, { VTK_EMPTY_CELL, {} } };
 
 bool TestMixedShapedUnstructuredGrid()
 {
@@ -299,19 +310,14 @@ bool TestMixedShapedUnstructuredGrid()
   unstructured_grid->SetPoints(points);
 
   unstructured_grid->Allocate(100);
-  unstructured_grid->InsertNextCell(VTK_HEXAHEDRON, 8, unstructured_grid_cell_connectivities[0]);
-  unstructured_grid->InsertNextCell(VTK_HEXAHEDRON, 8, unstructured_grid_cell_connectivities[1]);
-  unstructured_grid->InsertNextCell(VTK_TETRA, 4, unstructured_grid_cell_connectivities[2]);
-  unstructured_grid->InsertNextCell(VTK_TETRA, 4, unstructured_grid_cell_connectivities[3]);
-  unstructured_grid->InsertNextCell(VTK_POLYGON, 6, unstructured_grid_cell_connectivities[4]);
-  unstructured_grid->InsertNextCell(
-    VTK_TRIANGLE_STRIP, 6, unstructured_grid_cell_connectivities[5]);
-  unstructured_grid->InsertNextCell(VTK_QUAD, 4, unstructured_grid_cell_connectivities[6]);
-  unstructured_grid->InsertNextCell(VTK_TRIANGLE, 3, unstructured_grid_cell_connectivities[7]);
-  unstructured_grid->InsertNextCell(VTK_TRIANGLE, 3, unstructured_grid_cell_connectivities[8]);
-  unstructured_grid->InsertNextCell(VTK_LINE, 2, unstructured_grid_cell_connectivities[9]);
-  unstructured_grid->InsertNextCell(VTK_LINE, 2, unstructured_grid_cell_connectivities[10]);
-  unstructured_grid->InsertNextCell(VTK_VERTEX, 1, unstructured_grid_cell_connectivities[11]);
+  vtkIdType type_index = 0;
+  while (unstructured_grid_cell_connectivities[type_index].cell_type != VTK_EMPTY_CELL)
+  {
+    unstructured_grid->InsertNextCell(unstructured_grid_cell_connectivities[type_index].cell_type,
+      unstructured_grid_cell_connectivities[type_index].connectivity.size(),
+      unstructured_grid_cell_connectivities[type_index].connectivity.data());
+    ++type_index;
+  }
 
   auto previous_verbosity = vtkLogger::GetCurrentVerbosityCutoff();
   vtkLogger::SetStderrVerbosity(vtkLogger::VERBOSITY_OFF);
@@ -335,8 +341,12 @@ bool TestHexahedronUnstructuredGrid()
   }
   unstructured_grid->SetPoints(points);
   unstructured_grid->Allocate(100);
-  unstructured_grid->InsertNextCell(VTK_HEXAHEDRON, 8, unstructured_grid_cell_connectivities[0]);
-  unstructured_grid->InsertNextCell(VTK_HEXAHEDRON, 8, unstructured_grid_cell_connectivities[1]);
+  unstructured_grid->InsertNextCell(unstructured_grid_cell_connectivities[0].cell_type,
+    unstructured_grid_cell_connectivities[0].connectivity.size(),
+    unstructured_grid_cell_connectivities[0].connectivity.data());
+  unstructured_grid->InsertNextCell(unstructured_grid_cell_connectivities[1].cell_type,
+    unstructured_grid_cell_connectivities[1].connectivity.size(),
+    unstructured_grid_cell_connectivities[1].connectivity.data());
 
   vtkNew<vtkDoubleArray> cellValues;
   cellValues->SetNumberOfTuples(2);
@@ -409,8 +419,12 @@ bool TestTetrahedronUnstructuredGrid()
   }
   unstructured_grid->SetPoints(points);
   unstructured_grid->Allocate(100);
-  unstructured_grid->InsertNextCell(VTK_TETRA, 4, unstructured_grid_cell_connectivities[2]);
-  unstructured_grid->InsertNextCell(VTK_TETRA, 4, unstructured_grid_cell_connectivities[3]);
+  unstructured_grid->InsertNextCell(unstructured_grid_cell_connectivities[2].cell_type,
+    unstructured_grid_cell_connectivities[2].connectivity.size(),
+    unstructured_grid_cell_connectivities[2].connectivity.data());
+  unstructured_grid->InsertNextCell(unstructured_grid_cell_connectivities[3].cell_type,
+    unstructured_grid_cell_connectivities[3].connectivity.size(),
+    unstructured_grid_cell_connectivities[3].connectivity.data());
 
   vtkNew<vtkDoubleArray> cellValues;
   cellValues->SetNumberOfTuples(2);
@@ -483,7 +497,9 @@ bool TestQuadUnstructuredGrid()
   }
   unstructured_grid->SetPoints(points);
   unstructured_grid->Allocate(100);
-  unstructured_grid->InsertNextCell(VTK_QUAD, 4, unstructured_grid_cell_connectivities[6]);
+  unstructured_grid->InsertNextCell(unstructured_grid_cell_connectivities[6].cell_type,
+    unstructured_grid_cell_connectivities[6].connectivity.size(),
+    unstructured_grid_cell_connectivities[6].connectivity.data());
 
   vtkNew<vtkDoubleArray> pointValues;
   pointValues->SetNumberOfTuples(4);
@@ -556,8 +572,12 @@ bool TestTriangleUnstructuredGrid()
   }
   unstructured_grid->SetPoints(points);
   unstructured_grid->Allocate(100);
-  unstructured_grid->InsertNextCell(VTK_TRIANGLE, 3, unstructured_grid_cell_connectivities[7]);
-  unstructured_grid->InsertNextCell(VTK_TRIANGLE, 3, unstructured_grid_cell_connectivities[8]);
+  unstructured_grid->InsertNextCell(unstructured_grid_cell_connectivities[7].cell_type,
+    unstructured_grid_cell_connectivities[7].connectivity.size(),
+    unstructured_grid_cell_connectivities[7].connectivity.data());
+  unstructured_grid->InsertNextCell(unstructured_grid_cell_connectivities[8].cell_type,
+    unstructured_grid_cell_connectivities[8].connectivity.size(),
+    unstructured_grid_cell_connectivities[8].connectivity.data());
 
   vtkNew<vtkDoubleArray> cellValues;
   cellValues->SetNumberOfTuples(2);
@@ -628,8 +648,12 @@ bool TestLineUnstructuredGrid()
   }
   unstructured_grid->SetPoints(points);
   unstructured_grid->Allocate(100);
-  unstructured_grid->InsertNextCell(VTK_LINE, 2, unstructured_grid_cell_connectivities[9]);
-  unstructured_grid->InsertNextCell(VTK_LINE, 2, unstructured_grid_cell_connectivities[10]);
+  unstructured_grid->InsertNextCell(unstructured_grid_cell_connectivities[9].cell_type,
+    unstructured_grid_cell_connectivities[9].connectivity.size(),
+    unstructured_grid_cell_connectivities[9].connectivity.data());
+  unstructured_grid->InsertNextCell(unstructured_grid_cell_connectivities[10].cell_type,
+    unstructured_grid_cell_connectivities[10].connectivity.size(),
+    unstructured_grid_cell_connectivities[10].connectivity.data());
 
   vtkNew<vtkDoubleArray> cellValues;
   cellValues->SetNumberOfTuples(2);
@@ -700,7 +724,9 @@ bool TestPointUnstructuredGrid()
   }
   unstructured_grid->SetPoints(points);
   unstructured_grid->Allocate(100);
-  unstructured_grid->InsertNextCell(VTK_VERTEX, 1, unstructured_grid_cell_connectivities[11]);
+  unstructured_grid->InsertNextCell(unstructured_grid_cell_connectivities[11].cell_type,
+    unstructured_grid_cell_connectivities[11].connectivity.size(),
+    unstructured_grid_cell_connectivities[11].connectivity.data());
 
   vtkNew<vtkDoubleArray> cellValues;
   cellValues->SetNumberOfTuples(1);
