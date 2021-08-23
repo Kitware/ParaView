@@ -193,17 +193,14 @@ bool ConvertDataArrayToMCArray(vtkDataArray* data_array, conduit_cpp::Node& cond
 bool ConvertPoints(vtkPoints* points, conduit_cpp::Node& x_values_node,
   conduit_cpp::Node& y_values_node, conduit_cpp::Node& z_values_node)
 {
-  auto data_array = points->GetData();
-  bool is_success = data_array;
-
-  if (is_success)
+  if (auto data_array = points->GetData())
   {
-    is_success = ConvertDataArrayToMCArray(data_array, 0, 3, x_values_node) &&
+    return ConvertDataArrayToMCArray(data_array, 0, 3, x_values_node) &&
       ConvertDataArrayToMCArray(data_array, 1, 3, y_values_node) &&
       ConvertDataArrayToMCArray(data_array, 2, 3, z_values_node);
   }
 
-  return is_success;
+  return false;
 }
 
 //----------------------------------------------------------------------------
