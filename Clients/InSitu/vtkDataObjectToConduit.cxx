@@ -97,31 +97,28 @@ bool ConvertDataArrayToMCArray(
     return false;
   }
 
+  // The code below uses the legacy GetVoidPointer on purpose to get zero copy.
   bool is_supported = true;
   if (IsSignedIntegralType(data_type))
   {
     switch (data_type_size)
     {
       case 1:
-        // Use of GetVoidPointer on purpose to get zero copy.
         conduit_node.set_external_int8_ptr((conduit_int8*)data_array->GetVoidPointer(0),
           number_of_elements, offset * sizeof(conduit_int8), stride * sizeof(conduit_int8));
         break;
 
       case 2:
-        // Use of GetVoidPointer on purpose to get zero copy.
         conduit_node.set_external_int16_ptr((conduit_int16*)data_array->GetVoidPointer(0),
           number_of_elements, offset * sizeof(conduit_int16), stride * sizeof(conduit_int16));
         break;
 
       case 4:
-        // Use of GetVoidPointer on purpose to get zero copy.
         conduit_node.set_external_int32_ptr((conduit_int32*)data_array->GetVoidPointer(0),
           number_of_elements, offset * sizeof(conduit_int32), stride * sizeof(conduit_int32));
         break;
 
       case 8:
-        // Use of GetVoidPointer on purpose to get zero copy.
         conduit_node.set_external_int64_ptr((conduit_int64*)data_array->GetVoidPointer(0),
           number_of_elements, offset * sizeof(conduit_int64), stride * sizeof(conduit_int64));
         break;
@@ -135,25 +132,21 @@ bool ConvertDataArrayToMCArray(
     switch (data_type_size)
     {
       case 1:
-        // Use of GetVoidPointer on purpose to get zero copy.
         conduit_node.set_external_uint8_ptr((conduit_uint8*)data_array->GetVoidPointer(0),
           number_of_elements, offset * sizeof(conduit_uint8), stride * sizeof(conduit_uint8));
         break;
 
       case 2:
-        // Use of GetVoidPointer on purpose to get zero copy.
         conduit_node.set_external_uint16_ptr((conduit_uint16*)data_array->GetVoidPointer(0),
           number_of_elements, offset * sizeof(conduit_uint16), stride * sizeof(conduit_uint16));
         break;
 
       case 4:
-        // Use of GetVoidPointer on purpose to get zero copy.
         conduit_node.set_external_uint32_ptr((conduit_uint32*)data_array->GetVoidPointer(0),
           number_of_elements, offset * sizeof(conduit_uint32), stride * sizeof(conduit_uint32));
         break;
 
       case 8:
-        // Use of GetVoidPointer on purpose to get zero copy.
         conduit_node.set_external_uint64_ptr((conduit_uint64*)data_array->GetVoidPointer(0),
           number_of_elements, offset * sizeof(conduit_uint64), stride * sizeof(conduit_uint64));
         break;
@@ -167,13 +160,11 @@ bool ConvertDataArrayToMCArray(
     switch (data_type_size)
     {
       case 4:
-        // Use of GetVoidPointer on purpose to get zero copy.
         conduit_node.set_external_float32_ptr((conduit_float32*)data_array->GetVoidPointer(0),
           number_of_elements, offset * sizeof(conduit_float32), stride * sizeof(conduit_float32));
         break;
 
       case 8:
-        // Use of GetVoidPointer on purpose to get zero copy.
         conduit_node.set_external_float64_ptr((conduit_float64*)data_array->GetVoidPointer(0),
           number_of_elements, offset * sizeof(conduit_float64), stride * sizeof(conduit_float64));
         break;
