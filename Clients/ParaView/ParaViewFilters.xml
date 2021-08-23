@@ -66,6 +66,7 @@
     <Proxy group="filters" name="ExtractTimeSteps" />
     <Proxy group="filters" name="ForceTime" />
     <Proxy group="filters" name="GroupTimeSteps" />
+    <Proxy group="filters" name="MergeTime" />
     <Proxy group="filters" name="ParticlePath" />
     <Proxy group="filters" name="ParticleTracer" />
     <Proxy group="filters" name="StreakLine" />
@@ -268,6 +269,7 @@
   <Proxy group="filters" name="MaterialInterfaceFilter" />
   <Proxy group="filters" name="Median" />
   <Proxy group="filters" name="MergeBlocks" />
+  <Proxy group="filters" name="MergeTime" />
   <Proxy group="filters" name="MergeVectorComponents" />
   <Proxy group="filters" name="MeshQuality" />
   <Proxy group="filters" name="MinkowskiFilter" />

@@ -594,6 +594,7 @@ SET (TESTS_WITHOUT_BASELINES
   FindWidget.xml
   InformationPanel.xml
   LogViewer.xml
+  MergeTime.xml
   ModifyGUIWindowTitle.xml
   OpacityWidgetRange.xml
   OpenHelp.xml
