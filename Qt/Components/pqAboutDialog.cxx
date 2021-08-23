@@ -49,6 +49,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVServerInformation.h"
 #include "vtkProcessModule.h"
 #include "vtkRemotingCoreConfiguration.h"
+#include "vtkSMPTools.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMSession.h"
 #include "vtkSMViewProxy.h"
@@ -164,6 +165,9 @@ void pqAboutDialog::AddClientInformation()
   ::addItem(tree, "Test Directory", QString::fromStdString(pqConfig->testDirectory()));
   ::addItem(tree, "Data Directory", QString::fromStdString(pqConfig->dataDirectory()));
 
+  ::addItem(tree, "SMP Backend", vtkSMPTools::GetBackend());
+  ::addItem(tree, "SMP Max Number of Threads", vtkSMPTools::GetEstimatedNumberOfThreads());
+
   // For local OpenGL info, we ask Qt, as that's more truthful anyways.
   QOpenGLContext* ctx = QOpenGLContext::currentContext();
   if (QOpenGLFunctions* f = ctx ? ctx->functions() : nullptr)
@@ -225,6 +229,9 @@ void pqAboutDialog::AddServerInformation(pqServer* server, QTreeWidget* tree)
   }
 
   ::addItem(tree, "vtkIdType size", QString("%1bits").arg(serverInfo->GetIdTypeSize()));
+
+  ::addItem(tree, "SMP Backend", serverInfo->GetSMPBackendName().c_str());
+  ::addItem(tree, "SMP Max Number of Threads", serverInfo->GetSMPMaxNumberOfThreads());
 
   vtkSMSession* session = server->session();
   vtkNew<vtkPVPythonInformation> pythonInfo;

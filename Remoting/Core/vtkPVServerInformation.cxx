@@ -24,6 +24,7 @@
 #include "vtkPVSession.h"
 #include "vtkProcessModule.h"
 #include "vtkRemotingCoreConfiguration.h"
+#include "vtkSMPTools.h"
 #if VTK_MODULE_ENABLE_ParaView_nvpipe
 #include <nvpipe.h>
 #endif
@@ -97,6 +98,9 @@ vtkPVServerInformation::vtkPVServerInformation()
   this->IsInTileDisplay = false;
   this->IsInCave = false;
   this->TileDimensions[0] = this->TileDimensions[1] = 0;
+
+  this->SMPBackendName = vtkSMPTools::GetBackend() ? vtkSMPTools::GetBackend() : "";
+  this->SMPMaxNumberOfThreads = vtkSMPTools::GetEstimatedNumberOfThreads();
 }
 
 //----------------------------------------------------------------------------
@@ -121,6 +125,8 @@ void vtkPVServerInformation::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "IsInCave: " << this->IsInCave << endl;
   os << indent << "TileDimensions: " << this->TileDimensions[0] << ", " << this->TileDimensions[1]
      << endl;
+  os << indent << "SMPBackendName: " << this->SMPBackendName << endl;
+  os << indent << "SMPMaxNumberOfThreads: " << this->SMPMaxNumberOfThreads << endl;
 }
 
 //----------------------------------------------------------------------------
@@ -138,6 +144,8 @@ void vtkPVServerInformation::DeepCopy(vtkPVServerInformation* info)
   this->IsInTileDisplay = info->GetIsInTileDisplay();
   this->IsInCave = info->GetIsInCave();
   info->GetTileDimensions(this->TileDimensions);
+  this->SMPBackendName = info->GetSMPBackendName();
+  this->SMPMaxNumberOfThreads = info->GetSMPMaxNumberOfThreads();
 }
 
 //----------------------------------------------------------------------------
@@ -219,6 +227,8 @@ void vtkPVServerInformation::AddInformation(vtkPVInformation* info)
     {
       this->ClientId = serverInfo->ClientId;
     }
+    this->SMPBackendName = serverInfo->GetSMPBackendName();
+    this->SMPMaxNumberOfThreads = serverInfo->GetSMPMaxNumberOfThreads();
     this->SetIdTypeSize(serverInfo->GetIdTypeSize());
   }
 }
@@ -242,6 +252,8 @@ void vtkPVServerInformation::CopyToStream(vtkClientServerStream* css)
   *css << this->IsInTileDisplay;
   *css << this->IsInCave;
   *css << this->TileDimensions[0] << this->TileDimensions[1];
+  *css << this->SMPBackendName;
+  *css << this->SMPMaxNumberOfThreads;
   *css << vtkClientServerStream::End;
 }
 
@@ -327,6 +339,17 @@ void vtkPVServerInformation::CopyFromStream(const vtkClientServerStream* css)
     !css->GetArgument(0, idx++, &this->TileDimensions[1]))
   {
     vtkErrorMacro("Error parsing TileDimensions from message.");
+    return;
+  }
+
+  if (!css->GetArgument(0, idx++, &this->SMPBackendName))
+  {
+    vtkErrorMacro("Error parsing SMPBackendName from message.");
+    return;
+  }
+  if (!css->GetArgument(0, idx++, &this->SMPMaxNumberOfThreads))
+  {
+    vtkErrorMacro("Error parsing SMPMaxNumberOfThreads from message.");
     return;
   }
 }

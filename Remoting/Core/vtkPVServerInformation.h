@@ -24,6 +24,8 @@
 #ifndef vtkPVServerInformation_h
 #define vtkPVServerInformation_h
 
+#include <string>
+
 #include "vtkPVInformation.h"
 #include "vtkRemotingCoreModule.h" //needed for exports
 
@@ -140,6 +142,20 @@ public:
   vtkGetMacro(IdTypeSize, int);
   //@}
 
+  //@{
+  /**
+   * Get the SMP Tools backend name of the server.
+   */
+  vtkGetMacro(SMPBackendName, std::string);
+  //@}
+
+  //@{
+  /**
+   * Get the max number of threads of the server.
+   */
+  vtkGetMacro(SMPMaxNumberOfThreads, int);
+  //@}
+
 protected:
   vtkPVServerInformation();
   ~vtkPVServerInformation() override;
@@ -158,6 +174,8 @@ protected:
   bool IsInTileDisplay;
   bool IsInCave;
   int TileDimensions[2];
+  std::string SMPBackendName;
+  int SMPMaxNumberOfThreads;
 
 private:
   vtkPVServerInformation(const vtkPVServerInformation&) = delete;
