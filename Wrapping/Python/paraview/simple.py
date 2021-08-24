@@ -192,7 +192,7 @@ def CreateView(view_xml_name, detachedFromLayout=None, **params):
 # -----------------------------------------------------------------------------
 
 def CreateRenderView(detachedFromLayout=False, **params):
-    """"Create standard 3D render view.
+    """Create standard 3D render view.
     See CreateView for arguments documentation"""
     return CreateView("RenderView", detachedFromLayout, **params)
 
@@ -214,42 +214,42 @@ def CreateXYPointPlotView(detachedFromLayout=False, **params):
 
 
 def CreateBarChartView(detachedFromLayout=False, **params):
-    """"Create Bar Chart view.
+    """Create Bar Chart view.
     See CreateView for arguments documentation"""
     return CreateView("XYBarChartView", detachedFromLayout, **params)
 
 # -----------------------------------------------------------------------------
 
 def CreateComparativeRenderView(detachedFromLayout=False, **params):
-    """"Create Comparative view.
+    """Create Comparative view.
     See CreateView for arguments documentation"""
     return CreateView("ComparativeRenderView", detachedFromLayout, **params)
 
 # -----------------------------------------------------------------------------
 
 def CreateComparativeXYPlotView(detachedFromLayout=False, **params):
-    """"Create comparative XY plot Chart view.
+    """Create comparative XY plot Chart view.
     See CreateView for arguments documentation"""
     return CreateView("ComparativeXYPlotView", detachedFromLayout, **params)
 
 # -----------------------------------------------------------------------------
 
 def CreateComparativeBarChartView(detachedFromLayout=False, **params):
-    """"Create comparative Bar Chart view.
+    """Create comparative Bar Chart view.
     See CreateView for arguments documentation"""
     return CreateView("ComparativeBarChartView", detachedFromLayout, **params)
 
 # -----------------------------------------------------------------------------
 
 def CreateParallelCoordinatesChartView(detachedFromLayout=False, **params):
-    """"Create Parallele coordinate Chart view.
+    """Create Parallele coordinate Chart view.
     See CreateView for arguments documentation"""
     return CreateView("ParallelCoordinatesChartView", detachedFromLayout, **params)
 
 # -----------------------------------------------------------------------------
 
 def Create2DRenderView(detachedFromLayout=False, **params):
-    """"Create the standard 3D render view with the 2D interaction mode turned ON.
+    """Create the standard 3D render view with the 2D interaction mode turned ON.
     See CreateView for arguments documentation"""
     return CreateView("2DRenderView", detachedFromLayout, **params)
 
@@ -565,6 +565,25 @@ def SaveExtracts(**kwargs):
     SetProperties(proxy, **kwargs)
     return proxy.SaveExtracts()
 
+
+def CreateSteerableParameters(steerable_proxy_type_name,
+                              steerable_proxy_registration_name=
+                              "SteeringParameters",
+                              result_mesh_name="steerable"):
+    pxm = servermanager.ProxyManager()
+    steerable_proxy = pxm.NewProxy("sources", steerable_proxy_type_name)
+    pxm.RegisterProxy("sources", steerable_proxy_registration_name,
+                      steerable_proxy)
+    steerable_proxy_wrapper = servermanager._getPyProxy(steerable_proxy)
+    UpdateSteerableParameters(steerable_proxy_wrapper, result_mesh_name)
+    return steerable_proxy_wrapper
+
+
+def UpdateSteerableParameters(steerable_proxy, steerable_source_name):
+    helper = paraview.modules.vtkPVInSitu.vtkInSituInitializationHelper
+    helper.UpdateSteerableParameters(steerable_proxy.SMProxy,
+                                     steerable_source_name)
+
 #==============================================================================
 # XML State management
 #==============================================================================
@@ -674,7 +693,7 @@ def SaveState(filename):
 #==============================================================================
 
 def GetRepresentation(proxy=None, view=None):
-    """"Given a pipeline object and view, returns the corresponding representation object.
+    """Given a pipeline object and view, returns the corresponding representation object.
     If pipeline object and view are not specified, active objects are used."""
     if not view:
         view = active_objects.view
@@ -692,7 +711,7 @@ def GetRepresentation(proxy=None, view=None):
 
 # -----------------------------------------------------------------------------
 def GetDisplayProperties(proxy=None, view=None):
-    """"Given a pipeline object and view, returns the corresponding representation object.
+    """Given a pipeline object and view, returns the corresponding representation object.
     If pipeline object and/or view are not specified, active objects are used."""
     return GetRepresentation(proxy, view)
 
@@ -923,7 +942,7 @@ def GetViewProperty(*arguments, **keywords):
 
 # -----------------------------------------------------------------------------
 def GetViewProperties(view=None):
-    """"Same as GetActiveView(), this API is provided just for consistency with
+    """Same as GetActiveView(), this API is provided just for consistency with
     GetDisplayProperties()."""
     return GetActiveView()
 

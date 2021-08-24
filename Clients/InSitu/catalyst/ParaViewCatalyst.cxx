@@ -18,12 +18,17 @@
 #include <catalyst_conduit_blueprint.hpp>
 #include <catalyst_stub.h>
 
+#include "vtkCallbackCommand.h"
 #include "vtkCatalystBlueprint.h"
+#include "vtkCommand.h"
 #include "vtkConduitSource.h"
+#include "vtkDataObjectToConduit.h"
 #include "vtkInSituInitializationHelper.h"
 #include "vtkInSituPipelineIO.h"
 #include "vtkInSituPipelinePython.h"
+#include "vtkMultiBlockDataSet.h"
 #include "vtkPVLogger.h"
+#include "vtkSMPluginManager.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMSessionProxyManager.h"
 #include "vtkSMSourceProxy.h"
@@ -86,9 +91,34 @@ static bool process_script_args(vtkInSituPipelinePython* pipeline, const conduit
   return true;
 }
 
+static bool convert_to_blueprint_mesh(
+  vtkSMProxy* proxy, const std::string& name, conduit_cpp::Node& node)
+{
+  if (proxy != nullptr)
+  {
+    if (auto steeringDataGenerator = vtkAlgorithm::SafeDownCast(proxy->GetClientSideObject()))
+    {
+      steeringDataGenerator->Update();
+      if (vtkDataObject* outputDataObject = steeringDataGenerator->GetOutputDataObject(0))
+      {
+        if (auto multi_block = vtkMultiBlockDataSet::SafeDownCast(outputDataObject))
+        {
+          if (auto data_object = multi_block->GetBlock(0))
+          {
+            auto channel = node[name];
+            return vtkDataObjectToConduit::FillConduitNode(data_object, channel);
+          }
+        }
+      }
+    }
+  }
+  return true;
+}
+
 enum paraview_catalyst_error
 {
   paraview_catalyst_error_invalid_node = 100,
+  paraview_catalyst_error_results = 101,
 };
 #define pvcatalyst_err(name) static_cast<enum catalyst_error>(paraview_catalyst_error_##name)
 
@@ -151,6 +181,29 @@ enum catalyst_error catalyst_initialize_paraview(const conduit_node* params)
     else
     {
       vtkLogF(WARNING, "Python support not enabled, 'catalyst/scripts' are ignored.");
+    }
+  }
+
+  if (cpp_params.has_path("catalyst/proxies"))
+  {
+    auto plmgr = vtkSMProxyManager::GetProxyManager()->GetPluginManager();
+
+    const auto& proxies = cpp_params["catalyst/proxies"];
+    conduit_index_t nchildren = proxies.number_of_children();
+    for (conduit_index_t i = 0; i < nchildren; ++i)
+    {
+      auto proxy = proxies.child(i);
+      const auto proxyFilename =
+        proxy.dtype().is_string() ? proxy.as_string() : proxy["filename"].as_string();
+
+      if (!plmgr->LoadLocalPlugin(proxyFilename.c_str()))
+      {
+        vtkLog(ERROR, "Failed to load plugin xml " << proxyFilename);
+      }
+      else
+      {
+        vtkLog(INFO, "Catalyst plugin loaded: " << proxyFilename);
+      }
     }
   }
 
@@ -338,5 +391,23 @@ enum catalyst_error catalyst_about_paraview(conduit_node* params)
 //-----------------------------------------------------------------------------
 enum catalyst_error catalyst_results_paraview(conduit_node* params)
 {
-  return catalyst_stub_results(params);
+  auto stub_error_status = catalyst_stub_results(params);
+
+  if (stub_error_status != catalyst_error_ok)
+  {
+    return stub_error_status;
+  }
+
+  conduit_cpp::Node cpp_params = conduit_cpp::cpp_node(params);
+  auto catalyst_node = cpp_params["catalyst"];
+
+  bool is_success = true;
+  std::vector<std::pair<std::string, vtkSMProxy*> > steerableProxies;
+  vtkInSituInitializationHelper::GetSteerableProxies(steerableProxies);
+  for (auto& proxy : steerableProxies)
+  {
+    is_success &= convert_to_blueprint_mesh(proxy.second, proxy.first, catalyst_node);
+  }
+
+  return is_success ? catalyst_error_ok : pvcatalyst_err(results);
 }

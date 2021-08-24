@@ -48,6 +48,7 @@
 
 class vtkCPCxxHelper;
 class vtkInSituPipeline;
+class vtkSMProxy;
 class vtkSMSourceProxy;
 
 #include <string> // for std::string
@@ -147,6 +148,10 @@ public:
    */
   static bool IsPythonSupported();
 
+  static void GetSteerableProxies(std::vector<std::pair<std::string, vtkSMProxy*> >& proxies);
+  static void UpdateSteerableParameters(
+    vtkSMProxy* steerableProxy, const char* steerableSourceName);
+
 protected:
   vtkInSituInitializationHelper();
   ~vtkInSituInitializationHelper();
@@ -154,6 +159,9 @@ protected:
 private:
   vtkInSituInitializationHelper(const vtkInSituInitializationHelper&) = delete;
   void operator=(const vtkInSituInitializationHelper&) = delete;
+
+  static void UpdateSteerableProxies();
+  static int GetAttributeTypeFromString(const std::string& associationString);
 
   static int WasInitializedOnce;
   static int WasFinalizedOnce;

@@ -29,6 +29,7 @@
 #
 #==========================================================================
 set(classes
+  vtkDataObjectToConduit
   vtkInSituPipeline
   vtkInSituPipelineIO
   vtkInSituPipelinePython
