@@ -85,8 +85,12 @@ public:
    * Convenience method to pick a block in a multi-block data set. Will return
    * the selected representation. Furthermore, if it is a multi-block data set
    * the flat index of the selected block will be returned in flatIndex.
+   *
+   * With introduction of vtkPartitionedDataSet and
+   * vtkPartitionedDataSetCollection, flatIndex is no longer consistent across
+   * ranks and hence this method was changed to return the rank number as well.
    */
-  vtkSMRepresentationProxy* PickBlock(int x, int y, unsigned int& flatIndex);
+  vtkSMRepresentationProxy* PickBlock(int x, int y, unsigned int& flatIndex, int& rank);
 
   /**
    * Given a location is display coordinates (pixels), tries to compute and

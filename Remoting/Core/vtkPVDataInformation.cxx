@@ -53,6 +53,7 @@
 #include "vtkPartitionedDataSet.h"
 #include "vtkPartitionedDataSetCollection.h"
 #include "vtkPointData.h"
+#include "vtkProcessModule.h"
 #include "vtkRectilinearGrid.h"
 #include "vtkSelection.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
@@ -324,6 +325,7 @@ void vtkPVDataInformation::Initialize()
   this->TimeRange[1] = -VTK_DOUBLE_MAX;
   this->TimeLabel.clear();
   this->NumberOfTimeSteps = 0;
+  this->AMRNumberOfDataSets.clear();
 
   this->Hierarchy->Initialize();
   this->DataAssembly->Initialize();
@@ -336,6 +338,13 @@ void vtkPVDataInformation::CopyFromObject(vtkObject* object)
 
   if (object == nullptr)
   {
+    return;
+  }
+
+  auto pm = vtkProcessModule::GetProcessModule();
+  if (this->Rank != -1 && this->Rank != pm->GetPartitionId())
+  {
+    // nothing to do.
     return;
   }
 
@@ -445,6 +454,11 @@ void vtkPVDataInformation::CopyFromObject(vtkObject* object)
     else if (auto amr = vtkUniformGridAMR::SafeDownCast(subset))
     {
       this->NumberOfAMRLevels = amr->GetNumberOfLevels();
+      this->AMRNumberOfDataSets.resize(this->NumberOfAMRLevels);
+      for (unsigned int l = 0; l < this->NumberOfAMRLevels; ++l)
+      {
+        this->AMRNumberOfDataSets[l] = amr->GetNumberOfDataSets(l);
+      }
     }
   }
   else if (subset)
@@ -645,6 +659,13 @@ void vtkPVDataInformation::AddInformation(vtkPVInformation* oinfo)
   }
   this->PointArrayInformation->AddInformation(other->PointArrayInformation, vtkDataObject::POINT);
 
+  this->AMRNumberOfDataSets.resize(this->NumberOfAMRLevels);
+  for (vtkIdType cc = 0; cc < std::min(this->NumberOfAMRLevels, other->NumberOfAMRLevels); ++cc)
+  {
+    this->AMRNumberOfDataSets[cc] =
+      std::max(this->AMRNumberOfDataSets[cc], other->AMRNumberOfDataSets[cc]);
+  }
+
   // How to merge assemblies/structure?
   // we don't do anything currently since they are expected to be same on all
   // ranks.
@@ -665,6 +686,7 @@ void vtkPVDataInformation::DeepCopy(vtkPVDataInformation* other)
   this->NumberOfTrees = other->NumberOfTrees;
   this->NumberOfLeaves = other->NumberOfLeaves;
   this->NumberOfAMRLevels = other->NumberOfAMRLevels;
+  this->AMRNumberOfDataSets = other->AMRNumberOfDataSets;
   this->NumberOfDataSets = other->NumberOfDataSets;
   this->MemorySize = other->MemorySize;
   std::copy(other->Bounds, other->Bounds + 6, this->Bounds);
@@ -999,6 +1021,15 @@ void vtkPVDataInformation::CopyToStream(vtkClientServerStream* css)
     *css << this->Hierarchy->SerializeToXML(vtkIndent());
   }
 
+  if (!this->AMRNumberOfDataSets.empty())
+  {
+    *css << vtkClientServerStream::InsertArray(
+      &this->AMRNumberOfDataSets.front(), static_cast<int>(this->AMRNumberOfDataSets.size()));
+  }
+  else
+  {
+    assert(this->NumberOfAMRLevels == 0);
+  }
   *css << vtkClientServerStream::End;
 }
 
@@ -1081,6 +1112,17 @@ void vtkPVDataInformation::CopyFromStream(const vtkClientServerStream* css)
       vtkErrorMacro("Error parsing stream.");
       return;
     }
+  }
+
+  // read AMRNumberOfDataSets.
+  this->AMRNumberOfDataSets.resize(this->NumberOfAMRLevels);
+  if (this->NumberOfAMRLevels > 0 &&
+    !css->GetArgument(
+      0, argument++, &this->AMRNumberOfDataSets[0], static_cast<int>(this->NumberOfAMRLevels)))
+  {
+    this->Initialize();
+    vtkErrorMacro("Error parsing stream.");
+    return;
   }
 }
 
@@ -1251,6 +1293,55 @@ std::string vtkPVDataInformation::GetBlockName(vtkTypeUInt64 cid) const
     }
   }
   return {};
+}
+
+//----------------------------------------------------------------------------
+std::vector<std::string> vtkPVDataInformation::GetBlockNames(
+  const std::vector<std::string>& selectors, const char* assemblyName) const
+{
+  auto assembly = this->GetDataAssembly(assemblyName);
+  if (!assembly)
+  {
+    return {};
+  }
+
+  const auto nodes = assembly->SelectNodes(selectors);
+  std::set<std::string> labels;
+  for (const auto& node : nodes)
+  {
+    labels.insert(assembly->GetAttributeOrDefault(node, "label", assembly->GetNodeName(node)));
+  }
+  return std::vector<std::string>(labels.begin(), labels.end());
+}
+
+//----------------------------------------------------------------------------
+vtkTypeInt64 vtkPVDataInformation::GetNumberOfAMRDataSets(vtkTypeInt64 level) const
+{
+  if (level >= 0 && level < this->NumberOfAMRLevels)
+  {
+    return this->AMRNumberOfDataSets[level];
+  }
+
+  return -1;
+}
+
+//----------------------------------------------------------------------------
+unsigned int vtkPVDataInformation::ComputeCompositeIndexForAMR(
+  unsigned int level, unsigned int index) const
+{
+  if (!this->DataSetTypeIsA(VTK_UNIFORM_GRID_AMR))
+  {
+    vtkErrorMacro("ComputeCompositeIndexForAMR called on a non-AMR dataset!");
+    return 0;
+  }
+
+  unsigned int compositeIndex = 0;
+  for (unsigned int l = 0; l < this->NumberOfAMRLevels && l < level; ++l)
+  {
+    compositeIndex += this->AMRNumberOfDataSets[l];
+  }
+
+  return (compositeIndex + index);
 }
 
 //============================================================================

@@ -83,6 +83,11 @@ public:
   vtkPVTemporalDataInformation* getInputTemporalDataInformation() const;
 
   /**
+  * Returns rank-specific data information from input.
+  */
+  vtkPVDataInformation* getInputRankDataInformation(int rank) const;
+
+  /**
   * Returns the represented data information. Depending on the representation
   * this may differ from the input data information eg. if the representation
   * shows an outline of the data, the this method will return the information

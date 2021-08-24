@@ -75,15 +75,16 @@
 #undef NONE
 #endif
 
-class vtkSMProperty;
-class vtkSMProxy;
-class vtkSMVectorProperty;
-class vtkSMIntVectorProperty;
 class vtkSMDoubleVectorProperty;
 class vtkSMIdTypeVectorProperty;
-class vtkSMStringVectorProperty;
-class vtkSMProxyProperty;
 class vtkSMInputProperty;
+class vtkSMIntVectorProperty;
+class vtkSMOutputPort;
+class vtkSMProperty;
+class vtkSMProxy;
+class vtkSMProxyProperty;
+class vtkSMStringVectorProperty;
+class vtkSMVectorProperty;
 
 class VTKREMOTINGSERVERMANAGER_EXPORT vtkSMPropertyHelper
 {
@@ -211,6 +212,7 @@ public:
   void Remove(vtkSMProxy* value);
   vtkSMProxy* GetAsProxy(unsigned int index = 0) const;
   unsigned int GetOutputPort(unsigned int index = 0) const;
+  vtkSMOutputPort* GetAsOutputPort(unsigned int index = 0) const;
   //@}
 
   //@{
@@ -252,6 +254,13 @@ public:
   void SetStatus(const char* key, const char* value);
   const char* GetStatus(const char* key, const char* default_value) const;
   //@}
+
+  /**
+   * Removes the status value specified for the given key, if any. Applicable only to
+   * `vtkSMStringVectorProperty` objects, and this function assumes that the presence of a key in
+   * the property indicates that it is enabled.
+   */
+  void RemoveStatus(const char* key);
 
   //@{
   /**

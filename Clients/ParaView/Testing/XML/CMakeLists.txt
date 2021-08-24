@@ -72,6 +72,10 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${paraview_test_data_directory_input}/Data/blow_data.myvtk}"
   "DATA{${paraview_test_data_directory_input}/Data/bluntfin.vts}"
   "DATA{${paraview_test_data_directory_input}/Data/can.ex2}"
+  "DATA{${paraview_test_data_directory_input}/Data/can.e.4/can.e.4.0}"
+  "DATA{${paraview_test_data_directory_input}/Data/can.e.4/can.e.4.1}"
+  "DATA{${paraview_test_data_directory_input}/Data/can.e.4/can.e.4.2}"
+  "DATA{${paraview_test_data_directory_input}/Data/can.e.4/can.e.4.3}"
   "DATA{${paraview_test_data_directory_input}/Data/cgns_np01/,REGEX:.*}"
   "DATA{${paraview_test_data_directory_input}/Data/cgns_np04/,REGEX:.*}"
   "DATA{${paraview_test_data_directory_input}/Data/bc_struct.cgns}"
@@ -172,6 +176,10 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/AxesGrid9.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/AxesGrid10.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/BatchAxesGrid.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/BlockContextMenu-BlockOpacity.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/BlockContextMenu-ShowAllBlocks.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/BlockContextMenu-ShowOnlyBlock.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/BlockContextMenu-UnsetBlockOpacity.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/BoxWidget-Transform.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/BoxWidget-ClipDefault.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/BoxWidget-ClipCheckUseReferenceBounds.png}"
@@ -632,6 +640,7 @@ SET (TESTS_WITH_INLINE_COMPARES
   AxesGrid.xml
   BoundingRuler.xml
   BoxWidget.xml
+  BlockContextMenu.xml
   CalculatorQuotedVariable.xml
   CameraLink.xml
   ChartLoadNoVariables.xml
@@ -1017,6 +1026,7 @@ list(APPEND TESTS_WITH_BASELINES
   SaveTSV.xml
   SaveTXT.xml
   SelectedProxyPanelVisibility.xml
+  SelectionBlocks.xml
   SelectionModifiersCells.xml
   SelectionModifiersPoints.xml
   SelectionModifiersBlocks.xml
@@ -1441,6 +1451,7 @@ endif ()
 # Probe picking does not work in render server mode
 
 # Selection is not available in CRS mode
+set(BlockContextMenu_DISABLE_CRS TRUE)
 set(MultiSliceWavelet_DISABLE_CRS TRUE)
 set(MultiSliceMultiBlock_DISABLE_CRS TRUE)
 set(PolygonCellSelection_DISABLE_CRS TRUE)
@@ -1450,6 +1461,7 @@ set(InteractiveSelection_DISABLE_CRS TRUE)
 set(NonConvexPolygon_DISABLE_CRS TRUE)
 set(QuartilePlot_DISABLE_CRS TRUE)
 set(TestSelectionOnMultipiece_DISABLE_CRS TRUE)
+set(SelectionBlocks_DISABLE_CRS TRUE)
 set(SelectionModifiersCells_DISABLE_CRS TRUE)
 set(SelectionModifiersBlocks_DISABLE_CRS TRUE)
 set(SelectionModifiersPoints_DISABLE_CRS TRUE)
@@ -1490,6 +1502,7 @@ set (ShaderReplacements_FORCE_SERIAL TRUE)
 set (CustomViewpoints_FORCE_SERIAL TRUE)
 set (ExodusModeShapes_FORCE_SERIAL TRUE)
 set (LoadSaveStateAnimation_FORCE_SERIAL TRUE)
+set(BlockContextMenu_FORCE_SERIAL TRUE) # requires context menu
 
 # We don't support volume rendering of image data in data server & render server mode
 set(AdaptiveResampleToImage_DISABLE_CRS TRUE)

@@ -591,11 +591,11 @@ pqDataRepresentation* pqRenderView::pick(int pos[2])
 }
 
 //-----------------------------------------------------------------------------
-pqDataRepresentation* pqRenderView::pickBlock(int pos[2], unsigned int& flatIndex)
+pqDataRepresentation* pqRenderView::pickBlock(int pos[2], unsigned int& flatIndex, int& rank)
 {
   BEGIN_UNDO_EXCLUDE();
   vtkSMRenderViewProxy* renderView = this->getRenderViewProxy();
-  vtkSMRepresentationProxy* repr = renderView->PickBlock(pos[0], pos[1], flatIndex);
+  vtkSMRepresentationProxy* repr = renderView->PickBlock(pos[0], pos[1], flatIndex, rank);
   pqDataRepresentation* pq_repr = findRepresentationFromProxy(repr);
   END_UNDO_EXCLUDE();
   if (pq_repr)
@@ -642,13 +642,19 @@ void pqRenderView::collectSelectionPorts(vtkCollection* selectedRepresentations,
     pqOutputPort* opPort = pqRepr->getOutputPortFromInput();
     vtkSMSourceProxy* selectedSource =
       vtkSMSourceProxy::SafeDownCast(opPort->getSource()->getProxy());
-
     if (select_blocks)
     {
-      // convert the index based selection to vtkSelectionNode::BLOCKS selection.
+      // convert the index based selection to BLOCKS or BLOCK_SELECTORS.
+      // Eventually, we want all datasets to simply create `BLOCK_SELECTORS`,
+      // however I am worried this will impact custom applications. So we only
+      // do this for ParitionedDataSetCollection for now.
+      auto dinfo = opPort->getDataInformation();
+      const int targetContentType = dinfo->DataSetTypeIsA(VTK_PARTITIONED_DATA_SET_COLLECTION)
+        ? vtkSelectionNode::BLOCK_SELECTORS
+        : vtkSelectionNode::BLOCKS;
       vtkSMSourceProxy* newSelSource =
         vtkSMSourceProxy::SafeDownCast(vtkSMSelectionHelper::ConvertSelection(
-          vtkSelectionNode::BLOCKS, selectionSource, selectedSource, opPort->getPortNumber()));
+          targetContentType, selectionSource, selectedSource, opPort->getPortNumber()));
       selectionSource.TakeReference(newSelSource);
     }
 

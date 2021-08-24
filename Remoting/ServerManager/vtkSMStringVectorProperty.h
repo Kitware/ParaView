@@ -99,6 +99,14 @@ public:
    */
   void GetElements(vtkStringList* list);
 
+  ///@{
+  /**
+   * Another API to access all elements.
+   */
+  const std::vector<std::string>& GetElements() const;
+  const std::vector<std::string>& GetUncheckedElements() const;
+  ///@}
+
   /**
    * Returns the value of 1 element.
    */

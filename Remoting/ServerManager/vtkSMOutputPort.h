@@ -60,6 +60,11 @@ public:
    */
   virtual vtkPVDataInformation* GetDataInformation();
 
+  /**
+   * Get rank-specific data information.
+   */
+  vtkPVDataInformation* GetRankDataInformation(int rank);
+
   //@{
   /**
    * For composite datasets, `GetDataInformation` returns summary data information for
@@ -173,6 +178,7 @@ protected:
 
   std::map<std::string, std::map<int, vtkSmartPointer<vtkPVDataInformation> > >
     SubsetDataInformations;
+  std::map<int, vtkSmartPointer<vtkPVDataInformation> > RankDataInformations;
 
 private:
   vtkSMOutputPort(const vtkSMOutputPort&) = delete;

@@ -1095,18 +1095,34 @@ int vtkPVGeometryFilter::RequestDataObjectTree(
     }
   }
 
-  // At this point, all ranks have consistent tree structure with leaf nodes
-  // non-nullptr at exactly same locations. This is a good point to assign block
-  // colors.
-  outIter->SkipEmptyNodesOff();
-  outIter->VisitOnlyLeavesOn();
   unsigned int block_id = 0;
-  for (outIter->InitTraversal(); !outIter->IsDoneWithTraversal();
-       outIter->GoToNextItem(), ++block_id)
+  if (vtkPartitionedDataSetCollection::SafeDownCast(input))
   {
-    if (auto dobj = outIter->GetCurrentDataObject())
+    // To avoid paraview/paraview#20908, we use a 2-level approach.
+    vtkMultiBlockDataSet* outputMB = vtkMultiBlockDataSet::SafeDownCast(output);
+    for (block_id = 0; block_id < outputMB->GetNumberOfBlocks(); ++block_id)
     {
-      this->AddBlockColors(dobj, block_id);
+      auto datasets = vtkCompositeDataSet::GetDataSets(outputMB->GetBlock(block_id));
+      for (auto dataset : datasets)
+      {
+        this->AddBlockColors(dataset, block_id);
+      }
+    }
+  }
+  else
+  {
+    // At this point, all ranks have consistent tree structure with leaf nodes
+    // non-nullptr at exactly same locations. This is a good point to assign block
+    // colors.
+    outIter->SkipEmptyNodesOff();
+    outIter->VisitOnlyLeavesOn();
+    for (outIter->InitTraversal(); !outIter->IsDoneWithTraversal();
+         outIter->GoToNextItem(), ++block_id)
+    {
+      if (auto dobj = outIter->GetCurrentDataObject())
+      {
+        this->AddBlockColors(dobj, block_id);
+      }
     }
   }
 

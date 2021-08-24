@@ -28,6 +28,8 @@
 #include "vtkRemotingServerManagerModule.h" //needed for exports
 #include "vtkSMVectorProperty.h"
 
+#include <vector> // for std::vector
+
 class vtkSMStateLocator;
 
 class VTKREMOTINGSERVERMANAGER_EXPORT vtkSMIdTypeVectorProperty : public vtkSMVectorProperty
@@ -135,6 +137,14 @@ public:
    * before a domain check is performed.
    */
   unsigned int GetNumberOfUncheckedElements() override;
+
+  ///@{
+  /**
+   * Another API to access elements.
+   */
+  const std::vector<vtkIdType>& GetElements() const;
+  const std::vector<vtkIdType>& GetUncheckedElements() const;
+  ///@}
 
   //@{
   /**

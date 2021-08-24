@@ -167,6 +167,17 @@ public:
   vtkPVDataInformation* GetSubsetDataInformation(
     unsigned int outputIdx, unsigned int compositeIndex);
 
+  ///@{
+  /**
+   * Get rank-specific data information.
+   */
+  vtkPVDataInformation* GetRankDataInformation(int rank)
+  {
+    return this->GetRankDataInformation(0u, rank);
+  }
+  vtkPVDataInformation* GetRankDataInformation(unsigned int outputIdx, int rank);
+  ///@}
+
   /**
    * Creates extract selection proxies for each output port if not already
    * created.

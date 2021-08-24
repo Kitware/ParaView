@@ -71,6 +71,15 @@ public:
 
   //@{
   /**
+   * Indicates which rank to gather the information from. Default is -1 which
+   * means all ranks.
+   */
+  vtkSetClampMacro(Rank, int, -1, VTK_INT_MAX);
+  vtkGetMacro(Rank, int);
+  //@}
+
+  //@{
+  /**
    * Path if non-null, used to limit blocks from a composite dataset.
    * For details on support form of selector expressions see
    * `vtkDataAssembly::SelectNodes`.
@@ -267,6 +276,12 @@ public:
   vtkGetMacro(NumberOfAMRLevels, vtkTypeInt64);
 
   /**
+   * For vtkUniformGridAMR and subclasses, this returns the number of datasets
+   * at each level.
+   */
+  vtkTypeInt64 GetNumberOfAMRDataSets(vtkTypeInt64 level) const;
+
+  /**
    * This is count of non-null non-composite datasets.
    * A count of 0 may mean:
    * * the data is nullptr
@@ -441,6 +456,20 @@ public:
    */
   std::string GetBlockName(vtkTypeUInt64 cid) const;
 
+  /**
+   * Given a collection of selectors, returns all block names for chosen blocks.
+   */
+  std::vector<std::string> GetBlockNames(
+    const std::vector<std::string>& selectors, const char* assemblyName) const;
+
+  /**
+   * A helper method to convert an AMR level-index to a flat index. This uses
+   * the hierarchy to compute the flat index.
+   *
+   * Calling this on a non-AMR dataset will simply return 0.
+   */
+  unsigned int ComputeCompositeIndexForAMR(unsigned int level, unsigned int index) const;
+
   //@{
   /**
    * Deprecated in ParaView 5.10
@@ -479,6 +508,7 @@ private:
   void operator=(const vtkPVDataInformation&) = delete;
 
   int PortNumber = -1;
+  int Rank = -1;
   char* SubsetSelector = nullptr;
   char* SubsetAssemblyName = nullptr;
 
@@ -494,12 +524,12 @@ private:
     VTK_DOUBLE_MAX, -VTK_DOUBLE_MAX };
   int Extent[6] = { VTK_INT_MAX, -VTK_INT_MAX, VTK_INT_MAX, -VTK_INT_MAX, VTK_INT_MAX,
     -VTK_INT_MAX };
-  ;
   bool HasTime = false;
   double Time = 0.0;
   double TimeRange[2] = { VTK_DOUBLE_MAX, -VTK_DOUBLE_MAX };
   std::string TimeLabel;
   vtkTypeInt64 NumberOfTimeSteps = 0;
+  std::vector<vtkTypeInt64> AMRNumberOfDataSets;
 
   std::vector<int> UniqueBlockTypes;
   vtkTypeInt64 NumberOfElements[vtkDataObject::NUMBER_OF_ATTRIBUTE_TYPES] = { 0, 0, 0, 0, 0, 0, 0 };

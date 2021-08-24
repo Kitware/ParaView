@@ -44,6 +44,7 @@ set(classes
   pqAutoLoadPluginXMLBehavior
   pqAxesToolbar
   pqBackgroundEditorWidget
+  pqBlockContextMenu
   pqBoolPropertyWidgetDecorator
   pqBoxPropertyWidget
   pqCTHArraySelectionDecorator
