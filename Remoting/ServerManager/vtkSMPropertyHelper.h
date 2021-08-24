@@ -75,15 +75,16 @@
 #undef NONE
 #endif
 
-class vtkSMProperty;
-class vtkSMProxy;
-class vtkSMVectorProperty;
-class vtkSMIntVectorProperty;
 class vtkSMDoubleVectorProperty;
 class vtkSMIdTypeVectorProperty;
-class vtkSMStringVectorProperty;
-class vtkSMProxyProperty;
 class vtkSMInputProperty;
+class vtkSMIntVectorProperty;
+class vtkSMOutputPort;
+class vtkSMProperty;
+class vtkSMProxy;
+class vtkSMProxyProperty;
+class vtkSMStringVectorProperty;
+class vtkSMVectorProperty;
 
 class VTKREMOTINGSERVERMANAGER_EXPORT vtkSMPropertyHelper
 {
@@ -211,6 +212,7 @@ public:
   void Remove(vtkSMProxy* value);
   vtkSMProxy* GetAsProxy(unsigned int index = 0) const;
   unsigned int GetOutputPort(unsigned int index = 0) const;
+  vtkSMOutputPort* GetAsOutputPort(unsigned int index = 0) const;
   //@}
 
   //@{

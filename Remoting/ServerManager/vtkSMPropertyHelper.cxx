@@ -49,6 +49,7 @@
 #include "vtkSMInputProperty.h"
 #include "vtkSMIntVectorProperty.h"
 #include "vtkSMProxy.h"
+#include "vtkSMSourceProxy.h"
 #include "vtkSMStringVectorProperty.h"
 #include "vtkStringList.h"
 
@@ -961,6 +962,20 @@ unsigned int vtkSMPropertyHelper::GetOutputPort(unsigned int index /*=0*/) const
 
   vtkSMPropertyHelperWarningMacro("Call not supported for the current property type.");
   return 0;
+}
+
+//----------------------------------------------------------------------------
+vtkSMOutputPort* vtkSMPropertyHelper::GetAsOutputPort(unsigned int index) const
+{
+  if (this->Type == INPUT)
+  {
+    auto proxy = vtkSMSourceProxy::SafeDownCast(this->GetAsProxy(index));
+    auto port = this->GetOutputPort(index);
+    return proxy ? proxy->GetOutputPort(port) : nullptr;
+  }
+
+  vtkSMPropertyHelperWarningMacro("Call not supported for the current property type.");
+  return nullptr;
 }
 
 //----------------------------------------------------------------------------
