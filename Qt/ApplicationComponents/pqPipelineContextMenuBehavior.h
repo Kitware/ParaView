@@ -77,7 +77,7 @@ protected:
    * picked representation was a composite data set the block index of the
    * selected block will be passed in blockIndex.
    *
-   * With introduction on vtkPartitionedDataSetCollection and
+   * With introduction of vtkPartitionedDataSetCollection and
    * vtkPartitionedDataSet, flatIndex is no longer consistent across ranks and
    * hence rank is also returned. Unless dealing with these data types, rank can
    * be ignored.

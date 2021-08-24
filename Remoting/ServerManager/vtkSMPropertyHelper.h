@@ -256,7 +256,9 @@ public:
   //@}
 
   /**
-   * Removes the status value specified for the given key, if any.
+   * Removes the status value specified for the given key, if any. Applicable only to
+   * `vtkSMStringVectorProperty` objects, and this function assumes that the presence of a key in
+   * the property indicates that it is enabled.
    */
   void RemoveStatus(const char* key);
 
