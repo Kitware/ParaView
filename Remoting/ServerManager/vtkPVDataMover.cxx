@@ -72,9 +72,7 @@ std::vector<vtkSmartPointer<vtkDataObject> > CollectDataSets(
 vtkStandardNewMacro(vtkPVDataMover);
 vtkCxxSetObjectMacro(vtkPVDataMover, Producer, vtkAlgorithm);
 //----------------------------------------------------------------------------
-vtkPVDataMover::vtkPVDataMover()
-{
-}
+vtkPVDataMover::vtkPVDataMover() = default;
 
 //----------------------------------------------------------------------------
 vtkPVDataMover::~vtkPVDataMover()
