@@ -180,6 +180,9 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/BlockContextMenu-ShowAllBlocks.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/BlockContextMenu-ShowOnlyBlock.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/BlockContextMenu-UnsetBlockOpacity.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/BlockLinkedSelection-MB.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/BlockLinkedSelection-MBWithPieces.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/BlockLinkedSelection-PDC.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/BoxWidget-Transform.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/BoxWidget-ClipDefault.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/BoxWidget-ClipCheckUseReferenceBounds.png}"
@@ -641,6 +644,7 @@ SET (TESTS_WITH_INLINE_COMPARES
   BoundingRuler.xml
   BoxWidget.xml
   BlockContextMenu.xml
+  BlockLinkedSelection.xml
   CalculatorQuotedVariable.xml
   CameraLink.xml
   ChartLoadNoVariables.xml
@@ -1452,6 +1456,7 @@ endif ()
 
 # Selection is not available in CRS mode
 set(BlockContextMenu_DISABLE_CRS TRUE)
+set(BlockLinkedSelection_DISABLE_CRS TRUE)
 set(MultiSliceWavelet_DISABLE_CRS TRUE)
 set(MultiSliceMultiBlock_DISABLE_CRS TRUE)
 set(PolygonCellSelection_DISABLE_CRS TRUE)

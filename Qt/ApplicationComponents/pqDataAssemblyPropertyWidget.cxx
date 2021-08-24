@@ -32,19 +32,22 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqDataAssemblyPropertyWidget.h"
 #include "ui_pqDataAssemblyPropertyWidget.h"
 
-#include "pqApplicationCore.h"
 #include "pqComboBoxDomain.h"
 #include "pqCoreUtilities.h"
 #include "pqDataAssemblyTreeModel.h"
 #include "pqDoubleRangeDialog.h"
 #include "pqOutputPort.h"
+#include "pqPVApplicationCore.h"
 #include "pqPropertyLinks.h"
+#include "pqSelectionManager.h"
 #include "pqServerManagerModel.h"
 #include "pqSignalAdaptors.h"
 #include "pqTreeViewExpandState.h"
 #include "pqTreeViewSelectionHelper.h"
 #include "vtkCommand.h"
+#include "vtkDataAssembly.h"
 #include "vtkDataAssemblyUtilities.h"
+#include "vtkNew.h"
 #include "vtkPVXMLElement.h"
 #include "vtkSMCompositeTreeDomain.h"
 #include "vtkSMDataAssemblyDomain.h"
@@ -52,7 +55,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMProperty.h"
 #include "vtkSMPropertyGroup.h"
 #include "vtkSMPropertyHelper.h"
+#include "vtkSMSelectionHelper.h"
 #include "vtkSMSourceProxy.h"
+#include "vtkSMStringVectorProperty.h"
+#include "vtkSelection.h"
+#include "vtkSelectionNode.h"
+#include "vtkSmartPointer.h"
+#include "vtkStringArray.h"
 
 #include <QColorDialog>
 #include <QIdentityProxyModel>
@@ -643,6 +652,152 @@ void hookupTableView(QTableView* view, TableModel* model, QAbstractButton* addBu
 }
 
 //=================================================================================
+// Helper to create a selection for the producerPort to select blocks using the
+// specified selectors.
+void selectBlocks(vtkSMOutputPort* producerPort, const std::set<std::string>& selectors)
+{
+  auto producer = producerPort->GetSourceProxy();
+
+  vtkNew<vtkSelection> selection;
+  vtkNew<vtkSelectionNode> node;
+  node->SetContentType(vtkSelectionNode::BLOCK_SELECTORS);
+  node->SetFieldType(vtkSelectionNode::CELL);
+  vtkNew<vtkStringArray> array;
+  array->SetName("Hierarchy");
+  array->Allocate(static_cast<vtkIdType>(selectors.size()));
+  for (const auto& item : selectors)
+  {
+    array->InsertNextValue(item);
+  }
+  node->SetSelectionList(array);
+  selection->AddNode(node);
+
+  auto source = vtk::TakeSmartPointer(
+    vtkSMSelectionHelper::NewSelectionSourceFromSelection(producer->GetSession(), selection));
+  if (source)
+  {
+    producer->SetSelectionInput(
+      producerPort->GetPortIndex(), vtkSMSourceProxy::SafeDownCast(source), 0);
+
+    auto smmodel = pqApplicationCore::instance()->getServerManagerModel();
+    auto selManager = pqPVApplicationCore::instance()->selectionManager();
+    selManager->select(smmodel->findItem<pqOutputPort*>(producerPort));
+  }
+}
+
+//=================================================================================
+// Helper to return a list of selectors, if any from the selection source.
+// It returns empty list if the selection source doesn't select blocks.
+std::vector<std::string> getSelectors(vtkSMProxy* selectionSource, vtkDataAssembly* assembly)
+{
+  if (!selectionSource)
+  {
+    return {};
+  }
+
+  if (strcmp(selectionSource->GetXMLName(), "BlockSelectorsSelectionSource") == 0)
+  {
+    auto svp =
+      vtkSMStringVectorProperty::SafeDownCast(selectionSource->GetProperty("BlockSelectors"));
+    return svp->GetElements();
+  }
+  else if (strcmp(selectionSource->GetXMLName(), "BlockSelectionSource") == 0)
+  {
+    auto ids = vtkSMPropertyHelper(selectionSource, "Blocks").GetIdTypeArray();
+    return vtkDataAssemblyUtilities::GetSelectorsForCompositeIds(
+      std::vector<unsigned int>(ids.begin(), ids.end()), assembly);
+  }
+  return {};
+}
+
+//=================================================================================
+void hookupActiveSelection(
+  vtkSMProxy* repr, QItemSelectionModel* selectionModel, pqDataAssemblyTreeModel* model)
+{
+  // This function handles hooking up the selectionModel to follow active selection
+  // and vice-versa.
+  selectionModel->setProperty("PQ_IGNORE_SELECTION_CHANGES", false);
+  QObject::connect(selectionModel, &QItemSelectionModel::selectionChanged,
+    [=](const QItemSelection&, const QItemSelection&) {
+      if (selectionModel->property("PQ_IGNORE_SELECTION_CHANGES").toBool())
+      {
+        return;
+      }
+      auto selection = selectionModel->selection();
+      auto currentModel = selectionModel->model();
+      while (auto proxyModel = qobject_cast<QAbstractProxyModel*>(currentModel))
+      {
+        selection = proxyModel->mapSelectionToSource(selection);
+        currentModel = proxyModel->sourceModel();
+      }
+
+      assert(currentModel == model);
+      const auto assembly = model->dataAssembly();
+      const auto nodeIds = model->nodeId(selection.indexes());
+      std::set<std::string> selectors;
+      std::transform(nodeIds.begin(), nodeIds.end(), std::inserter(selectors, selectors.end()),
+        [&](int id) { return assembly->GetNodePath(id); });
+
+      // make active selection.
+      auto producerPort = vtkSMPropertyHelper(repr, "Input").GetAsOutputPort();
+      selectionModel->setProperty("PQ_IGNORE_SELECTION_CHANGES", true);
+      selectBlocks(producerPort, selectors);
+      selectionModel->setProperty("PQ_IGNORE_SELECTION_CHANGES", false);
+    });
+
+  auto selManager = pqPVApplicationCore::instance()->selectionManager();
+  auto connection =
+    QObject::connect(selManager, &pqSelectionManager::selectionChanged, [=](pqOutputPort* port) {
+      // When user creates selection in the application, reflect it in the
+      // widget, if possible.
+      if (selectionModel->property("PQ_IGNORE_SELECTION_CHANGES").toBool())
+      {
+        return;
+      }
+      selectionModel->setProperty("PQ_IGNORE_SELECTION_CHANGES", true);
+
+      const auto assembly = model->dataAssembly();
+      auto producerPort = vtkSMPropertyHelper(repr, "Input").GetAsOutputPort();
+      if (port == nullptr || port->getOutputPortProxy() != producerPort || assembly == nullptr)
+      {
+        // clear selection in the widget.
+        selectionModel->clearSelection();
+      }
+      else
+      {
+        // update selection.
+        auto selectors = getSelectors(port->getSelectionInput(), assembly);
+        const auto nodes = assembly->SelectNodes(selectors);
+        auto indexes = model->index(QList<int>(nodes.begin(), nodes.end()));
+        QItemSelection selection;
+        for (const auto& idx : indexes)
+        {
+          selection.select(idx, idx);
+        }
+
+        std::vector<QAbstractProxyModel*> proxyModels;
+        auto currentModel = selectionModel->model();
+        while (auto proxyModel = qobject_cast<QAbstractProxyModel*>(currentModel))
+        {
+          proxyModels.push_back(proxyModel);
+          currentModel = proxyModel->sourceModel();
+        }
+        std::reverse(proxyModels.begin(), proxyModels.end());
+        for (auto& proxyModel : proxyModels)
+        {
+          selection = proxyModel->mapSelectionFromSource(selection);
+        }
+        selectionModel->select(selection, QItemSelectionModel::ClearAndSelect);
+      }
+      selectionModel->setProperty("PQ_IGNORE_SELECTION_CHANGES", false);
+    });
+
+  // ensure that the connection is destroyed with the selectionModel dies.
+  QObject::connect(selectionModel, &QObject::destroyed,
+    [connection, selManager]() { selManager->disconnect(connection); });
+}
+
+//=================================================================================
 template <typename T1>
 QList<QVariant> colorsToVariantList(const QList<QPair<T1, QVariant> >& colors)
 {
@@ -813,6 +968,14 @@ pqDataAssemblyPropertyWidget::pqDataAssemblyPropertyWidget(
     internals.Ui.removeColors, internals.Ui.removeAllColors);
   hookupTableView(internals.Ui.opacities, internals.OpacitiesTableModel, internals.Ui.addOpacities,
     internals.Ui.removeOpacities, internals.Ui.removeAllOpacities);
+
+  int linkActiveSelection = 0;
+  if (groupHints && groupHints->GetScalarAttribute("link_active_selection", &linkActiveSelection) &&
+    linkActiveSelection == 1)
+  {
+    hookupActiveSelection(
+      smproxy, internals.Ui.hierarchy->selectionModel(), internals.AssemblyTreeModel);
+  }
 
   // A domain that can provide us the assembly we use to show in this property.
   vtkSMDomain* domain = nullptr;
