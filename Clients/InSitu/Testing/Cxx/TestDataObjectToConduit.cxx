@@ -290,7 +290,7 @@ static struct
   { VTK_TETRA, { 8, 11, 10, 14 } }, { VTK_POLYGON, { 16, 17, 14, 13, 12, 15 } },
   { VTK_TRIANGLE_STRIP, { 18, 15, 19, 16, 20, 17 } }, { VTK_QUAD, { 22, 23, 20, 19 } },
   { VTK_TRIANGLE, { 21, 22, 18 } }, { VTK_TRIANGLE, { 22, 19, 18 } }, { VTK_LINE, { 23, 26 } },
-  { VTK_LINE, { 21, 24 } }, { VTK_VERTEX, { 25 } }, { VTK_EMPTY_CELL, {} } };
+  { VTK_LINE, { 21, 24 } }, { VTK_VERTEX, { 25 } } };
 
 bool TestMixedShapedUnstructuredGrid()
 {
@@ -305,13 +305,10 @@ bool TestMixedShapedUnstructuredGrid()
   unstructured_grid->SetPoints(points);
 
   unstructured_grid->Allocate(100);
-  vtkIdType type_index = 0;
-  while (unstructured_grid_cell_connectivities[type_index].cell_type != VTK_EMPTY_CELL)
+  for (auto const& connectivity : unstructured_grid_cell_connectivities)
   {
-    unstructured_grid->InsertNextCell(unstructured_grid_cell_connectivities[type_index].cell_type,
-      unstructured_grid_cell_connectivities[type_index].connectivity.size(),
-      unstructured_grid_cell_connectivities[type_index].connectivity.data());
-    ++type_index;
+    unstructured_grid->InsertNextCell(
+      connectivity.cell_type, connectivity.connectivity.size(), connectivity.connectivity.data());
   }
 
   auto previous_verbosity = vtkLogger::GetCurrentVerbosityCutoff();
