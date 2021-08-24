@@ -240,16 +240,8 @@
       <ProxyProperty command="SetCutFunction"
                      label="Slice Type"
                      name="CutFunction">
-        <ProxyGroupDomain name="groups">
-          <Group name="implicit_functions" />
-        </ProxyGroupDomain>
         <ProxyListDomain name="proxy_list">
-          <Proxy group="implicit_functions"
-                 name="Plane" />
-          <Proxy group="implicit_functions"
-                 name="Box" />
-          <Proxy group="implicit_functions"
-                 name="Sphere" />
+          <Proxy name="slice_implicit_functions" default="Plane" />
         </ProxyListDomain>
         <Documentation>This property sets the parameters of the slice
         function.</Documentation>
@@ -1611,16 +1603,8 @@ found and the point will be rejected.</Documentation>
                      label="Cell Locator"
                      name="CellLocator"
                      panel_visibility="advanced">
-        <ProxyGroupDomain name="groups">
-          <Group name="cell_locators" />
-        </ProxyGroupDomain>
         <ProxyListDomain name="proxy_list">
-          <Proxy group="cell_locators"
-                 name="StaticCellLocator" />
-          <Proxy group="cell_locators"
-                 name="CellTreeLocator" />
-          <Proxy group="cell_locators"
-                 name="CellLocator" />
+          <Group name="cell_locators" default="StaticCellLocator" />
         </ProxyListDomain>
         <Documentation>The cell locator to use for finding cells for probing.
         </Documentation>

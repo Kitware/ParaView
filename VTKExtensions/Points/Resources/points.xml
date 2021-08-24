@@ -480,6 +480,23 @@
   </ProxyGroup>
 
   <!-- =================================================================== -->
+  <ProxyGroup name="generic_point_interpolation_kernels">
+    <Proxy group="point_interpolation_kernels" name="VoronoiKernel" />
+    <Proxy group="point_interpolation_kernels" name="EllipsoidalGaussianKernel" />
+    <Proxy group="point_interpolation_kernels" name="GaussianKernel" />
+    <Proxy group="point_interpolation_kernels" name="LinearKernel" />
+    <Proxy group="point_interpolation_kernels" name="ProbabilisticVoronoiKernel" />
+    <Proxy group="point_interpolation_kernels" name="ShepardKernel" />
+    <Proxy group="point_interpolation_kernels" name="VoronoiKernel" />
+  </ProxyGroup>
+  <ProxyGroup name="sph_point_interpolation_kernels">
+    <Proxy group="point_interpolation_kernels" name="SPHQuinticKernel" />
+    <Proxy group="point_interpolation_kernels" name="SPHCubicKernel" />
+    <Proxy group="point_interpolation_kernels" name="SPHQuarticKernel" />
+    <Proxy group="point_interpolation_kernels" name="SPHWendlandQuinticKernel" />
+  </ProxyGroup>
+
+  <!-- =================================================================== -->
   <ProxyGroup name="filters">
 
     <!-- ==================================================================== -->
@@ -692,10 +709,7 @@
         Specify an interpolation kernel. The interpolation kernel changes the basis of the
         interpolation.
         <ProxyListDomain name="proxy_list">
-          <Proxy group="point_interpolation_kernels" name="SPHQuinticKernel" />
-          <Proxy group="point_interpolation_kernels" name="SPHCubicKernel" />
-          <Proxy group="point_interpolation_kernels" name="SPHQuarticKernel" />
-          <Proxy group="point_interpolation_kernels" name="SPHWendlandQuinticKernel" />
+          <Group name="sph_point_interpolation_kernels" default="SPHQuinticKernel" />
         </ProxyListDomain>
       </ProxyProperty>
 
@@ -984,13 +998,7 @@
            interpolation.
         </Documentation>
         <ProxyListDomain name="proxy_list">
-          <Proxy group="point_interpolation_kernels" name="VoronoiKernel" />
-          <Proxy group="point_interpolation_kernels" name="EllipsoidalGaussianKernel" />
-          <Proxy group="point_interpolation_kernels" name="GaussianKernel" />
-          <Proxy group="point_interpolation_kernels" name="LinearKernel" />
-          <Proxy group="point_interpolation_kernels" name="ProbabilisticVoronoiKernel" />
-          <Proxy group="point_interpolation_kernels" name="ShepardKernel" />
-          <Proxy group="point_interpolation_kernels" name="VoronoiKernel" />
+          <Group name="generic_point_interpolation_kernels" default="VoronoiKernel" />
         </ProxyListDomain>
       </ProxyProperty>
 

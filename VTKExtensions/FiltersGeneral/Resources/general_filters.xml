@@ -2309,16 +2309,7 @@ Every Nth Point.
           <Group name="implicit_functions" />
         </ProxyGroupDomain>
         <ProxyListDomain name="proxy_list">
-          <Proxy group="implicit_functions"
-                 name="Plane" />
-          <Proxy group="implicit_functions"
-                 name="Box" />
-          <Proxy group="implicit_functions"
-                 name="Sphere" />
-          <Proxy group="implicit_functions"
-                 name="Cylinder" />
-          <Proxy group="implicit_functions"
-                 name="Scalar" />
+          <Group name="clip_implicit_functions" default="Plane" />
         </ProxyListDomain>
         <Hints>
           <PropertyWidgetDecorator type="InputDataTypeDecorator"
@@ -2332,22 +2323,8 @@ Every Nth Point.
       <ProxyProperty command="SetHyperTreeGridClipFunction"
                      label="Hyper Tree Grid Clipper"
                      name="HyperTreeGridClipFunction">
-        <ProxyGroupDomain name="groups">
-          <Group name="implicit_functions" />
-        </ProxyGroupDomain>
         <ProxyListDomain name="proxy_list">
-          <Proxy group="implicit_functions"
-                 name="Plane" />
-          <Proxy group="implicit_functions"
-                 name="Axis Aligned Box" />
-          <Proxy group="implicit_functions"
-                 name="Sphere" />
-          <Proxy group="implicit_functions"
-                 name="Cylinder" />
-          <Proxy group="implicit_functions"
-                 name="Quadric" />
-          <Proxy group="implicit_functions"
-                 name="Scalar" />
+          <Group name="clip_htg_implicit_functions" default="Plane" />
         </ProxyListDomain>
         <Documentation>This property specifies the parameters of the clip
         function (an implicit description) used to clip the hyper tree grid.</Documentation>
@@ -2529,18 +2506,8 @@ Every Nth Point.
                                    exclude="1"
                                    mode="visibility"/>
         </Hints>
-        <ProxyGroupDomain name="groups">
-          <Group name="implicit_functions" />
-        </ProxyGroupDomain>
         <ProxyListDomain name="proxy_list">
-          <Proxy group="implicit_functions"
-                 name="Plane" />
-          <Proxy group="implicit_functions"
-                 name="Box" />
-          <Proxy group="implicit_functions"
-                 name="Sphere" />
-          <Proxy group="implicit_functions"
-                 name="Cylinder" />
+          <Group name="slice_implicit_functions" default="Plane"/>
         </ProxyListDomain>
         <Documentation>This property sets the parameters of the slice
         function.</Documentation>
@@ -2553,14 +2520,8 @@ Every Nth Point.
                                    name="vtkHyperTreeGrid"
                                    mode="visibility"/>
         </Hints>
-        <ProxyGroupDomain name="groups">
-          <Group name="implicit_functions" />
-        </ProxyGroupDomain>
         <ProxyListDomain name="proxy_list">
-          <Proxy group="implicit_functions"
-                 name="Plane" />
-          <Proxy group="implicit_functions"
-                 name="Axis Aligned Plane" />
+          <Group name="slice_htg_implicit_functions" default="Plane"/>
         </ProxyListDomain>
         <Documentation>This property sets the parameters of the slice
         function.</Documentation>

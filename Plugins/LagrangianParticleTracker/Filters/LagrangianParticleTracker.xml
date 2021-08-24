@@ -174,14 +174,7 @@
                      name="Locator"
                      panel_visibility="default">
         <ProxyListDomain name="proxy_list">
-          <Proxy group="cell_locators"
-                 name="StaticCellLocator"/>
-          <Proxy group="cell_locators"
-                 name="CellLocator"/>
-          <Proxy group="cell_locators"
-                 name="CellTreeLocator"/>
-          <Proxy group="cell_locators"
-                 name="ModifiedBSPTree"/>
+          <Group name="cell_locators" default="StaticCellLocator"/>
         </ProxyListDomain>
         <Documentation>Specify the locator used to
         locate cells in the flow input</Documentation>

@@ -46,16 +46,8 @@
       <ProxyProperty command="SetCutFunction"
                      label="Slice Type"
                      name="CutFunction">
-        <ProxyGroupDomain name="groups">
-          <Group name="implicit_functions" />
-        </ProxyGroupDomain>
         <ProxyListDomain name="proxy_list">
-          <Proxy group="implicit_functions"
-                 name="Plane" />
-          <Proxy group="implicit_functions"
-                 name="Box" />
-          <Proxy group="implicit_functions"
-                 name="Sphere" />
+          <Group name="extract_implicit_functions" default="Plane" />
         </ProxyListDomain>
         <Documentation>This property sets the type of intersecting geometry,
         and associated parameters.</Documentation>

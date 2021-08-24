@@ -32,9 +32,7 @@
        name="ParametricFunction"
        label="Parametric Function">
        <ProxyListDomain name="proxy_list">
-         <Proxy group="parametric_functions" name="ParametricBoy" />
-         <Proxy group="parametric_functions" name="ParametricConicSpiral" />
-         <Proxy group="parametric_functions" name="ParametricEllipsoid" />
+         <Group name="parametric_functions" default="ParametricBoy" />
        </ProxyListDomain>
      </ProxyProperty>
    </SourceProxy>
