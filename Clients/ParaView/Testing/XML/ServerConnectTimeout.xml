@@ -1,0 +1,15 @@
+<?xml version="1.0" ?>
+<pqevents>
+  <pqevent object="pqClientMainWindow/MainControlsToolbar/actionServerConnect" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/pqServerConnectDialog/stackedWidget/page_choose/addServer" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/pqServerConnectDialog/stackedWidget/page_create/name" command="set_string" arguments="test" />
+  <pqevent object="pqClientMainWindow/pqServerConnectDialog/stackedWidget/page_create/port" command="set_int" arguments="45795" />
+  <pqevent object="pqClientMainWindow/pqServerConnectDialog/stackedWidget/page_create/okButton" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/pqServerConnectDialog/stackedWidget/page_edit/editServer2ButtonBox/1QPushButton0" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/pqServerConnectDialog/stackedWidget/page_choose/timeoutSpinBox" command="set_int" arguments="1" />
+  <pqevent object="pqClientMainWindow/pqServerConnectDialog/stackedWidget/page_choose/connect" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow" command="pause" arguments="1500"/>
+  <pqevent object="pqClientMainWindow/1QMessageBox0/qt_msgbox_buttonbox/1QPushButton0" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow" command="pause" arguments="150"/>
+  <pqevent object="pqClientMainWindow/1QMessageBox0/qt_msgbox_buttonbox/1QPushButton1" command="activate" arguments="" />
+</pqevents>
