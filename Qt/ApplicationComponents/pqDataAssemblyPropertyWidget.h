@@ -166,7 +166,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *      <Hints>
  *        <DataAssemblyPropertyWidget
  *          is_checkable="0"
- *          use_inputname_as_header="1" />
+ *          use_inputname_as_header="1"
+ *          link_active_selection="1"
+ *          />
  *      </Hints>
  *    </PropertyGroup>
  * @endcode
@@ -177,6 +179,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * `use_inputname_as_header`, when set to `1` causes the widget to use the
  * input's registration name as the header for the tree widget rather than the
  * XML label for the group (or property) attached to the widget.
+ *
+ * `link_active_selection`, when set to `1` causes the widget to track the
+ * active block-selection and vice-versa.
  */
 class vtkObject;
 class PQAPPLICATIONCOMPONENTS_EXPORT pqDataAssemblyPropertyWidget : public pqPropertyWidget

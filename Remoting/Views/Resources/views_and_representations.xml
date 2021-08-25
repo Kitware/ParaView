@@ -4422,7 +4422,7 @@
             <Property name="BlockColors"    function="Colors" />
             <Property name="BlockOpacities" function="Opacities" />
             <Hints>
-              <DataAssemblyPropertyWidget use_inputname_as_header="1" />
+              <DataAssemblyPropertyWidget use_inputname_as_header="1" link_active_selection="1"/>
             </Hints>
           </PropertyGroup>
 
@@ -9195,7 +9195,7 @@
         <Property name="Assembly" function="ActiveAssembly" />
         <Property name="BlockVisibilities" function="Selectors" />
         <Hints>
-          <DataAssemblyPropertyWidget use_inputname_as_header="1" />
+          <DataAssemblyPropertyWidget use_inputname_as_header="1" link_active_selection="1"/>
         </Hints>
       </PropertyGroup>
 
@@ -12808,7 +12808,7 @@
         <Property name="BlockColors"    function="Colors" />
         <Property name="BlockOpacities" function="Opacities" />
         <Hints>
-          <DataAssemblyPropertyWidget use_inputname_as_header="1" />
+          <DataAssemblyPropertyWidget use_inputname_as_header="1"  link_active_selection="1"/>
         </Hints>
       </PropertyGroup>
 
