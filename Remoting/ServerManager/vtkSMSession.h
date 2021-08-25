@@ -184,12 +184,15 @@ public:
    * This overload is used to create a built-in session.
    * The callback should return true, if the connection should continue trying to connect,
    * else return false to abort.
+   * The result arg provide information about the failure or sucess of the connection,
+   * see vtkNetworkAccessManager::ConnectionResult for possible values.
    */
   static vtkIdType ConnectToSelf(int timeout = 60)
   {
-    return vtkSMSession::ConnectToSelf(timeout, nullptr);
+    unsigned int result;
+    return vtkSMSession::ConnectToSelf(timeout, nullptr, result);
   }
-  static vtkIdType ConnectToSelf(int timeout, bool (*callback)());
+  static vtkIdType ConnectToSelf(int timeout, bool (*callback)(), unsigned int& result);
   //@}
 
   //@{
@@ -201,12 +204,16 @@ public:
    * This overload is used to create a client-server session on client.
    * The callback should return true, if the connection should continue trying to connect,
    * else return false to abort.
+   * The result arg provide information about the failure or sucess of the connection,
+   * see vtkNetworkAccessManager::ConnectionResult for possible values.
    */
   static vtkIdType ConnectToRemote(const char* hostname, int port, int timeout = 60)
   {
-    return vtkSMSession::ConnectToRemote(hostname, port, timeout, nullptr);
+    unsigned int result;
+    return vtkSMSession::ConnectToRemote(hostname, port, timeout, nullptr, result);
   }
-  static vtkIdType ConnectToRemote(const char* hostname, int port, int timeout, bool (*callback)());
+  static vtkIdType ConnectToRemote(
+    const char* hostname, int port, int timeout, bool (*callback)(), unsigned int& result);
   //@}
 
   //@{
@@ -216,12 +223,15 @@ public:
    * called periodically while this call is blocked.
    * The callback should return true, if the connection should continue waiting,
    * else return false to abort the wait.
+   * The result arg provide information about the failure or sucess of the connection,
+   * see vtkNetworkAccessManager::ConnectionResult for possible values.
    */
   static vtkIdType ReverseConnectToRemote(int port)
   {
-    return vtkSMSession::ReverseConnectToRemote(port, (bool (*)()) nullptr);
+    unsigned int result;
+    return vtkSMSession::ReverseConnectToRemote(port, nullptr, result);
   }
-  static vtkIdType ReverseConnectToRemote(int port, bool (*callback)());
+  static vtkIdType ReverseConnectToRemote(int port, bool (*callback)(), unsigned int& result);
   //@}
 
   //@{
@@ -233,14 +243,17 @@ public:
    * This overload is used to create a client-dataserver-renderserver session on client.
    * The callback should return true, if the connection should continue trying to connect,
    * else return false to abort.
+   * The result arg provide information about the failure or sucess of the connection,
+   * see vtkNetworkAccessManager::ConnectionResult for possible values.
    */
   static vtkIdType ConnectToRemote(
     const char* dshost, int dsport, const char* rshost, int rsport, int timeout = 60)
   {
-    return vtkSMSession::ConnectToRemote(dshost, dsport, rshost, rsport, timeout, nullptr);
+    unsigned int result;
+    return vtkSMSession::ConnectToRemote(dshost, dsport, rshost, rsport, timeout, nullptr, result);
   }
   static vtkIdType ConnectToRemote(const char* dshost, int dsport, const char* rshost, int rsport,
-    int timeout, bool (*callback)());
+    int timeout, bool (*callback)(), unsigned int& result);
   //@}
 
   //@{
@@ -250,12 +263,16 @@ public:
    * called periodically while this call is blocked.
    * The callback should return true, if the connection should continue waiting,
    * else return false to abort the wait.
+   * The result arg provide information about the failure or sucess of the connection,
+   * see vtkNetworkAccessManager::ConnectionResult for possible values.
    */
   static vtkIdType ReverseConnectToRemote(int dsport, int rsport)
   {
-    return vtkSMSession::ReverseConnectToRemote(dsport, rsport, nullptr);
+    unsigned int result;
+    return vtkSMSession::ReverseConnectToRemote(dsport, rsport, nullptr, result);
   }
-  static vtkIdType ReverseConnectToRemote(int dsport, int rsport, bool (*callback)());
+  static vtkIdType ReverseConnectToRemote(
+    int dsport, int rsport, bool (*callback)(), unsigned int& result);
   //@}
 
   //@{

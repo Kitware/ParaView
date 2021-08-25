@@ -75,6 +75,7 @@ public:
   pqObjectBuilder(QObject* parent = 0);
   ~pqObjectBuilder() override;
 
+  //@{
   /**
    * Create a server connection give a server resource.
    * By default, this method does not create a new connection if one already
@@ -87,8 +88,17 @@ public:
    * 0 means no retry, -1 means infinite retries.
    * Calling this method while waiting for a previous server connection to be
    * established raises errors.
+   * The result arg provide information about the failure or sucess of the connection,
+   * see vtkNetworkAccessManager::ConnectionResult for possible values.
    */
-  pqServer* createServer(const pqServerResource& resource, int connectionTimeout = 60);
+  pqServer* createServer(const pqServerResource& resource, int connectionTimeout = 60)
+  {
+    unsigned int result;
+    return this->createServer(resource, connectionTimeout, result);
+  }
+  pqServer* createServer(
+    const pqServerResource& resource, int connectionTimeout, unsigned int& result);
+  //@}
 
   /**
    * Destroy a server connection

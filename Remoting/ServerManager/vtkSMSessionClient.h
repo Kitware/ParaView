@@ -61,12 +61,16 @@ public:
    * -1 means infinite retries.
    * The callback should return true, if the connection should continue trying to connect,
    * else return false to abort.
+   * The result arg provide information about the failure or sucess of the connection,
+   * see vtkNetworkAccessManager::ConnectionResult for possible values.
    */
   virtual bool Connect(const char* url, int timeout = 60)
   {
-    return this->Connect(url, timeout, nullptr);
+    unsigned int result;
+    return this->Connect(url, timeout, nullptr, result);
   }
-  virtual bool Connect(const char* url, int timeout, bool (*callback)());
+  virtual bool Connect(
+    const char* url, int timeout, bool (*callback)(), unsigned int& connectionResult);
   //@}
 
   /**

@@ -616,6 +616,7 @@ bool pqServerLauncher::connectToPrelaunchedServer()
 {
   pqObjectBuilder* builder = pqApplicationCore::instance()->getObjectBuilder();
 
+  unsigned int result;
   do
   {
     QDialog dialog(pqCoreUtilities::mainWidget(), Qt::WindowStaysOnTopHint);
@@ -645,12 +646,11 @@ bool pqServerLauncher::connectToPrelaunchedServer()
 
     const pqServerResource& resource = this->Internals->Configuration.actualResource();
     this->Internals->Server =
-      builder->createServer(resource, this->Internals->Configuration.connectionTimeout());
-  }
-  // TODO not superb, question will be asked even when aborting
-  while (QMessageBox::question(pqCoreUtilities::mainWidget(), QString("Connection Failed"),
-           QString("Unable to connect sucessfully, would you like to try again for %1 seconds ?")
-             .arg(this->Internals->Configuration.connectionTimeout())) == QMessageBox::Yes);
+      builder->createServer(resource, this->Internals->Configuration.connectionTimeout(), result);
+  } while (result == vtkNetworkAccessManager::CONNECTION_TIMEOUT &&
+    QMessageBox::question(pqCoreUtilities::mainWidget(), QString("Connection Failed"),
+      QString("Unable to connect sucessfully. Try again for %1 seconds ?")
+        .arg(this->Internals->Configuration.connectionTimeout())) == QMessageBox::Yes);
 
   return this->Internals->Server != nullptr;
 }

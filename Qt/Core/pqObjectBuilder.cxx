@@ -642,7 +642,8 @@ void pqObjectBuilder::abortPendingConnections()
 }
 
 //-----------------------------------------------------------------------------
-pqServer* pqObjectBuilder::createServer(const pqServerResource& resource, int connectionTimeout)
+pqServer* pqObjectBuilder::createServer(
+  const pqServerResource& resource, int connectionTimeout, unsigned int& result)
 {
   if (this->WaitingForConnection)
   {
@@ -650,6 +651,8 @@ pqServer* pqObjectBuilder::createServer(const pqServerResource& resource, int co
                    "to be established.";
     return nullptr;
   }
+
+  pqObjectBuilderNS::ContinueWaiting = true;
 
   // Create a modified version of the resource that only contains server information
   const pqServerResource server_resource = resource.schemeHostsPorts();
@@ -684,31 +687,29 @@ pqServer* pqObjectBuilder::createServer(const pqServerResource& resource, int co
   vtkIdType id = 0;
   if (server_resource.scheme() == "builtin")
   {
-    id = vtkSMSession::ConnectToSelf(connectionTimeout, &pqObjectBuilderNS::processEvents);
+    id = vtkSMSession::ConnectToSelf(connectionTimeout, &pqObjectBuilderNS::processEvents, result);
   }
   else if (server_resource.scheme() == "cs")
   {
     id = vtkSMSession::ConnectToRemote(resource.host().toUtf8().data(), resource.port(11111),
-      connectionTimeout, &pqObjectBuilderNS::processEvents);
+      connectionTimeout, &pqObjectBuilderNS::processEvents, result);
   }
   else if (server_resource.scheme() == "csrc")
   {
-    pqObjectBuilderNS::ContinueWaiting = true;
     id = vtkSMSession::ReverseConnectToRemote(
-      server_resource.port(11111), &pqObjectBuilderNS::processEvents);
+      server_resource.port(11111), &pqObjectBuilderNS::processEvents, result);
   }
   else if (server_resource.scheme() == "cdsrs")
   {
     id = vtkSMSession::ConnectToRemote(server_resource.dataServerHost().toUtf8().data(),
       server_resource.dataServerPort(11111), server_resource.renderServerHost().toUtf8().data(),
-      server_resource.renderServerPort(22221), connectionTimeout,
-      &pqObjectBuilderNS::processEvents);
+      server_resource.renderServerPort(22221), connectionTimeout, &pqObjectBuilderNS::processEvents,
+      result);
   }
   else if (server_resource.scheme() == "cdsrsrc")
   {
-    pqObjectBuilderNS::ContinueWaiting = true;
     id = vtkSMSession::ReverseConnectToRemote(server_resource.dataServerPort(11111),
-      server_resource.renderServerPort(22221), &pqObjectBuilderNS::processEvents);
+      server_resource.renderServerPort(22221), &pqObjectBuilderNS::processEvents, result);
   }
   else if (server_resource.scheme() == "catalyst")
   {

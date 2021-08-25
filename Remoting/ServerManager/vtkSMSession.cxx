@@ -261,7 +261,7 @@ void vtkSMSession::Disconnect(vtkIdType sid)
 }
 
 //----------------------------------------------------------------------------
-vtkIdType vtkSMSession::ConnectToSelf(int timeout, bool (*callback)())
+vtkIdType vtkSMSession::ConnectToSelf(int timeout, bool (*callback)(), unsigned int& result)
 {
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   vtkSMSession* session = vtkSMSession::New();
@@ -284,14 +284,14 @@ vtkIdType vtkSMSession::ConnectToCatalyst()
 
 //----------------------------------------------------------------------------
 vtkIdType vtkSMSession::ConnectToRemote(
-  const char* hostname, int port, int timeout, bool (*callback)())
+  const char* hostname, int port, int timeout, bool (*callback)(), unsigned int& result)
 {
   std::ostringstream sname;
   sname << "cs://" << hostname << ":" << port;
   vtkSMSessionClient* session = vtkSMSessionClient::New();
 
   vtkIdType sid = 0;
-  if (session->Connect(sname.str().c_str(), timeout, callback))
+  if (session->Connect(sname.str().c_str(), timeout, callback, result))
   {
     vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
     sid = pm->RegisterSession(session);
@@ -301,14 +301,14 @@ vtkIdType vtkSMSession::ConnectToRemote(
 }
 
 //----------------------------------------------------------------------------
-vtkIdType vtkSMSession::ConnectToRemote(
-  const char* dshost, int dsport, const char* rshost, int rsport, int timeout, bool (*callback)())
+vtkIdType vtkSMSession::ConnectToRemote(const char* dshost, int dsport, const char* rshost,
+  int rsport, int timeout, bool (*callback)(), unsigned int& result)
 {
   std::ostringstream sname;
   sname << "cdsrs://" << dshost << ":" << dsport << "/" << rshost << ":" << rsport;
   vtkSMSessionClient* session = vtkSMSessionClient::New();
   vtkIdType sid = 0;
-  if (session->Connect(sname.str().c_str(), timeout, callback))
+  if (session->Connect(sname.str().c_str(), timeout, callback, result))
   {
     vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
     sid = pm->RegisterSession(session);
@@ -318,13 +318,14 @@ vtkIdType vtkSMSession::ConnectToRemote(
 }
 
 //----------------------------------------------------------------------------
-vtkIdType vtkSMSession::ReverseConnectToRemote(int port, bool (*callback)())
+vtkIdType vtkSMSession::ReverseConnectToRemote(int port, bool (*callback)(), unsigned int& result)
 {
-  return vtkSMSession::ReverseConnectToRemote(port, -1, callback);
+  return vtkSMSession::ReverseConnectToRemote(port, -1, callback, result);
 }
 
 //----------------------------------------------------------------------------
-vtkIdType vtkSMSession::ReverseConnectToRemote(int dsport, int rsport, bool (*callback)())
+vtkIdType vtkSMSession::ReverseConnectToRemote(
+  int dsport, int rsport, bool (*callback)(), unsigned int& result)
 {
   std::ostringstream sname;
   if (rsport <= -1)
@@ -339,7 +340,7 @@ vtkIdType vtkSMSession::ReverseConnectToRemote(int dsport, int rsport, bool (*ca
   vtkSMSessionClient* session = vtkSMSessionClient::New();
   vtkIdType sid = 0;
   // TODO timeout ?
-  if (session->Connect(sname.str().c_str(), 60, callback))
+  if (session->Connect(sname.str().c_str(), 60, callback, result))
   {
     vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
     sid = pm->RegisterSession(session);
