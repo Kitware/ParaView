@@ -573,7 +573,7 @@ ${_paraview_build_calls}
         "#ifndef ${_paraview_build_target_safe}_h
 #define ${_paraview_build_target_safe}_h
 
-void ${_paraview_build_target_safe}_initialize()
+static void ${_paraview_build_target_safe}_initialize()
 {
 }
 
