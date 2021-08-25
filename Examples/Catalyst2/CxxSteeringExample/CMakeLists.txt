@@ -54,9 +54,17 @@ if (USE_CATALYST)
       COMMAND CxxSteeringExample
               ${CMAKE_CURRENT_SOURCE_DIR}/catalyst_pipeline.py
               ${CMAKE_CURRENT_SOURCE_DIR}/catalyst_steering_proxies.xml)
+
+    set(_vtk_fail_regex
+        # vtkLogger
+        "(\n|^)ERROR: "
+        "ERR\\|"
+        # vtkDebugLeaks
+        "instance(s)? still around")
+
     set_tests_properties("CxxSteeringExample::SimplePipeline"
       PROPERTIES
-        FAIL_REGULAR_EXPRESSION "Err;ERROR:;instances(s)? still around;ERR\\\|"
+        FAIL_REGULAR_EXPRESSION "${_vtk_fail_regex}"
         SKIP_RETURN_CODE 125)
   endif()
 endif()
