@@ -324,9 +324,10 @@ More advanced build options are:
   * `PARAVIEW_BUILD_WITH_EXTERNAL` (default `OFF`): When set to `ON`, the build
     will try to use external copies of all included third party libraries unless
     explicitly overridden.
-  * `PARAVIEW_BUILD_WITH_KITS` (default `OFF`): Compile ParaView into a smaller
-    set of libraries. Can be useful on platforms where ParaView takes a long
-    time to launch due to expensive disk access.
+  * `PARAVIEW_BUILD_WITH_KITS` (default `OFF`; requires
+    `PARAVIEW_BUILD_SHARED_LIBS`): Compile ParaView into a smaller set of
+    libraries. Can be useful on platforms where ParaView takes a long time to
+    launch due to expensive disk access.
   * `PARAVIEW_BUILD_ID` (default `""`): A build ID for the ParaView build. It
     can be any arbitrary value which can be used to indicate the provenance of
     ParaView.

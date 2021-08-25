@@ -18,7 +18,10 @@ mark_as_advanced(PARAVIEW_BUILD_LEGACY_SILENT)
 # Kits bundle multiple modules together into a single library, this
 # is used to dramatically reduce the number of generated libraries.
 vtk_deprecated_setting(kits_default PARAVIEW_BUILD_WITH_KITS PARAVIEW_ENABLE_KITS "OFF")
-option(PARAVIEW_BUILD_WITH_KITS "Build ParaView using kits instead of modules." OFF)
+cmake_dependent_option(PARAVIEW_BUILD_WITH_KITS "Build ParaView using kits instead of modules." OFF
+  # Static builds don't make sense with kits. Ignore the flag if shared
+  # libraries aren't being built.
+  "PARAVIEW_BUILD_SHARED_LIBS" OFF)
 mark_as_advanced(PARAVIEW_BUILD_WITH_KITS)
 
 vtk_deprecated_setting(external_default PARAVIEW_BUILD_WITH_EXTERNAL PARAVIEW_USE_EXTERNAL "OFF")
