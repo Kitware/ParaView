@@ -40,7 +40,6 @@
 #include "vtkSocketController.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
 #include "vtkTimerLog.h"
-#include "vtkToolkits.h"
 
 #include "vtk_zlib.h"
 #include <sstream>

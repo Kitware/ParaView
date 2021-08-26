@@ -37,7 +37,6 @@
 #include "vtkStreamingDemandDrivenPipeline.h"
 #include "vtkStructuredGrid.h"
 #include "vtkTable.h"
-#include "vtkToolkits.h"
 #include "vtkTrivialProducer.h"
 
 #include <sstream>

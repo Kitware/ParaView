@@ -44,7 +44,6 @@ See Copyright.txt or http://www.paraview.org/HTML/Copyright.html for details.
 #include "vtkStringArray.h"
 #include "vtkStructuredGrid.h"
 #include "vtkThreshold.h"
-#include "vtkToolkits.h" // for VTK_USE_PARALLEL
 #include "vtkUnstructuredGrid.h"
 
 // .clang-format off
