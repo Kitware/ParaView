@@ -38,6 +38,7 @@ if ("$ENV{CMAKE_CONFIGURATION}" MATCHES "fedora")
     # some components of the scenes that are being tested. Needs investigation.
     # https://gitlab.kitware.com/vtk/vtk/-/issues/18098
     "\\.BoxWidget$"
+    "\\.BlockLinkedSelection$"
     "\\.CheckSelectedBlocks$"
     "\\.CTHAMRClip$"
     "\\.CTHAMRContour$"
