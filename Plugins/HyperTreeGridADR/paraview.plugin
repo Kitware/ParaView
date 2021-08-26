@@ -5,4 +5,11 @@ DESCRIPTION
   The hyper tree grid is subdivded following a criterion set by the user.
 REQUIRES_MODULES
   VTK::CommonCore
+  VTK::CommonDataModel
+  VTK::CommonExecutionModel
+  VTK::CommonMisc
+  VTK::CommonSystem
   VTK::FiltersCore
+  VTK::FiltersGeneral
+  VTK::FiltersParallelDIY2
+  VTK::ParallelCore
