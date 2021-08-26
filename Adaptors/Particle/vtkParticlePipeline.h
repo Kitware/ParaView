@@ -41,9 +41,9 @@ public:
   vtkTypeMacro(vtkParticlePipeline, vtkCPPipeline);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  virtual int RequestDataDescription(vtkCPDataDescription* desc);
+  int RequestDataDescription(vtkCPDataDescription* desc) override;
 
-  virtual int CoProcess(vtkCPDataDescription* desc);
+  int CoProcess(vtkCPDataDescription* desc) override;
 
   // Description:
   // name of the image file to output
