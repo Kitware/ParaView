@@ -152,6 +152,7 @@ set(classes
   vtkSMPWriterProxy
   vtkSMReaderFactory
   vtkSMReaderReloadHelper
+  vtkSMRegistrationNamesDomain
   vtkSMRemoteObject
   vtkSMRemoteObjectUpdateUndoElement
   vtkSMSelectionQueryDomain

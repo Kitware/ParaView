@@ -717,7 +717,7 @@
     </SourceProxy>
 
     <!-- ==================================================================== -->
-    <SourceProxy class="vtkMultiBlockDataGroupFilter"
+    <SourceProxy class="vtkGroupDataSetsFilter"
                  label="Group Datasets"
                  name="GroupDataSets">
       <Documentation long_help="Group data sets."
@@ -740,6 +740,47 @@
         <Documentation>This property indicates the the inputs to the Group
         Datasets filter.</Documentation>
       </InputProperty>
+
+      <IntVectorProperty name="OutputType"
+        command="SetOutputType"
+        number_of_elements="1"
+        default_values="13">
+        <EnumerationDomain name="enum">
+          <Entry text="vtkMultiBlockDataSet" value="13" />
+          <Entry text="vtkPartitionedDataSet" value="37" />
+          <Entry text="vtkPartitionedDataSetCollection" value="38" />
+        </EnumerationDomain>
+        <Documentation>
+          Specify the output type in which to group the inputs.
+        </Documentation>
+      </IntVectorProperty>
+
+      <StringVectorProperty name="BlockNames"
+        command="SetInputName"
+        number_of_elements_per_command="1"
+        repeat_command="1"
+        use_index="1"
+        clean_command="ClearInputNames">
+        <Documentation>
+          Specify names to use for each input.
+        </Documentation>
+        <RegistrationNamesDomain name="names_list" registration_group="sources">
+          <RequiredProperties>
+            <Property name="Input" function="Proxies" />
+          </RequiredProperties>
+        </RegistrationNamesDomain>
+      </StringVectorProperty>
+
+      <PropertyGroup label="Block Names">
+        <Property name="BlockNames" />
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+            mode="visibility"
+            property="OutputType"
+            value="37"
+            inverse="1" />
+        </Hints>
+      </PropertyGroup>
       <Hints>
         <Visibility replace_input="1" />
       </Hints>
