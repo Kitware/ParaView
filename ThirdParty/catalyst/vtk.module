@@ -1,3 +1,5 @@
 NAME
   ParaView::vtkcatalyst
+LIBRARY_NAME
+  vtkcatalyst
 THIRD_PARTY
