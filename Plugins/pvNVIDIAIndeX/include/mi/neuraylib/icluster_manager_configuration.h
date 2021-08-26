@@ -1,5 +1,5 @@
 /***************************************************************************************************
- * Copyright 2020 NVIDIA Corporation. All rights reserved.
+ * Copyright 2021 NVIDIA Corporation. All rights reserved.
  **************************************************************************************************/
 /// \file
 /// \brief API component to interact with the cluster manager
@@ -169,7 +169,7 @@ public:
     ///                      - -3: The connection to the cluster manager broke down.
     ///                      - -4: The request timed out. Please check if the cluster
     ///                            manager is working properly.
-    /// \return              The decriptor of the node that has been added to the cluster, or 
+    /// \return              The descriptor of the node that has been added to the cluster, or 
     ///                      \c NULL if no node was available to be added.
     virtual ICluster_manager_node* grow_cluster(Sint32* errors) = 0;
 

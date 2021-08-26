@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2020 NVIDIA Corporation. All rights reserved.
+ * Copyright 2021 NVIDIA Corporation. All rights reserved.
  *****************************************************************************/
 /// \brief Scene attribute controlling particle volume rendering properties.
 
@@ -17,18 +17,19 @@ namespace index {
 ///
 /// \ingroup nv_index_scene_description_attribute
 ///
-enum Particle_volume_render_mode
+enum Particle_volume_rendering_mode
 {
-    PARTICLE_VOLUME_RENDER_MODE_RBF             = 0x00u,    ///< Direct volume rendering using radial basis functions (RBF) (see \c Particle_volume_RBF_falloff_kernel)
-    PARTICLE_VOLUME_RENDER_MODE_SOLID_BOX,                  ///< Render particles as solid geometries (boxes)
-    PARTICLE_VOLUME_RENDER_MODE_SOLID_CONE,                 ///< Render particles as solid geometries (cones)
-    PARTICLE_VOLUME_RENDER_MODE_SOLID_CYLINDER,             ///< Render particles as solid geometries (cylinders)
-    PARTICLE_VOLUME_RENDER_MODE_SOLID_SPHERE,               ///< Render particles as solid geometries (spheres)
-    PARTICLE_VOLUME_RENDER_MODE_SOLID_INDIVIDUAL,           ///< Render particles as solid geometries, where the shape is selected by a second uint8-typed
-                                                            ///< attribute (index 1). The values stored per-particle need to match the values from
-                                                            ///< PARTICLE_VOLUME_RENDER_MODE_SOLID_BOX to PARTICLE_VOLUME_RENDER_MODE_SOLID_SPHERE (1..4)
+    PARTICLE_VOLUME_RENDERING_MODE_RBF             = 0x00u,    ///< Direct volume rendering using radial basis functions (RBF) (see \c Particle_volume_RBF_falloff_kernel)
+    PARTICLE_VOLUME_RENDERING_MODE_SOLID_BOX,                  ///< Render particles as solid geometries (boxes)
+    PARTICLE_VOLUME_RENDERING_MODE_SOLID_CONE,                 ///< Render particles as solid geometries (cones)
+    PARTICLE_VOLUME_RENDERING_MODE_SOLID_CYLINDER,             ///< Render particles as solid geometries (cylinders)
+    PARTICLE_VOLUME_RENDERING_MODE_SOLID_SPHERE,               ///< Render particles as solid geometries (spheres)
+    PARTICLE_VOLUME_RENDERING_MODE_SOLID_DISC,                 ///< Render particles as solid geometries (discs)
+    PARTICLE_VOLUME_RENDERING_MODE_SOLID_INDIVIDUAL,           ///< Render particles as solid geometries, where the shape is selected by a second uint8-typed
+                                                               ///< attribute (index 1). The values stored per-particle need to match the values from
+                                                               ///< PARTICLE_VOLUME_RENDERING_MODE_SOLID_BOX to PARTICLE_VOLUME_RENDERING_MODE_SOLID_DISC (1..5)
 
-    PARTICLE_VOLUME_RENDER_MODE_COUNT
+    PARTICLE_VOLUME_RENDERING_MODE_COUNT
 };
 
 /// Available radial basis-functions for the direct volume rendering mode of
@@ -57,7 +58,7 @@ class IParticle_volume_rendering_properties :
 {
 public:
     /// Set the sampling distance used for a particle volume scene element (\c Iparticle_volume_scene_element)
-    /// when applying the direct volume rendering mode (\c PARTICLE_VOLUME_RENDER_MODE_RBF).
+    /// when applying the direct volume rendering mode (\c PARTICLE_VOLUME_RENDERING_MODE_RBF).
     /// The default value used is 1.0f.
     /// 
     /// \param[in]  sample_dist     Sampling distance (default value is 1.0f).
@@ -78,11 +79,11 @@ public:
 
     /// Set rendering mode used for the visualization of a particle volume scene element (\c Iparticle_volume_scene_element).
     /// 
-    /// \param[in]  render_mode     Rendering mode identifier (default value is PARTICLE_VOLUME_RENDER_MODE_RBF).
+    /// \param[in]  rendering_mode     Rendering mode identifier (default value is PARTICLE_VOLUME_RENDERING_MODE_RBF).
     /// 
-    virtual void                        set_rendering_mode(Particle_volume_render_mode render_mode) = 0;
+    virtual void                        set_rendering_mode(Particle_volume_rendering_mode rendering_mode) = 0;
     /// Returns the rendering mode used for rendering a particle volume scene element (\c Iparticle_volume_scene_element).
-    virtual Particle_volume_render_mode get_rendering_mode() const = 0;
+    virtual Particle_volume_rendering_mode get_rendering_mode() const = 0;
 
 
     /// Set the radial basis-function falloff kernel applied for the direct volume rendering mode.

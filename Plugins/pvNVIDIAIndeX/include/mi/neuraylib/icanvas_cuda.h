@@ -1,5 +1,5 @@
 /***************************************************************************************************
- * Copyright 2020 NVIDIA Corporation. All rights reserved.
+ * Copyright 2021 NVIDIA Corporation. All rights reserved.
  **************************************************************************************************/
 /// \file
 /// \brief Abstract interface for CUDA canvases
@@ -13,57 +13,60 @@ namespace mi {
 
 namespace neuraylib {
 
-class ITile_cuda;
-
 /** \addtogroup mi_neuray_rendering
 @{
 */
 
 /// Abstract interface for a canvas with CUDA device memory storage.
 ///
-/// The provided interface is similar to the #mi::neuraylib::ICanvas interface except that all
-/// memory resides in CUDA device memory for a single CUDA device identified by its CUDA device
-/// id. Using this interface instead of #mi::neuraylib::ICanvas allows the result of the rendering
-/// operation to remain on the GPU instead of transferring it back to main memory.
-/// From there it can be processed further, or be downloaded to main memory for other operations.
+/// This interface is similar to a #mi::neuraylib::ICanvas interface with only a single tile,
+/// except that all memory resides in CUDA device memory for a single CUDA device identified by
+/// its CUDA device id.
 class ICanvas_cuda : public
     mi::base::Interface_declare<0x211963f4,0x31c1,0x4583,0x81,0x4b,0x5,0x24,0x69,0xa8,0xc,0x27,
                                 neuraylib::ICanvas_base>
 {
 public:
-    /// Returns the CUDA device id that owns the device memory storage for this canvas
-    /// and its tiles.
+    /// Returns the CUDA device id that owns the device memory storage for this canvas.
     virtual Sint32 get_cuda_device_id() const = 0;
 
-    /// Returns the tile size in x direction.
-    virtual Uint32 get_tile_resolution_x() const = 0;
+    /// Returns the number of pixels in x direction
+    virtual Uint32 get_resolution_x() const = 0;
 
-    /// Returns the tile size in y direction.
-    virtual Uint32 get_tile_resolution_y() const = 0;
+    /// Returns the number of pixels in y direction
+    virtual Uint32 get_resolution_y() const = 0;
 
-    /// Returns the number of tiles in x direction.
-    virtual Uint32 get_tiles_size_x() const = 0;
-
-    /// Returns the number of tiles in y direction.
-    virtual Uint32 get_tiles_size_y() const = 0;
-
-    /// Returns the tile which contains a given pixel.
+    /// Returns a pointer to the raw pixel data according to the pixel type of the canvas.
     ///
-    /// \param pixel_x   The x coordinate of pixel with respect to the canvas.
-    /// \param pixel_y   The y coordinate of pixel with respect to the canvas.
-    /// \param layer     The layer of the pixel in the canvas.
-    /// \return          The tile that contains the pixel, or \c NULL in case of invalid
-    ///                  parameters.
-    virtual const ITile_cuda* get_tile( Uint32 pixel_x, Uint32 pixel_y, Uint32 layer = 0) const = 0;
-
-    /// Returns the tile which contains a given pixel.
+    /// This methods is used for fast, direct read access to the raw data. It is expected that
+    /// the data is stored in row-major layout without any padding. In case of #mi::Color, the
+    /// components are expected to be stored in RGBA order.
     ///
-    /// \param pixel_x   The x coordinate of pixel with respect to the canvas.
-    /// \param pixel_y   The y coordinate of pixel with respect to the canvas.
+    /// The total size of the buffer in bytes is \code x * y * bpp \endcode where \c x is the result
+    /// of #get_resolution_x(), \c y is the result of #get_resolution_y(), and \c bpp is the number
+    /// of bytes per pixel. \ifnot MDL_SDK_API The number of bytes per pixel is the product of
+    /// #mi::neuraylib::IImage_api::get_components_per_pixel() and
+    /// #mi::neuraylib::IImage_api::get_bytes_per_component() when passing the result of #get_type()
+    /// as pixel type. \endif
+    ///
     /// \param layer     The layer of the pixel in the canvas.
-    /// \return          The tile that contains the pixel, or \c NULL in case of invalid
-    ///                  parameters.
-    virtual ITile_cuda* get_tile( Uint32 pixel_x, Uint32 pixel_y, Uint32 layer = 0) = 0;
+    virtual const void* get_data(Uint32 layer = 0) const = 0;
+
+    /// Returns a pointer to the raw pixel data according to the pixel type of the canvas.
+    ///
+    /// This methods is used for fast, direct write access to the raw data. It is expected that
+    /// the data is stored in row-major layout without any padding. In case of #mi::Color, the
+    /// components are expected to be stored in RGBA order.
+    ///
+    /// The total size of the buffer in bytes is \code x * y * bpp \endcode where \c x is the result
+    /// of #get_resolution_x(), \c y is the result of #get_resolution_y(), and \c bpp is the number
+    /// of bytes per pixel. \ifnot MDL_SDK_API The number of bytes per pixel is the product of
+    /// #mi::neuraylib::IImage_api::get_components_per_pixel() and
+    /// #mi::neuraylib::IImage_api::get_bytes_per_component() when passing the result of #get_type()
+    /// as pixel type. \endif
+    ///
+    /// \param layer     The layer of the pixel in the canvas.
+    virtual void* get_data(Uint32 layer = 0) = 0;
 };
 
 /*@}*/ // end group mi_neuray_rendering

@@ -1,5 +1,5 @@
 /***************************************************************************************************
- * Copyright 2020 NVIDIA Corporation. All rights reserved.
+ * Copyright 2021 NVIDIA Corporation. All rights reserved.
  **************************************************************************************************/
 /// \file
 /// \brief Abstract interface for canvases
@@ -63,33 +63,9 @@ public:
 ///
 /// A canvas represents a two- or three-dimensional array of pixels. The size of this array is given
 /// by #mi::neuraylib::ICanvas_base::get_resolution_x() and
-/// #mi::neuraylib::ICanvas_base::get_resolution_y(). The pixels are grouped in rectangular tiles
-/// of size #get_tile_resolution_x() and #get_tile_resolution_y(). The number of tiles is given by
-/// #get_tiles_size_x() and #get_tiles_size_y() and it holds
-/// \code
-///     get_tiles_size_x() * get_tile_resolution_x() >= get_resolution_x()
-///     get_tiles_size_y() * get_tile_resolution_y() >= get_resolution_y()
-/// \endcode
+/// #mi::neuraylib::ICanvas_base::get_resolution_y().
 ///
-/// If the left-hand side is strictly larger than the right hand side then there are excess pixels
-/// which might have any color.
-///
-/// A pixel at position (\c canvas_pixel_x, \c canvas_pixel_y) of the canvas belongs to the
-/// tile (\c tile_number_x, \c tile_number_y) where \c tile_number_x and \c tile_number_y are
-/// computed as follows:
-/// \code
-///     tile_number_x = canvas_pixel_x / get_tile_resolution_x()
-///     tile_number_y = canvas_pixel_y / get_tile_resolution_y()
-/// \endcode
-///
-/// Within this tile the pixel has the coordinates (\c tile_pixel_x, \c tile_pixel_y) which are
-/// computed as follows
-/// \code
-///     tile_pixel_x = canvas_pixel_x % get_tile_resolution_x()
-///     tile_pixel_y = canvas_pixel_y % get_tile_resolution_y()
-/// \endcode
-///
-/// Optionally, there can be multiple layers of such tile arrays. The number of these layers is
+/// Optionally, there can be multiple layers. The number of these layers is
 /// given by #mi::neuraylib::ICanvas_base::get_layers_size(). The format a layer, i.e., the type of
 /// each pixel in that layer, is described by #mi::neuraylib::ICanvas_base::get_type().
 ///
@@ -108,35 +84,19 @@ class ICanvas : public
 {
 public:
 
-    /// Returns the tile size in x direction.
-    virtual Uint32 get_tile_resolution_x() const = 0;
-
-    /// Returns the tile size in y direction.
-    virtual Uint32 get_tile_resolution_y() const = 0;
-
-    /// Returns the number of tiles in x direction.
-    virtual Uint32 get_tiles_size_x() const = 0;
-
-    /// Returns the number of tiles in y direction.
-    virtual Uint32 get_tiles_size_y() const = 0;
-
-    /// Returns the tile which contains a given pixel.
+    /// Returns the tile for the given layer.
     ///
-    /// \param pixel_x   The x coordinate of pixel with respect to the canvas.
-    /// \param pixel_y   The y coordinate of pixel with respect to the canvas.
     /// \param layer     The layer of the pixel in the canvas.
     /// \return          The tile that contains the pixel, or \c NULL in case of invalid
     ///                  parameters.
-    virtual const ITile* get_tile( Uint32 pixel_x, Uint32 pixel_y, Uint32 layer = 0) const = 0;
+    virtual const ITile* get_tile( Uint32 layer = 0) const = 0;
 
-    /// Returns the tile which contains a given pixel.
+    /// Returns the tile for the given layer.
     ///
-    /// \param pixel_x   The x coordinate of pixel with respect to the canvas.
-    /// \param pixel_y   The y coordinate of pixel with respect to the canvas.
     /// \param layer     The layer of the pixel in the canvas.
     /// \return          The tile that contains the pixel, or \c NULL in case of invalid
     ///                  parameters.
-    virtual ITile* get_tile( Uint32 pixel_x, Uint32 pixel_y, Uint32 layer = 0) = 0;
+    virtual ITile* get_tile( Uint32 layer = 0) = 0;
 };
 
 /*@}*/ // end group mi_neuray_rendering

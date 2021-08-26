@@ -1,5 +1,5 @@
 /***************************************************************************************************
- * Copyright 2020 NVIDIA Corporation. All rights reserved.
+ * Copyright 2021 NVIDIA Corporation. All rights reserved.
  **************************************************************************************************/
 /// \file
 /// \brief Support for remote DMA transfers.
@@ -48,7 +48,7 @@ namespace neuraylib {
 /// in a transparent manner.
 ///
 class IRDMA_buffer : public
-    mi::base::Interface_declare<0xa2c75819,0x752a,0x4348,0x9f,0x62,0x95,0x5a,0x2a,0xcf,0xed,0x12>
+    mi::base::Interface_declare<0x9b7b00e6,0x9539,0x4a07,0x88,0x1a,0x9d,0xdd,0x91,0x5c,0x6d,0xfe>
 {
 public:
     /// Returns the ID of this buffer.
@@ -107,6 +107,9 @@ public:
     /// \return         The RDMA buffer or \c NULL if \p offset and \p size result in a memory
     ///                 region not completely in the original buffer.
     virtual IRDMA_buffer* duplicate( Size offset, Size size) = 0;
+
+    /// Return True if this is a GPU puffer and GPUDirect registration was successful.
+    virtual bool is_gpudirect() = 0;
 };
 
 /// The RDMA context works as a cache for RDMA buffers.

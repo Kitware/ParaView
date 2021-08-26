@@ -1,5 +1,5 @@
 /***************************************************************************************************
- * Copyright 2020 NVIDIA Corporation. All rights reserved.
+ * Copyright 2021 NVIDIA Corporation. All rights reserved.
  **************************************************************************************************/
 /// \file
 /// \brief Main \NeurayApiName interface.
@@ -40,7 +40,7 @@ namespace neuraylib {
 /// This is an object representing the \neurayLibraryName. Only one object of this type will exist
 /// at a time. It is used for configuration, startup and shutdown of the \neurayLibraryName.
 class INeuray : public
-    mi::base::Interface_declare<0xd075e1bd,0x6d30,0x43bc,0xbd,0x9c,0x15,0x3f,0x3c,0x30,0xc2,0xce>
+    mi::base::Interface_declare<0xa43c2343,0x8fdd,0x467d,0x8b,0xc1,0xe3,0x4e,0x2a,0x2f,0x39,0x13>
 {
 public:
     /// Returns the interface version of the \neurayLibraryName.
@@ -79,7 +79,6 @@ public:
     ///                    -  0: Success
     ///                    - -1: Unspecified failure.
     ///                    - -2: Authentication failure (challenge-response).
-    ///                    - -3: Authentication failure (SPM).
     ///                    - -4: Provided license expired.
     ///                    - -5: No professional GPU as required by the license in use was found.
     ///                    - -6: Authentication failure (FLEXlm).

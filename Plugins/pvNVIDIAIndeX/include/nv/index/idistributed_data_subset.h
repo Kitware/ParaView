@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2020 NVIDIA Corporation. All rights reserved.
+ * Copyright 2021 NVIDIA Corporation. All rights reserved.
  *****************************************************************************/
 /// \file   idistributed_data_subset.h
 /// \brief  Distributed subset interaces for a large-scale distributed datasets.
@@ -197,6 +197,40 @@ public:
     ///             the set up data subset representation. 
     ///
     virtual bool finalize() = 0;
+};
+
+class IDistributed_data_subset_device :
+    public mi::base::Interface_declare<0x469345b3,0x51e8,0x4a49,0xa7,0xb1,0x5,0xf7,0x85,0x5,0x7c,0xc2>
+{
+public:
+    /// Verifying the integrity of a device data-subset for the use by NVIDIA IndeX.
+    ///
+    /// If the data subset is in a valid state NVIDIA IndeX is able to use the
+    /// subset data to perform rendering and compute operations.
+    ///
+    /// The application, e.g., an importer or compute task, can verify whether the  
+    /// dataset is valid using this method anytime.
+    ///
+    /// \return     Returns \c true if the device data-subset is ready for use
+    ///             by NVIDIA IndeX. Even if the subset is already in a valid state
+    ///             an application can continue to extend the subsets data contents.
+    ///             If the provided data is insufficient for NVIDIA IndeX 
+    ///             to produce a valid data representation for the subset, then 
+    ///             \c false is returned.
+    ///
+    virtual bool is_valid() const = 0;
+
+    /// Returns the id of the device the data subset is residing on..
+    ///
+    /// \returns The device id the data subset is residing on, negative values indicate
+    ///          that the data is currently not stored on any device.
+    ///
+    virtual mi::Sint32  get_device_id() const = 0;
+
+    // #todo required for device subsets?
+    // * maybe a place to gather data and update internal structures once 
+    //   the application is done changing the device subset?
+    // virtual bool finalize() = 0;
 };
 
 /// Factory for creating an empty data subset for a specific distributed dataset type.

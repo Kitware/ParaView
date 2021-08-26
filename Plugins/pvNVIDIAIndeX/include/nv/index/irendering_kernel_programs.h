@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2020 NVIDIA Corporation. All rights reserved.
+ * Copyright 2021 NVIDIA Corporation. All rights reserved.
  *****************************************************************************/
 /// \file
 /// \brief Scene attribute representing user programmable rendering kernel
@@ -104,11 +104,11 @@ public:
     ///
     /// \param[in] include_name   Name by which the header can be included. Must not be null or an
     ///                           empty string.
-    /// \param[in] header_src     Header source code. If null, any existing entry will be removed.
+    /// \param[in] header_source  Header source code. If null, any existing entry will be removed.
     ///
     virtual void set_header(
         const char* include_name,
-        const char* header_src) = 0;
+        const char* header_source) = 0;
 
     /// Returns the header source code for a given name.
     ///
@@ -128,12 +128,12 @@ public:
     /// \param[in]  index             Index of the header, must be less than \c get_nb_headers().
     /// \param[out] include_name_out  Will be filled with a pointer to the name of the entry, or
     ///                               null if the index is invalid.
-    /// \param[out] header_src_out    Will be filled with a pointer to the header source code.
+    /// \param[out] header_source_out Will be filled with a pointer to the header source code.
     ///
     virtual void get_header(
         mi::Uint32   index,
         const char** include_name_out,
-        const char** header_src_out) const = 0;
+        const char** header_source_out) const = 0;
 
     /// Removes all headers from the attributes.
     ///

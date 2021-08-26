@@ -1,5 +1,5 @@
 /***************************************************************************************************
- * Copyright 2020 NVIDIA Corporation. All rights reserved.
+ * Copyright 2021 NVIDIA Corporation. All rights reserved.
  **************************************************************************************************/
 /// \file mi/base/handle.h
 /// \brief Smart-pointer handle class for interfaces, const and non-const version.
@@ -265,6 +265,16 @@ public:
 
     /// Access to the interface. Returns 0 for an invalid interface.
     Interface* get() const { return  m_iptr; }
+
+    /// Extracts the interface and releases the handle. Returns 0 for an invalid interface.
+    ///
+    /// Note that the owner takes responsible for managing the lifetime of the interface.
+    Interface* extract()
+    {
+        Interface* ptr = m_iptr;
+        m_iptr = 0;
+        return ptr;
+    }
 
     /// The dereference operator accesses the interface.
     ///

@@ -1,5 +1,5 @@
 /***************************************************************************************************
- * Copyright 2020 NVIDIA Corporation. All rights reserved.
+ * Copyright 2021 NVIDIA Corporation. All rights reserved.
  **************************************************************************************************/
 /// \file mi/math/vector.h
 /// \brief Math vector class template of fixed dimension with arithmetic operators and generic
@@ -355,6 +355,11 @@ public:
 #endif
     }
 
+#if (__cplusplus >= 201103L)
+    /// Default copy constructor.
+    Vector( const Vector<T,DIM>& vec ) = default;
+#endif
+
     /// Constructor from underlying storage type.
     inline Vector( const Vector_struct<T,DIM>& vec )
     {
@@ -653,7 +658,7 @@ public:
     inline bool normalize()
     {
         const T rec_length = T(1) / length( *this);
-        const bool result = isfinite( rec_length);
+        const bool result = isfinite( rec_length); //-V601 PVS
         if( result)
             (*this) *= rec_length;
         return result;

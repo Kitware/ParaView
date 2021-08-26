@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2020 NVIDIA Corporation. All rights reserved.
+ * Copyright 2021 NVIDIA Corporation. All rights reserved.
  *****************************************************************************/
 /// \file   idistributed_data_edit.h
 /// \brief  Interfaces for distributed data processing.
@@ -229,7 +229,7 @@ public:
 /// IRegular_heightfield_compute_task and passed to #edit().
 ///
 /// In order to be able to process the given heightfield patch, the calling distributed rendering
-/// algorithm (e.g., \c IDistributed_compute_algorithm) has to make sure to query the interface
+/// algorithm (e.g., \c IDistributed_data_job) has to make sure to query the interface
 /// only for those heightfield patches that are available on the present cluster host where the compute
 /// unit (fragment of the fragmented job) runs on, i.e., the height field's patch data needs to be
 /// available locally on that machine.

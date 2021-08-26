@@ -1,5 +1,5 @@
 /***************************************************************************************************
- * Copyright 2020 NVIDIA Corporation. All rights reserved.
+ * Copyright 2021 NVIDIA Corporation. All rights reserved.
  **************************************************************************************************/
 /// \file
 /// \brief API component that provides access to the database configuration.
@@ -63,6 +63,25 @@ public:
     /// \param[out] high_water   The current high water mark (in bytes).
     virtual void get_memory_limits( Size* low_water, Size* high_water) const = 0;
 
+    /// Configures tracking of memory usage of the database.
+    ///
+    /// Tracking the memory usage of the database incurs a small overhead, and is disabled by
+    /// default. It is only needed if memory limits are enabled (\see set_memory_limits()), or for
+    /// debugging.
+    ///
+    /// This can only be configured before \NeurayProductName has been started.
+    ///
+    /// \see #get_memory_usage_tracking()
+    ///
+    /// \param flag                 \c true to enable, \c false to disable memory usage tracking.
+    /// \return                     0, in case of success, -1 in case of failure.
+    virtual Sint32 set_memory_usage_tracking( bool flag) = 0;
+
+    /// Indicates whether tracking of memory usage of the database is enabled.
+    ///
+    /// \see #set_memory_usage_tracking()
+    virtual bool get_memory_usage_tracking() const = 0;
+
     /// Configures the directory for disk swapping.
     ///
     /// If no directory is configured (the default) disk swapping is disabled.
@@ -88,25 +107,6 @@ public:
     ///
     /// \return                  The configured directory, or \c NULL if disabled.
     virtual const char* get_disk_swapping() const = 0;
-
-    /// Configures tracking of memory usage of the database.
-    ///
-    /// Tracking the memory usage of the database incurs a small overhead, and is disabled by
-    /// default. It is only needed if memory limits are enabled (\see set_memory_limits()), or for
-    /// debugging.
-    ///
-    /// This can only be configured before \NeurayProductName has been started.
-    ///
-    /// \see #get_memory_usage_tracking()
-    ///
-    /// \param flag                 \c true to enable, \c false to disable memory usage tracking.
-    /// \return                     0, in case of success, -1 in case of failure.
-    virtual Sint32 set_memory_usage_tracking( bool flag) = 0;
-
-    /// Indicates whether tracking of memory usage of the database is enabled.
-    ///
-    /// \see #set_memory_usage_tracking()
-    virtual bool get_memory_usage_tracking() const = 0;
 };
 
 /*@}*/ // end group mi_neuray_configuration

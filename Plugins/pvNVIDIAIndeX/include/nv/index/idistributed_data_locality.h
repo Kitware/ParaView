@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2020 NVIDIA Corporation. All rights reserved.
+ * Copyright 2021 NVIDIA Corporation. All rights reserved.
  *****************************************************************************/
 /// \file  idistributed_data_locality.h
 /// \brief Interfaces for exposing the data distribution scheme.
@@ -63,6 +63,14 @@ class IDistributed_data_locality_query_mode :
     public mi::base::Interface_declare<0x841224fe, 0x3c17, 0x43b3, 0xa1, 0xc1, 0xba, 0x30, 0x72, 0xc8, 0x44, 0xf1>
 {
 public:
+    enum Query_mode_flags {
+        QUERY_MODE_NONE                     = 0x00u,    ///<
+        QUERY_MODE_IMPORT_UNAVAILABLE_DATA  = 0x01u,    ///< Indicates that data-subsets not yet imported should
+                                                        ///< be made available to compute operations.
+
+        QUERY_MODE_DEFAULT                  = QUERY_MODE_IMPORT_UNAVAILABLE_DATA    ///< Default query mode flag
+    };
+public:
     /// Query methods apply to a distributed dataset that is refered to by an unique identifier.
     ///
     /// Each query method applies to a single instance of a distributed dataset. The method 
@@ -75,6 +83,14 @@ public:
     ///             data store.
     ///
     virtual const mi::neuraylib::Tag_struct& get_distributed_data_tag() const = 0;
+
+    /// Should return a combination of \c Query_mode_flags to indicate required behavior
+    /// to NVIDIA IndeX related to, for example, how to handle currently unavailable
+    /// data subsets.
+    ///
+    /// \return     Returns a combination of \c Query_mode_flags.
+    /// 
+    virtual mi::Uint32 get_query_mode_flags() const = 0;
 };
 
 /// Implements a query method that selection all data subsets of a distributed dataset for distributed job execution.
@@ -105,6 +121,12 @@ public:
     ///             the entire distribute dataset.
     /// 
     virtual const mi::neuraylib::Tag_struct& get_distributed_data_tag() const { return m_distribute_data_tag; };
+
+    /// Implements the default query flags.
+    ///
+    /// \returns    Return the default query flags \c IDistributed_data_locality_query_mode::QUERY_MODE_DEFAULT
+    /// 
+    virtual mi::Uint32 get_query_mode_flags() const { return IDistributed_data_locality_query_mode::QUERY_MODE_DEFAULT; }
 
 private:
     mi::neuraylib::Tag_struct m_distribute_data_tag;  ///<! Unique distributed dataset identifier.
@@ -205,6 +227,12 @@ public:
     ///             the entire distributed dataset.
     /// 
     virtual const mi::neuraylib::Tag_struct& get_distributed_data_tag()           const { return m_distribute_data_tag; };
+
+    /// Implements the default query flags.
+    ///
+    /// \returns    Return the default query flags \c IDistributed_data_locality_query_mode::QUERY_MODE_DEFAULT
+    /// 
+    virtual mi::Uint32 get_query_mode_flags() const { return IDistributed_data_locality_query_mode::QUERY_MODE_DEFAULT; }
 
     /// Implements the spatial query method let determine data localities based on a spatial coverage.
     ///
@@ -350,6 +378,12 @@ public:
     /// 
     virtual const mi::neuraylib::Tag_struct& get_distributed_data_tag()           const { return m_distribute_data_tag; }
 
+    /// Implements the default query flags.
+    ///
+    /// \returns    Return the default query flags \c IDistributed_data_locality_query_mode::QUERY_MODE_DEFAULT
+    /// 
+    virtual mi::Uint32 get_query_mode_flags() const { return IDistributed_data_locality_query_mode::QUERY_MODE_DEFAULT; }
+
     /// Implements the spatial query method to determine data localities based on a 2D coverage.
     ///
     /// The 2D area represented by \c mi::math::Bbox_struct<mi::Float32, 2> specifies a spatial 
@@ -429,6 +463,13 @@ public:
     /// The distributed heightfield dataset
     /// \return     Returns the unique identifier that refers to the heightfield datset.
     virtual const mi::neuraylib::Tag_struct&             get_distributed_data_tag() const { return m_distribute_data_tag; }
+
+    /// Implements the default query flags.
+    ///
+    /// \returns    Return the default query flags \c IDistributed_data_locality_query_mode::QUERY_MODE_DEFAULT
+    /// 
+    virtual mi::Uint32 get_query_mode_flags() const { return IDistributed_data_locality_query_mode::QUERY_MODE_DEFAULT; }
+
     /// The locality query only considers patches that cover or intersect a given 2D spatial area.
     /// \return     Returns the 2D spatial area.
     virtual const mi::math::Bbox_struct<mi::Uint32, 2>&  get_spatial_coverage()     const { return m_spatial_coverage; }

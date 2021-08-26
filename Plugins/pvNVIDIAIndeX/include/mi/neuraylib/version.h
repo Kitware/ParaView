@@ -1,5 +1,5 @@
 /***************************************************************************************************
- * Copyright 2020 NVIDIA Corporation. All rights reserved.
+ * Copyright 2021 NVIDIA Corporation. All rights reserved.
  **************************************************************************************************/
 /// \file
 /// \brief Major and minor version number and an optional qualifier.
@@ -23,11 +23,13 @@
     @{
  */
 
-/// API version number.
+/// ABI version number.
 ///
 /// A change in this version number indicates that the binary compatibility
 /// of the interfaces offered through the shared library have changed.
-#define MI_NEURAYLIB_API_VERSION  40
+///
+/// Despite the name, this number tracks \em ABI changes, not \em API changes.
+#define MI_NEURAYLIB_API_VERSION  45
 
 // The following three to four macros define the API version.
 // The macros thereafter are defined in terms of the first four.
@@ -75,59 +77,135 @@
 
 /// Type of plugins for the \NeurayApiName.
 /// \see #mi::base::Plugin::get_type().
-#define MI_NEURAYLIB_PLUGIN_TYPE "neuray API v31"
+#define MI_NEURAYLIB_PLUGIN_TYPE "neuray API v35"
 
-// Enables features that were deprecated with version 9.1.
-//#define MI_NEURAYLIB_DEPRECATED_9_1
+// Enables features that were deprecated with version 11.1.
+// #define MI_NEURAYLIB_DEPRECATED_11_1
+
+// Prefixes names of deprecated methods unless deprecated features are enabled.
+#ifdef MI_NEURAYLIB_DEPRECATED_11_1
+#define MI_NEURAYLIB_DEPRECATED_METHOD_11_1(X) X
+#else
+#define MI_NEURAYLIB_DEPRECATED_METHOD_11_1(X) deprecated_##X
+#endif
+
+// Enables features that were deprecated with version 12.0.
+// #define MI_NEURAYLIB_DEPRECATED_12_0
+
+// Prefixes names of deprecated methods unless deprecated features are enabled.
+#ifdef MI_NEURAYLIB_DEPRECATED_12_0
+#define MI_NEURAYLIB_DEPRECATED_METHOD_12_0(X) X
+#else
+#define MI_NEURAYLIB_DEPRECATED_METHOD_12_0(X) deprecated_##X
+#endif
+
+// Enables features that were deprecated with version 12.1.
+// #define MI_NEURAYLIB_DEPRECATED_12_1
+
+// Prefixes names of deprecated methods unless deprecated features are enabled.
+#ifdef MI_NEURAYLIB_DEPRECATED_12_1
+#define MI_NEURAYLIB_DEPRECATED_METHOD_12_1(X) X
+#else
+#define MI_NEURAYLIB_DEPRECATED_METHOD_12_1(X) deprecated_##X
+#endif
+
 
 #ifdef MI_NEURAYLIB_DEPRECATED_LEGACY_MDL_API
-#warning Support for macro \
-    MI_NEURAYLIB_DEPRECATED_LEGACY_MDL_API \
-    has been removed
+#ifdef MI_PLATFORM_WINDOWS
+#pragma message("Support for macro MI_NEURAYLIB_DEPRECATED_LEGACY_MDL_API has been removed")
+#else
+#warning Support for macro MI_NEURAYLIB_DEPRECATED_LEGACY_MDL_API has been removed
+#endif
 #endif
 
 #ifdef MI_NEURAYLIB_DEPRECATED_ITRANSACTION_STORE_DEFAULT_PRIVACY_LEVEL_ZERO
+#ifdef MI_PLATFORM_WINDOWS
+#pragma message("Support for macro " \
+    "MI_NEURAYLIB_DEPRECATED_ITRANSACTION_STORE_DEFAULT_PRIVACY_LEVEL_ZERO " \
+    "has been removed")
+#else
 #warning Support for macro \
     MI_NEURAYLIB_DEPRECATED_ITRANSACTION_STORE_DEFAULT_PRIVACY_LEVEL_ZERO \
     has been removed
 #endif
+#endif
 
 #ifdef MI_NEURAYLIB_DEPRECATED_IDICE_TRANSACTION_STORE_DEFAULT_PRIVACY_LEVEL_ZERO
+#ifdef MI_PLATFORM_WINDOWS
+#pragma message("Support for macro " \
+    "MI_NEURAYLIB_DEPRECATED_IDICE_TRANSACTION_STORE_DEFAULT_PRIVACY_LEVEL_ZERO " \
+    "has been removed")
+#else
 #warning Support for macro \
     MI_NEURAYLIB_DEPRECATED_IDICE_TRANSACTION_STORE_DEFAULT_PRIVACY_LEVEL_ZERO \
     has been removed
 #endif
+#endif
 
 #ifdef MI_NEURAYLIB_DEPRECATED_NAMESPACE_MI_TRANSITION
+#ifdef MI_PLATFORM_WINDOWS
+#pragma message("Support for macro " \
+    "MI_NEURAYLIB_DEPRECATED_NAMESPACE_MI_TRANSITION has been removed")
+#else
 #warning Support for macro MI_NEURAYLIB_DEPRECATED_NAMESPACE_MI_TRANSITION has been removed
+#endif
 #endif
 
 #ifdef MI_NEURAYLIB_DEPRECATED_NO_EXPLICIT_TRANSACTION
+#ifdef MI_PLATFORM_WINDOWS
+#pragma message("Support for macro " \
+    "MI_NEURAYLIB_DEPRECATED_NO_EXPLICIT_TRANSACTION has been removed")
+#else
 #warning Support for macro MI_NEURAYLIB_DEPRECATED_NO_EXPLICIT_TRANSACTION has been removed
+#endif
 #endif
 
 #ifdef MI_NEURAYLIB_DEPRECATED_7_1
+#ifdef MI_PLATFORM_WINDOWS
+#pragma message("Support for macro MI_NEURAYLIB_DEPRECATED_7_1 has been removed")
+#else
 #warning Support for macro MI_NEURAYLIB_DEPRECATED_7_1 has been removed
+#endif
 #endif
 
 #ifdef MI_NEURAYLIB_DEPRECATED_7_2
+#ifdef MI_PLATFORM_WINDOWS
+#pragma message("Support for macro MI_NEURAYLIB_DEPRECATED_7_2 has been removed")
+#else
 #warning Support for macro MI_NEURAYLIB_DEPRECATED_7_2 has been removed
+#endif
 #endif
 
 #ifdef MI_NEURAYLIB_DEPRECATED_7_3
+#ifdef MI_PLATFORM_WINDOWS
+#pragma message("Support for macro MI_NEURAYLIB_DEPRECATED_7_3 has been removed")
+#else
 #warning Support for macro MI_NEURAYLIB_DEPRECATED_7_3 has been removed
+#endif
 #endif
 
 #ifdef MI_NEURAYLIB_DEPRECATED_8_0
+#ifdef MI_PLATFORM_WINDOWS
+#pragma message("Support for macro MI_NEURAYLIB_DEPRECATED_8_0 has been removed")
+#else
 #warning Support for macro MI_NEURAYLIB_DEPRECATED_8_0 has been removed
+#endif
 #endif
 
 #ifdef MI_NEURAYLIB_DEPRECATED_8_1
+#ifdef MI_PLATFORM_WINDOWS
+#pragma message("Support for macro MI_NEURAYLIB_DEPRECATED_8_1 has been removed")
+#else
 #warning Support for macro MI_NEURAYLIB_DEPRECATED_8_1 has been removed
+#endif
 #endif
 
 #ifdef MI_NEURAYLIB_DEPRECATED_9_1
+#ifdef MI_PLATFORM_WINDOWS
+#pragma message("Support for macro MI_NEURAYLIB_DEPRECATED_9_1 has been removed")
+#else
 #warning Support for macro MI_NEURAYLIB_DEPRECATED_9_1 has been removed
+#endif
 #endif
 
 /*@}*/ // end group mi_neuray_version

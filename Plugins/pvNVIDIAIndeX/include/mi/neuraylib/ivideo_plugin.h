@@ -1,5 +1,5 @@
 /***************************************************************************************************
- * Copyright 2020 NVIDIA Corporation. All rights reserved.
+ * Copyright 2021 NVIDIA Corporation. All rights reserved.
  **************************************************************************************************/
 /// \file
 /// \brief Video plugin API
@@ -25,7 +25,7 @@ class IPlugin_api;
 */
 
 /// Type of video encoder plugins
-#define MI_NEURAY_VIDEO_PLUGIN_TYPE "video v25"
+#define MI_NEURAY_VIDEO_PLUGIN_TYPE "video v28"
 
 /// A buffer for video data representing a frame.
 class IVideo_data : public

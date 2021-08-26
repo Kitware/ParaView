@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2020 NVIDIA Corporation. All rights reserved.
+ * Copyright 2021 NVIDIA Corporation. All rights reserved.
  *****************************************************************************/
 /// \file
 /// \brief Distributed subsets of particle volume datasets.
@@ -69,7 +69,7 @@ public:
 /// \ingroup nv_index_data_storage
 ///
 class IParticle_volume_subset :
-    public mi::base::Interface_declare<0x81b198e6,0x8eaf,0x49a8,0xb9,0xa3,0x66,0x62,0xc,0x27,0xb6,0x90,
+    public mi::base::Interface_declare<0x7694224f,0x93e6,0x4d5c,0x91,0x82,0xad,0x90,0x6a,0xb1,0x12,0x70,
                                        IDistributed_data_subset>
 {
 public:
@@ -92,12 +92,14 @@ public:
     /// \param[in]  fixed_particle_radius   The fixed particle radius to be used for the volume subset.
     ///                                     A value less than or equal to 0.0f indicates the use of
     ///                                     individual particle radii.
+    /// \param[in]  enable_particle_normals If true, then storage for particle normals is created.
     ///
     /// \return                             True if a storage generation succeeded, false otherwise.
     ///
     virtual bool generate_volume_storage(
         mi::Size    nb_subset_particles,
-        mi::Float32 fixed_particle_radius = -1.0f) = 0;
+        mi::Float32 fixed_particle_radius = -1.0f,
+        bool        enable_particle_normals = false) = 0;
 
     /// Returns the number of particles in the current subset.
     ///
@@ -134,6 +136,16 @@ public:
     /// \returns    The fixed radius set for the particle volume.
     ///
     virtual mi::Float32                                 get_fixed_radius() const = 0;
+
+    /// Get the particle normals buffer.
+    ///
+    /// After successfully generating the subsets volume data storage a valid pointer to the particle
+    /// normals buffer is returned. If a prior \c generate_volume_storage call failed nullptr is returned.
+    ///
+    /// \returns    A pointer to the internal normals buffer.
+    ///
+    virtual mi::math::Vector_struct<mi::Float32, 3>*    get_normals_buffer() const = 0;
+
 
     /// Get a particle attributes buffer.
     ///

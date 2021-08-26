@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2020 NVIDIA Corporation. All rights reserved.
+ * Copyright 2021 NVIDIA Corporation. All rights reserved.
  *****************************************************************************/
 /// \file
 /// \brief Generic camera
@@ -30,7 +30,7 @@ namespace index {
 /// as an axis is defined by a vector which represents "straight up"
 /// (the <em>up vector</em>).
 ///
-/// Instances of \c ICamera implementations are created by \c ISession::create_camera().
+/// Instances of \c ICamera implementations are created by \c IScene::create_camera().
 ///
 /// Note: ICamera is not a IScene_element.
 ///

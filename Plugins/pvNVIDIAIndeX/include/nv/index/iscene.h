@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2020 NVIDIA Corporation. All rights reserved.
+ * Copyright 2021 NVIDIA Corporation. All rights reserved.
  *****************************************************************************/
 /// \file
 /// \brief Interface for a scene
@@ -12,6 +12,7 @@
 #include <mi/base/uuid.h>
 
 #include <nv/index/iattribute.h>
+#include <nv/index/icamera.h>
 #include <nv/index/icorner_point_grid.h>
 #include <nv/index/idistributed_data_import_callback.h>
 #include <nv/index/iheight_field_scene_element.h>
@@ -23,6 +24,7 @@
 #include <nv/index/ishape.h>
 #include <nv/index/isparse_volume_scene_element.h>
 #include <nv/index/itriangle_mesh_scene_element.h>
+#include <nv/index/ivdb_scene_element.h>
 
 namespace nv
 {
@@ -45,8 +47,8 @@ namespace index
 /// \ingroup nv_index_scene_description
 ///
 class IScene :
-    public mi::base::Interface_declare<0xaab98430,0xd6c5,0x49c5,0xbf,0x06,0x12,0xae,0xe5,0x17,0x71,0x8c,
-                                       nv::index::IScene_group>
+        public mi::base::Interface_declare<0xf28ba414,0x42dd,0x4836,0x9e,0xbc,0x0c,0x53,0x52,0xd9,0xf7,0x72,
+                                           nv::index::IScene_group>
 {
 public:
     ///////////////////////////////////////////////////////////////////////////////////
@@ -89,6 +91,27 @@ public:
     /// Returns the global scene transformation matrix.
     /// \return transformation matrix
     virtual mi::math::Matrix_struct<mi::Float32, 4, 4> get_transform_matrix() const = 0;
+    ///@}
+
+    ///////////////////////////////////////////////////////////////////////////////////
+    /// \name Creating cameras.
+    ///@{
+
+    /// Creates a new camera of the given type, e.g. \c IPerspective_camera or
+    /// \c IOrthographic_camera.
+    ///
+    /// \param[in] class_id Identifier of the type of camera.
+    /// \return The new \c ICamera
+    virtual ICamera* create_camera(const mi::base::Uuid& class_id) const = 0;
+
+    /// Creates a new camera of the given type.
+    ///
+    /// \return The new \c ICamera
+    template<class T>
+    T* create_camera() const
+    {
+        return static_cast<T*>( create_camera(typename T::IID()) );
+    }
     ///@}
 
     ///////////////////////////////////////////////////////////////////////////////////
@@ -225,6 +248,22 @@ public:
     ///
     virtual IParticle_volume_scene_element* create_particle_volume(
         const mi::math::Bbox_struct<mi::Float32, 3> &           ijk_bbox,
+        const mi::math::Matrix_struct<mi::Float32, 4, 4>&       transform_matrix,
+        nv::index::IDistributed_data_import_callback*           importer_callback,
+        mi::neuraylib::IDice_transaction*                       dice_transaction) const = 0;
+
+    /// Creates a new VDB scene element from the given import configuration, but does not yet
+    /// add it to the scene description.
+    ///
+    /// \param[in] object_space_bbox            The object space bounding box.
+    /// \param[in] transform_matrix             Transformation matrix from object to global space.
+    /// \param[in] importer_callback            Distributed data import callback function.
+    /// \param[in] dice_transaction             The DiCE transaction.
+    ///
+    /// \return                                 The new \c IVDB_scene_element instance.
+    ///
+    virtual IVDB_scene_element* create_vdb_scene_element(
+        const mi::math::Bbox_struct<mi::Float32, 3> &           object_space_bbox,
         const mi::math::Matrix_struct<mi::Float32, 4, 4>&       transform_matrix,
         nv::index::IDistributed_data_import_callback*           importer_callback,
         mi::neuraylib::IDice_transaction*                       dice_transaction) const = 0;

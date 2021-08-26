@@ -1,5 +1,5 @@
 /***************************************************************************************************
- * Copyright 2020 NVIDIA Corporation. All rights reserved.
+ * Copyright 2021 NVIDIA Corporation. All rights reserved.
  **************************************************************************************************/
 /// \file
 /// \brief Database transactions.
@@ -531,9 +531,8 @@ public:
     /// indices").
     ///
     /// \param root_element   The root of the subgraph to traverse.
-    /// \param name_pattern   A regular expression that acts as filter on the names of returned
-    ///                       scene elements. The regular expression must be compliant to extended
-    ///                       regular expressions as defined in POSIX 1003.2. The regular expression
+    /// \param name_pattern   An extended regular expression that acts as filter on the names of
+    ///                       returned scene elements (see [\ref OGBS7]). The regular expression
     ///                       is matched to \em any \em part of the scene element name, not just to
     ///                       the \em entire scene element name. The value \c NULL is handled as
     ///                       \c ".*".

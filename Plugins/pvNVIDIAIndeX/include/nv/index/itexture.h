@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2020 NVIDIA Corporation. All rights reserved.
+ * Copyright 2021 NVIDIA Corporation. All rights reserved.
  *****************************************************************************/
 /// \file
 /// \brief Scene attribute representing a texture element
@@ -57,40 +57,49 @@ public:
     ///
     virtual Pixel_format get_pixel_format() const = 0;
 
-    /// Set the texture data. It resets the texture with a pointer to a raw
-    /// texture data according to the pixel format.
+    /// Set the texture data from a buffer.
     ///
-    /// \param[in] pixel_data  A pointer to the raw pixel data
+    /// \param[in] pixel_data  Raw pixel data, this will be be copied.
     ///
-    /// \param[in] width       The horizontal resolution of the texture
+    /// \param[in] width       The horizontal resolution of the texture.
     ///
-    /// \param[in] height      The vertical resolution of the texture
+    /// \param[in] height      The vertical resolution of the texture.
     ///
-    /// \param[in] format      The pixel format of the texture:
-    ///                        RGBA_UINT8 (default) or RGBA_FLOAT32
+    /// \param[in] format      The pixel format of the texture.
     ///
-    /// The total size of the buffer in bytes is \code x * y * sizeof(t)
-    /// \endcode where \c x is the result of #get_resolution_x(), \c y is the
-    /// result of #get_resolution_y(), and \c t is the size of type as returned
-    /// by #get_pixel_format().
+    /// \return True on success, or false if the input is invalid.
     ///
-    /// \return  pixel data.
+    /// The total size in bytes of the buffer referenced by \c pixel_data must be \code width *
+    /// height * t \endcode where \c t is the size of a pixel according to \c format.
     ///
-    virtual void set_pixel_data(
+    virtual bool set_pixel_data(
         const void*  pixel_data,
         mi::Uint32   width,
         mi::Uint32   height,
         Pixel_format format) = 0;
+
+    /// Set the texture data from a canvas.
+    ///
+    /// \param[in] canvas  Canvas from which the pixels will be copied.
+    ///
+    /// \param[in] format  The pixel format of the texture. If the pixel type of the canvas is
+    ///                    different, its data will be converted accordingly.
+    ///
+    /// \return True on success, or false if the input is invalid.
+    ///
+    virtual bool set_pixel_data(
+        const mi::neuraylib::ICanvas* canvas,
+        Pixel_format                  format) = 0;
 
     /// Get the texture data. It returns a pointer to the raw texture data
     /// according to the pixel format.
     ///
     /// The total size of the buffer in bytes is \code x * y * sizeof(t)
     /// \endcode where \c x is the result of #get_resolution_x(), \c y is the
-    /// result of #get_resolution_y(), and \c t is the size of type as returned
-    /// by #get_pixel_format().
+    /// result of #get_resolution_y(), and \c t is the size of a pixel of the type
+    /// returned by #get_pixel_format().
     ///
-    /// \return  Returns the raw pointer to the pixel data.
+    /// \return  raw pointer to the pixel data.
     ///
     virtual const void* get_pixel_data() const = 0;
 };

@@ -1,5 +1,5 @@
 /***************************************************************************************************
- * Copyright 2020 NVIDIA Corporation. All rights reserved.
+ * Copyright 2021 NVIDIA Corporation. All rights reserved.
  **************************************************************************************************/
 /// \file mi/base/config.h
 /// \brief Configuration of the Base API.
@@ -20,7 +20,7 @@
  */
 
 // The current copyright year string.
-#define MI_COPYRIGHT_YEARS_STRING "2020"
+#define MI_COPYRIGHT_YEARS_STRING "2021"
 
 // The NVIDIA company name string for copyrights etc.
 #define MI_COPYRIGHT_COMPANY_STRING "NVIDIA Corporation"
@@ -182,6 +182,19 @@
 #define MI_COMPILER_ICC __ICC
 #endif // !defined(MI_COMPILER_ICC)
 
+
+#elif defined(__GNUC__) && defined(__clang__) // #elif defined(__clang__)
+
+#ifndef MI_SKIP_COMPILER_VERSION_CHECK
+#if !defined(MI_COMPILER_CLANG)
+#define MI_COMPILER_CLANG __clang__ 
+#endif // !defined(MI_COMPILER_CLANG)
+
+#if !defined(MI_COMPILER_GCC)
+#define MI_COMPILER_GCC __GNUC__
+#endif // !defined(MI_COMPILER_GCC)
+#endif // MI_SKIP_COMPILER_VERSION_CHECK
+
 #elif defined(__GNUC__) && !defined(__ICC) // #elif defined(__ICC)
 
 #ifndef MI_SKIP_COMPILER_VERSION_CHECK
@@ -297,6 +310,15 @@
 #  endif
 #endif
 
+#ifdef __CUDACC__
+#define MI_HOST_DEVICE_INLINE __host__ __device__ __forceinline__
+#else
+#ifdef __cplusplus
+#define MI_HOST_DEVICE_INLINE MI_FORCE_INLINE
+#else
+#define MI_HOST_DEVICE_INLINE
+#endif
+#endif
 
 #ifdef MI_PLATFORM_WINDOWS
 /// The operating system specific default filename extension for shared libraries (DLLs)

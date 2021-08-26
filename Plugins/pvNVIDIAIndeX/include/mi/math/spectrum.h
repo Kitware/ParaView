@@ -1,5 +1,5 @@
 /***************************************************************************************************
- * Copyright 2020 NVIDIA Corporation. All rights reserved.
+ * Copyright 2021 NVIDIA Corporation. All rights reserved.
  **************************************************************************************************/
 /// \file mi/math/spectrum.h
 /// \brief %Spectrum class with floating point elements and operations.
@@ -104,6 +104,11 @@ public:
 #endif
     }
 
+#if (__cplusplus >= 201103L)
+    /// Default copy constructor.
+    Spectrum( const Spectrum& s ) = default;
+#endif
+
     /// Constructor from underlying storage type.
     inline Spectrum( const Spectrum_struct& s)
     {
@@ -173,14 +178,14 @@ public:
     }
 
     /// Accesses the \c i-th spectrum element, <tt>0 <= i < 3</tt>.
-    inline const Float32& operator[]( Size i) const
+    MI_HOST_DEVICE_INLINE const Float32& operator[]( Size i) const
     {
         mi_math_assert_msg( i < SIZE, "precondition");
         return c[i];
     }
 
     /// Accesses the \c i-th spectrum element, <tt>0 <= i < 3</tt>.
-    inline Float32& operator[]( Size i)
+    MI_HOST_DEVICE_INLINE Float32& operator[]( Size i)
     {
         mi_math_assert_msg( i < SIZE, "precondition");
         return c[i];
@@ -833,28 +838,28 @@ inline bool isnan MI_PREVENT_MACRO_EXPAND (const Spectrum& c)
 }
 
 /// Encodes a spectrum into RGBE representation.
-inline void to_rgbe( const Spectrum& c, Uint32& rgbe)
+MI_HOST_DEVICE_INLINE void to_rgbe( const Spectrum& c, Uint32& rgbe)
 {
     mi_math_assert_msg( c.size() == 3, "precondition");
     to_rgbe( &c[0], rgbe);
 }
 
 /// Encodes a spectrum into RGBE representation.
-inline void to_rgbe( const Spectrum& c, Uint8 rgbe[4])
+MI_HOST_DEVICE_INLINE void to_rgbe( const Spectrum& c, Uint8 rgbe[4])
 {
     mi_math_assert_msg( c.size() == 3, "precondition");
     to_rgbe( &c[0], rgbe);
 }
 
 /// Decodes a color from RGBE representation.
-inline void from_rgbe( const Uint8 rgbe[4], Spectrum& c)
+MI_HOST_DEVICE_INLINE void from_rgbe( const Uint8 rgbe[4], Spectrum& c)
 {
     mi_math_assert_msg( c.size() == 3, "precondition");
     from_rgbe( rgbe, &c[0]);
 }
 
 /// Decodes a color from RGBE representation.
-inline void from_rgbe( const Uint32 rgbe, Spectrum& c)
+MI_HOST_DEVICE_INLINE void from_rgbe( const Uint32 rgbe, Spectrum& c)
 {
     mi_math_assert_msg( c.size() == 3, "precondition");
     from_rgbe( rgbe, &c[0]);

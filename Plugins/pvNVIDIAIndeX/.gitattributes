@@ -1,1 +1,4 @@
 include/**    -format.clang-format
+
+# prevent pre-commit hook from failing with "leftover conflict marker" due to "=======" in the file
+pvNVIDIAIndeX-license.txt   conflict-marker-size=1000

@@ -1,5 +1,5 @@
 /***************************************************************************************************
- * Copyright 2020 NVIDIA Corporation. All rights reserved.
+ * Copyright 2021 NVIDIA Corporation. All rights reserved.
  **************************************************************************************************/
 /// \file mi/math/function.h
 /// \brief Math functions and function templates on simple types or generic container and vector
@@ -335,8 +335,10 @@ inline Float32 log( Float32 s) { return std::log(s); }
 inline Float64 log( Float64 s) { return std::log(s); }
 
 
+#ifndef __CUDACC__
 using mi::base::min;
 using mi::base::max;
+#endif
 using mi::base::abs;
 
 
@@ -846,6 +848,15 @@ using std::isnan;
 #endif
 
 
+#ifndef __CUDA_ARCH__
+inline float uint_as_float(const unsigned v)
+{ return base::binary_cast<float>(v);}
+
+inline unsigned float_as_uint(const float v)
+{ return base::binary_cast<unsigned>(v);}
+#endif
+
+
 /// Checks a single-precision floating point number for "infinity".
 ///
 /// The methods relies on the IEEE 754 floating-point standard.
@@ -982,23 +993,23 @@ inline Float64 tan( Float64 a) { return std::tan(a); }
 
 
 /// Encodes a color into RGBE representation.
-inline void to_rgbe( const Float32 color[3], Uint32& rgbe)
+MI_HOST_DEVICE_INLINE void to_rgbe( const Float32 color[3], Uint32& rgbe)
 {
     Float32 c[3];
-    c[0] = mi::base::max( color[0], 0.0f);
-    c[1] = mi::base::max( color[1], 0.0f);
-    c[2] = mi::base::max( color[2], 0.0f);
+    c[0] = max( color[0], 0.0f);
+    c[1] = max( color[1], 0.0f);
+    c[2] = max( color[2], 0.0f);
 
-    const Float32 max = mi::base::max( mi::base::max( c[0], c[1]), c[2]);
+    const Float32 m = max( max( c[0], c[1]), c[2]);
 
     // should actually be -126 or even -128, but avoid precision problems / denormalized numbers
-    if( max <= 7.5231631727e-37f) // ~2^(-120)
+    if( m <= 7.5231631727e-37f) // ~2^(-120)
         rgbe = 0;
-    else if( max >= 1.7014118346046923173168730371588e+38f) // 2^127
+    else if( m >= 1.7014118346046923173168730371588e+38f) // 2^127
         rgbe = 0xFFFFFFFFu;
     else {
-        const Uint32  e = base::binary_cast<Uint32>( max) & 0x7F800000u;
-        const Float32 v = base::binary_cast<Float32>( 0x82800000u - e);
+        const Uint32  e = float_as_uint( m) & 0x7F800000u;
+        const Float32 v = uint_as_float( 0x82800000u - e);
 
         rgbe =  Uint32( c[0] * v)
              | (Uint32( c[1] * v) <<  8)
@@ -1008,23 +1019,23 @@ inline void to_rgbe( const Float32 color[3], Uint32& rgbe)
 }
 
 /// Encodes a color into RGBE representation.
-inline void to_rgbe( const Float32 color[3], Uint8 rgbe[4])
+MI_HOST_DEVICE_INLINE void to_rgbe( const Float32 color[3], Uint8 rgbe[4])
 {
     Float32 c[3];
-    c[0] = mi::base::max( color[0], 0.0f);
-    c[1] = mi::base::max( color[1], 0.0f);
-    c[2] = mi::base::max( color[2], 0.0f);
+    c[0] = max( color[0], 0.0f);
+    c[1] = max( color[1], 0.0f);
+    c[2] = max( color[2], 0.0f);
 
-    const Float32 max = mi::base::max( mi::base::max( c[0], c[1]), c[2]);
+    const Float32 m = max( max( c[0], c[1]), c[2]);
 
     // should actually be -126 or even -128, but avoid precision problems / denormalized numbers
-    if( max <= 7.5231631727e-37f) // ~2^(-120)
+    if( m <= 7.5231631727e-37f) // ~2^(-120)
         rgbe[0] = rgbe[1] = rgbe[2] = rgbe[3] = 0;
-    else if( max >= 1.7014118346046923173168730371588e+38f) // 2^127
+    else if( m >= 1.7014118346046923173168730371588e+38f) // 2^127
         rgbe[0] = rgbe[1] = rgbe[2] = rgbe[3] = 255;
     else {
-        const Uint32  e = base::binary_cast<Uint32>( max) & 0x7F800000u;
-        const Float32 v = base::binary_cast<Float32>( 0x82800000u - e);
+        const Uint32  e = float_as_uint( m) & 0x7F800000u;
+        const Float32 v = uint_as_float( 0x82800000u - e);
 
         rgbe[0] = Uint8( c[0] * v);
         rgbe[1] = Uint8( c[1] * v);
@@ -1034,7 +1045,7 @@ inline void to_rgbe( const Float32 color[3], Uint8 rgbe[4])
 }
 
 /// Decodes a color from RGBE representation.
-inline void from_rgbe( const Uint8 rgbe[4], Float32 color[3])
+MI_HOST_DEVICE_INLINE void from_rgbe( const Uint8 rgbe[4], Float32 color[3])
 {
     if( rgbe[3] == 0) {
         color[0] = color[1] = color[2] = 0.0f;
@@ -1042,16 +1053,16 @@ inline void from_rgbe( const Uint8 rgbe[4], Float32 color[3])
     }
 
     const Uint32  e = (static_cast<Uint32>( rgbe[3]) << 23) - 0x800000u;
-    const Float32 v = base::binary_cast<Float32>( e);
+    const Float32 v = uint_as_float( e);
     const Float32 c = static_cast<Float32>( 1.0 - 0.5/256.0) * v;
 
-    color[0] = base::binary_cast<Float32>( e | (static_cast<Uint32>( rgbe[0]) << 15)) - c;
-    color[1] = base::binary_cast<Float32>( e | (static_cast<Uint32>( rgbe[1]) << 15)) - c;
-    color[2] = base::binary_cast<Float32>( e | (static_cast<Uint32>( rgbe[2]) << 15)) - c;
+    color[0] = uint_as_float( e | (static_cast<Uint32>( rgbe[0]) << 15)) - c;
+    color[1] = uint_as_float( e | (static_cast<Uint32>( rgbe[1]) << 15)) - c;
+    color[2] = uint_as_float( e | (static_cast<Uint32>( rgbe[2]) << 15)) - c;
 }
 
 /// Decodes a color from RGBE representation.
-inline void from_rgbe( const Uint32 rgbe, Float32 color[3])
+MI_HOST_DEVICE_INLINE void from_rgbe( const Uint32 rgbe, Float32 color[3])
 {
     const Uint32 rgbe3 = rgbe & 0xFF000000u;
     if( rgbe3 == 0) {
@@ -1060,12 +1071,12 @@ inline void from_rgbe( const Uint32 rgbe, Float32 color[3])
     }
 
     const Uint32  e = (rgbe3 >> 1) - 0x800000u;
-    const Float32 v = base::binary_cast<Float32>( e);
+    const Float32 v = uint_as_float( e);
     const Float32 c = static_cast<Float32>( 1.0 - 0.5/256.0) * v;
 
-    color[0] = base::binary_cast<Float32>( e | ((rgbe << 15) & 0x7F8000u)) - c;
-    color[1] = base::binary_cast<Float32>( e | ((rgbe <<  7) & 0x7F8000u)) - c;
-    color[2] = base::binary_cast<Float32>( e | ((rgbe >>  1) & 0x7F8000u)) - c;
+    color[0] = uint_as_float( e | ((rgbe << 15) & 0x7F8000u)) - c;
+    color[1] = uint_as_float( e | ((rgbe <<  7) & 0x7F8000u)) - c;
+    color[2] = uint_as_float( e | ((rgbe >>  1) & 0x7F8000u)) - c;
 }
 
 
