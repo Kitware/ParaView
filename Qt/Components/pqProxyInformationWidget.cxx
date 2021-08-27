@@ -170,8 +170,7 @@ void pqArraysModel::setDataInformation(vtkPVDataInformation* dinfo)
     {
       for (int kk = 0, max = dsa->GetNumberOfArrays(); kk < max; ++kk)
       {
-        this->ArrayInformations.push_back(
-          std::pair<int, vtkSmartPointer<vtkPVArrayInformation>>(cc, dsa->GetArrayInformation(kk)));
+        this->ArrayInformations.emplace_back(cc, dsa->GetArrayInformation(kk));
       }
     }
   }
