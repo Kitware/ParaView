@@ -46,8 +46,8 @@ class vtkVRTrackStyle : public vtkVRInteractorStyle
 {
 public:
   static vtkVRTrackStyle* New();
-  vtkTypeMacro(vtkVRTrackStyle, vtkVRInteractorStyle) void PrintSelf(
-    ostream& os, vtkIndent indent) override;
+  vtkTypeMacro(vtkVRTrackStyle, vtkVRInteractorStyle);
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   int GetControlledPropertySize() override { return 16; }
 

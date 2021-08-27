@@ -46,8 +46,8 @@ class vtkVRSpaceNavigatorGrabWorldStyle : public vtkVRInteractorStyle
 {
 public:
   static vtkVRSpaceNavigatorGrabWorldStyle* New();
-  vtkTypeMacro(vtkVRSpaceNavigatorGrabWorldStyle, vtkVRInteractorStyle) void PrintSelf(
-    ostream& os, vtkIndent indent) override;
+  vtkTypeMacro(vtkVRSpaceNavigatorGrabWorldStyle, vtkVRInteractorStyle);
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
 protected:
   vtkVRSpaceNavigatorGrabWorldStyle();

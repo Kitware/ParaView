@@ -43,8 +43,8 @@ class vtkVRInteractorStyleFactory : public vtkObject
 {
 public:
   static vtkVRInteractorStyleFactory* New();
-  vtkTypeMacro(vtkVRInteractorStyleFactory, vtkObject) void PrintSelf(
-    ostream& os, vtkIndent indent) override;
+  vtkTypeMacro(vtkVRInteractorStyleFactory, vtkObject);
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   // Description:
   // Get the singleton instance of this class

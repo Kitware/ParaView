@@ -37,8 +37,8 @@ class vtkScalarsToColors;
 class VTKREMOTINGVIEWS_EXPORT vtkPointGaussianRepresentation : public vtkPVDataRepresentation
 {
 public:
-  vtkTypeMacro(vtkPointGaussianRepresentation,
-    vtkPVDataRepresentation) static vtkPointGaussianRepresentation* New();
+  vtkTypeMacro(vtkPointGaussianRepresentation, vtkPVDataRepresentation);
+  static vtkPointGaussianRepresentation* New();
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
   int ProcessViewRequest(vtkInformationRequestKey* request_type, vtkInformation* inInfo,
