@@ -38,8 +38,6 @@
 #include "vtkIdTypeArray.h" // For ivars
 #include <algorithm>        // For ivars
 #include <map>              // For ivars
-#include <map>              // For ivars
-#include <string>           // For ivars
 #include <string>           // For ivars
 #include <vector>           // For ivars
 

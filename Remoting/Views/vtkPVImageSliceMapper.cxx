@@ -23,7 +23,6 @@
 #include "vtkRenderWindow.h"
 #include "vtkRenderer.h"
 #include "vtkScalarsToColors.h"
-#include "vtkScalarsToColors.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
 
 #include "vtkCellArray.h"

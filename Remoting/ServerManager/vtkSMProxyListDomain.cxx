@@ -19,7 +19,6 @@
 #include "vtkObjectFactory.h"
 #include "vtkPVProxyDefinitionIterator.h"
 #include "vtkPVXMLElement.h"
-#include "vtkPVXMLElement.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMProxy.h"
 #include "vtkSMProxyDefinitionManager.h"

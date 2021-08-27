@@ -58,7 +58,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMSession.h"
 #include "vtkSMSessionClient.h"
 #include "vtkSMSessionProxyManager.h"
-#include "vtkSMSessionProxyManager.h"
 #include "vtkSMSourceProxy.h"
 #include "vtkSMStringVectorProperty.h"
 #include "vtkSmartPointer.h"

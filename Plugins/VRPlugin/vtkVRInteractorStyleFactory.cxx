@@ -43,9 +43,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkVRSkeletonStyle.h"
 #include "vtkVRSpaceNavigatorGrabWorldStyle.h"
 #include "vtkVRStylusStyle.h"
-#include "vtkVRStylusStyle.h"
 #include "vtkVRTrackStyle.h"
-#include "vtkVRVirtualHandStyle.h"
 #include "vtkVRVirtualHandStyle.h"
 
 //-----------------------------------------------------------------------------

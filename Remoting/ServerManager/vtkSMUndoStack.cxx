@@ -23,7 +23,6 @@
 #include "vtkSMMessage.h"
 #include "vtkSMProxyLocator.h"
 #include "vtkSMProxyManager.h"
-#include "vtkSMProxyManager.h"
 #include "vtkSMRemoteObjectUpdateUndoElement.h"
 #include "vtkSMSession.h"
 #include "vtkSMStateLocator.h"

@@ -62,7 +62,6 @@
 #include "vtkXMLPolyDataWriter.h"
 // Filters
 #include "vtkAppendPolyData.h"
-#include "vtkAppendPolyData.h"
 #include "vtkCleanPolyData.h"
 #include "vtkClipPolyData.h"
 #include "vtkContourFilter.h"

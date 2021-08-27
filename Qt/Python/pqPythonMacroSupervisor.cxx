@@ -44,7 +44,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QDir>
 #include <QFile>
 #include <QFileInfo>
-#include <QFileInfo>
 #include <QMenu>
 #include <QPointer>
 #include <QSet>

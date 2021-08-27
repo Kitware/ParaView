@@ -18,7 +18,6 @@
 #include "vtkByteSwap.h"
 #include "vtkCallbackCommand.h"
 #include "vtkCellArray.h"
-#include "vtkCellArray.h"
 #include "vtkCellData.h"
 #include "vtkDataArraySelection.h"
 #include "vtkErrorCode.h"

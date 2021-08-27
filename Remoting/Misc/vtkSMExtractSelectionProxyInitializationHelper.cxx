@@ -17,7 +17,6 @@
 #include "vtkObjectFactory.h"
 #include "vtkSMInputProperty.h"
 #include "vtkSMProperty.h"
-#include "vtkSMProperty.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMProxy.h"
 #include "vtkSMSessionProxyManager.h"

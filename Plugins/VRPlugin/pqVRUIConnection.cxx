@@ -34,7 +34,6 @@
 #include "pqActiveObjects.h"
 #include "pqView.h"
 #include "vtkMath.h"
-#include "vtkMath.h"
 #include "vtkMatrix4x4.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVXMLElement.h"

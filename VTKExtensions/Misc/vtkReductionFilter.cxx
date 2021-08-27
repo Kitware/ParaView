@@ -40,7 +40,6 @@
 #include "vtkTrivialProducer.h"
 
 #include <sstream>
-#include <sstream>
 #include <vector>
 
 vtkStandardNewMacro(vtkReductionFilter);

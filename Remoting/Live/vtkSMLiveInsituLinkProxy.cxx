@@ -16,7 +16,6 @@
 
 #include "vtkClientServerStream.h"
 #include "vtkCommand.h"
-#include "vtkCommand.h"
 #include "vtkLiveInsituLink.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"

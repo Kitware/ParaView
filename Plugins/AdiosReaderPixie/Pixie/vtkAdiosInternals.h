@@ -54,7 +54,6 @@ using std::ostringstream;
 #include <vtkCommunicator.h>
 #include <vtkMPI.h>
 #include <vtkMPICommunicator.h>
-#include <vtkMPICommunicator.h>
 #include <vtkMultiProcessController.h>
 
 extern "C" {

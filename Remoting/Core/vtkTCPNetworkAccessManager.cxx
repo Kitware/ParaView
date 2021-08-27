@@ -19,7 +19,6 @@
 #include "vtkObjectFactory.h"
 #include "vtkServerSocket.h"
 #include "vtkSmartPointer.h"
-#include "vtkSmartPointer.h"
 #include "vtkSocketCommunicator.h"
 #include "vtkSocketController.h"
 #include "vtkTimerLog.h"

@@ -51,7 +51,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QPainterPath>
 #include <QPen>
 #include <QPixmap>
-#include <QPixmap>
 #include <QSize>
 
 class pqPresetToPixmap::pqInternals

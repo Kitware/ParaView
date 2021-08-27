@@ -33,7 +33,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ui_SpreadSheetMainWindow.h"
 
 #include "pqActiveObjects.h"
-#include "pqActiveObjects.h"
 #include "pqAlwaysConnectedBehavior.h"
 #include "pqApplicationCore.h"
 #include "pqLoadDataReaction.h"

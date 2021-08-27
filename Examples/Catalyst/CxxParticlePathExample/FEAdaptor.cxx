@@ -11,7 +11,6 @@
 #include <vtkDoubleArray.h>
 #include <vtkFloatArray.h>
 #include <vtkLogger.h>
-#include <vtkLogger.h>
 #include <vtkNew.h>
 #include <vtkPointData.h>
 #include <vtkPoints.h>

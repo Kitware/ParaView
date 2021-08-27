@@ -49,7 +49,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMSaveScreenshotProxy.h"
-#include "vtkSMSaveScreenshotProxy.h"
 #include "vtkSMSessionProxyManager.h"
 #include "vtkSMTrace.h"
 #include "vtkSMUtilities.h"
