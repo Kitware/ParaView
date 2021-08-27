@@ -22,7 +22,6 @@
 #include "vtkPVSession.h"
 #include "vtkProcessModule.h"
 #include "vtkRemotingCoreConfiguration.h"
-#include "vtkToolkits.h"
 
 vtkStandardNewMacro(vtkPVMultiClientsInformation);
 
