@@ -30,7 +30,7 @@ public:
     this->AttributeArrayEnabled.resize(vtkDataObject::NUMBER_OF_ATTRIBUTE_TYPES);
   }
 
-  std::vector<std::map<std::string, bool> > AttributeArrayEnabled;
+  std::vector<std::map<std::string, bool>> AttributeArrayEnabled;
 };
 
 vtkStandardNewMacro(vtkPythonRepresentation);

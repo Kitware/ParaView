@@ -36,12 +36,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QToolBar>
 
 /**
-* pqMainControlsToolbar is the toolbar with actions (and reactions) for the
-* "Main Controls" toolbar in ParaView. It includes buttons like "Open Data",
-* "Save Data", "Connect", "Disconnect", "Undo", "Redo".
-* Simply instantiate this and put it in your application UI file or
-* QMainWindow to use it.
-*/
+ * pqMainControlsToolbar is the toolbar with actions (and reactions) for the
+ * "Main Controls" toolbar in ParaView. It includes buttons like "Open Data",
+ * "Save Data", "Connect", "Disconnect", "Undo", "Redo".
+ * Simply instantiate this and put it in your application UI file or
+ * QMainWindow to use it.
+ */
 class PQAPPLICATIONCOMPONENTS_EXPORT pqMainControlsToolbar : public QToolBar
 {
   Q_OBJECT

@@ -222,7 +222,7 @@ void vtkVRUIPipe::ReadState(vtkVRUIServerState* state)
   assert("pre: state_exists" && state != 0);
 
   // read all trackers states.
-  std::vector<vtkSmartPointer<vtkVRUITrackerState> >* trackers = state->GetTrackerStates();
+  std::vector<vtkSmartPointer<vtkVRUITrackerState>>* trackers = state->GetTrackerStates();
   quint64 readSize;
   int count;
   int num_inputs;

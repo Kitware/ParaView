@@ -17,7 +17,7 @@
  *
  *
  * This filter generates data needed to display bag and functional bag plots.
-*/
+ */
 
 #ifndef vtkPVExtractBagPlots_h
 #define vtkPVExtractBagPlots_h

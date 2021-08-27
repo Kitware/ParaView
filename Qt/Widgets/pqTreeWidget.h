@@ -65,8 +65,8 @@ public:
   bool event(QEvent* e) override;
 
   /**
-  * give a hint on the size
-  */
+   * give a hint on the size
+   */
   QSize sizeHint() const override;
   QSize minimumSizeHint() const override;
 
@@ -82,8 +82,8 @@ public Q_SLOTS:
 
 Q_SIGNALS:
   /**
-  * Fired when moveCursor takes the cursor beyond the last row.
-  */
+   * Fired when moveCursor takes the cursor beyond the last row.
+   */
   void navigatedPastEnd();
 
 protected Q_SLOTS:
@@ -104,9 +104,9 @@ protected:
   void wheelEvent(QWheelEvent* event) override;
 
   /**
-  * Move the cursor in the way described by cursorAction,
-  * using the information provided by the button modifiers.
-  */
+   * Move the cursor in the way described by cursorAction,
+   * using the information provided by the button modifiers.
+   */
   QModelIndex moveCursor(CursorAction cursorAction, Qt::KeyboardModifiers modifiers) override;
 
   QTimer* Timer;

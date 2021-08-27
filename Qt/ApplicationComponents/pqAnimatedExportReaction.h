@@ -35,9 +35,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqReaction.h"
 
 /**
-* @ingroup Reactions
-* Reaction to export an animated scene in a web format.
-*/
+ * @ingroup Reactions
+ * Reaction to export an animated scene in a web format.
+ */
 class PQAPPLICATIONCOMPONENTS_EXPORT pqAnimatedExportReaction : public pqReaction
 {
   Q_OBJECT
@@ -45,29 +45,29 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqAnimatedExportReaction : public pqReactio
 
 public:
   /**
-  * Constructor. Parent cannot be nullptr.
-  */
+   * Constructor. Parent cannot be nullptr.
+   */
   pqAnimatedExportReaction(QAction* parent);
 
   /**
-  * Export the animated scene from the active render view.
-  * Note that this method is static. Applications can simply use this without
-  * having to create a reaction instance.
-  */
+   * Export the animated scene from the active render view.
+   * Note that this method is static. Applications can simply use this without
+   * having to create a reaction instance.
+   */
   static void Export();
   static void Export(const QString& filename);
 
 public Q_SLOTS:
   /**
-  * Updates the enabled state. Applications need not explicitly call
-  * this.
-  */
+   * Updates the enabled state. Applications need not explicitly call
+   * this.
+   */
   void updateEnableState() override;
 
 protected:
   /**
-  * Called when the action is triggered.
-  */
+   * Called when the action is triggered.
+   */
   void onTriggered() override { pqAnimatedExportReaction::Export(); }
 
 private:

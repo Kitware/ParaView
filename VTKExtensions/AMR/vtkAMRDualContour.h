@@ -26,7 +26,7 @@
  * #define vtkAMRDualContourDEBUG
  * #define vtkAMRDualContourPROFILE
  * \endcode
-*/
+ */
 
 #ifndef vtkAMRDualContour_h
 #define vtkAMRDualContour_h
@@ -162,7 +162,7 @@ protected:
   // This method is getting too many arguments!
   // Capping was an after thought...
   void CapCell(int cellX, int cellY, int cellZ, // block coordinates
-    // Which cell faces need to be capped.
+                                                // Which cell faces need to be capped.
     unsigned char cubeBoundaryBits,
     // Marching cubes case for this cell
     int cubeCase,

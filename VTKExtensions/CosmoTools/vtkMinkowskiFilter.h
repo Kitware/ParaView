@@ -18,7 +18,7 @@
  *
  * Given as input a voronoi tessellation, stored in a vtkUnstructuredGrid, this
  * filter computes the Minkowski functionals on each cell.
-*/
+ */
 
 #ifndef vtkMinkowskiFilter_h
 #define vtkMinkowskiFilter_h

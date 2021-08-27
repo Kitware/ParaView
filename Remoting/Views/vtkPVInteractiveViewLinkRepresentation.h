@@ -20,7 +20,7 @@
  *
  * This Representation creates and manages a custom vtkLogoRepresentation which is precented
  * to go over the edge of the viewport
-*/
+ */
 
 #ifndef vtkPVInteractiveViewLinkRepresentation_h
 #define vtkPVInteractiveViewLinkRepresentation_h

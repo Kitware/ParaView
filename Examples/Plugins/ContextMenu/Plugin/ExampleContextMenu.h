@@ -45,7 +45,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * the context menu).
  */
 
-class ExampleContextMenu : public QObject, public pqContextMenuInterface
+class ExampleContextMenu
+  : public QObject
+  , public pqContextMenuInterface
 {
   Q_OBJECT
   Q_INTERFACES(pqContextMenuInterface)

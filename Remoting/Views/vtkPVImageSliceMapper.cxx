@@ -44,9 +44,7 @@ class vtkPainter : public vtkObject
 {
 };
 //-----------------------------------------------------------------------------
-void vtkPVImageSliceMapper::SetPainter(vtkPainter*)
-{
-}
+void vtkPVImageSliceMapper::SetPainter(vtkPainter*) {}
 
 vtkStandardNewMacro(vtkPVImageSliceMapper);
 //----------------------------------------------------------------------------

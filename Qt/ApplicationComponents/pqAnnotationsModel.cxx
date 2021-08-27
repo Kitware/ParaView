@@ -604,7 +604,7 @@ void pqAnnotationsModel::removeAllAnnotations()
 
 //-----------------------------------------------------------------------------
 void pqAnnotationsModel::setAnnotations(
-  const std::vector<std::pair<QString, QString> >& newAnnotations)
+  const std::vector<std::pair<QString, QString>>& newAnnotations)
 {
   if (newAnnotations.empty())
   {
@@ -687,9 +687,9 @@ void pqAnnotationsModel::setAnnotations(
 }
 
 //-----------------------------------------------------------------------------
-std::vector<std::pair<QString, QString> > pqAnnotationsModel::annotations() const
+std::vector<std::pair<QString, QString>> pqAnnotationsModel::annotations() const
 {
-  std::vector<std::pair<QString, QString> > strAnnotations;
+  std::vector<std::pair<QString, QString>> strAnnotations;
   strAnnotations.reserve(this->Internals->Items.size());
   for (const AnnotationItem& item : this->Internals->Items)
   {
@@ -700,7 +700,7 @@ std::vector<std::pair<QString, QString> > pqAnnotationsModel::annotations() cons
 
 //-----------------------------------------------------------------------------
 void pqAnnotationsModel::setVisibilities(
-  const std::vector<std::pair<QString, int> >& newVisibilities)
+  const std::vector<std::pair<QString, int>>& newVisibilities)
 {
   bool visibilityFlag = false;
 
@@ -730,9 +730,9 @@ void pqAnnotationsModel::setVisibilities(
 }
 
 //-----------------------------------------------------------------------------
-std::vector<std::pair<QString, int> > pqAnnotationsModel::visibilities() const
+std::vector<std::pair<QString, int>> pqAnnotationsModel::visibilities() const
 {
-  std::vector<std::pair<QString, int> > visibilities;
+  std::vector<std::pair<QString, int>> visibilities;
   for (const AnnotationItem& item : this->Internals->Items)
   {
     visibilities.push_back(std::make_pair(item.Value, item.Visibility));

@@ -39,13 +39,13 @@ class pqOutputPort;
 class pqView;
 
 /**
-* pqFindDataSelectionDisplayFrame is designed to be used by pqFindDataDialog.
-* pqFindDataDialog uses this class to allow controlling the display properties
-* for the selection in the active view. Currently, it only support
-* controlling the display properties for the selection in a render view.
-* It monitors the active selection by tracking pqSelectionManager as well as
-* the active view by tracking pqActiveObjects singleton.
-*/
+ * pqFindDataSelectionDisplayFrame is designed to be used by pqFindDataDialog.
+ * pqFindDataDialog uses this class to allow controlling the display properties
+ * for the selection in the active view. Currently, it only support
+ * controlling the display properties for the selection in a render view.
+ * It monitors the active selection by tracking pqSelectionManager as well as
+ * the active view by tracking pqActiveObjects singleton.
+ */
 class PQCOMPONENTS_EXPORT pqFindDataSelectionDisplayFrame : public QWidget
 {
   Q_OBJECT
@@ -57,16 +57,16 @@ public:
 
 public Q_SLOTS:
   /**
-  * Set the output port that is currently selected for which we are
-  * controlling the selection display properties.
-  */
+   * Set the output port that is currently selected for which we are
+   * controlling the selection display properties.
+   */
   void setSelectedPort(pqOutputPort*);
 
   /**
-  * set the view in which we are controlling the selection display properties.
-  * label properties as well as which array to label with affect only the
-  * active view.
-  */
+   * set the view in which we are controlling the selection display properties.
+   * label properties as well as which array to label with affect only the
+   * active view.
+   */
   void setView(pqView*);
 
 private Q_SLOTS:
@@ -77,9 +77,9 @@ private Q_SLOTS:
   void onDataUpdated();
 
   /**
-  * List for selection changes and enable/disable UI elements as appropriate.
-  * \c frustum indicates whether the selection is frustum-based or not.
-  */
+   * List for selection changes and enable/disable UI elements as appropriate.
+   * \c frustum indicates whether the selection is frustum-based or not.
+   */
   void onSelectionModeChanged(bool frustum);
 
 private:

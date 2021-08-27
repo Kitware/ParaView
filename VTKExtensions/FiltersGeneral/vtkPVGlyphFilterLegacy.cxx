@@ -47,7 +47,7 @@ class vtkPVGlyphFilterLegacy::vtkInternals
 {
   vtkBoundingBox Bounds;
   double NearestPointRadius;
-  std::vector<vtkTuple<double, 3> > Points;
+  std::vector<vtkTuple<double, 3>> Points;
   std::vector<vtkIdType> PointIds;
   size_t NextPointId;
 
@@ -66,8 +66,8 @@ class vtkPVGlyphFilterLegacy::vtkInternals
 
     this->PointIds.clear();
     std::set<vtkIdType> pointset;
-    for (std::vector<vtkTuple<double, 3> >::iterator iter = this->Points.begin(),
-                                                     end = this->Points.end();
+    for (std::vector<vtkTuple<double, 3>>::iterator iter = this->Points.begin(),
+                                                    end = this->Points.end();
          iter != end; ++iter)
     {
       double dist2;

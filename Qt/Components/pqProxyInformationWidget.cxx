@@ -146,13 +146,16 @@ private:
   Q_DISABLE_COPY(pqArraysModel);
 
   QIcon Pixmaps[vtkDataObject::NUMBER_OF_ASSOCIATIONS] = {
-    QIcon(":/pqWidgets/Icons/pqPointData.svg"), QIcon(":/pqWidgets/Icons/pqCellData.svg"),
-    QIcon(":/pqWidgets/Icons/pqGlobalData.svg"), QIcon(),
-    QIcon(":/pqWidgets/Icons/pqPointData.svg"), QIcon(":/pqWidgets/Icons/pqCellData.svg"),
+    QIcon(":/pqWidgets/Icons/pqPointData.svg"),
+    QIcon(":/pqWidgets/Icons/pqCellData.svg"),
+    QIcon(":/pqWidgets/Icons/pqGlobalData.svg"),
+    QIcon(),
+    QIcon(":/pqWidgets/Icons/pqPointData.svg"),
+    QIcon(":/pqWidgets/Icons/pqCellData.svg"),
     QIcon(":/pqWidgets/Icons/pqSpreadsheet.svg"),
   };
 
-  std::vector<std::pair<int, vtkSmartPointer<vtkPVArrayInformation> > > ArrayInformations;
+  std::vector<std::pair<int, vtkSmartPointer<vtkPVArrayInformation>>> ArrayInformations;
   vtkSmartPointer<vtkPVDataInformation> DataInformation;
 };
 
@@ -167,8 +170,8 @@ void pqArraysModel::setDataInformation(vtkPVDataInformation* dinfo)
     {
       for (int kk = 0, max = dsa->GetNumberOfArrays(); kk < max; ++kk)
       {
-        this->ArrayInformations.push_back(std::pair<int, vtkSmartPointer<vtkPVArrayInformation> >(
-          cc, dsa->GetArrayInformation(kk)));
+        this->ArrayInformations.push_back(
+          std::pair<int, vtkSmartPointer<vtkPVArrayInformation>>(cc, dsa->GetArrayInformation(kk)));
       }
     }
   }
@@ -507,7 +510,7 @@ public:
             .arg(l.toString(dinfo->GetNumberOfDataSets()))
         : QString("Data Statistics"));
 
-    std::map<int, std::pair<QLabel*, QLabel*> > labelMap;
+    std::map<int, std::pair<QLabel*, QLabel*>> labelMap;
     labelMap[vtkDataObject::POINT] = std::make_pair(ui.labelPointCount, ui.pointCount);
     labelMap[vtkDataObject::CELL] = std::make_pair(ui.labelCellCount, ui.cellCount);
     labelMap[vtkDataObject::VERTEX] = std::make_pair(ui.labelVertexCount, ui.vertexCount);

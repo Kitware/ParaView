@@ -67,11 +67,12 @@ QString getPVSCSourcesFromSettings()
 {
   pqSettings* settings = pqApplicationCore::instance()->settings();
   return settings
-    ->value("PVSC_SOURCES", QString("# Enter list of URLs to obtain server configurations from.\n"
-                                    "# Syntax:\n"
-                                    "#    pvsc <url> <userfriendly-name>\n\n"
-                                    "# Official Kitware Server Configurations\n"
-                                    "pvsc http://www.paraview.org/files/pvsc Kitware Inc.\n"))
+    ->value("PVSC_SOURCES",
+      QString("# Enter list of URLs to obtain server configurations from.\n"
+              "# Syntax:\n"
+              "#    pvsc <url> <userfriendly-name>\n\n"
+              "# Official Kitware Server Configurations\n"
+              "pvsc http://www.paraview.org/files/pvsc Kitware Inc.\n"))
     .toString();
 }
 
@@ -476,7 +477,7 @@ void pqServerConnectDialog::updateServerType()
       this->Internals->hostLabel->setVisible(true);
       this->Internals->host->setVisible(true);
       VTK_FALLTHROUGH;
-    // break; << -- don't break
+      // break; << -- don't break
 
     case CLIENT_SERVER_REVERSE_CONNECT:
       this->Internals->portLabel->setVisible(true);
@@ -489,7 +490,7 @@ void pqServerConnectDialog::updateServerType()
       this->Internals->dataServerHostLabel->setVisible(true);
       this->Internals->dataServerHost->setVisible(true);
       VTK_FALLTHROUGH;
-    // break; << -- don't break
+      // break; << -- don't break
 
     case CLIENT_DATA_SERVER_RENDER_SERVER_REVERSE_CONNECT:
       this->Internals->renderServerPortLabel->setVisible(true);

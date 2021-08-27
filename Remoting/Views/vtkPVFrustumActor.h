@@ -17,7 +17,7 @@
  *
  * vtkPVFrustumActor is an actor that renders a frustum. Used in ParaView to
  * show the frustum used for frustum selection extraction.
-*/
+ */
 
 #ifndef vtkPVFrustumActor_h
 #define vtkPVFrustumActor_h

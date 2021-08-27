@@ -108,12 +108,13 @@ bool pqQVTKWidgetEventTranslator::translateEvent(
           QSize size = widget->size();
           double normalized_x = mouseEvent->x() / static_cast<double>(size.width());
           double normalized_y = mouseEvent->y() / static_cast<double>(size.height());
-          Q_EMIT recordEvent(widget, "mousePress", QString("(%1,%2,%3,%4,%5)")
-                                                     .arg(normalized_x)
-                                                     .arg(normalized_y)
-                                                     .arg(mouseEvent->button())
-                                                     .arg(mouseEvent->buttons())
-                                                     .arg(mouseEvent->modifiers()));
+          Q_EMIT recordEvent(widget, "mousePress",
+            QString("(%1,%2,%3,%4,%5)")
+              .arg(normalized_x)
+              .arg(normalized_y)
+              .arg(mouseEvent->button())
+              .arg(mouseEvent->buttons())
+              .arg(mouseEvent->modifiers()));
         }
         return true;
         break;
@@ -130,18 +131,20 @@ bool pqQVTKWidgetEventTranslator::translateEvent(
           // Move to the place where the mouse was released and then release it.
           // This mimics drag without actually having to save all the intermediate
           // mouse move positions.
-          Q_EMIT recordEvent(widget, "mouseMove", QString("(%1,%2,%3,%4,%5)")
-                                                    .arg(normalized_x)
-                                                    .arg(normalized_y)
-                                                    .arg(mouseEvent->button())
-                                                    .arg(mouseEvent->buttons())
-                                                    .arg(mouseEvent->modifiers()));
-          Q_EMIT recordEvent(widget, "mouseRelease", QString("(%1,%2,%3,%4,%5)")
-                                                       .arg(normalized_x)
-                                                       .arg(normalized_y)
-                                                       .arg(mouseEvent->button())
-                                                       .arg(mouseEvent->buttons())
-                                                       .arg(mouseEvent->modifiers()));
+          Q_EMIT recordEvent(widget, "mouseMove",
+            QString("(%1,%2,%3,%4,%5)")
+              .arg(normalized_x)
+              .arg(normalized_y)
+              .arg(mouseEvent->button())
+              .arg(mouseEvent->buttons())
+              .arg(mouseEvent->modifiers()));
+          Q_EMIT recordEvent(widget, "mouseRelease",
+            QString("(%1,%2,%3,%4,%5)")
+              .arg(normalized_x)
+              .arg(normalized_y)
+              .arg(mouseEvent->button())
+              .arg(mouseEvent->buttons())
+              .arg(mouseEvent->modifiers()));
         }
         return true;
         break;

@@ -20,7 +20,7 @@
  * changes the default settings.  We want different defaults than
  * vtkConnectivityFilter has, but we don't want the user to have access to
  * these parameters in the UI.
-*/
+ */
 
 #ifndef vtkPVConnectivityFilter_h
 #define vtkPVConnectivityFilter_h

@@ -224,8 +224,9 @@ int vtkMergeBlocks::RequestDataObject(
 {
   auto input = vtkDataObject::GetData(inputVector[0], 0);
   auto output = vtkDataObject::GetData(outputVector, 0);
-  if (this->MergePartitionsOnly && (vtkMultiBlockDataSet::SafeDownCast(input) ||
-                                     vtkPartitionedDataSetCollection::SafeDownCast(input)))
+  if (this->MergePartitionsOnly &&
+    (vtkMultiBlockDataSet::SafeDownCast(input) ||
+      vtkPartitionedDataSetCollection::SafeDownCast(input)))
   {
     if (output == nullptr || !output->IsA(input->GetClassName()))
     {

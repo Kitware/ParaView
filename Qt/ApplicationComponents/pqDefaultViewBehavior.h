@@ -42,11 +42,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class pqServer;
 
 /**
-* @ingroup Behaviors
-* pqDefaultViewBehavior ensures that when a new server connection is made,
-* the default view of the user-specified type is automatically created.
-* This also has the logic to warn before server connection timesout.
-*/
+ * @ingroup Behaviors
+ * pqDefaultViewBehavior ensures that when a new server connection is made,
+ * the default view of the user-specified type is automatically created.
+ * This also has the logic to warn before server connection timesout.
+ */
 class PQAPPLICATIONCOMPONENTS_EXPORT pqDefaultViewBehavior : public QObject
 {
   Q_OBJECT

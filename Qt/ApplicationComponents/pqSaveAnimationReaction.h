@@ -37,9 +37,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class pqServer;
 
 /**
-* @ingroup Reactions
-* Reaction to save animation.
-*/
+ * @ingroup Reactions
+ * Reaction to save animation.
+ */
 class PQAPPLICATIONCOMPONENTS_EXPORT pqSaveAnimationReaction : public pqReaction
 {
   Q_OBJECT
@@ -47,28 +47,28 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqSaveAnimationReaction : public pqReaction
 
 public:
   /**
-  * Constructor. Parent cannot be nullptr.
-  */
+   * Constructor. Parent cannot be nullptr.
+   */
   pqSaveAnimationReaction(QAction* parent);
 
   /**
-  * Saves the animation from the active scene.
-  * Note that this method is static. Applications can simply use this without
-  * having to create a reaction instance.
-  */
+   * Saves the animation from the active scene.
+   * Note that this method is static. Applications can simply use this without
+   * having to create a reaction instance.
+   */
   static void saveAnimation();
 
 public Q_SLOTS:
   /**
-  * Updates the enabled state. Applications need not explicitly call
-  * this.
-  */
+   * Updates the enabled state. Applications need not explicitly call
+   * this.
+   */
   void updateEnableState() override;
 
 protected:
   /**
-  * Called when the action is triggered.
-  */
+   * Called when the action is triggered.
+   */
   void onTriggered() override { pqSaveAnimationReaction::saveAnimation(); }
 
 private:

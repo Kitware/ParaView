@@ -38,11 +38,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class pqView;
 
 /**
-* @ingroup Behaviors
-* Whenever spreadsheet view is created, ParaView wants to ensure that the
-* active source is automatically displayed in that view. This is managed by
-* this behavior.
-*/
+ * @ingroup Behaviors
+ * Whenever spreadsheet view is created, ParaView wants to ensure that the
+ * active source is automatically displayed in that view. This is managed by
+ * this behavior.
+ */
 class PQAPPLICATIONCOMPONENTS_EXPORT pqSpreadSheetVisibilityBehavior : public QObject
 {
   Q_OBJECT

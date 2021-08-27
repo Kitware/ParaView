@@ -377,10 +377,10 @@ QList<pqSMProxy> pqSMAdaptor::getProxyPropertyDomain(vtkSMProperty* Property)
   return proxydomain;
 }
 
-QList<QList<QVariant> > pqSMAdaptor::getSelectionProperty(
+QList<QList<QVariant>> pqSMAdaptor::getSelectionProperty(
   vtkSMProperty* Property, PropertyValueType Type)
 {
-  QList<QList<QVariant> > ret;
+  QList<QList<QVariant>> ret;
 
   if (!Property)
   {
@@ -651,7 +651,7 @@ void pqSMAdaptor::setSelectionProperty(
 }
 
 void pqSMAdaptor::setSelectionProperty(
-  vtkSMProperty* Property, QList<QList<QVariant> > Value, PropertyValueType Type)
+  vtkSMProperty* Property, QList<QList<QVariant>> Value, PropertyValueType Type)
 {
   if (!Property)
   {
@@ -1341,9 +1341,9 @@ void pqSMAdaptor::setMultipleElementProperty(
   }
 }
 
-QList<QList<QVariant> > pqSMAdaptor::getMultipleElementPropertyDomain(vtkSMProperty* Property)
+QList<QList<QVariant>> pqSMAdaptor::getMultipleElementPropertyDomain(vtkSMProperty* Property)
 {
-  QList<QList<QVariant> > domains;
+  QList<QList<QVariant>> domains;
   if (!Property)
   {
     return domains;

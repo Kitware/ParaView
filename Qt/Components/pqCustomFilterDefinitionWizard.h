@@ -31,9 +31,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ========================================================================*/
 
 /**
-* \file pqCustomFilterDefinitionWizard.h
-* \date 6/19/2006
-*/
+ * \file pqCustomFilterDefinitionWizard.h
+ * \date 6/19/2006
+ */
 
 #ifndef _pqCustomFilterDefinitionWizard_h
 #define _pqCustomFilterDefinitionWizard_h
@@ -85,249 +85,249 @@ class PQCOMPONENTS_EXPORT pqCustomFilterDefinitionWizard : public QDialog
 
 public:
   /**
-  * \brief
-  *   Creates a custom filter definition wizard.
-  * \param model The custom filter definition model to use. The
-  *   model should not be null.
-  * \param parent The parent widget for the wizard.
-  */
+   * \brief
+   *   Creates a custom filter definition wizard.
+   * \param model The custom filter definition model to use. The
+   *   model should not be null.
+   * \param parent The parent widget for the wizard.
+   */
   pqCustomFilterDefinitionWizard(pqCustomFilterDefinitionModel* model, QWidget* parent = 0);
   ~pqCustomFilterDefinitionWizard() override;
 
   /**
-  * \brief
-  *   Gets the custom filter definition model used by the wizard.
-  * \return
-  *   A pointer to the custom filter definition model.
-  */
+   * \brief
+   *   Gets the custom filter definition model used by the wizard.
+   * \return
+   *   A pointer to the custom filter definition model.
+   */
   pqCustomFilterDefinitionModel* getModel() const { return this->Model; }
 
   /**
-  * \brief
-  *   Gets the name of the compound proxy created by the wizard.
-  * \return
-  *   The name of the new compound proxy definition. The name will
-  *   be empty if the compound proxy has not been created.
-  * \sa pqCustomFilterDefinitionWizard::createCustomFilter();
-  */
+   * \brief
+   *   Gets the name of the compound proxy created by the wizard.
+   * \return
+   *   The name of the new compound proxy definition. The name will
+   *   be empty if the compound proxy has not been created.
+   * \sa pqCustomFilterDefinitionWizard::createCustomFilter();
+   */
   QString getCustomFilterName() const;
 
 public Q_SLOTS:
   /**
-  * \brief
-  *   Creates a compound proxy definition.
-  *
-  * The compound proxy definition is created using the custom filter
-  * definition model and the parameters entered by the user. The
-  * new definition is registered with the server manager.
-  *
-  * \sa pqCustomFilterDefinitionWizard::getCustomFilterName()
-  */
+   * \brief
+   *   Creates a compound proxy definition.
+   *
+   * The compound proxy definition is created using the custom filter
+   * definition model and the parameters entered by the user. The
+   * new definition is registered with the server manager.
+   *
+   * \sa pqCustomFilterDefinitionWizard::getCustomFilterName()
+   */
   void createCustomFilter();
 
 private:
   /**
-  * \brief
-  *   Adds proxies referred to by the proxies in the custom filter that
-  *   the user could not have explicitly selected/deselected.
-  *
-  * A custom filter may includes proxies which refer to other internal
-  * proxies such as implicit functions, internal sources which are not shown
-  * in the pipeline browser. We include these proxies into the custom filter
-  * so that its definition is complete. This method is called after all proxies
-  * have been added to the custom filter and before its definition is
-  * created.
-  */
+   * \brief
+   *   Adds proxies referred to by the proxies in the custom filter that
+   *   the user could not have explicitly selected/deselected.
+   *
+   * A custom filter may includes proxies which refer to other internal
+   * proxies such as implicit functions, internal sources which are not shown
+   * in the pipeline browser. We include these proxies into the custom filter
+   * so that its definition is complete. This method is called after all proxies
+   * have been added to the custom filter and before its definition is
+   * created.
+   */
   void addAutoIncludedProxies();
 
   /**
-  * \brief
-  *   Validates the custom filter name field.
-  *
-  * This method will pop up message boxes for the user if there is
-  * something wrong with the name entered.
-  *
-  * \return
-  *   True if the custom filter name is valid.
-  */
+   * \brief
+   *   Validates the custom filter name field.
+   *
+   * This method will pop up message boxes for the user if there is
+   * something wrong with the name entered.
+   *
+   * \return
+   *   True if the custom filter name is valid.
+   */
   bool validateCustomFilterName();
 
   /**
-  * \brief
-  *   Adds the default input and output to the forms.
-  *
-  * The current implementation only works for straight pipelines
-  * with one input and no branches.
-  */
+   * \brief
+   *   Adds the default input and output to the forms.
+   *
+   * The current implementation only works for straight pipelines
+   * with one input and no branches.
+   */
   void setupDefaultInputOutput();
 
 private Q_SLOTS:
   /**
-  * \name Page Navigation
-  */
+   * \name Page Navigation
+   */
   //@{
   /**
-  * Called when the user clicks the back button.
-  */
+   * Called when the user clicks the back button.
+   */
   void navigateBack();
 
   /**
-  * Called when the user clicks the next button.
-  */
+   * Called when the user clicks the next button.
+   */
   void navigateNext();
 
   /**
-  * Called when the user clicks the finish button.
-  */
+   * Called when the user clicks the finish button.
+   */
   void finishWizard();
 
   /**
-  * \brief
-  *   Clears the custom filter overwrite flag.
-  * \param text The changed name text.
-  */
+   * \brief
+   *   Clears the custom filter overwrite flag.
+   * \param text The changed name text.
+   */
   void clearNameOverwrite(const QString& text);
   //@}
 
   /**
-  * \name Model Selection Updates
-  */
+   * \name Model Selection Updates
+   */
   //@{
   /**
-  * \brief
-  *   Updates the input form fields for the newly selected source.
-  *
-  * The input property combobox is updated to display the available
-  * inputs for the newly selected source.
-  *
-  * \param current The currently selected index.
-  * \param previous The previously selected index.
-  */
+   * \brief
+   *   Updates the input form fields for the newly selected source.
+   *
+   * The input property combobox is updated to display the available
+   * inputs for the newly selected source.
+   *
+   * \param current The currently selected index.
+   * \param previous The previously selected index.
+   */
   void updateInputForm(const QModelIndex& current, const QModelIndex& previous);
 
   /**
-  * \brief
-  *   Updates the output form fields for the newly selected source.
-  * \param current The currently selected index.
-  * \param previous The previously selected index.
-  */
+   * \brief
+   *   Updates the output form fields for the newly selected source.
+   * \param current The currently selected index.
+   * \param previous The previously selected index.
+   */
   void updateOutputForm(const QModelIndex& current, const QModelIndex& previous);
 
   /**
-  * \brief
-  *   Updates the property form fields for the newly selected source.
-  *
-  * The property combobox is updated to display the available
-  * properties for the newly selected source. The input properties
-  * are excluded since they are set on the input page.
-  *
-  * \param current The currently selected index.
-  * \param previous The previously selected index.
-  */
+   * \brief
+   *   Updates the property form fields for the newly selected source.
+   *
+   * The property combobox is updated to display the available
+   * properties for the newly selected source. The input properties
+   * are excluded since they are set on the input page.
+   *
+   * \param current The currently selected index.
+   * \param previous The previously selected index.
+   */
   void updatePropertyForm(const QModelIndex& current, const QModelIndex& previous);
   //@}
 
   /**
-  * \name Input List Buttons
-  */
+   * \name Input List Buttons
+   */
   //@{
   /**
-  * Adds an input to the list based on the form parameters.
-  */
+   * Adds an input to the list based on the form parameters.
+   */
   void addInput();
 
   /**
-  * Removes the selected input from the list.
-  */
+   * Removes the selected input from the list.
+   */
   void removeInput();
 
   /**
-  * Moves the selected input up in the list.
-  */
+   * Moves the selected input up in the list.
+   */
   void moveInputUp();
 
   /**
-  * Moves the selected input down in the list.
-  */
+   * Moves the selected input down in the list.
+   */
   void moveInputDown();
   //@}
 
   /**
-  * \name Output List Buttons
-  */
+   * \name Output List Buttons
+   */
   //@{
   /**
-  * Adds an output to the list based on the form parameters.
-  */
+   * Adds an output to the list based on the form parameters.
+   */
   void addOutput();
 
   /**
-  * Removes the selected output from the list.
-  */
+   * Removes the selected output from the list.
+   */
   void removeOutput();
 
   /**
-  * Moves the selected output up in the list.
-  */
+   * Moves the selected output up in the list.
+   */
   void moveOutputUp();
 
   /**
-  * Moves the selected output down in the list.
-  */
+   * Moves the selected output down in the list.
+   */
   void moveOutputDown();
   //@}
 
   /**
-  * \name Property List Buttons
-  */
+   * \name Property List Buttons
+   */
   //@{
   /**
-  * Adds an property to the list based on the form parameters.
-  */
+   * Adds an property to the list based on the form parameters.
+   */
   void addProperty();
 
   /**
-  * Removes the selected property from the list.
-  */
+   * Removes the selected property from the list.
+   */
   void removeProperty();
 
   /**
-  * Moves the selected property up in the list.
-  */
+   * Moves the selected property up in the list.
+   */
   void movePropertyUp();
 
   /**
-  * Moves the selected property down in the list.
-  */
+   * Moves the selected property down in the list.
+   */
   void movePropertyDown();
   //@}
 
   /**
-  * \name List Selection Updates
-  */
+   * \name List Selection Updates
+   */
   //@{
   /**
-  * \brief
-  *   Updates the input list buttons for the newly selected index.
-  * \param current The currently selected index.
-  * \param previous The previously selected index.
-  */
+   * \brief
+   *   Updates the input list buttons for the newly selected index.
+   * \param current The currently selected index.
+   * \param previous The previously selected index.
+   */
   void updateInputButtons(const QModelIndex& current, const QModelIndex& previous);
 
   /**
-  * \brief
-  *   Updates the output list buttons for the newly selected index.
-  * \param current The currently selected index.
-  * \param previous The previously selected index.
-  */
+   * \brief
+   *   Updates the output list buttons for the newly selected index.
+   * \param current The currently selected index.
+   * \param previous The previously selected index.
+   */
   void updateOutputButtons(const QModelIndex& current, const QModelIndex& previous);
 
   /**
-  * \brief
-  *   Updates the property list buttons for the newly selected index.
-  * \param current The currently selected index.
-  * \param previous The previously selected index.
-  */
+   * \brief
+   *   Updates the property list buttons for the newly selected index.
+   * \param current The currently selected index.
+   * \param previous The previously selected index.
+   */
   void updatePropertyButtons(const QModelIndex& current, const QModelIndex& previous);
   //@}
 
@@ -339,8 +339,8 @@ private:
   pqCustomFilterDefinitionWizardForm* Form; ///< Defines the gui layout.
 
   /**
-  * Internal method called by addOutput().
-  */
+   * Internal method called by addOutput().
+   */
   void addOutputInternal(pqOutputPort* port, const QString& string);
 };
 

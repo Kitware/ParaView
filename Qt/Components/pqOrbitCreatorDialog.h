@@ -38,11 +38,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QVariant>
 
 /**
-* pqOrbitCreatorDialog is used by pqAnimationViewWidget to request the orbit
-* parameters from the user when the user want to create a camera animation track
-* that orbits some object(s). It's a simple dialog with a bunch of entries for
-* normal/center/radius of the orbit.
-*/
+ * pqOrbitCreatorDialog is used by pqAnimationViewWidget to request the orbit
+ * parameters from the user when the user want to create a camera animation track
+ * that orbits some object(s). It's a simple dialog with a bunch of entries for
+ * normal/center/radius of the orbit.
+ */
 class PQCOMPONENTS_EXPORT pqOrbitCreatorDialog : public QDialog
 {
   Q_OBJECT
@@ -53,13 +53,13 @@ public:
   ~pqOrbitCreatorDialog() override;
 
   /**
-  * Returns the points the orbit based on the user chosen options.
-  */
+   * Returns the points the orbit based on the user chosen options.
+   */
   QList<QVariant> orbitPoints(int resolution) const;
 
   /**
-  * Returns the center for the orbit.
-  */
+   * Returns the center for the orbit.
+   */
   QList<QVariant> center() const;
 
   void setNormal(double xyz[3]);

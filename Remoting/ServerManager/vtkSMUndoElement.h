@@ -20,7 +20,7 @@
  * Abstract superclass for Server Manager undo elements.
  * This class keeps the session, so undoelement could work across a set of
  * communication Sessions.
-*/
+ */
 
 #ifndef vtkSMUndoElement_h
 #define vtkSMUndoElement_h

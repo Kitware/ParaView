@@ -19,7 +19,7 @@
  * vtkExtractSelectionRange is used to compute the range of an input selection.
  * This is an internal filter designed to be used to "compute visible range" for
  * a dataset.
-*/
+ */
 
 #ifndef vtkExtractSelectionRange_h
 #define vtkExtractSelectionRange_h

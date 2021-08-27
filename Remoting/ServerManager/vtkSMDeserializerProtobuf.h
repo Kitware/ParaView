@@ -19,7 +19,7 @@
  * vtkSMDeserializerProtobuf is used to deserialize proxies from their Protobuf
  * states. This is the base class of deserialization classes that load Protobuf
  * messagess to restore proxy/servermanager state (or part thereof).
-*/
+ */
 
 #ifndef vtkSMDeserializerProtobuf_h
 #define vtkSMDeserializerProtobuf_h

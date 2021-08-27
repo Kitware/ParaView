@@ -56,7 +56,7 @@ struct vtkEHInternals
   {
     // The total of the values per bin - the second vector
     // is for arrays with multiple components
-    std::vector<std::vector<double> > TotalValues;
+    std::vector<std::vector<double>> TotalValues;
   };
   using ArrayMapType = std::map<std::string, ArrayValuesType>;
   ArrayMapType ArrayValues;
@@ -154,7 +154,7 @@ protected:
   unsigned char HiddenFlag;
   double ReducedRange[2];
   int Component;
-  vtkSMPThreadLocal<std::array<double, 2> > TLRange;
+  vtkSMPThreadLocal<std::array<double, 2>> TLRange;
 
 public:
   FiniteMinAndMaxWithBlankingFunctor(
@@ -281,7 +281,7 @@ void GetRangeWithBlanking(
 
   using FastArrayTypes = vtkTypeList::Unique<
     vtkTypeList::Create<vtkCharArray, vtkShortArray, vtkIntArray, vtkUnsignedCharArray,
-      vtkUnsignedShortArray, vtkUnsignedIntArray, vtkFloatArray, vtkDoubleArray> >::Result;
+      vtkUnsignedShortArray, vtkUnsignedIntArray, vtkFloatArray, vtkDoubleArray>>::Result;
   using GetRangeWithBlankingWorkerDispatch = vtkArrayDispatch::DispatchByArray<FastArrayTypes>;
 
   if (!GetRangeWithBlankingWorkerDispatch::Execute(
@@ -447,7 +447,7 @@ private:
   vtkUnsignedCharArray* Blanking;
   unsigned char GhostIndicator;
 
-  vtkSMPThreadLocal<vtkSmartPointer<vtkIntArray> > TLBinValues;
+  vtkSMPThreadLocal<vtkSmartPointer<vtkIntArray>> TLBinValues;
   vtkSMPThreadLocal<vtkEHInternals::ArrayMapType> TLArrayValues;
 
 public:
@@ -644,7 +644,7 @@ void vtkExtractHistogram::BinAnArray(
 
   using FastArrayTypes = vtkTypeList::Unique<
     vtkTypeList::Create<vtkCharArray, vtkShortArray, vtkIntArray, vtkUnsignedCharArray,
-      vtkUnsignedShortArray, vtkUnsignedIntArray, vtkFloatArray, vtkDoubleArray> >::Result;
+      vtkUnsignedShortArray, vtkUnsignedIntArray, vtkFloatArray, vtkDoubleArray>>::Result;
   using BinAnArrayWorkerDispatch = vtkArrayDispatch::DispatchByArray<FastArrayTypes>;
 
   if (!BinAnArrayWorkerDispatch::Execute(dataArray, BinAnArrayWorker{}, field, binValues,

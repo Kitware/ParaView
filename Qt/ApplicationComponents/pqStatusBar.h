@@ -37,10 +37,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqApplicationComponentsModule.h"
 
 /**
-* pqStatusBar extends QStatusBar to support showing paraview progress.
-* It uses pqProgressManager provided by pqApplicationCore to show the
-* progress values. Internally uses pqProgressWidget to show the progress.
-*/
+ * pqStatusBar extends QStatusBar to support showing paraview progress.
+ * It uses pqProgressManager provided by pqApplicationCore to show the
+ * progress values. Internally uses pqProgressWidget to show the progress.
+ */
 class PQAPPLICATIONCOMPONENTS_EXPORT pqStatusBar : public QStatusBar
 {
   Q_OBJECT

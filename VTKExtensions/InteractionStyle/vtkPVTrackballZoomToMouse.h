@@ -18,7 +18,7 @@
  *
  * vtkPVTrackballZoomToMouse is a redifinition of a vtkPVTrackballZoom
  * allowing the user to zoom at the point projected under the mouse position.
-*/
+ */
 
 #ifndef vtkPVTrackballZoomToMouse_h
 #define vtkPVTrackballZoomToMouse_h

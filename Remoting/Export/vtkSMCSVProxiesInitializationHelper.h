@@ -21,7 +21,7 @@
  * the PCSVReader or PCSVWriter proxy that sets up the delimiter to use based on the
  * file extension. If the file extension is .txt or .tsv then '\t' is set as
  * the delimiter.
-*/
+ */
 
 #ifndef vtkSMCSVProxiesInitializationHelper_h
 #define vtkSMCSVProxiesInitializationHelper_h

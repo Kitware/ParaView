@@ -18,7 +18,7 @@
  *
  * vtkPVDReader subclasses vtkXMLCollectionReader to add
  * ParaView-specific methods.
-*/
+ */
 
 #ifndef vtkPVDReader_h
 #define vtkPVDReader_h

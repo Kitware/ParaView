@@ -17,7 +17,7 @@
  *
  * vtkPythonView is a view for displaying data via a Python script
  * that uses matplotlib to generate a plot.
-*/
+ */
 
 #ifndef vtkPythonView_h
 #define vtkPythonView_h

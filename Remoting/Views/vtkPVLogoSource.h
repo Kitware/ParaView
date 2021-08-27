@@ -19,7 +19,7 @@
  *
  * vtkPVLogoSource is used to generate an image from a provided texture
  * Usually used with the logo representation.
-*/
+ */
 
 #ifndef vtkPVLogoSource_h
 #define vtkPVLogoSource_h

@@ -24,7 +24,7 @@
  * it alone to the vtkPVContextView.
  * For client-server cases, this class also handles delivering of the selection
  * to all "rendering" nodes.
-*/
+ */
 
 #ifndef vtkChartSelectionRepresentation_h
 #define vtkChartSelectionRepresentation_h

@@ -54,8 +54,9 @@ int vtkStringList::GetIndex(const char* str)
   }
   const auto& internals = (*this->Internals);
   auto iter = std::find(internals.Strings.begin(), internals.Strings.end(), std::string(str));
-  return (iter == internals.Strings.end() ? -1 : static_cast<int>(
-                                                   std::distance(internals.Strings.begin(), iter)));
+  return (iter == internals.Strings.end()
+      ? -1
+      : static_cast<int>(std::distance(internals.Strings.begin(), iter)));
 }
 
 //----------------------------------------------------------------------------

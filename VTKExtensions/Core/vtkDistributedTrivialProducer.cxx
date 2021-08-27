@@ -31,7 +31,7 @@
 //----------------------------------------------------------------------------
 struct vtkPVTrivialProducerStaticInternal
 {
-  std::map<std::string, vtkSmartPointer<vtkDataObject> > RegisteredDataObjectMap;
+  std::map<std::string, vtkSmartPointer<vtkDataObject>> RegisteredDataObjectMap;
 
   bool HasKey(const char* key)
   {
@@ -53,7 +53,7 @@ struct vtkPVTrivialProducerStaticInternal
 
   void Print(ostream& os, vtkIndent indent)
   {
-    std::map<std::string, vtkSmartPointer<vtkDataObject> >::iterator iter =
+    std::map<std::string, vtkSmartPointer<vtkDataObject>>::iterator iter =
       this->RegisteredDataObjectMap.begin();
     while (iter != this->RegisteredDataObjectMap.end())
     {

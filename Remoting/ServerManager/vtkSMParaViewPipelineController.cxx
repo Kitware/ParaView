@@ -61,7 +61,7 @@ namespace
 // Used to monitor properties whose domains change.
 class vtkDomainObserver
 {
-  std::vector<std::pair<vtkSMProperty*, unsigned long> > MonitoredProperties;
+  std::vector<std::pair<vtkSMProperty*, unsigned long>> MonitoredProperties;
   std::set<vtkSMProperty*> PropertiesWithModifiedDomains;
 
   void DomainModified(vtkObject* sender, unsigned long, void*)
@@ -121,6 +121,7 @@ public:
     this->ProxiesBeingUnRegistered.insert(this->Proxy);
   }
   ~vtkPrepareForUnregisteringScopedObj() { this->ProxiesBeingUnRegistered.erase(this->Proxy); }
+
 private:
   vtkPrepareForUnregisteringScopedObj(const vtkPrepareForUnregisteringScopedObj&);
   void operator=(const vtkPrepareForUnregisteringScopedObj&);
@@ -541,8 +542,9 @@ bool vtkSMParaViewPipelineController::RegisterPipelineProxy(
   // Register proxy with TimeKeeper.
   vtkSMProxy* timeKeeper = this->FindTimeKeeper(proxy->GetSession());
   vtkSMTimeKeeperProxy::AddTimeSource(timeKeeper, proxy,
-    /*suppress_input*/ (proxy->GetProperty("TimestepValues") != nullptr ||
-                                        proxy->GetProperty("TimeRange") != nullptr));
+    /*suppress_input*/
+    (proxy->GetProperty("TimestepValues") != nullptr ||
+      proxy->GetProperty("TimeRange") != nullptr));
 
   // Make the proxy active.
   vtkSMProxySelectionModel* selmodel =
@@ -580,8 +582,9 @@ bool vtkSMParaViewPipelineController::UnRegisterPipelineProxy(vtkSMProxy* proxy)
   // remove proxy from TimeKeeper.
   vtkSMProxy* timeKeeper = this->FindTimeKeeper(proxy->GetSession());
   vtkSMTimeKeeperProxy::RemoveTimeSource(timeKeeper, proxy,
-    /*unsuppress_input*/ (proxy->GetProperty("TimestepValues") != nullptr ||
-                                           proxy->GetProperty("TimeRange") != nullptr));
+    /*unsuppress_input*/
+    (proxy->GetProperty("TimestepValues") != nullptr ||
+      proxy->GetProperty("TimeRange") != nullptr));
 
   // unregister dependencies.
   this->UnRegisterDependencies(proxy);
@@ -704,7 +707,7 @@ bool vtkSMParaViewPipelineController::UnRegisterViewProxy(
       continue;
     }
 
-    typedef std::vector<vtkWeakPointer<vtkSMProxy> > proxyvectortype;
+    typedef std::vector<vtkWeakPointer<vtkSMProxy>> proxyvectortype;
     proxyvectortype reprs;
 
     vtkSMPropertyHelper helper(prop);
@@ -773,7 +776,7 @@ bool vtkSMParaViewPipelineController::UnRegisterRepresentationProxy(vtkSMProxy* 
 
   //---------------------------------------------------------------------------
   // remove the representation from any views.
-  typedef std::vector<std::pair<vtkSMProxy*, vtkSMProperty*> > viewsvector;
+  typedef std::vector<std::pair<vtkSMProxy*, vtkSMProperty*>> viewsvector;
   viewsvector views;
   for (unsigned int cc = 0, max = proxy->GetNumberOfConsumers(); cc < max; cc++)
   {
@@ -877,7 +880,7 @@ bool vtkSMParaViewPipelineController::UnRegisterAnimationProxy(vtkSMProxy* proxy
   //---------------------------------------------------------------------------
   // Animation proxies are typically added to some other animation proxy. We
   // need to remove it from that proxy.
-  typedef std::pair<vtkWeakPointer<vtkSMProxy>, vtkWeakPointer<vtkSMProperty> > proxypairitemtype;
+  typedef std::pair<vtkWeakPointer<vtkSMProxy>, vtkWeakPointer<vtkSMProperty>> proxypairitemtype;
   typedef std::vector<proxypairitemtype> proxypairvectortype;
   proxypairvectortype consumers;
   for (unsigned int cc = 0, max = proxy->GetNumberOfConsumers(); cc < max; ++cc)
@@ -902,7 +905,7 @@ bool vtkSMParaViewPipelineController::UnRegisterAnimationProxy(vtkSMProxy* proxy
 
   //---------------------------------------------------------------------------
   // destroy keyframes, if there are any.
-  typedef std::vector<vtkWeakPointer<vtkSMProxy> > proxyvectortype;
+  typedef std::vector<vtkWeakPointer<vtkSMProxy>> proxyvectortype;
   proxyvectortype keyframes;
   if (vtkSMProperty* kfProperty = proxy->GetProperty("KeyFrames"))
   {
@@ -1181,7 +1184,7 @@ bool vtkSMParaViewPipelineController::FinalizeProxy(vtkSMProxy* proxy)
   // also get removed.
   std::string groupname = this->GetHelperProxyGroupName(proxy);
 
-  typedef std::pair<std::string, vtkWeakPointer<vtkSMProxy> > proxymapitemtype;
+  typedef std::pair<std::string, vtkWeakPointer<vtkSMProxy>> proxymapitemtype;
   typedef std::vector<proxymapitemtype> proxymaptype;
   proxymaptype proxymap;
 
@@ -1221,7 +1224,7 @@ bool vtkSMParaViewPipelineController::UnRegisterDependencies(vtkSMProxy* proxy)
   // Before going any further build a list of all consumer proxies
   // (not pointing to internal/sub-proxies).
 
-  typedef std::vector<vtkWeakPointer<vtkSMProxy> > proxyvectortype;
+  typedef std::vector<vtkWeakPointer<vtkSMProxy>> proxyvectortype;
   proxyvectortype consumers;
 
   for (unsigned int cc = 0, max = proxy->GetNumberOfConsumers(); cc < max; ++cc)

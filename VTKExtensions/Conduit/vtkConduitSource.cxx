@@ -342,7 +342,7 @@ bool RequestMesh(vtkPartitionedDataSet* output, const conduit_cpp::Node& node)
     return false;
   }
 
-  std::map<std::string, vtkSmartPointer<vtkDataSet> > datasets;
+  std::map<std::string, vtkSmartPointer<vtkDataSet>> datasets;
 
   // process "topologies".
   auto topologies = node["topologies"];

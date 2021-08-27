@@ -17,7 +17,7 @@
  *
  *
  *  Creates a vtkUnstructuredGrid instance from a GenericIO file.
-*/
+ */
 
 #ifndef vtkPGenericIOReader_h
 #define vtkPGenericIOReader_h

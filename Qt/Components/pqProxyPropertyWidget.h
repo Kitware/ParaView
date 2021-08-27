@@ -40,9 +40,9 @@ class pqSelectionInputWidget;
 class pqProxySelectionWidget;
 
 /**
-* This is a widget for a vtkSMProxyProperty. It handles a "SelectionInput"
-* property and properties with ProxyListDomain.
-*/
+ * This is a widget for a vtkSMProxyProperty. It handles a "SelectionInput"
+ * property and properties with ProxyListDomain.
+ */
 class PQCOMPONENTS_EXPORT pqProxyPropertyWidget : public pqPropertyWidget
 {
   Q_OBJECT
@@ -52,23 +52,23 @@ public:
   pqProxyPropertyWidget(vtkSMProperty* property, vtkSMProxy* proxy, QWidget* parent = 0);
 
   /**
-  * Overridden to pass the calls to internal widgets.
-  */
+   * Overridden to pass the calls to internal widgets.
+   */
   void apply() override;
   void reset() override;
 
   /**
-  * These methods are called when the pqProxyPropertiesPanel containing the
-  * widget is activated/deactivated. Only widgets that have 3D widgets need to
-  * override these methods to select/deselect the 3D widgets.
-  */
+   * These methods are called when the pqProxyPropertiesPanel containing the
+   * widget is activated/deactivated. Only widgets that have 3D widgets need to
+   * override these methods to select/deselect the 3D widgets.
+   */
   void select() override;
   void deselect() override;
 
   /**
-  * Overridden to hide the properties for proxies in a vtkSMProxyListDomain if
-  * requested.
-  */
+   * Overridden to hide the properties for proxies in a vtkSMProxyListDomain if
+   * requested.
+   */
   void updateWidget(bool showing_advanced_properties) override;
 
 private:

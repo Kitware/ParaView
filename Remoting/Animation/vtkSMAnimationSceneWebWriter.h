@@ -20,7 +20,7 @@
  * vtkSMAnimationSceneWebWriter is a concrete implementation of
  * vtkSMAnimationSceneWriter that can write the geometry as a web archive.
  * This writer can only write the visible geometry in one view.
-*/
+ */
 
 #ifndef vtkSMAnimationSceneWebWriter_h
 #define vtkSMAnimationSceneWebWriter_h

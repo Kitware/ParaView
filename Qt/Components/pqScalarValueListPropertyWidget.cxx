@@ -248,7 +248,7 @@ public:
   // Given a list of modelindexes, return a vector containing multiple sorted
   // vectors of rows, split by their discontinuity
   void splitSelectedIndexesToRowRanges(
-    const QModelIndexList& indexList, QVector<QVector<QVariant> >& result)
+    const QModelIndexList& indexList, QVector<QVector<QVariant>>& result)
   {
     if (indexList.empty())
     {
@@ -286,7 +286,7 @@ public:
   // item, if any.
   QModelIndex removeListedRows(const QModelIndexList& toRemove = QModelIndexList())
   {
-    QVector<QVector<QVariant> > rowRanges;
+    QVector<QVector<QVariant>> rowRanges;
     this->splitSelectedIndexesToRowRanges(toRemove, rowRanges);
     int numGroups = static_cast<int>(rowRanges.size());
     for (int g = numGroups - 1; g > -1; --g)

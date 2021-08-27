@@ -18,7 +18,7 @@
  *
  * This filter takes a cell data array and generates a polydata
  * surface.
-*/
+ */
 
 #ifndef vtkFlashContour_h
 #define vtkFlashContour_h

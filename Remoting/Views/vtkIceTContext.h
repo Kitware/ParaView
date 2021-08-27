@@ -36,7 +36,7 @@
  *
  * @sa
  * vtkIceTRenderManager
-*/
+ */
 
 #ifndef vtkIceTContext_h
 #define vtkIceTContext_h

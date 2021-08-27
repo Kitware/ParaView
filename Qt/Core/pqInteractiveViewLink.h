@@ -39,10 +39,10 @@ class pqRenderView;
 class vtkPVXMLElement;
 
 /**
-* pqInteractiveViewLink is uaed by pqLinksModel to create
-* interactive view links, which are ViewLink allowing to see a view "trough"
-* another view.
-*/
+ * pqInteractiveViewLink is uaed by pqLinksModel to create
+ * interactive view links, which are ViewLink allowing to see a view "trough"
+ * another view.
+ */
 class PQCORE_EXPORT pqInteractiveViewLink : public QObject
 {
   Q_OBJECT;

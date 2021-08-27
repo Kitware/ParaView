@@ -35,9 +35,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqReaction.h"
 
 /**
-* @ingroup Reactions
-* Reaction to save animation geometry.
-*/
+ * @ingroup Reactions
+ * Reaction to save animation geometry.
+ */
 class PQAPPLICATIONCOMPONENTS_EXPORT pqSaveAnimationGeometryReaction : public pqReaction
 {
   Q_OBJECT
@@ -45,29 +45,29 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqSaveAnimationGeometryReaction : public pq
 
 public:
   /**
-  * Constructor. Parent cannot be nullptr.
-  */
+   * Constructor. Parent cannot be nullptr.
+   */
   pqSaveAnimationGeometryReaction(QAction* parent);
 
   /**
-  * Saves the animation from the active scene.
-  * Note that this method is static. Applications can simply use this without
-  * having to create a reaction instance.
-  */
+   * Saves the animation from the active scene.
+   * Note that this method is static. Applications can simply use this without
+   * having to create a reaction instance.
+   */
   static void saveAnimationGeometry();
   static void saveAnimationGeometry(const QString& filename);
 
 public Q_SLOTS:
   /**
-  * Updates the enabled state. Applications need not explicitly call
-  * this.
-  */
+   * Updates the enabled state. Applications need not explicitly call
+   * this.
+   */
   void updateEnableState() override;
 
 protected:
   /**
-  * Called when the action is triggered.
-  */
+   * Called when the action is triggered.
+   */
   void onTriggered() override { pqSaveAnimationGeometryReaction::saveAnimationGeometry(); }
 
 private:

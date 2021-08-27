@@ -51,14 +51,17 @@ struct PQCORE_EXPORT pqLinkedObjectQTextEdit : public pqLinkedObjectInterface
   /**
    * Constructor that takes the QTextEdit as parameter
    */
-  explicit pqLinkedObjectQTextEdit(QTextEdit& textEdit) noexcept : TextEdit(textEdit) {}
+  explicit pqLinkedObjectQTextEdit(QTextEdit& textEdit) noexcept
+    : TextEdit(textEdit)
+  {
+  }
 
   /**
    * Copy constructor. Do link the other object to this one if it exists
    */
   explicit pqLinkedObjectQTextEdit(const pqLinkedObjectQTextEdit& other) noexcept
-    : pqLinkedObjectInterface(other),
-      TextEdit(other.TextEdit)
+    : pqLinkedObjectInterface(other)
+    , TextEdit(other.TextEdit)
   {
     if (other.isLinked())
     {

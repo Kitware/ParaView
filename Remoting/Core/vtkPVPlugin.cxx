@@ -85,9 +85,7 @@ void vtkPVPlugin::SetFileName(const char* filename)
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVPlugin::GetBinaryResources(std::vector<std::string>&)
-{
-}
+void vtkPVPlugin::GetBinaryResources(std::vector<std::string>&) {}
 
 //-----------------------------------------------------------------------------
 void vtkPVPlugin::SetEULAConfirmationCallback(vtkPVPlugin::EULAConfirmationCallback ptr)

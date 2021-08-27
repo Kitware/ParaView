@@ -571,9 +571,7 @@ int vtkSMProperty::ReadXMLAttributes(vtkSMProxy* proxy, vtkPVXMLElement* element
 }
 
 //---------------------------------------------------------------------------
-void vtkSMProperty::Copy(vtkSMProperty*)
-{
-}
+void vtkSMProperty::Copy(vtkSMProperty*) {}
 
 //---------------------------------------------------------------------------
 void vtkSMProperty::WriteTo(vtkSMMessage* msg)

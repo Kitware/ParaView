@@ -53,7 +53,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class pqComparativeContextView::pqInternal
 {
 public:
-  QMap<vtkSMViewProxy*, QPointer<pqQVTKWidget> > RenderWidgets;
+  QMap<vtkSMViewProxy*, QPointer<pqQVTKWidget>> RenderWidgets;
   vtkSmartPointer<vtkEventQtSlotConnect> VTKConnect;
 
   pqInternal() { this->VTKConnect = vtkSmartPointer<vtkEventQtSlotConnect>::New(); }

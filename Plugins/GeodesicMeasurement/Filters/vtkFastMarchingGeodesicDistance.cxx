@@ -418,8 +418,9 @@ void vtkFastMarchingGeodesicDistance::SetupCallbacks()
   // We use this callback to check if a set of user defined destination
   // vertices have been reached, or if we've marched beyond a user specified
   // distance.
-  if (this->DistanceStopCriterion > 0 || (this->DestinationVertexStopCriterion &&
-                                           this->DestinationVertexStopCriterion->GetNumberOfIds()))
+  if (this->DistanceStopCriterion > 0 ||
+    (this->DestinationVertexStopCriterion &&
+      this->DestinationVertexStopCriterion->GetNumberOfIds()))
   {
     this->Internals->Mesh->RegisterForceStopCallbackFunction(
       vtkGeodesicMeshInternals::FastMarchingStopCallback);

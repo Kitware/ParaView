@@ -89,7 +89,7 @@ class pqLiveSourceBehavior::pqInternals
 
 public:
   pqTimer Timer;
-  std::vector<std::pair<QPointer<pqPipelineSource>, int> > LiveSources;
+  std::vector<std::pair<QPointer<pqPipelineSource>, int>> LiveSources;
 
   pqInternals()
   {

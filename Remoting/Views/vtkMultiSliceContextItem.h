@@ -14,7 +14,7 @@
 =========================================================================*/
 /**
  * @class   vtkMultiSliceContextItem
-*/
+ */
 
 #ifndef vtkMultiSliceContextItem_h
 #define vtkMultiSliceContextItem_h

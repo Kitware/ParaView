@@ -34,7 +34,7 @@ struct vtkPVXMLElementInternals
 {
   std::vector<std::string> AttributeNames;
   std::vector<std::string> AttributeValues;
-  typedef std::vector<vtkSmartPointer<vtkPVXMLElement> > VectorOfElements;
+  typedef std::vector<vtkSmartPointer<vtkPVXMLElement>> VectorOfElements;
   VectorOfElements NestedElements;
   std::string CharacterData;
 };
@@ -204,7 +204,7 @@ void vtkPVXMLElement::RemoveAllNestedElements()
 //----------------------------------------------------------------------------
 void vtkPVXMLElement::RemoveNestedElement(vtkPVXMLElement* element)
 {
-  std::vector<vtkSmartPointer<vtkPVXMLElement> >::iterator iter =
+  std::vector<vtkSmartPointer<vtkPVXMLElement>>::iterator iter =
     this->Internal->NestedElements.begin();
   for (; iter != this->Internal->NestedElements.end(); ++iter)
   {

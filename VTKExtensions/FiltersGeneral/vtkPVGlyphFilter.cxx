@@ -63,13 +63,13 @@ class vtkPVGlyphFilter::vtkInternals
   // Used only with SPATIALLY_UNIFORM_DISTRIBUTION
   vtkBoundingBox Bounds;
   double NearestPointRadius;
-  std::vector<vtkTuple<double, 3> > Points;
+  std::vector<vtkTuple<double, 3>> Points;
   std::vector<vtkIdType> PointIds;
   size_t NextPointId;
   vtkNew<vtkOctreePointLocator> Locator;
 
   // Used with SPATIALLY_UNIFORM_INVERSE_TRANSFORM_SAMPLING_*
-  std::map<unsigned int, std::vector<double> > UniformSamplingVectorMap;
+  std::map<unsigned int, std::vector<double>> UniformSamplingVectorMap;
   std::vector<vtkIdType> IdLookupTable;
   double SamplingRunningSum = 0;
 

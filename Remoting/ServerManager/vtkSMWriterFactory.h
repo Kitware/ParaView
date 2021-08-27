@@ -27,7 +27,7 @@
  *
  * Once the factory has been configured, the API to create writers, get
  * available writers etc. can be used.
-*/
+ */
 
 #ifndef vtkSMWriterFactory_h
 #define vtkSMWriterFactory_h
@@ -95,7 +95,7 @@ public:
   }
   /**
    * A variation on GetSupportedFileTypes that obtains a list of prototype proxy names.
-  */
+   */
   const char* GetSupportedWriterProxies(vtkSMSourceProxy* source, unsigned int outputport);
 
   // Returns the number of registered prototypes.

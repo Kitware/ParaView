@@ -22,7 +22,7 @@
  * Bar/Line/Quartile/Parallel Coordinates views).
  *
  * @sa vtkCSVExporter
-*/
+ */
 
 #ifndef vtkSMCSVExporterProxy_h
 #define vtkSMCSVExporterProxy_h

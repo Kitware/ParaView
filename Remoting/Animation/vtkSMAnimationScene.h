@@ -29,7 +29,7 @@
  * vtkSMAnimationScene forwards the vtkCommand::StartEvent and
  * vtkCommand::EndEvent from vtkCompositeAnimationPlayer to mark the start and
  * end of animation playback.
-*/
+ */
 
 #ifndef vtkSMAnimationScene_h
 #define vtkSMAnimationScene_h

@@ -97,7 +97,7 @@ public:
   }
 };
 typedef std::vector<vtkXMLCollectionReaderString> vtkXMLCollectionReaderAttributeNames;
-typedef std::vector<std::vector<vtkXMLCollectionReaderString> >
+typedef std::vector<std::vector<vtkXMLCollectionReaderString>>
   vtkXMLCollectionReaderAttributeValueSets;
 typedef std::map<vtkXMLCollectionReaderString, vtkXMLCollectionReaderString>
   vtkXMLCollectionReaderRestrictions;
@@ -109,16 +109,16 @@ public:
   vtkXMLCollectionReaderAttributeNames AttributeNames;
   vtkXMLCollectionReaderAttributeValueSets AttributeValueSets;
   vtkXMLCollectionReaderRestrictions Restrictions;
-  std::vector<vtkSmartPointer<vtkXMLReader> > Readers;
+  std::vector<vtkSmartPointer<vtkXMLReader>> Readers;
 
   typedef vtkXMLReader* (*Constructor)(void); // function pointer type
-  typedef std::map<std::string, std::pair<std::string, Constructor> > ReaderConstructorsType;
+  typedef std::map<std::string, std::pair<std::string, Constructor>> ReaderConstructorsType;
   static const ReaderConstructorsType ReaderConstructors;
 };
 
 #define GET_NEW_FUNCTOR(x)                                                                         \
   {                                                                                                \
-    #x, [](void) -> vtkXMLReader* { return x::New(); }                                             \
+#x, [](void) -> vtkXMLReader* { return x::New(); }                                             \
   }
 const vtkXMLCollectionReaderInternals::ReaderConstructorsType
   vtkXMLCollectionReaderInternals::ReaderConstructors = { { "vtp",
@@ -128,10 +128,12 @@ const vtkXMLCollectionReaderInternals::ReaderConstructorsType
     { "vtr", GET_NEW_FUNCTOR(vtkXMLRectilinearGridReader) },
     { "vtm", GET_NEW_FUNCTOR(vtkXMLMultiBlockDataReader) },
     { "vtmb", GET_NEW_FUNCTOR(vtkXMLMultiBlockDataReader) },
-    { "vtmg", GET_NEW_FUNCTOR(
-                vtkXMLMultiGroupDataReader) }, // legacy reader - produces vtkMultiBlockDataSet.
-    { "vthd", GET_NEW_FUNCTOR(
-                vtkXMLHierarchicalDataReader) }, // legacy reader - produces vtkMultiBlockDataSet.
+    { "vtmg",
+      GET_NEW_FUNCTOR(
+        vtkXMLMultiGroupDataReader) }, // legacy reader - produces vtkMultiBlockDataSet.
+    { "vthd",
+      GET_NEW_FUNCTOR(
+        vtkXMLHierarchicalDataReader) }, // legacy reader - produces vtkMultiBlockDataSet.
     { "vthb", GET_NEW_FUNCTOR(vtkXMLHierarchicalBoxDataReader) },
     { "vts", GET_NEW_FUNCTOR(vtkXMLStructuredGridReader) },
     { "vtt", GET_NEW_FUNCTOR(vtkXMLTableReader) },

@@ -65,8 +65,8 @@ public:
 
   //@{
   /**
-  * Methods overridden from pqPropertyWidget.
-  */
+   * Methods overridden from pqPropertyWidget.
+   */
   bool canShowWidget(bool show_advanced) const override;
   bool enableWidget() const override;
   //@}

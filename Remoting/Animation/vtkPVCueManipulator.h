@@ -32,7 +32,7 @@
  * the key frames are changed i.e. added/removed/modified.
  * @sa
  * vtkPVAnimationCue vtkAnimationCue
-*/
+ */
 
 #ifndef vtkPVCueManipulator_h
 #define vtkPVCueManipulator_h

@@ -46,7 +46,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  * Provides a dialog for specifying a range of scalar samples, used
  * by pqSampleScalarWidget
-*/
+ */
 class PQCOMPONENTS_EXPORT pqSampleScalarAddRangeDialog : public QDialog
 {
   typedef QDialog Superclass;

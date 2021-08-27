@@ -24,28 +24,29 @@
 // mangled function names.
 
 #ifdef __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 
-// call at the start of the simulation
-void VTKPVCATALYST_EXPORT coprocessorinitialize();
+  // call at the start of the simulation
+  void VTKPVCATALYST_EXPORT coprocessorinitialize();
 
-// call at the end of the simulation
-void VTKPVCATALYST_EXPORT coprocessorfinalize();
+  // call at the end of the simulation
+  void VTKPVCATALYST_EXPORT coprocessorfinalize();
 
-// this is the function that determines whether or not there
-// is anything to coprocess this time step
-void VTKPVCATALYST_EXPORT requestdatadescription(
-  int* timeStep, double* time, int* coprocessThisTimeStep);
+  // this is the function that determines whether or not there
+  // is anything to coprocess this time step
+  void VTKPVCATALYST_EXPORT requestdatadescription(
+    int* timeStep, double* time, int* coprocessThisTimeStep);
 
-// this function sets needgrid to 1 if it does not have a copy of the grid
-// it sets needgrid to 0 if it does have a copy of the grid but does not
-// check if the grid is modified or needs to be updated
-void VTKPVCATALYST_EXPORT needtocreategrid(int* needGrid);
+  // this function sets needgrid to 1 if it does not have a copy of the grid
+  // it sets needgrid to 0 if it does have a copy of the grid but does not
+  // check if the grid is modified or needs to be updated
+  void VTKPVCATALYST_EXPORT needtocreategrid(int* needGrid);
 
-// do the actual coprocessing.  it is assumed that the vtkCPDataDescription
-// has been filled in elsewhere.
-void VTKPVCATALYST_EXPORT coprocess();
+  // do the actual coprocessing.  it is assumed that the vtkCPDataDescription
+  // has been filled in elsewhere.
+  void VTKPVCATALYST_EXPORT coprocess();
 
 #ifdef __cplusplus
 } /* extern "C" */

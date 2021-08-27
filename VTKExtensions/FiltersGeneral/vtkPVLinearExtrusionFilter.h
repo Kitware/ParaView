@@ -19,7 +19,7 @@
  * vtkPVLinearExtrusionFilter is a subclass of vtkPLinearExtrusionFilter.
  * The only difference is changing the default extrusion type to vector
  * extrusion
-*/
+ */
 
 #ifndef vtkPVLinearExtrusionFilter_h
 #define vtkPVLinearExtrusionFilter_h

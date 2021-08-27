@@ -23,7 +23,7 @@
  * RequestData() itself. This makes it possible for client code to call
  * UpdatePipeline() on the representation proxy and then access the delivered
  * vtkTable on the client.
-*/
+ */
 
 #ifndef vtkChartRepresentation_h
 #define vtkChartRepresentation_h
@@ -232,7 +232,7 @@ protected:
    */
   virtual vtkSmartPointer<vtkDataObject> TransformTable(vtkSmartPointer<vtkDataObject> table);
 
-  typedef std::map<std::string, std::pair<vtkSmartPointer<vtkTable>, unsigned int> > MapOfTables;
+  typedef std::map<std::string, std::pair<vtkSmartPointer<vtkTable>, unsigned int>> MapOfTables;
   /**
    * Convenience method to get all vtkTable instances with their associated
    * names.

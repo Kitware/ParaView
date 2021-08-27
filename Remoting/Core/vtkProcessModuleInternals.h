@@ -25,10 +25,10 @@
 class vtkProcessModuleInternals
 {
 public:
-  typedef std::map<vtkIdType, vtkSmartPointer<vtkSession> > MapOfSessions;
+  typedef std::map<vtkIdType, vtkSmartPointer<vtkSession>> MapOfSessions;
   MapOfSessions Sessions;
 
-  typedef std::vector<vtkWeakPointer<vtkSession> > ActiveSessionStackType;
+  typedef std::vector<vtkWeakPointer<vtkSession>> ActiveSessionStackType;
   ActiveSessionStackType ActiveSessionStack;
 };
 

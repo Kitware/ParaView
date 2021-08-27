@@ -38,8 +38,8 @@ class vtkSMProxyLocator;
 class vtkSMProxyProperty::vtkPPInternals
 {
 public:
-  typedef std::vector<vtkSmartPointer<vtkSMProxy> > SmartVectorOfProxies;
-  typedef std::vector<vtkWeakPointer<vtkSMProxy> > WeakVectorOfProxies;
+  typedef std::vector<vtkSmartPointer<vtkSMProxy>> SmartVectorOfProxies;
+  typedef std::vector<vtkWeakPointer<vtkSMProxy>> WeakVectorOfProxies;
   typedef std::vector<unsigned int> VectorOfUInts;
 
 private:

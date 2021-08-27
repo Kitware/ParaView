@@ -35,13 +35,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqReaction.h"
 
 /**
-* @class pqDataQueryReaction
-* @brief reaction to bring up "find data" panel.
-* @ingroup Reactions
-*
-* pqDataQueryReaction is the reaction that brings to forefront the
-* `FIND_DATA_PANEL` registered with the application, if any.
-*/
+ * @class pqDataQueryReaction
+ * @brief reaction to bring up "find data" panel.
+ * @ingroup Reactions
+ *
+ * pqDataQueryReaction is the reaction that brings to forefront the
+ * `FIND_DATA_PANEL` registered with the application, if any.
+ */
 class PQAPPLICATIONCOMPONENTS_EXPORT pqDataQueryReaction : public pqReaction
 {
   Q_OBJECT
@@ -49,20 +49,20 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqDataQueryReaction : public pqReaction
 
 public:
   /**
-  * Constructor. Parent cannot be nullptr.
-  */
+   * Constructor. Parent cannot be nullptr.
+   */
   pqDataQueryReaction(QAction* parent);
   ~pqDataQueryReaction() override;
 
   /**
-  * Show the query panel for querying the data from the active source.
-  */
+   * Show the query panel for querying the data from the active source.
+   */
   void showQueryPanel();
 
 protected:
   /**
-  * Called when the action is triggered.
-  */
+   * Called when the action is triggered.
+   */
   void onTriggered() override { pqDataQueryReaction::showQueryPanel(); }
 
 private:

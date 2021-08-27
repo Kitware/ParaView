@@ -22,7 +22,7 @@
  * vtkPVXMLElement or obtained from the proxy manager.
  * @sa
  * vtkPVXMLElement vtkPVXMLParser vtkSMProxyManager
-*/
+ */
 
 #ifndef vtkSMCompoundProxyDefinitionLoader_h
 #define vtkSMCompoundProxyDefinitionLoader_h

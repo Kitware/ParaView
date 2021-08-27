@@ -19,7 +19,7 @@
  * vtkPVWebApplication defines the core interface for a ParaViewWeb application.
  * This exposes methods that make it easier to manage views and rendered images
  * from views.
-*/
+ */
 
 #ifndef vtkPVWebApplication_h
 #define vtkPVWebApplication_h

@@ -21,7 +21,7 @@
  *
  * vtkSMPluginManager supports multiple sessions. Every vtkSMSession registers
  * itself with the vtkSMPluginManager during initialization.
-*/
+ */
 
 #ifndef vtkSMPluginManager_h
 #define vtkSMPluginManager_h

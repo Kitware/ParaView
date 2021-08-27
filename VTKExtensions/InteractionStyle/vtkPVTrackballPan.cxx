@@ -31,14 +31,10 @@ vtkPVTrackballPan::vtkPVTrackballPan() = default;
 vtkPVTrackballPan::~vtkPVTrackballPan() = default;
 
 //-------------------------------------------------------------------------
-void vtkPVTrackballPan::OnButtonDown(int, int, vtkRenderer*, vtkRenderWindowInteractor*)
-{
-}
+void vtkPVTrackballPan::OnButtonDown(int, int, vtkRenderer*, vtkRenderWindowInteractor*) {}
 
 //-------------------------------------------------------------------------
-void vtkPVTrackballPan::OnButtonUp(int, int, vtkRenderer*, vtkRenderWindowInteractor*)
-{
-}
+void vtkPVTrackballPan::OnButtonUp(int, int, vtkRenderer*, vtkRenderWindowInteractor*) {}
 
 //-------------------------------------------------------------------------
 void vtkPVTrackballPan::OnMouseMove(int x, int y, vtkRenderer* ren, vtkRenderWindowInteractor* rwi)

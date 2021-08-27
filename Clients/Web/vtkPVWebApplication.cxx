@@ -113,7 +113,7 @@ public:
   typedef std::map<std::string, WebGLObjCacheValue> WebGLObjId2IndexMap;
   std::map<vtkWebGLExporter*, WebGLObjId2IndexMap> WebGLExporterObjIdMap;
   // map for <vtkSMViewProxy, vtkWebGLExporter>
-  std::map<vtkSMViewProxy*, vtkSmartPointer<vtkWebGLExporter> > ViewWebGLMap;
+  std::map<vtkSMViewProxy*, vtkSmartPointer<vtkWebGLExporter>> ViewWebGLMap;
   std::string LastAllWebGLBinaryObjects;
 };
 

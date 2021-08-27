@@ -19,7 +19,7 @@
  *
  * vtkSMProxyLocator is used to locate proxies referred to in state xmls (and
  * otherwise) when loading state files.
-*/
+ */
 
 #ifndef vtkSMProxyLocator_h
 #define vtkSMProxyLocator_h

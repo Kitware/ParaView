@@ -37,9 +37,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QLabel>
 
 /**
-* pqLabel is a subclass of QLabel that emits a clicked() signal when
-* the label text is clicked.
-*/
+ * pqLabel is a subclass of QLabel that emits a clicked() signal when
+ * the label text is clicked.
+ */
 class PQCOMPONENTS_EXPORT pqLabel : public QLabel
 {
   Q_OBJECT

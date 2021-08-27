@@ -38,43 +38,43 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QWidget>
 
 /**
-* Widget which provides an editor for the properties of a
-* representation.
-*/
+ * Widget which provides an editor for the properties of a
+ * representation.
+ */
 class PQCOMPONENTS_EXPORT pqDisplayPanel : public QWidget
 {
   Q_OBJECT
 public:
   /**
-  * constructor
-  */
+   * constructor
+   */
   pqDisplayPanel(pqRepresentation* Representation, QWidget* p = nullptr);
   /**
-  * destructor
-  */
+   * destructor
+   */
   ~pqDisplayPanel() override;
 
   /**
-  * get the proxy for which properties are displayed
-  */
+   * get the proxy for which properties are displayed
+   */
   pqRepresentation* getRepresentation();
 
 public Q_SLOTS:
   /**
-  * TODO: get rid of this function once the server manager can
-  * inform us of Representation property changes
-  */
+   * TODO: get rid of this function once the server manager can
+   * inform us of Representation property changes
+   */
   virtual void reloadGUI();
 
   /**
-  * Requests update on all views the
-  * Representation is visible in.
-  */
+   * Requests update on all views the
+   * Representation is visible in.
+   */
   virtual void updateAllViews();
 
   /**
-  * Called when the data information has changed.
-  */
+   * Called when the data information has changed.
+   */
   virtual void dataUpdated();
 
 protected:

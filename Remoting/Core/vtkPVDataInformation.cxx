@@ -996,8 +996,9 @@ void vtkPVDataInformation::CopyToStream(vtkClientServerStream* css)
        << vtkClientServerStream::InsertArray(this->Bounds, 6)
        << vtkClientServerStream::InsertArray(this->Extent, 6) << this->HasTime << this->Time
        << vtkClientServerStream::InsertArray(this->TimeRange, 2) << this->TimeLabel
-       << this->NumberOfTimeSteps << vtkClientServerStream::InsertArray(this->NumberOfElements,
-                                       vtkDataObject::NUMBER_OF_ATTRIBUTE_TYPES);
+       << this->NumberOfTimeSteps
+       << vtkClientServerStream::InsertArray(
+            this->NumberOfElements, vtkDataObject::NUMBER_OF_ATTRIBUTE_TYPES);
 
   *css << static_cast<int>(this->UniqueBlockTypes.size());
   if (!this->UniqueBlockTypes.empty())

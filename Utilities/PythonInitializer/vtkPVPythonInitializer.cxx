@@ -20,11 +20,12 @@
 #include "vtkUtilitiesPythonInitializerModule.h"
 #include "vtkpythonmodules.h"
 
-extern "C" {
-
-void VTKUTILITIESPYTHONINITIALIZER_EXPORT vtkPVInitializePythonModules()
+extern "C"
 {
-  vtkpythonmodules_load();
-  pvpythonmodules_load();
-}
+
+  void VTKUTILITIESPYTHONINITIALIZER_EXPORT vtkPVInitializePythonModules()
+  {
+    vtkpythonmodules_load();
+    pvpythonmodules_load();
+  }
 }

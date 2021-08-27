@@ -131,7 +131,7 @@ protected:
 
   //@{
   /** Utility routines
-  */
+   */
   void StartAction(int VTKIS_STATE, vtkEventDataDevice3D* edata);
   void EndAction(int VTKIS_STATE, vtkEventDataDevice3D* edata);
   //@}

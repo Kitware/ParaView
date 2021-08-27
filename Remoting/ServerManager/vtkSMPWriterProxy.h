@@ -20,7 +20,7 @@ PURPOSE.  See the above copyright notice for more information.
  * vtkSMPWriterProxy is the proxy for all writers that can write in parallel.
  * The only extra functionality provided by this class is that it sets up the
  * piece information on the writer.
-*/
+ */
 
 #ifndef vtkSMPWriterProxy_h
 #define vtkSMPWriterProxy_h

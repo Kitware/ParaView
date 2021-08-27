@@ -32,7 +32,7 @@
  * @par Thanks:
  * Thanks to David Thompson and Philippe Pebay from Sandia National Laboratories
  * for implementing this class. Updated by Philippe Pebay, Kitware SAS 2012
-*/
+ */
 
 #ifndef vtkSciVizStatistics_h
 #define vtkSciVizStatistics_h
@@ -105,14 +105,14 @@ public:
   //@}
 
   /**\brief Possible tasks the filter can perform.
-    *
-    * The MODEL_AND_ASSESS task is not recommended;
-    * you should never evaluate data with a model if that data was used to create the model.
-    * Doing so can result in a too-liberal estimate of model error, especially if overfitting
+   *
+   * The MODEL_AND_ASSESS task is not recommended;
+   * you should never evaluate data with a model if that data was used to create the model.
+   * Doing so can result in a too-liberal estimate of model error, especially if overfitting
    * occurs.
-    * Because we expect that MODEL_AND_ASSESS, despite being ill-advised, will be frequently used
-    * the TrainingFraction parameter has been created.
-    */
+   * Because we expect that MODEL_AND_ASSESS, despite being ill-advised, will be frequently used
+   * the TrainingFraction parameter has been created.
+   */
   enum Tasks
   {
     MODEL_INPUT,     //!< Execute Learn and Derive operations of a statistical engine on the input

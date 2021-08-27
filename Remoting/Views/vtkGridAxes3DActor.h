@@ -20,7 +20,7 @@
  * vtkCubeAxesActor which can be used to render a 3D grid in a scene.
  * It uses vtkGridAxes2DActor to render individual axes planes for the box.
  *
-*/
+ */
 
 #ifndef vtkGridAxes3DActor_h
 #define vtkGridAxes3DActor_h

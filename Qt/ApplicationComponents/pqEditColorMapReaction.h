@@ -40,9 +40,9 @@ class pqPipelineRepresentation;
 class pqDataRepresentation;
 
 /**
-* @ingroup Reactions
-* Reaction to edit the active representation's color map or solid color.
-*/
+ * @ingroup Reactions
+ * Reaction to edit the active representation's color map or solid color.
+ */
 class PQAPPLICATIONCOMPONENTS_EXPORT pqEditColorMapReaction : public pqReaction
 {
   Q_OBJECT
@@ -50,33 +50,33 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqEditColorMapReaction : public pqReaction
 
 public:
   /**
-  * if \c track_active_objects is false, then the reaction will not track
-  * pqActiveObjects automatically.
-  */
+   * if \c track_active_objects is false, then the reaction will not track
+   * pqActiveObjects automatically.
+   */
   pqEditColorMapReaction(QAction* parent, bool track_active_objects = true);
 
   /**
-  * Edit active representation's color map (or solid color).
-  */
+   * Edit active representation's color map (or solid color).
+   */
   static void editColorMap(pqPipelineRepresentation* repr = nullptr);
 
 public Q_SLOTS:
   /**
-  * Updates the enabled state. Applications need not explicitly call
-  * this.
-  */
+   * Updates the enabled state. Applications need not explicitly call
+   * this.
+   */
   void updateEnableState() override;
 
 public Q_SLOTS:
   /**
-  * Set the active representation.
-  */
+   * Set the active representation.
+   */
   void setRepresentation(pqDataRepresentation*);
 
 protected:
   /**
-  * Called when the action is triggered.
-  */
+   * Called when the action is triggered.
+   */
   void onTriggered() override;
 
 private:

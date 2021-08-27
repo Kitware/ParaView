@@ -39,15 +39,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class QTreeWidget;
 class QTreeWidgetItem;
 /**
-* pqTreeWidgetSelectionHelper enables multiple element selection and the
-* toggling on then changing the checked state of the selected elements.
-* Hence, the user can do things like selecting a subset of nodes and then
-* (un)checking all of them etc. This cannot work in parallel with
-* pqTreeWidgetCheckHelper, hence only once of the two must be used on the same
-* tree widget.
-* CAVEATS: This helper currently assumes that the 0-th column is checkable (if
-* at all). This can be fixed if needed.
-*/
+ * pqTreeWidgetSelectionHelper enables multiple element selection and the
+ * toggling on then changing the checked state of the selected elements.
+ * Hence, the user can do things like selecting a subset of nodes and then
+ * (un)checking all of them etc. This cannot work in parallel with
+ * pqTreeWidgetCheckHelper, hence only once of the two must be used on the same
+ * tree widget.
+ * CAVEATS: This helper currently assumes that the 0-th column is checkable (if
+ * at all). This can be fixed if needed.
+ */
 class PQWIDGETS_EXPORT pqTreeWidgetSelectionHelper : public QObject
 {
   Q_OBJECT

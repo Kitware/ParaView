@@ -35,9 +35,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqReaction.h"
 
 /**
-* @ingroup Reactions
-* Reaction for saving state file.
-*/
+ * @ingroup Reactions
+ * Reaction for saving state file.
+ */
 class PQAPPLICATIONCOMPONENTS_EXPORT pqSaveStateReaction : public pqReaction
 {
   Q_OBJECT
@@ -45,45 +45,45 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqSaveStateReaction : public pqReaction
 
 public:
   /**
-  * Constructor. Parent cannot be nullptr.
-  */
+   * Constructor. Parent cannot be nullptr.
+   */
   pqSaveStateReaction(QAction* parent);
   ~pqSaveStateReaction() override {}
 
   /**
-  * Open File dialog in order to choose the location and the type of
-  * the state file that should be saved
-  * Returns true if the user selected a file to save and false if they canceled the dialog
-  */
+   * Open File dialog in order to choose the location and the type of
+   * the state file that should be saved
+   * Returns true if the user selected a file to save and false if they canceled the dialog
+   */
   static bool saveState();
 
   /**
-  * Saves the state file.
-  * Note that this method is static. Applications can simply use this without
-  * having to create a reaction instance.
-  * Return true if the operation succeeded otherwise return false.
-  */
+   * Saves the state file.
+   * Note that this method is static. Applications can simply use this without
+   * having to create a reaction instance.
+   * Return true if the operation succeeded otherwise return false.
+   */
   static bool saveState(const QString& filename);
 
   /**
-  * Saves the state file as a python state.
-  * Note that this method is static. Applications can simply use this without
-  * having to create a reaction instance.
-  * Return true if the operation succeeded otherwise return false.
-  */
+   * Saves the state file as a python state.
+   * Note that this method is static. Applications can simply use this without
+   * having to create a reaction instance.
+   * Return true if the operation succeeded otherwise return false.
+   */
   static bool savePythonState(const QString& filename);
 
 public Q_SLOTS:
   /**
-  * Updates the enabled state. Applications need not explicitly call
-  * this.
-  */
+   * Updates the enabled state. Applications need not explicitly call
+   * this.
+   */
   void updateEnableState() override;
 
 protected:
   /**
-  * Called when the action is triggered.
-  */
+   * Called when the action is triggered.
+   */
   void onTriggered() override { pqSaveStateReaction::saveState(); }
 
 private:

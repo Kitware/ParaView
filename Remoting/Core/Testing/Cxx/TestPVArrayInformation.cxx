@@ -31,7 +31,7 @@ vtkSmartPointer<vtkFloatArray> GetPolyData()
   return array;
 }
 
-int TestPVArrayInformation(int, char* [])
+int TestPVArrayInformation(int, char*[])
 {
 
   vtkSmartPointer<vtkFloatArray> array = GetPolyData();

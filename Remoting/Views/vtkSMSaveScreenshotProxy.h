@@ -127,7 +127,7 @@ protected:
    * When StereoMode is set to VTK_STEREO_EMULATE, both eyes are captures. In
    * that case, this method may be used to return images for each of the eyes.
    */
-  std::pair<vtkSmartPointer<vtkImageData>, vtkSmartPointer<vtkImageData> > CapturePreppedImages();
+  std::pair<vtkSmartPointer<vtkImageData>, vtkSmartPointer<vtkImageData>> CapturePreppedImages();
 
   /**
    * Prepares for saving an image. This will do any changes to view properties

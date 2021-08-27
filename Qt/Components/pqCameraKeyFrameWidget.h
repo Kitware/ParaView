@@ -39,10 +39,10 @@ class vtkSMProxy;
 class vtkCamera;
 
 /**
-* pqCameraKeyFrameWidget is the widget that is shown to edit the value of a
-* single camera key frame. This class is based on pqCameraWidget and hence has
-* sections of code borrowed from there.
-*/
+ * pqCameraKeyFrameWidget is the widget that is shown to edit the value of a
+ * single camera key frame. This class is based on pqCameraWidget and hence has
+ * sections of code borrowed from there.
+ */
 class PQCOMPONENTS_EXPORT pqCameraKeyFrameWidget : public QWidget
 {
   Q_OBJECT
@@ -56,21 +56,21 @@ public:
 
 Q_SIGNALS:
   /**
-  * Fired when user requests the use of the current camera as the value for
-  * the key frame.
-  */
+   * Fired when user requests the use of the current camera as the value for
+   * the key frame.
+   */
   void useCurrentCamera();
   void updateCurrentCamera();
 
 public Q_SLOTS:
   /**
-  * Initialize the widget using the values from the key frame proxy.
-  */
+   * Initialize the widget using the values from the key frame proxy.
+   */
   void initializeUsingKeyFrame(vtkSMProxy* keyframeProxy);
 
   /**
-  * Initialize the widget using the camera.
-  */
+   * Initialize the widget using the camera.
+   */
   void initializeUsingCamera(vtkCamera* camera);
 
   /**
@@ -79,16 +79,16 @@ public Q_SLOTS:
   void applyToCamera(vtkCamera* camera);
 
   /**
-  * The camera keyframes have 2 modes either interpolate vtkCamera's using the
-  * camera interpolator or use path-based. This mode is not defined on
-  * per-keyframe basis, but on the entire animation track. Hence, we provide
-  * this slot to choose which mode should the widget operate in.
-  */
+   * The camera keyframes have 2 modes either interpolate vtkCamera's using the
+   * camera interpolator or use path-based. This mode is not defined on
+   * per-keyframe basis, but on the entire animation track. Hence, we provide
+   * this slot to choose which mode should the widget operate in.
+   */
   void setUsePathBasedMode(bool);
 
   /**
-  * Write the user chosen values for this key frame to the proxy.
-  */
+   * Write the user chosen values for this key frame to the proxy.
+   */
   void saveToKeyFrame(vtkSMProxy* keyframeProxy);
 
 protected:
@@ -98,8 +98,8 @@ protected:
 
 private Q_SLOTS:
   /**
-  * called when the user clicks on an item in the left pane.
-  */
+   * called when the user clicks on an item in the left pane.
+   */
   void changeCurrentPage();
 
 private:

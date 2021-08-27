@@ -20,7 +20,7 @@
  * vtkPVSelectionSource is used to create different types of selections. It
  * provides different APIs for different types of selections to create.
  * The output selection type depends on the API used most recently.
-*/
+ */
 
 #ifndef vtkPVSelectionSource_h
 #define vtkPVSelectionSource_h

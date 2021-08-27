@@ -28,7 +28,7 @@
  * number of rendering processors are call N.  This class is used to create N
  * vtkSocketCommunicator's that connect the first N of the M processes on the
  * data server to the N processes on the render server.
-*/
+ */
 
 #ifndef vtkMPIMToNSocketConnection_h
 #define vtkMPIMToNSocketConnection_h

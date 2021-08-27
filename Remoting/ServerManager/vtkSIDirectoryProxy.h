@@ -17,7 +17,7 @@
  *
  * vtkSIDirectoryProxy is the server-implementation for a vtkSMDirectory
  * which will customly handle server file listing for the pull request
-*/
+ */
 
 #ifndef vtkSIDirectoryProxy_h
 #define vtkSIDirectoryProxy_h

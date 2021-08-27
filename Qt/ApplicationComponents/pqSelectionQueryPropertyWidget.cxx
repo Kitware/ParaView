@@ -698,7 +698,7 @@ class pqSelectionQueryPropertyWidget::pqInternals
 public:
   pqSelectionQueryPropertyWidget* Parent;
   pqTimer DomainTimer;
-  QList<std::tuple<QueryWidgetType*, QPushButton*, QPushButton*> > QueryWidgets;
+  QList<std::tuple<QueryWidgetType*, QPushButton*, QPushButton*>> QueryWidgets;
 
   pqInternals(pqSelectionQueryPropertyWidget* self)
     : Parent(self)

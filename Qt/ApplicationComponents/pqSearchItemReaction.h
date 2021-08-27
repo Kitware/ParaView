@@ -40,9 +40,9 @@ class pqProxy;
 class QWidget;
 
 /**
-* @ingroup Reactions
-* Reaction to filter item widgets.
-*/
+ * @ingroup Reactions
+ * Reaction to filter item widgets.
+ */
 class PQAPPLICATIONCOMPONENTS_EXPORT pqSearchItemReaction : pqReaction
 {
   Q_OBJECT

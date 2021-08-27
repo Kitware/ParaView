@@ -37,10 +37,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkWeakPointer.h"
 
 /**
-* pqBoolPropertyWidgetDecorator is a base class for enable/disable
-* or show/hide widgets based on the status of another property not
-* directly controlled by the widget.
-*/
+ * pqBoolPropertyWidgetDecorator is a base class for enable/disable
+ * or show/hide widgets based on the status of another property not
+ * directly controlled by the widget.
+ */
 class PQAPPLICATIONCOMPONENTS_EXPORT pqBoolPropertyWidgetDecorator
   : public pqPropertyWidgetDecorator
 {
@@ -68,12 +68,12 @@ private:
   Q_DISABLE_COPY(pqBoolPropertyWidgetDecorator)
 
   /**
-  * updates the enabled state.
-  */
+   * updates the enabled state.
+   */
   void updateBoolPropertyState();
   /**
-  * update this->BoolProperty and fires boolPropertyChanged
-  */
+   * update this->BoolProperty and fires boolPropertyChanged
+   */
   void setBoolProperty(bool val);
 };
 

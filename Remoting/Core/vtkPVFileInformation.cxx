@@ -348,7 +348,7 @@ std::string MakeAbsolutePath(const std::string& path, const std::string& working
 }
 
 //-----------------------------------------------------------------------------
-class vtkPVFileInformationSet : public std::set<vtkSmartPointer<vtkPVFileInformation> >
+class vtkPVFileInformationSet : public std::set<vtkSmartPointer<vtkPVFileInformation>>
 {
 };
 
@@ -740,7 +740,7 @@ void vtkPVFileInformation::GetWindowsDirectoryListing()
     DWORD isdir = data.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY;
     DWORD isfile = (data.dwFileAttributes & FILE_ATTRIBUTE_NORMAL) ||
       (!(data.dwFileAttributes & FILE_ATTRIBUTE_SYSTEM) &&
-                     !(data.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY));
+        !(data.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY));
 
     FileTypes type = isdir ? DIRECTORY : SINGLE_FILE;
     if (isLink)
@@ -999,8 +999,7 @@ bool vtkPVFileInformation::DetectType()
 
 struct vtkPVFileInformation::vtkInfo
 {
-  typedef std::map<std::pair<int, std::string>, vtkSmartPointer<vtkPVFileInformation> >
-    ChildrenType;
+  typedef std::map<std::pair<int, std::string>, vtkSmartPointer<vtkPVFileInformation>> ChildrenType;
   vtkSmartPointer<vtkPVFileInformation> Group;
   ChildrenType Children;
 };

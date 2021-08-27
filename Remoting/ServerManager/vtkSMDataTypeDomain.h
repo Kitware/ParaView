@@ -46,7 +46,7 @@
  *
  * @sa
  * vtkSMDomain  vtkSMSourceProxy
-*/
+ */
 
 #ifndef vtkSMDataTypeDomain_h
 #define vtkSMDataTypeDomain_h

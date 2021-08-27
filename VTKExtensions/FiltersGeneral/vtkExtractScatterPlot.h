@@ -24,7 +24,7 @@
  * between bins along each dimension.  It will also contain a
  * vtkUnsignedLongArray named "bin_values" which contains the value for
  * each bin.
-*/
+ */
 
 #ifndef vtkExtractScatterPlot_h
 #define vtkExtractScatterPlot_h

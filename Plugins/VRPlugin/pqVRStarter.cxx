@@ -75,7 +75,7 @@ public:
                         "([\\d.-]+)," // quat_x
                         "([\\d.-]+)," // quat_y
                         "([\\d.-]+)$" // quat_z
-          );
+        );
         int ind = capture.indexIn(arguments);
         if (ind < 0)
         {

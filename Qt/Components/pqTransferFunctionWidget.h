@@ -41,11 +41,11 @@ class vtkPiecewiseFunction;
 class vtkTable;
 
 /**
-* pqTransferFunctionWidget provides a widget that can edit the control points
-* in a vtkPiecewiseFunction or a vtkScalarsToColors (or subclass) or both.
-* It is used by pqColorOpacityEditorWidget, for example, to show transfer
-* function editors for color and opacity for a PVLookupTable proxy.
-*/
+ * pqTransferFunctionWidget provides a widget that can edit the control points
+ * in a vtkPiecewiseFunction or a vtkScalarsToColors (or subclass) or both.
+ * It is used by pqColorOpacityEditorWidget, for example, to show transfer
+ * function editors for color and opacity for a PVLookupTable proxy.
+ */
 class PQCOMPONENTS_EXPORT pqTransferFunctionWidget : public QWidget
 {
   Q_OBJECT
@@ -56,22 +56,22 @@ public:
   ~pqTransferFunctionWidget() override;
 
   /**
-  * Initialize the pqTransferFunctionWidget with the given
-  * color-transfer-function and piecewise-function (either of which can be
-  * null). The editable flags are used to control if the users should be
-  * allowed to edit/change the particular transfer function.
-  */
+   * Initialize the pqTransferFunctionWidget with the given
+   * color-transfer-function and piecewise-function (either of which can be
+   * null). The editable flags are used to control if the users should be
+   * allowed to edit/change the particular transfer function.
+   */
   void initialize(
     vtkScalarsToColors* stc, bool stc_editable, vtkPiecewiseFunction* pwf, bool pwf_editable);
 
   /**
-  * Returns the current point index. -1 is none is selected.
-  */
+   * Returns the current point index. -1 is none is selected.
+   */
   vtkIdType currentPoint() const;
 
   /**
-  * Returns the number of control points in the editor widget.
-  */
+   * Returns the number of control points in the editor widget.
+   */
   vtkIdType numberOfControlPoints() const;
 
   //@{
@@ -101,21 +101,21 @@ public:
 
 public Q_SLOTS:
   /**
-  * Set the current point. Set to -1 clear the current point.
-  */
+   * Set the current point. Set to -1 clear the current point.
+   */
   void setCurrentPoint(vtkIdType index);
 
   /**
-  * Set the X-position for the current point (without changing the Y position,
-  * if applicable. We ensure that the point doesn't move past neighbouring
-  * points. Note this will not change the end points i.e. start and end points.
-  */
+   * Set the X-position for the current point (without changing the Y position,
+   * if applicable. We ensure that the point doesn't move past neighbouring
+   * points. Note this will not change the end points i.e. start and end points.
+   */
   void setCurrentPointPosition(double xpos);
 
   /**
-  * re-renders the transfer function view. This doesn't render immediately,
-  * schedules a render.
-  */
+   * re-renders the transfer function view. This doesn't render immediately,
+   * schedules a render.
+   */
   void render();
 
   /**
@@ -126,14 +126,14 @@ public Q_SLOTS:
 
 Q_SIGNALS:
   /**
-  * signal fired when the \c current selected control point changes.
-  */
+   * signal fired when the \c current selected control point changes.
+   */
   void currentPointChanged(vtkIdType index);
 
   /**
-  * signal fired to indicate that the control points changed i.e. either they
-  * were moved, orone was added/deleted, or edited to change color, etc.
-  */
+   * signal fired to indicate that the control points changed i.e. either they
+   * were moved, orone was added/deleted, or edited to change color, etc.
+   */
   void controlPointsModified();
 
   /**
@@ -153,9 +153,9 @@ Q_SIGNALS:
 
 protected Q_SLOTS:
   /**
-  * slot called when the internal vtkControlPointsItem fires
-  * vtkControlPointsItem::CurrentPointChangedEvent
-  */
+   * slot called when the internal vtkControlPointsItem fires
+   * vtkControlPointsItem::CurrentPointChangedEvent
+   */
   void onCurrentChangedEvent();
 
   /**
@@ -176,9 +176,9 @@ protected Q_SLOTS:
 
 protected:
   /**
-  * callback called when vtkControlPointsItem fires
-  * vtkControlPointsItem::CurrentPointEditEvent.
-  */
+   * callback called when vtkControlPointsItem fires
+   * vtkControlPointsItem::CurrentPointEditEvent.
+   */
   void onCurrentPointEditEvent();
 
 private:

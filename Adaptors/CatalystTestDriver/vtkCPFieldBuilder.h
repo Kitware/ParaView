@@ -17,7 +17,7 @@
  * @brief   Abstract class for specifying fields over grids.
  *
  * Abstract class for specifying fields over grids for a test driver.
-*/
+ */
 
 #ifndef vtkCPFieldBuilder_h
 #define vtkCPFieldBuilder_h

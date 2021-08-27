@@ -118,7 +118,7 @@ private:
   Ui::pqLogViewerDialog* Ui;
   QList<pqSingleLogViewerWidget*> LogViews;
   QVector<int> RankNumbers;
-  QList<vtkSmartPointer<vtkSMProxy> > LogRecorderProxies;
+  QList<vtkSmartPointer<vtkSMProxy>> LogRecorderProxies;
   using LogLocation = QPair<vtkSmartPointer<vtkSMProxy>, int>;
   QMap<LogLocation, double> RefTimes;
   std::array<bool, 5> CategoryPromoted;

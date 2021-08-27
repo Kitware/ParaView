@@ -21,7 +21,7 @@
  * various configurable parameters used by vtkPVRenderView.
  * All class to vtkPVRenderViewSettings::New() returns a reference to the
  * singleton instance.
-*/
+ */
 
 #ifndef vtkPVRenderViewSettings_h
 #define vtkPVRenderViewSettings_h

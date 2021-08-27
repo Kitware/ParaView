@@ -43,32 +43,32 @@ class vtkSMPropertyGroup;
 class pqColorMapModel;
 
 /**
-* pqColorOpacityEditorWidget provides an in-line editor widget for editing the
-* color and opacity transfer functions. The property group is expected to have
-* properties with the following functions. If any of the optional properties
-* are missing, then the corresponding widgets are hidden.
-* \li "XRGBPoints"                              :- property with (x,r,g,b) tuples that is
-*                                                  controlled by a color-transfer function
-*                                                  editor (pqTransferFunctionWidget).
-* \li "ScalarOpacityFunction"                   :- (optional) proxy-property referring to a proxy
-*                                                  with "Points" property with (x,a,m,s) tuples
-*                                                  that is controlled by an opacity-transfer
-*                                                  function editor (pqTransferFunctionWidget).
-* \li "EnableOpacityMapping"                    :- (optional) property used to enable
-*                                                  opacity mapping for surfaces. Controlled by a
-*                                                  checkbox in the Widget.
-* \li "UseLogScale"                             :- (optional) property used to enable/disable log
-*                                                  mapping for colors.
-* \li "UseLogScaleOpacity"                      :- (optional) property used to enable/disable log
-*                                                  mapping for opacity.
-* \li "UseOpacityControlPointsFreehandDrawing"  :- (optional) property used to enable/disable
-*                                                  freehand drawing for positioning control points
-* Caveats:
-* \li Opacity editor:- pqColorOpacityEditorWidget shows an opacity editor widget.
-* Typically, opacity function is optional and used only when
-* "EnableOpacityMapping" is property is ON. However, in cases of Volume
-* rendering, the EnableOpacityMapping has no effect.
-*/
+ * pqColorOpacityEditorWidget provides an in-line editor widget for editing the
+ * color and opacity transfer functions. The property group is expected to have
+ * properties with the following functions. If any of the optional properties
+ * are missing, then the corresponding widgets are hidden.
+ * \li "XRGBPoints"                              :- property with (x,r,g,b) tuples that is
+ *                                                  controlled by a color-transfer function
+ *                                                  editor (pqTransferFunctionWidget).
+ * \li "ScalarOpacityFunction"                   :- (optional) proxy-property referring to a proxy
+ *                                                  with "Points" property with (x,a,m,s) tuples
+ *                                                  that is controlled by an opacity-transfer
+ *                                                  function editor (pqTransferFunctionWidget).
+ * \li "EnableOpacityMapping"                    :- (optional) property used to enable
+ *                                                  opacity mapping for surfaces. Controlled by a
+ *                                                  checkbox in the Widget.
+ * \li "UseLogScale"                             :- (optional) property used to enable/disable log
+ *                                                  mapping for colors.
+ * \li "UseLogScaleOpacity"                      :- (optional) property used to enable/disable log
+ *                                                  mapping for opacity.
+ * \li "UseOpacityControlPointsFreehandDrawing"  :- (optional) property used to enable/disable
+ *                                                  freehand drawing for positioning control points
+ * Caveats:
+ * \li Opacity editor:- pqColorOpacityEditorWidget shows an opacity editor widget.
+ * Typically, opacity function is optional and used only when
+ * "EnableOpacityMapping" is property is ON. However, in cases of Volume
+ * rendering, the EnableOpacityMapping has no effect.
+ */
 class PQAPPLICATIONCOMPONENTS_EXPORT pqColorOpacityEditorWidget : public pqPropertyWidget
 {
   Q_OBJECT
@@ -92,25 +92,25 @@ public:
   ~pqColorOpacityEditorWidget() override;
 
   /**
-  * Returns the current list of control points for the color transfer
-  * function. This a list of 4-tuples.
-  */
+   * Returns the current list of control points for the color transfer
+   * function. This a list of 4-tuples.
+   */
   QList<QVariant> xrgbPoints() const;
 
   /**
-  * Returns the current list of control points for the opacity
-  * function. This a list of 4-tuples.
-  */
+   * Returns the current list of control points for the opacity
+   * function. This a list of 4-tuples.
+   */
   QList<QVariant> xvmsPoints() const;
 
   /**
-  * Returns the value for use-log-scale.
-  */
+   * Returns the value for use-log-scale.
+   */
   bool useLogScale() const;
 
   /**
-  * Returns the value for use-log-scale.
-  */
+   * Returns the value for use-log-scale.
+   */
   bool useLogScaleOpacity() const;
 
   /**
@@ -119,45 +119,45 @@ public:
   bool useOpacityControlPointsFreehandDrawing() const;
 
   /**
-  * Returns the value for showDataHistogram
-  */
+   * Returns the value for showDataHistogram
+   */
   bool showDataHistogram() const;
 
   /**
-  * Returns the value for automaticDataHistogramComputation
-  */
+   * Returns the value for automaticDataHistogramComputation
+   */
   bool automaticDataHistogramComputation() const;
 
   /**
-  * Returns the value for dataHistogramNumberOfBins
-  */
+   * Returns the value for dataHistogramNumberOfBins
+   */
   int dataHistogramNumberOfBins() const;
 
   /**
-  * Returns the scalar opacity function (i.e. PiecewiseFunction) proxy
-  * used, if any.
-  */
+   * Returns the scalar opacity function (i.e. PiecewiseFunction) proxy
+   * used, if any.
+   */
   pqSMProxy scalarOpacityFunctionProxy() const;
 
 public Q_SLOTS:
   /**
-  * Sets the xvmsPoints that control the opacity transfer function.
-  */
+   * Sets the xvmsPoints that control the opacity transfer function.
+   */
   void setXvmsPoints(const QList<QVariant>&);
 
   /**
-  * Sets the xrgbPoints that control the color transfer function.
-  */
+   * Sets the xrgbPoints that control the color transfer function.
+   */
   void setXrgbPoints(const QList<QVariant>&);
 
   /**
-  * Set whether to use-log scale.
-  */
+   * Set whether to use-log scale.
+   */
   void setUseLogScale(bool value);
 
   /**
-  * Set whether to use-log scale.
-  */
+   * Set whether to use-log scale.
+   */
   void setUseLogScaleOpacity(bool value);
 
   /**
@@ -166,60 +166,60 @@ public Q_SLOTS:
   void setUseOpacityControlPointsFreehandDrawing(bool value);
 
   /**
-  * Set whether to show data histogram.
-  */
+   * Set whether to show data histogram.
+   */
   void setShowDataHistogram(bool value);
 
   /**
-  * Set whether to automatically compute data histogram.
-  */
+   * Set whether to automatically compute data histogram.
+   */
   void setAutomaticDataHistogramComputation(bool value);
 
   /**
-  * Set the number of bins to use for the data histogram.
-  */
+   * Set the number of bins to use for the data histogram.
+   */
   void setDataHistogramNumberOfBins(int value);
 
   /**
-  * Set the scalar opacity function (or PiecewiseFunction) proxy to use.
-  */
+   * Set the scalar opacity function (or PiecewiseFunction) proxy to use.
+   */
   void setScalarOpacityFunctionProxy(pqSMProxy sofProxy);
 
   /**
-  * Reset the transfer function ranges to active data source.
-  */
+   * Reset the transfer function ranges to active data source.
+   */
   void resetRangeToData();
 
   /**
-  * Reset the transfer function ranges to custom values.
-  */
+   * Reset the transfer function ranges to custom values.
+   */
   void resetRangeToCustom();
 
   /**
-  * Reset the transfer function ranges to temporal range for active data
-  * source.
-  */
+   * Reset the transfer function ranges to temporal range for active data
+   * source.
+   */
   void resetRangeToDataOverTime();
 
   /**
-  * Reset the transfer function ranges to visible range for active data
-  * source.
-  */
+   * Reset the transfer function ranges to visible range for active data
+   * source.
+   */
   void resetRangeToVisibleData();
 
   /**
-  * Inverts the transfer functions.
-  */
+   * Inverts the transfer functions.
+   */
   void invertTransferFunctions();
 
   /**
-  * pick a preset.
-  */
+   * pick a preset.
+   */
   void choosePreset(const char* presetName = nullptr);
 
   /**
-  * save current transfer function as preset.
-  */
+   * save current transfer function as preset.
+   */
   void saveAsPreset();
 
   void onRangeHandlesRangeChanged(double rangeMin, double rangeMax);
@@ -232,78 +232,78 @@ public Q_SLOTS:
 
 Q_SIGNALS:
   /**
-  * Signal fired when the xrgbPoints change.
-  */
+   * Signal fired when the xrgbPoints change.
+   */
   void xrgbPointsChanged();
 
   /**
-  * Signal fired when the xvmsPoints change.
-  */
+   * Signal fired when the xvmsPoints change.
+   */
   void xvmsPointsChanged();
 
   /**
-  * Signal fired when useLogScale changes.
-  */
+   * Signal fired when useLogScale changes.
+   */
   void useLogScaleChanged();
 
   /**
-  * Signal fired when useLogScaleOpacity changes.
-  */
+   * Signal fired when useLogScaleOpacity changes.
+   */
   void useLogScaleOpacityChanged();
 
   /**
-  * Signal fired when useOpacityControlPointsFreehandDrawing changes.
-  */
+   * Signal fired when useOpacityControlPointsFreehandDrawing changes.
+   */
   void useOpacityControlPointsFreehandDrawingChanged();
 
   /**
-  * Signal fired when showDataHistogram changes.
-  */
+   * Signal fired when showDataHistogram changes.
+   */
   void showDataHistogramChanged();
 
   /**
-  * Signal fired when automaticDataHistogramComputation changes.
-  */
+   * Signal fired when automaticDataHistogramComputation changes.
+   */
   void automaticDataHistogramComputationChanged();
 
   /**
-  * Signal fired when dataHistogramNumberOfBins changes.
-  */
+   * Signal fired when dataHistogramNumberOfBins changes.
+   */
   void dataHistogramNumberOfBinsEdited();
 
   /**
-  * This signal is never really fired since this
-  * widget doesn't have any UI to allow users to changes the
-  * ScalarOpacityFunction proxy used.
-  */
+   * This signal is never really fired since this
+   * widget doesn't have any UI to allow users to changes the
+   * ScalarOpacityFunction proxy used.
+   */
   void scalarOpacityFunctionProxyChanged();
 
 protected Q_SLOTS:
   /**
-  * slots called when the current point changes on the two internal
-  * pqTransferFunctionWidget widgets.
-  */
+   * slots called when the current point changes on the two internal
+   * pqTransferFunctionWidget widgets.
+   */
   void opacityCurrentChanged(vtkIdType);
   void colorCurrentChanged(vtkIdType);
 
   /**
-  * updates the panel to show/hide advanced settings
-  */
+   * updates the panel to show/hide advanced settings
+   */
   void updatePanel();
 
   /**
-  * updates the text shown in the "current data" input.
-  */
+   * updates the text shown in the "current data" input.
+   */
   void updateCurrentData();
 
   /**
-  * update the transfer function with the text in CurrentDataValue text field.
-  */
+   * update the transfer function with the text in CurrentDataValue text field.
+   */
   void currentDataEdited();
 
   /**
-  * called when a preset is applied.
-  */
+   * called when a preset is applied.
+   */
   void presetApplied();
 
   /**
@@ -312,52 +312,52 @@ protected Q_SLOTS:
   void updateDefaultPresetsList();
 
   /**
-  * Ensures that the color-swatches for indexedColors are shown only when this
-  * is set to true.
-  */
+   * Ensures that the color-swatches for indexedColors are shown only when this
+   * is set to true.
+   */
   void updateIndexedLookupState();
 
   /**
    * called when "MultiComponentsMappingChanged" checkbox is modified.
-  */
+   */
   void multiComponentsMappingChanged(vtkObject*, unsigned long, void*, void*);
 
   /**
-  * called when the use-log-scale checkbox is clicked by the user. We then add
-  * extra logic to valid ranges convert the color map to log/linear space.
-  */
+   * called when the use-log-scale checkbox is clicked by the user. We then add
+   * extra logic to valid ranges convert the color map to log/linear space.
+   */
   void useLogScaleClicked(bool);
 
   /**
-  * called when the use-log-scale checkbox is clicked by the user. We then add
-  * extra logic to valid ranges convert the color map to log/linear space.
-  */
+   * called when the use-log-scale checkbox is clicked by the user. We then add
+   * extra logic to valid ranges convert the color map to log/linear space.
+   */
   void useLogScaleOpacityClicked(bool);
 
   /**
-  * Called when UseOpacityControlPointsFreehandDrawing checkbox
-  * is clicked by the user. We transfer the call to the pqTransferFunctionEditor.
-  */
+   * Called when UseOpacityControlPointsFreehandDrawing checkbox
+   * is clicked by the user. We transfer the call to the pqTransferFunctionEditor.
+   */
   void useOpacityControlPointsFreehandDrawingClicked(bool);
 
   /**
-  * Called when the showDataHistogram checkbox is clicked by the user. We then add
-  * extra logic to compute and update the histogram and enable to update histogram button.
-  * This uses the histogram table cache if it is up to date.
-  * This can be called manually to show/hide the histogram
-  */
+   * Called when the showDataHistogram checkbox is clicked by the user. We then add
+   * extra logic to compute and update the histogram and enable to update histogram button.
+   * This uses the histogram table cache if it is up to date.
+   * This can be called manually to show/hide the histogram
+   */
   void showDataHistogramClicked(bool show = true);
 
   /**
-  * Called when the automaticDataHistogramComputation checkbox is clicked by the user.
-  * We then add extra logic to show the histogram and update the UI.
-  */
+   * Called when the automaticDataHistogramComputation checkbox is clicked by the user.
+   * We then add extra logic to show the histogram and update the UI.
+   */
   void automaticDataHistogramComputationClicked(bool val);
 
   /**
    * Called when the  dataHistogramNumberOfBins is changed by the user.
    * We then add extra logic to set the histogram outdated
-  */
+   */
   void dataHistogramNumberOfBinsEdited(int val);
 
   /**
@@ -366,11 +366,11 @@ protected Q_SLOTS:
   void updateDataHistogramEnableState();
 
   /**
-  * called when the active representation or view changes.  We then change the
-  * enabled/disabled state of the buttons. Some actions require a valid
-  * representation or view, so disable them if there isn't one.
-  * We also update the opacity editor.
-  */
+   * called when the active representation or view changes.  We then change the
+   * enabled/disabled state of the buttons. Some actions require a valid
+   * representation or view, so disable them if there isn't one.
+   * We also update the opacity editor.
+   */
   void representationOrViewChanged();
 
   /**

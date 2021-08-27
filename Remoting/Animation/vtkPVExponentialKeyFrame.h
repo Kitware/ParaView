@@ -16,7 +16,7 @@
  * @class   vtkPVExponentialKeyFrame
  *
  * Interplates lineraly between consecutive key frames.
-*/
+ */
 
 #ifndef vtkPVExponentialKeyFrame_h
 #define vtkPVExponentialKeyFrame_h

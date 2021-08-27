@@ -19,7 +19,7 @@
  *
  * vtkPVPluginsInformation is used to collect information about plugins tracked
  * by vtkPVPluginTracker.
-*/
+ */
 
 #ifndef vtkPVPluginsInformation_h
 #define vtkPVPluginsInformation_h

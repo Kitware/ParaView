@@ -41,10 +41,10 @@ class QMainWindow;
 class QAction;
 
 /**
-* pqViewMenuManager keeps ParaView View menu populated with all the available
-* dock widgets and toolbars. This needs special handling since new dock
-* widget/toolbars may get added when plugins are loaded.
-*/
+ * pqViewMenuManager keeps ParaView View menu populated with all the available
+ * dock widgets and toolbars. This needs special handling since new dock
+ * widget/toolbars may get added when plugins are loaded.
+ */
 class PQAPPLICATIONCOMPONENTS_EXPORT pqViewMenuManager : public QObject
 {
   Q_OBJECT

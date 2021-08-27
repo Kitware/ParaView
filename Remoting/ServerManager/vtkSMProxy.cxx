@@ -1672,7 +1672,7 @@ int vtkSMProxy::CreateSubProxiesAndProperties(
         const char* pname = subElement->GetAttribute("proxyname");
         const char* gname = subElement->GetAttribute("proxygroup");
         int override = 0;
-        if (!subElement->GetScalarAttribute("override", & override))
+        if (!subElement->GetScalarAttribute("override", &override))
         {
           override = 0;
         }
@@ -1748,7 +1748,7 @@ vtkSMProperty* vtkSMProxy::SetupExposedProperty(
     exposed_name = name;
   }
   int override = 0;
-  if (!propertyElement->GetScalarAttribute("override", & override))
+  if (!propertyElement->GetScalarAttribute("override", &override))
   {
     override = 0;
   }
@@ -1895,8 +1895,9 @@ void vtkSMProxy::SetupSharedProperties(vtkSMProxy* subproxy, vtkPVXMLElement* el
       vtkSMProxy* src_subproxy = this->GetSubProxy(name);
       if (!src_subproxy)
       {
-        vtkErrorMacro("Subproxy " << name << " must be defined before "
-                                             "its properties can be shared with another subproxy.");
+        vtkErrorMacro("Subproxy " << name
+                                  << " must be defined before "
+                                     "its properties can be shared with another subproxy.");
         continue;
       }
       vtkSMProxyLink* sharingLink = vtkSMProxyLink::New();
@@ -2228,8 +2229,9 @@ void vtkSMProxy::LoadState(const vtkSMMessage* message, vtkSMProxyLocator* locat
 
     // Make sure we do not try to load a state to a proxy that has already
     // sub-proxy with IDs that differ from the message state
-    if (subProxy->HasGlobalID() && (subProxy->GlobalID != subProxyMsg->global_id() ||
-                                     !this->Session->GetRemoteObject(subProxyMsg->global_id())))
+    if (subProxy->HasGlobalID() &&
+      (subProxy->GlobalID != subProxyMsg->global_id() ||
+        !this->Session->GetRemoteObject(subProxyMsg->global_id())))
     {
       vtkErrorMacro("Invalid Proxy for message "
         << endl

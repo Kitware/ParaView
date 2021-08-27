@@ -26,7 +26,7 @@
  * or extract cell containing the point (extract selection).
  *
  * Internally this filter uses vtkPProbeFilter and vtkExtractSelection.
-*/
+ */
 
 #ifndef vtkHybridProbeFilter_h
 #define vtkHybridProbeFilter_h

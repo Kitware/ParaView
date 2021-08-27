@@ -15,7 +15,7 @@
 /**
  * @class   vtkSMTextWidgetRepresentationProxy
  *
-*/
+ */
 
 #ifndef vtkSMTextWidgetRepresentationProxy_h
 #define vtkSMTextWidgetRepresentationProxy_h

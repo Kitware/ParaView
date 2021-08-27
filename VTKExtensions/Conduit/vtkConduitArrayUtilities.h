@@ -36,8 +36,9 @@
 class vtkCellArray;
 class vtkDataArray;
 
-extern "C" {
-typedef void conduit_node;
+extern "C"
+{
+  typedef void conduit_node;
 }
 
 class VTKPVVTKEXTENSIONSCONDUIT_EXPORT vtkConduitArrayUtilities : public vtkObject

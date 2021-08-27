@@ -20,7 +20,7 @@
  * applications to create textures from image files where the image file is
  * present on only one process, say client, but is needed for rendering on the
  * render server and the data server.
-*/
+ */
 
 #ifndef vtkSIImageTextureProxy_h
 #define vtkSIImageTextureProxy_h

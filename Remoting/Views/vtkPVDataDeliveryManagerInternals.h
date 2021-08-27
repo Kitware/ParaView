@@ -33,7 +33,7 @@
 class vtkPVDataDeliveryManager::vtkInternals
 {
   friend class vtkItem;
-  std::map<int, vtkSmartPointer<vtkDataObject> > EmptyDataObjectTypes;
+  std::map<int, vtkSmartPointer<vtkDataObject>> EmptyDataObjectTypes;
 
   // This helps us avoid creating new instances of various data object types to use as
   // empty datasets. Instead, we build a map and keep reusing objects.
@@ -64,7 +64,7 @@ public:
     vtkSmartPointer<vtkDataObject> DataObject;
 
     // Data object available after delivery to the "rendering" node.
-    std::map<int, vtkSmartPointer<vtkDataObject> > DeliveredDataObjects;
+    std::map<int, vtkSmartPointer<vtkDataObject>> DeliveredDataObjects;
 
     // Some useful meta-data.
     vtkMTimeType TimeStamp{ 0 };
@@ -203,10 +203,10 @@ public:
 
   // First is repr unique id, second is the input port.
   typedef std::pair<unsigned int, int> ReprPortType;
-  typedef std::map<ReprPortType, std::pair<vtkItem, vtkItem> > ItemsMapType;
+  typedef std::map<ReprPortType, std::pair<vtkItem, vtkItem>> ItemsMapType;
 
   // Keep track of representation and its uid.
-  typedef std::map<unsigned int, vtkWeakPointer<vtkPVDataRepresentation> > RepresentationsMapType;
+  typedef std::map<unsigned int, vtkWeakPointer<vtkPVDataRepresentation>> RepresentationsMapType;
 
   vtkItem* GetItem(unsigned int index, bool use_second, int port, bool create_if_needed = false)
   {

@@ -38,11 +38,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class QMenu;
 
 /**
-* @ingroup Reactions
-* pqLoadPaletteReaction is used to setup an action that allows the user to
-* load a palette. It setups up menu on the parent action which is populated
-* with available palettes.
-*/
+ * @ingroup Reactions
+ * pqLoadPaletteReaction is used to setup an action that allows the user to
+ * load a palette. It setups up menu on the parent action which is populated
+ * with available palettes.
+ */
 class PQAPPLICATIONCOMPONENTS_EXPORT pqLoadPaletteReaction : public pqReaction
 {
   Q_OBJECT

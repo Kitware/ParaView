@@ -57,7 +57,9 @@ const char ENV_PATH_SEP = ':';
 namespace
 {
 // This is an helper class used for plugins constructed from XMLs.
-class vtkPVXMLOnlyPlugin : public vtkPVPlugin, public vtkPVServerManagerPluginInterface
+class vtkPVXMLOnlyPlugin
+  : public vtkPVPlugin
+  , public vtkPVServerManagerPluginInterface
 {
   std::string PluginName;
   std::string XML;

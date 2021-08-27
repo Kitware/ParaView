@@ -537,10 +537,9 @@ double* vtkPVComparativeAnimationCue::GetValues(
       {
         for (unsigned int cc = 0; cc < count; cc++)
         {
-          this->Values[cc] = (dx * dy > 1)
-            ? iter->MinValues[cc] +
+          this->Values[cc] = (dx * dy > 1) ? iter->MinValues[cc] +
               (y * dx + x) * (iter->MaxValues[cc] - iter->MinValues[cc]) / (dx * dy - 1)
-            : iter->MinValues[cc];
+                                           : iter->MinValues[cc];
         }
         numValues = count;
       }
@@ -550,10 +549,9 @@ double* vtkPVComparativeAnimationCue::GetValues(
       {
         for (unsigned int cc = 0; cc < count; cc++)
         {
-          this->Values[cc] = (dx * dy > 1)
-            ? iter->MinValues[cc] +
+          this->Values[cc] = (dx * dy > 1) ? iter->MinValues[cc] +
               (x * dy + y) * (iter->MaxValues[cc] - iter->MinValues[cc]) / (dx * dy - 1)
-            : iter->MinValues[cc];
+                                           : iter->MinValues[cc];
         }
         numValues = count;
       }

@@ -33,7 +33,7 @@
  * set UseModelTransform to true, and then specify the ModelBounds and
  * ModelTransformMatrix. Note: ModelTransform and DataScale/DataPosition are
  * mutually exclusive.
-*/
+ */
 
 #ifndef vtkPVGridAxes3DActor_h
 #define vtkPVGridAxes3DActor_h

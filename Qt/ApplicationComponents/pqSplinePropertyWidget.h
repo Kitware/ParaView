@@ -39,20 +39,20 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class QColor;
 
 /**
-* pqSplinePropertyWidget is a custom property widget that uses
-* "SplineWidgetRepresentation" to help users interactively set points that
-* form a spline. To use this widget for a property group (vtkSMPropertyGroup),
-* use "InteractiveSpline" as the "panel_widget" in the XML configuration.
-* The property group can have properties for following functions:
-* \li \c HandlePositions: a repeatable 3-tuple vtkSMDoubleVectorProperty that
-* corresponds to the property used to set the selected spline points.
-* \li \c Closed: (optional) a 1-tuple vtkSMIntVectorProperty that
-* corresponds to the boolean flag indicating if the spline should be closed at end points.
-* \li \c Input: (optional) a vtkSMInputProperty that is used to get data
-* information for bounds when placing/resetting the widget.
-* This widget can also be used for a poly-line instead of a spline. For this mode, use
-* "InteractivePolyLine" as the "panel_widget" in the XML configuration.
-*/
+ * pqSplinePropertyWidget is a custom property widget that uses
+ * "SplineWidgetRepresentation" to help users interactively set points that
+ * form a spline. To use this widget for a property group (vtkSMPropertyGroup),
+ * use "InteractiveSpline" as the "panel_widget" in the XML configuration.
+ * The property group can have properties for following functions:
+ * \li \c HandlePositions: a repeatable 3-tuple vtkSMDoubleVectorProperty that
+ * corresponds to the property used to set the selected spline points.
+ * \li \c Closed: (optional) a 1-tuple vtkSMIntVectorProperty that
+ * corresponds to the boolean flag indicating if the spline should be closed at end points.
+ * \li \c Input: (optional) a vtkSMInputProperty that is used to get data
+ * information for bounds when placing/resetting the widget.
+ * This widget can also be used for a poly-line instead of a spline. For this mode, use
+ * "InteractivePolyLine" as the "panel_widget" in the XML configuration.
+ */
 class PQAPPLICATIONCOMPONENTS_EXPORT pqSplinePropertyWidget : public pqInteractivePropertyWidget
 {
   Q_OBJECT;
@@ -96,8 +96,8 @@ Q_SIGNALS:
 
 public Q_SLOTS:
   /**
-  * Set the color to use for the spline.
-  */
+   * Set the color to use for the spline.
+   */
   void setLineColor(const QColor&);
 
 protected Q_SLOTS:

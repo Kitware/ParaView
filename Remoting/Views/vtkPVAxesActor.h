@@ -20,7 +20,7 @@
  * vtkPVAxesActor is used to represent 3D axes in the scene. The user can
  * define the geometry to use for the shaft and the tip, and the user can
  * set the text for the three axes. The text will follow the camera.
-*/
+ */
 
 #ifndef vtkPVAxesActor_h
 #define vtkPVAxesActor_h

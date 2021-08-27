@@ -18,7 +18,7 @@
  *
  * This is a subclass of vtkThreshold that allows to apply threshold filters
  * to either vtkDataSet or vtkHyperTreeGrid.
-*/
+ */
 
 #ifndef vtkPVThreshold_h
 #define vtkPVThreshold_h

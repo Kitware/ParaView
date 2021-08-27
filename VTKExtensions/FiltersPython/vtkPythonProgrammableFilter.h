@@ -36,7 +36,7 @@
  * call are defined as Python variables inside both scripts. This allows
  * the developer to keep the scripts the same but change their behaviour
  * using parameters.
-*/
+ */
 
 #ifndef vtkPythonProgrammableFilter_h
 #define vtkPythonProgrammableFilter_h

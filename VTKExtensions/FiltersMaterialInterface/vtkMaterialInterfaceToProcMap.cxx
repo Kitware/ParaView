@@ -17,7 +17,7 @@
 #include <cassert>
 
 //
-class vtkMaterialInterfaceToProcMap::PieceToProcMapContainer : public std::vector<std::vector<int> >
+class vtkMaterialInterfaceToProcMap::PieceToProcMapContainer : public std::vector<std::vector<int>>
 {
 };
 //

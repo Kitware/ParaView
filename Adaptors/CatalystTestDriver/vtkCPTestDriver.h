@@ -19,7 +19,7 @@
  * Class for creating a co-processor test driver.  It is intended
  * as a framework for creating custom inputs replicating a simulation for
  * the co-processing library.
-*/
+ */
 
 #ifndef vtkCPTestDriver_h
 #define vtkCPTestDriver_h

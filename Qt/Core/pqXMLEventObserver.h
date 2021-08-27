@@ -60,8 +60,8 @@ public:
 
 public Q_SLOTS:
   /**
-  * Record on event in xml file
-  */
+   * Record on event in xml file
+   */
   void onRecordEvent(const QString& Widget, const QString& Command, const QString& Arguments,
     const int& eventType) override;
 

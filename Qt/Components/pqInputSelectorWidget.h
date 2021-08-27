@@ -53,7 +53,7 @@ class vtkSMProxy;
  * exceptional cases. To use this widget for a vtkSMInputProperty, set
  * `panel_widget` attribute to `input_selector`.
  *
-*/
+ */
 class PQCOMPONENTS_EXPORT pqInputSelectorWidget : public pqPropertyWidget
 {
   Q_OBJECT

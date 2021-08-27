@@ -19,7 +19,7 @@
  *
  * This is a subclass of vtkTableBasedClipDataSet that allows selection of input
  * scalars.
-*/
+ */
 
 #ifndef vtkPVClipDataSet_h
 #define vtkPVClipDataSet_h

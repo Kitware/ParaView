@@ -54,7 +54,7 @@ static void string_replace(std::string& string, char c, std::string str)
 class vtkSMReaderFactory::vtkInternals
 {
 public:
-  static std::set<std::pair<std::string, std::string> > ReaderWhitelist;
+  static std::set<std::pair<std::string, std::string>> ReaderWhitelist;
   struct vtkValue
   {
     vtkWeakPointer<vtkSMSession> Session;
@@ -218,7 +218,7 @@ public:
   // included.
   std::set<std::string> Groups;
 };
-std::set<std::pair<std::string, std::string> > vtkSMReaderFactory::vtkInternals::ReaderWhitelist;
+std::set<std::pair<std::string, std::string>> vtkSMReaderFactory::vtkInternals::ReaderWhitelist;
 
 //----------------------------------------------------------------------------
 bool vtkSMReaderFactory::vtkInternals::vtkValue::ExtensionTest(

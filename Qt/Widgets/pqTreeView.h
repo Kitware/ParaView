@@ -64,10 +64,10 @@ class PQWIDGETS_EXPORT pqTreeView : public QTreeView
   Q_OBJECT
 
   /**
-  * Set the maximum number of rows beyond which this view should show a
-  * vertical scroll bar. The pqTreeView will keep on resizing until
-  * maximumRowCountBeforeScrolling row to avoid vertical scrolling.
-  */
+   * Set the maximum number of rows beyond which this view should show a
+   * vertical scroll bar. The pqTreeView will keep on resizing until
+   * maximumRowCountBeforeScrolling row to avoid vertical scrolling.
+   */
   Q_PROPERTY(int maximumRowCountBeforeScrolling READ maximumRowCountBeforeScrolling WRITE
       setMaximumRowCountBeforeScrolling)
 

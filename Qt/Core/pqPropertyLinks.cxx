@@ -44,7 +44,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class pqPropertyLinks::pqInternals
 {
 public:
-  QList<QPointer<pqPropertyLinksConnection> > Connections;
+  QList<QPointer<pqPropertyLinksConnection>> Connections;
   bool IgnoreSMChanges;
   pqInternals()
     : IgnoreSMChanges(false)

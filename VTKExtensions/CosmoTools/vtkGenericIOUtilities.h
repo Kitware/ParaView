@@ -18,7 +18,7 @@
  *
  * This file provides some common utility functions that are used in the
  * implementation of GenericIO readers.
-*/
+ */
 
 #ifndef vtkGenericIOUtilities_h
 #define vtkGenericIOUtilities_h

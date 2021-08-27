@@ -19,7 +19,7 @@
  *
  * vtkFileSeriesWriter is a meta-writer that enables writing a file series using
  * writers that are not time-aware.
-*/
+ */
 
 #ifndef vtkFileSeriesWriter_h
 #define vtkFileSeriesWriter_h

@@ -39,13 +39,13 @@ class vtkSMProxy;
 class pqDataRepresentation;
 
 /**
-* pqColorMapEditor is a widget that can be used to edit the active color-map,
-* if any. The panel is implemented as an auto-generated panel (similar to the
-* Properties panel) that shows the properties on the lookup-table proxy.
-* Custom widgets such as pqColorOpacityEditorWidget,
-* pqColorAnnotationsPropertyWidget, and others are used to
-* control certain properties on the proxy.
-*/
+ * pqColorMapEditor is a widget that can be used to edit the active color-map,
+ * if any. The panel is implemented as an auto-generated panel (similar to the
+ * Properties panel) that shows the properties on the lookup-table proxy.
+ * Custom widgets such as pqColorOpacityEditorWidget,
+ * pqColorAnnotationsPropertyWidget, and others are used to
+ * control certain properties on the proxy.
+ */
 class PQAPPLICATIONCOMPONENTS_EXPORT pqColorMapEditor : public QWidget
 {
   Q_OBJECT
@@ -57,39 +57,39 @@ public:
 
 protected Q_SLOTS:
   /**
-  * slot called to update the currently showing proxies.
-  */
+   * slot called to update the currently showing proxies.
+   */
   void updateActive();
 
   /**
-  * slot called to update the visible widgets.
-  */
+   * slot called to update the visible widgets.
+   */
   void updatePanel();
 
   /**
-  * render's view when transfer function is modified.
-  */
+   * render's view when transfer function is modified.
+   */
   void renderViews();
 
   /**
-  * Save the current transfer function(s) as default.
-  */
+   * Save the current transfer function(s) as default.
+   */
   void saveAsDefault();
 
   /**
-  * Save the current transfer function(s) as default for arrays with
-  * the same name as the selected array.
-  */
+   * Save the current transfer function(s) as default for arrays with
+   * the same name as the selected array.
+   */
   void saveAsArrayDefault();
 
   /**
-  * Restore the defaults (undoes effects of saveAsDefault()).
-  */
+   * Restore the defaults (undoes effects of saveAsDefault()).
+   */
   void restoreDefaults();
 
   /**
-  * called when AutoUpdate button is toggled.
-  */
+   * called when AutoUpdate button is toggled.
+   */
   void setAutoUpdate(bool);
 
   void updateIfNeeded();
@@ -100,8 +100,8 @@ protected:
 
 protected Q_SLOTS:
   /**
-  * update the enabled state for show/edit scalar bar buttons.
-  */
+   * update the enabled state for show/edit scalar bar buttons.
+   */
   void updateScalarBarButtons();
 
 private:

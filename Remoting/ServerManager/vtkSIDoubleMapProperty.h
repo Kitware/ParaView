@@ -17,7 +17,7 @@
  *
  * Map property that manage double value to be set through a method
  * on a vtkObject.
-*/
+ */
 
 #ifndef vtkSIDoubleMapProperty_h
 #define vtkSIDoubleMapProperty_h

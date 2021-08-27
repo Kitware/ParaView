@@ -21,7 +21,7 @@
  * This ParaView filter allows to select the columns of the input table
  * that must be included in the transposed table. This filter can also
  * be use to extract a non transposed table made by the selected columns.
-*/
+ */
 
 #ifndef vtkPVTransposeTable_h
 #define vtkPVTransposeTable_h

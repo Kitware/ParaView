@@ -216,7 +216,7 @@ public:
                             << "DBusMenuExporterPrivate"
                             << "DBusMenuExporterDBus"
                             /* This error appears in Qt 5.6 on Mac OS X 10.11.1 (and maybe others)
-                               */
+                             */
                             << "QNSView mouseDragged: Internal mouse button tracking invalid"
                             << "Unrecognised OpenGL version"
                             /* Skip DBusMenuExporterPrivate errors. These, I suspect, are due to

@@ -19,7 +19,7 @@
  * Abstract class for specifying fields over grids for a test driver.
  * May want to remove GetHighestFieldOrder as it is just a place holder
  * for now.
-*/
+ */
 
 #ifndef vtkCPBaseFieldBuilder_h
 #define vtkCPBaseFieldBuilder_h

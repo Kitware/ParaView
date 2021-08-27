@@ -18,7 +18,7 @@
  * Creates a link between two properties. Can create M->N links.
  * At the time when the link is created every output Selection is synchronized
  * with the first input Selection.
-*/
+ */
 
 #ifndef vtkSMSelectionLink_h
 #define vtkSMSelectionLink_h

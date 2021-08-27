@@ -45,15 +45,15 @@ class vtkSMOutputPort;
 class vtkSMSourceProxy;
 
 /**
-* pqOutputPort is a server manager model item for an output port of any
-* pqPipelineSource item. This makes it possible to refer to a particular
-* output port in the server manager model. The pqPipelineSource keeps
-* references to all its output ports. The only way to access pqOutputPort
-* items is through the pqPipelineSource. One can obtain the pqPipelineSource
-* item from a pqOutputPort using getSource().
-* Once the outputs can be named, we will change this class to use output port
-* names instead of numbers.
-*/
+ * pqOutputPort is a server manager model item for an output port of any
+ * pqPipelineSource item. This makes it possible to refer to a particular
+ * output port in the server manager model. The pqPipelineSource keeps
+ * references to all its output ports. The only way to access pqOutputPort
+ * items is through the pqPipelineSource. One can obtain the pqPipelineSource
+ * item from a pqOutputPort using getSource().
+ * Once the outputs can be named, we will change this class to use output port
+ * names instead of numbers.
+ */
 class PQCORE_EXPORT pqOutputPort : public pqProxy
 {
   Q_OBJECT
@@ -64,84 +64,84 @@ public:
   ~pqOutputPort() override;
 
   /**
-  * Returns the vtkSMOutputPort proxy for this port.
-  */
+   * Returns the vtkSMOutputPort proxy for this port.
+   */
   vtkSMOutputPort* getOutputPortProxy() const;
 
   /**
-  * Returns the pqPipelineSource whose output port this is.
-  */
+   * Returns the pqPipelineSource whose output port this is.
+   */
   pqPipelineSource* getSource() const { return this->Source; }
 
   /**
-  * Return the vtkSMSourceProxy for the source.
-  */
+   * Return the vtkSMSourceProxy for the source.
+   */
   vtkSMSourceProxy* getSourceProxy() const;
 
   /**
-  * Returns the server connection on which this output port exists.
-  */
+   * Returns the server connection on which this output port exists.
+   */
   pqServer* getServer() const;
 
   /**
-  * Returns the port number of the output port which this item represents.
-  */
+   * Returns the port number of the output port which this item represents.
+   */
   int getPortNumber() const { return this->PortNumber; }
 
   /**
-  * Returns the port name for this output port.
-  */
+   * Returns the port name for this output port.
+   */
   QString getPortName() const;
 
   /**
-  * Returns the number of consumers connected to this output port.
-  */
+   * Returns the number of consumers connected to this output port.
+   */
   int getNumberOfConsumers() const;
 
   /**
-  * Get the consumer at a particular index on this output port.
-  */
+   * Get the consumer at a particular index on this output port.
+   */
   pqPipelineSource* getConsumer(int index) const;
 
   /**
-  * Returns a list of consumers.
-  */
+   * Returns a list of consumers.
+   */
   QList<pqPipelineSource*> getConsumers() const;
 
   /**
-  * Returns a list of representations for this output port in the given view.
-  * If view == nullptr, returns all representations of this port.
-  */
+   * Returns a list of representations for this output port in the given view.
+   * If view == nullptr, returns all representations of this port.
+   */
   QList<pqDataRepresentation*> getRepresentations(pqView* view) const;
 
   /**
-  * Returns the first representation for this output port in the given view.
-  * If view is nullptr, returns 0.
-  */
+   * Returns the first representation for this output port in the given view.
+   * If view is nullptr, returns 0.
+   */
   pqDataRepresentation* getRepresentation(pqView* view) const;
 
   /**
-  * Returns a list of render modules in which this output port
-  * has representations added (the representations may not be visible).
-  */
+   * Returns a list of render modules in which this output port
+   * has representations added (the representations may not be visible).
+   */
   QList<pqView*> getViews() const;
 
   /**
-  * Returns the current data information at this output port.
-  * This does not update the pipeline, it simply returns the data information
-  * for data currently present on the output port on the server.
-  */
+   * Returns the current data information at this output port.
+   * This does not update the pipeline, it simply returns the data information
+   * for data currently present on the output port on the server.
+   */
   vtkPVDataInformation* getDataInformation() const;
 
   /**
-  * Returns rank-specific data information.
-  */
+   * Returns rank-specific data information.
+   */
   vtkPVDataInformation* getRankDataInformation(int rank) const;
 
   /**
-  * Collects data information over time. This can potentially be a very slow
-  * process, so use with caution.
-  */
+   * Collects data information over time. This can potentially be a very slow
+   * process, so use with caution.
+   */
   vtkPVTemporalDataInformation* getTemporalDataInformation();
 
   /**
@@ -155,25 +155,25 @@ public:
   vtkPVDataInformation* getSelectedDataInformation(int es_port = 0) const;
 
   /**
-  * Returns the class name of the output data.
-  */
+   * Returns the class name of the output data.
+   */
   const char* getDataClassName() const;
 
   /**
-  * Calls vtkSMSourceProxy::GetSelectionInput() on the underlying source
-  * proxy.
-  */
+   * Calls vtkSMSourceProxy::GetSelectionInput() on the underlying source
+   * proxy.
+   */
   vtkSMSourceProxy* getSelectionInput();
 
   /**
-  * Calls vtkSMSourceProxy::GetSelectionInputPort() on the underlying source
-  * proxy.
-  */
+   * Calls vtkSMSourceProxy::GetSelectionInputPort() on the underlying source
+   * proxy.
+   */
   unsigned int getSelectionInputPort();
 
   /**
-  * Set the selection input.
-  */
+   * Set the selection input.
+   */
   void setSelectionInput(vtkSMSourceProxy* src, int port);
 
   /**
@@ -183,40 +183,40 @@ public:
 
 public Q_SLOTS:
   /**
-  * This method updates all render modules to which all
-  * representations for this source belong, if force is true, it for an
-  * immediate render otherwise render on idle.
-  */
+   * This method updates all render modules to which all
+   * representations for this source belong, if force is true, it for an
+   * immediate render otherwise render on idle.
+   */
   void renderAllViews(bool force = false);
 
 Q_SIGNALS:
   /**
-  * Fired when a connection is added between this output port and a consumer.
-  */
+   * Fired when a connection is added between this output port and a consumer.
+   */
   void connectionAdded(pqOutputPort* port, pqPipelineSource* consumer);
   void preConnectionAdded(pqOutputPort* port, pqPipelineSource* consumer);
 
   /**
-  * Fired when a connection is removed between this output port and a consumer.
-  */
+   * Fired when a connection is removed between this output port and a consumer.
+   */
   void connectionRemoved(pqOutputPort* port, pqPipelineSource* consumer);
   void preConnectionRemoved(pqOutputPort* port, pqPipelineSource* consumer);
 
   /**
-  * fired when a representation is added.
-  */
+   * fired when a representation is added.
+   */
   void representationAdded(pqOutputPort* source, pqDataRepresentation* repr);
 
   /**
-  * fired when a representation is removed.
-  */
+   * fired when a representation is removed.
+   */
   void representationRemoved(pqOutputPort* source, pqDataRepresentation* repr);
 
   /**
-  * Fired when the visbility of a representation for the source changes.
-  * Also fired when representationAdded or representationRemoved is fired
-  * since that too implies change in source visibility.
-  */
+   * Fired when the visbility of a representation for the source changes.
+   * Also fired when representationAdded or representationRemoved is fired
+   * since that too implies change in source visibility.
+   */
   void visibilityChanged(pqOutputPort* source, pqDataRepresentation* repr);
 
 protected Q_SLOTS:
@@ -227,14 +227,14 @@ protected:
   friend class pqDataRepresentation;
 
   /**
-  * called by pqPipelineSource when the connections change.
-  */
+   * called by pqPipelineSource when the connections change.
+   */
   void removeConsumer(pqPipelineSource*);
   void addConsumer(pqPipelineSource*);
 
   /**
-  * Called by pqPipelineSource when the representations are added/removed.
-  */
+   * Called by pqPipelineSource when the representations are added/removed.
+   */
   void addRepresentation(pqDataRepresentation*);
   void removeRepresentation(pqDataRepresentation*);
 

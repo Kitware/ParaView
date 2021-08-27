@@ -71,7 +71,7 @@
  * provided. GetProxySettings() sets the values of proxy properties that are
  * defined in the setting collections. SetProxySettings() saves the non-default
  * proxy properties in the highest-priority collection.
-*/
+ */
 
 #ifndef vtkSMSettings_h
 #define vtkSMSettings_h

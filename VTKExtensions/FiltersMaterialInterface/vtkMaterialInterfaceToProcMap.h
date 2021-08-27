@@ -19,7 +19,7 @@
  * of whether a given process has a piece of some fragment,
  * and the number of processes which a specified fragment is
  * spread across.
-*/
+ */
 
 #ifndef vtkMaterialInterfaceToProcMap_h
 #define vtkMaterialInterfaceToProcMap_h

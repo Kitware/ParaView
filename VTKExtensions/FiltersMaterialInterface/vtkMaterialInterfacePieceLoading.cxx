@@ -15,10 +15,10 @@
 #include "vtkMaterialInterfacePieceLoading.h"
 #include "vtkMaterialInterfaceUtilities.h"
 #include <vector>
-using std::vector;
-using std::ostream;
 using std::cerr;
 using std::endl;
+using std::ostream;
+using std::vector;
 
 //
 ostream& operator<<(ostream& sout, const vtkMaterialInterfacePieceLoading& fp)
@@ -28,7 +28,7 @@ ostream& operator<<(ostream& sout, const vtkMaterialInterfacePieceLoading& fp)
   return sout;
 }
 //
-ostream& operator<<(ostream& sout, vector<vector<vtkMaterialInterfacePieceLoading> >& pla)
+ostream& operator<<(ostream& sout, vector<vector<vtkMaterialInterfacePieceLoading>>& pla)
 {
   size_t nProcs = pla.size();
   for (size_t procId = 0; procId < nProcs; ++procId)
@@ -44,7 +44,7 @@ ostream& operator<<(ostream& sout, vector<vector<vtkMaterialInterfacePieceLoadin
   return sout;
 }
 //
-void PrintPieceLoadingHistogram(vector<vector<vtkIdType> >& pla)
+void PrintPieceLoadingHistogram(vector<vector<vtkIdType>>& pla)
 {
   // cerr << "loading array:" <<endl;
   // cerr << pla << endl;

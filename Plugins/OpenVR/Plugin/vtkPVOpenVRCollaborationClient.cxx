@@ -473,56 +473,24 @@ void vtkPVOpenVRCollaborationClient::ClearPointSource()
 }
 
 #else
-void vtkPVOpenVRCollaborationClient::GoToPose(vtkOpenVRCameraPose const&, double*, double*)
-{
-}
-void vtkPVOpenVRCollaborationClient::SetCollabHost(std::string const&)
-{
-}
-void vtkPVOpenVRCollaborationClient::SetCollabSession(std::string const&)
-{
-}
-void vtkPVOpenVRCollaborationClient::SetCollabName(std::string const&)
-{
-}
-void vtkPVOpenVRCollaborationClient::SetCollabPort(int)
-{
-}
+void vtkPVOpenVRCollaborationClient::GoToPose(vtkOpenVRCameraPose const&, double*, double*) {}
+void vtkPVOpenVRCollaborationClient::SetCollabHost(std::string const&) {}
+void vtkPVOpenVRCollaborationClient::SetCollabSession(std::string const&) {}
+void vtkPVOpenVRCollaborationClient::SetCollabName(std::string const&) {}
+void vtkPVOpenVRCollaborationClient::SetCollabPort(int) {}
 void vtkPVOpenVRCollaborationClient::SetLogCallback(
   std::function<void(std::string const& data, vtkLogger::Verbosity verbosity)>)
 {
 }
-void vtkPVOpenVRCollaborationClient::GoToSavedLocation(int)
-{
-}
-void vtkPVOpenVRCollaborationClient::SetHelper(vtkPVOpenVRHelper*)
-{
-}
-void vtkPVOpenVRCollaborationClient::RemoveAllCropPlanes()
-{
-}
-void vtkPVOpenVRCollaborationClient::RemoveAllThickCrops()
-{
-}
-void vtkPVOpenVRCollaborationClient::UpdateCropPlane(size_t, vtkImplicitPlaneWidget2*)
-{
-}
-void vtkPVOpenVRCollaborationClient::UpdateThickCrop(size_t, vtkBoxWidget2*)
-{
-}
-void vtkPVOpenVRCollaborationClient::UpdateRay(vtkVRModel*, vtkEventDataDevice)
-{
-}
-void vtkPVOpenVRCollaborationClient::ShowBillboard(std::vector<std::string> const&)
-{
-}
-void vtkPVOpenVRCollaborationClient::HideBillboard()
-{
-}
-void vtkPVOpenVRCollaborationClient::AddPointToSource(std::string const&, double const*)
-{
-}
-void vtkPVOpenVRCollaborationClient::ClearPointSource()
-{
-}
+void vtkPVOpenVRCollaborationClient::GoToSavedLocation(int) {}
+void vtkPVOpenVRCollaborationClient::SetHelper(vtkPVOpenVRHelper*) {}
+void vtkPVOpenVRCollaborationClient::RemoveAllCropPlanes() {}
+void vtkPVOpenVRCollaborationClient::RemoveAllThickCrops() {}
+void vtkPVOpenVRCollaborationClient::UpdateCropPlane(size_t, vtkImplicitPlaneWidget2*) {}
+void vtkPVOpenVRCollaborationClient::UpdateThickCrop(size_t, vtkBoxWidget2*) {}
+void vtkPVOpenVRCollaborationClient::UpdateRay(vtkVRModel*, vtkEventDataDevice) {}
+void vtkPVOpenVRCollaborationClient::ShowBillboard(std::vector<std::string> const&) {}
+void vtkPVOpenVRCollaborationClient::HideBillboard() {}
+void vtkPVOpenVRCollaborationClient::AddPointToSource(std::string const&, double const*) {}
+void vtkPVOpenVRCollaborationClient::ClearPointSource() {}
 #endif

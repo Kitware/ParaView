@@ -18,7 +18,7 @@
  * vtk3DWidgetRepresentation is a vtkDataRepresentation subclass for 3D widgets
  * and their representations. It makes it possible to add 3D widgets to
  * vtkPVRenderView.
-*/
+ */
 
 #ifndef vtk3DWidgetRepresentation_h
 #define vtk3DWidgetRepresentation_h

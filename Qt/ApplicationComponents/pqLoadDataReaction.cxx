@@ -133,7 +133,7 @@ pqPipelineSource* pqLoadDataReaction::loadData(
   pqPipelineSource* reader = nullptr;
 
   // Extension to ReaderType,ReaderGroup Hash table
-  QHash<QString, QPair<QString, QString> > extensionToReaderSelection;
+  QHash<QString, QPair<QString, QString>> extensionToReaderSelection;
   foreach (const QStringList& filegroup, files)
   {
     QPair<QString, QString> readerInfo; // type,group
@@ -153,7 +153,7 @@ pqPipelineSource* pqLoadDataReaction::loadData(
     else
     {
       // Determine reader type based on if we have asked the user for this extension before
-      QHash<QString, QPair<QString, QString> >::const_iterator it =
+      QHash<QString, QPair<QString, QString>>::const_iterator it =
         extensionToReaderSelection.find(fi.suffix());
       if (it != extensionToReaderSelection.end())
       {

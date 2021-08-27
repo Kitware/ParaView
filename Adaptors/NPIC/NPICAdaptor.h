@@ -25,18 +25,19 @@
 // mangled function names.
 
 #ifdef __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 
-void VTKPVADAPTORSNPIC_EXPORT createstructuredgrid_(
-  int* myid, int* xdim, int* ystart, int* ystop, double* xspc, double* yspc);
+  void VTKPVADAPTORSNPIC_EXPORT createstructuredgrid_(
+    int* myid, int* xdim, int* ystart, int* ystop, double* xspc, double* yspc);
 
-void VTKPVADAPTORSNPIC_EXPORT add_scalar_(char* fname, int* len, double* data, int* size);
+  void VTKPVADAPTORSNPIC_EXPORT add_scalar_(char* fname, int* len, double* data, int* size);
 
-void VTKPVADAPTORSNPIC_EXPORT add_vector_(
-  char* fname, int* len, double* data0, double* data1, double* data2, int* size);
+  void VTKPVADAPTORSNPIC_EXPORT add_vector_(
+    char* fname, int* len, double* data0, double* data1, double* data2, int* size);
 
-void VTKPVADAPTORSNPIC_EXPORT add_pressure_(int* index, double* data, int* size);
+  void VTKPVADAPTORSNPIC_EXPORT add_pressure_(int* index, double* data, int* size);
 
 #ifdef __cplusplus
 }

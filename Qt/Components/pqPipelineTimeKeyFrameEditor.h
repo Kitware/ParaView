@@ -40,8 +40,8 @@ class pqAnimationScene;
 class pqAnimationCue;
 
 /**
-* editor for editing pipeline time key frames
-*/
+ * editor for editing pipeline time key frames
+ */
 class PQCOMPONENTS_EXPORT pqPipelineTimeKeyFrameEditor : public QDialog
 {
   typedef QDialog Superclass;
@@ -52,12 +52,12 @@ public:
 
 public Q_SLOTS:
   /**
-  * read the key frame data and display it
-  */
+   * read the key frame data and display it
+   */
   void readKeyFrameData();
   /**
-  * write the key frame data as edited by the user to the server manager
-  */
+   * write the key frame data as edited by the user to the server manager
+   */
   void writeKeyFrameData();
 
 protected Q_SLOTS:

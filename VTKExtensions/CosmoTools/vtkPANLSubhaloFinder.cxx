@@ -45,7 +45,7 @@ class vtkPANLSubhaloFinder::vtkInternals
 {
 public:
   vtkInternals() {}
-  std::map<vtkIdType, std::vector<vtkIdType> > haloIndices;
+  std::map<vtkIdType, std::vector<vtkIdType>> haloIndices;
 
   std::vector<POSVEL_T> xx;
   std::vector<POSVEL_T> yy;

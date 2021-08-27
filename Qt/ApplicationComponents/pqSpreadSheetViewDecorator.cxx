@@ -157,7 +157,7 @@ static void populateMenu(pqSpreadSheetView* view, QMenu* menu)
   // add checkboxes for known columns.
   auto model = view->getViewModel();
 
-  std::vector<std::pair<std::string, bool> > columnLabels;
+  std::vector<std::pair<std::string, bool>> columnLabels;
   std::set<std::string> columnLabelsSet;
   for (int col = 0, max = model->columnCount(); col < max; ++col)
   {
@@ -202,7 +202,7 @@ static void populateMenu(pqSpreadSheetView* view, QMenu* menu)
 
   auto allCheckbox = addCheckableAction(menu, "All Columns", false);
   menu->addSeparator();
-  auto checkboxes = std::make_shared<std::vector<QCheckBox*> >();
+  auto checkboxes = std::make_shared<std::vector<QCheckBox*>>();
 
   for (const auto& pair : columnLabels)
   {
@@ -248,33 +248,34 @@ static void populateMenu(pqSpreadSheetView* view, QMenu* menu)
   }
 
   updateAllCheckState(allCheckbox, *checkboxes);
-  QObject::connect(allCheckbox, &QCheckBox::stateChanged, [view, checkboxes, allCheckbox](
-                                                            int checkState) {
-    std::vector<std::string> hidden_columns;
-    for (auto cb : (*checkboxes))
-    {
-      QSignalBlocker sblocker(cb);
-      cb->setChecked(checkState == Qt::Checked);
-      if (checkState != Qt::Checked)
+  QObject::connect(
+    allCheckbox, &QCheckBox::stateChanged, [view, checkboxes, allCheckbox](int checkState) {
+      std::vector<std::string> hidden_columns;
+      for (auto cb : (*checkboxes))
       {
-        // all columns are hidden.
-        hidden_columns.push_back(cb->text().toUtf8().toStdString());
+        QSignalBlocker sblocker(cb);
+        cb->setChecked(checkState == Qt::Checked);
+        if (checkState != Qt::Checked)
+        {
+          // all columns are hidden.
+          hidden_columns.push_back(cb->text().toUtf8().toStdString());
+        }
       }
-    }
 
-    // turn off tristate to avoid the `All Columns` checkbox from entering the
-    // partially-checked state through user clicks.
-    allCheckbox->setTristate(false);
+      // turn off tristate to avoid the `All Columns` checkbox from entering the
+      // partially-checked state through user clicks.
+      allCheckbox->setTristate(false);
 
-    auto vproxy = view->getViewProxy();
-    auto vsvp = vtkSMStringVectorProperty::SafeDownCast(vproxy->GetProperty("HiddenColumnLabels"));
+      auto vproxy = view->getViewProxy();
+      auto vsvp =
+        vtkSMStringVectorProperty::SafeDownCast(vproxy->GetProperty("HiddenColumnLabels"));
 
-    SM_SCOPED_TRACE(PropertiesModified).arg("proxy", vproxy);
-    SCOPED_UNDO_SET("SpreadSheetView column visibilities");
-    vsvp->SetElements(hidden_columns);
-    vproxy->UpdateVTKObjects();
-    view->render();
-  });
+      SM_SCOPED_TRACE(PropertiesModified).arg("proxy", vproxy);
+      SCOPED_UNDO_SET("SpreadSheetView column visibilities");
+      vsvp->SetElements(hidden_columns);
+      vproxy->UpdateVTKObjects();
+      view->render();
+    });
 }
 }
 

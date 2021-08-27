@@ -17,7 +17,7 @@
  *
  * Abstract class for SIProperty that hold an array of values.
  * Define the array management API
-*/
+ */
 
 #ifndef vtkSIVectorProperty_h
 #define vtkSIVectorProperty_h

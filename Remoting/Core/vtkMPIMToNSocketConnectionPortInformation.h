@@ -19,7 +19,7 @@
  *
  * and host information from a render server.  This information is used by
  * the data server to make the connections to the render server processes.
-*/
+ */
 
 #ifndef vtkMPIMToNSocketConnectionPortInformation_h
 #define vtkMPIMToNSocketConnectionPortInformation_h

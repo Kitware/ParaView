@@ -19,7 +19,7 @@
  *
  * vtkSMIntRangeDomain is a type specific extension to
  * vtkSMRangeDomainTemplate for ints.
-*/
+ */
 
 #ifndef vtkSMIntRangeDomain_h
 #define vtkSMIntRangeDomain_h

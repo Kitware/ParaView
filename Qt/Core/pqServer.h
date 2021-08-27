@@ -55,11 +55,11 @@ class vtkSMSessionProxyManager;
 #include <QPointer>
 
 /**
-* pqServer (should be renamed to pqSession) is a pqServerManagerModelItem
-* subclass that represents a vtkSMSession. Besides providing API to access
-* vtkSMSession, it also performs some initialization of session-related
-* proxies such as time-keeper and global-mapper-properties proxies.
-*/
+ * pqServer (should be renamed to pqSession) is a pqServerManagerModelItem
+ * subclass that represents a vtkSMSession. Besides providing API to access
+ * vtkSMSession, it also performs some initialization of session-related
+ * proxies such as time-keeper and global-mapper-properties proxies.
+ */
 class PQCORE_EXPORT pqServer : public pqServerManagerModelItem
 {
   Q_OBJECT
@@ -71,92 +71,92 @@ public:
   void setResource(const pqServerResource& server_resource);
 
   /**
-  * Returns the session instance which the pqServer represents.
-  */
+   * Returns the session instance which the pqServer represents.
+   */
   vtkSMSession* session() const;
 
   /**
-  * Returns the connection id for the server connection.
-  */
+   * Returns the connection id for the server connection.
+   */
   vtkIdType GetConnectionID() const;
   vtkIdType sessionId() const { return this->GetConnectionID(); }
 
   /**
-  * Returns the proxy manager for this session.
-  */
+   * Returns the proxy manager for this session.
+   */
   vtkSMSessionProxyManager* proxyManager() const;
 
   /**
-  * Sources selection model is used to keep track of sources currently
-  * selected on this session/server-connection.
-  */
+   * Sources selection model is used to keep track of sources currently
+   * selected on this session/server-connection.
+   */
   vtkSMProxySelectionModel* activeSourcesSelectionModel() const;
 
   /**
-  * View selection model is used to keep track of active view.
-  */
+   * View selection model is used to keep track of active view.
+   */
   vtkSMProxySelectionModel* activeViewSelectionModel() const;
 
   /**
-  * Return the number of data server partitions on this
-  * server connection. A convenience method.
-  */
+   * Return the number of data server partitions on this
+   * server connection. A convenience method.
+   */
   int getNumberOfPartitions();
 
   /**
-  * Returns is this connection is a connection to a remote
-  * server or a built-in server.
-  */
+   * Returns is this connection is a connection to a remote
+   * server or a built-in server.
+   */
   bool isRemote() const;
 
   /**
-  * Returns true if the client is currently master. For non-collaborative
-  * session, it always return true.
-  */
+   * Returns true if the client is currently master. For non-collaborative
+   * session, it always return true.
+   */
   bool isMaster() const;
 
   /**
-  * Returns true if the client is currently processing remote messages
-  * and still have more to process.
-  * This method is used to deffered the tryRender.
-  */
+   * Returns true if the client is currently processing remote messages
+   * and still have more to process.
+   * This method is used to deffered the tryRender.
+   */
   bool isProcessingPending() const;
 
   /**
-  * Returns true is this connection has a separate render-server and
-  * data-server.
-  */
+   * Returns true is this connection has a separate render-server and
+   * data-server.
+   */
   bool isRenderServerSeparate();
 
   /**
-  * Returns the time keeper for this connection.
-  */
+   * Returns the time keeper for this connection.
+   */
   pqTimeKeeper* getTimeKeeper() const;
 
   /**
-  * Returns the vtkPVServerInformation object which contains information about
-  * the command line options specified on the remote server, if any.
-  */
+   * Returns the vtkPVServerInformation object which contains information about
+   * the command line options specified on the remote server, if any.
+   */
   vtkPVServerInformation* getServerInformation() const;
 
   /**
-  * Returns true if the client is waiting on some actions from the server that
-  * typically result in progress events.
-  */
+   * Returns true if the client is waiting on some actions from the server that
+   * typically result in progress events.
+   */
   bool isProgressPending() const;
 
   /**
-  * Get/Set the application wide heart beat timeout setting.
-  * Heartbeats are used in case of remote server connections to avoid the
-  * connection timing out due to inactivity. When set, the client send a
-  * heartbeat message to all servers every \c msec milliseconds.
-  */
+   * Get/Set the application wide heart beat timeout setting.
+   * Heartbeats are used in case of remote server connections to avoid the
+   * connection timing out due to inactivity. When set, the client send a
+   * heartbeat message to all servers every \c msec milliseconds.
+   */
   static void setHeartBeatTimeoutSetting(int msec);
   static int getHeartBeatTimeoutSetting();
 
   /**
-  * enable/disable monitoring of server notifications.
-  */
+   * enable/disable monitoring of server notifications.
+   */
   void setMonitorServerNotifications(bool);
 
   /**
@@ -171,60 +171,60 @@ public:
 
 Q_SIGNALS:
   /**
-  * Fired when the name of the proxy is changed.
-  */
+   * Fired when the name of the proxy is changed.
+   */
   void nameChanged(pqServerManagerModelItem*);
 
   /**
-  * Fired about 5 minutes before the server timesout. This signal will not be
-  * fired at all if server timeout < 5 minutes. The server timeout is
-  * specified by --timeout option on the server process.
-  * This is not fired if timeout is not specified on the server process.
-  */
+   * Fired about 5 minutes before the server timesout. This signal will not be
+   * fired at all if server timeout < 5 minutes. The server timeout is
+   * specified by --timeout option on the server process.
+   * This is not fired if timeout is not specified on the server process.
+   */
   void fiveMinuteTimeoutWarning();
 
   /**
-  * Fired about 1 minute before the server timesout.
-  * The server timeout is specified by --timeout option on the server process.
-  * This is not fired if timeout is not specified on the server process.
-  */
+   * Fired about 1 minute before the server timesout.
+   * The server timeout is specified by --timeout option on the server process.
+   * This is not fired if timeout is not specified on the server process.
+   */
   void finalTimeoutWarning();
 
   /**
-  * Fired if any server side crash or disconnection occurred.
-  */
+   * Fired if any server side crash or disconnection occurred.
+   */
   void serverSideDisconnected();
 
 protected:
   /**
-  * Returns the string key used for the heart beat time interval.
-  */
+   * Returns the string key used for the heart beat time interval.
+   */
   static const char* HEARBEAT_TIME_SETTING_KEY();
 
   /**
-  * Set the heartbeat timeout for this instance of pqServer.
-  */
+   * Set the heartbeat timeout for this instance of pqServer.
+   */
   void setHeartBeatTimeout(int msec);
 
   // ---- Collaboration client-to-clients communication mechanisme ----
 
 Q_SIGNALS:
   /**
-  * Allow user to listen messages from other clients.
-  * But if you plan to push some state by for example calling
-  * the sendToOtherClients(vtkSMMessage*) slot, you MUST queued your slot.
-  * Otherwise your communication will not be sent to the server.
-  * Here is a code sample on how to connect to that signal:
-  *
-  *    QObject::connect( server, SIGNAL(sentFromOtherClient(vtkSMMessage*)),
-  *                      this,   SLOT(onClientMessage(vtkSMMessage*)),
-  *                      Qt::QueuedConnection);
-  */
+   * Allow user to listen messages from other clients.
+   * But if you plan to push some state by for example calling
+   * the sendToOtherClients(vtkSMMessage*) slot, you MUST queued your slot.
+   * Otherwise your communication will not be sent to the server.
+   * Here is a code sample on how to connect to that signal:
+   *
+   *    QObject::connect( server, SIGNAL(sentFromOtherClient(vtkSMMessage*)),
+   *                      this,   SLOT(onClientMessage(vtkSMMessage*)),
+   *                      Qt::QueuedConnection);
+   */
   void sentFromOtherClient(pqServer*, vtkSMMessage* msg);
 
   /**
-  * Signal triggered when user information get updated
-  */
+   * Signal triggered when user information get updated
+   */
   void triggeredMasterUser(int);
   void triggeredUserName(int, QString&);
   void triggeredUserListChanged();
@@ -232,16 +232,16 @@ Q_SIGNALS:
 
 public Q_SLOTS:
   /**
-  * Allow user to broadcast to other client a given message
-  */
+   * Allow user to broadcast to other client a given message
+   */
   void sendToOtherClients(vtkSMMessage* msg);
 
   // ---- Collaboration client-to-clients communication mechanisme ----
 
 protected Q_SLOTS:
   /**
-  * Called to send a heartbeat to the server.
-  */
+   * Called to send a heartbeat to the server.
+   */
   void heartBeat();
 
   /**
@@ -250,21 +250,21 @@ protected Q_SLOTS:
   void updateRemainingLifeTime();
 
   /**
-  * Called when idle to look for server notification for collaboration purpose
-  */
+   * Called when idle to look for server notification for collaboration purpose
+   */
   void processServerNotification();
 
   /**
-  * Called by vtkSMCollaborationManager when associated message happen.
-  * This will convert the given parameter into vtkSMMessage and
-  * emit sentFromOtherClient(pqServer*,vtkSMMessage*) signal.
-  */
+   * Called by vtkSMCollaborationManager when associated message happen.
+   * This will convert the given parameter into vtkSMMessage and
+   * emit sentFromOtherClient(pqServer*,vtkSMMessage*) signal.
+   */
   void onCollaborationCommunication(vtkObject*, unsigned long, void*, void*);
 
   /**
-  * Called by vtkSMSessionClient is any communication error occurred with the
-  * server. This usually mean that the server side is dead.
-  */
+   * Called by vtkSMSessionClient is any communication error occurred with the
+   * server. This usually mean that the server side is dead.
+   */
   void onConnectionLost(vtkObject*, unsigned long, void*, void*);
 
 private:

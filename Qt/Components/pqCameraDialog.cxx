@@ -147,7 +147,7 @@ QStringList getListOfStrings(pqSettings* settings, const QString& defaultTxt, in
 //=============================================================================
 class pqCameraDialogInternal : public Ui::pqCameraDialog
 {
-  QVector<QPointer<QToolButton> > CustomViewpointButtons;
+  QVector<QPointer<QToolButton>> CustomViewpointButtons;
   QPointer<QToolButton> PlusButton;
 
 public:

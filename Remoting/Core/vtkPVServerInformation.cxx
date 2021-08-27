@@ -167,8 +167,9 @@ void vtkPVServerInformation::CopyFromObject(vtkObject* vtkNotUsed(obj))
 
   vtkPVSession* session = vtkPVSession::SafeDownCast(pm->GetSession());
   vtkCompositeMultiProcessController* ctrl;
-  if (session && (ctrl = vtkCompositeMultiProcessController::SafeDownCast(
-                    session->GetController(vtkPVSession::CLIENT))))
+  if (session &&
+    (ctrl = vtkCompositeMultiProcessController::SafeDownCast(
+       session->GetController(vtkPVSession::CLIENT))))
   {
     this->ClientId = ctrl->GetActiveControllerID();
   }

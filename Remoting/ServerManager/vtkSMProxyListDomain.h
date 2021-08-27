@@ -32,7 +32,7 @@
  *
  * @sa
  * vtkSMDomain vtkSMProxyProperty
-*/
+ */
 
 #ifndef vtkSMProxyListDomain_h
 #define vtkSMProxyListDomain_h

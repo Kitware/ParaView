@@ -31,17 +31,18 @@
 // mangled function names.
 
 #ifdef __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 
-void VTKPVADAPTORSPHASTA_EXPORT createpointsandallocatecells(
-  int* numPoints, double* coordsArray, int* numCells);
+  void VTKPVADAPTORSPHASTA_EXPORT createpointsandallocatecells(
+    int* numPoints, double* coordsArray, int* numCells);
 
-void VTKPVADAPTORSPHASTA_EXPORT insertblockofcells(
-  int* numCellsInBlock, int* numPointsPerCell, int* cellConnectivity);
+  void VTKPVADAPTORSPHASTA_EXPORT insertblockofcells(
+    int* numCellsInBlock, int* numPointsPerCell, int* cellConnectivity);
 
-void VTKPVADAPTORSPHASTA_EXPORT addfields(
-  int* nshg, int* ndof, double* dofArray, int* compressibleFlow);
+  void VTKPVADAPTORSPHASTA_EXPORT addfields(
+    int* nshg, int* ndof, double* dofArray, int* compressibleFlow);
 
 #ifdef __cplusplus
 }

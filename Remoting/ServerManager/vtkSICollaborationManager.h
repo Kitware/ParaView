@@ -16,7 +16,7 @@
  * @class   vtkSICollaborationManager
  *
  * Object that managed multi-client communication and provide the group awareness
-*/
+ */
 
 #ifndef vtkSICollaborationManager_h
 #define vtkSICollaborationManager_h

@@ -314,7 +314,7 @@ protected:
         continue;
       }
 
-      std::vector<vtkSmartPointer<vtkSMProxyLink> >& links = this->PLDLinks[iter->GetKey()];
+      std::vector<vtkSmartPointer<vtkSMProxyLink>>& links = this->PLDLinks[iter->GetKey()];
       links.resize(pld->GetNumberOfProxies());
       for (int cc = 0, max = pld->GetNumberOfProxies(); cc < max; ++cc)
       {
@@ -366,12 +366,12 @@ private:
     }
   }
 
-  std::vector<vtkSmartPointer<vtkSMProxy> > Items;
+  std::vector<vtkSmartPointer<vtkSMProxy>> Items;
   vtkNew<vtkSMProxyLink> Link;
   std::set<std::string> Exceptions;
   // key: property name
   // value: ordered list of vtkSMProxyLinks for each of the proxies in the proxy list domain.
-  std::map<std::string, std::vector<vtkSmartPointer<vtkSMProxyLink> > > PLDLinks;
+  std::map<std::string, std::vector<vtkSmartPointer<vtkSMProxyLink>>> PLDLinks;
 };
 
 //----------------------------------------------------------------------------
@@ -641,7 +641,7 @@ private:
   bool OverlayViews;
 
   size_t NumberOfComparisons;
-  std::vector<vtkSmartPointer<vtkCloningVectorOfRepresentations> > Representations;
+  std::vector<vtkSmartPointer<vtkCloningVectorOfRepresentations>> Representations;
 };
 }
 
@@ -649,7 +649,7 @@ private:
 class vtkPVComparativeView::vtkInternal
 {
 public:
-  typedef std::vector<vtkSmartPointer<vtkSMComparativeAnimationCueProxy> > VectorOfCues;
+  typedef std::vector<vtkSmartPointer<vtkSMComparativeAnimationCueProxy>> VectorOfCues;
   VectorOfCues Cues;
 
   vtkNew<vtkPVComparativeViewNS::vtkCloningVectorOfViews> Views;
@@ -937,7 +937,7 @@ void vtkPVComparativeView::GetViews(vtkCollection* collection)
 //----------------------------------------------------------------------------
 vtkImageData* vtkPVComparativeView::CaptureWindow(int magX, int magY)
 {
-  std::vector<vtkSmartPointer<vtkImageData> > images;
+  std::vector<vtkSmartPointer<vtkImageData>> images;
 
   vtkPVComparativeViewNS::vtkCloningVectorOfViews* views = this->Internal->Views.Get();
   for (size_t cc = 0, max = views->GetNumberOfItems(); cc < max; ++cc)

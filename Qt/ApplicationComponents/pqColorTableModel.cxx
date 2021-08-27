@@ -41,7 +41,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class pqColorTableModel::pqInternals
 {
 public:
-  std::vector<std::array<double, 6> > XRGBPoints;
+  std::vector<std::array<double, 6>> XRGBPoints;
 };
 
 //-----------------------------------------------------------------------------

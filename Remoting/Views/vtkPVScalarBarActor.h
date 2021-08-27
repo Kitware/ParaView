@@ -30,7 +30,7 @@
  * before their size is adjusted to meet geometric constraints.
  * These changes make it easier to control in ParaView.
  *
-*/
+ */
 
 #ifndef vtkPVScalarBarActor_h
 #define vtkPVScalarBarActor_h

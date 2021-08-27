@@ -16,7 +16,7 @@
  * @class   vtkSITimeRangeProperty
  *
  * SIProperty that deals with TimeRange on Algorithm object type
-*/
+ */
 
 #ifndef vtkSITimeStepsProperty_h
 #define vtkSITimeStepsProperty_h

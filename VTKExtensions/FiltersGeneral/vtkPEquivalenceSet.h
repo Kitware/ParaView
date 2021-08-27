@@ -18,7 +18,7 @@
  *
  * Same as EquivalenceSet, but resolving is a global operation.
  * .SEE vtkEquivalenceSet
-*/
+ */
 
 #ifndef vtkPEquivalenceSet_h
 #define vtkPEquivalenceSet_h

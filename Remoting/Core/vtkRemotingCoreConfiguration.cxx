@@ -477,7 +477,8 @@ bool vtkRemotingCoreConfiguration::PopulateRenderingOptions(
   {
     auto caveGroup = app->add_option_group("CAVE", "CAVE specific options");
     caveGroup
-      ->add_option("--pvx",
+      ->add_option(
+        "--pvx",
         [this](const CLI::results_t& args) {
           return this->DisplayConfiguration->LoadPVX(args.front().c_str());
         },
@@ -486,7 +487,8 @@ bool vtkRemotingCoreConfiguration::PopulateRenderingOptions(
       ->take_first();
 
     auto pvx = caveGroup
-                 ->add_option("'.pvx' file",
+                 ->add_option(
+                   "'.pvx' file",
                    [this](const CLI::results_t& args) {
                      return this->DisplayConfiguration->LoadPVX(args.front().c_str());
                    },

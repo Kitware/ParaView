@@ -38,9 +38,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class pqView;
 
 /**
-* @ingroup Reactions
-* Reaction for camera undo or redo.
-*/
+ * @ingroup Reactions
+ * Reaction for camera undo or redo.
+ */
 class PQAPPLICATIONCOMPONENTS_EXPORT pqCameraUndoRedoReaction : public pqReaction
 {
   Q_OBJECT
@@ -48,20 +48,20 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqCameraUndoRedoReaction : public pqReactio
 
 public:
   /**
-  * Constructor parent cannot be nullptr. When undo is true, acts as
-  * undo-reaction, else acts as redo reaction.
-  * If \c view ==nullptr then active view is used.
-  */
+   * Constructor parent cannot be nullptr. When undo is true, acts as
+   * undo-reaction, else acts as redo reaction.
+   * If \c view ==nullptr then active view is used.
+   */
   pqCameraUndoRedoReaction(QAction* parent, bool undo, pqView* view = 0);
 
   /**
-  * undo.
-  */
+   * undo.
+   */
   static void undo(pqView* view);
 
   /**
-  * redo.
-  */
+   * redo.
+   */
   static void redo(pqView* view);
 
 protected Q_SLOTS:
@@ -70,8 +70,8 @@ protected Q_SLOTS:
 
 protected:
   /**
-  * Called when the action is triggered.
-  */
+   * Called when the action is triggered.
+   */
   void onTriggered() override;
 
 private:

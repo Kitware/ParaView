@@ -22,7 +22,7 @@
 class vtkEnsembleDataReader::vtkInternal
 {
 public:
-  typedef std::vector<vtkSmartPointer<vtkAlgorithm> > VectorOfReaders;
+  typedef std::vector<vtkSmartPointer<vtkAlgorithm>> VectorOfReaders;
   VectorOfReaders Readers;
 
   std::vector<std::string> FilePaths;

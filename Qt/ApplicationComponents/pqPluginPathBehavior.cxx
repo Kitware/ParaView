@@ -38,6 +38,4 @@ pqPluginPathBehavior::pqPluginPathBehavior(QObject* parentObject)
 }
 
 //-----------------------------------------------------------------------------
-void pqPluginPathBehavior::loadDefaultPlugins(pqServer*)
-{
-}
+void pqPluginPathBehavior::loadDefaultPlugins(pqServer*) {}

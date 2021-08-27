@@ -47,16 +47,17 @@ class QAction;
 class QMenu;
 
 /**
-* This interface creates ParaView's default context menu in render views.
-* It has priority 0, so you can modify the QMenu it creates
-* by using a lower (negative) priority in your own custom interface.
-* You can eliminate the default menu by assigning your custom interface a
-* positive priority and have its contextMenu() method return true.
-*
-* @sa pqPipelineContextMenuBehavior
-*/
-class PQAPPLICATIONCOMPONENTS_EXPORT pqDefaultContextMenu : public QObject,
-                                                            public pqContextMenuInterface
+ * This interface creates ParaView's default context menu in render views.
+ * It has priority 0, so you can modify the QMenu it creates
+ * by using a lower (negative) priority in your own custom interface.
+ * You can eliminate the default menu by assigning your custom interface a
+ * positive priority and have its contextMenu() method return true.
+ *
+ * @sa pqPipelineContextMenuBehavior
+ */
+class PQAPPLICATIONCOMPONENTS_EXPORT pqDefaultContextMenu
+  : public QObject
+  , public pqContextMenuInterface
 {
   Q_OBJECT
   Q_INTERFACES(pqContextMenuInterface)

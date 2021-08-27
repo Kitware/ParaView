@@ -178,7 +178,7 @@ protected:
   vector<ScalarDataChunk> ScalarDataChunks;
   vector<VectorDataChunk> VectorDataChunks;
 
-  vector<vector<int> > SubSectionZones;
+  vector<vector<int>> SubSectionZones;
   vector<int> SubSectionIds;
   vector<int> SubSectionSize;
 

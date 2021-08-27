@@ -35,9 +35,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqMasterOnlyReaction.h"
 
 /**
-* @ingroup Reactions
-* pqTestingReaction can be used to recording or playing back tests.
-*/
+ * @ingroup Reactions
+ * pqTestingReaction can be used to recording or playing back tests.
+ */
 class PQAPPLICATIONCOMPONENTS_EXPORT pqTestingReaction : public pqMasterOnlyReaction
 {
   Q_OBJECT
@@ -55,25 +55,25 @@ public:
   pqTestingReaction(QAction* parentObject, Mode mode, Qt::ConnectionType type = Qt::AutoConnection);
 
   /**
-  * Records test.
-  */
+   * Records test.
+   */
   static void recordTest(const QString& filename);
   static void recordTest();
 
   /**
-  * Plays test.
-  */
+   * Plays test.
+   */
   static void playTest(const QString& filename);
   static void playTest();
 
   /**
-  * Locks the view size for testing.
-  */
+   * Locks the view size for testing.
+   */
   static void lockViewSize(bool);
 
   /**
-  * Locks the view size with a custom resolution.
-  */
+   * Locks the view size with a custom resolution.
+   */
   static void lockViewSizeCustom();
 
 protected:

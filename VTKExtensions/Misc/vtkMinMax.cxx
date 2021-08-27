@@ -306,8 +306,8 @@ void vtkMinMax::OperateOnArray(vtkAbstractArray* ia, vtkAbstractArray* oa)
       vtkTemplateMacro(vtkMinMaxExecute(this, numComp, this->ComponentIdx,
         static_cast<VTK_TT*>(idata), static_cast<VTK_TT*>(odata)));
 
-      // if you can make an operator for things like strings etc,
-      // put the cases for those strings here
+        // if you can make an operator for things like strings etc,
+        // put the cases for those strings here
 
       default:
         vtkErrorMacro(<< "Unknown data type refusing to operate on this array");

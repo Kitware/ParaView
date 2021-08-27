@@ -18,7 +18,7 @@
  * vtkSMAnimationSceneProxy observe vtkCommand::ModifiedEvent on the
  * client-side VTK-object to call UpdatePropertyInformation() every time that
  * happens.
-*/
+ */
 
 #ifndef vtkSMAnimationSceneProxy_h
 #define vtkSMAnimationSceneProxy_h

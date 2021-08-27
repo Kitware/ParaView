@@ -995,14 +995,14 @@ bool pqRenderViewSelectionReaction::isCompatible(SelectionMode mode)
   else if ((this->Mode == SELECT_SURFACE_CELLS || this->Mode == SELECT_SURFACE_CELLS_POLYGON ||
              this->Mode == SELECT_SURFACE_CELLS_INTERACTIVELY) &&
     (mode == SELECT_SURFACE_CELLS || mode == SELECT_SURFACE_CELLS_POLYGON ||
-             mode == SELECT_SURFACE_CELLS_INTERACTIVELY))
+      mode == SELECT_SURFACE_CELLS_INTERACTIVELY))
   {
     return true;
   }
   else if ((this->Mode == SELECT_SURFACE_POINTS || this->Mode == SELECT_SURFACE_POINTS_POLYGON ||
              this->Mode == SELECT_SURFACE_POINTS_INTERACTIVELY) &&
     (mode == SELECT_SURFACE_POINTS || mode == SELECT_SURFACE_POINTS_POLYGON ||
-             mode == SELECT_SURFACE_POINTS_INTERACTIVELY))
+      mode == SELECT_SURFACE_POINTS_INTERACTIVELY))
   {
     return true;
   }

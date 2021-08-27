@@ -30,14 +30,10 @@ vtkPVTrackballMoveActor::vtkPVTrackballMoveActor() = default;
 vtkPVTrackballMoveActor::~vtkPVTrackballMoveActor() = default;
 
 //-------------------------------------------------------------------------
-void vtkPVTrackballMoveActor::OnButtonDown(int, int, vtkRenderer*, vtkRenderWindowInteractor*)
-{
-}
+void vtkPVTrackballMoveActor::OnButtonDown(int, int, vtkRenderer*, vtkRenderWindowInteractor*) {}
 
 //-------------------------------------------------------------------------
-void vtkPVTrackballMoveActor::OnButtonUp(int, int, vtkRenderer*, vtkRenderWindowInteractor*)
-{
-}
+void vtkPVTrackballMoveActor::OnButtonUp(int, int, vtkRenderer*, vtkRenderWindowInteractor*) {}
 
 //-------------------------------------------------------------------------
 void vtkPVTrackballMoveActor::OnMouseMove(

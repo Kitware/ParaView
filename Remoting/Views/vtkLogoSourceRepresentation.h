@@ -17,7 +17,7 @@
  *
  * vtkLogoSourceRepresentation is a representation to show a Logo. The input is
  * expected to a be a vtkImageData that can be passed to a vtkLogoRepresentation.
-*/
+ */
 
 #ifndef vtkLogoSourceRepresentation_h
 #define vtkLogoSourceRepresentation_h

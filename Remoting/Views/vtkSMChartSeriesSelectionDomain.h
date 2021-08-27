@@ -36,7 +36,7 @@
  * \li hide_partial_arrays : when set to 1, partial arrays will not be shown in
  * the domain (default).
  *
-*/
+ */
 
 #ifndef vtkSMChartSeriesSelectionDomain_h
 #define vtkSMChartSeriesSelectionDomain_h

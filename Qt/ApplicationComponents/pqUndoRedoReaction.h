@@ -37,9 +37,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class pqUndoStack;
 
 /**
-* @ingroup Reactions
-* Reaction for application undo-redo.
-*/
+ * @ingroup Reactions
+ * Reaction for application undo-redo.
+ */
 class PQAPPLICATIONCOMPONENTS_EXPORT pqUndoRedoReaction : public pqReaction
 {
   Q_OBJECT
@@ -47,24 +47,24 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqUndoRedoReaction : public pqReaction
 
 public:
   /**
-  * if \c undo is set to true, then this behaves as an undo-reaction otherwise
-  * as a redo-reaction.
-  */
+   * if \c undo is set to true, then this behaves as an undo-reaction otherwise
+   * as a redo-reaction.
+   */
   pqUndoRedoReaction(QAction* parent, bool undo);
 
   /**
-  * undo.
-  */
+   * undo.
+   */
   static void undo();
 
   /**
-  * redo.
-  */
+   * redo.
+   */
   static void redo();
 
   /**
-  * Clear stack
-  */
+   * Clear stack
+   */
   static void clear();
 
 protected Q_SLOTS:
@@ -74,8 +74,8 @@ protected Q_SLOTS:
 
 protected:
   /**
-  * Called when the action is triggered.
-  */
+   * Called when the action is triggered.
+   */
   void onTriggered() override
   {
     if (this->Undo)

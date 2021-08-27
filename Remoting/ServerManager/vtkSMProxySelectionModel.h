@@ -21,7 +21,7 @@
  * selected/active sources/filters and the active view.
  * @sa
  * vtkSMProxyManager
-*/
+ */
 
 #ifndef vtkSMProxySelectionModel_h
 #define vtkSMProxySelectionModel_h
@@ -62,7 +62,7 @@ public:
   /**
    * Type for selection.
    */
-  typedef std::list<vtkSmartPointer<vtkSMProxy> > SelectionType;
+  typedef std::list<vtkSmartPointer<vtkSMProxy>> SelectionType;
 
   // vtkSMProxy selection flags
   enum ProxySelectionFlag

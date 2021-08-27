@@ -2886,9 +2886,9 @@ void vtkAMRDualGridHelper::ComputeGlobalMetaData(vtkNonOverlappingAMR* input)
   this->RootSpacing[1] = lowestSpacing[1] * (1 << (lowestLevel));
   this->RootSpacing[2] = lowestSpacing[2] * (1 << (lowestLevel));
 
-//    DebuggingRootSpacing[0] = this->RootSpacing[0];
-//    DebuggingRootSpacing[1] = this->RootSpacing[1];
-//    DebuggingRootSpacing[2] = this->RootSpacing[2];
+  //    DebuggingRootSpacing[0] = this->RootSpacing[0];
+  //    DebuggingRootSpacing[1] = this->RootSpacing[1];
+  //    DebuggingRootSpacing[2] = this->RootSpacing[2];
 
 #if 0
     // Find the grid for the largest block.  We assume this block has the

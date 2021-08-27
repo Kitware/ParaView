@@ -21,7 +21,7 @@
  * transitions are handled correctly, and second is that internal
  * cells are decimated.  I use a variation of degenerate points/cells
  * used for level transitions.
-*/
+ */
 
 #ifndef vtkAMRDualClip_h
 #define vtkAMRDualClip_h

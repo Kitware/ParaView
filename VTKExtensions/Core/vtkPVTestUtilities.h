@@ -17,7 +17,7 @@
  * @brief   A class to facilitate common test operations
  *
  *
-*/
+ */
 
 #ifndef vtkPVTestUtilities_h
 #define vtkPVTestUtilities_h

@@ -47,10 +47,10 @@ class pqLinksEditor;
 }
 
 /**
-* A Qt dialog for editing a property/proxy/camera link.
-* Two proxies can be selected, and if property type is
-* selected, then two properties can be selected as well.
-*/
+ * A Qt dialog for editing a property/proxy/camera link.
+ * Two proxies can be selected, and if property type is
+ * selected, then two properties can be selected as well.
+ */
 class PQCOMPONENTS_EXPORT pqLinksEditor : public QDialog
 {
   Q_OBJECT
@@ -58,54 +58,54 @@ class PQCOMPONENTS_EXPORT pqLinksEditor : public QDialog
 
 public:
   /**
-  * Create a link editor to create/edit a link.
-  * Initial values are retrieved from the provided vtkSMLink.
-  */
+   * Create a link editor to create/edit a link.
+   * Initial values are retrieved from the provided vtkSMLink.
+   */
   pqLinksEditor(vtkSMLink* link, QWidget* p = 0);
 
   /**
-  * Destroy this dialog
-  */
+   * Destroy this dialog
+   */
   ~pqLinksEditor() override;
 
   /**
-  * Get the name of the link
-  */
+   * Get the name of the link
+   */
   QString linkName();
 
   /**
-  * get the type of link
-  */
+   * get the type of link
+   */
   pqLinksModel::ItemType linkType();
 
   /**
-  * Get the first selected proxy
-  */
+   * Get the first selected proxy
+   */
   vtkSMProxy* selectedProxy1();
 
   /**
-  * Get the second selected proxy;
-  */
+   * Get the second selected proxy;
+   */
   vtkSMProxy* selectedProxy2();
 
   /**
-  * Get the first selected property
-  */
+   * Get the first selected property
+   */
   QString selectedProperty1();
 
   /**
-  * Get the second selected property
-  */
+   * Get the second selected property
+   */
   QString selectedProperty2();
 
   /**
-  * Get the check state of interactive view link check box
-  */
+   * Get the check state of interactive view link check box
+   */
   bool interactiveViewLinkChecked();
 
   /**
-  * Get the check state of convert to indices check box
-  */
+   * Get the check state of convert to indices check box
+   */
   bool convertToIndicesChecked();
 
 private Q_SLOTS:

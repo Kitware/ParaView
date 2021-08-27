@@ -98,7 +98,7 @@ public:
   /**
    * Returns a vector of pairs for log files requested.
    */
-  const std::vector<std::pair<std::string, vtkLogger::Verbosity> >& GetLogFiles() const
+  const std::vector<std::pair<std::string, vtkLogger::Verbosity>>& GetLogFiles() const
   {
     return this->LogFiles;
   }
@@ -132,7 +132,7 @@ private:
   bool EnableStackTrace = false;
   vtkLogger::Verbosity LogStdErrVerbosity = vtkLogger::VERBOSITY_INVALID;
   std::string CSLogFileName;
-  std::vector<std::pair<std::string, vtkLogger::Verbosity> > LogFiles;
+  std::vector<std::pair<std::string, vtkLogger::Verbosity>> LogFiles;
   static vtkProcessModuleConfiguration* New();
 };
 

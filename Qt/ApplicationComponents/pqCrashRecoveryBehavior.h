@@ -39,12 +39,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class pqServer;
 
 /**
-* @ingroup Behaviors
-* pqCrashRecoveryBehavior manages saving/loading of crash recovery state. If
-* you want your application to be able to recover from crashes, simply
-* instantiate this behavior and ensure that state saving/loading works
-* correctly.
-*/
+ * @ingroup Behaviors
+ * pqCrashRecoveryBehavior manages saving/loading of crash recovery state. If
+ * you want your application to be able to recover from crashes, simply
+ * instantiate this behavior and ensure that state saving/loading works
+ * correctly.
+ */
 class PQAPPLICATIONCOMPONENTS_EXPORT pqCrashRecoveryBehavior : public QObject
 {
   Q_OBJECT

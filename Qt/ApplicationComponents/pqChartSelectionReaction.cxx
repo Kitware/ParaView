@@ -80,8 +80,9 @@ inline void setChartParameters(pqContextView* view, int selectionType, bool upda
     chart = chartMatrix->GetMainChart();
   }
 
-  if (update_modifier && (selectionModifier < vtkContextScene::SELECTION_NONE ||
-                           selectionModifier > vtkContextScene::SELECTION_TOGGLE))
+  if (update_modifier &&
+    (selectionModifier < vtkContextScene::SELECTION_NONE ||
+      selectionModifier > vtkContextScene::SELECTION_TOGGLE))
   {
     qWarning() << "Invalid selection modifier  " << selectionModifier
                << ", using vtkContextScene::SELECTION_DEFAULT";

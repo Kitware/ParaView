@@ -29,7 +29,7 @@
 #include <list>
 #include <vector>
 
-typedef std::list<vtkSmartPointer<vtkPVXMLElement> > ElementsType;
+typedef std::list<vtkSmartPointer<vtkPVXMLElement>> ElementsType;
 //*****************************************************************************
 class vtkSMCompoundSourceProxy::vtkInternals
 {

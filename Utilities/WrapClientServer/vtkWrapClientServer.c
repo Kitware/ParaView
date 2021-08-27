@@ -87,7 +87,7 @@ void output_temp(FILE* fp, int i, unsigned int argType, const char* Id, int coun
   /* Handle some objects of known type.  */
   if (((argType & VTK_PARSE_BASE_TYPE) == VTK_PARSE_VTK_OBJECT) &&
     (((argType & VTK_PARSE_INDIRECT) == VTK_PARSE_POINTER) ||
-        ((argType & VTK_PARSE_INDIRECT) == VTK_PARSE_REF)) &&
+      ((argType & VTK_PARSE_INDIRECT) == VTK_PARSE_REF)) &&
     strcmp(Id, "vtkClientServerStream") == 0)
   {
     fprintf(fp, "vtkClientServerStream temp%i_inst, *temp%i = &temp%i_inst;\n", i, i, i);
@@ -273,19 +273,21 @@ void return_result(FILE* fp)
     case VTK_PARSE_STRING:
       if ((rType & VTK_PARSE_INDIRECT) == 0 ||
         (((rType & VTK_PARSE_BASE_TYPE) == VTK_PARSE_CHAR) &&
-            ((rType & VTK_PARSE_INDIRECT) == VTK_PARSE_POINTER)))
+          ((rType & VTK_PARSE_INDIRECT) == VTK_PARSE_POINTER)))
       {
-        fprintf(fp, "      resultStream.Reset();\n"
-                    "      resultStream << vtkClientServerStream::Reply << temp%i << "
-                    "vtkClientServerStream::End;\n",
+        fprintf(fp,
+          "      resultStream.Reset();\n"
+          "      resultStream << vtkClientServerStream::Reply << temp%i << "
+          "vtkClientServerStream::End;\n",
           MAX_ARGS);
         return;
       }
       else if ((rType & VTK_PARSE_INDIRECT) == VTK_PARSE_REF)
       {
-        fprintf(fp, "      resultStream.Reset();\n"
-                    "      resultStream << vtkClientServerStream::Reply << *temp%i << "
-                    "vtkClientServerStream::End;\n",
+        fprintf(fp,
+          "      resultStream.Reset();\n"
+          "      resultStream << vtkClientServerStream::Reply << *temp%i << "
+          "vtkClientServerStream::End;\n",
           MAX_ARGS);
         return;
       }
@@ -302,17 +304,19 @@ void return_result(FILE* fp)
       /* Handle some objects of known type.  */
       if (strcmp(rClass, "vtkClientServerStream") == 0)
       {
-        fprintf(fp, "      resultStream.Reset();\n"
-                    "      resultStream << vtkClientServerStream::Reply << *temp%i << "
-                    "vtkClientServerStream::End;\n",
+        fprintf(fp,
+          "      resultStream.Reset();\n"
+          "      resultStream << vtkClientServerStream::Reply << *temp%i << "
+          "vtkClientServerStream::End;\n",
           MAX_ARGS);
         return;
       }
       else if ((rType & VTK_PARSE_INDIRECT) == VTK_PARSE_POINTER)
       {
-        fprintf(fp, "      resultStream.Reset();\n"
-                    "      resultStream << vtkClientServerStream::Reply << (vtkObjectBase *)temp%i "
-                    "<< vtkClientServerStream::End;\n",
+        fprintf(fp,
+          "      resultStream.Reset();\n"
+          "      resultStream << vtkClientServerStream::Reply << (vtkObjectBase *)temp%i "
+          "<< vtkClientServerStream::End;\n",
           MAX_ARGS);
         return;
       }
@@ -321,10 +325,11 @@ void return_result(FILE* fp)
 
   /* if we get to here, then the type was not recognized */
 
-  fprintf(fp, "      resultStream.Reset();\n"
-              "      resultStream << vtkClientServerStream::Reply\n"
-              "                   << \"unable to return result of type(%#x).\"\n"
-              "                   << vtkClientServerStream::End;\n",
+  fprintf(fp,
+    "      resultStream.Reset();\n"
+    "      resultStream << vtkClientServerStream::Reply\n"
+    "                   << \"unable to return result of type(%#x).\"\n"
+    "                   << vtkClientServerStream::End;\n",
     (rType & VTK_PARSE_UNQUALIFIED_TYPE));
 }
 
@@ -372,7 +377,7 @@ void get_args(FILE* fp, int i)
       if (((argType & VTK_PARSE_INDIRECT) == 0) ||
         ((argType & VTK_PARSE_INDIRECT) == VTK_PARSE_REF) ||
         (((argType & VTK_PARSE_BASE_TYPE) == VTK_PARSE_CHAR) &&
-            ((argType & VTK_PARSE_INDIRECT) == VTK_PARSE_POINTER)))
+          ((argType & VTK_PARSE_INDIRECT) == VTK_PARSE_POINTER)))
       {
         fprintf(fp, "msg.GetArgument(0, %i, &temp%i)", i + 2, i);
       }
@@ -1023,7 +1028,7 @@ int uniqueClasses(const char* classes[], int total, const char* classSelfName)
       strcmp(current_class_name, "vtkClientServerStream") != 0 &&
       isUniqueString(current_class_name, &temp[0], j)
       // && strcmp(classes[i],"vtkObjectBase")!=0)
-      )
+    )
     {
       temp[j] = current_class_name;
       ++j;
@@ -1131,11 +1136,12 @@ void output_DummyInitFunction(FILE* fp, const char* filename)
   char* basename = strrchr(filename, '/');
   char* basename_dup = strdup(basename + 1);
   *strchr(basename_dup, '.') = '\0';
-  fprintf(fp, "#include \"vtkSystemIncludes.h\"\n"
-              "#include \"vtkClientServerInterpreter.h\"\n"
-              "void VTK_EXPORT %s_Init(vtkClientServerInterpreter* /*csi*/)\n"
-              "{\n"
-              "}\n",
+  fprintf(fp,
+    "#include \"vtkSystemIncludes.h\"\n"
+    "#include \"vtkClientServerInterpreter.h\"\n"
+    "void VTK_EXPORT %s_Init(vtkClientServerInterpreter* /*csi*/)\n"
+    "{\n"
+    "}\n",
     basename_dup);
   free(basename_dup);
 }
@@ -1153,14 +1159,15 @@ void output_DummyInitFunction(FILE* fp, const char* filename)
 void output_InitFunction(FILE* fp, NewClassInfo* data)
 {
   fprintf(fp, "\n");
-  fprintf(fp, "\n"
-              "//-------------------------------------------------------------------------auto\n"
-              "void VTK_EXPORT %s_Init(vtkClientServerInterpreter* csi)\n"
-              "{\n"
-              "  static vtkClientServerInterpreter* last = nullptr;\n"
-              "  if(last != csi)\n"
-              "    {\n"
-              "    last = csi;\n",
+  fprintf(fp,
+    "\n"
+    "//-------------------------------------------------------------------------auto\n"
+    "void VTK_EXPORT %s_Init(vtkClientServerInterpreter* csi)\n"
+    "{\n"
+    "  static vtkClientServerInterpreter* last = nullptr;\n"
+    "  if(last != csi)\n"
+    "    {\n"
+    "    last = csi;\n",
     data->ClassName);
   if (!data->IsAbstract)
     fprintf(fp, "    csi->AddNewInstanceFunction(\"%s\", %sClientServerNewCommand);\n",
@@ -1317,8 +1324,9 @@ int main(int argc, char* argv[])
       fprintf(fp, "// This automatically generated file contains only a stub,\n");
       fprintf(fp, "// bacause the class %s is based on a templated VTK class.\n", data->Name);
       fprintf(fp, "// Wrapping such classes is not currently supported.\n");
-      fprintf(fp, "// Here follows the list of detected superclasses "
-                  "(first offending one marked by !):\n");
+      fprintf(fp,
+        "// Here follows the list of detected superclasses "
+        "(first offending one marked by !):\n");
 
       for (j = 0; j < data->NumberOfSuperClasses; ++j)
       {
@@ -1382,12 +1390,13 @@ int main(int argc, char* argv[])
     fprintf(fp, "  return %s::New();\n}\n\n", data->Name);
   }
 
-  fprintf(fp, "\n"
-              "int VTK_EXPORT"
-              " %sCommand(vtkClientServerInterpreter *arlu, vtkObjectBase *ob,"
-              " const char *method, const vtkClientServerStream& msg,"
-              " vtkClientServerStream& resultStream, void* /*ctx*/)\n"
-              "{\n",
+  fprintf(fp,
+    "\n"
+    "int VTK_EXPORT"
+    " %sCommand(vtkClientServerInterpreter *arlu, vtkObjectBase *ob,"
+    " const char *method, const vtkClientServerStream& msg,"
+    " vtkClientServerStream& resultStream, void* /*ctx*/)\n"
+    "{\n",
     data->Name);
 
   if (strcmp(data->Name, "vtkObjectBase") == 0)
@@ -1397,17 +1406,18 @@ int main(int argc, char* argv[])
   else
   {
     fprintf(fp, "  %s *op = %s::SafeDownCast(ob);\n", data->Name, data->Name);
-    fprintf(fp, "  if(!op)\n"
-                "    {\n"
-                "    vtkOStrStreamWrapper vtkmsg;\n"
-                "    vtkmsg << \"Cannot cast \" << ob->GetClassName() << \" object to %s.  \"\n"
-                "           << \"This probably means the class specifies the incorrect superclass "
-                "in vtkTypeMacro.\";\n"
-                "    resultStream.Reset();\n"
-                "    resultStream << vtkClientServerStream::Error\n"
-                "                 << vtkmsg.str() << 0 << vtkClientServerStream::End;\n"
-                "    return 0;\n"
-                "    }\n",
+    fprintf(fp,
+      "  if(!op)\n"
+      "    {\n"
+      "    vtkOStrStreamWrapper vtkmsg;\n"
+      "    vtkmsg << \"Cannot cast \" << ob->GetClassName() << \" object to %s.  \"\n"
+      "           << \"This probably means the class specifies the incorrect superclass "
+      "in vtkTypeMacro.\";\n"
+      "    resultStream.Reset();\n"
+      "    resultStream << vtkClientServerStream::Error\n"
+      "                 << vtkmsg.str() << 0 << vtkClientServerStream::End;\n"
+      "    return 0;\n"
+      "    }\n",
       data->Name);
   }
 
@@ -1425,41 +1435,44 @@ int main(int argc, char* argv[])
   /* try superclasses */
   for (i = 0; i < data->NumberOfSuperClasses; i++)
   {
-    fprintf(fp, "\n"
-                "  {\n"
-                "    const char* commandName = \"%s\";\n"
-                "    if (arlu->HasCommandFunction(commandName) &&\n"
-                "        arlu->CallCommandFunction(commandName, op, method, msg, resultStream)) { "
-                "return 1; }\n"
-                "  }\n",
+    fprintf(fp,
+      "\n"
+      "  {\n"
+      "    const char* commandName = \"%s\";\n"
+      "    if (arlu->HasCommandFunction(commandName) &&\n"
+      "        arlu->CallCommandFunction(commandName, op, method, msg, resultStream)) { "
+      "return 1; }\n"
+      "  }\n",
       data->SuperClasses[i]);
   }
   /* Add the Print method to vtkObjectBase. */
   if (!strcmp("vtkObjectBase", data->Name))
   {
-    fprintf(fp, "  if (!strcmp(\"Print\",method) && msg.GetNumberOfArguments(0) == 2)\n"
-                "    {\n"
-                "    std::ostringstream buf_with_warning_C4701;\n"
-                "    op->Print(buf_with_warning_C4701);\n"
-                "    resultStream.Reset();\n"
-                "    resultStream << vtkClientServerStream::Reply\n"
-                "                 << buf_with_warning_C4701.str().c_str()\n"
-                "                 << vtkClientServerStream::End;\n"
-                "    return 1;\n"
-                "    }\n");
+    fprintf(fp,
+      "  if (!strcmp(\"Print\",method) && msg.GetNumberOfArguments(0) == 2)\n"
+      "    {\n"
+      "    std::ostringstream buf_with_warning_C4701;\n"
+      "    op->Print(buf_with_warning_C4701);\n"
+      "    resultStream.Reset();\n"
+      "    resultStream << vtkClientServerStream::Reply\n"
+      "                 << buf_with_warning_C4701.str().c_str()\n"
+      "                 << vtkClientServerStream::End;\n"
+      "    return 1;\n"
+      "    }\n");
   }
   /* Add the special form of AddObserver to vtkObject. */
   if (!strcmp("vtkObject", data->Name))
   {
-    fprintf(fp, "  if (!strcmp(\"AddObserver\",method) && msg.GetNumberOfArguments(0) == 4)\n"
-                "    {\n"
-                "    const char* event;\n"
-                "    vtkClientServerStream css;\n"
-                "    if(msg.GetArgument(0, 2, &event) && msg.GetArgument(0, 3, &css))\n"
-                "      {\n"
-                "      return arlu->NewObserver(op, event, css);\n"
-                "      }\n"
-                "    }\n");
+    fprintf(fp,
+      "  if (!strcmp(\"AddObserver\",method) && msg.GetNumberOfArguments(0) == 4)\n"
+      "    {\n"
+      "    const char* event;\n"
+      "    vtkClientServerStream css;\n"
+      "    if(msg.GetArgument(0, 2, &event) && msg.GetArgument(0, 3, &css))\n"
+      "      {\n"
+      "      return arlu->NewObserver(op, event, css);\n"
+      "      }\n"
+      "    }\n");
   }
   fprintf(fp,
     "  if(resultStream.GetNumberOfMessages() > 0 &&\n"
@@ -1477,8 +1490,9 @@ int main(int argc, char* argv[])
     "               << vtkmsg.str() << vtkClientServerStream::End;\n"
     "  vtkmsg.rdbuf()->freeze(0);\n",
     data->Name);
-  fprintf(fp, "  return 0;\n"
-              "}\n");
+  fprintf(fp,
+    "  return 0;\n"
+    "}\n");
 
   classData = (NewClassInfo*)malloc(sizeof(NewClassInfo));
   getClassInfo(fileInfo, data, classData);

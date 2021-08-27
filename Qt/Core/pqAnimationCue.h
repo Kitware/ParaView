@@ -78,20 +78,20 @@ public:
   int getAnimatedPropertyIndex() const;
 
   /**
-  * Set the type of the keyframe created by default.
-  * default is CompositeKeyFrame.
-  */
+   * Set the type of the keyframe created by default.
+   * default is CompositeKeyFrame.
+   */
   void setKeyFrameType(const QString& type) { this->KeyFrameType = type; }
 
   /**
-  * Used by editors to trigger keyframesModified() signal after bulk of
-  * modifications have been made to the cue/key frames.
-  */
+   * Used by editors to trigger keyframesModified() signal after bulk of
+   * modifications have been made to the cue/key frames.
+   */
   void triggerKeyFramesModified() { Q_EMIT this->keyframesModified(); }
 
   /**
-  * Get/Set the enabled state for the cue.
-  */
+   * Get/Set the enabled state for the cue.
+   */
   void setEnabled(bool enable);
   bool isEnabled() const;
 
@@ -104,22 +104,22 @@ Q_SIGNALS:
   void modified();
 
   /**
-  * Fired when the enabled-state of the cue changes.
-  */
+   * Fired when the enabled-state of the cue changes.
+   */
   void enabled(bool);
 
 private Q_SLOTS:
   /**
-  * Called when the "Enabled" property is changed.
-  */
+   * Called when the "Enabled" property is changed.
+   */
   void onEnabledModified();
 
 private:
   Q_DISABLE_COPY(pqAnimationCue)
 
   /**
-  * Methods used to register/unregister keyframe proxies.
-  */
+   * Methods used to register/unregister keyframe proxies.
+   */
   void addKeyFrameInternal(vtkSMProxy*);
   void removeKeyFrameInternal(vtkSMProxy*);
   QString KeyFrameType;

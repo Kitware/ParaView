@@ -35,9 +35,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqMasterOnlyReaction.h"
 
 /**
-* @ingroup Reactions
-* Reaction for creating or deleting a python macro
-*/
+ * @ingroup Reactions
+ * Reaction for creating or deleting a python macro
+ */
 class PQAPPLICATIONCOMPONENTS_EXPORT pqMacroReaction : public pqMasterOnlyReaction
 {
   Q_OBJECT
@@ -47,8 +47,8 @@ public:
   pqMacroReaction(QAction* parent);
 
   /**
-  * define a python file as a macro and save it.
-  */
+   * define a python file as a macro and save it.
+   */
   static void createMacro();
 
 protected Q_SLOTS:
@@ -56,8 +56,8 @@ protected Q_SLOTS:
 
 protected:
   /**
-  * Called when the action is triggered.
-  */
+   * Called when the action is triggered.
+   */
   void onTriggered() override { pqMacroReaction::createMacro(); }
 
 private:

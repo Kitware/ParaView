@@ -39,11 +39,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkNew.h"
 
 /**
-* Property widget for selecting the texture to apply to a surface.
-*
-* To use this widget for a property add the 'panel_widget="texture_selector"'
-* to the property's XML.
-*/
+ * Property widget for selecting the texture to apply to a surface.
+ *
+ * To use this widget for a property add the 'panel_widget="texture_selector"'
+ * to the property's XML.
+ */
 class vtkSMProxyGroupDomain;
 class pqTextureComboBox;
 class pqDataRepresentation;

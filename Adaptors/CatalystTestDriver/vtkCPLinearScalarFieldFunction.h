@@ -18,7 +18,7 @@
  *
  * Class for specifying a scalar field that is linear with respect to the
  * coordinate components as well as time.
-*/
+ */
 
 #ifndef vtkCPLinearScalarFieldFunction_h
 #define vtkCPLinearScalarFieldFunction_h

@@ -20,7 +20,7 @@
  * vtkNetworkImageSource is a vtkImageAlgorithm that can read an image file on
  * on the client process and produce the output image data on a client and
  * render-server processes.
-*/
+ */
 
 #ifndef vtkNetworkImageSource_h
 #define vtkNetworkImageSource_h

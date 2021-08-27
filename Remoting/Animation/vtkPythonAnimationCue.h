@@ -17,7 +17,7 @@
  *
  * vtkPythonAnimationCue is an animation cue that can execute arbitrary Python
  * scripts.
-*/
+ */
 
 #ifndef vtkPythonAnimationCue_h
 #define vtkPythonAnimationCue_h

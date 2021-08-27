@@ -23,7 +23,7 @@
  * vtkPVComparativeView is a client-side VTK object which literally uses the
  * view and representation proxies to simulate the comparative view. Refer to
  * vtkPVComparativeView for details.
-*/
+ */
 
 #ifndef vtkSMComparativeViewProxy_h
 #define vtkSMComparativeViewProxy_h

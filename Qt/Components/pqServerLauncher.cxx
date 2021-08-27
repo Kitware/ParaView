@@ -513,8 +513,9 @@ void handleSwitchCases(const pqServerConfiguration& configuration, QProcessEnvir
     }
     if (!handled)
     {
-      qWarning() << "Case '" << value << "' not handled in 'Switch' for variable "
-                                         "'"
+      qWarning() << "Case '" << value
+                 << "' not handled in 'Switch' for variable "
+                    "'"
                  << variable << "'";
     }
   }

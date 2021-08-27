@@ -87,7 +87,7 @@ struct vtkSMSourceProxyInternals
 {
   typedef std::vector<vtkSMSourceProxyOutputPort> VectorOfPorts;
   VectorOfPorts OutputPorts;
-  std::vector<vtkSmartPointer<vtkSMSourceProxy> > SelectionProxies;
+  std::vector<vtkSmartPointer<vtkSMSourceProxy>> SelectionProxies;
   std::vector<unsigned long> SelectionObservers;
 
   // Resizes output ports and ensures that Name for each port is initialized to
@@ -525,7 +525,7 @@ void vtkSMSourceProxy::MarkDirty(vtkSMProxy* modifiedProxy)
   // Mark the extract selection proxies modified as well.
   // This is needed to be done explicitly since we don't use vtkSMInputProperty
   // to connect this proxy to the input of the extract selection filter.
-  std::vector<vtkSmartPointer<vtkSMSourceProxy> >::iterator iter;
+  std::vector<vtkSmartPointer<vtkSMSourceProxy>>::iterator iter;
   for (iter = this->PInternals->SelectionProxies.begin();
        iter != this->PInternals->SelectionProxies.end(); ++iter)
   {

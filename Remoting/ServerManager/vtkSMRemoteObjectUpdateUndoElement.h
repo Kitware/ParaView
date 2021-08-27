@@ -19,7 +19,7 @@
  * This class keeps the before and after state of the RemoteObject in the
  * vtkSMMessage form. It works with any proxy and RemoteObject. It is a very
  * generic undoElement.
-*/
+ */
 
 #ifndef vtkSMRemoteObjectUpdateUndoElement_h
 #define vtkSMRemoteObjectUpdateUndoElement_h

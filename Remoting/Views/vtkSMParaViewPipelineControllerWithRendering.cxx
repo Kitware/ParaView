@@ -190,8 +190,9 @@ void vtkInheritRepresentationProperties(vtkSMRepresentationProxy* repr, vtkSMSou
     const char* pname = iter->GetKey();
     vtkSMProperty* dest = repr->GetProperty(pname);
     vtkSMProperty* source = iter->GetProperty();
-    if (pname && (strcmp(pname, "ColorArrayName") == 0 || strcmp(pname, "LookupTable") == 0 ||
-                   strcmp(pname, "ScalarOpacityFunction") == 0))
+    if (pname &&
+      (strcmp(pname, "ColorArrayName") == 0 || strcmp(pname, "LookupTable") == 0 ||
+        strcmp(pname, "ScalarOpacityFunction") == 0))
     {
       // HACK: to fix BUG #15539. We avoid copying coloring properties since
       // they are already inherited if needed. The tricky question is how do

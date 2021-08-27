@@ -1439,8 +1439,9 @@ void vtkAMRDualContour::AddCapPolygon(int ptCount, vtkIdType* pointIds, int bloc
 // and I permute the face corners and edges into hex corners and endges.
 // It ends up being a little long to duplicate the code 6 times,
 // but it is still fast.
-void vtkAMRDualContour::CapCell(int cellX, int cellY, int cellZ, // cell index in block coordinates.
-  // Which cell faces need to be capped.
+void vtkAMRDualContour::CapCell(int cellX, int cellY,
+  int cellZ, // cell index in block coordinates.
+             // Which cell faces need to be capped.
   unsigned char cubeBoundaryBits,
   // Marching cubes case for this cell
   int cubeCase,

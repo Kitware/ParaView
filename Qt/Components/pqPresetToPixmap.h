@@ -43,10 +43,10 @@ class QPixmap;
 class QSize;
 
 /**
-* pqPresetToPixmap is a helper class to generate QPixmap from a color/opacity
-* preset. Use pqPresetToPixmap::render() to generate a QPixmap for a transfer
-* function.
-*/
+ * pqPresetToPixmap is a helper class to generate QPixmap from a color/opacity
+ * preset. Use pqPresetToPixmap::render() to generate a QPixmap for a transfer
+ * function.
+ */
 class PQCOMPONENTS_EXPORT pqPresetToPixmap : public QObject
 {
   Q_OBJECT
@@ -57,20 +57,20 @@ public:
   ~pqPresetToPixmap() override;
 
   /**
-  * Render a preset to a pixmap for the given resolution.
-  */
+   * Render a preset to a pixmap for the given resolution.
+   */
   QPixmap render(const Json::Value& preset, const QSize& resolution) const;
 
 protected:
   /**
-  * Renders a color transfer function preset.
-  */
+   * Renders a color transfer function preset.
+   */
   QPixmap renderColorTransferFunction(
     vtkScalarsToColors* stc, vtkPiecewiseFunction* pf, const QSize& resolution) const;
 
   /**
-  * Renders a color transfer function preset.
-  */
+   * Renders a color transfer function preset.
+   */
   QPixmap renderIndexedColorTransferFunction(
     vtkScalarsToColors* stc, const QSize& resolution) const;
 

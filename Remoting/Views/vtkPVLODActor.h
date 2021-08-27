@@ -23,7 +23,7 @@
  *
  * @sa
  * vtkActor vtkRenderer vtkLODProp3D vtkLODActor
-*/
+ */
 
 #ifndef vtkPVLODActor_h
 #define vtkPVLODActor_h

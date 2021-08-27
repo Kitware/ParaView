@@ -62,19 +62,19 @@ class pqPythonMacroSupervisor::pqInternal
 {
 public:
   // Container widget that have an RunMacro action context
-  QList<QPointer<QWidget> > RunWidgetContainers;
+  QList<QPointer<QWidget>> RunWidgetContainers;
   // List of action linked to widget/menuItem used to start a macro
   QMap<QString, QAction*> RunActionMap;
 
   // Container widget that have an EditMacro action context
-  QList<QPointer<QWidget> > EditWidgetContainers;
+  QList<QPointer<QWidget>> EditWidgetContainers;
   // List of action linked to widget/menuItem used to edit a macro
   QMap<QString, QAction*> EditActionMap;
 
   // Container widget that have an DeleteMacro action context
-  QList<QPointer<QWidget> > DeleteWidgetContainers;
+  QList<QPointer<QWidget>> DeleteWidgetContainers;
   // List of action linked to widget/menuItem used to delete a macro
-  QMap<QString, QPointer<QAction> > DeleteActionMap;
+  QMap<QString, QPointer<QAction>> DeleteActionMap;
 };
 
 //----------------------------------------------------------------------------
@@ -119,7 +119,7 @@ void removePlaceHolderIfNeeded(QWidget* widget)
     }
   }
 }
-void addActionToWidgets(QAction* action, QList<QPointer<QWidget> >& widgets)
+void addActionToWidgets(QAction* action, QList<QPointer<QWidget>>& widgets)
 {
   foreach (QWidget* widget, widgets)
   {
@@ -130,7 +130,7 @@ void addActionToWidgets(QAction* action, QList<QPointer<QWidget> >& widgets)
     }
   }
 }
-void removeActionFromWidgets(QAction* action, QList<QPointer<QWidget> >& widgets)
+void removeActionFromWidgets(QAction* action, QList<QPointer<QWidget>>& widgets)
 {
   foreach (QWidget* widget, widgets)
   {
@@ -170,7 +170,7 @@ void pqPythonMacroSupervisor::addWidgetForDeleteMacros(QWidget* widget)
 //----------------------------------------------------------------------------
 void pqPythonMacroSupervisor::addWidgetForMacros(QWidget* widget, int actionType)
 {
-  QList<QPointer<QWidget> >* widgetContainers = nullptr;
+  QList<QPointer<QWidget>>* widgetContainers = nullptr;
   switch (actionType)
   {
     case 0: // run
@@ -374,7 +374,7 @@ void pqPythonMacroSupervisor::onDeleteMacroTriggered()
 {
   QObject* action = this->sender();
   QList<QString> listOfMacroToDelete;
-  QMap<QString, QPointer<QAction> >::const_iterator itr =
+  QMap<QString, QPointer<QAction>>::const_iterator itr =
     this->Internal->DeleteActionMap.constBegin();
   for (; itr != this->Internal->DeleteActionMap.constEnd(); ++itr)
   {

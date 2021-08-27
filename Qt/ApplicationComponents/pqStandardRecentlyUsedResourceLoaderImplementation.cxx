@@ -61,7 +61,7 @@ bool pqStandardRecentlyUsedResourceLoaderImplementation::canLoad(const pqServerR
 {
   return (resource.hasData("PARAVIEW_STATE") ||
     (resource.hasData("PARAVIEW_DATA") && resource.hasData("smgroup") &&
-            resource.hasData("smname")));
+      resource.hasData("smname")));
 }
 
 //-----------------------------------------------------------------------------

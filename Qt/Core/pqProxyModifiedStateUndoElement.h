@@ -13,15 +13,15 @@
 
 =========================================================================*/
 /**
-* .NAME pqProxyModifiedStateUndoElement - undo element to capture the change
-* in the modified state for a pqProxy.
-* .SECTION Description
-* pqProxyModifiedStateUndoElement can be used to capture the change in the
-* modified state of a pqProxy. Currently it only captures the change from
-* UNINITIALIZED to UNMODIFIED or vice-versa.  This is used by the
-* pqObjectInspectorWidget to control the apply button state when the first
-* accept is undone.
-*/
+ * .NAME pqProxyModifiedStateUndoElement - undo element to capture the change
+ * in the modified state for a pqProxy.
+ * .SECTION Description
+ * pqProxyModifiedStateUndoElement can be used to capture the change in the
+ * modified state of a pqProxy. Currently it only captures the change from
+ * UNINITIALIZED to UNMODIFIED or vice-versa.  This is used by the
+ * pqObjectInspectorWidget to control the apply button state when the first
+ * accept is undone.
+ */
 
 #ifndef pqProxyModifiedStateUndoElement_h
 #define pqProxyModifiedStateUndoElement_h
@@ -42,15 +42,15 @@ public:
   int Redo() override { return this->InternalUndoRedo(false) ? 1 : 0; }
 
   /**
-  * Use this to initialize the element if the pqProxy was marked as
-  * UNMODIFIED.
-  */
+   * Use this to initialize the element if the pqProxy was marked as
+   * UNMODIFIED.
+   */
   void MadeUnmodified(pqProxy*);
 
   /**
-  * Use this to initialize the element if the pqProxy was marked as
-  * UNINITIALIZED.
-  */
+   * Use this to initialize the element if the pqProxy was marked as
+   * UNINITIALIZED.
+   */
   void MadeUninitialized(pqProxy*);
 
 protected:

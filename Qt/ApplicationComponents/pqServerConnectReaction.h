@@ -38,9 +38,9 @@ class pqServerConfiguration;
 class pqServerResource;
 
 /**
-* @ingroup Reactions
-* Reaction for connecting to a server.
-*/
+ * @ingroup Reactions
+ * Reaction for connecting to a server.
+ */
 class PQAPPLICATIONCOMPONENTS_EXPORT pqServerConnectReaction : public pqReaction
 {
   Q_OBJECT
@@ -48,45 +48,45 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqServerConnectReaction : public pqReaction
 
 public:
   /**
-  * Constructor. Parent cannot be nullptr.
-  */
+   * Constructor. Parent cannot be nullptr.
+   */
   pqServerConnectReaction(QAction* parent);
 
   /**
-  * Creates a server connection.
-  * Note that this method is static. Applications can simply use this without
-  * having to create a reaction instance.
-  */
+   * Creates a server connection.
+   * Note that this method is static. Applications can simply use this without
+   * having to create a reaction instance.
+   */
   static void connectToServerWithWarning();
   static void connectToServer();
 
   /**
-  * ParaView names server configurations (in pvsc files). To connect to a
-  * server using the configuration specified, use this API.
-  */
+   * ParaView names server configurations (in pvsc files). To connect to a
+   * server using the configuration specified, use this API.
+   */
   static bool connectToServerUsingConfigurationName(const char* config_name);
 
   /**
-  * To connect to a server given a configuration, use this API.
-  */
+   * To connect to a server given a configuration, use this API.
+   */
   static bool connectToServerUsingConfiguration(const pqServerConfiguration& config);
 
   /**
-  * Connect to server using the resource. This will create a temporary
-  * configuration for the resource.
-  */
+   * Connect to server using the resource. This will create a temporary
+   * configuration for the resource.
+   */
   static bool connectToServer(const pqServerResource& resource);
 
 protected:
   /**
-  * Called when the action is triggered.
-  */
+   * Called when the action is triggered.
+   */
   void onTriggered() override { pqServerConnectReaction::connectToServerWithWarning(); }
 
 private Q_SLOTS:
   /**
-  * Updates the state of this reaction.
-  */
+   * Updates the state of this reaction.
+   */
   void updateEnableState() override;
 
 private:

@@ -36,10 +36,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QFrame>
 
 /**
-* pqExpanderButton provides a frame with a toggle mode. This can be used to
-* simulate a toggle button used to expand frames in an accordion style, for
-* example.
-*/
+ * pqExpanderButton provides a frame with a toggle mode. This can be used to
+ * simulate a toggle button used to expand frames in an accordion style, for
+ * example.
+ */
 class PQWIDGETS_EXPORT pqExpanderButton : public QFrame
 {
   Q_OBJECT
@@ -53,29 +53,29 @@ public:
 
 public Q_SLOTS:
   /**
-  * Toggles the state of the checkable button.
-  */
+   * Toggles the state of the checkable button.
+   */
   void toggle();
 
   /**
-  * This property holds whether the button is checked. By default, the button
-  * is unchecked.
-  */
+   * This property holds whether the button is checked. By default, the button
+   * is unchecked.
+   */
   void setChecked(bool);
   bool checked() const { return this->Checked; }
 
   /**
-  * This property holds the text shown on the button.
-  */
+   * This property holds the text shown on the button.
+   */
   void setText(const QString& text);
   QString text() const;
 
 Q_SIGNALS:
   /**
-  * This signal is emitted whenever a button changes its state.
-  * checked is true if the button is checked, or false if the button is
-  * unchecked.
-  */
+   * This signal is emitted whenever a button changes its state.
+   * checked is true if the button is checked, or false if the button is
+   * unchecked.
+   */
   void toggled(bool checked);
 
 protected:

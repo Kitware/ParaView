@@ -19,7 +19,7 @@
  * processes. The buffer can be initialized from a process
  * priority queue such that only those processes with loading
  * less than a specified tolerance are included.
-*/
+ */
 
 #ifndef vtkMaterialInterfaceProcessRing_h
 #define vtkMaterialInterfaceProcessRing_h

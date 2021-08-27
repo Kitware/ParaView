@@ -41,7 +41,7 @@
  * Below these entries are the eigenvalues of the covariance matrix (in the
  * column labeled "Mean") and the eigenvectors (as row vectors) in an
  * additional NxN matrix.
-*/
+ */
 
 #ifndef vtkPSciVizPCAStats_h
 #define vtkPSciVizPCAStats_h

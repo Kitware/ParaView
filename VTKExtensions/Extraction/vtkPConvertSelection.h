@@ -17,7 +17,7 @@
  * @brief   parallel aware vtkConvertSelection subclass.
  *
  * vtkPConvertSelection is a parallel aware vtkConvertSelection subclass.
-*/
+ */
 
 #ifndef vtkPConvertSelection_h
 #define vtkPConvertSelection_h

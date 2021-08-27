@@ -42,32 +42,32 @@ class vtkSMReaderFactory;
 class vtkStringList;
 
 /**
-* a dialog that prompts for a reader type to open a file
-*/
+ * a dialog that prompts for a reader type to open a file
+ */
 class PQCOMPONENTS_EXPORT pqSelectReaderDialog : public QDialog
 {
   Q_OBJECT
 public:
   /**
-  * constructor
-  */
+   * constructor
+   */
   pqSelectReaderDialog(
     const QString& file, pqServer* s, vtkSMReaderFactory* factory, QWidget* p = 0);
 
   pqSelectReaderDialog(const QString& file, pqServer* s, vtkStringList* list, QWidget* p = 0);
   /**
-  * destructor
-  */
+   * destructor
+   */
   ~pqSelectReaderDialog() override;
 
   /**
-  * get the reader that was chosen to read a file
-  */
+   * get the reader that was chosen to read a file
+   */
   QString getReader() const;
 
   /**
-  * get the group for the chosen reader.
-  */
+   * get the group for the chosen reader.
+   */
   QString getGroup() const;
 
 protected:

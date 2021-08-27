@@ -18,7 +18,7 @@
  *
  * vtkPVImplicitCylinderRepresentation extends vtkImplicitCylinderRepresentation
  * to add ParaView proper initialisation values
-*/
+ */
 
 #ifndef vtkPVImplicitCylinderRepresentation_h
 #define vtkPVImplicitCylinderRepresentation_h

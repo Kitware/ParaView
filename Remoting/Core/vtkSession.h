@@ -18,7 +18,7 @@
  * vtkSession defines a session i.e. a conversation, if you will. It can be
  * between different processes or same process. What types of conversations are
  * possible i.e what protocols are supported, is defined by the subclasses.
-*/
+ */
 
 #ifndef vtkSession_h
 #define vtkSession_h

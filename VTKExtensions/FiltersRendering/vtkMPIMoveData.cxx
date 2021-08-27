@@ -51,8 +51,7 @@ bool vtkMPIMoveData::UseZLibCompression = false;
 
 namespace
 {
-bool vtkMPIMoveDataMerge(
-  std::vector<vtkSmartPointer<vtkDataObject> >& pieces, vtkDataObject* result)
+bool vtkMPIMoveDataMerge(std::vector<vtkSmartPointer<vtkDataObject>>& pieces, vtkDataObject* result)
 {
   return vtkMultiProcessControllerHelper::MergePieces(pieces, result);
 }
@@ -1034,7 +1033,7 @@ void vtkMPIMoveData::ReconstructDataFromBuffer(vtkDataObject* data)
   }
 
   bool is_image_data = data->IsA("vtkImageData") != 0;
-  std::vector<vtkSmartPointer<vtkDataObject> > pieces;
+  std::vector<vtkSmartPointer<vtkDataObject>> pieces;
 
   for (int idx = 0; idx < this->NumberOfBuffers; ++idx)
   {

@@ -19,7 +19,7 @@
  * vtkRawImageFileSeriesReader is designed to read in raw files. The issue
  * with raw files is that the extents are not known and must be passed to
  * vtkImageReader2 and subclasses.
-*/
+ */
 
 #ifndef vtkRawImageFileSeriesReader_h
 #define vtkRawImageFileSeriesReader_h

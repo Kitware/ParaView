@@ -16,7 +16,7 @@
  * @class   vtkSMComparativeAnimationCueUndoElement
  * @brief   UndoElement for ComparativeAnimationCue
  *
-*/
+ */
 
 #ifndef vtkSMComparativeAnimationCueUndoElement_h
 #define vtkSMComparativeAnimationCueUndoElement_h

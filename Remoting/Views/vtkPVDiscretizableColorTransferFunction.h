@@ -21,7 +21,7 @@
  * it adds the concept of "active" annotations. These annotations are a
  * subset of the full list of annotations available and are used in place
  * of the full annotation list.
-*/
+ */
 
 #ifndef vtkPVDiscretizableColorTransferFunction_h
 #define vtkPVDiscretizableColorTransferFunction_h

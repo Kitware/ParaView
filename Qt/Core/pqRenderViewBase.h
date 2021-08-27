@@ -37,10 +37,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class pqTimer;
 
 /**
-* pqRenderViewBase is an abstract base class for all render-view based views.
-* It encapuslates some of the commonly needed functionality for all such
-* views.
-*/
+ * pqRenderViewBase is an abstract base class for all render-view based views.
+ * It encapuslates some of the commonly needed functionality for all such
+ * views.
+ */
 class PQCORE_EXPORT pqRenderViewBase : public pqView
 {
   Q_OBJECT
@@ -62,49 +62,49 @@ public:
   ~pqRenderViewBase() override;
 
   /**
-  * Resets the camera to include all visible data.
-  * It is essential to call this resetCamera, to ensure that the reset camera
-  * action gets pushed on the interaction undo stack.
-  */
+   * Resets the camera to include all visible data.
+   * It is essential to call this resetCamera, to ensure that the reset camera
+   * action gets pushed on the interaction undo stack.
+   */
   virtual void resetCamera(bool closest = false) = 0;
 
   /**
-  * Called to reset the view's display.  This method calls resetCamera().
-  */
+   * Called to reset the view's display.  This method calls resetCamera().
+   */
   void resetDisplay(bool closest = false) override;
 
 protected Q_SLOTS:
   virtual void initializeAfterObjectsCreated();
 
   /**
-  * Triggered by DelayNonInteractiveRenderEvent
-  */
+   * Triggered by DelayNonInteractiveRenderEvent
+   */
   void beginDelayInteractiveRender();
   void endDelayInteractiveRender();
 
   /**
-  * Triggered by internal timer to update the status bar message
-  */
+   * Triggered by internal timer to update the status bar message
+   */
   void updateStatusMessage();
 
 protected:
   /**
-  * Overridden to popup the context menu, if some actions have been added
-  * using addMenuAction.
-  */
+   * Overridden to popup the context menu, if some actions have been added
+   * using addMenuAction.
+   */
   bool eventFilter(QObject* caller, QEvent* e) override;
 
   /**
-  * Creates a new instance of the QWidget subclass to be used to show this
-  * view. Default implementation creates a pqQVTKWidget.
-  */
+   * Creates a new instance of the QWidget subclass to be used to show this
+   * view. Default implementation creates a pqQVTKWidget.
+   */
   QWidget* createWidget() override;
 
   /**
-  * Use this method to initialize the pqObject state using the
-  * underlying vtkSMProxy. This needs to be done only once,
-  * after the object has been created.
-  */
+   * Use this method to initialize the pqObject state using the
+   * underlying vtkSMProxy. This needs to be done only once,
+   * after the object has been created.
+   */
   void initialize() override;
 
 private:

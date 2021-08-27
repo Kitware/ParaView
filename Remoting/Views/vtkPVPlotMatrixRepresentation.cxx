@@ -54,7 +54,7 @@ vtkStandardNewMacro(vtkPVPlotMatrixRepresentation);
 class vtkPVPlotMatrixRepresentation::vtkInternals
 {
 public:
-  std::vector<std::pair<std::string, bool> > SeriesVisibilities;
+  std::vector<std::pair<std::string, bool>> SeriesVisibilities;
 
   vtkSmartPointer<vtkStringArray> GetOrderedVisibleColumnNames(vtkTable* table)
   {

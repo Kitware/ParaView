@@ -28,8 +28,9 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkSmartPointer.h"
 
 #ifdef PARAVIEW_USE_PYTHON
-extern "C" {
-void vtkPVInitializePythonModules();
+extern "C"
+{
+  void vtkPVInitializePythonModules();
 }
 #endif
 

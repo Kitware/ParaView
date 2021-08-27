@@ -31,7 +31,7 @@
  *  </Hints>
  * </Proxy>
  * \endcode
-*/
+ */
 
 #ifndef vtkSMProxyInitializationHelper_h
 #define vtkSMProxyInitializationHelper_h

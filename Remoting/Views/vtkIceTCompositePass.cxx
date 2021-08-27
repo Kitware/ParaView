@@ -342,9 +342,7 @@ void vtkIceTCompositePass::SetupContext(const vtkRenderState* render_state)
 }
 
 //----------------------------------------------------------------------------
-void vtkIceTCompositePass::CleanupContext(const vtkRenderState*)
-{
-}
+void vtkIceTCompositePass::CleanupContext(const vtkRenderState*) {}
 
 //----------------------------------------------------------------------------
 void vtkIceTCompositePass::Render(const vtkRenderState* render_state)

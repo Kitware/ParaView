@@ -38,10 +38,10 @@ class vtkSMSourceProxy;
 class pqDataRepresentation;
 
 /**
-* pqContextView subclass for "HistogramView". Doesn't do much expect adds
-* the API to get the chartview type and indicates that this view supports
-* selection.
-*/
+ * pqContextView subclass for "HistogramView". Doesn't do much expect adds
+ * the API to get the chartview type and indicates that this view supports
+ * selection.
+ */
 class PQCORE_EXPORT pqXYHistogramChartView : public pqContextView
 {
   Q_OBJECT
@@ -51,8 +51,8 @@ public:
   static QString XYHistogramChartViewType() { return "XYHistogramChartView"; }
 
   /**
-  * Currently the bar chart view is not supporting selection.
-  */
+   * Currently the bar chart view is not supporting selection.
+   */
   bool supportsSelection() const override { return true; }
 
   pqXYHistogramChartView(const QString& group, const QString& name,

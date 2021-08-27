@@ -21,7 +21,7 @@
  * of values passed to one or more invocations of a command. How the
  * values are distributed to the different invocations is controlled
  * by several parameters.
-*/
+ */
 
 #ifndef vtkSMVectorProperty_h
 #define vtkSMVectorProperty_h

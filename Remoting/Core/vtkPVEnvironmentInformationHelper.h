@@ -19,7 +19,7 @@
  *
  * vtkPVEnvironmentInformationHelper can be used to get values of environment
  * variables.
-*/
+ */
 
 #ifndef vtkPVEnvironmentInformationHelper_h
 #define vtkPVEnvironmentInformationHelper_h

@@ -532,8 +532,9 @@ int main(int argc, char** argv)
   args.AddArgument("--use-ordered-compositing", vtksys::CommandLineArguments::NO_ARGUMENT,
     &use_ordered_compositing, "Use ordered compositing");
   args.AddArgument("--use-depth-peeling", vtksys::CommandLineArguments::NO_ARGUMENT,
-    &use_depth_peeling, "Use depth peeling."
-                        "This works only when --use-ordered-compositing is true.");
+    &use_depth_peeling,
+    "Use depth peeling."
+    "This works only when --use-ordered-compositing is true.");
   args.AddArgument("--depth-only", vtksys::CommandLineArguments::NO_ARGUMENT, &depthOnly,
     "pass depth buffer only.");
   args.AddArgument("--server", vtksys::CommandLineArguments::NO_ARGUMENT, &act_as_server,

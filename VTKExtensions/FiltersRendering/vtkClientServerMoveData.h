@@ -24,7 +24,7 @@
  * the output type before hand.
  * @warning
  * This filter may change the output in RequestData().
-*/
+ */
 
 #ifndef vtkClientServerMoveData_h
 #define vtkClientServerMoveData_h

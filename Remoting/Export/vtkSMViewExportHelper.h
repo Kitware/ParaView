@@ -20,7 +20,7 @@
  * create instances of this helper on-demand to query available exporters and
  * create and exporter proxy (in same spirit as vtkSMWriterFactory, except that
  * there's no globally existing instance).
-*/
+ */
 
 #ifndef vtkSMViewExportHelper_h
 #define vtkSMViewExportHelper_h

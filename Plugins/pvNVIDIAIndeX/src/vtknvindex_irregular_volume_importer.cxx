@@ -83,8 +83,9 @@ nv::index::IDistributed_data_subset* vtknvindex_irregular_volume_importer::creat
   vtkMultiProcessController* controller = vtkMultiProcessController::GetGlobalController();
   const mi::Sint32 rank_id = controller ? controller->GetLocalProcessId() : 0;
 
-  const std::type_info* scalar_type_info =
-    (m_scalar_type == "unsigned char") ? &typeid(mi::Uint8) : (m_scalar_type == "unsigned short")
+  const std::type_info* scalar_type_info = (m_scalar_type == "unsigned char")
+    ? &typeid(mi::Uint8)
+    : (m_scalar_type == "unsigned short")
       ? &typeid(mi::Uint16)
       : (m_scalar_type == "float") ? &typeid(mi::Float32) : &typeid(mi::Float64);
 
@@ -484,7 +485,7 @@ nv::index::IDistributed_data_subset* vtknvindex_irregular_volume_importer::creat
     // * adds a face to the ivol mesh storage
     // * tries to orient faces to have correct CCW vertex ordering
     auto ivol_add_tet_face = [&](mi::Uint32 i0, mi::Uint32 i1, mi::Uint32 i2, Vec3f const& p0,
-      Vec3f const& p1, Vec3f const& p2) {
+                               Vec3f const& p1, Vec3f const& p2) {
       const Vec3f e1 = (p1 - p0);
       const Vec3f e2 = (p2 - p0);
 

@@ -175,8 +175,8 @@ bool pqFileDialogFilter::lessThan(const QModelIndex& left, const QModelIndex& ri
   // Sanity Check
   if ((leftType != rightType) ||
     ((left.parent().isValid() && right.parent().isValid() && left.parent() != right.parent()) ||
-        (left.parent().isValid() && !right.parent().isValid()) ||
-        (!left.parent().isValid() && right.parent().isValid())))
+      (left.parent().isValid() && !right.parent().isValid()) ||
+      (!left.parent().isValid() && right.parent().isValid())))
   {
     return false;
   }

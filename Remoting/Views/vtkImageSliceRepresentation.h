@@ -20,7 +20,7 @@
  * vtkImageSliceRepresentation is a representation for showing slices from an
  * image dataset. Currently, it does not support composite datasets, however, we
  * should be able to add such a support in future.
-*/
+ */
 
 #ifndef vtkImageSliceRepresentation_h
 #define vtkImageSliceRepresentation_h

@@ -19,7 +19,7 @@
  * vtkBoundedPlaneSource is a simple planar polydata generator that produces a
  * plane by intersecting a bounding box by a plane (specified by center and
  * normal).
-*/
+ */
 
 #ifndef vtkBoundedPlaneSource_h
 #define vtkBoundedPlaneSource_h

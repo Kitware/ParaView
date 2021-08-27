@@ -16,7 +16,7 @@
  * @class   vtkAnimationPlayer
  *
  * Abstract superclass for an animation player.
-*/
+ */
 
 #ifndef vtkAnimationPlayer_h
 #define vtkAnimationPlayer_h

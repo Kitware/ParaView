@@ -26,7 +26,7 @@
  * \li DisplayDate: Boolean value representing whether thedate/time is visible.
  * \li DisplaySystemName: Boolean value representing whether the system type is visible.
  * \li DisplayUserName: Boolean value representing whether the username is visible.
-*/
+ */
 
 #ifndef vtkEnvironmentAnnotationFilter_h
 #define vtkEnvironmentAnnotationFilter_h

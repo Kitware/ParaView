@@ -17,7 +17,7 @@
  * @brief   Abstract class for specifying scalars at points.
  *
  * Abstract class for specifying scalars at specified points.
-*/
+ */
 
 #ifndef vtkCPScalarFieldFunction_h
 #define vtkCPScalarFieldFunction_h

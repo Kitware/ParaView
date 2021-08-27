@@ -46,7 +46,7 @@
  * blending for translucent renderings in ParaView.
  * @par Thanks:
  * Thanks to Sandia National Laboratories for this compression technique
-*/
+ */
 
 #ifndef vtkSquirtCompressor_h
 #define vtkSquirtCompressor_h

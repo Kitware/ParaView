@@ -35,7 +35,7 @@ class pqCustomViewpointButtonDialogUI : public Ui::pqCustomViewpointButtonDialog
     QPointer<QToolButton> DeleteButton;
   };
 
-  QPointer< ::pqCustomViewpointButtonDialog> Parent;
+  QPointer<::pqCustomViewpointButtonDialog> Parent;
   QList<RowData> Rows;
 
 public:

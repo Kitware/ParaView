@@ -20,7 +20,7 @@
  * vtkSMInteractionUndoStackBuilder specializes in interaction.
  * This class can create undo elements for only one render view
  * at a time.
-*/
+ */
 
 #ifndef vtkSMInteractionUndoStackBuilder_h
 #define vtkSMInteractionUndoStackBuilder_h

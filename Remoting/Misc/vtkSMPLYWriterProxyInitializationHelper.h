@@ -20,7 +20,7 @@
  * vtkSMPLYWriterProxyInitializationHelper is an initialization helper for
  * the PPLYWriter proxy that sets up the "ColorArrayName" and "LookupTable"
  * using the coloring state in the active view.
-*/
+ */
 
 #ifndef vtkSMPLYWriterProxyInitializationHelper_h
 #define vtkSMPLYWriterProxyInitializationHelper_h

@@ -103,9 +103,10 @@ public:
     const auto real_notation =
       this->UseGlobalPrecisionAndNotation ? pqDoubleLineEdit::globalNotation() : this->Notation;
 
-    const QString limited =
-      self->text().isEmpty() ? QString() : pqDoubleLineEdit::formatDouble(self->text().toDouble(),
-                                             toTextStreamNotation(real_notation), real_precision);
+    const QString limited = self->text().isEmpty()
+      ? QString()
+      : pqDoubleLineEdit::formatDouble(
+          self->text().toDouble(), toTextStreamNotation(real_notation), real_precision);
 
     const bool changed = (limited != this->InactiveLineEdit->text());
     this->InactiveLineEdit->setText(limited);

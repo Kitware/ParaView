@@ -15,7 +15,7 @@
 /**
  * @class   vtkPVEnSightMasterServerTranslator
  *
-*/
+ */
 
 #ifndef vtkPVEnSightMasterServerTranslator_h
 #define vtkPVEnSightMasterServerTranslator_h

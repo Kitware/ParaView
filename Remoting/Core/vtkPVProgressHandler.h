@@ -38,7 +38,7 @@
  * \li \c calldata: vtkPVProgressHandler*
  *
  * Starting ParaView 5.5, vtkCommand::MessageEvent is no longer fired.
-*/
+ */
 
 #ifndef vtkPVProgressHandler_h
 #define vtkPVProgressHandler_h
@@ -100,10 +100,10 @@ public:
 
   //@{
   /**
-    * Get/Set the progress interval in seconds. Progress events
-    * occurring more frequently than this interval are skipped.
-    * Default is 0.1 seconds on client and 1 second on server and batch processes.
-    */
+   * Get/Set the progress interval in seconds. Progress events
+   * occurring more frequently than this interval are skipped.
+   * Default is 0.1 seconds on client and 1 second on server and batch processes.
+   */
   vtkSetClampMacro(ProgressInterval, double, 0.01, 30.0);
   vtkGetMacro(ProgressInterval, double);
   //@}

@@ -20,7 +20,7 @@
  * proxy. The properties of the root proxies as well as sub-proxies are
  * included in the iteration. For sub-proxies, only
  * exposed properties are iterated over.
-*/
+ */
 
 #ifndef vtkSMPropertyIterator_h
 #define vtkSMPropertyIterator_h

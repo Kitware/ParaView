@@ -208,7 +208,7 @@ void vtkACosmoReader::ReadMetaDataFile(const int levelIdx, std::string file)
     tokens.clear();
     std::istringstream iss(line);
     std::copy(std::istream_iterator<std::string>(iss), std::istream_iterator<std::string>(),
-      std::back_inserter<std::vector<std::string> >(tokens));
+      std::back_inserter<std::vector<std::string>>(tokens));
 
     assert("pre: encountered invalid line" && (tokens.size() == 7));
 

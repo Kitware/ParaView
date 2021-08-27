@@ -83,14 +83,14 @@ static const int PARAVIEW_DEFAULT_LAYOUT_SPACING = 4;
 class pqMultiViewWidget::pqInternals
 {
 public:
-  QVector<QPointer<pqViewFrame> > Frames;
+  QVector<QPointer<pqViewFrame>> Frames;
 
   // This map is used to avoid reassigning frames. Once a view is assigned a
   // frame, we preserve that frame as long as possible.
-  QMap<vtkSMViewProxy*, QPointer<pqViewFrame> > ViewFrames;
+  QMap<vtkSMViewProxy*, QPointer<pqViewFrame>> ViewFrames;
 
   // This is a collection for empty frames.
-  QVector<QPointer<pqViewFrame> > EmptyFrames;
+  QVector<QPointer<pqViewFrame>> EmptyFrames;
 
   std::vector<unsigned long> ObserverIds;
   vtkWeakPointer<vtkSMViewLayoutProxy> LayoutManager;
@@ -458,8 +458,9 @@ bool pqMultiViewWidget::eventFilter(QObject* caller, QEvent* evt)
   if (evt->type() == QEvent::MouseButtonPress)
   {
     QWidget* wdg = qobject_cast<QWidget*>(caller);
-    if (wdg && ((!this->Internals->Popout && this->isAncestorOf(wdg)) ||
-                 (this->Internals->Popout && this->Internals->PopoutWindow->isAncestorOf(wdg))))
+    if (wdg &&
+      ((!this->Internals->Popout && this->isAncestorOf(wdg)) ||
+        (this->Internals->Popout && this->Internals->PopoutWindow->isAncestorOf(wdg))))
     {
       // If the new widget that is getting the focus is a child widget of any of the
       // frames, then the frame should be made active.
@@ -633,7 +634,7 @@ void pqMultiViewWidget::reload()
   // Make sure the `hlayout` matches `vlayout`.
   QVector<pqHierarchicalGridLayout::Item> hitems;
 
-  QVector<QPointer<pqViewFrame> > empty_frames;
+  QVector<QPointer<pqViewFrame>> empty_frames;
   empty_frames = std::move(internals.EmptyFrames);
 
   auto& all_frames = internals.Frames;
@@ -921,8 +922,9 @@ bool pqMultiViewWidget::togglePopout()
   {
     if (internals.PopoutWindow == nullptr)
     {
-      internals.PopoutWindow.reset(new QWidget(this, Qt::Window | Qt::CustomizeWindowHint |
-          Qt::WindowTitleHint | Qt::WindowMaximizeButtonHint | Qt::WindowCloseButtonHint));
+      internals.PopoutWindow.reset(new QWidget(this,
+        Qt::Window | Qt::CustomizeWindowHint | Qt::WindowTitleHint | Qt::WindowMaximizeButtonHint |
+          Qt::WindowCloseButtonHint));
       internals.PopoutWindow->setObjectName("PopoutWindow");
       auto l = new QVBoxLayout(internals.PopoutWindow.data());
       l->setMargin(0);

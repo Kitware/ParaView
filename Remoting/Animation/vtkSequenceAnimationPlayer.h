@@ -16,7 +16,7 @@
  * @class   vtkSequenceAnimationPlayer
  *
  *
-*/
+ */
 
 #ifndef vtkSequenceAnimationPlayer_h
 #define vtkSequenceAnimationPlayer_h

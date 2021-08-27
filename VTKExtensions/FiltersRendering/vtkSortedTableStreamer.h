@@ -20,7 +20,7 @@
  * This filter is used quickly get a sorted subset of a given vtkTable.
  * By sorted we mean a subset build from a global sort even if some optimisation
  * allow us to skip a global table sorting.
-*/
+ */
 
 #ifndef vtkSortedTableStreamer_h
 #define vtkSortedTableStreamer_h
@@ -140,7 +140,7 @@ private:
   vtkSmartPointer<vtkTable> MergeBlocks(vtkPartitionedDataSet* cd);
   vtkSmartPointer<vtkUnsignedIntArray> GenerateCompositeIndexArray(
     vtkPartitionedDataSet* cd, vtkIdType maxSize);
-  std::pair<vtkSmartPointer<vtkStringArray>, vtkSmartPointer<vtkIdTypeArray> >
+  std::pair<vtkSmartPointer<vtkStringArray>, vtkSmartPointer<vtkIdTypeArray>>
   GenerateBlockNameArray(vtkPartitionedDataSet* cd, vtkIdType maxSize);
 };
 

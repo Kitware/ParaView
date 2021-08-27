@@ -18,7 +18,7 @@
  *
  *
  * This is a subclass of vtkCutter that allows selection of input vtkHyperTreeGrid
-*/
+ */
 
 #ifndef vtkPVCutter_h
 #define vtkPVCutter_h

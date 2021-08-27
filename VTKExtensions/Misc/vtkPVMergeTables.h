@@ -27,7 +27,7 @@
  * The output is a flattened vtkTable.
  * @todo
  * We may want to merge this functionality into vtkMergeTables filter itself.
-*/
+ */
 
 #ifndef vtkPVMergeTables_h
 #define vtkPVMergeTables_h

@@ -19,7 +19,7 @@
  * vtkSMDeserializer is used to deserialize proxies from their XML/Protobuf/?
  * states. This is the base class of deserialization classes that load
  * XMLs/Protobuf/? to restore servermanager state (or part thereof).
-*/
+ */
 
 #ifndef vtkSMDeserializer_h
 #define vtkSMDeserializer_h

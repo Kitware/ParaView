@@ -60,7 +60,7 @@ public:
 
   QString ActiveInputProperty;
   bool BlockSelectionChanged;
-  QMap<QString, QList<pqOutputPort*> > Inputs;
+  QMap<QString, QList<pqOutputPort*>> Inputs;
   QMap<QString, bool> AcceptsMultipleConnections;
 };
 
@@ -136,7 +136,7 @@ pqChangeInputDialog::~pqChangeInputDialog()
 }
 
 //-----------------------------------------------------------------------------
-const QMap<QString, QList<pqOutputPort*> >& pqChangeInputDialog::selectedInputs() const
+const QMap<QString, QList<pqOutputPort*>>& pqChangeInputDialog::selectedInputs() const
 {
   return this->Internals->Inputs;
 }

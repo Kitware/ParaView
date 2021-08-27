@@ -16,7 +16,7 @@
  * @class   vtkCameraInterpolator2
  *
  *
-*/
+ */
 
 #ifndef vtkCameraInterpolator2_h
 #define vtkCameraInterpolator2_h

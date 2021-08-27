@@ -25,7 +25,7 @@
  *
  * @sa
  * vtkExtractBlockUsingDataAssembly vtkTriangleFilter
-*/
+ */
 
 #ifndef vtkVolumeRepresentationPreprocessor_h
 #define vtkVolumeRepresentationPreprocessor_h

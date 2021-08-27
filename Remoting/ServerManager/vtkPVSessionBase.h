@@ -19,7 +19,7 @@
  * session methods for the following classes: vtkSMSession,
  *                                            vtkSMSessionClient,
  *                                            vtkSMSessionServer
-*/
+ */
 
 #ifndef vtkPVSessionBase_h
 #define vtkPVSessionBase_h

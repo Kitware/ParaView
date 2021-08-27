@@ -66,14 +66,14 @@ class PQCOMPONENTS_EXPORT pqRecentFilesMenu : public QObject
 
 public:
   /**
-  * Assigns the menu that will display the list of files
-  */
+   * Assigns the menu that will display the list of files
+   */
   pqRecentFilesMenu(QMenu& menu, QObject* p = 0);
   ~pqRecentFilesMenu() override;
 
   /**
-  * Open a resource on the given server
-  */
+   * Open a resource on the given server
+   */
   virtual bool open(pqServer* server, const pqServerResource& resource) const;
 
   /**

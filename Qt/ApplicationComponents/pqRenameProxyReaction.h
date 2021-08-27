@@ -40,9 +40,9 @@ class pqProxy;
 class QWidget;
 
 /**
-* @ingroup Reactions
-* Reaction for renaming a proxy.
-*/
+ * @ingroup Reactions
+ * Reaction for renaming a proxy.
+ */
 class PQAPPLICATIONCOMPONENTS_EXPORT pqRenameProxyReaction : pqReaction
 {
   Q_OBJECT
@@ -67,8 +67,8 @@ public:
 
 protected Q_SLOTS:
   /**
-  * Called when the action is triggered.
-  */
+   * Called when the action is triggered.
+   */
   void onTriggered() override;
   void updateEnableState() override;
 

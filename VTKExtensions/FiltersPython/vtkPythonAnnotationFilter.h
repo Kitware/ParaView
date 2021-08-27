@@ -32,7 +32,7 @@
  *
  * Examples of valid expressions are:
  * \li "Max temp is %s" % max(Temp)
-*/
+ */
 
 #ifndef vtkPythonAnnotationFilter_h
 #define vtkPythonAnnotationFilter_h

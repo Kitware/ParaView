@@ -18,7 +18,7 @@
  *
  * vtkOutlineRepresentation is merely a vtkGeometryRepresentationWithFaces that forces
  * the geometry filter to produce outlines.
-*/
+ */
 
 #ifndef vtkOutlineRepresentation_h
 #define vtkOutlineRepresentation_h

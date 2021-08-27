@@ -19,7 +19,7 @@
  *
  * vtkSMFunctionalBagChartSeriesSelectionDomain extends vtkSMChartSeriesSelectionDomain to
  * handle default values visibility for bags and outliers.
-*/
+ */
 
 #ifndef vtkSMFunctionalBagChartSeriesSelectionDomain_h
 #define vtkSMFunctionalBagChartSeriesSelectionDomain_h

@@ -24,7 +24,7 @@
  * properties are updated any time the widget fires interaction events.
  * \li Provides API to perform tasks typical with 3DWidgets in ParaView e.g.
  * picking, placing widget on data bounds.
-*/
+ */
 
 #ifndef vtkSMNewWidgetRepresentationProxy_h
 #define vtkSMNewWidgetRepresentationProxy_h

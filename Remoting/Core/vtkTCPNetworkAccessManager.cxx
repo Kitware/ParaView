@@ -43,9 +43,9 @@
 class vtkTCPNetworkAccessManager::vtkInternals
 {
 public:
-  typedef std::vector<vtkWeakPointer<vtkSocketController> > VectorOfControllers;
+  typedef std::vector<vtkWeakPointer<vtkSocketController>> VectorOfControllers;
   VectorOfControllers Controllers;
-  typedef std::map<int, vtkSmartPointer<vtkServerSocket> > MapToServerSockets;
+  typedef std::map<int, vtkSmartPointer<vtkServerSocket>> MapToServerSockets;
   MapToServerSockets ServerSockets;
 };
 

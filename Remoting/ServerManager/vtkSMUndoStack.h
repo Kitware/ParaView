@@ -31,7 +31,7 @@
  *
  * @sa
  * vtkSMUndoStackBuilder
-*/
+ */
 
 #ifndef vtkSMUndoStack_h
 #define vtkSMUndoStack_h

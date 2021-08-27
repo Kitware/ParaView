@@ -17,7 +17,7 @@
  * @brief   extends vtkCylinder to add ParaView specific API.
  *
  * vtkPVCylinder extends vtkCylinder to add ParaView specific API.
-*/
+ */
 
 #ifndef vtkPVCylinder_h
 #define vtkPVCylinder_h

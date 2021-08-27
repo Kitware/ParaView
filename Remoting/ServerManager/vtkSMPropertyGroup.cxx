@@ -28,8 +28,8 @@
 class vtkSMPropertyGroupInternals
 {
 public:
-  std::vector<std::pair<vtkWeakPointer<vtkSMProperty>, std::string> > Properties;
-  typedef std::map<std::string, vtkWeakPointer<vtkSMProperty> > PropertiesMapType;
+  std::vector<std::pair<vtkWeakPointer<vtkSMProperty>, std::string>> Properties;
+  typedef std::map<std::string, vtkWeakPointer<vtkSMProperty>> PropertiesMapType;
   PropertiesMapType PropertiesMap;
 };
 

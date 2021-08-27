@@ -24,7 +24,7 @@
  * from a restarted simulation.
  * @sa
  * vtkPParticlePathFilterBase has the details of the algorithms
-*/
+ */
 
 #ifndef vtkInSituPParticlePathFilter_h
 #define vtkInSituPParticlePathFilter_h

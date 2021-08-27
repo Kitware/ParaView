@@ -251,8 +251,9 @@ bool vtkSMSessionClient::Connect(const char* url, int timeout)
     if (result == 1) // some activity
     {
       dcontroller = dcontroller ? dcontroller : nam->NewConnection(data_server_url.c_str());
-      rcontroller = (rcontroller || !need_rcontroller) ? rcontroller : nam->NewConnection(
-                                                                         render_server_url.c_str());
+      rcontroller = (rcontroller || !need_rcontroller)
+        ? rcontroller
+        : nam->NewConnection(render_server_url.c_str());
     }
     else if (result == 0) // timeout
     {
@@ -776,7 +777,7 @@ bool vtkSMSessionClient::GatherInformation(
 
   else if (this->RenderServerController != nullptr &&
     ((location & vtkPVSession::RENDER_SERVER) != 0 ||
-             (location & vtkPVSession::RENDER_SERVER_ROOT) != 0))
+      (location & vtkPVSession::RENDER_SERVER_ROOT) != 0))
   {
     controller = this->RenderServerController;
   }

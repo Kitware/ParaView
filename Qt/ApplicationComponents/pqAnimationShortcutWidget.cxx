@@ -107,10 +107,9 @@ void pqAnimationShortcutWidget::updateMenu()
 
   popupMenu->clear();
 
-  pqAnimationCue* cue = this->Scene
-    ? pqPVApplicationCore::instance()->animationManager()->getCue(
-        this->Scene, this->Proxy, this->Property->GetXMLName(), 0)
-    : nullptr;
+  pqAnimationCue* cue = this->Scene ? pqPVApplicationCore::instance()->animationManager()->getCue(
+                                        this->Scene, this->Proxy, this->Property->GetXMLName(), 0)
+                                    : nullptr;
   if (!cue)
   {
     QAction* playAction = new QAction(

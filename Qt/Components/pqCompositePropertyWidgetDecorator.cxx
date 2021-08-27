@@ -52,8 +52,8 @@ namespace
 
 struct BaseOperation
 {
-  std::vector<QPointer<pqPropertyWidgetDecorator> > Decorators;
-  std::vector<std::shared_ptr<BaseOperation> > Expressions;
+  std::vector<QPointer<pqPropertyWidgetDecorator>> Decorators;
+  std::vector<std::shared_ptr<BaseOperation>> Expressions;
 
   void add(std::shared_ptr<BaseOperation>& op) { this->Expressions.push_back(op); }
 

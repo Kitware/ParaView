@@ -17,7 +17,7 @@
  * @brief   a map property storing double values
  *
  * vtkSMDoubleMapProperty stores a map of vtkIdType keys to double values.
-*/
+ */
 
 #ifndef vtkSMDoubleMapProperty_h
 #define vtkSMDoubleMapProperty_h

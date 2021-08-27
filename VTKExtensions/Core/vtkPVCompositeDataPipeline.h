@@ -23,7 +23,7 @@
  *     algorithms are passed along to the input vtkPVPostFilter, if one exists.
  *     vtkPVPostFilter is used to automatically extract components or generated
  *     derived arrays such as magnitude array for vectors.
-*/
+ */
 
 #ifndef vtkPVCompositeDataPipeline_h
 #define vtkPVCompositeDataPipeline_h

@@ -2771,7 +2771,7 @@ int vtkClientServerStreamBoolFromString(const char* begin, const char* end, bool
   }
   else if (valueEnd - valueBegin == 5 &&
     (valueBegin[0] == 'f' && valueBegin[1] == 'a' && valueBegin[2] == 'l' && valueBegin[3] == 's' &&
-             valueBegin[4] == 'e'))
+      valueBegin[4] == 'e'))
   {
     *value = false;
     return 1;

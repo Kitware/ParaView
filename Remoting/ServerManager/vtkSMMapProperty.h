@@ -18,7 +18,7 @@
  *
  * vtkSMMapProperty defines an interface common for all map properties.
  * A map property stores a set of keys and values.
-*/
+ */
 
 #ifndef vtkSMMapProperty_h
 #define vtkSMMapProperty_h

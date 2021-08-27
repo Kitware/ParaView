@@ -259,9 +259,9 @@ vtkSMProxy* vtkSMAnimationSceneProxy::FindAnimationCue(
 //----------------------------------------------------------------------------
 int vtkSMAnimationSceneProxy::LoadXMLState(vtkPVXMLElement* element, vtkSMProxyLocator* locator)
 {
-  PruneEndTimesIfNeeded(
-    element, (this->ObjectsCreated ? vtkSMAnimationScene::SafeDownCast(this->GetClientSideObject())
-                                   : nullptr));
+  PruneEndTimesIfNeeded(element,
+    (this->ObjectsCreated ? vtkSMAnimationScene::SafeDownCast(this->GetClientSideObject())
+                          : nullptr));
   return this->Superclass::LoadXMLState(element, locator);
   ;
 }

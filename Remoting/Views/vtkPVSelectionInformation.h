@@ -20,7 +20,7 @@
  * The results are stored in a vtkSelection.
  * @sa
  * vtkSelection
-*/
+ */
 
 #ifndef vtkPVSelectionInformation_h
 #define vtkPVSelectionInformation_h

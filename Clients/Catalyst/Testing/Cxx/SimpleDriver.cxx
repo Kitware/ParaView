@@ -20,7 +20,7 @@
 #include "vtkCPTestDriver.h"
 #include "vtkCPUniformGridBuilder.h"
 
-int SimpleDriver(int, char* [])
+int SimpleDriver(int, char*[])
 {
   // Specify how the field varies over space and time.
   vtkCPLinearScalarFieldFunction* fieldFunction = vtkCPLinearScalarFieldFunction::New();

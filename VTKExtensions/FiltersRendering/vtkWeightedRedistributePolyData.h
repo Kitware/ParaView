@@ -20,7 +20,7 @@
 /**
  * @class   vtkWeightedRedistributePolyData
  * @brief   do weighted balance of cells on processors
-*/
+ */
 
 #ifndef vtkWeightedRedistributePolyData_h
 #define vtkWeightedRedistributePolyData_h

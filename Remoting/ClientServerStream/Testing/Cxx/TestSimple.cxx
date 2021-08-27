@@ -82,9 +82,7 @@ void Server::ProcessMessage(const unsigned char* msg, size_t length)
   }
 }
 
-void Server::PrintObjects()
-{
-}
+void Server::PrintObjects() {}
 
 const vtkClientServerStream* ClientManager::GetResultMessage()
 {

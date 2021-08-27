@@ -18,7 +18,7 @@
  * on its GlobalID.
  *
  * vtkSMStateLocator allow a hierarchical way of finding a message state.
-*/
+ */
 
 #ifndef vtkSMStateLocator_h
 #define vtkSMStateLocator_h

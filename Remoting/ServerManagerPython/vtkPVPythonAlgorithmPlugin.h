@@ -35,8 +35,8 @@
 class vtkPVPluginLoaderCleanerInitializer;
 
 class VTKREMOTINGSERVERMANAGERPYTHON_EXPORT vtkPVPythonAlgorithmPlugin
-  : public vtkPVPlugin,
-    public vtkPVServerManagerPluginInterface
+  : public vtkPVPlugin
+  , public vtkPVServerManagerPluginInterface
 {
 public:
   vtkPVPythonAlgorithmPlugin(const char* pythonmodule);

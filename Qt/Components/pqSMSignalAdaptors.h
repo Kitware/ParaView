@@ -39,31 +39,31 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class pqProxy;
 
 /**
-* signal adaptor to allow getting/setting/observing of a pseudo vtkSMProxy property
-*/
+ * signal adaptor to allow getting/setting/observing of a pseudo vtkSMProxy property
+ */
 class PQCOMPONENTS_EXPORT pqSignalAdaptorProxy : public QObject
 {
   Q_OBJECT
   Q_PROPERTY(QVariant proxy READ proxy WRITE setProxy)
 public:
   /**
-  * constructor requires a QObject, the name of the QString proxy name, and
-  * a signal for property changes
-  */
+   * constructor requires a QObject, the name of the QString proxy name, and
+   * a signal for property changes
+   */
   pqSignalAdaptorProxy(QObject* p, const char* Property, const char* signal);
   /**
-  * get the proxy
-  */
+   * get the proxy
+   */
   QVariant proxy() const;
 Q_SIGNALS:
   /**
-  * signal the proxy changed
-  */
+   * signal the proxy changed
+   */
   void proxyChanged(const QVariant&);
 public Q_SLOTS:
   /**
-  * set the proxy
-  */
+   * set the proxy
+   */
   void setProxy(const QVariant&);
 protected Q_SLOTS:
   void handleProxyChanged();

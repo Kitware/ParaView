@@ -39,9 +39,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class pqConsoleWidget;
 
 /**
-* pqConsoleWidgetEventTranslator is used to record events from pqConsoleWidget
-* testing.
-*/
+ * pqConsoleWidgetEventTranslator is used to record events from pqConsoleWidget
+ * testing.
+ */
 class PQWIDGETS_EXPORT pqConsoleWidgetEventTranslator : public pqWidgetEventTranslator
 {
   Q_OBJECT
@@ -52,8 +52,8 @@ public:
   ~pqConsoleWidgetEventTranslator() override;
 
   /**
-  * Translate the event, if possible.
-  */
+   * Translate the event, if possible.
+   */
   using Superclass::translateEvent;
   bool translateEvent(QObject* target, QEvent* qtevent, bool& errorFlag) override;
 

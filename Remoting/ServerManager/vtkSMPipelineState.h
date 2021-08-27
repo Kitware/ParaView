@@ -21,7 +21,7 @@
  * which allow Undo/Redo and state sharing across several ParaView clients.
  * Basically, we expose the state management API of RemoteObject to handle
  * registration and unregistration of proxies.
-*/
+ */
 
 #ifndef vtkSMPipelineState_h
 #define vtkSMPipelineState_h

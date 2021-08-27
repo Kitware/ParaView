@@ -36,7 +36,7 @@
  * This class also has an optional pass through mode to make it easy to
  * turn ordered compositing on and off.
  *
-*/
+ */
 
 #ifndef vtkOrderedCompositeDistributor_h
 #define vtkOrderedCompositeDistributor_h

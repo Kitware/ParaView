@@ -14,8 +14,9 @@ PURPOSE.  See the above copyright notice for more information.
 =========================================================================*/
 #include "vtkPVConfig.h" // Required to get build options for paraview
 
-extern "C" {
-void vtkPVInitializePythonModules();
+extern "C"
+{
+  void vtkPVInitializePythonModules();
 }
 
 #include "vtkCLIOptions.h"

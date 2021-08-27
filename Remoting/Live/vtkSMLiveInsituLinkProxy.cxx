@@ -38,7 +38,7 @@
 class vtkSMLiveInsituLinkProxy::vtkInternals
 {
 public:
-  typedef std::map<std::string, vtkSmartPointer<vtkSMProxy> > ExtractProxiesType;
+  typedef std::map<std::string, vtkSmartPointer<vtkSMProxy>> ExtractProxiesType;
   ExtractProxiesType ExtractProxies;
 };
 

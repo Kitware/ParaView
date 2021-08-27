@@ -24,7 +24,7 @@
  * the file matching the restrictions will be read.  Each matching
  * data set becomes an output of this reader in the order in which
  * they appear in the file.
-*/
+ */
 
 #ifndef vtkXMLCollectionReader_h
 #define vtkXMLCollectionReader_h

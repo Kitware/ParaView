@@ -50,7 +50,7 @@ pqNodeEditorScene::pqNodeEditorScene(QObject* parent)
 
 // ----------------------------------------------------------------------------
 int pqNodeEditorScene::computeLayout(const std::unordered_map<int, pqNodeEditorNode*>& nodes,
-  std::unordered_map<int, std::vector<pqNodeEditorEdge*> >& edges)
+  std::unordered_map<int, std::vector<pqNodeEditorEdge*>>& edges)
 {
 #if NodeEditor_ENABLE_GRAPHVIZ
   // compute dot string
@@ -192,7 +192,7 @@ int pqNodeEditorScene::computeLayout(const std::unordered_map<int, pqNodeEditorN
   }
 
   // compute initial x position for all views
-  std::vector<std::pair<pqNodeEditorNode*, qreal> > viewXMap;
+  std::vector<std::pair<pqNodeEditorNode*, qreal>> viewXMap;
   for (const auto& it : nodes)
   {
     auto* proxyAsView = dynamic_cast<pqView*>(it.second->getProxy());

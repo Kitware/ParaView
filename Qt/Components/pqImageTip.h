@@ -41,16 +41,16 @@ class QPixmap;
 class QPoint;
 
 /**
-* Provides tooltip-like behavior, but displays an image instead of text
-*/
+ * Provides tooltip-like behavior, but displays an image instead of text
+ */
 class PQCOMPONENTS_EXPORT pqImageTip : public QLabel
 {
   Q_OBJECT
 
 public:
   /**
-  * Displays a pixmap at the given screen coordinates
-  */
+   * Displays a pixmap at the given screen coordinates
+   */
   static void showTip(const QPixmap& image, const QPoint& pos);
 
 private:

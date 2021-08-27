@@ -49,9 +49,7 @@ vtkImageCompressor::~vtkImageCompressor()
 }
 
 //-----------------------------------------------------------------------------
-void vtkImageCompressor::SetImageResolution(int, int)
-{
-}
+void vtkImageCompressor::SetImageResolution(int, int) {}
 
 //-----------------------------------------------------------------------------
 void vtkImageCompressor::SaveConfiguration(vtkMultiProcessStream* stream)

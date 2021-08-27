@@ -19,7 +19,7 @@
  * vtkPVTrackballRoll allows the user to interactively
  * manipulate the camera, the viewpoint of the scene.
  * Roll tracks the mouse around the center of rotation.
-*/
+ */
 
 #ifndef vtkPVTrackballRoll_h
 #define vtkPVTrackballRoll_h

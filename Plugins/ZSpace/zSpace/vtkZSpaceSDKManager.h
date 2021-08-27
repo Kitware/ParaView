@@ -12,23 +12,23 @@ PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
 /**
-* @class   vtkZSpaceSDKManager
-* @brief   zSpace SDK manager class
-*
-*
-* Encapsulates all the calls to the zSpace SDK :
-*  - Initializes the zSpace SDK via InitializeZSpace(). This method looks
-*     for a zSpace device and optional trackers
-*  - Updates the zSpace SDK via Update(vtkRenderWindow)
-*     the viewport (position, interpupillary distance, near and far plane);
-*     the view and projection matrix for each eye;
-*     the trackers (head pose and trackers pose such as the stylus);
-*     and the state of the buttons of the stylus (Down, Pressed, Up or None).
-*
-*  For button states, the states Down/Up are set by this class; whereas the states
-*  Pressed/None should be set by the calling class when the state Down/Up has been processed, to
-*  ensure that the same input won't be processed multiple times.
-*/
+ * @class   vtkZSpaceSDKManager
+ * @brief   zSpace SDK manager class
+ *
+ *
+ * Encapsulates all the calls to the zSpace SDK :
+ *  - Initializes the zSpace SDK via InitializeZSpace(). This method looks
+ *     for a zSpace device and optional trackers
+ *  - Updates the zSpace SDK via Update(vtkRenderWindow)
+ *     the viewport (position, interpupillary distance, near and far plane);
+ *     the view and projection matrix for each eye;
+ *     the trackers (head pose and trackers pose such as the stylus);
+ *     and the state of the buttons of the stylus (Down, Pressed, Up or None).
+ *
+ *  For button states, the states Down/Up are set by this class; whereas the states
+ *  Pressed/None should be set by the calling class when the state Down/Up has been processed, to
+ *  ensure that the same input won't be processed multiple times.
+ */
 
 #ifndef vtkZSpaceSDKManager_h
 #define vtkZSpaceSDKManager_h
@@ -170,9 +170,9 @@ public:
     ZSMatrix4 zSpaceMatrix, vtkMatrix4x4* vtkMatrix);
 
   /**
-  * zSpace stores matrix in column-major format (as OpenGL). The matrix
-  * needs to be transposed to be used by VTK.
-  */
+   * zSpace stores matrix in column-major format (as OpenGL). The matrix
+   * needs to be transposed to be used by VTK.
+   */
   static void ConvertZSpaceMatrixToVTKMatrix(ZSMatrix4 zSpaceMatrix, vtkMatrix4x4* vtkMatrix);
 
   /**

@@ -162,7 +162,7 @@ public:
   }
 
 private:
-  std::unordered_map<int, std::unordered_map<int, DataT> > Data;
+  std::unordered_map<int, std::unordered_map<int, DataT>> Data;
   std::map<int, pqDataAssemblyTreeModel::RoleProperties> RoleProperties;
 };
 
@@ -221,8 +221,9 @@ bool pqDataAssemblyTreeModel::pqInternals::setData(int node, int role, const QVa
   {
     // value is inherited down the whole tree.
     vtkNew<CallbackDataVisitor> visitor;
-    visitor->VisitCallback = [&](
-      int id) { role_map[id].setValue(actualValue, /*isInherited*/ clearValue || id != node); };
+    visitor->VisitCallback = [&](int id) {
+      role_map[id].setValue(actualValue, /*isInherited*/ clearValue || id != node);
+    };
     this->DataAssembly->Visit(node, visitor);
   }
   else if (rproperty == pqDataAssemblyTreeModel::InheritedUntilOverridden)
@@ -539,7 +540,7 @@ void pqDataAssemblyTreeModel::fireDataChanged(const QModelIndex& indx, const QVe
 //-----------------------------------------------------------------------------
 void pqDataAssemblyTreeModel::setCheckedNodes(const QStringList& paths)
 {
-  QList<QPair<QString, QVariant> > pairs;
+  QList<QPair<QString, QVariant>> pairs;
   for (const auto& path : paths)
   {
     pairs.push_back(qMakePair(path, QVariant(Qt::Checked)));
@@ -594,7 +595,7 @@ QStringList pqDataAssemblyTreeModel::checkedNodes() const
 }
 
 //-----------------------------------------------------------------------------
-QList<QPair<QString, QVariant> > pqDataAssemblyTreeModel::data(int role) const
+QList<QPair<QString, QVariant>> pqDataAssemblyTreeModel::data(int role) const
 {
   auto& internals = (*this->Internals);
   const auto assembly = internals.DataAssembly.GetPointer();
@@ -603,7 +604,7 @@ QList<QPair<QString, QVariant> > pqDataAssemblyTreeModel::data(int role) const
     return {};
   }
 
-  QList<QPair<QString, QVariant> > values;
+  QList<QPair<QString, QVariant>> values;
   for (const auto& pair : internals.data(role))
   {
     if (!pair.second.isDerived())
@@ -616,7 +617,7 @@ QList<QPair<QString, QVariant> > pqDataAssemblyTreeModel::data(int role) const
 }
 
 //-----------------------------------------------------------------------------
-bool pqDataAssemblyTreeModel::setData(const QList<QPair<QString, QVariant> >& values, int role)
+bool pqDataAssemblyTreeModel::setData(const QList<QPair<QString, QVariant>>& values, int role)
 {
   auto& internals = (*this->Internals);
   const auto assembly = internals.DataAssembly.GetPointer();

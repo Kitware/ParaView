@@ -27,7 +27,7 @@
  * representation. So it is essential that representations handle those methods
  * correctly and don't suffer from uncanny side effects when that's done
  * repeatedly.
-*/
+ */
 
 #ifndef vtkCompositeRepresentation_h
 #define vtkCompositeRepresentation_h

@@ -37,24 +37,24 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class QColor;
 
 /**
-* pqLinePropertyWidget is a custom property widget that uses
-* "LineWidgetRepresentation" to help the users
-*/
+ * pqLinePropertyWidget is a custom property widget that uses
+ * "LineWidgetRepresentation" to help the users
+ */
 
 /**
-* pqLinePropertyWidget is a custom property widget that uses
-* "LineSourceWidgetRepresentation" to help users interactively select the end
-* points of a line. To use this widget for a property group
-* (vtkSMPropertyGroup), use "InteractiveLine" as the "panel_widget" in the
-* XML configuration for the proxy. The property group should have properties for
-* following functions:
-* \li \c Point1WorldPosition: a 3-tuple vtkSMDoubleVectorProperty that will be
-* linked to one of the end points of the line.
-* \li \c Point2WorldPosition: a 3-tuple vtkSMDoubleVectorProperty that will be
-* linked to the other end point of the line.
-* \li \c Input: (optional) a vtkSMInputProperty that is used to get data
-* information for bounds when placing/resetting the widget.
-*/
+ * pqLinePropertyWidget is a custom property widget that uses
+ * "LineSourceWidgetRepresentation" to help users interactively select the end
+ * points of a line. To use this widget for a property group
+ * (vtkSMPropertyGroup), use "InteractiveLine" as the "panel_widget" in the
+ * XML configuration for the proxy. The property group should have properties for
+ * following functions:
+ * \li \c Point1WorldPosition: a 3-tuple vtkSMDoubleVectorProperty that will be
+ * linked to one of the end points of the line.
+ * \li \c Point2WorldPosition: a 3-tuple vtkSMDoubleVectorProperty that will be
+ * linked to the other end point of the line.
+ * \li \c Input: (optional) a vtkSMInputProperty that is used to get data
+ * information for bounds when placing/resetting the widget.
+ */
 class PQAPPLICATIONCOMPONENTS_EXPORT pqLinePropertyWidget : public pqInteractivePropertyWidget
 {
   Q_OBJECT
@@ -71,26 +71,26 @@ public Q_SLOTS:
   void centerOnBounds();
 
   /**
-  * Set the color to use for the line widget.
-  */
+   * Set the color to use for the line widget.
+   */
   void setLineColor(const QColor& color);
 
 protected Q_SLOTS:
   /**
-  * Places the interactive widget using current data source information.
-  */
+   * Places the interactive widget using current data source information.
+   */
   void placeWidget() override;
 
   /**
-  * Called when user picks a point using the pick shortcut keys.
-  */
+   * Called when user picks a point using the pick shortcut keys.
+   */
   void pick(double x, double y, double z);
   void pickPoint1(double x, double y, double z);
   void pickPoint2(double x, double y, double z);
 
   /**
-  * Updates the length label.
-  */
+   * Updates the length label.
+   */
   void updateLengthLabel();
 
 private:

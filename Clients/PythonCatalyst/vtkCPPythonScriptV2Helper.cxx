@@ -72,10 +72,10 @@ public:
   vtkNew<vtkCollection> Extractors;
 
   // Collection of views created in this pipeline.
-  std::vector<vtkSmartPointer<vtkSMProxy> > Views;
+  std::vector<vtkSmartPointer<vtkSMProxy>> Views;
 
   // Collection of trivial producers created for `vtkCPPythonScriptV2Pipeline`.
-  std::map<std::string, vtkSmartPointer<vtkSMProxy> > TrivialProducers;
+  std::map<std::string, vtkSmartPointer<vtkSMProxy>> TrivialProducers;
 
 #if VTK_MODULE_ENABLE_ParaView_RemotingLive
   vtkSmartPointer<vtkLiveInsituLink> LiveLink;
@@ -182,8 +182,9 @@ bool vtkCPPythonScriptV2Helper::vtkInternals::Import(const std::vector<std::stri
   if (!this->PackageName)
   {
     // not "prepared".
-    vtkLogF(ERROR, "Cannot determine package name. "
-                   "Did you forget to call 'PrepareFromScript'?");
+    vtkLogF(ERROR,
+      "Cannot determine package name. "
+      "Did you forget to call 'PrepareFromScript'?");
     return false;
   }
 

@@ -13,22 +13,22 @@ class vtkImageData;
 class vtkMultiBlockDataSet;
 
 /**\brief Read ParFlow simulation output.
-  *
-  * Data is output as a multiblock of image data.
-  *
-  * This reader will work in parallel settings by
-  * splitting existing blocks among ranks.
-  * If there are fewer blocks than ranks, some processes will do no work.
-  * You may use "pftools dist" to repartition the data into a different
-  * number of blocks (known in ParFlow as subgrids).
-  *
-  * You may indicate files contain CLM data or a single PFB state variable.
-  * CLM files have multiple values per cell while PFB files hold only one.
-  * The per-cell values are stored as i-j image stacks (i.e., each subgrid
-  * stores a sequence of 2-d images, one per CLM state variable); the k-index
-  * extent of the PFB file corresponds to the number of CLM state variables
-  * per cell.
-  */
+ *
+ * Data is output as a multiblock of image data.
+ *
+ * This reader will work in parallel settings by
+ * splitting existing blocks among ranks.
+ * If there are fewer blocks than ranks, some processes will do no work.
+ * You may use "pftools dist" to repartition the data into a different
+ * number of blocks (known in ParFlow as subgrids).
+ *
+ * You may indicate files contain CLM data or a single PFB state variable.
+ * CLM files have multiple values per cell while PFB files hold only one.
+ * The per-cell values are stored as i-j image stacks (i.e., each subgrid
+ * stores a sequence of 2-d images, one per CLM state variable); the k-index
+ * extent of the PFB file corresponds to the number of CLM state variables
+ * per cell.
+ */
 class VTKPARFLOWIO_EXPORT vtkParFlowReader : public vtkMultiBlockDataSetAlgorithm
 {
 public:

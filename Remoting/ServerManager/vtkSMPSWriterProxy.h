@@ -19,7 +19,7 @@ PURPOSE.  See the above copyright notice for more information.
  * vtkSMPSWriterProxy is the proxy for all vtkParallelSerialWriter
  * objects. It is responsible of setting the internal writer that is
  * configured as a sub-proxy.
-*/
+ */
 
 #ifndef vtkSMPSWriterProxy_h
 #define vtkSMPSWriterProxy_h

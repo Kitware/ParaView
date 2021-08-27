@@ -26,7 +26,7 @@
  *  the input.
  * @sa
  *  vtkArrayCalculator vtkFunctionParser
-*/
+ */
 
 #ifndef vtkPVArrayCalculator_h
 #define vtkPVArrayCalculator_h

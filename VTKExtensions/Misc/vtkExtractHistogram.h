@@ -22,7 +22,7 @@
  * will have contain a vtkDoubleArray named "bin_extents" which contains
  * the boundaries between each histogram bin, and a vtkUnsignedLongArray
  * named "bin_values" which will contain the value for each bin.
-*/
+ */
 
 #ifndef vtkExtractHistogram_h
 #define vtkExtractHistogram_h

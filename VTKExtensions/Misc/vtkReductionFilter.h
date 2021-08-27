@@ -28,7 +28,7 @@
  * In addition to doing reduction the PassThrough variable lets you choose
  * to pass through the results of any one node instead of aggregating all of
  * them together.
-*/
+ */
 
 #ifndef vtkReductionFilter_h
 #define vtkReductionFilter_h
@@ -47,7 +47,8 @@ public:
   vtkTypeMacro(vtkReductionFilter, vtkDataObjectAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  typedef enum ReductionModeType {
+  typedef enum ReductionModeType
+  {
     REDUCE_ALL_TO_ONE = 0,
     MOVE_ALL_TO_ONE = 1,
     REDUCE_ALL_TO_ALL = 2
@@ -153,7 +154,7 @@ protected:
    * vtkSelections. Selections are gathered on destProcessId
    */
   int GatherSelection(vtkSelection* sendData,
-    std::vector<vtkSmartPointer<vtkDataObject> >& receiveData, int destProcessId);
+    std::vector<vtkSmartPointer<vtkDataObject>>& receiveData, int destProcessId);
 
   vtkAlgorithm* PreGatherHelper;
   vtkAlgorithm* PostGatherHelper;

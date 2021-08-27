@@ -91,12 +91,12 @@ void HierarchicalGridLayoutTester::addWidget()
 void HierarchicalGridLayoutTester::rearrange_data()
 {
   using ItemT = pqHierarchicalGridLayout::Item;
-  QTest::addColumn<QVector<QVector<ItemT> > >("sbtrees");
-  QTest::addColumn<QVector<QSet<QWidget*> > >("removedWidgets");
+  QTest::addColumn<QVector<QVector<ItemT>>>("sbtrees");
+  QTest::addColumn<QVector<QSet<QWidget*>>>("removedWidgets");
   {
     // Case 1. [W0], [SH,null,W0], []
-    QVector<QVector<ItemT> > sbtrees(3);
-    QVector<QSet<QWidget*> > removedWidgets(3);
+    QVector<QVector<ItemT>> sbtrees(3);
+    QVector<QSet<QWidget*>> removedWidgets(3);
 
     // [W0]
     auto w0 = new QFrame();
@@ -115,8 +115,8 @@ void HierarchicalGridLayoutTester::rearrange_data()
 
   {
     // Case 2. [], [W0], [SV, W0, W1], [SH, SV, W1, W0, null, W2]
-    QVector<QVector<ItemT> > sbtrees(3);
-    QVector<QSet<QWidget*> > removedWidgets(3);
+    QVector<QVector<ItemT>> sbtrees(3);
+    QVector<QSet<QWidget*>> removedWidgets(3);
 
     auto w0 = new QFrame();
     auto w1 = new QFrame();
@@ -141,8 +141,8 @@ void HierarchicalGridLayoutTester::rearrange_data()
     sbtrees[2].push_back(ItemT(w2));
     removedWidgets[2].insert(w2);
 
-    QTest::newRow("case 2: '[], [W0], [SV, W0, W1], [SH, SV, W1, W0, null, W2]'") << sbtrees
-                                                                                  << removedWidgets;
+    QTest::newRow("case 2: '[], [W0], [SV, W0, W1], [SH, SV, W1, W0, null, W2]'")
+      << sbtrees << removedWidgets;
   }
 }
 
@@ -155,8 +155,8 @@ void HierarchicalGridLayoutTester::rearrange()
   QTest::qWait(250);
 
   using ItemT = pqHierarchicalGridLayout::Item;
-  QFETCH(QVector<QVector<ItemT> >, sbtrees);
-  QFETCH(QVector<QSet<QWidget*> >, removedWidgets);
+  QFETCH(QVector<QVector<ItemT>>, sbtrees);
+  QFETCH(QVector<QSet<QWidget*>>, removedWidgets);
 
   QVERIFY(sbtrees.size() == removedWidgets.size());
 

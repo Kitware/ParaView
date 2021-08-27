@@ -40,7 +40,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /**
  * @deprecated in ParaView 5.7. Use vtkLogger / vtkPVLogger instead.
-*/
+ */
 class PQCORE_EXPORT pqDebugType
 {
 protected:

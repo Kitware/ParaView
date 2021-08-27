@@ -211,7 +211,7 @@ void vtkSelectionConverter::Convert(
   }
 
   // key==piece offset, while value==list of ids for that piece.
-  typedef std::map<int, std::set<vtkIdType> > indicesType;
+  typedef std::map<int, std::set<vtkIdType>> indicesType;
   indicesType indices;
 
   for (vtkIdType hitId = 0; hitId < numHits; hitId++)

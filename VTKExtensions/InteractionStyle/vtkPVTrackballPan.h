@@ -21,7 +21,7 @@
  * Moving the mouse down zooms in. Up zooms out.
  * This manipulator has not been extended to parallel projection yet.
  * It works in perspective by rotating the camera.
-*/
+ */
 
 #ifndef vtkPVTrackballPan_h
 #define vtkPVTrackballPan_h

@@ -17,7 +17,7 @@
  * @brief   collection of utility methods.
  *
  * vtkSMUtilities defines a collection of useful static methods.
-*/
+ */
 
 #ifndef vtkSMUtilities_h
 #define vtkSMUtilities_h
@@ -88,7 +88,7 @@ public:
    * Merges multiple images into a single one and returns that.
    */
   static vtkSmartPointer<vtkImageData> MergeImages(
-    const std::vector<vtkSmartPointer<vtkImageData> >& images, int borderWidth = 0,
+    const std::vector<vtkSmartPointer<vtkImageData>>& images, int borderWidth = 0,
     const unsigned char* borderColorRGB = nullptr);
 
   /**

@@ -15,7 +15,7 @@
 /**
  * @class   vtkPVInformationKeys
  *
-*/
+ */
 
 #ifndef vtkPVInformationKeys_h
 #define vtkPVInformationKeys_h

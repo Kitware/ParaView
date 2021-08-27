@@ -17,7 +17,7 @@
  * @brief   Holds timer log for all processes.
  *
  * I am using this information object to gather timer logs from all processes.
-*/
+ */
 
 #ifndef vtkPVTimerInformation_h
 #define vtkPVTimerInformation_h

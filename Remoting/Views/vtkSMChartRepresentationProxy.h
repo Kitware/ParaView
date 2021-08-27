@@ -16,7 +16,7 @@
  * @class   vtkSMChartRepresentationProxy
  *
  *
-*/
+ */
 
 #ifndef vtkSMChartRepresentationProxy_h
 #define vtkSMChartRepresentationProxy_h

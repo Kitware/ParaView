@@ -23,7 +23,7 @@
  * vtkUnstructuredGrid because it's output can not change.
  * @sa
  * vtkSMDomain
-*/
+ */
 
 #ifndef vtkSMFixedTypeDomain_h
 #define vtkSMFixedTypeDomain_h

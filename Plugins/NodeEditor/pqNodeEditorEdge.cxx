@@ -199,10 +199,11 @@ void pqNodeEditorEdge::paint(QPainter* painter, const QStyleOptionGraphicsItem*,
     painter->drawPath(this->path);
   }
 
-  painter->setPen(QPen(isPipelineEdge ? QApplication::palette().highlight() : consumerIsActiveView
-        ? pqNodeEditorUtils::CONSTS::COLOR_DARK_ORANGE
-        : QApplication::palette().linkVisited(),
-    pqNodeEditorUtils::CONSTS::EDGE_WIDTH, isPipelineEdge ? Qt::SolidLine : Qt::DashDotLine,
-    Qt::RoundCap, Qt::RoundJoin));
+  painter->setPen(
+    QPen(isPipelineEdge ? QApplication::palette().highlight()
+                        : consumerIsActiveView ? pqNodeEditorUtils::CONSTS::COLOR_DARK_ORANGE
+                                               : QApplication::palette().linkVisited(),
+      pqNodeEditorUtils::CONSTS::EDGE_WIDTH, isPipelineEdge ? Qt::SolidLine : Qt::DashDotLine,
+      Qt::RoundCap, Qt::RoundJoin));
   painter->drawPath(this->path);
 }

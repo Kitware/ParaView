@@ -39,9 +39,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QToolBar>
 
 /**
-* pqCustomViewpointsToolbar is the toolbar that has buttons for using and configuring
-* custom views (aka camera positions)
-*/
+ * pqCustomViewpointsToolbar is the toolbar that has buttons for using and configuring
+ * custom views (aka camera positions)
+ */
 class QAction;
 
 class PQAPPLICATIONCOMPONENTS_EXPORT pqCustomViewpointsToolbar : public QToolBar
@@ -116,7 +116,7 @@ private:
   QPixmap BasePixmap;
   QPixmap PlusPixmap;
   QPixmap ConfigPixmap;
-  QVector<QPointer<QAction> > ViewpointActions;
+  QVector<QPointer<QAction>> ViewpointActions;
 };
 
 #endif

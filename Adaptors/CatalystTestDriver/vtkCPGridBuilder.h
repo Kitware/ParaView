@@ -17,7 +17,7 @@
  * @brief   Abstract class for creating grids.
  *
  * Abstract class for creating grids for a test driver.
-*/
+ */
 
 #ifndef vtkCPGridBuilder_h
 #define vtkCPGridBuilder_h

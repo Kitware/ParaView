@@ -31,9 +31,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
 /**
-* \file pqPipelineAnnotationFilterModel.h
-* \date 9/22/2011
-*/
+ * \file pqPipelineAnnotationFilterModel.h
+ * \date 9/22/2011
+ */
 
 #ifndef _pqPipelineAnnotationFilterModel_h
 #define _pqPipelineAnnotationFilterModel_h
@@ -44,13 +44,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class vtkSession;
 
 /**
-* \class pqPipelineAnnotationFilterModel
-* \brief
-*   The pqPipelineAnnotationFilterModel class is used to filter a tree
-*    representation of the pipeline graph by using proxy annotation.
-*
-* It use a pqPipelineModel as source model
-*/
+ * \class pqPipelineAnnotationFilterModel
+ * \brief
+ *   The pqPipelineAnnotationFilterModel class is used to filter a tree
+ *    representation of the pipeline graph by using proxy annotation.
+ *
+ * It use a pqPipelineModel as source model
+ */
 
 class PQCOMPONENTS_EXPORT pqPipelineAnnotationFilterModel : public QSortFilterProxyModel
 {

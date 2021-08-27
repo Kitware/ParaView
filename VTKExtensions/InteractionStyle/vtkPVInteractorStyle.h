@@ -22,7 +22,7 @@
  * the right button is for panning; and shift + right button is for zooming.
  * This class fires vtkCommand::StartInteractionEvent and
  * vtkCommand::EndInteractionEvent to signal start and end of interaction.
-*/
+ */
 
 #ifndef vtkPVInteractorStyle_h
 #define vtkPVInteractorStyle_h

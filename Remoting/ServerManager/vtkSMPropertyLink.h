@@ -18,7 +18,7 @@
  * Creates a link between two properties. Can create M->N links.
  * At the time when the link is created every output property is synchornized
  * with the first input property.
-*/
+ */
 
 #ifndef vtkSMPropertyLink_h
 #define vtkSMPropertyLink_h

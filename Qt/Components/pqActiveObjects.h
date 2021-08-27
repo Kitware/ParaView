@@ -37,8 +37,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QPointer>
 
 /**
-* needed for inline get-methods.
-*/
+ * needed for inline get-methods.
+ */
 #include "pqDataRepresentation.h"
 #include "pqOutputPort.h"
 #include "pqPipelineSource.h"
@@ -53,12 +53,12 @@ class vtkSMSessionProxyManager;
 class vtkSMViewLayoutProxy;
 
 /**
-* pqActiveObjects is a singleton that keeps track of "active objects"
-* including active view, active source, active representation etc.
-* pqActiveObjects also keeps track of selected sources (known as 'selection').
-* setActiveSource/setActivePort will affect the selection but not vice-versa
-* (unless dealing with multiple server sessions).
-*/
+ * pqActiveObjects is a singleton that keeps track of "active objects"
+ * including active view, active source, active representation etc.
+ * pqActiveObjects also keeps track of selected sources (known as 'selection').
+ * setActiveSource/setActivePort will affect the selection but not vice-versa
+ * (unless dealing with multiple server sessions).
+ */
 class PQCOMPONENTS_EXPORT pqActiveObjects : public QObject
 {
   Q_OBJECT
@@ -66,13 +66,13 @@ class PQCOMPONENTS_EXPORT pqActiveObjects : public QObject
 
 public:
   /**
-  * Provides access to the singleton.
-  */
+   * Provides access to the singleton.
+   */
   static pqActiveObjects& instance();
 
   /**
-  * Returns the active view.
-  */
+   * Returns the active view.
+   */
   pqView* activeView() const { return this->ActiveView; }
 
   //@{
@@ -94,18 +94,18 @@ public:
   //@}
 
   /**
-  * Returns the active port.
-  */
+   * Returns the active port.
+   */
   pqOutputPort* activePort() const;
 
   /**
-  * Returns the active server.
-  */
+   * Returns the active server.
+   */
   pqServer* activeServer() const { return this->ActiveServer; }
 
   /**
-  * Returns the active representation.
-  */
+   * Returns the active representation.
+   */
   pqDataRepresentation* activeRepresentation() const { return this->ActiveRepresentation; }
 
   vtkSMProxySelectionModel* activeSourcesSelectionModel() const
@@ -114,14 +114,14 @@ public:
   }
 
   /**
-  * Returns the current source selection.
-  */
+   * Returns the current source selection.
+   */
   const pqProxySelection& selection() const { return this->Selection; }
 
   /**
-  * Returns the proxyManager() from the active server, if any.
-  * Equivalent to calling this->activeServer()->proxyManager();
-  */
+   * Returns the proxyManager() from the active server, if any.
+   * Equivalent to calling this->activeServer()->proxyManager();
+   */
   vtkSMSessionProxyManager* proxyManager() const;
 
   /**
@@ -166,17 +166,17 @@ public Q_SLOTS:
   void setActiveServer(pqServer*);
 
   /**
-  * Sets the selected set of proxies. All proxies in the selection must be on
-  * the same server/session. This generally doesn't affect the activeSource
-  * etc. unless the server is different from the active server. In which case,
-  * the active server is changed before the selection is updated.
-  */
+   * Sets the selected set of proxies. All proxies in the selection must be on
+   * the same server/session. This generally doesn't affect the activeSource
+   * etc. unless the server is different from the active server. In which case,
+   * the active server is changed before the selection is updated.
+   */
   void setSelection(const pqProxySelection& selection, pqServerManagerModelItem* current);
 
 Q_SIGNALS:
   /**
-  * These signals are fired when any of the corresponding active items change.
-  */
+   * These signals are fired when any of the corresponding active items change.
+   */
   void serverChanged(pqServer*);
   void viewChanged(pqView* view);
   void pipelineProxyChanged(pqProxy*);
@@ -187,34 +187,34 @@ Q_SIGNALS:
   void selectionChanged(const pqProxySelection&);
 
   /**
-  * this signal is fired when the active source fires the dataUpdated()
-  * signal. This is used by components in the GUI that need to be updated when
-  * the active source's pipeline updates.
-  */
+   * this signal is fired when the active source fires the dataUpdated()
+   * signal. This is used by components in the GUI that need to be updated when
+   * the active source's pipeline updates.
+   */
   void dataUpdated();
 
 private Q_SLOTS:
   /**
-  * if a new server connection was established, and no active server is set,
-  * this makes the new server active by default. This helps with single-session
-  * clients.
-  */
+   * if a new server connection was established, and no active server is set,
+   * this makes the new server active by default. This helps with single-session
+   * clients.
+   */
   void serverAdded(pqServer*);
 
   /**
-  * if the active server connection was closed, this ensures that the
-  * application is notified.
-  */
+   * if the active server connection was closed, this ensures that the
+   * application is notified.
+   */
   void serverRemoved(pqServer*);
 
   /**
-  * if any of the active proxies is removed, we fire appropriate signals.
-  */
+   * if any of the active proxies is removed, we fire appropriate signals.
+   */
   void proxyRemoved(pqServerManagerModelItem*);
 
   /**
-  * called to update representation
-  */
+   * called to update representation
+   */
   void updateRepresentation();
 
   void sourceSelectionChanged();
@@ -226,17 +226,17 @@ protected:
   ~pqActiveObjects() override;
 
   /**
-  * single method that fires appropriate signals based on state changes. This
-  * also ensures that the Cached* variables are updated correctly.
-  */
+   * single method that fires appropriate signals based on state changes. This
+   * also ensures that the Cached* variables are updated correctly.
+   */
   void triggerSignals();
 
 private:
   Q_DISABLE_COPY(pqActiveObjects)
 
   /**
-  * method used to reset all active items.
-  */
+   * method used to reset all active items.
+   */
   void resetActives();
 
   QPointer<pqServer> ActiveServer;

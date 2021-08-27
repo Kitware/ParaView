@@ -58,8 +58,8 @@ struct PQWIDGETS_EXPORT pqConnect
 };
 
 /**
-* Makes a Qt connection
-*/
+ * Makes a Qt connection
+ */
 template <typename T>
 T* operator<<(T* LHS, const pqConnect& RHS)
 {

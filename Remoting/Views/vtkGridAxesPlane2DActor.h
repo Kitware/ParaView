@@ -19,7 +19,7 @@
  * vtkGridAxesPlane2DActor is designed for use by vtkGridAxes2DActor to render
  * the wireframe for the grid plane. It can also be used directly to render such
  * a wireframe in a renderer.
-*/
+ */
 
 #ifndef vtkGridAxesPlane2DActor_h
 #define vtkGridAxesPlane2DActor_h

@@ -59,8 +59,9 @@ class vtknvindex_host_properties;
 // to distribute
 // evenly datasets and rendering among cluster's gpu resources.
 
-class vtknvindex_affinity : public mi::neuraylib::Base<0x9bda367e, 0x755d, 0x47a4, 0xb5, 0x2f, 0xe1,
-                              0x0f, 0xd7, 0xae, 0x34, 0x90, nv::index::IDomain_specific_subdivision>
+class vtknvindex_affinity
+  : public mi::neuraylib::Base<0x9bda367e, 0x755d, 0x47a4, 0xb5, 0x2f, 0xe1, 0x0f, 0xd7, 0xae, 0x34,
+      0x90, nv::index::IDomain_specific_subdivision>
 {
 public:
   vtknvindex_affinity();
@@ -212,7 +213,7 @@ public:
 
 private:
   // Recursively build kd-subtree from raw cuts.
-  mi::Sint32 build_internal(const std::vector<mi::math::Bbox<mi::Float32, 3> >& bboxes,
+  mi::Sint32 build_internal(const std::vector<mi::math::Bbox<mi::Float32, 3>>& bboxes,
     const std::vector<int>& ranks, size_t pos, size_t count, int& leaf_count);
 
   std::vector<affinity_struct>

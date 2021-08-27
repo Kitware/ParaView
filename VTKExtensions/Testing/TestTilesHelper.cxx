@@ -25,7 +25,7 @@ static void vtkTest(int rank, vtkTilesHelper* helper, int minx, int miny, int ma
   assert(tile_viewport[3] == maxy);
 }
 
-int TestTilesHelper(int, char* [])
+int TestTilesHelper(int, char*[])
 {
   vtkTilesHelper* helper = vtkTilesHelper::New();
 

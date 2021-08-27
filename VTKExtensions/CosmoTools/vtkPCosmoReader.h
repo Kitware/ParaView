@@ -81,7 +81,7 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * Total particle data can be split into per processor files, with each file
  * name ending in the processor number.
  *
-*/
+ */
 
 #ifndef vtkPCosmoReader_h
 #define vtkPCosmoReader_h

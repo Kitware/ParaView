@@ -37,11 +37,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QObject>
 
 /**
-* This is standard implementation used by ParaView for creating different
-* pqProxy subclassess for every proxy registered.
-*/
-class PQCORE_EXPORT pqStandardServerManagerModelInterface : public QObject,
-                                                            public pqServerManagerModelInterface
+ * This is standard implementation used by ParaView for creating different
+ * pqProxy subclassess for every proxy registered.
+ */
+class PQCORE_EXPORT pqStandardServerManagerModelInterface
+  : public QObject
+  , public pqServerManagerModelInterface
 {
   Q_OBJECT
   Q_INTERFACES(pqServerManagerModelInterface)
@@ -50,9 +51,9 @@ public:
   ~pqStandardServerManagerModelInterface() override;
 
   /**
-  * Creates a pqProxy subclass for the vtkSMProxy given the details for its
-  * registration with the proxy manager.
-  */
+   * Creates a pqProxy subclass for the vtkSMProxy given the details for its
+   * registration with the proxy manager.
+   */
   pqProxy* createPQProxy(
     const QString& group, const QString& name, vtkSMProxy* proxy, pqServer* server) const override;
 };

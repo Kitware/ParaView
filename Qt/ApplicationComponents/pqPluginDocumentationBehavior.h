@@ -39,10 +39,10 @@ class QHelpEngine;
 class vtkPVPlugin;
 
 /**
-* @ingroup Behaviors
-* pqPluginDocumentationBehavior is a helper class that ensures that
-* documentation from plugins is registered with the QHelpEngine.
-*/
+ * @ingroup Behaviors
+ * pqPluginDocumentationBehavior is a helper class that ensures that
+ * documentation from plugins is registered with the QHelpEngine.
+ */
 class PQAPPLICATIONCOMPONENTS_EXPORT pqPluginDocumentationBehavior : public QObject
 {
   Q_OBJECT

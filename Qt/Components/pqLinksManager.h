@@ -44,8 +44,8 @@ namespace Ui
 class pqLinksManager;
 }
 /**
-* dialog for viewing, creating, editing, removing proxy/property/camera links
-*/
+ * dialog for viewing, creating, editing, removing proxy/property/camera links
+ */
 class PQCOMPONENTS_EXPORT pqLinksManager : public QDialog
 {
   Q_OBJECT
@@ -53,26 +53,26 @@ class PQCOMPONENTS_EXPORT pqLinksManager : public QDialog
 
 public:
   /**
-  * create this dialog with a parent
-  */
+   * create this dialog with a parent
+   */
   pqLinksManager(QWidget* p = 0);
   /**
-  * destroy this dialog
-  */
+   * destroy this dialog
+   */
   ~pqLinksManager() override;
 
 public Q_SLOTS:
   /**
-  * add a link
-  */
+   * add a link
+   */
   void addLink();
   /**
-  * edit the currently selected link
-  */
+   * edit the currently selected link
+   */
   void editLink();
   /**
-  * edit the currently selected link
-  */
+   * edit the currently selected link
+   */
   void removeLink();
 
 private Q_SLOTS:

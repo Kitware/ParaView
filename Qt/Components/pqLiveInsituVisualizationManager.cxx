@@ -56,7 +56,7 @@ public:
   QPointer<pqServer> InsituSession;
   QPointer<pqServer> DisplaySession;
   vtkWeakPointer<vtkSMLiveInsituLinkProxy> LiveInsituLinkProxy;
-  QList<QPointer<pqPipelineSource> > ExtractSourceProxies;
+  QList<QPointer<pqPipelineSource>> ExtractSourceProxies;
 };
 
 //-----------------------------------------------------------------------------

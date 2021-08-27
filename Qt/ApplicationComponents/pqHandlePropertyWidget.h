@@ -37,17 +37,17 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class QPushButton;
 
 /**
-* pqHandlePropertyWidget is a custom property widget that uses
-* "HandleWidgetRepresentation" to help users interactively set a 3D point in
-* space. To use this widget for a property group
-* (vtkSMPropertyGroup), use "InteractiveHandle" as the "panel_widget" in the
-* XML configuration for the proxy. The property group should have properties for
-* following functions:
-* \li \c WorldPosition: a 3-tuple vtkSMDoubleVectorProperty that will be linked to the
-* origin of the interactive plane.
-* \li \c Input: (optional) a vtkSMInputProperty that is used to get data
-* information for bounds when placing/resetting the widget.
-*/
+ * pqHandlePropertyWidget is a custom property widget that uses
+ * "HandleWidgetRepresentation" to help users interactively set a 3D point in
+ * space. To use this widget for a property group
+ * (vtkSMPropertyGroup), use "InteractiveHandle" as the "panel_widget" in the
+ * XML configuration for the proxy. The property group should have properties for
+ * following functions:
+ * \li \c WorldPosition: a 3-tuple vtkSMDoubleVectorProperty that will be linked to the
+ * origin of the interactive plane.
+ * \li \c Input: (optional) a vtkSMInputProperty that is used to get data
+ * information for bounds when placing/resetting the widget.
+ */
 class PQAPPLICATIONCOMPONENTS_EXPORT pqHandlePropertyWidget : public pqInteractivePropertyWidget
 {
   Q_OBJECT
@@ -59,14 +59,14 @@ public:
 
 public Q_SLOTS:
   /**
-  * Update the widget's WorldPosition using current data bounds.
-  */
+   * Update the widget's WorldPosition using current data bounds.
+   */
   void centerOnBounds();
 
 protected Q_SLOTS:
   /**
-  * Places the interactive widget using current data source information.
-  */
+   * Places the interactive widget using current data source information.
+   */
   void placeWidget() override;
 
 private Q_SLOTS:

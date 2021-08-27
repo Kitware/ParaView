@@ -31,7 +31,7 @@
 class vtkSMDeserializerXMLCache::vtkInternal
 {
 public:
-  std::map<vtkTypeUInt32, vtkSmartPointer<vtkPVXMLElement> > XMLCacheMap;
+  std::map<vtkTypeUInt32, vtkSmartPointer<vtkPVXMLElement>> XMLCacheMap;
 };
 //*****************************************************************************
 vtkStandardNewMacro(vtkSMDeserializerXMLCache);
@@ -57,7 +57,7 @@ vtkPVXMLElement* vtkSMDeserializerXMLCache::LocateProxyElement(vtkTypeUInt32 id)
 void vtkSMDeserializerXMLCache::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
-  std::map<vtkTypeUInt32, vtkSmartPointer<vtkPVXMLElement> >::iterator iter;
+  std::map<vtkTypeUInt32, vtkSmartPointer<vtkPVXMLElement>>::iterator iter;
   for (iter = this->Internals->XMLCacheMap.begin(); iter != this->Internals->XMLCacheMap.end();
        iter++)
   {

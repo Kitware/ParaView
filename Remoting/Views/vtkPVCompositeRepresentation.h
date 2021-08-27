@@ -24,7 +24,7 @@
  * (except SelectionRepresentation and PolarAxesRepresentation) properly.
  * For SelectionRepresentation and PolarAxesRepresentation the client is expected
  * to setup the input (look at vtkSMPVRepresentationProxy).
-*/
+ */
 
 #ifndef vtkPVCompositeRepresentation_h
 #define vtkPVCompositeRepresentation_h

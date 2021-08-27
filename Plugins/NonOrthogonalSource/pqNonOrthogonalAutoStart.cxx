@@ -48,6 +48,4 @@ void pqNonOrthogonalAutoStart::startup()
 }
 
 //-----------------------------------------------------------------------------
-void pqNonOrthogonalAutoStart::shutdown()
-{
-}
+void pqNonOrthogonalAutoStart::shutdown() {}

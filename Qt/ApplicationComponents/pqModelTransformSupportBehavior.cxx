@@ -87,7 +87,7 @@ void SafeSetAxisTitle(vtkSMProxy* gridAxis, const char* pname, const char* value
   QString key = QString("MTSBAutoTitle.%1").arg(pname);
   if (prop->IsValueDefault() ||
     (gridAxis->HasAnnotation(key.toUtf8().data()) &&
-        strcmp(gridAxis->GetAnnotation(key.toUtf8().data()), helper.GetAsString()) == 0))
+      strcmp(gridAxis->GetAnnotation(key.toUtf8().data()), helper.GetAsString()) == 0))
   {
     if (value)
     {

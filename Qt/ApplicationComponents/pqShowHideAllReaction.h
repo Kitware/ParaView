@@ -35,9 +35,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqReaction.h"
 
 /**
-* @ingroup Reactions
-* Reaction to show or hide all sources output ports.
-*/
+ * @ingroup Reactions
+ * Reaction to show or hide all sources output ports.
+ */
 class PQAPPLICATIONCOMPONENTS_EXPORT pqShowHideAllReaction : public pqReaction
 {
   Q_OBJECT
@@ -56,9 +56,10 @@ public:
 
 protected:
   /**
-  * Called when the action is triggered.
-  */
+   * Called when the action is triggered.
+   */
   void onTriggered() override { pqShowHideAllReaction::act(this->Action); }
+
 private:
   Q_DISABLE_COPY(pqShowHideAllReaction)
 

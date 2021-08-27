@@ -107,7 +107,7 @@ protected:
   std::string ImageType;
   std::atomic<double> LastStartDepth;
   std::atomic<double> LastEndDepth;
-  std::list<std::pair<std::string, vtkSmartPointer<vtkImageData> > > ImageCache;
+  std::list<std::pair<std::string, vtkSmartPointer<vtkImageData>>> ImageCache;
   unsigned int CacheLimit = 20;
   std::map<std::pair<std::string, std::string>, Json::Value> CollectionMap;
   std::map<std::pair<std::string, std::string>, Json::Value> ImageryMap;
@@ -186,8 +186,9 @@ bool sendMessage(HINTERNET connection, std::string type, std::string address,
 {
   PCTSTR rgpszAcceptTypes[] = { "*/*", nullptr };
   HINTERNET hRequest = HttpOpenRequest(connection, (LPCSTR)(type.c_str()),
-    (LPCSTR)(address.c_str()), nullptr, nullptr, rgpszAcceptTypes, INTERNET_FLAG_RELOAD |
-      INTERNET_FLAG_NO_CACHE_WRITE | INTERNET_FLAG_NEED_FILE | INTERNET_FLAG_SECURE,
+    (LPCSTR)(address.c_str()), nullptr, nullptr, rgpszAcceptTypes,
+    INTERNET_FLAG_RELOAD | INTERNET_FLAG_NO_CACHE_WRITE | INTERNET_FLAG_NEED_FILE |
+      INTERNET_FLAG_SECURE,
     0);
   if (!hRequest)
   {
@@ -971,7 +972,7 @@ bool vtkImagoLoader::GetImage(std::string const& workspace, std::string const& d
       }
 
       this->ImageCache.push_back(
-        std::pair<std::string, vtkSmartPointer<vtkImageData> >(imageString, imageData));
+        std::pair<std::string, vtkSmartPointer<vtkImageData>>(imageString, imageData));
 
       // record last depth requested
       this->LastStartDepth = startDepth;

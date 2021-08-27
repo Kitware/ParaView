@@ -21,7 +21,7 @@
  * animation by the vtkSMComparativeViewProxy. It provides a non-conventional
  * API i.e. without using properties to allow the user to setup parameter
  * values over the comparative grid.
-*/
+ */
 
 #ifndef vtkSMComparativeAnimationCueProxy_h
 #define vtkSMComparativeAnimationCueProxy_h

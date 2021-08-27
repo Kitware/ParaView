@@ -19,7 +19,7 @@
  *
  * vtkPVTrivialProducer is specialized subclass of vtkTrivialProducer that
  * can manage time requests.
-*/
+ */
 
 #ifndef vtkPVTrivialProducer_h
 #define vtkPVTrivialProducer_h

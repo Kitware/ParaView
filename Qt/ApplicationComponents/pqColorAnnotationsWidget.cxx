@@ -89,9 +89,9 @@ namespace
 // annotations list, then they are added to the end.
 // Arguments are vectors of pairs where the pair.first is the annotated value
 // while the pair.second is the label/text for the value.
-std::vector<std::pair<QString, QString> > MergeAnnotations(
-  const std::vector<std::pair<QString, QString> >& current_pairs,
-  const std::vector<std::pair<QString, QString> >& new_pairs)
+std::vector<std::pair<QString, QString>> MergeAnnotations(
+  const std::vector<std::pair<QString, QString>>& current_pairs,
+  const std::vector<std::pair<QString, QString>>& new_pairs)
 {
   QMap<QString, QString> old_values;
   for (const auto& pair : current_pairs)
@@ -102,7 +102,7 @@ std::vector<std::pair<QString, QString> > MergeAnnotations(
   // Subset candidate annotations to only those not in existing annotations.
   // At the same time, update old_values map to have better annotation
   // text/labels, if present in the new values.
-  std::vector<std::pair<QString, QString> > real_new_pairs;
+  std::vector<std::pair<QString, QString>> real_new_pairs;
   for (const auto& pair : new_pairs)
   {
     auto iter = old_values.find(pair.first);
@@ -119,7 +119,7 @@ std::vector<std::pair<QString, QString> > MergeAnnotations(
 
   // Iterate over existing annotations, backfilling annotation texts/labels
   // from the new_pairs, if old texts were empty.
-  std::vector<std::pair<QString, QString> > merged_pairs;
+  std::vector<std::pair<QString, QString>> merged_pairs;
   merged_pairs.reserve(current_pairs.size() + real_new_pairs.size());
   for (const auto& pair : current_pairs)
   {
@@ -249,7 +249,7 @@ public:
 //-----------------------------------------------------------------------------
 bool pqColorAnnotationsWidget::pqInternals::updateAnnotations(vtkAbstractArray* values, bool extend)
 {
-  std::vector<std::pair<QString, QString> > candidate_tuples;
+  std::vector<std::pair<QString, QString>> candidate_tuples;
   for (vtkIdType idx = 0; idx < values->GetNumberOfTuples(); idx++)
   {
     const auto val = values->GetVariantValue(idx);
@@ -496,7 +496,7 @@ QList<QVariant> pqColorAnnotationsWidget::annotations() const
 //-----------------------------------------------------------------------------
 void pqColorAnnotationsWidget::setAnnotations(const QList<QVariant>& value)
 {
-  std::vector<std::pair<QString, QString> > annotationsData;
+  std::vector<std::pair<QString, QString>> annotationsData;
   annotationsData.reserve(value.size() / 2);
 
   for (int cc = 0; (cc + 1) < value.size(); cc += 2)
@@ -562,7 +562,7 @@ QList<QVariant> pqColorAnnotationsWidget::visibilities() const
 //-----------------------------------------------------------------------------
 void pqColorAnnotationsWidget::setVisibilities(const QList<QVariant>& values)
 {
-  std::vector<std::pair<QString, int> > visibilities;
+  std::vector<std::pair<QString, int>> visibilities;
 
   for (int cc = 0; (cc + 1) < values.size(); cc += 2)
   {

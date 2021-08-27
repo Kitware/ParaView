@@ -26,7 +26,7 @@
  * Note that is vtkObject::GlobalWarningDisplay is off, this class will not
  * receive any ErrorEvents and hence will not report any errors that were
  * raised.
-*/
+ */
 
 #ifndef vtkCommunicationErrorCatcher_h
 #define vtkCommunicationErrorCatcher_h

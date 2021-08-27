@@ -18,7 +18,7 @@
  *
  * This filter defaults to using the outline filter unless the input
  * is a structured volume.
-*/
+ */
 
 #ifndef vtkPVGeometryFilter_h
 #define vtkPVGeometryFilter_h

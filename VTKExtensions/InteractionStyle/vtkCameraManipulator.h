@@ -21,7 +21,7 @@
  * might be rubber-band bounding-box zoom. This abstraction allows a
  * camera manipulator to be assigned to any button.  This super class
  * might become a subclass of vtkInteractorObserver in the future.
-*/
+ */
 
 #ifndef vtkCameraManipulator_h
 #define vtkCameraManipulator_h

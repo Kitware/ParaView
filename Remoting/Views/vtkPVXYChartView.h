@@ -19,7 +19,7 @@
  * vtkPVXYChartView is a concrete subclass of vtkPVContextView -- which
  * in turn inherits vtkPVView -- that creates a vtkChart to perform
  * rendering.
-*/
+ */
 
 #ifndef vtkPVXYChartView_h
 #define vtkPVXYChartView_h
@@ -467,8 +467,8 @@ public:
 
   /**
    * When plotting data with nonpositive values, ignore the standard warning
-  * and draw only the data with positive values.
-  */
+   * and draw only the data with positive values.
+   */
   static void SetIgnoreNegativeLogAxisWarning(bool val)
   {
     vtkPVXYChartView::IgnoreNegativeLogAxisWarning = val;

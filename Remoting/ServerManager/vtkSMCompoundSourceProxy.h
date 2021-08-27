@@ -29,7 +29,7 @@
  * directly used to input to other filters, representations etc.
  * vtkSMCompoundSourceProxy provides API to exposed properties from sub proxies
  * as well as output ports of the subproxies.
-*/
+ */
 
 #ifndef vtkSMCompoundSourceProxy_h
 #define vtkSMCompoundSourceProxy_h

@@ -33,7 +33,7 @@
  * vtkUndoElement, vtkUndoSet and vtkUndoStack form the undo/redo framework core.
  * @sa
  * vtkUndoSet vtkUndoElement
-*/
+ */
 
 #ifndef vtkUndoStack_h
 #define vtkUndoStack_h

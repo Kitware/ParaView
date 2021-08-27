@@ -59,34 +59,34 @@ public:
   enum SeriesT
   {
     /**
-    * Data series are organized in columns
-    */
+     * Data series are organized in columns
+     */
     COLUMN_SERIES
   };
 
   /**
-  * Initializes the parser with the delimiter that will be used to separate fields on the same line
-  * within parsed files.
-  */
+   * Initializes the parser with the delimiter that will be used to separate fields on the same line
+   * within parsed files.
+   */
   pqDelimitedTextParser(SeriesT series, char delimiter);
 
   /**
-  * Call this to parse a filesystem file.
-  */
+   * Call this to parse a filesystem file.
+   */
   void parse(const QString& path);
 
 Q_SIGNALS:
   /**
-  * Signal emitted when parsing begins.
-  */
+   * Signal emitted when parsing begins.
+   */
   void startParsing();
   /**
-  * Signal that will be emitted once for each data series contained in the parsed file.
-  */
+   * Signal that will be emitted once for each data series contained in the parsed file.
+   */
   void parseSeries(const QStringList&);
   /**
-  * Signal emitted when parsing ends.
-  */
+   * Signal emitted when parsing ends.
+   */
   void finishParsing();
 
 private:

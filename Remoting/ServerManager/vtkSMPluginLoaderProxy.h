@@ -19,7 +19,7 @@
  * vtkSMPluginLoaderProxy is used to load a plugin on dataserver and
  * renderserver processes. Simply call vtkSMPluginLoaderProxy::LoadPlugin() with
  * the right path to load the plugin remotely.
-*/
+ */
 
 #ifndef vtkSMPluginLoaderProxy_h
 #define vtkSMPluginLoaderProxy_h

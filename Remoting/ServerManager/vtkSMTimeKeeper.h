@@ -36,7 +36,7 @@
  * undo/redo, state etc. will not work as expected).
  *
  * This proxy has no VTK objects that it creates on the server.
-*/
+ */
 
 #ifndef vtkSMTimeKeeper_h
 #define vtkSMTimeKeeper_h

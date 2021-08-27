@@ -36,7 +36,7 @@ class vtkSIProxyProperty::InternalCache : public std::set<vtkTypeUInt32>
 };
 
 class vtkSIProxyProperty::vtkObjectCache
-  : public std::map<vtkTypeUInt32, vtkSmartPointer<vtkObjectBase> >
+  : public std::map<vtkTypeUInt32, vtkSmartPointer<vtkObjectBase>>
 {
 };
 

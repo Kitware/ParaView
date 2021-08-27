@@ -17,7 +17,7 @@
  *
  * Extend vtkPVTrivialProducer to allow distributed code to easily populate
  * a trivial producer with local DataObject while using a regular Proxy Model.
-*/
+ */
 
 #ifndef vtkDistributedTrivialProducer_h
 #define vtkDistributedTrivialProducer_h

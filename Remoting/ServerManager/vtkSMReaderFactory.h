@@ -30,7 +30,7 @@
  *
  * Once the factory has been configured, the API to create readers, get
  * available readers etc. can be used.
-*/
+ */
 
 #ifndef vtkSMReaderFactory_h
 #define vtkSMReaderFactory_h

@@ -40,14 +40,14 @@ class QListWidget;
 class QListWidgetItem;
 
 /**
-* If a QListWidget has checkable elements in any column, on needs
-* to explicitly click on the checkbox to change the check state.
-* However, sometimes we simply want the checkbox to be updated
-* when the user clicks on the entire row. For that
-* purpose, we use pqListWidgetCheckHelper. Simply create
-* and instance of pqListWidgetCheckHelper, and
-* set a List to use.
-*/
+ * If a QListWidget has checkable elements in any column, on needs
+ * to explicitly click on the checkbox to change the check state.
+ * However, sometimes we simply want the checkbox to be updated
+ * when the user clicks on the entire row. For that
+ * purpose, we use pqListWidgetCheckHelper. Simply create
+ * and instance of pqListWidgetCheckHelper, and
+ * set a List to use.
+ */
 class PQWIDGETS_EXPORT pqListWidgetCheckHelper : public QObject
 {
   Q_OBJECT

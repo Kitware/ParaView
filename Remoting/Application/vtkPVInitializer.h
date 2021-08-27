@@ -24,7 +24,9 @@
 
 class vtkClientServerInterpreter;
 
-class vtkPVInitializerPlugin : public vtkPVPlugin, public vtkPVServerManagerPluginInterface
+class vtkPVInitializerPlugin
+  : public vtkPVPlugin
+  , public vtkPVServerManagerPluginInterface
 {
   const char* GetPluginName() override { return "vtkPVInitializerPlugin"; }
   const char* GetPluginVersionString() override { return "0.0"; }

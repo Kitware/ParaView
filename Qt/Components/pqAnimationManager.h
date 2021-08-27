@@ -46,11 +46,11 @@ class pqView;
 class vtkSMProxy;
 
 /**
-* pqAnimationManager manages the Animation sub-system.
-* It encapsulates the initialization of animation scene per server
-* connection i.e. this class basically keeps track of the active
-* animation scene.
-*/
+ * pqAnimationManager manages the Animation sub-system.
+ * It encapsulates the initialization of animation scene per server
+ * connection i.e. this class basically keeps track of the active
+ * animation scene.
+ */
 class PQCOMPONENTS_EXPORT pqAnimationManager : public QObject
 {
   Q_OBJECT
@@ -59,75 +59,75 @@ public:
   ~pqAnimationManager() override;
 
   /**
-  * Returns the scene for the active server connection, if any.
-  */
+   * Returns the scene for the active server connection, if any.
+   */
   pqAnimationScene* getActiveScene() const;
 
   /**
-  * Returns the scene on the server connection, if any.
-  */
+   * Returns the scene on the server connection, if any.
+   */
   pqAnimationScene* getScene(pqServer* server) const;
 
   /**
-  * In the given \c scene, returns the cue that animates the given
-  * \c index of the given \c property on the \c proxy.
-  * This method simply calls getCue() on the pqAnimationScene instance.
-  */
+   * In the given \c scene, returns the cue that animates the given
+   * \c index of the given \c property on the \c proxy.
+   * This method simply calls getCue() on the pqAnimationScene instance.
+   */
   pqAnimationCue* getCue(
     pqAnimationScene* scene, vtkSMProxy* proxy, const char* propertyname, int index) const;
 
   /**
-  * Saves the animation geometry from the active scene
-  * as visible in the given view.
-  */
+   * Saves the animation geometry from the active scene
+   * as visible in the given view.
+   */
   bool saveGeometry(const QString& filename, pqView* view);
 
   /**
-  * Query whether or not an animation is currently playing
-  */
+   * Query whether or not an animation is currently playing
+   */
   bool animationPlaying() const;
 
 Q_SIGNALS:
   /**
-  * emitted when the active scene changes (\c scene may be nullptr).
-  */
+   * emitted when the active scene changes (\c scene may be nullptr).
+   */
   void activeSceneChanged(pqAnimationScene* scene);
 
   /**
-  * emitted when the active server changes and updated active scene.
-  */
+   * emitted when the active server changes and updated active scene.
+   */
   void activeServerChanged(pqServer* scene);
 
   /**
-  * emitted with the current save progress.
-  */
+   * emitted with the current save progress.
+   */
   void saveProgress(const QString&, int);
 
   /**
-  * emitted when the manager begins changes that should not get
-  * recorded on the undo stack.
-  */
+   * emitted when the manager begins changes that should not get
+   * recorded on the undo stack.
+   */
   void beginNonUndoableChanges();
 
   /**
-  * emitted when the manager is done with changes that
-  * should not get recorded on the undo stack.
-  */
+   * emitted when the manager is done with changes that
+   * should not get recorded on the undo stack.
+   */
   void endNonUndoableChanges();
 
   /**
-  * emitted to indicate an animation is being written out to a file.
-  */
+   * emitted to indicate an animation is being written out to a file.
+   */
   void writeAnimation(const QString& filename, int magnification, double frameRate);
 
   /**
-  * Emitted when the active animation scene begins playing.
-  */
+   * Emitted when the active animation scene begins playing.
+   */
   void beginPlay();
 
   /**
-  * Emitted when the active animation scene finishes playing.
-  */
+   * Emitted when the active animation scene finishes playing.
+   */
   void endPlay();
 
 public Q_SLOTS:
@@ -139,13 +139,13 @@ protected Q_SLOTS:
   void onProxyRemoved(pqProxy*);
 
   /**
-  * Called on every tick while saving animation.
-  */
+   * Called on every tick while saving animation.
+   */
   void onTick(int);
 
   /**
-  * Called to demarcate the start and end of an animation
-  */
+   * Called to demarcate the start and end of an animation
+   */
   void onBeginPlay();
   void onEndPlay();
 

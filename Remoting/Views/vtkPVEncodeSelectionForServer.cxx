@@ -52,7 +52,7 @@ static void vtkShrinkSelection(vtkSelection* sel)
     }
   }
 
-  std::vector<vtkSmartPointer<vtkSelectionNode> > chosenNodes;
+  std::vector<vtkSmartPointer<vtkSelectionNode>> chosenNodes;
   if (chosen != nullptr)
   {
     for (unsigned int cc = 0; cc < numNodes; cc++)

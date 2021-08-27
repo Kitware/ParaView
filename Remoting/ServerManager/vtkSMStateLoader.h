@@ -20,7 +20,7 @@
  * vtkPVXMLElement. This element is usually populated by a vtkPVXMLParser.
  * @sa
  * vtkPVXMLParser vtkPVXMLElement
-*/
+ */
 
 #ifndef vtkSMStateLoader_h
 #define vtkSMStateLoader_h

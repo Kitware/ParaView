@@ -32,7 +32,7 @@
  * Supported XML attributes
  * \li hide_partial_arrays : when set to 1, partial arrays will not be shown in
  * the domain (default).
-*/
+ */
 
 #ifndef vtkSMChartSeriesListDomain_h
 #define vtkSMChartSeriesListDomain_h

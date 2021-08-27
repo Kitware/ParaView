@@ -41,9 +41,9 @@ class vtkObject;
 class vtkSelection;
 
 /**
-* pqContextView is an abstract base class for all charting views based on the
-* VTK context charting library.
-*/
+ * pqContextView is an abstract base class for all charting views based on the
+ * VTK context charting library.
+ */
 class PQCORE_EXPORT pqContextView : public pqView
 {
   Q_OBJECT
@@ -53,39 +53,39 @@ public:
   ~pqContextView() override;
 
   /**
-  * Returns the internal vtkContextView which provides the implementation for
-  * the chart rendering.
-  */
+   * Returns the internal vtkContextView which provides the implementation for
+   * the chart rendering.
+   */
   virtual vtkContextView* getVTKContextView() const;
 
   /**
-  * Returns the context view proxy associated with this object.
-  */
+   * Returns the context view proxy associated with this object.
+   */
   virtual vtkSMContextViewProxy* getContextViewProxy() const;
 
   /**
-  * Returns true if selection can be done.
-  */
+   * Returns true if selection can be done.
+   */
   virtual bool supportsSelection() const;
 
   /**
-  * Returns if this view module can support
-  * image capture. Returns false by default. Subclassess must override
-  * if that's not the case.
-  */
+   * Returns if this view module can support
+   * image capture. Returns false by default. Subclassess must override
+   * if that's not the case.
+   */
   bool supportsCapture() const override { return true; }
 
   /**
-  * set/get the selection action in the context view, defined
-  * by vtkChart enumeration from SELECT to SELECT_POLYGON.
-  */
+   * set/get the selection action in the context view, defined
+   * by vtkChart enumeration from SELECT to SELECT_POLYGON.
+   */
   // Default is vtkChart::SELECT_RECTANGLE
   virtual void setSelectionAction(int selAction);
   virtual int selectionAction();
 
   /**
-  * Resets the zoom level to 100%.
-  */
+   * Resets the zoom level to 100%.
+   */
   void resetDisplay(bool closest = false) override;
 
 protected Q_SLOTS:
@@ -101,31 +101,31 @@ protected Q_SLOTS:
 
 protected:
   /**
-  * Constructor:
-  * \c type  :- view type.
-  * \c group :- SManager registration group.
-  * \c name  :- SManager registration name.
-  * \c view  :- View proxy.
-  * \c server:- server on which the proxy is created.
-  * \c parent:- QObject parent.
-  */
+   * Constructor:
+   * \c type  :- view type.
+   * \c group :- SManager registration group.
+   * \c name  :- SManager registration name.
+   * \c view  :- View proxy.
+   * \c server:- server on which the proxy is created.
+   * \c parent:- QObject parent.
+   */
   pqContextView(const QString& type, const QString& group, const QString& name,
     vtkSMViewProxy* view, pqServer* server, QObject* parent = nullptr);
 
   /**
-  * Creates a new instance of the QWidget subclass to be used to show this
-  * view. This will create a pqQVTKWidget for the render window.
-  */
+   * Creates a new instance of the QWidget subclass to be used to show this
+   * view. This will create a pqQVTKWidget for the render window.
+   */
   QWidget* createWidget() override;
 
   /**
-  * Listen for new selection events, and pass them back to ParaView
-  */
+   * Listen for new selection events, and pass them back to ParaView
+   */
   virtual void selectionChanged();
 
   /**
-  * Set selection to the view
-  */
+   * Set selection to the view
+   */
   virtual void setSelection(vtkSelection*);
   class command;
   command* Command;

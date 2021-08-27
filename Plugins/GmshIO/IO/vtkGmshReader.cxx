@@ -36,14 +36,14 @@
 
 //-----------------------------------------------------------------------------
 template <typename T>
-using Array2D = std::vector<std::vector<T> >;
+using Array2D = std::vector<std::vector<T>>;
 
 //-----------------------------------------------------------------------------
 struct DataArray
 {
   std::string Type;
-  std::vector<vtkSmartPointer<vtkDoubleArray> > VtkArrays; // [timestep]
-  std::vector<double> Times;                               // [timestep]
+  std::vector<vtkSmartPointer<vtkDoubleArray>> VtkArrays; // [timestep]
+  std::vector<double> Times;                              // [timestep]
 };
 
 //-----------------------------------------------------------------------------
@@ -77,7 +77,7 @@ struct GmshReaderInternal
   std::set<double> Timesteps;
 
   // Map a GmshPrimitive to a pair (vtkType, numberOfVertices)
-  static const std::unordered_map<GmshPrimitive, std::pair<int, int>, std::hash<GmshPrimitive> >
+  static const std::unordered_map<GmshPrimitive, std::pair<int, int>, std::hash<GmshPrimitive>>
     TRANSLATE_CELL;
 
   static constexpr short NUM_DIM = 4;
@@ -88,7 +88,7 @@ struct GmshReaderInternal
 constexpr short GmshReaderInternal::NUM_DIM;
 constexpr const char* GmshReaderInternal::DIM_LABEL[GmshReaderInternal::NUM_DIM];
 
-const std::unordered_map<GmshPrimitive, std::pair<int, int>, std::hash<GmshPrimitive> >
+const std::unordered_map<GmshPrimitive, std::pair<int, int>, std::hash<GmshPrimitive>>
   GmshReaderInternal::TRANSLATE_CELL = { { GmshPrimitive::POINT, { VTK_VERTEX, 1 } },
     { GmshPrimitive::LINE, { VTK_LINE, 2 } }, { GmshPrimitive::TRIANGLE, { VTK_TRIANGLE, 3 } },
     { GmshPrimitive::QUAD, { VTK_QUAD, 4 } }, { GmshPrimitive::TETRA, { VTK_TETRA, 4 } },

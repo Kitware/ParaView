@@ -2032,7 +2032,7 @@ int vtkMaterialInterfaceFilter::InitializeBlocks(vtkNonOverlappingAMR* input,
   this->ShareGhostBlocksTimer->StartTimer();
 #endif
 
-// cerr << "start ghost blocks\n" << endl;
+  // cerr << "start ghost blocks\n" << endl;
 
 #ifdef vtkMaterialInterfaceFilterPROFILE
   // Lets profile to see what takes the most time for large number of processes.
@@ -2871,12 +2871,12 @@ void vtkMaterialInterfaceFilter::ShareGhostBlocks()
   // MPI_INT, *com->GetMPIComm()->GetHandle());
 
   this->ComputeAndDistributeGhostBlocks(blocksPerProcess, gatheredBlockInfo, myProc, numProcs);
-// Send:
-// Process, extent, data,
-// ...
-// Receive:
-// Process, extent
-// ...
+  // Send:
+  // Process, extent, data,
+  // ...
+  // Receive:
+  // Process, extent
+  // ...
 
 #ifdef vtkMaterialInterfaceFilterPROFILE
   // Lets profile to see what takes the most time for large number of processes.
@@ -3587,11 +3587,11 @@ int vtkMaterialInterfaceFilter::RequestData(vtkInformation* vtkNotUsed(request),
     // Lets profile to see what takes the most time for large number of processes.
     this->ProcessBlocksTimer->StopTimer();
 #endif
-// char tmp[128];
-// sprintf(tmp, "C:/Law/tmp/mifSurface%d.vtp", this->Controller->GetLocalProcessId());
-// this->SaveBlockSurfaces(tmp);
-// sprintf(tmp, "C:/Law/tmp/mifGhost%d.vtp", this->Controller->GetLocalProcessId());
-// this->SaveGhostSurfaces(tmp);
+    // char tmp[128];
+    // sprintf(tmp, "C:/Law/tmp/mifSurface%d.vtp", this->Controller->GetLocalProcessId());
+    // this->SaveBlockSurfaces(tmp);
+    // sprintf(tmp, "C:/Law/tmp/mifGhost%d.vtp", this->Controller->GetLocalProcessId());
+    // this->SaveGhostSurfaces(tmp);
 
 #ifdef vtkMaterialInterfaceFilterPROFILE
     // Lets profile to see what takes the most time for large number of processes.
@@ -6460,11 +6460,11 @@ void vtkMaterialInterfaceFilter::CleanLocalFragmentGeometry()
 
   // Only need to merge points.
   vtkCleanPolyData* cpd = vtkCleanPolyData::New();
-// These caused some visual effects(rounded corners etc...)
-// cpd->ConvertLinesToPointsOff();
-// cpd->ConvertPolysToLinesOff();
-// cpd->ConvertStripsToPolysOff();
-// cpd->PointMergingOn();
+  // These caused some visual effects(rounded corners etc...)
+  // cpd->ConvertLinesToPointsOff();
+  // cpd->ConvertPolysToLinesOff();
+  // cpd->ConvertStripsToPolysOff();
+  // cpd->PointMergingOn();
 
 #ifdef vtkMaterialInterfaceFilterDEBUG
   const int myProcId = this->Controller->GetLocalProcessId();
@@ -6599,7 +6599,7 @@ void vtkMaterialInterfaceFilter::ComputeGeometricAttributes()
       int thisMsgId = msgBase;
 
       // fragment indexed arrays, with number of polys
-      vector<vector<vtkIdType> > loadingArrays;
+      vector<vector<vtkIdType>> loadingArrays;
       loadingArrays.resize(nProcs);
       // Gather loading arrays
       // mine
@@ -7452,8 +7452,8 @@ int vtkMaterialInterfaceFilter::GatherGeometricAttributes(const int recipientPro
 int vtkMaterialInterfaceFilter::CollectIntegratedAttributes(
   vector<vtkMaterialInterfaceCommBuffer>& buffers, vector<vtkDoubleArray*>& volumes,
   vector<vtkDoubleArray*>& clipDepthMaxs, vector<vtkDoubleArray*>& clipDepthMins,
-  vector<vtkDoubleArray*>& moments, vector<vector<vtkDoubleArray*> >& volumeWtdAvgs,
-  vector<vector<vtkDoubleArray*> >& massWtdAvgs, vector<vector<vtkDoubleArray*> >& sums)
+  vector<vtkDoubleArray*>& moments, vector<vector<vtkDoubleArray*>>& volumeWtdAvgs,
+  vector<vector<vtkDoubleArray*>>& massWtdAvgs, vector<vector<vtkDoubleArray*>>& sums)
 {
   const int myProcId = this->Controller->GetLocalProcessId();
   const int nProcs = this->Controller->GetNumberOfProcesses();
@@ -7722,8 +7722,8 @@ int vtkMaterialInterfaceFilter::BroadcastIntegratedAttributes(const int sourcePr
 int vtkMaterialInterfaceFilter::PrepareToCollectIntegratedAttributes(
   vector<vtkMaterialInterfaceCommBuffer>& buffers, vector<vtkDoubleArray*>& volumes,
   vector<vtkDoubleArray*>& clipDepthMaxs, vector<vtkDoubleArray*>& clipDepthMins,
-  vector<vtkDoubleArray*>& moments, vector<vector<vtkDoubleArray*> >& volumeWtdAvgs,
-  vector<vector<vtkDoubleArray*> >& massWtdAvgs, vector<vector<vtkDoubleArray*> >& sums)
+  vector<vtkDoubleArray*>& moments, vector<vector<vtkDoubleArray*>>& volumeWtdAvgs,
+  vector<vector<vtkDoubleArray*>>& massWtdAvgs, vector<vector<vtkDoubleArray*>>& sums)
 {
   const int myProcId = this->Controller->GetLocalProcessId();
   const int nProcs = this->Controller->GetNumberOfProcesses();
@@ -7811,8 +7811,8 @@ int vtkMaterialInterfaceFilter::PrepareToCollectIntegratedAttributes(
 int vtkMaterialInterfaceFilter::CleanUpAfterCollectIntegratedAttributes(
   vector<vtkMaterialInterfaceCommBuffer>& buffers, vector<vtkDoubleArray*>& volumes,
   vector<vtkDoubleArray*>& clipDepthMaxs, vector<vtkDoubleArray*>& clipDepthMins,
-  vector<vtkDoubleArray*>& moments, vector<vector<vtkDoubleArray*> >& volumeWtdAvgs,
-  vector<vector<vtkDoubleArray*> >& massWtdAvgs, vector<vector<vtkDoubleArray*> >& sums)
+  vector<vtkDoubleArray*>& moments, vector<vector<vtkDoubleArray*>>& volumeWtdAvgs,
+  vector<vector<vtkDoubleArray*>>& massWtdAvgs, vector<vector<vtkDoubleArray*>>& sums)
 {
   const int nProcs = this->Controller->GetNumberOfProcesses();
 
@@ -7950,9 +7950,9 @@ int vtkMaterialInterfaceFilter::ResolveIntegratedAttributes(const int controllin
     vector<vtkDoubleArray*> clipDepthMaxs;
     vector<vtkDoubleArray*> clipDepthMins;
     vector<vtkDoubleArray*> moments;
-    vector<vector<vtkDoubleArray*> > volumeWtdAvgs;
-    vector<vector<vtkDoubleArray*> > massWtdAvgs;
-    vector<vector<vtkDoubleArray*> > sums;
+    vector<vector<vtkDoubleArray*>> volumeWtdAvgs;
+    vector<vector<vtkDoubleArray*>> massWtdAvgs;
+    vector<vector<vtkDoubleArray*>> sums;
     // prepare collect buffers
     this->PrepareToCollectIntegratedAttributes(
       buffers, volumes, clipDepthMaxs, clipDepthMins, moments, volumeWtdAvgs, massWtdAvgs, sums);

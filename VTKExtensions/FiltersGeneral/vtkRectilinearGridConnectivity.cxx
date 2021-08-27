@@ -1043,7 +1043,7 @@ int vtkRectilinearGridConnectivity::RequestData(
 
     if (this->Controller->GetLocalProcessId() &&   // a root process
       this->Controller->GetNumberOfProcesses() > 1 // multi-process
-      )
+    )
     {
       for (i = 0; i < numParts; i++)
       {
@@ -2648,9 +2648,9 @@ void vtkRectilinearGridConnectivity::ExtractFragmentPolygons(int blockIdx, int& 
   std::vector<vtkRectilinearGridConnectivityFace*>* theGroup = nullptr;
   std::vector<vtkRectilinearGridConnectivityFace*>::iterator faceItrt;
   std::map<int,
-    std::vector<vtkRectilinearGridConnectivityFace*> >
+    std::vector<vtkRectilinearGridConnectivityFace*>>
     faceGrps; // faces grouped by the fragment Id
-  std::map<int, std::vector<vtkRectilinearGridConnectivityFace*> >::iterator grpItrat;
+  std::map<int, std::vector<vtkRectilinearGridConnectivityFace*>>::iterator grpItrat;
 
   // First we need to retrieve the exterior faces (with non-zero fragment Ids)
   // from the face hash and put them in a temporary buffer in which they are
@@ -3413,8 +3413,8 @@ void vtkRectilinearGridConnectivity::CreateInterProcessPolygons(vtkPolyData* fra
 
   std::vector<int>* theGroup = nullptr;
   std::vector<int>::iterator cellItrt;
-  std::map<int, std::vector<int> > cellGrps;
-  std::map<int, std::vector<int> >::iterator grpItrat;
+  std::map<int, std::vector<int>> cellGrps;
+  std::map<int, std::vector<int>>::iterator grpItrat;
 
   // number of points and that of cells
   numbPnts = fragPoly->GetNumberOfPoints();

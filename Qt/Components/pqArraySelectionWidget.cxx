@@ -294,7 +294,7 @@ private:
       return QVariant(iter->second.begin()->second->checkState() == Qt::Checked ? 1 : 0);
     }
 
-    QList<QList<QVariant> > values;
+    QList<QList<QVariant>> values;
     for (const auto& pair : iter->second)
     {
       values.push_back(QList<QVariant>{
@@ -358,7 +358,7 @@ private:
     Q_EMIT this->headerDataChanged(Qt::Horizontal, 0, 0);
   }
 
-  std::map<QString, std::map<QString, QStandardItem*> > GroupedItemsMap;
+  std::map<QString, std::map<QString, QStandardItem*>> GroupedItemsMap;
   mutable QVariant HeaderCheckState;
 };
 
@@ -507,7 +507,7 @@ void pqArraySelectionWidget::propertyChanged(const QString& pname)
   }
   else
   {
-    const QList<QList<QVariant> > status_values = value.value<QList<QList<QVariant> > >();
+    const QList<QList<QVariant>> status_values = value.value<QList<QList<QVariant>>>();
     std::map<QString, bool> statuses;
     for (const QList<QVariant>& tuple : status_values)
     {

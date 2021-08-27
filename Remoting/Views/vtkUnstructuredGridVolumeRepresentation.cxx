@@ -50,7 +50,7 @@
 class vtkUnstructuredGridVolumeRepresentation::vtkInternals
 {
 public:
-  typedef std::map<std::string, vtkSmartPointer<vtkAbstractVolumeMapper> > MapOfMappers;
+  typedef std::map<std::string, vtkSmartPointer<vtkAbstractVolumeMapper>> MapOfMappers;
   MapOfMappers Mappers;
   std::string ActiveVolumeMapper;
 };

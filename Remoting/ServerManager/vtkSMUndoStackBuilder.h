@@ -25,7 +25,7 @@
  * use PushToStack().
  * Applications can subclass vtkSMUndoStackBuilder to record GUI related
  * changes and add them to the undo stack.
-*/
+ */
 
 #ifndef vtkSMUndoStackBuilder_h
 #define vtkSMUndoStackBuilder_h

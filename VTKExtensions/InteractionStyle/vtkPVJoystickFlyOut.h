@@ -18,7 +18,7 @@
  *
  * vtkPVJoystickFlyOut allows the user to interactively
  * manipulate the camera, the viewpoint of the scene.
-*/
+ */
 
 #ifndef vtkPVJoystickFlyOut_h
 #define vtkPVJoystickFlyOut_h

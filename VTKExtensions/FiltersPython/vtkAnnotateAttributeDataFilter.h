@@ -20,7 +20,7 @@
  * vtkAnnotateAttributeDataFilter is a specialization of
  * vtkPythonAnnotationFilter which makes it easier to annotate using data values
  * from any input dataset.
-*/
+ */
 
 #ifndef vtkAnnotateAttributeDataFilter_h
 #define vtkAnnotateAttributeDataFilter_h

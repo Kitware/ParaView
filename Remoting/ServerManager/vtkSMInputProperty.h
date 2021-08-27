@@ -25,7 +25,7 @@
  * be used.
  * @sa
  * vtkSMInputProperty vtkSMSourceProxy
-*/
+ */
 
 #ifndef vtkSMInputProperty_h
 #define vtkSMInputProperty_h

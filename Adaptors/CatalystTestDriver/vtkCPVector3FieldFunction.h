@@ -17,7 +17,7 @@
  * @brief   Abstract class for specifying vectors at points.
  *
  * Abstract class for specifying vector values at specified points.
-*/
+ */
 
 #ifndef vtkCPVector3FieldFunction_h
 #define vtkCPVector3FieldFunction_h

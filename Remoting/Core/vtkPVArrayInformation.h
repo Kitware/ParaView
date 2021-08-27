@@ -184,7 +184,7 @@ private:
   std::vector<std::string> StringValues;
 
   // this array is used to store existing information keys (location/name pairs)
-  std::set<std::pair<std::string, std::string> > InformationKeys;
+  std::set<std::pair<std::string, std::string>> InformationKeys;
 
   vtkPVArrayInformation(const vtkPVArrayInformation&) = delete;
   void operator=(const vtkPVArrayInformation&) = delete;

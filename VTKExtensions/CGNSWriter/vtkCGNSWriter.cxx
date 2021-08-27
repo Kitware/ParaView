@@ -129,7 +129,7 @@ bool vtkCGNSWriter::vtkPrivate::WriteCells(write_info& info, vtkPointSet* grid, 
 
   // create a mapping of celltype to a list of cells of that type
   // then, write each cell type into a different section of the zone.
-  map<unsigned char, vector<vtkIdType> > cellTypeMap;
+  map<unsigned char, vector<vtkIdType>> cellTypeMap;
   for (vtkIdType i = 0; i < grid->GetNumberOfCells(); ++i)
   {
     unsigned char cellType = grid->GetCellType(i);

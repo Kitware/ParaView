@@ -79,9 +79,7 @@ void vtkPVJoystickFly::OnButtonUp(int, int, vtkRenderer*, vtkRenderWindowInterac
 }
 
 //-------------------------------------------------------------------------
-void vtkPVJoystickFly::OnMouseMove(int, int, vtkRenderer*, vtkRenderWindowInteractor*)
-{
-}
+void vtkPVJoystickFly::OnMouseMove(int, int, vtkRenderer*, vtkRenderWindowInteractor*) {}
 
 //-------------------------------------------------------------------------
 void vtkPVJoystickFly::Fly(vtkRenderer* ren, vtkRenderWindowInteractor* rwi, double, double ispeed)

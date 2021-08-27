@@ -15,7 +15,7 @@
 /**
  * @class   vtkPGenericIOMultiBlockWriter
  *
-*/
+ */
 
 #ifndef vtkPGenericIOMultiBlockWriter_h
 #define vtkPGenericIOMultiBlockWriter_h

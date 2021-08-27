@@ -19,7 +19,7 @@
  *
  * vtkMultiProcessControllerHelper is collection of assorted helper
  * routines dealing with communication.
-*/
+ */
 
 #ifndef vtkMultiProcessControllerHelper_h
 #define vtkMultiProcessControllerHelper_h
@@ -61,7 +61,7 @@ public:
    * Overload where the merged pieces are combined into result.
    */
   static bool MergePieces(
-    std::vector<vtkSmartPointer<vtkDataObject> >& pieces, vtkDataObject* result);
+    std::vector<vtkSmartPointer<vtkDataObject>>& pieces, vtkDataObject* result);
 
 protected:
   vtkMultiProcessControllerHelper();

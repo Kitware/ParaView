@@ -306,11 +306,11 @@ bool vtkParFlowMetaReader::IngestMetadata()
       this->SubsurfaceExtent[2 * ii + 1] = sse[ii];
       this->SurfaceExtent[2 * ii + 1] = ii < 2 ? se[ii] : 0;
       this->IJKDivs[Domain::Subsurface][ii] =
-        domains["subsurface"]["subgrid-divisions"][ii].get<std::vector<int> >();
+        domains["subsurface"]["subgrid-divisions"][ii].get<std::vector<int>>();
       if (ii < 2)
       {
         this->IJKDivs[Domain::Surface][ii] =
-          domains["surface"]["subgrid-divisions"][ii].get<std::vector<int> >();
+          domains["surface"]["subgrid-divisions"][ii].get<std::vector<int>>();
       }
       else
       {
@@ -409,7 +409,7 @@ void vtkParFlowMetaReader::ReplaceVariable(
       std::vector<int> timeSpec;
       if (entry.find("times-between") != entry.end())
       {
-        timeSpec = entry.at("times-between").get<std::vector<int> >();
+        timeSpec = entry.at("times-between").get<std::vector<int>>();
         // Now, since times-between is inclusive while time-range is not,
         // we increment the end time.
         if (timeSpec.size() >= 2)
@@ -425,7 +425,7 @@ void vtkParFlowMetaReader::ReplaceVariable(
       }
       else if (entry.find("time-range") != entry.end())
       {
-        timeSpec = entry.at("time-range").get<std::vector<int> >();
+        timeSpec = entry.at("time-range").get<std::vector<int>>();
       }
       if (timeSpec.size() >= 2)
       {
@@ -437,7 +437,7 @@ void vtkParFlowMetaReader::ReplaceVariable(
       }
       else if (entry.find("times") != entry.end())
       {
-        timeSpec = entry.at("times").get<std::vector<int> >();
+        timeSpec = entry.at("times").get<std::vector<int>>();
         for (auto ts : timeSpec)
         {
           this->TimeSteps.insert(ts);
@@ -710,7 +710,7 @@ int vtkParFlowMetaReader::FindPFBFiles(std::vector<std::string>& filesToLoad,
           std::string filePattern = fileSeries->get<std::string>();
           if (timeRange != fileMeta->end())
           {
-            auto times = timeRange->get<std::vector<int> >();
+            auto times = timeRange->get<std::vector<int>>();
             if (times.size() < 2)
             {
               vtkErrorMacro("File entry \"" << fileMeta->dump() << "\" has a bad time range.");
@@ -752,7 +752,7 @@ int vtkParFlowMetaReader::FindPFBFiles(std::vector<std::string>& filesToLoad,
           else if (timesBetween != fileMeta->end())
           {
             int ts1 = timestep + 1;
-            auto times = timesBetween->get<std::vector<int> >();
+            auto times = timesBetween->get<std::vector<int>>();
             if (times.size() != 3)
             {
               vtkErrorMacro("File entry \"" << fileMeta->dump() << "\" has a bad times-between.");
@@ -1054,7 +1054,7 @@ int vtkParFlowMetaReader::LoadPFBComponent(Domain dom, vtkDoubleArray* variable,
   if (nn[0] != (this->IJKDivs[dom][0].back() - this->IJKDivs[dom][0].front()) ||
     nn[1] != (this->IJKDivs[dom][1].back() - this->IJKDivs[dom][1].front()) ||
     (dom == Domain::Subsurface &&
-        nn[2] != (this->IJKDivs[dom][2].back() - this->IJKDivs[dom][2].front())))
+      nn[2] != (this->IJKDivs[dom][2].back() - this->IJKDivs[dom][2].front())))
   {
     vtkErrorMacro("File for \"" << variable->GetName() << "\"(" << component
                                 << ") has a different size " << nn << " than expected. Skipping.");

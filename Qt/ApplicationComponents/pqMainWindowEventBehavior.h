@@ -41,9 +41,9 @@ class QDropEvent;
 class QShowEvent;
 
 /**
-* @ingroup Reactions
-* Reaction to when things are dragged into the main window.
-*/
+ * @ingroup Reactions
+ * Reaction to when things are dragged into the main window.
+ */
 class PQAPPLICATIONCOMPONENTS_EXPORT pqMainWindowEventBehavior : public QObject
 {
   Q_OBJECT
@@ -55,23 +55,23 @@ public:
 
 public Q_SLOTS:
   /**
-  * Triggered when a close event occurs on the main window.
-  */
+   * Triggered when a close event occurs on the main window.
+   */
   void onClose(QCloseEvent*);
 
   /**
-  * Triggered when a show event occurs on the main window.
-  */
+   * Triggered when a show event occurs on the main window.
+   */
   void onShow(QShowEvent*);
 
   /**
-  * Triggered when a drag enter event occurs on the main window.
-  */
+   * Triggered when a drag enter event occurs on the main window.
+   */
   void onDragEnter(QDragEnterEvent*);
 
   /**
-  * Triggered when a drop event occurs on the main window.
-  */
+   * Triggered when a drop event occurs on the main window.
+   */
   void onDrop(QDropEvent*);
 
 private:

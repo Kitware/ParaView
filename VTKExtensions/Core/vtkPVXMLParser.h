@@ -17,7 +17,7 @@
  *
  * This is a subclass of vtkXMLParser that constructs a representation
  * of parsed XML using vtkPVXMLElement.
-*/
+ */
 
 #ifndef vtkPVXMLParser_h
 #define vtkPVXMLParser_h

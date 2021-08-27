@@ -32,7 +32,7 @@
  *
  * @sa
  * vtkPVAnimationCue vtkPVCueManipulator
-*/
+ */
 
 #ifndef vtkPVKeyFrameCueManipulator_h
 #define vtkPVKeyFrameCueManipulator_h

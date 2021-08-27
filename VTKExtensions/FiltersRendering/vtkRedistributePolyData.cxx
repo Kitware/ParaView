@@ -309,10 +309,10 @@ int vtkRedistributePolyData::RequestData(vtkInformation* vtkNotUsed(request),
 
   } // end of list of processors to send to
 
-// ssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss
-// aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+  // ssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss
+  // aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
 
-// ... allocate memory before receiving data ...
+  // ... allocate memory before receiving data ...
 
 #if (VTK_REDIST_DO_TIMING == 1)
   timerInfo8.timer->StopTimer();

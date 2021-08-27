@@ -22,7 +22,7 @@
  * are no cells or points in that partition.
  * This filter can also handle vtkTable by letting them pass through it
  * without modification.
-*/
+ */
 
 #ifndef vtkCompleteArrays_h
 #define vtkCompleteArrays_h

@@ -74,7 +74,7 @@ bool vtkSMEnsembleDataReaderProxy::FetchFileNames()
   assert(spm);
 
   // Stream reader proxies to VTK object
-  std::vector<vtkSmartPointer<vtkSMProxy> > proxies;
+  std::vector<vtkSmartPointer<vtkSMProxy>> proxies;
   vtkClientServerStream stream;
   stream << vtkClientServerStream::Invoke << VTKOBJECT(this) << "ResetReaders"
          << vtkClientServerStream::End;

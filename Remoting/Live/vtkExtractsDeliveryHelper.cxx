@@ -174,7 +174,7 @@ bool vtkExtractsDeliveryHelper::Update()
     int M = this->NumberOfSimulationProcesses;
     int N = this->NumberOfVisualizationProcesses;
 
-    std::map<std::string, vtkSmartPointer<vtkDataObject> > gathered_extracts;
+    std::map<std::string, vtkSmartPointer<vtkDataObject>> gathered_extracts;
     if (M > N)
     {
       // when simulation processes in greater than vis processes, the simulation
@@ -220,7 +220,7 @@ bool vtkExtractsDeliveryHelper::Update()
     vtkSocketController* comm = this->Simulation2VisualizationController;
     if (comm)
     {
-      std::vector<vtkSmartPointer<vtkCompositeDataSet> > compositeDSToShare;
+      std::vector<vtkSmartPointer<vtkCompositeDataSet>> compositeDSToShare;
       vtkMultiProcessStream data_types_stream;
       while (true)
       {
@@ -269,7 +269,7 @@ bool vtkExtractsDeliveryHelper::Update()
       this->ParallelController->Broadcast(data_types_stream, 0);
 
       // Send the empty data object that need to share its structure
-      std::vector<vtkSmartPointer<vtkCompositeDataSet> >::iterator dsIter;
+      std::vector<vtkSmartPointer<vtkCompositeDataSet>>::iterator dsIter;
       for (dsIter = compositeDSToShare.begin(); dsIter != compositeDSToShare.end(); dsIter++)
       {
         this->ParallelController->Broadcast(dsIter->GetPointer(), 0);

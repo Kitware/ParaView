@@ -25,7 +25,7 @@
  *
  * @par Thanks:
  * This class was contributed by SciberQuest Inc.
-*/
+ */
 
 #ifndef vtkSMCameraConfigurationWriter_h
 #define vtkSMCameraConfigurationWriter_h

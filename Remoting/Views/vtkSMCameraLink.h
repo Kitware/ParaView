@@ -21,7 +21,7 @@
  * property (if any) on camera B is also modified to be the same as the property
  * on the camera A. Similarly whenever camera A->UpdateVTKObjects() is called,
  * B->UpdateVTKObjects() is also fired.
-*/
+ */
 
 #ifndef vtkSMCameraLink_h
 #define vtkSMCameraLink_h

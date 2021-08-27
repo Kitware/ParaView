@@ -63,8 +63,9 @@ namespace
  */
 bool isBlockSelection(vtkSMSourceProxy* source)
 {
-  return (source && (strcmp(source->GetXMLName(), "BlockSelectorsSelectionSource") == 0 ||
-                      strcmp(source->GetXMLName(), "BlockSelectionSource") == 0));
+  return (source &&
+    (strcmp(source->GetXMLName(), "BlockSelectorsSelectionSource") == 0 ||
+      strcmp(source->GetXMLName(), "BlockSelectionSource") == 0));
 }
 
 std::pair<QList<unsigned int>, QStringList> getSelectedBlocks(
@@ -234,8 +235,9 @@ void pqPipelineContextMenuBehavior::buildMenu(
     });
   for (auto mbldr : interfaces)
   {
-    if (mbldr && (mbldr->contextMenu(this->Menu, view, this->Position, repr, legacyPickedBlocks) ||
-                   mbldr->contextMenu(this->Menu, view, this->Position, repr, pickedSelectors)))
+    if (mbldr &&
+      (mbldr->contextMenu(this->Menu, view, this->Position, repr, legacyPickedBlocks) ||
+        mbldr->contextMenu(this->Menu, view, this->Position, repr, pickedSelectors)))
     {
       break;
     }

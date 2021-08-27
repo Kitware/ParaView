@@ -21,7 +21,7 @@
  * properties on the representations for any source. This makes is possible to
  * set up an animation cue that will affect properties on all representations
  * for a source without directly referring to the representation proxies.
-*/
+ */
 
 #ifndef vtkPVRepresentationAnimationHelper_h
 #define vtkPVRepresentationAnimationHelper_h

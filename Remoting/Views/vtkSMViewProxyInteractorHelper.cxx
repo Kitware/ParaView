@@ -133,7 +133,7 @@ void vtkSMViewProxyInteractorHelper::Execute(vtkObject* caller, unsigned long ev
       // interactively and we wait some time (stored in the
       // WindowResizeNonInteractiveRenderDelay property) until a still render.
       double delay = vtkSMPropertyHelper(
-                       this->ViewProxy, "WindowResizeNonInteractiveRenderDelay", /*quiet*/ true)
+        this->ViewProxy, "WindowResizeNonInteractiveRenderDelay", /*quiet*/ true)
                        .GetAsDouble();
       if (delay > 0.0)
       {

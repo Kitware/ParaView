@@ -54,10 +54,10 @@ class vtkSMAnimationScene::vtkInternals
   vtkNew<vtkSMTransferFunctionManager> TransferFunctionManager;
 
 public:
-  typedef std::vector<vtkSmartPointer<vtkAnimationCue> > VectorOfAnimationCues;
+  typedef std::vector<vtkSmartPointer<vtkAnimationCue>> VectorOfAnimationCues;
   VectorOfAnimationCues AnimationCues;
 
-  typedef std::vector<vtkSmartPointer<vtkSMViewProxy> > VectorOfViews;
+  typedef std::vector<vtkSmartPointer<vtkSMViewProxy>> VectorOfViews;
   VectorOfViews ViewModules;
 
   void UpdateAllViews()
@@ -220,7 +220,7 @@ protected:
 #if VTK_MODULE_ENABLE_VTK_PythonInterpreter
       || (vtkPythonAnimationCue::SafeDownCast(cue) != nullptr)
 #endif
-        );
+    );
   }
 
 public:
@@ -491,8 +491,9 @@ void vtkSMAnimationScene::TickInternal(double currenttime, double deltatime, dou
 
   this->Internals->UpdateAllViews();
 
-  std::for_each(cues.begin(), cues.end(), vtkTickOnCameraCue(this->StartTime, this->EndTime,
-                                            currenttime, deltatime, clocktime, this->TimeKeeper));
+  std::for_each(cues.begin(), cues.end(),
+    vtkTickOnCameraCue(
+      this->StartTime, this->EndTime, currenttime, deltatime, clocktime, this->TimeKeeper));
 
   this->Superclass::TickInternal(currenttime, deltatime, clocktime);
 

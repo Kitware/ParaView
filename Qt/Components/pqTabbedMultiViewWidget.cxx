@@ -202,7 +202,7 @@ class pqTabbedMultiViewWidget::pqInternals
   bool DecorationsVisibility = true;
 
   // keeps tracks of pqMultiViewWidget instances.
-  QMap<pqServer*, QList<QPointer<pqMultiViewWidget> > > TabWidgets;
+  QMap<pqServer*, QList<QPointer<pqMultiViewWidget>>> TabWidgets;
 
   QString FilterAnnotationKey;
   bool FilterAnnotationMatching = true;
@@ -342,9 +342,9 @@ public:
     this->TabWidgets.remove(server);
   }
 
-  QList<QPointer<pqMultiViewWidget> > widgets() const
+  QList<QPointer<pqMultiViewWidget>> widgets() const
   {
-    QList<QPointer<pqMultiViewWidget> > wgs;
+    QList<QPointer<pqMultiViewWidget>> wgs;
     for (auto& list : this->TabWidgets)
     {
       wgs += list;
@@ -755,7 +755,7 @@ QSize pqTabbedMultiViewWidget::clientSize() const
 //-----------------------------------------------------------------------------
 void pqTabbedMultiViewWidget::lockViewSize(const QSize& viewSize)
 {
-  QList<QPointer<pqMultiViewWidget> > widgets = this->Internals->widgets();
+  QList<QPointer<pqMultiViewWidget>> widgets = this->Internals->widgets();
   foreach (QPointer<pqMultiViewWidget> widget, widgets)
   {
     if (widget)

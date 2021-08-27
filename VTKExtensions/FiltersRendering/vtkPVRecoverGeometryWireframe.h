@@ -37,7 +37,7 @@
  * @sa
  * vtkPVGeometryFilter
  *
-*/
+ */
 
 #ifndef vtkPVRecoverGeometryWireframe_h
 #define vtkPVRecoverGeometryWireframe_h

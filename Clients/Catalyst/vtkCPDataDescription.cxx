@@ -32,7 +32,7 @@
 class vtkCPDataDescription::vtkInternals
 {
 public:
-  typedef std::map<std::string, vtkSmartPointer<vtkCPInputDataDescription> > GridDescriptionMapType;
+  typedef std::map<std::string, vtkSmartPointer<vtkCPInputDataDescription>> GridDescriptionMapType;
   GridDescriptionMapType GridDescriptionMap;
 };
 

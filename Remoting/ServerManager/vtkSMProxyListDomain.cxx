@@ -119,9 +119,10 @@ public:
         vtkSMProxy* src_subproxy = parent->GetSubProxy(name);
         if (!src_subproxy)
         {
-          vtkErrorWithObjectMacro(parent, "Subproxy "
-              << name << " must be defined before "
-                         "its properties can be shared with another subproxy.");
+          vtkErrorWithObjectMacro(parent,
+            "Subproxy " << name
+                        << " must be defined before "
+                           "its properties can be shared with another subproxy.");
           continue;
         }
         vtkNew<vtkSMProxyLink> sharingLink;

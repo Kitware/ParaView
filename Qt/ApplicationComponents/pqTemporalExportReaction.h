@@ -36,12 +36,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqReaction.h"
 
 /**
-* @ingroup Reactions
-* Reaction to export a script that will produce configured temporal data
-* products simultaneously. Each group of nodes in the MPI job will process a
-* different subset of the temporal domain. Within a group the nodes split
-* the data spatially as usual.
-*/
+ * @ingroup Reactions
+ * Reaction to export a script that will produce configured temporal data
+ * products simultaneously. Each group of nodes in the MPI job will process a
+ * different subset of the temporal domain. Within a group the nodes split
+ * the data spatially as usual.
+ */
 
 class PQAPPLICATIONCOMPONENTS_EXPORT pqTemporalExportReaction : public pqReaction
 {
@@ -54,8 +54,8 @@ public:
 
 protected Q_SLOTS:
   /**
-  * Called when the action is triggered.
-  */
+   * Called when the action is triggered.
+   */
   virtual void onTriggered();
 
 private:

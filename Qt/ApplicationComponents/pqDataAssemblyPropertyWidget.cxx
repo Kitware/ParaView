@@ -217,7 +217,7 @@ public:
     return this->Superclass::flags(indx) | Qt::ItemIsEditable;
   }
 
-  void setData(const QList<QPair<QString, QVariant> >& values)
+  void setData(const QList<QPair<QString, QVariant>>& values)
   {
     if (this->Values != values)
     {
@@ -230,7 +230,7 @@ public:
   void setData(const QStringList& selectors)
   {
     Q_ASSERT(this->Mode == SELECTORS);
-    QList<QPair<QString, QVariant> > values;
+    QList<QPair<QString, QVariant>> values;
     for (const auto& value : selectors)
     {
       values.push_back(qMakePair(value, QVariant()));
@@ -248,7 +248,7 @@ public:
     return val;
   }
 
-  const QList<QPair<QString, QVariant> >& values() const { return this->Values; }
+  const QList<QPair<QString, QVariant>>& values() const { return this->Values; }
 
   QVariant headerData(int section, Qt::Orientation orientation, int role) const override
   {
@@ -412,7 +412,7 @@ private:
   Q_DISABLE_COPY(TableModel);
   ModeT Mode;
   int PixmapSize;
-  QList<QPair<QString, QVariant> > Values;
+  QList<QPair<QString, QVariant>> Values;
 };
 
 //=================================================================================
@@ -648,7 +648,7 @@ void hookupTableView(QTableView* view, TableModel* model, QAbstractButton* addBu
 
   // hookup remove all
   QObject::connect(removeAllButton, &QAbstractButton::clicked,
-    [=](bool) { model->setData(QList<QPair<QString, QVariant> >{}); });
+    [=](bool) { model->setData(QList<QPair<QString, QVariant>>{}); });
 }
 
 //=================================================================================
@@ -801,7 +801,7 @@ void hookupActiveSelection(
 
 //=================================================================================
 template <typename T1>
-QList<QVariant> colorsToVariantList(const QList<QPair<T1, QVariant> >& colors)
+QList<QVariant> colorsToVariantList(const QList<QPair<T1, QVariant>>& colors)
 {
   QList<QVariant> result;
   for (const auto& pair : colors)
@@ -820,7 +820,7 @@ QList<QVariant> colorsToVariantList(const QList<QPair<T1, QVariant> >& colors)
 
 //=================================================================================
 template <typename T1>
-QList<QVariant> opacitiesToVariantList(const QList<QPair<T1, QVariant> >& opacities)
+QList<QVariant> opacitiesToVariantList(const QList<QPair<T1, QVariant>>& opacities)
 {
   QList<QVariant> result;
   for (const auto& pair : opacities)
@@ -1279,7 +1279,7 @@ void pqDataAssemblyPropertyWidget::assemblyTreeModified(int role)
     if (assembly != nullptr && internals.InCompositeIndicesMode)
     {
       // convert selector:colors map to composite-index:color map.
-      QList<QPair<unsigned int, QVariant> > idColors;
+      QList<QPair<unsigned int, QVariant>> idColors;
       for (const auto& pair : colors)
       {
         auto ids =
@@ -1301,7 +1301,7 @@ void pqDataAssemblyPropertyWidget::assemblyTreeModified(int role)
     if (assembly != nullptr && internals.InCompositeIndicesMode)
     {
       // convert selector:opacities map to composite-index:opacities map.
-      QList<QPair<unsigned int, QVariant> > idOpacities;
+      QList<QPair<unsigned int, QVariant>> idOpacities;
       for (const auto& pair : opacities)
       {
         auto ids =
@@ -1507,7 +1507,7 @@ void pqDataAssemblyPropertyWidget::setSelectorColors(const QList<QVariant>& valu
   auto& internals = (*this->Internals);
   internals.Colors = values;
 
-  QList<QPair<QString, QVariant> > colors;
+  QList<QPair<QString, QVariant>> colors;
   for (int cc = 0, max = values.size(); (cc + 3) < max; cc += 4)
   {
     const auto color = QColor::fromRgbF(
@@ -1556,7 +1556,7 @@ void pqDataAssemblyPropertyWidget::setSelectorOpacities(const QList<QVariant>& v
   auto& internals = (*this->Internals);
   internals.Opacities = values;
 
-  QList<QPair<QString, QVariant> > opacities;
+  QList<QPair<QString, QVariant>> opacities;
   for (int cc = 0, max = values.size(); (cc + 1) < max; cc += 2)
   {
     opacities.push_back(qMakePair(values[cc].toString(), values[cc + 1].toDouble()));

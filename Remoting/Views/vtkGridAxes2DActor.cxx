@@ -47,7 +47,7 @@ inline bool IsInViewport(vtkViewport* viewport, const vtkVector2<T>& point)
 class vtkGridAxes2DActor::vtkLabels
 {
 public:
-  typedef std::vector<vtkSmartPointer<vtkBillboardTextActor3D> > TickLabelsType;
+  typedef std::vector<vtkSmartPointer<vtkBillboardTextActor3D>> TickLabelsType;
   TickLabelsType TickLabels[4];
   vtkNew<vtkBillboardTextActor3D> TitleLabels[4];
   vtkVector2i Justifications[4];

@@ -27,7 +27,7 @@ vtkCxxSetObjectMacro(vtkCPMultiBlockGridBuilder, Grid, vtkMultiBlockDataSet);
 
 struct vtkCPMultiBlockGridBuilderInternals
 {
-  typedef std::vector<vtkSmartPointer<vtkCPGridBuilder> > GridBuilderContainer;
+  typedef std::vector<vtkSmartPointer<vtkCPGridBuilder>> GridBuilderContainer;
   typedef GridBuilderContainer::iterator GridBuilderIterator;
   GridBuilderContainer GridBuilders;
 };

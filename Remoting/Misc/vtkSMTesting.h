@@ -20,7 +20,7 @@
  * This is also required for python testing, since when SM is python wrapped,
  * VTK need not by python wrapped, hence we cannot use vtkTesting in python
  * testing.
-*/
+ */
 
 #ifndef vtkSMTesting_h
 #define vtkSMTesting_h

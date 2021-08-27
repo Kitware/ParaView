@@ -18,7 +18,7 @@
  *
  * vtkPVJoystickFlyIn allows the user to interactively
  * manipulate the camera, the viewpoint of the scene.
-*/
+ */
 
 #ifndef vtkPVJoystickFlyIn_h
 #define vtkPVJoystickFlyIn_h

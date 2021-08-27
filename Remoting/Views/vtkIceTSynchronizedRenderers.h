@@ -25,7 +25,7 @@
  * RenderPass mechanism to intercept render calls from a vtkRenderer. In other
  * words, if you are using render passes, you should not use this class. Your
  * render passes will  be overridden.
-*/
+ */
 
 #ifndef vtkIceTSynchronizedRenderers_h
 #define vtkIceTSynchronizedRenderers_h

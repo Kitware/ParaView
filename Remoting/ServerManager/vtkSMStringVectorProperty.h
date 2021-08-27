@@ -24,7 +24,7 @@
  * type arguments.
  * @sa
  * vtkSMVectorProperty vtkSMDoubleVectorProperty vtkSMIntVectorProperty
-*/
+ */
 
 #ifndef vtkSMStringVectorProperty_h
 #define vtkSMStringVectorProperty_h

@@ -50,8 +50,8 @@ public:
   ~pqOpacityTableModel() override;
 
   /**
-  * All columns are editable.
-  */
+   * All columns are editable.
+   */
   Qt::ItemFlags flags(const QModelIndex& idx) const override;
 
   bool setData(const QModelIndex& idx, const QVariant& value, int role = Qt::EditRole) override;

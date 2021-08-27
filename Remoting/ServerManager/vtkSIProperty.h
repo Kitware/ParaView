@@ -18,7 +18,7 @@
  * Basic ServerImplementation property used to call a method with no argument
  * on a VTK object. If overridden, we naturally allow to call a method either
  * to set or get a set of values.
-*/
+ */
 
 #ifndef vtkSIProperty_h
 #define vtkSIProperty_h

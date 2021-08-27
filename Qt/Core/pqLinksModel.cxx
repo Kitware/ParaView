@@ -926,7 +926,7 @@ void pqLinksModelObject::refresh()
   this->Internal->InputProxies.clear();
   this->Internal->OutputProxies.clear();
 
-  QList<vtkSMProxy *> tmpInputs, tmpOutputs;
+  QList<vtkSMProxy*> tmpInputs, tmpOutputs;
 
   int numLinks = this->link()->GetNumberOfLinkedObjects();
   for (int i = 0; i < numLinks; i++)

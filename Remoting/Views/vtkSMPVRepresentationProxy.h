@@ -28,7 +28,7 @@
  * data-representations (i.e. representations showing input data) in the render
  * views. It provides helper functions for controlling transfer functions,
  * scalar coloring, etc.
-*/
+ */
 
 #ifndef vtkSMPVRepresentationProxy_h
 #define vtkSMPVRepresentationProxy_h

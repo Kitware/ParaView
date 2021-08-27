@@ -71,7 +71,7 @@ public:
 
 struct vtkSMNewWidgetRepresentationInternals
 {
-  typedef std::list<vtkSmartPointer<vtkSMLink> > LinksType;
+  typedef std::list<vtkSmartPointer<vtkSMLink>> LinksType;
   LinksType Links;
   vtkWeakPointer<vtkSMRenderViewProxy> ViewProxy;
 

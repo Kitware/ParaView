@@ -19,7 +19,7 @@
  *
  * vtkPVComparativeView is the view used to generate/view comparative
  * visualizations/film-strips. This is not a proxy
-*/
+ */
 
 #ifndef vtkPVComparativeView_h
 #define vtkPVComparativeView_h

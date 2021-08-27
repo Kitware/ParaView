@@ -29,7 +29,7 @@
  * using the "Writer" property. Now, when you call UpdatePipeline,
  * the vtkRemoteWriterHelper will transfer data if needed and then invoke the
  * writer's Write method on the target process.
-*/
+ */
 
 #ifndef vtkRemoteWriterHelper_h
 #define vtkRemoteWriterHelper_h

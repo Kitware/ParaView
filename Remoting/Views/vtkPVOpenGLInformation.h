@@ -17,7 +17,7 @@
  * @brief   Gets OpenGL information.
  *
  * Get details of OpenGL from the render server.
-*/
+ */
 
 #ifndef vtkPVOpenGLInformation_h
 #define vtkPVOpenGLInformation_h

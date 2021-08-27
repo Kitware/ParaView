@@ -38,7 +38,7 @@
 class vtkSMUndoStack::vtkInternal
 {
 public:
-  typedef std::set<vtkSmartPointer<vtkSMSession> > SessionSetType;
+  typedef std::set<vtkSmartPointer<vtkSMSession>> SessionSetType;
   SessionSetType Sessions;
   vtkNew<vtkSMProxyLocator> UndoSetProxyLocator;
   vtkNew<vtkSMDeserializerProtobuf> UndoSetProxyDeserializer;

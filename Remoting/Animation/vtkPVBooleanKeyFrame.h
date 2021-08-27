@@ -16,7 +16,7 @@
  * @class   vtkPVBooleanKeyFrame
  *
  * Empty key frame. Can be used to toggle boolean properties.
-*/
+ */
 
 #ifndef vtkPVBooleanKeyFrame_h
 #define vtkPVBooleanKeyFrame_h

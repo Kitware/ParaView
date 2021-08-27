@@ -29,7 +29,7 @@
 int main(int argc, char* argv[])
 {
   MPI_Init(&argc, &argv);
-  Grid grid = (Grid){.NumberOfPoints = 0, .Points = 0, .NumberOfCells = 0, .Cells = 0 };
+  Grid grid = (Grid){ .NumberOfPoints = 0, .Points = 0, .NumberOfCells = 0, .Cells = 0 };
   unsigned int numPoints[3] = { 70, 60, 44 };
   double spacing[3] = { 1, 1.1, 1.3 };
   InitializeGrid(&grid, numPoints, spacing);

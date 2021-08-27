@@ -19,7 +19,7 @@
  * This a proxy for controlling vtkOSPRayMaterialLibraries on various nodes.
  * In particular we use it to ensure that all rendering processes have
  * a consistent set of materials.
-*/
+ */
 
 #ifndef vtkSMMaterialLibraryProxy_h
 #define vtkSMMaterialLibraryProxy_h

@@ -37,12 +37,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QSet>
 
 /**
-* @ingroup Behaviors
-*
-* ParaView plugins can be loaded on the client or server before a connection is made.
-* This class makes sure if a plugin that needs both client and server components
-* is not correctly located we can inform the user.
-*/
+ * @ingroup Behaviors
+ *
+ * ParaView plugins can be loaded on the client or server before a connection is made.
+ * This class makes sure if a plugin that needs both client and server components
+ * is not correctly located we can inform the user.
+ */
 
 class PQAPPLICATIONCOMPONENTS_EXPORT pqVerifyRequiredPluginBehavior : public QObject
 {

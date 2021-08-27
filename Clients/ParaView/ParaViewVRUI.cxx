@@ -327,7 +327,7 @@ void ParaViewVRUI::GetNextPacket()
 // ----------------------------------------------------------------------------
 void ParaViewVRUI::PrintPositionOrientation()
 {
-  std::vector<vtkSmartPointer<vruiTrackerState> >* trackers =
+  std::vector<vtkSmartPointer<vruiTrackerState>>* trackers =
     this->Internals->State->GetTrackerStates();
 
   float pos[3];

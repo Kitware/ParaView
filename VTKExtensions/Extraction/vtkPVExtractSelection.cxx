@@ -42,7 +42,7 @@
 #include <vector>
 
 class vtkPVExtractSelection::vtkSelectionNodeVector
-  : public std::vector<vtkSmartPointer<vtkSelectionNode> >
+  : public std::vector<vtkSmartPointer<vtkSelectionNode>>
 {
 };
 

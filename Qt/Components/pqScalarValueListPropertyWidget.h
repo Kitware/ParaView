@@ -41,9 +41,9 @@ class vtkSMDoubleRangeDomain;
 class vtkSMIntRangeDomain;
 
 /**
-* pqScalarValueListPropertyWidget provides a table widget to which users are
-* add values e.g. for IsoValues for the Contour filter.
-*/
+ * pqScalarValueListPropertyWidget provides a table widget to which users are
+ * add values e.g. for IsoValues for the Contour filter.
+ */
 class PQCOMPONENTS_EXPORT pqScalarValueListPropertyWidget : public pqPropertyWidget
 {
   Q_OBJECT
@@ -59,8 +59,8 @@ public:
   QVariantList scalars() const;
 
   /**
-  * Sets range domain that will be used to initialize the scalar range.
-  */
+   * Sets range domain that will be used to initialize the scalar range.
+   */
   void setRangeDomain(vtkSMDoubleRangeDomain* smRangeDomain);
   void setRangeDomain(vtkSMIntRangeDomain* smRangeDomain);
 
@@ -74,8 +74,8 @@ private Q_SLOTS:
   void smRangeModified();
 
   /**
-  * slots called when corresponding buttons are clicked.
-  */
+   * slots called when corresponding buttons are clicked.
+   */
   void add();
   void addRange();
   void remove();

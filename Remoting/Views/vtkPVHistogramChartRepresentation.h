@@ -20,7 +20,7 @@
  * vtkPVHistogramChartRepresentation is the vtkPVDataRepresentation subclass for
  * showing an data in the "Histogram View". The representation pipeline extracts
  * histogram from the input dataset and then shows that in the view.
-*/
+ */
 
 #ifndef vtkPVHistogramChartRepresentation_h
 #define vtkPVHistogramChartRepresentation_h

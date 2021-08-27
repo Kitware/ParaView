@@ -311,7 +311,7 @@ public:
     return true;
   }
 
-  typedef std::map<Key, vtkSmartPointer<vtkTrivialProducer> > ExtractsMap;
+  typedef std::map<Key, vtkSmartPointer<vtkTrivialProducer>> ExtractsMap;
   ExtractsMap Extracts;
   std::map<vtkIdType, std::string> LastSentDataInformationMap;
 };

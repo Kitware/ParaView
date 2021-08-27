@@ -57,8 +57,8 @@ struct PQPYTHON_EXPORT pqLinkedObjectPythonTextArea : public pqLinkedObjectQText
    * Copy constructor
    */
   explicit pqLinkedObjectPythonTextArea(const pqLinkedObjectPythonTextArea& other) noexcept
-    : pqLinkedObjectQTextEdit(other),
-      TextArea(other.TextArea)
+    : pqLinkedObjectQTextEdit(other)
+    , TextArea(other.TextArea)
   {
     if (other.isLinked())
     {

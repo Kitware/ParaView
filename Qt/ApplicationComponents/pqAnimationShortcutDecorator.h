@@ -52,8 +52,8 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqAnimationShortcutDecorator : public pqPro
 
 public:
   /**
-  * Constructor that modify the widget if conditions are met.
-  */
+   * Constructor that modify the widget if conditions are met.
+   */
   pqAnimationShortcutDecorator(pqPropertyWidget* parent);
   virtual ~pqAnimationShortcutDecorator();
 

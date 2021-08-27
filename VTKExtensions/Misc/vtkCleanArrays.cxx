@@ -209,7 +209,7 @@ public:
       return;
     }
 
-    std::vector<std::pair<std::string, bool> > partial_flags;
+    std::vector<std::pair<std::string, bool>> partial_flags;
     vtkArraySet myself = (*this);
     int numArrays = dsa->GetNumberOfArrays();
     for (int cc = numArrays - 1; cc >= 0; cc--)

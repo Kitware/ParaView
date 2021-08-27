@@ -54,7 +54,7 @@ struct vtkSMStateLoaderInternals
 
   /// Vector filled up in CreatedNewProxy() to keep order in which the proxies
   /// are created.
-  typedef std::pair<vtkTypeUInt32, vtkWeakPointer<vtkSMProxy> > ProxyCreationOrderItem;
+  typedef std::pair<vtkTypeUInt32, vtkWeakPointer<vtkSMProxy>> ProxyCreationOrderItem;
   typedef std::vector<ProxyCreationOrderItem> ProxyCreationOrderType;
   ProxyCreationOrderType ProxyCreationOrder;
   bool DeferProxyRegistration;
@@ -628,7 +628,7 @@ int vtkSMStateLoader::LoadStateInternal(vtkPVXMLElement* parent)
   // registered. That way, when properties on TimeKeeper or AnimationScene
   // start getting modified, the proxies they may refer to are already
   // present and registered.
-  std::vector<vtkSmartPointer<vtkPVXMLElement> > deferredCollections;
+  std::vector<vtkSmartPointer<vtkPVXMLElement>> deferredCollections;
   this->Internal->DeferProxyRegistration = true;
   for (i = 0; i < numElems; i++)
   {

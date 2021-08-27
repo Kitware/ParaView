@@ -17,7 +17,7 @@
  * @brief   Extract a component of an attribute.
  *
  * vtkPVExtractComponent Extract a component of an attribute.
-*/
+ */
 
 #ifndef vtkPVExtractComponent_h
 #define vtkPVExtractComponent_h

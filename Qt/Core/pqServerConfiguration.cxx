@@ -269,7 +269,7 @@ QString pqServerConfiguration::sshCommand()
             "In Windows 10, ssh is available since Spring 2018 update,"
             "Alternativaly, Putty can be installed to provide a ssh implementation.");
 #else
-    );
+  );
 #endif
   return QString();
 }
@@ -501,10 +501,7 @@ QString pqServerConfiguration::command(double& timeout, double& delay) const
       }
     }
   }
-  else
-  {
-    stream << execCommand;
-  }
+  else { stream << execCommand; }
   return reply;
 }
 

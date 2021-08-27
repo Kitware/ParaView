@@ -26,7 +26,7 @@ int TestDataEncoder(int argc, char* argv[])
     "/Clients/Web/Testing/Data/Baseline/EnSight.png",
     "/Clients/Web/Testing/Data/Baseline/ExtractBlock.png", nullptr };
 
-  std::vector<vtkSmartPointer<vtkImageData> > images;
+  std::vector<vtkSmartPointer<vtkImageData>> images;
   for (int cc = 0; filenames[cc] != nullptr; cc++)
   {
     vtkNew<vtkPNGReader> reader;

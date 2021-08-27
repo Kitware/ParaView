@@ -19,7 +19,7 @@
  * expected to a vtkTable with a single row and column (atleast on the data
  * server nodes). The content of this entry in the table is shown as ProgressBar on the
  * rendering nodes.
-*/
+ */
 
 #ifndef vtkProgressBarSourceRepresentation_h
 #define vtkProgressBarSourceRepresentation_h

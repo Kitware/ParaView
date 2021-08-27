@@ -55,6 +55,4 @@ void pqRepresentationBehaviorStarter::onStartup()
 }
 
 //-----------------------------------------------------------------------------
-void pqRepresentationBehaviorStarter::onShutdown()
-{
-}
+void pqRepresentationBehaviorStarter::onShutdown() {}

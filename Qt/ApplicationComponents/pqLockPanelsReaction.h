@@ -38,11 +38,11 @@ class pqLockPanelsBehavior;
 class QMainWindow;
 
 /**
-* @ingroup Reactions
-* Reaction to toggle locking of dockable panels.
-* Note: For this reaction to have any effect on the dockable panels,
-* a pqLockPanelsBehavior must be instantiated.
-*/
+ * @ingroup Reactions
+ * Reaction to toggle locking of dockable panels.
+ * Note: For this reaction to have any effect on the dockable panels,
+ * a pqLockPanelsBehavior must be instantiated.
+ */
 class PQAPPLICATIONCOMPONENTS_EXPORT pqLockPanelsReaction : public pqReaction
 {
   Q_OBJECT

@@ -149,28 +149,28 @@ void vtkSMNumberOfComponentsDomain::Update(
   if (iadAttributeType == vtkSMInputArrayDomain::CELL ||
     ((iadAttributeType == vtkSMInputArrayDomain::ANY ||
        iadAttributeType == vtkSMInputArrayDomain::ANY_EXCEPT_FIELD) &&
-        !ai))
+      !ai))
   {
     ai = info->GetCellDataInformation()->GetArrayInformation(arrayName);
   }
   if (iadAttributeType == vtkSMInputArrayDomain::VERTEX ||
     ((iadAttributeType == vtkSMInputArrayDomain::ANY ||
        iadAttributeType == vtkSMInputArrayDomain::ANY_EXCEPT_FIELD) &&
-        !ai))
+      !ai))
   {
     ai = info->GetVertexDataInformation()->GetArrayInformation(arrayName);
   }
   if (iadAttributeType == vtkSMInputArrayDomain::EDGE ||
     ((iadAttributeType == vtkSMInputArrayDomain::ANY ||
        iadAttributeType == vtkSMInputArrayDomain::ANY_EXCEPT_FIELD) &&
-        !ai))
+      !ai))
   {
     ai = info->GetEdgeDataInformation()->GetArrayInformation(arrayName);
   }
   if (iadAttributeType == vtkSMInputArrayDomain::ROW ||
     ((iadAttributeType == vtkSMInputArrayDomain::ANY ||
        iadAttributeType == vtkSMInputArrayDomain::ANY_EXCEPT_FIELD) &&
-        !ai))
+      !ai))
   {
     ai = info->GetRowDataInformation()->GetArrayInformation(arrayName);
   }

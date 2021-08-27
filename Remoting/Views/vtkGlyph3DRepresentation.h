@@ -19,7 +19,7 @@
  * for rendering glyphs.
  * Note that vtkGlyph3DRepresentation requires that the "glyph" source data is
  * available on all rendering processes.
-*/
+ */
 
 #ifndef vtkGlyph3DRepresentation_h
 #define vtkGlyph3DRepresentation_h

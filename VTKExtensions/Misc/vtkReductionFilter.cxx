@@ -365,8 +365,8 @@ void vtkReductionFilter::Reduce(vtkDataObject* input, vtkDataObject* output)
     }
   }
 
-  std::vector<vtkSmartPointer<vtkDataObject> > data_sets;
-  std::vector<vtkSmartPointer<vtkDataObject> > receiveData(numProcs);
+  std::vector<vtkSmartPointer<vtkDataObject>> data_sets;
+  std::vector<vtkSmartPointer<vtkDataObject>> receiveData(numProcs);
 
   if (vtkSelection* sel = vtkSelection::SafeDownCast(preOutput))
   {
@@ -436,7 +436,7 @@ void vtkReductionFilter::Reduce(vtkDataObject* input, vtkDataObject* output)
 }
 //----------------------------------------------------------------------------
 int vtkReductionFilter::GatherSelection(vtkSelection* sendData,
-  std::vector<vtkSmartPointer<vtkDataObject> >& receiveData, int destProcessId)
+  std::vector<vtkSmartPointer<vtkDataObject>>& receiveData, int destProcessId)
 {
   std::ostringstream sendBufferOstr;
   if (sendData)

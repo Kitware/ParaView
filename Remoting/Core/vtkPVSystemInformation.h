@@ -20,7 +20,7 @@
  * vtkPVProcessMemoryInformation is used to collect miscellaneous information
  * from all processes involved. Implementation uses vtksys::SystemInformation to
  * obtain the relevant information for each of the processes.
-*/
+ */
 
 #ifndef vtkPVSystemInformation_h
 #define vtkPVSystemInformation_h

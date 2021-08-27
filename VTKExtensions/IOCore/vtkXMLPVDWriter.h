@@ -18,7 +18,7 @@
  *
  * vtkXMLPVDWriter is used to save all parts of a current
  * source to a file with pieces spread across other server processes.
-*/
+ */
 
 #ifndef vtkXMLPVDWriter_h
 #define vtkXMLPVDWriter_h

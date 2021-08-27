@@ -24,7 +24,7 @@
  * manager to refer to a group of proxies.
  * @endverbatim// .SECTION See Also
  * vtkSMDomain vtkSMProxyproperty
-*/
+ */
 
 #ifndef vtkSMProxyGroupDomain_h
 #define vtkSMProxyGroupDomain_h

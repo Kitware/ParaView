@@ -17,7 +17,7 @@
  * @brief   collection of utilities.
  *
  * vtkSMCoreUtilities provides miscellaneous utility functions.
-*/
+ */
 
 #ifndef vtkSMCoreUtilities_h
 #define vtkSMCoreUtilities_h

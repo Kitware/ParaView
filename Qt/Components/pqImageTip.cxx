@@ -116,8 +116,9 @@ bool pqImageTip::eventFilter(QObject*, QEvent* e)
       int key = static_cast<QKeyEvent*>(e)->key();
       Qt::KeyboardModifiers mody = static_cast<QKeyEvent*>(e)->modifiers();
 
-      if ((mody & Qt::KeyboardModifierMask) || (key == Qt::Key_Shift || key == Qt::Key_Control ||
-                                                 key == Qt::Key_Alt || key == Qt::Key_Meta))
+      if ((mody & Qt::KeyboardModifierMask) ||
+        (key == Qt::Key_Shift || key == Qt::Key_Control || key == Qt::Key_Alt ||
+          key == Qt::Key_Meta))
       {
         break;
       }

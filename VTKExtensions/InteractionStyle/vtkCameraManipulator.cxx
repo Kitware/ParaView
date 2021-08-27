@@ -45,39 +45,25 @@ vtkCameraManipulator::~vtkCameraManipulator()
 }
 
 //-------------------------------------------------------------------------
-void vtkCameraManipulator::StartInteraction()
-{
-}
+void vtkCameraManipulator::StartInteraction() {}
 
 //-------------------------------------------------------------------------
-void vtkCameraManipulator::EndInteraction()
-{
-}
+void vtkCameraManipulator::EndInteraction() {}
 
 //-------------------------------------------------------------------------
-void vtkCameraManipulator::OnButtonDown(int, int, vtkRenderer*, vtkRenderWindowInteractor*)
-{
-}
+void vtkCameraManipulator::OnButtonDown(int, int, vtkRenderer*, vtkRenderWindowInteractor*) {}
 
 //-------------------------------------------------------------------------
-void vtkCameraManipulator::OnButtonUp(int, int, vtkRenderer*, vtkRenderWindowInteractor*)
-{
-}
+void vtkCameraManipulator::OnButtonUp(int, int, vtkRenderer*, vtkRenderWindowInteractor*) {}
 
 //-------------------------------------------------------------------------
-void vtkCameraManipulator::OnMouseMove(int, int, vtkRenderer*, vtkRenderWindowInteractor*)
-{
-}
+void vtkCameraManipulator::OnMouseMove(int, int, vtkRenderer*, vtkRenderWindowInteractor*) {}
 
 //-------------------------------------------------------------------------
-void vtkCameraManipulator::OnKeyUp(vtkRenderWindowInteractor*)
-{
-}
+void vtkCameraManipulator::OnKeyUp(vtkRenderWindowInteractor*) {}
 
 //-------------------------------------------------------------------------
-void vtkCameraManipulator::OnKeyDown(vtkRenderWindowInteractor*)
-{
-}
+void vtkCameraManipulator::OnKeyDown(vtkRenderWindowInteractor*) {}
 
 //-------------------------------------------------------------------------
 void vtkCameraManipulator::ComputeDisplayCenter(vtkRenderer* ren)

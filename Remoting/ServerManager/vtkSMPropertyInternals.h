@@ -26,10 +26,10 @@
 
 struct vtkSMPropertyInternals
 {
-  typedef std::map<std::string, vtkSmartPointer<vtkSMDomain> > DomainMap;
+  typedef std::map<std::string, vtkSmartPointer<vtkSMDomain>> DomainMap;
   DomainMap Domains;
 
-  typedef std::vector<vtkSmartPointer<vtkSMDomain> > DependentsVector;
+  typedef std::vector<vtkSmartPointer<vtkSMDomain>> DependentsVector;
   DependentsVector Dependents;
 
   // Only one source allowed for links

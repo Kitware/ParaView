@@ -62,7 +62,7 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * @class   vtkACosmoReader
  * @brief   Adaptively read a binary cosmology data file
  *
-*/
+ */
 
 #ifndef vtkACosmoReader_h
 #define vtkACosmoReader_h

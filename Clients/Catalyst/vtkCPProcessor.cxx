@@ -49,11 +49,11 @@
 
 struct vtkCPProcessorInternals
 {
-  typedef std::list<vtkSmartPointer<vtkCPPipeline> > PipelineList;
+  typedef std::list<vtkSmartPointer<vtkCPPipeline>> PipelineList;
   typedef PipelineList::iterator PipelineListIterator;
   PipelineList Pipelines;
 
-  typedef std::map<std::string, vtkSmartPointer<vtkSMSourceProxy> > CacheList;
+  typedef std::map<std::string, vtkSmartPointer<vtkSMSourceProxy>> CacheList;
   typedef CacheList::iterator CacheListIterator;
   CacheList TemporalCaches;
 };

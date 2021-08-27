@@ -35,21 +35,21 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqInteractivePropertyWidget.h"
 
 /**
-* pqLightPropertyWidget is a custom property widget that uses
-* "LightWidgetRepresentation" to help users interactively set a light properties in
-* space. To use this widget for a property group
-* (vtkSMPropertyGroup), use "InteractiveLight" as the "panel_widget" in the
-* XML configuration for the proxy. The property group should have properties for
-* following functions:
-* \li \c Positional: a 1-tuple vtkSMIntVectorProperty with a vtkSMEnumerationDomain
-* that will be use to show the positional cone or not.
-* \li \c WorldPosition: a 3-tuple vtkSMDoubleVectorProperty that will be linked to the
-* origin of the interactive light.
-* \li \c FocalPoint: a 3-tuple vtkSMDoubleVectorProperty that will be linked to the
-* the focal point of the interactive light.
-* \li \c FocalPoint: a 1-tuple vtkSMDoubleVectorProperty with a vtkSMDoubleRangeDomain
-* that will be linked to the cone angle of the interactive light.
-*/
+ * pqLightPropertyWidget is a custom property widget that uses
+ * "LightWidgetRepresentation" to help users interactively set a light properties in
+ * space. To use this widget for a property group
+ * (vtkSMPropertyGroup), use "InteractiveLight" as the "panel_widget" in the
+ * XML configuration for the proxy. The property group should have properties for
+ * following functions:
+ * \li \c Positional: a 1-tuple vtkSMIntVectorProperty with a vtkSMEnumerationDomain
+ * that will be use to show the positional cone or not.
+ * \li \c WorldPosition: a 3-tuple vtkSMDoubleVectorProperty that will be linked to the
+ * origin of the interactive light.
+ * \li \c FocalPoint: a 3-tuple vtkSMDoubleVectorProperty that will be linked to the
+ * the focal point of the interactive light.
+ * \li \c FocalPoint: a 1-tuple vtkSMDoubleVectorProperty with a vtkSMDoubleRangeDomain
+ * that will be linked to the cone angle of the interactive light.
+ */
 class PQAPPLICATIONCOMPONENTS_EXPORT pqLightPropertyWidget : public pqInteractivePropertyWidget
 {
   Q_OBJECT

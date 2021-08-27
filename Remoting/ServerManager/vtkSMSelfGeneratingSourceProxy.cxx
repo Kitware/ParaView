@@ -30,7 +30,7 @@
 class vtkSMSelfGeneratingSourceProxy::vtkInternals
 {
 public:
-  std::vector<vtkSmartPointer<vtkPVXMLElement> > ExtendedDefinitionXMLs;
+  std::vector<vtkSmartPointer<vtkPVXMLElement>> ExtendedDefinitionXMLs;
 
   // This is fairly simplistic, but then we don't expect this to be called too
   // frequently.

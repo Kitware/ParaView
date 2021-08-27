@@ -28,7 +28,7 @@
  * (what was ORIGINAL_SOURCE_ID()).
  * @sa
  * vtkSelection
-*/
+ */
 
 #ifndef vtkSelectionConverter_h
 #define vtkSelectionConverter_h

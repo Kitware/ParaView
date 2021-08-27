@@ -61,10 +61,10 @@ public:
     this->SubSIProxies.clear();
   }
 
-  typedef std::map<std::string, vtkSmartPointer<vtkSIProperty> > SIPropertiesMapType;
+  typedef std::map<std::string, vtkSmartPointer<vtkSIProperty>> SIPropertiesMapType;
   SIPropertiesMapType SIProperties;
 
-  typedef std::map<std::string, vtkSmartPointer<vtkSIProxy> > SubSIProxiesMapType;
+  typedef std::map<std::string, vtkSmartPointer<vtkSIProxy>> SubSIProxiesMapType;
   SubSIProxiesMapType SubSIProxies;
 
   typedef std::vector<SubProxyInfo> SubProxiesVectorType;
@@ -311,12 +311,12 @@ bool vtkSIProxy::InitializeAndCreateVTKObjects(vtkSMMessage* message)
       : nullptr);
 
   vtkSIProxyDefinitionManager* pdm = this->GetProxyDefinitionManager();
-  vtkPVXMLElement* element = pdm->GetCollapsedProxyDefinition(
-    message->GetExtension(ProxyState::xml_group).c_str(),
-    message->GetExtension(ProxyState::xml_name).c_str(),
-    (message->HasExtension(ProxyState::xml_sub_proxy_name)
-        ? message->GetExtension(ProxyState::xml_sub_proxy_name).c_str()
-        : nullptr));
+  vtkPVXMLElement* element =
+    pdm->GetCollapsedProxyDefinition(message->GetExtension(ProxyState::xml_group).c_str(),
+      message->GetExtension(ProxyState::xml_name).c_str(),
+      (message->HasExtension(ProxyState::xml_sub_proxy_name)
+          ? message->GetExtension(ProxyState::xml_sub_proxy_name).c_str()
+          : nullptr));
 
   if (!element)
   {
@@ -473,9 +473,7 @@ vtkObjectBase* vtkSIProxy::NewVTKObject(const char* className)
 }
 
 //----------------------------------------------------------------------------
-void vtkSIProxy::OnCreateVTKObjects()
-{
-}
+void vtkSIProxy::OnCreateVTKObjects() {}
 
 //----------------------------------------------------------------------------
 void vtkSIProxy::RecreateVTKObjects()

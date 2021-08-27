@@ -421,8 +421,9 @@ int vtkSMProxyProperty::LoadState(vtkPVXMLElement* element, vtkSMProxyLocator* l
   for (unsigned int i = 0; i < numElems; i++)
   {
     vtkPVXMLElement* currentElement = element->GetNestedElement(i);
-    if (currentElement->GetName() && (strcmp(currentElement->GetName(), "Element") == 0 ||
-                                       strcmp(currentElement->GetName(), "Proxy") == 0))
+    if (currentElement->GetName() &&
+      (strcmp(currentElement->GetName(), "Element") == 0 ||
+        strcmp(currentElement->GetName(), "Proxy") == 0))
     {
       int id;
       if (currentElement->GetScalarAttribute("value", &id))

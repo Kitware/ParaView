@@ -20,7 +20,7 @@
  * proxy manager. It can also iterate over groups.
  * @sa
  * vtkSMProxy vtkSMProxyManager
-*/
+ */
 
 #ifndef vtkSMProxyIterator_h
 #define vtkSMProxyIterator_h

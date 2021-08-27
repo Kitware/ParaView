@@ -54,8 +54,8 @@ public:
 
 public Q_SLOTS:
   /**
-  * Slots to highlight (or clear the highlight).
-  */
+   * Slots to highlight (or clear the highlight).
+   */
   void highlight(bool clear = false);
   void clear() { this->highlight(true); }
 

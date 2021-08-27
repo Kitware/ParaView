@@ -26,7 +26,7 @@
  * \li \c Input : (optional) refers to a property that provides the data-producer.
  *                When present will be used to come up with default
  *                representation type using data information.
-*/
+ */
 
 #ifndef vtkSMRepresentationTypeDomain_h
 #define vtkSMRepresentationTypeDomain_h

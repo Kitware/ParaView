@@ -78,9 +78,9 @@ public:
   }
 
   /**
-  * Checks if the index in input has an associated timestep.
-  * If so, the timestep is passed to the input timestep parameter and the function returns true.
-  */
+   * Checks if the index in input has an associated timestep.
+   * If so, the timestep is passed to the input timestep parameter and the function returns true.
+   */
   bool checkTimeStepFromIndex(int index, double& timestep)
   {
     if (!this->DisableModifications && index >= 0 &&

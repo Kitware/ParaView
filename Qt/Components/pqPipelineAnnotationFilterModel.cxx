@@ -57,8 +57,8 @@ bool pqPipelineAnnotationFilterModel::filterAcceptsRow(
              ? sourceModel()->data(sourceIndex, pqPipelineModel::AnnotationFilterRole).toBool()
              : true) &&
     (this->FilterSession
-             ? sourceModel()->data(sourceIndex, pqPipelineModel::SessionFilterRole).toBool()
-             : true);
+        ? sourceModel()->data(sourceIndex, pqPipelineModel::SessionFilterRole).toBool()
+        : true);
 }
 //-----------------------------------------------------------------------------
 

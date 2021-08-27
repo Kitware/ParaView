@@ -40,19 +40,19 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class vtkGraphLayoutStrategy;
 
 /**
-* interface class for plugins that create view modules
-*/
+ * interface class for plugins that create view modules
+ */
 class PQCORE_EXPORT pqGraphLayoutStrategyInterface
 {
 public:
   /**
-  * destructor
-  */
+   * destructor
+   */
   virtual ~pqGraphLayoutStrategyInterface();
 
   /**
-  * Return a list of layout strategies supported by this interface
-  */
+   * Return a list of layout strategies supported by this interface
+   */
   virtual QStringList graphLayoutStrategies() const = 0;
 
   virtual vtkGraphLayoutStrategy* getGraphLayoutStrategy(const QString& layoutStrategy) = 0;

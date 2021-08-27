@@ -23,7 +23,7 @@
  * are discarded. The attribute to reduce can be set to point or cell or field
  * or all. Only selected attributes will be reduced according to the
  * type chosen, all other attributes are those at the first input.
-*/
+ */
 
 #ifndef vtkAttributeDataReductionFilter_h
 #define vtkAttributeDataReductionFilter_h
@@ -81,6 +81,7 @@ public:
   void SetReductionTypeToAdd() { this->SetReductionType(vtkAttributeDataReductionFilter::ADD); }
   void SetReductionTypeToMax() { this->SetReductionType(vtkAttributeDataReductionFilter::MAX); }
   void SetReductionTypeToMin() { this->SetReductionType(vtkAttributeDataReductionFilter::MIN); }
+
 protected:
   vtkAttributeDataReductionFilter();
   ~vtkAttributeDataReductionFilter() override;

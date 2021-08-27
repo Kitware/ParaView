@@ -17,7 +17,7 @@
  * @brief   proxy with stands for nullptr object on the server.
  *
  * vtkSMNullProxy stands for a 0 on the server side.
-*/
+ */
 
 #ifndef vtkSMNullProxy_h
 #define vtkSMNullProxy_h

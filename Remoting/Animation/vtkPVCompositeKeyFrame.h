@@ -22,7 +22,7 @@
  * as internal objects and provides API to choose one of them as the
  * active type. This is helpful in GUIs that allow for switching the
  * type of keyframe on the fly without much effort from the GUI.
-*/
+ */
 
 #ifndef vtkPVCompositeKeyFrame_h
 #define vtkPVCompositeKeyFrame_h

@@ -19,7 +19,7 @@
  *
  * vtkSMDoubleRangeDomain is a type-specific specialization for
  * vtkSMRangeDomainTemplate.
-*/
+ */
 
 #ifndef vtkSMDoubleRangeDomain_h
 #define vtkSMDoubleRangeDomain_h

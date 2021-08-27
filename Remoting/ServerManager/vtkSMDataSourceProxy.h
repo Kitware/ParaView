@@ -22,7 +22,7 @@
  * by the vtkSMDataSourceProxy.
  * @sa
  * vtkSMSourceProxy
-*/
+ */
 
 #ifndef vtkSMDataSourceProxy_h
 #define vtkSMDataSourceProxy_h

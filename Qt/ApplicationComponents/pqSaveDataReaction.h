@@ -38,9 +38,9 @@ class pqPipelineSource;
 class vtkPVDataInformation;
 
 /**
-* @ingroup Reactions
-* Reaction to save data files.
-*/
+ * @ingroup Reactions
+ * Reaction to save data files.
+ */
 class PQAPPLICATIONCOMPONENTS_EXPORT pqSaveDataReaction : public pqReaction
 {
   Q_OBJECT
@@ -48,35 +48,35 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqSaveDataReaction : public pqReaction
 
 public:
   /**
-  * Constructor. Parent cannot be nullptr.
-  */
+   * Constructor. Parent cannot be nullptr.
+   */
   pqSaveDataReaction(QAction* parent);
 
   /**
-  * Save data files from active port. Users the vtkSMWriterFactory to decide
-  * what writes are available. Returns true if the creation is
-  * successful, otherwise returns false.
-  * Note that this method is static. Applications can simply use this without
-  * having to create a reaction instance.
-  */
+   * Save data files from active port. Users the vtkSMWriterFactory to decide
+   * what writes are available. Returns true if the creation is
+   * successful, otherwise returns false.
+   * Note that this method is static. Applications can simply use this without
+   * having to create a reaction instance.
+   */
   static bool saveActiveData(const QString& files);
   static bool saveActiveData();
 
 public Q_SLOTS:
   /**
-  * Updates the enabled state. Applications need not explicitly call
-  * this.
-  */
+   * Updates the enabled state. Applications need not explicitly call
+   * this.
+   */
   void updateEnableState() override;
   /**
-  * Triggered when a source became valid
-  */
+   * Triggered when a source became valid
+   */
   void dataUpdated(pqPipelineSource* source);
 
 protected:
   /**
-  * Called when the action is triggered.
-  */
+   * Called when the action is triggered.
+   */
   void onTriggered() override { pqSaveDataReaction::saveActiveData(); }
 
 private:

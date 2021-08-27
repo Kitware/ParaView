@@ -18,7 +18,7 @@
  * string data.
  *
  * vtkPVTextSource is used to generate a table with a single string.
-*/
+ */
 
 #ifndef vtkPVTextSource_h
 #define vtkPVTextSource_h

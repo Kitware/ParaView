@@ -17,7 +17,7 @@
  * @brief   Gets python features.
  *
  * Get details of python availability on the root server.
-*/
+ */
 
 #ifndef vtkPVPythonInformation_h
 #define vtkPVPythonInformation_h

@@ -47,11 +47,11 @@ class vtkImageData;
 class vtkSMViewLayoutProxy;
 
 /**
-* pqTabbedMultiViewWidget is used to to enable adding of multiple
-* pqMultiViewWidget instances in tabs. This class directly listens to the
-* server-manager to automatically create pqMultiViewWidget instances for every
-* vtkSMViewLayoutProxy registered.
-*/
+ * pqTabbedMultiViewWidget is used to to enable adding of multiple
+ * pqMultiViewWidget instances in tabs. This class directly listens to the
+ * server-manager to automatically create pqMultiViewWidget instances for every
+ * vtkSMViewLayoutProxy registered.
+ */
 class PQCOMPONENTS_EXPORT pqTabbedMultiViewWidget : public QWidget
 {
   Q_OBJECT
@@ -62,27 +62,27 @@ public:
   ~pqTabbedMultiViewWidget() override;
 
   /**
-  * Returns the size for the tabs in the widget.
-  */
+   * Returns the size for the tabs in the widget.
+   */
   virtual QSize clientSize() const;
 
   /**
-  * When set to true (off by default), the widget will not allow
-  * adding/removing tabs trough user interactions.
-  */
+   * When set to true (off by default), the widget will not allow
+   * adding/removing tabs trough user interactions.
+   */
   void setReadOnly(bool val);
   bool readOnly() const;
 
   /**
-  * Set the tab visibility. To save some screen space when only one tab is
-  * needed, this can be set to false. True by default.
-  */
+   * Set the tab visibility. To save some screen space when only one tab is
+   * needed, this can be set to false. True by default.
+   */
   void setTabVisibility(bool visible);
   bool tabVisibility() const;
 
   /**
-  * Return the layout proxy for the current tab.
-  */
+   * Return the layout proxy for the current tab.
+   */
   vtkSMViewLayoutProxy* layoutProxy() const;
 
   /**
@@ -121,8 +121,8 @@ public:
 
 Q_SIGNALS:
   /**
-  * fired when lockViewSize() is called.
-  */
+   * fired when lockViewSize() is called.
+   */
   void viewSizeLocked(bool);
 
 public Q_SLOTS:
@@ -147,24 +147,24 @@ public Q_SLOTS:
   //@}
 
   /**
-  * toggles fullscreen state.
-  */
+   * toggles fullscreen state.
+   */
   virtual void toggleFullScreen();
 
   /**
-  * toggles decoration visibility on the current widget
-  */
+   * toggles decoration visibility on the current widget
+   */
   virtual void toggleWidgetDecoration();
 
   /**
-  * Locks the maximum size for each view-frame to the given size.
-  * Use empty QSize() instance to indicate no limits.
-  */
+   * Locks the maximum size for each view-frame to the given size.
+   * Use empty QSize() instance to indicate no limits.
+   */
   virtual void lockViewSize(const QSize&);
 
   /**
-  * cleans up the layout.
-  */
+   * cleans up the layout.
+   */
   virtual void reset();
 
   /**
@@ -189,27 +189,27 @@ public Q_SLOTS:
 
 protected Q_SLOTS:
   /**
-  * slots connects to corresponding signals on pqServerManagerObserver.
-  */
+   * slots connects to corresponding signals on pqServerManagerObserver.
+   */
   virtual void proxyAdded(pqProxy*);
   virtual void proxyRemoved(pqProxy*);
   virtual void serverRemoved(pqServer*);
 
   /**
-  * called when the active tab changes. If the active tab is the "+" tab, then
-  * add a new tab to the widget.
-  */
+   * called when the active tab changes. If the active tab is the "+" tab, then
+   * add a new tab to the widget.
+   */
   virtual void currentTabChanged(int);
 
   /**
-  * verifies that all views loaded from state are indeed assigned to some view
-  * layout, or we just assign them to one.
-  */
+   * verifies that all views loaded from state are indeed assigned to some view
+   * layout, or we just assign them to one.
+   */
   virtual void onStateLoaded();
 
   /**
-  * called when context menu need to be created on the tab title.
-  */
+   * called when context menu need to be created on the tab title.
+   */
   void contextMenuRequested(const QPoint&);
 
   void onLayoutNameChanged(pqServerManagerModelItem*);
@@ -218,8 +218,8 @@ protected:
   bool eventFilter(QObject* obj, QEvent* event) override;
 
   /**
-  * Internal class used as the TabWidget.
-  */
+   * Internal class used as the TabWidget.
+   */
   class pqTabWidget : public QTabWidget
   {
     typedef QTabWidget Superclass;
@@ -229,39 +229,39 @@ protected:
     ~pqTabWidget() override;
 
     /**
-    * Set a button to use on the tab bar.
-    */
+     * Set a button to use on the tab bar.
+     */
     virtual void setTabButton(int index, QTabBar::ButtonPosition position, QWidget* wdg);
 
     /**
-    * Given the QWidget pointer that points to the buttons (popout or close)
-    * in the tabbar, this returns the index of that that the button corresponds
-    * to.
-    */
+     * Given the QWidget pointer that points to the buttons (popout or close)
+     * in the tabbar, this returns the index of that that the button corresponds
+     * to.
+     */
     virtual int tabButtonIndex(QWidget* wdg, QTabBar::ButtonPosition position) const;
 
     /**
-    * Add a pqTabbedMultiViewWidget instance as a new tab. This will setup the
-    * appropriate tab-bar for this new tab (with 2 buttons for popout and
-    * close).
-    */
+     * Add a pqTabbedMultiViewWidget instance as a new tab. This will setup the
+     * appropriate tab-bar for this new tab (with 2 buttons for popout and
+     * close).
+     */
     virtual int addAsTab(pqMultiViewWidget* wdg, pqTabbedMultiViewWidget* self);
 
     /**
-    * Returns the label/tooltip to use for the popout button given the
-    * popped_out state.
-    */
+     * Returns the label/tooltip to use for the popout button given the
+     * popped_out state.
+     */
     static const char* popoutLabelText(bool popped_out);
 
     /**
-    * Returns the icon to use for the popout button given the popped_out state.
-    */
+     * Returns the icon to use for the popout button given the popped_out state.
+     */
     static QStyle::StandardPixmap popoutLabelPixmap(bool popped_out);
 
     /**
-    * When true the widget disable changes to the tabs i.e adding/removing tabs
-    * by user interaction.
-    */
+     * When true the widget disable changes to the tabs i.e adding/removing tabs
+     * by user interaction.
+     */
     void setReadOnly(bool val);
     bool readOnly() const { return this->ReadOnly; }
 

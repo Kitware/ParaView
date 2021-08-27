@@ -36,9 +36,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqWidgetsModule.h" // needed for EXPORT macro.
 
 /**
-* pqColorDialogEventPlayer is the player for QColorDialog. Events are recorded
-* using pqColorDialogEventTranslator.
-*/
+ * pqColorDialogEventPlayer is the player for QColorDialog. Events are recorded
+ * using pqColorDialogEventTranslator.
+ */
 class PQWIDGETS_EXPORT pqColorDialogEventPlayer : public pqWidgetEventPlayer
 {
   Q_OBJECT

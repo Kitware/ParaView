@@ -205,7 +205,7 @@ public:
 protected:
   void setServerManagerValue(bool use_unchecked, const QVariant& value) override
   {
-    QList<QVariant> list = value.value<QList<QVariant> >();
+    QList<QVariant> list = value.value<QList<QVariant>>();
     assert(list.size() == 2);
 
     vtkSMPropertyHelper helper(this->propertySM());

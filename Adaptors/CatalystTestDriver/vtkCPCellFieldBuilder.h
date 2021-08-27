@@ -17,7 +17,7 @@
  * @brief   Class for specifying cell fields over grids.
  *
  * Class for specifying cell data fields over grids for a test driver.
-*/
+ */
 
 #ifndef vtkCPCellFieldBuilder_h
 #define vtkCPCellFieldBuilder_h

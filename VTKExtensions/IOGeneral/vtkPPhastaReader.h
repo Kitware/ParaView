@@ -114,7 +114,7 @@
  *
  * @sa
  * vtkPhastaReader
-*/
+ */
 
 #ifndef vtkPPhastaReader_h
 #define vtkPPhastaReader_h

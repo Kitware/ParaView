@@ -18,7 +18,7 @@
  * vtkTCPNetworkAccessManager is a concrete implementation of
  * vtkNetworkAccessManager that uses tcp/ip sockets for communication between
  * processes. It supports urls that use "tcp" as their protocol specifier.
-*/
+ */
 
 #ifndef vtkTCPNetworkAccessManager_h
 #define vtkTCPNetworkAccessManager_h

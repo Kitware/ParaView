@@ -19,7 +19,7 @@
  * vtkAppendRectilinearGrid appends rectilinear grids to produce a
  * single combined rectilinear grid. Inputs are appends based on
  * their extents.
-*/
+ */
 
 #ifndef vtkAppendRectilinearGrid_h
 #define vtkAppendRectilinearGrid_h

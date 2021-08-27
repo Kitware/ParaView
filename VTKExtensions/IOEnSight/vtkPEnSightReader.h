@@ -27,7 +27,7 @@
  *
  *  Copyright (c) CEA
  * \endverbatim
-*/
+ */
 
 #ifndef vtkPEnSightReader_h
 #define vtkPEnSightReader_h
@@ -882,7 +882,7 @@ protected:
 
   int GhostLevels;
 
-  std::map<std::string, std::map<int, long> > FileOffsets;
+  std::map<std::string, std::map<int, long>> FileOffsets;
 
 private:
   vtkPEnSightReader(const vtkPEnSightReader&) = delete;

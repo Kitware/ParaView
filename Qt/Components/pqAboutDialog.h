@@ -44,9 +44,9 @@ class pqServer;
 class QTreeWidget;
 
 /**
-* pqAboutDialog is the about dialog used by ParaView.
-* It provides information about ParaView and current configuration.
-*/
+ * pqAboutDialog is the about dialog used by ParaView.
+ * It provides information about ParaView and current configuration.
+ */
 class PQCOMPONENTS_EXPORT pqAboutDialog : public QDialog
 {
   Q_OBJECT

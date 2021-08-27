@@ -20,7 +20,7 @@
  * representing a vector of integers.
  * @sa
  * vtkSMVectorProperty vtkSMDoubleVectorProperty vtkSMStringVectorProperty
-*/
+ */
 
 #ifndef vtkSMIntVectorProperty_h
 #define vtkSMIntVectorProperty_h

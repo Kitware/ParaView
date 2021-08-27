@@ -67,7 +67,8 @@ bool pqCoreConfiguration::populateOptions(vtkCLIOptions* options)
       "--data-directory", this->DataDirectory, "Directory containing data files for tests.")
     ->envname("PARAVIEW_DATA_ROOT");
   groupTesting
-    ->add_option("--test-script",
+    ->add_option(
+      "--test-script",
       [this](const CLI::results_t& args) {
         if (this->TestScripts.empty())
         {
@@ -88,7 +89,8 @@ bool pqCoreConfiguration::populateOptions(vtkCLIOptions* options)
     ->multi_option_policy(CLI::MultiOptionPolicy::TakeAll);
 
   groupTesting
-    ->add_option("--test-baseline",
+    ->add_option(
+      "--test-baseline",
       [this](const CLI::results_t& args) {
         if (this->TestScripts.empty())
         {
@@ -109,7 +111,8 @@ bool pqCoreConfiguration::populateOptions(vtkCLIOptions* options)
     ->multi_option_policy(CLI::MultiOptionPolicy::TakeAll);
 
   groupTesting
-    ->add_option("--test-threshold",
+    ->add_option(
+      "--test-threshold",
       [this](const CLI::results_t& args) {
         if (this->TestScripts.empty())
         {

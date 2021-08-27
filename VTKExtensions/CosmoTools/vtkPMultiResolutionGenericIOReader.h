@@ -20,7 +20,7 @@
  * different resolutions on different parts of the dataset.  It has the
  * concept of a resolution level with 0 being the lowest resolution and the
  * resolution increases as the level number increases.
-*/
+ */
 
 #ifndef vtkPMultiResolutionGenericIOReader_h
 #define vtkPMultiResolutionGenericIOReader_h

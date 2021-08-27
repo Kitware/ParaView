@@ -22,7 +22,7 @@
  * processes. vtkPVRenderView uses the information about what process it has
  * been created on to decide what part of the "rendering" happens on the
  * process.
-*/
+ */
 
 #ifndef vtkPVRenderView_h
 #define vtkPVRenderView_h

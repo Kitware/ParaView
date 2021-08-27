@@ -22,7 +22,7 @@
  * in the sequence. It will also provide the current sequence index of the
  * provided file name.
  * by several vtkPVUpdateSuppressor objects.
-*/
+ */
 
 #ifndef vtkFileSequenceParser_h
 #define vtkFileSequenceParser_h

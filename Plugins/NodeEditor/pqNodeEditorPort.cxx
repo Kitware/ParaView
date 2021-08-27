@@ -80,8 +80,9 @@ pqNodeEditorPort::pqNodeEditorPort(Type type, QString name, QGraphicsItem* paren
 
   qreal portRadius = pqNodeEditorUtils::CONSTS::PORT_RADIUS;
 
-  const qreal xpos = (type == Type::INPUT) ? portRadius + LABEL_OFFSET : -portRadius -
-      LABEL_OFFSET - this->label->boundingRect().width();
+  const qreal xpos = (type == Type::INPUT)
+    ? portRadius + LABEL_OFFSET
+    : -portRadius - LABEL_OFFSET - this->label->boundingRect().width();
   this->label->setPos(xpos, -0.5 * this->label->boundingRect().height());
 
   this->disc =

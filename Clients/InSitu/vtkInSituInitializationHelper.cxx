@@ -45,8 +45,9 @@
 #include <string>
 
 #if VTK_MODULE_ENABLE_ParaView_PythonCatalyst
-extern "C" {
-void vtkPVInitializePythonModules();
+extern "C"
+{
+  void vtkPVInitializePythonModules();
 }
 #endif
 
@@ -70,7 +71,7 @@ public:
   };
 
   vtkSmartPointer<vtkCPCxxHelper> CPCxxHelper;
-  std::map<std::string, vtkSmartPointer<vtkSMSourceProxy> > Producers;
+  std::map<std::string, vtkSmartPointer<vtkSMSourceProxy>> Producers;
   std::vector<PipelineInfo> Pipelines;
   std::map<vtkSMProxy*, std::string> SteerableProxies;
 
@@ -307,8 +308,9 @@ void vtkInSituInitializationHelper::MarkProducerModified(const std::string& chan
 {
   if (vtkInSituInitializationHelper::Internals == nullptr)
   {
-    vtkLogF(ERROR, "'vtkInSituInitializationHelper::MarkProducerModified' cannot be called before "
-                   "'Initialize'.");
+    vtkLogF(ERROR,
+      "'vtkInSituInitializationHelper::MarkProducerModified' cannot be called before "
+      "'Initialize'.");
     return;
   }
 
@@ -323,8 +325,9 @@ void vtkInSituInitializationHelper::MarkProducerModified(vtkSMSourceProxy* produ
 {
   if (vtkInSituInitializationHelper::Internals == nullptr)
   {
-    vtkLogF(ERROR, "'vtkInSituInitializationHelper::MarkProducerModified' cannot be called before "
-                   "'Initialize'.");
+    vtkLogF(ERROR,
+      "'vtkInSituInitializationHelper::MarkProducerModified' cannot be called before "
+      "'Initialize'.");
     return;
   }
 
@@ -342,8 +345,9 @@ bool vtkInSituInitializationHelper::ExecutePipelines(
 {
   if (vtkInSituInitializationHelper::Internals == nullptr)
   {
-    vtkLogF(ERROR, "'vtkInSituInitializationHelper::MarkProducerModified' cannot be called before "
-                   "'Initialize'.");
+    vtkLogF(ERROR,
+      "'vtkInSituInitializationHelper::MarkProducerModified' cannot be called before "
+      "'Initialize'.");
     return false;
   }
 
@@ -490,8 +494,8 @@ void vtkInSituInitializationHelper::UpdateSteerableProxies()
       auto property = steerable_proxies.first->GetProperty(child->GetAttribute("name"));
       if (!property)
       {
-        vtkLog(ERROR, "No property named '" << child->GetAttribute("name")
-                                            << "' present on proxy. Skipping.");
+        vtkLog(ERROR,
+          "No property named '" << child->GetAttribute("name") << "' present on proxy. Skipping.");
         continue;
       }
 
@@ -531,8 +535,8 @@ void vtkInSituInitializationHelper::UpdateSteerableProxies()
         }
         else
         {
-          vtkLog(ERROR, "Properties of type '" << property->GetClassName()
-                                               << "' are not supported. Skipping.");
+          vtkLog(ERROR,
+            "Properties of type '" << property->GetClassName() << "' are not supported. Skipping.");
           continue;
         }
       }
@@ -545,8 +549,9 @@ void vtkInSituInitializationHelper::UpdateAllProducers(double time)
 {
   if (vtkInSituInitializationHelper::Internals == nullptr)
   {
-    vtkLogF(ERROR, "'vtkInSituInitializationHelper::UpdateAllProducers' cannot be called before "
-                   "'Initialize'.");
+    vtkLogF(ERROR,
+      "'vtkInSituInitializationHelper::UpdateAllProducers' cannot be called before "
+      "'Initialize'.");
     return;
   }
 
@@ -616,7 +621,7 @@ void vtkInSituInitializationHelper::PrintSelf(ostream& os, vtkIndent indent)
 
 //----------------------------------------------------------------------------
 void vtkInSituInitializationHelper::GetSteerableProxies(
-  std::vector<std::pair<std::string, vtkSMProxy*> >& proxies)
+  std::vector<std::pair<std::string, vtkSMProxy*>>& proxies)
 {
   if (vtkInSituInitializationHelper::Internals != nullptr)
   {

@@ -21,7 +21,7 @@
  * chosen attribute in the input dataobject. This filter can accept composite
  * datasets. If the input is a composite dataset, the output is a multiblock
  * with vtkTable leaves.
-*/
+ */
 
 #ifndef vtkAttributeDataToTableFilter_h
 #define vtkAttributeDataToTableFilter_h

@@ -23,7 +23,7 @@
  * @sa
  * vtkAnimationCue vtkSMAnimationSceneProxy
  *
-*/
+ */
 
 #ifndef vtkPVAnimationCue_h
 #define vtkPVAnimationCue_h

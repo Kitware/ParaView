@@ -136,8 +136,9 @@ public:
   int styleHint(StyleHint hint, const QStyleOption* option = nullptr,
     const QWidget* widget = nullptr, QStyleHintReturn* returnData = nullptr) const override
   {
-    return hint == QStyle::SH_Menu_AllowActiveAndDisabled ? 1 : QProxyStyle::styleHint(
-                                                                  hint, option, widget, returnData);
+    return hint == QStyle::SH_Menu_AllowActiveAndDisabled
+      ? 1
+      : QProxyStyle::styleHint(hint, option, widget, returnData);
   }
 };
 
@@ -598,7 +599,7 @@ void pqParaViewMenuBuilders::buildHelpMenu(QMenu& menu)
   // Getting Started with ParaView
   new pqDesktopServicesReaction(QUrl::fromLocalFile(paraViewGettingStartedFile),
     (menu.addAction(QIcon(":/pqWidgets/Icons/pdf.png"), "Getting Started with ParaView")
-                                  << pqSetName("actionGettingStarted")));
+      << pqSetName("actionGettingStarted")));
 
   QString versionString = QString("%1.%2.%3")
                             .arg(vtkSMProxyManager::GetVersionMajor())
@@ -644,7 +645,7 @@ void pqParaViewMenuBuilders::buildHelpMenu(QMenu& menu)
                           .arg(vtkSMProxyManager::GetVersionPatch());
   new pqDesktopServicesReaction(QUrl(tutorialURL),
     (menu.addAction(QIcon(":/pqWidgets/Icons/pdf.png"), "ParaView Self-directed Tutorial")
-                                  << pqSetName("actionTutorialNotes")));
+      << pqSetName("actionTutorialNotes")));
 
   // Sandia National Labs Tutorials
   new pqDesktopServicesReaction(QUrl("https://www.paraview.org/Wiki/ParaView_Classroom_Tutorials"),

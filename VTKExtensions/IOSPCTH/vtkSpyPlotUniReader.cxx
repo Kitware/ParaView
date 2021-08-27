@@ -691,7 +691,8 @@ int vtkSpyPlotUniReaderRunLengthDataDecode(
       {
         if (outIndex >= outSize)
         {
-          vtkErrorWithObjectMacro(self, "Problem doing RLD decode. "
+          vtkErrorWithObjectMacro(self,
+            "Problem doing RLD decode. "
               << "Too much data generated. Expected: " << outSize);
           return 0;
         }
@@ -707,7 +708,8 @@ int vtkSpyPlotUniReaderRunLengthDataDecode(
       {
         if (outIndex >= outSize)
         {
-          vtkErrorWithObjectMacro(self, "Problem doing RLD decode. "
+          vtkErrorWithObjectMacro(self,
+            "Problem doing RLD decode. "
               << "Too much data generated. Expected: " << outSize);
           return 0;
         }

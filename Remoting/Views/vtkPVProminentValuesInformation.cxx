@@ -48,7 +48,7 @@
 
 namespace
 {
-typedef std::map<int, std::set<std::vector<vtkVariant> > > vtkInternalDistinctValuesBase;
+typedef std::map<int, std::set<std::vector<vtkVariant>>> vtkInternalDistinctValuesBase;
 }
 
 class vtkPVProminentValuesInformation::vtkInternalDistinctValues
@@ -338,7 +338,7 @@ void vtkPVProminentValuesInformation::CopyDistinctValuesFromObject(vtkAbstractAr
   {
     int tupleSize = c < 0 ? nc : 1;
     tuple.resize(tupleSize);
-    std::set<std::vector<vtkVariant> >& compDistincts((*this->DistinctValues)[c]);
+    std::set<std::vector<vtkVariant>>& compDistincts((*this->DistinctValues)[c]);
     cvalues->Initialize();
     unsigned int maxDiscreteValues = array->GetMaxDiscreteValues();
     if (this->Force)
@@ -601,7 +601,7 @@ void vtkPVProminentValuesInformation::AddDistinctValues(vtkPVProminentValuesInfo
       {
         if ((*this->DistinctValues)[i].insert(*eit).second &&
           ((*this->DistinctValues)[i].size() > vtkAbstractArray::MAX_DISCRETE_VALUES &&
-              !this->Force))
+            !this->Force))
         {
           tooManyValues = true;
           break;

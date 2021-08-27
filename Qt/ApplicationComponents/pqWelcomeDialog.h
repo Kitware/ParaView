@@ -10,10 +10,10 @@ class pqWelcomeDialog;
 }
 
 /**
-* This class provides a welcome dialog screen that you see in many applications.
-* The intent is to provide an on-ramp with a lower learning curve than the blank
-* ParaView screen.
-*/
+ * This class provides a welcome dialog screen that you see in many applications.
+ * The intent is to provide an on-ramp with a lower learning curve than the blank
+ * ParaView screen.
+ */
 class PQAPPLICATIONCOMPONENTS_EXPORT pqWelcomeDialog : public QDialog
 {
   Q_OBJECT
@@ -30,8 +30,8 @@ public Q_SLOTS:
 
 protected Q_SLOTS:
   /**
-  * React to checkbox events
-  */
+   * React to checkbox events
+   */
   void onDoNotShowAgainStateChanged(int);
 
 private:

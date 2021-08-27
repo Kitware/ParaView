@@ -23,7 +23,7 @@
  *  - You have a vtkRemoteObject or a Proxy that is client only.
  *  - Only one instance in a session
  *  - It has to be shared across clients
-*/
+ */
 
 #ifndef vtkReservedRemoteObjectIds_h
 #define vtkReservedRemoteObjectIds_h

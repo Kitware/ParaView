@@ -21,7 +21,7 @@
  * processes. It can redistributed polydata from M to N processors.
  * Update: This filter can now support delivering vtkUniformGridAMR datasets in
  * PASS_THROUGH and/or COLLECT modes.
-*/
+ */
 
 #ifndef vtkMPIMoveData_h
 #define vtkMPIMoveData_h

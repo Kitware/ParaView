@@ -65,7 +65,7 @@
  *  writer.Quality = 10
  *
  * @endcode
-*/
+ */
 
 #ifndef vtkSMEnumerationDomain_h
 #define vtkSMEnumerationDomain_h

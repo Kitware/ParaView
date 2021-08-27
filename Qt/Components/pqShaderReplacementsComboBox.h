@@ -49,9 +49,9 @@ public:
   ~pqShaderReplacementsComboBox() override = default;
 
   /**
-  * Return the combobox entry index corresponding to the provided preset path.
-  * Returned value is 0 if not found.
-  */
+   * Return the combobox entry index corresponding to the provided preset path.
+   * Returned value is 0 if not found.
+   */
   int getPathIndex(const QString& presetPath) const;
 
   /**

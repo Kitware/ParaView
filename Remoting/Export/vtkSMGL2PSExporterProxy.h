@@ -17,7 +17,7 @@
  * @brief   Proxy for vtkPVGL2PSExporter
  *
  *  Proxy for vtkPVGL2PSExporter
-*/
+ */
 
 #ifndef vtkSMGL2PSExporterProxy_h
 #define vtkSMGL2PSExporterProxy_h

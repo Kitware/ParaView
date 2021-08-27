@@ -40,24 +40,24 @@ class vtkObject;
 class pqConsoleWidget;
 
 /**
-* @class pqPythonShell
-* @brief Widget for a Python shell.
-*
-* pqPythonShell is a QWidget subclass that provides an interactive Python
-* shell. It uses vtkPythonInteractiveInterpreter to provide an interactive Python
-* interpreter. Note that this is still executing Python code using the
-* application wide global Python interpreter, it just keeps the context separate
-* using an instance of `core.InteractiveConsole` internally.
-*
-* @section PythonInit Python initialization
-*
-* pqPythonShell does not initialize Python on creation. By default, it waits
-* till the pqConsoleWidget gets focus or `pqPythonShell::executeScript` is
-* called. One can also call `pqPythonShell::initialize` explicitly to
-* initialize the interpreter.
-*
-* @sa pqConsoleWidget.
-*/
+ * @class pqPythonShell
+ * @brief Widget for a Python shell.
+ *
+ * pqPythonShell is a QWidget subclass that provides an interactive Python
+ * shell. It uses vtkPythonInteractiveInterpreter to provide an interactive Python
+ * interpreter. Note that this is still executing Python code using the
+ * application wide global Python interpreter, it just keeps the context separate
+ * using an instance of `core.InteractiveConsole` internally.
+ *
+ * @section PythonInit Python initialization
+ *
+ * pqPythonShell does not initialize Python on creation. By default, it waits
+ * till the pqConsoleWidget gets focus or `pqPythonShell::executeScript` is
+ * called. One can also call `pqPythonShell::initialize` explicitly to
+ * initialize the interpreter.
+ *
+ * @sa pqConsoleWidget.
+ */
 class PQPYTHON_EXPORT pqPythonShell : public QWidget
 {
   Q_OBJECT
@@ -68,10 +68,10 @@ public:
   ~pqPythonShell() override;
 
   /**
-  * Returns the interactive console context (the locals() dict).
-  * You can use static_cast<PythonObject*>() to convert the void pointer.
-  * See vtkPythonInteractiveInterpreter::GetInteractiveConsoleLocalsPyObject().
-  */
+   * Returns the interactive console context (the locals() dict).
+   * You can use static_cast<PythonObject*>() to convert the void pointer.
+   * See vtkPythonInteractiveInterpreter::GetInteractiveConsoleLocalsPyObject().
+   */
   void* consoleLocals();
 
   //@{
@@ -90,48 +90,48 @@ public:
 
 public Q_SLOTS:
   /**
-  * Prints some text on the shell.
-  */
+   * Prints some text on the shell.
+   */
   void printMessage(const QString&);
 
   /**
-  * Clears the terminal. This does not change the state of the Python
-  * interpreter, just clears the text shown in the Widget.
-  */
+   * Clears the terminal. This does not change the state of the Python
+   * interpreter, just clears the text shown in the Widget.
+   */
   void clear();
 
   /**
-  * Execute an arbitrary python script/string. This simply execute the Python
-  * script in the global Python interpreter.
-  */
+   * Execute an arbitrary python script/string. This simply execute the Python
+   * script in the global Python interpreter.
+   */
   void executeScript(const QString&);
 
   /**
-  * Resets the python interactive interpreter. This does not affect the global
-  * Python interpreter. If the interactive interpreter hasn't been initialized
-  * this has no effect.
-  */
+   * Resets the python interactive interpreter. This does not affect the global
+   * Python interpreter. If the interactive interpreter hasn't been initialized
+   * this has no effect.
+   */
   void reset();
 
   /**
-  * Returns true is the shell is currently executing a script/command.
-  */
+   * Returns true is the shell is currently executing a script/command.
+   */
   bool isExecuting() const;
 
   /**
-  * Use this method instead of calling pqConsoleWidget::printString()
-  * directly. That helps us keep track of whether we need to show the prompt
-  * or not.
-  */
+   * Use this method instead of calling pqConsoleWidget::printString()
+   * directly. That helps us keep track of whether we need to show the prompt
+   * or not.
+   */
   void printString(const QString&, PrintMode mode = STATUS);
 
   /**
-  * Set a list of statements to be run each time the interpreter is reset.
-  *
-  * By default, this imports the paraview.simple module.
-  * If you call this method, be aware that the preamble is
-  * assumed not to have any multi-line statements.
-  */
+   * Set a list of statements to be run each time the interpreter is reset.
+   *
+   * By default, this imports the paraview.simple module.
+   * If you call this method, be aware that the preamble is
+   * assumed not to have any multi-line statements.
+   */
   static void setPreamble(const QStringList& statements);
   static const QStringList& preamble();
 
@@ -143,10 +143,10 @@ public Q_SLOTS:
 
 Q_SIGNALS:
   /**
-  * signal fired whenever the shell starts (starting=true) and finishes
-  * (starting=false) executing a Python command/script. This can be used by
-  * the UI to block user input while the script is executing.
-  */
+   * signal fired whenever the shell starts (starting=true) and finishes
+   * (starting=false) executing a Python command/script. This can be used by
+   * the UI to block user input while the script is executing.
+   */
   void executing(bool starting);
 
 protected Q_SLOTS:
@@ -162,9 +162,9 @@ protected:
   static const char* PS2() { return "... "; }
 
   /**
-  * Show the user-input prompt, if needed. Returns true if the prompt was
-  * re-rendered, otherwise false.
-  */
+   * Show the user-input prompt, if needed. Returns true if the prompt was
+   * re-rendered, otherwise false.
+   */
   bool prompt(const QString& indent = QString());
 
   void HandleInterpreterEvents(vtkObject* caller, unsigned long eventid, void* calldata);

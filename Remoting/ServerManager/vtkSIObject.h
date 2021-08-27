@@ -17,7 +17,7 @@
  *
  * Object that is managed by vtkPVSessionCore which wrap concrete class such as
  * the vtk ones.
-*/
+ */
 
 #ifndef vtkSIObject_h
 #define vtkSIObject_h

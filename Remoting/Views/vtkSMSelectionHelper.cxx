@@ -468,9 +468,10 @@ vtkSMProxy* vtkSMSelectionHelper::ConvertSelection(
   }
   else if ((outputType == vtkSelectionNode::BLOCKS ||
              outputType == vtkSelectionNode::BLOCK_SELECTORS) &&
-    selectionSourceProxy && (strcmp(inproxyname, "GlobalIDSelectionSource") == 0 ||
-                              strcmp(inproxyname, "HierarchicalDataIDSelectionSource") == 0 ||
-                              strcmp(inproxyname, "CompositeDataIDSelectionSource") == 0))
+    selectionSourceProxy &&
+    (strcmp(inproxyname, "GlobalIDSelectionSource") == 0 ||
+      strcmp(inproxyname, "HierarchicalDataIDSelectionSource") == 0 ||
+      strcmp(inproxyname, "CompositeDataIDSelectionSource") == 0))
   {
     return vtkSMSelectionHelper::ConvertInternal(
       vtkSMSourceProxy::SafeDownCast(selectionSourceProxy), dataSource, dataPort, outputType);
@@ -766,7 +767,7 @@ bool vtkSMSelectionHelper::SubtractSelection(
 
     // Store ids to remove as vector , so set is ordered correctly.
     std::vector<vtkIdType> ids;
-    std::set<std::vector<vtkIdType> > idsToRemove;
+    std::set<std::vector<vtkIdType>> idsToRemove;
     unsigned int cc;
     unsigned int count = outputIDs.GetNumberOfElements() / selectionTupleSize;
     for (cc = 0; cc < count; cc++)
@@ -810,7 +811,7 @@ bool vtkSMSelectionHelper::SubtractSelection(
 
     // Store ids to remove as vector, so set is ordered correctly.
     std::vector<vtkIdType> ids;
-    std::set<std::vector<vtkIdType> > idsToRemove;
+    std::set<std::vector<vtkIdType>> idsToRemove;
     unsigned int cc;
     unsigned int count = outputIDs.GetNumberOfElements() / selectionTupleSize;
     for (cc = 0; cc < count; cc++)
@@ -959,7 +960,7 @@ bool vtkSMSelectionHelper::ToggleSelection(
 
     // Store ids to toggle as vector , so set is ordered correctly.
     std::vector<vtkIdType> ids;
-    std::set<std::vector<vtkIdType> > idsToToggle;
+    std::set<std::vector<vtkIdType>> idsToToggle;
     unsigned int cc;
     unsigned int count = outputIDs.GetNumberOfElements() / selectionTupleSize;
     for (cc = 0; cc < count; cc++)
@@ -997,7 +998,7 @@ bool vtkSMSelectionHelper::ToggleSelection(
     }
 
     // Insert new element, remaining in idToToggle
-    for (std::set<std::vector<vtkIdType> >::const_iterator it = idsToToggle.begin();
+    for (std::set<std::vector<vtkIdType>>::const_iterator it = idsToToggle.begin();
          it != idsToToggle.end(); it++)
     {
       for (int i = 0; i < selectionTupleSize; i++)
@@ -1018,7 +1019,7 @@ bool vtkSMSelectionHelper::ToggleSelection(
 
     // Store ids to toggle as vector , so set is ordered correctly.
     std::vector<vtkIdType> ids;
-    std::set<std::vector<vtkIdType> > idsToToggle;
+    std::set<std::vector<vtkIdType>> idsToToggle;
     unsigned int cc;
     unsigned int count = outputIDs.GetNumberOfElements() / selectionTupleSize;
     for (cc = 0; cc < count; cc++)
@@ -1056,7 +1057,7 @@ bool vtkSMSelectionHelper::ToggleSelection(
     }
 
     // Insert new element, remaining in idToToggle
-    for (std::set<std::vector<vtkIdType> >::const_iterator it = idsToToggle.begin();
+    for (std::set<std::vector<vtkIdType>>::const_iterator it = idsToToggle.begin();
          it != idsToToggle.end(); it++)
     {
       for (int i = 0; i < selectionTupleSize; i++)
@@ -1077,7 +1078,7 @@ namespace
 // Splits \c selection into a collection of selections based on the
 // SOURCE().
 void vtkSplitSelection(vtkSelection* selection,
-  std::map<vtkPVDataRepresentation*, vtkSmartPointer<vtkSelection> >& map_of_selections)
+  std::map<vtkPVDataRepresentation*, vtkSmartPointer<vtkSelection>>& map_of_selections)
 {
   for (unsigned int cc = 0; cc < selection->GetNumberOfNodes(); cc++)
   {
@@ -1151,10 +1152,10 @@ void vtkSMSelectionHelper::NewSelectionSourcesFromSelection(vtkSelection* select
   // This relies on SOURCE() defined on the selection nodes to locate the
   // representation proxy for the representation that was selected.
 
-  std::map<vtkPVDataRepresentation*, vtkSmartPointer<vtkSelection> > selections;
+  std::map<vtkPVDataRepresentation*, vtkSmartPointer<vtkSelection>> selections;
   vtkSplitSelection(selection, selections);
 
-  std::map<vtkPVDataRepresentation*, vtkSmartPointer<vtkSelection> >::iterator iter;
+  std::map<vtkPVDataRepresentation*, vtkSmartPointer<vtkSelection>>::iterator iter;
   for (iter = selections.begin(); iter != selections.end(); ++iter)
   {
     vtkSMProxy* reprProxy = vtkLocateRepresentation(view, iter->first);

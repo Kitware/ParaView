@@ -22,7 +22,7 @@
  * works with only vtkSMIntVectorProperty.
  * @sa
  * vtkSMDomain vtkSMIntVectorProperty
-*/
+ */
 
 #ifndef vtkSMBooleanDomain_h
 #define vtkSMBooleanDomain_h

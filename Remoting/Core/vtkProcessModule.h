@@ -18,7 +18,7 @@
  * ParaView processes.
  * vtkProcessModule is the process initialization and session management core
  * for ParaView processes.
-*/
+ */
 
 #ifndef vtkProcessModule_h
 #define vtkProcessModule_h

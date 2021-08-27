@@ -24,7 +24,7 @@
  * \li 2: Extracted vtkSelection (vtkSelection)
  * @warning
  * This representation doesn't support caching currently.
-*/
+ */
 
 #ifndef vtkSpreadSheetRepresentation_h
 #define vtkSpreadSheetRepresentation_h

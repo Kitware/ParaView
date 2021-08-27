@@ -43,8 +43,8 @@
 class vtkSISourceProxy::vtkInternals
 {
 public:
-  std::vector<vtkSmartPointer<vtkAlgorithmOutput> > OutputPorts;
-  std::vector<vtkSmartPointer<vtkPVPostFilter> > PostFilters;
+  std::vector<vtkSmartPointer<vtkAlgorithmOutput>> OutputPorts;
+  std::vector<vtkSmartPointer<vtkPVPostFilter>> PostFilters;
 };
 
 //*****************************************************************************

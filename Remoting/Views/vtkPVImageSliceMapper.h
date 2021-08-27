@@ -25,7 +25,7 @@
  * mapper uses painters similar to those employed by vtkPainterPolyDataMapper.
  * @sa
  * vtkPainterPolyDataMapper
-*/
+ */
 
 #ifndef vtkPVImageSliceMapper_h
 #define vtkPVImageSliceMapper_h

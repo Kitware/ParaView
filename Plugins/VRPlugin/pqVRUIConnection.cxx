@@ -849,7 +849,7 @@ void pqVRUIConnection::getAndEnqueueAnalogData()
 // ----------------------------------------------------------------------------
 void pqVRUIConnection::getAndEnqueueTrackerData()
 {
-  std::vector<vtkSmartPointer<vtkVRUITrackerState> >* trackers =
+  std::vector<vtkSmartPointer<vtkVRUITrackerState>>* trackers =
     this->Internals->State->GetTrackerStates();
 
   for (unsigned int i = 0; i < (*trackers).size(); ++i)

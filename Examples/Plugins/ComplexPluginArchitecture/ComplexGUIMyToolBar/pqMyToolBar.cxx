@@ -60,8 +60,8 @@ void pqMyToolBar::constructor()
   this->setObjectName("MyToolBar");
   this->addWidget(new QLabel("Custom Toolbar", this));
   this->addAction(qApp->style()->standardIcon(QStyle::SP_MessageBoxInformation), "My Action", []() {
-    QMessageBox::information(
-      nullptr, "MyAction", QString("Did you know that Pi value in degrees is ") +
+    QMessageBox::information(nullptr, "MyAction",
+      QString("Did you know that Pi value in degrees is ") +
         QString::number(vtkSharedUtils::DegreesFromRadians(vtkSharedUtils::Pi())) + " ?");
   });
 }

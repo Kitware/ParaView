@@ -27,7 +27,7 @@
  * per your choosing to call the methods. It uses the session proxy manager to
  * locate proxies registered using specific names under specific groups. Thus,
  * the state is maintained by the proxy manager itself.
-*/
+ */
 
 #ifndef vtkSMTransferFunctionManager_h
 #define vtkSMTransferFunctionManager_h

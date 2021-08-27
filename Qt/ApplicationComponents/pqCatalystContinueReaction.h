@@ -38,11 +38,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class pqLiveInsituVisualizationManager;
 
 /**
-* Reaction for setting a breakpoint to Catalyst CoProcessing Engine
-* for Live-Data Visualization.
-* @ingroup Reactions
-* @ingroup LiveInsitu
-*/
+ * Reaction for setting a breakpoint to Catalyst CoProcessing Engine
+ * for Live-Data Visualization.
+ * @ingroup Reactions
+ * @ingroup LiveInsitu
+ */
 class PQAPPLICATIONCOMPONENTS_EXPORT pqCatalystContinueReaction
   : public pqCatalystPauseSimulationReaction
 {
@@ -63,8 +63,8 @@ public Q_SLOTS:
 
 protected:
   /**
-  * Called when the action is triggered.
-  */
+   * Called when the action is triggered.
+   */
   void onTriggered() override { this->setPauseSimulation(false); }
 
 private:

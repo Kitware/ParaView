@@ -23,7 +23,7 @@
  * works with only vtkSMStringVectorProperty.
  * @sa
  * vtkSMDomain vtkSMStringVectorProperty
-*/
+ */
 
 #ifndef vtkSMInputFileNameDomain_h
 #define vtkSMInputFileNameDomain_h

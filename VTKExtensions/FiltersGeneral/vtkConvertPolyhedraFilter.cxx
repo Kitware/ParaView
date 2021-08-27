@@ -100,7 +100,7 @@ void vtkConvertPolyhedraFilter::InsertNextPolyhedralCell(
     {
       // get all the triangular, quadrangular and polyhedral faces
       std::vector<vtkIdType> triFaces, quadFaces, polyFaces;
-      std::vector<std::vector<vtkIdType> > faceVertices;
+      std::vector<std::vector<vtkIdType>> faceVertices;
       std::set<vtkIdType> cellVertices;
       std::map<vtkIdType, int> vertexFaceConnectivity;
 
@@ -215,9 +215,8 @@ void vtkConvertPolyhedraFilter::InsertNextPolyhedralCell(
             std::vector<vtkIdType> quadFaceVerts = faceVertices[*quadFaces.begin()];
 
             auto topVertex = std::find_if(cellVertices.begin(), cellVertices.end(),
-              [&vertexFaceConnectivity](const vtkIdType vi) {
-                return vertexFaceConnectivity[vi] == 4;
-              });
+              [&vertexFaceConnectivity](
+                const vtkIdType vi) { return vertexFaceConnectivity[vi] == 4; });
 
             if (topVertex == cellVertices.end())
             {

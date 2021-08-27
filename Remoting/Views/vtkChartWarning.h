@@ -20,7 +20,7 @@
  *
  * This is a vtkContextItem that can be placed into a vtkContextScene. It draws
  * a block of the given dimensions, and reacts to mouse events.
-*/
+ */
 
 #ifndef vtkChartWarning_h
 #define vtkChartWarning_h

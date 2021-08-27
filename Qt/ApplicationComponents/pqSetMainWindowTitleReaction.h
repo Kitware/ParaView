@@ -35,10 +35,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqReaction.h"
 
 /**
-* @ingroup Reactions
-* pqSetMainWindowTitleReaction is the reaction that popups the Set Window Title
-* Dialog allowing the user edit the main window title.
-*/
+ * @ingroup Reactions
+ * pqSetMainWindowTitleReaction is the reaction that popups the Set Window Title
+ * Dialog allowing the user edit the main window title.
+ */
 class PQAPPLICATIONCOMPONENTS_EXPORT pqSetMainWindowTitleReaction : public pqReaction
 {
   Q_OBJECT
@@ -46,20 +46,20 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqSetMainWindowTitleReaction : public pqRea
 
 public:
   /**
-  * Constructor. Parent cannot be nullptr.
-  */
+   * Constructor. Parent cannot be nullptr.
+   */
   pqSetMainWindowTitleReaction(QAction* parent);
   ~pqSetMainWindowTitleReaction() override;
 
   /**
-  * Show the main window title editor dialog.
-  */
+   * Show the main window title editor dialog.
+   */
   void showSetMainWindowTitleDialog();
 
 protected:
   /**
-  * Called when the action is triggered.
-  */
+   * Called when the action is triggered.
+   */
   void onTriggered() override { pqSetMainWindowTitleReaction::showSetMainWindowTitleDialog(); }
 
 private:

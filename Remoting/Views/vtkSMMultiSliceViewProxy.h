@@ -17,7 +17,7 @@
  *
  * Custom RenderViewProxy to override CreateDefaultRepresentation method
  * so only the Multi-Slice representation will be available to the user
-*/
+ */
 
 #ifndef vtkSMMultiSliceViewProxy_h
 #define vtkSMMultiSliceViewProxy_h

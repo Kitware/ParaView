@@ -34,13 +34,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _pqVariableType_h
 
 /**
-* Provides a standard enumeration of variables that can be displayed for a dataset
-*/
+ * Provides a standard enumeration of variables that can be displayed for a dataset
+ */
 enum pqVariableType
 {
   /**
-  * Used to represent an empty selection
-  */
+   * Used to represent an empty selection
+   */
   VARIABLE_TYPE_NONE = 0,
   VARIABLE_TYPE_CELL = 1,
   VARIABLE_TYPE_NODE = 2,

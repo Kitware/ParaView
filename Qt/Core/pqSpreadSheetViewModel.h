@@ -39,11 +39,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QSet>
 
 /**
-* This is the model used by SpreadSheetView to show the data. This model works
-* with vtkSMSpreadSheetRepresentationProxy to fetch blocks of data from the
-* server and show them. It requires that vtkSMSpreadSheetRepresentationProxy
-* delivers vtkTable.
-*/
+ * This is the model used by SpreadSheetView to show the data. This model works
+ * with vtkSMSpreadSheetRepresentationProxy to fetch blocks of data from the
+ * server and show them. It requires that vtkSMSpreadSheetRepresentationProxy
+ * delivers vtkTable.
+ */
 class pqDataRepresentation;
 class QItemSelection;
 class QItemSelectionModel;
@@ -88,19 +88,19 @@ public:
   };
 
   /**
-  * Returns the number of rows.
-  */
+   * Returns the number of rows.
+   */
   int rowCount(const QModelIndex& parent = QModelIndex()) const override;
 
   /**
-  * Returns the number of columns.
-  */
+   * Returns the number of columns.
+   */
   int columnCount(const QModelIndex& parent = QModelIndex()) const override;
 
   /**
-  * Returns the data storeed under the given role for the item referred by the
-  * index.
-  */
+   * Returns the data storeed under the given role for the item referred by the
+   * index.
+   */
   QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override;
 
   /**
@@ -120,53 +120,53 @@ public:
     int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override;
 
   /**
-  * Make a server request to sort based on a given column with a given order
-  */
+   * Make a server request to sort based on a given column with a given order
+   */
   void sortSection(int section, Qt::SortOrder order);
 
   /**
-  * Return true only if the given column is sortable.
-  */
+   * Return true only if the given column is sortable.
+   */
   bool isSortable(int section);
 
   /**
-  * Returns the field type for the data currently shown by this model.
-  */
+   * Returns the field type for the data currently shown by this model.
+   */
   int getFieldType() const;
 
   // Returns the vtk indices for the view indices.
   QSet<vtkIndex> getVTKIndices(const QModelIndexList& indexes);
 
   /**
-  * Set/Get the decimal precision for float and double type data.
-  */
+   * Set/Get the decimal precision for float and double type data.
+   */
   void setDecimalPrecision(int);
   int getDecimalPrecision();
 
   /** Set/Get whether the decimal representation is fixed or
-  * scientific.  True is fixed and False is scientific
-  */
+   * scientific.  True is fixed and False is scientific
+   */
   void setFixedRepresentation(bool);
   bool getFixedRepresentation();
 
   /**
-  * set the region (in row indices) that is currently being shown in the view.
-  * the model will provide data-values only for the active-region. For any
-  * other region it will simply return a "..." text for display (in
-  * QAbstractTableModel::data(..) callback).
-  */
+   * set the region (in row indices) that is currently being shown in the view.
+   * the model will provide data-values only for the active-region. For any
+   * other region it will simply return a "..." text for display (in
+   * QAbstractTableModel::data(..) callback).
+   */
   void setActiveRegion(int row_top, int row_bottom);
 
   /**
-  * Returns the active representation. Active representation is the
-  * representation being shown by the view.
-  */
+   * Returns the active representation. Active representation is the
+   * representation being shown by the view.
+   */
   pqDataRepresentation* activeRepresentation() const;
   vtkSMProxy* activeRepresentationProxy() const;
 
   /**
-  * Method needed for copy/past cell editor
-  */
+   * Method needed for copy/past cell editor
+   */
   Qt::ItemFlags flags(const QModelIndex& index) const override;
   bool setData(const QModelIndex& index, const QVariant& value, int role = Qt::EditRole) override;
 
@@ -184,33 +184,33 @@ public:
 
 public Q_SLOTS:
   /**
-  * resets the model.
-  */
+   * resets the model.
+   */
   void forceUpdate();
 
   /**
-  * Sets the active representation. Active representation is the
-  * representation being shown by the view.
-  */
+   * Sets the active representation. Active representation is the
+   * representation being shown by the view.
+   */
   void setActiveRepresentation(pqDataRepresentation*);
 
   /**
-  * Sets the active representation. When using this API instead of
-  * setActiveRepresentation(pqDataRepresentation*), some functionality won't be
-  * available.
-  */
+   * Sets the active representation. When using this API instead of
+   * setActiveRepresentation(pqDataRepresentation*), some functionality won't be
+   * available.
+   */
   void setActiveRepresentationProxy(vtkSMProxy*);
 
 Q_SIGNALS:
   /**
-  * Fired whenever the server side selection changes.
-  */
+   * Fired whenever the server side selection changes.
+   */
   void selectionChanged(const QItemSelection& selection);
 
 private Q_SLOTS:
   /**
-  * called to fetch data for all pending blocks.
-  */
+   * called to fetch data for all pending blocks.
+   */
   void delayedUpdate();
 
   void triggerSelectionChanged();
@@ -228,9 +228,9 @@ private Q_SLOTS:
 
 protected:
   /**
-  * Given an index into the model, check to see that its row number is
-  * less than the length of the data array associated with its column
-  */
+   * Given an index into the model, check to see that its row number is
+   * less than the length of the data array associated with its column
+   */
   bool isDataValid(const QModelIndex& idx) const;
 
   vtkSpreadSheetView* GetView() const;

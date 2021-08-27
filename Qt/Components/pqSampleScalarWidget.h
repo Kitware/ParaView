@@ -72,18 +72,18 @@ public:
   ~pqSampleScalarWidget() override;
 
   /**
-  * Sets the server manager objects that will be controlled by the widget
-  */
+   * Sets the server manager objects that will be controlled by the widget
+   */
   void setDataSources(pqSMProxy controlled_proxy, vtkSMDoubleVectorProperty* sample_property,
     vtkSMProperty* range_property = 0);
 
   /**
-  * Accept pending changes
-  */
+   * Accept pending changes
+   */
   void accept();
   /**
-  * Reset pending changes
-  */
+   * Reset pending changes
+   */
   void reset();
 
   // Returns the samples currently selected in the widget
@@ -94,8 +94,8 @@ public:
   void setSamples(QList<QVariant> samples);
 Q_SIGNALS:
   /**
-  * Signal emitted whenever the set of samples changes.
-  */
+   * Signal emitted whenever the set of samples changes.
+   */
   void samplesChanged();
 
 private Q_SLOTS:

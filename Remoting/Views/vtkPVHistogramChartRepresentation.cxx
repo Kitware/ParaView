@@ -277,7 +277,7 @@ bool vtkPVHistogramChartRepresentation::MapSelectionToView(vtkSelection* sel)
 
   // build a list of vtkSelectionNode instances that are potentially relevant.
   int fieldType = vtkSelectionNode::ConvertAttributeTypeToSelectionField(this->AttributeType);
-  std::vector<vtkSmartPointer<vtkSelectionNode> > nodes;
+  std::vector<vtkSmartPointer<vtkSelectionNode>> nodes;
   for (unsigned int cc = 0, max = sel->GetNumberOfNodes(); cc < max; ++cc)
   {
     vtkSelectionNode* node = sel->GetNode(cc);

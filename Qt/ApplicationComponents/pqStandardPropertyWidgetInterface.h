@@ -41,8 +41,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * of the custom widgets and decorators used by ParaView's Properties Panel.
  */
 class PQAPPLICATIONCOMPONENTS_EXPORT pqStandardPropertyWidgetInterface
-  : public QObject,
-    public pqPropertyWidgetInterface
+  : public QObject
+  , public pqPropertyWidgetInterface
 {
   Q_OBJECT
   Q_INTERFACES(pqPropertyWidgetInterface)

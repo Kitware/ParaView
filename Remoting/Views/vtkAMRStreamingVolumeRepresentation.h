@@ -19,7 +19,7 @@
  *
  * vtkAMRStreamingVolumeRepresentation  is a representation used for volume
  * rendering AMR datasets with ability to stream blocks from the input pipeline.
-*/
+ */
 
 #ifndef vtkAMRStreamingVolumeRepresentation_h
 #define vtkAMRStreamingVolumeRepresentation_h

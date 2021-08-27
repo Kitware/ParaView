@@ -76,32 +76,32 @@ bool vtkFileSequenceParser::ParseFileSequence(const char* file)
   }
   else if (this->reg_ex2->find(file))
   {
-    this->SetSequenceName(std::string(this->reg_ex2->match(1) + this->reg_ex2->match(2) + ".." +
-                            this->reg_ex2->match(4))
+    this->SetSequenceName(std::string(
+      this->reg_ex2->match(1) + this->reg_ex2->match(2) + ".." + this->reg_ex2->match(4))
                             .c_str());
     this->SequenceIndexString = this->reg_ex2->match(3);
     match = true;
   }
   else if (this->reg_ex3->find(file))
   {
-    this->SetSequenceName(std::string(this->reg_ex3->match(1) + this->reg_ex3->match(2) + ".." +
-                            this->reg_ex3->match(4))
+    this->SetSequenceName(std::string(
+      this->reg_ex3->match(1) + this->reg_ex3->match(2) + ".." + this->reg_ex3->match(4))
                             .c_str());
     this->SequenceIndexString = this->reg_ex3->match(3);
     match = true;
   }
   else if (this->reg_ex4->find(file))
   {
-    this->SetSequenceName(std::string(".." + this->reg_ex4->match(2) + this->reg_ex4->match(3) +
-                            "." + this->reg_ex4->match(4))
+    this->SetSequenceName(std::string(
+      ".." + this->reg_ex4->match(2) + this->reg_ex4->match(3) + "." + this->reg_ex4->match(4))
                             .c_str());
     this->SequenceIndexString = this->reg_ex4->match(1);
     match = true;
   }
   else if (this->reg_ex5->find(file))
   {
-    this->SetSequenceName(std::string(".." + this->reg_ex5->match(2) + this->reg_ex5->match(3) +
-                            "." + this->reg_ex5->match(4))
+    this->SetSequenceName(std::string(
+      ".." + this->reg_ex5->match(2) + this->reg_ex5->match(3) + "." + this->reg_ex5->match(4))
                             .c_str());
     this->SequenceIndexString = this->reg_ex5->match(1);
     match = true;

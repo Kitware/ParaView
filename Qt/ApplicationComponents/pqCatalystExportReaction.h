@@ -36,9 +36,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqReaction.h"
 
 /**
-* @ingroup Reactions
-* Reaction to export a Catalyst script that will produce configured catalyst data products.
-*/
+ * @ingroup Reactions
+ * Reaction to export a Catalyst script that will produce configured catalyst data products.
+ */
 
 class PQAPPLICATIONCOMPONENTS_EXPORT pqCatalystExportReaction : public pqReaction
 {
@@ -62,8 +62,8 @@ public:
 
 protected Q_SLOTS:
   /**
-  * Called when the action is triggered.
-  */
+   * Called when the action is triggered.
+   */
   void onTriggered() override { this->exportScript(); }
 
 private:

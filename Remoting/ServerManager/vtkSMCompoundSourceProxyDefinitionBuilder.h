@@ -23,7 +23,7 @@
  * definition.
  * @sa
  * vtkSMCompoundSourceProxy
-*/
+ */
 
 #ifndef vtkSMCompoundSourceProxyDefinitionBuilder_h
 #define vtkSMCompoundSourceProxyDefinitionBuilder_h

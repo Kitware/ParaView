@@ -16,8 +16,8 @@
 #include <string>
 #include <vtksys/SystemInformation.hxx>
 
-using std::string;
 using std::ostringstream;
+using std::string;
 
 // Description:
 // Get python version

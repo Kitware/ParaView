@@ -20,7 +20,7 @@
  * the visualization driver.
  * @sa
  * vtkSMSessionClient
-*/
+ */
 
 #ifndef vtkPVSessionServer_h
 #define vtkPVSessionServer_h

@@ -43,16 +43,16 @@ class vtkPVPluginsInformation;
 class vtkSMPluginManager;
 
 /**
-* pqPluginManager works with vtkSMPluginManager to keep track for plugins
-* loaded/available. It also ensures that when a new session is created, the
-* default plugin-configuration-xmls are parsed on all processes involved to
-* ensure that auto-load plugins are loaded. It preserves the information about
-* plugins loaded across ParaView sessions in settings so that users can easily
-* load previously loaded plugins.
-*
-* pqPluginManager can work with multiple sessions. It maintains internal
-* data-structures for different sessions.
-*/
+ * pqPluginManager works with vtkSMPluginManager to keep track for plugins
+ * loaded/available. It also ensures that when a new session is created, the
+ * default plugin-configuration-xmls are parsed on all processes involved to
+ * ensure that auto-load plugins are loaded. It preserves the information about
+ * plugins loaded across ParaView sessions in settings so that users can easily
+ * load previously loaded plugins.
+ *
+ * pqPluginManager can work with multiple sessions. It maintains internal
+ * data-structures for different sessions.
+ */
 class PQCORE_EXPORT pqPluginManager : public QObject
 {
   Q_OBJECT
@@ -63,12 +63,12 @@ public:
   ~pqPluginManager() override;
 
   /**
-  * Called during application initialization to load plugins from settings.
-  * This only loads "local" plugins. pqApplicationCore calls this method
-  * explicitly after the essential components of the core have been
-  * initialized. This ensures that any plugins  being loaded during startup of
-  * application have the environment setup correctly.
-  */
+   * Called during application initialization to load plugins from settings.
+   * This only loads "local" plugins. pqApplicationCore calls this method
+   * explicitly after the essential components of the core have been
+   * initialized. This ensures that any plugins  being loaded during startup of
+   * application have the environment setup correctly.
+   */
   void loadPluginsFromSettings();
 
   enum LoadStatus
@@ -79,57 +79,57 @@ public:
   };
 
   /**
-  * attempt to load an extension on a server
-  * if server is nullptr, extension will be loaded on client side
-  * return status on success, if NOTLOADED was returned, the error is reported
-  * If errorMsg is non-nullptr, then errors are not reported, but the error
-  * message is put in the errorMsg string
-  */
+   * attempt to load an extension on a server
+   * if server is nullptr, extension will be loaded on client side
+   * return status on success, if NOTLOADED was returned, the error is reported
+   * If errorMsg is non-nullptr, then errors are not reported, but the error
+   * message is put in the errorMsg string
+   */
   LoadStatus loadExtension(
     pqServer* session, const QString& lib, QString* errorMsg = 0, bool remote = true);
 
   /**
-  * attempt to load all available plugins on a server,
-  * or client plugins if nullptr
-  */
+   * attempt to load all available plugins on a server,
+   * or client plugins if nullptr
+   */
   void loadExtensions(pqServer*);
 
   /**
-  * return all the plugins loaded on a session. This will either returns the
-  * plugins information for local processes or server-process (for remote
-  * sessions) based on the state of \c remote.
-  */
+   * return all the plugins loaded on a session. This will either returns the
+   * plugins information for local processes or server-process (for remote
+   * sessions) based on the state of \c remote.
+   */
   vtkPVPluginsInformation* loadedExtensions(pqServer* session, bool remote);
 
   /**
-  * Return all the paths that plugins will be searched for.
-  */
+   * Return all the paths that plugins will be searched for.
+   */
   QStringList pluginPaths(pqServer* session, bool remote);
 
   /**
-  * simply adds the plugin to the ignore list, so when this class tries to
-  * serialize the plugin information, it skips the indicated plugin.
-  */
+   * simply adds the plugin to the ignore list, so when this class tries to
+   * serialize the plugin information, it skips the indicated plugin.
+   */
   void hidePlugin(const QString& lib, bool remote);
   bool isHidden(const QString& lib, bool remote);
 
   /**
-  * ensures that plugins required on client and server are present on both.
-  * Fires requiredPluginsNotLoaded() signal if any mismatch is found.
-  * Returns true is all plugin requirements are satisfied, else returns false.
-  */
+   * ensures that plugins required on client and server are present on both.
+   * Fires requiredPluginsNotLoaded() signal if any mismatch is found.
+   * Returns true is all plugin requirements are satisfied, else returns false.
+   */
   bool verifyPlugins(pqServer* session);
 
 Q_SIGNALS:
   /**
-  * notification when plugin has been loaded.
-  */
+   * notification when plugin has been loaded.
+   */
   void pluginsUpdated();
 
   /**
-  * notification that the plugins on the client and
-  * server are mismatched.
-  */
+   * notification that the plugins on the client and
+   * server are mismatched.
+   */
   void requiredPluginsNotLoaded(pqServer*);
 
 protected:
@@ -137,8 +137,8 @@ protected:
 
 protected Q_SLOTS:
   /**
-  * attempts to load the configuration for plugins for the particular server.
-  */
+   * attempts to load the configuration for plugins for the particular server.
+   */
   void loadPluginsFromSettings(pqServer*);
 
   void onServerConnected(pqServer*);

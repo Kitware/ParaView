@@ -20,7 +20,7 @@
  *
  * to another Reader.  The Reader reads from a file selected from a
  * list of files using a FileIndex.
-*/
+ */
 
 #ifndef vtkMetaReader_h
 #define vtkMetaReader_h

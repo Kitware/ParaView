@@ -39,7 +39,7 @@ void Test(const vtkVector2i& target, const vtkVector2i& maxsize, bool expect_app
 
 // Tests code in vtkSMSaveScreenshotProxy to compute scale factors when saving
 // images at target resolution.
-int TestImageScaleFactors(int, char* [])
+int TestImageScaleFactors(int, char*[])
 {
   try
   {

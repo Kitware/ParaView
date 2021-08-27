@@ -95,8 +95,8 @@ void pqChangePipelineInputReaction::changeInput()
   BEGIN_UNDO_SET(QString("Change Input for %1").arg(filter->getSMName()));
   SM_SCOPED_TRACE(PropertiesModified).arg("proxy", filter->getProxy());
 
-  const QMap<QString, QList<pqOutputPort*> > input_map = dialog.selectedInputs();
-  QMap<QString, QList<pqOutputPort*> >::const_iterator iter;
+  const QMap<QString, QList<pqOutputPort*>> input_map = dialog.selectedInputs();
+  QMap<QString, QList<pqOutputPort*>>::const_iterator iter;
 
   for (iter = input_map.begin(); iter != input_map.end(); iter++)
   {

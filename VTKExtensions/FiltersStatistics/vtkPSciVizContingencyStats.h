@@ -33,7 +33,7 @@
  * </ul>
  * Finally, the summary statistics include the information entropy
  * of the observations.
-*/
+ */
 
 #ifndef vtkPSciVizContingencyStats_h
 #define vtkPSciVizContingencyStats_h

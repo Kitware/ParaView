@@ -62,7 +62,7 @@ class pqProxyInternal
 {
 public:
   pqProxyInternal() { this->Connection = vtkSmartPointer<vtkEventQtSlotConnect>::New(); }
-  typedef QMap<QString, QList<vtkSmartPointer<vtkSMProxy> > > ProxyListsType;
+  typedef QMap<QString, QList<vtkSmartPointer<vtkSMProxy>>> ProxyListsType;
   ProxyListsType ProxyLists;
   vtkSmartPointer<vtkSMProxy> Proxy;
   vtkSmartPointer<vtkEventQtSlotConnect> Connection;

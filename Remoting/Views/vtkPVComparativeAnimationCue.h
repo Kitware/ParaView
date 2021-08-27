@@ -21,7 +21,7 @@
  * animation by the ComparativeView. It provides a non-conventional
  * API i.e. without using properties to allow the user to setup parameter
  * values over the comparative grid.
-*/
+ */
 
 #ifndef vtkPVComparativeAnimationCue_h
 #define vtkPVComparativeAnimationCue_h

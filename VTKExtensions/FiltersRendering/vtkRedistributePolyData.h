@@ -21,7 +21,7 @@
  * @class   vtkRedistributePolyData
  * @brief   redistribute poly cells from other processes
  *                        (special version to color according to processor)
-*/
+ */
 
 #ifndef vtkRedistributePolyData_h
 #define vtkRedistributePolyData_h

@@ -54,7 +54,7 @@ vtkSmartPointer<vtkPolyData> GetPolyData(
   return pd;
 }
 
-int TestPartialArraysInformation(int, char* [])
+int TestPartialArraysInformation(int, char*[])
 {
   vtkNew<vtkMultiBlockDataSet> data;
 

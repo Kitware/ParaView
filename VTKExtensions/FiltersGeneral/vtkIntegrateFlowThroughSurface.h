@@ -20,7 +20,7 @@
  * Takes a point vector field from the input and computes the
  * dot product with the normal.  It then integrates this dot value
  * to get net flow through the surface.
-*/
+ */
 
 #ifndef vtkIntegrateFlowThroughSurface_h
 #define vtkIntegrateFlowThroughSurface_h

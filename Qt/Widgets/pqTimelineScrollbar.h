@@ -43,9 +43,9 @@ class QSpacerItem;
 class pqAnimationModel;
 
 /**
-* A widget offering a scrollbar useful to interact with the timeline
-* from the animation model.
-*/
+ * A widget offering a scrollbar useful to interact with the timeline
+ * from the animation model.
+ */
 class PQWIDGETS_EXPORT pqTimelineScrollbar : public QWidget
 {
   Q_OBJECT
@@ -55,33 +55,33 @@ public:
   ~pqTimelineScrollbar() override = default;
 
   /**
-  * connects to an existing animation model
-  * if the parameter is nullptr, any already existing connection is removed
-  */
+   * connects to an existing animation model
+   * if the parameter is nullptr, any already existing connection is removed
+   */
   void setAnimationModel(pqAnimationModel* model);
 
   /**
-  * connects to an existing spacing constraint notifier
-  * if the parameter is nullptr, any already existing connection is removed
-  */
+   * connects to an existing spacing constraint notifier
+   * if the parameter is nullptr, any already existing connection is removed
+   */
   void linkSpacing(QObject* spaceNotifier);
 
 protected Q_SLOTS:
 
   /**
-  * called when the offset of the time scrollbar
-  * must be updated
-  */
+   * called when the offset of the time scrollbar
+   * must be updated
+   */
   void updateTimeScrollbar();
 
   /**
-  * called when the time scrollbar must be updated
-  */
+   * called when the time scrollbar must be updated
+   */
   void updateTimeScrollbarOffset(int);
 
   /**
-  * called when the time scrollbar is being used in the GUI
-  */
+   * called when the time scrollbar is being used in the GUI
+   */
   void setTimeZoom(int);
 
 private:

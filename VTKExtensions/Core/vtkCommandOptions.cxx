@@ -92,9 +92,7 @@ const char* vtkCommandOptions::GetHelp()
 }
 
 //----------------------------------------------------------------------------
-void vtkCommandOptions::Initialize()
-{
-}
+void vtkCommandOptions::Initialize() {}
 
 //----------------------------------------------------------------------------
 int vtkCommandOptions::PostProcess(int, const char* const*)

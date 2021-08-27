@@ -29,7 +29,7 @@
  * clients can instantiate vtkSMParaViewPipelineControllerWithRendering. Just
  * like vtkSMParaViewPipelineController, this class also uses vtkObjectFactory
  * mechanisms to enable overriding by clients at compile time.
-*/
+ */
 
 #ifndef vtkSMParaViewPipelineControllerWithRendering_h
 #define vtkSMParaViewPipelineControllerWithRendering_h

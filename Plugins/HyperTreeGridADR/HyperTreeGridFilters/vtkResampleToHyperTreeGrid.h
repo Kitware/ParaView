@@ -286,7 +286,7 @@ protected:
     /**
      * Accumulators used for measuring quantities on subtrees
      */
-    std::vector<vtkSmartPointer<vtkAbstractArrayMeasurement> > ArrayMeasurements;
+    std::vector<vtkSmartPointer<vtkAbstractArrayMeasurement>> ArrayMeasurements;
 
     vtkIdType NumberOfLeavesInSubtree;
     vtkIdType NumberOfPointsInSubtree;
@@ -327,7 +327,7 @@ protected:
    * idx bijectively maps to element (i,j,k) = this->IndexToCoordinates(idx,depth).
    * this->CoordinatesToIndex is the inverse function of this->IndexToCoordinates.
    */
-  typedef std::vector<std::unordered_map<vtkIdType, GridElement> > MultiResGridType;
+  typedef std::vector<std::unordered_map<vtkIdType, GridElement>> MultiResGridType;
 
   //@{
   /**
@@ -491,7 +491,7 @@ protected:
    * Dummy pointer for creating at run-time the proper type of ArrayMeasurement or
    * ArrayMeasurementDisplay.
    */
-  std::vector<vtkSmartPointer<vtkAbstractArrayMeasurement> > ArrayMeasurements;
+  std::vector<vtkSmartPointer<vtkAbstractArrayMeasurement>> ArrayMeasurements;
 
   /**
    * Converts indexing at given resolution to a tuple (i,j,k) to navigate in a MultiResolutionGrid.
@@ -580,7 +580,7 @@ protected:
    * Collection of input point data arrays to resample, deducted from
    * InputDataArrayNames.
    */
-  std::vector<std::vector<vtkDataArray*> > InputPointDataArrays;
+  std::vector<std::vector<vtkDataArray*>> InputPointDataArrays;
 
   /**
    * Collection of input scalar field names to resample.

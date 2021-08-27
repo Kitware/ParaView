@@ -15,7 +15,7 @@
 /**
  * @class   vtkPlotEdges
  *
-*/
+ */
 
 #ifndef vtkPlotEdges_h
 #define vtkPlotEdges_h

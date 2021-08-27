@@ -759,8 +759,9 @@ int vtkGmshReader::ReadGeomAndFieldFile(int& firstVertexNo, vtkUnstructuredGrid*
 
             if (this->GetDebug())
             {
-              debugmsg = "\nName of the view in Gmsh: " + PViewName + " - number of components: " +
-                ToString(numOfComps) + " - interpolation schme: " + interpolationSchemeName +
+              debugmsg = "\nName of the view in Gmsh: " + PViewName +
+                " - number of components: " + ToString(numOfComps) +
+                " - interpolation schme: " + interpolationSchemeName +
                 "\nName of the view in ParaView: " + fieldNameParaView;
             }
 

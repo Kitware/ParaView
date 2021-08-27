@@ -20,7 +20,7 @@
  * This class is used by the python modules when they are loaded from
  * python (as opposed to pvpython). It simply initializes the server
  * manager so that it can be used.
-*/
+ */
 
 #ifndef vtkInitializationHelper_h
 #define vtkInitializationHelper_h

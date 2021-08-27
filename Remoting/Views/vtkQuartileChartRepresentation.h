@@ -19,7 +19,7 @@
  * support for combining quartile plots. A quartile plot is created by treating
  * multiple input arrays are ranges for area plots. All properties, like color,
  * label etc. are specified collectively.
-*/
+ */
 
 #ifndef vtkQuartileChartRepresentation_h
 #define vtkQuartileChartRepresentation_h

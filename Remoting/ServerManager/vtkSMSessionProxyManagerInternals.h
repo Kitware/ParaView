@@ -95,7 +95,7 @@ private:
 
 //-----------------------------------------------------------------------------
 class vtkSMProxyManagerProxyListType
-  : public std::vector<vtkSmartPointer<vtkSMProxyManagerProxyInfo> >
+  : public std::vector<vtkSmartPointer<vtkSMProxyManagerProxyInfo>>
 {
 public:
   // Returns if the proxy exists in  this vector.
@@ -201,11 +201,11 @@ struct vtkSMSessionProxyManagerInternals
   SetOfProxies ModifiedProxies;
 
   // Data structure to save registered links.
-  typedef std::map<std::string, vtkSmartPointer<vtkSMLink> > LinkType;
+  typedef std::map<std::string, vtkSmartPointer<vtkSMLink>> LinkType;
   LinkType RegisteredLinkMap;
 
   // Data structure for selection models.
-  typedef std::map<std::string, vtkSmartPointer<vtkSMProxySelectionModel> > SelectionModelsType;
+  typedef std::map<std::string, vtkSmartPointer<vtkSMProxySelectionModel>> SelectionModelsType;
   SelectionModelsType SelectionModels;
 
   // Data structure for storing the fullState
@@ -461,7 +461,7 @@ struct vtkSMSessionProxyManagerInternals
   void UpdateProxySelectionModelState()
   {
     this->State.ClearExtension(PXMRegistrationState::registered_selection_model);
-    std::map<std::string, vtkSmartPointer<vtkSMProxySelectionModel> >::iterator iter;
+    std::map<std::string, vtkSmartPointer<vtkSMProxySelectionModel>>::iterator iter;
     for (iter = this->SelectionModels.begin(); iter != this->SelectionModels.end(); iter++)
     {
       PXMRegistrationState_Entry* selModel =

@@ -56,7 +56,8 @@ using std::ostringstream;
 #include <vtkMPICommunicator.h>
 #include <vtkMultiProcessController.h>
 
-extern "C" {
+extern "C"
+{
 #include <adios_error.h>
 #include <adios_read.h>
 }

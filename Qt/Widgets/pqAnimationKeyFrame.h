@@ -41,28 +41,30 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class pqAnimationTrack;
 
 // represents a key frame
-class PQWIDGETS_EXPORT pqAnimationKeyFrame : public QObject, public QGraphicsItem
+class PQWIDGETS_EXPORT pqAnimationKeyFrame
+  : public QObject
+  , public QGraphicsItem
 {
   Q_OBJECT
   /**
-  * the time as a fraction of scene time that this keyframe starts at
-  */
+   * the time as a fraction of scene time that this keyframe starts at
+   */
   Q_PROPERTY(double normalizedStartTime READ normalizedStartTime WRITE setNormalizedStartTime)
   /**
-  * the time as a fraction of scene time that this keyframe ends at
-  */
+   * the time as a fraction of scene time that this keyframe ends at
+   */
   Q_PROPERTY(double normalizedEndTime READ normalizedEndTime WRITE setNormalizedEndTime)
   /**
-  * the value at the start of the keyframe
-  */
+   * the value at the start of the keyframe
+   */
   Q_PROPERTY(QVariant startValue READ startValue WRITE setStartValue)
   /**
-  * the value at the end of the keyframe
-  */
+   * the value at the end of the keyframe
+   */
   Q_PROPERTY(QVariant endValue READ endValue WRITE setEndValue)
   /**
-  * an icon to help describe the keyframe
-  */
+   * an icon to help describe the keyframe
+   */
   Q_PROPERTY(QIcon icon READ icon WRITE setIcon)
   Q_INTERFACES(QGraphicsItem)
 public:
@@ -93,8 +95,8 @@ Q_SIGNALS:
 
 protected:
   /**
-  * Returns the parent pqAnimationTrack.
-  */
+   * Returns the parent pqAnimationTrack.
+   */
   pqAnimationTrack* parentTrack() const;
 
   void paint(QPainter* p, const QStyleOptionGraphicsItem* option, QWidget* widget) override;

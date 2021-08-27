@@ -59,9 +59,9 @@ class PQCORE_EXPORT pqFileDialogModel : public QAbstractItemModel
 
 public:
   /**
-  * server is the server for which we need the listing.
-  * if the server is nullptr, we get file listings locally
-  */
+   * server is the server for which we need the listing.
+   * if the server is nullptr, we get file listings locally
+   */
   pqFileDialogModel(pqServer* server, QObject* Parent = nullptr);
   ~pqFileDialogModel() override;
 
@@ -77,23 +77,23 @@ public:
   //@}
 
   /**
-  * Sets the path that the file dialog will display
-  */
+   * Sets the path that the file dialog will display
+   */
   void setCurrentPath(const QString&);
 
   /**
-  * Returns the path the the file dialog will display
-  */
+   * Returns the path the the file dialog will display
+   */
   QString getCurrentPath();
 
   /**
-  * Return true if the file at the index is hidden
-  */
+   * Return true if the file at the index is hidden
+   */
   bool isHidden(const QModelIndex&);
 
   /**
-  * Return true if the given row is a directory
-  */
+   * Return true if the given row is a directory
+   */
   bool isDir(const QModelIndex&);
 
   // Creates a directory. "dirName" can be relative or absolute path
@@ -106,78 +106,78 @@ public:
   bool rename(const QString& oldname, const QString& newname);
 
   /**
-  * Returns whether the file exists
-  * also returns the full path, which could be a resolved shortcut
-  */
+   * Returns whether the file exists
+   * also returns the full path, which could be a resolved shortcut
+   */
   bool fileExists(const QString& file, QString& fullpath);
 
   /**
-  * Returns whether a directory exists
-  * also returns the full path, which could be a resolved shortcut
-  */
+   * Returns whether a directory exists
+   * also returns the full path, which could be a resolved shortcut
+   */
   bool dirExists(const QString& dir, QString& fullpath);
 
   /**
-  * returns the path delimiter, could be \ or / depending on the platform
-  * this model is browsing
-  */
+   * returns the path delimiter, could be \ or / depending on the platform
+   * this model is browsing
+   */
   QChar separator() const;
 
   /**
-  * return the absolute path for this file
-  */
+   * return the absolute path for this file
+   */
   QString absoluteFilePath(const QString&);
 
   /**
-  * Returns the set of file paths associated with the given row
-  * (a row may represent one-to-many paths if grouping is implemented)
-  * this also resolved symlinks if necessary
-  */
+   * Returns the set of file paths associated with the given row
+   * (a row may represent one-to-many paths if grouping is implemented)
+   * this also resolved symlinks if necessary
+   */
   QStringList getFilePaths(const QModelIndex&);
 
   /**
-  * Returns the server that this model is browsing
-  */
+   * Returns the server that this model is browsing
+   */
   pqServer* server() const;
 
   /**
-  * sets data (used by the view when editing names of folders)
-  */
+   * sets data (used by the view when editing names of folders)
+   */
   bool setData(const QModelIndex& idx, const QVariant& value, int role) override;
 
   // overloads for QAbstractItemModel
 
   /**
-  * return the number of columns in the model
-  */
+   * return the number of columns in the model
+   */
   int columnCount(const QModelIndex&) const override;
   /**
-  * return the data for an item
-  */
+   * return the data for an item
+   */
   QVariant data(const QModelIndex& idx, int role) const override;
   /**
-  * return an index from another index
-  */
+   * return an index from another index
+   */
   QModelIndex index(int row, int column, const QModelIndex&) const override;
   /**
-  * return the parent index of an index
-  */
+   * return the parent index of an index
+   */
   QModelIndex parent(const QModelIndex&) const override;
   /**
-  * return the number of rows under a given index
-  */
+   * return the number of rows under a given index
+   */
   int rowCount(const QModelIndex&) const override;
   /**
-  * return whether a given index has children
-  */
+   * return whether a given index has children
+   */
   bool hasChildren(const QModelIndex& p) const override;
   /**
-  * returns header data
-  */
+   * returns header data
+   */
   QVariant headerData(int section, Qt::Orientation, int role) const override;
   /**
-  * returns flags for item
-  */
+   * returns flags for item
+   */
   Qt::ItemFlags flags(const QModelIndex& idx) const override;
 
 private:

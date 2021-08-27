@@ -72,11 +72,12 @@ bool pqServerDisconnectReaction::disconnectFromServerWithWarning()
 
   if (server && !smmodel->findItems<pqPipelineSource*>(server).empty())
   {
-    int ret = QMessageBox::warning(pqCoreUtilities::mainWidget(),
-      tr("Disconnect from current server?"), tr("The current connection will be closed and \n"
-                                                "the state will be discarded.\n\n"
-                                                "Are you sure you want to continue?"),
-      QMessageBox::Yes | QMessageBox::No);
+    int ret =
+      QMessageBox::warning(pqCoreUtilities::mainWidget(), tr("Disconnect from current server?"),
+        tr("The current connection will be closed and \n"
+           "the state will be discarded.\n\n"
+           "Are you sure you want to continue?"),
+        QMessageBox::Yes | QMessageBox::No);
     if (ret == QMessageBox::No)
     {
       return false;

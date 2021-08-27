@@ -18,7 +18,7 @@
  * on its GlobalID from the DataServer.
  *
  * Retrieve a given state from the server.
-*/
+ */
 
 #ifndef vtkSMServerStateLocator_h
 #define vtkSMServerStateLocator_h

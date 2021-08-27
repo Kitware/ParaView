@@ -23,7 +23,7 @@
  *
  * @sa
  * vtkCutter vtkPolyPlane
-*/
+ */
 
 #ifndef vtkSliceAlongPolyPlane_h
 #define vtkSliceAlongPolyPlane_h

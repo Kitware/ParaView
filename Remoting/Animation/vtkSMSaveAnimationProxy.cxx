@@ -48,11 +48,11 @@ namespace vtkSMSaveAnimationProxyNS
 class Friendship
 {
 public:
-  static std::pair<vtkSmartPointer<vtkImageData>, vtkSmartPointer<vtkImageData> > Grab(
+  static std::pair<vtkSmartPointer<vtkImageData>, vtkSmartPointer<vtkImageData>> Grab(
     vtkSMSaveAnimationProxy* proxy)
   {
     return proxy ? proxy->CapturePreppedImages()
-                 : std::pair<vtkSmartPointer<vtkImageData>, vtkSmartPointer<vtkImageData> >();
+                 : std::pair<vtkSmartPointer<vtkImageData>, vtkSmartPointer<vtkImageData>>();
   }
 
   static std::string GetStereoFileName(

@@ -169,7 +169,7 @@ public:
   QPointer<pqView> View;
   QPointer<pqProxy> Source;
   QPointer<pqDataRepresentation> Representation;
-  QMap<void*, QPointer<pqProxyWidgets> > SourceWidgets;
+  QMap<void*, QPointer<pqProxyWidgets>> SourceWidgets;
   QPointer<pqProxyWidgets> DisplayWidgets;
   QPointer<pqProxyWidgets> ViewWidgets;
   bool ReceivedChangeAvailable;
@@ -697,10 +697,11 @@ void pqPropertiesPanel::sourcePropertyChanged(bool change_finished /*=true*/)
   }
   if (change_finished && !this->Internals->ReceivedChangeAvailable)
   {
-    vtkVLogF(PARAVIEW_LOG_APPLICATION_VERBOSITY(), "received `changeFinished` signal without "
-                                                   "receiving a `changeAvailable` signal from "
-                                                   "`%s`'s proxy-widget;"
-                                                   "ignoring it!",
+    vtkVLogF(PARAVIEW_LOG_APPLICATION_VERBOSITY(),
+      "received `changeFinished` signal without "
+      "receiving a `changeAvailable` signal from "
+      "`%s`'s proxy-widget;"
+      "ignoring it!",
       proxyLabel.c_str());
     return;
   }

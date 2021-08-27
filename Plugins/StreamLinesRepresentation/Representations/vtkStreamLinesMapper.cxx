@@ -848,8 +848,8 @@ void vtkStreamLinesMapper::Render(vtkRenderer* ren, vtkActor* actor)
   for (int i = 0; i < this->NumberOfAnimationSteps && animate; i++)
   {
     animate = this->Animate &&
-      (this->NumberOfAnimationSteps == 1 || (this->NumberOfAnimationSteps > 1 &&
-                                              this->AnimationSteps < this->NumberOfAnimationSteps));
+      (this->NumberOfAnimationSteps == 1 ||
+        (this->NumberOfAnimationSteps > 1 && this->AnimationSteps < this->NumberOfAnimationSteps));
     if (animate)
     {
       // Move particles
