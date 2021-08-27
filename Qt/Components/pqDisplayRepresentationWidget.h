@@ -77,7 +77,7 @@ private Q_SLOTS:
   /**
    * Slot called when the combo-box is changed. If this change was due to
    * a UI interaction, we need to prompt the user if he really intended to make
-   * that change (BUG #0015117).
+   * that change (Issue #15117).
    */
   void comboBoxChanged(const QString&);
 
