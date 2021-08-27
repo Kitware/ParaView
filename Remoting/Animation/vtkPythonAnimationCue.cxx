@@ -14,6 +14,7 @@
 =========================================================================*/
 
 #include "vtkPython.h"
+
 #include "vtkCommand.h"
 #include "vtkObjectFactory.h"
 #include "vtkProcessModule.h"
