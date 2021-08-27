@@ -67,8 +67,8 @@ public:
 
   /**
    * To enable/disable whether the cursor position is reset to 0 after
-   * editingFinished() is fired, use the
-   * resetCursorPositionOnEditingFinished property (default: true).
+   * editingFinished() is fired, use the resetCursorPositionOnEditingFinished
+   * property (default: true).
    */
   bool resetCursorPositionOnEditingFinished() const
   {

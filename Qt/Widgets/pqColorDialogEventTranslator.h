@@ -37,9 +37,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QColor>
 
 /**
- * pqColorDialogEventTranslator translates events on QColorDialog
- * that they can be recorded in tests in a platform independent
- * way.
+ * pqColorDialogEventTranslator translates events on QColorDialog that they can
+ * be recorded in tests in a platform independent way.
  */
 class PQWIDGETS_EXPORT pqColorDialogEventTranslator : public pqWidgetEventTranslator
 {

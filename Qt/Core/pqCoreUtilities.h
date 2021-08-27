@@ -96,8 +96,7 @@ public:
   }
 
   /**
-   * Call QApplication::processEvents plus make sure the testing framework
-   * is
+   * Call QApplication::processEvents plus make sure the testing framework is
    */
   static void processEvents(QEventLoop::ProcessEventsFlags flags = QEventLoop::AllEvents)
   {

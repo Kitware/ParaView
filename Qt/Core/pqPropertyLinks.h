@@ -146,9 +146,9 @@ public Q_SLOTS:
   void reset();
 
   /**
-   * set whether to use unchecked properties on the server manager
-   * one may get/set unchecked properties to get domain updates before an
-   * accept is done
+   * set whether to use unchecked properties on the server manager one may
+   * get/set unchecked properties to get domain updates before an accept is
+   * done
    */
   void setUseUncheckedProperties(bool val);
 

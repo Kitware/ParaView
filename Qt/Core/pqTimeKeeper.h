@@ -52,8 +52,7 @@ public:
   ~pqTimeKeeper() override;
 
   /**
-   * Returns the number of timestep values
-   * known to this time keeper.
+   * Returns the number of timestep values known to this time keeper.
    */
   int getNumberOfTimeStepValues() const;
 
@@ -64,8 +63,8 @@ public:
   double getTimeStepValue(int index) const;
 
   /**
-   * Returns the maximum index in the timestep values
-   * for the given time for which timestep value[index] <= time.
+   * Returns the maximum index in the timestep values for the given time for
+   * which timestep value[index] <= time.
    */
   int getTimeStepValueIndex(double time) const;
 

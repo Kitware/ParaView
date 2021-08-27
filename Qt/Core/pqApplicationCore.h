@@ -330,8 +330,7 @@ public:
 public Q_SLOTS:
 
   /**
-   * Applications calls this to ensure
-   * that any cleanup is performed correctly.
+   * Applications calls this to ensure that any cleanup is performed correctly.
    */
   void prepareForQuit();
 

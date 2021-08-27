@@ -109,8 +109,7 @@ public:
   int padding() const { return this->Padding; }
 
   /**
-   * Overridden to ensure the view updates its size as rows are
-   * added/removed.
+   * Overridden to ensure the view updates its size as rows are added/removed.
    */
   void setModel(QAbstractItemModel* model) override;
   void setRootIndex(const QModelIndex& index) override;

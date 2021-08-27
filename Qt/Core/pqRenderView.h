@@ -84,8 +84,7 @@ public:
   virtual void resetCenterOfRotation();
 
   /**
-   * Resets the parallel scale which is used for a parallel
-   * projection
+   * Resets the parallel scale which is used for a parallel projection
    */
   virtual void resetParallelScale();
 
@@ -110,8 +109,7 @@ public:
   virtual QColor getOrientationAxesOutlineColor() const;
 
   /**
-   * Get whether resetCamera() resets the
-   * center of rotation as well.
+   * Get whether resetCamera() resets the center of rotation as well.
    */
   virtual bool getResetCenterWithCamera() const { return this->ResetCenterWithCamera; }
 
@@ -134,37 +132,34 @@ public:
   virtual void getCenterOfRotation(double center[3]) const;
 
   /**
-   * Returns if this view module can support
-   * undo/redo. Returns false by default. Subclassess must override
-   * if that's not the case.
+   * Returns if this view module can support undo/redo. Returns false by
+   * default. Subclassess must override if that's not the case.
    */
   bool supportsUndo() const override { return true; }
 
   /**
-   * Returns if the view module can undo/redo interaction
-   * given the current state of the interaction undo stack.
+   * Returns if the view module can undo/redo interaction given the current
+   * state of the interaction undo stack.
    */
   bool canUndo() const override;
   bool canRedo() const override;
 
   /**
-   * Returns if this view module can support
-   * image capture. Returns false by default. Subclassess must override
-   * if that's not the case.
+   * Returns if this view module can support image capture. Returns false by
+   * default. Subclassess must override if that's not the case.
    */
   bool supportsCapture() const override { return true; }
 
   /**
    * For linking of interaction undo stacks.
-   * This method is used by pqLinksModel to link
-   * interaction undo stack for linked render views.
+   * This method is used by pqLinksModel to link interaction undo stack for
+   * linked render views.
    */
   virtual void linkUndoStack(pqRenderView* other);
   virtual void unlinkUndoStack(pqRenderView* other);
 
   /**
-   * Clears interaction undo stack of this view
-   * (and all linked views, if any).
+   * Clears interaction undo stack of this view (and all linked views, if any).
    */
   virtual void clearUndoStack();
 
@@ -322,13 +317,12 @@ protected Q_SLOTS:
    */
   virtual void onGenericFilmicPresetsChange();
 
-  // Called when vtkSMRenderViewProxy fires
-  // ResetCameraEvent.
+  // Called when vtkSMRenderViewProxy fires ResetCameraEvent.
   virtual void onResetCameraEvent();
 
   /**
-   * Called when undo stack changes. We fires appropriate
-   * undo signals as required by pqView.
+   * Called when undo stack changes. We fires appropriate undo signals as
+   * required by pqView.
    */
   virtual void onUndoStackChanged();
 

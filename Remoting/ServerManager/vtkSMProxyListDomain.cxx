@@ -121,8 +121,8 @@ public:
         {
           vtkErrorWithObjectMacro(parent,
             "Subproxy " << name
-                        << " must be defined before "
-                           "its properties can be shared with another subproxy.");
+                        << " must be defined before its properties can be "
+                           "shared with another subproxy.");
           continue;
         }
         vtkNew<vtkSMProxyLink> sharingLink;

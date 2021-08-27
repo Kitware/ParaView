@@ -103,16 +103,15 @@ public:
 
   /**
    * Returns the lookuptable proxy, if any.
-   * Most consumer displays take a lookup table. This method
-   * provides access to the Lookup table, if one exists.
+   * Most consumer displays take a lookup table. This method provides access to
+   * the Lookup table, if one exists.
    */
   virtual vtkSMProxy* getLookupTableProxy();
 
   /**
-   * Returns the pqScalarsToColors object for the lookup table
-   * proxy if any.
-   * Most consumer displays take a lookup table. This method
-   * provides access to the Lookup table, if one exists.
+   * Returns the pqScalarsToColors object for the lookup table proxy if any.
+   * Most consumer displays take a lookup table. This method provides access to
+   * the Lookup table, if one exists.
    */
   virtual pqScalarsToColors* getLookupTable();
 

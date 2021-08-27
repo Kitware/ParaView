@@ -89,8 +89,8 @@ public:
     pqServer* session, const QString& lib, QString* errorMsg = 0, bool remote = true);
 
   /**
-   * attempt to load all available plugins on a server,
-   * or client plugins if nullptr
+   * attempt to load all available plugins on a server, or client plugins if
+   * nullptr
    */
   void loadExtensions(pqServer*);
 
@@ -127,8 +127,7 @@ Q_SIGNALS:
   void pluginsUpdated();
 
   /**
-   * notification that the plugins on the client and
-   * server are mismatched.
+   * notification that the plugins on the client and server are mismatched.
    */
   void requiredPluginsNotLoaded(pqServer*);
 

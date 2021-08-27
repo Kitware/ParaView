@@ -67,8 +67,7 @@ public Q_SLOTS:
   virtual void reloadGUI();
 
   /**
-   * Requests update on all views the
-   * Representation is visible in.
+   * Requests update on all views the Representation is visible in.
    */
   virtual void updateAllViews();
 

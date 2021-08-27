@@ -89,9 +89,8 @@ Q_SIGNALS:
 
   /**
    * signal the value was edited
-   * this means the user is done changing text
-   * or the user is done moving the slider. It implies
-   * value was changed and editing has finished.
+   * this means the user is done changing text or the user is done moving the
+   * slider. It implies value was changed and editing has finished.
    */
   void valueEdited(int);
 

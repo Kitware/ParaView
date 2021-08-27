@@ -542,7 +542,7 @@ bool vtkSMParaViewPipelineController::RegisterPipelineProxy(
   // Register proxy with TimeKeeper.
   vtkSMProxy* timeKeeper = this->FindTimeKeeper(proxy->GetSession());
   vtkSMTimeKeeperProxy::AddTimeSource(timeKeeper, proxy,
-    /*suppress_input*/
+    // suppress_input
     (proxy->GetProperty("TimestepValues") != nullptr ||
       proxy->GetProperty("TimeRange") != nullptr));
 
@@ -582,7 +582,7 @@ bool vtkSMParaViewPipelineController::UnRegisterPipelineProxy(vtkSMProxy* proxy)
   // remove proxy from TimeKeeper.
   vtkSMProxy* timeKeeper = this->FindTimeKeeper(proxy->GetSession());
   vtkSMTimeKeeperProxy::RemoveTimeSource(timeKeeper, proxy,
-    /*unsuppress_input*/
+    // unsuppress_input
     (proxy->GetProperty("TimestepValues") != nullptr ||
       proxy->GetProperty("TimeRange") != nullptr));
 

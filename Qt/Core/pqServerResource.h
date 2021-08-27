@@ -110,8 +110,8 @@ public:
   ~pqServerResource();
 
   /**
-   * Returns the pqServerConfiguration from which this resource was created,
-   * if any.
+   * Returns the pqServerConfiguration from which this resource was created, if
+   * any.
    */
   const pqServerConfiguration& configuration() const;
 

@@ -75,8 +75,8 @@ Q_SIGNALS:
   void textChangedAndEditingFinished();
 
   /**
-   * Just like the QLineEdit::editingFinished(), this signal is fired
-   * every time the widget loses focus.
+   * Just like the QLineEdit::editingFinished(), this signal is fired every
+   * time the widget loses focus.
    */
   void editingFinished();
 

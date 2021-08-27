@@ -81,8 +81,7 @@ public:
   vtkSMProxy* animationScene() const;
 
   /**
-   * Set the animation scene which is reflected/controlled by this
-   * widget.
+   * Set the animation scene which is reflected/controlled by this widget.
    */
   void setAnimationScene(pqAnimationScene* animationScene);
 

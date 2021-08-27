@@ -49,8 +49,7 @@ class vtkSMProxyLocator;
 class vtkPVXMLElement;
 
 /**
- * A Qt based model to represent the vtkSMLinks in the
- * server manager.
+ * A Qt based model to represent the vtkSMLinks in the server manager.
  * All links are bi-directional between two proxies.
  */
 class PQCORE_EXPORT pqLinksModel : public QAbstractTableModel

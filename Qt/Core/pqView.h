@@ -90,18 +90,16 @@ public:
   QWidget* widget();
 
   /**
-   * Returns if this view module can support
-   * undo/redo. Returns false by default. Subclassess must override
-   * if that's not the case.
-   * View modules that support undo must fire
-   * all undo related signals defined by this class.
+   * Returns if this view module can support undo/redo. Returns false by
+   * default. Subclassess must override if that's not the case.
+   * View modules that support undo must fire all undo related signals defined
+   * by this class.
    */
   virtual bool supportsUndo() const { return false; }
 
   /**
-   * Returns if this view module can support
-   * image capture. Returns false by default. Subclassess must override
-   * if that's not the case.
+   * Returns if this view module can support image capture. Returns false by
+   * default. Subclassess must override if that's not the case.
    */
   virtual bool supportsCapture() const { return false; }
 

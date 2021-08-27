@@ -127,9 +127,9 @@ public:
    * "Replace input" is a hint given to the GUI to turn off input visibility
    * when the filter is created.
    * Returns if this proxy replaces input on creation.
-   * This checks the "Hints" for the proxy, if any. If a `<Visibility>`
-   * element is present with replace_input="0", then this method
-   * returns false, otherwise true.
+   * This checks the "Hints" for the proxy, if any. If a `<Visibility>` element
+   * is present with replace_input="0", then this method returns false,
+   * otherwise true.
    */
   int replaceInput() const;
 
@@ -147,9 +147,9 @@ protected Q_SLOTS:
 
 protected:
   /**
-   * Use this method to initialize the pqObject state using the
-   * underlying vtkSMProxy. This needs to be done only once,
-   * after the object has been created.
+   * Use this method to initialize the pqObject state using the underlying
+   * vtkSMProxy. This needs to be done only once, after the object has been
+   * created.
    */
   void initialize() override;
 

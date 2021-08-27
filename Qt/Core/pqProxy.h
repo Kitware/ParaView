@@ -50,8 +50,8 @@ class vtkSMSessionProxyManager;
 
 /**
  * This class represents any registered Server Manager proxy.
- * It keeps essential information to locate the proxy as well as
- * additional metadata such as user-specified label.
+ * It keeps essential information to locate the proxy as well as additional
+ * metadata such as user-specified label.
  */
 class PQCORE_EXPORT pqProxy : public pqServerManagerModelItem
 {
@@ -77,27 +77,25 @@ public:
   pqServer* getServer() const;
 
   /**
-   * This is a convenience method. It re-registers the underlying proxy
-   * with the requested new name under the same group. Then it unregisters
-   * the proxy from the group with the old name. This operation is
-   * understood as renaming the proxy, since as a consequence, this
-   * pqProxy's \c SMName changes.
+   * This is a convenience method. It re-registers the underlying proxy with
+   * the requested new name under the same group. Then it unregisters the proxy
+   * from the group with the old name. This operation is understood as renaming
+   * the proxy, since as a consequence, this pqProxy's \c SMName changes.
    */
   void rename(const QString& newname);
 
   /**
-   * Get the name with which this proxy is registered on the
-   * server manager. A proxy can be registered with more than
-   * one name on the Server Manager. This is the name/group which
-   * this pqProxy stands for.
+   * Get the name with which this proxy is registered on the server manager. A
+   * proxy can be registered with more than one name on the Server Manager.
+   * This is the name/group which this pqProxy stands for.
    */
   const QString& getSMName();
   const QString& getSMGroup();
 
   /**
    * Get the vtkSMProxy this object stands for.
-   * This can never be nullptr. A pqProxy always represents
-   * one and only one Server Manager proxy.
+   * This can never be nullptr. A pqProxy always represents one and only one
+   * Server Manager proxy.
    */
   vtkSMProxy* getProxy() const;
 
@@ -117,8 +115,8 @@ public:
   void setModifiedState(ModifiedState modified);
 
   /**
-   * Returns the hints for this proxy, if any. May returns nullptr
-   * if no hints are defined.
+   * Returns the hints for this proxy, if any. May returns nullptr if no hints
+   * are defined.
    */
   vtkPVXMLElement* getHints() const;
 

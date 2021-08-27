@@ -80,9 +80,5 @@ protected:
    */
   bool isIndexValid(const QModelIndex& index_) const;
 
-  /**
-   *
-   */
-
   QTreeWidgetItem* RootItem;
 };

@@ -86,8 +86,7 @@ public:
   const Json::Value& currentPreset();
 
   /**
-   * Returns true if the user requested to load colors for the
-   * current preset.
+   * Returns true if the user requested to load colors for the current preset.
    */
   bool loadColors() const;
 

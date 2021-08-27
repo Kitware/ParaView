@@ -66,9 +66,8 @@ public Q_SLOTS:
 protected Q_SLOTS:
 
   /**
-   * The cues in the scene have changed, so we make sure
-   * that we are not displaying a removed or added cue, if so
-   * we update the GUI.
+   * The cues in the scene have changed, so we make sure that we are not
+   * displaying a removed or added cue, if so we update the GUI.
    */
   void onSceneCuesChanged();
 

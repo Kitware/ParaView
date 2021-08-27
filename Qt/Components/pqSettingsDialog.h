@@ -88,9 +88,8 @@ private:
   pqInternals* Internals;
 
   /**
-   * Set to true if a setting that requires a restart to take effect
-   * is modified. Made static to persist across instantiations of
-   * this class.
+   * Set to true if a setting that requires a restart to take effect is
+   * modified. Made static to persist across instantiations of this class.
    */
   static bool ShowRestartRequired;
 };

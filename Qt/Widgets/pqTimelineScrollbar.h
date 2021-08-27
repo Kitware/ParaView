@@ -69,8 +69,7 @@ public:
 protected Q_SLOTS:
 
   /**
-   * called when the offset of the time scrollbar
-   * must be updated
+   * called when the offset of the time scrollbar must be updated
    */
   void updateTimeScrollbar();
 

@@ -101,9 +101,9 @@ protected:
   QWidget* createWidget() override;
 
   /**
-   * Use this method to initialize the pqObject state using the
-   * underlying vtkSMProxy. This needs to be done only once,
-   * after the object has been created.
+   * Use this method to initialize the pqObject state using the underlying
+   * vtkSMProxy. This needs to be done only once, after the object has been
+   * created.
    */
   void initialize() override;
 

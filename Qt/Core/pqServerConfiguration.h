@@ -125,22 +125,21 @@ public:
   StartupType startupType() const;
 
   /**
-   * If startupType() == COMMAND, then this method can be used to obtain
-   * the command for the startup, from the client side.
-   * Note that this does not include any information options etc.
-   * that may be specified in the startup.
-   * This is the full command to be executed on the client,
-   * which includes xterm, ssh...
+   * If startupType() == COMMAND, then this method can be used to obtain the
+   * command for the startup, from the client side.
+   * Note that this does not include any information options etc. that may be
+   * specified in the startup.
+   * This is the full command to be executed on the client, which includes
+   * xterm, ssh...
    */
   QString command(double& timeout, double& delay) const;
 
   /**
-   * If startupType() == COMMAND, then this method can be used to obtain
-   * the command for the startup, on the remote server,
-   * contained in the exec attributes.
-   * Note that this does not include any information options etc.
-   * that may be specified in the startup. This also
-   * recovers timeout and delay attributes.
+   * If startupType() == COMMAND, then this method can be used to obtain the
+   * command for the startup, on the remote server, contained in the exec
+   * attributes.
+   * Note that this does not include any information options etc. that may be
+   * specified in the startup. This also recovers timeout and delay attributes.
    */
   QString execCommand(double& timeout, double& delay) const;
 

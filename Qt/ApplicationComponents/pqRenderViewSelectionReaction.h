@@ -161,8 +161,7 @@ private:
   void onMouseMove();
 
   /**
-   * callback called for click events when in 'interactive selection'
-   * modes.
+   * callback called for click events when in 'interactive selection' modes.
    */
   void onLeftButtonRelease();
   void onWheelRotate();

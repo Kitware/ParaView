@@ -161,8 +161,8 @@ Q_SIGNALS:
   void swapPositions(const QString& other);
 
   /**
-   * Internal signal, fired to notify the target
-   * pqViewFrame instance that the drag operation has completed.
+   * Internal signal, fired to notify the target pqViewFrame instance that the
+   * drag operation has completed.
    */
   void finishDrag(pqViewFrame* source);
 

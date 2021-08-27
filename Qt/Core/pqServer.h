@@ -98,14 +98,14 @@ public:
   vtkSMProxySelectionModel* activeViewSelectionModel() const;
 
   /**
-   * Return the number of data server partitions on this
-   * server connection. A convenience method.
+   * Return the number of data server partitions on this server connection. A
+   * convenience method.
    */
   int getNumberOfPartitions();
 
   /**
-   * Returns is this connection is a connection to a remote
-   * server or a built-in server.
+   * Returns is this connection is a connection to a remote server or a
+   * built-in server.
    */
   bool isRemote() const;
 

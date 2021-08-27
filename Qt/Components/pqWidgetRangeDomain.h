@@ -40,8 +40,8 @@ class vtkSMProperty;
 class QWidget;
 
 /**
- * observes the domain for a property and updates the
- * minimum and/or maximum properties of the object
+ * observes the domain for a property and updates the minimum and/or maximum
+ * properties of the object
  */
 class PQCOMPONENTS_EXPORT pqWidgetRangeDomain : public QObject
 {

@@ -115,8 +115,8 @@ protected Q_SLOTS:
   void stopFollowingCamera();
 
   /**
-   * Called when the user change its name
-   * (double click in the table on his name)
+   * Called when the user change its name (double click in the table on its
+   * name)
    */
   void itemChanged(QTableWidgetItem* item);
 

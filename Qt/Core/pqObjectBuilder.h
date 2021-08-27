@@ -144,8 +144,8 @@ public:
   VTK_LEGACY(pqView* createView(const QString& type, pqServer* server, bool detachedFromLayout));
 
   /**
-   * Destroys the view module. This destroys the view module
-   * as well as all the displays in the view module.
+   * Destroys the view module. This destroys the view module as well as all the
+   * displays in the view module.
    */
   virtual void destroy(pqView* view);
 
@@ -173,8 +173,8 @@ public:
     const QString& sm_group, const QString& sm_name, pqServer* server, const QString& reg_group);
 
   /**
-   * Destroys the data display. It will remove the display from any
-   * view modules it is added to and then unregister it.
+   * Destroys the data display. It will remove the display from any view
+   * modules it is added to and then unregister it.
    */
   virtual void destroy(pqRepresentation* repr);
 
@@ -194,8 +194,8 @@ public:
   virtual void destroy(pqAnimationCue* cue);
 
   /**
-   * Convenience method, simply unregisters the Server Manager proxy
-   * which the pqProxy represents.
+   * Convenience method, simply unregisters the Server Manager proxy which the
+   * pqProxy represents.
    */
   virtual void destroy(pqProxy* proxy);
 
@@ -217,14 +217,13 @@ public:
 
   /**
    * This method unregisters all proxies on the given server.
-   * This is usually done in anticipate of a disconnect
-   * or starting afresh.
+   * This is usually done in anticipate of a disconnect or starting afresh.
    */
   virtual void destroyAllProxies(pqServer* server);
 
   /**
-   * This is a convenience method to return the name of the
-   * property on the proxy, if any, which can be used to set the filename.
+   * This is a convenience method to return the name of the property on the
+   * proxy, if any, which can be used to set the filename.
    * If no such property exists, this returns a null string.
    * If there are more than 1 properties with FileListDomain, then it looks at
    * the Hints for the proxy for the XML of the form
@@ -264,25 +263,25 @@ Q_SIGNALS:
 
   /**
    * Fired on successful completion of createSource().
-   * Remember that this signal is fired only when the creation of the object
-   * is requested by the GUI. It wont be triggered when the python client
-   * creates the source or when state is loaded or on undo/redo.
+   * Remember that this signal is fired only when the creation of the object is
+   * requested by the GUI. It wont be triggered when the python client creates
+   * the source or when state is loaded or on undo/redo.
    */
   void sourceCreated(pqPipelineSource*);
 
   /**
    * Fired on successful completion of createFilter().
-   * Remember that this signal is fired only when the creation of the object
-   * is requested by the GUI. It wont be triggered when the python client
-   * creates the source or when state is loaded or on undo/redo.
+   * Remember that this signal is fired only when the creation of the object is
+   * requested by the GUI. It wont be triggered when the python client creates
+   * the source or when state is loaded or on undo/redo.
    */
   void filterCreated(pqPipelineSource*);
 
   /**
    * Fired on successful completion of createReader().
-   * Remember that this signal is fired only when the creation of the object
-   * is requested by the GUI. It wont be triggered when the python client
-   * creates the source or when state is loaded or on undo/redo.
+   * Remember that this signal is fired only when the creation of the object is
+   * requested by the GUI. It wont be triggered when the python client creates
+   * the source or when state is loaded or on undo/redo.
    */
   void readerCreated(pqPipelineSource*, const QString& filename);
   void readerCreated(pqPipelineSource*, const QStringList& filename);
@@ -294,33 +293,32 @@ Q_SIGNALS:
 
   /**
    * Fired on successful completion of createView().
-   * Remember that this signal is fired only when the creation of the object
-   * is requested by the GUI. It wont be triggered when the python client
-   * creates the source or when state is loaded or on undo/redo.
+   * Remember that this signal is fired only when the creation of the object is
+   * requested by the GUI. It wont be triggered when the python client creates
+   * the source or when state is loaded or on undo/redo.
    */
   void viewCreated(pqView*);
 
   /**
    * Fired on successful completion of createDataRepresentation().
-   * Remember that this signal is fired only when the creation of the object
-   * is requested by the GUI. It wont be triggered when the python client
-   * creates the source or when state is loaded or on undo/redo.
+   * Remember that this signal is fired only when the creation of the object is
+   * requested by the GUI. It wont be triggered when the python client creates
+   * the source or when state is loaded or on undo/redo.
    */
   void dataRepresentationCreated(pqDataRepresentation*);
 
   /**
    * Fired on successful completion of any method that creates a pqProxy
-   * or subclass including createDataRepresentation,
-   * createView, createFilter, createSource,
-   * createReader etc.
+   * or subclass including createDataRepresentation, createView, createFilter,
+   * createSource, createReader etc.
    */
   void proxyCreated(pqProxy*);
 
   /**
    * Fired on successful completion of createProxy().
-   * Remember that this signal is fired only when the creation of the object
-   * is requested by the GUI. It wont be triggered when the python client
-   * creates the source or when state is loaded or on undo/redo.
+   * Remember that this signal is fired only when the creation of the object is
+   * requested by the GUI. It wont be triggered when the python client creates
+   * the source or when state is loaded or on undo/redo.
    */
   void proxyCreated(vtkSMProxy*);
 

@@ -58,8 +58,8 @@ class PQCORE_EXPORT pqUndoStack : public QObject
   Q_OBJECT
 public:
   /**
-   * If no \c builder is provided a default vtkSMUndoStackBuilder object
-   * will be created.
+   * If no \c builder is provided a default vtkSMUndoStackBuilder object will
+   * be created.
    */
   pqUndoStack(vtkSMUndoStackBuilder* builder = 0, QObject* parent = nullptr);
   ~pqUndoStack() override;
@@ -85,8 +85,7 @@ public:
   QString redoLabel();
 
   /**
-   * Get the status of the IgnoreAllChanges flag on the
-   * stack builder.
+   * Get the status of the IgnoreAllChanges flag on the stack builder.
    */
   bool ignoreAllChanges() const;
 
@@ -139,18 +138,16 @@ public Q_SLOTS:
   void clear();
 
   /**
-   * when the GUI is performing some changes
-   * that should not go on the UndoStack at all, it should
-   * call beginNonUndoableChanges(). Once it's finished doing
-   * these changes, it must call endNonUndoableChanges() to restore
-   * the IgnoreAllChanges flag state to the one before the push.
+   * when the GUI is performing some changes that should not go on the
+   * UndoStack at all, it should call beginNonUndoableChanges(). Once it's
+   * finished doing these changes, it must call endNonUndoableChanges() to
+   * restore the IgnoreAllChanges flag state to the one before the push.
    */
   void beginNonUndoableChanges();
   void endNonUndoableChanges();
 
   /**
-   * One can add arbitrary elements to the
-   * undo set currently being built.
+   * One can add arbitrary elements to the undo set currently being built.
    */
   void addToActiveUndoSet(vtkUndoElement* element);
 

@@ -184,27 +184,27 @@ public:
   static void setMultipleElementProperty(
     vtkSMProperty* Property, QList<QVariant> Value, PropertyValueType Type = CHECKED);
   /**
-   * get the ranges of possible values to
-   * set the multiple elements of a property
+   * get the ranges of possible values to set the multiple elements of a
+   * property
    */
   static QList<QList<QVariant>> getMultipleElementPropertyDomain(vtkSMProperty* Property);
 
   /**
-   * get one of the multiple elements of a
-   * property (integer, string, real, etc..)
+   * get one of the multiple elements of a property (integer, string, real,
+   * etc..)
    */
   static QVariant getMultipleElementProperty(
     vtkSMProperty* Property, unsigned int Index, PropertyValueType Type = CHECKED);
   /**
-   * set one of the multiple elements of a
-   * property (integer, string, real, etc..)
+   * set one of the multiple elements of a property (integer, string, real,
+   * etc..)
    */
   static void setMultipleElementProperty(
     vtkSMProperty* Property, unsigned int Index, QVariant Value, PropertyValueType Type = CHECKED);
 
   /**
-   * get one of the ranges of possible values
-   * to set the multiple elements of a property
+   * get one of the ranges of possible values to set the multiple elements of a
+   * property
    */
   static QList<QVariant> getMultipleElementPropertyDomain(
     vtkSMProperty* Property, unsigned int Index);
@@ -220,9 +220,9 @@ public:
     vtkSMProperty* Property, QStringList Value, PropertyValueType Type = CHECKED);
 
   /**
-   * Returns a list of domains types for the property. eg.
-   * if a property has vtkSMBoundsDomain and vtkSMArrayListDomain then
-   * this method will returns ["vtkSMBoundsDomain", "vtkSMArrayListDomain"].
+   * Returns a list of domains types for the property. eg. if a property has
+   * vtkSMBoundsDomain and vtkSMArrayListDomain then this method will returns
+   * ["vtkSMBoundsDomain", "vtkSMArrayListDomain"].
    */
   static QList<QString> getDomainTypes(vtkSMProperty* property);
 

@@ -82,8 +82,7 @@ public:
   QModelIndex getIndexFor(pqOutputPort* item) const;
 
   /**
-   * Given a valid index, returns the pqOutputPort item corresponding
-   * to it.
+   * Given a valid index, returns the pqOutputPort item corresponding to it.
    */
   pqOutputPort* getItemFor(const QModelIndex& index) const;
 

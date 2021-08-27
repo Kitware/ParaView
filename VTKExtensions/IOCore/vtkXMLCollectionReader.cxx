@@ -128,12 +128,10 @@ const vtkXMLCollectionReaderInternals::ReaderConstructorsType
     { "vtr", GET_NEW_FUNCTOR(vtkXMLRectilinearGridReader) },
     { "vtm", GET_NEW_FUNCTOR(vtkXMLMultiBlockDataReader) },
     { "vtmb", GET_NEW_FUNCTOR(vtkXMLMultiBlockDataReader) },
-    { "vtmg",
-      GET_NEW_FUNCTOR(
-        vtkXMLMultiGroupDataReader) }, // legacy reader - produces vtkMultiBlockDataSet.
-    { "vthd",
-      GET_NEW_FUNCTOR(
-        vtkXMLHierarchicalDataReader) }, // legacy reader - produces vtkMultiBlockDataSet.
+    // legacy reader - produces vtkMultiBlockDataSet.
+    { "vtmg", GET_NEW_FUNCTOR(vtkXMLMultiGroupDataReader) },
+    // legacy reader - produces vtkMultiBlockDataSet.
+    { "vthd", GET_NEW_FUNCTOR(vtkXMLHierarchicalDataReader) },
     { "vthb", GET_NEW_FUNCTOR(vtkXMLHierarchicalBoxDataReader) },
     { "vts", GET_NEW_FUNCTOR(vtkXMLStructuredGridReader) },
     { "vtt", GET_NEW_FUNCTOR(vtkXMLTableReader) },

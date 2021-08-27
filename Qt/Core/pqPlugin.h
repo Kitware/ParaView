@@ -36,8 +36,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QObjectList>
 
 /**
- * the main plugin interface for GUI extensions
- * one instance of this resides in the plugin
+ * the main plugin interface for GUI extensions one instance of this resides in
+ * the plugin
  */
 class pqPlugin
 {

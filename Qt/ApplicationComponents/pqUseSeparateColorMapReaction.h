@@ -72,8 +72,7 @@ public Q_SLOTS:
 
 protected Q_SLOTS:
   /**
-   * Updates the enabled state. Applications need not explicitly call
-   * this.
+   * Updates the enabled state. Applications need not explicitly call this.
    */
   virtual void updateEnableState();
 

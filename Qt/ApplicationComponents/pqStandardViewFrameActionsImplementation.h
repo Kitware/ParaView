@@ -84,7 +84,6 @@ class QWidget;
  *   </StandardViewFrameActions>
  * </Hints>
  * \endverbatim
- *
  */
 class PQAPPLICATIONCOMPONENTS_EXPORT pqStandardViewFrameActionsImplementation
   : public QObject

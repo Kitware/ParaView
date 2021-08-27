@@ -214,9 +214,8 @@ public Q_SLOTS:
   void viewSaveAsDefaults();
 
   /**
-   * Set the view currently managed by the
-   * panel, should be called automatically
-   * when the active view changes.
+   * Set the view currently managed by the panel, should be called
+   * automatically when the active view changes.
    */
   void setView(pqView*);
 
@@ -228,9 +227,8 @@ public Q_SLOTS:
   void setPipelineProxy(pqProxy*);
 
   /**
-   * Set the representation currently managed by the
-   * panel, should be called automatically
-   * when the active representation changes.
+   * Set the representation currently managed by the panel, should be called
+   * automatically when the active representation changes.
    */
   void setRepresentation(pqDataRepresentation*);
 Q_SIGNALS:
@@ -268,9 +266,8 @@ Q_SIGNALS:
 
 private Q_SLOTS:
   /**
-   * This is called when the user clicks the "Delete" button on the
-   * properties panel. This triggers the deleteRequested() signal with proper
-   * arguments.
+   * This is called when the user clicks the "Delete" button on the properties
+   * panel. This triggers the deleteRequested() signal with proper arguments.
    */
   void deleteProxy();
 

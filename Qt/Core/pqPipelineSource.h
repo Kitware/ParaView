@@ -142,9 +142,9 @@ public:
   QList<pqView*> getViews() const;
 
   /**
-   * This method updates all render modules to which all
-   * representations for this source belong, if force is true, it for an
-   * immediate render otherwise render on idle.
+   * This method updates all render modules to which all representations for
+   * this source belong, if force is true, it for an immediate render otherwise
+   * render on idle.
    */
   void renderAllViews(bool force = false);
 

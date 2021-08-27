@@ -53,8 +53,7 @@ public:
   ~pqScalarsToColors() override;
 
   /**
-   * Returns the first scalar bar visible in the given render module,
-   * if any.
+   * Returns the first scalar bar visible in the given render module, if any.
    */
   pqScalarBarRepresentation* getScalarBar(pqRenderViewBase* ren) const;
 
@@ -65,15 +64,14 @@ public:
 
   /**
    * Sets the scalar range.
-   * Does not consider the ScalarRangeLock. Moves all control points
-   * uniformly to fit the new range.
+   * Does not consider the ScalarRangeLock. Moves all control points uniformly
+   * to fit the new range.
    */
   void setScalarRange(double min, double max);
 
   /**
-   * Returns the current scalar range. If number of RGBPoints is 0,
-   * then the scalar range is not defined (in which case this method
-   * returns (0, 0).
+   * Returns the current scalar range. If number of RGBPoints is 0, then the
+   * scalar range is not defined (in which case this method returns (0, 0).
    */
   QPair<double, double> getScalarRange() const;
 
@@ -149,8 +147,8 @@ public Q_SLOTS:
 
 protected Q_SLOTS:
   /**
-   * Checks to make sure that the range is compatible with the log flag
-   * and adjusts it if necessary.
+   * Checks to make sure that the range is compatible with the log flag and
+   * adjusts it if necessary.
    */
   void checkRange();
 

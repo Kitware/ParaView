@@ -54,9 +54,8 @@ public:
   ~pqProgressManager() override;
 
   /**
-   * Locks progress to respond to progress signals
-   * set by the \c object alone. All signals sent by other
-   * objects are ignored until Unlock is called.
+   * Locks progress to respond to progress signals set by the \c object alone.
+   * All signals sent by other objects are ignored until Unlock is called.
    */
   void lockProgress(QObject* object);
 
@@ -71,9 +70,8 @@ public:
   bool isLocked() const;
 
   /**
-   * When progress is enabled, the manager eats all
-   * mouse and key events fired except for those objects
-   * which are in the non-blockable list.
+   * When progress is enabled, the manager eats all mouse and key events fired
+   * except for those objects which are in the non-blockable list.
    * This is the API to add/remove non-blockable objects.
    */
   void addNonBlockableObject(QObject* o) { this->NonBlockableObjects.push_back(o); }
@@ -92,9 +90,9 @@ protected:
 
 public Q_SLOTS:
   /**
-   * Update progress. The progress must be enbled by
-   * calling enableProgress(true) before calling  this method
-   * for the progress to be updated.
+   * Update progress. The progress must be enbled by calling
+   * enableProgress(true) before calling  this method for the progress to be
+   * updated.
    */
   void setProgress(const QString& message, int progress);
 
@@ -115,8 +113,7 @@ public Q_SLOTS:
   void setEnableAbort(bool);
 
   /**
-   * fires abort(). Must be called by the GUI that triggers
-   * abort.
+   * fires abort(). Must be called by the GUI that triggers abort.
    */
   void triggerAbort();
 

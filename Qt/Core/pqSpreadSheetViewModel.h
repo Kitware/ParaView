@@ -143,8 +143,8 @@ public:
   void setDecimalPrecision(int);
   int getDecimalPrecision();
 
-  /** Set/Get whether the decimal representation is fixed or
-   * scientific.  True is fixed and False is scientific
+  /** Set/Get whether the decimal representation is fixed or scientific.  True
+   * is fixed and False is scientific
    */
   void setFixedRepresentation(bool);
   bool getFixedRepresentation();

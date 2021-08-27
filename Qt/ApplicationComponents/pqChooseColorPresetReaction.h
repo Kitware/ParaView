@@ -98,8 +98,7 @@ public Q_SLOTS:
   void setTransferFunction(vtkSMProxy* lut);
 
   /**
-   * Updates the enabled state. Applications need not explicitly call
-   * this.
+   * Updates the enabled state. Applications need not explicitly call this.
    */
   void updateEnableState() override;
 

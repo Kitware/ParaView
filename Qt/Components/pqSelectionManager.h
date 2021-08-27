@@ -79,14 +79,14 @@ public:
   pqOutputPort* getSelectedPort() const;
 
   /**
-   * Return all currently selected pqOutputPort as a QSet,
-   * or an empty QSet if there aren't any
+   * Return all currently selected pqOutputPort as a QSet, or an empty QSet if
+   * there aren't any
    */
   const QSet<pqOutputPort*>& getSelectedPorts() const;
 
   /**
-   * Return true if there is at least one currently selected pqOutputPort
-   * false otherwise
+   * Return true if there is at least one currently selected pqOutputPort false
+   * otherwise
    */
   bool hasActiveSelection() const;
 
@@ -105,8 +105,8 @@ Q_SIGNALS:
 public Q_SLOTS:
   /**
    * Clear selection on a pqOutputPort.
-   * Calling the method without arguments or with nullptr
-   * will clear all selection
+   * Calling the method without arguments or with nullptr will clear all
+   * selection
    */
   void clearSelection(pqOutputPort* outputPort = nullptr);
 
@@ -137,14 +137,12 @@ public Q_SLOTS:
 
 private Q_SLOTS:
   /**
-   * Called when pqLinkModel creates a link,
-   * to update the selection
+   * Called when pqLinkModel creates a link, to update the selection
    */
   void onLinkAdded(int linkType);
 
   /**
-   * Called when pqLinkModel removes a link,
-   * to update the selection
+   * Called when pqLinkModel removes a link, to update the selection
    */
   void onLinkRemoved();
 

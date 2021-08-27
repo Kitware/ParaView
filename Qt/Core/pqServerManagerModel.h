@@ -257,8 +257,8 @@ Q_SIGNALS:
   void itemAdded(pqServerManagerModelItem*);
 
   /**
-   * Signals emitted when any new pqServerManagerModelItem subclass is
-   * being destroyed.
+   * Signals emitted when any new pqServerManagerModelItem subclass is being
+   * destroyed.
    */
   void preItemRemoved(pqServerManagerModelItem*);
   void itemRemoved(pqServerManagerModelItem*);
@@ -382,8 +382,8 @@ private:
   Q_DISABLE_COPY(pqServerManagerModel)
 
   /**
-   * Process the QSettings-only settings, setting the values in the
-   * various settings proxies.
+   * Process the QSettings-only settings, setting the values in the various
+   * settings proxies.
    */
   void updateSettingsFromQSettings(pqServer* server);
 

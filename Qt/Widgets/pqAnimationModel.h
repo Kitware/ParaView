@@ -143,8 +143,7 @@ public:
   void positionZoom(double zoomStartTime);
 
   /**
-   * provides access to the custom ticks set using
-   * setTickMarks() method.
+   * provides access to the custom ticks set using setTickMarks() method.
    */
   const QList<double>& customTicks() const { return this->CustomTicks; }
 
