@@ -575,8 +575,7 @@ int main(int argc, char** argv)
     &use_ordered_compositing, "Use ordered compositing");
   args.AddArgument("--use-depth-peeling", vtksys::CommandLineArguments::NO_ARGUMENT,
     &use_depth_peeling,
-    "Use depth peeling."
-    "This works only when --use-ordered-compositing is true.");
+    "Use depth peeling. This works only when --use-ordered-compositing is true.");
   args.AddArgument("--server", vtksys::CommandLineArguments::NO_ARGUMENT, &act_as_server,
     "When present, the root process acts as a server process for a client.");
 

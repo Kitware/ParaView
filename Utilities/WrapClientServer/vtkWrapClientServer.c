@@ -315,8 +315,8 @@ void return_result(FILE* fp)
       {
         fprintf(fp,
           "      resultStream.Reset();\n"
-          "      resultStream << vtkClientServerStream::Reply << (vtkObjectBase *)temp%i "
-          "<< vtkClientServerStream::End;\n",
+          "      resultStream << vtkClientServerStream::Reply << (vtkObjectBase *)temp%i << "
+          "vtkClientServerStream::End;\n",
           MAX_ARGS);
         return;
       }
@@ -1325,8 +1325,7 @@ int main(int argc, char* argv[])
       fprintf(fp, "// bacause the class %s is based on a templated VTK class.\n", data->Name);
       fprintf(fp, "// Wrapping such classes is not currently supported.\n");
       fprintf(fp,
-        "// Here follows the list of detected superclasses "
-        "(first offending one marked by !):\n");
+        "// Here follows the list of detected superclasses (first offending one marked by !):\n");
 
       for (j = 0; j < data->NumberOfSuperClasses; ++j)
       {
@@ -1392,10 +1391,10 @@ int main(int argc, char* argv[])
 
   fprintf(fp,
     "\n"
-    "int VTK_EXPORT"
-    " %sCommand(vtkClientServerInterpreter *arlu, vtkObjectBase *ob,"
-    " const char *method, const vtkClientServerStream& msg,"
-    " vtkClientServerStream& resultStream, void* /*ctx*/)\n"
+    "int VTK_EXPORT %sCommand(\n"
+    "  vtkClientServerInterpreter *arlu, vtkObjectBase *ob,\n"
+    "  const char *method, const vtkClientServerStream& msg,\n"
+    "  vtkClientServerStream& resultStream, void* /*ctx*/)\n"
     "{\n",
     data->Name);
 
@@ -1411,8 +1410,8 @@ int main(int argc, char* argv[])
       "    {\n"
       "    vtkOStrStreamWrapper vtkmsg;\n"
       "    vtkmsg << \"Cannot cast \" << ob->GetClassName() << \" object to %s.  \"\n"
-      "           << \"This probably means the class specifies the incorrect superclass "
-      "in vtkTypeMacro.\";\n"
+      "           << \"This probably means the class specifies the incorrect superclass in "
+      "vtkTypeMacro.\";\n"
       "    resultStream.Reset();\n"
       "    resultStream << vtkClientServerStream::Error\n"
       "                 << vtkmsg.str() << 0 << vtkClientServerStream::End;\n"
@@ -1440,8 +1439,8 @@ int main(int argc, char* argv[])
       "  {\n"
       "    const char* commandName = \"%s\";\n"
       "    if (arlu->HasCommandFunction(commandName) &&\n"
-      "        arlu->CallCommandFunction(commandName, op, method, msg, resultStream)) { "
-      "return 1; }\n"
+      "        arlu->CallCommandFunction(commandName, op, method, msg, resultStream)) { return 1; "
+      "}\n"
       "  }\n",
       data->SuperClasses[i]);
   }

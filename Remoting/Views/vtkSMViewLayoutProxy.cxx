@@ -626,9 +626,7 @@ bool vtkSMViewLayoutProxy::AssignView(int location, vtkSMViewProxy* view)
   vtkInternals::Cell& cell = this->Internals->KDTree[location];
   if (cell.Direction != NONE)
   {
-    vtkErrorMacro("Cell is not a leaf '" << location
-                                         << "'."
-                                            " Cannot assign a view to it.");
+    vtkErrorMacro("Cell is not a leaf '" << location << "'. Cannot assign a view to it.");
     return false;
   }
 

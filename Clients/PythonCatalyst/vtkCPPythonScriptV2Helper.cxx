@@ -182,9 +182,7 @@ bool vtkCPPythonScriptV2Helper::vtkInternals::Import(const std::vector<std::stri
   if (!this->PackageName)
   {
     // not "prepared".
-    vtkLogF(ERROR,
-      "Cannot determine package name. "
-      "Did you forget to call 'PrepareFromScript'?");
+    vtkLogF(ERROR, "Cannot determine package name. Did you forget to call 'PrepareFromScript'?");
     return false;
   }
 

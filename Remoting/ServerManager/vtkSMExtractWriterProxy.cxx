@@ -78,9 +78,7 @@ std::string vtkSMExtractWriterProxy::GenerateExtractsFileName(
   vtksys::SystemTools::ReplaceString(name, "%cm", "{camera}");
   if (possibleOldFormatString2 != name || oldFormatUsed)
   {
-    vtkLogF(WARNING,
-      "Legacy formatting pattern detected."
-      "Please replace '%s' with '%s'.",
+    vtkLogF(WARNING, "Legacy formatting pattern detected. Please replace '%s' with '%s'.",
       possibleOldFormatString1.c_str(), name.c_str());
   }
 

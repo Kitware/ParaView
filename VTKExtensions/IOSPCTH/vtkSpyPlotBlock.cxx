@@ -858,9 +858,8 @@ int vtkSpyPlotBlock::SetGeometry(int dir, const unsigned char* encodedInfo, int 
       {
         if (compIndex >= compSize)
         {
-          vtkErrorWithObjectMacro(nullptr,
-            "Problem doing RLD decode. "
-              << "Too much data generated. Expected: " << compSize);
+          vtkErrorWithObjectMacro(
+            nullptr, "Problem doing RLD decode. Too much data generated. Expected: " << compSize);
           return 0;
         }
         comp[compIndex] = val + compIndex * delta;
@@ -875,9 +874,8 @@ int vtkSpyPlotBlock::SetGeometry(int dir, const unsigned char* encodedInfo, int 
       {
         if (compIndex >= compSize)
         {
-          vtkErrorWithObjectMacro(nullptr,
-            "Problem doing RLD decode. "
-              << "Too much data generated. Expected: " << compSize);
+          vtkErrorWithObjectMacro(
+            nullptr, "Problem doing RLD decode. Too much data generated. Expected: " << compSize);
           return 0;
         }
         float nval;

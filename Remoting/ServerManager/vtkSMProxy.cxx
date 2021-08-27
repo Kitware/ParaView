@@ -1896,8 +1896,8 @@ void vtkSMProxy::SetupSharedProperties(vtkSMProxy* subproxy, vtkPVXMLElement* el
       if (!src_subproxy)
       {
         vtkErrorMacro("Subproxy " << name
-                                  << " must be defined before "
-                                     "its properties can be shared with another subproxy.");
+                                  << " must be defined before its properties "
+                                     "can be shared with another subproxy.");
         continue;
       }
       vtkSMProxyLink* sharingLink = vtkSMProxyLink::New();

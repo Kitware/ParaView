@@ -152,9 +152,7 @@ void vtkNvPipeCompressor::SetImageResolution(int w, int h)
   assert(h >= 0);
   if (w > 8192 || h > 8192)
   {
-    vtkWarningMacro("Image size (" << w << "x" << h
-                                   << ") exceeds max image "
-                                      "size for NvPipe.");
+    vtkWarningMacro("Image size (" << w << "x" << h << ") exceeds max image size for NvPipe.");
   }
   this->Width = static_cast<size_t>(w);
   this->Height = static_cast<size_t>(h);

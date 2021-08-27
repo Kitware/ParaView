@@ -268,9 +268,8 @@ enum catalyst_status catalyst_initialize_paraview(const conduit_node* params)
   {
     // no catalyst initialization specified.
     vtkVLogF(PARAVIEW_LOG_CATALYST_VERBOSITY(),
-      "No Catalyst Python scripts or pre-compiled "
-      "pipelines specified. No analysis pipelines will "
-      "be executed.");
+      "No Catalyst Python scripts or pre-compiled pipelines specified. No "
+      "analysis pipelines will be executed.");
   }
 
   return catalyst_status_ok;
@@ -414,8 +413,7 @@ enum catalyst_status catalyst_execute_paraview(const conduit_node* params)
   else
   {
     vtkVLogF(PARAVIEW_LOG_CATALYST_VERBOSITY(),
-      "No 'catalyst/channels' found. "
-      "No meshes will be processed.");
+      "No 'catalyst/channels' found. No meshes will be processed.");
   }
 
   // check for optional 'parameters'

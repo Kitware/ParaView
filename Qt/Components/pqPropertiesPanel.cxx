@@ -698,10 +698,8 @@ void pqPropertiesPanel::sourcePropertyChanged(bool change_finished /*=true*/)
   if (change_finished && !this->Internals->ReceivedChangeAvailable)
   {
     vtkVLogF(PARAVIEW_LOG_APPLICATION_VERBOSITY(),
-      "received `changeFinished` signal without "
-      "receiving a `changeAvailable` signal from "
-      "`%s`'s proxy-widget;"
-      "ignoring it!",
+      "received `changeFinished` signal without receiving a `changeAvailable` "
+      "signal from `%s`'s proxy-widget; ignoring it!",
       proxyLabel.c_str());
     return;
   }

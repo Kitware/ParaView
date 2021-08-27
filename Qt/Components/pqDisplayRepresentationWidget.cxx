@@ -199,7 +199,7 @@ void pqDisplayRepresentationWidget::comboBoxChanged(const QString& text)
         QMessageBox::Question, "Are you sure?",
         QString("This will change the representation type to \"%1\".\n"
                 "That may take a while, depending on your dataset.\n"
-                " Are you sure?")
+                "Are you sure?")
           .arg(text),
         QMessageBox::Yes | QMessageBox::No | QMessageBox::Save);
 

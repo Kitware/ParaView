@@ -106,9 +106,7 @@ int vtkTimeToTextConvertor::RequestData(vtkInformation* vtkNotUsed(request),
     vtksys::SystemTools::ReplaceString(formattedTitle, "%f", "{time:f}");
     if (possibleOldFormatString != formattedTitle)
     {
-      vtkLogF(WARNING,
-        "Legacy formatting pattern detected."
-        "Please replace '%s' with '%s'.",
+      vtkLogF(WARNING, "Legacy formatting pattern detected. Please replace '%s' with '%s'.",
         possibleOldFormatString.c_str(), formattedTitle.c_str());
     }
 

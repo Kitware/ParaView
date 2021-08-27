@@ -793,8 +793,8 @@ bool vtkSMTransferFunctionProxy::ApplyPreset(const Json::Value& arg, bool rescal
     .arg(arg.get("Name", "-PresetName-").asString().c_str())
     .arg(rescale)
     .arg("comment",
-      "Apply a preset using its name. "
-      "Note this may not work as expected when presets have duplicate names.");
+      "Apply a preset using its name. Note this may not work as expected when "
+      "presets have duplicate names.");
 
   bool usingIndexedColors = arg.isMember("IndexedColors");
 

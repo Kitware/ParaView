@@ -532,9 +532,7 @@ void pqDisplayColorWidget::setComponentNumber(int val)
       this->Components->blockSignals(false);
 
       index = this->Components->findData(val);
-      qDebug() << "Component " << val
-               << " is not currently known. "
-                  "Will add a new entry for it.";
+      qDebug() << "Component " << val << " is not currently known. Will add a new entry for it.";
     }
     assert(index != -1);
     this->Components->blockSignals(true);

@@ -417,8 +417,7 @@ void pqIndexSelectionWidget::buildWidget(vtkSMProperty* infoProp)
   if (!svp)
   {
     qWarning() << Q_FUNC_INFO
-               << "index_selection widget expects "
-                  "Hints/InfoProperty to be a "
+               << "index_selection widget expects Hints/InfoProperty to be a "
                   "StringVectorProperty.";
     return;
   }
@@ -427,9 +426,7 @@ void pqIndexSelectionWidget::buildWidget(vtkSMProperty* infoProp)
   svp->GetElements(strings.GetPointer());
   if (strings->GetNumberOfStrings() % 3 != 0)
   {
-    qWarning() << Q_FUNC_INFO
-               << "index_selection InfoProperty size must be a "
-                  "multiple of 3.";
+    qWarning() << Q_FUNC_INFO << "index_selection InfoProperty size must be a multiple of 3.";
     return;
   }
 

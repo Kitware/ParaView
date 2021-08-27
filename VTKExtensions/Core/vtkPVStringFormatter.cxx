@@ -72,8 +72,10 @@ std::string vtkPVStringFormatter::Format(const std::string& formattableString)
     // vtkErrorMacro can not be used because this function is static
     auto object = vtkSmartPointer<vtkPVStringFormatter>::New();
     vtkErrorWithObjectMacro(object,
-      "\nInvalid format specified '" << formattableString << "'\n"
-                                     << "Details: " << error.what() << "\n\n"
+      "\nInvalid format specified '" << formattableString
+                                     << "'\n"
+                                        "Details: "
+                                     << error.what() << "\n\n"
                                      << vtkPVStringFormatter::GetArgInfo());
     result = std::string();
   }
