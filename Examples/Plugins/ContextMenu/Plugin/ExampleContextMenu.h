@@ -52,7 +52,7 @@ class ExampleContextMenu : public QObject, public pqContextMenuInterface
 public:
   ExampleContextMenu();
   ExampleContextMenu(QObject* parent);
-  virtual ~ExampleContextMenu();
+  ~ExampleContextMenu() override;
 
   /// This method is called when a context menu is requested,
   /// usually by a right click in a pqView instance.
