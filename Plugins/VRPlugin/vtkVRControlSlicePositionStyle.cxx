@@ -68,9 +68,7 @@ vtkVRControlSlicePositionStyle::vtkVRControlSlicePositionStyle()
 
 // ----------------------------------------------------------------------------
 // Destructor method
-vtkVRControlSlicePositionStyle::~vtkVRControlSlicePositionStyle()
-{
-}
+vtkVRControlSlicePositionStyle::~vtkVRControlSlicePositionStyle() = default;
 
 // ----------------------------------------------------------------------------
 // PrintSelf() method

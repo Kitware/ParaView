@@ -44,9 +44,7 @@ pqMyApplicationStarter::pqMyApplicationStarter(QObject* p /*=0*/)
 }
 
 //-----------------------------------------------------------------------------
-pqMyApplicationStarter::~pqMyApplicationStarter()
-{
-}
+pqMyApplicationStarter::~pqMyApplicationStarter() = default;
 
 //-----------------------------------------------------------------------------
 void pqMyApplicationStarter::onStartup()

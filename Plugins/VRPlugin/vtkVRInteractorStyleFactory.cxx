@@ -116,9 +116,7 @@ vtkVRInteractorStyleFactory::vtkVRInteractorStyleFactory()
 }
 
 //-----------------------------------------------------------------------------
-vtkVRInteractorStyleFactory::~vtkVRInteractorStyleFactory()
-{
-}
+vtkVRInteractorStyleFactory::~vtkVRInteractorStyleFactory() = default;
 
 //-----------------------------------------------------------------------------
 void vtkVRInteractorStyleFactory::SetInstance(vtkVRInteractorStyleFactory* ins)

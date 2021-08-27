@@ -55,9 +55,7 @@ vtkVRUITrackerState::vtkVRUITrackerState()
 }
 
 // ----------------------------------------------------------------------------
-vtkVRUITrackerState::~vtkVRUITrackerState()
-{
-}
+vtkVRUITrackerState::~vtkVRUITrackerState() = default;
 
 // ----------------------------------------------------------------------------
 void vtkVRUITrackerState::PrintSelf(ostream& os, vtkIndent indent)

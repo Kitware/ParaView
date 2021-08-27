@@ -41,9 +41,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <iostream>
 
 //-----------------------------------------------------------------------------
-ExampleContextMenu::ExampleContextMenu()
-{
-}
+ExampleContextMenu::ExampleContextMenu() = default;
 
 //-----------------------------------------------------------------------------
 ExampleContextMenu::ExampleContextMenu(QObject* parent)
@@ -52,9 +50,7 @@ ExampleContextMenu::ExampleContextMenu(QObject* parent)
 }
 
 //-----------------------------------------------------------------------------
-ExampleContextMenu::~ExampleContextMenu()
-{
-}
+ExampleContextMenu::~ExampleContextMenu() = default;
 
 bool ExampleContextMenu::contextMenu(QMenu* menu, pqView* viewContext, const QPoint& viewPoint,
   pqRepresentation* dataContext, const QList<unsigned int>& dataBlockContext) const

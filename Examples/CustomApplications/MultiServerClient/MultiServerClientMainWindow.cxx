@@ -98,9 +98,7 @@ MultiServerClientMainWindow::MultiServerClientMainWindow(
 }
 
 //-----------------------------------------------------------------------------
-MultiServerClientMainWindow::~MultiServerClientMainWindow()
-{
-}
+MultiServerClientMainWindow::~MultiServerClientMainWindow() = default;
 
 //-----------------------------------------------------------------------------
 void MultiServerClientMainWindow::applyPipelineFiltering(int index)

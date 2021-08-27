@@ -31,9 +31,7 @@ vtkMinkowskiFilter::vtkMinkowskiFilter()
   this->SetNumberOfOutputPorts(1);
 }
 
-vtkMinkowskiFilter::~vtkMinkowskiFilter()
-{
-}
+vtkMinkowskiFilter::~vtkMinkowskiFilter() = default;
 
 void vtkMinkowskiFilter::PrintSelf(ostream& os, vtkIndent indent)
 {

@@ -60,6 +60,4 @@ myMainWindow::myMainWindow(QWidget* parentObject, Qt::WindowFlags wflags)
 }
 
 //-----------------------------------------------------------------------------
-myMainWindow::~myMainWindow()
-{
-}
+myMainWindow::~myMainWindow() = default;

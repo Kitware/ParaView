@@ -64,9 +64,7 @@ vtkVRUIPipe::vtkVRUIPipe(int socket)
 
 // ----------------------------------------------------------------------------
 // Destructor method
-vtkVRUIPipe::~vtkVRUIPipe()
-{
-}
+vtkVRUIPipe::~vtkVRUIPipe() = default;
 
 // ----------------------------------------------------------------------------
 void vtkVRUIPipe::Send(MessageTag m)

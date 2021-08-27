@@ -71,9 +71,7 @@ vtkVRGrabWorldStyle::vtkVRGrabWorldStyle()
 
 // ----------------------------------------------------------------------------
 // Destructor method
-vtkVRGrabWorldStyle::~vtkVRGrabWorldStyle()
-{
-}
+vtkVRGrabWorldStyle::~vtkVRGrabWorldStyle() = default;
 
 // ----------------------------------------------------------------------------
 // PrintSelf() method

@@ -28,9 +28,7 @@ vtkCPVTKPipeline::vtkCPVTKPipeline()
 }
 
 //----------------------------------------------------------------------------
-vtkCPVTKPipeline::~vtkCPVTKPipeline()
-{
-}
+vtkCPVTKPipeline::~vtkCPVTKPipeline() = default;
 
 //----------------------------------------------------------------------------
 void vtkCPVTKPipeline::Initialize(int outputFrequency, std::string& fileName)

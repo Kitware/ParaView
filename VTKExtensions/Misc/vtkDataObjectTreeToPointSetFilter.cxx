@@ -43,9 +43,7 @@ vtkDataObjectTreeToPointSetFilter::vtkDataObjectTreeToPointSetFilter()
 }
 
 //----------------------------------------------------------------------------
-vtkDataObjectTreeToPointSetFilter::~vtkDataObjectTreeToPointSetFilter()
-{
-}
+vtkDataObjectTreeToPointSetFilter::~vtkDataObjectTreeToPointSetFilter() = default;
 
 //----------------------------------------------------------------------------
 int vtkDataObjectTreeToPointSetFilter::RequestDataObject(vtkInformation* vtkNotUsed(request),

@@ -3,9 +3,7 @@
 #include <iostream>
 #include <mpi.h>
 
-Grid::Grid()
-{
-}
+Grid::Grid() = default;
 
 void Grid::Initialize(const unsigned int numPoints[3], const double spacing[3])
 {

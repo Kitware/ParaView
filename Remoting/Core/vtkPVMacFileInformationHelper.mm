@@ -25,14 +25,10 @@
 vtkStandardNewMacro(vtkPVMacFileInformationHelper);
 
 //-----------------------------------------------------------------------------
-vtkPVMacFileInformationHelper::vtkPVMacFileInformationHelper()
-{
-}
+vtkPVMacFileInformationHelper::vtkPVMacFileInformationHelper() = default;
 
 //-----------------------------------------------------------------------------
-vtkPVMacFileInformationHelper::~vtkPVMacFileInformationHelper()
-{
-}
+vtkPVMacFileInformationHelper::~vtkPVMacFileInformationHelper() = default;
 
 //-----------------------------------------------------------------------------
 std::string vtkPVMacFileInformationHelper::GetHomeDirectory()

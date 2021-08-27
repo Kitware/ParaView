@@ -19,14 +19,10 @@
 vtkStandardNewMacro(vtkMyElevationFilter);
 
 //----------------------------------------------------------------------------
-vtkMyElevationFilter::vtkMyElevationFilter()
-{
-}
+vtkMyElevationFilter::vtkMyElevationFilter() = default;
 
 //----------------------------------------------------------------------------
-vtkMyElevationFilter::~vtkMyElevationFilter()
-{
-}
+vtkMyElevationFilter::~vtkMyElevationFilter() = default;
 
 //----------------------------------------------------------------------------
 void vtkMyElevationFilter::PrintSelf(ostream& os, vtkIndent indent)

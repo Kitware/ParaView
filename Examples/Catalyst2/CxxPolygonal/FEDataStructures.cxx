@@ -4,9 +4,7 @@
 #include <iterator>
 #include <mpi.h>
 
-Grid::Grid()
-{
-}
+Grid::Grid() = default;
 
 void Grid::Initialize(const unsigned int numPoints[2], const double spacing[2])
 {

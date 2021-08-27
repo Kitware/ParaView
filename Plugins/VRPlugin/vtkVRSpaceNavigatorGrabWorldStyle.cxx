@@ -56,9 +56,7 @@ vtkVRSpaceNavigatorGrabWorldStyle::vtkVRSpaceNavigatorGrabWorldStyle()
 
 // ----------------------------------------------------------------------------
 // Destructor method
-vtkVRSpaceNavigatorGrabWorldStyle::~vtkVRSpaceNavigatorGrabWorldStyle()
-{
-}
+vtkVRSpaceNavigatorGrabWorldStyle::~vtkVRSpaceNavigatorGrabWorldStyle() = default;
 
 // ----------------------------------------------------------------------------
 // PrintSelf() method

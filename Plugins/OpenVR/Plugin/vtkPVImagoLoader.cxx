@@ -240,9 +240,7 @@ Json::Value getJSON(std::vector<char> const& result)
 }
 }
 
-vtkImagoLoader::vtkImagoLoader()
-{
-}
+vtkImagoLoader::vtkImagoLoader() = default;
 
 vtkImagoLoader::~vtkImagoLoader()
 {

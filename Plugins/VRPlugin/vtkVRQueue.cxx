@@ -45,9 +45,7 @@ vtkVRQueue::vtkVRQueue()
 }
 
 //----------------------------------------------------------------------------
-vtkVRQueue::~vtkVRQueue()
-{
-}
+vtkVRQueue::~vtkVRQueue() = default;
 
 //----------------------------------------------------------------------------
 void vtkVRQueue::Enqueue(const vtkVREvent& event)

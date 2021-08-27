@@ -64,6 +64,4 @@ pqMyPropertyWidgetForProperty::pqMyPropertyWidgetForProperty(
 }
 
 //-----------------------------------------------------------------------------
-pqMyPropertyWidgetForProperty::~pqMyPropertyWidgetForProperty()
-{
-}
+pqMyPropertyWidgetForProperty::~pqMyPropertyWidgetForProperty() = default;

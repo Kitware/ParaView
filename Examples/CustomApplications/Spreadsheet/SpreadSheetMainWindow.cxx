@@ -80,9 +80,7 @@ SpreadSheetMainWindow::SpreadSheetMainWindow(QWidget* parentObject, Qt::WindowFl
 }
 
 //-----------------------------------------------------------------------------
-SpreadSheetMainWindow::~SpreadSheetMainWindow()
-{
-}
+SpreadSheetMainWindow::~SpreadSheetMainWindow() = default;
 
 //-----------------------------------------------------------------------------
 void SpreadSheetMainWindow::showData(pqPipelineSource* source)
