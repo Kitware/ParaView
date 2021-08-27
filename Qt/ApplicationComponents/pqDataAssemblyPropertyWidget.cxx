@@ -768,7 +768,9 @@ void hookupActiveSelection(
         // update selection.
         auto selectors = getSelectors(port->getSelectionInput(), assembly);
         const auto nodes = assembly->SelectNodes(selectors);
-        auto indexes = model->index(QList<int>(nodes.begin(), nodes.end()));
+        QList<int> iListNodes;
+        std::copy(nodes.begin(), nodes.end(), std::back_inserter(iListNodes));
+        auto indexes = model->index(iListNodes);
         QItemSelection selection;
         for (const auto& idx : indexes)
         {
