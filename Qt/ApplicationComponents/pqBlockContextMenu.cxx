@@ -112,7 +112,9 @@ bool pqBlockContextMenu::contextMenu(QMenu* menu, pqView*, const QPoint&,
       model->setDataAssembly(hierarchy);
       model->setCheckedNodes({ "/" });
       const auto nodes = hierarchy->SelectNodes(dataBlockContext);
-      auto indexes = model->index(QList<int>(nodes.begin(), nodes.end()));
+      QList<int> iListNodes;
+      std::copy(nodes.begin(), nodes.end(), std::back_inserter(iListNodes));
+      auto indexes = model->index(iListNodes);
       for (auto& idx : indexes)
       {
         model->setData(idx, Qt::Unchecked, Qt::CheckStateRole);
