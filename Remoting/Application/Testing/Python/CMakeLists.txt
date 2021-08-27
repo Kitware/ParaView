@@ -47,6 +47,7 @@ set(PY_TESTS
   SaveScreenshot.py,NO_VALID
   ScalarBarActorBackwardsCompatibility.py,NO_VALID
   TestFetchData.py,NO_VALID
+  TestSAVGReader.py
   TestVTKSeriesWithMeta.py
   ThresholdBackwardsCompatibilityTest.py,NO_VALID
   ValidateSources.py,NO_VALID

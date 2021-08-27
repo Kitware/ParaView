@@ -21,7 +21,8 @@ if (PARAVIEW_USE_PYTHON)
     Data/elements.vtu
     Data/multicomb_0.vts
     Data/poisson_3dall_2.xmf
-    Data/quadraticTetra01.vtu)
+    Data/quadraticTetra01.vtu
+    Data/test.savg)
 
   ExternalData_Expand_Arguments(ParaViewData _
     # Baselines

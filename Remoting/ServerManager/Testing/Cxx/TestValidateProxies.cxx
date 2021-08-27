@@ -75,6 +75,7 @@ int TestValidateProxies(int argc, char* argv[])
 
   // reports errors when required Python modules are missing.
   exceptions.insert(PairType("sources", "OpenPMDReader"));
+  exceptions.insert(PairType("sources", "SAVGReader"));
   (void)argc;
 
   int exitCode = EXIT_SUCCESS;
