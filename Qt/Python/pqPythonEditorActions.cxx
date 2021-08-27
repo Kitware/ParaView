@@ -137,27 +137,27 @@ void pqPythonEditorActions::updateScriptsList()
     QAction* openAction = &actions[ScriptAction::Type::Open];
     openAction->setText(filename);
     QObject::connect(openAction, &QAction::triggered, [openAction]() {
-      const QString filename =
+      const QString openedFilename =
         pqPythonScriptEditor::getScriptsDir() + "/" + openAction->text() + ".py";
       auto scriptEditor = pqPythonScriptEditor::getUniqueInstance();
-      scriptEditor->open(filename);
+      scriptEditor->open(openedFilename);
     });
 
     QAction* loadAction = &actions[ScriptAction::Type::Load];
     loadAction->setText(filename);
     QObject::connect(loadAction, &QAction::triggered, [loadAction]() {
-      const QString filename =
+      const QString loadedFilename =
         pqPythonScriptEditor::getScriptsDir() + "/" + loadAction->text() + ".py";
       auto scriptEditor = pqPythonScriptEditor::getUniqueInstance();
-      scriptEditor->load(filename);
+      scriptEditor->load(loadedFilename);
     });
 
     QAction* deleteAction = &actions[ScriptAction::Type::Delete];
     deleteAction->setText(filename);
     QObject::connect(deleteAction, &QAction::triggered, [deleteAction]() {
-      const QString filename =
+      const QString deletedFilename =
         pqPythonScriptEditor::getScriptsDir() + "/" + deleteAction->text() + ".py";
-      QFile file(filename);
+      QFile file(deletedFilename);
       file.remove();
       pqPythonScriptEditor::getUniqueInstance()->updateScriptList();
     });
@@ -172,9 +172,9 @@ void pqPythonEditorActions::FillQMenu(EnumArray<ScriptAction::Type, QMenu*> menu
     const ScriptAction::Type type = static_cast<ScriptAction::Type>(j);
     menus[type]->clear();
 
-    for (int i = 0; i < this->ScriptActions.size(); ++i)
+    for (auto action : this->ScriptActions)
     {
-      menus[type]->addAction(&this->ScriptActions[i][type]);
+      menus[type]->addAction(&action[type]);
     }
   }
 }

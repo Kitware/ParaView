@@ -66,39 +66,44 @@ public:
   pqDefaultContextMenu(QObject* parent = 0);
   ~pqDefaultContextMenu() override;
 
+  //@{
   /**
    * Create ParaView's default context menu.
    * It will always return false (i.e., allow lower-priority menus to append/modify
    * its output).
    */
+  using pqContextMenuInterface::contextMenu;
   bool contextMenu(QMenu* menu, pqView* viewContext, const QPoint& viewPoint,
     pqRepresentation* dataContext, const QList<unsigned int>& dataBlockContext) const override;
+  //@}
 
-  /// The priority is used to order calls to pqContextMenuInterface::contextMenu among
-  /// all registered instances of pqContextMenuInterface.
+  /**
+   * The priority is used to order calls to pqContextMenuInterface::contextMenu among
+   * all registered instances of pqContextMenuInterface.
+   */
   int priority() const override { return 0; }
 
 protected Q_SLOTS:
 
   /**
-  * called to hide the representation.
-  */
+   * called to hide the representation.
+   */
   void hide();
 
   /**
-  * called to change the representation type.
-  */
+   * called to change the representation type.
+   */
   void reprTypeChanged(QAction* action);
 
   /**
-  * called to change the coloring mode.
-  */
+   * called to change the coloring mode.
+   */
   void colorMenuTriggered(QAction* action);
 
 protected:
   /**
-  * called to build the color arrays submenu.
-  */
+   * called to build the color arrays submenu.
+   */
   virtual void buildColorFieldsMenu(pqPipelineRepresentation* pipelineRepr, QMenu* menu) const;
 
   mutable QPoint Position;
