@@ -63,6 +63,7 @@ OPTIONAL_DEPENDS
   VTK::IOMotionFX
   VTK::IONetCDF
   VTK::IOOMF
+  VTK::IOOpenVDB
   VTK::IOParallel
   VTK::IOParallelLSDyna
   VTK::IOParallelNetCDF

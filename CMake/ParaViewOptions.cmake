@@ -420,6 +420,11 @@ paraview_require_module(
   EXCLUSIVE)
 
 paraview_require_module(
+  CONDITION PARAVIEW_ENABLE_OPENVDB
+  MODULES   VTK::IOOpenVDB
+  EXCLUSIVE)
+
+paraview_require_module(
   CONDITION PARAVIEW_ENABLE_FFMPEG
   MODULES   VTK::IOFFMPEG
   EXCLUSIVE)
