@@ -277,7 +277,7 @@ private:
     const int id = proxy.attribute("id").as_int();
 
     std::ostringstream str;
-    str << proxyname.c_str() << " ("
+    str << proxyname << " ("
         /* << proxy.attribute("group").value() << ", "*/
         << proxy.attribute("type").value() << ") (id=" << id << ")";
     vtkNew<vtkSMPropertyGroup> group;
