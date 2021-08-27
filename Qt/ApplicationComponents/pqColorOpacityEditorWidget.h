@@ -51,9 +51,9 @@ class pqColorMapModel;
 *                                                  controlled by a color-transfer function
 *                                                  editor (pqTransferFunctionWidget).
 * \li "ScalarOpacityFunction"                   :- (optional) proxy-property referring to a proxy
-*                                                  with "Points" property with (x,a,m,s) tuples that
-*                                                  is controlled by an opacity-transfer function
-*                                                  editor (pqTransferFunctionWidget).
+*                                                  with "Points" property with (x,a,m,s) tuples
+*                                                  that is controlled by an opacity-transfer
+*                                                  function editor (pqTransferFunctionWidget).
 * \li "EnableOpacityMapping"                    :- (optional) property used to enable
 *                                                  opacity mapping for surfaces. Controlled by a
 *                                                  checkbox in the Widget.
