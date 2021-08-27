@@ -46,10 +46,10 @@ See Copyright.txt or http://www.paraview.org/HTML/Copyright.html for details.
 #include "vtkThreshold.h"
 #include "vtkUnstructuredGrid.h"
 
-// .clang-format off
+// clang-format off
 #include "vtk_cgns.h"
 #include VTK_CGNS(cgnslib.h)
-// .clang-format on
+// clang-format on
 
 #include <map>
 #include <set>

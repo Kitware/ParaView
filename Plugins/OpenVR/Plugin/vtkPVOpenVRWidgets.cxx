@@ -867,9 +867,7 @@ void vtkPVOpenVRWidgets::ShowBillboard(
       std::string fname = (textureFile.c_str() + 7);
 
       // handle non standard \\c:\ format?
-      // clang-format off
       std::regex matcher(R"=(\\\\[a-zA-Z]:\\)=");
-      // clang-format on
       if (std::regex_match(fname, matcher))
       {
         fname = fname.substr(2);

@@ -1343,7 +1343,6 @@ public:
     {
       // use a simple vertex shader
       // remove clang option once we move to cpp11 on clang
-      // clang-format off
       std::string vshader = R"***(
         //VTK::System::Dec
         in vec4 ndCoordIn;
@@ -1366,7 +1365,6 @@ public:
       uniform sampler2D screenTex;
       void main() { fragColor = vec4(texture(screenTex, texCoords.xy).rgb, 1.0); }
         )***";
-      // clang-format on
       this->ObserverDraw =
         new vtkOpenGLQuadHelper(this->ObserverWindow, vshader.c_str(), fshader.c_str(), "");
     }

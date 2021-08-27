@@ -73,10 +73,8 @@ public:
 
   void addLines(const QVector<QStringRef>& lines)
   {
-    /* clang-format off */
     QRegularExpression scopeBegin(R"==(^\s*{ (?<label>.*))==");
     QRegularExpression scopeEnd(R"==(^\s*} (?<time>[^:]+):.*)==");
-    /* clang-format on */
     for (const auto& line : lines)
     {
       bool is_raw_log;
@@ -323,10 +321,8 @@ void pqLogViewerWidget::scrollToTime(double time)
 QVector<QString> pqLogViewerWidget::extractLogParts(const QStringRef& txt, bool& is_raw)
 {
   QVector<QString> parts{ 5 };
-  /* clang-format off */
   QRegularExpression re(
     R"==(\(\s*(?<time>\S+)\s*\) \[(?<tid>.+)\]\s*(?<fname>\S+)\s+(?<v>\S+)\s*\| (\.\s+)*(?<txt>.*))==");
-  /* clang-format on */
   auto match = re.match(txt);
   if (match.hasMatch())
   {

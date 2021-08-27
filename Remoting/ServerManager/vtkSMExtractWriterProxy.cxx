@@ -42,9 +42,7 @@ std::string vtkSMExtractWriterProxy::GenerateExtractsFileName(
 
   // check for old format for ts and t
   bool oldFormatUsed = false;
-  // clang-format off
   vtksys::RegularExpression regex(R"=((%[.0-9]*)((ts)|(t)))=");
-  // clang-format on
   std::string possibleOldFormatString1 = name;
   while (regex.find(name))
   {

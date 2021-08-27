@@ -202,9 +202,7 @@ bool sendMessage(HINTERNET connection, std::string type, std::string address,
       HTTP_ADDREQ_FLAG_ADD | HTTP_ADDREQ_FLAG_REPLACE);
   }
 
-  // clang-format off
   std::string frmdata = R"({ "username": "imagodemo1", "password": "ImagoDemo1" })";
-  // clang-format on
 
   while (!HttpSendRequest(
     hRequest, nullptr, 0, (LPVOID)formData.c_str(), static_cast<DWORD>(formData.size())))
@@ -406,17 +404,14 @@ bool vtkImagoLoader::IsCellImageDifferent(std::string const& /*oldimg*/, std::st
   // look for http signature
   if (!strncmp(newimg.c_str(), "http", 4))
   {
-    // clang-format off
-    std::regex matcher(R"=([^ ]*\?((?:de|ds|im|dp)=[^&]*)(&(?:de|ds|im|dp)=[^&]*)?(&(?:de|ds|im|dp)=[^&]*)?(&(?:de|ds|im|dp)=[^&]*)?)=");
-    // clang-format on
+    std::regex matcher(
+      R"=([^ ]*\?((?:de|ds|im|dp)=[^&]*)(&(?:de|ds|im|dp)=[^&]*)?(&(?:de|ds|im|dp)=[^&]*)?(&(?:de|ds|im|dp)=[^&]*)?)=");
     std::regex_search(newimg, sm, matcher);
   }
   // now check holieid signature
   else if (!strncmp(newimg.c_str(), "holeid:", 7))
   {
-    // clang-format off
     std::regex matcher(R"=(holeid:(de=[^&]*)(&dp=[^&]*))=");
-    // clang-format on
     std::regex_search(newimg, sm, matcher);
   }
   else
@@ -531,9 +526,7 @@ bool vtkImagoLoader::GetContext()
 bool vtkImagoLoader::GetImage(std::string const& fname, std::future<vtkImageData*>& future)
 {
   std::smatch sm;
-  // clang-format off
   std::regex matcher(R"=(holeid:(de=[^&]*)(&dp=[^&]*))=");
-  // clang-format on
   std::regex_search(fname, sm, matcher);
 
   std::map<std::string, std::string> args;
@@ -562,9 +555,8 @@ bool vtkImagoLoader::GetImage(std::string const& fname, std::future<vtkImageData
 bool vtkImagoLoader::GetHttpImage(std::string const& fname, std::future<vtkImageData*>& future)
 {
   std::smatch sm;
-  // clang-format off
-  std::regex matcher(R"=([^ ]*\?((?:de|ds|im|dp)=[^&]*)(&(?:de|ds|im|dp)=[^&]*)?(&(?:de|ds|im|dp)=[^&]*)?(&(?:de|ds|im|dp)=[^&]*)?)=");
-  // clang-format on
+  std::regex matcher(
+    R"=([^ ]*\?((?:de|ds|im|dp)=[^&]*)(&(?:de|ds|im|dp)=[^&]*)?(&(?:de|ds|im|dp)=[^&]*)?(&(?:de|ds|im|dp)=[^&]*)?)=");
   std::regex_search(fname, sm, matcher);
 
   std::map<std::string, std::string> args;
