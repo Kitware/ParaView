@@ -787,7 +787,7 @@ bool TestUnstructuredGrid()
   return is_success;
 }
 
-int TestDataObjectToConduit(int, char* [])
+int TestDataObjectToConduit(int, char*[])
 {
   bool is_success = true;
 

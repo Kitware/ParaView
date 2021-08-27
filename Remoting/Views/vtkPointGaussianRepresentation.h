@@ -17,7 +17,7 @@
  *
  * Representation for showing point data as sprites, including gaussian
  * splats, spheres, or some custom shaded representation.
-*/
+ */
 
 #ifndef vtkPointGaussianRepresentation_h
 #define vtkPointGaussianRepresentation_h

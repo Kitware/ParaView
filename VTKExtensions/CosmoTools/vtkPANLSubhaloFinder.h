@@ -33,7 +33,7 @@
  * The second output is a vtkUnstructuredGrid with one point per subhalo and
  * data arrays for summary information such as average velocity, mass, and
  * center of mass.
-*/
+ */
 
 #include "vtkNew.h"                             // for vtkNew
 #include "vtkPVVTKExtensionsCosmoToolsModule.h" // for export macro
