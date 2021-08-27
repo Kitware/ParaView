@@ -116,10 +116,9 @@ public:
   static const ReaderConstructorsType ReaderConstructors;
 };
 
-#define GET_NEW_FUNCTOR(x)                                                                         \
-  {                                                                                                \
-#x, [](void) -> vtkXMLReader* { return x::New(); }                                             \
-  }
+// clang-format off
+#define GET_NEW_FUNCTOR(x) { #x, [](void) -> vtkXMLReader* { return x::New(); } }
+// clang-format on
 const vtkXMLCollectionReaderInternals::ReaderConstructorsType
   vtkXMLCollectionReaderInternals::ReaderConstructors = { { "vtp",
                                                             GET_NEW_FUNCTOR(vtkXMLPolyDataReader) },
