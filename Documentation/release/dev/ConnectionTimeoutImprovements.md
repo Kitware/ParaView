@@ -36,3 +36,4 @@ You can now write:
 
 * Add support for connection abort in all cases (except catalyst). Before that it was only limited to reverse connection.
 * Add support for connection retry in case of timeout on connection.
+* Add support for timeout with reverse connections

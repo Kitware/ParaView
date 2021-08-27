@@ -218,8 +218,8 @@ public:
 
   //@{
   /**
-   * Same as ConnectToRemote() except that it waits for a reverse connection.
-   * This is a blocking call. One can optionally provide a callback that can be
+   * Same as ConnectToRemote() except that it waits for a reverse connection
+   * for timeout seconds. One can optionally provide a callback that can be
    * called periodically while this call is blocked.
    * The callback should return true, if the connection should continue waiting,
    * else return false to abort the wait.
@@ -228,10 +228,15 @@ public:
    */
   static vtkIdType ReverseConnectToRemote(int port)
   {
-    unsigned int result;
-    return vtkSMSession::ReverseConnectToRemote(port, nullptr, result);
+    return vtkSMSession::ReverseConnectToRemoteWithTimeout(port, 60);
   }
-  static vtkIdType ReverseConnectToRemote(int port, bool (*callback)(), unsigned int& result);
+  static vtkIdType ReverseConnectToRemoteWithTimeout(int port, int timeout)
+  {
+    unsigned int result;
+    return vtkSMSession::ReverseConnectToRemote(port, timeout, nullptr, result);
+  }
+  static vtkIdType ReverseConnectToRemote(
+    int port, int timeout, bool (*callback)(), unsigned int& result);
   //@}
 
   //@{
@@ -258,8 +263,8 @@ public:
 
   //@{
   /**
-   * Same as ConnectToRemote() except that it waits for a reverse connection.
-   * This is a blocking call. One can optionally provide a callback that can be
+   * Same as ConnectToRemote() except that it waits for a reverse connection
+   * for timeout seconds. One can optionally provide a callback that can be
    * called periodically while this call is blocked.
    * The callback should return true, if the connection should continue waiting,
    * else return false to abort the wait.
@@ -268,11 +273,15 @@ public:
    */
   static vtkIdType ReverseConnectToRemote(int dsport, int rsport)
   {
+    return vtkSMSession::ReverseConnectToRemoteWithTimeout(dsport, rsport, 60);
+  }
+  static vtkIdType ReverseConnectToRemoteWithTimeout(int dsport, int rsport, int timeout)
+  {
     unsigned int result;
-    return vtkSMSession::ReverseConnectToRemote(dsport, rsport, nullptr, result);
+    return vtkSMSession::ReverseConnectToRemote(dsport, rsport, timeout, nullptr, result);
   }
   static vtkIdType ReverseConnectToRemote(
-    int dsport, int rsport, bool (*callback)(), unsigned int& result);
+    int dsport, int rsport, int timeout, bool (*callback)(), unsigned int& result);
   //@}
 
   //@{

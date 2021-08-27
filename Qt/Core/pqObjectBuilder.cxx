@@ -697,7 +697,7 @@ pqServer* pqObjectBuilder::createServer(
   else if (server_resource.scheme() == "csrc")
   {
     id = vtkSMSession::ReverseConnectToRemote(
-      server_resource.port(11111), &pqObjectBuilderNS::processEvents, result);
+      server_resource.port(11111), connectionTimeout, &pqObjectBuilderNS::processEvents, result);
   }
   else if (server_resource.scheme() == "cdsrs")
   {
@@ -709,7 +709,8 @@ pqServer* pqObjectBuilder::createServer(
   else if (server_resource.scheme() == "cdsrsrc")
   {
     id = vtkSMSession::ReverseConnectToRemote(server_resource.dataServerPort(11111),
-      server_resource.renderServerPort(22221), &pqObjectBuilderNS::processEvents, result);
+      server_resource.renderServerPort(22221), connectionTimeout, &pqObjectBuilderNS::processEvents,
+      result);
   }
   else if (server_resource.scheme() == "catalyst")
   {

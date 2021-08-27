@@ -344,17 +344,15 @@ void pqServerConnectDialog::updateButtons()
     int original_index = this->Internals->servers->item(row, 0)->data(Qt::UserRole).toInt();
 
     bool is_mutable = false;
-    bool isReverse = false;
     if (original_index >= 0 && original_index < this->Internals->servers->rowCount())
     {
       is_mutable = this->Internals->Configurations[original_index].isMutable();
-      isReverse = this->Internals->Configurations[original_index].resource().isReverse();
     }
     this->Internals->editServer->setEnabled(is_mutable);
     this->Internals->deleteServer->setEnabled(is_mutable);
     this->Internals->connect->setEnabled(true);
-    this->Internals->timeoutLabel->setVisible(!isReverse);
-    this->Internals->timeoutSpinBox->setVisible(!isReverse);
+    this->Internals->timeoutLabel->setVisible(true);
+    this->Internals->timeoutSpinBox->setVisible(true);
     this->Internals->timeoutSpinBox->setValue(
       this->Internals->Configurations[original_index].connectionTimeout());
   }

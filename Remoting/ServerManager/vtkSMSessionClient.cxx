@@ -41,6 +41,7 @@
 #include "vtkSMSessionProxyManager.h"
 #include "vtkSMSettings.h"
 #include "vtkSocketCommunicator.h"
+#include "vtkTimerLog.h"
 
 #include <sstream>
 #include <string>
@@ -281,6 +282,8 @@ bool vtkSMSessionClient::Connect(
   unsigned long sid = this->AddObserver(vtkCommand::ProgressEvent, &temp, &vtkTemp::OnEvent);
   unsigned long nid = nam->AddObserver(vtkCommand::ProgressEvent, &temp, &vtkTemp::OnEvent);
 
+  // Main connection part, expected to work in client server mode
+
   // Initialize connection result to CONNECTION_FAILURE in case the error is not set in the loop
   // below
   // It will be set to CONNECTION_SUCCESS by NewConnection when needed
@@ -293,11 +296,26 @@ bool vtkSMSessionClient::Connect(
   vtkMultiProcessController* rcontroller =
     need_rcontroller ? nam->NewConnection(render_server_url.c_str(), rConnectionResult) : nullptr;
 
+  // Reverse Connection part, require a loop to check until connection is done
+  vtkNew<vtkTimerLog> timer;
+  timer->StartTimer();
   this->AbortConnect = false;
   while (
     !this->AbortConnect && (dcontroller == nullptr || (need_rcontroller && rcontroller == nullptr)))
   {
     int result = nam->ProcessEvents(100);
+    timer->StopTimer();
+    if (timeout >= 0)
+    {
+      if (timeout == 0 || timer->GetElapsedTime() > timeout)
+      {
+        vtkErrorMacro(<< "Waiting for connection timeout.");
+        result = vtkNetworkAccessManager::CONNECTION_TIMEOUT;
+        connectionResult = vtkNetworkAccessManager::CONNECTION_TIMEOUT;
+        break;
+      }
+    }
+
     if (result == 1) // some activity
     {
       dcontroller =
@@ -306,10 +324,9 @@ bool vtkSMSessionClient::Connect(
         ? rcontroller
         : nam->NewConnection(render_server_url.c_str(), rConnectionResult);
     }
-    else if (result == 0) // timeout
+    else if (result == 0) // socket timeout
     {
       double foo = 0.5;
-      connectionResult = vtkNetworkAccessManager::CONNECTION_TIMEOUT;
       this->InvokeEvent(vtkCommand::ProgressEvent, &foo);
     }
     else if (result == -1)

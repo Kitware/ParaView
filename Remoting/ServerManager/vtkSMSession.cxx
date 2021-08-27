@@ -318,14 +318,15 @@ vtkIdType vtkSMSession::ConnectToRemote(const char* dshost, int dsport, const ch
 }
 
 //----------------------------------------------------------------------------
-vtkIdType vtkSMSession::ReverseConnectToRemote(int port, bool (*callback)(), unsigned int& result)
+vtkIdType vtkSMSession::ReverseConnectToRemote(
+  int port, int timeout, bool (*callback)(), unsigned int& result)
 {
-  return vtkSMSession::ReverseConnectToRemote(port, -1, callback, result);
+  return vtkSMSession::ReverseConnectToRemote(port, -1, timeout, callback, result);
 }
 
 //----------------------------------------------------------------------------
 vtkIdType vtkSMSession::ReverseConnectToRemote(
-  int dsport, int rsport, bool (*callback)(), unsigned int& result)
+  int dsport, int rsport, int timeout, bool (*callback)(), unsigned int& result)
 {
   std::ostringstream sname;
   if (rsport <= -1)
@@ -339,8 +340,7 @@ vtkIdType vtkSMSession::ReverseConnectToRemote(
 
   vtkSMSessionClient* session = vtkSMSessionClient::New();
   vtkIdType sid = 0;
-  // TODO timeout ?
-  if (session->Connect(sname.str().c_str(), 60, callback, result))
+  if (session->Connect(sname.str().c_str(), timeout, callback, result))
   {
     vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
     sid = pm->RegisterSession(session);
