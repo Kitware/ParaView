@@ -477,7 +477,6 @@ void pqServerConnectDialog::updateServerType()
       this->Internals->hostLabel->setVisible(true);
       this->Internals->host->setVisible(true);
       VTK_FALLTHROUGH;
-      // break; << -- don't break
 
     case CLIENT_SERVER_REVERSE_CONNECT:
       this->Internals->portLabel->setVisible(true);
@@ -490,7 +489,6 @@ void pqServerConnectDialog::updateServerType()
       this->Internals->dataServerHostLabel->setVisible(true);
       this->Internals->dataServerHost->setVisible(true);
       VTK_FALLTHROUGH;
-      // break; << -- don't break
 
     case CLIENT_DATA_SERVER_RENDER_SERVER_REVERSE_CONNECT:
       this->Internals->renderServerPortLabel->setVisible(true);
