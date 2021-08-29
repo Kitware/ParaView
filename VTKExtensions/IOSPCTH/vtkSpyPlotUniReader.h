@@ -80,6 +80,7 @@ public:
    * Set and get the current time step to process
    */
   // FIXME: This collides with `windows.h` symbols. It should be renamed.
+  // https://gitlab.kitware.com/paraview/paraview/-/issues/20916
   int SetCurrentTime(double time);
   vtkGetMacro(CurrentTime, double);
 
