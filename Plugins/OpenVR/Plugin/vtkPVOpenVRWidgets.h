@@ -128,6 +128,9 @@ public:
 
   void UpdateWidgetsFromParaView();
 
+  // perform any cleanup required when quitting VR
+  void Quit();
+
 protected:
   vtkPVOpenVRWidgets();
   ~vtkPVOpenVRWidgets();

@@ -1,0 +1,151 @@
+<ServerManagerConfiguration>
+  <ProxyGroup name="representations">
+    <RepresentationProxy class="vtkWebPageRepresentation"
+      name="WebPageRepresentation"
+      processes="client|dataserver|renderserver"
+      si_class="vtkSIProxy">
+      <Documentation>Representation proxy used to show web pages.</Documentation>
+      <InputProperty command="SetInputConnection"
+        name="Input">
+        <Documentation>Data input for the representation.</Documentation>
+        <DataTypeDomain composite_data_supported="0"
+          name="input_type">
+          <DataType value="vtkTable" />
+        </DataTypeDomain>
+      </InputProperty>
+
+      <StringVectorProperty command="SetInputText"
+        name="InputText"
+        number_of_elements="1"
+        default_values="">
+        <Documentation>
+          Set text to pass to the web page.
+        </Documentation>
+      </StringVectorProperty>
+      <DoubleVectorProperty animateable="1"
+        command="SetOrigin"
+        default_values="0.0 0.0 0.0"
+        name="Origin"
+        number_of_elements="3"
+        panel_visibility="default">
+        <DoubleRangeDomain name="range" />
+        <Documentation>This property specifies the 3D coordinate of the origin
+        (one corner) of the web page.</Documentation>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty animateable="1"
+        command="SetPoint1"
+        default_values="1.0 0.0 0.0"
+        name="Point1"
+        number_of_elements="3"
+        panel_visibility="default">
+        <DoubleRangeDomain name="range" />
+        <Documentation>This property specifies the 3D coordinate a second
+        corner of the web page. The line connecting this point and that
+        specified by the Origin property define one edge of the parallelogram
+        (its X axis).</Documentation>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty animateable="1"
+        command="SetPoint2"
+        default_values="0.0 0.0 1.0"
+        name="Point2"
+        number_of_elements="3"
+        panel_visibility="default">
+        <DoubleRangeDomain name="range" />
+        <Documentation>This property specifies the 3D coordinate a third corner
+        of the web page. The line connecting this point and that specified
+        by the Origin property define a second edge of the parallelogram (its Y
+        axis).</Documentation>
+      </DoubleVectorProperty>
+
+      <IntVectorProperty command="SetVisibility"
+        default_values="1"
+        name="Visibility"
+        number_of_elements="1"
+        panel_visibility="never">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+      <IntVectorProperty command="SetForceUseCache"
+        default_values="0"
+        is_internal="1"
+        name="ForceUseCache"
+        number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Typically UseCache and CacheKey are updated by the View
+        and representations cache based on what the view tells it. However in
+        some cases we may want to force a representation to cache irrespective
+        of the view (e.g. comparative views). In which case these ivars can up
+        set. If ForcedCacheKey is true, it overrides UseCache and CacheKey.
+        Instead, ForcedCacheKey is used.</Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty command="SetForcedCacheKey"
+        default_values="none"
+        is_internal="1"
+        name="ForcedCacheKey"
+        number_of_elements="1">
+        <DoubleRangeDomain name="range" />
+        <Documentation>Typically UseCache and CacheKey are updated by the View
+        and representations cache based on what the view tells it. However in
+        some cases we may want to force a representation to cache irrespective
+        of the view (e.g. comparative views). In which case these ivars can up
+        set. If ForcedCacheKey is true, it overrides UseCache and CacheKey.
+        Instead, ForcedCacheKey is used.</Documentation>
+      </DoubleVectorProperty>
+      <IntVectorProperty command="SetInteractivity"
+        default_values="1"
+        name="Interactivity"
+        number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Set whether user should be able to interactively place the text in the view.
+        </Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+            mode="visibility"
+            property="TextPropMode"
+            value="0" />
+
+          <PropertyWidgetDecorator type="GenericDecorator"
+            mode="enabled_state"
+            property="WindowLocation"
+            value="0" />
+        </Hints>
+      </IntVectorProperty>
+
+      <!-- End of WebPageSourceRepresentation -->
+    </RepresentationProxy>
+  </ProxyGroup>
+
+
+  <ProxyGroup name="sources">
+
+    <SourceProxy class="vtkPVTextSource"
+      label="Web Page"
+      name="WebPage">
+      <Documentation long_help="The Text source generates a table containing text."
+        short_help="Display text">The Text source is used to
+                     generate a 1x1 vtkTable with a single text
+                     string.</Documentation>
+      <StringVectorProperty command="SetText"
+        default_values="Text"
+        name="Text"
+        number_of_elements="1"
+        panel_visibility="default">
+        <Hints>
+          <Widget type="multi_line" />
+        </Hints>
+        <Documentation>This property specifies the text to
+        display.</Documentation>
+      </StringVectorProperty>
+      <Hints>
+        <Representation view="RenderView"
+          type="WebPageRepresentation" />
+        <OutputPort index="0"
+          name="Output-0"
+          type="text" />
+      </Hints>
+      <!-- End of TextSource -->
+    </SourceProxy>
+
+  </ProxyGroup>
+
+</ServerManagerConfiguration>

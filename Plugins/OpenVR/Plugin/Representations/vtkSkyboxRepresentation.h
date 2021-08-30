@@ -60,7 +60,7 @@ public:
 
   //@{
   /**
-   * ethods farwarded to the skybox instance
+   * Methods forwarded to the skybox instance
    */
   virtual void SetFloorPlane(float, float, float, float);
   virtual void SetFloorRight(float, float, float);

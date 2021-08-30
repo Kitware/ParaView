@@ -1,20 +1,26 @@
 <ServerManagerConfiguration>
   <ProxyGroup name="representations">
-    <RepresentationProxy class="vtkSkyboxRepresentation"
-      name="SkyboxRepresentation"
-      processes="client|renderserver|dataserver">
-      <Documentation>Representation to show 2D images as a skybox.</Documentation>
+    <RepresentationProxy class="vtkSkyboxMovieRepresentation"
+      name="SkyboxMovieRepresentation"
+      processes="client|dataserver|renderserver"
+      si_class="vtkSIProxy">
+      <Documentation>Representation proxy used to show web pages.</Documentation>
       <InputProperty command="SetInputConnection"
         name="Input">
-        <Documentation>Set the input to the representation. Must be a
-        vtkImageData producer.</Documentation>
+        <Documentation>Data input for the representation.</Documentation>
         <DataTypeDomain composite_data_supported="0"
           name="input_type">
-          <DataType value="vtkImageData" />
+          <DataType value="vtkTable" />
         </DataTypeDomain>
-        <InputArrayDomain attribute_type="any"
-          name="input_array_any"></InputArrayDomain>
       </InputProperty>
+
+      <IntVectorProperty command="SetPlay"
+        default_values="1"
+        name="Play"
+        number_of_elements="1"
+        panel_visibility="default">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
       <DoubleVectorProperty command="SetFloorPlane"
         default_values="0 1.0 0.0 0.0"
         name="FloorPlane"
@@ -50,10 +56,9 @@
       <IntVectorProperty command="SetVisibility"
         default_values="1"
         name="Visibility"
-        number_of_elements="1">
+        number_of_elements="1"
+        panel_visibility="never">
         <BooleanDomain name="bool" />
-        <Documentation>Set the visibility for this
-        representation.</Documentation>
       </IntVectorProperty>
       <IntVectorProperty command="SetForceUseCache"
         default_values="0"
@@ -81,66 +86,41 @@
         set. If ForcedCacheKey is true, it overrides UseCache and CacheKey.
         Instead, ForcedCacheKey is used.</Documentation>
       </DoubleVectorProperty>
-      <StringVectorProperty command="SetInputArrayToProcess"
-        element_types="0 0 0 0 2"
-        name="ColorArrayName"
-        no_custom_default="1"
-        number_of_elements="5">
-        <Documentation>
-          Set the array to color with. One must specify the field association and
-          the array name of the array. If the array is missing, scalar coloring will
-          automatically be disabled.
-        </Documentation>
-        <RepresentedArrayListDomain name="array_list"
-          input_domain_name="input_array_any">
-          <RequiredProperties>
-            <Property function="Input"
-              name="Input" />
-          </RequiredProperties>
-        </RepresentedArrayListDomain>
-      </StringVectorProperty>
-      <!-- End of SkyboxRepresentation -->
+      <!-- End of SkyboxMovieRepresentation -->
     </RepresentationProxy>
+  </ProxyGroup>
 
-    <Extension name="UniformGridRepresentation">
-      <Documentation>
-        Extends standard UniformGridRepresentation by adding
-        SkyboxRepresentation as a new type of representation.
-      </Documentation>
 
-      <!-- this adds to what is already defined in PVRepresentationBase -->
-      <RepresentationType subproxy="SkyboxRepresentation"
-        text="Skybox View" />
+  <ProxyGroup name="sources">
 
-      <SubProxy>
-        <Proxy name="SkyboxRepresentation"
-          proxygroup="representations"
-          proxyname="SkyboxRepresentation" />
-        <ShareProperties subproxy="SurfaceRepresentation">
-          <Exception name="Input" />
-          <Exception name="Visibility" />
-        </ShareProperties>
-        <ExposedProperties>
-          <PropertyGroup label="Skybox">
-            <Property name="FloorPlane"
-              panel_visibility="advanced"
-              panel_visibility_default_for_representation="skybox" />
-            <Property name="FloorRight"
-              panel_visibility="advanced"
-              panel_visibility_default_for_representation="skybox" />
-            <Property name="Projection"
-              panel_visibility="advanced"
-              panel_visibility_default_for_representation="skybox" />
-            <Hints>
-              <PropertyWidgetDecorator type="GenericDecorator"
-                mode="visibility"
-                property="Representation"
-                value="Skybox View" />
-            </Hints>
-          </PropertyGroup>
-        </ExposedProperties>
-      </SubProxy>
-    </Extension>
+    <SourceProxy class="vtkPVTextSource"
+      label="Skybox Movie"
+      name="SkyboxMovie">
+      <Documentation long_help="The skybox movie plays 360 movies."
+        short_help="Display text">The Text source is used to
+                     generate a 1x1 vtkTable with a single text
+                     string.</Documentation>
+      <StringVectorProperty command="SetText"
+        default_values="Text"
+        name="Text"
+        number_of_elements="1"
+        panel_visibility="default">
+        <Hints>
+          <Widget type="multi_line" />
+        </Hints>
+        <Documentation>This property specifies the text to
+        display.</Documentation>
+      </StringVectorProperty>
+      <Hints>
+        <Representation view="RenderView"
+          type="SkyboxMovieRepresentation" />
+        <OutputPort index="0"
+          name="Output-0"
+          type="text" />
+      </Hints>
+      <!-- End of SkyboxMovie -->
+    </SourceProxy>
+
   </ProxyGroup>
 
 </ServerManagerConfiguration>

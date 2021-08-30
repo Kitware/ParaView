@@ -1997,10 +1997,12 @@ void vtkPVOpenVRHelper::UpdateProps()
     this->AddedProps->RemoveAllItems();
     for (pcol->InitTraversal(pit); (prop = pcol->GetNextProp(pit));)
     {
-      // look for plane widgets and do not add them as we will be
-      // creating copies for VR so that we can interact with them.
+      // look for plane widgets and QWidgetRepresentaitons and do not add
+      // them as we will be creating copies for VR so that we can interact
+      // with them.
       auto* impPlane = vtkImplicitPlaneRepresentation::SafeDownCast(prop);
-      if (impPlane)
+      auto* qwidgetrep = vtkQWidgetRepresentation::SafeDownCast(prop);
+      if (impPlane || qwidgetrep)
       {
         continue;
       }
@@ -2029,6 +2031,7 @@ void vtkPVOpenVRHelper::UpdateProps()
 void vtkPVOpenVRHelper::Quit()
 {
   this->Done = true;
+  this->Widgets->Quit();
 }
 
 //----------------------------------------------------------------------------
