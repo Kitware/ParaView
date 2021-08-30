@@ -616,7 +616,7 @@ bool pqServerLauncher::connectToPrelaunchedServer()
 {
   pqObjectBuilder* builder = pqApplicationCore::instance()->getObjectBuilder();
 
-  unsigned int result;
+  vtkNetworkAccessManager::ConnectionResult result;
   do
   {
     QDialog dialog(pqCoreUtilities::mainWidget(), Qt::WindowStaysOnTopHint);
@@ -647,7 +647,7 @@ bool pqServerLauncher::connectToPrelaunchedServer()
     const pqServerResource& resource = this->Internals->Configuration.actualResource();
     this->Internals->Server =
       builder->createServer(resource, this->Internals->Configuration.connectionTimeout(), result);
-  } while (result == vtkNetworkAccessManager::CONNECTION_TIMEOUT &&
+  } while (result == vtkNetworkAccessManager::ConnectionResult::CONNECTION_TIMEOUT &&
     QMessageBox::question(pqCoreUtilities::mainWidget(), QString("Connection Failed"),
       QString("Unable to connect sucessfully. Try again for %1 seconds ?")
         .arg(this->Internals->Configuration.connectionTimeout())) == QMessageBox::Yes);

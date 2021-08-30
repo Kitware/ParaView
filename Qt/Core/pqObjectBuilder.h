@@ -33,7 +33,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define pqObjectBuilder_h
 
 #include "pqCoreModule.h"
-#include "vtkSetGet.h" // for VTK_LEGACY
+#include "vtkNetworkAccessManager.h" // needed for vtkNetworkAccessManager::ConnectionResult.
+#include "vtkSetGet.h"               // needed for VTK_LEGACY
+
 #include <QMap>
 #include <QObject>
 #include <QVariant>
@@ -93,11 +95,11 @@ public:
    */
   pqServer* createServer(const pqServerResource& resource, int connectionTimeout = 60)
   {
-    unsigned int result;
+    vtkNetworkAccessManager::ConnectionResult result;
     return this->createServer(resource, connectionTimeout, result);
   }
-  pqServer* createServer(
-    const pqServerResource& resource, int connectionTimeout, unsigned int& result);
+  pqServer* createServer(const pqServerResource& resource, int connectionTimeout,
+    vtkNetworkAccessManager::ConnectionResult& result);
   //@}
 
   /**

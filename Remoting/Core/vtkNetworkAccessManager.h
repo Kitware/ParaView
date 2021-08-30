@@ -35,6 +35,23 @@ public:
   vtkTypeMacro(vtkNetworkAccessManager, vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
+  /**
+   * Possible result of connection when creating a new connection
+   * CONNECTION_SUCCESS: Connection was sucessfull
+   * CONNECTION_TIMEOUT: After spending a specified amount of time, no connection was initiated
+   * CONNECTION_ABORT: User aborted the connection before it was successful or timed out
+   * CONNECTION_HANDSHAKE_ERROR: Connection was iniated but the handshake failed
+   * CONNECTION_FAILURE: Unspecified connection error
+   */
+  enum class ConnectionResult
+  {
+    CONNECTION_SUCCESS,
+    CONNECTION_TIMEOUT,
+    CONNECTION_ABORT,
+    CONNECTION_HANDSHAKE_ERROR,
+    CONNECTION_FAILURE
+  };
+
   //@{
   /**
    * Creates a new connection given the url.
@@ -66,10 +83,10 @@ public:
    */
   virtual vtkMultiProcessController* NewConnection(const char* url)
   {
-    unsigned int result;
+    ConnectionResult result;
     return this->NewConnection(url, result);
   }
-  virtual vtkMultiProcessController* NewConnection(const char* url, unsigned int& result) = 0;
+  virtual vtkMultiProcessController* NewConnection(const char* url, ConnectionResult& result) = 0;
   //@}
 
   /**
@@ -104,23 +121,6 @@ public:
    * Returns true if the last check of connect ids was wrong.
    */
   virtual bool GetWrongConnectID() = 0;
-
-  /**
-   * Possible result of connection when creating a new connection
-   * CONNECTION_SUCCESS: Connection was sucessfull
-   * CONNECTION_TIMEOUT: After spending a specified amount of time, no connection was initiated
-   * CONNECTION_ABORT: User aborted the connection before it was successful or timed out
-   * CONNECTION_HANDSHAKE_ERROR: Connection was iniated but the handshake failed
-   * CONNECTION_FAILURE: Unspecified connection error
-   */
-  enum ConnectionResult
-  {
-    CONNECTION_SUCCESS = 0,
-    CONNECTION_TIMEOUT,
-    CONNECTION_ABORT,
-    CONNECTION_HANDSHAKE_ERROR,
-    CONNECTION_FAILURE
-  };
 
 protected:
   vtkNetworkAccessManager();

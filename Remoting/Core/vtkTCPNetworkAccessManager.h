@@ -75,7 +75,8 @@ public:
    * A negative value implies an infinite number of retries.
    */
   using vtkNetworkAccessManager::NewConnection;
-  vtkMultiProcessController* NewConnection(const char* url, unsigned int& result) override;
+  vtkMultiProcessController* NewConnection(
+    const char* url, vtkNetworkAccessManager::ConnectionResult& result) override;
   //@}
 
   /**
@@ -122,13 +123,13 @@ protected:
    * Connects to remote processes.
    */
   vtkMultiProcessController* ConnectToRemote(const char* hostname, int port, const char* handshake,
-    int timeout_in_seconds, unsigned int& result);
+    int timeout_in_seconds, vtkNetworkAccessManager::ConnectionResult& result);
 
   /**
    * Waits for connection from remote process.
    */
-  vtkMultiProcessController* WaitForConnection(
-    int port, bool once, const char* handshake, bool nonblocking, unsigned int& result);
+  vtkMultiProcessController* WaitForConnection(int port, bool once, const char* handshake,
+    bool nonblocking, vtkNetworkAccessManager::ConnectionResult& result);
 
   enum HandshakeErrors
   {

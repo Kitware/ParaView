@@ -66,11 +66,11 @@ public:
    */
   virtual bool Connect(const char* url, int timeout = 60)
   {
-    unsigned int result;
+    vtkNetworkAccessManager::ConnectionResult result;
     return this->Connect(url, timeout, nullptr, result);
   }
-  virtual bool Connect(
-    const char* url, int timeout, bool (*callback)(), unsigned int& connectionResult);
+  virtual bool Connect(const char* url, int timeout, bool (*callback)(),
+    vtkNetworkAccessManager::ConnectionResult& connectionResult);
   //@}
 
   /**

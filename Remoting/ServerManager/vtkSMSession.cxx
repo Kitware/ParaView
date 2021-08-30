@@ -261,7 +261,8 @@ void vtkSMSession::Disconnect(vtkIdType sid)
 }
 
 //----------------------------------------------------------------------------
-vtkIdType vtkSMSession::ConnectToSelf(int timeout, bool (*callback)(), unsigned int& result)
+vtkIdType vtkSMSession::ConnectToSelf(
+  int timeout, bool (*callback)(), vtkNetworkAccessManager::ConnectionResult& result)
 {
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   vtkSMSession* session = vtkSMSession::New();
@@ -283,8 +284,8 @@ vtkIdType vtkSMSession::ConnectToCatalyst()
 }
 
 //----------------------------------------------------------------------------
-vtkIdType vtkSMSession::ConnectToRemote(
-  const char* hostname, int port, int timeout, bool (*callback)(), unsigned int& result)
+vtkIdType vtkSMSession::ConnectToRemote(const char* hostname, int port, int timeout,
+  bool (*callback)(), vtkNetworkAccessManager::ConnectionResult& result)
 {
   std::ostringstream sname;
   sname << "cs://" << hostname << ":" << port;
@@ -302,7 +303,7 @@ vtkIdType vtkSMSession::ConnectToRemote(
 
 //----------------------------------------------------------------------------
 vtkIdType vtkSMSession::ConnectToRemote(const char* dshost, int dsport, const char* rshost,
-  int rsport, int timeout, bool (*callback)(), unsigned int& result)
+  int rsport, int timeout, bool (*callback)(), vtkNetworkAccessManager::ConnectionResult& result)
 {
   std::ostringstream sname;
   sname << "cdsrs://" << dshost << ":" << dsport << "/" << rshost << ":" << rsport;
@@ -319,14 +320,14 @@ vtkIdType vtkSMSession::ConnectToRemote(const char* dshost, int dsport, const ch
 
 //----------------------------------------------------------------------------
 vtkIdType vtkSMSession::ReverseConnectToRemote(
-  int port, int timeout, bool (*callback)(), unsigned int& result)
+  int port, int timeout, bool (*callback)(), vtkNetworkAccessManager::ConnectionResult& result)
 {
   return vtkSMSession::ReverseConnectToRemote(port, -1, timeout, callback, result);
 }
 
 //----------------------------------------------------------------------------
-vtkIdType vtkSMSession::ReverseConnectToRemote(
-  int dsport, int rsport, int timeout, bool (*callback)(), unsigned int& result)
+vtkIdType vtkSMSession::ReverseConnectToRemote(int dsport, int rsport, int timeout,
+  bool (*callback)(), vtkNetworkAccessManager::ConnectionResult& result)
 {
   std::ostringstream sname;
   if (rsport <= -1)

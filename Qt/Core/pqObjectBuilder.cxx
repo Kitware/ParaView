@@ -642,8 +642,8 @@ void pqObjectBuilder::abortPendingConnections()
 }
 
 //-----------------------------------------------------------------------------
-pqServer* pqObjectBuilder::createServer(
-  const pqServerResource& resource, int connectionTimeout, unsigned int& result)
+pqServer* pqObjectBuilder::createServer(const pqServerResource& resource, int connectionTimeout,
+  vtkNetworkAccessManager::ConnectionResult& result)
 {
   if (this->WaitingForConnection)
   {

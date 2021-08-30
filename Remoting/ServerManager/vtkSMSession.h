@@ -22,7 +22,8 @@
 #ifndef vtkSMSession_h
 #define vtkSMSession_h
 
-#include "vtkLegacy.h" // for VTK_LEGACY
+#include "vtkLegacy.h"               // for VTK_LEGACY
+#include "vtkNetworkAccessManager.h" // needed for vtkNetworkAccessManager::ConnectionResult.
 #include "vtkPVSessionBase.h"
 #include "vtkRemotingServerManagerModule.h" //needed for exports
 
@@ -189,10 +190,11 @@ public:
    */
   static vtkIdType ConnectToSelf(int timeout = 60)
   {
-    unsigned int result;
+    vtkNetworkAccessManager::ConnectionResult result;
     return vtkSMSession::ConnectToSelf(timeout, nullptr, result);
   }
-  static vtkIdType ConnectToSelf(int timeout, bool (*callback)(), unsigned int& result);
+  static vtkIdType ConnectToSelf(
+    int timeout, bool (*callback)(), vtkNetworkAccessManager::ConnectionResult& result);
   //@}
 
   //@{
@@ -209,11 +211,11 @@ public:
    */
   static vtkIdType ConnectToRemote(const char* hostname, int port, int timeout = 60)
   {
-    unsigned int result;
+    vtkNetworkAccessManager::ConnectionResult result;
     return vtkSMSession::ConnectToRemote(hostname, port, timeout, nullptr, result);
   }
-  static vtkIdType ConnectToRemote(
-    const char* hostname, int port, int timeout, bool (*callback)(), unsigned int& result);
+  static vtkIdType ConnectToRemote(const char* hostname, int port, int timeout, bool (*callback)(),
+    vtkNetworkAccessManager::ConnectionResult& result);
   //@}
 
   //@{
@@ -232,11 +234,11 @@ public:
   }
   static vtkIdType ReverseConnectToRemoteWithTimeout(int port, int timeout)
   {
-    unsigned int result;
+    vtkNetworkAccessManager::ConnectionResult result;
     return vtkSMSession::ReverseConnectToRemote(port, timeout, nullptr, result);
   }
   static vtkIdType ReverseConnectToRemote(
-    int port, int timeout, bool (*callback)(), unsigned int& result);
+    int port, int timeout, bool (*callback)(), vtkNetworkAccessManager::ConnectionResult& result);
   //@}
 
   //@{
@@ -254,11 +256,11 @@ public:
   static vtkIdType ConnectToRemote(
     const char* dshost, int dsport, const char* rshost, int rsport, int timeout = 60)
   {
-    unsigned int result;
+    vtkNetworkAccessManager::ConnectionResult result;
     return vtkSMSession::ConnectToRemote(dshost, dsport, rshost, rsport, timeout, nullptr, result);
   }
   static vtkIdType ConnectToRemote(const char* dshost, int dsport, const char* rshost, int rsport,
-    int timeout, bool (*callback)(), unsigned int& result);
+    int timeout, bool (*callback)(), vtkNetworkAccessManager::ConnectionResult& result);
   //@}
 
   //@{
@@ -277,11 +279,11 @@ public:
   }
   static vtkIdType ReverseConnectToRemoteWithTimeout(int dsport, int rsport, int timeout)
   {
-    unsigned int result;
+    vtkNetworkAccessManager::ConnectionResult result;
     return vtkSMSession::ReverseConnectToRemote(dsport, rsport, timeout, nullptr, result);
   }
-  static vtkIdType ReverseConnectToRemote(
-    int dsport, int rsport, int timeout, bool (*callback)(), unsigned int& result);
+  static vtkIdType ReverseConnectToRemote(int dsport, int rsport, int timeout, bool (*callback)(),
+    vtkNetworkAccessManager::ConnectionResult& result);
   //@}
 
   //@{
