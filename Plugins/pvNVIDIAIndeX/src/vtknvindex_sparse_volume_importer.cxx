@@ -238,6 +238,21 @@ void clamp_to_border(const mi::math::Bbox<mi::Sint32, 3>& brick_bbox_global,
   }
 }
 
+// In contrast to Bbox::intersects(), this does not consider bboxes intersecting when only their
+// boundaries intersect.
+inline bool bbox_interior_intersects(
+  const mi::math::Bbox<mi::Sint32, 3>& box, const mi::math::Bbox<mi::Sint32, 3>& other)
+{
+  for (mi::Size i = 0; i < 3; ++i)
+  {
+    if ((box.min[i] >= other.max[i]) || (box.max[i] <= other.min[i]))
+    {
+      return false;
+    }
+  }
+  return true;
+}
+
 } // namespace
 
 //-------------------------------------------------------------------------------------------------
@@ -465,8 +480,8 @@ void vtknvindex_import_bricks::execute_fragment(
           continue;
         }
 
-        if (dest_brick_bbox_clipped_with_border_inner.contains(neighbor->query_bbox.min) &&
-          dest_brick_bbox_clipped_with_border_inner.contains(neighbor->query_bbox.max))
+        if (bbox_interior_intersects(
+              dest_brick_bbox_clipped_with_border_inner, neighbor->query_bbox))
         {
 #if 0
           ERROR_LOG << "** neighbor " << neighbor->direction << " for dest "
