@@ -289,8 +289,8 @@ void pqPythonTabWidget::setTabCloseButton(pqPythonTextArea* widget)
 {
   QCloseLabel* label = new QCloseLabel(widget, widget);
   this->tabBar()->setTabButton(this->count() - 2, QTabBar::RightSide, label);
-  this->connect(label, &QCloseLabel::onClicked, [this](QWidget* widget) {
-    int idx = this->indexOf(widget);
+  this->connect(label, &QCloseLabel::onClicked, [this](QWidget* clickedWidget) {
+    int idx = this->indexOf(clickedWidget);
     if (idx >= 0 && idx < this->count() - 1)
     {
       this->tabBar()->tabCloseRequested(idx);

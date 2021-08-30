@@ -244,7 +244,7 @@ bool pqCoreUtilities::promptUser(const QString& settingsKey, QMessageBox::Icon i
 {
   if (::ApplicationIsRunningInDashboard())
   {
-    return QMessageBox::Save;
+    return true;
   }
 
   parentWdg = parentWdg ? parentWdg : pqCoreUtilities::mainWidget();

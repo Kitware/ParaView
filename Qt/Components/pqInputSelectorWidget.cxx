@@ -119,8 +119,8 @@ pqInputSelectorWidget::pqInputSelectorWidget(
 
   QObject::connect(
     this->ComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged), [this](int index) {
-      auto data = this->ComboBox->itemData(index);
-      auto ptr = reinterpret_cast<vtkSMProxy*>(data.value<void*>());
+      auto changedData = this->ComboBox->itemData(index);
+      auto ptr = reinterpret_cast<vtkSMProxy*>(changedData.value<void*>());
       this->ChosenPort = ptr;
       Q_EMIT this->selectedInputChanged();
     });

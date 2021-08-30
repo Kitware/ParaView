@@ -40,11 +40,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 template <>
 inline void pqPythonTabWidget::linkTo<QTextEdit>(QTextEdit* obj)
 {
-  const auto FindLinkedWidget = [this](const QObject* obj) -> pqPythonTextArea* {
+  const auto FindLinkedWidget = [this](const QObject* localObj) -> pqPythonTextArea* {
     for (int i = 0; i < this->count() - 1; ++i)
     {
       pqPythonTextArea* widget = this->getWidget<pqPythonTextArea>(i);
-      if (widget && widget->isLinkedTo(obj))
+      if (widget && widget->isLinkedTo(localObj))
       {
         return widget;
       }
@@ -68,17 +68,17 @@ inline void pqPythonTabWidget::linkTo<QTextEdit>(QTextEdit* obj)
 
     // We set a callback on the QTextEdit in the associated filter gets destroyed
     this->connect(obj, &QObject::destroyed, [this, FindLinkedWidget](QObject* object) {
-      pqPythonTextArea* linkedWidget = FindLinkedWidget(object);
-      if (linkedWidget)
+      pqPythonTextArea* destroyedWidget = FindLinkedWidget(object);
+      if (destroyedWidget)
       {
-        linkedWidget->unlink();
-        if (linkedWidget->isEmpty())
+        destroyedWidget->unlink();
+        if (destroyedWidget->isEmpty())
         {
-          this->tabCloseRequested(this->indexOf(linkedWidget));
+          this->tabCloseRequested(this->indexOf(destroyedWidget));
         }
         else
         {
-          this->updateTab(linkedWidget);
+          this->updateTab(destroyedWidget);
         }
       }
     });

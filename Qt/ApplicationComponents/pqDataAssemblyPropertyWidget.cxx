@@ -187,8 +187,8 @@ public:
 
   TableModel(int pixmapSize, ModeT mode, QObject* prnt)
     : Superclass(prnt)
-    , PixmapSize(pixmapSize)
     , Mode(mode)
+    , PixmapSize(pixmapSize)
   {
   }
   ~TableModel() override = default;
@@ -459,7 +459,7 @@ public:
       // it to decorate role on appropriate column to ensure the view updates correctly.
       QObject::connect(smodel, &QAbstractItemModel::dataChanged,
         [&](const QModelIndex& topLeft, const QModelIndex& bottomRight, const QVector<int>& roles) {
-          for (int cc = 0; cc < this->ExtraColumns.size(); ++cc)
+          for (int cc = 0; cc < static_cast<int>(this->ExtraColumns.size()); ++cc)
           {
             const auto& customRole = this->ExtraColumns[cc];
             if (roles.contains(customRole))

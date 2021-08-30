@@ -58,8 +58,10 @@ public:
   pqBlockContextMenu(QObject* parent = nullptr);
   ~pqBlockContextMenu() override;
 
+  using pqContextMenuInterface::contextMenu;
   bool contextMenu(QMenu* menu, pqView* viewContext, const QPoint& viewPoint,
     pqRepresentation* dataContext, const QStringList& dataBlockContext) const override;
+
   int priority() const override { return 1; }
 
 private:
