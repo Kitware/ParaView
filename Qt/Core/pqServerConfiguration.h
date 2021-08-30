@@ -132,6 +132,8 @@ public:
    * This is the full command to be executed on the client,
    * which includes xterm, ssh...
    * This also recovers processWait and delay attributes.
+   * processWait is the amount of time to wait for the process to start in seconds.
+   * delay is the amount of time wait for the process to finish, -1 means infinite wait.
    */
   QString command(double& processWait, double& delay) const;
 
@@ -142,6 +144,8 @@ public:
    * Note that this does not include any information options etc.
    * that may be specified in the startup.
    * This also recovers processWait and delay attributes.
+   * processWait is the amount of time to wait for the process to start in seconds.
+   * delay is the amount of time wait for the process to finish, -1 means infinite wait.
    */
   QString execCommand(double& processWait, double& delay) const;
 
