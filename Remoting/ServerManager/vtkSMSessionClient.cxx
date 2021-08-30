@@ -150,13 +150,13 @@ vtkMultiProcessController* vtkSMSessionClient::GetController(ServerFlags process
 //----------------------------------------------------------------------------
 namespace
 {
-class vtkTemp
+class AbortCallback
 {
 public:
   bool (*Callback)();
   vtkNetworkAccessManager* Nam;
   vtkSMSessionClient* Session;
-  vtkTemp()
+  AbortCallback()
   {
     this->Callback = nullptr;
     this->Nam = nullptr;
@@ -275,18 +275,17 @@ bool vtkSMSessionClient::Connect(const char* url, int timeout, bool (*callback)(
   bool need_rcontroller = !render_server_url.empty();
   vtkNetworkAccessManager* nam = pm->GetNetworkAccessManager();
 
-  vtkTemp temp;
+  AbortCallback temp;
   temp.Callback = callback;
   temp.Nam = nam;
   temp.Session = this;
-  unsigned long sid = this->AddObserver(vtkCommand::ProgressEvent, &temp, &vtkTemp::OnEvent);
-  unsigned long nid = nam->AddObserver(vtkCommand::ProgressEvent, &temp, &vtkTemp::OnEvent);
+  unsigned long sid = this->AddObserver(vtkCommand::ProgressEvent, &temp, &AbortCallback::OnEvent);
+  unsigned long nid = nam->AddObserver(vtkCommand::ProgressEvent, &temp, &AbortCallback::OnEvent);
 
   // Main connection part, expected to work in client server mode
 
   // Initialize connection result to CONNECTION_FAILURE in case the error is not set in the loop
-  // below
-  // It will be set to CONNECTION_SUCCESS by NewConnection when needed
+  // below. It will be set to CONNECTION_SUCCESS by NewConnection when needed
   connectionResult = vtkNetworkAccessManager::ConnectionResult::CONNECTION_FAILURE;
   vtkMultiProcessController* dcontroller =
     nam->NewConnection(data_server_url.c_str(), connectionResult);
@@ -381,7 +380,7 @@ bool vtkSMSessionClient::Connect(const char* url, int timeout, bool (*callback)(
   }
 
   // rConnectionResult can only be not CONNECTION_SUCCESS only if a connection has been attempted
-  // If the main connection is sucessfull but not the render connection, set the result from the
+  // If the main connection is sucessful but not the render connection, set the result from the
   // render connection
   if (connectionResult == vtkNetworkAccessManager::ConnectionResult::CONNECTION_SUCCESS &&
     rConnectionResult != vtkNetworkAccessManager::ConnectionResult::CONNECTION_SUCCESS)
