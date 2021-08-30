@@ -645,13 +645,11 @@ void pqServerConfiguration::setStartupToCommand(
     xmlCommand = child.GetPointer();
   }
 
-  QStringList commandList = command_str.split(" ", PV_QT_SKIP_EMPTY_PARTS);
-  assert(commandList.size() >= 1);
-
-  xmlCommand->SetAttribute("exec", commandList[0].toUtf8().data());
+  // attributes
   xmlCommand->SetAttribute("process_wait", QString::number(processWait).toUtf8().data());
   xmlCommand->SetAttribute("delay", QString::number(delay).toUtf8().data());
 
+  // clean up arguments
   vtkPVXMLElement* oldArguments = xmlCommand->FindNestedElementByName("Arguments");
   if (oldArguments)
   {
@@ -662,12 +660,18 @@ void pqServerConfiguration::setStartupToCommand(
   xmlArguments->SetName("Arguments");
   xmlCommand->AddNestedElement(xmlArguments.GetPointer());
 
-  for (int i = 1; i < commandList.size(); ++i)
+  // exec and arguments
+  QStringList commandList = command_str.split(" ", PV_QT_SKIP_EMPTY_PARTS);
+  if (commandList.size() >= 1)
   {
-    vtkNew<vtkPVXMLElement> xmlArgument;
-    xmlArgument->SetName("Argument");
-    xmlArguments->AddNestedElement(xmlArgument.GetPointer());
-    xmlArgument->AddAttribute("value", commandList[i].toUtf8().data());
+    xmlCommand->SetAttribute("exec", commandList[0].toUtf8().data());
+    for (int i = 1; i < commandList.size(); ++i)
+    {
+      vtkNew<vtkPVXMLElement> xmlArgument;
+      xmlArgument->SetName("Argument");
+      xmlArguments->AddNestedElement(xmlArgument.GetPointer());
+      xmlArgument->AddAttribute("value", commandList[i].toUtf8().data());
+    }
   }
 }
 
