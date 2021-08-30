@@ -637,6 +637,13 @@ void pqServerConfiguration::setStartupToCommand(
 
   vtkPVXMLElement* xmlCommand =
     startupElement->FindNestedElementByName(CommandXMLString.toUtf8().data());
+  if (!xmlCommand)
+  {
+    vtkNew<vtkPVXMLElement> child;
+    child->SetName(CommandXMLString.toUtf8().data());
+    startupElement->AddNestedElement(child.GetPointer());
+    xmlCommand = child.GetPointer();
+  }
 
   QStringList commandList = command_str.split(" ", PV_QT_SKIP_EMPTY_PARTS);
   assert(commandList.size() >= 1);

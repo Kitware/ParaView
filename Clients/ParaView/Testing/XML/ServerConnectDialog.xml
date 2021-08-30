@@ -21,11 +21,14 @@
   <pqevent object="pqClientMainWindow/pqServerConnectDialog/stackedWidget/page_choose/servers" command="mousePress" arguments="1,1,0,99,11,/4:0" />
   <pqevent object="pqClientMainWindow/pqServerConnectDialog/stackedWidget/page_choose/servers" command="mouseRelease" arguments="1,0,0,99,11,/4:0" />
   <pqevent object="pqClientMainWindow/pqServerConnectDialog/stackedWidget/page_choose/editServer" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/pqServerConnectDialog/stackedWidget/page_create/host" command="key" arguments="16777232" />
-  <pqevent object="pqClientMainWindow/pqServerConnectDialog/stackedWidget/page_create/host" command="key" arguments="16777248" />
-  <pqevent object="pqClientMainWindow/pqServerConnectDialog/stackedWidget/page_create/host" command="set_string" arguments="l" />
   <pqevent object="pqClientMainWindow/pqServerConnectDialog/stackedWidget/page_create/host" command="set_string" arguments="localhost" />
   <pqevent object="pqClientMainWindow/pqServerConnectDialog/stackedWidget/page_create/okButton" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/pqServerConnectDialog/stackedWidget/page_edit/startup_type" command="activated" arguments="Command" />
+  <pqevent object="pqClientMainWindow/pqServerConnectDialog/stackedWidget/page_edit/stackedWidget_2/page_1/commandLine" command="set_string" arguments="Test" />
+  <pqevent object="pqClientMainWindow/pqServerConnectDialog/stackedWidget/page_edit/editServer2ButtonBox/1QPushButton0" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/pqServerConnectDialog/stackedWidget/page_choose/editServer" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/pqServerConnectDialog/stackedWidget/page_create/okButton" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/pqServerConnectDialog/stackedWidget/page_edit/startup_type" command="activated" arguments="Manual" />
   <pqevent object="pqClientMainWindow/pqServerConnectDialog/stackedWidget/page_edit/editServer2ButtonBox/1QPushButton0" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/pqServerConnectDialog/stackedWidget/page_choose/deleteServer" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/pqServerConnectDialog/1QMessageBox0/qt_msgbox_buttonbox/1QPushButton0" command="activate" arguments="" />
