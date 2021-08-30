@@ -493,7 +493,8 @@ class ParaViewWebPublishImageDelivery(ParaViewWebProtocol):
         self.trackingViews = {}
         self.lastStaleTime = {}
         self.staleHandlerCount = {}
-        self.deltaStaleTimeBeforeRender = 0.5  # 0.5s
+        self.deltaStaleTimeBeforeRender = 0.1  # 0.1s
+        self.staleCountLimit = 10
         self.decode = decode
         self.viewsInAnimations = []
         self.targetFrameRate = 30.0
@@ -578,7 +579,10 @@ class ParaViewWebPublishImageDelivery(ParaViewWebProtocol):
                 delta = time.time() - self.lastStaleTime[vId]
                 # Break on staleCount otherwise linked view will always report to be stale
                 # And loop forever
-                if delta >= self.deltaStaleTimeBeforeRender and staleCount < 3:
+                if (
+                    delta >= (self.deltaStaleTimeBeforeRender * (staleCount + 1))
+                    and staleCount < self.staleCountLimit
+                ):
                     self.pushRender(vId, False, staleCount + 1)
                 elif delta < self.deltaStaleTimeBeforeRender:
                     self.staleHandlerCount[vId] += 1
