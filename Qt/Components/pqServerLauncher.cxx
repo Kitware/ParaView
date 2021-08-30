@@ -640,6 +640,7 @@ bool pqServerLauncher::connectToPrelaunchedServer()
       dialog.setWindowTitle("Waiting for Connection to Server");
     }
 
+    dialog.setModal(true);
     dialog.show();
     dialog.raise();
     dialog.activateWindow();
@@ -647,6 +648,10 @@ bool pqServerLauncher::connectToPrelaunchedServer()
     const pqServerResource& resource = this->Internals->Configuration.actualResource();
     this->Internals->Server =
       builder->createServer(resource, this->Internals->Configuration.connectionTimeout(), result);
+
+    // Make sure events have been processed
+    pqEventDispatcher::processEventsAndWait(100);
+
   } while (result == vtkNetworkAccessManager::ConnectionResult::CONNECTION_TIMEOUT &&
     QMessageBox::question(pqCoreUtilities::mainWidget(), QString("Connection Failed"),
       QString("Unable to connect sucessfully. Try again for %1 seconds ?")
