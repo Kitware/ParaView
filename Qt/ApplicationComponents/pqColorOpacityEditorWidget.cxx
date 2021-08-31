@@ -375,8 +375,16 @@ pqColorOpacityEditorWidget::pqColorOpacityEditorWidget(
 
   QObject::connect(ui.ChoosePreset, SIGNAL(clicked()), this, SLOT(choosePreset()));
   QObject::connect(ui.SaveAsPreset, SIGNAL(clicked()), this, SLOT(saveAsPreset()));
-  QObject::connect(
-    ui.ComputeDataHistogram, SIGNAL(clicked()), this, SLOT(showDataHistogramClicked()));
+  QObject::connect(ui.ComputeDataHistogram, &QAbstractButton::clicked, this, [=]() {
+    if (ui.Use2DTransferFunction->isChecked())
+    {
+      this->show2DHistogram(true);
+    }
+    else
+    {
+      this->showDataHistogramClicked(true);
+    }
+  });
   QObject::connect(ui.AdvancedButton, SIGNAL(clicked()), this, SLOT(updatePanel()));
 
   QObject::connect(
@@ -1326,6 +1334,7 @@ void pqColorOpacityEditorWidget::show2DHistogram(bool show)
   ui.Transfer2DEditor->setVisible(show);
   ui.ShowDataHistogram->setEnabled(!show);
   ui.DataHistogramNumberOfBins->setEnabled(show);
+  ui.ComputeDataHistogram->setEnabled(!ui.AutomaticDataHistogramComputation->isChecked());
 
   Q_EMIT this->use2DTransferFunctionChanged();
 }
