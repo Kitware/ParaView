@@ -382,8 +382,10 @@ const char* vtkSMCoreUtilities::GetStringForCellType(int cellType)
       return "Bi-Quadratic-Quad";
     case VTK_TRIQUADRATIC_HEXAHEDRON:
       return "Tri-Quadratic-Hexahedron";
+    case VTK_TRIQUADRATIC_PYRAMID:
+      return "Tri-Quadratic-Pyramid";
     case VTK_QUADRATIC_LINEAR_QUAD:
-      return "Quadratice-Linear-Quad";
+      return "Quadratic-Linear-Quad";
     case VTK_QUADRATIC_LINEAR_WEDGE:
       return "Quadratic-Linear-Wedge";
     case VTK_BIQUADRATIC_QUADRATIC_WEDGE:
