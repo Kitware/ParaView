@@ -76,9 +76,11 @@ vtkStandardNewMacro(vtkTransferFunctionBoxItem)
   this->BoxPoints->InsertNextPoint(0.0, 0.0);
 
   // Initialize outline
-  this->Pen->SetWidth(2.);
-  this->Pen->SetColor(255, 255, 255);
+  this->Pen->SetColor(63, 90, 115, 200);
   this->Pen->SetLineType(vtkPen::SOLID_LINE);
+  this->Pen->SetWidth(1.);
+  this->SelectedPointPen->SetColor(255, 0, 255, 200);
+  this->SelectedPointPen->SetWidth(2.);
 
   // Initialize texture
   auto tex = this->Texture.GetPointer();
@@ -311,7 +313,16 @@ bool vtkTransferFunctionBoxItem::Paint(vtkContext2D* painter)
   // Prepare outline
   painter->ApplyPen(this->Pen.GetPointer());
 
-  painter->DrawPolygon(this->BoxPoints.GetPointer());
+  if (!this->Selected)
+  {
+    painter->DrawPolygon(this->BoxPoints.GetPointer());
+  }
+  else
+  {
+    painter->GetPen()->SetLineType(vtkPen::SOLID_LINE);
+    painter->ApplyPen(this->SelectedPointPen);
+    painter->DrawPolygon(this->BoxPoints.GetPointer());
+  }
   return Superclass::Paint(painter);
 }
 
@@ -382,10 +393,10 @@ bool vtkTransferFunctionBoxItem::MouseButtonPressEvent(const vtkContextMouseEven
 
   if (mouse.GetButton() == vtkContextMouseEvent::LEFT_BUTTON)
   {
+    this->SelectBox();
     if (pointUnderMouse != -1)
     {
       this->SetCurrentPoint(pointUnderMouse);
-      return true;
     }
     else
     {
@@ -592,4 +603,16 @@ void vtkTransferFunctionBoxItem::SetValidBounds(double x0, double x1, double y0,
     this->BoxPoints->SetPoint(id, pos);
   }
   this->Superclass::SetValidBounds(x0, x1, y0, y1);
+}
+
+//-------------------------------------------------------------------------------------------------
+void vtkTransferFunctionBoxItem::SelectBox()
+{
+  if (this->Selected)
+  {
+    return;
+  }
+  this->SetSelected(true);
+  this->Scene->SetDirty(true);
+  this->InvokeEvent(vtkTransferFunctionBoxItem::BoxSelectEvent);
 }

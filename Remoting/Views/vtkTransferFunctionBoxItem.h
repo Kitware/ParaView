@@ -38,7 +38,8 @@ public:
   enum
   {
     BoxAddEvent = vtkCommand::UserEvent + 100,
-    BoxEditEvent
+    BoxEditEvent,
+    BoxSelectEvent
   };
 
   /**
@@ -60,6 +61,15 @@ public:
    * Override to rescale box corners when the valid bounds have changed.
    */
   virtual void SetValidBounds(double x0, double x1, double y0, double y1) override;
+
+  ///@{
+  /**
+   * Set/Get whether the box should be drawn selected.
+   */
+  vtkSetMacro(Selected, bool);
+  vtkGetMacro(Selected, bool);
+  vtkBooleanMacro(Selected, bool);
+  ///@}
 
 protected:
   vtkTransferFunctionBoxItem();
@@ -134,6 +144,8 @@ protected:
 
   virtual void ComputeTexture();
 
+  virtual void SelectBox();
+
 private:
   /**
    * Custom method to clamp point positions to valid bounds (chart bounds).  A
@@ -180,6 +192,7 @@ private:
   vtkNew<vtkPen> Pen;
   vtkNew<vtkImageData> Texture;
   bool Initialized = false;
+  bool Selected = false;
 };
 
 #endif // vtkTransferFunctionBoxItem_h

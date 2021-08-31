@@ -67,6 +67,14 @@ public:
   virtual vtkImageData* GetTransferFunction2D();
   ///@}
 
+  ///@{
+  /**
+   * Set/Get the actively selected box.
+   */
+  vtkSmartPointer<vtkTransferFunctionBoxItem> GetActiveBox() const;
+  void SetActiveBox(vtkSmartPointer<vtkTransferFunctionBoxItem> box);
+  ///@}
+
 protected:
   vtkTransferFunctionChartHistogram2D() {}
   ~vtkTransferFunctionChartHistogram2D() override = default;
@@ -90,6 +98,7 @@ protected:
 
   // Member variables;
   vtkWeakPointer<vtkImageData> TransferFunction2D;
+  vtkSmartPointer<vtkTransferFunctionBoxItem> ActiveBox;
 
 private:
   vtkTransferFunctionChartHistogram2D(const vtkTransferFunctionChartHistogram2D&);

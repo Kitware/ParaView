@@ -20,6 +20,7 @@
 // vtk includes
 #include "vtkAxis.h"
 #include "vtkContextMouseEvent.h"
+#include "vtkContextScene.h"
 #include "vtkDataArrayRange.h"
 #include "vtkFloatArray.h"
 #include "vtkImageData.h"
@@ -78,7 +79,10 @@ vtkSmartPointer<vtkTransferFunctionBoxItem> vtkTransferFunctionChartHistogram2D:
     &vtkTransferFunctionChartHistogram2D::OnTransferFunctionBoxItemModified);
   boxItem->AddObserver(vtkTransferFunctionBoxItem::BoxEditEvent, this,
     &vtkTransferFunctionChartHistogram2D::OnTransferFunctionBoxItemModified);
+  boxItem->AddObserver(vtkTransferFunctionBoxItem::BoxSelectEvent, this,
+    &vtkTransferFunctionChartHistogram2D::OnTransferFunctionBoxItemModified);
   this->AddPlot(boxItem);
+  this->SetActiveBox(boxItem);
   return boxItem;
 }
 
@@ -242,10 +246,37 @@ void vtkTransferFunctionChartHistogram2D::OnTransferFunctionBoxItemModified(
   {
     return;
   }
-  if (eid != vtkTransferFunctionBoxItem::BoxAddEvent &&
-    eid != vtkTransferFunctionBoxItem::BoxEditEvent)
+  if (eid == vtkTransferFunctionBoxItem::BoxSelectEvent)
   {
-    return;
+    this->SetActiveBox(plot);
   }
-  this->GenerateTransfer2D();
+  else if (eid == vtkTransferFunctionBoxItem::BoxAddEvent ||
+    eid == vtkTransferFunctionBoxItem::BoxEditEvent)
+  {
+    this->GenerateTransfer2D();
+  }
+}
+
+//-------------------------------------------------------------------------------------------------
+vtkSmartPointer<vtkTransferFunctionBoxItem> vtkTransferFunctionChartHistogram2D::GetActiveBox()
+  const
+{
+  return this->ActiveBox;
+}
+
+//-------------------------------------------------------------------------------------------------
+void vtkTransferFunctionChartHistogram2D::SetActiveBox(
+  vtkSmartPointer<vtkTransferFunctionBoxItem> box)
+{
+  if (this->ActiveBox)
+  {
+    this->ActiveBox->SetSelected(false);
+    this->ActiveBox->SetCurrentPoint(-1);
+  }
+  this->ActiveBox = box;
+  if (this->ActiveBox)
+  {
+    this->ActiveBox->SetSelected(true);
+  }
+  this->GetScene()->SetDirty(true);
 }
