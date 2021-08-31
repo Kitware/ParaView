@@ -268,12 +268,25 @@ const std::vector<vtkSMProxyListDomain::ProxyType>& vtkSMProxyListDomain::GetPro
 void vtkSMProxyListDomain::CreateProxies(vtkSMSessionProxyManager* pxm)
 {
   assert(pxm);
+
+  // Custom filters using proxy list domains
+  // Rely on putting the user set proxy in first position
+  // so this is needed to override the default index from the domain
+  // in that case.
+  if (this->GetNumberOfProxies() == 1)
+  {
+    this->SetDefaultIndex(0);
+  }
   for (const auto& apair : this->Internals->ProxyTypeList)
   {
-    if (vtkSMProxy* proxy = pxm->NewProxy(apair.GroupName.c_str(), apair.ProxyName.c_str()))
+    // Make sure there isn't two proxies with the same name in the domain
+    if (!this->GetProxyWithName(apair.ProxyName.c_str()))
     {
-      this->Internals->AddProxy(proxy, this);
-      proxy->FastDelete();
+      if (vtkSMProxy* proxy = pxm->NewProxy(apair.GroupName.c_str(), apair.ProxyName.c_str()))
+      {
+        this->Internals->AddProxy(proxy, this);
+        proxy->FastDelete();
+      }
     }
   }
 }
@@ -383,6 +396,7 @@ int vtkSMProxyListDomain::ReadXMLAttributes(vtkSMProperty* prop, vtkPVXMLElement
     {
       // Recover group name
       const char* name = proxyElement->GetAttribute("name");
+      const char* defaultProxyName = proxyElement->GetAttribute("default");
 
       if (name)
       {
@@ -397,10 +411,17 @@ int vtkSMProxyListDomain::ReadXMLAttributes(vtkSMProperty* prop, vtkPVXMLElement
         }
         else
         {
+          unsigned int index = 0;
           vtkPVProxyDefinitionIterator* iter = pxdm->NewSingleGroupIterator(name);
           for (iter->InitTraversal(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
           {
-            this->AddProxy(name, iter->GetProxyName());
+            const char* proxyName = iter->GetProxyName();
+            this->AddProxy(name, proxyName);
+            if (defaultProxyName && (strcmp(proxyName, defaultProxyName) == 0))
+            {
+              this->SetDefaultIndex(index);
+            }
+            index++;
           }
           iter->Delete();
         }
