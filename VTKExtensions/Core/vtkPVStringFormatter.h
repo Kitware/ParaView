@@ -78,12 +78,12 @@ public:
   static void PushScope(Args&&... args)
   {
     std::shared_ptr<vtkArgumentScope> newScope;
-    // check if stack is empty
-    if (vtkPVStringFormatter::ScopeStack.empty())
+
+    if (vtkPVStringFormatter::ScopeStack.empty()) // check if stack is empty
     {
       newScope = std::make_shared<vtkArgumentScope>();
     }
-    else // else user the top scope as a baseline for the new scope
+    else // else use the top scope as a baseline for the new scope
     {
       newScope = std::make_shared<vtkArgumentScope>(*vtkPVStringFormatter::ScopeStack.top());
     }
@@ -105,12 +105,12 @@ public:
   static void PushScope(const char* scopeName, Args&&... args)
   {
     std::shared_ptr<vtkArgumentScope> newScope;
-    // check if stack is empty
-    if (vtkPVStringFormatter::ScopeStack.empty())
+
+    if (vtkPVStringFormatter::ScopeStack.empty()) // check if stack is empty
     {
       newScope = std::make_shared<vtkArgumentScope>();
     }
-    else // else user the top scope as a baseline for the new scope
+    else // else use the top scope as a baseline for the new scope
     {
       newScope = std::make_shared<vtkArgumentScope>(*vtkPVStringFormatter::ScopeStack.top());
     }
