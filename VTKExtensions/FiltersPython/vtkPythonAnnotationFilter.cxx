@@ -16,12 +16,12 @@
 
 #include "vtkPythonAnnotationFilter.h"
 
-#include "vtkDataObjectTypes.h"
 #include "vtkIdTypeArray.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
 #include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
+#include "vtkPVStringFormatter.h"
 #include "vtkPythonInterpreter.h"
 #include "vtkPythonUtil.h"
 #include "vtkSmartPyObject.h"
@@ -30,7 +30,6 @@
 #include "vtkTable.h"
 
 #include <cassert>
-#include <map>
 #include <sstream>
 #include <vector>
 #include <vtksys/SystemTools.hxx>
@@ -50,6 +49,7 @@ bool CheckAndFlushPythonErrors()
 }
 
 vtkStandardNewMacro(vtkPythonAnnotationFilter);
+
 //----------------------------------------------------------------------------
 vtkPythonAnnotationFilter::vtkPythonAnnotationFilter()
   : Expression(nullptr)
@@ -100,7 +100,6 @@ int vtkPythonAnnotationFilter::RequestData(vtkInformation* vtkNotUsed(request),
   this->CurrentInputDataObject = input;
 
   // Extract time information
-  std::ostringstream timeInfo;
   if (vtkInformation* dataInformation = input->GetInformation())
   {
     if (dataInformation->Has(vtkDataObject::DATA_TIME_STEP()))
@@ -110,20 +109,54 @@ int vtkPythonAnnotationFilter::RequestData(vtkInformation* vtkNotUsed(request),
     }
   }
 
+  std::vector<double> timeSteps;
   vtkInformation* inputInfo = inputVector[0]->GetInformationObject(0);
   if (inputInfo->Has(vtkStreamingDemandDrivenPipeline::TIME_STEPS()))
   {
     this->NumberOfTimeSteps = inputInfo->Length(vtkStreamingDemandDrivenPipeline::TIME_STEPS());
     this->TimeSteps = inputInfo->Get(vtkStreamingDemandDrivenPipeline::TIME_STEPS());
+
+    timeSteps.insert(timeSteps.begin(), this->TimeSteps, this->TimeSteps + this->NumberOfTimeSteps);
   }
 
+  std::vector<double> timeRange;
   if (inputInfo->Has(vtkStreamingDemandDrivenPipeline::TIME_RANGE()))
   {
     this->TimeRangeValid = true;
     inputInfo->Get(vtkStreamingDemandDrivenPipeline::TIME_RANGE(), this->TimeRange);
+
+    timeRange.insert(timeRange.begin(), this->TimeRange, this->TimeRange + 2);
   }
 
+  int timeIndex = 0;
+  if (this->GetDataTimeValid() && this->GetNumberOfTimeSteps() > 0)
+  {
+    for (int i = 0; i < this->NumberOfTimeSteps; ++i)
+    {
+      if (timeSteps[i] == this->DataTime)
+      {
+        timeIndex = i;
+      }
+    }
+  }
+
+  // define annotate scope
+  PV_STRING_FORMATTER_NAMED_SCOPE("ANNOTATE", fmt::arg("timevalue", this->DataTime),
+    fmt::arg("timesteps", timeSteps), fmt::arg("timerange", timeRange),
+    fmt::arg("timeindex", timeIndex));
+
+  char* cachedExpression = vtksys::SystemTools::DuplicateString(this->Expression);
+
+  std::string formattableExpression = this->Expression ? this->Expression : std::string();
+  delete[] this->Expression;
+  this->Expression = vtksys::SystemTools::DuplicateString(
+    vtkPVStringFormatter::Format(formattableExpression).c_str());
+
   this->EvaluateExpression();
+
+  // restore cached expression
+  delete[] this->Expression;
+  this->Expression = vtksys::SystemTools::DuplicateString(cachedExpression);
 
   // Make sure a valid ComputedAnnotationValue is available
   if (this->ComputedAnnotationValue == nullptr)
