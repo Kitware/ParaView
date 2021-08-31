@@ -100,30 +100,34 @@ void pqServerConnectReaction::connectToServer()
 }
 
 //-----------------------------------------------------------------------------
-bool pqServerConnectReaction::connectToServerUsingConfigurationName(const char* config_name)
+bool pqServerConnectReaction::connectToServerUsingConfigurationName(
+  const char* config_name, bool showConnectionDialog)
 {
   const pqServerConfiguration* config =
     pqApplicationCore::instance()->serverConfigurations().configuration(config_name);
   if (config)
   {
-    return pqServerConnectReaction::connectToServerUsingConfiguration(*config);
+    return pqServerConnectReaction::connectToServerUsingConfiguration(
+      *config, showConnectionDialog);
   }
   return false;
 }
 
 //-----------------------------------------------------------------------------
-bool pqServerConnectReaction::connectToServer(const pqServerResource& resource)
+bool pqServerConnectReaction::connectToServer(
+  const pqServerResource& resource, bool showConnectionDialog)
 {
   pqServerConfiguration config;
   config.setResource(resource);
-  return pqServerConnectReaction::connectToServerUsingConfiguration(config);
+  return pqServerConnectReaction::connectToServerUsingConfiguration(config, showConnectionDialog);
 }
 
 //-----------------------------------------------------------------------------
-bool pqServerConnectReaction::connectToServerUsingConfiguration(const pqServerConfiguration& config)
+bool pqServerConnectReaction::connectToServerUsingConfiguration(
+  const pqServerConfiguration& config, bool showConnectionDialog)
 {
   QScopedPointer<pqServerLauncher> launcher(pqServerLauncher::newInstance(config));
-  return launcher->connectToServer();
+  return launcher->connectToServer(showConnectionDialog);
 }
 
 //-----------------------------------------------------------------------------

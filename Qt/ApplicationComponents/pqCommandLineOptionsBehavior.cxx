@@ -141,7 +141,7 @@ void pqCommandLineOptionsBehavior::processServerConnection()
   if (!serverResourceName.isEmpty())
   {
     if (!pqServerConnectReaction::connectToServerUsingConfigurationName(
-          qPrintable(serverResourceName)))
+          qPrintable(serverResourceName), false))
     {
       qCritical() << "Could not connect to requested server \"" << serverResourceName
                   << "\". Creating default builtin connection.";
@@ -155,14 +155,14 @@ void pqCommandLineOptionsBehavior::processServerConnection()
       const QStringList urls = serverURL.split(QRegExp("\\|"), PV_QT_SKIP_EMPTY_PARTS);
       for (const QString& url : urls)
       {
-        if (!pqServerConnectReaction::connectToServer(pqServerResource(url)))
+        if (!pqServerConnectReaction::connectToServer(pqServerResource(url), false))
         {
           qCritical() << "Could not connect to requested server \"" << url
                       << "\". Creating default builtin connection.";
         }
       }
     }
-    else if (!pqServerConnectReaction::connectToServer(pqServerResource(serverURL)))
+    else if (!pqServerConnectReaction::connectToServer(pqServerResource(serverURL), false))
     {
       qCritical() << "Could not connect to requested server \"" << serverURL
                   << "\". Creating default builtin connection.";
@@ -172,7 +172,7 @@ void pqCommandLineOptionsBehavior::processServerConnection()
   // Connect to builtin, if none present.
   if (pqActiveObjects::instance().activeServer() == nullptr)
   {
-    pqServerConnectReaction::connectToServer(pqServerResource("builtin:"));
+    pqServerConnectReaction::connectToServer(pqServerResource("builtin:"), false);
   }
 
   // Now we are assured that some default server connection has been made

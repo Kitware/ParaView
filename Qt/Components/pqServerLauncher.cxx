@@ -554,7 +554,7 @@ pqServerConfiguration& pqServerLauncher::configuration() const
 }
 
 //-----------------------------------------------------------------------------
-bool pqServerLauncher::connectToServer()
+bool pqServerLauncher::connectToServer(bool showConnectionDialog)
 {
   pqServerConfiguration::StartupType startupType = this->Internals->Configuration.startupType();
   if (startupType != pqServerConfiguration::MANUAL && startupType != pqServerConfiguration::COMMAND)
@@ -602,8 +602,8 @@ bool pqServerLauncher::connectToServer()
   pqObjectBuilder* builder = pqApplicationCore::instance()->getObjectBuilder();
   bool force = builder->forceWaitingForConnection(true);
   bool launched = false;
-  while (!(launched = this->connectToPrelaunchedServer()) && nam->GetWrongConnectID() &&
-    dialog.exec() == QDialog::Accepted)
+  while (!(launched = this->connectToPrelaunchedServer(showConnectionDialog)) &&
+    nam->GetWrongConnectID() && dialog.exec() == QDialog::Accepted)
   {
     config->SetConnectID(ui.connectId->value());
   }
@@ -612,7 +612,7 @@ bool pqServerLauncher::connectToServer()
 }
 
 //-----------------------------------------------------------------------------
-bool pqServerLauncher::connectToPrelaunchedServer()
+bool pqServerLauncher::connectToPrelaunchedServer(bool showConnectionDialog)
 {
   pqObjectBuilder* builder = pqApplicationCore::instance()->getObjectBuilder();
 
@@ -620,30 +620,33 @@ bool pqServerLauncher::connectToPrelaunchedServer()
   do
   {
     QDialog dialog(pqCoreUtilities::mainWidget(), Qt::WindowStaysOnTopHint);
-    QObject::connect(&dialog, SIGNAL(rejected()), builder, SLOT(abortPendingConnections()));
-
-    Ui::pqServerLauncherDialog ui;
-    ui.setupUi(&dialog);
-
-    if (this->isReverseConnection())
+    if (showConnectionDialog)
     {
-      ui.message->setText(QString("Establishing connection to '%1' \n"
-                                  "Waiting for server to connect.")
-                            .arg(this->Internals->Configuration.name()));
-      dialog.setWindowTitle("Waiting for Server Connection");
-    }
-    else
-    {
-      ui.message->setText(QString("Establishing connection to '%1' \n"
-                                  "Waiting %1 seconds for connection to server.")
-                            .arg(this->Internals->Configuration.name()));
-      dialog.setWindowTitle("Waiting for Connection to Server");
-    }
+      QObject::connect(&dialog, SIGNAL(rejected()), builder, SLOT(abortPendingConnections()));
 
-    dialog.setModal(true);
-    dialog.show();
-    dialog.raise();
-    dialog.activateWindow();
+      Ui::pqServerLauncherDialog ui;
+      ui.setupUi(&dialog);
+
+      if (this->isReverseConnection())
+      {
+        ui.message->setText(QString("Establishing connection to '%1' \n"
+                                    "Waiting for server to connect.")
+                              .arg(this->Internals->Configuration.name()));
+        dialog.setWindowTitle("Waiting for Server Connection");
+      }
+      else
+      {
+        ui.message->setText(QString("Establishing connection to '%1' \n"
+                                    "Waiting %1 seconds for connection to server.")
+                              .arg(this->Internals->Configuration.name()));
+        dialog.setWindowTitle("Waiting for Connection to Server");
+      }
+
+      dialog.setModal(true);
+      dialog.show();
+      dialog.raise();
+      dialog.activateWindow();
+    }
 
     const pqServerResource& resource = this->Internals->Configuration.actualResource();
     this->Internals->Server =
