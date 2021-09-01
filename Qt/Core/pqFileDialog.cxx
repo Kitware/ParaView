@@ -45,6 +45,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QAction>
 #include <QComboBox>
 #include <QCompleter>
+#include <QDesktopServices>
 #include <QDir>
 #include <QLineEdit>
 #include <QMenu>
@@ -308,15 +309,25 @@ pqFileDialog::pqFileDialog(pqServer* server, QWidget* p, const QString& title,
   QPixmap back = style()->standardPixmap(QStyle::SP_FileDialogBack);
   impl.Ui.NavigateBack->setIcon(back);
   impl.Ui.NavigateBack->setEnabled(false);
+  impl.Ui.NavigateBack->setShortcut(QKeySequence::Back);
+  impl.Ui.NavigateBack->setToolTip(
+    "Navigate Back (" + impl.Ui.NavigateBack->shortcut().toString() + ")");
   QObject::connect(impl.Ui.NavigateBack, SIGNAL(clicked(bool)), this, SLOT(onNavigateBack()));
   // just flip the back image to make a forward image
   QPixmap forward = QPixmap::fromImage(back.toImage().mirrored(true, false));
   impl.Ui.NavigateForward->setIcon(forward);
   impl.Ui.NavigateForward->setDisabled(true);
+  impl.Ui.NavigateForward->setShortcut(QKeySequence::Forward);
+  impl.Ui.NavigateForward->setToolTip(
+    "Navigate Forward (" + impl.Ui.NavigateForward->shortcut().toString() + ")");
   QObject::connect(impl.Ui.NavigateForward, SIGNAL(clicked(bool)), this, SLOT(onNavigateForward()));
   impl.Ui.NavigateUp->setIcon(style()->standardPixmap(QStyle::SP_FileDialogToParent));
+  impl.Ui.NavigateUp->setShortcut(Qt::ALT + Qt::Key_Up);
+  impl.Ui.NavigateUp->setToolTip("Navigate Up (" + impl.Ui.NavigateUp->shortcut().toString() + ")");
   impl.Ui.CreateFolder->setIcon(style()->standardPixmap(QStyle::SP_FileDialogNewFolder));
-  impl.Ui.CreateFolder->setDisabled(true);
+  impl.Ui.CreateFolder->setShortcut(QKeySequence::New);
+  impl.Ui.CreateFolder->setToolTip(
+    "Create New Folder (" + impl.Ui.CreateFolder->shortcut().toString() + ")");
 
   impl.Ui.ShowDetail->setIcon(QIcon(":/pqWidgets/Icons/pqAdvanced.svg"));
 
@@ -326,7 +337,22 @@ pqFileDialog::pqFileDialog(pqServer* server, QWidget* p, const QString& title,
   impl.Ui.Files->setContextMenuPolicy(Qt::CustomContextMenu);
   QObject::connect(impl.Ui.Files, SIGNAL(customContextMenuRequested(const QPoint&)), this,
     SLOT(onContextMenuRequested(const QPoint&)));
-  impl.Ui.CreateFolder->setEnabled(true);
+
+  impl.Ui.Favorites->setContextMenuPolicy(Qt::CustomContextMenu);
+  QObject::connect(impl.Ui.Favorites, SIGNAL(customContextMenuRequested(const QPoint&)), this,
+    SLOT(onFavoritesContextMenuRequested(const QPoint&)));
+
+  impl.Ui.Favorites->setEditTriggers(QAbstractItemView::EditTrigger::EditKeyPressed);
+
+  impl.Ui.AddCurrentDirectoryToFavorites->setIcon(QIcon(":/QtWidgets/Icons/pqPlus.svg"));
+  QObject::connect(impl.Ui.AddCurrentDirectoryToFavorites, SIGNAL(clicked()), this,
+    SLOT(onAddCurrentDirectoryToFavorites()));
+  impl.Ui.RemoveCurrentDirectoryFromFavorites->setIcon(QIcon(":/QtWidgets/Icons/pqMinus.svg"));
+  QObject::connect(impl.Ui.RemoveCurrentDirectoryFromFavorites, SIGNAL(clicked()), this,
+    SLOT(onRemoveCurrentDirectoryFromFavorites()));
+  impl.Ui.ResetFavortiesToSystemDefault->setIcon(QIcon(":/pqWidgets/Icons/pqReset.svg"));
+  QObject::connect(impl.Ui.ResetFavortiesToSystemDefault, SIGNAL(clicked()), this,
+    SLOT(onResetFavoritesToSystemDefault()));
 
   impl.Ui.Favorites->setModel(impl.FavoriteModel);
   impl.Ui.Recent->setModel(impl.RecentModel);
@@ -487,21 +513,151 @@ void pqFileDialog::onContextMenuRequested(const QPoint& menuPos)
   QMenu menu;
   menu.setObjectName("FileDialogContextMenu");
 
+  QModelIndex proxyItemIndex = this->Implementation->Ui.Files->indexAt(menuPos).siblingAtColumn(0);
+  QModelIndex sourceItemIndex = this->Implementation->FileFilter.mapToSource(proxyItemIndex);
+
+  bool isCurrentIndexADirectory = this->Implementation->Model->isDir(sourceItemIndex);
+
+  // Add to favorites action
+  if (isCurrentIndexADirectory)
+  {
+    auto addToFavoritesAction = new QAction("Add to favorites", this);
+
+    QStringList filePaths = impl.Model->getFilePaths(sourceItemIndex);
+    if (filePaths.size() == 1)
+    {
+      QString const dirPath = filePaths.front();
+      QObject::connect(
+        addToFavoritesAction, &QAction::triggered, [=] { this->AddDirectoryToFavorites(dirPath); });
+      menu.addAction(addToFavoritesAction);
+    }
+  }
+
+  // Rename action
+  if (proxyItemIndex.flags() & Qt::ItemFlag::ItemIsEditable)
+  {
+    auto renameAction = new QAction("Rename", this);
+    QObject::connect(renameAction, &QAction::triggered,
+      [=]() { this->Implementation->Ui.Files->edit(proxyItemIndex); });
+    menu.addAction(renameAction);
+  }
+
+  // Open in file explorer
+  auto openInFileExplorerAction = new QAction("Open in file explorer", this);
+  QString dirToOpen;
+  if (isCurrentIndexADirectory)
+  {
+    dirToOpen = impl.Model->data(sourceItemIndex, Qt::UserRole).toString();
+  }
+  else
+  {
+    dirToOpen = this->Implementation->Model->getCurrentPath();
+  }
+
+  QObject::connect(
+    openInFileExplorerAction, &QAction::triggered, [=] { QDesktopServices::openUrl(dirToOpen); });
+  menu.addAction(openInFileExplorerAction);
+
   // Only display new dir option if we're saving, not opening
   if (impl.Mode == pqFileDialog::AnyFile)
   {
-    QAction* actionNewDir = new QAction("Create New Folder", this);
-    QObject::connect(actionNewDir, SIGNAL(triggered()), this, SLOT(onCreateNewFolder()));
-    menu.addAction(actionNewDir);
+    QAction* createNewDirAction = new QAction("Create New Folder", this);
+    QObject::connect(createNewDirAction, SIGNAL(triggered()), this, SLOT(onCreateNewFolder()));
+    menu.addAction(createNewDirAction);
   }
 
-  QAction* actionHiddenFiles = new QAction("Show Hidden Files", this);
-  actionHiddenFiles->setCheckable(true);
-  actionHiddenFiles->setChecked(impl.FileFilter.getShowHidden());
-  QObject::connect(actionHiddenFiles, SIGNAL(triggered(bool)), this, SLOT(onShowHiddenFiles(bool)));
-  menu.addAction(actionHiddenFiles);
+  // Delete directory action
+  if (isCurrentIndexADirectory)
+  {
+    QString const fullPath =
+      this->Implementation->Model->data(sourceItemIndex, Qt::UserRole).toString();
+    QDir dir(fullPath);
+    if (dir.isEmpty())
+    {
+      auto deleteDirectoryAction = new QAction("Delete empty directory", this);
+      QObject::connect(deleteDirectoryAction, &QAction::triggered, [=]() {
+        this->Implementation->Model->rmdir(
+          this->Implementation->Model->data(sourceItemIndex, Qt::DisplayRole).toString());
+      });
+      menu.addAction(deleteDirectoryAction);
+    }
+  }
 
-  menu.exec(impl.Ui.Files->mapToGlobal(menuPos));
+  // Show hidden files action
+  QAction* showHiddenFilesAction = new QAction("Show Hidden Files", this);
+  showHiddenFilesAction->setCheckable(true);
+  showHiddenFilesAction->setChecked(impl.FileFilter.getShowHidden());
+  QObject::connect(
+    showHiddenFilesAction, SIGNAL(triggered(bool)), this, SLOT(onShowHiddenFiles(bool)));
+  menu.addAction(showHiddenFilesAction);
+
+  menu.exec(impl.Ui.Files->viewport()->mapToGlobal(menuPos));
+}
+
+//-----------------------------------------------------------------------------
+void pqFileDialog::AddDirectoryToFavorites(QString const& directory)
+{
+  this->Implementation->FavoriteModel->addToFavorites(directory);
+}
+
+//-----------------------------------------------------------------------------
+void pqFileDialog::RemoveDirectoryFromFavorites(QString const& directory)
+{
+  this->Implementation->FavoriteModel->removeFromFavorites(directory);
+}
+
+//-----------------------------------------------------------------------------
+void pqFileDialog::onAddCurrentDirectoryToFavorites()
+{
+  QString const currentPath = this->Implementation->Model->getCurrentPath();
+  this->AddDirectoryToFavorites(currentPath);
+}
+
+//-----------------------------------------------------------------------------
+void pqFileDialog::onRemoveCurrentDirectoryFromFavorites()
+{
+  QString const currentPath = this->Implementation->Model->getCurrentPath();
+  this->RemoveDirectoryFromFavorites(currentPath);
+}
+
+//-----------------------------------------------------------------------------
+void pqFileDialog::onResetFavoritesToSystemDefault()
+{
+  int const ret = QMessageBox::warning(this, "Reset favorites",
+    "This will reset the favorites to their default value.\nAre you sure you want to continue ?",
+    QMessageBox::StandardButton::Yes, QMessageBox::StandardButton::No);
+
+  if (ret == QMessageBox::StandardButton::Yes)
+  {
+    this->Implementation->FavoriteModel->resetFavoritesToDefault();
+  }
+}
+
+//-----------------------------------------------------------------------------
+void pqFileDialog::onFavoritesContextMenuRequested(const QPoint& menuPos)
+{
+  QMenu menu;
+  menu.setObjectName("FileDialogFavoritesContextMenu");
+
+  QModelIndex index = this->Implementation->Ui.Favorites->indexAt(menuPos);
+  if (index.isValid())
+  {
+    QString dirPath = this->Implementation->FavoriteModel->filePath(index);
+    if (!dirPath.isEmpty())
+    {
+      auto removeFromFavorites = new QAction("Remove from favorites", this);
+      QObject::connect(removeFromFavorites, &QAction::triggered,
+        [=] { this->Implementation->FavoriteModel->removeFromFavorites(dirPath); });
+      menu.addAction(removeFromFavorites);
+
+      auto renameLabel = new QAction("Rename label", this);
+      QObject::connect(
+        renameLabel, &QAction::triggered, [=] { this->Implementation->Ui.Favorites->edit(index); });
+      menu.addAction(renameLabel);
+    }
+  }
+
+  menu.exec(this->Implementation->Ui.Favorites->viewport()->mapToGlobal(menuPos));
 }
 
 //-----------------------------------------------------------------------------
@@ -539,6 +695,8 @@ void pqFileDialog::setFileMode(pqFileDialog::FileMode mode)
 
   impl.Ui.Navigate->show();
   impl.Ui.Navigate->setEnabled(false);
+  impl.Ui.CreateFolder->setEnabled(impl.Mode == pqFileDialog::AnyFile);
+  this->updateButtonStates();
 }
 
 //-----------------------------------------------------------------------------
@@ -1025,6 +1183,13 @@ bool pqFileDialog::acceptInternal(const QStringList& selected_files)
 
   auto& impl = *this->Implementation;
   QString file = selected_files[0];
+
+  if (file.isEmpty() && (impl.Mode == Directory || impl.Mode == ExistingFilesAndDirectories))
+  {
+    this->addToFilesSelected(QStringList(impl.Model->getCurrentPath()));
+    return true;
+  }
+
   // User chose an existing directory
   if (impl.Model->dirExists(file, file))
   {
@@ -1115,6 +1280,11 @@ bool pqFileDialog::acceptInternal(const QStringList& selected_files)
         return false;
 
       case AnyFile:
+        QDir dir = QFileInfo(file).absoluteDir();
+        if (!dir.exists())
+        {
+          qWarning() << "'" << dir.absolutePath() << "' does not exist";
+        }
         this->addToFilesSelected(QStringList(file));
         return true;
     }
@@ -1283,7 +1453,7 @@ void pqFileDialog::updateButtonStates()
   // We disable buttons if no file in the current folder
   if (impl.FileNames.empty())
   {
-    impl.Ui.OK->setEnabled(false);
+    impl.Ui.OK->setEnabled(impl.Mode == Directory || impl.Mode == ExistingFilesAndDirectories);
     impl.Ui.Navigate->setEnabled(false);
     return;
   }

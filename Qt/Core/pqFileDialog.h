@@ -231,6 +231,16 @@ private Q_SLOTS:
   // Called when the user right-clicks in the file qtreeview
   void onContextMenuRequested(const QPoint& pos);
 
+  // Called when the user right-clicks in the favorites qlistview
+  void onFavoritesContextMenuRequested(const QPoint& pos);
+
+  void AddDirectoryToFavorites(QString const&);
+  void RemoveDirectoryFromFavorites(QString const&);
+
+  void onAddCurrentDirectoryToFavorites();
+  void onRemoveCurrentDirectoryFromFavorites();
+  void onResetFavoritesToSystemDefault();
+
   // Called when the user requests to create a new directory in the cwd
   void onCreateNewFolder();
 
