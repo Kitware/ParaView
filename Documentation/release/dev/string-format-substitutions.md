@@ -29,6 +29,8 @@ Currently, the following four modules utilize ``vtkPVStringFormatter``:
 * ``Views``
 * ``Annotate Time (vtkTextToTimeFilter)``
 * ``EnvironmentAnnotation (vtkEnvironmentAnnotationFilter)``
+* ``PythonAnnotation (vtkPythonAnnotationFilter)``
+* ``PythonCalulator (vtkPythonCalculator)``
 
 ``Extract_writers`` include the newly added extract_generators that are listed in the ``Extractors`` drop-down menu of ParaView (e.g. CSV, PNG, JPG, VTP). All the extractors used to have the following arguments ``%ts`` (int), ``%t`` (double) and (optionally if the extractor is an image) ``%cm`` (string). It should be noted that ``{fmt}`` does not support specified precision for integers, so {timestep:.6d} does not work, but {timestep:06d} does work.
 * ``vtkSMExtractsController`` is responsible for inserting the scope of the following arguments ``{time} == {EXTRACT_time}`` and ``{timestep} = {EXTRACT_timestep}``.
@@ -46,3 +48,7 @@ Currently, the following four modules utilize ``vtkPVStringFormatter``:
 
 ``EnvironmentAnnotation`` used to call hard-coded pieces of code to get ``GLOBAL`` and ``ENV`` arguments. Now it's using the ``vtkPVStringFormatter`` since these values have already been calculated.
 * It should be noted that the date that is printed from ``EnvironmentAnnotation`` is ``{GLOBAL_date}`` therefore it does not change at every call of the filter.
+
+``PythonAnnotation`` used to use ``time_value``, ``time_steps``, ``time_range``, and ``time_index`` in the provided expression. Now it can also use ``{timevalue} == {ANNOTATE_timevalue}``, ``{timesteps} == {ANNOTATE_timesteps}``, ``{timerange} == {ANNOTATE_timerange}`` and ``{timeindex} == {ANNOTATE_timeindex}``.
+
+``PythonCalulator`` used to use ``time_value``, and ``time_index`` in the provided expression. Now it can also use ``{timevalue} == {ANNOTATE_timevalue}``, and ``{timeindex} == {ANNOTATE_timeindex}``.
