@@ -119,6 +119,19 @@ if not equal(value, expected):
   errors += 1
   print ("Error: Expected ", expected, " and got ", value)
 
+# update expression and time to test string substitutions
+annotation.Expression = '"{timeindex} {timevalue} {timerange}"'
+# annotation.Expression = '"%i %f %s" % (t_index, t_value, str(t_range))'
+time = timesteps[7]
+annotation.UpdatePipeline(time)
+
+annotation.SMProxy.UpdatePropertyInformation()
+value = annotation.SMProxy.GetProperty('AnnotationValue').GetElement(0)
+expected = "7 0.000700 [0.0, 0.004299988504499197]"
+if not equal(value, expected):
+    errors += 1
+    print ("Error: Expected ", expected, " and got ", value)
+
 # Disconnect and quit application...
 Disconnect()
 
