@@ -214,6 +214,11 @@ pqStringVectorPropertyWidget::pqStringVectorPropertyWidget(
       arrayListWidget->setMaximumRowCountBeforeScrolling(
         pqPropertyWidget::hintsWidgetHeightNumberOfRows(smProperty->GetHints()));
 
+      if (auto aswHints = hints ? hints->FindNestedElementByName("ArraySelectionWidget") : nullptr)
+      {
+        arrayListWidget->setIconType(aswHints->GetAttribute("icon_type"));
+      }
+
       listWidget = arrayListWidget;
     }
     else

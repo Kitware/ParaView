@@ -334,6 +334,7 @@
   <Proxy group="filters" name="RectilinearGridToPointSet" />
   <Proxy group="filters" name="RedistributeDataSet" />
   <Proxy group="filters" name="ReflectionFilter" icon=":/pqWidgets/Icons/pqReflect.svg" />
+  <Proxy group="filters" name="RenameArrays" />
   <Proxy group="filters" name="RemoveGhostInformation" />
   <Proxy group="filters" name="ResampleToImage" />
   <Proxy group="filters" name="ResampleToLine" />

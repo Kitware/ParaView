@@ -64,9 +64,22 @@ public:
    */
   bool event(QEvent* e) override;
 
+  /**
+   * Set table header label. It should match the Property name.
+   */
   void setHeaderLabel(const QString& label);
 
+  /**
+   * Set the maximum number of visible rows. Beyond this threshold,
+   * a scrollbar is added.
+   * Forwarded to the inner pqTableView.
+   */
   void setMaximumRowCountBeforeScrolling(int size);
+
+  /**
+   * Set the icon type corresponding to the arrays.
+   */
+  void setIconType(const QString& icon_type);
 
 Q_SIGNALS:
   /**

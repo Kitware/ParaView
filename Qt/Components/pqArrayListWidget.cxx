@@ -52,7 +52,6 @@ public:
 
   QVariant headerData(int section, Qt::Orientation orientation, int role) const override
   {
-    // TODO add icon for array type ?
     if (orientation == Qt::Horizontal && role == Qt::DisplayRole)
     {
       switch (section)
@@ -63,6 +62,38 @@ public:
           return tr("New Name");
         default:
           break;
+      }
+    }
+
+    if (role == Qt::DecorationRole && section == pqAnnotationsModel::VALUE)
+    {
+      if (this->IconType == "point")
+      {
+        return QIcon(":/pqWidgets/Icons/pqNodalData.svg");
+      }
+      else if (this->IconType == "cell")
+      {
+        return QIcon(":/pqWidgets/Icons/pqCellCenterData.svg");
+      }
+      else if (this->IconType == "field")
+      {
+        return QIcon(":/pqWidgets/Icons/pqGlobalData.svg");
+      }
+      else if (this->IconType == "vertex")
+      {
+        return QIcon(":/pqWidgets/Icons/pqNodalData.svg");
+      }
+      else if (this->IconType == "edge")
+      {
+        return QIcon(":/pqWidgets/Icons/pqEdgeCenterData.svg");
+      }
+      else if (this->IconType == "face")
+      {
+        return QIcon(":/pqWidgets/Icons/pqFaceCenterData.svg");
+      }
+      else if (this->IconType == "row")
+      {
+        return QIcon(":/pqWidgets/Icons/pqSpreadsheet.svg");
       }
     }
 
@@ -81,6 +112,7 @@ public:
   }
 
   QString ArrayLabel = tr("Array Name");
+  QString IconType = "";
   pqArrayListWidget* ParentWidget = nullptr;
 };
 
@@ -136,6 +168,12 @@ bool pqArrayListWidget::event(QEvent* evt)
 void pqArrayListWidget::setHeaderLabel(const QString& label)
 {
   this->Model->ArrayLabel = label;
+}
+
+//-----------------------------------------------------------------------------
+void pqArrayListWidget::setIconType(const QString& icon_type)
+{
+  this->Model->IconType = icon_type;
 }
 
 //-----------------------------------------------------------------------------

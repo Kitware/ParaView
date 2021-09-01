@@ -2231,5 +2231,139 @@ found and the point will be rejected.</Documentation>
       </InputProperty>
     </SourceProxy>
 
+    <SourceProxy class="vtkArrayRename" label="RenameArrays" name="RenameArrays">
+      <Documentation long_help="Rename Data Arrays"
+        short_help="Rename Data Arrays">
+    This forwards the data to the output and allow to modify array names in place.</Documentation>
+      <InputProperty command="SetInputConnection" name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkDataObject" />
+        </DataTypeDomain>
+        <InputArrayDomain name="point_arrays" attribute_type="point" optional="1" />
+        <InputArrayDomain name="cell_arrays" attribute_type="cell" optional="1" />
+        <InputArrayDomain name="field_arrays" attribute_type="field" optional="1" />
+        <InputArrayDomain name="vertex_arrays" attribute_type="vertex" optional="1" />
+        <InputArrayDomain name="edge_arrays" attribute_type="edge" optional="1" />
+        <InputArrayDomain name="row_arrays" attribute_type="row" optional="1" />
+      </InputProperty>
+      <StringVectorProperty name="PointArrayNames"
+                            label="Point Arrays"
+                            command="SetPointArrayName"
+                            clean_command="ClearPointMapping"
+                            element_types="str str"
+                            number_of_elements_per_command="2"
+                            repeat_command="1">
+        <ArrayListDomain input_domain_name="point_arrays" name="array_list">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input" />
+          </RequiredProperties>
+        </ArrayListDomain>
+        <Documentation>This property associates new names to the input point array names</Documentation>
+        <Hints>
+          <ArraySelectionWidget icon_type="point"/>
+        </Hints>
+      </StringVectorProperty>
+
+      <StringVectorProperty name="CellArrayNames"
+                            label="Cell Arrays"
+                            command="SetCellArrayName"
+                            clean_command="ClearCellMapping"
+                            element_types="str str"
+                            number_of_elements_per_command="2"
+                            repeat_command="1">
+        <ArrayListDomain input_domain_name="cell_arrays" name="array_list">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input" />
+          </RequiredProperties>
+        </ArrayListDomain>
+        <Documentation>This property associates new names to the input cell array names</Documentation>
+        <Hints>
+          <ArraySelectionWidget icon_type="cell"/>
+        </Hints>
+      </StringVectorProperty>
+
+      <StringVectorProperty name="FieldArrayNames"
+                            label="Field Arrays"
+                            command="SetFieldArrayName"
+                            clean_command="ClearFieldMapping"
+                            element_types="str str"
+                            number_of_elements_per_command="2"
+                            repeat_command="1">
+        <ArrayListDomain input_domain_name="field_arrays" name="array_list">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input" />
+          </RequiredProperties>
+        </ArrayListDomain>
+        <Documentation>This property associates new names to the input field array names</Documentation>
+        <Hints>
+          <ArraySelectionWidget icon_type="field"/>
+        </Hints>
+      </StringVectorProperty>
+
+      <StringVectorProperty name="VertexArrayNames"
+                            label="Vertex Arrays"
+                            command="SetVertexArrayName"
+                            clean_command="ClearVertexMapping"
+                            element_types="str str"
+                            number_of_elements_per_command="2"
+                            repeat_command="1">
+        <ArrayListDomain input_domain_name="vertex_arrays" name="array_list">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input" />
+          </RequiredProperties>
+        </ArrayListDomain>
+        <Documentation>This property associates new names to the input vertex array names</Documentation>
+        <Hints>
+          <ArraySelectionWidget icon_type="vertex"/>
+        </Hints>
+      </StringVectorProperty>
+
+      <StringVectorProperty name="EdgeArrayNames"
+                            label="Edge Arrays"
+                            command="SetEdgeArrayName"
+                            clean_command="ClearEdgeMapping"
+                            element_types="str str"
+                            number_of_elements_per_command="2"
+                            repeat_command="1">
+        <ArrayListDomain input_domain_name="edge_arrays" name="array_list">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input" />
+          </RequiredProperties>
+        </ArrayListDomain>
+        <Documentation>This property associates new names to the input edge array names</Documentation>
+        <Hints>
+          <ArraySelectionWidget icon_type="edge"/>
+        </Hints>
+      </StringVectorProperty>
+
+      <StringVectorProperty name="RowArrayNames"
+                            label="Row Arrays"
+                            command="SetRowArrayName"
+                            clean_command="ClearRowMapping"
+                            element_types="str str"
+                            number_of_elements_per_command="2"
+                            repeat_command="1">
+        <ArrayListDomain input_domain_name="row_arrays" name="array_list">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input" />
+          </RequiredProperties>
+        </ArrayListDomain>
+        <Documentation>This property associates new names to the input row array names</Documentation>
+        <Hints>
+          <ArraySelectionWidget icon_type="row"/>
+        </Hints>
+      </StringVectorProperty>
+
+    </SourceProxy>
   </ProxyGroup>
 </ServerManagerConfiguration>

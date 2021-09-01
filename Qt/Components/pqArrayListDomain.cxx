@@ -102,14 +102,12 @@ void pqArrayListDomain::domainChanged()
   if (prop && nbPerCommand > 1 && prop->GetElementType(1) == vtkSMStringVectorProperty::STRING)
   {
     QList<QVariant> newPropList = pqSMAdaptor::getStringListProperty(this->Internals->SMProperty);
-
     variantVal.setValue(newPropList);
   }
   else
   {
     QList<QList<QVariant>> newPropList =
       pqSMAdaptor::getSelectionProperty(this->Internals->SMProperty, pqSMAdaptor::UNCHECKED);
-
     variantVal.setValue(newPropList);
   }
 
