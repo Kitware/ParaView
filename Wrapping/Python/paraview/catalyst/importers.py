@@ -14,12 +14,14 @@ class MetaPathFinder(importlib.abc.MetaPathFinder):
         if modulename is None:
             modulename = os.path.splitext(os.path.basename(filename))[0]
 
-        if modulename in self._registered_files:
-            raise RuntimeError(\
-                    "Duplicate module name detected! '%s' is already used" % module)
+        unique_modulename = modulename
+        uniqifier = 1
+        while unique_modulename in self._registered_files:
+            unique_modulename = "%s%d" % (modulename, uniqifier)
+            uniqifier += 1
 
-        self._registered_files[modulename] = filename
-        return modulename
+        self._registered_files[unique_modulename] = filename
+        return unique_modulename
 
 
     def find_spec(self, fullname, path, target=None):

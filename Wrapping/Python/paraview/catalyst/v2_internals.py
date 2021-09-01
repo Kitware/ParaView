@@ -22,7 +22,6 @@ def register_module(path):
     # seamlessly.
     importers.install_pathfinder()
 
-    modulename = None
     if vtkPSystemTools.FileIsDirectory(path):
         return RegisterPackageFromDir(path)
     elif path.lower().endswith(".zip"):
