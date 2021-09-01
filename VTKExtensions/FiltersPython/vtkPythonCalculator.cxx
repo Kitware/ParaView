@@ -16,24 +16,24 @@
 
 #include "vtkPythonCalculator.h"
 
-#include "vtkCellData.h"
 #include "vtkDataArray.h"
 #include "vtkDataObject.h"
-#include "vtkDataObjectTypes.h"
 #include "vtkDataSet.h"
+#include "vtkGraph.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
+#include "vtkMolecule.h"
 #include "vtkObjectFactory.h"
-#include "vtkPVOptions.h"
+#include "vtkPVStringFormatter.h"
 #include "vtkPointData.h"
-#include "vtkProcessModule.h"
 #include "vtkPythonInterpreter.h"
 #include "vtkPythonUtil.h"
 #include "vtkSmartPyObject.h"
+#include "vtkStreamingDemandDrivenPipeline.h"
+#include "vtkTable.h"
 
 #include <algorithm>
 #include <map>
-#include <sstream>
 #include <string>
 #include <vtksys/SystemTools.hxx>
 
@@ -68,6 +68,74 @@ vtkPythonCalculator::~vtkPythonCalculator()
 {
   this->SetExpression(nullptr);
   this->SetArrayName(nullptr);
+}
+
+//----------------------------------------------------------------------------
+int vtkPythonCalculator::RequestData(
+  vtkInformation* request, vtkInformationVector** inputVector, vtkInformationVector* outputVector)
+{
+  // get the info objects
+  vtkInformation* inInfo = nullptr;
+  if (inputVector[0]->GetNumberOfInformationObjects() > 0)
+  {
+    inInfo = inputVector[0]->GetInformationObject(0);
+  }
+  vtkInformation* outInfo = outputVector->GetInformationObject(0);
+
+  double dataTime = 0;
+  bool dataTimeValid = false;
+  std::vector<double> timeSteps;
+  int timeIndex = 0;
+
+  // get the input and output
+  if (inInfo)
+  {
+    if (inInfo->Has(vtkDataObject::DATA_TIME_STEP()))
+    {
+      dataTimeValid = true;
+      dataTime = inInfo->Get(vtkDataObject::DATA_TIME_STEP());
+    }
+
+    if (inInfo->Has(vtkStreamingDemandDrivenPipeline::TIME_STEPS()))
+    {
+      int numberOfTimeSteps = inInfo->Length(vtkStreamingDemandDrivenPipeline::TIME_STEPS());
+      double* tempTimeSteps = inInfo->Get(vtkStreamingDemandDrivenPipeline::TIME_STEPS());
+
+      timeSteps.insert(timeSteps.begin(), tempTimeSteps, tempTimeSteps + numberOfTimeSteps);
+    }
+
+    timeIndex = 0;
+    if (dataTimeValid && !timeSteps.empty())
+    {
+      for (int i = 0; i < timeSteps.size(); ++i)
+      {
+        if (timeSteps[i] == dataTime)
+        {
+          timeIndex = i;
+        }
+      }
+    }
+  }
+
+  // define calculator scope
+  PV_STRING_FORMATTER_NAMED_SCOPE(
+    "CALCULATOR", fmt::arg("timevalue", dataTime), fmt::arg("timeindex", timeIndex));
+
+  char* cachedExpression = vtksys::SystemTools::DuplicateString(this->Expression);
+
+  std::string formattableExpression = this->Expression ? this->Expression : std::string();
+  delete[] this->Expression;
+  this->Expression = vtksys::SystemTools::DuplicateString(
+    vtkPVStringFormatter::Format(formattableExpression).c_str());
+
+  // call superclass
+  this->Superclass::RequestData(request, inputVector, outputVector);
+
+  // restore cached expression
+  delete[] this->Expression;
+  this->Expression = vtksys::SystemTools::DuplicateString(cachedExpression);
+
+  return 1;
 }
 
 //----------------------------------------------------------------------------

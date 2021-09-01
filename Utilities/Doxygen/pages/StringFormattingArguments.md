@@ -84,6 +84,16 @@ Argument | Type | Description
 `{ANNOTATE_timeindex}` | int | The index of the time-steps element which is equal to time-value.
 `{timeindex}` | int | The index of the time-steps element which is equal to time-value.
 
+The following arguments are part of a scope that is used in `PythonCalculator`. `vtkPythonCalculator` is
+responsible for pushing and popping the scope.
+
+Argument | Type | Description
+---------|------|---------------------------------------------------------
+`{ANNOTATE_timevalue}` | double | The time-value of the information. Extracted from vtkDataObject::DATA_TIME_STEP().
+`{timestep}` | double | The time-value of the information. Extracted from vtkDataObject::DATA_TIME_STEP().
+`{ANNOTATE_timeindex}` | int | The index of the time-steps element which is equal to time-value. time-steps are extracted from vtkStreamingDemandDrivenPipeline::TIME_STEPS().
+`{timeindex}` | int | The index of the time-steps element which is equal to time-value. time-steps are extracted from vtkStreamingDemandDrivenPipeline::TIME_STEPS().
+
 All the aforementioned arguments can be used in appropriate ParaView use cases to format formattable strings.
 If a user wants to see which are the available arguments that he can use, he can try to type a wrong argument in the
 formattable field, e.g. `{test123}`. In output messages of ParaView, the user will see a message like below:
