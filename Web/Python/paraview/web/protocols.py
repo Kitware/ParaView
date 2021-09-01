@@ -3,8 +3,6 @@ protocols that can be combined together to provide a flexible way to define
 very specific web application.
 """
 
-from __future__ import absolute_import, division, print_function
-
 import base64
 import fnmatch
 import json
@@ -52,10 +50,7 @@ from vtkmodules.web.render_window_serializer import (
     serializeInstance,
 )
 
-try:
-    from wslink import schedule_callback
-except:
-    from twisted.internet.reactor import callLater as schedule_callback
+from wslink import schedule_callback
 
 # import RPC annotation
 from wslink import register as exportRpc
