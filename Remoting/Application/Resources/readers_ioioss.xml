@@ -1,8 +1,8 @@
 <ServerManagerConfiguration>
   <ProxyGroup name="sources">
-    <SourceProxy class="vtkIossReader" label="Ioss Reader" name="IossReader">
-      <Documentation short_help="Reader for Ioss data">
-        Reader for Ioss data. This is a distributed reader.
+    <SourceProxy class="vtkIOSSReader" label="IOSS Reader" name="IOSSReader">
+      <Documentation short_help="Reader for IOSS-supported data">
+        Reader for IOSS supported data. This is a distributed reader.
       </Documentation>
       <StringVectorProperty clean_command="ClearFileNames"
                             command="AddFileName"

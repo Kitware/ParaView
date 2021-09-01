@@ -38,8 +38,8 @@
 #include "vtkMPI.h"
 #endif
 
-#if VTK_MODULE_ENABLE_VTK_IOIoss
-#include "vtkIossReader.h"
+#if VTK_MODULE_ENABLE_VTK_IOIOSS
+#include "vtkIOSSReader.h"
 #endif
 
 #include "catalyst_impl_paraview.h"
@@ -87,12 +87,12 @@ static vtkSmartPointer<vtkInSituPipeline> create_precompiled_pipeline(const cond
 static bool update_producer_ioss(const std::string& channel_name, const conduit_cpp::Node* node,
   const conduit_cpp::Node* vtkNotUsed(global_fields))
 {
-#if VTK_MODULE_ENABLE_VTK_IOIoss
+#if VTK_MODULE_ENABLE_VTK_IOIOSS
   auto producer = vtkInSituInitializationHelper::GetProducer(channel_name);
   if (producer == nullptr)
   {
     auto pxm = vtkSMProxyManager::GetProxyManager()->GetActiveSessionProxyManager();
-    producer = vtkSMSourceProxy::SafeDownCast(pxm->NewProxy("sources", "IossReader"));
+    producer = vtkSMSourceProxy::SafeDownCast(pxm->NewProxy("sources", "IOSSReader"));
     if (!producer)
     {
       vtkLogF(ERROR, "Failed to create 'Conduit' proxy!");
@@ -104,7 +104,7 @@ static bool update_producer_ioss(const std::string& channel_name, const conduit_
     producer->Delete();
   }
 
-  auto algo = vtkIossReader::SafeDownCast(producer->GetClientSideObject());
+  auto algo = vtkIOSSReader::SafeDownCast(producer->GetClientSideObject());
   algo->SetDatabaseTypeOverride("catalyst");
   algo->AddProperty(
     "CATALYST_CONDUIT_NODE", conduit_cpp::c_node(const_cast<conduit_cpp::Node*>(node)));
@@ -353,7 +353,7 @@ enum catalyst_error catalyst_execute_paraview(const conduit_node* params)
       }
       else if (type == "ioss")
       {
-#if VTK_MODULE_ENABLE_VTK_IOIoss
+#if VTK_MODULE_ENABLE_VTK_IOIOSS
         is_valid = true;
         vtkVLogF(PARAVIEW_LOG_CATALYST_VERBOSITY(),
           "IOSS mesh detected for channel (%s); validation will be skipped for now",

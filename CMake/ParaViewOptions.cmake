@@ -480,7 +480,7 @@ paraview_require_module(
             VTK::IOCGNSReader
             VTK::IOCityGML
             VTK::IOCONVERGECFD
-            VTK::IOIoss
+            VTK::IOIOSS
             VTK::IOH5part
             VTK::IOH5Rage
             VTK::IONetCDF

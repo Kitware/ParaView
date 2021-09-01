@@ -57,7 +57,7 @@ OPTIONAL_DEPENDS
   VTK::IOH5part
   VTK::IOH5Rage
   VTK::IOInfovis
-  VTK::IOIoss
+  VTK::IOIOSS
   VTK::IOLAS
   VTK::IOLegacy
   VTK::IOMotionFX
