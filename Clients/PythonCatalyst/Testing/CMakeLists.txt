@@ -94,12 +94,36 @@ if (NOT PARAVIEW_SERIAL_TESTS_USE_MPIEXEC)
     PREFIX "Catalyst::WaveletMiniApp"
     ARGS   "$<TARGET_FILE:ParaView::pvbatch>" --dr --sym -- -m paraview.demos.wavelet_miniapp -t 20 --size 21 -s
     TEST_SCRIPTS ${simple_scripts})
+
+  # Add test to test for adding the same pipeline script twice.
+  paraview_add_test(
+    PREFIX "Catalyst::WaveletMiniApp"
+    ARGS   "$<TARGET_FILE:ParaView::pvbatch>" --dr --sym -- -m paraview.demos.wavelet_miniapp -t 2 --size 21
+            --script-version 2
+            -s "${CMAKE_CURRENT_SOURCE_DIR}/repeated_pipeline.py"
+            -s
+    TEST_SCRIPTS "repeated_pipeline.py" )
+  set_tests_properties("Catalyst::WaveletMiniApp.repeated_pipeline"
+     PROPERTIES
+        PASS_REGULAR_EXPRESSION "Importing 'repeated_pipeline' for 2-th time!")
 endif()
 
 paraview_add_test_mpi(
   PREFIX "Catalyst::MPI::WaveletMiniApp"
   ARGS   "$<TARGET_FILE:ParaView::pvbatch>" --dr --sym -- -m paraview.demos.wavelet_miniapp -t 20 --size 21 -s
   TEST_SCRIPTS ${simple_scripts})
+
+# Add test to test for adding the same pipeline script twice.
+paraview_add_test_mpi(
+  PREFIX "Catalyst::MPI::WaveletMiniApp"
+  ARGS   "$<TARGET_FILE:ParaView::pvbatch>" --dr --sym -- -m paraview.demos.wavelet_miniapp -t 2 --size 21
+          --script-version 2
+          -s "${CMAKE_CURRENT_SOURCE_DIR}/repeated_pipeline.py"
+          -s
+  TEST_SCRIPTS "repeated_pipeline.py" )
+set_tests_properties("Catalyst::WaveletMiniApp.repeated_pipeline"
+   PROPERTIES
+      PASS_REGULAR_EXPRESSION "Importing 'repeated_pipeline' for 2-th time!")
 
 foreach (tname IN LISTS scripts)
   if (NOT PARAVIEW_SERIAL_TESTS_USE_MPIEXEC)
