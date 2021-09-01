@@ -29,12 +29,17 @@
 #include "vtkMultiBlockDataSet.h"
 #include "vtkPVLogger.h"
 #include "vtkSMPluginManager.h"
+#include "vtkSMPropertyHelper.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMSessionProxyManager.h"
 #include "vtkSMSourceProxy.h"
 
 #if VTK_MODULE_ENABLE_VTK_ParallelMPI
 #include "vtkMPI.h"
+#endif
+
+#if VTK_MODULE_ENABLE_VTK_IOIoss
+#include "vtkIossReader.h"
 #endif
 
 #include "catalyst_impl_paraview.h"
@@ -77,6 +82,42 @@ static vtkSmartPointer<vtkInSituPipeline> create_precompiled_pipeline(const cond
   {
     return nullptr;
   }
+}
+
+static bool update_producer_ioss(const std::string& channel_name, const conduit_cpp::Node* node,
+  const conduit_cpp::Node* vtkNotUsed(global_fields))
+{
+#if VTK_MODULE_ENABLE_VTK_IOIoss
+  auto producer = vtkInSituInitializationHelper::GetProducer(channel_name);
+  if (producer == nullptr)
+  {
+    auto pxm = vtkSMProxyManager::GetProxyManager()->GetActiveSessionProxyManager();
+    producer = vtkSMSourceProxy::SafeDownCast(pxm->NewProxy("sources", "IossReader"));
+    if (!producer)
+    {
+      vtkLogF(ERROR, "Failed to create 'Conduit' proxy!");
+      return false;
+    }
+    vtkSMPropertyHelper(producer, "FileName").Set("catalyst.bin");
+    producer->UpdateVTKObjects();
+    vtkInSituInitializationHelper::SetProducer(channel_name, producer);
+    producer->Delete();
+  }
+
+  auto algo = vtkIossReader::SafeDownCast(producer->GetClientSideObject());
+  algo->SetDatabaseTypeOverride("catalyst");
+  algo->AddProperty(
+    "CATALYST_CONDUIT_NODE", conduit_cpp::c_node(const_cast<conduit_cpp::Node*>(node)));
+  /*
+  algo->SetGlobalFieldsNode(global_fields);
+  */
+  vtkInSituInitializationHelper::MarkProducerModified(channel_name);
+  return true;
+#else
+  (void)channel_name;
+  (void)node;
+  return false;
+#endif
 }
 
 static bool process_script_args(vtkInSituPipelinePython* pipeline, const conduit_cpp::Node& node)
@@ -310,6 +351,17 @@ enum catalyst_error catalyst_execute_paraview(const conduit_node* params)
           }
         }
       }
+      else if (type == "ioss")
+      {
+#if VTK_MODULE_ENABLE_VTK_IOIoss
+        is_valid = true;
+        vtkVLogF(PARAVIEW_LOG_CATALYST_VERBOSITY(),
+          "IOSS mesh detected for channel (%s); validation will be skipped for now",
+          channel_name.c_str());
+#else
+        vtkLogF(ERROR, "IOSS mesh is not supported by this build. Rebuild with IOSS enabled.");
+#endif
+      }
       else
       {
         is_valid = false;
@@ -331,6 +383,10 @@ enum catalyst_error catalyst_execute_paraview(const conduit_node* params)
       if (type == "mesh" || type == "multimesh")
       {
         update_producer_mesh_blueprint(channel_name, &data_node, &fields, type == "multimesh");
+      }
+      else if (type == "ioss")
+      {
+        update_producer_ioss(channel_name, &data_node, &fields);
       }
     }
   }
