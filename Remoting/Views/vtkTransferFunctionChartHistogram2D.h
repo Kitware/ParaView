@@ -21,7 +21,10 @@
 #include "vtkRemotingViewsModule.h" // needed for export macro
 #include "vtkWeakPointer.h"         // needed for vtkWeakPointer
 
+#include <vector> // needed for ivar
+
 // Forward declarations
+class vtkContext2D;
 class vtkContextMouseEvent;
 class vtkImageData;
 class vtkTransferFunctionBoxItem;
@@ -50,9 +53,19 @@ public:
   vtkSmartPointer<vtkTransferFunctionBoxItem> AddNewBox();
 
   /**
+   * Remove box item from the chart
+   */
+  virtual void RemoveBox(vtkSmartPointer<vtkTransferFunctionBoxItem> box);
+
+  /**
    * Override to add new box item to the chart when double clicked.
    */
   bool MouseDoubleClickEvent(const vtkContextMouseEvent& mouse) override;
+
+  /**
+   * Override to delete the active box item
+   */
+  bool KeyPressEvent(const vtkContextKeyEvent& key) override;
 
   /**
    * Set the input image data for the 2D histogram.
@@ -74,6 +87,11 @@ public:
   vtkSmartPointer<vtkTransferFunctionBoxItem> GetActiveBox() const;
   void SetActiveBox(vtkSmartPointer<vtkTransferFunctionBoxItem> box);
   ///@}
+
+  /**
+   * Paint event for the chart, called whenever the chart needs to be drawn
+   */
+  bool Paint(vtkContext2D* painter) override;
 
 protected:
   vtkTransferFunctionChartHistogram2D() {}
@@ -99,6 +117,7 @@ protected:
   // Member variables;
   vtkWeakPointer<vtkImageData> TransferFunction2D;
   vtkSmartPointer<vtkTransferFunctionBoxItem> ActiveBox;
+  std::vector<int> BoxesToRemove;
 
 private:
   vtkTransferFunctionChartHistogram2D(const vtkTransferFunctionChartHistogram2D&);

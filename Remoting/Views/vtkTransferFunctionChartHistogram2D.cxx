@@ -19,6 +19,7 @@
 
 // vtk includes
 #include "vtkAxis.h"
+#include "vtkContextKeyEvent.h"
 #include "vtkContextMouseEvent.h"
 #include "vtkContextScene.h"
 #include "vtkDataArrayRange.h"
@@ -27,6 +28,7 @@
 #include "vtkObjectFactory.h"
 #include "vtkPlotHistogram2D.h"
 #include "vtkPointData.h"
+#include "vtkRenderWindowInteractor.h"
 
 //-------------------------------------------------------------------------------------------------
 vtkStandardNewMacro(vtkTransferFunctionChartHistogram2D);
@@ -80,6 +82,8 @@ vtkSmartPointer<vtkTransferFunctionBoxItem> vtkTransferFunctionChartHistogram2D:
   boxItem->AddObserver(vtkTransferFunctionBoxItem::BoxEditEvent, this,
     &vtkTransferFunctionChartHistogram2D::OnTransferFunctionBoxItemModified);
   boxItem->AddObserver(vtkTransferFunctionBoxItem::BoxSelectEvent, this,
+    &vtkTransferFunctionChartHistogram2D::OnTransferFunctionBoxItemModified);
+  boxItem->AddObserver(vtkTransferFunctionBoxItem::BoxDeleteEvent, this,
     &vtkTransferFunctionChartHistogram2D::OnTransferFunctionBoxItemModified);
   this->AddPlot(boxItem);
   this->SetActiveBox(boxItem);
@@ -246,14 +250,32 @@ void vtkTransferFunctionChartHistogram2D::OnTransferFunctionBoxItemModified(
   {
     return;
   }
-  if (eid == vtkTransferFunctionBoxItem::BoxSelectEvent)
+  switch (eid)
   {
-    this->SetActiveBox(plot);
-  }
-  else if (eid == vtkTransferFunctionBoxItem::BoxAddEvent ||
-    eid == vtkTransferFunctionBoxItem::BoxEditEvent)
-  {
-    this->GenerateTransfer2D();
+    case vtkTransferFunctionBoxItem::BoxSelectEvent:
+    {
+      this->SetActiveBox(plot);
+      break;
+    }
+    case vtkTransferFunctionBoxItem::BoxAddEvent:
+    case vtkTransferFunctionBoxItem::BoxEditEvent:
+    {
+      this->GenerateTransfer2D();
+      break;
+    }
+    case vtkTransferFunctionBoxItem::BoxDeleteEvent:
+    {
+      auto boxItem = this->GetActiveBox();
+      if (boxItem)
+      {
+        this->RemoveBox(boxItem);
+      }
+      break;
+    }
+    default:
+    {
+      break;
+    }
   }
 }
 
@@ -279,4 +301,64 @@ void vtkTransferFunctionChartHistogram2D::SetActiveBox(
     this->ActiveBox->SetSelected(true);
   }
   this->GetScene()->SetDirty(true);
+}
+
+//-------------------------------------------------------------------------------------------------
+bool vtkTransferFunctionChartHistogram2D::KeyPressEvent(const vtkContextKeyEvent& key)
+{
+  if (key.GetInteractor()->GetKeySym() == std::string("Delete") ||
+    key.GetInteractor()->GetKeySym() == std::string("BackSpace"))
+  {
+    auto boxItem = this->GetActiveBox();
+    if (boxItem)
+    {
+      this->RemoveBox(boxItem);
+    }
+    return true;
+  }
+  return this->Superclass::KeyPressEvent(key);
+}
+
+//-------------------------------------------------------------------------------------------------
+void vtkTransferFunctionChartHistogram2D::RemoveBox(vtkSmartPointer<vtkTransferFunctionBoxItem> box)
+{
+  if (!box)
+  {
+    return;
+  }
+
+  const vtkIdType numPlots = GetNumberOfPlots();
+  for (vtkIdType i = 0; i < numPlots; i++)
+  {
+    auto boxItem = vtkControlPointsItem::SafeDownCast(GetPlot(i));
+    if (!boxItem)
+    {
+      continue;
+    }
+    if (boxItem == box)
+    {
+      this->BoxesToRemove.push_back(i);
+      this->GetScene()->SetDirty(true);
+      break;
+    }
+  }
+  if (this->ActiveBox == box)
+  {
+    this->ActiveBox = nullptr;
+  }
+}
+
+//-------------------------------------------------------------------------------------------------
+bool vtkTransferFunctionChartHistogram2D::Paint(vtkContext2D* painter)
+{
+  if (!this->BoxesToRemove.empty())
+  {
+    for (auto i = this->BoxesToRemove.cbegin(); i < this->BoxesToRemove.cend(); ++i)
+    {
+      this->RemovePlot(*i);
+    }
+    this->BoxesToRemove.clear();
+    this->GenerateTransfer2D();
+  }
+  return Superclass::Paint(painter);
 }

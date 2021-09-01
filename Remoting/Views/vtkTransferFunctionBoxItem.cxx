@@ -17,6 +17,7 @@
 #include "vtkBrush.h"
 #include "vtkColorTransferFunction.h"
 #include "vtkContext2D.h"
+#include "vtkContextKeyEvent.h"
 #include "vtkContextMouseEvent.h"
 #include "vtkContextScene.h"
 #include "vtkContextTransform.h"
@@ -27,6 +28,7 @@
 #include "vtkPiecewiseFunction.h"
 #include "vtkPointData.h"
 #include "vtkPoints2D.h"
+#include "vtkRenderWindowInteractor.h"
 #include "vtkTransform2D.h"
 #include "vtkUnsignedCharArray.h"
 #include "vtkVectorOperators.h"
@@ -463,6 +465,11 @@ void vtkTransferFunctionBoxItem::ClampToValidPosition(double pos[2])
 //-------------------------------------------------------------------------------------------------
 bool vtkTransferFunctionBoxItem::KeyPressEvent(const vtkContextKeyEvent& key)
 {
+  if (key.GetInteractor()->GetKeySym() == std::string("Delete") ||
+    key.GetInteractor()->GetKeySym() == std::string("BackSpace"))
+  {
+    this->InvokeEvent(vtkTransferFunctionBoxItem::BoxDeleteEvent);
+  }
   return Superclass::KeyPressEvent(key);
 }
 

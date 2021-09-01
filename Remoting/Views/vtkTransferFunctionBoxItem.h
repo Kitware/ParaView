@@ -39,7 +39,8 @@ public:
   {
     BoxAddEvent = vtkCommand::UserEvent + 100,
     BoxEditEvent,
-    BoxSelectEvent
+    BoxSelectEvent,
+    BoxDeleteEvent
   };
 
   /**
