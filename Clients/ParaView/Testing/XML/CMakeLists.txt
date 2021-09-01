@@ -1945,10 +1945,12 @@ endforeach()
 
 # Server Connection specific tests
 
-paraview_add_client_tests(
-  SMTESTING_ALLOW_ERRORS
-  FORCE_SERIAL
-  TEST_SCRIPTS ServerConnectTimeout.xml)
+if(NOT WIN32) # On windows, QtTesting is not able to press the connection dialog buttons
+  paraview_add_client_tests(
+    SMTESTING_ALLOW_ERRORS
+    FORCE_SERIAL
+    TEST_SCRIPTS ServerConnectTimeout.xml)
+endif()
 
 configure_file (
   "${CMAKE_CURRENT_SOURCE_DIR}/configuredServer.pvsc.in"
