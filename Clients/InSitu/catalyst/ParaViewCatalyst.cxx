@@ -45,7 +45,8 @@
 #include "catalyst_impl_paraview.h"
 
 static bool update_producer_mesh_blueprint(const std::string& channel_name,
-  const conduit_cpp::Node* node, const conduit_cpp::Node* global_fields, bool multimesh)
+  const conduit_node* node, const conduit_node* global_fields, bool multimesh,
+  const conduit_node* assemblyNode)
 {
   auto producer = vtkInSituInitializationHelper::GetProducer(channel_name);
   if (producer == nullptr)
@@ -62,9 +63,10 @@ static bool update_producer_mesh_blueprint(const std::string& channel_name,
   }
 
   auto algo = vtkConduitSource::SafeDownCast(producer->GetClientSideObject());
-  algo->SetNode(conduit_cpp::c_node(node));
-  algo->SetGlobalFieldsNode(conduit_cpp::c_node(global_fields));
+  algo->SetNode(node);
+  algo->SetGlobalFieldsNode(global_fields);
   algo->SetUseMultiMeshProtocol(multimesh);
+  algo->SetAssemblyNode(assemblyNode);
   vtkInSituInitializationHelper::MarkProducerModified(channel_name);
   return true;
 }
@@ -350,6 +352,16 @@ enum catalyst_error catalyst_execute_paraview(const conduit_node* params)
               mesh_node.name().c_str(), channel_name.c_str());
           }
         }
+
+        if (channel_node.has_path("assembly"))
+        {
+          is_valid = vtkCatalystBlueprint::Verify("assembly", channel_node["assembly"]);
+          if (!is_valid)
+          {
+            vtkLogF(ERROR, "'assembly' on channel '%s' is not valid; skipping channel.",
+              channel_name.c_str());
+          }
+        }
       }
       else if (type == "ioss")
       {
@@ -382,7 +394,14 @@ enum catalyst_error catalyst_execute_paraview(const conduit_node* params)
       fields["channel"].set(channel_name);
       if (type == "mesh" || type == "multimesh")
       {
-        update_producer_mesh_blueprint(channel_name, &data_node, &fields, type == "multimesh");
+        conduit_node* assembly = nullptr;
+        if (channel_node.has_path("assembly"))
+        {
+          auto anode = channel_node["assembly"];
+          assembly = conduit_cpp::c_node(&anode);
+        }
+        update_producer_mesh_blueprint(channel_name, conduit_cpp::c_node(&data_node),
+          conduit_cpp::c_node(&fields), type == "multimesh", assembly);
       }
       else if (type == "ioss")
       {

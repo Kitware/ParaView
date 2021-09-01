@@ -118,6 +118,22 @@ void Execute(int cycle, double time, Grid& grid, Attributes& attribs, Particles&
   mesh_particles["topologies/mesh/elements/connectivity"].set_external(
     &connectivity[0], particles.GetNumberOfPoints());
 
+  // now, add assembly
+  // Assembly:
+  //   > Mesh
+  //      (grid)
+  //   > Particles
+  //      (particles)
+  //   > Collection
+  //      > SubCollection
+  //        [(grid), (particles)]
+  auto assembly = channel["assembly"];
+  assembly["Grid"].set_string("grid");
+  assembly["Particles"].set_string("particles");
+  auto subCollection = assembly["Collection/SubCollection"];
+  subCollection.append().set_string("grid");
+  subCollection.append().set_string("particles");
+
   catalyst_error err = catalyst_execute(conduit_cpp::c_node(&exec_params));
   if (err != catalyst_error_ok)
   {

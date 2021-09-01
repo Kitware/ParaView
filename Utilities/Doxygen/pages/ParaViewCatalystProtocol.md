@@ -165,3 +165,20 @@ to "multimesh".
   [Conduit Mesh](https://llnl-conduit.readthedocs.io/en/latest/blueprint_mesh.html#)
   protocol. This can be repeated for multiple blocks. 'block-name' must be unique for
   each blocks.
+
+* channel/assembly: (optional) if present, can be used to define arbitrary
+  hierarchical relationships between individual meshes/blocks in the mutlimesh.
+  For example, for two blocks named `blockA` and `blockB`, following is a
+  possible hierarchy. Thus all nodes are either object, list or string, and if
+  string, must refer to a valid block name.
+
+@verbatim
+
+  channel/assembly/
+                   AllBlocks: ["blockA", "blockB"]
+                   BlockA: "blockA"
+                   BlockB: "blockB"
+                   SubGroup/
+                          AnotherChild: "blockA"
+
+@endverbatim

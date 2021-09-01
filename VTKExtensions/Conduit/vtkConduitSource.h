@@ -73,6 +73,14 @@ public:
    */
   void SetGlobalFieldsNode(const conduit_node* node);
   //@}
+
+  //@{
+  /**
+   * Set the node to read the assembly information from, if any.
+   */
+  void SetAssemblyNode(const conduit_node* node);
+  //@}
+
 protected:
   vtkConduitSource();
   ~vtkConduitSource();
