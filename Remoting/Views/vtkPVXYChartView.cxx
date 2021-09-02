@@ -815,10 +815,6 @@ void vtkPVXYChartView::Render(bool interactive)
                        "Please replace '%s' with '%s'.",
         possibleOldFormatString.c_str(), formattedTitle.c_str());
     }
-    if (possibleOldFormatString != formattedTitle)
-    {
-      vtkLogF(WARNING, "Old string-format was used");
-    }
     this->SetTitle(formattedTitle.c_str());
   }
 
