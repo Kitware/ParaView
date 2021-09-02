@@ -161,14 +161,16 @@ void pqTreeViewSelectionHelper::showContextMenu(int section, const QPoint& pos)
 
   QMenu menu;
   menu.setObjectName("TreeViewCheckMenu");
+
+  QLineEdit* searchLineEdit = nullptr;
   if (this->Filterable && sfmodel != nullptr)
   {
     if (auto filterActn = new QWidgetAction(&menu))
     {
-      auto ledit = new QLineEdit(&menu);
-      ledit->setPlaceholderText("Filter items (regex)");
-      ledit->setClearButtonEnabled(true);
-      ledit->setText(sfmodel->filterRegExp().pattern());
+      searchLineEdit = new QLineEdit(&menu);
+      searchLineEdit->setPlaceholderText("Filter items (regex)");
+      searchLineEdit->setClearButtonEnabled(true);
+      searchLineEdit->setText(sfmodel->filterRegExp().pattern());
 
       auto container = new QWidget(&menu);
       auto l = new QVBoxLayout(container);
@@ -176,8 +178,8 @@ void pqTreeViewSelectionHelper::showContextMenu(int section, const QPoint& pos)
       // actions, but not sure how to do it.
       // const auto xpos = 28; //menu.style()->pixelMetric(QStyle::PM_MenuHMargin);
       l->setContentsMargins(2, 2, 2, 2);
-      l->addWidget(ledit);
-      QObject::connect(ledit, &QLineEdit::textChanged,
+      l->addWidget(searchLineEdit);
+      QObject::connect(searchLineEdit, &QLineEdit::textChanged,
         [tree, section](const QString& txt) { updateFilter(tree, section, txt); });
 
       filterActn->setDefaultWidget(container);
@@ -241,6 +243,10 @@ void pqTreeViewSelectionHelper::showContextMenu(int section, const QPoint& pos)
         header->setSortIndicatorShown(false);
       });
     }
+  }
+  if (searchLineEdit)
+  {
+    searchLineEdit->setFocus();
   }
   menu.exec(this->TreeView->mapToGlobal(pos));
 }
