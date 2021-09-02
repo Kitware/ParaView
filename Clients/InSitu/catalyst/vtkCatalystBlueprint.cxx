@@ -431,6 +431,34 @@ bool verify(const std::string& protocol, const conduit_cpp::Node& n)
 
 } // namespace execute
 
+namespace assembly
+{
+bool verify(const std::string& protocol, const conduit_cpp::Node& n)
+{
+  vtkVLogScopeF(PARAVIEW_LOG_CATALYST_VERBOSITY(), "%s: verify", protocol.c_str());
+  if (!n.dtype().is_object() && !n.dtype().is_list() && !n.dtype().is_string())
+  {
+    vtkLogF(ERROR, "node must be 'object', 'list', or 'string'.");
+    return false;
+  }
+
+  if (n.dtype().is_string())
+  {
+    return true;
+  }
+
+  for (conduit_index_t cc = 0; cc < n.number_of_children(); ++cc)
+  {
+    if (!assembly::verify(protocol + "::" + n.name(), n.child(cc)))
+    {
+      return false;
+    }
+  }
+  return true;
+}
+
+} // namespace assembly
+
 //----------------------------------------------------------------------------
 vtkCatalystBlueprint::vtkCatalystBlueprint() = default;
 
@@ -452,6 +480,10 @@ bool vtkCatalystBlueprint::Verify(const std::string& protocol, const conduit_cpp
   else if (protocol == "finalize")
   {
     res = true;
+  }
+  else if (protocol == "assembly")
+  {
+    res = assembly::verify("assembly", n);
   }
   return res;
 }

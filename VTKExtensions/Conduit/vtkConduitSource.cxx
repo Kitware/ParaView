@@ -18,6 +18,7 @@
 #include "vtkCellArrayIterator.h"
 #include "vtkConduitArrayUtilities.h"
 #include "vtkDataArray.h"
+#include "vtkDataAssembly.h"
 #include "vtkDataSetAttributes.h"
 #include "vtkDoubleArray.h"
 #include "vtkImageData.h"
@@ -41,6 +42,7 @@
 #include <catalyst_conduit_blueprint.hpp>
 
 #include <algorithm>
+#include <functional>
 #include <map>
 
 namespace detail
@@ -474,7 +476,9 @@ class vtkConduitSource::vtkInternals
 public:
   conduit_cpp::Node Node;
   conduit_cpp::Node GlobalFieldsNode;
+  conduit_cpp::Node AssemblyNode;
   bool GlobalFieldsNodeValid{ false };
+  bool AssemblyNodeValid{ false };
 };
 
 vtkStandardNewMacro(vtkConduitSource);
@@ -509,8 +513,29 @@ void vtkConduitSource::SetGlobalFieldsNode(const conduit_node* node)
   {
     return;
   }
-  this->Internals->GlobalFieldsNode = conduit_cpp::cpp_node(const_cast<conduit_node*>(node));
-  this->Internals->GlobalFieldsNodeValid = true;
+
+  if (node)
+  {
+    this->Internals->GlobalFieldsNode = conduit_cpp::cpp_node(const_cast<conduit_node*>(node));
+  }
+  this->Internals->GlobalFieldsNodeValid = (node != nullptr);
+  this->Modified();
+}
+
+//----------------------------------------------------------------------------
+void vtkConduitSource::SetAssemblyNode(const conduit_node* node)
+{
+  if (this->Internals->AssemblyNodeValid &&
+    conduit_cpp::c_node(&this->Internals->AssemblyNode) == node)
+  {
+    return;
+  }
+
+  if (node)
+  {
+    this->Internals->AssemblyNode = conduit_cpp::cpp_node(const_cast<conduit_node*>(node));
+  }
+  this->Internals->AssemblyNodeValid = (node != nullptr);
   this->Modified();
 }
 
@@ -538,6 +563,8 @@ int vtkConduitSource::RequestData(
     const auto& node = internals.Node;
     const auto count = node.number_of_children();
     output->SetNumberOfPartitionedDataSets(static_cast<unsigned int>(count));
+
+    std::map<std::string, unsigned int> name_map;
     for (conduit_index_t cc = 0; cc < count; ++cc)
     {
       const auto child = node.child(cc);
@@ -552,6 +579,39 @@ int vtkConduitSource::RequestData(
 
       // set the mesh name.
       output->GetMetaData(cc)->Set(vtkCompositeDataSet::NAME(), child.name().c_str());
+      name_map[child.name()] = static_cast<unsigned int>(cc);
+    }
+
+    if (internals.AssemblyNodeValid)
+    {
+      vtkNew<vtkDataAssembly> assembly;
+      std::function<void(int, const conduit_cpp::Node&)> helper;
+      helper = [&name_map, &assembly, &helper](int parent, const conduit_cpp::Node& node) {
+        if (node.dtype().is_object() || node.dtype().is_list())
+        {
+          const auto id = assembly->AddNode(node.name().c_str(), parent);
+          for (conduit_index_t cc = 0; cc < node.number_of_children(); ++cc)
+          {
+            helper(id, node.child(cc));
+          }
+        }
+        else if (node.dtype().is_string())
+        {
+          auto value = node.as_string();
+          auto iter = name_map.find(node.as_string());
+          if (iter != name_map.end())
+          {
+            assembly->AddDataSetIndex(parent, iter->second);
+          }
+          else
+          {
+            vtkLogF(ERROR, "Assembly referring to unknown node '%s'. Skipping.", value.c_str());
+          }
+        }
+      };
+      // assembly->SetRootNodeName(....); What should this be?
+      helper(assembly->GetRootNode(), internals.AssemblyNode);
+      output->SetDataAssembly(assembly);
     }
   }
   else
