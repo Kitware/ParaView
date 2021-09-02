@@ -55,16 +55,16 @@ if (TARGET VTK::ParallelMPI)
       VTK::ParallelMPI)
 endif()
 
-if (TARGET VTK::IOIoss)
+if (TARGET VTK::IOIOSS)
   target_link_libraries(catalyst-paraview
     PRIVATE
-      VTK::IOIoss)
+      VTK::IOIOSS)
 endif ()
 
 target_compile_definitions(catalyst-paraview
   PRIVATE
     "VTK_MODULE_ENABLE_VTK_ParallelMPI=$<TARGET_EXISTS:VTK::ParallelMPI>"
-    "VTK_MODULE_ENABLE_VTK_IOIoss=$<TARGET_EXISTS:VTK::IOIoss>")
+    "VTK_MODULE_ENABLE_VTK_IOIOSS=$<TARGET_EXISTS:VTK::IOIOSS>")
 
 if (TARGET VTK::Python)
   # Simulations loading the ParaView Catalyst implementation might not have

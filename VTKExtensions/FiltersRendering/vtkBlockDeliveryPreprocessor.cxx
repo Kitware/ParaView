@@ -169,7 +169,7 @@ int vtkBlockDeliveryPreprocessor::RequestData(
       vtkPartitionedDataSetCollection::SafeDownCast(data) != nullptr)
     {
       // this is a hack. a cleaner solution requires a more aggressive change to
-      // this filter. for now, we're just doing this special case for Ioss
+      // this filter. for now, we're just doing this special case for IOSS
       // datasets.
       // not sure what's the best way to deal with field data on the root-node
       // itself.

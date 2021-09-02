@@ -22,7 +22,7 @@ OPTIONAL_DEPENDS
   ParaView::PythonCatalyst
   ParaView::PythonInitializer
   ParaView::RemotingLive
-  VTK::IOIoss
+  VTK::IOIOSS
   VTK::ParallelMPI
   VTK::WrappingPythonCore
 TEST_DEPENDS

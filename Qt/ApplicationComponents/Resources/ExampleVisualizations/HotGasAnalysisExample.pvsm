@@ -12919,7 +12919,7 @@
         <Element index="0" value="This example show data analysis&#xa;of a hot gas"/>
       </Property>
     </Proxy>
-    <Proxy group="sources" type="IossReader" id="85830" servers="1">
+    <Proxy group="sources" type="IOSSReader" id="85830" servers="1">
       <Property name="ApplyDisplacements" id="85830.ApplyDisplacements" number_of_elements="1">
         <Element index="0" value="1"/>
         <Domain name="bool" id="85830.ApplyDisplacements.bool"/>

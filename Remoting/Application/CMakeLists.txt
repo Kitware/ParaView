@@ -396,7 +396,7 @@ if (TARGET VTK::FiltersParallel AND
     Resources/filters_selectionfftovertime.xml)
 endif()
 
-if (TARGET VTK::IOIoss)
+if (TARGET VTK::IOIOSS)
   list(APPEND xml_files
     Resources/readers_ioioss.xml)
 endif()

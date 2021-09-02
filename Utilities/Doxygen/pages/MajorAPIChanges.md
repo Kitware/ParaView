@@ -25,7 +25,7 @@ subclasses.
 
 `vtkSubsetInclusionLattice` and related classes have been removed. The only
 reader that used this when this was introduced was CGNS reader which since
-stopped used these classes for performance reasons. IOSS reader (`vtkIossReader`)
+stopped used these classes for performance reasons. IOSS reader (`vtKIOSSReader`)
 demonstrates a newer away of representing assemblies using `vtkDataAssembly`
 and using that for selecting blocks to read on the reader.
 
