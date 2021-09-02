@@ -44,7 +44,7 @@ public:
   };
 
   /**
-   * Returns the curren box as [x0, y0, width, height].
+   * Returns the current box as [x0, y0, width, height].
    */
   const vtkRectd& GetBox();
 
@@ -70,6 +70,22 @@ public:
   vtkSetMacro(Selected, bool);
   vtkGetMacro(Selected, bool);
   vtkBooleanMacro(Selected, bool);
+  ///@}
+
+  ///@{
+  /**
+   * Set/Get the color to be used for this box.
+   */
+  vtkSetVector3Macro(Color, double);
+  vtkGetVector3Macro(Color, double);
+  ///@}
+
+  ///@{
+  /**
+   * Set/Get the opacity to be used for this box.
+   */
+  vtkSetMacro(Opacity, double);
+  vtkGetMacro(Opacity, double);
   ///@}
 
 protected:
@@ -145,6 +161,9 @@ protected:
 
   virtual void ComputeTexture();
 
+  /**
+   * Highlight this box
+   */
   virtual void SelectBox();
 
 private:
@@ -189,6 +208,8 @@ private:
   vtkNew<vtkPoints2D> BoxPoints;
   const int NumPoints = 5;
   vtkRectd Box;
+  double Color[3] = { 1, 1, 1 };
+  double Opacity = 1.0;
 
   vtkNew<vtkPen> Pen;
   vtkNew<vtkImageData> Texture;
