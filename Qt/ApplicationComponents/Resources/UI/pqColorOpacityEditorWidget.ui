@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>392</width>
+    <width>410</width>
     <height>774</height>
    </rect>
   </property>
@@ -201,6 +201,20 @@ background-image: url(:/pqWidgets/Icons/pqEdgeCenterData.svg);</string>
          <property name="icon">
           <iconset resource="../../../Components/Resources/pqComponents.qrc">
            <normaloff>:/pqWidgets/Icons/pqSave.svg</normaloff>:/pqWidgets/Icons/pqSave.svg</iconset>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QToolButton" name="ChooseBoxColor">
+         <property name="toolTip">
+          <string>Choose box color and alpha</string>
+         </property>
+         <property name="text">
+          <string/>
+         </property>
+         <property name="icon">
+          <iconset resource="../../../Components/Resources/pqComponents.qrc">
+           <normaloff>:/pqWidgets/Icons/pqBoxColorAlpha.svg</normaloff>:/pqWidgets/Icons/pqBoxColorAlpha.svg</iconset>
          </property>
         </widget>
        </item>
