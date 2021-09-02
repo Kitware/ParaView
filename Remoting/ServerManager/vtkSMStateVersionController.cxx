@@ -1248,14 +1248,15 @@ struct Process_5_9_to_5_10
 
       // Retrieve threshold values
       auto elementNode =
-        node.select_node("//Property[@name='ThresholdBetween']/Element[@index='0']").node();
+        node.select_node("./Property[@name='ThresholdBetween']/Element[@index='0']").node();
       double lower = elementNode.attribute("value").as_double();
+
       elementNode =
-        node.select_node("//Property[@name='ThresholdBetween']/Element[@index='1']").node();
+        node.select_node("./Property[@name='ThresholdBetween']/Element[@index='1']").node();
       double upper = elementNode.attribute("value").as_double();
 
       // Remove ThresholdBetween node
-      node.remove_child("//Property[@name='ThresholdBetween']");
+      node.remove_child("./Property[@name='ThresholdBetween']");
 
       // Append LowerThreshold node with lower value
       auto thresholdNode = node.append_child("Property");
