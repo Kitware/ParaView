@@ -1,5 +1,5 @@
 /***************************************************************************************************
- * Copyright 2020 NVIDIA Corporation. All rights reserved.
+ * Copyright 2021 NVIDIA Corporation. All rights reserved.
  **************************************************************************************************/
 /// \file
 /// \brief Interface to inquire network statistics.
@@ -57,6 +57,12 @@ public:
 
     /// Returns the total number of bytes sent so far.
     virtual Uint64 get_sent_bytes() const = 0;
+
+    /// Returns the total number of bytes sent as RDMA.
+    virtual Uint64 get_rdma_sent_bytes() const = 0;
+
+    /// Returns the total number of bytes received as RDMA.
+    virtual Uint64 get_rdma_received_bytes() const = 0;
 };
 
 /*@}*/ // end group mi_neuray_configuration

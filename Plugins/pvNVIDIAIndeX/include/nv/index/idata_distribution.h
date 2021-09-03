@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2020 NVIDIA Corporation. All rights reserved.
+ * Copyright 2021 NVIDIA Corporation. All rights reserved.
  *****************************************************************************/
 /// \file  idata_distribution.h
 /// \brief Interfaces for implementing and launching distributed data jobs.
@@ -25,7 +25,7 @@ namespace index
 /// \c mi::neuraylib::IFragment_job interface on purpose. While DiCE's \c mi::neuraylib::IFragment_job
 /// interface is meant to implement general cluster wide jobs, e.g., compute algorithms,
 /// the \c IDistributed_data_job interface enables applications to implement algorithms
-/// specificly for NVIDIA IndeX's distributed data. Here, the scheduling is based on the 
+/// specifically for NVIDIA IndeX's distributed data. Here, the scheduling is based on the 
 /// data locality, i.e., which cluster node stores which portion of the dataset. 
 /// The job will then send out one execution thread per subset data so that all data subsets 
 /// can be processed in parallel either locally or remotely. For local execution, the 
@@ -33,12 +33,12 @@ namespace index
 /// the method #execute_subset_remote is invoked. The method #execute_subset_remote has its
 /// local counterpart #receive_subset_result in case the distributed data processing analyses
 /// the data and derives information from the data that need to be assembled locally.
-/// A common use-case for that is the histogram genereration.
+/// A common use-case for that is the histogram generation.
 ///
 /// Technically, the DiCE \c mi::neuraylib::Fragmented_job infrastructure is used to facilitate the   
 /// distributed data analysis and processing. While the processing of subset data could still be 
 /// implemented using the \c mi::neuraylib::Fragmented_job interface and, for instance, the 
-/// information provided by the data locallity (see \c IDistributed_data_locality), the use of 
+/// information provided by the data locality (see \c IDistributed_data_locality), the use of 
 /// the \c IDistributed_data_job interface reduces the code complexity drastically and provides
 /// immediate access to the data subset through \c IData_subset_processing_task and
 /// \c IData_subset_compute_task_processing interfaces.
@@ -51,7 +51,7 @@ class IDistributed_data_job :
 {
 public:
     /// A data locality query mode specifies which data subsets to process.
-    /// Implementations of the class \c \c IDistributed_data_locality_query_mode 
+    /// Implementations of the class \c IDistributed_data_locality_query_mode 
     /// specify which distributed data scene element to process and typically also 
     /// provide additional query parameter such as the region of interest in 3D in
     /// case of a volume or a 2D in case of a height field.
@@ -100,13 +100,13 @@ public:
     ///
     /// \param[in] data_distribution        The \c IData_distribution interface enables
     ///                                     to derive a data locality and schedule new 
-    ///                                     distributed ja jobs.
+    ///                                     distributed jobs.
     ///
     /// \param[in] data_subset_processing   The \c IData_subset_compute_task_processing interface
     ///                                     facilitates the execution of user-implemented
     ///                                     data processing tasks (see \c IData_subset_processing_task).
     /// 
-    /// \param[in] data_subset_index        The data subset ID that curresponds and uniquely 
+    /// \param[in] data_subset_index        The data subset ID that corresponds and uniquely 
     ///                                     identifies the data subset that this execution call
     ///                                     processes.
     ///
@@ -142,13 +142,13 @@ public:
     ///
     /// \param[in] data_distribution        The \c IData_distribution interface enables
     ///                                     to derive a data locality and schedule new 
-    ///                                     distributed ja jobs.
+    ///                                     distributed jobs.
     ///
     /// \param[in] data_subset_processing   The \c IData_subset_compute_task_processing interface
     ///                                     facilitates the execution of user-implemented
     ///                                     data processing tasks (see \c IData_subset_processing_task).
     /// 
-    /// \param[in] data_subset_index        The data subset ID that curresponds and uniquely 
+    /// \param[in] data_subset_index        The data subset ID that corresponds and uniquely 
     ///                                     identifies the data subset that this execution call
     ///                                     processes.
     ///
@@ -181,9 +181,9 @@ public:
     ///
     /// \param[in] data_distribution        The \c IData_distribution interface enables
     ///                                     to derive a data locality and schedule new 
-    ///                                     distributed ja jobs.
+    ///                                     distributed jobs.
     ///
-    /// \param[in] data_subset_index        The data subset ID that curresponds and uniquely 
+    /// \param[in] data_subset_index        The data subset ID that corresponds and uniquely 
     ///                                     identifies the data subset that this execution call
     ///                                     processes.
     ///

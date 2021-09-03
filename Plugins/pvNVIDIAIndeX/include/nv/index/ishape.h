@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2020 NVIDIA Corporation. All rights reserved.
+ * Copyright 2021 NVIDIA Corporation. All rights reserved.
  *****************************************************************************/
 /// \file
 /// \brief Base class declaring the functionality of higher-level shapes.

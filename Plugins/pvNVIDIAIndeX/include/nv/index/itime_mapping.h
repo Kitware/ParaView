@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2020 NVIDIA Corporation. All rights reserved.
+ * Copyright 2021 NVIDIA Corporation. All rights reserved.
  *****************************************************************************/
 /// \file
 /// \brief Base class representing clock pulses and time mapping vor time varying data.
@@ -72,7 +72,7 @@ public:
     ///
     virtual void set_nb_time_steps(mi::Uint64 steps) = 0;
 
-    /// Maps a absolute point in time to a time step.
+    /// Maps an absolute point in time to a time step.
     ///
     /// \param[in] current  The absolute point in time that maps to a time stamp. 
     /// \param[in] start    The start time of the global time interval. 

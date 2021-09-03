@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2020 NVIDIA Corporation. All rights reserved.
+ * Copyright 2021 NVIDIA Corporation. All rights reserved.
  *****************************************************************************/
 /// \file
 /// \brief Interface for a session
@@ -107,6 +107,8 @@ public:
     ///             The caller takes ownership of the camera and is
     ///             responsible for freeing it from the database by calling
     ///             \c IDice_transaction::remove() when it is not needed anymore.
+    ///
+    /// \deprecated Please use IScene::create_camera().
     ///
     virtual mi::neuraylib::Tag_struct create_camera(
         mi::neuraylib::IDice_transaction*       dice_transaction,

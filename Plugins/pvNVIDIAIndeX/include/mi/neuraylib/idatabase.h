@@ -1,5 +1,5 @@
 /***************************************************************************************************
- * Copyright 2020 NVIDIA Corporation. All rights reserved.
+ * Copyright 2021 NVIDIA Corporation. All rights reserved.
  **************************************************************************************************/
 /// \file
 /// \brief API component that provides access to the database.
@@ -158,6 +158,28 @@ public:
     /// \endif
     virtual IScope* get_named_scope( const char* name) const = 0;
 
+    /// Priorites for synchronous garbage collection runs.
+    enum Garbage_collection_priority {
+
+        /// Low priority for synchronous garbage collection runs. Use this priority if the
+        /// performance of other concurrent DB operations is more important than a fast synchronous
+        /// garbage collection.
+        PRIORITY_LOW = 0,
+
+        /// Medium priority for synchronous garbage collection runs. This priority attempts to
+        /// maintain a balance between the synchronous garbage collection and other concurrent DB
+        /// operations.
+        PRIORITY_MEDIUM = 1,
+
+        /// High priority for synchronous garbage collection runs. Other concurrent DB operations
+        /// will experience a large performance drop. Therefore, this priority should not be used
+        /// in multi-user settings.
+        PRIORITY_HIGH = 2,
+
+        //  Undocumented, for alignment only.
+        PRIORITY_FORCE_32_BIT = 0xffffffffU
+    };
+    
     /// Triggers a synchronous garbage collection run.
     ///
     /// The method sweeps through the entire database and removes all database elements which have
@@ -168,8 +190,15 @@ public:
     /// To mark an element for removal use \ifnot DICE_API #mi::neuraylib::ITransaction::remove().
     /// \else #mi::neuraylib::IDice_transaction::remove() or
     /// #mi::neuraylib::IDice_transaction::store_for_reference_counting(). \endif
-    virtual void garbage_collection() = 0;
+    ///
+    /// \param priority   The intended priority of the synchronous garbage collection run.
+    ///                   \if MDL_SDK_API The MDL SDK does not support different priorities, and
+    ///                   the synchronous garbage collection always runs at highest priority.
+    ///                   \endif
+    virtual void garbage_collection( Garbage_collection_priority priority = PRIORITY_MEDIUM) = 0;
 };
+
+mi_static_assert( sizeof( IDatabase::Garbage_collection_priority) == sizeof( Uint32));
 
 /*@}*/ // end group mi_neuray_database_access
 

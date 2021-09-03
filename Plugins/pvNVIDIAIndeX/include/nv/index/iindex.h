@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2020 NVIDIA Corporation. All rights reserved.
+ * Copyright 2021 NVIDIA Corporation. All rights reserved.
  *****************************************************************************/
 /// \file
 /// \brief Main API of the NVIDIA IndeX library.
@@ -36,7 +36,7 @@
 /// \brief  The NVIDIA IndeX C++ library consists of pure virtual interfaces exposed through a single library entry point.
 ///
 /// The NVIDIA IndeX C++ library exports a single factory function 
-/// \c nv_index_factory which returns an instance of the interface class \c nv::index::IIndex.
+/// \c #nv_factory() which returns an instance of the interface class \c nv::index::IIndex.
 /// The \c nv::index::IIndex interface enables an application to authenticate, configure, 
 /// start up, operate with, and shut down the NVIDIA IndeX library.
 /// Moreover, \c nv::index::IIndex represents the main or root interface for using 
@@ -48,8 +48,8 @@
 /// functionalities and capabilities as well as the data structures that applications
 /// operate on.
 ///
-/// The NVIDIA IndeX C++ API declares pure virtual interfaces and relies on Plain-Old-Datatypes
-/// only, which enables binary compatability on operating system platforms, i.e., the NVIDIA IndeX
+/// The NVIDIA IndeX C++ API declares pure virtual interfaces and relies on "plain old data" (POD)
+/// only, which enables binary compatibility between different operating system platforms, i.e., the NVIDIA IndeX
 /// library supports all Linux distributions without explicit recompilation.
 
 // ----------------------------------------------------------------------------------
@@ -901,10 +901,8 @@ public:
     /// \param[in] vendor_key_length    Length of the vendor key.
     /// \param[in] secret_key           Secret key string.
     /// \param[in] secret_key_length    Length of the secret key.
-    /// \param[in] flexnet_license_path FlexNet license path string.
-    ///                                 Can be 0 when no FlexNet license is used.
-    /// \param[in] flexnet_license_path_length Length of the FlexNet license path.
-    ///                                 Can be 0 when no FlexNet license is used.
+    /// \param[in] flexnet_license_path Deprecated, will be ignored.
+    /// \param[in] flexnet_license_path_length Deprecated, will be ignored.
     ///
     /// \return Result of the NVIDIA IndeX library authentication
     ///         attempt, 0 means success.
@@ -914,8 +912,8 @@ public:
         mi::Sint32  vendor_key_length,
         const char* secret_key,
         mi::Sint32  secret_key_length,
-        const char* flexnet_license_path,
-        mi::Sint32  flexnet_license_path_length) = 0;
+        const char* flexnet_license_path = 0,
+        mi::Sint32  flexnet_license_path_length = 0) = 0;
 
     /// Starts the operation of the IndeX library.
     //
@@ -930,7 +928,7 @@ public:
     /// \return                       Returns 0 on success.
     ///
     virtual mi::Uint32 start(
-        bool is_dice_start_block) = 0;
+        bool is_dice_start_block = true) = 0;
 
     /// Shut down the IndeX library.
     /// After this call, all library-related function calls will fail.
@@ -1128,6 +1126,8 @@ extern "C"
 ///
 /// \ingroup nv_index
 ///
+/// \deprecated Use \c nv_factory() instead.
+///
 /// \note       This function may be called only once in each process.
 ///
 /// \return     Returns an instance of the main nv::index::IIndex interface, which
@@ -1136,6 +1136,64 @@ extern "C"
 MI_DLL_EXPORT
 nv::index::IIndex* nv_index_factory();
 
+/// Unique public access point to the NVIDIA IndeX library.
+///
+/// This factory function is the only public access point to all algorithms and data structures in
+/// the NVIDIA IndeX library. It returns a pointer to an instance of the class identified by the
+/// given UUID. Currently the function supports the following interfaces:
+/// - an instance of the main #nv::index::IIndex interface, which is used to configure,
+/// to start up, to operate and to shut down NVIDIA IndeX. This interface can be requested
+/// only once.
+/// - an instance of the mi::neuraylib::IVersion class.
+///
+/// \ingroup nv_index
+///
+/// \param[in] iid     UUID of the requested interface.
+/// \param[in] arg     Optional argument, set this to 0.
+/// \return            A pointer to an instance of the requested interface, or \c 0 if there is
+///                    no interface with the requested UUID. This can happen if the library used at
+///                    runtime does not match the headers used at compile time. In addition,
+///                    \c 0 is returned if the interface #nv::index::IIndex is requested a
+///                    second time.
+///
+MI_DLL_EXPORT
+mi::base::IInterface* nv_factory(const mi::base::Uuid& iid, void* arg);
+
 } // extern "C"
+
+namespace nv {
+namespace index {
+
+/// Convenience function to ease the use of #nv_factory().
+///
+/// \ingroup nv_index
+///
+/// \param[in] symbol Pointer to the nv_factory symbol.
+/// \param[in] arg    Optional argument.
+/// \return           A pointer to an interface of type \c T or \c 0 if the interface could not be
+///                   retrieved. See #nv_factory for supported interfaces.
+template <class T>
+T* nv_factory(void* symbol, void* arg = 0)
+{
+    if (!symbol)
+    {
+        return 0;
+    }
+
+    typedef mi::base::IInterface* INeuray_factory(const mi::base::Uuid& iid, void* arg);
+    INeuray_factory* factory = reinterpret_cast<INeuray_factory*>(symbol);
+    mi::base::Handle<mi::base::IInterface> iinterface(factory(typename T::IID(), arg));
+    if (iinterface)
+    {
+        return iinterface->get_interface<T>();
+    }
+    else
+    {
+        return 0;
+    }
+}
+
+} // namespace index
+} // namespace nv
 
 #endif // NVIDIA_INDEX_IINDEX_H

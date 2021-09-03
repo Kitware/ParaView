@@ -1,5 +1,5 @@
 /***************************************************************************************************
- * Copyright 2020 NVIDIA Corporation. All rights reserved.
+ * Copyright 2021 NVIDIA Corporation. All rights reserved.
  **************************************************************************************************/
 /// \file
 /// \brief \NeurayApiName for implementing distributed parallel computing algorithms.
@@ -49,7 +49,7 @@
 #define MI_NEURAYLIB_DICE_VERSION_QUALIFIER_EMPTY
 
 /// DiCE product version number in a string representation, such as \c "2016".
-#define MI_NEURAYLIB_DICE_PRODUCT_VERSION_STRING  "2020"
+#define MI_NEURAYLIB_DICE_PRODUCT_VERSION_STRING  "2021"
 
 /*@}*/ // end group mi_neuray_dice
 
@@ -121,6 +121,32 @@ public:
         return register_serializable_class( typename T::IID(), factory.get());
     }
 
+    /// Unregisters a serializable class with DiCE.
+    ///
+    /// Unregistering a class for serialization can only be done after \neurayProductName has been
+    /// shut down.
+    ///
+    /// \param class_id     The class ID of the class that shall be unregistered for serialization.
+    /// \return             \c true if the class of was successfully unregistered
+    ///                     for serialization, and \c false otherwise.
+    virtual bool unregister_serializable_class( base::Uuid class_id) = 0;
+
+    /// Unregisters a serializable class with DiCE.
+    ///
+    /// Unregistering a class for serialization can only be done after \neurayProductName has been
+    /// shut down.
+    ///
+    /// This templated member function is a wrapper of the non-template variant for the user's
+    /// convenience.
+    ///
+    /// \return             \c true if the class of type T was successfully unregistered
+    ///                     for serialization, and \c false otherwise.
+    template <class T>
+    bool unregister_serializable_class()
+    {
+        return unregister_serializable_class( typename T::IID());
+    }
+
     /// Enables or disables GPU detection.
     ///
     /// By default, GPU detection is enabled. GPU detection can be disabled in case it causes
@@ -168,6 +194,7 @@ public:
     /// \return         A description of the GPU with that ID, or \c NULL if \p gpu_id is not a
     ///                 valid GPU ID for the host \p host_id.
     virtual const IGpu_description* get_gpu_description( Uint32 gpu_id, Uint32 host_id = 0) = 0;
+
 };
 
 /*@}*/ // end group mi_neuray_configuration
@@ -284,7 +311,7 @@ public:
     ///
     /// This symbolic constant can be passed to #store(), #store_for_reference_counting(), and
     /// #localize() to indicate the privacy level of the scope of this transaction. It has the same
-    /// affect as passing the result of #mi::neuraylib::IScope::get_privacy_level(), but is more
+    /// effect as passing the result of #mi::neuraylib::IScope::get_privacy_level(), but is more
     /// convenient.
     static const mi::Uint8 LOCAL_SCOPE = 255;
 

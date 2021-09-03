@@ -1,5 +1,5 @@
  /******************************************************************************
- * Copyright 2020 NVIDIA Corporation. All rights reserved.
+ * Copyright 2021 NVIDIA Corporation. All rights reserved.
  *****************************************************************************/
 /// \file
 /// \brief Asynchronous texture generation for use with shapes.
@@ -13,8 +13,9 @@
 #include <nv/index/idistributed_data_subset.h>
 
 #include <nv/index/iirregular_volume_subset.h>
-
 #include <nv/index/isparse_volume_subset.h>
+#include <nv/index/isparse_volume_subset.h>
+#include <nv/index/ivdb_subset.h>
 
 namespace nv {
 namespace index {
@@ -174,6 +175,37 @@ public:
     virtual IIrregular_volume_subset* get_distributed_data_subset() = 0;
 };
 
+/// Compute-destination buffer for VDB (NanoVDB) volume generation techniques.
+///
+/// Upon applying an \c IDistributed_compute_technique attribute to a \c IVDB_scene_element scene element
+/// a \c IDistributed_compute_destination_buffer_VDB is passed to the \c IDistributed_compute_technique::launch_compute()
+/// method.
+///
+/// \ingroup nv_index_data_computing
+///
+class IDistributed_compute_destination_buffer_VDB :
+    public mi::base::Interface_declare<0x8993a772,0xbde1,0x4424,0x9b,0xec,0xc7,0x86,0xa1,0x38,0x85,0xac,
+                                       nv::index::IDistributed_compute_destination_buffer>
+{
+public:
+    /// Returns the bounding box of the volume subset for which the compute technique
+    /// is required to generate values.
+    ///
+    /// The rendering system computes and initializes the bounding box of the volume subset.
+    ///
+    /// \return     The bounding box of the volume subset, defined in non-normalized
+    ///             volume coordinates.
+    ///
+    virtual mi::math::Bbox_struct<mi::Float32, 3>   get_volume_subset_data_bbox() const = 0;
+
+    /// Returns the VDB volume data-subset for which the compute technique is required to
+    /// generate data values.
+    ///
+    /// \return     An interface pointer to an instance of \c IVDB_subset.
+    ///
+    virtual IVDB_subset*                            get_distributed_data_subset() = 0;
+};
+
 /// The interface class exposes intersections points that can be used, for
 /// instance, to texture or shade the surface of geometry.
 ///
@@ -262,9 +294,10 @@ public:
     ///
     enum Buffer_format
     {
-        INTENSITY_UINT8 = 0,        ///< 8-bit integer used for indexing a color table of 256 entries
-        RGBA_UINT8      = 1,        ///< 8-bit integer per RGBA component
-        RGBA_FLOAT32    = 2         ///< 32-bit float per RGBA component
+        FORMAT_INVALID          = 0x00,
+        FORMAT_SCALAR_UINT8     = 0x01,        ///< 8-bit integer used for indexing a color table of 256 entries
+        FORMAT_RGBA_UINT8       = 0x02,        ///< 8-bit integer per RGBA component
+        FORMAT_RGBA_FLOAT32     = 0x03         ///< 32-bit float per RGBA component
     };
 
     /// Texture buffer configuration.

@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2020 NVIDIA Corporation. All rights reserved.
+ * Copyright 2021 NVIDIA Corporation. All rights reserved.
  *****************************************************************************/
 /// \file
 /// \brief Asynchronous, distributed data generation techniques.
@@ -62,6 +62,17 @@ public:
     virtual void launch_compute(
         mi::neuraylib::IDice_transaction*        dice_transaction,
         IDistributed_compute_destination_buffer* dst_buffer) const = 0;
+
+    /// Return whether the compute technique will work on the potentially exposed device data directly.
+    /// 
+    /// Some NVIDIA IndeX data-access interfaces exposed by the particular \c IDistributed_compute_destination_buffer
+    /// interfaces allow manipulation of GPU-located data directly (e.g., \c ISparse_volume_subset). This function
+    /// communicates to IndeX if the device data is accessed or manipulated in order to change the internal
+    /// data residency scheduling during the NVIDIA IndeX rendering operation when the compute task is invoked.
+    /// 
+    /// \returns Whether the compute technique will work on the potentially exposed device data directly
+    /// 
+    virtual bool is_gpu_operation() const = 0;
 
     /// Returns optional configuration settings that may be used by the library
     /// for the session export mechanism provided by \c ISession::export_session().
@@ -166,6 +177,14 @@ public:
     ///          data associated with the scene element.
     ///
     virtual mi::neuraylib::Tag_struct get_meta_data() const { return mi::neuraylib::NULL_TAG; }
+
+    /// Tell NVIDIA IndeX the default operation does not access or alter potentially exposed device data.
+    /// 
+    virtual bool is_gpu_operation() const
+    {
+        return false;
+    }
+
 };
 
 

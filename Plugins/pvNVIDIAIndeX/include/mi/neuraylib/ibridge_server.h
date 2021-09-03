@@ -1,5 +1,5 @@
 /***************************************************************************************************
- * Copyright 2020 NVIDIA Corporation. All rights reserved.
+ * Copyright 2021 NVIDIA Corporation. All rights reserved.
  **************************************************************************************************/
 /// \file
 /// \brief  Bridge server
@@ -22,7 +22,7 @@ class IMap;
 
 namespace http { class IServer; }
 
-namespace neuraylib { class ICanvas; class IImport_result; class ITag_set; class IExport_result; }
+namespace neuraylib { class IImport_result; class IExport_result; }
 
 namespace bridge {
 

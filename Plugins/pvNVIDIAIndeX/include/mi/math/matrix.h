@@ -1,5 +1,5 @@
 /***************************************************************************************************
- * Copyright 2020 NVIDIA Corporation. All rights reserved.
+ * Copyright 2021 NVIDIA Corporation. All rights reserved.
  **************************************************************************************************/
 /// \file mi/math/matrix.h
 /// \brief A NxM-dimensional matrix class template of fixed dimensions with supporting
@@ -363,7 +363,7 @@ inline const T* matrix_base_ptr( const Matrix_struct<T,ROW,COL>& mat)
         The underlying POD type #mi::math::Matrix_struct.
 */
 template <typename T, Size ROW, Size COL>
-class Matrix : public Matrix_struct<T,ROW,COL>
+class Matrix : public Matrix_struct<T,ROW,COL> //-V690 PVS
 {
 public:
     typedef Matrix_struct<T,ROW,COL> Pod_type;     ///< POD class corresponding to this matrix.
@@ -433,6 +433,11 @@ public:
 
     /// The default constructor leaves the vector elements uninitialized.
     inline Matrix() { }
+
+#if (__cplusplus >= 201103L)
+    /// Default copy constructor.
+    Matrix( const Matrix<T,ROW,COL>& other ) = default;
+#endif
 
     /// Constructor from underlying storage type.
     inline Matrix( const Matrix_struct<T,ROW,COL>& other)

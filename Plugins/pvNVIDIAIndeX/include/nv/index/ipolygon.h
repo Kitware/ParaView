@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2020 NVIDIA Corporation. All rights reserved.
+ * Copyright 2021 NVIDIA Corporation. All rights reserved.
  *****************************************************************************/
 /// \file
 /// \brief Scene elements representing object space and image space labels.
@@ -31,11 +31,11 @@ class IPolygon :
 public:
     /// set polygon geometry
     ///
-    /// \param[in] verts            The 2D vertex list in counter-clockwise order
+    /// \param[in] vertices         The 2D vertex list in counter-clockwise order
     ///                             in pixel coordinates respect to
     ///                             the polygon center in 2D.
     ///
-    /// \param[in] nb_verts         The number of 2D vertices in the vertex list
+    /// \param[in] nb_vertices      The number of 2D vertices in the vertex list
     ///
     /// \param[in] center           The center position of the polygon in 3D
     ///
@@ -48,23 +48,23 @@ public:
     ///                                     or is self intersecting.
     ///
     virtual bool set_geometry(
-        const mi::math::Vector_struct<mi::Float32, 2>* verts,
-        mi::Uint32                                     nb_verts,
+        const mi::math::Vector_struct<mi::Float32, 2>* vertices,
+        mi::Uint32                                     nb_vertices,
         const mi::math::Vector_struct<mi::Float32, 3>& center) = 0;
 
     /// Get polygon geometry.
     ///
-    /// \param[out] verts            The 2D vertex list in counter-clockwise order
+    /// \param[out] vertices         The 2D vertex list in counter-clockwise order
     ///                              in pixel coordinates respect to
     ///                              the polygon center in 2D.
     ///
-    /// \param[out] nb_verts         The number of 2D vertices in the vertex list
+    /// \param[out] nb_vertices      The number of 2D vertices in the vertex list
     ///
     /// \param[out] center           The center position of the polygon in 3D
     ///
     virtual void get_geometry(
-        mi::math::Vector_struct<mi::Float32, 2>**      verts,
-        mi::Uint32&                                    nb_verts,
+        mi::math::Vector_struct<mi::Float32, 2>**      vertices,
+        mi::Uint32&                                    nb_vertices,
         mi::math::Vector_struct<mi::Float32, 3>&       center) const = 0;
         
     /// Fill style defines the appearance of the polygon.

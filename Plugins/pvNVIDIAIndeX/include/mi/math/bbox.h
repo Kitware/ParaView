@@ -1,5 +1,5 @@
 /***************************************************************************************************
- * Copyright 2020 NVIDIA Corporation. All rights reserved.
+ * Copyright 2021 NVIDIA Corporation. All rights reserved.
  **************************************************************************************************/
 /// \file mi/math/bbox.h
 /// \brief An axis-aligned N-dimensional bounding box class template of fixed dimension with
@@ -70,7 +70,7 @@ struct Bbox_struct
         For the free functions and operators available for bounding boxes see \ref mi_math_bbox.
 */
 template <typename T, Size DIM>
-class Bbox
+class Bbox //-V690 PVS
 {
 public:
     typedef math::Vector<T,DIM> Vector;         ///< Corresponding vector type.
@@ -128,6 +128,11 @@ public:
     /// Bounding box with its elements not initialized.
     inline explicit Bbox( Uninitialized_tag) { }
 
+#if (__cplusplus >= 201103L)
+    /// Default copy constructor.
+    Bbox( const Bbox<T,DIM>& other ) = default;
+#endif
+
     /// Bounding box initialized from corresponding POD type.
     inline Bbox( const Bbox_struct<T,DIM>& bbox_struct )
     {
@@ -145,7 +150,7 @@ public:
     inline Bbox(
         const Vector& nmin,     ///< \c min corner vector
         const Vector& nmax)     ///< \c max corner vector
-  : min(nmin), max(nmax)
+      : min( nmin), max( nmax)
     {
     }
 
@@ -416,7 +421,7 @@ public:
     {
         Vector diag = max - min;
         T vol = base::max MI_PREVENT_MACRO_EXPAND ( T(0), diag[0]);
-        for( Size i = 1; i < DIM; i++)
+        for( Size i = 1; i < DIM; i++) //-V1008 PVS
             vol *= base::max MI_PREVENT_MACRO_EXPAND ( T(0), diag[i]);
         return vol;
     }
@@ -438,7 +443,7 @@ public:
         Vector diag = max - min;
         T maxval = diag[0];
         Size  maxidx = 0;
-        for( Size i = 1; i < DIM; i++) {
+        for( Size i = 1; i < DIM; i++) { //-V1008 PVS
             if (maxval < diag[i]) {
                 maxval = diag[i];
                 maxidx = i;

@@ -1,5 +1,5 @@
 /***************************************************************************************************
- * Copyright 2020 NVIDIA Corporation. All rights reserved.
+ * Copyright 2021 NVIDIA Corporation. All rights reserved.
  **************************************************************************************************/
 /// \file mi/dice.h
 /// \brief \NeurayApiName
@@ -24,9 +24,9 @@
 #include <mi/neuraylib/ibridge_video_client.h>
 #include <mi/neuraylib/ibridge_video_server.h>
 #include <mi/neuraylib/ibuffer.h>
+#include <mi/neuraylib/icache_manager.h>
 #include <mi/neuraylib/icanvas.h>
 #include <mi/neuraylib/icanvas_cuda.h>
-#include <mi/neuraylib/icache_manager.h>
 #include <mi/neuraylib/icluster.h>
 #include <mi/neuraylib/icluster_factory.h>
 #include <mi/neuraylib/icluster_manager_configuration.h>
@@ -71,7 +71,6 @@
 #include <mi/neuraylib/istructure.h>
 #include <mi/neuraylib/istructure_decl.h>
 #include <mi/neuraylib/itile.h>
-#include <mi/neuraylib/itile_cuda.h>
 #include <mi/neuraylib/itimer_configuration.h>
 #include <mi/neuraylib/itransaction.h>
 #include <mi/neuraylib/iuser_class.h>
@@ -80,9 +79,11 @@
 #include <mi/neuraylib/ivector.h>
 #include <mi/neuraylib/iversion.h>
 #include <mi/neuraylib/ivideo_plugin.h>
+#include <mi/neuraylib/matrix_typedefs.h>
 #include <mi/neuraylib/rtmp.h>
-#include <mi/neuraylib/typedefs.h>
 #include <mi/neuraylib/type_traits.h>
+#include <mi/neuraylib/typedefs.h>
+#include <mi/neuraylib/vector_typedefs.h>
 #include <mi/neuraylib/version.h>
 
 namespace mi {

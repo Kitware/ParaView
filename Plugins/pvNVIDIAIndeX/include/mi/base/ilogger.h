@@ -1,5 +1,5 @@
 /***************************************************************************************************
- * Copyright 2020 NVIDIA Corporation. All rights reserved.
+ * Copyright 2021 NVIDIA Corporation. All rights reserved.
  **************************************************************************************************/
 /// \file mi/base/ilogger.h
 /// \brief Logger interface class that supports message logging
@@ -52,7 +52,8 @@ enum Message_tag
     TAG_SYSTEM_RESOURCE         = 1u << 5, ///< non-memory, e.g. device assignment, disk space, ...
     TAG_MEMORY                  = 1u << 6, ///< memory resource
     TAG_FILE                    = 1u << 7, ///< file not found, etc.
-    TAG_STATS                   = 1u << 8  ///< e.g. timing, memory usage
+    TAG_STATS                   = 1u << 8, ///< e.g. timing, memory usage
+    TAG_UNAVAILABLE             = 1u << 9  ///< device or resource not available; possibly temporary
 };
 
 } // namespace details
@@ -71,7 +72,8 @@ struct Message_details
     enum { HOST_ID_LOCAL = 0 };
     enum {
         DEVICE_ID_CPU = -1,
-        DEVICE_ID_UNKNOWN_CUDA = -2
+        DEVICE_ID_UNKNOWN_CUDA = -2,
+        DEVICE_ID_ALL_CUDA = -3
     };
 
     /// The cluster ID of the host on which the message originated.
@@ -299,6 +301,10 @@ public:
     }
 };
 
+
+class Log_stream;
+
+
 // A specialization of std::stringbuf to be used together with #mi::base::Log_stream.
 //
 // Its sync() method is overridden to send the contents of the string buffer to the logger, and an
@@ -310,8 +316,6 @@ public:
     //
     // \param stream             The stream used with this string buffer. Used to flush the stream
     //                           if the log level is changed.
-    // \param logger             The logger that finally receives the contents of this string
-    //                           buffer.
     // \param module_category    The module and the category which specify the origin and the
     //                           functional area of this message. See #mi::base::ILogger::message()
     //                           for details.
@@ -319,8 +323,7 @@ public:
     //                           one of the manipulators.
     // \param default_details    The default message details. Used if no other details are set.
     Log_streambuf(
-        std::ostream& stream,
-        ILogger* logger,
+        Log_stream& stream,
         const std::string& module_category,
         Message_severity default_level = MESSAGE_SEVERITY_INFO,
         const Message_details& default_details = Message_details())
@@ -328,7 +331,6 @@ public:
         m_stream( stream),
         m_default_level( default_level),
         m_default_details( default_details),
-        m_logger( logger, DUP_INTERFACE),
         m_module_category( module_category),
         m_details( default_details)
     {
@@ -342,43 +344,23 @@ public:
     
     // Flushes the string buffer if not empty, and sets the log level of the next message to the
     // given log level.
-    void set_log_level( Message_severity level)
-    {
-        m_stream.flush();
-        m_level = level;
-    }
+    void set_log_level( Message_severity level);
 
     // Flushes the string buffer if not empty, and sets the log level of the next message to the
     // given log level.
-    void set_details( const Message_details& details)
-    {
-        m_stream.flush();
-        m_details = details;
-    }
+    void set_details( const Message_details& details);
 
 protected:
 
     // Sends the contents of the string buffer to the logger, clears the string buffer, and resets
     // the log level and details to their defaults.
-    int sync()
-    {
-        std::stringbuf::sync();
-        const std::string& s = str();
-        if( !s.empty()) {
-            m_logger->message( m_level, m_module_category.c_str(), m_details, s.c_str());
-            str( "");
-            m_level = m_default_level;
-            m_details = m_default_details;
-        }
-        return 0;
-    }
+    int sync();
 
 private:
 
-    std::ostream& m_stream;
+    Log_stream& m_stream;
     Message_severity m_default_level;
     Message_details m_default_details;
-    mi::base::Handle<ILogger> m_logger;
     std::string m_module_category;
     Message_severity m_level;
     Message_details m_details;
@@ -418,8 +400,9 @@ public:
         Message_severity default_level = MESSAGE_SEVERITY_INFO,
         const Message_details& default_details = Message_details())
       : std::ostream( 0),
-        m_buffer( *this, logger, module_category ? module_category : "APP:MAIN",
-                default_level, default_details)
+        m_buffer( *this, module_category ? module_category : "APP:MAIN",
+                default_level, default_details),
+        m_logger( logger, DUP_INTERFACE)
     {
         rdbuf( &m_buffer);
 #if (__cplusplus >= 201402L)
@@ -442,7 +425,8 @@ public:
         Message_severity default_level = MESSAGE_SEVERITY_INFO,
         const Message_details& default_details = Message_details())
       : std::ostream( 0),
-        m_buffer( *this, logger, module_category, default_level, default_details)
+        m_buffer( *this, module_category, default_level, default_details),
+        m_logger( logger, DUP_INTERFACE)
     {
         rdbuf( &m_buffer);
 #if (__cplusplus >= 201402L)
@@ -471,14 +455,56 @@ public:
     {
         // Static initialization is guaranteed to be thread-safe with C++11 and later. The method
         // std::ios_base::xalloc() is guaranteed to be thread-safe with C++14 and later.
-        static int s_index = std::ios_base::xalloc();
+        static const int s_index = std::ios_base::xalloc();
         return s_index;
     }
 #endif
 
 private:
+    friend class Log_streambuf;
+
     Log_streambuf m_buffer;
+    mi::base::Handle<ILogger> m_logger;
+
+    // Primary customization point.
+    // Note that this function may be called from the destructor.
+    virtual void message(
+            Message_severity level,
+            const char* module_category,
+            const Message_details& details,
+            const char* message) const
+    {
+        m_logger->message( level, module_category, details, message);
+    }
 };
+
+
+
+inline void Log_streambuf::set_log_level( Message_severity level)
+{
+    m_stream.flush();
+    m_level = level;
+}
+
+inline void Log_streambuf::set_details( const Message_details& details)
+{
+    m_stream.flush();
+    m_details = details;
+}
+
+inline int Log_streambuf::sync()
+{
+    std::stringbuf::sync();
+    const std::string& s = str();
+    if( !s.empty()) {
+        m_stream.message( m_level, m_module_category.c_str(), m_details, s.c_str());
+        str( "");
+        m_level = m_default_level;
+        m_details = m_default_details;
+    }
+    return 0;
+}
+
 
 /// Manipulator for #mi::base::Log_stream.
 ///

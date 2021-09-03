@@ -1,5 +1,5 @@
 /***************************************************************************************************
- * Copyright 2020 NVIDIA Corporation. All rights reserved.
+ * Copyright 2021 NVIDIA Corporation. All rights reserved.
  **************************************************************************************************/
 /// \file mi/math/color.h
 /// \brief Standard RGBA color class with floating point elements and operations.
@@ -134,6 +134,11 @@ public:
 #endif
     }
 
+#if (__cplusplus >= 201103L)
+    /// Default copy constructor.
+    Color( const Color& c) = default;
+#endif
+
     /// Constructor from underlying storage type.
     inline Color( const Color_struct& c)
     {
@@ -142,7 +147,6 @@ public:
         b = c.b;
         a = c.a;
     }
-
 
     /// Constructor initializes all vector elements to the value \p s.
     inline explicit Color( const Float32 s)
@@ -847,7 +851,7 @@ inline bool isnan MI_PREVENT_MACRO_EXPAND (const Color& c)
 /// Encodes a color into RGBE representation.
 ///
 /// \note The alpha value is not part of the RGBE representation.
-inline void to_rgbe( const Color& color, Uint32& rgbe)
+MI_HOST_DEVICE_INLINE void to_rgbe( const Color& color, Uint32& rgbe)
 {
     to_rgbe( &color.r, rgbe);
 }
@@ -855,7 +859,7 @@ inline void to_rgbe( const Color& color, Uint32& rgbe)
 /// Encodes a color into RGBE representation.
 ///
 /// \note The alpha value is not part of the RGBE representation.
-inline void to_rgbe( const Color& color, Uint8 rgbe[4])
+MI_HOST_DEVICE_INLINE void to_rgbe( const Color& color, Uint8 rgbe[4])
 {
     to_rgbe( &color.r, rgbe);
 }
@@ -863,7 +867,7 @@ inline void to_rgbe( const Color& color, Uint8 rgbe[4])
 /// Decodes a color from RGBE representation.
 ///
 /// \note The alpha value is set to 1.0.
-inline void from_rgbe( const Uint8 rgbe[4], Color& color)
+MI_HOST_DEVICE_INLINE void from_rgbe( const Uint8 rgbe[4], Color& color)
 {
     from_rgbe( rgbe, &color.r);
     color.a = 1.0f;
@@ -872,7 +876,7 @@ inline void from_rgbe( const Uint8 rgbe[4], Color& color)
 /// Decodes a color from RGBE representation.
 ///
 /// \note The alpha value is set to 1.0.
-inline void from_rgbe( const Uint32 rgbe, Color& color)
+MI_HOST_DEVICE_INLINE void from_rgbe( const Uint32 rgbe, Color& color)
 {
     from_rgbe( rgbe, &color.r);
     color.a = 1.0f;

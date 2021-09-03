@@ -1,5 +1,5 @@
 /***************************************************************************************************
- * Copyright 2020 NVIDIA Corporation. All rights reserved.
+ * Copyright 2021 NVIDIA Corporation. All rights reserved.
  **************************************************************************************************/
 /// \file       mi/base/condition.h
 /// \brief      Multithreading condition.
@@ -62,7 +62,7 @@ public:
     {
 #ifndef MI_PLATFORM_WINDOWS
         pthread_mutex_lock( &m_mutex);
-        while( !m_signaled)
+        while( !m_signaled) //-V776 PVS
             pthread_cond_wait( &m_condvar, &m_mutex);
         m_signaled = false;
         pthread_mutex_unlock( &m_mutex);

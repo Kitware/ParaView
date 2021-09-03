@@ -1,5 +1,5 @@
 /***************************************************************************************************
- * Copyright 2020 NVIDIA Corporation. All rights reserved.
+ * Copyright 2021 NVIDIA Corporation. All rights reserved.
  **************************************************************************************************/
 /// \file
 /// \brief API component for various image-related functions.
@@ -17,12 +17,18 @@ namespace neuraylib {
 
 class IBuffer;
 class ICanvas;
+class ICanvas_cuda;
 class IReader;
 class ITile;
 
-/** 
+/**
 \if MDL_SDK_API
     \defgroup mi_neuray_mdl_sdk_misc Miscellaneous Interfaces
+    \ingroup mi_neuray
+
+    \brief Various utility classes.
+\elseif IRAY_API
+    \defgroup mi_neuray_mdl_sdk_misc Miscellaneous MDL-related Interfaces
     \ingroup mi_neuray
 
     \brief Various utility classes.
@@ -36,6 +42,7 @@ class ITile;
 @{
 */
 
+
 /// This interface provides various utilities related to canvases and buffers.
 ///
 /// Note that #create_buffer_from_canvas() and #create_canvas_from_buffer() encode and decode pixel
@@ -48,38 +55,6 @@ class IImage_api : public
 public:
     /// \name Factory methods for canvases and tiles
     //@{
-
-    /// Creates a canvas with given pixel type, width, height, and layers.
-    ///
-    /// This factory function allows to create instances of the abstract interface
-    /// #mi::neuraylib::ICanvas based on an internal default implementation. However, you are not
-    /// obligated to use this factory function and the internal default implementation. It is
-    /// absolutely fine to use your own (correct) implementation of the #mi::neuraylib::ICanvas
-    /// interface.
-    ///
-    /// \param pixel_type   The desired pixel type. See \ref mi_neuray_types for a list of
-    ///                     supported pixel types.
-    /// \param width        The desired width.
-    /// \param height       The desired height.
-    /// \param tile_width   The desired tile width. The special value 0 represents the canvas
-    ///                     width.
-    /// \param tile_height  The desired tile height. The special value 0 represents the canvas
-    ///                     height.
-    /// \param layers       The desired number of layers (depth). Must be 6 for cubemaps.
-    /// \param is_cubemap   Flag that indicates whether this canvas represents a cubemap.
-    /// \param gamma        The desired gamma value. The special value 0.0 represents the default
-    ///                     gamma which is 1.0 for HDR pixel types and 2.2 for LDR pixel types.
-    /// \return             The requested canvas, or \c NULL in case of invalid pixel type, width,
-    ///                     height, layers, or cubemap flag.
-    virtual ICanvas* create_canvas(
-        const char* pixel_type,
-        Uint32 width,
-        Uint32 height,
-        Uint32 tile_width = 0,
-        Uint32 tile_height = 0,
-        Uint32 layers = 1,
-        bool is_cubemap = false,
-        Float32 gamma = 0.0f) const = 0;
 
     /// Creates a tile with given pixel type, width, and height.
     ///
@@ -99,6 +74,74 @@ public:
         const char* pixel_type,
         Uint32 width,
         Uint32 height) const = 0;
+
+    /// Creates a canvas with given pixel type, resolution, and layers.
+    ///
+    /// This factory function allows to create instances of the abstract interface
+    /// #mi::neuraylib::ICanvas based on an internal default implementation. However, you are not
+    /// obligated to use this factory function and the internal default implementation. It is
+    /// absolutely fine to use your own (correct) implementation of the #mi::neuraylib::ICanvas
+    /// interface.
+    ///
+    /// \param pixel_type   The desired pixel type. See \ref mi_neuray_types for a list of
+    ///                     supported pixel types.
+    /// \param width        The desired width.
+    /// \param height       The desired height.
+    /// \param layers       The desired number of layers (depth). Must be 6 for cubemaps.
+    /// \param is_cubemap   Flag that indicates whether this canvas represents a cubemap.
+    /// \param gamma        The desired gamma value. The special value 0.0 represents the default
+    ///                     gamma which is 1.0 for HDR pixel types and 2.2 for LDR pixel types.
+    /// \return             The requested canvas, or \c NULL in case of invalid pixel type, width,
+    ///                     height, layers, or cubemap flag.
+    virtual ICanvas* create_canvas(
+        const char* pixel_type,
+        Uint32 width,
+        Uint32 height,
+        Uint32 layers = 1,
+        bool is_cubemap = false,
+        Float32 gamma = 0.0f) const = 0;
+
+#ifndef MI_SKIP_WITH_MDL_SDK_DOXYGEN
+    /// Creates a CUDA canvas with given pixel type, width, height, and layers.
+    ///
+    /// \see #create_canvas()
+    /// \see #mi::neuraylib::IGpu_description::get_cuda_device_id()
+    ///
+    /// \param cuda_device_id The CUDA ID of the device on which the canvas will reside.
+    ///                     Note that this is the CUDA device ID, not the 1-based GPU index
+    ///                     used in \if IRAY_API #mi::neuraylib::IRendering_configuration.
+    ///                     \else #mi::neuraylib::IDice_configuration. \endif
+    /// \param pixel_type   The desired pixel type. See \ref mi_neuray_types for a list of
+    ///                     supported pixel types.
+    /// \param width        The desired width.
+    /// \param height       The desired height.
+    /// \param layers       The desired number of layers.
+    /// \param gamma        The desired gamma value. The special value 0.0 represents the default
+    ///                     gamma which is 1.0 for HDR pixel types and 2.2 for LDR pixel types.
+    /// \return             The requested canvas, or \c NULL in case of invalid parameters or
+    ///                     CUDA errors.
+#endif // MI_SKIP_WITH_MDL_SDK_DOXYGEN
+    virtual ICanvas_cuda* create_canvas_cuda(
+        Sint32 cuda_device_id,
+        const char* pixel_type,
+        Uint32 width,
+        Uint32 height,
+        Uint32 layers = 1,
+        Float32 gamma = 0.0f) const = 0;
+
+    /// Creates mipmaps from the given canvas.
+    ///
+    /// \note The base level (the canvas that is passed in) is not included in the returned
+    /// canvas array.
+    ///
+    /// \param canvas           The canvas to create the mipmaps from.
+    /// \param gamma_override   If this parameter is different from zero, it is used instead of the
+    ///                         canvas gamma during mipmap creation.
+    /// \return                 An array of type #mi::IPointer containing pointers to
+    ///                         the mipmaps of type #mi::neuraylib::ICanvas.
+    ///                         If no mipmaps could be created, NULL is returned.
+    virtual IArray* create_mipmaps(
+        const ICanvas* canvas, Float32 gamma_override = 0.0f) const = 0;
 
     //@}
     /// \name Conversion between canvases and raw memory buffers
@@ -184,33 +227,49 @@ public:
 
     /// Encodes the pixel data of a canvas into a memory buffer.
     ///
-    /// \param canvas        The canvas whose contents are to be used.
-    /// \param image_format  The desired image format of the image, e.g., \c "jpg". Note that
-    ///                      support for a given image format requires an image plugin capable of
-    ///                      handling that format.
-    /// \param pixel_type    The desired pixel type. See \ref mi_neuray_types for a list of
-    ///                      supported pixel types. Not every image plugin supports every pixel
-    ///                      type. If the requested pixel type is not supported, the argument is
-    ///                      ignored and one of the supported formats is chosen instead.
-    /// \param quality       The compression quality is an integer in the range from 0 to 100, where
-    ///                      0 is the lowest quality, and 100 is the highest quality.
-    /// \return              The created buffer, or \c NULL in case of failure.
+    /// \param canvas                The canvas whose contents are to be used.
+    /// \param image_format          The desired image format of the image, e.g., \c "jpg". Note
+    ///                              that support for a given image format requires an image plugin
+    ///                              capable of handling that format.
+    /// \param pixel_type            The desired pixel type. See \ref mi_neuray_types for a list of
+    ///                              supported pixel types. Not every image plugin supports every
+    ///                              pixel type. If the requested pixel type is not supported, the
+    ///                              argument is ignored and one of the supported formats is chosen
+    ///                              instead.
+    /// \param quality               The compression quality is an integer in the range from 0 to
+    ///                              100, where 0 is the lowest quality, and 100 is the highest
+    ///                              quality.
+    /// \param force_default_gamma   If enabled, adjusts the gamma value of the exported pixel data
+    ///                              according to the pixel type chosen for export (1.0 for HDR
+    ///                              pixel types, 2.2 for LDR pixel types).
+    /// \return                      The created buffer, or \c NULL in case of failure.
     virtual IBuffer* create_buffer_from_canvas(
         const ICanvas* canvas,
         const char* image_format,
         const char* pixel_type,
-        const char* quality) const = 0;
+        const char* quality,
+        bool force_default_gamma = false) const = 0;
 
     /// Decodes the pixel data of a memory buffer into a canvas.
     ///
     /// \param buffer        The buffer that holds the encoded pixel data.
-    /// \param image_format  The image format of the buffer, e.g., \c "jpg". Note that
-    ///                      support for a given image format requires an image plugin capable of
-    ///                      handling that format.
+    /// \param image_format  The image format of the buffer, e.g., \c "jpg". Note that support for
+    ///                      a given image format requires an image plugin capable of handling that
+    ///                      format.
     /// \return              The canvas with the decoded pixel data, or \c NULL in case of failure.
     virtual ICanvas* create_canvas_from_buffer(
-        const IBuffer* buffer,
-        const char* image_format) const = 0;
+        const IBuffer* buffer, const char* image_format) const = 0;
+
+    /// Decodes the pixel data from a reader into a canvas.
+    ///
+    /// \param reader        The reader that provides the data for the image. The reader needs to
+    ///                      support absolute access.
+    /// \param image_format  The image format of the buffer, e.g., \c "jpg". Note that support for
+    ///                      a given image format requires an image plugin capable of handling that
+    ///                      format.
+    /// \return              The canvas with the decoded pixel data, or \c NULL in case of failure.
+    virtual ICanvas* create_canvas_from_reader(
+        IReader* reader, const char* image_format) const = 0;
 
     /// Indicates whether a particular image format is supported for decoding.
     ///
@@ -316,21 +375,42 @@ public:
     /// \see #get_components_per_pixel()
     virtual Uint32 get_bytes_per_component( const char* pixel_type) const = 0;
 
-    /// Creates mipmaps from the given canvas.
+    //@}
+    /// \name Utility methods for RGBA channels
+    //@{
+
+    /// Returns the pixel type of an RGBA channel.
     ///
-    /// \note The base level (the canvas that is passed in) is not included in the returned 
-    /// canvas array.
+    /// Invalid pixel type/selector combinations are:
+    /// - \p pixel_type is not an RGB or RGBA pixel type
+    /// - \p selector is not an RGBA channel selector
     ///
-    /// \param canvas           The canvas to create the mipmaps from.
-    /// \param gamma_override   If this parameter is different from zero, it is used instead of the
-    ///                         canvas gamma during mipmap creation.
-    /// \return                 An array of type #mi::IPointer containing pointers to
-    ///                         the mipmaps of type #mi::neuraylib::ICanvas.
-    ///                         If no mipmaps could be created, NULL is returned.
-    virtual IArray* create_mipmaps(
-        const ICanvas* canvas, Float32 gamma_override=0.0f) const = 0;
+    /// \param pixel_type   The pixel type of the mipmap/canvas/tile.
+    /// \param selector     The RGBA channel selector.
+    /// \return             Returns PT_UNDEF for invalid pixel type/selector combinations.
+    ///                     Otherwise, returns PT_SINT8 or PT_FLOAT32, depending on
+    ///                     \p pixel_type.
+    virtual const char* get_pixel_type_for_channel(
+        const char* pixel_type, const char* selector) const = 0;
+
+    /// Extracs an RGBA channel from a canvas.
+    ///
+    /// \param canvas           The canvas to extract a channel from.
+    /// \param selector         The RGBA channel selector.
+    /// \return                 The extracted channel, or \c NULL in case of invalid pixel type/
+    ///                         channel selector combinations (see #get_pixel_type_for_channel()).
+    virtual ICanvas* extract_channel( const ICanvas* canvas, const char* selector) const = 0;
+
+    /// Extracs an RGBA channel from a tile.
+    ///
+    /// \param tile             The tile to extract a channel from.
+    /// \param selector         The RGBA channel selector.
+    /// \return                 The extracted channel, or \c NULL in case of invalid pixel type/
+    ///                         channel selector combinations (see #get_pixel_type_for_channel()).
+    virtual ITile* extract_channel( const ITile* tile, const char* selector) const = 0;
 
     //@}
+
 };
 
 /*@}*/ // end group mi_neuray_rendering / mi_neuray_rtmp

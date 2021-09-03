@@ -1,5 +1,5 @@
 /***************************************************************************************************
- * Copyright 2020 NVIDIA Corporation. All rights reserved.
+ * Copyright 2021 NVIDIA Corporation. All rights reserved.
  **************************************************************************************************/
 /// \file
 /// \brief API component for library authentication functionality.
@@ -34,9 +34,9 @@ namespace neuraylib {
 /// This interface is used for authenticating the application against the library.
 ///
 /// Different variants of the \neurayLibraryName use different mechanisms to prevent unauthorized
-/// use of the library. Two such variants are SPM-protected and non-SPM-protected binaries.
+/// use of the library.
 ///
-/// In non-SPM-protected variants the application needs to prove against the library that it has a
+/// The application needs to prove against the library that it has a
 /// valid secret key which enables it to start the \neurayLibraryName.
 class ILibrary_authenticator : public
     mi::base::Interface_declare<0x5a7d010a,0x2a65,0x43da,0x92,0xf2,0xcd,0xd9,0xc8,0x4b,0x10,0xd2>
@@ -334,7 +334,7 @@ void sha256( const char* input, unsigned int input_length, char* buffer)
         // If we are at the end of input message
         if( pos == input_length) {
             // If we still have not padded and have space to add a 1, add it
-            if( (k > 0) && (pos/64 == chunk))
+            if( pos/64 == chunk)
                 ptr[pos%64] |= static_cast<Uint8>( 0x80);
             // If we can pad and still have space to add the length, add it
             if( (pos*8 + 1 + k) - (chunk*512) <= 448) {

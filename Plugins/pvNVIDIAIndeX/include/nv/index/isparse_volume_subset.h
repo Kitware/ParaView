@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2020 NVIDIA Corporation. All rights reserved.
+ * Copyright 2021 NVIDIA Corporation. All rights reserved.
  *****************************************************************************/
 /// \file
 /// \brief Distributed subsets of sparse volume datasets.
@@ -52,7 +52,7 @@ enum Sparse_volume_voxel_format
 /// 
 /// \ingroup nv_index_data_subsets
 ///
-inline mi::Size get_sizeof(const nv::index::Sparse_volume_voxel_format fmt)
+inline mi::Sint32 get_sizeof(const nv::index::Sparse_volume_voxel_format fmt)
 {
     switch (fmt)
     {
@@ -75,7 +75,6 @@ inline mi::Size get_sizeof(const nv::index::Sparse_volume_voxel_format fmt)
         return 0;
     }
 }
-
 
 /// Volume device-data accessor interface.
 ///
@@ -463,6 +462,34 @@ public:
                                                 mi::Uint32                    brick_subset_idx,
                                                 mi::Uint32                    brick_attrib_idx) = 0;
 
+    /// Write a single homogeneous value for a volume-data brick to the subset from a memory block in main memory.
+    /// The passed value pointer needs to match the type and size of the attribute voxel-format.
+    ///
+    /// \param[in]  brick_subset_idx    Volume-data brick subset index for which to write homogeneous data value.
+    /// \param[in]  brick_attrib_idx    The attribute index of the volume-data brick for which to write homogeneous data value.
+    /// \param[in]  brick_homog_value   Pointer to source value of homogeneous data value that will be written to
+    ///                                 this data-subset.
+    ///
+    /// \returns                        True if the write operation was successful, false otherwise.
+    ///
+    virtual bool                            set_brick_homogeneous_value(
+                                                mi::Uint32      brick_subset_idx,
+                                                mi::Uint32      brick_attrib_idx,
+                                                const void*     brick_homog_value) = 0;
+
+    /// Set a background value used in volume areas not covered by voxel or homogeneous brick data. The default
+    /// background value is a zero value according to the attributes voxel format.
+    /// 
+    /// \param[in]  attrib_idx          The attribute index of the volume for which to set the background value.
+    /// \param[in]  background_value    Pointer to source value of background value that will be written to
+    ///                                 this data-subset.
+    /// 
+    /// \returns                        True if the write operation was successful, false otherwise.
+    ///
+    virtual bool                            set_background_value(
+                                                mi::Uint32      attrib_idx,
+                                                const void*     background_value) = 0;
+
     /// Explicitly set the state of a data-brick in the subset.
     ///
     /// \param[in]  brick_subset_idx    Volume-data brick subset index for which to set the state.
@@ -525,6 +552,7 @@ public:
     };
 
     /// Generating a volume data buffer for use by the application.
+    /// 
     /// \param[in] subdata_attrib_idx   The attribute index.
     /// \param[in] subdata_position     The position as an anchor that specifies a request bounding box together with the extent.
     /// \param[in] subdata_extent       The extent that specifies a request bounding box together with the position.
@@ -532,11 +560,32 @@ public:
     ///
     /// \return     Returns the volume data buffer encapsulated by an instance
     ///             of an \c IVolume_device_data_buffer interface implementation.
-    virtual IVolume_device_data_buffer* generate_volume_sub_data_device(
+    /// 
+    virtual IVolume_device_data_buffer* allocate_volume_sub_data_device(
                                                 mi::Uint32                             subdata_attrib_idx,
                                                 mi::math::Vector_struct<mi::Sint32, 3> subdata_position,
                                                 mi::math::Vector_struct<mi::Uint32, 3> subdata_extent,
                                                 mi::Uint32                             subdata_flags = SUB_DATA_GEN_DEFAULT) const = 0;
+
+    /// Fill a volume data buffer with subset-volume data for use by the application.
+    /// 
+    /// \param[in] subdata_volume_buffer   The volume data buffer to fill.
+    ///
+    /// \return     Returns true if the operation was successful, false otherwise.
+    /// 
+    virtual bool                        fill_volume_sub_data_buffer(
+                                                 IVolume_device_data_buffer*        subdata_volume_buffer) const = 0;
+
+    /// Write back volume date from a volume data buffer.
+    /// 
+    /// \param[in] subdata_volume_buffer   The volume data buffer to fill.
+    ///
+    /// \return     Returns true if the operation was successful, false otherwise.
+    /// 
+    virtual bool                        write_from_volume_sub_data_buffer(
+                                                const IVolume_device_data_buffer*   subdata_volume_buffer) const = 0;
+
+
 };
 
 } // namespace index

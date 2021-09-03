@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2020 NVIDIA Corporation. All rights reserved.
+ * Copyright 2021 NVIDIA Corporation. All rights reserved.
  *****************************************************************************/
 /// \file
 /// \brief The interface class for implementing import callbacks used for distributed large-scale data chunk loading.
@@ -16,6 +16,36 @@ namespace nv
 {
 namespace index
 {
+
+/// This class gives basic properties of distributed datasets imported using the parallel data loading
+/// of NVIDIA IndeX through the \c IDistributed_data_import_callback interface.
+/// 
+/// Implementations of \c IDistributed_data_import_callback optionally can expose an implementation
+/// of this interface in order to inform the NVIDIA IndeX library about basic properties of the
+/// datasets loaded through the parallel data loading mechanism.
+/// 
+/// \note Exposing this properties interface right now is optional to all \c IDistributed_data_import_callback.
+///       In the future this class will act as a base class for further specialized dataset properties for
+///       supported dataset types (e.g., \c ISparse_volume_scene_element, \c IIrregular_volume_scene_element ...)
+/// 
+class IDistributed_data_properties :
+    public mi::base::Interface_declare<0x78a31b0c,0x5691,0x4278,0x98,0xba,0xa6,0x82,0xab,0xd7,0x31,0xdf,
+                                       mi::neuraylib::ISerializable>
+{
+public:
+    /// Returns the axis-aligned bounding box of the dataset in its local object space.
+    ///
+    /// \return The axis-aligned bounding box of the dataset in its local object space.
+    /// 
+    virtual mi::math::Bbox_struct<mi::Float32, 3>       get_bounding_box() const = 0;
+
+    /// Returns an optional transformation inherently attached to the dataset.
+    ///
+    /// \return An optional transformation inherently attached to the dataset.
+    /// 
+    virtual mi::math::Matrix_struct<mi::Float32, 4, 4>  get_transform() const = 0;
+};
+
 
 /// Import callback mechanism for implementing distributed and parallel data loading from arbitrary sources.
 ///
@@ -114,6 +144,18 @@ public:
     /// \return             The UUID represent the type of the distributed data subset.
     ///
     virtual mi::base::Uuid subset_id() const = 0;
+
+    /// Shall provide an instance of \c IDistributed_data_properties giving basic property information
+    /// about the dataset imported through the current instance of this import callback.
+    /// 
+    /// \note Currently it is optional for implementations of \c IDistributed_data_import_callback to provide
+    ///       a \c IDistributed_data_properties instance. In cases where it is not provided this query shall
+    ///       return a NULL pointer.
+    /// 
+    /// \return             An instance of \c IDistributed_data_properties describing basic properties
+    ///                     of the imported dataset.
+    /// 
+    virtual const IDistributed_data_properties* get_dataset_properties() const = 0;
 
     /// Returns optional configuration settings that may be used by the library
     /// for the session export mechanism provided by \c
@@ -307,6 +349,9 @@ public:
         (void) deserializer;
     }
 
+    /// Empty body, i.e., no data properties exposed.
+    const IDistributed_data_properties* get_dataset_properties() const { return 0; }
+
     /// Empty body, i.e., no configuration for the session exporter given.
     virtual const char* get_configuration() const { return 0; }
 };
@@ -366,6 +411,9 @@ public:
         // avoid warnings
         (void)deserializer;
     }
+
+    /// Empty body, i.e., no data properties exposed.
+    const IDistributed_data_properties* get_dataset_properties() const { return 0; }
 
     /// Empty body, i.e., no configuration for the session exporter given.
     virtual const char* get_configuration() const { return 0; }

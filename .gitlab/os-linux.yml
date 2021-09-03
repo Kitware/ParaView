@@ -22,7 +22,7 @@
 
 .fedora33:
     extends: .linux
-    image: "kitware/paraview:ci-fedora33-20210818"
+    image: "kitware/paraview:ci-fedora33-20210903"
 
 .fedora31_icc:
     extends: .linux

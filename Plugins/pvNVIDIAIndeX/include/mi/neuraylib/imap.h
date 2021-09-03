@@ -1,5 +1,5 @@
 /***************************************************************************************************
- * Copyright 2020 NVIDIA Corporation. All rights reserved.
+ * Copyright 2021 NVIDIA Corporation. All rights reserved.
  **************************************************************************************************/
 /// \file
 /// \brief Map type.
@@ -30,11 +30,11 @@ namespace neuraylib { class IFactory; }
 ///
 /// Most methods of #mi::IData_collection come in two versions, an index-based and a key-based
 /// version. Since a map is a key-based data structure, the key-based variants of the methods of
-/// #mi::IData_collection are more efficient (constant time). In general, the index-based methods
-/// require linear time to compute the key for a given index (in particular for random access
-/// patterns). As an exception, accessing the indices in sequence from 0 to #get_length()-1
-/// requires only constant time per access (provided the structure of the map is not changed,
-/// the values of the keys may change). The mapping of indices to keys is unspecified.
+/// #mi::IData_collection are more efficient (logarithmic time). In general, the index-based
+/// methods require linear time (in particular for random access patterns). As an exception,
+/// accessing the indices in sequence from 0 to #get_length()-1 requires only constant time per
+/// access (provided the structure of the map is not changed, the values of the keys may change).
+/// The mapping of indices to keys is unspecified.
 class IMap :
     public base::Interface_declare<0xca097e3a,0x2621,0x41e7,0x80,0xa3,0x97,0x2f,0x0d,0x56,0xf8,0x47,
                                    IData_collection>
