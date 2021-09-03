@@ -448,6 +448,11 @@ else ()
   # Forward logging option to VTK.
   set(VTK_ENABLE_LOGGING ON)
 
+  # ParaView assumes these are created. These should probably be moved to
+  # distinct modules for easier handling however.
+  set(VTK_USE_VIDEO_FOR_WINDOWS ON)
+  set(VTK_USE_MICROSOFT_MEDIA_FOUNDATION ON)
+
   if (use_vtk_remote_modules)
     if (PARAVIEW_ENABLE_MOMENTINVARIANTS)
       set(VTK_MODULE_ENABLE_VTK_MomentInvariants WANT)
