@@ -295,7 +295,7 @@ bool vtkInitializationHelper::Initialize(
   // push the ENV argument scope which includes environment arguments
   std::string username;
 #if defined(_WIN16) || defined(_WIN32) || defined(_WIN64)
-  username = getenv("USERNAME") != nullptr ? getenv("USERNAME") : "Not defined";
+  username = getenv("USERNAME") != nullptr ? getenv("USERNAME") : undefined;
 #else
   username = getenv("USER") != nullptr ? getenv("USER") : undefined;
 #endif

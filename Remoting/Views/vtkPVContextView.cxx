@@ -199,14 +199,7 @@ bool vtkPVContextView::Export(vtkCSVExporter* exporter)
 //----------------------------------------------------------------------------
 std::string vtkPVContextView::GetFormattedTitle()
 {
-  if (!this->GetTitle())
-  {
-    return std::string();
-  }
-
-  std::string formattedTitle = this->GetTitle();
-
-  return vtkPVStringFormatter::Format(formattedTitle);
+  return vtkPVStringFormatter::Format(this->Title ? this->Title : std::string());
 }
 
 //----------------------------------------------------------------------------

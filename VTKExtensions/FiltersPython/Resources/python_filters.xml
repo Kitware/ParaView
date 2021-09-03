@@ -40,7 +40,10 @@
         <Documentation>The Python expression evaluated during
         execution. Set of potentially available variables [inputs, points, t_value,
         t_index, FieldData, PointData, CellData] (i.e.: "Momentum: (%f, %f, %f)" %
-        (XMOM[t_index,0], YMOM[t_index,0], ZMOM[t_index,0]) )</Documentation>
+        (XMOM[t_index,0], YMOM[t_index,0], ZMOM[t_index,0]) ). Additional variables,
+        using the fmt library's syntax, are {timevalue}, and {timeindex}. These variables
+        are always available, and their default values are 0, and 0 respectively.
+        </Documentation>
       </StringVectorProperty>
       <IntVectorProperty command="SetArrayAssociation"
                          default_values="0"
@@ -209,6 +212,9 @@ annotation text.
         potentially available variables [inputs, points, t_value, t_steps,
         t_range, t_index, FieldData, PointData, CellData]
         (i.e.: "Momentum: (%f, %f, %f)" % (XMOM[t_index,0], YMOM[t_index,0], ZMOM[t_index,0]) )
+        Additional variables, using the fmt library's syntax, are {timevalue}, {timerange},
+        {timesteps} and {timeindex}. These variables are always available, and their default
+        values are 0, [], [] and 0 respectively.
         </Documentation>
       </StringVectorProperty>
       <StringVectorProperty command="GetComputedAnnotationValue"
