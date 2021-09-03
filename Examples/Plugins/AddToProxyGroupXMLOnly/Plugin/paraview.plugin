@@ -1,0 +1,6 @@
+NAME
+  AddToProxyGroupXMLOnly
+DESCRIPTION
+  An example plugin which adds a new implicit function
+  to the slice_implicit_function proxy group, effectively add a new
+  implicit function to the slice filter.
