@@ -7,6 +7,7 @@ producer = TrivialProducer(registrationName="input")
 def catalyst_execute(info):
     global grid, particles
     producer.UpdatePipeline()
+    print(producer.GetDataInformation().GetDataAssembly())
     assert producer.GetDataInformation().GetNumberOfDataSets() == 2
 
     gridInfo = producer.GetSubsetDataInformation(0, "//grid", "Hierarchy");
@@ -23,3 +24,10 @@ def catalyst_execute(info):
 
     print("particles:")
     print("  bounds:", particlesInfo.GetBounds())
+
+    # try subsetting using the assembly and confirm it's as exepected.
+    gridInfo2 = producer.GetSubsetDataInformation(0, "//Grid", "Assembly")
+    assert gridInfo2.GetNumberOfPoints() == gridInfo.GetNumberOfPoints()
+
+    info2 = producer.GetSubsetDataInformation(0, "//SubCollection", "Assembly")
+    assert producer.GetDataInformation().GetNumberOfDataSets() == info2.GetNumberOfDataSets()
