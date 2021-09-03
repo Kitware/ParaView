@@ -87,6 +87,20 @@ int vtkPVExtractHistogram2D::RequestInformation(vtkInformation* vtkNotUsed(reque
 }
 
 //------------------------------------------------------------------------------------------------
+int vtkPVExtractHistogram2D::RequestUpdateExtent(vtkInformation* vtkNotUsed(request),
+  vtkInformationVector** inputVector, vtkInformationVector* outputVector)
+{
+  vtkInformation* inInfo = inputVector[0]->GetInformationObject(0);
+  if (inInfo->Has(vtkStreamingDemandDrivenPipeline::WHOLE_EXTENT()))
+  {
+    int* ext = inInfo->Get(vtkStreamingDemandDrivenPipeline::WHOLE_EXTENT());
+    inInfo->Set(vtkStreamingDemandDrivenPipeline::UPDATE_EXTENT(), ext, 6);
+  }
+
+  return 1;
+}
+
+//------------------------------------------------------------------------------------------------
 int vtkPVExtractHistogram2D::RequestData(vtkInformation* vtkNotUsed(request),
   vtkInformationVector** inputVector, vtkInformationVector* outputVector)
 {
