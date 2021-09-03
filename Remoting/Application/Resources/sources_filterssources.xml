@@ -154,6 +154,8 @@
                  value="26" />
           <Entry text="Quadratic Pyramid"
                  value="27" />
+          <Entry text="Tri-Quadratic Pyramid"
+                 value="37" />
           <Entry text="Lagrange Curve"
                  value="68" />
           <Entry text="Lagrange Triangle"
