@@ -151,7 +151,6 @@
   <Proxy group="filters" name="TransformFilter" />
   <Proxy group="filters" name="TriangleFilter" />
   <Proxy group="filters" name="TubeFilter" />
-  <Proxy group="filters" name="UnstructuredGradient" />
   <Proxy group="filters" name="WarpScalar" />
   <Proxy group="filters" name="WarpVector" />
   <Proxy group="filters" name="NormalGlyphs" />

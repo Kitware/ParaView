@@ -864,7 +864,7 @@ struct Process_5_9_to_5_10
       HandleRepresentationBlockColor(document) && HandleRepresentationBlockOpacity(document) &&
       HandleSelectionQuerySource(document) && ConvertProbeLine(document) &&
       HandleBackgroundColor(document) && HandleCalculatorParserType(document) &&
-      ConvertThreshold(document);
+      ConvertThreshold(document) && HandleGradient(document);
   }
 
   static std::string GetSelector(unsigned int cid)
@@ -1311,6 +1311,183 @@ struct Process_5_9_to_5_10
       entryNode = domainNode.append_child("Entry");
       entryNode.append_attribute("value").set_value(2);
       entryNode.append_attribute("text").set_value("Above Upper Threshold");
+    }
+
+    return true;
+  }
+
+  static bool HandleGradient(xml_document& document)
+  {
+    // The filters Gradient (for vtkImageData) and Gradient Of Unstructured DataSet
+    // (UnstructuredGradient) (for vtkDataSet) have been merged and replaced with a
+    // unique Gradient filter (for vtkDataSet). This new filter is based on the previous
+    // UnstructuredGradient, to which the functionality from the previous Gradient is added.
+
+    // Replace UnstructuredGradient filters by Gradient
+    pugi::xpath_node_set xpath_set = document.select_nodes(
+      "//ServerManagerState/Proxy[@group='filters' and @type='UnstructuredGradient']");
+
+    for (auto xpath_node : xpath_set)
+    {
+      auto node = xpath_node.node();
+      const std::string id(node.attribute("id").value());
+
+      // Change filter type
+      node.attribute("type").set_value("Gradient");
+
+      // Insert BoundaryMethod property
+      auto propertyNode = node.append_child("Property");
+      propertyNode.append_attribute("name").set_value("BoundaryMethod");
+      propertyNode.append_attribute("id").set_value((id + ".BoundaryMethod").c_str());
+      propertyNode.append_attribute("number_of_elements").set_value(1);
+
+      auto elementNode = propertyNode.append_child("Element");
+      elementNode.append_attribute("index").set_value(0);
+      elementNode.append_attribute("value").set_value(1);
+
+      // Insert Dimensionality property
+      propertyNode = node.append_child("Property");
+      propertyNode.append_attribute("name").set_value("Dimensionality");
+      propertyNode.append_attribute("id").set_value((id + ".Dimensionality").c_str());
+      propertyNode.append_attribute("number_of_elements").set_value(1);
+
+      elementNode = propertyNode.append_child("Element");
+      elementNode.append_attribute("index").set_value(0);
+      elementNode.append_attribute("value").set_value(3);
+    }
+
+    // Update Gradient filters with new properties
+    xpath_set =
+      document.select_nodes("//ServerManagerState/Proxy[@group='filters' and @type='Gradient']");
+
+    for (auto xpath_node : xpath_set)
+    {
+      auto node = xpath_node.node();
+
+      if (node.select_nodes("./Property[@name='BoundaryMethod']").empty())
+      {
+        const std::string id(node.attribute("id").value());
+
+        // Insert BoundaryMethod property
+        auto propertyNode = node.append_child("Property");
+        propertyNode.append_attribute("name").set_value("BoundaryMethod");
+        propertyNode.append_attribute("id").set_value((id + ".BoundaryMethod").c_str());
+        propertyNode.append_attribute("number_of_elements").set_value(1);
+
+        auto elementNode = propertyNode.append_child("Element");
+        elementNode.append_attribute("index").set_value(0);
+        elementNode.append_attribute("value").set_value(0);
+
+        // Insert ComputeGradient property
+        propertyNode = node.append_child("Property");
+        propertyNode.append_attribute("name").set_value("ComputeGradient");
+        propertyNode.append_attribute("id").set_value((id + ".ComputeGradient").c_str());
+        propertyNode.append_attribute("number_of_elements").set_value(1);
+
+        elementNode = propertyNode.append_child("Element");
+        elementNode.append_attribute("index").set_value(0);
+        elementNode.append_attribute("value").set_value(1);
+
+        // Insert ResultArrayName property
+        propertyNode = node.append_child("Property");
+        propertyNode.append_attribute("name").set_value("ResultArrayName");
+        propertyNode.append_attribute("id").set_value((id + ".ResultArrayName").c_str());
+        propertyNode.append_attribute("number_of_elements").set_value(1);
+
+        elementNode = propertyNode.append_child("Element");
+        elementNode.append_attribute("index").set_value(0);
+        elementNode.append_attribute("value").set_value("Gradient");
+
+        // Insert FasterApproximation property
+        propertyNode = node.append_child("Property");
+        propertyNode.append_attribute("name").set_value("FasterApproximation");
+        propertyNode.append_attribute("id").set_value((id + ".FasterApproximation").c_str());
+        propertyNode.append_attribute("number_of_elements").set_value(1);
+
+        elementNode = propertyNode.append_child("Element");
+        elementNode.append_attribute("index").set_value(0);
+        elementNode.append_attribute("value").set_value(0);
+
+        // Insert ComputeDivergence property
+        propertyNode = node.append_child("Property");
+        propertyNode.append_attribute("name").set_value("ComputeDivergence");
+        propertyNode.append_attribute("id").set_value((id + ".ComputeDivergence").c_str());
+        propertyNode.append_attribute("number_of_elements").set_value(1);
+
+        elementNode = propertyNode.append_child("Element");
+        elementNode.append_attribute("index").set_value(0);
+        elementNode.append_attribute("value").set_value(0);
+
+        // Insert DivergenceArrayName property
+        propertyNode = node.append_child("Property");
+        propertyNode.append_attribute("name").set_value("DivergenceArrayName");
+        propertyNode.append_attribute("id").set_value((id + ".DivergenceArrayName").c_str());
+        propertyNode.append_attribute("number_of_elements").set_value(1);
+
+        elementNode = propertyNode.append_child("Element");
+        elementNode.append_attribute("index").set_value(0);
+        elementNode.append_attribute("value").set_value("Divergence");
+
+        // Insert ComputeVorticity property
+        propertyNode = node.append_child("Property");
+        propertyNode.append_attribute("name").set_value("ComputeVorticity");
+        propertyNode.append_attribute("id").set_value((id + ".ComputeVorticity").c_str());
+        propertyNode.append_attribute("number_of_elements").set_value(1);
+
+        elementNode = propertyNode.append_child("Element");
+        elementNode.append_attribute("index").set_value(0);
+        elementNode.append_attribute("value").set_value(0);
+
+        // Insert VorticityArrayName property
+        propertyNode = node.append_child("Property");
+        propertyNode.append_attribute("name").set_value("VorticityArrayName");
+        propertyNode.append_attribute("id").set_value((id + ".VorticityArrayName").c_str());
+        propertyNode.append_attribute("number_of_elements").set_value(1);
+
+        elementNode = propertyNode.append_child("Element");
+        elementNode.append_attribute("index").set_value(0);
+        elementNode.append_attribute("value").set_value("Vorticity");
+
+        // Insert ComputeQCriterion property
+        propertyNode = node.append_child("Property");
+        propertyNode.append_attribute("name").set_value("ComputeQCriterion");
+        propertyNode.append_attribute("id").set_value((id + ".ComputeQCriterion").c_str());
+        propertyNode.append_attribute("number_of_elements").set_value(1);
+
+        elementNode = propertyNode.append_child("Element");
+        elementNode.append_attribute("index").set_value(0);
+        elementNode.append_attribute("value").set_value(0);
+
+        // Insert QCriterionArrayName property
+        propertyNode = node.append_child("Property");
+        propertyNode.append_attribute("name").set_value("QCriterionArrayName");
+        propertyNode.append_attribute("id").set_value((id + ".QCriterionArrayName").c_str());
+        propertyNode.append_attribute("number_of_elements").set_value(1);
+
+        elementNode = propertyNode.append_child("Element");
+        elementNode.append_attribute("index").set_value(0);
+        elementNode.append_attribute("value").set_value("Q Criterion");
+
+        // Insert ContributingCellOption property
+        propertyNode = node.append_child("Property");
+        propertyNode.append_attribute("name").set_value("ContributingCellOption");
+        propertyNode.append_attribute("id").set_value((id + ".ContributingCellOption").c_str());
+        propertyNode.append_attribute("number_of_elements").set_value(1);
+
+        elementNode = propertyNode.append_child("Element");
+        elementNode.append_attribute("index").set_value(0);
+        elementNode.append_attribute("value").set_value(2);
+
+        // Insert ReplacementValueOption property
+        propertyNode = node.append_child("Property");
+        propertyNode.append_attribute("name").set_value("ReplacementValueOption");
+        propertyNode.append_attribute("id").set_value((id + ".ReplacementValueOption").c_str());
+        propertyNode.append_attribute("number_of_elements").set_value(1);
+
+        elementNode = propertyNode.append_child("Element");
+        elementNode.append_attribute("index").set_value(0);
+        elementNode.append_attribute("value").set_value(1);
+      }
     }
 
     return true;

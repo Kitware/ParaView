@@ -807,6 +807,9 @@ def getattr(proxy, pname):
 
     raise Continue()
 
+# Depending on the compatibility version that has been set, older functionalities
+# are restored in this function. Note that the 'key' variable refers to a proxy
+# label and not its name.
 def GetProxy(module, key, **kwargs):
     version = paraview.compatibility.GetVersion()
     if version < 5.2:
@@ -855,6 +858,11 @@ def GetProxy(module, key, **kwargs):
             calculator = builtins.getattr(module, key)(**kwargs)
             calculator.FunctionParserType = 0
             return calculator
+        if key == "Gradient":
+            # In 5.10, 'Gradient' and 'GradientOfUnstructuredDataSet' were merged
+            # into a unique 'Gradient" filter.
+            gradient = builtins.getattr(module, "GradientLegacy")(**kwargs)
+            return gradient
 
     return builtins.getattr(module, key)(**kwargs)
 

@@ -537,7 +537,11 @@
     <!-- ==================================================================== -->
     <SourceProxy class="vtkGradientFilter"
                  label="Gradient Of Unstructured DataSet"
-                 name="UnstructuredGradient">
+                 name="UnstructuredGradientLegacy">
+      <Deprecated deprecated_in="5.10" to_remove_in="5.11">
+        This filter has been replaced by 'Compute Gradient'.
+        Please consider using that instead.
+      </Deprecated>
       <Documentation long_help="Estimate the gradient for each point or cell in any type of dataset."
                      short_help="Compute gradients for any type of dataset.">
                      The Gradient (Unstructured) filter estimates the gradient
@@ -684,12 +688,12 @@
           <Entry text="Data Type Min"
                  value="2" />
           <Entry text="Data Type Max"
-                 value="2" />
+                 value="3" />
         </EnumerationDomain>
         <Documentation>Specify what value to use for when the gradient quantities at a
         point can't be computed with the selected **ContributingCellOption**.</Documentation>
       </IntVectorProperty>
-      <!-- End UnstructuredGradient -->
+      <!-- End UnstructuredGradientLegacy -->
     </SourceProxy>
 
     <!-- ==================================================================== -->
