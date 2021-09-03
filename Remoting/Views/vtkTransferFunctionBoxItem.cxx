@@ -302,11 +302,11 @@ bool vtkTransferFunctionBoxItem::Paint(vtkContext2D* painter)
   // Prepare brush
   if (!this->Initialized)
   {
-    this->ComputeTexture();
     this->Initialized = true;
     this->InvokeEvent(vtkTransferFunctionBoxItem::BoxAddEvent);
   }
 
+  this->ComputeTexture();
   auto brush = painter->GetBrush();
   brush->SetColorF(0.0, 0.0, 0.0, 0.0);
   brush->SetTexture(this->Texture.GetPointer());
@@ -331,6 +331,10 @@ bool vtkTransferFunctionBoxItem::Paint(vtkContext2D* painter)
 //-------------------------------------------------------------------------------------------------
 void vtkTransferFunctionBoxItem::ComputeTexture()
 {
+  if (this->Texture->GetMTime() > this->GetMTime())
+  {
+    return;
+  }
   double colorC[3] = { 1.0, 1.0, 1.0 };
   colorC[0] = this->Color[0] * 255;
   colorC[1] = this->Color[1] * 255;
@@ -353,6 +357,7 @@ void vtkTransferFunctionBoxItem::ComputeTexture()
     }
   }
   this->Texture->Modified();
+  this->InvokeEvent(vtkTransferFunctionBoxItem::BoxEditEvent);
 }
 
 //-------------------------------------------------------------------------------------------------

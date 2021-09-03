@@ -91,6 +91,14 @@ public:
   void SetActiveBox(vtkSmartPointer<vtkTransferFunctionBoxItem> box);
   ///@}
 
+  ///@{
+  /**
+   * Set active box color and alpha.
+   */
+  void SetActiveBoxColorAlpha(double r, double g, double b, double a);
+  void SetActiveBoxColorAlpha(double color[3], double alpha);
+  ///@}
+
   /**
    * Paint event for the chart, called whenever the chart needs to be drawn
    */

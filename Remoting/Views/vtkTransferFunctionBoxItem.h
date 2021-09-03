@@ -210,6 +210,7 @@ private:
   vtkRectd Box;
   double Color[3] = { 1, 1, 1 };
   double Alpha = 1.0;
+  vtkTimeStamp ColorAlphaMTime;
 
   vtkNew<vtkPen> Pen;
   vtkNew<vtkImageData> Texture;

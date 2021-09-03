@@ -271,6 +271,11 @@ public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
    */
   void setTransfer2DBoxes(const QList<QVariant>&);
 
+  /**
+   * Choose a color and alpha for the currently active 2D transfer function box.
+   */
+  void chooseBoxColorAlpha();
+
 Q_SIGNALS:
   /**
    * Signal fired when the xrgbPoints change.

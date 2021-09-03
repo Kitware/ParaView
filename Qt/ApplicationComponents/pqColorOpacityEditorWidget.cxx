@@ -51,6 +51,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqTransferFunctionWidget.h"
 #include "pqUndoStack.h"
 #include "vtkCommand.h"
+#include "vtkContextScene.h"
 #include "vtkDiscretizableColorTransferFunction.h"
 #include "vtkEventQtSlotConnect.h"
 #include "vtkImageData.h"
@@ -73,6 +74,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkWeakPointer.h"
 #include "vtk_jsoncpp.h"
 
+#include <QColorDialog>
 #include <QMessageBox>
 #include <QPainter>
 #include <QPointer>
@@ -387,6 +389,8 @@ pqColorOpacityEditorWidget::pqColorOpacityEditorWidget(
       this->showDataHistogramClicked(true);
     }
   });
+  QObject::connect(ui.ChooseBoxColor, &QAbstractButton::clicked, this,
+    &pqColorOpacityEditorWidget::chooseBoxColorAlpha);
   QObject::connect(ui.AdvancedButton, SIGNAL(clicked()), this, SLOT(updatePanel()));
 
   QObject::connect(
@@ -1331,6 +1335,7 @@ void pqColorOpacityEditorWidget::show2DHistogram(bool show)
   ui.ChoosePreset->setEnabled(!show);
   ui.SaveAsPreset->setEnabled(!show);
   ui.InvertTransferFunctions->setEnabled(!show);
+  ui.ChooseBoxColor->setVisible(show);
 
   ui.AutomaticDataHistogramComputation->setEnabled(show);
   ui.Transfer2DEditor->setVisible(show);
@@ -1569,5 +1574,35 @@ void pqColorOpacityEditorWidget::setTransfer2DBoxes(const QList<QVariant>& value
     color[2] = values[i + 6].toDouble();
     alpha = values[i + 7].toDouble();
     chart->AddNewBox(box, color, alpha);
+  }
+}
+
+//-----------------------------------------------------------------------------
+void pqColorOpacityEditorWidget::chooseBoxColorAlpha()
+{
+  Ui::ColorOpacityEditorWidget& ui = this->Internals->Ui;
+  vtkTransferFunctionChartHistogram2D* chart =
+    vtkTransferFunctionChartHistogram2D::SafeDownCast(ui.Transfer2DEditor->chart());
+  if (!chart->IsInitialized())
+  {
+    return;
+  }
+  auto activeBox = chart->GetActiveBox();
+  if (!activeBox)
+  {
+    vtkGenericWarningMacro("No transfer function box selected. Click on a box to select it.");
+    return;
+  }
+  double color[3];
+  activeBox->GetColor(color);
+  double alpha = activeBox->GetAlpha();
+
+  QColor initialColor;
+  initialColor.setRgbF(color[0], color[1], color[2], alpha);
+  QColor c = QColorDialog::getColor(
+    initialColor, this, tr("Choose box color"), QColorDialog::ShowAlphaChannel);
+  if (c.isValid())
+  {
+    chart->SetActiveBoxColorAlpha(c.redF(), c.greenF(), c.blueF(), c.alphaF());
   }
 }

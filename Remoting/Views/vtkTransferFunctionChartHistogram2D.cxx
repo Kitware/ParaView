@@ -330,6 +330,25 @@ void vtkTransferFunctionChartHistogram2D::SetActiveBox(
 }
 
 //-------------------------------------------------------------------------------------------------
+void vtkTransferFunctionChartHistogram2D::SetActiveBoxColorAlpha(
+  double r, double g, double b, double a)
+{
+  if (!this->ActiveBox)
+  {
+    return;
+  }
+  this->ActiveBox->SetColor(r, g, b);
+  this->ActiveBox->SetAlpha(a);
+  this->GetScene()->SetDirty(true);
+}
+
+//-------------------------------------------------------------------------------------------------
+void vtkTransferFunctionChartHistogram2D::SetActiveBoxColorAlpha(double color[3], double alpha)
+{
+  this->SetActiveBoxColorAlpha(color[0], color[1], color[2], alpha);
+}
+
+//-------------------------------------------------------------------------------------------------
 bool vtkTransferFunctionChartHistogram2D::KeyPressEvent(const vtkContextKeyEvent& key)
 {
   if (key.GetInteractor()->GetKeySym() == std::string("Delete") ||
