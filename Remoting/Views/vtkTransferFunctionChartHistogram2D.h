@@ -27,6 +27,7 @@
 class vtkContext2D;
 class vtkContextMouseEvent;
 class vtkImageData;
+class vtkPVDiscretizableColorTransferFunction;
 class vtkTransferFunctionBoxItem;
 
 class VTKREMOTINGVIEWS_EXPORT vtkTransferFunctionChartHistogram2D : public vtkChartHistogram2D
@@ -52,7 +53,9 @@ public:
    * Add a new box item to the chart
    */
   vtkSmartPointer<vtkTransferFunctionBoxItem> AddNewBox();
-  vtkSmartPointer<vtkTransferFunctionBoxItem> AddNewBox(vtkRectd& r, double color[3], double alpha);
+  vtkSmartPointer<vtkTransferFunctionBoxItem> AddNewBox(
+    const vtkRectd& r, double* color, double alpha);
+  void AddBox(vtkSmartPointer<vtkTransferFunctionBoxItem> box);
   ///@}
 
   /**
@@ -81,6 +84,14 @@ public:
    */
   virtual void SetTransferFunction2D(vtkImageData* transfer2D);
   virtual vtkImageData* GetTransferFunction2D();
+  ///@}
+
+  ///@{
+  /**
+   * Set/Get the transfer 2d boxes item.
+   */
+  virtual void SetTransfer2DBoxesItem(vtkPVDiscretizableColorTransferFunction* t2dBoxes);
+  virtual vtkPVDiscretizableColorTransferFunction* GetTransfer2DBoxesItem();
   ///@}
 
   ///@{
@@ -127,6 +138,7 @@ protected:
 
   // Member variables;
   vtkWeakPointer<vtkImageData> TransferFunction2D;
+  vtkWeakPointer<vtkPVDiscretizableColorTransferFunction> Transfer2DBoxesItem;
   vtkSmartPointer<vtkTransferFunctionBoxItem> ActiveBox;
   std::vector<int> BoxesToRemove;
 

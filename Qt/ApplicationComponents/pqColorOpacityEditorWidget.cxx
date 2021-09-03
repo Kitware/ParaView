@@ -52,10 +52,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqUndoStack.h"
 #include "vtkCommand.h"
 #include "vtkContextScene.h"
-#include "vtkDiscretizableColorTransferFunction.h"
 #include "vtkEventQtSlotConnect.h"
 #include "vtkImageData.h"
 #include "vtkNew.h"
+#include "vtkPVDiscretizableColorTransferFunction.h"
 #include "vtkPVXMLElement.h"
 #include "vtkPiecewiseFunction.h"
 #include "vtkSMCoreUtilities.h"
@@ -410,6 +410,8 @@ pqColorOpacityEditorWidget::pqColorOpacityEditorWidget(
   // if the user edits the 2D transfer function item
   QObject::connect(
     ui.Transfer2DEditor, SIGNAL(transferFunctionModified()), this, SLOT(transfer2DChanged()));
+  QObject::connect(ui.Transfer2DEditor, SIGNAL(transferFunctionModified()), this,
+    SIGNAL(transfer2DBoxesChanged()));
 
   vtkSMProperty* smproperty = smgroup->GetProperty("XRGBPoints");
   if (smproperty)
@@ -448,6 +450,12 @@ pqColorOpacityEditorWidget::pqColorOpacityEditorWidget(
   else
   {
     ui.Use2DTransferFunction->hide();
+  }
+
+  smproperty = smgroup->GetProperty("Transfer2DBoxes");
+  if (smproperty)
+  {
+    this->addPropertyLink(this, "transfer2DBoxes", SIGNAL(transfer2DBoxesChanged()), smproperty);
   }
 
   smproperty = smgroup->GetProperty("EnableOpacityMapping");
@@ -1513,7 +1521,9 @@ void pqColorOpacityEditorWidget::onRangeHandlesRangeChanged(double rangeMin, dou
 void pqColorOpacityEditorWidget::initializeTransfer2DEditor(vtkImageData* t2d)
 {
   Ui::ColorOpacityEditorWidget& ui = this->Internals->Ui;
-  ui.Transfer2DEditor->initialize(t2d);
+  vtkPVDiscretizableColorTransferFunction* ctf =
+    vtkPVDiscretizableColorTransferFunction::SafeDownCast(this->proxy()->GetClientSideObject());
+  ui.Transfer2DEditor->initialize(ctf, t2d);
 }
 
 //-----------------------------------------------------------------------------
@@ -1525,12 +1535,14 @@ void pqColorOpacityEditorWidget::transfer2DChanged()
 //-----------------------------------------------------------------------------
 QList<QVariant> pqColorOpacityEditorWidget::transfer2DBoxes() const
 {
+  vtkPVDiscretizableColorTransferFunction* stc =
+    vtkPVDiscretizableColorTransferFunction::SafeDownCast(this->proxy()->GetClientSideObject());
   QList<QVariant> values;
-  Ui::ColorOpacityEditorWidget& ui = this->Internals->Ui;
-  vtkChart* chart = ui.Transfer2DEditor->chart();
-  for (int i = 0; i < chart->GetNumberOfPlots(); ++i)
+  std::vector<vtkSmartPointer<vtkTransferFunctionBoxItem>> boxes =
+    stc->GetTransferFunction2DBoxes();
+  for (auto it = boxes.cbegin(); it < boxes.cend(); ++it)
   {
-    auto box = vtkTransferFunctionBoxItem::SafeDownCast(chart->GetPlot(i));
+    vtkSmartPointer<vtkTransferFunctionBoxItem> box = (*it);
     if (!box)
     {
       continue;
@@ -1538,43 +1550,64 @@ QList<QVariant> pqColorOpacityEditorWidget::transfer2DBoxes() const
     const vtkRectd r = box->GetBox();
     for (int j = 0; j < 4; ++j)
     {
-      values.push_back(r[i]);
+      values.push_back(r[j]);
     }
     const double* color = box->GetColor();
     for (int j = 0; j < 3; ++j)
     {
-      values.push_back(color[i]);
+      values.push_back(color[j]);
     }
     values.push_back(box->GetAlpha());
   }
+  // Ui::ColorOpacityEditorWidget& ui = this->Internals->Ui;
+  // vtkChart* chart = ui.Transfer2DEditor->chart();
+  // for (int i = 0; i < chart->GetNumberOfPlots(); ++i)
+  // {
+  //   auto box = vtkTransferFunctionBoxItem::SafeDownCast(chart->GetPlot(i));
+  //   if (!box)
+  //   {
+  //     continue;
+  //   }
+  //   const vtkRectd r = box->GetBox();
+  //   for (int j = 0; j < 4; ++j)
+  //   {
+  //     values.push_back(r[j]);
+  //   }
+  //   const double* color = box->GetColor();
+  //   for (int j = 0; j < 3; ++j)
+  //   {
+  //     values.push_back(color[j]);
+  //   }
+  //   values.push_back(box->GetAlpha());
+  // }
   return values;
 }
 
 //-----------------------------------------------------------------------------
 void pqColorOpacityEditorWidget::setTransfer2DBoxes(const QList<QVariant>& values)
 {
-  Ui::ColorOpacityEditorWidget& ui = this->Internals->Ui;
-  vtkTransferFunctionChartHistogram2D* chart =
-    vtkTransferFunctionChartHistogram2D::SafeDownCast(ui.Transfer2DEditor->chart());
-  if (!chart->IsInitialized())
-  {
-    return;
-  }
-  vtkRectd box;
-  double color[3];
-  double alpha;
-  for (int i = 0; i < values.size(); i = i + 8)
-  {
-    box.SetX(values[i].toDouble());
-    box.SetY(values[i + 1].toDouble());
-    box.SetWidth(values[i + 2].toDouble());
-    box.SetHeight(values[i + 3].toDouble());
-    color[0] = values[i + 4].toDouble();
-    color[1] = values[i + 5].toDouble();
-    color[2] = values[i + 6].toDouble();
-    alpha = values[i + 7].toDouble();
-    chart->AddNewBox(box, color, alpha);
-  }
+  //  Ui::ColorOpacityEditorWidget& ui = this->Internals->Ui;
+  //  vtkTransferFunctionChartHistogram2D* chart =
+  //    vtkTransferFunctionChartHistogram2D::SafeDownCast(ui.Transfer2DEditor->chart());
+  //  if (!chart->IsInitialized())
+  //  {
+  //    return;
+  //  }
+  //  vtkRectd box;
+  //  double color[3];
+  //  double alpha;
+  //  for (int i = 0; i < values.size(); i = i + 8)
+  //  {
+  //    box.SetX(values[i].toDouble());
+  //    box.SetY(values[i + 1].toDouble());
+  //    box.SetWidth(values[i + 2].toDouble());
+  //    box.SetHeight(values[i + 3].toDouble());
+  //    color[0] = values[i + 4].toDouble();
+  //    color[1] = values[i + 5].toDouble();
+  //    color[2] = values[i + 6].toDouble();
+  //    alpha = values[i + 7].toDouble();
+  //    chart->AddNewBox(box, color, alpha);
+  //  }
 }
 
 //-----------------------------------------------------------------------------

@@ -334,6 +334,11 @@ Q_SIGNALS:
    */
   void use2DTransferFunctionChanged();
 
+  /**
+   * Signal fired when the transfer function 2d boxes change.
+   */
+  void transfer2DBoxesChanged();
+
 protected Q_SLOTS:
   /**
    * slots called when the current point changes on the two internal

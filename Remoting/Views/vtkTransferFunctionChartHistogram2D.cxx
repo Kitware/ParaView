@@ -15,6 +15,7 @@
 #include "vtkTransferFunctionChartHistogram2D.h"
 
 // paraview includes
+#include "vtkPVDiscretizableColorTransferFunction.h"
 #include "vtkTransferFunctionBoxItem.h"
 
 // vtk includes
@@ -76,12 +77,16 @@ vtkSmartPointer<vtkTransferFunctionBoxItem> vtkTransferFunctionChartHistogram2D:
   double alpha = 1.0;
   auto boxItem = this->AddNewBox(box, color, alpha);
   this->SetActiveBox(boxItem);
+  if (this->Transfer2DBoxesItem)
+  {
+    this->Transfer2DBoxesItem->AddTransfer2DBox(boxItem);
+  }
   return boxItem;
 }
 
 //-------------------------------------------------------------------------------------------------
 vtkSmartPointer<vtkTransferFunctionBoxItem> vtkTransferFunctionChartHistogram2D::AddNewBox(
-  vtkRectd& box, double color[3], double alpha)
+  const vtkRectd& box, double* color, double alpha)
 {
   if (!this->IsInitialized())
   {
@@ -103,17 +108,27 @@ vtkSmartPointer<vtkTransferFunctionBoxItem> vtkTransferFunctionChartHistogram2D:
   boxItem->SetBox(box.GetX(), box.GetY(), box.GetWidth(), box.GetHeight());
   boxItem->SetColor(color);
   boxItem->SetAlpha(alpha);
-  // Add the observer to update the transfer function on interaction
-  boxItem->AddObserver(vtkTransferFunctionBoxItem::BoxAddEvent, this,
-    &vtkTransferFunctionChartHistogram2D::OnTransferFunctionBoxItemModified);
-  boxItem->AddObserver(vtkTransferFunctionBoxItem::BoxEditEvent, this,
-    &vtkTransferFunctionChartHistogram2D::OnTransferFunctionBoxItemModified);
-  boxItem->AddObserver(vtkTransferFunctionBoxItem::BoxSelectEvent, this,
-    &vtkTransferFunctionChartHistogram2D::OnTransferFunctionBoxItemModified);
-  boxItem->AddObserver(vtkTransferFunctionBoxItem::BoxDeleteEvent, this,
-    &vtkTransferFunctionChartHistogram2D::OnTransferFunctionBoxItemModified);
-  this->AddPlot(boxItem);
+  this->AddBox(boxItem);
   return boxItem;
+}
+
+//-------------------------------------------------------------------------------------------------
+void vtkTransferFunctionChartHistogram2D::AddBox(vtkSmartPointer<vtkTransferFunctionBoxItem> box)
+{
+  if (!this->IsInitialized() || !box)
+  {
+    return;
+  }
+  // Add the observer to update the transfer function on interaction
+  box->AddObserver(vtkTransferFunctionBoxItem::BoxAddEvent, this,
+    &vtkTransferFunctionChartHistogram2D::OnTransferFunctionBoxItemModified);
+  box->AddObserver(vtkTransferFunctionBoxItem::BoxEditEvent, this,
+    &vtkTransferFunctionChartHistogram2D::OnTransferFunctionBoxItemModified);
+  box->AddObserver(vtkTransferFunctionBoxItem::BoxSelectEvent, this,
+    &vtkTransferFunctionChartHistogram2D::OnTransferFunctionBoxItemModified);
+  box->AddObserver(vtkTransferFunctionBoxItem::BoxDeleteEvent, this,
+    &vtkTransferFunctionChartHistogram2D::OnTransferFunctionBoxItemModified);
+  this->AddPlot(box);
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -154,6 +169,20 @@ void vtkTransferFunctionChartHistogram2D::SetTransferFunction2D(vtkImageData* tr
 vtkImageData* vtkTransferFunctionChartHistogram2D::GetTransferFunction2D()
 {
   return this->TransferFunction2D.GetPointer();
+}
+
+//-------------------------------------------------------------------------------------------------
+void vtkTransferFunctionChartHistogram2D::SetTransfer2DBoxesItem(
+  vtkPVDiscretizableColorTransferFunction* t2dBoxes)
+{
+  this->Transfer2DBoxesItem = t2dBoxes;
+}
+
+//-------------------------------------------------------------------------------------------------
+vtkPVDiscretizableColorTransferFunction*
+vtkTransferFunctionChartHistogram2D::GetTransfer2DBoxesItem()
+{
+  return this->Transfer2DBoxesItem;
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -390,6 +419,10 @@ void vtkTransferFunctionChartHistogram2D::RemoveBox(vtkSmartPointer<vtkTransferF
   if (this->ActiveBox == box)
   {
     this->ActiveBox = nullptr;
+  }
+  if (this->Transfer2DBoxesItem)
+  {
+    this->Transfer2DBoxesItem->RemoveTransfer2DBox(box);
   }
 }
 

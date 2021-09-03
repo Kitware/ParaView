@@ -405,6 +405,71 @@ vtkImageData* vtkPVDiscretizableColorTransferFunction::GetTransferFunction2D() c
 }
 
 //-------------------------------------------------------------------------
+int vtkPVDiscretizableColorTransferFunction::AddTransfer2DBox(
+  double x, double y, double width, double height, double r, double g, double b, double a)
+{
+  vtkNew<vtkTransferFunctionBoxItem> boxItem;
+  boxItem->SetBox(x, y, width, height);
+  boxItem->SetColor(r, g, b);
+  boxItem->SetAlpha(a);
+  return this->AddTransfer2DBox(boxItem);
+}
+
+//-------------------------------------------------------------------------
+int vtkPVDiscretizableColorTransferFunction::AddTransfer2DBox(
+  double x, double y, double width, double height, double* color, double alpha)
+{
+  return this->AddTransfer2DBox(x, y, width, height, color[0], color[1], color[2], alpha);
+}
+
+//-------------------------------------------------------------------------
+int vtkPVDiscretizableColorTransferFunction::AddTransfer2DBox(
+  vtkSmartPointer<vtkTransferFunctionBoxItem> boxItem)
+{
+  this->TransferFunction2DBoxes.push_back(boxItem);
+  return static_cast<int>(this->TransferFunction2DBoxes.size()) - 1;
+}
+
+//-------------------------------------------------------------------------
+int vtkPVDiscretizableColorTransferFunction::RemoveTransfer2DBox(int n)
+{
+  if (static_cast<int>(this->TransferFunction2DBoxes.size()) <= n)
+  {
+    return -1;
+  }
+  this->TransferFunction2DBoxes.erase(this->TransferFunction2DBoxes.begin() + n - 1);
+  return n;
+}
+
+//-------------------------------------------------------------------------
+int vtkPVDiscretizableColorTransferFunction::RemoveTransfer2DBox(
+  vtkSmartPointer<vtkTransferFunctionBoxItem> box)
+{
+  int n = -1;
+  auto it =
+    std::find(this->TransferFunction2DBoxes.cbegin(), this->TransferFunction2DBoxes.cend(), box);
+  if (it != this->TransferFunction2DBoxes.cend())
+  {
+    n = std::distance(this->TransferFunction2DBoxes.cbegin(), it);
+    return this->RemoveTransfer2DBox(n);
+  }
+  return n;
+}
+
+//-------------------------------------------------------------------------
+void vtkPVDiscretizableColorTransferFunction::RemoveAllTransfer2DBoxes()
+{
+  this->TransferFunction2DBoxes.clear();
+}
+
+//-------------------------------------------------------------------------
+std::vector<vtkSmartPointer<vtkTransferFunctionBoxItem>>
+vtkPVDiscretizableColorTransferFunction::GetTransferFunction2DBoxes() const
+{
+  return this->TransferFunction2DBoxes;
+}
+
+//-------------------------------------------------------------------------
 void vtkPVDiscretizableColorTransferFunction::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);

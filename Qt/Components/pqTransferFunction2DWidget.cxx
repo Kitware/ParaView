@@ -36,7 +36,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqTimer.h"
 #include "vtkAxis.h"
 #include "vtkChartHistogram2D.h"
-#include "vtkColorTransferFunction.h"
 #include "vtkContextMouseEvent.h"
 #include "vtkContextScene.h"
 #include "vtkContextView.h"
@@ -48,6 +47,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkGenericOpenGLRenderWindow.h"
 #include "vtkImageData.h"
 #include "vtkObjectFactory.h"
+#include "vtkPVDiscretizableColorTransferFunction.h"
 #include "vtkPlotHistogram2D.h"
 #include "vtkPointData.h"
 #include "vtkTransferFunctionBoxItem.h"
@@ -69,6 +69,7 @@ public:
   vtkNew<vtkTransferFunctionChartHistogram2D> Chart;
   vtkNew<vtkContextView> ContextView;
   vtkNew<vtkEventQtSlotConnect> VTKConnect;
+  vtkWeakPointer<vtkPVDiscretizableColorTransferFunction> ColorTransferFunction;
 
   pqTimer Timer;
 
@@ -128,8 +129,9 @@ public:
     this->Chart->ClearPlots();
   }
 
-  void initialize(vtkImageData* transfer2D)
+  void initialize(vtkPVDiscretizableColorTransferFunction* ctf, vtkImageData* transfer2D)
   {
+    this->ColorTransferFunction = ctf;
     this->Chart->SetTransferFunction2D(transfer2D);
     if (this->Chart->IsInitialized())
     {
@@ -162,6 +164,21 @@ public:
     transferFunction->SetScaleToLog10();
     transferFunction->Build();
     this->Chart->SetTransferFunction(transferFunction);
+
+    if (this->ColorTransferFunction)
+    {
+      std::vector<vtkSmartPointer<vtkTransferFunctionBoxItem>> boxes =
+        this->ColorTransferFunction->GetTransferFunction2DBoxes();
+      for (auto it = boxes.cbegin(); it < boxes.cend(); ++it)
+      {
+        vtkSmartPointer<vtkTransferFunctionBoxItem> box = (*it);
+        if (!box)
+        {
+          continue;
+        }
+        this->Chart->AddBox(box);
+      }
+    }
   }
 };
 
@@ -205,9 +222,10 @@ void pqTransferFunction2DWidget::setHistogram(vtkImageData* histogram)
 }
 
 //-----------------------------------------------------------------------------
-void pqTransferFunction2DWidget::initialize(vtkImageData* transfer2D)
+void pqTransferFunction2DWidget::initialize(
+  vtkPVDiscretizableColorTransferFunction* ctf, vtkImageData* transfer2D)
 {
-  this->Internals->initialize(transfer2D);
+  this->Internals->initialize(ctf, transfer2D);
 
   pqCoreUtilities::connect(
     this->Internals->Chart, vtkCommand::MouseMoveEvent, this, SLOT(showUsageStatus()));
@@ -238,4 +256,10 @@ void pqTransferFunction2DWidget::showUsageStatus()
 vtkChart* pqTransferFunction2DWidget::chart() const
 {
   return this->Internals->Chart;
+}
+
+//-----------------------------------------------------------------------------
+vtkPVDiscretizableColorTransferFunction* pqTransferFunction2DWidget::colorTransferFunction() const
+{
+  return this->Internals->ColorTransferFunction;
 }

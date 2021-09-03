@@ -107,7 +107,7 @@ protected:
    */
   enum BoxCorners
   {
-    BOTTOM_LEFT,
+    BOTTOM_LEFT = 0,
     BOTTOM_RIGHT,
     TOP_RIGHT,
     TOP_LEFT,

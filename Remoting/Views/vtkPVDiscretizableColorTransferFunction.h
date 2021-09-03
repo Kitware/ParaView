@@ -28,12 +28,15 @@
 
 #include "vtkDiscretizableColorTransferFunction.h"
 
-#include "vtkRemotingViewsModule.h" // needed for export macro
+#include "vtkRemotingViewsModule.h"     // needed for export macro
+#include "vtkTransferFunctionBoxItem.h" // needed for ivar
+
+#include <vector> // needed for ivar
 
 class vtkAbstractArray;
 class vtkDoubleArray;
-class vtkVariantArray;
 class vtkImageData;
+class vtkVariantArray;
 
 class VTKREMOTINGVIEWS_EXPORT vtkPVDiscretizableColorTransferFunction
   : public vtkDiscretizableColorTransferFunction
@@ -92,11 +95,29 @@ public:
   virtual vtkImageData* GetTransferFunction2D() const;
   ///@}
 
+  ///@{
+  /**
+   * Add/Remove a transfer function box control to the 2D transfer function.
+   * Returns the index for the added box or -1 on error.
+   */
+  virtual int AddTransfer2DBox(
+    double x, double y, double width, double height, double r, double g, double b, double a);
+  virtual int AddTransfer2DBox(
+    double x, double y, double width, double height, double* color, double alpha);
+  virtual int AddTransfer2DBox(vtkSmartPointer<vtkTransferFunctionBoxItem> box);
+  virtual int RemoveTransfer2DBox(int n);
+  virtual int RemoveTransfer2DBox(vtkSmartPointer<vtkTransferFunctionBoxItem> box);
+  virtual void RemoveAllTransfer2DBoxes();
+  ///@}
+
+  /**
+   * Get access to the 2D transfer function boxes.
+   */
+  std::vector<vtkSmartPointer<vtkTransferFunctionBoxItem>> GetTransferFunction2DBoxes() const;
+
 protected:
   vtkPVDiscretizableColorTransferFunction();
   ~vtkPVDiscretizableColorTransferFunction() override;
-
-  vtkSmartPointer<vtkImageData> TransferFunction2D;
 
 private:
   vtkPVDiscretizableColorTransferFunction(const vtkPVDiscretizableColorTransferFunction&) = delete;
@@ -128,6 +149,12 @@ private:
    * Build time for this subclass.
    */
   vtkTimeStamp BuildTime;
+
+  /**
+   * 2D transfer function
+   */
+  vtkSmartPointer<vtkImageData> TransferFunction2D;
+  std::vector<vtkSmartPointer<vtkTransferFunctionBoxItem>> TransferFunction2DBoxes;
 };
 
 #endif
