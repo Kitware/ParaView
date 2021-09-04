@@ -410,8 +410,8 @@ int vtkPVDiscretizableColorTransferFunction::AddTransfer2DBox(
 {
   vtkNew<vtkTransferFunctionBoxItem> boxItem;
   boxItem->SetBox(x, y, width, height);
-  boxItem->SetColor(r, g, b);
-  boxItem->SetAlpha(a);
+  boxItem->SetBoxColor(r, g, b);
+  boxItem->SetBoxAlpha(a);
   return this->AddTransfer2DBox(boxItem);
 }
 

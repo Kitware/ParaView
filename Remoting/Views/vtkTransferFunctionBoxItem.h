@@ -76,16 +76,16 @@ public:
   /**
    * Set/Get the color to be used for this box.
    */
-  vtkSetVector3Macro(Color, double);
-  vtkGetVector3Macro(Color, double);
+  vtkSetVector3Macro(BoxColor, double);
+  vtkGetVector3Macro(BoxColor, double);
   ///@}
 
   ///@{
   /**
    * Set/Get the alpha to be used for this box.
    */
-  vtkSetMacro(Alpha, double);
-  vtkGetMacro(Alpha, double);
+  vtkSetMacro(BoxAlpha, double);
+  vtkGetMacro(BoxAlpha, double);
   ///@}
 
 protected:
@@ -208,9 +208,8 @@ private:
   vtkNew<vtkPoints2D> BoxPoints;
   const int NumPoints = 5;
   vtkRectd Box;
-  double Color[3] = { 1, 1, 1 };
-  double Alpha = 1.0;
-  vtkTimeStamp ColorAlphaMTime;
+  double BoxColor[3] = { 1, 1, 1 };
+  double BoxAlpha = 1.0;
 
   vtkNew<vtkPen> Pen;
   vtkNew<vtkImageData> Texture;

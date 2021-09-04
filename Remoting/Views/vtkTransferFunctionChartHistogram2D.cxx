@@ -106,8 +106,8 @@ vtkSmartPointer<vtkTransferFunctionBoxItem> vtkTransferFunctionChartHistogram2D:
   // histogram's range.
   boxItem->SetValidBounds(xRange[0], xRange[1], yRange[0], yRange[1]);
   boxItem->SetBox(box.GetX(), box.GetY(), box.GetWidth(), box.GetHeight());
-  boxItem->SetColor(color);
-  boxItem->SetAlpha(alpha);
+  boxItem->SetBoxColor(color);
+  boxItem->SetBoxAlpha(alpha);
   this->AddBox(boxItem);
   return boxItem;
 }
@@ -366,8 +366,8 @@ void vtkTransferFunctionChartHistogram2D::SetActiveBoxColorAlpha(
   {
     return;
   }
-  this->ActiveBox->SetColor(r, g, b);
-  this->ActiveBox->SetAlpha(a);
+  this->ActiveBox->SetBoxColor(r, g, b);
+  this->ActiveBox->SetBoxAlpha(a);
   this->GetScene()->SetDirty(true);
 }
 

@@ -336,11 +336,11 @@ void vtkTransferFunctionBoxItem::ComputeTexture()
     return;
   }
   double colorC[3] = { 1.0, 1.0, 1.0 };
-  colorC[0] = this->Color[0] * 255;
-  colorC[1] = this->Color[1] * 255;
-  colorC[2] = this->Color[2] * 255;
+  colorC[0] = this->BoxColor[0] * 255;
+  colorC[1] = this->BoxColor[1] * 255;
+  colorC[2] = this->BoxColor[2] * 255;
 
-  double amp = this->Alpha * 255;
+  double amp = this->BoxAlpha * 255;
   double sigma = 80.0;
   double expdenom = 2 * sigma * sigma;
 

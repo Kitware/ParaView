@@ -1552,12 +1552,12 @@ QList<QVariant> pqColorOpacityEditorWidget::transfer2DBoxes() const
     {
       values.push_back(r[j]);
     }
-    const double* color = box->GetColor();
+    const double* color = box->GetBoxColor();
     for (int j = 0; j < 3; ++j)
     {
       values.push_back(color[j]);
     }
-    values.push_back(box->GetAlpha());
+    values.push_back(box->GetBoxAlpha());
   }
   // Ui::ColorOpacityEditorWidget& ui = this->Internals->Ui;
   // vtkChart* chart = ui.Transfer2DEditor->chart();
@@ -1627,8 +1627,8 @@ void pqColorOpacityEditorWidget::chooseBoxColorAlpha()
     return;
   }
   double color[3];
-  activeBox->GetColor(color);
-  double alpha = activeBox->GetAlpha();
+  activeBox->GetBoxColor(color);
+  double alpha = activeBox->GetBoxAlpha();
 
   QColor initialColor;
   initialColor.setRgbF(color[0], color[1], color[2], alpha);
