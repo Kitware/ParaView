@@ -1538,7 +1538,7 @@ QList<QVariant> pqColorOpacityEditorWidget::transfer2DBoxes() const
   vtkPVDiscretizableColorTransferFunction* stc =
     vtkPVDiscretizableColorTransferFunction::SafeDownCast(this->proxy()->GetClientSideObject());
   QList<QVariant> values;
-  if (stc == nullptr)
+  if (stc == nullptr || !this->Internals->Ui.Transfer2DEditor->isInitialized())
   {
     return values;
   }

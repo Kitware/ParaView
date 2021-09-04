@@ -64,10 +64,13 @@ public:
   virtual void setHistogram(vtkImageData*);
   ///@}
 
+  ///@{
   /**
    * Initialize the pqTransferFunction2DWidget with a default box item.
    */
   void initialize(vtkPVDiscretizableColorTransferFunction*, vtkImageData*);
+  bool isInitialized();
+  ///@}
 
   /**
    * Get access to the internal chart.

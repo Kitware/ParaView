@@ -226,6 +226,11 @@ void pqTransferFunction2DWidget::setHistogram(vtkImageData* histogram)
 void pqTransferFunction2DWidget::initialize(
   vtkPVDiscretizableColorTransferFunction* ctf, vtkImageData* transfer2D)
 {
+  if (!transfer2D)
+  {
+    return;
+  }
+
   this->Internals->initialize(ctf, transfer2D);
 
   pqCoreUtilities::connect(
@@ -233,6 +238,12 @@ void pqTransferFunction2DWidget::initialize(
   pqCoreUtilities::connect(this->Internals->Chart,
     vtkTransferFunctionChartHistogram2D::TransferFunctionModified, this,
     SIGNAL(transferFunctionModified()));
+}
+
+//-----------------------------------------------------------------------------
+bool pqTransferFunction2DWidget::isInitialized()
+{
+  return this->Internals->Chart->IsInitialized();
 }
 
 //-----------------------------------------------------------------------------
