@@ -31,6 +31,7 @@
 #include "vtkPVLODVolume.h"
 #include "vtkPVRenderView.h"
 #include "vtkPartitionedDataSet.h"
+#include "vtkPointData.h"
 #include "vtkPolyDataMapper.h"
 #include "vtkRectilinearGrid.h"
 #include "vtkRenderer.h"
@@ -586,5 +587,14 @@ void vtkImageVolumeRepresentation::SelectColorArray2Component(int component)
 //----------------------------------------------------------------------------
 void vtkImageVolumeRepresentation::SetTransferFunction2D(vtkImageData* transfer2D)
 {
+  if (transfer2D)
+  {
+    vtkDataArray* arr = transfer2D->GetPointData()->GetScalars();
+    if (!arr)
+    {
+      transfer2D->SetDimensions(10, 10, 0);
+      transfer2D->AllocateScalars(VTK_FLOAT, 4);
+    }
+  }
   this->Property->SetTransferFunction2D(transfer2D);
 }
