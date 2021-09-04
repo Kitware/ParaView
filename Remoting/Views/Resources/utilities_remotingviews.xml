@@ -1188,7 +1188,6 @@
         </Documentation>
       </IntVectorProperty>
       <DoubleVectorProperty clean_command="RemoveAllTransfer2DBoxes"
-                            command="AddTransfer2DBox"
                             name="Transfer2DBoxes"
                             number_of_elements_per_command="8"
                             repeat_command="1">
