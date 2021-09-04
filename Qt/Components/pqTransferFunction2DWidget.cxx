@@ -133,6 +133,7 @@ public:
   {
     this->ColorTransferFunction = ctf;
     this->Chart->SetTransferFunction2D(transfer2D);
+    this->Chart->SetTransfer2DBoxesItem(ctf);
     if (this->Chart->IsInitialized())
     {
       this->Chart->AddNewBox();
