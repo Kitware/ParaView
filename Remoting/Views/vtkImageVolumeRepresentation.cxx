@@ -592,7 +592,7 @@ void vtkImageVolumeRepresentation::SetTransferFunction2D(vtkImageData* transfer2
     vtkDataArray* arr = transfer2D->GetPointData()->GetScalars();
     if (!arr)
     {
-      transfer2D->SetDimensions(10, 10, 0);
+      transfer2D->SetDimensions(10, 10, 1);
       transfer2D->AllocateScalars(VTK_FLOAT, 4);
     }
   }

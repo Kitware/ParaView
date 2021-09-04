@@ -155,6 +155,11 @@ void vtkTransferFunctionChartHistogram2D::SetInputData(vtkImageData* data, vtkId
     this->RecalculatePlotTransforms();
 
     UpdateItemsBounds(xMin, xMax, yMin, yMax);
+
+    if (this->TransferFunction2D)
+    {
+      this->GenerateTransfer2D();
+    }
   }
   this->Superclass::SetInputData(data, z);
 }
@@ -211,12 +216,6 @@ void vtkTransferFunctionChartHistogram2D::GenerateTransfer2D()
     return;
   }
   const vtkIdType numPlots = this->GetNumberOfPlots();
-  if (numPlots < 2)
-  {
-    // the first plot will be the histogram plot
-    // i.e. no transfer2D boxes
-    return;
-  }
 
   vtkSmartPointer<vtkImageData> histogram =
     vtkPlotHistogram2D::SafeDownCast(this->GetPlot(0))->GetInputImageData();
