@@ -1569,10 +1569,22 @@ QList<QVariant> pqColorOpacityEditorWidget::transfer2DBoxes() const
 //-----------------------------------------------------------------------------
 void pqColorOpacityEditorWidget::setTransfer2DBoxes(const QList<QVariant>& values)
 {
-  Q_UNUSED(values);
-  // Since the vtkColorTransferFunction connected to the widget is directly obtained
-  // from the proxy, we don't need to do anything here. The widget will be
-  // updated when the proxy updates.
+  vtkPVDiscretizableColorTransferFunction* stc =
+    vtkPVDiscretizableColorTransferFunction::SafeDownCast(this->proxy()->GetClientSideObject());
+  if (stc == nullptr)
+  {
+    return;
+  }
+  for (int i = 0; i < values.size(); i = i + 8)
+  {
+    stc->AddTransfer2DBox(values[i].toDouble(), values[i + 1].toDouble(), values[i + 2].toDouble(),
+      values[i + 3].toDouble(), values[i + 4].toDouble(), values[i + 5].toDouble(),
+      values[i + 6].toDouble(), values[i + 7].toDouble());
+  }
+  // Q_UNUSED(values);
+  //// Since the vtkColorTransferFunction connected to the widget is directly obtained
+  //// from the proxy, we don't need to do anything here. The widget will be
+  //// updated when the proxy updates.
 }
 
 //-----------------------------------------------------------------------------
