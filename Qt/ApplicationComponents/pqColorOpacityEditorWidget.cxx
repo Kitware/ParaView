@@ -1538,6 +1538,10 @@ QList<QVariant> pqColorOpacityEditorWidget::transfer2DBoxes() const
   vtkPVDiscretizableColorTransferFunction* stc =
     vtkPVDiscretizableColorTransferFunction::SafeDownCast(this->proxy()->GetClientSideObject());
   QList<QVariant> values;
+  if (stc == nullptr)
+  {
+    return values;
+  }
   std::vector<vtkSmartPointer<vtkTransferFunctionBoxItem>> boxes =
     stc->GetTransferFunction2DBoxes();
   for (auto it = boxes.cbegin(); it < boxes.cend(); ++it)
@@ -1559,55 +1563,16 @@ QList<QVariant> pqColorOpacityEditorWidget::transfer2DBoxes() const
     }
     values.push_back(box->GetBoxAlpha());
   }
-  // Ui::ColorOpacityEditorWidget& ui = this->Internals->Ui;
-  // vtkChart* chart = ui.Transfer2DEditor->chart();
-  // for (int i = 0; i < chart->GetNumberOfPlots(); ++i)
-  // {
-  //   auto box = vtkTransferFunctionBoxItem::SafeDownCast(chart->GetPlot(i));
-  //   if (!box)
-  //   {
-  //     continue;
-  //   }
-  //   const vtkRectd r = box->GetBox();
-  //   for (int j = 0; j < 4; ++j)
-  //   {
-  //     values.push_back(r[j]);
-  //   }
-  //   const double* color = box->GetColor();
-  //   for (int j = 0; j < 3; ++j)
-  //   {
-  //     values.push_back(color[j]);
-  //   }
-  //   values.push_back(box->GetAlpha());
-  // }
   return values;
 }
 
 //-----------------------------------------------------------------------------
 void pqColorOpacityEditorWidget::setTransfer2DBoxes(const QList<QVariant>& values)
 {
-  //  Ui::ColorOpacityEditorWidget& ui = this->Internals->Ui;
-  //  vtkTransferFunctionChartHistogram2D* chart =
-  //    vtkTransferFunctionChartHistogram2D::SafeDownCast(ui.Transfer2DEditor->chart());
-  //  if (!chart->IsInitialized())
-  //  {
-  //    return;
-  //  }
-  //  vtkRectd box;
-  //  double color[3];
-  //  double alpha;
-  //  for (int i = 0; i < values.size(); i = i + 8)
-  //  {
-  //    box.SetX(values[i].toDouble());
-  //    box.SetY(values[i + 1].toDouble());
-  //    box.SetWidth(values[i + 2].toDouble());
-  //    box.SetHeight(values[i + 3].toDouble());
-  //    color[0] = values[i + 4].toDouble();
-  //    color[1] = values[i + 5].toDouble();
-  //    color[2] = values[i + 6].toDouble();
-  //    alpha = values[i + 7].toDouble();
-  //    chart->AddNewBox(box, color, alpha);
-  //  }
+  Q_UNUSED(values);
+  // Since the vtkColorTransferFunction connected to the widget is directly obtained
+  // from the proxy, we don't need to do anything here. The widget will be
+  // updated when the proxy updates.
 }
 
 //-----------------------------------------------------------------------------
