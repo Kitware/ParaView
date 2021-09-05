@@ -431,33 +431,6 @@ pqColorOpacityEditorWidget::pqColorOpacityEditorWidget(
       this, "scalarOpacityFunctionProxy", SIGNAL(scalarOpacityFunctionProxyChanged()), smproperty);
   }
 
-  ui.Transfer2DEditor->hide();
-  smproperty = smgroup->GetProperty("TransferFunction2D");
-  if (smproperty)
-  {
-    this->addPropertyLink(
-      this, "transferFunction2DProxy", SIGNAL(transferFunction2DProxyChanged()), smproperty);
-  }
-
-  smproperty = smgroup->GetProperty("Use2DTransferFunction");
-  if (smproperty)
-  {
-    this->addPropertyLink(
-      this, "use2DTransferFunction", SIGNAL(use2DTransferFunctionChanged()), smproperty);
-    QObject::connect(
-      ui.Use2DTransferFunction, SIGNAL(clicked(bool)), this, SLOT(show2DHistogram(bool)));
-  }
-  else
-  {
-    ui.Use2DTransferFunction->hide();
-  }
-
-  smproperty = smgroup->GetProperty("Transfer2DBoxes");
-  if (smproperty)
-  {
-    this->addPropertyLink(this, "transfer2DBoxes", SIGNAL(transfer2DBoxesChanged()), smproperty);
-  }
-
   smproperty = smgroup->GetProperty("EnableOpacityMapping");
   if (smproperty)
   {
@@ -519,9 +492,11 @@ pqColorOpacityEditorWidget::pqColorOpacityEditorWidget(
     ui.AutomaticDataHistogramComputation->hide();
   }
 
+  int numBins = 10;
   smproperty = smgroup->GetProperty("DataHistogramNumberOfBins");
   if (smproperty)
   {
+    numBins = vtkSMPropertyHelper(smproperty).GetAsInt();
     this->addPropertyLink(
       this, "dataHistogramNumberOfBins", SIGNAL(dataHistogramNumberOfBinsEdited()), smproperty);
     QObject::connect(ui.DataHistogramNumberOfBins, SIGNAL(valueEdited(int)), this,
@@ -532,6 +507,67 @@ pqColorOpacityEditorWidget::pqColorOpacityEditorWidget(
     ui.DataHistogramNumberOfBins->hide();
   }
 
+  ui.Transfer2DEditor->hide();
+  smproperty = smgroup->GetProperty("TransferFunction2D");
+  if (smproperty)
+  {
+    this->addPropertyLink(
+      this, "transferFunction2DProxy", SIGNAL(transferFunction2DProxyChanged()), smproperty);
+    smproperty = smgroup->GetProperty("Transfer2DRange");
+    if (smproperty)
+    {
+      double values[4];
+      vtkSMPropertyHelper(smproperty).Get(values, 4);
+      vtkSmartPointer<vtkImageData> im =
+        vtkImageData::SafeDownCast(this->transferFunction2DProxy()->GetClientSideObject());
+      if (!im)
+      {
+        return;
+      }
+      im->SetOrigin(values[0], values[2], 0.0);
+      im->SetDimensions(numBins, numBins, 1);
+      im->SetSpacing((values[1] - values[0]) / numBins, (values[3] - values[2]) / numBins, 1.0);
+      QObject::connect(
+        ui.Transfer2DEditor, &pqTransferFunction2DWidget::transferFunctionModified, this, [=]() {
+          vtkSmartPointer<vtkImageData> im =
+            vtkImageData::SafeDownCast(this->transferFunction2DProxy()->GetClientSideObject());
+          if (!im)
+          {
+            return;
+          }
+          double origin[3], spacing[3];
+          int dims[3];
+          im->GetOrigin(origin);
+          im->GetDimensions(dims);
+          im->GetSpacing(spacing);
+          double values[4];
+          values[0] = origin[0];
+          values[1] = origin[0] + dims[0] * spacing[0];
+          values[2] = origin[1];
+          values[3] = origin[1] + dims[1] * spacing[1];
+          vtkSMPropertyHelper(this->proxy(), "Transfer2DRange").Set(values, 4);
+        });
+    }
+  }
+
+  smproperty = smgroup->GetProperty("Use2DTransferFunction");
+  if (smproperty)
+  {
+    this->addPropertyLink(
+      this, "use2DTransferFunction", SIGNAL(use2DTransferFunctionChanged()), smproperty);
+    QObject::connect(
+      ui.Use2DTransferFunction, SIGNAL(clicked(bool)), this, SLOT(show2DHistogram(bool)));
+  }
+  else
+  {
+    ui.Use2DTransferFunction->hide();
+  }
+
+  smproperty = smgroup->GetProperty("Transfer2DBoxes");
+  if (smproperty)
+  {
+    this->addPropertyLink(this, "transfer2DBoxes", SIGNAL(transfer2DBoxesChanged()), smproperty);
+  }
   // Manage histogram computation if enabled
   // When creating the widget, we consider that the cost of recomputing the histogram table
   // can be paid systematically

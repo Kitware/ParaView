@@ -1187,6 +1187,16 @@
           Proxy only property used by the ColorOpacityWidget to know if a 2D transfer function is being used.
         </Documentation>
       </IntVectorProperty>
+      <DoubleVectorProperty name="Transfer2DRange"
+                            number_of_elements_per_command="4"
+                            repeat_command="0"
+                            panel_visibility="never"
+                            number_of_elements="4"
+                            default_values="0 1 0 1">
+        <Documentation>
+          Proxy only property used by the TransferFunction2DWidget to synchronize range between states.
+        </Documentation>
+      </DoubleVectorProperty>
       <DoubleVectorProperty clean_command="RemoveAllTransfer2DBoxes"
                             name="Transfer2DBoxes"
                             number_of_elements_per_command="8"
@@ -1467,6 +1477,7 @@
         <Property name="TransferFunction2D" function="TransferFunction2D" />
         <Property name="Use2DTransferFunction" function="Use2DTransferFunction" />
         <Property name="Transfer2DBoxes" function="Transfer2DBoxes" />
+        <Property name="Transfer2DRange" function="Transfer2DRange" />
         <Property name="UseLogScale" function="UseLogScale" />
         <Property name="UseOpacityControlPointsFreehandDrawing" function="UseOpacityControlPointsFreehandDrawing" />
         <Property name="ShowDataHistogram" function="ShowDataHistogram" />

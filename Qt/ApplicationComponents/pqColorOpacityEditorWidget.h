@@ -94,6 +94,8 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqColorOpacityEditorWidget : public pqPrope
     pqSMProxy transferFunction2DProxy READ transferFunction2DProxy WRITE setTransferFunction2DProxy)
   Q_PROPERTY(bool use2DTransferFunction READ use2DTransferFunction WRITE setUse2DTransferFunction)
   Q_PROPERTY(QList<QVariant> transfer2DBoxes READ transfer2DBoxes WRITE setTransfer2DBoxes)
+  // Q_PROPERTY(QList<QVariant> transfer2DRange READ transfer2DRange WRITE setTransfer2DRange)
+
   typedef pqPropertyWidget Superclass;
 
 public:
