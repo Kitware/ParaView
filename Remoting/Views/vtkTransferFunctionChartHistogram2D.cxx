@@ -162,7 +162,7 @@ void vtkTransferFunctionChartHistogram2D::SetInputData(vtkImageData* data, vtkId
         this->Transfer2DBoxesItem->GetTransferFunction2DBoxes();
       for (auto it = boxes.begin(); it < boxes.end(); ++it)
       {
-        vtkSmartPointer<vtkTransferFunctionBoxItem> box = *it;
+        vtkSmartPointer<vtkTransferFunctionBoxItem> box = *(it);
         if (!box)
         {
           continue;

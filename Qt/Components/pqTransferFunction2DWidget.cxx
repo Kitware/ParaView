@@ -102,7 +102,7 @@ public:
     this->Chart->SetActionToButton(vtkChart::ZOOM, -1);
 
     this->Chart->SetRenderEmpty(true);
-    this->Chart->SetAutoAxes(false);
+    this->Chart->SetAutoAxes(true);
     this->Chart->SetHiddenAxisBorder(8);
     auto axis = this->Chart->GetAxis(vtkAxis::BOTTOM);
     axis->SetTitle("Scalar Value");
