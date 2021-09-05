@@ -71,10 +71,6 @@ public Q_SLOTS:
 
 private Q_SLOTS:
   void updatePanel();
-  void fillCellLabels();
-  void fillPointLabels();
-  void cellLabelSelected(QAction*);
-  void pointLabelSelected(QAction*);
   void editLabelPropertiesSelection();
   void editLabelPropertiesInteractiveSelection();
   void showFrustum(bool);

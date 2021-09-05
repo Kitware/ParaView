@@ -90,13 +90,20 @@ public:
     this->Ui.cellLabelsButton->setMenu(&this->CellLabelsMenu);
     this->Ui.pointLabelsButton->setMenu(&this->PointLabelsMenu);
 
-    self->connect(&this->CellLabelsMenu, SIGNAL(aboutToShow()), SLOT(fillCellLabels()));
-    self->connect(
-      &this->CellLabelsMenu, SIGNAL(triggered(QAction*)), SLOT(cellLabelSelected(QAction*)));
+    QObject::connect(&this->CellLabelsMenu, &QMenu::aboutToShow,
+      [this]() { this->fillLabels(vtkDataObject::FIELD_ASSOCIATION_CELLS); });
+    QObject::connect(&this->CellLabelsMenu, &QMenu::triggered, [this](QAction* actn) {
+      vtkSMInteractiveSelectionPipeline::GetInstance()->GetOrCreateSelectionRepresentation();
+      this->labelBy(vtkDataObject::FIELD_ASSOCIATION_CELLS, actn);
+    });
 
-    self->connect(&this->PointLabelsMenu, SIGNAL(aboutToShow()), SLOT(fillPointLabels()));
-    self->connect(
-      &this->PointLabelsMenu, SIGNAL(triggered(QAction*)), SLOT(pointLabelSelected(QAction*)));
+    QObject::connect(&this->PointLabelsMenu, &QMenu::aboutToShow,
+      [this]() { this->fillLabels(vtkDataObject::FIELD_ASSOCIATION_POINTS); });
+    QObject::connect(&this->PointLabelsMenu, &QMenu::triggered, [this](QAction* actn) {
+      vtkSMInteractiveSelectionPipeline::GetInstance()->GetOrCreateSelectionRepresentation();
+      this->labelBy(vtkDataObject::FIELD_ASSOCIATION_POINTS, actn);
+    });
+
     self->connect(
       this->Ui.labelPropertiesSelection, SIGNAL(clicked()), SLOT(editLabelPropertiesSelection()));
     self->connect(this->Ui.labelPropertiesInteractiveSelection, SIGNAL(clicked()),
@@ -202,19 +209,21 @@ public:
       ? "SelectionCellLabelVisibility"
       : "SelectionPointLabelVisibility";
 
-    QString cur_array;
+    QString arrayName;
     if (vtkSMPropertyHelper(repr->getProxy(), vname.toUtf8().data(), true).GetAsInt() != 0)
     {
-      cur_array =
+      arrayName =
         vtkSMPropertyHelper(repr->getProxy(), pname.toUtf8().data(), /*quiet=*/true).GetAsString();
     }
 
-    foreach (QAction* action, menu.actions())
+    bool found = false;
+    for (QAction* action : menu.actions())
     {
       action->setCheckable(true);
-      if (cur_array.isEmpty() == false && action->data().toString() == cur_array)
+      if (arrayName.isEmpty() == false && action->data().toString() == arrayName)
       {
         action->setChecked(true);
+        found = true;
       }
     }
   }
@@ -467,32 +476,6 @@ void pqFindDataSelectionDisplayFrame::setSelectedPort(pqOutputPort* port)
     this->connect(
       port, SIGNAL(visibilityChanged(pqOutputPort*, pqDataRepresentation*)), SLOT(updatePanel()));
   }
-}
-
-//-----------------------------------------------------------------------------
-void pqFindDataSelectionDisplayFrame::fillCellLabels()
-{
-  this->Internals->fillLabels(vtkDataObject::FIELD_ASSOCIATION_CELLS);
-}
-
-//-----------------------------------------------------------------------------
-void pqFindDataSelectionDisplayFrame::fillPointLabels()
-{
-  this->Internals->fillLabels(vtkDataObject::FIELD_ASSOCIATION_POINTS);
-}
-
-//-----------------------------------------------------------------------------
-void pqFindDataSelectionDisplayFrame::cellLabelSelected(QAction* act)
-{
-  vtkSMInteractiveSelectionPipeline::GetInstance()->GetOrCreateSelectionRepresentation();
-  this->Internals->labelBy(vtkDataObject::FIELD_ASSOCIATION_CELLS, act);
-}
-
-//-----------------------------------------------------------------------------
-void pqFindDataSelectionDisplayFrame::pointLabelSelected(QAction* act)
-{
-  vtkSMInteractiveSelectionPipeline::GetInstance()->GetOrCreateSelectionRepresentation();
-  this->Internals->labelBy(vtkDataObject::FIELD_ASSOCIATION_POINTS, act);
 }
 
 //-----------------------------------------------------------------------------
