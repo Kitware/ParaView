@@ -610,69 +610,64 @@ void pqFindDataSelectionDisplayFrame::editLabelPropertiesSelection()
 void pqFindDataSelectionDisplayFrame::onDataUpdated()
 {
   // remove a label array name that does not exist anymore
-  int fieldAssociations[] = { vtkDataObject::FIELD_ASSOCIATION_CELLS,
-    vtkDataObject::FIELD_ASSOCIATION_POINTS };
-  const char* selectionArrayNames[] = { "SelectionCellFieldDataArrayName",
-    "SelectionPointFieldDataArrayName" };
-  const char* selectionVisibilityNames[] = { "SelectionCellLabelVisibility",
-    "SelectionPointLabelVisibility" };
-  const char* iSelectionArrayNames[] = { "CellFieldDataArrayName", "PointFieldDataArrayName" };
-  const char* iSelectionVisibilityNames[] = { "CellLabelVisibility", "PointLabelVisibility" };
+  auto& internals = (*this->Internals);
+  auto updateLabels = [&internals](
+    vtkSMProxy* repr, int fieldAssociation, const std::string& prefix) {
+    const auto arrayNameProperty = prefix +
+      (fieldAssociation == vtkDataObject::FIELD_ASSOCIATION_CELLS ? "Cell" : "Point") +
+      "FieldDataArrayName";
+    const auto visibilityProperty = prefix +
+      (fieldAssociation == vtkDataObject::FIELD_ASSOCIATION_CELLS ? "Cell" : "Point") +
+      "LabelVisibility";
 
-  pqDataRepresentation* pqrepresentation =
-    this->Internals->Port->getRepresentation(this->Internals->View);
-  if (!pqrepresentation)
-  {
-    return;
-  }
-  vtkSMProxy* selectionRepresentation = pqrepresentation->getProxy();
-  vtkSMProxy* iSelectionRepresentation =
-    vtkSMInteractiveSelectionPipeline::GetInstance()->GetOrCreateSelectionRepresentation();
-  for (int i = 0; i < 2; ++i)
-  {
-    int fieldAssociation = fieldAssociations[i];
-    const char* iSelectionVisibilityName = iSelectionVisibilityNames[i];
-    const char* iSelectionArrayName = iSelectionArrayNames[i];
-    const char* selectionVisibilityName = selectionVisibilityNames[i];
-    const char* selectionArrayName = selectionArrayNames[i];
-
-    QString arrayName;
-    if (vtkSMPropertyHelper(selectionRepresentation, selectionVisibilityName, true).GetAsInt() != 0)
+    vtkSMPropertyHelper visibilityHelper(repr, visibilityProperty.c_str(), /*quiet=*/true);
+    if (visibilityHelper.GetAsInt() == 0)
     {
-      arrayName = vtkSMPropertyHelper(selectionRepresentation, selectionArrayName,
-                    /*quiet=*/true)
-                    .GetAsString();
+      return;
     }
-    if (!arrayName.isEmpty())
+
+    vtkSMPropertyHelper arrayNameHelper(repr, arrayNameProperty.c_str(), /*quiet=*/true);
+    const std::string arrayName =
+      arrayNameHelper.GetAsString() ? arrayNameHelper.GetAsString() : "";
+    if (!arrayName.empty())
     {
-      vtkPVDataSetAttributesInformation* attrInfo =
-        this->Internals->attributeInformation(fieldAssociation);
-      if (!attrInfo)
+      // note, these are not part of the input data and hence will never be
+      // present in the data information, but are always available after
+      // "extract selection".
+      if ((fieldAssociation == vtkDataObject::FIELD_ASSOCIATION_CELLS &&
+            arrayName == "vtkOriginalCellIds") ||
+        (fieldAssociation == vtkDataObject::FIELD_ASSOCIATION_POINTS &&
+            arrayName == "vtkOriginalPointIds"))
       {
         return;
       }
 
-      bool found = false;
-      for (int cc = 0; cc < attrInfo->GetNumberOfArrays(); cc++)
+      auto dsaInfo = internals.attributeInformation(fieldAssociation);
+      if (dsaInfo && dsaInfo->GetArrayInformation(arrayName.c_str()) != nullptr)
       {
-        vtkPVArrayInformation* arrayInfo = attrInfo->GetArrayInformation(cc);
-        if (arrayName == arrayInfo->GetName())
-        {
-          found = true;
-          break;
-        }
-      }
-      if (!found)
-      {
-        // update selection representation
-        vtkSMPropertyHelper(selectionRepresentation, selectionVisibilityName, true).Set(0);
-        vtkSMPropertyHelper(selectionRepresentation, selectionArrayName, /*quiet=*/true).Set("");
-        selectionRepresentation->UpdateVTKObjects();
-        // update interactive selection representation
-        vtkSMPropertyHelper(iSelectionRepresentation, iSelectionVisibilityName, true).Set(0);
-        vtkSMPropertyHelper(iSelectionRepresentation, iSelectionArrayName, /*quiet=*/true).Set("");
-        iSelectionRepresentation->UpdateVTKObjects();
+        // all's well. no need to stop showing these labels.
+        return;
       }
     }
+
+    // hide the labels. they don't exist anymore.
+    visibilityHelper.Set(0);
+    arrayNameHelper.Set("");
+    repr->UpdateVTKObjects();
+  };
+
+  if (auto selectionRepresentation = internals.Port->getRepresentation(internals.View))
+  {
+    updateLabels(
+      selectionRepresentation->getProxy(), vtkDataObject::FIELD_ASSOCIATION_CELLS, "Selection");
+    updateLabels(
+      selectionRepresentation->getProxy(), vtkDataObject::FIELD_ASSOCIATION_POINTS, "Selection");
+  }
+
+  if (auto iSelectionRepresentation =
+        vtkSMInteractiveSelectionPipeline::GetInstance()->GetSelectionRepresentation())
+  {
+    updateLabels(iSelectionRepresentation, vtkDataObject::FIELD_ASSOCIATION_CELLS, {});
+    updateLabels(iSelectionRepresentation, vtkDataObject::FIELD_ASSOCIATION_POINTS, {});
   }
 }
