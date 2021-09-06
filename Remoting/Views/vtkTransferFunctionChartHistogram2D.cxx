@@ -150,9 +150,9 @@ void vtkTransferFunctionChartHistogram2D::SetInputData(vtkImageData* data, vtkId
 
     // Compute image bounds
     const double xMin = origin[0];
-    const double xMax = bins[0] * spacing[0];
+    const double xMax = origin[0] + bins[0] * spacing[0];
     const double yMin = origin[1];
-    const double yMax = bins[1] * spacing[1];
+    const double yMax = origin[1] + bins[1] * spacing[1];
 
     auto axis = GetAxis(vtkAxis::BOTTOM);
     axis->SetUnscaledRange(xMin, xMax);
@@ -162,6 +162,10 @@ void vtkTransferFunctionChartHistogram2D::SetInputData(vtkImageData* data, vtkId
 
     UpdateItemsBounds(xMin, xMax, yMin, yMax);
 
+    // Set the histogram and initialize the chart
+    this->Superclass::SetInputData(data, z);
+
+    // Now add the transfer function boxes from the color function
     if (this->Transfer2DBoxesItem)
     {
       std::vector<vtkSmartPointer<vtkTransferFunctionBoxItem>> boxes =
@@ -173,6 +177,7 @@ void vtkTransferFunctionChartHistogram2D::SetInputData(vtkImageData* data, vtkId
         {
           continue;
         }
+        box->SetValidBounds(xMin, xMax, yMin, yMax);
         this->AddBox(box);
       }
     }
@@ -182,7 +187,6 @@ void vtkTransferFunctionChartHistogram2D::SetInputData(vtkImageData* data, vtkId
       this->GenerateTransfer2D();
     }
   }
-  this->Superclass::SetInputData(data, z);
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -257,9 +261,9 @@ void vtkTransferFunctionChartHistogram2D::GenerateTransfer2D()
   int dims[3];
   histogram->GetDimensions(dims);
 
-  // im->SetOrigin(origin);
-  // im->SetSpacing(spacing);
   this->TransferFunction2D->SetDimensions(dims);
+  this->TransferFunction2D->SetOrigin(origin);
+  this->TransferFunction2D->SetSpacing(spacing);
   this->TransferFunction2D->AllocateScalars(VTK_FLOAT, 4);
   auto arr = vtkFloatArray::SafeDownCast(this->TransferFunction2D->GetPointData()->GetScalars());
   auto arrRange = vtk::DataArrayValueRange(arr);
