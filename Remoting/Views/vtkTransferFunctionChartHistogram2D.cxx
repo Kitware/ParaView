@@ -119,6 +119,12 @@ void vtkTransferFunctionChartHistogram2D::AddBox(vtkSmartPointer<vtkTransferFunc
   {
     return;
   }
+  // Check if the chart already contains the box
+  if (this->GetPlotIndex(box) > -1)
+  {
+    // Plot index other than -1 indicates the chart already has the box
+    return;
+  }
   // Add the observer to update the transfer function on interaction
   box->AddObserver(vtkTransferFunctionBoxItem::BoxAddEvent, this,
     &vtkTransferFunctionChartHistogram2D::OnTransferFunctionBoxItemModified);
