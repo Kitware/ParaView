@@ -1614,11 +1614,27 @@ void pqColorOpacityEditorWidget::setTransfer2DBoxes(const QList<QVariant>& value
   {
     return;
   }
+  double validBounds[4] = { 0, 1, 0, 1 };
+  vtkSmartPointer<vtkImageData> im =
+    vtkImageData::SafeDownCast(this->transferFunction2DProxy()->GetClientSideObject());
+  if (im)
+  {
+    double origin[3], spacing[3];
+    int dims[3];
+    im->GetOrigin(origin);
+    im->GetDimensions(dims);
+    im->GetSpacing(spacing);
+    validBounds[0] = origin[0];
+    validBounds[1] = origin[0] + dims[0] * spacing[0];
+    validBounds[2] = origin[1];
+    validBounds[3] = origin[1] + dims[1] * spacing[1];
+  }
   for (int i = 0; i < values.size(); i = i + 8)
   {
     stc->AddTransfer2DBox(values[i].toDouble(), values[i + 1].toDouble(), values[i + 2].toDouble(),
       values[i + 3].toDouble(), values[i + 4].toDouble(), values[i + 5].toDouble(),
-      values[i + 6].toDouble(), values[i + 7].toDouble());
+      values[i + 6].toDouble(), values[i + 7].toDouble(), validBounds[0], validBounds[1],
+      validBounds[2], validBounds[3]);
   }
   // Q_UNUSED(values);
   //// Since the vtkColorTransferFunction connected to the widget is directly obtained

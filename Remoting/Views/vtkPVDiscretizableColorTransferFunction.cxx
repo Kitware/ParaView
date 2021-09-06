@@ -405,10 +405,12 @@ vtkImageData* vtkPVDiscretizableColorTransferFunction::GetTransferFunction2D() c
 }
 
 //-------------------------------------------------------------------------
-int vtkPVDiscretizableColorTransferFunction::AddTransfer2DBox(
-  double x, double y, double width, double height, double r, double g, double b, double a)
+int vtkPVDiscretizableColorTransferFunction::AddTransfer2DBox(double x, double y, double width,
+  double height, double r, double g, double b, double a, double rangexmin, double rangexmax,
+  double rangeymin, double rangeymax)
 {
   vtkNew<vtkTransferFunctionBoxItem> boxItem;
+  boxItem->SetValidBounds(rangexmin, rangexmax, rangeymin, rangeymax);
   boxItem->SetBox(x, y, width, height);
   boxItem->SetBoxColor(r, g, b);
   boxItem->SetBoxAlpha(a);
@@ -417,9 +419,10 @@ int vtkPVDiscretizableColorTransferFunction::AddTransfer2DBox(
 
 //-------------------------------------------------------------------------
 int vtkPVDiscretizableColorTransferFunction::AddTransfer2DBox(
-  double x, double y, double width, double height, double* color, double alpha)
+  double x, double y, double width, double height, double* color, double alpha, double* range)
 {
-  return this->AddTransfer2DBox(x, y, width, height, color[0], color[1], color[2], alpha);
+  return this->AddTransfer2DBox(x, y, width, height, color[0], color[1], color[2], alpha, range[0],
+    range[1], range[2], range[3]);
 }
 
 //-------------------------------------------------------------------------

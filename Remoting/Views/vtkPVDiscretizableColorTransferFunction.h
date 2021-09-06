@@ -100,10 +100,11 @@ public:
    * Add/Remove a transfer function box control to the 2D transfer function.
    * Returns the index for the added box or -1 on error.
    */
+  virtual int AddTransfer2DBox(double x, double y, double width, double height, double r, double g,
+    double b, double a, double rangexmin = 0, double rangexmax = 1, double rangeymin = 0,
+    double rangeymax = 1);
   virtual int AddTransfer2DBox(
-    double x, double y, double width, double height, double r, double g, double b, double a);
-  virtual int AddTransfer2DBox(
-    double x, double y, double width, double height, double* color, double alpha);
+    double x, double y, double width, double height, double* color, double alpha, double* range);
   virtual int AddTransfer2DBox(vtkSmartPointer<vtkTransferFunctionBoxItem> box);
   virtual int RemoveTransfer2DBox(int n);
   virtual int RemoveTransfer2DBox(vtkSmartPointer<vtkTransferFunctionBoxItem> box);
