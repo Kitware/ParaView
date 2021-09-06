@@ -437,7 +437,7 @@ int vtkPVDiscretizableColorTransferFunction::RemoveTransfer2DBox(int n)
   {
     return -1;
   }
-  this->TransferFunction2DBoxes.erase(this->TransferFunction2DBoxes.begin() + n - 1);
+  this->TransferFunction2DBoxes.erase(this->TransferFunction2DBoxes.begin() + n);
   return n;
 }
 
