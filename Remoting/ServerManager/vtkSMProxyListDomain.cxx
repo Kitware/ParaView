@@ -396,7 +396,7 @@ int vtkSMProxyListDomain::ReadXMLAttributes(vtkSMProperty* prop, vtkPVXMLElement
     {
       // Recover group name
       const char* name = proxyElement->GetAttribute("name");
-      const char* defaultProxyName = proxyElement->GetAttribute("default");
+      const char* defaultProxyName = proxyElement->GetAttributeOrEmpty("default");
 
       if (name)
       {
