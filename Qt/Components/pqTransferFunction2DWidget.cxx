@@ -101,24 +101,21 @@ public:
     this->Chart->SetActionToButton(vtkChart::PAN, -1);
     this->Chart->SetActionToButton(vtkChart::ZOOM, -1);
 
-    this->Chart->SetRenderEmpty(true);
-    this->Chart->SetAutoAxes(true);
-    this->Chart->SetHiddenAxisBorder(8);
-    auto axis = this->Chart->GetAxis(vtkAxis::BOTTOM);
-    axis->SetTitle("Scalar Value");
-    axis->SetBehavior(vtkAxis::FIXED);
-    axis->SetRange(0, 255);
-
-    axis = this->Chart->GetAxis(vtkAxis::LEFT);
-    axis->SetTitle("Scalar Value");
-    axis->SetBehavior(vtkAxis::FIXED);
-    axis->SetRange(0, 255);
-
     for (int cc = 0; cc < 4; cc++)
     {
       this->Chart->GetAxis(cc)->SetVisible(false);
       this->Chart->GetAxis(cc)->SetBehavior(vtkAxis::FIXED);
     }
+    this->Chart->SetRenderEmpty(true);
+    this->Chart->SetAutoAxes(true);
+    this->Chart->SetHiddenAxisBorder(8);
+    auto axis = this->Chart->GetAxis(vtkAxis::BOTTOM);
+    axis->SetTitle("Scalar Value");
+    axis->SetRange(0, 255);
+
+    axis = this->Chart->GetAxis(vtkAxis::LEFT);
+    axis->SetTitle("Scalar Value");
+    axis->SetRange(0, 255);
   }
 
   ~pqInternals() { this->cleanup(); }
@@ -134,10 +131,10 @@ public:
     this->ColorTransferFunction = ctf;
     this->Chart->SetTransferFunction2D(transfer2D);
     this->Chart->SetTransfer2DBoxesItem(ctf);
-    if (this->Chart->IsInitialized())
-    {
-      this->Chart->AddNewBox();
-    }
+    //    if (this->Chart->IsInitialized())
+    //    {
+    //      this->Chart->AddNewBox();
+    //    }
   }
 
   void setHistogram(vtkImageData* histogram)
@@ -165,21 +162,6 @@ public:
     transferFunction->SetScaleToLog10();
     transferFunction->Build();
     this->Chart->SetTransferFunction(transferFunction);
-
-    if (this->ColorTransferFunction)
-    {
-      std::vector<vtkSmartPointer<vtkTransferFunctionBoxItem>> boxes =
-        this->ColorTransferFunction->GetTransferFunction2DBoxes();
-      for (auto it = boxes.cbegin(); it < boxes.cend(); ++it)
-      {
-        vtkSmartPointer<vtkTransferFunctionBoxItem> box = (*it);
-        if (!box)
-        {
-          continue;
-        }
-        this->Chart->AddBox(box);
-      }
-    }
   }
 };
 

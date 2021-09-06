@@ -77,6 +77,12 @@
        </item>
        <item>
         <widget class="pqTransferFunction2DWidget" name="Transfer2DEditor" native="true">
+         <property name="minimumSize">
+          <size>
+           <width>100</width>
+           <height>100</height>
+          </size>
+         </property>
          <property name="visible">
           <bool>false</bool>
          </property>
