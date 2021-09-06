@@ -518,6 +518,9 @@ pqColorOpacityEditorWidget::pqColorOpacityEditorWidget(
     {
       double values[4];
       vtkSMPropertyHelper(smproperty).Get(values, 4);
+      vtkSMTransferFunctionProxy::RescaleTransferFunction(this->proxy(), values);
+      vtkSMProxy* opacityProxy = this->Internals->ScalarOpacityFunctionProxy;
+      vtkSMTransferFunctionProxy::RescaleTransferFunction(opacityProxy, values);
       vtkSmartPointer<vtkImageData> im =
         vtkImageData::SafeDownCast(this->transferFunction2DProxy()->GetClientSideObject());
       if (!im)

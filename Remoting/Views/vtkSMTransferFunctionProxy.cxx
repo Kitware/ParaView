@@ -342,14 +342,17 @@ bool vtkSMTransferFunctionProxy::RescaleTransferFunction(
     rangeMin = std::min(rangeMin, preNormalizationRange[0]);
     rangeMax = std::max(rangeMax, preNormalizationRange[1]);
   }
+
+  // Setting the "LastRange" here because, it should match the current range of the control points.
+  // Aside from that, it will also be used for computing the 1D and 2D histograms.
+  this->LastRange[0] = rangeMin;
+  this->LastRange[1] = rangeMax;
   if (preNormalizationRange[0] == rangeMin && preNormalizationRange[1] == rangeMax)
   {
     // current range is same as the new range. Nothing to do here.
     return true;
   }
 
-  this->LastRange[0] = rangeMin;
-  this->LastRange[1] = rangeMax;
   vtkRescaleNormalizedControlPoints(points, rangeMin, rangeMax, log_space);
   SM_SCOPED_TRACE(CallMethod)
     .arg(this)
@@ -814,9 +817,11 @@ vtkSmartPointer<vtkImageData> vtkSMTransferFunctionProxy::ComputeDataHistogram2D
   numBins[0] = numberOfBins;
   numBins[1] = numberOfBins;
   vtkSMPropertyHelper(histo, "NumberOfBins").Set(numBins, 2);
-  vtkSMPropertyHelper(histo, "UseGradientForYAxis").Set(useGradientAsY);
   vtkSMPropertyHelper(histo, "UseCustomBinRangesX").Set(true);
   vtkSMPropertyHelper(histo, "CustomBinRangesX").Set(this->LastRange, 2);
+  vtkSMPropertyHelper(histo, "UseGradientForYAxis").Set(useGradientAsY);
+  vtkSMPropertyHelper(histo, "UseCustomBinRangesY").Set(false);
+  //  vtkSMPropertyHelper(histo, "CustomBinRangesY").Set(this->LastYRange, 2);
   histo->UpdateVTKObjects();
 
   // Reduce it
