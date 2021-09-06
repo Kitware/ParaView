@@ -122,12 +122,12 @@ protected:
   // Initialize the bin_extents using the data range for the selected
   // array.
   virtual bool InitializeBinExtents(
-    vtkInformationVector** inputVector, vtkDoubleArray* bin_extents, double& min, double& max);
+    vtkInformationVector** inputVector, vtkDoubleArray* binExtents, double& min, double& max);
 
   void BinAnArray(
-    vtkDataArray* src, vtkIntArray* vals, double min, double max, vtkFieldData* field);
+    vtkDataArray* dataArray, vtkIntArray* binValues, double min, double max, vtkFieldData* field);
 
-  void FillBinExtents(vtkDoubleArray* bin_extents, double min, double max);
+  void FillBinExtents(vtkDoubleArray* binExtents, double min, double max);
 
   double CustomBinRanges[2];
   bool CenterBinsAroundMinAndMax;

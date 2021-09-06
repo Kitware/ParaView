@@ -58,7 +58,7 @@ struct vtkEHInternals
     // is for arrays with multiple components
     std::vector<std::vector<double> > TotalValues;
   };
-  typedef std::map<std::string, ArrayValuesType> ArrayMapType;
+  using ArrayMapType = std::map<std::string, ArrayValuesType>;
   ArrayMapType ArrayValues;
   int FieldAssociation;
 };
@@ -128,22 +128,16 @@ vtkFieldData* vtkExtractHistogram::GetInputFieldData(vtkDataObject* input)
     case vtkDataObject::FIELD_ASSOCIATION_POINTS:
     case vtkDataObject::FIELD_ASSOCIATION_POINTS_THEN_CELLS:
       return vtkDataSet::SafeDownCast(input)->GetPointData();
-      break;
     case vtkDataObject::FIELD_ASSOCIATION_CELLS:
       return vtkDataSet::SafeDownCast(input)->GetCellData();
-      break;
     case vtkDataObject::FIELD_ASSOCIATION_NONE:
       return input->GetFieldData();
-      break;
     case vtkDataObject::FIELD_ASSOCIATION_VERTICES:
       return vtkGraph::SafeDownCast(input)->GetVertexData();
-      break;
     case vtkDataObject::FIELD_ASSOCIATION_EDGES:
       return vtkGraph::SafeDownCast(input)->GetEdgeData();
-      break;
     case vtkDataObject::FIELD_ASSOCIATION_ROWS:
       return vtkTable::SafeDownCast(input)->GetRowData();
-      break;
   }
   return nullptr;
 }
@@ -152,7 +146,7 @@ vtkFieldData* vtkExtractHistogram::GetInputFieldData(vtkDataObject* input)
 namespace
 {
 template <typename ArrayT>
-class FiniteMinAndMaxWithBlanking
+class FiniteMinAndMaxWithBlankingFunctor
 {
 protected:
   ArrayT* Array;
@@ -163,7 +157,7 @@ protected:
   vtkSMPThreadLocal<std::array<double, 2> > TLRange;
 
 public:
-  FiniteMinAndMaxWithBlanking(
+  FiniteMinAndMaxWithBlankingFunctor(
     ArrayT* array, int component, vtkUnsignedCharArray* ghostArray, unsigned char hiddenFlag)
     : Array(array)
     , Component(component)
@@ -183,9 +177,8 @@ public:
 
   void Reduce()
   {
-    for (auto itr = this->TLRange.begin(); itr != this->TLRange.end(); ++itr)
+    for (auto& range : this->TLRange)
     {
-      auto& range = *itr;
       this->ReducedRange[0] = vtkMath::Min(this->ReducedRange[0], range[0]);
       this->ReducedRange[1] = vtkMath::Max(this->ReducedRange[1], range[1]);
     }
@@ -222,8 +215,7 @@ public:
         }
         else
         {
-          auto tuple = valueRange[idx];
-          value = static_cast<double>(tuple[this->Component]);
+          value = static_cast<double>(valueRange[idx][this->Component]);
         }
 
         if (vtkMath::IsFinite(value))
@@ -266,13 +258,13 @@ struct GetRangeWithBlankingWorker
   void operator()(ArrayT* array, int component, vtkUnsignedCharArray* ghostArray,
     unsigned char hiddenFlag, double tRange[2])
   {
-    FiniteMinAndMaxWithBlanking<ArrayT> worker(array, component, ghostArray, hiddenFlag);
-    vtkSMPTools::For(0, array->GetNumberOfTuples(), worker);
-    worker.CopyRange(tRange);
+    FiniteMinAndMaxWithBlankingFunctor<ArrayT> functor(array, component, ghostArray, hiddenFlag);
+    vtkSMPTools::For(0, array->GetNumberOfTuples(), functor);
+    functor.CopyRange(tRange);
   }
 };
 
-// Local version of GetRange that respects point/cell blankingd
+// Local version of GetRange that respects point/cell Blanking
 void GetRangeWithBlanking(
   vtkDataArray* array, vtkFieldData* fieldData, double tRange[2], int component)
 {
@@ -291,11 +283,11 @@ void GetRangeWithBlanking(
     vtkTypeList::Create<vtkCharArray, vtkShortArray, vtkIntArray, vtkUnsignedCharArray,
       vtkUnsignedShortArray, vtkUnsignedIntArray, vtkFloatArray, vtkDoubleArray> >::Result;
   using GetRangeWithBlankingWorkerDispatch = vtkArrayDispatch::DispatchByArray<FastArrayTypes>;
-  GetRangeWithBlankingWorker worker;
+
   if (!GetRangeWithBlankingWorkerDispatch::Execute(
-        array, worker, component, ghostArray, hiddenFlag, tRange))
+        array, GetRangeWithBlankingWorker{}, component, ghostArray, hiddenFlag, tRange))
   {
-    worker(array, component, ghostArray, hiddenFlag, tRange);
+    GetRangeWithBlankingWorker{}(array, component, ghostArray, hiddenFlag, tRange);
   }
 }
 }
@@ -317,7 +309,7 @@ bool vtkExtractHistogram::GetInputArrayRange(vtkInformationVector** inputVector,
     // range
     vtkCompositeDataIterator* cdit = cdin->NewIterator();
     cdit->InitTraversal();
-    bool foundone = false;
+    bool foundOne = false;
     while (!cdit->IsDoneWithTraversal())
     {
       vtkDataObject* dObj = cdit->GetCurrentDataObject();
@@ -325,7 +317,7 @@ bool vtkExtractHistogram::GetInputArrayRange(vtkInformationVector** inputVector,
       if (data_array && this->Component >= 0 &&
         this->Component <= data_array->GetNumberOfComponents())
       {
-        foundone = true;
+        foundOne = true;
         double tRange[2];
         GetRangeWithBlanking(data_array, this->GetInputFieldData(dObj), tRange, this->Component);
         range[0] = (tRange[0] < range[0]) ? tRange[0] : range[0];
@@ -335,7 +327,7 @@ bool vtkExtractHistogram::GetInputArrayRange(vtkInformationVector** inputVector,
     }
     cdit->Delete();
 
-    if (!foundone)
+    if (!foundOne)
     {
       return false;
     }
@@ -363,14 +355,14 @@ bool vtkExtractHistogram::GetInputArrayRange(vtkInformationVector** inputVector,
 
 //-----------------------------------------------------------------------------
 bool vtkExtractHistogram::InitializeBinExtents(
-  vtkInformationVector** inputVector, vtkDoubleArray* bin_extents, double& min, double& max)
+  vtkInformationVector** inputVector, vtkDoubleArray* binExtents, double& min, double& max)
 {
   double range[2];
   range[0] = VTK_DOUBLE_MAX;
   range[1] = -VTK_DOUBLE_MAX;
 
   // Keeping the column name constant causes less issues in the GUI.
-  bin_extents->SetName("bin_extents");
+  binExtents->SetName("bin_extents");
 
   if (this->UseCustomBinRanges)
   {
@@ -397,12 +389,12 @@ bool vtkExtractHistogram::InitializeBinExtents(
 
   min = range[0];
   max = range[1];
-  this->FillBinExtents(bin_extents, min, max);
+  this->FillBinExtents(binExtents, min, max);
   return true;
 }
 
 //-----------------------------------------------------------------------------
-void vtkExtractHistogram::FillBinExtents(vtkDoubleArray* bin_extents, double min, double max)
+void vtkExtractHistogram::FillBinExtents(vtkDoubleArray* binExtents, double min, double max)
 {
   // Calculate the extents of each bin, based on the range of values in the
   // input ...
@@ -412,18 +404,19 @@ void vtkExtractHistogram::FillBinExtents(vtkDoubleArray* bin_extents, double min
     max = min + 1;
   }
 
-  bin_extents->SetNumberOfComponents(1);
-  bin_extents->SetNumberOfTuples(this->BinCount);
+  binExtents->SetNumberOfComponents(1);
+  binExtents->SetNumberOfTuples(this->BinCount);
   double bin_delta =
     (max - min) / (this->CenterBinsAroundMinAndMax ? (this->BinCount - 1) : this->BinCount);
   double half_delta = bin_delta / 2.0;
   for (int i = 0; i < this->BinCount; ++i)
   {
-    bin_extents->SetValue(
+    binExtents->SetValue(
       i, min + (i * bin_delta) + (this->CenterBinsAroundMinAndMax ? 0. : half_delta));
   }
 }
 
+//-----------------------------------------------------------------------------
 inline int vtkExtractHistogramClamp(int value, int min, int max)
 {
   value = value < min ? min : value;
@@ -432,95 +425,234 @@ inline int vtkExtractHistogramClamp(int value, int min, int max)
 }
 
 //-----------------------------------------------------------------------------
-void vtkExtractHistogram::BinAnArray(
-  vtkDataArray* data_array, vtkIntArray* bin_values, double min, double max, vtkFieldData* field)
+namespace
 {
-  // If the requested component is out-of-range for the input,
-  // the bin_values will be 0, so no need to do any actual counting.
-  if (data_array == nullptr || this->Component < 0 ||
-    this->Component > data_array->GetNumberOfComponents())
+template <typename ArrayT>
+class BinAnArrayFunctor
+{
+private:
+  ArrayT* DataArray;
+  vtkFieldData* Field;
+  vtkIntArray* BinValues;
+  vtkEHInternals::ArrayMapType& ArrayValues;
+  int BinCount;
+  int Component;
+  double Min;
+  double Max;
+  int CalculateAverages;
+  bool CenterBinsAroundMinAndMax;
+
+  double BinDelta;
+  double HalfDelta;
+  vtkUnsignedCharArray* Blanking;
+  unsigned char GhostIndicator;
+
+  vtkSMPThreadLocal<vtkSmartPointer<vtkIntArray> > TLBinValues;
+  vtkSMPThreadLocal<vtkEHInternals::ArrayMapType> TLArrayValues;
+
+public:
+  BinAnArrayFunctor(ArrayT* dataArray, vtkFieldData* field, vtkIntArray* binValues,
+    vtkEHInternals::ArrayMapType& arrayValues, int binCount, int component, double min, double max,
+    int calculateAverages, bool centerBinsAroundMinAndMax)
+    : DataArray(dataArray)
+    , Field(field)
+    , BinValues(binValues)
+    , ArrayValues(arrayValues)
+    , BinCount(binCount)
+    , Component(component)
+    , Min(min)
+    , Max(max)
+    , CalculateAverages(calculateAverages)
+    , CenterBinsAroundMinAndMax(centerBinsAroundMinAndMax)
   {
-    return;
+    this->BinDelta = (this->Max - this->Min) /
+      (this->CenterBinsAroundMinAndMax ? (this->BinCount - 1) : this->BinCount);
+    this->HalfDelta = this->BinDelta / 2.0;
+
+    // Get blanking array
+    this->Blanking = nullptr;
+    vtkDataSetAttributes* attributes = vtkDataSetAttributes::SafeDownCast(this->Field);
+    if (attributes)
+    {
+      auto ghostArray = attributes->GetArray(vtkDataSetAttributes::GhostArrayName());
+      this->Blanking = vtkUnsignedCharArray::SafeDownCast(ghostArray);
+    }
+    this->GhostIndicator = field->IsA("vtkPointData")
+      ? (vtkDataSetAttributes::HIDDENPOINT | vtkDataSetAttributes::DUPLICATEPOINT)
+      : (vtkDataSetAttributes::HIDDENCELL | vtkDataSetAttributes::DUPLICATECELL);
   }
 
-  int num_of_tuples = data_array->GetNumberOfTuples();
-  double bin_delta =
-    (max - min) / (this->CenterBinsAroundMinAndMax ? (this->BinCount - 1) : this->BinCount);
-  double half_delta = bin_delta / 2.0;
-
-  // Get blanking array
-  vtkUnsignedCharArray* blanking = nullptr;
-  vtkDataSetAttributes* attributes = vtkDataSetAttributes::SafeDownCast(field);
-  if (attributes)
+  void Initialize()
   {
-    auto ghostArray = attributes->GetArray(vtkDataSetAttributes::GhostArrayName());
-    blanking = vtkUnsignedCharArray::SafeDownCast(ghostArray);
+    // initialize thread copies
+    auto& tlBinValues = this->TLBinValues.Local();
+    tlBinValues = vtkSmartPointer<vtkIntArray>::New();
+    tlBinValues->SetNumberOfComponents(1);
+    tlBinValues->SetNumberOfTuples(this->BinCount);
+    tlBinValues->SetName("bin_values");
+    tlBinValues->FillComponent(0, 0.0);
+
+    this->TLArrayValues.Local();
   }
-  const unsigned char ghostIndicator = field->IsA("vtkPointData")
-    ? (vtkDataSetAttributes::HIDDENPOINT | vtkDataSetAttributes::DUPLICATEPOINT)
-    : (vtkDataSetAttributes::HIDDENCELL | vtkDataSetAttributes::DUPLICATECELL);
 
-  for (int i = 0; i != num_of_tuples; ++i)
+  void operator()(vtkIdType begin, vtkIdType end)
   {
-    if (i % 1000 == 0)
-    {
-      this->UpdateProgress(0.10 + 0.90 * i / num_of_tuples);
-    }
+    auto& tlBinValues = this->TLBinValues.Local();
+    auto& tlArrayValues = this->TLArrayValues.Local();
+    const auto valueRange = vtk::DataArrayTupleRange(this->DataArray);
+    const int numComponents = this->DataArray->GetNumberOfComponents();
 
-    // Skip if the array value is blanked.
-    if (blanking && blanking->GetTypedComponent(i, 0) & ghostIndicator)
+    for (int i = begin; i < end; ++i)
     {
-      continue;
-    }
-
-    double value;
-    // if component is equal to the number of components, then the magnitude was requested.
-    if (this->Component == data_array->GetNumberOfComponents())
-    {
-      value = 0;
-      double comp;
-      for (int j = 0; j < data_array->GetNumberOfComponents(); ++j)
+      // Skip if the array value is blanked.
+      if (this->Blanking && this->Blanking->GetTypedComponent(i, 0) & this->GhostIndicator)
       {
-        comp = data_array->GetComponent(i, j);
-        value += comp * comp;
+        continue;
       }
-      value = sqrt(value);
-    }
-    else
-    {
-      value = data_array->GetComponent(i, this->Component);
-    }
-    int index = static_cast<int>(
-      (value - min + (this->CenterBinsAroundMinAndMax ? half_delta : 0.)) / bin_delta);
 
-    // If the value is equal to max, include it in the last bin.
-    index = ::vtkExtractHistogramClamp(index, 0, this->BinCount - 1);
-    bin_values->SetValue(index, bin_values->GetValue(index) + 1);
-
-    if (this->CalculateAverages)
-    {
-      // Get all other arrays, add their value to the bin
-      // For each bin, we will need 2 values per array ->
-      // total, num. elements
-      // at the end, divide each total by num. elements
-      int num_arrays = field->GetNumberOfArrays();
-      for (int idx = 0; idx < num_arrays; idx++)
+      double value;
+      // if component is equal to the number of components, then the magnitude was requested.
+      if (this->Component == numComponents)
       {
-        vtkDataArray* array = field->GetArray(idx);
-        if (array && array != data_array && array->GetName())
+        value = 0;
+        double comp;
+        for (int j = 0; j < numComponents; ++j)
         {
-          vtkEHInternals::ArrayValuesType& arrayValues =
-            this->Internal->ArrayValues[array->GetName()];
-          arrayValues.TotalValues.resize(this->BinCount);
-          int numComps = array->GetNumberOfComponents();
-          arrayValues.TotalValues[index].resize(numComps);
-          for (int comp = 0; comp < numComps; comp++)
+          comp = static_cast<double>(valueRange[i][j]);
+          value += comp * comp;
+        }
+        value = std::sqrt(value);
+      }
+      else
+      {
+        value = static_cast<double>(valueRange[i][this->Component]);
+      }
+      int index = static_cast<int>(
+        (value - this->Min + (this->CenterBinsAroundMinAndMax ? this->HalfDelta : 0.)) /
+        this->BinDelta);
+
+      // If the value is equal to max, include it in the last bin.
+      index = ::vtkExtractHistogramClamp(index, 0, this->BinCount - 1);
+      tlBinValues->SetValue(index, tlBinValues->GetValue(index) + 1);
+
+      if (this->CalculateAverages)
+      {
+        // Get all other arrays, add their value to the bin
+        // For each bin, we will need 2 values per array ->
+        // total, num. elements
+        // at the end, divide each total by num. elements
+        int numberOfArrays = this->Field->GetNumberOfArrays();
+        for (int idx = 0; idx < numberOfArrays; idx++)
+        {
+          vtkDataArray* array = this->Field->GetArray(idx);
+          if (array && array != this->DataArray && array->GetName())
           {
-            arrayValues.TotalValues[index][comp] += array->GetComponent(i, comp);
+            vtkEHInternals::ArrayValuesType& arrayValues = tlArrayValues[array->GetName()];
+            arrayValues.TotalValues.resize(this->BinCount);
+            int numComps = array->GetNumberOfComponents();
+            arrayValues.TotalValues[index].resize(numComps);
+            for (int comp = 0; comp < numComps; comp++)
+            {
+              arrayValues.TotalValues[index][comp] += array->GetComponent(i, comp);
+            }
           }
         }
       }
     }
+  }
+
+  void Reduce()
+  {
+    // collect binValues results
+    for (auto& tlBinValues : this->TLBinValues)
+    {
+      for (int i = 0; i < this->BinCount; ++i)
+      {
+        this->BinValues->SetValue(i, this->BinValues->GetValue(i) + tlBinValues->GetValue(i));
+      }
+    }
+
+    // collect arrayValues results
+    if (this->CalculateAverages)
+    {
+      int numberOfArrays = this->Field->GetNumberOfArrays();
+      for (int idx = 0; idx < numberOfArrays; idx++)
+      {
+        vtkDataArray* array = this->Field->GetArray(idx);
+        // if array is not valid move to the next one
+        if (!(array && array != this->DataArray && array->GetName()))
+        {
+          continue;
+        }
+
+        int numComps = this->Field->GetArray(array->GetName())->GetNumberOfComponents();
+        // iterate over all thread instances
+        for (auto& tlArrayValues : this->TLArrayValues)
+        {
+          vtkEHInternals::ArrayValuesType& arrayValuesOfArray = this->ArrayValues[array->GetName()];
+          vtkEHInternals::ArrayValuesType& tlArrayValuesOfArray = tlArrayValues[array->GetName()];
+
+          // resizing will occur only if it's needed
+          arrayValuesOfArray.TotalValues.resize(this->BinCount);
+
+          for (int i = 0; i < this->BinCount; ++i)
+          {
+            if (!tlArrayValuesOfArray.TotalValues[i].empty())
+            {
+              // resizing will occur only if it's needed
+              arrayValuesOfArray.TotalValues[i].resize(tlArrayValuesOfArray.TotalValues[i].size());
+
+              for (int comp = 0; comp < numComps; comp++)
+              {
+                arrayValuesOfArray.TotalValues[i][comp] +=
+                  tlArrayValuesOfArray.TotalValues[i][comp];
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+};
+
+// Worker for array dispatch
+struct BinAnArrayWorker
+{
+  template <typename ArrayT>
+  void operator()(ArrayT* dataArray, vtkFieldData* field, vtkIntArray* binValues,
+    vtkEHInternals::ArrayMapType& arrayValues, int binCount, int component, double min, double max,
+    int calculateAverages, bool centerBinsAroundMinAndMax)
+  {
+    BinAnArrayFunctor<ArrayT> functor(dataArray, field, binValues, arrayValues, binCount, component,
+      min, max, calculateAverages, centerBinsAroundMinAndMax);
+    vtkSMPTools::For(0, dataArray->GetNumberOfTuples(), functor);
+  }
+};
+}
+
+//-----------------------------------------------------------------------------
+void vtkExtractHistogram::BinAnArray(
+  vtkDataArray* dataArray, vtkIntArray* binValues, double min, double max, vtkFieldData* field)
+{
+  // If the requested component is out-of-range for the input,
+  // the bin_values will be 0, so no need to do any actual counting.
+  if (dataArray == nullptr || this->Component < 0 ||
+    this->Component > dataArray->GetNumberOfComponents())
+  {
+    return;
+  }
+
+  using FastArrayTypes = vtkTypeList::Unique<
+    vtkTypeList::Create<vtkCharArray, vtkShortArray, vtkIntArray, vtkUnsignedCharArray,
+      vtkUnsignedShortArray, vtkUnsignedIntArray, vtkFloatArray, vtkDoubleArray> >::Result;
+  using BinAnArrayWorkerDispatch = vtkArrayDispatch::DispatchByArray<FastArrayTypes>;
+
+  if (!BinAnArrayWorkerDispatch::Execute(dataArray, BinAnArrayWorker{}, field, binValues,
+        this->Internal->ArrayValues, this->BinCount, this->Component, min, max,
+        this->CalculateAverages, this->CenterBinsAroundMinAndMax))
+  {
+    BinAnArrayWorker{}(dataArray, field, binValues, this->Internal->ArrayValues, this->BinCount,
+      this->Component, min, max, this->CalculateAverages, this->CenterBinsAroundMinAndMax);
   }
 }
 
@@ -530,8 +662,8 @@ int vtkExtractHistogram::RequestData(vtkInformation* /*request*/,
 {
   // Build an empty output grid in advance, so we can bail-out if we
   // encounter any problems
-  vtkTable* const output_data = vtkTable::GetData(outputVector, 0);
-  output_data->Initialize();
+  vtkTable* const outputData = vtkTable::GetData(outputVector, 0);
+  outputData->Initialize();
 
   if (this->UseCustomBinRanges && this->CustomBinRanges[1] < this->CustomBinRanges[0])
   {
@@ -543,29 +675,29 @@ int vtkExtractHistogram::RequestData(vtkInformation* /*request*/,
   }
 
   // These are the mid-points for each of the bins
-  vtkSmartPointer<vtkDoubleArray> bin_extents = vtkSmartPointer<vtkDoubleArray>::New();
-  bin_extents->SetNumberOfComponents(1);
-  bin_extents->SetNumberOfTuples(this->BinCount);
-  bin_extents->SetName("bin_extents");
-  bin_extents->FillComponent(0, 0.0);
+  auto binExtents = vtkSmartPointer<vtkDoubleArray>::New();
+  binExtents->SetNumberOfComponents(1);
+  binExtents->SetNumberOfTuples(this->BinCount);
+  binExtents->SetName("bin_extents");
+  binExtents->FillComponent(0, 0.0);
 
   // Insert values into bins ...
-  vtkSmartPointer<vtkIntArray> bin_values = vtkSmartPointer<vtkIntArray>::New();
-  bin_values->SetNumberOfComponents(1);
-  bin_values->SetNumberOfTuples(this->BinCount);
-  bin_values->SetName("bin_values");
-  bin_values->FillComponent(0, 0.0);
+  auto binValues = vtkSmartPointer<vtkIntArray>::New();
+  binValues->SetNumberOfComponents(1);
+  binValues->SetNumberOfTuples(this->BinCount);
+  binValues->SetName("bin_values");
+  binValues->FillComponent(0, 0.0);
 
   // Initializes the bin_extents array.
   double min, max;
-  if (!this->InitializeBinExtents(inputVector, bin_extents, min, max))
+  if (!this->InitializeBinExtents(inputVector, binExtents, min, max))
   {
     this->Internal->ArrayValues.clear();
     return 1;
   }
 
-  output_data->GetRowData()->AddArray(bin_extents);
-  output_data->GetRowData()->AddArray(bin_values);
+  outputData->GetRowData()->AddArray(binExtents);
+  outputData->GetRowData()->AddArray(binValues);
 
   vtkInformation* inInfo = inputVector[0]->GetInformationObject(0);
   vtkDataObject* input = inInfo->Get(vtkDataObject::DATA_OBJECT());
@@ -578,30 +710,29 @@ int vtkExtractHistogram::RequestData(vtkInformation* /*request*/,
     while (!cdit->IsDoneWithTraversal())
     {
       vtkDataObject* dObj = cdit->GetCurrentDataObject();
-      vtkDataArray* data_array = this->GetInputArrayToProcess(0, dObj);
-      this->BinAnArray(data_array, bin_values, min, max, this->GetInputFieldData(dObj));
+      vtkDataArray* dataArray = this->GetInputArrayToProcess(0, dObj);
+      this->BinAnArray(dataArray, binValues, min, max, this->GetInputFieldData(dObj));
       cdit->GoToNextItem();
     }
     cdit->Delete();
   }
   else
   {
-    vtkDataArray* data_array = this->GetInputArrayToProcess(0, inputVector);
-    this->BinAnArray(data_array, bin_values, min, max, this->GetInputFieldData(input));
+    vtkDataArray* dataArray = this->GetInputArrayToProcess(0, inputVector);
+    this->BinAnArray(dataArray, binValues, min, max, this->GetInputFieldData(input));
   }
 
   if (this->CalculateAverages)
   {
-    vtkEHInternals::ArrayMapType::iterator iter = this->Internal->ArrayValues.begin();
-    for (; iter != this->Internal->ArrayValues.end(); iter++)
+    for (auto& iter : this->Internal->ArrayValues)
     {
-      vtkSmartPointer<vtkDoubleArray> da = vtkSmartPointer<vtkDoubleArray>::New();
-      std::string newname = iter->first + "_total";
-      da->SetName(newname.c_str());
-      vtkSmartPointer<vtkDoubleArray> aa = vtkSmartPointer<vtkDoubleArray>::New();
-      std::string newname2 = iter->first + "_average";
-      aa->SetName(newname2.c_str());
-      int numComps = static_cast<int>(iter->second.TotalValues[0].size());
+      auto da = vtkSmartPointer<vtkDoubleArray>::New();
+      std::string newName = iter.first + "_total";
+      da->SetName(newName.c_str());
+      auto aa = vtkSmartPointer<vtkDoubleArray>::New();
+      std::string newName2 = iter.first + "_average";
+      aa->SetName(newName2.c_str());
+      int numComps = static_cast<int>(iter.second.TotalValues[0].size());
       da->SetNumberOfComponents(numComps);
       da->SetNumberOfTuples(this->BinCount);
       aa->SetNumberOfComponents(numComps);
@@ -610,13 +741,13 @@ int vtkExtractHistogram::RequestData(vtkInformation* /*request*/,
       {
         for (int j = 0; j < numComps; j++)
         {
-          if (iter->second.TotalValues[i].size() == (unsigned int)numComps)
+          if (iter.second.TotalValues[i].size() == (unsigned int)numComps)
           {
-            da->SetValue(i * numComps + j, iter->second.TotalValues[i][j]);
-            if (bin_values->GetValue(i))
+            da->SetValue(i * numComps + j, iter.second.TotalValues[i][j]);
+            if (binValues->GetValue(i))
             {
               aa->SetValue(
-                i * numComps + j, iter->second.TotalValues[i][j] / bin_values->GetValue(i));
+                i * numComps + j, iter.second.TotalValues[i][j] / binValues->GetValue(i));
             }
             else
             {
@@ -630,8 +761,8 @@ int vtkExtractHistogram::RequestData(vtkInformation* /*request*/,
           }
         }
       }
-      output_data->GetRowData()->AddArray(da);
-      output_data->GetRowData()->AddArray(aa);
+      outputData->GetRowData()->AddArray(da);
+      outputData->GetRowData()->AddArray(aa);
     }
 
     this->Internal->ArrayValues.clear();
