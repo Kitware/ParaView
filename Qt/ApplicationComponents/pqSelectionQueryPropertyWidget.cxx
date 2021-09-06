@@ -376,6 +376,7 @@ public:
 
   void setExpression(const QString& expr)
   {
+    // vtkLogScopeF(INFO, "expr=%s", qPrintable(expr));
     // we loop from reverse so when done, the operators is set to the first item
     // rather than last one.
     for (int termType = TermType::CELL_CONTAINING_POINT; termType >= 0; --termType)
@@ -474,7 +475,11 @@ protected:
     regex.replace("[", "\\[").replace("]", "\\]"); // escape brackets.
 
     std::map<QString, QString> map;
-    map["term"] = "\\w+";
+    // note: the term can include things like "accl", "mag(accl)", "accl[:,0]", etc.
+    // hence the pattern for the term is not simply "\w+".
+    // clang-format off
+    map["term"] = R"==(\w+|\w+\(\w+\)|\w+\[:,\d+\])==";
+    // clang-format on
     map["value"] = "[a-zA-Z0-9\\_\\,\\ \\-]+";
     map["value_min"] = map["value_max"] = map["value_x"] = map["value_y"] = map["value_z"] =
       map["value_tolerance"] = "[a-zA-Z0-9\\_\\.\\-]+";

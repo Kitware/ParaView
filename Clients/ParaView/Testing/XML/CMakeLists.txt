@@ -1302,6 +1302,7 @@ if(PARAVIEW_USE_PYTHON)
       FindDataSelectLocationMultiblock.xml # find data needs python/numpy
       FindDataSelectLocation.xml # find data needs python/numpy
       FindDataSelectors.xml
+      FindDataTime.xml
       ForceTimeDiamond.xml
       FreezeQueryMultiblock.xml
       IndexedLookupInitialization.xml # needs Python Calculator/numpy

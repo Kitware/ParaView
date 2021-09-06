@@ -39,9 +39,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqSelectionManager.h"
 #include "pqServer.h"
 #include "pqSpreadSheetViewModel.h"
+#include "pqTimer.h"
 #include "vtkDataObject.h"
+#include "vtkLogger.h"
+#include "vtkNew.h"
 #include "vtkPVDataInformation.h"
 #include "vtkSMFieldDataDomain.h"
+#include "vtkSMParaViewPipelineController.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMSessionProxyManager.h"
 #include "vtkSMSourceProxy.h"
@@ -117,6 +121,7 @@ class pqFindDataCurrentSelectionFrame::pqInternals
   vtkSmartPointer<vtkSMViewProxy> ViewProxy;
   QPointer<pqSpreadSheetViewModel> Model;
   QPointer<pqOutputPort> ShowingPort;
+  pqTimer UpdateSpreadSheetTimer;
 
   void deleteSpreadSheet()
   {
@@ -145,6 +150,11 @@ public:
     self->connect(
       this->Ui.showTypeComboBox, SIGNAL(currentIndexChanged(int)), SLOT(updateFieldType()));
     this->showSelectedData(this->SelectionManager->getSelectedPort(), self);
+
+    this->UpdateSpreadSheetTimer.setInterval(100);
+    this->UpdateSpreadSheetTimer.setSingleShot(true);
+    QObject::connect(
+      &this->UpdateSpreadSheetTimer, &QTimer::timeout, [this]() { this->updateSpreadSheetNow(); });
   }
 
   ~pqInternals() { this->deleteSpreadSheet(); }
@@ -177,6 +187,9 @@ public:
       repr->PrototypeOn();
       repr->UpdateVTKObjects();
 
+      vtkNew<vtkSMParaViewPipelineController> controller;
+      auto timeKeeper = controller->FindTimeKeeper(server->session());
+
       vtkSMViewProxy* view =
         vtkSMViewProxy::SafeDownCast(pxm->NewProxy("views", "SpreadSheetView"));
       view->PrototypeOn();
@@ -184,6 +197,8 @@ public:
       vtkSMPropertyHelper(view, "Representations").Set(repr);
       vtkSMPropertyHelper(view, "ViewSize").Set(0, 1);
       vtkSMPropertyHelper(view, "ViewSize").Set(1, 1);
+      vtkSMPropertyHelper(view, "ViewTime")
+        .Set(0, vtkSMPropertyHelper(timeKeeper, "Time").GetAsDouble());
       view->UpdateVTKObjects();
 
       this->ViewProxy.TakeReference(view);
@@ -273,12 +288,24 @@ public:
     }
   }
 
-  void updateSpreadSheet()
+  void updateSpreadSheet() { this->UpdateSpreadSheetTimer.start(); }
+
+  void updateSpreadSheetNow()
   {
     if (this->ViewProxy)
     {
+      // Ensure we're showing the right timestep.
+      vtkNew<vtkSMParaViewPipelineController> controller;
+      auto timeKeeper = controller->FindTimeKeeper(this->ViewProxy->GetSession());
+      vtkSMPropertyHelper(this->ViewProxy, "ViewTime")
+        .Set(0, vtkSMPropertyHelper(timeKeeper, "Time").GetAsDouble());
+      this->ViewProxy->UpdateVTKObjects();
       this->ViewProxy->StillRender();
     }
+    this->Ui.spreadsheet->viewport()->update();
+
+    // cancel timer, since we just updated.
+    this->UpdateSpreadSheetTimer.stop();
   }
 
   pqOutputPort* showingPort() const { return this->ShowingPort; }
