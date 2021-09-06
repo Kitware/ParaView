@@ -197,16 +197,8 @@
       <ProxyProperty command="SetImplicitFunction"
                      label="Intersect With"
                      name="ImplicitFunction">
-        <ProxyGroupDomain name="groups">
-          <Group name="implicit_functions" />
-        </ProxyGroupDomain>
         <ProxyListDomain name="proxy_list">
-          <Proxy group="implicit_functions"
-                 name="Plane" />
-          <Proxy group="implicit_functions"
-                 name="Box" />
-          <Proxy group="implicit_functions"
-                 name="Sphere" />
+          <Group name="extract_implicit_functions" default="Plane"/>
         </ProxyListDomain>
         <Documentation>This property sets the region used to extract
         cells.</Documentation>

@@ -248,26 +248,8 @@
       <ProxyProperty command="SetArrayMeasurement"
                      label="Subdividing Criterion"
                      name="ArrayMeasurement">
-        <ProxyGroupDomain name="groups">
-          <Group name="array_measurement" />
-        </ProxyGroupDomain>
         <ProxyListDomain name="proxy_list">
-          <Proxy group="array_measurement"
-                 name="Arithmetic Mean" />
-          <Proxy group="array_measurement"
-                 name="Geometric Mean" />
-          <Proxy group="array_measurement"
-                 name="Harmonic Mean" />
-          <Proxy group="array_measurement"
-                 name="Max" />
-          <Proxy group="array_measurement"
-                 name="Quantile" />
-          <Proxy group="array_measurement"
-                 name="Standard Deviation" />
-          <Proxy group="array_measurement"
-                 name="Entropy" />
-          <Proxy group="array_measurement"
-                 name="None" />
+          <Group name="array_measurement" default="Arithmetic Mean" />
         </ProxyListDomain>
         <Documentation>This property sets the array measurement method used for
           subdividing leaves in the hyper tree grid.</Documentation>
@@ -275,26 +257,8 @@
       <ProxyProperty command="SetArrayMeasurementDisplay"
                      label="Averaging method"
                      name="ArrayMeasurementDisplay">
-        <ProxyGroupDomain name="groups">
-          <Group name="array_measurement" />
-        </ProxyGroupDomain>
         <ProxyListDomain name="proxy_list">
-          <Proxy group="array_measurement"
-                 name="None" />
-          <Proxy group="array_measurement"
-                 name="Arithmetic Mean" />
-          <Proxy group="array_measurement"
-                 name="Geometric Mean" />
-          <Proxy group="array_measurement"
-                 name="Harmonic Mean" />
-          <Proxy group="array_measurement"
-                 name="Max" />
-          <Proxy group="array_measurement"
-                 name="Quantile" />
-          <Proxy group="array_measurement"
-                 name="Standard Deviation" />
-          <Proxy group="array_measurement"
-                 name="Entropy" />
+          <Group name="array_measurement" default="None" />
         </ProxyListDomain>
         <Documentation>This property sets an extra array measurement method only for visualization
           purposes. This measurement is applied to the list of inputs.</Documentation>
