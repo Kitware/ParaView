@@ -254,6 +254,11 @@ void vtkTransferFunctionChartHistogram2D::GenerateTransfer2D()
     return;
   }
 
+  if (auto oldScalars = this->TransferFunction2D->GetPointData()->GetScalars())
+  {
+    this->TransferFunction2D->GetPointData()->RemoveArray(oldScalars->GetName());
+  }
+
   double spacing[3];
   histogram->GetSpacing(spacing);
   double origin[3];
