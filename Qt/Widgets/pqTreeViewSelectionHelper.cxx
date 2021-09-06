@@ -179,6 +179,10 @@ void pqTreeViewSelectionHelper::showContextMenu(int section, const QPoint& pos)
       // const auto xpos = 28; //menu.style()->pixelMetric(QStyle::PM_MenuHMargin);
       l->setContentsMargins(2, 2, 2, 2);
       l->addWidget(searchLineEdit);
+
+      // Close the QMenu on return press for an easier usage
+      QObject::connect(searchLineEdit, &QLineEdit::returnPressed, &menu, &QMenu::close);
+
       QObject::connect(searchLineEdit, &QLineEdit::textChanged,
         [tree, section](const QString& txt) { updateFilter(tree, section, txt); });
 
