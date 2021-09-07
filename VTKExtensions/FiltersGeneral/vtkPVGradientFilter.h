@@ -53,7 +53,7 @@ public:
 
   ///@{
   /**
-   * Get/Set the number of dimensions used to compute the gradient.
+   * Get/Set the number of dimensions used to compute the gradient when using CENTRAL_DIFFERENCING.
    * In two dimensions, the X and Y dimensions are used.
    * Used in vtkImageGradient for the vtkImageData type.
    */
@@ -71,8 +71,6 @@ public:
   vtkGetMacro(BoundaryMethod, int);
   ///@}
 
-  int ProcessRequest(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
-
 protected:
   vtkPVGradientFilter() = default;
   ~vtkPVGradientFilter() override = default;
@@ -81,7 +79,6 @@ protected:
   int BoundaryMethod = CENTRAL_DIFFERENCING;
 
   int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
-  virtual int RequestDataObject(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
 
 private:
   vtkPVGradientFilter(const vtkPVGradientFilter&) = delete;

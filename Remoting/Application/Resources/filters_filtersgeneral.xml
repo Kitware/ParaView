@@ -548,8 +548,8 @@
                      vector at each point or cell. It operates on any type of
                      vtkDataSet, and the output is the same type as the input.
                      If the dataset is a vtkImageData, use the Gradient filter
-                     instead; it will be more efficient for this type of
-                     dataset.</Documentation>
+                     instead; it will be more efficient for this type of dataset.
+      </Documentation>
       <InputProperty command="SetInputConnection"
                      name="Input">
         <ProxyGroupDomain name="groups">
@@ -560,8 +560,9 @@
           <DataType value="vtkDataSet" />
         </DataTypeDomain>
         <InputArrayDomain name="input_array" />
-        <Documentation>This property specifies the input to the Gradient
-        (Unstructured) filter.</Documentation>
+        <Documentation>
+          This property specifies the input to the Gradient (Unstructured) filter.
+        </Documentation>
       </InputProperty>
       <StringVectorProperty command="SetInputArrayToProcess"
                             element_types="0 0 0 0 2"
@@ -575,8 +576,9 @@
                       name="Input" />
           </RequiredProperties>
         </ArrayListDomain>
-        <Documentation>This property lists the name of the scalar array from
-        which to compute the gradient.</Documentation>
+        <Documentation>
+          This property lists the name of the scalar array from which to compute the gradient.
+        </Documentation>
       </StringVectorProperty>
       <IntVectorProperty command="SetComputeGradient"
                          default_values="1"
@@ -584,15 +586,17 @@
                          number_of_elements="1"
                          panel_visibility="advanced">
         <BooleanDomain name="bool" />
-        <Documentation>When this flag is on, the gradient filter will compute
-        the gradient of the input array.</Documentation>
+        <Documentation>
+          When this flag is on, the gradient filter will compute the gradient of the input array.
+        </Documentation>
       </IntVectorProperty>
       <StringVectorProperty command="SetResultArrayName"
                             default_values="Gradients"
                             name="ResultArrayName"
                             number_of_elements="1">
-        <Documentation>This property provides a name for the output array
-        containing the gradient vectors.</Documentation>
+        <Documentation>
+          This property provides a name for the output array containing the gradient vectors.
+        </Documentation>
       </StringVectorProperty>
       <IntVectorProperty command="SetFasterApproximation"
                          default_values="0"
@@ -600,12 +604,14 @@
                          number_of_elements="1"
                          panel_visibility="advanced">
         <BooleanDomain name="bool" />
-        <Documentation>When this flag is on, the gradient filter will provide a
-        less accurate (but close) algorithm that performs fewer derivative
-        calculations (and is therefore faster). The error contains some
-        smoothing of the output data and some possible errors on the boundary.
-        This parameter has no effect when performing the gradient of cell
-        data or when the input grid is not a vtkUnstructuredGrid.</Documentation>
+        <Documentation>
+          When this flag is on, the gradient filter will provide a
+          less accurate (but close) algorithm that performs fewer derivative
+          calculations (and is therefore faster). The error contains some
+          smoothing of the output data and some possible errors on the boundary.
+          This parameter has no effect when performing the gradient of cell
+          data or when the input grid is not a vtkUnstructuredGrid.
+        </Documentation>
       </IntVectorProperty>
       <IntVectorProperty command="SetComputeDivergence"
                          default_values="0"
@@ -613,16 +619,18 @@
                          number_of_elements="1"
                          panel_visibility="advanced">
         <BooleanDomain name="bool" />
-        <Documentation>When this flag is on, the gradient filter will compute
-        the divergence of a 3 component array.</Documentation>
+        <Documentation>
+          When this flag is on, the gradient filter will compute the divergence of a 3 component array.
+        </Documentation>
       </IntVectorProperty>
       <StringVectorProperty command="SetDivergenceArrayName"
                             default_values="Divergence"
                             name="DivergenceArrayName"
                             number_of_elements="1"
                             panel_visibility="advanced">
-        <Documentation>This property provides a name for the output array
-        containing the divergence vector.</Documentation>
+        <Documentation>
+          This property provides a name for the output array containing the divergence vector.
+        </Documentation>
       </StringVectorProperty>
       <IntVectorProperty command="SetComputeVorticity"
                          default_values="0"
@@ -630,16 +638,18 @@
                          number_of_elements="1"
                          panel_visibility="advanced">
         <BooleanDomain name="bool" />
-        <Documentation>When this flag is on, the gradient filter will compute
-        the vorticity/curl of a 3 component array.</Documentation>
+        <Documentation>
+          When this flag is on, the gradient filter will compute the vorticity/curl of a 3 component array.
+        </Documentation>
       </IntVectorProperty>
       <StringVectorProperty command="SetVorticityArrayName"
                             default_values="Vorticity"
                             name="VorticityArrayName"
                             number_of_elements="1"
                             panel_visibility="advanced">
-        <Documentation>This property provides a name for the output array
-        containing the vorticity vector.</Documentation>
+        <Documentation>
+          This property provides a name for the output array containing the vorticity vector.
+        </Documentation>
       </StringVectorProperty>
       <IntVectorProperty command="SetComputeQCriterion"
                          default_values="0"
@@ -647,16 +657,18 @@
                          number_of_elements="1"
                          panel_visibility="advanced">
         <BooleanDomain name="bool" />
-        <Documentation>When this flag is on, the gradient filter will compute
-        the Q-criterion of a 3 component array.</Documentation>
+        <Documentation>
+          When this flag is on, the gradient filter will compute the Q-criterion of a 3 component array.
+        </Documentation>
       </IntVectorProperty>
       <StringVectorProperty command="SetQCriterionArrayName"
                             default_values="Q-criterion"
                             name="QCriterionArrayName"
                             number_of_elements="1"
                             panel_visibility="advanced">
-        <Documentation>This property provides a name for the output array
-        containing Q criterion.</Documentation>
+        <Documentation>
+          This property provides a name for the output array containing Q criterion.
+        </Documentation>
       </StringVectorProperty>
       <IntVectorProperty command="SetContributingCellOption"
                          default_values="2"
@@ -671,9 +683,10 @@
           <Entry text="Dataset Max"
                  value="2" />
         </EnumerationDomain>
-        <Documentation>Specify which dimensions of cells should be used
-        when computing gradient quantities. Default is to use
-        the dataset's maximum cell dimension.</Documentation>
+        <Documentation>
+          Specify which dimensions of cells should be used when computing gradient
+          quantities. Default is to use the dataset's maximum cell dimension.
+        </Documentation>
       </IntVectorProperty>
       <IntVectorProperty command="SetReplacementValueOption"
                          default_values="1"
@@ -690,8 +703,10 @@
           <Entry text="Data Type Max"
                  value="3" />
         </EnumerationDomain>
-        <Documentation>Specify what value to use for when the gradient quantities at a
-        point can't be computed with the selected **ContributingCellOption**.</Documentation>
+        <Documentation>
+          Specify what value to use for when the gradient quantities at a
+          point can't be computed with the selected **ContributingCellOption**.
+        </Documentation>
       </IntVectorProperty>
       <!-- End UnstructuredGradientLegacy -->
     </SourceProxy>
