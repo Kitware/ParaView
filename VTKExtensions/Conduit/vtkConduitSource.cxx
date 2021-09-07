@@ -587,12 +587,25 @@ int vtkConduitSource::RequestData(
       vtkNew<vtkDataAssembly> assembly;
       std::function<void(int, const conduit_cpp::Node&)> helper;
       helper = [&name_map, &assembly, &helper](int parent, const conduit_cpp::Node& node) {
-        if (node.dtype().is_object() || node.dtype().is_list())
+        if (node.dtype().is_object())
         {
-          const auto id = assembly->AddNode(node.name().c_str(), parent);
           for (conduit_index_t cc = 0; cc < node.number_of_children(); ++cc)
           {
-            helper(id, node.child(cc));
+            auto child = node.child(cc);
+            helper(assembly->AddNode(child.name().c_str(), parent), child);
+          }
+        }
+        else if (node.dtype().is_list())
+        {
+          for (conduit_index_t cc = 0; cc < node.number_of_children(); ++cc)
+          {
+            auto child = node.child(cc);
+            if (!child.dtype().is_string())
+            {
+              vtkLogF(ERROR, "list cannot have non-string items!");
+              continue;
+            }
+            helper(parent, node.child(cc));
           }
         }
         else if (node.dtype().is_string())

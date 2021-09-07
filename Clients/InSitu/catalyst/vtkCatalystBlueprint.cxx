@@ -436,25 +436,39 @@ namespace assembly
 bool verify(const std::string& protocol, const conduit_cpp::Node& n)
 {
   vtkVLogScopeF(PARAVIEW_LOG_CATALYST_VERBOSITY(), "%s: verify", protocol.c_str());
-  if (!n.dtype().is_object() && !n.dtype().is_list() && !n.dtype().is_string())
+  if (n.dtype().is_list())
+  {
+    // list can only comprise of string items.
+    for (conduit_index_t cc = 0, max = n.number_of_children(); cc < max; ++cc)
+    {
+      if (!n.child(cc).dtype().is_string())
+      {
+        vtkLogF(ERROR, "list cannot have non-string items!");
+        return false;
+      }
+    }
+    return true;
+  }
+  else if (n.dtype().is_string())
+  {
+    return true;
+  }
+  else if (n.dtype().is_object())
+  {
+    for (conduit_index_t cc = 0; cc < n.number_of_children(); ++cc)
+    {
+      if (!assembly::verify(protocol + "::" + n.name(), n.child(cc)))
+      {
+        return false;
+      }
+    }
+    return true;
+  }
+  else
   {
     vtkLogF(ERROR, "node must be 'object', 'list', or 'string'.");
     return false;
   }
-
-  if (n.dtype().is_string())
-  {
-    return true;
-  }
-
-  for (conduit_index_t cc = 0; cc < n.number_of_children(); ++cc)
-  {
-    if (!assembly::verify(protocol + "::" + n.name(), n.child(cc)))
-    {
-      return false;
-    }
-  }
-  return true;
 }
 
 } // namespace assembly
