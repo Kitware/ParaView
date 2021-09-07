@@ -53,6 +53,8 @@
           <!-- <Entry value="21" text="vtkTree"/> -->
           <Entry text="vtkMolecule"
                  value="33" />
+          <Entry text="vtkPartitionedDataSet" value="37" />
+          <Entry text="vtkPartitionedDataSetCollection" value="38" />
         </EnumerationDomain>
         <Documentation>The value of this property determines the dataset type
         for the output of the programmable source.</Documentation>

@@ -81,6 +81,17 @@
         </DataTypeDomain>
         <Documentation>This property specifies the input.</Documentation>
       </InputProperty>
+
+      <DoubleVectorProperty name="Tolerance"
+        command="SetTolerance"
+        number_of_elements="1"
+        default_values="0">
+        <Documentation>
+          Set the tolerance to use to identify coincident points. 0 means the
+          points should be exactly identical.
+        </Documentation>
+        <DoubleRangeDomain name="range" min="0" />
+      </DoubleVectorProperty>
       <!-- End GenerateGlobalIds -->
     </SourceProxy>
 
