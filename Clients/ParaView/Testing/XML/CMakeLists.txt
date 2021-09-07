@@ -113,6 +113,8 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${paraview_test_data_directory_input}/Data/mb_with_pieces/pvi_Material_Remap2_0005_1_1.vtu}"
   "DATA{${paraview_test_data_directory_input}/Data/mb_with_pieces/pvi_Material_Remap2_0005_2_0.vtu}"
   "DATA{${paraview_test_data_directory_input}/Data/mb_with_pieces/pvi_Material_Remap2_0005_2_1.vtu}"
+  "DATA{${paraview_test_data_directory_input}/Data/mg_diff_0062.vtm}"
+  "DATA{${paraview_test_data_directory_input}/Data/mg_diff_0062/,REGEX:.*}"
   "DATA{${paraview_test_data_directory_input}/Data/multicomb_0.vts}"
   "DATA{${paraview_test_data_directory_input}/Data/multicomb_1.vts}"
   "DATA{${paraview_test_data_directory_input}/Data/multicomb_2.vts}"
