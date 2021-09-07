@@ -745,6 +745,7 @@ bool pqFileDialogModel::rmdir(const QString& dirName)
   {
     vtkSMDirectoryProxy* dirProxy = vtkSMDirectoryProxy::SafeDownCast(
       this->Implementation->getServer()->proxyManager()->NewProxy("misc", "Directory"));
+    dirProxy->SetLocation(vtkPVSession::SERVERS);
     ret = dirProxy->DeleteDirectory(dirPath.toUtf8().data());
     dirProxy->Delete();
   }
@@ -800,6 +801,7 @@ bool pqFileDialogModel::rename(const QString& oldname, const QString& newname)
   {
     vtkSMDirectoryProxy* dirProxy = vtkSMDirectoryProxy::SafeDownCast(
       this->Implementation->getServer()->proxyManager()->NewProxy("misc", "Directory"));
+    dirProxy->SetLocation(vtkPVSession::SERVERS);
     ret = dirProxy->Rename(oldPath.toUtf8().data(), newPath.toUtf8().data());
     dirProxy->Delete();
   }
