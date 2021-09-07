@@ -66,14 +66,7 @@ endif ()
 
 if ("$ENV{CMAKE_CONFIGURATION}" MATCHES "macos")
   list(APPEND test_exclusions
-    # Segfaults in an event handler
-    "\\.ColorOpacityTableEditing$"
-
-    # Possibly https://gitlab.kitware.com/paraview/paraview/-/issues/19091
-    "\\.SeparateOpacityArray$"
-
     # Known-bad
-    "\\.SliceWithPlaneMultiBlock$"
     "\\.PreviewFontScaling$"
 
     # https://gitlab.kitware.com/paraview/paraview/-/issues/20594
