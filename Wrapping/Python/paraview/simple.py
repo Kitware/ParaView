@@ -558,6 +558,11 @@ def SaveExtracts(**kwargs):
     # that the animation is updated based on timesteps in data by explicitly
     # calling UpdateAnimationUsingDataTimeSteps.
     scene = GetAnimationScene()
+    if not scene:
+        from . import print_warning
+        print_warning("This Edition does not support animations. Cannot save extracts.")
+        return False
+
     scene.UpdateAnimationUsingDataTimeSteps()
 
     pxm = servermanager.ProxyManager()
