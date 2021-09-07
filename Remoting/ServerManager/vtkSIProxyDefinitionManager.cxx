@@ -1022,23 +1022,22 @@ void vtkSIProxyDefinitionManager::MergeProxyDefinition(
     std::string name = mapIter->first;
     if (propertiesSrc.find(name) != propertiesSrc.end())
     {
-      if (!propertiesSrc[name]->GetAttribute("override") &&
-        !propertiesSrc[name]
-           ->GetParent()
-           ->GetParent()
-           ->FindNestedElementByName("Proxy")
-           ->GetAttribute("override"))
+      if (!propertiesSrc[name]->GetAttribute("override"))
       {
-        vtkWarningMacro(<< "Find conflict between 2 property name. (" << name.c_str() << ")");
-        return;
+        vtkPVXMLElement* parentProxyElem =
+          propertiesSrc[name]->GetParent()->GetParent()->FindNestedElementByName("Proxy");
+        if (!parentProxyElem || !parentProxyElem->GetAttribute("override"))
+        {
+          vtkWarningMacro(<< "Find conflict between 2 property name. (" << name.c_str() << ")");
+          return;
+        }
       }
-      else
-      { // Replace the overriden property by the new one
-        vtkPVXMLElement* subPropDefToRemove = propertiesToFill[name].GetPointer();
-        vtkPVXMLElement* overridingProp = propertiesSrc[name].GetPointer();
-        subPropDefToRemove->GetParent()->ReplaceNestedElement(subPropDefToRemove, overridingProp);
-        overridingProp->GetParent()->RemoveNestedElement(overridingProp);
-      }
+
+      // Replace the overriden property by the new one
+      vtkPVXMLElement* subPropDefToRemove = propertiesToFill[name].GetPointer();
+      vtkPVXMLElement* overridingProp = propertiesSrc[name].GetPointer();
+      subPropDefToRemove->GetParent()->ReplaceNestedElement(subPropDefToRemove, overridingProp);
+      overridingProp->GetParent()->RemoveNestedElement(overridingProp);
     }
     // Move to next
     mapIter++;
