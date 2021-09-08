@@ -592,7 +592,10 @@ int vtkConduitSource::RequestData(
           for (conduit_index_t cc = 0; cc < node.number_of_children(); ++cc)
           {
             auto child = node.child(cc);
-            helper(assembly->AddNode(child.name().c_str(), parent), child);
+            auto nodeName = vtkDataAssembly::MakeValidNodeName(child.name().c_str());
+            auto childId = assembly->AddNode(nodeName.c_str(), parent);
+            assembly->SetAttribute(childId, "label", child.name().c_str());
+            helper(childId, child);
           }
         }
         else if (node.dtype().is_list())
