@@ -154,7 +154,7 @@ void CoProcess(
     for (int i = 0; i < 3; i++)
     {
       wholeExtent[2 * i] = 0;
-      wholeExtent[2 * i + 1] = grid.GetNumPoints()[i];
+      wholeExtent[2 * i + 1] = grid.GetNumPoints()[i] - 1;
     }
 
     dataDescription->GetInputDescriptionByName("input")->SetWholeExtent(wholeExtent);
