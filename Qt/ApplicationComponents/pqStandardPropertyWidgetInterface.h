@@ -78,6 +78,7 @@ public:
    * \li \c pause_livesource: pqPauseLiveSourcePropertyWidget
    * \li \c data_assembly_editor: pqDataAssemblyPropertyWidget
    * \li \c selection_query : pqSelectionQueryPropertyWidget
+   * \li \c file_list : pqFileListPropertyWidget
    */
   pqPropertyWidget* createWidgetForProperty(
     vtkSMProxy* proxy, vtkSMProperty* property, QWidget* parentWidget) override;

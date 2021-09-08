@@ -100,6 +100,7 @@ set(classes
   pqExampleVisualizationsDialogReaction
   pqExportReaction
   pqExtractorsMenuReaction
+  pqFileListPropertyWidget
   pqFileNamePropertyWidget
   pqFiltersMenuReaction
   pqFindDataWidget
@@ -250,6 +251,7 @@ set(ui_files
   Resources/UI/pqEmptyView.ui
   Resources/UI/pqExampleVisualizationsDialog.ui
   Resources/UI/pqFileMenuBuilder.ui
+  Resources/UI/pqFileListPropertyWidget.ui
   Resources/UI/pqFindDataWidget.ui
   Resources/UI/pqFontPropertyWidget.ui
   Resources/UI/pqHandlePropertyWidget.ui
