@@ -24,8 +24,8 @@
 /// Test the output of the vtkExtractHistogram filter in a simple serial case
 int TestExtractHistogram(int, char* [])
 {
-  vtkSmartPointer<vtkSphereSource> sphere = vtkSmartPointer<vtkSphereSource>::New();
-  vtkSmartPointer<vtkExtractHistogram> extraction = vtkSmartPointer<vtkExtractHistogram>::New();
+  auto sphere = vtkSmartPointer<vtkSphereSource>::New();
+  auto extraction = vtkSmartPointer<vtkExtractHistogram>::New();
 
   const int bin_count = 3;
 
@@ -36,9 +36,9 @@ int TestExtractHistogram(int, char* [])
   extraction->SetBinCount(bin_count);
   extraction->Update();
 
-  vtkTable* const histogram = extraction->GetOutput();
+  vtkTable* histogram = extraction->GetOutput();
 
-  vtkDoubleArray* const bin_extents =
+  const vtkDoubleArray* bin_extents =
     vtkDoubleArray::SafeDownCast(histogram->GetRowData()->GetArray("bin_extents"));
 
   if (!bin_extents)
@@ -69,7 +69,8 @@ int TestExtractHistogram(int, char* [])
 
   if (bin_values->GetNumberOfComponents() != 1)
   {
-    vtkGenericWarningMacro("bin_values must be a 1 component array.") return 1;
+    vtkGenericWarningMacro("bin_values must be a 1 component array.");
+    return 1;
   }
   if (bin_values->GetNumberOfTuples() != bin_count)
   {
