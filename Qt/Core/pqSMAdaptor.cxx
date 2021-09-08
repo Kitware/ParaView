@@ -35,6 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // qt includes
 #include <QString>
+#include <QStringList>
 #include <QVariant>
 #include <QtDebug>
 
@@ -78,8 +79,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // ParaView includes
 #include "pqSMProxy.h"
 
-#include <QStringList>
-
+#include <algorithm>
 #include <cassert>
 #include <set>
 
@@ -1601,6 +1601,7 @@ QList<QVariant> pqSMAdaptor::getMultipleElementPropertyDomain(
   return domain;
 }
 
+//-----------------------------------------------------------------------------
 QStringList pqSMAdaptor::getFileListProperty(vtkSMProperty* Property, PropertyValueType Type)
 {
   QStringList files;
@@ -1636,44 +1637,29 @@ QStringList pqSMAdaptor::getFileListProperty(vtkSMProperty* Property, PropertyVa
   return files;
 }
 
+//-----------------------------------------------------------------------------
 void pqSMAdaptor::setFileListProperty(
   vtkSMProperty* Property, QStringList Value, PropertyValueType Type)
 {
   vtkSMStringVectorProperty* svp = vtkSMStringVectorProperty::SafeDownCast(Property);
-
   if (!svp)
   {
     return;
   }
 
-  unsigned int i = 0;
-  foreach (const QString& file, Value)
+  std::vector<std::string> valueVector(Value.size());
+  std::transform(Value.begin(), Value.end(), valueVector.begin(),
+    [](const QString& str) { return std::string(str.toUtf8().data()); });
+
+  switch (Type)
   {
-    unsigned int elementCount = 0;
-    if (Type == CHECKED)
-    {
-      elementCount = svp->GetNumberOfElements();
-    }
-    else if (Type == UNCHECKED)
-    {
-      elementCount = svp->GetNumberOfUncheckedElements();
-    }
-
-    if (!svp->GetRepeatable() && i >= elementCount)
-    {
+    case CHECKED:
+      svp->SetElements(valueVector);
       break;
-    }
 
-    if (Type == CHECKED)
-    {
-      svp->SetElement(i, file.toUtf8().data());
-    }
-    else if (Type == UNCHECKED)
-    {
-      svp->SetUncheckedElement(i, file.toUtf8().data());
-    }
-
-    i++;
+    case UNCHECKED:
+      svp->SetUncheckedElements(valueVector);
+      break;
   }
 }
 
