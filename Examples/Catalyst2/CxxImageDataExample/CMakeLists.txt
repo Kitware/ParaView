@@ -68,6 +68,29 @@ if (USE_CATALYST)
       PROPERTIES
         FIXTURES_REQUIRED "CxxImageDataExampleV2::IOPipeline::Prepare")
 
+    add_test(
+      NAME CxxImageDataExampleV2::IOPipelineRelativePaths::Prepare
+      COMMAND "${CMAKE_COMMAND}" -E rm -rf  "${CMAKE_CURRENT_BINARY_DIR}/Testing/Temporary/relative_paths/*")
+
+    set_tests_properties(
+      "CxxImageDataExampleV2::IOPipelineRelativePaths::Prepare"
+      PROPERTIES
+        FIXTURES_SETUP "CxxImageDataExampleV2::IOPipelineRelativePaths::Prepare")
+
+    make_directory("${CMAKE_CURRENT_BINARY_DIR}/Testing/Temporary/relative_paths")
+    add_test(
+      NAME CxxImageDataExampleV2::IOPipelineRelativePaths
+      WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/Testing/Temporary/relative_paths"
+      COMMAND CxxImageDataExampleV2
+              --output "dataset-%04ts.vtpd"
+              --exists "${CMAKE_CURRENT_BINARY_DIR}/Testing/Temporary/relative_paths/dataset-0093.vtpd"
+              --exists "${CMAKE_CURRENT_BINARY_DIR}/Testing/Temporary/relative_paths/dataset-0093/dataset-0093_0.vti")
+
+    set_tests_properties(
+      "CxxImageDataExampleV2::IOPipelineRelativePaths"
+      PROPERTIES
+        FIXTURES_REQUIRED "CxxImageDataExampleV2::IOPipelineRelativePaths::Prepare")
+
     set(_vtk_fail_regex
       # vtkLogger
       "(\n|^)ERROR: "
@@ -78,6 +101,7 @@ if (USE_CATALYST)
     set_tests_properties(
         "CxxImageDataExampleV2::SimplePipeline"
         "CxxImageDataExampleV2::IOPipeline"
+        "CxxImageDataExampleV2::IOPipelineRelativePaths"
       PROPERTIES
         FAIL_REGULAR_EXPRESSION "${_vtk_fail_regex}"
         SKIP_RETURN_CODE 125)
