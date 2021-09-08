@@ -37,9 +37,8 @@ if ("$ENV{CMAKE_CONFIGURATION}" MATCHES "fedora")
     # These tests all seem to have some problem with the rendering order of
     # some components of the scenes that are being tested. Needs investigation.
     # https://gitlab.kitware.com/vtk/vtk/-/issues/18098
-    "\\.BoxWidget$"
     "\\.BlockLinkedSelection$"
-    "\\.CheckSelectedBlocks$"
+    "\\.BoxWidget$"
     "\\.CTHAMRClip$"
     "\\.CTHAMRContour$"
     "\\.MultiSliceWavelet$"
@@ -54,27 +53,10 @@ if ("$ENV{CMAKE_CONFIGURATION}" MATCHES "fedora")
     # "Structure does not match. You must use CopyStructure before calling this
     # method."
     # https://gitlab.kitware.com/paraview/paraview/-/issues/20692
-    "\\.VisItBridgeLAMMPSDump$"
-    "\\.VisItBridgeLAMMPSDump2$"
-
-    # These have failed on buildbot before. Not sure what the cause is.
-    "\\.TestPythonView$"
-
-    # X races
-    # https://gitlab.kitware.com/paraview/paraview/-/issues/20697
-    "\\.ComparativeViewOverlay"
-
-    # UI tests that fail without messages or baselines.
-    "\\.BagPlotMatrixView$"
-    "\\.BagPlots$"
-    "\\.BagPlotsSelection$"
-    "\\.FunctionalBagPlots$"
-    "\\.GMVReaderBasicRead$"
-    "\\.LagrangianParticleTracker$"
-    "\\.LagrangianParticleTrackerReseeding$"
-    "\\.Slice$"
-    "\\.TraceMultiViews$"
-    "\\.TruchasReaderWithVisItBridge$"
+    "^pvcrs\\.VisItBridgeLAMMPSDump$"
+    "^pvcrs\\.VisItBridgeLAMMPSDump2$"
+    "^pvcs\\.VisItBridgeLAMMPSDump$"
+    "^pvcs\\.VisItBridgeLAMMPSDump2$"
 
     # Some X sync issue causing the images to be capture with
     # incorrect size, ignore for now.
@@ -84,14 +66,7 @@ endif ()
 
 if ("$ENV{CMAKE_CONFIGURATION}" MATCHES "macos")
   list(APPEND test_exclusions
-    # Segfaults in an event handler
-    "\\.ColorOpacityTableEditing$"
-
-    # Possibly https://gitlab.kitware.com/paraview/paraview/-/issues/19091
-    "\\.SeparateOpacityArray$"
-
     # Known-bad
-    "\\.SliceWithPlaneMultiBlock$"
     "\\.PreviewFontScaling$"
 
     # https://gitlab.kitware.com/paraview/paraview/-/issues/20594
@@ -117,16 +92,12 @@ if ("$ENV{CMAKE_CONFIGURATION}" MATCHES "windows")
     "^pv\\.FindWidget$"
 
     # See https://gitlab.kitware.com/paraview/paraview/-/issues/20282
-    "\\.AnimationSetTimeCursor$"
     "\\.ColorByCellDataStringArray$"
     "\\.IndexedLookupInitialization$"
     "\\.LoadStateMultiView$"
     "\\.PreviewFontScaling$"
-    "\\.SaveColorMap$"
     "\\.SelectPointsTrace$"
-    "\\.UndoRedo1$"
     "\\.UnstructuredVolumeRenderingVectorComponent$"
-    "^pv\\.AnalyzeReaderWriterPlugin$"
     "^pv\\.CompositeSurfaceSelection$"
     "^pv\\.ExportFilteredColumnsSpreadsheet$"
     "^pv\\.ExportSpreadsheetFormatting$"

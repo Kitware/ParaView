@@ -12,7 +12,7 @@ ExternalData_add_test("${_vtk_build_TEST_DATA_TARGET}"
   )
 
 set(MyTests
-  LogViewerWidget
+  LogViewerWidget.cxx
 )
 
 set(MocSources

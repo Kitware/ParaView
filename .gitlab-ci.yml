@@ -102,8 +102,6 @@ test:fedora33-shared-debug-mpi-python-qt:
     needs:
         - build:fedora33-shared-debug-mpi-python-qt
     timeout: 120 minutes
-    # some tests are failing. investigation needed
-    allow_failure: true
 
 ## Catalyst editions
 
@@ -126,8 +124,6 @@ test:fedora33-shared-mpi-core:
         - build:fedora33-shared-mpi-core
     needs:
         - build:fedora33-shared-mpi-core
-    # editions testing needs some work.
-    allow_failure: true
 
 build:fedora33-shared-mpi-python-core:
     extends:
@@ -148,8 +144,6 @@ test:fedora33-shared-mpi-python-core:
         - build:fedora33-shared-mpi-python-core
     needs:
         - build:fedora33-shared-mpi-python-core
-    # editions testing needs some work.
-    allow_failure: true
 
 ## Static analysis
 

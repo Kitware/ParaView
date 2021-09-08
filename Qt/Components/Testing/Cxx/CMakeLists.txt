@@ -5,7 +5,7 @@ target_link_libraries(pqPipelineApp PRIVATE Qt5::Core Qt5::Widgets)
 #ADD_TEST(pqPipelineApp "${EXECUTABLE_OUTPUT_PATH}/pqPipelineApp" -dr "--test-directory=${PARAVIEW_TEST_DIR}")
 
 set(tests_sources
-  TabbedMultiViewWidgetFilteringApp)
+  TabbedMultiViewWidgetFilteringApp.cxx)
 create_test_sourcelist(tests pqComponentsTest.cxx ${tests_sources})
 vtk_module_test_executable(pqComponentsTest ${tests})
 target_link_libraries(pqComponentsTest PRIVATE Qt5::Core Qt5::Widgets)
