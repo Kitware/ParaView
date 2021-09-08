@@ -48,10 +48,25 @@ if (USE_CATALYST)
       NAME CxxImageDataExampleV2::SimplePipeline
       COMMAND CxxImageDataExampleV2
               ${CMAKE_CURRENT_SOURCE_DIR}/catalyst_pipeline.py)
+
+    add_test(
+      NAME CxxImageDataExampleV2::IOPipeline::Prepare
+      COMMAND "${CMAKE_COMMAND}" -E remove_directory  "${CMAKE_CURRENT_BINARY_DIR}/Testing/Temporary/result")
+    set_tests_properties(
+      "CxxImageDataExampleV2::IOPipeline::Prepare"
+      PROPERTIES
+        FIXTURES_SETUP "CxxImageDataExampleV2::IOPipeline::Prepare")
+
     add_test(
       NAME CxxImageDataExampleV2::IOPipeline
       COMMAND CxxImageDataExampleV2
-              --output "${CMAKE_CURRENT_BINARY_DIR}/Testing/Temporary/dataset-%04ts.vtpd")
+              --output "${CMAKE_CURRENT_BINARY_DIR}/Testing/Temporary/result/dataset-%04ts.vtpd"
+              --exists "${CMAKE_CURRENT_BINARY_DIR}/Testing/Temporary/result/dataset-0093.vtpd"
+              --exists "${CMAKE_CURRENT_BINARY_DIR}/Testing/Temporary/result/dataset-0093/dataset-0093_0.vti")
+    set_tests_properties(
+      "CxxImageDataExampleV2::IOPipeline"
+      PROPERTIES
+        FIXTURES_REQUIRED "CxxImageDataExampleV2::IOPipeline::Prepare")
 
     set(_vtk_fail_regex
       # vtkLogger
@@ -66,5 +81,11 @@ if (USE_CATALYST)
       PROPERTIES
         FAIL_REGULAR_EXPRESSION "${_vtk_fail_regex}"
         SKIP_RETURN_CODE 125)
+
+    # this ensures that ParaView Catalyst was indeed loaded.
+    set_tests_properties(
+        "CxxImageDataExampleV2::SimplePipeline"
+      PROPERTIES
+        PASS_REGULAR_EXPRESSION "executing catalyst_pipeline")
   endif()
 endif()

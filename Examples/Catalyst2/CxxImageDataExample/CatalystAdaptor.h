@@ -4,11 +4,13 @@
 #include "FEDataStructures.h"
 #include <catalyst.hpp>
 #include <cstring>
+#include <fstream>
 #include <iostream>
 #include <string>
 
 namespace CatalystAdaptor
 {
+static std::vector<std::string> filesToValidate;
 
 /**
  * In this example, we show how we can use Catalysts's C++
@@ -30,6 +32,11 @@ void Initialize(int argc, char* argv[])
       node["catalyst/pipelines/0/channel"].set("grid");
       ++cc;
     }
+    else if (strcmp(argv[cc], "--exists") == 0 && (cc + 1) < argc)
+    {
+      filesToValidate.push_back(argv[cc + 1]);
+      ++cc;
+    }
     else
     {
       const auto path = std::string(argv[cc]);
@@ -44,10 +51,15 @@ void Initialize(int argc, char* argv[])
       node[name + "/args"].append().set_string("--argument3");
     }
   }
+
+  // indicate that we want to load ParaView-Catalyst
+  node["catalyst_load/implementation"].set_string("paraview");
+  node["catalyst_load/search_paths/paraview"] = PARAVIEW_IMPL_DIR;
+
   catalyst_error err = catalyst_initialize(conduit_cpp::c_node(&node));
   if (err != catalyst_error_ok)
   {
-    std::cerr << "Failed to initialize Catalyst: " << err << std::endl;
+    std::cerr << "ERROR: Failed to initialize Catalyst: " << err << std::endl;
   }
 }
 
@@ -126,7 +138,7 @@ void Execute(int cycle, double time, Grid& grid, Attributes& attribs)
   catalyst_error err = catalyst_execute(conduit_cpp::c_node(&exec_params));
   if (err != catalyst_error_ok)
   {
-    std::cerr << "Failed to execute Catalyst: " << err << std::endl;
+    std::cerr << "ERROR: Failed to execute Catalyst: " << err << std::endl;
   }
 }
 
@@ -136,7 +148,16 @@ void Finalize()
   catalyst_error err = catalyst_finalize(conduit_cpp::c_node(&node));
   if (err != catalyst_error_ok)
   {
-    std::cerr << "Failed to finalize Catalyst: " << err << std::endl;
+    std::cerr << "ERROR: Failed to finalize Catalyst: " << err << std::endl;
+  }
+
+  for (const auto& fname : filesToValidate)
+  {
+    std::ifstream istrm(fname.c_str(), std::ios::binary);
+    if (!istrm.is_open())
+    {
+      std::cerr << "ERROR: Failed to open file '" << fname.c_str() << "'." << std::endl;
+    }
   }
 }
 }
