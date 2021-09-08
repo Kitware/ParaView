@@ -76,6 +76,13 @@
       </widget>
      </item>
      <item>
+      <widget class="QPushButton" name="setAsDefault">
+       <property name="text">
+        <string>Set reader as default</string>
+       </property>
+      </widget>
+     </item>
+     <item>
       <widget class="QPushButton" name="cancelButton">
        <property name="text">
         <string>Cancel</string>

@@ -139,6 +139,7 @@ public:
   pqFileDialog::FileMode Mode;
   Ui::pqFileDialog Ui;
   QList<QStringList> SelectedFiles;
+  int SelectedFilterIndex;
   QStringList Filters;
   bool SuppressOverwriteWarning;
   bool ShowMultipleFileHelp;
@@ -764,6 +765,12 @@ QStringList pqFileDialog::getSelectedFiles(int index)
 }
 
 //-----------------------------------------------------------------------------
+int pqFileDialog::getSelectedFilterIndex()
+{
+  return this->Implementation->SelectedFilterIndex;
+}
+
+//-----------------------------------------------------------------------------
 void pqFileDialog::accept()
 {
   auto& impl = *this->Implementation;
@@ -1011,6 +1018,11 @@ void pqFileDialog::onFilterChange(const QString& filter)
 
   // update view
   impl.FileFilter.invalidate();
+  impl.Ui.FileType->setToolTip(impl.Ui.FileType->currentText());
+
+  impl.SelectedFilterIndex = impl.Ui.FileType->currentIndex();
+
+  this->updateButtonStates();
 }
 
 //-----------------------------------------------------------------------------
@@ -1452,10 +1464,13 @@ void pqFileDialog::updateButtonStates()
 {
   auto& impl = *this->Implementation;
 
-  // We disable buttons if no file in the current folder
   if (impl.FileNames.empty())
   {
-    impl.Ui.OK->setEnabled(impl.Mode == Directory || impl.Mode == ExistingFilesAndDirectories);
+    QString const currentDirName = QFileInfo(impl.Model->getCurrentPath()).fileName();
+    // Enables "Ok" only if the current directory can be opened
+    impl.Ui.OK->setEnabled((impl.Mode == Directory || impl.Mode == ExistingFilesAndDirectories) &&
+      impl.FileFilter.getWildcards().exactMatch(currentDirName));
+
     impl.Ui.Navigate->setEnabled(false);
     return;
   }
@@ -1467,14 +1482,31 @@ void pqFileDialog::updateButtonStates()
     is_dir = impl.Model->dirExists(impl.FileNames.front(), tmp);
   }
 
-  // if mode is Directory, update OK button state.
-  if (impl.Mode == Directory)
+  switch (impl.Mode)
   {
-    impl.Ui.OK->setEnabled(is_dir);
-  }
-  else
-  {
-    impl.Ui.OK->setEnabled(true);
+    case Directory:
+      // if mode is Directory, update OK button state.
+      impl.Ui.OK->setEnabled(is_dir);
+      break;
+    case AnyFile:
+      impl.Ui.OK->setEnabled(true);
+      break;
+    default:
+      // Check that the files match the selected filter
+      bool filesMatching = std::all_of(
+        impl.FileNames.begin(), impl.FileNames.end(), [&](QString const& fileOrGroupName) {
+          // Get all the files of the group if fileName is a group, else just get {fileName}
+          QStringList const fileNames = buildFileGroup(fileOrGroupName);
+          return std::all_of(fileNames.begin(), fileNames.end(), [&](QString const& fileName) {
+            QString fileNameWithoutPath =
+              QFileInfo(impl.Model->absoluteFilePath(fileName)).fileName();
+            QString unusedString;
+            return impl.FileFilter.getWildcards().exactMatch(fileNameWithoutPath) &&
+              (impl.Model->fileExists(fileName, unusedString) ||
+                impl.Model->dirExists(fileName, unusedString));
+          });
+        });
+      impl.Ui.OK->setEnabled(filesMatching);
   }
 
   // show the Navigate button.

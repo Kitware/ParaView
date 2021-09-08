@@ -843,8 +843,9 @@
     </SettingsProxy>
 
     <!-- ================================================================== -->
+    <!-- TODO change this setting organization later -->
     <SettingsProxy name="RepresentedArrayListSettings"
-                   label="Color Arrays"
+                   label="Miscellaneous"
                    processes="client"
                    class="vtkPVRepresentedArrayListSettings">
       <StringVectorProperty command="SetFilterExpression"
@@ -857,8 +858,20 @@
         <Documentation>
           List of expressions used to filter out arrays you do not want to display in the color array list.
         </Documentation>
-        <!--<StringListDomain name="blah">
-        </StringListDomain>-->
+        <Hints>
+          <ShowLabel />
+        </Hints>
+      </StringVectorProperty>
+      <StringVectorProperty name="ReaderDetails"
+                            label="Default reader details"
+                            number_of_elements_per_command="3"
+                            repeat_command="1">
+        <Documentation>
+          List of file patterns, names and underling filter to use by default when selecting a file with the "Supported Files" filter selected.
+        </Documentation>
+        <Hints>
+          <ShowLabel />
+        </Hints>
       </StringVectorProperty>
       <Hints>
         <UseDocumentationForLabels />

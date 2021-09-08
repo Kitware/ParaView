@@ -146,6 +146,11 @@ public:
   QList<QStringList> getAllSelectedFiles();
 
   /**
+   * Return the used filter index
+   */
+  int getSelectedFilterIndex();
+
+  /**
    * accept this dialog
    */
   void accept() override;

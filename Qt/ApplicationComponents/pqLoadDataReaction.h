@@ -126,6 +126,29 @@ protected:
   static pqPipelineSource* LoadFile(
     const QStringList& files, pqServer* server, const QPair<QString, QString>& readerInfo);
 
+  /**
+   * Called when the file dialog filter was on "Supported Types"
+   * First search for a matching reader in the default readers settings, and if none is found use
+   * the standard method to choose a reader.
+   */
+  static QVector<pqPipelineSource*> loadFilesForSupportedTypes(QList<QStringList> files);
+
+  /**
+   * Called when the file dialog filter was on "All Types"
+   * Lists all existing readers for the user to choose.
+   * If the user clicks "Set reader as default", this lets the user choose the pattern they want to
+   * add to the setting for this reader.
+   */
+  static QVector<pqPipelineSource*> loadFilesForAllTypes(
+    QList<QStringList> files, pqServer* server, vtkSMReaderFactory* readerFactory);
+
+  /**
+   * Adds the reader to the defaults readers settings.
+   * If customPattern is empty, the reader pattern will be used.
+   */
+  static void addReaderToDefaults(QString const& readerName, pqServer* server,
+    vtkSMReaderFactory* readerFactory, QString const& customPattern = "");
+
 private:
   Q_DISABLE_COPY(pqLoadDataReaction)
 };
