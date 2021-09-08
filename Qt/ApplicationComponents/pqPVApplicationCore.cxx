@@ -85,20 +85,25 @@ pqPVApplicationCore::pqPVApplicationCore(int& argc, char** argv, vtkCLIOptions* 
   pqApplicationCore::instance()->registerManager("SELECTION_MANAGER", this->SelectionManager);
 
   pqPresetGroupsManager* presetGroupManager = new pqPresetGroupsManager(this);
-  QString groupString;
-  QFile groupsFile(":pqWidgets/pqPresetGroups.json");
-
-  if (!groupsFile.open(QIODevice::ReadOnly))
+  bool loadedFromSettings = presetGroupManager->loadGroupsFromSettings();
+  // If the groups could not be loaded from the settings, use the default groups
+  if (!loadedFromSettings)
   {
-    qWarning() << "Could not load preset group list.";
-  }
-  else
-  {
-    groupString = groupsFile.readAll();
-  }
-  groupsFile.close();
+    QString groupString;
+    QFile groupsFile(":pqWidgets/pqPresetGroups.json");
 
-  presetGroupManager->loadGroups(groupString);
+    if (!groupsFile.open(QIODevice::ReadOnly))
+    {
+      qWarning() << "Could not load preset group list.";
+    }
+    else
+    {
+      groupString = groupsFile.readAll();
+    }
+    groupsFile.close();
+
+    presetGroupManager->loadGroups(groupString);
+  }
   pqApplicationCore::instance()->registerManager("PRESET_GROUP_MANAGER", presetGroupManager);
 
   this->PythonManager = nullptr;

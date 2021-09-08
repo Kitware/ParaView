@@ -224,6 +224,12 @@ public Q_SLOTS:
 
   void onRangeHandlesRangeChanged(double rangeMin, double rangeMax);
 
+  /**
+   * Resets the color map combo box by setting its index
+   * to -1 which sets its text to an empty string
+   */
+  void resetColorMapComboBox();
+
 Q_SIGNALS:
   /**
   * Signal fired when the xrgbPoints change.
@@ -299,6 +305,11 @@ protected Q_SLOTS:
   * called when a preset is applied.
   */
   void presetApplied();
+
+  /**
+   * Updates the default presets combo box when the list changes
+   */
+  void updateDefaultPresetsList();
 
   /**
   * Ensures that the color-swatches for indexedColors are shown only when this

@@ -1,0 +1,31 @@
+<?xml version="1.0" ?>
+<pqevents>
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuTools" />
+  <pqevent object="pqClientMainWindow/menubar/menuTools" command="activate" arguments="actionTesting_Window_Size_Custom" />
+  <pqevent object="pqClientMainWindow/pqLockViewSizeCustomDialog/Width" command="set_string" arguments="400" />
+  <pqevent object="pqClientMainWindow/pqLockViewSizeCustomDialog/Height" command="set_string" arguments="400" />
+  <pqevent object="pqClientMainWindow/pqLockViewSizeCustomDialog/ButtonBox/1QPushButton0" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuSources" />
+  <pqevent object="pqClientMainWindow/menubar/menuSources/Alphabetical" command="activate" arguments="CubeSource" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/DisplayFrame/ProxyPanel/ColorEditor/DisplayColorWidget/Variables" command="activated" arguments="TCoords" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/DisplayFrame/ProxyPanel/ColorEditor/EditColorMap" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/colorMapEditorDock/colorMapEditorPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/Properties/ColorOpacityEditor/ChoosePreset" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/pqPresetDialog/importPresets" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/pqPresetDialog/ImportPresets" command="filesSelected" arguments="$PARAVIEW_DATA_ROOT/Testing/Data/x_ray_copy_1.json" />
+  <pqcheck object="pqClientMainWindow/pqPresetDialog/gradients" property="modelItemData" arguments="8.0,X_Ray_Copy_1" />
+  <pqevent object="pqClientMainWindow/pqPresetDialog/widget/groupChooser" command="activated" arguments="CustomGroup1" />
+  <pqcheck object="pqClientMainWindow/pqPresetDialog/gradients" property="modelItemData" arguments="0.0,X_Ray_Copy_1" />
+  <pqevent object="pqClientMainWindow/pqPresetDialog/gradients" command="setCurrent" arguments="0.0" />
+  <pqevent object="pqClientMainWindow/pqPresetDialog/widget/groupChooser" command="activated" arguments="Linear" />
+  <pqcheck object="pqClientMainWindow/pqPresetDialog/gradients" property="modelItemData" arguments="32.1,X_Ray_Copy_1" />
+  <pqevent object="pqClientMainWindow/pqPresetDialog/gradients" command="setCurrent" arguments="0.0" />
+  <pqevent object="pqClientMainWindow/pqPresetDialog/importPresets" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/pqPresetDialog/ImportPresets" command="filesSelected" arguments="$PARAVIEW_DATA_ROOT/Testing/Data/x_ray_copy_2.json" />
+  <pqevent object="pqClientMainWindow/pqPresetDialog/widget/groupChooser" command="activated" arguments="Default" />
+  <pqevent object="pqClientMainWindow/pqPresetDialog/gradients" command="setSelection" arguments="8.1,8.1" />
+  <pqevent object="pqClientMainWindow/pqPresetDialog/gradients" command="setCurrent" arguments="8.1" />
+  <pqcheck object="pqClientMainWindow/pqPresetDialog/gradients" property="modelItemData" arguments="8.1,X_Ray_Copy_2" />
+  <pqevent object="pqClientMainWindow/pqPresetDialog/widget/groupChooser" command="activated" arguments="User" />
+  <pqcheck object="pqClientMainWindow/pqPresetDialog/gradients" property="modelItemData" arguments="0.0,X_Ray_Copy_2" />
+</pqevents>

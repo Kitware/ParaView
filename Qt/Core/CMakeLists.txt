@@ -110,6 +110,7 @@ set(classes
   pqServerManagerObserver
   pqServerResource
   pqSettings
+  pqSignalsBlocker
   pqSpreadSheetView
   pqSpreadSheetViewModel
   pqSpreadSheetViewSelectionModel

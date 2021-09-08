@@ -30,8 +30,8 @@
 #include <cassert>
 #include <list>
 #include <memory>
-#include <set>
 #include <sstream>
+#include <unordered_set>
 
 vtkSmartPointer<vtkSMTransferFunctionPresets> vtkSMTransferFunctionPresets::Instance;
 
@@ -123,6 +123,15 @@ public:
   {
     if (newname && newname[0])
     {
+      // Check that the newname is not already used
+      if (std::any_of(
+            this->Presets.begin(), this->Presets.end(), [newname](vtkJson::Value const& preset) {
+              return preset.get("Name", "").asString() == newname;
+            }))
+      {
+        return false;
+      }
+
       const std::vector<Json::Value>& presets = this->GetPresets();
       if (index < static_cast<unsigned int>(presets.size()) &&
         index >= static_cast<unsigned int>(this->BuiltinPresets.size()))
@@ -140,7 +149,7 @@ public:
     return false;
   }
 
-  bool ImportPresets(const char* filename)
+  bool ImportPresets(const char* filename, std::vector<ImportedPreset>* importedPresets)
   {
     Json::CharReaderBuilder builder;
     builder["collectComments"] = false;
@@ -162,16 +171,98 @@ public:
       vtkGenericWarningMacro("File may not contain presets: " << filename);
       return false;
     }
-    return this->ImportPresets(root);
+
+    std::unordered_set<std::string> presetNames;
+    presetNames.reserve(this->Presets.size());
+    std::transform(this->Presets.begin(), this->Presets.end(),
+      std::inserter(presetNames, presetNames.end()),
+      [](vtkJson::Value const& preset) { return preset.get("Name", Json::Value()).asString(); });
+
+    for (Json::Value& preset : root)
+    {
+      std::string basename = preset.get("Name", "Preset").asString();
+
+      std::string name = this->FindUniquePresetNameWithinPresets(basename, presetNames);
+
+      preset["Name"] = name;
+      presetNames.insert(name);
+    }
+
+    return this->ImportPresets(root, importedPresets);
   }
 
-  bool ImportPresets(const Json::Value& root)
+  bool ImportPresets(const Json::Value& root,
+    std::vector<vtkSMTransferFunctionPresets::ImportedPreset>* importedPresets)
   {
+    if (importedPresets != nullptr)
+    {
+      // The root is an array of presets that contain a "Name" and "Groups" fields that are
+      // extracted to fill the importedPresets vector.
+      std::transform(root.begin(), root.end(), std::back_inserter(*importedPresets),
+        [&](Json::Value const& preset) {
+          auto result = vtkSMTransferFunctionPresets::ImportedPreset{};
+          result.name = preset.get("Name", "").asString();
+          auto groups = preset.get("Groups", Json::Value());
+          // This checks if the "Groups" field is an array, but also that it is present to make the
+          // distinction between an empty "Groups" field which means the user wants the preset to be
+          // added to no group, and a non-present "Groups" field which means the preset will be
+          // added to default groups, "Default" and "User" at the time this comment is written.
+          if (groups.isArray())
+          {
+            result.potentialGroups.isValid = true;
+            std::transform(groups.begin(), groups.end(),
+              std::back_inserter(result.potentialGroups.groups),
+              [&](Json::Value const& groupName) { return groupName.asString(); });
+          }
+          else
+          {
+            result.potentialGroups.isValid = false;
+          }
+          return result;
+        });
+    }
     this->LoadCustomPresets();
     this->CustomPresets.insert(this->CustomPresets.end(), root.begin(), root.end());
     this->SaveToSettings();
     this->Reload();
     return true;
+  }
+
+  // Adds a suffix to basename to make sure the preset name is unique
+  std::string FindUniquePresetName(std::string const& basename)
+  {
+    std::unordered_set<std::string> presetNames;
+    presetNames.reserve(this->Presets.size());
+    std::transform(this->Presets.begin(), this->Presets.end(),
+      std::inserter(presetNames, presetNames.end()),
+      [](vtkJson::Value const& preset) { return preset.get("Name", Json::Value()).asString(); });
+    return this->FindUniquePresetNameWithinPresets(basename, presetNames);
+  }
+
+  // Same as FindUniquePresetName, but takes the unordered_set containing all preset names, when the
+  // caller wants to avoid creating it on each call for performances sake
+  std::string FindUniquePresetNameWithinPresets(
+    std::string const& basename, std::unordered_set<std::string> const& presetNames)
+  {
+    std::string const _basename = !basename.empty() ? basename : "Preset";
+    std::string name = _basename;
+    std::string separator = " ";
+    int suffix = 0;
+
+    while (presetNames.find(_basename) != presetNames.end())
+    {
+      std::ostringstream stream;
+      stream << _basename << separator.c_str() << suffix;
+      name = stream.str();
+      suffix++;
+      if (suffix > 1000)
+      {
+        vtkGenericWarningMacro(<< "Giving up. Cannot find a unique name for '" << _basename
+                               << "'. Please provide a good prefix.");
+        return std::string();
+      }
+    }
+    return name;
   }
 
 private:
@@ -395,29 +486,12 @@ std::string vtkSMTransferFunctionPresets::AddUniquePreset(
 {
   prefix = prefix ? prefix : "Preset";
 
-  std::set<std::string> names;
-  const std::vector<Json::Value>& presets = this->Internals->GetPresets();
-  for (std::vector<Json::Value>::const_iterator iter = presets.begin(); iter != presets.end();
-       ++iter)
+  std::string name = this->Internals->FindUniquePresetName(prefix);
+  if (name.empty())
   {
-    names.insert(iter->get("Name", Json::Value()).asString());
+    return name;
   }
 
-  std::string name = prefix;
-  std::string separator = name.empty() ? "" : " ";
-  int suffix = 0;
-  while (names.find(name) != names.end())
-  {
-    std::ostringstream stream;
-    stream << prefix << separator.c_str() << suffix;
-    name = stream.str();
-    suffix++;
-    if (suffix > 1000)
-    {
-      vtkErrorMacro("Giving up. Cannot find a unique name. Please provide a good prefix.");
-      return std::string();
-    }
-  }
   this->AddPreset(name.c_str(), preset);
   return name;
 }
@@ -453,16 +527,6 @@ bool vtkSMTransferFunctionPresets::GetPresetHasAnnotations(const Json::Value& pr
 }
 
 //----------------------------------------------------------------------------
-bool vtkSMTransferFunctionPresets::IsPresetDefault(const Json::Value& preset)
-{
-  if (preset.empty() || !preset.isMember("DefaultMap"))
-  {
-    return false;
-  }
-  return preset["DefaultMap"].asBool();
-}
-
-//----------------------------------------------------------------------------
 bool vtkSMTransferFunctionPresets::IsPresetBuiltin(unsigned int index)
 {
   if (index >= this->GetNumberOfPresets())
@@ -475,7 +539,8 @@ bool vtkSMTransferFunctionPresets::IsPresetBuiltin(unsigned int index)
 }
 
 //----------------------------------------------------------------------------
-bool vtkSMTransferFunctionPresets::ImportPresets(const char* filename)
+bool vtkSMTransferFunctionPresets::ImportPresets(
+  const char* filename, std::vector<ImportedPreset>* importedPresets)
 {
   if (!filename)
   {
@@ -504,14 +569,15 @@ bool vtkSMTransferFunctionPresets::ImportPresets(const char* filename)
   }
   else
   {
-    return this->Internals->ImportPresets(filename);
+    return this->Internals->ImportPresets(filename, importedPresets);
   }
 }
 
 //----------------------------------------------------------------------------
-bool vtkSMTransferFunctionPresets::ImportPresets(const Json::Value& presets)
+bool vtkSMTransferFunctionPresets::ImportPresets(
+  const Json::Value& presets, std::vector<ImportedPreset>* importedPresets)
 {
-  return this->Internals->ImportPresets(presets);
+  return this->Internals->ImportPresets(presets, importedPresets);
 }
 
 //----------------------------------------------------------------------------

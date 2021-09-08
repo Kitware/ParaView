@@ -221,6 +221,9 @@ in default mode</string>
      </item>
      <item>
       <widget class="QPushButton" name="importPresets">
+       <property name="toolTip">
+        <string>Import a preset from a json file, imported preset will appear in italics</string>
+       </property>
        <property name="text">
         <string>Import</string>
        </property>

@@ -139,6 +139,34 @@ public:
    */
   void replaceGroups(const QString& json);
 
+  /**
+   * Load the groups from the settings
+   * Return true if loading was successful
+   */
+  bool loadGroupsFromSettings();
+
+  /**
+   * Adds a preset to a group.
+   * Creates the group if it does not exist
+   */
+  void addToGroup(const QString& groupName, const QString& presetName);
+
+  /**
+   * Removes a preset from a group.
+   */
+  void removeFromGroup(const QString& groupName, const QString& presetName);
+
+  /**
+   * Removes a preset from all groups.
+   */
+  void removeFromAllGroups(const QString& presetName);
+
+public Q_SLOTS:
+  /**
+   * Save groups to settings
+   */
+  void saveGroupsToSettings();
+
 Q_SIGNALS:
   /**
    * Fired whenever loadGroups or replaceGroups is called and new group information
