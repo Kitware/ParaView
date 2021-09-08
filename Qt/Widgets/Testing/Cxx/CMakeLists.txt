@@ -1,13 +1,13 @@
 SET(MyTests
-  Animation
-  FlatTreeView
-  HeaderViewCheckState
-  TreeViewSelectionAndCheckState
+  Animation.cxx
+  FlatTreeView.cxx
+  HeaderViewCheckState.cxx
+  TreeViewSelectionAndCheckState.cxx
   )
 
 set(TestsNoArgs
-  DoubleLineEdit
-  HierarchicalGridLayout)
+  DoubleLineEdit.cxx
+  HierarchicalGridLayout.cxx)
 
 SET(MocSources
   DoubleLineEdit.h
@@ -18,7 +18,7 @@ SET(MocSources
 if(NOT CMAKE_CXX_COMPILER_ID STREQUAL "Intel")
   # QtTest fails to compile on ICC. Hence we don't add this test on
   # Intel compilers.
-  list(APPEND TestsNoArgs pqTextEditTest)
+  list(APPEND TestsNoArgs pqTextEditTest.cxx)
   list(APPEND MocSources pqTextEditTest.h)
 endif()
 
