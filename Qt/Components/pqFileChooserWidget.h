@@ -44,10 +44,13 @@ class QLineEdit;
 class pqServer;
 
 /**
-* file chooser widget which consists of a tool button and a line edit
-* hitting the tool button will bring up a file dialog, and the chosen
-* file will be put in the line edit
-*/
+ * @class pqFileChooserWidget
+ * @brief input widget for files
+ *
+ * pqFileChooserWidget which consists of a tool button and a line edit
+ * hitting the tool button will bring up a file dialog, and the chosen
+ * file will be put in the line edit
+ */
 class PQCOMPONENTS_EXPORT pqFileChooserWidget : public QWidget
 {
   Q_OBJECT
@@ -80,12 +83,14 @@ public:
   // must be down be what ever calls this method
   void setFilenames(const QStringList&);
 
+  ///@{
   /**
-  * convienince functions for when using only a single file (see
+  * Convenience functions for when using only a single file (see
   * forceSingleFile property).
   */
   QString singleFilename() const;
   void setSingleFilename(const QString&);
+  ///@}
 
   /**
   * get the file extension for the file dialog
