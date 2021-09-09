@@ -23,6 +23,7 @@ set(PY_TESTS
   GenerateIdScalarsBackwardsCompatibility.py,NO_VALID
   GetActiveCamera.py,NO_VALID
   GhostCellsInMergeBlocks.py
+  GradientBackwardsCompatibilityTest.py,NO_VALID
   IntegrateAttributes.py,NO_VALID
   LookupTable.py,NO_VALID
   MultiServer.py,NO_VALID

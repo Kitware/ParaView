@@ -56,6 +56,7 @@ set(classes
   vtkPVExtractVOI
   vtkPVGlyphFilter
   vtkPVGlyphFilterLegacy
+  vtkPVGradientFilter
   vtkPVLinearExtrusionFilter
   vtkPVMetaClipDataSet
   vtkPVMetaSliceDataSet

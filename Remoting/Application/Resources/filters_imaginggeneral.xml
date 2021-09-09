@@ -2,15 +2,19 @@
   <ProxyGroup name="filters">
     <!-- ==================================================================== -->
     <SourceProxy class="vtkImageGradient"
-                 label="Gradient"
-                 name="Gradient">
+                 label="Gradient Legacy"
+                 name="GradientLegacy">
+      <Deprecated deprecated_in="5.10" to_remove_in="5.11">
+        This filter has been merged with 'GradientOfUnstructuredDataSet' into a new 'Gradient' filter.
+        Please consider using that instead.
+      </Deprecated>
       <Documentation long_help="This filter computes gradient vectors for an image/volume."
-                     short_help="Compute gradient vectors.">The Gradient filter
-                     computes the gradient vector at each point in an image or
-                     volume. This filter uses central differences to compute
-                     the gradients. The Gradient filter operates on uniform
-                     rectilinear (image) data and produces image data
-                     output.</Documentation>
+                     short_help="Compute gradient vectors.">
+                     The Gradient filter computes the gradient vector at each point in an
+                     image or volume. This filter uses central differences to compute
+                     the gradients. The Gradient filter operates on uniform rectilinear
+                     (image) data and produces image data output.
+      </Documentation>
       <InputProperty command="SetInputConnection"
                      name="Input">
         <ProxyGroupDomain name="groups">
@@ -23,8 +27,9 @@
         <InputArrayDomain attribute_type="point"
                           name="input_array"
                           number_of_components="1" />
-        <Documentation>This property specifies the input to the Gradient
-        filter.</Documentation>
+        <Documentation>
+          This property specifies the input to the Gradient filter.
+        </Documentation>
       </InputProperty>
       <StringVectorProperty command="SetInputArrayToProcess"
                             element_types="0 0 0 0 2"
@@ -37,8 +42,9 @@
                       name="Input" />
           </RequiredProperties>
         </ArrayListDomain>
-        <Documentation>This property lists the name of the array from which to
-        compute the gradient.</Documentation>
+        <Documentation>
+          This property lists the name of the array from which to compute the gradient.
+        </Documentation>
       </StringVectorProperty>
       <IntVectorProperty command="SetDimensionality"
                          default_values="3"
@@ -50,11 +56,13 @@
           <Entry text="Three"
                  value="3" />
         </EnumerationDomain>
-        <Documentation>This property indicates whether to compute the gradient
-        in two dimensions or in three. If the gradient is being computed in two
-        dimensions, the X and Y dimensions are used.</Documentation>
+        <Documentation>
+          This property indicates whether to compute the gradient in two dimensions
+          or in three. If the gradient is being computed in two dimensions, the X
+          and Y dimensions are used.
+        </Documentation>
       </IntVectorProperty>
-      <!-- End Gradient -->
+      <!-- End GradientLegacy -->
     </SourceProxy>
 
     <!-- ==================================================================== -->
