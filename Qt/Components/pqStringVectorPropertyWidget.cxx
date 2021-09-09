@@ -173,52 +173,15 @@ pqStringVectorPropertyWidget::pqStringVectorPropertyWidget(
       this->setChangeAvailableAsChangeFinished(true);
     }
 
-    // If there's a hint on the smproperty indicating that this smproperty expects a
-    // directory name, then, we will use the directory mode.
-
-    if (hints && hints->FindNestedElementByName("UseDirectoryName"))
-    {
-      chooser->setUseDirectoryMode(true);
-    }
-
-    // If there's a hint on the smproperty indicating that this smproperty accepts
-    // any file name, then, we will use the AnyFile mode.
-
-    if (hints && hints->FindNestedElementByName("AcceptAnyFile"))
-    {
-      chooser->setAcceptAnyFile(true);
-    }
-
-    QStringList supportedExtensions;
-    for (unsigned int cc = 0, max = (hints ? hints->GetNumberOfNestedElements() : 0); cc < max;
-         ++cc)
-    {
-      vtkPVXMLElement* childXML = hints->GetNestedElement(cc);
-      if (childXML && childXML->GetName() && strcmp(childXML->GetName(), "FileChooser") == 0)
-      {
-        const char* extensions = childXML->GetAttribute("extensions");
-        const char* file_description = childXML->GetAttribute("file_description");
-        if (!extensions || !file_description)
-        {
-          vtkVLogF(PARAVIEW_LOG_APPLICATION_VERBOSITY(), "incomplete `FileChooser` hint skipped.");
-        }
-        else
-        {
-          QStringList lextensions =
-            QString(extensions).split(QRegExp("\\s+"), PV_QT_SKIP_EMPTY_PARTS);
-          supportedExtensions.push_back(
-            QString("%1 (*.%2)").arg(file_description).arg(lextensions.join(" *.")));
-        }
-      }
-    }
-    if (!supportedExtensions.empty())
-    {
-      vtkVLogF(PARAVIEW_LOG_APPLICATION_VERBOSITY(), "using extensions `%s`",
-        supportedExtensions.join(", ").toUtf8().data());
-      chooser->setExtension(supportedExtensions.join(";;"));
-    }
-
-    if (hints == nullptr || hints->FindNestedElementByName("BrowseLocalFileSystem") == nullptr)
+    // process hints.
+    bool directoryMode, anyFile, browseLocalFileSystem;
+    QString filter;
+    pqStringVectorPropertyWidget::processFileChooserHints(
+      hints, directoryMode, anyFile, filter, browseLocalFileSystem);
+    chooser->setUseDirectoryMode(directoryMode);
+    chooser->setAcceptAnyFile(anyFile);
+    chooser->setExtension(filter);
+    if (!browseLocalFileSystem)
     {
       pqServerManagerModel* smm = pqApplicationCore::instance()->getServerManagerModel();
       chooser->setServer(smm->findServer(smProxy->GetSession()));
@@ -433,4 +396,49 @@ pqPropertyWidget* pqStringVectorPropertyWidget::createWidget(
     return new pqArraySelectorPropertyWidget(svp, smproxy, parent);
   }
   return new pqStringVectorPropertyWidget(svp, smproxy, parent);
+}
+
+//-----------------------------------------------------------------------------
+void pqStringVectorPropertyWidget::processFileChooserHints(vtkPVXMLElement* hints,
+  bool& directoryMode, bool& anyFile, QString& filter, bool& browseLocalFileSystem)
+{
+  // If there's a hint on the smproperty indicating that this smproperty expects a
+  // directory name, then, we will use the directory mode.
+  directoryMode = (hints && hints->FindNestedElementByName("UseDirectoryName"));
+
+  // If there's a hint on the smproperty indicating that this smproperty accepts
+  // any file name, then, we will use the AnyFile mode.
+  anyFile = (hints && hints->FindNestedElementByName("AcceptAnyFile"));
+
+  // For browsing of local file system.
+  browseLocalFileSystem = (hints && hints->FindNestedElementByName("BrowseLocalFileSystem"));
+
+  QStringList supportedExtensions;
+  for (unsigned int cc = 0, max = (hints ? hints->GetNumberOfNestedElements() : 0); cc < max; ++cc)
+  {
+    vtkPVXMLElement* childXML = hints->GetNestedElement(cc);
+    if (childXML && childXML->GetName() && strcmp(childXML->GetName(), "FileChooser") == 0)
+    {
+      const char* extensions = childXML->GetAttribute("extensions");
+      const char* file_description = childXML->GetAttribute("file_description");
+      if (!extensions || !file_description)
+      {
+        vtkVLogF(PARAVIEW_LOG_APPLICATION_VERBOSITY(), "incomplete `FileChooser` hint skipped.");
+      }
+      else
+      {
+        QStringList lextensions =
+          QString(extensions).split(QRegExp("\\s+"), PV_QT_SKIP_EMPTY_PARTS);
+        supportedExtensions.push_back(
+          QString("%1 (*.%2)").arg(file_description).arg(lextensions.join(" *.")));
+      }
+    }
+  }
+
+  if (!supportedExtensions.empty())
+  {
+    vtkVLogF(PARAVIEW_LOG_APPLICATION_VERBOSITY(), "using extensions `%s`",
+      supportedExtensions.join(", ").toUtf8().data());
+    filter = supportedExtensions.join(";;");
+  }
 }

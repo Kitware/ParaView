@@ -53,6 +53,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqDisplayRepresentationWidget.h"
 #include "pqDoubleRangeSliderPropertyWidget.h"
 #include "pqEnableWidgetDecorator.h"
+#include "pqFileListPropertyWidget.h"
 #include "pqFileNamePropertyWidget.h"
 #include "pqFontPropertyWidget.h"
 #include "pqGenericPropertyWidgetDecorator.h"
@@ -217,6 +218,10 @@ pqPropertyWidget* pqStandardPropertyWidgetInterface::createWidgetForProperty(
   else if (name == "selection_query")
   {
     return new pqSelectionQueryPropertyWidget(smProxy, smProperty, parentWidget);
+  }
+  else if (name == "file_list")
+  {
+    return new pqFileListPropertyWidget(smProxy, smProperty, parentWidget);
   }
 
   // *** NOTE: When adding new types, please update the header documentation ***

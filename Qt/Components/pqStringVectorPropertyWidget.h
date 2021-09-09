@@ -30,12 +30,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-#ifndef _pqStringVectorPropertyWidget_h
-#define _pqStringVectorPropertyWidget_h
-
-#include "pqPropertyWidget.h"
+#ifndef pqStringVectorPropertyWidget_h
+#define pqStringVectorPropertyWidget_h
 
 #include "pqPropertyLinks.h"
+#include "pqPropertyWidget.h"
 
 class vtkSMStringVectorProperty;
 class PQCOMPONENTS_EXPORT pqStringVectorPropertyWidget : public pqPropertyWidget
@@ -52,6 +51,12 @@ public:
    */
   static pqPropertyWidget* createWidget(
     vtkSMStringVectorProperty* smproperty, vtkSMProxy* smproxy, QWidget* parent = nullptr);
+
+  /**
+   * Method to process file-choice related hints.
+   */
+  static void processFileChooserHints(vtkPVXMLElement* hints, bool& directoryMode, bool& anyFile,
+    QString& filter, bool& browseLocalFileSystem);
 
 private:
   Q_DISABLE_COPY(pqStringVectorPropertyWidget);

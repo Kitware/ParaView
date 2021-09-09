@@ -39,6 +39,7 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${paraview_test_data_directory_input}/Data/FieldDataBlocks/,REGEX:.*}"
   "DATA{${paraview_test_data_directory_input}/Data/FieldDataBlocks/FieldDataBlocks/,REGEX:.*}"
   "DATA{${paraview_test_data_directory_input}/Data/FileSeries/,REGEX:.*}"
+  "DATA{${paraview_test_data_directory_input}/Data/FileListPropertyWidgetPlugin.xml}"
   "DATA{${paraview_test_data_directory_input}/Data/GenericIOReader/,REGEX:.*}"
   "DATA{${paraview_test_data_directory_input}/Data/HeadMRVolume.mhd}"
   "DATA{${paraview_test_data_directory_input}/Data/HeadMRVolume.raw}"
@@ -628,6 +629,7 @@ SET (TESTS_WITHOUT_BASELINES
   TableHistogram.xml
   TestAnimationStride.xml
   TestCompositePropertyWidgetDecorator.xml
+  TestFileListPropertyWidget.xml
   TextSource.xml
   ThresholdBackwardsCompatibility.xml
 )

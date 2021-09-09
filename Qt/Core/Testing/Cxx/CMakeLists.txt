@@ -24,7 +24,8 @@ create_test_sourcelist(Tests pqCoreTest.cxx ${MyTests})
 vtk_module_test_executable(pqCoreTest ${Tests})
 target_link_libraries(pqCoreTest PRIVATE Qt5::Core Qt5::Widgets Qt5::Test)
 
-foreach(test ${MyTests})
+foreach(test_file ${MyTests})
+  get_filename_component(test "${test_file}" NAME_WE)
   add_test(
     NAME pqCore${test}
     COMMAND pqCoreTest ${test})
