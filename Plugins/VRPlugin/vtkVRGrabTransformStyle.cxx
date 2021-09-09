@@ -353,7 +353,7 @@ float vtkVRGrabTransformStyle::GetSpeedFactor(vtkCamera* cam, vtkMatrix4x4* mvma
   result = sqrt(pos[0] + pos[1] + pos[2]);
 #endif
 
-  if (isnan(result))
+  if (std::isnan(result))
   {
     fprintf(stderr, "GetSpeedFactor -- nan -- pos = (%f %f %f), foc = (%f %f %f)\n", pos[0], pos[1],
       pos[2], foc[0], foc[1], foc[2]);
