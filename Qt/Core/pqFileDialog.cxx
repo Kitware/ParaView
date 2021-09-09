@@ -396,6 +396,8 @@ pqFileDialog::pqFileDialog(pqServer* server, QWidget* p, const QString& title,
   QObject::connect(impl.Ui.FileName, SIGNAL(textChanged(const QString&)), this,
     SLOT(onTextEdited(const QString&)));
 
+  impl.Completer->setCaseSensitivity(Qt::CaseInsensitive);
+
   QStringList filterList = MakeFilterList(nameFilter);
   if (filterList.empty())
   {
