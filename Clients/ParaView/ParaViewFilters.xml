@@ -262,6 +262,7 @@
   <Proxy group="filters" name="IsoVolume" />
   <Proxy group="filters" name="KMeans" />
   <Proxy group="filters" name="LANLHaloFinder" />
+  <Proxy group="filters" name="LegacyGhostCellsGenerator" />
   <Proxy group="filters" name="LinearCellExtrusionFilter" />
   <Proxy group="filters" name="LinearExtrusionFilter" />
   <Proxy group="filters" name="LoopSubdivisionFilter" />
