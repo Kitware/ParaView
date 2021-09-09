@@ -18,11 +18,14 @@
  *
  * This is a subclass of vtkGradientFilter that allows to apply gradient filters
  * to different structure types through a unique filter. In practice, vtkGradientFilter
- * can be applied to any vtkDataSet using central differencing except on the boundaries of the
- * dataset. However, for vtkImageData, the class vtkImageGradient is used by default as a faster
- * implementation for that type. Note that vtkImageGradient always uses central differencing. By
- * setting the boundary handling method to forward/backward differencing, the vtkGradientFilter
- * class can also be used on vtkImageData.
+ * can be applied to any vtkDataSet. For unstructured grids, the gradient is computed
+ * using the cell derivatives, while for structured grids, central differencing is
+ * used, except on the boundaries of the dataset where forward and backward differencing
+ * is used for the boundary elements.
+ * For vtkImageData, however, the class vtkImageGradient is used by default as a
+ * faster implementation for that type. Note that vtkImageGradient always uses
+ * central differencing. By setting the boundary handling method to forward/backward
+ * differencing instead, the vtkGradientFilter class can also be used on vtkImageData.
  */
 
 #ifndef vtkPVGradientFilter_h
