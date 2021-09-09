@@ -125,7 +125,7 @@ public:
     {
       // Check that the newname is not already used
       if (std::any_of(
-            this->Presets.begin(), this->Presets.end(), [newname](vtkJson::Value const& preset) {
+            this->Presets.begin(), this->Presets.end(), [newname](Json::Value const& preset) {
               return preset.get("Name", "").asString() == newname;
             }))
       {
@@ -176,7 +176,7 @@ public:
     presetNames.reserve(this->Presets.size());
     std::transform(this->Presets.begin(), this->Presets.end(),
       std::inserter(presetNames, presetNames.end()),
-      [](vtkJson::Value const& preset) { return preset.get("Name", Json::Value()).asString(); });
+      [](Json::Value const& preset) { return preset.get("Name", Json::Value()).asString(); });
 
     for (Json::Value& preset : root)
     {
@@ -235,7 +235,7 @@ public:
     presetNames.reserve(this->Presets.size());
     std::transform(this->Presets.begin(), this->Presets.end(),
       std::inserter(presetNames, presetNames.end()),
-      [](vtkJson::Value const& preset) { return preset.get("Name", Json::Value()).asString(); });
+      [](Json::Value const& preset) { return preset.get("Name", Json::Value()).asString(); });
     return this->FindUniquePresetNameWithinPresets(basename, presetNames);
   }
 
