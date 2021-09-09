@@ -2139,10 +2139,14 @@ Every Nth Point.
                      The Gradient filter estimates the gradient vector at each
                      point or cell. It operates on any type of vtkDataSet, and
                      the output is of the same type as the input.
+                     For unstructured grids, the gradient is computed with the
+                     cell derivatives. For structured grids, the gradient is computed
+                     using central differencing, except on the boundary of the
+                     dataset where forward and backward differencing is used for
+                     the boundary elements.
                      If the dataset is a vtkImageData, the gradient computation
                      at the boundaries can be done either with central or
-                     forward/backward differencing. For other dataset types,
-                     forward/backward differencing is used at the boundaries.
+                     forward/backward differencing.
       </Documentation>
       <InputProperty command="SetInputConnection"
                      name="Input">
