@@ -37,7 +37,7 @@
 #include <string> // needed for std::string
 
 class vtkActor;
-class vtkHyperTreeGridMapper;
+class vtkOpenGLHyperTreeGridMapper;
 class vtkPVGeometryFilter;
 class vtkPiecewiseFunction;
 class vtkScalarsToColors;
@@ -73,10 +73,14 @@ public:
    */
   void SetVisibility(bool val) override;
 
+  //@{
   /**
-   * Enable/Disable LOD;
+   * Use adaptive decimation to only render the part inside the camera frustum
    */
-  virtual void SetSuppressLOD(bool suppress) { this->SuppressLOD = suppress; }
+  vtkGetMacro(AdaptiveDecimation, bool);
+  vtkSetMacro(AdaptiveDecimation, bool);
+  vtkBooleanMacro(AdaptiveDecimation, bool);
+  //@}
 
   //@{
   /**
@@ -103,17 +107,7 @@ public:
 
   //@{
   /**
-   * Set the shift scale method for the point coordinates
-   * see vtkOpenGLVertexBufferObject.h for more information.
-   */
-  void SetCoordinateShiftScaleMethod(int val);
-  int GetCoordinateShiftScaleMethod();
-  //@}
-
-  //@{
-  /**
-   * Set the representation type. This adds VTK_SURFACE_WITH_EDGES to those
-   * defined in vtkProperty.
+   * Set the representation type: WIREFRAME SURFACE SURFACE_WITH_EDGES
    */
   vtkSetClampMacro(Representation, int, WIREFRAME, SURFACE_WITH_EDGES);
   vtkGetMacro(Representation, int);
@@ -130,67 +124,17 @@ public:
    */
   vtkDataObject* GetRenderedDataObject(int port) override;
 
-  //@{
-  /**
-   * Representations that use geometry representation as the internal
-   * representation should turn this flag off so that we don't end up requesting
-   * ghost cells twice.
-   */
-  vtkSetMacro(RequestGhostCellsIfNeeded, bool);
-  vtkGetMacro(RequestGhostCellsIfNeeded, bool);
-  vtkBooleanMacro(RequestGhostCellsIfNeeded, bool);
-  //@}
-
   //***************************************************************************
   // Forwarded to vtkPVGeometryFilter
   virtual void SetUseOutline(int);
 
   //***************************************************************************
   // Forwarded to vtkProperty.
-  virtual void SetAmbientColor(double r, double g, double b);
   virtual void SetColor(double r, double g, double b);
-  virtual void SetDiffuseColor(double r, double g, double b);
   virtual void SetEdgeColor(double r, double g, double b);
-  virtual void SetInteractiveSelectionColor(double r, double g, double b);
-  virtual void SetInterpolation(int val);
   virtual void SetLineWidth(double val);
   virtual void SetOpacity(double val);
-  virtual void SetPointSize(double val);
-  virtual void SetSpecularColor(double r, double g, double b);
-  virtual void SetSpecularPower(double val);
-  virtual void SetLuminosity(double val);
-  virtual void SetRenderPointsAsSpheres(bool);
   virtual void SetRenderLinesAsTubes(bool);
-  virtual void SetRoughness(double val);
-  virtual void SetMetallic(double val);
-  virtual void SetEdgeTint(double r, double g, double b);
-  virtual void SetBaseColorTexture(vtkTexture* tex);
-  virtual void SetMaterialTexture(vtkTexture* tex);
-  virtual void SetNormalTexture(vtkTexture* tex);
-  virtual void SetEmissiveTexture(vtkTexture* tex);
-  virtual void SetNormalScale(double val);
-  virtual void SetOcclusionStrength(double val);
-  virtual void SetEmissiveFactor(double rval, double gval, double bval);
-
-  //***************************************************************************
-  // Forwarded to Actor.
-  virtual void SetOrientation(double, double, double);
-  virtual void SetOrigin(double, double, double);
-  virtual void SetPickable(int val);
-  virtual void SetPosition(double, double, double);
-  virtual void SetScale(double, double, double);
-  virtual void SetTexture(vtkTexture*);
-  virtual void SetUserTransform(const double[16]);
-  virtual void SetFlipTextures(bool);
-
-  //***************************************************************************
-  // Forwarded to all textures
-  virtual void SetRepeatTextures(bool);
-  vtkGetMacro(RepeatTextures, bool);
-  virtual void SetInterpolateTextures(bool);
-  vtkGetMacro(InterpolateTextures, bool);
-  virtual void SetUseMipmapTextures(bool);
-  vtkGetMacro(UseMipmapTextures, bool);
 
   //***************************************************************************
   // Forwarded to Mapper and LODMapper.
@@ -223,7 +167,7 @@ public:
    * Get/Set the name of the assembly to use for mapping block visibilities,
    * colors and opacities.
    *
-   * TODO: this is simply a placeholder for the future. Since this
+   * This is simply a placeholder for the future. Since this
    * representation doesn't really support PartitionedDataSetCollections and
    * hence assembly, the only assembly supported is the
    * `vtkDataAssemblyUtilities::HierarchyName`. All others are simply ignored.
@@ -235,47 +179,6 @@ public:
    * Convenience method to get the array name used to scalar color with.
    */
   const char* GetColorArrayName();
-
-  //@{
-  /**
-   * For OSPRay controls sizing of implicit spheres (points) and
-   * cylinders (lines)
-   */
-  virtual void SetEnableScaling(int v);
-  virtual void SetScalingArrayName(const char*);
-  virtual void SetScalingFunction(vtkPiecewiseFunction* pwf);
-  //@}
-
-  /**
-   * For OSPRay, choose from among available materials.
-   */
-  virtual void SetMaterial(const char*);
-
-  //@{
-  /**
-   * Specify whether or not to redistribute the data. The default is false
-   * since that is the only way in general to guarantee correct rendering.
-   * Can set to true if all rendered data sets are based on the same
-   * data partitioning in order to save on the data redistribution.
-   */
-  vtkSetMacro(UseDataPartitions, bool);
-  vtkGetMacro(UseDataPartitions, bool);
-  //@}
-
-  //@{
-  /**
-   * Specify whether or not to shader replacements string must be used.
-   */
-  virtual void SetUseShaderReplacements(bool);
-  vtkGetMacro(UseShaderReplacements, bool);
-  //@}
-
-  /**
-   * Specify shader replacements using a Json string.
-   * Please refer to the XML definition of the property for details about
-   * the expected Json string format.
-   */
-  virtual void SetShaderReplacements(const char*);
 
 protected:
   vtkHyperTreeGridRepresentation();
@@ -336,20 +239,6 @@ protected:
    */
   virtual vtkActor* GetRenderedProp() { return this->Actor; }
 
-  // Progress Callback
-  void HandleHyperTreeGridRepresentationProgress(vtkObject* caller, unsigned long, void*);
-
-  /**
-   * Computes the bounds of the visible data based on the block visibilities in the
-   * composite data attributes of the mapper.
-   */
-  void ComputeVisibleDataBounds();
-
-  /**
-   * Update the mapper with the shader replacement strings if feature is enabled.
-   */
-  void UpdateShaderReplacements();
-
   /**
    * Returns true if this representation has translucent geometry. Unlike
    * `vtkActor::HasTranslucentPolygonalGeometry` which cannot be called in
@@ -358,31 +247,20 @@ protected:
    */
   virtual bool NeedsOrderedCompositing();
 
-  vtkPVGeometryFilter* LODOutlineFilter;
+  /*
+   * Fields
+   */
 
-  vtkNew<vtkHyperTreeGridMapper> Mapper;
+  vtkNew<vtkOpenGLHyperTreeGridMapper> Mapper;
   vtkActor* Actor;
   vtkProperty* Property;
 
-  bool RepeatTextures;
-  bool InterpolateTextures;
-  bool UseMipmapTextures;
   double Ambient;
   double Specular;
   double Diffuse;
   int Representation;
-  bool SuppressLOD;
-  bool RequestGhostCellsIfNeeded;
+  bool AdaptiveDecimation;
   double VisibleDataBounds[6];
-
-  vtkTimeStamp VisibleDataBoundsTime;
-
-  vtkPiecewiseFunction* PWF;
-
-  bool UseDataPartitions;
-
-  bool UseShaderReplacements;
-  std::string ShaderReplacementsString;
 
 private:
   vtkHyperTreeGridRepresentation(const vtkHyperTreeGridRepresentation&) = delete;

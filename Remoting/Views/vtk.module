@@ -19,7 +19,6 @@ DEPENDS
   VTK::RenderingAnnotation
   VTK::RenderingContext2D
   VTK::RenderingCore
-  VTK::RenderingHyperTree
   VTK::RenderingParallel
   VTK::ViewsContext2D
   VTK::ViewsCore

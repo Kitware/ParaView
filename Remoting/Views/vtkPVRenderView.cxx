@@ -1385,7 +1385,6 @@ void vtkPVRenderView::Update()
   this->AllReduce(lsize, gsize, vtkCommunicator::SUM_OP);
   const double geometry_size = gsize / 1024.0;
 
-  // cout << "Full Geometry size: " << geometry_size << endl;
   // Update decisions about lod-rendering and remote-rendering.
   this->UseLODForInteractiveRender = this->ShouldUseLODRendering(geometry_size);
   this->UseDistributedRenderingForRender =
@@ -1451,7 +1450,6 @@ void vtkPVRenderView::UpdateLOD()
   vtkTypeUInt64 gsize;
   this->AllReduce(lsize, gsize, vtkCommunicator::SUM_OP);
   const double geometry_size = gsize / 1024.0;
-  // cout << "LOD Geometry size: " << geometry_size << endl;
 
   this->UseDistributedRenderingForLODRender =
     this->ShouldUseDistributedRendering(geometry_size, /*using_lod=*/true);
@@ -1574,8 +1572,6 @@ void vtkPVRenderView::Render(bool interactive, bool skip_rendering)
   {
     this->RequestInformation->Set(USE_LOD(), 1);
   }
-
-  // cout << "Using remote rendering: " << use_distributed_rendering << endl;
 
   // Decide if we are doing remote rendering or local rendering.
   bool use_distributed_rendering = use_lod_rendering
@@ -1735,7 +1731,6 @@ void vtkPVRenderView::Render(bool interactive, bool skip_rendering)
 //----------------------------------------------------------------------------
 void vtkPVRenderView::Deliver(int use_lod, unsigned int size, unsigned int* representation_ids)
 {
-  std::cout << "vtkPVRenderview::Deliver" << std::endl;
   // if in multi-clients mode, ensure that processes are in the same "state"
   // before doing the data delivery or we may end up with dead-locks due to
   // mismatched representations.

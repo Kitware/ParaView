@@ -92,7 +92,6 @@ public:
 
     void SetDataObject(vtkDataObject* data, vtkInternals* helper, double cacheKey)
     {
-      std::cout << "SETTING DATA OBJECT *************** " << std::endl;
       auto& store = this->Data[cacheKey];
       if (data)
       {
@@ -138,24 +137,19 @@ public:
 
     vtkDataObject* GetDeliveredDataObject(int dataKey, double cacheKey) const
     {
-      std::cout << "GetDeliveredDataObject " << dataKey << std::endl;
       try
       {
         const auto& store = this->Data.at(cacheKey);
-        std::cout << "at " << store.DeliveredDataObjects.at(dataKey) << std::endl;
-        std::cout << "bt " << store.DeliveredDataObjects.at(dataKey)->GetClassName() << std::endl;
         return store.DeliveredDataObjects.at(dataKey);
       }
       catch (std::out_of_range&)
       {
-        std::cout << "OUT OF RANGE " << std::endl;
         return nullptr;
       }
     }
 
     void SetDeliveredDataObject(int dataKey, double cacheKey, vtkDataObject* data)
     {
-      std::cout << "SetDeliveredDataObject " << dataKey << std::endl;
       auto& store = this->Data[cacheKey];
       store.DeliveredDataObjects[dataKey] = data;
     }

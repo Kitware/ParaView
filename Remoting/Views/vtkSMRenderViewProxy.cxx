@@ -463,7 +463,6 @@ const char* vtkSMRenderViewProxy::GetRepresentationType(vtkSMSourceProxy* produc
     vtkSMProxy* prototype = pxm->GetPrototypeProxy("representations", representationsToTry[cc]);
     if (prototype)
     {
-      std::cout << "Loading " << representationsToTry[cc] << std::endl;
       vtkSMProperty* inputProp = prototype->GetProperty("Input");
       vtkSMUncheckedPropertyHelper helper(inputProp);
       helper.Set(producer, outputPort);
@@ -471,7 +470,6 @@ const char* vtkSMRenderViewProxy::GetRepresentationType(vtkSMSourceProxy* produc
       helper.SetNumberOfElements(0);
       if (acceptable)
       {
-        std::cout << "acceptable" << std::endl;
         return representationsToTry[cc];
       }
     }

@@ -4644,6 +4644,7 @@
       </InputProperty>
       <!-- End of GeometryRepresentation -->
     </PVRepresentationProxy>
+
     <!-- ================================================================== -->
     <PVRepresentationProxy base_proxygroup="representations"
                            base_proxyname="UnstructuredGridRepresentation"
@@ -4656,7 +4657,6 @@
     </PVRepresentationProxy>
 
     <!-- ================================================================== -->
-
     <PVRepresentationProxy base_proxygroup="internal_representations"
                            base_proxyname="PVRepresentationBase"
                            class="vtkPVCompositeRepresentation"
@@ -4796,6 +4796,8 @@
       </Hints>
       <!-- End of StructuredGridRepresentation -->
     </PVRepresentationProxy>
+
+    <!-- ================================================================== -->
     <PVRepresentationProxy base_proxygroup="internal_representations"
                            base_proxyname="PVRepresentationBase"
                            class="vtkPVCompositeRepresentation"
@@ -4934,6 +4936,7 @@
       </Hints>
       <!-- End of UniformGridRepresentation -->
     </PVRepresentationProxy>
+
     <!-- ================================================================== -->
     <PVRepresentationProxy base_proxygroup="internal_representations"
                            base_proxyname="PVRepresentationBase"
@@ -5009,22 +5012,26 @@
       <!-- End of AMRRepresentation -->
     </PVRepresentationProxy>
 
-  <!-- ================================================================== -->
-    <RepresentationProxy class="vtkHyperTreeGridRepresentation"
+    <!-- ================================================================== -->
+    <PVRepresentationProxy class="vtkHyperTreeGridRepresentation"
                          name="HyperTreeGridRepresentation"
-                         processes="client|renderserver|dataserver">
-      <Documentation>Representation to show any dataset in a 3D render
-      view.</Documentation>
+                         processes="client|renderserver|dataserver"
+                         si_class="vtkSIProxy">
+      <Documentation>Representation to show 2D Hyper Tree Grid render view.</Documentation>
+
       <InputProperty command="SetInputConnection"
                      name="Input">
         <DataTypeDomain composite_data_supported="0"
                         name="input_type">
           <DataType value="vtkHyperTreeGrid" />
         </DataTypeDomain>
-        <InputArrayDomain attribute_type="any"
-                          name="input_array_any" />
+        <InputArrayDomain attribute_type="cell"
+                          name="input_array_cell"
+                          optional="1">
+        </InputArrayDomain>
         <Documentation>Set the input to the representation.</Documentation>
       </InputProperty>
+
       <IntVectorProperty command="SetVisibility"
                          default_values="1"
                          name="Visibility"
@@ -5033,32 +5040,31 @@
         <Documentation>Set the visibility of the
         representation.</Documentation>
       </IntVectorProperty>
-      <IntVectorProperty command="SetForceUseCache"
-                         default_values="0"
-                         is_internal="1"
-                         name="ForceUseCache"
+
+      <IntVectorProperty command="SetAdaptiveDecimation"
+                         default_values="1"
+                         name="AdaptiveDecimation"
                          number_of_elements="1">
         <BooleanDomain name="bool" />
-        <Documentation>Typically UseCache and CacheKey are updated by the View
-        and representations cache based on what the view tells it. However in
-        some cases we may want to force a representation to cache irrespective
-        of the view (e.g. comparative views). In which case these ivars can up
-        set. If ForcedCacheKey is true, it overrides UseCache and CacheKey.
-        Instead, ForcedCacheKey is used.</Documentation>
+        <Documentation>Enable the use of the Adaptive decimation to only
+        map the part of the HTG inside the camera frustum.</Documentation>
       </IntVectorProperty>
-      <DoubleVectorProperty command="SetForcedCacheKey"
-                            default_values="none"
-                            is_internal="1"
-                            name="ForcedCacheKey"
-                            number_of_elements="1">
-        <DoubleRangeDomain name="range" />
-        <Documentation>Typically UseCache and CacheKey are updated by the View
-        and representations cache based on what the view tells it. However in
-        some cases we may want to force a representation to cache irrespective
-        of the view (e.g. comparative views). In which case these ivars can up
-        set. If ForcedCacheKey is true, it overrides UseCache and CacheKey.
-        Instead, ForcedCacheKey is used.</Documentation>
-      </DoubleVectorProperty>
+
+      <IntVectorProperty command="SetRepresentation"
+                         default_values="1"
+                         name="Representation"
+                         panel_widget="display_representation_selector"
+                         number_of_elements="1">
+        <EnumerationDomain name="enum">
+          <Entry text="Wireframe"
+                 value="1" />
+          <Entry text="Surface"
+                 value="2" />
+          <Entry text="Surface With Edges"
+                 value="3" />
+        </EnumerationDomain>
+      </IntVectorProperty>
+
       <StringVectorProperty command="SetInputArrayToProcess"
                             element_types="0 0 0 0 2"
                             name="ColorArrayName"
@@ -5070,548 +5076,13 @@
           automatically be disabled.
         </Documentation>
         <RepresentedArrayListDomain name="array_list"
-                                    input_domain_name="input_array_any">>
+                         input_domain_name="input_array_any">
           <RequiredProperties>
             <Property function="Input" name="Input" />
           </RequiredProperties>
         </RepresentedArrayListDomain>
       </StringVectorProperty>
-      <StringVectorProperty command="SetRepresentation"
-                            default_values="Surface"
-                            name="Representation"
-                            panel_widget="display_representation_selector"
-                            number_of_elements="1">
-        <StringListDomain name="string_list">
-          <String value="Wireframe" />
-          <String value="Surface" />
-          <String value="Surface With Edges" />
-        </StringListDomain>
-      </StringVectorProperty>
-      <IntVectorProperty command="SetCoordinateShiftScaleMethod"
-                         default_values="2"
-                         name="CoordinateShiftScaleMethod"
-                         number_of_elements="1">
-        <Documentation>Options for normalizing the point coordinates.
-        The points are sent to the GPU as float data which can result in resolution issues
-        due to the limited precision of float. VTK includes a variety of methods to normalize
-        the point coordinates prior to sending them to the GPU. Auto shift scale is a good
-        setting that should work for most datasets. Focal point shift scale works based
-        on the current camera viewpoint which makes it the most robust setting but it
-        will renormalize the data occasionally as the camera's settings change which
-        requires reuploading the data to the GPU so there may be a performance cost.
-        </Documentation>
-        <EnumerationDomain name="enum">
-          <Entry text="Disable"
-                 value="0" />
-          <Entry text="Auto Shift Scale"
-                 value="1" />
-          <Entry text="Always Auto Shift Scale"
-                 value="2" />
-          <Entry text="Auto Shift Only"
-                 value="4" />
-          <Entry text="Near Focal Plane Shift Scale"
-                 value="5" />
-          <Entry text="Focal Point Shift Scale"
-                 value="6" />
-        </EnumerationDomain>
-      </IntVectorProperty>
-      <DoubleVectorProperty command="SetAmbient"
-                            default_values="0.0"
-                            name="Ambient"
-                            number_of_elements="1">
-        <DoubleRangeDomain max="1"
-                           min="0"
-                           name="range" />
-        <Hints>
-          <PropertyWidgetDecorator type="GenericDecorator"
-                                   mode="visibility"
-                                   property="Interpolation"
-                                   value="3"
-                                   inverse="1" />
-        </Hints>
-      </DoubleVectorProperty>
-      <DoubleVectorProperty command="SetDiffuse"
-                            default_values="1.0"
-                            name="Diffuse"
-                            number_of_elements="1">
-        <DoubleRangeDomain max="1"
-                           min="0"
-                           name="range" />
-      </DoubleVectorProperty>
-      <DoubleVectorProperty command="SetSpecular"
-                            default_values="0.0"
-                            name="Specular"
-                            number_of_elements="1">
-        <DoubleRangeDomain max="1"
-                           min="0"
-                           name="range" />
-        <Hints>
-          <PropertyWidgetDecorator type="GenericDecorator"
-                                   mode="visibility"
-                                   property="Interpolation"
-                                   value="3"
-                                   inverse="1" />
-        </Hints>
-      </DoubleVectorProperty>
-      <DoubleVectorProperty command="SetRoughness"
-                            default_values="0.3"
-                            name="Roughness"
-                            number_of_elements="1">
-        <Documentation>
-          Set how rough is the surface
-        </Documentation>
-        <DoubleRangeDomain max="1"
-                           min="0"
-                           name="range" />
-        <Hints>
-          <PropertyWidgetDecorator type="GenericDecorator"
-                                   mode="visibility"
-                                   property="Interpolation"
-                                   value="3" />
-        </Hints>
-      </DoubleVectorProperty>
-      <DoubleVectorProperty command="SetMetallic"
-                            default_values="0.0"
-                            name="Metallic"
-                            number_of_elements="1">
-        <Documentation>
-          Set metalness of the surface. It is usually either 0 or 1 but any value is valid.
-        </Documentation>
-        <DoubleRangeDomain max="1"
-                           min="0"
-                           name="range" />
-        <Hints>
-          <PropertyWidgetDecorator type="GenericDecorator"
-                                   mode="visibility"
-                                   property="Interpolation"
-                                   value="3" />
-        </Hints>
-      </DoubleVectorProperty>
-      <DoubleVectorProperty command="SetEdgeTint"
-                            default_values="1.0 1.0 1.0"
-                            name="EdgeTint"
-                            number_of_elements="3">
-        <Documentation>
-          For metals only. Set the tint at grazing angles.
-        </Documentation>
-        <DoubleRangeDomain max="1 1 1"
-                           min="0 0 0"
-                           name="range" />
-        <Hints>
-          <PropertyWidgetDecorator type="GenericDecorator"
-                                   mode="visibility"
-                                   property="Interpolation"
-                                   value="3" />
-        </Hints>
-      </DoubleVectorProperty>
-      <ProxyProperty command="SetTexture"
-                     name="Texture"
-                     panel_widget="texture_selector"
-                     null_on_empty="1" >
-        <Documentation>
-          Set the diffuse color texture.
-        </Documentation>
-        <ProxyGroupDomain name="groups">
-          <Group name="textures" />
-        </ProxyGroupDomain>
-        <Hints>
-          <PropertyWidgetDecorator type="GenericDecorator"
-                                   mode="visibility"
-                                   property="Interpolation"
-                                   value="3"
-                                   inverse="1" />
-          <TextureSelectorWidget check_tcoords="1" />
-          <!-- enable the texture selector only when tcoords is available. -->
-        </Hints>
-      </ProxyProperty>
-      <IntVectorProperty command="SetRepeatTextures"
-                         default_values="1"
-                         name="RepeatTextures"
-                         number_of_elements="1">
-        <BooleanDomain name="bool" />
-        <Documentation>
-          Should textures be clamped or repeated when texture coordinates go
-          outside the range of 0 to 1.
-        </Documentation>
-      </IntVectorProperty>
-      <IntVectorProperty command="SetInterpolateTextures"
-                         default_values="0"
-                         name="InterpolateTextures"
-                         number_of_elements="1">
-        <BooleanDomain name="bool" />
-        <Documentation>
-          When sampling a texture should linear interpolations be used. If false
-          then nearest neighbor sampling will be used.
-        </Documentation>
-      </IntVectorProperty>
-      <IntVectorProperty command="SetUseMipmapTextures"
-                         default_values="0"
-                         name="UseMipmapTextures"
-                         number_of_elements="1">
-        <BooleanDomain name="bool" />
-        <Documentation>
-          Should mipmaps be used for textures. Mipmaps are espcially useful when
-          working with large detailed textures or situations where you might be
-          viewing a texture map from far away.
-        </Documentation>
-        <Hints>
-          <PropertyWidgetDecorator type="GenericDecorator"
-                                   mode="visibility"
-                                   property="InterpolateTextures"
-                                   value="1" />
-        </Hints>
-      </IntVectorProperty>
-      <ProxyProperty command="SetBaseColorTexture"
-                     name="BaseColorTexture"
-                     panel_widget="texture_selector"
-                     null_on_empty="1" >
-        <Documentation>
-          Set the base color (also called albedo) texture. It will define the diffuse color for a
-          non metallic surface or the specular color for a metallic surface.
-        </Documentation>
-        <ProxyGroupDomain name="groups">
-          <Group name="textures" />
-        </ProxyGroupDomain>
-        <Hints>
-          <PropertyWidgetDecorator type="GenericDecorator"
-                                   mode="visibility"
-                                   property="Interpolation"
-                                   value="3" />
-          <TextureSelectorWidget check_tcoords="1" />
-          <!-- enable the texture selector only when tcoords is available. -->
-        </Hints>
-      </ProxyProperty>
-      <ProxyProperty command="SetMaterialTexture"
-                     name="MaterialTexture"
-                     panel_widget="texture_selector"
-                     null_on_empty="1" >
-        <Documentation>
-          Set the material texture. This texture encodes occlusion, roughness and metalness
-          on the red, green, blue channel respectively.
-        </Documentation>
-        <ProxyGroupDomain name="groups">
-          <Group name="textures" />
-        </ProxyGroupDomain>
-        <Hints>
-          <PropertyWidgetDecorator type="GenericDecorator"
-                                   mode="visibility"
-                                   property="Interpolation"
-                                   value="3" />
-          <TextureSelectorWidget check_tcoords="1" />
-          <!-- enable the texture selector only when tcoords is available. -->
-        </Hints>
-      </ProxyProperty>
-      <DoubleVectorProperty command="SetOcclusionStrength"
-                            default_values="1.0"
-                            name="OcclusionStrength"
-                            number_of_elements="1">
-        <Documentation>
-          Set the ambient occlusion strength of the material texture.
-        </Documentation>
-        <DoubleRangeDomain max="5"
-                           min="0"
-                           name="range" />
-        <Hints>
-          <PropertyWidgetDecorator type="GenericDecorator"
-                                   mode="visibility"
-                                   property="MaterialTexture"
-                                   value="null"
-                                   inverse="1" />
-        </Hints>
-      </DoubleVectorProperty>
-      <ProxyProperty command="SetNormalTexture"
-                     name="NormalTexture"
-                     panel_widget="texture_selector"
-                     null_on_empty="1" >
-        <Documentation>
-          Set the normal mapping texture.
-        </Documentation>
-        <ProxyGroupDomain name="groups">
-          <Group name="textures" />
-        </ProxyGroupDomain>
-        <Hints>
-          <PropertyWidgetDecorator type="GenericDecorator"
-                                   mode="visibility"
-                                   property="Interpolation"
-                                   value="0"
-                                   inverse="1" />
-          <TextureSelectorWidget check_tcoords="1" check_tangents="1" />
-          <!-- enable the texture selector only when tcoords is available. -->
-        </Hints>
-      </ProxyProperty>
-      <DoubleVectorProperty command="SetNormalScale"
-                            default_values="1.0"
-                            name="NormalScale"
-                            number_of_elements="1">
-        <Documentation>
-          Set the scale of normal mapping deviation.
-        </Documentation>
-        <DoubleRangeDomain max="5"
-                           min="0"
-                           name="range" />
-        <Hints>
-          <PropertyWidgetDecorator type="GenericDecorator"
-                                   mode="visibility"
-                                   property="NormalTexture"
-                                   value="null"
-                                   inverse="1" />
-        </Hints>
-      </DoubleVectorProperty>
-      <ProxyProperty command="SetEmissiveTexture"
-                     name="EmissiveTexture"
-                     panel_widget="texture_selector"
-                     null_on_empty="1" >
-        <Documentation>
-          Set the emissive texture.
-        </Documentation>
-        <ProxyGroupDomain name="groups">
-          <Group name="textures" />
-        </ProxyGroupDomain>
-        <Hints>
-          <PropertyWidgetDecorator type="GenericDecorator"
-                                   mode="visibility"
-                                   property="Interpolation"
-                                   value="3" />
-          <TextureSelectorWidget check_tcoords="1" />
-          <!-- enable the texture selector only when tcoords is available. -->
-        </Hints>
-      </ProxyProperty>
-      <DoubleVectorProperty command="SetEmissiveFactor"
-                            default_values="1.0 1.0 1.0"
-                            name="EmissiveFactor"
-                            number_of_elements="3">
-        <Documentation>
-          Set the factor of the red, green, blue channels of the emissive texture.
-        </Documentation>
-        <DoubleRangeDomain max="10"
-                           min="0"
-                           name="range" />
-        <Hints>
-          <PropertyWidgetDecorator type="GenericDecorator"
-                                   mode="visibility"
-                                   property="EmissiveTexture"
-                                   value="null"
-                                   inverse="1" />
-        </Hints>
-      </DoubleVectorProperty>
-      <IntVectorProperty command="SetFlipTextures"
-                         default_values="0"
-                         name="FlipTextures"
-                         number_of_elements="1">
-        <Documentation>
-          Enable texture coordinate flip on Y axis. Depending on some format specification, the
-          origin of the texture could be either at the bottom left or the top left of the image.
-        </Documentation>
-        <BooleanDomain name="bool" />
-      </IntVectorProperty>
-      <IntVectorProperty command="SetSuppressLOD"
-                         default_values="0"
-                         name="SuppressLOD"
-                         number_of_elements="1">
-        <BooleanDomain name="bool" />
-      </IntVectorProperty>
-      <DoubleVectorProperty command="SetAmbientColor"
-                            default_values="1.0 1.0 1.0"
-                            name="AmbientColor"
-                            number_of_elements="3">
-        <DoubleRangeDomain max="1 1 1"
-                           min="0 0 0"
-                           name="range" />
-        <Hints>
-          <PropertyLink group="settings" proxy="ColorPalette" property="ForegroundColor" unlink_if_modified="1" />
-        </Hints>
-      </DoubleVectorProperty>
-      <DoubleVectorProperty command="SetDiffuseColor"
-                            default_values="1.0 1.0 1.0"
-                            name="DiffuseColor"
-                            number_of_elements="3"
-                            panel_widget="color_selector_with_palette">
-        <DoubleRangeDomain max="1 1 1"
-                           min="0 0 0"
-                           name="range" />
-        <Hints>
-          <PropertyLink group="settings" proxy="ColorPalette" property="SurfaceColor" unlink_if_modified="1" />
-        </Hints>
-      </DoubleVectorProperty>
-      <DoubleVectorProperty command="SetSpecularColor"
-                            default_values="1.0 1.0 1.0"
-                            name="SpecularColor"
-                            number_of_elements="3">
-        <DoubleRangeDomain max="1 1 1"
-                           min="0 0 0"
-                           name="range" />
-        <Hints>
-          <PropertyWidgetDecorator type="GenericDecorator"
-                                   mode="visibility"
-                                   property="Interpolation"
-                                   value="3"
-                                   inverse="1" />
-        </Hints>
-      </DoubleVectorProperty>
-      <DoubleVectorProperty command="SetLineWidth"
-                            default_values="1.0"
-                            name="LineWidth"
-                            number_of_elements="1">
-        <DoubleRangeDomain min="0"
-                           name="range" />
-      </DoubleVectorProperty>
-      <DoubleVectorProperty command="SetPointSize"
-                            default_values="2.0"
-                            name="PointSize"
-                            number_of_elements="1">
-        <DoubleRangeDomain min="0"
-                           name="range" />
-      </DoubleVectorProperty>
-      <IntVectorProperty command="SetRenderLinesAsTubes"
-                         default_values="0"
-                         name="RenderLinesAsTubes"
-                         number_of_elements="1"
-                         panel_visibility="never">
-        <BooleanDomain name="bool" />
-        <Documentation>
-          When set, all lines are rendered as 3D tubes, if supported by OpenGL driver.
-        </Documentation>
-      </IntVectorProperty>
-      <IntVectorProperty command="SetRenderPointsAsSpheres"
-                         default_values="0"
-                         name="RenderPointsAsSpheres"
-                         number_of_elements="1"
-                         panel_visibility="never">
-        <BooleanDomain name="bool" />
-        <Documentation>
-          When set, all points are rendered as 3D spheres, if supported by OpenGL driver.
-        </Documentation>
-      </IntVectorProperty>
-      <IntVectorProperty command="SetInterpolation"
-                         default_values="1"
-                         name="Interpolation"
-                         number_of_elements="1">
-        <EnumerationDomain name="enum">
-          <Entry text="Flat"
-                 value="0" />
-          <Entry text="Gouraud"
-                 value="1" />
-          <Entry text="PBR"
-                 value="3" />
-        </EnumerationDomain>
-      </IntVectorProperty>
-      <DoubleVectorProperty command="SetOpacity"
-                            default_values="1.0"
-                            name="Opacity"
-                            number_of_elements="1">
-        <DoubleRangeDomain max="1"
-                           min="0"
-                           name="range" />
-      </DoubleVectorProperty>
-      <DoubleVectorProperty command="SetSpecularPower"
-                            default_values="100.0"
-                            name="SpecularPower"
-                            number_of_elements="1">
-        <DoubleRangeDomain max="100"
-                           min="0"
-                           name="range" />
-        <Hints>
-          <PropertyWidgetDecorator type="GenericDecorator"
-                                   mode="visibility"
-                                   property="Interpolation"
-                                   value="3"
-                                   inverse="1" />
-        </Hints>
-      </DoubleVectorProperty>
-      <DoubleVectorProperty command="SetLuminosity"
-                            default_values="0.0"
-                            name="Luminosity"
-                            number_of_elements="1">
-        <DoubleRangeDomain max="100.0"
-                           min="0"
-                           name="range" />
-        <Documentation>Makes the object emit light.
-        Only takes effect with OSPRay's path traced renderer.
-        </Documentation>
-        <Hints>
-          <PropertyWidgetDecorator type="OSPRayHidingDecorator" />
-          <PropertyWidgetDecorator type="GenericDecorator"
-                                   mode="visibility"
-                                   property="EnableOSPRay"
-                                   values="1" />
-        </Hints>
-      </DoubleVectorProperty>
-      <DoubleVectorProperty command="SetEdgeColor"
-                            default_values="0 0 0.5"
-                            name="EdgeColor"
-                            number_of_elements="3">
-        <Documentation>Set the edge color. This color is used to draw the edge
-        for the polygonal data when EdgeVisibility is on.</Documentation>
-        <DoubleRangeDomain max="1 1 1"
-                           min="0 0 0"
-                           name="range" />
-        <Hints>
-          <PropertyLink group="settings" proxy="ColorPalette" property="EdgeColor" unlink_if_modified="1" />
-        </Hints>
-      </DoubleVectorProperty>
-      <DoubleVectorProperty command="SetInteractiveSelectionColor"
-                            default_values="0.5 0.0 1.0"
-                            name="InteractiveSelectionColor"
-                            number_of_elements="3">
-        <Documentation>Set the preselection color. This color is used to draw the edge
-        of the current preselection.</Documentation>
-        <DoubleRangeDomain max="1 1 1"
-                           min="0 0 0"
-                           name="range" />
-        <Hints>
-          <PropertyLink group="settings" proxy="ColorPalette" property="InteractiveSelectionColor" unlink_if_modified="1" />
-        </Hints>
-      </DoubleVectorProperty>
-      <DoubleVectorProperty command="SetPosition"
-                            default_values="0 0 0"
-                            label="Translation"
-                            name="Position"
-                            number_of_elements="3">
-        <DoubleRangeDomain name="range" />
-      </DoubleVectorProperty>
-      <DoubleVectorProperty command="SetScale"
-                            default_values="1 1 1"
-                            name="Scale"
-                            number_of_elements="3">
-        <DoubleRangeDomain name="range" />
-      </DoubleVectorProperty>
-      <DoubleVectorProperty command="SetOrientation"
-                            default_values="0 0 0"
-                            name="Orientation"
-                            number_of_elements="3">
-        <DoubleRangeDomain name="range" />
-      </DoubleVectorProperty>
-      <DoubleVectorProperty command="SetOrigin"
-                            default_values="0 0 0"
-                            name="Origin"
-                            number_of_elements="3">
-        <DoubleRangeDomain name="range" />
-      </DoubleVectorProperty>
 
-      <DoubleVectorProperty argument_is_array="1"
-                            command="SetUserTransform"
-                            default_values="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1"
-                            name="UserTransform"
-                            number_of_elements="16">
-        <Documentation>
-          In addition to the instance variables such as position and
-          orientation, you can add an additional transformation for your own
-          use. This transformation is concatenated with the actor's internal
-          transformation, which you implicitly create through the use of
-          Position, Origin, Orientation. The value is 4x4 matrix for the linear
-          transform to use.
-        </Documentation>
-      </DoubleVectorProperty>
-
-      <IntVectorProperty command="SetPickable"
-                         default_values="1"
-                         name="Pickable"
-                         number_of_elements="1">
-        <Hints>
-          <NoDefault />
-        </Hints>
-        <BooleanDomain name="bool" />
-      </IntVectorProperty>
       <ProxyProperty command="SetLookupTable"
                      name="LookupTable" >
         <Documentation>Set the lookup-table to use to map data array to colors.
@@ -5620,172 +5091,40 @@
           <Group name="lookup_tables" />
         </ProxyGroupDomain>
       </ProxyProperty>
-      <IntVectorProperty default_values="0"
-                         name="UseSeparateColorMap"
-                         number_of_elements="1"
-                         panel_visibility="never">
-        <BooleanDomain name="bool" />
-        <Documentation>By default, ParaView shares a single color map among all datasets colored
-        by arrays that have the same name. When this option is enabled, the active dataset will
-        be assigned a separate color map not shared by other datasets.</Documentation>
-      </IntVectorProperty>
-      <IntVectorProperty command="SetMapScalars"
-                         default_values="1"
-                         name="MapScalars"
-                         number_of_elements="1">
-        <BooleanDomain name="bool" />
-        <Documentation>When enabled, LookupTable will always be
-        used for scalar mapping. Otherwise, when up to 4 component
-        scalars are present, the components are clamped to a valid
-        color interval (0-255 for an integral type and 0.0-1.0 for a
-        floating point type) and then directly used as
-        color.</Documentation>
-      </IntVectorProperty>
-      <IntVectorProperty default_values="0"
-                         name="MultiComponentsMapping"
-                         number_of_elements="1">
-        <BooleanDomain name="bool" />
-        <Documentation>Enable multi components mapping. For a two-components array,
-        the first component is mapped to the color, the second component is mapped to the
-        opacity. For a four-components array, the first, second and third components are used as
-        RGB values and the fourth component is mapped to the opacity. Only available
-        when MapScalars is ON. This feature forces "Separate Color Map" and scales the color and
-        the opacity range with the correct component.</Documentation>
+
+      <DoubleVectorProperty command="SetOpacity"
+                            default_values="1.0"
+                            name="Opacity"
+                            number_of_elements="1">
+        <DoubleRangeDomain max="1"
+                           min="0"
+                           name="range" />
+      </DoubleVectorProperty>
+
+      <!-- Edge parameters -->
+      <DoubleVectorProperty command="SetLineWidth"
+                            default_values="1.0"
+                            name="LineWidth"
+                            number_of_elements="1">
+        <DoubleRangeDomain min="0"
+                           name="range" />
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetEdgeColor"
+                            default_values="0 0 0.5"
+                            name="EdgeColor"
+                            number_of_elements="3">
+        <Documentation>Set the edge color. This color is used to draw the edge
+        for the hyper tree grid data when EdgeVisibility is on.</Documentation>
+        <DoubleRangeDomain max="1 1 1"
+                           min="0 0 0"
+                           name="range" />
         <Hints>
-          <PropertyWidgetDecorator type="GenericDecorator"
-                                   mode="visibility"
-                                   property="Representation"
-                                   value="Volume" />
-          <PropertyWidgetDecorator type="GenericDecorator"
-                                   mode="visibility"
-                                   property="MapScalars"
-                                   value="1" />
-          <PropertyWidgetDecorator type="MultiComponentsDecorator"
-                                   components="2 4" />
+          <PropertyLink group="settings" proxy="ColorPalette" property="EdgeColor" unlink_if_modified="1" />
         </Hints>
-      </IntVectorProperty>
-      <IntVectorProperty command="SetInterpolateScalarsBeforeMapping"
-                         default_values="1"
-                         name="InterpolateScalarsBeforeMapping"
-                         number_of_elements="1">
-        <BooleanDomain name="bool" />
-        <Documentation>When set to true (default), texture coordinates
-        are sent to and interpolated by the graphics card. This is
-        equivalent with interpolating scalars and then mapping them to
-        obtain colors between points. Otherwise, colors are sent to
-        and interpolated by the graphics card.
-        </Documentation>
-      </IntVectorProperty>
-      <IntVectorProperty command="SetStatic"
-                         default_values="0"
-                         name="StaticMode"
-                         number_of_elements="1">
-        <BooleanDomain name="bool" />
-      </IntVectorProperty>
+      </DoubleVectorProperty>
 
-      <StringVectorProperty name="Assembly"
-        command="SetActiveAssembly"
-        number_of_elements="1"
-        default_values="Hierarchy"
-        panel_visibility="multiblock_inspector">
-        <DataAssemblyListDomain name="data_assembly">
-          <RequiredProperties>
-            <Property function="Input" name="Input" />
-          </RequiredProperties>
-        </DataAssemblyListDomain>
-        <Documentation>
-          Select which assembly is used when specify selectors
-          to choose block visibilities, block colors, etc. for composite datasets.
-        </Documentation>
-      </StringVectorProperty>
-
-      <IntVectorProperty command="SetEnableScaling"
-                         default_values="0"
-                         name="OSPRayUseScaleArray"
-                         label="Scaling Mode"
-                         number_of_elements="1">
-        <Documentation>
-          Choose how the size of each sphere and cylinder is determined.
-        </Documentation>
-        <EnumerationDomain name="enum">
-          <Entry text="All Exact"
-                 value="-1" />
-          <Entry text="All Approximate"
-                 value="0" />
-          <Entry text="Each Scaled"
-                 value="1" />
-          <Entry text="Each Exact"
-                 value="2" />
-        </EnumerationDomain>
-        <Hints>
-          <PropertyWidgetDecorator type="OSPRayHidingDecorator" />
-        </Hints>
-      </IntVectorProperty>
-      <StringVectorProperty command="SetScalingArrayName"
-                            default_values=""
-                            name="OSPRayScaleArray"
-                            label="Scale Array"
-                            number_of_elements="1"
-                            panel_visibility="advanced">
-        <ArrayListDomain input_domain_name="input_array_point"
-                         name="array_list">
-          <RequiredProperties>
-            <Property function="Input" name="Input" />
-          </RequiredProperties>
-        </ArrayListDomain>
-        <Documentation>
-          Choice of an array for OSPRay implicit points and lines sizes.
-        </Documentation>
-        <Hints>
-          <PropertyWidgetDecorator type="OSPRayHidingDecorator" />
-          <PropertyWidgetDecorator type="GenericDecorator"
-                                   mode="visibility"
-                                   property="OSPRayUseScaleArray"
-                                   values="1" />
-        </Hints>
-      </StringVectorProperty>
-      <ProxyProperty command="SetScalingFunction"
-                     name="OSPRayScaleFunction"
-                     label="Scale Function"
-                     panel_visibility="advanced"
-                     panel_widget="transfer_function_editor" >
-        <Documentation>Set the piecewise function used to map data array to sprite size.
-        ScaleTransferFunction is only used if ScaleByArray is set.</Documentation>
-        <ProxyGroupDomain name="groups">
-          <Group name="piecewise_functions" />
-        </ProxyGroupDomain>
-        <ProxyListDomain name="proxy_list">
-          <Proxy group="piecewise_functions"
-                 name="PiecewiseFunction" />
-        </ProxyListDomain>
-        <Hints>
-          <PropertyWidgetDecorator type="OSPRayHidingDecorator" />
-          <PropertyWidgetDecorator type="GenericDecorator"
-                                   mode="visibility"
-                                   property="OSPRayUseScaleArray"
-                                   values="1" />
-        </Hints>
-      </ProxyProperty>
-      <StringVectorProperty command="SetMaterial"
-                            name="OSPRayMaterial"
-                            label="Material"
-                            number_of_elements="1"
-                            panel_visibility="advanced"
-                            default_values="None">
-        <Documentation>Set the material to paint this object with.</Documentation>
-        <MaterialDomain name="string_list">
-        </MaterialDomain>
-        <Hints>
-          <PropertyWidgetDecorator type="OSPRayHidingDecorator" />
-        </Hints>
-      </StringVectorProperty>
-
-      <!-- End of SurfaceRepresentationBase -->
-    </RepresentationProxy>
-
-
-
-
+    <!--  End of SurfaceRepresentationBase -->
+    </PVRepresentationProxy>
 
     <!-- ================================================================== -->
     <RepresentationProxy class="vtkStructuredGridVolumeRepresentation"

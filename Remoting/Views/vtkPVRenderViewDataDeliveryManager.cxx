@@ -618,7 +618,6 @@ int vtkPVRenderViewDataDeliveryManager::GetMoveMode(vtkInformation* info, int vi
 void vtkPVRenderViewDataDeliveryManager::MoveData(
   vtkPVDataRepresentation* repr, bool low_res, int port)
 {
-  std::cout << "vtkPVRenderViewDataDeliveryManager::MoveData" << std::endl;
   const auto cacheKey = this->GetCacheKey(repr);
   vtkInternals::vtkItem* item = this->Internals->GetItem(repr, low_res, port);
 
