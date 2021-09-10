@@ -137,12 +137,17 @@ bool pqSaveScreenshotReaction::saveScreenshot(bool clipboardMode)
     return false;
   }
 
+  vtkSMViewProxy* viewProxy = view->getViewProxy();
+
   if (clipboardMode)
   {
-    return pqSaveScreenshotReaction::copyScreenshotToClipboard(view->getSize(), false);
+    // Get pixel size (not scaled pixel size) for the view.
+    // fixes #20225
+    vtkSMPropertyHelper helper(viewProxy, "ViewSize");
+    const QSize pixelSize(helper.GetAsInt(0), helper.GetAsInt(1));
+    return pqSaveScreenshotReaction::copyScreenshotToClipboard(pixelSize, false);
   }
 
-  vtkSMViewProxy* viewProxy = view->getViewProxy();
   vtkSMViewLayoutProxy* layout = vtkSMViewLayoutProxy::FindLayout(viewProxy);
   vtkSMSessionProxyManager* pxm = view->getServer()->proxyManager();
   vtkSmartPointer<vtkSMProxy> proxy;
