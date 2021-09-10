@@ -158,15 +158,15 @@ static bool convert_to_blueprint_mesh(
   return true;
 }
 
-enum paraview_catalyst_error
+enum paraview_catalyst_status
 {
-  paraview_catalyst_error_invalid_node = 100,
-  paraview_catalyst_error_results = 101,
+  paraview_catalyst_status_invalid_node = 100,
+  paraview_catalyst_status_results = 101,
 };
-#define pvcatalyst_err(name) static_cast<enum catalyst_error>(paraview_catalyst_error_##name)
+#define pvcatalyst_err(name) static_cast<enum catalyst_status>(paraview_catalyst_status_##name)
 
 //-----------------------------------------------------------------------------
-enum catalyst_error catalyst_initialize_paraview(const conduit_node* params)
+enum catalyst_status catalyst_initialize_paraview(const conduit_node* params)
 {
   vtkLogger::Init();
   vtkVLogScopeFunction(PARAVIEW_LOG_CATALYST_VERBOSITY());
@@ -271,11 +271,11 @@ enum catalyst_error catalyst_initialize_paraview(const conduit_node* params)
                                                 "be executed.");
   }
 
-  return catalyst_error_ok;
+  return catalyst_status_ok;
 }
 
 //-----------------------------------------------------------------------------
-enum catalyst_error catalyst_execute_paraview(const conduit_node* params)
+enum catalyst_status catalyst_execute_paraview(const conduit_node* params)
 {
   vtkVLogScopeFunction(PARAVIEW_LOG_CATALYST_VERBOSITY());
 
@@ -428,11 +428,11 @@ enum catalyst_error catalyst_execute_paraview(const conduit_node* params)
   }
   vtkInSituInitializationHelper::ExecutePipelines(timestep, time, parameters);
 
-  return catalyst_error_ok;
+  return catalyst_status_ok;
 }
 
 //-----------------------------------------------------------------------------
-enum catalyst_error catalyst_finalize_paraview(const conduit_node* params)
+enum catalyst_status catalyst_finalize_paraview(const conduit_node* params)
 {
   vtkVLogScopeFunction(PARAVIEW_LOG_CATALYST_VERBOSITY());
 
@@ -445,11 +445,11 @@ enum catalyst_error catalyst_finalize_paraview(const conduit_node* params)
 
   vtkInSituInitializationHelper::Finalize();
 
-  return catalyst_error_ok;
+  return catalyst_status_ok;
 }
 
 //-----------------------------------------------------------------------------
-enum catalyst_error catalyst_about_paraview(conduit_node* params)
+enum catalyst_status catalyst_about_paraview(conduit_node* params)
 {
   catalyst_stub_about(params);
   conduit_cpp::Node cpp_params = conduit_cpp::cpp_node(params);
@@ -460,15 +460,15 @@ enum catalyst_error catalyst_about_paraview(conduit_node* params)
   }
   cpp_params["catalyst"]["implementation"] = "paraview";
 
-  return catalyst_error_ok;
+  return catalyst_status_ok;
 }
 
 //-----------------------------------------------------------------------------
-enum catalyst_error catalyst_results_paraview(conduit_node* params)
+enum catalyst_status catalyst_results_paraview(conduit_node* params)
 {
   auto stub_error_status = catalyst_stub_results(params);
 
-  if (stub_error_status != catalyst_error_ok)
+  if (stub_error_status != catalyst_status_ok)
   {
     return stub_error_status;
   }
@@ -484,5 +484,5 @@ enum catalyst_error catalyst_results_paraview(conduit_node* params)
     is_success &= convert_to_blueprint_mesh(proxy.second, proxy.first, catalyst_node);
   }
 
-  return is_success ? catalyst_error_ok : pvcatalyst_err(results);
+  return is_success ? catalyst_status_ok : pvcatalyst_err(results);
 }
