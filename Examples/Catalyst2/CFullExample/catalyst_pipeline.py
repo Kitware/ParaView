@@ -1,5 +1,8 @@
 from paraview.simple import *
 
+# Greeting to ensure that ctest knows this script is being imported
+print("executing catalyst_pipeline")
+
 # registrationName must match the channel name used in the
 # 'CatalystAdaptor'.
 producer = TrivialProducer(registrationName="grid")

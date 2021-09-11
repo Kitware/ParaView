@@ -1,5 +1,8 @@
 from paraview.simple import *
 
+# Greeting to ensure that ctest knows this script is being imported
+print("executing catalyst_pipeline")
+
 producer = TrivialProducer(registrationName="grid")
 steerable_parameters = CreateSteerableParameters("SteerableParameters")
 
