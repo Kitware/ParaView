@@ -30,6 +30,7 @@ execute_process(
       "-DCMAKE_BUILD_TYPE:STRING=${build_type}"
       "-DBUILD_SHARED_LIBS:BOOL=${shared}"
       "-DParaView_DIR:PATH=${paraview_dir}"
+      "-DParaView_CATALYST_DIR:PATH=${paraview_catalyst_dir}"
     --test-command
       "${ctest}"
         -C ${config}

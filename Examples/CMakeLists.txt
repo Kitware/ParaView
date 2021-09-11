@@ -2,6 +2,12 @@ cmake_minimum_required(VERSION 3.8)
 project(ParaViewExamples)
 
 if (ParaView_BINARY_DIR)
+  set(paraview_catalyst_directory "")
+  if (TARGET ParaView::catalyst-paraview)
+    get_property(paraview_catalyst_directory GLOBAL
+      PROPERTY paraview_catalyst_directory)
+  endif ()
+
   function (add_example dir)
     cmake_parse_arguments(arg "" "TEST_TIMEOUT" "" ${ARGN})
     if (arg_UNPARSED_ARGUMENTS)
@@ -23,6 +29,7 @@ if (ParaView_BINARY_DIR)
               "-Dplatform=${CMAKE_GENERATOR_PLATFORM}"
               "-Dtoolset=${CMAKE_GENERATOR_TOOLSET}"
               "-Dparaview_binary_dir=${CMAKE_RUNTIME_OUTPUT_DIRECTORY}"
+              "-Dparaview_catalyst_dir=${ParaView_BINARY_DIR}/${paraview_catalyst_directory}"
               -P "${CMAKE_CURRENT_LIST_DIR}/RunExample.cmake")
     set_property(TEST "ParaViewExample-${dir}" APPEND
       PROPERTY
