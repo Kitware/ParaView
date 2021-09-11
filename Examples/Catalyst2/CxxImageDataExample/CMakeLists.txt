@@ -110,6 +110,7 @@ if (USE_CATALYST)
     set_tests_properties(
         "CxxImageDataExampleV2::SimplePipeline"
       PROPERTIES
-        PASS_REGULAR_EXPRESSION "executing catalyst_pipeline")
+        PASS_REGULAR_EXPRESSION "executing catalyst_pipeline"
+        SKIP_REGULAR_EXPRESSION "Python support not enabled")
   endif()
 endif()
