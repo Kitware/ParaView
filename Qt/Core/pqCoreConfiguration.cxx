@@ -55,7 +55,7 @@ bool pqCoreConfiguration::populateOptions(vtkCLIOptions* options)
   auto groupTesting = app->add_option_group("Testing", "Testing specific options");
 
   groupTesting
-    ->add_option("--baseline-directory", this->TestDirectory,
+    ->add_option("--baseline-directory", this->BaselineDirectory,
       "Baseline directory where test recorder will store baseline images.")
     ->envname("PARAVIEW_TEST_BASELINE_DIR");
   groupTesting
