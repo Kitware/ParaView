@@ -77,9 +77,11 @@ void vtkSMPVRepresentationProxy::CreateVTKObjects()
     return;
   }
 
-  // The RepresentationTypesInfo property and the domain
-  // for "Representations" property have been updated by the superclass.
-  // This ensure that all representations have valid Representations domain.
+  // Ensure that we update the RepresentationTypesInfo property and the domain
+  // for "Representations" property before CreateVTKObjects() is finished. This
+  // ensure that all representations have valid Representations domain.
+  this->UpdatePropertyInformation();
+
   // Whenever the "Representation" property is modified, we ensure that the
   // this->InvalidateDataInformation() is called.
   this->AddObserver(
