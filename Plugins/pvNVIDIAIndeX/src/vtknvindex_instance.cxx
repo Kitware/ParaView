@@ -219,8 +219,10 @@ mi::Sint32 vtknvindex_instance::get_cur_local_rank_id() const
 //-------------------------------------------------------------------------------------------------
 vtknvindex_instance* vtknvindex_instance::get()
 {
-  static vtknvindex_instance instance; // Meyers' singleton
-  return &instance;
+  // As a workaround for undefined shutdown order of static variables in dependency libs, this
+  // pointer is leaked on shutdown.
+  static vtknvindex_instance* instance = new vtknvindex_instance;
+  return instance;
 }
 
 //-------------------------------------------------------------------------------------------------
