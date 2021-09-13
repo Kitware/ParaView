@@ -46,6 +46,7 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${paraview_test_data_directory_input}/Data/Iron_Xdmf/,REGEX:.*}"
   "DATA{${paraview_test_data_directory_input}/Data/LoadState.pvsm}"
   "DATA{${paraview_test_data_directory_input}/Data/LoadStateDialog.pvsm}"
+  "DATA{${paraview_test_data_directory_input}/Data/LoadStateTextSourceRepresentation.pvsm}"
   "DATA{${paraview_test_data_directory_input}/Data/MultiBlockWithPieces.vtm}"
   "DATA{${paraview_test_data_directory_input}/Data/MultiBlockWithPieces_0_0.vtp}"
   "DATA{${paraview_test_data_directory_input}/Data/MultiBlockWithPieces_1_0.vtp}"
@@ -978,6 +979,7 @@ list(APPEND TESTS_WITH_BASELINES
   LoadState.xml
   LoadStateChooseDirectory.xml
   LoadStateChooseFiles.xml
+  LoadStateTextSourceRepresentation.xml
   LoadStateUseExisting.xml
   LoadSaveStateVolume.xml
   ManyTypesXMLWriterReader.xml
