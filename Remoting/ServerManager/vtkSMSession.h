@@ -22,11 +22,10 @@
 #ifndef vtkSMSession_h
 #define vtkSMSession_h
 
+#include "vtkLegacy.h" // for VTK_LEGACY
 #include "vtkPVSessionBase.h"
 #include "vtkRemotingServerManagerModule.h" //needed for exports
-#include "vtkSmartPointer.h"                // needed for vtkSmartPointer.
 
-class vtkProcessModuleAutoMPI;
 class vtkSMCollaborationManager;
 class vtkSMProxyLocator;
 class vtkSMSessionProxyManager;
@@ -240,12 +239,11 @@ public:
   //@}
 
   //@{
+
   /**
-   * This flag if set indicates that the current session
-   * module has automatically started "pvservers" as MPI processes as
-   * default pipeline.
+   * Deprecated. AutoMPI is no longer supported. This simply returns false.
    */
-  vtkGetMacro(IsAutoMPI, bool);
+  VTK_LEGACY(bool GetIsAutoMPI() const);
   //@}
 
 protected:
@@ -259,8 +257,7 @@ protected:
   /**
    * Internal method used by ConnectToRemote().
    */
-  static vtkIdType ConnectToRemoteInternal(
-    const char* hostname, int port, bool is_auto_mpi, int timeout = 60);
+  static vtkIdType ConnectToRemoteInternal(const char* hostname, int port, int timeout = 60);
 
   /**
    * Process the Notifation message sent using API to communicate from
@@ -285,14 +282,9 @@ protected:
   vtkSMStateLocator* StateLocator;
   vtkSMProxyLocator* ProxyLocator;
 
-  bool IsAutoMPI;
-
 private:
   vtkSMSession(const vtkSMSession&) = delete;
   void operator=(const vtkSMSession&) = delete;
-
-  // AutoMPI helper class
-  static vtkSmartPointer<vtkProcessModuleAutoMPI> AutoMPI;
 };
 
 #endif

@@ -375,23 +375,13 @@ void vtkSMRenderViewProxy::CreateVTKObjects()
   }
 
   bool remote_rendering_available = true;
-  if (this->GetSession()->GetIsAutoMPI())
+  // Update whether render servers can open display i.e. remote rendering is
+  // possible on all processes.
+  vtkNew<vtkPVRenderingCapabilitiesInformation> info;
+  this->GetSession()->GatherInformation(vtkPVSession::RENDER_SERVER, info.Get(), 0);
+  if (!info->Supports(vtkPVRenderingCapabilitiesInformation::OPENGL))
   {
-    // When the session is an auto-mpi session, we don't support remote
-    // rendering.
     remote_rendering_available = false;
-  }
-
-  if (remote_rendering_available)
-  {
-    // Update whether render servers can open display i.e. remote rendering is
-    // possible on all processes.
-    vtkNew<vtkPVRenderingCapabilitiesInformation> info;
-    this->GetSession()->GatherInformation(vtkPVSession::RENDER_SERVER, info.Get(), 0);
-    if (!info->Supports(vtkPVRenderingCapabilitiesInformation::OPENGL))
-    {
-      remote_rendering_available = false;
-    }
   }
 
   // Disable remote rendering on all processes, if not available.
