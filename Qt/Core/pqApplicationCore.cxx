@@ -83,7 +83,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVXMLElement.h"
 #include "vtkPVXMLParser.h"
 #include "vtkProcessModule.h"
-#include "vtkProcessModuleAutoMPI.h"
 #include "vtkRemotingCoreConfiguration.h"
 #include "vtkSMProperty.h"
 #include "vtkSMPropertyHelper.h"
@@ -570,11 +569,6 @@ pqSettings* pqApplicationCore::settings()
     // now settings are ready!
 
     this->Settings = settings;
-
-    vtkProcessModuleAutoMPI::SetEnableAutoMPI(
-      this->Settings->value("GeneralSettings.EnableAutoMPI").toBool());
-    vtkProcessModuleAutoMPI::SetNumberOfCores(
-      this->Settings->value("GeneralSettings.AutoMPILimit").toInt());
   }
   return this->Settings;
 }

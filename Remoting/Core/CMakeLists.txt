@@ -36,7 +36,6 @@ set(classes
   vtkNetworkAccessManager
   vtkPResourceFileLocator
   vtkProcessModule
-  vtkProcessModuleAutoMPI
   vtkProcessModuleConfiguration
   vtkPVAlgorithmPortsInformation
   vtkPVArrayInformation
@@ -133,24 +132,6 @@ endif ()
 set_source_files_properties(vtkPVOptions.cxx
   PROPERTIES
     COMPILE_DEFINITIONS "${vtkPVOptions_defines}")
-
-set(vtkProcessModuleAutoMPI_defines)
-if (TARGET VTK::ParallelMPI)
-  list(APPEND vtkProcessModuleAutoMPI_defines
-    "PARAVIEW_MPIEXEC_EXECUTABLE=\"${MPIEXEC_EXECUTABLE}\""
-    "PARAVIEW_MPI_NUMPROC_FLAG=\"${MPIEXEC_NUMPROC_FLAG}\"")
-  if (MPIEXEC_PREFLAGS)
-    list(APPEND vtkProcessModuleAutoMPI_defines
-      "PARAVIEW_MPI_PREFLAGS=\"${MPIEXEC_PREFLAGS}\"")
-  endif ()
-  if (MPIEXEC_POSTFLAGS)
-    list(APPEND vtkProcessModuleAutoMPI_defines
-      "PARAVIEW_MPI_POSTFLAGS=\"${MPIEXEC_POSTFLAGS}\"")
-  endif ()
-endif ()
-set_source_files_properties(vtkProcessModuleAutoMPI.cxx
-  PROPERTIES
-    COMPILE_DEFINITIONS "${vtkProcessModuleAutoMPI_defines}")
 
 set(PARAVIEW_PLUGIN_LOADER_PATHS ""
   CACHE STRING "Extra paths to search for plugins")

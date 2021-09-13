@@ -256,36 +256,6 @@
         </EnumerationDomain>
       </IntVectorProperty>
 
-      <IntVectorProperty name="EnableAutoMPI"
-        number_of_elements="1"
-        default_values="0"
-        command="SetEnableAutoMPI"
-        panel_visibility="advanced">
-        <Documentation>
-          Enable multicore support for data processing.
-        </Documentation>
-        <BooleanDomain name="bool" />
-        <Hints>
-          <SaveInQSettings both="1" />
-          <RestartRequired />
-        </Hints>
-      </IntVectorProperty>
-
-      <IntVectorProperty name="AutoMPILimit"
-        number_of_elements="1"
-        default_values="2"
-        command="SetAutoMPILimit"
-        panel_visibility="advanced">
-        <Documentation>
-          Limit maximum number of cores to
-        </Documentation>
-        <IntRangeDomain min="1" max="64" />
-        <Hints>
-          <SaveInQSettings both="1" />
-          <RestartRequired />
-        </Hints>
-      </IntVectorProperty>
-
       <IntVectorProperty name="CacheGeometryForAnimation"
         command="SetCacheGeometryForAnimation"
         number_of_elements="1"
@@ -514,15 +484,6 @@
       <PropertyGroup label="Data Processing Options">
         <Property name="AutoConvertProperties" />
         <Property name="BlockColorsDistinctValues" />
-      </PropertyGroup>
-
-      <PropertyGroup label="Multicore Support">
-        <Documentation>
-          On multicore systems, ParaView can run parallel pvserver processes automatically,
-          without you having to launch them manually for processing data in parallel.
-        </Documentation>
-        <Property name="EnableAutoMPI" />
-        <Property name="AutoMPILimit" />
       </PropertyGroup>
 
       <PropertyGroup label="Animation">

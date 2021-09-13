@@ -21,7 +21,6 @@
 #include "vtkPVServerInformation.h"
 #include "vtkPVSessionCore.h"
 #include "vtkProcessModule.h"
-#include "vtkProcessModuleAutoMPI.h"
 #include "vtkReservedRemoteObjectIds.h"
 #include "vtkSMDeserializerProtobuf.h"
 #include "vtkSMMessage.h"
@@ -40,11 +39,6 @@
 #include <sstream>
 #include <vtkNew.h>
 
-//----------------------------------------------------------------------------
-// STATICS
-vtkSmartPointer<vtkProcessModuleAutoMPI> vtkSMSession::AutoMPI =
-  vtkSmartPointer<vtkProcessModuleAutoMPI>::New();
-//----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSMSession);
 //----------------------------------------------------------------------------
 vtkSMSession* vtkSMSession::New(vtkPVSessionBase* otherSession)
@@ -71,7 +65,6 @@ vtkSMSession::vtkSMSession(bool initialize_during_constructor /*=true*/,
 
   this->SessionProxyManager = nullptr;
   this->StateLocator = vtkSMStateLocator::New();
-  this->IsAutoMPI = false;
 
   // Create and setup deserializer for the local ProxyLocator
   vtkNew<vtkSMDeserializerProtobuf> deserializer;
@@ -271,25 +264,8 @@ void vtkSMSession::Disconnect(vtkIdType sid)
 vtkIdType vtkSMSession::ConnectToSelf(int timeout)
 {
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-  vtkIdType sid = 0;
-
-  if (vtkSMSession::AutoMPI->IsPossible())
-  {
-    int port = vtkSMSession::AutoMPI->ConnectToRemoteBuiltInSelf();
-    if (port > 0)
-    {
-      sid = vtkSMSession::ConnectToRemoteInternal("localhost", port, true, timeout);
-      if (sid > 0)
-      {
-        return sid;
-      }
-    }
-    vtkGenericWarningMacro("Failed to automatically launch 'pvserver' for multi-core support. "
-                           "Defaulting to local session.");
-  }
-
   vtkSMSession* session = vtkSMSession::New();
-  sid = pm->RegisterSession(session);
+  const vtkIdType sid = pm->RegisterSession(session);
   session->Delete();
   return sid;
 }
@@ -309,17 +285,15 @@ vtkIdType vtkSMSession::ConnectToCatalyst()
 //----------------------------------------------------------------------------
 vtkIdType vtkSMSession::ConnectToRemote(const char* hostname, int port, int timeout)
 {
-  return vtkSMSession::ConnectToRemoteInternal(hostname, port, false, timeout);
+  return vtkSMSession::ConnectToRemoteInternal(hostname, port, timeout);
 }
 
 //----------------------------------------------------------------------------
-vtkIdType vtkSMSession::ConnectToRemoteInternal(
-  const char* hostname, int port, bool is_auto_mpi, int timeout)
+vtkIdType vtkSMSession::ConnectToRemoteInternal(const char* hostname, int port, int timeout)
 {
   std::ostringstream sname;
   sname << "cs://" << hostname << ":" << port;
   vtkSMSessionClient* session = vtkSMSessionClient::New();
-  session->IsAutoMPI = is_auto_mpi;
   vtkIdType sid = 0;
   if (session->Connect(sname.str().c_str(), timeout))
   {
@@ -413,11 +387,6 @@ vtkIdType vtkSMSession::ReverseConnectToRemote(int dsport, int rsport, bool (*ca
 //----------------------------------------------------------------------------
 unsigned int vtkSMSession::GetRenderClientMode()
 {
-  if (this->GetIsAutoMPI())
-  {
-    return vtkSMSession::RENDERING_UNIFIED;
-  }
-
   if (this->GetController(vtkPVSession::DATA_SERVER_ROOT) !=
     this->GetController(vtkPVSession::RENDER_SERVER_ROOT))
   {
@@ -463,3 +432,12 @@ void vtkSMSession::ProcessNotification(const vtkSMMessage* message)
     this->StopProcessingRemoteNotification(previousValue);
   }
 }
+
+//----------------------------------------------------------------------------
+#if !defined(VTK_LEGACY_REMOVE)
+bool vtkSMSession::GetIsAutoMPI() const
+{
+  VTK_LEGACY_BODY(vtkMyClass::GetIsAutoMPI, "ParaView 5.10");
+  return false;
+}
+#endif

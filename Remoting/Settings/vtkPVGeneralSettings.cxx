@@ -16,7 +16,6 @@
 
 #include "vtkObjectFactory.h"
 #include "vtkProcessModule.h"
-#include "vtkProcessModuleAutoMPI.h"
 #include "vtkSISourceProxy.h"
 #include "vtkSMArraySelectionDomain.h"
 #include "vtkSMInputArrayDomain.h"
@@ -111,35 +110,38 @@ bool vtkPVGeneralSettings::GetAutoConvertProperties()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVGeneralSettings::SetEnableAutoMPI(bool val)
+#if !defined(VTK_LEGACY_REMOVE)
+void vtkPVGeneralSettings::SetEnableAutoMPI(bool)
 {
-  if (this->GetEnableAutoMPI() != val)
-  {
-    vtkProcessModuleAutoMPI::SetEnableAutoMPI(val);
-    this->Modified();
-  }
+  VTK_LEGACY_BODY(vtkPVGeneralSettings::SetEnableAutoMPI, "ParaView 5.10");
 }
+#endif
 
 //----------------------------------------------------------------------------
+#if !defined(VTK_LEGACY_REMOVE)
 bool vtkPVGeneralSettings::GetEnableAutoMPI()
 {
-  return vtkProcessModuleAutoMPI::EnableAutoMPI;
+  VTK_LEGACY_BODY(vtkPVGeneralSettings::GetEnableAutoMPI, "ParaView 5.10");
+  return false;
 }
+#endif
 
 //----------------------------------------------------------------------------
-void vtkPVGeneralSettings::SetAutoMPILimit(int val)
+#if !defined(VTK_LEGACY_REMOVE)
+void vtkPVGeneralSettings::SetAutoMPILimit(int)
 {
-  if (this->GetAutoMPILimit() != val && val >= 1)
-  {
-    vtkProcessModuleAutoMPI::SetNumberOfCores(val);
-  }
+  VTK_LEGACY_BODY(vtkPVGeneralSettings::SetAutoMPILimit, "ParaView 5.10");
 }
+#endif
 
 //----------------------------------------------------------------------------
+#if !defined(VTK_LEGACY_REMOVE)
 int vtkPVGeneralSettings::GetAutoMPILimit()
 {
-  return vtkProcessModuleAutoMPI::NumberOfCores;
+  VTK_LEGACY_BODY(vtkPVGeneralSettings::GetAutoMPILimit, "ParaView 5.10");
+  return 1;
 }
+#endif
 
 //----------------------------------------------------------------------------
 void vtkPVGeneralSettings::SetCacheGeometryForAnimation(bool val)
