@@ -48,10 +48,48 @@ if (USE_CATALYST)
       NAME CxxImageDataExampleV2::SimplePipeline
       COMMAND CxxImageDataExampleV2
               ${CMAKE_CURRENT_SOURCE_DIR}/catalyst_pipeline.py)
+
+    add_test(
+      NAME CxxImageDataExampleV2::IOPipeline::Prepare
+      COMMAND "${CMAKE_COMMAND}" -E remove_directory  "${CMAKE_CURRENT_BINARY_DIR}/Testing/Temporary/result")
+    set_tests_properties(
+      "CxxImageDataExampleV2::IOPipeline::Prepare"
+      PROPERTIES
+        FIXTURES_SETUP "CxxImageDataExampleV2::IOPipeline::Prepare")
+
     add_test(
       NAME CxxImageDataExampleV2::IOPipeline
       COMMAND CxxImageDataExampleV2
-              --output "${CMAKE_CURRENT_BINARY_DIR}/Testing/Temporary/dataset-%04ts.vtpd")
+              --output "${CMAKE_CURRENT_BINARY_DIR}/Testing/Temporary/result/dataset-%04ts.vtpd"
+              --exists "${CMAKE_CURRENT_BINARY_DIR}/Testing/Temporary/result/dataset-0093.vtpd"
+              --exists "${CMAKE_CURRENT_BINARY_DIR}/Testing/Temporary/result/dataset-0093/dataset-0093_0.vti")
+    set_tests_properties(
+      "CxxImageDataExampleV2::IOPipeline"
+      PROPERTIES
+        FIXTURES_REQUIRED "CxxImageDataExampleV2::IOPipeline::Prepare")
+
+    add_test(
+      NAME CxxImageDataExampleV2::IOPipelineRelativePaths::Prepare
+      COMMAND "${CMAKE_COMMAND}" -E rm -rf  "${CMAKE_CURRENT_BINARY_DIR}/Testing/Temporary/relative_paths/*")
+
+    set_tests_properties(
+      "CxxImageDataExampleV2::IOPipelineRelativePaths::Prepare"
+      PROPERTIES
+        FIXTURES_SETUP "CxxImageDataExampleV2::IOPipelineRelativePaths::Prepare")
+
+    make_directory("${CMAKE_CURRENT_BINARY_DIR}/Testing/Temporary/relative_paths")
+    add_test(
+      NAME CxxImageDataExampleV2::IOPipelineRelativePaths
+      WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/Testing/Temporary/relative_paths"
+      COMMAND CxxImageDataExampleV2
+              --output "dataset-%04ts.vtpd"
+              --exists "${CMAKE_CURRENT_BINARY_DIR}/Testing/Temporary/relative_paths/dataset-0093.vtpd"
+              --exists "${CMAKE_CURRENT_BINARY_DIR}/Testing/Temporary/relative_paths/dataset-0093/dataset-0093_0.vti")
+
+    set_tests_properties(
+      "CxxImageDataExampleV2::IOPipelineRelativePaths"
+      PROPERTIES
+        FIXTURES_REQUIRED "CxxImageDataExampleV2::IOPipelineRelativePaths::Prepare")
 
     set(_vtk_fail_regex
       # vtkLogger
@@ -63,8 +101,16 @@ if (USE_CATALYST)
     set_tests_properties(
         "CxxImageDataExampleV2::SimplePipeline"
         "CxxImageDataExampleV2::IOPipeline"
+        "CxxImageDataExampleV2::IOPipelineRelativePaths"
       PROPERTIES
         FAIL_REGULAR_EXPRESSION "${_vtk_fail_regex}"
         SKIP_RETURN_CODE 125)
+
+    # this ensures that ParaView Catalyst was indeed loaded.
+    set_tests_properties(
+        "CxxImageDataExampleV2::SimplePipeline"
+      PROPERTIES
+        PASS_REGULAR_EXPRESSION "executing catalyst_pipeline"
+        SKIP_REGULAR_EXPRESSION "Python support not enabled")
   endif()
 endif()

@@ -53,6 +53,8 @@ if (USE_CATALYST)
               ${CMAKE_CURRENT_SOURCE_DIR}/catalyst_pipeline.py)
 
     set(_vtk_fail_regex
+      # CatalystAdaptor
+      "Failed"
       # vtkLogger
       "(\n|^)ERROR: "
       "ERR\\|"
@@ -62,6 +64,8 @@ if (USE_CATALYST)
     set_tests_properties("CxxMultimeshV2::SimplePipeline"
       PROPERTIES
         FAIL_REGULAR_EXPRESSION "${_vtk_fail_regex}"
+        PASS_REGULAR_EXPRESSION "executing catalyst_pipeline"
+        SKIP_REGULAR_EXPRESSION "Python support not enabled"
         SKIP_RETURN_CODE 125)
   endif()
 endif()

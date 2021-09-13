@@ -125,12 +125,12 @@ void Execute(int cycle, double time, Grid& grid, Attributes& attribs, Particles&
   //   > Particles
   //      (particles)
   //   > Collection
-  //      > SubCollection
+  //      > Sub Collection
   //        [(grid), (particles)]
   auto assembly = channel["assembly"];
   assembly["Grid"].set_string("grid");
   assembly["Particles"].set_string("particles");
-  auto subCollection = assembly["Collection/SubCollection"];
+  auto subCollection = assembly["Collection/Sub Collection"];
   subCollection.append().set_string("grid");
   subCollection.append().set_string("particles");
 

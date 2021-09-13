@@ -4,6 +4,7 @@ from paraview.catalyst import get_args, get_execute_params
 
 # print values for parameters passed via adaptor (note these don't change,
 # and hence must be created as command line params)
+print("executing catalyst_pipeline")
 print("===================================")
 print("pipeline args={}".format(get_args()))
 print("===================================")
