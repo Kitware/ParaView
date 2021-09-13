@@ -7,10 +7,8 @@
 
 // Example of a C++ adaptor for a simulation code
 // where the simulation code has a fixed topology
-// grid. We treat the grid as an unstructured
-// grid even though in the example provided it
-// would be best described as a vtkImageData.
-// Also, the points are stored in an inconsistent
+// grid. In the adaptor we treat the grid as a vtkImageData.
+// Note that the points are stored in an inconsistent
 // manner with respect to the velocity vector.
 // This is purposefully done to demonstrate
 // the different approaches for getting data
@@ -23,13 +21,15 @@ int main(int argc, char* argv[])
   MPI_Init(&argc, &argv);
   Grid grid;
   unsigned int numPoints[3] = { 70, 60, 44 };
+
   double spacing[3] = { 1, 1.1, 1.3 };
   grid.Initialize(numPoints, spacing);
   Attributes attributes;
   attributes.Initialize(&grid);
 
 #ifdef USE_CATALYST
-  // The first argument is the program name
+  // The first argument is the program name and the subsequent arguments
+  // are the Catalyst Python scripts
   FEAdaptor::Initialize(argc - 1, argv + 1);
 #endif
   unsigned int numberOfTimeSteps = 100;

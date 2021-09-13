@@ -27,13 +27,13 @@ void Grid::Initialize(const unsigned int numPoints[3], const double spacing[3])
   this->Extent[0] = mpiRank * numPoints[0] / mpiSize;
   this->Extent[1] = (mpiRank + 1) * numPoints[0] / mpiSize;
 
-  if (mpiSize != mpiRank + 1)
+  if (mpiSize == mpiRank + 1)
   {
-    this->Extent[1]++;
+    this->Extent[1]--;
   }
   this->Extent[2] = this->Extent[4] = 0;
-  this->Extent[3] = numPoints[1];
-  this->Extent[5] = numPoints[2];
+  this->Extent[3] = numPoints[1] - 1;
+  this->Extent[5] = numPoints[2] - 1;
 }
 
 unsigned int Grid::GetNumberOfLocalPoints()
