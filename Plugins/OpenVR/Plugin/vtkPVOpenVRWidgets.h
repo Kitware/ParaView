@@ -39,8 +39,8 @@ class vtkImageData;
 class vtkImagoLoader;
 class vtkImplicitPlaneWidget2;
 class vtkOpenGLRenderWindow;
-class vtkOpenVRPanelRepresentation;
-class vtkOpenVRPanelWidget;
+class vtkVRPanelRepresentation;
+class vtkVRPanelWidget;
 class vtkPlaneSource;
 class vtkProp;
 class vtkPVDataRepresentation;
@@ -141,8 +141,8 @@ protected:
   std::future<vtkImageData*> ImageFuture;
   unsigned long RenderObserver;
 
-  vtkNew<vtkOpenVRPanelWidget> NavWidget;
-  vtkNew<vtkOpenVRPanelRepresentation> NavRepresentation;
+  vtkNew<vtkVRPanelWidget> NavWidget;
+  vtkNew<vtkVRPanelRepresentation> NavRepresentation;
   vtkDistanceWidget* DistanceWidget;
 
   std::vector<vtkImplicitPlaneWidget2*> CropPlanes;

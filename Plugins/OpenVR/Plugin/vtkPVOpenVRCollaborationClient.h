@@ -33,7 +33,7 @@ class vtkOpenGLRenderer;
 class vtkPVOpenVRCollaborationClientInternal;
 class vtkPVOpenVRHelper;
 class vtkOpenVRCameraPose;
-class vtkOpenVRModel;
+class vtkVRModel;
 
 class vtkPVOpenVRCollaborationClient : public vtkObject
 {
@@ -67,7 +67,7 @@ public:
   void RemoveAllThickCrops();
   void UpdateThickCrop(size_t i, vtkBoxWidget2*);
 
-  void UpdateRay(vtkOpenVRModel*, vtkEventDataDevice);
+  void UpdateRay(vtkVRModel*, vtkEventDataDevice);
 
   void ShowBillboard(std::vector<std::string> const& vals);
   void HideBillboard();

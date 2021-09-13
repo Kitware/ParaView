@@ -13,7 +13,7 @@
 =========================================================================*/
 #include "vtkPVOpenVRHelper.h"
 
-// must be before others due to gelw include
+// must be before others due to glew include
 #include "vtkOpenVRRenderWindow.h"
 
 #include "QVTKOpenGLWidget.h"
@@ -40,13 +40,10 @@
 #include "vtkOpenGLQuadHelper.h"
 #include "vtkOpenGLShaderCache.h"
 #include "vtkOpenGLState.h"
-#include "vtkOpenVRFollower.h"
 #include "vtkOpenVRInteractorStyle.h"
-#include "vtkOpenVRModel.h"
 #include "vtkOpenVROverlay.h"
 #include "vtkOpenVROverlayInternal.h"
 #include "vtkOpenVRPolyfill.h"
-#include "vtkOpenVRRay.h"
 #include "vtkOpenVRRenderWindowInteractor.h"
 #include "vtkOpenVRRenderer.h"
 #include "vtkPVOpenVRCollaborationClient.h"
@@ -73,6 +70,9 @@
 #include "vtkShaderProperty.h"
 #include "vtkStringArray.h"
 #include "vtkTimerLog.h"
+#include "vtkVRFollower.h"
+#include "vtkVRModel.h"
+#include "vtkVRRay.h"
 #include "vtkWidgetEvent.h"
 #include "vtkXMLDataElement.h"
 #include "vtkXMLUtilities.h"
@@ -250,10 +250,10 @@ bool vtkPVOpenVRHelper::CollaborationConnect()
   }
 
   // add observers to vr rays
-  auto ovr_rw = vtkOpenVRRenderWindow::SafeDownCast(this->RenderWindow);
+  auto ovr_rw = vtkVRRenderWindow::SafeDownCast(this->RenderWindow);
   if (ovr_rw)
   {
-    vtkOpenVRModel* cmodel = ovr_rw->GetTrackedDeviceModel(vtkEventDataDevice::LeftController);
+    vtkVRModel* cmodel = ovr_rw->GetTrackedDeviceModel(vtkEventDataDevice::LeftController);
     if (cmodel)
     {
       cmodel->GetRay()->AddObserver(
@@ -272,10 +272,10 @@ bool vtkPVOpenVRHelper::CollaborationConnect()
 
 bool vtkPVOpenVRHelper::CollaborationDisconnect()
 {
-  auto ovr_rw = vtkOpenVRRenderWindow::SafeDownCast(this->RenderWindow);
+  auto ovr_rw = vtkVRRenderWindow::SafeDownCast(this->RenderWindow);
   if (ovr_rw)
   {
-    vtkOpenVRModel* cmodel = ovr_rw->GetTrackedDeviceModel(vtkEventDataDevice::LeftController);
+    vtkVRModel* cmodel = ovr_rw->GetTrackedDeviceModel(vtkEventDataDevice::LeftController);
     if (cmodel)
     {
       cmodel->GetRay()->RemoveObservers(vtkCommand::ModifiedEvent);
@@ -321,6 +321,8 @@ void vtkPVOpenVRHelper::collabGoToPose(
   auto ovr_rw = vtkOpenVRRenderWindow::SafeDownCast(this->RenderWindow);
   if (ovr_rw)
   {
+    // TODO: vtk modif, modify vtkOpenVRCameraPose::Apply to handle vtkVRCamera and
+    // vtkVRRenderWindow
     pose->Apply(static_cast<vtkOpenVRCamera*>(this->Renderer->GetActiveCamera()), ovr_rw);
     this->Renderer->ResetCameraClippingRange();
     ovr_rw->UpdateHMDMatrixPose();
@@ -385,6 +387,7 @@ void vtkPVOpenVRHelper::SetBaseStationVisibility(bool v)
   this->BaseStationVisibility = v;
   if (this->RenderWindow)
   {
+    // TODO: add vtkVRRenderWindow::SetBaseStationVisibility ?
     auto ovr_rw = vtkOpenVRRenderWindow::SafeDownCast(this->RenderWindow);
     if (ovr_rw)
     {
@@ -397,8 +400,8 @@ void vtkPVOpenVRHelper::SetBaseStationVisibility(bool v)
 void vtkPVOpenVRHelper::ToggleShowControls()
 {
   // only show when in VR not simulated
-  auto ovr_rw = vtkOpenVRRenderWindow::SafeDownCast(this->RenderWindow);
-  if (!ovr_rw)
+  auto vr_rw = vtkVRRenderWindow::SafeDownCast(this->RenderWindow);
+  if (!vr_rw)
   {
     return;
   }
@@ -419,14 +422,14 @@ void vtkPVOpenVRHelper::ToggleShowControls()
     // place widget in front of the viewer, facing them
     double aspect =
       static_cast<double>(this->OpenVRControls->height()) / this->OpenVRControls->width();
-    double scale = ovr_rw->GetPhysicalScale();
+    double scale = vr_rw->GetPhysicalScale();
 
     vtkVector3d camPos;
     this->Renderer->GetActiveCamera()->GetPosition(camPos.GetData());
     vtkVector3d camDOP;
     this->Renderer->GetActiveCamera()->GetDirectionOfProjection(camDOP.GetData());
     vtkVector3d physUp;
-    ovr_rw->GetPhysicalViewUp(physUp.GetData());
+    vr_rw->GetPhysicalViewUp(physUp.GetData());
 
     // orthogonalize dop to vup
     camDOP = camDOP - physUp * camDOP.Dot(physUp);
@@ -447,9 +450,9 @@ void vtkPVOpenVRHelper::ToggleShowControls()
     this->QWidgetWidget->SetInteractor(this->Interactor);
     this->QWidgetWidget->SetCurrentRenderer(this->Renderer);
     this->QWidgetWidget->SetEnabled(1);
-    vtkOpenVRModel* ovrmodel = ovr_rw->GetTrackedDeviceModel(vtkEventDataDevice::RightController);
-    ovrmodel->SetShowRay(true);
-    ovrmodel->SetRayLength(this->Renderer->GetActiveCamera()->GetClippingRange()[1]);
+    vtkVRModel* vrmodel = vr_rw->GetTrackedDeviceModel(vtkEventDataDevice::RightController);
+    vrmodel->SetShowRay(true);
+    vrmodel->SetRayLength(this->Renderer->GetActiveCamera()->GetClippingRange()[1]);
   }
   else
   {
@@ -595,17 +598,17 @@ void vtkPVOpenVRHelper::SetRightTriggerMode(std::string const& text)
 
   style->HidePickActor();
 
-  auto ovr_rw = vtkOpenVRRenderWindow::SafeDownCast(this->RenderWindow);
-  if (!ovr_rw)
+  auto vr_rw = vtkVRRenderWindow::SafeDownCast(this->RenderWindow);
+  if (!vr_rw)
   {
     return;
   }
 
-  vtkOpenVRModel* ovrmodel = ovr_rw->GetTrackedDeviceModel(vtkEventDataDevice::RightController);
+  vtkVRModel* vrmodel = vr_rw->GetTrackedDeviceModel(vtkEventDataDevice::RightController);
 
-  if (ovrmodel)
+  if (vrmodel)
   {
-    ovrmodel->SetShowRay(this->QWidgetWidget->GetEnabled() || text == "Pick");
+    vrmodel->SetShowRay(this->QWidgetWidget->GetEnabled() || text == "Pick");
   }
 
   style->GrabWithRayOff();
@@ -1146,18 +1149,18 @@ bool vtkPVOpenVRHelper::EventCallback(vtkObject* caller, unsigned long eventID, 
     break;
     case vtkCommand::ModifiedEvent:
     {
-      auto ovr_rw = vtkOpenVRRenderWindow::SafeDownCast(this->RenderWindow);
-      vtkOpenVRRay* ray = vtkOpenVRRay::SafeDownCast(caller);
-      if (ovr_rw && ray)
+      auto vr_rw = vtkVRRenderWindow::SafeDownCast(this->RenderWindow);
+      vtkVRRay* ray = vtkVRRay::SafeDownCast(caller);
+      if (vr_rw && ray)
       {
         // find the model
-        vtkOpenVRModel* model = ovr_rw->GetTrackedDeviceModel(vtkEventDataDevice::LeftController);
+        vtkVRModel* model = vr_rw->GetTrackedDeviceModel(vtkEventDataDevice::LeftController);
         if (model && model->GetRay() == ray)
         {
           this->CollaborationClient->UpdateRay(model, vtkEventDataDevice::LeftController);
           return false;
         }
-        model = ovr_rw->GetTrackedDeviceModel(vtkEventDataDevice::RightController);
+        model = vr_rw->GetTrackedDeviceModel(vtkEventDataDevice::RightController);
         if (model && model->GetRay() == ray)
         {
           this->CollaborationClient->UpdateRay(model, vtkEventDataDevice::RightController);
@@ -1304,6 +1307,7 @@ void vtkPVOpenVRHelper::ViewRemoved(vtkSMViewProxy* smview)
 
 void vtkPVOpenVRHelper::DoOneEvent()
 {
+  // TODO: use vtkVRRenderWindow
   auto ovr_rw = vtkOpenVRRenderWindow::SafeDownCast(this->RenderWindow);
   if (!ovr_rw)
   {
@@ -1316,6 +1320,7 @@ void vtkPVOpenVRHelper::DoOneEvent()
   }
   else
   {
+    // TODO: vtk, create vtkVRRenderWindowInteractor and use DoOneEvent(vtkVRRenderWindow*)
     static_cast<vtkOpenVRRenderWindowInteractor*>(this->Interactor)
       ->DoOneEvent(ovr_rw, this->Renderer);
   }
@@ -1458,7 +1463,7 @@ void vtkPVOpenVRHelper::RenderVRView()
     vtkRenderer* ren =
       static_cast<vtkRenderer*>(this->RenderWindow->GetRenderers()->GetItemAsObject(0));
 
-    vtkOpenVRRenderWindow* ovrrw = vtkOpenVRRenderWindow::SafeDownCast(this->RenderWindow);
+    vtkVRRenderWindow* vrrw = vtkVRRenderWindow::SafeDownCast(this->RenderWindow);
 
     // bind framebuffer with texture
     this->RenderWindow->GetState()->PushFramebufferBindings();
@@ -1498,7 +1503,7 @@ void vtkPVOpenVRHelper::RenderVRView()
 
     // adjust ratio based on movement
     double moveDist = sqrt(vtkMath::Distance2BetweenPoints(pos, opos));
-    double scale = ovrrw->GetPhysicalScale();
+    double scale = vrrw->GetPhysicalScale();
     moveDist /= scale;
     ratio = 0.0;
     if (moveDist > 0.05) // in meters
@@ -1533,7 +1538,7 @@ void vtkPVOpenVRHelper::RenderVRView()
 
     // render
     this->RenderWindow->GetRenderers()->Render();
-    ovrrw->RenderModels();
+    vrrw->RenderModels();
 
     // restore
     ocam->SetPosition(pos);
@@ -1558,15 +1563,15 @@ void vtkPVOpenVRHelper::RenderVRView()
 
 void vtkPVOpenVRHelper::ShowVRView()
 {
-  vtkOpenVRRenderWindow* ovrrw = vtkOpenVRRenderWindow::SafeDownCast(this->RenderWindow);
-  if (!ovrrw)
+  vtkVRRenderWindow* vrrw = vtkVRRenderWindow::SafeDownCast(this->RenderWindow);
+  if (!vrrw)
   {
     return;
   }
 
   if (!this->ObserverWidget)
   {
-    ovrrw->MakeCurrent();
+    vrrw->MakeCurrent();
     QOpenGLContext* ctx = QOpenGLContext::currentContext();
 
     this->ObserverWidget = new QVTKOpenGLWindow(ctx);

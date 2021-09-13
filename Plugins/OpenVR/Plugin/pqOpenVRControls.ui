@@ -1061,7 +1061,7 @@ font: 75 12pt &quot;Arial&quot;;</string>
   <customwidget>
    <class>pqVCRToolbar</class>
    <extends>QWidget</extends>
-   <header>pqvcrtoolbar.h</header>
+   <header>pqVCRToolbar.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

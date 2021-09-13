@@ -146,6 +146,7 @@ void vtkOpenVRPolyfill::SetPose(
   auto ovrcam = vtkOpenVRCamera::SafeDownCast(cam);
   if (ovrcam)
   {
+    // TODO: vtk modif, modify vtkOpenVRCameraPose::Set to handle vtkVRCamera and vtkVRRenderWindow
     thePose->Set(ovrcam, static_cast<vtkOpenVRRenderWindow*>(renWin));
   }
   else
@@ -171,6 +172,8 @@ void vtkOpenVRPolyfill::ApplyPose(
   auto ovrcam = vtkOpenVRCamera::SafeDownCast(cam);
   if (ovrcam)
   {
+    // TODO: vtk modif, modify vtkOpenVRCameraPose::Apply to handle vtkVRCamera and
+    // vtkVRRenderWindow
     thePose->Apply(ovrcam, static_cast<vtkOpenVRRenderWindow*>(renWin));
   }
   else
