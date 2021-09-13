@@ -7,6 +7,10 @@ if (NOT TARGET ParaView::RemotingMisc)
   return()
 endif ()
 
+vtk_module_test_data(
+  "${paraview_test_data_directory_input}/Data/StateWithHiddenRepresentations.pvsm")
+
+
 # Add python script names here.
 set(PY_TESTS
   Animation.py
@@ -47,6 +51,7 @@ set(PY_TESTS
   SaveAnimation.py
   SaveScreenshot.py,NO_VALID
   ScalarBarActorBackwardsCompatibility.py,NO_VALID
+  StateWithHiddenRepresentations.py,NO_VALID
   TestFetchData.py,NO_VALID
   TestSAVGReader.py
   TestVTKSeriesWithMeta.py

@@ -682,23 +682,23 @@ protected:
   friend class vtkSMCameraLink;
   friend class vtkSMCompoundProxy;
   friend class vtkSMCompoundSourceProxy;
+  friend class vtkSMDeserializerProtobuf;
   friend class vtkSMInputProperty;
+  friend class vtkSMMultiServerSourceProxy;
+  friend class vtkSMNamedPropertyIterator;
   friend class vtkSMOrderedPropertyIterator;
-  friend class vtkSMPart;
   friend class vtkSMProperty;
   friend class vtkSMPropertyIterator;
-  friend class vtkSMNamedPropertyIterator;
-  friend class vtkSMSessionProxyManager;
   friend class vtkSMProxyObserver;
   friend class vtkSMProxyProperty;
   friend class vtkSMProxyRegisterUndoElement;
   friend class vtkSMProxyUnRegisterUndoElement;
+  friend class vtkSMSessionProxyManager;
   friend class vtkSMSourceProxy;
-  friend class vtkSMUndoRedoStateLoader;
-  friend class vtkSMDeserializerProtobuf;
-  friend class vtkSMStateLocator;
-  friend class vtkSMMultiServerSourceProxy;
   friend class vtkSMStateLoader;
+  friend class vtkSMStateLocator;
+  friend class vtkSMUndoRedoStateLoader;
+  friend class vtkSMViewProxy;
   //@}
 
   //@{
@@ -853,6 +853,12 @@ protected:
    * using playing animations with cache enabled.
    */
   virtual void PostUpdateData(bool using_cache);
+
+  /**
+   * This is called by `PostUpdateData` to only update state for this proxy
+   * without iterative over producers.
+   */
+  void PostUpdateDataSelfOnly(bool using_cache);
 
   /**
    * If a proxy is deprecated, prints a warning.

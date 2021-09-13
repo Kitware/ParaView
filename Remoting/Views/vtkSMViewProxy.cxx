@@ -470,11 +470,13 @@ void vtkSMViewProxy::Update()
       }
       else
       {
-        // this->GetProducerProxy(i)->PostUpdateData();
+        this->GetProducerProxy(i)->PostUpdateData(false);
       }
     }
 
-    this->PostUpdateData(false);
+    // We don't need to call PostUpdateData on all producers again since we just
+    // did that explicitly (and selectively) in the loop above.
+    this->PostUpdateDataSelfOnly(false);
   }
 }
 

@@ -295,11 +295,17 @@ void vtkSMRepresentationProxy::ViewUpdated(vtkSMProxy* view)
       this->MarkInputsAsDirty();
     }
 
+    const bool repr_updated = this->VTKRepresentationUpdated;
     const bool using_cache = this->VTKRepresentationUpdateSkipped;
     this->VTKRepresentationUpdateSkipped = false;
     this->VTKRepresentationUpdated = false;
     this->VTKRepresentationUpdateTimeChanged = false;
-    this->PostUpdateData(using_cache);
+    if (repr_updated || using_cache)
+    {
+      // Don't call PostUpdateData, unless representation was updated or cache
+      // was used. This is necessary to avoid #20133.
+      this->PostUpdateData(using_cache);
+    }
   }
 
   // If this class has sub-representations, we need to tell those that the view
