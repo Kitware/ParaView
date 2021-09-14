@@ -651,6 +651,8 @@ void vtkPVDataInformation::AddInformation(vtkPVInformation* oinfo)
       case vtkDataObject::FIELD:
         this->NumberOfElements[cc] =
           std::max(this->NumberOfElements[cc], other->NumberOfElements[cc]);
+        break;
+
       default:
         this->NumberOfElements[cc] += other->NumberOfElements[cc];
     }
@@ -1213,9 +1215,10 @@ vtkSmartPointer<vtkDataObject> vtkPVDataInformation::GetSubset(vtkDataObject* do
     return nullptr;
   }
 
-  if (cids.size() == 1)
+  // vtkAMRUniformGrid needs to use the other path because indexing is done differently.
+  // See issue #20947
+  if (cids.size() == 1 && !vtkUniformGridAMR::SafeDownCast(cd))
   {
-    vtkSmartPointer<vtkPartitionedDataSetCollection> subset;
     auto iter = vtkSmartPointer<vtkCompositeDataIterator>::Take(cd->NewIterator());
     if (auto diter = vtkDataObjectTreeIterator::SafeDownCast(iter))
     {
