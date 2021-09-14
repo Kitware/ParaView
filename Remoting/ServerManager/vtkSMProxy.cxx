@@ -1256,6 +1256,12 @@ void vtkSMProxy::PostUpdateData(bool using_cache)
       this->GetProducerProxy(i)->PostUpdateData(using_cache);
     }
   }
+  this->PostUpdateDataSelfOnly(using_cache);
+}
+
+//----------------------------------------------------------------------------
+void vtkSMProxy::PostUpdateDataSelfOnly(bool using_cache)
+{
   if (this->NeedsUpdate)
   {
     vtkLogF(TRACE, "PostUpdateData (%s)", this->GetLogNameOrDefault());
