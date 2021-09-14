@@ -43,3 +43,4 @@ Variable | Description
 `PARAVIEW_LOG_DATA_MOVEMENT_VERBOSITY` | Log messages related to data movement for rendering and other tasks (see vtkPVLogger::GetDataMovementVerbosity())
 `PARAVIEW_LOG_PIPELINE_VERBOSITY`  | Log messages related to Pipeline execution (see vtkPVLogger::GetPipelineVerbosity())
 `PARAVIEW_LOG_PLUGIN_VERBOSITY` | Log messages related to ParaView plugins (see vtkPVLogger::GetPluginVerbosity())
+`PARAVIEW_LOG_EXECUTION_VERBOSITY` | Log messages related to ParaView algorithms executions (see vtkPVLogger::GetExecutionVerbosity())
