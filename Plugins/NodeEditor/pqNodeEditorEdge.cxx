@@ -155,7 +155,7 @@ int pqNodeEditorEdge::updatePoints()
     const auto xc = this->cPoint.x();
     const auto yc = this->cPoint.y();
 
-    this->path.clear();
+    this->path = QPainterPath();
     path.moveTo(this->oPoint);
 
     if (this->type == Type::PIPELINE)
