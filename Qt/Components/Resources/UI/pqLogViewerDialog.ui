@@ -355,6 +355,13 @@
             </property>
            </widget>
           </item>
+          <item>
+           <widget class="QCheckBox" name="executionCheckBox">
+            <property name="text">
+             <string>Filter Execution</string>
+            </property>
+           </widget>
+          </item>
          </layout>
         </widget>
        </item>

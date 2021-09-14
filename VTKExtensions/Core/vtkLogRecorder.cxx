@@ -173,6 +173,9 @@ void vtkLogRecorder::SetCategoryVerbosity(int categoryIndex, int verbosity)
     case 4:
       vtkPVLogger::SetPluginVerbosity(v);
       break;
+    case 5:
+      vtkPVLogger::SetExecutionVerbosity(v);
+      break;
     default:
       break;
   }
@@ -187,6 +190,7 @@ void vtkLogRecorder::ResetCategoryVerbosities()
   vtkPVLogger::SetApplicationVerbosity(verbosity);
   vtkPVLogger::SetPipelineVerbosity(verbosity);
   vtkPVLogger::SetPluginVerbosity(verbosity);
+  vtkPVLogger::SetExecutionVerbosity(verbosity);
 }
 
 //----------------------------------------------------------------------------
