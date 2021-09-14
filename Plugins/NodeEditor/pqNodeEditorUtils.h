@@ -32,16 +32,22 @@ namespace pqNodeEditorUtils
 namespace CONSTS
 {
 constexpr int NODE_WIDTH = 300;
-constexpr int NODE_BORDER_WIDTH = 4;
+constexpr int NODE_BORDER_WIDTH = 3;
 constexpr int NODE_BORDER_RADIUS = 6;
-constexpr int NODE_DEFAULT_VERBOSITY = 1;
 constexpr int NODE_FONT_SIZE = 13;
-constexpr int EDGE_WIDTH = 5;
+constexpr int PORT_RADIUS = 8;
+constexpr int PORT_HEIGHT = 20; // radius + width + padding
+constexpr int EDGE_WIDTH = 4;
+constexpr int EDGE_OUTLINE = 1;
+const QColor COLOR_DARK_GREEN = QColor("#078a17");
 const QColor COLOR_SWEET_GREEN = QColor("#3fb55d");
+const QColor COLOR_DARK_ORANGE = QColor("#e9783d"); // complement to blue
 
-constexpr int NODE_LAYER = 1;
-constexpr int EDGE_LAYER = 2;
-constexpr int FOREGROUND_LAYER = 9;
+constexpr int NODE_LAYER = 10;
+constexpr int EDGE_LAYER = 20;
+constexpr int PORT_LAYER = 30;
+constexpr int VIEW_NODE_LAYER = 50;
+constexpr int FOREGROUND_LAYER = 40;
 
 constexpr unsigned long DOUBLE_CLICK_DELAY = 2.5e8;
 };

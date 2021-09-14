@@ -43,6 +43,7 @@ pqNodeEditorView::pqNodeEditorView(QGraphicsScene* scene, QWidget* parent)
   new pqDeleteReaction(this->deleteAction);
 
   this->setRenderHint(QPainter::Antialiasing);
+  this->setViewportUpdateMode(QGraphicsView::FullViewportUpdate);
 }
 
 // ----------------------------------------------------------------------------

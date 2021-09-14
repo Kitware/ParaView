@@ -15,8 +15,9 @@
   <!-- Test node editor toolbar -->
   <pqevent object="pqClientMainWindow/pqNodeEditorWidget/nodeEditorWidget/toolbar/ZoomButton" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/pqNodeEditorWidget/nodeEditorWidget/toolbar/LayoutButton" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/pqNodeEditorWidget/nodeEditorWidget/toolbar/CollapseAllButton" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/pqNodeEditorWidget/nodeEditorWidget/toolbar/autolayoutCheckbox" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/pqNodeEditorWidget/nodeEditorWidget/toolbar/CycleVerbosityButton" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/pqNodeEditorWidget/nodeEditorWidget/toolbar/ViewNodesCheckbox" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/pqNodeEditorWidget/nodeEditorWidget/toolbar/AutoLayoutCheckbox" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/pqNodeEditorWidget/nodeEditorWidget/toolbar/ResetButton" command="activate" arguments="" />
 
   <!-- Change property of the sphere from the classic tab (not testable from the node editor yet) -->

@@ -38,12 +38,12 @@ class pqNodeEditorEdge : public QObject, public QGraphicsPathItem
 
 public:
   /**
-   * Edge style enumeration. NORMAL is for an edge between 2 sources and VIEW is for an edge between
-   * a source and a view node.
+   * Edge style enumeration: PIPELINE is for an edge between 2 sources and VIEW is for an edge
+   * between a source and a view node.
    */
-  enum class EdgeType : int
+  enum class Type : int
   {
-    NORMAL = 0,
+    PIPELINE = 0,
     VIEW
   };
 
@@ -53,7 +53,7 @@ public:
    * One can also set its type and parent.
    */
   pqNodeEditorEdge(QGraphicsScene* scene, pqNodeEditorNode* producer, int producerOutputPortIdx,
-    pqNodeEditorNode* consumer, int consumerInputPortIdx, EdgeType type = EdgeType::NORMAL,
+    pqNodeEditorNode* consumer, int consumerInputPortIdx, Type type = Type::PIPELINE,
     QGraphicsItem* parent = nullptr);
 
   /**
@@ -65,8 +65,8 @@ public:
   /*
    * Get/Set the type of the edge (0:normal edge, 1: view edge). Update the style accordingly.
    */
-  void setType(EdgeType type);
-  int getType() { return static_cast<int>(this->type); };
+  void setType(Type type);
+  Type getType() { return this->type; };
   //@}
 
   //@{
@@ -75,6 +75,14 @@ public:
    */
   pqNodeEditorNode* getProducer() { return this->producer; };
   pqNodeEditorNode* getConsumer() { return this->consumer; };
+  //@}
+
+  //@{
+  /*
+   * Get the producer/consumer port idx
+   */
+  int getProducerOutputPortIdx() { return this->producerOutputPortIdx; };
+  int getConsumerInputPortIdx() { return this->consumerInputPortIdx; };
   //@}
 
   /*
@@ -96,10 +104,11 @@ protected:
 private:
   QGraphicsScene* scene;
 
-  EdgeType type{ EdgeType::NORMAL };
+  Type type{ Type::PIPELINE };
   QPointF oPoint;
   QPointF cPoint;
   QPointF iPoint;
+  QPainterPath path;
 
   pqNodeEditorNode* producer;
   int producerOutputPortIdx;

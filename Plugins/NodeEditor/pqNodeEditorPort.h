@@ -37,13 +37,7 @@ class pqNodeEditorPort : public QGraphicsItem
 {
 
 public:
-  enum class NodeStyle : int
-  {
-    NORMAL = 0,
-    SELECTED
-  };
-
-  enum class NodeType : int
+  enum class Type : int
   {
     INPUT = 0,
     OUTPUT
@@ -53,16 +47,21 @@ public:
    * Create a node port of a specific type with a specific name. The one instanciating the port
    * should take care of where to place it on the scene.
    */
-  pqNodeEditorPort(NodeType type, QString name = "", QGraphicsItem* parent = nullptr);
+  pqNodeEditorPort(Type type, QString name = "", QGraphicsItem* parent = nullptr);
   virtual ~pqNodeEditorPort() = default;
 
   QGraphicsEllipseItem* getDisc() { return this->disc; }
   QGraphicsTextItem* getLabel() { return this->label; }
 
   /**
-   * Set the appareance of the port.
+   * Determines if the port is marked as selected.
    */
-  int setStyle(NodeStyle style);
+  int setMarkedAsSelected(bool selected);
+
+  /**
+   * Determines if the port is marked as visible.
+   */
+  int setMarkedAsVisible(bool visible);
 
 protected:
   QRectF boundingRect() const override;
@@ -76,9 +75,6 @@ protected:
 private:
   QGraphicsEllipseItem* disc;
   QGraphicsTextItem* label;
-
-  int borderWidth{ 4 };
-  int portRadius{ 8 };
 };
 
 #endif // pqNodeEditorPort_h

@@ -48,23 +48,6 @@ class pqNodeEditorNode : public QObject, public QGraphicsItem
 
 public:
   /**
-   * Creates a node for the given pqPipelineSource instance. This will also create the input/ouput
-   * ports on the left/right of the node.
-   */
-  pqNodeEditorNode(
-    QGraphicsScene* scene, pqPipelineSource* source, QGraphicsItem* parent = nullptr);
-
-  /**
-   *  Create a node and its input port representing the given @c view.
-   */
-  pqNodeEditorNode(QGraphicsScene* scene, pqView* view, QGraphicsItem* parent = nullptr);
-
-  /**
-   * Remove the node from the scene it has been added to.
-   */
-  virtual ~pqNodeEditorNode();
-
-  /**
    * Enum for the verbosity style of the nodes in the node editor scene.
    * EMPTY : no properties displayed
    * SIMPLE : default properties displayed
@@ -73,7 +56,7 @@ public:
   enum class Verbosity : int
   {
     EMPTY = 0,
-    SIMPLE,
+    NORMAL,
     ADVANCED
   };
 
@@ -100,6 +83,32 @@ public:
     NORMAL = 0,
     DIRTY
   };
+
+  /**
+   * Static method to cycle through default verbosity levels in deceasing order.
+   */
+  static pqNodeEditorNode::Verbosity CycleDefaultVerbosity()
+  {
+    return pqNodeEditorNode::DefaultNodeVerbosity = static_cast<pqNodeEditorNode::Verbosity>(
+             (static_cast<int>(pqNodeEditorNode::DefaultNodeVerbosity) + 2) % 3);
+  };
+
+  /**
+   * Creates a node for the given pqPipelineSource instance. This will also create the input/ouput
+   * ports on the left/right of the node.
+   */
+  pqNodeEditorNode(
+    QGraphicsScene* scene, pqPipelineSource* source, QGraphicsItem* parent = nullptr);
+
+  /**
+   *  Create a node and its input port representing the given @c view.
+   */
+  pqNodeEditorNode(QGraphicsScene* scene, pqView* view, QGraphicsItem* parent = nullptr);
+
+  /**
+   * Remove the node from the scene it has been added to.
+   */
+  virtual ~pqNodeEditorNode();
 
   /**
    *  Get corresponding pqProxy of the node.
@@ -137,8 +146,8 @@ public:
    * displayed in the node. It can be either empty, simple or advandeced (every properties).
    * Update the style accordingly.
    */
-  void setVerbosity(Verbosity i);
-  int getVerbosity() { return static_cast<int>(this->verbosity); };
+  void setVerbosity(Verbosity v);
+  Verbosity getVerbosity() { return this->verbosity; };
   //@}
 
   /**
@@ -146,7 +155,7 @@ public:
    * past the last level of verbosity we go back to the first level.
    * Update the style accordingly and return the new verbosity level.
    */
-  int incrementVerbosity();
+  void incrementVerbosity();
 
   //@{
   /**
@@ -154,7 +163,7 @@ public:
    * (for the active source) or SELECTED_VIEW (for the active view). Update the style accordingly.
    */
   void setOutlineStyle(OutlineStyle style);
-  int getOutlineStyle() { return static_cast<int>(this->outlineStyle); };
+  OutlineStyle getOutlineStyle() { return this->outlineStyle; };
   //@}
 
   //@{
@@ -164,7 +173,7 @@ public:
    * 0: BackgroundStyle::NORMAL, 1: BackgroundStyle::DIRTY
    */
   void setBackgroundStyle(BackgroundStyle style);
-  int getBackgroundStyle() { return static_cast<int>(this->backgroundStyle); };
+  BackgroundStyle getBackgroundStyle() { return this->backgroundStyle; };
   //@}
 
   /**
@@ -202,12 +211,15 @@ private:
   Verbosity verbosity{ Verbosity::EMPTY };
 
   int labelHeight{ 30 };
-
-  int portHeight{ 24 };
   int portContainerHeight{ 0 };
 
   int widgetContainerHeight{ 0 };
   int widgetContainerWidth{ 0 };
+
+  /**
+   * Static property that controls the verbosity of nodes upon creation.
+   */
+  static pqNodeEditorNode::Verbosity DefaultNodeVerbosity;
 };
 
 #endif // pqNodeEditorNode_h

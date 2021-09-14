@@ -82,10 +82,12 @@ pqNodeEditorWidget::pqNodeEditorWidget(const QString& title, QWidget* parent)
   this->view->setDragMode(QGraphicsView::ScrollHandDrag);
   const QRectF MAX_SCENE_SIZE{ -1e4, -1e4, 3e4, 3e4 };
   this->view->setSceneRect(MAX_SCENE_SIZE);
-  layout->addWidget(this->view);
 
+  // toolbar
   this->initializeActions();
   this->createToolbar(layout);
+
+  layout->addWidget(this->view);
 
   this->attachServerManagerListeners();
 
@@ -104,8 +106,7 @@ int pqNodeEditorWidget::apply()
   auto nodes = this->nodeRegistry;
   for (auto it : nodes)
   {
-    auto source = dynamic_cast<pqPipelineSource*>(it.second->getProxy());
-    if (source)
+    if (auto source = dynamic_cast<pqPipelineSource*>(it.second->getProxy()))
     {
       it.second->getProxyProperties()->apply();
       source->setModifiedState(pqProxy::ModifiedState::UNMODIFIED);
@@ -113,37 +114,13 @@ int pqNodeEditorWidget::apply()
     }
   }
 
-  auto activeView = pqActiveObjects::instance().activeView();
-  if (!activeView)
+  for (auto it : nodes)
   {
-    return 1;
-  }
-
-  auto activeSource = pqActiveObjects::instance().activeSource();
-  if (!activeSource || activeSource->getNumberOfConsumers() > 0)
-  {
-    return 1;
-  }
-
-  auto viewSMProxy = static_cast<vtkSMViewProxy*>(activeView->getProxy());
-  vtkNew<vtkSMParaViewPipelineControllerWithRendering> controller;
-
-  for (int i = 0; i < activeSource->getNumberOfOutputPorts(); i++)
-  {
-    controller->SetVisibility(
-      static_cast<vtkSMSourceProxy*>(activeSource->getProxy()), i, viewSMProxy, 1);
-  }
-
-  if (auto activeFilter = dynamic_cast<pqPipelineFilter*>(activeSource))
-  {
-    for (auto port : activeFilter->getInputs())
+    if (auto view = dynamic_cast<pqView*>(it.second->getProxy()))
     {
-      controller->SetVisibility(static_cast<vtkSMSourceProxy*>(port->getSourceProxy()),
-        port->getPortNumber(), viewSMProxy, 0);
+      view->render();
     }
   }
-
-  activeView->render();
 
   return 1;
 }
@@ -201,9 +178,9 @@ int pqNodeEditorWidget::initializeActions()
     return 1;
   });
 
-  this->actionCollapseAllNodes = new QAction(this);
-  QObject::connect(
-    this->actionCollapseAllNodes, &QAction::triggered, this, &pqNodeEditorWidget::collapseAllNodes);
+  this->actionCycleNodeVerbosity = new QAction(this);
+  QObject::connect(this->actionCycleNodeVerbosity, &QAction::triggered, this,
+    &pqNodeEditorWidget::cycleNodeVerbosity);
 
   return 1;
 }
@@ -227,12 +204,23 @@ int pqNodeEditorWidget::createToolbar(QLayout* layout)
     return 1;
   };
 
+  auto addSeparator = [](QHBoxLayout* layout) {
+    const auto separator = new QFrame();
+    separator->setFrameShape(QFrame::VLine);
+    separator->setFrameShadow(QFrame::Sunken);
+    layout->addWidget(separator);
+    return 1;
+  };
+
   addButton("Apply", this->actionApply);
   addButton("Reset", this->actionReset);
+  addSeparator(toolbarLayout);
+
+  addButton("Zoom", this->actionZoom);
   addButton("Layout", this->actionLayout);
   {
     auto checkBox = new QCheckBox("Auto Layout");
-    checkBox->setObjectName("autolayoutCheckbox");
+    checkBox->setObjectName("AutoLayoutCheckbox");
     checkBox->setCheckState(this->autoUpdateLayout ? Qt::Checked : Qt::Unchecked);
     this->connect(checkBox, &QCheckBox::stateChanged, this, [this](int state) {
       this->autoUpdateLayout = state;
@@ -241,8 +229,25 @@ int pqNodeEditorWidget::createToolbar(QLayout* layout)
     });
     toolbarLayout->addWidget(checkBox);
   }
-  addButton("Zoom", this->actionZoom);
-  addButton("Collapse All", this->actionCollapseAllNodes);
+  addSeparator(toolbarLayout);
+
+  addButton("Cycle Verbosity", this->actionCycleNodeVerbosity);
+  {
+    auto checkBox = new QCheckBox("View Nodes");
+    checkBox->setObjectName("ViewNodesCheckbox");
+    checkBox->setCheckState(this->showViewNodes ? Qt::Checked : Qt::Unchecked);
+    this->connect(checkBox, &QCheckBox::stateChanged, this, [this](int state) {
+      this->showViewNodes = state;
+      auto smm = pqApplicationCore::instance()->getServerManagerModel();
+      for (auto proxy : smm->findItems<pqView*>())
+      {
+        this->updateVisibilityEdges(proxy);
+      }
+      this->updateActiveView();
+      return 1;
+    });
+    toolbarLayout->addWidget(checkBox);
+  }
 
   // add spacer
   toolbarLayout->addItem(new QSpacerItem(0, 0, QSizePolicy::Expanding));
@@ -334,9 +339,11 @@ int pqNodeEditorWidget::updateActiveView()
     if (dynamic_cast<pqView*>(it.second->getProxy()))
     {
       it.second->setOutlineStyle(pqNodeEditorNode::OutlineStyle::NORMAL);
+      it.second->setVisible(this->showViewNodes);
     }
     else
     {
+      // for 3D widgets; TODO: Probably related to 3D widgets toggle bug
       it.second->getProxyProperties()->setView(aView);
     }
   }
@@ -353,6 +360,17 @@ int pqNodeEditorWidget::updateActiveView()
   }
 
   nodeIt->second->setOutlineStyle(pqNodeEditorNode::OutlineStyle::SELECTED_VIEW);
+
+  // force redraw of edges
+  for (auto edgesPerNodeIt : this->edgeRegistry)
+  {
+    for (auto edge : edgesPerNodeIt.second)
+    {
+      edge->setType(edge->getType());
+    }
+  }
+
+  this->updatePortStyles();
 
   return 1;
 }
@@ -371,7 +389,7 @@ int pqNodeEditorWidget::updateActiveSourcesAndPorts()
     it.second->setOutlineStyle(pqNodeEditorNode::OutlineStyle::NORMAL);
     for (auto oPort : it.second->getOutputPorts())
     {
-      oPort->setStyle(pqNodeEditorPort::NodeStyle::NORMAL);
+      oPort->setMarkedAsSelected(false);
     }
   }
 
@@ -393,7 +411,7 @@ int pqNodeEditorWidget::updateActiveSourcesAndPorts()
       auto oPorts = nodeIt->second->getOutputPorts();
       if (!oPorts.empty())
       {
-        oPorts[0]->setStyle(pqNodeEditorPort::NodeStyle::SELECTED);
+        oPorts[0]->setMarkedAsSelected(true);
       }
     }
     else if (auto port = dynamic_cast<pqOutputPort*>(it))
@@ -405,8 +423,7 @@ int pqNodeEditorWidget::updateActiveSourcesAndPorts()
       }
 
       nodeIt->second->setOutlineStyle(pqNodeEditorNode::OutlineStyle::SELECTED_FILTER);
-      nodeIt->second->getOutputPorts()[port->getPortNumber()]->setStyle(
-        pqNodeEditorPort::NodeStyle::SELECTED);
+      nodeIt->second->getOutputPorts()[port->getPortNumber()]->setMarkedAsSelected(true);
     }
   }
 
@@ -471,8 +488,8 @@ int pqNodeEditorWidget::createNodeForSource(pqPipelineSource* proxy)
         }
         auto eventMDC = static_cast<QGraphicsSceneMouseEvent*>(event);
 
-        // double left click
-        if (eventMDC->button() == Qt::MouseButton::LeftButton && pqNodeEditorUtils::isDoubleClick())
+        // left click
+        if (eventMDC->button() == Qt::MouseButton::LeftButton)
         {
           auto activeObjects = &pqActiveObjects::instance();
 
@@ -516,7 +533,8 @@ int pqNodeEditorWidget::createNodeForSource(pqPipelineSource* proxy)
           }
 
           auto eventMDC = static_cast<QGraphicsSceneMouseEvent*>(event);
-          if (pqNodeEditorUtils::isDoubleClick())
+          if (eventMDC->button() == Qt::MouseButton::LeftButton &&
+            pqNodeEditorUtils::isDoubleClick())
           {
             this->setInput(
               proxy, static_cast<int>(idx), eventMDC->modifiers() == Qt::ControlModifier);
@@ -543,38 +561,35 @@ int pqNodeEditorWidget::createNodeForSource(pqPipelineSource* proxy)
 
           auto portProxy = proxy->getOutputPort(static_cast<int>(idx));
 
-          // double left click
-          if (eventMDC->button() == Qt::MouseButton::LeftButton &&
-            pqNodeEditorUtils::isDoubleClick())
+          // left click
+          if (eventMDC->button() == Qt::MouseButton::LeftButton) // only react to left clicks
           {
-            auto activeObjects = &pqActiveObjects::instance();
-
-            // add to selection or make single active selection
-            if (eventMDC->modifiers() == Qt::ControlModifier)
+            if (eventMDC->modifiers() & Qt::ShiftModifier) // shift -> toggle visibility
             {
-              pqProxySelection sel = activeObjects->selection();
-              sel.push_back(portProxy);
-              activeObjects->setSelection(sel, portProxy);
+              if (eventMDC->modifiers() & Qt::ControlModifier) // ctrl -> show exclusively
+              {
+                this->hideAllInActiveView();
+              }
+
+              this->toggleInActiveView(proxy->getOutputPort(static_cast<int>(idx)));
             }
             else
-            {
-              activeObjects->setActivePort(portProxy);
+            { // else -> select port
+
+              auto activeObjects = &pqActiveObjects::instance();
+
+              // add to selection or make single active selection
+              if (eventMDC->modifiers() == Qt::ControlModifier)
+              {
+                pqProxySelection sel = activeObjects->selection();
+                sel.push_back(portProxy);
+                activeObjects->setSelection(sel, portProxy);
+              }
+              else
+              {
+                activeObjects->setActivePort(portProxy);
+              }
             }
-
-            return true;
-          }
-
-          // toggle visibility
-          if (eventMDC->button() == Qt::MouseButton::LeftButton &&
-            eventMDC->modifiers() & Qt::ShiftModifier)
-          {
-            // exclusive
-            if (eventMDC->modifiers() & Qt::ControlModifier)
-            {
-              this->hideAllInActiveView();
-            }
-
-            this->toggleInActiveView(proxy->getOutputPort(static_cast<int>(idx)));
 
             return true;
           }
@@ -608,8 +623,8 @@ int pqNodeEditorWidget::createNodeForView(pqView* proxy)
 
       auto eventMDC = static_cast<QGraphicsSceneMouseEvent*>(event);
 
-      // double left click
-      if (eventMDC->button() == Qt::MouseButton::LeftButton && pqNodeEditorUtils::isDoubleClick())
+      // left click
+      if (eventMDC->button() == Qt::MouseButton::LeftButton)
       {
         pqActiveObjects::instance().setActiveView(proxy);
       }
@@ -727,6 +742,12 @@ int pqNodeEditorWidget::setInput(pqPipelineSource* consumer, int idx, bool clear
         inputPorts.push_back(0);
       }
     }
+
+    // if no ports are selected do nothing
+    if (inputPorts.size() < 1)
+    {
+      return 1;
+    }
   }
 
   auto iPortName = consumerAsFilter->getInputPortName(idx);
@@ -795,15 +816,51 @@ int pqNodeEditorWidget::hideAllInActiveView()
 };
 
 // ----------------------------------------------------------------------------
-int pqNodeEditorWidget::collapseAllNodes()
+int pqNodeEditorWidget::cycleNodeVerbosity()
 {
+  const auto verbosity = pqNodeEditorNode::CycleDefaultVerbosity();
   for (auto nodeIt : this->nodeRegistry)
   {
-    nodeIt.second->setVerbosity(pqNodeEditorNode::Verbosity::EMPTY);
+    nodeIt.second->setVerbosity(verbosity);
   }
 
   return 1;
 };
+
+// ----------------------------------------------------------------------------
+int pqNodeEditorWidget::updatePortStyles()
+{
+  // mark all ports as invisible
+  for (auto nodeIt : this->nodeRegistry)
+  {
+    for (auto port : nodeIt.second->getOutputPorts())
+    {
+      port->setMarkedAsVisible(false);
+    }
+  }
+
+  // get active view
+  auto aView = pqActiveObjects::instance().activeView();
+  if (!aView)
+  {
+    return 1;
+  }
+
+  // iterate over active view edges to mark visible ports
+  auto activeVisibilityEdges = this->edgeRegistry.find(pqNodeEditorUtils::getID(aView));
+  if (activeVisibilityEdges == this->edgeRegistry.end())
+  {
+    return 1;
+  }
+
+  for (auto edge : activeVisibilityEdges->second)
+  {
+    edge->getProducer()->getOutputPorts()[edge->getProducerOutputPortIdx()]->setMarkedAsVisible(
+      true);
+  }
+
+  return 1;
+}
 
 // ----------------------------------------------------------------------------
 int pqNodeEditorWidget::updateVisibilityEdges(pqView* proxy)
@@ -845,8 +902,11 @@ int pqNodeEditorWidget::updateVisibilityEdges(pqView* proxy)
 
     // create edge
     viewEdgesIt->second.push_back(new pqNodeEditorEdge(this->scene, producerIt->second,
-      producerPort->getPortNumber(), viewIt->second, 0, pqNodeEditorEdge::EdgeType::VIEW));
+      producerPort->getPortNumber(), viewIt->second, 0, pqNodeEditorEdge::Type::VIEW));
+    viewEdgesIt->second.back()->setVisible(this->showViewNodes);
   }
+
+  this->updatePortStyles();
 
   this->actionAutoLayout->trigger();
 
