@@ -103,9 +103,14 @@ public slots:
   int removeIncomingEdges(pqProxy* proxy);
 
   /**
-   * Rebuild every input edges of a given source proxy.
+   * Rebuild every input edge of a given source proxy.
    */
   int updatePipelineEdges(pqPipelineSource* consumer);
+
+  /**
+   * Sets the style of ports.
+   */
+  int updatePortStyles();
 
   /**
    * Rebuild every input edges of a given view proxy.
@@ -123,9 +128,9 @@ public slots:
   int hideAllInActiveView();
 
   /**
-   * Set the style to EMPTY (no property displayed) for all nodes
+   * Cycle the node verbosity in incrasing order
    */
-  int collapseAllNodes();
+  int cycleNodeVerbosity();
 
 protected:
   pqNodeEditorNode* createNode(pqProxy* proxy);
@@ -139,12 +144,14 @@ private:
   pqNodeEditorView* view;
 
   bool autoUpdateLayout{ true };
+  bool showViewNodes{ true };
   QAction* actionZoom;
   QAction* actionLayout;
   QAction* actionApply;
   QAction* actionReset;
   QAction* actionAutoLayout;
-  QAction* actionCollapseAllNodes;
+  QAction* actionCycleNodeVerbosity;
+  QAction* actionToggleViewNodeVisibility;
 
   /**
    *  The node registry stores a node for each source/filter/view proxy

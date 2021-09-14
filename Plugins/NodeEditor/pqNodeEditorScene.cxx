@@ -25,6 +25,7 @@
 #include "pqNodeEditorNode.h"
 #include "pqNodeEditorUtils.h"
 
+#include <pqPipelineFilter.h>
 #include <pqPipelineSource.h>
 #include <pqView.h>
 
@@ -51,13 +52,9 @@ int pqNodeEditorScene::computeLayout(const std::unordered_map<int, pqNodeEditorN
   std::unordered_map<int, std::vector<pqNodeEditorEdge*> >& edges)
 {
 #if NodeEditor_ENABLE_GRAPHVIZ
-  // Scale factor between graphviz and Qt coordinates
-  constexpr double GRAPHVIZ_SCALE_FACTOR = 100.0;
-
   // compute dot string
   qreal maxHeight = 0.0;
   qreal maxY = 0;
-  qreal minY = 0;
   std::string dotString;
   {
     std::stringstream nodeString;
@@ -67,14 +64,14 @@ int pqNodeEditorScene::computeLayout(const std::unordered_map<int, pqNodeEditorN
     {
       pqProxy* proxy = it.second->getProxy();
       int proxyId = pqNodeEditorUtils::getID(proxy);
-      if (dynamic_cast<pqView*>(proxy) != nullptr)
+      if (dynamic_cast<pqView*>(proxy) != nullptr) // ignore view in pipeline layout
       {
         continue;
       }
 
       const QRectF& b = it.second->boundingRect();
-      qreal width = b.width() / GRAPHVIZ_SCALE_FACTOR;
-      qreal height = b.height() / GRAPHVIZ_SCALE_FACTOR;
+      qreal width = b.width() / POINTS_PER_INCH; // convert from points to inches
+      qreal height = b.height() / POINTS_PER_INCH;
       if (maxHeight < height)
       {
         maxHeight = height;
@@ -83,9 +80,28 @@ int pqNodeEditorScene::computeLayout(const std::unordered_map<int, pqNodeEditorN
       // Construct the string representing a node in the text-based graphviz representation of the
       // graph.
       // See https://www.graphviz.org/pdf/libguide.pdf for more detail
+      std::string sInputPorts = "";
+      std::string sOutputPorts = "";
+      if (const auto proxyAsSource = dynamic_cast<pqPipelineSource*>(proxy))
+      {
+        for (int i = 0; i < proxyAsSource->getNumberOfOutputPorts(); i++)
+        {
+          sOutputPorts += "<o" + std::to_string(i) + ">|";
+        }
+      }
+
+      if (const auto proxyAsFilter = dynamic_cast<pqPipelineFilter*>(proxy))
+      {
+        for (int i = 0; i < proxyAsFilter->getNumberOfInputPorts(); i++)
+        {
+          sInputPorts += "<i" + std::to_string(i) + ">|";
+        }
+      }
+
       nodeString << proxyId << "["
-                 << "label=\"\","
-                 << "shape=box,"
+                 << "shape=record,"
+                 << "label=\"{{" + sInputPorts.substr(0, sInputPorts.size() - 1) + "}|{" +
+          sOutputPorts.substr(0, sOutputPorts.size() - 1) + "}}\","
                  << "width=" << width << ","
                  << "height=" << height << ""
                  << "];\n";
@@ -94,15 +110,18 @@ int pqNodeEditorScene::computeLayout(const std::unordered_map<int, pqNodeEditorN
       // See https://www.graphviz.org/pdf/libguide.pdf for more detail
       for (pqNodeEditorEdge* edge : edges[proxyId])
       {
-        edgeString << pqNodeEditorUtils::getID(edge->getProducer()->getProxy()) << " -> "
-                   << pqNodeEditorUtils::getID(edge->getConsumer()->getProxy()) << ";\n";
+        edgeString << pqNodeEditorUtils::getID(edge->getProducer()->getProxy()) << ":<o"
+                   << edge->getProducerOutputPortIdx() << "> -> "
+                   << pqNodeEditorUtils::getID(edge->getConsumer()->getProxy()) << ":<i"
+                   << edge->getConsumerInputPortIdx() << ">;\n";
       }
     }
 
     // describe the overall look of the graph. For example : rankdir=LR -> Left To Right layout
     // See https://www.graphviz.org/pdf/libguide.pdf for more detail
-    dotString += "digraph g {\nrankdir=LR;graph[pad=\"0\", ranksep=\"2\", nodesep=\"" +
-      std::to_string(maxHeight) + "\"];\n" + nodeString.str() + edgeString.str() + "\n}";
+    dotString +=
+      "digraph g {\nrankdir=LR;splines = line;graph[pad=\"0\", ranksep=\"1\", nodesep=\"1\"];\n" +
+      nodeString.str() + edgeString.str() + "\n}";
   }
 
   std::vector<qreal> coords(2 * nodes.size(), 0.0);
@@ -132,20 +151,16 @@ int pqNodeEditorScene::computeLayout(const std::unordered_map<int, pqNodeEditorN
         agnode(G, const_cast<char*>(std::to_string(pqNodeEditorUtils::getID(proxy)).data()), 0);
       if (n != nullptr)
       {
-        auto& coord = ND_coord(n);
+        const auto& coord = ND_coord(n);
+        const auto& w = ND_width(n);
+        const auto& h = ND_height(n);
 
-        coords[i] = coord.x;
-        coords[i + 1] = coord.y;
+        auto& x = coords[i];
+        auto& y = coords[i + 1];
+        x = (coord.x - w * POINTS_PER_INCH / 2.0); // convert w/h in inches to points
+        y = (-coord.y - h * POINTS_PER_INCH / 2.0);
 
-        if (minY > coord.y)
-        {
-          minY = coord.y;
-        }
-
-        if (maxY < coord.y)
-        {
-          maxY = coord.y;
-        }
+        maxY = std::max(maxY, y);
       }
     }
 
@@ -171,7 +186,7 @@ int pqNodeEditorScene::computeLayout(const std::unordered_map<int, pqNodeEditorN
         continue;
       }
 
-      it.second->setPos(coords[i], coords[i + 1] - minY);
+      it.second->setPos(coords[i], coords[i + 1]);
     }
   }
 
@@ -219,7 +234,7 @@ int pqNodeEditorScene::computeLayout(const std::unordered_map<int, pqNodeEditorN
     {
       x = lastX + width + 10.0;
     }
-    it.first->setPos(x, maxY + maxHeight * GRAPHVIZ_SCALE_FACTOR + 10.0);
+    it.first->setPos(x, maxY + maxHeight);
     lastX = x;
   }
 

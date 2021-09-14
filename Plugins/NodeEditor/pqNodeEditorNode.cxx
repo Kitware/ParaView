@@ -50,6 +50,10 @@
 #include <pqActiveObjects.h>
 #include <pqProxySelection.h>
 
+pqNodeEditorNode::Verbosity pqNodeEditorNode::DefaultNodeVerbosity{
+  pqNodeEditorNode::Verbosity::NORMAL
+};
+
 // ----------------------------------------------------------------------------
 pqNodeEditorNode::pqNodeEditorNode(QGraphicsScene* scene, pqProxy* proxy, QGraphicsItem* parent)
   : QGraphicsItem(parent)
@@ -63,7 +67,6 @@ pqNodeEditorNode::pqNodeEditorNode(QGraphicsScene* scene, pqProxy* proxy, QGraph
   this->setFlag(ItemSendsGeometryChanges);
   this->setCacheMode(DeviceCoordinateCache);
   this->setCursor(Qt::ArrowCursor);
-  this->setZValue(pqNodeEditorUtils::CONSTS::NODE_LAYER);
   this->setObjectName(QString("node") + proxy->getSMName());
 
   // determine port height
@@ -71,11 +74,12 @@ pqNodeEditorNode::pqNodeEditorNode(QGraphicsScene* scene, pqProxy* proxy, QGraph
   {
     this->portContainerHeight =
       std::max(proxyAsFilter->getNumberOfInputPorts(), proxyAsFilter->getNumberOfOutputPorts()) *
-      this->portHeight;
+      pqNodeEditorUtils::CONSTS::PORT_HEIGHT;
   }
   else if (auto* proxyAsSource = dynamic_cast<pqPipelineSource*>(proxy))
   {
-    this->portContainerHeight = proxyAsSource->getNumberOfOutputPorts() * this->portHeight;
+    this->portContainerHeight =
+      proxyAsSource->getNumberOfOutputPorts() * pqNodeEditorUtils::CONSTS::PORT_HEIGHT;
   }
 
   // init label
@@ -133,8 +137,7 @@ pqNodeEditorNode::pqNodeEditorNode(QGraphicsScene* scene, pqProxy* proxy, QGraph
     this->proxyProperties->updatePanel();
     containerLayout->addWidget(this->proxyProperties);
 
-    this->setVerbosity(
-      static_cast<pqNodeEditorNode::Verbosity>(pqNodeEditorUtils::CONSTS::NODE_DEFAULT_VERBOSITY));
+    this->setVerbosity(pqNodeEditorNode::DefaultNodeVerbosity);
 
     this->updateSize();
   }
@@ -147,6 +150,9 @@ pqNodeEditorNode::pqNodeEditorNode(
   QGraphicsScene* scene, pqPipelineSource* proxy, QGraphicsItem* parent)
   : pqNodeEditorNode(scene, (pqProxy*)proxy, parent)
 {
+
+  this->setZValue(pqNodeEditorUtils::CONSTS::NODE_LAYER);
+
   // create ports
   {
     auto br = this->boundingRect();
@@ -158,8 +164,9 @@ pqNodeEditorNode::pqNodeEditorNode(
       for (int i = 0; i < proxyAsFilter->getNumberOfInputPorts(); i++)
       {
         auto iPort = new pqNodeEditorPort(
-          pqNodeEditorPort::NodeType::INPUT, proxyAsFilter->getInputPortName(i), this);
-        iPort->setPos(br.left(), -this->portContainerHeight + (i + 0.5) * this->portHeight);
+          pqNodeEditorPort::Type::INPUT, proxyAsFilter->getInputPortName(i), this);
+        iPort->setPos(br.left(),
+          -this->portContainerHeight + (i + 0.5) * pqNodeEditorUtils::CONSTS::PORT_HEIGHT);
         this->iPorts.push_back(iPort);
       }
     }
@@ -167,8 +174,9 @@ pqNodeEditorNode::pqNodeEditorNode(
     for (int i = 0; i < proxy->getNumberOfOutputPorts(); i++)
     {
       auto oPort = new pqNodeEditorPort(
-        pqNodeEditorPort::NodeType::OUTPUT, proxy->getOutputPort(i)->getPortName(), this);
-      oPort->setPos(br.right(), -this->portContainerHeight + (i + 0.5) * this->portHeight);
+        pqNodeEditorPort::Type::OUTPUT, proxy->getOutputPort(i)->getPortName(), this);
+      oPort->setPos(br.right(),
+        -this->portContainerHeight + (i + 0.5) * pqNodeEditorUtils::CONSTS::PORT_HEIGHT);
       this->oPorts.push_back(oPort);
     }
   }
@@ -190,12 +198,14 @@ pqNodeEditorNode::pqNodeEditorNode(
 pqNodeEditorNode::pqNodeEditorNode(QGraphicsScene* scene, pqView* proxy, QGraphicsItem* parent)
   : pqNodeEditorNode(scene, (pqProxy*)proxy, parent)
 {
+  this->setZValue(pqNodeEditorUtils::CONSTS::VIEW_NODE_LAYER);
+
   auto br = this->boundingRect();
   auto adjust = 0.5 * pqNodeEditorUtils::CONSTS::NODE_BORDER_WIDTH;
   br.adjust(adjust, adjust, -adjust, -adjust);
 
   // create port
-  auto iPort = new pqNodeEditorPort(pqNodeEditorPort::NodeType::INPUT, "", this);
+  auto iPort = new pqNodeEditorPort(pqNodeEditorPort::Type::INPUT, "", this);
   iPort->setPos(br.center().x(), br.top());
   this->iPorts.push_back(iPort);
 
@@ -232,6 +242,8 @@ int pqNodeEditorNode::updateSize()
 void pqNodeEditorNode::setOutlineStyle(OutlineStyle style)
 {
   this->outlineStyle = style;
+  this->setZValue(style == OutlineStyle::NORMAL ? pqNodeEditorUtils::CONSTS::NODE_LAYER
+                                                : pqNodeEditorUtils::CONSTS::NODE_LAYER + 1);
   this->update(this->boundingRect());
 }
 // ----------------------------------------------------------------------------
@@ -242,20 +254,19 @@ void pqNodeEditorNode::setBackgroundStyle(BackgroundStyle style)
 }
 
 // ----------------------------------------------------------------------------
-void pqNodeEditorNode::setVerbosity(Verbosity _verbosity)
+void pqNodeEditorNode::setVerbosity(Verbosity v)
 {
-  // this string is used to filter out every widget that does not contains such string as a tag.
-  // Since we're pretty sure no one will ever name or a document a property with such a string
-  // we'll use this value.
-  constexpr const char* NO_PROPERTIES_FILTER = "%%%%%%%%%%%%%%";
-
-  this->verbosity = _verbosity;
+  this->verbosity = v;
   switch (this->verbosity)
   {
+    // The string "%%%..." is used to filter out every widget that does not contains such string as
+    // a tag.
+    // Since we're pretty sure no one will ever name or a document a property with such a string
+    // this is ok.
     case Verbosity::EMPTY:
-      this->proxyProperties->filterWidgets(false, NO_PROPERTIES_FILTER);
+      this->proxyProperties->filterWidgets(false, "%%%%%%%%%%%%%%");
       break;
-    case Verbosity::SIMPLE:
+    case Verbosity::NORMAL:
       this->proxyProperties->filterWidgets(false);
       break;
     case Verbosity::ADVANCED:
@@ -267,13 +278,9 @@ void pqNodeEditorNode::setVerbosity(Verbosity _verbosity)
 }
 
 // ----------------------------------------------------------------------------
-int pqNodeEditorNode::incrementVerbosity()
+void pqNodeEditorNode::incrementVerbosity()
 {
-  int next = static_cast<int>(this->verbosity) + 1;
-  Verbosity verb =
-    next > static_cast<int>(Verbosity::ADVANCED) ? Verbosity::EMPTY : static_cast<Verbosity>(next);
-  this->setVerbosity(verb);
-  return this->getVerbosity();
+  this->setVerbosity(static_cast<Verbosity>((static_cast<int>(this->verbosity) + 1) % 3));
 }
 
 // ----------------------------------------------------------------------------
@@ -290,11 +297,10 @@ QVariant pqNodeEditorNode::itemChange(GraphicsItemChange change, const QVariant&
 // ----------------------------------------------------------------------------
 QRectF pqNodeEditorNode::boundingRect() const
 {
-  auto offset = pqNodeEditorUtils::CONSTS::NODE_BORDER_WIDTH;
-  auto br = QRectF(-offset, -offset - this->portContainerHeight - this->labelHeight,
-    this->widgetContainerWidth + 2 * offset,
-    this->widgetContainerHeight + 2 * offset + this->portContainerHeight + this->labelHeight);
-  br.adjust(0, 0, 0, pqNodeEditorUtils::CONSTS::NODE_BORDER_RADIUS);
+  auto br = QRectF(0, -this->portContainerHeight - this->labelHeight, this->widgetContainerWidth,
+    this->widgetContainerHeight + this->portContainerHeight + this->labelHeight);
+  constexpr qreal offset = 0.5 * pqNodeEditorUtils::CONSTS::NODE_BORDER_WIDTH + 3.0; // +padding
+  br.adjust(-offset, -offset, offset, offset);
 
   return br;
 }
@@ -305,8 +311,8 @@ void pqNodeEditorNode::paint(QPainter* painter, const QStyleOptionGraphicsItem*,
   auto palette = QApplication::palette();
 
   QPainterPath path;
-  int offset = 0.5 * pqNodeEditorUtils::CONSTS::NODE_BORDER_WIDTH;
   auto br = this->boundingRect();
+  constexpr qreal offset = 0.5 * pqNodeEditorUtils::CONSTS::NODE_BORDER_WIDTH;
   br.adjust(offset, offset, -offset, -offset);
   path.addRoundedRect(br, pqNodeEditorUtils::CONSTS::NODE_BORDER_RADIUS,
     pqNodeEditorUtils::CONSTS::NODE_BORDER_RADIUS);
@@ -316,13 +322,13 @@ void pqNodeEditorNode::paint(QPainter* painter, const QStyleOptionGraphicsItem*,
   switch (this->outlineStyle)
   {
     case OutlineStyle::NORMAL:
-      pen.setBrush(palette.base());
+      pen.setBrush(palette.light());
       break;
     case OutlineStyle::SELECTED_FILTER:
       pen.setBrush(palette.highlight());
       break;
     case OutlineStyle::SELECTED_VIEW:
-      pen.setBrush(palette.linkVisited());
+      pen.setBrush(pqNodeEditorUtils::CONSTS::COLOR_DARK_ORANGE);
       break;
     default:
       break;
@@ -330,7 +336,7 @@ void pqNodeEditorNode::paint(QPainter* painter, const QStyleOptionGraphicsItem*,
 
   painter->setPen(pen);
   painter->fillPath(path, this->backgroundStyle == BackgroundStyle::DIRTY
-      ? pqNodeEditorUtils::CONSTS::COLOR_SWEET_GREEN
+      ? pqNodeEditorUtils::CONSTS::COLOR_DARK_GREEN
       : palette.window().color());
   painter->drawPath(path);
 }

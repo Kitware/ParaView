@@ -67,31 +67,43 @@ public:
 }
 
 // ----------------------------------------------------------------------------
-pqNodeEditorPort::pqNodeEditorPort(NodeType type, QString name, QGraphicsItem* parent)
+pqNodeEditorPort::pqNodeEditorPort(Type type, QString name, QGraphicsItem* parent)
   : QGraphicsItem(parent)
 {
+  this->setZValue(pqNodeEditorUtils::CONSTS::PORT_LAYER);
+
   this->label = new details::PortLabel(name, this);
 
   // Set the port label at the right of the actual port for input ports and at the left
   // for output ports. Use an offset to not make the label too close of the node border.
   constexpr qreal LABEL_OFFSET = 3.0;
-  const qreal xpos = (type == NodeType::INPUT)
-    ? this->portRadius + LABEL_OFFSET
-    : -this->portRadius - LABEL_OFFSET - this->label->boundingRect().width();
+
+  qreal portRadius = pqNodeEditorUtils::CONSTS::PORT_RADIUS;
+
+  const qreal xpos = (type == Type::INPUT) ? portRadius + LABEL_OFFSET : -portRadius -
+      LABEL_OFFSET - this->label->boundingRect().width();
   this->label->setPos(xpos, -0.5 * this->label->boundingRect().height());
 
-  this->disc = new QGraphicsEllipseItem(
-    -this->portRadius, -this->portRadius, 2.0 * this->portRadius, 2.0 * this->portRadius, this);
-  this->disc->setBrush(QApplication::palette().dark());
-  this->setStyle(NodeStyle::NORMAL);
+  this->disc =
+    new QGraphicsEllipseItem(-portRadius, -portRadius, 2.0 * portRadius, 2.0 * portRadius, this);
+  this->setMarkedAsSelected(false);
+  this->setMarkedAsVisible(false);
 }
 
 // ----------------------------------------------------------------------------
-int pqNodeEditorPort::setStyle(NodeStyle style)
+int pqNodeEditorPort::setMarkedAsSelected(bool selected)
 {
-  this->disc->setPen(QPen(style == NodeStyle::SELECTED ? QApplication::palette().highlight()
-                                                       : QApplication::palette().light(),
-    this->borderWidth));
+  this->disc->setPen(
+    QPen(selected ? QApplication::palette().highlight() : QApplication::palette().light(),
+      pqNodeEditorUtils::CONSTS::NODE_BORDER_WIDTH));
+  return 1;
+}
+
+// ----------------------------------------------------------------------------
+int pqNodeEditorPort::setMarkedAsVisible(bool visible)
+{
+  this->disc->setBrush(
+    visible ? pqNodeEditorUtils::CONSTS::COLOR_DARK_ORANGE : QApplication::palette().dark());
   return 1;
 }
 
