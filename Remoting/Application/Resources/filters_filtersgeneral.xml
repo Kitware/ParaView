@@ -539,7 +539,7 @@
                  label="Gradient Of Unstructured DataSet"
                  name="UnstructuredGradientLegacy">
       <Deprecated deprecated_in="5.10" to_remove_in="5.11">
-        This filter has been replaced by 'Compute Gradient'.
+        This filter has been replaced by 'Gradient'.
         Please consider using that instead.
       </Deprecated>
       <Documentation long_help="Estimate the gradient for each point or cell in any type of dataset."

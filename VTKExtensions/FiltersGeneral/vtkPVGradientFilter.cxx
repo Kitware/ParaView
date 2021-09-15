@@ -53,7 +53,7 @@ int vtkPVGradientFilter::RequestData(
   }
 
   // vtkImageGradient is used by default for vtkImageData
-  if (vtkImageData::SafeDownCast(inDataObj) && this->BoundaryMethod == CENTRAL_DIFFERENCING)
+  if (vtkImageData::SafeDownCast(inDataObj) && this->BoundaryMethod == SMOOTHED)
   {
     vtkNew<vtkImageGradient> imageGradFilter;
     imageGradFilter->SetInputData(0, inDataObj);
