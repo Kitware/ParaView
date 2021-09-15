@@ -194,12 +194,7 @@ protected:
   void RemoveConsumer(vtkSMProperty* property, vtkSMProxy* proxy) override;
   void RemoveAllConsumers() override;
 
-  /**
-   * Overridden to initialize vtkPVDataRepresentation, add listeners and
-   * ensure that property information are updated.
-   */
   void CreateVTKObjects() override;
-
   void OnVTKRepresentationUpdated();
   void OnVTKRepresentationUpdateSkipped();
   void OnVTKRepresentationUpdateTimeChanged();

@@ -113,9 +113,6 @@ void vtkSMRepresentationProxy::CreateVTKObjects()
     obj->AddObserver(vtkPVDataRepresentation::UpdateTimeChangedEvent, this,
       &vtkSMRepresentationProxy::OnVTKRepresentationUpdateTimeChanged);
   }
-
-  // Update the information properties
-  this->UpdatePropertyInformation();
 }
 
 //---------------------------------------------------------------------------
