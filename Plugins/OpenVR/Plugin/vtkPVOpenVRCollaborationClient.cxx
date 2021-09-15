@@ -18,24 +18,23 @@
 #include "vtkImplicitPlaneRepresentation.h"
 #include "vtkImplicitPlaneWidget2.h"
 #include "vtkObjectFactory.h"
-#include "vtkOpenVRModel.h"
 #include "vtkOpenVROverlayInternal.h"
-#include "vtkOpenVRRay.h"
-#include "vtkOpenVRRenderWindow.h"
-#include "vtkOpenVRRenderer.h"
 #include "vtkPVOpenVRHelper.h"
 #include "vtkTransform.h"
+#include "vtkVRModel.h"
+#include "vtkVRRay.h"
+#include "vtkVRRenderWindow.h"
 #include <sstream>
 
 #ifdef OPENVR_HAS_COLLABORATION
-#include "vtkOpenVRCollaborationClient.h"
 #include "vtkOpenVRPolyfill.h"
+#include "vtkVRCollaborationClient.h"
 
-class vtkPVOpenVRCollaborationClientInternal : public vtkOpenVRCollaborationClient
+class vtkPVOpenVRCollaborationClientInternal : public vtkVRCollaborationClient
 {
 public:
   static vtkPVOpenVRCollaborationClientInternal* New();
-  vtkTypeMacro(vtkPVOpenVRCollaborationClientInternal, vtkOpenVRCollaborationClient);
+  vtkTypeMacro(vtkPVOpenVRCollaborationClientInternal, vtkVRCollaborationClient);
   void SetHelper(vtkPVOpenVRHelper* l) { this->Helper = l; }
 
   vtkPVOpenVRCollaborationClientInternal()
@@ -247,7 +246,7 @@ protected:
     }
     else
     {
-      this->vtkOpenVRCollaborationClient::HandleBroadcastMessage(otherID, type);
+      this->vtkVRCollaborationClient::HandleBroadcastMessage(otherID, type);
     }
   }
 
@@ -342,8 +341,8 @@ void vtkPVOpenVRCollaborationClient::GoToSavedLocation(int index)
   {
     if (this->Internal->GetConnected())
     {
-      vtkOpenVRRenderWindow* renWin =
-        vtkOpenVRRenderWindow::SafeDownCast(this->Internal->GetRenderer()->GetVTKWindow());
+      vtkVRRenderWindow* renWin =
+        vtkVRRenderWindow::SafeDownCast(this->Internal->GetRenderer()->GetVTKWindow());
       if (renWin)
       {
         this->Internal->SendPoseMessage(
@@ -374,7 +373,7 @@ void vtkPVOpenVRCollaborationClient::GoToPose(
   dvec.insert(dvec.end(), collabTrans, collabTrans + 3);
   dvec.insert(dvec.end(), collabDir, collabDir + 3);
 
-  std::vector<vtkOpenVRCollaborationClient::Argument> args;
+  std::vector<vtkVRCollaborationClient::Argument> args;
   args.resize(1);
   args[0].SetDoubleVector(dvec.data(), static_cast<uint16_t>(dvec.size()));
   this->Internal->SendAMessage("PO", args);
@@ -403,7 +402,7 @@ void vtkPVOpenVRCollaborationClient::UpdateCropPlane(size_t i, vtkImplicitPlaneW
     vtkImplicitPlaneRepresentation* rep =
       static_cast<vtkImplicitPlaneRepresentation*>(widget->GetRepresentation());
 
-    std::vector<vtkOpenVRCollaborationClient::Argument> args;
+    std::vector<vtkVRCollaborationClient::Argument> args;
     args.resize(3);
     args[0].SetInt32(static_cast<int32_t>(i));
     args[1].SetDoubleVector(rep->GetOrigin(), 3);
@@ -420,7 +419,7 @@ void vtkPVOpenVRCollaborationClient::UpdateThickCrop(size_t i, vtkBoxWidget2* wi
     vtkNew<vtkTransform> t;
     rep->GetTransform(t);
 
-    std::vector<vtkOpenVRCollaborationClient::Argument> args;
+    std::vector<vtkVRCollaborationClient::Argument> args;
     args.resize(2);
     args[0].SetInt32(static_cast<int32_t>(i));
     args[1].SetDoubleVector(t->GetMatrix()->GetData(), 16);
@@ -428,11 +427,11 @@ void vtkPVOpenVRCollaborationClient::UpdateThickCrop(size_t i, vtkBoxWidget2* wi
   }
 }
 
-void vtkPVOpenVRCollaborationClient::UpdateRay(vtkOpenVRModel* model, vtkEventDataDevice dev)
+void vtkPVOpenVRCollaborationClient::UpdateRay(vtkVRModel* model, vtkEventDataDevice dev)
 {
   if (this->Internal->GetConnected())
   {
-    std::vector<vtkOpenVRCollaborationClient::Argument> args;
+    std::vector<vtkVRCollaborationClient::Argument> args;
     args.resize(1);
     args[0].SetInt32(static_cast<int32_t>(dev));
     this->Internal->SendAMessage(model->GetRay()->GetShow() ? "SR" : "HR", args);
@@ -441,7 +440,7 @@ void vtkPVOpenVRCollaborationClient::UpdateRay(vtkOpenVRModel* model, vtkEventDa
 
 void vtkPVOpenVRCollaborationClient::ShowBillboard(std::vector<std::string> const& vals)
 {
-  std::vector<vtkOpenVRCollaborationClient::Argument> args;
+  std::vector<vtkVRCollaborationClient::Argument> args;
   args.resize(1);
   args[0].SetStringVector(vals);
   this->Internal->SendAMessage("SB", args);
@@ -456,7 +455,7 @@ void vtkPVOpenVRCollaborationClient::AddPointToSource(std::string const& name, d
 {
   if (this->Internal->GetConnected())
   {
-    std::vector<vtkOpenVRCollaborationClient::Argument> args;
+    std::vector<vtkVRCollaborationClient::Argument> args;
     args.resize(2);
     args[0].SetString(name);
     args[1].SetDoubleVector(pt, 3);
@@ -510,7 +509,7 @@ void vtkPVOpenVRCollaborationClient::UpdateCropPlane(size_t, vtkImplicitPlaneWid
 void vtkPVOpenVRCollaborationClient::UpdateThickCrop(size_t, vtkBoxWidget2*)
 {
 }
-void vtkPVOpenVRCollaborationClient::UpdateRay(vtkOpenVRModel*, vtkEventDataDevice)
+void vtkPVOpenVRCollaborationClient::UpdateRay(vtkVRModel*, vtkEventDataDevice)
 {
 }
 void vtkPVOpenVRCollaborationClient::ShowBillboard(std::vector<std::string> const&)

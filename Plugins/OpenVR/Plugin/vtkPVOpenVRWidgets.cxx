@@ -33,11 +33,7 @@
 #include "vtkMapper.h"
 #include "vtkObjectFactory.h"
 #include "vtkOpenGLRenderer.h"
-#include "vtkOpenVRFollower.h"
 #include "vtkOpenVRInteractorStyle.h"
-#include "vtkOpenVRPanelRepresentation.h"
-#include "vtkOpenVRPanelWidget.h"
-#include "vtkOpenVRRenderWindow.h"
 #include "vtkPVDataRepresentation.h"
 #include "vtkPVLODActor.h"
 #include "vtkPVOpenVRCollaborationClient.h"
@@ -58,6 +54,10 @@
 #include "vtkTextProperty.h"
 #include "vtkTexture.h"
 #include "vtkTransform.h"
+#include "vtkVRFollower.h"
+#include "vtkVRPanelRepresentation.h"
+#include "vtkVRPanelWidget.h"
+#include "vtkVRRenderWindow.h"
 #include "vtkVectorOperators.h"
 #include "vtkView.h"
 #include "vtkVolume.h"
@@ -101,7 +101,7 @@ vtkPVOpenVRWidgets::vtkPVOpenVRWidgets()
   this->DistanceWidget = vtkDistanceWidget::New();
   vtkNew<vtkDistanceRepresentation3D> drep;
   this->DistanceWidget->SetRepresentation(drep.Get());
-  vtkNew<vtkOpenVRFollower> fol;
+  vtkNew<vtkVRFollower> fol;
   drep->SetLabelActor(fol.Get());
   vtkNew<vtkPointHandleRepresentation3D> hr;
   drep->SetHandleRepresentation(hr.Get());
@@ -236,8 +236,8 @@ void vtkPVOpenVRWidgets::ReleaseGraphicsResources()
 void vtkPVOpenVRWidgets::SetShowNavigationPanel(bool val, vtkOpenGLRenderWindow* renderWindow)
 {
   // ignored for simulated VR
-  auto ovr_rw = vtkOpenVRRenderWindow::SafeDownCast(renderWindow);
-  if (!ovr_rw)
+  auto vr_rw = vtkVRRenderWindow::SafeDownCast(renderWindow);
+  if (!vr_rw)
   {
     return;
   }
@@ -257,7 +257,7 @@ void vtkPVOpenVRWidgets::SetShowNavigationPanel(bool val, vtkOpenGLRenderWindow*
     this->NavWidget->SetInteractor(renderWindow->GetInteractor());
     this->NavWidget->SetRepresentation(this->NavRepresentation.Get());
     this->NavRepresentation->SetText("\n Position not updated yet \n");
-    double scale = ovr_rw->GetPhysicalScale();
+    double scale = vr_rw->GetPhysicalScale();
 
     double bnds[6] = { -0.3, 0.3, 0.01, 0.01, -0.01, -0.01 };
     double normal[3] = { 0, 2, 1 };
@@ -283,10 +283,10 @@ void vtkPVOpenVRWidgets::UpdateNavigationText(
   // use scale to control resolution, we want to show about
   // 2mm of resolution
   double scale = 1.0;
-  auto ovr_rw = vtkOpenVRRenderWindow::SafeDownCast(renderWindow);
-  if (ovr_rw)
+  auto vr_rw = vtkVRRenderWindow::SafeDownCast(renderWindow);
+  if (vr_rw)
   {
-    scale = ovr_rw->GetPhysicalScale();
+    scale = vr_rw->GetPhysicalScale();
   }
   double sfactor = pow(10.0, floor(log10(scale * 0.002)));
   pos[0] = floor(pos[0] / sfactor) * sfactor;
@@ -369,10 +369,10 @@ void vtkPVOpenVRWidgets::collabAddACropPlane(double* origin, double* normal)
   double* fp = ren->GetActiveCamera()->GetFocalPoint();
   double scale = 1.0;
 
-  auto ovr_rw = vtkOpenVRRenderWindow::SafeDownCast(renWin);
-  if (ovr_rw)
+  auto vr_rw = vtkVRRenderWindow::SafeDownCast(renWin);
+  if (vr_rw)
   {
-    scale = ovr_rw->GetPhysicalScale();
+    scale = vr_rw->GetPhysicalScale();
   }
   double bnds[6] = { fp[0] - scale * 0.5, fp[0] + scale * 0.5, fp[1] - scale * 0.5,
     fp[1] + scale * 0.5, fp[2] - scale * 0.5, fp[2] + scale * 0.5 };
@@ -559,10 +559,10 @@ void vtkPVOpenVRWidgets::collabAddAThickCrop(vtkTransform* intrans)
     vtkNew<vtkTransform> t;
     double* fp = ren->GetActiveCamera()->GetFocalPoint();
     double scale = this->DefaultCropThickness;
-    auto ovr_rw = vtkOpenVRRenderWindow::SafeDownCast(renWin);
-    if (ovr_rw && this->DefaultCropThickness == 0)
+    auto vr_rw = vtkVRRenderWindow::SafeDownCast(renWin);
+    if (vr_rw && this->DefaultCropThickness == 0)
     {
-      scale = ovr_rw->GetPhysicalScale();
+      scale = vr_rw->GetPhysicalScale();
     }
     t->Translate(fp);
     t->Scale(scale, scale, scale);
@@ -769,7 +769,7 @@ void vtkPVOpenVRWidgets::ShowBillboard(
     return;
   }
 
-  vtkOpenVRRenderWindow* ovr = vtkOpenVRRenderWindow::SafeDownCast(renWin);
+  vtkVRRenderWindow* vr_rw = vtkVRRenderWindow::SafeDownCast(renWin);
 
   double orient[3];
   double tpos[3];
@@ -778,11 +778,11 @@ void vtkPVOpenVRWidgets::ShowBillboard(
     double vr[3];
     double* vup;
     double scale = 1.0;
-    if (ovr)
+    if (vr_rw)
     {
-      ovr->UpdateHMDMatrixPose();
-      vup = ovr->GetPhysicalViewUp();
-      scale = ovr->GetPhysicalScale();
+      vr_rw->UpdateHMDMatrixPose();
+      vup = vr_rw->GetPhysicalViewUp();
+      scale = vr_rw->GetPhysicalScale();
     }
     else
     {
@@ -1651,10 +1651,10 @@ void vtkPVOpenVRWidgets::UpdateWidgetsFromParaView()
     double scale = 1.0;
     double* fp = ren->GetActiveCamera()->GetFocalPoint();
 
-    auto ovr_rw = vtkOpenVRRenderWindow::SafeDownCast(renWin);
-    if (ovr_rw)
+    auto vr_rw = vtkVRRenderWindow::SafeDownCast(renWin);
+    if (vr_rw)
     {
-      scale = ovr_rw->GetPhysicalScale();
+      scale = vr_rw->GetPhysicalScale();
     }
     double bnds[6] = { fp[0] - scale * 0.5, fp[0] + scale * 0.5, fp[1] - scale * 0.5,
       fp[1] + scale * 0.5, fp[2] - scale * 0.5, fp[2] + scale * 0.5 };

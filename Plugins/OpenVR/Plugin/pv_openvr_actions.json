@@ -48,6 +48,10 @@
     },
     {
       "binding_url": "pv_openvr_binding_oculus_touch.json",
+      "controller_type": "knuckles"
+    },
+    {
+      "binding_url": "pv_openvr_binding_oculus_touch.json",
       "controller_type": "oculus_touch"
     },
     {

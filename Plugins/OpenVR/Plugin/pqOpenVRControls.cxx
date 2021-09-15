@@ -26,9 +26,9 @@
 #include "vtkEventData.h"
 #include "vtkOpenVRDefaultOverlay.h"
 #include "vtkOpenVRInteractorStyle.h"
-#include "vtkOpenVRRenderer.h"
 #include "vtkPVOpenVRHelper.h"
 #include "vtkRenderWindowInteractor.h"
+#include "vtkVRRenderer.h"
 
 #include <QItemSelectionModel>
 #include <QMenu>
@@ -104,39 +104,39 @@ void pqOpenVRControls::constructor(vtkPVOpenVRHelper* val)
     std::bind(&vtkPVOpenVRHelper::SetCropSnapping, this->Helper, std::placeholders::_1));
 
   QObject::connect(this->Internals->showFloorCheckbox, &QCheckBox::stateChanged, [&](int state) {
-    auto ovrr = vtkOpenVRRenderer::SafeDownCast(this->Helper->GetRenderer());
+    auto ovrr = vtkVRRenderer::SafeDownCast(this->Helper->GetRenderer());
     if (ovrr)
     {
       ovrr->SetShowFloor(state == Qt::Checked);
     }
   });
 
-  QObject::connect(this->Internals->scaleFactorCombo,
-    QOverload<const QString&>::of(&QComboBox::activated), [=](QString const& text) {
+  QObject::connect(
+    this->Internals->scaleFactorCombo, &QComboBox::textActivated, [=](QString const& text) {
       if (!this->NoForward && text.length())
       {
         this->Helper->SetScaleFactor(std::stof(text.toUtf8().toStdString()));
       }
     });
 
-  QObject::connect(this->Internals->motionFactorCombo,
-    QOverload<const QString&>::of(&QComboBox::activated), [=](QString const& text) {
+  QObject::connect(
+    this->Internals->motionFactorCombo, &QComboBox::textActivated, [=](QString const& text) {
       if (!this->NoForward && text.length())
       {
         this->Helper->SetMotionFactor(std::stof(text.toUtf8().toStdString()));
       }
     });
 
-  QObject::connect(this->Internals->loadCameraCombo,
-    QOverload<const QString&>::of(&QComboBox::activated), [=](QString const& text) {
+  QObject::connect(
+    this->Internals->loadCameraCombo, &QComboBox::textActivated, [=](QString const& text) {
       if (!this->NoForward && text.length())
       {
         this->Helper->LoadCameraPose(std::stoi(text.toUtf8().toStdString()));
       }
     });
 
-  QObject::connect(this->Internals->saveCameraCombo,
-    QOverload<const QString&>::of(&QComboBox::activated), [=](QString const& text) {
+  QObject::connect(
+    this->Internals->saveCameraCombo, &QComboBox::textActivated, [=](QString const& text) {
       if (text.length())
       {
         this->Helper->SaveCameraPose(std::stoi(text.toUtf8().toStdString()));
