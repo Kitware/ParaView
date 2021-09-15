@@ -23,6 +23,7 @@
 class vtkImageData;
 class vtkPen;
 class vtkPoints2D;
+class vtkTransferFunctionBoxItemInternals;
 
 class VTKREMOTINGVIEWS_EXPORT vtkTransferFunctionBoxItem : public vtkControlPointsItem
 {
@@ -53,9 +54,9 @@ public:
    */
   void SetBox(const double x, const double y, const double width, const double height);
 
-  /**
-   * Get access to the texture of this box item
-   */
+  //  /**
+  //   * Get access to the texture of this box item
+  //   */
   vtkSmartPointer<vtkImageData> GetTexture() const;
 
   /*
@@ -159,7 +160,7 @@ protected:
   bool KeyReleaseEvent(const vtkContextKeyEvent& key) override;
   //@}
 
-  virtual void ComputeTexture();
+  // virtual void ComputeTexture();
 
   /**
    * Highlight this box
@@ -176,6 +177,12 @@ private:
    * overriding that behavior are unclear so for now this custom method is used.
    */
   void ClampToValidPosition(double pos[2]);
+
+  /**
+   * Update the internal representation box corners based on the transfer function box and the valid
+   * bounds for the item.
+   */
+  void UpdateBoxPoints();
 
   /**
    * Predicate to check whether pointA crosses pointB in either axis after
@@ -205,14 +212,16 @@ private:
    */
   vtkIdType FindBoxPoint(double* _pos);
 
-  vtkNew<vtkPoints2D> BoxPoints;
-  const int NumPoints = 5;
-  vtkRectd Box;
+  // Helper members
+  vtkTransferFunctionBoxItemInternals* Internals;
+
+  // vtkNew<vtkPoints2D> BoxPoints;
+  // const int NumPoints = 5;
+  // vtkRectd Box;
   double BoxColor[3] = { 1, 1, 1 };
   double BoxAlpha = 1.0;
 
-  vtkNew<vtkPen> Pen;
-  vtkNew<vtkImageData> Texture;
+  // vtkNew<vtkImageData> Texture;
   bool Initialized = false;
   bool Selected = false;
 };

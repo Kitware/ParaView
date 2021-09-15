@@ -24,6 +24,7 @@
 #include "vtkFloatArray.h"
 #include "vtkImageData.h"
 #include "vtkObjectFactory.h"
+#include "vtkPVTransferFunction2DBox.h"
 #include "vtkPen.h"
 #include "vtkPiecewiseFunction.h"
 #include "vtkPointData.h"
@@ -34,33 +35,76 @@
 #include "vtkVectorOperators.h"
 
 //-------------------------------------------------------------------------------------------------
-namespace
-{
-inline bool PointIsWithinBounds2D(double point[2], double bounds[4], const double delta[2])
-{
-  if (!point || !bounds || !delta)
-  {
-    return false;
-  }
-
-  for (int i = 0; i < 2; i++)
-  {
-    if (point[i] + delta[i] < bounds[2 * i] || point[i] - delta[i] > bounds[2 * i + 1])
-    {
-      return false;
-    }
-  }
-  return true;
-}
-}
-
-//-------------------------------------------------------------------------------------------------
 vtkStandardNewMacro(vtkTransferFunctionBoxItem)
 
   //-------------------------------------------------------------------------------------------------
-  vtkTransferFunctionBoxItem::vtkTransferFunctionBoxItem()
+  namespace
+{
+  inline bool PointIsWithinBounds2D(double point[2], double bounds[4], const double delta[2])
+  {
+    if (!point || !bounds || !delta)
+    {
+      return false;
+    }
+
+    for (int i = 0; i < 2; i++)
+    {
+      if (point[i] + delta[i] < bounds[2 * i] || point[i] - delta[i] > bounds[2 * i + 1])
+      {
+        return false;
+      }
+    }
+    return true;
+  }
+}
+
+//-------------------------------------------------------------------------------------------------
+class vtkTransferFunctionBoxItemInternals
+{
+public:
+  vtkNew<vtkPVTransferFunction2DBox> TransferFunctionBox;
+
+  vtkNew<vtkPoints2D> BoxPoints;
+  const int NumPoints = 5;
+
+  vtkNew<vtkPen> Pen;
+};
+
+//-------------------------------------------------------------------------------------------------
+void vtkTransferFunctionBoxItem::UpdateBoxPoints()
+{
+  vtkRectd tfBox = this->Internals->TransferFunctionBox->GetBox();
+
+  double pos[2];
+  pos[0] = tfBox.GetLeft();
+  pos[1] = tfBox.GetBottom();
+
+  this->ClampToValidPosition(pos);
+  this->Internals->BoxPoints->SetPoint(BOTTOM_LEFT, pos);
+  this->Internals->BoxPoints->SetPoint(BOTTOM_LEFT_LOOP, pos);
+
+  pos[0] = tfBox.GetRight();
+  pos[1] = tfBox.GetBottom();
+  this->ClampToValidPosition(pos);
+  this->Internals->BoxPoints->SetPoint(BOTTOM_RIGHT, pos);
+
+  pos[0] = tfBox.GetRight();
+  pos[1] = tfBox.GetTop();
+  this->ClampToValidPosition(pos);
+  this->Internals->BoxPoints->SetPoint(TOP_RIGHT, pos);
+
+  pos[0] = tfBox.GetLeft();
+  pos[1] = tfBox.GetTop();
+  this->ClampToValidPosition(pos);
+  this->Internals->BoxPoints->SetPoint(TOP_LEFT, pos);
+}
+
+//-------------------------------------------------------------------------------------------------
+vtkTransferFunctionBoxItem::vtkTransferFunctionBoxItem()
   : Superclass()
 {
+  this->Internals = new vtkTransferFunctionBoxItemInternals();
+
   this->ValidBounds[0] = 0.0;
   this->ValidBounds[1] = 1.0;
   this->ValidBounds[2] = 0.0;
@@ -75,7 +119,7 @@ vtkStandardNewMacro(vtkTransferFunctionBoxItem)
   this->AddPoint(0.0, 1.0);
 
   // Point 0 is repeated for rendering purposes
-  this->BoxPoints->InsertNextPoint(0.0, 0.0);
+  this->Internals->BoxPoints->InsertNextPoint(0.0, 0.0);
 
   // Initialize outline
   this->Pen->SetColor(63, 90, 115, 200);
@@ -84,18 +128,22 @@ vtkStandardNewMacro(vtkTransferFunctionBoxItem)
   this->SelectedPointPen->SetColor(255, 0, 255, 200);
   this->SelectedPointPen->SetWidth(2.);
 
-  // Initialize texture
-  auto tex = this->Texture.GetPointer();
-  const int texSize = 256;
-  tex->SetDimensions(texSize, texSize, 1);
-  tex->AllocateScalars(VTK_UNSIGNED_CHAR, 4);
-  auto arr = vtkUnsignedCharArray::SafeDownCast(tex->GetPointData()->GetScalars());
-  const auto dataPtr = arr->GetVoidPointer(0);
-  memset(dataPtr, 0, texSize * texSize * 4 * sizeof(unsigned char));
+  //  // Initialize texture
+  //  auto tex = this->Texture.GetPointer();
+  //  const int texSize = 256;
+  //  tex->SetDimensions(texSize, texSize, 1);
+  //  tex->AllocateScalars(VTK_UNSIGNED_CHAR, 4);
+  //  auto arr = vtkUnsignedCharArray::SafeDownCast(tex->GetPointData()->GetScalars());
+  //  const auto dataPtr = arr->GetVoidPointer(0);
+  //  memset(dataPtr, 0, texSize * texSize * 4 * sizeof(unsigned char));
 }
 
 //-------------------------------------------------------------------------------------------------
-vtkTransferFunctionBoxItem::~vtkTransferFunctionBoxItem() = default;
+vtkTransferFunctionBoxItem::~vtkTransferFunctionBoxItem()
+{
+  delete this->Internals;
+  this->Internals = nullptr;
+}
 
 //-------------------------------------------------------------------------------------------------
 void vtkTransferFunctionBoxItem::DragBox(const double deltaX, const double deltaY)
@@ -122,10 +170,10 @@ bool vtkTransferFunctionBoxItem::BoxIsWithinBounds(const double deltaX, const do
   this->GetValidBounds(bounds);
 
   const double delta[2] = { 0.0, 0.0 };
-  for (vtkIdType id = 0; id < this->NumPoints; id++)
+  for (vtkIdType id = 0; id < this->Internals->NumPoints; id++)
   {
     double pos[2];
-    this->BoxPoints->GetPoint(id, pos);
+    this->Internals->BoxPoints->GetPoint(id, pos);
     pos[0] += deltaX;
     pos[1] += deltaY;
     if (!PointIsWithinBounds2D(pos, bounds, delta))
@@ -139,12 +187,42 @@ void vtkTransferFunctionBoxItem::MovePoint(
   vtkIdType pointId, const double deltaX, const double deltaY)
 {
   double pos[2];
-  this->BoxPoints->GetPoint(pointId, pos);
+  this->Internals->BoxPoints->GetPoint(pointId, pos);
 
   double newPos[2] = { pos[0] + deltaX, pos[1] + deltaY };
   this->ClampToValidPosition(newPos);
 
-  this->BoxPoints->SetPoint(pointId, newPos[0], newPos[1]);
+  vtkRectd tfBox = this->Internals->TransferFunctionBox->GetBox();
+  switch (pointId)
+  {
+    case BOTTOM_LEFT:
+    {
+      tfBox.SetX(newPos[0]);
+      tfBox.SetY(newPos[1]);
+      break;
+    }
+    case BOTTOM_RIGHT:
+    {
+      tfBox.SetWidth(newPos[0] - tfBox.GetX());
+      tfBox.SetY(newPos[1]);
+      break;
+    }
+    case TOP_RIGHT:
+    {
+      tfBox.SetWidth(newPos[0] - tfBox.GetX());
+      tfBox.SetHeight(newPos[1] - tfBox.GetY());
+      break;
+    }
+    case TOP_LEFT:
+    {
+      tfBox.SetX(newPos[0]);
+      tfBox.SetHeight(newPos[1] - tfBox.GetY());
+      break;
+    }
+  }
+  this->Internals->TransferFunctionBox->SetBox(tfBox);
+  // Directly updating the box point here as it is already clamped to valid bounds.
+  this->Internals->BoxPoints->SetPoint(pointId, newPos[0], newPos[1]);
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -157,14 +235,14 @@ vtkIdType vtkTransferFunctionBoxItem::AddPoint(const double x, const double y)
 //-------------------------------------------------------------------------------------------------
 vtkIdType vtkTransferFunctionBoxItem::AddPoint(double* pos)
 {
-  if (this->BoxPoints->GetNumberOfPoints() >= 4)
+  if (this->Internals->BoxPoints->GetNumberOfPoints() >= 4)
   {
     return 3;
   }
 
   this->StartChanges();
 
-  const vtkIdType id = this->BoxPoints->InsertNextPoint(pos[0], pos[1]);
+  const vtkIdType id = this->Internals->BoxPoints->InsertNextPoint(pos[0], pos[1]);
   Superclass::AddPointId(id);
 
   this->EndChanges();
@@ -230,10 +308,10 @@ bool vtkTransferFunctionBoxItem::ArePointsCrossing(
   const vtkIdType pointA, const double* deltaA, const vtkIdType pointB)
 {
   double posA[2];
-  this->BoxPoints->GetPoint(pointA, posA);
+  this->Internals->BoxPoints->GetPoint(pointA, posA);
 
   double posB[2];
-  this->BoxPoints->GetPoint(pointB, posB);
+  this->Internals->BoxPoints->GetPoint(pointB, posB);
 
   const double distXBefore = posA[0] - posB[0];
   const double distXAfter = posA[0] + deltaA[0] - posB[0];
@@ -270,18 +348,18 @@ void vtkTransferFunctionBoxItem::SetControlPoint(
 //-------------------------------------------------------------------------------------------------
 vtkIdType vtkTransferFunctionBoxItem::GetNumberOfPoints() const
 {
-  return static_cast<vtkIdType>(this->NumPoints);
+  return static_cast<vtkIdType>(this->Internals->NumPoints);
 }
 
 //-------------------------------------------------------------------------------------------------
 void vtkTransferFunctionBoxItem::GetControlPoint(vtkIdType index, double* point) const
 {
-  if (index >= this->NumPoints)
+  if (index >= this->Internals->NumPoints)
   {
     return;
   }
 
-  this->BoxPoints->GetPoint(index, point);
+  this->Internals->BoxPoints->GetPoint(index, point);
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -306,10 +384,17 @@ bool vtkTransferFunctionBoxItem::Paint(vtkContext2D* painter)
     this->InvokeEvent(vtkTransferFunctionBoxItem::BoxAddEvent);
   }
 
-  this->ComputeTexture();
+  this->Internals->TransferFunctionBox->SetColor(
+    this->BoxColor[0], this->BoxColor[1], this->BoxColor[2], this->BoxAlpha);
+  auto texture = this->Internals->TransferFunctionBox->GetTexture();
+  if (!texture)
+  {
+    return Superclass::Paint(painter);
+  }
+
   auto brush = painter->GetBrush();
   brush->SetColorF(0.0, 0.0, 0.0, 0.0);
-  brush->SetTexture(this->Texture.GetPointer());
+  brush->SetTexture(texture);
   brush->SetTextureProperties(vtkBrush::Linear | vtkBrush::Stretch);
 
   // Prepare outline
@@ -317,48 +402,48 @@ bool vtkTransferFunctionBoxItem::Paint(vtkContext2D* painter)
 
   if (!this->Selected)
   {
-    painter->DrawPolygon(this->BoxPoints.GetPointer());
+    painter->DrawPolygon(this->Internals->BoxPoints);
   }
   else
   {
     painter->GetPen()->SetLineType(vtkPen::SOLID_LINE);
     painter->ApplyPen(this->SelectedPointPen);
-    painter->DrawPolygon(this->BoxPoints.GetPointer());
+    painter->DrawPolygon(this->Internals->BoxPoints);
   }
   return Superclass::Paint(painter);
 }
 
 //-------------------------------------------------------------------------------------------------
-void vtkTransferFunctionBoxItem::ComputeTexture()
-{
-  if (this->Texture->GetMTime() > this->GetMTime())
-  {
-    return;
-  }
-  double colorC[3] = { 1.0, 1.0, 1.0 };
-  colorC[0] = this->BoxColor[0] * 255;
-  colorC[1] = this->BoxColor[1] * 255;
-  colorC[2] = this->BoxColor[2] * 255;
-
-  double amp = this->BoxAlpha * 255;
-  double sigma = 80.0;
-  double expdenom = 2 * sigma * sigma;
-
-  auto arr = vtkUnsignedCharArray::SafeDownCast(this->Texture->GetPointData()->GetScalars());
-
-  for (vtkIdType i = 0; i < 256; ++i)
-  {
-    for (vtkIdType j = 0; j < 256; ++j)
-    {
-      double color[4] = { colorC[0], colorC[1], colorC[2], 0.0 };
-      double e = -1.0 * ((i - 128) * (i - 128) + (j - 128) * (j - 128)) / expdenom;
-      color[3] = amp * std::exp(e);
-      arr->SetTuple(i * 256 + j, color);
-    }
-  }
-  this->Texture->Modified();
-  this->InvokeEvent(vtkTransferFunctionBoxItem::BoxEditEvent);
-}
+// void vtkTransferFunctionBoxItem::ComputeTexture()
+//{
+//  if (this->Texture->GetMTime() > this->GetMTime())
+//  {
+//    return;
+//  }
+//  double colorC[3] = { 1.0, 1.0, 1.0 };
+//  colorC[0] = this->BoxColor[0] * 255;
+//  colorC[1] = this->BoxColor[1] * 255;
+//  colorC[2] = this->BoxColor[2] * 255;
+//
+//  double amp = this->BoxAlpha * 255;
+//  double sigma = 80.0;
+//  double expdenom = 2 * sigma * sigma;
+//
+//  auto arr = vtkUnsignedCharArray::SafeDownCast(this->Texture->GetPointData()->GetScalars());
+//
+//  for (vtkIdType i = 0; i < 256; ++i)
+//  {
+//    for (vtkIdType j = 0; j < 256; ++j)
+//    {
+//      double color[4] = { colorC[0], colorC[1], colorC[2], 0.0 };
+//      double e = -1.0 * ((i - 128) * (i - 128) + (j - 128) * (j - 128)) / expdenom;
+//      color[3] = amp * std::exp(e);
+//      arr->SetTuple(i * 256 + j, color);
+//    }
+//  }
+//  this->Texture->Modified();
+//  this->InvokeEvent(vtkTransferFunctionBoxItem::BoxEditEvent);
+//}
 
 //-------------------------------------------------------------------------------------------------
 bool vtkTransferFunctionBoxItem::Hit(const vtkContextMouseEvent& mouse)
@@ -379,7 +464,7 @@ bool vtkTransferFunctionBoxItem::Hit(const vtkContextMouseEvent& mouse)
   // maybe the cursor is over the first or last point (which could be outside
   // the bounds because of the screen point size).
   bool isOverPoint = false;
-  for (int i = 0; i < this->NumPoints; ++i)
+  for (int i = 0; i < this->Internals->NumPoints; ++i)
   {
     isOverPoint = this->IsOverPoint(pos, i);
     if (isOverPoint)
@@ -493,61 +578,77 @@ bool vtkTransferFunctionBoxItem::KeyReleaseEvent(const vtkContextKeyEvent& key)
 //-------------------------------------------------------------------------------------------------
 void vtkTransferFunctionBoxItem::PrintSelf(ostream& os, vtkIndent indent)
 {
+  os << indent << "Initialized: " << (this->Initialized ? "true" : "false") << endl;
+  os << indent << "Selected: " << (this->GetSelected() ? "true" : "false") << endl;
+  os << indent << "BoxColor: [" << this->BoxColor[0] << ", " << this->BoxColor[1] << ", "
+     << this->BoxColor[2] << endl;
+  os << indent << "BoxAlpha: " << this->BoxAlpha << endl;
+  os << indent << "Transfer Function Box: " << endl;
+  this->Internals->TransferFunctionBox->PrintSelf(os, indent.GetNextIndent());
   Superclass::PrintSelf(os, indent);
-
-  os << indent << "Box [x, y, width, height]: [" << this->Box.GetX() << ", " << this->Box.GetY()
-     << ", " << this->Box.GetWidth() << ", " << this->Box.GetHeight() << "]\n";
 }
 
 //-------------------------------------------------------------------------------------------------
 const vtkRectd& vtkTransferFunctionBoxItem::GetBox()
 {
-  double lowerBound[2];
-  this->BoxPoints->GetPoint(BOTTOM_LEFT, lowerBound);
+  return this->Internals->TransferFunctionBox->GetBox();
+  //  double lowerBound[2];
+  //  this->BoxPoints->GetPoint(BOTTOM_LEFT, lowerBound);
+  //
+  //  double upperBound[2];
+  //  this->BoxPoints->GetPoint(TOP_RIGHT, upperBound);
+  //
+  //  const double width = upperBound[0] - lowerBound[0];
+  //  const double height = upperBound[1] - lowerBound[1];
+  //
+  //  this->Box.Set(lowerBound[0], lowerBound[1], width, height);
 
-  double upperBound[2];
-  this->BoxPoints->GetPoint(TOP_RIGHT, upperBound);
-
-  const double width = upperBound[0] - lowerBound[0];
-  const double height = upperBound[1] - lowerBound[1];
-
-  this->Box.Set(lowerBound[0], lowerBound[1], width, height);
-
-  return this->Box;
+  //  return this->Box;
 }
 
 //-------------------------------------------------------------------------------------------------
 void vtkTransferFunctionBoxItem::SetBox(
   const double x, const double y, const double width, const double height)
 {
+  vtkRectd tfBox = this->Internals->TransferFunctionBox->GetBox();
+  if (tfBox.GetX() == x && tfBox.GetY() == y && tfBox.GetWidth() == width &&
+    tfBox.GetHeight() == height)
+  {
+    return;
+  }
+
+  this->Internals->TransferFunctionBox->SetBox(x, y, width, height);
+
   this->StartChanges();
-  double pos[2];
-  pos[0] = x;
-  pos[1] = y;
-
-  this->ClampToValidPosition(pos);
-  this->BoxPoints->SetPoint(0, pos);
-  this->BoxPoints->SetPoint(4, pos);
-
-  pos[0] = x + width;
-  pos[1] = y;
-  this->ClampToValidPosition(pos);
-  this->BoxPoints->SetPoint(1, pos);
-
-  pos[0] = x + width;
-  pos[1] = y + height;
-  this->ClampToValidPosition(pos);
-  this->BoxPoints->SetPoint(2, pos);
-
-  pos[0] = x;
-  pos[1] = y + height;
-  this->ClampToValidPosition(pos);
-  this->BoxPoints->SetPoint(3, pos);
+  this->UpdateBoxPoints();
+  //  double pos[2];
+  //  pos[0] = x;
+  //  pos[1] = y;
+  //
+  //  this->ClampToValidPosition(pos);
+  //  this->Internals->BoxPoints->SetPoint(0, pos);
+  //  this->Internals->BoxPoints->SetPoint(4, pos);
+  //
+  //  pos[0] = x + width;
+  //  pos[1] = y;
+  //  this->ClampToValidPosition(pos);
+  //  this->Internals->BoxPoints->SetPoint(1, pos);
+  //
+  //  pos[0] = x + width;
+  //  pos[1] = y + height;
+  //  this->ClampToValidPosition(pos);
+  //  this->Internals->BoxPoints->SetPoint(2, pos);
+  //
+  //  pos[0] = x;
+  //  pos[1] = y + height;
+  //  this->ClampToValidPosition(pos);
+  //  this->Internals->BoxPoints->SetPoint(3, pos);
 
   this->EndChanges();
   this->InvokeEvent(vtkTransferFunctionBoxItem::BoxEditEvent);
 }
 
+//-------------------------------------------------------------------------------------------------
 vtkIdType vtkTransferFunctionBoxItem::FindBoxPoint(double* _pos)
 {
   vtkVector2f vpos(_pos[0], _pos[1]);
@@ -593,10 +694,10 @@ vtkIdType vtkTransferFunctionBoxItem::FindBoxPoint(double* _pos)
   return pointId;
 }
 
-//-------------------------------------------------------------------------------------------------
+////-------------------------------------------------------------------------------------------------
 vtkSmartPointer<vtkImageData> vtkTransferFunctionBoxItem::GetTexture() const
 {
-  return this->Texture;
+  return this->Internals->TransferFunctionBox->GetTexture();
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -608,18 +709,20 @@ void vtkTransferFunctionBoxItem::SetValidBounds(double x0, double x1, double y0,
     return;
   }
 
-  for (vtkIdType id = 0; id < this->NumPoints; id++)
-  {
-    double pos[2];
-    this->BoxPoints->GetPoint(id, pos);
-    pos[0] =
-      (pos[0] - this->ValidBounds[0]) * (x1 - x0) / (this->ValidBounds[1] - this->ValidBounds[0]) +
-      x0;
-    pos[1] =
-      (pos[1] - this->ValidBounds[2]) * (y1 - y0) / (this->ValidBounds[3] - this->ValidBounds[2]) +
-      y0;
-    this->BoxPoints->SetPoint(id, pos);
-  }
+  this->UpdateBoxPoints();
+
+  //  for (vtkIdType id = 0; id < this->Internals->NumPoints; id++)
+  //  {
+  //    double pos[2];
+  //    this->BoxPoints->GetPoint(id, pos);
+  //    pos[0] =
+  //      (pos[0] - this->ValidBounds[0]) * (x1 - x0) / (this->ValidBounds[1] -
+  //      this->ValidBounds[0]) + x0;
+  //    pos[1] =
+  //      (pos[1] - this->ValidBounds[2]) * (y1 - y0) / (this->ValidBounds[3] -
+  //      this->ValidBounds[2]) + y0;
+  //    this->BoxPoints->SetPoint(id, pos);
+  //  }
   this->Superclass::SetValidBounds(x0, x1, y0, y1);
 }
 

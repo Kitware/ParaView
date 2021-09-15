@@ -118,6 +118,7 @@ set(classes
   vtkPVSelectionInformation
   vtkPVStreamingPiecesInformation
   vtkPVSynchronizedRenderer
+  vtkPVTransferFunction2DBox
   vtkPVView
   vtkPVXYChartView
   vtkPointGaussianRepresentation
