@@ -126,6 +126,48 @@
   </ProxyGroup>
   <ProxyGroup name="filters">
     <!-- ==================================================================== -->
+    <SourceProxy class="vtkPartitionBalancer"
+                 name="PartitionBalancer">
+      <Documentation short_help="Evens the number of partitions across ranks">
+        Evens the number of partitions across ranks, while discarding empty partitions of the input
+        There are two ways this filter will
+        balance the input. If Squash is selected, empty partitions are appended to
+        ranks having less partitions than the rank with the most partitions. If
+        Expand is selected, then the number of partitions in the output is equal
+        to the number of partitions if all partitions were sent to one rank.
+        For a given rank, the indices of non empty partitions in the output
+        map to empty partitions in every other ranks.
+      </Documentation>
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkDataSet" />
+        </DataTypeDomain>
+        <Documentation>This property specifies the input.</Documentation>
+      </InputProperty>
+
+      <IntVectorProperty name="Mode"
+        command="SetMode"
+        number_of_elements="1"
+        default_values="1">
+        <EnumerationDomain name="enum">
+          <Entry text="Expand"
+                 value="0" />
+          <Entry text="Squash"
+                 value="1" />
+        </EnumerationDomain>
+        <Documentation>
+          Set the method for balancing partitions
+        </Documentation>
+      </IntVectorProperty>
+      <!-- End PartitionBalancer -->
+    </SourceProxy>
+
+    <!-- ==================================================================== -->
     <SourceProxy class="vtkPProbeFilter"
                  label="Probe Location"
                  name="ProbePoint">
