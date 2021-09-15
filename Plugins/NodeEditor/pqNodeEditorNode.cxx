@@ -183,7 +183,10 @@ pqNodeEditorNode::pqNodeEditorNode(
 
   // create property widgets
   QObject::connect(this->proxyProperties, &pqProxyWidget::changeFinished, this, [this]() {
-    this->proxy->setModifiedState(pqProxy::MODIFIED);
+    if (this->proxy->modifiedState() != pqProxy::UNINITIALIZED)
+    {
+      this->proxy->setModifiedState(pqProxy::MODIFIED);
+    }
     return 1;
   });
   QObject::connect(this->proxy, &pqProxy::modifiedStateChanged, this, [this]() {
