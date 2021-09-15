@@ -55,10 +55,10 @@ pqNodeEditorNode::Verbosity pqNodeEditorNode::DefaultNodeVerbosity{
 };
 
 // ----------------------------------------------------------------------------
-pqNodeEditorNode::pqNodeEditorNode(QGraphicsScene* scene, pqProxy* proxy, QGraphicsItem* parent)
+pqNodeEditorNode::pqNodeEditorNode(QGraphicsScene* qscene, pqProxy* prx, QGraphicsItem* parent)
   : QGraphicsItem(parent)
-  , scene(scene)
-  , proxy(proxy)
+  , scene(qscene)
+  , proxy(prx)
   , widgetContainer(new QWidget)
   , label(new QGraphicsTextItem("", this))
 {
@@ -67,16 +67,16 @@ pqNodeEditorNode::pqNodeEditorNode(QGraphicsScene* scene, pqProxy* proxy, QGraph
   this->setFlag(ItemSendsGeometryChanges);
   this->setCacheMode(DeviceCoordinateCache);
   this->setCursor(Qt::ArrowCursor);
-  this->setObjectName(QString("node") + proxy->getSMName());
+  this->setObjectName(QString("node") + this->proxy->getSMName());
 
   // determine port height
-  if (auto* proxyAsFilter = dynamic_cast<pqPipelineFilter*>(proxy))
+  if (auto* proxyAsFilter = dynamic_cast<pqPipelineFilter*>(this->proxy))
   {
     this->portContainerHeight =
       std::max(proxyAsFilter->getNumberOfInputPorts(), proxyAsFilter->getNumberOfOutputPorts()) *
       pqNodeEditorUtils::CONSTS::PORT_HEIGHT;
   }
-  else if (auto* proxyAsSource = dynamic_cast<pqPipelineSource*>(proxy))
+  else if (auto* proxyAsSource = dynamic_cast<pqPipelineSource*>(this->proxy))
   {
     this->portContainerHeight =
       proxyAsSource->getNumberOfOutputPorts() * pqNodeEditorUtils::CONSTS::PORT_HEIGHT;
@@ -95,12 +95,12 @@ pqNodeEditorNode::pqNodeEditorNode(QGraphicsScene* scene, pqProxy* proxy, QGraph
     // Get the name from the linked proxy and place it in the middle of the GUI
     // Function is connected to be called each time the proxy get renamed.
     auto nameChangeFunc = [=]() {
-      this->label->setPlainText(proxy->getSMName());
+      this->label->setPlainText(this->proxy->getSMName());
       auto br = this->label->boundingRect();
       this->label->setPos(0.5 * (pqNodeEditorUtils::CONSTS::NODE_WIDTH - br.width()),
         -this->portContainerHeight - this->labelHeight);
     };
-    QObject::connect(proxy, &pqPipelineSource::nameChanged, this->label, nameChangeFunc);
+    QObject::connect(this->proxy, &pqPipelineSource::nameChanged, this->label, nameChangeFunc);
 
     nameChangeFunc();
   }
@@ -147,10 +147,9 @@ pqNodeEditorNode::pqNodeEditorNode(QGraphicsScene* scene, pqProxy* proxy, QGraph
 
 // ----------------------------------------------------------------------------
 pqNodeEditorNode::pqNodeEditorNode(
-  QGraphicsScene* scene, pqPipelineSource* proxy, QGraphicsItem* parent)
-  : pqNodeEditorNode(scene, (pqProxy*)proxy, parent)
+  QGraphicsScene* qscene, pqPipelineSource* source, QGraphicsItem* parent)
+  : pqNodeEditorNode(qscene, (pqProxy*)source, parent)
 {
-
   this->setZValue(pqNodeEditorUtils::CONSTS::NODE_LAYER);
 
   // create ports
@@ -159,7 +158,7 @@ pqNodeEditorNode::pqNodeEditorNode(
     auto adjust = 0.5 * pqNodeEditorUtils::CONSTS::NODE_BORDER_WIDTH;
     br.adjust(adjust, adjust, -adjust, -adjust);
 
-    if (auto proxyAsFilter = dynamic_cast<pqPipelineFilter*>(proxy))
+    if (auto proxyAsFilter = dynamic_cast<pqPipelineFilter*>(source))
     {
       for (int i = 0; i < proxyAsFilter->getNumberOfInputPorts(); i++)
       {
@@ -171,10 +170,10 @@ pqNodeEditorNode::pqNodeEditorNode(
       }
     }
 
-    for (int i = 0; i < proxy->getNumberOfOutputPorts(); i++)
+    for (int i = 0; i < source->getNumberOfOutputPorts(); i++)
     {
       auto oPort = new pqNodeEditorPort(
-        pqNodeEditorPort::Type::OUTPUT, proxy->getOutputPort(i)->getPortName(), this);
+        pqNodeEditorPort::Type::OUTPUT, source->getOutputPort(i)->getPortName(), this);
       oPort->setPos(br.right(),
         -this->portContainerHeight + (i + 0.5) * pqNodeEditorUtils::CONSTS::PORT_HEIGHT);
       this->oPorts.push_back(oPort);
@@ -198,8 +197,8 @@ pqNodeEditorNode::pqNodeEditorNode(
 }
 
 // ----------------------------------------------------------------------------
-pqNodeEditorNode::pqNodeEditorNode(QGraphicsScene* scene, pqView* proxy, QGraphicsItem* parent)
-  : pqNodeEditorNode(scene, (pqProxy*)proxy, parent)
+pqNodeEditorNode::pqNodeEditorNode(QGraphicsScene* qscene, pqView* view, QGraphicsItem* parent)
+  : pqNodeEditorNode(qscene, (pqProxy*)view, parent)
 {
   this->setZValue(pqNodeEditorUtils::CONSTS::VIEW_NODE_LAYER);
 
