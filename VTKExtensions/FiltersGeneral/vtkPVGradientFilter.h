@@ -22,10 +22,10 @@
  * using the cell derivatives, while for structured grids, central differencing is
  * used, except on the boundaries of the dataset where forward and backward differencing
  * is used for the boundary elements.
- * For vtkImageData, however, the class vtkImageGradient is used by default as a
- * faster implementation for that type. Note that vtkImageGradient always uses
- * central differencing. By setting the boundary handling method to forward/backward
- * differencing instead, the vtkGradientFilter class can also be used on vtkImageData.
+ * For vtkImageData, it is possible to use the vtkImageGradient implementation.
+ * Note that vtkImageGradient always uses central differencing by duplicating the
+ * boundary values, which has a smoothing effect. This can be done by setting
+ * the boundary handling method to 'SMOOTHED'.
  */
 
 #ifndef vtkPVGradientFilter_h
@@ -43,21 +43,21 @@ public:
 
   /**
    * Possible values for gradient computation at boundaries for vtkImageData:
-   * - CENTRAL_DIFFERENCING - Boundary values are duplicated to apply central differencing on the
+   * - SMOOTHED - Boundary values are duplicated to apply central differencing on the
    * boundary elements.
-   * - FORWARD_BACKWARD_DIFFERENCING - Forward or backward differencing is used on the boundary
+   * - NON_SMOOTHED - Forward or backward differencing is used on the boundary
    * elements by using their only neighbor.
    */
   enum BoundaryMethod
   {
-    CENTRAL_DIFFERENCING = 0,
-    FORWARD_BACKWARD_DIFFERENCING,
+    SMOOTHED = 0,
+    NON_SMOOTHED,
   };
 
   ///@{
   /**
-   * Get/Set the number of dimensions used to compute the gradient when using CENTRAL_DIFFERENCING.
-   * In two dimensions, the X and Y dimensions are used.
+   * Get/Set the number of dimensions used to compute the gradient when using SMOOTHED.
+   * In two dimensions, the X and Y dimensions are used. The default is set to 3.
    * Used in vtkImageGradient for the vtkImageData type.
    */
   vtkSetClampMacro(Dimensionality, int, 2, 3);
@@ -67,10 +67,11 @@ public:
   ///@{
   /**
    * Get/Set the method used to compute the gradient on the boundaries of a vtkImageData.
-   * CENTRAL_DIFFERENCING corresponds to the vtkImageGradient implementation with HandleBoundaries
-   * on, while FORWARD_BACKWARD_DIFFERENCING corresponds to the vtkGradientFilter implementation.
+   * SMOOTHED corresponds to the vtkImageGradient implementation with HandleBoundaries
+   * on, while NON_SMOOTHED corresponds to the vtkGradientFilter implementation.
+   * The default is set to NON_SMOOTHED.
    */
-  vtkSetClampMacro(BoundaryMethod, int, CENTRAL_DIFFERENCING, FORWARD_BACKWARD_DIFFERENCING);
+  vtkSetClampMacro(BoundaryMethod, int, SMOOTHED, NON_SMOOTHED);
   vtkGetMacro(BoundaryMethod, int);
   ///@}
 
@@ -79,7 +80,7 @@ protected:
   ~vtkPVGradientFilter() override = default;
 
   int Dimensionality = 3;
-  int BoundaryMethod = CENTRAL_DIFFERENCING;
+  int BoundaryMethod = NON_SMOOTHED;
 
   int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
 

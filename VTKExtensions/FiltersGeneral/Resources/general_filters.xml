@@ -2145,8 +2145,9 @@ Every Nth Point.
                      dataset where forward and backward differencing is used for
                      the boundary elements.
                      If the dataset is a vtkImageData, the gradient computation
-                     at the boundaries can be done either with central or
-                     forward/backward differencing.
+                     at the boundaries can also be done with central differencing
+                     using a duplication of the boundary values, smoothing out
+                     the result (see 'Boundary Method' property).
       </Documentation>
       <InputProperty command="SetInputConnection"
                      name="Input">
@@ -2179,13 +2180,13 @@ Every Nth Point.
         </Documentation>
       </StringVectorProperty>
       <IntVectorProperty command="SetBoundaryMethod"
-                         default_values="0"
+                         default_values="1"
                          name="BoundaryMethod"
                          number_of_elements="1">
         <EnumerationDomain name="enum">
-          <Entry text="Central differencing"
+          <Entry text="Smoothed"
                  value="0" />
-          <Entry text="Forward/backward differencing"
+          <Entry text="Non-Smoothed"
                  value="1" />
         </EnumerationDomain>
         <Hints>
@@ -2195,10 +2196,11 @@ Every Nth Point.
         </Hints>
         <Documentation>
           Specify how to compute the gradient on the boundaries.
-          Central differencing duplicates the boundary values to compute the
-          gradient on the boundary elements. Forward/backward differencing
-          uses the values of a boundary element and its neighbor to compute
-          the gradient.
+          'Smoothed' uses central differencing by duplicating the boundary values
+          to compute the gradient on the boundary elements (corresponds to the
+          old 'Gradient' filter). 'Non-Smoothed' uses forward/backward differencing
+          with the values of a boundary element and its neighbor to compute the
+          gradient (corresponds to the old 'Gradient Of Unstructured DataSet' filter).
         </Documentation>
       </IntVectorProperty>
       <IntVectorProperty command="SetDimensionality"
