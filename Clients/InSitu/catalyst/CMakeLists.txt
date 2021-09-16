@@ -4,7 +4,7 @@ set(BUILD_SHARED_LIBS ON)
 
 if (WIN32)
   set(catalyst_library_destination
-    "${_vtk_build_RUNTIME_DESTINATION}")
+    "${_vtk_build_RUNTIME_DESTINATION}/catalyst")
 else ()
   set(catalyst_library_destination
     "${_vtk_build_LIBRARY_DESTINATION}/catalyst")
@@ -77,7 +77,6 @@ if (TARGET VTK::Python)
     PRIVATE
       VTK::PythonUsed)
 endif ()
-
 
 # Clear the `-pvVERSION` suffix (if any).
 set(_vtk_build_LIBRARY_NAME_SUFFIX "")
