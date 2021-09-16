@@ -116,9 +116,9 @@ int pqNodeEditorWidget::apply()
 
   for (auto it : nodes)
   {
-    if (auto view = dynamic_cast<pqView*>(it.second->getProxy()))
+    if (auto pview = dynamic_cast<pqView*>(it.second->getProxy()))
     {
-      view->render();
+      pview->render();
     }
   }
 
@@ -204,17 +204,17 @@ int pqNodeEditorWidget::createToolbar(QLayout* layout)
     return 1;
   };
 
-  auto addSeparator = [](QHBoxLayout* layout) {
+  auto addSeparator = [toolbarLayout]() {
     const auto separator = new QFrame();
     separator->setFrameShape(QFrame::VLine);
     separator->setFrameShadow(QFrame::Sunken);
-    layout->addWidget(separator);
+    toolbarLayout->addWidget(separator);
     return 1;
   };
 
   addButton("Apply", this->actionApply);
   addButton("Reset", this->actionReset);
-  addSeparator(toolbarLayout);
+  addSeparator();
 
   addButton("Zoom", this->actionZoom);
   addButton("Layout", this->actionLayout);
@@ -229,7 +229,7 @@ int pqNodeEditorWidget::createToolbar(QLayout* layout)
     });
     toolbarLayout->addWidget(checkBox);
   }
-  addSeparator(toolbarLayout);
+  addSeparator();
 
   addButton("Cycle Verbosity", this->actionCycleNodeVerbosity);
   {
@@ -520,7 +520,7 @@ int pqNodeEditorWidget::createNodeForSource(pqPipelineSource* proxy)
   }
 
   // input port events
-  if (auto proxyAsFilter = dynamic_cast<pqPipelineFilter*>(proxy))
+  if (dynamic_cast<pqPipelineFilter*>(proxy))
   {
     for (size_t idx = 0; idx < node->getInputPorts().size(); idx++)
     {
@@ -648,11 +648,11 @@ int pqNodeEditorWidget::removeIncomingEdges(pqProxy* proxy)
   auto edgesIt = this->edgeRegistry.find(pqNodeEditorUtils::getID(proxy));
   if (edgesIt != this->edgeRegistry.end())
   {
-    for (int i = 0; i < edgesIt->second.size(); i++)
+    for (pqNodeEditorEdge* edge : edgesIt->second)
     {
-      if (edgesIt->second[i])
+      if (edge)
       {
-        delete edgesIt->second[i];
+        delete edge;
       }
     }
     edgesIt->second.resize(0);
@@ -729,14 +729,12 @@ int pqNodeEditorWidget::setInput(pqPipelineSource* consumer, int idx, bool clear
 
     for (auto item : selection)
     {
-      auto itemAsSource = dynamic_cast<pqPipelineSource*>(item);
-      auto itemAsPort = dynamic_cast<pqOutputPort*>(item);
-      if (itemAsPort)
+      if (auto itemAsPort = dynamic_cast<pqOutputPort*>(item))
       {
         inputPtrs.push_back(itemAsPort->getSource()->getProxy());
         inputPorts.push_back(itemAsPort->getPortNumber());
       }
-      else if (itemAsSource)
+      else if (auto itemAsSource = dynamic_cast<pqPipelineSource*>(item))
       {
         inputPtrs.push_back(itemAsSource->getProxy());
         inputPorts.push_back(0);
@@ -744,7 +742,7 @@ int pqNodeEditorWidget::setInput(pqPipelineSource* consumer, int idx, bool clear
     }
 
     // if no ports are selected do nothing
-    if (inputPorts.size() < 1)
+    if (inputPorts.empty())
     {
       return 1;
     }

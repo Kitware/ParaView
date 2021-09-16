@@ -64,9 +64,9 @@ public:
   /**
    * Create an Interceptor that process all events of @c parent using @c functor.
    */
-  Interceptor(QObject* parent, F functor)
+  Interceptor(QObject* parent, F fn)
     : QObject(parent)
-    , functor(functor)
+    , functor(fn)
   {
   }
   ~Interceptor() = default;

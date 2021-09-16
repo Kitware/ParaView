@@ -37,16 +37,16 @@
 #include <sstream>
 
 // -----------------------------------------------------------------------------
-pqNodeEditorEdge::pqNodeEditorEdge(QGraphicsScene* scene, pqNodeEditorNode* producer,
-  int producerOutputPortIdx, pqNodeEditorNode* consumer, int consumerInputPortIdx, Type type,
+pqNodeEditorEdge::pqNodeEditorEdge(QGraphicsScene* qscene, pqNodeEditorNode* producerNode,
+  int outputPortIdx, pqNodeEditorNode* consumerNode, int inputPortIdx, Type edgeType,
   QGraphicsItem* parent)
   : QGraphicsPathItem(parent)
-  , scene(scene)
-  , producer(producer)
-  , producerOutputPortIdx(producerOutputPortIdx)
-  , consumer(consumer)
-  , consumerInputPortIdx(consumerInputPortIdx)
-  , type(type)
+  , scene(qscene)
+  , type(edgeType)
+  , producer(producerNode)
+  , producerOutputPortIdx(outputPortIdx)
+  , consumer(consumerNode)
+  , consumerInputPortIdx(inputPortIdx)
 {
   this->connect(
     this->producer, &pqNodeEditorNode::nodeMoved, this, &pqNodeEditorEdge::updatePoints);
