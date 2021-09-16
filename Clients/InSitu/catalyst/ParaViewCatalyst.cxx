@@ -14,6 +14,7 @@
 =========================================================================*/
 
 #include <catalyst.h>
+#include <catalyst_api.h>
 #include <catalyst_conduit.hpp>
 #include <catalyst_conduit_blueprint.hpp>
 #include <catalyst_stub.h>
