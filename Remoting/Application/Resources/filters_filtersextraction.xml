@@ -283,6 +283,39 @@
     </SourceProxy>
 
     <!-- ==================================================================== -->
+    <SourceProxy class="vtkExtractGhostCells"
+                 name="ExtractGhostCells"
+                 label="Extract Ghost Cells">
+      <Documentation short_help="Extract ghost cells so they can be visualized.">
+        This filter extracts the ghost cells from the input and displays them so
+        one can inspect them visually.
+      </Documentation>
+
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkDataSet" />
+          <DataType value="vtkCompositeDataSet" />
+        </DataTypeDomain>
+      </InputProperty>
+      <StringVectorProperty name="ArrayName"
+        command="SetOutputGhostArrayName"
+        number_of_elements="1"
+        default_values="GhostType">
+        <Documentation>
+          Name of the ghost cell array in the output.
+          It must be different to `vtkGhostType` in order for the cells to be displayed.
+        </Documentation>
+      </StringVectorProperty>
+
+
+    </SourceProxy>
+
+    <!-- ==================================================================== -->
     <SourceProxy class="vtkExtractTimeSteps"
                  name="ExtractTimeSteps"
                  label="Extract Time Steps">

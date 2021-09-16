@@ -221,6 +221,7 @@
   <Proxy group="filters" name="ExtractEnclosedPoints" />
   <Proxy group="filters" name="ExtractFieldDataOverTime" icon=":/pqWidgets/Icons/pqPlotGlobalOverTime.svg" />
   <Proxy group="filters" name="ExtractGeometry" />
+  <Proxy group="filters" name="ExtractGhostCells" />
   <Proxy group="filters" name="ExtractGrid" icon=":/pqWidgets/Icons/pqExtractGrid.svg" />
   <Proxy group="filters" name="ExtractHierarchicalDataSets" />
   <Proxy group="filters" name="ExtractHistogram" icon=":/pqWidgets/Icons/pqHistogram24.png" />
