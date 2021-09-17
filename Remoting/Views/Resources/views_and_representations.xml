@@ -2616,6 +2616,7 @@
           <Property name="CameraFocalPoint" panel_visibility="never"/>
           <Property name="CameraViewUpInfo" panel_visibility="never"/>
           <Property name="CameraViewUp" panel_visibility="never"/>
+          <Property name="CameraViewAngleInfo" panel_visibility="never"/>
           <Property name="CameraViewAngle" panel_visibility="never"/>
           <Property name="CameraFocalDiskInfo" panel_visibility="never"/>
           <Property name="CameraFocalDisk" panel_visibility="never"/>
