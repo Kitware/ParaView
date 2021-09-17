@@ -38,6 +38,12 @@
 #include <functional>
 #include <sstream>
 
+#if QT_VERSION < QT_VERSION_CHECK(5, 14, 0)
+#define QCOMBOBOX_TEXT_ACTIVATED_SLOT QOverload<const QString&>::of(&QComboBox::activated)
+#else
+#define QCOMBOBOX_TEXT_ACTIVATED_SLOT &QComboBox::textActivated
+#endif
+
 class pqOpenVRControls::pqInternals : public Ui::pqOpenVRControls
 {
 };
@@ -112,7 +118,7 @@ void pqOpenVRControls::constructor(vtkPVOpenVRHelper* val)
   });
 
   QObject::connect(
-    this->Internals->scaleFactorCombo, &QComboBox::textActivated, [=](QString const& text) {
+    this->Internals->scaleFactorCombo, QCOMBOBOX_TEXT_ACTIVATED_SLOT, [=](QString const& text) {
       if (!this->NoForward && text.length())
       {
         this->Helper->SetScaleFactor(std::stof(text.toUtf8().toStdString()));
@@ -120,7 +126,7 @@ void pqOpenVRControls::constructor(vtkPVOpenVRHelper* val)
     });
 
   QObject::connect(
-    this->Internals->motionFactorCombo, &QComboBox::textActivated, [=](QString const& text) {
+    this->Internals->motionFactorCombo, QCOMBOBOX_TEXT_ACTIVATED_SLOT, [=](QString const& text) {
       if (!this->NoForward && text.length())
       {
         this->Helper->SetMotionFactor(std::stof(text.toUtf8().toStdString()));
@@ -128,7 +134,7 @@ void pqOpenVRControls::constructor(vtkPVOpenVRHelper* val)
     });
 
   QObject::connect(
-    this->Internals->loadCameraCombo, &QComboBox::textActivated, [=](QString const& text) {
+    this->Internals->loadCameraCombo, QCOMBOBOX_TEXT_ACTIVATED_SLOT, [=](QString const& text) {
       if (!this->NoForward && text.length())
       {
         this->Helper->LoadCameraPose(std::stoi(text.toUtf8().toStdString()));
@@ -136,7 +142,7 @@ void pqOpenVRControls::constructor(vtkPVOpenVRHelper* val)
     });
 
   QObject::connect(
-    this->Internals->saveCameraCombo, &QComboBox::textActivated, [=](QString const& text) {
+    this->Internals->saveCameraCombo, QCOMBOBOX_TEXT_ACTIVATED_SLOT, [=](QString const& text) {
       if (text.length())
       {
         this->Helper->SaveCameraPose(std::stoi(text.toUtf8().toStdString()));
