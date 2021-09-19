@@ -900,7 +900,7 @@
         without warning.
       </Documentation>
       <ProxyProperty name="Producer" command="SetProducer" skip_valid_check="1"/>
-      <IntVectorProperty name="PortNumber" default_values="1"
+      <IntVectorProperty name="PortNumber" default_values="0"
         number_of_elements="1" command="SetPortNumber" />
       <IntVectorProperty name="GatherOnAllRanks" command="SetGatherOnAllRanks"
         number_of_elements="1" default_values="0" />
@@ -909,7 +909,11 @@
         clean_command="ClearAllSourceRanks"
         number_of_elements_per_command="1"
         repeat_command="1" />
-       <Property name="Execute" command="Execute" />
+      <IntVectorProperty name="SkipEmptyDataSets"
+         command="SetSkipEmptyDataSets"
+         number_of_elements="1"
+         default_values="0" />
+      <Property name="Execute" command="Execute" />
     </Proxy>
 
     <!-- End of group "misc" -->
