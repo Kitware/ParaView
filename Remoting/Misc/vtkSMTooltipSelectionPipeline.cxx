@@ -17,7 +17,6 @@
 
 #include "vtkCell.h"
 #include "vtkCellData.h"
-#include "vtkCompositeDataIterator.h"
 #include "vtkCompositeDataSet.h"
 #include "vtkCoordinate.h"
 #include "vtkDataArray.h"
@@ -26,6 +25,8 @@
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVDataInformation.h"
+#include "vtkPVDataMover.h"
+#include "vtkPVDataUtilities.h"
 #include "vtkPVExtractSelection.h"
 #include "vtkPVRenderView.h"
 #include "vtkPVSelectionSource.h"
@@ -51,7 +52,7 @@ vtkStandardNewMacro(vtkSMTooltipSelectionPipeline);
 
 //----------------------------------------------------------------------------
 vtkSMTooltipSelectionPipeline::vtkSMTooltipSelectionPipeline()
-  : MoveSelectionToClient(nullptr)
+  : DataMover(nullptr)
 {
   this->PreviousSelectionId = 0;
   this->SelectionFound = false;
@@ -67,11 +68,7 @@ vtkSMTooltipSelectionPipeline::~vtkSMTooltipSelectionPipeline()
 //----------------------------------------------------------------------------
 void vtkSMTooltipSelectionPipeline::ClearCache()
 {
-  if (this->MoveSelectionToClient)
-  {
-    this->MoveSelectionToClient->Delete();
-    this->MoveSelectionToClient = nullptr;
-  }
+  this->DataMover = nullptr;
   this->Superclass::ClearCache();
 }
 
@@ -137,67 +134,31 @@ bool vtkSMTooltipSelectionPipeline::GetCurrentSelectionId(
 vtkDataObject* vtkSMTooltipSelectionPipeline::ConnectPVMoveSelectionToClient(
   vtkSMSourceProxy* source, unsigned int sourceOutputPort)
 {
-  vtkSMSessionProxyManager* proxyManager =
-    vtkSMProxyManager::GetProxyManager()->GetActiveSessionProxyManager();
+  auto pxm = source->GetSessionProxyManager();
 
-  // Reduce data
-  vtkSMSourceProxy* reduceSelectionToClient =
-    vtkSMSourceProxy::SafeDownCast(proxyManager->NewProxy("filters", "ReductionFilter"));
-  // set input
-  vtkSMInputProperty* inputProperty =
-    vtkSMInputProperty::SafeDownCast(reduceSelectionToClient->GetProperty("Input"));
-  inputProperty->RemoveAllProxies();
-  inputProperty->AddInputConnection(source, sourceOutputPort);
-  // set postGatherHelperName
-  std::string postGatherHelperName;
-  if (source->GetDataInformation(sourceOutputPort)->IsCompositeDataSet())
+  if (this->DataMover == nullptr)
   {
-    postGatherHelperName = "vtkMultiBlockDataGroupFilter";
-  }
-  else if (std::string(source->GetDataInformation(sourceOutputPort)->GetDataClassName()) ==
-    std::string("vtkPolyData"))
-  {
-    postGatherHelperName = "vtkAppendPolyData";
-  }
-  else if (std::string(source->GetDataInformation(sourceOutputPort)->GetDataClassName()) ==
-    std::string("vtkRectilinearGrid"))
-  {
-    postGatherHelperName = "vtkAppendRectilinearGrid";
-  }
-  else
-  {
-    postGatherHelperName = "vtkAppendFilter";
-  }
-  vtkSMPropertyHelper(reduceSelectionToClient, "PostGatherHelperName")
-    .Set(postGatherHelperName.c_str());
-  reduceSelectionToClient->UpdateVTKObjects();
-  reduceSelectionToClient->UpdatePipeline();
-
-  // Move data to client
-  if (!this->MoveSelectionToClient)
-  {
-    this->MoveSelectionToClient =
-      vtkSMSourceProxy::SafeDownCast(proxyManager->NewProxy("filters", "ClientServerMoveData"));
+    this->DataMover = vtk::TakeSmartPointer(pxm->NewProxy("misc", "DataMover"));
+    if (this->DataMover == nullptr)
+    {
+      vtkErrorMacro("Failed to create required proxy 'DataMover'");
+      return nullptr;
+    }
   }
 
-  // set input, manually modifying VTK object so it is updated
-  vtkSMPropertyHelper(this->MoveSelectionToClient, "Input").Set(reduceSelectionToClient, 0);
-  vtkObject::SafeDownCast(this->MoveSelectionToClient->GetClientSideObject())->Modified();
-  reduceSelectionToClient->Delete();
+  vtkSMPropertyHelper(this->DataMover, "Producer").Set(source);
+  vtkSMPropertyHelper(this->DataMover, "PortNumber").Set(static_cast<int>(sourceOutputPort));
+  vtkSMPropertyHelper(this->DataMover, "SkipEmptyDataSets").Set(1);
+  this->DataMover->UpdateVTKObjects();
+  this->DataMover->InvokeCommand("Execute");
 
-  // set data type
-  vtkPVDataInformation* info = reduceSelectionToClient->GetDataInformation(0);
-  int dataType = info->GetDataSetType();
-  if (info->GetCompositeDataSetType() > 0)
+  auto dataMover = vtkPVDataMover::SafeDownCast(this->DataMover->GetClientSideObject());
+  if (dataMover->GetNumberOfDataSets() >= 1)
   {
-    dataType = info->GetCompositeDataSetType();
+    return dataMover->GetDataSetAtIndex(0);
   }
-  vtkSMPropertyHelper(this->MoveSelectionToClient, "OutputDataType").Set(dataType);
 
-  this->MoveSelectionToClient->UpdateVTKObjects();
-  this->MoveSelectionToClient->UpdatePipeline();
-  return vtkAlgorithm::SafeDownCast(this->MoveSelectionToClient->GetClientSideObject())
-    ->GetOutputDataObject(0);
+  return nullptr;
 }
 
 #ifndef VTK_LEGACY_REMOVE
@@ -373,39 +334,21 @@ void vtkSMTooltipSelectionPipeline::PrintSelf(ostream& os, vtkIndent indent)
 vtkDataSet* vtkSMTooltipSelectionPipeline::FindDataSet(
   vtkDataObject* dataObject, bool& compositeFound, std::string& compositeName)
 {
-  vtkDataSet* ds = vtkDataSet::SafeDownCast(dataObject);
-  vtkCompositeDataSet* cd = vtkCompositeDataSet::SafeDownCast(dataObject);
-
-  // handle composite case
-  compositeFound = false;
-  if (cd)
+  auto cd = vtkCompositeDataSet::SafeDownCast(dataObject);
+  compositeFound = cd != nullptr;
+  if (!compositeFound)
   {
-    vtkCompositeDataIterator* it = cd->NewIterator();
-    it->SkipEmptyNodesOn();
-    it->InitTraversal();
-    while (!it->IsDoneWithTraversal())
-    {
-      ds = vtkDataSet::SafeDownCast(it->GetCurrentDataObject());
-      if (ds)
-      {
-        compositeFound = true;
-        std::stringstream ssname;
-        ssname << it->GetCurrentFlatIndex() - 1;
-        const char* name = it->GetCurrentMetaData()->Get(vtkCompositeDataSet::NAME());
-        if (name)
-        {
-          ssname << ": " << name;
-        }
-        compositeName = ssname.str();
-        break;
-      }
-      it->GoToNextItem();
-    }
-    it->Delete();
-    if (!compositeFound)
-    {
-      return nullptr;
-    }
+    return vtkDataSet::SafeDownCast(dataObject);
   }
-  return ds;
+
+  vtkPVDataUtilities::AssignNamesToBlocks(cd);
+  auto datasets = vtkCompositeDataSet::GetDataSets(cd);
+  if (!datasets.empty())
+  {
+    auto ds = datasets.front();
+    compositeName = vtkPVDataUtilities::GetAssignedNameForBlock(ds);
+    return ds;
+  }
+
+  return nullptr;
 }

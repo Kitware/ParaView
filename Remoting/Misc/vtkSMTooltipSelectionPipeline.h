@@ -30,8 +30,8 @@
 
 #include "vtkRemotingMiscModule.h" //needed for exports
 #include "vtkSMPreselectionPipeline.h"
-
-#include <string> // STL Header
+#include "vtkSmartPointer.h" // for vtkSmartPointer
+#include <string>            // for std::string
 
 class vtkDataObject;
 class vtkDataSet;
@@ -100,7 +100,7 @@ protected:
   vtkDataSet* FindDataSet(
     vtkDataObject* dataObject, bool& compositeFound, std::string& compositeName);
 
-  vtkSMSourceProxy* MoveSelectionToClient;
+  vtkSmartPointer<vtkSMProxy> DataMover;
   vtkIdType PreviousSelectionId;
   bool SelectionFound;
   bool TooltipEnabled;
