@@ -1,5 +1,6 @@
 packages:
   cmake:
-    paths:
-      cmake: /builds/gitlab-kitware-sciviz-ci/.gitlab/cmake
-    buildable: False
+    buildable: false
+    externals:
+    - spec: cmake
+      prefix: /builds/gitlab-kitware-sciviz-ci/.gitlab/cmake
