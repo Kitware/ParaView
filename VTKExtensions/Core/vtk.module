@@ -22,6 +22,8 @@ PRIVATE_DEPENDS
   VTK::pugixml
   VTK::vtksys
 TEST_DEPENDS
+  VTK::FiltersCore
+  VTK::FiltersSources
   VTK::TestingCore
 TEST_LABELS
   ParaView
