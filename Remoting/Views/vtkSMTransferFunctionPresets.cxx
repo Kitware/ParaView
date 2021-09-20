@@ -539,6 +539,12 @@ bool vtkSMTransferFunctionPresets::IsPresetBuiltin(unsigned int index)
 }
 
 //----------------------------------------------------------------------------
+bool vtkSMTransferFunctionPresets::ImportPresets(const char* filename)
+{
+  return this->ImportPresets(filename, nullptr);
+}
+
+//----------------------------------------------------------------------------
 bool vtkSMTransferFunctionPresets::ImportPresets(
   const char* filename, std::vector<ImportedPreset>* importedPresets)
 {
@@ -571,6 +577,12 @@ bool vtkSMTransferFunctionPresets::ImportPresets(
   {
     return this->Internals->ImportPresets(filename, importedPresets);
   }
+}
+
+//----------------------------------------------------------------------------
+bool vtkSMTransferFunctionPresets::ImportPresets(const Json::Value& presets)
+{
+  return this->ImportPresets(presets, nullptr);
 }
 
 //----------------------------------------------------------------------------
