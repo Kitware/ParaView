@@ -9,7 +9,7 @@ v.OrientationAxesVisibility = 0
 
 HeadingText = Text(Text="Hello World")
 HeadingRep = Show()
-HeadingRep.WindowLocation = 'UpperCenter'
+HeadingRep.WindowLocation = 'Upper Center'
 HeadingRep.FontSize = 18
 HeadingRep.TextScaleMode = 'Viewport'
 
