@@ -38,6 +38,7 @@
 
 #if NodeEditor_ENABLE_GRAPHVIZ
 #include <cgraph.h>
+#include <geom.h>
 #include <gvc.h>
 #endif // NodeEditor_ENABLE_GRAPHVIZ
 
