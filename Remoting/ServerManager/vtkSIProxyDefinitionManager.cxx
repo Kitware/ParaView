@@ -55,6 +55,8 @@ class vtkSIProxyDefinitionManager::vtkInternals
 public:
   // Keep State Flag of the ProcessType
   bool EnableXMLProxyDefinitionUpdate;
+  // To know if override need to be taken into account and replaced in the parent
+  bool ReplaceOverrideInParent;
   // Keep track of ServerManager definition
   StrToStrToXmlMap CoreDefinitions;
   // Keep track of custom definition
@@ -62,6 +64,7 @@ public:
   //-------------------------------------------------------------------------
   vtkInternals()
     : EnableXMLProxyDefinitionUpdate(true)
+    , ReplaceOverrideInParent(true)
   {
   }
   //-------------------------------------------------------------------------
@@ -1001,7 +1004,7 @@ void vtkSIProxyDefinitionManager::MergeProxyDefinition(
           << "#####################################" << endl);
         return;
       }
-      else
+      else if (this->Internals->ReplaceOverrideInParent)
       {
         // Replace the overriden sub proxy definition by the new one
         vtkPVXMLElement* subProxyDefToRemove = subProxyToFill[name].GetPointer();
@@ -1033,11 +1036,14 @@ void vtkSIProxyDefinitionManager::MergeProxyDefinition(
         }
       }
 
-      // Replace the overriden property by the new one
-      vtkPVXMLElement* subPropDefToRemove = propertiesToFill[name].GetPointer();
-      vtkPVXMLElement* overridingProp = propertiesSrc[name].GetPointer();
-      subPropDefToRemove->GetParent()->ReplaceNestedElement(subPropDefToRemove, overridingProp);
-      overridingProp->GetParent()->RemoveNestedElement(overridingProp);
+      if (this->Internals->ReplaceOverrideInParent)
+      {
+        // Replace the overriden property by the new one
+        vtkPVXMLElement* subPropDefToRemove = propertiesToFill[name].GetPointer();
+        vtkPVXMLElement* overridingProp = propertiesSrc[name].GetPointer();
+        subPropDefToRemove->GetParent()->ReplaceNestedElement(subPropDefToRemove, overridingProp);
+        overridingProp->GetParent()->RemoveNestedElement(overridingProp);
+      }
     }
     // Move to next
     mapIter++;
@@ -1192,6 +1198,8 @@ void vtkSIProxyDefinitionManager::HandlePlugin(vtkPVPlugin* plugin)
     // Make sure only the SERVER is processing the XML proxy definition
     if (this->Internals->EnableXMLProxyDefinitionUpdate)
     {
+      bool tmpReplaceOverrideInParent = this->Internals->ReplaceOverrideInParent;
+      this->Internals->ReplaceOverrideInParent = false;
       for (size_t cc = 0; cc < xmls.size(); cc++)
       {
         this->LoadConfigurationXMLFromString(xmls[cc].c_str(),
@@ -1202,6 +1210,7 @@ void vtkSIProxyDefinitionManager::HandlePlugin(vtkPVPlugin* plugin)
 
       // Make sure we invalidate any cached flatten version of our proxy definition
       this->InternalsFlatten->Clear();
+      this->Internals->ReplaceOverrideInParent = tmpReplaceOverrideInParent;
     }
   }
 }
