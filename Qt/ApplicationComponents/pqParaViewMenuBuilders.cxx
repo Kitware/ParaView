@@ -647,7 +647,7 @@ void pqParaViewMenuBuilders::buildHelpMenu(QMenu& menu)
                                   << pqSetName("actionTutorialNotes")));
 
   // Sandia National Labs Tutorials
-  new pqDesktopServicesReaction(QUrl("http://www.paraview.org/Wiki/SNL_ParaView_4_Tutorials"),
+  new pqDesktopServicesReaction(QUrl("https://www.paraview.org/Wiki/ParaView_Classroom_Tutorials"),
     (menu.addAction("ParaView Classroom Tutorials") << pqSetName("actionClassroomTutorial")));
 
   // Example Data Sets
