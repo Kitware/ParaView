@@ -7765,14 +7765,14 @@
                          number_of_elements="1">
         <EnumerationDomain name="enum">
           <!-- for now, we skip interactive placement functionality
-          <Entry text="AnyLocation" value="0" />
+          <Entry text="Any Location" value="0" />
           -->
-          <Entry text="LowerLeftCorner" value="1" />
-          <Entry text="LowerRightCorner" value="2" />
-          <Entry text="LowerCenter" value="3" />
-          <Entry text="UpperLeftCorner" value="4" />
-          <Entry text="UpperRightCorner" value="5" />
-          <Entry text="UpperCenter" value="6" />
+          <Entry text="Lower Left Corner" value="1" />
+          <Entry text="Lower Right Corner" value="2" />
+          <Entry text="Lower Center" value="3" />
+          <Entry text="Upper Left Corner" value="4" />
+          <Entry text="Upper Right Corner" value="5" />
+          <Entry text="Upper Center" value="6" />
         </EnumerationDomain>
         <Documentation>Specify placement of the scalar bar actor.</Documentation>
       </IntVectorProperty>
