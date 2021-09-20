@@ -556,8 +556,8 @@ void pqFileDialog::onContextMenuRequested(const QPoint& menuPos)
     dirToOpen = this->Implementation->Model->getCurrentPath();
   }
 
-  QObject::connect(
-    openInFileExplorerAction, &QAction::triggered, [=] { QDesktopServices::openUrl(dirToOpen); });
+  QObject::connect(openInFileExplorerAction, &QAction::triggered,
+    [=] { QDesktopServices::openUrl(QUrl::fromLocalFile(dirToOpen)); });
   menu.addAction(openInFileExplorerAction);
 
   // Only display new dir option if we're saving, not opening
