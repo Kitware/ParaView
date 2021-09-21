@@ -3,11 +3,49 @@
 #
 # SPDX-License-Identifier: (Apache-2.0 OR MIT)
 
+import copy
 import itertools
-import os
+import os, os.path
 
 from spack import *
+from spack.fetch_strategy import fetcher, VCSFetchStrategy
+import llnl.util.tty as tty
 
+
+@fetcher
+class LocalStrategy(VCSFetchStrategy):
+    url_attr = "file"
+    def __init__(self, **kwargs):
+        # Discards the keywords in kwargs that may conflict with the next
+        # call to __init__
+        forwarded_args = copy.copy(kwargs)
+        forwarded_args.pop('', None)
+        super(LocalStrategy, self).__init__(**forwarded_args)
+        self._git = None
+        self.revision = None
+
+    def fetch(self):
+        # already fetched
+        tty.msg("Using source directory, nothing to fetch")
+        tty.msg("%s --> %s" % (self.url, self.stage.source_path))
+        os.symlink(self.url, self.stage.source_path)
+        return True
+
+    @property
+    def cachable(self):
+        return False
+
+    def source_id(self):
+        return "local"
+
+    def mirror_id(self):
+        return None
+
+def _determine_paraview_source_dir():
+    source_dir = __file__
+    return source_dir[:source_dir.rfind("/Utilities/spack/repo/packages/paraview/package.py")]
+
+enable_local_fetch_strategy = True
 
 class Paraview(CMakePackage, CudaPackage):
     """ParaView is an open-source, multi-platform data analysis and
@@ -21,24 +59,27 @@ class Paraview(CMakePackage, CudaPackage):
 
     maintainers = ['chuckatkins', 'danlipsa', 'vicentebolea']
 
-    version('master', branch='master', submodules=True)
-    version('5.9.1', sha256='0d486cb6fbf55e428845c9650486f87466efcb3155e40489182a7ea85dfd4c8d', preferred=True)
-    version('5.9.0', sha256='b03258b7cddb77f0ee142e3e77b377e5b1f503bcabc02bfa578298c99a06980d')
-    version('5.8.1', sha256='7653950392a0d7c0287c26f1d3a25cdbaa11baa7524b0af0e6a1a0d7d487d034')
-    version('5.8.0', sha256='219e4107abf40317ce054408e9c3b22fb935d464238c1c00c0161f1c8697a3f9')
-    version('5.7.0', sha256='e41e597e1be462974a03031380d9e5ba9a7efcdb22e4ca2f3fec50361f310874')
-    version('5.6.2', sha256='1f3710b77c58a46891808dbe23dc59a1259d9c6b7bb123aaaeaa6ddf2be882ea')
-    version('5.6.0', sha256='cb8c4d752ad9805c74b4a08f8ae6e83402c3f11e38b274dba171b99bb6ac2460')
-    version('5.5.2', sha256='64561f34c4402b88f3cb20a956842394dde5838efd7ebb301157a837114a0e2d')
-    version('5.5.1', sha256='a6e67a95a7a5711a2b5f95f38ccbff4912262b3e1b1af7d6b9afe8185aa85c0d')
-    version('5.5.0', sha256='1b619e326ff574de808732ca9a7447e4cd14e94ae6568f55b6581896cd569dff')
-    version('5.4.1', sha256='390d0f5dc66bf432e202a39b1f34193af4bf8aad2355338fa5e2778ea07a80e4')
-    version('5.4.0', sha256='f488d84a53b1286d2ee1967e386626c8ad05a6fe4e6cbdaa8d5e042f519f94a9')
-    version('5.3.0', sha256='046631bbf00775edc927314a3db207509666c9c6aadc7079e5159440fd2f88a0')
-    version('5.2.0', sha256='894e42ef8475bb49e4e7e64f4ee2c37c714facd18bfbb1d6de7f69676b062c96')
-    version('5.1.2', sha256='ff02b7307a256b7c6e8ad900dee5796297494df7f9a0804fe801eb2f66e6a187')
-    version('5.0.1', sha256='caddec83ec284162a2cbc46877b0e5a9d2cca59fb4ab0ea35b0948d2492950bb')
-    version('4.4.0', sha256='c2dc334a89df24ce5233b81b74740fc9f10bc181cd604109fd13f6ad2381fc73')
+    if enable_local_fetch_strategy:
+        version('develop', file=_determine_paraview_source_dir(), preferred=True)
+    else:
+        version('master', branch='master', submodules=True)
+        version('5.9.1', sha256='0d486cb6fbf55e428845c9650486f87466efcb3155e40489182a7ea85dfd4c8d', preferred=True)
+        version('5.9.0', sha256='b03258b7cddb77f0ee142e3e77b377e5b1f503bcabc02bfa578298c99a06980d')
+        version('5.8.1', sha256='7653950392a0d7c0287c26f1d3a25cdbaa11baa7524b0af0e6a1a0d7d487d034')
+        version('5.8.0', sha256='219e4107abf40317ce054408e9c3b22fb935d464238c1c00c0161f1c8697a3f9')
+        version('5.7.0', sha256='e41e597e1be462974a03031380d9e5ba9a7efcdb22e4ca2f3fec50361f310874')
+        version('5.6.2', sha256='1f3710b77c58a46891808dbe23dc59a1259d9c6b7bb123aaaeaa6ddf2be882ea')
+        version('5.6.0', sha256='cb8c4d752ad9805c74b4a08f8ae6e83402c3f11e38b274dba171b99bb6ac2460')
+        version('5.5.2', sha256='64561f34c4402b88f3cb20a956842394dde5838efd7ebb301157a837114a0e2d')
+        version('5.5.1', sha256='a6e67a95a7a5711a2b5f95f38ccbff4912262b3e1b1af7d6b9afe8185aa85c0d')
+        version('5.5.0', sha256='1b619e326ff574de808732ca9a7447e4cd14e94ae6568f55b6581896cd569dff')
+        version('5.4.1', sha256='390d0f5dc66bf432e202a39b1f34193af4bf8aad2355338fa5e2778ea07a80e4')
+        version('5.4.0', sha256='f488d84a53b1286d2ee1967e386626c8ad05a6fe4e6cbdaa8d5e042f519f94a9')
+        version('5.3.0', sha256='046631bbf00775edc927314a3db207509666c9c6aadc7079e5159440fd2f88a0')
+        version('5.2.0', sha256='894e42ef8475bb49e4e7e64f4ee2c37c714facd18bfbb1d6de7f69676b062c96')
+        version('5.1.2', sha256='ff02b7307a256b7c6e8ad900dee5796297494df7f9a0804fe801eb2f66e6a187')
+        version('5.0.1', sha256='caddec83ec284162a2cbc46877b0e5a9d2cca59fb4ab0ea35b0948d2492950bb')
+        version('4.4.0', sha256='c2dc334a89df24ce5233b81b74740fc9f10bc181cd604109fd13f6ad2381fc73')
 
     variant('plugins', default=True,
             description='Install include files for plugins support')
@@ -122,6 +163,8 @@ class Paraview(CMakePackage, CudaPackage):
     depends_on('double-conversion')
     depends_on('expat')
     depends_on('eigen@3:')
+    # Needs https://github.com/fmtlib/fmt/pull/2432 to be released
+    # depends_on('fmt', when='@5.10:')
     depends_on('freetype')
     # depends_on('hdf5+mpi', when='+mpi')
     # depends_on('hdf5~mpi', when='~mpi')
@@ -155,22 +198,29 @@ class Paraview(CMakePackage, CudaPackage):
     # https://gitlab.kitware.com/paraview/paraview/-/merge_requests/4951
     depends_on('cli11@1.9.1', when='@5.10:')
 
-    patch('stl-reader-pv440.patch', when='@4.4.0')
+    if enable_local_fetch_strategy:
+        # skip patches
+        # we can rely on the version number given `git describe` since
+        # that may end up using an older tag when building user forks without
+        # updated tags.
+        pass
+    else:
+        patch('stl-reader-pv440.patch', when='@4.4.0')
 
-    # Broken gcc-detection - improved in 5.1.0, redundant later
-    patch('gcc-compiler-pv501.patch', when='@:5.0.1')
+        # Broken gcc-detection - improved in 5.1.0, redundant later
+        patch('gcc-compiler-pv501.patch', when='@:5.0.1')
 
-    # Broken installation (ui_pqExportStateWizard.h) - fixed in 5.2.0
-    patch('ui_pqExportStateWizard.patch', when='@:5.1.2')
+        # Broken installation (ui_pqExportStateWizard.h) - fixed in 5.2.0
+        patch('ui_pqExportStateWizard.patch', when='@:5.1.2')
 
-    # Broken vtk-m config. Upstream catalyst changes
-    patch('vtkm-catalyst-pv551.patch', when='@5.5.0:5.5.2')
+        # Broken vtk-m config. Upstream catalyst changes
+        patch('vtkm-catalyst-pv551.patch', when='@5.5.0:5.5.2')
 
-    # Broken H5Part with external parallel HDF5
-    patch('h5part-parallel.patch', when='@5.7:5.7.999')
+        # Broken H5Part with external parallel HDF5
+        patch('h5part-parallel.patch', when='@5.7:5.7.999')
 
-    # Broken downstream FindMPI
-    patch('vtkm-findmpi-downstream.patch', when='@5.9.0')
+        # Broken downstream FindMPI
+        patch('vtkm-findmpi-downstream.patch', when='@5.9.0')
 
     def url_for_version(self, version):
         _urlfmt  = 'http://www.paraview.org/files/v{0}/ParaView-v{1}{2}.tar.{3}'
@@ -285,6 +335,7 @@ class Paraview(CMakePackage, CudaPackage):
         if spec.satisfies('@5.10:'):
             cmake_args.extend([
                 '-DVTK_MODULE_USE_EXTERNAL_ParaView_vtkcatalyst:BOOL=OFF',
+                '-DVTK_MODULE_USE_EXTERNAL_VTK_cgns=OFF',
                 '-DVTK_MODULE_USE_EXTERNAL_VTK_ioss:BOOL=OFF',
                 '-DVTK_MODULE_USE_EXTERNAL_VTK_exprtk:BOOL=OFF',
                 '-DVTK_MODULE_USE_EXTERNAL_VTK_fmt:BOOL=OFF'
@@ -308,7 +359,7 @@ class Paraview(CMakePackage, CudaPackage):
             cmake_args.extend([
                 '-DPARAVIEW_ENABLE_EXAMPLES:BOOL=%s' % variant_bool(
                     '+examples'),
-                '-DVTK_MODULE_USE_EXTERNAL_VTK_cgns=OFF',
+                '-DVTK_MODULE_USE_EXTERNAL_ParaView_cgns=OFF',
                 '-DVTK_MODULE_USE_EXTERNAL_VTK_glew=OFF',
                 '-DVTK_MODULE_USE_EXTERNAL_VTK_gl2ps=OFF',
                 '-DVTK_MODULE_USE_EXTERNAL_VTK_libharu=OFF',
