@@ -54,6 +54,7 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${paraview_test_data_directory_input}/Data/OMETIFF/multi-channel-time-series.ome.tif}"
   "DATA{${paraview_test_data_directory_input}/Data/OverridePropertyPlugin.xml}"
   "DATA{${paraview_test_data_directory_input}/Data/PlotOverLineLegacy.pvsm}"
+  "DATA{${paraview_test_data_directory_input}/Data/PNGReadersPlugin.xml}"
   "DATA{${paraview_test_data_directory_input}/Data/PropertyLink.pvsm}"
   "DATA{${paraview_test_data_directory_input}/Data/RectGrid2.vtk}"
   "DATA{${paraview_test_data_directory_input}/Data/RodPlate/,REGEX:.*}"
@@ -107,6 +108,8 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${paraview_test_data_directory_input}/Data/glTF/Triangle/Triangle.glb}"
   "DATA{${paraview_test_data_directory_input}/Data/glTF/SimpleSkin/SimpleSkin.gltf}"
   "DATA{${paraview_test_data_directory_input}/Data/WaveletGradientLegacy.pvsm}"
+  "DATA{${paraview_test_data_directory_input}/Data/img1.png}"
+  "DATA{${paraview_test_data_directory_input}/Data/img2.png}"
   "DATA{${paraview_test_data_directory_input}/Data/iron_protein.vtk}"
   "DATA{${paraview_test_data_directory_input}/Data/linesPolydata.vtk}"
   "DATA{${paraview_test_data_directory_input}/Data/manyTypes.vtu}"
@@ -607,6 +610,7 @@ SET (TESTS_WITHOUT_BASELINES
   AboutDialog.xml
   ArrayBoundsScaleDomain.xml
   CustomOutputFormat.xml
+  DefaultReadersSetting.xml
   DelimitedTextReader.xml
   DynamicFieldDataDomain.xml
   ExportFilteredColumnsSpreadsheet.xml
