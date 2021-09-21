@@ -211,6 +211,7 @@
         - if [ "$CI_MERGE_REQUEST_ID" ]; then TRACK="merge-requests" ; fi
         - $LAUNCHER $spack spec $paraview_spec
         - $LAUNCHER $spack install --no-check-signature --only dependencies -j $(nproc) $paraview_spec
+        - $LAUNCHER $spack clean
         - export dependency_specs=`$LAUNCHER $spack find --format "{name}{@version}{%compiler}"`
         - $LAUNCHER $spack buildcache create -a -f -u -d $PWD/spack-cache $dependency_specs
         - $LAUNCHER $spack install --no-check-signature -j $(nproc) --cdash-upload-url="http://open.cdash.org/submit.php?project=ParaView" --cdash-track $TRACK --cdash-build="paraview-spack-$CI_COMMIT_REF_NAME" $paraview_spec
