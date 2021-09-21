@@ -1,0 +1,6 @@
+packages:
+  cmake:
+    buildable: false
+    externals:
+    - spec: cmake@CMAKE_VERSION
+      prefix: CMAKE_PREFIX

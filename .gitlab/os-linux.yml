@@ -184,7 +184,7 @@
         # root
         FORCE_UNSAFE_CONFIGURE: 1
 
-        spack: "$CI_BUILDS_DIR/spack/bin/spack -C Utilities/spack/configs/gitlab-ci"
+        spack: "$CI_BUILDS_DIR/spack/bin/spack -C $CI_PROJECT_DIR/build/spack"
         paraview_spec: "paraview+osmesa^mesa~glx^mpich"
 
     before_script:

@@ -38,3 +38,12 @@ mv "$filename" cmake
 if [ "$( uname -s )" = "Darwin" ]; then
     ln -s CMake.app/Contents/bin cmake/bin
 fi
+
+if [ "$CI_JOB_NAME" = "build:spack-centos7" ]; then
+    mkdir -p "$CI_PROJECT_DIR/build/spack"
+    sed \
+        -e "s/CMAKE_VERSION/$version/" \
+        -e "s,CMAKE_PREFIX,$PWD/cmake," \
+        < "$CI_PROJECT_DIR/Utilities/spack/configs/gitlab-ci/packages.yaml.in" \
+        > "$CI_PROJECT_DIR/build/spack/packages.yaml"
+fi
