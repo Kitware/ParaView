@@ -27,6 +27,7 @@
 #include <sstream>
 
 #ifdef OPENVR_HAS_COLLABORATION
+#include "vtkOpenGLRenderer.h"
 #include "vtkOpenVRPolyfill.h"
 #include "vtkVRCollaborationClient.h"
 
