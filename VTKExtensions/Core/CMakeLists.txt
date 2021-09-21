@@ -38,6 +38,7 @@ set(classes
   vtkLogRecorder
   vtkMultiProcessControllerHelper
   vtkPVCompositeDataPipeline
+  vtkPVDataUtilities
   vtkPVInformationKeys
   vtkPVLogger
   vtkPVNullSource

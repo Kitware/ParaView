@@ -1,11 +1,13 @@
 <?xml version="1.0" ?>
 <pqevents>
-  <!-- Enforce viewport size (even though it should already be 300x300) -->
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menu_View" />
+
+  <!-- hide Node Editor -->
+  <pqevent object="pqClientMainWindow/menubar/menu_View" command="activate" arguments="Node Editor" />
+
+  <!-- Enforce viewport size -->
   <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuTools" />
-  <pqevent object="pqClientMainWindow/menubar/menuTools" command="activate" arguments="actionTesting_Window_Size_Custom" />
-  <pqevent object="pqClientMainWindow/pqLockViewSizeCustomDialog/Width" command="set_string" arguments="300" />
-  <pqevent object="pqClientMainWindow/pqLockViewSizeCustomDialog/Height" command="set_string" arguments="300" />
-  <pqevent object="pqClientMainWindow/pqLockViewSizeCustomDialog/ButtonBox/0QPushButton0" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/menubar/menuTools" command="activate" arguments="actionTesting_Window_Size" />
 
   <!-- Create Sphere -->
   <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuSources" />
@@ -13,6 +15,8 @@
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
 
   <!-- Test node editor toolbar -->
+  <!-- show node editor -->
+  <pqevent object="pqClientMainWindow/menubar/menu_View" command="activate" arguments="Node Editor" />
   <pqevent object="pqClientMainWindow/pqNodeEditorWidget/nodeEditorWidget/toolbar/ZoomButton" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/pqNodeEditorWidget/nodeEditorWidget/toolbar/LayoutButton" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/pqNodeEditorWidget/nodeEditorWidget/toolbar/CycleVerbosityButton" command="activate" arguments="" />
@@ -25,4 +29,7 @@
 
   <!-- Apply from node editor -->
   <pqevent object="pqClientMainWindow/pqNodeEditorWidget/nodeEditorWidget/toolbar/ApplyButton" command="activate" arguments="" />
+
+  <!-- Close node editor for reliable baseline capture -->
+  <pqevent object="pqClientMainWindow/menubar/menu_View" command="activate" arguments="Node Editor" />
 </pqevents>

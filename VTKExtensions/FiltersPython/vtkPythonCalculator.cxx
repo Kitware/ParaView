@@ -80,7 +80,6 @@ int vtkPythonCalculator::RequestData(
   {
     inInfo = inputVector[0]->GetInformationObject(0);
   }
-  vtkInformation* outInfo = outputVector->GetInformationObject(0);
 
   double dataTime = 0;
   bool dataTimeValid = false;

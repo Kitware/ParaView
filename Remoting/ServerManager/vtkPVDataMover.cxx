@@ -29,6 +29,18 @@
 namespace
 {
 
+bool IsEmpty(vtkDataObject* dataObject)
+{
+  for (int cc = vtkDataObject::POINT; cc < vtkDataObject::NUMBER_OF_ATTRIBUTE_TYPES; ++cc)
+  {
+    if (cc != vtkDataObject::FIELD && dataObject->GetNumberOfElements(cc) != 0)
+    {
+      return false;
+    }
+  }
+  return true;
+}
+
 std::vector<vtkSmartPointer<vtkDataObject> > CollectDataSets(
   vtkPVDataMover* self, vtkMultiProcessController* controller)
 {
@@ -49,9 +61,19 @@ std::vector<vtkSmartPointer<vtkDataObject> > CollectDataSets(
     ? algo->GetOutputDataObject(self->GetPortNumber())
     : nullptr;
 
+  if (self->GetSkipEmptyDataSets() && IsEmpty(localData))
+  {
+    localData = nullptr;
+  }
+
   if (numRanks == 1)
   {
-    return { localData };
+    std::vector<vtkSmartPointer<vtkDataObject> > result;
+    if (localData)
+    {
+      result.push_back(localData);
+    }
+    return result;
   }
 
   std::vector<vtkSmartPointer<vtkDataObject> > result;

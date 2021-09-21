@@ -261,7 +261,7 @@ void vtkSMSession::Disconnect(vtkIdType sid)
 }
 
 //----------------------------------------------------------------------------
-vtkIdType vtkSMSession::ConnectToSelf(int timeout)
+vtkIdType vtkSMSession::ConnectToSelf(int vtkNotUsed(timeout))
 {
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   vtkSMSession* session = vtkSMSession::New();

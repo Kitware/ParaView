@@ -24,6 +24,7 @@
 #include "vtkLogger.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
+#include "vtkPVDataUtilities.h"
 #include "vtkPartitionedDataSet.h"
 #include "vtkPartitionedDataSetCollection.h"
 #include "vtkSplitColumnComponents.h"
@@ -42,34 +43,6 @@ vtkTable* NewFieldDataWrapper(vtkDataObject* dobj)
   vtkTable* dummy = vtkTable::New();
   dummy->GetFieldData()->PassData(dobj->GetFieldData());
   return dummy;
-}
-
-std::map<vtkDataObject*, std::string> GenerateNameMap(vtkDataObject* dobj)
-{
-  std::map<vtkDataObject*, std::string> result;
-  auto pdc = vtkPartitionedDataSetCollection::SafeDownCast(dobj);
-  if (!pdc)
-  {
-    return result;
-  }
-
-  for (unsigned int cc = 0; cc < pdc->GetNumberOfPartitionedDataSets(); ++cc)
-  {
-    if (pdc->GetPartitionedDataSet(cc) && pdc->GetMetaData(cc) &&
-      pdc->GetMetaData(cc)->Has(vtkCompositeDataSet::NAME()))
-    {
-      auto ptd = pdc->GetPartitionedDataSet(cc);
-      std::string name = pdc->GetMetaData(cc)->Get(vtkCompositeDataSet::NAME());
-      for (unsigned int idx = 0; idx < ptd->GetNumberOfPartitions(); ++idx)
-      {
-        if (auto part = ptd->GetPartitionAsDataObject(idx))
-        {
-          result[part] = name;
-        }
-      }
-    }
-  }
-  return result;
 }
 }
 
@@ -143,9 +116,8 @@ int vtkDataTabulator::RequestData(
       inputCD = vtkCompositeDataSet::SafeDownCast(extractor->GetOutputDataObject(0));
     }
 
-    // we need special handling for names for partitioned-dataset in a
-    // partitioned-dataset-collection. to handle that we build this map.
-    auto nameMap = ::GenerateNameMap(inputDO);
+    // Assign names to each leaf to make the subsequent code easier.
+    vtkPVDataUtilities::AssignNamesToBlocks(inputCD);
 
     vtkNew<vtkPartitionedDataSet> xInput;
 
@@ -208,22 +180,10 @@ int vtkDataTabulator::RequestData(
         metaData->Set(vtkDataTabulator::HIERARCHICAL_INDEX(), amrIter->GetCurrentIndex());
       }
 
-      if (!metaData->Has(vtkCompositeDataSet::NAME()))
+      const auto blockName = vtkPVDataUtilities::GetAssignedNameForBlock(currentDO);
+      if (!blockName.empty())
       {
-        auto niter = nameMap.find(currentDO);
-        if (niter == nameMap.end())
-        {
-          // if a name doesn't exist, let's create one.
-          std::string name = amrIter
-            ? "level=" + std::to_string(amrIter->GetCurrentLevel()) + " index=" +
-              std::to_string(amrIter->GetCurrentIndex())
-            : "unnamed_" + std::to_string(iter->GetCurrentFlatIndex());
-          metaData->Set(vtkCompositeDataSet::NAME(), name.c_str());
-        }
-        else
-        {
-          metaData->Set(vtkCompositeDataSet::NAME(), niter->second.c_str());
-        }
+        metaData->Set(vtkCompositeDataSet::NAME(), blockName.c_str());
       }
     }
     iter->Delete();

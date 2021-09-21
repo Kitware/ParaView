@@ -70,6 +70,19 @@ public:
 
   ///@{
   /**
+   * When set to true (default is false), skips moving empty datasets. A dataset
+   * is treated as empty if it has no cells, points, etc. i.e.
+   * `vtkDataObject::GetNumberOfElements` for all types returns 0.
+   */
+  vtkSetMacro(SkipEmptyDataSets, bool);
+  vtkGetMacro(SkipEmptyDataSets, bool);
+  vtkBooleanMacro(SkipEmptyDataSets, bool);
+  ///@}
+
+  ///@}
+
+  ///@{
+  /**
    * API to select source ranks. This allows users to limit fetching data from
    * only certain ranks as listed. If none are provided, default, data from all
    * ranks is fetched. Otherwise, data only from the ranks listed is fetched.
@@ -104,6 +117,7 @@ private:
   vtkAlgorithm* Producer = nullptr;
   int PortNumber = 0;
   bool GatherOnAllRanks = false;
+  bool SkipEmptyDataSets = false;
 
   std::vector<int> SourceRanks;
   std::map<int, vtkSmartPointer<vtkDataObject> > DataSets;

@@ -1,10 +1,7 @@
 <?xml version="1.0" ?>
 <pqevents>
   <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuTools" />
-  <pqevent object="pqClientMainWindow/menubar/menuTools" command="activate" arguments="actionTesting_Window_Size_Custom" />
-  <pqevent object="pqClientMainWindow/pqLockViewSizeCustomDialog/Width" command="set_string" arguments="400" />
-  <pqevent object="pqClientMainWindow/pqLockViewSizeCustomDialog/Height" command="set_string" arguments="400" />
-  <pqevent object="pqClientMainWindow/pqLockViewSizeCustomDialog/ButtonBox/1QPushButton0" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/menubar/menuTools" command="activate" arguments="actionTesting_Window_Size" />
 
   <pqevent object="pqClientMainWindow/menubar/menuSources/Alphabetical" command="activate" arguments="SphereSource" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
@@ -33,11 +30,11 @@
   <pqevent object="pqClientMainWindow/lightInspectorDock/lightInspectorPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/LightContainer0/1pqProxyWidget0/InteractiveLight/show3DWidget" command="set_boolean" arguments="false" />
   <pqevent object="pqClientMainWindow/lightInspectorDock/lightInspectorPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/LightContainer1/1pqProxyWidget0/InteractiveLight/show3DWidget" command="set_boolean" arguments="false" />
   <pqevent object="pqClientMainWindow/cameraToolbar/actionResetCamera" command="activate" arguments="" />
-  <pqcompareview object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.0/CentralWidgetFrame/Viewport" baseline="$PARAVIEW_DATA_ROOT/Clients/ParaView/Testing/Data/Baseline/LightAddRemove1.png" width="400" height="400" />
+  <pqcompareview object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.0/CentralWidgetFrame/Viewport" baseline="$PARAVIEW_DATA_ROOT/Clients/ParaView/Testing/Data/Baseline/LightAddRemove1.png" width="300" height="300" />
   <pqevent object="pqClientMainWindow/lightInspectorDock/lightInspectorPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/LightContainer0/ButtonContainer/RemoveLight" command="activate" arguments="" />
   <pqevent object="" command="comment" arguments="Remove blue, green remains" />
   <pqevent object="pqClientMainWindow/lightInspectorDock/lightInspectorPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/LightContainer0/1pqProxyWidget0/LightType/ComboBox" command="activated" arguments="Headlight" />
   <pqevent object="pqClientMainWindow/lightInspectorDock/lightInspectorPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/LightContainer0/1pqProxyWidget0/InteractiveLight/positionalComboBox" command="activated" arguments="Directional" />
   <pqevent object="pqClientMainWindow/lightInspectorDock/lightInspectorPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/LightContainer0/1pqProxyWidget0/InteractiveLight/positionalComboBox" command="activated" arguments="Positional" />
-  <pqcompareview object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.0/CentralWidgetFrame/Viewport" baseline="$PARAVIEW_DATA_ROOT/Clients/ParaView/Testing/Data/Baseline/LightAddRemove2.png" width="400" height="400" />
+  <pqcompareview object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.0/CentralWidgetFrame/Viewport" baseline="$PARAVIEW_DATA_ROOT/Clients/ParaView/Testing/Data/Baseline/LightAddRemove2.png" width="300" height="300" />
 </pqevents>
