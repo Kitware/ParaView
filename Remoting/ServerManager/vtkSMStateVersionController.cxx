@@ -1244,73 +1244,53 @@ struct Process_5_9_to_5_10
     for (auto xpath_node : xpath_set)
     {
       auto node = xpath_node.node();
-      const std::string id(node.attribute("id").value());
 
-      // Retrieve threshold values
-      auto elementNode =
-        node.select_node("./Property[@name='ThresholdBetween']/Element[@index='0']").node();
-      double lower = elementNode.attribute("value").as_double();
+      if (!node.select_nodes("./Property[@name='ThresholdBetween']").empty())
+      {
+        const std::string id(node.attribute("id").value());
 
-      elementNode =
-        node.select_node("./Property[@name='ThresholdBetween']/Element[@index='1']").node();
-      double upper = elementNode.attribute("value").as_double();
+        // Retrieve threshold values
+        auto elementNode =
+          node.select_node("./Property[@name='ThresholdBetween']/Element[@index='0']").node();
+        double lower = elementNode.attribute("value").as_double();
 
-      // Remove ThresholdBetween node
-      node.remove_child("./Property[@name='ThresholdBetween']");
+        elementNode =
+          node.select_node("./Property[@name='ThresholdBetween']/Element[@index='1']").node();
+        double upper = elementNode.attribute("value").as_double();
 
-      // Append LowerThreshold node with lower value
-      auto thresholdNode = node.append_child("Property");
-      thresholdNode.append_attribute("name").set_value("LowerThreshold");
-      thresholdNode.append_attribute("id").set_value((id + ".LowerThreshold").c_str());
-      thresholdNode.append_attribute("number_of_elements").set_value(1);
+        // Remove ThresholdBetween node
+        node.remove_child("./Property[@name='ThresholdBetween']");
 
-      elementNode = thresholdNode.append_child("Element");
-      elementNode.append_attribute("index").set_value(0);
-      elementNode.append_attribute("value").set_value(lower);
+        // Append LowerThreshold node with lower value
+        auto thresholdNode = node.append_child("Property");
+        thresholdNode.append_attribute("name").set_value("LowerThreshold");
+        thresholdNode.append_attribute("id").set_value((id + ".LowerThreshold").c_str());
+        thresholdNode.append_attribute("number_of_elements").set_value(1);
 
-      auto domainNode = thresholdNode.append_child("Domain");
-      domainNode.append_attribute("name").set_value("range");
-      domainNode.append_attribute("id").set_value((id + ".LowerThreshold.range").c_str());
+        elementNode = thresholdNode.append_child("Element");
+        elementNode.append_attribute("index").set_value(0);
+        elementNode.append_attribute("value").set_value(lower);
 
-      // Append UpperThreshold node with upper value
-      thresholdNode = node.append_child("Property");
-      thresholdNode.append_attribute("name").set_value("UpperThreshold");
-      thresholdNode.append_attribute("id").set_value((id + ".UpperThreshold").c_str());
-      thresholdNode.append_attribute("number_of_elements").set_value(1);
+        // Append UpperThreshold node with upper value
+        thresholdNode = node.append_child("Property");
+        thresholdNode.append_attribute("name").set_value("UpperThreshold");
+        thresholdNode.append_attribute("id").set_value((id + ".UpperThreshold").c_str());
+        thresholdNode.append_attribute("number_of_elements").set_value(1);
 
-      elementNode = thresholdNode.append_child("Element");
-      elementNode.append_attribute("index").set_value(0);
-      elementNode.append_attribute("value").set_value(upper);
+        elementNode = thresholdNode.append_child("Element");
+        elementNode.append_attribute("index").set_value(0);
+        elementNode.append_attribute("value").set_value(upper);
 
-      domainNode = thresholdNode.append_child("Domain");
-      domainNode.append_attribute("name").set_value("range");
-      domainNode.append_attribute("id").set_value((id + ".UpperThreshold.range").c_str());
+        // Append ThresholdMethod node
+        thresholdNode = node.append_child("Property");
+        thresholdNode.append_attribute("name").set_value("ThresholdMethod");
+        thresholdNode.append_attribute("id").set_value((id + ".ThresholdMethod").c_str());
+        thresholdNode.append_attribute("number_of_elements").set_value(1);
 
-      // Append ThresholdMethod node
-      thresholdNode = node.append_child("Property");
-      thresholdNode.append_attribute("name").set_value("ThresholdMethod");
-      thresholdNode.append_attribute("id").set_value((id + ".ThresholdMethod").c_str());
-      thresholdNode.append_attribute("number_of_elements").set_value(1);
-
-      elementNode = thresholdNode.append_child("Element");
-      elementNode.append_attribute("index").set_value(0);
-      elementNode.append_attribute("value").set_value(0);
-
-      domainNode = thresholdNode.append_child("Domain");
-      domainNode.append_attribute("name").set_value("enum");
-      domainNode.append_attribute("id").set_value((id + ".ThresholdMethod.enum").c_str());
-
-      auto entryNode = domainNode.append_child("Entry");
-      entryNode.append_attribute("value").set_value(0);
-      entryNode.append_attribute("text").set_value("Between");
-
-      entryNode = domainNode.append_child("Entry");
-      entryNode.append_attribute("value").set_value(1);
-      entryNode.append_attribute("text").set_value("Below Lower Threshold");
-
-      entryNode = domainNode.append_child("Entry");
-      entryNode.append_attribute("value").set_value(2);
-      entryNode.append_attribute("text").set_value("Above Upper Threshold");
+        elementNode = thresholdNode.append_child("Element");
+        elementNode.append_attribute("index").set_value(0);
+        elementNode.append_attribute("value").set_value(0);
+      }
     }
 
     return true;
