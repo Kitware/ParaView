@@ -56,8 +56,12 @@ inline void pqPythonTabWidget::linkTo<QTextEdit>(QTextEdit* obj)
   pqPythonTextArea* linkedWidget = FindLinkedWidget(obj);
   if (!linkedWidget)
   {
-    this->createNewEmptyTab();
     linkedWidget = this->getCurrentTextArea();
+    if (!linkedWidget->isEmpty() || linkedWidget->isLinked())
+    {
+      this->createNewEmptyTab();
+      linkedWidget = this->getCurrentTextArea();
+    }
 
     linkedWidget->linkTo(obj);
     const QString txt = obj->toPlainText();

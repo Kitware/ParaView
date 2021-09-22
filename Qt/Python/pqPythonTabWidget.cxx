@@ -153,13 +153,14 @@ void pqPythonTabWidget::addNewTextArea(const QString& filename)
     return;
   }
 
-  if (!this->getCurrentTextArea()->isEmpty() || this->getCurrentTextArea()->isLinked())
+  pqPythonTextArea* tArea = this->getCurrentTextArea();
+  if (!tArea->isEmpty() || tArea->isLinked())
   {
     this->createNewEmptyTab();
+    tArea = this->getCurrentTextArea();
   }
 
   // If not create a new tab
-  pqPythonTextArea* tArea = this->getCurrentTextArea();
   tArea->openFile(filename);
 }
 
@@ -334,11 +335,13 @@ void pqPythonTabWidget::createParaviewTraceTab()
 {
   if (!this->TraceWidget)
   {
-    if (!this->getCurrentTextArea()->isEmpty())
+    pqPythonTextArea* widget = this->getCurrentTextArea();
+    if (!widget->isEmpty() || widget->isLinked())
     {
       this->createNewEmptyTab();
+      widget = this->getCurrentTextArea();
     }
-    this->TraceWidget = this->getCurrentTextArea();
+    this->TraceWidget = widget;
   }
 }
 
