@@ -182,7 +182,7 @@ private:
   /**
    * The python manager only used for the paraview macro system
    */
-  pqPythonManager* pythonManager;
+  pqPythonManager* PythonManager;
 };
 
 #endif

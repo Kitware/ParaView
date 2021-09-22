@@ -68,7 +68,7 @@ void FillMenu(QMenu* menu, std::vector<QAction*>& actions)
 pqPythonScriptEditor::pqPythonScriptEditor(QWidget* p)
   : QMainWindow(p)
   , TabWidget(new pqPythonTabWidget(this))
-  , pythonManager(nullptr)
+  , PythonManager(nullptr)
 {
   this->setCentralWidget(TabWidget);
 
@@ -138,7 +138,7 @@ void pqPythonScriptEditor::setSaveDialogDefaultDirectory(const QString& dir)
 //-----------------------------------------------------------------------------
 void pqPythonScriptEditor::setPythonManager(pqPythonManager* manager)
 {
-  this->pythonManager = manager;
+  this->PythonManager = manager;
   this->Actions[pqPythonEditorActions::GeneralActionType::SaveFileAsMacro].setEnabled(
     manager != nullptr);
 }
@@ -213,9 +213,9 @@ void pqPythonScriptEditor::scrollToBottom()
 void pqPythonScriptEditor::updateMacroList()
 {
   auto editor = pqPythonScriptEditor::getUniqueInstance();
-  if (editor->pythonManager)
+  if (editor->PythonManager)
   {
-    editor->pythonManager->updateMacroList();
+    editor->PythonManager->updateMacroList();
   }
 }
 
