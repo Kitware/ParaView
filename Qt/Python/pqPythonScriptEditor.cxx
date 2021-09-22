@@ -64,6 +64,8 @@ void FillMenu(QMenu* menu, std::vector<QAction*>& actions)
 }
 }
 
+pqPythonScriptEditor* pqPythonScriptEditor::UniqueInstance = nullptr;
+
 //-----------------------------------------------------------------------------
 pqPythonScriptEditor::pqPythonScriptEditor(QWidget* p)
   : QMainWindow(p)
@@ -244,4 +246,34 @@ void pqPythonScriptEditor::linkTo(QTextEdit* obj)
 {
   auto instance = pqPythonScriptEditor::getUniqueInstance();
   instance->TabWidget->linkTo(obj);
+}
+
+//-----------------------------------------------------------------------------
+pqPythonScriptEditor* pqPythonScriptEditor::getUniqueInstance()
+{
+  if (!pqPythonScriptEditor::UniqueInstance)
+  {
+    pqPythonScriptEditor::UniqueInstance = new pqPythonScriptEditor(pqCoreUtilities::mainWidget());
+  }
+  return pqPythonScriptEditor::UniqueInstance;
+}
+
+//-----------------------------------------------------------------------------
+void pqPythonScriptEditor::bringFront()
+{
+  pqPythonScriptEditor* instance = pqPythonScriptEditor::getUniqueInstance();
+  instance->show();
+  instance->raise();
+}
+
+//-----------------------------------------------------------------------------
+QString pqPythonScriptEditor::getMacrosDir()
+{
+  return pqCoreUtilities::getParaViewUserDirectory() + "/Macros";
+}
+
+//-----------------------------------------------------------------------------
+QString pqPythonScriptEditor::getScriptsDir()
+{
+  return pqCoreUtilities::getParaViewUserDirectory() + "/Scripts";
 }
