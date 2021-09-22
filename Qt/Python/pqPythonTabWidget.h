@@ -202,7 +202,7 @@ protected:
 
 private:
   void updateTab(QWidget* widget);
-  void addNewTabButton();
+  void addNewTabWidget();
   void setTabCloseButton(pqPythonTextArea* widget);
   void createParaviewTraceTab();
   QLabel* getTabLabel(const pqPythonTextArea* widget) const;

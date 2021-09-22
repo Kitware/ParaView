@@ -50,7 +50,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 pqPythonTabWidget::pqPythonTabWidget(QWidget* parent)
   : QTabWidget(parent)
 {
-  this->addNewTabButton();
+  this->addNewTabWidget();
   this->createNewEmptyTab();
   this->setMovable(false);
 
@@ -293,12 +293,12 @@ void pqPythonTabWidget::setTabCloseButton(pqPythonTextArea* widget)
 }
 
 //-----------------------------------------------------------------------------
-void pqPythonTabWidget::addNewTabButton()
+void pqPythonTabWidget::addNewTabWidget()
 {
-  QLabel* label = new QLabel("+");
-  this->addTab(new QLabel("Adds a new tab"), QString());
-  this->tabBar()->setTabButton(0, QTabBar::RightSide, label);
+  QWidget* newTabWidget = new QWidget(this);
+  this->addTab(newTabWidget, "+");
 
+  // New tab widget is always the last one
   this->connect(this, &QTabWidget::tabBarClicked, [this](int index) {
     if (index == this->count() - 1)
     {
