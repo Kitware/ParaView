@@ -37,7 +37,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqCoreUtilities.h"
 #include "pqProgressManager.h"
 #include "pqProxyWidgetDialog.h"
-#include "pqProxyWidgetDialog.h"
 #include "vtkNew.h"
 #include "vtkSMParaViewPipelineController.h"
 #include "vtkSMSaveAnimationExtractsProxy.h"

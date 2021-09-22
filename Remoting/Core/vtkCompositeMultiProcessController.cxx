@@ -122,7 +122,7 @@ public:
     int Id;
     bool IsMaster;
     vtkSmartPointer<vtkMultiProcessController> MultiProcessController;
-    std::map<unsigned long, std::vector<unsigned long> > RMICallbackIdMapping;
+    std::map<unsigned long, std::vector<unsigned long>> RMICallbackIdMapping;
   };
 
   vtkCompositeInternals(vtkCompositeMultiProcessController* owner)

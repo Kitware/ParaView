@@ -36,9 +36,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class vtkSMProxy;
 /**
-* @ingroup Reactions
-* Reaction for copying sources/filters.
-*/
+ * @ingroup Reactions
+ * Reaction for copying sources/filters.
+ */
 class PQAPPLICATIONCOMPONENTS_EXPORT pqCopyReaction : public pqReaction
 {
   Q_OBJECT
@@ -49,9 +49,9 @@ public:
   ~pqCopyReaction() override;
 
   /**
-  * Copy all properties from source to dest. Uses the property names as the
-  * key for matching properties.
-  */
+   * Copy all properties from source to dest. Uses the property names as the
+   * key for matching properties.
+   */
   static void copy(vtkSMProxy* dest, vtkSMProxy* source);
 
   static void copy();
@@ -59,15 +59,14 @@ public:
 
 public Q_SLOTS:
   /**
-  * Updates the enabled state. Applications need not explicitly call
-  * this.
-  */
+   * Updates the enabled state. Applications need not explicitly call this.
+   */
   void updateEnableState() override;
 
 protected:
   /**
-  * Called when the action is triggered.
-  */
+   * Called when the action is triggered.
+   */
   void onTriggered() override
   {
     if (this->Paste)

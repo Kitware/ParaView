@@ -19,7 +19,7 @@
  * vtkSMXYChartRepresentationInitializationHelper is an initialization helper for
  * the XYChartRepresentation proxy that change default PlotCorner values
  * in case the representation is added to a XYBarCharView.
-*/
+ */
 
 #ifndef vtkSMXYChartRepresentationInitializationHelper_h
 #define vtkSMXYChartRepresentationInitializationHelper_h

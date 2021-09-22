@@ -42,7 +42,7 @@
 class vtkSMWriterFactory::vtkInternals
 {
 public:
-  static std::set<std::pair<std::string, std::string> > WriterWhitelist;
+  static std::set<std::pair<std::string, std::string>> WriterWhitelist;
   struct vtkValue
   {
     std::string Group;
@@ -165,7 +165,7 @@ public:
   std::set<std::string> Groups;
 };
 
-std::set<std::pair<std::string, std::string> > vtkSMWriterFactory::vtkInternals::WriterWhitelist;
+std::set<std::pair<std::string, std::string>> vtkSMWriterFactory::vtkInternals::WriterWhitelist;
 
 vtkStandardNewMacro(vtkSMWriterFactory);
 //----------------------------------------------------------------------------

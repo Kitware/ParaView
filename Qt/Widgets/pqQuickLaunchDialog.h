@@ -36,9 +36,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QDialog>
 
 /**
-* A borderless pop-up dialog used to show actions that the user can launch.
-* Provides search capabilities.
-*/
+ * A borderless pop-up dialog used to show actions that the user can launch.
+ * Provides search capabilities.
+ */
 class PQWIDGETS_EXPORT pqQuickLaunchDialog : public QDialog
 {
   Q_OBJECT
@@ -49,39 +49,39 @@ public:
   ~pqQuickLaunchDialog() override;
 
   /**
-  * Set the actions to be launched using this dialog.
-  * This clears all already added actions.
-  */
+   * Set the actions to be launched using this dialog.
+   * This clears all already added actions.
+   */
   void setActions(const QList<QAction*>& actions);
 
   /**
-  * Add actions to be launched using this dialog.
-  * This adds to already added actions.
-  */
+   * Add actions to be launched using this dialog.
+   * This adds to already added actions.
+   */
   void addActions(const QList<QAction*>& actions);
 
 public Q_SLOTS:
   /**
-  * Overridden to trigger the user selected action.
-  */
+   * Overridden to trigger the user selected action.
+   */
   void accept() override;
 
 protected Q_SLOTS:
   /**
-  * Called when the user chooses an item from available choices shown in the
-  * options list.
-  */
+   * Called when the user chooses an item from available choices shown in the
+   * options list.
+   */
   void currentRowChanged(int);
 
 protected:
   /**
-  * Overridden to capture key presses.
-  */
+   * Overridden to capture key presses.
+   */
   bool eventFilter(QObject* watched, QEvent* event) override;
 
   /**
-  * Given the user entered text, update the GUI.
-  */
+   * Given the user entered text, update the GUI.
+   */
   void updateSearch();
 
 private:

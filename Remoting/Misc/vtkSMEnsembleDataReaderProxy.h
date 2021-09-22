@@ -18,7 +18,7 @@
  * Examines file paths found in ensemble data files (.pve) and creates readers
  * that can read those files. Sets the correct reader for each file on the
  * corresponding VTK object.
-*/
+ */
 
 #ifndef vtkSMEnsembleDataReaderProxy_h
 #define vtkSMEnsembleDataReaderProxy_h

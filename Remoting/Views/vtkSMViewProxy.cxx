@@ -159,8 +159,7 @@ public:
     const int stereo_type = vtkSMPropertyHelper(self, "StereoType", true).GetAsInt();
 
     // determine if we're capture a stereo image that needs two passes.
-    const bool two_pass_stereo =
-      stereo_render &&
+    const bool two_pass_stereo = stereo_render &&
       (stereo_type == VTK_STEREO_RED_BLUE || stereo_type == VTK_STEREO_ANAGLYPH ||
         stereo_type == VTK_STEREO_INTERLACED || stereo_type == VTK_STEREO_DRESDEN ||
         stereo_type == VTK_STEREO_CHECKERBOARD ||
@@ -803,9 +802,7 @@ bool vtkSMViewProxy::HideOtherRepresentationsIfNeeded(vtkSMProxy* repr)
 }
 
 //----------------------------------------------------------------------------
-void vtkSMViewProxy::RepresentationVisibilityChanged(vtkSMProxy*, bool)
-{
-}
+void vtkSMViewProxy::RepresentationVisibilityChanged(vtkSMProxy*, bool) {}
 
 //----------------------------------------------------------------------------
 bool vtkSMViewProxy::GetLocalProcessSupportsInteraction()

@@ -247,8 +247,8 @@ private:
   int ScalarBarThickness;
 
   /**
-  * Length of the color bar.
-  */
+   * Length of the color bar.
+   */
   double ScalarBarLength;
 
   int AutomaticLabelFormat;

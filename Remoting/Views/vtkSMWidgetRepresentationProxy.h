@@ -20,7 +20,7 @@
  * VTK widget representation. It adds the capability of syncing the
  * appearance of server-side representation to the client-side
  * representation
-*/
+ */
 
 #ifndef vtkSMWidgetRepresentationProxy_h
 #define vtkSMWidgetRepresentationProxy_h

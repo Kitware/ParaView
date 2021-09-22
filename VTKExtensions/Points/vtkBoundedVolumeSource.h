@@ -18,7 +18,7 @@
  *
  * vtkBoundedVolumeSource generate an image data given the position and
  * scale factors for a unit volume.
-*/
+ */
 
 #ifndef vtkBoundedVolumeSource_h
 #define vtkBoundedVolumeSource_h

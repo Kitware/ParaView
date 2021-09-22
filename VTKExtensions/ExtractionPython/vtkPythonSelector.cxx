@@ -32,7 +32,7 @@
 
 class vtkPythonSelector::vtkInternals
 {
-  std::map<void*, vtkSmartPointer<vtkDataArray> > Map;
+  std::map<void*, vtkSmartPointer<vtkDataArray>> Map;
 
 public:
   static constexpr const char* MASK_ARRAYNAME = "__vtkPythonSelector__internal__array__";

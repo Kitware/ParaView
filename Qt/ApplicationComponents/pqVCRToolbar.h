@@ -38,10 +38,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class pqVCRController;
 
 /**
-* pqVCRToolbar is the toolbar with VCR controls.
-* Simply instantiate this and put it in your application UI file or
-* QMainWindow to use it.
-*/
+ * pqVCRToolbar is the toolbar with VCR controls.
+ * Simply instantiate this and put it in your application UI file or
+ * QMainWindow to use it.
+ */
 class PQAPPLICATIONCOMPONENTS_EXPORT pqVCRToolbar : public QToolBar
 {
   Q_OBJECT

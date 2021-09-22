@@ -46,9 +46,9 @@ class QMenu;
 class vtkSession;
 
 /**
-* pqPipelineBrowserWidget is the widget for the pipeline  browser. This is a
-* replacement for pqPipelineBrowser.
-*/
+ * pqPipelineBrowserWidget is the widget for the pipeline  browser. This is a
+ * replacement for pqPipelineBrowser.
+ */
 class PQCOMPONENTS_EXPORT pqPipelineBrowserWidget : public pqFlatTreeView
 {
   Q_OBJECT
@@ -59,24 +59,24 @@ public:
   ~pqPipelineBrowserWidget() override;
 
   /**
-  * Used to monitor the key press events in the tree view.
-  * Returns True if the event should not be sent to the object.
-  */
+   * Used to monitor the key press events in the tree view.
+   * Returns True if the event should not be sent to the object.
+   */
   bool eventFilter(QObject* object, QEvent* e) override;
 
   /**
-  * Set the visibility of selected items.
-  */
+   * Set the visibility of selected items.
+   */
   void setSelectionVisibility(bool visible);
 
   /**
-  * Set Annotation filter to use
-  */
+   * Set Annotation filter to use
+   */
   void enableAnnotationFilter(const QString& annotationKey);
 
   /**
-  * Disable any Annotation filter
-  */
+   * Disable any Annotation filter
+   */
   void disableAnnotationFilter();
 
   /**
@@ -86,49 +86,49 @@ public:
   void setAnnotationFilterMatching(bool matching);
 
   /**
-  * Set Session filter to use
-  */
+   * Set Session filter to use
+   */
   void enableSessionFilter(vtkSession* session);
 
   /**
-  * Disable any Session filter
-  */
+   * Disable any Session filter
+   */
   void disableSessionFilter();
 
   /**
-  * Overload of pqFlatTreeView::setModel
-  */
+   * Overload of pqFlatTreeView::setModel
+   */
   void setModel(pqPipelineModel* model);
 
   /**
-  * TODO document
-  * @note Moved from proteced
-  */
+   * TODO document
+   * @note Moved from proteced
+   */
   QModelIndex pipelineModelIndex(const QModelIndex& index) const;
   const pqPipelineModel* getPipelineModel(const QModelIndex& index) const;
 
   /**
-  * static method to sets the visibility of a pqOutputPort
-  */
+   * static method to sets the visibility of a pqOutputPort
+   */
   static void setVisibility(bool visible, pqOutputPort* port);
 
   /**
-  * Provides access to the context menu.
-  */
+   * Provides access to the context menu.
+   */
   QMenu* contextMenu() const;
 
 Q_SIGNALS:
   /**
-  * Fired when the delete key is pressed.
-  * Typically implies that the selected items need to be deleted.
-  */
+   * Fired when the delete key is pressed.
+   * Typically implies that the selected items need to be deleted.
+   */
   void deleteKey();
 
 public Q_SLOTS:
   /**
-  * Set the active view. By default connected to
-  * pqActiveObjects::viewChanged() so it keeps track of the active view.
-  */
+   * Set the active view. By default connected to
+   * pqActiveObjects::viewChanged() so it keeps track of the active view.
+   */
   void setActiveView(pqView*);
 
 protected Q_SLOTS:
@@ -137,8 +137,8 @@ protected Q_SLOTS:
 
 protected:
   /**
-  * sets the visibility for items in the indices list.
-  */
+   * sets the visibility for items in the indices list.
+   */
   void setVisibility(bool visible, const QModelIndexList& indices);
 
   void contextMenuEvent(QContextMenuEvent* e) override;
@@ -154,8 +154,8 @@ protected:
 
 private:
   /**
-  * Set up the current pqPipelineModel.
-  */
+   * Set up the current pqPipelineModel.
+   */
   void configureModel();
 
   Q_DISABLE_COPY(pqPipelineBrowserWidget)

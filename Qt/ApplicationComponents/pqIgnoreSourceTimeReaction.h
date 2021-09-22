@@ -37,10 +37,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class pqPipelineSource;
 
 /**
-* @ingroup Reactions
-* Reaction for ignoring a source's time information for animations etc.
-* It affects all selected sources.
-*/
+ * @ingroup Reactions
+ * Reaction for ignoring a source's time information for animations etc.
+ * It affects all selected sources.
+ */
 class PQAPPLICATIONCOMPONENTS_EXPORT pqIgnoreSourceTimeReaction : public pqReaction
 {
   Q_OBJECT
@@ -50,26 +50,25 @@ public:
   pqIgnoreSourceTimeReaction(QAction* parent);
 
   /**
-  * Ignore time from all selected sources.
-  */
+   * Ignore time from all selected sources.
+   */
   static void ignoreSourceTime(bool ignore);
 
   /**
-  * Ignore time for the given source.
-  */
+   * Ignore time for the given source.
+   */
   static void ignoreSourceTime(pqPipelineSource*, bool ignore);
 
 public Q_SLOTS:
   /**
-  * Updates the enabled state. Applications need not explicitly call
-  * this.
-  */
+   * Updates the enabled state. Applications need not explicitly call this.
+   */
   void updateEnableState() override;
 
 protected:
   /**
-  * Called when the action is triggered.
-  */
+   * Called when the action is triggered.
+   */
   void onTriggered() override
   {
     pqIgnoreSourceTimeReaction::ignoreSourceTime(this->parentAction()->isChecked());

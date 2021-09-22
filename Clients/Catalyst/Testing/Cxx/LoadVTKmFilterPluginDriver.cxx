@@ -24,7 +24,7 @@
 #include "vtkCPPythonStringPipeline.h"
 #endif
 
-static const char* script=R"==(
+static const char* script = R"==(
 from paraview.simple import *
 LoadDistributedPlugin("VTKmFilters", ns=globals())
 assert VTKmContour

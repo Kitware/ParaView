@@ -47,13 +47,13 @@ class QAction;
 class QMenu;
 
 /**
-* @ingroup Behaviors
-*
-* This behavior manages showing up of a context menu with sensible pipeline
-* related actions for changing color/visibility etc. when the user
-* right-clicks on top of an object in the 3D view. Currently, it only supports
-* views with proxies that vtkSMRenderViewProxy subclasses.
-*/
+ * @ingroup Behaviors
+ *
+ * This behavior manages showing up of a context menu with sensible pipeline
+ * related actions for changing color/visibility etc. when the user
+ * right-clicks on top of an object in the 3D view. Currently, it only supports
+ * views with proxies that vtkSMRenderViewProxy subclasses.
+ */
 class PQAPPLICATIONCOMPONENTS_EXPORT pqPipelineContextMenuBehavior : public QObject
 {
   Q_OBJECT
@@ -66,9 +66,9 @@ public:
 protected Q_SLOTS:
 
   /**
-  * Called when a new view is added. We add actions to the widget for context
-  * menu if the view is a render-view.
-  */
+   * Called when a new view is added. We add actions to the widget for context
+   * menu if the view is a render-view.
+   */
   void onViewAdded(pqView*);
 
 protected:
@@ -85,11 +85,11 @@ protected:
   virtual void buildMenu(pqDataRepresentation* repr, unsigned int blockIndex, int rank);
 
   /**
-  * event filter to capture the right-click. We don't directly use mechanisms
-  * from QWidget to popup the context menu since all of those mechanism seem
-  * to eat away the right button release, leaving the render window in a
-  * dragging state.
-  */
+   * event filter to capture the right-click. We don't directly use mechanisms
+   * from QWidget to popup the context menu since all of those mechanism seem
+   * to eat away the right button release, leaving the render window in a
+   * dragging state.
+   */
   bool eventFilter(QObject* caller, QEvent* e) override;
 
   QMenu* Menu;

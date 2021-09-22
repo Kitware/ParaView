@@ -39,66 +39,66 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class pqServerConfiguration;
 
 /**
-* pqServerResource encapsulates a resource in ParaView. A resource can be anything,
-* a data file, a list of data files, a state file, or a connection to a server.
-* The resource specification is based on URL-like syntax:
-* \verbatim
-* <scheme>://<scheme-specific-parameters>
-* \endverbatim
-*
-* To specify a data file, the following syntax is used:
-* \verbatim
-* <connection-scheme>:[//<server-details>]/<path-to-data-file>
-* \endverbatim
-*
-* \c connection-scheme can be
-* \li \c builtin - for builtin connections
-* \li \c cs - for client-server connections (pvserver)
-* \li \c csrc - for client-server connections with reverse-connect (pvserver rc)
-* \li \c cdsrs - for client-data-server-render-server connections (pvdataserver, pvrenderserver)
-* \li \c cdsrsrc - for cdsrs with reverse-connect.
-*
-* \c server-details are of the form \c \<serverhost-name\>:\<port\> or
-* \c \<dataserver-hostname\>:\<dataserver-port\>/\<renderserver-hostname\>:\<render-server-port\>
-* as applicable. Port numbers are always optional.
-*
-* Examples:
-* \verbatim
-* builtin:/home/user/foo.vtk
-* cs://amber1:11112/C:\Users\User\foo.vtk
-* cdsrsrc://amber2:11111/amber3:22222/home/user/foo.vtk
-* \endverbatim
-*
-* To specify a state file, the following syntax is used:
-* \verbatim
-* session:/<path-to-state-file>
-* \endverbatim
-*
-* Session files are not associated with any connection.
-*
-* To specify a server-connection, without pointing to any data file(s), the
-* following syntax may be used:
-* \verbatim
-* <connection-scheme>:[//<server-details>]
-* \endverbatim
-*
-* Examples:
-* \verbatim
-* builtin:
-* cs://amber1:11112
-* cdsrsrc://amber2:11111/amber3:22222
-* \endverbatim
-*
-* As with data-files, port numbers are always optional in when specifying
-* server-details.
-*
-* Arbitrary data can be added to a resource. ParaView leverages this mechanism
-* to save additional files in a file series when referring to a data file, or
-* details about how to connect to the server when referring to a
-* server-connection.
-*
-* \sa pqServerResources, pqServer
-*/
+ * pqServerResource encapsulates a resource in ParaView. A resource can be anything,
+ * a data file, a list of data files, a state file, or a connection to a server.
+ * The resource specification is based on URL-like syntax:
+ * \verbatim
+ * <scheme>://<scheme-specific-parameters>
+ * \endverbatim
+ *
+ * To specify a data file, the following syntax is used:
+ * \verbatim
+ * <connection-scheme>:[//<server-details>]/<path-to-data-file>
+ * \endverbatim
+ *
+ * \c connection-scheme can be
+ * \li \c builtin - for builtin connections
+ * \li \c cs - for client-server connections (pvserver)
+ * \li \c csrc - for client-server connections with reverse-connect (pvserver rc)
+ * \li \c cdsrs - for client-data-server-render-server connections (pvdataserver, pvrenderserver)
+ * \li \c cdsrsrc - for cdsrs with reverse-connect.
+ *
+ * \c server-details are of the form \c \<serverhost-name\>:\<port\> or
+ * \c \<dataserver-hostname\>:\<dataserver-port\>/\<renderserver-hostname\>:\<render-server-port\>
+ * as applicable. Port numbers are always optional.
+ *
+ * Examples:
+ * \verbatim
+ * builtin:/home/user/foo.vtk
+ * cs://amber1:11112/C:\Users\User\foo.vtk
+ * cdsrsrc://amber2:11111/amber3:22222/home/user/foo.vtk
+ * \endverbatim
+ *
+ * To specify a state file, the following syntax is used:
+ * \verbatim
+ * session:/<path-to-state-file>
+ * \endverbatim
+ *
+ * Session files are not associated with any connection.
+ *
+ * To specify a server-connection, without pointing to any data file(s), the
+ * following syntax may be used:
+ * \verbatim
+ * <connection-scheme>:[//<server-details>]
+ * \endverbatim
+ *
+ * Examples:
+ * \verbatim
+ * builtin:
+ * cs://amber1:11112
+ * cdsrsrc://amber2:11111/amber3:22222
+ * \endverbatim
+ *
+ * As with data-files, port numbers are always optional in when specifying
+ * server-details.
+ *
+ * Arbitrary data can be added to a resource. ParaView leverages this mechanism
+ * to save additional files in a file series when referring to a data file, or
+ * details about how to connect to the server when referring to a
+ * server-connection.
+ *
+ * \sa pqServerResources, pqServer
+ */
 class PQCORE_EXPORT pqServerResource
 {
 public:
@@ -110,22 +110,22 @@ public:
   ~pqServerResource();
 
   /**
-  * Returns the pqServerConfiguration from which this resource was created,
-  * if any.
-  */
+   * Returns the pqServerConfiguration from which this resource was created, if
+   * any.
+   */
   const pqServerConfiguration& configuration() const;
 
   /**
-  * Returns a compact string representation of the resource in URI format
-  * Prefer using configuration->URI() if a configuration is available
-  * and not default.
-  */
+   * Returns a compact string representation of the resource in URI format
+   * Prefer using configuration->URI() if a configuration is available
+   * and not default.
+   */
   QString toURI() const;
 
   /**
-  * Returns a compact string representation of the resource including extra
-  * data
-  */
+   * Returns a compact string representation of the resource including extra
+   * data
+   */
   QString serializeString() const;
 
   /** Returns the resource scheme -
@@ -133,8 +133,8 @@ public:
   QString scheme() const;
 
   /**
-  * Sets the resource scheme
-  */
+   * Sets the resource scheme
+   */
   void setScheme(const QString&);
 
   /**
@@ -146,8 +146,8 @@ public:
   cdsrs, and cdsrsrc schemes */
   QString host() const;
   /**
-  * Sets the resource host
-  */
+   * Sets the resource host
+   */
   void setHost(const QString&);
 
   int port() const;

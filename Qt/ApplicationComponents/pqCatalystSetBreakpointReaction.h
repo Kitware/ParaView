@@ -39,11 +39,11 @@ class pqLiveInsituVisualizationManager;
 class vtkSMLiveInsituLinkProxy;
 
 /**
-* Reaction for setting a breakpoint to Catalyst CoProcessing Engine
-* for Live-Data Visualization.
-* @ingroup Reactions
-* @ingroup LiveInsitu
-*/
+ * Reaction for setting a breakpoint to Catalyst CoProcessing Engine
+ * for Live-Data Visualization.
+ * @ingroup Reactions
+ * @ingroup LiveInsitu
+ */
 
 class PQAPPLICATIONCOMPONENTS_EXPORT pqCatalystSetBreakpointReaction : public pqReaction
 {

@@ -133,7 +133,7 @@ QVariant pqPropertyLinksConnection::currentServerManagerValue(bool use_unchecked
     case pqSMAdaptor::SELECTION:
       if (this->IndexSM == -1)
       {
-        QList<QList<QVariant> > newVal =
+        QList<QList<QVariant>> newVal =
           pqSMAdaptor::getSelectionProperty(this->PropertySM, value_type);
         currentSMValue.setValue(newVal);
       }
@@ -219,7 +219,7 @@ void pqPropertyLinksConnection::setServerManagerValue(bool use_unchecked, const 
     case pqSMAdaptor::SELECTION:
       if (this->IndexSM == -1)
       {
-        QList<QList<QVariant> > theProp = value.value<QList<QList<QVariant> > >();
+        QList<QList<QVariant>> theProp = value.value<QList<QList<QVariant>>>();
         pqSMAdaptor::setSelectionProperty(this->PropertySM, theProp, value_type);
       }
       else

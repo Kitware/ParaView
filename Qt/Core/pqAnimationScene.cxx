@@ -69,7 +69,7 @@ static uint qHash(QPointer<T> p)
 class pqAnimationScene::pqInternals
 {
 public:
-  QSet<QPointer<pqAnimationCue> > Cues;
+  QSet<QPointer<pqAnimationCue>> Cues;
   QPointer<pqAnimationCue> GlobalTimeCue;
   pqInternals() = default;
 };
@@ -141,7 +141,7 @@ void pqAnimationScene::onCuesChanged()
   pqServerManagerModel* model = pqApplicationCore::instance()->getServerManagerModel();
 
   vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(this->getProxy()->GetProperty("Cues"));
-  QSet<QPointer<pqAnimationCue> > currentCues;
+  QSet<QPointer<pqAnimationCue>> currentCues;
 
   for (unsigned int cc = 0; cc < pp->GetNumberOfProxies(); cc++)
   {
@@ -153,8 +153,8 @@ void pqAnimationScene::onCuesChanged()
     }
   }
 
-  QSet<QPointer<pqAnimationCue> > added = currentCues - this->Internals->Cues;
-  QSet<QPointer<pqAnimationCue> > removed = this->Internals->Cues - currentCues;
+  QSet<QPointer<pqAnimationCue>> added = currentCues - this->Internals->Cues;
+  QSet<QPointer<pqAnimationCue>> removed = this->Internals->Cues - currentCues;
 
   foreach (pqAnimationCue* cue, removed)
   {
@@ -277,7 +277,7 @@ void pqAnimationScene::initializeCue(
     QList<QVariant> maxs;
     if (index == -1 && prop)
     {
-      QList<QList<QVariant> > domains = pqSMAdaptor::getMultipleElementPropertyDomain(prop);
+      QList<QList<QVariant>> domains = pqSMAdaptor::getMultipleElementPropertyDomain(prop);
       QList<QVariant> currents = pqSMAdaptor::getMultipleElementProperty(prop);
       for (int i = 0; i < currents.size(); i++)
       {
@@ -411,7 +411,7 @@ void pqAnimationScene::removeCues(vtkSMProxy* animated_proxy)
 
   vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(this->getProxy()->GetProperty("Cues"));
 
-  QList<QPointer<pqAnimationCue> > toRemove;
+  QList<QPointer<pqAnimationCue>> toRemove;
   for (unsigned int cc = 0; cc < pp->GetNumberOfProxies(); cc++)
   {
     vtkSMProxy* cueProxy = pp->GetProxy(cc);

@@ -69,7 +69,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class pqApplyBehavior::pqInternals
 {
 public:
-  typedef QPair<vtkWeakPointer<vtkSMRepresentationProxy>, vtkWeakPointer<vtkSMViewProxy> > PairType;
+  typedef QPair<vtkWeakPointer<vtkSMRepresentationProxy>, vtkWeakPointer<vtkSMViewProxy>> PairType;
   QList<PairType> NewlyCreatedRepresentations;
 };
 

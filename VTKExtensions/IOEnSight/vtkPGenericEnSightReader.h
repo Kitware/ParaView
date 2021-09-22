@@ -18,7 +18,7 @@
  *
  * The class vtkPGenericEnSightReader allows the user to read an EnSight data
  * set without a priori knowledge of what type of EnSight data set it is.
-*/
+ */
 
 #ifndef vtkPGenericEnSightReader_h
 #define vtkPGenericEnSightReader_h

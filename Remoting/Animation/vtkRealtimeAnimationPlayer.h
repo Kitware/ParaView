@@ -16,7 +16,7 @@
  * @class   vtkRealtimeAnimationPlayer
  *
  * Animation player that plays in real time.
-*/
+ */
 
 #ifndef vtkRealtimeAnimationPlayer_h
 #define vtkRealtimeAnimationPlayer_h

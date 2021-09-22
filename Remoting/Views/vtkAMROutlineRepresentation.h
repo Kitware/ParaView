@@ -21,7 +21,7 @@
  * datasets that with streaming capabilities. It demonstrates how a
  * representation can exploit streaming capabilities provided by ParaView's
  * Render View (vtkPVRenderView).
-*/
+ */
 
 #ifndef vtkAMROutlineRepresentation_h
 #define vtkAMROutlineRepresentation_h

@@ -62,8 +62,8 @@ public:
 
 protected Q_SLOTS:
   /**
-  * Called when the action is triggered.
-  */
+   * Called when the action is triggered.
+   */
   void onTriggered() override { pqSaveExtractsReaction::generateExtracts(); }
 
 private:

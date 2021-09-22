@@ -19,7 +19,7 @@
  * vtkPVCatalystSessionCore handle catalyst based proxy which don't contains any
  * real data and therefore are not allowed to execute the VTK pipeline.
  * @ingroup LiveInsitu
-*/
+ */
 
 #ifndef vtkPVCatalystSessionCore_h
 #define vtkPVCatalystSessionCore_h

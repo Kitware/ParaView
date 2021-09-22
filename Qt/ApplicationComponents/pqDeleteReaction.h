@@ -38,9 +38,9 @@ class pqPipelineSource;
 class pqProxy;
 
 /**
-* @ingroup Reactions
-* Reaction for delete sources (all or selected only).
-*/
+ * @ingroup Reactions
+ * Reaction for delete sources (all or selected only).
+ */
 class PQAPPLICATIONCOMPONENTS_EXPORT pqDeleteReaction : public pqReaction
 {
   Q_OBJECT
@@ -48,9 +48,9 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqDeleteReaction : public pqReaction
 
 public:
   /**
-  * if delete_all is false, then only selected items will be deleted if
-  * possible.
-  */
+   * if delete_all is false, then only selected items will be deleted if
+   * possible.
+   */
   pqDeleteReaction(QAction* parent, bool delete_all = false);
 
   static void deleteAll();
@@ -58,31 +58,30 @@ public:
   static bool canDeleteSelected();
 
   /**
-  * Deletes all sources in the set, if possible.
-  * All variants of public methods on this class basically call this method
-  * with the sources set built up appropriately.
-  * The sources set is
-  * modified to remove all deleted sources. Any undeleted sources will remain
-  * in the set.
-  */
+   * Deletes all sources in the set, if possible.
+   * All variants of public methods on this class basically call this method
+   * with the sources set built up appropriately.
+   * The sources set is
+   * modified to remove all deleted sources. Any undeleted sources will remain
+   * in the set.
+   */
   static void deleteSources(const QSet<pqProxy*>& sources);
 
 public Q_SLOTS:
   /**
-  * Updates the enabled state. Applications need not explicitly call
-  * this.
-  */
+   * Updates the enabled state. Applications need not explicitly call this.
+   */
   void updateEnableState() override;
 
   /**
-  * Request deletion of a particular source.
-  */
+   * Request deletion of a particular source.
+   */
   void deleteSource(pqProxy* source);
 
 protected:
   /**
-  * Called when the action is triggered.
-  */
+   * Called when the action is triggered.
+   */
   void onTriggered() override;
 
 private:
@@ -90,9 +89,9 @@ private:
   bool DeleteAll;
 
   /**
-  * Method called just before deleting a source.
-  * Updates to the UI before deletion are done here.
-  */
+   * Method called just before deleting a source.
+   * Updates to the UI before deletion are done here.
+   */
   static void aboutToDelete(pqProxy* source);
 };
 

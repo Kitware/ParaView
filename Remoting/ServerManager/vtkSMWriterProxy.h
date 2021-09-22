@@ -21,7 +21,7 @@ PURPOSE.  See the above copyright notice for more information.
  * vtkSMWriterProxy also provides support for meta-writers. i.e. if the proxy
  * has a subproxy name "Writer" that this proxy represents a meta-writer which
  * uses the given writer as the writer to write each component.
-*/
+ */
 
 #ifndef vtkSMWriterProxy_h
 #define vtkSMWriterProxy_h

@@ -34,7 +34,7 @@
  * the selected output arrays to be cleared out.  This class saves and
  * restores the information.
  *
-*/
+ */
 
 #ifndef vtkExodusFileSeriesReader_h
 #define vtkExodusFileSeriesReader_h

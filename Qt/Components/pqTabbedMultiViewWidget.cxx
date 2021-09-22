@@ -49,7 +49,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMSaveScreenshotProxy.h"
-#include "vtkSMSaveScreenshotProxy.h"
 #include "vtkSMSessionProxyManager.h"
 #include "vtkSMTrace.h"
 #include "vtkSMUtilities.h"
@@ -203,7 +202,7 @@ class pqTabbedMultiViewWidget::pqInternals
   bool DecorationsVisibility = true;
 
   // keeps tracks of pqMultiViewWidget instances.
-  QMap<pqServer*, QList<QPointer<pqMultiViewWidget> > > TabWidgets;
+  QMap<pqServer*, QList<QPointer<pqMultiViewWidget>>> TabWidgets;
 
   QString FilterAnnotationKey;
   bool FilterAnnotationMatching = true;
@@ -343,9 +342,9 @@ public:
     this->TabWidgets.remove(server);
   }
 
-  QList<QPointer<pqMultiViewWidget> > widgets() const
+  QList<QPointer<pqMultiViewWidget>> widgets() const
   {
-    QList<QPointer<pqMultiViewWidget> > wgs;
+    QList<QPointer<pqMultiViewWidget>> wgs;
     for (auto& list : this->TabWidgets)
     {
       wgs += list;
@@ -756,7 +755,7 @@ QSize pqTabbedMultiViewWidget::clientSize() const
 //-----------------------------------------------------------------------------
 void pqTabbedMultiViewWidget::lockViewSize(const QSize& viewSize)
 {
-  QList<QPointer<pqMultiViewWidget> > widgets = this->Internals->widgets();
+  QList<QPointer<pqMultiViewWidget>> widgets = this->Internals->widgets();
   foreach (QPointer<pqMultiViewWidget> widget, widgets)
   {
     if (widget)

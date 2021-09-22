@@ -251,9 +251,9 @@ public:
 
   void SetTransparentBackground(bool val) { vtkSMViewProxy::SetTransparentBackground(val); }
 
-  std::pair<vtkSmartPointer<vtkImageData>, vtkSmartPointer<vtkImageData> > CaptureImages()
+  std::pair<vtkSmartPointer<vtkImageData>, vtkSmartPointer<vtkImageData>> CaptureImages()
   {
-    std::pair<vtkSmartPointer<vtkImageData>, vtkSmartPointer<vtkImageData> > result;
+    std::pair<vtkSmartPointer<vtkImageData>, vtkSmartPointer<vtkImageData>> result;
     if (this->BothEyes)
     {
       vtkVLogScopeF(PARAVIEW_LOG_RENDERING_VERBOSITY(), "Capture stereo images");
@@ -666,7 +666,7 @@ vtkSmartPointer<vtkImageData> vtkSMSaveScreenshotProxy::CaptureImage()
 }
 
 //----------------------------------------------------------------------------
-std::pair<vtkSmartPointer<vtkImageData>, vtkSmartPointer<vtkImageData> >
+std::pair<vtkSmartPointer<vtkImageData>, vtkSmartPointer<vtkImageData>>
 vtkSMSaveScreenshotProxy::CapturePreppedImages()
 {
   assert(this->State != nullptr);
@@ -952,9 +952,9 @@ vtkSmartPointer<vtkImageData> vtkSMSaveScreenshotProxy::CaptureImage(
 
 namespace detail
 {
-std::pair<std::string, std::vector<std::string> > GetFormatOptions(vtkSMProxy* proxy)
+std::pair<std::string, std::vector<std::string>> GetFormatOptions(vtkSMProxy* proxy)
 {
-  using pair_type = std::pair<std::string, std::vector<std::string> >;
+  using pair_type = std::pair<std::string, std::vector<std::string>>;
   vtkPVXMLElement* hints =
     proxy->GetHints() ? proxy->GetHints()->FindNestedElementByName("FormatOptions") : nullptr;
   if (hints && hints->GetAttribute("extensions") && hints->GetAttribute("file_description"))

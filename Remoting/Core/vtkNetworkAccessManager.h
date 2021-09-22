@@ -19,7 +19,7 @@
  * activity of those connections. This is an abstract class that defines the
  * interface. Concrete implementations of this class can be written to support
  * tcp/ip socket or ssl or ssh based network connections among processes.
-*/
+ */
 
 #ifndef vtkNetworkAccessManager_h
 #define vtkNetworkAccessManager_h

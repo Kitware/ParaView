@@ -28,7 +28,7 @@
  *
  * @sa
  * vtkCleanPolyData
-*/
+ */
 
 #ifndef vtkCleanUnstructuredGridCells_h
 #define vtkCleanUnstructuredGridCells_h

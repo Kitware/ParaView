@@ -19,7 +19,7 @@
  *
  * See the vtkMPASReader proxy in readers.xml for how the properties should be
  * set up for this domain.
-*/
+ */
 
 #ifndef vtkSMIndexSelectionDomain_h
 #define vtkSMIndexSelectionDomain_h

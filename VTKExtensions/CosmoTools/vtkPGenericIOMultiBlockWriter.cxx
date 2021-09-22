@@ -84,7 +84,7 @@ int vtkPGenericIOMultiBlockWriter::FillInputPortInformation(int port, vtkInforma
 
 //----------------------------------------------------------------------------
 static inline void addCoordinates(
-  std::map<std::pair<int, std::string>, std::vector<char> >& dataArrays,
+  std::map<std::pair<int, std::string>, std::vector<char>>& dataArrays,
   gio::GenericIOWriter* writer, vtkUnstructuredGrid* grid, uint64_t blockId)
 {
   std::string xName = "x", yName = "y", zName = "z";
@@ -255,7 +255,7 @@ static inline void computeDataForArray(
 
 //----------------------------------------------------------------------------
 static inline void addArray(vtkDataArray* array, gio::GenericIOWriter* writer, int blockId,
-  std::map<std::pair<int, std::string>, std::vector<char> >& dataBuffers)
+  std::map<std::pair<int, std::string>, std::vector<char>>& dataBuffers)
 {
   if (array != nullptr)
   {
@@ -308,7 +308,7 @@ void vtkPGenericIOMultiBlockWriter::WriteData()
   }
   this->Internals->Writer = vtkGenericIOUtilities::GetWriter(
     vtkGenericIOUtilities::GetMPICommunicator(this->Controller), this->FileName);
-  std::map<std::pair<int, std::string>, std::vector<char> > dataArrays;
+  std::map<std::pair<int, std::string>, std::vector<char>> dataArrays;
   vtkFieldData* fieldData = input->GetFieldData();
   if (fieldData->HasArray("genericio_phys_origin"))
   {

@@ -20,7 +20,7 @@
  * vtkClientServerInterpreter.  Although the identifier is simply an
  * integer, this class allows vtkClientServerStream to identify the
  * integer as an object identifier.
-*/
+ */
 
 #ifndef vtkClientServerID_h
 #define vtkClientServerID_h

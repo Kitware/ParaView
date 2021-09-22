@@ -20,7 +20,7 @@
 /**
  * @class   vtkAllToNRedistributePolyData
  * @brief   do balanced redistribution of cells on from all to n processors
-*/
+ */
 
 #ifndef vtkAllToNRedistributePolyData_h
 #define vtkAllToNRedistributePolyData_h

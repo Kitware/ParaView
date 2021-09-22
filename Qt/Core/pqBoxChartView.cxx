@@ -60,9 +60,7 @@ void pqBoxChartView::onAddRepresentation(pqRepresentation* repr)
 }
 
 //-----------------------------------------------------------------------------
-void pqBoxChartView::onRemoveRepresentation(pqRepresentation*)
-{
-}
+void pqBoxChartView::onRemoveRepresentation(pqRepresentation*) {}
 
 //-----------------------------------------------------------------------------
 void pqBoxChartView::updateRepresentationVisibility(pqRepresentation* repr, bool visible)

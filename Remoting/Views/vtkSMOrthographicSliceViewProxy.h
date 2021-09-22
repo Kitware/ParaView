@@ -16,7 +16,7 @@
  * @class   vtkSMOrthographicSliceViewProxy
  *
  *
-*/
+ */
 
 #ifndef vtkSMOrthographicSliceViewProxy_h
 #define vtkSMOrthographicSliceViewProxy_h

@@ -187,7 +187,7 @@
   c->Print(cout);                                                                                  \
   c->Delete();
 
-int ParaViewCoreVTKExtensionsPrintSelf(int, char* [])
+int ParaViewCoreVTKExtensionsPrintSelf(int, char*[])
 {
   vtkObject* c;
 

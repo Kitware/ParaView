@@ -35,19 +35,19 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqInteractivePropertyWidget.h"
 
 /**
-* pqImplicitPlanePropertyWidget is a custom property widget that uses
-* "ImplicitPlaneWidgetRepresentation" to help users interactively set the origin
-* and normal for a plane. To use this widget for a property group
-* (vtkSMPropertyGroup), use "InteractivePlane" as the "panel_widget" in the
-* XML configuration for the proxy. The property group should have properties for
-* following functions:
-* \li \c Origin: a 3-tuple vtkSMDoubleVectorProperty that will be linked to the
-* origin of the interactive plane.
-* \li \c Normal: a 3-tuple vtkSMDoubleVectorProperty that will be linked to the
-* normal for the interactive plane.
-* \li \c Input: (optional) a vtkSMInputProperty that is used to get data
-* information for bounds when placing/resetting the widget.
-*/
+ * pqImplicitPlanePropertyWidget is a custom property widget that uses
+ * "ImplicitPlaneWidgetRepresentation" to help users interactively set the origin
+ * and normal for a plane. To use this widget for a property group
+ * (vtkSMPropertyGroup), use "InteractivePlane" as the "panel_widget" in the
+ * XML configuration for the proxy. The property group should have properties for
+ * following functions:
+ * \li \c Origin: a 3-tuple vtkSMDoubleVectorProperty that will be linked to the
+ * origin of the interactive plane.
+ * \li \c Normal: a 3-tuple vtkSMDoubleVectorProperty that will be linked to the
+ * normal for the interactive plane.
+ * \li \c Input: (optional) a vtkSMInputProperty that is used to get data
+ * information for bounds when placing/resetting the widget.
+ */
 class PQAPPLICATIONCOMPONENTS_EXPORT pqImplicitPlanePropertyWidget
   : public pqInteractivePropertyWidget
 {
@@ -60,53 +60,53 @@ public:
   ~pqImplicitPlanePropertyWidget() override;
 
   /**
-  * Overridden to update the DrawPlane state.
-  */
+   * Overridden to update the DrawPlane state.
+   */
   void apply() override;
   void reset() override;
 
 public Q_SLOTS:
   /**
-  * Slots used to toggle the visibility of the translucent plane.
-  */
+   * Slots used to toggle the visibility of the translucent plane.
+   */
   void showPlane() { this->setDrawPlane(true); }
   void hidePlane() { this->setDrawPlane(false); }
   void setDrawPlane(bool val);
 
   /**
-  * Set the widget normal to be along the X axis.
-  */
+   * Set the widget normal to be along the X axis.
+   */
   void useXNormal() { this->setNormal(1, 0, 0); }
 
   /**
-  * Set the widget normal to be along the Y axis.
-  */
+   * Set the widget normal to be along the Y axis.
+   */
   void useYNormal() { this->setNormal(0, 1, 0); }
 
   /**
-  * Set the widget normal to be along the Z axis.
-  */
+   * Set the widget normal to be along the Z axis.
+   */
   void useZNormal() { this->setNormal(0, 0, 1); }
 
   /**
-  * Update the widget's origin and bounds using current data bounds.
-  */
+   * Update the widget's origin and bounds using current data bounds.
+   */
   void resetToDataBounds();
 
   /**
-  * Reset the camera to be down the plane normal.
-  */
+   * Reset the camera to be down the plane normal.
+   */
   void resetCameraToNormal();
 
   /**
-  * Set the widget normal to be along the camera view direction.
-  */
+   * Set the widget normal to be along the camera view direction.
+   */
   void useCameraNormal();
 
 protected Q_SLOTS:
   /**
-  * Places the interactive widget using current data source information.
-  */
+   * Places the interactive widget using current data source information.
+   */
   void placeWidget() override;
 
 private Q_SLOTS:

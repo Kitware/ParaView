@@ -26,7 +26,7 @@
  * blocks currently in the queue.
  * @sa
  * vtkAMROutlineRepresentation, vtkAMRStreamingVolumeRepresentation.
-*/
+ */
 
 #ifndef vtkAMRStreamingPriorityQueue_h
 #define vtkAMRStreamingPriorityQueue_h

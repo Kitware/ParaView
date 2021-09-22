@@ -76,7 +76,8 @@ public:
   vtkIdType LookupValue(vtkVariant value) override;
   void LookupValue(vtkVariant value, vtkIdList* ids) override;
   void SetVariantValue(vtkIdType vtkNotUsed(index), vtkVariant vtkNotUsed(value)) override
-  { /* TODO */}
+  { /* TODO */
+  }
 
   // Description:
   // Get the address of a particular data index. Performs no checks

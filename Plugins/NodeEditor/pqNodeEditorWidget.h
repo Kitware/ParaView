@@ -163,7 +163,7 @@ private:
    *  The edge registry stores all incoming edges of a node.
    *  The key is the global identifier of the node proxy.
    */
-  std::unordered_map<int, std::vector<pqNodeEditorEdge*> > edgeRegistry;
+  std::unordered_map<int, std::vector<pqNodeEditorEdge*>> edgeRegistry;
 };
 
 #endif // pqNodeEditorWidget_h

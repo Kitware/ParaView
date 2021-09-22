@@ -31,7 +31,7 @@
  * mouse, you will rotate that sphere.  However, if you grab outside that sphere
  * and move the mouse, you will roll the view.
  *
-*/
+ */
 
 #ifndef vtkPVTrackballMultiRotate_h
 #define vtkPVTrackballMultiRotate_h

@@ -40,8 +40,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QWidget>
 
 /**
-* pqVectorWidget is an abstract widget that can be used to edit a vector.
-*/
+ * pqVectorWidget is an abstract widget that can be used to edit a vector.
+ */
 class PQWIDGETS_EXPORT pqVectorWidget : public QWidget
 {
   Q_OBJECT
@@ -85,9 +85,9 @@ private:
 };
 
 /**
-* pqVectorWidgetImpl is a templated class inherited from pqVectorWidget
-* to be used with QVector classes or QQuaternion.
-*/
+ * pqVectorWidgetImpl is a templated class inherited from pqVectorWidget
+ * to be used with QVector classes or QQuaternion.
+ */
 template <class T, unsigned int S>
 class pqVectorWidgetImpl : public pqVectorWidget
 {

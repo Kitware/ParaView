@@ -25,7 +25,7 @@
  * for representations.
  * If the chosen attribute type is not present on the data, no array
  * (or none_string if available) will be chosen.
-*/
+ */
 
 #ifndef vtkSMRepresentedArrayListDomain_h
 #define vtkSMRepresentedArrayListDomain_h

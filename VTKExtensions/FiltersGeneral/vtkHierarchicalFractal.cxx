@@ -164,7 +164,7 @@ private:
     : GridDescription(-1)
   {
   }
-  std::vector<vtkSmartPointer<vtkDataObject> > DataSets;
+  std::vector<vtkSmartPointer<vtkDataObject>> DataSets;
   std::vector<unsigned int> Levels;
   std::vector<vtkAMRBox> Boxes;
   int GridDescription;

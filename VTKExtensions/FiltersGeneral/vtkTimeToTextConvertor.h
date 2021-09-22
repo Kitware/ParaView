@@ -20,7 +20,7 @@
  * for the data time using the format specified.
  * The input to this filter is optional. If no input is specified, it will show
  * produce request time in the output.
-*/
+ */
 
 #ifndef vtkTimeToTextConvertor_h
 #define vtkTimeToTextConvertor_h

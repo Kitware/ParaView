@@ -25,7 +25,7 @@
  *
  * @par Thanks:
  * This class was contributed by SciberQuest Inc.
-*/
+ */
 
 #ifndef vtkSMProxyConfigurationFileInfo_h
 #define vtkSMProxyConfigurationFileInfo_h

@@ -105,7 +105,7 @@ std::string get_interface_address(const std::string interface_name, bool ipv6 = 
     {
       if (i->ifa_addr != nullptr && i->ifa_name != nullptr &&
         ((i->ifa_addr->sa_family == AF_INET && !ipv6) ||
-            (i->ifa_addr->sa_family == AF_INET6 && ipv6)) &&
+          (i->ifa_addr->sa_family == AF_INET6 && ipv6)) &&
         std::string(i->ifa_name) == interface_name)
       {
         char buf[1025];
@@ -202,7 +202,7 @@ mi::Sint32 vtknvindex_instance::get_cur_local_rank_id() const
   vtksys::SystemInformation sys_info;
   std::string cur_host = sys_info.GetHostname();
 
-  std::map<std::string, std::vector<mi::Sint32> >::const_iterator it =
+  std::map<std::string, std::vector<mi::Sint32>>::const_iterator it =
     m_hostname_to_rankids.find(cur_host);
   if (it == m_hostname_to_rankids.end())
     return -1;
@@ -359,7 +359,7 @@ void vtknvindex_instance::build_cluster_info()
   {
     m_is_index_viewer = false;
     cur_host_name = sys_info.GetHostname();
-    std::map<std::string, std::vector<mi::Sint32> >::const_iterator it =
+    std::map<std::string, std::vector<mi::Sint32>>::const_iterator it =
       m_hostname_to_rankids.find(cur_host_name);
     m_is_index_rank = (it != m_hostname_to_rankids.cend() && it->second[0] == cur_rank_id);
   }
@@ -913,7 +913,7 @@ bool vtknvindex_instance::setup_nvindex()
 
 #if (NVIDIA_INDEX_LIBRARY_REVISION_MAJOR > 329100 ||                                               \
   (NVIDIA_INDEX_LIBRARY_REVISION_MAJOR == 329100 && NVIDIA_INDEX_LIBRARY_REVISION_MINOR == 8100 && \
-       NVIDIA_INDEX_LIBRARY_REVISION_SUBMINOR > 3009))
+    NVIDIA_INDEX_LIBRARY_REVISION_SUBMINOR > 3009))
 
     // Skip when running with the old library version, as that would trigger a runtime warning
     if (std::string(m_nvindex_interface->get_revision()).find("329100.8100.3009,") != 0)

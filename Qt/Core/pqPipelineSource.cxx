@@ -75,8 +75,8 @@ public:
   QString Name;
   QList<pqOutputPort*> OutputPorts;
 
-  QList<vtkSmartPointer<vtkSMPropertyLink> > Links;
-  QList<vtkSmartPointer<vtkSMProxy> > ProxyListDomainProxies;
+  QList<vtkSmartPointer<vtkSMPropertyLink>> Links;
+  QList<vtkSmartPointer<vtkSMProxy>> ProxyListDomainProxies;
 
   pqPipelineSourceInternal(QString name, vtkSMProxy* proxy)
   {

@@ -38,10 +38,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class pqSettingsDialog;
 
 /**
-* @ingroup Reactions
-* pqApplicationSettingsReaction is a reaction to popup the application
-* settings dialog. It creates pqSettingsDialog when required.
-*/
+ * @ingroup Reactions
+ * pqApplicationSettingsReaction is a reaction to popup the application
+ * settings dialog. It creates pqSettingsDialog when required.
+ */
 class PQAPPLICATIONCOMPONENTS_EXPORT pqApplicationSettingsReaction : public pqReaction
 {
   Q_OBJECT
@@ -49,20 +49,20 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqApplicationSettingsReaction : public pqRe
 
 public:
   /**
-  * Constructor. Parent cannot be nullptr.
-  */
+   * Constructor. Parent cannot be nullptr.
+   */
   pqApplicationSettingsReaction(QAction* parent);
   ~pqApplicationSettingsReaction() override;
 
   /**
-  * Show the application settings dialog.
-  */
+   * Show the application settings dialog.
+   */
   static void showApplicationSettingsDialog(const QString& tabName = "");
 
 protected:
   /**
-  * Called when the action is triggered.
-  */
+   * Called when the action is triggered.
+   */
   void onTriggered() override { pqApplicationSettingsReaction::showApplicationSettingsDialog(); }
 
 private:

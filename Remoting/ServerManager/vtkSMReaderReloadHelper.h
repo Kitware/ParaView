@@ -23,7 +23,7 @@
  * using a specific property on the reader proxy for reloading, if available).
  * Use vtkSMReaderReloadHelper::ExtendFileSeries() to detect new files in a file
  * series and update the reader to use those.
-*/
+ */
 
 #ifndef vtkSMReaderReloadHelper_h
 #define vtkSMReaderReloadHelper_h

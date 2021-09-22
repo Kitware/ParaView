@@ -910,7 +910,7 @@ void vtkPVOpenVRHelper::LoadState(vtkPVXMLElement* e, vtkSMProxyLocator* locator
           gchild->GetScalarAttribute("normal1", normal.data() + 1);
           gchild->GetScalarAttribute("normal2", normal.data() + 2);
           loc.CropPlaneStates.push_back(
-            std::pair<std::array<double, 3>, std::array<double, 3> >(origin, normal));
+            std::pair<std::array<double, 3>, std::array<double, 3>>(origin, normal));
         }
       }
 
@@ -1039,7 +1039,7 @@ void vtkPVOpenVRHelper::LoadState(vtkPVXMLElement* e, vtkSMProxyLocator* locator
           child->GetScalarAttribute("normal1", normal.data() + 1);
           child->GetScalarAttribute("normal2", normal.data() + 2);
           loc.CropPlaneStates.push_back(
-            std::pair<std::array<double, 3>, std::array<double, 3> >(origin, normal));
+            std::pair<std::array<double, 3>, std::array<double, 3>>(origin, normal));
         }
       }
     }
@@ -1343,7 +1343,6 @@ public:
     {
       // use a simple vertex shader
       // remove clang option once we move to cpp11 on clang
-      // clang-format off
       std::string vshader = R"***(
         //VTK::System::Dec
         in vec4 ndCoordIn;
@@ -1366,7 +1365,6 @@ public:
       uniform sampler2D screenTex;
       void main() { fragColor = vec4(texture(screenTex, texCoords.xy).rgb, 1.0); }
         )***";
-      // clang-format on
       this->ObserverDraw =
         new vtkOpenGLQuadHelper(this->ObserverWindow, vshader.c_str(), fshader.c_str(), "");
     }
@@ -1592,9 +1590,10 @@ void vtkPVOpenVRHelper::ShowVRView()
     this->ObserverWidget->show();
 
     vtkNew<vtkEndRenderObserver> endObserver;
-    endObserver->Initialize(observerWindow, this->RenderWindow->GetDisplayFramebuffer()
-                                              ->GetColorAttachmentAsTextureObject(0)
-                                              ->GetHandle(),
+    endObserver->Initialize(observerWindow,
+      this->RenderWindow->GetDisplayFramebuffer()
+        ->GetColorAttachmentAsTextureObject(0)
+        ->GetHandle(),
       this->RenderWindow->GetSize());
     observerWindow->AddObserver(vtkCommand::RenderEvent, endObserver);
     observerWindow->SetMultiSamples(8);

@@ -18,7 +18,7 @@
  *
  *  This filter merges connected voroni tessellation regions based on the
  *  global region ID.
-*/
+ */
 
 #ifndef vtkPMergeConnected_h
 #define vtkPMergeConnected_h

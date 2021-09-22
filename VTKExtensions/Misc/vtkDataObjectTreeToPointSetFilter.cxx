@@ -43,9 +43,7 @@ vtkDataObjectTreeToPointSetFilter::vtkDataObjectTreeToPointSetFilter()
 }
 
 //----------------------------------------------------------------------------
-vtkDataObjectTreeToPointSetFilter::~vtkDataObjectTreeToPointSetFilter()
-{
-}
+vtkDataObjectTreeToPointSetFilter::~vtkDataObjectTreeToPointSetFilter() = default;
 
 //----------------------------------------------------------------------------
 int vtkDataObjectTreeToPointSetFilter::RequestDataObject(vtkInformation* vtkNotUsed(request),
@@ -71,8 +69,9 @@ int vtkDataObjectTreeToPointSetFilter::RequestDataObject(vtkInformation* vtkNotU
     vtkInformation* info = outputVector->GetInformationObject(0);
     vtkDataObject* output = info->Get(vtkDataObject::DATA_OBJECT());
 
-    if (!output || (vtkDataObjectTypes::GetTypeIdFromClassName(output->GetClassName()) !=
-                     this->OutputDataSetType))
+    if (!output ||
+      (vtkDataObjectTypes::GetTypeIdFromClassName(output->GetClassName()) !=
+        this->OutputDataSetType))
     {
       vtkSmartPointer<vtkDataObject> newOutput;
       newOutput.TakeReference(vtkDataObjectTypes::NewDataObject(this->OutputDataSetType));

@@ -38,36 +38,38 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QObject>
 
 /**
-* QListWidgetItem subclass with additional signals, slots, and properties
-*/
-class PQWIDGETS_EXPORT pqListWidgetItemObject : public QObject, public QListWidgetItem
+ * QListWidgetItem subclass with additional signals, slots, and properties
+ */
+class PQWIDGETS_EXPORT pqListWidgetItemObject
+  : public QObject
+  , public QListWidgetItem
 {
   Q_OBJECT
   Q_PROPERTY(bool checked READ isChecked WRITE setChecked)
 public:
   /**
-  * construct list widget item to for QListWidget with a string
-  */
+   * construct list widget item to for QListWidget with a string
+   */
   pqListWidgetItemObject(const QString& t, QListWidget* p);
   /**
-  * overload setData() to emit changed signal
-  */
+   * overload setData() to emit changed signal
+   */
   void setData(int role, const QVariant& v) override;
 
 public Q_SLOTS:
   /**
-  * get the check true/false
-  */
+   * get the check true/false
+   */
   bool isChecked() const;
   /**
-  * set the check state true/false
-  */
+   * set the check state true/false
+   */
   void setChecked(bool v);
 
 Q_SIGNALS:
   /**
-  * signal check state changed
-  */
+   * signal check state changed
+   */
   void checkedStateChanged(bool);
 };
 

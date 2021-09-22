@@ -364,9 +364,8 @@ bool TestHexahedronUnstructuredGrid()
     2, 0, 1, 2, 0, 1, 2, 0, 1, 2 };
   coords_node["values/y"] = std::vector<float>{ 0, 0, 0, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1,
     1, 1, 1, 1, 1, 1, 1, 1, 1, 1 };
-  coords_node["values/z"] = std::vector<float>{
-    0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 2, 2, 2, 3, 3, 3, 4, 4, 4, 5, 5, 5, 6, 6, 6,
-  };
+  coords_node["values/z"] = std::vector<float>{ 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 2, 2, 2, 3, 3,
+    3, 4, 4, 4, 5, 5, 5, 6, 6, 6 };
 
   auto topologies_node0 = expected_node["topologies/mesh"];
   topologies_node0["type"] = "unstructured";
@@ -442,9 +441,8 @@ bool TestTetrahedronUnstructuredGrid()
     2, 0, 1, 2, 0, 1, 2, 0, 1, 2 };
   coords_node["values/y"] = std::vector<float>{ 0, 0, 0, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1,
     1, 1, 1, 1, 1, 1, 1, 1, 1, 1 };
-  coords_node["values/z"] = std::vector<float>{
-    0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 2, 2, 2, 3, 3, 3, 4, 4, 4, 5, 5, 5, 6, 6, 6,
-  };
+  coords_node["values/z"] = std::vector<float>{ 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 2, 2, 2, 3, 3,
+    3, 4, 4, 4, 5, 5, 5, 6, 6, 6 };
 
   auto topologies_node = expected_node["topologies/mesh"];
   topologies_node["type"] = "unstructured";
@@ -519,9 +517,8 @@ bool TestQuadUnstructuredGrid()
     2, 0, 1, 2, 0, 1, 2, 0, 1, 2 };
   coords_node["values/y"] = std::vector<float>{ 0, 0, 0, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1,
     1, 1, 1, 1, 1, 1, 1, 1, 1, 1 };
-  coords_node["values/z"] = std::vector<float>{
-    0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 2, 2, 2, 3, 3, 3, 4, 4, 4, 5, 5, 5, 6, 6, 6,
-  };
+  coords_node["values/z"] = std::vector<float>{ 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 2, 2, 2, 3, 3,
+    3, 4, 4, 4, 5, 5, 5, 6, 6, 6 };
 
   auto topologies_node = expected_node["topologies/mesh"];
   topologies_node["type"] = "unstructured";
@@ -595,9 +592,8 @@ bool TestTriangleUnstructuredGrid()
     2, 0, 1, 2, 0, 1, 2, 0, 1, 2 };
   coords_node["values/y"] = std::vector<float>{ 0, 0, 0, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1,
     1, 1, 1, 1, 1, 1, 1, 1, 1, 1 };
-  coords_node["values/z"] = std::vector<float>{
-    0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 2, 2, 2, 3, 3, 3, 4, 4, 4, 5, 5, 5, 6, 6, 6,
-  };
+  coords_node["values/z"] = std::vector<float>{ 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 2, 2, 2, 3, 3,
+    3, 4, 4, 4, 5, 5, 5, 6, 6, 6 };
 
   auto topologies_node = expected_node["topologies/mesh"];
   topologies_node["type"] = "unstructured";
@@ -671,9 +667,8 @@ bool TestLineUnstructuredGrid()
     2, 0, 1, 2, 0, 1, 2, 0, 1, 2 };
   coords_node["values/y"] = std::vector<float>{ 0, 0, 0, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1,
     1, 1, 1, 1, 1, 1, 1, 1, 1, 1 };
-  coords_node["values/z"] = std::vector<float>{
-    0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 2, 2, 2, 3, 3, 3, 4, 4, 4, 5, 5, 5, 6, 6, 6,
-  };
+  coords_node["values/z"] = std::vector<float>{ 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 2, 2, 2, 3, 3,
+    3, 4, 4, 4, 5, 5, 5, 6, 6, 6 };
 
   auto topologies_node = expected_node["topologies/mesh"];
   topologies_node["type"] = "unstructured";
@@ -743,9 +738,8 @@ bool TestPointUnstructuredGrid()
     2, 0, 1, 2, 0, 1, 2, 0, 1, 2 };
   coords_node["values/y"] = std::vector<float>{ 0, 0, 0, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1,
     1, 1, 1, 1, 1, 1, 1, 1, 1, 1 };
-  coords_node["values/z"] = std::vector<float>{
-    0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 2, 2, 2, 3, 3, 3, 4, 4, 4, 5, 5, 5, 6, 6, 6,
-  };
+  coords_node["values/z"] = std::vector<float>{ 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 2, 2, 2, 3, 3,
+    3, 4, 4, 4, 5, 5, 5, 6, 6, 6 };
 
   auto topologies_node = expected_node["topologies/mesh"];
   topologies_node["type"] = "unstructured";
@@ -793,7 +787,7 @@ bool TestUnstructuredGrid()
   return is_success;
 }
 
-int TestDataObjectToConduit(int, char* [])
+int TestDataObjectToConduit(int, char*[])
 {
   bool is_success = true;
 

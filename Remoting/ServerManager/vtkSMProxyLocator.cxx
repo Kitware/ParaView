@@ -26,7 +26,7 @@
 class vtkSMProxyLocator::vtkInternal
 {
 public:
-  typedef std::map<vtkTypeUInt32, vtkSmartPointer<vtkSMProxy> > ProxiesType;
+  typedef std::map<vtkTypeUInt32, vtkSmartPointer<vtkSMProxy>> ProxiesType;
   ProxiesType Proxies;
   ProxiesType AssignedProxies;
 };

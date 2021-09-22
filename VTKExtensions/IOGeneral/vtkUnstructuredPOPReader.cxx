@@ -498,8 +498,8 @@ int vtkUnstructuredPOPReader::ProcessGrid(
     static_cast<size_t>(subExtent[3] - subExtent[2] + 1),
     static_cast<size_t>(subExtent[1] - subExtent[0] + 1) };
 
-  ptrdiff_t rStride[3] = { (ptrdiff_t) this->Stride[2], (ptrdiff_t) this->Stride[1],
-    (ptrdiff_t) this->Stride[0] };
+  ptrdiff_t rStride[3] = { (ptrdiff_t)this->Stride[2], (ptrdiff_t)this->Stride[1],
+    (ptrdiff_t)this->Stride[0] };
 
   // initialize memory (raw data space, x y z axis space) and rectilinear grid
   bool firstPass = true;
@@ -775,7 +775,7 @@ bool vtkUnstructuredPOPReader::Transform(vtkUnstructuredGrid* grid, size_t* star
     }
   }
 
-  size_t rStride[2] = { (size_t) this->Stride[1], (size_t) this->Stride[0] };
+  size_t rStride[2] = { (size_t)this->Stride[1], (size_t)this->Stride[0] };
 
   vtkPoints* points = grid->GetPoints();
 
@@ -1341,8 +1341,8 @@ void vtkUnstructuredPOPReader::CommunicateParallelVerticalVelocity(int* wholeExt
   { // other processes are depending on information from this process
     // a map from piece number/processId to information to be sent.
     // this needs to be done after this process has fully updated it's information
-    std::map<vtkIdType, std::vector<int> > sendIndexInfo;
-    std::map<vtkIdType, std::vector<float> > sendValueInfo;
+    std::map<vtkIdType, std::vector<int>> sendIndexInfo;
+    std::map<vtkIdType, std::vector<float>> sendValueInfo;
     vtkNew<vtkIdList> pieceIds;
     int numberOfPieces = controller->GetNumberOfProcesses();
     for (vtkIdType column = pointIterator.BeginColumn(); column != pointIterator.EndColumn();
@@ -1372,7 +1372,7 @@ void vtkUnstructuredPOPReader::CommunicateParallelVerticalVelocity(int* wholeExt
       }
     }
     std::vector<vtkMPICommunicator::Request> requests;
-    for (std::map<vtkIdType, std::vector<int> >::iterator it = sendIndexInfo.begin();
+    for (std::map<vtkIdType, std::vector<int>>::iterator it = sendIndexInfo.begin();
          it != sendIndexInfo.end(); it++)
     {
       requests.push_back(vtkMPICommunicator::Request());

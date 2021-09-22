@@ -34,9 +34,7 @@ vtkCompositeDataToUnstructuredGridFilter::vtkCompositeDataToUnstructuredGridFilt
 }
 
 //----------------------------------------------------------------------------
-vtkCompositeDataToUnstructuredGridFilter::~vtkCompositeDataToUnstructuredGridFilter()
-{
-}
+vtkCompositeDataToUnstructuredGridFilter::~vtkCompositeDataToUnstructuredGridFilter() = default;
 
 //----------------------------------------------------------------------------
 int vtkCompositeDataToUnstructuredGridFilter::RequestData(vtkInformation* vtkNotUsed(request),

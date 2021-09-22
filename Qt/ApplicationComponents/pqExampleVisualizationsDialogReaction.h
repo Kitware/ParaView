@@ -35,11 +35,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqReaction.h"
 
 /**
-* @ingroup Reactions
-*
-* pqExampleVisualizationsDialogReaction is used to show the
-* pqExampleVisualizationsDialog when the action is triggered.
-*/
+ * @ingroup Reactions
+ *
+ * pqExampleVisualizationsDialogReaction is used to show the
+ * pqExampleVisualizationsDialog when the action is triggered.
+ */
 class PQAPPLICATIONCOMPONENTS_EXPORT pqExampleVisualizationsDialogReaction : public pqReaction
 {
   Q_OBJECT
@@ -50,14 +50,14 @@ public:
   ~pqExampleVisualizationsDialogReaction() override;
 
   /**
-  * Shows the example visualizations dialog.
-  */
+   * Shows the example visualizations dialog.
+   */
   static void showExampleVisualizationsDialog();
 
 protected:
   /**
-  * Called when the action is triggered.
-  */
+   * Called when the action is triggered.
+   */
   void onTriggered() override
   {
     pqExampleVisualizationsDialogReaction::showExampleVisualizationsDialog();

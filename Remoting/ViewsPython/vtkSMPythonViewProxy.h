@@ -17,7 +17,7 @@
  * @brief   Superclass for all view proxies
  *
  * vtkSMPythonViewProxy is a view proxy for the vtkPythonView.
-*/
+ */
 
 #ifndef vtkSMPythonViewProxy_h
 #define vtkSMPythonViewProxy_h

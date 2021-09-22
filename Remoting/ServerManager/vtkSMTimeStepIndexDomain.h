@@ -21,7 +21,7 @@
  * It requires a vtkSMSourceProxy to do this.
  * @sa
  * vtkSMIntRangeDomain
-*/
+ */
 
 #ifndef vtkSMTimeStepIndexDomain_h
 #define vtkSMTimeStepIndexDomain_h

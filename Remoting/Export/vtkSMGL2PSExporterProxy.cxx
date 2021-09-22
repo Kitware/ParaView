@@ -35,8 +35,9 @@ vtkSMGL2PSExporterProxy::~vtkSMGL2PSExporterProxy() = default;
 //----------------------------------------------------------------------------
 bool vtkSMGL2PSExporterProxy::CanExport(vtkSMProxy* proxy)
 {
-  return proxy && ((this->ViewType == RenderView && proxy->IsA("vtkSMRenderViewProxy")) ||
-                    (this->ViewType == ContextView && proxy->IsA("vtkSMContextViewProxy")));
+  return proxy &&
+    ((this->ViewType == RenderView && proxy->IsA("vtkSMRenderViewProxy")) ||
+      (this->ViewType == ContextView && proxy->IsA("vtkSMContextViewProxy")));
 }
 
 //----------------------------------------------------------------------------

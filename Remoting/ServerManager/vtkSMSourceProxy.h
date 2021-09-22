@@ -28,7 +28,7 @@
  * about the output(s) of the VTK sources (obtained from the server)
  * @sa
  * vtkSMProxy vtkSMOutputPort vtkSMInputProperty
-*/
+ */
 
 #ifndef vtkSMSourceProxy_h
 #define vtkSMSourceProxy_h

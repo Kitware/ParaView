@@ -27,7 +27,7 @@
  * \li vtkCommand::EndEvent(callData: int:0) -- end of StillRender().
  * \li vtkCommand::StartEvent(callData: int:1) -- start of InteractiveRender().
  * \li vtkCommand::EndEvent(callData: int:1) -- end of InteractiveRender().
-*/
+ */
 
 #ifndef vtkSMViewProxy_h
 #define vtkSMViewProxy_h

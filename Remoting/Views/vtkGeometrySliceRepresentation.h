@@ -20,7 +20,7 @@
  * vtkGeometrySliceRepresentation extends vtkGeometryRepresentation to show
  * slices from the dataset. This is used for vtkPVMultiSliceView and
  * vtkPVOrthographicSliceView.
-*/
+ */
 
 #ifndef vtkGeometrySliceRepresentation_h
 #define vtkGeometrySliceRepresentation_h

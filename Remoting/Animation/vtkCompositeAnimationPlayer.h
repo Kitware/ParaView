@@ -18,7 +18,7 @@
  * This is composite animation player that can me made to play an animation
  * using the active player. It provides API to add animation players and then
  * set one of them as the active one.
-*/
+ */
 
 #ifndef vtkCompositeAnimationPlayer_h
 #define vtkCompositeAnimationPlayer_h

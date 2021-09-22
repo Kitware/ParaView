@@ -27,7 +27,7 @@
  * @par Thanks:
  * Thanks to David Thompson and Philippe Pebay from Sandia National Laboratories
  * for implementing this class.
-*/
+ */
 
 #ifndef vtkPSciVizDescriptiveStats_h
 #define vtkPSciVizDescriptiveStats_h

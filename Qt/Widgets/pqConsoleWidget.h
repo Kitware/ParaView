@@ -57,17 +57,17 @@ public:
   ~pqConsoleWidget() override;
 
   /**
-  * Returns the current formatting that will be used by printString
-  */
+   * Returns the current formatting that will be used by printString
+   */
   QTextCharFormat getFormat();
   /**
-  * Sets formatting that will be used by printString
-  */
+   * Sets formatting that will be used by printString
+   */
   void setFormat(const QTextCharFormat& Format);
 
   /**
-  * Set a completer for this console widget
-  */
+   * Set a completer for this console widget
+   */
   void setCompleter(pqConsoleWidgetCompleter* completer);
 
   QPoint getCursorPosition();
@@ -79,8 +79,8 @@ public:
 
 Q_SIGNALS:
   /**
-  * Signal emitted whenever the user enters a command
-  */
+   * Signal emitted whenever the user enters a command
+   */
   void executeCommand(const QString& Command);
 
   /**
@@ -90,14 +90,14 @@ Q_SIGNALS:
 
 public Q_SLOTS:
   /**
-  * Writes the supplied text to the console
-  */
+   * Writes the supplied text to the console
+   */
   void printString(const QString& Text);
 
   /**
-  * Updates the current command. Unlike printString, this will affect the
-  * current command being typed.
-  */
+   * Updates the current command. Unlike printString, this will affect the
+   * current command being typed.
+   */
   void printCommand(const QString& cmd);
 
   /**
@@ -106,23 +106,23 @@ public Q_SLOTS:
   QString text();
 
   /**
-  * Clears the contents of the console
-  */
+   * Clears the contents of the console
+   */
   void clear();
 
   /**
-  * Puts out an input accepting prompt.
-  * It is recommended that one uses prompt instead of printString() to print
-  * an input prompt since this call ensures that the prompt is shown on a new
-  * line.
-  */
+   * Puts out an input accepting prompt.
+   * It is recommended that one uses prompt instead of printString() to print
+   * an input prompt since this call ensures that the prompt is shown on a new
+   * line.
+   */
   void prompt(const QString& text);
 
   /**
-  * Inserts the given completion string at the cursor.  This will replace
-  * the current word that the cursor is touching with the given text.
-  * Determines the word using QTextCursor::StartOfWord, EndOfWord.
-  */
+   * Inserts the given completion string at the cursor.  This will replace
+   * the current word that the cursor is touching with the given text.
+   * Determines the word using QTextCursor::StartOfWord, EndOfWord.
+   */
   void insertCompletion(const QString& text);
 
   /**
@@ -145,9 +145,9 @@ private:
   int FontSize;
 
   /**
-  * Prints and executes the command. Used by pqConsoleWidgetEventPlayer for
-  * text playback.
-  */
+   * Prints and executes the command. Used by pqConsoleWidgetEventPlayer for
+   * text playback.
+   */
   void printAndExecuteCommand(const QString& text);
 };
 
@@ -155,10 +155,10 @@ class PQWIDGETS_EXPORT pqConsoleWidgetCompleter : public QCompleter
 {
 public:
   /**
-  * Update the completion model given a string.  The given string
-  * is the current console text between the cursor and the start of
-  * the line.
-  */
+   * Update the completion model given a string.  The given string
+   * is the current console text between the cursor and the start of
+   * the line.
+   */
   virtual void updateCompletionModel(const QString& str) = 0;
 };
 

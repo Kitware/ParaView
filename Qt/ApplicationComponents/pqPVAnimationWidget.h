@@ -36,9 +36,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqApplicationComponentsModule.h"
 
 /**
-* pqPVAnimationWidget is subclass of pqAnimationViewWidget that connects with
-* the pqAnimationManager maintained by pqPVApplicationCore.
-*/
+ * pqPVAnimationWidget is subclass of pqAnimationViewWidget that connects with
+ * the pqAnimationManager maintained by pqPVApplicationCore.
+ */
 class PQAPPLICATIONCOMPONENTS_EXPORT pqPVAnimationWidget : public pqAnimationViewWidget
 {
   Q_OBJECT

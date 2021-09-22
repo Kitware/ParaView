@@ -129,7 +129,7 @@ struct ValuePassStateT
 
 class vtkPVRenderView::vtkInternals
 {
-  std::map<int, vtkWeakPointer<vtkPVDataRepresentation> > PropMap;
+  std::map<int, vtkWeakPointer<vtkPVDataRepresentation>> PropMap;
 
 public:
 #if VTK_MODULE_ENABLE_VTK_RenderingRayTracing
@@ -164,7 +164,7 @@ public:
 
   vtkPVDataRepresentation* GetRepresentationForPropId(int id)
   {
-    std::map<int, vtkWeakPointer<vtkPVDataRepresentation> >::iterator iter = this->PropMap.find(id);
+    std::map<int, vtkWeakPointer<vtkPVDataRepresentation>>::iterator iter = this->PropMap.find(id);
     return (iter != this->PropMap.end() ? iter->second : nullptr);
   }
 
@@ -2177,7 +2177,7 @@ bool vtkPVRenderView::GetRenderEmptyImages()
   int ptype = vtkProcessModule::GetProcessType();
   if (this->RenderEmptyImages &&
     ((ptype == vtkProcessModule::PROCESS_SERVER) || (ptype == vtkProcessModule::PROCESS_BATCH) ||
-        (ptype == vtkProcessModule::PROCESS_RENDER_SERVER)) &&
+      (ptype == vtkProcessModule::PROCESS_RENDER_SERVER)) &&
     (vtkProcessModule::GetProcessModule()->GetNumberOfLocalPartitions() > 1))
   {
     return true;

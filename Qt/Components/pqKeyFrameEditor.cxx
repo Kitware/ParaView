@@ -116,7 +116,9 @@ private:
 
 //-----------------------------------------------------------------------------
 // model model for key frame values
-class pqKeyFrameItem : public QObject, public QStandardItem
+class pqKeyFrameItem
+  : public QObject
+  , public QStandardItem
 {
 public:
   // return an editor for the item
@@ -547,7 +549,7 @@ void pqKeyFrameEditor::writeKeyFrameData()
     this->Internal->Cue->insertKeyFrame(0);
   }
 
-  QList<QPair<int, double> > sortedKeyFrames;
+  QList<QPair<int, double>> sortedKeyFrames;
   for (int i = 0; i < newNumber; i++)
   {
     QModelIndex idx = this->Internal->Model.index(i, 0);

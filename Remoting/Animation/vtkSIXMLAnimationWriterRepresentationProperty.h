@@ -18,7 +18,7 @@
  * vtkSIXMLAnimationWriterRepresentationProperty extends vtkSIInputProperty to
  * add push-API specific to vtkXMLPVAnimationWriter to add representations while
  * assigning them unique names consistently across all processes.
-*/
+ */
 
 #ifndef vtkSIXMLAnimationWriterRepresentationProperty_h
 #define vtkSIXMLAnimationWriterRepresentationProperty_h

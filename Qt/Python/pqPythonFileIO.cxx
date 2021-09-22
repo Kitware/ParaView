@@ -48,8 +48,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
   if (!file.open(FLAGS))                                                                           \
   {                                                                                                \
     QMessageBox::warning(pqCoreUtilities::mainWidget(), QObject::tr("Sorry!"),                     \
-      QObject::tr(qPrintable(                                                                      \
-        QString("Cannot open file %1:\n%2.").arg(FILENAME).arg(file.errorString()))));             \
+      QObject::tr(                                                                                 \
+        qPrintable(QString("Cannot open file %1:\n%2.").arg(FILENAME).arg(file.errorString()))));  \
     return false;                                                                                  \
   }
 
@@ -63,8 +63,8 @@ QString GetSwapDir()
   if (!existCheck.mkpath(swapDir))
   {
     QMessageBox::warning(nullptr, QString("Sorry!"),
-      QObject::tr(qPrintable(
-        QString("Could not create user PythonSwap directory: %1.").arg(swapDir))));
+      QObject::tr(
+        qPrintable(QString("Could not create user PythonSwap directory: %1.").arg(swapDir))));
 
     return {};
   }

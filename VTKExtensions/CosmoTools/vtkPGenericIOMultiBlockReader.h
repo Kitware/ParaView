@@ -17,7 +17,7 @@
  *
  *
  *  Creates a vtkMultiBlockDataSet from a GenericIO file
-*/
+ */
 
 #ifndef vtkPGenericIOMultiBlockReader_h
 #define vtkPGenericIOMultiBlockReader_h
@@ -71,73 +71,73 @@ public:
 
   //@{
   /**
-    * Set/Get the variable name to be used as the y-axis for plotting particles.
-    */
+   * Set/Get the variable name to be used as the y-axis for plotting particles.
+   */
   vtkSetStringMacro(YAxisVariableName);
   vtkGetStringMacro(YAxisVariableName);
   //@}
 
   //@{
   /**
-    * Set/Get the variable name to be used as the z-axis for plotting particles.
-    */
+   * Set/Get the variable name to be used as the z-axis for plotting particles.
+   */
   vtkSetStringMacro(ZAxisVariableName);
   vtkGetStringMacro(ZAxisVariableName);
   //@}
 
   //@{
   /**
-    * Specify the name of the cosmology particle binary file to read
-    */
+   * Specify the name of the cosmology particle binary file to read
+   */
   vtkSetStringMacro(FileName);
   vtkGetStringMacro(FileName);
   //@}
 
   //@{
   /**
-    * Set/Get the underlying IO method the reader will employ, i.e., MPI or POSIX.
-    */
+   * Set/Get the underlying IO method the reader will employ, i.e., MPI or POSIX.
+   */
   vtkSetMacro(GenericIOType, int);
   vtkGetMacro(GenericIOType, int);
   //@}
 
   //@{
   /**
-    * Set/Get the underlying block-assignment strategy to use, i.e., ROUND_ROBIN,
-    * or RCB.
-    */
+   * Set/Get the underlying block-assignment strategy to use, i.e., ROUND_ROBIN,
+   * or RCB.
+   */
   vtkSetMacro(BlockAssignment, int);
   vtkGetMacro(BlockAssignment, int);
   //@}
 
   //@{
   /**
-    * Returns the list of arrays used to select the variables to be used
-    * for the x,y and z axis.
-    */
+   * Returns the list of arrays used to select the variables to be used
+   * for the x,y and z axis.
+   */
   vtkGetObjectMacro(ArrayList, vtkStringArray);
   //@}
 
   //@{
   /**
-    * Get the data array selection tables used to configure which data
-    * arrays are loaded by the reader.
-    */
+   * Get the data array selection tables used to configure which data
+   * arrays are loaded by the reader.
+   */
   vtkGetObjectMacro(PointDataArraySelection, vtkDataArraySelection);
   //@}
 
   //@{
   /**
-    * Set/Get a multiprocess-controller for reading in parallel.
-    * By default this parameter is set to nullptr by the constructor.
-    */
+   * Set/Get a multiprocess-controller for reading in parallel.
+   * By default this parameter is set to nullptr by the constructor.
+   */
   vtkGetMacro(Controller, vtkMultiProcessController*);
   vtkSetMacro(Controller, vtkMultiProcessController*);
   //@}
 
   /**
-    * Returns the number of arrays in the file, i.e., the number of columns.
-    */
+   * Returns the number of arrays in the file, i.e., the number of columns.
+   */
   int GetNumberOfPointArrays();
 
   /**
@@ -166,11 +166,11 @@ public:
   //@}
 
   /**
-    * Gets the ith requested halo id.
-    * If the number of requested halo ids is
-    * greater than 0, only points with those halo ids will be read in.
-    * Otherwise all points will be read in.
-    */
+   * Gets the ith requested halo id.
+   * If the number of requested halo ids is
+   * greater than 0, only points with those halo ids will be read in.
+   * Otherwise all points will be read in.
+   */
   vtkIdType GetRequestedHaloId(vtkIdType i);
 
   /**

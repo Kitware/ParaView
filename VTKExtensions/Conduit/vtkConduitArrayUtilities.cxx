@@ -43,14 +43,14 @@ using AOSArrays = vtkTypeList::Unique<
     vtkAOSDataArrayTemplate<vtkTypeInt32>, vtkAOSDataArrayTemplate<vtkTypeInt64>,
     vtkAOSDataArrayTemplate<vtkTypeUInt8>, vtkAOSDataArrayTemplate<vtkTypeUInt16>,
     vtkAOSDataArrayTemplate<vtkTypeUInt32>, vtkAOSDataArrayTemplate<vtkTypeUInt64>,
-    vtkAOSDataArrayTemplate<vtkTypeFloat32>, vtkAOSDataArrayTemplate<vtkTypeFloat64> > >::Result;
+    vtkAOSDataArrayTemplate<vtkTypeFloat32>, vtkAOSDataArrayTemplate<vtkTypeFloat64>>>::Result;
 
 using SOAArrays = vtkTypeList::Unique<
   vtkTypeList::Create<vtkSOADataArrayTemplate<vtkTypeInt8>, vtkSOADataArrayTemplate<vtkTypeInt16>,
     vtkSOADataArrayTemplate<vtkTypeInt32>, vtkSOADataArrayTemplate<vtkTypeInt64>,
     vtkSOADataArrayTemplate<vtkTypeUInt8>, vtkSOADataArrayTemplate<vtkTypeUInt16>,
     vtkSOADataArrayTemplate<vtkTypeUInt32>, vtkSOADataArrayTemplate<vtkTypeUInt64>,
-    vtkSOADataArrayTemplate<vtkTypeFloat32>, vtkSOADataArrayTemplate<vtkTypeFloat64> > >::Result;
+    vtkSOADataArrayTemplate<vtkTypeFloat32>, vtkSOADataArrayTemplate<vtkTypeFloat64>>>::Result;
 
 bool is_contiguous(const conduit_cpp::Node& node)
 {
@@ -82,10 +82,10 @@ vtkSmartPointer<ArrayT> CreateAOSArray(
 }
 
 template <typename ValueT>
-vtkSmartPointer<vtkSOADataArrayTemplate<ValueT> > CreateSOArray(
+vtkSmartPointer<vtkSOADataArrayTemplate<ValueT>> CreateSOArray(
   vtkIdType number_of_tuples, int number_of_components, const std::vector<void*>& raw_ptrs)
 {
-  auto array = vtkSmartPointer<vtkSOADataArrayTemplate<ValueT> >::New();
+  auto array = vtkSmartPointer<vtkSOADataArrayTemplate<ValueT>>::New();
   array->SetNumberOfComponents(number_of_components);
   for (int cc = 0; cc < number_of_components; ++cc)
   {
@@ -526,7 +526,7 @@ vtkSmartPointer<vtkCellArray> vtkConduitArrayUtilities::O2MRelationToVTKCellArra
 
   // Using a reduced type list for typical id types.
   using TypeList =
-    vtkTypeList::Unique<vtkTypeList::Create<vtkTypeInt32, vtkTypeInt64, vtkIdType> >::Result;
+    vtkTypeList::Unique<vtkTypeList::Create<vtkTypeInt32, vtkTypeInt64, vtkIdType>>::Result;
 
   using Dispatcher = vtkArrayDispatch::Dispatch3ByValueType<TypeList, TypeList, TypeList>;
   if (!Dispatcher::Execute(elements.GetPointer(), sizes.GetPointer(), offsets.GetPointer(), worker))

@@ -19,7 +19,7 @@
  *
  *
  * .SEE vtkAMRConnectivity
-*/
+ */
 
 #ifndef vtkAMRConnectivity_h
 #define vtkAMRConnectivity_h
@@ -95,12 +95,12 @@ protected:
 
   std::vector<std::string> VolumeArrays;
 
-  std::vector<std::vector<vtkSmartPointer<vtkIdTypeArray> > > BoundaryArrays;
-  std::vector<std::vector<int> > ReceiveList;
+  std::vector<std::vector<vtkSmartPointer<vtkIdTypeArray>>> BoundaryArrays;
+  std::vector<std::vector<int>> ReceiveList;
 
   std::vector<bool> ValidNeighbor;
-  std::vector<std::vector<std::vector<int> > > NeighborList;
-  std::vector<vtkSmartPointer<vtkIntArray> > EquivPairs;
+  std::vector<std::vector<std::vector<int>>> NeighborList;
+  std::vector<vtkSmartPointer<vtkIntArray>> EquivPairs;
 
   int FillInputPortInformation(int port, vtkInformation* info) override;
   int FillOutputPortInformation(int port, vtkInformation* info) override;

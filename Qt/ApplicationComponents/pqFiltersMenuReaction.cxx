@@ -204,8 +204,9 @@ void pqFiltersMenuReaction::updateEnableState(bool updateOnlyToolbars)
 
     int numProcs = outputPorts[0]->getServer()->getNumberOfPartitions();
     vtkSMSourceProxy* sp = vtkSMSourceProxy::SafeDownCast(prototype);
-    if (sp && ((sp->GetProcessSupport() == vtkSMSourceProxy::SINGLE_PROCESS && numProcs > 1) ||
-                (sp->GetProcessSupport() == vtkSMSourceProxy::MULTIPLE_PROCESSES && numProcs == 1)))
+    if (sp &&
+      ((sp->GetProcessSupport() == vtkSMSourceProxy::SINGLE_PROCESS && numProcs > 1) ||
+        (sp->GetProcessSupport() == vtkSMSourceProxy::MULTIPLE_PROCESSES && numProcs == 1)))
     {
       // Skip single process filters when running in multiprocesses and vice
       // versa.
@@ -335,7 +336,7 @@ pqPipelineSource* pqFiltersMenuReaction::createFilter(
   }
 
   // Get the list of selected sources.
-  QMap<QString, QList<pqOutputPort*> > namedInputs;
+  QMap<QString, QList<pqOutputPort*>> namedInputs;
   QList<pqOutputPort*> selectedOutputPorts;
 
   vtkSMProxySelectionModel* selModel = pqActiveObjects::instance().activeSourcesSelectionModel();

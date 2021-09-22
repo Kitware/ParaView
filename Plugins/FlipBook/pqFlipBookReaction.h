@@ -112,7 +112,7 @@ private:
   QTimer* Timer;
   QPointer<QShortcut> ShortCutNext;
 
-  QList<QPointer<pqDataRepresentation> > VisibleRepresentations;
+  QList<QPointer<pqDataRepresentation>> VisibleRepresentations;
   int VisibilityIndex;
 };
 

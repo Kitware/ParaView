@@ -18,7 +18,7 @@
  * vtkPVServerManagerPluginInterface defines the interface needed to be
  * implemented by a server-manager plugin i.e. a plugin that adds new
  * filters/readers/proxies etc. to ParaView.
-*/
+ */
 
 #ifndef vtkPVServerManagerPluginInterface_h
 #define vtkPVServerManagerPluginInterface_h

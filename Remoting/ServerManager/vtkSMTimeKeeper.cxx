@@ -31,10 +31,10 @@
 class vtkSMTimeKeeper::vtkInternal
 {
 public:
-  typedef std::set<vtkSmartPointer<vtkSMProxy> > ViewsType;
+  typedef std::set<vtkSmartPointer<vtkSMProxy>> ViewsType;
   ViewsType Views;
 
-  typedef std::set<vtkSmartPointer<vtkSMSourceProxy> > SourcesType;
+  typedef std::set<vtkSmartPointer<vtkSMSourceProxy>> SourcesType;
 
   // Add sources added using AddTimeSource as saved in these two sets. Those
   // that have timesteps are saved in "Sources" while those that don't are saved

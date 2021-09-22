@@ -24,7 +24,7 @@
  * the LossLessMode ivar, which is used by the composite manager to force
  * loss less compression during a still render. Additionally compressors
  * must be able to seriealize and restore their setting from a stream.
-*/
+ */
 
 #ifndef vtkImageCompressor_h
 #define vtkImageCompressor_h

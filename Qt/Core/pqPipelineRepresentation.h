@@ -31,9 +31,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
 /**
-* \file pqPipelineRepresentation.h
-* \date 4/24/2006
-*/
+ * \file pqPipelineRepresentation.h
+ * \date 4/24/2006
+ */
 
 #ifndef _pqPipelineRepresentation_h
 #define _pqPipelineRepresentation_h
@@ -50,11 +50,11 @@ class vtkPVDataSetAttributesInformation;
 class vtkSMRepresentationProxy;
 
 /**
-* This is PQ representation for a single display. A pqRepresentation represents
-* a single vtkSMRepresentationProxy. The display can be added to
-* only one render module or more (ofcouse on the same server, this class
-* doesn't worry about that.
-*/
+ * This is PQ representation for a single display. A pqRepresentation represents
+ * a single vtkSMRepresentationProxy. The display can be added to
+ * only one render module or more (ofcouse on the same server, this class
+ * doesn't worry about that.
+ */
 class PQCORE_EXPORT pqPipelineRepresentation : public pqDataRepresentation
 {
   Q_OBJECT

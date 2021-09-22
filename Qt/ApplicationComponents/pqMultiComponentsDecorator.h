@@ -37,10 +37,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vector>
 
 /**
-* pqMultiComponentsDecorator's purpose is to prevent the GUI from
-* showing Multi Components Mapping checkbox when the representation is not Volume,
-* the number of components is not valid or MapScalars is not checked.
-*/
+ * pqMultiComponentsDecorator's purpose is to prevent the GUI from
+ * showing Multi Components Mapping checkbox when the representation is not Volume,
+ * the number of components is not valid or MapScalars is not checked.
+ */
 class pqMultiComponentsDecorator : public pqPropertyWidgetDecorator
 {
   Q_OBJECT
@@ -51,8 +51,8 @@ public:
   ~pqMultiComponentsDecorator() override = default;
 
   /**
-  * Overridden to hide the widget
-  */
+   * Overridden to hide the widget
+   */
   bool canShowWidget(bool show_advanced) const override;
 
 private:

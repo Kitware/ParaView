@@ -17,7 +17,7 @@
  * @brief   is the representation
  * corresponding to a scalar bar or color legend in a Render View.
  *
-*/
+ */
 
 #ifndef vtkSMScalarBarWidgetRepresentationProxy_h
 #define vtkSMScalarBarWidgetRepresentationProxy_h

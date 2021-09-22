@@ -18,7 +18,7 @@
  * vtkPVBoxChartRepresentation is the vtkChartBox
  * subclass for box plots representation. It exposes API from
  * underlying vtkChartBox.
-*/
+ */
 
 #ifndef vtkPVBoxChartRepresentation_h
 #define vtkPVBoxChartRepresentation_h

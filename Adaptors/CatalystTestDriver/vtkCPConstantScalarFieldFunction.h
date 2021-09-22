@@ -17,7 +17,7 @@
  * @brief   Class for specifying constant scalars at points.
  *
  * Class for specifying a constant scalar field.
-*/
+ */
 
 #ifndef vtkCPConstantScalarFieldFunction_h
 #define vtkCPConstantScalarFieldFunction_h

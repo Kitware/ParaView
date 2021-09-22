@@ -23,7 +23,7 @@
  * a ruler along the input data.
  *
  * .SEE vtkRulerLineForInput
-*/
+ */
 
 #ifndef vtkRulerLineForInput_h
 #define vtkRulerLineForInput_h

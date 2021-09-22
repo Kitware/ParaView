@@ -17,7 +17,7 @@
  *
  * vtkRulerSourceRepresentation is a representation to show a ruler. The input
  * is expected to be vtkPolyData with two points.
-*/
+ */
 
 #ifndef vtkRulerSourceRepresentation_h
 #define vtkRulerSourceRepresentation_h

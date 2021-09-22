@@ -17,7 +17,7 @@
  * @brief   helper class that used selection and ray
  * casting to find the intersection point between the user picking point
  * and the concreate cell underneath.
-*/
+ */
 
 #ifndef vtkPVRayCastPickingHelper_h
 #define vtkPVRayCastPickingHelper_h

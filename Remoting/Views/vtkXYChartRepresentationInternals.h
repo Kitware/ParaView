@@ -286,7 +286,7 @@ public:
     assert(self != nullptr);
     vtkChartXY* chartXY = self->GetChart();
     this->RemoveAllPlots(chartXY);
-    std::multimap<int, std::pair<vtkTable*, TableInfo> > orderMap;
+    std::multimap<int, std::pair<vtkTable*, TableInfo>> orderMap;
     for (MapOfTables::const_iterator tablesIter = tables.begin(); tablesIter != tables.end();
          ++tablesIter)
     {

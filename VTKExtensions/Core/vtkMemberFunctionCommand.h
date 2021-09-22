@@ -66,7 +66,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * possible to get additional details about the event.
  * @sa
  * vtkCallbackCommand
-*/
+ */
 
 #ifndef vtkMemberFunctionCommand_h
 #define vtkMemberFunctionCommand_h

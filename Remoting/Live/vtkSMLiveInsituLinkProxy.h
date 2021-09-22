@@ -22,7 +22,7 @@
  * object and applies it to the InsituProxyManager as well as sending
  * modified paraview state to its object.
  * @ingroup LiveInsitu
-*/
+ */
 
 #ifndef vtkSMLiveInsituLinkProxy_h
 #define vtkSMLiveInsituLinkProxy_h

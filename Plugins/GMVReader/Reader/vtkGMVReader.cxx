@@ -18,7 +18,6 @@
 #include "vtkByteSwap.h"
 #include "vtkCallbackCommand.h"
 #include "vtkCellArray.h"
-#include "vtkCellArray.h"
 #include "vtkCellData.h"
 #include "vtkDataArraySelection.h"
 #include "vtkErrorCode.h"
@@ -61,7 +60,8 @@ namespace GMVRead
 {
 // include GMV's I/O utility provided by GMV's author, Frank Ortega (LANL).
 // import it from VisItBridge's include directories
-extern "C" {
+extern "C"
+{
 #include "gmvread.c"
 }
 
@@ -1305,9 +1305,9 @@ int vtkGMVReader::RequestData(vtkInformation* vtkNotUsed(request),
 
               for (unsigned long int i = 0; i < this->NumberOfNodes; ++i)
                 // -1 because GMV file format starts to count from 1 while here we start from 0
-                flags->SetValue(
-                  i, &GMVRead::gmv_data
-                        .chardata1[(GMVRead::gmv_data.longdata1[i] - 1) * MAXCUSTOMNAMELENGTH]);
+                flags->SetValue(i,
+                  &GMVRead::gmv_data
+                     .chardata1[(GMVRead::gmv_data.longdata1[i] - 1) * MAXCUSTOMNAMELENGTH]);
               this->Mesh->GetPointData()->AddArray(flags);
               flags->Delete();
             }
@@ -1336,9 +1336,9 @@ int vtkGMVReader::RequestData(vtkInformation* vtkNotUsed(request),
 
               for (unsigned long int i = 0; i < this->NumberOfCells; ++i)
                 // -1 because GMV file format starts to count from 1 while here we start from 0
-                flags->SetValue(
-                  i, &GMVRead::gmv_data
-                        .chardata1[(GMVRead::gmv_data.longdata1[i] - 1) * MAXCUSTOMNAMELENGTH]);
+                flags->SetValue(i,
+                  &GMVRead::gmv_data
+                     .chardata1[(GMVRead::gmv_data.longdata1[i] - 1) * MAXCUSTOMNAMELENGTH]);
               this->Mesh->GetCellData()->AddArray(flags);
               flags->Delete();
             }

@@ -17,7 +17,7 @@
  * @brief   Observe errors and warnings
  *
  * Use during testing to verify errors and warnings were emitted
-*/
+ */
 
 #ifndef vtkErrorObserver_h
 #define vtkErrorObserver_h

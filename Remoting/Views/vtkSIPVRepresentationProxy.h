@@ -16,7 +16,7 @@
  * @class   vtkSIPVRepresentationProxy
  *
  * vtkSIPVRepresentationProxy is the helper for vtkSMPVRepresentationProxy.
-*/
+ */
 
 #ifndef vtkSIPVRepresentationProxy_h
 #define vtkSIPVRepresentationProxy_h

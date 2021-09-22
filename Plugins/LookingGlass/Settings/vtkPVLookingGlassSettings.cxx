@@ -18,9 +18,7 @@
 
 vtkStandardNewMacro(vtkPVLookingGlassSettings);
 
-vtkPVLookingGlassSettings::vtkPVLookingGlassSettings()
-{
-}
+vtkPVLookingGlassSettings::vtkPVLookingGlassSettings() = default;
 
 vtkPVLookingGlassSettings::~vtkPVLookingGlassSettings()
 {

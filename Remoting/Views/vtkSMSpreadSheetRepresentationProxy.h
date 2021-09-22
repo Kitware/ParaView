@@ -18,7 +18,7 @@
  * vtkSMSpreadSheetRepresentationProxy is a representation proxy used for
  * spreadsheet view. This class overrides vtkSMRepresentationProxy to ensure
  * that the selection inputs are setup correctly.
-*/
+ */
 
 #ifndef vtkSMSpreadSheetRepresentationProxy_h
 #define vtkSMSpreadSheetRepresentationProxy_h

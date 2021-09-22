@@ -22,7 +22,7 @@
  * (or filled) in the output. This filter also handles certain non-composite
  * data objects such a tables.
  *
-*/
+ */
 
 #ifndef vtkCleanArrays_h
 #define vtkCleanArrays_h

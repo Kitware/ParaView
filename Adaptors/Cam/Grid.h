@@ -117,7 +117,7 @@ private:
 
   /// Returns (lonIndex, latIndex) for FV dynamic core (regular grid) or
   /// (s, t, face) for SE dynamic core (cube sphere grid).
-  void GetValueIndex(double lonRad, double latRad, std::vector<std::vector<int> >& index) const;
+  void GetValueIndex(double lonRad, double latRad, std::vector<std::vector<int>>& index) const;
 
   /// Points for a 2D cell surrounding value at index for 2D or (index, level) for 3D.
   void GetCellPoints(const int index[3], double cellPoints[4][3]) const;
@@ -135,7 +135,7 @@ private:
   /// index is between (0,0,0) - (NLon-1, NLon-1, NLon-1). Returns the
   /// index in the vector that has the minimum face.
   size_t CubeToIndex(double side, const std::vector<double>& cubeCoordinates, double v[3],
-    std::vector<std::vector<int> >& index) const;
+    std::vector<std::vector<int>>& index) const;
 
   /// converts from (s, t, face) to cartesian coordinates on the cube
   /// the index is double[3] because we can get indexes in between integer positions.

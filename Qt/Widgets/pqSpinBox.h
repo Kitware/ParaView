@@ -36,12 +36,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QSpinBox>
 
 /**
-* QSpinBox which fires editingFinished() signal when the value is changed
-* by steps (increments).
-* Also, this adds a new signal valueChangedAndEditingFinished() which is fired
-* after editingFinished() signal is fired and the value in the spin box indeed
-* changed.
-*/
+ * QSpinBox which fires editingFinished() signal when the value is changed
+ * by steps (increments).
+ * Also, this adds a new signal valueChangedAndEditingFinished() which is fired
+ * after editingFinished() signal is fired and the value in the spin box indeed
+ * changed.
+ */
 class PQWIDGETS_EXPORT pqSpinBox : public QSpinBox
 {
   Q_OBJECT
@@ -51,18 +51,18 @@ public:
   explicit pqSpinBox(QWidget* parent = 0);
 
   /**
-  * Virtual function that is called whenever the user triggers a step.  We are
-  * overriding this so that we can emit editingFinished() signal
-  */
+   * Virtual function that is called whenever the user triggers a step.  We are
+   * overriding this so that we can emit editingFinished() signal
+   */
   void stepBy(int steps) override;
 
 Q_SIGNALS:
   /**
-  * Unlike QSpinBox::editingFinished() which gets fired whenever the widget
-  * looses focus irrespective of if the value was indeed edited,
-  * valueChangedAndEditingFinished() is fired only when the value was changed
-  * as well.
-  */
+   * Unlike QSpinBox::editingFinished() which gets fired whenever the widget
+   * looses focus irrespective of if the value was indeed edited,
+   * valueChangedAndEditingFinished() is fired only when the value was changed
+   * as well.
+   */
   void valueChangedAndEditingFinished();
 
 private Q_SLOTS:

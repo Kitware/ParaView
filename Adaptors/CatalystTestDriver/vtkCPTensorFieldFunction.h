@@ -17,7 +17,7 @@
  * @brief   Abstract class for specifying tensor fields at points.
  *
  * Abstract class for specifying tensor fields at specified points.
-*/
+ */
 
 #ifndef vtkCPTensorFieldFunction_h
 #define vtkCPTensorFieldFunction_h

@@ -20,7 +20,7 @@
  *
  * These options can be retrieved during run-time, set using configuration file
  * or using Command Line Arguments.
-*/
+ */
 
 #ifndef vtkCommandOptions_h
 #define vtkCommandOptions_h

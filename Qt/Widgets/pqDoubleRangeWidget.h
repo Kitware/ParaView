@@ -55,8 +55,8 @@ class PQWIDGETS_EXPORT pqDoubleRangeWidget : public pqDoubleSliderWidget
 
 public:
   /**
-  * constructor requires the proxy, property
-  */
+   * constructor requires the proxy, property
+   */
   pqDoubleRangeWidget(QWidget* parent = nullptr);
   ~pqDoubleRangeWidget() override;
 

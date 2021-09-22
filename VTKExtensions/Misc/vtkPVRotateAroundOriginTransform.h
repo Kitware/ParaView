@@ -18,7 +18,7 @@
  *
  * vtkPVRotateAroundOriginTransform extend vtkPVTransform by setting an origin of rotation
  * and overriding UpdateMatrix to rotate around this point.
-*/
+ */
 
 #ifndef vtkPVRotateAroundOriginTransform_h
 #define vtkPVRotateAroundOriginTransform_h

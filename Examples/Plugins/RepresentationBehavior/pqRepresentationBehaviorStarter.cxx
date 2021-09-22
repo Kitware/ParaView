@@ -45,9 +45,7 @@ pqRepresentationBehaviorStarter::pqRepresentationBehaviorStarter(QObject* p /*=0
 }
 
 //-----------------------------------------------------------------------------
-pqRepresentationBehaviorStarter::~pqRepresentationBehaviorStarter()
-{
-}
+pqRepresentationBehaviorStarter::~pqRepresentationBehaviorStarter() = default;
 
 //-----------------------------------------------------------------------------
 void pqRepresentationBehaviorStarter::onStartup()
@@ -57,6 +55,4 @@ void pqRepresentationBehaviorStarter::onStartup()
 }
 
 //-----------------------------------------------------------------------------
-void pqRepresentationBehaviorStarter::onShutdown()
-{
-}
+void pqRepresentationBehaviorStarter::onShutdown() {}

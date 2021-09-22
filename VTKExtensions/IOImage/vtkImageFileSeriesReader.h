@@ -23,7 +23,7 @@
  * When ReadAsImageStack is true, we simply by-pass the superclass and instead
  * pass all filenames to the internal reader and then let it handle the pipeline
  * requests.
-*/
+ */
 
 #ifndef vtkImageFileSeriesReader_h
 #define vtkImageFileSeriesReader_h

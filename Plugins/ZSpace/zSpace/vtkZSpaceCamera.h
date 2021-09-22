@@ -12,12 +12,12 @@ PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
 /**
-* @class   vtkZSpaceCamera
-* @brief   Extends vtkOpenGLCamera to use custom view and projection matrix given by zSpace SDK.
+ * @class   vtkZSpaceCamera
+ * @brief   Extends vtkOpenGLCamera to use custom view and projection matrix given by zSpace SDK.
  *
  * This is needed to change the view / projection matrix during a render(), depending on the
  * vtkCamera::LeftEye value (support for stereo).
-*/
+ */
 
 #ifndef vtkZSpaceCamera_h
 #define vtkZSpaceCamera_h

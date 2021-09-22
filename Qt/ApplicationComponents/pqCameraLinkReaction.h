@@ -43,21 +43,20 @@ public:
   pqCameraLinkReaction(QAction* parent);
 
   /**
-  * Adds camera link with the active view.
-  */
+   * Adds camera link with the active view.
+   */
   static void addCameraLink();
 
 public Q_SLOTS:
   /**
-  * Updates the enabled state. Applications need not explicitly call
-  * this.
-  */
+   * Updates the enabled state. Applications need not explicitly call this.
+   */
   void updateEnableState() override;
 
 protected:
   /**
-  * Called when the action is triggered.
-  */
+   * Called when the action is triggered.
+   */
   void onTriggered() override { pqCameraLinkReaction::addCameraLink(); }
 
 private:

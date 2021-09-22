@@ -105,7 +105,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class pqApplicationCore::pqInternals
 {
 public:
-  QMap<QString, QPointer<QObject> > RegisteredManagers;
+  QMap<QString, QPointer<QObject>> RegisteredManagers;
 };
 
 //-----------------------------------------------------------------------------
@@ -352,7 +352,7 @@ void pqApplicationCore::unRegisterManager(const QString& function)
 //-----------------------------------------------------------------------------
 QObject* pqApplicationCore::manager(const QString& function)
 {
-  QMap<QString, QPointer<QObject> >::iterator iter =
+  QMap<QString, QPointer<QObject>>::iterator iter =
     this->Internal->RegisteredManagers.find(function);
   if (iter != this->Internal->RegisteredManagers.end())
   {
@@ -419,7 +419,7 @@ void pqApplicationCore::clearViewsForLoadingState(pqServer* server)
   // In anycase, the stack will be cleared, why bother recording something...
   BEGIN_UNDO_EXCLUDE();
   QList<pqProxy*> proxies = this->ServerManagerModel->findItems<pqProxy*>(server);
-  QList<QPointer<pqProxy> > to_destroy;
+  QList<QPointer<pqProxy>> to_destroy;
   foreach (pqProxy* proxy, proxies)
   {
     pqView* view = qobject_cast<pqView*>(proxy);
@@ -760,8 +760,7 @@ void pqApplicationCore::generalSettingsChanged()
 {
   if (auto pvsettings = vtkPVGeneralSettings::GetInstance())
   {
-    pqDoubleLineEdit::setGlobalPrecisionAndNotation(
-      pvsettings->GetRealNumberDisplayedPrecision(),
+    pqDoubleLineEdit::setGlobalPrecisionAndNotation(pvsettings->GetRealNumberDisplayedPrecision(),
       static_cast<pqDoubleLineEdit::RealNumberNotation>(
         pvsettings->GetRealNumberDisplayedNotation()));
   }

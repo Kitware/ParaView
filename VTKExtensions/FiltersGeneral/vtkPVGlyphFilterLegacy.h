@@ -35,7 +35,7 @@
  * doesn't not equal the number of points actually glyphed, since that depends on
  * several factors. In parallel, this filter ensures that spatial bounds are collected
  * across all ranks for generating identical sample points.
-*/
+ */
 
 #ifndef vtkPVGlyphFilterLegacy_h
 #define vtkPVGlyphFilterLegacy_h

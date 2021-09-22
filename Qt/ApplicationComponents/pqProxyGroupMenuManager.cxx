@@ -81,7 +81,7 @@ public:
     bool PreserveOrder;
     bool ShowInToolbar;
     bool HideForTests;
-    QList<QPair<QString, QString> > Proxies;
+    QList<QPair<QString, QString>> Proxies;
     CategoryInfo()
     {
       this->PreserveOrder = false;
@@ -123,10 +123,10 @@ public:
   // Proxies and Categories is what gets shown in the menu.
   ProxyInfoMap Proxies;
   CategoryInfoMap Categories;
-  QList<QPair<QString, QString> > RecentlyUsed;
+  QList<QPair<QString, QString>> RecentlyUsed;
   // list of favorites. Each pair is {filterGroup, filterPath} where filterPath
   // is the category path to access the favorite: category1;category2;...;filterName
-  QList<QPair<QString, QString> > Favorites;
+  QList<QPair<QString, QString>> Favorites;
   QSet<QString> ProxyDefinitionGroupToListen;
   QSet<unsigned long> CallBackIDs;
   QWidget Widget;
@@ -966,7 +966,7 @@ void pqProxyGroupMenuManager::lookForNewDefinitions()
   }
 
   // Loop over proxy that should be inserted inside the UI
-  QSet<QPair<QString, QString> > definitionSet;
+  QSet<QPair<QString, QString>> definitionSet;
   for (iter->InitTraversal(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
   {
     const char* group = iter->GetGroupName();

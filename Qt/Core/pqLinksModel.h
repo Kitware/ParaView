@@ -49,10 +49,9 @@ class vtkSMProxyLocator;
 class vtkPVXMLElement;
 
 /**
-* A Qt based model to represent the vtkSMLinks in the
-* server manager.
-* All links are bi-directional between two proxies.
-*/
+ * A Qt based model to represent the vtkSMLinks in the server manager.
+ * All links are bi-directional between two proxies.
+ */
 class PQCORE_EXPORT pqLinksModel : public QAbstractTableModel
 {
   Q_OBJECT
@@ -60,8 +59,8 @@ class PQCORE_EXPORT pqLinksModel : public QAbstractTableModel
 
 public:
   /**
-  * type of link (camera, proxy or property)
-  */
+   * type of link (camera, proxy or property)
+   */
   enum ItemType
   {
     Unknown,
@@ -73,145 +72,145 @@ public:
 
 public:
   /**
-  * construct a links model
-  */
+   * construct a links model
+   */
   pqLinksModel(QObject* parent = 0);
 
   /**
-  * destruct a links model
-  */
+   * destruct a links model
+   */
   ~pqLinksModel() override;
 
   // implementation to satisfy api
   /**
-  * the number of rows (number of links)
-  */
+   * the number of rows (number of links)
+   */
   int rowCount(const QModelIndex& parent = QModelIndex()) const override;
   /**
-  * the number of columns
-  */
+   * the number of columns
+   */
   int columnCount(const QModelIndex& parent = QModelIndex()) const override;
   /**
-  * data for an index
-  */
+   * data for an index
+   */
   QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override;
   /**
-  * header data
-  */
+   * header data
+   */
   QVariant headerData(
     int section, Qt::Orientation orient, int role = Qt::DisplayRole) const override;
 
   // subclass specific implementation
   /**
-  * get the type of link from model index
-  */
+   * get the type of link from model index
+   */
   ItemType getLinkType(const QModelIndex& idx) const;
   /**
-  * get the link from model index
-  */
+   * get the link from model index
+   */
   vtkSMLink* getLink(const QModelIndex& idx) const;
   /**
-  * search for a link and return model index
-  */
+   * search for a link and return model index
+   */
   QModelIndex findLink(vtkSMLink* link) const;
 
   /**
-  * search for a link using an proxy and a direction
-  * use a none direction to get input and output
-  */
+   * search for a link using an proxy and a direction
+   * use a none direction to get input and output
+   */
   int FindLinksFromProxy(vtkSMProxy* inputProxy, int direction, vtkCollection* links) const;
 
   /**
-  * get the first proxy for a link
-  */
+   * get the first proxy for a link
+   */
   vtkSMProxy* getProxy1(const QModelIndex& idx) const;
   /**
-  * get the second proxy for a link
-  */
+   * get the second proxy for a link
+   */
   vtkSMProxy* getProxy2(const QModelIndex& idx) const;
 
   /**
-  * get the first property for a link
-  */
+   * get the first property for a link
+   */
   QString getProperty1(const QModelIndex& idx) const;
   /**
-  * get the second property for a link
-  */
+   * get the second property for a link
+   */
   QString getProperty2(const QModelIndex& idx) const;
 
   /**
-  * get the name of a link
-  */
+   * get the name of a link
+   */
   QString getLinkName(const QModelIndex& idx) const;
   /**
-  * get the link from a name
-  */
+   * get the link from a name
+   */
   vtkSMLink* getLink(const QString& name) const;
 
   /**
-  * add a proxy based link
-  */
+   * add a proxy based link
+   */
   void addProxyLink(const QString& name, vtkSMProxy* proxy1, vtkSMProxy* proxy2);
 
   /**
-  * add a camera based link
-  */
+   * add a camera based link
+   */
   void addCameraLink(
     const QString& name, vtkSMProxy* proxy1, vtkSMProxy* proxy2, bool interactiveViewLink = false);
 
   /**
-  * return true if pqLinksModels contain an interactive view link associated to name
-  */
+   * return true if pqLinksModels contain an interactive view link associated to name
+   */
   bool hasInteractiveViewLink(const QString& name);
 
   /**
-  * return pointer to the interactive view link associated to name
-  */
+   * return pointer to the interactive view link associated to name
+   */
   pqInteractiveViewLink* getInteractiveViewLink(const QString& name);
 
   /**
-  * add a property based link
-  */
+   * add a property based link
+   */
   void addPropertyLink(const QString& name, vtkSMProxy* proxy1, const QString& prop1,
     vtkSMProxy* proxy2, const QString& prop2);
 
   /**
-  * add a selection based link
-  */
+   * add a selection based link
+   */
   void addSelectionLink(
     const QString& name, vtkSMProxy* proxy1, vtkSMProxy* proxy2, bool convertToIndices = true);
 
   /**
-  * remove a link by index
-  */
+   * remove a link by index
+   */
   void removeLink(const QModelIndex& idx);
   /**
-  * remove a link by name
-  */
+   * remove a link by name
+   */
   void removeLink(const QString& name);
 
   /**
-  * Return a representative proxy.
-  * It could be itself, or in the case of internal proxies, the owning
-  * pqProxy.
-  */
+   * Return a representative proxy.
+   * It could be itself, or in the case of internal proxies, the owning
+   * pqProxy.
+   */
   static pqProxy* representativeProxy(vtkSMProxy* proxy);
 
   /**
-  * return the proxy list domain for a proxy
-  * this domain is used to get internal linkable proxies
-  */
+   * return the proxy list domain for a proxy
+   * this domain is used to get internal linkable proxies
+   */
   static vtkSMProxyListDomain* proxyListDomain(vtkSMProxy* proxy);
 
 Q_SIGNALS:
   /**
-  * Fired when a link is added
-  */
+   * Fired when a link is added
+   */
   void linkAdded(int linkType);
 
   /**
-  * Fired when a link is removed
-  */
+   * Fired when a link is removed
+   */
   void linkRemoved(const QString& name);
 
 protected Q_SLOTS:
@@ -219,27 +218,27 @@ protected Q_SLOTS:
   void onSessionRemoved(pqServer*);
 
   /**
-  * method called when a state is loaded,
-  * will create interactive view link according to xml node
-  */
+   * method called when a state is loaded,
+   * will create interactive view link according to xml node
+   */
   void onStateLoaded(vtkPVXMLElement* root, vtkSMProxyLocator* locator);
 
   /**
-  * method called when state is saved
-  * Will save interactive view links in xml
-  */
+   * method called when state is saved
+   * Will save interactive view links in xml
+   */
   void onStateSaved(vtkPVXMLElement* root);
 
   /**
-  * Create a interactive view link with provided parameters
-  */
+   * Create a interactive view link with provided parameters
+   */
   void createInteractiveViewLink(const QString& name, vtkSMProxy* displayView,
     vtkSMProxy* linkedView, double xPos = 0.375, double yPos = 0.375, double xSize = 0.25,
     double ySize = 0.25);
 
   /**
-  * Convenience method used by the internal
-  */
+   * Convenience method used by the internal
+   */
   void emitLinkRemoved(const QString& name);
 
 private:

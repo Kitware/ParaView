@@ -24,7 +24,7 @@
 class vtkClientServerInterpreterInitializer::vtkInternals
 {
 public:
-  typedef std::vector<vtkWeakPointer<vtkClientServerInterpreter> > VectorOfInterpreters;
+  typedef std::vector<vtkWeakPointer<vtkClientServerInterpreter>> VectorOfInterpreters;
   VectorOfInterpreters Interpreters;
   typedef std::vector<vtkClientServerInterpreterInitializer::InterpreterInitializationCallback>
     VectorOfCallbacks;

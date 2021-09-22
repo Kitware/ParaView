@@ -26,7 +26,6 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkSphereSource.h"
 #include "vtkWeakPointer.h"
 
-/* clang-format off */
 static const char* testMultiplexerSourceProxyXML = R"==(
 <ServerManagerConfiguration>
   <ProxyGroup name="filters">
@@ -126,10 +125,7 @@ static const char* testMultiplexerSourceProxyXML = R"==(
 </ServerManagerConfiguration>
 )==";
 
-  /* clang-format on */
-
-  static bool
-  ValidateSphere(vtkSMProxy* mux)
+static bool ValidateSphere(vtkSMProxy* mux)
 {
   if (mux->GetProperty("Center") != nullptr)
   {

@@ -20,7 +20,7 @@
  * The undo action sets the property to the value that was pushed on
  * to the server previous to the modification.
  * The redo action sets the property to the modified value.
-*/
+ */
 
 #ifndef vtkSMPropertyModificationUndoElement_h
 #define vtkSMPropertyModificationUndoElement_h

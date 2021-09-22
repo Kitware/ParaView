@@ -17,7 +17,7 @@
  * @brief   Find out the Catalyst input channel name for a dataset.
  *
  * Find out the Catalyst input channel name for a dataset.
-*/
+ */
 
 #ifndef vtkPVCatalystChannelInformation_h
 #define vtkPVCatalystChannelInformation_h

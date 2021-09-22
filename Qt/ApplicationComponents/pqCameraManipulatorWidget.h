@@ -36,9 +36,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPropertyWidget.h"
 
 /**
-* pqCameraManipulatorWidget used on "Camera2DManipulators" and
-* "Camera3DManipulators" property on a RenderView proxy.
-*/
+ * pqCameraManipulatorWidget used on "Camera2DManipulators" and
+ * "Camera3DManipulators" property on a RenderView proxy.
+ */
 class PQAPPLICATIONCOMPONENTS_EXPORT pqCameraManipulatorWidget : public pqPropertyWidget
 {
   Q_OBJECT;
@@ -50,16 +50,16 @@ public:
   ~pqCameraManipulatorWidget() override;
 
   /**
-  * returns a list for the selected manipulator types. This has exactly 9
-  * items always.
-  */
+   * returns a list for the selected manipulator types. This has exactly 9
+   * items always.
+   */
   QList<QVariant> manipulatorTypes() const;
 
 public Q_SLOTS:
   /**
-  * Set the manipulator types selection. This must have exactly 9 items or
-  * less. Any missing items are treated as "None".
-  */
+   * Set the manipulator types selection. This must have exactly 9 items or
+   * less. Any missing items are treated as "None".
+   */
   void setManipulatorTypes(const QList<QVariant>& value);
 
 Q_SIGNALS:

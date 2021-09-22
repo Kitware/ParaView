@@ -18,7 +18,7 @@
  *
  * vtkSMObject is mostly to tag a class hierarchy that it belong to the
  * servermanager.
-*/
+ */
 
 #ifndef vtkSMObject_h
 #define vtkSMObject_h

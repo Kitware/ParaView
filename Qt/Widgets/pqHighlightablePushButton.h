@@ -37,9 +37,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QScopedPointer>
 
 /**
-* pqHighlightablePushButton extents QPushButton to add support for
-* highlighting the button.
-*/
+ * pqHighlightablePushButton extents QPushButton to add support for
+ * highlighting the button.
+ */
 class PQWIDGETS_EXPORT pqHighlightablePushButton : public QPushButton
 {
   Q_OBJECT
@@ -53,8 +53,8 @@ public:
 
 public Q_SLOTS:
   /**
-  * Slots to highlight (or clear the highlight).
-  */
+   * Slots to highlight (or clear the highlight).
+   */
   void highlight(bool clear = false);
   void clear() { this->highlight(true); }
 

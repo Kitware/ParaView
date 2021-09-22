@@ -23,7 +23,7 @@
  * that here the memory grows by exactly what is needed, and
  * in VTK data arrays the memory will grow by at least twice
  * what is requested.
-*/
+ */
 
 #ifndef vtkPointAccumulator_h
 #define vtkPointAccumulator_h

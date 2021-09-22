@@ -24,7 +24,7 @@
  *
  * @note This is an old class that uses old style for create widgets. Please
  * don't use it as a reference for creating similar elements.
-*/
+ */
 
 #ifndef vtkPVAxesWidget_h
 #define vtkPVAxesWidget_h

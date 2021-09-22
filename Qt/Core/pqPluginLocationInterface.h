@@ -64,18 +64,18 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QtPlugin>
 
 /**
-* Abstract interface for storing the file system location of a
-* dyanamically-loaded plugin.
-*/
+ * Abstract interface for storing the file system location of a
+ * dyanamically-loaded plugin.
+ */
 class PQCORE_EXPORT pqPluginLocationInterface
 {
 public:
   virtual ~pqPluginLocationInterface() = default;
 
   /**
-  * Called once after the plugin is loaded. If `location` is null, the plugin
-  * is static and has no file system location.
-  */
+   * Called once after the plugin is loaded. If `location` is null, the plugin
+   * is static and has no file system location.
+   */
   virtual void StoreLocation(const char* location) = 0;
 
 protected:

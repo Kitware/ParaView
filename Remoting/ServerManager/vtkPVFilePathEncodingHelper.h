@@ -19,7 +19,7 @@
  * Server side object to list, create and remove directory
  * the main reason for this helper to exist is to convert
  * the file path from utf8 to locale encoding
-*/
+ */
 
 #ifndef vtkPVFilePathEncodingHelper_h
 #define vtkPVFilePathEncodingHelper_h

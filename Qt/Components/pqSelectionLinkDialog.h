@@ -36,8 +36,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QDialog>
 
 /**
-* Dialog used to ask the user for selection link options.
-*/
+ * Dialog used to ask the user for selection link options.
+ */
 class PQCOMPONENTS_EXPORT pqSelectionLinkDialog : public QDialog
 {
   Q_OBJECT
@@ -48,15 +48,15 @@ public:
   ~pqSelectionLinkDialog() override;
 
   /**
-  * Specify if the convert to indices flag should be set to on
-  * Default behaviour is on. It can sometimes be useful to disable it,
-  * eg. A frustum selection over multiple datasets.
-  */
+   * Specify if the convert to indices flag should be set to on
+   * Default behaviour is on. It can sometimes be useful to disable it,
+   * eg. A frustum selection over multiple datasets.
+   */
   void setEnableConvertToIndices(bool enable);
 
   /**
-  * Returns if the user requested to convert to indices.
-  */
+   * Returns if the user requested to convert to indices.
+   */
   bool convertToIndices() const;
 
 private:

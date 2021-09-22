@@ -52,17 +52,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMPropertyIterator.h"
 #include "vtkSMPropertyLink.h"
 #include "vtkSMProxy.h"
-#include "vtkSMProxy.h"
-#include "vtkSMProxyLink.h"
 #include "vtkSMProxyLink.h"
 #include "vtkSMProxyListDomain.h"
 #include "vtkSMProxyLocator.h"
 #include "vtkSMProxyManager.h"
-#include "vtkSMProxyManager.h"
 #include "vtkSMProxyProperty.h"
 #include "vtkSMRenderViewProxy.h"
 #include "vtkSMSelectionLink.h"
-#include "vtkSMSessionProxyManager.h"
 #include "vtkSMSessionProxyManager.h"
 #include "vtkSMTrace.h"
 
@@ -930,7 +926,7 @@ void pqLinksModelObject::refresh()
   this->Internal->InputProxies.clear();
   this->Internal->OutputProxies.clear();
 
-  QList<vtkSMProxy *> tmpInputs, tmpOutputs;
+  QList<vtkSMProxy*> tmpInputs, tmpOutputs;
 
   int numLinks = this->link()->GetNumberOfLinkedObjects();
   for (int i = 0; i < numLinks; i++)

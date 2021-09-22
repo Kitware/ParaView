@@ -68,7 +68,7 @@ public:
 
   typedef std::vector<PortInfo> VectorOfPortInfo;
   VectorOfPortInfo ExposedPorts;
-  std::vector<vtkSmartPointer<vtkAlgorithmOutput> > OutputPorts;
+  std::vector<vtkSmartPointer<vtkAlgorithmOutput>> OutputPorts;
   bool NeedOutputPortCreation;
 };
 //*****************************************************************************

@@ -244,10 +244,10 @@ void pqCollaborationManager::onClientMessage(pqServer* server, vtkSMMessage* msg
   }
   else if (msg->HasExtension(MousePointer::view) &&
     (this->Internals->AciveSession ==
-             server->session()) && // Make sure we share the same active server
+      server->session()) && // Make sure we share the same active server
     (msg->GetExtension(MousePointer::forceShow) ||
-             (static_cast<int>(msg->client_id()) ==
-               this->activeCollaborationManager()->GetFollowedUser())))
+      (static_cast<int>(msg->client_id()) ==
+        this->activeCollaborationManager()->GetFollowedUser())))
   {
     this->showMousePointer(msg->GetExtension(MousePointer::view),
       msg->GetExtension(MousePointer::x), msg->GetExtension(MousePointer::y),

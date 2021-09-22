@@ -242,7 +242,7 @@ private:
     vtkPVStringFormatter::Push(scope, scopeName, args...);
   }
 
-  static std::stack<std::shared_ptr<vtkArgumentScope> > ScopeStack;
+  static std::stack<std::shared_ptr<vtkArgumentScope>> ScopeStack;
 };
 
 #define PV_STRING_FORMATTER_SCOPE_0(x, y) x##y

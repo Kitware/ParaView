@@ -33,7 +33,7 @@
  *
  * @par Thanks:
  * This class was contribued by SciberQuest Inc.
-*/
+ */
 
 #ifndef vtkSMProxyConfigurationWriter_h
 #define vtkSMProxyConfigurationWriter_h

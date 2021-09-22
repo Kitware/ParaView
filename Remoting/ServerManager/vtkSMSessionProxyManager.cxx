@@ -1316,7 +1316,7 @@ vtkSmartPointer<vtkPVXMLElement> vtkSMSessionProxyManager::GetXMLState(
   rootElement->AddAttribute("version", version_string.str().c_str());
 
   std::set<vtkSMProxy*> visited_proxies; // set of proxies already added.
-  std::set<std::pair<std::string, std::string> > visited_proxy_types;
+  std::set<std::pair<std::string, std::string>> visited_proxy_types;
 
   // First save the state of all proxies
   vtkSMSessionProxyManagerInternals::ProxyGroupType::iterator it =

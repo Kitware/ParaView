@@ -278,7 +278,7 @@ vtkStandardNewMacro(SpreadSheetViewMergeTables);
 
 class vtkSpreadSheetView::vtkInternals
 {
-  std::vector<std::tuple<std::string, std::string, int> > ColumnMetaData;
+  std::vector<std::tuple<std::string, std::string, int>> ColumnMetaData;
   std::map<std::string, size_t> ColumnIndexMap;
 
   void UpdateColumnMetaData(vtkTable* table)
@@ -422,7 +422,7 @@ public:
     vtkTable* clone = vtkTable::New();
 
     // sort columns for better usability.
-    std::vector<vtkSmartPointer<vtkAbstractArray> > arrays;
+    std::vector<vtkSmartPointer<vtkAbstractArray>> arrays;
     for (vtkIdType cc = 0; cc < data->GetNumberOfColumns(); cc++)
     {
       if (auto column = data->GetColumn(cc))
@@ -678,8 +678,9 @@ void vtkSpreadSheetView::ClearHiddenColumnsByLabel()
 bool vtkSpreadSheetView::IsColumnHiddenByLabel(const std::string& columnLabel)
 {
   const auto& internals = *this->Internals;
-  return columnLabel.empty() ? true : internals.HiddenColumnsByLabel.find(columnLabel) !=
-      internals.HiddenColumnsByLabel.end();
+  return columnLabel.empty()
+    ? true
+    : internals.HiddenColumnsByLabel.find(columnLabel) != internals.HiddenColumnsByLabel.end();
 }
 
 //----------------------------------------------------------------------------

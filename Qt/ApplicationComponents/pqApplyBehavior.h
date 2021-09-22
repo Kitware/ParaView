@@ -43,16 +43,16 @@ class pqProxy;
 class pqView;
 
 /**
-* @ingroup Behaviors
-* pqApplyBehavior collects the logic that needs to happen after the user hits
-* "Apply" on the pqPropertiesPanel. Since "Apply" is an important concept in
-* ParaView application, it gets its own behavior so applications can customize
-* it, if needed.
-*
-* For pqApplyBehavior to work, one needs to manually register
-* pqPropertiesPanel instance(s). pqParaViewBehaviors does that automatically
-* for pqPropertiesPanel instances available during the startup.
-*/
+ * @ingroup Behaviors
+ * pqApplyBehavior collects the logic that needs to happen after the user hits
+ * "Apply" on the pqPropertiesPanel. Since "Apply" is an important concept in
+ * ParaView application, it gets its own behavior so applications can customize
+ * it, if needed.
+ *
+ * For pqApplyBehavior to work, one needs to manually register
+ * pqPropertiesPanel instance(s). pqParaViewBehaviors does that automatically
+ * for pqPropertiesPanel instances available during the startup.
+ */
 class PQAPPLICATIONCOMPONENTS_EXPORT pqApplyBehavior : public QObject
 {
   Q_OBJECT
@@ -63,8 +63,8 @@ public:
   ~pqApplyBehavior() override;
 
   /**
-  * Register/unregister pqPropertiesPanel instances to monitor.
-  */
+   * Register/unregister pqPropertiesPanel instances to monitor.
+   */
   void registerPanel(pqPropertiesPanel* panel);
   void unregisterPanel(pqPropertiesPanel* panel);
 protected Q_SLOTS:

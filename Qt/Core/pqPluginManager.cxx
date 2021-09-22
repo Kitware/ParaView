@@ -66,7 +66,7 @@ class pqPluginManager::pqInternals
 public:
   QSet<QString> LocalHiddenPlugins;
   QSet<QString> RemoteHiddenPlugins;
-  QList<QPointer<pqServer> > Servers;
+  QList<QPointer<pqServer>> Servers;
 
   QString getXML(vtkPVPluginsInformation* info, bool remote)
   {

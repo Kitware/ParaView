@@ -34,8 +34,9 @@
 #include "vtkDataObjectAlgorithm.h"
 #include "vtkPVVTKExtensionsConduitModule.h" // for exports
 #include <memory>                            // for std::unique_ptr
-extern "C" {
-typedef void conduit_node;
+extern "C"
+{
+  typedef void conduit_node;
 }
 class VTKPVVTKEXTENSIONSCONDUIT_EXPORT vtkConduitSource : public vtkDataObjectAlgorithm
 {

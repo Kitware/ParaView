@@ -39,9 +39,9 @@ class pqDataInformationModel;
 class QTableView;
 
 /**
-* Widget for the DataInformation(or Statistics View).
-* It creates the model and the view and connects them.
-*/
+ * Widget for the DataInformation(or Statistics View).
+ * It creates the model and the view and connects them.
+ */
 class PQCOMPONENTS_EXPORT pqDataInformationWidget : public QWidget
 {
   Q_OBJECT
@@ -51,8 +51,8 @@ public:
 
 protected:
   /**
-  * Filters events received by the View.
-  */
+   * Filters events received by the View.
+   */
   bool eventFilter(QObject* object, QEvent* event) override;
 
 private Q_SLOTS:

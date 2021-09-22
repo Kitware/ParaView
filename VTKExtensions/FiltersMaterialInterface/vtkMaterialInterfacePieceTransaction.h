@@ -23,7 +23,7 @@
  *
  * The fragment to be transacted and the executing process are
  * determined implicitly by where the transaction is stored.
-*/
+ */
 
 #ifndef vtkMaterialInterfacePieceTransaction_h
 #define vtkMaterialInterfacePieceTransaction_h
@@ -81,6 +81,7 @@ public:
   int GetRemoteProc() const { return this->Data[REMOTE_PROC]; }
   //
   int GetFlatSize() const { return SIZE; }
+
 private:
   int Data[SIZE];
 };

@@ -164,8 +164,8 @@ public:
    *
    * @sa vtkDataAssembly::SelectNodes
    */
-  bool setData(const QList<QPair<QString, QVariant> >& values, int role);
-  QList<QPair<QString, QVariant> > data(int role) const;
+  bool setData(const QList<QPair<QString, QVariant>>& values, int role);
+  QList<QPair<QString, QVariant>> data(int role) const;
   //@}
 
   //@{

@@ -35,12 +35,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPropertyWidget.h"
 
 /**
-* pqCommandPropertyWidget is used for vtkSMProperty instances (not one of its
-* subclasses). It simply creates a button that the users can press. Unlike
-* other pqPropertyWidget subclasses, the result of clicking this button does
-* not affect the state of the Apply/Reset buttons. It triggers the action
-* prompted by the property immediately.
-*/
+ * pqCommandPropertyWidget is used for vtkSMProperty instances (not one of its
+ * subclasses). It simply creates a button that the users can press. Unlike
+ * other pqPropertyWidget subclasses, the result of clicking this button does
+ * not affect the state of the Apply/Reset buttons. It triggers the action
+ * prompted by the property immediately.
+ */
 class PQCOMPONENTS_EXPORT pqCommandPropertyWidget : public pqPropertyWidget
 {
   Q_OBJECT
@@ -52,8 +52,8 @@ public:
 
 protected Q_SLOTS:
   /**
-  * called when the button is clicked by the user.
-  */
+   * called when the button is clicked by the user.
+   */
   virtual void buttonClicked();
 
 private:

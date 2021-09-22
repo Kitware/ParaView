@@ -21,7 +21,7 @@
  * property (if any) on proxy B is also modified to be the same as the property
  * on the proxy A. Similarly whenever proxy A->UpdateVTKObjects() is called,
  * B->UpdateVTKObjects() is also fired.
-*/
+ */
 
 #ifndef vtkSMProxyLink_h
 #define vtkSMProxyLink_h

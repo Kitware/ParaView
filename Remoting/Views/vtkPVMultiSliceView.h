@@ -17,7 +17,7 @@
  *
  * vtkPVMultiSliceView extends vtkPVRenderView but add meta-data information
  * used by SliceRepresentation as a data model.
-*/
+ */
 
 #ifndef vtkPVMultiSliceView_h
 #define vtkPVMultiSliceView_h

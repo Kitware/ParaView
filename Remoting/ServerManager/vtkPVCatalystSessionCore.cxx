@@ -67,7 +67,7 @@ public:
   {
     std::string id = this->GenerateID(globalid, 0, nullptr);
     std::vector<std::string> keysToDelete;
-    std::map<std::string, vtkSmartPointer<vtkPVInformation> >::iterator iter;
+    std::map<std::string, vtkSmartPointer<vtkPVInformation>>::iterator iter;
     for (iter = this->DataInformationMap.begin(); iter != this->DataInformationMap.end(); iter++)
     {
       if (iter->first.find(id) == 0)
@@ -145,7 +145,7 @@ public:
 private:
   vtkWeakPointer<vtkPVCatalystSessionCore> Owner;
   unsigned long ObserverId;
-  std::map<std::string, vtkSmartPointer<vtkPVInformation> > DataInformationMap;
+  std::map<std::string, vtkSmartPointer<vtkPVInformation>> DataInformationMap;
   std::map<vtkTypeUInt32, vtkTypeUInt32> IdMap;
 };
 //****************************************************************************/

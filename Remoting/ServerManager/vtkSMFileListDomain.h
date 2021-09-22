@@ -18,7 +18,7 @@
  *
  * vtkSMFileListDomain represents a domain consisting of a list of
  * filenames. It only works with vtkSMStringVectorProperty.
-*/
+ */
 
 #ifndef vtkSMFileListDomain_h
 #define vtkSMFileListDomain_h

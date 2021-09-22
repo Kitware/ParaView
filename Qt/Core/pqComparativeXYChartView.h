@@ -35,8 +35,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqComparativeContextView.h"
 
 /**
-* The comparative line chart subclass.
-*/
+ * The comparative line chart subclass.
+ */
 class PQCORE_EXPORT pqComparativeXYChartView : public pqComparativeContextView
 {
   Q_OBJECT

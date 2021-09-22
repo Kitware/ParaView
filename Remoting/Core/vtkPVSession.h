@@ -19,7 +19,7 @@
  * vtkPVSession adds APIs to vtkSession for ParaView-specific sessions, namely
  * those that are used to communicate between data-server,render-server and
  * client. This is an abstract class.
-*/
+ */
 
 #ifndef vtkPVSession_h
 #define vtkPVSession_h

@@ -17,7 +17,7 @@
  *
  * vtkPVRepresentedDataInformation is a vtkPVDataInformation subclass that knows
  * how to gather rendered data-information from a vtkPVDataRepresentation.
-*/
+ */
 
 #ifndef vtkPVRepresentedDataInformation_h
 #define vtkPVRepresentedDataInformation_h

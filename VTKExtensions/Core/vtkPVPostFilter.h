@@ -23,7 +23,7 @@
  *
  *  Interpolate cell centered data to point data, and the inverse if needed
  * by the filter.
-*/
+ */
 
 #ifndef vtkPVPostFilter_h
 #define vtkPVPostFilter_h

@@ -125,7 +125,7 @@
  *
  * @sa
  * vtkSMProxyManager vtkSMProperty vtkSMSourceProxy vtkSMPropertyIterator
-*/
+ */
 
 #ifndef vtkSMProxy_h
 #define vtkSMProxy_h
@@ -939,13 +939,13 @@ protected:
   virtual void UpdatePropertyInformationInternal(vtkSMProperty* prop = nullptr);
 
   /**
-  * vtkSMProxy tracks state of properties on this proxy in an internal State
-  * object. Since it tracks all the properties by index, if there's a potential
-  * for the properties order to have changed, then this method must be called
-  * after the changes have happened so that vtkSMProxy can rebuild this->State.
-  * Currently, this is only relevant for vtkSMSelfGeneratingSourceProxy and
-  * similar that add new properties at run time.
-  */
+   * vtkSMProxy tracks state of properties on this proxy in an internal State
+   * object. Since it tracks all the properties by index, if there's a potential
+   * for the properties order to have changed, then this method must be called
+   * after the changes have happened so that vtkSMProxy can rebuild this->State.
+   * Currently, this is only relevant for vtkSMSelfGeneratingSourceProxy and
+   * similar that add new properties at run time.
+   */
   void RebuildStateForProperties();
 
   /**

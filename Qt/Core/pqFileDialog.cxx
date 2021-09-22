@@ -1259,8 +1259,8 @@ bool pqFileDialog::acceptInternal(const QStringList& selected_files)
         {
           if (QMessageBox::No ==
             QMessageBox::warning(this, this->windowTitle(),
-                QString(tr("%1 already exists.\nDo you want to replace it?")).arg(file),
-                QMessageBox::Yes, QMessageBox::No))
+              QString(tr("%1 already exists.\nDo you want to replace it?")).arg(file),
+              QMessageBox::Yes, QMessageBox::No))
           {
             return false;
           }

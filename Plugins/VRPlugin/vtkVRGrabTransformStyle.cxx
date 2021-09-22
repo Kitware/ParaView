@@ -127,9 +127,7 @@ vtkVRGrabTransformStyle::vtkVRGrabTransformStyle()
 
 // ----------------------------------------------------------------------------
 // Destructor method
-vtkVRGrabTransformStyle::~vtkVRGrabTransformStyle()
-{
-}
+vtkVRGrabTransformStyle::~vtkVRGrabTransformStyle() = default;
 
 // ----------------------------------------------------------------------------
 // PrintSelf() method

@@ -23,7 +23,7 @@
  * eg. "GLOBALID is_in_range (0, 10)" here GLOBALID is the TERM, is_in_range is
  * the operator and (0,10) are the values. A query can have additional
  * qualifiers such as the process id, block id, amr level, amr block.
-*/
+ */
 
 #ifndef vtkQuerySelectionSource_h
 #define vtkQuerySelectionSource_h

@@ -26,7 +26,7 @@
  * labeling, grid rendering, edge rendering etc.
  *
  * @sa vtkGridAxes3DActor
-*/
+ */
 
 #ifndef vtkGridAxes2DActor_h
 #define vtkGridAxes2DActor_h

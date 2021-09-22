@@ -40,6 +40,4 @@ pqMyPropertyWidgetForGroup::pqMyPropertyWidgetForGroup(
 }
 
 //-----------------------------------------------------------------------------
-pqMyPropertyWidgetForGroup::~pqMyPropertyWidgetForGroup()
-{
-}
+pqMyPropertyWidgetForGroup::~pqMyPropertyWidgetForGroup() = default;

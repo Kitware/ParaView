@@ -127,9 +127,7 @@ std::string vtkInSituPipelineIO::GetCurrentFileName(const char* fname, int times
 {
   assert(fname != nullptr);
 
-  // clang-format off
   vtksys::RegularExpression regex(R"=((%[.0-9]*)((ts)|(t)))=");
-  // clang-format on
 
   std::string name{ fname };
   while (regex.find(name))

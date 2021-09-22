@@ -73,9 +73,7 @@ vtkVRVirtualHandStyle::vtkVRVirtualHandStyle()
 
 // -----------------------------------------------------------------------------
 // Destructor method
-vtkVRVirtualHandStyle::~vtkVRVirtualHandStyle()
-{
-}
+vtkVRVirtualHandStyle::~vtkVRVirtualHandStyle() = default;
 
 // ----------------------------------------------------------------------------
 // PrintSelf() method

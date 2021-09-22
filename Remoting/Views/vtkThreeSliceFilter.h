@@ -24,7 +24,7 @@
  * - 1: Output of the first internal vtkCutter filter
  * - 2: Output of the second internal vtkCutter filter
  * - 3: Output of the third internal vtkCutter filter
-*/
+ */
 
 #ifndef vtkThreeSliceFilter_h
 #define vtkThreeSliceFilter_h

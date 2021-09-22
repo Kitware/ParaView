@@ -57,7 +57,7 @@ vtkStandardNewMacro(vtkXMLPVDWriter);
 class vtkXMLPVDWriterInternals
 {
 public:
-  std::vector<vtkSmartPointer<vtkXMLWriter> > Writers;
+  std::vector<vtkSmartPointer<vtkXMLWriter>> Writers;
   std::string FilePath;
   std::string FilePrefix;
   std::vector<std::string> Entries;

@@ -31,9 +31,9 @@ template <class Scalar>
 class vtkCPMappedVectorArrayTemplate : public vtkMappedDataArray<Scalar>
 {
 public:
-  vtkAbstractTemplateTypeMacro(vtkCPMappedVectorArrayTemplate<Scalar>, vtkMappedDataArray<Scalar>)
-    vtkMappedDataArrayNewInstanceMacro(
-      vtkCPMappedVectorArrayTemplate<Scalar>) static vtkCPMappedVectorArrayTemplate* New();
+  vtkAbstractTemplateTypeMacro(vtkCPMappedVectorArrayTemplate<Scalar>, vtkMappedDataArray<Scalar>);
+  vtkMappedDataArrayNewInstanceMacro(vtkCPMappedVectorArrayTemplate<Scalar>);
+  static vtkCPMappedVectorArrayTemplate* New();
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
   typedef typename Superclass::ValueType ValueType;

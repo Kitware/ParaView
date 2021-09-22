@@ -74,8 +74,8 @@ public:
 
 public Q_SLOTS:
   /**
-  * Set the display whose properties we want to edit.
-  */
+   * Set the display whose properties we want to edit.
+   */
   void setOutputPort(pqOutputPort* outputport);
 
 private Q_SLOTS:

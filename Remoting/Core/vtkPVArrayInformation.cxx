@@ -485,8 +485,7 @@ void vtkPVArrayInformation::AddInformation(vtkPVArrayInformation* other, int fie
   {
     // this happens when the same array has different number of components
     // across blocks or ranks.
-    vtkLogF(WARNING, "mismatching in number of components for array "
-                     "'%s'. '%d' != '%d'.",
+    vtkLogF(WARNING, "mismatching in number of components for array '%s'. '%d' != '%d'.",
       this->Name.c_str(), this->GetNumberOfComponents(), other->GetNumberOfComponents());
   }
 

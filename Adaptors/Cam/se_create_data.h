@@ -28,44 +28,45 @@
 // mangled function names.
 
 #ifdef __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 
-/**
- * Initializes the Catalyst Coprocessor
- * @warning Make sure you pass a zero terminated string
- */
-void VTKPVADAPTORSCAM_EXPORT se_coprocessorinitializewithpython_(const char* pythonScriptName);
+  /**
+   * Initializes the Catalyst Coprocessor
+   * @warning Make sure you pass a zero terminated string
+   */
+  void VTKPVADAPTORSCAM_EXPORT se_coprocessorinitializewithpython_(const char* pythonScriptName);
 
-/**
- * Creates grids for 2d and 3d cubed-spheres
- */
-void VTKPVADAPTORSCAM_EXPORT se_create_grid_(int* ne, int* np, int* nlon, double* lonRad, int* nlat,
-  double* latRad, int* nlev, double* lev, int* nCells2d, int* maxNcols, int* mpiRank);
+  /**
+   * Creates grids for 2d and 3d cubed-spheres
+   */
+  void VTKPVADAPTORSCAM_EXPORT se_create_grid_(int* ne, int* np, int* nlon, double* lonRad,
+    int* nlat, double* latRad, int* nlev, double* lev, int* nCells2d, int* maxNcols, int* mpiRank);
 
-/**
- * for timestep 0: creates the points and cells for the grids.
- * for all timesteps: copies data from the simulation to Catalyst.
- */
-void VTKPVADAPTORSCAM_EXPORT se_add_chunk_(int* nstep, int* chunkSize, double* lonRad,
-  double* latRad, double* psScalar, double* tScalar, double* uScalar, double* vScalar);
+  /**
+   * for timestep 0: creates the points and cells for the grids.
+   * for all timesteps: copies data from the simulation to Catalyst.
+   */
+  void VTKPVADAPTORSCAM_EXPORT se_add_chunk_(int* nstep, int* chunkSize, double* lonRad,
+    double* latRad, double* psScalar, double* tScalar, double* uScalar, double* vScalar);
 
-/**
- * Checks if Catalyst needs to coprocess data
- */
-int VTKPVADAPTORSCAM_EXPORT se_requestdatadescription_(int* timeStep, double* time);
+  /**
+   * Checks if Catalyst needs to coprocess data
+   */
+  int VTKPVADAPTORSCAM_EXPORT se_requestdatadescription_(int* timeStep, double* time);
 
-/**
- * Checks if the grids need to be created
- */
-int VTKPVADAPTORSCAM_EXPORT se_needtocreategrid_();
+  /**
+   * Checks if the grids need to be created
+   */
+  int VTKPVADAPTORSCAM_EXPORT se_needtocreategrid_();
 
-/**
- * calls the coprocessor
- */
-void VTKPVADAPTORSCAM_EXPORT se_coprocess_();
+  /**
+   * calls the coprocessor
+   */
+  void VTKPVADAPTORSCAM_EXPORT se_coprocess_();
 
-void VTKPVADAPTORSCAM_EXPORT se_catalyst_finalize_();
+  void VTKPVADAPTORSCAM_EXPORT se_catalyst_finalize_();
 
 #ifdef __cplusplus
 }

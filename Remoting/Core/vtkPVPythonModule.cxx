@@ -29,7 +29,7 @@
 
 //=============================================================================
 // The static structure holding all of the registered modules.
-typedef std::list<vtkSmartPointer<vtkPVPythonModule> > vtkPVPythonModuleContainerType;
+typedef std::list<vtkSmartPointer<vtkPVPythonModule>> vtkPVPythonModuleContainerType;
 static vtkPVPythonModuleContainerType vtkPVPythonModuleRegisteredModules;
 
 void vtkPVPythonModule::RegisterModule(vtkPVPythonModule* module)

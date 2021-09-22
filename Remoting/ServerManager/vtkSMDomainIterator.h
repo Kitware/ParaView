@@ -17,7 +17,7 @@
  * @brief   iterates over domains of a property
  *
  * vtkSMDomainIterator iterates over the domains of a property.
-*/
+ */
 
 #ifndef vtkSMDomainIterator_h
 #define vtkSMDomainIterator_h

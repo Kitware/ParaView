@@ -26,7 +26,7 @@
  * @par Thanks:
  * The addition of a transformation matrix was supported by CEA/DIF
  * Commissariat a l'Energie Atomique, Centre DAM Ile-De-France, Arpajon, France.
-*/
+ */
 
 #ifndef vtkDataLabelRepresentation_h
 #define vtkDataLabelRepresentation_h

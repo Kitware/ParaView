@@ -19,7 +19,7 @@
  * "ColorTransferFunction" and "PiecewiseFunction".
  * It provides utility API to update lookup-table ranges, invert transfer
  * function, etc. that can be used from C++ as well as Python layers.
-*/
+ */
 
 #ifndef vtkSMTransferFunctionProxy_h
 #define vtkSMTransferFunctionProxy_h

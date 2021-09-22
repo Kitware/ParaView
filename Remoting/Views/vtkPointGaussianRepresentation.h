@@ -17,7 +17,7 @@
  *
  * Representation for showing point data as sprites, including gaussian
  * splats, spheres, or some custom shaded representation.
-*/
+ */
 
 #ifndef vtkPointGaussianRepresentation_h
 #define vtkPointGaussianRepresentation_h
@@ -37,8 +37,8 @@ class vtkScalarsToColors;
 class VTKREMOTINGVIEWS_EXPORT vtkPointGaussianRepresentation : public vtkPVDataRepresentation
 {
 public:
-  vtkTypeMacro(vtkPointGaussianRepresentation,
-    vtkPVDataRepresentation) static vtkPointGaussianRepresentation* New();
+  vtkTypeMacro(vtkPointGaussianRepresentation, vtkPVDataRepresentation);
+  static vtkPointGaussianRepresentation* New();
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
   int ProcessViewRequest(vtkInformationRequestKey* request_type, vtkInformation* inInfo,

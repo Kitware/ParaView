@@ -18,7 +18,7 @@
  *
  * This class contains several static methods that help with the
  * complicated selection task.
-*/
+ */
 
 #ifndef vtkSMSelectionHelper_h
 #define vtkSMSelectionHelper_h

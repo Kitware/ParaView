@@ -56,7 +56,7 @@ class pqOMETransferFunctionsPropertyWidget::pqInternals
 {
 public:
   Ui::OMETransferFunctionsPropertyWidget Ui;
-  QVector<QPointer<QWidget> > Pages;
+  QVector<QPointer<QWidget>> Pages;
   vtkWeakPointer<vtkSMPropertyGroup> Group;
 };
 
@@ -89,9 +89,9 @@ pqOMETransferFunctionsPropertyWidget::pqOMETransferFunctionsPropertyWidget(
         (void)this;
         vtkSMProxy* sof = vtkSMPropertyHelper(lut, "ScalarOpacityFunction", true).GetAsProxy();
         bool indexedLookup = vtkSMPropertyHelper(lut, "IndexedLookup", true).GetAsInt() != 0;
-        pqPresetDialog dialog(pqCoreUtilities::mainWidget(), indexedLookup
-            ? pqPresetDialog::SHOW_INDEXED_COLORS_ONLY
-            : pqPresetDialog::SHOW_NON_INDEXED_COLORS_ONLY);
+        pqPresetDialog dialog(pqCoreUtilities::mainWidget(),
+          indexedLookup ? pqPresetDialog::SHOW_INDEXED_COLORS_ONLY
+                        : pqPresetDialog::SHOW_NON_INDEXED_COLORS_ONLY);
         dialog.setCustomizableLoadColors(!indexedLookup);
         dialog.setCustomizableLoadOpacities(sof != nullptr);
         dialog.setCustomizableUsePresetRange(false);
@@ -277,13 +277,13 @@ bool pqOMETransferFunctionsPropertyWidget::event(QEvent* evt)
     if (parts[0] == "RGBPoints")
     {
       this->setXrgbPoints(
-        parts[1].toInt(), this->property(pname.toUtf8().data()).value<QList<QVariant> >());
+        parts[1].toInt(), this->property(pname.toUtf8().data()).value<QList<QVariant>>());
     }
     else
     {
       assert(parts[0] == "Points");
       this->setXvmsPoints(
-        parts[1].toInt(), this->property(pname.toUtf8().data()).value<QList<QVariant> >());
+        parts[1].toInt(), this->property(pname.toUtf8().data()).value<QList<QVariant>>());
     }
   }
 

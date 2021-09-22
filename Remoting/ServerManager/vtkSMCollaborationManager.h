@@ -34,7 +34,7 @@
  *   vtkSMMessage* msg = reinterpret_cast<vtkSMMessage*>(data);
  *   => do what you want with the message
  * }
-*/
+ */
 
 #ifndef vtkSMCollaborationManager_h
 #define vtkSMCollaborationManager_h

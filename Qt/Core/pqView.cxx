@@ -81,7 +81,7 @@ public:
   bool WidgetCreated;
 
   // List of representation shown by this view.
-  QList<QPointer<pqRepresentation> > Representations;
+  QList<QPointer<pqRepresentation>> Representations;
 
   pqViewInternal()
     : WidgetCreated(false)
@@ -322,7 +322,7 @@ void pqView::onRepresentationsChanged()
   // Determine what changed. Add the new Representations and remove the old
   // ones. Make sure new Representations have a reference to this render module.
   // Remove the reference to this render module in the removed Representations.
-  QList<QPointer<pqRepresentation> > currentReprs;
+  QList<QPointer<pqRepresentation>> currentReprs;
   vtkSMProxyProperty* prop =
     vtkSMProxyProperty::SafeDownCast(this->getProxy()->GetProperty("Representations"));
   pqServerManagerModel* smModel = pqApplicationCore::instance()->getServerManagerModel();
@@ -353,7 +353,7 @@ void pqView::onRepresentationsChanged()
     }
   }
 
-  QList<QPointer<pqRepresentation> >::Iterator iter = this->Internal->Representations.begin();
+  QList<QPointer<pqRepresentation>>::Iterator iter = this->Internal->Representations.begin();
   while (iter != this->Internal->Representations.end())
   {
     if (*iter && !currentReprs.contains(*iter))

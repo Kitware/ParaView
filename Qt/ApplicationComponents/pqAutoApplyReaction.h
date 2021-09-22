@@ -35,9 +35,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqReaction.h"
 
 /**
-* @ingroup Reactions
-* Reaction for enabling/disabling auto-apply.
-*/
+ * @ingroup Reactions
+ * Reaction for enabling/disabling auto-apply.
+ */
 class PQAPPLICATIONCOMPONENTS_EXPORT pqAutoApplyReaction : public pqReaction
 {
   Q_OBJECT
@@ -47,13 +47,13 @@ public:
   pqAutoApplyReaction(QAction* parent = 0);
 
   /**
-  * Set the status of auto-apply.
-  */
+   * Set the status of auto-apply.
+   */
   static void setAutoApply(bool);
 
   /**
-  * Get the status of auto-apply.
-  */
+   * Get the status of auto-apply.
+   */
   static bool autoApply();
 
 protected Q_SLOTS:

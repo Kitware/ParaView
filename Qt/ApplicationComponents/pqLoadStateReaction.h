@@ -37,9 +37,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class pqServer;
 
 /**
-* @ingroup Reactions
-* Reaction for load state action.
-*/
+ * @ingroup Reactions
+ * Reaction for load state action.
+ */
 class pqServer;
 class PQAPPLICATIONCOMPONENTS_EXPORT pqLoadStateReaction : public pqReaction
 {
@@ -48,16 +48,16 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqLoadStateReaction : public pqReaction
 
 public:
   /**
-  * Constructor. Parent cannot be nullptr.
-  */
+   * Constructor. Parent cannot be nullptr.
+   */
   pqLoadStateReaction(QAction* parent);
 
   /**
-  * Loads the state file.
-  * Note that this method is static. Applications can simply use this without
-  * having to create a reaction instance.
-  * If no server is specified, active server is used.
-  */
+   * Loads the state file.
+   * Note that this method is static. Applications can simply use this without
+   * having to create a reaction instance.
+   * If no server is specified, active server is used.
+   */
   static void loadState(
     const QString& filename, bool dialogBlocked = false, pqServer* server = nullptr);
   static void loadState();
@@ -69,15 +69,14 @@ public:
 
 public Q_SLOTS:
   /**
-  * Updates the enabled state. Applications need not explicitly call
-  * this.
-  */
+   * Updates the enabled state. Applications need not explicitly call this.
+   */
   void updateEnableState() override;
 
 protected:
   /**
-  * Called when the action is triggered.
-  */
+   * Called when the action is triggered.
+   */
   void onTriggered() override { pqLoadStateReaction::loadState(); }
 
 private:

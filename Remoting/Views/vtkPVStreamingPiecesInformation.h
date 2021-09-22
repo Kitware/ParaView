@@ -21,7 +21,7 @@
  * vtkPVStreamingPiecesInformation is an information object used by
  * vtkSMDataDeliveryManager to get information about representations that have
  * pieces to stream from the data-server.
-*/
+ */
 
 #ifndef vtkPVStreamingPiecesInformation_h
 #define vtkPVStreamingPiecesInformation_h

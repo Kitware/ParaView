@@ -20,7 +20,7 @@
  * Adaptive Stabilized Transient Analysis) dumps.  See
  * http://www.scorec.rpi.edu/software_products.html or contact Scorec for
  * information on PHASTA.
-*/
+ */
 
 #ifndef vtkPhastaReader_h
 #define vtkPhastaReader_h

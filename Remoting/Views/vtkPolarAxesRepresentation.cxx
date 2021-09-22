@@ -35,7 +35,6 @@
 #include "vtkPolarAxesActor.h"
 #include "vtkPolyData.h"
 #include "vtkProperty.h"
-#include "vtkProperty.h"
 #include "vtkRenderer.h"
 #include "vtkSmartPointer.h"
 #include "vtkStringArray.h"

@@ -20,7 +20,7 @@
  * file (of extension .pve).
  * 'pve' a simply CSV file with the last column being the relative filename and
  * other columns for each of the variables in the ensemble.
-*/
+ */
 
 #ifndef vtkEnsembleDataReader_h
 #define vtkEnsembleDataReader_h

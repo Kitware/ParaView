@@ -107,7 +107,7 @@ protected:
   std::string ImageType;
   std::atomic<double> LastStartDepth;
   std::atomic<double> LastEndDepth;
-  std::list<std::pair<std::string, vtkSmartPointer<vtkImageData> > > ImageCache;
+  std::list<std::pair<std::string, vtkSmartPointer<vtkImageData>>> ImageCache;
   unsigned int CacheLimit = 20;
   std::map<std::pair<std::string, std::string>, Json::Value> CollectionMap;
   std::map<std::pair<std::string, std::string>, Json::Value> ImageryMap;
@@ -186,8 +186,9 @@ bool sendMessage(HINTERNET connection, std::string type, std::string address,
 {
   PCTSTR rgpszAcceptTypes[] = { "*/*", nullptr };
   HINTERNET hRequest = HttpOpenRequest(connection, (LPCSTR)(type.c_str()),
-    (LPCSTR)(address.c_str()), nullptr, nullptr, rgpszAcceptTypes, INTERNET_FLAG_RELOAD |
-      INTERNET_FLAG_NO_CACHE_WRITE | INTERNET_FLAG_NEED_FILE | INTERNET_FLAG_SECURE,
+    (LPCSTR)(address.c_str()), nullptr, nullptr, rgpszAcceptTypes,
+    INTERNET_FLAG_RELOAD | INTERNET_FLAG_NO_CACHE_WRITE | INTERNET_FLAG_NEED_FILE |
+      INTERNET_FLAG_SECURE,
     0);
   if (!hRequest)
   {
@@ -201,9 +202,7 @@ bool sendMessage(HINTERNET connection, std::string type, std::string address,
       HTTP_ADDREQ_FLAG_ADD | HTTP_ADDREQ_FLAG_REPLACE);
   }
 
-  // clang-format off
   std::string frmdata = R"({ "username": "imagodemo1", "password": "ImagoDemo1" })";
-  // clang-format on
 
   while (!HttpSendRequest(
     hRequest, nullptr, 0, (LPVOID)formData.c_str(), static_cast<DWORD>(formData.size())))
@@ -240,9 +239,7 @@ Json::Value getJSON(std::vector<char> const& result)
 }
 }
 
-vtkImagoLoader::vtkImagoLoader()
-{
-}
+vtkImagoLoader::vtkImagoLoader() = default;
 
 vtkImagoLoader::~vtkImagoLoader()
 {
@@ -407,17 +404,14 @@ bool vtkImagoLoader::IsCellImageDifferent(std::string const& /*oldimg*/, std::st
   // look for http signature
   if (!strncmp(newimg.c_str(), "http", 4))
   {
-    // clang-format off
-    std::regex matcher(R"=([^ ]*\?((?:de|ds|im|dp)=[^&]*)(&(?:de|ds|im|dp)=[^&]*)?(&(?:de|ds|im|dp)=[^&]*)?(&(?:de|ds|im|dp)=[^&]*)?)=");
-    // clang-format on
+    std::regex matcher(
+      R"=([^ ]*\?((?:de|ds|im|dp)=[^&]*)(&(?:de|ds|im|dp)=[^&]*)?(&(?:de|ds|im|dp)=[^&]*)?(&(?:de|ds|im|dp)=[^&]*)?)=");
     std::regex_search(newimg, sm, matcher);
   }
   // now check holieid signature
   else if (!strncmp(newimg.c_str(), "holeid:", 7))
   {
-    // clang-format off
     std::regex matcher(R"=(holeid:(de=[^&]*)(&dp=[^&]*))=");
-    // clang-format on
     std::regex_search(newimg, sm, matcher);
   }
   else
@@ -532,9 +526,7 @@ bool vtkImagoLoader::GetContext()
 bool vtkImagoLoader::GetImage(std::string const& fname, std::future<vtkImageData*>& future)
 {
   std::smatch sm;
-  // clang-format off
   std::regex matcher(R"=(holeid:(de=[^&]*)(&dp=[^&]*))=");
-  // clang-format on
   std::regex_search(fname, sm, matcher);
 
   std::map<std::string, std::string> args;
@@ -563,9 +555,8 @@ bool vtkImagoLoader::GetImage(std::string const& fname, std::future<vtkImageData
 bool vtkImagoLoader::GetHttpImage(std::string const& fname, std::future<vtkImageData*>& future)
 {
   std::smatch sm;
-  // clang-format off
-  std::regex matcher(R"=([^ ]*\?((?:de|ds|im|dp)=[^&]*)(&(?:de|ds|im|dp)=[^&]*)?(&(?:de|ds|im|dp)=[^&]*)?(&(?:de|ds|im|dp)=[^&]*)?)=");
-  // clang-format on
+  std::regex matcher(
+    R"=([^ ]*\?((?:de|ds|im|dp)=[^&]*)(&(?:de|ds|im|dp)=[^&]*)?(&(?:de|ds|im|dp)=[^&]*)?(&(?:de|ds|im|dp)=[^&]*)?)=");
   std::regex_search(fname, sm, matcher);
 
   std::map<std::string, std::string> args;
@@ -973,7 +964,7 @@ bool vtkImagoLoader::GetImage(std::string const& workspace, std::string const& d
       }
 
       this->ImageCache.push_back(
-        std::pair<std::string, vtkSmartPointer<vtkImageData> >(imageString, imageData));
+        std::pair<std::string, vtkSmartPointer<vtkImageData>>(imageString, imageData));
 
       // record last depth requested
       this->LastStartDepth = startDepth;

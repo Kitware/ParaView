@@ -22,7 +22,7 @@
  * vtkSMSourceProxy to do this.
  * @sa
  * vtkSMIntRangeDomain
-*/
+ */
 
 #ifndef vtkSMExtentDomain_h
 #define vtkSMExtentDomain_h

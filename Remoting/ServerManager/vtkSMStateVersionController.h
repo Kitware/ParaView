@@ -17,7 +17,7 @@
  *
  * vtkSMStateVersionController is used to convert the state XML from any
  * previously supported versions to the current version.
-*/
+ */
 
 #ifndef vtkSMStateVersionController_h
 #define vtkSMStateVersionController_h

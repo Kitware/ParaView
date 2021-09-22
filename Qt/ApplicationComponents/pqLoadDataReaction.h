@@ -41,9 +41,9 @@ class pqServer;
 class vtkSMReaderFactory;
 
 /**
-* @ingroup Reactions
-* Reaction for open data files.
-*/
+ * @ingroup Reactions
+ * Reaction for open data files.
+ */
 class PQAPPLICATIONCOMPONENTS_EXPORT pqLoadDataReaction : public pqReaction
 {
   Q_OBJECT
@@ -51,40 +51,40 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqLoadDataReaction : public pqReaction
 
 public:
   /**
-  * Constructor. Parent cannot be nullptr.
-  */
+   * Constructor. Parent cannot be nullptr.
+   */
   pqLoadDataReaction(QAction* parent);
 
   /**
-  * Loads multiple data files. Uses reader factory to determine what reader are
-  * supported. If a file requires user input the reader of choice, it will use
-  * that reader for all other files of that type.
-  * Returns the reader is creation successful, otherwise returns
-  * nullptr.
-  * Note that this method is static. Applications can simply use this without
-  * having to create a reaction instance.
-  *
-  * If `readergroup` and `readername` are non empty, then they are assumed to be
-  * the type of the reader to use and reader factory is not used.
-  *
-  * If `server` is nullptr, active server is used.
-  */
+   * Loads multiple data files. Uses reader factory to determine what reader are
+   * supported. If a file requires user input the reader of choice, it will use
+   * that reader for all other files of that type.
+   * Returns the reader is creation successful, otherwise returns
+   * nullptr.
+   * Note that this method is static. Applications can simply use this without
+   * having to create a reaction instance.
+   *
+   * If `readergroup` and `readername` are non empty, then they are assumed to be
+   * the type of the reader to use and reader factory is not used.
+   *
+   * If `server` is nullptr, active server is used.
+   */
   static pqPipelineSource* loadData(const QList<QStringList>& files,
     const QString& readergroup = QString(), const QString& readername = QString(),
     pqServer* server = nullptr);
 
   /**
-  * Loads data files. Uses reader factory to determine what reader are
-  * supported. Returns the reader is creation successful, otherwise returns
-  * nullptr.
-  * Note that this method is static. Applications can simply use this without
-  * having to create a reaction instance.
-  *
-  * If `readergroup` and `readername` are non empty, then they are assumed to be
-  * the type of the reader to use and reader factory is not used.
-  *
-  * If `server` is nullptr, active server is used.
-  */
+   * Loads data files. Uses reader factory to determine what reader are
+   * supported. Returns the reader is creation successful, otherwise returns
+   * nullptr.
+   * Note that this method is static. Applications can simply use this without
+   * having to create a reaction instance.
+   *
+   * If `readergroup` and `readername` are non empty, then they are assumed to be
+   * the type of the reader to use and reader factory is not used.
+   *
+   * If `server` is nullptr, active server is used.
+   */
   static pqPipelineSource* loadData(const QStringList& files,
     const QString& readergroup = QString(), const QString& readername = QString(),
     pqServer* server = nullptr);
@@ -93,21 +93,20 @@ public:
 
 public Q_SLOTS:
   /**
-  * Updates the enabled state. Applications need not explicitly call
-  * this.
-  */
+   * Updates the enabled state. Applications need not explicitly call this.
+   */
   void updateEnableState() override;
 
 Q_SIGNALS:
   /**
-  * Fired when a dataset is loaded by this reaction.
-  */
+   * Fired when a dataset is loaded by this reaction.
+   */
   void loadedData(pqPipelineSource*);
 
 protected:
   /**
-  * Called when the action is triggered.
-  */
+   * Called when the action is triggered.
+   */
   void onTriggered() override
   {
     QList<pqPipelineSource*> sources = pqLoadDataReaction::loadData();

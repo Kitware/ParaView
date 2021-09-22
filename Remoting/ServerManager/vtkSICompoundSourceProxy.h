@@ -19,7 +19,7 @@
  * vtkSMCompoundSourceProxy.
  * It provides the mapping to the exposed output port to the underneath
  * internal sub-proxy.
-*/
+ */
 
 #ifndef vtkSICompoundSourceProxy_h
 #define vtkSICompoundSourceProxy_h

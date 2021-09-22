@@ -143,7 +143,7 @@ void vtkPVMultiSliceView::AboutToRenderOnLocalProcess(bool interactive)
 {
   if (this->CenterAxes->GetVisibility() &&
     (this->ModelTransformationMatrix->GetMTime() > this->ModelTransformationMatrixUpdateTime ||
-        this->CenterAxes->GetMTime() > this->ModelTransformationMatrixUpdateTime))
+      this->CenterAxes->GetMTime() > this->ModelTransformationMatrixUpdateTime))
   {
     // The CenterAxes is still going to show the position of the center of
     // rotation in Cartesian space. We however want to rotate the u,v,w vectors

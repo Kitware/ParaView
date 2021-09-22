@@ -30,7 +30,7 @@
  * \li For other vtkSMProxyProperty instances (e.g. LookupTable,
  * ScalarOpacityFunction, etc.) on Paste, it tries to locate the requested proxy
  * value on the session.
-*/
+ */
 
 #ifndef vtkSMProxyClipboard_h
 #define vtkSMProxyClipboard_h

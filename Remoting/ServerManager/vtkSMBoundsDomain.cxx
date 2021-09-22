@@ -16,7 +16,6 @@
 
 #include "vtkBoundingBox.h"
 #include "vtkMath.h"
-#include "vtkMath.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVDataInformation.h"
 #include "vtkPVXMLElement.h"

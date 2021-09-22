@@ -929,7 +929,7 @@ struct Process_5_9_to_5_10
 
       node.attribute("name").set_value("BlockSelectors");
 
-      std::vector<std::pair<unsigned int, bool> > visibilities(numElements / 2);
+      std::vector<std::pair<unsigned int, bool>> visibilities(numElements / 2);
       for (auto child : node.children("Element"))
       {
         const int index = child.attribute("index").as_int();
@@ -982,7 +982,7 @@ struct Process_5_9_to_5_10
                                            "Property[@name='BlockColor']");
     for (auto xpath_node : xpath_set)
     {
-      std::vector<std::tuple<unsigned int, double, double, double> > colors;
+      std::vector<std::tuple<unsigned int, double, double, double>> colors;
 
       auto node = xpath_node.node();
       node.attribute("name").set_value("BlockColors");
@@ -1035,7 +1035,7 @@ struct Process_5_9_to_5_10
                                            "Property[@name='BlockOpacity']");
     for (auto xpath_node : xpath_set)
     {
-      std::vector<std::tuple<unsigned int, double> > opacities;
+      std::vector<std::tuple<unsigned int, double>> opacities;
 
       auto node = xpath_node.node();
       node.attribute("name").set_value("BlockOpacities");

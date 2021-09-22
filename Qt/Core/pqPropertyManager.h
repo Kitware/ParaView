@@ -43,42 +43,42 @@ class vtkSMProperty;
 class pqPropertyLinks;
 
 /**
-* Manages links between Qt properties and unchecked proxy properties
-* This is useful if more than one QWidget exposes a single proxy property
-* In which case the server manager will not keep the widgets synchronized
-* Also provides a mechanims for accepting or rejecting changes for unchecked
-* properties
-*/
+ * Manages links between Qt properties and unchecked proxy properties
+ * This is useful if more than one QWidget exposes a single proxy property
+ * In which case the server manager will not keep the widgets synchronized
+ * Also provides a mechanims for accepting or rejecting changes for unchecked
+ * properties
+ */
 class PQCORE_EXPORT pqPropertyManager : public QObject
 {
   Q_OBJECT
 
 public:
   /**
-  * constructor
-  */
+   * constructor
+   */
   pqPropertyManager(QObject* p = 0);
   /**
-  * destructor
-  */
+   * destructor
+   */
   ~pqPropertyManager() override;
 
   /**
-  * register a QObject property to link with the server manager
-  */
+   * register a QObject property to link with the server manager
+   */
   void registerLink(QObject* qObject, const char* qProperty, const char* signal, vtkSMProxy* Proxy,
     vtkSMProperty* Property, int Index = -1);
 
   /**
-  * unregister a QObject property to link with the server manager
-  */
+   * unregister a QObject property to link with the server manager
+   */
   void unregisterLink(QObject* qObject, const char* qProperty, const char* signal,
     vtkSMProxy* Proxy, vtkSMProperty* Property, int Index = -1);
 
   /**
-  * returns whether there are modified properties to send to
-  * the server manager
-  */
+   * returns whether there are modified properties to send to
+   * the server manager
+   */
   bool isModified() const;
 
   // Call this method to un-links all property links
@@ -87,33 +87,33 @@ public:
 
 Q_SIGNALS:
   /**
-  * Signal emitted when there are possible properties to send down to
-  * the server manager
-  */
+   * Signal emitted when there are possible properties to send down to
+   * the server manager
+   */
   void modified();
 
   /**
-  * Signal emitted when the user has accepted changes
-  */
+   * Signal emitted when the user has accepted changes
+   */
   void aboutToAccept();
   void accepted();
   /**
-  * Signal emitted when the user has rejected changes
-  */
+   * Signal emitted when the user has rejected changes
+   */
   void rejected();
 
 public Q_SLOTS:
   /**
-  * accept property changes by pushing them all down to the server manager
-  */
+   * accept property changes by pushing them all down to the server manager
+   */
   void accept();
   /**
-  * reject property changes and revert all QObject properties
-  */
+   * reject property changes and revert all QObject properties
+   */
   void reject();
   /**
-  * Called whenever a property changes from the GUI side
-  */
+   * Called whenever a property changes from the GUI side
+   */
   void propertyChanged();
 
 protected:

@@ -19,7 +19,7 @@
  * This filter works on point vectors.  It does not work on cell vectors yet.
  * A normal is conputed for a point by averaging normals of surrounding
  * 2D cells.  The vector is then constrained to be perpendicular to the normal.
-*/
+ */
 
 #ifndef vtkSurfaceVectors_h
 #define vtkSurfaceVectors_h

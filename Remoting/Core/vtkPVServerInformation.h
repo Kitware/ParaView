@@ -19,7 +19,7 @@
  * This objects is used by the client to get the features
  * supported by the server.
  * At the moment, server information is only on the root.
-*/
+ */
 
 #ifndef vtkPVServerInformation_h
 #define vtkPVServerInformation_h

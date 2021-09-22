@@ -176,7 +176,7 @@ Q_SIGNALS:
 
 private:
   QList<QString> GroupNames;
-  QMap<QString, QList<QString> > Groups;
+  QMap<QString, QList<QString>> Groups;
 
   /**
    * Clears all groups the manager knows.  This resets the internal state so that

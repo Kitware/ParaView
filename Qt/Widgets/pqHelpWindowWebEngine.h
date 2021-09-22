@@ -33,11 +33,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define pqHelpWindowWebKit_h
 
 /**
-*============================================================================
-* This is an internal header used by pqHelpWindow.
-* This header gets included when PARAVIEW_USE_QTWEBENGINE is ON.
-*============================================================================
-*/
+ *============================================================================
+ * This is an internal header used by pqHelpWindow.
+ * This header gets included when PARAVIEW_USE_QTWEBENGINE is ON.
+ *============================================================================
+ */
 
 #include <QBuffer>
 #include <QFileInfo>
@@ -93,8 +93,8 @@ private:
 };
 //----------------------------------------------------------------------------------
 /**
-* Extend QWebView to support the interface expected in pqBrowserTemplate.
-*/
+ * Extend QWebView to support the interface expected in pqBrowserTemplate.
+ */
 class pqWebView : public QWebEngineView
 {
   typedef QWebEngineView Superclass;

@@ -22,7 +22,7 @@
  * int GetCurrentDimensionIndex(std::string)
  * int GetDimensionSize(std::string)
  * void SetCurrentDimensionIndex(std::string, int)
-*/
+ */
 
 #ifndef vtkSIIndexSelectionProperty_h
 #define vtkSIIndexSelectionProperty_h

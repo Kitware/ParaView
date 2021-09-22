@@ -1628,7 +1628,7 @@ void vtkGeometryRepresentation::UpdateShaderReplacements()
   bool isArray = root.isArray();
   size_t nbReplacements = isArray ? root.size() : 1;
 
-  std::vector<std::tuple<vtkShader::Type, std::string, std::string> > replacements;
+  std::vector<std::tuple<vtkShader::Type, std::string, std::string>> replacements;
   for (size_t index = 0; index < nbReplacements; ++index)
   {
     const Json::Value& repl = isArray ? root[(int)index] : root;

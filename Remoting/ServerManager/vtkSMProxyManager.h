@@ -21,7 +21,7 @@
  * call to the appropriate one based on the provided session.
  * @sa
  * vtkSMSessionProxyManager, vtkSMProxyDefinitionManager
-*/
+ */
 
 #ifndef vtkSMProxyManager_h
 #define vtkSMProxyManager_h

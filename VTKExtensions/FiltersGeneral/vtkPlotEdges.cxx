@@ -505,10 +505,11 @@ double vtkPlotEdges::Node::ComputeConnectionScore(Segment* segment1, Segment* se
 
   double start1[3], end1[3];
   double start2[3], end2[3];
-  if (segment1->GetCountPointIds() <= 3 && ((segment1->GetStartId() == segment2->GetStartId() &&
-                                              segment1->GetEndId() == segment2->GetEndId()) ||
-                                             (segment1->GetStartId() == segment2->GetEndId() &&
-                                               segment1->GetEndId() == segment2->GetStartId())))
+  if (segment1->GetCountPointIds() <= 3 &&
+    ((segment1->GetStartId() == segment2->GetStartId() &&
+       segment1->GetEndId() == segment2->GetEndId()) ||
+      (segment1->GetStartId() == segment2->GetEndId() &&
+        segment1->GetEndId() == segment2->GetStartId())))
   {
     penaltyScore = 0.4;
   }
@@ -521,8 +522,8 @@ double vtkPlotEdges::Node::ComputeConnectionScore(Segment* segment1, Segment* se
     if (segment1->GetCountPointIds() <= 3 &&
       ((vtkMath::Distance2BetweenPoints(start1, start2) < 0.00001 &&
          vtkMath::Distance2BetweenPoints(end1, end2) < 0.00001) ||
-          (vtkMath::Distance2BetweenPoints(start1, end2) < 0.00001 &&
-            vtkMath::Distance2BetweenPoints(end1, start2) < 0.00001)))
+        (vtkMath::Distance2BetweenPoints(start1, end2) < 0.00001 &&
+          vtkMath::Distance2BetweenPoints(end1, start2) < 0.00001)))
     {
       penaltyScore = 0.45;
     }
@@ -841,8 +842,9 @@ void vtkPlotEdges::ExtractSegmentsFromExtremity(vtkPolyData* polyData, vtkCollec
         // cerr << "At point " << pointId2
         //          << ", get the node branch of cell "
         //          << cellIds[i] << endl;
-        if (!visitedCells[cellIds[i]] && (polyData->GetCellType(cellIds[i]) == VTK_LINE ||
-                                           polyData->GetCellType(cellIds[i]) == VTK_POLY_LINE))
+        if (!visitedCells[cellIds[i]] &&
+          (polyData->GetCellType(cellIds[i]) == VTK_LINE ||
+            polyData->GetCellType(cellIds[i]) == VTK_POLY_LINE))
         {
           vtkPlotEdges::ExtractSegmentsFromExtremity(
             polyData, segments, nodes, visitedCells, cellIds[i], pointId2, node2);

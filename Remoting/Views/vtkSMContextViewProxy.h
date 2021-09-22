@@ -18,7 +18,7 @@
  *
  * vtkSMContextViewProxy is an abstract base class for all vtkContextView
  * subclasses.
-*/
+ */
 
 #ifndef vtkSMContextViewProxy_h
 #define vtkSMContextViewProxy_h

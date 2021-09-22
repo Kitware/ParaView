@@ -36,10 +36,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqDoubleVectorPropertyWidget.h"
 
 /**
-* pqGlyphScaleFactorPropertyWidget is used for the "Scale Factor" property on
-* the Glyph filter. It customizes the resetButtonClicked() logic since the
-* Glyph filter's scale factor setup is custom.
-*/
+ * pqGlyphScaleFactorPropertyWidget is used for the "Scale Factor" property on
+ * the Glyph filter. It customizes the resetButtonClicked() logic since the
+ * Glyph filter's scale factor setup is custom.
+ */
 class PQAPPLICATIONCOMPONENTS_EXPORT pqGlyphScaleFactorPropertyWidget
   : public pqDoubleVectorPropertyWidget
 {
@@ -52,8 +52,8 @@ public:
 
 protected Q_SLOTS:
   /**
-  * update the property's value using the domain.
-  */
+   * update the property's value using the domain.
+   */
   void resetButtonClicked() override;
 
 private:

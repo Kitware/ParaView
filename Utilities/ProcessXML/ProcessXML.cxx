@@ -67,9 +67,9 @@ public:
 
   int ProcessFile(const char* file, const char* title)
   {
-    vtksys::ifstream ifs(file, this->UseBase64Encoding
-        ? (vtksys::ifstream::in | vtksys::ifstream::binary)
-        : vtksys::ifstream::in);
+    vtksys::ifstream ifs(file,
+      this->UseBase64Encoding ? (vtksys::ifstream::in | vtksys::ifstream::binary)
+                              : vtksys::ifstream::in);
     if (!ifs)
     {
       std::cerr << "Cannot open file: " << file << std::endl;

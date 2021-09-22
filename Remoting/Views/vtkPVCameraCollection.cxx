@@ -35,7 +35,7 @@ double GetSimilarity(vtkCamera* ac, vtkCamera* bc)
 class vtkPVCameraCollection::vtkInternals
 {
 public:
-  typedef std::vector<vtkSmartPointer<vtkCamera> > CamerasType;
+  typedef std::vector<vtkSmartPointer<vtkCamera>> CamerasType;
   CamerasType Cameras;
 };
 

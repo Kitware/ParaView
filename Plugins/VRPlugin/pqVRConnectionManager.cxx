@@ -73,10 +73,10 @@ class pqVRConnectionManager::pqInternals
 {
 public:
 #if PARAVIEW_PLUGIN_VRPlugin_USE_VRPN
-  QList<QPointer<pqVRPNConnection> > VRPNConnections;
+  QList<QPointer<pqVRPNConnection>> VRPNConnections;
 #endif
 #if PARAVIEW_PLUGIN_VRPlugin_USE_VRUI
-  QList<QPointer<pqVRUIConnection> > VRUIConnections;
+  QList<QPointer<pqVRUIConnection>> VRUIConnections;
 #endif
   vtkWeakPointer<vtkVRQueue> Queue;
 };

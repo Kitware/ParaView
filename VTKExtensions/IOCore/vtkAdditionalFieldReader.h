@@ -17,7 +17,7 @@
  * @brief   read field data arrays and add to an input
  *
  *
-*/
+ */
 
 #ifndef vtkAdditionalFieldReader_h
 #define vtkAdditionalFieldReader_h

@@ -20,7 +20,7 @@
  * representing a vector of doubles.
  * @sa
  * vtkSMVectorProperty vtkSMIntVectorProperty vtkSMStringVectorProperty
-*/
+ */
 
 #ifndef vtkSMDoubleVectorProperty_h
 #define vtkSMDoubleVectorProperty_h

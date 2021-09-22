@@ -19,7 +19,7 @@
  * vtkSIProxyDefinitionManager instance on all the processes. ParaView clients
  * should use API on this class to add/update xml definitions to ensure that
  * the xmls are processed/updated correctly on all the processes.
-*/
+ */
 
 #ifndef vtkSMProxyDefinitionManager_h
 #define vtkSMProxyDefinitionManager_h
@@ -101,10 +101,9 @@ public:
   vtkPVXMLElement* GetCollapsedProxyDefinition(
     const char* group, const char* name, const char* subProxyName, bool throwError)
   {
-    return this->ProxyDefinitionManager
-      ? this->ProxyDefinitionManager->GetCollapsedProxyDefinition(
-          group, name, subProxyName, throwError)
-      : nullptr;
+    return this->ProxyDefinitionManager ? this->ProxyDefinitionManager->GetCollapsedProxyDefinition(
+                                            group, name, subProxyName, throwError)
+                                        : nullptr;
   }
 
   /**

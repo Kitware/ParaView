@@ -28,7 +28,7 @@
  * \li \c Input : points to a property that provides the data producer.
  * \li \c Direction: points to a property that provides the value for the
  *                   selected direction.
-*/
+ */
 
 #ifndef vtkSMDimensionsDomain_h
 #define vtkSMDimensionsDomain_h

@@ -31,9 +31,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
 /**
-* \file pqRescaleRange.h
-* \date 3/28/2007
-*/
+ * \file pqRescaleRange.h
+ * \date 3/28/2007
+ */
 
 #ifndef _pqRescaleRange_h
 #define _pqRescaleRange_h

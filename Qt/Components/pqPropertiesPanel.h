@@ -46,17 +46,17 @@ class vtkSMProperty;
 class vtkSMProxy;
 
 /**
-* pqPropertiesPanel is the default panel used by paraview to edit source
-* properties and display properties for pipeline objects. pqPropertiesPanel
-* supports auto-generating widgets for properties of the proxy as well as a
-* mechanism to provide custom widgets/panels for the proxy or its
-* representations. pqPropertiesPanel uses pqProxyWidget to create and manage
-* the widgets for the source and representation proxies.
-*
-* pqPropertiesPanel comprises of 3 separate parts for showing the source
-* properties, display properties and view properties. One can control which
-* parts are shown by setting the panelMode property.
-*/
+ * pqPropertiesPanel is the default panel used by paraview to edit source
+ * properties and display properties for pipeline objects. pqPropertiesPanel
+ * supports auto-generating widgets for properties of the proxy as well as a
+ * mechanism to provide custom widgets/panels for the proxy or its
+ * representations. pqPropertiesPanel uses pqProxyWidget to create and manage
+ * the widgets for the source and representation proxies.
+ *
+ * pqPropertiesPanel comprises of 3 separate parts for showing the source
+ * properties, display properties and view properties. One can control which
+ * parts are shown by setting the panelMode property.
+ */
 class PQCOMPONENTS_EXPORT pqPropertiesPanel : public QWidget
 {
   Q_OBJECT
@@ -68,34 +68,34 @@ public:
   ~pqPropertiesPanel() override;
 
   /**
-  * Enable/disable auto-apply.
-  */
+   * Enable/disable auto-apply.
+   */
   static void setAutoApply(bool enabled);
 
   /**
-  * Returns \c true if auto-apply is enabled.
-  */
+   * Returns \c true if auto-apply is enabled.
+   */
   static bool autoApply();
 
   /**
-  * Sets the delay for auto-apply to \p delay (in msec).
-  */
+   * Sets the delay for auto-apply to \p delay (in msec).
+   */
   static void setAutoApplyDelay(int delay);
 
   /**
-  * Returns the delay for the auto-apply (in msec).
-  */
+   * Returns the delay for the auto-apply (in msec).
+   */
   static int autoApplyDelay();
 
   /**
-  * Returns the current view, if any.
-  */
+   * Returns the current view, if any.
+   */
   pqView* view() const;
 
   /**
-  * methods used to obtain the recommended spacing and margins to be used for
-  * widgets.
-  */
+   * methods used to obtain the recommended spacing and margins to be used for
+   * widgets.
+   */
   static int suggestedMargin() { return 0; }
   static QMargins suggestedMargins() { return QMargins(0, 0, 0, 0); }
   static int suggestedHorizontalSpacing() { return 4; }
@@ -110,8 +110,8 @@ public:
   };
 
   /**
-  * Get/Set the panel mode.
-  */
+   * Get/Set the panel mode.
+   */
   void setPanelMode(int val);
   int panelMode() const { return this->PanelMode; }
 
@@ -142,82 +142,81 @@ public:
 
 public Q_SLOTS:
   /**
-  * Apply the changes properties to the proxies.
-  *
-  * This is triggered when the user clicks the "Apply" button on the
-  * properties panel.
-  */
+   * Apply the changes properties to the proxies.
+   *
+   * This is triggered when the user clicks the "Apply" button on the
+   * properties panel.
+   */
   void apply();
 
   /**
-  * Reset the changes made.
-  *
-  * This is triggered when the user clicks the "Reset" button on the
-  * properties panel.
-  */
+   * Reset the changes made.
+   *
+   * This is triggered when the user clicks the "Reset" button on the
+   * properties panel.
+   */
   void reset();
 
   /**
-  * Shows the help dialog.
-  *
-  * This is triggered when the user clicks the "?" button on the
-  * properties panel.
-  */
+   * Shows the help dialog.
+   *
+   * This is triggered when the user clicks the "?" button on the
+   * properties panel.
+   */
   void showHelp();
 
   /**
-  * Restores the application defaults for the source properties.
-  *
-  * This is triggered when the user clicks the button with the
-  * reload button next to the properties button.
-  */
+   * Restores the application defaults for the source properties.
+   *
+   * This is triggered when the user clicks the button with the
+   * reload button next to the properties button.
+   */
   void propertiesRestoreDefaults();
 
   /**
-  * Saves the current property settings as default.
-  *
-  * This is triggered when the user clicks the button with the
-  * save icon next to the properties button.
-  */
+   * Saves the current property settings as default.
+   *
+   * This is triggered when the user clicks the button with the
+   * save icon next to the properties button.
+   */
   void propertiesSaveAsDefaults();
 
   /**
-  * Restores the application defaults for the display properties.
-  *
-  * This is triggered when the user clicks the button with the
-  * reload button next to the display button.
-  */
+   * Restores the application defaults for the display properties.
+   *
+   * This is triggered when the user clicks the button with the
+   * reload button next to the display button.
+   */
   void displayRestoreDefaults();
 
   /**
-  * Saves the current display settings as default.
-  *
-  * This is triggered when the user clicks the button with the
-  * save icon next to the display button.
-  */
+   * Saves the current display settings as default.
+   *
+   * This is triggered when the user clicks the button with the
+   * save icon next to the display button.
+   */
   void displaySaveAsDefaults();
 
   /**
-  * Restores the application defaults for the view properties.
-  *
-  * This is triggered when the user clicks the button with the
-  * reload button next to the view button.
-  */
+   * Restores the application defaults for the view properties.
+   *
+   * This is triggered when the user clicks the button with the
+   * reload button next to the view button.
+   */
   void viewRestoreDefaults();
 
   /**
-  * Saves the current view settings as default.
-  *
-  * This is triggered when the user clicks the button with the
-  * save icon next to the view button.
-  */
+   * Saves the current view settings as default.
+   *
+   * This is triggered when the user clicks the button with the
+   * save icon next to the view button.
+   */
   void viewSaveAsDefaults();
 
   /**
-  * Set the view currently managed by the
-  * panel, should be called automatically
-  * when the active view changes.
-  */
+   * Set the view currently managed by the panel, should be called
+   * automatically when the active view changes.
+   */
   void setView(pqView*);
 
   /**
@@ -228,35 +227,34 @@ public Q_SLOTS:
   void setPipelineProxy(pqProxy*);
 
   /**
-  * Set the representation currently managed by the
-  * panel, should be called automatically
-  * when the active representation changes.
-  */
+   * Set the representation currently managed by the panel, should be called
+   * automatically when the active representation changes.
+   */
   void setRepresentation(pqDataRepresentation*);
 Q_SIGNALS:
   /**
-  * This signal is emitted after the user clicks the apply button.
-  */
+   * This signal is emitted after the user clicks the apply button.
+   */
   void applied();
 
   /**
-  * This signal is emitted after a panel for a proxy is applied.
-  */
+   * This signal is emitted after a panel for a proxy is applied.
+   */
   void applied(pqProxy*);
 
   /**
-  * This signal is emitted when the current view changes.
-  */
+   * This signal is emitted when the current view changes.
+   */
   void viewChanged(pqView*);
 
   /**
-  * This signal is emitted when the user clicks the help button.
-  */
+   * This signal is emitted when the user clicks the help button.
+   */
   void helpRequested(const QString& groupname, const QString& proxyType);
 
   /**
-  * This signal is emitted when the user clicks the delete button.
-  */
+   * This signal is emitted when the user clicks the delete button.
+   */
   void deleteRequested(pqProxy* source);
 
   /**
@@ -268,54 +266,53 @@ Q_SIGNALS:
 
 private Q_SLOTS:
   /**
-  * This is called when the user clicks the "Delete" button on the
-  * properties panel. This triggers the deleteRequested() signal with proper
-  * arguments.
-  */
+   * This is called when the user clicks the "Delete" button on the properties
+   * panel. This triggers the deleteRequested() signal with proper arguments.
+   */
   void deleteProxy();
 
   /**
-  * slot gets called when a proxy is deleted.
-  */
+   * slot gets called when a proxy is deleted.
+   */
   void proxyDeleted(pqProxy*);
 
   /**
-  * Updates the entire panel (properties+display) using the current
-  * port/representation.
-  */
+   * Updates the entire panel (properties+display) using the current
+   * port/representation.
+   */
   void updatePanel();
 
   /**
-  * Updates the display part of the panel alone, unlike updatePanel().
-  */
+   * Updates the display part of the panel alone, unlike updatePanel().
+   */
   void updateDisplayPanel();
 
   /**
-  * renders the view, if any.
-  */
+   * renders the view, if any.
+   */
   void renderActiveView();
 
   /**
-  * Called when a property on the current proxy changes.
-  */
+   * Called when a property on the current proxy changes.
+   */
   void sourcePropertyChanged(bool change_finished = true);
   void sourcePropertyChangeAvailable() { this->sourcePropertyChanged(false); }
 
   /**
-  * Updates the state of all the buttons, apply/reset/delete.
-  */
+   * Updates the state of all the buttons, apply/reset/delete.
+   */
   void updateButtonState();
 
   /**
-  * Updates enabled state for buttons on panel (other than
-  * apply/reset/delete);
-  */
+   * Updates enabled state for buttons on panel (other than
+   * apply/reset/delete);
+   */
   void updateButtonEnableState();
 
   /**
-  * called when vtkPVGeneralSettings instance is modified. We update the
-  * auto-apply status.
-  */
+   * called when vtkPVGeneralSettings instance is modified. We update the
+   * auto-apply status.
+   */
   void generalSettingsChanged();
 
   void copyProperties();

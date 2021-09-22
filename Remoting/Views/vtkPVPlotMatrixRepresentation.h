@@ -41,7 +41,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  * vtkPVPlotMatrixRepresentation currently does not support multiblock of tables
  * and only the first table is rendered.
-*/
+ */
 
 #ifndef vtkPVPlotMatrixRepresentation_h
 #define vtkPVPlotMatrixRepresentation_h

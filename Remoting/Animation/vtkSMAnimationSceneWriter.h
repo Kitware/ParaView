@@ -19,7 +19,7 @@
  *
  * vtkSMAnimationSceneWriter is an abstract superclass for writers
  * that can write animations out.
-*/
+ */
 
 #ifndef vtkSMAnimationSceneWriter_h
 #define vtkSMAnimationSceneWriter_h

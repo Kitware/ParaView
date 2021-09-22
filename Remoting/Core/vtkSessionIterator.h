@@ -17,7 +17,7 @@
  *
  * vtkSessionIterator is used to iterate over sessions in the global
  * ProcessModule.
-*/
+ */
 
 #ifndef vtkSessionIterator_h
 #define vtkSessionIterator_h

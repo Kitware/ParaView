@@ -19,7 +19,7 @@ PURPOSE.  See the above copyright notice for more information.
  * Extracted from vtkSpyPlotReader
  *-----------------------------------------------------------------------------
  *=============================================================================
-*/
+ */
 
 #ifndef vtkSpyPlotReaderMap_h
 #define vtkSpyPlotReaderMap_h

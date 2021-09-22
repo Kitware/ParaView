@@ -26,7 +26,7 @@
  *
  * When dealing with composite datasets, it uses `vtkExtractBlock` to pass only
  * the selected blocks.
-*/
+ */
 
 #ifndef vtkBlockDeliveryPreprocessor_h
 #define vtkBlockDeliveryPreprocessor_h

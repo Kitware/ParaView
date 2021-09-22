@@ -4,7 +4,6 @@
 #include <vtkCPAdaptorAPI.h>
 #include <vtkCPDataDescription.h>
 #include <vtkCPInputDataDescription.h>
-#include <vtkCPInputDataDescription.h>
 #include <vtkCPProcessor.h>
 #include <vtkCellData.h>
 #include <vtkCellType.h>

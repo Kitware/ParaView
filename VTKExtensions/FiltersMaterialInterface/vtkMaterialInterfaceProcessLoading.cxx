@@ -14,8 +14,8 @@
 =========================================================================*/
 
 #include "vtkMaterialInterfaceProcessLoading.h"
-using std::ostream;
 using std::endl;
+using std::ostream;
 using std::vector;
 
 //

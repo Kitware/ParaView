@@ -277,8 +277,9 @@ int vtkVDFReader::RequestData(
       {
         for (vtkIdType x = ext[0]; x < ext[1]; x++)
         {
-          scalars->SetValue(iReal, vapor_data[(z - front_pad[2]) * data_size[1] * data_size[0] +
-                                     (y - front_pad[1]) * data_size[0] + (x - front_pad[0])]);
+          scalars->SetValue(iReal,
+            vapor_data[(z - front_pad[2]) * data_size[1] * data_size[0] +
+              (y - front_pad[1]) * data_size[0] + (x - front_pad[0])]);
           iReal++;
         }
       }

@@ -135,8 +135,8 @@ public:
   }
 
   static void ExtractMetaInformation(vtkPVXMLElement* proxy,
-    std::map<std::string, vtkSmartPointer<vtkPVXMLElement> >& subProxyMap,
-    std::map<std::string, vtkSmartPointer<vtkPVXMLElement> >& propertyMap)
+    std::map<std::string, vtkSmartPointer<vtkPVXMLElement>>& subProxyMap,
+    std::map<std::string, vtkSmartPointer<vtkPVXMLElement>>& propertyMap)
   {
     std::set<std::string> propertyTypeName;
     propertyTypeName.insert("DoubleMapProperty");
@@ -976,17 +976,17 @@ void vtkSIProxyDefinitionManager::MergeProxyDefinition(
   vtkPVXMLElement* element, vtkPVXMLElement* elementToFill)
 {
   // Meta-data of elementToFill
-  std::map<std::string, vtkSmartPointer<vtkPVXMLElement> > subProxyToFill;
-  std::map<std::string, vtkSmartPointer<vtkPVXMLElement> > propertiesToFill;
+  std::map<std::string, vtkSmartPointer<vtkPVXMLElement>> subProxyToFill;
+  std::map<std::string, vtkSmartPointer<vtkPVXMLElement>> propertiesToFill;
   vtkInternals::ExtractMetaInformation(elementToFill, subProxyToFill, propertiesToFill);
 
   // Meta-data of element that should be merged into the other
-  std::map<std::string, vtkSmartPointer<vtkPVXMLElement> > subProxySrc;
-  std::map<std::string, vtkSmartPointer<vtkPVXMLElement> > propertiesSrc;
+  std::map<std::string, vtkSmartPointer<vtkPVXMLElement>> subProxySrc;
+  std::map<std::string, vtkSmartPointer<vtkPVXMLElement>> propertiesSrc;
   vtkInternals::ExtractMetaInformation(element, subProxySrc, propertiesSrc);
 
   // Look for conflicting sub-proxy name and remove their definition if override
-  std::map<std::string, vtkSmartPointer<vtkPVXMLElement> >::iterator mapIter;
+  std::map<std::string, vtkSmartPointer<vtkPVXMLElement>>::iterator mapIter;
   mapIter = subProxyToFill.begin();
   while (mapIter != subProxyToFill.end())
   {

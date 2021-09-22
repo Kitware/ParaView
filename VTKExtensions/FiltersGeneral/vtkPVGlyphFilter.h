@@ -54,7 +54,7 @@
  * In parallel and with composite dataset, this filter ensures that each piece
  * samples only a representative number of points.
  * Note that the grid will be tetrahedralized first.
-*/
+ */
 
 #ifndef vtkPVGlyphFilter_h
 #define vtkPVGlyphFilter_h

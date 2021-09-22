@@ -27,7 +27,7 @@
  *
  *  Copyright (c) CEA
  * \endverbatim
-*/
+ */
 
 #ifndef vtkPEnSightGoldBinaryReader_h
 #define vtkPEnSightGoldBinaryReader_h

@@ -134,7 +134,7 @@ void pqRecentFilesMenu::buildMenu()
     pqApplicationCore::instance()->recentlyUsedResources().list();
 
   // Sort resources to cluster them by servers.
-  typedef QMap<QString, QList<pqServerResource> > ClusteredResourcesType;
+  typedef QMap<QString, QList<pqServerResource>> ClusteredResourcesType;
   ClusteredResourcesType clusteredResources;
 
   for (int cc = 0; cc < resources.size(); cc++)

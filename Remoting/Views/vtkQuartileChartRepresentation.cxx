@@ -140,7 +140,7 @@ public:
           const std::string label = this->GetSeriesParameter(
             self, tableName, columnName, role, this->Labels, default_label);
 
-          std::vector<std::pair<std::string, std::string> > yNames;
+          std::vector<std::pair<std::string, std::string>> yNames;
           if (role == "minmax")
           {
             yNames.push_back(std::make_pair(columnName.replace(0, 3, "min"), "min " + label));

@@ -39,15 +39,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 vtkStandardNewMacro(vtkVRQueue);
 
 //----------------------------------------------------------------------------
-vtkVRQueue::vtkVRQueue()
-  : Superclass()
-{
-}
+vtkVRQueue::vtkVRQueue() = default;
 
 //----------------------------------------------------------------------------
-vtkVRQueue::~vtkVRQueue()
-{
-}
+vtkVRQueue::~vtkVRQueue() = default;
 
 //----------------------------------------------------------------------------
 void vtkVRQueue::Enqueue(const vtkVREvent& event)

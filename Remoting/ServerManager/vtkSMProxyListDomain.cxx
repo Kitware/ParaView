@@ -19,7 +19,6 @@
 #include "vtkObjectFactory.h"
 #include "vtkPVProxyDefinitionIterator.h"
 #include "vtkPVXMLElement.h"
-#include "vtkPVXMLElement.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMProxy.h"
 #include "vtkSMProxyDefinitionManager.h"
@@ -120,9 +119,10 @@ public:
         vtkSMProxy* src_subproxy = parent->GetSubProxy(name);
         if (!src_subproxy)
         {
-          vtkErrorWithObjectMacro(parent, "Subproxy "
-              << name << " must be defined before "
-                         "its properties can be shared with another subproxy.");
+          vtkErrorWithObjectMacro(parent,
+            "Subproxy " << name
+                        << " must be defined before its properties can be "
+                           "shared with another subproxy.");
           continue;
         }
         vtkNew<vtkSMProxyLink> sharingLink;

@@ -49,8 +49,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * `pqParaViewBehaviors::enableStandardRecentlyUsedResourceLoader` is false.
  */
 class PQAPPLICATIONCOMPONENTS_EXPORT pqStandardRecentlyUsedResourceLoaderImplementation
-  : public QObject,
-    public pqRecentlyUsedResourceLoaderInterface
+  : public QObject
+  , public pqRecentlyUsedResourceLoaderInterface
 {
   Q_OBJECT
   Q_INTERFACES(pqRecentlyUsedResourceLoaderInterface)

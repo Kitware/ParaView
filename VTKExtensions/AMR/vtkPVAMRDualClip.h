@@ -21,7 +21,7 @@
  *
  * .SEE vtkAMRDualClip
  *
-*/
+ */
 
 #ifndef vtkPVAMRDualClip_h
 #define vtkPVAMRDualClip_h

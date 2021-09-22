@@ -16,7 +16,7 @@
  * @class   vtkSIIntVectorProperty
  *
  * ServerSide Property use to set int array as method argument.
-*/
+ */
 
 #ifndef vtkSIIntVectorProperty_h
 #define vtkSIIntVectorProperty_h

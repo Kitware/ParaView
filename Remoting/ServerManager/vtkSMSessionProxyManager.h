@@ -108,7 +108,7 @@
  *           </Hints>
  *       </SourceProxy>
  * \endcode
-*/
+ */
 
 #ifndef vtkSMSessionProxyManager_h
 #define vtkSMSessionProxyManager_h

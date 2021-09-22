@@ -72,7 +72,7 @@ public:
   // Maps a proxy name with a map of <propertyLabel, propertyName>
   // pairs for each of its properties. This assumes that labels of
   // a proxy's properties are unique.
-  QMap<QString, QMap<QString, QString> > LabelToNamePropertyMap;
+  QMap<QString, QMap<QString, QString>> LabelToNamePropertyMap;
 };
 
 //-----------------------------------------------------------------------------
@@ -319,8 +319,9 @@ bool pqCustomFilterDefinitionWizard::validateCustomFilterName()
   QString filterName = this->Form->CustomFilterName->text();
   if (filterName.isEmpty())
   {
-    QMessageBox::warning(this, "No Name", "The custom filter name field is empty.\n"
-                                          "Please enter a unique name for the custom filter.",
+    QMessageBox::warning(this, "No Name",
+      "The custom filter name field is empty.\n"
+      "Please enter a unique name for the custom filter.",
       QMessageBox::Ok | QMessageBox::Default, QMessageBox::NoButton);
     this->Form->CustomFilterName->setFocus();
     return false;
@@ -334,8 +335,9 @@ bool pqCustomFilterDefinitionWizard::validateCustomFilterName()
     if (proxyManager->GetProxyDefinition("filters", filterName.toUtf8().data()) ||
       proxyManager->GetProxyDefinition("sources", filterName.toUtf8().data()))
     {
-      QMessageBox::warning(this, "Duplicate Name", "This filter name already exists.\n"
-                                                   "Please enter a different name.",
+      QMessageBox::warning(this, "Duplicate Name",
+        "This filter name already exists.\n"
+        "Please enter a different name.",
         QMessageBox::Ok | QMessageBox::Default, QMessageBox::NoButton);
       return false;
     }
@@ -611,8 +613,9 @@ void pqCustomFilterDefinitionWizard::addInput()
   QString name = this->Form->InputName->text();
   if (name.isEmpty())
   {
-    QMessageBox::warning(this, "No Name", "The input name field is empty.\n"
-                                          "Please enter a unique name for the input.",
+    QMessageBox::warning(this, "No Name",
+      "The input name field is empty.\n"
+      "Please enter a unique name for the input.",
       QMessageBox::Ok | QMessageBox::Default, QMessageBox::NoButton);
     this->Form->InputName->setFocus();
     return;
@@ -620,8 +623,9 @@ void pqCustomFilterDefinitionWizard::addInput()
 
   if (this->Form->ExposedPropertyNames.contains(name))
   {
-    QMessageBox::warning(this, "Duplicate Name", "Another input already has the name entered.\n"
-                                                 "Please enter a unique name for the input.",
+    QMessageBox::warning(this, "Duplicate Name",
+      "Another input already has the name entered.\n"
+      "Please enter a unique name for the input.",
       QMessageBox::Ok | QMessageBox::Default, QMessageBox::NoButton);
     this->Form->InputName->setFocus();
     this->Form->InputName->selectAll();
@@ -731,8 +735,9 @@ void pqCustomFilterDefinitionWizard::addOutput()
   QString name = this->Form->OutputName->text();
   if (name.isEmpty())
   {
-    QMessageBox::warning(this, "No Name", "The output name field is empty.\n"
-                                          "Please enter a unique name for the output.",
+    QMessageBox::warning(this, "No Name",
+      "The output name field is empty.\n"
+      "Please enter a unique name for the output.",
       QMessageBox::Ok | QMessageBox::Default, QMessageBox::NoButton);
     this->Form->OutputName->setFocus();
     return;
@@ -740,8 +745,9 @@ void pqCustomFilterDefinitionWizard::addOutput()
 
   if (this->Form->ExposedPortNames.contains(name))
   {
-    QMessageBox::warning(this, "Duplicate Name", "Another output already has the name entered.\n"
-                                                 "Please enter a unique name for the output.",
+    QMessageBox::warning(this, "Duplicate Name",
+      "Another output already has the name entered.\n"
+      "Please enter a unique name for the output.",
       QMessageBox::Ok | QMessageBox::Default, QMessageBox::NoButton);
     this->Form->OutputName->setFocus();
     this->Form->OutputName->selectAll();
@@ -892,8 +898,9 @@ void pqCustomFilterDefinitionWizard::addProperty()
   QString name = this->Form->PropertyName->text();
   if (name.isEmpty())
   {
-    QMessageBox::warning(this, "No Name", "The property name field is empty.\n"
-                                          "Please enter a unique name for the property.",
+    QMessageBox::warning(this, "No Name",
+      "The property name field is empty.\n"
+      "Please enter a unique name for the property.",
       QMessageBox::Ok | QMessageBox::Default, QMessageBox::NoButton);
     this->Form->PropertyName->setFocus();
     return;
@@ -901,8 +908,9 @@ void pqCustomFilterDefinitionWizard::addProperty()
 
   if (this->Form->ExposedPropertyNames.contains(name))
   {
-    QMessageBox::warning(this, "Duplicate Name", "Another property already has the name entered.\n"
-                                                 "Please enter a unique name for the property.",
+    QMessageBox::warning(this, "Duplicate Name",
+      "Another property already has the name entered.\n"
+      "Please enter a unique name for the property.",
       QMessageBox::Ok | QMessageBox::Default, QMessageBox::NoButton);
     this->Form->PropertyName->setFocus();
     this->Form->PropertyName->selectAll();

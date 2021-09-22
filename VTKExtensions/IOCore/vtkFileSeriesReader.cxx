@@ -79,11 +79,12 @@ public:
   // See paraview/paraview#20314 and paraview/paraview#19777 for two apparently
   // conflicting use-cases that need to be supported.
   void SetSkipTimeInOutput(bool val) { this->SkipTimeInOutput = val; }
+
 private:
   static vtkInformationIntegerKey* INDEX();
-  typedef std::map<double, vtkSmartPointer<vtkInformation> > RangeMapType;
+  typedef std::map<double, vtkSmartPointer<vtkInformation>> RangeMapType;
   RangeMapType RangeMap;
-  std::map<int, vtkSmartPointer<vtkInformation> > InputLookup;
+  std::map<int, vtkSmartPointer<vtkInformation>> InputLookup;
   bool SkipTimeInOutput = false;
 };
 
@@ -621,8 +622,9 @@ int vtkFileSeriesReader::RequestInformation(vtkInformation* request,
   ignoreReaderTime |= !this->Internal->TimeValues.empty();
 
   // Does the reader have time?
-  if (ignoreReaderTime || (!outInfo->Has(vtkStreamingDemandDrivenPipeline::TIME_STEPS()) &&
-                            !outInfo->Has(vtkStreamingDemandDrivenPipeline::TIME_RANGE())))
+  if (ignoreReaderTime ||
+    (!outInfo->Has(vtkStreamingDemandDrivenPipeline::TIME_STEPS()) &&
+      !outInfo->Has(vtkStreamingDemandDrivenPipeline::TIME_RANGE())))
   {
     // Input files have no time steps.  Fake a time step for each equal to the
     // index.

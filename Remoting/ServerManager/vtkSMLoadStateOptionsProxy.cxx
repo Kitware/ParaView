@@ -113,11 +113,11 @@ public:
   };
 
   // A map of { id : { property-name: PropertyInfo } }.
-  std::map<int, std::map<std::string, PropertyInfo> > PropertiesMap;
+  std::map<int, std::map<std::string, PropertyInfo>> PropertiesMap;
 
   // A map that helps us identify the property (id, propertyname) given its
   // exposed name.
-  std::map<std::string, std::pair<int, std::string> > ExposedPropertyNameMap;
+  std::map<std::string, std::pair<int, std::string>> ExposedPropertyNameMap;
 
   // A map of proxy names used and their count: this is used to ensure each
   // proxy gets a different names when coming up with exposed names for its
@@ -277,7 +277,8 @@ private:
     const int id = proxy.attribute("id").as_int();
 
     std::ostringstream str;
-    str << proxyname.c_str() << " ("
+    str << proxyname
+        << " ("
         /* << proxy.attribute("group").value() << ", "*/
         << proxy.attribute("type").value() << ") (id=" << id << ")";
     vtkNew<vtkSMPropertyGroup> group;

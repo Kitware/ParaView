@@ -25,7 +25,7 @@
  * only one name.
  * @sa
  * vtkSMProxyManager
-*/
+ */
 
 #ifndef vtkPVProxyDefinitionIterator_h
 #define vtkPVProxyDefinitionIterator_h

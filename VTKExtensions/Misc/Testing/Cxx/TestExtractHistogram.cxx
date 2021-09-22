@@ -22,7 +22,7 @@
 #include "vtkTable.h"
 
 /// Test the output of the vtkExtractHistogram filter in a simple serial case
-int TestExtractHistogram(int, char* [])
+int TestExtractHistogram(int, char*[])
 {
   auto sphere = vtkSmartPointer<vtkSphereSource>::New();
   auto extraction = vtkSmartPointer<vtkExtractHistogram>::New();

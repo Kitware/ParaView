@@ -21,7 +21,7 @@
  *
  * @sa
  * vtkThreshold vtkPVClipDataSet
-*/
+ */
 
 #ifndef vtkIsoVolume_h
 #define vtkIsoVolume_h

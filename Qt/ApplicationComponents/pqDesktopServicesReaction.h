@@ -37,18 +37,18 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QUrl>
 
 /**
-* @ingroup Reactions
-* pqDesktopServicesReaction can be used to open a file (or URL) using
-* QDesktopServices. e.g. if your application wants to launch a PDF viewer to
-* open the application's User Guide, you can hookup a menu QAction to the
-* pqDesktopServicesReaction. e.g.
-* @code
-* QAction* action = ...
-* new pqDesktopServicesReaction(QUrl("file:///..../doc/UsersGuide.pdf"), action);
-* @endcode
-*
-* The URL is set as status tip on the parent action.
-*/
+ * @ingroup Reactions
+ * pqDesktopServicesReaction can be used to open a file (or URL) using
+ * QDesktopServices. e.g. if your application wants to launch a PDF viewer to
+ * open the application's User Guide, you can hookup a menu QAction to the
+ * pqDesktopServicesReaction. e.g.
+ * @code
+ * QAction* action = ...
+ * new pqDesktopServicesReaction(QUrl("file:///..../doc/UsersGuide.pdf"), action);
+ * @endcode
+ *
+ * The URL is set as status tip on the parent action.
+ */
 class PQAPPLICATIONCOMPONENTS_EXPORT pqDesktopServicesReaction : public pqReaction
 {
   Q_OBJECT
@@ -59,9 +59,9 @@ public:
   ~pqDesktopServicesReaction() override;
 
   /**
-  * Attempt to open a file (local or on the Web) using QDesktopServices.
-  * Returns false if failed to open for some reason, other returns true.
-  */
+   * Attempt to open a file (local or on the Web) using QDesktopServices.
+   * Returns false if failed to open for some reason, other returns true.
+   */
   static bool openUrl(const QUrl& url);
 
 protected:

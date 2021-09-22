@@ -75,8 +75,8 @@ int TestMergeTablesMultiBlock(int argc, char* argv[])
     {
       for (vtkIdType cc = 0; cc < data0->GetNumberOfColumns(); cc++)
       {
-        expect(result->GetValue(rr, cc) == data0->GetValue(rr, cc), "data0 value mismatched at ("
-            << rr << "," << cc << ")");
+        expect(result->GetValue(rr, cc) == data0->GetValue(rr, cc),
+          "data0 value mismatched at (" << rr << "," << cc << ")");
       }
     }
     for (vtkIdType rr = 0; rr < data1->GetNumberOfRows(); rr++)
@@ -106,8 +106,8 @@ int TestMergeTablesMultiBlock(int argc, char* argv[])
     {
       for (vtkIdType cc = 0; cc < data0->GetNumberOfColumns(); cc++)
       {
-        expect(result0->GetValue(rr, cc) == data0->GetValue(rr, cc), "data0 value mismatched at ("
-            << rr << "," << cc << ")");
+        expect(result0->GetValue(rr, cc) == data0->GetValue(rr, cc),
+          "data0 value mismatched at (" << rr << "," << cc << ")");
       }
     }
     vtkTable* result1 = vtkTable::SafeDownCast(merger->GetOutput()->GetBlock(1));
@@ -117,8 +117,8 @@ int TestMergeTablesMultiBlock(int argc, char* argv[])
     {
       for (vtkIdType cc = 0; cc < data1->GetNumberOfColumns(); cc++)
       {
-        expect(result1->GetValue(rr, cc) == data1->GetValue(rr, cc), "data1 value mismatched at ("
-            << rr << "," << cc << ")");
+        expect(result1->GetValue(rr, cc) == data1->GetValue(rr, cc),
+          "data1 value mismatched at (" << rr << "," << cc << ")");
       }
     }
   }

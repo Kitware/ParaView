@@ -25,7 +25,7 @@
  * data-information. However for backwards compatibility, to keep the impact
  * minimal, we leave this as a sub-class of a Proxy with GlobalID=0 and
  * Session=nullptr.
-*/
+ */
 
 #ifndef vtkSMOutputPort_h
 #define vtkSMOutputPort_h
@@ -176,9 +176,9 @@ protected:
   vtkPVTemporalDataInformation* TemporalDataInformation;
   bool TemporalDataInformationValid;
 
-  std::map<std::string, std::map<int, vtkSmartPointer<vtkPVDataInformation> > >
+  std::map<std::string, std::map<int, vtkSmartPointer<vtkPVDataInformation>>>
     SubsetDataInformations;
-  std::map<int, vtkSmartPointer<vtkPVDataInformation> > RankDataInformations;
+  std::map<int, vtkSmartPointer<vtkPVDataInformation>> RankDataInformations;
 
 private:
   vtkSMOutputPort(const vtkSMOutputPort&) = delete;

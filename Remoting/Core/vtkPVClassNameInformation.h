@@ -19,7 +19,7 @@
  * This information object gets the class name of the input VTK object.  This
  * is separate from vtkPVDataInformation because it can be determined before
  * Update is called and because it operates on any VTK object.
-*/
+ */
 
 #ifndef vtkPVClassNameInformation_h
 #define vtkPVClassNameInformation_h

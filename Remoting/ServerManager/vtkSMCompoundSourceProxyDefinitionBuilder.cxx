@@ -26,7 +26,7 @@
 class vtkSMCompoundSourceProxyDefinitionBuilder::vtkInternals
 {
 public:
-  typedef std::map<std::string, vtkSmartPointer<vtkSMProxy> > MapOfProxies;
+  typedef std::map<std::string, vtkSmartPointer<vtkSMProxy>> MapOfProxies;
   MapOfProxies Proxies;
 
   struct PropertyInfo
@@ -288,7 +288,7 @@ int vtkSMCompoundSourceProxyDefinitionBuilder::ShouldWriteValue(vtkPVXMLElement*
 //---------------------------------------------------------------------------
 void vtkSMCompoundSourceProxyDefinitionBuilder::StripValues(vtkPVXMLElement* propertyElem)
 {
-  typedef std::list<vtkSmartPointer<vtkPVXMLElement> > ElementsType;
+  typedef std::list<vtkSmartPointer<vtkPVXMLElement>> ElementsType;
   ElementsType elements;
 
   // Find all elements we want to keep

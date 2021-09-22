@@ -92,9 +92,8 @@ void vtkSMComparativeViewProxy::CreateVTKObjects()
     return;
   }
 
-  GET_PV_COMPARATIVE_VIEW()
-    ->AddObserver(
-      vtkCommand::ConfigureEvent, this, &vtkSMComparativeViewProxy::InvokeConfigureEvent);
+  GET_PV_COMPARATIVE_VIEW()->AddObserver(
+    vtkCommand::ConfigureEvent, this, &vtkSMComparativeViewProxy::InvokeConfigureEvent);
 
   GET_PV_COMPARATIVE_VIEW()->Initialize(rootView);
 }

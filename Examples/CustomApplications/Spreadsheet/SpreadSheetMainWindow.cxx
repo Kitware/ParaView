@@ -33,7 +33,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ui_SpreadSheetMainWindow.h"
 
 #include "pqActiveObjects.h"
-#include "pqActiveObjects.h"
 #include "pqAlwaysConnectedBehavior.h"
 #include "pqApplicationCore.h"
 #include "pqLoadDataReaction.h"
@@ -81,9 +80,7 @@ SpreadSheetMainWindow::SpreadSheetMainWindow(QWidget* parentObject, Qt::WindowFl
 }
 
 //-----------------------------------------------------------------------------
-SpreadSheetMainWindow::~SpreadSheetMainWindow()
-{
-}
+SpreadSheetMainWindow::~SpreadSheetMainWindow() = default;
 
 //-----------------------------------------------------------------------------
 void SpreadSheetMainWindow::showData(pqPipelineSource* source)

@@ -19,7 +19,7 @@
  * This assumes that all tiles have the same pixel-size.
  *
  *
-*/
+ */
 
 #ifndef vtkTilesHelper_h
 #define vtkTilesHelper_h

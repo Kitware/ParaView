@@ -166,7 +166,7 @@ pqPipelineSource* pqObjectBuilder::createSource(
 
 //-----------------------------------------------------------------------------
 pqPipelineSource* pqObjectBuilder::createFilter(const QString& sm_group, const QString& sm_name,
-  QMap<QString, QList<pqOutputPort*> > namedInputs, pqServer* server)
+  QMap<QString, QList<pqOutputPort*>> namedInputs, pqServer* server)
 {
   vtkNew<vtkSMParaViewPipelineController> controller;
   vtkSMSessionProxyManager* pxm = server->proxyManager();
@@ -178,7 +178,7 @@ pqPipelineSource* pqObjectBuilder::createFilter(const QString& sm_group, const Q
   }
 
   // Now for every input port, connect the inputs.
-  QMap<QString, QList<pqOutputPort*> >::iterator mapIter;
+  QMap<QString, QList<pqOutputPort*>>::iterator mapIter;
   for (mapIter = namedInputs.begin(); mapIter != namedInputs.end(); ++mapIter)
   {
     const QString& input_port_name = mapIter.key();
@@ -208,7 +208,7 @@ pqPipelineSource* pqObjectBuilder::createFilter(const QString& sm_group, const Q
 pqPipelineSource* pqObjectBuilder::createFilter(
   const QString& group, const QString& name, pqPipelineSource* input, int output_port)
 {
-  QMap<QString, QList<pqOutputPort*> > namedInputs;
+  QMap<QString, QList<pqOutputPort*>> namedInputs;
   QList<pqOutputPort*> inputs;
   inputs.push_back(input->getOutputPort(output_port));
   namedInputs["Input"] = inputs;

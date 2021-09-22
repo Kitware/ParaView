@@ -17,7 +17,7 @@
  * @brief   InformationOnly property
  *
  * SIProperty that deals with vtkDataArray object type
-*/
+ */
 
 #ifndef vtkSIDataArrayProperty_h
 #define vtkSIDataArrayProperty_h

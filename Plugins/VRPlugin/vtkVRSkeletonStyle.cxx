@@ -72,9 +72,7 @@ vtkVRSkeletonStyle::vtkVRSkeletonStyle()
 
 // ----------------------------------------------------------------------------
 // Destructor method
-vtkVRSkeletonStyle::~vtkVRSkeletonStyle()
-{
-}
+vtkVRSkeletonStyle::~vtkVRSkeletonStyle() = default;
 
 // ----------------------------------------------------------------------------
 // PrintSelf() method

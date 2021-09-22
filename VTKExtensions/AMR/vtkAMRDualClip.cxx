@@ -43,8 +43,6 @@
 #include "vtkPointData.h"
 #include "vtkUniformGrid.h"
 #include "vtkUnsignedCharArray.h"
-#include "vtkUnsignedCharArray.h"
-#include "vtkUnstructuredGrid.h"
 #include "vtkUnstructuredGrid.h"
 #include <cmath>
 #include <ctime>

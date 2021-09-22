@@ -56,9 +56,7 @@ vtkVRSpaceNavigatorGrabWorldStyle::vtkVRSpaceNavigatorGrabWorldStyle()
 
 // ----------------------------------------------------------------------------
 // Destructor method
-vtkVRSpaceNavigatorGrabWorldStyle::~vtkVRSpaceNavigatorGrabWorldStyle()
-{
-}
+vtkVRSpaceNavigatorGrabWorldStyle::~vtkVRSpaceNavigatorGrabWorldStyle() = default;
 
 // ----------------------------------------------------------------------------
 // PrintSelf() method
@@ -128,9 +126,8 @@ void vtkVRSpaceNavigatorGrabWorldStyle::HandleAnalog(const vtkVREvent& event)
       camera->SetFocalPoint(focal_point);
 
       // Set all the other camera values
-      camera->Dolly(
-        pow(1.01, analog_input[1])); /* WRS: why the use of pow()?  And why doesn't this use the
-                                        forward_vector? */
+      /* WRS: why the use of pow()?  And why doesn't this use the forward_vector? */
+      camera->Dolly(pow(1.01, analog_input[1]));
       camera->Elevation(1.0 * analog_input[3]);
       camera->Azimuth(1.0 * analog_input[5]);
       camera->Roll(1.0 * analog_input[4]);

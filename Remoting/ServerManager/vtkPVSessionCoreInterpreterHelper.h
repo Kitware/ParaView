@@ -17,7 +17,7 @@
  *
  * vtkPVSessionCoreInterpreterHelper is used by vtkPVSessionCore to avoid a
  * circular reference between the vtkPVSessionCore instance and its Interpreter.
-*/
+ */
 
 #ifndef vtkPVSessionCoreInterpreterHelper_h
 #define vtkPVSessionCoreInterpreterHelper_h

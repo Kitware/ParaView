@@ -19,7 +19,7 @@
  * vtkPVClientServerSynchronizedRenderers is similar to
  * vtkClientServerSynchronizedRenderers except that it optionally uses image
  * compressors to compress the image before transmitting.
-*/
+ */
 
 #ifndef vtkPVClientServerSynchronizedRenderers_h
 #define vtkPVClientServerSynchronizedRenderers_h

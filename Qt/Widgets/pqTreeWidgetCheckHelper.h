@@ -40,13 +40,13 @@ class QTreeWidget;
 class QTreeWidgetItem;
 
 /**
-* If a QTreeWidget has checkable elements in any column, one needs
-* to explicitly click on the checkbox to change the check state.
-* However, sometimes we simply want the checkbox to be updated
-* when the user clicks on the entire row. For that
-* purpose, we use pqTreeWidgetCheckHelper. Simply create
-* and instance of pqTreeWidgetCheckHelper, and set a tree to use.
-*/
+ * If a QTreeWidget has checkable elements in any column, one needs
+ * to explicitly click on the checkbox to change the check state.
+ * However, sometimes we simply want the checkbox to be updated
+ * when the user clicks on the entire row. For that
+ * purpose, we use pqTreeWidgetCheckHelper. Simply create
+ * and instance of pqTreeWidgetCheckHelper, and set a tree to use.
+ */
 class PQWIDGETS_EXPORT pqTreeWidgetCheckHelper : public QObject
 {
   Q_OBJECT

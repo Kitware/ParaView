@@ -47,7 +47,7 @@ PURPOSE.  See the above copyright notice for more information.
  * even on part of the block that don't have actual neighbor cells. The
  * reader removes those wrong ghost cells.
  * - Each time step contains all the cell array name variables
-*/
+ */
 
 #ifndef vtkSpyPlotReader_h
 #define vtkSpyPlotReader_h

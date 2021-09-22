@@ -23,7 +23,7 @@
  * This class was originally designed to support and maintain multiple
  * interpreter instances. However ParaView no longer has need for that and hence
  * that functionality is no longer made public.
-*/
+ */
 
 #ifndef vtkClientServerInterpreterInitializer_h
 #define vtkClientServerInterpreterInitializer_h

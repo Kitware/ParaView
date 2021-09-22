@@ -25,14 +25,10 @@
 vtkStandardNewMacro(vtkPVMacFileInformationHelper);
 
 //-----------------------------------------------------------------------------
-vtkPVMacFileInformationHelper::vtkPVMacFileInformationHelper()
-{
-}
+vtkPVMacFileInformationHelper::vtkPVMacFileInformationHelper() = default;
 
 //-----------------------------------------------------------------------------
-vtkPVMacFileInformationHelper::~vtkPVMacFileInformationHelper()
-{
-}
+vtkPVMacFileInformationHelper::~vtkPVMacFileInformationHelper() = default;
 
 //-----------------------------------------------------------------------------
 std::string vtkPVMacFileInformationHelper::GetHomeDirectory()
@@ -97,8 +93,8 @@ namespace
 std::string GetUserDomainDirectory(NSSearchPathDirectory userDirectory)
 {
   std::string directory;
-  NSArray* urls =
-    [[NSFileManager defaultManager] URLsForDirectory:userDirectory inDomains:NSUserDomainMask];
+  NSArray* urls = [[NSFileManager defaultManager] URLsForDirectory:userDirectory
+                                                         inDomains:NSUserDomainMask];
   for (NSURL* url in urls)
   {
     NSString* path = [url path];

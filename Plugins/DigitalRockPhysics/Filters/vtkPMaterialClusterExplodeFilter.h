@@ -40,7 +40,7 @@
  * @par Thanks:
  * This class was written by Joachim Pouderoux and Mathieu Westphal, Kitware 2017
  * This work was supported by Total SA.
-*/
+ */
 
 #ifndef vtkPMaterialClusterExplodeFilter_h
 #define vtkPMaterialClusterExplodeFilter_h

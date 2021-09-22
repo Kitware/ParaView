@@ -46,8 +46,8 @@ class vtkVRResetTransformStyle : public vtkVRTrackStyle
 {
 public:
   static vtkVRResetTransformStyle* New();
-  vtkTypeMacro(vtkVRResetTransformStyle, vtkVRTrackStyle) void PrintSelf(
-    ostream& os, vtkIndent indent) override;
+  vtkTypeMacro(vtkVRResetTransformStyle, vtkVRTrackStyle);
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
 protected:
   vtkVRResetTransformStyle();

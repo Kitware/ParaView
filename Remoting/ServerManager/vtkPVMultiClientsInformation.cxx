@@ -104,8 +104,9 @@ void vtkPVMultiClientsInformation::CopyFromObject(vtkObject* vtkNotUsed(obj))
     delete[] this->ClientIds;
     this->ClientIds = nullptr;
   }
-  if (session && (ctrl = vtkCompositeMultiProcessController::SafeDownCast(
-                    session->GetController(vtkPVSession::CLIENT))))
+  if (session &&
+    (ctrl = vtkCompositeMultiProcessController::SafeDownCast(
+       session->GetController(vtkPVSession::CLIENT))))
   {
     this->ClientId = ctrl->GetActiveControllerID();
     this->MasterId = ctrl->GetMasterController();

@@ -94,7 +94,7 @@ inline vtkSMProperty* GetControlPointsProperty(vtkSMProxy* self)
 // interpolation space.
 // originalRange is filled with the original range of the cntrlPoints before
 // rescaling.
-bool vtkNormalize(std::vector<vtkTuple<double, 4> >& cntrlPoints, bool log_space,
+bool vtkNormalize(std::vector<vtkTuple<double, 4>>& cntrlPoints, bool log_space,
   vtkTuple<double, 2>* originalRange = nullptr)
 {
   if (cntrlPoints.empty())
@@ -166,7 +166,7 @@ bool vtkNormalize(std::vector<vtkTuple<double, 4> >& cntrlPoints, bool log_space
 // case too, rangeMin/rangeMax should be still specified as the original data
 // values (and not log of the data values).
 bool vtkRescaleNormalizedControlPoints(
-  std::vector<vtkTuple<double, 4> >& cntrlPoints, double rangeMin, double rangeMax, bool log_space)
+  std::vector<vtkTuple<double, 4>>& cntrlPoints, double rangeMin, double rangeMax, bool log_space)
 {
   assert(cntrlPoints.size() >= 2);
   assert(cntrlPoints.front()[0] == 0.0 && cntrlPoints.back()[0] == 1.0);
@@ -242,7 +242,7 @@ bool vtkSMTransferFunctionProxy::GetRange(double range[2])
     return false;
   }
 
-  std::vector<vtkTuple<double, 4> > points;
+  std::vector<vtkTuple<double, 4>> points;
   points.resize(num_elements / 4);
   cntrlPoints.Get(points[0].GetData(), num_elements);
 
@@ -328,7 +328,7 @@ bool vtkSMTransferFunctionProxy::RescaleTransferFunction(
 
   // just in case the num_elements is not a perfect multiple of 4.
   num_elements = 4 * (num_elements / 4);
-  std::vector<vtkTuple<double, 4> > points;
+  std::vector<vtkTuple<double, 4>> points;
   points.resize(num_elements / 4);
   cntrlPoints.Get(points[0].GetData(), num_elements);
 
@@ -702,7 +702,7 @@ bool vtkSMTransferFunctionProxy::InvertTransferFunction()
   // determine if the interpolation has to happen in log-space.
   bool log_space = (vtkSMPropertyHelper(this, "UseLogScale", true).GetAsInt() != 0);
 
-  std::vector<vtkTuple<double, 4> > points;
+  std::vector<vtkTuple<double, 4>> points;
   points.resize(num_elements / 4);
   cntrlPoints.Get(points[0].GetData(), num_elements);
 
@@ -746,7 +746,7 @@ bool vtkSMTransferFunctionProxy::MapControlPointsToLogSpace(bool inverse /*=fals
     return true;
   }
 
-  std::vector<vtkTuple<double, 4> > points;
+  std::vector<vtkTuple<double, 4>> points;
   points.resize(num_elements / 4);
   cntrlPoints.Get(points[0].GetData(), num_elements);
 
@@ -792,8 +792,9 @@ bool vtkSMTransferFunctionProxy::ApplyPreset(const Json::Value& arg, bool rescal
     .arg("ApplyPreset")
     .arg(arg.get("Name", "-PresetName-").asString().c_str())
     .arg(rescale)
-    .arg("comment", "Apply a preset using its name. "
-                    "Note this may not work as expected when presets have duplicate names.");
+    .arg("comment",
+      "Apply a preset using its name. Note this may not work as expected when "
+      "presets have duplicate names.");
 
   bool usingIndexedColors = arg.isMember("IndexedColors");
 
@@ -827,7 +828,7 @@ bool vtkSMTransferFunctionProxy::ApplyPreset(const Json::Value& arg, bool rescal
       return false;
     }
 
-    std::vector<vtkTuple<double, 4> > cntrlPoints;
+    std::vector<vtkTuple<double, 4>> cntrlPoints;
     cntrlPoints.resize(pointsValue.size() / 4);
     for (Json::ArrayIndex cc = 0, max = pointsValue.size() / 4; cc < max; ++cc)
     {
@@ -968,7 +969,7 @@ bool vtkSMTransferFunctionProxy::SaveColorMap(vtkPVXMLElement* xml)
     if (indexedLookup)
     {
       // Save (r,g,b) tuples for categorical colors.
-      std::vector<vtkTuple<double, 3> > points;
+      std::vector<vtkTuple<double, 3>> points;
       points.resize(num_elements / 3);
       cntrlPoints.Get(points[0].GetData(), num_elements);
 
@@ -986,7 +987,7 @@ bool vtkSMTransferFunctionProxy::SaveColorMap(vtkPVXMLElement* xml)
     else
     {
       // Save (x, r, g, b) tuples for non-categorical colors.
-      std::vector<vtkTuple<double, 4> > points;
+      std::vector<vtkTuple<double, 4>> points;
       points.resize(num_elements / 4);
       cntrlPoints.Get(points[0].GetData(), num_elements);
 
@@ -1137,7 +1138,7 @@ void vtkSMTransferFunctionProxy::ResetPropertiesToDefaults(
       throw true;
     }
 
-    std::vector<vtkTuple<double, 4> > points;
+    std::vector<vtkTuple<double, 4>> points;
     points.resize(num_elements / 4);
     cntrlPoints.Get(points[0].GetData(), num_elements);
 
@@ -1220,8 +1221,8 @@ Json::Value vtkSMTransferFunctionProxy::ConvertLegacyColorMapXMLToJSON(vtkPVXMLE
   }
 
   // Read the control points from the XML.
-  std::vector<vtkTuple<double, 4> > new_points;
-  std::vector<vtkTuple<const char*, 2> > new_annotations;
+  std::vector<vtkTuple<double, 4>> new_points;
+  std::vector<vtkTuple<const char*, 2>> new_annotations;
 
   for (unsigned int cc = 0; cc < xml->GetNumberOfNestedElements(); cc++)
   {

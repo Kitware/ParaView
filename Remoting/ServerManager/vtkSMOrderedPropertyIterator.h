@@ -23,7 +23,7 @@
  * the order they appear in the xml or in the order they were added. This
  * is possible because vtkSMProxy keeps track of the order in which properties
  * were added or exposed in a PropertyNamesInOrder vector.
-*/
+ */
 
 #ifndef vtkSMOrderedPropertyIterator_h
 #define vtkSMOrderedPropertyIterator_h

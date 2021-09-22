@@ -540,7 +540,7 @@ void vtkIntersectFragments::ComputeGeometricAttributes()
       {
         int thisMsgId = msgBase;
         // fragment indexed arrays, with number of polys
-        vector<vector<vtkIdType> > loadingArrays;
+        vector<vector<vtkIdType>> loadingArrays;
         loadingArrays.resize(nProcs);
         // Total number of fragments we hit
         this->NFragmentsIntersected[blockId] = 0;
@@ -881,8 +881,8 @@ void vtkIntersectFragments::ComputeGeometricAttributes()
 //
 // return 0 on error
 int vtkIntersectFragments::CollectGeometricAttributes(
-  vector<vtkMaterialInterfaceCommBuffer>& buffers, vector<vector<vtkDoubleArray*> >& centers,
-  vector<vector<int*> >& ids)
+  vector<vtkMaterialInterfaceCommBuffer>& buffers, vector<vector<vtkDoubleArray*>>& centers,
+  vector<vector<int*>>& ids)
 {
   const int myProcId = this->Controller->GetLocalProcessId();
   const int nProcs = this->Controller->GetNumberOfProcesses();
@@ -976,8 +976,8 @@ int vtkIntersectFragments::SendGeometricAttributes(const int recipientProcId)
 //
 // return 0 on error
 int vtkIntersectFragments::PrepareToCollectGeometricAttributes(
-  vector<vtkMaterialInterfaceCommBuffer>& buffers, vector<vector<vtkDoubleArray*> >& centers,
-  vector<vector<int*> >& ids)
+  vector<vtkMaterialInterfaceCommBuffer>& buffers, vector<vector<vtkDoubleArray*>>& centers,
+  vector<vector<int*>>& ids)
 {
   const int myProcId = this->Controller->GetLocalProcessId();
   const int nProcs = this->Controller->GetNumberOfProcesses();
@@ -1026,8 +1026,8 @@ int vtkIntersectFragments::PrepareToCollectGeometricAttributes(
 //
 // return 0 on error
 int vtkIntersectFragments::CleanUpAfterCollectGeometricAttributes(
-  vector<vtkMaterialInterfaceCommBuffer>& buffers, vector<vector<vtkDoubleArray*> >& centers,
-  vector<vector<int*> >& ids)
+  vector<vtkMaterialInterfaceCommBuffer>& buffers, vector<vector<vtkDoubleArray*>>& centers,
+  vector<vector<int*>>& ids)
 {
   const int myProcId = this->Controller->GetLocalProcessId();
   const int nProcs = this->Controller->GetNumberOfProcesses();
@@ -1057,7 +1057,7 @@ int vtkIntersectFragments::CleanUpAfterCollectGeometricAttributes(
 // hold data from all processes.
 //
 // return 0 on error.
-int vtkIntersectFragments::PrepareToMergeGeometricAttributes(vector<vector<int> >& unique)
+int vtkIntersectFragments::PrepareToMergeGeometricAttributes(vector<vector<int>>& unique)
 {
   //
   unique.clear();
@@ -1092,12 +1092,12 @@ int vtkIntersectFragments::GatherGeometricAttributes(const int recipientProcId)
   {
     // collect
     vector<vtkMaterialInterfaceCommBuffer> buffers;
-    vector<vector<vtkDoubleArray*> > centers;
-    vector<vector<int*> > ids;
+    vector<vector<vtkDoubleArray*>> centers;
+    vector<vector<int*>> ids;
     this->PrepareToCollectGeometricAttributes(buffers, centers, ids);
     this->CollectGeometricAttributes(buffers, centers, ids);
     // merge
-    vector<vector<int> > unique;
+    vector<vector<int>> unique;
     this->PrepareToMergeGeometricAttributes(unique);
     vector<int> mergedIdx(this->NBlocks, 0); // counts merged so far
     for (int procId = 0; procId < nProcs; ++procId)

@@ -21,7 +21,7 @@
  *
  * This class does nothing without raytracing (module VTK_MODULE_ENABLE_VTK_RenderingRayTracing
  * disabled)
-*/
+ */
 
 #ifndef vtkPVMaterialLibrary_h
 #define vtkPVMaterialLibrary_h

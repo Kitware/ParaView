@@ -27,7 +27,7 @@
  * The output is a multiblock dataset of vtkTable.
  * @todo
  * We may want to consolidate with vtkPVMergeTable somehow
-*/
+ */
 
 #ifndef vtkPVMergeTablesMultiBlock_h
 #define vtkPVMergeTablesMultiBlock_h

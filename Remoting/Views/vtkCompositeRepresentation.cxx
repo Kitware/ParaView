@@ -39,7 +39,7 @@
 class vtkCompositeRepresentation::vtkInternals
 {
 public:
-  typedef std::map<std::string, vtkSmartPointer<vtkPVDataRepresentation> > RepresentationMap;
+  typedef std::map<std::string, vtkSmartPointer<vtkPVDataRepresentation>> RepresentationMap;
   RepresentationMap Representations;
 
   std::string ActiveRepresentationKey;

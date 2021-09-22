@@ -68,7 +68,7 @@ uint qHash(QPair<QPointer<pqPipelineSource>, int> arg)
 class pqPipelineFilter::pqInternal
 {
 public:
-  typedef QList<QPointer<pqOutputPort> > InputList;
+  typedef QList<QPointer<pqOutputPort>> InputList;
   typedef QMap<QString, InputList> InputMap;
   InputMap Inputs;
 
@@ -106,8 +106,9 @@ static void pqPipelineFilterGetInputProperties(
     if (inputProp)
     {
       vtkPVXMLElement* hints = inputProp->GetHints();
-      if (hints && (hints->FindNestedElementByName("NoGUI") ||
-                     hints->FindNestedElementByName("SelectionInput")))
+      if (hints &&
+        (hints->FindNestedElementByName("NoGUI") ||
+          hints->FindNestedElementByName("SelectionInput")))
       {
         // hints suggest that this input property is not to be considered by the
         // GUI.
@@ -271,9 +272,9 @@ QList<pqOutputPort*> pqPipelineFilter::getInputs(const QString& portname) const
 }
 
 //-----------------------------------------------------------------------------
-QMap<QString, QList<pqOutputPort*> > pqPipelineFilter::getNamedInputs() const
+QMap<QString, QList<pqOutputPort*>> pqPipelineFilter::getNamedInputs() const
 {
-  QMap<QString, QList<pqOutputPort*> > map;
+  QMap<QString, QList<pqOutputPort*>> map;
 
   pqInternal::InputMap::iterator iter = this->Internal->Inputs.begin();
   for (; iter != this->Internal->Inputs.end(); ++iter)

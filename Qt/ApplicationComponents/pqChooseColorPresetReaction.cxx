@@ -143,9 +143,9 @@ bool pqChooseColorPresetReaction::choosePreset(const char* presetName)
     // This should be deleted when the mainWidget is closed and it should be impossible
     // to get back here with the preset dialog open due to the event filtering done by
     // the preset dialog.
-    PresetDialog = new pqPresetDialog(pqCoreUtilities::mainWidget(), indexedLookup
-        ? pqPresetDialog::SHOW_INDEXED_COLORS_ONLY
-        : pqPresetDialog::SHOW_NON_INDEXED_COLORS_ONLY);
+    PresetDialog = new pqPresetDialog(pqCoreUtilities::mainWidget(),
+      indexedLookup ? pqPresetDialog::SHOW_INDEXED_COLORS_ONLY
+                    : pqPresetDialog::SHOW_NON_INDEXED_COLORS_ONLY);
   }
 
   PresetDialog->setCurrentPreset(presetName);

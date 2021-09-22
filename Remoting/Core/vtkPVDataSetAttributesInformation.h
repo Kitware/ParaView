@@ -21,7 +21,7 @@
  * on the fly as needed.  It may be possible to add features of this object
  * to vtkDataSetAttributes.  That would eliminate all of the "Information"
  * in ParaView.
-*/
+ */
 
 #ifndef vtkPVDataSetAttributesInformation_h
 #define vtkPVDataSetAttributesInformation_h

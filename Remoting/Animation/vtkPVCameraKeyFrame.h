@@ -17,7 +17,7 @@
  *
  * Special key frame for animating Camera. Unlike typical keyframes,
  * this keyframe interpolates a camera and not a property on the camera.
-*/
+ */
 
 #ifndef vtkPVCameraKeyFrame_h
 #define vtkPVCameraKeyFrame_h

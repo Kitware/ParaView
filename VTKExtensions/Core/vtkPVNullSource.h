@@ -19,7 +19,7 @@
  * This is a source for null data. Although this actually produces a
  * vtkPolyLine paraview blocks all data information from this source resulting
  * in it being treated as a null source.
-*/
+ */
 
 #ifndef vtkPVNullSource_h
 #define vtkPVNullSource_h

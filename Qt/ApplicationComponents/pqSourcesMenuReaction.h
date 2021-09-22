@@ -39,9 +39,9 @@ class pqPipelineSource;
 class pqProxyGroupMenuManager;
 class pqServer;
 /**
-* @ingroup Reactions
-* Reaction to handle creation of sources from the sources menu.
-*/
+ * @ingroup Reactions
+ * Reaction to handle creation of sources from the sources menu.
+ */
 class PQAPPLICATIONCOMPONENTS_EXPORT pqSourcesMenuReaction : public QObject
 {
   Q_OBJECT
@@ -64,16 +64,15 @@ public:
 
 public Q_SLOTS:
   /**
-  * Updates the enabled state. Applications need not explicitly call
-  * this.
-  */
+   * Updates the enabled state. Applications need not explicitly call this.
+   */
   virtual void updateEnableState();
   void updateEnableState(bool);
 
 protected Q_SLOTS:
   /**
-  * Called when the action is triggered.
-  */
+   * Called when the action is triggered.
+   */
   virtual void onTriggered(const QString& group, const QString& name)
   {
     pqSourcesMenuReaction::createSource(group, name);

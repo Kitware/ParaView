@@ -83,7 +83,7 @@ struct EditorActionGroup
   /**
    * @brief The array of actions
    */
-  EnumArray<Type, QPointer<QAction> > Actions;
+  EnumArray<Type, QPointer<QAction>> Actions;
 };
 
 /**

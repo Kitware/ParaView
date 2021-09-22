@@ -340,9 +340,9 @@ public:
 
   //@{
   /**
-    * @deprecated in ParaView 5.10.
-    * Use Get[...]Color([...], double color[3]) methods instead.
-    */
+   * @deprecated in ParaView 5.10.
+   * Use Get[...]Color([...], double color[3]) methods instead.
+   */
   VTK_LEGACY(double* GetBackgroundColor(int plotType));
   VTK_LEGACY(double* GetGridColor(int plotType));
   VTK_LEGACY(double* GetAxisColor(int plotType));

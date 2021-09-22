@@ -17,7 +17,7 @@
  * @brief   Class for creating multiblock grids.
  *
  * Class for creating vtkMultiBlockDataSet grids for a test driver.
-*/
+ */
 
 #ifndef vtkCPMultiBlockGridBuilder_h
 #define vtkCPMultiBlockGridBuilder_h

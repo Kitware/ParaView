@@ -59,8 +59,8 @@ public:
   vtkPVOpenVRHelperLocation();
   ~vtkPVOpenVRHelperLocation();
   int NavigationPanelVisibility;
-  std::vector<std::pair<std::array<double, 3>, std::array<double, 3> > > CropPlaneStates;
-  std::vector<std::array<double, 16> > ThickCropStates;
+  std::vector<std::pair<std::array<double, 3>, std::array<double, 3>>> CropPlaneStates;
+  std::vector<std::array<double, 16>> ThickCropStates;
   std::map<vtkSMProxy*, bool> Visibility;
   vtkOpenVRCameraPose* Pose;
 };

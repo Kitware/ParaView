@@ -15,7 +15,7 @@ PURPOSE.  See the above copyright notice for more information.
 /**
  * @class   vtkSMPlotMatrixViewProxy
  * @brief   Proxy class for plot matrix view
-*/
+ */
 
 #ifndef vtkSMPlotMatrixViewProxy_h
 #define vtkSMPlotMatrixViewProxy_h

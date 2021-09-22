@@ -62,8 +62,8 @@ public:
 
 protected:
   /**
-  * Called when the action is triggered.
-  */
+   * Called when the action is triggered.
+   */
   void onTriggered() override { this->resetSettingsToDefault(); }
 
   virtual void clearSettings();

@@ -496,7 +496,7 @@ void pqFindDataSelectionDisplayFrame::updateInteractiveSelectionLabelProperties(
     return;
   }
 
-  QList<QPair<QString, QString> > prop;
+  QList<QPair<QString, QString>> prop;
   prop << QPair<QString, QString>("SelectionOpacity", "Opacity")
        << QPair<QString, QString>("SelectionPointSize", "PointSize")
        << QPair<QString, QString>("SelectionLineWidth", "LineWidth")
@@ -612,7 +612,7 @@ void pqFindDataSelectionDisplayFrame::onDataUpdated()
   // remove a label array name that does not exist anymore
   auto& internals = (*this->Internals);
   auto updateLabels = [&internals](
-    vtkSMProxy* repr, int fieldAssociation, const std::string& prefix) {
+                        vtkSMProxy* repr, int fieldAssociation, const std::string& prefix) {
     const auto arrayNameProperty = prefix +
       (fieldAssociation == vtkDataObject::FIELD_ASSOCIATION_CELLS ? "Cell" : "Point") +
       "FieldDataArrayName";
@@ -637,7 +637,7 @@ void pqFindDataSelectionDisplayFrame::onDataUpdated()
       if ((fieldAssociation == vtkDataObject::FIELD_ASSOCIATION_CELLS &&
             arrayName == "vtkOriginalCellIds") ||
         (fieldAssociation == vtkDataObject::FIELD_ASSOCIATION_POINTS &&
-            arrayName == "vtkOriginalPointIds"))
+          arrayName == "vtkOriginalPointIds"))
       {
         return;
       }

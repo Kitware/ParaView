@@ -21,7 +21,7 @@
  * lines, polylines, triangles, triangle strips, pixels, voxels, convex
  * polygons, quads and tetrahedra. All other 3D cells are triangulated
  * during volume calculation. In such cases, the result may not be exact.
-*/
+ */
 
 #ifndef vtkCellIntegrator_h
 #define vtkCellIntegrator_h

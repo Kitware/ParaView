@@ -193,7 +193,7 @@ void vtkCSVWriterGetDataString(vtkArrayIteratorTemplate<unsigned char>* iter, vt
 class vtkCSVWriter::CSVFile
 {
   vtksys::ofstream Stream;
-  std::vector<std::pair<std::string, int> > ColumnInfo;
+  std::vector<std::pair<std::string, int>> ColumnInfo;
   double Time = vtkMath::Nan();
 
 public:
@@ -275,7 +275,7 @@ public:
 
   void WriteData(vtkDataSetAttributes* dsa, vtkCSVWriter* self)
   {
-    std::vector<vtkSmartPointer<vtkArrayIterator> > columnsIters;
+    std::vector<vtkSmartPointer<vtkArrayIterator>> columnsIters;
     for (const auto& cinfo : this->ColumnInfo)
     {
       auto array = dsa->GetAbstractArray(cinfo.first.c_str());

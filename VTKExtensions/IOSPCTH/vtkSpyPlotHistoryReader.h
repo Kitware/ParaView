@@ -19,7 +19,7 @@ PURPOSE.  See the above copyright notice for more information.
  * vtkSpyPlotHistoryReader is a reader that reads SPCTH Spy Plot history
  * file format files. Each row in the history files represents a time step
  * and columns represent points and properties for the points
-*/
+ */
 
 #ifndef vtkSpyPlotHistoryReader_h
 #define vtkSpyPlotHistoryReader_h

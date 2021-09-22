@@ -20,7 +20,7 @@
  *
  * These options can be retrieved during run-time, set using configuration file
  * or using Command Line Arguments.
-*/
+ */
 
 #ifndef vtkCommandOptionsXMLParser_h
 #define vtkCommandOptionsXMLParser_h
@@ -49,6 +49,7 @@ public:
   void AddArgument(const char* longarg, int* var, int type = 0);
   void AddArgument(const char* longarg, char** var, int type = 0);
   void SetPVOptions(vtkCommandOptions* o) { this->PVOptions = o; }
+
 protected:
   //@}
   /**

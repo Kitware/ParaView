@@ -34,9 +34,7 @@ vtkMySpecialRepresentation::vtkMySpecialRepresentation()
 }
 
 //----------------------------------------------------------------------------
-vtkMySpecialRepresentation::~vtkMySpecialRepresentation()
-{
-}
+vtkMySpecialRepresentation::~vtkMySpecialRepresentation() = default;
 
 //----------------------------------------------------------------------------
 void vtkMySpecialRepresentation::PrintSelf(ostream& os, vtkIndent indent)

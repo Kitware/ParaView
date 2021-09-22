@@ -28,7 +28,7 @@
  * Supported Required-Property functions:
  * \li \c ArrayList : points a string-vector property that produces the
  * (array_name, status) tuples. This is typically an information-only property.
-*/
+ */
 
 #ifndef vtkSMArraySelectionDomain_h
 #define vtkSMArraySelectionDomain_h

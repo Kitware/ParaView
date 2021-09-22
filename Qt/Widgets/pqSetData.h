@@ -57,8 +57,8 @@ private:
 };
 
 /**
-* Sets custom data for a Qt object
-*/
+ * Sets custom data for a Qt object
+ */
 template <typename T>
 T* operator<<(T* LHS, const pqSetData& RHS)
 {

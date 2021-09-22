@@ -21,7 +21,7 @@
  * about data size. This is a light weight sibling of vtkPVDataInformation which
  * only returns the data size and nothing more. The data size can also be
  * obtained from vtkPVDataInformation.
-*/
+ */
 
 #ifndef vtkPVDataSizeInformation_h
 #define vtkPVDataSizeInformation_h

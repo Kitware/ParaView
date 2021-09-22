@@ -27,7 +27,7 @@ See Copyright.txt or http://www.paraview.org/HTML/Copyright.html for details.
  *   - vtkPolydata
  *   - vtkMultiBlockDataSet
  *   - vtkMultiPieceDataSet (currently not implemented)
-*/
+ */
 
 #ifndef vtkCGNSWriter_h
 #define vtkCGNSWriter_h
@@ -43,11 +43,11 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /**
-  * Name for the output file.  If writing in parallel, the number
-  * of processes and the process rank will be appended to the name,
-  * so each process is writing out a separate file.
-  * If not set, this class will make up a file name.
-  */
+   * Name for the output file.  If writing in parallel, the number
+   * of processes and the process rank will be appended to the name,
+   * so each process is writing out a separate file.
+   * If not set, this class will make up a file name.
+   */
 
   vtkSetStringMacro(FileName);
   vtkGetStringMacro(FileName);

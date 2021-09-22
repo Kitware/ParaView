@@ -50,7 +50,7 @@
  * property is less than the number of default specified, the last value is
  * assumed to be repeated. Thus, "min,max,min" is same as the regular expression
  * "min,max,min(,min)*".
-*/
+ */
 
 #ifndef vtkSMRangeDomainTemplate_h
 #define vtkSMRangeDomainTemplate_h

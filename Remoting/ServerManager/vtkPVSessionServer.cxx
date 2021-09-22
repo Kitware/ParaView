@@ -40,7 +40,6 @@
 #include <map>
 #include <sstream>
 #include <string>
-#include <string>
 #include <vector>
 #include <vtksys/RegularExpression.hxx>
 

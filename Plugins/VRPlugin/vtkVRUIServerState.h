@@ -45,7 +45,7 @@ public:
 
   // Description:
   // Return the state of all the trackers.
-  std::vector<vtkSmartPointer<vtkVRUITrackerState> >* GetTrackerStates();
+  std::vector<vtkSmartPointer<vtkVRUITrackerState>>* GetTrackerStates();
 
   // Description:
   // Return the state of all the buttons.
@@ -56,7 +56,7 @@ public:
   std::vector<float>* GetValuatorStates();
 
 protected:
-  std::vector<vtkSmartPointer<vtkVRUITrackerState> > TrackerStates;
+  std::vector<vtkSmartPointer<vtkVRUITrackerState>> TrackerStates;
   std::vector<bool> ButtonStates;
   std::vector<float> ValuatorStates;
 

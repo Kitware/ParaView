@@ -40,10 +40,10 @@ class pqAnimationTimeWidget;
 class pqAnimationScene;
 
 /**
-* pqAnimationTimeToolbar is a QToolBar containing a pqAnimationTimeWidget.
-* pqAnimationTimeToolbar also ensures that the pqAnimationTimeWidget is
-* tracking the animation scene on the active session.
-*/
+ * pqAnimationTimeToolbar is a QToolBar containing a pqAnimationTimeWidget.
+ * pqAnimationTimeToolbar also ensures that the pqAnimationTimeWidget is
+ * tracking the animation scene on the active session.
+ */
 class PQAPPLICATIONCOMPONENTS_EXPORT pqAnimationTimeToolbar : public QToolBar
 {
   Q_OBJECT
@@ -62,8 +62,8 @@ public:
   }
 
   /**
-  * Provides access to the pqAnimationTimeWidget used.
-  */
+   * Provides access to the pqAnimationTimeWidget used.
+   */
   pqAnimationTimeWidget* animationTimeWidget() const;
 private Q_SLOTS:
   void setAnimationScene(pqAnimationScene* scene);

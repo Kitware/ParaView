@@ -64,7 +64,7 @@ struct vtkGmshMetaReaderInternal
 
   typedef std::map<int, TimeStepInfo> TimeStepInfoMapType;
   TimeStepInfoMapType TimeStepInfoMap;
-  typedef std::map<int, vtkSmartPointer<vtkUnstructuredGrid> > CachedGridsMapType;
+  typedef std::map<int, vtkSmartPointer<vtkUnstructuredGrid>> CachedGridsMapType;
   CachedGridsMapType CachedGrids;
   std::map<std::string, std::string> ArrayNameMap;
 };

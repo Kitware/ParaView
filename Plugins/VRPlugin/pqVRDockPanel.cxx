@@ -512,8 +512,7 @@ void pqVRDockPanel::saveState()
 void pqVRDockPanel::restoreState()
 {
   pqFileDialog fileDialog(nullptr, pqCoreUtilities::mainWidget(), "Load VR plugin template",
-    QString(), "VR plugin template files (*.pvvr);;"
-               "ParaView state files (*.pvsm)");
+    QString(), "VR plugin template files (*.pvvr);;ParaView state files (*.pvsm)");
 
   fileDialog.setFileMode(pqFileDialog::ExistingFile);
 

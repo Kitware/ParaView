@@ -21,7 +21,7 @@
  * needed for each type of interpolation available between two
  * key frames. This class can be instantiated to create a no-action key
  * frame.
-*/
+ */
 
 #ifndef vtkPVKeyFrame_h
 #define vtkPVKeyFrame_h

@@ -247,7 +247,7 @@ void pqDeleteReaction::deleteSources(const QSet<pqProxy*>& argSources)
   int sbMode = vtkPVGeneralSettings::GetInstance()->GetScalarBarMode();
   if (something_deleted &&
     (sbMode == vtkPVGeneralSettings::AUTOMATICALLY_SHOW_AND_HIDE_SCALAR_BARS ||
-        sbMode == vtkPVGeneralSettings::AUTOMATICALLY_HIDE_SCALAR_BARS))
+      sbMode == vtkPVGeneralSettings::AUTOMATICALLY_HIDE_SCALAR_BARS))
   {
     vtkNew<vtkSMTransferFunctionManager> tmgr;
     pqServerManagerModel* smmodel = pqApplicationCore::instance()->getServerManagerModel();
@@ -333,9 +333,10 @@ void pqDeleteReaction::onTriggered()
   if (this->DeleteAll)
   {
     if (pqCoreUtilities::promptUser("pqDeleteReaction::onTriggered", QMessageBox::Question,
-          "Delete All?", tr("The current visualization will be reset \n"
-                            "and the state will be discarded.\n\n"
-                            "Are you sure you want to continue?"),
+          "Delete All?",
+          tr("The current visualization will be reset \n"
+             "and the state will be discarded.\n\n"
+             "Are you sure you want to continue?"),
           QMessageBox::Yes | QMessageBox::No))
     {
       pqDeleteReaction::deleteAll();

@@ -18,7 +18,7 @@
  * vtkPVParallelCoordinatesRepresentation is the vtkChartParallelCoordinates
  * subclass for parallel coordinates representation. It exposes API from
  * underlying vtkChartParallelCoordinates.
-*/
+ */
 
 #ifndef vtkPVParallelCoordinatesRepresentation_h
 #define vtkPVParallelCoordinatesRepresentation_h

@@ -27,7 +27,7 @@
 #include "vtkTimestepsAnimationPlayer.h"
 #include "vtkXMLPVAnimationWriter.h"
 
-int ParaViewCoreAnimationPrintSelf(int, char* [])
+int ParaViewCoreAnimationPrintSelf(int, char*[])
 {
   vtkObject* c;
   PRINT_SELF(vtkCompositeAnimationPlayer);

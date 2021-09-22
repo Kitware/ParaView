@@ -18,7 +18,7 @@
  * vtkPVLight extends vtkLight with controls that are specific to
  * OSPRay. When OSPRay is not enabled, at compile or runtime, they do
  * nothing.
-*/
+ */
 
 #ifndef vtkPVLight_h
 #define vtkPVLight_h

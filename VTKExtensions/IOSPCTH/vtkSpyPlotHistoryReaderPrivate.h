@@ -20,7 +20,7 @@
  *
  *
  * \internal
-*/
+ */
 
 #ifndef vtkSpyPlotHistoryReaderPrivate_h
 #define vtkSpyPlotHistoryReaderPrivate_h

@@ -43,9 +43,9 @@ class pqServerResource;
 class vtkIndent;
 
 /**
-* pqServerConfiguration corresponds to a server connection configuration.
-* These are typically read from pvsc files.
-*/
+ * pqServerConfiguration corresponds to a server connection configuration.
+ * These are typically read from pvsc files.
+ */
 class PQCORE_EXPORT pqServerConfiguration
 {
 public:
@@ -59,41 +59,41 @@ public:
   pqServerConfiguration(vtkPVXMLElement* xml, int connectionTimeout = 60);
 
   /**
-  * Get/Set whether the configuration is mutable. This variable is not
-  * serialized.
-  */
+   * Get/Set whether the configuration is mutable. This variable is not
+   * serialized.
+   */
   bool isMutable() const { return this->Mutable; }
   void setMutable(bool val) { this->Mutable = val; }
 
   /**
-  * Get/Set the name for the configuration.
-  */
+   * Get/Set the name for the configuration.
+   */
   void setName(const QString& name);
   QString name() const;
 
   /**
-  * Returns true if the name for this configuration is the default one i.e.
-  * the one that gets set when none is specified. Useful to determine "empty"
-  * configurations.
-  */
+   * Returns true if the name for this configuration is the default one i.e.
+   * the one that gets set when none is specified. Useful to determine "empty"
+   * configurations.
+   */
   bool isNameDefault() const;
 
   /**
-  * Get/Set the resource that describes the server scheme, hostname(s) and port(s).
-  */
+   * Get/Set the resource that describes the server scheme, hostname(s) and port(s).
+   */
   pqServerResource resource() const;
   void setResource(const QString&);
   void setResource(const pqServerResource&);
 
   /**
-  * Get the actual resource that describes the server scheme, hostname(s) and port(s).
-  * Can be different from resource() when using SSH Port Forwarding as it will point to
-  * ip and port actually used for the tcp connection,
-  * which can be different than the server where the pvserver is running.
-  * eg. it will give you localhost:8080, instead of serverip:serverport when using port forwarding.
-  * Using this method is needed only when using low level tcp api.
-  * ressource() method should be used in any other cases.
-  */
+   * Get the actual resource that describes the server scheme, hostname(s) and port(s).
+   * Can be different from resource() when using SSH Port Forwarding as it will point to
+   * ip and port actually used for the tcp connection,
+   * which can be different than the server where the pvserver is running.
+   * eg. it will give you localhost:8080, instead of serverip:serverport when using port forwarding.
+   * Using this method is needed only when using low level tcp api.
+   * ressource() method should be used in any other cases.
+   */
   pqServerResource actualResource() const;
 
   /**
@@ -102,15 +102,15 @@ public:
   QString URI() const;
 
   /**
-  * Get/Set the timeout in seconds that will be used when connecting
-  * 0 means no retry and -1 means infinite retries.
-  */
+   * Get/Set the timeout in seconds that will be used when connecting
+   * 0 means no retry and -1 means infinite retries.
+   */
   int connectionTimeout() const;
   void setConnectionTimeout(int connectionTimeout);
 
   /**
-  * Types of start
-  */
+   * Types of start
+   */
   enum StartupType
   {
     INVALID,
@@ -119,59 +119,58 @@ public:
   };
 
   /**
-  * returns the startup type for this configuration. There are 3 types of
-  * startup: manual, simple-command and custom-command.
-  */
+   * returns the startup type for this configuration. There are 3 types of
+   * startup: manual, simple-command and custom-command.
+   */
   StartupType startupType() const;
 
   /**
-  * If startupType() == COMMAND, then this method can be used to obtain
-  * the command for the startup, from the client side.
-  * Note that this does not include any information options etc.
-  * that may be specified in the startup.
-  * This is the full command to be executed on the client,
-  * which includes xterm, ssh...
-  */
+   * If startupType() == COMMAND, then this method can be used to obtain the
+   * command for the startup, from the client side.
+   * Note that this does not include any information options etc. that may be
+   * specified in the startup.
+   * This is the full command to be executed on the client, which includes
+   * xterm, ssh...
+   */
   QString command(double& timeout, double& delay) const;
 
   /**
-  * If startupType() == COMMAND, then this method can be used to obtain
-  * the command for the startup, on the remote server,
-  * contained in the exec attributes.
-  * Note that this does not include any information options etc.
-  * that may be specified in the startup. This also
-  * recovers timeout and delay attributes.
-  */
+   * If startupType() == COMMAND, then this method can be used to obtain the
+   * command for the startup, on the remote server, contained in the exec
+   * attributes.
+   * Note that this does not include any information options etc. that may be
+   * specified in the startup. This also recovers timeout and delay attributes.
+   */
   QString execCommand(double& timeout, double& delay) const;
 
   /**
-  * changes the startup type to manual.
-  */
+   * changes the startup type to manual.
+   */
   void setStartupToManual();
 
   /**
-  * changes the startup type to command.
-  */
+   * changes the startup type to command.
+   */
   void setStartupToCommand(double timeout, double delay, const QString& command);
 
   /**
-  * serialize to a string.
-  */
+   * serialize to a string.
+   */
   QString toString(vtkIndent indent) const;
 
   /**
-  * Create a new clone (deep copying the vtkPVXMLElement).
-  */
+   * Create a new clone (deep copying the vtkPVXMLElement).
+   */
   pqServerConfiguration clone() const;
 
   /**
-  * returns the \<Options\> element, if any.
-  */
+   * returns the \<Options\> element, if any.
+   */
   vtkPVXMLElement* optionsXML() const;
 
   /**
-  * returns the \<Hints\> element, if any.
-  */
+   * returns the \<Hints\> element, if any.
+   */
   vtkPVXMLElement* hintsXML() const;
 
   /**

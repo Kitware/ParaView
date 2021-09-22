@@ -1448,7 +1448,7 @@ void vtkSMSettings::SetSettingDescription(const char* settingName, const char* d
 //----------------------------------------------------------------------------
 template <class T>
 Json::Value vtkConvertXMLElementToJSON(
-  vtkSMVectorProperty* vp, const std::vector<vtkSmartPointer<vtkPVXMLElement> >& elements)
+  vtkSMVectorProperty* vp, const std::vector<vtkSmartPointer<vtkPVXMLElement>>& elements)
 {
   // Since we need to handle enumeration domain :/.
   auto enumDomain = vp->FindDomain<vtkSMEnumerationDomain>();
@@ -1485,7 +1485,7 @@ Json::Value vtkConvertXMLElementToJSON(
 #ifdef VTK_USE_64BIT_IDS
 template <>
 Json::Value vtkConvertXMLElementToJSON<vtkIdType>(
-  vtkSMVectorProperty* vp, const std::vector<vtkSmartPointer<vtkPVXMLElement> >& elements)
+  vtkSMVectorProperty* vp, const std::vector<vtkSmartPointer<vtkPVXMLElement>>& elements)
 {
   // Since we need to handle enumeration domain :/.
   auto enumDomain = vp->FindDomain<vtkSMEnumerationDomain>();
@@ -1515,7 +1515,7 @@ Json::Value vtkConvertXMLElementToJSON<vtkIdType>(
 
 template <>
 Json::Value vtkConvertXMLElementToJSON<std::string>(
-  vtkSMVectorProperty* vp, const std::vector<vtkSmartPointer<vtkPVXMLElement> >& elements)
+  vtkSMVectorProperty* vp, const std::vector<vtkSmartPointer<vtkPVXMLElement>>& elements)
 {
   Json::Value value(Json::arrayValue);
   for (size_t cc = 0; cc < elements.size(); ++cc)
@@ -1559,7 +1559,7 @@ Json::Value vtkSMSettings::SerializeAsJSON(
       }
 
       // parse "Element".
-      std::vector<vtkSmartPointer<vtkPVXMLElement> > valueElements;
+      std::vector<vtkSmartPointer<vtkPVXMLElement>> valueElements;
       valueElements.resize(number_of_elements);
       for (unsigned int kk = 0, maxkk = propXML->GetNumberOfNestedElements(); kk < maxkk; ++kk)
       {
@@ -1571,9 +1571,9 @@ Json::Value vtkSMSettings::SerializeAsJSON(
           valueElements[index] = elemXML;
         }
       }
-      vtkSMVectorPropertyTemplateMacro(
-        prop, root[pname] = vtkConvertXMLElementToJSON<SM_TT>(
-                vtkSMVectorProperty::SafeDownCast(prop), valueElements););
+      vtkSMVectorPropertyTemplateMacro(prop,
+                                       root[pname] = vtkConvertXMLElementToJSON<SM_TT>(
+                                         vtkSMVectorProperty::SafeDownCast(prop), valueElements););
     }
   }
   return root;

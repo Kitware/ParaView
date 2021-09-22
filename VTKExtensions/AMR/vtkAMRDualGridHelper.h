@@ -23,7 +23,7 @@
  * This class will take advantage of some meta information, if available
  * from a coprocessing adaptor.  If not available, it will compute the
  * information.
-*/
+ */
 
 #ifndef vtkAMRDualGridHelper_h
 #define vtkAMRDualGridHelper_h

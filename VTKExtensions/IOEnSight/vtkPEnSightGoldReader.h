@@ -30,7 +30,7 @@
  * Thanks:
  *  Copyright (c) CEA
  * \endverbatim
-*/
+ */
 
 #ifndef vtkPEnSightGoldReader_h
 #define vtkPEnSightGoldReader_h

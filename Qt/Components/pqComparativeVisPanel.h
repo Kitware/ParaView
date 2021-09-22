@@ -41,10 +41,10 @@ class vtkSMProperty;
 class vtkEventQtSlotConnect;
 
 /**
-* pqComparativeVisPanel is a properties page for the comparative view. It
-* allows the user to change the layout of the grid as well as add/remove
-* parameters to compare in the view.
-*/
+ * pqComparativeVisPanel is a properties page for the comparative view. It
+ * allows the user to change the layout of the grid as well as add/remove
+ * parameters to compare in the view.
+ */
 class PQCOMPONENTS_EXPORT pqComparativeVisPanel : public QWidget
 {
   Q_OBJECT
@@ -55,45 +55,45 @@ public:
   ~pqComparativeVisPanel() override;
 
   /**
-  * Access the current view being shown by this panel.
-  */
+   * Access the current view being shown by this panel.
+   */
   pqView* view() const;
 
 public Q_SLOTS:
   /**
-  * Set the view to shown in this panel. If the view is not a comparative view
-  * then the panel will be disabled, otherwise, it shows the properties of the
-  * view.
-  */
+   * Set the view to shown in this panel. If the view is not a comparative view
+   * then the panel will be disabled, otherwise, it shows the properties of the
+   * view.
+   */
   void setView(pqView*);
 
 protected Q_SLOTS:
   /**
-  * If vtkSMProxy has a TimestepValues property then this method will set the
-  * TimeRange property of vtkSMComparativeViewProxy to reflect the values.
-  */
+   * If vtkSMProxy has a TimestepValues property then this method will set the
+   * TimeRange property of vtkSMComparativeViewProxy to reflect the values.
+   */
   // void setTimeRangeFromSource(vtkSMProxy*);
 
   /**
-  * Called when the "+" button is clicked to add a new parameter.
-  */
+   * Called when the "+" button is clicked to add a new parameter.
+   */
   void addParameter();
 
   /**
-  * Updates the list of animated parameters from the proxy.
-  */
+   * Updates the list of animated parameters from the proxy.
+   */
   void updateParametersList();
 
   /**
-  * Called when the selection in the active parameters widget changes.
-  */
+   * Called when the selection in the active parameters widget changes.
+   */
   void parameterSelectionChanged();
 
   void sizeUpdated();
 
   /**
-  * Triggered when user clicks the delete button to remove a parameter.
-  */
+   * Triggered when user clicks the delete button to remove a parameter.
+   */
   void removeParameter(int index);
 
 protected:
@@ -101,8 +101,8 @@ protected:
   // vtkSMProxy* animatedProxy, const QString& animatedPName, int animatedIndex);
 
   /**
-  * Finds the row (-1 if none found) for the given (proxy,property).
-  */
+   * Finds the row (-1 if none found) for the given (proxy,property).
+   */
   int findRow(vtkSMProxy* animatedProxy, const QString& animatedPName, int animatedIndex);
 
 private:

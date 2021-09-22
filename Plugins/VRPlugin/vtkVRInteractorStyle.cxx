@@ -306,21 +306,15 @@ bool vtkVRInteractorStyle::Update()
 
 // ----------------------------------------------------------------------------
 // HandleButton() method -- empty in the generic class
-void vtkVRInteractorStyle::HandleButton(const vtkVREvent& vtkNotUsed(event))
-{
-}
+void vtkVRInteractorStyle::HandleButton(const vtkVREvent& vtkNotUsed(event)) {}
 
 // ----------------------------------------------------------------------------
 // HandleAnalog() method -- empty in the generic class
-void vtkVRInteractorStyle::HandleAnalog(const vtkVREvent& vtkNotUsed(event))
-{
-}
+void vtkVRInteractorStyle::HandleAnalog(const vtkVREvent& vtkNotUsed(event)) {}
 
 // ----------------------------------------------------------------------------
 // HandleTracker() method -- empty in the generic class
-void vtkVRInteractorStyle::HandleTracker(const vtkVREvent& vtkNotUsed(event))
-{
-}
+void vtkVRInteractorStyle::HandleTracker(const vtkVREvent& vtkNotUsed(event)) {}
 
 // ----------------------------------------------------------------------------
 // ----------------------------------------------------------------------------

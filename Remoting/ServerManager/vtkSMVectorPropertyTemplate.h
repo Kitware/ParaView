@@ -16,7 +16,7 @@
  * @class   vtkSMVectorPropertyTemplate
  *
  *
-*/
+ */
 
 #ifndef vtkSMVectorPropertyTemplate_h
 #define vtkSMVectorPropertyTemplate_h

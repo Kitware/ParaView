@@ -36,10 +36,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqWidgetsModule.h"
 
 /**
-* pqLineEditEventPlayer extends pqAbstractStringEventPlayer to ensure that
-* pqLineEdit fires textChangedAndEditingFinished() signals in
-* playback when "set_string" is handled.
-*/
+ * pqLineEditEventPlayer extends pqAbstractStringEventPlayer to ensure that
+ * pqLineEdit fires textChangedAndEditingFinished() signals in
+ * playback when "set_string" is handled.
+ */
 class PQWIDGETS_EXPORT pqLineEditEventPlayer : public pqAbstractStringEventPlayer
 {
   Q_OBJECT

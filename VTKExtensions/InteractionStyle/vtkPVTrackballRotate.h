@@ -18,7 +18,7 @@
  *
  * vtkPVTrackballRotate allows the user to interactively
  * manipulate the camera, the viewpoint of the scene.
-*/
+ */
 
 #ifndef vtkPVTrackballRotate_h
 #define vtkPVTrackballRotate_h

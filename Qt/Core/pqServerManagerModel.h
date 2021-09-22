@@ -70,13 +70,13 @@ template <class T>
 inline T pqGetItemAtIndex(const pqServerManagerModel* const model, int index);
 
 /**
-* pqServerManagerModel is the model for the Server Manager.
-* All the pipelines in the Server Manager need a GUI representation
-* to obtain additional information about their connections etc.
-* This class collects that. This is merely representation of all the
-* information available in the Server Manager in a more GUI friendly
-* way. Simplicity is the key here.
-*/
+ * pqServerManagerModel is the model for the Server Manager.
+ * All the pipelines in the Server Manager need a GUI representation
+ * to obtain additional information about their connections etc.
+ * This class collects that. This is merely representation of all the
+ * information available in the Server Manager in a more GUI friendly
+ * way. Simplicity is the key here.
+ */
 class PQCORE_EXPORT pqServerManagerModel : public QObject
 {
   Q_OBJECT
@@ -84,50 +84,50 @@ class PQCORE_EXPORT pqServerManagerModel : public QObject
 
 public:
   /**
-  * Constructor:
-  * \c observer  :- instance of pqServerManagerObserver observing the server
-  *                 manager.
-  */
+   * Constructor:
+   * \c observer  :- instance of pqServerManagerObserver observing the server
+   *                 manager.
+   */
   pqServerManagerModel(pqServerManagerObserver* observer, QObject* parent = 0);
   ~pqServerManagerModel() override;
 
   /**
-  * Given a session Id, returns the pqServer instance for that session,
-  * if any.
-  */
+   * Given a session Id, returns the pqServer instance for that session,
+   * if any.
+   */
   pqServer* findServer(vtkIdType cid) const;
 
   /**
-  * Given a vtkSession*, returns the pqServer instance for that session, if
-  * any.
-  */
+   * Given a vtkSession*, returns the pqServer instance for that session, if
+   * any.
+   */
   pqServer* findServer(vtkSession*) const;
   pqServer* findServer(vtkSMSession*) const;
 
   /**
-  * Given a server resource, locates the pqServer instance for it, if any.
-  */
+   * Given a server resource, locates the pqServer instance for it, if any.
+   */
   pqServer* findServer(const pqServerResource& resource) const;
 
   /**
-  * Book end events for removing a server.
-  */
+   * Book end events for removing a server.
+   */
   void beginRemoveServer(pqServer* server);
   void endRemoveServer();
 
   /**
-  * This method to called by any code that's requesting ServerManager to
-  * create a new connection (viz. pqObjectBuilder) to set the resource to be
-  * used for the newly create pqServer instance. The active resource is
-  * automatically cleared one a new pqServer instance is created. Refer to
-  * pqObjectBuilder::createServer for details.
-  */
+   * This method to called by any code that's requesting ServerManager to
+   * create a new connection (viz. pqObjectBuilder) to set the resource to be
+   * used for the newly create pqServer instance. The active resource is
+   * automatically cleared one a new pqServer instance is created. Refer to
+   * pqObjectBuilder::createServer for details.
+   */
   void setActiveResource(const pqServerResource& resource);
 
   /**
-  * Given a proxy, locates a pqServerManagerModelItem subclass for the given
-  * proxy.
-  */
+   * Given a proxy, locates a pqServerManagerModelItem subclass for the given
+   * proxy.
+   */
   template <class T>
   T findItem(vtkSMProxy* proxy) const
   {
@@ -135,9 +135,9 @@ public:
   }
 
   /**
-  * Given the global id for a proxy,
-  * locates a pqServerManagerModelItem subclass for the proxy.
-  */
+   * Given the global id for a proxy,
+   * locates a pqServerManagerModelItem subclass for the proxy.
+   */
   template <class T>
   T findItem(vtkTypeUInt32 id) const
   {
@@ -145,8 +145,8 @@ public:
   }
 
   /**
-  * Returns a list of pqServerManagerModelItem of the given type.
-  */
+   * Returns a list of pqServerManagerModelItem of the given type.
+   */
   template <class T>
   QList<T> findItems() const
   {
@@ -154,8 +154,8 @@ public:
   }
 
   /**
-  * Returns the number of items of the given type.
-  */
+   * Returns the number of items of the given type.
+   */
   template <class T>
   int getNumberOfItems() const
   {
@@ -163,10 +163,10 @@ public:
   }
 
   /**
-  * Returns the item of the given type and the given index.
-  * The index is determined by collecting all the items of the given type in a
-  * list (findItems()).
-  */
+   * Returns the item of the given type and the given index.
+   * The index is determined by collecting all the items of the given type in a
+   * list (findItems()).
+   */
   template <class T>
   T getItemAtIndex(int index) const
   {
@@ -174,9 +174,9 @@ public:
   }
 
   /**
-  * Same as findItems<T>() except that this returns only those items that are
-  * on the indicated server. If server == 0, then all items are returned.
-  */
+   * Same as findItems<T>() except that this returns only those items that are
+   * on the indicated server. If server == 0, then all items are returned.
+   */
   template <class T>
   QList<T> findItems(pqServer* server) const
   {
@@ -184,11 +184,11 @@ public:
   }
 
   /**
-  * Returns an item with the given name. The type can be pqProxy
-  * subclass, since these are the ones that can have a name.
-  * Note that since names need not be unique, using this method is not
-  * recommended. This is provided for backwards compatibility alone.
-  */
+   * Returns an item with the given name. The type can be pqProxy
+   * subclass, since these are the ones that can have a name.
+   * Note that since names need not be unique, using this method is not
+   * recommended. This is provided for backwards compatibility alone.
+   */
   template <class T>
   T findItem(const QString& name) const
   {
@@ -196,70 +196,70 @@ public:
   }
 
   /**
-  * Internal method.
-  */
+   * Internal method.
+   */
   static void findItemsHelper(const pqServerManagerModel* const model, const QMetaObject& mo,
     QList<void*>* list, pqServer* server = 0);
 
   /**
-  * Internal method.
-  */
+   * Internal method.
+   */
   static pqServerManagerModelItem* findItemHelper(
     const pqServerManagerModel* const model, const QMetaObject& mo, vtkSMProxy* proxy);
 
   /**
-  * Internal method.
-  */
+   * Internal method.
+   */
   static pqServerManagerModelItem* findItemHelper(
     const pqServerManagerModel* const model, const QMetaObject& mo, vtkTypeUInt32 id);
 
   /**
-  * Internal method.
-  */
+   * Internal method.
+   */
   static pqServerManagerModelItem* findItemHelper(
     const pqServerManagerModel* const model, const QMetaObject& mo, const QString& name);
 
 Q_SIGNALS:
   /**
-  * Signals emitted when a new pqServer object is created.
-  */
+   * Signals emitted when a new pqServer object is created.
+   */
   void preServerAdded(pqServer*);
   void serverAdded(pqServer*);
 
   /**
-  * Signals emitted when a new pqServer object is properly initialized.
-  * This happen just before serverAdded() but should not be used by user.
-  * serverAdded() should be the signal to bind against unless you need to be
-  * notified before the serverAdded() like the plugin loader do.
-  */
+   * Signals emitted when a new pqServer object is properly initialized.
+   * This happen just before serverAdded() but should not be used by user.
+   * serverAdded() should be the signal to bind against unless you need to be
+   * notified before the serverAdded() like the plugin loader do.
+   */
   void serverReady(pqServer*);
 
   /**
-  * Signals emitted when a pqServer instance is being destroyed.
-  */
+   * Signals emitted when a pqServer instance is being destroyed.
+   */
   void preServerRemoved(pqServer*);
   void serverRemoved(pqServer*);
 
   /**
-  * Fired when beginRemoveServer is called.
-  */
+   * Fired when beginRemoveServer is called.
+   */
   void aboutToRemoveServer(pqServer* server);
 
   /**
-  * Fired when endRemoveServer is called.
-  */
+   * Fired when endRemoveServer is called.
+   */
   void finishedRemovingServer();
 
   /**
-  * Signals emitted when any pqServerManagerModelItem subclass is created.
-  */
+   * Signals emitted when any pqServerManagerModelItem subclass is created.
+   */
   void preItemAdded(pqServerManagerModelItem*);
   void itemAdded(pqServerManagerModelItem*);
 
   /**
-  * Signals emitted when any new pqServerManagerModelItem subclass is
-  * being destroyed.
-  */
+   * Signals emitted when any new pqServerManagerModelItem subclass is being
+   * destroyed.
+   */
   void preItemRemoved(pqServerManagerModelItem*);
   void itemRemoved(pqServerManagerModelItem*);
 
@@ -270,38 +270,38 @@ Q_SIGNALS:
   void proxyRemoved(pqProxy*);
 
   /**
-  * Signals emitted when a source/filter is created.
-  */
+   * Signals emitted when a source/filter is created.
+   */
   void preSourceAdded(pqPipelineSource* source);
   void sourceAdded(pqPipelineSource* source);
 
   /**
-  * Signals emitted when a source/filter is destroyed.
-  */
+   * Signals emitted when a source/filter is destroyed.
+   */
   void preSourceRemoved(pqPipelineSource*);
   void sourceRemoved(pqPipelineSource*);
 
   /**
-  * Signals emitted when a view is created
-  */
+   * Signals emitted when a view is created
+   */
   void preViewAdded(pqView* view);
   void viewAdded(pqView* view);
 
   /**
-  * Signals emitted when a view is destroyed.
-  */
+   * Signals emitted when a view is destroyed.
+   */
   void preViewRemoved(pqView*);
   void viewRemoved(pqView*);
 
   /**
-  * Signals emitted when a representation is created.
-  */
+   * Signals emitted when a representation is created.
+   */
   void preRepresentationAdded(pqRepresentation* rep);
   void representationAdded(pqRepresentation* rep);
 
   /**
-  * Signals emitted when a representation is destroyed.
-  */
+   * Signals emitted when a representation is destroyed.
+   */
   void preRepresentationRemoved(pqRepresentation*);
   void representationRemoved(pqRepresentation*);
 
@@ -320,19 +320,19 @@ Q_SIGNALS:
   void nameChanged(pqServerManagerModelItem* item);
 
   /**
-  * Fired when the state of the model item changes
-  */
+   * Fired when the state of the model item changes
+   */
   void modifiedStateChanged(pqServerManagerModelItem* item);
 
   /**
-  * Fired when a connection between two pqPipelineSources is created.
-  */
+   * Fired when a connection between two pqPipelineSources is created.
+   */
   void connectionAdded(pqPipelineSource* source, pqPipelineSource* consumer, int srcOutputPort);
   void preConnectionAdded(pqPipelineSource* source, pqPipelineSource* consumer, int srcOutputPort);
 
   /**
-  * Fired when a connection between tow pqPipelineSources is broken.
-  */
+   * Fired when a connection between tow pqPipelineSources is broken.
+   */
   void connectionRemoved(pqPipelineSource* source, pqPipelineSource* consumer, int srcOutputPort);
   void preConnectionRemoved(
     pqPipelineSource* source, pqPipelineSource* consumer, int srcOutputPort);
@@ -346,45 +346,45 @@ Q_SIGNALS:
   //@}
 
   /**
-  * Fired when a source indicates that data was updated i.e. the pipeline was
-  * updated.
-  */
+   * Fired when a source indicates that data was updated i.e. the pipeline was
+   * updated.
+   */
   void dataUpdated(pqPipelineSource*);
 
 protected Q_SLOTS:
   /**
-  * Called when a proxy is registered.
-  */
+   * Called when a proxy is registered.
+   */
   virtual void onProxyRegistered(const QString& group, const QString& name, vtkSMProxy* proxy);
 
   /**
-  * Called when a proxy is unregistered.
-  */
+   * Called when a proxy is unregistered.
+   */
   virtual void onProxyUnRegistered(const QString& group, const QString& name, vtkSMProxy* proxy);
 
   /**
-  * Called when a new server connection is created.
-  */
+   * Called when a new server connection is created.
+   */
   virtual void onConnectionCreated(vtkIdType id);
 
   /**
-  * Called when a server connection is closed.
-  */
+   * Called when a server connection is closed.
+   */
   virtual void onConnectionClosed(vtkIdType id);
 
   /**
-  * Called when state file is loaded. We need to discover "helper proxies" and
-  * set up the associations accordingly.
-  */
+   * Called when state file is loaded. We need to discover "helper proxies" and
+   * set up the associations accordingly.
+   */
   virtual void onStateLoaded(vtkPVXMLElement*, vtkSMProxyLocator*);
 
 private:
   Q_DISABLE_COPY(pqServerManagerModel)
 
   /**
-  * Process the QSettings-only settings, setting the values in the
-  * various settings proxies.
-  */
+   * Process the QSettings-only settings, setting the values in the various
+   * settings proxies.
+   */
   void updateSettingsFromQSettings(pqServer* server);
 
   class pqInternal;

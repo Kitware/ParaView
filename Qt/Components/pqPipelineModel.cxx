@@ -467,7 +467,7 @@ public:
   QFont ModifiedFont;
   pqPipelineModelDataItem Root;
   pqTimer DelayedUpdateVisibilityTimer;
-  QList<QPointer<pqPipelineSource> > DelayedUpdateVisibilityItems;
+  QList<QPointer<pqPipelineSource>> DelayedUpdateVisibilityItems;
 };
 
 //-----------------------------------------------------------------------------
@@ -963,7 +963,7 @@ QModelIndex pqPipelineModel::getIndexFor(pqServerManagerModelItem* item) const
 pqPipelineModelDataItem* pqPipelineModel::getDataItem(
   pqServerManagerModelItem* item, pqPipelineModelDataItem* _parent = nullptr,
   pqPipelineModel::ItemType type /*= pqPipelineModel::Invalid*/
-  ) const
+) const
 {
   if (_parent == nullptr)
   {

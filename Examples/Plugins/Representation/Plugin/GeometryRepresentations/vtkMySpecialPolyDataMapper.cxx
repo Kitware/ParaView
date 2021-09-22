@@ -18,14 +18,10 @@
 
 vtkStandardNewMacro(vtkMySpecialPolyDataMapper);
 //----------------------------------------------------------------------------
-vtkMySpecialPolyDataMapper::vtkMySpecialPolyDataMapper()
-{
-}
+vtkMySpecialPolyDataMapper::vtkMySpecialPolyDataMapper() = default;
 
 //----------------------------------------------------------------------------
-vtkMySpecialPolyDataMapper::~vtkMySpecialPolyDataMapper()
-{
-}
+vtkMySpecialPolyDataMapper::~vtkMySpecialPolyDataMapper() = default;
 
 //----------------------------------------------------------------------------
 void vtkMySpecialPolyDataMapper::PrintSelf(ostream& os, vtkIndent indent)

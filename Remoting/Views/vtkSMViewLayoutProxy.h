@@ -35,7 +35,7 @@
  * Although, currently, there are no safe guards against assigning a view to
  * more than one layout, this is strictly prohibited and can cause unexpected
  * problems at run-time.
-*/
+ */
 
 #ifndef vtkSMViewLayoutProxy_h
 #define vtkSMViewLayoutProxy_h

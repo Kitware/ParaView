@@ -38,11 +38,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QStyledItemDelegate>
 
 /**
-* pqNonEditableStyledItemDelegate() can be used inside Table or TreeView as
-* ItemDelegate to make them Copy/Paste friendly. Basically it will allow
-* the user to enter in edit mode but without having the option to change the
-* content so the content can only be selected and Copy to the clipboard.
-*/
+ * pqNonEditableStyledItemDelegate() can be used inside Table or TreeView as
+ * ItemDelegate to make them Copy/Paste friendly. Basically it will allow
+ * the user to enter in edit mode but without having the option to change the
+ * content so the content can only be selected and Copy to the clipboard.
+ */
 
 class PQCORE_EXPORT pqNonEditableStyledItemDelegate : public QStyledItemDelegate
 {

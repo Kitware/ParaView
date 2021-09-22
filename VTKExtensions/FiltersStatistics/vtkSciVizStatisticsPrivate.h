@@ -17,7 +17,7 @@
  * @brief   Private class for scientific viz statistics classes.
  *
  * This class handles array selection in a way that makes ParaView happy.
-*/
+ */
 
 #ifndef vtkSciVizStatisticsPrivate_h
 #define vtkSciVizStatisticsPrivate_h

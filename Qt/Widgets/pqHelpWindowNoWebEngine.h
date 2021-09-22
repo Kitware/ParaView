@@ -33,11 +33,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define pqHelpWindowNoWebKit_h
 
 /**
-*============================================================================
-* This is an internal header used by pqHelpWindow.
-* This header gets included when PARAVIEW_USE_QTWEBENGINE is OFF.
-*============================================================================
-*/
+ *============================================================================
+ * This is an internal header used by pqHelpWindow.
+ * This header gets included when PARAVIEW_USE_QTWEBENGINE is OFF.
+ *============================================================================
+ */
 
 #include <QTextBrowser>
 
@@ -47,8 +47,8 @@ namespace
 //            CLASS pqTextBrowser
 // ****************************************************************************
 /**
-* Internal class used to add overload the QTextBrowser
-*/
+ * Internal class used to add overload the QTextBrowser
+ */
 class pqTextBrowser : public QTextBrowser
 {
 public:
@@ -66,11 +66,12 @@ public:
     return instance;
   }
   void setUrl(const QUrl& url) { this->setSource(url); }
+
 protected:
   /**
-  * Implementation reference from:
-  * http://doc.qt.digia.com/qq/qq28-qthelp.html
-  */
+   * Implementation reference from:
+   * http://doc.qt.digia.com/qq/qq28-qthelp.html
+   */
   QVariant loadResource(int type, const QUrl& url) override
   {
     if (url.scheme() == "qthelp")

@@ -29,7 +29,7 @@ PURPOSE.  See the above copyright notice for more information.
  * cell data
  *-----------------------------------------------------------------------------
  *=============================================================================
-*/
+ */
 
 #ifndef vtkSpyPlotUniReader_h
 #define vtkSpyPlotUniReader_h

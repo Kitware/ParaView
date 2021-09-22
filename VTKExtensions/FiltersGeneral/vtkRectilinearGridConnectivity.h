@@ -71,7 +71,7 @@
  * @sa
  *  vtkGridConnectivity vtkExtractCTHPart vtkPolyData vtkRectilinearGrid
  *  vtkMultiBlockDataSetAlgorithm
-*/
+ */
 
 #ifndef vtkRectilinearGridConnectivity_h
 #define vtkRectilinearGridConnectivity_h

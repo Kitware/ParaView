@@ -17,9 +17,9 @@
 #include "vtkSmartPointer.h"
 
 // initialize the Scope Stack
-std::stack<std::shared_ptr<vtkPVStringFormatter::vtkArgumentScope> >
+std::stack<std::shared_ptr<vtkPVStringFormatter::vtkArgumentScope>>
   vtkPVStringFormatter::ScopeStack =
-    std::stack<std::shared_ptr<vtkPVStringFormatter::vtkArgumentScope> >();
+    std::stack<std::shared_ptr<vtkPVStringFormatter::vtkArgumentScope>>();
 
 vtkStandardNewMacro(vtkPVStringFormatter);
 
@@ -71,10 +71,12 @@ std::string vtkPVStringFormatter::Format(const std::string& formattableString)
     // an object is used to print in the output window of ParaView since vtkLogF is not enough
     // vtkErrorMacro can not be used because this function is static
     auto object = vtkSmartPointer<vtkPVStringFormatter>::New();
-    vtkErrorWithObjectMacro(object, "\nInvalid format specified '"
-        << formattableString << "'\n"
-        << "Details: " << error.what() << "\n\n"
-        << vtkPVStringFormatter::GetArgInfo());
+    vtkErrorWithObjectMacro(object,
+      "\nInvalid format specified '" << formattableString
+                                     << "'\n"
+                                        "Details: "
+                                     << error.what() << "\n\n"
+                                     << vtkPVStringFormatter::GetArgInfo());
     result = std::string();
   }
   return result;

@@ -18,7 +18,7 @@
  *
  * vtkPExtractHistogram is vtkExtractHistogram subclass for parallel datasets.
  * It gathers the histogram data on the root node.
-*/
+ */
 
 #ifndef vtkPExtractHistogram_h
 #define vtkPExtractHistogram_h

@@ -17,7 +17,7 @@
  * @brief   Superclass for information objects.
  *
  * Subclasses of this class are used to get information from the server.
-*/
+ */
 
 #ifndef vtkPVInformation_h
 #define vtkPVInformation_h

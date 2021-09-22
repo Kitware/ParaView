@@ -17,7 +17,7 @@
  *
  * vtkPVKeyFrameAnimationCueForProxies extends vtkPVKeyFrameAnimationCue to
  * update properties on proxies in SetAnimationValue().
-*/
+ */
 
 #ifndef vtkPVKeyFrameAnimationCueForProxies_h
 #define vtkPVKeyFrameAnimationCueForProxies_h

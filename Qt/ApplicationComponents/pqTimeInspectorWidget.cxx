@@ -216,7 +216,7 @@ private:
   void updateTimeSteps()
   {
     this->Markers = vtkSMPropertyHelper(this->Source, "TimestepValues",
-                      /*quiet*/ true)
+      /*quiet*/ true)
                       .GetDoubleArray();
     pqAnimationModel* model = this->animationModel();
     model->update();

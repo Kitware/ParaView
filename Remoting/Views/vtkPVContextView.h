@@ -17,7 +17,7 @@
  *
  * vtkPVContextView adopts vtkContextView so that it can be used in ParaView
  * configurations.
-*/
+ */
 
 #ifndef vtkPVContextView_h
 #define vtkPVContextView_h

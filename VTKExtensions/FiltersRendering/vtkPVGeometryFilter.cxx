@@ -1025,8 +1025,9 @@ int vtkPVGeometryFilter::RequestDataObjectTree(
   }
 
   if (this->Controller && this->Controller->GetNumberOfProcesses() > 1 &&
-    !pieces_to_merge.empty() && (vtkPartitionedDataSet::SafeDownCast(input) ||
-                                  vtkPartitionedDataSetCollection::SafeDownCast(input)))
+    !pieces_to_merge.empty() &&
+    (vtkPartitionedDataSet::SafeDownCast(input) ||
+      vtkPartitionedDataSetCollection::SafeDownCast(input)))
   {
     // since output of this filter is MB, and not a PDC or PD, we need to ensure
     // the number of pieces are same on all ranks (fixes #20654).

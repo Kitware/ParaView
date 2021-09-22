@@ -22,7 +22,7 @@
  * such information between these classes.
  * This class works with a single face of the bounding box specified using the
  * GridBounds.
-*/
+ */
 
 #ifndef vtkGridAxesHelper_h
 #define vtkGridAxesHelper_h

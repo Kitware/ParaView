@@ -15,7 +15,7 @@
 /**
  * @class   vtkPVEnSightMasterServerReader2
  *
-*/
+ */
 
 #ifndef vtkPVEnSightMasterServerReader2_h
 #define vtkPVEnSightMasterServerReader2_h

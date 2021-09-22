@@ -54,7 +54,7 @@ void vtkSMPlotMatrixViewProxy::CreateVTKObjects()
   this->Superclass::CreateVTKObjects();
 
 #if 0 // Server-side animation has been deactivated for now, support
-      // for animation is broken in tiling mode, and this 
+      // for animation is broken in tiling mode, and this
       // prevent the plot matrix view usage in cs.
       // This class may be removed altogether if we decide not to support
       // it again.

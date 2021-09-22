@@ -17,7 +17,7 @@
  *
  * vtkPVKeyFrameAnimationCue is a specialization of vtkPVAnimationCue that uses
  * the vtkPVKeyFrameCueManipulator as the manipulator.
-*/
+ */
 
 #ifndef vtkPVKeyFrameAnimationCue_h
 #define vtkPVKeyFrameAnimationCue_h

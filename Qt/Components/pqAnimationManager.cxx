@@ -91,7 +91,7 @@ public:
   }
 
   QPointer<pqServer> ActiveServer;
-  typedef QMap<pqServer*, QPointer<pqAnimationScene> > SceneMap;
+  typedef QMap<pqServer*, QPointer<pqAnimationScene>> SceneMap;
   SceneMap Scenes;
 
   QSize OldMaxSize;

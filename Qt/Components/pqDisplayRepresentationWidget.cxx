@@ -194,13 +194,14 @@ void pqDisplayRepresentationWidget::comboBoxChanged(const QString& text)
   // pqDisplayRepresentationWidget::setRepresentationText() is called.
   if (this->Internal->WarnOnRepresentationChange.contains(text))
   {
-    bool confirmed = pqCoreUtilities::promptUser(
-      QString("pqDisplayRepresentationWidget_type_%1").arg(text), QMessageBox::Question,
-      "Are you sure?", QString("This will change the representation type to \"%1\".\n"
-                               "That may take a while, depending on your dataset.\n"
-                               " Are you sure?")
-                         .arg(text),
-      QMessageBox::Yes | QMessageBox::No | QMessageBox::Save);
+    bool confirmed =
+      pqCoreUtilities::promptUser(QString("pqDisplayRepresentationWidget_type_%1").arg(text),
+        QMessageBox::Question, "Are you sure?",
+        QString("This will change the representation type to \"%1\".\n"
+                "That may take a while, depending on your dataset.\n"
+                "Are you sure?")
+          .arg(text),
+        QMessageBox::Yes | QMessageBox::No | QMessageBox::Save);
 
     if (!confirmed)
     {

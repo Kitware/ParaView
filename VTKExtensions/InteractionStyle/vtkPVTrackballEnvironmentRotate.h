@@ -17,7 +17,7 @@
  * @brief   Rotates the environment with xy mouse movement.
  *
  * vtkPVTrackballEnvironmentRotate allows the user to rotate the renderer environment.
-*/
+ */
 
 #ifndef vtkPVTrackballEnvironmentRotate_h
 #define vtkPVTrackballEnvironmentRotate_h

@@ -24,7 +24,7 @@
 #include <vector>
 
 class vtkPVStreamingPiecesInformation::vtkInternals
-  : public std::set<std::pair<unsigned int, unsigned int> >
+  : public std::set<std::pair<unsigned int, unsigned int>>
 {
 };
 

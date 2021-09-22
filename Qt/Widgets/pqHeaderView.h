@@ -134,8 +134,8 @@ private:
   bool CustomIndicatorShown;
 
   // we keep as a vector since order of addition of icons is important.
-  std::vector<std::pair<QIcon, QString> > CustomIndicatorIcons;
-  mutable std::vector<std::pair<QRect, QString> > CustomIndicatorRects;
+  std::vector<std::pair<QIcon, QString>> CustomIndicatorIcons;
+  mutable std::vector<std::pair<QRect, QString>> CustomIndicatorRects;
 };
 
 #endif

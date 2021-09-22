@@ -24,7 +24,7 @@
  *
  * @sa
  * vtkSMPreselectionPipeline vtkSMTooltipSelectionPipeline
-*/
+ */
 
 #ifndef vtkSMInteractiveSelectionPipeline_h
 #define vtkSMInteractiveSelectionPipeline_h

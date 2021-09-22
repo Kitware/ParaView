@@ -20,7 +20,7 @@
  * or the VTK object managed by the SIProxy instance. The type of object is
  * specified inside the XML definition of the property with the attribute
  * argument_type=[VTK, SMProxy, SIProxy].
-*/
+ */
 
 #ifndef vtkSIProxyProperty_h
 #define vtkSIProxyProperty_h

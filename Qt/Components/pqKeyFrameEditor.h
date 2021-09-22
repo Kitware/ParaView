@@ -41,8 +41,8 @@ class pqAnimationCue;
 class pqAnimationScene;
 
 /**
-* editor for editing animation key frames
-*/
+ * editor for editing animation key frames
+ */
 class PQCOMPONENTS_EXPORT pqKeyFrameEditor : public QWidget
 {
   typedef QWidget Superclass;
@@ -54,22 +54,22 @@ public:
   ~pqKeyFrameEditor() override;
 
   /**
-  * The keyframe editor can be set in a mode where the user can only edit the
-  * key frame values or keyframe interpolation and not add/delete keyframes
-  * or change key time. To enable this mode, set this to true (false by
-  * default).
-  */
+   * The keyframe editor can be set in a mode where the user can only edit the
+   * key frame values or keyframe interpolation and not add/delete keyframes
+   * or change key time. To enable this mode, set this to true (false by
+   * default).
+   */
   void setValuesOnly(bool);
   bool valuesOnly() const;
 
 public Q_SLOTS:
   /**
-  * read the key frame data and display it
-  */
+   * read the key frame data and display it
+   */
   void readKeyFrameData();
   /**
-  * write the key frame data as edited by the user to the server manager
-  */
+   * write the key frame data as edited by the user to the server manager
+   */
   void writeKeyFrameData();
 
 private Q_SLOTS:

@@ -26,7 +26,7 @@
  * To select which type of vtkPlot instances this class will use, you must set
  * the ChartType. Refer to vtkChartXY::AddPlot() for details on what the type
  * must be.
-*/
+ */
 
 #ifndef vtkXYChartRepresentation_h
 #define vtkXYChartRepresentation_h

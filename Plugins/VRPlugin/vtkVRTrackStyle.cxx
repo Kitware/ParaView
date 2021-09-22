@@ -66,9 +66,7 @@ vtkVRTrackStyle::vtkVRTrackStyle()
 
 // ----------------------------------------------------------------------------
 // Destructor method
-vtkVRTrackStyle::~vtkVRTrackStyle()
-{
-}
+vtkVRTrackStyle::~vtkVRTrackStyle() = default;
 
 // ----------------------------------------------------------------------------
 // PrintSelf() method

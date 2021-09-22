@@ -45,14 +45,16 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * the context menu).
  */
 
-class ExampleContextMenu : public QObject, public pqContextMenuInterface
+class ExampleContextMenu
+  : public QObject
+  , public pqContextMenuInterface
 {
   Q_OBJECT
   Q_INTERFACES(pqContextMenuInterface)
 public:
   ExampleContextMenu();
   ExampleContextMenu(QObject* parent);
-  virtual ~ExampleContextMenu();
+  ~ExampleContextMenu() override;
 
   /// This method is called when a context menu is requested,
   /// usually by a right click in a pqView instance.

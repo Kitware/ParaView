@@ -38,10 +38,10 @@ class pqProxyWidget;
 class pqView;
 
 /**
-* @ingroup Reactions
-* Reaction for exporting a view. Uses pqViewExporterManager for actual
-* exporting.
-*/
+ * @ingroup Reactions
+ * Reaction for exporting a view. Uses pqViewExporterManager for actual
+ * exporting.
+ */
 class PQAPPLICATIONCOMPONENTS_EXPORT pqExportReaction : public pqReaction
 {
   Q_OBJECT
@@ -49,33 +49,32 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqExportReaction : public pqReaction
 
 public:
   /**
-  * Constructor. Parent cannot be nullptr.
-  */
+   * Constructor. Parent cannot be nullptr.
+   */
   pqExportReaction(QAction* parent);
 
   /**
-  * Exports the current view. Returns the exported filename of successful
-  * export, otherwise returns an empty QString.
-  */
+   * Exports the current view. Returns the exported filename of successful
+   * export, otherwise returns an empty QString.
+   */
   QString exportActiveView();
 
 public Q_SLOTS:
   /**
-  * Updates the enabled state. Applications need not explicitly call
-  * this.
-  */
+   * Updates the enabled state. Applications need not explicitly call this.
+   */
   void updateEnableState() override;
 
 protected:
   /**
-  * Called when the action is triggered.
-  */
+   * Called when the action is triggered.
+   */
   void onTriggered() override { this->exportActiveView(); }
 
 private:
   /**
-  * Creates a dialog widget containing the predefined proxyWidget.
-  */
+   * Creates a dialog widget containing the predefined proxyWidget.
+   */
   QDialog* createConfigurationDialog(pqProxyWidget* proxyWidget);
 
   pqView* ConnectedView;

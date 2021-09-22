@@ -22,7 +22,7 @@
  *
  *   Output 0: A multiblock containing tables of fragments, one block
  *             for each requested material
-*/
+ */
 
 #ifndef vtkAMRFragmentIntegration_h
 #define vtkAMRFragmentIntegration_h

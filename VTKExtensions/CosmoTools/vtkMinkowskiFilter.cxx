@@ -18,7 +18,6 @@
 #include <vtkPolyhedron.h>
 #include <vtkStreamingDemandDrivenPipeline.h>
 #include <vtkUnstructuredGrid.h>
-#include <vtkUnstructuredGrid.h>
 
 #include <vtkSmartPointer.h>
 #define VTK_CREATE(type, name) vtkSmartPointer<type> name = vtkSmartPointer<type>::New()
@@ -32,9 +31,7 @@ vtkMinkowskiFilter::vtkMinkowskiFilter()
   this->SetNumberOfOutputPorts(1);
 }
 
-vtkMinkowskiFilter::~vtkMinkowskiFilter()
-{
-}
+vtkMinkowskiFilter::~vtkMinkowskiFilter() = default;
 
 void vtkMinkowskiFilter::PrintSelf(ostream& os, vtkIndent indent)
 {

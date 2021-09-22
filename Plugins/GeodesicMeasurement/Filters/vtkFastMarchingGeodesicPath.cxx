@@ -135,7 +135,7 @@ void vtkFastMarchingGeodesicPath::ComputePath(vtkPolyData* pd)
 
   GW::GW_GeodesicMesh* mesh = (GW::GW_GeodesicMesh*)(this->Geodesic->GetGeodesicMesh());
   GW::GW_GeodesicVertex* begin =
-    (GW::GW_GeodesicVertex*)(mesh->GetVertex((GW::GW_U32) this->BeginPointId));
+    (GW::GW_GeodesicVertex*)(mesh->GetVertex((GW::GW_U32)this->BeginPointId));
 
   // Sanity check to ensure that the start point for the gradient tracing
   // does indeed lie on the mesh.

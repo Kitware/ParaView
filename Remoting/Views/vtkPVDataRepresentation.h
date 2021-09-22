@@ -19,7 +19,7 @@
  * representations.
  * @sa
  * vtkPVDataRepresentationPipeline
-*/
+ */
 
 #ifndef vtkPVDataRepresentation_h
 #define vtkPVDataRepresentation_h

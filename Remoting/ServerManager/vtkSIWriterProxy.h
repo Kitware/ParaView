@@ -16,7 +16,7 @@
  * @class   vtkSIWriterProxy
  *
  * ServerImplementation for WriterProxy
-*/
+ */
 
 #ifndef vtkSIWriterProxy_h
 #define vtkSIWriterProxy_h

@@ -107,7 +107,7 @@ public:
     // A tree is trivial if it has only 1 node.
     bool trivial_tree = (model->rowCount(rootIndex) < 1) ||
       (model->rowCount(rootIndex) == 1 &&
-                          model->hasChildren(model->index(0, 0, rootIndex)) == false);
+        model->hasChildren(model->index(0, 0, rootIndex)) == false);
 
     // For trivial trees, we don't save any state, that way it's restore is
     // unaffected. This allows the applications to have a default expansion

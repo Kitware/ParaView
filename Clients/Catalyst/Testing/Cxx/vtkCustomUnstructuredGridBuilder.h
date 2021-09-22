@@ -19,7 +19,7 @@
  * Class for creating vtkUnstructuredGrids for a test driver.  The
  * UnstructuredGrid is built directly from a vtkUniformGrid to demonstrate
  * how to input a grid into the coprocessor.
-*/
+ */
 
 #ifndef vtkCustomUnstructuredGridBuilder_h
 #define vtkCustomUnstructuredGridBuilder_h

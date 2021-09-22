@@ -38,9 +38,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class QMainWindow;
 
 /**
-* @ingroup Behaviors
-* pqCustomShortcutBehavior TODO
-*/
+ * @ingroup Behaviors
+ * pqCustomShortcutBehavior TODO
+ */
 class PQAPPLICATIONCOMPONENTS_EXPORT pqCustomShortcutBehavior : public QObject
 {
   Q_OBJECT

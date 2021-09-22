@@ -56,7 +56,7 @@
  * has been changed to include field data arrays since 5.0. Use
  * "any-except-field" for cases where the intention is to match any attribute arrays except
  * field data arrays.
-*/
+ */
 
 #ifndef vtkSMInputArrayDomain_h
 #define vtkSMInputArrayDomain_h

@@ -43,23 +43,23 @@ class vtkSMProxy;
 
 //============================================================================
 /**
-* pqColorChooserButtonWithPalettes extends pqColorChooserButton to add support
-* for a menu that allows the user to connect the color to a color in the
-* ParaView application's color palettes.
-*
-* When the user selects a color from the color palette, this class will get
-* the color value from the palette and simply apply it, as if the user
-* explicitly chose the color.
-*
-* However, in ParaView, when the user selects a color from the palette,
-* there's an expectation that the color stays "linked" with the color palette.
-* Thus, if the color palette is changed, the linked color is also updated.
-*
-* To achieve that, pqColorChooserButtonWithPalettes is often used with a
-* pqColorPaletteLinkHelper. Simply instantiate a pqColorPaletteLinkHelper
-* instance with appropriate constructor arguments and then linking of
-* properties with the color palette is automatically managed.
-*/
+ * pqColorChooserButtonWithPalettes extends pqColorChooserButton to add support
+ * for a menu that allows the user to connect the color to a color in the
+ * ParaView application's color palettes.
+ *
+ * When the user selects a color from the color palette, this class will get
+ * the color value from the palette and simply apply it, as if the user
+ * explicitly chose the color.
+ *
+ * However, in ParaView, when the user selects a color from the palette,
+ * there's an expectation that the color stays "linked" with the color palette.
+ * Thus, if the color palette is changed, the linked color is also updated.
+ *
+ * To achieve that, pqColorChooserButtonWithPalettes is often used with a
+ * pqColorPaletteLinkHelper. Simply instantiate a pqColorPaletteLinkHelper
+ * instance with appropriate constructor arguments and then linking of
+ * properties with the color palette is automatically managed.
+ */
 class PQCOMPONENTS_EXPORT pqColorChooserButtonWithPalettes : public pqColorChooserButton
 {
   Q_OBJECT
@@ -71,22 +71,22 @@ public:
 
 private Q_SLOTS:
   /**
-  * Called to rebuild the menu. This is called everytime the popup menu is
-  * going to be shown.
-  */
+   * Called to rebuild the menu. This is called everytime the popup menu is
+   * going to be shown.
+   */
   void updateMenu();
 
   /**
-  * callback when a menu action is triggered.
-  */
+   * callback when a menu action is triggered.
+   */
   void actionTriggered(QAction*);
 
 private:
   Q_DISABLE_COPY(pqColorChooserButtonWithPalettes)
 
   /**
-  * Returns the color palette proxy for the active session.
-  */
+   * Returns the color palette proxy for the active session.
+   */
   vtkSMSettingsProxy* colorPalette() const;
   QPointer<QActionGroup> ActionGroup;
   friend class pqColorPaletteLinkHelper;
@@ -94,10 +94,10 @@ private:
 
 //============================================================================
 /**
-* pqColorPaletteLinkHelper is designed to be used with
-* pqColorChooserButtonWithPalettes to manage setting up of property links with
-* ParaView application's color palette.
-*/
+ * pqColorPaletteLinkHelper is designed to be used with
+ * pqColorChooserButtonWithPalettes to manage setting up of property links with
+ * ParaView application's color palette.
+ */
 class PQCOMPONENTS_EXPORT pqColorPaletteLinkHelper : public QObject
 {
   Q_OBJECT;
@@ -110,14 +110,14 @@ public:
 
 private:
   /**
-  * called when a palette color is selected by the user.
-  */
+   * called when a palette color is selected by the user.
+   */
   void setSelectedPaletteColor(const QString& colorName);
 
   /**
-  * Returns the name of the current selected palette color for the
-  * smproperty, if any.
-  */
+   * Returns the name of the current selected palette color for the
+   * smproperty, if any.
+   */
   QString selectedPaletteColor() const;
 
 private:

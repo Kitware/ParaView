@@ -8,7 +8,7 @@ pre-commit       crlf=input
 *.patch.in       -whitespace -text
 
 # Custom attribute to mark sources as using our C code style.
-[attr]our-c-style  whitespace=tab-in-indent,-blank-at-eol  format.clang-format
+[attr]our-c-style  whitespace=tab-in-indent,-blank-at-eol  format.clang-format=9
 
 *.c              our-c-style
 *.h              our-c-style

@@ -58,7 +58,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMSession.h"
 #include "vtkSMSessionClient.h"
 #include "vtkSMSessionProxyManager.h"
-#include "vtkSMSessionProxyManager.h"
 #include "vtkSMSourceProxy.h"
 #include "vtkSMStringVectorProperty.h"
 #include "vtkSmartPointer.h"
@@ -76,16 +75,16 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class pqServerManagerModel::pqInternal
 {
 public:
-  typedef QMap<vtkIdType, QPointer<pqServer> > ServerMap;
+  typedef QMap<vtkIdType, QPointer<pqServer>> ServerMap;
   ServerMap Servers;
 
-  typedef QMap<vtkSMProxy*, QPointer<pqProxy> > ProxyMap;
+  typedef QMap<vtkSMProxy*, QPointer<pqProxy>> ProxyMap;
   ProxyMap Proxies;
 
-  typedef QMap<vtkSMOutputPort*, QPointer<pqOutputPort> > OutputPortMap;
+  typedef QMap<vtkSMOutputPort*, QPointer<pqOutputPort>> OutputPortMap;
   OutputPortMap OutputPorts;
 
-  QList<QPointer<pqServerManagerModelItem> > ItemList;
+  QList<QPointer<pqServerManagerModelItem>> ItemList;
 
   pqServerResource ActiveResource;
 };

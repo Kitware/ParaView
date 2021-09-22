@@ -21,7 +21,7 @@
  * and forwarding the method call to that specific one.
  * RMICallBack are simply set on all of the MultiProcessController inside the
  * composite.
-*/
+ */
 
 #ifndef vtkCompositeMultiProcessController_h
 #define vtkCompositeMultiProcessController_h

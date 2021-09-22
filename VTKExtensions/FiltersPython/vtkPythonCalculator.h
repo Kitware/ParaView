@@ -28,7 +28,7 @@
  * valid Python variable, it has to be accessed through a dictionary called
  * arrays (i.e. arrays['array_name']). The points can be accessed using the
  * points variable.
-*/
+ */
 
 #ifndef vtkPythonCalculator_h
 #define vtkPythonCalculator_h

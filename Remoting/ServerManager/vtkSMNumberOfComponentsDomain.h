@@ -23,7 +23,7 @@
  * * Input -- input property for the filter.
  * * ArraySelection -- string vector property used to select the array.
  * This domain will not work if either of the required properties is missing.
-*/
+ */
 
 #ifndef vtkSMNumberOfComponentsDomain_h
 #define vtkSMNumberOfComponentsDomain_h

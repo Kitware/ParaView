@@ -29,7 +29,7 @@
  * The model is then a set of cluster centers.
  * Data is assessed by assigning a cluster center and distance to the
  * cluster to each point in the input data set.
-*/
+ */
 
 #ifndef vtkPSciVizKMeans_h
 #define vtkPSciVizKMeans_h

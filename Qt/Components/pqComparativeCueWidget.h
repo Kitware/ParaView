@@ -42,10 +42,10 @@ class vtkSMComparativeAnimationCueProxy;
 class vtkSMProxy;
 
 /**
-* pqComparativeCueWidget is designed to be used by
-* pqComparativeVisPanel to show/edit the values for an
-* vtkSMComparativeAnimationCueProxy.
-*/
+ * pqComparativeCueWidget is designed to be used by
+ * pqComparativeVisPanel to show/edit the values for an
+ * vtkSMComparativeAnimationCueProxy.
+ */
 class PQCOMPONENTS_EXPORT pqComparativeCueWidget : public QTableWidget
 {
   Q_OBJECT
@@ -56,8 +56,8 @@ public:
   ~pqComparativeCueWidget() override;
 
   /**
-  * Get/Set the cue that is currently being shown/edited by this widget.
-  */
+   * Get/Set the cue that is currently being shown/edited by this widget.
+   */
   void setCue(vtkSMProxy*);
   vtkSMComparativeAnimationCueProxy* cue() const;
 
@@ -68,8 +68,8 @@ public:
 
 public Q_SLOTS:
   /**
-  * Set the comparative grid size.
-  */
+   * Set the comparative grid size.
+   */
   void setSize(int w, int h)
   {
     this->Size = QSize(w, h);
@@ -82,8 +82,8 @@ Q_SIGNALS:
 
 protected Q_SLOTS:
   /**
-  * refreshes the GUI with values from the proxy.
-  */
+   * refreshes the GUI with values from the proxy.
+   */
   void updateGUI();
 
   void updateGUIOnIdle() { this->IdleUpdateTimer.start(); }
@@ -94,9 +94,9 @@ protected Q_SLOTS:
 
 protected:
   /**
-  * called when mouse is released. We use this to popup the range editing
-  * dialog if the selection changed.
-  */
+   * called when mouse is released. We use this to popup the range editing
+   * dialog if the selection changed.
+   */
   void mouseReleaseEvent(QMouseEvent* evt) override;
 
   void editRange();

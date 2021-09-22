@@ -42,7 +42,7 @@
 class pqOpacityTableModel::pqInternals
 {
 public:
-  std::vector<std::array<double, 4> > XVMSPoints;
+  std::vector<std::array<double, 4>> XVMSPoints;
 };
 
 //-----------------------------------------------------------------------------

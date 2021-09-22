@@ -56,7 +56,7 @@ public slots:
    * If GraphViz has not been at the compilation this function will do nothing.
    */
   int computeLayout(const std::unordered_map<int, pqNodeEditorNode*>& nodes,
-    std::unordered_map<int, std::vector<pqNodeEditorEdge*> >& edges);
+    std::unordered_map<int, std::vector<pqNodeEditorEdge*>>& edges);
 
 protected:
   /**

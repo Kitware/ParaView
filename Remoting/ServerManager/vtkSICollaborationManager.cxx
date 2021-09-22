@@ -84,8 +84,9 @@ public:
 
         if (this->ServerSession)
         {
-          findChanges = findChanges || (this->ServerSession->GetDisableFurtherConnections() !=
-                                         user->disable_further_connections());
+          findChanges = findChanges ||
+            (this->ServerSession->GetDisableFurtherConnections() !=
+              user->disable_further_connections());
           this->ServerSession->SetDisableFurtherConnections(user->disable_further_connections());
           unsigned int serverConnectId = this->ServerSession->GetConnectID();
           findChanges = findChanges || serverConnectId != user->connect_id();

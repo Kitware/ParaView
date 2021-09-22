@@ -52,7 +52,7 @@ struct vtkPPhastaReaderInternal
 
   typedef std::map<int, TimeStepInfo> TimeStepInfoMapType;
   TimeStepInfoMapType TimeStepInfoMap;
-  typedef std::map<int, vtkSmartPointer<vtkUnstructuredGrid> > CachedGridsMapType;
+  typedef std::map<int, vtkSmartPointer<vtkUnstructuredGrid>> CachedGridsMapType;
   CachedGridsMapType CachedGrids;
 };
 

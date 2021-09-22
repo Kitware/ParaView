@@ -35,9 +35,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqReaction.h"
 
 /**
-* @ingroup Reactions
-* Reaction for change pipeline input for the currently selected element.
-*/
+ * @ingroup Reactions
+ * Reaction for change pipeline input for the currently selected element.
+ */
 class PQAPPLICATIONCOMPONENTS_EXPORT pqChangePipelineInputReaction : public pqReaction
 {
   Q_OBJECT
@@ -47,21 +47,21 @@ public:
   pqChangePipelineInputReaction(QAction* parent = 0);
 
   /**
-  * Changes the input for the active source.
-  */
+   * Changes the input for the active source.
+   */
   static void changeInput();
 
 public Q_SLOTS:
   /**
-  * Updates the enabled state. Applications need not explicitly call
-  * this.
-  */
+   * Updates the enabled state. Applications need not explicitly call
+   * this.
+   */
   void updateEnableState() override;
 
 protected:
   /**
-  * Called when the action is triggered.
-  */
+   * Called when the action is triggered.
+   */
   void onTriggered() override { pqChangePipelineInputReaction::changeInput(); }
 
 private:

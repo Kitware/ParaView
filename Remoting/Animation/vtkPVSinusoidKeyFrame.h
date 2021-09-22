@@ -21,7 +21,7 @@
  * where theta = this->Frequency*t + (this->Phase/360).
  * As is clear from  the equation, the amplitude of the wave
  * is obtained from the value of the keyframe.
-*/
+ */
 
 #ifndef vtkPVSinusoidKeyFrame_h
 #define vtkPVSinusoidKeyFrame_h

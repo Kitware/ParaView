@@ -41,9 +41,9 @@ class pqDisplayColorWidget;
 class vtkSMProxy;
 
 /**
-* @ingroup Reactions
-* Reaction to toggle the use of separated color map for an array in a representation
-*/
+ * @ingroup Reactions
+ * Reaction to toggle the use of separated color map for an array in a representation
+ */
 class PQAPPLICATIONCOMPONENTS_EXPORT pqUseSeparateColorMapReaction : public pqReaction
 {
   Q_OBJECT
@@ -51,35 +51,34 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqUseSeparateColorMapReaction : public pqRe
 
 public:
   /**
-  * if \c track_active_objects is false, then the reaction will not track
-  * pqActiveObjects automatically.
-  * colorWidget is used to force a representation update
-  */
+   * if \c track_active_objects is false, then the reaction will not track
+   * pqActiveObjects automatically.
+   * colorWidget is used to force a representation update
+   */
   pqUseSeparateColorMapReaction(
     QAction* parent, pqDisplayColorWidget* colorWidget, bool track_active_objects = true);
   virtual ~pqUseSeparateColorMapReaction();
 
   /**
-  * Returns the representation currently being used by the reaction.
-  */
+   * Returns the representation currently being used by the reaction.
+   */
   pqDataRepresentation* representation() const;
 
 public Q_SLOTS:
   /**
-  * Set the active representation.
-  */
+   * Set the active representation.
+   */
   void setRepresentation(pqDataRepresentation*);
 
 protected Q_SLOTS:
   /**
-  * Updates the enabled state. Applications need not explicitly call
-  * this.
-  */
+   * Updates the enabled state. Applications need not explicitly call this.
+   */
   virtual void updateEnableState();
 
   /**
-    * Called when the action is triggered.
-    */
+   * Called when the action is triggered.
+   */
   virtual void onTriggered();
 
 private:

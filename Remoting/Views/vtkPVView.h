@@ -21,7 +21,7 @@
  * vtkPVView to use their own vtkView subclass with added support for
  * parallel rendering, tile-displays and client-server. Even if the view is
  * client-only view, it needs to address these other configuration gracefully.
-*/
+ */
 
 #ifndef vtkPVView_h
 #define vtkPVView_h

@@ -36,9 +36,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqTimer.h" // needed for pqTimer.
 
 /**
-* @ingroup Reactions
-* Reaction to disconnect from a server.
-*/
+ * @ingroup Reactions
+ * Reaction to disconnect from a server.
+ */
 class PQAPPLICATIONCOMPONENTS_EXPORT pqServerDisconnectReaction : public pqReaction
 {
   Q_OBJECT
@@ -46,30 +46,30 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqServerDisconnectReaction : public pqReact
 
 public:
   /**
-  * Constructor. Parent cannot be nullptr.
-  */
+   * Constructor. Parent cannot be nullptr.
+   */
   pqServerDisconnectReaction(QAction* parent);
 
   /**
-  * Disconnects from active server.
-  * Note that this method is static. Applications can simply use this without
-  * having to create a reaction instance.
-  */
+   * Disconnects from active server.
+   * Note that this method is static. Applications can simply use this without
+   * having to create a reaction instance.
+   */
   static void disconnectFromServer();
 
   /**
-  * Disconnects from active server with a warning message to the user to
-  * confirm that active proxies will be destroyed, if any. Returns true if
-  * disconnect happened, false if not i.e. the user cancelled the operation.
-  */
+   * Disconnects from active server with a warning message to the user to
+   * confirm that active proxies will be destroyed, if any. Returns true if
+   * disconnect happened, false if not i.e. the user cancelled the operation.
+   */
   static bool disconnectFromServerWithWarning();
 private Q_SLOTS:
   void updateState();
 
 protected:
   /**
-  * Called when the action is triggered.
-  */
+   * Called when the action is triggered.
+   */
   void onTriggered() override;
 
   pqTimer UpdateTimer;

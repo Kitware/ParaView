@@ -81,8 +81,8 @@ public:
 
 protected Q_SLOTS:
   /**
-  * Places the interactive widget using current data source information.
-  */
+   * Places the interactive widget using current data source information.
+   */
   void placeWidget() override;
 
 private:

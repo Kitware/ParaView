@@ -18,7 +18,7 @@
  *
  * vtkFeatureEdgesRepresentation is merely a vtkGeometryRepresentationWithFaces that forces
  * the geometry filter to produce feature edges.
-*/
+ */
 
 #ifndef vtkFeatureEdgesRepresentation_h
 #define vtkFeatureEdgesRepresentation_h

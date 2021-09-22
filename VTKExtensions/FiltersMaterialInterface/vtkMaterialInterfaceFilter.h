@@ -30,7 +30,7 @@
  * \code{.cpp}
  * #define vtkMaterialInterfaceFilterPROFILE
  * \endcode
-*/
+ */
 
 #ifndef vtkMaterialInterfaceFilter_h
 #define vtkMaterialInterfaceFilter_h
@@ -411,24 +411,24 @@ protected:
   int PrepareToCollectIntegratedAttributes(std::vector<vtkMaterialInterfaceCommBuffer>& buffers,
     std::vector<vtkDoubleArray*>& volumes, std::vector<vtkDoubleArray*>& clipDepthMaxs,
     std::vector<vtkDoubleArray*>& clipDepthMins, std::vector<vtkDoubleArray*>& moments,
-    std::vector<std::vector<vtkDoubleArray*> >& volumeWtdAvgs,
-    std::vector<std::vector<vtkDoubleArray*> >& massWtdAvgs,
-    std::vector<std::vector<vtkDoubleArray*> >& sums);
+    std::vector<std::vector<vtkDoubleArray*>>& volumeWtdAvgs,
+    std::vector<std::vector<vtkDoubleArray*>>& massWtdAvgs,
+    std::vector<std::vector<vtkDoubleArray*>>& sums);
   // Free resources.
   int CleanUpAfterCollectIntegratedAttributes(std::vector<vtkMaterialInterfaceCommBuffer>& buffers,
     std::vector<vtkDoubleArray*>& volumes, std::vector<vtkDoubleArray*>& clipDepthMaxs,
     std::vector<vtkDoubleArray*>& clipDepthMins, std::vector<vtkDoubleArray*>& moments,
-    std::vector<std::vector<vtkDoubleArray*> >& volumeWtdAvgs,
-    std::vector<std::vector<vtkDoubleArray*> >& massWtdAvgs,
-    std::vector<std::vector<vtkDoubleArray*> >& sums);
+    std::vector<std::vector<vtkDoubleArray*>>& volumeWtdAvgs,
+    std::vector<std::vector<vtkDoubleArray*>>& massWtdAvgs,
+    std::vector<std::vector<vtkDoubleArray*>>& sums);
   // Receive all integrated attribute arrays from all other
   // processes.
   int CollectIntegratedAttributes(std::vector<vtkMaterialInterfaceCommBuffer>& buffers,
     std::vector<vtkDoubleArray*>& volumes, std::vector<vtkDoubleArray*>& clipDepthMaxs,
     std::vector<vtkDoubleArray*>& clipDepthMins, std::vector<vtkDoubleArray*>& moments,
-    std::vector<std::vector<vtkDoubleArray*> >& volumeWtdAvgs,
-    std::vector<std::vector<vtkDoubleArray*> >& massWtdAvgs,
-    std::vector<std::vector<vtkDoubleArray*> >& sums);
+    std::vector<std::vector<vtkDoubleArray*>>& volumeWtdAvgs,
+    std::vector<std::vector<vtkDoubleArray*>>& massWtdAvgs,
+    std::vector<std::vector<vtkDoubleArray*>>& sums);
   // Send my integrated attributes to all other processes.
   int BroadcastIntegratedAttributes(const int sourceProcessId);
   // Send my geometric attribuites to a controller.
@@ -564,7 +564,7 @@ protected:
 
   // Weighted average, where weights correspond to fragment volume.
   // Accumulators one for each array to average, scalar or vector
-  std::vector<std::vector<double> > FragmentVolumeWtdAvg;
+  std::vector<std::vector<double>> FragmentVolumeWtdAvg;
   // weighted averages indexed by fragment id.
   std::vector<vtkDoubleArray*> FragmentVolumeWtdAvgs;
   // number of arrays for which to compute the weighted average
@@ -574,7 +574,7 @@ protected:
 
   // Weighted average, where weights correspond to fragment mass.
   // Accumulators one for each array to average, scalar or vector
-  std::vector<std::vector<double> > FragmentMassWtdAvg;
+  std::vector<std::vector<double>> FragmentMassWtdAvg;
   // weighted averages indexed by fragment id.
   std::vector<vtkDoubleArray*> FragmentMassWtdAvgs;
   // number of arrays for which to compute the weighted average
@@ -592,7 +592,7 @@ protected:
 
   // Sum of data over the fragment.
   // Accumulators, one for each array to sum
-  std::vector<std::vector<double> > FragmentSum;
+  std::vector<std::vector<double>> FragmentSum;
   // sums indexed by fragment id.
   std::vector<vtkDoubleArray*> FragmentSums;
   // number of arrays for which to compute the weighted average
@@ -630,9 +630,9 @@ protected:
   // multi block is indexed by material.
   vtkMultiBlockDataSet* ResolvedFragments;
   // for each material a list of global ids of pieces we own.
-  std::vector<std::vector<int> > ResolvedFragmentIds;
+  std::vector<std::vector<int>> ResolvedFragmentIds;
   // List of split fragments
-  std::vector<std::vector<int> > FragmentSplitMarker;
+  std::vector<std::vector<int>> FragmentSplitMarker;
   vtkIntArray* FragmentSplitGeometry;
 
   // A polydata with points at fragment centers, same structure

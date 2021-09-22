@@ -16,7 +16,7 @@
  * @class   vtkExtractsDeliveryHelper
  *
  *
-*/
+ */
 
 #ifndef vtkExtractsDeliveryHelper_h
 #define vtkExtractsDeliveryHelper_h
@@ -84,11 +84,11 @@ protected:
   // the bool is to keep track of whether the trivial producer has had
   // its output set yet. we don't want to update the pipeline until
   // it gets its output.
-  typedef std::map<std::string, std::pair<vtkSmartPointer<vtkTrivialProducer>, bool> >
+  typedef std::map<std::string, std::pair<vtkSmartPointer<vtkTrivialProducer>, bool>>
     ExtractConsumersType;
   ExtractConsumersType ExtractConsumers;
 
-  typedef std::map<std::string, vtkSmartPointer<vtkAlgorithmOutput> > ExtractProducersType;
+  typedef std::map<std::string, vtkSmartPointer<vtkAlgorithmOutput>> ExtractProducersType;
   ExtractProducersType ExtractProducers;
 
   vtkSmartPointer<vtkSocketController> Simulation2VisualizationController;

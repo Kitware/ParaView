@@ -34,7 +34,6 @@
 #include "pqActiveObjects.h"
 #include "pqView.h"
 #include "vtkMath.h"
-#include "vtkMath.h"
 #include "vtkMatrix4x4.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVXMLElement.h"
@@ -850,7 +849,7 @@ void pqVRUIConnection::getAndEnqueueAnalogData()
 // ----------------------------------------------------------------------------
 void pqVRUIConnection::getAndEnqueueTrackerData()
 {
-  std::vector<vtkSmartPointer<vtkVRUITrackerState> >* trackers =
+  std::vector<vtkSmartPointer<vtkVRUITrackerState>>* trackers =
     this->Internals->State->GetTrackerStates();
 
   for (unsigned int i = 0; i < (*trackers).size(); ++i)

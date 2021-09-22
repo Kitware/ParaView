@@ -70,7 +70,7 @@ protected:
   }
   void setServerManagerValue(bool use_unchecked, const QVariant& value) override
   {
-    pqSMAdaptor::setMultipleElementProperty(this->propertySM(), value.value<QList<QVariant> >(),
+    pqSMAdaptor::setMultipleElementProperty(this->propertySM(), value.value<QList<QVariant>>(),
       (use_unchecked ? pqSMAdaptor::UNCHECKED : pqSMAdaptor::CHECKED));
   }
   Q_DISABLE_COPY(pqYoungsMaterialPropertyLinksConnection)

@@ -30,7 +30,7 @@
  * @endverbatim
  * @sa
  * vtkSMDomain vtkSMStringVectorProperty
-*/
+ */
 
 #ifndef vtkSMStringListDomain_h
 #define vtkSMStringListDomain_h

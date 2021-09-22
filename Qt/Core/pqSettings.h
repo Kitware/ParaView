@@ -41,9 +41,9 @@ class QDockWidget;
 class vtkSMProperty;
 
 /**
-* pqSettings extends QSettings to add support for following:
-* \li saving/restoring window/dialog geometry.
-*/
+ * pqSettings extends QSettings to add support for following:
+ * \li saving/restoring window/dialog geometry.
+ */
 class PQCORE_EXPORT pqSettings : public QSettings
 {
   Q_OBJECT
@@ -67,13 +67,13 @@ public:
   void restoreState(const QString& key, QDialog& dialog);
 
   /**
-  * Calling this method will cause the modified signal to be emitted.
-  */
+   * Calling this method will cause the modified signal to be emitted.
+   */
   void alertSettingsModified();
 
   /**
-  * Save a property value to a given setting name
-  */
+   * Save a property value to a given setting name
+   */
   void saveInQSettings(const char* key, vtkSMProperty* smproperty);
 
   /**
@@ -86,9 +86,9 @@ public:
 
 private:
   /**
-  * ensure that when window state is being loaded, if dock windows are
-  * beyond the viewport, we correct them.
-  */
+   * ensure that when window state is being loaded, if dock windows are
+   * beyond the viewport, we correct them.
+   */
   void sanityCheckDock(QDockWidget* dock_widget);
 Q_SIGNALS:
   void modified();

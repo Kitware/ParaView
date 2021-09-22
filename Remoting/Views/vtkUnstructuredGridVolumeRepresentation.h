@@ -20,7 +20,7 @@
  * vtkUnstructuredGridVolumeRepresentation is a representation for volume
  * rendering vtkUnstructuredGrid datasets. It simply renders a translucent
  * surface for LOD i.e. interactive rendering.
-*/
+ */
 
 #ifndef vtkUnstructuredGridVolumeRepresentation_h
 #define vtkUnstructuredGridVolumeRepresentation_h

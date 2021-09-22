@@ -23,7 +23,6 @@
 #include "vtkSMMessage.h"
 #include "vtkSMProxyLocator.h"
 #include "vtkSMProxyManager.h"
-#include "vtkSMProxyManager.h"
 #include "vtkSMRemoteObjectUpdateUndoElement.h"
 #include "vtkSMSession.h"
 #include "vtkSMStateLocator.h"
@@ -39,7 +38,7 @@
 class vtkSMUndoStack::vtkInternal
 {
 public:
-  typedef std::set<vtkSmartPointer<vtkSMSession> > SessionSetType;
+  typedef std::set<vtkSmartPointer<vtkSMSession>> SessionSetType;
   SessionSetType Sessions;
   vtkNew<vtkSMProxyLocator> UndoSetProxyLocator;
   vtkNew<vtkSMDeserializerProtobuf> UndoSetProxyDeserializer;

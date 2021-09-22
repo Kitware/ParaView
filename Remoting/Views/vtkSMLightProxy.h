@@ -17,7 +17,7 @@
  * @brief   a configurable light proxy.
  *
  * vtkSMLightProxy is a configurable light. One or more can exist in a view.
-*/
+ */
 
 #ifndef vtkSMLightProxy_h
 #define vtkSMLightProxy_h

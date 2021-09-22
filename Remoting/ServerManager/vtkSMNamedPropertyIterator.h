@@ -27,7 +27,7 @@
  *
  * @par Thanks:
  * This class was contributed by SciberQuest Inc.
-*/
+ */
 
 #ifndef vtkSMNamedPropertyIterator_h
 #define vtkSMNamedPropertyIterator_h

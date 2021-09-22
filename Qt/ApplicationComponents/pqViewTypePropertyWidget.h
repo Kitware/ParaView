@@ -39,10 +39,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class QComboBox;
 
 /**
-* pqViewTypePropertyWidget is a property widget that shows a combo-box with
-* values equal to the currently available types of views. This could have been
-* implemented as a domain, but I was being lazy :).
-*/
+ * pqViewTypePropertyWidget is a property widget that shows a combo-box with
+ * values equal to the currently available types of views. This could have been
+ * implemented as a domain, but I was being lazy :).
+ */
 class PQAPPLICATIONCOMPONENTS_EXPORT pqViewTypePropertyWidget : public pqPropertyWidget
 {
   Q_OBJECT;
@@ -54,14 +54,14 @@ public:
   ~pqViewTypePropertyWidget() override;
 
   /**
-  * get the current value in the widget
-  */
+   * get the current value in the widget
+   */
   QString value() const;
 
 public Q_SLOTS:
   /**
-  * set the value for the widget.
-  */
+   * set the value for the widget.
+   */
   void setValue(const QString& value);
 
 Q_SIGNALS:

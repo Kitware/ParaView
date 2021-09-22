@@ -69,7 +69,7 @@ protected:
   vtkBoundingBox Bounds;
 
   std::vector<std::string> CFieldNames;
-  std::vector<std::vector<std::string> > MFieldNames;
+  std::vector<std::vector<std::string>> MFieldNames;
 
   vtkIntArray* NeighborArray;
 
@@ -87,9 +87,9 @@ protected:
     int top[3];
     int neighbor_proc[24];
     int neighbor_block[24];
-    std::vector<vtkSmartPointer<vtkCTHDataArray> > CFieldData;
+    std::vector<vtkSmartPointer<vtkCTHDataArray>> CFieldData;
     int actualMaterials;
-    std::vector<std::vector<vtkSmartPointer<vtkCTHDataArray> > > MFieldData;
+    std::vector<std::vector<vtkSmartPointer<vtkCTHDataArray>>> MFieldData;
     vtkUniformGrid* ug;
     vtkAMRBox* box;
   };

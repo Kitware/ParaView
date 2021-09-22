@@ -20,7 +20,7 @@
  * ServerImplementation code instantiation and execution.
  * On the other hand, the vtkSMSession dispatch the request to the right
  * process and therefore to the right vtkPVSessionCore instance.
-*/
+ */
 
 #ifndef vtkPVSessionCore_h
 #define vtkPVSessionCore_h

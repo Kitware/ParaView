@@ -19,7 +19,7 @@
  * vtkClientServerInterpreter will process messages stored in a
  * vtkClientServerStream.  This allows run-time creation and execution
  * of VTK programs.
-*/
+ */
 
 #ifndef vtkClientServerInterpreter_h
 #define vtkClientServerInterpreter_h

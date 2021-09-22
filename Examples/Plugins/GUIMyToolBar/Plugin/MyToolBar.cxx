@@ -18,9 +18,7 @@ MyToolBar::MyToolBar(QWidget* parentW)
   this->constructor();
 }
 
-MyToolBar::~MyToolBar()
-{
-}
+MyToolBar::~MyToolBar() = default;
 
 void MyToolBar::constructor()
 {

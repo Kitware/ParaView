@@ -25,8 +25,8 @@
 #include "vtkUnsignedIntArray.h" // for vtkUnsignedIntArray
 // STL
 #include <fstream> // for file operations
-using std::ofstream;
 using std::ifstream;
+using std::ofstream;
 #include <sstream> // for std::ostringstream
 using std::ostringstream;
 #include <vector> // for std::vector
@@ -429,7 +429,7 @@ ostream& operator<<(ostream& sout, vector<vtkDoubleArray*>& vda)
   return sout;
 }
 //
-ostream& operator<<(ostream& sout, vector<vector<int> >& vvi)
+ostream& operator<<(ostream& sout, vector<vector<int>>& vvi)
 {
   size_t nv = vvi.size();
   for (size_t i = 0; i < nv; ++i)

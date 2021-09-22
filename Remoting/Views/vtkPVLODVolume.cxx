@@ -108,10 +108,11 @@ bool vtkPVLODVolume::CanRender()
     {
       int unused = 0;
       vtkDataSet* input = ugMapper->GetInput();
-      vtkDataArray* scalars =
-        input == nullptr ? nullptr : vtkAbstractMapper::GetScalars(input, ugMapper->GetScalarMode(),
-                                       ugMapper->GetArrayAccessMode(), ugMapper->GetArrayId(),
-                                       ugMapper->GetArrayName(), unused);
+      vtkDataArray* scalars = input == nullptr
+        ? nullptr
+        : vtkAbstractMapper::GetScalars(input, ugMapper->GetScalarMode(),
+            ugMapper->GetArrayAccessMode(), ugMapper->GetArrayId(), ugMapper->GetArrayName(),
+            unused);
       return scalars != nullptr;
     }
   }

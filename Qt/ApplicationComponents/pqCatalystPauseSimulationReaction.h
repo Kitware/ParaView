@@ -39,11 +39,11 @@ class pqLiveInsituVisualizationManager;
 class vtkSMLiveInsituLinkProxy;
 
 /**
-* Reaction for setting a breakpoint to Catalyst CoProcessing Engine
-* for Live-Data Visualization.
-* @ingroup Reactions
-* @ingroup LiveInsitu
-*/
+ * Reaction for setting a breakpoint to Catalyst CoProcessing Engine
+ * for Live-Data Visualization.
+ * @ingroup Reactions
+ * @ingroup LiveInsitu
+ */
 class PQAPPLICATIONCOMPONENTS_EXPORT pqCatalystPauseSimulationReaction : public pqReaction
 {
   Q_OBJECT
@@ -63,8 +63,8 @@ protected:
   };
 
   /**
-  * Called when the action is triggered.
-  */
+   * Called when the action is triggered.
+   */
   void onTriggered() override { this->setPauseSimulation(true); }
 
   void setPauseSimulation(bool pause);

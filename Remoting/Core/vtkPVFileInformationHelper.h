@@ -23,7 +23,7 @@
  * To make such information available, we use vtkPVFileInformationHelper.
  * One creates a server side representation of vtkPVFileInformationHelper and
  * sets attributes on it, then requests a gather information on the helper object.
-*/
+ */
 
 #ifndef vtkPVFileInformationHelper_h
 #define vtkPVFileInformationHelper_h

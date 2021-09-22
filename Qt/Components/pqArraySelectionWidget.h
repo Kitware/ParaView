@@ -100,8 +100,8 @@ public:
   //@}
 Q_SIGNALS:
   /**
-  * fired whenever the check state has been modified.
-  */
+   * fired whenever the check state has been modified.
+   */
   void widgetModified();
 
 private:

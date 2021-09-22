@@ -110,9 +110,9 @@ QWidget* newGroupSeparator(QWidget* parent)
   return widget;
 }
 
-std::vector<vtkWeakPointer<vtkPVXMLElement> > get_decorators(vtkPVXMLElement* hints)
+std::vector<vtkWeakPointer<vtkPVXMLElement>> get_decorators(vtkPVXMLElement* hints)
 {
-  std::vector<vtkWeakPointer<vtkPVXMLElement> > decoratorTypes;
+  std::vector<vtkWeakPointer<vtkPVXMLElement>> decoratorTypes;
   vtkNew<vtkCollection> collection;
   if (hints)
   {
@@ -583,7 +583,7 @@ class pqProxyWidget::pqInternals
 {
 public:
   vtkSmartPointer<vtkSMProxy> Proxy;
-  QList<QPointer<pqProxyWidgetItem> > Items;
+  QList<QPointer<pqProxyWidgetItem>> Items;
   bool CachedShowAdvanced;
   QString CachedFilterText;
   vtkStringList* Properties;
@@ -957,7 +957,7 @@ void pqProxyWidget::createPropertyWidgets(const QStringList& properties)
   //         that corresponds to the order in which the widgets will be rendered.
   //         this is generally same as the order in the XML with one exception,
   //         properties in groups with same label are placed next to each other.
-  std::list<std::pair<vtkSMProperty*, std::string> > ordered_properties;
+  std::list<std::pair<vtkSMProperty*, std::string>> ordered_properties;
   std::map<std::string, decltype(ordered_properties)::iterator> group_end_iterators;
 
   vtkNew<vtkSMOrderedPropertyIterator> opiter;

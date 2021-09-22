@@ -300,7 +300,7 @@ void vtkPVOpenVRExporter::ExportLocationsAsView(vtkPVOpenVRHelper* helper, vtkSM
   }
 
   // save floagpole and skybox locations
-  std::map<vtkActor*, std::vector<int> > specialActorLocations;
+  std::map<vtkActor*, std::vector<int>> specialActorLocations;
 
   vtkNew<vtkXMLDataElement> posesel;
   posesel->SetName("CameraPoses");

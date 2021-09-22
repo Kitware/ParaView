@@ -17,7 +17,7 @@
  * @brief   Class for creating uniform grids.
  *
  * Class for creating vtkUniformGrids for a test driver.
-*/
+ */
 
 #ifndef vtkCPUniformGridBuilder_h
 #define vtkCPUniformGridBuilder_h

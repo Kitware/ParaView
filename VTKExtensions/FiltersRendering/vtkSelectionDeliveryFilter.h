@@ -19,7 +19,7 @@
  * data-server nodes to the client. This should not be instantiated on the
  * pure-render-server nodes to avoid odd side effects (We can fix this later if
  * the need arises).
-*/
+ */
 
 #ifndef vtkSelectionDeliveryFilter_h
 #define vtkSelectionDeliveryFilter_h

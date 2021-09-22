@@ -1105,10 +1105,9 @@ void pqAnimationViewWidget::onTimeLabelChanged()
   QString timeName = "Time";
   if (this->Internal->Scene)
   {
-    timeName =
-      pqSMAdaptor::getElementProperty(
-        this->Internal->Scene->getServer()->getTimeKeeper()->getProxy()->GetProperty("TimeLabel"))
-        .toString();
+    timeName = pqSMAdaptor::getElementProperty(
+      this->Internal->Scene->getServer()->getTimeKeeper()->getProxy()->GetProperty("TimeLabel"))
+                 .toString();
   }
 
   // Update labels

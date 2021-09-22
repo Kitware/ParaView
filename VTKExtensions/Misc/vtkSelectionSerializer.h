@@ -22,7 +22,7 @@
  * PROP_ID, PROCESS_ID, ORIGINAL_SOURCE_ID
  * @sa
  * vtkSelection
-*/
+ */
 
 #ifndef vtkSelectionSerializer_h
 #define vtkSelectionSerializer_h

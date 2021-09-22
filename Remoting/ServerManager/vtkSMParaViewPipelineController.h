@@ -36,7 +36,7 @@
  * For an example of using vtkSMParaViewPipelineController in your application,
  * see `Remoting/Views/Testing/Cxx/TestParaViewPipelineController.cxx`.
  *
-*/
+ */
 
 #ifndef vtkSMParaViewPipelineController_h
 #define vtkSMParaViewPipelineController_h

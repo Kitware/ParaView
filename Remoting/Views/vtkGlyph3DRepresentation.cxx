@@ -52,10 +52,11 @@ class vtkGlyphRepresentationMultiBlockMaker : public vtkMultiBlockDataSetAlgorit
 {
 public:
   static vtkGlyphRepresentationMultiBlockMaker* New();
-  vtkTypeMacro(vtkGlyphRepresentationMultiBlockMaker, vtkMultiBlockDataSetAlgorithm)
+  vtkTypeMacro(vtkGlyphRepresentationMultiBlockMaker, vtkMultiBlockDataSetAlgorithm);
 
-    protected : int RequestData(vtkInformation*, vtkInformationVector** inVec,
-                  vtkInformationVector* outVec) override
+protected:
+  int RequestData(
+    vtkInformation*, vtkInformationVector** inVec, vtkInformationVector* outVec) override
   {
     vtkDataObject* inputDO = vtkDataObject::GetData(inVec[0], 0);
     vtkMultiBlockDataSet* outputMB = vtkMultiBlockDataSet::GetData(outVec, 0);

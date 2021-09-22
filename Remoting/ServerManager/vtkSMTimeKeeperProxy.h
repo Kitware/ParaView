@@ -17,7 +17,7 @@
  *
  * We simply pass the TimestepValues and TimeRange properties to the client-side
  * vtkSMTimeKeeper instance so that it can keep those up-to-date.
-*/
+ */
 
 #ifndef vtkSMTimeKeeperProxy_h
 #define vtkSMTimeKeeperProxy_h

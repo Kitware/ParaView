@@ -17,7 +17,7 @@
  *
  * vtkSIProxy is the server-implementation for a vtkSMProxy that helps the
  * vtkSMProxy with managing/updating VTK objects.
-*/
+ */
 
 #ifndef vtkSIProxy_h
 #define vtkSIProxy_h

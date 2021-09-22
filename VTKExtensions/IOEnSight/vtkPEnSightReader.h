@@ -27,7 +27,7 @@
  *
  *  Copyright (c) CEA
  * \endverbatim
-*/
+ */
 
 #ifndef vtkPEnSightReader_h
 #define vtkPEnSightReader_h
@@ -38,8 +38,6 @@
 #include "vtkIdTypeArray.h" // For ivars
 #include <algorithm>        // For ivars
 #include <map>              // For ivars
-#include <map>              // For ivars
-#include <string>           // For ivars
 #include <string>           // For ivars
 #include <vector>           // For ivars
 
@@ -884,7 +882,7 @@ protected:
 
   int GhostLevels;
 
-  std::map<std::string, std::map<int, long> > FileOffsets;
+  std::map<std::string, std::map<int, long>> FileOffsets;
 
 private:
   vtkPEnSightReader(const vtkPEnSightReader&) = delete;

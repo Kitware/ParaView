@@ -24,7 +24,7 @@
  * if available so that the manipulator can use it.
  * @sa
  * vtkPVInteractorStyle
-*/
+ */
 
 #ifndef vtkCameraManipulatorGUIHelper_h
 #define vtkCameraManipulatorGUIHelper_h

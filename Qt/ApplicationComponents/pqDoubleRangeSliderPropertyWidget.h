@@ -36,18 +36,18 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPropertyWidget.h"
 
 /**
-* pqDoubleRangeSliderPropertyWidget is a widget used for properties such as
-* the "ThresholdRange" property on the IsoVolume filter's panel. It provides
-* two double sliders, one for min and one for max and has logic to ensure that
-* the min <= max.
-*
-* The appearance of this widget can be modified by hints in the property XML
-* definition. If a hint element named "HideResetButton" is present, the range
-* reset button will be hidden. If a hint element named "MinimumLabel" is present with
-* a "text" attribute, that text attribute will be used as the label text instead
-* of "Minimum". Similarly, the default "Maximum" label can be replaced with a
-* "MaximumLabel" element with a "text" attribute.
-*/
+ * pqDoubleRangeSliderPropertyWidget is a widget used for properties such as
+ * the "ThresholdRange" property on the IsoVolume filter's panel. It provides
+ * two double sliders, one for min and one for max and has logic to ensure that
+ * the min <= max.
+ *
+ * The appearance of this widget can be modified by hints in the property XML
+ * definition. If a hint element named "HideResetButton" is present, the range
+ * reset button will be hidden. If a hint element named "MinimumLabel" is present with
+ * a "text" attribute, that text attribute will be used as the label text instead
+ * of "Minimum". Similarly, the default "Maximum" label can be replaced with a
+ * "MaximumLabel" element with a "text" attribute.
+ */
 class PQAPPLICATIONCOMPONENTS_EXPORT pqDoubleRangeSliderPropertyWidget : public pqPropertyWidget
 {
   Q_OBJECT
@@ -67,8 +67,8 @@ protected Q_SLOTS:
 
 private Q_SLOTS:
   /**
-  * slots called when the slider(s) are moved.
-  */
+   * slots called when the slider(s) are moved.
+   */
   void lowerChanged(double);
   void upperChanged(double);
 

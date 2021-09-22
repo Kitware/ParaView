@@ -19,7 +19,7 @@
  *
  * vtkSMBagChartSeriesListDomain extends vtkSMChartSeriesListDomain to
  * setup defaults specific for bag plot representations.
-*/
+ */
 
 #ifndef vtkSMBagChartSeriesListDomain_h
 #define vtkSMBagChartSeriesListDomain_h

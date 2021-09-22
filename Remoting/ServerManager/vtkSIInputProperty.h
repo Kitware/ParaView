@@ -18,7 +18,7 @@
  * ServerSide Property use to set vtkOutputPort as method parameter.
  * For that we need the object on which we should get the Port and its port
  * number.
-*/
+ */
 
 #ifndef vtkSIInputProperty_h
 #define vtkSIInputProperty_h

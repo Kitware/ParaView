@@ -47,7 +47,7 @@
  * \li \c EnableRenderOnInteraction :- when present provides a flag whether the interactor
  * should trigger the render calls (either StillRender or InteractiveRender) as
  * a consequence of interaction. If missing, we treat EnableRender as ON.
-*/
+ */
 
 #ifndef vtkSMViewProxyInteractorHelper_h
 #define vtkSMViewProxyInteractorHelper_h

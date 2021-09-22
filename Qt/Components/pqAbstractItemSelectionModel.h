@@ -35,10 +35,10 @@ class QTreeWidgetItem;
 class vtkSMProxy;
 
 /**
-* @brief Abstract class implementing a tree model with checkable items.
-* It uses QTreeWidgetItem as its item class. Reimplement the virtual methods
-* to fill it with data.
-*/
+ * @brief Abstract class implementing a tree model with checkable items.
+ * It uses QTreeWidgetItem as its item class. Reimplement the virtual methods
+ * to fill it with data.
+ */
 class pqAbstractItemSelectionModel : public QAbstractItemModel
 {
   Q_OBJECT
@@ -48,9 +48,9 @@ protected:
   ~pqAbstractItemSelectionModel() override;
 
   /**
-  * @{
-  * QAbstractItemModel implementation
-  */
+   * @{
+   * QAbstractItemModel implementation
+   */
   int rowCount(const QModelIndex& parent_ = QModelIndex()) const override;
   int columnCount(const QModelIndex& parent_ = QModelIndex()) const override;
 
@@ -62,27 +62,23 @@ protected:
     int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override;
   Qt::ItemFlags flags(const QModelIndex& index_) const override;
   /**
-  * @}
-  */
+   * @}
+   */
 
   /**
-  * Concrete classes should implement how the model is to be populated.
-  */
+   * Concrete classes should implement how the model is to be populated.
+   */
   virtual void populateModel(void* dataObject) = 0;
 
   /**
-  * Initialize the root item which holds the header tags.
-  */
+   * Initialize the root item which holds the header tags.
+   */
   virtual void initializeRootItem() = 0;
 
   /**
-  * Helper for a more comprehensive validation of indices.
-  */
+   * Helper for a more comprehensive validation of indices.
+   */
   bool isIndexValid(const QModelIndex& index_) const;
-
-  /**
-  *
-  */
 
   QTreeWidgetItem* RootItem;
 };

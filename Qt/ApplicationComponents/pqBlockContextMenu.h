@@ -47,8 +47,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * that add context-menu actions to control display properties for chosen
  * blocks. This is currently only supported for render view.
  */
-class PQAPPLICATIONCOMPONENTS_EXPORT pqBlockContextMenu : public QObject,
-                                                          public pqContextMenuInterface
+class PQAPPLICATIONCOMPONENTS_EXPORT pqBlockContextMenu
+  : public QObject
+  , public pqContextMenuInterface
 {
   Q_OBJECT
   Q_INTERFACES(pqContextMenuInterface)

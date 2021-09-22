@@ -37,7 +37,7 @@ vtkStandardNewMacro(vtkPythonProgrammableFilter);
 //----------------------------------------------------------------------------
 
 typedef std::map<std::string, std::string> ParametersT;
-typedef std::map<std::string, std::vector<std::string> > RepeatableParametersT;
+typedef std::map<std::string, std::vector<std::string>> RepeatableParametersT;
 
 class vtkPythonProgrammableFilterImplementation
 {
@@ -312,8 +312,9 @@ void vtkPythonProgrammableFilter::Exec(const char* script, const char* funcname)
   }
 
   // Remove the function if it already exists
-  std::string cleanupScript = "try: del " + std::string(funcname) + "\n"
-                                                                    "except NameError: pass\n";
+  std::string cleanupScript = "try: del " + std::string(funcname) +
+    "\n"
+    "except NameError: pass\n";
   vtkPythonInterpreter::RunSimpleString(cleanupScript.c_str());
 
   // Construct a script that defines a function

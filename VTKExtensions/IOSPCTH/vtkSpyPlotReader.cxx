@@ -2424,7 +2424,7 @@ void vtkSpyPlotReader::SetGlobalLevels(vtkCompositeDataSet* composite)
         else
         {
           int kk;
-          std::vector<vtkSmartPointer<vtkDataSet> > datasets;
+          std::vector<vtkSmartPointer<vtkDataSet>> datasets;
           for (kk = 0; kk < numberOfDataSets; kk++)
           {
             datasets.push_back(vtkDataSet::SafeDownCast(mbDS->GetBlock(kk)));
@@ -2445,10 +2445,10 @@ void vtkSpyPlotReader::SetGlobalLevels(vtkCompositeDataSet* composite)
   if (hbDS)
   {
     // save all the existing data sets
-    std::vector<std::vector<vtkSmartPointer<vtkUniformGrid> > > datasets;
+    std::vector<std::vector<vtkSmartPointer<vtkUniformGrid>>> datasets;
     for (unsigned int level = 0; level < numberOfLevels; level++)
     {
-      std::vector<vtkSmartPointer<vtkUniformGrid> > datasetsAtLevel;
+      std::vector<vtkSmartPointer<vtkUniformGrid>> datasetsAtLevel;
       for (unsigned int kk = 0; kk < hbDS->GetNumberOfDataSets(level); kk++)
       {
         vtkUniformGrid* ug = hbDS->GetDataSet(level, kk);

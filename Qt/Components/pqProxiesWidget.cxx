@@ -53,9 +53,9 @@ public:
   };
 
   /// Key == "ComponentName", Value == List of "ProxyInfo".
-  typedef QMap<QString, QList<ProxyInfo> > MapOfProxyList;
+  typedef QMap<QString, QList<ProxyInfo>> MapOfProxyList;
   MapOfProxyList ComponentProxies;
-  QList<QPointer<pqExpanderButton> > Expanders;
+  QList<QPointer<pqExpanderButton>> Expanders;
   QPointer<pqView> View;
   QStringList OrderedComponentNames;
 

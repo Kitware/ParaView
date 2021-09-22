@@ -54,7 +54,7 @@
  * The constructed class instance is \c finalized and deleted when the temporary
  * variable created by the macro goes out of scope (hence the name
  * SM_SCOPED_TRACE).
-*/
+ */
 
 #ifndef vtkSMTrace_h
 #define vtkSMTrace_h

@@ -78,8 +78,8 @@ int vtkCleanUnstructuredGridCells::RequestData(vtkInformation* vtkNotUsed(reques
   outCD->CopyAllocate(input->GetCellData());
 
   // remove duplicate cells
-  std::set<std::set<int> > cellSet;
-  std::set<std::set<int> >::iterator cellIter;
+  std::set<std::set<int>> cellSet;
+  std::set<std::set<int>>::iterator cellIter;
 
   // Now copy the cells.
   vtkIdList* cellPoints = vtkIdList::New();

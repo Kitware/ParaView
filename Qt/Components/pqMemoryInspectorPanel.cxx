@@ -68,8 +68,8 @@ using std::vector;
 #include <string>
 using std::string;
 #include <sstream>
-using std::ostringstream;
 using std::istringstream;
+using std::ostringstream;
 #include <iostream>
 using std::endl;
 #include <algorithm>
@@ -935,9 +935,9 @@ void pqMemoryInspectorPanel::InitializeServerGroup(long long clientPid,
     long long hostMemoryAvailable = configs->GetHostMemoryAvailable(i);
     long long procMemoryAvailable = configs->GetProcMemoryAvailable(i);
 
-// it's useful to have hostname's rank's and pid's in
-// the terminal. if the client hangs you can attach
-// gdb and see where it's stuck without a lot of effort
+    // it's useful to have hostname's rank's and pid's in
+    // the terminal. if the client hangs you can attach
+    // gdb and see where it's stuck without a lot of effort
 
 #ifdef MIP_PROCESS_TABLE
     cerr << setw(32) << hostName << setw(16) << pid << setw(8) << rank << endl << setw(1);

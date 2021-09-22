@@ -108,16 +108,16 @@ public:
   /**
    * Set/Get the value-annotation pairs.
    */
-  void setAnnotations(const std::vector<std::pair<QString, QString> >& newAnnotations);
-  std::vector<std::pair<QString, QString> > annotations() const;
+  void setAnnotations(const std::vector<std::pair<QString, QString>>& newAnnotations);
+  std::vector<std::pair<QString, QString>> annotations() const;
   //@}
 
   //@{
   /**
    * Set/Get the visibilities.
    */
-  void setVisibilities(const std::vector<std::pair<QString, int> >& newVisibilities);
-  std::vector<std::pair<QString, int> > visibilities() const;
+  void setVisibilities(const std::vector<std::pair<QString, int>>& newVisibilities);
+  std::vector<std::pair<QString, int>> visibilities() const;
   //@}
 
   //@{

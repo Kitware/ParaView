@@ -27,7 +27,7 @@
  * the prominent values are also made available.
  *
  * This class uses vtkAbstractArray::GetProminentComponentValues().
-*/
+ */
 
 #ifndef vtkPVProminentValuesInformation_h
 #define vtkPVProminentValuesInformation_h

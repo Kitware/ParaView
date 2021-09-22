@@ -16,7 +16,7 @@
  * @class   vtkSMInsituStateLoader
  *
  *
-*/
+ */
 
 #ifndef vtkSMInsituStateLoader_h
 #define vtkSMInsituStateLoader_h

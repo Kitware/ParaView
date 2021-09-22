@@ -14,9 +14,9 @@
 =========================================================================*/
 #include "vtkMaterialInterfaceProcessRing.h"
 #include <iostream>
-using std::ostream;
 using std::cerr;
 using std::endl;
+using std::ostream;
 //
 class vtkMaterialInterfaceProcessRing::BufferContainer : public std::vector<vtkIdType>
 {

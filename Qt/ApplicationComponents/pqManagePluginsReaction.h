@@ -35,9 +35,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqMasterOnlyReaction.h"
 
 /**
-* @ingroup Reactions
-* pqManagePluginsReaction is the reaction to pop-up the plugins manager dialog.
-*/
+ * @ingroup Reactions
+ * pqManagePluginsReaction is the reaction to pop-up the plugins manager dialog.
+ */
 class PQAPPLICATIONCOMPONENTS_EXPORT pqManagePluginsReaction : public pqMasterOnlyReaction
 {
   Q_OBJECT
@@ -50,12 +50,13 @@ public:
   }
 
   /**
-  * Pops-up the pqPluginDialog dialog.
-  */
+   * Pops-up the pqPluginDialog dialog.
+   */
   static void managePlugins();
 
 protected:
   void onTriggered() override { pqManagePluginsReaction::managePlugins(); }
+
 private:
   Q_DISABLE_COPY(pqManagePluginsReaction)
 };

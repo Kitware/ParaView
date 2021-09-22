@@ -42,10 +42,10 @@ class pqView;
 class QShortcut;
 
 /**
-* pqPointPickingHelper is a helper class that is designed for use by
-* subclasses of pqInteractivePropertyWidget (or others) that want to support
-* using a shortcut key to pick a point on the surface mesh.
-*/
+ * pqPointPickingHelper is a helper class that is designed for use by
+ * subclasses of pqInteractivePropertyWidget (or others) that want to support
+ * using a shortcut key to pick a point on the surface mesh.
+ */
 class PQAPPLICATIONCOMPONENTS_EXPORT pqPointPickingHelper : public QObject
 {
   Q_OBJECT
@@ -56,23 +56,23 @@ public:
   ~pqPointPickingHelper() override;
 
   /**
-  * Returns whether the helper will pick a point in the mesh or simply a point
-  * on the surface. In other words, if pickOnMesh returns true, then the
-  * picked point will always be a point specified in the points that form the
-  * mesh.
-  */
+   * Returns whether the helper will pick a point in the mesh or simply a point
+   * on the surface. In other words, if pickOnMesh returns true, then the
+   * picked point will always be a point specified in the points that form the
+   * mesh.
+   */
   bool pickOnMesh() const { return this->PickOnMesh; }
 
 public Q_SLOTS:
   /**
-  * Set the view on which the pick is active. We only support pqRenderView and
-  * subclasses currently.
-  */
+   * Set the view on which the pick is active. We only support pqRenderView and
+   * subclasses currently.
+   */
   void setView(pqView* view);
 
   /**
-  * Enable/disable the pick point shortcut.
-  */
+   * Enable/disable the pick point shortcut.
+   */
   void setShortcutEnabled(bool);
 
 Q_SIGNALS:

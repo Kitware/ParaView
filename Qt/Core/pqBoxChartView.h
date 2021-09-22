@@ -38,8 +38,8 @@ class vtkSMSourceProxy;
 class pqDataRepresentation;
 
 /**
-* Bar chart view
-*/
+ * Bar chart view
+ */
 class PQCORE_EXPORT pqBoxChartView : public pqContextView
 {
   Q_OBJECT
@@ -55,22 +55,22 @@ public:
 
 Q_SIGNALS:
   /**
-  * Fired when the currently shown representation changes. \c repr may be
-  * nullptr.
-  */
+   * Fired when the currently shown representation changes. \c repr may be
+   * nullptr.
+   */
   void showing(pqDataRepresentation* repr);
 
 public Q_SLOTS:
   /**
-  * Called when a new repr is added.
-  */
+   * Called when a new repr is added.
+   */
   void onAddRepresentation(pqRepresentation*);
   void onRemoveRepresentation(pqRepresentation*);
 
 protected Q_SLOTS:
   /**
-  * Called to ensure that at most 1 repr is visible at a time.
-  */
+   * Called to ensure that at most 1 repr is visible at a time.
+   */
   void updateRepresentationVisibility(pqRepresentation* repr, bool visible);
 
 private:

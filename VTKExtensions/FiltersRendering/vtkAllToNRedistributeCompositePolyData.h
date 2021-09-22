@@ -16,7 +16,7 @@
  * @class   vtkAllToNRedistributeCompositePolyData
  *
  * vtkAllToNRedistributePolyData extension that is composite data aware.
-*/
+ */
 
 #ifndef vtkAllToNRedistributeCompositePolyData_h
 #define vtkAllToNRedistributeCompositePolyData_h

@@ -22,7 +22,7 @@
  * RepresentedArrayList domain. All class to
  * vtkPVRepresentedArrayListSettings::New() returns a reference to the
  * singleton instance.
-*/
+ */
 
 #ifndef vtkPVRepresentedArrayListSettings_h
 #define vtkPVRepresentedArrayListSettings_h

@@ -38,11 +38,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class QMainWindow;
 
 /**
-* @ingroup Behaviors
-* pqPluginDockWidgetsBehavior adds support for loading dock widgets from
-* plugins. In other words, it adds support for plugins created using
-* ADD_PARAVIEW_DOCK_WINDOW.
-*/
+ * @ingroup Behaviors
+ * pqPluginDockWidgetsBehavior adds support for loading dock widgets from
+ * plugins. In other words, it adds support for plugins created using
+ * ADD_PARAVIEW_DOCK_WINDOW.
+ */
 class PQAPPLICATIONCOMPONENTS_EXPORT pqPluginDockWidgetsBehavior : public QObject
 {
   Q_OBJECT

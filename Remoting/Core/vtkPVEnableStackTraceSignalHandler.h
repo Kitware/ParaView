@@ -17,7 +17,7 @@
  *
  * When run on the process it enables a stacktrace signal handler for
  * common errors.
-*/
+ */
 
 #ifndef vtkPVEnableStackTraceSignalHandler_h
 #define vtkPVEnableStackTraceSignalHandler_h

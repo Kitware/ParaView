@@ -305,8 +305,8 @@ void vtkSMProxySelectionModel::LoadState(const vtkSMMessage* msg, vtkSMProxyLoca
   // If we did not get initialized yet, we don't filter
   if (this->Internal->GetMasterId() != -1 &&
     !(!this->Internal->Initialized ||
-        (this->IsFollowingMaster() &&
-          this->Internal->GetMasterId() == static_cast<int>(msg->client_id()))))
+      (this->IsFollowingMaster() &&
+        this->Internal->GetMasterId() == static_cast<int>(msg->client_id()))))
   {
     return;
   }

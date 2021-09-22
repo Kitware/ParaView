@@ -17,7 +17,7 @@
  * @brief   Class for creating grids from a VTK file.
  *
  * Class for creating grids from a VTK file.
-*/
+ */
 
 #ifndef vtkCPFileGridBuilder_h
 #define vtkCPFileGridBuilder_h

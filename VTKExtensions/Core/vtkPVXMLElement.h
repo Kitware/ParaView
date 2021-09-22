@@ -17,7 +17,7 @@
  *
  * This is used by vtkPVXMLParser to represent an XML document starting
  * at the root element.
-*/
+ */
 
 #ifndef vtkPVXMLElement_h
 #define vtkPVXMLElement_h

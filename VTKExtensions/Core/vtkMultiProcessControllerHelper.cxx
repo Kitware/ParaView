@@ -92,7 +92,7 @@ vtkDataObject* vtkMultiProcessControllerHelper::MergePieces(
 
   vtkDataObject* result = pieces[0]->NewInstance();
 
-  std::vector<vtkSmartPointer<vtkDataObject> > piece_vector;
+  std::vector<vtkSmartPointer<vtkDataObject>> piece_vector;
   piece_vector.resize(num_pieces);
   for (unsigned int cc = 0; cc < num_pieces; cc++)
   {
@@ -109,7 +109,7 @@ vtkDataObject* vtkMultiProcessControllerHelper::MergePieces(
 
 //-----------------------------------------------------------------------------
 bool vtkMultiProcessControllerHelper::MergePieces(
-  std::vector<vtkSmartPointer<vtkDataObject> >& pieces, vtkDataObject* result)
+  std::vector<vtkSmartPointer<vtkDataObject>>& pieces, vtkDataObject* result)
 {
   if (pieces.empty())
   {
@@ -172,7 +172,7 @@ bool vtkMultiProcessControllerHelper::MergePieces(
     result->ShallowCopy(pieces[0]);
     return false;
   }
-  std::vector<vtkSmartPointer<vtkDataObject> >::iterator iter;
+  std::vector<vtkSmartPointer<vtkDataObject>>::iterator iter;
   for (iter = pieces.begin(); iter != pieces.end(); ++iter)
   {
     vtkDataSet* ds = vtkDataSet::SafeDownCast(iter->GetPointer());

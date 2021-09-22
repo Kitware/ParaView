@@ -79,9 +79,7 @@ void pqBlotDialog::setActiveServer(pqServer* server)
 }
 
 //-----------------------------------------------------------------------------
-void pqBlotDialog::open()
-{
-}
+void pqBlotDialog::open() {}
 
 //-----------------------------------------------------------------------------
 void pqBlotDialog::open(const QString& filename)

@@ -32,7 +32,9 @@ class QGraphicsScene;
  * and an input port. This class internally detects if the positions of the
  * corresponding ports change and updates itself automatically.
  */
-class pqNodeEditorEdge : public QObject, public QGraphicsPathItem
+class pqNodeEditorEdge
+  : public QObject
+  , public QGraphicsPathItem
 {
   Q_OBJECT
 

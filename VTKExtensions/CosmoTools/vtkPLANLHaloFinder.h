@@ -65,7 +65,7 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * vtkPLANLHaloFinder is a filter object that operates on the unstructured
  * grid of all particles and assigns each particle a halo id.
  *
-*/
+ */
 
 #ifndef vtkPLANLHaloFinder_h
 #define vtkPLANLHaloFinder_h

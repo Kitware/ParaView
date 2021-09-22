@@ -50,8 +50,8 @@ public:
   void setContent(const QString& path) override;
 
   /**
-  * Get the next event from the event source
-  */
+   * Get the next event from the event source
+   */
   int getNextEvent(QString& object, QString& command, QString& arguments, int& eventType) override;
 
 private:

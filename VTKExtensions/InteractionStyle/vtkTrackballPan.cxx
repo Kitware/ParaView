@@ -73,9 +73,7 @@ void vtkTrackballPan::OnKeyDown(vtkRenderWindowInteractor* interactor)
 }
 
 //-------------------------------------------------------------------------
-void vtkTrackballPan::OnButtonDown(int, int, vtkRenderer*, vtkRenderWindowInteractor*)
-{
-}
+void vtkTrackballPan::OnButtonDown(int, int, vtkRenderer*, vtkRenderWindowInteractor*) {}
 
 //-------------------------------------------------------------------------
 void vtkTrackballPan::OnButtonUp(int, int, vtkRenderer*, vtkRenderWindowInteractor*)

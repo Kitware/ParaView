@@ -25,7 +25,7 @@
  * direction. This is default behavior. You can change that to use zoom instead
  * i.e. change view angle on camera, by setting UseDollyForPerspectiveProjection
  * to off.
-*/
+ */
 
 #ifndef vtkPVTrackballZoom_h
 #define vtkPVTrackballZoom_h

@@ -41,7 +41,9 @@ class pqNodeEditorPort;
  * See :
  * @sa pqNodeEditorPort
  */
-class pqNodeEditorNode : public QObject, public QGraphicsItem
+class pqNodeEditorNode
+  : public QObject
+  , public QGraphicsItem
 {
   Q_OBJECT
   Q_INTERFACES(QGraphicsItem)

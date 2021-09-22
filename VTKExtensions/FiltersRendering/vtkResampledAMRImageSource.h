@@ -29,7 +29,7 @@
  * We subclass vtkTrivialProducer since it deals with all the meta-data that
  * needs to be passed down the pipeline for image data, keeping the code here
  * simple.
-*/
+ */
 
 #ifndef vtkResampledAMRImageSource_h
 #define vtkResampledAMRImageSource_h

@@ -18,7 +18,7 @@
  * collect file information from vtkEnsembleDataReader.
  *
  * Gather information about data files from vtkEnsembleDataReader.
-*/
+ */
 
 #ifndef vtkPVEnsembleDataReaderInformation_h
 #define vtkPVEnsembleDataReaderInformation_h

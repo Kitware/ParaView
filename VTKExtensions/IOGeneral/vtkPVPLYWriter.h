@@ -18,7 +18,7 @@
  *
  * This is a facade for vtkPLYWriter that provides an API more amiable to the
  * GUI shown in the ParaView application.
-*/
+ */
 
 #ifndef vtkPVPLYWriter_h
 #define vtkPVPLYWriter_h

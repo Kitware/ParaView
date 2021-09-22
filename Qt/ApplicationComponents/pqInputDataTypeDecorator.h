@@ -39,13 +39,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class vtkObject;
 
 /**
-* pqInputDataTypeDecorator is a pqPropertyWidgetDecorator subclass.
-* For certain properties, they should update the enable state
-* based on input data types.
-* For example, "Computer Gradients" in Contour filter should only
-* be enabled when an input data type is a StructuredData. Please see
-* vtkPVDataInformation::IsDataStructured() for structured types.
-*/
+ * pqInputDataTypeDecorator is a pqPropertyWidgetDecorator subclass.
+ * For certain properties, they should update the enable state
+ * based on input data types.
+ * For example, "Computer Gradients" in Contour filter should only
+ * be enabled when an input data type is a StructuredData. Please see
+ * vtkPVDataInformation::IsDataStructured() for structured types.
+ */
 class PQAPPLICATIONCOMPONENTS_EXPORT pqInputDataTypeDecorator : public pqPropertyWidgetDecorator
 {
   Q_OBJECT
@@ -56,8 +56,8 @@ public:
   ~pqInputDataTypeDecorator() override;
 
   /**
-  * Overridden to enable/disable the widget based on input data type.
-  */
+   * Overridden to enable/disable the widget based on input data type.
+   */
   bool enableWidget() const override;
 
   /**

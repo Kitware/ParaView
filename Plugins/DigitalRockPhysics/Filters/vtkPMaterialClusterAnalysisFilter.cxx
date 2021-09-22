@@ -60,9 +60,9 @@ void vtkPMaterialClusterAnalysisFilter::PrintSelf(ostream& os, vtkIndent indent)
 //----------------------------------------------------------------------------
 namespace
 {
-typedef std::map<int, std::pair<unsigned int, std::array<double, 3> > >
-  LabelValuesMap;                                    // cluster label -> { count, barycenter }
-typedef std::map<int, std::set<int> > LabelRanksMap; // cluster label -> { list of rank using it }
+typedef std::map<int, std::pair<unsigned int, std::array<double, 3>>>
+  LabelValuesMap;                                   // cluster label -> { count, barycenter }
+typedef std::map<int, std::set<int>> LabelRanksMap; // cluster label -> { list of rank using it }
 
 //----------------------------------------------------------------------------
 void Barycenter(unsigned int weight1, const double* point1, unsigned int weight2,
@@ -155,7 +155,7 @@ int ReduceTable(vtkAlgorithm* that, LabelValuesMap& lvMap, vtkTable* table, int 
 
   that->SetProgressText("Reducing data");
   that->UpdateProgress(0.0);
-  std::vector<vtkSmartPointer<vtkDataObject> > recv;
+  std::vector<vtkSmartPointer<vtkDataObject>> recv;
   controller->Gather(table, recv, 0);
   while (table->GetNumberOfColumns() != 0)
   {

@@ -62,14 +62,10 @@ pqPythonQtPlugin::~pqPythonQtPlugin()
 }
 
 //-----------------------------------------------------------------------------
-void pqPythonQtPlugin::startup()
-{
-}
+void pqPythonQtPlugin::startup() {}
 
 //-----------------------------------------------------------------------------
-void pqPythonQtPlugin::shutdown()
-{
-}
+void pqPythonQtPlugin::shutdown() {}
 
 //-----------------------------------------------------------------------------
 void pqPythonQtPlugin::initialize()

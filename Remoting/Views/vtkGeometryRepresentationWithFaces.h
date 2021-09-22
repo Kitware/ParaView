@@ -18,7 +18,7 @@
  * vtkGeometryRepresentationWithFaces extends vtkGeometryRepresentation to add
  * support for rendering back and front faces separately (with different
  * visibility and properties).
-*/
+ */
 
 #ifndef vtkGeometryRepresentationWithFaces_h
 #define vtkGeometryRepresentationWithFaces_h

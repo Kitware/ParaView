@@ -19,7 +19,7 @@
  * vtkPVTransform extend vtkTransform in the sens that it extend the vtkTransform
  * API with absolute position/rotation/scale change and not incremental one like
  * the vtkTransform does.
-*/
+ */
 
 #ifndef vtkPVTransform_h
 #define vtkPVTransform_h

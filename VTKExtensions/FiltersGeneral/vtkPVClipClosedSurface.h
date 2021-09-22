@@ -18,7 +18,7 @@
  *
  *
  *  This is a subclass of vtkClipClosedSurface
-*/
+ */
 
 #ifndef vtkPVClipClosedSurface_h
 #define vtkPVClipClosedSurface_h

@@ -56,8 +56,7 @@ void vtkPVBagPlotMatrixView::Render(bool interactive)
   vtksys::SystemTools::ReplaceString(formattedTitle, "${VARIANCE}", "{variance}");
   if (possibleOldFormatString != formattedTitle)
   {
-    vtkLogF(WARNING, "Legacy formatting pattern detected."
-                     "Please replace '%s' with '%s'.",
+    vtkLogF(WARNING, "Legacy formatting pattern detected. Please replace '%s' with '%s'.",
       possibleOldFormatString.c_str(), formattedTitle.c_str());
   }
   this->SetTitle(formattedTitle.c_str());

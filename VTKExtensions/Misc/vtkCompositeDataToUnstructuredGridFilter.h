@@ -24,7 +24,7 @@
  * the SubTreeCompositeIndex is a leaf node, then no appending is required.
  *
  * @deprecated ParaView 5.9. Please use vtkMergeBlocks instead.
-*/
+ */
 
 #ifndef vtkCompositeDataToUnstructuredGridFilter_h
 #define vtkCompositeDataToUnstructuredGridFilter_h

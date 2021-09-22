@@ -23,7 +23,7 @@
  * I may also add block id and level as extra cell arrays.
  * If GenerateRectilinearGrids is true then this filter outputs
  * vtkHierarchicalBoxDataSet otherwise it generates a vtkMultiBlockDataSet.
-*/
+ */
 
 #ifndef vtkHierarchicalFractal_h
 #define vtkHierarchicalFractal_h

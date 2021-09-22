@@ -120,9 +120,9 @@ public:
 
   //@{
   /**
-  * Set the settings key that will be used to restore/save the state for
-  * the "Show full messages" button. By default "pqOutputWidget" will be used.
-  */
+   * Set the settings key that will be used to restore/save the state for
+   * the "Show full messages" button. By default "pqOutputWidget" will be used.
+   */
   void setSettingsKey(const QString& key);
   const QString& settingsKey() const;
   //@}

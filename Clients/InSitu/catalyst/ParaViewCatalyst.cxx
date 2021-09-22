@@ -267,9 +267,9 @@ enum catalyst_status catalyst_initialize_paraview(const conduit_node* params)
   if (!cpp_params.has_path("catalyst/scripts") && !cpp_params.has_path("catalyst/pipelines"))
   {
     // no catalyst initialization specified.
-    vtkVLogF(PARAVIEW_LOG_CATALYST_VERBOSITY(), "No Catalyst Python scripts or pre-compiled "
-                                                "pipelines specified. No analysis pipelines will "
-                                                "be executed.");
+    vtkVLogF(PARAVIEW_LOG_CATALYST_VERBOSITY(),
+      "No Catalyst Python scripts or pre-compiled pipelines specified. No "
+      "analysis pipelines will be executed.");
   }
 
   return catalyst_status_ok;
@@ -412,8 +412,8 @@ enum catalyst_status catalyst_execute_paraview(const conduit_node* params)
   }
   else
   {
-    vtkVLogF(PARAVIEW_LOG_CATALYST_VERBOSITY(), "No 'catalyst/channels' found. "
-                                                "No meshes will be processed.");
+    vtkVLogF(PARAVIEW_LOG_CATALYST_VERBOSITY(),
+      "No 'catalyst/channels' found. No meshes will be processed.");
   }
 
   // check for optional 'parameters'
@@ -478,7 +478,7 @@ enum catalyst_status catalyst_results_paraview(conduit_node* params)
   auto catalyst_node = cpp_params["catalyst"];
 
   bool is_success = true;
-  std::vector<std::pair<std::string, vtkSMProxy*> > steerableProxies;
+  std::vector<std::pair<std::string, vtkSMProxy*>> steerableProxies;
   vtkInSituInitializationHelper::GetSteerableProxies(steerableProxies);
   for (auto& proxy : steerableProxies)
   {

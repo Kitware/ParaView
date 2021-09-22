@@ -27,7 +27,7 @@
  * Supported Required-Property functions:
  * \li ArraySelection : (required) refers to the property that dictates the
  * array selection.
-*/
+ */
 
 #ifndef vtkSMChartUseIndexForAxisDomain_h
 #define vtkSMChartUseIndexForAxisDomain_h

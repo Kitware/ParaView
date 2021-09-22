@@ -33,7 +33,7 @@ class vtkCSVExporter::vtkInternals
 public:
   std::string Header;
   std::string XColumnName;
-  std::map<double, std::pair<std::string, int> > Lines;
+  std::map<double, std::pair<std::string, int>> Lines;
   int ColumnCount;
 
   //@{
@@ -63,7 +63,7 @@ public:
   {
     ofs << (this->XColumnName.empty() ? "X" : this->XColumnName.c_str()) << delim
         << this->Header.c_str() << endl;
-    for (std::map<double, std::pair<std::string, int> >::iterator iter = this->Lines.begin();
+    for (std::map<double, std::pair<std::string, int>>::iterator iter = this->Lines.begin();
          iter != this->Lines.end(); ++iter)
     {
       ofs << iter->first << delim << iter->second.first.c_str();

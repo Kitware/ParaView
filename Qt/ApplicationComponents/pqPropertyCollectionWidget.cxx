@@ -270,8 +270,9 @@ pqPropertyCollectionWidget::pqPropertyCollectionWidget(
 
     if (static_cast<int>(target->GetNumberOfElements()) != prop->GetNumberOfElementsPerCommand())
     {
-      vtkLogF(WARNING, "Prototype property '%s' must have exactly as many elements as each "
-                       "repeated entry for source property '%s'. Expected %d, got %d.",
+      vtkLogF(WARNING,
+        "Prototype property '%s' must have exactly as many elements as each "
+        "repeated entry for source property '%s'. Expected %d, got %d.",
         pfunction, pname, prop->GetNumberOfElementsPerCommand(), target->GetNumberOfElements());
       continue;
     }
@@ -318,12 +319,12 @@ void pqPropertyCollectionWidget::propertyChanged(const char* pname)
   assert(internals.UpdatingProperty == false);
 
   const QVariant value = this->property(pname);
-  if (!value.isValid() || !value.canConvert<QList<QVariant> >())
+  if (!value.isValid() || !value.canConvert<QList<QVariant>>())
   {
     return;
   }
 
-  auto listVariants = value.value<QList<QVariant> >();
+  auto listVariants = value.value<QList<QVariant>>();
   auto smprop = vtkSMVectorProperty::SafeDownCast(this->proxy()->GetProperty(pname));
   assert(smprop != nullptr);
 

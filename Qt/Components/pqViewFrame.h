@@ -51,11 +51,11 @@ class pqServerManagerModelItem;
 class pqView;
 
 /**
-* pqViewFrame is used to represent a frame for any ParaView view shown in the
-* pqMultiViewWidget. A frame has title-bar that can be used to show arbitrary
-* buttons, as well as a border that can be used to indicate if the frame is
-* active.
-*/
+ * pqViewFrame is used to represent a frame for any ParaView view shown in the
+ * pqMultiViewWidget. A frame has title-bar that can be used to show arbitrary
+ * buttons, as well as a border that can be used to indicate if the frame is
+ * active.
+ */
 class PQCOMPONENTS_EXPORT pqViewFrame : public QWidget
 {
   Q_OBJECT
@@ -66,36 +66,36 @@ public:
   ~pqViewFrame() override;
 
   /**
-  * Get/Set the window title. If not empty, the title is shown in the
-  * title-bar.
-  */
+   * Get/Set the window title. If not empty, the title is shown in the
+   * title-bar.
+   */
   void setTitle(const QString& text);
   QString title() const;
 
   /**
-  * Get/Set the central widget shown in this frame. Similar to
-  * QLayout::addWidget, this call takes the ownership of the widget and the
-  * widget will be deleted with pqViewFrame is deleted or another widget is set
-  * using setCentralWidget().
-  */
+   * Get/Set the central widget shown in this frame. Similar to
+   * QLayout::addWidget, this call takes the ownership of the widget and the
+   * widget will be deleted with pqViewFrame is deleted or another widget is set
+   * using setCentralWidget().
+   */
   void setCentralWidget(QWidget* widget, pqView* view = 0);
   QWidget* centralWidget() const;
 
   /**
-  * Get/Set the border BorderColor. The border is only drawn when the
-  * borderVisibility is set to true.
-  */
+   * Get/Set the border BorderColor. The border is only drawn when the
+   * borderVisibility is set to true.
+   */
   void setBorderColor(const QColor& clr);
   const QColor& borderColor() const { return this->BorderColor; }
 
   /**
-  * Get/Set the border visibility.
-  */
+   * Get/Set the border visibility.
+   */
   bool isBorderVisible() const { return this->BorderVisible; }
 
   /**
-  * Get whether the title-bar is shown.
-  */
+   * Get whether the title-bar is shown.
+   */
   bool isTitleBarVisible() const { return this->TitleBarVisible; }
 
   enum StandardButton
@@ -111,65 +111,65 @@ public:
   Q_DECLARE_FLAGS(StandardButtons, StandardButton);
 
   /**
-  * This holds the collection of standard buttons the frame should show in the
-  * title-bar.
-  */
+   * This holds the collection of standard buttons the frame should show in the
+   * title-bar.
+   */
   void setStandardButtons(StandardButtons buttons);
   StandardButtons standardButtons() const { return this->Buttons; }
 
   /**
-  * One can add arbitrary actions to be shown on the title bar.
-  */
+   * One can add arbitrary actions to be shown on the title bar.
+   */
   void addTitleBarAction(QAction* action);
   QAction* addTitleBarAction(const QString& title);
   QAction* addTitleBarAction(const QIcon& icon, const QString& title);
 
   /**
-  * One can add a separator between actions
-  */
+   * One can add a separator between actions
+   */
   QAction* addTitleBarSeparator();
 
   /**
-  * remove all added custom title-bar actions.
-  */
+   * remove all added custom title-bar actions.
+   */
   void removeTitleBarActions();
 
   /**
-  * Provides access to the context menu.
-  */
+   * Provides access to the context menu.
+   */
   QMenu* contextMenu() const;
 
   /**
-  * provides access to the unique id assigned to the frame.
-  */
+   * provides access to the unique id assigned to the frame.
+   */
   QUuid uniqueID() const { return this->UniqueID; }
 
 Q_SIGNALS:
   /**
-  * fired when a standard button is pressed.
-  */
+   * fired when a standard button is pressed.
+   */
   void buttonPressed(int button);
 
   /**
-  * fired when one of the custom title-bar actions is triggered.
-  */
+   * fired when one of the custom title-bar actions is triggered.
+   */
   void actionTriggered(QAction* action);
 
   /**
-  * Fired to indicate the positions for the two frames need to be swapped.
-  */
+   * Fired to indicate the positions for the two frames need to be swapped.
+   */
   void swapPositions(const QString& other);
 
   /**
-  * Internal signal, fired to notify the target
-  * pqViewFrame instance that the drag operation has completed.
-  */
+   * Internal signal, fired to notify the target pqViewFrame instance that the
+   * drag operation has completed.
+   */
   void finishDrag(pqViewFrame* source);
 
 public Q_SLOTS:
   /**
-  * set whether the border is visible.
-  */
+   * set whether the border is visible.
+   */
   void setBorderVisibility(bool val)
   {
     this->BorderVisible = val;
@@ -177,8 +177,8 @@ public Q_SLOTS:
   }
 
   /**
-  * set whether the title-bar is visible.
-  */
+   * set whether the title-bar is visible.
+   */
   void setTitleBarVisibility(bool val)
   {
     this->TitleBarVisible = val;
@@ -194,20 +194,20 @@ public Q_SLOTS:
   void onViewNameChanged(pqServerManagerModelItem*);
 
   /**
-  * event filter to handle drag/drop events.
-  */
+   * event filter to handle drag/drop events.
+   */
   bool eventFilter(QObject*, QEvent*) override;
 
 protected:
   /**
-  * Updates the visibilities for various components of the pqViewFrame based
-  * on flags set on the instance.
-  */
+   * Updates the visibilities for various components of the pqViewFrame based
+   * on flags set on the instance.
+   */
   virtual void updateComponentVisibilities();
 
   /**
-  * methods to manage drag-drop.
-  */
+   * methods to manage drag-drop.
+   */
   void drag();
   void dragEnter(QDragEnterEvent*);
   void drop(QDropEvent*);
@@ -227,7 +227,7 @@ protected:
   QPointer<QMenu> ContextMenu;
   QUuid UniqueID;
   QPoint DragStartPosition;
-  typedef QMap<StandardButton, QPointer<QToolButton> > StandardToolButtonsMap;
+  typedef QMap<StandardButton, QPointer<QToolButton>> StandardToolButtonsMap;
   StandardToolButtonsMap StandardToolButtons;
   QPalette PaletteWithBorder;
   QPalette PaletteWithoutBorder;
@@ -237,8 +237,8 @@ private:
   Q_DISABLE_COPY(pqViewFrame)
 
   /**
-  * creates a tool button for the action.
-  */
+   * creates a tool button for the action.
+   */
   QToolButton* createButton(QAction* action);
 
   class pqInternals;

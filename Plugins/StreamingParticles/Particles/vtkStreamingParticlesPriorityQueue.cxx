@@ -218,7 +218,7 @@ void vtkStreamingParticlesPriorityQueue::UpdatePriorities(const double view_plan
       }
       if (this->AnyProcessCanLoadAnyBlock ||
         (blockInfo->Has(vtkCompositeDataSet::CURRENT_PROCESS_CAN_LOAD_BLOCK()) &&
-            blockInfo->Get(vtkCompositeDataSet::CURRENT_PROCESS_CAN_LOAD_BLOCK())))
+          blockInfo->Get(vtkCompositeDataSet::CURRENT_PROCESS_CAN_LOAD_BLOCK())))
       {
         queue.push(item);
       }

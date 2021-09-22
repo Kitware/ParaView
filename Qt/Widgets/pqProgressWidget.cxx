@@ -86,6 +86,7 @@ public:
   int progressPercentage() const { return this->ProgressPercentage; }
   void setShowProgress(bool val) { this->ShowProgress = val; }
   bool showProgress() const { return this->ShowProgress; }
+
 protected:
   QStyle* astyle() { return this->Style ? this->Style : this->style(); }
   void paintEvent(QPaintEvent* evt) override

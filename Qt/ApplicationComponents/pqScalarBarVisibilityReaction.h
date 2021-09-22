@@ -40,9 +40,9 @@ class pqTimer;
 class vtkSMProxy;
 
 /**
-* @ingroup Reactions
-* Reaction to toggle scalar bar visibility.
-*/
+ * @ingroup Reactions
+ * Reaction to toggle scalar bar visibility.
+ */
 class PQAPPLICATIONCOMPONENTS_EXPORT pqScalarBarVisibilityReaction : public pqReaction
 {
   Q_OBJECT
@@ -50,44 +50,43 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqScalarBarVisibilityReaction : public pqRe
 
 public:
   /**
-  * if \c track_active_objects is false, then the reaction will not track
-  * pqActiveObjects automatically.
-  */
+   * if \c track_active_objects is false, then the reaction will not track
+   * pqActiveObjects automatically.
+   */
   pqScalarBarVisibilityReaction(QAction* parent, bool track_active_objects = true);
   ~pqScalarBarVisibilityReaction() override;
 
   /**
-  * Returns the representation currently being used by the reaction.
-  */
+   * Returns the representation currently being used by the reaction.
+   */
   pqDataRepresentation* representation() const;
 
   /**
-  * Returns the scalar bar for the current representation, if any.
-  */
+   * Returns the scalar bar for the current representation, if any.
+   */
   vtkSMProxy* scalarBarProxy() const;
 
 public Q_SLOTS:
   /**
-  * Set the active representation.
-  */
+   * Set the active representation.
+   */
   void setRepresentation(pqDataRepresentation*);
 
   /**
-  * set scalar bar visibility.
-  */
+   * set scalar bar visibility.
+   */
   void setScalarBarVisibility(bool visible);
 
 protected Q_SLOTS:
   /**
-  * Updates the enabled state. Applications need not explicitly call
-  * this.
-  */
+   * Updates the enabled state. Applications need not explicitly call this.
+   */
   void updateEnableState() override;
 
 protected:
   /**
-  * Called when the action is triggered.
-  */
+   * Called when the action is triggered.
+   */
   void onTriggered() override { this->setScalarBarVisibility(this->parentAction()->isChecked()); }
 
 private:

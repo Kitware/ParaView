@@ -38,7 +38,7 @@
  * if the particular selection can be shown in the view at all.
  * @sa
  * vtkExtractSelection vtkSelection
-*/
+ */
 
 #ifndef vtkPVExtractSelection_h
 #define vtkPVExtractSelection_h

@@ -55,7 +55,7 @@
  * \li \c scale_factor : used in SCALED_EXTENT, ARRAY_SCALED_EXTENT and APPROXIMATE_CELL_LENGTH
  * mode.
  * Value is a floating point number that is used as the scale factor.
-*/
+ */
 
 #ifndef vtkSMBoundsDomain_h
 #define vtkSMBoundsDomain_h

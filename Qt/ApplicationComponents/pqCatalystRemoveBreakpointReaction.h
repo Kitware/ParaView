@@ -45,7 +45,7 @@ class vtkSMLiveInsituLinkProxy;
  *
  * @ingroup Reactions
  * @ingroup LiveInsitu
-*/
+ */
 class PQAPPLICATIONCOMPONENTS_EXPORT pqCatalystRemoveBreakpointReaction : public pqReaction
 {
   Q_OBJECT

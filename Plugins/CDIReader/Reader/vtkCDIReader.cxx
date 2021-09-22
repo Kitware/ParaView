@@ -2498,13 +2498,15 @@ int vtkCDIReader::LoadPointVarData(int variableIndex, double dTimeStep)
   int success = false;
   if (this->DoublePrecision)
   {
-    vtkICONTemplateDispatch(VTK_DOUBLE, success = this->LoadPointVarDataTemplate<VTK_TT>(
-                                          variableIndex, dTimeStep, dataArray););
+    vtkICONTemplateDispatch(
+      VTK_DOUBLE,
+      success = this->LoadPointVarDataTemplate<VTK_TT>(variableIndex, dTimeStep, dataArray););
   }
   else
   {
-    vtkICONTemplateDispatch(VTK_FLOAT, success = this->LoadPointVarDataTemplate<VTK_TT>(
-                                         variableIndex, dTimeStep, dataArray););
+    vtkICONTemplateDispatch(
+      VTK_FLOAT,
+      success = this->LoadPointVarDataTemplate<VTK_TT>(variableIndex, dTimeStep, dataArray););
   }
 
   return success;
@@ -2536,13 +2538,15 @@ int vtkCDIReader::LoadCellVarData(int variableIndex, double dTimeStep)
   int success = false;
   if (this->DoublePrecision)
   {
-    vtkICONTemplateDispatch(VTK_DOUBLE, success = this->LoadCellVarDataTemplate<VTK_TT>(
-                                          variableIndex, dTimeStep, dataArray););
+    vtkICONTemplateDispatch(
+      VTK_DOUBLE,
+      success = this->LoadCellVarDataTemplate<VTK_TT>(variableIndex, dTimeStep, dataArray););
   }
   else
   {
-    vtkICONTemplateDispatch(VTK_FLOAT, success = this->LoadCellVarDataTemplate<VTK_TT>(
-                                         variableIndex, dTimeStep, dataArray););
+    vtkICONTemplateDispatch(
+      VTK_FLOAT,
+      success = this->LoadCellVarDataTemplate<VTK_TT>(variableIndex, dTimeStep, dataArray););
   }
 
   return success;

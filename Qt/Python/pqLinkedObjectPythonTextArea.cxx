@@ -35,8 +35,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 pqLinkedObjectPythonTextArea::pqLinkedObjectPythonTextArea(pqPythonTextArea& textArea) noexcept
-  : pqLinkedObjectQTextEdit(*textArea.getTextEdit()),
-    TextArea(textArea)
+  : pqLinkedObjectQTextEdit(*textArea.getTextEdit())
+  , TextArea(textArea)
 {
 }
 

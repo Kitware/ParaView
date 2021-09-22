@@ -459,8 +459,8 @@ void vtkSMTestDriver::Stop(vtksysProcess* p, const char* name)
 int vtkSMTestDriver::OutputStringHasError(const char* pname, std::string& output)
 {
   const char* possibleMPIErrors[] = { "error", "Missing:", "core dumped",
-    "process in local group is dead", "Segmentation fault", "erroneous", "ERROR:", "Error:",
-    "mpirun can *only* be used with MPI programs", "due to signal", "failure",
+    "process in local group is dead", "Segmentation fault", "erroneous",
+    "ERROR:", "Error:", "mpirun can *only* be used with MPI programs", "due to signal", "failure",
     "bnormal termination", "failed", "FAILED", "Failed", nullptr };
 
   const char* nonErrors[] = {

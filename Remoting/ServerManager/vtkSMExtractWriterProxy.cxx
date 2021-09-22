@@ -42,9 +42,7 @@ std::string vtkSMExtractWriterProxy::GenerateExtractsFileName(
 
   // check for old format for ts and t
   bool oldFormatUsed = false;
-  // clang-format off
   vtksys::RegularExpression regex(R"=((%[.0-9]*)((ts)|(t)))=");
-  // clang-format on
   std::string possibleOldFormatString1 = name;
   while (regex.find(name))
   {
@@ -78,8 +76,7 @@ std::string vtkSMExtractWriterProxy::GenerateExtractsFileName(
   vtksys::SystemTools::ReplaceString(name, "%cm", "{camera}");
   if (possibleOldFormatString2 != name || oldFormatUsed)
   {
-    vtkLogF(WARNING, "Legacy formatting pattern detected."
-                     "Please replace '%s' with '%s'.",
+    vtkLogF(WARNING, "Legacy formatting pattern detected. Please replace '%s' with '%s'.",
       possibleOldFormatString1.c_str(), name.c_str());
   }
 

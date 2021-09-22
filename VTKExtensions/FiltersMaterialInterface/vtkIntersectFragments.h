@@ -17,7 +17,7 @@
  * @brief   Geometry intersection operations.
  *
  * TODO
-*/
+ */
 
 #ifndef vtkIntersectFragments_h
 #define vtkIntersectFragments_h
@@ -97,16 +97,16 @@ protected:
   int SendGeometricAttributes(const int recipientProcId);
   // size buffers & new containers
   int PrepareToCollectGeometricAttributes(std::vector<vtkMaterialInterfaceCommBuffer>& buffers,
-    std::vector<std::vector<vtkDoubleArray*> >& centers, std::vector<std::vector<int*> >& ids);
+    std::vector<std::vector<vtkDoubleArray*>>& centers, std::vector<std::vector<int*>>& ids);
   // Free resources.
   int CleanUpAfterCollectGeometricAttributes(std::vector<vtkMaterialInterfaceCommBuffer>& buffers,
-    std::vector<std::vector<vtkDoubleArray*> >& centers, std::vector<std::vector<int*> >& ids);
+    std::vector<std::vector<vtkDoubleArray*>>& centers, std::vector<std::vector<int*>>& ids);
   // Receive all geometric attributes from all other
   // processes.
   int CollectGeometricAttributes(std::vector<vtkMaterialInterfaceCommBuffer>& buffers,
-    std::vector<std::vector<vtkDoubleArray*> >& centers, std::vector<std::vector<int*> >& ids);
+    std::vector<std::vector<vtkDoubleArray*>>& centers, std::vector<std::vector<int*>>& ids);
   // size local copy to hold all.
-  int PrepareToMergeGeometricAttributes(std::vector<std::vector<int> >& unique);
+  int PrepareToMergeGeometricAttributes(std::vector<std::vector<int>>& unique);
   // Gather geometric attributes on a single process.
   int GatherGeometricAttributes(const int recipientProcId);
   // Copy attributes from input to output
@@ -118,11 +118,11 @@ protected:
   //
   vtkMultiProcessController* Controller;
   // Global ids of what we own before the intersection.
-  std::vector<std::vector<int> > FragmentIds;
+  std::vector<std::vector<int>> FragmentIds;
   // Centers, and global fragment ids.
   // an array for each block.
   std::vector<vtkDoubleArray*> IntersectionCenters;
-  std::vector<std::vector<int> > IntersectionIds;
+  std::vector<std::vector<int>> IntersectionIds;
   //
   vtkCutter* Cutter;
   // data in/out

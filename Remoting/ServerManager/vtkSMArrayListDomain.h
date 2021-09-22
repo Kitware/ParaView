@@ -65,7 +65,7 @@
  *      if nothing is specified, the default is to add a vtkAbstractArray::GUI_HIDE
  *      key, with the reject_key strategy, so that arrays that have this InformationKey
  *      are not visible in the user interface.
-*/
+ */
 
 #ifndef vtkSMArrayListDomain_h
 #define vtkSMArrayListDomain_h

@@ -39,10 +39,10 @@ class vtkPVXMLElement;
 class vtkSMProxy;
 
 /**
-* pqProxyGroupMenuManager is a menu-populator that fills up a menu with
-* proxies defined in an XML configuration file. This is use to automatically
-* build the sources and filters menu in ParaView.
-*/
+ * pqProxyGroupMenuManager is a menu-populator that fills up a menu with
+ * proxies defined in an XML configuration file. This is use to automatically
+ * build the sources and filters menu in ParaView.
+ */
 class PQAPPLICATIONCOMPONENTS_EXPORT pqProxyGroupMenuManager : public QObject
 {
   Q_OBJECT
@@ -50,84 +50,84 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqProxyGroupMenuManager : public QObject
 
 public:
   /**
-  * Constructor.
-  * \c menu is the Menu to be populated.
-  * \c resourceTagName is the tag name eg. "ParaViewSources" in the client
-  *    configuration files which contains lists the items shown by this menu.
-  * \c supportsQuickLaunch, set to false if quick-launch is not to be supported
-  *    for this menu.
-  */
+   * Constructor.
+   * \c menu is the Menu to be populated.
+   * \c resourceTagName is the tag name eg. "ParaViewSources" in the client
+   *    configuration files which contains lists the items shown by this menu.
+   * \c supportsQuickLaunch, set to false if quick-launch is not to be supported
+   *    for this menu.
+   */
   pqProxyGroupMenuManager(
     QMenu* menu, const QString& resourceTagName, bool supportsQuickLaunch = true);
   ~pqProxyGroupMenuManager() override;
 
   /**
-  * Access the menu.
-  */
+   * Access the menu.
+   */
   QMenu* menu() const { return static_cast<QMenu*>(this->parent()); }
 
   /**
-  * When size>0 a recently used category will be added to the menu.
-  * One must call update() or initialize() after changing this value.
-  */
+   * When size>0 a recently used category will be added to the menu.
+   * One must call update() or initialize() after changing this value.
+   */
   void setRecentlyUsedMenuSize(unsigned int val) { this->RecentlyUsedMenuSize = val; }
 
   unsigned int recentlyUsedMenuSize() const { return this->RecentlyUsedMenuSize; }
 
   /**
-  * returns the widget that hold actions created by this menu manager.
-  */
+   * returns the widget that hold actions created by this menu manager.
+   */
   QWidget* widgetActionsHolder() const;
 
   /**
-  * returns the actions holds by the widgetActionsHolder
-  */
+   * returns the actions holds by the widgetActionsHolder
+   */
   QList<QAction*> actions() const;
 
   /**
-  * Returns the prototype proxy for the action.
-  */
+   * Returns the prototype proxy for the action.
+   */
   vtkSMProxy* getPrototype(QAction* action) const;
 
   /**
-  * Provides mechanism to explicitly add a proxy to the menu.
-  */
+   * Provides mechanism to explicitly add a proxy to the menu.
+   */
   void addProxy(const QString& xmlgroup, const QString& xmlname);
 
   /**
-  * Provides mechanism to explicitly remove a proxy to the menu.
-  */
+   * Provides mechanism to explicitly remove a proxy to the menu.
+   */
   void removeProxy(const QString& xmlgroup, const QString& xmlname);
 
   /**
-  * Returns a list of categories that have the "show_in_toolbar" attribute set
-  * to 1.
-  */
+   * Returns a list of categories that have the "show_in_toolbar" attribute set
+   * to 1.
+   */
   QStringList getToolbarCategories() const;
 
   /**
-  * Returns the list of actions in a category.
-  */
+   * Returns the list of actions in a category.
+   */
   QList<QAction*> actions(const QString& category);
 
   /**
-  * Returns this list of actions that appear in toolbars
-  */
+   * Returns this list of actions that appear in toolbars
+   */
   QList<QAction*> actionsInToolbars();
 
   /**
-  * Returns whether or not the category's toolbar should be hidden initially.
-  */
+   * Returns whether or not the category's toolbar should be hidden initially.
+   */
   bool hideForTests(const QString& category) const;
 
   /**
-  * Attach an observer to proxy manager to monitor any proxy definition update
-  * The detected proxy have to own a hint:
-  * \code
-  *     <ShowInMenu category="" icon=""/>
-  * \endcode
-  * where all the attribute are fully optional.
-  */
+   * Attach an observer to proxy manager to monitor any proxy definition update
+   * The detected proxy have to own a hint:
+   * \code
+   *     <ShowInMenu category="" icon=""/>
+   * \endcode
+   * where all the attribute are fully optional.
+   */
   void addProxyDefinitionUpdateListener(const QString& proxyGroupName);
   void removeProxyDefinitionUpdateListener(const QString& proxyGroupName);
 
@@ -148,46 +148,46 @@ public:
 
 public Q_SLOTS:
   /**
-  * Load a configuration XML. It will find the elements with resourceTagName
-  * in the XML and populate the menu accordingly. Applications do not need to
-  * call this method directly, it's by default connected to
-  * pqApplicationCore::loadXML()
-  */
+   * Load a configuration XML. It will find the elements with resourceTagName
+   * in the XML and populate the menu accordingly. Applications do not need to
+   * call this method directly, it's by default connected to
+   * pqApplicationCore::loadXML()
+   */
   void loadConfiguration(vtkPVXMLElement*);
 
   /**
-  * Look for new proxy definition to add inside the menu
-  */
+   * Look for new proxy definition to add inside the menu
+   */
   void lookForNewDefinitions();
 
   /**
-  * Remove all ProxyDefinitionUpdate observers to active server
-  */
+   * Remove all ProxyDefinitionUpdate observers to active server
+   */
   void removeProxyDefinitionUpdateObservers();
 
   /**
-  * Update the list of ProxyDefinitionUpdate observers to  server
-  */
+   * Update the list of ProxyDefinitionUpdate observers to  server
+   */
   void addProxyDefinitionUpdateObservers();
 
   /**
-  * Enable/disable the menu and the actions.
-  */
+   * Enable/disable the menu and the actions.
+   */
   void setEnabled(bool enable);
 
   /**
-  * Forces a re-population of the menu. Any need to call this only after
-  * addProxy() has been used to explicitly add entries.
-  */
+   * Forces a re-population of the menu. Any need to call this only after
+   * addProxy() has been used to explicitly add entries.
+   */
   virtual void populateMenu();
 
 Q_SIGNALS:
   void triggered(const QString& group, const QString& name);
 
   /**
-  * fired when the menu gets repopulated,typically means that the actions have
-  * been updated.
-  */
+   * fired when the menu gets repopulated,typically means that the actions have
+   * been updated.
+   */
   void menuPopulated();
 
 protected Q_SLOTS:
@@ -224,8 +224,8 @@ protected:
   void loadFavoritesItems();
 
   /**
-  * Returns the action for a given proxy.
-  */
+   * Returns the action for a given proxy.
+   */
   QAction* getAction(const QString& pgroup, const QString& proxyname);
 
   QAction* getAddToCategoryAction(const QString& path);

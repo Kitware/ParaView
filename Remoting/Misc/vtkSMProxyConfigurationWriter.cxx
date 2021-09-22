@@ -113,8 +113,9 @@ int vtkSMProxyConfigurationWriter::WriteConfiguration(const char* cFilename)
   cExt = (cExt == nullptr ? "" : cExt);
   std::string filename(cFilename);
   std::string ext(cExt);
-  if (!ext.empty() && (filename.size() <= ext.size() ||
-                        filename.find(ext, filename.size() - ext.size()) == std::string::npos))
+  if (!ext.empty() &&
+    (filename.size() <= ext.size() ||
+      filename.find(ext, filename.size() - ext.size()) == std::string::npos))
   {
     filename += ext;
   }

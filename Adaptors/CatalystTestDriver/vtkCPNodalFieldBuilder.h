@@ -17,7 +17,7 @@
  * @brief   Class for specifying nodal fields over grids.
  *
  * Class for specifying nodal fields over grids for a test driver.
-*/
+ */
 
 #ifndef vtkCPNodalFieldBuilder_h
 #define vtkCPNodalFieldBuilder_h

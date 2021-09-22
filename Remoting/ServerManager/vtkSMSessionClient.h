@@ -18,7 +18,7 @@
  * vtkSMSessionClient is a remote-session that connects to a remote server.
  * vtkSMSessionClient supports both connecting a pvserver as well as connecting
  * a pvdataserver/pvrenderserver.
-*/
+ */
 
 #ifndef vtkSMSessionClient_h
 #define vtkSMSessionClient_h

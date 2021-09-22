@@ -4,13 +4,9 @@
 
 vtkStandardNewMacro(vtkSMMyElevationProxy);
 
-vtkSMMyElevationProxy::vtkSMMyElevationProxy()
-{
-}
+vtkSMMyElevationProxy::vtkSMMyElevationProxy() = default;
 
-vtkSMMyElevationProxy::~vtkSMMyElevationProxy()
-{
-}
+vtkSMMyElevationProxy::~vtkSMMyElevationProxy() = default;
 
 void vtkSMMyElevationProxy::PrintSelf(ostream& os, vtkIndent indent)
 {

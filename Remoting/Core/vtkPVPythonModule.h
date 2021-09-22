@@ -28,7 +28,7 @@
  * makes up a Python module as well as some state variables about the module
  * (such as its name).
  *
-*/
+ */
 
 #ifndef vtkPVPythonModule_h
 #define vtkPVPythonModule_h

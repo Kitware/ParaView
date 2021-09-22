@@ -35,9 +35,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqSelectionAdaptor.h"
 
 /**
-* pqPipelineModelSelectionAdaptor is an adaptor that connects a
-* QItemSelectionModel for a pqPipelineModel to pqActiveObjects.
-*/
+ * pqPipelineModelSelectionAdaptor is an adaptor that connects a
+ * QItemSelectionModel for a pqPipelineModel to pqActiveObjects.
+ */
 class PQCOMPONENTS_EXPORT pqPipelineModelSelectionAdaptor : public pqSelectionAdaptor
 {
   Q_OBJECT

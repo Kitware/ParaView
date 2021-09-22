@@ -36,9 +36,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqWidgetsModule.h" // needed for EXPORT macro.
 
 /**
-* pqConsoleWidgetEventPlayer is used to play back test commands recorded by
-* pqConsoleWidgetEventTranslator for pqConsoleWidget.
-*/
+ * pqConsoleWidgetEventPlayer is used to play back test commands recorded by
+ * pqConsoleWidgetEventTranslator for pqConsoleWidget.
+ */
 class PQWIDGETS_EXPORT pqConsoleWidgetEventPlayer : public pqWidgetEventPlayer
 {
   Q_OBJECT
@@ -49,8 +49,8 @@ public:
   ~pqConsoleWidgetEventPlayer() override;
 
   /**
-  * Callback to play a command.
-  */
+   * Callback to play a command.
+   */
   using Superclass::playEvent;
   bool playEvent(
     QObject* target, const QString& cmd, const QString& args, bool& errorFlag) override;

@@ -19,7 +19,7 @@
  * This information object collects the number of outputs from the
  * sources.  This is separate from vtkPVDataInformation because the number of
  * outputs can be determined before Update is called.
-*/
+ */
 
 #ifndef vtkPVAlgorithmPortsInformation_h
 #define vtkPVAlgorithmPortsInformation_h

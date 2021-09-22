@@ -746,7 +746,7 @@ void pqSLACManager::createPlotOverZ()
   dataInfo->GetBounds(bounds);
 
   // Create the plot filter.
-  QMap<QString, QList<pqOutputPort*> > namedInputs;
+  QMap<QString, QList<pqOutputPort*>> namedInputs;
   QList<pqOutputPort*> inputs;
   inputs.push_back(meshReader->getOutputPort(1));
   namedInputs["Input"] = inputs;

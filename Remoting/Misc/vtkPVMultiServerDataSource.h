@@ -16,7 +16,7 @@
  * @class   vtkPVMultiServerDataSource
  *
  * VTK class that handle the fetch of remote data
-*/
+ */
 
 #ifndef vtkPVMultiServerDataSource_h
 #define vtkPVMultiServerDataSource_h

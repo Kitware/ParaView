@@ -24,7 +24,7 @@
  *
  * Transaction are intended to execute in fragment order
  * so that no deadlocks occur.
-*/
+ */
 
 #ifndef vtkMaterialInterfacePieceTransactionMatrix_h
 #define vtkMaterialInterfacePieceTransactionMatrix_h

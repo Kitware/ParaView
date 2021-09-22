@@ -18,7 +18,7 @@
  *
  * vtkPVImplicitPlaneRepresentation extends vtkImplicitPlaneRepresentation to
  * add ParaView proper initialisation values
-*/
+ */
 
 #ifndef vtkPVImplicitPlaneRepresentation_h
 #define vtkPVImplicitPlaneRepresentation_h

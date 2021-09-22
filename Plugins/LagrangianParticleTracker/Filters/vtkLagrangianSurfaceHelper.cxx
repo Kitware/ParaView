@@ -42,7 +42,7 @@ public:
     int Type;
     int NumberOfLeafs;
     int NumberOfComponents;
-    std::vector<std::vector<double> > Constants;
+    std::vector<std::vector<double>> Constants;
     std::vector<bool> Skips;
   } ArrayVal;
   std::vector<ArrayVal> ArraysToGenerate;

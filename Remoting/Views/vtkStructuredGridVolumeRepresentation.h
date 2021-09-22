@@ -20,7 +20,7 @@
  * rendering vtkStructuredGrid datasets. For the mast part the work is done by
  * vtkUnstructuredGridVolumeRepresentation. It converts the input
  * vtkStructuredGrid to vtkUnstructuredGrid and then renders it.
-*/
+ */
 
 #ifndef vtkStructuredGridVolumeRepresentation_h
 #define vtkStructuredGridVolumeRepresentation_h

@@ -42,9 +42,7 @@ void vtkPVTrackballRotate::OnButtonDown(int, int, vtkRenderer* ren, vtkRenderWin
 }
 
 //-------------------------------------------------------------------------
-void vtkPVTrackballRotate::OnButtonUp(int, int, vtkRenderer*, vtkRenderWindowInteractor*)
-{
-}
+void vtkPVTrackballRotate::OnButtonUp(int, int, vtkRenderer*, vtkRenderWindowInteractor*) {}
 
 //-------------------------------------------------------------------------
 void vtkPVTrackballRotate::OnMouseMove(

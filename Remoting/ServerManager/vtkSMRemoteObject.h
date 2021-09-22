@@ -19,7 +19,7 @@
  *
  * Abstract class involved in ServerManager class hierarchy that has a
  * corresponding SIObject which can be local or remote.
-*/
+ */
 
 #ifndef vtkSMRemoteObject_h
 #define vtkSMRemoteObject_h

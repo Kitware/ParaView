@@ -15,7 +15,6 @@
 #include "vtkCPFileGridBuilder.h"
 
 #include "vtkCPFieldBuilder.h"
-#include "vtkCPFieldBuilder.h"
 #include "vtkCellData.h"
 #include "vtkCompositeDataIterator.h"
 #include "vtkCompositeDataSet.h"

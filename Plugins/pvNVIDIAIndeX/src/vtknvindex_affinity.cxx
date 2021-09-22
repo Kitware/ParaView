@@ -343,7 +343,7 @@ void vtknvindex_KDTree_affinity::build(
 
   assert(raw_cuts.size() == raw_cuts_ranks.size());
 
-  std::vector<mi::math::Bbox<mi::Float32, 3> > bboxes(raw_cuts.size());
+  std::vector<mi::math::Bbox<mi::Float32, 3>> bboxes(raw_cuts.size());
   for (size_t i = 0; i < raw_cuts.size(); ++i)
   {
     mi::Float64 bounds[6];
@@ -360,7 +360,7 @@ void vtknvindex_KDTree_affinity::build(
 
 // ------------------------------------------------------------------------------------------------
 mi::Sint32 vtknvindex_KDTree_affinity::build_internal(
-  const std::vector<mi::math::Bbox<mi::Float32, 3> >& bboxes, const std::vector<int>& ranks,
+  const std::vector<mi::math::Bbox<mi::Float32, 3>>& bboxes, const std::vector<int>& ranks,
   size_t pos, size_t count, int& leaf_count)
 {
   // INFO_LOG << "build_internal " << pos << " / " << count;

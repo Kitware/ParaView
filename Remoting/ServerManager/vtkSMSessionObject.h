@@ -18,7 +18,7 @@
  *                            that are related to a session
  *
  * vtkSMSessionObject provides methods to set and get the relative session
-*/
+ */
 
 #ifndef vtkSMSessionObject_h
 #define vtkSMSessionObject_h

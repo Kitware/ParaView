@@ -32,12 +32,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkVRUIServerState.h"
 
 // ----------------------------------------------------------------------------
-vtkVRUIServerState::vtkVRUIServerState()
-{
-}
+vtkVRUIServerState::vtkVRUIServerState() = default;
 
 // ----------------------------------------------------------------------------
-std::vector<vtkSmartPointer<vtkVRUITrackerState> >* vtkVRUIServerState::GetTrackerStates()
+std::vector<vtkSmartPointer<vtkVRUITrackerState>>* vtkVRUIServerState::GetTrackerStates()
 {
   return &(this->TrackerStates);
 }

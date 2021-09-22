@@ -188,7 +188,12 @@ void rayBoxIntersection(double r, double v[3])
 {
   // The face order is X, -X, Y, -Y, Z, -Z
   double faceNormal[NFACES][3] = {
-    { 1, 0, 0 }, { -1, 0, 0 }, { 0, 1, 0 }, { 0, -1, 0 }, { 0, 0, 1 }, { 0, 0, -1 },
+    { 1, 0, 0 },
+    { -1, 0, 0 },
+    { 0, 1, 0 },
+    { 0, -1, 0 },
+    { 0, 0, 1 },
+    { 0, 0, -1 },
   };
   double side = r * 2 / sqrt3;
   double minT = std::numeric_limits<double>::max();
@@ -319,7 +324,7 @@ void Grid<gridType>::AddPointsAndCells(double lonRad, double latRad)
   // for points shared between 2 or 3 faces we still need a different index
   // for each shared face, because we need to create a different cell for
   // each face. For FV grid the vector always has one element.
-  std::vector<std::vector<int> > indexArray;
+  std::vector<std::vector<int>> indexArray;
   this->GetValueIndex(lonRad, latRad, indexArray);
   // ostr << "AddPointsAndCells: " << vtkMath::DegreesFromRadians(lonRad)
   //      << ", " << vtkMath::DegreesFromRadians(latRad) << " indexArraySize: "
@@ -429,7 +434,7 @@ void Grid<gridType>::SetAttributeValue(int chunkSize, double* lonRad, double* la
   {
     double lonDeg = vtkMath::DegreesFromRadians(lonRad[c]);
     double latDeg = vtkMath::DegreesFromRadians(latRad[c]);
-    std::vector<std::vector<int> > indexArray;
+    std::vector<std::vector<int>> indexArray;
     this->GetValueIndex(lonRad[c], latRad[c], indexArray);
     for (size_t i = 0; i < indexArray.size(); ++i)
     {
@@ -853,7 +858,7 @@ void Grid<gridType>::MinFaceIndex(int side, int index[3]) const
   // std::ostringstream ostr;
   // ostr << "MinFaceIndex index: "
   //      << index[0] << ", " << index[1] << ", " << index[2];
-  std::vector<std::vector<int> > allIndexes;
+  std::vector<std::vector<int>> allIndexes;
   size_t mfi = this->CubeToIndex(sideD, cubeCoordinates, v, allIndexes);
   std::copy(allIndexes[mfi].begin(), allIndexes[mfi].end(), index);
   // ostr << " result: "
@@ -865,7 +870,7 @@ void Grid<gridType>::MinFaceIndex(int side, int index[3]) const
 //------------------------------------------------------------------------------
 template <GridType gridType>
 void Grid<gridType>::GetValueIndex(
-  double lonRad, double latRad, std::vector<std::vector<int> >& index) const
+  double lonRad, double latRad, std::vector<std::vector<int>>& index) const
 {
   Internals* impl = this->Impl;
   if (gridType == CUBE_SPHERE)
@@ -963,7 +968,7 @@ void Grid<gridType>::SetCubeGridPoints(
 //------------------------------------------------------------------------------
 template <GridType gridType>
 size_t Grid<gridType>::CubeToIndex(double side, const std::vector<double>& cubeCoordinates,
-  double v[3], std::vector<std::vector<int> >& index) const
+  double v[3], std::vector<std::vector<int>>& index) const
 {
   FuzzyEQ eq(MAX_DIFF);
   // The face order is X, -X, Y, -Y, Z, -Z
@@ -1014,12 +1019,20 @@ void Grid<gridType>::IndexToCube(
 
   // 2: where does face value go, 0,1: where do lon,lat go.
   int position[NFACES][3] = {
-    { 1, 2, 0 }, { 1, 2, 0 }, { 2, 0, 1 }, { 2, 0, 1 }, { 0, 1, 2 }, { 0, 1, 2 },
+    { 1, 2, 0 },
+    { 1, 2, 0 },
+    { 2, 0, 1 },
+    { 2, 0, 1 },
+    { 0, 1, 2 },
+    { 0, 1, 2 },
   };
   double faceValue[NFACES] = {
-    cubeCoordinates[cubeCoordinates.size() - 1], cubeCoordinates[0],
-    cubeCoordinates[cubeCoordinates.size() - 1], cubeCoordinates[0],
-    cubeCoordinates[cubeCoordinates.size() - 1], cubeCoordinates[0],
+    cubeCoordinates[cubeCoordinates.size() - 1],
+    cubeCoordinates[0],
+    cubeCoordinates[cubeCoordinates.size() - 1],
+    cubeCoordinates[0],
+    cubeCoordinates[cubeCoordinates.size() - 1],
+    cubeCoordinates[0],
   };
   int face = index[2];
   v[position[face][2]] = faceValue[face];

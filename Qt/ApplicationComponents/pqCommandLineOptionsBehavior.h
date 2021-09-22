@@ -36,12 +36,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QObject>
 
 /**
-* @ingroup Behaviors
-* pqCommandLineOptionsBehavior processes command-line options on startup and
-* performs relevant actions such as loading data files, connecting to server
-* etc.
-* This also handles test playback and image comparison.
-*/
+ * @ingroup Behaviors
+ * pqCommandLineOptionsBehavior processes command-line options on startup and
+ * performs relevant actions such as loading data files, connecting to server
+ * etc.
+ * This also handles test playback and image comparison.
+ */
 class PQAPPLICATIONCOMPONENTS_EXPORT pqCommandLineOptionsBehavior : public QObject
 {
   Q_OBJECT
@@ -51,8 +51,8 @@ public:
   pqCommandLineOptionsBehavior(QObject* parent = 0);
 
   /**
-  * Used during testing to "initialize" application state as much as possible.
-  */
+   * Used during testing to "initialize" application state as much as possible.
+   */
   static void resetApplication();
 
   /**

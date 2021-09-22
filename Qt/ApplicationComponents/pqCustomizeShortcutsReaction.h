@@ -43,14 +43,14 @@ public:
   pqCustomizeShortcutsReaction(QAction* parent);
 
   /**
-  * Adds camera link with the active view.
-  */
+   * Adds camera link with the active view.
+   */
   static void showCustomizeShortcutsDialog();
 
 protected:
   /**
-  * Called when the action is triggered.
-  */
+   * Called when the action is triggered.
+   */
   void onTriggered() override { pqCustomizeShortcutsReaction::showCustomizeShortcutsDialog(); }
 };
 

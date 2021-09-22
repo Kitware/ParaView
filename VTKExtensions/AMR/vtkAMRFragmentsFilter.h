@@ -23,7 +23,7 @@
  *
  *   Output 0: A multiblock containing tables of fragments, one block
  *             for each requested material
-*/
+ */
 
 #ifndef vtkAMRFragmentsFilter_h
 #define vtkAMRFragmentsFilter_h

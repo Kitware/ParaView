@@ -18,7 +18,7 @@
  * Representation for showing data in a vtkPythonView. This representation
  * does not create any intermediate data for display. Instead, it simply
  * fetches data from the server.
-*/
+ */
 
 #ifndef vtkPythonRepresentation_h
 #define vtkPythonRepresentation_h

@@ -88,7 +88,8 @@ void vtkLogRecorder::EnableLoggingCallback()
     vtkErrorMacro("Logging callback " << this->CallbackName << " already added.");
   }
   this->CallbackName = "log-grabber_" + std::to_string(RankEnabled) + "_" + std::to_string(rand());
-  vtkLogger::AddCallback(this->CallbackName.c_str(),
+  vtkLogger::AddCallback(
+    this->CallbackName.c_str(),
     [](void* user_data, const vtkLogger::Message& message) {
       auto lines = reinterpret_cast<std::string*>(user_data);
       (*lines) += "\n";

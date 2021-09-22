@@ -23,7 +23,7 @@
  * This class does not know, however, when the cached buffers are invalid.
  * External logic must explicitly calls InvalidateCachedSelection() to ensure
  * that the cache is not reused.
-*/
+ */
 
 #ifndef vtkPVHardwareSelector_h
 #define vtkPVHardwareSelector_h

@@ -219,9 +219,9 @@ public:
     }
   }
   //---------------------------------------------------------------------------
-  typedef std::map<vtkTypeUInt32, vtkWeakPointer<vtkSIObject> > SIObjectMapType;
-  typedef std::map<vtkTypeUInt32, vtkWeakPointer<vtkObject> > RemoteObjectMapType;
-  typedef std::map<int, std::set<vtkTypeUInt32> > ClientSIRegistrationMapType;
+  typedef std::map<vtkTypeUInt32, vtkWeakPointer<vtkSIObject>> SIObjectMapType;
+  typedef std::map<vtkTypeUInt32, vtkWeakPointer<vtkObject>> RemoteObjectMapType;
+  typedef std::map<int, std::set<vtkTypeUInt32>> ClientSIRegistrationMapType;
   ClientSIRegistrationMapType ClientSIRegistrationMap;
   SIObjectMapType SIObjectMap;
   RemoteObjectMapType RemoteObjectMap;

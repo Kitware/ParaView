@@ -378,7 +378,7 @@ int vtkSMMultiplexerSourceProxy::LoadXMLState(vtkPVXMLElement* element, vtkSMPro
     // curate subproxies based on the state and add them.
     internals.SubproxiesInitialized = true;
 
-    std::set<std::pair<std::string, std::string> > available;
+    std::set<std::pair<std::string, std::string>> available;
     for (unsigned int cc = 0, max = muxElem->GetNumberOfNestedElements(); cc < max; ++cc)
     {
       auto child = muxElem->GetNestedElement(cc);

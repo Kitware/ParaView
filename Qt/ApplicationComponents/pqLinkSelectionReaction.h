@@ -35,9 +35,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqReaction.h"
 
 /**
-* @ingroup Reactions
-* Reaction for change pipeline input for the currently selected element.
-*/
+ * @ingroup Reactions
+ * Reaction for change pipeline input for the currently selected element.
+ */
 class PQAPPLICATIONCOMPONENTS_EXPORT pqLinkSelectionReaction : public pqReaction
 {
   Q_OBJECT
@@ -47,22 +47,21 @@ public:
   pqLinkSelectionReaction(QAction* parent = 0);
 
   /**
-  * Link selection of the current active source with
-  * the current selected source
-  */
+   * Link selection of the current active source with
+   * the current selected source
+   */
   static void linkSelection();
 
 public Q_SLOTS:
   /**
-  * Updates the enabled state. Applications need not explicitly call
-  * this.
-  */
+   * Updates the enabled state. Applications need not explicitly call this.
+   */
   void updateEnableState() override;
 
 protected:
   /**
-  * Called when the action is triggered.
-  */
+   * Called when the action is triggered.
+   */
   void onTriggered() override { pqLinkSelectionReaction::linkSelection(); }
 
 private:

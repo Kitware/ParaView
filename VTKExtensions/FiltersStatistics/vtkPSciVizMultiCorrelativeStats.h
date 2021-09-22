@@ -64,7 +64,7 @@
  * Because the diagonal must be stored for both matrices, an additional
  * row is required - hence the N+1 rows and the final entry of the column
  * named "Column".
-*/
+ */
 
 #ifndef vtkPSciVizMultiCorrelativeStats_h
 #define vtkPSciVizMultiCorrelativeStats_h

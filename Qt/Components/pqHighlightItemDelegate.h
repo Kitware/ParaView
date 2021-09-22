@@ -36,11 +36,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QStyledItemDelegate>
 
 /**
-* pqHighlightItemDelegate is a delegate used to highlight item views
-* It is currently used to highlight matching items found using the
-* pqItemViewSearchWidget. It works by repainting the item with a
-* colored background.
-*/
+ * pqHighlightItemDelegate is a delegate used to highlight item views
+ * It is currently used to highlight matching items found using the
+ * pqItemViewSearchWidget. It works by repainting the item with a
+ * colored background.
+ */
 
 class PQCOMPONENTS_EXPORT pqHighlightItemDelegate : public QStyledItemDelegate
 {
@@ -48,10 +48,10 @@ class PQCOMPONENTS_EXPORT pqHighlightItemDelegate : public QStyledItemDelegate
 
 public:
   /**
-  * Construct the pqHighlightItemDelegate
-  * The variable color is used to specify the highlight color,
-  * defaults to QColor(Qt::white)
-  */
+   * Construct the pqHighlightItemDelegate
+   * The variable color is used to specify the highlight color,
+   * defaults to QColor(Qt::white)
+   */
   pqHighlightItemDelegate(QColor color = QColor(Qt::white), QObject* parentObject = 0)
     : QStyledItemDelegate(parentObject)
     , HighlightColor(color)

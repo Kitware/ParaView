@@ -56,13 +56,9 @@ pqRepresentation* pqDisplayPanel::getRepresentation()
   return this->Representation;
 }
 
-void pqDisplayPanel::reloadGUI()
-{
-}
+void pqDisplayPanel::reloadGUI() {}
 
-void pqDisplayPanel::dataUpdated()
-{
-}
+void pqDisplayPanel::dataUpdated() {}
 
 void pqDisplayPanel::updateAllViews()
 {

@@ -37,10 +37,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QColor>
 
 /**
-* pqColorDialogEventTranslator translates events on QColorDialog
-* that they can be recorded in tests in a platform independent
-* way.
-*/
+ * pqColorDialogEventTranslator translates events on QColorDialog that they can
+ * be recorded in tests in a platform independent way.
+ */
 class PQWIDGETS_EXPORT pqColorDialogEventTranslator : public pqWidgetEventTranslator
 {
   Q_OBJECT
@@ -51,8 +50,8 @@ public:
   ~pqColorDialogEventTranslator() override;
 
   /**
-  * Overridden to handle events on QColorDialog.
-  */
+   * Overridden to handle events on QColorDialog.
+   */
   using Superclass::translateEvent;
   bool translateEvent(QObject* Object, QEvent* Event, bool& Error) override;
 

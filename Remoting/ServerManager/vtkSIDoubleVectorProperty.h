@@ -17,7 +17,7 @@
  *
  * Vector property that manage double value to be set through a method
  * on a vtkObject.
-*/
+ */
 
 #ifndef vtkSIDoubleVectorProperty_h
 #define vtkSIDoubleVectorProperty_h

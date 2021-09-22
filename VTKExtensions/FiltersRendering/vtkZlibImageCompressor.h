@@ -24,7 +24,7 @@
  * stripped/restored.
  * @par Thanks:
  * SciberQuest Inc. contributed this class.
-*/
+ */
 
 #ifndef vtkZlibImageCompressor_h
 #define vtkZlibImageCompressor_h

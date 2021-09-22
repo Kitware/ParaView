@@ -68,9 +68,7 @@ vtkVRControlSliceOrientationStyle::vtkVRControlSliceOrientationStyle()
 
 // ----------------------------------------------------------------------------
 // Destructor method
-vtkVRControlSliceOrientationStyle::~vtkVRControlSliceOrientationStyle()
-{
-}
+vtkVRControlSliceOrientationStyle::~vtkVRControlSliceOrientationStyle() = default;
 
 // ----------------------------------------------------------------------------
 // PrintSelf() method

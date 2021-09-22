@@ -33,7 +33,7 @@
  * application (by using a proxy that instantiates the
  * vtkLiveInsituLink).
  * @ingroup LiveInsitu
-*/
+ */
 
 #ifndef vtkLiveInsituLink_h
 #define vtkLiveInsituLink_h

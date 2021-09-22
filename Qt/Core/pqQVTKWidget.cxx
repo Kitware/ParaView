@@ -320,10 +320,10 @@ void pqQVTKWidget::notifyQApplication(QMouseEvent* e)
 {
   if (this->useStereo)
   {
-// Due to QTBUG-61836 (see QVTKOpenGLStereoWidget::testingEvent()), events should
-// be propagated back to the internal QVTKOpenGLWindow when being fired
-// explicitly on the widget instance. We have to use a custom event
-// callback in this case to ensure that events are passed to the window.
+    // Due to QTBUG-61836 (see QVTKOpenGLStereoWidget::testingEvent()), events should
+    // be propagated back to the internal QVTKOpenGLWindow when being fired
+    // explicitly on the widget instance. We have to use a custom event
+    // callback in this case to ensure that events are passed to the window.
 
 #if defined(__APPLE__)
     qApp->notify(baseClass.value<QVTKOpenGLNativeWidget*>(), e);

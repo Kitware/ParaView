@@ -17,7 +17,7 @@
  *
  * vtkPVCenterAxesActor is an actor for the center-axes used in ParaView. It
  * merely uses vtkAxes as the poly data source.
-*/
+ */
 
 #ifndef vtkPVCenterAxesActor_h
 #define vtkPVCenterAxesActor_h

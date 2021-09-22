@@ -66,9 +66,7 @@ vtkVRGrabPointStyle::vtkVRGrabPointStyle()
 
 // ----------------------------------------------------------------------------
 // Destructor method
-vtkVRGrabPointStyle::~vtkVRGrabPointStyle()
-{
-}
+vtkVRGrabPointStyle::~vtkVRGrabPointStyle() = default;
 
 // ----------------------------------------------------------------------------
 // PrintSelf() method

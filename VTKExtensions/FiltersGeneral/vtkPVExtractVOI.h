@@ -22,7 +22,7 @@
  *
  * @sa
  * vtkExtractVOI vtkExtractGrid vtkExtractRectilinearGrid
-*/
+ */
 
 #ifndef vtkPVExtractVOI_h
 #define vtkPVExtractVOI_h

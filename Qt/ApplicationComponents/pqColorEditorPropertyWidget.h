@@ -36,10 +36,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPropertyWidget.h"
 
 /**
-* This is a pqPropertyWidget subclass that presents a widget to edit the color
-* of a representation and other related functionality. It's used as the
-* "widget" for \c ColorEditor property group.
-*/
+ * This is a pqPropertyWidget subclass that presents a widget to edit the color
+ * of a representation and other related functionality. It's used as the
+ * "widget" for \c ColorEditor property group.
+ */
 class PQAPPLICATIONCOMPONENTS_EXPORT pqColorEditorPropertyWidget : public pqPropertyWidget
 {
   Q_OBJECT

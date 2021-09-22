@@ -18,7 +18,7 @@
  * vtkImageData.
  *
  * vtkSkyboxRepresentation is a representation for showing an image as a skybox.
-*/
+ */
 
 #ifndef vtkSkyboxRepresentation_h
 #define vtkSkyboxRepresentation_h

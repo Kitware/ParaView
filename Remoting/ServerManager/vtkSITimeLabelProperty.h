@@ -16,7 +16,7 @@
  * @class   vtkSITimeLabelProperty
  *
  * SIProperty that deals with TimeLabel annotation on Algorithm object type
-*/
+ */
 
 #ifndef vtkSITimeLabelProperty_h
 #define vtkSITimeLabelProperty_h

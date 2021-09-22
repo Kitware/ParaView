@@ -50,8 +50,9 @@ void vtkSMXYChartRepresentationInitializationHelper::PostInitializeProxy(
   }
 
   vtkSMPropertyHelper input(proxy, "Input");
-  if (activeView && (!strcmp(activeView->GetXMLName(), "XYBarChartView") ||
-                      !strcmp(activeView->GetXMLName(), "XYHistogramChartView")) &&
+  if (activeView &&
+    (!strcmp(activeView->GetXMLName(), "XYBarChartView") ||
+      !strcmp(activeView->GetXMLName(), "XYHistogramChartView")) &&
     input.GetAsProxy())
   {
     if (vtkSMRepresentationProxy* repr = vtkSMRepresentationProxy::SafeDownCast(proxy))

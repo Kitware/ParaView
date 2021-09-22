@@ -226,7 +226,7 @@ void vtkXMLPVAnimationWriter::WriteTime(double time)
           ->GetPipelineMTime() > this->Internal->InputMTimes[i])
     {
       this->Internal->InputMTimes[i] = vtkStreamingDemandDrivenPipeline::SafeDownCast(
-                                         this->GetInputAlgorithm(0, i)->GetExecutive())
+        this->GetInputAlgorithm(0, i)->GetExecutive())
                                          ->GetPipelineMTime();
       changed = 1;
     }

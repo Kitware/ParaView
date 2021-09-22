@@ -38,22 +38,22 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class pqTextEditPrivate;
 
 /**
-* pqTextEdit is a specialization of QTextEdit which provide a
-* editingFinished() signal and a textChangedAndEditingFinished().
-* Unlike editingFinished() which gets fired whenever the widget looses
-* focus irrespective of if the text if actually was edited,
-* textChangedAndEditingFinished() is fired only when the text was changed
-* as well.
-*
-* Important Notes:
-* The editingFinished() signals and the textChangedAndEditingFinished()
-* are *NOT* sent when using the setText, setPlainText and setHtml methods.
-*
-* Also the textChangedAndEditingFinished() is not truly emitted only when
-* the text has changed and the edition is finished. For example, removing
-* a letter and adding it back will cause the signal to be fired even though
-* the text is the same as before.
-*/
+ * pqTextEdit is a specialization of QTextEdit which provide a
+ * editingFinished() signal and a textChangedAndEditingFinished().
+ * Unlike editingFinished() which gets fired whenever the widget looses
+ * focus irrespective of if the text if actually was edited,
+ * textChangedAndEditingFinished() is fired only when the text was changed
+ * as well.
+ *
+ * Important Notes:
+ * The editingFinished() signals and the textChangedAndEditingFinished()
+ * are *NOT* sent when using the setText, setPlainText and setHtml methods.
+ *
+ * Also the textChangedAndEditingFinished() is not truly emitted only when
+ * the text has changed and the edition is finished. For example, removing
+ * a letter and adding it back will cause the signal to be fired even though
+ * the text is the same as before.
+ */
 class PQWIDGETS_EXPORT pqTextEdit : public QTextEdit
 {
   Q_OBJECT
@@ -67,17 +67,17 @@ public:
 
 Q_SIGNALS:
   /**
-  * Unlike editingFinished() which gets fired whenever the widget looses
-  * focus irrespective of if the text actually was edited,
-  * textChangedAndEditingFinished() is fired only when the text was changed
-  * as well.
-  */
+   * Unlike editingFinished() which gets fired whenever the widget looses
+   * focus irrespective of if the text actually was edited,
+   * textChangedAndEditingFinished() is fired only when the text was changed
+   * as well.
+   */
   void textChangedAndEditingFinished();
 
   /**
-  * Just like the QLineEdit::editingFinished(), this signal is fired
-  * every time the widget loses focus.
-  */
+   * Just like the QLineEdit::editingFinished(), this signal is fired every
+   * time the widget loses focus.
+   */
   void editingFinished();
 
 private Q_SLOTS:

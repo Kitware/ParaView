@@ -127,7 +127,7 @@ bool ValidateMeshTypeUnstructured()
 }
 }
 
-int TestConduitSource(int, char* [])
+int TestConduitSource(int, char*[])
 {
   return ValidateMeshTypeUniform() && ValidateMeshTypeRectilinear() &&
       ValidateMeshTypeStructured() && ValidateMeshTypeUnstructured()

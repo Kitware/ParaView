@@ -335,7 +335,7 @@ void vtkSMUtilities::FillImage(vtkImageData* image, const int extent[6], const u
 
 //----------------------------------------------------------------------------
 vtkSmartPointer<vtkImageData> vtkSMUtilities::MergeImages(
-  const std::vector<vtkSmartPointer<vtkImageData> >& images, int borderWidth,
+  const std::vector<vtkSmartPointer<vtkImageData>>& images, int borderWidth,
   const unsigned char* borderColorRGB)
 {
   if (images.empty())
@@ -349,7 +349,7 @@ vtkSmartPointer<vtkImageData> vtkSMUtilities::MergeImages(
 
   int extent[6] = { VTK_INT_MAX, VTK_INT_MIN, VTK_INT_MAX, VTK_INT_MIN, VTK_INT_MAX, VTK_INT_MIN };
   int numComps = -1;
-  for (std::vector<vtkSmartPointer<vtkImageData> >::const_iterator iter = images.begin();
+  for (std::vector<vtkSmartPointer<vtkImageData>>::const_iterator iter = images.begin();
        iter != images.end(); ++iter)
   {
     if (vtkImageData* image = iter->GetPointer())
@@ -399,7 +399,7 @@ vtkSmartPointer<vtkImageData> vtkSMUtilities::MergeImages(
       reinterpret_cast<vtkTuple<unsigned char, 4>*>(image->GetScalarPointer());
     std::fill(image_ptr, image_ptr + image->GetNumberOfPoints(), rgba);
   }
-  for (std::vector<vtkSmartPointer<vtkImageData> >::const_iterator iter = images.begin();
+  for (std::vector<vtkSmartPointer<vtkImageData>>::const_iterator iter = images.begin();
        iter != images.end(); ++iter)
   {
     vtkSMUtilities::Merge(image, iter->GetPointer(), borderWidth, borderColorRGB);

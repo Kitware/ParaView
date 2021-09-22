@@ -499,8 +499,9 @@ int vtkPEnSightReader::ReadCaseFileGeometry(char* line)
   // There will definitely be a "model" line.  There may also be "measured"
   // and "match" lines.
   lineRead = this->ReadNextDataLine(line);
-  while (lineRead && (strncmp(line, "m", 1) == 0 || strncmp(line, "boundary:", 9) == 0 ||
-                       strncmp(line, "rigid_body:", 11) == 0))
+  while (lineRead &&
+    (strncmp(line, "m", 1) == 0 || strncmp(line, "boundary:", 9) == 0 ||
+      strncmp(line, "rigid_body:", 11) == 0))
   {
     if (strncmp(line, "model:", 6) == 0)
     {
@@ -2114,8 +2115,9 @@ vtkPEnSightReader::vtkPEnSightReaderCellIds* vtkPEnSightReader::GetCellIds(int i
                                << " types exist.");
     return nullptr;
   }
-  if (index < 0 || ((this->UnstructuredPartIds->IsId(index) == -1) &&
-                     (this->StructuredPartIds->IsId(index) == -1)))
+  if (index < 0 ||
+    ((this->UnstructuredPartIds->IsId(index) == -1) &&
+      (this->StructuredPartIds->IsId(index) == -1)))
   {
     vtkErrorMacro("Index " << index << " out of range.  Only "
                            << this->UnstructuredPartIds->GetNumberOfIds() << " (unstructured) or "
@@ -2162,8 +2164,9 @@ vtkPEnSightReader::vtkPEnSightReaderCellIds* vtkPEnSightReader::GetCellIds(int i
 vtkPEnSightReader::vtkPEnSightReaderCellIds* vtkPEnSightReader::GetPointIds(int index)
 {
   // Check argument range.
-  if (index < 0 || ((this->UnstructuredPartIds->IsId(index) == -1) &&
-                     (this->StructuredPartIds->IsId(index) == -1)))
+  if (index < 0 ||
+    ((this->UnstructuredPartIds->IsId(index) == -1) &&
+      (this->StructuredPartIds->IsId(index) == -1)))
   {
     vtkErrorMacro("Index " << index << " out of range.  Only "
                            << this->UnstructuredPartIds->GetNumberOfIds() << " (unstructured) or "
@@ -2208,8 +2211,9 @@ vtkIdType vtkPEnSightReader::GetTotalNumberOfCellIds(int index)
   int i;
   vtkIdType result = 0;
 
-  if (index < 0 || ((this->UnstructuredPartIds->IsId(index) == -1) &&
-                     (this->StructuredPartIds->IsId(index) == -1)))
+  if (index < 0 ||
+    ((this->UnstructuredPartIds->IsId(index) == -1) &&
+      (this->StructuredPartIds->IsId(index) == -1)))
   {
     vtkErrorMacro("Index " << index << " out of range.  Only "
                            << this->UnstructuredPartIds->GetNumberOfIds() << " (unstructured) or "
@@ -2237,8 +2241,9 @@ vtkIdType vtkPEnSightReader::GetLocalTotalNumberOfCellIds(int index)
   int i;
   vtkIdType numCellIds = 0;
 
-  if (index < 0 || ((this->UnstructuredPartIds->IsId(index) == -1) &&
-                     (this->StructuredPartIds->IsId(index) == -1)))
+  if (index < 0 ||
+    ((this->UnstructuredPartIds->IsId(index) == -1) &&
+      (this->StructuredPartIds->IsId(index) == -1)))
   {
     vtkErrorMacro("Index " << index << " out of range.  Only "
                            << this->UnstructuredPartIds->GetNumberOfIds() << " (unstructured) or "

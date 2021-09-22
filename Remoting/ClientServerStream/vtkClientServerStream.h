@@ -22,7 +22,7 @@
  * and the message represented will remain unchanged.  Messages are
  * used to represent both commands and results for
  * vtkClientServerInterpreter, but they may be used for any purpose.
-*/
+ */
 
 #ifndef vtkClientServerStream_h
 #define vtkClientServerStream_h
@@ -529,6 +529,7 @@ public:
 
   // Allow this object to be passed as if it were a pointer.
   operator T*() { return this->Data; }
+
 private:
   T* Data;
 };

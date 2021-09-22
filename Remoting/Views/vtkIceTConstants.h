@@ -37,7 +37,7 @@
  * @sa
  * vtkIceTRenderManager, vtkOpenGLIceTRenderer
  *
-*/
+ */
 
 #ifndef vtkIceTConstants_h
 #define vtkIceTConstants_h

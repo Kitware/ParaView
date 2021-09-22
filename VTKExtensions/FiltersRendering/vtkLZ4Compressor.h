@@ -19,7 +19,7 @@
  *
  * vtkLZ4Compressor uses LZ4 for fast lossless compression and decompression on
  * data.
-*/
+ */
 
 #ifndef vtkLZ4Compressor_h
 #define vtkLZ4Compressor_h

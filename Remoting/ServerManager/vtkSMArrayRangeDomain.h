@@ -22,7 +22,7 @@
  * (vtkSMStringVectorProperty) properties.
  * @sa
  * vtkSMDoubleRangeDomain vtkSMProxyProperty vtkSMStringVectorProperty
-*/
+ */
 
 #ifndef vtkSMArrayRangeDomain_h
 #define vtkSMArrayRangeDomain_h

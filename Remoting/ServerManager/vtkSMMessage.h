@@ -17,7 +17,7 @@
  *
  * Header class that setup every thing in order to use Protobuf messages in
  * a transparent manner
-*/
+ */
 #ifndef vtkSMMessage_h
 #define vtkSMMessage_h
 

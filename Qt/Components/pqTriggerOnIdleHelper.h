@@ -41,13 +41,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class pqServer;
 
 /**
-* Often times we need to call certain slots on idle. However, just relying on
-* Qt's idle is not safe since progress events often result in processing of
-* pending events, which may not be a safe place for such slots to be called.
-* In that such cases this class can be used. It emits the triggered() signal
-* when the server (set using setServer()) is indeed idle. Otherwise it simply
-* reschedules the triggering of another time.
-*/
+ * Often times we need to call certain slots on idle. However, just relying on
+ * Qt's idle is not safe since progress events often result in processing of
+ * pending events, which may not be a safe place for such slots to be called.
+ * In that such cases this class can be used. It emits the triggered() signal
+ * when the server (set using setServer()) is indeed idle. Otherwise it simply
+ * reschedules the triggering of another time.
+ */
 class PQCOMPONENTS_EXPORT pqTriggerOnIdleHelper : public QObject
 {
   Q_OBJECT
@@ -58,8 +58,8 @@ public:
   ~pqTriggerOnIdleHelper() override;
 
   /**
-  * get the server
-  */
+   * get the server
+   */
   pqServer* server() const;
 
 Q_SIGNALS:

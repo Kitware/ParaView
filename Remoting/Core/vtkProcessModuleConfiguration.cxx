@@ -72,7 +72,8 @@ bool vtkProcessModuleConfiguration::PopulateOptions(
     ->check([](const std::string&) { return std::string(); }, "filename", "filename");
 
   groupLogging
-    ->add_option("-l,--log",
+    ->add_option(
+      "-l,--log",
       [this](const CLI::results_t& results) {
         for (const auto& value : results)
         {

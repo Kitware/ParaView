@@ -56,12 +56,12 @@ class PQCOMPONENTS_EXPORT pqPluginDialog : public QDialog
 
 public:
   /**
-  * create this dialog with a parent
-  */
+   * create this dialog with a parent
+   */
   pqPluginDialog(pqServer* server, QWidget* p = 0);
   /**
-  * destroy this dialog
-  */
+   * destroy this dialog
+   */
   ~pqPluginDialog() override;
 
 public Q_SLOTS:

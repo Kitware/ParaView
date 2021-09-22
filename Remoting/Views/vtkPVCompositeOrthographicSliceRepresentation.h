@@ -19,7 +19,7 @@
  * vtkPVOrthographicSliceView. We add 3 vtkGeometrySliceRepresentation
  * instances to render the 3 slices in vtkPVOrthographicSliceView's orthographic
  * views.
-*/
+ */
 
 #ifndef vtkPVCompositeOrthographicSliceRepresentation_h
 #define vtkPVCompositeOrthographicSliceRepresentation_h

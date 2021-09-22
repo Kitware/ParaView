@@ -28,7 +28,7 @@
 class vtkSMDoubleMapPropertyPrivate
 {
 public:
-  std::map<vtkIdType, std::vector<double> > Map;
+  std::map<vtkIdType, std::vector<double>> Map;
   unsigned int NumberOfComponents;
 
   std::vector<double>& GetVector(vtkIdType id)
@@ -182,7 +182,7 @@ void vtkSMDoubleMapProperty::WriteTo(vtkSMMessage* msg)
   Variant* variant = prop->mutable_value();
   variant->set_type(Variant::MAP);
 
-  std::map<vtkIdType, std::vector<double> >::iterator iter;
+  std::map<vtkIdType, std::vector<double>>::iterator iter;
   for (iter = this->Private->Map.begin(); iter != this->Private->Map.end(); iter++)
   {
     variant->add_idtype(iter->first);
@@ -246,7 +246,7 @@ void vtkSMDoubleMapProperty::SaveStateValues(vtkPVXMLElement* propertyElement)
     propertyElement->AddAttribute("number_of_components", this->Private->NumberOfComponents);
   }
 
-  typedef std::map<vtkIdType, std::vector<double> >::const_iterator iter;
+  typedef std::map<vtkIdType, std::vector<double>>::const_iterator iter;
 
   for (iter i = this->Private->Map.begin(); i != this->Private->Map.end(); i++)
   {
@@ -344,10 +344,11 @@ void vtkSMDoubleMapProperty::PrintSelf(ostream& os, vtkIndent indent)
 void vtkSMDoubleMapProperty::Copy(vtkSMProperty* src)
 {
   vtkSMDoubleMapProperty* other = vtkSMDoubleMapProperty::SafeDownCast(src);
-  if (other && (other->Private->NumberOfComponents != this->Private->NumberOfComponents ||
-                 other->Private->Map.size() != this->Private->Map.size() ||
-                 !std::equal(other->Private->Map.begin(), other->Private->Map.end(),
-                   this->Private->Map.begin())))
+  if (other &&
+    (other->Private->NumberOfComponents != this->Private->NumberOfComponents ||
+      other->Private->Map.size() != this->Private->Map.size() ||
+      !std::equal(
+        other->Private->Map.begin(), other->Private->Map.end(), this->Private->Map.begin())))
   {
     this->Private->Map = other->Private->Map;
     this->Private->NumberOfComponents = other->Private->NumberOfComponents;

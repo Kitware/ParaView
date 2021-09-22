@@ -37,7 +37,7 @@
 class vtkSMPluginManager::vtkInternals
 {
 public:
-  typedef std::map<vtkSMSession*, vtkSmartPointer<vtkPVPluginsInformation> > RemoteInfoMapType;
+  typedef std::map<vtkSMSession*, vtkSmartPointer<vtkPVPluginsInformation>> RemoteInfoMapType;
   RemoteInfoMapType RemoteInformations;
 };
 

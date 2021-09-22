@@ -66,9 +66,7 @@ vtkVRResetTransformStyle::vtkVRResetTransformStyle()
 
 // ----------------------------------------------------------------------------
 // Destructor method
-vtkVRResetTransformStyle::~vtkVRResetTransformStyle()
-{
-}
+vtkVRResetTransformStyle::~vtkVRResetTransformStyle() = default;
 
 // ----------------------------------------------------------------------------
 // PrintSelf() method

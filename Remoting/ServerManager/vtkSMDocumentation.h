@@ -20,7 +20,7 @@
  * Every proxy defined in the server manager XML can have documentation
  * associated with it. This class provides access to the various types
  * of documentation text for every proxy.
-*/
+ */
 
 #ifndef vtkSMDocumentation_h
 #define vtkSMDocumentation_h

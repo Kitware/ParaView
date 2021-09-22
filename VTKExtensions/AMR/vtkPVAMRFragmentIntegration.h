@@ -21,7 +21,7 @@
  *
  * .SEE vtkAMRFragmentIntegration
  *
-*/
+ */
 
 #ifndef vtkPVAMRFragmentIntegration_h
 #define vtkPVAMRFragmentIntegration_h

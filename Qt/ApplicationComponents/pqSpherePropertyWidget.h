@@ -35,18 +35,18 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqInteractivePropertyWidget.h"
 
 /**
-* pqSpherePropertyWidget is a custom property widget that uses
-* "SphereWidgetRepresentation" to help users interactively setup a center and
-* a radius for a group of properties used to define a spherical shape. To use
-* this widget for a property group (vtkSMPropertyGroup), use
-* "InteractiveSphere" as the "panel_widget" in the XML configuration.
-* The property group should have properties for the following functions:
-* \li \c Center: a 3-tuple vtkSMDoubleVectorProperty that corresponds to the center of the Sphere.
-* \li \c Radius: a 1-tuple vtkSMDoubleVectorProperty that corresponds to the radius.
-* \li \c Normal: (optional) a 3-tuple vtkSMDoubleVectorProperty corresponds to a direction vector.
-* \li \c Input: (optional) a vtkSMInputProperty that is used to get data
-* information for bounds when placing/resetting the widget.
-*/
+ * pqSpherePropertyWidget is a custom property widget that uses
+ * "SphereWidgetRepresentation" to help users interactively setup a center and
+ * a radius for a group of properties used to define a spherical shape. To use
+ * this widget for a property group (vtkSMPropertyGroup), use
+ * "InteractiveSphere" as the "panel_widget" in the XML configuration.
+ * The property group should have properties for the following functions:
+ * \li \c Center: a 3-tuple vtkSMDoubleVectorProperty that corresponds to the center of the Sphere.
+ * \li \c Radius: a 1-tuple vtkSMDoubleVectorProperty that corresponds to the radius.
+ * \li \c Normal: (optional) a 3-tuple vtkSMDoubleVectorProperty corresponds to a direction vector.
+ * \li \c Input: (optional) a vtkSMInputProperty that is used to get data
+ * information for bounds when placing/resetting the widget.
+ */
 class PQAPPLICATIONCOMPONENTS_EXPORT pqSpherePropertyWidget : public pqInteractivePropertyWidget
 {
   Q_OBJECT
@@ -58,14 +58,14 @@ public:
 
 public Q_SLOTS:
   /**
-  * Center the widget on the data bounds.
-  */
+   * Center the widget on the data bounds.
+   */
   void centerOnBounds();
 
 protected Q_SLOTS:
   /**
-  * Places the interactive widget using current data source information.
-  */
+   * Places the interactive widget using current data source information.
+   */
   void placeWidget() override;
 
 private Q_SLOTS:

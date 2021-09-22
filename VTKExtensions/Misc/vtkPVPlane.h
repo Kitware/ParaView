@@ -19,7 +19,7 @@
  * vtkPVPlane adds an offset setting to vtkPlane.
  * This offset is used together with normal and origin when
  * setting parameters on the represented object.
-*/
+ */
 
 #ifndef vtkPVPlane_h
 #define vtkPVPlane_h

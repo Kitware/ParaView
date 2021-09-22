@@ -21,7 +21,7 @@
  *
  * .SEE vtkAMRDualContour
  *
-*/
+ */
 
 #ifndef vtkPVAMRDualContour_h
 #define vtkPVAMRDualContour_h

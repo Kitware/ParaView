@@ -16,7 +16,7 @@
  * @class   vtkMaterialInterfaceIdListItem
  *
  * Elemental data type for fragment id list containers.
-*/
+ */
 
 #ifndef vtkMaterialInterfaceIdListItem_h
 #define vtkMaterialInterfaceIdListItem_h

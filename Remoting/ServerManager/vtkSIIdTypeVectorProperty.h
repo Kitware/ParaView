@@ -16,7 +16,7 @@
  * @class   vtkSIIdTypeVectorProperty
  *
  * IdType ServerSide Property use to set IdType array as method parameter.
-*/
+ */
 
 #ifndef vtkSIIdTypeVectorProperty_h
 #define vtkSIIdTypeVectorProperty_h
