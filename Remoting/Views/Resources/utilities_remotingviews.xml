@@ -1536,6 +1536,7 @@
                             no_custom_default="1"
                             name="Title"
                             number_of_elements="1">
+        <Documentation>Set the title text with respect to the color legend.</Documentation>
       </StringVectorProperty>
       <StringVectorProperty animateable="0"
                             command="SetComponentTitle"
@@ -1543,6 +1544,7 @@
                             no_custom_default="1"
                             name="ComponentTitle"
                             number_of_elements="1">
+        <Documentation>Set the component title text with respect to the color legend.</Documentation>
       </StringVectorProperty>
       <IntVectorProperty animateable="0"
                          command="SetTitleJustification"
@@ -1557,7 +1559,7 @@
           <Entry text="Right"
                  value="2" />
         </EnumerationDomain>
-        <Documentation>Sets the justification of the title text with respect to the scalar color bar.</Documentation>
+        <Documentation>Set the justification of the title text with respect to the color legend.</Documentation>
       </IntVectorProperty>
       <IntVectorProperty animateable="0"
                          command="SetForceHorizontalTitle"
@@ -1620,6 +1622,10 @@
                          name="AutomaticLabelFormat"
                          number_of_elements="1">
         <BooleanDomain name="bool" />
+        <Documentation>
+          Set if the number format used for the labels (specified as a C-style printf format string) will be automatically generated to make
+          the numbers best fit within the widget. When off, the Label Format property will be used.
+        </Documentation>
       </IntVectorProperty>
       <StringVectorProperty animateable="0"
                             command="SetLabelFormat"
@@ -1631,6 +1637,10 @@
             <Property name="AutomaticLabelFormat" function="boolean_invert" index="0" />
           </PropertyWidgetDecorator>
         </Hints>
+        <Documentation>
+          Set the number format (specified as a C-style printf format string) with which to print the labels on the color legend.
+          Can be used only if Automatic Label Format is off.
+        </Documentation>
       </StringVectorProperty>
       <IntVectorProperty animateable="0"
                          command="SetDrawNanAnnotation"
@@ -1638,6 +1648,7 @@
                          name="DrawNanAnnotation"
                          number_of_elements="1">
         <BooleanDomain name="bool" />
+        <Documentation>Set whether the NaN annotation should be rendered or not.</Documentation>
       </IntVectorProperty>
       <IntVectorProperty animateable="0"
                          command="SetDrawAnnotations"
@@ -1645,6 +1656,7 @@
                          name="DrawAnnotations"
                          number_of_elements="1">
         <BooleanDomain name="bool" />
+        <Documentation>Set whether text annotations should be rendered or not.</Documentation>
       </IntVectorProperty>
       <IntVectorProperty animateable="0"
                          command="SetAddRangeAnnotations"
@@ -1652,6 +1664,9 @@
                          name="AddRangeAnnotations"
                          number_of_elements="1">
         <BooleanDomain name="bool" />
+        <Documentation>
+          Set whether the data range endpoints (minimum and maximum) are added as annotations.
+        </Documentation>
       </IntVectorProperty>
       <IntVectorProperty animateable="0"
                          command="SetAutomaticAnnotations"
@@ -1670,6 +1685,10 @@
                          name="AddRangeLabels"
                          label="Add Range Labels">
         <BooleanDomain name="bool" />
+        <Documentation>
+          Set whether to add range labels or not. These are labels that have
+          the minimum/maximum values of the color legend range.
+        </Documentation>
       </IntVectorProperty>
       <StringVectorProperty animateable="0"
                             command="SetRangeLabelFormat"
@@ -1682,6 +1701,9 @@
             <Property name="AddRangeLabels" function="boolean" index="0" />
           </PropertyWidgetDecorator>
         </Hints>
+        <Documentation>
+          Set number format for range labels (specified as a C-style printf format string). Can be used only if Add Range Labels is enabled.
+        </Documentation>
       </StringVectorProperty>
       <StringVectorProperty animateable="0"
                             command="SetNanAnnotation"
@@ -1693,6 +1715,9 @@
             <Property name="DrawNanAnnotation" function="boolean" index="0" />
           </PropertyWidgetDecorator>
         </Hints>
+        <Documentation>
+          Set the annotation text for "NaN" values. Can be used only if Draw Nan Annotation is enabled.
+        </Documentation>
       </StringVectorProperty>
       <IntVectorProperty animateable="0"
                          command="SetDrawTickMarks"

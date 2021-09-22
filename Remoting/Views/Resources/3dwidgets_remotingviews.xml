@@ -1669,6 +1669,7 @@
         <Hints>
           <NoDefault />
         </Hints>
+        <Documentation>Set if color legend's orientation will be updated based on its position.</Documentation>
       </IntVectorProperty>
       <IntVectorProperty command="GetAutoOrient"
                          information_only="1"
@@ -1692,6 +1693,9 @@
           <Entry text="Vertical"
                  value="1" />
         </EnumerationDomain>
+        <Documentation>
+          Specify orientation of the color legend. Can be used only if Auto Orient is disabled.
+        </Documentation>
       </IntVectorProperty>
       <IntVectorProperty command="GetOrientation"
                          information_only="1"
@@ -1718,7 +1722,7 @@
           <Entry text="UpperCenter"
                  value="6" />
         </EnumerationDomain>
-        <Documentation>Specify placement of the scalar bar actor.</Documentation>
+        <Documentation>Specify placement of the color legend.</Documentation>
       </IntVectorProperty>
       <ProxyProperty command="SetScalarBarActor"
                      name="ScalarBarActor">
