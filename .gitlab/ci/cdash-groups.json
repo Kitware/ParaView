@@ -44,6 +44,11 @@
             "group": "Nightly",
             "site": "ANY",
             "buildname": "ascent-gcc-osmesa"
+        },
+        {
+            "group": "master-packages",
+            "site": "ANY",
+            "buildname": "[paraview-spack-paraview+osmesa^mesa~glx^mpich]"
         }
     ],
     "latest-master-editions": [

@@ -214,7 +214,7 @@
         - $LAUNCHER $spack clean
         - export dependency_specs=`$LAUNCHER $spack find --format "{name}{@version}{%compiler}"`
         - $LAUNCHER $spack buildcache create -a -f -u -d $PWD/spack-cache $dependency_specs
-        - $LAUNCHER $spack install --no-check-signature -j $(nproc) --cdash-upload-url="http://open.cdash.org/submit.php?project=ParaView" --cdash-track $TRACK --cdash-build="paraview-spack-$CI_COMMIT_REF_NAME" $paraview_spec
+        - $LAUNCHER $spack install --no-check-signature -j $(nproc) --cdash-upload-url="http://open.cdash.org/submit.php?project=ParaView" --cdash-track $TRACK --cdash-build="[paraview-spack-$paraview_spec]-$CI_COMMIT_REF_NAME" $paraview_spec
         - eval `$spack load --sh paraview`
         - pvserver --version
         - .gitlab/sccache --show-stats
