@@ -32,6 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqPythonTabWidget.h"
 
+#include "pqClickableLabel.h"
 #include "pqCoreUtilities.h"
 #include "pqPythonEditorActions.h"
 #include "pqPythonScriptEditor.h"
@@ -248,8 +249,16 @@ void pqPythonTabWidget::updateTab(QWidget* widget)
   const int idx = this->indexOf(widget);
   if (idx != -1)
   {
-    this->tabBar()->setTabButton(
-      idx, QTabBar::LeftSide, this->getTabLabel(reinterpret_cast<pqPythonTextArea*>(widget)));
+    QString tabName = this->generateTabName(reinterpret_cast<pqPythonTextArea*>(widget));
+    pqClickableLabel* cLabel = new pqClickableLabel(widget, tabName, nullptr, widget);
+    this->tabBar()->setTabButton(idx, QTabBar::LeftSide, cLabel);
+    this->connect(cLabel, &pqClickableLabel::onClicked, [this](QWidget* clickedWidget) {
+      int tmpIdx = this->indexOf(clickedWidget);
+      if (tmpIdx >= 0 && tmpIdx < this->count() - 1)
+      {
+        this->setCurrentIndex(tmpIdx);
+      }
+    });
   }
 }
 
@@ -281,9 +290,10 @@ void pqPythonTabWidget::createNewEmptyTab()
 //-----------------------------------------------------------------------------
 void pqPythonTabWidget::setTabCloseButton(pqPythonTextArea* widget)
 {
-  QCloseLabel* label = new QCloseLabel(widget, widget);
-  this->tabBar()->setTabButton(this->count() - 2, QTabBar::RightSide, label);
-  this->connect(label, &QCloseLabel::onClicked, [this](QWidget* clickedWidget) {
+  QPixmap closePixmap = this->style()->standardIcon(QStyle::SP_TitleBarCloseButton).pixmap(16, 16);
+  pqClickableLabel* cLabel = new pqClickableLabel(widget, "Close Tab", &closePixmap, widget);
+  this->tabBar()->setTabButton(this->count() - 2, QTabBar::RightSide, cLabel);
+  this->connect(cLabel, &pqClickableLabel::onClicked, [this](QWidget* clickedWidget) {
     int idx = this->indexOf(clickedWidget);
     if (idx >= 0 && idx < this->count() - 1)
     {
@@ -361,66 +371,62 @@ void pqPythonTabWidget::stopTrace(const QString& str)
 }
 
 //-----------------------------------------------------------------------------
-QLabel* pqPythonTabWidget::getTabLabel(const pqPythonTextArea* widget) const
+QString pqPythonTabWidget::generateTabName(const pqPythonTextArea* widget) const
 {
-  const auto GenerateTabName = [this, widget]() {
-    const auto QColorToString = [](const QColor& color) { return color.name(QColor::HexRgb); };
-    const auto ColorText = [&QColorToString](const QColor& color, const QString& text) {
-      return "<span style=\"color:" + QColorToString(color) + "\">" + text + "</span>";
-    };
+  const auto QColorToString = [](const QColor& color) { return color.name(QColor::HexRgb); };
+  const auto ColorText = [&QColorToString](const QColor& color, const QString& text) {
+    return "<span style=\"color:" + QColorToString(color) + "\">" + text + "</span>";
+  };
 
-    const QString& filename = widget->getFilename();
-    const QFileInfo fileInfo(filename);
-    const QString macroDir = pqPythonScriptEditor::getMacrosDir();
-    const QString scriptDir = pqPythonScriptEditor::getScriptsDir();
+  const QString& filename = widget->getFilename();
+  const QFileInfo fileInfo(filename);
+  const QString macroDir = pqPythonScriptEditor::getMacrosDir();
+  const QString scriptDir = pqPythonScriptEditor::getScriptsDir();
 
-    QString tabname;
+  QString tabname;
 
-    // Insert a tag for the tab type
-    if (widget == this->TraceWidget)
-    {
-      tabname = ColorText(Qt::GlobalColor::darkCyan, "[Trace] ");
-    }
-    else if (filename.contains(macroDir))
-    {
-      tabname = ColorText(Qt::GlobalColor::darkGreen, "[Macro] ");
-    }
-    else if (filename.contains(scriptDir))
-    {
-      tabname = ColorText(Qt::GlobalColor::darkBlue, "[Script] ");
-    }
+  // Insert a tag for the tab type
+  if (widget == this->TraceWidget)
+  {
+    tabname = ColorText(Qt::GlobalColor::darkCyan, "[Trace] ");
+  }
+  else if (filename.contains(macroDir))
+  {
+    tabname = ColorText(Qt::GlobalColor::darkGreen, "[Macro] ");
+  }
+  else if (filename.contains(scriptDir))
+  {
+    tabname = ColorText(Qt::GlobalColor::darkBlue, "[Script] ");
+  }
 
-    if (widget->isLinked())
-    {
-      tabname += ColorText(Qt::GlobalColor::darkYellow, "[Linked] ");
-    }
+  if (widget->isLinked())
+  {
+    tabname += ColorText(Qt::GlobalColor::darkYellow, "[Linked] ");
+  }
 
-    if (filename.isEmpty())
+  if (filename.isEmpty())
+  {
+    tabname += "New File";
+  }
+  else
+  {
+    tabname += ColorText(Qt::GlobalColor::gray, fileInfo.dir().absolutePath()) + "/";
+
+    if (widget->isDirty())
     {
-      tabname += "New File";
+      tabname += "<b>" + ColorText(Qt::GlobalColor::red, fileInfo.fileName()) + "</b>";
     }
     else
     {
-      tabname += ColorText(Qt::GlobalColor::gray, fileInfo.dir().absolutePath()) + "/";
-
-      if (widget->isDirty())
-      {
-        tabname += "<b>" + ColorText(Qt::GlobalColor::red, fileInfo.fileName()) + "</b>";
-      }
-      else
-      {
-        tabname += fileInfo.fileName();
-      }
+      tabname += fileInfo.fileName();
     }
+  }
 
-    // Replace the home folder path with ~
-    const QString homeDirectory = QStandardPaths::writableLocation(QStandardPaths::HomeLocation);
-    tabname.replace(homeDirectory, "~");
+  // Replace the home folder path with ~
+  const QString homeDirectory = QStandardPaths::writableLocation(QStandardPaths::HomeLocation);
+  tabname.replace(homeDirectory, "~");
 
-    return tabname;
-  };
-
-  return new QLabel(GenerateTabName());
+  return tabname;
 }
 
 //-----------------------------------------------------------------------------

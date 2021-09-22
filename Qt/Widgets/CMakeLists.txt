@@ -36,6 +36,7 @@ set(classes
   pqCheckBoxPixMaps
   pqCheckBoxPixMaps
   pqCheckableHeaderView
+  pqClickableLabel
   pqCollapsedGroup
   pqColorButtonEventPlayer
   pqColorButtonEventTranslator
