@@ -91,8 +91,6 @@ pqPythonTextArea::pqPythonTextArea(QWidget* parent)
     this->FileIO->contentChanged();
   });
 
-  this->connect(this->FileIO.data(), &pqPythonFileIO::fileSavedAsMacro, this,
-    &pqPythonTextArea::fileSavedAsMacro);
   this->connect(
     this->FileIO.data(), &pqPythonFileIO::fileSaved, this, &pqPythonTextArea::fileSaved);
   this->connect(

@@ -271,17 +271,11 @@ void pqPythonTabWidget::createNewEmptyTab()
   this->connect(widget, &pqPythonTextArea::fileSaved,
     [this, widget](const QString&) { this->updateTab(widget); });
 
-  this->connect(widget, &pqPythonTextArea::fileSavedAsMacro,
-    [this, widget](const QString&) { this->updateTab(widget); });
-
   this->connect(
     widget, &pqPythonTextArea::contentChanged, [this, widget]() { this->updateTab(widget); });
 
   this->connect(widget, &pqPythonTextArea::fileOpened, this, &pqPythonTabWidget::fileOpened);
   this->connect(widget, &pqPythonTextArea::fileSaved, this, &pqPythonTabWidget::fileSaved);
-  this->connect(
-    widget, &pqPythonTextArea::fileSavedAsMacro, this, &pqPythonTabWidget::fileSavedAsMacro);
-
   this->setTabCloseButton(widget);
 }
 
@@ -395,6 +389,11 @@ QLabel* pqPythonTabWidget::getTabLabel(const pqPythonTextArea* widget) const
     else if (filename.contains(scriptDir))
     {
       tabname = ColorText(Qt::GlobalColor::darkBlue, "[Script] ");
+    }
+
+    if (widget->isLinked())
+    {
+      tabname += ColorText(Qt::GlobalColor::darkYellow, "[Linked] ");
     }
 
     if (filename.isEmpty())

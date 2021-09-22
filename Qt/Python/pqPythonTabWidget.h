@@ -196,12 +196,6 @@ signals:
    */
   void fileSaved(const QString&);
 
-  /**
-   * @brief Raised when a file has been successfuly
-   * saved as a paraview macro
-   */
-  void fileSavedAsMacro(const QString&);
-
 protected:
   void keyPressEvent(QKeyEvent* keyEvent) override;
   void mousePressEvent(QMouseEvent* mouseEvent) override;

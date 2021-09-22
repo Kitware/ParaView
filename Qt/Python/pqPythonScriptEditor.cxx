@@ -81,18 +81,6 @@ pqPythonScriptEditor::pqPythonScriptEditor(QWidget* p)
 
   this->setWindowTitle(tr("ParaView Python Script Editor"));
 
-  this->connect(
-    this->TabWidget, &pqPythonTabWidget::fileSavedAsMacro, [this](const QString& filename) {
-      if (pythonManager)
-      {
-        pythonManager->updateMacroList();
-      }
-
-      this->setWindowTitle(
-        tr("%1[*] - %2").arg(details::stripFilename(filename)).arg(tr("Script Editor")));
-      this->statusBar()->showMessage(tr("File %1 saved as macro").arg(filename), 4000);
-    });
-
   this->connect(this->TabWidget, &pqPythonTabWidget::fileSaved, [this](const QString& filename) {
     this->setWindowTitle(
       tr("%1[*] - %2").arg(details::stripFilename(filename)).arg(tr("Script Editor")));

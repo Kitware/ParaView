@@ -183,13 +183,6 @@ signals:
   void fileSaved(const QString&);
 
   /**
-   * @brief Triggers after a successful
-   * copy of the current buffer to a new
-   * file.
-   */
-  void fileSavedAsMacro(const QString&);
-
-  /**
    * @brief Emitted when the buffer content
    * has been modified.
    */
