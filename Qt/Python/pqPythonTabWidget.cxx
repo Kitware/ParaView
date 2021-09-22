@@ -53,7 +53,6 @@ pqPythonTabWidget::pqPythonTabWidget(QWidget* parent)
   this->addNewTabButton();
   this->createNewEmptyTab();
   this->setMovable(false);
-  this->setTabsClosable(true);
 
   this->connect(this, &QTabWidget::tabCloseRequested, [this](int index) {
     pqPythonTextArea* widget = this->getWidget<pqPythonTextArea>(index);
@@ -288,7 +287,7 @@ void pqPythonTabWidget::setTabCloseButton(pqPythonTextArea* widget)
     int idx = this->indexOf(clickedWidget);
     if (idx >= 0 && idx < this->count() - 1)
     {
-      this->tabBar()->tabCloseRequested(idx);
+      emit this->tabCloseRequested(idx);
     }
   });
 }
