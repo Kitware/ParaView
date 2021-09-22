@@ -449,6 +449,20 @@ def setattr_fix_value(proxy, pname, value, setter_func):
                     else:
                         raise NotSupportedException("%s is an obsolete value. Use %s instead." % (seed_sources_from[i], seed_sources_to[i]))
 
+    if (pname == "WindowLocation" and proxy.SMProxy.GetXMLName() in ["TextSourceRepresentation", "ScalarBarWidgetRepresentation"]) or \
+            (pname == "LabelLocation" and proxy.SMProxy.GetXMLName() == "ChartTextRepresentation"):
+        # In ParaView 5.10, we changed "WindowsLocation/LabelLocation" values to have spaces in between as seen in the following map
+        window_location_map = {'AnyLocation': 'Any Location', 'LowerRightCorner': 'Lower Right Corner',
+                               'LowerLeftCorner': 'Lower Left Corner', 'LowerCenter': 'Lower Center',
+                               'UpperLeftCorner': 'Upper Left Corner', 'UpperRightCorner': 'Upper Right Corner',
+                               'UpperCenter': 'Upper Center'}
+        new_value = window_location_map[value]
+        if paraview.compatibility.GetVersion() <= 5.9:
+            setter_func(proxy, new_value)
+            raise Continue()
+        else:
+            raise NotSupportedException("%s is an obsolete value. Use %s instead." % (value, new_value))
+
     # Always keep this line last
     raise ValueError("'%s' is not a valid value for %s!" % (value, pname))
 

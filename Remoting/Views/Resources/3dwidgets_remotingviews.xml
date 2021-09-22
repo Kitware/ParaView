@@ -1707,19 +1707,19 @@
                          name="WindowLocation"
                          number_of_elements="1">
         <EnumerationDomain name="enum">
-          <Entry text="AnyLocation"
+          <Entry text="Any Location"
                  value="0" />
-          <Entry text="LowerLeftCorner"
+          <Entry text="Lower Left Corner"
                  value="1" />
-          <Entry text="LowerRightCorner"
+          <Entry text="Lower Right Corner"
                  value="2" />
-          <Entry text="LowerCenter"
+          <Entry text="Lower Center"
                  value="3" />
-          <Entry text="UpperLeftCorner"
+          <Entry text="Upper Left Corner"
                  value="4" />
-          <Entry text="UpperRightCorner"
+          <Entry text="Upper Right Corner"
                  value="5" />
-          <Entry text="UpperCenter"
+          <Entry text="Upper Center"
                  value="6" />
         </EnumerationDomain>
         <Documentation>Specify placement of the color legend.</Documentation>
@@ -1779,19 +1779,19 @@
                          name="WindowLocation"
                          number_of_elements="1">
         <EnumerationDomain name="enum">
-          <Entry text="AnyLocation"
+          <Entry text="Any Location"
                  value="0" />
-          <Entry text="LowerLeftCorner"
+          <Entry text="Lower Left Corner"
                  value="1" />
-          <Entry text="LowerRightCorner"
+          <Entry text="Lower Right Corner"
                  value="2" />
-          <Entry text="LowerCenter"
+          <Entry text="Lower Center"
                  value="3" />
-          <Entry text="UpperLeftCorner"
+          <Entry text="Upper Left Corner"
                  value="4" />
-          <Entry text="UpperRightCorner"
+          <Entry text="Upper Right Corner"
                  value="5" />
-          <Entry text="UpperCenter"
+          <Entry text="Upper Center"
                  value="6" />
         </EnumerationDomain>
       </IntVectorProperty>

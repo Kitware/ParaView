@@ -54,12 +54,12 @@ public:
     this->Ui.gridLayout->setSpacing(pqPropertiesPanel::suggestedHorizontalSpacing());
 
     // Add location enum values to the buttons
-    this->Ui.toolButtonLL->setProperty("location", QVariant("LowerLeftCorner"));
-    this->Ui.toolButtonLR->setProperty("location", QVariant("LowerRightCorner"));
-    this->Ui.toolButtonLC->setProperty("location", QVariant("LowerCenter"));
-    this->Ui.toolButtonUL->setProperty("location", QVariant("UpperLeftCorner"));
-    this->Ui.toolButtonUR->setProperty("location", QVariant("UpperRightCorner"));
-    this->Ui.toolButtonUC->setProperty("location", QVariant("UpperCenter"));
+    this->Ui.toolButtonLL->setProperty("location", QVariant("Lower Left Corner"));
+    this->Ui.toolButtonLR->setProperty("location", QVariant("Lower Right Corner"));
+    this->Ui.toolButtonLC->setProperty("location", QVariant("Lower Center"));
+    this->Ui.toolButtonUL->setProperty("location", QVariant("Upper Left Corner"));
+    this->Ui.toolButtonUR->setProperty("location", QVariant("Upper Right Corner"));
+    this->Ui.toolButtonUC->setProperty("location", QVariant("Upper Center"));
   }
 
   QString windowLocation;
@@ -144,7 +144,7 @@ void pqTextLocationWidget::radioButtonLocationClicked()
 //-----------------------------------------------------------------------------
 void pqTextLocationWidget::radioButtonPositionClicked()
 {
-  QString str("AnyLocation");
+  QString str("Any Location");
   this->setWindowLocation(str);
 }
 
@@ -155,7 +155,7 @@ void pqTextLocationWidget::updateUI()
   QAbstractButton* buttonToCheck = nullptr;
   const QString& windowLocation = this->Internals->windowLocation;
 
-  bool anyLocation = (windowLocation == "AnyLocation");
+  bool anyLocation = (windowLocation == "Any Location");
   ui.radioButtonPosition->blockSignals(true);
   ui.radioButtonPosition->setChecked(anyLocation);
   ui.radioButtonPosition->blockSignals(false);

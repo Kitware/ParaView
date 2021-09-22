@@ -28,7 +28,7 @@ text1.Text = 'Interstellar clouds of gas and dust collapse to form stars'
 text1Display = Show(text1, renderView1, 'TextSourceRepresentation')
 text1Display.FontFamily = 'Times'
 text1Display.FontSize = 10
-text1Display.WindowLocation = 'AnyLocation'
+text1Display.WindowLocation = 'Any Location'
 text1Display.Position = [0.1, 0.0]
 
 text2 = Text()
@@ -37,7 +37,7 @@ text2.Text = text1.Text
 text2Display = Show(text2, renderView1, 'TextSourceRepresentation')
 text2Display.FontFamily = 'Times'
 text2Display.FontSize = 11
-text2Display.WindowLocation = 'AnyLocation'
+text2Display.WindowLocation = 'Any Location'
 text2Display.Position = [0.1, 0.1]
 
 text3 = Text()
@@ -46,7 +46,7 @@ text3.Text = text1.Text
 text3Display = Show(text3, renderView1, 'TextSourceRepresentation')
 text3Display.FontFamily = 'Times'
 text3Display.FontSize = 12
-text3Display.WindowLocation = 'AnyLocation'
+text3Display.WindowLocation = 'Any Location'
 text3Display.Position = [0.1, 0.2]
 
 text4 = Text()
@@ -55,7 +55,7 @@ text4.Text = text1.Text
 text4Display = Show(text4, renderView1, 'TextSourceRepresentation')
 text4Display.FontFamily = 'Times'
 text4Display.FontSize = 13
-text4Display.WindowLocation = 'AnyLocation'
+text4Display.WindowLocation = 'Any Location'
 text4Display.Position = [0.1, 0.3]
 
 text5 = Text()
@@ -64,7 +64,7 @@ text5.Text = text1.Text
 text5Display = Show(text5, renderView1, 'TextSourceRepresentation')
 text5Display.FontFamily = 'Times'
 text5Display.FontSize = 14
-text5Display.WindowLocation = 'AnyLocation'
+text5Display.WindowLocation = 'Any Location'
 text5Display.Position = [0.1, 0.4]
 text5Display.TextScaleMode = 'Viewport'
 
