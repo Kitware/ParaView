@@ -1,15 +1,16 @@
-# Copyright 2013-2020 Lawrence Livermore National Security, LLC and other
+# Copyright 2013-2021 Lawrence Livermore National Security, LLC and other
 # Spack Project Developers. See the top-level COPYRIGHT file for details.
 #
 # SPDX-License-Identifier: (Apache-2.0 OR MIT)
 
+import copy
+import itertools
+import os, os.path
+
 from spack import *
 from spack.fetch_strategy import fetcher, VCSFetchStrategy
-from spack.util.executable import which
 import llnl.util.tty as tty
 
-import os, os.path
-import copy
 
 @fetcher
 class LocalStrategy(VCSFetchStrategy):
@@ -56,12 +57,14 @@ class Paraview(CMakePackage, CudaPackage):
     list_depth = 1
     git      = "https://gitlab.kitware.com/paraview/paraview.git"
 
-    maintainers = ['chuckatkins', 'danlipsa']
+    maintainers = ['chuckatkins', 'danlipsa', 'vicentebolea']
 
     if enable_local_fetch_strategy:
         version('develop', file=_determine_paraview_source_dir(), preferred=True)
     else:
-        version('develop', branch='master', submodules=True)
+        version('master', branch='master', submodules=True)
+        version('5.9.1', sha256='0d486cb6fbf55e428845c9650486f87466efcb3155e40489182a7ea85dfd4c8d', preferred=True)
+        version('5.9.0', sha256='b03258b7cddb77f0ee142e3e77b377e5b1f503bcabc02bfa578298c99a06980d')
         version('5.8.1', sha256='7653950392a0d7c0287c26f1d3a25cdbaa11baa7524b0af0e6a1a0d7d487d034')
         version('5.8.0', sha256='219e4107abf40317ce054408e9c3b22fb935d464238c1c00c0161f1c8697a3f9')
         version('5.7.0', sha256='e41e597e1be462974a03031380d9e5ba9a7efcdb22e4ca2f3fec50361f310874')
@@ -93,6 +96,8 @@ class Paraview(CMakePackage, CudaPackage):
     variant('kits', default=True,
             description='Use module kits')
 
+    variant('advanced_debug', default=False, description="Enable all other debug flags beside build_type, such as VTK_DEBUG_LEAK")
+
     conflicts('+python', when='+python3')
     # Python 2 support dropped with 5.9.0
     conflicts('+python', when='@5.9:')
@@ -102,11 +107,18 @@ class Paraview(CMakePackage, CudaPackage):
     # See commit: https://gitlab.kitware.com/paraview/paraview/-/commit/798d328c
     conflicts('~opengl2', when='@5.5:')
 
-    depends_on('cmake@3.3:', type='build')
+    # We only support one single Architecture
+    for _arch, _other_arch in itertools.permutations(CudaPackage.cuda_arch_values, 2):
+        conflicts(
+            'cuda_arch={0}'.format(_arch),
+            when='cuda_arch={0}'.format(_other_arch),
+            msg='Paraview only accepts one architecture value'
+        )
 
-    # let's use Ninja
-    generator = 'Ninja'
-    depends_on('ninja', type='build')
+    for _arch in range(10, 14):
+        conflicts('cuda_arch=%d' % _arch, when="+cuda", msg='ParaView requires cuda_arch >= 20')
+
+    depends_on('cmake@3.3:', type='build')
 
     # Workaround for
     # adding the following to your packages.yaml
@@ -151,6 +163,8 @@ class Paraview(CMakePackage, CudaPackage):
     depends_on('double-conversion')
     depends_on('expat')
     depends_on('eigen@3:')
+    # Needs https://github.com/fmtlib/fmt/pull/2432 to be released
+    # depends_on('fmt', when='@5.10:')
     depends_on('freetype')
     # depends_on('hdf5+mpi', when='+mpi')
     # depends_on('hdf5~mpi', when='~mpi')
@@ -165,16 +179,24 @@ class Paraview(CMakePackage, CudaPackage):
     depends_on('netcdf-c')
     depends_on('pegtl')
     depends_on('protobuf@3.4:')
-    depends_on('pugixml')
     depends_on('libxml2')
     depends_on('lz4')
-    depends_on('lzma')
+    depends_on('xz')
     depends_on('zlib')
+
+    # Older builds of pugi export their symbols differently,
+    # and pre-5.9 is unable to handle that.
+    depends_on('pugixml@:1.10', when='@:5.8.99')
+    depends_on('pugixml', when='@5.9:')
 
     # Can't contretize with python2 and py-setuptools@45.0.0:
     depends_on('py-setuptools@:44.99.99', when='+python')
     # Can't contretize with python2 and py-pillow@7.0.0:
     depends_on('pil@:6', when='+python')
+
+    # ParaView depends on cli11 due to changes in MR
+    # https://gitlab.kitware.com/paraview/paraview/-/merge_requests/4951
+    depends_on('cli11@1.9.1', when='@5.10:')
 
     if enable_local_fetch_strategy:
         # skip patches
@@ -197,6 +219,9 @@ class Paraview(CMakePackage, CudaPackage):
         # Broken H5Part with external parallel HDF5
         patch('h5part-parallel.patch', when='@5.7:5.7.999')
 
+        # Broken downstream FindMPI
+        patch('vtkm-findmpi-downstream.patch', when='@5.9.0')
+
     def url_for_version(self, version):
         _urlfmt  = 'http://www.paraview.org/files/v{0}/ParaView-v{1}{2}.tar.{3}'
         """Handle ParaView version-based custom URLs."""
@@ -210,7 +235,7 @@ class Paraview(CMakePackage, CudaPackage):
     @property
     def paraview_subdir(self):
         """The paraview subdirectory name as paraview-major.minor"""
-        if self.spec.version == Version('develop'):
+        if self.spec.version == Version('master'):
             return 'paraview-5.9'
         else:
             return 'paraview-{0}'.format(self.spec.version.up_to(2))
@@ -228,6 +253,12 @@ class Paraview(CMakePackage, CudaPackage):
         else:
             env.set('PARAVIEW_VTK_DIR',
                     join_path(lib_dir, 'cmake', self.paraview_subdir, 'vtk'))
+
+    def flag_handler(self, name, flags):
+        if name == 'ldflags' and self.spec.satisfies('%intel'):
+            flags.append('-shared-intel')
+            return(None, flags, None)
+        return(flags, None, None)
 
     def setup_run_environment(self, env):
         # paraview 5.5 and later
@@ -301,6 +332,15 @@ class Paraview(CMakePackage, CudaPackage):
             '-DBUILD_TESTING:BOOL=OFF',
             '-DOpenGL_GL_PREFERENCE:STRING=LEGACY']
 
+        if spec.satisfies('@5.10:'):
+            cmake_args.extend([
+                '-DVTK_MODULE_USE_EXTERNAL_ParaView_vtkcatalyst:BOOL=OFF',
+                '-DVTK_MODULE_USE_EXTERNAL_VTK_cgns=OFF',
+                '-DVTK_MODULE_USE_EXTERNAL_VTK_ioss:BOOL=OFF',
+                '-DVTK_MODULE_USE_EXTERNAL_VTK_exprtk:BOOL=OFF',
+                '-DVTK_MODULE_USE_EXTERNAL_VTK_fmt:BOOL=OFF'
+            ])
+
         if spec.satisfies('@:5.7') and spec['cmake'].satisfies('@3.17:'):
             cmake_args.append('-DFPHSA_NAME_MISMATCHED:BOOL=ON')
 
@@ -309,6 +349,8 @@ class Paraview(CMakePackage, CudaPackage):
                 cmake_args.extend([
                     '-DPARAVIEW_USE_QT:BOOL=%s' % variant_bool('+qt'),
                     '-DPARAVIEW_BUILD_WITH_EXTERNAL=ON'])
+                if spec.satisfies('%cce'):
+                    cmake_args.append('-DVTK_PYTHON_OPTIONAL_LINK:BOOL=OFF')
             else:  # @5.7:
                 cmake_args.extend([
                     '-DPARAVIEW_BUILD_QT_GUI:BOOL=%s' % variant_bool('+qt'),
@@ -317,7 +359,7 @@ class Paraview(CMakePackage, CudaPackage):
             cmake_args.extend([
                 '-DPARAVIEW_ENABLE_EXAMPLES:BOOL=%s' % variant_bool(
                     '+examples'),
-                '-DVTK_MODULE_USE_EXTERNAL_VTK_cgns=OFF',
+                '-DVTK_MODULE_USE_EXTERNAL_ParaView_cgns=OFF',
                 '-DVTK_MODULE_USE_EXTERNAL_VTK_glew=OFF',
                 '-DVTK_MODULE_USE_EXTERNAL_VTK_gl2ps=OFF',
                 '-DVTK_MODULE_USE_EXTERNAL_VTK_libharu=OFF',
@@ -375,7 +417,7 @@ class Paraview(CMakePackage, CudaPackage):
                 '-DMPI_Fortran_COMPILER:PATH=%s' % spec['mpi'].mpifc
             ])
 
-            cmake_args.append(
+        cmake_args.append(
             '-DPARAVIEW_BUILD_SHARED_LIBS:BOOL=%s' % variant_bool('+shared'))
 
         if spec.satisfies('@5.8:'):
@@ -386,6 +428,42 @@ class Paraview(CMakePackage, CudaPackage):
         else:
             cmake_args.append('-DVTKm_ENABLE_CUDA:BOOL=%s' %
                               variant_bool('+cuda'))
+
+        # VTK-m expects cuda_arch to be the arch name vs. the arch version.
+        if spec.satisfies('+cuda'):
+            supported_cuda_archs = {
+
+                # VTK-m and transitively ParaView does not support Tesla Arch
+                '20': 'fermi',
+                '21': 'fermi',
+                '30': 'kepler',
+                '32': 'kepler',
+                '35': 'kepler',
+                '37': 'kepler',
+                '50': 'maxwel',
+                '52': 'maxwel',
+                '53': 'maxwel',
+                '60': 'pascal',
+                '61': 'pascal',
+                '62': 'pascal',
+                '70': 'volta',
+                '72': 'volta',
+                '75': 'turing',
+                '80': 'ampere',
+                '86': 'ampere',
+            }
+
+            cuda_arch_value = 'native'
+            requested_arch = spec.variants['cuda_arch'].value
+
+            # ParaView/VTK-m only accepts one arch, default to first element
+            if requested_arch[0] != 'none':
+                try:
+                    cuda_arch_value = supported_cuda_archs[requested_arch[0]]
+                except KeyError:
+                    raise InstallError("Incompatible cuda_arch=" + requested_arch[0])
+
+            cmake_args.append(self.define('VTKm_CUDA_Architecture', cuda_arch_value))
 
         if 'darwin' in spec.architecture:
             cmake_args.extend([
@@ -417,5 +495,17 @@ class Paraview(CMakePackage, CudaPackage):
         # arises.
         if '%intel' in spec and spec.version >= Version('5.6'):
             cmake_args.append('-DPARAVIEW_ENABLE_MOTIONFX:BOOL=OFF')
+
+        # Encourage Paraview to use the correct Python libs
+        if spec.satisfies('+python') or spec.satisfies('+python3'):
+            pylibdirs = spec['python'].libs.directories
+            cmake_args.append(
+                "-DCMAKE_INSTALL_RPATH={0}".format(
+                    ":".join(self.rpath + pylibdirs)
+                )
+            )
+
+        if '+advanced_debug' in spec:
+            cmake_args.append('-DVTK_DEBUG_LEAKS:BOOL=ON')
 
         return cmake_args

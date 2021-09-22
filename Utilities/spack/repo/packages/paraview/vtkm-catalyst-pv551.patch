@@ -4,9 +4,9 @@
 # paraview-5.6.
 # They are API-compatible with paraview-5.5 but not ABI compatible.
 #
-# https://gitlab.kitware.com/vtk/vtk-m/-/merge_requests/1166
-# https://gitlab.kitware.com/paraview/paraview/-/merge_requests/2433
-# https://gitlab.kitware.com/paraview/paraview/-/merge_requests/2436
+# https://gitlab.kitware.com/vtk/vtk-m/merge_requests/1166
+# https://gitlab.kitware.com/paraview/paraview/merge_requests/2433
+# https://gitlab.kitware.com/paraview/paraview/merge_requests/2436
 #
 --- ParaView-v5.5.0/VTK/ThirdParty/vtkm/vtk-m/CMake/VTKmDetermineVersion.cmake.orig	2018-04-06 22:03:33.000000000 +0200
 +++ ParaView-v5.5.0/VTK/ThirdParty/vtkm/vtk-m/CMake/VTKmDetermineVersion.cmake	2018-04-23 12:00:23.708544206 +0200
