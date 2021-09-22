@@ -89,9 +89,9 @@ responsible for pushing and popping the scope.
 
 Argument | Type | Description
 ---------|------|---------------------------------------------------------
-`{ANNOTATE_timevalue}` | double | The time-value of the information. Extracted from vtkDataObject::DATA_TIME_STEP().
+`{CALCULATOR_timevalue}` | double | The time-value of the information. Extracted from vtkDataObject::DATA_TIME_STEP().
 `{timestep}` | double | The time-value of the information. Extracted from vtkDataObject::DATA_TIME_STEP().
-`{ANNOTATE_timeindex}` | int | The index of the time-steps element which is equal to time-value. time-steps are extracted from vtkStreamingDemandDrivenPipeline::TIME_STEPS().
+`{CALCULATOR_timeindex}` | int | The index of the time-steps element which is equal to time-value. time-steps are extracted from vtkStreamingDemandDrivenPipeline::TIME_STEPS().
 `{timeindex}` | int | The index of the time-steps element which is equal to time-value. time-steps are extracted from vtkStreamingDemandDrivenPipeline::TIME_STEPS().
 
 All the aforementioned arguments can be used in appropriate ParaView use cases to format formattable strings.

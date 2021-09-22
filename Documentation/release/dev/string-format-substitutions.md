@@ -51,4 +51,4 @@ Currently, the following four modules utilize ``vtkPVStringFormatter``:
 
 ``PythonAnnotation`` used to use ``time_value``, ``time_steps``, ``time_range``, and ``time_index`` in the provided expression. Now it can also use ``{timevalue} == {ANNOTATE_timevalue}``, ``{timesteps} == {ANNOTATE_timesteps}``, ``{timerange} == {ANNOTATE_timerange}`` and ``{timeindex} == {ANNOTATE_timeindex}``.
 
-``PythonCalulator`` used to use ``time_value``, and ``time_index`` in the provided expression. Now it can also use ``{timevalue} == {ANNOTATE_timevalue}``, and ``{timeindex} == {ANNOTATE_timeindex}``.
+``PythonCalulator`` used to use ``time_value``, and ``time_index`` in the provided expression. Now it can also use ``{timevalue} == {CALCULATOR_timevalue}``, and ``{timeindex} == {CALCULATOR_timeindex}``.
