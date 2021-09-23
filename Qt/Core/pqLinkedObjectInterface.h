@@ -89,13 +89,6 @@ struct PQCORE_EXPORT pqLinkedObjectInterface
   };
 
   /**
-   * This method should either block or unblock all signals from the object. This is used to avoid
-   * infinite loop when copying the text from one object to the other.
-   * @return The old blocking state.
-   */
-  virtual QtSignalState blockSignals(QtSignalState lock) = 0;
-
-  /**
    * Updates the object text. This effectively should override the current content of the widget
    **/
   virtual void setText(const QString& txt) = 0;
@@ -123,6 +116,7 @@ struct PQCORE_EXPORT pqLinkedObjectInterface
 protected:
   pqLinkedObjectInterface* ConnectedTo = nullptr;
   QMetaObject::Connection Connection;
+  bool SettingText = false;
 };
 
 #endif // pqLinkedObjectInterface_h

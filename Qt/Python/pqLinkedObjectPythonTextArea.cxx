@@ -48,9 +48,10 @@ void pqLinkedObjectPythonTextArea::link(pqLinkedObjectInterface* other)
     const QUndoStack& undoStack = this->TextArea.getUndoStack();
     this->ConnectedTo = other;
     this->Connection = QObject::connect(&undoStack, &QUndoStack::indexChanged, [this]() {
-      QtSignalState state = this->ConnectedTo->blockSignals(QtSignalState::Off);
-      this->ConnectedTo->setText(this->getText());
-      this->ConnectedTo->blockSignals(state);
+      if (!this->SettingText)
+      {
+        this->ConnectedTo->setText(this->getText());
+      }
     });
   }
 }

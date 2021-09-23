@@ -41,9 +41,10 @@ void pqLinkedObjectQTextEdit::link(pqLinkedObjectInterface* other)
   {
     this->ConnectedTo = other;
     this->Connection = QObject::connect(&this->TextEdit, &QTextEdit::textChanged, [this]() {
-      QtSignalState state = this->ConnectedTo->blockSignals(QtSignalState::Off);
-      this->ConnectedTo->setText(this->getText());
-      this->ConnectedTo->blockSignals(state);
+      if (!this->SettingText)
+      {
+        this->ConnectedTo->setText(this->getText());
+      }
     });
   }
 }
@@ -59,15 +60,11 @@ void pqLinkedObjectQTextEdit::unlink()
 }
 
 //-----------------------------------------------------------------------------
-pqLinkedObjectInterface::QtSignalState pqLinkedObjectQTextEdit::blockSignals(QtSignalState block)
-{
-  return static_cast<QtSignalState>(this->TextEdit.blockSignals(!static_cast<bool>(block)));
-}
-
-//-----------------------------------------------------------------------------
 void pqLinkedObjectQTextEdit::setText(const QString& txt)
 {
+  this->SettingText = true;
   this->TextEdit.setHtml(txt);
+  this->SettingText = false;
 }
 
 //-----------------------------------------------------------------------------
