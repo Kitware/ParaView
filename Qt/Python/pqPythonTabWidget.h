@@ -152,7 +152,8 @@ private:
   void addNewTabWidget();
   void setTabCloseButton(pqPythonTextArea* widget);
   void createParaviewTraceTab();
-  QString generateTabName(const pqPythonTextArea* widget) const;
+  void generateTabName(const pqPythonTextArea* widget, QString& tabName, QString& elidedTabName,
+    QString& unstyledTabName) const;
 
   /**
    * @brief Returns -1 if the editor doesn't contain

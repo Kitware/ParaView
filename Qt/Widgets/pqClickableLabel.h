@@ -53,8 +53,10 @@ public:
   /**
    * @brief Default constructor that sets up the tooltip
    * and the label pixmap or text.
+   * If the pixmap is nullptr, it will not be set.
    */
-  pqClickableLabel(QWidget* widget, QString text, QPixmap* pixmap, QWidget* parent);
+  pqClickableLabel(QWidget* widget, const QString& text, const QString& tooltip,
+    const QString& statusTip, QPixmap* pixmap, QWidget* parent);
 
   /**
    * @brief Defaulted destructor for polymorphism

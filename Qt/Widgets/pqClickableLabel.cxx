@@ -34,19 +34,17 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QMouseEvent>
 
 //-----------------------------------------------------------------------------
-pqClickableLabel::pqClickableLabel(QWidget* widget, QString text, QPixmap* pixmap, QWidget* parent)
+pqClickableLabel::pqClickableLabel(QWidget* widget, const QString& text, const QString& tooltip,
+  const QString& statusTip, QPixmap* pixmap, QWidget* parent)
   : QLabel(parent)
   , Widget(widget)
 {
-  this->setToolTip(text);
-  this->setStatusTip(text);
+  this->setText(text);
+  this->setToolTip(tooltip);
+  this->setStatusTip(statusTip);
   if (pixmap)
   {
     this->setPixmap(*pixmap);
-  }
-  else
-  {
-    this->setText(text);
   }
 }
 
