@@ -1,0 +1,17 @@
+<?xml version="1.0" ?>
+<pqevents>
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuSources" />
+  <pqevent object="pqClientMainWindow/menubar/menuSources/Alphabetical" command="activate" arguments="ProgrammableSource" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/Script/Script" command="set_string" arguments="print(&quot;Hello" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/Script/1QWidget0/1QPushButton0" command="activate" arguments="" />
+  <pqcheck object="pqClientMainWindow/1pqPythonScriptEditor0/1pqPythonTabWidget0/qt_tabwidget_stackedwidget/1pqPythonTextArea0/1QTextEdit0" property="plainText" arguments="print(&quot;Hello" />
+  <pqcheck object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/Script/Script" property="plainText" arguments="print(&quot;Hello" />
+  <pqevent object="pqClientMainWindow/1pqPythonScriptEditor0/1pqPythonTabWidget0/qt_tabwidget_stackedwidget/1pqPythonTextArea0/1QTextEdit0" command="set_string" arguments="print(&quot;Hello World" />
+  <pqcheck object="pqClientMainWindow/1pqPythonScriptEditor0/1pqPythonTabWidget0/qt_tabwidget_stackedwidget/1pqPythonTextArea0/1QTextEdit0" property="plainText" arguments="print(&quot;Hello World" />
+  <pqcheck object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/Script/Script" property="plainText" arguments="print(&quot;Hello World" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/Script/Script" command="set_string" arguments="print(&quot;Hello World&quot;)" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
+  <pqcheck object="pqClientMainWindow/1pqPythonScriptEditor0/1pqPythonTabWidget0/qt_tabwidget_stackedwidget/1pqPythonTextArea0/1QTextEdit0" property="plainText" arguments="print(&quot;Hello World&quot;)" />
+  <pqcheck object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/Script/Script" property="plainText" arguments="print(&quot;Hello World&quot;)" />
+</pqevents>
