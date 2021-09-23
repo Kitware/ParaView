@@ -32,5 +32,22 @@
         </PropertyGroup>
       </ContextViewProxy>
     </ProxyGroup>
+    <ProxyGroup name="filters">
+     <SourceProxy name="MySliceFilter" label="MySlice"
+                  class="vtkPVMetaSliceDataSet"
+                  base_proxygroup="filters"
+                  base_proxyname="Cut">
+        <ProxyProperty command="SetDataSetCutFunction"
+                       label="Slice Type"
+                       override="1"
+                       name="CutFunction">
+          <ProxyListDomain name="proxy_list">
+              <Group name="slice_implicit_functions" default="Box" />
+          </ProxyListDomain>
+          <Documentation>This property sets the parameters of the slice
+          function.</Documentation>
+        </ProxyProperty>
+     </SourceProxy>
+   </ProxyGroup>
   </ServerManagerConfiguration>
 </ParaViewPlugin>

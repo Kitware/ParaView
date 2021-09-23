@@ -52,6 +52,7 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${paraview_test_data_directory_input}/Data/MultiBlockWithPieces_1_0.vtp}"
   "DATA{${paraview_test_data_directory_input}/Data/NE2_ps_bath.png}"
   "DATA{${paraview_test_data_directory_input}/Data/OMETIFF/multi-channel-time-series.ome.tif}"
+  "DATA{${paraview_test_data_directory_input}/Data/OverridePropertyPlugin.xml}"
   "DATA{${paraview_test_data_directory_input}/Data/PlotOverLineLegacy.pvsm}"
   "DATA{${paraview_test_data_directory_input}/Data/PropertyLink.pvsm}"
   "DATA{${paraview_test_data_directory_input}/Data/RectGrid2.vtk}"
@@ -620,6 +621,7 @@ SET (TESTS_WITHOUT_BASELINES
   ModifyGUIWindowTitle.xml
   OpacityWidgetRange.xml
   OpenHelp.xml
+  OverrideProperty.xml
   PartialArrayInLineChart.xml
   PlotOverLineLegacy.xml
   PointCellDataConversion.xml
