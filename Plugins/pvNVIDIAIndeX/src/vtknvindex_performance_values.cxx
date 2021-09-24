@@ -32,6 +32,7 @@
 #include "vtksys/SystemTools.hxx"
 
 #include "vtknvindex_forwarding_logger.h"
+#include "vtknvindex_global_settings.h"
 #include "vtknvindex_instance.h"
 #include "vtknvindex_performance_values.h"
 
@@ -40,7 +41,6 @@
 //-------------------------------------------------------------------------------------------------
 vtknvindex_performance_values::vtknvindex_performance_values()
   : m_print_header(true)
-  , m_performance_log_file("nvindex_perf_log.txt")
 {
   // empty
 }
@@ -53,20 +53,33 @@ void vtknvindex_performance_values::print_perf_values(
   mi::base::Handle<nv::index::IFrame_results> frame_results, mi::Uint32 time_step)
 {
   // Prints only a subset of the full performance values that NVIDIA IndeX provides.
-  // Additional fields can be added as and when required.
+  // Additional fields can be added when required.
+
+  std::string filename;
+  if (vtknvindex_global_settings::GetInstance()->GetOutputPerformanceValuesFilename())
+  {
+    filename = vtknvindex_global_settings::GetInstance()->GetOutputPerformanceValuesFilename();
+  }
 
   vtksys::ofstream file_handler;
-  file_handler.open(m_performance_log_file.c_str(), std::ios::out | std::ios::app);
+  if (!filename.empty())
+  {
+    file_handler.open(filename.c_str(), std::ios::out | std::ios::app);
+  }
   std::ostringstream s;
   const std::streamsize ssize_time(10);
 
+  if (filename != m_last_log_file)
+  {
+    m_last_log_file = filename;
+    m_print_header = true;
+  }
+
   if (m_print_header)
   {
-    std::vector<std::string> path_components;
-    path_components.push_back(vtksys::SystemTools::GetCurrentWorkingDirectory() + "/");
-    path_components.push_back(m_performance_log_file);
-    INFO_LOG << "Writing performance values to '" << vtksys::SystemTools::JoinPath(path_components)
-             << "'";
+    WARN_LOG << "Writing performance values to "
+             << (filename.empty() ? "standard output" : "'" + filename + "'")
+             << ". This can be disabled in the 'Settings' dialog.";
 
     std::ostringstream header_str;
 
@@ -165,7 +178,14 @@ void vtknvindex_performance_values::print_perf_values(
                << std::setw(ssize_time) << "S_GPU_M" << std::setw(ssize_time) << "N_SPANS"
                << "\n";
 
-    file_handler << header_str.str();
+    if (filename.empty())
+    {
+      std::cout << header_str.str();
+    }
+    else
+    {
+      file_handler << header_str.str();
+    }
     m_print_header = false;
   }
   const mi::base::Handle<nv::index::IPerformance_values> perf_values(
@@ -187,8 +207,15 @@ void vtknvindex_performance_values::print_perf_values(
     << to_string(perf_values->get("size_gpu_memory_used")) << std::setw(ssize_time)
     << perf_values->get("nb_horizontal_spans") << "\n";
 
-  file_handler << s.str();
-  file_handler.close();
+  if (filename.empty())
+  {
+    std::cout << s.str();
+  }
+  else
+  {
+    file_handler << s.str();
+    file_handler.close();
+  }
 }
 
 //-------------------------------------------------------------------------------------------------

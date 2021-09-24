@@ -773,6 +773,79 @@ ParaView's filter `vtkExtractHistogram` has been multithreaded using `vtkSMPTool
 
 Additionally, `TestExtractHistogram` test has been re-enabled.
 
+## NVIDIA IndeX plugin improvements
+
+### Cropping structured grid rendering
+
+Structured grids rendered by the "NVIDIA IndeX" representation can now be
+cropped to a volume of interest (VOI) by checking the "Use Cropping" property.
+Cropping is controlled by an interactive box widget or through the associated
+text widgets.
+
+This replaces the custom "NVIDIA IndeX Region of Interest" properties, which
+however are still in use for unstructured grids. Existing state files that rely
+on the old properties will continue to work, but a warning will be printed,
+showing the corresponding settings for the "Cropping Origin" and "Cropping
+Scale" parameters.
+
+### Remote rendering on macOS clients
+
+A limited "remote rendering only" version of the NVIDIA IndeX plugin is now
+available for macOS, making it possible to connect a macOS ParaView client to a
+remote `pvserver` running Linux and rendering with NVIDIA IndeX there. The
+plugin does not support local rendering on macOS and an error will be printed
+when the user tries to enable the "NVIDIA IndeX" representation locally.
+
+### Additional data type support
+
+32-bit integer data values (signed/unsigned) of structured and unstructured
+grids will be automatically converted to an internal float representation by
+the plugin, to enable efficient rendering. This automatic data conversion does
+not affect the memory utilization.
+
+Multiple components per voxel (e.g. vector or RGB data) are now supported for
+structured grids. The component to be rendered can be selected with the
+"Coloring" setting in the "Properties" panel. Rendering the vector magnitude is
+also supported.
+
+### Settings dialog
+
+Plugin settings can be changed in the new "NVIDIA IndeX" tab of the "Settings"
+dialog:
+
+* Logging: The minimum required severity level for messages to appear in
+  ParaView's "Output Messages" window as well as on standard output can be set.
+  The current timestamp and the hostname can optionally be added to each log
+  message.
+
+* Performance values: Output statistics about rendering performance to a file
+  or to standard output.
+
+* Session export: Output the state of the NVIDIA IndeX scene to a file or to
+  standard output.
+
+* Network Configuration: Various settings for running on multiple hosts in
+  cluster mode. This covers the same settings as in `nvindex_config.xml`, which
+  still takes precedence if it exists.
+
+* Extra Configuration: Allows setting low-level configuration options, e.g. for
+  performance tuning.
+
+* License keys: An NVIDIA IndeX license (e.g. for enabling cluster mode) can
+  now be entered directly in the UI, as an alternative to using environment
+  variables or `nvindex_config.xml` (both have precedence).
+
+### Stability fixes and usability improvements
+
+Fixed the "Update kernel" button not always updating the rendering after the
+source code of an XAC shader was modified.
+
+On Windows, the NVIDIA IndeX plugin can now be used to connect to a remote
+`pvserver` even if no NVIDIA display driver is installed locally.
+
+Fixed an issue that could lead to visible seams on structured grids for certain
+configurations when rendering in cluster mode on multiple hosts.
+
 
 # ParaView Plugin debugging #
 

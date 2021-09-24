@@ -34,6 +34,8 @@
 
 #include <nv/index/version.h>
 
+#include "vtknvindex_global_settings.h"
+
 //----------------------------------------------------------------------
 vtknvindex_receiving_logger::vtknvindex_receiving_logger() = default;
 
@@ -46,12 +48,21 @@ void vtknvindex_receiving_logger::message(mi::base::Message_severity level, cons
     return;
 #endif
 
+  mi::base::Message_severity level_output = mi::base::MESSAGE_SEVERITY_WARNING;
+  mi::base::Message_severity level_stdout = mi::base::MESSAGE_SEVERITY_VERBOSE;
+  vtknvindex_global_settings* settings = vtknvindex_global_settings::GetInstance();
+  if (settings)
+  {
+    level_output = mi::base::Message_severity(settings->GetLogLevel());
+    level_stdout = mi::base::Message_severity(settings->GetLogLevelStandardOutput());
+  }
+
   std::string message_str = message;
 
   if (message_str.empty() && level > mi::base::MESSAGE_SEVERITY_FATAL)
     return; // no message
 
-  bool use_output_window = (level <= mi::base::MESSAGE_SEVERITY_WARNING);
+  bool use_output_window = (level <= level_output);
   const std::string prefix = "nvindex: ";
 
   // Customize how some specific log messages are handled
@@ -128,7 +139,7 @@ void vtknvindex_receiving_logger::message(mi::base::Message_severity level, cons
       vtkObject::BreakOnError();
     }
   }
-  else
+  else if (level <= level_stdout)
   {
     // Log only to console.
     std::cout << prefix << message_str << std::endl;

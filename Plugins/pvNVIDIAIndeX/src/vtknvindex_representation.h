@@ -125,12 +125,6 @@ public:
   // Set opacity reference.
   void set_opacity_reference(double opacity_reference);
 
-  // Set dump internal state of NVIDIA IndeX.
-  void set_dump_internal_state(bool is_dump);
-
-  // Set flag to log performance values.
-  void set_log_performance(bool is_log);
-
   // Set slice parameters.
   void show_volume(bool enable);
   void set_selected_slice(int selected_slice);
@@ -188,7 +182,7 @@ public:
   void set_custom_pint_3(int ci3);
   void set_custom_pint_4(int ci4);
 
-  // Set region of interest.
+  // Set region of interest: Deprecated, use "Cropping" instead.
   void update_index_roi();
 
   void set_roi_minI(double val);
@@ -222,7 +216,10 @@ private:
     mi::Float64 time, const mi::Float64* time_steps, mi::Sint32 nb_tsteps) const;
 
   // Update current kernel
-  void update_current_kernel();
+  bool update_current_kernel();
+
+  // Update current kernel source code.
+  void update_current_kernel_source(bool need_force_render = false);
 
   // For the GUI
   double m_roi_range_I[2];
@@ -232,9 +229,9 @@ private:
   vtkMultiProcessController* m_controller;           // MPI controller from ParaView.
   vtknvindex_config_settings* m_app_config_settings; // Application side config settings.
   vtknvindex_cluster_properties*
-    m_cluster_properties; // Cluster wide properties, refer class documentation.
-  mi::math::Bbox_struct<mi::Float32, 3> m_roi_gui; // Region of interest set in the GUI.
-  mi::math::Vector<mi::Uint32, 3> m_volume_size;   // Cached volume size.
+    m_cluster_properties;                   // Cluster wide properties, refer class documentation.
+  mi::math::Bbox<mi::Float32, 3> m_roi_gui; // Region of interest set in the GUI.
+  mi::math::Vector<mi::Uint32, 3> m_volume_size; // Cached volume size.
 
   // backup of original Image Reduction Factors
   mi::Sint32 m_still_image_reduction_factor;

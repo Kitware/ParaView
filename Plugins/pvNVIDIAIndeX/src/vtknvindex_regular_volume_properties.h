@@ -49,7 +49,13 @@ public:
 
   // Scalar type of the volumetric (vtkImageData) dataset.
   void set_scalar_type(std::string scalar_type);
-  void get_scalar_type(std::string& scalar_type) const;
+  std::string get_scalar_type() const;
+
+  // Number of components of the volumetric (vtkImageData) dataset, when >= 1.
+  // If negative, the absolute value represents the number of components of the original dataset,
+  // of which only one will have been extracted into the current dataset.
+  void set_scalar_components(mi::Sint32 components);
+  mi::Sint32 get_scalar_components() const;
 
   // Voxel range of the volumetric (vtkImageData) dataset, i.e. the range of actual data values.
   void set_voxel_range(mi::math::Vector<mi::Float32, 2> voxel_range);
@@ -133,6 +139,7 @@ private:
   mi::Uint32 m_time_step_start;    // Starting timestep.
 
   std::string m_scalar_type;                             // Volume's scalar type as string.
+  mi::Sint32 m_scalar_components;                        // Number of components.
   mi::math::Bbox<mi::Sint32, 3> m_volume_extents;        // ParaView volume extents.
   mi::math::Bbox<mi::Float32, 3> m_ivol_volume_extents;  // ParaView irregular volume extents.
   mi::math::Vector<mi::Float32, 2> m_voxel_range;        // Voxel range of the Volume data.

@@ -106,8 +106,7 @@ void vtknvindex_colormap::get_paraview_colormaps(vtkVolume* vol,
 
   // Normalize the range only if it is not floating point data.
   // If float, set the domain values as-is from ParaView.
-  std::string scalar_type;
-  regular_volume_properties->get_scalar_type(scalar_type);
+  const std::string scalar_type = regular_volume_properties->get_scalar_type();
 
   // Colormap size used by ParaView
   // see vtkOpenGLVolumeRGBTable
@@ -117,8 +116,10 @@ void vtknvindex_colormap::get_paraview_colormaps(vtkVolume* vol,
   std::vector<mi::Float32> opacity_array;
 
   mi::math::Vector<mi::Float32, 2> domain_range;
-  if (scalar_type != "float" && scalar_type != "double")
+  if (scalar_type != "float" && scalar_type != "double" && scalar_type != "int" &&
+    scalar_type != "unsigned int")
   {
+    // The scalar type is float or is internally converted to float (e.g. for "int")
     mi::math::Vector<mi::Float32, 2> scalar_range;
     regular_volume_properties->get_scalar_range(scalar_range);
 
@@ -134,8 +135,8 @@ void vtknvindex_colormap::get_paraview_colormaps(vtkVolume* vol,
   // Read color values from ParaView.
   color_array.resize(3 * array_size);
 
-  // using Logarithmic scale?
-  if (app_color_transfer_function->GetScale())
+  // Using logarithmic scale?
+  if (app_color_transfer_function->UsingLogScale())
   {
     double color[3];
     for (mi::Uint32 i = 0; i < array_size; i++)

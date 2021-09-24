@@ -55,6 +55,11 @@ inline nv::index::Sparse_volume_voxel_format match_volume_format(const std::stri
   {
     return nv::index::SPARSE_VOLUME_VOXEL_FORMAT_SINT16;
   }
+  else if (fmt_string == "int" || fmt_string == "unsigned int")
+  {
+    // IndeX doesn't support (unsigned) int, will be converted to float
+    return nv::index::SPARSE_VOLUME_VOXEL_FORMAT_FLOAT32;
+  }
   else if (fmt_string == "float" || fmt_string == "double")
   {
     return nv::index::SPARSE_VOLUME_VOXEL_FORMAT_FLOAT32;
@@ -87,12 +92,14 @@ inline mi::Size volume_format_size(const nv::index::Sparse_volume_voxel_format f
 vtknvindex_import_bricks::vtknvindex_import_bricks(
   const nv::index::ISparse_volume_subset_data_descriptor* subset_data_descriptor,
   nv::index::ISparse_volume_subset* volume_subset, const mi::Uint8* source_buffer,
-  mi::Size vol_fmt_size, mi::Sint32 border_size, mi::Sint32 ghost_levels,
-  const vtknvindex::util::Bbox3i& source_bbox, const vtknvindex_volume_neighbor_data* neighbor_data)
+  mi::Size vol_fmt_size, const std::string& source_scalar_type, mi::Sint32 border_size,
+  mi::Sint32 ghost_levels, const vtknvindex::util::Bbox3i& source_bbox,
+  const vtknvindex_volume_neighbor_data* neighbor_data)
   : m_subset_data_descriptor(subset_data_descriptor)
   , m_volume_subset(volume_subset)
   , m_source_buffer(source_buffer)
   , m_vol_fmt_size(vol_fmt_size)
+  , m_source_scalar_type(source_scalar_type)
   , m_border_size(border_size)
   , m_ghost_levels(ghost_levels)
   , m_source_bbox(source_bbox)
@@ -229,6 +236,21 @@ void clamp_to_border(const mi::math::Bbox<mi::Sint32, 3>& brick_bbox_global,
       memcpy(brick_buffer + dst, brick_buffer + src, len_x * voxel_fmt_size);
     }
   }
+}
+
+// In contrast to Bbox::intersects(), this does not consider bboxes intersecting when only their
+// boundaries intersect.
+inline bool bbox_interior_intersects(
+  const mi::math::Bbox<mi::Sint32, 3>& box, const mi::math::Bbox<mi::Sint32, 3>& other)
+{
+  for (mi::Size i = 0; i < 3; ++i)
+  {
+    if ((box.min[i] >= other.max[i]) || (box.max[i] <= other.min[i]))
+    {
+      return false;
+    }
+  }
+  return true;
 }
 
 } // namespace
@@ -458,8 +480,8 @@ void vtknvindex_import_bricks::execute_fragment(
           continue;
         }
 
-        if (dest_brick_bbox_clipped_with_border_inner.contains(neighbor->query_bbox.min) &&
-          dest_brick_bbox_clipped_with_border_inner.contains(neighbor->query_bbox.max))
+        if (bbox_interior_intersects(
+              dest_brick_bbox_clipped_with_border_inner, neighbor->query_bbox))
         {
 #if 0
           ERROR_LOG << "** neighbor " << neighbor->direction << " for dest "
@@ -489,6 +511,27 @@ void vtknvindex_import_bricks::execute_fragment(
     //
     clamp_to_border(dest_brick_bbox, dest_brick_bbox_clipped_with_border_inner,
       dest_brick_bbox_clipped_with_border, svol_brick_data_raw, m_vol_fmt_size);
+
+    // In-place conversion of (unsigned) int data to float
+    mi::Float32* dst = reinterpret_cast<mi::Float32*>(svol_brick_data_raw);
+    const mi::Size size =
+      static_cast<mi::Size>(dest_brick_dims.x) * dest_brick_dims.y * dest_brick_dims.y;
+    if (m_source_scalar_type == "int")
+    {
+      const mi::Sint32* src = reinterpret_cast<mi::Sint32*>(svol_brick_data_raw);
+      for (mi::Size i = 0; i < size; ++i)
+      {
+        dst[i] = static_cast<mi::Float32>(src[i]);
+      }
+    }
+    else if (m_source_scalar_type == "unsigned int")
+    {
+      const mi::Uint32* src = reinterpret_cast<mi::Uint32*>(svol_brick_data_raw);
+      for (mi::Size i = 0; i < size; ++i)
+      {
+        dst[i] = static_cast<mi::Float32>(src[i]);
+      }
+    }
   }
 }
 
@@ -501,11 +544,12 @@ mi::Size vtknvindex_import_bricks::get_nb_fragments() const
 //-------------------------------------------------------------------------------------------------
 vtknvindex_sparse_volume_importer::vtknvindex_sparse_volume_importer(
   const mi::math::Vector_struct<mi::Uint32, 3>& volume_size, mi::Sint32 border_size,
-  mi::Sint32 ghost_levels, const std::string& scalar_type)
+  mi::Sint32 ghost_levels, const std::string& scalar_type, mi::Sint32 scalar_components)
   : m_border_size(border_size)
   , m_ghost_levels(ghost_levels)
   , m_volume_size(volume_size)
   , m_scalar_type(scalar_type)
+  , m_scalar_components(scalar_components)
   , m_cluster_properties(nullptr)
 {
   // empty
@@ -665,17 +709,27 @@ nv::index::IDistributed_data_subset* vtknvindex_sparse_volume_importer::create(
     shm_info->m_neighbors->fetch_data(host_props, time_step);
   }
 
+  std::string converted_msg;
+  if (m_scalar_components < 0)
+  {
+    // A single component was extracted out of the original multi-component volume
+    converted_msg += "single component, ";
+  }
+  if (m_scalar_type == "double" || m_scalar_type == "int" || m_scalar_type == "unsigned int")
+  {
+    converted_msg += "converted to float, ";
+  }
+
   INFO_LOG << "Importing volume data from " << (rankid == shm_info->m_rank_id ? "local" : "shared")
            << " "
-           << "memory (" << shm_info->m_shm_name << ") on rank " << rankid << ", "
-           << (m_scalar_type == "double" ? "converted to float, " : "") << "data bbox " << shm_bbox
-           << ", "
+           << "memory (" << shm_info->m_shm_name << ") on rank " << rankid << ", " << converted_msg
+           << "data bbox " << shm_bbox << ", "
            << "importer bbox " << bounding_box << ", border " << m_ghost_levels << "/"
            << m_border_size << ".";
 
   // Import all bricks for the subregion in parallel
   vtknvindex_import_bricks import_bricks_job(svol_subset_desc.get(), svol_data_subset.get(),
-    subset_data_buffer, vol_fmt_size, m_border_size, m_ghost_levels, shm_bbox,
+    subset_data_buffer, vol_fmt_size, m_scalar_type, m_border_size, m_ghost_levels, shm_bbox,
     shm_info->m_neighbors.get());
 
   dice_transaction->execute_fragmented(&import_bricks_job, import_bricks_job.get_nb_fragments());
@@ -712,6 +766,7 @@ void vtknvindex_sparse_volume_importer::set_cluster_properties(
 void vtknvindex_sparse_volume_importer::serialize(mi::neuraylib::ISerializer* serializer) const
 {
   vtknvindex::util::serialize(serializer, m_scalar_type);
+  serializer->write(&m_scalar_components);
   serializer->write(&m_volume_size.x, 3);
   serializer->write(&m_border_size);
   serializer->write(&m_ghost_levels);
@@ -724,6 +779,7 @@ void vtknvindex_sparse_volume_importer::serialize(mi::neuraylib::ISerializer* se
 void vtknvindex_sparse_volume_importer::deserialize(mi::neuraylib::IDeserializer* deserializer)
 {
   vtknvindex::util::deserialize(deserializer, m_scalar_type);
+  deserializer->read(&m_scalar_components);
   deserializer->read(&m_volume_size.x, 3);
   deserializer->read(&m_border_size);
   deserializer->read(&m_ghost_levels);

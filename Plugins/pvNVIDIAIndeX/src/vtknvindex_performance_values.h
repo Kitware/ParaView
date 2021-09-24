@@ -58,7 +58,7 @@ private:
   std::string to_string(mi::Uint64 memory) const;
 
   bool m_print_header;
-  std::string m_performance_log_file;
+  std::string m_last_log_file;
 };
 
 // General use system information

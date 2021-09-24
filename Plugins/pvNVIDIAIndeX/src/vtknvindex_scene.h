@@ -107,7 +107,7 @@ public:
 
 private:
   // Dump internal state of NVIDIA IndeX
-  void export_session();
+  void export_session(const char* filename);
 
   mi::Float32 calculate_volume_reference_step_size(
     vtkVolume* vol, mi::Uint32 mode, mi::Float32 opacity) const;

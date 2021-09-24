@@ -49,6 +49,7 @@
 #include "vtkFixedPointVolumeRayCastMapper.h"
 #include "vtkImageData.h"
 
+#include "vtkColorTransferFunction.h"
 #include "vtkDataArray.h"
 #include "vtkMatrix4x4.h"
 #include "vtkMultiThreader.h"
@@ -70,6 +71,7 @@
 
 #include "vtknvindex_cluster_properties.h"
 #include "vtknvindex_forwarding_logger.h"
+#include "vtknvindex_global_settings.h"
 #include "vtknvindex_instance.h"
 #include "vtknvindex_utilities.h"
 #include "vtknvindex_volumemapper.h"
@@ -86,17 +88,15 @@ vtknvindex_volumemapper::vtknvindex_volumemapper()
   , m_volume_changed(false)
   , m_rtc_kernel_changed(false)
   , m_rtc_param_changed(false)
+  , m_last_MTime(0)
+  , m_prev_vector_component(-1)
+  , m_prev_vector_mode(-1)
   , m_is_mpi_rendering(false)
+  , m_region_of_interest_deprecated_warning_printed(false)
 
 {
   m_index_instance = vtknvindex_instance::get();
   m_controller = vtkMultiProcessController::GetGlobalController();
-
-  for (mi::Uint32 i = 0; i < 6; i++)
-    m_whole_bounds[i] = 0.0;
-
-  m_prev_property = "";
-  m_last_MTime = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -112,7 +112,7 @@ double* vtknvindex_volumemapper::GetBounds()
 }
 
 //----------------------------------------------------------------------------
-void vtknvindex_volumemapper::set_whole_bounds(const mi::math::Bbox<mi::Float64, 3> bounds)
+void vtknvindex_volumemapper::set_whole_bounds(const mi::math::Bbox<mi::Float64, 3>& bounds)
 {
   m_whole_bounds[0] = bounds.min.x;
   m_whole_bounds[1] = bounds.max.x;
@@ -172,6 +172,19 @@ bool vtknvindex_volumemapper::prepare_data(mi::Sint32 time_step)
     scalar_array = this->GetScalars(image_piece, this->ScalarMode, this->ArrayAccessMode,
       this->ArrayId, this->ArrayName, cell_flag);
 
+    vtkDataArray* converted_array = this->convert_scalar_array(scalar_array);
+    if (converted_array)
+    {
+      scalar_array = converted_array;
+      // Keep track of converted array, to ensure it will be freed
+      m_converted_scalar_arrays[time_step] = vtkSmartPointer<vtkDataArray>::Take(converted_array);
+    }
+    else
+    {
+      // Conversion not necessary, use scalar_array directly
+      m_converted_scalar_arrays[time_step] = nullptr;
+    }
+
     m_subset_ptrs[time_step] = scalar_array->GetVoidPointer(0);
   }
 
@@ -213,6 +226,7 @@ bool vtknvindex_volumemapper::initialize_mapper(vtkVolume* vol)
   {
     m_subset_ptrs.resize(1);
   }
+  m_converted_scalar_arrays.resize(m_subset_ptrs.size());
 
   // Update in_volume first to make sure states are current.
   vol->Update();
@@ -226,19 +240,11 @@ bool vtknvindex_volumemapper::initialize_mapper(vtkVolume* vol)
   }
 
   mi::Sint32 cell_flag;
-  m_scalar_array = this->GetScalars(image_piece, this->ScalarMode, this->ArrayAccessMode,
-    this->ArrayId, this->ArrayName, cell_flag);
+  vtkDataArray* scalar_array = this->GetScalars(image_piece, this->ScalarMode,
+    this->ArrayAccessMode, this->ArrayId, this->ArrayName, cell_flag);
+  m_scalar_array = scalar_array;
 
   bool is_data_supported = true;
-
-  // Data can only have a single component (not RGB/HSV format)
-  const int components = m_scalar_array->GetNumberOfComponents();
-  if (components > 1)
-  {
-    ERROR_LOG << "The data array '" << this->ArrayName << "' has " << components << " components, "
-              << "which is not supported by NVIDIA IndeX.";
-    is_data_supported = false;
-  }
 
   // Only per cell scalars are allowed
   if (cell_flag > 0)
@@ -251,7 +257,7 @@ bool vtknvindex_volumemapper::initialize_mapper(vtkVolume* vol)
   }
 
   // Check for valid data types
-  const std::string scalar_type = m_scalar_array->GetDataTypeAsString();
+  const std::string scalar_type = scalar_array->GetDataTypeAsString();
   if (vtknvindex_regular_volume_properties::get_scalar_size(scalar_type) == 0)
   {
     ERROR_LOG << "The data array '" << this->ArrayName << "' uses the scalar type '" << scalar_type
@@ -261,12 +267,15 @@ bool vtknvindex_volumemapper::initialize_mapper(vtkVolume* vol)
   else if (scalar_type == "double" && is_data_supported)
   {
     // Only print the warning once per data array, and do not repeat when switching between arrays.
+    // No warning for "int" and "unsigned int" because there is no memory overhead and only minimal
+    // CPU overhead.
     if (m_data_array_warning_printed.find(this->ArrayName) == m_data_array_warning_printed.end())
     {
       WARN_LOG << "The data array '" << this->ArrayName << "' has scalar values "
-               << "in double precision format, which is not natively supported by NVIDIA IndeX. "
-               << "The plugin will proceed to convert the values from double to float with the "
-               << "corresponding overhead.";
+               << "in " << scalar_type << " format, which is not natively "
+               << "supported by NVIDIA IndeX. "
+               << "The plugin will proceed to convert the values from " << scalar_type << " "
+               << "to float with the corresponding overhead.";
       m_data_array_warning_printed.emplace(this->ArrayName);
     }
   }
@@ -276,7 +285,20 @@ bool vtknvindex_volumemapper::initialize_mapper(vtkVolume* vol)
     return false;
   }
 
-  m_subset_ptrs[0] = m_scalar_array->GetVoidPointer(0);
+  vtkDataArray* converted_array = this->convert_scalar_array(scalar_array);
+  if (converted_array)
+  {
+    scalar_array = converted_array;
+    // Keep track of converted array, to ensure it will be freed
+    m_converted_scalar_arrays[0] = vtkSmartPointer<vtkDataArray>::Take(converted_array);
+  }
+  else
+  {
+    // Conversion not necessary, use scalar_array directly
+    m_converted_scalar_arrays[0] = nullptr;
+  }
+
+  m_subset_ptrs[0] = scalar_array->GetVoidPointer(0);
 
   vtknvindex_regular_volume_data volume_data;
   volume_data.scalars = &m_subset_ptrs[0];
@@ -288,12 +310,21 @@ bool vtknvindex_volumemapper::initialize_mapper(vtkVolume* vol)
   dataset_parameters.volume_type =
     vtknvindex_scene::VOLUME_TYPE_REGULAR; // vtknviVTKNVINDEX_VOLUME_TYPE_REGULAR;
   dataset_parameters.scalar_type = scalar_type;
+
+  int nb_components = m_scalar_array->GetNumberOfComponents(); // use unconverted array
+  if (scalar_array->GetNumberOfComponents() != nb_components)
+  {
+    // negative means the data was already converted to a single component
+    nb_components = -nb_components;
+  }
+  dataset_parameters.scalar_components = nb_components;
+
   dataset_parameters.voxel_range[0] = static_cast<mi::Float32>(
-    m_scalar_array->GetRange(0)[0]); // '0' is component ID TODO: do this in a clean way
+    scalar_array->GetRange(0)[0]); // '0' is component ID TODO: do this in a clean way
   dataset_parameters.voxel_range[1] = static_cast<mi::Float32>(
-    m_scalar_array->GetRange(0)[1]); // '0' is component ID TODO: do this in a clean way
-  dataset_parameters.scalar_range[0] = static_cast<mi::Float32>(m_scalar_array->GetDataTypeMin());
-  dataset_parameters.scalar_range[1] = static_cast<mi::Float32>(m_scalar_array->GetDataTypeMax());
+    scalar_array->GetRange(0)[1]); // '0' is component ID TODO: do this in a clean way
+  dataset_parameters.scalar_range[0] = static_cast<mi::Float32>(scalar_array->GetDataTypeMin());
+  dataset_parameters.scalar_range[1] = static_cast<mi::Float32>(scalar_array->GetDataTypeMax());
 
   dataset_parameters.bounds[0] = extent[0];
   dataset_parameters.bounds[1] = extent[1];
@@ -442,24 +473,32 @@ void vtknvindex_volumemapper::slices_changed()
 }
 
 //-------------------------------------------------------------------------------------------------
-void vtknvindex_volumemapper::rtc_kernel_changed(vtknvindex_rtc_kernels kernel,
+bool vtknvindex_volumemapper::rtc_kernel_changed(vtknvindex_rtc_kernels kernel,
   const std::string& kernel_program, const void* params_buffer, mi::Uint32 buffer_size)
 {
+  bool kernel_changed = false;
   if (kernel != m_volume_rtc_kernel.rtc_kernel)
   {
     m_volume_rtc_kernel.rtc_kernel = kernel;
-    m_rtc_kernel_changed = true;
+    kernel_changed = true;
   }
 
   if (kernel_program != m_volume_rtc_kernel.kernel_program)
   {
     m_volume_rtc_kernel.kernel_program = kernel_program;
+    kernel_changed = true;
+  }
+
+  if (kernel_changed)
+  {
     m_rtc_kernel_changed = true;
   }
 
   m_volume_rtc_kernel.params_buffer = params_buffer;
   m_volume_rtc_kernel.buffer_size = buffer_size;
   m_rtc_param_changed = true;
+
+  return kernel_changed;
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -510,12 +549,25 @@ void vtknvindex_volumemapper::Render(vtkRenderer* ren, vtkVolume* vol)
     }
   }
 
-  // check for volume property changed
-  std::string cur_property(this->GetArrayName());
-  if (cur_property != m_prev_property)
+  // check for changed volume properties
+  vtkVolumeProperty* property = vol->GetProperty();
+  const std::string cur_array_name = this->GetArrayName();
+  if (cur_array_name != m_prev_array_name || this->VectorComponent != m_prev_vector_component ||
+    this->VectorMode != m_prev_vector_mode)
   {
     m_volume_changed = true;
-    m_prev_property = cur_property;
+    m_prev_array_name = cur_array_name;
+    m_prev_vector_component = this->VectorComponent;
+    m_prev_vector_mode = this->VectorMode;
+  }
+
+  static bool independent_components_warning_printed = false;
+  if (!property->GetIndependentComponents() && !independent_components_warning_printed)
+  {
+    ERROR_LOG << "Setting 'Map Scalars' (IndependentComponents) to 'off' is currently not "
+              << "supported by the NVIDIA IndeX plugin. "
+              << "This warning will only be printed once.";
+    independent_components_warning_printed = true;
   }
 
   // Initialize the mapper
@@ -530,7 +582,9 @@ void vtknvindex_volumemapper::Render(vtkRenderer* ren, vtkVolume* vol)
   // Prepare data to be rendered
 
   mi::Sint32 cur_time_step =
-    m_cluster_properties->get_regular_volume_properties()->get_current_time_step();
+    (m_cluster_properties->get_regular_volume_properties()->is_timeseries_data()
+        ? m_cluster_properties->get_regular_volume_properties()->get_current_time_step()
+        : 0);
 
   bool needs_activate = m_cluster_properties->activate();
   if (needs_activate)
@@ -549,27 +603,16 @@ void vtknvindex_volumemapper::Render(vtkRenderer* ren, vtkVolume* vol)
       return;
     }
 
-    // Ensure border data is available, fetching it from other hosts if necessary
-    vtknvindex_host_properties* host_props =
-      m_cluster_properties->get_host_properties(m_controller->GetLocalProcessId());
-
-    const void* piece_data = nullptr;
-    if (m_cluster_properties->get_regular_volume_properties()->is_timeseries_data())
-    {
-      piece_data = m_subset_ptrs[cur_time_step];
-    }
-    else if (m_scalar_array)
-    {
-      piece_data = m_scalar_array->GetVoidPointer(0);
-    }
-
-    std::string scalar_type;
-    m_cluster_properties->get_regular_volume_properties()->get_scalar_type(scalar_type);
-
     if (m_is_mpi_rendering)
     {
-      host_props->fetch_remote_volume_border_data(
-        m_controller, cur_time_step, piece_data, scalar_type);
+      // Ensure border data is available, fetching it from other hosts if necessary
+      vtknvindex_host_properties* host_props =
+        m_cluster_properties->get_host_properties(m_controller->GetLocalProcessId());
+
+      const void* piece_data = m_subset_ptrs[cur_time_step];
+
+      host_props->fetch_remote_volume_border_data(m_controller, cur_time_step, piece_data,
+        m_cluster_properties->get_regular_volume_properties()->get_scalar_type());
     }
   }
 
@@ -582,6 +625,7 @@ void vtknvindex_volumemapper::Render(vtkRenderer* ren, vtkVolume* vol)
   if (m_index_instance->is_index_viewer() && m_index_instance->ensure_index_initialized())
   {
     vtkTimerLog::MarkStartEvent("NVIDIA-IndeX: Rendering");
+    bool skip_rendering = false;
 
     {
       // DiCE database access
@@ -608,6 +652,71 @@ void vtknvindex_volumemapper::Render(vtkRenderer* ren, vtkVolume* vol)
         m_config_settings_changed = true; // force setting region-of-interest
       }
 
+      {
+        // Handle cropping
+        const mi::math::Bbox<mi::Float32, 3> whole_bounds(m_whole_bounds[0], m_whole_bounds[2],
+          m_whole_bounds[4], m_whole_bounds[1], m_whole_bounds[3], m_whole_bounds[5]);
+
+        mi::math::Bbox<mi::Sint32, 3> volume_extents;
+        m_cluster_properties->get_regular_volume_properties()->get_volume_extents(volume_extents);
+        const mi::math::Vector<mi::Float32, 3> volume_size(
+          volume_extents.max - volume_extents.min); // in voxels
+
+        mi::math::Bbox<mi::Float32, 3> roi;
+        if (this->Cropping)
+        {
+          roi = mi::math::Bbox<mi::Float32, 3>(this->CroppingRegionPlanes[0],
+            this->CroppingRegionPlanes[2], this->CroppingRegionPlanes[4],
+            this->CroppingRegionPlanes[1], this->CroppingRegionPlanes[3],
+            this->CroppingRegionPlanes[5]);
+
+          roi = mi::math::clip(roi, whole_bounds); // Limit to bounds of the volume
+
+          // Translate to origin
+          roi.min -= whole_bounds.min;
+          roi.max -= whole_bounds.min;
+
+          // Transform to volume size in voxels
+          roi.min = (roi.min / (whole_bounds.max - whole_bounds.min)) * volume_size;
+          roi.max = (roi.max / (whole_bounds.max - whole_bounds.min)) * volume_size;
+        }
+        else if (!m_region_of_interest_deprecated.empty())
+        {
+          // Backward-compatibility: Apply deprecated "region of interest" if set
+          roi = mi::math::Bbox<mi::Float32, 3>(volume_size * m_region_of_interest_deprecated.min,
+            volume_size * m_region_of_interest_deprecated.max);
+
+          if (!m_region_of_interest_deprecated_warning_printed)
+          {
+            const mi::math::Vector<mi::Float32, 3> scale(
+              m_region_of_interest_deprecated.max - m_region_of_interest_deprecated.min);
+            const mi::math::Vector<mi::Float32, 3> origin(
+              (whole_bounds.min - whole_bounds.min * scale) +
+              (whole_bounds.max - whole_bounds.min) * m_region_of_interest_deprecated.min);
+
+            WARN_LOG << "The 'NVIDIA IndeX Region of Interest' setting is deprecated, "
+                     << "please use 'Cropping' instead (origin: " << origin << ", scale: " << scale
+                     << ").";
+            m_region_of_interest_deprecated_warning_printed = true;
+          }
+        }
+        else
+        {
+          // No cropping, show entire volume
+          roi = mi::math::Bbox<mi::Float32, 3>(mi::math::Vector<mi::Float32, 3>(0.f), volume_size);
+        }
+
+        if (roi.is_volume())
+        {
+          m_cluster_properties->get_config_settings()->set_region_of_interest(roi);
+        }
+        else
+        {
+          // Nothing to render
+          skip_rendering = true;
+        }
+      }
+
       // Update scene parameters
       m_scene.update_scene(
         ren, vol, dice_transaction, m_config_settings_changed, m_opacity_changed, m_slices_changed);
@@ -632,6 +741,7 @@ void vtknvindex_volumemapper::Render(vtkRenderer* ren, vtkVolume* vol)
     }
 
     // Render the scene
+    if (!skip_rendering)
     {
       // DiCE database access
       mi::base::Handle<mi::neuraylib::IDice_transaction> dice_transaction(
@@ -687,7 +797,7 @@ void vtknvindex_volumemapper::Render(vtkRenderer* ren, vtkVolume* vol)
         }
 
         // log performance values if requested
-        if (m_cluster_properties->get_config_settings()->is_log_performance())
+        if (vtknvindex_global_settings::GetInstance()->GetOutputPerformanceValues())
           m_performance_values.print_perf_values(frame_results, cur_time_step);
       }
 
@@ -740,4 +850,50 @@ bool vtknvindex_volumemapper::is_caching() const
 void vtknvindex_volumemapper::set_visibility(bool visibility)
 {
   m_cluster_properties->set_visibility(visibility);
+}
+
+//-------------------------------------------------------------------------------------------------
+vtkDataArray* vtknvindex_volumemapper::convert_scalar_array(vtkDataArray* scalar_array) const
+{
+  vtkDataArray* converted_array = nullptr;
+
+  if (scalar_array->GetNumberOfComponents() > 1)
+  {
+    // Extract only the selected component from the vector data
+    converted_array = scalar_array->NewInstance();
+    converted_array->SetNumberOfComponents(1);
+    converted_array->SetNumberOfTuples(scalar_array->GetNumberOfTuples());
+    if (this->VectorMode == vtkColorTransferFunction::MAGNITUDE)
+    {
+      // Calculate vector magnitude
+      for (vtkIdType t = 0; t < scalar_array->GetNumberOfTuples(); ++t)
+      {
+        converted_array->SetTuple1(t, vtkMath::Norm(scalar_array->GetTuple3(t)));
+      }
+    }
+    else
+    {
+      // Copy the requested vector component
+      converted_array->CopyComponent(0, scalar_array, this->VectorComponent);
+    }
+  }
+
+  return converted_array;
+}
+
+//-------------------------------------------------------------------------------------------------
+void vtknvindex_volumemapper::set_region_of_interest_deprecated(
+  const mi::math::Bbox<mi::Float32, 3>& roi)
+{
+  if (m_region_of_interest_deprecated.empty())
+  {
+    const mi::math::Bbox<mi::Float32, 3> unit_bbox(0.f, 0.f, 0.f, 1.f, 1.f, 1.f);
+    if (roi.empty() || roi == unit_bbox)
+    {
+      // Nothing will be cropped
+      return;
+    }
+  }
+
+  m_region_of_interest_deprecated = roi;
 }
