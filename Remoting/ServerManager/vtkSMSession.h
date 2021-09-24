@@ -172,7 +172,7 @@ public:
    * These are static helper methods that help create Catalyst ParaView
    * sessions. They register the session with the process module and return the
    * session id. Returns 0 on failure.
-   * This overload is used to create a catalyst built-in session.
+   * This version is used to create a catalyst built-in session.
    */
   static vtkIdType ConnectToCatalyst();
 
@@ -181,7 +181,7 @@ public:
    * These are static helper methods that help create standard ParaView
    * sessions. They register the session with the process module and return the
    * session id.
-   * This overload is used to create a built-in session.
+   * This version is used to create a built-in session.
    */
   static vtkIdType ConnectToSelf();
   //@}
@@ -192,7 +192,7 @@ public:
    * sessions. They register the session with the process module and return the
    * session id. It will try to connect for timeout seconds, -1 meaning infinite retries.
    * and 0 means no retry. Returns 0 on failure. Returns 0 on failure.
-   * This overload is used to create a client-server session on client.
+   * This version is used to create a client-server session on client.
    * The callback should return true, if the connection should continue trying to connect,
    * else return false to abort.
    * The result arg provide information about the failure or sucess of the connection,
@@ -236,7 +236,7 @@ public:
    * sessions. They register the session with the process module and return the
    * session id. It will try to connect for timeout seconds, -1 meaning infinite retries.
    * and 0 means no retry. Returns 0 on failure.
-   * This overload is used to create a client-dataserver-renderserver session on client.
+   * This version is used to create a client-dataserver-renderserver session on client.
    * The callback should return true, if the connection should continue trying to connect,
    * else return false to abort.
    * The result arg provide information about the failure or sucess of the connection,
