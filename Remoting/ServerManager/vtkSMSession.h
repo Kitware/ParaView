@@ -180,21 +180,10 @@ public:
   /**
    * These are static helper methods that help create standard ParaView
    * sessions. They register the session with the process module and return the
-   * session id. It will try to connect for timeout seconds, -1 meaning infinite retries.
-   * and 0 means no retry. Returns 0 on failure.
+   * session id.
    * This overload is used to create a built-in session.
-   * The callback should return true, if the connection should continue trying to connect,
-   * else return false to abort.
-   * The result arg provide information about the failure or sucess of the connection,
-   * see vtkNetworkAccessManager::ConnectionResult for possible values.
    */
-  static vtkIdType ConnectToSelf(int timeout = 60)
-  {
-    vtkNetworkAccessManager::ConnectionResult result;
-    return vtkSMSession::ConnectToSelf(timeout, nullptr, result);
-  }
-  static vtkIdType ConnectToSelf(
-    int timeout, bool (*callback)(), vtkNetworkAccessManager::ConnectionResult& result);
+  static vtkIdType ConnectToSelf();
   //@}
 
   //@{

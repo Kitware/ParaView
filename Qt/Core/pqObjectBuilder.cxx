@@ -687,7 +687,8 @@ pqServer* pqObjectBuilder::createServer(const pqServerResource& resource, int co
   vtkIdType id = 0;
   if (server_resource.scheme() == "builtin")
   {
-    id = vtkSMSession::ConnectToSelf(connectionTimeout, &pqObjectBuilderNS::processEvents, result);
+    id = vtkSMSession::ConnectToSelf();
+    result = vtkNetworkAccessManager::ConnectionResult::CONNECTION_SUCCESS;
   }
   else if (server_resource.scheme() == "cs")
   {
@@ -715,10 +716,12 @@ pqServer* pqObjectBuilder::createServer(const pqServerResource& resource, int co
   else if (server_resource.scheme() == "catalyst")
   {
     id = vtkSMSession::ConnectToCatalyst();
+    result = vtkNetworkAccessManager::ConnectionResult::CONNECTION_SUCCESS;
   }
   else
   {
     qCritical() << "Unknown server type: " << server_resource.scheme() << "\n";
+    result = vtkNetworkAccessManager::ConnectionResult::CONNECTION_FAILURE;
   }
 
   pqServer* server = nullptr;
