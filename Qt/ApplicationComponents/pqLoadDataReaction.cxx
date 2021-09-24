@@ -41,12 +41,18 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqServer.h"
 #include "pqStandardRecentlyUsedResourceLoaderImplementation.h"
 #include "pqUndoStack.h"
+#include "vtkSMPropertyHelper.h"
 #include "vtkSMProxy.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMReaderFactory.h"
+#include "vtkSMSessionProxyManager.h"
+#include "vtkSMSettings.h"
+#include "vtkSMSettingsProxy.h"
 #include "vtkStringList.h"
+#include <vtksys/SystemTools.hxx>
 
 #include <QDebug>
+#include <QInputDialog>
 
 #include <cassert>
 
@@ -74,34 +80,207 @@ QList<pqPipelineSource*> pqLoadDataReaction::loadData()
 {
   pqServer* server = pqActiveObjects::instance().activeServer();
   vtkSMReaderFactory* readerFactory = vtkSMProxyManager::GetProxyManager()->GetReaderFactory();
-  QString filters = readerFactory->GetSupportedFileTypes(server->session());
-  // insert "All Files(*)" as the second item after supported files.
-  int insertIndex = filters.indexOf(";;");
-  if (insertIndex >= 0)
+  std::vector<FileTypeDetailed> filtersDetailed =
+    readerFactory->GetSupportedFileTypesDetailed(server->session());
+
+  QString filtersString;
+  bool first = true;
+  // Generates the filter string used by the fileDialog
+  // For example, this could be "Supported Files (*.jpg *.jpeg *.png);;All Files (*);;JPEG Image
+  // Files(*.jpg *.jpeg);;PNG Image Files (*.png)"
+  for (auto const& filterDetailed : filtersDetailed)
   {
-    filters.insert(insertIndex, ";;All Files (*)");
-  }
-  else
-  {
-    assert(filters.isEmpty());
-    filters = "All Files (*)";
+    if (!first)
+    {
+      filtersString += ";;";
+    }
+
+    filtersString += QString::fromStdString(filterDetailed.Description) + " (" +
+      QString::fromStdString(vtksys::SystemTools::Join(filterDetailed.FilenamePatterns, " ")) + ")";
+
+    first = false;
   }
 
+  int constexpr SupportedFilesFilterIndex = 0;
+  int constexpr AllFilesFilterIndex = 1;
+
   pqFileDialog fileDialog(
-    server, pqCoreUtilities::mainWidget(), tr("Open File:"), QString(), filters);
+    server, pqCoreUtilities::mainWidget(), tr("Open File:"), QString(), filtersString);
   fileDialog.setObjectName("FileOpenDialog");
   fileDialog.setFileMode(pqFileDialog::ExistingFilesAndDirectories);
   QList<pqPipelineSource*> sources;
   if (fileDialog.exec() == QDialog::Accepted)
   {
     QList<QStringList> files = fileDialog.getAllSelectedFiles();
-    pqPipelineSource* source = pqLoadDataReaction::loadData(files);
-    if (source)
+    int filterIndex = fileDialog.getSelectedFilterIndex();
+    switch (filterIndex)
     {
-      sources << source;
+      case SupportedFilesFilterIndex:
+      {
+        auto newSources = pqLoadDataReaction::loadFilesForSupportedTypes(files);
+        for (auto const& source : newSources)
+        {
+          sources << source;
+        }
+      }
+      break;
+      case AllFilesFilterIndex:
+      {
+        auto newSources = pqLoadDataReaction::loadFilesForAllTypes(files, server, readerFactory);
+        for (auto const& source : newSources)
+        {
+          sources << source;
+        }
+      }
+      break;
+      default:
+        // Specific reader
+        pqPipelineSource* source = pqLoadDataReaction::loadData(files,
+          QString::fromStdString(filtersDetailed[filterIndex].Group),
+          QString::fromStdString(filtersDetailed[filterIndex].Name));
+        if (source)
+        {
+          sources << source;
+        }
     }
   }
   return sources;
+}
+
+//-----------------------------------------------------------------------------
+QVector<pqPipelineSource*> pqLoadDataReaction::loadFilesForSupportedTypes(QList<QStringList> files)
+{
+  QVector<pqPipelineSource*> newSources;
+  auto* settings = vtkSMSettings::GetInstance();
+  char const* settingName = ".settings.RepresentedArrayListSettings.ReaderDetails";
+
+  for (auto const& file : files)
+  {
+    QFileInfo fileInfo(file[0]);
+    bool loaded = false;
+    unsigned int const numberOfEntries = settings->GetSettingNumberOfElements(settingName) / 3;
+    for (unsigned int loopIndex = 0; loopIndex < numberOfEntries; ++loopIndex)
+    {
+      // Read entries from the end to the start
+      unsigned int const reversedIndex = numberOfEntries - loopIndex - 1;
+      auto const patternsString = settings->GetSettingAsString(settingName, reversedIndex * 3, "");
+      std::vector<std::string> patterns;
+      vtksys::SystemTools::Split(patternsString, patterns, ' ');
+
+      for (std::string const& pattern : patterns)
+      {
+        if (QRegExp(QString::fromStdString(pattern), Qt::CaseInsensitive, QRegExp::Wildcard)
+              .exactMatch(fileInfo.fileName()))
+        {
+          pqLoadDataReaction::loadData(file, "sources",
+            QString::fromStdString(
+              settings->GetSettingAsString(settingName, reversedIndex * 3 + 2, "")));
+          loaded = true;
+          break;
+        }
+      }
+      if (loaded)
+      {
+        break;
+      }
+    }
+
+    if (!loaded)
+    {
+      pqPipelineSource* source = pqLoadDataReaction::loadData({ file });
+      if (source)
+      {
+        newSources << source;
+      }
+    }
+  }
+  return newSources;
+}
+
+//-----------------------------------------------------------------------------
+QVector<pqPipelineSource*> pqLoadDataReaction::loadFilesForAllTypes(
+  QList<QStringList> files, pqServer* server, vtkSMReaderFactory* readerFactory)
+{
+  QVector<pqPipelineSource*> newSources;
+  vtkStringList* list = readerFactory->GetReaders(server->session());
+  for (QStringList const& fileGroups : files)
+  {
+    pqSelectReaderDialog prompt(fileGroups[0], server, list, pqCoreUtilities::mainWidget());
+    if (prompt.exec() == QDialog::Accepted)
+    {
+      if (prompt.isSetAsDefault())
+      {
+        QString customPattern;
+        QString const completeSuffix = QFileInfo(fileGroups[0]).completeSuffix();
+        if (completeSuffix.isEmpty())
+        {
+          customPattern = "*";
+        }
+        else
+        {
+          customPattern = "*." + completeSuffix;
+        }
+
+        bool cancel = false;
+        bool patternValid = false;
+        QString errorString = "";
+        // Ask the user the pattern they want to associate with the reader as long as the pattern is
+        // not valid, or the user cancels the operation
+        while (!patternValid)
+        {
+          bool ok;
+          customPattern = QInputDialog::getText(&prompt, "Define custom pattern",
+            QString(
+              "Define the pattern you want to use to default to this reader.\nFor example: '*.png "
+              "*.jpg'") +
+              (errorString.isEmpty() ? "" : ("\nError: '" + errorString + "'")),
+
+            QLineEdit::Normal, customPattern, &ok);
+
+          if (!ok)
+          {
+            cancel = true;
+            break;
+          }
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 14, 0))
+          auto splitCustomPattern = customPattern.split(".", Qt::SkipEmptyParts);
+#else
+          auto splitCustomPattern = customPattern.split(" ", QString::SkipEmptyParts);
+#endif
+          patternValid = !splitCustomPattern.empty() &&
+            std::all_of(
+              splitCustomPattern.begin(), splitCustomPattern.end(), [&](QString const& pattern) {
+                QRegExp regexp(pattern, Qt::CaseInsensitive, QRegExp::Wildcard);
+                if (!regexp.isValid())
+                {
+                  errorString = regexp.errorString();
+                  return false;
+                }
+                return true;
+              });
+          if (splitCustomPattern.empty())
+          {
+            errorString = "pattern cannot be empty";
+          }
+        }
+
+        if (cancel)
+        {
+          continue;
+        }
+
+        pqLoadDataReaction::addReaderToDefaults(
+          prompt.getReader(), server, readerFactory, customPattern);
+      }
+      pqPipelineSource* source =
+        pqLoadDataReaction::loadData(files, prompt.getGroup(), prompt.getReader());
+      if (source)
+      {
+        newSources << source;
+      }
+    }
+  }
+  return newSources;
 }
 
 //-----------------------------------------------------------------------------
@@ -202,6 +381,10 @@ bool pqLoadDataReaction::DetermineFileReader(const QString& filename, pqServer* 
     pqSelectReaderDialog prompt(filename, server, list, pqCoreUtilities::mainWidget());
     if (prompt.exec() == QDialog::Accepted)
     {
+      if (prompt.isSetAsDefault())
+      {
+        pqLoadDataReaction::addReaderToDefaults(prompt.getReader(), server, factory);
+      }
       readerType = prompt.getReader();
       readerGroup = prompt.getGroup();
     }
@@ -224,6 +407,10 @@ bool pqLoadDataReaction::DetermineFileReader(const QString& filename, pqServer* 
     pqSelectReaderDialog prompt(filename, server, factory, pqCoreUtilities::mainWidget());
     if (prompt.exec() == QDialog::Accepted)
     {
+      if (prompt.isSetAsDefault())
+      {
+        pqLoadDataReaction::addReaderToDefaults(prompt.getReader(), server, factory);
+      }
       readerType = prompt.getReader();
       readerGroup = prompt.getGroup();
     }
@@ -252,4 +439,49 @@ pqPipelineSource* pqLoadDataReaction::LoadFile(
       server, files, reader->getProxy()->GetXMLGroup(), reader->getProxy()->GetXMLName());
   }
   return reader;
+}
+
+//-----------------------------------------------------------------------------
+void pqLoadDataReaction::addReaderToDefaults(QString const& readerName, pqServer* server,
+  vtkSMReaderFactory* readerFactory, QString const& customPattern)
+{
+  auto pxm = server ? server->proxyManager() : nullptr;
+  auto settingsProxy = pxm
+    ? vtkSMSettingsProxy::SafeDownCast(pxm->GetProxy("settings", "RepresentedArrayListSettings"))
+    : nullptr;
+
+  auto* settings = vtkSMSettings::GetInstance();
+  char const* settingName = ".settings.RepresentedArrayListSettings.ReaderDetails";
+  unsigned int numberOfEntries = settings->GetSettingNumberOfElements(settingName) / 3;
+
+  std::string const readerNameString = readerName.toStdString();
+
+  auto filtersDetailed = readerFactory->GetSupportedFileTypesDetailed(server->session());
+  auto readerIt = std::find_if(filtersDetailed.begin(), filtersDetailed.end(),
+    [&](FileTypeDetailed const& fileType) { return fileType.Name == readerNameString; });
+
+  if (readerIt == filtersDetailed.end())
+  {
+    vtkGenericWarningMacro(<< "Could not add reader as default, name '" << readerName.toStdString()
+                           << "' is incorrect.");
+    return;
+  }
+
+  std::string customPatternString = customPattern.toStdString();
+  if (customPatternString.empty())
+  {
+    customPatternString = vtksys::SystemTools::Join(readerIt->FilenamePatterns, " ");
+  }
+
+  settings->SetSetting(settingName, numberOfEntries * 3, customPatternString);
+  vtkSMPropertyHelper(settingsProxy, "ReaderDetails")
+    .Set(numberOfEntries * 3, customPatternString.c_str());
+  settings->SetSetting(settingName, numberOfEntries * 3 + 1, readerIt->Description);
+  vtkSMPropertyHelper(settingsProxy, "ReaderDetails")
+    .Set(numberOfEntries * 3 + 1, readerIt->Description.c_str());
+  settings->SetSetting(settingName, numberOfEntries * 3 + 2, readerNameString);
+  vtkSMPropertyHelper(settingsProxy, "ReaderDetails")
+    .Set(numberOfEntries * 3 + 2, readerNameString.c_str());
+  settingsProxy->UpdateVTKObjects();
+  numberOfEntries++;
 }

@@ -50,6 +50,7 @@ public Q_SLOTS:
   void setFilter(const QString& filter);
   void setShowHidden(const bool& hidden);
   bool getShowHidden() { return showHidden; };
+  QRegExp const& getWildcards() const { return Wildcards; }
 
 protected:
   bool filterAcceptsRow(int row_source, const QModelIndex& source_parent) const override;

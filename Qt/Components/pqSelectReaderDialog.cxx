@@ -43,10 +43,18 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class pqSelectReaderDialog::pqInternal : public Ui::SelectReaderDialog
 {
 public:
+  bool isSetAsDefault = false;
+
   pqInternal(pqSelectReaderDialog* self)
   {
     this->setupUi(self);
     self->setObjectName("pqSelectReaderDialog"); // to avoid breaking old tests.
+    connect(this->setAsDefault, &QPushButton::clicked, [this, self] {
+      this->isSetAsDefault = true;
+      self->accept();
+    });
+
+    this->okButton->setDefault(true);
   }
 
   void setHeader(const QString& header) { this->FileInfo->setText(header); }
@@ -134,4 +142,10 @@ QString pqSelectReaderDialog::getReader() const
   // should have only one with single selection mode
   QListWidgetItem* item = selection[0];
   return item->data(Qt::UserRole + 1).toString();
+}
+
+//-----------------------------------------------------------------------------
+bool pqSelectReaderDialog::isSetAsDefault() const
+{
+  return this->Internal->isSetAsDefault;
 }

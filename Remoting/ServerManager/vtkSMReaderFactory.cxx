@@ -27,6 +27,7 @@
 #include "vtkSMProxyManager.h"
 #include "vtkSMSession.h"
 #include "vtkSMSessionProxyManager.h"
+#include "vtkSMSettings.h"
 #include "vtkSMSourceProxy.h"
 #include "vtkSmartPointer.h"
 #include "vtkStringList.h"
@@ -581,6 +582,73 @@ const char* vtkSMReaderFactory::GetSupportedFileTypes(vtkSMSession* session)
   }
   this->Internals->SupportedFileTypes = all_types.str();
   return this->Internals->SupportedFileTypes.c_str();
+}
+
+//----------------------------------------------------------------------------
+std::vector<FileTypeDetailed> vtkSMReaderFactory::GetSupportedFileTypesDetailed(
+  vtkSMSession* session)
+{
+  std::vector<FileTypeDetailed> result;
+  FileTypeDetailed supportedFiles;
+  supportedFiles.Description = "Supported Files";
+
+  for (auto& proto : this->Internals->Prototypes)
+  {
+    if (proto.second.CanCreatePrototype(session))
+    {
+      proto.second.FillInformation(session);
+      std::string const& group = proto.second.Group;
+      std::string const& name = proto.second.Name;
+      for (auto& hint : proto.second.FileEntryHints)
+      {
+        FileTypeDetailed currentFileType;
+        for (auto const& ext : hint.Extensions)
+        {
+          currentFileType.FilenamePatterns.push_back("*." + ext);
+        }
+
+        for (auto const& pattern : hint.FilenamePatterns)
+        {
+          currentFileType.FilenamePatterns.push_back(pattern);
+        }
+
+        if (currentFileType.FilenamePatterns.empty())
+        {
+          continue;
+        }
+
+        currentFileType.Description = hint.Description;
+        std::copy(currentFileType.FilenamePatterns.begin(), currentFileType.FilenamePatterns.end(),
+          std::back_inserter(supportedFiles.FilenamePatterns));
+        currentFileType.Name = name;
+        currentFileType.Group = group;
+        result.push_back(std::move(currentFileType));
+      }
+    }
+  }
+
+  // Add custom patterns to supported files
+  auto* settings = vtkSMSettings::GetInstance();
+  char const* settingName = ".settings.RepresentedArrayListSettings.ReaderDetails";
+  unsigned int const numberOfEntries = settings->GetSettingNumberOfElements(settingName) / 3;
+  for (unsigned int entryIndex = 0; entryIndex < numberOfEntries; ++entryIndex)
+  {
+    std::string const patternsString =
+      settings->GetSettingAsString(settingName, entryIndex * 3, "");
+    vtksys::SystemTools::Split(patternsString, supportedFiles.FilenamePatterns, ' ');
+  }
+
+  std::sort(
+    result.begin(), result.end(), [](FileTypeDetailed const& lhs, FileTypeDetailed const& rhs) {
+      return vtksys::SystemTools::Strucmp(lhs.Description.c_str(), rhs.Description.c_str()) < 0;
+    });
+
+  FileTypeDetailed allFiles;
+  allFiles.Description = "All Files";
+  allFiles.FilenamePatterns = { "*" };
+  result.insert(result.begin(), { supportedFiles, allFiles });
+
+  return result;
 }
 
 //----------------------------------------------------------------------------

@@ -38,10 +38,21 @@
 #include "vtkRemotingServerManagerModule.h" //needed for exports
 #include "vtkSMObject.h"
 
+#include <string>
+#include <vector>
+
 class vtkStringList;
 class vtkPVXMLElement;
 class vtkSMProxy;
 class vtkSMSession;
+
+struct FileTypeDetailed
+{
+  std::string Description = "";
+  std::vector<std::string> FilenamePatterns = {};
+  std::string Group = "";
+  std::string Name = "";
+};
 
 class VTKREMOTINGSERVERMANAGER_EXPORT vtkSMReaderFactory : public vtkSMObject
 {
@@ -129,6 +140,14 @@ public:
    * \endverbatim
    */
   virtual const char* GetSupportedFileTypes(vtkSMSession* session);
+
+  /**
+   * Returns the list of supported file types with details on the corresponding readers and its
+   * supported patterns.
+   * The two first values of this vector are Supported Type and All Files to simplify its use with
+   * the pqFileDialog. They do not have a name or group fields.
+   */
+  virtual std::vector<FileTypeDetailed> GetSupportedFileTypesDetailed(vtkSMSession* session);
 
   //@{
   /**

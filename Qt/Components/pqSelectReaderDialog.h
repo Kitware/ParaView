@@ -70,6 +70,11 @@ public:
    */
   QString getGroup() const;
 
+  /**
+   * Check if the user clicked the "Set reader as default" button
+   */
+  bool isSetAsDefault() const;
+
 protected:
   class pqInternal;
   QScopedPointer<pqInternal> Internal;

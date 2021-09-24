@@ -99,6 +99,7 @@ pqStringVectorPropertyWidget::pqStringVectorPropertyWidget(
 
   bool multiline_text = false;
   bool python = false;
+  bool showLabel = false;
   QString placeholderText;
   if (hints)
   {
@@ -118,6 +119,7 @@ pqStringVectorPropertyWidget::pqStringVectorPropertyWidget(
       placeholderText = phtElement->GetCharacterData();
       placeholderText = placeholderText.trimmed();
     }
+    showLabel = (hints->FindNestedElementByName("ShowLabel") != nullptr);
   }
 
   // find the domain(s)
@@ -211,7 +213,7 @@ pqStringVectorPropertyWidget::pqStringVectorPropertyWidget(
     new pqTreeViewSelectionHelper(selectorWidget);
 
     // hide widget label
-    this->setShowLabel(false);
+    this->setShowLabel(showLabel);
 
     vbox->addWidget(selectorWidget);
 
@@ -249,7 +251,7 @@ pqStringVectorPropertyWidget::pqStringVectorPropertyWidget(
     this->setChangeAvailableAsChangeFinished(true);
 
     // hide widget label
-    setShowLabel(false);
+    this->setShowLabel(showLabel);
 
     vbox->addWidget(selectorWidget);
 
@@ -329,7 +331,7 @@ pqStringVectorPropertyWidget::pqStringVectorPropertyWidget(
     {
       vbox->addWidget(textEdit);
     }
-    this->setShowLabel(false);
+    this->setShowLabel(showLabel);
   }
   else if (enumerationDomain)
   {
@@ -360,7 +362,7 @@ pqStringVectorPropertyWidget::pqStringVectorPropertyWidget(
       this->addPropertyLink(widget, "scalars", SIGNAL(scalarsChanged()), smProperty);
       this->setChangeAvailableAsChangeFinished(true);
       vbox->addWidget(widget);
-      this->setShowLabel(false);
+      this->setShowLabel(showLabel);
     }
     else
     {
