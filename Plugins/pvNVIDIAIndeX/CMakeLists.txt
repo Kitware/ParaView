@@ -3,7 +3,7 @@
 # *****************************************************************************/
 
 paraview_add_plugin(pvNVIDIAIndeX
-  VERSION "5.9.1"
+  VERSION "5.10"
   EULA "EULA.txt"
   MODULES pvNVIDIAIndeX::IndeXRepresentations
   MODULE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/vtk.module"

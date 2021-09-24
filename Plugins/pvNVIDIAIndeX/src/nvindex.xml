@@ -40,6 +40,7 @@
                 NVIDIA IndeX mapper.
             </Documentation>
 
+          <!-- Region of interest: Deprecated, just for backward-compatibility with old state files. Use "Cropping" instead. -->
           <DoubleVectorProperty
                 command="Getm_roi_range_I"
                 information_only="1"
@@ -173,7 +174,8 @@
                 name="Subcube Size"
                 command="set_subcube_size"
                 number_of_elements="3"
-                default_values="512 512 512">
+                default_values="512 512 512"
+                panel_visibility="advanced">
                 <Documentation>Set subcube size. This can only be set once before the first rendering</Documentation>
             </IntVectorProperty>
 
@@ -181,7 +183,8 @@
                 name="Subcube Border"
                 command="set_subcube_border"
                 number_of_elements="1"
-                default_values="2">
+                default_values="2"
+                panel_visibility="advanced">
                 <Documentation>Set subcube border size,
                     multiplied by 2 internally</Documentation>
             </IntVectorProperty>
@@ -261,29 +264,6 @@
             </IntVectorProperty>
 
             <IntVectorProperty
-                label="Log Performance"
-                name="log_performance"
-                panel_visibility="advanced"
-                command="set_log_performance"
-                number_of_elements="1"
-                default_values="0">
-                <BooleanDomain name="bool" />
-                <Documentation>Print performance values in the terminal</Documentation>
-            </IntVectorProperty>
-
-            <IntVectorProperty
-                label="Export Session"
-                name="dump_internal_state"
-                panel_visibility="advanced"
-                command="set_dump_internal_state"
-                number_of_elements="1"
-                default_values="0">
-                <BooleanDomain name="bool" />
-                <Documentation>Dump internal state of NVIDIA IndeX library and write
-                    it into the file "nvindex_pvplugin.prj".</Documentation>
-            </IntVectorProperty>
-
-            <IntVectorProperty
                 name="Show Volume"
                 command="show_volume"
                 number_of_elements="1"
@@ -308,7 +288,7 @@
             </IntVectorProperty>
 
             <IntVectorProperty
-                label="Enabled"
+                label="Enable Slice 1"
                 name="Enable Slice 1"
                 command="enable_slice1"
                 number_of_elements="1"
@@ -363,7 +343,7 @@
             </DoubleVectorProperty>
 
             <IntVectorProperty
-                label="Enabled"
+                label="Enable Slice 2"
                 name="Enable Slice 2"
                 command="enable_slice2"
                 number_of_elements="1"
@@ -418,7 +398,7 @@
             </DoubleVectorProperty>
 
             <IntVectorProperty
-                label="Enabled"
+                label="Enable Slice 3"
                 name="Enable Slice 3"
                 command="enable_slice3"
                 number_of_elements="1"
@@ -1142,7 +1122,8 @@
                 name="Subcube Size"
                 command="set_subcube_size"
                 number_of_elements="3"
-                default_values="512 512 512">
+                default_values="512 512 512"
+                panel_visibility="advanced">
                 <Documentation>Set subcube size. This can only be set once before the first rendering</Documentation>
             </IntVectorProperty>
 
@@ -1150,32 +1131,10 @@
                 name="Subcube Border"
                 command="set_subcube_border"
                 number_of_elements="1"
-                default_values="0">
+                default_values="0"
+                panel_visibility="advanced">
                 <Documentation>Set subcube border size,
                     multiplied by 2 internally</Documentation>
-            </IntVectorProperty>
-
-            <IntVectorProperty
-                label="Log Performance"
-                name="log_performance"
-                panel_visibility="advanced"
-                command="set_log_performance"
-                number_of_elements="1"
-                default_values="0">
-                <BooleanDomain name="bool" />
-                <Documentation>Print performance values in the terminal</Documentation>
-            </IntVectorProperty>
-
-            <IntVectorProperty
-                label="Export Session"
-                name="dump_internal_state"
-                panel_visibility="advanced"
-                command="set_dump_internal_state"
-                number_of_elements="1"
-                default_values="0">
-                <BooleanDomain name="bool" />
-                <Documentation>Dump internal state of NVIDIA IndeX library and write
-                    it into the file "nvindex_pvplugin.prj".</Documentation>
             </IntVectorProperty>
 
             <IntVectorProperty
@@ -1679,7 +1638,6 @@
             </Hints>
           </Property>
 
-
           <!-- End of NvidiaIndexRegularVolumeRepresentation -->
         </RepresentationProxy>
 
@@ -1702,7 +1660,8 @@
         </ShareProperties>
 
         <ExposedProperties>
-            <PropertyGroup label="NVIDIA IndeX Region of Interest">
+            <!-- Region of interest: Deprecated, just for backward-compatibility with old state files, hence hidden. Use "Cropping" instead. -->
+            <PropertyGroup label="NVIDIA IndeX Region of Interest" panel_visibility="never">
                   <Property name="Min I"/>
                   <Property name="Max I"/>
                   <Property name="Min J"/>
@@ -1712,11 +1671,10 @@
             </PropertyGroup>
             <PropertyGroup label="NVIDIA IndeX Volume">
                   <Property name="Subcube Size"/>
+                  <Property name="Subcube Border"/>
                   <Property name="Pre-integration"/>
                   <Property name="Filtering"/>
                   <Property name="volume_step_size"/>
-                  <Property name="dump_internal_state"/>
-                  <Property name="log_performance"/>
             </PropertyGroup>
             <PropertyGroup label="NVIDIA IndeX Slices">
                 <Property name="Show Volume"/>
@@ -1794,8 +1752,7 @@
             </PropertyGroup>
             <PropertyGroup label="NVIDIA IndeX Volume">
                     <Property name="Subcube Size"/>
-                    <Property name="dump_internal_state"/>
-                    <Property name="log_performance"/>
+                    <Property name="Subcube Border"/>
             </PropertyGroup>
             <PropertyGroup label="NVIDIA IndeX Visual Elements">
               <Property name="Filter"/>
@@ -1833,5 +1790,349 @@
 
     <!--<ProxyGroup name="internal_representations">
     </ProxyGroup>-->
+
+    <!-- Setting dialog -->
+    <ProxyGroup name="settings">
+        <SettingsProxy name="NvidiaIndexSettings"
+                       label="NVIDIA IndeX"
+                       processes="client|dataserver|renderserver"
+                       class="vtknvindex_global_settings">
+            <Documentation>General settings for the NVIDIA IndeX plugin.</Documentation>
+
+            <!-- Logging -->
+
+            <IntVectorProperty
+                name="LogLevel"
+                label="Log Level For 'Output Messages'"
+                command="SetLogLevel"
+                number_of_elements="1"
+                default_values="2"
+                panel_visibility="default">
+                <EnumerationDomain name="enum">
+                    <Entry value="0" text="Disable logging"/>
+                    <Entry value="1" text="Error"/>
+                    <Entry value="2" text="Warning (default)"/>
+                    <Entry value="3" text="Info"/>
+                    <Entry value="4" text="Verbose"/>
+                </EnumerationDomain>
+                <Documentation>
+                    NVIDIA IndeX log messages with this severity level or higher
+                    will appear in the 'Output Messages' window.
+                </Documentation>
+            </IntVectorProperty>
+
+            <IntVectorProperty
+                name="LogLevelStandardOutput"
+                label="Log Level For Standard Output"
+                command="SetLogLevelStandardOutput"
+                number_of_elements="1"
+                default_values="3"
+                panel_visibility="default">
+                <EnumerationDomain name="enum">
+                    <Entry value="0" text="Disable logging"/>
+                    <Entry value="1" text="Error"/>
+                    <Entry value="2" text="Warning"/>
+                    <Entry value="3" text="Info (default)"/>
+                    <Entry value="4" text="Verbose"/>
+                </EnumerationDomain>
+                <Documentation>
+                    NVIDIA IndeX log messages with the severity level or higher
+                    will be written to standard output (console). Log message
+                    written to the 'Output Messages' window will typically also
+                    appear on standard output.
+                </Documentation>
+            </IntVectorProperty>
+
+            <IntVectorProperty
+                name="LogTimestamp"
+                command="SetLogTimestamp"
+                number_of_elements="1"
+                default_values="0"
+                panel_visibility="default">
+                <BooleanDomain name="bool" />
+                <Hints><RestartRequired/></Hints>
+                <Documentation>Add a timestamp to each log message.</Documentation>
+            </IntVectorProperty>
+
+            <IntVectorProperty
+                name="LogHostname"
+                command="SetLogHostname"
+                number_of_elements="1"
+                default_values="0"
+                panel_visibility="default">
+                <BooleanDomain name="bool" />
+                <Hints><RestartRequired/></Hints>
+                <Documentation>Add the hostname to each log message.</Documentation>
+            </IntVectorProperty>
+
+            <!-- Performance tracking -->
+
+            <IntVectorProperty
+                name="OutputPerformanceValues"
+                command="SetOutputPerformanceValues"
+                panel_visibility="advanced"
+                number_of_elements="1"
+                default_values="0">
+                <BooleanDomain name="bool" />
+                <Documentation>Write performance statistics to a file or to standard output after each rendered frame.</Documentation>
+            </IntVectorProperty>
+
+            <StringVectorProperty
+                name="OutputPerformanceValuesFilename"
+                label="Filename"
+                command="SetOutputPerformanceValuesFilename"
+                default_values=""
+                number_of_elements="1"
+                panel_visibility="advanced">
+                <FileListDomain name="files" />
+                <Documentation>If non-empty, the performance statistics will be written to this file. Otherwise standard output will be used.</Documentation>
+                <Hints>
+                    <FileChooser extensions="log" file_description="NVIDIA IndeX performance log files" />
+                    <AcceptAnyFile/>
+                    <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="OutputPerformanceValues" value="1"/>
+                </Hints>
+            </StringVectorProperty>
+
+            <IntVectorProperty
+                name="ExportSession"
+                command="SetExportSession"
+                panel_visibility="advanced"
+                number_of_elements="1"
+                default_values="0">
+                <BooleanDomain name="bool" />
+                <Documentation>
+                    Write the internal state information of NVIDIA IndeX to a file or to standard output after each rendered frame.
+                </Documentation>
+            </IntVectorProperty>
+
+            <StringVectorProperty
+                name="ExportSessionFilename"
+                label="Filename"
+                command="SetExportSessionFilename"
+                default_values=""
+                number_of_elements="1"
+                panel_visibility="advanced">
+                <FileListDomain name="files" />
+                <Documentation>If non-empty, the session export will be written to this file. Otherwise standard output will be used.</Documentation>
+                <Hints>
+                    <FileChooser extensions="prj" file_description="NVIDIA IndeX project files" />
+                    <AcceptAnyFile/>
+                    <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="ExportSession" value="1"/>
+                </Hints>
+            </StringVectorProperty>
+
+            <!-- Network Configuration -->
+
+            <IntVectorProperty
+                name="ClusterMode"
+                command="SetClusterMode"
+                number_of_elements="1"
+                default_values="1"
+                panel_visibility="advanced">
+                <EnumerationDomain name="enum">
+                    <Entry value="0" text="OFF"/>
+                    <Entry value="1" text="TCP (default)"/>
+                    <Entry value="2" text="UDP"/>
+                    <Entry value="3" text="TCP_WITH_DISCOVERY"/>
+                </EnumerationDomain>
+                <Hints><RestartRequired/></Hints>
+                <Documentation>
+                    Network mode for running in cluster mode. Running NVIDIA
+                    IndeX in cluster mode requires a valid cluster license.
+                </Documentation>
+            </IntVectorProperty>
+
+            <StringVectorProperty
+                name="ClusterInterfaceAddress"
+                command="SetClusterInterfaceAddress"
+                default_values=""
+                number_of_elements="1"
+                panel_visibility="advanced">
+                <Hints>
+                    <PlaceholderText>1.2.3.0/24:10001</PlaceholderText>
+                    <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="ClusterMode" value="0" inverse="1"/>
+                    <RestartRequired/>
+                </Hints>
+                <Documentation>
+                    Specify the network interface to be used for outgoing
+                    packets. Optional, but recommend when there are multiple
+                    network interfaces. If not set, a network interface will be
+                    chosen automatically, which might not always be the right
+                    one. This may also be an interface name, but it must be the
+                    same on all hosts. The string may end with ':' and a port
+                    number to select which port to listen on for UDP and TCP
+                    unicast traffic. If no port is set and unicast only mode is
+                    set, port 10000 will be used.
+                </Documentation>
+            </StringVectorProperty>
+
+            <StringVectorProperty
+                name="MulticastAddress"
+                command="SetMulticastAddress"
+                default_values=""
+                number_of_elements="1"
+                panel_visibility="advanced">
+                <Hints>
+                    <PlaceholderText>239.1.2.3</PlaceholderText>
+                    <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="ClusterMode" value="2"/>
+                    <RestartRequired/>
+                </Hints>
+                <Documentation>Only used when cluster mode is set to UDP.</Documentation>
+            </StringVectorProperty>
+
+            <StringVectorProperty
+                name="DiscoveryAddress"
+                command="SetDiscoveryAddress"
+                default_values=""
+                number_of_elements="1"
+                panel_visibility="advanced">
+                <Hints>
+                    <PlaceholderText>1.2.3.4:5555</PlaceholderText>
+                    <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="ClusterMode" value="3"/>
+                    <RestartRequired/>
+                </Hints>
+                <Documentation>Only used when cluster mode is set to TCP_WITH_DISCOVERY.</Documentation>
+            </StringVectorProperty>
+
+            <IntVectorProperty
+                name="UseRDMA"
+                command="SetUseRDMA"
+                number_of_elements="1"
+                default_values="0"
+                panel_visibility="advanced" >
+                <BooleanDomain name="bool"/>
+                <Hints>
+                    <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="ClusterMode" value="0" inverse="1"/>
+                    <RestartRequired/>
+                </Hints>
+                <Documentation>Enable Remote Direct Memory Access for InfiniBand.</Documentation>
+            </IntVectorProperty>
+
+            <StringVectorProperty
+                name="RDMAInterface"
+                label="RDMA Interface Address"
+                command="SetRDMAInterface"
+                default_values=""
+                number_of_elements="1"
+                panel_visibility="advanced">
+                <Hints>
+                    <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="UseRDMA" value="1"/>
+                    <PlaceholderText>1.2.3.0/24</PlaceholderText>
+                    <RestartRequired/>
+                </Hints>
+                <Documentation>Address of the network interface to use for RDMA.</Documentation>
+            </StringVectorProperty>
+
+            <StringVectorProperty
+                name="RDMAInterfaceByName"
+                label="RDMA Interface Name"
+                command="SetRDMAInterfaceByName"
+                default_values=""
+                number_of_elements="1"
+                panel_visibility="advanced">
+                <Hints>
+                    <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="UseRDMA" value="1"/>
+                    <PlaceholderText>ib0</PlaceholderText>
+                    <RestartRequired/>
+                </Hints>
+                <Documentation>Name of the network interface to use for RDMA. If set, this will be used instead of 'RDMA Interface Address'.</Documentation>
+            </StringVectorProperty>
+
+            <!-- Extra Configuration -->
+
+            <StringVectorProperty
+                name="ExtraConfiguration"
+                command="SetExtraConfiguration"
+                set_number_command="SetNumberOfExtraConfigurations"
+                number_of_elements_per_command="1"
+                repeat_command="1"
+                use_index="1"
+                panel_visibility="advanced">
+                <Hints>
+                    <RestartRequired/>
+                </Hints>
+                <Documentation>Additional low-level configuration options for NVIDIA IndeX. Must be specified as 'key=value'.</Documentation>
+            </StringVectorProperty>
+
+            <!-- NVIDIA IndeX License -->
+
+            <StringVectorProperty
+                name="VendorKey"
+                command="SetVendorKey"
+                default_values=""
+                number_of_elements="1"
+                panel_visibility="advanced">
+                <Hints>
+                    <PlaceholderText>&lt;using default license&gt;</PlaceholderText>
+                    <RestartRequired/>
+                </Hints>
+                <Documentation>Activate a custom NVIDIA IndeX license. Leave empty to use the default license.</Documentation>
+            </StringVectorProperty>
+
+            <IntVectorProperty
+                name="ShowSecretKey"
+                no_custom_default="1"
+                panel_visibility="advanced"
+                number_of_elements="1"
+                default_values="0">
+                <BooleanDomain name="bool" />
+                <Documentation>View or modify the Secret Key.</Documentation>
+            </IntVectorProperty>
+
+            <StringVectorProperty
+                name="SecretKey"
+                command="SetSecretKey"
+                default_values=""
+                number_of_elements="1"
+                panel_visibility="advanced">
+                <Hints>
+                    <PlaceholderText>&lt;using default license&gt;</PlaceholderText>
+                    <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="ShowSecretKey" value="1"/>
+                    <RestartRequired/>
+                </Hints>
+                <Documentation>Activate a custom NVIDIA IndeX license. Leave empty to use the default license.</Documentation>
+            </StringVectorProperty>
+
+            <!-- Property Groups -->
+
+            <PropertyGroup label="NVIDIA IndeX Logging">
+                <Property name="LogLevel" />
+                <Property name="LogLevelStandardOutput" />
+                <Property name="LogTimestamp" />
+                <Property name="LogHostname" />
+            </PropertyGroup>
+
+            <PropertyGroup label="NVIDIA IndeX Performance Tracking">
+                <Property name="OutputPerformanceValues" />
+                <Property name="OutputPerformanceValuesFilename" />
+                <Property name="ExportSession" />
+                <Property name="ExportSessionFilename" />
+            </PropertyGroup>
+            <PropertyGroup label="NVIDIA IndeX Network Configuration">
+                <Property name="ClusterMode" />
+                <Property name="ClusterInterfaceAddress" />
+                <Property name="MulticastAddress" />
+                <Property name="DiscoveryAddress" />
+                <Property name="UseRDMA" />
+                <Property name="RDMAInterface" />
+                <Property name="RDMAInterfaceByName" />
+            </PropertyGroup>
+
+            <PropertyGroup label="NVIDIA IndeX Extra Configuration">
+                <Property name="ExtraConfiguration" />
+            </PropertyGroup>
+
+            <PropertyGroup label="NVIDIA IndeX License">
+                <Property name="VendorKey" />
+                <Property name="ShowSecretKey" />
+                <Property name="SecretKey" />
+            </PropertyGroup>
+
+            <Hints>
+                <UseDocumentationForLabels />
+            </Hints>
+
+        </SettingsProxy>
+    </ProxyGroup>
 
 </ServerManagerConfiguration>

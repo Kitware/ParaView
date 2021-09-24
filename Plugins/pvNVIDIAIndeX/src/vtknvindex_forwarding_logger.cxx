@@ -34,6 +34,8 @@
 #include "vtkOutputWindow.h"
 #include "vtkSetGet.h"
 
+#include "vtknvindex_global_settings.h"
+
 namespace vtknvindex
 {
 namespace logger
@@ -80,6 +82,15 @@ vtknvindex_forwarding_logger::~vtknvindex_forwarding_logger()
     }
     else
     {
+      mi::base::Message_severity level_output = mi::base::MESSAGE_SEVERITY_WARNING;
+      mi::base::Message_severity level_stdout = mi::base::MESSAGE_SEVERITY_VERBOSE;
+      vtknvindex_global_settings* settings = vtknvindex_global_settings::GetInstance();
+      if (settings)
+      {
+        level_output = mi::base::Message_severity(settings->GetLogLevel());
+        level_stdout = mi::base::Message_severity(settings->GetLogLevelStandardOutput());
+      }
+
       // No forwarding logger available (yet)
       if (vtknvindex_forwarding_logger_factory::instance()->get_fallback_log_severity() >= m_level)
       {
@@ -92,7 +103,7 @@ vtknvindex_forwarding_logger::~vtknvindex_forwarding_logger()
         const std::string prefix = "nvindex: ";
 
         // This is based on vtkErrorWithObjectMacro().
-        if (m_level <= mi::base::MESSAGE_SEVERITY_WARNING && vtkObject::GetGlobalWarningDisplay())
+        if (m_level <= level_output && vtkObject::GetGlobalWarningDisplay())
         {
           // This will pop up the Output Messages window, messages will also be printed to the
           // console.
@@ -103,13 +114,15 @@ vtknvindex_forwarding_logger::~vtknvindex_forwarding_logger()
 
           if (m_level <= mi::base::MESSAGE_SEVERITY_ERROR)
             vtkOutputWindowDisplayErrorText(vtkmsg.str());
-          else
+          else if (m_level <= mi::base::MESSAGE_SEVERITY_WARNING)
             vtkOutputWindowDisplayWarningText(vtkmsg.str());
+          else
+            vtkOutputWindowDisplayText(vtkmsg.str());
 
           vtkmsg.rdbuf()->freeze(0);
           vtkObject::BreakOnError();
         }
-        else
+        else if (m_level <= level_stdout)
         {
           // Log info level only to console.
           std::cout << prefix << "        PVPLN  init " << level << ": " << m_os.str();
@@ -141,6 +154,7 @@ vtknvindex_forwarding_logger::~vtknvindex_forwarding_logger()
     }
   }
 #endif
+
   // The m_forwarding_logger is destructed and ref-count is down here.
   m_forwarding_logger = nullptr;
 }

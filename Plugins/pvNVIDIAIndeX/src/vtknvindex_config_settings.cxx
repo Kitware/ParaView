@@ -134,27 +134,6 @@ bool vtknvindex_xml_config_parser::get_license_strings(
 }
 
 //-------------------------------------------------------------------------------------------------
-bool vtknvindex_xml_config_parser::get_flex_license_path(std::string& path)
-{
-  vtkXMLDataElement* license_elm = m_root_elm->LookupElementWithName("license");
-  if (!license_elm)
-  {
-    return false;
-  }
-
-  vtkXMLDataElement* flex_license_path_elm =
-    license_elm->FindNestedElementWithName("flex_license_path");
-  if (!flex_license_path_elm)
-  {
-    return false;
-  }
-
-  path = std::string(flex_license_path_elm->GetCharacterData());
-
-  return true;
-}
-
-//-------------------------------------------------------------------------------------------------
 bool vtknvindex_xml_config_parser::get_section_settings(
   std::map<std::string, std::string>& params, const std::string& section) const
 {
@@ -309,8 +288,6 @@ bool vtknvindex_xml_config_parser::create_config_file(const std::string& filenam
 //-------------------------------------------------------------------------------------------------
 vtknvindex_config_settings::vtknvindex_config_settings()
   : m_enable_preintegration(false)
-  , m_dump_internal_state(false)
-  , m_log_performance(false)
   , m_animation_play_forward(true)
   , m_animation_interval_max(1)
   , m_filter_mode(nv::index::SPARSE_VOLUME_FILTER_TRILINEAR_POST)
@@ -335,10 +312,9 @@ void vtknvindex_config_settings::set_region_of_interest(
 }
 
 //-------------------------------------------------------------------------------------------------
-void vtknvindex_config_settings::get_region_of_interest(
-  mi::math::Bbox_struct<mi::Float32, 3>& region_of_interest) const
+mi::math::Bbox<mi::Float32, 3> vtknvindex_config_settings::get_region_of_interest() const
 {
-  region_of_interest = m_region_of_interest;
+  return m_region_of_interest;
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -349,10 +325,9 @@ void vtknvindex_config_settings::set_subcube_size(
 }
 
 //-------------------------------------------------------------------------------------------------
-void vtknvindex_config_settings::get_subcube_size(
-  mi::math::Vector_struct<mi::Uint32, 3>& subcube_size) const
+mi::math::Vector<mi::Uint32, 3> vtknvindex_config_settings::get_subcube_size() const
 {
-  subcube_size = m_subcube_size;
+  return m_subcube_size;
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -412,30 +387,6 @@ void vtknvindex_config_settings::set_ivol_step_size(mi::Float32 step_size)
 mi::Float32 vtknvindex_config_settings::get_ivol_step_size() const
 {
   return m_ivol_step_size;
-}
-
-//-------------------------------------------------------------------------------------------------
-void vtknvindex_config_settings::set_dump_internal_state(bool is_dump)
-{
-  m_dump_internal_state = is_dump;
-}
-
-//-------------------------------------------------------------------------------------------------
-bool vtknvindex_config_settings::is_dump_internal_state() const
-{
-  return m_dump_internal_state;
-}
-
-//-------------------------------------------------------------------------------------------------
-void vtknvindex_config_settings::set_log_performance(bool is_log)
-{
-  m_log_performance = is_log;
-}
-
-//-------------------------------------------------------------------------------------------------
-bool vtknvindex_config_settings::is_log_performance() const
-{
-  return m_log_performance;
 }
 
 //-------------------------------------------------------------------------------------------------

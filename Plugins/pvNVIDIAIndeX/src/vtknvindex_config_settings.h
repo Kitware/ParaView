@@ -80,9 +80,6 @@ public:
   // Retrieve license string from the xml file.
   bool get_license_strings(std::string& vendor_key, std::string& secret_key);
 
-  // Retrieve Flex license path.
-  bool get_flex_license_path(std::string& path);
-
   // Retrieve all parameters from a given section.
   bool get_section_settings(
     std::map<std::string, std::string>& params, const std::string& section) const;
@@ -113,7 +110,7 @@ public:
 
   // Set region of interest.
   void set_region_of_interest(const mi::math::Bbox_struct<mi::Float32, 3>& region_of_interest);
-  void get_region_of_interest(mi::math::Bbox_struct<mi::Float32, 3>& region_of_interest) const;
+  mi::math::Bbox<mi::Float32, 3> get_region_of_interest() const;
 
   // Set/get horizontal slice position.
   void set_hslice_position(mi::Float32 slice_pos);
@@ -121,7 +118,7 @@ public:
 
   // Set/get subcube size.
   void set_subcube_size(const mi::math::Vector_struct<mi::Uint32, 3>& subcube_size);
-  void get_subcube_size(mi::math::Vector_struct<mi::Uint32, 3>& subcube_size) const;
+  mi::math::Vector<mi::Uint32, 3> get_subcube_size() const;
 
   // Set/get subcube border size.
   void set_subcube_border(mi::Sint32 border);
@@ -142,14 +139,6 @@ public:
   // Set/get irregular volume step size.
   void set_ivol_step_size(mi::Float32 step_size);
   mi::Float32 get_ivol_step_size() const;
-
-  // Set/get flag for performance logging.
-  void set_log_performance(bool is_dump);
-  bool is_log_performance() const;
-
-  // Set/get flag to dump internal state.
-  void set_dump_internal_state(bool is_dump);
-  bool is_dump_internal_state() const;
 
   // Set/get play forward/backward time series animation.
   void animation_play_forward(bool play_forward);
@@ -185,8 +174,6 @@ private:
   void operator=(const vtknvindex_config_settings&) = delete;
 
   bool m_enable_preintegration;                               // Use pre-integration tables.
-  bool m_dump_internal_state;                                 // Dump scene to file.
-  bool m_log_performance;                                     // Log performance values to file.
   bool m_animation_play_forward;                              // Animation is running.
   mi::Uint32 m_animation_interval_max;                        // The max animation interval.
   nv::index::Sparse_volume_filter_mode m_filter_mode;         // Volume filtering mode.

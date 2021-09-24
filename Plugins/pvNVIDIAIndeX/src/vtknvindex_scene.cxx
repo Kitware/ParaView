@@ -53,6 +53,7 @@
 #include "vtknvindex_clock_pulse_generator.h"
 #include "vtknvindex_cluster_properties.h"
 #include "vtknvindex_forwarding_logger.h"
+#include "vtknvindex_global_settings.h"
 #include "vtknvindex_instance.h"
 #include "vtknvindex_irregular_volume_importer.h"
 #include "vtknvindex_rtc_kernel_params.h"
@@ -246,8 +247,7 @@ void vtknvindex_scene::create_scene(vtkRenderer* ren, vtkVolume* vol,
     vtknvindex_regular_volume_properties* regular_volume_properties =
       m_cluster_properties->get_regular_volume_properties();
 
-    std::string scalar_type;
-    regular_volume_properties->get_scalar_type(scalar_type);
+    const std::string scalar_type = regular_volume_properties->get_scalar_type();
 
     // Scene contains a regular volume.
     if (volume_type == VOLUME_TYPE_REGULAR)
@@ -257,7 +257,8 @@ void vtknvindex_scene::create_scene(vtkRenderer* ren, vtkVolume* vol,
 
       // Create shared memory regular volume data importer.
       vtknvindex_sparse_volume_importer* volume_importer = new vtknvindex_sparse_volume_importer(
-        volume_size, subcube_border, regular_volume_properties->get_ghost_levels(), scalar_type);
+        volume_size, subcube_border, regular_volume_properties->get_ghost_levels(), scalar_type,
+        regular_volume_properties->get_scalar_components());
 
       assert(volume_importer);
 
@@ -522,9 +523,9 @@ void vtknvindex_scene::create_scene(vtkRenderer* ren, vtkVolume* vol,
         mi::math::Vector_struct<mi::Uint32, 3> volume_size;
         regular_volume_properties->get_volume_size(volume_size);
 
-        mi::base::Handle<vtknvindex_volume_compute> vol_compute(
-          new vtknvindex_volume_compute(volume_size, subcube_border,
-            regular_volume_properties->get_ghost_levels(), scalar_type, m_cluster_properties));
+        mi::base::Handle<vtknvindex_volume_compute> vol_compute(new vtknvindex_volume_compute(
+          volume_size, subcube_border, regular_volume_properties->get_ghost_levels(), scalar_type,
+          regular_volume_properties->get_scalar_components(), m_cluster_properties));
         assert(vol_compute.is_valid_interface());
 
         vol_compute->set_enabled(false);
@@ -734,8 +735,7 @@ void vtknvindex_scene::update_volume(
     vtknvindex_regular_volume_properties* regular_volume_properties =
       m_cluster_properties->get_regular_volume_properties();
 
-    std::string scalar_type;
-    regular_volume_properties->get_scalar_type(scalar_type);
+    const std::string scalar_type = regular_volume_properties->get_scalar_type();
 
     // Remove previous volume.
     mi::base::Handle<nv::index::IStatic_scene_group> static_group_edit(
@@ -754,7 +754,8 @@ void vtknvindex_scene::update_volume(
 
       // Create shared memory regular volume data importer.
       vtknvindex_sparse_volume_importer* volume_importer = new vtknvindex_sparse_volume_importer(
-        volume_size, subcube_border, regular_volume_properties->get_ghost_levels(), scalar_type);
+        volume_size, subcube_border, regular_volume_properties->get_ghost_levels(), scalar_type,
+        regular_volume_properties->get_scalar_components());
       assert(volume_importer);
 
       volume_importer->set_cluster_properties(m_cluster_properties);
@@ -846,6 +847,38 @@ void vtknvindex_scene::update_scene(vtkRenderer* ren, vtkVolume* vol,
 
   // Update colormap.
   update_colormap(vol, dice_transaction, m_cluster_properties->get_regular_volume_properties());
+
+  {
+    // Detect changed region of interest (cropping).
+    mi::base::Handle<const nv::index::ISession> session(
+      dice_transaction->access<nv::index::ISession>(m_index_instance->m_session_tag));
+    mi::base::Handle<const nv::index::IScene> scene(
+      dice_transaction->access<nv::index::IScene>(session->get_scene()));
+
+    const mi::math::Bbox<mi::Float32, 3> roi_new =
+      m_cluster_properties->get_config_settings()->get_region_of_interest();
+
+    const mi::math::Bbox<mi::Float32, 3> roi_old = scene->get_clipped_bounding_box();
+    if (roi_new != roi_old)
+    {
+      config_settings_changed = true; // scene will be updated with new ROI below
+    }
+
+    // Performance logging.
+    vtknvindex_global_settings* settings = vtknvindex_global_settings::GetInstance();
+    mi::base::Handle<const nv::index::IConfig_settings> config_settings(
+      dice_transaction->access<nv::index::IConfig_settings>(session->get_config()));
+    if (config_settings->is_monitor_performance_values() != settings->GetOutputPerformanceValues())
+    {
+      config_settings_changed = true;
+    }
+
+    // Dump internal state.
+    if (settings->GetExportSession())
+    {
+      export_session(settings->GetExportSessionFilename());
+    }
+  }
 
   // Update config settings.
   if (config_settings_changed)
@@ -1155,9 +1188,7 @@ void vtknvindex_scene::update_config_settings(
   vtknvindex_config_settings* pv_config_settings = m_cluster_properties->get_config_settings();
 
   // Set region of interest.
-  mi::math::Bbox_struct<mi::Float32, 3> region_of_interest;
-  pv_config_settings->get_region_of_interest(region_of_interest);
-  scene->set_clipped_bounding_box(region_of_interest);
+  scene->set_clipped_bounding_box(pv_config_settings->get_region_of_interest());
 
   // Access (edit mode) the global configurations.
   mi::base::Handle<nv::index::IConfig_settings> config_settings(
@@ -1208,8 +1239,7 @@ void vtknvindex_scene::update_config_settings(
     mi::Uint32 subcube_border_size = pv_config_settings->get_subcube_border();
 
     // Subcube size
-    mi::math::Vector_struct<mi::Uint32, 3> subcube_size;
-    pv_config_settings->get_subcube_size(subcube_size);
+    mi::math::Vector<mi::Uint32, 3> subcube_size = pv_config_settings->get_subcube_size();
 
     // Adding padding to subcube size in order to build a
     // subcube size multiple of the volume size when border size is present.
@@ -1275,15 +1305,9 @@ void vtknvindex_scene::update_config_settings(
     config_settings->set_data_transfer_config(data_transfer_config);
   }
 
-  // Logging performance values.
-  if (m_cluster_properties->get_config_settings()->is_log_performance())
-    config_settings->set_monitor_performance_values(true);
-  else
-    config_settings->set_monitor_performance_values(false);
-
-  // Dump internal state.
-  if (pv_config_settings->is_dump_internal_state())
-    export_session();
+  // Enable generation of performance values if needed.
+  config_settings->set_monitor_performance_values(
+    vtknvindex_global_settings::GetInstance()->GetOutputPerformanceValues());
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -1385,7 +1409,7 @@ void vtknvindex_scene::set_cluster_properties(vtknvindex_cluster_properties* clu
 }
 
 //-------------------------------------------------------------------------------------------------
-void vtknvindex_scene::export_session()
+void vtknvindex_scene::export_session(const char* filename)
 {
   // TODO: Add scene lock here before accessing the export file.
   mi::base::Handle<mi::neuraylib::IDice_transaction> dice_transaction(
@@ -1407,9 +1431,11 @@ void vtknvindex_scene::export_session()
     std::ostringstream s;
     s << str->get_c_str();
 
-    std::string output_filename = "nvindex_pvplugin.prj";
-    if (output_filename.empty() || output_filename == "stdout")
+    std::string output_filename = (filename ? filename : "");
+    if (output_filename.empty())
     {
+      WARN_LOG << "Exporting NVIDIA IndeX session to standard output. This can be disabled in the "
+                  "'Settings' dialog.";
       std::cout << "\n"
                 << "----------------8<-------------[ cut here ]------------------\n"
                 << s.str() << "----------------8<-------------[ cut here ]------------------\n"
@@ -1417,12 +1443,8 @@ void vtknvindex_scene::export_session()
     }
     else
     {
-      std::vector<std::string> path_components;
-      path_components.push_back(vtksys::SystemTools::GetCurrentWorkingDirectory() + "/");
-      path_components.push_back(output_filename);
-
-      INFO_LOG << "Writing export session to file '"
-               << vtksys::SystemTools::JoinPath(path_components) << "'";
+      WARN_LOG << "Exporting NVIDIA IndeX session to file '" << output_filename
+               << "'. This can be disabled in the 'Settings' dialog.";
 
       vtksys::ofstream f(output_filename.c_str());
       f << s.str();

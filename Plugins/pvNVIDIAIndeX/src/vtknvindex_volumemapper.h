@@ -72,7 +72,7 @@ public:
   using Superclass::GetBounds;
 
   // Set the whole volume bounds.
-  void set_whole_bounds(const mi::math::Bbox<mi::Float64, 3> bounds);
+  void set_whole_bounds(const mi::math::Bbox<mi::Float64, 3>& bounds);
 
   // Shutdown forward loggers, NVIDIA IndeX library and unload libraries.
   void shutdown();
@@ -105,7 +105,7 @@ public:
   void slices_changed();
 
   // The CUDA code need to be updated on changes applied in the GUI.
-  void rtc_kernel_changed(vtknvindex_rtc_kernels kernel, const std::string& kernel_program,
+  bool rtc_kernel_changed(vtknvindex_rtc_kernels kernel, const std::string& kernel_program,
     const void* params_buffer, mi::Uint32 buffer_size);
 
   // Initialize the mapper.
@@ -118,12 +118,20 @@ public:
   // Set volume visibility
   void set_visibility(bool visibility);
 
+  // Region of interest used when cropping is disabled and "roi" is not empty. For
+  // backward-compatibility with old state files.
+  void set_region_of_interest_deprecated(const mi::math::Bbox<mi::Float32, 3>& roi);
+
 private:
   vtknvindex_volumemapper(const vtknvindex_volumemapper&) = delete;
   void operator=(const vtknvindex_volumemapper&) = delete;
 
   // Is data prepared for given time step?
   bool is_data_prepared(mi::Sint32 time_step);
+
+  // Converts scalar array to a compatible format, returns nullptr if no conversion necessary or
+  // possible.
+  vtkDataArray* convert_scalar_array(vtkDataArray* scalar_array) const;
 
   bool m_is_caching;              // True when ParaView is caching data on animation loops.
   bool m_is_mapper_initialized;   // True if mapper was initialized.
@@ -135,8 +143,10 @@ private:
   bool m_rtc_kernel_changed; // True when switching between CUDA code.
   bool m_rtc_param_changed;  // True when a kernel parameter changed.
 
-  vtkMTimeType m_last_MTime;   // last MTime when volume was modified
-  std::string m_prev_property; // Volume property that was rendered.
+  vtkMTimeType m_last_MTime;     // last MTime when volume was modified
+  std::string m_prev_array_name; // Volume array name used for last rendering.
+  int m_prev_vector_component;   // Vector component used for last rendering.
+  int m_prev_vector_mode;        // Vector mode used for last rendering.
 
   std::map<mi::Sint32, bool>
     m_time_step_data_prepared; // Is data for given frame ready for importer?
@@ -148,13 +158,19 @@ private:
   vtkDataArray* m_scalar_array;     // Scalar array containing actual data.
   std::vector<void*> m_subset_ptrs; // Array with pointers to scalars data for all time steps.
 
-  mi::Float64 m_whole_bounds[6]; // Whole volume bounds.
+  // Converted scalar arrays for all time steps, m_subset_ptrs will point to their scalar data.
+  // Entries will be null if no conversion took place (and m_scalar_array can be used directly).
+  std::vector<vtkSmartPointer<vtkDataArray>> m_converted_scalar_arrays;
 
-  std::set<std::string> m_data_array_warning_printed; // A warning was already printed for these
+  mi::Float64 m_whole_bounds[6];                                  // Whole volume bounds.
+  mi::math::Bbox<mi::Float32, 3> m_region_of_interest_deprecated; // For backward-compatibility.
+  bool m_region_of_interest_deprecated_warning_printed;           // A warning was already printed.
+
+  std::set<std::string> m_data_array_warning_printed; // A warning was already printed for these.
 
   vtknvindex_rtc_params_buffer m_volume_rtc_kernel; // The CUDA code applied to the current volume.
 
-  vtknvindex_instance* m_index_instance; // global index instance pointer
+  vtknvindex_instance* m_index_instance; // Global index instance pointer.
 };
 
 #endif

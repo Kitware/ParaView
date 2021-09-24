@@ -2,7 +2,12 @@
      The plugin will look for this configuration file in the default ParaView
      configuration directory (typically $HOME/.config/ParaView/) or, if it is
      defined, in the directory specified by the environment variable
-     NVINDEX_PVPLUGIN_HOME. -->
+     NVINDEX_PVPLUGIN_HOME.
+
+     Any settings specified here have precedence over those from the 'Settings'
+     dialog.
+-->
+
 <index_config>
     <!-- NVIDIA IndeX license, can be used to override the default license. -->
     <license>
@@ -31,7 +36,7 @@
         <!-- Discovery address. Only used when cluster_mode is set to TCP_WITH_DISCOVERY. -->
         <!-- <discovery_address>224.1.3.3:5555</discovery_address> -->
 
-        <!-- Control usage of InfiniBand RDMA in the networking layer. -->
+        <!-- Controls usage of InfiniBand RDMA in the networking layer. -->
         <!-- <use_rdma>no</use_rdma> -->
     </network>
 </index_config>

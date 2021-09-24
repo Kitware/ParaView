@@ -83,11 +83,24 @@ nv::index::IDistributed_data_subset* vtknvindex_irregular_volume_importer::creat
   vtkMultiProcessController* controller = vtkMultiProcessController::GetGlobalController();
   const mi::Sint32 rank_id = controller ? controller->GetLocalProcessId() : 0;
 
-  const std::type_info* scalar_type_info = (m_scalar_type == "unsigned char")
-    ? &typeid(mi::Uint8)
-    : (m_scalar_type == "unsigned short")
-      ? &typeid(mi::Uint16)
-      : (m_scalar_type == "float") ? &typeid(mi::Float32) : &typeid(mi::Float64);
+  const std::type_info* scalar_type_info;
+  if (m_scalar_type == "unsigned char")
+    scalar_type_info = &typeid(mi::Uint8);
+  else if (m_scalar_type == "unsigned short")
+    scalar_type_info = &typeid(mi::Uint16);
+  else if (m_scalar_type == "unsigned int")
+    scalar_type_info = &typeid(mi::Uint32);
+  else if (m_scalar_type == "int")
+    scalar_type_info = &typeid(mi::Sint32);
+  else if (m_scalar_type == "float")
+    scalar_type_info = &typeid(mi::Float32);
+  else if (m_scalar_type == "double")
+    scalar_type_info = &typeid(mi::Float64);
+  else
+  {
+    ERROR_LOG << "Invalid scalar type '" << m_scalar_type << "' for unstructed volume.";
+    return nullptr;
+  }
 
   // Fetch shared memory details from host properties.
   const mi::Uint32 time_step = 0;
@@ -192,6 +205,10 @@ nv::index::IDistributed_data_subset* vtknvindex_irregular_volume_importer::creat
       size_elm = sizeof(mi::Uint8) * num_scalars;
     else if (*scalar_type_info == typeid(mi::Uint16))
       size_elm = sizeof(mi::Uint16) * num_scalars;
+    else if (*scalar_type_info == typeid(mi::Uint32))
+      size_elm = sizeof(mi::Uint32) * num_scalars;
+    else if (*scalar_type_info == typeid(mi::Sint32))
+      size_elm = sizeof(mi::Sint32) * num_scalars;
     else if (*scalar_type_info == typeid(mi::Float32))
       size_elm = sizeof(mi::Float32) * num_scalars;
     else // typeid(mi::Float64)
@@ -260,10 +277,19 @@ nv::index::IDistributed_data_subset* vtknvindex_irregular_volume_importer::creat
           else if (*scalar_type_info == typeid(mi::Uint16))
             subset_scalars_uint16.push_back(
               (reinterpret_cast<const mi::Uint16*>(scalars))[cell_id]);
+          else if (*scalar_type_info == typeid(mi::Uint32))
+            // convert unsigned int to float
+            subset_scalars_float32.push_back(
+              static_cast<mi::Float32>((reinterpret_cast<const mi::Uint32*>(scalars))[cell_id]));
+          else if (*scalar_type_info == typeid(mi::Sint32))
+            // convert int to float
+            subset_scalars_float32.push_back(
+              static_cast<mi::Float32>((reinterpret_cast<const mi::Sint32*>(scalars))[cell_id]));
           else if (*scalar_type_info == typeid(mi::Float32))
             subset_scalars_float32.push_back(
               (reinterpret_cast<const mi::Float32*>(scalars))[cell_id]);
           else // typeid(mi::Float64)
+            // convert double to float
             subset_scalars_float32.push_back(
               static_cast<mi::Float32>((reinterpret_cast<const mi::Float64*>(scalars))[cell_id]));
         }
@@ -293,9 +319,18 @@ nv::index::IDistributed_data_subset* vtknvindex_irregular_volume_importer::creat
             subset_scalars_uint8.push_back((reinterpret_cast<const mi::Uint8*>(scalars))[t]);
           else if (*scalar_type_info == typeid(mi::Uint16))
             subset_scalars_uint16.push_back((reinterpret_cast<const mi::Uint16*>(scalars))[t]);
+          else if (*scalar_type_info == typeid(mi::Uint32))
+            // convert unsigned int to float
+            subset_scalars_float32.push_back(
+              static_cast<mi::Float32>((reinterpret_cast<const mi::Uint32*>(scalars))[t]));
+          else if (*scalar_type_info == typeid(mi::Sint32))
+            // convert int to float
+            subset_scalars_float32.push_back(
+              static_cast<mi::Float32>((reinterpret_cast<const mi::Sint32*>(scalars))[t]));
           else if (*scalar_type_info == typeid(mi::Float32))
             subset_scalars_float32.push_back((reinterpret_cast<const mi::Float32*>(scalars))[t]);
           else // typeid(mi::Float64)
+            // convert double to float
             subset_scalars_float32.push_back(
               static_cast<mi::Float32>((reinterpret_cast<const mi::Float64*>(scalars))[t]));
         }
@@ -364,10 +399,19 @@ nv::index::IDistributed_data_subset* vtknvindex_irregular_volume_importer::creat
           else if (*scalar_type_info == typeid(mi::Uint16))
             subset_scalars_uint16.push_back(
               (reinterpret_cast<const mi::Uint16*>(scalars))[vtx_index]);
+          else if (*scalar_type_info == typeid(mi::Uint32))
+            // convert unsigned int to float
+            subset_scalars_float32.push_back(
+              static_cast<mi::Float32>((reinterpret_cast<const mi::Uint32*>(scalars))[vtx_index]));
+          else if (*scalar_type_info == typeid(mi::Sint32))
+            // convert int to float
+            subset_scalars_float32.push_back(
+              static_cast<mi::Float32>((reinterpret_cast<const mi::Sint32*>(scalars))[vtx_index]));
           else if (*scalar_type_info == typeid(mi::Float32))
             subset_scalars_float32.push_back(
               (reinterpret_cast<const mi::Float32*>(scalars))[vtx_index]);
           else // typeid(mi::Float64)
+            // convert double to float
             subset_scalars_float32.push_back(
               static_cast<mi::Float32>((reinterpret_cast<const mi::Float64*>(scalars))[vtx_index]));
         }
@@ -428,8 +472,8 @@ nv::index::IDistributed_data_subset* vtknvindex_irregular_volume_importer::creat
     attrib_params.type = nv::index::IIrregular_volume_subset::ATTRIB_TYPE_UINT8;
   else if (*scalar_type_info == typeid(mi::Uint16))
     attrib_params.type = nv::index::IIrregular_volume_subset::ATTRIB_TYPE_UINT16;
-  else // typeid(mi::Float32)
-    attrib_params.type = nv::index::IIrregular_volume_subset::ATTRIB_TYPE_FLOAT32;
+  else // Uint32/Sint32 (converted), Float32, or Float64 (converted)
+    attrib_params.type = nv::index::IIrregular_volume_subset::ATTRIB_TYPE_FLOAT32; // converted
 
   nv::index::IIrregular_volume_subset::Attribute_storage attribute_storage;
   if (!irregular_volume_subset->generate_attribute_storage(0u, attrib_params, attribute_storage))
@@ -456,7 +500,7 @@ nv::index::IDistributed_data_subset* vtknvindex_irregular_volume_importer::creat
     scalars_buffer = subset_scalars_uint16.data();
     scalars_buffer_size = subset_scalars_uint16.size() * sizeof(mi::Uint16);
   }
-  else // typeid(mi::Float32)
+  else // Uint32/Sint32 (converted), Float32, or Float64 (converted)
   {
     scalars_buffer = subset_scalars_float32.data();
     scalars_buffer_size = subset_scalars_float32.size() * sizeof(mi::Float32);
