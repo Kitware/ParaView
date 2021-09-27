@@ -1,7 +1,7 @@
 /*=========================================================================
 
-   Program: ParaView
-   Module:    pqLinkedObjectPythonTextArea.cxx
+   Program:   ParaView
+   Module:    pqDoubleRangeWidget.h
 
    Copyright (c) 2005-2008 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,29 +29,53 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
+#ifndef pqClickableLabel_h
+#define pqClickableLabel_h
 
-#include "pqLinkedObjectPythonTextArea.h"
-#include "pqPythonTextArea.h"
+#include "pqWidgetsModule.h"
 
-//-----------------------------------------------------------------------------
-pqLinkedObjectPythonTextArea::pqLinkedObjectPythonTextArea(pqPythonTextArea& textArea) noexcept
-  : pqLinkedObjectQTextEdit(*textArea.getTextEdit())
-  , TextArea(textArea)
+#include <QLabel>
+
+/**
+ * @brief A simple clickable label that mimics
+ * a push button and emits onClicked event
+ */
+class PQWIDGETS_EXPORT pqClickableLabel : public QLabel
 {
-}
+  Q_OBJECT
 
-//-----------------------------------------------------------------------------
-void pqLinkedObjectPythonTextArea::link(pqLinkedObjectInterface* other)
-{
-  if (other)
-  {
-    const QUndoStack& undoStack = this->TextArea.getUndoStack();
-    this->ConnectedTo = other;
-    this->Connection = QObject::connect(&undoStack, &QUndoStack::indexChanged, [this]() {
-      if (!this->SettingText)
-      {
-        this->ConnectedTo->setText(this->getText());
-      }
-    });
-  }
-}
+public:
+  /**
+   * @brief Default constructor is deleted
+   */
+  pqClickableLabel() = delete;
+
+  /**
+   * @brief Default constructor that sets up the tooltip
+   * and the label pixmap or text.
+   * If the pixmap is nullptr, it will not be set.
+   */
+  pqClickableLabel(QWidget* widget, const QString& text, const QString& tooltip,
+    const QString& statusTip, QPixmap* pixmap, QWidget* parent);
+
+  /**
+   * @brief Defaulted destructor for polymorphism
+   */
+  ~pqClickableLabel() override = default;
+
+signals:
+  /**
+   * @brief Signal emitted when the label
+   * is clicked (to mimic a push button)
+   * @param[in] w the widget attached to
+   * the pqClickableLabel
+   */
+  void onClicked(QWidget* widget);
+
+protected:
+  void mousePressEvent(QMouseEvent* event) override;
+
+  QWidget* Widget = nullptr;
+};
+
+#endif

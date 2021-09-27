@@ -121,12 +121,6 @@ signals:
   void fileSaved(const QString&);
 
   /**
-   * @brief Signals that the file has been saved under
-   * the macro directory from Paraview
-   */
-  void fileSavedAsMacro(const QString&);
-
-  /**
    * @brief Emitted when the content of the buffer
    * has changed
    */

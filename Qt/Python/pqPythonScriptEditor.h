@@ -112,11 +112,7 @@ public:
   /**
    * Utility function that provides a single instance of the editor.
    */
-  static pqPythonScriptEditor* getUniqueInstance()
-  {
-    static pqPythonScriptEditor* instance = new pqPythonScriptEditor(pqCoreUtilities::mainWidget());
-    return instance;
-  }
+  static pqPythonScriptEditor* getUniqueInstance();
 
   /**
    * Triggers an macro list update if the PythonManager exists
@@ -137,25 +133,17 @@ public:
   /**
    * Opens and bring the editor in front of other windows
    */
-  static void bringFront()
-  {
-    pqPythonScriptEditor* instance = pqPythonScriptEditor::getUniqueInstance();
-    instance->show();
-    instance->raise();
-  }
+  static void bringFront();
 
   /**
    * Returns the macro directory
    */
-  static QString getMacrosDir() { return pqCoreUtilities::getParaViewUserDirectory() + "/Macros"; }
+  static QString getMacrosDir();
 
   /**
    * Returns the script directory
    */
-  static QString getScriptsDir()
-  {
-    return pqCoreUtilities::getParaViewUserDirectory() + "/Scripts";
-  }
+  static QString getScriptsDir();
 
 protected:
   /**
@@ -182,7 +170,12 @@ private:
   /**
    * The python manager only used for the paraview macro system
    */
-  pqPythonManager* pythonManager;
+  pqPythonManager* PythonManager;
+
+  /**
+   * Unique python script editor instance when needed
+   */
+  static pqPythonScriptEditor* UniqueInstance;
 };
 
 #endif

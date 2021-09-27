@@ -1,7 +1,7 @@
 /*=========================================================================
 
-   Program: ParaView
-   Module:    pqLinkedObjectQTextEdit.cxx
+   Program:   ParaView
+   Module:    pqClickableLabel.cxx
 
    Copyright (c) 2005-2008 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,58 +29,28 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
+#include "pqClickableLabel.h"
 
-#include "pqLinkedObjectQTextEdit.h"
-
-#include <QTextEdit>
+#include <QMouseEvent>
 
 //-----------------------------------------------------------------------------
-void pqLinkedObjectQTextEdit::link(pqLinkedObjectInterface* other)
+pqClickableLabel::pqClickableLabel(QWidget* widget, const QString& text, const QString& tooltip,
+  const QString& statusTip, QPixmap* pixmap, QWidget* parent)
+  : QLabel(parent)
+  , Widget(widget)
 {
-  if (other)
+  this->setText(text);
+  this->setToolTip(tooltip);
+  this->setStatusTip(statusTip);
+  if (pixmap)
   {
-    this->ConnectedTo = other;
-    this->Connection = QObject::connect(&this->TextEdit, &QTextEdit::textChanged, [this]() {
-      if (!this->SettingText)
-      {
-        this->ConnectedTo->setText(this->getText());
-      }
-    });
+    this->setPixmap(*pixmap);
   }
 }
 
 //-----------------------------------------------------------------------------
-void pqLinkedObjectQTextEdit::unlink()
+void pqClickableLabel::mousePressEvent(QMouseEvent* event)
 {
-  if (this->ConnectedTo)
-  {
-    QObject::disconnect(this->Connection);
-    this->ConnectedTo = nullptr;
-  }
-}
-
-//-----------------------------------------------------------------------------
-void pqLinkedObjectQTextEdit::setText(const QString& txt)
-{
-  this->SettingText = true;
-  this->TextEdit.setHtml(txt);
-  this->SettingText = false;
-}
-
-//-----------------------------------------------------------------------------
-QString pqLinkedObjectQTextEdit::getText() const
-{
-  return this->TextEdit.toHtml();
-}
-
-//-----------------------------------------------------------------------------
-QObject* pqLinkedObjectQTextEdit::getLinked() const noexcept
-{
-  return &this->TextEdit;
-}
-
-//-----------------------------------------------------------------------------
-QString pqLinkedObjectQTextEdit::getName() const
-{
-  return this->TextEdit.objectName();
+  emit this->onClicked(this->Widget);
+  event->accept();
 }

@@ -32,6 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqPythonTabWidget.h"
 
+#include "pqClickableLabel.h"
 #include "pqCoreUtilities.h"
 #include "pqPythonEditorActions.h"
 #include "pqPythonScriptEditor.h"
@@ -50,10 +51,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 pqPythonTabWidget::pqPythonTabWidget(QWidget* parent)
   : QTabWidget(parent)
 {
-  this->addNewTabButton();
+  this->addNewTabWidget();
   this->createNewEmptyTab();
   this->setMovable(false);
-  this->setTabsClosable(true);
 
   this->connect(this, &QTabWidget::tabCloseRequested, [this](int index) {
     pqPythonTextArea* widget = this->getWidget<pqPythonTextArea>(index);
@@ -138,45 +138,46 @@ pqPythonTextArea* pqPythonTabWidget::getCurrentTextArea() const
 }
 
 //-----------------------------------------------------------------------------
-void pqPythonTabWidget::addNewTextArea(const QString& filename)
+void pqPythonTabWidget::addNewTextArea(const QString& fileName)
 {
-  // If the filename is empty abort
-  if (filename.isEmpty())
+  // If the fileName is empty abort
+  if (fileName.isEmpty())
   {
     return;
   }
 
-  const int isOpened = this->fileIsOpened(filename);
+  const int isOpened = this->fileIsOpened(fileName);
   if (isOpened != -1)
   {
     this->setCurrentIndex(isOpened);
     return;
   }
 
-  if (!this->getCurrentTextArea()->isEmpty() || this->getCurrentTextArea()->isLinked())
+  pqPythonTextArea* tArea = this->getCurrentTextArea();
+  if (!tArea->isEmpty() || tArea->isLinked())
   {
     this->createNewEmptyTab();
+    tArea = this->getCurrentTextArea();
   }
 
   // If not create a new tab
-  pqPythonTextArea* tArea = this->getCurrentTextArea();
-  tArea->openFile(filename);
+  tArea->openFile(fileName);
 }
 
 //-----------------------------------------------------------------------------
-void pqPythonTabWidget::loadFile(const QString& filename)
+void pqPythonTabWidget::loadFile(const QString& fileName)
 {
-  // If the filename is empty abort
-  if (filename.isEmpty())
+  // If the fileName is empty abort
+  if (fileName.isEmpty())
   {
     return;
   }
 
-  QFile file(filename);
+  QFile file(fileName);
   if (!file.open(QFile::ReadOnly | QFile::Text))
   {
     QMessageBox::warning(pqCoreUtilities::mainWidget(), QString("Sorry!"),
-      QString("Cannot open file %1:\n%2.").arg(filename).arg(file.errorString()));
+      QString("Cannot open file %1:\n%2.").arg(fileName).arg(file.errorString()));
     return;
   }
 
@@ -248,8 +249,21 @@ void pqPythonTabWidget::updateTab(QWidget* widget)
   const int idx = this->indexOf(widget);
   if (idx != -1)
   {
-    this->tabBar()->setTabButton(
-      idx, QTabBar::LeftSide, this->getTabLabel(reinterpret_cast<pqPythonTextArea*>(widget)));
+    QString tabName;
+    QString elidedTabName;
+    QString unstyledTabName;
+    this->generateTabName(
+      qobject_cast<pqPythonTextArea*>(widget), tabName, elidedTabName, unstyledTabName);
+    pqClickableLabel* cLabel =
+      new pqClickableLabel(widget, elidedTabName, tabName, unstyledTabName, nullptr, widget);
+    this->tabBar()->setTabButton(idx, QTabBar::LeftSide, cLabel);
+    this->connect(cLabel, &pqClickableLabel::onClicked, [this](QWidget* clickedWidget) {
+      int tmpIdx = this->indexOf(clickedWidget);
+      if (tmpIdx >= 0 && tmpIdx < this->count() - 1)
+      {
+        this->setCurrentIndex(tmpIdx);
+      }
+    });
   }
 }
 
@@ -270,41 +284,38 @@ void pqPythonTabWidget::createNewEmptyTab()
   this->connect(widget, &pqPythonTextArea::fileSaved,
     [this, widget](const QString&) { this->updateTab(widget); });
 
-  this->connect(widget, &pqPythonTextArea::fileSavedAsMacro,
-    [this, widget](const QString&) { this->updateTab(widget); });
-
   this->connect(
     widget, &pqPythonTextArea::contentChanged, [this, widget]() { this->updateTab(widget); });
 
   this->connect(widget, &pqPythonTextArea::fileOpened, this, &pqPythonTabWidget::fileOpened);
   this->connect(widget, &pqPythonTextArea::fileSaved, this, &pqPythonTabWidget::fileSaved);
-  this->connect(
-    widget, &pqPythonTextArea::fileSavedAsMacro, this, &pqPythonTabWidget::fileSavedAsMacro);
-
   this->setTabCloseButton(widget);
 }
 
 //-----------------------------------------------------------------------------
 void pqPythonTabWidget::setTabCloseButton(pqPythonTextArea* widget)
 {
-  QCloseLabel* label = new QCloseLabel(widget, widget);
-  this->tabBar()->setTabButton(this->count() - 2, QTabBar::RightSide, label);
-  this->connect(label, &QCloseLabel::onClicked, [this](QWidget* clickedWidget) {
+  QPixmap closePixmap = this->style()->standardIcon(QStyle::SP_TitleBarCloseButton).pixmap(16, 16);
+  QString label = "Close Tab";
+  pqClickableLabel* cLabel =
+    new pqClickableLabel(widget, label, label, label, &closePixmap, widget);
+  this->tabBar()->setTabButton(this->count() - 2, QTabBar::RightSide, cLabel);
+  this->connect(cLabel, &pqClickableLabel::onClicked, [this](QWidget* clickedWidget) {
     int idx = this->indexOf(clickedWidget);
     if (idx >= 0 && idx < this->count() - 1)
     {
-      this->tabBar()->tabCloseRequested(idx);
+      emit this->tabCloseRequested(idx);
     }
   });
 }
 
 //-----------------------------------------------------------------------------
-void pqPythonTabWidget::addNewTabButton()
+void pqPythonTabWidget::addNewTabWidget()
 {
-  QLabel* label = new QLabel("+");
-  this->addTab(new QLabel("Adds a new tab"), QString());
-  this->tabBar()->setTabButton(0, QTabBar::RightSide, label);
+  QWidget* newTabWidget = new QWidget(this);
+  this->addTab(newTabWidget, "+");
 
+  // New tab widget is always the last one
   this->connect(this, &QTabWidget::tabBarClicked, [this](int index) {
     if (index == this->count() - 1)
     {
@@ -334,11 +345,13 @@ void pqPythonTabWidget::createParaviewTraceTab()
 {
   if (!this->TraceWidget)
   {
-    if (!this->getCurrentTextArea()->isEmpty())
+    pqPythonTextArea* widget = this->getCurrentTextArea();
+    if (!widget->isEmpty() || widget->isLinked())
     {
       this->createNewEmptyTab();
+      widget = this->getCurrentTextArea();
     }
-    this->TraceWidget = this->getCurrentTextArea();
+    this->TraceWidget = widget;
   }
 }
 
@@ -365,67 +378,92 @@ void pqPythonTabWidget::stopTrace(const QString& str)
 }
 
 //-----------------------------------------------------------------------------
-QLabel* pqPythonTabWidget::getTabLabel(const pqPythonTextArea* widget) const
+void pqPythonTabWidget::generateTabName(const pqPythonTextArea* widget, QString& tabName,
+  QString& elidedTabName, QString& unstyledTabName) const
 {
-  const auto GenerateTabName = [this, widget]() {
-    const auto QColorToString = [](const QColor& color) { return color.name(QColor::HexRgb); };
-    const auto ColorText = [&QColorToString](const QColor& color, const QString& text) {
-      return "<span style=\"color:" + QColorToString(color) + "\">" + text + "</span>";
-    };
+  const auto QColorToString = [](const QColor& color) { return color.name(QColor::HexRgb); };
+  const auto ColorText = [&QColorToString](const QColor& color, const QString& text) {
+    return "<span style=\"color:" + QColorToString(color) + "\">" + text + "</span>";
+  };
 
-    const QString& filename = widget->getFilename();
-    const QFileInfo fileInfo(filename);
-    const QString macroDir = pqPythonScriptEditor::getMacrosDir();
-    const QString scriptDir = pqPythonScriptEditor::getScriptsDir();
+  QString fileName = widget->getFilename();
+  const QFileInfo fileInfo(fileName);
+  const QString macroDir = pqPythonScriptEditor::getMacrosDir();
+  const QString scriptDir = pqPythonScriptEditor::getScriptsDir();
 
-    QString tabname;
+  // Insert a tag for the tab type
+  QString prefix;
+  QColor prefixColor;
+  if (widget == this->TraceWidget)
+  {
+    prefix = "[Trace]";
+    prefixColor = Qt::GlobalColor::darkCyan;
+  }
+  else if (fileName.contains(macroDir))
+  {
+    prefix = "[Macro]";
+    prefixColor = Qt::GlobalColor::darkGreen;
+  }
+  else if (fileName.contains(scriptDir))
+  {
+    prefix = "[Script]";
+    prefixColor = Qt::GlobalColor::darkBlue;
+  }
+  tabName = ColorText(prefixColor, prefix);
+  unstyledTabName = prefix;
 
-    // Insert a tag for the tab type
-    if (widget == this->TraceWidget)
-    {
-      tabname = ColorText(Qt::GlobalColor::darkCyan, "[Trace] ");
-    }
-    else if (filename.contains(macroDir))
-    {
-      tabname = ColorText(Qt::GlobalColor::darkGreen, "[Macro] ");
-    }
-    else if (filename.contains(scriptDir))
-    {
-      tabname = ColorText(Qt::GlobalColor::darkBlue, "[Script] ");
-    }
+  if (widget->isLinked())
+  {
+    tabName += ColorText(Qt::GlobalColor::darkYellow, "[Linked]");
+    unstyledTabName += "[Linked]";
+  }
 
-    if (filename.isEmpty())
-    {
-      tabname += "New File";
-    }
-    else
-    {
-      tabname += ColorText(Qt::GlobalColor::gray, fileInfo.dir().absolutePath()) + "/";
+  tabName += " ";
+  unstyledTabName += " ";
 
-      if (widget->isDirty())
-      {
-        tabname += "<b>" + ColorText(Qt::GlobalColor::red, fileInfo.fileName()) + "</b>";
-      }
-      else
-      {
-        tabname += fileInfo.fileName();
-      }
-    }
+  if (fileName.isEmpty())
+  {
+    tabName += "New File";
+    elidedTabName = tabName;
+    unstyledTabName += "New File";
+  }
+  else
+  {
+    QString absoluteDirPath = fileInfo.dir().absolutePath();
 
     // Replace the home folder path with ~
     const QString homeDirectory = QStandardPaths::writableLocation(QStandardPaths::HomeLocation);
-    tabname.replace(homeDirectory, "~");
+    absoluteDirPath.replace(homeDirectory, "~");
 
-    return tabname;
-  };
+    elidedTabName = tabName;
+    tabName += ColorText(Qt::GlobalColor::gray, absoluteDirPath) + "/";
+    unstyledTabName += absoluteDirPath + "/";
 
-  return new QLabel(GenerateTabName());
+    // Path can get long, elide it
+    QLabel tmpLabel;
+    QFontMetrics metrics(tmpLabel.font());
+    QString elidedAbsoluteDirPath = metrics.elidedText(absoluteDirPath, Qt::ElideMiddle, 200);
+    elidedTabName += ColorText(Qt::GlobalColor::gray, elidedAbsoluteDirPath) + "/";
+
+    QString styledFileName;
+    if (widget->isDirty())
+    {
+      styledFileName = "<b>" + ColorText(Qt::GlobalColor::red, fileInfo.fileName()) + "</b>";
+    }
+    else
+    {
+      styledFileName = fileInfo.fileName();
+    }
+    tabName += styledFileName;
+    unstyledTabName += styledFileName;
+    elidedTabName += styledFileName;
+  }
 }
 
 //-----------------------------------------------------------------------------
-int pqPythonTabWidget::fileIsOpened(const QString& filename) const
+int pqPythonTabWidget::fileIsOpened(const QString& fileName) const
 {
-  const QFileInfo fileInfo(filename);
+  const QFileInfo fileInfo(fileName);
   for (int i = 0; i < this->count() - 1; ++i)
   {
     pqPythonTextArea* widget = this->getWidget<pqPythonTextArea>(i);

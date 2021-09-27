@@ -64,11 +64,13 @@ void FillMenu(QMenu* menu, std::vector<QAction*>& actions)
 }
 }
 
+pqPythonScriptEditor* pqPythonScriptEditor::UniqueInstance = nullptr;
+
 //-----------------------------------------------------------------------------
 pqPythonScriptEditor::pqPythonScriptEditor(QWidget* p)
   : QMainWindow(p)
   , TabWidget(new pqPythonTabWidget(this))
-  , pythonManager(nullptr)
+  , PythonManager(nullptr)
 {
   this->setCentralWidget(TabWidget);
 
@@ -80,18 +82,6 @@ pqPythonScriptEditor::pqPythonScriptEditor(QWidget* p)
   vtkPythonInterpreter::Initialize();
 
   this->setWindowTitle(tr("ParaView Python Script Editor"));
-
-  this->connect(
-    this->TabWidget, &pqPythonTabWidget::fileSavedAsMacro, [this](const QString& filename) {
-      if (pythonManager)
-      {
-        pythonManager->updateMacroList();
-      }
-
-      this->setWindowTitle(
-        tr("%1[*] - %2").arg(details::stripFilename(filename)).arg(tr("Script Editor")));
-      this->statusBar()->showMessage(tr("File %1 saved as macro").arg(filename), 4000);
-    });
 
   this->connect(this->TabWidget, &pqPythonTabWidget::fileSaved, [this](const QString& filename) {
     this->setWindowTitle(
@@ -150,7 +140,7 @@ void pqPythonScriptEditor::setSaveDialogDefaultDirectory(const QString& dir)
 //-----------------------------------------------------------------------------
 void pqPythonScriptEditor::setPythonManager(pqPythonManager* manager)
 {
-  this->pythonManager = manager;
+  this->PythonManager = manager;
   this->Actions[pqPythonEditorActions::GeneralActionType::SaveFileAsMacro].setEnabled(
     manager != nullptr);
 }
@@ -225,9 +215,9 @@ void pqPythonScriptEditor::scrollToBottom()
 void pqPythonScriptEditor::updateMacroList()
 {
   auto editor = pqPythonScriptEditor::getUniqueInstance();
-  if (editor->pythonManager)
+  if (editor->PythonManager)
   {
-    editor->pythonManager->updateMacroList();
+    editor->PythonManager->updateMacroList();
   }
 }
 
@@ -256,4 +246,34 @@ void pqPythonScriptEditor::linkTo(QTextEdit* obj)
 {
   auto instance = pqPythonScriptEditor::getUniqueInstance();
   instance->TabWidget->linkTo(obj);
+}
+
+//-----------------------------------------------------------------------------
+pqPythonScriptEditor* pqPythonScriptEditor::getUniqueInstance()
+{
+  if (!pqPythonScriptEditor::UniqueInstance)
+  {
+    pqPythonScriptEditor::UniqueInstance = new pqPythonScriptEditor(pqCoreUtilities::mainWidget());
+  }
+  return pqPythonScriptEditor::UniqueInstance;
+}
+
+//-----------------------------------------------------------------------------
+void pqPythonScriptEditor::bringFront()
+{
+  pqPythonScriptEditor* instance = pqPythonScriptEditor::getUniqueInstance();
+  instance->show();
+  instance->raise();
+}
+
+//-----------------------------------------------------------------------------
+QString pqPythonScriptEditor::getMacrosDir()
+{
+  return pqCoreUtilities::getParaViewUserDirectory() + "/Macros";
+}
+
+//-----------------------------------------------------------------------------
+QString pqPythonScriptEditor::getScriptsDir()
+{
+  return pqCoreUtilities::getParaViewUserDirectory() + "/Scripts";
 }

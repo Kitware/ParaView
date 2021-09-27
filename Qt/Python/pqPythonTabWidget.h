@@ -44,59 +44,6 @@ class pqPythonTextArea;
 struct pqPythonEditorActions;
 
 /**
- * @brief A simple close label that mimics
- * the paraview cross button to close a tab
- * in the main window.
- */
-class PQPYTHON_EXPORT QCloseLabel : public QLabel
-{
-  Q_OBJECT
-
-public:
-  /**
-   * @brief Default constructor is deleted
-   */
-  QCloseLabel() = delete;
-
-  /**
-   * @brief Default constructor that sets up the tooltip
-   * and the label pixmap.
-   */
-  QCloseLabel(QWidget* w, QWidget* parent)
-    : QLabel(parent)
-    , widget(w)
-  {
-    this->setToolTip("Close tab");
-    this->setStatusTip("Close tab");
-    this->setPixmap(this->style()->standardIcon(QStyle::SP_TitleBarCloseButton).pixmap(16, 16));
-  }
-
-  /**
-   * @brief Defaulted destructor for polymorphism
-   */
-  ~QCloseLabel() override = default;
-
-signals:
-  /**
-   * @brief Signal emitted when the label
-   * is clicked (to mimic a push button)
-   * @param[in] w the widget attached to
-   * the QCloseLabel
-   */
-  void onClicked(QWidget* w);
-
-protected:
-  void mousePressEvent(QMouseEvent* event) override
-  {
-    emit this->onClicked(widget);
-    event->accept();
-  }
-
-private:
-  QWidget* widget = nullptr;
-};
-
-/**
  * @class pqPythonTabWidget
  * @brief Encapsulates the multitab python editor
  * @details Provides a QWidget with multiple QTextArea
@@ -196,22 +143,17 @@ signals:
    */
   void fileSaved(const QString&);
 
-  /**
-   * @brief Raised when a file has been successfuly
-   * saved as a paraview macro
-   */
-  void fileSavedAsMacro(const QString&);
-
 protected:
   void keyPressEvent(QKeyEvent* keyEvent) override;
   void mousePressEvent(QMouseEvent* mouseEvent) override;
 
 private:
   void updateTab(QWidget* widget);
-  void addNewTabButton();
+  void addNewTabWidget();
   void setTabCloseButton(pqPythonTextArea* widget);
   void createParaviewTraceTab();
-  QLabel* getTabLabel(const pqPythonTextArea* widget) const;
+  void generateTabName(const pqPythonTextArea* widget, QString& tabName, QString& elidedTabName,
+    QString& unstyledTabName) const;
 
   /**
    * @brief Returns -1 if the editor doesn't contain
