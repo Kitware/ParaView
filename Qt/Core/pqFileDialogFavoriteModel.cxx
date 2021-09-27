@@ -38,6 +38,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QFont>
 #include <QStyle>
 #include <pqApplicationCore.h>
+#include <pqCoreConfiguration.h>
 #include <pqFileDialogModel.h>
 #include <pqServer.h>
 #include <pqServerConfiguration.h>
@@ -57,6 +58,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkStringList.h>
 
 #include "pqSMAdaptor.h"
+
+bool pqFileDialogFavoriteModel::AddExamplesInFavorites = true;
 
 /////////////////////////////////////////////////////////////////////
 // Icons
@@ -147,6 +150,16 @@ public:
     }
 
     this->FavoriteList.clear();
+    if (pqFileDialogFavoriteModel::AddExamplesInFavorites)
+    {
+      // Adds the Examples entry in the favorites
+      // This is using `_examples_path_` as a placeholder because storing the absolute path to the
+      // `Examples` directory causes issues when switching to another ParaView version, because this
+      // path would still point to the previous version's examples. This entry is added even if the
+      // `Examples` directory is not present.
+      this->FavoriteList.push_back(pqFileDialogFavoriteModelFileInfo{
+        "Examples", "_examples_path_", vtkPVFileInformation::DIRECTORY });
+    }
     vtkCollectionIterator* iter = information->GetContents()->NewIterator();
     for (iter->InitTraversal(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
     {
@@ -198,12 +211,7 @@ pqFileDialogFavoriteModel::~pqFileDialogFavoriteModel()
 //-----------------------------------------------------------------------------
 QString pqFileDialogFavoriteModel::filePath(const QModelIndex& Index) const
 {
-  if (Index.row() < this->Implementation->FavoriteList.size())
-  {
-    pqFileDialogFavoriteModelFileInfo& file = this->Implementation->FavoriteList[Index.row()];
-    return file.FilePath;
-  }
-  return QString();
+  return this->data(Index, Qt::UserRole).toString();
 }
 
 //-----------------------------------------------------------------------------
@@ -231,24 +239,35 @@ QVariant pqFileDialogFavoriteModel::data(const QModelIndex& idx, int role) const
   }
 
   const pqFileDialogFavoriteModelFileInfo& file = this->Implementation->FavoriteList[idx.row()];
+  auto filePath = file.FilePath;
+  // If it is the Examples dir placeholder, replace it with the real path to the examples.
+  if (filePath == "_examples_path_")
+  {
+    // FIXME when the shared resources dir is not found, this is equal to `/examples`. This might be
+    // confusing for people without the `Examples` directory (mostly ParaView devs). This directory
+    // can be hidden by setting the `AddExamplesInFavoritesBehavior` to `false`.
+    filePath = QString::fromStdString(vtkPVFileInformation::GetParaViewExampleFilesDirectory());
+  }
   switch (role)
   {
     case Qt::DisplayRole:
     case Qt::EditRole:
       return file.Label;
+    case Qt::UserRole:
+      return filePath;
     case Qt::ItemDataRole::ToolTipRole:
-      if (QDir(file.FilePath).exists())
+      if (QDir(filePath).exists())
       {
-        return file.FilePath;
+        return filePath;
       }
       else
       {
-        return file.FilePath + " (Warning: does not exist)";
+        return filePath + " (Warning: does not exist)";
       }
     case Qt::ItemDataRole::FontRole:
-      if (QDir(file.FilePath).exists())
+      if (QDir(filePath).exists())
       {
-        return QFont{};
+        return {};
       }
       else
       {
@@ -258,9 +277,9 @@ QVariant pqFileDialogFavoriteModel::data(const QModelIndex& idx, int role) const
       }
 
     case Qt::ItemDataRole::ForegroundRole:
-      if (QDir(file.FilePath).exists())
+      if (QDir(filePath).exists())
       {
-        return QBrush{};
+        return {};
       }
       else
       {
@@ -270,7 +289,7 @@ QVariant pqFileDialogFavoriteModel::data(const QModelIndex& idx, int role) const
       }
 
     case Qt::DecorationRole:
-      if (QDir(file.FilePath).exists())
+      if (QDir(filePath).exists())
       {
         return Icons()->icon(static_cast<vtkPVFileInformation::FileTypes>(file.Type));
       }

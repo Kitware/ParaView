@@ -475,16 +475,6 @@ void vtkPVFileInformation::CopyFromObject(vtkObject* object)
 //-----------------------------------------------------------------------------
 void vtkPVFileInformation::GetSpecialDirectories()
 {
-  std::string examplesPath = vtkPVFileInformation::GetParaViewExampleFilesDirectory();
-  if (vtksys::SystemTools::FileIsDirectory(examplesPath))
-  {
-    vtkNew<vtkPVFileInformation> info;
-    info->SetFullPath(examplesPath.c_str());
-    info->SetName("Examples");
-    info->Type = DIRECTORY;
-    this->Contents->AddItem(info.Get());
-  }
-
 #if defined(_WIN32)
   // Return favorite directories ...
 
