@@ -1528,7 +1528,7 @@ set (ShaderReplacements_FORCE_SERIAL TRUE)
 set (CustomViewpoints_FORCE_SERIAL TRUE)
 set (ExodusModeShapes_FORCE_SERIAL TRUE)
 set (LoadSaveStateAnimation_FORCE_SERIAL TRUE)
-set(BlockContextMenu_FORCE_SERIAL TRUE) # requires context menu
+set (BlockContextMenu_FORCE_SERIAL TRUE) # requires context menu
 
 # We don't support volume rendering of image data in data server & render server mode
 set(AdaptiveResampleToImage_DISABLE_CRS TRUE)
@@ -1942,3 +1942,24 @@ foreach(test_name IN LISTS texture_buffer_exceeding_hardware_tests)
     endif()
   endforeach()
 endforeach()
+
+# Server Connection specific tests
+
+if(NOT WIN32) # On windows, QtTesting is not able to press the connection dialog buttons
+  paraview_add_client_tests(
+    SMTESTING_ALLOW_ERRORS
+    FORCE_SERIAL
+    TEST_SCRIPTS ServerConnectTimeout.xml)
+endif()
+
+configure_file (
+  "${CMAKE_CURRENT_SOURCE_DIR}/configuredServer.pvsc.in"
+  "${CMAKE_CURRENT_BINARY_DIR}/configuredServer.pvsc" @ONLY)
+
+configure_file (
+  "${CMAKE_CURRENT_SOURCE_DIR}/ServerConnectConfigured.xml.in"
+  "${CMAKE_CURRENT_BINARY_DIR}/ServerConnectConfigured.xml" @ONLY)
+
+paraview_add_client_tests(
+  FORCE_SERIAL
+  TEST_SCRIPTS ${CMAKE_CURRENT_BINARY_DIR}/ServerConnectConfigured.xml)

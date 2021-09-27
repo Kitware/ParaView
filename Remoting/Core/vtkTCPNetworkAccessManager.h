@@ -35,11 +35,14 @@ public:
   vtkTypeMacro(vtkTCPNetworkAccessManager, vtkNetworkAccessManager);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
+  //@{
   /**
    * Creates a new connection given the url.
    * This call may block until the connection can be established. To keep
    * user-interfaces responsive, one can listen to the vtkCommand::ProgressEvent
    * fired periodically by this class while waiting.
+   * The result arg provide information about the failure or sucess of the connection,
+   * see vtkNetworkAccessManager::ConnectionResult for possible values.
 
    * vtkNetworkAccessManager can  be waiting for atmost one connection at a
    * time. Calling NewConnection() while another connection is pending will
@@ -71,7 +74,10 @@ public:
    * connect to the host/port. If absent, default is 60s. 0 implies no retry attempts.
    * A negative value implies an infinite number of retries.
    */
-  vtkMultiProcessController* NewConnection(const char* url) override;
+  using vtkNetworkAccessManager::NewConnection;
+  vtkMultiProcessController* NewConnection(
+    const char* url, vtkNetworkAccessManager::ConnectionResult& result) override;
+  //@}
 
   /**
    * Used to abort pending connection creation, if any. Refer to
@@ -116,14 +122,14 @@ protected:
   /**
    * Connects to remote processes.
    */
-  vtkMultiProcessController* ConnectToRemote(
-    const char* hostname, int port, const char* handshake, int timeout_in_seconds);
+  vtkMultiProcessController* ConnectToRemote(const char* hostname, int port, const char* handshake,
+    int timeout_in_seconds, vtkNetworkAccessManager::ConnectionResult& result);
 
   /**
    * Waits for connection from remote process.
    */
-  vtkMultiProcessController* WaitForConnection(
-    int port, bool once, const char* handshake, bool nonblocking);
+  vtkMultiProcessController* WaitForConnection(int port, bool once, const char* handshake,
+    bool nonblocking, vtkNetworkAccessManager::ConnectionResult& result);
 
   enum HandshakeErrors
   {

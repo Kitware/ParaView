@@ -82,10 +82,12 @@ public:
 
   /**
    * This method will launch the server process based on the configuration and
-   * connect to the server. Returns true if the connection was successful,
+   * connect to the server.
+   * Set showConnectionDialog to false to not show the modal connection dialog when connecting.
+   * Returns true if the connection was successful,
    * otherwise returns false.
    */
-  bool connectToServer();
+  bool connectToServer(bool showConnectionDialog = true);
 
   /**
    * on successful call to connectToServer() this method can be used to obtain
@@ -116,10 +118,10 @@ protected:
   /**
    * An utility method to execute a command using a QProcess
    */
-  bool processCommand(
-    QString command, double timeout, double delay, const QProcessEnvironment* options = nullptr);
+  bool processCommand(QString command, double processWait, double delay,
+    const QProcessEnvironment* options = nullptr);
 
-  virtual bool connectToPrelaunchedServer();
+  virtual bool connectToPrelaunchedServer(bool showConnectionDialog = true);
 
   bool isReverseConnection() const;
 

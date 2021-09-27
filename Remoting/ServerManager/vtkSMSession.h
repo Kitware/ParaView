@@ -22,7 +22,8 @@
 #ifndef vtkSMSession_h
 #define vtkSMSession_h
 
-#include "vtkLegacy.h" // for VTK_LEGACY
+#include "vtkLegacy.h"               // for VTK_LEGACY
+#include "vtkNetworkAccessManager.h" // needed for vtkNetworkAccessManager::ConnectionResult.
 #include "vtkPVSessionBase.h"
 #include "vtkRemotingServerManagerModule.h" //needed for exports
 
@@ -171,63 +172,108 @@ public:
    * These are static helper methods that help create Catalyst ParaView
    * sessions. They register the session with the process module and return the
    * session id. Returns 0 on failure.
-   * This overload is used to create a catalyst built-in session.
+   * This version is used to create a catalyst built-in session.
    */
   static vtkIdType ConnectToCatalyst();
 
+  //@{
   /**
    * These are static helper methods that help create standard ParaView
    * sessions. They register the session with the process module and return the
-   * session id. It will try to connect for timeout seconds, -1 meaning infinite retries.
-   * and 0 means no retry. Returns 0 on failure.
-   * This overload is used to create a built-in session.
+   * session id.
+   * This version is used to create a built-in session.
    */
-  static vtkIdType ConnectToSelf(int timeout = 60);
+  static vtkIdType ConnectToSelf();
+  //@}
 
+  //@{
   /**
    * These are static helper methods that help create standard ParaView
    * sessions. They register the session with the process module and return the
    * session id. It will try to connect for timeout seconds, -1 meaning infinite retries.
    * and 0 means no retry. Returns 0 on failure. Returns 0 on failure.
-   * This overload is used to create a client-server session on client.
+   * This version is used to create a client-server session on client.
+   * The callback should return true, if the connection should continue trying to connect,
+   * else return false to abort.
+   * The result arg provide information about the failure or sucess of the connection,
+   * see vtkNetworkAccessManager::ConnectionResult for possible values.
    */
-  static vtkIdType ConnectToRemote(const char* hostname, int port, int timeout = 60);
+  static vtkIdType ConnectToRemote(const char* hostname, int port, int timeout = 60)
+  {
+    vtkNetworkAccessManager::ConnectionResult result;
+    return vtkSMSession::ConnectToRemote(hostname, port, timeout, nullptr, result);
+  }
+  static vtkIdType ConnectToRemote(const char* hostname, int port, int timeout, bool (*callback)(),
+    vtkNetworkAccessManager::ConnectionResult& result);
+  //@}
 
+  //@{
   /**
-   * Same as ConnectToRemote() except that it waits for a reverse connection.
-   * This is a blocking call. One can optionally provide a callback that can be
+   * Same as ConnectToRemote() except that it waits for a reverse connection
+   * for timeout seconds. One can optionally provide a callback that can be
    * called periodically while this call is blocked.
    * The callback should return true, if the connection should continue waiting,
    * else return false to abort the wait.
+   * The result arg provide information about the failure or sucess of the connection,
+   * see vtkNetworkAccessManager::ConnectionResult for possible values.
    */
   static vtkIdType ReverseConnectToRemote(int port)
   {
-    return vtkSMSession::ReverseConnectToRemote(port, (bool (*)()) nullptr);
+    return vtkSMSession::ReverseConnectToRemoteWithTimeout(port, 60);
   }
-  static vtkIdType ReverseConnectToRemote(int port, bool (*callback)());
+  static vtkIdType ReverseConnectToRemoteWithTimeout(int port, int timeout)
+  {
+    vtkNetworkAccessManager::ConnectionResult result;
+    return vtkSMSession::ReverseConnectToRemote(port, timeout, nullptr, result);
+  }
+  static vtkIdType ReverseConnectToRemote(
+    int port, int timeout, bool (*callback)(), vtkNetworkAccessManager::ConnectionResult& result);
+  //@}
 
+  //@{
   /**
    * These are static helper methods that help create standard ParaView
    * sessions. They register the session with the process module and return the
    * session id. It will try to connect for timeout seconds, -1 meaning infinite retries.
    * and 0 means no retry. Returns 0 on failure.
-   * This overload is used to create a client-dataserver-renderserver session on client.
+   * This version is used to create a client-dataserver-renderserver session on client.
+   * The callback should return true, if the connection should continue trying to connect,
+   * else return false to abort.
+   * The result arg provide information about the failure or sucess of the connection,
+   * see vtkNetworkAccessManager::ConnectionResult for possible values.
    */
   static vtkIdType ConnectToRemote(
-    const char* dshost, int dsport, const char* rshost, int rsport, int timeout = 60);
+    const char* dshost, int dsport, const char* rshost, int rsport, int timeout = 60)
+  {
+    vtkNetworkAccessManager::ConnectionResult result;
+    return vtkSMSession::ConnectToRemote(dshost, dsport, rshost, rsport, timeout, nullptr, result);
+  }
+  static vtkIdType ConnectToRemote(const char* dshost, int dsport, const char* rshost, int rsport,
+    int timeout, bool (*callback)(), vtkNetworkAccessManager::ConnectionResult& result);
+  //@}
 
+  //@{
   /**
-   * Same as ConnectToRemote() except that it waits for a reverse connection.
-   * This is a blocking call. One can optionally provide a callback that can be
+   * Same as ConnectToRemote() except that it waits for a reverse connection
+   * for timeout seconds. One can optionally provide a callback that can be
    * called periodically while this call is blocked.
    * The callback should return true, if the connection should continue waiting,
    * else return false to abort the wait.
+   * The result arg provide information about the failure or sucess of the connection,
+   * see vtkNetworkAccessManager::ConnectionResult for possible values.
    */
   static vtkIdType ReverseConnectToRemote(int dsport, int rsport)
   {
-    return vtkSMSession::ReverseConnectToRemote(dsport, rsport, nullptr);
+    return vtkSMSession::ReverseConnectToRemoteWithTimeout(dsport, rsport, 60);
   }
-  static vtkIdType ReverseConnectToRemote(int dsport, int rsport, bool (*callback)());
+  static vtkIdType ReverseConnectToRemoteWithTimeout(int dsport, int rsport, int timeout)
+  {
+    vtkNetworkAccessManager::ConnectionResult result;
+    return vtkSMSession::ReverseConnectToRemote(dsport, rsport, timeout, nullptr, result);
+  }
+  static vtkIdType ReverseConnectToRemote(int dsport, int rsport, int timeout, bool (*callback)(),
+    vtkNetworkAccessManager::ConnectionResult& result);
+  //@}
 
   //@{
   /**
@@ -255,11 +301,6 @@ protected:
   vtkSMSession(
     bool initialize_during_constructor = true, vtkPVSessionCore* preExistingSessionCore = nullptr);
   ~vtkSMSession() override;
-
-  /**
-   * Internal method used by ConnectToRemote().
-   */
-  static vtkIdType ConnectToRemoteInternal(const char* hostname, int port, int timeout = 60);
 
   /**
    * Process the Notifation message sent using API to communicate from

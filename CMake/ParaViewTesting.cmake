@@ -31,7 +31,7 @@ endfunction ()
 
 function (_paraview_add_tests function)
   cmake_parse_arguments(_paraview_add_tests
-    "FORCE_SERIAL;FORCE_LOCK"
+    "FORCE_SERIAL;FORCE_LOCK;SMTESTING_ALLOW_ERRORS"
     "LOAD_PLUGIN;PLUGIN_PATH;CLIENT;TEST_DIRECTORY;TEST_DATA_TARGET;PREFIX;SUFFIX;_ENABLE_SUFFIX;_DISABLE_SUFFIX;BASELINE_DIR;DATA_DIRECTORY;NUMPROCS"
     "_COMMAND_PATTERN;LOAD_PLUGINS;PLUGIN_PATHS;TEST_SCRIPTS;TEST_NAME;ENVIRONMENT;ARGS;CLIENT_ARGS"
     ${ARGN})
@@ -147,6 +147,12 @@ function (_paraview_add_tests function)
       endif ()
     endif ()
 
+    # Build arguments to pass to smTestDriver
+    set(_paraview_add_tests_smtesting_args "")
+    if (_paraview_add_tests_SMTESTING_ALLOW_ERRORS)
+      list(APPEND _paraview_add_tests_smtesting_args "--allow-errors")
+    endif ()
+
     # Build arguments to pass to the clients.
     set(_paraview_add_tests_client_args
       "--test-directory=${_paraview_add_tests_TEST_DIRECTORY}"
@@ -203,6 +209,9 @@ function (_paraview_add_tests function)
       _paraview_add_tests_script_args
       "${_paraview_add_tests_script_args}")
     string(REPLACE "__paraview_test_name__" "${_paraview_add_tests_name_base}"
+      _paraview_add_tests_script_args
+      "${_paraview_add_tests_script_args}")
+    string(REPLACE "__paraview_smtesting_args__" "${_paraview_add_tests_smtesting_args}"
       _paraview_add_tests_script_args
       "${_paraview_add_tests_script_args}")
 
@@ -275,6 +284,7 @@ function (paraview_add_client_tests)
     PREFIX "${chosen_prefix}"
     _DISABLE_SUFFIX "_DISABLE_C"
     _COMMAND_PATTERN
+      __paraview_smtesting_args__
       --client __paraview_client__
         --enable-bt
         __paraview_args__
@@ -291,6 +301,7 @@ function (paraview_add_client_server_tests)
     PREFIX "${chosen_prefix}"
     _DISABLE_SUFFIX "_DISABLE_CS"
     _COMMAND_PATTERN
+      __paraview_smtesting_args__
       --server "$<TARGET_FILE:ParaView::pvserver>"
         --enable-bt
         __paraview_args__
@@ -310,6 +321,7 @@ function (paraview_add_client_server_render_tests)
     PREFIX "${chosen_prefix}"
     _DISABLE_SUFFIX "_DISABLE_CRS"
     _COMMAND_PATTERN
+      __paraview_smtesting_args__
       --data-server "$<TARGET_FILE:ParaView::pvdataserver>"
         --enable-bt
         __paraview_args__
@@ -332,6 +344,7 @@ function (paraview_add_multi_server_tests count)
     PREFIX "${chosen_prefix}"
     SUFFIX "-${count}"
     _COMMAND_PATTERN
+      __paraview_smtesting_args__
       --test-multi-servers "${count}"
       --server "$<TARGET_FILE:ParaView::pvserver>"
         --enable-bt
@@ -362,6 +375,7 @@ function (paraview_add_tile_display_tests width height)
       SMTESTDRIVER_MPI_NUMPROCS=${_paraview_add_tile_display_cpu_count}
     NUMPROCS "${_paraview_add_tile_display_cpu_count}"
     _COMMAND_PATTERN
+      __paraview_smtesting_args__
       --server "$<TARGET_FILE:ParaView::pvserver>"
         --enable-bt
         --tdx=${width}
@@ -395,6 +409,7 @@ function (paraview_add_cave_tests num_ranks config)
       SMTESTDRIVER_MPI_NUMPROCS=${num_ranks}
     NUMPROCS "${num_ranks}"
     _COMMAND_PATTERN
+      __paraview_smtesting_args__
       --server "$<TARGET_FILE:ParaView::pvserver>"
         --enable-bt
         # using offscreen to avoid clobbering display (although should not be
@@ -422,6 +437,7 @@ function (paraview_add_test)
   _paraview_add_tests("paraview_add_test"
     PREFIX "${chosen_prefix}"
     _COMMAND_PATTERN
+      __paraview_smtesting_args__
       --client
       __paraview_args__
       __paraview_scriptpath__
@@ -437,6 +453,7 @@ function (paraview_add_test_mpi)
       PREFIX "${chosen_prefix}"
       NUMPROCS 2 # See Utilities/TestDriver/CMakeLists.txt (PARAVIEW_MPI_MAX_NUMPROCS)
       _COMMAND_PATTERN
+        __paraview_smtesting_args__
         --client-mpi
         __paraview_args__
         __paraview_scriptpath__

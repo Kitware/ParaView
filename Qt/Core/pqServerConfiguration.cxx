@@ -56,21 +56,20 @@ pqServerConfiguration::pqServerConfiguration()
   vtkNew<vtkPVXMLParser> parser;
   parser->Parse("<Server name='" SERVER_CONFIGURATION_DEFAULT_NAME
                 "' configuration=''><ManualStartup/></Server>");
-  this->constructor(parser->GetRootElement(), 60);
+  this->constructor(parser->GetRootElement());
 }
 
 //-----------------------------------------------------------------------------
-pqServerConfiguration::pqServerConfiguration(vtkPVXMLElement* xml, int connectionTimeout)
+pqServerConfiguration::pqServerConfiguration(vtkPVXMLElement* xml)
 {
-  this->constructor(xml, connectionTimeout);
+  this->constructor(xml);
 }
 
 //-----------------------------------------------------------------------------
-void pqServerConfiguration::constructor(vtkPVXMLElement* xml, int connectionTimeout)
+void pqServerConfiguration::constructor(vtkPVXMLElement* xml)
 {
   assert(xml && xml->GetName() && strcmp(xml->GetName(), "Server") == 0);
   this->XML = xml;
-  this->ConnectionTimeout = connectionTimeout;
   this->Mutable = true;
   this->parseSshPortForwardingXML();
 }
@@ -132,13 +131,13 @@ void pqServerConfiguration::setResource(const QString& str)
 //-----------------------------------------------------------------------------
 int pqServerConfiguration::connectionTimeout() const
 {
-  return this->ConnectionTimeout;
+  return QString(this->XML->GetAttributeOrDefault("timeout", "60")).toInt();
 }
 
 //-----------------------------------------------------------------------------
 void pqServerConfiguration::setConnectionTimeout(int connectionTimeout)
 {
-  this->ConnectionTimeout = connectionTimeout;
+  this->XML->SetAttribute("timeout", QString::number(connectionTimeout).toUtf8().data());
 }
 
 //-----------------------------------------------------------------------------
@@ -366,10 +365,8 @@ void pqServerConfiguration::parseSshPortForwardingXML()
 }
 
 //-----------------------------------------------------------------------------
-QString pqServerConfiguration::command(double& timeout, double& delay) const
+QString pqServerConfiguration::command(double& processWait, double& delay) const
 {
-  timeout = 0;
-  delay = 0;
   if (this->startupType() != COMMAND)
   {
     return QString();
@@ -379,7 +376,7 @@ QString pqServerConfiguration::command(double& timeout, double& delay) const
   QTextStream stream(&reply);
 
   // Recover exec command
-  QString execCommand = this->execCommand(timeout, delay);
+  QString execCommand = this->execCommand(processWait, delay);
 
   if (this->SSHCommand)
   {
@@ -535,10 +532,8 @@ QString pqServerConfiguration::sshFullCommand(
 }
 
 //-----------------------------------------------------------------------------
-QString pqServerConfiguration::execCommand(double& timeout, double& delay) const
+QString pqServerConfiguration::execCommand(double& processWait, double& delay) const
 {
-  timeout = 0;
-  delay = 0;
   if (this->startupType() != COMMAND)
   {
     return QString();
@@ -563,7 +558,16 @@ QString pqServerConfiguration::execCommand(double& timeout, double& delay) const
   QString reply;
   QTextStream stream(&reply);
 
-  commandXML->GetScalarAttribute("timeout", &timeout);
+  processWait = 0;
+  delay = 0;
+
+  if (commandXML->GetScalarAttribute("timeout", &processWait))
+  {
+    qWarning("timeout attribute in Command and SSHCommand element has been deprecated, please use "
+             "process_wait attribute instead");
+  }
+
+  commandXML->GetScalarAttribute("process_wait", &processWait);
   commandXML->GetScalarAttribute("delay", &delay);
 
   stream << commandXML->GetAttributeOrDefault("exec", "");
@@ -608,7 +612,7 @@ void pqServerConfiguration::setStartupToManual()
 
 //-----------------------------------------------------------------------------
 void pqServerConfiguration::setStartupToCommand(
-  double timeout, double delay, const QString& command_str)
+  double processWait, double delay, const QString& command_str)
 {
   // we try to preserve any existing options.
   vtkPVXMLElement* startupElement = this->startupXML();
@@ -633,14 +637,19 @@ void pqServerConfiguration::setStartupToCommand(
 
   vtkPVXMLElement* xmlCommand =
     startupElement->FindNestedElementByName(CommandXMLString.toUtf8().data());
+  if (!xmlCommand)
+  {
+    vtkNew<vtkPVXMLElement> child;
+    child->SetName(CommandXMLString.toUtf8().data());
+    startupElement->AddNestedElement(child.GetPointer());
+    xmlCommand = child.GetPointer();
+  }
 
-  QStringList commandList = command_str.split(" ", PV_QT_SKIP_EMPTY_PARTS);
-  assert(commandList.size() >= 1);
-
-  xmlCommand->SetAttribute("exec", commandList[0].toUtf8().data());
-  xmlCommand->SetAttribute("timeout", QString::number(timeout).toUtf8().data());
+  // attributes
+  xmlCommand->SetAttribute("process_wait", QString::number(processWait).toUtf8().data());
   xmlCommand->SetAttribute("delay", QString::number(delay).toUtf8().data());
 
+  // clean up arguments
   vtkPVXMLElement* oldArguments = xmlCommand->FindNestedElementByName("Arguments");
   if (oldArguments)
   {
@@ -651,12 +660,18 @@ void pqServerConfiguration::setStartupToCommand(
   xmlArguments->SetName("Arguments");
   xmlCommand->AddNestedElement(xmlArguments.GetPointer());
 
-  for (int i = 1; i < commandList.size(); ++i)
+  // exec and arguments
+  QStringList commandList = command_str.split(" ", PV_QT_SKIP_EMPTY_PARTS);
+  if (commandList.size() >= 1)
   {
-    vtkNew<vtkPVXMLElement> xmlArgument;
-    xmlArgument->SetName("Argument");
-    xmlArguments->AddNestedElement(xmlArgument.GetPointer());
-    xmlArgument->AddAttribute("value", commandList[i].toUtf8().data());
+    xmlCommand->SetAttribute("exec", commandList[0].toUtf8().data());
+    for (int i = 1; i < commandList.size(); ++i)
+    {
+      vtkNew<vtkPVXMLElement> xmlArgument;
+      xmlArgument->SetName("Argument");
+      xmlArguments->AddNestedElement(xmlArgument.GetPointer());
+      xmlArgument->AddAttribute("value", commandList[i].toUtf8().data());
+    }
   }
 }
 
@@ -673,5 +688,5 @@ pqServerConfiguration pqServerConfiguration::clone() const
 {
   vtkNew<vtkPVXMLElement> xml;
   this->XML->CopyTo(xml.GetPointer());
-  return pqServerConfiguration(xml.GetPointer(), this->ConnectionTimeout);
+  return pqServerConfiguration(xml.GetPointer());
 }

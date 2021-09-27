@@ -44,6 +44,7 @@ public:
    */
   const char* GetURI() override { return this->URI; };
 
+  //@{
   /**
    * Connects a remote server. URL can be of the following format:
    * cs://<pvserver-host>:<pvserver-port>
@@ -58,8 +59,19 @@ public:
    * In this case, the hostname is irrelevant and is ignored.
    * Wait for timeout seconds for the connection. Default is 60, 0 means no retry.
    * -1 means infinite retries.
+   * The callback should return true, if the connection should continue trying to connect,
+   * else return false to abort.
+   * The result arg provide information about the failure or sucess of the connection,
+   * see vtkNetworkAccessManager::ConnectionResult for possible values.
    */
-  virtual bool Connect(const char* url, int timeout = 60);
+  virtual bool Connect(const char* url, int timeout = 60)
+  {
+    vtkNetworkAccessManager::ConnectionResult result;
+    return this->Connect(url, timeout, nullptr, result);
+  }
+  virtual bool Connect(const char* url, int timeout, bool (*callback)(),
+    vtkNetworkAccessManager::ConnectionResult& connectionResult);
+  //@}
 
   /**
    * Returns true is this session is active/alive/valid.

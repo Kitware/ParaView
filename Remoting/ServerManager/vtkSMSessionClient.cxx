@@ -41,6 +41,7 @@
 #include "vtkSMSessionProxyManager.h"
 #include "vtkSMSettings.h"
 #include "vtkSocketCommunicator.h"
+#include "vtkTimerLog.h"
 
 #include <sstream>
 #include <string>
@@ -147,7 +148,41 @@ vtkMultiProcessController* vtkSMSessionClient::GetController(ServerFlags process
 }
 
 //----------------------------------------------------------------------------
-bool vtkSMSessionClient::Connect(const char* url, int timeout)
+namespace
+{
+class AbortCallback
+{
+public:
+  bool (*Callback)();
+  vtkNetworkAccessManager* Nam;
+  vtkSMSessionClient* Session;
+  AbortCallback()
+  {
+    this->Callback = nullptr;
+    this->Nam = nullptr;
+    this->Session = nullptr;
+  }
+  void OnEvent()
+  {
+    if (this->Callback != nullptr)
+    {
+      bool continue_waiting = (*this->Callback)();
+      if (!continue_waiting && this->Nam)
+      {
+        this->Nam->AbortPendingConnection();
+      }
+      if (!continue_waiting && this->Session)
+      {
+        this->Session->SetAbortConnect(true);
+      }
+    }
+  }
+};
+}
+
+//----------------------------------------------------------------------------
+bool vtkSMSessionClient::Connect(const char* url, int timeout, bool (*callback)(),
+  vtkNetworkAccessManager::ConnectionResult& connectionResult)
 {
   this->SetURI(url);
   vtksys::RegularExpression pvserver("^cs://([^:]+)(:([0-9]+))?");
@@ -239,23 +274,56 @@ bool vtkSMSessionClient::Connect(const char* url, int timeout)
 
   bool need_rcontroller = !render_server_url.empty();
   vtkNetworkAccessManager* nam = pm->GetNetworkAccessManager();
-  vtkMultiProcessController* dcontroller = nam->NewConnection(data_server_url.c_str());
-  vtkMultiProcessController* rcontroller =
-    need_rcontroller ? nam->NewConnection(render_server_url.c_str()) : nullptr;
 
+  AbortCallback temp;
+  temp.Callback = callback;
+  temp.Nam = nam;
+  temp.Session = this;
+  unsigned long sid = this->AddObserver(vtkCommand::ProgressEvent, &temp, &AbortCallback::OnEvent);
+  unsigned long nid = nam->AddObserver(vtkCommand::ProgressEvent, &temp, &AbortCallback::OnEvent);
+
+  // Main connection part, expected to work in client server mode
+
+  // Initialize connection result to CONNECTION_FAILURE in case the error is not set in the loop
+  // below. It will be set to CONNECTION_SUCCESS by NewConnection when needed
+  connectionResult = vtkNetworkAccessManager::ConnectionResult::CONNECTION_FAILURE;
+  vtkMultiProcessController* dcontroller =
+    nam->NewConnection(data_server_url.c_str(), connectionResult);
+
+  // Initialize render connection result to CONNECTION_SUCCESS as it is an optional connection
+  vtkNetworkAccessManager::ConnectionResult rConnectionResult =
+    vtkNetworkAccessManager::ConnectionResult::CONNECTION_SUCCESS;
+  vtkMultiProcessController* rcontroller =
+    need_rcontroller ? nam->NewConnection(render_server_url.c_str(), rConnectionResult) : nullptr;
+
+  // Reverse Connection part, require a loop to check until connection is done
+  vtkNew<vtkTimerLog> timer;
+  timer->StartTimer();
   this->AbortConnect = false;
   while (
     !this->AbortConnect && (dcontroller == nullptr || (need_rcontroller && rcontroller == nullptr)))
   {
     int result = nam->ProcessEvents(100);
+    timer->StopTimer();
+    if (timeout >= 0)
+    {
+      if (timeout == 0 || timer->GetElapsedTime() > timeout)
+      {
+        vtkErrorMacro(<< "Waiting for connection timeout.");
+        connectionResult = vtkNetworkAccessManager::ConnectionResult::CONNECTION_TIMEOUT;
+        break;
+      }
+    }
+
     if (result == 1) // some activity
     {
-      dcontroller = dcontroller ? dcontroller : nam->NewConnection(data_server_url.c_str());
+      dcontroller =
+        dcontroller ? dcontroller : nam->NewConnection(data_server_url.c_str(), connectionResult);
       rcontroller = (rcontroller || !need_rcontroller)
         ? rcontroller
-        : nam->NewConnection(render_server_url.c_str());
+        : nam->NewConnection(render_server_url.c_str(), rConnectionResult);
     }
-    else if (result == 0) // timeout
+    else if (result == 0) // socket timeout
     {
       double foo = 0.5;
       this->InvokeEvent(vtkCommand::ProgressEvent, &foo);
@@ -265,6 +333,10 @@ bool vtkSMSessionClient::Connect(const char* url, int timeout)
       break;
     }
   }
+
+  nam->RemoveObserver(nid);
+  this->RemoveObserver(sid);
+
   if (dcontroller)
   {
     this->SetDataServerController(dcontroller);
@@ -301,6 +373,19 @@ bool vtkSMSessionClient::Connect(const char* url, int timeout)
 
     // Initializes other things like plugin manager/proxy-manager etc.
     this->Initialize();
+  }
+  else if (this->AbortConnect)
+  {
+    connectionResult = vtkNetworkAccessManager::ConnectionResult::CONNECTION_ABORT;
+  }
+
+  // rConnectionResult can only be not CONNECTION_SUCCESS only if a connection has been attempted
+  // If the main connection is sucessful but not the render connection, set the result from the
+  // render connection
+  if (connectionResult == vtkNetworkAccessManager::ConnectionResult::CONNECTION_SUCCESS &&
+    rConnectionResult != vtkNetworkAccessManager::ConnectionResult::CONNECTION_SUCCESS)
+  {
+    connectionResult = rConnectionResult;
   }
 
   // TODO: test with following expressions.

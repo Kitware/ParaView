@@ -53,7 +53,7 @@ public:
   pqServerConnectReaction(QAction* parent);
 
   /**
-   * Creates a server connection.
+   * Creates a server connection using the server connection dialog.
    * Note that this method is static. Applications can simply use this without
    * having to create a reaction instance.
    */
@@ -64,18 +64,20 @@ public:
    * ParaView names server configurations (in pvsc files). To connect to a
    * server using the configuration specified, use this API.
    */
-  static bool connectToServerUsingConfigurationName(const char* config_name);
+  static bool connectToServerUsingConfigurationName(
+    const char* config_name, bool showConnectionDialog = true);
 
   /**
    * To connect to a server given a configuration, use this API.
    */
-  static bool connectToServerUsingConfiguration(const pqServerConfiguration& config);
+  static bool connectToServerUsingConfiguration(
+    const pqServerConfiguration& config, bool showConnectionDialog = true);
 
   /**
    * Connect to server using the resource. This will create a temporary
    * configuration for the resource.
    */
-  static bool connectToServer(const pqServerResource& resource);
+  static bool connectToServer(const pqServerResource& resource, bool showConnectionDialog = true);
 
 protected:
   /**

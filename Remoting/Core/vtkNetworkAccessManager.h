@@ -36,10 +36,30 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /**
+   * Possible result of connection when creating a new connection
+   * CONNECTION_SUCCESS: Connection was sucessfull
+   * CONNECTION_TIMEOUT: After spending a specified amount of time, no connection was initiated
+   * CONNECTION_ABORT: User aborted the connection before it was successful or timed out
+   * CONNECTION_HANDSHAKE_ERROR: Connection was iniated but the handshake failed
+   * CONNECTION_FAILURE: Unspecified connection error
+   */
+  enum class ConnectionResult
+  {
+    CONNECTION_SUCCESS,
+    CONNECTION_TIMEOUT,
+    CONNECTION_ABORT,
+    CONNECTION_HANDSHAKE_ERROR,
+    CONNECTION_FAILURE
+  };
+
+  //@{
+  /**
    * Creates a new connection given the url.
    * This call may block until the connection can be established. To keep
    * user-interfaces responsive, one can listen to the vtkCommand::ProgressEvent
    * fired periodically by this class while waiting.
+   * The result arg provide information about the failure or sucess of the connection,
+   * see vtkNetworkAccessManager::ConnectionResult for possible values.
 
    * vtkNetworkAccessManager can  be waiting for atmost one connection at a
    * time. Calling NewConnection() while another connection is pending will
@@ -61,7 +81,13 @@ public:
    * * \p ssh://utkarsh\@medea
    * * http://kitware-server/session?id=12322&authorization=12
    */
-  virtual vtkMultiProcessController* NewConnection(const char* url) = 0;
+  virtual vtkMultiProcessController* NewConnection(const char* url)
+  {
+    ConnectionResult result;
+    return this->NewConnection(url, result);
+  }
+  virtual vtkMultiProcessController* NewConnection(const char* url, ConnectionResult& result) = 0;
+  //@}
 
   /**
    * Used to abort pending connection creation, if any. Refer to
