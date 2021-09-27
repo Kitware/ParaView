@@ -74,6 +74,20 @@
        </property>
       </widget>
      </item>
+     <item>
+      <widget class="QToolButton" name="SaveMaterials">
+       <property name="toolTip">
+        <string>Save materials</string>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+       <property name="icon">
+        <iconset resource="../../../Components/Resources/pqComponents.qrc">
+         <normaloff>:/pqWidgets/Icons/pqSave.svg</normaloff>:/pqWidgets/Icons/pqSave.svg</iconset>
+       </property>
+      </widget>
+     </item>
     </layout>
    </item>
    <item>

@@ -25,7 +25,6 @@
 #endif
 
 #include <cassert>
-#include <string>
 #include <vtksys/SystemTools.hxx>
 
 #if defined(_WIN32) && !defined(__CYGWIN__)
@@ -169,5 +168,15 @@ const char* vtkPVMaterialLibrary::WriteBuffer()
   return vtkOSPRayMaterialLibrary::SafeDownCast(this->GetMaterialLibrary())->WriteBuffer();
 #else
   return nullptr;
+#endif
+}
+
+//-----------------------------------------------------------------------------
+void vtkPVMaterialLibrary::WriteFile(const std::string& filename)
+{
+#if VTK_MODULE_ENABLE_VTK_RenderingRayTracing
+  return vtkOSPRayMaterialLibrary::SafeDownCast(this->GetMaterialLibrary())->WriteFile(filename);
+#else
+  (void)filename;
 #endif
 }
