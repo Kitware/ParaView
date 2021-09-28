@@ -74,44 +74,41 @@ vtkPythonCalculator::~vtkPythonCalculator()
 int vtkPythonCalculator::RequestData(
   vtkInformation* request, vtkInformationVector** inputVector, vtkInformationVector* outputVector)
 {
-  // get the info objects
-  vtkInformation* inInfo = nullptr;
-  if (inputVector[0]->GetNumberOfInformationObjects() > 0)
-  {
-    inInfo = inputVector[0]->GetInformationObject(0);
-  }
+  vtkDataObject* input = vtkDataObject::GetData(inputVector[0], 0);
+  assert(input != nullptr);
 
   double dataTime = 0;
   bool dataTimeValid = false;
   std::vector<double> timeSteps;
-  int timeIndex = 0;
+  int timeIndex;
 
-  // get the input and output
-  if (inInfo)
+  // Extract time information
+  if (vtkInformation* dataInformation = input->GetInformation())
   {
-    if (inInfo->Has(vtkDataObject::DATA_TIME_STEP()))
+    if (dataInformation->Has(vtkDataObject::DATA_TIME_STEP()))
     {
       dataTimeValid = true;
-      dataTime = inInfo->Get(vtkDataObject::DATA_TIME_STEP());
+      dataTime = dataInformation->Get(vtkDataObject::DATA_TIME_STEP());
     }
+  }
 
-    if (inInfo->Has(vtkStreamingDemandDrivenPipeline::TIME_STEPS()))
+  vtkInformation* inputInfo = inputVector[0]->GetInformationObject(0);
+  if (inputInfo->Has(vtkStreamingDemandDrivenPipeline::TIME_STEPS()))
+  {
+    int numberOfTimeSteps = inputInfo->Length(vtkStreamingDemandDrivenPipeline::TIME_STEPS());
+    double* tempTimeSteps = inputInfo->Get(vtkStreamingDemandDrivenPipeline::TIME_STEPS());
+
+    timeSteps.insert(timeSteps.begin(), tempTimeSteps, tempTimeSteps + numberOfTimeSteps);
+  }
+
+  timeIndex = 0;
+  if (dataTimeValid && !timeSteps.empty())
+  {
+    for (int i = 0; i < timeSteps.size(); ++i)
     {
-      int numberOfTimeSteps = inInfo->Length(vtkStreamingDemandDrivenPipeline::TIME_STEPS());
-      double* tempTimeSteps = inInfo->Get(vtkStreamingDemandDrivenPipeline::TIME_STEPS());
-
-      timeSteps.insert(timeSteps.begin(), tempTimeSteps, tempTimeSteps + numberOfTimeSteps);
-    }
-
-    timeIndex = 0;
-    if (dataTimeValid && !timeSteps.empty())
-    {
-      for (int i = 0; i < timeSteps.size(); ++i)
+      if (timeSteps[i] == dataTime)
       {
-        if (timeSteps[i] == dataTime)
-        {
-          timeIndex = i;
-        }
+        timeIndex = i;
       }
     }
   }
