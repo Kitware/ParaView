@@ -127,6 +127,7 @@ void pqSLACDataLoadManager::setupPipeline()
   // This should never really be not empty.
   if (!meshFiles.isEmpty())
   {
+    pqSLACManager::instance()->loaderCreatingPipeline();
     pqPipelineSource* meshReader =
       builder->createReader("sources", "SLACReader", meshFiles, this->Server);
 

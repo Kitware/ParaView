@@ -83,6 +83,9 @@ public:
   /// object was never created.
   pqPipelineSource* getTemporalRanges();
 
+  /// Data loader calls this to notify manager
+  void loaderCreatingPipeline();
+
   /// Convenience function for destroying a pipeline object and all of its
   /// consumers.
   static void destroyPipelineSourceAndConsumers(pqPipelineSource* source);
@@ -90,6 +93,7 @@ public:
 public Q_SLOTS:
   void showDataLoadManager();
   void checkActionEnabled();
+  void onSourceCreated(pqPipelineSource* source);
   void showField(QString name);
   void showField(const char* name);
   void showEField();

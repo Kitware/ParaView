@@ -121,6 +121,14 @@ pqSLACManager::pqSLACManager(QObject* p)
     SLOT(resetRangeCurrentTime()));
 
   this->checkActionEnabled();
+
+  // If toolbar not enabled at startup, listed for source-created signals
+  if (!this->actionSolidMesh()->isEnabled())
+  {
+    const auto* builder = pqApplicationCore::instance()->getObjectBuilder();
+    QObject::connect(
+      builder, &pqObjectBuilder::sourceCreated, this, &pqSLACManager::onSourceCreated);
+  }
 }
 
 pqSLACManager::~pqSLACManager()
@@ -297,6 +305,14 @@ pqPipelineSource* pqSLACManager::getTemporalRanges()
   return this->findPipelineSource("TemporalRanges");
 }
 
+void pqSLACManager::loaderCreatingPipeline()
+{
+  // If the loader is building the pipeline, stop listening for source-created signals
+  const auto* builder = pqApplicationCore::instance()->getObjectBuilder();
+  QObject::disconnect(
+    builder, &pqObjectBuilder::sourceCreated, this, &pqSLACManager::onSourceCreated);
+}
+
 //-----------------------------------------------------------------------------
 static void destroyPortConsumers(pqOutputPort* port)
 {
@@ -372,6 +388,18 @@ void pqSLACManager::checkActionEnabled()
   }
 
   this->actionShowParticles()->setEnabled(particlesReader != nullptr);
+}
+
+//-----------------------------------------------------------------------------
+void pqSLACManager::onSourceCreated(pqPipelineSource* source)
+{
+  const char* SName = "SLACReader";
+  if (strcmp(source->getProxy()->GetXMLName(), SName) == 0)
+  {
+    // After data is loaded, call checkActionEnabled() to enable toolbar
+    QObject::connect(source, QOverload<pqPipelineSource*>::of(&pqPipelineSource::dataUpdated), this,
+      &pqSLACManager::checkActionEnabled);
+  }
 }
 
 //-----------------------------------------------------------------------------
