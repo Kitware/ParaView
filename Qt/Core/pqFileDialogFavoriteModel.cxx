@@ -340,13 +340,7 @@ void pqFileDialogFavoriteModel::addToFavorites(QString const& dirPath)
 //-----------------------------------------------------------------------------
 void pqFileDialogFavoriteModel::removeFromFavorites(QString const& dirPath)
 {
-  QFileInfo fileInfo(dirPath);
-  if (!fileInfo.isDir())
-  {
-    return;
-  }
-
-  QString const cleanDirPath = QDir::cleanPath(fileInfo.absoluteFilePath());
+  QString const cleanDirPath = QDir::cleanPath(QFileInfo(dirPath).absoluteFilePath());
 
   QList<pqFileDialogFavoriteModelFileInfo>& favoriteList = this->Implementation->FavoriteList;
   auto foundIter = std::find_if(favoriteList.begin(), favoriteList.end(),
