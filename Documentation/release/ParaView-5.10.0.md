@@ -118,6 +118,10 @@ The 'RealTime' animation mode is deprecated and will be removed in a future rele
 
 See the [discussion](https://discourse.paraview.org/t/paraview-time-refactoring/5506/6) leading to the decision to remove this animation mode.
 
+## Support for 19-node tri-quadratic pyramid cells
+
+ParaView now incorporates the VTK implementation of the 19-node-pyramid (`vtkTriQuadraticPyramid`). This new cell type is included as an option in the **UnstructuredCellTypes** source.
+
 # Rendering enhancements
 
 ## Render View background color
