@@ -51,13 +51,18 @@ if arrayRange[0] < .0098 or arrayRange[0] > .0099 or \
     print("ERROR: incorrect volume computed for can.ex2")
     sys.exit(1)
 
+# get the time-keeper
+timeKeeper1 = GetTimeKeeper()
+timesteps = timeKeeper1.TimestepValues
+time = timesteps[28]
+
 # create a new 'Python Calculator'
 pythonCalculator3 = PythonCalculator(Input=canex2)
-pythonCalculator3.Expression = '{timevalue} + 1'
+pythonCalculator3.Expression = '{timevalue}'
 
-pythonCalculator3.UpdatePipeline(0.0)
+pythonCalculator3.UpdatePipeline(time)
 arrayRange = pythonCalculator3.PointData['result'].GetRange()
-if arrayRange[0] != 1 or arrayRange[0] != 1:
-    print("ERROR: incorrect volume computed for can.ex2")
+if arrayRange[0] < .00279 or arrayRange[0] > .0028:
+    print("ERROR: incorrect {timevalue} computed for can.ex2")
     sys.exit(1)
 print("success")
