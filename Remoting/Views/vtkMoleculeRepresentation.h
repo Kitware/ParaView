@@ -74,6 +74,11 @@ public:
    */
   vtkDataObject* GetRenderedDataObject(int port) override;
 
+  /**
+   * Return the actor.
+   */
+  vtkGetMacro(Actor, vtkActor*);
+
   //@{
   /**
    * Forward custom atom/bonds rendering parameters to the mapper.
