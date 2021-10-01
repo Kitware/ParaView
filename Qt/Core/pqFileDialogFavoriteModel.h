@@ -110,6 +110,12 @@ public:
    */
   void resetFavoritesToDefault();
 
+  /**
+   * Flag to indicate if the ParaView Examples directory must be added when creating the settings
+   * for the first time, or when reseting it to the default value.
+   */
+  static bool AddExamplesInFavorites;
+
 private:
   class pqImplementation;
   pqImplementation* const Implementation;
