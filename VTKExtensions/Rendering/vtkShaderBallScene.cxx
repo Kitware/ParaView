@@ -185,13 +185,7 @@ vtkShaderBallScene::vtkShaderBallScene()
 }
 
 //-----------------------------------------------------------------------------
-vtkShaderBallScene::~vtkShaderBallScene()
-{
-  if (this->OSPRayPass)
-  {
-    this->OSPRayPass->Delete();
-  }
-}
+vtkShaderBallScene::~vtkShaderBallScene() = default;
 
 //-----------------------------------------------------------------------------
 void vtkShaderBallScene::Render()
@@ -232,13 +226,8 @@ void vtkShaderBallScene::Modified()
 //-----------------------------------------------------------------------------
 void vtkShaderBallScene::ResetPass()
 {
-  if (this->OSPRayPass)
-  {
-    this->OSPRayPass->Delete();
-  }
-
-  this->OSPRayPass = vtkOSPRayPass::New();
-  this->Renderer->SetPass(this->OSPRayPass);
+  vtkSmartPointer<vtkOSPRayPass> ospp = vtkSmartPointer<vtkOSPRayPass>::New();
+  this->Renderer->SetPass(ospp);
 
   this->NeedRender = true;
   this->Render();

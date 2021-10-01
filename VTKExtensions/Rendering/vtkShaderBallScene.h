@@ -33,18 +33,18 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef vtkShaderBallScene_h
 #define vtkShaderBallScene_h
 
+#include "vtkObject.h"
+
 #include "vtkExtensionsRenderingModule.h" // needed for export macros
 #include "vtkNew.h"                       // for ivars
-#include "vtkObject.h"
-#include "vtkSetGet.h" // for get/set macros
+#include "vtkSetGet.h"                    // for get/set macros
 
-class vtkOSPRayPass;
-class vtkGenericOpenGLRenderWindow;
 class vtkActor;
+class vtkGenericOpenGLRenderWindow;
 class vtkRenderer;
 
 /**
- * @class pqShaderBallWidget
+ * @class vtkShaderBallScene
  * Used as part of the pqMaterialEditor to display the current
  * selected material in a simple scene
  * containing a sphere and a plane.
@@ -57,7 +57,7 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /**
-   * Returns the render window where the sceene is rendered
+   * Returns the render window where the scene is rendered
    */
   vtkGetObjectMacro(Window, vtkGenericOpenGLRenderWindow);
 
@@ -87,6 +87,9 @@ public:
 
   void Modified() override;
 
+  /**
+   * Setup the number of samples to use in the Shader ball scene.
+   */
   void SetNumberOfSamples(int numberOfSamples);
 
   /**
@@ -96,7 +99,7 @@ public:
 
 protected:
   vtkShaderBallScene();
-  ~vtkShaderBallScene();
+  virtual ~vtkShaderBallScene();
 
 private:
   vtkShaderBallScene(const vtkShaderBallScene&) = delete;
@@ -105,8 +108,6 @@ private:
   vtkNew<vtkGenericOpenGLRenderWindow> Window;
   vtkNew<vtkActor> SphereActor;
   vtkNew<vtkRenderer> Renderer;
-
-  vtkOSPRayPass* OSPRayPass = nullptr;
 
   bool NeedRender = true;
   bool Visible = false;
