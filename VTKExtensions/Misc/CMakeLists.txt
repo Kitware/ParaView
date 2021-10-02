@@ -40,6 +40,7 @@ set(classes
   vtkMinMax
   vtkPExtractHistogram
   vtkPVBox
+  vtkPVChangeOfBasisHelper
   vtkPVCylinder
   vtkPVMergeTables
   vtkPVMergeTablesMultiBlock
@@ -49,15 +50,8 @@ set(classes
   vtkReductionFilter
   vtkSelectionSerializer)
 
-set(headers
-  vtkPVChangeOfBasisHelper.h)
-set(sources
-  vtkPVChangeOfBasisHelper.cxx)
-
 vtk_module_add_module(ParaView::VTKExtensionsMisc
-  CLASSES ${classes}
-  HEADERS ${headers}
-  SOURCES ${sources})
+  CLASSES ${classes})
 
 paraview_add_server_manager_xmls(
   XMLS  Resources/misc_filters.xml
