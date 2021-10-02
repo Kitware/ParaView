@@ -476,24 +476,6 @@ public:
 
   //@{
   /**
-   * As of ParaView 5.9, these methods are replaced by
-   * `SetOrderedCompositingConfiguration` which provides a new mechanisms for
-   * indicating to the view how this representation participates in
-   * data-redistribution needed when ordered-compositing is being used.
-   *
-   * @deprecated ParaView 5.9.
-   */
-  VTK_LEGACY(static void MarkAsRedistributable(
-    vtkInformation* info, vtkPVDataRepresentation* repr, bool value = true, int port = 0));
-  VTK_LEGACY(static void SetOrderedCompositingInformation(vtkInformation* info,
-    vtkPVDataRepresentation* repr, vtkExtentTranslator* translator, const int whole_extents[6],
-    const double origin[3], const double spacing[3]));
-  VTK_LEGACY(
-    static void SetOrderedCompositingInformation(vtkInformation* info, const double bounds[6]));
-  //@}
-
-  //@{
-  /**
    * `OrderedCompositingConfiguration` lets representations indicate to the view
    * how the representation participates in data-redistribution necessary when
    * ordered-compositing is being used. These flags are meant to be combined

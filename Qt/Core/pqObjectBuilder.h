@@ -34,7 +34,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqCoreModule.h"
 #include "vtkNetworkAccessManager.h" // needed for vtkNetworkAccessManager::ConnectionResult.
-#include "vtkSetGet.h"               // needed for VTK_LEGACY
 
 #include <QMap>
 #include <QObject>
@@ -148,12 +147,6 @@ public:
    * Creates a new view module of the given type on the given server.
    */
   virtual pqView* createView(const QString& type, pqServer* server);
-
-  /**
-   * Deprecated in ParaView 5.7. `detachedFromLayout` argument is not longer
-   * applicable. All views are now created *detached* by default.
-   */
-  VTK_LEGACY(pqView* createView(const QString& type, pqServer* server, bool detachedFromLayout));
 
   /**
    * Destroys the view module. This destroys the view module as well as all the

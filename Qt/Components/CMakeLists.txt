@@ -241,15 +241,6 @@ set(ui_files
 set(resource_files
   Resources/pqComponents.qrc)
 
-if (NOT VTK_LEGACY_REMOVE)
-  list(APPEND classes
-    pqSampleScalarAddRangeDialog
-    pqSampleScalarWidget)
-  list(APPEND ui_files
-    Resources/UI/pqSampleScalarAddRangeDialog.ui
-    Resources/UI/pqSampleScalarWidget.ui)
-endif()
-
 vtk_module_find_package(
   PACKAGE     Qt5
   COMPONENTS  Network Widgets)

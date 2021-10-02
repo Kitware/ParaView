@@ -34,7 +34,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqComponentsModule.h"
 #include "pqDoubleLineEdit.h" // for pqDoubleLineEdit::RealNumberNotation.
-#include "vtkLegacy.h"        // for VTK_LEGACY
 
 #include <QList>
 #include <QScopedPointer>
@@ -134,25 +133,6 @@ public:
    */
   void setTimeLabel(const QString& val);
   QString timeLabel() const;
-  //@}
-
-  //@{
-  /**
-   * @deprecated ParaView 5.9. Use `setPrecision`  and `setNotation` instead.
-   */
-  VTK_LEGACY(void setTimePrecision(int));
-  VTK_LEGACY(int timePrecision() const);
-  VTK_LEGACY(void setTimeNotation(const QChar& val));
-  VTK_LEGACY(QChar timeNotation() const);
-  //@}
-
-  //@{
-  /**
-   * @deprecated ParaVIew 5.9. No longer used. Use `setTimestepValues` instead
-   * to provide the timesteps explicitly.
-   */
-  VTK_LEGACY(void setTimeStepCount(int count));
-  VTK_LEGACY(int timeStepCount() const);
   //@}
 
 Q_SIGNALS:

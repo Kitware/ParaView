@@ -33,7 +33,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define pqPropertiesPanel_h
 
 #include "pqComponentsModule.h"
-#include "vtkLegacy.h" // for legacy macros
 #include <QWidget>
 
 class pqDataRepresentation;
@@ -116,13 +115,6 @@ public:
   int panelMode() const { return this->PanelMode; }
 
   /**
-   * Update the panel to show the widgets for the given pair.
-   * @deprecated in ParaView 5.9. Use `setRepresentation`, `setView` and
-   * `setPipelineProxy` instead.
-   */
-  VTK_LEGACY(void updatePanel(pqOutputPort* port));
-
-  /**
    * Returns true if there are changes to be applied.
    */
   bool canApply();
@@ -131,14 +123,6 @@ public:
    * Returns true if there are changes to be reset.
    */
   bool canReset();
-
-  /**
-   * This has been replaced by `setPipelineProxy` to add support for other types
-   * of pqProxy subclasses such as pqExtractor.
-   *
-   * @deprecated in ParaView 5.9. Use `setPipelineProxy` instead.
-   */
-  VTK_LEGACY(void setOutputPort(pqOutputPort*));
 
 public Q_SLOTS:
   /**

@@ -1806,26 +1806,6 @@ vtkAlgorithmOutput* vtkPVRenderView::GetPieceProducerLOD(
 }
 
 //----------------------------------------------------------------------------
-#if !defined(VTK_LEGACY_REMOVE)
-void vtkPVRenderView::MarkAsRedistributable(
-  vtkInformation* info, vtkPVDataRepresentation* repr, bool value /*=true*/, int port)
-{
-  vtkPVRenderView* view = vtkPVRenderView::SafeDownCast(info->Get(VIEW()));
-  if (!view)
-  {
-    vtkGenericWarningMacro("Missing VIEW().");
-    return;
-  }
-
-  VTK_LEGACY_REPLACED_BODY("vtkPVRenderView::MarkAsRedistributable", "ParaView 5.9",
-    "vtkPVRenderView::SetOrderedCompositingConfiguration");
-  vtkPVRenderView::SetOrderedCompositingConfiguration(info, repr,
-    vtkPVRenderView::DATA_IS_REDISTRIBUTABLE | vtkPVRenderView::USE_DATA_FOR_LOAD_BALANCING,
-    nullptr, port);
-}
-#endif
-
-//----------------------------------------------------------------------------
 void vtkPVRenderView::SetRedistributionMode(
   vtkInformation* info, vtkPVDataRepresentation* repr, int mode, int port)
 {
@@ -1913,23 +1893,6 @@ void vtkPVRenderView::SetOrderedCompositingConfiguration(
   vtkPVRenderViewDataDeliveryManager::SafeDownCast(view->GetDeliveryManager())
     ->SetOrderedCompositingConfiguration(repr, config, bounds, port);
 }
-
-//----------------------------------------------------------------------------
-#if !defined(VTK_LEGACY_REMOVE)
-void vtkPVRenderView::SetOrderedCompositingInformation(vtkInformation*, vtkPVDataRepresentation*,
-  vtkExtentTranslator*, const int[6], const double[3], const double[3])
-{
-  VTK_LEGACY_BODY("vtkPVRenderView::SetOrderedCompositingInformation", "ParaView 5.9");
-}
-#endif
-
-//----------------------------------------------------------------------------
-#if !defined(VTK_LEGACY_REMOVE)
-void vtkPVRenderView::SetOrderedCompositingInformation(vtkInformation* info, const double bounds[6])
-{
-  VTK_LEGACY_BODY("vtkPVRenderView::SetOrderedCompositingInformation", "ParaView 5.9");
-}
-#endif
 
 //----------------------------------------------------------------------------
 void vtkPVRenderView::SetDeliverToAllProcesses(

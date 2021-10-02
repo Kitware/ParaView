@@ -33,7 +33,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define pqPropertyWidget_h
 
 #include "pqComponentsModule.h"
-#include "vtkSetGet.h" // for VTK_LEGACY_REMOVE.
 
 #include "pqPropertyLinks.h"
 #include <QPointer>
@@ -256,10 +255,5 @@ private:
   void modified();
   void editingFinished();
 };
-
-#if !defined(VTK_LEGACY_REMOVE)
-#include "pqDebug.h"
-#define PV_DEBUG_PANELS() pqDebug("PV_DEBUG_PANELS")
-#endif
 
 #endif // pqPropertyWidget_h

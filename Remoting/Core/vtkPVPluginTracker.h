@@ -127,9 +127,6 @@ public:
    */
   static void RegisterStaticPluginSearchFunction(vtkPluginSearchFunction function);
   static void RegisterStaticPluginListFunction(vtkPluginListFunction function);
-#ifndef VTK_LEGACY_REMOVE
-  static VTK_LEGACY(void SetStaticPluginSearchFunction(vtkPluginSearchFunction function));
-#endif
   //@}
 
   enum

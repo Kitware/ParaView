@@ -129,11 +129,6 @@ set(classes
   pqXYHistogramChartView
   vtkPVGUIPluginInterface)
 
-if (NOT VTK_LEGACY_REMOVE)
-  list(APPEND classes
-    pqDebug)
-endif()
-
 set(headers)
 
 configure_file(

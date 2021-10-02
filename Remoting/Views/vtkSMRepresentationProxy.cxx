@@ -61,26 +61,6 @@ vtkSMRepresentationProxy::~vtkSMRepresentationProxy()
 }
 
 //----------------------------------------------------------------------------
-#if !defined(VTK_LEGACY_REMOVE)
-void vtkSMRepresentationProxy::SetDebugName(const char* name)
-{
-  VTK_LEGACY_REPLACED_BODY(
-    vtkSMRepresentationProxy::SetDebugName, "ParaView 5.7", vtkSMProxy::SetLogName);
-  this->SetLogName(name);
-}
-#endif
-
-//----------------------------------------------------------------------------
-#if !defined(VTK_LEGACY_REMOVE)
-const char* vtkSMRepresentationProxy::GetDebugName()
-{
-  VTK_LEGACY_REPLACED_BODY(
-    vtkSMRepresentationProxy::GetDebugName, "ParaView 5.7", vtkSMProxy::GetLogName);
-  return this->GetLogName();
-}
-#endif
-
-//----------------------------------------------------------------------------
 void vtkSMRepresentationProxy::CreateVTKObjects()
 {
   if (this->ObjectsCreated)

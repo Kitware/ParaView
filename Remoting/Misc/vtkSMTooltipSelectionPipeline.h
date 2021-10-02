@@ -66,12 +66,6 @@ public:
    */
   bool GetTooltipInfo(int association, std::string& tooltipText);
 
-  /**
-   * Get information about the tooltip to be displayed.
-   * This method is deprecated and pos will always return (0,0).
-   */
-  VTK_LEGACY(bool GetTooltipInfo(int association, double pos[2], std::string& tooltipText));
-
 protected:
   vtkSMTooltipSelectionPipeline();
   ~vtkSMTooltipSelectionPipeline() override;

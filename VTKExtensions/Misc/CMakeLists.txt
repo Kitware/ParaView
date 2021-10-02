@@ -49,12 +49,6 @@ set(classes
   vtkReductionFilter
   vtkSelectionSerializer)
 
-if (NOT VTK_LEGACY_REMOVE)
-  list(APPEND classes
-    vtkCompositeDataToUnstructuredGridFilter
-    vtkDataObjectTreeToPointSetFilter)
-endif()
-
 set(headers
   vtkPVChangeOfBasisHelper.h)
 set(sources
