@@ -34,7 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqEventDispatcher.h" // For blocking test events during configuration download
 
 #include "vtkNew.h"
-#include "vtkPVConfig.h"
+#include "vtkPVVersion.h"
 #include "vtkPVXMLElement.h"
 #include "vtkPVXMLParser.h"
 

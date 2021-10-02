@@ -44,7 +44,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkCommand.h"
 #include "vtkMinimalStandardRandomSequence.h"
 #include "vtkNetworkAccessManager.h"
-#include "vtkPVConfig.h"
+#include "vtkPVVersion.h"
 #include "vtkPVXMLElement.h"
 #include "vtkProcessModule.h"
 #include "vtkRemotingCoreConfiguration.h"

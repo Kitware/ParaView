@@ -31,7 +31,7 @@
 #ifndef vtkPVPlugin_h
 #define vtkPVPlugin_h
 
-#include "vtkPVConfig.h"           // needed for PARAVIEW_VERSION
+#include "vtkPVVersion.h"          // needed for PARAVIEW_VERSION
 #include "vtkRemotingCoreModule.h" //needed for exports
 #include <string>                  // for std::string
 #include <vector>                  // for std::vector

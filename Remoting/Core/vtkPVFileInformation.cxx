@@ -13,7 +13,6 @@
 
 =========================================================================*/
 #include "vtkPVFileInformation.h"
-#include "vtkPVConfig.h"
 
 #include "vtkClientServerStream.h"
 #include "vtkCollection.h"
@@ -22,6 +21,7 @@
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVFileInformationHelper.h"
+#include "vtkPVVersion.h"
 #include "vtkProcessModule.h"
 #include "vtkResourceFileLocator.h"
 #include "vtkSmartPointer.h"

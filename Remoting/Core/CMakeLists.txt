@@ -142,6 +142,12 @@ if (PARAVIEW_PLUGIN_LOADER_PATHS)
       COMPILE_DEFINITIONS PARAVIEW_PLUGIN_LOADER_PATHS=\"${PARAVIEW_PLUGIN_LOADER_PATHS}\")
 endif ()
 
+configure_file(
+  "${CMAKE_CURRENT_SOURCE_DIR}/vtkPVVersion.h.in"
+  "${CMAKE_CURRENT_BINARY_DIR}/vtkPVVersion.h"
+  @ONLY)
+list(APPEND headers
+  "${CMAKE_CURRENT_BINARY_DIR}/vtkPVVersion.h")
 
 # Based on state of VTK modules, set up some variables that paraview needs to
 # compile optional code.

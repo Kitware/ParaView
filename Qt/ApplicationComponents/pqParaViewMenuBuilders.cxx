@@ -129,6 +129,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QSysInfo>
 
 #include "vtkPVFileInformation.h"
+#include "vtkPVVersion.h"
 #include "vtkSMProxyManager.h"
 
 //-----------------------------------------------------------------------------
