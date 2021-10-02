@@ -88,6 +88,8 @@ if (APPLE)
     vtkPVMacFileInformationHelper.h)
 endif ()
 
+set(nowrap_headers)
+
 set_property(SOURCE vtkPVPluginLoader.cxx APPEND
   PROPERTY
     COMPILE_DEFINITIONS "BUILD_SHARED_LIBS=$<BOOL:${BUILD_SHARED_LIBS}>")
@@ -149,19 +151,22 @@ configure_file(
 list(APPEND headers
   "${CMAKE_CURRENT_BINARY_DIR}/vtkPVVersion.h")
 
-# Based on state of VTK modules, set up some variables that paraview needs to
-# compile optional code.
-configure_file(
-  "${CMAKE_CURRENT_SOURCE_DIR}/vtkPVConfig.h.in"
-  "${CMAKE_CURRENT_BINARY_DIR}/vtkPVConfig.h"
-  @ONLY)
-list(APPEND headers
-  "${CMAKE_CURRENT_BINARY_DIR}/vtkPVConfig.h")
+if (NOT PARAVIEW_BUILD_LEGACY_REMOVE)
+  # Based on state of VTK modules, set up some variables that paraview needs to
+  # compile optional code.
+  configure_file(
+    "${CMAKE_CURRENT_SOURCE_DIR}/vtkPVConfig.h.in"
+    "${CMAKE_CURRENT_BINARY_DIR}/vtkPVConfig.h"
+    @ONLY)
+  list(APPEND nowrap_headers
+    "${CMAKE_CURRENT_BINARY_DIR}/vtkPVConfig.h")
+endif ()
 
 vtk_module_add_module(ParaView::RemotingCore
   CLASSES ${classes}
   SOURCES ${sources}
   HEADERS ${headers}
+  NOWRAP_HEADERS ${nowrap_headers}
   PRIVATE_HEADERS ${private_headers})
 
 # for vtkPVFileInformation
