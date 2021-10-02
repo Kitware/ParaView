@@ -144,10 +144,6 @@ source_group("Resources" FILES
   ${ui_files}
   ${resource_files})
 
-##########################################################################
-# import Qt build settings
-set(${vtk-module}_NO_HeaderTest 1)
-
 list(APPEND headers
   pqQtDeprecated.h
 )
