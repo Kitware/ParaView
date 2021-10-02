@@ -46,7 +46,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPluginManager.h"
 #include "pqQtDeprecated.h"
 #include "pqSettings.h"
-#include "vtkPVConfig.h"
 #include "vtkSmartPointer.h"
 #include "vtkRemotingCoreConfiguration.h"
 #include "vtkSMProxyManager.h"

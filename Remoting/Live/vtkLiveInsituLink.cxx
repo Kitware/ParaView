@@ -24,7 +24,6 @@
 #include "vtkNetworkAccessManager.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
-#include "vtkPVConfig.h"
 #include "vtkPVDataInformation.h"
 #include "vtkPVSessionBase.h"
 #include "vtkPVXMLElement.h"

@@ -19,7 +19,6 @@
 #include "vtkObjectFactory.h"
 #include "vtkPResourceFileLocator.h"
 #include "vtkPSystemTools.h"
-#include "vtkPVConfig.h"
 #include "vtkPVLogger.h"
 #include "vtkPVPlugin.h"
 #include "vtkPVPluginLoader.h"

@@ -1,5 +1,3 @@
-#include "vtkPVConfig.h"
-
 #define PRINT_SELF(classname)                                                                      \
   c = classname::New();                                                                            \
   c->Print(cout);                                                                                  \

@@ -24,7 +24,6 @@
 #include "vtkOpenGLFXAAPass.h"
 #include "vtkOpenGLRenderer.h"
 #include "vtkPVClientServerSynchronizedRenderers.h"
-#include "vtkPVConfig.h"
 #include "vtkPVDefaultPass.h"
 #include "vtkPVRenderViewSettings.h"
 #include "vtkPVServerInformation.h"

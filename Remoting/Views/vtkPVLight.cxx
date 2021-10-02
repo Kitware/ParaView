@@ -17,7 +17,6 @@
 #include "vtkInformation.h"
 #include "vtkInformationStringKey.h"
 #include "vtkObjectFactory.h"
-#include "vtkPVConfig.h"
 
 #if VTK_MODULE_ENABLE_VTK_RenderingRayTracing
 #include "vtkOSPRayLightNode.h"

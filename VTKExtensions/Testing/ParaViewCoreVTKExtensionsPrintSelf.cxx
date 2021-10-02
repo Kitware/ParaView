@@ -12,7 +12,6 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-#include "vtkPVConfig.h"
 
 #include "vtkAMRDualClip.h"
 #include "vtkAMRDualContour.h"

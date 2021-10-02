@@ -19,7 +19,6 @@
 #include "vtkMultiProcessController.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
-#include "vtkPVConfig.h" // Required to get build options for paraview
 #include "vtkPVPluginTracker.h"
 #include "vtkProcessModule.h"
 #include "vtkProcessModuleConfiguration.h"

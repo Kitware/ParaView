@@ -47,7 +47,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <cassert>
 
-#include "vtkPVConfig.h"
 #if VTK_MODULE_ENABLE_ParaView_pqPython
 #include "pqPythonScriptEditor.h"
 #else

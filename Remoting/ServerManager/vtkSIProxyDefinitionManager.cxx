@@ -19,7 +19,6 @@
 #include "vtkCommand.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
-#include "vtkPVConfig.h"
 #include "vtkPVPlugin.h"
 #include "vtkPVPluginTracker.h"
 #include "vtkPVProxyDefinitionIterator.h"

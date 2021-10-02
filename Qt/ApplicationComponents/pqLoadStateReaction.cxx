@@ -41,7 +41,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqServerManagerModel.h"
 #include "pqStandardRecentlyUsedResourceLoaderImplementation.h"
 #include "vtkNew.h"
-#include "vtkPVConfig.h"
 #include "vtkPVXMLParser.h"
 #include "vtkSMLoadStateOptionsProxy.h"
 #include "vtkSMParaViewPipelineController.h"

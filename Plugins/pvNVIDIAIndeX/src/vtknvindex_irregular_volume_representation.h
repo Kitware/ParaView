@@ -31,7 +31,6 @@
 #include <mi/math/bbox.h>
 
 #include "vtkIndeXRepresentationsModule.h"
-#include "vtkPVConfig.h"
 #include "vtkVolumeRepresentation.h"
 
 #include "vtknvindex_rtc_kernel_params.h"

@@ -56,7 +56,6 @@
 #include "vtkPVCenterAxesActor.h"
 #include "vtkPVClientServerSynchronizedRenderers.h"
 #include "vtkPVCompositeRepresentation.h"
-#include "vtkPVConfig.h"
 #include "vtkPVDataRepresentation.h"
 #include "vtkPVGridAxes3DActor.h"
 #include "vtkPVHardwareSelector.h"

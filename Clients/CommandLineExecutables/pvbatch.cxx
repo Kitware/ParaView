@@ -15,7 +15,6 @@ PURPOSE.  See the above copyright notice for more information.
 #include "pvpython.h" // include this 1st.
 
 #include "vtkOutputWindow.h"
-#include "vtkPVConfig.h" // Required to get build options for paraview
 #include "vtkProcessModule.h"
 
 int main(int argc, char* argv[])

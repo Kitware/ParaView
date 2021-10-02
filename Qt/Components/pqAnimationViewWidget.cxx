@@ -75,7 +75,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqUndoStack.h"
 
 #include "vtkCamera.h"
-#include "vtkPVConfig.h"
 #include "vtkPVGeneralSettings.h"
 #include "vtkSMProperty.h"
 #include "vtkSMPropertyHelper.h"

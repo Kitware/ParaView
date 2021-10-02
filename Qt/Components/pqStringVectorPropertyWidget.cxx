@@ -64,7 +64,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqTreeView.h"
 #include "pqTreeViewSelectionHelper.h"
 #include "pqTreeWidget.h"
-#include "vtkPVConfig.h"
 
 #include <QComboBox>
 #include <QDebug>

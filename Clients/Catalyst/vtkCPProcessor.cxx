@@ -14,8 +14,6 @@
 =========================================================================*/
 #include "vtkCPProcessor.h"
 
-#include "vtkPVConfig.h" // need ParaView defines before MPI stuff
-
 #include "vtkCPCxxHelper.h"
 #include "vtkCPDataDescription.h"
 #include "vtkCPInputDataDescription.h"

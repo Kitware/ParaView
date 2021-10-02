@@ -28,7 +28,6 @@
 #include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
 #include "vtkOutlineFilter.h"
-#include "vtkPVConfig.h"
 #include "vtkPVGridAxes3DActor.h"
 #include "vtkPVRenderView.h"
 #include "vtkPoints.h"

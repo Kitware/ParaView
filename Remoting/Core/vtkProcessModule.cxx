@@ -28,7 +28,6 @@
 #include "vtkObjectFactory.h"
 #include "vtkOutputWindow.h"
 #include "vtkPSystemTools.h"
-#include "vtkPVConfig.h"
 #include "vtkPolyData.h"
 #include "vtkProcessModuleConfiguration.h"
 #include "vtkSessionIterator.h"

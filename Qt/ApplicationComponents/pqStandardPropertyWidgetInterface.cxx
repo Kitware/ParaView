@@ -31,8 +31,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 #include "pqStandardPropertyWidgetInterface.h"
 
-#include "vtkPVConfig.h"
-
 #include "pqAnimationShortcutDecorator.h"
 #include "pqArrayStatusPropertyWidget.h"
 #include "pqBackgroundEditorWidget.h"
