@@ -29,6 +29,10 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
+
+// Hide PARAVIEW_DEPRECATED_IN_5_10_0() warnings for this class.
+#define PARAVIEW_DEPRECATION_LEVEL 0
+
 #include "pqPVApplicationCore.h"
 
 #include "pqActiveObjects.h"
@@ -62,13 +66,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QShortcut>
 
 //-----------------------------------------------------------------------------
-#if !defined(VTK_LEGACY_REMOVE)
 pqPVApplicationCore::pqPVApplicationCore(int& argc, char** argv, pqOptions* options)
   : pqPVApplicationCore(argc, argv, static_cast<vtkCLIOptions*>(nullptr), true, nullptr)
 {
   this->setOptions(options);
 }
-#endif
 
 //-----------------------------------------------------------------------------
 pqPVApplicationCore::pqPVApplicationCore(int& argc, char** argv, vtkCLIOptions* options,

@@ -27,11 +27,11 @@
 #define vtkPVDataInformation_h
 
 #include "vtkDataObject.h" // for vtkDataObject::NUMBER_OF_ATTRIBUTE_TYPES
-#include "vtkLegacy.h"     // for VTK_LEGACY
 #include "vtkNew.h"        // for vtkNew
 #include "vtkPVInformation.h"
-#include "vtkRemotingCoreModule.h" //needed for exports
-#include "vtkSmartPointer.h"       // for vtkSmartPointer
+#include "vtkParaViewDeprecation.h" // for PARAVIEW_DEPRECATED_IN_5_10_0
+#include "vtkRemotingCoreModule.h"  //needed for exports
+#include "vtkSmartPointer.h"        // for vtkSmartPointer
 
 #include <vector> // for std::vector
 
@@ -474,15 +474,24 @@ public:
   /**
    * Deprecated in ParaView 5.10
    */
-  VTK_LEGACY(vtkTypeUInt64 GetPolygonCount());
-  VTK_LEGACY(void* GetCompositeDataInformation());
-  VTK_LEGACY(vtkPVDataInformation* GetDataInformationForCompositeIndex(int));
-  VTK_LEGACY(unsigned int GetNumberOfBlockLeafs(bool skipEmpty));
-  VTK_LEGACY(vtkPVDataInformation* GetDataInformationForCompositeIndex(int*));
-  VTK_LEGACY(double* GetTimeSpan());
-  VTK_LEGACY(void GetTimeSpan(double&, double&));
-  VTK_LEGACY(void GetTimeSpan(double[2]));
-  VTK_LEGACY(static void RegisterHelper(const char*, const char*));
+  PARAVIEW_DEPRECATED_IN_5_10_0("Replaced by `vtkPVDataInformation::GetNumberOfCells()` instead")
+  vtkTypeUInt64 GetPolygonCount();
+  PARAVIEW_DEPRECATED_IN_5_10_0("Removed")
+  void* GetCompositeDataInformation();
+  PARAVIEW_DEPRECATED_IN_5_10_0("Removed")
+  vtkPVDataInformation* GetDataInformationForCompositeIndex(int);
+  PARAVIEW_DEPRECATED_IN_5_10_0("Removed")
+  unsigned int GetNumberOfBlockLeafs(bool skipEmpty);
+  PARAVIEW_DEPRECATED_IN_5_10_0("Removed")
+  vtkPVDataInformation* GetDataInformationForCompositeIndex(int*);
+  PARAVIEW_DEPRECATED_IN_5_10_0("Replaced by `vtkPVDataInformation::GetTimeRange()` instead")
+  double* GetTimeSpan();
+  PARAVIEW_DEPRECATED_IN_5_10_0("Replaced by `vtkPVDataInformation::GetTimeRange()` instead")
+  void GetTimeSpan(double&, double&);
+  PARAVIEW_DEPRECATED_IN_5_10_0("Replaced by `vtkPVDataInformation::GetTimeRange()` instead")
+  void GetTimeSpan(double[2]);
+  PARAVIEW_DEPRECATED_IN_5_10_0("Removed")
+  static void RegisterHelper(const char*, const char*);
   //@}
 
 protected:

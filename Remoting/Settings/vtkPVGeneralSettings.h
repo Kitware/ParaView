@@ -26,8 +26,8 @@
 #ifndef vtkPVGeneralSettings_h
 #define vtkPVGeneralSettings_h
 
-#include "vtkLegacy.h" // for VTK_LEGACY
 #include "vtkObject.h"
+#include "vtkParaViewDeprecation.h"    // for PARAVIEW_DEPRECATED_IN_5_10_0
 #include "vtkRemotingSettingsModule.h" //needed for exports
 #include "vtkSmartPointer.h"           // needed for vtkSmartPointer.
 
@@ -85,10 +85,14 @@ public:
   /**
    * Deprecated. AutoMPI is no longer supported.
    */
-  VTK_LEGACY(void SetEnableAutoMPI(bool));
-  VTK_LEGACY(bool GetEnableAutoMPI());
-  VTK_LEGACY(void SetAutoMPILimit(int val));
-  VTK_LEGACY(int GetAutoMPILimit());
+  PARAVIEW_DEPRECATED_IN_5_10_0("AutoMPI is no longer supported")
+  void SetEnableAutoMPI(bool);
+  PARAVIEW_DEPRECATED_IN_5_10_0("AutoMPI is no longer supported")
+  bool GetEnableAutoMPI();
+  PARAVIEW_DEPRECATED_IN_5_10_0("AutoMPI is no longer supported")
+  void SetAutoMPILimit(int val);
+  PARAVIEW_DEPRECATED_IN_5_10_0("AutoMPI is no longer supported")
+  int GetAutoMPILimit();
   //@}
 
   //@{

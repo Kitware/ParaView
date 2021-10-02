@@ -30,6 +30,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
+// Hide PARAVIEW_DEPRECATED_IN_5_10_0() warnings for this class.
+#define PARAVIEW_DEPRECATION_LEVEL 0
+
 #include "pqIntRangeWidget.h"
 
 // Qt includes
@@ -149,36 +152,30 @@ void pqIntRangeWidget::setMinimum(int val)
 //-----------------------------------------------------------------------------
 void pqIntRangeWidget::updateValidator()
 {
-#if !defined(VTK_LEGACY_REMOVE)
   if (this->StrictRange)
   {
     this->LineEdit->setValidator(
       new QIntValidator(this->minimum(), this->maximum(), this->LineEdit));
   }
   else
-#endif
   {
     this->LineEdit->setValidator(new QIntValidator(this->LineEdit));
   }
 }
 
-#if !defined(VTK_LEGACY_REMOVE)
 //-----------------------------------------------------------------------------
 bool pqIntRangeWidget::strictRange() const
 {
   const QIntValidator* dv = qobject_cast<const QIntValidator*>(this->LineEdit->validator());
   return dv->bottom() == this->minimum() && dv->top() == this->maximum();
 }
-#endif
 
-#if !defined(VTK_LEGACY_REMOVE)
 //-----------------------------------------------------------------------------
 void pqIntRangeWidget::setStrictRange(bool s)
 {
   this->StrictRange = s;
   this->updateValidator();
 }
-#endif
 
 //-----------------------------------------------------------------------------
 void pqIntRangeWidget::setDomain(vtkSMIntRangeDomain* domain)

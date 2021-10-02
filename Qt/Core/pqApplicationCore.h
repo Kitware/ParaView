@@ -33,9 +33,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define pqApplicationCore_h
 
 #include "pqCoreModule.h"
-#include "pqQtConfig.h"      // for PARAVIEW_USE_QTHELP
-#include "vtkLegacy.h"       // for VTK_LEGACY
-#include "vtkSmartPointer.h" // for vtkSmartPointer
+#include "pqQtConfig.h"             // for PARAVIEW_USE_QTHELP
+#include "vtkParaViewDeprecation.h" // for PARAVIEW_DEPRECATED_IN_5_10_0
+#include "vtkSmartPointer.h"        // for vtkSmartPointer
 #include <QObject>
 #include <QPointer>
 #include <exception> // for std::exception
@@ -120,9 +120,10 @@ public:
    * @deprecated in ParaView 5.10. pqOptions has been replaced by vtkCLIOptions
    * based command line parsing.
    */
-  VTK_LEGACY(
-    pqApplicationCore(int& argc, char** argv, pqOptions* options, QObject* parent = nullptr));
-  VTK_LEGACY(pqOptions* getOptions() const);
+  PARAVIEW_DEPRECATED_IN_5_10_0("Replaced by `vtkCLIOptions` APIs")
+  pqApplicationCore(int& argc, char** argv, pqOptions* options, QObject* parent = nullptr);
+  PARAVIEW_DEPRECATED_IN_5_10_0("Replaced by `vtkCLIOptions` APIs")
+  pqOptions* getOptions() const;
   ///@}
 
   /**
@@ -418,10 +419,10 @@ private Q_SLOTS:
 protected:
   bool LoadingState;
 
-#if !defined(VTK_LEGACY_REMOVE)
+  PARAVIEW_DEPRECATED_IN_5_10_0("Replaced by `vtkCLIOptions` APIs")
   vtkSmartPointer<pqOptions> Options;
+  PARAVIEW_DEPRECATED_IN_5_10_0("Replaced by `vtkCLIOptions` APIs")
   void setOptions(pqOptions* options);
-#endif
   pqLinksModel* LinksModel;
   pqObjectBuilder* ObjectBuilder;
   pqInterfaceTracker* InterfaceTracker;

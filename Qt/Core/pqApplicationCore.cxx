@@ -29,6 +29,10 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
+
+// Hide PARAVIEW_DEPRECATED_IN_5_10_0() warnings for this class.
+#define PARAVIEW_DEPRECATION_LEVEL 0
+
 #include "pqApplicationCore.h"
 
 #include <vtksys/SystemTools.hxx>
@@ -59,6 +63,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqLinksModel.h"
 #include "pqMainWindowEventManager.h"
 #include "pqObjectBuilder.h"
+#include "pqOptions.h"
 #include "pqPipelineFilter.h"
 #include "pqPluginManager.h"
 #include "pqProgressManager.h"
@@ -76,6 +81,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkCLIOptions.h"
 #include "vtkCommand.h"
 #include "vtkInitializationHelper.h"
+#include "vtkLegacy.h"
 #include "vtkPVGeneralSettings.h"
 #include "vtkPVLogger.h"
 #include "vtkPVPluginTracker.h"
@@ -97,10 +103,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <cassert>
 
-#if !defined(VTK_LEGACY_REMOVE)
-#include "pqOptions.h"
-#endif
-
 //-----------------------------------------------------------------------------
 class pqApplicationCore::pqInternals
 {
@@ -118,24 +120,19 @@ pqApplicationCore* pqApplicationCore::instance()
 }
 
 //-----------------------------------------------------------------------------
-#if !defined(VTK_LEGACY_REMOVE)
 pqApplicationCore::pqApplicationCore(
   int& argc, char** argv, pqOptions* options, QObject* parentObject)
   : pqApplicationCore(argc, argv, static_cast<vtkCLIOptions*>(nullptr), true, parentObject)
 {
   this->setOptions(options);
 }
-#endif
 
-#if !defined(VTK_LEGACY_REMOVE)
 //-----------------------------------------------------------------------------
 void pqApplicationCore::setOptions(pqOptions* options)
 {
   this->Options = options;
   vtkProcessModule::GetProcessModule()->SetOptions(this->Options);
 }
-
-#endif
 
 //-----------------------------------------------------------------------------
 pqApplicationCore::pqApplicationCore(int& argc, char** argv, vtkCLIOptions* options /*=nullptr*/,
@@ -164,10 +161,8 @@ pqApplicationCore::pqApplicationCore(int& argc, char** argv, vtkCLIOptions* opti
     throw pqApplicationCoreExitCode(vtkInitializationHelper::GetExitCode());
   }
 
-#if !defined(VTK_LEGACY_REMOVE)
   this->Options = vtk::TakeSmartPointer(pqOptions::New());
   vtkProcessModule::GetProcessModule()->SetOptions(this->Options);
-#endif
 
   this->constructor();
 }
@@ -310,13 +305,11 @@ pqApplicationCore::~pqApplicationCore()
 }
 
 //-----------------------------------------------------------------------------
-#if !defined(VTK_LEGACY_REMOVE)
 pqOptions* pqApplicationCore::getOptions() const
 {
   VTK_LEGACY_BODY(pqApplicationCore::getOptions, "ParaView 5.10");
   return this->Options;
 }
-#endif
 
 //-----------------------------------------------------------------------------
 void pqApplicationCore::setUndoStack(pqUndoStack* stack)

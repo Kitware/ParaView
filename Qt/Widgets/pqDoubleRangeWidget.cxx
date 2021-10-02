@@ -29,6 +29,10 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
+
+// Hide PARAVIEW_DEPRECATED_IN_5_10_0() warnings for this class.
+#define PARAVIEW_DEPRECATION_LEVEL 0
+
 #include "pqDoubleRangeWidget.h"
 
 // Qt includes
@@ -109,32 +113,26 @@ void pqDoubleRangeWidget::setMinimum(double val)
 //-----------------------------------------------------------------------------
 void pqDoubleRangeWidget::updateValidator()
 {
-#if !defined(VTK_LEGACY_REMOVE)
   if (this->StrictRange)
   {
     this->setValidator(new QDoubleValidator(this->minimum(), this->maximum(), 100, this));
   }
   else
-#endif
   {
     this->setValidator(new QDoubleValidator(this));
   }
 }
 
-#if !defined(VTK_LEGACY_REMOVE)
 //-----------------------------------------------------------------------------
 bool pqDoubleRangeWidget::strictRange() const
 {
   const QDoubleValidator* dv = this->validator();
   return dv->bottom() == this->minimum() && dv->top() == this->maximum();
 }
-#endif
 
-#if !defined(VTK_LEGACY_REMOVE)
 //-----------------------------------------------------------------------------
 void pqDoubleRangeWidget::setStrictRange(bool s)
 {
   this->StrictRange = s;
   this->updateValidator();
 }
-#endif

@@ -26,8 +26,8 @@
 #define vtkPVOptions_h
 
 #include "vtkCommandOptions.h"
-#include "vtkLegacy.h"             // for legacy macros.
-#include "vtkRemotingCoreModule.h" //needed for exports
+#include "vtkParaViewDeprecation.h" // for PARAVIEW_DEPRECATED_IN_5_10_0
+#include "vtkRemotingCoreModule.h"  //needed for exports
 
 #include <string>  // used for ivar
 #include <utility> // needed for pair
@@ -46,39 +46,72 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
   ///@{
-  VTK_LEGACY(const char* GetHostName());
-  VTK_LEGACY(int GetConnectID());
-  VTK_LEGACY(void SetConnectID(int));
-  VTK_LEGACY(int GetTellVersion());
-  VTK_LEGACY(int GetSymmetricMPIMode());
-  VTK_LEGACY(int GetEnableStackTrace());
-  VTK_LEGACY(int GetTimeout());
-  VTK_LEGACY(const char* GetLogFileName());
-  VTK_LEGACY(int GetReverseConnection());
-  VTK_LEGACY(const char* GetServerURL());
-  VTK_LEGACY(const char* GetServersFileName());
-  VTK_LEGACY(int GetUseStereoRendering());
-  VTK_LEGACY(const char* GetStereoType());
-  VTK_LEGACY(const int* GetTileDimensions());
-  VTK_LEGACY(void GetTileDimensions(int[2]));
-  VTK_LEGACY(const int* GetTileMullions());
-  VTK_LEGACY(void GetTileMullions(int[2]));
-  VTK_LEGACY(bool GetIsInTileDisplay() const);
-  VTK_LEGACY(int GetForceOnscreenRendering());
-  VTK_LEGACY(int GetForceOffscreenRendering());
-  VTK_LEGACY(bool GetIsInCave() const);
-  VTK_LEGACY(int GetDisableXDisplayTests());
-  VTK_LEGACY(int GetEGLDeviceIndex());
-  VTK_LEGACY(int GetMultiClientMode());
-  VTK_LEGACY(int IsMultiClientModeDebug());
-  VTK_LEGACY(int GetDisableFurtherConnections());
-  VTK_LEGACY(int GetMultiServerMode());
-  VTK_LEGACY(const char* GetParaViewDataName());
-  VTK_LEGACY(const char* GetTestPlugins());
-  VTK_LEGACY(const char* GetTestPluginPaths());
-  VTK_LEGACY(int GetCatalystLivePort());
-  VTK_LEGACY(int GetDisableRegistry());
-  VTK_LEGACY(int GetPrintMonitors());
+  PARAVIEW_DEPRECATED_IN_5_10_0("Use `vtkCLIOptions` instead")
+  const char* GetHostName();
+  PARAVIEW_DEPRECATED_IN_5_10_0("Use `vtkCLIOptions` instead")
+  int GetConnectID();
+  PARAVIEW_DEPRECATED_IN_5_10_0("Use `vtkCLIOptions` instead")
+  void SetConnectID(int);
+  PARAVIEW_DEPRECATED_IN_5_10_0("Use `vtkCLIOptions` instead")
+  int GetTellVersion();
+  PARAVIEW_DEPRECATED_IN_5_10_0("Use `vtkCLIOptions` instead")
+  int GetSymmetricMPIMode();
+  PARAVIEW_DEPRECATED_IN_5_10_0("Use `vtkCLIOptions` instead")
+  int GetEnableStackTrace();
+  PARAVIEW_DEPRECATED_IN_5_10_0("Use `vtkCLIOptions` instead")
+  int GetTimeout();
+  PARAVIEW_DEPRECATED_IN_5_10_0("Use `vtkCLIOptions` instead")
+  const char* GetLogFileName();
+  PARAVIEW_DEPRECATED_IN_5_10_0("Use `vtkCLIOptions` instead")
+  int GetReverseConnection();
+  PARAVIEW_DEPRECATED_IN_5_10_0("Use `vtkCLIOptions` instead")
+  const char* GetServerURL();
+  PARAVIEW_DEPRECATED_IN_5_10_0("Use `vtkCLIOptions` instead")
+  const char* GetServersFileName();
+  PARAVIEW_DEPRECATED_IN_5_10_0("Use `vtkCLIOptions` instead")
+  int GetUseStereoRendering();
+  PARAVIEW_DEPRECATED_IN_5_10_0("Use `vtkCLIOptions` instead")
+  const char* GetStereoType();
+  PARAVIEW_DEPRECATED_IN_5_10_0("Use `vtkCLIOptions` instead")
+  const int* GetTileDimensions();
+  PARAVIEW_DEPRECATED_IN_5_10_0("Use `vtkCLIOptions` instead")
+  void GetTileDimensions(int[2]);
+  PARAVIEW_DEPRECATED_IN_5_10_0("Use `vtkCLIOptions` instead")
+  const int* GetTileMullions();
+  PARAVIEW_DEPRECATED_IN_5_10_0("Use `vtkCLIOptions` instead")
+  void GetTileMullions(int[2]);
+  PARAVIEW_DEPRECATED_IN_5_10_0("Use `vtkCLIOptions` instead")
+  bool GetIsInTileDisplay() const;
+  PARAVIEW_DEPRECATED_IN_5_10_0("Use `vtkCLIOptions` instead")
+  int GetForceOnscreenRendering();
+  PARAVIEW_DEPRECATED_IN_5_10_0("Use `vtkCLIOptions` instead")
+  int GetForceOffscreenRendering();
+  PARAVIEW_DEPRECATED_IN_5_10_0("Use `vtkCLIOptions` instead")
+  bool GetIsInCave() const;
+  PARAVIEW_DEPRECATED_IN_5_10_0("Use `vtkCLIOptions` instead")
+  int GetDisableXDisplayTests();
+  PARAVIEW_DEPRECATED_IN_5_10_0("Use `vtkCLIOptions` instead")
+  int GetEGLDeviceIndex();
+  PARAVIEW_DEPRECATED_IN_5_10_0("Use `vtkCLIOptions` instead")
+  int GetMultiClientMode();
+  PARAVIEW_DEPRECATED_IN_5_10_0("Use `vtkCLIOptions` instead")
+  int IsMultiClientModeDebug();
+  PARAVIEW_DEPRECATED_IN_5_10_0("Use `vtkCLIOptions` instead")
+  int GetDisableFurtherConnections();
+  PARAVIEW_DEPRECATED_IN_5_10_0("Use `vtkCLIOptions` instead")
+  int GetMultiServerMode();
+  PARAVIEW_DEPRECATED_IN_5_10_0("Use `vtkCLIOptions` instead")
+  const char* GetParaViewDataName();
+  PARAVIEW_DEPRECATED_IN_5_10_0("Use `vtkCLIOptions` instead")
+  const char* GetTestPlugins();
+  PARAVIEW_DEPRECATED_IN_5_10_0("Use `vtkCLIOptions` instead")
+  const char* GetTestPluginPaths();
+  PARAVIEW_DEPRECATED_IN_5_10_0("Use `vtkCLIOptions` instead")
+  int GetCatalystLivePort();
+  PARAVIEW_DEPRECATED_IN_5_10_0("Use `vtkCLIOptions` instead")
+  int GetDisableRegistry();
+  PARAVIEW_DEPRECATED_IN_5_10_0("Use `vtkCLIOptions` instead")
+  int GetPrintMonitors();
   ///@}
 
   //@{

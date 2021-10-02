@@ -34,7 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define pqOptions_h
 
 #include "pqCoreModule.h"
-#include "vtkLegacy.h" // for VTK_LEGACY
+#include "vtkParaViewDeprecation.h" // for PARAVIEW_DEPRECATED_IN_5_10_0
 #include <QStringList>
 #include <vtkPVOptions.h>
 /** \brief Command line options for pqClient.
@@ -49,21 +49,36 @@ public:
   vtkTypeMacro(pqOptions, vtkPVOptions);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  VTK_LEGACY(const char* GetBaselineDirectory());
-  VTK_LEGACY(const char* GetTestDirectory());
-  VTK_LEGACY(const char* GetDataDirectory());
-  VTK_LEGACY(const char* GetStateFileName());
-  VTK_LEGACY(const char* GetPythonScript());
-  VTK_LEGACY(int GetExitAppWhenTestsDone());
-  VTK_LEGACY(const char* GetServerResourceName());
-  VTK_LEGACY(QStringList GetTestScripts());
-  VTK_LEGACY(int GetNumberOfTestScripts());
-  VTK_LEGACY(QString GetTestScript(int cc));
-  VTK_LEGACY(QString GetTestBaseline(int cc));
-  VTK_LEGACY(int GetTestImageThreshold(int cc));
-  VTK_LEGACY(int GetCurrentImageThreshold());
-  VTK_LEGACY(int GetTestMaster());
-  VTK_LEGACY(int GetTestSlave());
+  PARAVIEW_DEPRECATED_IN_5_10_0("Use `vtkCLIOptions` instead")
+  const char* GetBaselineDirectory();
+  PARAVIEW_DEPRECATED_IN_5_10_0("Use `vtkCLIOptions` instead")
+  const char* GetTestDirectory();
+  PARAVIEW_DEPRECATED_IN_5_10_0("Use `vtkCLIOptions` instead")
+  const char* GetDataDirectory();
+  PARAVIEW_DEPRECATED_IN_5_10_0("Use `vtkCLIOptions` instead")
+  const char* GetStateFileName();
+  PARAVIEW_DEPRECATED_IN_5_10_0("Use `vtkCLIOptions` instead")
+  const char* GetPythonScript();
+  PARAVIEW_DEPRECATED_IN_5_10_0("Use `vtkCLIOptions` instead")
+  int GetExitAppWhenTestsDone();
+  PARAVIEW_DEPRECATED_IN_5_10_0("Use `vtkCLIOptions` instead")
+  const char* GetServerResourceName();
+  PARAVIEW_DEPRECATED_IN_5_10_0("Use `vtkCLIOptions` instead")
+  QStringList GetTestScripts();
+  PARAVIEW_DEPRECATED_IN_5_10_0("Use `vtkCLIOptions` instead")
+  int GetNumberOfTestScripts();
+  PARAVIEW_DEPRECATED_IN_5_10_0("Use `vtkCLIOptions` instead")
+  QString GetTestScript(int cc);
+  PARAVIEW_DEPRECATED_IN_5_10_0("Use `vtkCLIOptions` instead")
+  QString GetTestBaseline(int cc);
+  PARAVIEW_DEPRECATED_IN_5_10_0("Use `vtkCLIOptions` instead")
+  int GetTestImageThreshold(int cc);
+  PARAVIEW_DEPRECATED_IN_5_10_0("Use `vtkCLIOptions` instead")
+  int GetCurrentImageThreshold();
+  PARAVIEW_DEPRECATED_IN_5_10_0("Use `vtkCLIOptions` instead")
+  int GetTestMaster();
+  PARAVIEW_DEPRECATED_IN_5_10_0("Use `vtkCLIOptions` instead")
+  int GetTestSlave();
 
 protected:
   pqOptions();

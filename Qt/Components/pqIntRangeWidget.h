@@ -33,7 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define pqIntRangeWidget_h
 
 #include "pqComponentsModule.h"
-#include "vtkSetGet.h" // for VTK_LEGACY
+#include "vtkParaViewDeprecation.h" // for PARAVIEW_DEPRECATED_IN_5_10_0
 #include "vtkSmartPointer.h"
 #include <QWidget>
 
@@ -51,9 +51,8 @@ class PQCOMPONENTS_EXPORT pqIntRangeWidget : public QWidget
   Q_PROPERTY(int value READ value WRITE setValue USER true)
   Q_PROPERTY(int minimum READ minimum WRITE setMinimum)
   Q_PROPERTY(int maximum READ maximum WRITE setMaximum)
-#if !defined(VTK_LEGACY_REMOVE)
+  // PARAVIEW_DEPRECATED_IN_5_10_0("Removed; it did not work as intended")
   Q_PROPERTY(bool strictRange READ strictRange WRITE setStrictRange);
-#endif
 
 public:
   /**
@@ -75,7 +74,8 @@ public:
   /**
    * @deprecated strictRange is deprecated and is not working as intended
    */
-  VTK_LEGACY(bool strictRange() const);
+  PARAVIEW_DEPRECATED_IN_5_10_0("Removed; it did not work as intended")
+  bool strictRange() const;
 
   // Sets the range domain to monitor. This will automatically update
   // the widgets range when the domain changes.
@@ -105,12 +105,11 @@ public Q_SLOTS:
   // set the max range value
   void setMaximum(int);
 
-#if !defined(VTK_LEGACY_REMOVE)
   /**
    * @deprecated strictRange is deprecated and is not working as intended
    */
+  PARAVIEW_DEPRECATED_IN_5_10_0("Removed; it did not work as intended")
   void setStrictRange(bool);
-#endif
 
 private Q_SLOTS:
   void sliderChanged(int);
@@ -130,9 +129,8 @@ private:
   QSlider* Slider;
   pqLineEdit* LineEdit;
   bool BlockUpdate;
-#if !defined(VTK_LEGACY_REMOVE)
+  PARAVIEW_DEPRECATED_IN_5_10_0("Removed; it did not work as intended")
   bool StrictRange = false;
-#endif
   vtkSmartPointer<vtkSMIntRangeDomain> Domain;
   vtkEventQtSlotConnect* DomainConnection;
   bool InteractingWithSlider;

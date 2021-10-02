@@ -22,9 +22,9 @@
 #ifndef vtkSMSession_h
 #define vtkSMSession_h
 
-#include "vtkLegacy.h"               // for VTK_LEGACY
 #include "vtkNetworkAccessManager.h" // needed for vtkNetworkAccessManager::ConnectionResult.
 #include "vtkPVSessionBase.h"
+#include "vtkParaViewDeprecation.h"         // for PARAVIEW_DEPRECATED_IN_5_10_0
 #include "vtkRemotingServerManagerModule.h" //needed for exports
 
 class vtkSMCollaborationManager;
@@ -291,7 +291,8 @@ public:
   /**
    * Deprecated. AutoMPI is no longer supported. This simply returns false.
    */
-  VTK_LEGACY(bool GetIsAutoMPI() const);
+  PARAVIEW_DEPRECATED_IN_5_10_0("AutoMPI is no longer supported")
+  bool GetIsAutoMPI() const;
   //@}
 
 protected:
