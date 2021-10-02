@@ -33,8 +33,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pvpythonmodules.h"
 #endif
 
-#include "vtkPVConfig.h"
-
 #include "ParaViewMainWindow.h"
 #include "ui_ParaViewMainWindow.h"
 
@@ -56,6 +54,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMSettings.h"
 #include "vtksys/SystemTools.hxx"
 
+#include "pqQtConfig.h"
 #ifdef PARAVIEW_USE_QTHELP
 #include "pqHelpReaction.h"
 #endif

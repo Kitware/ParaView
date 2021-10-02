@@ -134,6 +134,15 @@ if (NOT VTK_LEGACY_REMOVE)
     pqDebug)
 endif()
 
+set(headers)
+
+configure_file(
+  "${CMAKE_CURRENT_SOURCE_DIR}/pqQtConfig.h.in"
+  "${CMAKE_CURRENT_BINARY_DIR}/pqQtConfig.h"
+  @ONLY)
+list(APPEND headers
+  "${CMAKE_CURRENT_BINARY_DIR}/pqQtConfig.h")
+
 set_property(SOURCE pqCoreInit.cxx APPEND
   PROPERTY
     COMPILE_DEFINITIONS "BUILD_SHARED_LIBS=$<BOOL:${BUILD_SHARED_LIBS}>")
@@ -183,7 +192,8 @@ source_group("Resources" FILES
 vtk_module_add_module(ParaView::pqCore
   CLASSES ${classes}
   SOURCES ${ui_files}
-          ${resource_files})
+          ${resource_files}
+  HEADERS ${headers})
 vtk_module_link(ParaView::pqCore
   PRIVATE
     Qt5::Widgets)
