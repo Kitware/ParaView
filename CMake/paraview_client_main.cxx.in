@@ -38,7 +38,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QSurfaceFormat>
 
 #include "pq@_paraview_client_NAME@Initializer.h"
-#include "vtkPVConfig.h"
+#include "pqQtWidgetsConfig.h"
 
 #if PARAVIEW_USE_QTWEBENGINE
 #include <QWebEngineUrlScheme>

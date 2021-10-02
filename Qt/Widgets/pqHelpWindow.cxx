@@ -30,8 +30,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
 #include "pqHelpWindow.h"
+#include "pqQtWidgetsConfig.h" // for PARAVIEW_USE_QTWEBENGINE
 #include "ui_pqHelpWindow.h"
-#include "vtkPVConfig.h" // for PARAVIEW_USE_QTWEBENGINE
 
 #include <cassert>
 

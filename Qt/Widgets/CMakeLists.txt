@@ -90,6 +90,15 @@ set(classes
   pqVectorWidget
   pqWaitCursor)
 
+set(headers)
+
+configure_file(
+  "${CMAKE_CURRENT_SOURCE_DIR}/pqQtWidgetsConfig.h.in"
+  "${CMAKE_CURRENT_BINARY_DIR}/pqQtWidgetsConfig.h"
+  @ONLY)
+list(APPEND headers
+  "${CMAKE_CURRENT_BINARY_DIR}/pqQtWidgetsConfig.h")
+
 set(qt_components
   Core
   Gui
@@ -139,7 +148,7 @@ source_group("Resources" FILES
 # import Qt build settings
 set(${vtk-module}_NO_HeaderTest 1)
 
-set(headers
+list(APPEND headers
   pqQtDeprecated.h
 )
 
