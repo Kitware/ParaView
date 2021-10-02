@@ -80,6 +80,7 @@ set(private_headers
   vtkProcessModuleInternals.h)
 
 set(headers
+  vtkParaViewDeprecation.h
   vtkReservedRemoteObjectIds.h)
 if (APPLE)
   list(APPEND sources
