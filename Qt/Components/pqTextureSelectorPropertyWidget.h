@@ -61,7 +61,7 @@ public:
    */
   const QString& selectedName() const;
 
-protected slots:
+protected Q_SLOTS:
   void onTextureChanged(vtkSMProxy* texture);
   void onPropertyChanged();
   void checkAttributes(bool tcoords, bool tangents);

@@ -158,7 +158,7 @@ void pqAnimationWidget::headerDblClicked(int which)
 {
   if (which > 0)
   {
-    emit this->trackSelected(this->Model->track(which - 1));
+    Q_EMIT this->trackSelected(this->Model->track(which - 1));
   }
 }
 
@@ -191,7 +191,7 @@ void pqAnimationWidget::updateGeometries()
 
   this->setViewportMargins(width1 + width2 + width3, 0, 0, 0);
 
-  emit this->timelineOffsetChanged(width1 + width2 + width3);
+  Q_EMIT this->timelineOffsetChanged(width1 + width2 + width3);
 
   QRect vg = this->contentsRect();
   this->CreateDeleteHeader->setGeometry(vg.left(), vg.top(), width1, vg.height());
@@ -305,14 +305,14 @@ void pqAnimationWidget::headerDeleteClicked(int which)
   {
     if (which == this->CreateDeleteHeader->count() - 1)
     {
-      emit this->createTrackClicked();
+      Q_EMIT this->createTrackClicked();
     }
     else
     {
       pqAnimationTrack* t = this->Model->track(which - 1);
       if (t && t->isDeletable())
       {
-        emit this->deleteTrackClicked(t);
+        Q_EMIT this->deleteTrackClicked(t);
       }
     }
   }
@@ -326,7 +326,7 @@ void pqAnimationWidget::headerEnabledClicked(int which)
     pqAnimationTrack* track = this->Model->track(which - 1);
     if (track)
     {
-      emit this->enableTrackClicked(track);
+      Q_EMIT this->enableTrackClicked(track);
     }
   }
 }

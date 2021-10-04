@@ -55,13 +55,13 @@ public:
   pqSaveStateAndScreenshotReaction(QAction* saveAction, QAction* settingsAction);
   ~pqSaveStateAndScreenshotReaction() override = default;
 
-public slots:
+public Q_SLOTS:
   /**
    * Updates the enabled state. Applications need not explicitly call this.
    */
   void updateEnableState() override;
 
-protected slots:
+protected Q_SLOTS:
   /**
    * Called when the Save action is triggered
    */

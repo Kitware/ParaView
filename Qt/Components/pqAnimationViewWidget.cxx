@@ -824,7 +824,7 @@ void pqAnimationViewWidget::updatePlayMode()
       SIGNAL(editingFinished()), this->Internal->Scene->getProxy(),
       this->Internal->Scene->getProxy()->GetProperty("NumberOfFrames"));
     this->Internal->Stride->setText(QString::number(this->Internal->SequenceStrideCache));
-    emit this->Internal->Stride->editingFinished();
+    Q_EMIT this->Internal->Stride->editingFinished();
   }
   else if (mode == "Snap To TimeSteps")
   {
@@ -849,7 +849,7 @@ void pqAnimationViewWidget::updatePlayMode()
     this->Internal->EndTime->setEnabled(false);
 
     this->Internal->Stride->setText(QString::number(this->Internal->TimestepStrideCache));
-    emit this->Internal->Stride->editingFinished();
+    Q_EMIT this->Internal->Stride->editingFinished();
   }
   else
   {

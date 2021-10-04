@@ -93,7 +93,7 @@ protected:
    */
   QStandardItem* currentItem();
 
-protected slots:
+protected Q_SLOTS:
   /**
    * Called when the ordering array is changed
    */

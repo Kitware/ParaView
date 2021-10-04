@@ -192,7 +192,7 @@ void pqPythonTabWidget::loadFile(const QString& fileName)
 //-----------------------------------------------------------------------------
 void pqPythonTabWidget::closeCurrentTab()
 {
-  emit this->tabCloseRequested(this->currentIndex());
+  Q_EMIT this->tabCloseRequested(this->currentIndex());
 }
 
 //-----------------------------------------------------------------------------
@@ -304,7 +304,7 @@ void pqPythonTabWidget::setTabCloseButton(pqPythonTextArea* widget)
     int idx = this->indexOf(clickedWidget);
     if (idx >= 0 && idx < this->count() - 1)
     {
-      emit this->tabCloseRequested(idx);
+      Q_EMIT this->tabCloseRequested(idx);
     }
   });
 }

@@ -183,7 +183,7 @@ public:
    */
   QRectF boundingRect() const override;
 
-signals:
+Q_SIGNALS:
   void nodeResized();
   void nodeMoved();
 

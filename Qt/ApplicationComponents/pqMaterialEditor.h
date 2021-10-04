@@ -96,7 +96,7 @@ public:
     PropertyValue = Qt::UserRole + 1
   };
 
-protected slots:
+protected Q_SLOTS:
   void updateCurrentMaterial(const QString&);
   void updateCurrentMaterialWithIndex(int index);
 

@@ -393,7 +393,7 @@ bool pqFileDialogFavoriteModel::setData(const QModelIndex& index, const QVariant
   {
     this->Implementation->FavoriteList[index.row()].Label = value.toString();
 
-    emit this->dataChanged(index, index);
+    Q_EMIT this->dataChanged(index, index);
 
     return true;
   }

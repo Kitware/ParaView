@@ -56,7 +56,7 @@ public:
   pqNodeEditorWidget(const QString& title, QWidget* parent = nullptr);
   virtual ~pqNodeEditorWidget() = default;
 
-public slots:
+public Q_SLOTS:
   /**
    * Update ParaView pipeline and views
    */

@@ -64,7 +64,7 @@ public:
    */
   const QString& type() { return this->Type; }
 
-public slots:
+public Q_SLOTS:
   /**
    * Store the name and type of the material after accept.
    * This slot is connected in pqMaterialEditor to add a new material to

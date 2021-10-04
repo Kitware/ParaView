@@ -56,13 +56,13 @@ public:
    */
   const QVariant& value() const { return this->Vector; }
 
-signals:
+Q_SIGNALS:
   /**
    * Signal emitted when any component value changed.
    */
   void valueChanged(const QVariant&);
 
-public slots:
+public Q_SLOTS:
 
   /**
    * Set the value at index \p index of the QVariant with \p value.
@@ -106,7 +106,7 @@ public:
     T vec = this->Vector.template value<T>();
     vec[index] = value;
     this->Vector = QVariant::fromValue(vec);
-    emit this->valueChanged(this->Vector);
+    Q_EMIT this->valueChanged(this->Vector);
   }
 
 protected:

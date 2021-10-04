@@ -634,7 +634,7 @@ void pqTimeInspectorWidget::toggleTrackSuppression(pqAnimationTrack* track)
     }
     this->Internals->SuppressedTimeSources = newValue;
   }
-  emit this->suppressedTimeSourcesChanged();
+  Q_EMIT this->suppressedTimeSourcesChanged();
 }
 
 //-----------------------------------------------------------------------------
