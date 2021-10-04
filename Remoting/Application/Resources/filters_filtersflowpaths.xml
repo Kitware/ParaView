@@ -881,6 +881,19 @@
         the streamlines will be generated.</Documentation>
       </InputProperty>
 
+      <IntVectorProperty command="SetUseLocalSeedSource"
+                         number_of_elements="1"
+                         default_values="0"
+                         name="UseLocalSeedSource"
+                         panel_visibility="never">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          If true the filter considers that the whole seed source is available on all ranks.
+          Else the filter will aggregate all seed sources from all ranks and merge their points.
+          WARNING: do not set this value to true unless you know what you're doing.
+        </Documentation>
+      </IntVectorProperty>
+
       <PropertyGroup label="Seeds">
         <Property name="Source" />
       </PropertyGroup>
@@ -1126,6 +1139,18 @@
         <BooleanDomain name="bool" />
         <Documentation>Specify whether or not to compute
         vorticity.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetUseLocalSeedSource"
+                         number_of_elements="1"
+                         default_values="0"
+                         name="UseLocalSeedSource"
+                         panel_visibility="never">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          If true the filter considers that the whole seed source is available on all ranks.
+          Else the filter will aggregate all seed sources from all ranks and merge their points.
+          WARNING: do not set this value to true unless you know what you're doing.
+        </Documentation>
       </IntVectorProperty>
       <InputProperty command="SetSourceConnection"
                      label="Seed Source"
