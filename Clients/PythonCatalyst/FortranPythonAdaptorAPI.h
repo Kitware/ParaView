@@ -12,8 +12,8 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-#ifndef FortranAdaptorAPI_h
-#define FortranAdaptorAPI_h
+#ifndef FortranPythonAdaptorAPI_h
+#define FortranPythonAdaptorAPI_h
 
 #include "FortranPythonAdaptorAPIMangling.h"
 #include "vtkPVPythonCatalystModule.h"

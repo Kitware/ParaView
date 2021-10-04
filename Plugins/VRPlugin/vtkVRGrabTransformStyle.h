@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef vtkVRGrabTransfromStyle_h
-#define vtkVRGrabTransfromStyle_h
+#ifndef vtkVRGrabTransformStyle_h
+#define vtkVRGrabTransformStyle_h
 
 #include "vtkNew.h"
 #include "vtkVRTrackStyle.h"
@@ -70,4 +70,4 @@ private:
   vtkCamera* GetCamera();                                       // WRS-TODO: how is this used?
 };
 
-#endif // vtkVRGrabTransfromStyle_h
+#endif // vtkVRGrabTransformStyle_h

@@ -30,8 +30,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-#ifndef pqPythonTextSave_h
-#define pqPythonTextSave_h
+#ifndef pqPythonFileIO_h
+#define pqPythonFileIO_h
 
 #include "pqPythonModule.h"
 
@@ -190,4 +190,4 @@ private:
   QString DefaultSaveDirectory = QDir::homePath();
 };
 
-#endif // pqPythonTextSave_h
+#endif // pqPythonFileIO_h

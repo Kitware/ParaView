@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef vtkVRUIConnection_h
-#define vtkVRUIConnection_h
+#ifndef pqVRUIConnection_h
+#define pqVRUIConnection_h
 
 #include "vtkSmartPointer.h"
 #include "vtkVRQueue.h"

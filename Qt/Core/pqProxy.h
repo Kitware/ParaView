@@ -36,8 +36,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * \date 11/16/2005
  */
 
-#ifndef _pqPipelineObject_h
-#define _pqPipelineObject_h
+#ifndef pqProxy_h
+#define pqProxy_h
 
 #include "pqServerManagerModelItem.h"
 #include <QPointer>

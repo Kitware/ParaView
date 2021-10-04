@@ -30,8 +30,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
 
-#ifndef pqSingleLogViewWidget_h
-#define pqSingleLogViewWidget_h
+#ifndef pqSingleLogViewerWidget_h
+#define pqSingleLogViewerWidget_h
 
 #include "pqComponentsModule.h"
 #include "pqLogViewerWidget.h"
@@ -86,4 +86,4 @@ private:
   int Rank;
 };
 
-#endif // pqSingleLogViewWidget_h
+#endif // pqSingleLogViewerWidget_h

@@ -30,8 +30,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-#ifndef pqPythonActionsConnector_h
-#define pqPythonActionsConnector_h
+#ifndef pqPythonEditorActions_h
+#define pqPythonEditorActions_h
 
 #include "pqPythonUtils.h"
 
@@ -201,4 +201,4 @@ struct pqPythonEditorActions
   static void disconnect(pqPythonEditorActions&, T*);
 };
 
-#endif // pqPythonActionsConnector_h
+#endif // pqPythonEditorActions_h
