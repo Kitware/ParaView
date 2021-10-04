@@ -30,8 +30,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-#ifndef _pqColorSelectorPropertyWidget_h
-#define _pqColorSelectorPropertyWidget_h
+#ifndef pqColorSelectorPropertyWidget_h
+#define pqColorSelectorPropertyWidget_h
 
 #include "pqApplicationComponentsModule.h"
 
@@ -55,4 +55,4 @@ public:
   ~pqColorSelectorPropertyWidget() override;
 };
 
-#endif // _pqColorSelectorPropertyWidget_h
+#endif // pqColorSelectorPropertyWidget_h

@@ -30,8 +30,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-#ifndef _pqMainWindowEventManager_h
-#define _pqMainWindowEventManager_h
+#ifndef pqMainWindowEventManager_h
+#define pqMainWindowEventManager_h
 
 #include "pqCoreModule.h"
 #include <QObject>

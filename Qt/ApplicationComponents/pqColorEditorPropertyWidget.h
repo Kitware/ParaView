@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-#ifndef _pqColorEditorPropertyWidget_h
-#define _pqColorEditorPropertyWidget_h
+#ifndef pqColorEditorPropertyWidget_h
+#define pqColorEditorPropertyWidget_h
 
 #include "pqApplicationComponentsModule.h"
 #include "pqPropertyWidget.h"
@@ -59,4 +59,4 @@ private:
   Q_DISABLE_COPY(pqColorEditorPropertyWidget)
 };
 
-#endif // _pqColorEditorPropertyWidget_h
+#endif // pqColorEditorPropertyWidget_h

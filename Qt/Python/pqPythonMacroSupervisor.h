@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-#ifndef _pqPythonMacroSupervisor_h
-#define _pqPythonMacroSupervisor_h
+#ifndef pqPythonMacroSupervisor_h
+#define pqPythonMacroSupervisor_h
 
 #include "pqPythonModule.h"
 #include <QList>
@@ -148,4 +148,4 @@ private:
   pqInternal* Internal;
 };
 
-#endif // ifndef _pqPythonMacroSupervisor_h
+#endif // ifndef pqPythonMacroSupervisor_h

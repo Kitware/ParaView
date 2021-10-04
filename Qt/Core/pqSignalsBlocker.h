@@ -31,8 +31,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-#ifndef pq_SignalsBlocker_h
-#define pq_SignalsBlocker_h
+#ifndef pqSignalsBlocker_h
+#define pqSignalsBlocker_h
 
 #include "pqCoreModule.h"
 #include <QObject>

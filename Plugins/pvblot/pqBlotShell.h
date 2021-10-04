@@ -19,8 +19,8 @@
   the U.S. Government retains certain rights in this software.
 -------------------------------------------------------------------------*/
 
-#ifndef pqBlotWidget_h
-#define pqBlotWidget_h
+#ifndef pqBlotShell_h
+#define pqBlotShell_h
 
 #include <QWidget>
 
@@ -92,4 +92,4 @@ private:
   Q_DISABLE_COPY(pqBlotShell)
 };
 
-#endif // pqBlotWidget_h
+#endif // pqBlotShell_h

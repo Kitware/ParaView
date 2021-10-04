@@ -30,8 +30,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-#ifndef _pqFavoritesTreeWidget_h
-#define _pqFavoritesTreeWidget_h
+#ifndef pqFavoritesTreeWidget_h
+#define pqFavoritesTreeWidget_h
 
 #include <QTreeWidget>
 
@@ -69,4 +69,4 @@ protected:
   QSet<QTreeWidgetItem*> UnfoldedDraggedCategories;
 };
 
-#endif // !_pqFavoritesTreeWidget_h
+#endif // !pqFavoritesTreeWidget_h

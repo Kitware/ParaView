@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-#ifndef _pqPythonQtPlugin_h
-#define _pqPythonQtPlugin_h
+#ifndef pqPythonQtPlugin_h
+#define pqPythonQtPlugin_h
 
 #include <QObject>
 

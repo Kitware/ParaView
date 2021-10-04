@@ -30,8 +30,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
 
-#ifndef pqPresetGroupManager_h
-#define pqPresetGroupManager_h
+#ifndef pqPresetGroupsManager_h
+#define pqPresetGroupsManager_h
 
 #include "pqComponentsModule.h" // for exports
 

@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-#ifndef _pqStandardPropertyWidgetInterface_h
-#define _pqStandardPropertyWidgetInterface_h
+#ifndef pqStandardPropertyWidgetInterface_h
+#define pqStandardPropertyWidgetInterface_h
 
 #include "pqApplicationComponentsModule.h"
 #include "pqPropertyWidgetInterface.h"
@@ -139,4 +139,4 @@ public:
   void createDefaultWidgetDecorators(pqPropertyWidget* widget) override;
 };
 
-#endif // _pqStandardPropertyWidgetInterface_h
+#endif // pqStandardPropertyWidgetInterface_h

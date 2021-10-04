@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-#ifndef pqPythonUndoStack_h
-#define pqPythonUndoStack_h
+#ifndef pqPythonUndoCommand_h
+#define pqPythonUndoCommand_h
 
 #include "pqPythonModule.h"
 
@@ -147,4 +147,4 @@ private:
   const pqPythonTextHistoryEntry CurrentHistoryEntry;
 };
 
-#endif // pqPythonUndoStack_h
+#endif // pqPythonUndoCommand_h

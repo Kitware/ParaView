@@ -118,4 +118,4 @@ protected:
   int InferredAsCLM;
 };
 
-#endif // vtkParflowReader_h
+#endif // vtkParFlowReader_h

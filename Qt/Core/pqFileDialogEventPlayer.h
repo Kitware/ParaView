@@ -30,8 +30,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-#ifndef _pqFileDialogEventPlayer_h
-#define _pqFileDialogEventPlayer_h
+#ifndef pqFileDialogEventPlayer_h
+#define pqFileDialogEventPlayer_h
 
 #include "pqCoreModule.h"
 #include <pqWidgetEventPlayer.h>
@@ -59,4 +59,4 @@ private:
   pqFileDialogEventPlayer& operator=(const pqFileDialogEventPlayer&);
 };
 
-#endif // !_pqFileDialogEventPlayer_h
+#endif // !pqFileDialogEventPlayer_h

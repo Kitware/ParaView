@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqLinkSelectionReaction_h
-#define __pqLinkSelectionReaction_h
+#ifndef pqLinkSelectionReaction_h
+#define pqLinkSelectionReaction_h
 
 #include "pqReaction.h"
 

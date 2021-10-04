@@ -30,8 +30,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-#ifndef _pqTreeWidgetItemObject_h
-#define _pqTreeWidgetItemObject_h
+#ifndef pqTreeWidgetItemObject_h
+#define pqTreeWidgetItemObject_h
 
 #include "pqWidgetsModule.h"
 #include <QObject>

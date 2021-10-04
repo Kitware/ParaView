@@ -30,8 +30,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-#ifndef _pqDisplayPanelPropertyWidget_h
-#define _pqDisplayPanelPropertyWidget_h
+#ifndef pqDisplayPanelPropertyWidget_h
+#define pqDisplayPanelPropertyWidget_h
 
 #include <pqPropertyWidget.h>
 
@@ -51,4 +51,4 @@ private:
   pqDisplayPanel* DisplayPanel;
 };
 
-#endif // _pqDisplayPanelPropertyWidget_h
+#endif // pqDisplayPanelPropertyWidget_h

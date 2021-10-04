@@ -30,8 +30,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-#ifndef _pqServerResource_h
-#define _pqServerResource_h
+#ifndef pqServerResource_h
+#define pqServerResource_h
 
 #include "pqCoreModule.h"
 

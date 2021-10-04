@@ -30,8 +30,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-#ifndef pq_SignalAdaptors_h
-#define pq_SignalAdaptors_h
+#ifndef pqSignalAdaptors_h
+#define pqSignalAdaptors_h
 
 #include <QObject>
 #include <QString>

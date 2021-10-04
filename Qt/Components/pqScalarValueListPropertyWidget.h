@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-#ifndef _pqScalarValueListPropertyWidget_h
-#define _pqScalarValueListPropertyWidget_h
+#ifndef pqScalarValueListPropertyWidget_h
+#define pqScalarValueListPropertyWidget_h
 
 #include "pqPropertyWidget.h"
 
@@ -92,4 +92,4 @@ private:
   pqInternals* Internals;
 };
 
-#endif // _pqScalarValueListPropertyWidget_h
+#endif // pqScalarValueListPropertyWidget_h

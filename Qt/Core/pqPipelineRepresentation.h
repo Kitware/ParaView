@@ -35,8 +35,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * \date 4/24/2006
  */
 
-#ifndef _pqPipelineRepresentation_h
-#define _pqPipelineRepresentation_h
+#ifndef pqPipelineRepresentation_h
+#define pqPipelineRepresentation_h
 
 #include "pqDataRepresentation.h"
 #include <QPair>

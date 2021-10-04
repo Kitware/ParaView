@@ -30,8 +30,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-#ifndef _pqWaitCursor_h
-#define _pqWaitCursor_h
+#ifndef pqWaitCursor_h
+#define pqWaitCursor_h
 
 #include "pqWidgetsModule.h"
 

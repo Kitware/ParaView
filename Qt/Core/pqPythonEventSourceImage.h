@@ -30,8 +30,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-#ifndef _pqPythonEventSourceImage_h
-#define _pqPythonEventSourceImage_h
+#ifndef pqPythonEventSourceImage_h
+#define pqPythonEventSourceImage_h
 
 #include "pqCoreModule.h"
 #include "pqPythonEventSource.h"
@@ -60,4 +60,4 @@ protected Q_SLOTS:
   void doComparison();
 };
 
-#endif // !_pqPythonEventSourceImage_h
+#endif // !pqPythonEventSourceImage_h

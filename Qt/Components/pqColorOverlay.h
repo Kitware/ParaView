@@ -30,8 +30,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-#ifndef pq_ColorOverlay_h
-#define pq_ColorOverlay_h
+#ifndef pqColorOverlay_h
+#define pqColorOverlay_h
 
 #include "pqComponentsModule.h"
 #include <QWidget>

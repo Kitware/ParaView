@@ -30,8 +30,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-#ifndef _pqTreeLayoutStrategyInterface_h
-#define _pqTreeLayoutStrategyInterface_h
+#ifndef pqTreeLayoutStrategyInterface_h
+#define pqTreeLayoutStrategyInterface_h
 
 #include "pqCoreModule.h"
 #include <QStringList>

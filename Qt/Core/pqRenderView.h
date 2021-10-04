@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-#ifndef pqRenderViewModule_h
-#define pqRenderViewModule_h
+#ifndef pqRenderView_h
+#define pqRenderView_h
 
 #include "pqRenderViewBase.h"
 #include <QColor> // needed for return type.

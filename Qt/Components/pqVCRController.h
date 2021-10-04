@@ -30,8 +30,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-#ifndef _pqVCRController_h
-#define _pqVCRController_h
+#ifndef pqVCRController_h
+#define pqVCRController_h
 
 #include "pqComponentsModule.h"
 #include <QObject>

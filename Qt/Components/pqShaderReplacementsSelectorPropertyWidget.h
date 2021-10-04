@@ -30,8 +30,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-#ifndef _pqShaderReplacementsSelectorPropertyWidget_h
-#define _pqShaderReplacementsSelectorPropertyWidget_h
+#ifndef pqShaderReplacementsSelectorPropertyWidget_h
+#define pqShaderReplacementsSelectorPropertyWidget_h
 
 #include "pqComponentsModule.h"
 

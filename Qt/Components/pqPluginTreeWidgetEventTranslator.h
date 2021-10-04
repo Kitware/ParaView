@@ -30,8 +30,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-#ifndef _pqPluginTreeWidgetEventTranslator_h
-#define _pqPluginTreeWidgetEventTranslator_h
+#ifndef pqPluginTreeWidgetEventTranslator_h
+#define pqPluginTreeWidgetEventTranslator_h
 
 #include "pqComponentsModule.h"
 #include "pqWidgetEventTranslator.h"
@@ -68,4 +68,4 @@ private:
   QPointer<pqPluginTreeWidget> TreeView;
 };
 
-#endif // !_pqPluginTreeWidgetEventTranslator_h
+#endif // !pqPluginTreeWidgetEventTranslator_h

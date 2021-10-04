@@ -30,8 +30,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-#ifndef pq_ComboBoxDomain_h
-#define pq_ComboBoxDomain_h
+#ifndef pqComboBoxDomain_h
+#define pqComboBoxDomain_h
 
 #include "pqComponentsModule.h"
 #include <QObject>

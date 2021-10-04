@@ -30,8 +30,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-#ifndef _pqScalarSetModel_h
-#define _pqScalarSetModel_h
+#ifndef pqScalarSetModel_h
+#define pqScalarSetModel_h
 
 #include "pqComponentsModule.h"
 
@@ -93,4 +93,4 @@ private:
   pqImplementation* const Implementation;
 };
 
-#endif // !_pqScalarSetModel_h
+#endif // !pqScalarSetModel_h

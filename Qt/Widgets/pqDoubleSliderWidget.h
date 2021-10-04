@@ -12,8 +12,8 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-#ifndef pqDoubleSliderWidget_H
-#define pqDoubleSliderWidget_H
+#ifndef pqDoubleSliderWidget_h
+#define pqDoubleSliderWidget_h
 
 #include "pqDoubleLineEdit.h"
 #include "pqWidgetsModule.h"

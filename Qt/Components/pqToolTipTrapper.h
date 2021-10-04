@@ -30,8 +30,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-#ifndef _pqToolTipTrapper_h
-#define _pqToolTipTrapper_h
+#ifndef pqToolTipTrapper_h
+#define pqToolTipTrapper_h
 
 #include "pqComponentsModule.h"
 

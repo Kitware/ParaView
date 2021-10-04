@@ -30,8 +30,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-#ifndef _pqPropertyManager_h
-#define _pqPropertyManager_h
+#ifndef pqPropertyManager_h
+#define pqPropertyManager_h
 
 #include "pqCoreModule.h"
 #include <QObject>
@@ -120,4 +120,4 @@ protected:
   pqPropertyLinks* Links;
   bool Modified;
 };
-#endif // !_pqPropertyManager_h
+#endif // !pqPropertyManager_h

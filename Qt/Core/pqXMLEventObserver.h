@@ -30,8 +30,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-#ifndef _pqXMLEventObserver_h
-#define _pqXMLEventObserver_h
+#ifndef pqXMLEventObserver_h
+#define pqXMLEventObserver_h
 
 #include "pqCoreModule.h"
 #include "pqEventObserver.h"
@@ -68,4 +68,4 @@ public Q_SLOTS:
 private:
 };
 
-#endif // !_pqXMLEventObserver_h
+#endif // !pqXMLEventObserver_h

@@ -36,8 +36,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * vtkVRMovePointStyle is an interaction style that uses the position of the
  * tracker in screen space to modify the position of a 3D point.
  */
-#ifndef vtkVRMovePointStyle_h_
-#define vtkVRMovePointStyle_h_
+#ifndef vtkVRMovePointStyle_h
+#define vtkVRMovePointStyle_h
 
 #include "vtkVRTrackStyle.h"
 
@@ -69,4 +69,4 @@ private:
   bool PositionRecorded;
 };
 
-#endif // vtkVRMovePointStyle.h_
+#endif // vtkVRMovePointStyle_h

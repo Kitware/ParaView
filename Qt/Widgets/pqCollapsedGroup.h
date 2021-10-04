@@ -30,8 +30,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-#ifndef _pqCollapsedGroup
-#define _pqCollapsedGroup
+#ifndef pqCollapsedGroup_h
+#define pqCollapsedGroup_h
 
 #include "pqWidgetsModule.h"
 #include <QGroupBox>
@@ -65,4 +65,4 @@ private:
   QRect collapseRect();
 };
 
-#endif // _pqCollapsedGroup
+#endif // pqCollapsedGroup_h

@@ -30,8 +30,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-#ifndef _pqLinksEditor_h
-#define _pqLinksEditor_h
+#ifndef pqLinksEditor_h
+#define pqLinksEditor_h
 
 #include <QDialog>
 #include <QListWidgetItem>

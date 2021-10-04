@@ -30,8 +30,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-#ifndef _pqIntVectorPropertyWidget_h
-#define _pqIntVectorPropertyWidget_h
+#ifndef pqIntVectorPropertyWidget_h
+#define pqIntVectorPropertyWidget_h
 
 #include "pqPropertyWidget.h"
 
@@ -55,4 +55,4 @@ private:
   Q_DISABLE_COPY(pqIntVectorPropertyWidget);
 };
 
-#endif // _pqIntVectorPropertyWidget_h
+#endif // pqIntVectorPropertyWidget_h

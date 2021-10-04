@@ -30,8 +30,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-#ifndef _pqPipelineTimeKeyFrameEditor_h
-#define _pqPipelineTimeKeyFrameEditor_h
+#ifndef pqPipelineTimeKeyFrameEditor_h
+#define pqPipelineTimeKeyFrameEditor_h
 
 #include "pqComponentsModule.h"
 #include <QDialog>

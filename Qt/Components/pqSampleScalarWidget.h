@@ -30,8 +30,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-#ifndef _pqSampleScalarWidget_h
-#define _pqSampleScalarWidget_h
+#ifndef pqSampleScalarWidget_h
+#define pqSampleScalarWidget_h
 
 #include "pqComponentsModule.h"
 #include "pqSMProxy.h"
@@ -125,4 +125,4 @@ private:
 };
 
 #endif // !defined(VTK_LEGACY_REMOVE)
-#endif // !_pqSampleScalarWidget_h
+#endif // !pqSampleScalarWidget_h

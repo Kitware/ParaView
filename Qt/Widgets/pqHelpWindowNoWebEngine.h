@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:  pqHelpWindowNoWebKit.h
+   Module:  pqHelpWindowNoWebEngine.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef pqHelpWindowNoWebKit_h
-#define pqHelpWindowNoWebKit_h
+#ifndef pqHelpWindowNoWebEngine_h
+#define pqHelpWindowNoWebEngine_h
 
 /**
  *============================================================================

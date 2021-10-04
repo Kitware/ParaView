@@ -35,8 +35,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * \date 3/28/2007
  */
 
-#ifndef _pqRescaleRange_h
-#define _pqRescaleRange_h
+#ifndef pqRescaleRange_h
+#define pqRescaleRange_h
 
 #include "pqComponentsModule.h"
 #include <QDialog>

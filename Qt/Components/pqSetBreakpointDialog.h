@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-#ifndef _pqSetBreakpointDialog_h
-#define _pqSetBreakpointDialog_h
+#ifndef pqSetBreakpointDialog_h
+#define pqSetBreakpointDialog_h
 
 #include "pqComponentsModule.h"
 #include <QDialog>
@@ -71,4 +71,4 @@ private:
   Ui::pqSetBreakpointDialog* const Ui;
 };
 
-#endif // !_pqSetBreakpointDialog_h
+#endif // !pqSetBreakpointDialog_h

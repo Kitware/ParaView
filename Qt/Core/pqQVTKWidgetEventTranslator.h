@@ -30,8 +30,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-#ifndef _pqQVTKWidgetEventTranslator_h
-#define _pqQVTKWidgetEventTranslator_h
+#ifndef pqQVTKWidgetEventTranslator_h
+#define pqQVTKWidgetEventTranslator_h
 
 #include "pqCoreModule.h"
 #include "pqWidgetEventTranslator.h"
@@ -59,4 +59,4 @@ private:
   pqQVTKWidgetEventTranslator& operator=(const pqQVTKWidgetEventTranslator&);
 };
 
-#endif // !_pqQVTKWidgetEventTranslator_h
+#endif // !pqQVTKWidgetEventTranslator_h

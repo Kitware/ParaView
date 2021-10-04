@@ -30,8 +30,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-#ifndef _pqVariableType_h
-#define _pqVariableType_h
+#ifndef pqVariableType_h
+#define pqVariableType_h
 
 /**
  * Provides a standard enumeration of variables that can be displayed for a dataset

@@ -30,8 +30,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-#ifndef _pqImageCompressorType_h
-#define _pqImageCompressorType_h
+#ifndef pqImageCompressorType_h
+#define pqImageCompressorType_h
 
 enum
 {

@@ -30,8 +30,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-#ifndef _pqDelimitedTextParser_h
-#define _pqDelimitedTextParser_h
+#ifndef pqDelimitedTextParser_h
+#define pqDelimitedTextParser_h
 
 #include "pqWidgetsModule.h"
 #include <QObject>

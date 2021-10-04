@@ -30,8 +30,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-#ifndef _pqSetData_h
-#define _pqSetData_h
+#ifndef pqSetData_h
+#define pqSetData_h
 
 #include "pqWidgetsModule.h"
 #include <QVariant>
@@ -66,4 +66,4 @@ T* operator<<(T* LHS, const pqSetData& RHS)
   return LHS;
 }
 
-#endif // !_pqSetData_h
+#endif // !pqSetData_h

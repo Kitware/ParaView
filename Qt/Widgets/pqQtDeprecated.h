@@ -30,8 +30,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
 
-#ifndef pqDeprecated_h
-#define pqDeprecated_h
+#ifndef pqQtDeprecated_h
+#define pqQtDeprecated_h
 
 #include <QtGlobal>
 
@@ -41,4 +41,4 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define PV_QT_SKIP_EMPTY_PARTS QString::SkipEmptyParts
 #endif
 
-#endif // pqDeprecated_h
+#endif // pqQtDeprecated_h

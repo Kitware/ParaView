@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-#ifndef _pqPythonShell_h
-#define _pqPythonShell_h
+#ifndef pqPythonShell_h
+#define pqPythonShell_h
 
 #include "pqPythonModule.h" //  needed for PQPYTHON_EXPORT.
 #include <QScopedPointer>   // needed for QScopedPointer.
@@ -178,4 +178,4 @@ private:
   QScopedPointer<pqInternals> Internals;
 };
 
-#endif // !_pqPythonShell_h
+#endif // !pqPythonShell_h

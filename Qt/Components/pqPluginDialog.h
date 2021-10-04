@@ -30,8 +30,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-#ifndef _pqPluginDialog_h
-#define _pqPluginDialog_h
+#ifndef pqPluginDialog_h
+#define pqPluginDialog_h
 
 #include "pqComponentsModule.h"
 #include <QDialog>

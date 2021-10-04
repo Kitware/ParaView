@@ -30,8 +30,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-#ifndef _pqImageTip_h
-#define _pqImageTip_h
+#ifndef pqImageTip_h
+#define pqImageTip_h
 
 #include "pqComponentsModule.h"
 #include <QLabel>

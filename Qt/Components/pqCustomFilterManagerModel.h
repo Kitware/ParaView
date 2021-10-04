@@ -35,8 +35,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * \date 6/23/2006
  */
 
-#ifndef _pqCustomFilterManagerModel_h
-#define _pqCustomFilterManagerModel_h
+#ifndef pqCustomFilterManagerModel_h
+#define pqCustomFilterManagerModel_h
 
 #include "pqComponentsModule.h"
 #include <QAbstractListModel>
