@@ -32,4 +32,5 @@ if (PARAVIEW_USE_QT)
   target_link_libraries(zSpace
     PRIVATE
       ParaView::RemotingViews)
+  target_compile_definitions(zSpace PRIVATE QT_NO_KEYWORDS)
 endif ()

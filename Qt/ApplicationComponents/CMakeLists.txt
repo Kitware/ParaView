@@ -331,6 +331,7 @@ vtk_module_link(ParaView::pqApplicationComponents
     Qt5::Widgets
     Qt5::Svg
     Qt5::Network)
+vtk_module_definitions(ParaView::pqApplicationComponents PRIVATE QT_NO_KEYWORDS)
 if (PARAVIEW_USE_QTHELP)
   vtk_module_link(ParaView::pqApplicationComponents
     PRIVATE

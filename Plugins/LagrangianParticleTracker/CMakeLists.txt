@@ -51,6 +51,7 @@ if (PARAVIEW_USE_QT)
   target_link_libraries(LagrangianParticleTracker
     PRIVATE
       VTK::GUISupportQt)
+    target_compile_definitions(LagrangianParticleTracker PRIVATE QT_NO_KEYWORDS)
 
   if (BUILD_TESTING)
     add_subdirectory(Testing)

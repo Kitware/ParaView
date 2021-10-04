@@ -160,6 +160,7 @@ vtk_module_link(ParaView::pqWidgets
     Qt5::Widgets
   PRIVATE
     Qt5::Network)
+vtk_module_definitions(ParaView::pqWidgets PRIVATE QT_NO_KEYWORDS)
 
 if (APPLE)
   vtk_module_link(ParaView::pqWidgets

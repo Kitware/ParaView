@@ -8,6 +8,7 @@ paraview_add_plugin(GMVReader
 target_link_libraries(GMVReader
   PRIVATE
     ParaView::RemotingServerManager)
+target_compile_definitions(GMVReader PRIVATE QT_NO_KEYWORDS)
 
 if (BUILD_TESTING)
   add_subdirectory(Testing)

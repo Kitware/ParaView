@@ -29,6 +29,7 @@ target_link_libraries(FlipBookPlugin
   PRIVATE
     ParaView::pqApplicationComponents
 )
+target_compile_definitions(FlipBookPlugin PRIVATE QT_NO_KEYWORDS)
 
 if (BUILD_TESTING)
   add_subdirectory(Testing)

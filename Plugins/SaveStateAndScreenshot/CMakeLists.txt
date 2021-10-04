@@ -25,6 +25,7 @@ target_link_libraries(SaveStateAndScreenshot
     ParaView::pqApplicationComponents
     ParaView::RemotingViews
 )
+target_compile_definitions(SaveStateAndScreenshot PRIVATE QT_NO_KEYWORDS)
 
 if (BUILD_TESTING)
   add_subdirectory(Testing)

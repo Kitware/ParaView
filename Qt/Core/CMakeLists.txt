@@ -192,6 +192,7 @@ if (PARAVIEW_USE_QTHELP)
     PRIVATE
       Qt5::Help)
 endif ()
+vtk_module_definitions(ParaView::pqCore PRIVATE QT_NO_KEYWORDS)
 
 vtk_module_definitions(ParaView::pqCore
   PRIVATE "PARAVIEW_PQCORE_ENABLE_PYTHON=$<BOOL:${PARAVIEW_USE_PYTHON}>")

@@ -132,6 +132,7 @@ target_link_libraries(VRPlugin
     VTK::CommonTransforms
     VTK::RenderingCore
     Qt5::Network)
+  target_compile_definitions(VRPlugin PRIVATE QT_NO_KEYWORDS)
 
 if (PARAVIEW_PLUGIN_VRPlugin_USE_VRPN)
   target_link_libraries(VRPlugin
