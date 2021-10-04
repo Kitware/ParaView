@@ -149,6 +149,9 @@ public:
       SLOT(showSelectedData(pqOutputPort*)));
     self->connect(
       this->Ui.showTypeComboBox, SIGNAL(currentIndexChanged(int)), SLOT(updateFieldType()));
+    self->connect(
+      this->Ui.invertSelectionCheckBox, SIGNAL(toggled(bool)), SLOT(invertSelection(bool)));
+
     this->showSelectedData(this->SelectionManager->getSelectedPort(), self);
 
     this->UpdateSpreadSheetTimer.setInterval(100);
@@ -231,6 +234,7 @@ public:
     bool prev = this->Ui.showTypeComboBox->blockSignals(true);
     ::populateSelectionTypeCombo(this->Ui.showTypeComboBox, port);
     this->Ui.showTypeComboBox->blockSignals(prev);
+    this->Ui.invertSelectionCheckBox->setEnabled(port != nullptr);
     if (port)
     {
       vtkSMPropertyHelper(this->RepresentationProxy, "Input")
@@ -270,6 +274,12 @@ public:
         }
       }
       this->updateFieldType();
+
+      bool checked =
+        selectionSource && (vtkSMPropertyHelper(selectionSource, "InsideOut").GetAsInt() != 0);
+      prev = this->Ui.invertSelectionCheckBox->blockSignals(true);
+      this->Ui.invertSelectionCheckBox->setChecked(checked);
+      this->Ui.invertSelectionCheckBox->blockSignals(prev);
     }
   }
 
@@ -343,6 +353,29 @@ pqOutputPort* pqFindDataCurrentSelectionFrame::showingPort() const
 void pqFindDataCurrentSelectionFrame::updateFieldType()
 {
   this->Internals->updateFieldType();
+}
+
+//-----------------------------------------------------------------------------
+void pqFindDataCurrentSelectionFrame::invertSelection(bool val)
+{
+  Ui::FindDataCurrentSelectionFrame& ui = this->Internals->Ui;
+  ui.invertSelectionCheckBox->blockSignals(true);
+  ui.invertSelectionCheckBox->setChecked(val);
+  ui.invertSelectionCheckBox->blockSignals(false);
+
+  pqOutputPort* port = this->showingPort();
+  if (port)
+  {
+    vtkSMSourceProxy* selectionSource = port->getSelectionInput();
+    if (selectionSource)
+    {
+      vtkSMPropertyHelper(selectionSource, "InsideOut").Set(val ? 1 : 0);
+      selectionSource->UpdateVTKObjects();
+      port->renderAllViews();
+
+      this->Internals->updateSpreadSheet();
+    }
+  }
 }
 
 //-----------------------------------------------------------------------------

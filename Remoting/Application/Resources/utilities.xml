@@ -818,16 +818,13 @@
       <IntVectorProperty name="InsideOut"
         label="Invert Selection"
         number_of_elements="1"
-        default_values="0">
+        default_values="0"
+        panel_visibility="never">
         <BooleanDomain name="bool" />
         <Documentation>
           Invert the selection. Find elements that **don't**
           match the chosen seletion criteria.
         </Documentation>
-        <Hints>
-          <PropertyWidgetDecorator type="InputDataTypeDecorator"
-            mode="enabled_state" name="vtkDataObject" />
-        </Hints>
       </IntVectorProperty>
 
       <PropertyGroup label="Selection Criteria">
