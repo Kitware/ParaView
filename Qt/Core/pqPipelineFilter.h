@@ -35,8 +35,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * \date 4/17/2006
  */
 
-#ifndef _pqPipelineFilter_h
-#define _pqPipelineFilter_h
+#ifndef pqPipelineFilter_h
+#define pqPipelineFilter_h
 
 #include "pqCoreModule.h"
 #include "pqPipelineSource.h"

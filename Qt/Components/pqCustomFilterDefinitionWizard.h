@@ -35,8 +35,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * \date 6/19/2006
  */
 
-#ifndef _pqCustomFilterDefinitionWizard_h
-#define _pqCustomFilterDefinitionWizard_h
+#ifndef pqCustomFilterDefinitionWizard_h
+#define pqCustomFilterDefinitionWizard_h
 
 #include "pqComponentsModule.h"
 #include <QDialog>

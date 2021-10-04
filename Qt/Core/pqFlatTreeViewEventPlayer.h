@@ -30,8 +30,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-#ifndef _pqFlatTreeViewEventPlayer_h
-#define _pqFlatTreeViewEventPlayer_h
+#ifndef pqFlatTreeViewEventPlayer_h
+#define pqFlatTreeViewEventPlayer_h
 
 #include "pqCoreModule.h"
 #include "pqWidgetEventPlayer.h"
@@ -60,4 +60,4 @@ private:
   pqFlatTreeViewEventPlayer& operator=(const pqFlatTreeViewEventPlayer&);
 };
 
-#endif // !_pqFlatTreeViewEventPlayer_h
+#endif // !pqFlatTreeViewEventPlayer_h

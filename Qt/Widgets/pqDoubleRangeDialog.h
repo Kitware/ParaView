@@ -30,8 +30,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-#ifndef _pqDoubleRangeDialog_h
-#define _pqDoubleRangeDialog_h
+#ifndef pqDoubleRangeDialog_h
+#define pqDoubleRangeDialog_h
 
 #include "pqWidgetsModule.h"
 
@@ -57,4 +57,4 @@ private:
   pqDoubleRangeWidget* Widget;
 };
 
-#endif // !_pqDoubleRangeDialog_h
+#endif // !pqDoubleRangeDialog_h

@@ -83,4 +83,4 @@ private:
 };
 
 #endif // !defined(VTK_LEGACY_REMOVE)
-#endif // !_pqSampleScalarAddRangeDialog_h
+#endif // !pqSampleScalarAddRangeDialog_h

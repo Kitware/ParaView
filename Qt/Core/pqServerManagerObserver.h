@@ -30,8 +30,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-#ifndef _pqServerManagerObserver_h
-#define _pqServerManagerObserver_h
+#ifndef pqServerManagerObserver_h
+#define pqServerManagerObserver_h
 
 #include "pqCoreModule.h"
 #include "vtkType.h" // needed for vtkIdType
@@ -109,4 +109,4 @@ protected:
   pqServerManagerObserverInternal* Internal; ///< Stores the pipeline objects.
 };
 
-#endif // _pqServerManagerObserver_h
+#endif // pqServerManagerObserver_h

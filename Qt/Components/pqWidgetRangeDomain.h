@@ -30,8 +30,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-#ifndef pq_WidgetRangeDomain_h
-#define pq_WidgetRangeDomain_h
+#ifndef pqWidgetRangeDomain_h
+#define pqWidgetRangeDomain_h
 
 #include "pqComponentsModule.h"
 #include <QObject>

@@ -30,8 +30,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-#ifndef _pqSelectReaderDialog_h
-#define _pqSelectReaderDialog_h
+#ifndef pqSelectReaderDialog_h
+#define pqSelectReaderDialog_h
 
 #include "pqComponentsModule.h"
 #include <QDialog>

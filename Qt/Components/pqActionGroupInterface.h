@@ -30,8 +30,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-#ifndef _pqActionGroupInterface_h
-#define _pqActionGroupInterface_h
+#ifndef pqActionGroupInterface_h
+#define pqActionGroupInterface_h
 
 #include "pqComponentsModule.h"
 #include <QtPlugin>

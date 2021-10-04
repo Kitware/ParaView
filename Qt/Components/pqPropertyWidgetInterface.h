@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-#ifndef _pqPropertyWidgetInterface_h
-#define _pqPropertyWidgetInterface_h
+#ifndef pqPropertyWidgetInterface_h
+#define pqPropertyWidgetInterface_h
 
 #include <QtPlugin>
 
@@ -88,4 +88,4 @@ public:
 
 Q_DECLARE_INTERFACE(pqPropertyWidgetInterface, "com.kitware/paraview/propertywidget")
 
-#endif // _pqPropertyWidgetInterface_h
+#endif // pqPropertyWidgetInterface_h

@@ -35,8 +35,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * \date 3/27/2006
  */
 
-#ifndef _pqFlatTreeView_h
-#define _pqFlatTreeView_h
+#ifndef pqFlatTreeView_h
+#define pqFlatTreeView_h
 
 #include "pqWidgetsModule.h"
 #include <QAbstractScrollArea>

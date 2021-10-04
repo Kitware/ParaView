@@ -30,8 +30,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-#ifndef _pqLinksModel_h
-#define _pqLinksModel_h
+#ifndef pqLinksModel_h
+#define pqLinksModel_h
 
 #include "pqCoreModule.h"
 #include <QAbstractItemModel>

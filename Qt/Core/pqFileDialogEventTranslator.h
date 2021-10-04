@@ -30,8 +30,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-#ifndef _pqFileDialogEventTranslator_h
-#define _pqFileDialogEventTranslator_h
+#ifndef pqFileDialogEventTranslator_h
+#define pqFileDialogEventTranslator_h
 
 #include "pqCoreModule.h"
 #include <QPointer>
@@ -67,4 +67,4 @@ private Q_SLOTS:
   void onCancelled();
 };
 
-#endif // !_pqFileDialogEventTranslator_h
+#endif // !pqFileDialogEventTranslator_h

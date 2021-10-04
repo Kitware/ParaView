@@ -30,8 +30,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-#ifndef _pqFavoritesDialog_h
-#define _pqFavoritesDialog_h
+#ifndef pqFavoritesDialog_h
+#define pqFavoritesDialog_h
 
 #include "pqComponentsModule.h"
 #include <QDialog>

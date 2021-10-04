@@ -30,8 +30,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-#ifndef _pqDoubleVectorPropertyWidget_h
-#define _pqDoubleVectorPropertyWidget_h
+#ifndef pqDoubleVectorPropertyWidget_h
+#define pqDoubleVectorPropertyWidget_h
 
 #include "pqPropertyWidget.h"
 
@@ -80,4 +80,4 @@ private:
   Q_DISABLE_COPY(pqDoubleVectorPropertyWidget)
 };
 
-#endif // _pqDoubleVectorPropertyWidget_h
+#endif // pqDoubleVectorPropertyWidget_h

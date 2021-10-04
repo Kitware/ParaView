@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-#ifndef _pqPythonShellCompleter_h
-#define _pqPythonShellCompleter_h
+#ifndef pqPythonShellCompleter_h
+#define pqPythonShellCompleter_h
 
 #include "pqConsoleWidget.h"
 

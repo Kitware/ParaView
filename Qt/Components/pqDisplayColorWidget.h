@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-#ifndef _pqDisplayColorWidget_h
-#define _pqDisplayColorWidget_h
+#ifndef pqDisplayColorWidget_h
+#define pqDisplayColorWidget_h
 
 #include "pqComponentsModule.h"
 

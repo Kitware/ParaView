@@ -30,8 +30,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-#ifndef _pqImageUtil_h
-#define _pqImageUtil_h
+#ifndef pqImageUtil_h
+#define pqImageUtil_h
 
 #include "pqCoreModule.h"
 

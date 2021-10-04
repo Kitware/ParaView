@@ -100,4 +100,4 @@ protected:
   vtkClientServerInterpreter* Interpreter = nullptr;
 };
 
-#endif /* end of include guard: VTKNETWORKIMAGEWRITER_H_3BVHUERT */
+#endif /* end of include guard: vtkRemoteWriterHelper_h */

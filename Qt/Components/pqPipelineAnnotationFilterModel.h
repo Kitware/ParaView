@@ -35,8 +35,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * \date 9/22/2011
  */
 
-#ifndef _pqPipelineAnnotationFilterModel_h
-#define _pqPipelineAnnotationFilterModel_h
+#ifndef pqPipelineAnnotationFilterModel_h
+#define pqPipelineAnnotationFilterModel_h
 
 #include "pqComponentsModule.h"
 #include <QSortFilterProxyModel>

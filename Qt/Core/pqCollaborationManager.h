@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-#ifndef _pqCollaborationManager_h
-#define _pqCollaborationManager_h
+#ifndef pqCollaborationManager_h
+#define pqCollaborationManager_h
 
 #include "pqCoreModule.h"
 #include "vtkSMMessageMinimal.h"
@@ -193,4 +193,4 @@ private:
   pqInternals* Internals;
 };
 
-#endif // !_pqCollaborationManager_h
+#endif // !pqCollaborationManager_h

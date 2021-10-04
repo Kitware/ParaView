@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef _pqPlotMatrixView_h
-#define _pqPlotMatrixView_h
+#ifndef pqPlotMatrixView_h
+#define pqPlotMatrixView_h
 
 #include "pqContextView.h"
 

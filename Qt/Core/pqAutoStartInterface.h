@@ -1,5 +1,5 @@
-#ifndef _pqAutoStartInterface_h
-#define _pqAutoStartInterface_h
+#ifndef pqAutoStartInterface_h
+#define pqAutoStartInterface_h
 /*=========================================================================
 
    Program: ParaView
@@ -94,4 +94,4 @@ private:
 
 Q_DECLARE_INTERFACE(pqAutoStartInterface, "com.kitware/paraview/autostart")
 
-#endif // !_pqAutoStartInterface_h
+#endif // !pqAutoStartInterface_h

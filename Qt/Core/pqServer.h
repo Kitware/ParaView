@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-#ifndef _pqServer_h
-#define _pqServer_h
+#ifndef pqServer_h
+#define pqServer_h
 
 class vtkObject;
 class pqTimeKeeper;
@@ -280,4 +280,4 @@ private:
   pqInternals* Internals;
 };
 
-#endif // !_pqServer_h
+#endif // !pqServer_h

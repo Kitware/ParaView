@@ -30,8 +30,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-#ifndef _pqDisplayPanelInterface_h
-#define _pqDisplayPanelInterface_h
+#ifndef pqDisplayPanelInterface_h
+#define pqDisplayPanelInterface_h
 
 #include "pqComponentsModule.h"
 #include <QtPlugin>

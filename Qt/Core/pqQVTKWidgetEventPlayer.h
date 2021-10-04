@@ -30,8 +30,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-#ifndef _pqQVTKWidgetEventPlayer_h
-#define _pqQVTKWidgetEventPlayer_h
+#ifndef pqQVTKWidgetEventPlayer_h
+#define pqQVTKWidgetEventPlayer_h
 
 #include "pqCoreModule.h"
 #include "pqWidgetEventPlayer.h"
@@ -59,4 +59,4 @@ private:
   pqQVTKWidgetEventPlayer& operator=(const pqQVTKWidgetEventPlayer&);
 };
 
-#endif // !_pqQVTKWidgetEventPlayer_h
+#endif // !pqQVTKWidgetEventPlayer_h

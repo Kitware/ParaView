@@ -30,8 +30,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-#ifndef _pqFileDialog_h
-#define _pqFileDialog_h
+#ifndef pqFileDialog_h
+#define pqFileDialog_h
 
 #include "pqCoreModule.h"
 #include <QDialog>
@@ -288,4 +288,4 @@ private:
   void restoreState();
 };
 
-#endif // !_pqFileDialog_h
+#endif // !pqFileDialog_h

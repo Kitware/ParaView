@@ -30,8 +30,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-#ifndef _pqFileDialogModel_h
-#define _pqFileDialogModel_h
+#ifndef pqFileDialogModel_h
+#define pqFileDialogModel_h
 
 #include "pqCoreModule.h"
 #include <QAbstractItemModel>
@@ -214,4 +214,4 @@ protected:
   QIcon NetworkIcon;
 };
 
-#endif // !_pqFileDialogModel_h
+#endif // !pqFileDialogModel_h

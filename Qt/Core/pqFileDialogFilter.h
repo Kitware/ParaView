@@ -30,8 +30,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-#ifndef _pqFileDialogFilter_h
-#define _pqFileDialogFilter_h
+#ifndef pqFileDialogFilter_h
+#define pqFileDialogFilter_h
 
 #include "pqCoreModule.h"
 #include <QRegExp>
@@ -61,4 +61,4 @@ protected:
   bool showHidden;
 };
 
-#endif // !_pqFileDialogFilter_h
+#endif // !pqFileDialogFilter_h

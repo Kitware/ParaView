@@ -30,8 +30,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-#ifndef _pqConsoleWidget_h
-#define _pqConsoleWidget_h
+#ifndef pqConsoleWidget_h
+#define pqConsoleWidget_h
 
 #include "pqWidgetsModule.h"
 
@@ -162,4 +162,4 @@ public:
   virtual void updateCompletionModel(const QString& str) = 0;
 };
 
-#endif // !_pqConsoleWidget_h
+#endif // !pqConsoleWidget_h

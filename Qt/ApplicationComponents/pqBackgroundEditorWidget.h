@@ -30,8 +30,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-#ifndef _pqBackgroundEditorWidget_h
-#define _pqBackgroundEditorWidget_h
+#ifndef pqBackgroundEditorWidget_h
+#define pqBackgroundEditorWidget_h
 
 #include "pqApplicationComponentsModule.h"
 #include "pqPropertyGroupWidget.h"

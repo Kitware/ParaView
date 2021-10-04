@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-#ifndef _pqTransferFunctionWidgetPropertyWidget_h
-#define _pqTransferFunctionWidgetPropertyWidget_h
+#ifndef pqTransferFunctionWidgetPropertyWidget_h
+#define pqTransferFunctionWidgetPropertyWidget_h
 
 #include "pqApplicationComponentsModule.h" // for export macros
 #include "pqPropertyWidget.h"
@@ -89,4 +89,4 @@ private:
   const QScopedPointer<pqInternals> Internals;
 };
 
-#endif // _pqTransferFunctionWidgetPropertyWidget_h
+#endif // pqTransferFunctionWidgetPropertyWidget_h

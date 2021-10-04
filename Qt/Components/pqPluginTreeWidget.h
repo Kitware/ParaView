@@ -30,8 +30,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-#ifndef _pqPluginTreeWidget_h
-#define _pqPluginTreeWidget_h
+#ifndef pqPluginTreeWidget_h
+#define pqPluginTreeWidget_h
 
 #include <QTreeWidget>
 
@@ -49,4 +49,4 @@ public:
   }
 };
 
-#endif // !_pqPluginTreeWidget_h
+#endif // !pqPluginTreeWidget_h

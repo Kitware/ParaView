@@ -31,8 +31,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-#ifndef _pqTimerLogDisplay_h
-#define _pqTimerLogDisplay_h
+#ifndef pqTimerLogDisplay_h
+#define pqTimerLogDisplay_h
 
 #include "pqComponentsModule.h"
 #include <QDialog>
@@ -84,4 +84,4 @@ private:
   pqTimerLogDisplayUi* ui;
 };
 
-#endif //_pqTimerLogDisplay_h
+#endif // pqTimerLogDisplay_h

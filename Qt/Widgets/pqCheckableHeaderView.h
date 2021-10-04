@@ -124,4 +124,4 @@ private:
   pqCheckableHeaderViewInternal* Internal;
 };
 
-#endif //_pqCheckableHeaderView_h
+#endif // pqCheckableHeaderView_h

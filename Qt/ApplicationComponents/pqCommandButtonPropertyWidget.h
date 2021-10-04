@@ -30,8 +30,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-#ifndef _pqCommandButtonPropertyWidget_h
-#define _pqCommandButtonPropertyWidget_h
+#ifndef pqCommandButtonPropertyWidget_h
+#define pqCommandButtonPropertyWidget_h
 
 #include "pqApplicationComponentsModule.h"
 
@@ -63,4 +63,4 @@ private:
   vtkSMProperty* Property;
 };
 
-#endif // _pqCommandButtonPropertyWidget_h
+#endif // pqCommandButtonPropertyWidget_h

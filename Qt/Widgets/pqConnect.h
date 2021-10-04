@@ -30,8 +30,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-#ifndef _pqConnect_h
-#define _pqConnect_h
+#ifndef pqConnect_h
+#define pqConnect_h
 
 #include "pqWidgetsModule.h"
 
@@ -67,4 +67,4 @@ T* operator<<(T* LHS, const pqConnect& RHS)
   return LHS;
 }
 
-#endif // !_pqConnect_h
+#endif // !pqConnect_h

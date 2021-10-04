@@ -46,4 +46,4 @@ private:
   void operator=(const vtkSMExtractSelectionProxyInitializationHelper&) = delete;
 };
 
-#endif // vtkSMExtractSelectionProxyInitializationHelper
+#endif // vtkSMExtractSelectionProxyInitializationHelper_h

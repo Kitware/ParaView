@@ -30,8 +30,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-#ifndef _pqPlugin_h
-#define _pqPlugin_h
+#ifndef pqPlugin_h
+#define pqPlugin_h
 
 #include <QObjectList>
 

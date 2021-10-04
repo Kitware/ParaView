@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-#ifndef _pqLabel_h
-#define _pqLabel_h
+#ifndef pqLabel_h
+#define pqLabel_h
 
 #include "pqComponentsModule.h"
 
@@ -54,4 +54,4 @@ Q_SIGNALS:
   void clicked();
 };
 
-#endif // _pqLabel_h
+#endif // pqLabel_h

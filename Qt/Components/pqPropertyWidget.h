@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-#ifndef _pqPropertyWidget_h
-#define _pqPropertyWidget_h
+#ifndef pqPropertyWidget_h
+#define pqPropertyWidget_h
 
 #include "pqComponentsModule.h"
 #include "vtkSetGet.h" // for VTK_LEGACY_REMOVE.
@@ -262,4 +262,4 @@ private:
 #define PV_DEBUG_PANELS() pqDebug("PV_DEBUG_PANELS")
 #endif
 
-#endif // _pqPropertyWidget_h
+#endif // pqPropertyWidget_h

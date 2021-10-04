@@ -30,8 +30,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-#ifndef _pqTreeWidget_h
-#define _pqTreeWidget_h
+#ifndef pqTreeWidget_h
+#define pqTreeWidget_h
 
 #include "pqWidgetsModule.h"
 #include <QTreeWidget>
@@ -115,4 +115,4 @@ protected:
   int MaximumRowCountBeforeScrolling;
 };
 
-#endif // !_pqTreeWidget_h
+#endif // !pqTreeWidget_h

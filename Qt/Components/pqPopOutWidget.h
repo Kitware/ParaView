@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-#ifndef _pqPopOutWidget_h
-#define _pqPopOutWidget_h
+#ifndef pqPopOutWidget_h
+#define pqPopOutWidget_h
 
 #include "pqComponentsModule.h"
 #include <QWidget>
@@ -92,4 +92,4 @@ private:
   pqInternal* Internals;
 };
 
-#endif // PQPOPOUTWIDGET_H
+#endif // pqPopOutWidget_h

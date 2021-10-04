@@ -99,4 +99,4 @@ private:
   bool SortByServers;
 };
 
-#endif // !_pqRecentFilesMenu_h
+#endif // !pqRecentFilesMenu_h

@@ -30,8 +30,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-#ifndef _pqSMAdaptor_h
-#define _pqSMAdaptor_h
+#ifndef pqSMAdaptor_h
+#define pqSMAdaptor_h
 
 class vtkSMProperty;
 class vtkSMProxy;
@@ -237,4 +237,4 @@ public:
   static QVariant convertToQVariant(const vtkVariant& variant);
 };
 
-#endif // !_pqSMAdaptor_h
+#endif // !pqSMAdaptor_h

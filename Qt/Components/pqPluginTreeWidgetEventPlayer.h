@@ -30,8 +30,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-#ifndef _pqPluginTreeWidgetEventPlayer_h
-#define _pqPluginTreeWidgetEventPlayer_h
+#ifndef pqPluginTreeWidgetEventPlayer_h
+#define pqPluginTreeWidgetEventPlayer_h
 
 #include "pqComponentsModule.h"
 #include "pqWidgetEventPlayer.h"
@@ -60,4 +60,4 @@ private:
   Q_DISABLE_COPY(pqPluginTreeWidgetEventPlayer)
 };
 
-#endif // !_pqPluginTreeWidgetEventPlayer_h
+#endif // !pqPluginTreeWidgetEventPlayer_h

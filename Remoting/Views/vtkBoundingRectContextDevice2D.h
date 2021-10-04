@@ -325,4 +325,4 @@ private:
   void operator=(const vtkBoundingRectContextDevice2D&) = delete;
 };
 
-#endif // vtkBoundingRectContextDevice2D
+#endif // vtkBoundingRectContextDevice2D_h

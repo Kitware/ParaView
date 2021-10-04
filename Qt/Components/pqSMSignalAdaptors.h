@@ -30,8 +30,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-#ifndef pq_SMSignalAdaptors_h
-#define pq_SMSignalAdaptors_h
+#ifndef pqSMSignalAdaptors_h
+#define pqSMSignalAdaptors_h
 
 #include "pqComponentsModule.h"
 #include <QObject>

@@ -30,8 +30,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-#ifndef _pqFlatTreeViewEventTranslator_h
-#define _pqFlatTreeViewEventTranslator_h
+#ifndef pqFlatTreeViewEventTranslator_h
+#define pqFlatTreeViewEventTranslator_h
 
 #include "pqCoreModule.h"
 #include "pqWidgetEventTranslator.h"
@@ -62,4 +62,4 @@ private:
   pqFlatTreeViewEventTranslator& operator=(const pqFlatTreeViewEventTranslator&);
 };
 
-#endif // !_pqFlatTreeViewEventTranslator_h
+#endif // !pqFlatTreeViewEventTranslator_h

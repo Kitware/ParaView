@@ -30,8 +30,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-#ifndef _pqSetName_h
-#define _pqSetName_h
+#ifndef pqSetName_h
+#define pqSetName_h
 
 #include "pqWidgetsModule.h"
 #include <QString>
@@ -66,4 +66,4 @@ T* operator<<(T* LHS, const pqSetName& RHS)
   return LHS;
 }
 
-#endif // !_pqSetName_h
+#endif // !pqSetName_h

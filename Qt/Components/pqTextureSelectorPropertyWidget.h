@@ -30,8 +30,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-#ifndef _pqTextureSelectorPropertyWidget_h
-#define _pqTextureSelectorPropertyWidget_h
+#ifndef pqTextureSelectorPropertyWidget_h
+#define pqTextureSelectorPropertyWidget_h
 
 #include "pqComponentsModule.h"
 
@@ -75,4 +75,4 @@ private:
   QString SelectedName;
 };
 
-#endif // _pqTextureSelectorPropertyWidget_h
+#endif // pqTextureSelectorPropertyWidget_h

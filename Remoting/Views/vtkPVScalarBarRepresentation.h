@@ -88,4 +88,4 @@ private:
   void operator=(const vtkPVScalarBarRepresentation&) = delete;
 };
 
-#endif // vtkPVScalarBarRepresentation
+#endif // vtkPVScalarBarRepresentation_h

@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-#ifndef _pqPythonDebugLeaksView_h
-#define _pqPythonDebugLeaksView_h
+#ifndef pqPythonDebugLeaksView_h
+#define pqPythonDebugLeaksView_h
 
 #include "vtkQtDebugLeaksView.h"
 
@@ -68,4 +68,4 @@ protected:
   QPointer<pqPythonShell> Shell;
 };
 
-#endif // !_pqPythonDebugLeaksView_h
+#endif // !pqPythonDebugLeaksView_h

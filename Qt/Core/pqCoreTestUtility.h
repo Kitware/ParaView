@@ -30,8 +30,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-#ifndef _pqCoreTestUtility_h
-#define _pqCoreTestUtility_h
+#ifndef pqCoreTestUtility_h
+#define pqCoreTestUtility_h
 
 #include "pqCoreModule.h"
 #include "pqTestUtility.h"
@@ -133,4 +133,4 @@ private:
   QStringList TestFilenames;
 };
 
-#endif // !_pqCoreTestUtility_h
+#endif // !pqCoreTestUtility_h

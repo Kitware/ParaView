@@ -36,8 +36,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * \date 1/19/2006
  */
 
-#ifndef _pqXMLUtil_h
-#define _pqXMLUtil_h
+#ifndef pqXMLUtil_h
+#define pqXMLUtil_h
 
 #include "pqCoreModule.h"
 #include <QList>

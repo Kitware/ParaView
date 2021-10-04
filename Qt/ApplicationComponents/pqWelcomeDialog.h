@@ -1,5 +1,5 @@
-#ifndef PQWELCOMEDIALOG_H
-#define PQWELCOMEDIALOG_H
+#ifndef pqWelcomeDialog_h
+#define pqWelcomeDialog_h
 
 #include "pqApplicationComponentsModule.h"
 #include <QDialog>
@@ -38,4 +38,4 @@ private:
   Ui::pqWelcomeDialog* ui;
 };
 
-#endif // PQWELCOMEDIALOG_H
+#endif // pqWelcomeDialog_h

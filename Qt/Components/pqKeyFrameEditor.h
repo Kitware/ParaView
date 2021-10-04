@@ -30,8 +30,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-#ifndef _pqKeyFrameEditor_h
-#define _pqKeyFrameEditor_h
+#ifndef pqKeyFrameEditor_h
+#define pqKeyFrameEditor_h
 
 #include "pqComponentsModule.h"
 #include <QDialog>

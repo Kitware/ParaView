@@ -62,4 +62,4 @@ private:
   Q_DISABLE_COPY(pqStringVectorPropertyWidget);
 };
 
-#endif // _pqStringVectorPropertyWidget_h
+#endif // pqStringVectorPropertyWidget_h
