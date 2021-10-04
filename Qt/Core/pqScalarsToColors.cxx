@@ -146,7 +146,7 @@ void pqScalarsToColors::hideUnusedScalarBars()
   //  smmodel->findItems<pqPipelineRepresentation*>(this->getServer());
 
   // bool used_at_all = false;
-  // foreach(pqPipelineRepresentation* display, displays)
+  // Q_FOREACH(pqPipelineRepresentation* display, displays)
   //  {
   //  if (display->isVisible() &&
   //    display->getColorField(true) != pqPipelineRepresentation::solidColor() &&
@@ -158,7 +158,7 @@ void pqScalarsToColors::hideUnusedScalarBars()
   //  }
   // if (!used_at_all)
   //  {
-  //  foreach(pqScalarBarRepresentation* sb, this->Internal->ScalarBars)
+  //  Q_FOREACH(pqScalarBarRepresentation* sb, this->Internal->ScalarBars)
   //    {
   //    sb->setVisible(false);
   //    sb->renderViewEventually();
@@ -294,7 +294,7 @@ void pqScalarsToColors::updateScalarBarTitles(const QString& component)
 {
   (void)component;
   // FIXME:
-  // foreach(pqScalarBarRepresentation* sb, this->Internal->ScalarBars)
+  // Q_FOREACH(pqScalarBarRepresentation* sb, this->Internal->ScalarBars)
   //  {
   //  sb->setTitle(sb->getTitle().first, component);
   //  }

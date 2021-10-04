@@ -149,7 +149,7 @@ pqServer* pqServerManagerModel::findServer(vtkIdType cid) const
 //-----------------------------------------------------------------------------
 pqServer* pqServerManagerModel::findServer(const pqServerResource& resource) const
 {
-  foreach (pqServer* server, this->Internal->Servers)
+  Q_FOREACH (pqServer* server, this->Internal->Servers)
   {
     if (server && server->getResource() == resource)
     {
@@ -193,7 +193,7 @@ pqServerManagerModelItem* pqServerManagerModel::findItemHelper(
 pqServerManagerModelItem* pqServerManagerModel::findItemHelper(
   const pqServerManagerModel* const model, const QMetaObject& mo, vtkTypeUInt32 id)
 {
-  foreach (pqServerManagerModelItem* item, model->Internal->ItemList)
+  Q_FOREACH (pqServerManagerModelItem* item, model->Internal->ItemList)
   {
     if (item && mo.cast(item))
     {
@@ -212,7 +212,7 @@ pqServerManagerModelItem* pqServerManagerModel::findItemHelper(
 pqServerManagerModelItem* pqServerManagerModel::findItemHelper(
   const pqServerManagerModel* const model, const QMetaObject& mo, const QString& name)
 {
-  foreach (pqServerManagerModelItem* item, model->Internal->ItemList)
+  Q_FOREACH (pqServerManagerModelItem* item, model->Internal->ItemList)
   {
     if (item && mo.cast(item))
     {
@@ -236,7 +236,7 @@ void pqServerManagerModel::findItemsHelper(const pqServerManagerModel* const mod
     return;
   }
 
-  foreach (pqServerManagerModelItem* item, model->Internal->ItemList)
+  Q_FOREACH (pqServerManagerModelItem* item, model->Internal->ItemList)
   {
     if (item && mo.cast(item))
     {
@@ -293,7 +293,7 @@ void pqServerManagerModel::onProxyRegistered(
   pqProxy* item = nullptr;
 
   QObjectList ifaces = pqApplicationCore::instance()->interfaceTracker()->interfaces();
-  foreach (QObject* iface, ifaces)
+  Q_FOREACH (QObject* iface, ifaces)
   {
     pqServerManagerModelInterface* smi = qobject_cast<pqServerManagerModelInterface*>(iface);
     if (smi)

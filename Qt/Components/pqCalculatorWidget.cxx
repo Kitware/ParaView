@@ -103,7 +103,7 @@ pqCalculatorWidget::pqCalculatorWidget(
 
   QList<QToolButton*> buttons;
   buttons = this->findChildren<QToolButton*>(regexp);
-  foreach (QToolButton* tb, buttons)
+  Q_FOREACH (QToolButton* tb, buttons)
   {
     QObject::connect(tb, &QToolButton::pressed, this, [=]() { this->buttonPressed(tb->text()); });
   }

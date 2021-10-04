@@ -146,7 +146,7 @@ void pqSettings::restoreState(const QString& key, QMainWindow& window)
     window.restoreState(this->value("Layout").toByteArray());
 
     QList<QDockWidget*> dockWidgets = window.findChildren<QDockWidget*>();
-    foreach (QDockWidget* dock_widget, dockWidgets)
+    Q_FOREACH (QDockWidget* dock_widget, dockWidgets)
     {
       if (dock_widget->isFloating() == true)
       {

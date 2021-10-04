@@ -210,7 +210,7 @@ pqServer* pqSLACManager::getActiveServer()
 //-----------------------------------------------------------------------------
 QWidget* pqSLACManager::getMainWindow()
 {
-  foreach (QWidget* topWidget, QApplication::topLevelWidgets())
+  Q_FOREACH (QWidget* topWidget, QApplication::topLevelWidgets())
   {
     if (qobject_cast<QMainWindow*>(topWidget))
       return topWidget;
@@ -224,7 +224,7 @@ pqView* pqSLACManager::findView(pqPipelineSource* source, int port, const QStrin
   // Step 1, try to find a view in which the source is already shown.
   if (source)
   {
-    foreach (pqView* view, source->getViews())
+    Q_FOREACH (pqView* view, source->getViews())
     {
       pqDataRepresentation* repr = source->getRepresentation(port, view);
       if (repr && repr->isVisible())
@@ -241,7 +241,7 @@ pqView* pqSLACManager::findView(pqPipelineSource* source, int port, const QStrin
   // showing anything.
   pqApplicationCore* core = pqApplicationCore::instance();
   pqServerManagerModel* smModel = core->getServerManagerModel();
-  foreach (view, smModel->findItems<pqView*>())
+  Q_FOREACH (view, smModel->findItems<pqView*>())
   {
     if (view && (view->getViewType() == viewType) &&
       (view->getNumberOfVisibleRepresentations() < 1))
@@ -276,7 +276,7 @@ pqPipelineSource* pqSLACManager::findPipelineSource(const char* SMName)
   pqServerManagerModel* smModel = core->getServerManagerModel();
 
   QList<pqPipelineSource*> sources = smModel->findItems<pqPipelineSource*>(this->getActiveServer());
-  foreach (pqPipelineSource* s, sources)
+  Q_FOREACH (pqPipelineSource* s, sources)
   {
     if (strcmp(s->getProxy()->GetXMLName(), SMName) == 0)
       return s;
@@ -316,7 +316,7 @@ void pqSLACManager::loaderCreatingPipeline()
 //-----------------------------------------------------------------------------
 static void destroyPortConsumers(pqOutputPort* port)
 {
-  foreach (pqPipelineSource* consumer, port->getConsumers())
+  Q_FOREACH (pqPipelineSource* consumer, port->getConsumers())
   {
     pqSLACManager::destroyPipelineSourceAndConsumers(consumer);
   }
@@ -327,7 +327,7 @@ void pqSLACManager::destroyPipelineSourceAndConsumers(pqPipelineSource* source)
   if (!source)
     return;
 
-  foreach (pqOutputPort* port, source->getOutputPorts())
+  Q_FOREACH (pqOutputPort* port, source->getOutputPorts())
   {
     destroyPortConsumers(port);
   }

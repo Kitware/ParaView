@@ -138,7 +138,7 @@ void pqSelectionInputWidget::updateLabels()
     QList<QVariant> value =
       pqSMAdaptor::getMultipleElementProperty(this->SelectionSource->GetProperty("IDs"));
     columnValues << "Global ID" << QT_ENDL;
-    foreach (QVariant val, value)
+    Q_FOREACH (QVariant val, value)
     {
       columnValues << val.toString() << QT_ENDL;
     }
@@ -222,7 +222,7 @@ void pqSelectionInputWidget::updateLabels()
     columnValues << "Blocks" << QT_ENDL;
     vtkSMProperty* prop = this->SelectionSource->GetProperty("Blocks");
     QList<QVariant> values = pqSMAdaptor::getMultipleElementProperty(prop);
-    foreach (const QVariant& value, values)
+    Q_FOREACH (const QVariant& value, values)
     {
       columnValues << value.toString() << QT_ENDL;
     }
@@ -234,7 +234,7 @@ void pqSelectionInputWidget::updateLabels()
     columnValues << "Block Selectors" << QT_ENDL;
     vtkSMProperty* prop = this->SelectionSource->GetProperty("BlockSelectors");
     QList<QVariant> values = pqSMAdaptor::getMultipleElementProperty(prop);
-    foreach (const QVariant& value, values)
+    Q_FOREACH (const QVariant& value, values)
     {
       columnValues << value.toString() << QT_ENDL;
     }

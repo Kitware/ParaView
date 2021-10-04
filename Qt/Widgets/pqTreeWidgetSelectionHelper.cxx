@@ -75,7 +75,7 @@ void pqTreeWidgetSelectionHelper::setSelectedItemsCheckState(Qt::CheckState stat
   this->TreeWidget->selectionModel()->select(this->Selection, QItemSelectionModel::ClearAndSelect);
 
   QList<QTreeWidgetItem*> items = this->TreeWidget->selectedItems();
-  foreach (QTreeWidgetItem* curitem, items)
+  Q_FOREACH (QTreeWidgetItem* curitem, items)
   {
     if ((curitem->flags() & Qt::ItemIsUserCheckable) == Qt::ItemIsUserCheckable)
     {

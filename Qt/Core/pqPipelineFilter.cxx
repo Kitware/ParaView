@@ -83,7 +83,7 @@ pqPipelineFilter::pqPipelineFilter(
 {
   this->Internal = new pqInternal();
   QList<const char*> inputPortNames = pqPipelineFilter::getInputPorts(proxy);
-  foreach (const char* pname, inputPortNames)
+  Q_FOREACH (const char* pname, inputPortNames)
   {
     this->Internal->Inputs.insert(pname, pqInternal::InputList());
 
@@ -173,7 +173,7 @@ void pqPipelineFilter::initialize()
   this->Superclass::initialize();
 
   // Now update the input connections.
-  foreach (QString portname, this->Internal->Inputs.keys())
+  Q_FOREACH (QString portname, this->Internal->Inputs.keys())
   {
     this->inputChanged(portname);
   }
@@ -185,7 +185,7 @@ pqPipelineFilter::~pqPipelineFilter()
   pqInternal::InputMap::iterator mapIter;
   for (mapIter = this->Internal->Inputs.begin(); mapIter != this->Internal->Inputs.end(); ++mapIter)
   {
-    foreach (pqOutputPort* opPort, mapIter.value())
+    Q_FOREACH (pqOutputPort* opPort, mapIter.value())
     {
       if (opPort)
       {
@@ -234,7 +234,7 @@ QList<pqOutputPort*> pqPipelineFilter::getAllInputs() const
 {
   QList<pqOutputPort*> list;
 
-  foreach (const pqInternal::InputList& inputs, this->Internal->Inputs)
+  Q_FOREACH (const pqInternal::InputList& inputs, this->Internal->Inputs)
   {
     for (int cc = 0; cc < inputs.size(); cc++)
     {
@@ -260,7 +260,7 @@ QList<pqOutputPort*> pqPipelineFilter::getInputs(const QString& portname) const
     return list;
   }
 
-  foreach (pqOutputPort* port, iter.value())
+  Q_FOREACH (pqOutputPort* port, iter.value())
   {
     if (port)
     {
@@ -281,7 +281,7 @@ QMap<QString, QList<pqOutputPort*>> pqPipelineFilter::getNamedInputs() const
   {
     QList<pqOutputPort*>& list = map[iter.key()];
 
-    foreach (pqOutputPort* port, iter.value())
+    Q_FOREACH (pqOutputPort* port, iter.value())
     {
       if (port)
       {
@@ -388,7 +388,7 @@ void pqPipelineFilter::inputChanged(const QString& portname)
   // registered with the SM and as far as we are concerned, does not even exist :).
 
   QSet<pqOutputPort*> oldInputs;
-  foreach (pqOutputPort* obj, iter.value())
+  Q_FOREACH (pqOutputPort* obj, iter.value())
   {
     oldInputs.insert(obj);
   }
@@ -400,23 +400,23 @@ void pqPipelineFilter::inputChanged(const QString& portname)
   QSet<pqOutputPort*> added = currentInputs - oldInputs;
 
   // To preserve the order, we do this funny computation to sync the inputs list.
-  foreach (pqOutputPort* obj, removed)
+  Q_FOREACH (pqOutputPort* obj, removed)
   {
     iter.value().removeAll(obj);
   }
-  foreach (pqOutputPort* obj, added)
+  Q_FOREACH (pqOutputPort* obj, added)
   {
     iter.value().push_back(obj);
   }
 
   // Now tell pqPipelineSource in removed list that we are no longer their
   // descendent.
-  foreach (pqOutputPort* obj, removed)
+  Q_FOREACH (pqOutputPort* obj, removed)
   {
     obj->removeConsumer(this);
   }
 
-  foreach (pqOutputPort* obj, added)
+  Q_FOREACH (pqOutputPort* obj, added)
   {
     obj->addConsumer(this);
   }

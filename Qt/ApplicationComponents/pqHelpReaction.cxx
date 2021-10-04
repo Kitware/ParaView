@@ -100,7 +100,7 @@ void pqHelpReaction::showProxyHelp(const QString& group, const QString& name)
   QHelpEngine* engine = pqApplicationCore::instance()->helpEngine();
 
   // now determine the url for this proxy.
-  foreach (const QString& doc_namespace, engine->registeredDocumentations())
+  Q_FOREACH (const QString& doc_namespace, engine->registeredDocumentations())
   {
     QString basename = QFileInfo(doc_namespace).baseName();
     QString url =

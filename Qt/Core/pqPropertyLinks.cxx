@@ -96,7 +96,7 @@ void pqPropertyLinks::setUseUncheckedProperties(bool val)
     return;
   }
 
-  foreach (pqPropertyLinksConnection* connection, this->Internals->Connections)
+  Q_FOREACH (pqPropertyLinksConnection* connection, this->Internals->Connections)
   {
     connection->setUseUncheckedProperties(val);
   }
@@ -110,7 +110,7 @@ bool pqPropertyLinks::addNewConnection(pqPropertyLinksConnection* connection)
   assert(connection);
 
   // Avoid adding duplicates.
-  foreach (pqPropertyLinksConnection* existing, this->Internals->Connections)
+  Q_FOREACH (pqPropertyLinksConnection* existing, this->Internals->Connections)
   {
     if (*existing == *connection)
     {
@@ -145,7 +145,7 @@ bool pqPropertyLinks::removePropertyLink(QObject* qobject, const char* qproperty
     this->useUncheckedProperties(), this);
 
   // Avoid adding duplicates.
-  foreach (pqPropertyLinksConnection* existing, this->Internals->Connections)
+  Q_FOREACH (pqPropertyLinksConnection* existing, this->Internals->Connections)
   {
     if (*existing == connection)
     {
@@ -160,7 +160,7 @@ bool pqPropertyLinks::removePropertyLink(QObject* qobject, const char* qproperty
 //-----------------------------------------------------------------------------
 void pqPropertyLinks::clear()
 {
-  foreach (pqPropertyLinksConnection* connection, this->Internals->Connections)
+  Q_FOREACH (pqPropertyLinksConnection* connection, this->Internals->Connections)
   {
     delete connection;
   }
@@ -223,7 +223,7 @@ void pqPropertyLinks::accept()
   // IgnoreSMChanges flag.
   this->Internals->IgnoreSMChanges = true;
 
-  foreach (pqPropertyLinksConnection* connection, this->Internals->Connections)
+  Q_FOREACH (pqPropertyLinksConnection* connection, this->Internals->Connections)
   {
     if (connection && connection->proxy())
     {
@@ -243,7 +243,7 @@ void pqPropertyLinks::accept()
 //-----------------------------------------------------------------------------
 void pqPropertyLinks::reset()
 {
-  foreach (pqPropertyLinksConnection* connection, this->Internals->Connections)
+  Q_FOREACH (pqPropertyLinksConnection* connection, this->Internals->Connections)
   {
     if (connection && connection->proxy())
     {

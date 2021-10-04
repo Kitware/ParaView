@@ -106,7 +106,7 @@ void pqChangePipelineInputReaction::changeInput()
     std::vector<vtkSMProxy*> inputPtrs;
     std::vector<unsigned int> inputPorts;
 
-    foreach (pqOutputPort* opport, inputs)
+    Q_FOREACH (pqOutputPort* opport, inputs)
     {
       inputPtrs.push_back(opport->getSource()->getProxy());
       inputPorts.push_back(opport->getPortNumber());

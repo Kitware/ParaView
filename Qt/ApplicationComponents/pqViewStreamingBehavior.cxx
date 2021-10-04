@@ -61,7 +61,7 @@ pqViewStreamingBehavior::pqViewStreamingBehavior(QObject* parentObject)
   QObject::connect(&this->Timer, SIGNAL(timeout()), this, SLOT(onTimeout()));
   this->Timer.setSingleShot(true);
 
-  foreach (pqView* view, smmodel->findItems<pqView*>())
+  Q_FOREACH (pqView* view, smmodel->findItems<pqView*>())
   {
     this->onViewAdded(view);
   }

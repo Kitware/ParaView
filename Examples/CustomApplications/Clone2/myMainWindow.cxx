@@ -164,7 +164,7 @@ myMainWindow::myMainWindow()
   pqApplyBehavior* applyBehavior = new pqApplyBehavior(this);
 
   // Register panels
-  foreach (pqPropertiesPanel* ppanel, this->findChildren<pqPropertiesPanel*>())
+  Q_FOREACH (pqPropertiesPanel* ppanel, this->findChildren<pqPropertiesPanel*>())
   {
     applyBehavior->registerPanel(ppanel);
   }

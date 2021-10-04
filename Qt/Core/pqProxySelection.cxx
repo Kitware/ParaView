@@ -77,7 +77,7 @@ bool pqProxySelectionUtilities::copy(const pqProxySelection& source, vtkSMProxyS
   assert(dest != nullptr);
 
   vtkSMProxySelectionModel::SelectionType selection;
-  foreach (pqServerManagerModelItem* item, source)
+  Q_FOREACH (pqServerManagerModelItem* item, source)
   {
     pqProxy* proxy = qobject_cast<pqProxy*>(item);
     pqOutputPort* port = qobject_cast<pqOutputPort*>(item);

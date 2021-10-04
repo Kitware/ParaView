@@ -40,7 +40,7 @@ int pqSelectionReaction::getSelectionModifier()
   {
     // we cannot use QActionGroup::checkedAction() since the ModifierGroup may
     // not be exclusive.
-    foreach (QAction* maction, this->ModifierGroup->actions())
+    Q_FOREACH (QAction* maction, this->ModifierGroup->actions())
     {
       if (maction->isChecked() && maction->data().isValid())
       {
@@ -55,7 +55,7 @@ void pqSelectionReaction::uncheckSelectionModifiers()
 {
   if (this->ModifierGroup)
   {
-    foreach (QAction* act, this->ModifierGroup->actions())
+    Q_FOREACH (QAction* act, this->ModifierGroup->actions())
     {
       act->setChecked(false);
     }

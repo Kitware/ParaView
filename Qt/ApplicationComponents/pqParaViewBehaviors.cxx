@@ -300,7 +300,7 @@ pqParaViewBehaviors::pqParaViewBehaviors(QMainWindow* mainWindow, QObject* paren
   if (PQ_IS_BEHAVIOR_ENABLED(ApplyBehavior))
   {
     pqApplyBehavior* applyBehavior = new pqApplyBehavior(this);
-    foreach (pqPropertiesPanel* ppanel, mainWindow->findChildren<pqPropertiesPanel*>())
+    Q_FOREACH (pqPropertiesPanel* ppanel, mainWindow->findChildren<pqPropertiesPanel*>())
     {
       applyBehavior->registerPanel(ppanel);
     }

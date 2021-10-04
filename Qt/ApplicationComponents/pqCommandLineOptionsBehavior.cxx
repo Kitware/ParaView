@@ -207,7 +207,7 @@ void pqCommandLineOptionsBehavior::processData()
     }
     QList<QStringList> files = dialog.getAllSelectedFiles();
     QStringList file;
-    foreach (file, files)
+    Q_FOREACH (file, files)
     {
       if (pqLoadDataReaction::loadData(file) == nullptr)
       {

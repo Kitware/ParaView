@@ -304,7 +304,7 @@ void pqCustomFilterDefinitionWizard::addAutoIncludedProxies()
       }
     }
   }
-  foreach (vtkSMProxy* proxy, autoIncludeSet)
+  Q_FOREACH (vtkSMProxy* proxy, autoIncludeSet)
   {
     QString name = "auto_";
     name += proxy->GetGlobalIDAsString();

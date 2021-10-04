@@ -106,7 +106,7 @@ pqViewFrame::pqViewFrame(QWidget* parentObject)
 
   // Setup the title bar.
   ui.TitleBarLayout->insertWidget(0, this->ToolBar);
-  foreach (QToolButton* button, this->StandardToolButtons)
+  Q_FOREACH (QToolButton* button, this->StandardToolButtons)
   {
     ui.TitleBarLayout->addWidget(button);
   }

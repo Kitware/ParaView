@@ -368,7 +368,7 @@ void pqServer::setHeartBeatTimeoutSetting(int msec)
   // update all current servers.
   pqServerManagerModel* smmodel = core->getServerManagerModel();
   QList<pqServer*> servers = smmodel->findItems<pqServer*>();
-  foreach (pqServer* server, servers)
+  Q_FOREACH (pqServer* server, servers)
   {
     server->setHeartBeatTimeout(msec);
   }
@@ -414,7 +414,7 @@ void pqServer::processServerNotification()
   {
   }
 
-  foreach (pqView* view, pqApplicationCore::instance()->findChildren<pqView*>())
+  Q_FOREACH (pqView* view, pqApplicationCore::instance()->findChildren<pqView*>())
   {
     vtkSMViewProxy* viewProxy = view->getViewProxy();
     if (viewProxy && viewProxy->HasDirtyRepresentation())

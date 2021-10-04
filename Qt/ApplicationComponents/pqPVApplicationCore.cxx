@@ -144,7 +144,7 @@ void pqPVApplicationCore::quickLaunch()
   if (!this->QuickLaunchMenus.empty())
   {
     pqQuickLaunchDialog dialog(pqCoreUtilities::mainWidget());
-    foreach (QWidget* menu, this->QuickLaunchMenus)
+    Q_FOREACH (QWidget* menu, this->QuickLaunchMenus)
     {
       if (menu)
       {

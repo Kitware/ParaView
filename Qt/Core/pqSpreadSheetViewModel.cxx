@@ -500,7 +500,7 @@ QSet<pqSpreadSheetViewModel::vtkIndex> pqSpreadSheetViewModel::getVTKIndices(
   assert(view->GetShowExtractedSelection() == 0);
 
   vtkIdType numrows = view->GetNumberOfRows();
-  foreach (QModelIndex idx, indexes)
+  Q_FOREACH (QModelIndex idx, indexes)
   {
     vtkIdType row = idx.row();
     if (row >= numrows)

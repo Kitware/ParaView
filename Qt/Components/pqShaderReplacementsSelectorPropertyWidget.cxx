@@ -258,7 +258,7 @@ void pqShaderReplacementsSelectorPropertyWidget::onDelete()
     QStringList plist = paths.split(QDir::listSeparator());
     QString newPaths;
     int count = 0;
-    foreach (QString p, plist)
+    Q_FOREACH (QString p, plist)
     {
       if (p != presetPath)
       {

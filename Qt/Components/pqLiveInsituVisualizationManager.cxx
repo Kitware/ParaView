@@ -244,7 +244,7 @@ void pqLiveInsituVisualizationManager::sourceRemoved(pqPipelineSource* source)
 //-----------------------------------------------------------------------------
 void pqLiveInsituVisualizationManager::timestepsUpdated()
 {
-  foreach (pqPipelineSource* source, this->Internals->ExtractSourceProxies)
+  Q_FOREACH (pqPipelineSource* source, this->Internals->ExtractSourceProxies)
   {
     if (source)
     {

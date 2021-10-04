@@ -100,7 +100,7 @@ pqComparativeRenderView::pqComparativeRenderView(const QString& group, const QSt
 //-----------------------------------------------------------------------------
 pqComparativeRenderView::~pqComparativeRenderView()
 {
-  foreach (pqQVTKWidget* wdg, this->Internal->RenderWidgets.values())
+  Q_FOREACH (pqQVTKWidget* wdg, this->Internal->RenderWidgets.values())
   {
     delete wdg;
   }
@@ -158,14 +158,14 @@ void pqComparativeRenderView::updateViewWidgets(QWidget* container /*=nullptr*/)
   QSet<vtkSMViewProxy*> added = currentViewsSet - oldViews;
 
   // Destroy old QVTKWidgets widgets.
-  foreach (vtkSMViewProxy* key, removed)
+  Q_FOREACH (vtkSMViewProxy* key, removed)
   {
     pqQVTKWidget* item = this->Internal->RenderWidgets.take(key);
     delete item;
   }
 
   // Create QVTKWidgets for new ones.
-  foreach (vtkSMViewProxy* key, added)
+  Q_FOREACH (vtkSMViewProxy* key, added)
   {
     vtkSMRenderViewProxy* renView = vtkSMRenderViewProxy::SafeDownCast(key);
     renView->UpdateVTKObjects();

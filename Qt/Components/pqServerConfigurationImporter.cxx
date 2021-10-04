@@ -186,7 +186,7 @@ void pqServerConfigurationImporter::fetchConfigurations()
     this->Internals->ActiveSourceName = iter.key();
 
     QList<QUrl> alternative_urls = pqInternals::getAlternativeURLs(url);
-    foreach (const QUrl& cur_url, alternative_urls)
+    Q_FOREACH (const QUrl& cur_url, alternative_urls)
     {
       if (this->fetch(cur_url))
       {

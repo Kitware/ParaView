@@ -46,7 +46,7 @@ pqPluginToolBarBehavior::pqPluginToolBarBehavior(QMainWindow* parentObject)
   this->connect(tracker, SIGNAL(interfaceRegistered(QObject*)), SLOT(addPluginInterface(QObject*)));
 
   // handle any already loaded plugins.
-  foreach (QObject* iface, tracker->interfaces())
+  Q_FOREACH (QObject* iface, tracker->interfaces())
   {
     this->addPluginInterface(iface);
   }

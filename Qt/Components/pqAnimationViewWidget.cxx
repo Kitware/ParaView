@@ -493,7 +493,7 @@ void pqAnimationViewWidget::onSceneCuesChanged()
   pqInternal::TrackMapType::iterator iter;
 
   // add new tracks
-  foreach (pqAnimationCue* cue, cues)
+  Q_FOREACH (pqAnimationCue* cue, cues)
   {
     if (cue == nullptr)
     {
@@ -1000,7 +1000,7 @@ void pqAnimationViewWidget::createTrack()
   }
 
   // check that we don't already have one
-  foreach (pqAnimationCue* cue, this->Internal->TrackMap.keys())
+  Q_FOREACH (pqAnimationCue* cue, this->Internal->TrackMap.keys())
   {
     if (cue->getAnimatedProxy() == nullptr)
     {

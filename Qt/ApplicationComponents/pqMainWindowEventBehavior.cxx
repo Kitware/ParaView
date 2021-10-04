@@ -107,7 +107,7 @@ void pqMainWindowEventBehavior::onDrop(QDropEvent* event)
 
   QList<QString> files;
 
-  foreach (QUrl url, urls)
+  Q_FOREACH (QUrl url, urls)
   {
     if (!url.toLocalFile().isEmpty())
     {

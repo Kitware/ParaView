@@ -139,7 +139,7 @@ void pqViewMenuManager::updateMenu()
   QList<QToolBar*> all_toolbars = this->Window->findChildren<QToolBar*>();
   std::sort(all_toolbars.begin(), all_toolbars.end(), toolbarLessThan);
 
-  foreach (QToolBar* toolbar, all_toolbars)
+  Q_FOREACH (QToolBar* toolbar, all_toolbars)
   {
     // Nested toolbars should be skipped. These are the non-top-level toolbars
     // such as those on the view frame or other widgets.
@@ -162,7 +162,7 @@ void pqViewMenuManager::updateMenu()
 
   QList<QDockWidget*> all_docks = this->Window->findChildren<QDockWidget*>();
   std::sort(all_docks.begin(), all_docks.end(), dockWidgetLessThan);
-  foreach (QDockWidget* dock_widget, all_docks)
+  Q_FOREACH (QDockWidget* dock_widget, all_docks)
   {
     this->Menu->insertAction(
       /*before*/ this->DockPanelSeparators[1], dock_widget->toggleViewAction());

@@ -68,7 +68,7 @@ pqPropertyWidget::pqPropertyWidget(vtkSMProxy* smProxy, QWidget* parentObject)
 //-----------------------------------------------------------------------------
 pqPropertyWidget::~pqPropertyWidget()
 {
-  foreach (pqPropertyWidgetDecorator* decorator, this->Decorators)
+  Q_FOREACH (pqPropertyWidgetDecorator* decorator, this->Decorators)
   {
     delete decorator;
   }

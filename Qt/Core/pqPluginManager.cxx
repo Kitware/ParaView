@@ -146,7 +146,7 @@ pqPluginManager::pqPluginManager(QObject* parentObject)
 pqPluginManager::~pqPluginManager()
 {
   // save all settings for each open server session.
-  foreach (pqServer* server, this->Internals->Servers)
+  Q_FOREACH (pqServer* server, this->Internals->Servers)
   {
     this->onServerDisconnected(server);
   }

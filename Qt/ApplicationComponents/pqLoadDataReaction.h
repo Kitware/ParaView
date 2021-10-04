@@ -111,7 +111,7 @@ protected:
   {
     QList<pqPipelineSource*> sources = pqLoadDataReaction::loadData();
     pqPipelineSource* source;
-    foreach (source, sources)
+    Q_FOREACH (source, sources)
     {
       Q_EMIT this->loadedData(source);
     }

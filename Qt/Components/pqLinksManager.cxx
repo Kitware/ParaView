@@ -151,7 +151,7 @@ void pqLinksManager::removeLink()
   QModelIndexList idxs = this->Ui->treeView->selectionModel()->selectedIndexes();
   QStringList names;
   // convert indexes to names so our indexes don't become invalid during removal
-  foreach (QModelIndex idx, idxs)
+  Q_FOREACH (QModelIndex idx, idxs)
   {
     QString name = model->getLinkName(idx);
     if (!names.contains(name))
@@ -160,7 +160,7 @@ void pqLinksManager::removeLink()
     }
   }
 
-  foreach (QString name, names)
+  Q_FOREACH (QString name, names)
   {
     model->removeLink(name);
   }

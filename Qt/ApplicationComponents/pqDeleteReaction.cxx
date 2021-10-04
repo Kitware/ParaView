@@ -252,7 +252,7 @@ void pqDeleteReaction::deleteSources(const QSet<pqProxy*>& argSources)
     vtkNew<vtkSMTransferFunctionManager> tmgr;
     pqServerManagerModel* smmodel = pqApplicationCore::instance()->getServerManagerModel();
     QList<pqView*> views = smmodel->findItems<pqView*>();
-    foreach (pqView* view, views)
+    Q_FOREACH (pqView* view, views)
     {
       tmgr->UpdateScalarBars(
         view->getProxy(), vtkSMTransferFunctionManager::HIDE_UNUSED_SCALAR_BARS);
@@ -297,7 +297,7 @@ void pqDeleteReaction::aboutToDelete(pqProxy* source)
   // Make input visible if it was hidden in views this source was displayed.
   vtkNew<vtkSMParaViewPipelineControllerWithRendering> controller;
   QList<pqView*> views = filter->getViews();
-  foreach (pqView* view, views)
+  Q_FOREACH (pqView* view, views)
   {
     vtkSMViewProxy* viewProxy = view->getViewProxy();
     if (controller->GetVisibility(filter->getSourceProxy(), 0, viewProxy))

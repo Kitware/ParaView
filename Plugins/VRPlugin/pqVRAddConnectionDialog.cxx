@@ -487,7 +487,7 @@ void pqVRAddConnectionDialog::pqInternals::addInput()
 void pqVRAddConnectionDialog::pqInternals::removeInput()
 {
   bool changed = false;
-  foreach (QListWidgetItem* item, this->listWidget->selectedItems())
+  Q_FOREACH (QListWidgetItem* item, this->listWidget->selectedItems())
   {
     QString id = this->parseEntry(item->text()).first;
     if (id.isEmpty())

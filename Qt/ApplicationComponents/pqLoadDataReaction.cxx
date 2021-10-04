@@ -313,7 +313,7 @@ pqPipelineSource* pqLoadDataReaction::loadData(
 
   // Extension to ReaderType,ReaderGroup Hash table
   QHash<QString, QPair<QString, QString>> extensionToReaderSelection;
-  foreach (const QStringList& filegroup, files)
+  Q_FOREACH (const QStringList& filegroup, files)
   {
     QPair<QString, QString> readerInfo; // type,group
     QString filename(filegroup[0]);

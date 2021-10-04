@@ -65,7 +65,7 @@ void pqLinkSelectionReaction::updateEnableState()
     pqPipelineSource* activeSource = pqActiveObjects::instance().activeSource();
     if (activeSource != nullptr && selectionManager->hasActiveSelection())
     {
-      foreach (pqOutputPort* port, selectionManager->getSelectedPorts())
+      Q_FOREACH (pqOutputPort* port, selectionManager->getSelectedPorts())
       {
         if (port->getSource() == activeSource)
         {

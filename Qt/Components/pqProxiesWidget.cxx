@@ -61,7 +61,7 @@ public:
 
   void clear()
   {
-    foreach (const QList<ProxyInfo>& proxies, this->ComponentProxies)
+    Q_FOREACH (const QList<ProxyInfo>& proxies, this->ComponentProxies)
     {
       for (int cc = 0, max = proxies.size(); cc < max; cc++)
       {
@@ -74,7 +74,7 @@ public:
   }
   void clearExpanders()
   {
-    foreach (pqExpanderButton* expander, this->Expanders)
+    Q_FOREACH (pqExpanderButton* expander, this->Expanders)
     {
       delete expander;
     }
@@ -155,7 +155,7 @@ void pqProxiesWidget::updateLayout()
     }
 
     const QList<pqInternals::ProxyInfo>& proxies = internals.ComponentProxies[key];
-    foreach (const pqInternals::ProxyInfo& info, proxies)
+    Q_FOREACH (const pqInternals::ProxyInfo& info, proxies)
     {
       if (expander)
       {
@@ -229,7 +229,7 @@ bool pqProxiesWidget::filterWidgets(bool show_advanced, const QString& filterTex
   for (pqInternals::MapOfProxyList::const_iterator iter = internals.ComponentProxies.constBegin();
        iter != internals.ComponentProxies.constEnd(); ++iter)
   {
-    foreach (const pqInternals::ProxyInfo& info, iter.value())
+    Q_FOREACH (const pqInternals::ProxyInfo& info, iter.value())
     {
       bool val = info.ProxyWidget->filterWidgets(show_advanced, filterText);
       retval |= val;
@@ -246,7 +246,7 @@ void pqProxiesWidget::apply() const
   for (pqInternals::MapOfProxyList::const_iterator iter = internals.ComponentProxies.constBegin();
        iter != internals.ComponentProxies.constEnd(); ++iter)
   {
-    foreach (const pqInternals::ProxyInfo& info, iter.value())
+    Q_FOREACH (const pqInternals::ProxyInfo& info, iter.value())
     {
       info.ProxyWidget->apply();
     }
@@ -261,7 +261,7 @@ void pqProxiesWidget::reset() const
   for (pqInternals::MapOfProxyList::const_iterator iter = internals.ComponentProxies.constBegin();
        iter != internals.ComponentProxies.constEnd(); ++iter)
   {
-    foreach (const pqInternals::ProxyInfo& info, iter.value())
+    Q_FOREACH (const pqInternals::ProxyInfo& info, iter.value())
     {
       info.ProxyWidget->reset();
     }
@@ -277,7 +277,7 @@ void pqProxiesWidget::setView(pqView* pqview)
   for (pqInternals::MapOfProxyList::const_iterator iter = internals.ComponentProxies.constBegin();
        iter != internals.ComponentProxies.constEnd(); ++iter)
   {
-    foreach (const pqInternals::ProxyInfo& info, iter.value())
+    Q_FOREACH (const pqInternals::ProxyInfo& info, iter.value())
     {
       info.ProxyWidget->setView(pqview);
     }
@@ -292,7 +292,7 @@ void pqProxiesWidget::updatePanel()
   for (pqInternals::MapOfProxyList::const_iterator iter = internals.ComponentProxies.constBegin();
        iter != internals.ComponentProxies.constEnd(); ++iter)
   {
-    foreach (const pqInternals::ProxyInfo& info, iter.value())
+    Q_FOREACH (const pqInternals::ProxyInfo& info, iter.value())
     {
       info.ProxyWidget->updatePanel();
     }

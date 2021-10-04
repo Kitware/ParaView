@@ -129,7 +129,7 @@ bool pqDefaultContextMenu::contextMenu(QMenu* menu, pqView* viewContext, const Q
       pqSMAdaptor::getEnumerationPropertyDomain(repr->getProxy()->GetProperty("Representation"));
     QVariant curRType =
       pqSMAdaptor::getEnumerationProperty(repr->getProxy()->GetProperty("Representation"));
-    foreach (QVariant rtype, rTypes)
+    Q_FOREACH (QVariant rtype, rTypes)
     {
       QAction* raction = reprMenu->addAction(rtype.toString());
       raction->setCheckable(true);

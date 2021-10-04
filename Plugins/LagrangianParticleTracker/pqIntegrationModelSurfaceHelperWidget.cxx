@@ -334,7 +334,7 @@ QList<QVariant> pqIntegrationModelSurfaceHelperWidget::arrayToGenerate() const
 {
   QList<QVariant> values;
   // For each group box
-  foreach (QGroupBox* gb, this->findChildren<QGroupBox*>())
+  Q_FOREACH (QGroupBox* gb, this->findChildren<QGroupBox*>())
   {
     if (gb->isChecked())
     {
@@ -381,7 +381,7 @@ void pqIntegrationModelSurfaceHelperWidget::setArrayToGenerate(const QList<QVari
 {
   QGroupBox* gb;
   QList<QGroupBox*> gbs = this->findChildren<QGroupBox*>();
-  foreach (gb, gbs)
+  Q_FOREACH (gb, gbs)
   {
     gb->setChecked(false);
   }
@@ -399,7 +399,7 @@ void pqIntegrationModelSurfaceHelperWidget::setArrayToGenerate(const QList<QVari
     QString arrayName = i->toString();
     int type = (i + 1)->toInt();
     gb = nullptr;
-    foreach (gb, gbs)
+    Q_FOREACH (gb, gbs)
     {
       if (arrayName == gb->property("name"))
       {

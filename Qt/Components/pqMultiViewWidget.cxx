@@ -604,7 +604,7 @@ pqViewFrame* pqMultiViewWidget::newFrame(vtkSMProxy* view)
   // Search for view frame actions plugins and allow them to decide
   // whether to add their actions to this view type's frame or not.
   pqInterfaceTracker* tracker = pqApplicationCore::instance()->interfaceTracker();
-  foreach (pqViewFrameActionsInterface* vfai, tracker->interfaces<pqViewFrameActionsInterface*>())
+  Q_FOREACH (pqViewFrameActionsInterface* vfai, tracker->interfaces<pqViewFrameActionsInterface*>())
   {
     vfai->frameConnected(frame, pqview);
   }
@@ -813,7 +813,7 @@ void pqMultiViewWidget::destroyAllViews()
   BEGIN_UNDO_SET("Destroy all views");
   pqObjectBuilder* builder = pqApplicationCore::instance()->getObjectBuilder();
   QList<vtkSMViewProxy*> views = this->viewProxies();
-  foreach (vtkSMViewProxy* view, views)
+  Q_FOREACH (vtkSMViewProxy* view, views)
   {
     if (view)
     {

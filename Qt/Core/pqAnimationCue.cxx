@@ -192,7 +192,7 @@ void pqAnimationCue::deleteKeyFrame(int index)
   keyframes.removeAt(index);
 
   std::vector<vtkSMProxy*> proxy_vector;
-  foreach (vtkSMProxy* curKf, keyframes)
+  Q_FOREACH (vtkSMProxy* curKf, keyframes)
   {
     proxy_vector.push_back(curKf);
   }
@@ -293,7 +293,7 @@ vtkSMProxy* pqAnimationCue::insertKeyFrame(int index)
   kf->UpdateVTKObjects();
 
   std::vector<vtkSMProxy*> proxy_vector;
-  foreach (vtkSMProxy* curKf, keyframes)
+  Q_FOREACH (vtkSMProxy* curKf, keyframes)
   {
     proxy_vector.push_back(curKf);
   }

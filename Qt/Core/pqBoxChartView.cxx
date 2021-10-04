@@ -77,7 +77,7 @@ void pqBoxChartView::updateRepresentationVisibility(pqRepresentation* repr, bool
 
   // If visible, turn-off visibility of all other representations.
   QList<pqRepresentation*> reprs = this->getRepresentations();
-  foreach (pqRepresentation* cur_repr, reprs)
+  Q_FOREACH (pqRepresentation* cur_repr, reprs)
   {
     if (cur_repr != repr)
     {

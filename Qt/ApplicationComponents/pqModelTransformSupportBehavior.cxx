@@ -52,7 +52,7 @@ namespace
 {
 static vtkSMSourceProxy* FindVisibleProducerWithChangeOfBasisMatrix(pqView* view)
 {
-  foreach (pqRepresentation* repr, view->getRepresentations())
+  Q_FOREACH (pqRepresentation* repr, view->getRepresentations())
   {
     pqDataRepresentation* drepr = qobject_cast<pqDataRepresentation*>(repr);
     if (!drepr || !drepr->isVisible())
@@ -109,7 +109,7 @@ pqModelTransformSupportBehavior::pqModelTransformSupportBehavior(QObject* parent
 {
   pqServerManagerModel* smmodel = pqApplicationCore::instance()->getServerManagerModel();
   this->connect(smmodel, SIGNAL(viewAdded(pqView*)), SLOT(viewAdded(pqView*)));
-  foreach (pqView* view, smmodel->findItems<pqView*>())
+  Q_FOREACH (pqView* view, smmodel->findItems<pqView*>())
   {
     this->viewAdded(view);
   }

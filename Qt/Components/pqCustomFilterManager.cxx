@@ -270,7 +270,7 @@ void pqCustomFilterManager::removeSelected()
     filters.append(this->Model->getCustomFilterName(*iter));
   }
 
-  foreach (QString filter, filters)
+  Q_FOREACH (QString filter, filters)
   {
     // Unregister the custom filter from the server manager.
     if (proxyManager->GetProxyDefinition("filters", filter.toUtf8().data()))

@@ -191,7 +191,7 @@ void pqVRDockPanel::updateConnections()
 
   pqVRConnectionManager* mgr = pqVRConnectionManager::instance();
   QList<QString> connectionNames = mgr->connectionNames();
-  foreach (const QString& name, connectionNames)
+  Q_FOREACH (const QString& name, connectionNames)
   {
     this->Internals->connectionsTable->addItem(name);
   }
@@ -376,7 +376,7 @@ void pqVRDockPanel::updateStyles()
   this->Internals->StyleNameMap.clear();
   this->Internals->stylesTable->clear();
 
-  foreach (vtkVRInteractorStyle* style, pqVRQueueHandler::instance()->styles())
+  Q_FOREACH (vtkVRInteractorStyle* style, pqVRQueueHandler::instance()->styles())
   {
     QString name = this->Internals->createName(style);
     this->Internals->StyleNameMap.insert(name, style);

@@ -295,7 +295,7 @@ bool pqCoreTestUtility::CompareImage(QWidget* widget, const QString& referenceIm
   // try to locate a pqView, if any associated with the QWidget.
   QList<pqView*> views =
     pqApplicationCore::instance()->getServerManagerModel()->findItems<pqView*>();
-  foreach (pqView* view, views)
+  Q_FOREACH (pqView* view, views)
   {
     if (view && (view->widget() == widget))
     {

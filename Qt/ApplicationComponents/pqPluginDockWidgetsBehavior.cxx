@@ -45,7 +45,7 @@ pqPluginDockWidgetsBehavior::pqPluginDockWidgetsBehavior(QMainWindow* parentObje
   pqInterfaceTracker* pm = pqApplicationCore::instance()->interfaceTracker();
   QObject::connect(
     pm, SIGNAL(interfaceRegistered(QObject*)), this, SLOT(addPluginInterface(QObject*)));
-  foreach (QObject* iface, pm->interfaces())
+  Q_FOREACH (QObject* iface, pm->interfaces())
   {
     this->addPluginInterface(iface);
   }

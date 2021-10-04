@@ -114,7 +114,7 @@ pqPreviewMenuManager::pqPreviewMenuManager(const QStringList& defaultItems, QMen
 //-----------------------------------------------------------------------------
 void pqPreviewMenuManager::init(const QStringList& defaultItems, QMenu* menu)
 {
-  foreach (const QString& txt, defaultItems)
+  Q_FOREACH (const QString& txt, defaultItems)
   {
     SETUP_ACTION(menu->addAction(txt));
   }
@@ -167,7 +167,7 @@ void pqPreviewMenuManager::updateCustomActions()
   // add custom actions.
   pqSettings* settings = pqApplicationCore::instance()->settings();
   QStringList resolutions = settings->value("PreviewResolutions").toStringList();
-  foreach (const QString& res, resolutions)
+  Q_FOREACH (const QString& res, resolutions)
   {
     QAction* actn = menu->addAction(res);
     SETUP_ACTION(actn);
@@ -233,7 +233,7 @@ QAction* pqPreviewMenuManager::findAction(int dx, int dy)
 {
   QString prefix = QString("%1 x %2").arg(dx).arg(dy);
 
-  foreach (QAction* actn, this->parentMenu()->actions())
+  Q_FOREACH (QAction* actn, this->parentMenu()->actions())
   {
     if (actn->text().startsWith(prefix))
     {
@@ -327,7 +327,7 @@ void pqPreviewMenuManager::aboutToShow()
   int resolution[2];
   vtkSMPropertyHelper(layout, "PreviewMode").Get(resolution, 2);
 
-  foreach (QAction* other, this->parentMenu()->actions())
+  Q_FOREACH (QAction* other, this->parentMenu()->actions())
   {
     if (other->isChecked())
     {

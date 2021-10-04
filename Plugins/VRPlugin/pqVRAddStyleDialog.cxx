@@ -97,7 +97,7 @@ pqVRAddStyleDialog::pqVRAddStyleDialog(QWidget* parentObject, Qt::WindowFlags f)
   std::map<std::string, std::string> buttons;
   std::map<std::string, std::string> trackers;
 
-  foreach (const QString& connName, mgr->connectionNames())
+  Q_FOREACH (const QString& connName, mgr->connectionNames())
   {
     analogs.clear();
     buttons.clear();
@@ -202,7 +202,7 @@ void pqVRAddStyleDialog::updateInteractorStyle()
     return;
   }
 
-  foreach (const pqInternals::InputGui& gui, this->Internals->Inputs)
+  Q_FOREACH (const pqInternals::InputGui& gui, this->Internals->Inputs)
   {
     const std::string& role = gui.role;
     const std::string& name = gui.combo->currentText().toStdString();

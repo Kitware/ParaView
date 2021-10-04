@@ -94,7 +94,7 @@ pqChangeInputDialog::pqChangeInputDialog(vtkSMProxy* filterProxy, QWidget* paren
 
   // build current input list.
   QList<const char*> input_property_names = pqPipelineFilter::getInputPorts(filterProxy);
-  foreach (const char* property_name, input_property_names)
+  Q_FOREACH (const char* property_name, input_property_names)
   {
     QList<pqOutputPort*>& list = this->Internals->Inputs[property_name];
 
@@ -200,7 +200,7 @@ void pqChangeInputDialog::inputPortToggled(bool checked)
   this->Internals->ActiveInputProperty = input_prop_name;
 
   QList<pqOutputPort*>& list = this->Internals->Inputs[input_prop_name];
-  foreach (pqOutputPort* port, list)
+  Q_FOREACH (pqOutputPort* port, list)
   {
     selected_indexes.push_back(this->Internals->PipelineModel->getIndexFor(port));
   }
@@ -266,7 +266,7 @@ void pqChangeInputDialog::inputPortToggled(bool checked)
   this->Internals->BlockSelectionChanged = true;
   QItemSelectionModel* selModel = this->Internals->pipelineView->getSelectionModel();
   selModel->clear();
-  foreach (QModelIndex idx, selected_indexes)
+  Q_FOREACH (QModelIndex idx, selected_indexes)
   {
     selModel->select(idx, QItemSelectionModel::Select);
   }
@@ -287,7 +287,7 @@ void pqChangeInputDialog::selectionChanged()
 
   QItemSelectionModel* selModel = this->Internals->pipelineView->getSelectionModel();
   QModelIndexList indexes = selModel->selectedIndexes();
-  foreach (QModelIndex idx, indexes)
+  Q_FOREACH (QModelIndex idx, indexes)
   {
     pqServerManagerModelItem* item = this->Internals->PipelineModel->getItemFor(idx);
     pqOutputPort* port = qobject_cast<pqOutputPort*>(item);

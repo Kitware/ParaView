@@ -181,7 +181,7 @@ void pqApplyBehavior::applied(pqPropertiesPanel*)
 
   //---------------------------------------------------------------------------
   // If there is a catalyst session, push its updates to the server
-  foreach (pqServer* server, smmodel->findItems<pqServer*>())
+  Q_FOREACH (pqServer* server, smmodel->findItems<pqServer*>())
   {
     if (pqLiveInsituManager::isInsituServer(server))
     {
@@ -193,7 +193,7 @@ void pqApplyBehavior::applied(pqPropertiesPanel*)
 
   //---------------------------------------------------------------------------
   // find views that need updating and update them.
-  foreach (pqView* view, smmodel->findItems<pqView*>())
+  Q_FOREACH (pqView* view, smmodel->findItems<pqView*>())
   {
     if (view && view->getViewProxy()->GetNeedsUpdate())
     {
@@ -205,7 +205,7 @@ void pqApplyBehavior::applied(pqPropertiesPanel*)
   // Update all the views separately. This ensures that all pipelines are
   // up-to-date before we render as we may need to change some rendering
   // properties like color transfer functions before the actual render.
-  foreach (pqView* view, dirty_views)
+  Q_FOREACH (pqView* view, dirty_views)
   {
     SM_SCOPED_TRACE(CallMethod)
       .arg(view->getViewProxy())
@@ -217,7 +217,7 @@ void pqApplyBehavior::applied(pqPropertiesPanel*)
   vtkPVGeneralSettings* gsettings = vtkPVGeneralSettings::GetInstance();
   if (gsettings->GetColorByBlockColorsOnApply())
   {
-    foreach (const pqInternals::PairType& pair, this->Internals->NewlyCreatedRepresentations)
+    Q_FOREACH (const pqInternals::PairType& pair, this->Internals->NewlyCreatedRepresentations)
     {
       vtkSMRepresentationProxy* reprProxy = pair.first;
       vtkSMViewProxy* viewProxy = pair.second;
@@ -253,7 +253,7 @@ void pqApplyBehavior::applied(pqPropertiesPanel*)
 
   //---------------------------------------------------------------------------
   // Perform the render on visible views.
-  foreach (pqView* view, dirty_views)
+  Q_FOREACH (pqView* view, dirty_views)
   {
     if (view->widget()->isVisible())
     {
@@ -372,7 +372,7 @@ void pqApplyBehavior::hideInputIfRequired(pqPipelineFilter* filter, pqView* view
 
     // hide input source.
     QList<pqOutputPort*> inputs = filter->getAllInputs();
-    foreach (pqOutputPort* input, inputs)
+    Q_FOREACH (pqOutputPort* input, inputs)
     {
       pqDataRepresentation* inputRepr = input->getRepresentation(view);
       if (inputRepr)

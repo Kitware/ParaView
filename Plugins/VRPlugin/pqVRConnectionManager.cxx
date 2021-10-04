@@ -121,7 +121,7 @@ void pqVRConnectionManager::remove(pqVRPNConnection* conn)
 pqVRPNConnection* pqVRConnectionManager::GetVRPNConnection(const QString& name)
 {
   std::string target = name.toStdString();
-  foreach (const QPointer<pqVRPNConnection>& conn, this->Internals->VRPNConnections)
+  Q_FOREACH (const QPointer<pqVRPNConnection>& conn, this->Internals->VRPNConnections)
   {
     if (!conn.isNull())
     {
@@ -156,7 +156,7 @@ void pqVRConnectionManager::remove(pqVRUIConnection* conn)
 pqVRUIConnection* pqVRConnectionManager::GetVRUIConnection(const QString& name)
 {
   std::string target = name.toStdString();
-  foreach (const QPointer<pqVRUIConnection>& conn, this->Internals->VRUIConnections)
+  Q_FOREACH (const QPointer<pqVRUIConnection>& conn, this->Internals->VRUIConnections)
   {
     if (!conn.isNull())
     {
@@ -188,7 +188,7 @@ QList<QString> pqVRConnectionManager::connectionNames() const
 {
   QList<QString> result;
 #if PARAVIEW_PLUGIN_VRPlugin_USE_VRPN
-  foreach (pqVRPNConnection* conn, this->Internals->VRPNConnections)
+  Q_FOREACH (pqVRPNConnection* conn, this->Internals->VRPNConnections)
   {
     if (conn)
     {
@@ -197,7 +197,7 @@ QList<QString> pqVRConnectionManager::connectionNames() const
   }
 #endif
 #if PARAVIEW_PLUGIN_VRPlugin_USE_VRUI
-  foreach (pqVRUIConnection* conn, this->Internals->VRUIConnections)
+  Q_FOREACH (pqVRUIConnection* conn, this->Internals->VRUIConnections)
   {
     if (conn)
     {
@@ -214,7 +214,7 @@ int pqVRConnectionManager::numConnections() const
 {
   int result = 0;
 #if PARAVIEW_PLUGIN_VRPlugin_USE_VRPN
-  foreach (pqVRPNConnection* conn, this->Internals->VRPNConnections)
+  Q_FOREACH (pqVRPNConnection* conn, this->Internals->VRPNConnections)
   {
     if (conn)
     {
@@ -223,7 +223,7 @@ int pqVRConnectionManager::numConnections() const
   }
 #endif
 #if PARAVIEW_PLUGIN_VRPlugin_USE_VRUI
-  foreach (pqVRUIConnection* conn, this->Internals->VRUIConnections)
+  Q_FOREACH (pqVRUIConnection* conn, this->Internals->VRUIConnections)
   {
     if (conn)
     {
@@ -238,7 +238,7 @@ int pqVRConnectionManager::numConnections() const
 void pqVRConnectionManager::start()
 {
 #if PARAVIEW_PLUGIN_VRPlugin_USE_VRPN
-  foreach (pqVRPNConnection* conn, this->Internals->VRPNConnections)
+  Q_FOREACH (pqVRPNConnection* conn, this->Internals->VRPNConnections)
   {
     if (conn && conn->init())
     {
@@ -247,7 +247,7 @@ void pqVRConnectionManager::start()
   }
 #endif
 #if PARAVIEW_PLUGIN_VRPlugin_USE_VRUI
-  foreach (pqVRUIConnection* conn, this->Internals->VRUIConnections)
+  Q_FOREACH (pqVRUIConnection* conn, this->Internals->VRUIConnections)
   {
     if (conn && conn->init())
     {
@@ -261,7 +261,7 @@ void pqVRConnectionManager::start()
 void pqVRConnectionManager::stop()
 {
 #if PARAVIEW_PLUGIN_VRPlugin_USE_VRPN
-  foreach (pqVRPNConnection* conn, this->Internals->VRPNConnections)
+  Q_FOREACH (pqVRPNConnection* conn, this->Internals->VRPNConnections)
   {
     if (conn)
     {
@@ -270,7 +270,7 @@ void pqVRConnectionManager::stop()
   }
 #endif
 #if PARAVIEW_PLUGIN_VRPlugin_USE_VRUI
-  foreach (pqVRUIConnection* conn, this->Internals->VRUIConnections)
+  Q_FOREACH (pqVRUIConnection* conn, this->Internals->VRUIConnections)
   {
     if (conn)
     {
@@ -349,7 +349,7 @@ void pqVRConnectionManager::saveConnectionsConfiguration(vtkPVXMLElement* root)
   vtkPVXMLElement* tempParent = vtkPVXMLElement::New();
   tempParent->SetName("VRConnectionManager");
 #if PARAVIEW_PLUGIN_VRPlugin_USE_VRPN
-  foreach (pqVRPNConnection* conn, this->Internals->VRPNConnections)
+  Q_FOREACH (pqVRPNConnection* conn, this->Internals->VRPNConnections)
   {
     vtkPVXMLElement* child = conn->saveConfiguration();
     if (child)
@@ -360,7 +360,7 @@ void pqVRConnectionManager::saveConnectionsConfiguration(vtkPVXMLElement* root)
   }
 #endif
 #if PARAVIEW_PLUGIN_VRPlugin_USE_VRUI
-  foreach (pqVRUIConnection* conn, this->Internals->VRUIConnections)
+  Q_FOREACH (pqVRUIConnection* conn, this->Internals->VRUIConnections)
   {
     vtkPVXMLElement* child = conn->saveConfiguration();
     if (child)

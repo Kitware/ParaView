@@ -169,7 +169,7 @@ void pqTabbedMultiViewWidget::pqTabWidget::setReadOnly(bool val)
 
   this->ReadOnly = val;
   QList<QLabel*> labels = this->findChildren<QLabel*>("close");
-  foreach (QLabel* label, labels)
+  Q_FOREACH (QLabel* label, labels)
   {
     label->setVisible(!val);
   }
@@ -756,7 +756,7 @@ QSize pqTabbedMultiViewWidget::clientSize() const
 void pqTabbedMultiViewWidget::lockViewSize(const QSize& viewSize)
 {
   QList<QPointer<pqMultiViewWidget>> widgets = this->Internals->widgets();
-  foreach (QPointer<pqMultiViewWidget> widget, widgets)
+  Q_FOREACH (QPointer<pqMultiViewWidget> widget, widgets)
   {
     if (widget)
     {
@@ -796,7 +796,7 @@ void pqTabbedMultiViewWidget::onStateLoaded()
 // maybe warn there are views in state file not assigned to layout
 #if 0
   QSet<vtkSMViewProxy*> proxies;
-  foreach (pqMultiViewWidget* wdg, this->Internals->TabWidgets.values())
+  Q_FOREACH (pqMultiViewWidget* wdg, this->Internals->TabWidgets.values())
   {
     if (wdg)
     {
@@ -808,7 +808,7 @@ void pqTabbedMultiViewWidget::onStateLoaded()
   QList<pqView*> views =
     pqApplicationCore::instance()->getServerManagerModel()->findItems<pqView*>();
 
-  foreach (pqView* view, views)
+  Q_FOREACH (pqView* view, views)
   {
     if (!proxies.contains(view->getViewProxy()))
     {

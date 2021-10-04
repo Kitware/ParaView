@@ -91,7 +91,7 @@ void pqExportReaction::updateEnableState()
   {
     bool visibleRepresentation = false;
     QList<pqRepresentation*> representations = view->getRepresentations();
-    foreach (pqRepresentation* repr, representations)
+    Q_FOREACH (pqRepresentation* repr, representations)
     {
       if (repr->isVisible())
       {

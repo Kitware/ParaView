@@ -67,7 +67,7 @@ public:
   {
     QList<T> list;
     QObjectList objList = this->interfaces();
-    foreach (QObject* object, objList)
+    Q_FOREACH (QObject* object, objList)
     {
       if (object && qobject_cast<T>(object))
       {

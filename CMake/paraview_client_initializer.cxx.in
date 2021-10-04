@@ -132,7 +132,7 @@ pq@_paraview_client_NAME@Initializer::Status pq@_paraview_client_NAME@Initialize
   vtkVLogStartScopeF(PARAVIEW_LOG_PLUGIN_VERBOSITY(), "req-plugins", "load required plugins: `@_paraview_client_REQUIRED_PLUGINS@`");
   QString plugin_string = "@_paraview_client_REQUIRED_PLUGINS@";
   QStringList plugin_list = plugin_string.split(';',PV_QT_SKIP_EMPTY_PARTS);
-  foreach (const QString plugin_name, plugin_list)
+  Q_FOREACH (const QString plugin_name, plugin_list)
   {
     if (!loader->LoadPluginByName(plugin_name.toUtf8().data()))
     {
@@ -146,7 +146,7 @@ pq@_paraview_client_NAME@Initializer::Status pq@_paraview_client_NAME@Initialize
   vtkVLogStartScopeF(PARAVIEW_LOG_PLUGIN_VERBOSITY(), "opt-plugins", "load optional plugins: `@_paraview_client_OPTIONAL_PLUGINS@`");
   plugin_string = "@_paraview_client_OPTIONAL_PLUGINS@";
   plugin_list = plugin_string.split(';', PV_QT_SKIP_EMPTY_PARTS);
-  foreach (const QString plugin_name, plugin_list)
+  Q_FOREACH (const QString plugin_name, plugin_list)
   {
     if (!loader->LoadPluginByName(plugin_name.toUtf8().data()))
     {
@@ -167,7 +167,7 @@ pq@_paraview_client_NAME@Initializer::Status pq@_paraview_client_NAME@Initialize
   // given this too much thought.
   QDir dir2(":/@_paraview_client_NAME@/Configuration");
   QStringList files = dir2.entryList(QDir::Files);
-  foreach (QString file, files)
+  Q_FOREACH (QString file, files)
   {
     this->PVApp->loadConfiguration(QString(":/@_paraview_client_NAME@/Configuration/") + file);
   }

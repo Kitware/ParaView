@@ -262,7 +262,7 @@ void pqComboBoxDomain::internalDomainChanged()
   else if (type == pqSMAdaptor::PROXYSELECTION || type == pqSMAdaptor::PROXYLIST)
   {
     QList<pqSMProxy> proxies = pqSMAdaptor::getProxyPropertyDomain(this->Internal->Property);
-    foreach (vtkSMProxy* pxy, proxies)
+    Q_FOREACH (vtkSMProxy* pxy, proxies)
     {
       texts.append(pxy->GetXMLLabel());
       data.append(pxy->GetXMLLabel());
@@ -276,7 +276,7 @@ void pqComboBoxDomain::internalDomainChanged()
     }
   }
 
-  foreach (QString userStr, this->Internal->UserStrings)
+  Q_FOREACH (QString userStr, this->Internal->UserStrings)
   {
     if (!texts.contains(userStr))
     {

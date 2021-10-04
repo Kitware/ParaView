@@ -756,7 +756,7 @@ void pqPresetDialog::updateEnabledStateForSelection()
     ui.showDefault->setEnabled(false);
 
     bool isEditable = true;
-    foreach (const QModelIndex& idx, selectedRows)
+    Q_FOREACH (const QModelIndex& idx, selectedRows)
     {
       isEditable &= this->Internals->ProxyModel->flags(idx).testFlag(Qt::ItemIsEditable);
     }
@@ -933,7 +933,7 @@ void pqPresetDialog::exportPresets()
 
   Json::Value presetCollection(Json::arrayValue);
   QModelIndexList selectedRows = ui.gradients->selectionModel()->selectedIndexes();
-  foreach (const QModelIndex& proxyIndex, selectedRows)
+  Q_FOREACH (const QModelIndex& proxyIndex, selectedRows)
   {
     QModelIndex idx = internals.ReflowModel->mapToSource(proxyIndex);
     idx = internals.ProxyModel->mapToSource(idx);

@@ -193,12 +193,12 @@ pqLiveSourceBehavior::pqLiveSourceBehavior(QObject* parentObject)
 
   this->connect(&this->Internals->Timer, SIGNAL(timeout()), SLOT(timeout()));
 
-  foreach (pqView* view, smmodel->findItems<pqView*>())
+  Q_FOREACH (pqView* view, smmodel->findItems<pqView*>())
   {
     this->viewAdded(view);
   }
 
-  foreach (pqPipelineSource* src, smmodel->findItems<pqPipelineSource*>())
+  Q_FOREACH (pqPipelineSource* src, smmodel->findItems<pqPipelineSource*>())
   {
     this->sourceAdded(src);
   }
