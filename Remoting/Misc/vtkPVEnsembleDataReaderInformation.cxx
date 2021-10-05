@@ -19,6 +19,7 @@
 #include "vtkObjectFactory.h"
 
 #include <cassert>
+#include <vector>
 
 class vtkPVEnsembleDataReaderInformation::vtkInternal
 {
