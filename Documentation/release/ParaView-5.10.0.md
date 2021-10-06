@@ -101,6 +101,16 @@ These sources and filters use the new string formatting method:
 
 Note: these string substitutions are not available in the **Python Annotation** filter. Access to time information remains unchanged in that filter.
 
+## Favorite directory customization in file dialog
+
+You can now customize a set of favorite directories displayed in file dialogs. Buttons to "Add current directory to favorites", "Remove current directory from favorites" and "Reset favorites to system default" are available in the dialog. The context menu that appears when right-clicking a directory in the files list now includes "Add to favorites", "Remove from favorites", "Rename", and "Open in file explorer" options. When the "Open in file explorer" option is selected, if the selected item is a directory, it will be opened in the system file explorer. Otherwise, if a file or nothing is selected, the current directory is opened in the file explorer. The context menu shows a "Delete empty directory" when right-clicking an empty directory in the files list.
+
+When right-clicking a directory in the favorites list, a "Rename label" option is available, which can also be triggered by pressing the F2 key. It only renames the label displayed in the favorites list and not the actual folder name. If a favorites directory does not exist (e.g., it was deleted), the name is greyed out and in italic, and the icon indicates a warning and the tooltip says that the path does not exist.
+
+Standard shortcuts to some buttons in the file dialog have been added as well. `Alt+Left` goes back, `Alt+Right` goes forward, `Alt+Up` goes to the parent directory and `Ctrl+N` creates a new directory. The "Create New Folder" button is now disabled when opening an existing file.
+
+XXXX Add image of favorites
+
 ## New stride property for animations
 
 It is now possible to change the granularity of the animation using the **Stride** property in the animation view. This property only makes sense in the **Snap to Timesteps** and **Sequence** mode, i.e., when there is a fixed number of frames. The **Stride** property allows skipping a fixed number of frames to control how many frames should be displayed. For example, with a dataset having a time domain of `[0,1,2,3,4,5,6]` and when setting the stride to 2, only the times `[0,2,4,6]` will be used. The stride is taken into account when using the `Play`, `Go To Next Frame` or `Go To Previous Frame` buttons. A stride of 1 will act as the default behavior, i.e., no frames are skipped.
@@ -304,6 +314,26 @@ The following was added to the ParaView Python script editor:
 * Faster syntax highlighting
 * Undo/redo capabilities
 * More robust file saving
+
+## Tooltips in *Edit Color Legend* window
+
+Some property widgets in the *Edit Color Legend Window* now have descriptions.
+
+Basic properties:
+* Auto Orient check box
+* Orientation drop down
+* Title text box
+* Component Title text box
+* Draw annotations check box
+
+Advanced properties:
+* Automatic Label Format check box
+* Label format text box
+* Add Range Labels check box
+* Range Label Format text box
+* Add range annotations check box
+* Draw NaN annotation check box
+* NaN annotation text box
 
 ## New buttons ResetCameraClosest and ZoomClosestToData
 
