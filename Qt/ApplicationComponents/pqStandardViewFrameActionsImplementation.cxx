@@ -699,7 +699,7 @@ void pqStandardViewFrameActionsImplementation::aboutToShowConvertMenu()
     assert(viewframe != nullptr);
 
     QList<ViewType> views = this->availableViewTypes();
-    foreach (const ViewType& type, views)
+    Q_FOREACH (const ViewType& type, views)
     {
       QAction* view_action = new QAction(type.Label, menu);
       menu->addAction(view_action);
@@ -721,7 +721,7 @@ void pqStandardViewFrameActionsImplementation::setupEmptyFrame(QWidget* frame)
   assert(viewframe != nullptr);
 
   QList<ViewType> views = this->availableViewTypes();
-  foreach (const ViewType& type, views)
+  Q_FOREACH (const ViewType& type, views)
   {
     QPushButton* button = new QPushButton(type.Label, ui.ConvertActionsFrame);
     button->setObjectName(type.Name);
@@ -855,7 +855,7 @@ void pqStandardViewFrameActionsImplementation::manageGroupExclusivity(QAction* c
   }
 
   QActionGroup* group = qobject_cast<QActionGroup*>(this->sender());
-  foreach (QAction* groupAction, group->actions())
+  Q_FOREACH (QAction* groupAction, group->actions())
   {
     if (groupAction != curAction && groupAction->isChecked())
     {

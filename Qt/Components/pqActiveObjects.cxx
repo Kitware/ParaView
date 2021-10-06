@@ -439,7 +439,7 @@ void pqActiveObjects::setSelection(
                                    : (current_port ? current_port->getServer() : nullptr);
 
   // ascertain that all items in the selection have the same server.
-  foreach (pqServerManagerModelItem* item, selection_)
+  Q_FOREACH (pqServerManagerModelItem* item, selection_)
   {
     pqProxy* proxy = qobject_cast<pqProxy*>(item);
     pqOutputPort* port = qobject_cast<pqOutputPort*>(item);

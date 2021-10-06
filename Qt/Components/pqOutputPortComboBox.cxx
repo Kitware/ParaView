@@ -67,7 +67,7 @@ void pqOutputPortComboBox::fillExistingPorts()
   pqServerManagerModel* smmodel = core->getServerManagerModel();
 
   QList<pqPipelineSource*> sources = smmodel->findItems<pqPipelineSource*>(nullptr);
-  foreach (pqPipelineSource* source, sources)
+  Q_FOREACH (pqPipelineSource* source, sources)
   {
     this->addSource(source);
   }

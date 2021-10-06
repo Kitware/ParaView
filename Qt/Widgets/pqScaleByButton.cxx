@@ -49,7 +49,7 @@ pqScaleByButton::pqScaleByButton(
   : Superclass(parentObject)
 {
   QMap<double, QString> amap;
-  foreach (double sf, scaleFactors)
+  Q_FOREACH (double sf, scaleFactors)
   {
     amap[sf] = QString("%1%2").arg(sf).arg(suffix);
   }

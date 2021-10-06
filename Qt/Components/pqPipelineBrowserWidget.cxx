@@ -203,7 +203,7 @@ void pqPipelineBrowserWidget::handleIndexClicked(const QModelIndex& index_)
       bool new_visibility_state = !cur_state;
       bool is_selected = false;
       QModelIndexList indexes = this->getSelectionModel()->selectedIndexes();
-      foreach (QModelIndex selIndex_, indexes)
+      Q_FOREACH (QModelIndex selIndex_, indexes)
       {
         // Convert index to pqPipelineModel
         QModelIndex selIndex = this->pipelineModelIndex(selIndex_);
@@ -256,7 +256,7 @@ void pqPipelineBrowserWidget::setVisibility(bool visible, const QModelIndexList&
 {
   bool begun_undo_set = false;
 
-  foreach (QModelIndex index_, indexes)
+  Q_FOREACH (QModelIndex index_, indexes)
   {
     // Get object relative to pqPipelineModel
     const pqPipelineModel* model = this->getPipelineModel(index_);

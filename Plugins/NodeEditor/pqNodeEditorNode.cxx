@@ -235,7 +235,7 @@ int pqNodeEditorNode::updateSize()
   this->widgetContainerWidth = this->widgetContainer->width();
   this->widgetContainerHeight = this->widgetContainer->height();
 
-  emit this->nodeResized();
+  Q_EMIT this->nodeResized();
 
   return 1;
 }
@@ -290,7 +290,7 @@ QVariant pqNodeEditorNode::itemChange(GraphicsItemChange change, const QVariant&
 {
   if (change == GraphicsItemChange::ItemPositionHasChanged)
   {
-    emit this->nodeMoved();
+    Q_EMIT this->nodeMoved();
   }
 
   return QGraphicsItem::itemChange(change, value);

@@ -685,7 +685,7 @@ void pqSMAdaptor::setSelectionProperty(
   }
   iter->Delete();
 
-  foreach (QList<QVariant> value, Value)
+  Q_FOREACH (QList<QVariant> value, Value)
   {
     if (value.size() != 2)
     {
@@ -1179,7 +1179,7 @@ QList<QVariant> pqSMAdaptor::getMultipleElementProperty(
   if (VectorProperty->IsA("vtkSMDoubleVectorProperty"))
   {
     std::vector<double> vals = helper->GetArray<double>();
-    foreach (const double& val, vals)
+    Q_FOREACH (const double& val, vals)
     {
       props.push_back(val);
     }
@@ -1187,7 +1187,7 @@ QList<QVariant> pqSMAdaptor::getMultipleElementProperty(
   else if (VectorProperty->IsA("vtkSMIntVectorProperty"))
   {
     std::vector<int> vals = helper->GetArray<int>();
-    foreach (const int& val, vals)
+    Q_FOREACH (const int& val, vals)
     {
       props.push_back(val);
     }
@@ -1195,7 +1195,7 @@ QList<QVariant> pqSMAdaptor::getMultipleElementProperty(
   else if (VectorProperty->IsA("vtkSMIdTypeVectorProperty"))
   {
     std::vector<vtkIdType> vals = helper->GetArray<vtkIdType>();
-    foreach (const vtkIdType& val, vals)
+    Q_FOREACH (const vtkIdType& val, vals)
     {
       props.push_back(val);
     }

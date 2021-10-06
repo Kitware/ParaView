@@ -247,7 +247,7 @@ public:
 
   bool contains(pqPipelineSource* src)
   {
-    foreach (pqSourceInfo info, this->Sources)
+    Q_FOREACH (pqSourceInfo info, this->Sources)
     {
       if (info.OutputPort->getSource() == src)
       {
@@ -260,7 +260,7 @@ public:
   int indexOf(pqPipelineSource* src)
   {
     int index = 0;
-    foreach (pqSourceInfo info, this->Sources)
+    Q_FOREACH (pqSourceInfo info, this->Sources)
     {
       if (info.OutputPort->getSource() == src)
       {

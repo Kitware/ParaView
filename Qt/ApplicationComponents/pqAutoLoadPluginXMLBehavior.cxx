@@ -50,14 +50,14 @@ void getAllParaViewResourcesDirs(const QString& prefix, QSet<QString>& set)
   if (prefix.endsWith("/ParaViewResources"))
   {
     QStringList contents = dir.entryList(QDir::Files);
-    foreach (QString file, contents)
+    Q_FOREACH (QString file, contents)
     {
       set.insert(prefix + "/" + file);
     }
     return;
   }
   QStringList contents = dir.entryList(QDir::AllDirs);
-  foreach (QString sub_dir, contents)
+  Q_FOREACH (QString sub_dir, contents)
   {
     getAllParaViewResourcesDirs(prefix + "/" + sub_dir, set);
   }
@@ -78,7 +78,7 @@ void pqAutoLoadPluginXMLBehavior::updateResources()
   QSet<QString> xml_files;
   ::getAllParaViewResourcesDirs(":", xml_files);
 
-  foreach (QString dir, xml_files)
+  Q_FOREACH (QString dir, xml_files)
   {
     if (!this->PreviouslyParsedResources.contains(dir))
     {

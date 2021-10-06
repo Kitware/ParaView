@@ -51,7 +51,7 @@ pqServer* PVBlotPluginActions::activeServer()
 //-----------------------------------------------------------------------------
 QWidget* PVBlotPluginActions::mainWindow()
 {
-  foreach (QWidget* topWidget, QApplication::topLevelWidgets())
+  Q_FOREACH (QWidget* topWidget, QApplication::topLevelWidgets())
   {
     if (qobject_cast<QMainWindow*>(topWidget))
       return topWidget;

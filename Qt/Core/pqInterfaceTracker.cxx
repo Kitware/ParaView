@@ -53,7 +53,7 @@ pqInterfaceTracker::pqInterfaceTracker(QObject* parentObject)
 pqInterfaceTracker::~pqInterfaceTracker()
 {
   // Shutdown all autostart interfaces.
-  foreach (QObject* iface, this->Interfaces)
+  Q_FOREACH (QObject* iface, this->Interfaces)
   {
     pqAutoStartInterface* asi = qobject_cast<pqAutoStartInterface*>(iface);
     if (asi)
@@ -62,7 +62,7 @@ pqInterfaceTracker::~pqInterfaceTracker()
     }
   }
 
-  foreach (QObject* iface, this->RegisteredInterfaces)
+  Q_FOREACH (QObject* iface, this->RegisteredInterfaces)
   {
     pqAutoStartInterface* asi = qobject_cast<pqAutoStartInterface*>(iface);
     if (asi)
@@ -95,7 +95,7 @@ void pqInterfaceTracker::onPluginLoaded(vtkObject*, unsigned long, void* calldat
   if (guiplugin != nullptr)
   {
     QObjectList ifaces = guiplugin->interfaces();
-    foreach (QObject* iface, ifaces)
+    Q_FOREACH (QObject* iface, ifaces)
     {
       this->Interfaces.append(iface);
       Q_EMIT this->interfaceRegistered(iface);

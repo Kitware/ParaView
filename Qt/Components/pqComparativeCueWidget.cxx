@@ -65,7 +65,7 @@ std::vector<double> getValues(const QString& str)
 {
   std::vector<double> values;
   QStringList parts = str.split(',', PV_QT_SKIP_EMPTY_PARTS);
-  foreach (QString part, parts)
+  Q_FOREACH (QString part, parts)
   {
     values.push_back(QVariant(part).toDouble());
   }
@@ -203,7 +203,7 @@ void pqComparativeCueWidget::onCellChanged(int rowno, int colno)
     {
       double* newvalues = new double[parts.size()];
       double* ptr = newvalues;
-      foreach (QString part, parts)
+      Q_FOREACH (QString part, parts)
       {
         *ptr = QVariant(part).toDouble();
         ptr++;

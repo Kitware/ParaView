@@ -55,6 +55,7 @@ if (PARAVIEW_USE_QT)
       ParaView::RemotingCore
       VTK::GUISupportQt
       VTK::Python)
+  target_compile_definitions(pvblot PRIVATE QT_NO_KEYWORDS)
 endif ()
 
 set(ext "")

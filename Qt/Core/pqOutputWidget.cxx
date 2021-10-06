@@ -382,7 +382,7 @@ public:
   bool suppress(const QString& message, QtMsgType)
   {
     QMutexLocker locker(&this->SuppressionMutex);
-    foreach (const QString& substr, this->SuppressedStrings)
+    Q_FOREACH (const QString& substr, this->SuppressedStrings)
     {
       if (message.contains(substr))
       {

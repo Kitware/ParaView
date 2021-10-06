@@ -263,7 +263,7 @@ pqDataRepresentation* pqOutputPort::getRepresentation(pqView* view) const
 {
   if (view)
   {
-    foreach (pqDataRepresentation* repr, this->Internal->Representations)
+    Q_FOREACH (pqDataRepresentation* repr, this->Internal->Representations)
     {
       if (repr && (!view || repr->getView() == view))
       {
@@ -279,7 +279,7 @@ pqDataRepresentation* pqOutputPort::getRepresentation(pqView* view) const
 QList<pqDataRepresentation*> pqOutputPort::getRepresentations(pqView* view) const
 {
   QList<pqDataRepresentation*> list;
-  foreach (pqDataRepresentation* repr, this->Internal->Representations)
+  Q_FOREACH (pqDataRepresentation* repr, this->Internal->Representations)
   {
     if (repr && (!view || repr->getView() == view))
     {
@@ -294,7 +294,7 @@ QList<pqDataRepresentation*> pqOutputPort::getRepresentations(pqView* view) cons
 QList<pqView*> pqOutputPort::getViews() const
 {
   QList<pqView*> views;
-  foreach (pqDataRepresentation* repr, this->Internal->Representations)
+  Q_FOREACH (pqDataRepresentation* repr, this->Internal->Representations)
   {
     if (repr)
     {
@@ -313,7 +313,7 @@ QList<pqView*> pqOutputPort::getViews() const
 void pqOutputPort::renderAllViews(bool force /*=false*/)
 {
   QList<pqView*> views = this->getViews();
-  foreach (pqView* view, views)
+  Q_FOREACH (pqView* view, views)
   {
     if (force)
     {

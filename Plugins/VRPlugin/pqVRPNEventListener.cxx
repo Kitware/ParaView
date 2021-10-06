@@ -161,7 +161,7 @@ void pqVRPNEventListener::stop()
 //------------------------------------------------------------------------------
 void pqVRPNThreadBridge::listen()
 {
-  foreach (pqVRPNConnection* conn, this->Connections)
+  Q_FOREACH (pqVRPNConnection* conn, this->Connections)
   {
     conn->listen();
   }

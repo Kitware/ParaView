@@ -208,7 +208,7 @@ void pqFileChooserWidget::chooseFile()
     // The file browser has a list of selected files, each of which could
     // be a group of files.  Condense them all into a single list.
     QStringList selectedFiles;
-    foreach (selectedFiles, dialog.getAllSelectedFiles())
+    Q_FOREACH (selectedFiles, dialog.getAllSelectedFiles())
     {
       files << selectedFiles;
     }

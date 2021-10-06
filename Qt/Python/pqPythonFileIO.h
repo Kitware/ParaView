@@ -104,7 +104,7 @@ public:
    */
   bool isDirty() const;
 
-signals:
+Q_SIGNALS:
   /**
    * @brief Signals that the QTextEdit buffer has been erased
    */
@@ -126,7 +126,7 @@ signals:
    */
   void contentChanged();
 
-public slots:
+public Q_SLOTS:
   /**
    * @brief Change the buffer status to modified
    */

@@ -76,7 +76,7 @@ void pqSurfaceRepresentationBehavior::onRepresentationAdded(pqRepresentation* re
     // Set a representation type based on a priority
     int priority = 0;
     std::string finalValue;
-    foreach (QVariant v, list)
+    Q_FOREACH (QVariant v, list)
     {
       if (v.toString() == "Surface" && priority < 1)
       {

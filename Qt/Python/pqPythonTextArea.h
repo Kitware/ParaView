@@ -163,7 +163,7 @@ public:
    */
   QString getLinkedName() const { return this->TextLinker.getSecondObjectName(); }
 
-signals:
+Q_SIGNALS:
   /**
    * @brief Triggered when the current text
    * buffer is erased

@@ -327,7 +327,7 @@ public:
 
       if (changed)
       {
-        emit this->dataChanged(index, index, { role });
+        Q_EMIT this->dataChanged(index, index, { role });
       }
       return changed;
     }
@@ -464,7 +464,7 @@ public:
             const auto& customRole = this->ExtraColumns[cc];
             if (roles.contains(customRole))
             {
-              emit this->dataChanged(topLeft.siblingAtColumn(cc + 1),
+              Q_EMIT this->dataChanged(topLeft.siblingAtColumn(cc + 1),
                 bottomRight.siblingAtColumn(cc + 1), { Qt::DecorationRole });
             }
           }

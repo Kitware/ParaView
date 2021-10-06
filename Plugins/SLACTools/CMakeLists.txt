@@ -48,6 +48,7 @@ if (PARAVIEW_USE_QT)
       VTK::CommonCore
       VTK::CommonDataModel
       VTK::CommonExecutionModel)
+  target_compile_definitions(SLACTools PRIVATE QT_NO_KEYWORDS)
 endif ()
 
 if (BUILD_TESTING)

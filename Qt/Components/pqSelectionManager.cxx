@@ -130,7 +130,7 @@ void pqSelectionManager::onItemRemoved(pqServerManagerModelItem* item)
   }
 
   // Search for the source output ports in the SelectedPorts set
-  foreach (pqOutputPort* port, this->Implementation->SelectedPorts)
+  Q_FOREACH (pqOutputPort* port, this->Implementation->SelectedPorts)
   {
     if (port->getSource() == item)
     {
@@ -169,7 +169,7 @@ void pqSelectionManager::clearSelection(pqOutputPort* outputPort)
       src->CleanSelectionInputs((*this->Implementation->SelectedPorts.begin())->getPortNumber());
 
       // Render all cleaned output ports
-      foreach (pqOutputPort* opport, this->Implementation->SelectedPorts)
+      Q_FOREACH (pqOutputPort* opport, this->Implementation->SelectedPorts)
       {
         if (opport)
         {
@@ -253,7 +253,7 @@ void pqSelectionManager::select(pqOutputPort* selectedPort)
   // hence some selection cleared without our knowing
   else
   {
-    foreach (pqOutputPort* port, this->Implementation->SelectedPorts)
+    Q_FOREACH (pqOutputPort* port, this->Implementation->SelectedPorts)
     {
       port->renderAllViews(false);
     }
@@ -366,7 +366,7 @@ void pqSelectionManager::onLinkRemoved()
 {
   // When removing a link, the set of selected port became invalid
   // We have to look for a potential selection in the set of selected port
-  foreach (pqOutputPort* port, this->Implementation->SelectedPorts)
+  Q_FOREACH (pqOutputPort* port, this->Implementation->SelectedPorts)
   {
     vtkSMSourceProxy* proxy = port->getSourceProxy();
     for (unsigned int i = 0; i < proxy->GetNumberOfOutputPorts(); i++)
@@ -391,7 +391,7 @@ void pqSelectionManager::onLinkRemoved()
 vtkBoundingBox pqSelectionManager::selectedDataBounds() const
 {
   vtkBoundingBox bbox;
-  foreach (pqOutputPort* port, this->Implementation->SelectedPorts)
+  Q_FOREACH (pqOutputPort* port, this->Implementation->SelectedPorts)
   {
     double bds[6] = { 0, -1, 0, -1, 0, -1 };
     port->getSelectedDataInformation()->GetBounds(bds);

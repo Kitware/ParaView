@@ -110,7 +110,7 @@ QVariant pqAnimationTrack::property() const
 void pqAnimationTrack::setProperty(const QVariant& p)
 {
   this->Property = p;
-  emit this->propertyChanged();
+  Q_EMIT this->propertyChanged();
   this->update();
 }
 

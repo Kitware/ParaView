@@ -116,7 +116,7 @@ pqSpreadSheetView::pqSpreadSheetView(const QString& group, const QString& name,
 
   this->onFontSizeChanged();
 
-  foreach (pqRepresentation* rep, this->getRepresentations())
+  Q_FOREACH (pqRepresentation* rep, this->getRepresentations())
   {
     this->onAddRepresentation(rep);
   }

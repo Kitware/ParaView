@@ -156,7 +156,7 @@ void pqHelpWindow::showHomePage(const QString& namespace_name)
 {
   QList<QUrl> html_pages = this->HelpEngine->files(namespace_name, QStringList(), "html");
   // now try to locate a file named index.html in this collection.
-  foreach (QUrl url, html_pages)
+  Q_FOREACH (QUrl url, html_pages)
   {
     if (url.path().endsWith("index.html"))
     {

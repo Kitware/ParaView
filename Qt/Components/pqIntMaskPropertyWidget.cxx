@@ -113,7 +113,7 @@ void pqIntMaskPropertyWidget::setMask(int ivalue)
   if (this->Internals->Mask != value)
   {
     this->Internals->Mask = value;
-    foreach (QAction* actn, this->Internals->Menu->actions())
+    Q_FOREACH (QAction* actn, this->Internals->Menu->actions())
     {
       unsigned int mask_flag = actn->data().value<unsigned int>();
       actn->setChecked((value & mask_flag) != 0);
@@ -126,7 +126,7 @@ void pqIntMaskPropertyWidget::setMask(int ivalue)
 int pqIntMaskPropertyWidget::mask() const
 {
   this->Internals->Mask = 0;
-  foreach (QAction* actn, this->Internals->Menu->actions())
+  Q_FOREACH (QAction* actn, this->Internals->Menu->actions())
   {
     if (actn->isChecked())
     {

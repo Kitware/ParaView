@@ -462,7 +462,7 @@ void pqRenderView::clearUndoStack()
   }
   this->Internal->UpdatingStack = true;
   this->Internal->InteractionUndoStack->Clear();
-  foreach (pqRenderView* other, this->Internal->LinkedUndoStacks)
+  Q_FOREACH (pqRenderView* other, this->Internal->LinkedUndoStacks)
   {
     if (other)
     {
@@ -491,7 +491,7 @@ void pqRenderView::fakeUndoRedo(bool fake_redo, bool self)
       this->Internal->InteractionUndoStack->PopUndoStack();
     }
   }
-  foreach (pqRenderView* other, this->Internal->LinkedUndoStacks)
+  Q_FOREACH (pqRenderView* other, this->Internal->LinkedUndoStacks)
   {
     if (other)
     {
@@ -520,7 +520,7 @@ void pqRenderView::fakeInteraction(bool start)
     this->Internal->UndoStackBuilder->EndInteraction();
   }
 
-  foreach (pqRenderView* other, this->Internal->LinkedUndoStacks)
+  Q_FOREACH (pqRenderView* other, this->Internal->LinkedUndoStacks)
   {
     other->fakeInteraction(start);
   }

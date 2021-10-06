@@ -79,7 +79,7 @@ void pqFileDialogFilter::setFilter(const QString& filter)
 
     QStringList strings = f.split("|");
     QStringList extensions_list, filepatterns_list;
-    foreach (QString string, strings)
+    Q_FOREACH (QString string, strings)
     {
       if (string.startsWith("*."))
       {

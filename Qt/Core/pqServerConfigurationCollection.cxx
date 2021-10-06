@@ -216,7 +216,7 @@ QString pqServerConfigurationCollection::saveContents(bool only_mutable) const
   QString xml;
   QTextStream stream(&xml);
   stream << "<Servers>\n";
-  foreach (const pqServerConfiguration& config, this->Configurations)
+  Q_FOREACH (const pqServerConfiguration& config, this->Configurations)
   {
     if (only_mutable == false || config.isMutable())
     {
@@ -274,7 +274,7 @@ void pqServerConfigurationCollection::removeConfiguration(const QString& toremov
 QList<pqServerConfiguration> pqServerConfigurationCollection::configurations() const
 {
   QList<pqServerConfiguration> reply;
-  foreach (const pqServerConfiguration& config, this->Configurations)
+  Q_FOREACH (const pqServerConfiguration& config, this->Configurations)
   {
     // skip builtin from this list.
     if (config.name() != "builtin")
@@ -290,7 +290,7 @@ QList<pqServerConfiguration> pqServerConfigurationCollection::configurations(
   const pqServerResource& selector) const
 {
   QList<pqServerConfiguration> reply;
-  foreach (const pqServerConfiguration& config, this->Configurations)
+  Q_FOREACH (const pqServerConfiguration& config, this->Configurations)
   {
     if (config.resource().schemeHosts() == selector.schemeHosts())
     {

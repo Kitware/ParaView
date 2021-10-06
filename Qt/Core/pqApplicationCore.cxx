@@ -420,7 +420,7 @@ void pqApplicationCore::clearViewsForLoadingState(pqServer* server)
   BEGIN_UNDO_EXCLUDE();
   QList<pqProxy*> proxies = this->ServerManagerModel->findItems<pqProxy*>(server);
   QList<QPointer<pqProxy>> to_destroy;
-  foreach (pqProxy* proxy, proxies)
+  Q_FOREACH (pqProxy* proxy, proxies)
   {
     pqView* view = qobject_cast<pqView*>(proxy);
     if (view)
@@ -432,7 +432,7 @@ void pqApplicationCore::clearViewsForLoadingState(pqServer* server)
       to_destroy.push_back(proxy);
     }
   }
-  foreach (pqProxy* cur, to_destroy)
+  Q_FOREACH (pqProxy* cur, to_destroy)
   {
     pqView* view = qobject_cast<pqView*>(cur);
     if (view)
@@ -499,7 +499,7 @@ void pqApplicationCore::onStateLoaded(vtkPVXMLElement* root, vtkSMProxyLocator* 
   // the scenes gets pushed before StartTime and EndTime and as a consequence
   // the scene may not even result in the animation time being set as expected.
   QList<pqAnimationScene*> scenes = this->getServerManagerModel()->findItems<pqAnimationScene*>();
-  foreach (pqAnimationScene* scene, scenes)
+  Q_FOREACH (pqAnimationScene* scene, scenes)
   {
     scene->getProxy()->UpdateProperty("AnimationTime", 1);
   }
@@ -587,7 +587,7 @@ void pqApplicationCore::clearSettings()
 void pqApplicationCore::render()
 {
   QList<pqView*> list = this->ServerManagerModel->findItems<pqView*>();
-  foreach (pqView* view, list)
+  Q_FOREACH (pqView* view, list)
   {
     view->render();
   }
@@ -603,7 +603,7 @@ pqServer* pqApplicationCore::getActiveServer() const
 //-----------------------------------------------------------------------------
 void pqApplicationCore::prepareForQuit()
 {
-  foreach (pqServer* server, this->getServerManagerModel()->findChildren<pqServer*>())
+  Q_FOREACH (pqServer* server, this->getServerManagerModel()->findChildren<pqServer*>())
   {
     server->session()->PreDisconnection();
   }
@@ -613,7 +613,7 @@ void pqApplicationCore::prepareForQuit()
   // fired until the event loop exits, which doesn't happen until animation
   // stops playing.
   QList<pqAnimationScene*> scenes = this->getServerManagerModel()->findItems<pqAnimationScene*>();
-  foreach (pqAnimationScene* scene, scenes)
+  Q_FOREACH (pqAnimationScene* scene, scenes)
   {
     scene->pause();
   }
@@ -719,7 +719,7 @@ QHelpEngine* pqApplicationCore::helpEngine()
       filters << "*.qch";
       help_files = dir.entryList(filters, QDir::Files);
     }
-    foreach (const QString& filename, help_files)
+    Q_FOREACH (const QString& filename, help_files)
     {
       QString qch_file =
         QString(":/%1/Documentation/%2").arg(QApplication::applicationName()).arg(filename);

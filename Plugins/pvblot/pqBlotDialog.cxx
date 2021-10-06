@@ -110,7 +110,7 @@ void pqBlotDialog::runScript()
 //-----------------------------------------------------------------------------
 void pqBlotDialog::runScript(const QStringList& files)
 {
-  foreach (QString filename, files)
+  Q_FOREACH (QString filename, files)
   {
     this->ui->shellWidget->executeBlotScript(filename);
   }

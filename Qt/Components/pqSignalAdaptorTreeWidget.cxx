@@ -145,7 +145,7 @@ QTreeWidgetItem* pqSignalAdaptorTreeWidget::appendValue(const QStringList& colum
 QTreeWidgetItem* pqSignalAdaptorTreeWidget::appendValue(const QList<QVariant>& value)
 {
   QStringList strVals;
-  foreach (QVariant v, value)
+  Q_FOREACH (QVariant v, value)
   {
     strVals.push_back(v.toString());
   }

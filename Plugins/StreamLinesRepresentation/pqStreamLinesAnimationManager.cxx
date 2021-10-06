@@ -52,7 +52,7 @@ pqStreamLinesAnimationManager::pqStreamLinesAnimationManager(QObject* p /*=nullp
   QObject::connect(smmodel, SIGNAL(preViewRemoved(pqView*)), this, SLOT(onViewRemoved(pqView*)));
 
   // Add currently existing views
-  foreach (pqView* view, smmodel->findItems<pqView*>())
+  Q_FOREACH (pqView* view, smmodel->findItems<pqView*>())
   {
     this->onViewAdded(view);
   }

@@ -323,7 +323,7 @@ public:
       return false;
     }
 
-    foreach (const pqPropertyWidgetDecorator* decorator, this->PropertyWidget->decorators())
+    Q_FOREACH (const pqPropertyWidgetDecorator* decorator, this->PropertyWidget->decorators())
     {
       if (decorator && !decorator->canShowWidget(show_advanced))
       {
@@ -340,7 +340,7 @@ public:
     {
       return false;
     }
-    foreach (const pqPropertyWidgetDecorator* decorator, this->PropertyWidget->decorators())
+    Q_FOREACH (const pqPropertyWidgetDecorator* decorator, this->PropertyWidget->decorators())
     {
       if (decorator && !decorator->enableWidget())
       {
@@ -616,7 +616,7 @@ public:
 
   ~pqInternals()
   {
-    foreach (pqProxyWidgetItem* item, this->Items)
+    Q_FOREACH (pqProxyWidgetItem* item, this->Items)
     {
       delete item;
     }
@@ -637,7 +637,7 @@ public:
     assert(gridLayout);
     item->appendToLayout(gridLayout, self->useDocumentationForLabels());
 
-    foreach (pqPropertyWidgetDecorator* decorator, item->propertyWidget()->decorators())
+    Q_FOREACH (pqPropertyWidgetDecorator* decorator, item->propertyWidget()->decorators())
     {
       this->RequestUpdatePanel.connect(decorator, SIGNAL(visibilityChanged()), SLOT(start()));
       this->RequestUpdatePanel.connect(decorator, SIGNAL(enableStateChanged()), SLOT(start()));
@@ -832,7 +832,7 @@ void pqProxyWidget::showEvent(QShowEvent* sevent)
   this->Superclass::showEvent(sevent);
   if (sevent == nullptr || !sevent->spontaneous())
   {
-    foreach (const pqProxyWidgetItem* item, this->Internals->Items)
+    Q_FOREACH (const pqProxyWidgetItem* item, this->Internals->Items)
     {
       item->select();
     }
@@ -844,7 +844,7 @@ void pqProxyWidget::hideEvent(QHideEvent* hevent)
 {
   if (hevent == nullptr || !hevent->spontaneous())
   {
-    foreach (const pqProxyWidgetItem* item, this->Internals->Items)
+    Q_FOREACH (const pqProxyWidgetItem* item, this->Internals->Items)
     {
       item->deselect();
     }
@@ -856,7 +856,7 @@ void pqProxyWidget::hideEvent(QHideEvent* hevent)
 void pqProxyWidget::apply() const
 {
   SM_SCOPED_TRACE(PropertiesModified).arg("proxy", this->proxy());
-  foreach (const pqProxyWidgetItem* item, this->Internals->Items)
+  Q_FOREACH (const pqProxyWidgetItem* item, this->Internals->Items)
   {
     item->apply();
   }
@@ -865,7 +865,7 @@ void pqProxyWidget::apply() const
 //-----------------------------------------------------------------------------
 void pqProxyWidget::reset() const
 {
-  foreach (const pqProxyWidgetItem* item, this->Internals->Items)
+  Q_FOREACH (const pqProxyWidgetItem* item, this->Internals->Items)
   {
     item->reset();
   }
@@ -874,7 +874,7 @@ void pqProxyWidget::reset() const
 //-----------------------------------------------------------------------------
 void pqProxyWidget::setView(pqView* view)
 {
-  foreach (const pqProxyWidgetItem* item, this->Internals->Items)
+  Q_FOREACH (const pqProxyWidgetItem* item, this->Internals->Items)
   {
     item->propertyWidget()->setView(view);
   }
@@ -919,7 +919,7 @@ void pqProxyWidget::createWidgets(const QStringList& properties)
   {
     this->create3DWidgets();
   }
-  foreach (const pqProxyWidgetItem* item, this->Internals->Items)
+  Q_FOREACH (const pqProxyWidgetItem* item, this->Internals->Items)
   {
     QObject::connect(
       item->propertyWidget(), SIGNAL(changeAvailable()), this, SIGNAL(changeAvailable()));
@@ -1202,7 +1202,7 @@ pqPropertyWidget* pqProxyWidget::createWidgetForProperty(
   pqInterfaceTracker* interfaceTracker = pqApplicationCore::instance()->interfaceTracker();
   QList<pqPropertyWidgetInterface*> interfaces =
     interfaceTracker->interfaces<pqPropertyWidgetInterface*>();
-  foreach (pqPropertyWidgetInterface* interface, interfaces)
+  Q_FOREACH (pqPropertyWidgetInterface* interface, interfaces)
   {
     widget = interface->createWidgetForProperty(smproxy, smproperty, parentObj);
     if (widget)
@@ -1293,7 +1293,7 @@ bool pqProxyWidget::filterWidgets(bool show_advanced, const QString& filterText)
 
   const pqProxyWidgetItem* prevItem = nullptr;
   vtkSMProxy* smProxy = this->Internals->Proxy;
-  foreach (const pqProxyWidgetItem* item, this->Internals->Items)
+  Q_FOREACH (const pqProxyWidgetItem* item, this->Internals->Items)
   {
     bool visible = item->canShowWidget(show_advanced, filterText, smProxy);
     if (visible)

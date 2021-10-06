@@ -192,7 +192,7 @@ pqPipelineSource* pqObjectBuilder::createFilter(const QString& sm_group, const Q
     }
 
     vtkSMPropertyHelper helper(prop);
-    foreach (pqOutputPort* opPort, inputs)
+    Q_FOREACH (pqOutputPort* opPort, inputs)
     {
       helper.Add(opPort->getSource()->getProxy(), opPort->getPortNumber());
     }
@@ -294,7 +294,7 @@ pqPipelineSource* pqObjectBuilder::createReader(
     else
     {
       QList<QVariant> values;
-      foreach (QString file, files)
+      Q_FOREACH (QString file, files)
       {
         values.push_back(pqObjectBuilderGetPath(file, use_dir));
       }
@@ -578,14 +578,14 @@ void pqObjectBuilder::destroyLookupTables(pqServer* server)
   pqObjectBuilder* builder = pqApplicationCore::instance()->getObjectBuilder();
 
   QList<pqScalarsToColors*> luts = model->findItems<pqScalarsToColors*>(server);
-  foreach (pqScalarsToColors* lut, luts)
+  Q_FOREACH (pqScalarsToColors* lut, luts)
   {
     builder->destroy(lut);
   }
 
   QList<pqScalarBarRepresentation*> scalarbars =
     model->findItems<pqScalarBarRepresentation*>(server);
-  foreach (pqScalarBarRepresentation* sb, scalarbars)
+  Q_FOREACH (pqScalarBarRepresentation* sb, scalarbars)
   {
     builder->destroy(sb);
   }
@@ -811,7 +811,7 @@ void pqObjectBuilder::destroy(pqAnimationCue* cue)
 
   QList<vtkSMProxy*> keyframes = cue->getKeyFrames();
   // unregister all the keyframes.
-  foreach (vtkSMProxy* kf, keyframes)
+  Q_FOREACH (vtkSMProxy* kf, keyframes)
   {
     pxm->UnRegisterProxy("animation", pxm->GetProxyName("animation", kf), kf);
   }

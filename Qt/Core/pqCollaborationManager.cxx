@@ -376,7 +376,7 @@ void pqCollaborationManager::updateEnabledState()
   bool enabled =
     (this->activeCollaborationManager() ? this->activeCollaborationManager()->IsMaster() : true);
   QWidget* mainWidget = pqCoreUtilities::mainWidget();
-  foreach (QWidget* wdg, mainWidget->findChildren<QWidget*>())
+  Q_FOREACH (QWidget* wdg, mainWidget->findChildren<QWidget*>())
   {
     QVariant val = wdg->property("PV_MUST_BE_MASTER");
     if (val.isValid() && val.toBool())
@@ -389,7 +389,7 @@ void pqCollaborationManager::updateEnabledState()
       wdg->setVisible(enabled);
     }
   }
-  foreach (QAction* actn, mainWidget->findChildren<QAction*>())
+  Q_FOREACH (QAction* actn, mainWidget->findChildren<QAction*>())
   {
     // some actions are hidden, if the process is not a master.
     QVariant val = actn->property("PV_MUST_BE_MASTER_TO_SHOW");
@@ -428,7 +428,7 @@ void pqCollaborationManager::attachMouseListenerTo3DViews()
   // use-case, we just drop it for now.
 
   // QWidget* mainWidget = pqCoreUtilities::mainWidget();
-  // foreach (pqQVTKWidget* widget, mainWidget->findChildren<pqQVTKWidget*>())
+  // Q_FOREACH (pqQVTKWidget* widget, mainWidget->findChildren<pqQVTKWidget*>())
   //{
   //  QObject::connect(widget, SIGNAL(mouseEvent(QMouseEvent*)), this,
   //    SLOT(updateMousePointerLocation(QMouseEvent*)), Qt::UniqueConnection);

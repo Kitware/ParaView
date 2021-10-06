@@ -90,7 +90,7 @@ void pqShaderReplacementsComboBox::populate()
   {
     this->addItem(tr("(Select a preset)"), "");
     QSet<QString> pathSet;
-    foreach (QString p, plist)
+    Q_FOREACH (QString p, plist)
     {
       if (p != "" && !pathSet.contains(p))
       {

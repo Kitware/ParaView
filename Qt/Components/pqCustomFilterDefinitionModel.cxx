@@ -306,7 +306,7 @@ void pqCustomFilterDefinitionModel::setContents(const pqProxySelection& items)
 
   // locate pqPipelineSource instances for all the proxies in items.
   QSet<pqPipelineSource*> selectedSources;
-  foreach (pqServerManagerModelItem* item, items)
+  Q_FOREACH (pqServerManagerModelItem* item, items)
   {
     pqOutputPort* port = qobject_cast<pqOutputPort*>(item);
     pqPipelineSource* source = port ? port->getSource() : qobject_cast<pqPipelineSource*>(item);
@@ -319,7 +319,7 @@ void pqCustomFilterDefinitionModel::setContents(const pqProxySelection& items)
   // Add all the items to the model.
   // TODO: Make sure the sources are from the same server.
   QMap<pqPipelineSource*, pqCustomFilterDefinitionModelSource*> itemMap;
-  foreach (pqPipelineSource* source, selectedSources)
+  Q_FOREACH (pqPipelineSource* source, selectedSources)
   {
     pqCustomFilterDefinitionModelSource* item =
       new pqCustomFilterDefinitionModelSource(this->Root, source);
@@ -334,7 +334,7 @@ void pqCustomFilterDefinitionModel::setContents(const pqProxySelection& items)
   pqCustomFilterDefinitionModelItem* otherItem = nullptr;
   QList<pqCustomFilterDefinitionModelItem*> fanInList;
   QMap<pqPipelineSource*, pqCustomFilterDefinitionModelSource*>::Iterator jter;
-  foreach (pqPipelineSource* source, selectedSources)
+  Q_FOREACH (pqPipelineSource* source, selectedSources)
   {
     jter = itemMap.find(source);
     if (jter != itemMap.end())

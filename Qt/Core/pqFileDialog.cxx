@@ -116,7 +116,7 @@ QStringList GetWildCardsFromFilter(const QString& filter)
 
   // add a *.ext.* for every *.ext we get to support file groups
   QStringList ret = fs;
-  foreach (QString ext, fs)
+  Q_FOREACH (QString ext, fs)
   {
     ret.append(ext + ".*");
   }
@@ -807,7 +807,7 @@ bool pqFileDialog::acceptExistingFiles()
     // attempt to use the default way
     return this->acceptDefault(true);
   }
-  foreach (filename, impl.FileNames)
+  Q_FOREACH (filename, impl.FileNames)
   {
     filename = filename.trimmed();
 
@@ -1142,12 +1142,12 @@ QString pqFileDialog::fixFileExtension(const QString& filename, const QString& f
     // Ensure that the extension the user added is indeed of one the supported
     // types. (BUG #7634).
     QStringList wildCards;
-    foreach (QString curfilter, impl.Filters)
+    Q_FOREACH (QString curfilter, impl.Filters)
     {
       wildCards += ::GetWildCardsFromFilter(curfilter);
     }
     bool pass = false;
-    foreach (QString wildcard, wildCards)
+    Q_FOREACH (QString wildcard, wildCards)
     {
       if (wildcard.indexOf('.') != -1)
       {

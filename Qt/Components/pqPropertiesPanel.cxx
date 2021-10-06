@@ -234,7 +234,7 @@ public:
 
   ~pqInternals()
   {
-    foreach (pqProxyWidgets* widgets, this->SourceWidgets)
+    Q_FOREACH (pqProxyWidgets* widgets, this->SourceWidgets)
     {
       delete widgets;
     }
@@ -729,7 +729,7 @@ void pqPropertiesPanel::updateButtonState()
   ui.Help->setEnabled(this->Internals->Source != nullptr);
   ui.Delete->setEnabled(isDeletable(this->Internals->Source));
 
-  foreach (const pqProxyWidgets* widgets, this->Internals->SourceWidgets)
+  Q_FOREACH (const pqProxyWidgets* widgets, this->Internals->SourceWidgets)
   {
     pqProxy* proxy = widgets->Proxy;
     if (proxy == nullptr)
@@ -856,7 +856,7 @@ void pqPropertiesPanel::apply()
   }
   else
   {
-    foreach (pqProxyWidgets* widgets, this->Internals->SourceWidgets)
+    Q_FOREACH (pqProxyWidgets* widgets, this->Internals->SourceWidgets)
     {
       widgets->apply(this->view());
       Q_EMIT this->applied(widgets->Proxy);
@@ -888,7 +888,7 @@ void pqPropertiesPanel::reset()
   }
   else
   {
-    foreach (pqProxyWidgets* widgets, this->Internals->SourceWidgets)
+    Q_FOREACH (pqProxyWidgets* widgets, this->Internals->SourceWidgets)
     {
       widgets->reset();
     }

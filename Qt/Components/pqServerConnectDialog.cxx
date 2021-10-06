@@ -284,7 +284,7 @@ void pqServerConnectDialog::updateConfigurations()
   this->Internals->servers->setSortingEnabled(false);
   this->Internals->servers->setRowCount(this->Internals->Configurations.size());
   int original_index = 0;
-  foreach (const pqServerConfiguration& config, this->Internals->Configurations)
+  Q_FOREACH (const pqServerConfiguration& config, this->Internals->Configurations)
   {
     QTableWidgetItem* item1 = new QTableWidgetItem(config.name());
     QTableWidgetItem* item2 = new QTableWidgetItem(config.resource().toURI());
@@ -439,7 +439,7 @@ void pqServerConnectDialog::onNameChanged()
   QString current_name = this->Internals->name->text();
   if (current_name != this->Internals->OriginalName)
   {
-    foreach (const pqServerConfiguration& config, this->Internals->Configurations)
+    Q_FOREACH (const pqServerConfiguration& config, this->Internals->Configurations)
     {
       if (config.name() == current_name)
       {
@@ -765,7 +765,7 @@ void pqServerConnectDialog::fetchServers()
 
   QRegExp regExp("pvsc\\s+([^\\s]+)\\s+(.+)");
   QTextStream stream(&pvsc_sources, QIODevice::ReadOnly);
-  foreach (const QString& line, stream.readAll().split("\n", PV_QT_SKIP_EMPTY_PARTS))
+  Q_FOREACH (const QString& line, stream.readAll().split("\n", PV_QT_SKIP_EMPTY_PARTS))
   {
     QString cleaned_line = line.trimmed();
     if (regExp.exactMatch(cleaned_line))
@@ -829,7 +829,7 @@ void pqServerConnectDialog::updateImportableConfigurations()
   this->Internals->importServersTable->setRowCount(items.size());
   this->Internals->importServersTable->setSortingEnabled(false);
   int original_index = 0;
-  foreach (const pqServerConfigurationImporter::Item& item, items)
+  Q_FOREACH (const pqServerConfigurationImporter::Item& item, items)
   {
     QTableWidgetItem* item1 = new QTableWidgetItem(item.Configuration.name());
     QTableWidgetItem* item2 = new QTableWidgetItem("");
@@ -873,7 +873,7 @@ void pqServerConnectDialog::importServers()
 {
   QList<QTableWidgetItem*> items = this->Internals->importServersTable->selectedItems();
   QSet<int> indexes;
-  foreach (QTableWidgetItem* item, items)
+  Q_FOREACH (QTableWidgetItem* item, items)
   {
     indexes.insert(item->data(Qt::UserRole).toInt());
   }
@@ -881,7 +881,7 @@ void pqServerConnectDialog::importServers()
   pqServerConfigurationCollection& collection =
     pqApplicationCore::instance()->serverConfigurations();
 
-  foreach (int index, indexes)
+  Q_FOREACH (int index, indexes)
   {
     collection.addConfiguration(this->Internals->Importer.configurations()[index].Configuration);
   }

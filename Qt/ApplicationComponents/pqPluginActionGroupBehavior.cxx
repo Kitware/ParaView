@@ -45,7 +45,7 @@ namespace
 {
 QAction* findExitAction(QMenu* menu)
 {
-  foreach (QAction* action, menu->actions())
+  Q_FOREACH (QAction* action, menu->actions())
   {
     QString name = action->text().toLower();
     name.remove('&');
@@ -60,7 +60,7 @@ QAction* findExitAction(QMenu* menu)
 QAction* findHelpMenuAction(QMenuBar* menubar)
 {
   QList<QAction*> menuBarActions = menubar->actions();
-  foreach (QAction* existingMenuAction, menuBarActions)
+  Q_FOREACH (QAction* existingMenuAction, menuBarActions)
   {
     QString menuName = existingMenuAction->text().toLower();
     menuName.remove('&');
@@ -80,7 +80,7 @@ pqPluginActionGroupBehavior::pqPluginActionGroupBehavior(QMainWindow* parentObje
   pqInterfaceTracker* pm = pqApplicationCore::instance()->interfaceTracker();
   QObject::connect(
     pm, SIGNAL(interfaceRegistered(QObject*)), this, SLOT(addPluginInterface(QObject*)));
-  foreach (QObject* iface, pm->interfaces())
+  Q_FOREACH (QObject* iface, pm->interfaces())
   {
     this->addPluginInterface(iface);
   }
@@ -116,7 +116,7 @@ void pqPluginActionGroupBehavior::addPluginInterface(QObject* iface)
   {
     QMenu* menu = nullptr;
     QList<QAction*> menuBarActions = mainWindow->menuBar()->actions();
-    foreach (QAction* existingMenuAction, menuBarActions)
+    Q_FOREACH (QAction* existingMenuAction, menuBarActions)
     {
       QString menuName = existingMenuAction->text();
       menuName.remove('&');
@@ -136,7 +136,7 @@ void pqPluginActionGroupBehavior::addPluginInterface(QObject* iface)
       {
         menu->addSeparator();
       }
-      foreach (a, agi->actionGroup()->actions())
+      Q_FOREACH (a, agi->actionGroup()->actions())
       {
         menu->insertAction(exitAction, a);
       }

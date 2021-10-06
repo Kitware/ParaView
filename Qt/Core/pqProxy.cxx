@@ -197,7 +197,7 @@ QList<vtkSMProxy*> pqProxy::getHelperProxies(const QString& key) const
 
   if (this->Internal->ProxyLists.contains(key))
   {
-    foreach (vtkSMProxy* proxy, this->Internal->ProxyLists[key])
+    Q_FOREACH (vtkSMProxy* proxy, this->Internal->ProxyLists[key])
     {
       list.push_back(proxy);
     }
@@ -215,7 +215,7 @@ QList<vtkSMProxy*> pqProxy::getHelperProxies() const
   pqProxyInternal::ProxyListsType::iterator iter = this->Internal->ProxyLists.begin();
   for (; iter != this->Internal->ProxyLists.end(); ++iter)
   {
-    foreach (vtkSMProxy* proxy, iter.value())
+    Q_FOREACH (vtkSMProxy* proxy, iter.value())
     {
       list.push_back(proxy);
     }
@@ -233,7 +233,7 @@ pqProxy* pqProxy::findProxyWithHelper(vtkSMProxy* aproxy, QString& key)
   pqServerManagerModel* smmodel = pqApplicationCore::instance()->getServerManagerModel();
   pqServer* server = smmodel->findServer(aproxy->GetSession());
   QList<pqProxy*> proxies = smmodel->findItems<pqProxy*>(server);
-  foreach (pqProxy* pqproxy, proxies)
+  Q_FOREACH (pqProxy* pqproxy, proxies)
   {
     if (pqproxy->Internal->containsHelperProxy(aproxy, key))
     {

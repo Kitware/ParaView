@@ -48,7 +48,7 @@ class PQCORE_EXPORT pqSignalsBlocker : public QObject
 public:
   pqSignalsBlocker(QObject* parent = nullptr);
 
-signals:
+Q_SIGNALS:
   void passSignal();
 };
 

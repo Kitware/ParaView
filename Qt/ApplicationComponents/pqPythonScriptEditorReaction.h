@@ -48,7 +48,7 @@ public:
   {
   }
 
-protected slots:
+protected Q_SLOTS:
   void onTriggered() override
   {
     pqPythonScriptEditor* pyEditor = pqPythonScriptEditor::getUniqueInstance();

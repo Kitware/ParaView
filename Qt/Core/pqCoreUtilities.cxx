@@ -67,7 +67,7 @@ bool ApplicationIsRunningInDashboard()
 //-----------------------------------------------------------------------------
 QWidget* pqCoreUtilities::findMainWindow()
 {
-  foreach (QWidget* widget, QApplication::topLevelWidgets())
+  Q_FOREACH (QWidget* widget, QApplication::topLevelWidgets())
   {
     if (widget->isWindow() && widget->isVisible() && qobject_cast<QMainWindow*>(widget))
     {
@@ -76,7 +76,7 @@ QWidget* pqCoreUtilities::findMainWindow()
   }
 
   // Find any window (even if not visible).
-  foreach (QWidget* widget, QApplication::topLevelWidgets())
+  Q_FOREACH (QWidget* widget, QApplication::topLevelWidgets())
   {
     if (widget->isWindow() && qobject_cast<QMainWindow*>(widget))
     {
@@ -128,7 +128,7 @@ QStringList pqCoreUtilities::findParaviewPaths(
 
   // Filter with only existing ones
   QStringList existingDirs;
-  foreach (QString path, allPossibleDirs)
+  Q_FOREACH (QString path, allPossibleDirs)
   {
     if (QFile::exists(path))
       existingDirs.push_back(path);

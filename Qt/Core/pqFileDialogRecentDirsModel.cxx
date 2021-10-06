@@ -70,7 +70,7 @@ pqFileDialogRecentDirsModel::pqFileDialogRecentDirsModel(
   {
     QStringList dirs = settings->value(key).toStringList();
     // ensure that the directories exist.
-    foreach (QString dir, dirs)
+    Q_FOREACH (QString dir, dirs)
     {
       QString temp;
       if (!this->FileDialogModel || this->FileDialogModel->dirExists(dir, temp))

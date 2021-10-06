@@ -57,7 +57,7 @@ namespace rfm
 bool canLoad(
   const QList<pqRecentlyUsedResourceLoaderInterface*>& ifaces, const pqServerResource& resource)
 {
-  // using foreach here was causing failures on VS
+  // using Q_FOREACH here was causing failures on VS
   for (int cc = 0, max = ifaces.size(); cc < max; ++cc)
   {
     pqRecentlyUsedResourceLoaderInterface* iface = ifaces[cc];
@@ -72,7 +72,7 @@ bool canLoad(
 bool iconAndLabel(const QList<pqRecentlyUsedResourceLoaderInterface*>& ifaces,
   const pqServerResource& resource, QIcon& icon, QString& label)
 {
-  // using foreach here was causing failures on VS
+  // using Q_FOREACH here was causing failures on VS
   for (int cc = 0, max = ifaces.size(); cc < max; ++cc)
   {
     pqRecentlyUsedResourceLoaderInterface* iface = ifaces[cc];
@@ -89,7 +89,7 @@ bool iconAndLabel(const QList<pqRecentlyUsedResourceLoaderInterface*>& ifaces,
 bool load(const QList<pqRecentlyUsedResourceLoaderInterface*>& ifaces,
   const pqServerResource& resource, pqServer* server)
 {
-  // using foreach here was causing failures on VS
+  // using Q_FOREACH here was causing failures on VS
   for (int cc = 0, max = ifaces.size(); cc < max; ++cc)
   {
     pqRecentlyUsedResourceLoaderInterface* iface = ifaces[cc];

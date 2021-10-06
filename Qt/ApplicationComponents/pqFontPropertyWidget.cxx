@@ -205,7 +205,7 @@ void pqFontPropertyWidget::setHorizontalJustification(QString& str)
 
   this->UpdateToolButtonIcon(str, this->Internals->Ui.HorizontalJustification);
 
-  this->emit horizontalJustificationChanged(str);
+  Q_EMIT this->horizontalJustificationChanged(str);
 }
 
 //-----------------------------------------------------------------------------
@@ -219,7 +219,7 @@ void pqFontPropertyWidget::setVerticalJustification(QString& str)
 
   this->UpdateToolButtonIcon(str, this->Internals->Ui.VerticalJustification);
 
-  this->emit verticalJustificationChanged(str);
+  Q_EMIT this->verticalJustificationChanged(str);
 }
 
 //-----------------------------------------------------------------------------

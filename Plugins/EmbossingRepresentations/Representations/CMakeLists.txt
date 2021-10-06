@@ -27,3 +27,4 @@ vtk_module_add_module(EmbossingRepresentations::vtkEmbossingRepresentations
 
 paraview_add_server_manager_xmls(
   XMLS  EmbossingRepresentations.xml)
+vtk_module_definitions(EmbossingRepresentations::vtkEmbossingRepresentations PRIVATE QT_NO_KEYWORDS)

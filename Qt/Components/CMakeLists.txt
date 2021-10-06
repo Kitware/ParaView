@@ -272,3 +272,4 @@ vtk_module_link(ParaView::pqComponents
   PRIVATE
     Qt5::Network
     Qt5::Widgets)
+vtk_module_definitions(ParaView::pqComponents PRIVATE QT_NO_KEYWORDS)

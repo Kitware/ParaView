@@ -48,7 +48,7 @@ public:
    */
   static QRect getBoundingRect(const std::unordered_map<int, pqNodeEditorNode*>& nodes);
 
-public slots:
+public Q_SLOTS:
   /**
    * Compute an optimized layout for the nodes in the scene.
    * Return 1 if success, 0 else.

@@ -105,3 +105,4 @@ target_link_libraries(OpenVR
     VTK::RenderingOpenGL2
     VTK::RenderingOpenVR
     VTK::ViewsCore)
+target_compile_definitions(OpenVR PRIVATE QT_NO_KEYWORDS)

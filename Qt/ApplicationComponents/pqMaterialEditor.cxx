@@ -298,7 +298,7 @@ bool pqMaterialProxyModel::setData(const QModelIndex& index, const QVariant& var
     this->Proxy->UpdateVTKObjects();
 
     QModelIndex sibling = index.sibling(index.row(), 1); // emit for value too
-    emit this->dataChanged(index, sibling);
+    Q_EMIT this->dataChanged(index, sibling);
     return true;
   }
   if (index.column() == 1 &&
@@ -332,7 +332,7 @@ bool pqMaterialProxyModel::setData(const QModelIndex& index, const QVariant& var
 
     this->Proxy->UpdateVTKObjects();
 
-    emit this->dataChanged(index, index);
+    Q_EMIT this->dataChanged(index, index);
     return true;
   }
   return QAbstractTableModel::setData(index, variant, role);

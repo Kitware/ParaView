@@ -399,7 +399,7 @@ void pqPythonShell::pushScript(const QString& script)
 
   this->Prompted = false;
   this->Internals->begin();
-  foreach (QString line, lines)
+  Q_FOREACH (QString line, lines)
   {
     bool isMultilineStatement = this->Internals->interpreter()->Push(line.toUtf8().data());
     this->Prompt = isMultilineStatement ? pqPythonShell::PS2() : pqPythonShell::PS1();

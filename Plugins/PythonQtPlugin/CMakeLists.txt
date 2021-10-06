@@ -35,6 +35,7 @@ target_link_libraries(PythonQtPlugin
     VTK::Python
     VTK::PythonInterpreter
     VTK::WrappingPythonCore)
+target_compile_definitions(PythonQtPlugin PRIVATE QT_NO_KEYWORDS)
 
 if (BUILD_TESTING)
   add_subdirectory(Testing)

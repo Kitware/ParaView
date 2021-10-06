@@ -48,7 +48,7 @@ pqAnimatableProxyComboBox::pqAnimatableProxyComboBox(QWidget* _parent)
   pqServerManagerModel* smmodel = pqApplicationCore::instance()->getServerManagerModel();
 
   QList<pqPipelineSource*> sources = smmodel->findItems<pqPipelineSource*>();
-  foreach (pqPipelineSource* src, sources)
+  Q_FOREACH (pqPipelineSource* src, sources)
   {
     QVariant p;
     p.setValue(pqSMProxy(src->getProxy()));

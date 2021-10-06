@@ -30,6 +30,7 @@ if (PARAVIEW_USE_QT)
   target_link_libraries(StreamLinesRepresentation
     PRIVATE
       ParaView::RemotingViews)
+    target_compile_definitions(StreamLinesRepresentation PRIVATE QT_NO_KEYWORDS)
 endif ()
 
 if (BUILD_TESTING)

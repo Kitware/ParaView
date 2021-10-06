@@ -92,7 +92,7 @@ public:
    */
   std::string toString();
 
-public slots:
+public Q_SLOTS:
   /**
    * Recompute the points where the edge should pass by.
    * Should be called whenever one of the port the edge is attached to move.

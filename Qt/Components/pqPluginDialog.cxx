@@ -422,7 +422,7 @@ void pqPluginDialog::loadSelectedPlugins(
 {
   this->LoadingMultiplePlugins = true;
   for (int i = 0; i < selItems.count(); i++)
-    foreach (QTreeWidgetItem* item, selItems)
+    Q_FOREACH (QTreeWidgetItem* item, selItems)
     {
       unsigned int index = 0;
       vtkPVPluginsInformation* plInfo = this->getPluginInfo(item, index);

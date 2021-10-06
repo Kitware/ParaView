@@ -112,7 +112,7 @@ public:
 
   void loadFile(const QString& filename);
 
-public slots:
+public Q_SLOTS:
   /**
    * @brief Add a new empty text area
    */
@@ -131,7 +131,7 @@ public slots:
    */
   void closeCurrentTab();
 
-signals:
+Q_SIGNALS:
   /**
    * @brief Raised when a file has been opened and loaded
    * into the text edit widget

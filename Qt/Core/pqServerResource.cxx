@@ -117,7 +117,7 @@ public:
     }
 
     strings.removeFirst();
-    foreach (QString str, strings)
+    Q_FOREACH (QString str, strings)
     {
       QStringList data = str.split(":");
       this->ExtraData[data[0]] = data[1];

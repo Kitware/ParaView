@@ -51,6 +51,6 @@ pqClickableLabel::pqClickableLabel(QWidget* widget, const QString& text, const Q
 //-----------------------------------------------------------------------------
 void pqClickableLabel::mousePressEvent(QMouseEvent* event)
 {
-  emit this->onClicked(this->Widget);
+  Q_EMIT this->onClicked(this->Widget);
   event->accept();
 }

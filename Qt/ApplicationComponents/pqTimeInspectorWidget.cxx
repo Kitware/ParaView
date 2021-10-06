@@ -97,7 +97,7 @@ protected:
     (void)use_unchecked;
 
     std::vector<vtkSMProxy*> proxies;
-    foreach (const QVariant& var, value.toList())
+    Q_FOREACH (const QVariant& var, value.toList())
     {
       vtkSMProxy* aproxy = reinterpret_cast<vtkSMProxy*>(var.value<void*>());
       proxies.push_back(aproxy);
@@ -186,7 +186,7 @@ protected:
     p->setPen(pen);
 
     pqAnimationModel* model = this->animationModel();
-    foreach (double mark, this->Markers)
+    Q_FOREACH (double mark, this->Markers)
     {
       if (mark >= model->zoomStartTime() && mark <= model->zoomEndTime())
       {
@@ -462,7 +462,7 @@ void pqTimeInspectorWidget::setSceneTimeSteps(const QList<QVariant>& val)
   pqAnimationModel* animationModel = this->Internals->Ui.AnimationWidget->animationModel();
   assert(animationModel);
   std::vector<double> timeSteps;
-  foreach (const QVariant& v, val)
+  Q_FOREACH (const QVariant& v, val)
   {
     if (v.canConvert<double>())
     {
@@ -487,7 +487,7 @@ QList<QVariant> pqTimeInspectorWidget::sceneTimeSteps() const
   pqAnimationModel* animationModel = this->Internals->Ui.AnimationWidget->animationModel();
   assert(animationModel);
   QList<QVariant> reply;
-  foreach (double val, animationModel->customTicks())
+  Q_FOREACH (double val, animationModel->customTicks())
   {
     reply.push_back(val);
   }
@@ -517,7 +517,7 @@ void pqTimeInspectorWidget::setTimeSources(const QList<QVariant>& value)
   assert(animationModel);
 
   QSet<vtkSMProxy*> proxies;
-  foreach (const QVariant& val, value)
+  Q_FOREACH (const QVariant& val, value)
   {
     vtkSMProxy* proxy = reinterpret_cast<vtkSMProxy*>(val.value<void*>());
     proxies.insert(proxy);
@@ -533,7 +533,7 @@ void pqTimeInspectorWidget::setTimeSources(const QList<QVariant>& value)
       animationModel->removeTrack(track);
     }
   }
-  foreach (vtkSMProxy* proxy, proxies)
+  Q_FOREACH (vtkSMProxy* proxy, proxies)
   {
     if (proxy && (proxy->GetProperty("TimestepValues") || proxy->GetProperty("TimeRange")))
     {
@@ -561,7 +561,7 @@ void pqTimeInspectorWidget::setSuppressedTimeSources(const QList<QVariant>& valu
 
   this->Internals->SuppressedTimeSources = value;
   QSet<vtkSMProxy*> proxies;
-  foreach (const QVariant& val, value)
+  Q_FOREACH (const QVariant& val, value)
   {
     vtkSMProxy* proxy = reinterpret_cast<vtkSMProxy*>(val.value<void*>());
     proxies.insert(proxy);
@@ -624,7 +624,7 @@ void pqTimeInspectorWidget::toggleTrackSuppression(pqAnimationTrack* track)
   {
     ttrack->setEnabled(true);
     QList<QVariant> newValue;
-    foreach (const QVariant& val, this->Internals->SuppressedTimeSources)
+    Q_FOREACH (const QVariant& val, this->Internals->SuppressedTimeSources)
     {
       vtkSMProxy* proxy = reinterpret_cast<vtkSMProxy*>(val.value<void*>());
       if (proxy != ttrack->source())
@@ -634,7 +634,7 @@ void pqTimeInspectorWidget::toggleTrackSuppression(pqAnimationTrack* track)
     }
     this->Internals->SuppressedTimeSources = newValue;
   }
-  emit this->suppressedTimeSourcesChanged();
+  Q_EMIT this->suppressedTimeSourcesChanged();
 }
 
 //-----------------------------------------------------------------------------

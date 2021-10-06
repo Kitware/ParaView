@@ -199,7 +199,7 @@ void pqSignalAdaptorSelectionTreeWidget::domainChanged()
   // Now update the tree widget. We hide any elements no longer in the domain.
   this->Internal->TreeWidget->clear();
 
-  foreach (QList<QVariant> newValue, newValues)
+  Q_FOREACH (QList<QVariant> newValue, newValues)
   {
     QTreeWidgetItem* item = nullptr;
     if (this->ItemCreatorFunctionPtr)

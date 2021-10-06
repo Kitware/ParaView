@@ -99,7 +99,7 @@ pqComparativeContextView::pqComparativeContextView(const QString& type, const QS
 //-----------------------------------------------------------------------------
 pqComparativeContextView::~pqComparativeContextView()
 {
-  foreach (pqQVTKWidget* wdg, this->Internal->RenderWidgets.values())
+  Q_FOREACH (pqQVTKWidget* wdg, this->Internal->RenderWidgets.values())
   {
     delete wdg;
   }
@@ -171,14 +171,14 @@ void pqComparativeContextView::updateViewWidgets()
   QSet<vtkSMViewProxy*> added = currentViewsSet - oldViews;
 
   // Destroy old QVTKWidgets widgets.
-  foreach (vtkSMViewProxy* key, removed)
+  Q_FOREACH (vtkSMViewProxy* key, removed)
   {
     pqQVTKWidget* item = this->Internal->RenderWidgets.take(key);
     delete item;
   }
 
   // Create QVTKWidgets for new ones.
-  foreach (vtkSMViewProxy* key, added)
+  Q_FOREACH (vtkSMViewProxy* key, added)
   {
     vtkSMContextViewProxy* cntxtView = vtkSMContextViewProxy::SafeDownCast(key);
     cntxtView->UpdateVTKObjects();

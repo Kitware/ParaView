@@ -27,6 +27,7 @@ if (PARAVIEW_USE_QT)
   target_link_libraries(NonOrthogonalSource
     PRIVATE
       ParaView::pqApplicationComponents)
+    target_compile_definitions(NonOrthogonalSource PRIVATE QT_NO_KEYWORDS)
 endif ()
 
 if (BUILD_TESTING)

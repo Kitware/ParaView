@@ -423,7 +423,7 @@ void updateEnvironment(const QMap<QString, pqWidget*>& widgets,
 {
   pqSettings* settings = pqApplicationCore::instance()->settings();
   pqServerResource resource = configuration.resource();
-  foreach (const pqWidget* item, widgets)
+  Q_FOREACH (const pqWidget* item, widgets)
   {
     QString name = item->Widget->objectName();
     QVariant chosen_value = item->get();

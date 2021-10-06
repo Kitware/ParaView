@@ -122,7 +122,7 @@ protected:
   ~pqInternal() override
   {
     // clean up interactiveViewLinks
-    foreach (pqInteractiveViewLink* interLink, this->InteractiveViewLinks)
+    Q_FOREACH (pqInteractiveViewLink* interLink, this->InteractiveViewLinks)
     {
       delete interLink;
     }
@@ -269,7 +269,7 @@ void pqLinksModel::onStateSaved(vtkPVXMLElement* root)
   tempParent->SetName("InteractiveViewLinks");
 
   // Save state of each stored pqInteractiveViewLink
-  foreach (QString linkName, this->Internal->InteractiveViewLinks.keys())
+  Q_FOREACH (QString linkName, this->Internal->InteractiveViewLinks.keys())
   {
     pqInteractiveViewLink* interLink = this->Internal->InteractiveViewLinks[linkName];
     if (interLink != nullptr)
@@ -630,7 +630,7 @@ void pqLinksModel::createInteractiveViewLink(const QString& name, vtkSMProxy* di
   pqRenderView* firstView = nullptr;
   pqRenderView* otherView = nullptr;
   QList<pqRenderView*> views = smModel->findItems<pqRenderView*>();
-  foreach (pqRenderView* view, views)
+  Q_FOREACH (pqRenderView* view, views)
   {
     if (view && view->getRenderViewProxy() == displayView)
     {
@@ -822,7 +822,7 @@ pqLinksModelObject::~pqLinksModelObject()
 {
   if (vtkSMCameraLink::SafeDownCast(this->Internal->Link))
   {
-    foreach (pqProxy* p, this->Internal->InputProxies)
+    Q_FOREACH (pqProxy* p, this->Internal->InputProxies)
     {
       // For render module links, we have to ensure that we remove
       // the links between their interaction undo stacks as well.
@@ -858,7 +858,7 @@ void pqLinksModelObject::proxyModified(pqServerManagerModelItem* item)
   pqProxy* source = qobject_cast<pqProxy*>(item);
   if (source && source->modifiedState() == pqProxy::MODIFIED)
   {
-    foreach (pqProxy* p, this->Internal->OutputProxies)
+    Q_FOREACH (pqProxy* p, this->Internal->OutputProxies)
     {
       if (p != source && p->modifiedState() != pqProxy::MODIFIED)
       {
@@ -877,7 +877,7 @@ void pqLinksModelObject::remove()
 
 void pqLinksModelObject::unlinkUndoStacks(pqRenderView* ren)
 {
-  foreach (pqProxy* output, this->Internal->OutputProxies)
+  Q_FOREACH (pqProxy* output, this->Internal->OutputProxies)
   {
     // assume all are render modules because some might be deleted already
     pqRenderView* other = static_cast<pqRenderView*>(output);
@@ -890,7 +890,7 @@ void pqLinksModelObject::unlinkUndoStacks(pqRenderView* ren)
 
 void pqLinksModelObject::linkUndoStacks()
 {
-  foreach (pqProxy* proxy, this->Internal->InputProxies)
+  Q_FOREACH (pqProxy* proxy, this->Internal->InputProxies)
   {
     pqRenderView* src = qobject_cast<pqRenderView*>(proxy);
     if (src)
@@ -909,7 +909,7 @@ void pqLinksModelObject::linkUndoStacks()
 
 void pqLinksModelObject::refresh()
 {
-  foreach (pqProxy* p, this->Internal->InputProxies)
+  Q_FOREACH (pqProxy* p, this->Internal->InputProxies)
   {
     QObject::disconnect(p, SIGNAL(modifiedStateChanged(pqServerManagerModelItem*)), this,
       SLOT(proxyModified(pqServerManagerModelItem*)));
@@ -943,7 +943,7 @@ void pqLinksModelObject::refresh()
     }
   }
 
-  foreach (vtkSMProxy* p, tmpInputs)
+  Q_FOREACH (vtkSMProxy* p, tmpInputs)
   {
     pqProxy* pxy = pqLinksModel::representativeProxy(p);
     if (pxy)
@@ -955,7 +955,7 @@ void pqLinksModelObject::refresh()
     }
   }
 
-  foreach (vtkSMProxy* p, tmpOutputs)
+  Q_FOREACH (vtkSMProxy* p, tmpOutputs)
   {
     pqProxy* pxy = pqLinksModel::representativeProxy(p);
     if (pxy)

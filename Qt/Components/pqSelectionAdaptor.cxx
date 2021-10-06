@@ -130,7 +130,7 @@ void pqSelectionAdaptor::selectionChanged()
 
   pqProxySelection selection;
   const QModelIndexList& indexes = qModel->selection().indexes();
-  foreach (const QModelIndex& index, indexes)
+  Q_FOREACH (const QModelIndex& index, indexes)
   {
     pqServerManagerModelItem* item = this->mapToItem(this->mapToSource(index));
     if (item)
@@ -175,7 +175,7 @@ void pqSelectionAdaptor::proxySelectionChanged()
 
   QItemSelection qSelection;
   const pqProxySelection& selection = pqActiveObjects::instance().selection();
-  foreach (pqServerManagerModelItem* item, selection)
+  Q_FOREACH (pqServerManagerModelItem* item, selection)
   {
     const QModelIndex& index =
       this->mapFromSource(this->mapFromItem(item), this->getQSelectionModel()->model());

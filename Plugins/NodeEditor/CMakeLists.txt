@@ -52,6 +52,7 @@ target_link_libraries(NodeEditor
     ParaView::RemotingViews
     ParaView::pqApplicationComponents
 )
+target_compile_definitions(NodeEditor PRIVATE QT_NO_KEYWORDS)
 
 if (BUILD_TESTING)
   add_subdirectory(Testing)

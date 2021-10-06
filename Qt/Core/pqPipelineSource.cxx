@@ -133,7 +133,7 @@ pqPipelineSource::pqPipelineSource(
 //-----------------------------------------------------------------------------
 pqPipelineSource::~pqPipelineSource()
 {
-  foreach (pqOutputPort* opport, this->Internal->OutputPorts)
+  Q_FOREACH (pqOutputPort* opport, this->Internal->OutputPorts)
   {
     delete opport;
   }
@@ -227,7 +227,7 @@ int pqPipelineSource::getNumberOfOutputPorts() const
 QList<pqOutputPort*> pqPipelineSource::getOutputPorts() const
 {
   QList<pqOutputPort*> ports;
-  foreach (pqOutputPort* port, this->Internal->OutputPorts)
+  Q_FOREACH (pqOutputPort* port, this->Internal->OutputPorts)
   {
     ports << port;
   }
@@ -288,7 +288,7 @@ pqPipelineSource* pqPipelineSource::getConsumer(int outputport, int index) const
 QList<pqPipelineSource*> pqPipelineSource::getAllConsumers() const
 {
   QList<pqPipelineSource*> consumers;
-  foreach (pqOutputPort* port, this->Internal->OutputPorts)
+  Q_FOREACH (pqOutputPort* port, this->Internal->OutputPorts)
   {
     QList<pqPipelineSource*> portConsumers = port->getConsumers();
     for (int cc = 0; cc < portConsumers.size(); cc++)
@@ -341,7 +341,7 @@ QList<pqView*> pqPipelineSource::getViews() const
 {
   QSet<pqView*> views;
 
-  foreach (pqOutputPort* opPort, this->Internal->OutputPorts)
+  Q_FOREACH (pqOutputPort* opPort, this->Internal->OutputPorts)
   {
 #if QT_VERSION < QT_VERSION_CHECK(5, 14, 0)
     views.unite(QSet<pqView*>::fromList(opPort->getViews()));
@@ -361,7 +361,7 @@ QList<pqView*> pqPipelineSource::getViews() const
 //-----------------------------------------------------------------------------
 void pqPipelineSource::renderAllViews(bool force /*=false*/)
 {
-  foreach (pqOutputPort* opPort, this->Internal->OutputPorts)
+  Q_FOREACH (pqOutputPort* opPort, this->Internal->OutputPorts)
   {
     opPort->renderAllViews(force);
   }

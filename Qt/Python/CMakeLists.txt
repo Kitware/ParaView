@@ -71,3 +71,4 @@ vtk_module_add_module(ParaView::pqPython
 vtk_module_link(ParaView::pqPython
   PRIVATE
     Qt5::Widgets)
+vtk_module_definitions(ParaView::pqPython PRIVATE QT_NO_KEYWORDS)

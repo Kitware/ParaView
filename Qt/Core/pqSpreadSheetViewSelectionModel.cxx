@@ -114,11 +114,11 @@ void pqSpreadSheetViewSelectionModel::serverSelectionChanged(const QItemSelectio
   // Don't simple call ClearAndSelect, that causes the UI to flicker. Instead
   // determine what changed and update those.
   QSet<int> currentRows, newRows;
-  foreach (const QModelIndex& idx, this->selectedIndexes())
+  Q_FOREACH (const QModelIndex& idx, this->selectedIndexes())
   {
     currentRows.insert(idx.row());
   }
-  foreach (const QModelIndex& idx, sel.indexes())
+  Q_FOREACH (const QModelIndex& idx, sel.indexes())
   {
     newRows.insert(idx.row());
   }
@@ -127,12 +127,12 @@ void pqSpreadSheetViewSelectionModel::serverSelectionChanged(const QItemSelectio
   QSet<int> toSelectRows = newRows - currentRows;
   // cout << "Selecting: " << toSelectRows.size()
   //      << " De-Selection: " << toDeselectRows.size() <<  endl;
-  foreach (int idx, toDeselectRows)
+  Q_FOREACH (int idx, toDeselectRows)
   {
     this->select(this->Internal->Model->index(idx, 0),
       QItemSelectionModel::Deselect | QItemSelectionModel::Rows);
   }
-  foreach (int idx, toSelectRows)
+  Q_FOREACH (int idx, toSelectRows)
   {
     this->select(this->Internal->Model->index(idx, 0),
       QItemSelectionModel::Select | QItemSelectionModel::Rows);

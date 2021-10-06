@@ -226,7 +226,7 @@ void pqIntegrationModelSeedHelperWidget::updateEnabledState()
   QGroupBox* gb = qobject_cast<QGroupBox*>(cb->parent());
   bool constant = cb->itemData(cb->currentIndex()).toInt() == vtkLagrangianSeedHelper::CONSTANT;
   gb->findChild<QComboBox*>("Arrays")->setEnabled(!constant);
-  foreach (pqLineEdit* line, gb->findChildren<pqLineEdit*>())
+  Q_FOREACH (pqLineEdit* line, gb->findChildren<pqLineEdit*>())
   {
     line->setEnabled(constant);
   }
@@ -236,7 +236,7 @@ void pqIntegrationModelSeedHelperWidget::updateEnabledState()
 QList<QVariant> pqIntegrationModelSeedHelperWidget::arrayToGenerate() const
 {
   QList<QVariant> values;
-  foreach (QGroupBox* gb, this->findChildren<QGroupBox*>())
+  Q_FOREACH (QGroupBox* gb, this->findChildren<QGroupBox*>())
   {
     // Recover the state of each groupbox
     if (gb->isChecked())
@@ -278,7 +278,7 @@ void pqIntegrationModelSeedHelperWidget::setArrayToGenerate(const QList<QVariant
 {
   QGroupBox* gb;
   QList<QGroupBox*> gbs = this->findChildren<QGroupBox*>();
-  foreach (gb, gbs)
+  Q_FOREACH (gb, gbs)
   {
     gb->setChecked(false);
   }
@@ -297,7 +297,7 @@ void pqIntegrationModelSeedHelperWidget::setArrayToGenerate(const QList<QVariant
     QString arrayName = i->toString();
     int type = (i + 1)->toInt();
     gb = nullptr;
-    foreach (gb, gbs)
+    Q_FOREACH (gb, gbs)
     {
       // Identify correct combo box
       if (arrayName == gb->property("name"))

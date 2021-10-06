@@ -63,7 +63,7 @@ public:
    */
   ~pqClickableLabel() override = default;
 
-signals:
+Q_SIGNALS:
   /**
    * @brief Signal emitted when the label
    * is clicked (to mimic a push button)
