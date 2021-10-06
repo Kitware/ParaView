@@ -177,6 +177,17 @@ public:
   void ResetCameraScreenSpace(double bounds[6]);
   //@}
 
+  //@{
+  /**
+   * Compute and reduce the visible bounds of the provided
+   * representation. Uses LastRepresentationVisibleBounds
+   * to store the result until the next call.
+   * \note CallOnAllProcesses
+   */
+  double* ComputeVisibleBounds(vtkPVDataRepresentation* pvrepr) VTK_SIZEHINT(6);
+  double LastRepresentationVisibleBounds[6];
+  //@}
+
   /**
    * Triggers a high-resolution render.
    * \note Can be called on processes involved in rendering i.e those returned

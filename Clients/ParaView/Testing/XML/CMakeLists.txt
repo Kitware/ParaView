@@ -604,7 +604,10 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/ZoomClosestA_1.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/ZoomClosestB.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/ZoomClosestC.png}"
-  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/ZoomClosestD.png}")
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/ZoomClosestD.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/ZoomToData.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/ZoomToData_A.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/ZoomToData_B.png}")
 
 SET (TESTS_WITHOUT_BASELINES
   AboutDialog.xml
@@ -757,6 +760,7 @@ SET(TESTS_WITH_BASELINES
   SeriesPresetRegexp.xml
   TestHiddenLineRemoval.xml
   TestOpacityRendering.xml
+  ZoomToData.xml
 )
 
 if(PARAVIEW_ENABLE_VISITBRIDGE)
@@ -1503,6 +1507,9 @@ set(ExpandSelection_DISABLE_CRS TRUE)
 set(ExportSelectionToCSV_DISABLE_CRS TRUE)
 set(BlockOpacities_DISABLE_CRS TRUE)
 set(SaveExodus_DISABLE_CRS TRUE) # yes, this test does a selection
+
+# ZoomToData is not working as well in crs
+set(ZoomToData_DISABLE_CRS TRUE)
 
 # These tests cannot be run using ctest -j since they are affected by focus
 # changed events.
