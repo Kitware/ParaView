@@ -34,6 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqActiveObjects.h"
 #include "pqCameraReaction.h"
+#include "pqDataRepresentation.h"
 #include "pqRenderViewSelectionReaction.h"
 
 //-----------------------------------------------------------------------------
@@ -63,10 +64,49 @@ void pqCameraToolbar::constructor()
   this->ZoomClosestToDataAction = ui.actionZoomClosestToData;
   this->ZoomClosestToDataAction->setEnabled(pqActiveObjects::instance().activeSource() != nullptr);
 
-  QObject::connect(
-    &pqActiveObjects::instance(), SIGNAL(viewChanged(pqView*)), this, SLOT(updateEnabledState()));
-  QObject::connect(&pqActiveObjects::instance(), SIGNAL(sourceChanged(pqPipelineSource*)), this,
-    SLOT(updateEnabledState()));
+  QObject::connect(&pqActiveObjects::instance(), &pqActiveObjects::sourceChanged, this,
+    &pqCameraToolbar::onSourceChanged);
+  QObject::connect(&pqActiveObjects::instance(), &pqActiveObjects::viewChanged, this,
+    &pqCameraToolbar::updateEnabledState);
+  QObject::connect(&pqActiveObjects::instance(),
+    QOverload<pqDataRepresentation*>::of(&pqActiveObjects::representationChanged), this,
+    &pqCameraToolbar::onRepresentationChanged);
+}
+
+//-----------------------------------------------------------------------------
+void pqCameraToolbar::onSourceChanged(pqPipelineSource* source)
+{
+  if (this->SourceVisibilityChangedConnection)
+  {
+    // Make sure we have only one visibility changed qt connection
+    QObject::disconnect(this->SourceVisibilityChangedConnection);
+  }
+
+  if (source)
+  {
+    this->SourceVisibilityChangedConnection = QObject::connect(
+      source, &pqPipelineSource::visibilityChanged, this, &pqCameraToolbar::updateEnabledState);
+
+    this->updateEnabledState();
+  }
+}
+
+//-----------------------------------------------------------------------------
+void pqCameraToolbar::onRepresentationChanged(pqDataRepresentation* repr)
+{
+  if (this->RepresentationDataUpdatedConnection)
+  {
+    // Make sure we have only one data updated qt connection
+    QObject::disconnect(this->RepresentationDataUpdatedConnection);
+  }
+
+  if (repr)
+  {
+    this->RepresentationDataUpdatedConnection = QObject::connect(
+      repr, &pqDataRepresentation::dataUpdated, this, &pqCameraToolbar::updateEnabledState);
+
+    this->updateEnabledState();
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -74,6 +114,7 @@ void pqCameraToolbar::updateEnabledState()
 {
   pqView* view = pqActiveObjects::instance().activeView();
   pqPipelineSource* source = pqActiveObjects::instance().activeSource();
-  this->ZoomToDataAction->setEnabled(source && view);
-  this->ZoomClosestToDataAction->setEnabled(source && view);
+  pqDataRepresentation* repr = pqActiveObjects::instance().activeRepresentation();
+  this->ZoomToDataAction->setEnabled(source && view && repr && repr->isVisible());
+  this->ZoomClosestToDataAction->setEnabled(source && view && repr && repr->isVisible());
 }
