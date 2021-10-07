@@ -24,7 +24,7 @@ PRIVATE_DEPENDS
   VTK::IOCore
 OPTIONAL_DEPENDS
   ParaView::nvpipe
-  ParaView::VTKExtensionsRendering
+  ParaView::VTKExtensionsShaderBall
   VTK::PythonInterpreter
   VTK::RenderingRayTracing
 

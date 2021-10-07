@@ -1650,7 +1650,7 @@ endif(PARAVIEW_SSH_SERVERS_TESTING)
 #------------------------------------------------------------------------------
 
 # Add tests for OSPRay material editor
-if (PARAVIEW_USE_MATERIALEDITOR)
+if (paraview_use_materialeditor)
   list(APPEND TESTS_WITH_INLINE_COMPARES
     MaterialEditorCreateMaterials.xml
     MaterialEditorLoadMaterials.xml

@@ -1,7 +1,7 @@
 NAME
-  ParaView::VTKExtensionsRendering
+  ParaView::VTKExtensionsShaderBall
 LIBRARY_NAME
-  vtkExtensionsRendering
+  vtkExtensionsShaderBall
 KIT
   ParaView::CoreKit
 GROUPS

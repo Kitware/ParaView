@@ -483,7 +483,11 @@ public:
 
   void setMaterialName(const char* matName) { this->ShaderBall->SetMaterialName(matName); }
 
-  void resetShaderBall() { this->ShaderBall->ResetPass(); }
+  void resetShaderBall()
+  {
+    this->ShaderBall->ResetOSPrayPass();
+    this->ShaderBall->Render();
+  }
 
 public Q_SLOTS:
   void Render() { this->ShaderBall->Render(); }
@@ -528,15 +532,14 @@ pqMaterialEditor::pqMaterialEditor(QWidget* parentObject, QDockWidget* dockWidge
   QObject::connect(this->Internals->Ui.ShowShaderBall, &QCheckBox::stateChanged, [this](int state) {
     this->Internals->Ui.RenderWidget->setVisible(state);
     this->Internals->ShaderBall->SetVisible(state);
+    this->Internals->ShaderBall->Render();
   });
   QObject::connect(
     this->Internals->Ui.ShaderBallNumberOfSamples, &QSpinBox::editingFinished, [this]() {
       this->Internals->ShaderBall->SetNumberOfSamples(
         this->Internals->Ui.ShaderBallNumberOfSamples->value());
+      this->Internals->ShaderBall->Render();
     });
-  QObject::connect(
-    dockWidget, &QDockWidget::topLevelChanged, [this]() { this->Internals->resetShaderBall(); });
-
   QObject::connect(
     &pqActiveObjects::instance(), &pqActiveObjects::serverChanged, [this](pqServer* server) {
       this->Internals->AttributesModel.reset();
@@ -612,6 +615,9 @@ void pqMaterialEditor::addMaterial()
   dialog->setAttribute(Qt::WA_DeleteOnClose);
   dialog->show();
 
+  vtkOSPRayRendererNode::SetMaterialLibrary(
+    this->Internals->MaterialLibrary, this->Internals->getRenderer());
+
   QObject::connect(dialog, &pqNewMaterialDialog::accepted, [=]() {
     const std::string matName = dialog->name().toStdString();
     ml->AddMaterial(matName, dialog->type().toUtf8().data());
@@ -632,6 +638,10 @@ void pqMaterialEditor::removeMaterial()
   {
     this->Internals->AttributesModel.reset();
     const auto& removedMaterial = this->currentMaterialName();
+    if (removedMaterial.isEmpty())
+    {
+      return;
+    }
     ml->RemoveMaterial(removedMaterial.toStdString());
 
     // Needed so representations that used this material stop using it
@@ -661,6 +671,7 @@ void pqMaterialEditor::removeMaterial()
     // Needed to update vtkSMMaterialDomain instances
     ml->Fire();
     this->updateCurrentMaterial(this->currentMaterialName().toStdString());
+    this->Internals->ShaderBall->Modified();
   }
 }
 
@@ -813,6 +824,7 @@ void pqMaterialEditor::removeProperty()
         ml->RemoveShaderVariable(matName, var.toStdString());
       }
       this->updateCurrentMaterial(matName);
+      this->Internals->ShaderBall->Modified();
     }
   }
 }
@@ -834,10 +846,10 @@ void pqMaterialEditor::removeAllProperties()
 }
 
 //-----------------------------------------------------------------------------
-void pqMaterialEditor::propertyChanged(const QModelIndex& topLeft, const QModelIndex& botRight)
+void pqMaterialEditor::propertyChanged(const QModelIndex& topLeft, const QModelIndex& bottomRight)
 {
   Q_UNUSED(topLeft);
-  Q_UNUSED(botRight);
+  Q_UNUSED(bottomRight);
 
   // update material and render
   QString matName = this->currentMaterialName();
@@ -904,7 +916,11 @@ void pqMaterialEditor::updateMaterialList()
 void pqMaterialEditor::updateCurrentMaterialWithIndex(int index)
 {
   const QString& label = this->Internals->Ui.SelectMaterial->itemText(index);
-  this->updateCurrentMaterial(label.toStdString());
+  if (!label.isEmpty())
+  {
+    this->updateCurrentMaterial(label.toStdString());
+    this->Internals->setMaterialName(label.toStdString().c_str());
+  }
 }
 
 //-----------------------------------------------------------------------------

@@ -106,7 +106,7 @@ endif ()
 
 target_compile_definitions(paraview
   PRIVATE
-    "PARAVIEW_USE_MATERIALEDITOR=$<BOOL:${PARAVIEW_USE_MATERIALEDITOR}>")
+    "PARAVIEW_USE_MATERIALEDITOR=$<BOOL:${paraview_use_materialeditor}>")
 
 if (PARAVIEW_INSTALL_DEVELOPMENT_FILES)
   export(

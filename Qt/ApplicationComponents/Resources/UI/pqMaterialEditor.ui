@@ -21,6 +21,67 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
+    <widget class="QCheckBox" name="ShowShaderBall">
+     <property name="toolTip">
+      <string>Show / Hide the Shader Ball.</string>
+     </property>
+     <property name="text">
+      <string>Show Shader Ball</string>
+     </property>
+    </widget>
+   </item>
+  <item>
+   <layout class="QHBoxLayout" name="NumberOfSamplesLayout">
+     <item>
+      <widget class="QLabel" name="TypeLabel1">
+       <property name="font">
+        <font>
+         <weight>50</weight>
+        </font>
+       </property>
+       <property name="text">
+        <string>Number of samples per pixels</string>
+       </property>
+       <property name="textFormat">
+        <enum>Qt::AutoText</enum>
+       </property>
+      </widget>
+    </item>
+     <item>
+      <widget class="QSpinBox" name="ShaderBallNumberOfSamples">
+       <property name="toolTip">
+        <string>Set the number of samples for the Shader Ball Scene.</string>
+       </property>
+       <property name="minimum" >
+        <number>1</number>
+       </property>
+       <property name="maximum" >
+        <number>50</number>
+       </property>
+       <property name="value">
+        <number>2</number>
+       </property>
+      </widget>
+     </item>
+   </layout>
+ </item>
+   <item>
+     <widget class="QVTKOpenGLNativeWidget" name="RenderWidget">
+       <property name="sizePolicy">
+         <sizepolicy vsizetype="Expanding" hsizetype="Expanding">
+           <horstretch>0.9</horstretch>
+           <verstretch>0.9</verstretch>
+         </sizepolicy>
+       </property>
+       <property name="minimumSize">
+         <size>
+           <width>300</width>
+           <height>300</height>
+         </size>
+       </property>
+     </widget>
+   </item>
+   <item>
     <layout class="QHBoxLayout" name="MaterialListLayout">
      <property name="spacing">
       <number>2</number>
@@ -243,68 +304,6 @@
       </layout>
      </widget>
     </widget>
-   </item>
-   <item>
-    <widget class="QCheckBox" name="ShowShaderBall">
-     <property name="toolTip">
-      <string>Show / Hide the Shader Ball.</string>
-     </property>
-     <property name="text">
-      <string>Show Shader Ball</string>
-     </property>
-    </widget>
-   </item>
-  <item>
-   <layout class="QHBoxLayout" name="NumberOfSamplesLayout">
-     <item>
-      <widget class="QLabel" name="TypeLabel1">
-       <property name="font">
-        <font>
-         <weight>50</weight>
-         <bold>false</bold>
-        </font>
-       </property>
-       <property name="text">
-        <string>Number of samples per pixels</string>
-       </property>
-       <property name="textFormat">
-        <enum>Qt::AutoText</enum>
-       </property>
-      </widget>
-    </item>
-     <item>
-      <widget class="QSpinBox" name="ShaderBallNumberOfSamples">
-       <property name="toolTip">
-        <string>Set the number of samples for the Shader Ball Scene.</string>
-       </property>
-       <property name="minimum" >
-        <number>1</number>
-       </property>
-       <property name="maximum" >
-        <number>500</number>
-       </property>
-       <property name="value">
-        <number>4</number>
-       </property>
-      </widget>
-     </item>
-   </layout>
- </item>
-   <item>
-     <widget class="QVTKOpenGLNativeWidget" name="RenderWidget">
-       <property name="sizePolicy">
-         <sizepolicy vsizetype="Expanding" hsizetype="Expanding">
-           <horstretch>1</horstretch>
-           <verstretch>1</verstretch>
-         </sizepolicy>
-       </property>
-       <property name="minimumSize">
-         <size>
-           <width>300</width>
-           <height>300</height>
-         </size>
-       </property>
-     </widget>
    </item>
    <item>
     <spacer name="VerticalSpacer">

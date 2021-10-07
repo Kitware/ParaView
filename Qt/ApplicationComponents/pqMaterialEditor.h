@@ -99,7 +99,7 @@ protected Q_SLOTS:
   void removeProperty();
   void removeAllProperties();
 
-  void propertyChanged(const QModelIndex& topLeft, const QModelIndex& botRight);
+  void propertyChanged(const QModelIndex& topLeft, const QModelIndex& bottomRight);
 
 protected:
   /**

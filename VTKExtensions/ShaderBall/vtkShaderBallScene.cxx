@@ -1,34 +1,17 @@
 /*=========================================================================
 
-   Program: ParaView
-   Module: vtkShaderBallScene.cxx
+  Program:   ParaView
+  Module:    vtkShaderBallScene.h
 
-   Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
-   All rights reserved.
+  Copyright (c) Kitware, Inc.
+  All rights reserved.
+  See Copyright.txt or http://www.paraview.org/HTML/Copyright.html for details.
 
-   ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2.
+     This software is distributed WITHOUT ANY WARRANTY; without even
+     the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+     PURPOSE.  See the above copyright notice for more information.
 
-   See License_v1.2.txt for the full ParaView license.
-   A copy of this license can be obtained by contacting
-   Kitware Inc.
-   28 Corporate Drive
-   Clifton Park, NY 12065
-   USA
-
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
-A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE AUTHORS OR
-CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
-EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
-PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
-PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
-LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
-NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
-========================================================================*/
+=========================================================================*/
 
 #include "vtkShaderBallScene.h"
 
@@ -38,6 +21,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkGenericOpenGLRenderWindow.h"
 #include "vtkImageData.h"
 #include "vtkJPEGReader.h"
+#include "vtkNamedColors.h"
 #include "vtkOSPRayPass.h"
 #include "vtkOSPRayRendererNode.h"
 #include "vtkObjectFactory.h"
@@ -152,12 +136,16 @@ vtkShaderBallScene::vtkShaderBallScene()
 {
   this->Renderer->SetRenderWindow(this->Window);
 
-  this->ResetPass();
+  vtkSmartPointer<vtkOSPRayPass> ospp = vtkSmartPointer<vtkOSPRayPass>::New();
+  this->Renderer->SetPass(ospp);
 
-  vtkOSPRayRendererNode::SetSamplesPerPixel(4, this->Renderer);
+  vtkOSPRayRendererNode::SetSamplesPerPixel(2, this->Renderer);
   vtkOSPRayRendererNode::SetRendererType("pathtracer", this->Renderer);
   vtkOSPRayRendererNode::SetRouletteDepth(5, this->Renderer);
   vtkOSPRayRendererNode::SetEnableDenoiser(1, this->Renderer);
+  vtkOSPRayRendererNode::SetBackgroundMode(
+    vtkOSPRayRendererNode::BackgroundMode::Both, this->Renderer);
+  vtkOSPRayRendererNode::SetDenoiserThreshold(2, this->Renderer);
 
   vtkNew<vtkSphereSource> sphere;
   sphere->SetPhiResolution(40);
@@ -182,25 +170,17 @@ vtkShaderBallScene::vtkShaderBallScene()
   this->Renderer->AutomaticLightCreationOff();
 
   this->Window->AddRenderer(this->Renderer);
+
+  this->NeedRender = true;
 }
 
 //-----------------------------------------------------------------------------
 vtkShaderBallScene::~vtkShaderBallScene() = default;
 
 //-----------------------------------------------------------------------------
-void vtkShaderBallScene::Render()
-{
-  if (this->Visible && this->NeedRender)
-  {
-    this->Window->Render();
-    this->NeedRender = false;
-  }
-}
-
-//-----------------------------------------------------------------------------
 void vtkShaderBallScene::SetMaterialName(const char* materialName)
 {
-  if (!materialName || !*materialName)
+  if (!materialName || materialName[0] == '\0')
   {
     return;
   }
@@ -214,23 +194,9 @@ void vtkShaderBallScene::SetMaterialName(const char* materialName)
 }
 
 //-----------------------------------------------------------------------------
-void vtkShaderBallScene::Modified()
+const char* vtkShaderBallScene::GetMaterialName() const
 {
-  this->Superclass::Modified();
-  // This is to ensure that we pass new properties to the sphere
-  this->SphereActor->GetProperty()->Modified();
-  this->NeedRender = true;
-  this->Render();
-}
-
-//-----------------------------------------------------------------------------
-void vtkShaderBallScene::ResetPass()
-{
-  vtkSmartPointer<vtkOSPRayPass> ospp = vtkSmartPointer<vtkOSPRayPass>::New();
-  this->Renderer->SetPass(ospp);
-
-  this->NeedRender = true;
-  this->Render();
+  return this->SphereActor->GetProperty()->GetMaterialName();
 }
 
 //-----------------------------------------------------------------------------
@@ -238,7 +204,14 @@ void vtkShaderBallScene::SetNumberOfSamples(int numberOfSamples)
 {
   vtkOSPRayRendererNode::SetSamplesPerPixel(numberOfSamples, this->Renderer);
   this->NeedRender = true;
-  this->Render();
+}
+
+//-----------------------------------------------------------------------------
+int vtkShaderBallScene::GetNumberOfSamples() const
+{
+  int numberOfSamples;
+  numberOfSamples = vtkOSPRayRendererNode::GetSamplesPerPixel(this->Renderer);
+  return numberOfSamples;
 }
 
 //-----------------------------------------------------------------------------
@@ -249,11 +222,34 @@ void vtkShaderBallScene::SetVisible(bool visible)
     return;
   }
   this->Visible = visible;
-  if (this->Visible)
+}
+
+//-----------------------------------------------------------------------------
+void vtkShaderBallScene::Render()
+{
+  if (this->Visible && this->NeedRender)
   {
-    this->NeedRender = true;
-    this->Render();
+    this->Window->Render();
+    this->NeedRender = false;
   }
+}
+
+//-----------------------------------------------------------------------------
+void vtkShaderBallScene::ResetOSPrayPass()
+{
+  vtkSmartPointer<vtkOSPRayPass> ospp = vtkSmartPointer<vtkOSPRayPass>::New();
+  this->Renderer->SetPass(ospp);
+  this->NeedRender = true;
+}
+
+//-----------------------------------------------------------------------------
+void vtkShaderBallScene::Modified()
+{
+  this->Superclass::Modified();
+  // This is to ensure that we pass new properties to the sphere
+  this->SphereActor->GetProperty()->Modified();
+  this->NeedRender = true;
+  this->Render();
 }
 
 //----------------------------------------------------------------------------

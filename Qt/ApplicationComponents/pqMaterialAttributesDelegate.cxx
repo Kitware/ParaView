@@ -168,10 +168,10 @@ QWidget* pqMaterialAttributesDelegate::createEditor(
     // add current material
     paramsList << index.data(Qt::EditRole).toString();
 
-    pqMaterialEditor* parentEditor = qobject_cast<pqMaterialEditor*>(this->parent());
-    if (parentEditor)
+    pqMaterialEditor* materialEditor = qobject_cast<pqMaterialEditor*>(this->parent());
+    if (materialEditor)
     {
-      for (auto p : parentEditor->availableParameters())
+      for (auto p : materialEditor->availableParameters())
       {
         paramsList << p.c_str();
       }
