@@ -104,17 +104,20 @@ protected:
   static bool WritePoints(write_info& info, vtkPoints* pts, string& error);
 
   static bool WriteFieldArray(write_info& info, const char* solution,
-    CGNS_ENUMT(GridLocation_t) location, vtkDataSetAttributes* dsa, string& error);
+    CGNS_ENUMT(GridLocation_t) location, vtkDataSetAttributes* dsa,
+    map<unsigned char, vector<vtkIdType>>* cellTypeMap, string& error);
 
   static bool WriteStructuredGrid(
     write_info& info, vtkStructuredGrid* sg, const char* zonename, string& error);
   static bool WritePointSet(
     write_info& info, vtkPointSet* grid, const char* zonename, string& error);
   static bool WritePolygonalZone(write_info& info, vtkPointSet* grid, string& error);
-  static bool WriteCells(write_info& info, vtkPointSet* grid, string& error);
+  static bool WriteCells(write_info& info, vtkPointSet* grid,
+    map<unsigned char, vector<vtkIdType>>& cellTypeMap, string& error);
 };
 
-bool vtkCGNSWriter::vtkPrivate::WriteCells(write_info& info, vtkPointSet* grid, string& error)
+bool vtkCGNSWriter::vtkPrivate::WriteCells(write_info& info, vtkPointSet* grid,
+  map<unsigned char, vector<vtkIdType>>& cellTypeMap, string& error)
 {
   if (!grid)
   {
@@ -127,9 +130,6 @@ bool vtkCGNSWriter::vtkPrivate::WriteCells(write_info& info, vtkPointSet* grid, 
     return WritePolygonalZone(info, grid, error);
   }
 
-  // create a mapping of celltype to a list of cells of that type
-  // then, write each cell type into a different section of the zone.
-  map<unsigned char, vector<vtkIdType>> cellTypeMap;
   for (vtkIdType i = 0; i < grid->GetNumberOfCells(); ++i)
   {
     unsigned char cellType = grid->GetCellType(i);
@@ -344,18 +344,19 @@ bool vtkCGNSWriter::vtkPrivate::WritePointSet(
   {
     return false;
   }
-
-  if (!WriteCells(info, grid, error))
+  map<unsigned char, vector<vtkIdType>> cellTypeMap;
+  if (!WriteCells(info, grid, cellTypeMap, error))
   {
     return false;
   }
 
-  if (!WriteFieldArray(info, "PointData", CGNS_ENUMV(Vertex), grid->GetPointData(), error))
+  if (!WriteFieldArray(info, "PointData", CGNS_ENUMV(Vertex), grid->GetPointData(), nullptr, error))
   {
     return false;
   }
 
-  if (!WriteFieldArray(info, "CellData", CGNS_ENUMV(CellCenter), grid->GetCellData(), error))
+  auto ptr = (isPolygonal ? nullptr : &cellTypeMap);
+  if (!WriteFieldArray(info, "CellData", CGNS_ENUMV(CellCenter), grid->GetCellData(), ptr, error))
   {
     return false;
   }
@@ -397,9 +398,37 @@ bool vtkCGNSWriter::vtkPrivate::WritePointSet(vtkPointSet* grid, const char* fil
   cg_check_operation(cg_close(info.F)) return rc;
 }
 
+/*
+ This function assigns the correct order of data elements for cases where
+ multiple element types are written in different sections in a CGNS zone.
+ Because all similar cells are grouped in the CGNS file, this means that
+ the order of the cells is different in the file compared to the data arrays.
+ To compensate for that, the data is reordered to follow the cell order in the file.
+*/
+void ReorderData(vector<double>& temp, map<unsigned char, vector<vtkIdType>>* cellTypeMap)
+{
+  vector<double> reordered(temp.size());
+
+  size_t i(0);
+  for (auto& entry : *cellTypeMap)
+  {
+    const vector<vtkIdType>& cellIdsOfType = entry.second;
+    for (size_t j = 0; j < cellIdsOfType.size(); ++j)
+    {
+      reordered[i++] = temp[cellIdsOfType[j]];
+    }
+  }
+
+  for (i = 0; i < temp.size(); ++i)
+  {
+    temp[i] = reordered[i];
+  }
+}
+
 // writes a field array to a new solution
 bool vtkCGNSWriter::vtkPrivate::WriteFieldArray(write_info& info, const char* solution,
-  CGNS_ENUMT(GridLocation_t) location, vtkDataSetAttributes* dsa, string& error)
+  CGNS_ENUMT(GridLocation_t) location, vtkDataSetAttributes* dsa,
+  map<unsigned char, vector<vtkIdType>>* cellTypeMap, string& error)
 {
   if (!dsa)
   {
@@ -437,6 +466,11 @@ bool vtkCGNSWriter::vtkPrivate::WriteFieldArray(write_info& info, const char* so
               temp.push_back(tpl[idx]);
             }
 
+            if (location == CGNS_ENUMV(CellCenter) && cellTypeMap)
+            {
+              ReorderData(temp, cellTypeMap);
+            }
+
             string fieldComponentName = fieldName + components[idx];
 
             cg_check_operation(cg_field_write(info.F, info.B, info.Z, info.Sol,
@@ -460,6 +494,11 @@ bool vtkCGNSWriter::vtkPrivate::WriteFieldArray(write_info& info, const char* so
         {
           double* tpl = da->GetTuple(t);
           temp.push_back(*tpl);
+        }
+
+        if (location == CGNS_ENUMV(CellCenter) && cellTypeMap)
+        {
+          ReorderData(temp, cellTypeMap);
         }
 
         cg_check_operation(cg_field_write(info.F, info.B, info.Z, info.Sol, CGNS_ENUMV(RealDouble),
@@ -582,12 +621,12 @@ bool vtkCGNSWriter::vtkPrivate::WriteStructuredGrid(
     return false;
   }
 
-  if (!WriteFieldArray(info, "PointData", CGNS_ENUMV(Vertex), sg->GetPointData(), error))
+  if (!WriteFieldArray(info, "PointData", CGNS_ENUMV(Vertex), sg->GetPointData(), nullptr, error))
   {
     return false;
   }
 
-  if (!WriteFieldArray(info, "CellData", CGNS_ENUMV(CellCenter), sg->GetCellData(), error))
+  if (!WriteFieldArray(info, "CellData", CGNS_ENUMV(CellCenter), sg->GetCellData(), nullptr, error))
   {
     return false;
   }
