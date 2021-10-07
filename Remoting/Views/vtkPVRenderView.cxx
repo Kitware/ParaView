@@ -15,8 +15,6 @@
 =========================================================================*/
 #include "vtkPVRenderView.h"
 
-#include "vtkPVConfig.h"
-
 #include "vtk3DWidgetRepresentation.h"
 #include "vtkAbstractMapper.h"
 #include "vtkAlgorithmOutput.h"
@@ -57,6 +55,8 @@
 #include "vtkPVCameraCollection.h"
 #include "vtkPVCenterAxesActor.h"
 #include "vtkPVClientServerSynchronizedRenderers.h"
+#include "vtkPVCompositeRepresentation.h"
+#include "vtkPVConfig.h"
 #include "vtkPVDataRepresentation.h"
 #include "vtkPVGridAxes3DActor.h"
 #include "vtkPVHardwareSelector.h"
@@ -92,14 +92,13 @@
 #include "vtkTextRepresentation.h"
 #include "vtkTexture.h"
 #include "vtkTimerLog.h"
+#include "vtkToneMappingPass.h"
 #include "vtkTrackballPan.h"
 #include "vtkTrivialProducer.h"
+#include "vtkValuePass.h"
 #include "vtkVector.h"
 #include "vtkWeakPointer.h"
 #include "vtkWindowToImageFilter.h"
-
-#include "vtkToneMappingPass.h"
-#include "vtkValuePass.h"
 
 #if VTK_MODULE_ENABLE_ParaView_icet
 #include "vtkIceTSynchronizedRenderers.h"
@@ -1086,6 +1085,45 @@ void vtkPVRenderView::SynchronizeGeometryBounds()
 
   this->UpdateCenterAxes();
   this->ResetCameraClippingRange();
+}
+
+//----------------------------------------------------------------------------
+double* vtkPVRenderView::ComputeVisibleBounds(vtkPVDataRepresentation* pvrepr)
+{
+  // Reset RepresentationVisibleBounds
+  vtkBoundingBox bbox(-1, 1, -1, 1, -1, 1);
+  bbox.GetBounds(this->LastRepresentationVisibleBounds);
+
+  // Get the active representation from composite repr if any
+  auto compRepr = vtkPVCompositeRepresentation::SafeDownCast(pvrepr);
+  if (compRepr)
+  {
+    pvrepr = compRepr->GetActiveRepresentation();
+  }
+
+  // Recover visible bounds
+  if (pvrepr && pvrepr->GetVisibility())
+  {
+    auto deliveryManager =
+      vtkPVRenderViewDataDeliveryManager::SafeDownCast(this->GetDeliveryManager());
+    bbox.Reset();
+    for (int port = 0, num_ports = deliveryManager->GetNumberOfPorts(pvrepr); port < num_ports;
+         ++port)
+    {
+      bbox.AddBox(deliveryManager->GetTransformedGeometryBounds(pvrepr, port));
+    }
+  }
+
+  // Reduce bounds
+  vtkBoundingBox result;
+  this->AllReduce(bbox, result);
+  if (!result.IsValid())
+  {
+    result.SetBounds(-1, 1, -1, 1, -1, 1);
+  }
+
+  result.GetBounds(this->LastRepresentationVisibleBounds);
+  return this->LastRepresentationVisibleBounds;
 }
 
 //----------------------------------------------------------------------------
