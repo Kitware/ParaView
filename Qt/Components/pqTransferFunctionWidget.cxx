@@ -517,6 +517,12 @@ void pqTransferFunctionWidget::editColorAtCurrentControlPoint()
     xrgbms[3] = color.blueF();
     ctf->SetNodeValue(currentIdx, xrgbms);
 
+    // Simulate a MouseButtonReleaseEvent that can get lost when the color
+    // selector is closed. Fixes #20758.
+    vtkContextMouseEvent mouseEvent;
+    mouseEvent.SetButton(vtkContextMouseEvent::LEFT_BUTTON);
+    cpitem->MouseButtonReleaseEvent(mouseEvent);
+
     Q_EMIT this->controlPointsModified();
   }
 }
