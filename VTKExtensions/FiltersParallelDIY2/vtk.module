@@ -1,0 +1,18 @@
+NAME
+  ParaView::VTKExtensionsFiltersParallelDIY2
+LIBRARY_NAME
+  vtkPVVTKExtensionsFiltersParallelDIY2
+GROUPS
+  PARAVIEW_CANONICAL
+KIT
+  ParaView::CoreKit
+DEPENDS
+  VTK::CommonCore
+  VTK::CommonDataModel
+  VTK::CommonExecutionModel
+  VTK::FiltersGeneral
+  VTK::FiltersParallelDIY2
+PRIVATE_DEPENDS
+  VTK::ParallelCore
+TEST_LABELS
+  ParaView

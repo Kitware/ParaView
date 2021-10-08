@@ -123,62 +123,6 @@
       </DoubleVectorProperty>
       <!-- End ProbeLineLegacy -->
     </SourceProxy>
-    <SourceProxy class="vtkLineSource"
-                 label="Line"
-                 name="SimpleLineSource">
-      <Documentation>Proxy to have an interactive widget controlling a line source
-      with a resolution of 1. Used for the PlotLine proxy.</Documentation>
-      <DoubleVectorProperty animateable="1"
-                            command="SetPoint1"
-                            default_values="0.0 0.0 0.0"
-                            name="Point1"
-                            number_of_elements="3"
-                            panel_visibility="default">
-        <BoundsDomain default_mode="min"
-                      mode="normal"
-                      name="range">
-          <RequiredProperties>
-            <Property function="Input"
-                      name="DummyInput" />
-          </RequiredProperties>
-        </BoundsDomain>
-      </DoubleVectorProperty>
-      <DoubleVectorProperty animateable="1"
-                            command="SetPoint2"
-                            default_values="0.0 0.0 0.0"
-                            name="Point2"
-                            number_of_elements="3"
-                            panel_visibility="default">
-        <BoundsDomain default_mode="max"
-                      mode="normal"
-                      name="range">
-          <RequiredProperties>
-            <Property function="Input"
-                      name="DummyInput" />
-          </RequiredProperties>
-        </BoundsDomain>
-      </DoubleVectorProperty>
-      <IntVectorProperty command="SetResolution"
-                         default_values="1"
-                         name="Resolution"
-                         number_of_elements="1"
-                         panel_visibility="never">
-        <IntRangeDomain min="1"
-                        name="range" />
-      </IntVectorProperty>
-      <InputProperty is_internal="1" name="DummyInput" />
-      <PropertyGroup label="Line Parameters" panel_widget="InteractiveLine">
-          <!-- Necessary to have the interactive widget rendered -->
-          <Property function="Point1WorldPosition" name="Point1" />
-          <Property function="Point2WorldPosition" name="Point2" />
-          <Property function="Input" name="DummyInput" />
-      </PropertyGroup>
-      <Hints>
-        <ProxyList>
-          <Link name="DummyInput" with_property="Input" />
-        </ProxyList>
-      </Hints>
-    </SourceProxy>
     <Proxy name="ProbeLineGenericProxy">
       <InputProperty command="SetInputConnection"
                      name="Input">
@@ -206,6 +150,11 @@
           <Entry text="Sample Uniformly"
                  value="2" />
         </EnumerationDomain>
+        <Documentation>
+          "Sample At Cell Boundaries" gives the most accurate plots by creating probing points at the cell borders.
+          "Sample At Segment Centers" provides one sample per probed cell located at the middle of the line intersecting the cell.
+          "Sample Uniformally" samples uniformally along the input line.
+        </Documentation>
       </IntVectorProperty>
       <IntVectorProperty command="SetLineResolution"
                          name="Resolution"
@@ -229,13 +178,13 @@
         <Documentation>When dealing with composite datasets, partial arrays are
         common i.e. data-arrays that are not available in all of the blocks. By
         default, this filter only passes those point and cell data-arrays that
-        are available in all the blocks i.e. partial array are removed. When
+        are available in all the blocks i.e. partial arrays are removed. When
         PassPartialArrays is turned on, this behavior is changed to take a
         union of all arrays present thus partial arrays are passed as well.
         However, for composite dataset input, this filter still produces a
         non-composite output. For all those locations in a block of where a
         particular data array is missing, this filter uses vtkMath::Nan() for
-        double and float arrays, while 0 for all other types of arrays i.e int,
+        double and float arrays, and 0 for all other types of arrays i.e int,
         char etc.</Documentation>
         <BooleanDomain name="bool" />
       </IntVectorProperty>
@@ -245,7 +194,7 @@
                          number_of_elements="1"
                          panel_visibility="advanced">
         <Documentation>
-        When set the input's cell data arrays are shallow copied to the output.
+        When set the input cell data arrays are shallow copied to the output.
         </Documentation>
         <BooleanDomain name="bool" />
       </IntVectorProperty>
@@ -255,7 +204,7 @@
                          number_of_elements="1"
                          panel_visibility="advanced">
         <Documentation>
-        When set the input's point data arrays are shallow copied to the output.
+        When set the input point data arrays are shallow copied to the output.
         </Documentation>
         <BooleanDomain name="bool" />
       </IntVectorProperty>
@@ -266,7 +215,7 @@
                          panel_visibility="advanced">
         <Documentation>
         Set whether to pass the field-data arrays from the Input i.e. the input
-        providing the geometry to the output. On by default.
+        providing the geometry to the output.
         </Documentation>
         <BooleanDomain name="bool" />
       </IntVectorProperty>
@@ -277,7 +226,7 @@
                          panel_visibility="advanced">
         <Documentation>
         Set whether to compute the tolerance or to use a user provided
-        value. On by default.
+        value.
         </Documentation>
         <BooleanDomain name="bool" />
       </IntVectorProperty>
@@ -296,8 +245,14 @@
         <Documentation>Set the tolerance to use for
         vtkDataSet::FindCell</Documentation>
       </DoubleVectorProperty>
+      <Hints>
+        <Visibility replace_input="0" />
+        <View type="XYChartView" also_show_in_current_view="1" />
+        <Plotable />
+      </Hints>
     </Proxy>
   </ProxyGroup>
+
   <ProxyGroup name="filters">
     <!-- ==================================================================== -->
     <SourceProxy class="vtkPartitionBalancer"
@@ -410,8 +365,6 @@
                             name="Tolerance"
                             number_of_elements="1"
                             panel_visibility="advanced">
-        <DoubleRangeDomain min="2.2204460492503131e-16"
-                           name="range" />
         <Hints>
           <PropertyWidgetDecorator type="ShowWidgetDecorator">
             <Property name="ComputeTolerance" function="boolean_invert" />
@@ -427,6 +380,7 @@
       </Hints>
       <!-- End ProbePoint -->
     </SourceProxy>
+
     <!-- ==================================================================== -->
     <CompoundSourceProxy label="Plot Over Line Legacy"
                          name="ProbeLineLegacy">
@@ -483,14 +437,15 @@
                   proxy="AppendArcLength1" />
       <!-- End ProbeLineLegacy -->
     </CompoundSourceProxy>
+
     <!-- ==================================================================== -->
     <SourceProxy class="vtkProbeLineFilter"
                  base_proxygroup="internal_filters"
                  base_proxyname="ProbeLineGenericProxy"
-                 label="Plot Over Custom Lines"
+                 label="Plot Over Lines From Custom Source"
                  name="ProbeCustomLines">
-      <Documentation>The Plot Over Custom Lines filter samples the data set attributes
-      of the input data set at the points along multiple lines given by the source
+      <Documentation>The Plot Over Lines From Custom Source filter samples the dataset
+      attributes of the input data set at the points along multiple lines given by the source
       dataset. The values of the point-centered variables along these lines will be
       displayed in an XY Plot. This filter uses interpolation to determine the values
       at the selected point, whether or not it lies at an input point. This filter
@@ -500,7 +455,7 @@
       per probed cells, and "Sample Uniformally" samples uniformally along the input
       line.</Documentation>
       <InputProperty command="SetSourceConnection"
-                     name="ProbedLines">
+                     name="Source">
         <ProxyGroupDomain name="groups">
           <Group name="sources" />
           <Group name="filters" />
@@ -513,62 +468,19 @@
         the probing lines locations.</Documentation>
       </InputProperty>
       <IntVectorProperty command="SetAggregateAsPolyData"
-                         default_values="1"
+                         default_values="0"
                          name="AggregateAsPolyData"
                          number_of_elements="1"
                          panel_visibility="never">
         <Documentation>
-          Force ouput to be a multiblock when plotting over custom line(s).
+          If false then each result from an input line to probe results in a block in a
+          vtkMultiBlockDataSet. If true then each block is aggregated as a cell in a
+          single dataset and the output type of the filter becomes a vtkPolyData. Should
+          always be false for this filter.
         </Documentation>
       </IntVectorProperty>
-      <Hints>
-        <Visibility replace_input="0" />
-        <View type="XYChartView" also_show_in_current_view="1" />
-        <Plotable />
-      </Hints>
     </SourceProxy>
-    <!-- ==================================================================== -->
-    <SourceProxy class="vtkProbeLineFilter"
-                 base_proxygroup="internal_filters"
-                 base_proxyname="ProbeLineGenericProxy"
-                 label="Plot Over Line"
-                 name="ProbeLine">
-      <Documentation>The Plot Over Custom Lines filter samples the data set attributes
-      of the input data set at the points a given line. The values of the point-centered
-      variables along that line will be displayed in an XY Plot. This filter uses
-      interpolation to determine the values at the selected point, whether or not it
-      lies at an input point. This filter operates on any type of data and produces a
-      polygonal output (a polyline). One can use different sampling patterns with this
-      filter. "Sample At Cell Boundaries" gives the most accurate plots, "Sample At
-      Segment Centers" provides one sample per probed cells, and "Sample Uniformally"
-      samples uniformally along the input line.</Documentation>
-      <InputProperty command="SetSourceConnection"
-                     label="Probe Type"
-                     name="Source"
-                     panel_visibility="default">
-        <ProxyGroupDomain name="groups">
-          <Group name="sources" />
-        </ProxyGroupDomain>
-        <ProxyListDomain name="proxy_list">
-          <Proxy group="internal_filters"
-                 name="SimpleLineSource" />
-        </ProxyListDomain>
-      </InputProperty>
-      <IntVectorProperty command="SetAggregateAsPolyData"
-                         default_values="1"
-                         name="AggregateAsPolyData"
-                         number_of_elements="1"
-                         panel_visibility="never">
-        <Documentation>
-          Force ouput to be a polydata when plotting over a single line.
-        </Documentation>
-      </IntVectorProperty>
-      <Hints>
-        <Visibility replace_input="0" />
-        <View type="XYChartView" also_show_in_current_view="1" />
-        <Plotable />
-      </Hints>
-    </SourceProxy>
+
     <!-- ==================================================================== -->
     <SourceProxy class="vtkPProbeFilter"
                  label="Legacy Resample With Dataset"
