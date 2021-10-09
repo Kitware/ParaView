@@ -91,15 +91,14 @@ The actual information represented by the strings listed above is substituted in
 These sources and filters use the new string formatting method:
 
 * **Annotate Time** - To reference time, use `{time}`. The number formatting syntax from the `{fmt}` library are available to control the precision of the displayed time, e.g., `{time:3.2f}` limits the number of displayed digits after the decimal point to two.
-* **Environment Annotation** - Formatting methods are used internally only - there are no exposed text fields to modify.
+* **Python Calculator** - In addition to using the Python variables ``time_value``, and ``time_index`` in the provided expression, now you may also use ``{timevalue} == {CALCULATOR_timevalue}``, and ``{timeindex} == {CALCULATOR_timeindex}``.
+
 * Views - The view types **Bar Chart View**, **Bar Chart View (Comparative)**, **Box Chart View**, **Histogram View**, **Line Chart View**, **Line Chart View (Comparative)**, **Plot Matrix View**, **Point Chart View** and  **Quartile Chart View** all have `{time}` available in their **Chart Title** properties in addition to the globally available substitutions. The **Bag Chart View (Comparative)** views provided in the `BagPlotViewsAndFilters` plugin also defines a `{variance}` string substitution available for use in the **Chart Title** property.
 * Extract writers - All extract writers listed in the *Extractors* menu have `{time}` (equivalently, `{EXTRACT_time}`) and an additional `{timestep}` (equivalently, `{EXTRACT_timestep}`) substitution that provides the current timestep index. In addition, image extractors have available a `{camera}` (equivalently, `{EXTRACT_camera}`) substitution for encoding camera information in the output **File Name** property.
 
 >![string-formatter](img/5.10.0/string-formatter.png)
 >
 > New substitution string example in an **Annotate Time** filter.
-
-Note: these string substitutions are not available in the **Python Annotation** filter. Access to time information remains unchanged in that filter.
 
 ## Favorite directory customization in file dialog
 
@@ -186,6 +185,10 @@ A new double property, **WindowResizeNonInteractiveRenderDelay**, on view proxie
 
 # Plugin updates
 
+[Topology Toolkit (TTK) filters](https://topology-tool-kit.github.io/) are now available in ParaView by loading the TopologyToolkit plugin. TTK is a collection of filters that help with topological data analysis.
+
+>![ttk-plugin](img/5.10.0/ttk-plugin.png)
+
 ## NVIDIA IndeX plugin improvements
 
 ### Cropping structured grid rendering
@@ -259,9 +262,7 @@ Accordingly, the property **ThresholdBetween** has been removed. Instead, the fo
 
 **Extract Block** filter now supports choosing blocks to extract using selector expressions. This makes the block selection more robust to changes to the input hierarchy than the previous selection implementation, which was based on block indices.
 
->|  |  |
->| ------- | ------- |
->|![extract-block-panel-assembly](img/5.10.0/extract-block-panel-assembly.png)|![extract-block-panel-selectors](img/5.10.0/extract-block-panel-selectors.png)|
+![extract-block](img/5.10.0/extract-block.png)|
 
 
 ## Improvements to Group Datasets filter #
@@ -420,6 +421,8 @@ The following was added to the ParaView Python script editor:
 * Undo/redo capabilities
 * More robust file saving
 
+>![python-editor](img/5.10.0/python-editor.png)
+
 ## Tooltips in *Edit Color Legend* window
 
 Some property widgets in the *Edit Color Legend Window* now have descriptions.
@@ -472,6 +475,8 @@ This editor enables the following:
 * Load a material library using a `.json` file or create materials directly in the GUI
 * Edit / Add / Remove properties on the materials
 * Attach the selected material to the current selected source
+
+>![material-editor](img/5.10.0/material-editor.png)
 
 ## OSPRay Runtime Detection
 
@@ -767,14 +772,3 @@ Loading paths and file names containing non-ASCII characters on Windows is now h
 ## Static builds with kits enabled no longer supported
 
 ParaView no longer allows building kits with static builds. There are issues with *in situ* modules being able to reliably load Python in such configurations. However, the configuration does not make much sense in the first place since the goal of kits is to reduce the number of libraries that need to be loaded at runtime and static builds do not have this problem.
-
-## CGNS module migration
-
-The following modules migrations have occurred:
-
-  - `ParaView::cgns` → `VTK::cgns`
-  - `ParaView::VTKExtensionsCGNSReader` → `VTK::IOCGNSReader`
-
-The cache variables controlling these modules are automatically migrated,
-however, the target names have not been migrated. Consumers may need updates to
-use the new VTK-homed target names.
