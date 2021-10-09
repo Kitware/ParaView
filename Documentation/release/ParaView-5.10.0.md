@@ -128,9 +128,22 @@ The 'RealTime' animation mode is deprecated and will be removed in a future rele
 
 See the [discussion](https://discourse.paraview.org/t/paraview-time-refactoring/5506/6) leading to the decision to remove this animation mode.
 
+## PVSC updates
+
+ParaView server configuration files (PVSC) now support two new predefined
+variables:
+
+1. `PV_APPLICATION_DIR`: This is set to the directory containing the application
+   executable. For macOS app bundles, for example, this will be inside the
+   bundle. This is simply `QCoreApplication::applicationDirPath`.
+2. `PV_APPLICATION_NAME`: This is set to the name of the Qt application as
+   specified during application initialization. This is same as
+   `QCoreApplication::applicationName`.
+
+
 ## Support for 19-node tri-quadratic pyramid cells
 
-ParaView now incorporates the VTK implementation of the 19-node-pyramid (`vtkTriQuadraticPyramid`). This new cell type is included as an option in the **UnstructuredCellTypes** source.
+ParaView now supports a 19-node-pyramid (`vtkTriQuadraticPyramid`) element. This new cell type is included as an option in the **UnstructuredCellTypes** source.
 
 # Rendering enhancements
 
@@ -173,6 +186,49 @@ A new double property, **WindowResizeNonInteractiveRenderDelay**, on view proxie
 
 # Plugin updates
 
+## NVIDIA IndeX plugin improvements
+
+### Cropping structured grid rendering
+
+Structured grids rendered by the "NVIDIA IndeX" representation can now be cropped to a volume of interest (VOI) by checking the "Use Cropping" property. Cropping is controlled by an interactive box widget or through the associated text widgets.
+
+This replaces the custom "NVIDIA IndeX Region of Interest" properties, which however are still in use for unstructured grids. Existing state files that rely on the old properties will continue to work, but a warning will be printed, showing the corresponding settings for the "Cropping Origin" and "Cropping
+Scale" parameters.
+
+### Remote rendering on macOS clients
+
+A limited "remote rendering only" version of the NVIDIA IndeX plugin is now available for macOS, making it possible to connect a macOS ParaView client to a remote `pvserver` running Linux and rendering with NVIDIA IndeX there. The plugin does not support local rendering on macOS and an error will be printed when the user tries to enable the "NVIDIA IndeX" representation locally.
+
+### Additional data type support
+
+32-bit integer data values (signed/unsigned) of structured and unstructured grids will be automatically converted to an internal float representation by the plugin, to enable efficient rendering. This automatic data conversion does not affect the memory utilization.
+
+Multiple components per voxel (e.g. vector or RGB data) are now supported for structured grids. The component to be rendered can be selected with the "Coloring" setting in the "Properties" panel. Rendering the vector magnitude is also supported.
+
+### Settings dialog
+
+Plugin settings can be changed in the new "NVIDIA IndeX" tab of the "Settings" dialog:
+
+* Logging: The minimum required severity level for messages to appear in ParaView's *Output Messages* window as well as on standard output can be set. The current timestamp and the hostname can optionally be added to each log message.
+
+* Performance values: Output statistics about rendering performance to a file or to standard output.
+
+* Session export: Output the state of the NVIDIA IndeX scene to a file or to standard output.
+
+* Network Configuration: Various settings for running on multiple hosts in cluster mode. This covers the same settings as in `nvindex_config.xml`, which still takes precedence if it exists.
+
+* Extra Configuration: Allows setting low-level configuration options, e.g. for performance tuning.
+
+* License keys: An NVIDIA IndeX license (e.g., for enabling cluster mode) can now be entered directly in the UI, as an alternative to using environment variables or `nvindex_config.xml` (both have precedence).
+
+### Stability fixes and usability improvements
+
+Fixed the "Update kernel" button not always updating the rendering after the source code of an XAC shader was modified.
+
+On Windows, the NVIDIA IndeX plugin can now be used to connect to a remote `pvserver` even if no NVIDIA display driver is installed locally.
+
+Fixed an issue that could lead to visible seams on structured grids for certain configurations when rendering in cluster mode on multiple hosts.
+
 ## GmshReader plugin deprecation
 
 The `GmshReader` plugin is deprecated in favor of the `GmshIO` plugin.
@@ -181,7 +237,7 @@ The `GmshReader` plugin is deprecated in favor of the `GmshIO` plugin.
 
 ## **Calculator** filter rewrite
 
-The **Calculator** filter implementation has a completely new backend and has been multhithreaded using VTK's symmetric multiprocessing tools. The implementation uses the [ExprTk](https://github.com/ArashPartow/exprtk) library for expression parsing and evaluation. The new implementation solves several bugs found in the previous calculator implementation, and it offers improved performance as well. Expression syntax is largely unchanged, but the expression for a dot product operation has changed from `A.B` to `dot(A,B)`. The previous implementation will be used for backwards compatibility when loading state files from ParaView 5.9.1 or earlier.
+The **Calculator** filter implementation has a completely new backend and has been multhithreaded using VTK's symmetric multiprocessing tools. The implementation uses the [ExprTk](https://github.com/ArashPartow/exprtk) library for expression parsing and evaluation. The new implementation solves several bugs found in the previous calculator implementation, and it offers improved performance as well. Expression syntax is largely unchanged, but the expression for a dot product operation has changed from `A.B` to `dot(A,B)`. Data arrays with names that include spaces or characters unsupported by the backend can be used as long as they are surrounded by quotation marks. The previous implementation will be used for backwards compatibility when loading state files from ParaView 5.9.1 or earlier.
 
 >![calculator-new](img/5.10.0/calculator-new.png)
 
@@ -199,7 +255,7 @@ Accordingly, the property **ThresholdBetween** has been removed. Instead, the fo
 
 >![threshold-filter-changes](img/5.10.0/threshold-filter-changes.png)
 
-## Changes to Extract Block filter
+## Changes to **Extract Block** filter
 
 **Extract Block** filter now supports choosing blocks to extract using selector expressions. This makes the block selection more robust to changes to the input hierarchy than the previous selection implementation, which was based on block indices.
 
@@ -207,6 +263,26 @@ Accordingly, the property **ThresholdBetween** has been removed. Instead, the fo
 >| ------- | ------- |
 >|![extract-block-panel-assembly](img/5.10.0/extract-block-panel-assembly.png)|![extract-block-panel-selectors](img/5.10.0/extract-block-panel-selectors.png)|
 
+
+## Improvements to Group Datasets filter #
+
+The **Group Datasets** filter now supports multiple types of outputs including `vtkPartitionedDataSetCollection`, `vtkPartitionedDataSet`, and `vtkMultiBlockDataSet`. One can also assign names to inputs which then get assigned as blocked names in the output.
+
+![group-datasets](img/5.10.0/group-datasets.png)
+
+## The filters Gradient and Gradient Of Unstructured DataSet have been merged #
+
+Before ParaView 5.10, these two filters could be used to compute the gradient of a dataset:
+- `Gradient` based on `vtkImageGradient` for `vtkImageData` only
+- `Gradient Of Unstructured DataSet` based on `vtkGradientFilter` for all `vtkDataSet`
+
+These filters have been replaced with a unique `Gradient` filter based on `vtkGradientFilter` and including the functionalities from the former `Gradient` filter. The default behavior always uses the `vtkGradientFilter` implementation.
+
+For `vtkImageData` objects, it is still possible to use the `vtkImageGradient` implementation through the `BoundaryMethod` property, which has two options defining the gradient computation at the boundaries:
+- `Smoothed` corresponds to the `vtkImageGradient` implementation (the old `Gradient`) and uses central differencing for the boundary elements by duplicating their values
+- `Non-Smoothed` corresponds to the `vtkGradientFilter` implementation (the old `Gradient Of Unstructured DataSet`) and simply uses forward/backward differencing for the boundary elements
+
+For all other `vtkDataSet` objects, the filter usage is unchanged.
 
 
 ## **Resample With Dataset** can work with partial arrays
@@ -222,6 +298,7 @@ The **Histogram** filter has been enhanced in several ways:
 * Values from hidden points or cells are no longer included in the histogram results.
 * The data range used for automatic bin range values now excludes hidden points and cells.
 * A new option, **Normalize**, makes the filter produce normalized histogram values for applications where knowing the fraction of values that fall within each bin is desired.
+* The filter has been multithreaded using VTK's SMP tools.
 
 # Grid Connectivity has been removed
 
@@ -255,15 +332,15 @@ The **Rotational Extrusion** filter has a new property named **Rotation Axis** t
 
 ParaView Windows binaries now offer export of H.264-encoded MP4 files. The frame rate and bit rate are both exposed as options.
 
-## Ioss reader for Exodus files
+## IOSS reader for Exodus files
 
-ParaView now uses the Ioss library to read Exodus files. This new reader,`vtkIossReader`, was introduced in 5.9 as a plugin. In this release, ParaView now uses this new reader as the default reader for all Exodus files. The previous reader is still available and can be used in the UI by simply loading the **LegacyExodusReader** plugin. XML state files and Python scripts using the old Exodus reader explicitly will continue to work without any changes.
+ParaView now uses the IOSS library to read Exodus files. This new reader,`vtkIOSSReader`, was introduced in 5.9 as a plugin. In this release, ParaView now uses this new reader as the default reader for all Exodus files. The previous reader is still available and can be used in the UI by simply loading the **LegacyExodusReader** plugin. XML state files and Python scripts using the old Exodus reader explicitly will continue to work without any changes.
 
-The Ioss reader has several advantages over the previous implementation. One of the major advantage is that it uses the modern `vtkPartitionedDataSetCollection` as the output data-type instead of `vtkMultiBlockDataSet`.
+The IOSS reader has several advantages over the previous implementation. One of the major advantage is that it uses the modern `vtkPartitionedDataSetCollection` as the output data-type instead of `vtkMultiBlockDataSet`.
 
-## Ioss reader for CGNS files
+## IOSS reader for CGNS files
 
-In additional to Exodus, Ioss reader now supports reading CGNS files as well. Note, the reader only supports a subset of CGNS files that are generated using the Ioss library and hence may not work for all CGNS files. The CGNS reader is still the preferred way for reading all CGNS files.
+In additional to Exodus, IOSS reader now supports reading CGNS files as well. Note, the reader only supports a subset of CGNS files that are generated using the IOSS library and hence may not work for all CGNS files. The CGNS reader is still the preferred way for reading all CGNS files.
 
 ## Add OpenVDB Writer
 
@@ -275,7 +352,7 @@ ParaView now has a reader for [Open Mining Format](https://omf.readthedocs.io/en
 
 ## NIST SAVG file format reader
 
-A reader for the SAVG file format, developed by the High Performance Computing and Visualization Group at NIST, an ASCII format supporting definition of primitives likes points, lines, and polygons.
+ParaView now includes a reader for the SAVG file format, developed by the High Performance Computing and Visualization Group at the National Institute of Standards and Technology. SAVG is an ASCII format supporting definition of primitives likes points, lines, and polygons.
 
 ## SEP reader enhancements
 
@@ -292,6 +369,34 @@ The **Information Panel** has been redesigned to improve the way information is 
 * All numbers now use locale specific formatting. For example, for US-EN based locale, large number are formatted by placing commas. Memory used is shown in KB, MB, or GB as appropriate.
 
 >![information-panel](img/5.10.0/information-panel.png)
+
+## Color Map Editor improvements
+
+The *Color Map Editor* now has a combo box to quickly apply a preset from the `Default` group without needing to open the *Choose Preset* dialog.
+
+Imported presets can specify a `Groups` field in their `json` definition files to add the preset to one or more groups. For example this preset will be added to the groups `Default`, `CustomGroup1`, and `Linear`:
+
+  ```json
+  [
+    {
+      "ColorSpace" : "RGB",
+      "Groups" : ["Default", "CustomGroup1", "Linear"],
+      "Name" : "X_Ray_Copy_1",
+      "NanColor" :
+      [
+        1,
+        0,
+        0
+      ],
+      "RGBPoints" :
+      [0, 1, 1, 1, 1, 0, 0, 0]
+    }
+  ]
+  ```
+
+  In this case, `CustomGroup1` does not exist beforehand so it will be created on import. If the `Groups` field is absent in the JSON definition, the preset is added to the `Default` and `User` groups. The `DefaultMap` field is no longer used as it is redundant with the new `Groups` field. Additionally, any preset can now be added or removed from the `Default` group.
+
+To aid in viewing the results of applying differet color maps to the visualization, the *Choose Preset* dialog is now non-modal, meaning it can remain open while you interact with ParaView's other user interface elements. Lastly, imported presets are displayed in italics to be able to differentiate them from base presets.
 
 ## Find Data panel
 
@@ -335,7 +440,18 @@ Advanced properties:
 * Draw NaN annotation check box
 * NaN annotation text box
 
-## New buttons ResetCameraClosest and ZoomClosestToData
+## **Window Location** values now have spaces
+
+Options for the **Window Location** property in the *Edit Color Legend Properties* have been made more readable by adding spaces between words. For example, `LowerLeftCorner` has been replaced with `Lower Left Corner`.
+
+## Add Symmetric Multiprocessing (SMP) backend information to the About dialog
+
+Adds the following in the Help -> About dialog:
+
+- The SMPTools backend in use
+- The maximum number of threads available
+
+## New toolbar buttons "Reset Camera Closest" and "Zoom Closest To Data"
 
 Two new buttons "Reset Camera Closest" and "Zoom Closest To Data" has been added to the right of the existing "Reset Camera" and "Zoom To Data" buttons. These buttons reset the camera to maximize the screen occupancy occupation of the whole scene bounding box ("Reset Camera Closest") or of the active source bounding box ("Zoom Closest To Data").
 
@@ -349,7 +465,7 @@ When saving a screenshot to the clipboard, the view now blinks.
 
 ## OSPRay Material Editor
 
-A new OSPRay material editor control panel has been added to control the OSPRay materials by selecting the "Material Editor" item in the "View" menu. The control panel is available when ParaView is compiled with `PARAVIEW_ENABLE_RAYTRACING` CMake option set to `ON` to enable the editor widget.
+A new OSPRay material editor control panel has been added to control the OSPRay materials. This control panel can be accessed by selecting the "Material Editor" item in the "View" menu. The control panel is available when ParaView is compiled with `PARAVIEW_ENABLE_RAYTRACING` CMake option set to `ON` to enable the editor widget.
 
 This editor enables the following:
 
@@ -366,19 +482,6 @@ translation support of `x86_64` binaries on `arm64` hardware.
 ## "ParaView Community Support" item in "Help" menu now links to discourse.paraview.org
 
 The "ParaView Community Support" link in the "Help" menu will send you to the [ParaView Support Discourse[(https://discourse.paraview.org)] page to open a new topic or search for an existing one.
-
-## Node editor plugin
-
-It is now possible to visualize the pipeline as a node graph like other popular software like Blender. This is embedded in the **Node Editor** plugin and can be compiled by activating the `PARAVIEW_PLUGIN_ENABLE_NodeEditor` CMake option when compiling ParaView.
-
-User controls are:
-
-* Select Filters/Views by double-clicking their corresponding node labels (hold Ctrl to select multiple filters).
-* Select output ports by double-clicking their corresponding port labels (hold Ctrl to select multiple output ports).
-* Nodes are collapsed/expanded by right-clicking node labels.
-* Selected output ports are set as the input of another filter by double-clicking the corresponding input port label.
-* To remove all input connections, Ctrl+double-click on an input port.
-* To toggle the visibility of an output port in the current active view, Shift+left-click the corresponding output port (Ctrl+Shift+left-click shows the output port exclusively)
 
 # Python scripting improvements
 
@@ -456,7 +559,6 @@ Many updates to improve the OpenVR plugin support have been made in ParaView 5.1
 >![openvr-desktop-collaboration](img/5.10.0/openvr-desktop-collaboration.png)
 
 * Added a "Show VR View" option to show the VR view of the user when they are in VR. This is like the SteamVR option but is camera stabilized making it a better option for recording and sharing via video conferences.
-* Broke parts of `vtkPVOpenVRHelper` into new classes named `vtkPVOpenVRExporter` and `vtkPVOpenVRWidgets` to break what was a large class into smaller classes and files to make the code a bit cleaner and more compartmentalized.
 * Add Imago Image Support - added support for displaying images strings that are found in a dataset's cell data (optional, off by default).
 * Fix thick crop stepping within collaboration.
 * Update to new SteamVR Input API, which allows you to customize controller mappings for ParaView. Default bindings for VIVE, HP Motion, and Oculus Touch controllers are provided.
@@ -518,26 +620,15 @@ With steering, you are now able to change simulation parameters through the Para
 
 A new **TimeValue** trigger option for triggering output through Catalyst 2.0 has been added which is based on the amount of simulation time that has passed since the last output of the specified extract. This trigger option is more appropriate for simulation codes that have variable timestep lengths.
 
-# Support for Polyhedral elements in Catalyst 2.0
+# Support for Polygonal and Polyhedral elements in Catalyst 2.0
 
-Catalyst Adaptor API V2 now supports polyhedral elements.
-This is done by adding support for polyhedral elements
-in `vtkConduitSource`. A new example, `CxxPolyhedra`, demonstrates
-how to use Conduit Mesh Blueprint to communicate information about
-polyhedral elements.
+Catalyst Adaptor API V2 now supports polygonal and polyhedral elements. This is done by adding support for such elements in `vtkConduitSource`. Two new examples, `CxxPolygonal` and `CxxPolyhedra`, demonstrate how to use Conduit Mesh Blueprint to communicate information about these elements.
 
 ## Added support for empty mesh Blueprint coming from Conduit to Catalyst
 
 Catalyst 2.0 used to fail when the simulation code sent a mesh through Conduit with a full Conduit tree that matches the Mesh Blueprint but without any cells or points. This can happen, for example, with distributed data where some of the dataset may be empty on some ranks. When using `vtkUnstructedGrid`s in Catalyst 2.0 now checks the number of cells in the Conduit tree and returns an empty `vtkUnstructuredGrid` when needed.
 
 [More](https://gitlab.kitware.com/paraview/paraview/-/issues/20833)
-
-## Polygonal cell support in Conduit source
-
-The goal of this merge is to add support for polygonal cells in the vtkConduitSource to allow for passing of cells of shape polygonal from a Conduit tree to VTK.
-
-[More](https://gitlab.kitware.com/paraview/paraview/-/issues/20828)
-
 
 # Cinema
 
@@ -558,7 +649,21 @@ For composite datasets, `vtkPVDataInformation` now gathers information about all
 
 `vtkPVTemporalDataInformation` is now simply a subclass of `vtkPVDataInformation`. This is possible since `vtkPVDataInformation` no longer includes `vtkPVCompositeDataInformation`.
 
-## Example plugin for paraview_plugin_add_proxy
+## `ProxyListDomain` support default for group
+
+A proxy list domain containing a group can define a proxy from that group to use as the default. As an example, the following says to use the **SphereSource** as the default proxy for the property to which this `ProxyListDomain` is assigned.
+
+```
+    <ProxyListDomain name="proxy_list">
+      <Group name="sources" default="SphereSource" />
+    </ProxyListDomain>
+```
+
+Previously, the default proxy was alphabetically the first in the group.
+
+Most filters using `ProxyListDomain` have been converted to use group and default in order for it to be easier to add a new proxy to a proxy list domain through plugins.
+
+## Example plugin for `paraview_plugin_add_proxy`
 
 A new example plugin **AddPQProxy** has been added to demonstrate how to use the `paraview_plugin_add_proxy` CMake macros (`add_pqproxy` before ParaView 5.7.0).
 
