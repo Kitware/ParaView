@@ -90,7 +90,7 @@ responsible for pushing and popping the scope.
 Argument | Type | Description
 ---------|------|---------------------------------------------------------
 `{CALCULATOR_timevalue}` | double | The time-value of the information. Extracted from vtkDataObject::DATA_TIME_STEP().
-`{timestep}` | double | The time-value of the information. Extracted from vtkDataObject::DATA_TIME_STEP().
+`{timevalue}` | double | The time-value of the information. Extracted from vtkDataObject::DATA_TIME_STEP().
 `{CALCULATOR_timeindex}` | int | The index of the time-steps element which is equal to time-value. time-steps are extracted from vtkStreamingDemandDrivenPipeline::TIME_STEPS().
 `{timeindex}` | int | The index of the time-steps element which is equal to time-value. time-steps are extracted from vtkStreamingDemandDrivenPipeline::TIME_STEPS().
 
