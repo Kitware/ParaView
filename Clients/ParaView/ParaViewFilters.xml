@@ -187,6 +187,7 @@
   <Proxy group="filters" name="CleanUnstructuredGridCells" />
   <Proxy group="filters" name="Clip" icon=":/pqWidgets/Icons/pqClip.svg" />
   <Proxy group="filters" name="ClipClosedSurface" />
+  <Proxy group="filters" name="ComputeConnectedSurfaceProperties" />
   <Proxy group="filters" name="ComputeMoleculeBonds" />
   <Proxy group="filters" name="ComputeMoments" />
   <Proxy group="filters" name="ComputeQuartiles" icon=":/pqWidgets/Icons/pqBoxChart16.png" />
