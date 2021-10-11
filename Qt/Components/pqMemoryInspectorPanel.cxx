@@ -24,6 +24,7 @@ using Ui::pqMemoryInspectorPanelForm;
 
 #include "pqActiveObjects.h"
 #include "pqApplicationCore.h"
+#include "pqCoreUtilities.h"
 #include "pqRenderView.h"
 #include "pqServerManagerModel.h"
 #include "pqView.h"
@@ -175,26 +176,10 @@ void setMemoryUseWidgetColor(QPalette& palette, float fracUsed, float fracWarn, 
 
   if (fracUsed > fracCrit)
   {
-    // danger -> red
-    // palette.setColor(QPalette::Highlight,QColor(232,40,40)); // bright
-    // palette.setColor(QPalette::Highlight,QColor(190,60,60)); // moderate
-    // palette.setColor(QPalette::Highlight,QColor(147,57,57)); // moderate balanced
-    palette.setColor(QPalette::Highlight, QColor(217, 84, 84)); // cdash red
+    pqCoreUtilities::setPaletteHighlightToCritical(palette);
   }
-  /*
-  else
-  if (fracUsed>fracWarn)
-    {
-    //palette.setColor(QPalette::Highlight,QColor(219,219,80)); // moderate
-    palette.setColor(QPalette::Highlight,QColor(252,168,84));   // cdash yellow
-    }
-  */
   else
   {
-    // ok -> green
-    // palette.setColor(QPalette::Highlight,QColor(66,232,20)); // bright
-    // palette.setColor(QPalette::Highlight,QColor(90,160,70)); // moderate
-    // palette.setColor(QPalette::Highlight,QColor(125,176,74));// cdash yellow
     palette.setColor(QPalette::Highlight, Qt::darkGray);
   }
 }
@@ -206,44 +191,6 @@ void setWidgetContainerColor(QPalette& palette, int rank)
   {
     palette.setColor(QPalette::Base, palette.alternateBase().color());
   }
-}
-
-// ****************************************************************************
-QString translateUnits(float memUse)
-{
-  QString fmt("%1 %2");
-
-  float p210 = pow(2.0, 10.0);
-  float p220 = pow(2.0, 20.0);
-  float p230 = pow(2.0, 30.0);
-  float p240 = pow(2.0, 40.0);
-  float p250 = pow(2.0, 50.0);
-
-  // were dealing with kiB
-  memUse *= 1024;
-
-  if (memUse < p210)
-  {
-    return fmt.arg(memUse, 0, 'f', 2).arg("B");
-  }
-  else if (memUse < p220)
-  {
-    return fmt.arg(memUse / p210, 0, 'f', 2).arg("KiB");
-  }
-  else if (memUse < p230)
-  {
-    return fmt.arg(memUse / p220, 0, 'f', 2).arg("MiB");
-  }
-  else if (memUse < p240)
-  {
-    return fmt.arg(memUse / p230, 0, 'f', 2).arg("GiB");
-  }
-  else if (memUse < p250)
-  {
-    return fmt.arg(memUse / p240, 0, 'f', 2).arg("TiB");
-  }
-
-  return fmt.arg(memUse / p250, 0, 'f', 2).arg("PiB");
 }
 
 // ****************************************************************************
@@ -352,8 +299,9 @@ void RankData::UpdateMemoryUseWidget()
   int progVal = (int)(fracUsed * MIP_PROGBAR_MAX);
 
   this->MemoryUseWidget->setValue(progVal);
-  this->MemoryUseWidget->setFormat(
-    QString("%1 %2%").arg(::translateUnits(used)).arg(percUsed, 0, 'f', 2));
+  this->MemoryUseWidget->setFormat(QString("%1 %2%")
+                                     .arg(pqCoreUtilities::formatMemoryFromKiBValue(used))
+                                     .arg(percUsed, 0, 'f', 2));
 
   QPalette palette(this->MemoryUseWidget->palette());
   ::setMemoryUseWidgetColor(
@@ -651,7 +599,9 @@ void HostData::UpdateMemoryUseWidget(
   int progVal = (int)(fracUsed * MIP_PROGBAR_MAX);
 
   loadWidget->setValue(progVal);
-  loadWidget->setFormat(QString("%1 %2%").arg(::translateUnits(used)).arg(percUsed, 0, 'f', 2));
+  loadWidget->setFormat(QString("%1 %2%")
+                          .arg(pqCoreUtilities::formatMemoryFromKiBValue(used))
+                          .arg(percUsed, 0, 'f', 2));
 
   QPalette palette(loadWidget->palette());
   ::setMemoryUseWidgetColor(palette, fracUsed, warnFrac, critFrac);

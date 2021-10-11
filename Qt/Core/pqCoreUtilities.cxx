@@ -51,6 +51,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtksys/SystemTools.hxx"
 
 #include <cassert>
+#include <cmath>
 #include <cstdlib>
 #include <sstream>
 
@@ -315,6 +316,44 @@ QString pqCoreUtilities::number(double value)
 }
 
 //-----------------------------------------------------------------------------
+QString pqCoreUtilities::formatMemoryFromKiBValue(double memoryInKiB, int precision)
+{
+  QString fmt("%1 %2");
+
+  double const p210 = std::pow(2.0, 10.0);
+  double const p220 = std::pow(2.0, 20.0);
+  double const p230 = std::pow(2.0, 30.0);
+  double const p240 = std::pow(2.0, 40.0);
+  double const p250 = std::pow(2.0, 50.0);
+
+  // were dealing with kiB
+  memoryInKiB *= 1024;
+
+  if (memoryInKiB < p210)
+  {
+    return fmt.arg(memoryInKiB, 0, 'f', precision).arg("B");
+  }
+  else if (memoryInKiB < p220)
+  {
+    return fmt.arg(memoryInKiB / p210, 0, 'f', precision).arg("KiB");
+  }
+  else if (memoryInKiB < p230)
+  {
+    return fmt.arg(memoryInKiB / p220, 0, 'f', precision).arg("MiB");
+  }
+  else if (memoryInKiB < p240)
+  {
+    return fmt.arg(memoryInKiB / p230, 0, 'f', precision).arg("GiB");
+  }
+  else if (memoryInKiB < p250)
+  {
+    return fmt.arg(memoryInKiB / p240, 0, 'f', precision).arg("TiB");
+  }
+
+  return fmt.arg(memoryInKiB / p250, 0, 'f', precision).arg("PiB");
+}
+
+//-----------------------------------------------------------------------------
 void pqCoreUtilities::initializeClickMeButton(QAbstractButton* button)
 {
   if (button)
@@ -324,4 +363,31 @@ void pqCoreUtilities::initializeClickMeButton(QAbstractButton* button)
     applyPalette.setColor(QPalette::Inactive, QPalette::Button, QColor(161, 213, 135));
     button->setPalette(applyPalette);
   }
+}
+
+//-----------------------------------------------------------------------------
+void pqCoreUtilities::setPaletteHighlightToOk(QPalette& palette)
+{
+  // CDash green
+  auto okGreen = QColor::fromRgb(184, 220, 179);
+  palette.setColor(QPalette::Highlight, okGreen);
+  palette.setColor(QPalette::HighlightedText, Qt::black);
+}
+
+//-----------------------------------------------------------------------------
+void pqCoreUtilities::setPaletteHighlightToWarning(QPalette& palette)
+{
+  // CDash yellow
+  auto warningOrange = QColor::fromRgb(236, 144, 31);
+  palette.setColor(QPalette::Highlight, warningOrange);
+  palette.setColor(QPalette::HighlightedText, Qt::white);
+}
+
+//-----------------------------------------------------------------------------
+void pqCoreUtilities::setPaletteHighlightToCritical(QPalette& palette)
+{
+  // CDash red
+  auto criticalRed = QColor::fromRgb(217, 84, 84);
+  palette.setColor(QPalette::Highlight, criticalRed);
+  palette.setColor(QPalette::HighlightedText, Qt::white);
 }

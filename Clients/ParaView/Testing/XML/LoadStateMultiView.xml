@@ -7,14 +7,14 @@
   <pqevent object="pqClientMainWindow/variableToolbar/displayColor/Variables" command="set_string" arguments="Normals" />
   <pqevent object="pqClientMainWindow/variableToolbar/displayColor/Components" command="set_string" arguments="X" />
   <pqevent object="pqClientMainWindow/variableToolbar/actionScalarBarVisibility" command="set_boolean" arguments="false" />
-  <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.0/SplitHorizontal" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.0/SplitVertical" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.2/CentralWidgetFrame/EmptyView/scrollArea/qt_scrollarea_viewport/widgetFoo/ConvertActionsFrame/XYChartView" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.1/SplitHorizontal" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.4/CentralWidgetFrame/EmptyView/scrollArea/qt_scrollarea_viewport/widgetFoo/ConvertActionsFrame/RenderView" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuSources" />
   <pqevent object="pqClientMainWindow/menubar/menuSources/Alphabetical" command="activate" arguments="RTAnalyticSource" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/cameraToolbar/actionResetCamera" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.2/SplitVertical" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.1/SplitVertical" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.4/CentralWidgetFrame/EmptyView/scrollArea/qt_scrollarea_viewport/widgetFoo/ConvertActionsFrame/XYBarChartView" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.2/SplitHorizontal" command="activate" arguments="" />
 
   <!-- save state file -->
   <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menu_File" />
@@ -38,8 +38,8 @@
 
   <!-- save all views -->
   <pqevent object="pqClientMainWindow/SaveScreenshotDialog/scrollArea/qt_scrollarea_viewport/Container/ProxyWidget/SaveAllViews/CheckBox" command="set_boolean" arguments="true" />
-  <pqevent object="pqClientMainWindow/SaveScreenshotDialog/scrollArea/qt_scrollarea_viewport/Container/ProxyWidget/ImageResolution/width" command="set_string" arguments="500" />
-  <pqevent object="pqClientMainWindow/SaveScreenshotDialog/scrollArea/qt_scrollarea_viewport/Container/ProxyWidget/ImageResolution/height" command="set_string" arguments="500" />
+  <pqevent object="pqClientMainWindow/SaveScreenshotDialog/scrollArea/qt_scrollarea_viewport/Container/ProxyWidget/ImageResolution/width" command="set_string" arguments="300" />
+  <pqevent object="pqClientMainWindow/SaveScreenshotDialog/scrollArea/qt_scrollarea_viewport/Container/ProxyWidget/ImageResolution/height" command="set_string" arguments="300" />
   <!-- add a 3 pixel multi-view border in red -->
   <pqevent object="pqClientMainWindow/SaveScreenshotDialog/scrollArea/qt_scrollarea_viewport/Container/ProxyWidget/SeparatorWidth/IntRangeWidget/LineEdit" command="set_string" arguments="3" />
   <pqevent object="pqClientMainWindow/SaveScreenshotDialog/scrollArea/qt_scrollarea_viewport/Container/ProxyWidget/SeparatorColor/ColorButton" command="setChosenColor" arguments="170,0,0" />

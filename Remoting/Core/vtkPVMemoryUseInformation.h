@@ -58,10 +58,10 @@ public:
    * access the managed information.
    */
   size_t GetSize() { return this->MemInfos.size(); }
-  int GetProcessType(int i) { return this->MemInfos[i].ProcessType; }
-  int GetRank(int i) { return this->MemInfos[i].Rank; }
-  long long GetProcMemoryUse(int i) { return this->MemInfos[i].ProcMemUse; }
-  long long GetHostMemoryUse(int i) { return this->MemInfos[i].HostMemUse; }
+  int GetProcessType(size_t i) { return this->MemInfos[i].ProcessType; }
+  int GetRank(size_t i) { return this->MemInfos[i].Rank; }
+  long long GetProcMemoryUse(size_t i) { return this->MemInfos[i].ProcMemUse; }
+  long long GetHostMemoryUse(size_t i) { return this->MemInfos[i].HostMemUse; }
 
 protected:
   vtkPVMemoryUseInformation();
