@@ -37,6 +37,7 @@
 
 class vtkClientServerInterpreter;
 class vtkMultiProcessController;
+class vtkPartitionedDataSet;
 
 class VTKPVVTKEXTENSIONSIOCORE_EXPORT vtkParallelSerialWriter : public vtkDataObjectAlgorithm
 {
@@ -215,7 +216,7 @@ private:
   vtkParallelSerialWriter(const vtkParallelSerialWriter&) = delete;
   void operator=(const vtkParallelSerialWriter&) = delete;
 
-  void WriteATimestep(vtkDataObject* input);
+  void WriteATimestep(const std::string& fname, vtkPartitionedDataSet* input);
   void WriteAFile(const std::string& fname, vtkDataObject* input);
 
   void SetWriterFileName(const char* fname);

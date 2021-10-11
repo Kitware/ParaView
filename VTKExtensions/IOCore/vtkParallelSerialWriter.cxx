@@ -19,21 +19,30 @@
 #include "vtkClientServerStream.h"
 #include "vtkCompositeDataIterator.h"
 #include "vtkCompositeDataSet.h"
+#include "vtkConvertToPartitionedDataSetCollection.h"
 #include "vtkDataSet.h"
 #include "vtkFileSeriesWriter.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
 #include "vtkMultiProcessController.h"
+#include "vtkNew.h"
 #include "vtkObjectFactory.h"
+#include "vtkPartitionedDataSet.h"
+#include "vtkPartitionedDataSetCollection.h"
 #include "vtkReductionFilter.h"
 #include "vtkSmartPointer.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
 
 #include <algorithm>
 #include <cassert>
-#include <sstream>
+#include <cmath>
 #include <string>
 #include <vtksys/SystemTools.hxx>
+
+// clang-format off
+#include <vtk_fmt.h> // needed for `fmt`
+#include VTK_FMT(fmt/core.h)
+// clang-format on
 
 namespace
 {
@@ -224,9 +233,42 @@ int vtkParallelSerialWriter::RequestData(vtkInformation* request,
       this->Controller->PartitionController(this->SubControllerColor, myid));
   }
 
-  vtkInformation* inInfo = inputVector[0]->GetInformationObject(0);
-  vtkDataObject* input = inInfo->Get(vtkDataObject::DATA_OBJECT());
-  this->WriteATimestep(input);
+  auto inputDO = vtkDataObject::GetData(inputVector[0], 0);
+
+  // PartitionedDataSet (PD)/PartitionedDataSetCollection (PDC) make it much easier
+  // to deal with blocks and partitions esp. in distributed environments.
+  if (vtkCompositeDataSet::SafeDownCast(inputDO) != nullptr &&
+    vtkPartitionedDataSet::SafeDownCast(inputDO) == nullptr)
+  {
+    vtkNew<vtkConvertToPartitionedDataSetCollection> converter;
+    converter->SetInputDataObject(inputDO);
+    converter->Update();
+
+    const std::string path = vtksys::SystemTools::GetFilenamePath(this->FileName);
+    const std::string fnameNoExt =
+      vtksys::SystemTools::GetFilenameWithoutLastExtension(this->FileName);
+    const std::string ext = vtksys::SystemTools::GetFilenameLastExtension(this->FileName);
+
+    auto pdc = converter->GetOutput();
+    const auto numBlocks = pdc->GetNumberOfPartitionedDataSets();
+    const int precision = numBlocks > 0 ? static_cast<int>(std::log10(numBlocks)) + 1 : 1;
+
+    for (unsigned int cc = 0, max = pdc->GetNumberOfPartitionedDataSets(); cc < max; ++cc)
+    {
+      // Create filename for the block.
+      auto fname = fmt::format("{0}/{1}{2:{3}}{4}", path, fnameNoExt, cc, precision, ext);
+      this->WriteATimestep(fname, pdc->GetPartitionedDataSet(cc));
+    }
+  }
+  else
+  {
+    vtkNew<vtkConvertToPartitionedDataSetCollection> converter;
+    converter->SetInputDataObject(inputDO);
+    converter->Update();
+    auto pdc = converter->GetOutput();
+    assert(pdc->GetNumberOfPartitionedDataSets() == 1);
+    this->WriteATimestep(this->FileName, pdc->GetPartitionedDataSet(0));
+  }
 
   if (write_all)
   {
@@ -240,91 +282,109 @@ int vtkParallelSerialWriter::RequestData(vtkInformation* request,
   }
 
   this->SubController = nullptr;
+
+  // A barrier at end to just sync up. This just makes it easier to write tests
+  // etc.
+  this->Controller->Barrier();
   return 1;
 }
 
 //----------------------------------------------------------------------------
-void vtkParallelSerialWriter::WriteATimestep(vtkDataObject* input)
+void vtkParallelSerialWriter::WriteATimestep(const std::string& fname, vtkPartitionedDataSet* input)
 {
-  vtkCompositeDataSet* cds = vtkCompositeDataSet::SafeDownCast(input);
-  if (cds)
+  assert(input != nullptr);
+
+  auto inputDO = vtk::MakeSmartPointer(vtkDataObject::SafeDownCast(input));
+  auto controller = this->SubController ? this->SubController.GetPointer() : this->Controller;
+
+  if (this->PreGatherHelper)
   {
-    vtkSmartPointer<vtkCompositeDataIterator> iter;
-    iter.TakeReference(cds->NewIterator());
-    iter->SetSkipEmptyNodes(0);
-    int idx;
-    for (idx = 0, iter->InitTraversal(); !iter->IsDoneWithTraversal(); iter->GoToNextItem(), idx++)
+    this->PreGatherHelper->SetInputDataObject(inputDO);
+    this->PreGatherHelper->Update();
+    inputDO = this->PreGatherHelper->GetOutputDataObject(0);
+    this->PreGatherHelper->RemoveAllInputConnections(0);
+  }
+
+  // gather data to "root"; note this can be the root of the subcontroller.
+  std::vector<vtkSmartPointer<vtkDataObject>> gatheredDataSets;
+  controller->Gather(inputDO, gatheredDataSets, 0);
+  if (controller->GetLocalProcessId() != 0)
+  {
+    // done.
+    return;
+  }
+  assert(!gatheredDataSets.empty());
+
+  // flatten the datasets.
+  std::vector<vtkSmartPointer<vtkDataObject>> allDataSets;
+  for (auto& dobj : gatheredDataSets)
+  {
+    const auto pieces = vtkCompositeDataSet::GetDataSets<vtkDataObject>(dobj);
+    allDataSets.insert(allDataSets.end(), pieces.begin(), pieces.end());
+  }
+  gatheredDataSets.clear();
+
+  // purge empty datasets from allDataSets.
+  allDataSets.erase(std::remove_if(allDataSets.begin(), allDataSets.end(),
+                      [](vtkDataObject* dobj) { return vtkIsEmpty(dobj); }),
+    allDataSets.end());
+  if (allDataSets.empty())
+  {
+    return;
+  }
+
+  if (this->PostGatherHelper)
+  {
+    for (auto piece : allDataSets)
     {
-      vtkDataObject* curObj = iter->GetCurrentDataObject();
-      std::string path = vtksys::SystemTools::GetFilenamePath(this->FileName);
-      std::string fnamenoext = vtksys::SystemTools::GetFilenameWithoutLastExtension(this->FileName);
-      std::string ext = vtksys::SystemTools::GetFilenameLastExtension(this->FileName);
-      std::ostringstream fname;
-      fname << path << "/" << fnamenoext << idx << ext;
-      this->WriteAFile(fname.str(), curObj);
+      this->PostGatherHelper->AddInputDataObject(piece);
     }
+    this->PostGatherHelper->Update();
+    inputDO = this->PostGatherHelper->GetOutputDataObject(0);
+    this->PostGatherHelper->RemoveAllInputConnections(0);
   }
-  else if (input)
+  else if (allDataSets.size() > 1)
   {
-    vtkSmartPointer<vtkDataObject> inputCopy;
-    inputCopy.TakeReference(input->NewInstance());
-    inputCopy->ShallowCopy(input);
-    this->WriteAFile(this->FileName, inputCopy);
+    vtkErrorMacro("PostGatherHelper was not specified. Unclear how to 'merge' partitions."
+                  "Only 1st partition will be written out");
+    inputDO = allDataSets.front();
   }
+  else
+  {
+    inputDO = allDataSets.front();
+  }
+
+  // release memory.
+  allDataSets.clear();
+  this->WriteAFile(fname, inputDO);
 }
 
 //----------------------------------------------------------------------------
 void vtkParallelSerialWriter::WriteAFile(const std::string& filename_arg, vtkDataObject* input)
 {
-  auto controller = this->SubController ? this->SubController.GetPointer() : this->Controller;
-
-  const auto filename = this->GetPartitionFileName(filename_arg);
-
-  vtkSmartPointer<vtkReductionFilter> reductionFilter = vtkSmartPointer<vtkReductionFilter>::New();
-  reductionFilter->SetController(controller);
-  reductionFilter->SetPreGatherHelper(this->PreGatherHelper);
-  reductionFilter->SetPostGatherHelper(this->PostGatherHelper);
-  reductionFilter->SetInputDataObject(input);
-  reductionFilter->UpdateInformation();
-  vtkInformation* outInfo = reductionFilter->GetExecutive()->GetOutputInformation(0);
-  outInfo->Set(vtkStreamingDemandDrivenPipeline::UPDATE_PIECE_NUMBER(), this->Piece);
-  outInfo->Set(vtkStreamingDemandDrivenPipeline::UPDATE_NUMBER_OF_PIECES(), this->NumberOfPieces);
-  outInfo->Set(vtkStreamingDemandDrivenPipeline::UPDATE_NUMBER_OF_GHOST_LEVELS(), this->GhostLevel);
-  reductionFilter->Update();
-
-  if (controller->GetLocalProcessId() == 0)
+  std::string filename = this->GetPartitionFileName(filename_arg);
+  if (this->WriteAllTimeSteps)
   {
-    vtkDataObject* output = reductionFilter->GetOutputDataObject(0);
-    if (vtkIsEmpty(output) == false)
+    std::string path = vtksys::SystemTools::GetFilenamePath(filename);
+    std::string fnamenoext = vtksys::SystemTools::GetFilenameWithoutLastExtension(filename);
+    std::string ext = vtksys::SystemTools::GetFilenameLastExtension(filename);
+    if (this->FileNameSuffix && vtkFileSeriesWriter::SuffixValidation(this->FileNameSuffix))
     {
-      std::ostringstream fname;
-      if (this->WriteAllTimeSteps)
-      {
-        std::string path = vtksys::SystemTools::GetFilenamePath(filename);
-        std::string fnamenoext = vtksys::SystemTools::GetFilenameWithoutLastExtension(filename);
-        std::string ext = vtksys::SystemTools::GetFilenameLastExtension(filename);
-        if (this->FileNameSuffix && vtkFileSeriesWriter::SuffixValidation(this->FileNameSuffix))
-        {
-          // Print this->CurrentTimeIndex to a string using this->FileNameSuffix as format
-          char suffix[100];
-          snprintf(suffix, 100, this->FileNameSuffix, this->CurrentTimeIndex);
-          fname << path << "/" << fnamenoext << suffix << ext;
-        }
-        else
-        {
-          fname << path << "/" << fnamenoext << "." << this->CurrentTimeIndex << ext;
-        }
-      }
-      else
-      {
-        fname << filename;
-      }
-      this->Writer->SetInputDataObject(output);
-      this->SetWriterFileName(fname.str().c_str());
-      this->WriteInternal();
-      this->Writer->SetInputConnection(nullptr);
+      // Print this->CurrentTimeIndex to a string using this->FileNameSuffix as format
+      char suffix[100];
+      snprintf(suffix, 100, this->FileNameSuffix, this->CurrentTimeIndex);
+      filename = fmt::format("{0}/{1}{2}{3}", path, fnamenoext, suffix, ext);
+    }
+    else
+    {
+      filename = fmt::format("{0}/{1}.{2}{3}", path, fnamenoext, this->CurrentTimeIndex, ext);
     }
   }
+
+  this->Writer->SetInputDataObject(input);
+  this->SetWriterFileName(filename.c_str());
+  this->WriteInternal();
+  this->Writer->RemoveAllInputConnections(0);
 }
 
 //----------------------------------------------------------------------------

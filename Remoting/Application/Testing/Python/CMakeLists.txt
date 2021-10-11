@@ -100,6 +100,7 @@ set(PVBATCH_TESTS
   MultiView.py
   ParallelImageWriter.py,NO_VALID
   ParallelSerialWriter.py
+  ParallelSerialWriterWithIOSS.py
   PotentialMismatchedDataDelivery.py,NO_VALID
   SaveScreenshot.py,NO_VALID
   Simple.py

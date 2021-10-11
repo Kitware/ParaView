@@ -15,6 +15,8 @@ PRIVATE_DEPENDS
   ParaView::VTKExtensionsCore
   ParaView::VTKExtensionsMisc
   VTK::CommonMisc
+  VTK::FiltersCore
+  VTK::fmt
   VTK::IOLegacy
   VTK::IOParallelXML
   VTK::jsoncpp
