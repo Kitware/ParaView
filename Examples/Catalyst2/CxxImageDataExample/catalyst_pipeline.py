@@ -11,7 +11,13 @@ print("===================================")
 
 # registrationName must match the channel name used in the
 # 'CatalystAdaptor'.
-producer = TrivialProducer(registrationName="grid")
+producer = TrivialProducer(registrationName="${args.channel-name}")
+
+
+# this is only for testing purposes. never directly import `catalyst.detail`
+from paraview.catalyst.detail import IsInsituInput, _transform_registration_name
+assert(IsInsituInput("${args.channel-name}"))
+assert(_transform_registration_name("${args.channel-name}")=="grid")
 
 def catalyst_execute(info):
     global producer

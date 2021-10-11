@@ -95,6 +95,8 @@ if (USE_CATALYST)
       # vtkLogger
       "(\n|^)ERROR: "
       "ERR\\|"
+      # Python errors / exceptions
+      "Error"
       # vtkDebugLeaks
       "instance(s)? still around")
 

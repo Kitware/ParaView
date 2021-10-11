@@ -49,6 +49,7 @@ void Initialize(int argc, char* argv[])
       node[name + "/args"].append().set_string("argument0");
       node[name + "/args"].append().set_string("argument1=12");
       node[name + "/args"].append().set_string("--argument3");
+      node[name + "/args"].append().set_string("--channel-name=grid");
     }
   }
 
