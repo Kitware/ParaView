@@ -4581,7 +4581,7 @@
           </PropertyGroup>
           <Property exposed_name="SelectionCellLabelFormat" name="CellLabelFormat" panel_visibility="never"/>
           <Property exposed_name="SelectionPointLabelVisibility" name="PointLabelVisibility" panel_visibility="never"/>
-          <Property exposed_name="SelectionMaximumNumberOfLabels" name="MaximumNumberOfLabels"/>
+          <Property exposed_name="SelectionMaximumNumberOfLabels" name="MaximumNumberOfLabels" panel_visibility="never"/>
           <PropertyGroup label="Point Label Font" panel_visibility="never" panel_widget="FontEditor">
             <Property exposed_name="SelectionPointLabelBold" name="PointLabelBold" function="Bold"/>
             <Property exposed_name="SelectionPointLabelColor" name="PointLabelColor" function="Color"/>
