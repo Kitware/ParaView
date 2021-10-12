@@ -38,6 +38,7 @@
     <Proxy group="filters" name="ComputeQuartiles" />
     <Proxy group="filters" name="ExtractLocation" omit_from_toolbar="1" />
     <Proxy group="filters" name="PlotDataOverTime" omit_from_toolbar="1" />
+    <Proxy group="filters" name="ThresholdTable" />
   </Category>
   <Category name="Hyper Tree Grid" menu_label="&amp;Hyper Tree Grid">
     <Proxy group="filters" name="Clip" />
@@ -363,6 +364,7 @@
   <Proxy group="filters" name="TextureMapToPlane" />
   <Proxy group="filters" name="TextureMapToSphere" />
   <Proxy group="filters" name="Threshold" icon=":/pqWidgets/Icons/pqThreshold.svg" />
+  <Proxy group="filters" name="ThresholdTable" />
   <Proxy group="filters" name="TimeStepProgressFilter" />
   <Proxy group="filters" name="TimeToTextConvertor" />
   <Proxy group="filters" name="TransformFilter" />

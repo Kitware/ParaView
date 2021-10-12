@@ -3501,6 +3501,120 @@ Every Nth Point.
     </SourceProxy>
 
     <!-- ==================================================================== -->
+    <SourceProxy class="vtkThresholdTable"
+                 label="Threshold Table"
+                 name="ThresholdTable">
+      <Documentation long_help="This filter extracts table rows that satisfy a threshold criterion for a given column."
+                     short_help="Threshold table rows.">
+                     The Threshold Table Filter uses minimum and/or maximum values to threshold
+                     table rows based on the values in a particular column of a vtkTable object.
+                     It operates on scalar fields, and accepts two thresholding parameters:
+                     MinValue and MaxValue. This filter offers four different thresholding
+                     methods : "Below Max Threshold", "Above Min Threshold", "Between", and "Outside".
+                     The output of this filter is a vtkTable object with less or as many rows as the input vtkTable.
+      </Documentation>
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkTable" />
+        </DataTypeDomain>
+        <InputArrayDomain name="input_array"
+                          number_of_components="1"/>
+        <Documentation>This property specifies the input to the Threshold Table
+        filter.</Documentation>
+      </InputProperty>
+      <StringVectorProperty command="SetInputArrayToProcess"
+                            element_types="0 0 0 0 2"
+                            label="Column"
+                            name="SelectInputScalars"
+                            number_of_elements="5">
+        <ArrayListDomain attribute_type="Scalars"
+                         name="array_list">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input" />
+          </RequiredProperties>
+        </ArrayListDomain>
+        <Documentation>This property specifies which column to use for
+        thresholding.</Documentation>
+      </StringVectorProperty>
+      <DoubleVectorProperty command="SetMinValue"
+                            default_values="0"
+                            name="MinValue"
+                            number_of_elements="1">
+        <ArrayRangeDomain name="range"
+                          default_mode="min">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input" />
+            <Property function="ArraySelection"
+                      name="SelectInputScalars" />
+          </RequiredProperties>
+        </ArrayRangeDomain>
+        <Hints>
+          <PropertyWidgetDecorator type="CompositeDecorator">
+            <Expression type="or">
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="Mode" value="1" />
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="Mode" value="2" />
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="Mode" value="3" />
+            </Expression>
+          </PropertyWidgetDecorator>
+        </Hints>
+        <Documentation>
+          The value of this property specifies the lower bound of the
+          thresholding operation.
+        </Documentation>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetMaxValue"
+                            default_values="0"
+                            name="MaxValue"
+                            number_of_elements="1">
+        <ArrayRangeDomain name="range"
+                          default_mode="max">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input" />
+            <Property function="ArraySelection"
+                      name="SelectInputScalars" />
+          </RequiredProperties>
+        </ArrayRangeDomain>
+        <Hints>
+          <PropertyWidgetDecorator type="CompositeDecorator">
+            <Expression type="or">
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="Mode" value="0" />
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="Mode" value="2" />
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="Mode" value="3" />
+            </Expression>
+          </PropertyWidgetDecorator>
+        </Hints>
+        <Documentation>
+          The value of this property specifies the upper bound of the
+          thresholding operation.
+        </Documentation>
+      </DoubleVectorProperty>
+      <IntVectorProperty command="SetMode"
+                         default_values="2"
+                         name="Mode"
+                         number_of_elements="1"
+                         panel_visibility="default">
+        <EnumerationDomain name="enum">
+          <Entry text="Below Max Threshold" value="0"/>
+          <Entry text="Above Min Threshold" value="1"/>
+          <Entry text="Between" value="2"/>
+          <Entry text="Outside" value="3"/>
+        </EnumerationDomain>
+        <Documentation>
+          This property indicates the threshold method.
+        </Documentation>
+      </IntVectorProperty>
+      <!-- End ThresholdTable -->
+    </SourceProxy>
+
+    <!-- ==================================================================== -->
     <SourceProxy class="vtkSurfaceVectors"
                  label="Surface Vectors"
                  name="SurfaceVectors">
