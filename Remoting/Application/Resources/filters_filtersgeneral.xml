@@ -1758,6 +1758,17 @@
             ids are used if they exist or the point index is otherwise.
           </Documentation>
       </StringVectorProperty>
+
+      <IntVectorProperty command="SetBackwardTime"
+                     panel_visibility="advanced"
+                     default_values="0"
+                     name="Backward Time"
+                     number_of_elements="1">
+          <BooleanDomain name="bool" />
+          <Documentation>Compute particle path lines when time goes backward.
+          </Documentation>
+      </IntVectorProperty>
+
       <!-- End TemporalPathLineFilter -->
     </SourceProxy>
 
