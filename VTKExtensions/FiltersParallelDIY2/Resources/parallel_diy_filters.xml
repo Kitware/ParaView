@@ -1,0 +1,55 @@
+<ServerManagerConfiguration>
+  <ProxyGroup name="filters">
+    <SourceProxy class="vtkPVProbeLineFilter"
+                 base_proxygroup="internal_filters"
+                 base_proxyname="ProbeLineGenericProxy"
+                 label="Plot Over Line"
+                 name="ProbeLine">
+      <Documentation>The Plot Over Line filter samples the dataset attributes of the
+      input dataset at the points of a given line. The values of the point-centered
+      variables along that line will be displayed in an XY Plot. This filter uses
+      interpolation to determine the values at the selected point, whether or not it
+      lies at an input point. This filter operates on any type of data and produces a
+      polygonal output (a polyline). One can use different sampling patterns with this
+      filter. "Sample At Cell Boundaries" gives the most accurate plots, "Sample At
+      Segment Centers" provides one sample per probed cell, and "Sample Uniformally"
+      samples uniformally along the input line.</Documentation>
+      <DoubleVectorProperty animateable="1"
+                            command="SetPoint1"
+                            default_values="0.0 0.0 0.0"
+                            name="Point1"
+                            number_of_elements="3">
+        <BoundsDomain default_mode="min"
+                      mode="normal"
+                      name="range">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input" />
+          </RequiredProperties>
+        </BoundsDomain>
+        <Documentation>This property controls the coordinates of the first
+        endpoint of the line.</Documentation>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty animateable="1"
+                            command="SetPoint2"
+                            default_values="0.0 0.0 0.0"
+                            name="Point2"
+                            number_of_elements="3">
+        <BoundsDomain default_mode="max"
+                      mode="normal"
+                      name="range">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input" />
+          </RequiredProperties>
+        </BoundsDomain>
+        <Documentation>This property controls the coordinates of the second
+        endpoint of the line.</Documentation>
+      </DoubleVectorProperty>
+      <PropertyGroup label="Line Parameters" panel_widget="InteractiveLine">
+          <Property function="Point1WorldPosition" name="Point1" />
+          <Property function="Point2WorldPosition" name="Point2" />
+      </PropertyGroup>
+    </SourceProxy>
+  </ProxyGroup>
+</ServerManagerConfiguration>
