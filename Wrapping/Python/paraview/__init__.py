@@ -132,7 +132,7 @@ class options:
     suppressed."""
     print_debug_messages = False
 
-    """When True, This mean the current process is a satelite and should not try to
+    """When True, This mean the current process is a satellite and should not try to
     connect or do anything else."""
     satelite = False
 
@@ -148,7 +148,7 @@ class NotSupportedException(Exception):
 
 """This variable is set whenever Python is initialized within a ParaView
 Qt-based application. Modules within the 'paraview' package often use this to
-taylor their behaviour based on whether the Python environment is embedded
+tailor their behaviour based on whether the Python environment is embedded
 within an application or not."""
 fromGUI = False
 
