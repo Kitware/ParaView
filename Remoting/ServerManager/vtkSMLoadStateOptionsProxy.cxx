@@ -95,20 +95,26 @@ public:
       }
     }
 
-    std::string GetSequenceName() const
+    std::string GetFileName(bool woExtension) const
     {
-      vtkNew<vtkFileSequenceParser> sequenceParser;
       if (auto element = this->XMLElement.child("Element"))
       {
-        auto name = vtksys::SystemTools::GetFilenameName(element.attribute("value").value());
-        if (sequenceParser->ParseFileSequence(name.c_str()))
-        {
-          return sequenceParser->GetSequenceName();
-        }
-        return name;
+        auto fname = element.attribute("value").value();
+        return woExtension ? vtksys::SystemTools::GetFilenameWithoutExtension(fname)
+                           : vtksys::SystemTools::GetFilenameName(fname);
       }
       return std::string();
-      ;
+    }
+
+    std::string GetSequenceName() const
+    {
+      const auto name = this->GetFileName(/*woExtension=*/false);
+      vtkNew<vtkFileSequenceParser> sequenceParser;
+      if (!name.empty() && sequenceParser->ParseFileSequence(name.c_str()))
+      {
+        return sequenceParser->GetSequenceName();
+      }
+      return name;
     }
   };
 
@@ -156,14 +162,6 @@ public:
     // Let's build the `PropertiesMap` with information about that.
     for (auto proxy : xpath_smstate.node().children("Proxy"))
     {
-      if (strcmp(proxy.attribute("group").value(), "sources") != 0)
-      {
-        continue; // for now, skip non-source proxies.
-                  // I am not convinced this is correct, since we can have
-                  // textures, materials etc. but this is what we did
-                  // conventionally, so keep that intact for now.
-      }
-
       auto prototype =
         pxm->GetPrototypeProxy(proxy.attribute("group").value(), proxy.attribute("type").value());
       if (!prototype)
@@ -194,7 +192,8 @@ public:
 
           // if the proxy's registration name is based on the value of this property,
           // we flag it, so we can change it when it's modified.
-          info.UpdateProxyName = (info.GetSequenceName() == proxyname);
+          info.UpdateProxyName = (info.GetSequenceName() == proxyname ||
+            info.GetFileName(/*woExtension=*/true) == proxyname);
           const auto pname = property.attribute("name").value();
           this->PropertiesMap[proxy.attribute("id").as_int()][pname] = info;
         }
@@ -229,8 +228,7 @@ public:
   int GetId(const std::string& pname) const
   {
     const auto query =
-      std::string("//ServerManagerState/ProxyCollection[@name='sources']/Item[@name=") + pname +
-      "]";
+      std::string("//ServerManagerState/ProxyCollection/Item[@name=") + pname + "]";
     if (auto xpath_node = this->StateXML.select_node(query.c_str()))
     {
       return xpath_node.node().attribute("id").as_int();
@@ -241,8 +239,7 @@ public:
   std::string GetProxyRegistrationName(int id) const
   {
     const auto query =
-      std::string("//ServerManagerState/ProxyCollection[@name='sources']/Item[@id=") +
-      std::to_string(id) + "]";
+      std::string("//ServerManagerState/ProxyCollection/Item[@id=") + std::to_string(id) + "]";
     if (auto xpath_node = this->StateXML.select_node(query.c_str()))
     {
       return xpath_node.node().attribute("name").value();
@@ -304,8 +301,7 @@ private:
 
   std::string GetProxyRegistrationName(const pugi::xml_node& proxy) const
   {
-    const auto query =
-      std::string("//ServerManagerState/ProxyCollection[@name='sources']/Item[@id=") +
+    const auto query = std::string("//ServerManagerState/ProxyCollection/Item[@id=") +
       proxy.attribute("id").value() + "]";
     if (auto xpath_node = this->StateXML.select_node(query.c_str()))
     {
@@ -321,8 +317,7 @@ private:
       return;
     }
     const auto query =
-      std::string("//ServerManagerState/ProxyCollection[@name='sources']/Item[@id=") +
-      std::to_string(id) + "]";
+      std::string("//ServerManagerState/ProxyCollection/Item[@id=") + std::to_string(id) + "]";
     if (auto xpath_node = this->StateXML.select_node(query.c_str()))
     {
       xpath_node.node().attribute("name") = name.c_str();
