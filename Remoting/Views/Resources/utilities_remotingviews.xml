@@ -1553,11 +1553,53 @@
     <!-- end of "transfer_functions" -->
   </ProxyGroup>
 
+  <!-- ==================================================================== -->
   <ProxyGroup name="transfer_2d_functions">
-    <TransferFunctionProxy class="vtkImageData"
-                           name="ImageData"
+    <!-- ================================================================== -->
+    <TransferFunction2DProxy class="vtkPVTransferFunction2D"
+                           name="TransferFunction2D"
                            processes="client|renderserver|dataserver">
-    </TransferFunctionProxy>
+      <DoubleVectorProperty clean_command="RemoveAllBoxes"
+                            command="AddControlBox"
+                            default_values="0.0 0.0 1.0 1.0 1.0 1.0 1.0 1.0"
+                            name="Boxes"
+                            number_of_elements="8"
+                            number_of_elements_per_command="8"
+                            repeat_command="1">
+        <Documentation>
+          Specify the box parameters for the 2D transfer function. These are
+          a list of 8-tuples of the form (x, y, width, height, r, g, b, a) where
+          (x, y) is the position i.e. the range-min of the box, (width, height)
+          specify the dimensions of the box in the scalar units and (r, g, b, a)
+          denote the color with maximum alpha of the box. The color and alpha
+          components are in the range [0, 1].
+        </Documentation>
+      </DoubleVectorProperty>
+      <IntVectorProperty default_values="0"
+                         name="ScalarRangeInitialized"
+                         number_of_elements="1"
+                         panel_visibility="never" >
+        <Documentation>
+          Set to 1 to indicate that the scalar range has been initialized.
+        </Documentation>
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+      <!--
+      <IntVectorProperty command="SetUseCustomRange"
+                         default_values="0"
+                         name="UseCustomRange"
+                         number_of_elements="1"
+                         panel_visibility="never" >
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+      -->
+      <IntVectorProperty command="SetCustomRange"
+                         default_values="0.0 1.0 0.0 1.0"
+                         name="CustomRange"
+                         number_of_elements="4"
+                         panel_visibility="never" >
+      </IntVectorProperty>
+    </TransferFunction2DProxy>
     <!-- end of "transfer_2d_functions" -->
   </ProxyGroup>
 
