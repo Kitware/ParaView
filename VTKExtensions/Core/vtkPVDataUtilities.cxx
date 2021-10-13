@@ -154,14 +154,10 @@ void AssignNamesToBlocks(vtkMultiBlockDataSet* mb)
 
 vtkStandardNewMacro(vtkPVDataUtilities);
 //----------------------------------------------------------------------------
-vtkPVDataUtilities::vtkPVDataUtilities()
-{
-}
+vtkPVDataUtilities::vtkPVDataUtilities() = default;
 
 //----------------------------------------------------------------------------
-vtkPVDataUtilities::~vtkPVDataUtilities()
-{
-}
+vtkPVDataUtilities::~vtkPVDataUtilities() = default;
 
 //----------------------------------------------------------------------------
 void vtkPVDataUtilities::AssignNamesToBlocks(vtkDataObject* dataObject)
