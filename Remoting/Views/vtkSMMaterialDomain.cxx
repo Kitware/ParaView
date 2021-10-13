@@ -23,8 +23,6 @@
 #include "vtkSMProperty.h"
 #include "vtkWeakPointer.h"
 
-#include "vtkPVConfig.h"
-
 #if VTK_MODULE_ENABLE_VTK_RenderingRayTracing
 #include "vtkOSPRayMaterialLibrary.h"
 #endif

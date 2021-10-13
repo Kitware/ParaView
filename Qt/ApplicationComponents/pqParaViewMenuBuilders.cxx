@@ -30,10 +30,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
 #include "pqParaViewMenuBuilders.h"
-#include "vtkPVConfig.h"
 
 #include "ui_pqEditMenuBuilder.h"
 #include "ui_pqFileMenuBuilder.h"
+
+#include "pqQtConfig.h"
 
 #include "pqAboutDialogReaction.h"
 #include "pqAnimatedExportReaction.h"
@@ -127,6 +128,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QSysInfo>
 
 #include "vtkPVFileInformation.h"
+#include "vtkPVVersion.h"
 #include "vtkSMProxyManager.h"
 
 //-----------------------------------------------------------------------------

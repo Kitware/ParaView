@@ -18,7 +18,6 @@
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkPDirectory.h"
-#include "vtkPVConfig.h"
 #include "vtkPVLogger.h"
 #include "vtkPVPlugin.h"
 #include "vtkPVPluginTracker.h"

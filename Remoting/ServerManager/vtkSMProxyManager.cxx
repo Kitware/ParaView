@@ -17,7 +17,7 @@
 #include "vtkCommand.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
-#include "vtkPVConfig.h" // for PARAVIEW_VERSION_*
+#include "vtkPVVersion.h" // for PARAVIEW_VERSION_*
 #include "vtkPVXMLElement.h"
 #include "vtkProcessModule.h"
 #include "vtkSIProxyDefinitionManager.h"

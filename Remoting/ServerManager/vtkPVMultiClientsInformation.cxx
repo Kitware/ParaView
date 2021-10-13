@@ -18,7 +18,6 @@
 #include "vtkCompositeMultiProcessController.h"
 #include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
-#include "vtkPVConfig.h"
 #include "vtkPVSession.h"
 #include "vtkProcessModule.h"
 #include "vtkRemotingCoreConfiguration.h"

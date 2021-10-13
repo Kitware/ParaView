@@ -6,7 +6,6 @@
 #include "pqExampleVisualizationsDialog.h"
 #include "pqServer.h"
 #include "pqSettings.h"
-#include "vtkPVConfig.h" // for PARAVIEW_VERSION
 #include "vtkPVFileInformation.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMSessionProxyManager.h"

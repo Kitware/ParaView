@@ -30,9 +30,14 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
+
+// Hide PARAVIEW_DEPRECATED_IN_5_10_0() warnings for this class.
+#define PARAVIEW_DEPRECATION_LEVEL 0
+
 #include "pqOptions.h"
 
 #include "pqCoreConfiguration.h"
+#include "vtkLegacy.h"
 #include "vtkRemotingCoreConfiguration.h"
 #include <string>
 #include <vtkObjectFactory.h>
@@ -45,7 +50,6 @@ pqOptions::pqOptions() = default;
 pqOptions::~pqOptions() = default;
 
 //-----------------------------------------------------------------------------
-#if !defined(VTK_LEGACY_REMOVE)
 const char* pqOptions::GetBaselineDirectory()
 {
   VTK_LEGACY_REPLACED_BODY(
@@ -53,10 +57,8 @@ const char* pqOptions::GetBaselineDirectory()
   const auto& dir = pqCoreConfiguration::instance()->baselineDirectory();
   return dir.empty() ? nullptr : dir.c_str();
 }
-#endif
 
 //-----------------------------------------------------------------------------
-#if !defined(VTK_LEGACY_REMOVE)
 const char* pqOptions::GetTestDirectory()
 {
   VTK_LEGACY_REPLACED_BODY(
@@ -64,10 +66,8 @@ const char* pqOptions::GetTestDirectory()
   const auto& dir = pqCoreConfiguration::instance()->testDirectory();
   return dir.empty() ? nullptr : dir.c_str();
 }
-#endif
 
 //-----------------------------------------------------------------------------
-#if !defined(VTK_LEGACY_REMOVE)
 const char* pqOptions::GetDataDirectory()
 {
   VTK_LEGACY_REPLACED_BODY(
@@ -75,10 +75,8 @@ const char* pqOptions::GetDataDirectory()
   const auto& dir = pqCoreConfiguration::instance()->dataDirectory();
   return dir.empty() ? nullptr : dir.c_str();
 }
-#endif
 
 //-----------------------------------------------------------------------------
-#if !defined(VTK_LEGACY_REMOVE)
 const char* pqOptions::GetStateFileName()
 {
   VTK_LEGACY_REPLACED_BODY(
@@ -86,10 +84,8 @@ const char* pqOptions::GetStateFileName()
   const auto& dir = pqCoreConfiguration::instance()->stateFileName();
   return dir.empty() ? nullptr : dir.c_str();
 }
-#endif
 
 //-----------------------------------------------------------------------------
-#if !defined(VTK_LEGACY_REMOVE)
 const char* pqOptions::GetPythonScript()
 {
   VTK_LEGACY_REPLACED_BODY(
@@ -97,10 +93,8 @@ const char* pqOptions::GetPythonScript()
   const auto& dir = pqCoreConfiguration::instance()->pythonScript();
   return dir.empty() ? nullptr : dir.c_str();
 }
-#endif
 
 //-----------------------------------------------------------------------------
-#if !defined(VTK_LEGACY_REMOVE)
 const char* pqOptions::GetServerResourceName()
 {
   VTK_LEGACY_REPLACED_BODY(pqOptions::GetServerResourceName, "ParaView 5.10",
@@ -108,20 +102,16 @@ const char* pqOptions::GetServerResourceName()
   const auto& dir = vtkRemotingCoreConfiguration::GetInstance()->GetServerResourceName();
   return dir.empty() ? nullptr : dir.c_str();
 }
-#endif
 
 //-----------------------------------------------------------------------------
-#if !defined(VTK_LEGACY_REMOVE)
 int pqOptions::GetExitAppWhenTestsDone()
 {
   VTK_LEGACY_REPLACED_BODY(pqOptions::GetExitAppWhenTestsDone, "ParaView 5.10",
     pqCoreConfiguration::exitApplicationWhenTestsDone);
   return pqCoreConfiguration::instance()->exitApplicationWhenTestsDone() ? 1 : 0;
 }
-#endif
 
 //-----------------------------------------------------------------------------
-#if !defined(VTK_LEGACY_REMOVE)
 QStringList pqOptions::GetTestScripts()
 {
   VTK_LEGACY_REPLACED_BODY(
@@ -135,77 +125,62 @@ QStringList pqOptions::GetTestScripts()
   }
   return result;
 }
-#endif
 
 //-----------------------------------------------------------------------------
-#if !defined(VTK_LEGACY_REMOVE)
 int pqOptions::GetNumberOfTestScripts()
 {
   VTK_LEGACY_REPLACED_BODY(
     pqOptions::GetNumberOfTestScripts, "ParaView 5.10", pqCoreConfiguration::testScriptCount);
   return pqCoreConfiguration::instance()->testScriptCount();
 }
-#endif
 
 //-----------------------------------------------------------------------------
-#if !defined(VTK_LEGACY_REMOVE)
 QString pqOptions::GetTestScript(int cc)
 {
   VTK_LEGACY_REPLACED_BODY(
     pqOptions::GetTestScript, "ParaView 5.10", pqCoreConfiguration::testScript);
   return pqCoreConfiguration::instance()->testScript(cc).c_str();
 }
-#endif
 
 //-----------------------------------------------------------------------------
-#if !defined(VTK_LEGACY_REMOVE)
 QString pqOptions::GetTestBaseline(int cc)
 {
   VTK_LEGACY_REPLACED_BODY(
     pqOptions::GetTestBaseline, "ParaView 5.10", pqCoreConfiguration::testBaseline);
   return pqCoreConfiguration::instance()->testBaseline(cc).c_str();
 }
-#endif
 
 //-----------------------------------------------------------------------------
-#if !defined(VTK_LEGACY_REMOVE)
 int pqOptions::GetTestImageThreshold(int cc)
 {
   VTK_LEGACY_REPLACED_BODY(
     pqOptions::GetTestImageThreshold, "ParaView 5.10", pqCoreConfiguration::testThreshold);
   return pqCoreConfiguration::instance()->testThreshold(cc);
 }
-#endif
 
 //-----------------------------------------------------------------------------
-#if !defined(VTK_LEGACY_REMOVE)
 int pqOptions::GetCurrentImageThreshold()
 {
   VTK_LEGACY_REPLACED_BODY(
     pqOptions::GetCurrentImageThreshold, "ParaView 5.10", pqCoreConfiguration::testThreshold);
   return pqCoreConfiguration::instance()->testThreshold();
 }
-#endif
 
 //-----------------------------------------------------------------------------
-#if !defined(VTK_LEGACY_REMOVE)
 int pqOptions::GetTestMaster()
 {
   VTK_LEGACY_REPLACED_BODY(
     pqOptions::GetTestMaster, "ParaView 5.10", pqCoreConfiguration::testMaster);
   return pqCoreConfiguration::instance()->testMaster() ? 1 : 0;
 }
-#endif
 
 //-----------------------------------------------------------------------------
-#if !defined(VTK_LEGACY_REMOVE)
 int pqOptions::GetTestSlave()
 {
   VTK_LEGACY_REPLACED_BODY(
     pqOptions::GetTestSlave, "ParaView 5.10", pqCoreConfiguration::testSlave);
   return pqCoreConfiguration::instance()->testSlave() ? 1 : 0;
 }
-#endif
 
 //-----------------------------------------------------------------------------
 void pqOptions::PrintSelf(ostream& os, vtkIndent indent)

@@ -34,7 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqDoubleSliderWidget.h"
 #include "pqWidgetsModule.h"
-#include "vtkSetGet.h" // for VTK_LEGACY
+#include "vtkParaViewDeprecation.h" // for PARAVIEW_DEPRECATED_IN_5_10_0
 #include <QWidget>
 
 /**
@@ -46,9 +46,8 @@ class PQWIDGETS_EXPORT pqDoubleRangeWidget : public pqDoubleSliderWidget
   Q_OBJECT
   Q_PROPERTY(double minimum READ minimum WRITE setMinimum)
   Q_PROPERTY(double maximum READ maximum WRITE setMaximum)
-#if !defined(VTK_LEGACY_REMOVE)
+  // PARAVIEW_DEPRECATED_IN_5_10_0("Removed; it did not work as intended")
   Q_PROPERTY(bool strictRange READ strictRange WRITE setStrictRange);
-#endif
   Q_PROPERTY(int resolution READ resolution WRITE setResolution)
 
   typedef pqDoubleSliderWidget Superclass;
@@ -68,7 +67,8 @@ public:
   /**
    * @deprecated strictRange is deprecated and is not working as intended
    */
-  VTK_LEGACY(bool strictRange() const);
+  PARAVIEW_DEPRECATED_IN_5_10_0("Removed; it did not work as intended")
+  bool strictRange() const;
 
   // returns the resolution.
   int resolution() const;
@@ -79,12 +79,11 @@ public Q_SLOTS:
   // set the max range value
   void setMaximum(double);
 
-#if !defined(VTK_LEGACY_REMOVE)
   /**
    * @deprecated strictRange is deprecated and is not working as intended
    */
+  PARAVIEW_DEPRECATED_IN_5_10_0("Removed; it did not work as intended")
   void setStrictRange(bool);
-#endif
 
   // set the resolution.
   void setResolution(int);
@@ -100,9 +99,8 @@ private:
   int Resolution;
   double Minimum;
   double Maximum;
-#if !defined(VTK_LEGACY_REMOVE)
+  PARAVIEW_DEPRECATED_IN_5_10_0("Removed; it did not work as intended")
   bool StrictRange = false;
-#endif
 };
 
 #endif

@@ -23,7 +23,6 @@
 #include "vtkNetworkAccessManager.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
-#include "vtkPVConfig.h"
 #include "vtkPVInformation.h"
 #include "vtkPVSessionCore.h"
 #include "vtkProcessModule.h"

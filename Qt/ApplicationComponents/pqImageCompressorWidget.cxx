@@ -34,7 +34,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqPropertiesPanel.h"
 #include "pqProxyWidget.h"
-#include "vtkPVConfig.h"
 
 #include <QRegExp>
 

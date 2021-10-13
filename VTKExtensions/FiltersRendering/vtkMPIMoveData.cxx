@@ -30,7 +30,6 @@
 #include "vtkMultiProcessControllerHelper.h"
 #include "vtkObjectFactory.h"
 #include "vtkOutlineFilter.h"
-#include "vtkPVConfig.h"
 #include "vtkPVLogger.h"
 #include "vtkPVSession.h"
 #include "vtkPointData.h"

@@ -14,7 +14,6 @@
 =========================================================================*/
 
 // Include vtkPython.h first to avoid warnings:
-#include "vtkPVConfig.h"
 #if VTK_MODULE_ENABLE_VTK_PythonInterpreter && VTK_MODULE_ENABLE_VTK_WrappingPythonCore
 #include "vtkPython.h"
 

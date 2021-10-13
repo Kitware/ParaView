@@ -19,7 +19,6 @@
 #include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
 #include "vtkOpenGLRenderer.h"
-#include "vtkPVConfig.h"
 #include "vtkSquirtCompressor.h"
 #include "vtkUnsignedCharArray.h"
 #include "vtkZlibImageCompressor.h"

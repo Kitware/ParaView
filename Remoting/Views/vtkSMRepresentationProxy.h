@@ -161,15 +161,6 @@ public:
   }
   //@}
 
-  //@{
-  /**
-   * @deprecated in ParaView 5.7. Use
-   * vtkSMProxy::SetLogName/vtkSMProxy::GetLogName instead.
-   */
-  VTK_LEGACY(void SetDebugName(const char* name));
-  VTK_LEGACY(const char* GetDebugName());
-  //@}
-
   void MarkDirty(vtkSMProxy* modifiedProxy) override;
 
 protected:

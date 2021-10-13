@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   ParaView
-  Module:    vtkPVConfig.h.in
+  Module:    vtkPVConfig.h
 
   Copyright (c) Kitware, Inc.
   All rights reserved.
@@ -16,13 +16,22 @@
 #ifndef vtkPVConfig_h
 #define vtkPVConfig_h
 
-#cmakedefine PARAVIEW_USE_QTHELP
-#cmakedefine01 PARAVIEW_USE_QTWEBENGINE
+#ifdef _MSC_VER
+#pragma message(                                                                                   \
+  "vtkPVConfig.h is deprecated. Please include `vtkPVVersion.h`, `pqQtConfig.h`, or `pqQtWidgetConfig.h` instead.")
+#else
+#warning                                                                                           \
+  "vtkPVConfig.h is deprecated. Please include `vtkPVVersion.h`, `pqQtConfig.h`, or `pqQtWidgetConfig.h` instead."
+#endif
 
-#define PARAVIEW_VERSION_MAJOR @PARAVIEW_VERSION_MAJOR@
-#define PARAVIEW_VERSION_MINOR @PARAVIEW_VERSION_MINOR@
-#define PARAVIEW_VERSION_PATCH @PARAVIEW_VERSION_PATCH@
-#define PARAVIEW_VERSION "@PARAVIEW_VERSION@"
-#define PARAVIEW_VERSION_FULL "@PARAVIEW_VERSION_FULL@"
+#ifndef PARAVIEW_USE_QTHELP
+#cmakedefine PARAVIEW_USE_QTHELP
+#endif
+
+#ifndef PARAVIEW_USE_QTWEBENGINE
+#cmakedefine01 PARAVIEW_USE_QTWEBENGINE
+#endif
+
+#include "vtkPVVersion.h"
 
 #endif

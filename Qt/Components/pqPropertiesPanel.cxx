@@ -454,16 +454,6 @@ void pqPropertiesPanel::setView(pqView* pqview)
 }
 
 //-----------------------------------------------------------------------------
-#if !defined(VTK_LEGACY_REMOVE)
-void pqPropertiesPanel::setOutputPort(pqOutputPort* port)
-{
-  VTK_LEGACY_REPLACED_BODY(
-    pqPropertiesPanel::setOutputPort, "ParaView 5.9", pqPropertiesPanel::setPipelineProxy);
-  this->setPipelineProxy(port);
-}
-#endif
-
-//-----------------------------------------------------------------------------
 void pqPropertiesPanel::setPipelineProxy(pqProxy* proxy)
 {
   if (auto port = qobject_cast<pqOutputPort*>(proxy))
@@ -483,21 +473,6 @@ void pqPropertiesPanel::updatePanel()
   this->updateViewPanel(internals.View);
   this->updateButtonState();
 }
-
-//-----------------------------------------------------------------------------
-#if !defined(VTK_LEGACY_REMOVE)
-void pqPropertiesPanel::updatePanel(pqOutputPort* port)
-{
-  VTK_LEGACY_BODY(pqPropertiesPanel::updatePanel, "ParaView 5.9");
-
-  // Determine if the proxy/repr has changed. If so, we have to recreate the
-  // entire panel, else we simply update the widgets.
-  this->setPipelineProxy(port);
-  this->updateDisplayPanel(port ? port->getRepresentation(this->view()) : nullptr);
-  this->updateViewPanel(this->view());
-  this->updateButtonState();
-}
-#endif
 
 //-----------------------------------------------------------------------------
 void pqPropertiesPanel::updatePropertiesPanel(pqProxy* source)

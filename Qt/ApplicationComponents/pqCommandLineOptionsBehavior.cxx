@@ -55,7 +55,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqTimeKeeper.h"
 #include "pqTimer.h"
 #include "pqUndoStack.h"
-#include "vtkPVConfig.h"
 #include "vtkProcessModule.h"
 #include "vtkRemotingCoreConfiguration.h"
 #include "vtkSMPluginManager.h"

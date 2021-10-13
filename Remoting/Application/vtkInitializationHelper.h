@@ -25,8 +25,8 @@
 #ifndef vtkInitializationHelper_h
 #define vtkInitializationHelper_h
 
-#include "vtkLegacy.h" // for VTK_LEGACY
 #include "vtkObject.h"
+#include "vtkParaViewDeprecation.h"       // for PARAVIEW_DEPRECATED_IN_5_10_0
 #include "vtkRemotingApplicationModule.h" // needed for exports
 #include <string>                         // needed for std::string
 
@@ -128,8 +128,10 @@ public:
    * @deprecated in ParaView 5.10. `vtkPVOptions` is deprecated in ParaView 5.10
    * and hence these functions are also deprecated.
    */
-  VTK_LEGACY(static void Initialize(const char* executable, int type, vtkPVOptions* options));
-  VTK_LEGACY(static void Initialize(int argc, char** argv, int type, vtkPVOptions* options));
+  PARAVIEW_DEPRECATED_IN_5_10_0("Use the `vtkCLIOptions` overload")
+  static void Initialize(const char* executable, int type, vtkPVOptions* options);
+  PARAVIEW_DEPRECATED_IN_5_10_0("Use the `vtkCLIOptions` overload")
+  static void Initialize(int argc, char** argv, int type, vtkPVOptions* options);
 
 protected:
   vtkInitializationHelper(){};

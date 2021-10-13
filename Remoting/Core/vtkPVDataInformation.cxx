@@ -12,6 +12,10 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
+
+// Hide PARAVIEW_DEPRECATED_IN_5_10_0() warnings for this class.
+#define PARAVIEW_DEPRECATION_LEVEL 0
+
 #include "vtkPVDataInformation.h"
 
 #include "vtkAlgorithm.h"
@@ -1349,7 +1353,6 @@ unsigned int vtkPVDataInformation::ComputeCompositeIndexForAMR(
 }
 
 //============================================================================
-#if !defined(VTK_LEGACY_REMOVE)
 vtkTypeUInt64 vtkPVDataInformation::GetPolygonCount()
 {
   VTK_LEGACY_REPLACED_BODY(
@@ -1406,5 +1409,3 @@ void vtkPVDataInformation::RegisterHelper(const char*, const char*)
 {
   VTK_LEGACY_BODY(vtkPVDataInformation::RegisterHelper, "ParaView 5.10");
 }
-
-#endif

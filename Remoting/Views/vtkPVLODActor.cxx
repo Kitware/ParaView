@@ -19,7 +19,6 @@
 #include "vtkMath.h"
 #include "vtkMatrix4x4.h"
 #include "vtkObjectFactory.h"
-#include "vtkPVConfig.h"
 #include "vtkPiecewiseFunction.h"
 #include "vtkProperty.h"
 #include "vtkRenderWindow.h"

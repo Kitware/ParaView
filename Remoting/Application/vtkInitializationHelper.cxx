@@ -12,6 +12,10 @@ the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
+
+// Hide PARAVIEW_DEPRECATED_IN_5_10_0() warnings for this class.
+#define PARAVIEW_DEPRECATION_LEVEL 0
+
 #include "vtkInitializationHelper.h"
 
 #include "vtkCLIOptions.h"
@@ -20,13 +24,13 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkMultiProcessController.h"
 #include "vtkNew.h"
 #include "vtkOutputWindow.h"
-#include "vtkPVConfig.h"
 #include "vtkPVInitializer.h"
 #include "vtkPVLogger.h"
 #include "vtkPVOptions.h"
 #include "vtkPVPluginLoader.h"
 #include "vtkPVSession.h"
 #include "vtkPVStringFormatter.h"
+#include "vtkPVVersion.h"
 #include "vtkProcessModule.h"
 #include "vtkProcessModuleConfiguration.h"
 #include "vtkRemotingCoreConfiguration.h"
@@ -154,12 +158,10 @@ bool vtkInitializationHelper::Initialize(const char* executable, int type)
 }
 
 //----------------------------------------------------------------------------
-#if !defined(VTK_LEGACY_REMOVE)
 void vtkInitializationHelper::Initialize(const char* executable, int type, vtkPVOptions*)
 {
   vtkInitializationHelper::Initialize(executable, type);
 }
-#endif
 
 //----------------------------------------------------------------------------
 bool vtkInitializationHelper::Initialize(vtkStringList* slist, int type)
@@ -327,12 +329,10 @@ bool vtkInitializationHelper::Initialize(
 }
 
 //----------------------------------------------------------------------------
-#if !defined(VTK_LEGACY_REMOVE)
 void vtkInitializationHelper::Initialize(int argc, char** argv, int type, vtkPVOptions*)
 {
   vtkInitializationHelper::Initialize(argc, argv, type);
 }
-#endif
 
 //----------------------------------------------------------------------------
 void vtkInitializationHelper::StandaloneInitialize()

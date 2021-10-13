@@ -38,7 +38,7 @@
 #include "vtk_glew.h"
 
 // this header have to be included after vtkHardwareSelector
-#include "vtkCompositePolyDataMapper2Internal.h"
+#include "vtkCompositeMapperHelper2.h"
 
 #include <map>
 #include <sstream>

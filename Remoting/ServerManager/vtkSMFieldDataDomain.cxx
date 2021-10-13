@@ -134,22 +134,15 @@ int vtkSMFieldDataDomain::ReadXMLAttributes(vtkSMProperty* prop, vtkPVXMLElement
 
   if (vtkSMStringVectorProperty::SafeDownCast(prop))
   {
-#if !defined(VTK_LEGACY_SILENT)
     vtkErrorMacro(
       "`vtkSMFieldDataDomain` is being used on a `vtkSMStringVectorProperty`. "
       "This is no longer needed or supported. Simply remove it from your XML configuration "
       "for property "
       << prop->GetXMLName());
-#endif
 
-#if defined(VTK_LEGACY_REMOVE)
     return 0;
-#else
-    return 1;
-#endif
   }
 
-#if !defined(VTK_LEGACY_SILENT)
   if (element->GetAttribute("disable_update_domain_entries"))
   {
     vtkErrorMacro("`vtkSMFieldDataDomain` no longer supports or needs "
@@ -165,7 +158,6 @@ int vtkSMFieldDataDomain::ReadXMLAttributes(vtkSMProperty* prop, vtkPVXMLElement
       "Simply remove it from the XML for property "
       << prop->GetXMLName());
   }
-#endif
 
   int enable_field_data = 0;
   if (element->GetScalarAttribute("enable_field_data", &enable_field_data))

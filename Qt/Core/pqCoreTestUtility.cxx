@@ -81,7 +81,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPNGReader.h"
 #include "vtkPNGWriter.h"
 #include "vtkPNMWriter.h"
-#include "vtkPVConfig.h"
 #include "vtkPVServerInformation.h"
 #include "vtkProcessModule.h"
 #include "vtkRenderWindow.h"

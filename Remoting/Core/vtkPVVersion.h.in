@@ -1,0 +1,30 @@
+/*=========================================================================
+
+  Program:   ParaView
+  Module:    vtkPVVersion.h
+
+  Copyright (c) Kitware, Inc.
+  All rights reserved.
+  See Copyright.txt or http://www.paraview.org/HTML/Copyright.html for details.
+
+     This software is distributed WITHOUT ANY WARRANTY; without even
+     the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+     PURPOSE.  See the above copyright notice for more information.
+
+=========================================================================*/
+
+#ifndef vtkPVVersion_h
+#define vtkPVVersion_h
+
+#define PARAVIEW_VERSION_MAJOR @PARAVIEW_VERSION_MAJOR@
+#define PARAVIEW_VERSION_MINOR @PARAVIEW_VERSION_MINOR@
+#define PARAVIEW_VERSION_PATCH @PARAVIEW_VERSION_PATCH@
+#define PARAVIEW_VERSION "@PARAVIEW_VERSION@"
+#define PARAVIEW_VERSION_FULL "@PARAVIEW_VERSION_FULL@"
+
+#define PARAVIEW_VERSION_CHECK(major, minor, build)                                                     \
+  (10000000000ULL * major + 100000000ULL * minor + build)
+#define PARAVIEW_VERSION_NUMBER                                                                         \
+  PARAVIEW_VERSION_CHECK(PARAVIEW_MAJOR_VERSION, PARAVIEW_MINOR_VERSION, PARAVIEW_BUILD_VERSION)
+
+#endif

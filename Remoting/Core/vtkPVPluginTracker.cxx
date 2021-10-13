@@ -19,7 +19,6 @@
 #include "vtkObjectFactory.h"
 #include "vtkPResourceFileLocator.h"
 #include "vtkPSystemTools.h"
-#include "vtkPVConfig.h"
 #include "vtkPVLogger.h"
 #include "vtkPVPlugin.h"
 #include "vtkPVPluginLoader.h"
@@ -662,13 +661,3 @@ void vtkPVPluginTracker::RegisterStaticPluginListFunction(vtkPluginListFunction 
 {
   RegisteredPluginListFunctions.push_back(function);
 }
-
-#ifndef VTK_LEGACY_REMOVE
-//-----------------------------------------------------------------------------
-void vtkPVPluginTracker::SetStaticPluginSearchFunction(vtkPluginSearchFunction function)
-{
-  VTK_LEGACY_BODY(vtkPVPluginTracker::SetStaticPluginSearchFunction, "ParaView 5.7");
-  vtkPVPluginTracker::RegisterStaticPluginSearchFunction(function);
-}
-
-#endif

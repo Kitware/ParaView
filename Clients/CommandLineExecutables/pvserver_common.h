@@ -12,7 +12,6 @@ the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-#include "vtkPVConfig.h"
 
 #include "vtkCLIOptions.h"
 #include "vtkInitializationHelper.h"

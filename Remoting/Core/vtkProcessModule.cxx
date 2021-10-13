@@ -1,4 +1,3 @@
-
 /*=========================================================================
 
   Program:   ParaView
@@ -13,6 +12,10 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
+
+// Hide PARAVIEW_DEPRECATED_IN_5_10_0() warnings for this class.
+#define PARAVIEW_DEPRECATION_LEVEL 0
+
 #include "vtkProcessModule.h"
 #include "vtkProcessModuleInternals.h"
 
@@ -22,23 +25,20 @@
 #include "vtkDummyController.h"
 #include "vtkFloatingPointExceptions.h"
 #include "vtkInformation.h"
+#include "vtkLegacy.h"
 #include "vtkLogger.h"
 #include "vtkMultiThreader.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkOutputWindow.h"
 #include "vtkPSystemTools.h"
-#include "vtkPVConfig.h"
+#include "vtkPVOptions.h"
 #include "vtkPolyData.h"
 #include "vtkProcessModuleConfiguration.h"
 #include "vtkSessionIterator.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
 #include "vtkTCPNetworkAccessManager.h"
 #include "vtkUnstructuredGrid.h"
-
-#if !defined(VTK_LEGACY_REMOVE)
-#include "vtkPVOptions.h"
-#endif
 
 #include <vtksys/SystemTools.hxx>
 
@@ -412,9 +412,7 @@ vtkProcessModule* vtkProcessModule::GetProcessModule()
 vtkStandardNewMacro(vtkProcessModule);
 vtkCxxSetObjectMacro(vtkProcessModule, NetworkAccessManager, vtkNetworkAccessManager);
 
-#if !defined(VTK_LEGACY_REMOVE)
 vtkCxxSetObjectMacro(vtkProcessModule, Options, vtkPVOptions);
-#endif
 
 //----------------------------------------------------------------------------
 vtkProcessModule::vtkProcessModule()
@@ -425,18 +423,14 @@ vtkProcessModule::vtkProcessModule()
   this->ReportInterpreterErrors = true;
   this->MultipleSessionsSupport = false; // Set MULTI-SERVER to false as DEFAULT
   this->EventCallDataSessionId = 0;
-#if !defined(VTK_LEGACY_REMOVE)
   this->Options = nullptr;
-#endif
 }
 
 //----------------------------------------------------------------------------
 vtkProcessModule::~vtkProcessModule()
 {
   this->SetNetworkAccessManager(nullptr);
-#if !defined(VTK_LEGACY_REMOVE)
   this->SetOptions(nullptr);
-#endif
 
   delete this->Internals;
   this->Internals = nullptr;
@@ -691,7 +685,6 @@ void vtkProcessModule::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "NetworkAccessManager: " << endl;
   this->NetworkAccessManager->PrintSelf(os, indent.GetNextIndent());
 
-#if !defined(VTK_LEGACY_REMOVE)
   if (this->Options)
   {
     os << indent << "Options: " << endl;
@@ -702,7 +695,6 @@ void vtkProcessModule::PrintSelf(ostream& os, vtkIndent indent)
     os << indent << "Options: "
        << "(null)" << endl;
   }
-#endif
 }
 
 //----------------------------------------------------------------------------
@@ -763,10 +755,8 @@ int vtkProcessModule::GetNumberOfGhostLevelsToRequest(vtkInformation* info)
 }
 
 //----------------------------------------------------------------------------
-#if !defined(VTK_LEGACY_REMOVE)
 vtkPVOptions* vtkProcessModule::GetOptions()
 {
   VTK_LEGACY_BODY(vtkProcessModule::GetOptions, "ParaView 5.10");
   return this->Options;
 }
-#endif

@@ -12,8 +12,13 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
+
+// Hide PARAVIEW_DEPRECATED_IN_5_10_0() warnings for this class.
+#define PARAVIEW_DEPRECATION_LEVEL 0
+
 #include "vtkPVGeneralSettings.h"
 
+#include "vtkLegacy.h"
 #include "vtkObjectFactory.h"
 #include "vtkProcessModule.h"
 #include "vtkSISourceProxy.h"
@@ -110,38 +115,30 @@ bool vtkPVGeneralSettings::GetAutoConvertProperties()
 }
 
 //----------------------------------------------------------------------------
-#if !defined(VTK_LEGACY_REMOVE)
 void vtkPVGeneralSettings::SetEnableAutoMPI(bool)
 {
   VTK_LEGACY_BODY(vtkPVGeneralSettings::SetEnableAutoMPI, "ParaView 5.10");
 }
-#endif
 
 //----------------------------------------------------------------------------
-#if !defined(VTK_LEGACY_REMOVE)
 bool vtkPVGeneralSettings::GetEnableAutoMPI()
 {
   VTK_LEGACY_BODY(vtkPVGeneralSettings::GetEnableAutoMPI, "ParaView 5.10");
   return false;
 }
-#endif
 
 //----------------------------------------------------------------------------
-#if !defined(VTK_LEGACY_REMOVE)
 void vtkPVGeneralSettings::SetAutoMPILimit(int)
 {
   VTK_LEGACY_BODY(vtkPVGeneralSettings::SetAutoMPILimit, "ParaView 5.10");
 }
-#endif
 
 //----------------------------------------------------------------------------
-#if !defined(VTK_LEGACY_REMOVE)
 int vtkPVGeneralSettings::GetAutoMPILimit()
 {
   VTK_LEGACY_BODY(vtkPVGeneralSettings::GetAutoMPILimit, "ParaView 5.10");
   return 1;
 }
-#endif
 
 //----------------------------------------------------------------------------
 void vtkPVGeneralSettings::SetCacheGeometryForAnimation(bool val)

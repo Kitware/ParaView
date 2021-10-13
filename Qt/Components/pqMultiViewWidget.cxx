@@ -824,32 +824,12 @@ void pqMultiViewWidget::destroyAllViews()
 }
 
 //-----------------------------------------------------------------------------
-#if !defined(VTK_LEGACY_REMOVE)
-void pqMultiViewWidget::setDecorationsVisible(bool val)
-{
-  VTK_LEGACY_REPLACED_BODY(pqMultiViewWidget::setDecorationsVisible, "ParaView 5.7",
-    pqMultiViewWidget::setDecorationsVisibility);
-  this->setDecorationsVisibility(val);
-}
-#endif
-
-//-----------------------------------------------------------------------------
 void pqMultiViewWidget::setDecorationsVisibility(bool val)
 {
   auto& internals = (*this->Internals);
   internals.setDecorationsVisibility(val);
   Q_EMIT this->decorationsVisibilityChanged(val);
 }
-
-//-----------------------------------------------------------------------------
-#if !defined(VTK_LEGACY_REMOVE)
-bool pqMultiViewWidget::isDecorationsVisible() const
-{
-  VTK_LEGACY_REPLACED_BODY(pqMultiViewWidget::isDecorationsVisible, "ParaView 5.7",
-    pqMultiViewWidget::decorationsVisibility);
-  return this->decorationsVisibility();
-}
-#endif
 
 //-----------------------------------------------------------------------------
 bool pqMultiViewWidget::decorationsVisibility() const

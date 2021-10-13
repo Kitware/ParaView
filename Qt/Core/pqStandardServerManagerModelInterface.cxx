@@ -52,7 +52,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqXYBarChartView.h"
 #include "pqXYChartView.h"
 #include "pqXYHistogramChartView.h"
-#include "vtkPVConfig.h"
 #include "vtkSMComparativeViewProxy.h"
 #include "vtkSMContextViewProxy.h"
 #include "vtkSMProxy.h"

@@ -5,7 +5,6 @@
 #include "pqApplicationCore.h"
 #include "pqEventDispatcher.h"
 #include "pqLoadStateReaction.h"
-#include "vtkPVConfig.h"
 #include "vtkPVFileInformation.h"
 
 #include <QFile>
