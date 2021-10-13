@@ -1,3 +1,6 @@
+// Hide VTK_DEPRECATED_IN_9_1_0() warnings for this class (vtkUnicodeString).
+#define VTK_DEPRECATION_LEVEL 0
+
 #include "vtkBoundingRectContextDevice2D.h"
 
 #include "vtkAbstractContextItem.h"
@@ -74,12 +77,6 @@ vtkRectf vtkBoundingRectContextDevice2D::GetBoundingRect()
 //-----------------------------------------------------------------------------
 void vtkBoundingRectContextDevice2D::DrawString(float* point, const vtkStdString& string)
 {
-  this->DrawString(point, vtkUnicodeString::from_utf8(string));
-}
-
-//-----------------------------------------------------------------------------
-void vtkBoundingRectContextDevice2D::DrawString(float* point, const vtkUnicodeString& string)
-{
   if (!this->DelegateDevice)
   {
     vtkWarningMacro(<< "No DelegateDevice defined");
@@ -87,10 +84,16 @@ void vtkBoundingRectContextDevice2D::DrawString(float* point, const vtkUnicodeSt
   }
 
   float bounds[4];
-  this->DelegateDevice->ComputeJustifiedStringBounds(string.utf8_str(), bounds);
+  this->DelegateDevice->ComputeJustifiedStringBounds(string.c_str(), bounds);
 
   this->AddPoint(point[0] + bounds[0], point[1] + bounds[1]);
   this->AddPoint(point[0] + bounds[0] + bounds[2], point[1] + bounds[1] + bounds[3]);
+}
+
+//-----------------------------------------------------------------------------
+void vtkBoundingRectContextDevice2D::DrawString(float* point, const vtkUnicodeString& string)
+{
+  return this->DrawString(point, string.utf8_str());
 }
 
 //-----------------------------------------------------------------------------
