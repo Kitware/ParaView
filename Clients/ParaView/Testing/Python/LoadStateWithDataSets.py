@@ -35,7 +35,7 @@ LoadState(statefile,
 ResetSession()
 
 #------------------------------------------------------------------------------------
-# old style state loading calls.
+# new style state loading calls.
 LoadState(statefile,
           data_directory=data_dir,
           restrict_to_data_directory=True)
