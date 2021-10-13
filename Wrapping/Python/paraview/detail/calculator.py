@@ -190,8 +190,11 @@ def execute(self, expression):
     output = dsa.WrapDataObject(self.GetOutputDataObject(0))
 
     if self.GetCopyArrays():
-        output.GetPointData().PassData(inputs[0].GetPointData())
-        output.GetCellData().PassData(inputs[0].GetCellData())
+        if self.GetInputDataObject(0, 0).IsA('vtkTable'):
+            output.GetRowData().PassData(inputs[0].GetRowData())
+        else:
+            output.GetPointData().PassData(inputs[0].GetPointData())
+            output.GetCellData().PassData(inputs[0].GetCellData())
 
     # get a dictionary for arrays in the dataset attributes. We pass that
     # as the variables in the eval namespace for compute.
@@ -201,6 +204,7 @@ def execute(self, expression):
                        "time_index": inputs[0].time_index,
                        "t_index": inputs[0].t_index })
     retVal = compute(inputs, expression, ns=variables)
+
     if retVal is not None:
         if hasattr(retVal, "Association"):
             output.GetAttributes(retVal.Association).append(\
