@@ -31,8 +31,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ========================================================================*/
 #include "vtkVRQueue.h"
 
-#include "vtkConditionVariable.h"
-#include "vtkMutexLock.h"
 #include "vtkObjectFactory.h"
 
 //----------------------------------------------------------------------------
@@ -47,33 +45,41 @@ vtkVRQueue::~vtkVRQueue() = default;
 //----------------------------------------------------------------------------
 void vtkVRQueue::Enqueue(const vtkVREvent& event)
 {
-  this->Mutex->Lock();
-  this->Queue.push(event);
-  this->Mutex->Unlock();
-  this->CondVar->Signal();
+  {
+    std::lock_guard<std::mutex> lock(this->Mutex);
+    (void)lock;
+    this->Queue.push(event);
+  }
+  this->CondVar.notify_all();
 }
 
 //----------------------------------------------------------------------------
 bool vtkVRQueue::IsEmpty() const
 {
-  this->Mutex->Lock();
-  bool result = this->Queue.empty();
-  this->Mutex->Unlock();
+  bool result;
+  {
+    std::lock_guard<std::mutex> lock(this->Mutex);
+    (void)lock;
+    result = this->Queue.empty();
+  }
   return result;
 }
 
 //----------------------------------------------------------------------------
 bool vtkVRQueue::TryDequeue(vtkVREvent& event)
 {
-  this->Mutex->Lock();
-  bool result = false;
-  if (!this->Queue.empty())
+  bool result;
   {
-    result = true;
-    event = this->Queue.front();
-    this->Queue.pop();
+    std::lock_guard<std::mutex> lock(this->Mutex);
+    (void)lock;
+    result = false;
+    if (!this->Queue.empty())
+    {
+      result = true;
+      event = this->Queue.front();
+      this->Queue.pop();
+    }
   }
-  this->Mutex->Unlock();
 
   return result;
 }
@@ -81,32 +87,35 @@ bool vtkVRQueue::TryDequeue(vtkVREvent& event)
 //----------------------------------------------------------------------------
 void vtkVRQueue::Dequeue(vtkVREvent& event)
 {
-  this->Mutex->Lock();
-  while (this->Queue.empty())
   {
-    this->CondVar->Wait(this->Mutex.GetPointer());
-  }
+    std::lock_guard<std::mutex> lock(this->Mutex);
+    (void)lock;
+    while (this->Queue.empty())
+    {
+      this->CondVar.wait(this->Mutex);
+    }
 
-  event = this->Queue.front();
-  this->Queue.pop();
-  this->Mutex->Unlock();
+    event = this->Queue.front();
+    this->Queue.pop();
+  }
 }
 
 //----------------------------------------------------------------------------
 bool vtkVRQueue::TryDequeue(std::queue<vtkVREvent>& event)
 {
-  this->Mutex->Lock();
-  if (!this->Queue.empty())
   {
-    event = this->Queue;
-    while (!this->Queue.empty())
+    std::lock_guard<std::mutex> lock(this->Mutex);
+    (void)lock;
+    if (!this->Queue.empty())
     {
-      this->Queue.pop();
+      event = this->Queue;
+      while (!this->Queue.empty())
+      {
+        this->Queue.pop();
+      }
     }
   }
-  this->Mutex->Unlock();
-  return true;
-  return true; // WRS-TODO: for the other TryDequeue, we return the result.  Why not here? */
+  return true; // WRS-TODO: for the other TryDequeue, we return the result.  Why not here?
 }
 
 //----------------------------------------------------------------------------
@@ -115,8 +124,4 @@ void vtkVRQueue::PrintSelf(ostream& os, vtkIndent indent)
   this->Superclass::PrintSelf(os, indent);
 
   os << indent << "Queued Events: " << this->Queue.size() << endl;
-  os << indent << "Mutex:" << endl;
-  this->Mutex->PrintSelf(os, indent.GetNextIndent());
-  os << indent << "CondVar:" << endl;
-  this->CondVar->PrintSelf(os, indent.GetNextIndent());
 }

@@ -649,10 +649,7 @@ int pqNodeEditorWidget::removeIncomingEdges(pqProxy* proxy)
   {
     for (pqNodeEditorEdge* edge : edgesIt->second)
     {
-      if (edge)
-      {
-        delete edge;
-      }
+      delete edge;
     }
     edgesIt->second.resize(0);
   }

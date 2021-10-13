@@ -662,7 +662,7 @@ void pqServerConfiguration::setStartupToCommand(
 
   // exec and arguments
   QStringList commandList = command_str.split(" ", PV_QT_SKIP_EMPTY_PARTS);
-  if (commandList.size() >= 1)
+  if (!commandList.empty())
   {
     xmlCommand->SetAttribute("exec", commandList[0].toUtf8().data());
     for (int i = 1; i < commandList.size(); ++i)

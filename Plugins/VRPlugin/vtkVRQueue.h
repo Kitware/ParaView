@@ -35,9 +35,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkNew.h"
 #include "vtkObject.h"
 
-class vtkConditionVariable;
-class vtkMutexLock;
-
+#include <condition_variable>
+#include <mutex>
 #include <queue>
 
 #define BUTTON_EVENT 1
@@ -100,7 +99,7 @@ private:
   void operator=(const vtkVRQueue&) = delete;
 
   std::queue<vtkVREvent> Queue;
-  mutable vtkNew<vtkMutexLock> Mutex;
-  vtkNew<vtkConditionVariable> CondVar;
+  mutable std::mutex Mutex;
+  std::condition_variable_any CondVar;
 };
 #endif // vtkVRQueue_h
