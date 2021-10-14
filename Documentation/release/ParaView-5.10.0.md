@@ -144,6 +144,10 @@ variables:
 
 ParaView now supports a 19-node-pyramid (`vtkTriQuadraticPyramid`) element. This new cell type is included as an option in the **UnstructuredCellTypes** source.
 
+## Additional example data files
+
+ParaView 5.10.0 installers now include many more example datasets. A netCDF example with sea surface temperature has been added. VTK legacy and XML examples have also been added, including both structured and unstructured datasets. Some of these datasets are parallel and/or time-dependent examples.
+
 # Rendering enhancements
 
 ## Render View background color
