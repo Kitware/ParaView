@@ -437,5 +437,49 @@
       </IntVectorProperty>
       <!-- End ExtractTimeSteps -->
     </SourceProxy>
+
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkExtractParticlesOverTime"
+                 name="ExtractParticlesOverTime"
+                 label="Extract Particles Over Time">
+        <Documentation short_help="Extract particles that pass through a volume over time."
+                     long_help="This filter extracts input particles that pass through a volume by iterating over time.">
+        </Documentation>
+
+        <InputProperty
+            name="Particles"
+            port_index="0"
+            command="SetInputConnection">
+          <ProxyGroupDomain name="groups">
+            <Group name="sources"/>
+            <Group name="filters"/>
+          </ProxyGroupDomain>
+          <DataTypeDomain name="input_type">
+            <DataType value="vtkDataSet"/>
+          </DataTypeDomain>
+          <Documentation>
+            The moving particles.
+          </Documentation>
+        </InputProperty>
+
+        <InputProperty
+            name="Volume"
+            port_index="1"
+            command="SetInputConnection">
+          <ProxyGroupDomain name="groups">
+            <Group name="sources"/>
+            <Group name="filters"/>
+          </ProxyGroupDomain>
+          <DataTypeDomain name="input_type">
+            <DataType value="vtkDataSet"/>
+          </DataTypeDomain>
+          <Documentation>
+            The volumetric data to detect if particles pass through.
+          </Documentation>
+        </InputProperty>
+
+      <!-- End ExtractParticlesOverTime -->
+    </SourceProxy>
+
   </ProxyGroup>
 </ServerManagerConfiguration>
