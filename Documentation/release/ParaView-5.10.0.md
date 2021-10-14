@@ -108,7 +108,7 @@ When right-clicking a directory in the favorites list, a "Rename label" option i
 
 Standard shortcuts to some buttons in the file dialog have been added as well. `Alt+Left` goes back, `Alt+Right` goes forward, `Alt+Up` goes to the parent directory and `Ctrl+N` creates a new directory. The "Create New Folder" button is now disabled when opening an existing file.
 
-XXXX Add image of favorites
+>![file-dialog-favorites](img/5.10.0/file-dialog-favorites.png)
 
 ## New stride property for animations
 
