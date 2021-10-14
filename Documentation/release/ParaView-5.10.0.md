@@ -114,10 +114,6 @@ XXXX Add image of favorites
 
 It is now possible to change the granularity of the animation using the **Stride** property in the *Animation View*. This property only makes sense in the **Snap to Timesteps** and **Sequence** mode, i.e., when there is a fixed number of frames. The **Stride** property allows skipping a fixed number of frames to control how many frames should be displayed. For example, with a dataset having a time domain of `[0,1,2,3,4,5,6]` and when setting the stride to 2, only the times `[0,2,4,6]` will be used. The stride is taken into account when using the `Play`, `Go To Next Frame` or `Go To Previous Frame` buttons. A stride of 1 will act as the default behavior, i.e., no frames are skipped.
 
-## New default view setting 'Empty'
-
-The **Default View Type** advanced property under "General" settings/preferences tab now has an "Empty" option. This setting will open ParaView with an empty view that lets you select one of the available views.
-
 ## RealTime animation mode deprecated
 
 The 'RealTime' animation mode is deprecated and will be removed in a future release. Rationale:
@@ -126,6 +122,10 @@ The 'RealTime' animation mode is deprecated and will be removed in a future rele
 * ParaView processes data and takes the time it needs so real-time replay is unlikely to happen as expected.
 
 See the [discussion](https://discourse.paraview.org/t/paraview-time-refactoring/5506/6) leading to the decision to remove this animation mode.
+
+## New default view setting 'Empty'
+
+The **Default View Type** advanced property under "General" settings/preferences tab now has an "Empty" option. This setting will open ParaView with an empty view that lets you select one of the available views.
 
 ## PVSC updates
 
