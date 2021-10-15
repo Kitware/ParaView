@@ -194,15 +194,15 @@ vtkSMProxy* vtkSMTransferFunctionManager::GetTransferFunction2D(
   }
 
   // Create a new one.
-  proxy = pxm->NewProxy("transfer_2d_functions", "ImageData");
+  proxy = pxm->NewProxy("transfer_2d_functions", "TransferFunction2D");
   if (!proxy)
   {
     vtkErrorMacro("Failed to create 2DTransferFunction proxy.");
     return nullptr;
   }
-  vtkImageData* im = vtkImageData::SafeDownCast(proxy->GetClientSideObject());
-  im->SetDimensions(2, 2, 2);
-  im->AllocateScalars(VTK_FLOAT, 4);
+  //  vtkPVTransferFunction2D* tf2d =
+  //  vtkPVTransferFunction2D::SafeDownCast(proxy->GetClientSideObject()); im->SetDimensions(2, 2,
+  //  2); im->AllocateScalars(VTK_FLOAT, 4);
 
   vtkNew<vtkSMParaViewPipelineController> controller;
   controller->PreInitializeProxy(proxy);

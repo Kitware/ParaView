@@ -1593,12 +1593,12 @@
         <BooleanDomain name="bool" />
       </IntVectorProperty>
       -->
-      <IntVectorProperty command="SetCustomRange"
+      <DoubleVectorProperty command="SetCustomRange"
                          default_values="0.0 1.0 0.0 1.0"
                          name="CustomRange"
                          number_of_elements="4"
                          panel_visibility="never" >
-      </IntVectorProperty>
+      </DoubleVectorProperty>
     </TransferFunction2DProxy>
     <!-- end of "transfer_2d_functions" -->
   </ProxyGroup>
