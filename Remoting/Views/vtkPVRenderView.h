@@ -1303,6 +1303,8 @@ private:
 
   int ForceDataDistributionMode;
   int PreviousDiscreteCameraIndex;
+  vtkSmartPointer<vtkTexture> EnvironmentalBGTexture;
+  bool UseTexturedEnvironmentalBG;
 };
 
 #endif

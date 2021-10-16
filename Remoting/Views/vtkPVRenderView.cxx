@@ -401,6 +401,7 @@ vtkPVRenderView::vtkPVRenderView()
   this->UseRenderViewSettingsForBackground = true;
   this->Background[0] = this->Background[1] = this->Background[2] = 0.0;
   this->Background2[0] = this->Background2[1] = this->Background2[2] = 0.0;
+  this->UseTexturedEnvironmentalBG = false;
 
   auto window = this->GetRenderWindow();
   assert(window);
@@ -2608,7 +2609,7 @@ void vtkPVRenderView::UpdateBackground(vtkRenderer* renderer /*=nullptr*/)
     case DEFAULT:
       renderer->SetTexturedBackground(false);
       renderer->SetGradientBackground(false);
-      renderer->SetUseImageBasedLighting(false);
+      renderer->SetUseImageBasedLighting(this->UseTexturedEnvironmentalBG);
       break;
 
     case GRADIENT:
@@ -2667,7 +2668,7 @@ void vtkPVRenderView::UpdateBackground(vtkRenderer* renderer /*=nullptr*/)
   else
   {
     this->Skybox->SetVisibility(0);
-    renderer->SetEnvironmentTexture(nullptr);
+    renderer->SetEnvironmentTexture(this->EnvironmentalBGTexture);
   }
 }
 
@@ -2723,7 +2724,7 @@ void vtkPVRenderView::SetEnvironmentalBG2(double r, double g, double b)
 void vtkPVRenderView::SetEnvironmentalBGTexture(vtkTexture* texture)
 {
   this->ConfigureTexture(texture);
-  this->GetRenderer()->SetEnvironmentTexture(texture);
+  this->EnvironmentalBGTexture = texture;
 }
 
 //----------------------------------------------------------------------------
@@ -2735,7 +2736,7 @@ void vtkPVRenderView::SetGradientEnvironmentalBG(int val)
 //----------------------------------------------------------------------------
 void vtkPVRenderView::SetTexturedEnvironmentalBG(int val)
 {
-  this->GetRenderer()->SetUseImageBasedLighting(val ? true : false);
+  this->UseTexturedEnvironmentalBG = (val ? true : false);
 }
 
 //*****************************************************************
