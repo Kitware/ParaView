@@ -1,0 +1,637 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ServerManagerConfiguration>
+  <ProxyGroup name="parametric_functions">
+    <Proxy name="Boy's surface" class="vtkParametricBoy">
+      <DoubleVectorProperty name="Z Scale"
+                            command="SetZScale"
+                            number_of_elements="1"
+                            default_values="0.125">
+      </DoubleVectorProperty>
+      <IntVectorProperty name="ClockwiseOrdering"
+                         command="SetClockwiseOrdering"
+                         number_of_elements="1"
+                         default_values="1">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          This property changes the direction of the normals.
+        </Documentation>
+      </IntVectorProperty>
+    </Proxy>
+    <Proxy name="Conic spiral" class="vtkParametricConicSpiral">
+      <DoubleVectorProperty name="TubeRadius"
+                            command="SetA"
+                            animateable="1"
+                            number_of_elements="1"
+                            default_values="0.2">
+        <DoubleRangeDomain name="range" min="0" />
+      </DoubleVectorProperty>
+      <DoubleVectorProperty name="Height"
+                            command="SetB"
+                            number_of_elements="1"
+                            default_values="1">
+        <DoubleRangeDomain name="range" min="0" />
+      </DoubleVectorProperty>
+      <DoubleVectorProperty name="Radius"
+                            command="SetC"
+                            number_of_elements="1"
+                            default_values="0.1">
+        <DoubleRangeDomain name="range" min="0" />
+      </DoubleVectorProperty>
+      <DoubleVectorProperty name="NumberOfWindings"
+                            command="SetN"
+                            number_of_elements="1"
+                            default_values="2">
+         <DoubleRangeDomain name="range" min="0" />
+      </DoubleVectorProperty>
+      <IntVectorProperty name="ClockwiseOrdering"
+                         command="SetClockwiseOrdering"
+                         number_of_elements="1"
+                         default_values="1">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          This property changes the direction of the normals.
+        </Documentation>
+      </IntVectorProperty>
+    </Proxy>
+    <Proxy name="Cross-cap" class="vtkParametricCrossCap">
+      <IntVectorProperty name="ClockwiseOrdering"
+                         command="SetClockwiseOrdering"
+                         number_of_elements="1"
+                         default_values="1">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          This property changes the direction of the normals.
+        </Documentation>
+      </IntVectorProperty>
+    </Proxy>
+    <Proxy name="Dini's surface" class="vtkParametricDini">
+      <DoubleVectorProperty name="A"
+                            command="SetA"
+                            animateable="1"
+                            number_of_elements="1"
+                            default_values="1.0">
+        <DoubleRangeDomain name="range" min="0" />
+      </DoubleVectorProperty>
+      <DoubleVectorProperty name="B"
+                            command="SetB"
+                            number_of_elements="1"
+                            default_values="0.2">
+        <DoubleRangeDomain name="range" min="0" />
+      </DoubleVectorProperty>
+      <IntVectorProperty name="ClockwiseOrdering"
+                         command="SetClockwiseOrdering"
+                         number_of_elements="1"
+                         default_values="1">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          This property changes the direction of the normals.
+        </Documentation>
+      </IntVectorProperty>
+    </Proxy>
+    <Proxy name="Ellipsoid" class="vtkParametricEllipsoid">
+      <DoubleVectorProperty name="X Radius"
+                            command="SetXRadius"
+                            number_of_elements="1"
+                            default_values="1">
+        <DoubleRangeDomain name="range" min="0" />
+      </DoubleVectorProperty>
+      <DoubleVectorProperty name="Y Radius"
+                            command="SetYRadius"
+                            number_of_elements="1"
+                            default_values="1">
+        <DoubleRangeDomain name="range" min="0" />
+      </DoubleVectorProperty>
+      <DoubleVectorProperty name="Z Radius"
+                            command="SetZRadius"
+                            number_of_elements="1"
+                            default_values="1">
+        <DoubleRangeDomain name="range" min="0" />
+      </DoubleVectorProperty>
+      <IntVectorProperty name="ClockwiseOrdering"
+                         command="SetClockwiseOrdering"
+                         number_of_elements="1"
+                         default_values="1">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          This property changes the direction of the normals.
+        </Documentation>
+      </IntVectorProperty>
+    </Proxy>
+    <Proxy name="Enneper's minimal surface" class="vtkParametricEnneper"/>
+    <Proxy name="Figure 8 klein bottle" class="vtkParametricFigure8Klein">
+      <DoubleVectorProperty name="Radius"
+                            command="SetRadius"
+                            number_of_elements="1"
+                            default_values="1">
+        <DoubleRangeDomain name="range" min="0" />
+      </DoubleVectorProperty>
+      <IntVectorProperty name="ClockwiseOrdering"
+                         command="SetClockwiseOrdering"
+                         number_of_elements="1"
+                         default_values="1">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          This property changes the direction of the normals.
+        </Documentation>
+      </IntVectorProperty>
+    </Proxy>
+    <Proxy name="Klein bottle" class="vtkParametricKlein">
+      <IntVectorProperty name="ClockwiseOrdering"
+                         command="SetClockwiseOrdering"
+                         number_of_elements="1"
+                         default_values="1">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          This property changes the direction of the normals.
+        </Documentation>
+      </IntVectorProperty>
+    </Proxy>
+    <Proxy name="Mobius strip" class="vtkParametricMobius">
+      <DoubleVectorProperty name="Radius"
+                            command="SetRadius"
+                            number_of_elements="1"
+                            default_values="1">
+         <DoubleRangeDomain name="range" min="0" />
+      </DoubleVectorProperty>
+      <DoubleVectorProperty name="MinimumV"
+                            command="SetMinimumV"
+                            number_of_elements="1"
+                            default_values="-1">
+         <DoubleRangeDomain name="range" min="-1" max="1" />
+      </DoubleVectorProperty>
+      <DoubleVectorProperty name="MaximumV"
+                            command="SetMaximumV"
+                            number_of_elements="1"
+                            default_values="1">
+         <DoubleRangeDomain name="range" min="-1"  max="1" />
+      </DoubleVectorProperty>
+      <IntVectorProperty name="ClockwiseOrdering"
+                         command="SetClockwiseOrdering"
+                         number_of_elements="1"
+                         default_values="1">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          This property changes the direction of the normals.
+        </Documentation>
+      </IntVectorProperty>
+    </Proxy>
+    <Proxy name="Random Hills" class="vtkParametricRandomHills">
+      <IntVectorProperty name="Number of Hills"
+                            command="SetNumberOfHills"
+                            number_of_elements="1"
+                            default_values="30">
+         <IntRangeDomain name="range" min="1" />
+      </IntVectorProperty>
+      <DoubleVectorProperty name="Hill X-variance"
+                            command="SetHillXVariance"
+                            number_of_elements="1"
+                            default_values="2.5">
+         <DoubleRangeDomain name="range" min="0" />
+      </DoubleVectorProperty>
+      <DoubleVectorProperty name="Hill Y-variance"
+                            command="SetHillYVariance"
+                            number_of_elements="1"
+                            default_values="2.5">
+         <DoubleRangeDomain name="range" min="0" />
+      </DoubleVectorProperty>
+      <DoubleVectorProperty name="Hill Amplitude"
+                            command="SetHillAmplitude"
+                            number_of_elements="1"
+                            default_values="2">
+         <DoubleRangeDomain name="range" min="0" />
+      </DoubleVectorProperty>
+      <IntVectorProperty name="Allow Random Generation"
+                         command="SetAllowRandomGeneration"
+                         number_of_elements="1"
+                         default_values="1">
+        <BooleanDomain name="bool"/>
+      </IntVectorProperty>
+      <IntVectorProperty name="Random Seed"
+                            command="SetRandomSeed"
+                            number_of_elements="1"
+                            default_values="1">
+      </IntVectorProperty>
+      <DoubleVectorProperty name="X-Variance Scale Factor"
+                            command="SetXVarianceScaleFactor"
+                            number_of_elements="1"
+                            default_values="0.333333333333333">
+         <DoubleRangeDomain name="range" min="0" />
+      </DoubleVectorProperty>
+      <DoubleVectorProperty name="Y-Variance Scale Factor"
+                            command="SetYVarianceScaleFactor"
+                            number_of_elements="1"
+                            default_values="0.333333333333333">
+         <DoubleRangeDomain name="range" min="0" />
+      </DoubleVectorProperty>
+      <DoubleVectorProperty name="Amplitude Scale Factor"
+                            command="SetAmplitudeScaleFactor"
+                            number_of_elements="1"
+                            default_values="0.333333333333333">
+         <DoubleRangeDomain name="range" min="0" />
+      </DoubleVectorProperty>
+      <IntVectorProperty name="ClockwiseOrdering"
+                         command="SetClockwiseOrdering"
+                         number_of_elements="1"
+                         default_values="0">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          This property changes the direction of the normals.
+        </Documentation>
+      </IntVectorProperty>
+    </Proxy>
+    <Proxy name="Roman surface" class="vtkParametricRoman">
+      <DoubleVectorProperty name="Radius"
+                            command="SetRadius"
+                            number_of_elements="1"
+                            default_values="1">
+         <DoubleRangeDomain name="range" min="0" />
+      </DoubleVectorProperty>
+      <IntVectorProperty name="ClockwiseOrdering"
+                         command="SetClockwiseOrdering"
+                         number_of_elements="1"
+                         default_values="1">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          This property changes the direction of the normals.
+        </Documentation>
+      </IntVectorProperty>
+    </Proxy>
+    <Proxy name="Super Ellipsoid" class="vtkParametricSuperEllipsoid">
+      <DoubleVectorProperty name="X Radius"
+                            command="SetXRadius"
+                            number_of_elements="1"
+                            default_values="1">
+        <DoubleRangeDomain name="range" min="0" />
+      </DoubleVectorProperty>
+      <DoubleVectorProperty name="Y Radius"
+                            command="SetYRadius"
+                            number_of_elements="1"
+                            default_values="1">
+        <DoubleRangeDomain name="range" min="0" />
+      </DoubleVectorProperty>
+      <DoubleVectorProperty name="Z Radius"
+                            command="SetZRadius"
+                            number_of_elements="1"
+                            default_values="1">
+        <DoubleRangeDomain name="range" min="0" />
+      </DoubleVectorProperty>
+      <DoubleVectorProperty name="N1"
+                            command="SetN1"
+                            number_of_elements="1"
+                            default_values="1">
+        <DoubleRangeDomain name="range" min="0" />
+      </DoubleVectorProperty>
+      <DoubleVectorProperty name="N2"
+                            command="SetN2"
+                            number_of_elements="1"
+                            default_values="1">
+        <DoubleRangeDomain name="range" min="0" />
+      </DoubleVectorProperty>
+      <IntVectorProperty name="ClockwiseOrdering"
+                         command="SetClockwiseOrdering"
+                         number_of_elements="1"
+                         default_values="0">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          This property changes the direction of the normals.
+        </Documentation>
+      </IntVectorProperty>
+    </Proxy>
+    <Proxy name="Super Toroid" class="vtkParametricSuperToroid">
+      <DoubleVectorProperty name="Ring Radius"
+                            command="SetRingRadius"
+                            number_of_elements="1"
+                            default_values="1">
+        <DoubleRangeDomain name="range" min="0" />
+      </DoubleVectorProperty>
+      <DoubleVectorProperty name="Cross-section Radius"
+                            command="SetCrossSectionRadius"
+                            number_of_elements="1"
+                            default_values="0.5">
+        <DoubleRangeDomain name="range" min="0" />
+      </DoubleVectorProperty>
+      <DoubleVectorProperty name="X Radius"
+                            command="SetXRadius"
+                            number_of_elements="1"
+                            default_values="1">
+        <DoubleRangeDomain name="range" min="0" />
+      </DoubleVectorProperty>
+      <DoubleVectorProperty name="Y Radius"
+                            command="SetYRadius"
+                            number_of_elements="1"
+                            default_values="1">
+        <DoubleRangeDomain name="range" min="0" />
+      </DoubleVectorProperty>
+      <DoubleVectorProperty name="Z Radius"
+                            command="SetZRadius"
+                            number_of_elements="1"
+                            default_values="1">
+        <DoubleRangeDomain name="range" min="0" />
+      </DoubleVectorProperty>
+      <DoubleVectorProperty name="N1"
+                            command="SetN1"
+                            number_of_elements="1"
+                            default_values="1">
+        <DoubleRangeDomain name="range" min="0" />
+      </DoubleVectorProperty>
+      <DoubleVectorProperty name="N2"
+                            command="SetN2"
+                            number_of_elements="1"
+                            default_values="1">
+        <DoubleRangeDomain name="range" min="0" />
+      </DoubleVectorProperty>
+      <IntVectorProperty name="ClockwiseOrdering"
+                         command="SetClockwiseOrdering"
+                         number_of_elements="1"
+                         default_values="1">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          This property changes the direction of the normals.
+        </Documentation>
+      </IntVectorProperty>
+    </Proxy>
+    <Proxy name="Torus" class="vtkParametricTorus">
+      <DoubleVectorProperty name="Ring Radius"
+                            command="SetRingRadius"
+                            number_of_elements="1"
+                            default_values="1">
+        <DoubleRangeDomain name="range" min="0" />
+      </DoubleVectorProperty>
+      <DoubleVectorProperty name="Cross-section Radius"
+                            command="SetCrossSectionRadius"
+                            number_of_elements="1"
+                            default_values="0.5">
+        <DoubleRangeDomain name="range" min="0" />
+      </DoubleVectorProperty>
+      <IntVectorProperty name="ClockwiseOrdering"
+                         command="SetClockwiseOrdering"
+                         number_of_elements="1"
+                         default_values="1">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          This property changes the direction of the normals.
+        </Documentation>
+      </IntVectorProperty>
+    </Proxy>
+    <!-- More Parametric Surfaces-->
+    <Proxy name="Bohemian Dome" class="vtkParametricBohemianDome">
+      <DoubleVectorProperty name="A"
+                            command="SetA"
+                            animateable="1"
+                            number_of_elements="1"
+                            default_values="0.5">
+        <DoubleRangeDomain name="range" min="0" />
+      </DoubleVectorProperty>
+      <DoubleVectorProperty name="B"
+                            command="SetB"
+                            number_of_elements="1"
+                            default_values="1.5">
+        <DoubleRangeDomain name="range" min="0" />
+      </DoubleVectorProperty>
+      <DoubleVectorProperty name="C"
+                            command="SetC"
+                            number_of_elements="1"
+                            default_values="1.0">
+        <DoubleRangeDomain name="range" min="0" />
+      </DoubleVectorProperty>
+      <IntVectorProperty name="ClockwiseOrdering"
+                         command="SetClockwiseOrdering"
+                         number_of_elements="1"
+                         default_values="1">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          This property changes the direction of the normals.
+        </Documentation>
+      </IntVectorProperty>
+    </Proxy>
+    <Proxy name="Bour's minimal surface" class="vtkParametricBour">
+      <DoubleVectorProperty name="MinimumU"
+                            command="SetMinimumU"
+                            number_of_elements="1"
+                            default_values="0.0">
+      </DoubleVectorProperty>
+      <DoubleVectorProperty name="MaximumU"
+                            command="SetMaximumU"
+                            number_of_elements="1"
+                            default_values="1.0">
+      </DoubleVectorProperty>
+      <DoubleVectorProperty name="MinimumV"
+                            command="SetMinimumV"
+                            number_of_elements="1"
+                            default_values="0.0">
+      </DoubleVectorProperty>
+      <DoubleVectorProperty name="MaximumV"
+                            command="SetMaximumV"
+                            number_of_elements="1"
+                            default_values="12.5663706144">
+      </DoubleVectorProperty>
+      <IntVectorProperty name="ClockwiseOrdering"
+                         command="SetClockwiseOrdering"
+                         number_of_elements="1"
+                         default_values="1">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          This property changes the direction of the normals.
+        </Documentation>
+      </IntVectorProperty>
+    </Proxy>
+    <Proxy name="Catalan's minimal surface" class="vtkParametricCatalanMinimal">
+      <DoubleVectorProperty name="MinimumU"
+                            command="SetMinimumU"
+                            number_of_elements="1"
+                            default_values="-12.5663706144">
+      </DoubleVectorProperty>
+      <DoubleVectorProperty name="MaximumU"
+                            command="SetMaximumU"
+                            number_of_elements="1"
+                            default_values="12.5663706144">
+      </DoubleVectorProperty>
+      <DoubleVectorProperty name="MinimumV"
+                            command="SetMinimumV"
+                            number_of_elements="1"
+                            default_values="-1.5">
+      </DoubleVectorProperty>
+      <DoubleVectorProperty name="MaximumV"
+                            command="SetMaximumV"
+                            number_of_elements="1"
+                            default_values="1.5">
+      </DoubleVectorProperty>
+      <IntVectorProperty name="ClockwiseOrdering"
+                         command="SetClockwiseOrdering"
+                         number_of_elements="1"
+                         default_values="1">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          This property changes the direction of the normals.
+        </Documentation>
+      </IntVectorProperty>
+    </Proxy>
+    <Proxy name="Henneberg's minimal surface" class="vtkParametricHenneberg">
+      <DoubleVectorProperty name="MinimumU"
+                            command="SetMinimumU"
+                            number_of_elements="1"
+                            default_values="-1.0">
+      </DoubleVectorProperty>
+      <DoubleVectorProperty name="MaximumU"
+                            command="SetMaximumU"
+                            number_of_elements="1"
+                            default_values="1.0">
+      </DoubleVectorProperty>
+      <DoubleVectorProperty name="MinimumV"
+                            command="SetMinimumV"
+                            number_of_elements="1"
+                            default_values="-1.57079632679">
+      </DoubleVectorProperty>
+      <DoubleVectorProperty name="MaximumV"
+                            command="SetMaximumV"
+                            number_of_elements="1"
+                            default_values="1.57079632679">
+      </DoubleVectorProperty>
+      <IntVectorProperty name="ClockwiseOrdering"
+                         command="SetClockwiseOrdering"
+                         number_of_elements="1"
+                         default_values="1">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          This property changes the direction of the normals.
+        </Documentation>
+      </IntVectorProperty>
+    </Proxy>
+    <Proxy name="Kuen's surface" class="vtkParametricKuen">
+      <DoubleVectorProperty name="MinimumU"
+                            command="SetMinimumU"
+                            number_of_elements="1"
+                            default_values="-9.42477796077">
+      </DoubleVectorProperty>
+      <DoubleVectorProperty name="MaximumU"
+                            command="SetMaximumU"
+                            number_of_elements="1"
+                            default_values="9.42477796077">
+      </DoubleVectorProperty>
+      <DoubleVectorProperty name="MinimumV"
+                            command="SetMinimumV"
+                            number_of_elements="1"
+                            default_values="0.0">
+      </DoubleVectorProperty>
+      <DoubleVectorProperty name="MaximumV"
+                            command="SetMaximumV"
+                            number_of_elements="1"
+                            default_values="3.14159265359">
+      </DoubleVectorProperty>
+      <IntVectorProperty name="ClockwiseOrdering"
+                         command="SetClockwiseOrdering"
+                         number_of_elements="1"
+                         default_values="1">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          This property changes the direction of the normals.
+        </Documentation>
+      </IntVectorProperty>
+    </Proxy>
+    <Proxy name="Plucker's conoid" class="vtkParametricPluckerConoid">
+      <DoubleVectorProperty name="MinimumU"
+                            command="SetMinimumU"
+                            number_of_elements="1"
+                            default_values="0.0">
+      </DoubleVectorProperty>
+      <DoubleVectorProperty name="MaximumU"
+                            command="SetMaximumU"
+                            number_of_elements="1"
+                            default_values="3.0">
+      </DoubleVectorProperty>
+      <DoubleVectorProperty name="MinimumV"
+                            command="SetMinimumV"
+                            number_of_elements="1"
+                            default_values="0.0">
+      </DoubleVectorProperty>
+      <DoubleVectorProperty name="MaximumV"
+                            command="SetMaximumV"
+                            number_of_elements="1"
+                            default_values="6.28318530718">
+      </DoubleVectorProperty>
+      <IntVectorProperty name="ClockwiseOrdering"
+                         command="SetClockwiseOrdering"
+                         number_of_elements="1"
+                         default_values="1">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          This property changes the direction of the normals.
+        </Documentation>
+      </IntVectorProperty>
+    </Proxy>
+    <Proxy name="Pseudosphere" class="vtkParametricPseudosphere">
+      <DoubleVectorProperty name="MinimumU"
+                            command="SetMinimumU"
+                            number_of_elements="1"
+                            default_values="-5.0">
+      </DoubleVectorProperty>
+      <DoubleVectorProperty name="MaximumU"
+                            command="SetMaximumU"
+                            number_of_elements="1"
+                            default_values="5.0">
+      </DoubleVectorProperty>
+      <DoubleVectorProperty name="MinimumV"
+                            command="SetMinimumV"
+                            number_of_elements="1"
+                            default_values="-3.14159265359">
+      </DoubleVectorProperty>
+      <DoubleVectorProperty name="MaximumV"
+                            command="SetMaximumV"
+                            number_of_elements="1"
+                            default_values="3.14159265359">
+      </DoubleVectorProperty>
+      <IntVectorProperty name="ClockwiseOrdering"
+                         command="SetClockwiseOrdering"
+                         number_of_elements="1"
+                         default_values="1">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          This property changes the direction of the normals.
+        </Documentation>
+      </IntVectorProperty>
+    </Proxy>
+  </ProxyGroup>
+
+  <ProxyGroup name="sources">
+   <SourceProxy name="ParametricSurfaces" class="vtkParametricFunctionSource"
+                label="Parametric Surfaces">
+      <IntVectorProperty name="U Resolution" command="SetUResolution"
+         number_of_elements="1" default_values="50">
+      </IntVectorProperty>
+      <IntVectorProperty name="V Resolution" command="SetVResolution"
+         number_of_elements="1" default_values="50">
+      </IntVectorProperty>
+      <IntVectorProperty
+        name="Scalar Mode"
+        command="SetScalarMode"
+        number_of_elements="1"
+        default_values="0">
+        <EnumerationDomain name="enum">
+          <Entry value="0" text="None"/>
+          <Entry value="1" text="U"/>
+          <Entry value="2" text="V"/>
+          <Entry value="3" text="U0"/>
+          <Entry value="4" text="V0"/>
+          <Entry value="5" text="U0V0"/>
+          <Entry value="6" text="Modulus"/>
+          <Entry value="7" text="Phase"/>
+          <Entry value="8" text="Quadrant"/>
+          <Entry value="9" text="X"/>
+          <Entry value="10" text="Y"/>
+          <Entry value="11" text="Z"/>
+        </EnumerationDomain>
+        <Documentation>
+          This property indicates which scalar mode will be generated.
+        </Documentation>
+      </IntVectorProperty>
+      <ProxyProperty
+       command="SetParametricFunction"
+       name="ParametricFunction"
+       label="Parametric Surfaces">
+       <ProxyListDomain name="proxy_list">
+          <Group name="parametric_functions"/>
+       </ProxyListDomain>
+     </ProxyProperty>
+   </SourceProxy>
+ </ProxyGroup>
+</ServerManagerConfiguration>

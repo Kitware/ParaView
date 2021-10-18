@@ -1,0 +1,6 @@
+NAME
+  ParametricSurfaces
+DESCRIPTION
+  Adds a ParametricSurfaces source
+REQUIRES_MODULES
+  VTK::FiltersCore
