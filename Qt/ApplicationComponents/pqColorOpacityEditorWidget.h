@@ -42,6 +42,7 @@ class pqColorMapModel;
 class vtkImageData;
 class vtkPiecewiseFunction;
 class vtkSMPropertyGroup;
+class vtkPVTransferFunction2D;
 
 /**
  * pqColorOpacityEditorWidget provides an in-line editor widget for editing the
@@ -484,7 +485,7 @@ protected: // NOLINT(readability-redundant-access-specifiers)
   /**
    * Initialize the 2D transfer function editor
    */
-  void initializeTransfer2DEditor(vtkImageData* im);
+  void initializeTransfer2DEditor(vtkPVTransferFunction2D* tf2d);
 
 private:
   Q_DISABLE_COPY(pqColorOpacityEditorWidget)

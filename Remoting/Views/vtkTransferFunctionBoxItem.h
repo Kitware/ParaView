@@ -24,6 +24,7 @@ class vtkImageData;
 class vtkPen;
 class vtkPoints2D;
 class vtkTransferFunctionBoxItemInternals;
+class vtkPVTransferFunction2DBox;
 
 class VTKREMOTINGVIEWS_EXPORT vtkTransferFunctionBoxItem : public vtkControlPointsItem
 {
@@ -87,6 +88,14 @@ public:
    */
   vtkSetMacro(BoxAlpha, double);
   vtkGetMacro(BoxAlpha, double);
+  ///@}
+
+  ///@{
+  /**
+   * Set/Get the internal transfer function control box.
+   */
+  void SetTransferFunctionBox(vtkPVTransferFunction2DBox* b);
+  vtkPVTransferFunction2DBox* GetTransferFunctionBox();
   ///@}
 
 protected:

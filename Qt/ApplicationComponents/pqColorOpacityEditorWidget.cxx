@@ -56,6 +56,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkImageData.h"
 #include "vtkNew.h"
 #include "vtkPVDiscretizableColorTransferFunction.h"
+#include "vtkPVTransferFunction2D.h"
+#include "vtkPVTransferFunction2DBox.h"
 #include "vtkPVXMLElement.h"
 #include "vtkPiecewiseFunction.h"
 #include "vtkSMCoreUtilities.h"
@@ -65,6 +67,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMRenderViewProxy.h"
 #include "vtkSMSessionProxyManager.h"
+#include "vtkSMTransferFunction2DProxy.h"
 #include "vtkSMTransferFunctionPresets.h"
 #include "vtkSMTransferFunctionProxy.h"
 #include "vtkTable.h"
@@ -513,44 +516,45 @@ pqColorOpacityEditorWidget::pqColorOpacityEditorWidget(
   {
     this->addPropertyLink(
       this, "transferFunction2DProxy", SIGNAL(transferFunction2DProxyChanged()), smproperty);
-    smproperty = smgroup->GetProperty("Transfer2DRange");
-    if (smproperty)
-    {
-      double values[4];
-      vtkSMPropertyHelper(smproperty).Get(values, 4);
-      vtkSMTransferFunctionProxy::RescaleTransferFunction(this->proxy(), values);
-      vtkSMProxy* opacityProxy = this->Internals->ScalarOpacityFunctionProxy;
-      vtkSMTransferFunctionProxy::RescaleTransferFunction(opacityProxy, values);
-      vtkSmartPointer<vtkImageData> im =
-        vtkImageData::SafeDownCast(this->transferFunction2DProxy()->GetClientSideObject());
-      if (!im)
-      {
-        return;
-      }
-      im->SetOrigin(values[0], values[2], 0.0);
-      im->SetDimensions(numBins, numBins, 1);
-      im->SetSpacing((values[1] - values[0]) / numBins, (values[3] - values[2]) / numBins, 1.0);
-      QObject::connect(
-        ui.Transfer2DEditor, &pqTransferFunction2DWidget::transferFunctionModified, this, [=]() {
-          vtkSmartPointer<vtkImageData> im =
-            vtkImageData::SafeDownCast(this->transferFunction2DProxy()->GetClientSideObject());
-          if (!im)
-          {
-            return;
-          }
-          double origin[3], spacing[3];
-          int dims[3];
-          im->GetOrigin(origin);
-          im->GetDimensions(dims);
-          im->GetSpacing(spacing);
-          double values[4];
-          values[0] = origin[0];
-          values[1] = origin[0] + dims[0] * spacing[0];
-          values[2] = origin[1];
-          values[3] = origin[1] + dims[1] * spacing[1];
-          vtkSMPropertyHelper(this->proxy(), "Transfer2DRange").Set(values, 4);
-        });
-    }
+    //    smproperty = smgroup->GetProperty("Transfer2DRange");
+    //    if (smproperty)
+    //    {
+    //      double values[4];
+    //      vtkSMPropertyHelper(smproperty).Get(values, 4);
+    //      vtkSMTransferFunctionProxy::RescaleTransferFunction(this->proxy(), values);
+    //      vtkSMProxy* opacityProxy = this->Internals->ScalarOpacityFunctionProxy;
+    //      vtkSMTransferFunctionProxy::RescaleTransferFunction(opacityProxy, values);
+    //      vtkSmartPointer<vtkImageData> im =
+    //        vtkImageData::SafeDownCast(this->transferFunction2DProxy()->GetClientSideObject());
+    //      if (!im)
+    //      {
+    //        return;
+    //      }
+    //      im->SetOrigin(values[0], values[2], 0.0);
+    //      im->SetDimensions(numBins, numBins, 1);
+    //      im->SetSpacing((values[1] - values[0]) / numBins, (values[3] - values[2]) /
+    //      numBins, 1.0); QObject::connect(
+    //        ui.Transfer2DEditor, &pqTransferFunction2DWidget::transferFunctionModified, this,
+    //        [=]() {
+    //          vtkSmartPointer<vtkImageData> im =
+    //            vtkImageData::SafeDownCast(this->transferFunction2DProxy()->GetClientSideObject());
+    //          if (!im)
+    //          {
+    //            return;
+    //          }
+    //          double origin[3], spacing[3];
+    //          int dims[3];
+    //          im->GetOrigin(origin);
+    //          im->GetDimensions(dims);
+    //          im->GetSpacing(spacing);
+    //          double values[4];
+    //          values[0] = origin[0];
+    //          values[1] = origin[0] + dims[0] * spacing[0];
+    //          values[2] = origin[1];
+    //          values[3] = origin[1] + dims[1] * spacing[1];
+    //          vtkSMPropertyHelper(this->proxy(), "Transfer2DRange").Set(values, 4);
+    //        });
+    //    }
   }
 
   smproperty = smgroup->GetProperty("Use2DTransferFunction");
@@ -723,19 +727,19 @@ pqSMProxy pqColorOpacityEditorWidget::scalarOpacityFunctionProxy() const
 }
 
 //-----------------------------------------------------------------------------
-void pqColorOpacityEditorWidget::setTransferFunction2DProxy(pqSMProxy t2dProxy)
+void pqColorOpacityEditorWidget::setTransferFunction2DProxy(pqSMProxy tf2dProxy)
 {
   pqInternals& internals = (*this->Internals);
   // Ui::ColorOpacityEditorWidget& ui = internals.Ui;
 
-  vtkSMProxy* newT2dProxy = nullptr;
-  vtkImageData* t2d =
-    t2dProxy ? vtkImageData::SafeDownCast(t2dProxy->GetClientSideObject()) : nullptr;
-  if (t2dProxy && t2d)
+  vtkSMProxy* newtf2dProxy = nullptr;
+  vtkPVTransferFunction2D* tf2d =
+    tf2dProxy ? vtkPVTransferFunction2D::SafeDownCast(tf2dProxy->GetClientSideObject()) : nullptr;
+  if (tf2dProxy && tf2d)
   {
-    newT2dProxy = t2dProxy;
+    newtf2dProxy = tf2dProxy;
   }
-  if (internals.TransferFunction2DProxy == newT2dProxy)
+  if (internals.TransferFunction2DProxy == newtf2dProxy)
   {
     return;
   }
@@ -743,14 +747,14 @@ void pqColorOpacityEditorWidget::setTransferFunction2DProxy(pqSMProxy t2dProxy)
   {
     // cleanup old property links
   }
-  internals.TransferFunction2DProxy = newT2dProxy;
+  internals.TransferFunction2DProxy = newtf2dProxy;
   if (internals.TransferFunction2DProxy)
   {
     // pqDataRepresentation* repr = pqActiveObjects::instance().activeRepresentation();
     // vtkSMPVRepresentationProxy* proxy =
     // vtkSMPVRepresentationProxy::SafeDownCast(repr->getProxy());
 
-    this->initializeTransfer2DEditor(t2d);
+    this->initializeTransfer2DEditor(tf2d);
 
     // add new property links.
     //
@@ -1451,11 +1455,13 @@ void pqColorOpacityEditorWidget::realShow2DHistogram()
 {
   this->Internals->Ui.Transfer2DEditor->show();
 
-  vtkImageData* hist2D = vtkSMTransferFunctionProxy::GetHistogram2DCache(this->proxy());
+  vtkImageData* hist2D =
+    vtkSMTransferFunction2DProxy::GetHistogram2DCache(this->transferFunction2DProxy());
   if (!hist2D || this->Internals->HistogramOutdated)
   {
     this->Internals->Ui.ComputeDataHistogram->clear();
-    vtkSMTransferFunctionProxy* tfProxy = vtkSMTransferFunctionProxy::SafeDownCast(this->proxy());
+    vtkSMTransferFunction2DProxy* tfProxy =
+      vtkSMTransferFunction2DProxy::SafeDownCast(this->transferFunction2DProxy());
     hist2D =
       tfProxy->ComputeDataHistogram2D(this->Internals->Ui.DataHistogramNumberOfBins->value());
     this->Internals->Ui.Transfer2DEditor->setHistogram(hist2D);
@@ -1552,17 +1558,17 @@ void pqColorOpacityEditorWidget::onRangeHandlesRangeChanged(double rangeMin, dou
 
   vtkSMTransferFunctionProxy::RescaleTransferFunction(colorProxy, range);
   vtkSMTransferFunctionProxy::RescaleTransferFunction(opacityProxy, range);
+  vtkSMTransferFunction2DProxy::RescaleTransferFunction(
+    this->transferFunction2DProxy(), range[0], range[1], range[0], range[1]);
   this->Internals->render();
   Q_EMIT this->changeFinished();
 }
 
 //-----------------------------------------------------------------------------
-void pqColorOpacityEditorWidget::initializeTransfer2DEditor(vtkImageData* t2d)
+void pqColorOpacityEditorWidget::initializeTransfer2DEditor(vtkPVTransferFunction2D* tf2d)
 {
   Ui::ColorOpacityEditorWidget& ui = this->Internals->Ui;
-  vtkPVDiscretizableColorTransferFunction* ctf =
-    vtkPVDiscretizableColorTransferFunction::SafeDownCast(this->proxy()->GetClientSideObject());
-  ui.Transfer2DEditor->initialize(ctf, t2d);
+  ui.Transfer2DEditor->initialize(tf2d);
 }
 
 //-----------------------------------------------------------------------------
@@ -1574,18 +1580,17 @@ void pqColorOpacityEditorWidget::transfer2DChanged()
 //-----------------------------------------------------------------------------
 QList<QVariant> pqColorOpacityEditorWidget::transfer2DBoxes() const
 {
-  vtkPVDiscretizableColorTransferFunction* stc =
-    vtkPVDiscretizableColorTransferFunction::SafeDownCast(this->proxy()->GetClientSideObject());
+  vtkPVTransferFunction2D* tf2d = vtkPVTransferFunction2D::SafeDownCast(
+    this->Internals->TransferFunction2DProxy->GetClientSideObject());
   QList<QVariant> values;
-  if (stc == nullptr || !this->Internals->Ui.Transfer2DEditor->isInitialized())
+  if (tf2d == nullptr || !this->Internals->Ui.Transfer2DEditor->isInitialized())
   {
     return values;
   }
-  std::vector<vtkSmartPointer<vtkTransferFunctionBoxItem>> boxes =
-    stc->GetTransferFunction2DBoxes();
+  std::vector<vtkPVTransferFunction2DBox*> boxes = tf2d->GetBoxes();
   for (auto it = boxes.cbegin(); it < boxes.cend(); ++it)
   {
-    vtkSmartPointer<vtkTransferFunctionBoxItem> box = (*it);
+    vtkPVTransferFunction2DBox* box = (*it);
     if (!box)
     {
       continue;
@@ -1595,12 +1600,11 @@ QList<QVariant> pqColorOpacityEditorWidget::transfer2DBoxes() const
     {
       values.push_back(r[j]);
     }
-    const double* color = box->GetBoxColor();
-    for (int j = 0; j < 3; ++j)
+    const double* color = box->GetColor();
+    for (int j = 0; j < 4; ++j)
     {
       values.push_back(color[j]);
     }
-    values.push_back(box->GetBoxAlpha());
   }
   return values;
 }
@@ -1608,34 +1612,35 @@ QList<QVariant> pqColorOpacityEditorWidget::transfer2DBoxes() const
 //-----------------------------------------------------------------------------
 void pqColorOpacityEditorWidget::setTransfer2DBoxes(const QList<QVariant>& values)
 {
-  vtkPVDiscretizableColorTransferFunction* stc =
-    vtkPVDiscretizableColorTransferFunction::SafeDownCast(this->proxy()->GetClientSideObject());
-  if (stc == nullptr)
-  {
-    return;
-  }
-  double validBounds[4] = { 0, 1, 0, 1 };
-  vtkSmartPointer<vtkImageData> im =
-    vtkImageData::SafeDownCast(this->transferFunction2DProxy()->GetClientSideObject());
-  if (im)
-  {
-    double origin[3], spacing[3];
-    int dims[3];
-    im->GetOrigin(origin);
-    im->GetDimensions(dims);
-    im->GetSpacing(spacing);
-    validBounds[0] = origin[0];
-    validBounds[1] = origin[0] + dims[0] * spacing[0];
-    validBounds[2] = origin[1];
-    validBounds[3] = origin[1] + dims[1] * spacing[1];
-  }
-  for (int i = 0; i < values.size(); i = i + 8)
-  {
-    stc->AddTransfer2DBox(values[i].toDouble(), values[i + 1].toDouble(), values[i + 2].toDouble(),
-      values[i + 3].toDouble(), values[i + 4].toDouble(), values[i + 5].toDouble(),
-      values[i + 6].toDouble(), values[i + 7].toDouble(), validBounds[0], validBounds[1],
-      validBounds[2], validBounds[3]);
-  }
+  //  vtkPVDiscretizableColorTransferFunction* stc =
+  //    vtkPVDiscretizableColorTransferFunction::SafeDownCast(this->proxy()->GetClientSideObject());
+  //  if (stc == nullptr)
+  //  {
+  //    return;
+  //  }
+  //  double validBounds[4] = { 0, 1, 0, 1 };
+  //  vtkSmartPointer<vtkImageData> im =
+  //    vtkImageData::SafeDownCast(this->transferFunction2DProxy()->GetClientSideObject());
+  //  if (im)
+  //  {
+  //    double origin[3], spacing[3];
+  //    int dims[3];
+  //    im->GetOrigin(origin);
+  //    im->GetDimensions(dims);
+  //    im->GetSpacing(spacing);
+  //    validBounds[0] = origin[0];
+  //    validBounds[1] = origin[0] + dims[0] * spacing[0];
+  //    validBounds[2] = origin[1];
+  //    validBounds[3] = origin[1] + dims[1] * spacing[1];
+  //  }
+  //  for (int i = 0; i < values.size(); i = i + 8)
+  //  {
+  //    stc->AddTransfer2DBox(values[i].toDouble(), values[i + 1].toDouble(), values[i +
+  //    2].toDouble(),
+  //      values[i + 3].toDouble(), values[i + 4].toDouble(), values[i + 5].toDouble(),
+  //      values[i + 6].toDouble(), values[i + 7].toDouble(), validBounds[0], validBounds[1],
+  //      validBounds[2], validBounds[3]);
+  //  }
   // Q_UNUSED(values);
   //// Since the vtkColorTransferFunction connected to the widget is directly obtained
   //// from the proxy, we don't need to do anything here. The widget will be

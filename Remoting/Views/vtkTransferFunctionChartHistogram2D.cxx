@@ -27,6 +27,7 @@
 #include "vtkFloatArray.h"
 #include "vtkImageData.h"
 #include "vtkObjectFactory.h"
+#include "vtkPVTransferFunction2D.h"
 #include "vtkPlotHistogram2D.h"
 #include "vtkPointData.h"
 #include "vtkRenderWindowInteractor.h"
@@ -77,10 +78,10 @@ vtkSmartPointer<vtkTransferFunctionBoxItem> vtkTransferFunctionChartHistogram2D:
   double alpha = 1.0;
   auto boxItem = this->AddNewBox(box, color, alpha);
   this->SetActiveBox(boxItem);
-  if (this->Transfer2DBoxesItem)
-  {
-    this->Transfer2DBoxesItem->AddTransfer2DBox(boxItem);
-  }
+  //  if (this->Transfer2DBoxesItem)
+  //  {
+  //    this->Transfer2DBoxesItem->AddTransfer2DBox(boxItem);
+  //  }
   return boxItem;
 }
 
@@ -125,6 +126,10 @@ void vtkTransferFunctionChartHistogram2D::AddBox(vtkSmartPointer<vtkTransferFunc
     // Plot index other than -1 indicates the chart already has the box
     return;
   }
+  if (this->TransferFunction2D)
+  {
+    this->TransferFunction2D->AddControlBox(box->GetTransferFunctionBox());
+  }
   // Add the observer to update the transfer function on interaction
   box->AddObserver(vtkTransferFunctionBoxItem::BoxAddEvent, this,
     &vtkTransferFunctionChartHistogram2D::OnTransferFunctionBoxItemModified);
@@ -166,21 +171,21 @@ void vtkTransferFunctionChartHistogram2D::SetInputData(vtkImageData* data, vtkId
     this->Superclass::SetInputData(data, z);
 
     // Now add the transfer function boxes from the color function
-    if (this->Transfer2DBoxesItem)
-    {
-      std::vector<vtkSmartPointer<vtkTransferFunctionBoxItem>> boxes =
-        this->Transfer2DBoxesItem->GetTransferFunction2DBoxes();
-      for (auto it = boxes.begin(); it < boxes.end(); ++it)
-      {
-        vtkSmartPointer<vtkTransferFunctionBoxItem> box = *(it);
-        if (!box)
-        {
-          continue;
-        }
-        box->SetValidBounds(xMin, xMax, yMin, yMax);
-        this->AddBox(box);
-      }
-    }
+    //    if (this->Transfer2DBoxesItem)
+    //    {
+    //      std::vector<vtkSmartPointer<vtkTransferFunctionBoxItem>> boxes =
+    //        this->Transfer2DBoxesItem->GetTransferFunction2DBoxes();
+    //      for (auto it = boxes.begin(); it < boxes.end(); ++it)
+    //      {
+    //        vtkSmartPointer<vtkTransferFunctionBoxItem> box = *(it);
+    //        if (!box)
+    //        {
+    //          continue;
+    //        }
+    //        box->SetValidBounds(xMin, xMax, yMin, yMax);
+    //        this->AddBox(box);
+    //      }
+    //    }
 
     if (this->TransferFunction2D)
     {
@@ -190,30 +195,30 @@ void vtkTransferFunctionChartHistogram2D::SetInputData(vtkImageData* data, vtkId
 }
 
 //-------------------------------------------------------------------------------------------------
-void vtkTransferFunctionChartHistogram2D::SetTransferFunction2D(vtkImageData* transfer2D)
+void vtkTransferFunctionChartHistogram2D::SetTransferFunction2D(vtkPVTransferFunction2D* transfer2D)
 {
   this->TransferFunction2D = transfer2D;
 }
 
 //-------------------------------------------------------------------------------------------------
-vtkImageData* vtkTransferFunctionChartHistogram2D::GetTransferFunction2D()
+vtkPVTransferFunction2D* vtkTransferFunctionChartHistogram2D::GetTransferFunction2D()
 {
   return this->TransferFunction2D.GetPointer();
 }
 
-//-------------------------------------------------------------------------------------------------
-void vtkTransferFunctionChartHistogram2D::SetTransfer2DBoxesItem(
-  vtkPVDiscretizableColorTransferFunction* t2dBoxes)
-{
-  this->Transfer2DBoxesItem = t2dBoxes;
-}
-
-//-------------------------------------------------------------------------------------------------
-vtkPVDiscretizableColorTransferFunction*
-vtkTransferFunctionChartHistogram2D::GetTransfer2DBoxesItem()
-{
-  return this->Transfer2DBoxesItem;
-}
+////-------------------------------------------------------------------------------------------------
+// void vtkTransferFunctionChartHistogram2D::SetTransfer2DBoxesItem(
+//  vtkPVDiscretizableColorTransferFunction* t2dBoxes)
+//{
+//  this->Transfer2DBoxesItem = t2dBoxes;
+//}
+//
+////-------------------------------------------------------------------------------------------------
+// vtkPVDiscretizableColorTransferFunction*
+// vtkTransferFunctionChartHistogram2D::GetTransfer2DBoxesItem()
+//{
+//  return this->Transfer2DBoxesItem;
+//}
 
 //-------------------------------------------------------------------------------------------------
 void vtkTransferFunctionChartHistogram2D::UpdateItemsBounds(
@@ -254,74 +259,79 @@ void vtkTransferFunctionChartHistogram2D::GenerateTransfer2D()
     return;
   }
 
-  if (auto oldScalars = this->TransferFunction2D->GetPointData()->GetScalars())
-  {
-    this->TransferFunction2D->GetPointData()->RemoveArray(oldScalars->GetName());
-  }
-
-  double spacing[3];
-  histogram->GetSpacing(spacing);
-  double origin[3];
-  histogram->GetOrigin(origin);
   int dims[3];
   histogram->GetDimensions(dims);
+  this->TransferFunction2D->SetOutputDimensions(dims[0], dims[1]);
+  this->TransferFunction2D->Build();
 
-  this->TransferFunction2D->SetDimensions(dims);
-  this->TransferFunction2D->SetOrigin(origin);
-  this->TransferFunction2D->SetSpacing(spacing);
-  this->TransferFunction2D->AllocateScalars(VTK_FLOAT, 4);
-  auto arr = vtkFloatArray::SafeDownCast(this->TransferFunction2D->GetPointData()->GetScalars());
-  auto arrRange = vtk::DataArrayValueRange(arr);
-  std::fill(arrRange.begin(), arrRange.end(), 0.0);
-
-  for (vtkIdType i = 0; i < numPlots; ++i)
-  {
-    auto boxItem = vtkTransferFunctionBoxItem::SafeDownCast(this->GetPlot(i));
-    if (!boxItem)
-    {
-      continue;
-    }
-    const vtkRectd box = boxItem->GetBox();
-    vtkIdType width = static_cast<vtkIdType>(box.GetWidth() / spacing[0]);
-    vtkIdType height = static_cast<vtkIdType>(box.GetHeight() / spacing[1]);
-    if (width <= 0 || height <= 0)
-    {
-      continue;
-    }
-    vtkIdType x0 = static_cast<vtkIdType>((box.GetX() - origin[0]) / spacing[0]);
-    vtkIdType y0 = static_cast<vtkIdType>((box.GetY() - origin[1]) / spacing[1]);
-    vtkSmartPointer<vtkImageData> boxTexture = boxItem->GetTexture();
-    int boxDims[3];
-    boxTexture->GetDimensions(boxDims);
-    double boxSpacing[3] = { 1, 1, 1 };
-    boxSpacing[0] = box.GetWidth() / boxDims[0];
-    boxSpacing[1] = box.GetHeight() / boxDims[1];
-    for (vtkIdType ii = x0; ii < x0 + width; ++ii)
-    {
-      for (vtkIdType jj = y0; jj < y0 + height; ++jj)
-      {
-        int boxCoord[3] = { 0, 0, 0 };
-        boxCoord[0] = (ii - x0) * spacing[0] / boxSpacing[0];
-        boxCoord[1] = (jj - y0) * spacing[1] / boxSpacing[1];
-        unsigned char* ptr = static_cast<unsigned char*>(boxTexture->GetScalarPointer(boxCoord));
-        float fptr[4];
-        for (int tp = 0; tp < 4; ++tp)
-        {
-          fptr[tp] = ptr[tp] / 255.0;
-        }
-        // composite this color with the current color
-        float* c = static_cast<float*>(this->TransferFunction2D->GetScalarPointer(ii, jj, 0));
-        float opacity = c[3] + fptr[3] * (1 - c[3]);
-        opacity = opacity > 1.0 ? 1.0 : opacity;
-        for (int tp = 0; tp < 3; ++tp)
-        {
-          c[tp] = (fptr[tp] * fptr[3] + c[tp] * c[3] * (1 - fptr[tp])) / opacity;
-          c[tp] = c[tp] > 1.0 ? 1.0 : c[tp];
-        }
-        c[3] = opacity;
-      }
-    }
-  }
+  //  if (auto oldScalars = this->TransferFunction2D->GetPointData()->GetScalars())
+  //  {
+  //    this->TransferFunction2D->GetPointData()->RemoveArray(oldScalars->GetName());
+  //  }
+  //
+  //  double spacing[3];
+  //  histogram->GetSpacing(spacing);
+  //  double origin[3];
+  //  histogram->GetOrigin(origin);
+  //  int dims[3];
+  //  histogram->GetDimensions(dims);
+  //
+  //  this->TransferFunction2D->SetDimensions(dims);
+  //  this->TransferFunction2D->SetOrigin(origin);
+  //  this->TransferFunction2D->SetSpacing(spacing);
+  //  this->TransferFunction2D->AllocateScalars(VTK_FLOAT, 4);
+  //  auto arr =
+  //  vtkFloatArray::SafeDownCast(this->TransferFunction2D->GetPointData()->GetScalars()); auto
+  //  arrRange = vtk::DataArrayValueRange(arr); std::fill(arrRange.begin(), arrRange.end(), 0.0);
+  //
+  //  for (vtkIdType i = 0; i < numPlots; ++i)
+  //  {
+  //    auto boxItem = vtkTransferFunctionBoxItem::SafeDownCast(this->GetPlot(i));
+  //    if (!boxItem)
+  //    {
+  //      continue;
+  //    }
+  //    const vtkRectd box = boxItem->GetBox();
+  //    vtkIdType width = static_cast<vtkIdType>(box.GetWidth() / spacing[0]);
+  //    vtkIdType height = static_cast<vtkIdType>(box.GetHeight() / spacing[1]);
+  //    if (width <= 0 || height <= 0)
+  //    {
+  //      continue;
+  //    }
+  //    vtkIdType x0 = static_cast<vtkIdType>((box.GetX() - origin[0]) / spacing[0]);
+  //    vtkIdType y0 = static_cast<vtkIdType>((box.GetY() - origin[1]) / spacing[1]);
+  //    vtkSmartPointer<vtkImageData> boxTexture = boxItem->GetTexture();
+  //    int boxDims[3];
+  //    boxTexture->GetDimensions(boxDims);
+  //    double boxSpacing[3] = { 1, 1, 1 };
+  //    boxSpacing[0] = box.GetWidth() / boxDims[0];
+  //    boxSpacing[1] = box.GetHeight() / boxDims[1];
+  //    for (vtkIdType ii = x0; ii < x0 + width; ++ii)
+  //    {
+  //      for (vtkIdType jj = y0; jj < y0 + height; ++jj)
+  //      {
+  //        int boxCoord[3] = { 0, 0, 0 };
+  //        boxCoord[0] = (ii - x0) * spacing[0] / boxSpacing[0];
+  //        boxCoord[1] = (jj - y0) * spacing[1] / boxSpacing[1];
+  //        unsigned char* ptr = static_cast<unsigned
+  //        char*>(boxTexture->GetScalarPointer(boxCoord)); float fptr[4]; for (int tp = 0; tp < 4;
+  //        ++tp)
+  //        {
+  //          fptr[tp] = ptr[tp] / 255.0;
+  //        }
+  //        // composite this color with the current color
+  //        float* c = static_cast<float*>(this->TransferFunction2D->GetScalarPointer(ii, jj, 0));
+  //        float opacity = c[3] + fptr[3] * (1 - c[3]);
+  //        opacity = opacity > 1.0 ? 1.0 : opacity;
+  //        for (int tp = 0; tp < 3; ++tp)
+  //        {
+  //          c[tp] = (fptr[tp] * fptr[3] + c[tp] * c[3] * (1 - fptr[tp])) / opacity;
+  //          c[tp] = c[tp] > 1.0 ? 1.0 : c[tp];
+  //        }
+  //        c[3] = opacity;
+  //      }
+  //    }
+  //  }
   this->InvokeEvent(vtkTransferFunctionChartHistogram2D::TransferFunctionModified, nullptr);
 }
 
@@ -449,9 +459,9 @@ void vtkTransferFunctionChartHistogram2D::RemoveBox(vtkSmartPointer<vtkTransferF
   {
     this->ActiveBox = nullptr;
   }
-  if (this->Transfer2DBoxesItem)
+  if (this->TransferFunction2D)
   {
-    this->Transfer2DBoxesItem->RemoveTransfer2DBox(box);
+    this->TransferFunction2D->RemoveControlBox(box->GetTransferFunctionBox());
   }
 }
 

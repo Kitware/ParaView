@@ -36,6 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqTimer.h"
 #include "vtkAxis.h"
 #include "vtkChartHistogram2D.h"
+#include "vtkColorTransferFunction.h"
 #include "vtkContextMouseEvent.h"
 #include "vtkContextScene.h"
 #include "vtkContextView.h"
@@ -47,12 +48,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkGenericOpenGLRenderWindow.h"
 #include "vtkImageData.h"
 #include "vtkObjectFactory.h"
-#include "vtkPVDiscretizableColorTransferFunction.h"
+#include "vtkPVTransferFunction2D.h"
 #include "vtkPlotHistogram2D.h"
 #include "vtkPointData.h"
 #include "vtkTransferFunctionBoxItem.h"
 #include "vtkTransferFunctionChartHistogram2D.h"
-#include "vtkXMLImageDataWriter.h"
 
 // Qt includes
 #include <QMainWindow>
@@ -69,7 +69,7 @@ public:
   vtkNew<vtkTransferFunctionChartHistogram2D> Chart;
   vtkNew<vtkContextView> ContextView;
   vtkNew<vtkEventQtSlotConnect> VTKConnect;
-  vtkWeakPointer<vtkPVDiscretizableColorTransferFunction> ColorTransferFunction;
+  vtkWeakPointer<vtkPVTransferFunction2D> TransferFunction;
 
   pqTimer Timer;
 
@@ -126,11 +126,11 @@ public:
     this->Chart->ClearPlots();
   }
 
-  void initialize(vtkPVDiscretizableColorTransferFunction* ctf, vtkImageData* transfer2D)
+  void initialize(vtkPVTransferFunction2D* tf2d)
   {
-    this->ColorTransferFunction = ctf;
-    this->Chart->SetTransferFunction2D(transfer2D);
-    this->Chart->SetTransfer2DBoxesItem(ctf);
+    this->TransferFunction = tf2d;
+    this->Chart->SetTransferFunction2D(tf2d);
+    // this->Chart->SetTransfer2DBoxesItem(ctf);
     //    if (this->Chart->IsInitialized())
     //    {
     //      this->Chart->AddNewBox();
@@ -205,15 +205,14 @@ void pqTransferFunction2DWidget::setHistogram(vtkImageData* histogram)
 }
 
 //-----------------------------------------------------------------------------
-void pqTransferFunction2DWidget::initialize(
-  vtkPVDiscretizableColorTransferFunction* ctf, vtkImageData* transfer2D)
+void pqTransferFunction2DWidget::initialize(vtkPVTransferFunction2D* tf2d)
 {
-  if (!transfer2D)
+  if (!tf2d)
   {
     return;
   }
 
-  this->Internals->initialize(ctf, transfer2D);
+  this->Internals->initialize(tf2d);
 
   pqCoreUtilities::connect(
     this->Internals->Chart, vtkCommand::MouseMoveEvent, this, SLOT(showUsageStatus()));
@@ -253,7 +252,7 @@ vtkChart* pqTransferFunction2DWidget::chart() const
 }
 
 //-----------------------------------------------------------------------------
-vtkPVDiscretizableColorTransferFunction* pqTransferFunction2DWidget::colorTransferFunction() const
+vtkPVTransferFunction2D* pqTransferFunction2DWidget::transferFunction() const
 {
-  return this->Internals->ColorTransferFunction;
+  return this->Internals->TransferFunction;
 }

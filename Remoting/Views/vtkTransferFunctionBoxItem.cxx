@@ -62,7 +62,7 @@ vtkStandardNewMacro(vtkTransferFunctionBoxItem)
 class vtkTransferFunctionBoxItemInternals
 {
 public:
-  vtkNew<vtkPVTransferFunction2DBox> TransferFunctionBox;
+  vtkPVTransferFunction2DBox* TransferFunctionBox;
 
   vtkNew<vtkPoints2D> BoxPoints;
   const int NumPoints = 5;
@@ -104,6 +104,7 @@ vtkTransferFunctionBoxItem::vtkTransferFunctionBoxItem()
   : Superclass()
 {
   this->Internals = new vtkTransferFunctionBoxItemInternals();
+  this->Internals->TransferFunctionBox = vtkPVTransferFunction2DBox::New();
 
   this->ValidBounds[0] = 0.0;
   this->ValidBounds[1] = 1.0;
@@ -141,6 +142,7 @@ vtkTransferFunctionBoxItem::vtkTransferFunctionBoxItem()
 //-------------------------------------------------------------------------------------------------
 vtkTransferFunctionBoxItem::~vtkTransferFunctionBoxItem()
 {
+  this->Internals->TransferFunctionBox->Delete();
   delete this->Internals;
   this->Internals = nullptr;
 }
@@ -736,4 +738,27 @@ void vtkTransferFunctionBoxItem::SelectBox()
   this->SetSelected(true);
   this->Scene->SetDirty(true);
   this->InvokeEvent(vtkTransferFunctionBoxItem::BoxSelectEvent);
+}
+
+//-------------------------------------------------------------------------------------------------
+void vtkTransferFunctionBoxItem::SetTransferFunctionBox(vtkPVTransferFunction2DBox* b)
+{
+  if (this->Internals->TransferFunctionBox == b)
+  {
+    return;
+  }
+  if (this->Internals->TransferFunctionBox)
+  {
+    // this->Internals->TransferFunctionBox->UnRegister(this);
+    this->Internals->TransferFunctionBox->Delete();
+  }
+  this->Internals->TransferFunctionBox = b;
+  // this->Internals->TransferFunctionBox->Register(this);
+  this->UpdateBoxPoints();
+}
+
+//-------------------------------------------------------------------------------------------------
+vtkPVTransferFunction2DBox* vtkTransferFunctionBoxItem::GetTransferFunctionBox()
+{
+  return this->Internals->TransferFunctionBox;
 }

@@ -28,7 +28,6 @@
 
 // STL includes
 #include <algorithm>
-#include <vector>
 
 vtkStandardNewMacro(vtkPVTransferFunction2D);
 
@@ -313,6 +312,12 @@ int vtkPVTransferFunction2D::RemoveControlBox(vtkPVTransferFunction2DBox* box)
 }
 
 //-------------------------------------------------------------------------------------------------
+std::vector<vtkPVTransferFunction2DBox*> vtkPVTransferFunction2D::GetBoxes()
+{
+  return this->Internals->Boxes;
+}
+
+//-------------------------------------------------------------------------------------------------
 void vtkPVTransferFunction2D::RemoveAllBoxes()
 {
   this->Internals->Boxes.clear();
@@ -343,4 +348,11 @@ void vtkPVTransferFunction2D::GetRange(double& arg1, double& arg2, double& arg3,
 void vtkPVTransferFunction2D::GetRange(double arg[4])
 {
   this->GetRange(arg[0], arg[1], arg[2], arg[3]);
+}
+
+//------------------------------------------------------------------------------------------------
+vtkImageData* vtkPVTransferFunction2D::GetFunction()
+{
+  this->Build();
+  return this->Internals->Function;
 }

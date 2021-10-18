@@ -28,6 +28,8 @@
 
 #include "vtkRemotingViewsModule.h" // needed for export macro
 
+#include <vector> // needed for ivar
+
 // Forward declarations
 class vtkImageData;
 class vtkPVTransferFunction2DInternals;
@@ -101,6 +103,11 @@ public:
   ///@}
 
   /**
+   * Get the control boxes defined on the function.
+   */
+  std::vector<vtkPVTransferFunction2DBox*> GetBoxes();
+
+  /**
    * Remove all control boxes from the transfer function.
    */
   void RemoveAllBoxes();
@@ -114,6 +121,11 @@ public:
   virtual void GetRange(double& arg1, double& arg2, double& arg3, double& arg4);
   virtual void GetRange(double arg[4]);
   ///@}
+
+  /**
+   * Get the 2D transfer function.
+   */
+  vtkImageData* GetFunction();
 
 protected:
   vtkPVTransferFunction2D();

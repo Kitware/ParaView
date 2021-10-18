@@ -1187,6 +1187,7 @@
           Proxy only property used by the ColorOpacityWidget to know if a 2D transfer function is being used.
         </Documentation>
       </IntVectorProperty>
+      <!--
       <DoubleVectorProperty name="Transfer2DRange"
                             number_of_elements_per_command="4"
                             repeat_command="0"
@@ -1197,19 +1198,7 @@
           Proxy only property used by the TransferFunction2DWidget to synchronize range between states.
         </Documentation>
       </DoubleVectorProperty>
-      <DoubleVectorProperty clean_command="RemoveAllTransfer2DBoxes"
-                            name="Transfer2DBoxes"
-                            number_of_elements_per_command="8"
-                            repeat_command="1">
-        <Documentation>
-          Specify the box parameters for the 2D transfer function. These are
-          a list of 8-tuples of the form (x, y, width, height, r, g, b, a) where
-          (x, y) is the position i.e. the range-min of the box, (width, height)
-          specify the dimensions of the box in the scalar units and (r, g, b, a)
-          denote the color with maximum alpha of the box. The color and alpha
-          components are in the range [0, 1].
-        </Documentation>
-      </DoubleVectorProperty>
+      -->
 
       <DoubleVectorProperty clean_command="RemoveAllPoints"
                             command="AddRGBPoint"
@@ -1476,8 +1465,8 @@
         <Property name="ScalarOpacityFunction" function="ScalarOpacityFunction" />
         <Property name="TransferFunction2D" function="TransferFunction2D" />
         <Property name="Use2DTransferFunction" function="Use2DTransferFunction" />
-        <Property name="Transfer2DBoxes" function="Transfer2DBoxes" />
-        <Property name="Transfer2DRange" function="Transfer2DRange" />
+        <!-- <Property name="Transfer2DBoxes" function="Transfer2DBoxes" /> -->
+        <!-- <Property name="Transfer2DRange" function="Transfer2DRange" /> -->
         <Property name="UseLogScale" function="UseLogScale" />
         <Property name="UseOpacityControlPointsFreehandDrawing" function="UseOpacityControlPointsFreehandDrawing" />
         <Property name="ShowDataHistogram" function="ShowDataHistogram" />
@@ -1584,6 +1573,20 @@
         </Documentation>
         <BooleanDomain name="bool" />
       </IntVectorProperty>
+      <DoubleVectorProperty clean_command="RemoveAllBoxes"
+                            command="AddControlBox"
+                            name="Transfer2DBoxes"
+                            number_of_elements_per_command="8"
+                            repeat_command="1">
+        <Documentation>
+          Specify the box parameters for the 2D transfer function. These are
+          a list of 8-tuples of the form (x, y, width, height, r, g, b, a) where
+          (x, y) is the position i.e. the range-min of the box, (width, height)
+          specify the dimensions of the box in the scalar units and (r, g, b, a)
+          denote the color with maximum alpha of the box. The color and alpha
+          components are in the range [0, 1].
+        </Documentation>
+      </DoubleVectorProperty>
       <!--
       <IntVectorProperty command="SetUseCustomRange"
                          default_values="0"

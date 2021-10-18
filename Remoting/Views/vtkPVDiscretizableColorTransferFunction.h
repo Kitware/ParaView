@@ -28,14 +28,14 @@
 
 #include "vtkDiscretizableColorTransferFunction.h"
 
-#include "vtkRemotingViewsModule.h"     // needed for export macro
-#include "vtkTransferFunctionBoxItem.h" // needed for ivar
+#include "vtkRemotingViewsModule.h" // needed for export macro
+// #include "vtkTransferFunctionBoxItem.h" // needed for ivar
 
 #include <vector> // needed for ivar
 
 class vtkAbstractArray;
 class vtkDoubleArray;
-class vtkImageData;
+class vtkPVTransferFunction2D;
 class vtkVariantArray;
 
 class VTKREMOTINGVIEWS_EXPORT vtkPVDiscretizableColorTransferFunction
@@ -91,30 +91,32 @@ public:
   /**
    * Set/get the 2D transfer function.
    */
-  virtual void SetTransferFunction2D(vtkImageData* f);
-  virtual vtkImageData* GetTransferFunction2D() const;
+  virtual void SetTransferFunction2D(vtkPVTransferFunction2D* f);
+  virtual vtkPVTransferFunction2D* GetTransferFunction2D() const;
   ///@}
 
-  ///@{
-  /**
-   * Add/Remove a transfer function box control to the 2D transfer function.
-   * Returns the index for the added box or -1 on error.
-   */
-  virtual int AddTransfer2DBox(double x, double y, double width, double height, double r, double g,
-    double b, double a, double rangexmin = 0, double rangexmax = 1, double rangeymin = 0,
-    double rangeymax = 1);
-  virtual int AddTransfer2DBox(
-    double x, double y, double width, double height, double* color, double alpha, double* range);
-  virtual int AddTransfer2DBox(vtkSmartPointer<vtkTransferFunctionBoxItem> box);
-  virtual int RemoveTransfer2DBox(int n);
-  virtual int RemoveTransfer2DBox(vtkSmartPointer<vtkTransferFunctionBoxItem> box);
-  virtual void RemoveAllTransfer2DBoxes();
-  ///@}
-
-  /**
-   * Get access to the 2D transfer function boxes.
-   */
-  std::vector<vtkSmartPointer<vtkTransferFunctionBoxItem>> GetTransferFunction2DBoxes() const;
+  //  ///@{
+  //  /**
+  //   * Add/Remove a transfer function box control to the 2D transfer function.
+  //   * Returns the index for the added box or -1 on error.
+  //   */
+  //  virtual int AddTransfer2DBox(double x, double y, double width, double height, double r, double
+  //  g,
+  //    double b, double a, double rangexmin = 0, double rangexmax = 1, double rangeymin = 0,
+  //    double rangeymax = 1);
+  //  virtual int AddTransfer2DBox(
+  //    double x, double y, double width, double height, double* color, double alpha, double*
+  //    range);
+  //  virtual int AddTransfer2DBox(vtkSmartPointer<vtkTransferFunctionBoxItem> box);
+  //  virtual int RemoveTransfer2DBox(int n);
+  //  virtual int RemoveTransfer2DBox(vtkSmartPointer<vtkTransferFunctionBoxItem> box);
+  //  virtual void RemoveAllTransfer2DBoxes();
+  //  ///@}
+  //
+  //  /**
+  //   * Get access to the 2D transfer function boxes.
+  //   */
+  //  std::vector<vtkSmartPointer<vtkTransferFunctionBoxItem>> GetTransferFunction2DBoxes() const;
 
 protected:
   vtkPVDiscretizableColorTransferFunction();
@@ -154,8 +156,8 @@ private:
   /**
    * 2D transfer function
    */
-  vtkSmartPointer<vtkImageData> TransferFunction2D;
-  std::vector<vtkSmartPointer<vtkTransferFunctionBoxItem>> TransferFunction2DBoxes;
+  vtkSmartPointer<vtkPVTransferFunction2D> TransferFunction2D;
+  // std::vector<vtkSmartPointer<vtkTransferFunctionBoxItem>> TransferFunction2DBoxes;
 };
 
 #endif

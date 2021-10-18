@@ -26,8 +26,7 @@
 // Forward declarations
 class vtkContext2D;
 class vtkContextMouseEvent;
-class vtkImageData;
-class vtkPVDiscretizableColorTransferFunction;
+class vtkPVTransferFunction2D;
 class vtkTransferFunctionBoxItem;
 
 class VTKREMOTINGVIEWS_EXPORT vtkTransferFunctionChartHistogram2D : public vtkChartHistogram2D
@@ -82,17 +81,17 @@ public:
   /**
    * Set/Get the image data that will be populated with the 2D transfer function.
    */
-  virtual void SetTransferFunction2D(vtkImageData* transfer2D);
-  virtual vtkImageData* GetTransferFunction2D();
+  virtual void SetTransferFunction2D(vtkPVTransferFunction2D* transfer2D);
+  virtual vtkPVTransferFunction2D* GetTransferFunction2D();
   ///@}
 
-  ///@{
-  /**
-   * Set/Get the transfer 2d boxes item.
-   */
-  virtual void SetTransfer2DBoxesItem(vtkPVDiscretizableColorTransferFunction* t2dBoxes);
-  virtual vtkPVDiscretizableColorTransferFunction* GetTransfer2DBoxesItem();
-  ///@}
+  //  ///@{
+  //  /**
+  //   * Set/Get the transfer 2d boxes item.
+  //   */
+  //  virtual void SetTransfer2DBoxesItem(vtkPVDiscretizableColorTransferFunction* t2dBoxes);
+  //  virtual vtkPVDiscretizableColorTransferFunction* GetTransfer2DBoxesItem();
+  //  ///@}
 
   ///@{
   /**
@@ -137,8 +136,8 @@ protected:
   void OnTransferFunctionBoxItemModified(vtkObject* caller, unsigned long eid, void* callData);
 
   // Member variables;
-  vtkWeakPointer<vtkImageData> TransferFunction2D;
-  vtkWeakPointer<vtkPVDiscretizableColorTransferFunction> Transfer2DBoxesItem;
+  vtkWeakPointer<vtkPVTransferFunction2D> TransferFunction2D;
+  // vtkWeakPointer<vtkPVDiscretizableColorTransferFunction> Transfer2DBoxesItem;
   vtkSmartPointer<vtkTransferFunctionBoxItem> ActiveBox;
   std::vector<int> BoxesToRemove;
 

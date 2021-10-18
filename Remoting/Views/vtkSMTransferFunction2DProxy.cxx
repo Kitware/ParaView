@@ -90,6 +90,7 @@ bool vtkNormalize(
     }
     return true;
   }
+  return true;
 }
 }
 
@@ -252,6 +253,7 @@ bool vtkSMTransferFunction2DProxy::RescaleTransferFunction(
   //
 
   // TODO: Normalize and rescale
+  return true;
 }
 
 //----------------------------------------------------------------------------
@@ -332,10 +334,10 @@ vtkSmartPointer<vtkImageData> vtkSMTransferFunction2DProxy::ComputeDataHistogram
 {
   // Recover component property
   int component = -1;
-  if (vtkSMPropertyHelper(this, "VectorMode").GetAsInt() == vtkScalarsToColors::COMPONENT)
-  {
-    component = vtkSMPropertyHelper(this, "VectorComponent").GetAsInt();
-  }
+  //  if (vtkSMPropertyHelper(this, "VectorMode").GetAsInt() == vtkScalarsToColors::COMPONENT)
+  //  {
+  //    component = vtkSMPropertyHelper(this, "VectorComponent").GetAsInt();
+  //  }
 
   // Find the visible consumer using the transfer function proxy
   vtkPVArrayInformation* arrayInfo = nullptr;

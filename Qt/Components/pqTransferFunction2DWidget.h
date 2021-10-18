@@ -39,7 +39,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // Forward declarations
 class vtkChart;
 class vtkImageData;
-class vtkPVDiscretizableColorTransferFunction;
+class vtkPVTransferFunction2D;
+// class vtkPVDiscretizableColorTransferFunction;
 
 /**
  * pqTransferFunction2DWidget provides a widget that can edit control boxes in a 2D histogram to
@@ -68,7 +69,7 @@ public:
   /**
    * Initialize the pqTransferFunction2DWidget with a default box item.
    */
-  void initialize(vtkPVDiscretizableColorTransferFunction*, vtkImageData*);
+  void initialize(vtkPVTransferFunction2D* tf2d);
   bool isInitialized();
   ///@}
 
@@ -78,9 +79,9 @@ public:
   vtkChart* chart() const;
 
   /**
-   * Get access to the color function passed to initialize
+   * Get access to the 2D transfer function passed to initialize
    */
-  vtkPVDiscretizableColorTransferFunction* colorTransferFunction() const;
+  vtkPVTransferFunction2D* transferFunction() const;
 
 public Q_SLOTS:
   /**

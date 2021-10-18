@@ -30,6 +30,7 @@
 #include "vtkOutlineSource.h"
 #include "vtkPVLODVolume.h"
 #include "vtkPVRenderView.h"
+#include "vtkPVTransferFunction2D.h"
 #include "vtkPartitionedDataSet.h"
 #include "vtkPointData.h"
 #include "vtkPolyDataMapper.h"
@@ -585,16 +586,23 @@ void vtkImageVolumeRepresentation::SelectColorArray2Component(int component)
 }
 
 //----------------------------------------------------------------------------
-void vtkImageVolumeRepresentation::SetTransferFunction2D(vtkImageData* transfer2D)
+void vtkImageVolumeRepresentation::SetTransferFunction2D(vtkPVTransferFunction2D* transfer2D)
 {
-  if (transfer2D)
+  if (!transfer2D)
   {
-    vtkDataArray* arr = transfer2D->GetPointData()->GetScalars();
-    if (!arr)
-    {
-      transfer2D->SetDimensions(10, 10, 1);
-      transfer2D->AllocateScalars(VTK_FLOAT, 4);
-    }
+    return;
   }
-  this->Property->SetTransferFunction2D(transfer2D);
+  vtkImageData* func = transfer2D->GetFunction();
+
+  if (!func)
+  {
+    return;
+  }
+  vtkDataArray* arr = func->GetPointData()->GetScalars();
+  if (!arr)
+  {
+    func->SetDimensions(10, 10, 1);
+    func->AllocateScalars(VTK_FLOAT, 4);
+  }
+  this->Property->SetTransferFunction2D(func);
 }
