@@ -37,6 +37,7 @@ set(PY_TESTS
   ProxyBackwardsCompatibilityTest.py,NO_VALID
   ProxyManager.py,NO_VALID
   ProxyPropertyLinks.py
+  PythonVersion.py,NO_VALID
   PythonAnimationTrack.py
   PythonProgrammableFilterParameters.py,NO_VALID
   PythonPVSimpleCone.py
