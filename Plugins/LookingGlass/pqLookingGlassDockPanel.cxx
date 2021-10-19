@@ -16,7 +16,6 @@
 
 #include "pqActiveObjects.h"
 #include "pqApplicationCore.h"
-#include "pqDebug.h"
 #include "pqMainWindowEventManager.h"
 #include "pqProxyWidget.h"
 #include "pqRenderView.h"
