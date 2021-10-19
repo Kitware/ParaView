@@ -25,7 +25,13 @@
 vtkStandardNewMacro(vtkPVTransferFunction2DBox);
 
 //-------------------------------------------------------------------------------------------------
-vtkPVTransferFunction2DBox::vtkPVTransferFunction2DBox() {}
+vtkPVTransferFunction2DBox::vtkPVTransferFunction2DBox()
+{
+  this->Box.SetX(0);
+  this->Box.SetY(0);
+  this->Box.SetWidth(1);
+  this->Box.SetHeight(1);
+}
 
 //-------------------------------------------------------------------------------------------------
 vtkPVTransferFunction2DBox::~vtkPVTransferFunction2DBox()

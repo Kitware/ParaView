@@ -62,14 +62,14 @@ vtkPVTransferFunction2D::~vtkPVTransferFunction2D()
 {
   if (this->Internals->Function)
   {
-    this->Internals->Function->Delete();
     this->Internals->Function = nullptr;
   }
   for (auto box : this->Internals->Boxes)
   {
     if (box)
     {
-      box->UnRegister(this);
+      // box->UnRegister(this);
+      box = nullptr;
     }
   }
   this->Internals->Boxes.clear();
