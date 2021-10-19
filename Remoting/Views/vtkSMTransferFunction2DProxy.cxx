@@ -68,30 +68,136 @@ inline vtkSMProperty* GetTransferFunction2DBoxesProperty(vtkSMProxy* self)
 // The cntrlBoxes are assumed to be using log-space interpolation
 // if "log_space" is true. The result is always in linear space
 // irrespective of the original interpolation space.
-// originalRange is filled with the original range of the cntrlBoxes before rescaling.
+// originalRange is the range of the cntrlBoxes before rescaling.
 bool vtkNormalize(
   std::vector<vtkTuple<double, vtkSMTransferFunction2DProxy::BOX_PROPERTY_SIZE>>& cntrlBoxes,
-  bool log_space, vtkTuple<double, 4>* originalRange = nullptr)
+  bool log_space, vtkTuple<double, 4>* originalRange)
 {
-  if (cntrlBoxes.empty())
+  if (cntrlBoxes.empty() || !originalRange)
   {
     // nothing to do, but not an error, so return true.
     return true;
   }
 
-  if (cntrlBoxes.size() == 1)
+  //  if (cntrlBoxes.size() == 1)
+  //  {
+  //    if (originalRange)
+  //    {
+  //      (*originalRange)[0] = cntrlBoxes[0][0];
+  //      (*originalRange)[1] = cntrlBoxes[0][0] + cntrlBoxes[0][2];
+  //      (*originalRange)[2] = cntrlBoxes[0][1];
+  //      (*originalRange)[3] = cntrlBoxes[0][1] + cntrlBoxes[0][3];
+  //    }
+  //    // Only 1 control box in the property
+  //    return true;
+  //  }
+
+  // if in log_space, let's convert all the box values to log.
+  if (log_space)
   {
-    if (originalRange)
+    for (auto box : cntrlBoxes)
     {
-      (*originalRange)[0] = cntrlBoxes[0][0];
-      (*originalRange)[1] = cntrlBoxes[0][0] + cntrlBoxes[0][2];
-      (*originalRange)[2] = cntrlBoxes[0][1];
-      (*originalRange)[3] = cntrlBoxes[0][1] + cntrlBoxes[0][3];
+      for (auto i = 0; i < 4; ++i)
+      {
+        box[i] = log10(box[i]);
+      }
     }
+  }
+
+  // now simply normalize the box points
+  if ((*originalRange)[0] == 0.0 && (*originalRange)[1] == 1.0 && (*originalRange)[2] == 0.0 &&
+    (*originalRange)[3] == 1.0)
+  {
+    // nothing to do.
     return true;
+  }
+
+  const double xDenominator = (*originalRange)[1] - (*originalRange)[0];
+  assert(xDenominator > 0);
+  const double yDenominator = (*originalRange)[3] - (*originalRange)[2];
+  assert(yDenominator > 0);
+
+  for (auto box : cntrlBoxes)
+  {
+    box[0] = (box[0] - (*originalRange)[0]) / xDenominator;
+    box[1] = (box[1] - (*originalRange)[1]) / xDenominator;
+    box[2] = (box[2] - (*originalRange)[2]) / yDenominator;
+    box[3] = (box[3] - (*originalRange)[3]) / yDenominator;
   }
   return true;
 }
+
+//----------------------------------------------------------------------------
+// Rescale normalized control boxes to the given range. If "log_space" is true, the log
+// interpolation is used between rangeMin and rangeMax.
+bool vtkRescaleNormalizedControlBoxes(
+  std::vector<vtkTuple<double, vtkSMTransferFunction2DProxy::BOX_PROPERTY_SIZE>>& cntrlBoxes,
+  vtkTuple<double, 4>* range, bool log_space)
+{
+  assert((*range)[0] < (*range)[1]);
+  assert((*range)[2] < (*range)[3]);
+  double xrange[2] = { (*range)[0], (*range)[1] };
+  double yrange[2] = { (*range)[2], (*range)[3] };
+  if (log_space)
+  {
+    if (xrange[0] <= 0.0 || xrange[1] <= 0.0)
+    {
+      // ensure the range is valid for log space.
+      if (vtkSMCoreUtilities::AdjustRangeForLog(xrange))
+      {
+        vtkGenericWarningMacro("X-Range not valid for log-space. "
+                               "Changed the range to ("
+          << xrange[0] << ", " << xrange[1] << ").");
+      }
+    }
+    if (yrange[0] <= 0.0 || yrange[1] <= 0.0)
+    {
+      // ensure the range is valid for log space.
+      if (vtkSMCoreUtilities::AdjustRangeForLog(yrange))
+      {
+        vtkGenericWarningMacro("Y-Range not valid for log-space. "
+                               "Changed the range to ("
+          << yrange[0] << ", " << yrange[1] << ").");
+      }
+    }
+  }
+
+  if (log_space)
+  {
+    xrange[0] = log10(xrange[0]);
+    xrange[1] = log10(xrange[1]);
+    yrange[0] = log10(yrange[0]);
+    yrange[1] = log10(yrange[1]);
+  }
+  double scale[2];
+  scale[0] = xrange[1] - xrange[0];
+  assert(scale[0] > 0);
+  scale[1] = yrange[1] - yrange[0];
+  assert(scale[1] > 0);
+  for (auto box : cntrlBoxes)
+  {
+    for (int j = 0; j < 2; ++j)
+    {
+      double& x = box[j];
+      x = x * scale[0] + xrange[0];
+      if (log_space)
+      {
+        x = pow(10.0, x);
+      }
+    }
+    for (int j = 2; j < 3; ++j)
+    {
+      double& y = box[j];
+      y = y * scale[1] + yrange[0];
+      if (log_space)
+      {
+        y = pow(10.0, y);
+      }
+    }
+  }
+  return true;
+}
+
 }
 
 vtkStandardNewMacro(vtkSMTransferFunction2DProxy);
@@ -221,36 +327,60 @@ bool vtkSMTransferFunction2DProxy::RescaleTransferFunction(
 
   // just in case the num_elements is not a perfect multiple of BOX_PROPERTY_SIZE
   num_elements = BOX_PROPERTY_SIZE * (num_elements / BOX_PROPERTY_SIZE);
-  std::vector<vtkTuple<double, BOX_PROPERTY_SIZE>> points;
-  points.resize(num_elements / BOX_PROPERTY_SIZE);
-  cntrlBoxes.Get(points[0].GetData(), num_elements);
+  std::vector<vtkTuple<double, BOX_PROPERTY_SIZE>> boxes;
+  boxes.resize(num_elements / BOX_PROPERTY_SIZE);
+  cntrlBoxes.Get(boxes[0].GetData(), num_elements);
+
+  vtkTuple<double, 4> currentRange;
+  this->GetRange(currentRange.GetData());
 
   if (extend)
   {
-    vtkSMProperty* rngProp = this->GetProperty("CustomRange");
-    if (!rngProp)
-    {
-      vtkGenericWarningMacro("'CustomRange' property is required.");
-      return false;
-    }
-    vtkSMPropertyHelper rng(rngProp);
-    unsigned int rng_num_elements = rng.GetNumberOfElements();
-    if (rng_num_elements != 4)
-    {
-      vtkGenericWarningMacro(
-        "'CustomRange' property must have 4-tuples. Found " << rng_num_elements);
-      return false;
-    }
+    //    vtkSMProperty* rngProp = this->GetProperty("CustomRange");
+    //    if (!rngProp)
+    //    {
+    //      vtkGenericWarningMacro("'CustomRange' property is required.");
+    //      return false;
+    //    }
+    //    vtkSMPropertyHelper rng(rngProp);
+    //    unsigned int rng_num_elements = rng.GetNumberOfElements();
+    //    if (rng_num_elements != 4)
+    //    {
+    //      vtkGenericWarningMacro(
+    //        "'CustomRange' property must have 4-tuples. Found " << rng_num_elements);
+    //      return false;
+    //    }
+    rangeXMin = std::min(rangeXMin, currentRange[0]);
+    rangeXMax = std::max(rangeXMax, currentRange[1]);
+    rangeYMin = std::min(rangeYMin, currentRange[2]);
+    rangeYMax = std::max(rangeYMax, currentRange[3]);
   }
 
-  //  // Setting the "LastRange" here because, it should match the current range of the control
-  //  boxes.
-  //  // Aside from that, it will also be used for computing the 2D histogram.
-  //  this->LastRange[0] = rangeXMin;
-  //  this->LastRange[1] = rangeXMax;
-  //  this->LastRange[2] = rangeYMin;
-  //  this->LastRange[3] = rangeYMax;
-  //
+  if (rangeXMin == currentRange[0] && rangeXMax == currentRange[1] &&
+    rangeYMin == currentRange[2] && rangeYMax == currentRange[3])
+  {
+    // The range is the same.
+    // Nothing to do here.
+    return true;
+  }
+
+  // Normalize the range
+  vtkNormalize(boxes, false, &currentRange);
+
+  vtkTuple<double, 4> newRange;
+  newRange[0] = rangeXMin;
+  newRange[1] = rangeXMax;
+  newRange[2] = rangeYMin;
+  newRange[3] = rangeYMax;
+  vtkRescaleNormalizedControlBoxes(boxes, &newRange, false);
+
+  // Setting the "LastRange" here because, it should match the current range of the control
+  // boxes.
+  // Aside from that, it will also be used for computing the 2D histogram.
+  this->LastRange[0] = rangeXMin;
+  this->LastRange[1] = rangeXMax;
+  this->LastRange[2] = rangeYMin;
+  this->LastRange[3] = rangeYMax;
 
   // TODO: Normalize and rescale
   return true;

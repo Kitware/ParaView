@@ -35,6 +35,7 @@
 #include "vtkSMSettings.h"
 #include "vtkSMStringVectorProperty.h"
 #include "vtkSMTrace.h"
+#include "vtkSMTransferFunction2DProxy.h"
 #include "vtkSMTransferFunctionManager.h"
 #include "vtkSMTransferFunctionProxy.h"
 #include "vtkStringList.h"
@@ -478,14 +479,22 @@ bool vtkSMPVRepresentationProxy::RescaleTransferFunctionToVisibleRange(
 
   vtkSMProperty* lutProperty = this->GetProperty("LookupTable");
   vtkSMProperty* sofProperty = this->GetProperty("ScalarOpacityFunction");
-  if (!lutProperty && !sofProperty)
+  vtkSMProperty* useTransfer2DProperty = this->GetProperty("UseTransfer2D");
+  vtkSMProperty* transfer2DProperty = this->GetProperty("TransferFunction2D");
+  if ((!lutProperty && !sofProperty) || (!useTransfer2DProperty && !transfer2DProperty))
   {
     // No LookupTable and ScalarOpacityFunction found.
+    // No UseTransfer2D and TransferFunction2D found.
     return false;
   }
 
   vtkSMProxy* lut = lutProperty ? vtkSMPropertyHelper(lutProperty).GetAsProxy() : nullptr;
   vtkSMProxy* sof = sofProperty ? vtkSMPropertyHelper(sofProperty).GetAsProxy() : nullptr;
+  bool useTransfer2D =
+    useTransfer2DProperty ? vtkSMPropertyHelper(useTransfer2DProperty).GetAsInt() == 1 : false;
+  vtkSMProxy* tf2d = (useTransfer2D && transfer2DProperty)
+    ? vtkSMPropertyHelper(transfer2DProperty).GetAsProxy()
+    : nullptr;
 
   // We need to determine the component number to use from the lut.
   int component = -1;
@@ -506,18 +515,32 @@ bool vtkSMPVRepresentationProxy::RescaleTransferFunctionToVisibleRange(
     return false;
   }
 
-  if (lut)
+  if (!useTransfer2D)
   {
-    vtkSMTransferFunctionProxy::RescaleTransferFunction(lut, range, false);
-    vtkSMProxy* sof_lut = vtkSMPropertyHelper(lut, "ScalarOpacityFunction", true).GetAsProxy();
-    if (sof_lut && sof != sof_lut)
+    if (lut)
     {
-      vtkSMTransferFunctionProxy::RescaleTransferFunction(sof_lut, range, false);
+      vtkSMTransferFunctionProxy::RescaleTransferFunction(lut, range, false);
+      vtkSMProxy* sof_lut = vtkSMPropertyHelper(lut, "ScalarOpacityFunction", true).GetAsProxy();
+      if (sof_lut && sof != sof_lut)
+      {
+        vtkSMTransferFunctionProxy::RescaleTransferFunction(sof_lut, range, false);
+      }
+    }
+    if (sof)
+    {
+      vtkSMTransferFunctionProxy::RescaleTransferFunction(sof, range, false);
     }
   }
-  if (sof)
+  else
   {
-    vtkSMTransferFunctionProxy::RescaleTransferFunction(sof, range, false);
+    if (tf2d)
+    {
+      double r[4];
+      vtkSMTransferFunction2DProxy::GetRange(tf2d, r);
+      r[0] = range[0];
+      r[1] = range[1];
+      vtkSMTransferFunction2DProxy::RescaleTransferFunction(tf2d, r, false);
+    }
   }
   return true;
 }
