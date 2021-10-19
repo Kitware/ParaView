@@ -272,6 +272,7 @@ set(paraview_default_plugins
   NonOrthogonalSource
   PacMan
   PanoramicProjectionView
+  ParametricSurfaces
   # ParFlow - Because of dependency to nlohmann_json
   SaveStateAndScreenshot
   SLACTools
