@@ -45,6 +45,7 @@ set(classes
   vtkPVDataSetAttributesInformation
   vtkPVDataSizeInformation
   vtkPVDisableStackTraceSignalHandler
+  vtkPVDynamicInitializerPluginInterface
   vtkPVEnableStackTraceSignalHandler
   vtkPVEnvironmentInformation
   vtkPVEnvironmentInformationHelper
