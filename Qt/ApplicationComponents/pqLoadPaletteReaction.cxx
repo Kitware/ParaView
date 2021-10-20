@@ -38,6 +38,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqApplicationCore.h"
 #include "pqApplicationSettingsReaction.h"
 #include "pqUndoStack.h"
+#include "vtkLogger.h"
 #include "vtkPVProxyDefinitionIterator.h"
 #include "vtkSMProxy.h"
 #include "vtkSMProxyDefinitionManager.h"
@@ -46,7 +47,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMTrace.h"
 #include "vtkSmartPointer.h"
 
+#include <array>
 #include <cassert>
+#include <string>
 
 //-----------------------------------------------------------------------------
 pqLoadPaletteReaction::pqLoadPaletteReaction(QAction* parentObject)
@@ -90,23 +93,37 @@ void pqLoadPaletteReaction::populateMenu()
   vtkSMProxyDefinitionManager* pdmgr = pxm->GetProxyDefinitionManager();
   assert(pdmgr);
 
-  // Add "DefaultBackground" as the first entry.
-  if (vtkSMProxy* prototype = pxm->GetPrototypeProxy("palettes", "DefaultBackground"))
+  // Palette ordering / ban list can be found in issue #20707
+  std::array<std::string, 7> mainPalettes = { "BlueGrayBackground", "WarmGrayBackground",
+    "NeutralGrayBackground", "LightGrayBackground", "WhiteBackground", "BlackBackground",
+    "GradientBackground" };
+
+  for (const std::string& str : mainPalettes)
   {
-    QAction* actn = menu->addAction(prototype->GetXMLLabel());
-    actn->setProperty("PV_XML_GROUP", "palettes");
-    actn->setProperty("PV_XML_NAME", "DefaultBackground");
+    const char* name = str.c_str();
+    if (vtkSMProxy* prototype = pxm->GetPrototypeProxy("palettes", name))
+    {
+      QAction* actn = menu->addAction(prototype->GetXMLLabel());
+      actn->setProperty("PV_XML_GROUP", "palettes");
+      actn->setProperty("PV_XML_NAME", name);
+    }
+    else
+    {
+      vtkLog(WARNING, "Missing palette: " << name);
+    }
   }
 
+  // If there were any other available palettes, we append them in alphabetical order.
   vtkSmartPointer<vtkPVProxyDefinitionIterator> iter;
   iter.TakeReference(pdmgr->NewSingleGroupIterator("palettes"));
   for (iter->InitTraversal(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
   {
     if (vtkSMProxy* prototype = pxm->GetPrototypeProxy("palettes", iter->GetProxyName()))
     {
-      if (strcmp(prototype->GetXMLName(), "DefaultBackground") == 0)
+      if (std::find(mainPalettes.cbegin(), mainPalettes.cend(),
+            std::string(iter->GetProxyName())) != mainPalettes.cend())
       {
-        // skip DefaultBackground since already added.
+        // skip main palettes since already added.
         continue;
       }
       QAction* actn = menu->addAction(prototype->GetXMLLabel());

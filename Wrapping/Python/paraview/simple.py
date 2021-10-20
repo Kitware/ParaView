@@ -956,9 +956,19 @@ def LoadPalette(paletteName):
     """Load a color palette to override the default foreground and background
     colors used by ParaView views.  The current global palette's colors are set
     to the colors in the loaded palette."""
+
+    name = paletteName
+
+    # Handling backward compatibility
+    if paraview.compatibility.GetVersion() <= (5, 10):
+        if paletteName == "DefaultBackground" or paletteName == "GrayBackground":
+            name = "BlueGrayBackground"
+        elif paletteName == "PrintBackground":
+            name = "WhiteBackground"
+
     pxm = servermanager.ProxyManager()
     palette = pxm.GetProxy("settings", "ColorPalette")
-    prototype = pxm.GetPrototypeProxy("palettes", paletteName)
+    prototype = pxm.GetPrototypeProxy("palettes", name)
 
     if palette is None or prototype is None:
         return
