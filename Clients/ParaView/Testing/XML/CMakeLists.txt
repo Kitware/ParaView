@@ -644,6 +644,7 @@ SET (TESTS_WITHOUT_BASELINES
   TestFileListPropertyWidget.xml
   TextSource.xml
   ThresholdBackwardsCompatibility.xml
+  ThresholdTable.xml
 )
 
 if (PARAVIEW_PLUGIN_ENABLE_EULATestPlugin)
