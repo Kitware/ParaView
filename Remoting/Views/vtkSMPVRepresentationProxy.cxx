@@ -291,7 +291,8 @@ bool vtkSMPVRepresentationProxy::RescaleTransferFunctionToDataRange(
 
   vtkSMProperty* lutProperty = this->GetProperty("LookupTable");
   vtkSMProperty* sofProperty = this->GetProperty("ScalarOpacityFunction");
-  if (!lutProperty && !sofProperty)
+  vtkSMProperty* tf2dProperty = this->GetProperty("TransferFunction2D");
+  if (!lutProperty && !sofProperty && !tf2dProperty)
   {
     vtkWarningMacro("No 'LookupTable' and 'ScalarOpacityFunction' found.");
     return false;
@@ -299,6 +300,7 @@ bool vtkSMPVRepresentationProxy::RescaleTransferFunctionToDataRange(
 
   vtkSMProxy* lut = vtkSMPropertyHelper(lutProperty).GetAsProxy();
   vtkSMProxy* sof = vtkSMPropertyHelper(sofProperty).GetAsProxy();
+  vtkSMProxy* tf2d = vtkSMPropertyHelper(tf2dProperty).GetAsProxy();
 
   if (force == false &&
     vtkSMPropertyHelper(lut, "AutomaticRescaleRangeMode", true).GetAsInt() ==
@@ -430,7 +432,16 @@ bool vtkSMPVRepresentationProxy::RescaleTransferFunctionToDataRange(
       {
         vtkSMTransferFunctionProxy::RescaleTransferFunction(sof, rangeOpacity, extend);
       }
-      return (lut || sof);
+
+      if (tf2d && rangeColor[1] >= rangeColor[0])
+      {
+        double range2D[4];
+        vtkSMTransferFunction2DProxy::GetRange(tf2d, range2D);
+        range2D[0] = rangeColor[0];
+        range2D[1] = rangeColor[1];
+        vtkSMTransferFunction2DProxy::RescaleTransferFunction(tf2d, range2D);
+      }
+      return (lut || sof || tf2d);
     }
   }
   return false;
