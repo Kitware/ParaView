@@ -101,6 +101,14 @@ QObjectList @_paraview_build_plugin@Plugin::interfaces()
 #endif
 
 //-----------------------------------------------------------------------------
+#if _paraview_add_plugin_with_initializers
+void @_paraview_build_plugin@Plugin::Initialize()
+{
+  @_paraview_add_plugin_invoke_initializers@
+}
+#endif
+
+//-----------------------------------------------------------------------------
 #if _paraview_add_plugin_with_python
 @_paraview_add_plugin_python_includes@
 void @_paraview_build_plugin@Plugin::GetPythonSourceList(std::vector<std::string>& modules,

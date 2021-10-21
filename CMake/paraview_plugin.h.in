@@ -1,4 +1,5 @@
 #cmakedefine01 _paraview_add_plugin_built_shared
+#cmakedefine01 _paraview_add_plugin_with_initializers
 #cmakedefine01 _paraview_add_plugin_with_python
 #cmakedefine01 _paraview_add_plugin_with_ui
 #cmakedefine01 _paraview_add_plugin_with_xml
@@ -21,6 +22,10 @@
 #include "vtkPVPythonPluginInterface.h"
 #endif
 
+#if _paraview_add_plugin_with_initializers
+#include "vtkPVDynamicInitializerPluginInterface.h"
+#endif
+
 class @_paraview_build_plugin@Plugin :
 #if _paraview_add_plugin_with_ui
   public QObject,
@@ -29,6 +34,9 @@ class @_paraview_build_plugin@Plugin :
 
   public vtkPVPlugin
 
+#if _paraview_add_plugin_with_initializers
+  , public vtkPVDynamicInitializerPluginInterface
+#endif
 #if _paraview_add_plugin_with_xml
   , public vtkPVServerManagerPluginInterface
 #endif
@@ -119,5 +127,9 @@ public:
   void GetPythonSourceList(std::vector<std::string>& modules,
     std::vector<std::string>& sources,
     std::vector<int>& package_flags) override;
+#endif
+
+#if _paraview_add_plugin_with_initializers
+  void Initialize() override;
 #endif
 };

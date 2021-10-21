@@ -1,0 +1,8 @@
+NAME
+  DynamicInitializer
+DESCRIPTION
+  An example dynamic-initializer plugin. This type of plugin is
+  useful if the plugin only includes side effects (such as registering
+  new classes with existing third-party libraries).
+REQUIRES_MODULES
+  ParaView::RemotingCore
