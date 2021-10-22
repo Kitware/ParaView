@@ -60,7 +60,11 @@ public:
   /**
    * do nothing, everything is handled in createEditor method
    */
-  void setEditorData(QWidget* editor, const QModelIndex& index) const override{};
+  void setEditorData(QWidget* editor, const QModelIndex& index) const override
+  {
+    Q_UNUSED(editor);
+    Q_UNUSED(index);
+  };
 
   /**
    * Gets data from the editor widget and stores it in the specified model at the item index
