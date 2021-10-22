@@ -52,10 +52,9 @@ public:
   void LoadMaterials(const char*);
 
   /**
-   * After loading materials in the OSPRay material library, this function is used to
-   * iterate over all stored materials and create the material proxy accordingly.
+   * Overridden to control load from server file system.
    */
-  void CreateProxies();
+  void UpdateVTKObjects() override;
 
 protected:
   vtkSMMaterialLibraryProxy() = default;

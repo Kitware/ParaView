@@ -35,6 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqColorChooserButton.h"
 #include "pqDoubleSliderWidget.h"
 #include "pqDoubleSpinBox.h"
+#include "pqFileDialog.h"
 #include "pqMaterialEditor.h"
 #include "pqServer.h"
 #include "pqTextureSelectorPropertyWidget.h"
@@ -48,6 +49,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QComboBox>
 #include <QMetaProperty>
 #include <QPainter>
+#include <QPushButton>
 #include <QVector2D>
 #include <QVector3D>
 
@@ -71,7 +73,7 @@ void pqMaterialAttributesDelegate::paint(
         .data(static_cast<int>(pqMaterialEditor::ExtendedItemDataRole::PropertyValue))
         .toString();
 
-    auto& dic = vtkOSPRayMaterialLibrary::GetParametersDictionary();
+    const auto& dic = vtkOSPRayMaterialLibrary::GetParametersDictionary();
 
     auto paramType = dic.at(matType.toStdString()).at(attrName.toStdString());
 
@@ -97,7 +99,7 @@ void pqMaterialAttributesDelegate::paint(
         painter->restore();
 
         modOption.rect.setLeft(swatchRect.right() + 4);
-        modOption.text = QString("%1, %2, %3").arg(c.red()).arg(c.green()).arg(c.blue());
+        modOption.text = QString("(%1, %2, %3)").arg(c.red()).arg(c.green()).arg(c.blue());
       }
       break;
       case vtkOSPRayMaterialLibrary::ParameterType::NORMALIZED_FLOAT: // normalized
@@ -136,12 +138,9 @@ void pqMaterialAttributesDelegate::paint(
       case vtkOSPRayMaterialLibrary::ParameterType::TEXTURE:
       {
         QString str = variant.toString();
-
-        if (str.isEmpty() ||
-          pqActiveObjects::instance().activeServer()->proxyManager()->GetProxy(
-            str.toLocal8Bit().data()) == nullptr)
+        if (str.isEmpty())
         {
-          str = "None";
+          str = "<None>";
         }
 
         modOption.text = str;
@@ -151,6 +150,7 @@ void pqMaterialAttributesDelegate::paint(
         break;
     }
   }
+
   QStyledItemDelegate::paint(painter, modOption, index);
 }
 
@@ -167,10 +167,10 @@ QWidget* pqMaterialAttributesDelegate::createEditor(
     // add current material
     paramsList << index.data(Qt::EditRole).toString();
 
-    pqMaterialEditor* parent = qobject_cast<pqMaterialEditor*>(this->parent());
-    if (parent)
+    pqMaterialEditor* materialEditor = qobject_cast<pqMaterialEditor*>(this->parent());
+    if (materialEditor)
     {
-      for (auto p : parent->availableParameters())
+      for (auto p : materialEditor->availableParameters())
       {
         paramsList << p.c_str();
       }
@@ -250,22 +250,35 @@ QWidget* pqMaterialAttributesDelegate::createEditor(
           new pqVectorWidgetImpl<QVector3D, 3>(variant.value<QVector3D>(), parent);
         return widget;
       }
-      case vtkOSPRayMaterialLibrary::ParameterType::FLOAT_DATA:
-        return nullptr;
       case vtkOSPRayMaterialLibrary::ParameterType::TEXTURE:
       {
-        pqServer* server = pqActiveObjects::instance().activeServer();
-        vtkSMProxy* proxy =
-          server->proxyManager()->FindProxy("materiallibrary", "materials", "MaterialLibrary");
+        auto editor = new QPushButton(parent);
+        editor->setText(variant.value<QString>());
+        QObject::connect(editor, &QPushButton::clicked, [editor](bool) {
+          const QString filters = "Image files (*.png *.jpg *.bmp *.ppm)";
+          pqServer* server = pqActiveObjects::instance().activeServer();
+          pqFileDialog* dialog =
+            new pqFileDialog(server, editor, tr("Open Texture:"), QString(), filters);
+          dialog->setObjectName("LoadMaterialTextureDialog");
+          dialog->setFileMode(pqFileDialog::ExistingFile);
+          QObject::connect(dialog,
+            // Qt independant version of qOverload, for not having to deal with Qt's API breaks
+            static_cast<void (pqFileDialog::*)(const QList<QStringList>&)>(
+              &pqFileDialog::filesSelected),
+            [editor](const QList<QStringList>& files) {
+              if (!files.empty() && !files[0].empty())
+              {
+                editor->setText(files[0][0]);
+              }
+            });
 
-        // dummy texture is used to set the default value of the combobox
-        vtkSMProxy* textureProxy =
-          server->proxyManager()->GetProxy(variant.toString().toLocal8Bit().data());
-        vtkSMPropertyHelper(proxy, "DummyTexture").Set(textureProxy);
-        pqTextureSelectorPropertyWidget* widget =
-          new pqTextureSelectorPropertyWidget(proxy, proxy->GetProperty("DummyTexture"), parent);
-        return widget;
+          dialog->open();
+        });
+
+        return editor;
       }
+      default:
+        return nullptr;
     }
   }
   return QStyledItemDelegate::createEditor(parent, option, index);
@@ -289,12 +302,19 @@ void pqMaterialAttributesDelegate::setModelData(
       sibling.data(static_cast<int>(pqMaterialEditor::ExtendedItemDataRole::PropertyValue))
         .toString();
 
-    auto& dic = vtkOSPRayMaterialLibrary::GetParametersDictionary();
+    const auto& dic = vtkOSPRayMaterialLibrary::GetParametersDictionary();
     auto paramType = dic.at(matType.toStdString()).at(attrName.toStdString());
 
-    if (paramType == vtkOSPRayMaterialLibrary::ParameterType::NORMALIZED_FLOAT)
+    switch (paramType)
     {
-      newValue = newValue.toDouble() * 0.01;
+      case vtkOSPRayMaterialLibrary::ParameterType::NORMALIZED_FLOAT:
+        newValue = newValue.toDouble() * 0.01;
+        break;
+      case vtkOSPRayMaterialLibrary::ParameterType::TEXTURE:
+        // Get the text property of the button
+        newValue = editor->property("text");
+      default:
+        break;
     }
 
     model->setData(
