@@ -57,24 +57,24 @@ public:
    */
   virtual void Build();
 
-  ///@{
-  /**
-   * Set/Get whether to use a custom range for the transfer function.
-   * This determines the bounds of the image data that is the transfer function.
-   */
-  vtkSetMacro(UseCustomRange, bool);
-  vtkGetMacro(UseCustomRange, bool);
-  vtkBooleanMacro(UseCustomRange, bool);
-  ///@}
-
-  ///@{
-  /**
-   * Set/Get the custom range for the transfer function.
-   * This determines the bounds of the image data that is the transfer function.
-   */
-  vtkSetVector4Macro(CustomRange, double);
-  vtkGetVector4Macro(CustomRange, double);
-  ///@}
+  //  ///@{
+  //  /**
+  //   * Set/Get whether to use a custom range for the transfer function.
+  //   * This determines the bounds of the image data that is the transfer function.
+  //   */
+  //  vtkSetMacro(UseCustomRange, bool);
+  //  vtkGetMacro(UseCustomRange, bool);
+  //  vtkBooleanMacro(UseCustomRange, bool);
+  //  ///@}
+  //
+  //  ///@{
+  //  /**
+  //   * Set/Get the custom range for the transfer function.
+  //   * This determines the bounds of the image data that is the transfer function.
+  //   */
+  //  vtkSetVector4Macro(CustomRange, double);
+  //  vtkGetVector4Macro(CustomRange, double);
+  //  ///@}
 
   ///@{
   /**
@@ -114,12 +114,11 @@ public:
 
   ///@{
   /**
-   * Returns the (minX, maxX, minY, maxY) for the 2D transfer function.
-   * When UseCustomRange is enabled, this function returns the same values as GetCustomRange()
+   * Set/Get the range of the function.
+   * Set/Get the (minX, maxX, minY, maxY) for the 2D transfer function.
    */
-  double* GetRange() VTK_SIZEHINT(4);
-  virtual void GetRange(double& arg1, double& arg2, double& arg3, double& arg4);
-  virtual void GetRange(double arg[4]);
+  vtkSetVector4Macro(Range, double);
+  vtkGetVector4Macro(Range, double);
   ///@}
 
   /**
@@ -132,15 +131,11 @@ protected:
   ~vtkPVTransferFunction2D();
 
   // Helper members
-  ///@{
   /**
-   * Use a custom range for the X and Y axes of the function.
+   * The range for the X and Y axes of the function.
    * This will determine the bounds of the transfer function.
-   * By default, this is disabled and the range is calculated at build time.
    */
-  bool UseCustomRange = false;
-  double CustomRange[4] = { 0, 0, 0, 0 };
-  ///@}
+  double Range[4] = { 0, 0, 0, 0 };
 
   /**
    * The output dimensions for the transfer function.

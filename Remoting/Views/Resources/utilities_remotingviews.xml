@@ -1594,11 +1594,15 @@
         <BooleanDomain name="bool" />
       </IntVectorProperty>
       -->
-      <DoubleVectorProperty command="SetCustomRange"
+      <DoubleVectorProperty command="SetRange"
                          default_values="0.0 1.0 0.0 1.0"
-                         name="CustomRange"
+                         name="Range"
                          number_of_elements="4"
                          panel_visibility="never" >
+        <Documentation>
+          The range of the X and Y axes of the transfer function. This is
+          specified as a 4-tuple of the form (xmin, xmax, ymin, ymax).
+        </Documentation>
       </DoubleVectorProperty>
     </TransferFunction2DProxy>
     <!-- end of "transfer_2d_functions" -->

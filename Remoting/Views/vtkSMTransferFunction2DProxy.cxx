@@ -53,14 +53,33 @@ inline vtkSMProperty* GetTransferFunction2DBoxesProperty(vtkSMProxy* self)
   unsigned int num_elements = cntrlBoxes.GetNumberOfElements();
   if (num_elements % vtkSMTransferFunction2DProxy::BOX_PROPERTY_SIZE != 0)
   {
-    vtkGenericWarningMacro("Property must have " << vtkSMTransferFunction2DProxy::BOX_PROPERTY_SIZE
-                                                 << "-tuples. Resizing.");
+    vtkGenericWarningMacro("'Boxes' property must have "
+      << vtkSMTransferFunction2DProxy::BOX_PROPERTY_SIZE << "-tuples. Resizing.");
     cntrlBoxes.SetNumberOfElements(
       (num_elements / vtkSMTransferFunction2DProxy::BOX_PROPERTY_SIZE) *
       vtkSMTransferFunction2DProxy::BOX_PROPERTY_SIZE);
   }
 
   return controlBoxesProperty;
+}
+
+//----------------------------------------------------------------------------
+inline vtkSMProperty* GetTransferFunction2DRangeProperty(vtkSMProxy* self)
+{
+  vtkSMProperty* tf2DRangeProperty = self->GetProperty("Range");
+  if (!tf2DRangeProperty)
+  {
+    vtkGenericWarningMacro("'Range' property is required.");
+    return nullptr;
+  }
+  vtkSMPropertyHelper tf2DRange(tf2DRangeProperty);
+  unsigned int num_elements = tf2DRange.GetNumberOfElements();
+  if (num_elements != 4)
+  {
+    vtkGenericWarningMacro("'Range' property must have 4-tuples. Resizing.");
+    tf2DRange.SetNumberOfElements(4);
+  }
+  return tf2DRangeProperty;
 }
 
 //----------------------------------------------------------------------------
