@@ -139,6 +139,11 @@ vtkPVDataInformation* vtkSMOutputPort::GetSubsetDataInformation(unsigned int com
   auto dinfo = this->GetDataInformation();
   if (dinfo->DataSetTypeIsA(VTK_MULTIBLOCK_DATA_SET))
   {
+    if (compositeIndex == 0)
+    {
+      // Bug #20997 return the full data information for composite index 0
+      return dinfo;
+    }
     auto hierarchy = dinfo->GetHierarchy();
     return this->GetSubsetDataInformation(
       vtkDataAssemblyUtilities::GetSelectorForCompositeId(compositeIndex, hierarchy).c_str(),
