@@ -1550,9 +1550,7 @@
                            processes="client|renderserver|dataserver">
       <DoubleVectorProperty clean_command="RemoveAllBoxes"
                             command="AddControlBox"
-                            default_values="0.0 0.0 1.0 1.0 1.0 1.0 1.0 1.0"
                             name="Boxes"
-                            number_of_elements="8"
                             number_of_elements_per_command="8"
                             repeat_command="1">
         <Documentation>
@@ -1573,6 +1571,7 @@
         </Documentation>
         <BooleanDomain name="bool" />
       </IntVectorProperty>
+      <!--
       <DoubleVectorProperty clean_command="RemoveAllBoxes"
                             command="AddControlBox"
                             name="Transfer2DBoxes"
@@ -1587,7 +1586,6 @@
           components are in the range [0, 1].
         </Documentation>
       </DoubleVectorProperty>
-      <!--
       <IntVectorProperty command="SetUseCustomRange"
                          default_values="0"
                          name="UseCustomRange"
