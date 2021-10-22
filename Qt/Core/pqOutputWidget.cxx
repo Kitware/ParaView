@@ -232,7 +232,12 @@ public:
                             /* suppress "warning: internal error:  void
                                QXcbWindow::setNetWmStateOnUnmappedWindow() called on mapped window"
                                */
-                            << "QXcbWindow::setNetWmStateOnUnmappedWindow";
+                            << "QXcbWindow::setNetWmStateOnUnmappedWindow"
+                            /* suppress "warning: In unknown, line 0" and
+                               "warning: Populating font family aliases took"
+                             */
+                            << "warning: In unknown, line 0"
+                            << "warning: Populating font family aliases took";
   }
 
   void displayMessageInConsole(const QString& message, QtMsgType type)
