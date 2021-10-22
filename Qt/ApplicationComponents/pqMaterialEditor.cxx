@@ -247,10 +247,8 @@ QVariant pqMaterialProxyModel::headerData(int section, Qt::Orientation orientati
 }
 
 //-----------------------------------------------------------------------------
-int pqMaterialProxyModel::rowCount(const QModelIndex& index) const
+int pqMaterialProxyModel::rowCount(const QModelIndex&) const
 {
-  Q_UNUSED(index);
-
   if (!this->MaterialLibrary)
   {
     return 0;
@@ -422,7 +420,7 @@ bool pqMaterialProxyModel::setData(const QModelIndex& index, const QVariant& var
         ml->AddShaderVariable(this->MaterialName, varName, { variant.toDouble() });
     }
 
-    emit this->dataChanged(index, index);
+    Q_EMIT this->dataChanged(index, index);
     return true;
   }
 
