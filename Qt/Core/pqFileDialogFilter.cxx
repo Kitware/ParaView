@@ -101,8 +101,8 @@ void pqFileDialogFilter::setFilter(const QString& filter)
     filepatterns.replace("*", ".*");
 
     // use non capturing(?:) for speed
-    // name.ext or ext.001 or name.ext001 (for bug #10101)
-    QString postExtFileSeries("(\\.?\\d+)?$"); // match the .0001 component
+    // accepts the pattern followed by up to 3 dot and number (for example can.e.4.1.001)
+    QString postExtFileSeries("(\\.?\\d+){0,3}$");
     QString extGroup = ".*\\.(?:" % extensions % ")" % postExtFileSeries;
     QString fileGroup = "(?:" % filepatterns % ")" % postExtFileSeries;
     if (!extensions_list.empty() && !filepatterns_list.empty())
@@ -135,6 +135,7 @@ void pqFileDialogFilter::setShowHidden(const bool& hidden)
 bool pqFileDialogFilter::filterAcceptsRow(int row_source, const QModelIndex& source_parent) const
 {
   QModelIndex idx = this->Model->index(row_source, 0, source_parent);
+  QAbstractItemModel const* sourceModel = this->sourceModel();
 
   // hidden flag supersedes anything else
   if (this->Model->isHidden(idx) && !this->showHidden)
@@ -144,21 +145,27 @@ bool pqFileDialogFilter::filterAcceptsRow(int row_source, const QModelIndex& sou
 
   if (this->Model->isDir(idx))
   {
-    QString str = this->sourceModel()->data(idx).toString();
+    QString str = sourceModel->data(idx).toString();
     return true;
   }
 
-  if (source_parent.isValid())
+  int const rowCount = sourceModel->rowCount(idx);
+
+  if (rowCount != 0)
   {
-    // if source_parent is valid, then the item is an element in a file-group.
-    // For file-groups, we use pass any file in a group, if the group's label
-    // passes the test (BUG #13179).
-    QString str = this->sourceModel()->data(source_parent).toString();
-    return this->Wildcards.exactMatch(str);
+    for (int row = 0; row < rowCount; ++row)
+    {
+      QString str = sourceModel->data(sourceModel->index(row, 0, idx)).toString();
+      if (!this->Wildcards.exactMatch(str))
+      {
+        return false;
+      }
+    }
+    return true;
   }
   else
   {
-    QString str = this->sourceModel()->data(idx).toString();
+    QString str = sourceModel->data(idx).toString();
     return this->Wildcards.exactMatch(str);
   }
 }
