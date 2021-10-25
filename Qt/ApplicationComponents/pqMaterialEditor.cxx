@@ -247,8 +247,10 @@ QVariant pqMaterialProxyModel::headerData(int section, Qt::Orientation orientati
 }
 
 //-----------------------------------------------------------------------------
-int pqMaterialProxyModel::rowCount(const QModelIndex&) const
+int pqMaterialProxyModel::rowCount(const QModelIndex& index) const
 {
+  Q_UNUSED(index);
+
   if (!this->MaterialLibrary)
   {
     return 0;
