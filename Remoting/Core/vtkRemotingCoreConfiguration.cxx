@@ -363,6 +363,9 @@ bool vtkRemotingCoreConfiguration::PopulateConnectionOptions(
         "may timeout. "
         "The client typically shows a warning message before the server times out.")
       ->default_val(0);
+
+    groupConnection->add_option("--timeout-command", this->TimeoutCommand,
+      "Timeout command allowing server to regularly check remaining time available.");
   }
   else if (ptype == vtkProcessModule::PROCESS_CLIENT)
   {
@@ -548,6 +551,7 @@ void vtkRemotingCoreConfiguration::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "ServerURL: " << this->ServerURL.c_str() << endl;
   os << indent << "ServerResourceName: " << this->ServerResourceName.c_str() << endl;
   os << indent << "Timeout: " << this->Timeout << endl;
+  os << indent << "TimeoutCommand: " << this->TimeoutCommand << endl;
   os << indent << "UseStereoRendering: " << this->UseStereoRendering << endl;
   os << indent << "StereoType: " << this->StereoType << endl;
   os << indent << "EyeSeparation: " << this->GetEyeSeparation() << endl;

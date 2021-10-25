@@ -28,7 +28,6 @@ OPTIONAL_DEPENDS
   VTK::PythonInterpreter
   VTK::WrappingPythonCore
 TEST_DEPENDS
-  ParaView::RemotingApplication
   VTK::FiltersSources
   VTK::TestingCore
 TEST_LABELS
