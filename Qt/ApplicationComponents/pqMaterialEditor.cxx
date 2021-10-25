@@ -247,8 +247,10 @@ QVariant pqMaterialProxyModel::headerData(int section, Qt::Orientation orientati
 }
 
 //-----------------------------------------------------------------------------
-int pqMaterialProxyModel::rowCount(const QModelIndex&) const
+int pqMaterialProxyModel::rowCount(const QModelIndex& index) const
 {
+  Q_UNUSED(index);
+
   if (!this->MaterialLibrary)
   {
     return 0;
@@ -501,6 +503,7 @@ pqMaterialEditor::pqMaterialEditor(QWidget* parentObject)
       this->Internals->Ui.SelectMaterial->clear();
       this->Internals->MaterialLibrary = nullptr;
       bool enable = false;
+      this->HasWarnedUser = false;
       if (server && !server->isRemote())
       {
         vtkSMProxy* proxy =
@@ -522,6 +525,12 @@ pqMaterialEditor::pqMaterialEditor(QWidget* parentObject)
             }
           }
         }
+      }
+      if (server && server->isRemote() && this->isVisible())
+      {
+        vtkGenericWarningMacro(
+          "Material Editor disabled because client is connected to a remote server.");
+        this->HasWarnedUser = true;
       }
       // Grey out the material editor if CS mode or if we didn't find the ML object
       this->Internals->Ui.AddMaterial->setEnabled(enable);
@@ -756,8 +765,11 @@ void pqMaterialEditor::removeAllProperties()
 }
 
 //-----------------------------------------------------------------------------
-void pqMaterialEditor::propertyChanged(const QModelIndex&, const QModelIndex&)
+void pqMaterialEditor::propertyChanged(const QModelIndex& topLeft, const QModelIndex& botRight)
 {
+  Q_UNUSED(topLeft);
+  Q_UNUSED(botRight);
+
   // update material and render
   QString matName = this->currentMaterialName();
 
@@ -847,4 +859,17 @@ void pqMaterialEditor::updateCurrentMaterial(const std::string& label)
 
   this->Internals->AttributesModel.setMaterial(ml, label);
   this->propertyChanged(QModelIndex(), QModelIndex());
+}
+
+//-----------------------------------------------------------------------------
+void pqMaterialEditor::showEvent(QShowEvent* event)
+{
+  if (!this->HasWarnedUser && !this->Internals->MaterialLibrary)
+  {
+    vtkGenericWarningMacro(
+      "Material Editor disabled because client is connected to a remote server.");
+    this->HasWarnedUser = true;
+  }
+
+  this->Superclass::showEvent(event);
 }

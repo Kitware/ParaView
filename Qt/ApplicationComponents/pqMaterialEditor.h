@@ -36,7 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QWidget>
 
-#include <string>
+#include <string> // for std::string
 
 class vtkOSPRayMaterialLibrary;
 class vtkSMProxy;
@@ -48,7 +48,7 @@ class vtkSMProxy;
  * Then, you can customize this material by adding or removing properties, such as the color,
  * the roughness, the textures... depending on the available properties that you can see
  * in vtkOSPRayMaterialLibrary.
- *
+ * Texture format supported are *.png, *.jpg, *.bmp and *.ppm.
  */
 class PQAPPLICATIONCOMPONENTS_EXPORT pqMaterialEditor : public QWidget
 {
@@ -109,11 +109,18 @@ protected:
    */
   std::string generateValidMaterialName(const std::string& name);
 
+  /**
+   * Overriden to warn user when material editor is not usable.
+   */
+  void showEvent(QShowEvent* event) override;
+
 private:
   Q_DISABLE_COPY(pqMaterialEditor)
   class pqInternals;
   pqInternals* Internals;
   friend class pqInternals;
+
+  bool HasWarnedUser = true;
 };
 
 #endif
