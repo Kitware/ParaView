@@ -100,7 +100,7 @@ void AddDefaultValue(
       ml->AddShaderVariable(matName, variable, { 1.0, 1.0, 1.0 });
       break;
     case vtkOSPRayMaterialLibrary::ParameterType::TEXTURE:
-      ml->AddTexture(matName, variable, nullptr, "<None>", "");
+      ml->AddTexture(matName, variable, nullptr, "<None>");
       break;
     default:
       vtkGenericWarningMacro("Material property " << variable << " is unsupported.");
@@ -405,8 +405,7 @@ bool pqMaterialProxyModel::setData(const QModelIndex& index, const QVariant& var
             vtkNew<vtkTexture> texture;
             texture->SetInputData(reader->GetOutput());
             texture->Update();
-            ml->AddTexture(this->MaterialName, varName, texture, fileInfo.baseName().toStdString(),
-              fileInfo.absoluteFilePath().toStdString());
+            ml->AddTexture(this->MaterialName, varName, texture, fileInfo.baseName().toStdString());
           }
           else
           {
