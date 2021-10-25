@@ -36,6 +36,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QWidget>
 
+#include <string> // for std::string
+
 class vtkOSPRayMaterialLibrary;
 class vtkSMProxy;
 
@@ -46,7 +48,7 @@ class vtkSMProxy;
  * Then, you can customize this material by adding or removing properties, such as the color,
  * the roughness, the textures... depending on the available properties that you can see
  * in vtkOSPRayMaterialLibrary.
- *
+ * Texture format supported are *.png, *.jpg, *.bmp and *.ppm.
  */
 class PQAPPLICATIONCOMPONENTS_EXPORT pqMaterialEditor : public QWidget
 {
@@ -68,21 +70,6 @@ public:
   QString currentMaterialName();
 
   /**
-   * Return the proxy associated with vtkOSPRayMaterialLibrary.
-   */
-  vtkSMProxy* materialLibraryProxy();
-
-  /**
-   * Return the vtkOSPRayMaterialLibrary class managed by the library proxy.
-   */
-  vtkOSPRayMaterialLibrary* materialLibrary();
-
-  /**
-   * Return the vtkPVMaterial proxy associated with the "matName" material.
-   */
-  vtkSMProxy* materialProxy(const QString& matName);
-
-  /**
    * Return the list of the available OSPRay parameters for the current material.
    */
   std::vector<std::string> availableParameters();
@@ -97,7 +84,7 @@ public:
   };
 
 protected Q_SLOTS:
-  void updateCurrentMaterial(const QString&);
+  void updateCurrentMaterial(const std::string&);
   void updateCurrentMaterialWithIndex(int index);
 
   void loadMaterials();
@@ -106,8 +93,6 @@ protected Q_SLOTS:
   void removeMaterial();
   void attachMaterial();
 
-  void synchronizeClientToServ();
-
   void addProperty();
   void removeProperty();
   void removeAllProperties();
@@ -115,9 +100,6 @@ protected Q_SLOTS:
   void propertyChanged(const QModelIndex& topLeft, const QModelIndex& bottomRight);
 
 protected:
-  void removeProperties(vtkSMProxy* proxy, const QSet<QString>& variables);
-  void addNewProperty(vtkSMProxy* proxy, const QString& prop);
-
   /**
    * Return a unique material name given a desired name.
    *
@@ -127,11 +109,18 @@ protected:
    */
   std::string generateValidMaterialName(const std::string& name);
 
+  /**
+   * Overriden to warn user when material editor is not usable.
+   */
+  void showEvent(QShowEvent* event) override;
+
 private:
   Q_DISABLE_COPY(pqMaterialEditor)
   class pqInternals;
   pqInternals* Internals;
   friend class pqInternals;
+
+  bool HasWarnedUser = true;
 };
 
 #endif

@@ -94,7 +94,6 @@ set(classes
   vtkPVLODActor
   vtkPVLODVolume
   vtkPVLogoSource
-  vtkPVMaterial
   vtkPVMaterialLibrary
   vtkPVMultiSliceView
   vtkPVOpenGLInformation

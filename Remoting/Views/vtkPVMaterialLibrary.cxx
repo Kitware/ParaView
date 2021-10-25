@@ -22,7 +22,6 @@
 
 #if VTK_MODULE_ENABLE_VTK_RenderingRayTracing
 #include "vtkOSPRayMaterialLibrary.h"
-#include "vtkPVMaterial.h"
 #endif
 
 #include <cassert>
@@ -170,29 +169,5 @@ const char* vtkPVMaterialLibrary::WriteBuffer()
   return vtkOSPRayMaterialLibrary::SafeDownCast(this->GetMaterialLibrary())->WriteBuffer();
 #else
   return nullptr;
-#endif
-}
-
-//-----------------------------------------------------------------------------
-void vtkPVMaterialLibrary::AddMaterial(vtkPVMaterial* material)
-{
-#if VTK_MODULE_ENABLE_VTK_RenderingRayTracing
-  vtkOSPRayMaterialLibrary* l = vtkOSPRayMaterialLibrary::SafeDownCast(this->GetMaterialLibrary());
-  l->AddMaterial(material->GetName(), material->GetType());
-  l->Fire();
-#else
-  (void)material;
-#endif
-}
-
-//-----------------------------------------------------------------------------
-void vtkPVMaterialLibrary::RemoveMaterial(vtkPVMaterial* material)
-{
-#if VTK_MODULE_ENABLE_VTK_RenderingRayTracing
-  vtkOSPRayMaterialLibrary* l = vtkOSPRayMaterialLibrary::SafeDownCast(this->GetMaterialLibrary());
-  l->RemoveMaterial(material->GetName());
-  l->Fire();
-#else
-  (void)material;
 #endif
 }

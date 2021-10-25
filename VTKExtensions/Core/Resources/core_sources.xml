@@ -23,11 +23,6 @@
     </SourceProxy>
 
     <!-- ==================================================================== -->
-    <SourceProxy class="vtkPVTrivialProducer" name="PVTrivialProducerOnAllProcesses"
-                 processes="client|dataserver|renderserver">
-    </SourceProxy>
-
-    <!-- ==================================================================== -->
     <SourceProxy class="vtkDistributedTrivialProducer"
                  name="DistributedTrivialProducer">
       <IntVectorProperty command="SetWholeExtent"
