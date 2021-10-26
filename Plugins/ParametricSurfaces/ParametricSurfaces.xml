@@ -10,7 +10,7 @@
       <IntVectorProperty name="ClockwiseOrdering"
                          command="SetClockwiseOrdering"
                          number_of_elements="1"
-                         default_values="1">
+                         default_values="0">
         <BooleanDomain name="bool"/>
         <Documentation>
           This property changes the direction of the normals.
@@ -46,7 +46,7 @@
       <IntVectorProperty name="ClockwiseOrdering"
                          command="SetClockwiseOrdering"
                          number_of_elements="1"
-                         default_values="1">
+                         default_values="0">
         <BooleanDomain name="bool"/>
         <Documentation>
           This property changes the direction of the normals.
@@ -57,7 +57,7 @@
       <IntVectorProperty name="ClockwiseOrdering"
                          command="SetClockwiseOrdering"
                          number_of_elements="1"
-                         default_values="1">
+                         default_values="0">
         <BooleanDomain name="bool"/>
         <Documentation>
           This property changes the direction of the normals.
@@ -81,7 +81,7 @@
       <IntVectorProperty name="ClockwiseOrdering"
                          command="SetClockwiseOrdering"
                          number_of_elements="1"
-                         default_values="1">
+                         default_values="0">
         <BooleanDomain name="bool"/>
         <Documentation>
           This property changes the direction of the normals.
@@ -110,7 +110,7 @@
       <IntVectorProperty name="ClockwiseOrdering"
                          command="SetClockwiseOrdering"
                          number_of_elements="1"
-                         default_values="1">
+                         default_values="0">
         <BooleanDomain name="bool"/>
         <Documentation>
           This property changes the direction of the normals.
@@ -128,7 +128,7 @@
       <IntVectorProperty name="ClockwiseOrdering"
                          command="SetClockwiseOrdering"
                          number_of_elements="1"
-                         default_values="1">
+                         default_values="0">
         <BooleanDomain name="bool"/>
         <Documentation>
           This property changes the direction of the normals.
@@ -139,7 +139,7 @@
       <IntVectorProperty name="ClockwiseOrdering"
                          command="SetClockwiseOrdering"
                          number_of_elements="1"
-                         default_values="1">
+                         default_values="0">
         <BooleanDomain name="bool"/>
         <Documentation>
           This property changes the direction of the normals.
@@ -168,7 +168,7 @@
       <IntVectorProperty name="ClockwiseOrdering"
                          command="SetClockwiseOrdering"
                          number_of_elements="1"
-                         default_values="1">
+                         default_values="0">
         <BooleanDomain name="bool"/>
         <Documentation>
           This property changes the direction of the normals.
@@ -249,7 +249,7 @@
       <IntVectorProperty name="ClockwiseOrdering"
                          command="SetClockwiseOrdering"
                          number_of_elements="1"
-                         default_values="1">
+                         default_values="0">
         <BooleanDomain name="bool"/>
         <Documentation>
           This property changes the direction of the normals.
@@ -343,7 +343,7 @@
       <IntVectorProperty name="ClockwiseOrdering"
                          command="SetClockwiseOrdering"
                          number_of_elements="1"
-                         default_values="1">
+                         default_values="0">
         <BooleanDomain name="bool"/>
         <Documentation>
           This property changes the direction of the normals.
@@ -366,7 +366,7 @@
       <IntVectorProperty name="ClockwiseOrdering"
                          command="SetClockwiseOrdering"
                          number_of_elements="1"
-                         default_values="1">
+                         default_values="0">
         <BooleanDomain name="bool"/>
         <Documentation>
           This property changes the direction of the normals.
@@ -397,7 +397,7 @@
       <IntVectorProperty name="ClockwiseOrdering"
                          command="SetClockwiseOrdering"
                          number_of_elements="1"
-                         default_values="1">
+                         default_values="0">
         <BooleanDomain name="bool"/>
         <Documentation>
           This property changes the direction of the normals.
@@ -428,7 +428,7 @@
       <IntVectorProperty name="ClockwiseOrdering"
                          command="SetClockwiseOrdering"
                          number_of_elements="1"
-                         default_values="1">
+                         default_values="0">
         <BooleanDomain name="bool"/>
         <Documentation>
           This property changes the direction of the normals.
@@ -459,7 +459,7 @@
       <IntVectorProperty name="ClockwiseOrdering"
                          command="SetClockwiseOrdering"
                          number_of_elements="1"
-                         default_values="1">
+                         default_values="0">
         <BooleanDomain name="bool"/>
         <Documentation>
           This property changes the direction of the normals.
@@ -490,7 +490,7 @@
       <IntVectorProperty name="ClockwiseOrdering"
                          command="SetClockwiseOrdering"
                          number_of_elements="1"
-                         default_values="1">
+                         default_values="0">
         <BooleanDomain name="bool"/>
         <Documentation>
           This property changes the direction of the normals.
@@ -521,7 +521,7 @@
       <IntVectorProperty name="ClockwiseOrdering"
                          command="SetClockwiseOrdering"
                          number_of_elements="1"
-                         default_values="1">
+                         default_values="0">
         <BooleanDomain name="bool"/>
         <Documentation>
           This property changes the direction of the normals.
@@ -552,7 +552,7 @@
       <IntVectorProperty name="ClockwiseOrdering"
                          command="SetClockwiseOrdering"
                          number_of_elements="1"
-                         default_values="1">
+                         default_values="0">
         <BooleanDomain name="bool"/>
         <Documentation>
           This property changes the direction of the normals.
@@ -583,7 +583,7 @@
       <IntVectorProperty name="ClockwiseOrdering"
                          command="SetClockwiseOrdering"
                          number_of_elements="1"
-                         default_values="1">
+                         default_values="0">
         <BooleanDomain name="bool"/>
         <Documentation>
           This property changes the direction of the normals.
@@ -622,6 +622,15 @@
         </EnumerationDomain>
         <Documentation>
           This property indicates which scalar mode will be generated.
+        </Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty name="GenerateTextureCoordinates"
+                         command="SetGenerateTextureCoordinates"
+                         number_of_elements="1"
+                         default_values="1">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          This property whether to generate texture coordinates or not.
         </Documentation>
       </IntVectorProperty>
       <ProxyProperty
