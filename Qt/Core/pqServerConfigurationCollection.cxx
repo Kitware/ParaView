@@ -41,6 +41,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkProcessModule.h"
 #include "vtkRemotingCoreConfiguration.h"
 #include "vtkResourceFileLocator.h"
+#include "vtkVersion.h"
 
 #include <vtksys/SystemTools.hxx>
 
