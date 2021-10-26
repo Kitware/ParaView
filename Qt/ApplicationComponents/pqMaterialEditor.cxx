@@ -32,11 +32,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqMaterialEditor.h"
 #include "ui_pqMaterialEditor.h"
 
+#include "vtkBMPReader.h"
 #include "vtkCollection.h"
 #include "vtkCommand.h"
+#include "vtkImageData.h"
+#include "vtkJPEGReader.h"
 #include "vtkMath.h"
 #include "vtkOSPRayMaterialLibrary.h"
-#include "vtkPVMaterial.h"
+#include "vtkPNGReader.h"
+#include "vtkPNMReader.h"
 #include "vtkPVMaterialLibrary.h"
 #include "vtkPVRenderView.h"
 #include "vtkProcessModule.h"
@@ -44,6 +48,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMSessionProxyManager.h"
+#include "vtkTexture.h"
 
 #include "pqActiveObjects.h"
 #include "pqApplicationCore.h"
@@ -66,6 +71,44 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <array>
 #include <sstream>
 
+namespace
+{
+void AddDefaultValue(
+  vtkOSPRayMaterialLibrary* ml, const std::string& matName, const std::string& variable)
+{
+  const std::string& matType = ml->LookupImplName(matName);
+  const auto& dic = vtkOSPRayMaterialLibrary::GetParametersDictionary();
+  const auto varType = dic.at(matType).at(variable);
+  switch (varType)
+  {
+    case vtkOSPRayMaterialLibrary::ParameterType::BOOLEAN:
+      ml->AddShaderVariable(matName, variable, { 1.0 });
+      break;
+    case vtkOSPRayMaterialLibrary::ParameterType::FLOAT:
+      ml->AddShaderVariable(matName, variable, { 1.5 });
+      break;
+    case vtkOSPRayMaterialLibrary::ParameterType::NORMALIZED_FLOAT:
+      ml->AddShaderVariable(matName, variable, { 1.0 });
+      break;
+    case vtkOSPRayMaterialLibrary::ParameterType::VEC2:
+      ml->AddShaderVariable(matName, variable, { 0.0, 0.0 });
+      break;
+    case vtkOSPRayMaterialLibrary::ParameterType::VEC3:
+      ml->AddShaderVariable(matName, variable, { 0.0, 0.0, 0.0 });
+      break;
+    case vtkOSPRayMaterialLibrary::ParameterType::COLOR_RGB:
+      ml->AddShaderVariable(matName, variable, { 1.0, 1.0, 1.0 });
+      break;
+    case vtkOSPRayMaterialLibrary::ParameterType::TEXTURE:
+      ml->AddTexture(matName, variable, nullptr, "<None>");
+      break;
+    default:
+      vtkGenericWarningMacro("Material property " << variable << " is unsupported.");
+      break;
+  }
+}
+}
+
 /**
  * The Qt model associated with the 2D array representation of the material properties
  */
@@ -85,7 +128,30 @@ public:
   /**
    * Sets the material proxy whose property will be displayed
    */
-  void setProxy(vtkSMProxy* proxy) { this->Proxy = proxy; }
+  void setMaterial(vtkOSPRayMaterialLibrary* ml, const std::string& name)
+  {
+    this->reset();
+    if (!ml)
+    {
+      return;
+    }
+    this->MaterialLibrary = ml;
+    this->MaterialName = name;
+    this->MaterialType = ml->LookupImplName(name);
+
+    const auto& variables = ml->GetDoubleShaderVariableList(name);
+    const auto& textures = ml->GetTextureList(name);
+    this->beginInsertRows(QModelIndex(), 0, variables.size() + textures.size() - 1);
+    for (const auto& var : variables)
+    {
+      this->VariableNames.push_back(var);
+    }
+    for (const auto& tex : textures)
+    {
+      this->VariableNames.push_back(tex);
+    }
+    this->endInsertRows();
+  }
 
   /**
    * Returns the flags associated with this model
@@ -114,17 +180,15 @@ public:
   /**
    * Returns the number of columns (two in our case)
    */
-  int columnCount(const QModelIndex& parent = QModelIndex()) const override { return 2; }
+  int columnCount(const QModelIndex&) const override { return 2; }
 
+  //@{
   /**
-   * Returns the material attribute name at row
+   * Query current material informations
    */
-  std::string getMaterialAttributeName(const int row) const;
-
-  /**
-   * Query the proxy to get the material type
-   */
-  std::string getMaterialType() const;
+  std::string getMaterialType() const { return this->MaterialType; }
+  std::string getMaterialName() const { return this->MaterialName; }
+  //@}
 
   /**
    * Return the data at index with role
@@ -142,7 +206,10 @@ private:
     return role1 == static_cast<int>(role2);
   }
 
-  vtkSMProxy* Proxy = nullptr;
+  vtkOSPRayMaterialLibrary* MaterialLibrary = nullptr;
+  std::string MaterialName;
+  std::vector<std::string> VariableNames;
+  std::string MaterialType;
 };
 
 //-----------------------------------------------------------------------------
@@ -155,6 +222,10 @@ pqMaterialProxyModel::pqMaterialProxyModel(QObject* p)
 void pqMaterialProxyModel::reset()
 {
   this->beginResetModel();
+  this->MaterialLibrary = nullptr;
+  this->MaterialType = "";
+  this->MaterialName = "";
+  this->VariableNames.clear();
   this->endResetModel();
 }
 
@@ -176,126 +247,102 @@ QVariant pqMaterialProxyModel::headerData(int section, Qt::Orientation orientati
 }
 
 //-----------------------------------------------------------------------------
-int pqMaterialProxyModel::rowCount(const QModelIndex& parent) const
+int pqMaterialProxyModel::rowCount(const QModelIndex& index) const
 {
-  if (!this->Proxy)
+  Q_UNUSED(index);
+
+  if (!this->MaterialLibrary)
   {
     return 0;
   }
-  return vtkSMPropertyHelper(this->Proxy, "DoubleVariables").GetNumberOfElements() / 2;
-}
-
-//-----------------------------------------------------------------------------
-std::string pqMaterialProxyModel::getMaterialAttributeName(const int row) const
-{
-  return vtkSMPropertyHelper(this->Proxy, "DoubleVariables").GetAsString(row * 2);
-}
-
-//-----------------------------------------------------------------------------
-std::string pqMaterialProxyModel::getMaterialType() const
-{
-  return vtkSMPropertyHelper(this->Proxy, "Type").GetAsString();
+  return this->VariableNames.size();
 }
 
 //-----------------------------------------------------------------------------
 QVariant pqMaterialProxyModel::data(const QModelIndex& index, int role) const
 {
+  vtkOSPRayMaterialLibrary* ml = this->MaterialLibrary;
+  if (!ml || index.row() >= static_cast<long>(this->VariableNames.size()))
+  {
+    return QVariant();
+  }
+  const std::string& variableName = this->VariableNames[index.row()];
+
   if (index.column() == 0)
   {
     if (role == Qt::DisplayRole || role == Qt::EditRole)
     {
-      return QString(this->getMaterialAttributeName(index.row()).c_str());
+      return QString(variableName.c_str());
     }
     if (this->IsSameRole(role, pqMaterialEditor::ExtendedItemDataRole::PropertyValue))
     {
-      return QString(this->getMaterialType().c_str());
+      return QString(this->MaterialType.c_str());
     }
   }
-  if (index.column() == 1 &&
+  else if (index.column() == 1 &&
     this->IsSameRole(role, pqMaterialEditor::ExtendedItemDataRole::PropertyValue))
   {
-    std::string attName = this->getMaterialAttributeName(index.row());
-
-    auto& dic = vtkOSPRayMaterialLibrary::GetParametersDictionary();
-    std::string matType = this->getMaterialType();
-    auto attType = dic.at(matType).at(attName);
-
-    switch (attType)
+    const auto& paramDic = vtkOSPRayMaterialLibrary::GetParametersDictionary();
+    auto value = ml->GetDoubleShaderVariable(this->MaterialName, variableName);
+    switch (paramDic.at(ml->LookupImplName(this->MaterialName)).at(variableName))
     {
       case vtkOSPRayMaterialLibrary::ParameterType::BOOLEAN:
-        return static_cast<bool>(
-          vtkSMPropertyHelper(this->Proxy, "DoubleVariables").GetAsInt(index.row() * 2 + 1));
+        return static_cast<bool>(value[0]);
       case vtkOSPRayMaterialLibrary::ParameterType::FLOAT:
-        return vtkSMPropertyHelper(this->Proxy, "DoubleVariables").GetAsDouble(index.row() * 2 + 1);
+        return value[0];
       case vtkOSPRayMaterialLibrary::ParameterType::NORMALIZED_FLOAT:
-        return vtkMath::ClampValue(
-          vtkSMPropertyHelper(this->Proxy, "DoubleVariables").GetAsDouble(index.row() * 2 + 1), 0.0,
-          1.0);
-      case vtkOSPRayMaterialLibrary::ParameterType::TEXTURE:
-        return QString(
-          vtkSMPropertyHelper(this->Proxy, "DoubleVariables").GetAsString(index.row() * 2 + 1));
+        return value[0];
       case vtkOSPRayMaterialLibrary::ParameterType::VEC2:
       {
-        std::array<double, 2> data;
-        std::stringstream ss(
-          vtkSMPropertyHelper(this->Proxy, "DoubleVariables").GetAsString(index.row() * 2 + 1));
-        for (double& value : data)
-        {
-          ss >> value;
-        }
-
-        QVector2D vec;
-        vec.setX(data[0]);
-        vec.setY(data[1]);
-        return vec;
+        QVector2D vec2;
+        vec2.setX(value[0]);
+        vec2.setY(value[1]);
+        return vec2;
       }
       case vtkOSPRayMaterialLibrary::ParameterType::VEC3:
       {
-        std::array<double, 3> data;
-        std::stringstream ss(
-          vtkSMPropertyHelper(this->Proxy, "DoubleVariables").GetAsString(index.row() * 2 + 1));
-        for (double& value : data)
-        {
-          ss >> value;
-        }
-
-        QVector3D vec;
-        vec.setX(data[0]);
-        vec.setY(data[1]);
-        vec.setZ(data[2]);
-        return vec;
+        QVector3D vec3;
+        vec3.setX(value[0]);
+        vec3.setY(value[1]);
+        vec3.setZ(value[2]);
+        return vec3;
       }
       case vtkOSPRayMaterialLibrary::ParameterType::COLOR_RGB:
       {
-        std::array<double, 3> data;
-        std::stringstream ss(
-          vtkSMPropertyHelper(this->Proxy, "DoubleVariables").GetAsString(index.row() * 2 + 1));
-        for (double& value : data)
-        {
-          ss >> value;
-        }
-
-        QColor col;
-        col.setRedF(vtkMath::ClampValue(data[0], 0.0, 1.0));
-        col.setGreenF(vtkMath::ClampValue(data[1], 0.0, 1.0));
-        col.setBlueF(vtkMath::ClampValue(data[2], 0.0, 1.0));
-        return col;
-      }
+        QColor color;
+        color.setRedF(value[0]);
+        color.setGreenF(value[1]);
+        color.setBlueF(value[2]);
+        return color;
+      };
+      case vtkOSPRayMaterialLibrary::ParameterType::TEXTURE:
+      {
+        return QString(ml->GetTextureName(this->MaterialName, variableName).c_str());
+      };
       default:
-        break;
+        return QVariant();
     }
   }
-  return QString();
+
+  return QVariant();
 }
 
 //-----------------------------------------------------------------------------
 bool pqMaterialProxyModel::setData(const QModelIndex& index, const QVariant& variant, int role)
 {
+  vtkOSPRayMaterialLibrary* ml = this->MaterialLibrary;
+  if (!ml || index.row() >= static_cast<long>(this->VariableNames.size()))
+  {
+    return false;
+  }
+
   if (index.column() == 0 && role == Qt::EditRole)
   {
-    vtkSMPropertyHelper(this->Proxy, "DoubleVariables")
-      .Set(index.row() * 2, variant.toString().toLocal8Bit().data());
-    this->Proxy->UpdateVTKObjects();
+    int row = index.row();
+    ml->RemoveTexture(this->MaterialName, this->VariableNames[row]);
+    ml->RemoveShaderVariable(this->MaterialName, this->VariableNames[row]);
+    this->VariableNames[row] = variant.toString().toStdString();
+    ::AddDefaultValue(ml, this->MaterialName, this->VariableNames[row]);
 
     QModelIndex sibling = index.sibling(index.row(), 1); // emit for value too
     emit this->dataChanged(index, sibling);
@@ -305,62 +352,93 @@ bool pqMaterialProxyModel::setData(const QModelIndex& index, const QVariant& var
     this->IsSameRole(role, pqMaterialEditor::ExtendedItemDataRole::PropertyValue))
   {
     std::stringstream ss;
+    const std::string& varName = this->VariableNames[index.row()];
     switch (static_cast<QMetaType::Type>(variant.type()))
     {
       case QMetaType::QVector2D:
       {
         QVector2D vec = variant.value<QVector2D>();
-        ss << vec.x() << " " << vec.y();
+        ml->AddShaderVariable(this->MaterialName, varName, { vec.x(), vec.y() });
       }
       break;
       case QMetaType::QVector3D:
       {
         QVector3D vec = variant.value<QVector3D>();
-        ss << vec.x() << " " << vec.y() << " " << vec.z();
+        ml->AddShaderVariable(this->MaterialName, varName, { vec.x(), vec.y(), vec.z() });
       }
       break;
       case QMetaType::QColor:
       {
         QColor col = variant.value<QColor>();
-        ss << col.redF() << " " << col.greenF() << " " << col.blueF();
+        ml->AddShaderVariable(
+          this->MaterialName, varName, { col.redF(), col.greenF(), col.blueF() });
+      }
+      break;
+      case QMetaType::QString:
+      {
+        QString filePath = variant.value<QString>();
+        QFileInfo fileInfo(filePath);
+        if (fileInfo.isFile() && fileInfo.isReadable())
+        {
+          vtkSmartPointer<vtkImageReader2> reader;
+          const QString& ext = fileInfo.suffix();
+          if (ext == "bmp")
+          {
+            reader.TakeReference(vtkBMPReader::New());
+          }
+          else if (ext == "jpg")
+          {
+            reader.TakeReference(vtkJPEGReader::New());
+          }
+          else if (ext == "png")
+          {
+            reader.TakeReference(vtkPNGReader::New());
+          }
+          else if (ext == "ppm")
+          {
+            reader.TakeReference(vtkPNMReader::New());
+          }
+          if (reader)
+          {
+            reader->SetFileName(filePath.toUtf8().data());
+            reader->Update();
+            vtkNew<vtkTexture> texture;
+            texture->SetInputData(reader->GetOutput());
+            texture->Update();
+            ml->AddTexture(this->MaterialName, varName, texture, fileInfo.baseName().toStdString());
+          }
+          else
+          {
+            ml->AddTexture(this->MaterialName, varName, nullptr, "<None>");
+          }
+        }
+        else
+        {
+          ml->AddTexture(this->MaterialName, varName, nullptr, "<None>");
+        }
       }
       break;
       default:
-        ss << variant.toString().toStdString();
+        ml->AddShaderVariable(this->MaterialName, varName, { variant.toDouble() });
     }
-    vtkSMPropertyHelper(this->Proxy, "DoubleVariables").Set(index.row() * 2 + 1, ss.str().c_str());
-
-    this->Proxy->UpdateVTKObjects();
 
     emit this->dataChanged(index, index);
     return true;
   }
+
   return QAbstractTableModel::setData(index, variant, role);
 }
 
+//-----------------------------------------------------------------------------
 /**
- * This vtkCommand set the material library to any new material proxy registered.
+ * This vtkCommand update the material list when a new file has been loaded.
  */
-class vtkSMProxyManagerRegisterObserver : public vtkCommand
+class vtkNewLibraryLoadedObserver : public vtkCommand
 {
 public:
-  static vtkSMProxyManagerRegisterObserver* New()
-  {
-    return new vtkSMProxyManagerRegisterObserver();
-  }
+  static vtkNewLibraryLoadedObserver* New() { return new vtkNewLibraryLoadedObserver(); }
 
-  void Execute(vtkObject* vtkNotUsed(obj), unsigned long vtkNotUsed(event), void* data) override
-  {
-    vtkSMProxyManager::RegisteredProxyInformation* info =
-      static_cast<vtkSMProxyManager::RegisteredProxyInformation*>(data);
-    if (info->Type == vtkSMProxyManager::RegisteredProxyInformation::PROXY && info->GroupName &&
-      strcmp(info->GroupName, "materials") == 0)
-    {
-      vtkPVMaterial::SafeDownCast(info->Proxy->GetClientSideObject())
-        ->SetLibrary(this->Editor->materialLibrary());
-      this->Editor->updateMaterialList();
-    }
-  }
+  void Execute(vtkObject*, unsigned long, void*) override { this->Editor->updateMaterialList(); }
 
   pqMaterialEditor* Editor;
 };
@@ -372,6 +450,7 @@ public:
   Ui::MaterialEditor Ui;
 
   pqMaterialProxyModel AttributesModel;
+  vtkOSPRayMaterialLibrary* MaterialLibrary = nullptr;
 
   pqInternals(pqMaterialEditor* self)
   {
@@ -382,6 +461,7 @@ public:
     this->Ui.PropertiesView->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
     this->Ui.PropertiesView->horizontalHeader()->setStretchLastSection(true);
     this->Ui.PropertiesView->verticalHeader()->hide();
+    this->Ui.PropertiesView->setItemDelegate(new pqMaterialAttributesDelegate(self));
   }
 
   ~pqInternals() = default;
@@ -392,8 +472,6 @@ pqMaterialEditor::pqMaterialEditor(QWidget* parentObject)
   : Superclass(parentObject)
   , Internals(new pqMaterialEditor::pqInternals(this))
 {
-  this->Internals->Ui.PropertiesView->setItemDelegate(new pqMaterialAttributesDelegate(this));
-
   // materials
   QObject::connect(
     this->Internals->Ui.AddMaterial, &QPushButton::clicked, this, &pqMaterialEditor::addMaterial);
@@ -420,17 +498,49 @@ pqMaterialEditor::pqMaterialEditor(QWidget* parentObject)
 
   QObject::connect(
     &pqActiveObjects::instance(), &pqActiveObjects::serverChanged, [this](pqServer* server) {
-      if (server)
+      this->Internals->AttributesModel.reset();
+      this->Internals->Ui.SelectMaterial->clear();
+      this->Internals->MaterialLibrary = nullptr;
+      bool enable = false;
+      this->HasWarnedUser = false;
+      if (server && !server->isRemote())
       {
-        vtkNew<vtkSMProxyManagerRegisterObserver> observer;
-        observer->Editor = this;
-        server->proxyManager()->AddObserver(vtkCommand::RegisterEvent, observer);
-        // This will clear the material editor when a new connection occurs
-        this->Internals->Ui.SelectMaterial->clear();
+        vtkSMProxy* proxy =
+          server->proxyManager()->FindProxy("materiallibrary", "materials", "MaterialLibrary");
+        if (proxy)
+        {
+          auto* localObject = proxy->GetClientSideObject();
+          if (localObject)
+          {
+            this->Internals->MaterialLibrary = vtkOSPRayMaterialLibrary::SafeDownCast(
+              vtkPVMaterialLibrary::SafeDownCast(localObject)->GetMaterialLibrary());
+            if (this->Internals->MaterialLibrary)
+            {
+              enable = true;
+              vtkNew<vtkNewLibraryLoadedObserver> observer;
+              observer->Editor = this;
+              this->Internals->MaterialLibrary->AddObserver(vtkCommand::UpdateDataEvent, observer);
+              this->updateMaterialList();
+            }
+          }
+        }
       }
+      if (server && server->isRemote() && this->isVisible())
+      {
+        vtkGenericWarningMacro(
+          "Material Editor disabled because client is connected to a remote server.");
+        this->HasWarnedUser = true;
+      }
+      // Grey out the material editor if CS mode or if we didn't find the ML object
+      this->Internals->Ui.AddMaterial->setEnabled(enable);
+      this->Internals->Ui.RemoveMaterial->setEnabled(enable);
+      this->Internals->Ui.AddProperty->setEnabled(enable);
+      this->Internals->Ui.RemoveProperty->setEnabled(enable);
+      this->Internals->Ui.PropertiesView->setEnabled(enable);
+      this->Internals->Ui.AttachMaterial->setEnabled(enable);
+      this->Internals->Ui.SelectMaterial->setEnabled(enable);
+      this->Internals->Ui.DeleteProperties->setEnabled(enable);
     });
-
-  this->updateMaterialList();
 }
 
 //-----------------------------------------------------------------------------
@@ -447,124 +557,68 @@ QString pqMaterialEditor::currentMaterialName()
 }
 
 //-----------------------------------------------------------------------------
-vtkOSPRayMaterialLibrary* pqMaterialEditor::materialLibrary()
-{
-  vtkSMMaterialLibraryProxy* mlp =
-    vtkSMMaterialLibraryProxy::SafeDownCast(this->materialLibraryProxy());
-  if (mlp)
-  {
-    return vtkOSPRayMaterialLibrary::SafeDownCast(
-      vtkPVMaterialLibrary::SafeDownCast(mlp->GetClientSideObject())->GetMaterialLibrary());
-  }
-  return nullptr;
-}
-
-//-----------------------------------------------------------------------------
-vtkSMProxy* pqMaterialEditor::materialLibraryProxy()
-{
-  pqServer* server = pqActiveObjects::instance().activeServer();
-  if (!server)
-  {
-    return nullptr;
-  }
-
-  return server->proxyManager()->FindProxy("materiallibrary", "materials", "MaterialLibrary");
-}
-
-//-----------------------------------------------------------------------------
-vtkSMProxy* pqMaterialEditor::materialProxy(const QString& matName)
-{
-  pqServer* server = pqActiveObjects::instance().activeServer();
-  vtkSMSessionProxyManager* pxm = server->proxyManager();
-
-  vtkNew<vtkCollection> collection;
-  pxm->GetProxies("materials", collection);
-
-  collection->InitTraversal();
-  vtkObject* obj = nullptr;
-  while ((obj = collection->GetNextItemAsObject()) != nullptr)
-  {
-    vtkSMProxy* mp = vtkSMProxy::SafeDownCast(obj);
-
-    if (matName.toStdString() == vtkSMPropertyHelper(mp, "Name").GetAsString())
-    {
-      return mp;
-    }
-  }
-  return nullptr;
-}
-
-//-----------------------------------------------------------------------------
 void pqMaterialEditor::addMaterial()
 {
+  vtkOSPRayMaterialLibrary* ml = this->Internals->MaterialLibrary;
+  if (!ml)
+  {
+    return;
+  }
+
   pqNewMaterialDialog* dialog = new pqNewMaterialDialog(pqCoreUtilities::mainWidget());
   dialog->setWindowTitle("New Material");
-  dialog->setMaterialLibrary(this->materialLibrary());
+  dialog->setMaterialLibrary(ml);
   dialog->setAttribute(Qt::WA_DeleteOnClose);
   dialog->show();
-
   QObject::connect(dialog, &pqNewMaterialDialog::accepted, [=]() {
-    pqObjectBuilder* builder = pqApplicationCore::instance()->getObjectBuilder();
-    pqServer* server = pqActiveObjects::instance().activeServer();
-    vtkSMProxy* mp = builder->createProxy("materials", "Material", server, "materials");
+    const std::string matName = dialog->name().toStdString();
+    ml->AddMaterial(matName, dialog->type().toUtf8().data());
 
-    const std::string matName = this->generateValidMaterialName(dialog->name().toStdString());
+    // Needed to update vtkSMMaterialDomain instances
+    ml->Fire();
 
-    vtkSMPropertyHelper(mp, "Name").Set(matName.c_str());
-    vtkSMPropertyHelper(mp, "Type").Set(dialog->type().toLocal8Bit().data());
-    mp->UpdateVTKObjects();
-
-    vtkSMProxy* mlp = this->materialLibraryProxy();
-    vtkSMPropertyHelper(mlp, "Materials").Add(mp);
-    mlp->UpdateVTKObjects();
-
-    this->updateMaterialList();
     this->Internals->Ui.SelectMaterial->setCurrentText(QString(matName.c_str()));
   });
 }
 
 //-----------------------------------------------------------------------------
-std::string pqMaterialEditor::generateValidMaterialName(const std::string& name)
-{
-  vtkOSPRayMaterialLibrary* ml = this->materialLibrary();
-  const auto& names = ml->GetMaterialNames();
-  std::string res = name;
-
-  auto findName = names.find(name);
-  if (findName != names.end())
-  {
-    int counter = 0;
-    do
-    {
-      res = std::string(name).append("_").append(std::to_string(++counter));
-      findName = names.find(res);
-    } while (findName != names.end());
-  }
-
-  return res;
-}
-
-//-----------------------------------------------------------------------------
 void pqMaterialEditor::removeMaterial()
 {
-  vtkOSPRayMaterialLibrary* ml = this->materialLibrary();
+  vtkOSPRayMaterialLibrary* ml = this->Internals->MaterialLibrary;
 
   if (ml)
   {
-    vtkSMProxy* mp = this->materialProxy(this->currentMaterialName());
+    this->Internals->AttributesModel.reset();
+    const auto& removedMaterial = this->currentMaterialName();
+    ml->RemoveMaterial(removedMaterial.toStdString());
 
-    if (mp)
+    // Needed so representations that used this material stop using it
+    // We need to do this before firing the material library event because if
+    // we are deleting the last material in the list the representation won't update
+    pqServer* server = pqActiveObjects::instance().activeServer();
+    if (!server)
     {
-      vtkSMProxy* mlp = this->materialLibraryProxy();
-      vtkSMPropertyHelper(mlp, "Materials").Remove(mp);
-      mlp->UpdateVTKObjects();
-
-      // remove material proxy
-      pqServer* server = pqActiveObjects::instance().activeServer();
-      server->proxyManager()->UnRegisterProxy(mp->GetXMLGroup(), mp->GetXMLName(), mp);
-
-      this->updateMaterialList();
+      return;
     }
+    vtkSMSessionProxyManager* pxm = server->proxyManager();
+    vtkNew<vtkCollection> collection;
+    pxm->GetProxies("representations", collection);
+    collection->InitTraversal();
+    vtkObject* obj = nullptr;
+    while ((obj = collection->GetNextItemAsObject()) != nullptr)
+    {
+      vtkSMProxy* proxy = vtkSMProxy::SafeDownCast(obj);
+
+      if (removedMaterial == vtkSMPropertyHelper(proxy, "OSPRayMaterial").GetAsString())
+      {
+        vtkSMPropertyHelper(proxy, "OSPRayMaterial").Set("None");
+        proxy->UpdateVTKObjects();
+      }
+    }
+
+    // Needed to update vtkSMMaterialDomain instances
+    ml->Fire();
+    this->updateCurrentMaterial(this->currentMaterialName().toStdString());
   }
 }
 
@@ -580,20 +634,15 @@ void pqMaterialEditor::attachMaterial()
   pqPipelineSource* activeObject = pqActiveObjects::instance().activeSource();
   if (!activeObject)
   {
-    vtkGenericWarningMacro("An active source should exist to be able to attach a material to it.");
+    vtkGenericWarningMacro("No active source selected.");
     return;
   }
 
   pqView* activeView = pqActiveObjects::instance().activeView();
-  vtkPVRenderView* activeRenderView = nullptr;
-  if (activeView)
+  if (!vtkPVRenderView::SafeDownCast(activeView->getClientSideView()))
   {
-    activeRenderView = vtkPVRenderView::SafeDownCast(activeView->getClientSideView());
-    if (!activeRenderView || !activeRenderView->GetEnableOSPRay())
-    {
-      vtkGenericWarningMacro("A valid active render view should exist with OSPRay enabled.");
-      return;
-    }
+    vtkGenericWarningMacro("No valid render view selected.");
+    return;
   }
 
   auto* activeRepresentation = activeObject->getRepresentation(activeView);
@@ -612,17 +661,9 @@ void pqMaterialEditor::attachMaterial()
       vtkGenericWarningMacro("Current representation is not compatible with OSPRay materials.");
     }
   }
-}
-
-//-----------------------------------------------------------------------------
-void pqMaterialEditor::synchronizeClientToServ()
-{
-  vtkSMMaterialLibraryProxy* ml =
-    vtkSMMaterialLibraryProxy::SafeDownCast(this->materialLibraryProxy());
-
-  if (ml)
+  else
   {
-    ml->Synchronize(vtkPVSession::CLIENT, vtkPVSession::RENDER_SERVER_ROOT);
+    vtkGenericWarningMacro("No representation for selected source in the selected view.");
   }
 }
 
@@ -631,7 +672,7 @@ std::vector<std::string> pqMaterialEditor::availableParameters()
 {
   std::vector<std::string> availableList;
 
-  vtkOSPRayMaterialLibrary* ml = this->materialLibrary();
+  vtkOSPRayMaterialLibrary* ml = this->Internals->MaterialLibrary;
 
   const QString& currentText = this->currentMaterialName();
   if (ml && !currentText.isEmpty())
@@ -641,9 +682,9 @@ std::vector<std::string> pqMaterialEditor::availableParameters()
     auto usedVariable = ml->GetDoubleShaderVariableList(matName);
     auto usedTexture = ml->GetTextureList(matName);
 
-    auto& allParams = vtkOSPRayMaterialLibrary::GetParametersDictionary().at(matType);
+    const auto& allParams = vtkOSPRayMaterialLibrary::GetParametersDictionary().at(matType);
     // Filter all available parameters so only the relevant ones are left
-    for (auto& p : allParams)
+    for (const auto& p : allParams)
     {
       if (p.second != vtkOSPRayMaterialLibrary::ParameterType::FLOAT_DATA &&
         p.first.find(".transform") == std::string::npos &&
@@ -664,94 +705,22 @@ void pqMaterialEditor::loadMaterials()
 }
 
 //-----------------------------------------------------------------------------
-void pqMaterialEditor::addNewProperty(vtkSMProxy* proxy, const QString& prop)
-{
-  auto& dic = vtkOSPRayMaterialLibrary::GetParametersDictionary();
-
-  unsigned int nbElem = vtkSMPropertyHelper(proxy, "DoubleVariables").GetNumberOfElements();
-  vtkSMPropertyHelper(proxy, "DoubleVariables").SetNumberOfElements(nbElem + 2);
-  vtkSMPropertyHelper(proxy, "DoubleVariables").Set(nbElem, prop.toLocal8Bit().data());
-
-  std::string matType = vtkSMPropertyHelper(proxy, "Type").GetAsString();
-
-  switch (dic.at(matType).at(prop.toStdString()))
-  {
-    case vtkOSPRayMaterialLibrary::ParameterType::BOOLEAN:
-      vtkSMPropertyHelper(proxy, "DoubleVariables").Set(nbElem + 1, "1");
-      break;
-    case vtkOSPRayMaterialLibrary::ParameterType::FLOAT:
-      vtkSMPropertyHelper(proxy, "DoubleVariables").Set(nbElem + 1, "1.5");
-      break;
-    case vtkOSPRayMaterialLibrary::ParameterType::NORMALIZED_FLOAT:
-      vtkSMPropertyHelper(proxy, "DoubleVariables").Set(nbElem + 1, "1");
-      break;
-    case vtkOSPRayMaterialLibrary::ParameterType::VEC2:
-      vtkSMPropertyHelper(proxy, "DoubleVariables").Set(nbElem + 1, "0 0");
-      break;
-    case vtkOSPRayMaterialLibrary::ParameterType::VEC3:
-      vtkSMPropertyHelper(proxy, "DoubleVariables").Set(nbElem + 1, "0 0 0");
-      break;
-    case vtkOSPRayMaterialLibrary::ParameterType::COLOR_RGB:
-      vtkSMPropertyHelper(proxy, "DoubleVariables").Set(nbElem + 1, "1 1 1");
-      break;
-    case vtkOSPRayMaterialLibrary::ParameterType::FLOAT_DATA:
-      vtkSMPropertyHelper(proxy, "DoubleVariables").Set(nbElem + 1, "");
-      break;
-    case vtkOSPRayMaterialLibrary::ParameterType::TEXTURE:
-      vtkSMPropertyHelper(proxy, "DoubleVariables").Set(nbElem + 1, "");
-      break;
-    default:
-      vtkGenericWarningMacro("Material property " << prop.toStdString() << " has unsupported type");
-      break;
-  }
-
-  this->Internals->AttributesModel.reset();
-}
-
-//-----------------------------------------------------------------------------
 void pqMaterialEditor::addProperty()
 {
   auto params = this->availableParameters();
-  if (!params.empty())
+  vtkOSPRayMaterialLibrary* ml = this->Internals->MaterialLibrary;
+  if (ml && !params.empty())
   {
-    QString matName = this->currentMaterialName();
-    QString matType = this->Internals->Ui.SelectMaterial->currentData().toString();
-
-    vtkSMProxy* mp = this->materialProxy(matName);
-
-    this->addNewProperty(mp, QString::fromStdString(params[0]));
-
-    mp->UpdateVTKObjects();
-    this->updateCurrentMaterial(matName);
+    std::string matName = this->currentMaterialName().toStdString();
+    ::AddDefaultValue(ml, matName, params[0]);
+    this->Internals->AttributesModel.setMaterial(ml, matName);
   }
-}
-
-//-----------------------------------------------------------------------------
-void pqMaterialEditor::removeProperties(vtkSMProxy* proxy, const QSet<QString>& variables)
-{
-  unsigned int nbElem = vtkSMPropertyHelper(proxy, "DoubleVariables").GetNumberOfElements();
-  unsigned int newNbElem = 0;
-  for (unsigned int i = 0; i < nbElem; i += 2)
-  {
-    const char* varName = vtkSMPropertyHelper(proxy, "DoubleVariables").GetAsString(i);
-    if (!variables.contains(varName))
-    {
-      const char* value = vtkSMPropertyHelper(proxy, "DoubleVariables").GetAsString(i + 1);
-      vtkSMPropertyHelper(proxy, "DoubleVariables").Set(newNbElem, varName);
-      vtkSMPropertyHelper(proxy, "DoubleVariables").Set(newNbElem + 1, value);
-
-      newNbElem += 2;
-    }
-  }
-  vtkSMPropertyHelper(proxy, "DoubleVariables").SetNumberOfElements(newNbElem);
-
-  proxy->UpdateVTKObjects();
 }
 
 //-----------------------------------------------------------------------------
 void pqMaterialEditor::removeProperty()
 {
-  vtkOSPRayMaterialLibrary* ml = this->materialLibrary();
+  vtkOSPRayMaterialLibrary* ml = this->Internals->MaterialLibrary;
 
   if (ml)
   {
@@ -766,10 +735,14 @@ void pqMaterialEditor::removeProperty()
         selectedVariables.insert(index.sibling(index.row(), 0).data(Qt::EditRole).toString());
       }
 
-      QString matName = this->currentMaterialName();
-      vtkSMProxy* mp = this->materialProxy(matName);
-
-      this->removeProperties(mp, selectedVariables);
+      std::string matName = this->currentMaterialName().toStdString();
+      for (const auto& var : selectedVariables)
+      {
+        // There is no variables with the same name in textures and double variable so
+        // we can remove them safely
+        ml->RemoveTexture(matName, var.toStdString());
+        ml->RemoveShaderVariable(matName, var.toStdString());
+      }
       this->updateCurrentMaterial(matName);
     }
   }
@@ -778,27 +751,24 @@ void pqMaterialEditor::removeProperty()
 //-----------------------------------------------------------------------------
 void pqMaterialEditor::removeAllProperties()
 {
-  vtkOSPRayMaterialLibrary* ml = this->materialLibrary();
+  vtkOSPRayMaterialLibrary* ml = this->Internals->MaterialLibrary;
 
   if (ml)
   {
-    QString matName = this->currentMaterialName();
-    vtkSMProxy* mp = this->materialProxy(matName);
-    if (!mp)
-    {
-      return;
-    }
-    vtkSMPropertyHelper(mp, "DoubleVariables").RemoveAllValues();
-
-    mp->UpdateVTKObjects();
+    std::string matName = this->currentMaterialName().toStdString();
+    ml->RemoveAllShaderVariables(matName);
+    ml->RemoveAllTextures(matName);
 
     this->updateCurrentMaterial(matName);
   }
 }
 
 //-----------------------------------------------------------------------------
-void pqMaterialEditor::propertyChanged(const QModelIndex& topLeft, const QModelIndex& bottomRight)
+void pqMaterialEditor::propertyChanged(const QModelIndex& topLeft, const QModelIndex& botRight)
 {
+  Q_UNUSED(topLeft);
+  Q_UNUSED(botRight);
+
   // update material and render
   QString matName = this->currentMaterialName();
 
@@ -831,9 +801,6 @@ void pqMaterialEditor::propertyChanged(const QModelIndex& topLeft, const QModelI
     }
   }
 
-  // Synchronize
-  this->synchronizeClientToServ();
-
   if (needRender)
   {
     pqApplicationCore* app = pqApplicationCore::instance();
@@ -850,50 +817,58 @@ void pqMaterialEditor::propertyChanged(const QModelIndex& topLeft, const QModelI
 //-----------------------------------------------------------------------------
 void pqMaterialEditor::updateMaterialList()
 {
-  vtkSMProxy* mlp = this->materialLibraryProxy();
+  vtkOSPRayMaterialLibrary* ml = this->Internals->MaterialLibrary;
 
-  if (mlp)
+  if (ml)
   {
-    int nbMaterials = vtkSMPropertyHelper(mlp, "Materials").GetNumberOfElements();
-
     this->Internals->Ui.SelectMaterial->clear();
 
-    for (int i = 0; i < nbMaterials; i++)
+    for (const auto& matName : ml->GetMaterialNames())
     {
-      vtkSMProxy* matProxy = vtkSMPropertyHelper(mlp, "Materials").GetAsProxy(i);
-      this->Internals->Ui.SelectMaterial->addItem(
-        vtkSMPropertyHelper(matProxy, "Name").GetAsString());
+      this->Internals->Ui.SelectMaterial->addItem(matName.c_str());
     }
   }
 }
 
+//-----------------------------------------------------------------------------
 void pqMaterialEditor::updateCurrentMaterialWithIndex(int index)
 {
   const QString& label = this->Internals->Ui.SelectMaterial->itemText(index);
-  this->updateCurrentMaterial(label);
+  this->updateCurrentMaterial(label.toStdString());
 }
 
 //-----------------------------------------------------------------------------
-void pqMaterialEditor::updateCurrentMaterial(const QString& label)
+void pqMaterialEditor::updateCurrentMaterial(const std::string& label)
 {
-  vtkSMProxy* proxy = nullptr;
+  vtkOSPRayMaterialLibrary* ml = this->Internals->MaterialLibrary;
+  if (!ml || label.empty())
+  {
+    return;
+  }
 
   // material type name label update
   std::string materialTypeLabel = "Material Type: ";
-
-  if (!label.isEmpty())
+  std::string matType = ml->LookupImplName(label);
+  if (matType.empty())
   {
-    proxy = this->materialProxy(label);
-    materialTypeLabel += vtkSMPropertyHelper(proxy, "Type").GetAsString();
+    matType = "<none>";
   }
-  else
-  {
-    materialTypeLabel += "<none>";
-  }
-
+  materialTypeLabel += matType;
   this->Internals->Ui.TypeLabel->setText(materialTypeLabel.c_str());
 
-  this->Internals->AttributesModel.setProxy(proxy);
-  this->Internals->AttributesModel.reset();
+  this->Internals->AttributesModel.setMaterial(ml, label);
   this->propertyChanged(QModelIndex(), QModelIndex());
+}
+
+//-----------------------------------------------------------------------------
+void pqMaterialEditor::showEvent(QShowEvent* event)
+{
+  if (!this->HasWarnedUser && !this->Internals->MaterialLibrary)
+  {
+    vtkGenericWarningMacro(
+      "Material Editor disabled because client is connected to a remote server.");
+    this->HasWarnedUser = true;
+  }
+
+  this->Superclass::showEvent(event);
 }

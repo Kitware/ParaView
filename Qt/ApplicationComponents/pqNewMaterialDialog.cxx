@@ -72,6 +72,7 @@ void pqNewMaterialDialog::accept()
   if (!this->MaterialLibrary)
   {
     this->done(Rejected);
+    return;
   }
 
   this->Name = this->Internals->Ui.MaterialName->text().trimmed();
@@ -79,6 +80,7 @@ void pqNewMaterialDialog::accept()
   if (this->Name.isEmpty())
   {
     this->done(Rejected);
+    return;
   }
 
   auto currentNames = this->MaterialLibrary->GetMaterialNames();
@@ -86,6 +88,7 @@ void pqNewMaterialDialog::accept()
   if (currentNames.find(this->Name.toStdString()) != currentNames.end())
   {
     this->done(Rejected);
+    return;
   }
 
   this->Type = this->Internals->Ui.MaterialType->currentText();

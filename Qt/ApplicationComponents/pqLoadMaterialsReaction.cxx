@@ -84,7 +84,8 @@ bool pqLoadMaterialsReaction::loadMaterials(const QString& dbase, pqServer* serv
     vtkNew<vtkSMParaViewPipelineController> controller;
     vtkSMMaterialLibraryProxy* mlp =
       vtkSMMaterialLibraryProxy::SafeDownCast(controller->FindMaterialLibrary(session));
-    mlp->LoadMaterials(dbase.toUtf8().data());
+    vtkSMPropertyHelper(mlp, "LoadMaterials").Set(dbase.toUtf8().data());
+    mlp->UpdateVTKObjects();
   }
 
   CLEAR_UNDO_STACK();
