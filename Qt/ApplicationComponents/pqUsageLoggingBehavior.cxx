@@ -35,6 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVLogger.h"
 #include "vtkPVVersion.h"
 #include "vtkResourceFileLocator.h"
+#include "vtkVersion.h"
 #include "vtksys/SystemTools.hxx"
 
 #include <QApplication>
