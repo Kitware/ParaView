@@ -22,26 +22,24 @@
 #ifndef pqNodeEditorWidget_h
 #define pqNodeEditorWidget_h
 
-// qt includes
 #include <QDockWidget>
 
-// std includes
+#include "vtkType.h"
+
 #include <unordered_map>
 
-// forward declarations
-class QAction;
-class QLayout;
-
-class pqProxy;
-class pqPipelineSource;
-class pqRepresentation;
-class pqOutputPort;
-class pqView;
-
-class pqNodeEditorNode;
+class pqNodeEditorApplyBehavior;
 class pqNodeEditorEdge;
+class pqNodeEditorNode;
 class pqNodeEditorScene;
 class pqNodeEditorView;
+class pqProxy;
+class pqPipelineFilter;
+class pqPipelineSource;
+class pqOutputPort;
+class pqView;
+class QAction;
+class QLayout;
 
 /**
  * This is the root widget of the node editor that can be docked in ParaView.
@@ -98,14 +96,14 @@ public Q_SLOTS:
   int updateActiveSourcesAndPorts();
 
   /**
-   * Given a proxy, remove every edges connected to its input ports.
+   * Given a proxy, remove every edges connected to its input ports. Only affects the UI.
    */
   int removeIncomingEdges(pqProxy* proxy);
 
   /**
    * Rebuild every input edge of a given source proxy.
    */
-  int updatePipelineEdges(pqPipelineSource* consumer);
+  int updatePipelineEdges(pqPipelineFilter* consumer);
 
   /**
    * Sets the style of ports.
@@ -133,9 +131,10 @@ public Q_SLOTS:
   int cycleNodeVerbosity();
 
 protected:
-  pqNodeEditorNode* createNode(pqProxy* proxy);
+  void initializeNode(pqNodeEditorNode* node, vtkIdType id);
 
   int initializeActions();
+  int initializeSignals();
   int createToolbar(QLayout* layout);
   int attachServerManagerListeners();
 
@@ -152,18 +151,19 @@ private:
   QAction* actionAutoLayout;
   QAction* actionCycleNodeVerbosity;
   QAction* actionToggleViewNodeVisibility;
+  pqNodeEditorApplyBehavior* applyBehavior;
 
   /**
    *  The node registry stores a node for each source/filter/view proxy
    *  The key is the global identifier of the node proxy.
    */
-  std::unordered_map<int, pqNodeEditorNode*> nodeRegistry;
+  std::unordered_map<vtkIdType, pqNodeEditorNode*> nodeRegistry;
 
   /**
    *  The edge registry stores all incoming edges of a node.
    *  The key is the global identifier of the node proxy.
    */
-  std::unordered_map<int, std::vector<pqNodeEditorEdge*>> edgeRegistry;
+  std::unordered_map<vtkIdType, std::vector<pqNodeEditorEdge*>> edgeRegistry;
 };
 
 #endif // pqNodeEditorWidget_h

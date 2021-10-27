@@ -24,8 +24,10 @@
 
 #include <QGraphicsItem>
 
+#include "vtkType.h"
+
+class pqNodeEditorLabel;
 class QGraphicsEllipseItem;
-class QGraphicsTextItem;
 
 /**
  * Every instance of this class corresponds to a port belonging to a pqNodeEditorNode.
@@ -47,11 +49,35 @@ public:
    * Create a node port of a specific type with a specific name. The one instanciating the port
    * should take care of where to place it on the scene.
    */
-  pqNodeEditorPort(Type type, QString name = "", QGraphicsItem* parent = nullptr);
+  pqNodeEditorPort(
+    Type type, vtkIdType id, int portNumber, QString name = "", QGraphicsItem* parent = nullptr);
   virtual ~pqNodeEditorPort() = default;
 
-  QGraphicsEllipseItem* getDisc() { return this->disc; }
-  QGraphicsTextItem* getLabel() { return this->label; }
+  /**
+   * Return the label widget of the port
+   */
+  pqNodeEditorLabel* getLabel() { return this->label; }
+
+  /**
+   * Get the id of the proxy this port is attached to.
+   */
+  vtkIdType getProxyId() const { return this->proxyId; }
+
+  /**
+   * Get the port number this port represent.
+   */
+  int getPortNumber() const { return this->portNumber; }
+
+  /**
+   * Return the type (input or output) of this port.
+   */
+  Type getPortType() const { return this->portType; }
+
+  /**
+   * Get the center of the port disc in the @c item coordinate. If @c item is nullptr
+   * then the coordinates are given in the scene coordinate system.
+   */
+  QPointF getConnectionPoint(QGraphicsItem* item = nullptr) const;
 
   /**
    * Determines if the port is marked as selected.
@@ -74,7 +100,11 @@ protected:
 
 private:
   QGraphicsEllipseItem* disc;
-  QGraphicsTextItem* label;
+  pqNodeEditorLabel* label;
+
+  const vtkIdType proxyId;
+  const int portNumber;
+  const Type portType;
 };
 
 #endif // pqNodeEditorPort_h

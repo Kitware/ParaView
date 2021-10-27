@@ -23,10 +23,10 @@
 
 #include "pqNodeEditorNode.h"
 #include "pqNodeEditorPort.h"
-#include "pqNodeEditorScene.h"
 #include "pqNodeEditorUtils.h"
 
 #include <pqPipelineSource.h>
+
 #include <vtkSMProxy.h>
 
 #include <QApplication>
@@ -114,7 +114,7 @@ QRectF pqNodeEditorEdge::boundingRect() const
   }
   else
   {
-    const auto dx = std::abs(xi - xo) / 2.0;
+    const auto dx = std::abs(xi - xo) * 0.5;
     qreal x0 = std::min(xo, xi - dx);
     qreal y0 = std::min(yo, yi);
     qreal x1 = std::max(xi, xo + dx);
@@ -129,21 +129,16 @@ int pqNodeEditorEdge::updatePoints()
 {
   this->prepareGeometryChange();
 
-  this->oPoint = QGraphicsItem::mapFromItem(
-    this->producer->getOutputPorts()[this->producerOutputPortIdx]->getDisc(), 0, 0);
-  this->iPoint = QGraphicsItem::mapFromItem(
-    this->consumer->getInputPorts()[this->consumerInputPortIdx]->getDisc(), 0, 0);
+  this->oPoint =
+    this->producer->getOutputPorts()[this->producerOutputPortIdx]->getConnectionPoint(this);
+  this->iPoint =
+    this->consumer->getInputPorts()[this->consumerInputPortIdx]->getConnectionPoint(this);
 
   if (this->type == Type::VIEW)
   {
-    this->cPoint = this->oPoint;
-
-    auto nProducerOutputPorts = this->producer->getOutputPorts().size();
-    const auto& bb = this->producer->boundingRect();
-    this->cPoint = this->mapFromItem(this->producer, bb.bottomRight());
-
-    const auto dx = (nProducerOutputPorts - this->producerOutputPortIdx) * 10.0;
-    this->cPoint.setX(this->cPoint.x() + dx);
+    this->cPoint = this->mapFromItem(this->producer, this->producer->boundingRect().bottomRight());
+    // slighly pad the point so it doesnt get too close of the node
+    this->cPoint += QPointF(10, 0);
   }
 
   // compute path
@@ -155,12 +150,16 @@ int pqNodeEditorEdge::updatePoints()
     const auto xc = this->cPoint.x();
     const auto yc = this->cPoint.y();
 
+#if QT_VERSION < QT_VERSION_CHECK(5, 13, 0)
     this->path = QPainterPath();
+#else
+    this->path.clear();
+#endif
     path.moveTo(this->oPoint);
 
     if (this->type == Type::PIPELINE)
     {
-      const auto dx = std::abs(xi - xo) / 2.0;
+      const auto dx = std::abs(xi - xo) * 0.5;
       path.cubicTo(xo + dx, yo, xi - dx, yi, xi, yi);
     }
     else
@@ -185,25 +184,30 @@ int pqNodeEditorEdge::updatePoints()
 // -----------------------------------------------------------------------------
 void pqNodeEditorEdge::paint(QPainter* painter, const QStyleOptionGraphicsItem*, QWidget*)
 {
-  const bool isPipelineEdge = this->type == Type::PIPELINE;
-  const bool consumerIsActiveView =
-    this->consumer->getOutlineStyle() == pqNodeEditorNode::OutlineStyle::SELECTED_VIEW;
+  // Pre-allocate pens for faster rendering
+  static const QPen edgeOutlinePen(pqNodeEditorUtils::CONSTS::COLOR_BASE,
+    pqNodeEditorUtils::CONSTS::EDGE_WIDTH + pqNodeEditorUtils::CONSTS::EDGE_OUTLINE, Qt::SolidLine,
+    Qt::RoundCap, Qt::RoundJoin);
+  static const QPen edgePipelinePen(pqNodeEditorUtils::CONSTS::COLOR_HIGHLIGHT,
+    pqNodeEditorUtils::CONSTS::EDGE_WIDTH, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin);
+  static const QPen activeViewPen(pqNodeEditorUtils::CONSTS::COLOR_BASE_ORANGE,
+    pqNodeEditorUtils::CONSTS::EDGE_WIDTH, Qt::DashDotLine, Qt::RoundCap, Qt::RoundJoin);
+  static const QPen unfocusedPen(pqNodeEditorUtils::CONSTS::COLOR_DULL_ORANGE,
+    pqNodeEditorUtils::CONSTS::EDGE_WIDTH, Qt::DashDotLine, Qt::RoundCap, Qt::RoundJoin);
 
-  if (isPipelineEdge)
+  if (this->type == Type::PIPELINE)
   {
-    static const QPen edgeOutlinePen(QApplication::palette().window(),
-      pqNodeEditorUtils::CONSTS::EDGE_WIDTH + pqNodeEditorUtils::CONSTS::EDGE_OUTLINE,
-      Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin);
-
     painter->setPen(edgeOutlinePen);
     painter->drawPath(this->path);
+    painter->setPen(edgePipelinePen);
   }
-
-  painter->setPen(
-    QPen(isPipelineEdge ? QApplication::palette().highlight()
-                        : consumerIsActiveView ? pqNodeEditorUtils::CONSTS::COLOR_DARK_ORANGE
-                                               : QApplication::palette().linkVisited(),
-      pqNodeEditorUtils::CONSTS::EDGE_WIDTH, isPipelineEdge ? Qt::SolidLine : Qt::DashDotLine,
-      Qt::RoundCap, Qt::RoundJoin));
+  else if (this->consumer->getOutlineStyle() == pqNodeEditorNode::OutlineStyle::SELECTED_VIEW)
+  {
+    painter->setPen(activeViewPen);
+  }
+  else
+  {
+    painter->setPen(unfocusedPen);
+  }
   painter->drawPath(this->path);
 }

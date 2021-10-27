@@ -24,7 +24,10 @@
 
 #include <QGraphicsScene>
 
-#include <unordered_map>
+#include "vtkType.h" // for vtkIdType
+
+#include <unordered_map> // for std::unordered_map
+#include <vector>        // for std::vector
 
 class pqNodeEditorNode;
 class pqNodeEditorEdge;
@@ -42,11 +45,13 @@ public:
   pqNodeEditorScene(QObject* parent = nullptr);
   virtual ~pqNodeEditorScene() = default;
 
+Q_SIGNALS:
   /**
-   * Given a list of nodes, return the bounding box englobing all of these nodes.
-   * The bounding box is expressed in coordinates relative to the scene.
+   * Fired when an en edge created from the drag and drop interaction of a port disc
+   * is released. @c fromNode is the ID of the producer proxy and @c fromPort its port number.
+   * @c toNode and @c toPort re the same informations but relative to the consumer.
    */
-  static QRect getBoundingRect(const std::unordered_map<int, pqNodeEditorNode*>& nodes);
+  void edgeDragAndDropRelease(vtkIdType fromNode, int fromPort, vtkIdType toNode, int toPort);
 
 public Q_SLOTS:
   /**
@@ -55,14 +60,14 @@ public Q_SLOTS:
    *
    * If GraphViz has not been at the compilation this function will do nothing.
    */
-  int computeLayout(const std::unordered_map<int, pqNodeEditorNode*>& nodes,
-    std::unordered_map<int, std::vector<pqNodeEditorEdge*>>& edges);
+  int computeLayout(const std::unordered_map<vtkIdType, pqNodeEditorNode*>& nodes,
+    std::unordered_map<vtkIdType, std::vector<pqNodeEditorEdge*>>& edges);
 
 protected:
   /**
    *  Draws a grid background.
    */
-  void drawBackground(QPainter* painter, const QRectF& rect);
+  void drawBackground(QPainter* painter, const QRectF& rect) override;
 };
 
 #endif // pqNodeEditorScene_h

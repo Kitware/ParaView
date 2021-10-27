@@ -24,22 +24,40 @@
 
 #include <QGraphicsItem>
 
+class pqNodeEditorLabel;
+class pqNodeEditorPort;
+class pqPipelineSource;
 class pqProxy;
 class pqProxyWidget;
 class pqView;
-class pqPipelineSource;
 class QGraphicsScene;
-class QGraphicsSceneMouseEvent;
-
-class pqNodeEditorPort;
+class QGraphicsSceneMous;
 
 /**
- * Every instance of this class corresponds to a node representing either a source, a filter
- * or a render view. They have severals input and output pqNodeEditorPort, allowing them
- * to connect to each other.
+ * Every instance of this class corresponds to a node representing either a source,
+ * a filter or a render view. They have severals input and output pqNodeEditorPort,
+ * allowing them to connect to each other.
  *
- * See :
- * @sa pqNodeEditorPort
+ * See below for an ASCII art of the coordinate system for this item (useful to
+ * understand how are implemented @c paint and @c boundingRect functions for example).
+ * `X` is the position (0,0), `═` signs are the border, `O` is the position of a port.
+ *
+ * ╔═══════════════╗
+ * ║X-------------+║
+ * ║| (headline)  |║   <- PORT_PADDING y dimension |
+ * ║O    Label    O║   <- PORT_HEIGHT  y dimension | <= sum := pqNodeEditorNode::headlineHeight
+ * ║|             |║   <- PORT_PADDING y dimension |
+ * ║+-------------+║
+ * ║|             |║
+ * ║|  Properties |║
+ * ║|    Panel    |║
+ * ║|             |║
+ * ║+-------------+║
+ * ╚═══════════════╝
+ *
+ * @sa
+ * pqNodeEditorPort
+ * pqProxyWidget
  */
 class pqNodeEditorNode
   : public QObject
@@ -52,7 +70,7 @@ public:
   /**
    * Enum for the verbosity style of the nodes in the node editor scene.
    * EMPTY : no properties displayed
-   * SIMPLE : default properties displayed
+   * NORMAL : default properties displayed
    * ADVANCED : default and advanced properties displayed
    */
   enum class Verbosity : int
@@ -133,14 +151,9 @@ public:
   pqProxyWidget* getProxyProperties() { return this->proxyProperties; }
 
   /**
-   *  Get widget container of the node.
+   *  Get the label of the node.
    */
-  QGraphicsTextItem* getLabel() { return this->label; }
-
-  /**
-   *  Update the size of the node to fit its contents.
-   */
-  int updateSize();
+  pqNodeEditorLabel* getLabel() { return this->label; }
 
   //@{
   /**
@@ -192,6 +205,11 @@ protected:
 
   void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget) override;
 
+  /**
+   *  Update the size of the node to fit its contents.
+   */
+  int updateSize();
+
 private:
   /**
    * Internal constructor used by the public ones for initializing the node regardless
@@ -201,9 +219,9 @@ private:
 
   QGraphicsScene* scene;
   pqProxy* proxy;
-  pqProxyWidget* proxyProperties = nullptr;
+  pqProxyWidget* proxyProperties;
   QWidget* widgetContainer;
-  QGraphicsTextItem* label;
+  pqNodeEditorLabel* label;
 
   std::vector<pqNodeEditorPort*> iPorts;
   std::vector<pqNodeEditorPort*> oPorts;
@@ -212,11 +230,10 @@ private:
   BackgroundStyle backgroundStyle{ BackgroundStyle::NORMAL };
   Verbosity verbosity{ Verbosity::EMPTY };
 
-  int labelHeight{ 30 };
-  int portContainerHeight{ 0 };
-
-  int widgetContainerHeight{ 0 };
-  int widgetContainerWidth{ 0 };
+  // Height of the headline of the node.
+  // Should be computed in the constructor and never assigned again.
+  int headlineHeight{ 0 };
+  int labelHeight{ 0 };
 
   /**
    * Static property that controls the verbosity of nodes upon creation.

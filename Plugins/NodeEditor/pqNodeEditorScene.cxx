@@ -49,8 +49,8 @@ pqNodeEditorScene::pqNodeEditorScene(QObject* parent)
 }
 
 // ----------------------------------------------------------------------------
-int pqNodeEditorScene::computeLayout(const std::unordered_map<int, pqNodeEditorNode*>& nodes,
-  std::unordered_map<int, std::vector<pqNodeEditorEdge*>>& edges)
+int pqNodeEditorScene::computeLayout(const std::unordered_map<vtkIdType, pqNodeEditorNode*>& nodes,
+  std::unordered_map<vtkIdType, std::vector<pqNodeEditorEdge*>>& edges)
 {
 #if NodeEditor_ENABLE_GRAPHVIZ
   // compute dot string
@@ -64,8 +64,9 @@ int pqNodeEditorScene::computeLayout(const std::unordered_map<int, pqNodeEditorN
     for (const auto& it : nodes)
     {
       pqProxy* proxy = it.second->getProxy();
-      int proxyId = pqNodeEditorUtils::getID(proxy);
-      if (dynamic_cast<pqView*>(proxy) != nullptr) // ignore view in pipeline layout
+      const vtkIdType proxyId = pqNodeEditorUtils::getID(proxy);
+      // ignore view and hidden nodes in pipeline layout
+      if (!it.second->isVisible() || dynamic_cast<pqView*>(proxy) != nullptr)
       {
         continue;
       }
@@ -171,7 +172,7 @@ int pqNodeEditorScene::computeLayout(const std::unordered_map<int, pqNodeEditorN
     status += gvFreeContext(gvc);
     if (status)
     {
-      vtkLogF(WARNING, "Error when freeing Graphviz ressources.");
+      vtkLogF(WARNING, "[NodeEditorPlugin] Error when freeing Graphviz ressources.");
     }
   }
 
@@ -226,7 +227,7 @@ int pqNodeEditorScene::computeLayout(const std::unordered_map<int, pqNodeEditorN
     });
 
   // make sure all views have enough space
-  qreal lastX = 0.0;
+  qreal lastX = VTK_DOUBLE_MIN;
   for (const auto& it : viewXMap)
   {
     const qreal width = it.first->boundingRect().width();
@@ -235,7 +236,7 @@ int pqNodeEditorScene::computeLayout(const std::unordered_map<int, pqNodeEditorN
     {
       x = lastX + width + 10.0;
     }
-    it.first->setPos(x, maxY + maxHeight);
+    it.first->setPos(x, maxY + maxHeight + 20.0);
     lastX = x;
   }
 
@@ -245,39 +246,6 @@ int pqNodeEditorScene::computeLayout(const std::unordered_map<int, pqNodeEditorN
   (void)edges;
   return 0;
 #endif // NodeEditor_ENABLE_GRAPHVIZ
-}
-
-// ----------------------------------------------------------------------------
-QRect pqNodeEditorScene::getBoundingRect(const std::unordered_map<int, pqNodeEditorNode*>& nodes)
-{
-  int x0 = std::numeric_limits<int>::max();
-  int x1 = std::numeric_limits<int>::min();
-  int y0 = std::numeric_limits<int>::max();
-  int y1 = std::numeric_limits<int>::min();
-
-  for (const auto& it : nodes)
-  {
-    QPointF p = it.second->pos();
-    QRectF b = it.second->boundingRect();
-    if (x0 > p.x() + b.left())
-    {
-      x0 = p.x() + b.left();
-    }
-    if (x1 < p.x() + b.right())
-    {
-      x1 = p.x() + b.right();
-    }
-    if (y0 > p.y() + b.top())
-    {
-      y0 = p.y() + b.top();
-    }
-    if (y1 < p.y() + b.bottom())
-    {
-      y1 = p.y() + b.bottom();
-    }
-  }
-
-  return QRect(x0, y0, x1 - x0, y1 - y0);
 }
 
 // ----------------------------------------------------------------------------
