@@ -23,11 +23,13 @@
   </Category>
   <Category name="DataAnalysis" menu_label="&amp;Data Analysis" show_in_toolbar="1" hide_for_tests="1">
     <Proxy group="filters" name="Calculator" omit_from_toolbar="1" />
+    <Proxy group="filters" name="ExtractCellsAlongLine" />
+    <Proxy group="filters" name="ExtractCellsAlongLineCustom" />
     <Proxy group="filters" name="ExtractSelection" />
     <Proxy group="filters" name="ExtractSelectionOverTime" />
     <Proxy group="filters" name="ExtractHistogram" />
-    <Proxy group="filters" name="IntegrateAttributes" omit_from_toolbar="1" />
     <Proxy group="filters" name="ExtractFieldDataOverTime" />
+    <Proxy group="filters" name="IntegrateAttributes" omit_from_toolbar="1" />
     <Proxy group="filters" name="ProbeLine" />
     <Proxy group="filters" name="ProbePoint" />
     <Proxy group="filters" name="PlotAttributes" omit_from_toolbar="1" />
@@ -219,6 +221,8 @@
   <Proxy group="filters" name="EnvironmentAnnotation" />
   <Proxy group="filters" name="EvenlySpacedStreamlines2D" />
   <Proxy group="filters" name="ExtractBlock" icon=":/pqWidgets/Icons/pqGroupExtract.svg" />
+  <Proxy group="filters" name="ExtractCellsAlongLine" />
+  <Proxy group="filters" name="ExtractCellsAlongLineCustom" />
   <Proxy group="filters" name="ExtractComponent" />
   <Proxy group="filters" name="ExtractEdges" />
   <Proxy group="filters" name="ExtractEnclosedPoints" />

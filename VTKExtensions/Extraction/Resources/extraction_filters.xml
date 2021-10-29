@@ -80,6 +80,100 @@
   <ProxyGroup name="filters">
 
     <!-- ==================================================================== -->
+    <SourceProxy class="vtkExtractCellsAlongLine"
+                 label="Extract Cells Along Line"
+                 name="ExtractCellsAlongLine">
+      <Documentation short_help="Extract cells along input line.">
+        This filter extract the cells intersected by a line.
+      </Documentation>
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkDataSet" />
+          <DataType value="vtkCompositeDataSet" />
+        </DataTypeDomain>
+      </InputProperty>
+      <DoubleVectorProperty animateable="1"
+                            command="SetPoint1"
+                            default_values="0.0 0.0 0.0"
+                            name="Point1"
+                            number_of_elements="3">
+        <BoundsDomain default_mode="min"
+                      mode="normal"
+                      name="range">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input" />
+          </RequiredProperties>
+        </BoundsDomain>
+        <Documentation>This property controls the coordinates of the first
+        endpoint of the line.</Documentation>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty animateable="1"
+                            command="SetPoint2"
+                            default_values="0.0 0.0 0.0"
+                            name="Point2"
+                            number_of_elements="3">
+        <BoundsDomain default_mode="max"
+                      mode="normal"
+                      name="range">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input" />
+          </RequiredProperties>
+        </BoundsDomain>
+        <Documentation>This property controls the coordinates of the second
+        endpoint of the line.</Documentation>
+      </DoubleVectorProperty>
+      <PropertyGroup label="Line Parameters" panel_widget="InteractiveLine">
+          <Property function="Point1WorldPosition" name="Point1" />
+          <Property function="Point2WorldPosition" name="Point2" />
+      </PropertyGroup>
+    </SourceProxy>
+
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkExtractCellsAlongPolyLine"
+                 label="Extract Cells Along Lines Custom Source"
+                 name="ExtractCellsAlongLineCustom">
+    <Documentation short_help="Extract cells along input lines from custom source">
+        The Extract Cells Along Lines From Custom Source filter
+        extracts cells from the input data set that intersect lines from a custom source.
+        This source can be either an Unstructured Grid or a Poly Data. Any cells other
+        than lines or poly lines are ignored in the source.
+      </Documentation>
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkDataSet" />
+          <DataType value="vtkCompositeDataSet" />
+        </DataTypeDomain>
+      </InputProperty>
+      <InputProperty command="SetSourceConnection"
+                     name="Source">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkPolyData" />
+          <DataType value="vtkUnstructuredGrid" />
+        </DataTypeDomain>
+        <Documentation>
+          This property specifies the dataset composed of the lines and poly lines used
+          to extract cells in the input.
+        </Documentation>
+      </InputProperty>
+    </SourceProxy>
+
+    <!-- ==================================================================== -->
     <SourceProxy class="vtkPVExtractSelection"
                  label="Extract Selection (internal)"
                  name="PVExtractSelection">
