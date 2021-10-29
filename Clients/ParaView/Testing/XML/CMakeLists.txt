@@ -1337,6 +1337,11 @@ if(PARAVIEW_USE_PYTHON)
       StructuredGridCellBlanking.xml
       VolumeNoMapScalars.xml # needs programmable filter + numpy
       )
+
+    list(APPEND TESTS_WITHOUT_BASELINES
+      PythonCalculatorOnTable.xml
+      )
+    
     set(SpreadSheetSelectionTrace_DISABLE_CS TRUE)
     set(SpreadSheetSelectionTrace_DISABLE_CRS TRUE)
 
