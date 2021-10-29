@@ -930,6 +930,7 @@ list(APPEND TESTS_WITH_BASELINES
   # disabling overlay test for now. It has issues with Time 0.
   #  ComparativeOverlay.xml
   CompositeSurfaceSelection.xml
+  ComputeConnectedSurfaceProperties.xml
   CustomFilter.xml
   CustomSourceProbe.xml
   CustomViewpoints.xml

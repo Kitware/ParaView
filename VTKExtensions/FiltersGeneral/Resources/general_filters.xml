@@ -4070,5 +4070,66 @@ Every Nth Point.
       </StringVectorProperty>
       <!-- End MergeVectorComponents -->
    </SourceProxy>
+
+   <!-- ==================================================================== -->
+   <SourceProxy class="vtkMultiObjectMassProperties"
+                label="Compute Connected Surface Properties"
+                name="ComputeConnectedSurfaceProperties">
+     <Documentation
+             long_help="Compute volume, area, and centroid of multiple connected polygonal
+             objects in a single polygonal input"
+             short_help="Compute volume, area, and centroid of multiple polygonal objects">
+       Given a PolyData, computed the volume, area and centroid of one or more polygonal objects.
+       An optional object IDs cell data array that maps a polygon to a specific object may be provided,
+       or the objects will be identified as connected components in the input data.
+     </Documentation>
+     <InputProperty command="SetInputConnection"
+                    name="Input">
+       <ProxyGroupDomain name="groups">
+         <Group name="sources"/>
+         <Group name="filters"/>
+       </ProxyGroupDomain>
+       <DataTypeDomain name="input_type">
+         <DataType value="vtkPolyData"/>
+       </DataTypeDomain>
+       <InputArrayDomain attribute_type="cell"
+                         name="scale_array"
+                         number_of_components="1"
+                         optional="1" />
+     </InputProperty>
+     <IntVectorProperty command="SetSkipValidityCheck"
+                        name="SkipObjectIdentification"
+                        default_values="0"
+                        number_of_elements="1">
+       <BooleanDomain name="bool" />
+       <Documentation>This property determines whether to skip the object identification
+        which detects the multiple objects in the PolyData. This check can be skipped
+        only if the PolyData has a CellData array with the object Ids, and the ids start with 0 index.
+        The name of that array is configurable.
+       </Documentation>
+     </IntVectorProperty>
+     <StringVectorProperty command="SetObjectIdsArrayName"
+                           name="ObjectIdsArrayName"
+                           default_values="ObjectIds"
+                           number_of_elements="1">
+       <ArrayListDomain attribute_type="Scalars"
+                        name="array_list">
+         <RequiredProperties>
+           <Property function="Input"
+                     name="Input" />
+         </RequiredProperties>
+       </ArrayListDomain>
+       <Hints>
+         <PropertyWidgetDecorator type="EnableWidgetDecorator">
+           <Property name="SkipObjectIdentification" function="boolean"/>
+         </PropertyWidgetDecorator>
+         <NoDefault />
+       </Hints>
+       <Documentation>
+         This property indicates the name of the array with the object IDs. The default name is "ObjectIds".
+       </Documentation>
+     </StringVectorProperty>
+     <!-- End ComputeConnectedSurfaceProperties -->
+   </SourceProxy>
   </ProxyGroup>
 </ServerManagerConfiguration>
