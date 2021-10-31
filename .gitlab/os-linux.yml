@@ -202,9 +202,6 @@
         - $LAUNCHER $spack repo add $PWD/Utilities/spack/repo
         - $LAUNCHER $spack compiler find
         - $LAUNCHER $spack compiler info gcc@7.3.1
-        # setup buildcache mirror
-        - $LAUNCHER $spack mirror add local $PWD/spack-cache
-        - $LAUNCHER $spack buildcache list
     script:
         - TRACK="Experimental"
         - if [ "$CI_PIPELINE_SOURCE" == "schedule" ] && [ "$CI_PROJECT_PATH" == "paraview/paraview" ]; then TRACK="master-packages" ; fi
@@ -213,7 +210,6 @@
         - $LAUNCHER $spack install --no-check-signature --only dependencies -j $(nproc) $paraview_spec
         - $LAUNCHER $spack clean
         - export dependency_specs=`$LAUNCHER $spack find --format "{name}{@version}{%compiler}"`
-        - $LAUNCHER $spack buildcache create -a -f -u -d $PWD/spack-cache $dependency_specs
         - $LAUNCHER $spack install --no-check-signature -j $(nproc) --cdash-upload-url="http://open.cdash.org/submit.php?project=ParaView" --cdash-track $TRACK --cdash-build="[paraview-spack-$paraview_spec]-$CI_COMMIT_REF_NAME" $paraview_spec
         - eval `$spack load --sh paraview`
         - pvserver --version
@@ -221,10 +217,6 @@
 
     interruptible: true
     timeout: 3 hours
-    cache:
-        key: spack:centos7
-        paths:
-            - spack-cache/
 
 .doxygen_build_linux:
     stage: build
