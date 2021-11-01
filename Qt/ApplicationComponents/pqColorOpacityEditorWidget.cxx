@@ -1128,6 +1128,7 @@ void pqColorOpacityEditorWidget::resetRangeToData()
   // passing in nullptr ensure pqResetScalarRangeReaction simply uses active representation.
   if (pqResetScalarRangeReaction::resetScalarRangeToData(nullptr))
   {
+    this->setHistogramOutdated();
     this->Internals->render();
     Q_EMIT this->changeFinished();
   }
@@ -1198,6 +1199,7 @@ void pqColorOpacityEditorWidget::resetRangeToCustom()
 
   if (changed)
   {
+    this->setHistogramOutdated();
     this->Internals->render();
     Q_EMIT this->changeFinished();
   }
