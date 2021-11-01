@@ -24,6 +24,8 @@
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMSessionProxyManager.h"
+#include "vtkSMTrace.h"
+#include "vtkTuple.h"
 
 // VTK includes
 #include <vtkAlgorithm.h>
@@ -258,6 +260,23 @@ bool vtkSMTransferFunction2DProxy::GetRange(double range[4])
   range[0] = range[2] = VTK_DOUBLE_MAX;
   range[1] = range[3] = VTK_DOUBLE_MIN;
 
+  vtkSMProperty* tf2dRangeProperty = GetTransferFunction2DRangeProperty(this);
+  if (!tf2dRangeProperty)
+  {
+    return range;
+  }
+
+  vtkSMPropertyHelper rangeHelper(tf2dRangeProperty);
+  unsigned int num_elements = rangeHelper.GetNumberOfElements();
+  if (num_elements != 4)
+  {
+    return range;
+  }
+
+  rangeHelper.Get(range, 4);
+  return range;
+
+#if 0
   vtkSMProperty* controlBoxesProperty = GetTransferFunction2DBoxesProperty(this);
   if (!controlBoxesProperty)
   {
@@ -276,46 +295,38 @@ bool vtkSMTransferFunction2DProxy::GetRange(double range[4])
   cntrlBoxes.Get(boxes[0].GetData(), num_elements);
 
   auto boxXMin = std::min_element(boxes.begin(), boxes.end(),
-    [](vtkTuple<double, BOX_PROPERTY_SIZE> box1, vtkTuple<double, BOX_PROPERTY_SIZE> box2) {
-      return box1[0] < box2[0];
-    });
+    [](vtkTuple<double, BOX_PROPERTY_SIZE> box1, vtkTuple<double, BOX_PROPERTY_SIZE> box2)
+    { return box1[0] < box2[0]; });
   range[0] = (*boxXMin)[0];
 
   // For the max value, check box (X + Width). Note that the property values are stored as
   // [x, y, width, height]
   auto boxXMax = std::max_element(boxes.begin(), boxes.end(),
-    [](vtkTuple<double, BOX_PROPERTY_SIZE> box1, vtkTuple<double, BOX_PROPERTY_SIZE> box2) {
-      return box1[0] + box1[2] < box2[0] + box2[2];
-    });
+    [](vtkTuple<double, BOX_PROPERTY_SIZE> box1, vtkTuple<double, BOX_PROPERTY_SIZE> box2)
+    { return box1[0] + box1[2] < box2[0] + box2[2]; });
   range[1] = (*boxXMax)[0] + (*boxXMax)[2];
 
   auto boxYMin = std::min_element(boxes.begin(), boxes.end(),
-    [](vtkTuple<double, BOX_PROPERTY_SIZE> box1, vtkTuple<double, BOX_PROPERTY_SIZE> box2) {
-      return box1[1] < box2[1];
-    });
+    [](vtkTuple<double, BOX_PROPERTY_SIZE> box1, vtkTuple<double, BOX_PROPERTY_SIZE> box2)
+    { return box1[1] < box2[1]; });
   range[2] = (*boxYMin)[1];
 
   // For the max value, check box (Y + Height). Note that the property values are stored as
   // [x, y, width, height]
   auto boxYMax = std::max_element(boxes.begin(), boxes.end(),
-    [](vtkTuple<double, BOX_PROPERTY_SIZE> box1, vtkTuple<double, BOX_PROPERTY_SIZE> box2) {
-      return box1[1] + box1[3] < box2[1] + box2[3];
-    });
+    [](vtkTuple<double, BOX_PROPERTY_SIZE> box1, vtkTuple<double, BOX_PROPERTY_SIZE> box2)
+    { return box1[1] + box1[3] < box2[1] + box2[3]; });
   range[3] = (*boxYMax)[1] + (*boxYMax)[3];
 
   return true;
+#endif
 }
 
 //------------------------------------------------------------------------------------------------
 bool vtkSMTransferFunction2DProxy::RescaleTransferFunction(
   double rangeXMin, double rangeXMax, double rangeYMin, double rangeYMax, bool extend)
 {
-  vtkSMProperty* controlBoxesProperty = GetTransferFunction2DBoxesProperty(this);
-  if (!controlBoxesProperty)
-  {
-    return false;
-  }
-
+  // Adjust the range
   vtkSMCoreUtilities::AdjustRange(rangeXMin, rangeXMax);
   vtkSMCoreUtilities::AdjustRange(rangeYMin, rangeYMax);
   if (rangeXMax < rangeXMin || rangeYMax < rangeYMin)
@@ -323,12 +334,10 @@ bool vtkSMTransferFunction2DProxy::RescaleTransferFunction(
     return false;
   }
 
-  vtkSMPropertyHelper cntrlBoxes(controlBoxesProperty);
-  unsigned int num_elements = cntrlBoxes.GetNumberOfElements();
-  if (num_elements == 0)
+  vtkSMProperty* rangeProperty = GetTransferFunction2DRangeProperty(this);
+  if (!rangeProperty)
   {
-    // nothing to do, but not an error, so return true.
-    return true;
+    return false;
   }
 
   if (vtkSMProperty* sriProp = this->GetProperty("ScalarRangeInitialized"))
@@ -344,14 +353,9 @@ bool vtkSMTransferFunction2DProxy::RescaleTransferFunction(
     }
   }
 
-  // just in case the num_elements is not a perfect multiple of BOX_PROPERTY_SIZE
-  num_elements = BOX_PROPERTY_SIZE * (num_elements / BOX_PROPERTY_SIZE);
-  std::vector<vtkTuple<double, BOX_PROPERTY_SIZE>> boxes;
-  boxes.resize(num_elements / BOX_PROPERTY_SIZE);
-  cntrlBoxes.Get(boxes[0].GetData(), num_elements);
-
+  vtkSMPropertyHelper rangeHelper(rangeProperty);
   vtkTuple<double, 4> currentRange;
-  this->GetRange(currentRange.GetData());
+  rangeHelper.Get(currentRange.GetData(), 4);
 
   if (extend)
   {
@@ -374,7 +378,6 @@ bool vtkSMTransferFunction2DProxy::RescaleTransferFunction(
     rangeYMin = std::min(rangeYMin, currentRange[2]);
     rangeYMax = std::max(rangeYMax, currentRange[3]);
   }
-
   if (rangeXMin == currentRange[0] && rangeXMax == currentRange[1] &&
     rangeYMin == currentRange[2] && rangeYMax == currentRange[3])
   {
@@ -383,25 +386,56 @@ bool vtkSMTransferFunction2DProxy::RescaleTransferFunction(
     return true;
   }
 
-  // Normalize the range
-  vtkNormalize(boxes, false, &currentRange);
-
   vtkTuple<double, 4> newRange;
   newRange[0] = rangeXMin;
   newRange[1] = rangeXMax;
   newRange[2] = rangeYMin;
   newRange[3] = rangeYMax;
-  vtkRescaleNormalizedControlBoxes(boxes, &newRange, false);
+
+  // Rescale the control boxes
+  vtkSMProperty* controlBoxesProperty = GetTransferFunction2DBoxesProperty(this);
+  unsigned int num_elements = 0;
+  std::vector<vtkTuple<double, BOX_PROPERTY_SIZE>> boxes;
+  if (controlBoxesProperty)
+  {
+    vtkSMPropertyHelper cntrlBoxes(controlBoxesProperty);
+    // vtkSMPropertyHelper cntrlBoxes(controlBoxesProperty);
+    num_elements = cntrlBoxes.GetNumberOfElements();
+    if (num_elements != 0)
+    {
+      // just in case the num_elements is not a perfect multiple of BOX_PROPERTY_SIZE
+      num_elements = BOX_PROPERTY_SIZE * (num_elements / BOX_PROPERTY_SIZE);
+      boxes.resize(num_elements / BOX_PROPERTY_SIZE);
+      cntrlBoxes.Get(boxes[0].GetData(), num_elements);
+
+      // Normalize the range
+      vtkNormalize(boxes, false, &currentRange);
+
+      vtkRescaleNormalizedControlBoxes(boxes, &newRange, false);
+    }
+  }
+  SM_SCOPED_TRACE(CallMethod)
+    .arg(this)
+    .arg("RescaleTransferFunction")
+    .arg(rangeXMin)
+    .arg(rangeXMax)
+    .arg(rangeYMin)
+    .arg(rangeYMax)
+    .arg("comment", "Rescale 2D transfer function");
 
   // Setting the "LastRange" here because, it should match the current range of the control
   // boxes.
   // Aside from that, it will also be used for computing the 2D histogram.
-  this->LastRange[0] = rangeXMin;
-  this->LastRange[1] = rangeXMax;
-  this->LastRange[2] = rangeYMin;
-  this->LastRange[3] = rangeYMax;
-
-  // TODO: Normalize and rescale
+  this->LastRange[0] = newRange[0];
+  this->LastRange[1] = newRange[1];
+  this->LastRange[2] = newRange[2];
+  this->LastRange[3] = newRange[3];
+  rangeHelper.Set(newRange.GetData(), 4);
+  if (controlBoxesProperty && num_elements != 0)
+  {
+    vtkSMPropertyHelper(controlBoxesProperty).Set(boxes[0].GetData(), num_elements);
+  }
+  this->UpdateVTKObjects();
   return true;
 }
 
@@ -675,6 +709,23 @@ vtkSmartPointer<vtkImageData> vtkSMTransferFunction2DProxy::ComputeDataHistogram
     vtkErrorMacro("Histogram2D is not producing the values as expected");
     this->Histogram2DCache = nullptr;
     return this->Histogram2DCache;
+  }
+
+  if (useGradientAsY)
+  {
+    vtkSMProperty* rangeProperty = GetTransferFunction2DRangeProperty(this);
+
+    vtkSMPropertyHelper rangeHelper(rangeProperty);
+
+    // Check if the range needs to be updated.
+    vtkTuple<double, 4> currentRange;
+    rangeHelper.Get(currentRange.GetData(), 4);
+    double bounds[6];
+    this->Histogram2DCache->GetBounds(bounds);
+    currentRange[2] = bounds[2];
+    currentRange[3] = bounds[3];
+    rangeHelper.Set(currentRange.GetData(), 4);
+    this->UpdateVTKObjects();
   }
   return this->Histogram2DCache;
 }
