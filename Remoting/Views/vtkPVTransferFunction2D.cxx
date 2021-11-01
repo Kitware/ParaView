@@ -162,7 +162,7 @@ void vtkPVTransferFunction2D::Build()
   func->SetDimensions(this->OutputDimensions[0], this->OutputDimensions[1], 1);
   double spacing[2];
   spacing[0] = (this->Range[1] - this->Range[0]) / this->OutputDimensions[0];
-  spacing[1] = (this->Range[3] - this->Range[3]) / this->OutputDimensions[1];
+  spacing[1] = (this->Range[3] - this->Range[2]) / this->OutputDimensions[1];
   func->SetSpacing(spacing[0], spacing[1], 1.0);
   func->AllocateScalars(VTK_FLOAT, 4);
   auto arr = vtkFloatArray::SafeDownCast(func->GetPointData()->GetScalars());
@@ -193,7 +193,7 @@ void vtkPVTransferFunction2D::Build()
     x1 = bbox.GetRight() <= this->Range[0] ? 0 : x1;
     x1 = bbox.GetRight() >= this->Range[1] ? this->OutputDimensions[0] : x1;
     y1 = bbox.GetTop() <= this->Range[2] ? 0 : y1;
-    x1 = bbox.GetTop() >= this->Range[3] ? this->OutputDimensions[1] : y1;
+    y1 = bbox.GetTop() >= this->Range[3] ? this->OutputDimensions[1] : y1;
     vtkSmartPointer<vtkImageData> boxTexture = box->GetTexture();
     int boxDims[3];
     boxTexture->GetDimensions(boxDims);
@@ -206,7 +206,9 @@ void vtkPVTransferFunction2D::Build()
       {
         int boxCoord[3] = { 0, 0, 0 };
         boxCoord[0] = (ii * spacing[0] + this->Range[0] - bbox.GetLeft()) / boxSpacing[0];
+        boxCoord[0] = boxCoord[0] < 0 ? 0 : boxCoord[0];
         boxCoord[1] = (jj * spacing[1] + this->Range[2] - bbox.GetBottom()) / boxSpacing[1];
+        boxCoord[1] = boxCoord[1] < 0 ? 0 : boxCoord[1];
         unsigned char* ptr = static_cast<unsigned char*>(boxTexture->GetScalarPointer(boxCoord));
         float fptr[4];
         for (int tp = 0; tp < 4; ++tp)
