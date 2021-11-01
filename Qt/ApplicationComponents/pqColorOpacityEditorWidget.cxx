@@ -1668,12 +1668,11 @@ void pqColorOpacityEditorWidget::chooseBoxColorAlpha()
     vtkGenericWarningMacro("No transfer function box selected. Click on a box to select it.");
     return;
   }
-  double color[3];
+  double color[4];
   activeBox->GetBoxColor(color);
-  double alpha = activeBox->GetBoxAlpha();
 
   QColor initialColor;
-  initialColor.setRgbF(color[0], color[1], color[2], alpha);
+  initialColor.setRgbF(color[0], color[1], color[2], color[3]);
   QColor c = QColorDialog::getColor(
     initialColor, this, tr("Choose box color"), QColorDialog::ShowAlphaChannel);
   if (c.isValid())

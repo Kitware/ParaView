@@ -386,8 +386,6 @@ bool vtkTransferFunctionBoxItem::Paint(vtkContext2D* painter)
     this->InvokeEvent(vtkTransferFunctionBoxItem::BoxAddEvent);
   }
 
-  this->Internals->TransferFunctionBox->SetColor(
-    this->BoxColor[0], this->BoxColor[1], this->BoxColor[2], this->BoxAlpha);
   auto texture = this->Internals->TransferFunctionBox->GetTexture();
   if (!texture)
   {
@@ -582,9 +580,6 @@ void vtkTransferFunctionBoxItem::PrintSelf(ostream& os, vtkIndent indent)
 {
   os << indent << "Initialized: " << (this->Initialized ? "true" : "false") << endl;
   os << indent << "Selected: " << (this->GetSelected() ? "true" : "false") << endl;
-  os << indent << "BoxColor: [" << this->BoxColor[0] << ", " << this->BoxColor[1] << ", "
-     << this->BoxColor[2] << endl;
-  os << indent << "BoxAlpha: " << this->BoxAlpha << endl;
   os << indent << "Transfer Function Box: " << endl;
   this->Internals->TransferFunctionBox->PrintSelf(os, indent.GetNextIndent());
   Superclass::PrintSelf(os, indent);
@@ -648,6 +643,30 @@ void vtkTransferFunctionBoxItem::SetBox(
 
   this->EndChanges();
   this->InvokeEvent(vtkTransferFunctionBoxItem::BoxEditEvent);
+}
+
+//-------------------------------------------------------------------------------------------------
+void vtkTransferFunctionBoxItem::SetBoxColor(double r, double g, double b, double a)
+{
+  double* c = this->Internals->TransferFunctionBox->GetColor();
+  if (c[0] == r && c[1] == g && c[2] == b && c[3] == a)
+  {
+    return;
+  }
+  this->Internals->TransferFunctionBox->SetColor(r, g, b, a);
+  this->InvokeEvent(vtkTransferFunctionBoxItem::BoxEditEvent);
+}
+
+//-------------------------------------------------------------------------------------------------
+double* vtkTransferFunctionBoxItem::GetBoxColor()
+{
+  return this->Internals->TransferFunctionBox->GetColor();
+}
+
+//-------------------------------------------------------------------------------------------------
+void vtkTransferFunctionBoxItem::GetBoxColor(double& r, double& g, double& b, double& a)
+{
+  this->Internals->TransferFunctionBox->GetColor(r, g, b, a);
 }
 
 //-------------------------------------------------------------------------------------------------

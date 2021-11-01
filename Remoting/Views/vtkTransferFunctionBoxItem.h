@@ -78,16 +78,11 @@ public:
   /**
    * Set/Get the color to be used for this box.
    */
-  vtkSetVector3Macro(BoxColor, double);
-  vtkGetVector3Macro(BoxColor, double);
-  ///@}
-
-  ///@{
-  /**
-   * Set/Get the alpha to be used for this box.
-   */
-  vtkSetMacro(BoxAlpha, double);
-  vtkGetMacro(BoxAlpha, double);
+  virtual void SetBoxColor(double r, double g, double b, double a);
+  virtual void SetBoxColor(const double c[4]) { this->SetBoxColor(c[0], c[1], c[2], c[3]); }
+  double* GetBoxColor() VTK_SIZEHINT(4);
+  virtual void GetBoxColor(double& r, double& g, double& b, double& a);
+  virtual void GetBoxColor(double c[4]) { this->GetBoxColor(c[0], c[1], c[2], c[3]); }
   ///@}
 
   ///@{
@@ -223,12 +218,6 @@ private:
 
   // Helper members
   vtkTransferFunctionBoxItemInternals* Internals;
-
-  // vtkNew<vtkPoints2D> BoxPoints;
-  // const int NumPoints = 5;
-  // vtkRectd Box;
-  double BoxColor[3] = { 1, 1, 1 };
-  double BoxAlpha = 1.0;
 
   // vtkNew<vtkImageData> Texture;
   bool Initialized = false;
