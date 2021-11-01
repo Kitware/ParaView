@@ -227,8 +227,6 @@ vtkStandardNewMacro(vtkSMTransferFunction2DProxy);
 void vtkSMTransferFunction2DProxy::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
-  os << indent << "LastRange: " << this->LastRange[0] << " " << this->LastRange[1] << " "
-     << this->LastRange[2] << " " << this->LastRange[3] << endl;
   if (this->Histogram2DCache)
   {
     os << indent << "Histogram2DCache: " << endl;
@@ -423,13 +421,6 @@ bool vtkSMTransferFunction2DProxy::RescaleTransferFunction(
     .arg(rangeYMax)
     .arg("comment", "Rescale 2D transfer function");
 
-  // Setting the "LastRange" here because, it should match the current range of the control
-  // boxes.
-  // Aside from that, it will also be used for computing the 2D histogram.
-  this->LastRange[0] = newRange[0];
-  this->LastRange[1] = newRange[1];
-  this->LastRange[2] = newRange[2];
-  this->LastRange[3] = newRange[3];
   rangeHelper.Set(newRange.GetData(), 4);
   if (controlBoxesProperty && num_elements != 0)
   {
@@ -647,6 +638,9 @@ vtkSmartPointer<vtkImageData> vtkSMTransferFunction2DProxy::ComputeDataHistogram
     return this->Histogram2DCache;
   }
 
+  double range[4];
+  this->GetRange(range);
+
   // Compute the histogram
   vtkSMSessionProxyManager* pxm =
     vtkSMProxyManager::GetProxyManager()->GetActiveSessionProxyManager();
@@ -665,10 +659,10 @@ vtkSmartPointer<vtkImageData> vtkSMTransferFunction2DProxy::ComputeDataHistogram
   numBins[1] = numberOfBins;
   vtkSMPropertyHelper(histo, "NumberOfBins").Set(numBins, 2);
   vtkSMPropertyHelper(histo, "UseCustomBinRangesX").Set(true);
-  vtkSMPropertyHelper(histo, "CustomBinRangesX").Set(this->LastRange, 2);
+  vtkSMPropertyHelper(histo, "CustomBinRangesX").Set(range, 2);
   vtkSMPropertyHelper(histo, "UseGradientForYAxis").Set(useGradientAsY);
   vtkSMPropertyHelper(histo, "UseCustomBinRangesY").Set(false);
-  //  vtkSMPropertyHelper(histo, "CustomBinRangesY").Set(this->LastYRange, 2);
+  //  vtkSMPropertyHelper(histo, "CustomBinRangesY").Set(range + 2, 2);
   histo->UpdateVTKObjects();
 
   // Reduce it

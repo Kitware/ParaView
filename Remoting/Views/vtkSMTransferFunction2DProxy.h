@@ -157,11 +157,6 @@ protected:
 
   // Helper members
   /**
-   * Store the last range used to rescale the transfer function
-   */
-  double LastRange[4] = { 0, 1, 0, 1 };
-
-  /**
    * Cache for the 2D histogram image
    */
   vtkSmartPointer<vtkImageData> Histogram2DCache;
