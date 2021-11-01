@@ -31,6 +31,7 @@
 #include "vtkPlotHistogram2D.h"
 #include "vtkPointData.h"
 #include "vtkRenderWindowInteractor.h"
+#include "vtkStringArray.h"
 
 //-------------------------------------------------------------------------------------------------
 vtkStandardNewMacro(vtkTransferFunctionChartHistogram2D);
@@ -186,6 +187,13 @@ void vtkTransferFunctionChartHistogram2D::SetInputData(vtkImageData* data, vtkId
     //        this->AddBox(box);
     //      }
     //    }
+
+    if (auto arr =
+          vtkStringArray::SafeDownCast(data->GetFieldData()->GetAbstractArray("ArrayNames")))
+    {
+      this->GetAxis(vtkAxis::BOTTOM)->SetTitle(arr->GetValue(0));
+      this->GetAxis(vtkAxis::LEFT)->SetTitle(arr->GetValue(1));
+    }
 
     if (this->TransferFunction2D)
     {

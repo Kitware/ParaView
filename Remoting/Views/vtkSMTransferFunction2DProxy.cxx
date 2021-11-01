@@ -25,7 +25,6 @@
 #include "vtkSMProxyManager.h"
 #include "vtkSMSessionProxyManager.h"
 #include "vtkSMTrace.h"
-#include "vtkTuple.h"
 
 // VTK includes
 #include <vtkAlgorithm.h>
@@ -33,6 +32,7 @@
 #include <vtkObjectFactory.h>
 #include <vtkPointData.h>
 #include <vtkScalarsToColors.h>
+#include <vtkStringArray.h>
 #include <vtkTuple.h>
 
 // STL includes
@@ -710,6 +710,13 @@ vtkSmartPointer<vtkImageData> vtkSMTransferFunction2DProxy::ComputeDataHistogram
     this->Histogram2DCache = nullptr;
     return this->Histogram2DCache;
   }
+
+  vtkNew<vtkStringArray> s;
+  s->SetName("ArrayNames");
+  s->SetNumberOfTuples(2);
+  s->SetValue(0, arrayName.c_str());
+  s->SetValue(1, (useGradientAsY ? "Gradient Magnitude" : array2Name.c_str()));
+  this->Histogram2DCache->GetFieldData()->AddArray(s);
 
   if (useGradientAsY)
   {
