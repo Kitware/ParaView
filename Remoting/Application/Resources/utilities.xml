@@ -918,7 +918,7 @@
 
   <ProxyGroup name="palettes">
     <!-- ================================================================= -->
-    <Proxy label="Default Background" name="DefaultBackground">
+    <Proxy label="Blue Gray Background (Default)" name="BlueGrayBackground">
       <DoubleVectorProperty default_values="1.0 1.0 1.0"
                             name="ForegroundColor"
                             number_of_elements="3"></DoubleVectorProperty>
@@ -943,7 +943,7 @@
     </Proxy>
 
     <!-- ================================================================= -->
-    <Proxy label="Print Background" name="PrintBackground">
+    <Proxy label = "White Background" name="WhiteBackground">
       <DoubleVectorProperty default_values="0.0 0.0 0.0"
                             name="ForegroundColor"
                             number_of_elements="3"></DoubleVectorProperty>
@@ -969,12 +969,79 @@
     </Proxy>
 
     <!-- ================================================================= -->
-    <Proxy label="Gray Background" name="GrayBackground"
-      base_proxygroup="palettes"  base_proxyname="DefaultBackground" />
+    <Proxy label="Warm Gray Background" name="WarmGrayBackground">
+      <DoubleVectorProperty default_values="1.0 1.0 1.0"
+                            name="ForegroundColor"
+                            number_of_elements="3"></DoubleVectorProperty>
+      <DoubleVectorProperty default_values="0.29 0.27 0.26"
+                            name="BackgroundColor"
+                            number_of_elements="3"></DoubleVectorProperty>
+      <DoubleVectorProperty default_values="1.0 1.0 1.0"
+                            name="SurfaceColor"
+                            number_of_elements="3"></DoubleVectorProperty>
+      <DoubleVectorProperty default_values="1.0 1.0 1.0"
+                            name="TextAnnotationColor"
+                            number_of_elements="3"></DoubleVectorProperty>
+      <DoubleVectorProperty default_values="1.0 0.0 1.0"
+                            name="SelectionColor"
+                            number_of_elements="3"></DoubleVectorProperty>
+      <DoubleVectorProperty default_values="0.0 0.0 0.5"
+                            name="EdgeColor"
+                            number_of_elements="3"></DoubleVectorProperty>
+      <IntVectorProperty    default_values="0"
+                            name="BackgroundColorMode"
+                            number_of_elements="1"></IntVectorProperty>
+    </Proxy>
 
     <!-- ================================================================= -->
-    <Proxy label="White Background" name="WhiteBackground"
-      base_proxygroup="palettes"  base_proxyname="PrintBackground" />
+    <Proxy label="Neutral Gray Background" name="NeutralGrayBackground">
+      <DoubleVectorProperty default_values="1.0 1.0 1.0"
+                            name="ForegroundColor"
+                            number_of_elements="3"></DoubleVectorProperty>
+      <DoubleVectorProperty default_values="0.42 0.42 0.42"
+                            name="BackgroundColor"
+                            number_of_elements="3"></DoubleVectorProperty>
+      <DoubleVectorProperty default_values="1.0 1.0 1.0"
+                            name="SurfaceColor"
+                            number_of_elements="3"></DoubleVectorProperty>
+      <DoubleVectorProperty default_values="1.0 1.0 1.0"
+                            name="TextAnnotationColor"
+                            number_of_elements="3"></DoubleVectorProperty>
+      <DoubleVectorProperty default_values="1.0 0.0 1.0"
+                            name="SelectionColor"
+                            number_of_elements="3"></DoubleVectorProperty>
+      <DoubleVectorProperty default_values="0.0 0.0 0.5"
+                            name="EdgeColor"
+                            number_of_elements="3"></DoubleVectorProperty>
+      <IntVectorProperty    default_values="0"
+                            name="BackgroundColorMode"
+                            number_of_elements="1"></IntVectorProperty>
+    </Proxy>
+
+    <!-- ================================================================= -->
+    <Proxy label="Light Gray Background" name="LightGrayBackground">
+      <DoubleVectorProperty default_values="1.0 1.0 1.0"
+                            name="ForegroundColor"
+                            number_of_elements="3"></DoubleVectorProperty>
+      <DoubleVectorProperty default_values="0.46 0.44 0.42"
+                            name="BackgroundColor"
+                            number_of_elements="3"></DoubleVectorProperty>
+      <DoubleVectorProperty default_values="1.0 1.0 1.0"
+                            name="SurfaceColor"
+                            number_of_elements="3"></DoubleVectorProperty>
+      <DoubleVectorProperty default_values="1.0 1.0 1.0"
+                            name="TextAnnotationColor"
+                            number_of_elements="3"></DoubleVectorProperty>
+      <DoubleVectorProperty default_values="1.0 0.0 1.0"
+                            name="SelectionColor"
+                            number_of_elements="3"></DoubleVectorProperty>
+      <DoubleVectorProperty default_values="0.0 0.0 0.5"
+                            name="EdgeColor"
+                            number_of_elements="3"></DoubleVectorProperty>
+      <IntVectorProperty    default_values="0"
+                            name="BackgroundColorMode"
+                            number_of_elements="1"></IntVectorProperty>
+    </Proxy>
 
     <!-- ================================================================= -->
     <Proxy label="Black Background" name="BlackBackground">

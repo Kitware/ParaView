@@ -12,16 +12,15 @@ Show(Representation="Wireframe", LineWidth=4)
 Render()
 
 # load print palette
-LoadPalette("PrintBackground")
+LoadPalette("WhiteBackground")
 if not smtesting.DoRegressionTesting():
     raise RuntimeError("Test failed!")
-
 
 statefilename = os.path.join(smtesting.TempDir, "ColorPaletteInStateFile.pvsm")
 SaveState(statefilename)
 
 # restore palette, not necessary but let's do it anyways.
-LoadPalette("DefaultBackground")
+LoadPalette("BlueGrayBackground")
 
 # start a new session
 ResetSession()
