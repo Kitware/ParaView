@@ -140,10 +140,10 @@ bool vtkPVTransferFunction2D::UpdateRange()
 //------------------------------------------------------------------------------------------------
 void vtkPVTransferFunction2D::Build()
 {
-  if (this->Internals->Boxes.empty())
-  {
-    return;
-  }
+  //  if (this->Internals->Boxes.empty())
+  //  {
+  //    return;
+  //  }
 
   if (!this->Internals->Function)
   {
