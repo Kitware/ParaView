@@ -570,11 +570,11 @@ pqColorOpacityEditorWidget::pqColorOpacityEditorWidget(
     ui.Use2DTransferFunction->hide();
   }
 
-  smproperty = smgroup->GetProperty("Transfer2DBoxes");
-  if (smproperty)
-  {
-    this->addPropertyLink(this, "transfer2DBoxes", SIGNAL(transfer2DBoxesChanged()), smproperty);
-  }
+  // smproperty = smgroup->GetProperty("Transfer2DBoxes");
+  // if (smproperty)
+  // {
+  //   this->addPropertyLink(this, "transfer2DBoxes", SIGNAL(transfer2DBoxesChanged()), smproperty);
+  // }
   // Manage histogram computation if enabled
   // When creating the widget, we consider that the cost of recomputing the histogram table
   // can be paid systematically
@@ -745,7 +745,9 @@ void pqColorOpacityEditorWidget::setTransferFunction2DProxy(pqSMProxy tf2dProxy)
   }
   if (internals.TransferFunction2DProxy)
   {
-    // cleanup old property links
+    // cleanup old property links.
+    this->links().removePropertyLink(this, "transfer2DBoxes", SIGNAL(transfer2DBoxesChanged()),
+      internals.TransferFunction2DProxy, internals.TransferFunction2DProxy->GetProperty("Boxes"));
   }
   internals.TransferFunction2DProxy = newtf2dProxy;
   if (internals.TransferFunction2DProxy)
@@ -757,7 +759,8 @@ void pqColorOpacityEditorWidget::setTransferFunction2DProxy(pqSMProxy tf2dProxy)
     this->initializeTransfer2DEditor(tf2d);
 
     // add new property links.
-    //
+    this->links().addPropertyLink(this, "transfer2DBoxes", SIGNAL(transfer2DBoxesChanged()),
+      internals.TransferFunction2DProxy, internals.TransferFunction2DProxy->GetProperty("Boxes"));
   }
 }
 
@@ -1643,10 +1646,10 @@ void pqColorOpacityEditorWidget::setTransfer2DBoxes(const QList<QVariant>& value
   //      values[i + 6].toDouble(), values[i + 7].toDouble(), validBounds[0], validBounds[1],
   //      validBounds[2], validBounds[3]);
   //  }
-  // Q_UNUSED(values);
-  //// Since the vtkColorTransferFunction connected to the widget is directly obtained
-  //// from the proxy, we don't need to do anything here. The widget will be
-  //// updated when the proxy updates.
+  Q_UNUSED(values);
+  // Since the vtkPVTransferFunction2D connected to the widget is directly obtained
+  // from the proxy, we don't need to do anything here. The widget will be
+  // updated when the proxy updates.
 }
 
 //-----------------------------------------------------------------------------
