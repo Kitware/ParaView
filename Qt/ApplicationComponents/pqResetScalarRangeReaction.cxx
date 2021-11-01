@@ -203,11 +203,13 @@ bool pqResetScalarRangeReaction::resetScalarRangeToCustom(pqPipelineRepresentati
   }
 
   bool transfer2D = false;
-  if (proxy->GetProperty("UseTransfer2D") && proxy->GetProperty("TransferFuncion2D"))
-  {
-    vtkSMPropertyHelper helper(proxy, "UseTransfer2D", true /*quiet*/);
-    transfer2D = helper.GetAsInt() == 1;
-  }
+  //  if (proxy->GetProperty("UseTransfer2D") && proxy->GetProperty("TransferFuncion2D"))
+  //  {
+  //    vtkSMPropertyHelper helper(proxy, "UseTransfer2D", true /*quiet*/);
+  //    transfer2D = helper.GetAsInt() == 1;
+  //  }
+
+  transfer2D = (proxy->GetProperty("TransferFunction2D") != nullptr);
 
   if (transfer2D)
   {
