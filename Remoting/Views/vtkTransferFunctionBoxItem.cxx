@@ -62,7 +62,7 @@ vtkStandardNewMacro(vtkTransferFunctionBoxItem)
 class vtkTransferFunctionBoxItemInternals
 {
 public:
-  vtkPVTransferFunction2DBox* TransferFunctionBox;
+  vtkPVTransferFunction2DBox* TransferFunctionBox = nullptr;
 
   vtkNew<vtkPoints2D> BoxPoints;
   const int NumPoints = 5;

@@ -359,8 +359,20 @@ void vtkTransferFunctionChartHistogram2D::OnTransferFunctionBoxItemModified(
       break;
     }
     case vtkTransferFunctionBoxItem::BoxAddEvent:
+    {
+      if (this->TransferFunction2D)
+      {
+        auto box = plot->GetTransferFunctionBox();
+        plot->SetID(this->TransferFunction2D->AddControlBox(box));
+        // this->TransferFunction2D->AddControlBox(plot->GetTransferFunctionBox());
+        this->GenerateTransfer2D();
+      }
+      break;
+    }
     case vtkTransferFunctionBoxItem::BoxEditEvent:
     {
+      plot->SetID(
+        this->TransferFunction2D->SetControlBox(plot->GetID(), plot->GetTransferFunctionBox()));
       this->GenerateTransfer2D();
       break;
     }
@@ -467,7 +479,7 @@ void vtkTransferFunctionChartHistogram2D::RemoveBox(vtkSmartPointer<vtkTransferF
   }
   if (this->TransferFunction2D)
   {
-    this->TransferFunction2D->RemoveControlBox(box->GetTransferFunctionBox());
+    this->TransferFunction2D->RemoveControlBox(box->GetID());
   }
 }
 

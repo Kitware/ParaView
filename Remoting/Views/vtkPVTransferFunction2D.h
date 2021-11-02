@@ -98,6 +98,7 @@ public:
   int AddControlBox(double x, double y, double width, double height, double* color);
   int AddControlBox(vtkRectd& box, double* color);
   int AddControlBox(vtkSmartPointer<vtkPVTransferFunction2DBox> box);
+  int SetControlBox(int id, vtkSmartPointer<vtkPVTransferFunction2DBox> box);
   int RemoveControlBox(int id);
   int RemoveControlBox(vtkSmartPointer<vtkPVTransferFunction2DBox> box);
   ///@}

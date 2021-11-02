@@ -93,6 +93,15 @@ public:
   vtkPVTransferFunction2DBox* GetTransferFunctionBox();
   ///@}
 
+  ///@{
+  /**
+   * Set/Get an ID used to reference this item.
+   * This identifier is used by ParaView to update client/server proxy for the 2D transfer function.
+   */
+  vtkSetMacro(ID, int);
+  vtkGetMacro(ID, int);
+  ///@}
+
 protected:
   vtkTransferFunctionBoxItem();
   ~vtkTransferFunctionBoxItem();
@@ -222,6 +231,7 @@ private:
   // vtkNew<vtkImageData> Texture;
   bool Initialized = false;
   bool Selected = false;
+  int ID = -1;
 };
 
 #endif // vtkTransferFunctionBoxItem_h
