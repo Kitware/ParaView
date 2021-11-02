@@ -16,7 +16,7 @@
 // must be before others due to glew include
 #include "vtkOpenVRRenderWindow.h"
 
-#include "QVTKOpenGLWidget.h"
+#include "QVTKOpenGLWindow.h"
 #include "pqActiveObjects.h"
 #include "pqApplicationCore.h"
 #include "pqCoreUtilities.h"
