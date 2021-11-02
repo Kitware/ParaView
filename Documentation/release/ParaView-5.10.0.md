@@ -65,13 +65,13 @@ There way to specify command line options is now more flexible. These can be pro
 
 Note this is a subset of ways supported by CLI11 itself. This is because ParaView traditionally supported options of form `-long=value` i.e. `-` could be used as the prefix for long-named options. This is non-standard and now deprecated. Instead, one should add use `--` as the prefix for such options, e.g., `-url=...` becomes `--url=...`. Currently, this is done automatically to avoid disruption and a warning is raised. Since this conflicts with some of the other more flexible ways of specifying options in `CLI11`, we limit ourselves to the ways listed above until this legacy behavior is no longer supported.
 
-The `--help` output for all ParaView executables is now better formatted. Options are grouped, making it easier to inspect related options together. Mutually exclusive options, deprecated options are clearly marked to minimize confusion. Also, in most terminals, the text width is automatically adjusted to the terminal width and text is wrapped to make it easier to read.
+The `--help` output for all ParaView executables is now better formatted. Options are grouped, making it easier to inspect related options together. Mutually exclusive options and deprecated options are clearly marked to minimize confusion. Also, in most terminals, the text width is automatically adjusted to the terminal width and text is wrapped to make it easier to read.
 
-Several options supports overriding default values using environment variables. If the option is not specified on the command line, then that denoted environment variable will be used to fetch the value for that option (or flag).
+Several options support overriding default values using environment variables. If the option is not specified on the command line, then that denoted environment variable will be used to fetch the value for that option (or flag).
 
 ### Changes for developers
 
-`vtkPVOptions` and subclasses are deprecated. Instead of a single class that handled the parsing of the defining of command line flags/options, command line arguments, and then keep state for the flag/option selections, the new design uses two different classes. `vtkCLIOptions` handle the parsing (using CLI11), while singletons such as `vtkProcessModuleConfiguration`, `vtkRemotingCoreConfiguration`, `pqCoreConfiguration` maintain the state and also populate `vtkCLIOptions`  with supported flags/options. Custom applications can easily add their own `*Configuration` classes to populate `vtkCLIOptions` to custom options or override the default ParaView ones. If your custom code was simply checking user selections from `vtkPVOptions` or subclasses, change it to using the corresponding `*Configuration` singleton
+`vtkPVOptions` and subclasses are deprecated. Instead of a single class that handled the parsing of the defining of command line flags/options, command-line arguments, and then keep state for the flag/option selections, the new design uses two different classes. `vtkCLIOptions` handle the parsing (using CLI11), while singletons such as `vtkProcessModuleConfiguration`, `vtkRemotingCoreConfiguration`, `pqCoreConfiguration` maintain the state and also populate `vtkCLIOptions`  with supported flags/options. Custom applications can easily add their own `*Configuration` classes to populate `vtkCLIOptions` to custom options or override the default ParaView ones. If your custom code was simply checking user selections from `vtkPVOptions` or subclasses, change it to using the corresponding `*Configuration` singleton
 
 ## Consistent string substitutions and formatting across ParaView
 
@@ -98,7 +98,7 @@ These sources and filters use the new string formatting method:
 
 >![string-formatter](img/5.10.0/string-formatter.png)
 >
-> New substitution string example in an **Annotate Time** filter.
+> Example of new string formatting in an **Annotate Time** filter.
 
 ## Favorite directory customization in file dialog
 
@@ -158,12 +158,11 @@ Render View (and related views) now have a property **UseColorPaletteForBackgrou
 
 In addition, instead of having separate boolean properties that are largely mutually exclusive, the view now adds a **BackgroundColorMode** property that lets the user choose how the background should be rendered. Supported values are "Single Color", "Gradient", "Texture" and "Skybox".
 
-This change impacts the Python API. **UseGradientBackground**, **UseTexturedBackground** and **UseSkyboxBackground** properties have been replaced by **BackgroundColorMode** which is now an enumeration that lets you choose how to render the background. Also, unless compatibility <= 5.9 is specified, view specific background color changes will get ignored unless `UseColorPaletteForBackground` property is not
-set to 0 explicitly.
+This change impacts the Python API. **UseGradientBackground**, **UseTexturedBackground** and **UseSkyboxBackground** properties have been replaced by **BackgroundColorMode** which is now an enumeration that lets you choose how to render the background. Also, unless Python compatibility for ParaView 5.9 or earlier is specified, view specific background color changes will get ignored unless `UseColorPaletteForBackground` property is not set to 0 explicitly.
 
 ## Simulate clear coat layer in the PBR representation
 
-When using the PBR representation under the lighting panel, you can now add a second layer on top of the base layer. This is useful to simulate a coating on top of a material. This layer is dielectric (as opposed with metallic), and can be configured with various parameters. You can set the coat strength to control the presence of the coat layer (1.0 means strongest coating), the coat roughness and the coat color. You can also choose the index of refraction of the coat layer as well as the base layer. The more the index of refraction goes up, the more specular reflections there are.
+When using the PBR representation under the lighting panel, you can now add a second layer on top of the base layer. This is useful to simulate a coating on top of a material. This layer is dielectric (as opposed to metallic), and can be configured with various parameters. You can set the coat strength to control the presence of the coat layer (1.0 means strongest coating), the coat roughness and the coat color. You can also choose the index of refraction of the coat layer as well as the base layer. The more the index of refraction goes up, the more specular reflections there are.
 
 You can also use a texture to normal map the coating. These parameters are supported by OSPRay pathtracer.
 
@@ -181,7 +180,7 @@ The **Text Source Representation** used to represent how text sources are render
 
 ## Multicolumn and multiline support in equation text rendering
 
-The rendering of equations using mathtext now supports multiline and multicolumn equations. You can define a new line by writing a new line in the text source, and you can define a new column by entering the character '|'. You can still write a '|' by escaping it with a backslash ('\|').
+The rendering of equations using mathtext now supports multiline and multicolumn equations. You can define a new line by writing a new line in the text source, and you can define a new column by entering the character '|'. You can still write a '|' by escaping it with a backslash ('\\|').
 
 ## View Property **WindowResizeNonInteractiveRenderDelay**
 
@@ -278,17 +277,16 @@ The **Group Datasets** filter now supports multiple types of outputs including `
 ## The filters Gradient and Gradient Of Unstructured DataSet have been merged #
 
 Before ParaView 5.10, these two filters could be used to compute the gradient of a dataset:
-- `Gradient` based on `vtkImageGradient` for `vtkImageData` only
-- `Gradient Of Unstructured DataSet` based on `vtkGradientFilter` for all `vtkDataSet`
+- `Gradient` for `vtkImageData` only
+- `Gradient Of Unstructured DataSet` for all `vtkDataSet` types
 
-These filters have been replaced with a unique `Gradient` filter based on `vtkGradientFilter` and including the functionalities from the former `Gradient` filter. The default behavior always uses the `vtkGradientFilter` implementation.
+These two filters have been replaced with a single `Gradient` filter based on `vtkGradientFilter` and including the functionalities from the former `Gradient` filter.
 
-For `vtkImageData` objects, it is still possible to use the `vtkImageGradient` implementation through the `BoundaryMethod` property, which has two options defining the gradient computation at the boundaries:
-- `Smoothed` corresponds to the `vtkImageGradient` implementation (the old `Gradient`) and uses central differencing for the boundary elements by duplicating their values
-- `Non-Smoothed` corresponds to the `vtkGradientFilter` implementation (the old `Gradient Of Unstructured DataSet`) and simply uses forward/backward differencing for the boundary elements
+For `vtkImageData` objects, it is still possible to use the specialized implementation through the `BoundaryMethod` property, which has two options defining the gradient computation at the boundaries:
+- `Smoothed` corresponds to the the old `Gradient` filter and uses central differencing for the boundary elements by duplicating their values
+- `Non-Smoothed` corresponds to the old `Gradient of Unstructured DataSet` implementation and simply uses forward/backward differencing for the boundary elements
 
 For all other `vtkDataSet` objects, the filter usage is unchanged.
-
 
 ## **Resample With Dataset** can work with partial arrays
 
@@ -311,7 +309,7 @@ Filter named **Grid Connectivity** has been removed. The **Connectivity** filter
 
 ## New **Convert To Point Cloud** filter
 
-A new filter, **Convert To Point Cloud**, has been added. It let users convert any dataset into a `vtkPolyData` containing the same points as the inputs but with either a single poly vertex cell, many vertex cells or no cells.
+A new filter, **Convert To Point Cloud**, has been added. It let users convert any dataset into a `vtkPolyData` containing the same points as the inputs but with either a single poly vertex cell, one vertex cell per point, or no cells.
 
 >![convert-to-point-cloud](img/5.10.0/convert-to-point-cloud.png)
 
@@ -415,14 +413,13 @@ The *Selection Display Inspector* been removed since the *Find Data* panel prese
 
 The following was added to the ParaView Python script editor:
 
-* Auto save of opened buffers in swap files and possibility of recovery in case ParaView crashes
+* Auto save of opened buffers in swap files and the option of recovery if ParaView crashes
 * Opening of multiple tabs in the editor
 * Integration with ParaView's Python trace functionality in its own tab
-* Integration with the Programmable Filter/Source/Annotation in a synchronized tab
-* Improvements of the Undo/Redo feature within the editor
+* Integration with the **Programmable Filter**/**Source**/**Annotation** in a synchronized tab
+* Improvements of the undo/redo feature within the editor
 * A new entry in ParaView's "Edit" menu to access the editor directly
 * Faster syntax highlighting
-* Undo/redo capabilities
 * More robust file saving
 
 >![python-editor](img/5.10.0/python-editor.png)
@@ -466,9 +463,9 @@ Two new buttons "Reset Camera Closest" and "Zoom Closest To Data" has been added
 
 ## Effect of modifier key reversed for saving, copying screenshots
 
-When clicking the screenshot capture button, a simple click now saves the screenshot to a file and a click with a modifier key (Option or Ctrl) saves it to the clipboard, which is the opposite of what it was before.
+When clicking the screenshot capture button, a simple click now saves the screenshot to a file and a click with a modifier key (Option or Ctrl) copies it to the clipboard, which is the opposite of what it was before.
 
-When saving a screenshot to the clipboard, the view now blinks.
+When copying a screenshot to the clipboard, the view now blinks to confirm the copying action.
 
 ## OSPRay Material Editor
 
@@ -484,13 +481,11 @@ This editor enables the following:
 
 ## OSPRay Runtime Detection
 
-ParaView will now detect whether OSPRay is supported at runtime and disable it
-rather than acting as if it works. Of note is when using under macOS' Rosetta
-translation support of `x86_64` binaries on `arm64` hardware.
+ParaView will now detect whether OSPRay is supported at runtime and enable it only if it is. Of note is when using under macOS' Rosetta translation support of `x86_64` binaries on `arm64` hardware.
 
 ## "ParaView Community Support" item in "Help" menu now links to discourse.paraview.org
 
-The "ParaView Community Support" link in the "Help" menu will send you to the [ParaView Support Discourse[(https://discourse.paraview.org)] page to open a new topic or search for an existing one.
+The "ParaView Community Support" link in the "Help" menu will send you to the [ParaView Support Discourse](https://discourse.paraview.org) page to open a new topic or search for an existing one.
 
 # Python scripting improvements
 
@@ -577,7 +572,7 @@ Many updates to improve the OpenVR plugin support have been made in ParaView 5.1
 
 ## zSpace plugin
 
-A new Microsoft Windows-only plugin named **zSpace** has been added. It adds a new view named **zSpaceView** that let a user interact with a zSpace device directly. This device is designed to work with Crystal Eyes stereo, in full screen or in a cave display. The zSpace glasses use a head tracking system that allow the user to look around 3D object by moving his head.
+A new Microsoft Windows-only plugin named **zSpace** has been added. It adds a new view named **zSpaceView** that let a user interact with a zSpace device directly. This device is designed to work with Crystal Eyes (quad-buffered) stereo, in full screen or in a CAVE display. The zSpace glasses use a head tracking system that allow you to look around 3D object by moving your head.
 
 This plugin requires a [zSpace System Software >= 4.4.2](https://support.zspace.com/s/article/zSpace-System-Software-release-Required?language=en_US), and a SDK version >= 4.0.0.
 It was tested on a zSpace 200 device but should be compatible with more recent devices as well.
@@ -619,7 +614,7 @@ The `need` return values are of type `logical` rather than an integer.
 
 # Catalyst 2.0 Steering
 
-Add steering capabilities to Catalyst 2, by implementing the `catalyst_results` method in ParaView Catalyst.
+Add steering capabilities to Catalyst 2.0, by implementing the `catalyst_results` method in ParaView Catalyst.
 
 With steering, you are now able to change simulation parameters through the ParaView Catalyst GUI. See `CxxSteeringExample` in `Examples/Catalyst2` folder for live example of the feature.
 
@@ -635,7 +630,7 @@ Catalyst Adaptor API V2 now supports polygonal and polyhedral elements. This is 
 
 ## Added support for empty mesh Blueprint coming from Conduit to Catalyst
 
-Catalyst 2.0 used to fail when the simulation code sent a mesh through Conduit with a full Conduit tree that matches the Mesh Blueprint but without any cells or points. This can happen, for example, with distributed data where some of the dataset may be empty on some ranks. When using `vtkUnstructedGrid`s in Catalyst 2.0 now checks the number of cells in the Conduit tree and returns an empty `vtkUnstructuredGrid` when needed.
+Catalyst 2.0 used to fail when the simulation code sent a mesh through Conduit with a full Conduit tree that matches the Mesh Blueprint but without any cells or points. This can happen, for example, with distributed data where some of the dataset may be empty on some ranks. When using `vtkUnstructedGrid`s, Catalyst 2.0 now checks the number of cells in the Conduit tree and returns an empty `vtkUnstructuredGrid` when needed.
 
 [More](https://gitlab.kitware.com/paraview/paraview/-/issues/20833)
 
@@ -680,7 +675,7 @@ A new example plugin **AddPQProxy** has been added to demonstrate how to use the
 
 Three new CMake options to the `paraview_add_plugin` function have been added:
 
- * **DOCUMENTATION_ADD_PATTERNS**: If specified, add patterns for the documentation files within `DOCUMENTATION_DIR` other than the default ones (i.e., `*.html`, `*.css`, `*.png`, `*.js` and `*.jpg`). This can be used to add new patterns (ex: `*.txt`) or even subdirectories (ex: `subDir/*.*`). Subdirectory hierarchy is kept so if you store all of your images in a `img/` sub directory and if your html file is at the root level of your documentation directory, then you should reference them using `<img src="img/my_image.png"/>` in the html file.
+ * **DOCUMENTATION_ADD_PATTERNS**: If specified, add patterns for the documentation files within `DOCUMENTATION_DIR` other than the default ones (i.e., `*.html`, `*.css`, `*.png`, `*.js` and `*.jpg`). This can be used to add new patterns (ex: `*.txt`) or even subdirectories (ex: `subDir/*.*`). Subdirectory hierarchy is kept so if you store all of your images in a `img/` sub directory and if your HTML file is at the root level of your documentation directory, then you should reference them using `<img src="img/my_image.png"/>` in the HTML file.
 
  * **DOCUMENTATION_TOC**: If specified, the function will use the given string to describe the table of content for the documentation. A TOC is divided into sections. Every section points to a specific file (`ref` keyword) that is accessed when double-clicked in the UI. A section that contains other sections can be folded into the UI. An example of such a string is:
 ```html
@@ -765,9 +760,9 @@ A new CMake option `PARAVIEW_WINDOWS_PYTHON_DEBUGGABLE` has been added. Turn thi
 
 The [documentation](https://kitware.github.io/paraview-docs/nightly/cxx/Offscreen.html) about OpenGL options has been improved. In addition, CMake now checks which options are compatible with each other.
 
-## Force `QString` conversion to/from Utf8 bytes
+## Force `QString` conversion to and from Utf8 bytes
 
-The practice of converting `QString` data to a user's current locale has been replaced by an explicit conversion to UTF-8 encoding. This change integrates neatly with VTK's UTF-8 everywhere policy and is in line with Qt5 string handling, whereby C++ `string`s/`char*` are assumed to be UTF-8 encoded. Any legacy text files containing extended character sets should be saved as UTF-8 documents, in order to load them in the latest version of ParaView.
+The practice of converting `QString` data to a user's current locale has been replaced by an explicit conversion to UTF-8 encoding. This change integrates neatly with VTK's UTF-8 everywhere policy and is in line with Qt5 string handling, whereby C++ `string`s and `char*` are assumed to be UTF-8 encoded. Any legacy text files containing extended character sets should be saved as UTF-8 documents, in order to load them in the latest version of ParaView.
 
 ## Use wide string Windows API for directory listings
 
