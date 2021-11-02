@@ -23,7 +23,6 @@
 #include "vtkMapper.h"
 #include "vtkNumberToString.h"
 #include "vtkObjectFactory.h"
-#include "vtkOpenVROverlayInternal.h"
 #include "vtkPVOpenVRHelper.h"
 #include "vtkPVRenderView.h"
 #include "vtkPolyData.h"
@@ -36,6 +35,7 @@
 #include "vtkShaderProperty.h"
 #include "vtkSkybox.h"
 #include "vtkTexture.h"
+#include "vtkVRCamera.h"
 #include "vtkWindowToImageFilter.h"
 #include "vtkXMLDataElement.h"
 #include "vtkXMLDataObjectWriter.h"
@@ -110,10 +110,6 @@ void vtkPVOpenVRExporter::ExportLocationsAsSkyboxes(vtkPVOpenVRHelper* helper,
   for (auto& loci : locations)
   {
     auto& loc = loci.second;
-    if (!loc.Pose->Loaded)
-    {
-      continue;
-    }
     // create subdir for each pose
     std::ostringstream sdir;
     sdir << dir << count;
@@ -313,12 +309,7 @@ void vtkPVOpenVRExporter::ExportLocationsAsView(vtkPVOpenVRHelper* helper, vtkSM
   for (auto& loci : locations)
   {
     auto& loc = loci.second;
-    if (!loc.Pose->Loaded)
-    {
-      continue;
-    }
-
-    vtkOpenVRCameraPose& pose = *loc.Pose;
+    vtkVRCamera::Pose& pose = *loc.Pose;
 
     helper->LoadLocationState(loci.first);
 
@@ -683,15 +674,8 @@ void vtkPVOpenVRExporter::ExportLocationsAsView(vtkPVOpenVRHelper* helper, vtkSM
 
   vtkNew<vtkXMLDataElement> cpel;
   cpel->SetName("CameraPoses");
-  count = 0;
-  for (auto& loci : locations)
+  for (count = 0; count < locations.size(); ++count)
   {
-    auto& loc = loci.second;
-    if (!loc.Pose->Loaded)
-    {
-      continue;
-    }
-
     vtkNew<vtkXMLDataElement> poseel;
     poseel->SetName("CameraPose");
     poseel->SetIntAttribute("PoseNumber", static_cast<int>(count + 1));
@@ -701,7 +685,6 @@ void vtkPVOpenVRExporter::ExportLocationsAsView(vtkPVOpenVRHelper* helper, vtkSM
       poseel->SetAttribute("ShowPhotoSphere", defaultSkyboxes[count + 1].c_str());
     }
     cpel->AddNestedElement(poseel);
-    count++;
   }
   topel2->AddNestedElement(cpel);
   vtkXMLUtilities::WriteElementToFile(topel2, "pv-view/extra.xml", &indent);

@@ -26,3 +26,17 @@ interact with them. The web page to load is pyut into the text table
 property. In VR the laser pointers can be used to interact with the web page
 and text can be entered as well from the properties panel for the
 representation.
+
+## Building the plugin with OpenXR support
+
+To enable support for the OpenXR runtime in the ParaView plugin, first build
+the OpenXR-SDK.  For development and debugging purposes use
+[this](https://github.com/KhronosGroup/OpenXR-SDK-Source) repo, for
+production, use [this](https://github.com/KhronosGroup/OpenXR-SDK) one.
+
+Then provide the following additional cmake variables when configuring
+paraview:
+
+`-DVTK_MODULE_ENABLE_VTK_RenderingOpenXR:STRING=WANT`
+`-DOpenXR_INCLUDE_DIR:PATH=<path-to-openxr-install-dir>\include\openxr`
+`-DOpenXR_LIBRARY:FILEPATH=<path-to-openxr-install-dir>\lib\openxr_loader.lib`

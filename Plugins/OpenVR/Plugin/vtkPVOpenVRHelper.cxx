@@ -16,6 +16,14 @@
 // must be before others due to glew include
 #include "vtkOpenVRRenderWindow.h"
 
+#if PARAVIEW_HAS_OPENXR_SUPPORT
+#include "vtkOpenXRRenderWindow.h"
+#include "vtkOpenXRRenderWindowInteractor.h"
+#include "vtkOpenXRRenderer.h"
+#endif
+
+#include "vtkVRRenderWindow.h"
+
 #include "QVTKOpenGLWindow.h"
 #include "pqActiveObjects.h"
 #include "pqApplicationCore.h"
@@ -40,10 +48,8 @@
 #include "vtkOpenGLQuadHelper.h"
 #include "vtkOpenGLShaderCache.h"
 #include "vtkOpenGLState.h"
-#include "vtkOpenVRInteractorStyle.h"
-#include "vtkOpenVROverlay.h"
-#include "vtkOpenVROverlayInternal.h"
 #include "vtkOpenVRPolyfill.h"
+#include "vtkOpenVRRenderWindow.h"
 #include "vtkOpenVRRenderWindowInteractor.h"
 #include "vtkOpenVRRenderer.h"
 #include "vtkPVOpenVRCollaborationClient.h"
@@ -72,8 +78,12 @@
 #include "vtkTimerLog.h"
 #include "vtkTransform.h"
 #include "vtkVRFollower.h"
+#include "vtkVRInteractorStyle.h"
 #include "vtkVRModel.h"
 #include "vtkVRRay.h"
+#include "vtkVRRenderWindowInteractor.h"
+#include "vtkVRRenderer.h"
+#include "vtkVectorOperators.h"
 #include "vtkWidgetEvent.h"
 #include "vtkXMLDataElement.h"
 #include "vtkXMLUtilities.h"
@@ -88,7 +98,7 @@
 
 vtkPVOpenVRHelperLocation::vtkPVOpenVRHelperLocation()
 {
-  this->Pose = new vtkOpenVRCameraPose();
+  this->Pose = new vtkVRCamera::Pose();
 }
 vtkPVOpenVRHelperLocation::~vtkPVOpenVRHelperLocation()
 {
@@ -243,6 +253,18 @@ void vtkPVOpenVRHelper::SetCropSnapping(int val)
 // end of methods that mostly just forward to helper classes
 //==========================================================
 
+void vtkPVOpenVRHelper::SetUseOpenXR(bool useOpenXr)
+{
+#if PARAVIEW_HAS_OPENXR_SUPPORT
+  this->UseOpenXR = useOpenXr;
+#else
+  if (useOpenXr)
+  {
+    vtkWarningMacro("Attempted to enable UseOpenXR without OpenXR support");
+  }
+#endif
+}
+
 bool vtkPVOpenVRHelper::CollaborationConnect()
 {
   if (!this->Renderer)
@@ -251,8 +273,7 @@ bool vtkPVOpenVRHelper::CollaborationConnect()
   }
 
   // add observers to vr rays
-  auto ovr_rw = vtkVRRenderWindow::SafeDownCast(this->RenderWindow);
-  if (ovr_rw)
+  if (auto* ovr_rw = vtkVRRenderWindow::SafeDownCast(this->RenderWindow))
   {
     vtkVRModel* cmodel = ovr_rw->GetModelForDevice(vtkEventDataDevice::LeftController);
     if (cmodel)
@@ -290,46 +311,86 @@ bool vtkPVOpenVRHelper::CollaborationDisconnect()
   return this->CollaborationClient->Disconnect();
 }
 
+void vtkPVOpenVRHelper::LoadNextCameraPose()
+{
+  if (this->SavedCameraPoses.empty())
+  {
+    return;
+  }
+
+  auto lowerIter = this->SavedCameraPoses.upper_bound(this->LastCameraPoseIndex);
+  int nextValue = lowerIter != this->SavedCameraPoses.end() ? lowerIter->first
+                                                            : this->SavedCameraPoses.begin()->first;
+
+  this->LoadCameraPose(nextValue);
+}
+
+void vtkPVOpenVRHelper::LoadPoseInternal(vtkVRRenderWindow* vr_rw, int slot)
+{
+  auto p_iter = this->SavedCameraPoses.find(slot);
+  if (p_iter != this->SavedCameraPoses.end())
+  {
+    // If we ever add ability to remove camera poses from the SavedCameraPoses
+    // map, be sure to check that LastCameraPoseIndex isn't left holding a key
+    // which is no longer valid.
+    this->LastCameraPoseIndex = slot;
+    vtkVRCamera::Pose pose = p_iter->second;
+    vtkRenderer* ren = static_cast<vtkRenderer*>(vr_rw->GetRenderers()->GetItemAsObject(0));
+    vtkVRCamera* cam = vtkVRCamera::SafeDownCast(ren->GetActiveCamera());
+    cam->ApplyPoseToCamera(&pose, vr_rw);
+    ren->ResetCameraClippingRange();
+    this->InvokeEvent(vtkCommand::LoadStateEvent, reinterpret_cast<void*>(slot));
+  }
+}
+
 void vtkPVOpenVRHelper::LoadCameraPose(int slot)
 {
   if (this->RenderWindow)
   {
-    auto ovr_rw = vtkOpenVRRenderWindow::SafeDownCast(this->RenderWindow);
-    if (ovr_rw)
+    if (auto* vr_rw = vtkVRRenderWindow::SafeDownCast(this->RenderWindow))
     {
-      ovr_rw->GetDashboardOverlay()->LoadCameraPose(slot);
-      this->ToggleShowControls();
+      this->LoadPoseInternal(vr_rw, slot);
     }
   }
+}
+
+void vtkPVOpenVRHelper::SavePoseInternal(vtkVRRenderWindow* vr_rw, int slot)
+{
+  vtkVRCamera::Pose pose = this->SavedCameraPoses[slot];
+  vtkRenderer* ren = static_cast<vtkRenderer*>(vr_rw->GetRenderers()->GetItemAsObject(0));
+  vtkVRCamera* cam = vtkVRCamera::SafeDownCast(ren->GetActiveCamera());
+  cam->SetPoseFromCamera(&pose, vr_rw);
+  this->InvokeEvent(vtkCommand::SaveStateEvent, reinterpret_cast<void*>(slot));
 }
 
 void vtkPVOpenVRHelper::SaveCameraPose(int slot)
 {
   if (this->RenderWindow)
   {
-    auto ovr_rw = vtkOpenVRRenderWindow::SafeDownCast(this->RenderWindow);
-    if (ovr_rw)
+    auto vr_rw = vtkVRRenderWindow::SafeDownCast(this->RenderWindow);
+    if (vr_rw)
     {
-      ovr_rw->GetDashboardOverlay()->SaveCameraPose(slot);
+      this->SavePoseInternal(vr_rw, slot);
     }
-    this->SaveLocationState(slot);
+    else
+    {
+      this->SaveLocationState(slot);
+    }
   }
 }
 
 void vtkPVOpenVRHelper::collabGoToPose(
-  vtkOpenVRCameraPose* pose, double* collabTrans, double* collabDir)
+  vtkVRCamera::Pose* pose, double* collabTrans, double* collabDir)
 {
-  auto ovr_rw = vtkOpenVRRenderWindow::SafeDownCast(this->RenderWindow);
-  if (ovr_rw)
+  if (auto* vr_rw = vtkVRRenderWindow::SafeDownCast(this->RenderWindow))
   {
-    // TODO: vtk modif, modify vtkOpenVRCameraPose::Apply to handle vtkVRCamera and
-    // vtkVRRenderWindow
-    pose->Apply(static_cast<vtkOpenVRCamera*>(this->Renderer->GetActiveCamera()), ovr_rw);
+    vtkVRCamera* cam = static_cast<vtkVRCamera*>(this->Renderer->GetActiveCamera());
+    cam->ApplyPoseToCamera(pose, vr_rw);
     this->Renderer->ResetCameraClippingRange();
-    ovr_rw->UpdateHMDMatrixPose();
-    ovr_rw->SetPhysicalTranslation(collabTrans);
-    ovr_rw->SetPhysicalViewDirection(collabDir);
-    ovr_rw->UpdateHMDMatrixPose();
+    vr_rw->UpdateHMDMatrixPose();
+    vr_rw->SetPhysicalTranslation(collabTrans);
+    vr_rw->SetPhysicalViewDirection(collabDir);
+    vr_rw->UpdateHMDMatrixPose();
   }
   else
   {
@@ -342,11 +403,11 @@ void vtkPVOpenVRHelper::ComeToMe()
   // get the current pose
   if (this->RenderWindow)
   {
-    auto ovr_rw = vtkOpenVRRenderWindow::SafeDownCast(this->RenderWindow);
-    if (ovr_rw)
+    if (auto* vr_rw = vtkVRRenderWindow::SafeDownCast(this->RenderWindow))
     {
-      vtkOpenVRCameraPose pose;
-      pose.Set(static_cast<vtkOpenVRCamera*>(this->Renderer->GetActiveCamera()), ovr_rw);
+      vtkVRCamera* cam = static_cast<vtkVRCamera*>(this->Renderer->GetActiveCamera());
+      vtkVRCamera::Pose pose;
+      cam->SetPoseFromCamera(&pose, vr_rw);
       double* collabTrans = this->OpenVRPolyfill->GetPhysicalTranslation();
       double* collabDir = this->OpenVRPolyfill->GetPhysicalViewDirection();
       this->CollaborationClient->GoToPose(pose, collabTrans, collabDir);
@@ -357,7 +418,7 @@ void vtkPVOpenVRHelper::ComeToMe()
 void vtkPVOpenVRHelper::SetScaleFactor(float val)
 {
   auto style = this->Interactor
-    ? vtkOpenVRInteractorStyle::SafeDownCast(this->Interactor->GetInteractorStyle())
+    ? vtkVRInteractorStyle::SafeDownCast(this->Interactor->GetInteractorStyle())
     : nullptr;
   if (style)
   {
@@ -370,7 +431,7 @@ void vtkPVOpenVRHelper::SetScaleFactor(float val)
 void vtkPVOpenVRHelper::SetMotionFactor(float val)
 {
   auto style = this->Interactor
-    ? vtkOpenVRInteractorStyle::SafeDownCast(this->Interactor->GetInteractorStyle())
+    ? vtkVRInteractorStyle::SafeDownCast(this->Interactor->GetInteractorStyle())
     : nullptr;
   if (style)
   {
@@ -388,84 +449,79 @@ void vtkPVOpenVRHelper::SetBaseStationVisibility(bool v)
   this->BaseStationVisibility = v;
   if (this->RenderWindow)
   {
-    // TODO: add vtkVRRenderWindow::SetBaseStationVisibility ?
-    auto ovr_rw = vtkOpenVRRenderWindow::SafeDownCast(this->RenderWindow);
-    if (ovr_rw)
+    if (auto* vr_rw = vtkVRRenderWindow::SafeDownCast(this->RenderWindow))
     {
-      ovr_rw->SetBaseStationVisibility(v);
+      vr_rw->SetBaseStationVisibility(v);
+      this->Modified();
     }
   }
-  this->Modified();
 }
 
 void vtkPVOpenVRHelper::ToggleShowControls()
 {
   // only show when in VR not simulated
-  auto vr_rw = vtkVRRenderWindow::SafeDownCast(this->RenderWindow);
-  if (!vr_rw)
+  if (auto* vr_rw = vtkVRRenderWindow::SafeDownCast(this->RenderWindow))
   {
-    return;
-  }
+    if (!this->QWidgetWidget)
+    {
+      this->QWidgetWidget = vtkQWidgetWidget::New();
+      this->QWidgetWidget->CreateDefaultRepresentation();
+      this->QWidgetWidget->SetWidget(this->OpenVRControls);
+      this->OpenVRControls->show();
+      // this->OpenVRControls->resize(960, 700);
+      this->QWidgetWidget->SetCurrentRenderer(this->Renderer);
+      this->QWidgetWidget->SetInteractor(this->Interactor);
+    }
 
-  if (!this->QWidgetWidget)
-  {
-    this->QWidgetWidget = vtkQWidgetWidget::New();
-    this->QWidgetWidget->CreateDefaultRepresentation();
-    this->QWidgetWidget->SetWidget(this->OpenVRControls);
-    this->OpenVRControls->show();
-    // this->OpenVRControls->resize(960, 700);
-    this->QWidgetWidget->SetCurrentRenderer(this->Renderer);
-    this->QWidgetWidget->SetInteractor(this->Interactor);
-  }
+    if (!this->QWidgetWidget->GetEnabled())
+    {
+      // place widget in front of the viewer, facing them
+      double aspect =
+        static_cast<double>(this->OpenVRControls->height()) / this->OpenVRControls->width();
+      double scale = vr_rw->GetPhysicalScale();
 
-  if (!this->QWidgetWidget->GetEnabled())
-  {
-    // place widget in front of the viewer, facing them
-    double aspect =
-      static_cast<double>(this->OpenVRControls->height()) / this->OpenVRControls->width();
-    double scale = vr_rw->GetPhysicalScale();
+      vtkVector3d camPos;
+      this->Renderer->GetActiveCamera()->GetPosition(camPos.GetData());
+      vtkVector3d camDOP;
+      this->Renderer->GetActiveCamera()->GetDirectionOfProjection(camDOP.GetData());
+      vtkVector3d physUp;
+      vr_rw->GetPhysicalViewUp(physUp.GetData());
 
-    vtkVector3d camPos;
-    this->Renderer->GetActiveCamera()->GetPosition(camPos.GetData());
-    vtkVector3d camDOP;
-    this->Renderer->GetActiveCamera()->GetDirectionOfProjection(camDOP.GetData());
-    vtkVector3d physUp;
-    vr_rw->GetPhysicalViewUp(physUp.GetData());
+      // orthogonalize dop to vup
+      camDOP = camDOP - physUp * camDOP.Dot(physUp);
+      camDOP.Normalize();
+      vtkVector3d vRight;
+      vRight = camDOP.Cross(physUp);
+      vtkVector3d center = camPos + camDOP * scale * 2.7;
 
-    // orthogonalize dop to vup
-    camDOP = camDOP - physUp * camDOP.Dot(physUp);
-    camDOP.Normalize();
-    vtkVector3d vRight;
-    vRight = camDOP.Cross(physUp);
-    vtkVector3d center = camPos + camDOP * scale * 2.7;
+      vtkPlaneSource* ps = this->QWidgetWidget->GetQWidgetRepresentation()->GetPlaneSource();
 
-    vtkPlaneSource* ps = this->QWidgetWidget->GetQWidgetRepresentation()->GetPlaneSource();
+      vtkVector3d pos = center - 2.6 * physUp * scale * aspect - 2.0 * vRight * scale;
+      ps->SetOrigin(pos.GetData());
+      pos = center - 2.6 * physUp * scale * aspect + 2.0 * vRight * scale;
+      ps->SetPoint1(pos.GetData());
+      pos = center + 1.4 * physUp * scale * aspect - 2.0 * vRight * scale;
+      ps->SetPoint2(pos.GetData());
 
-    vtkVector3d pos = center - 2.6 * physUp * scale * aspect - 2.0 * vRight * scale;
-    ps->SetOrigin(pos.GetData());
-    pos = center - 2.6 * physUp * scale * aspect + 2.0 * vRight * scale;
-    ps->SetPoint1(pos.GetData());
-    pos = center + 1.4 * physUp * scale * aspect - 2.0 * vRight * scale;
-    ps->SetPoint2(pos.GetData());
-
-    this->QWidgetWidget->SetInteractor(this->Interactor);
-    this->QWidgetWidget->SetCurrentRenderer(this->Renderer);
-    this->QWidgetWidget->SetEnabled(1);
-    vtkVRModel* vrmodel = vr_rw->GetModelForDevice(vtkEventDataDevice::RightController);
-    vrmodel->SetShowRay(true);
-    vrmodel->SetRayLength(this->Renderer->GetActiveCamera()->GetClippingRange()[1]);
-  }
-  else
-  {
-    this->QWidgetWidget->SetEnabled(0);
-    this->NeedStillRender = true;
+      this->QWidgetWidget->SetInteractor(this->Interactor);
+      this->QWidgetWidget->SetCurrentRenderer(this->Renderer);
+      this->QWidgetWidget->SetEnabled(1);
+      vtkVRModel* vrmodel = vr_rw->GetModelForDevice(vtkEventDataDevice::RightController);
+      vrmodel->SetShowRay(true);
+      vrmodel->SetRayLength(this->Renderer->GetActiveCamera()->GetClippingRange()[1]);
+    }
+    else
+    {
+      this->QWidgetWidget->SetEnabled(0);
+      this->NeedStillRender = true;
+    }
   }
 }
 
 void vtkPVOpenVRHelper::SetDrawControls(bool val)
 {
   auto style = this->Interactor
-    ? vtkOpenVRInteractorStyle::SafeDownCast(this->Interactor->GetInteractorStyle())
+    ? vtkVRInteractorStyle::SafeDownCast(this->Interactor->GetInteractorStyle())
     : nullptr;
   if (style)
   {
@@ -575,7 +631,7 @@ void vtkPVOpenVRHelper::SetEditableFieldValue(std::string value)
 void vtkPVOpenVRHelper::SetHoverPick(bool val)
 {
   auto style = this->Interactor
-    ? vtkOpenVRInteractorStyle::SafeDownCast(this->Interactor->GetInteractorStyle())
+    ? vtkVRInteractorStyle::SafeDownCast(this->Interactor->GetInteractorStyle())
     : nullptr;
   if (style)
   {
@@ -590,7 +646,7 @@ void vtkPVOpenVRHelper::SetRightTriggerMode(std::string const& text)
   this->RightTriggerMode = text;
 
   auto style = this->Interactor
-    ? vtkOpenVRInteractorStyle::SafeDownCast(this->Interactor->GetInteractorStyle())
+    ? vtkVRInteractorStyle::SafeDownCast(this->Interactor->GetInteractorStyle())
     : nullptr;
   if (!style)
   {
@@ -599,37 +655,34 @@ void vtkPVOpenVRHelper::SetRightTriggerMode(std::string const& text)
 
   style->HidePickActor();
 
-  auto vr_rw = vtkVRRenderWindow::SafeDownCast(this->RenderWindow);
-  if (!vr_rw)
+  if (auto* vr_rw = vtkVRRenderWindow::SafeDownCast(this->RenderWindow))
   {
-    return;
-  }
+    vtkVRModel* vrmodel = vr_rw->GetModelForDevice(vtkEventDataDevice::RightController);
 
-  vtkVRModel* vrmodel = vr_rw->GetModelForDevice(vtkEventDataDevice::RightController);
+    if (vrmodel)
+    {
+      vrmodel->SetShowRay(this->QWidgetWidget->GetEnabled() || text == "Pick");
+    }
 
-  if (vrmodel)
-  {
-    vrmodel->SetShowRay(this->QWidgetWidget->GetEnabled() || text == "Pick");
-  }
+    style->GrabWithRayOff();
 
-  style->GrabWithRayOff();
-
-  if (text == "Grab")
-  {
-    style->MapInputToAction(vtkCommand::Select3DEvent, VTKIS_POSITION_PROP);
-  }
-  else if (text == "Pick")
-  {
-    style->MapInputToAction(vtkCommand::Select3DEvent, VTKIS_POSITION_PROP);
-    style->GrabWithRayOn();
-  }
-  else if (text == "Interactive Crop")
-  {
-    style->MapInputToAction(vtkCommand::Select3DEvent, VTKIS_CLIP);
-  }
-  else if (text == "Probe")
-  {
-    style->MapInputToAction(vtkCommand::Select3DEvent, VTKIS_PICK);
+    if (text == "Grab")
+    {
+      style->MapInputToAction(vtkCommand::Select3DEvent, VTKIS_POSITION_PROP);
+    }
+    else if (text == "Pick")
+    {
+      style->MapInputToAction(vtkCommand::Select3DEvent, VTKIS_POSITION_PROP);
+      style->GrabWithRayOn();
+    }
+    else if (text == "Interactive Crop")
+    {
+      style->MapInputToAction(vtkCommand::Select3DEvent, VTKIS_CLIP);
+    }
+    else if (text == "Probe")
+    {
+      style->MapInputToAction(vtkCommand::Select3DEvent, VTKIS_PICK);
+    }
   }
 }
 
@@ -638,6 +691,13 @@ bool vtkPVOpenVRHelper::InteractorEventCallback(vtkObject*, unsigned long eventI
   vtkEventData* edata = static_cast<vtkEventData*>(calldata);
   this->Widgets->SetLastEventData(edata);
   vtkEventDataDevice3D* edd = edata->GetAsEventDataDevice3D();
+
+  if (edd && edd->GetDevice() == vtkEventDataDevice::LeftController &&
+    edd->GetAction() == vtkEventDataAction::Press && eventID == vtkCommand::NextPose3DEvent)
+  {
+    this->LoadNextCameraPose();
+    return true;
+  }
 
   if (edd && edd->GetDevice() == vtkEventDataDevice::LeftController &&
     this->Widgets->GetNavigationPanelVisibility() && eventID == vtkCommand::Move3DEvent /* &&
@@ -736,83 +796,80 @@ void vtkPVOpenVRHelper::SaveState(vtkPVXMLElement* root)
   {
     auto& loc = loci.second;
 
-    vtkOpenVRCameraPose& pose = *loc.Pose;
-    if (pose.Loaded)
+    vtkVRCamera::Pose& pose = *(loc.Pose);
+    vtkNew<vtkPVXMLElement> locel;
+    locel->SetName("Location");
+    locel->AddAttribute("PoseNumber", loci.first);
+
+    // camera pose
     {
-      vtkNew<vtkPVXMLElement> locel;
-      locel->SetName("Location");
-      locel->AddAttribute("PoseNumber", loci.first);
-
-      // camera pose
-      {
-        vtkNew<vtkPVXMLElement> el;
-        el->SetName("CameraPose");
-        el->AddAttribute("PoseNumber", loci.first);
-        addVectorAttribute(el, "Position", pose.Position, 3);
-        el->AddAttribute("Distance", pose.Distance, 20);
-        el->AddAttribute("MotionFactor", pose.MotionFactor, 20);
-        addVectorAttribute(el, "Translation", pose.Translation, 3);
-        addVectorAttribute(el, "InitialViewUp", pose.PhysicalViewUp, 3);
-        addVectorAttribute(el, "InitialViewDirection", pose.PhysicalViewDirection, 3);
-        addVectorAttribute(el, "ViewDirection", pose.ViewDirection, 3);
-        locel->AddNestedElement(el);
-      }
-
-      locel->AddAttribute("NavigationPanel", loc.NavigationPanelVisibility);
-
-      { // regular crops
-        vtkNew<vtkPVXMLElement> el;
-        el->SetName("CropPlanes");
-        for (auto i : loc.CropPlaneStates)
-        {
-          vtkNew<vtkPVXMLElement> child;
-          child->SetName("Crop");
-          child->AddAttribute("origin0", i.first[0], 20);
-          child->AddAttribute("origin1", i.first[1], 20);
-          child->AddAttribute("origin2", i.first[2], 20);
-          child->AddAttribute("normal0", i.second[0], 20);
-          child->AddAttribute("normal1", i.second[1], 20);
-          child->AddAttribute("normal2", i.second[2], 20);
-          el->AddNestedElement(child);
-        }
-        locel->AddNestedElement(el);
-      }
-
-      { // thick crops
-        vtkNew<vtkPVXMLElement> el;
-        el->SetName("ThickCrops");
-        for (auto t : loc.ThickCropStates)
-        {
-          vtkNew<vtkPVXMLElement> child;
-          child->SetName("Crop");
-          for (int i = 0; i < 16; ++i)
-          {
-            std::ostringstream o;
-            o << "transform" << i;
-            child->AddAttribute(o.str().c_str(), t[i]);
-          }
-          el->AddNestedElement(child);
-        }
-        locel->AddNestedElement(el);
-      }
-
-      // save the visibility information
-      {
-        vtkNew<vtkPVXMLElement> el;
-        el->SetName("Visibility");
-        for (auto vdi : loc.Visibility)
-        {
-          vtkNew<vtkPVXMLElement> gchild;
-          gchild->SetName("RepVisibility");
-          gchild->AddAttribute("id", vdi.first->GetGlobalID());
-          gchild->AddAttribute("visibility", vdi.second);
-          el->AddNestedElement(gchild);
-        }
-        locel->AddNestedElement(el);
-      }
-
-      e->AddNestedElement(locel);
+      vtkNew<vtkPVXMLElement> el;
+      el->SetName("CameraPose");
+      el->AddAttribute("PoseNumber", loci.first);
+      addVectorAttribute(el, "Position", pose.Position, 3);
+      el->AddAttribute("Distance", pose.Distance, 20);
+      el->AddAttribute("MotionFactor", pose.MotionFactor, 20);
+      addVectorAttribute(el, "Translation", pose.Translation, 3);
+      addVectorAttribute(el, "InitialViewUp", pose.PhysicalViewUp, 3);
+      addVectorAttribute(el, "InitialViewDirection", pose.PhysicalViewDirection, 3);
+      addVectorAttribute(el, "ViewDirection", pose.ViewDirection, 3);
+      locel->AddNestedElement(el);
     }
+
+    locel->AddAttribute("NavigationPanel", loc.NavigationPanelVisibility);
+
+    { // regular crops
+      vtkNew<vtkPVXMLElement> el;
+      el->SetName("CropPlanes");
+      for (auto i : loc.CropPlaneStates)
+      {
+        vtkNew<vtkPVXMLElement> child;
+        child->SetName("Crop");
+        child->AddAttribute("origin0", i.first[0], 20);
+        child->AddAttribute("origin1", i.first[1], 20);
+        child->AddAttribute("origin2", i.first[2], 20);
+        child->AddAttribute("normal0", i.second[0], 20);
+        child->AddAttribute("normal1", i.second[1], 20);
+        child->AddAttribute("normal2", i.second[2], 20);
+        el->AddNestedElement(child);
+      }
+      locel->AddNestedElement(el);
+    }
+
+    { // thick crops
+      vtkNew<vtkPVXMLElement> el;
+      el->SetName("ThickCrops");
+      for (auto t : loc.ThickCropStates)
+      {
+        vtkNew<vtkPVXMLElement> child;
+        child->SetName("Crop");
+        for (int i = 0; i < 16; ++i)
+        {
+          std::ostringstream o;
+          o << "transform" << i;
+          child->AddAttribute(o.str().c_str(), t[i]);
+        }
+        el->AddNestedElement(child);
+      }
+      locel->AddNestedElement(el);
+    }
+
+    // save the visibility information
+    {
+      vtkNew<vtkPVXMLElement> el;
+      el->SetName("Visibility");
+      for (auto vdi : loc.Visibility)
+      {
+        vtkNew<vtkPVXMLElement> gchild;
+        gchild->SetName("RepVisibility");
+        gchild->AddAttribute("id", vdi.first->GetGlobalID());
+        gchild->AddAttribute("visibility", vdi.second);
+        el->AddNestedElement(gchild);
+      }
+      locel->AddNestedElement(el);
+    }
+
+    e->AddNestedElement(locel);
   }
   root->AddNestedElement(e);
 
@@ -860,7 +917,6 @@ void vtkPVOpenVRHelper::LoadState(vtkPVXMLElement* e, vtkSMProxyLocator* locator
       if (child)
       {
         auto& pose = *loc.Pose;
-        pose.Loaded = true;
         child->GetVectorAttribute("Position", 3, pose.Position);
         child->GetScalarAttribute("Distance", &pose.Distance);
         child->GetScalarAttribute("MotionFactor", &pose.MotionFactor);
@@ -970,7 +1026,6 @@ void vtkPVOpenVRHelper::LoadState(vtkPVXMLElement* e, vtkSMProxyLocator* locator
         vtkPVOpenVRHelperLocation& loc = this->Locations[poseNum];
         auto& pose = *loc.Pose;
 
-        pose.Loaded = true;
         child->GetVectorAttribute("Position", 3, pose.Position);
         child->GetScalarAttribute("Distance", &pose.Distance);
         child->GetScalarAttribute("MotionFactor", &pose.MotionFactor);
@@ -1096,13 +1151,30 @@ void vtkPVOpenVRHelper::ApplyState()
   //   Snap to Axes On"));
 
   // set camera poses
-  auto ovr_rw = vtkOpenVRRenderWindow::SafeDownCast(this->RenderWindow);
-  if (ovr_rw)
+  for (auto& loci : this->Locations)
   {
-    ovr_rw->GetDashboardOverlay()->GetSavedCameraPoses().clear();
-    for (auto& loci : this->Locations)
+    if (loci.second.Pose)
     {
-      ovr_rw->GetDashboardOverlay()->SetSavedCameraPose(loci.first, loci.second.Pose);
+      auto& src = loci.second.Pose;
+      auto& dst = this->SavedCameraPoses[loci.first];
+
+      dst.Position[0] = src->Position[0];
+      dst.Position[1] = src->Position[1];
+      dst.Position[2] = src->Position[2];
+      dst.PhysicalViewUp[0] = src->PhysicalViewUp[0];
+      dst.PhysicalViewUp[1] = src->PhysicalViewUp[1];
+      dst.PhysicalViewUp[2] = src->PhysicalViewUp[2];
+      dst.PhysicalViewDirection[0] = src->PhysicalViewDirection[0];
+      dst.PhysicalViewDirection[1] = src->PhysicalViewDirection[1];
+      dst.PhysicalViewDirection[2] = src->PhysicalViewDirection[2];
+      dst.ViewDirection[0] = src->ViewDirection[0];
+      dst.ViewDirection[1] = src->ViewDirection[1];
+      dst.ViewDirection[2] = src->ViewDirection[2];
+      dst.Translation[0] = src->Translation[0];
+      dst.Translation[1] = src->Translation[1];
+      dst.Translation[2] = src->Translation[2];
+      dst.Distance = src->Distance;
+      dst.MotionFactor = src->MotionFactor;
     }
   }
 }
@@ -1185,14 +1257,13 @@ void vtkPVOpenVRHelper::GoToSavedLocation(int pos, double* collabTrans, double* 
   }
   auto& loc = sdi->second;
 
-  auto ovr_rw = vtkOpenVRRenderWindow::SafeDownCast(this->RenderWindow);
-  if (ovr_rw)
+  if (auto* vr_rw = vtkVRRenderWindow::SafeDownCast(this->RenderWindow))
   {
-    ovr_rw->GetDashboardOverlay()->LoadCameraPose(pos);
-    ovr_rw->UpdateHMDMatrixPose();
-    ovr_rw->SetPhysicalTranslation(collabTrans);
-    ovr_rw->SetPhysicalViewDirection(collabDir);
-    ovr_rw->UpdateHMDMatrixPose();
+    this->LoadPoseInternal(vr_rw, pos);
+    vr_rw->UpdateHMDMatrixPose();
+    vr_rw->SetPhysicalTranslation(collabTrans);
+    vr_rw->SetPhysicalViewDirection(collabDir);
+    vr_rw->UpdateHMDMatrixPose();
   }
   else
   {
@@ -1260,16 +1331,13 @@ void vtkPVOpenVRHelper::SaveLocationState(int slot)
 {
   vtkPVOpenVRHelperLocation& sd = this->Locations[slot];
 
-  auto ovr_rw = vtkOpenVRRenderWindow::SafeDownCast(this->RenderWindow);
-  if (ovr_rw)
+  auto p_iter = this->SavedCameraPoses.find(slot);
+  if (p_iter == this->SavedCameraPoses.end())
   {
-    auto spose = ovr_rw->GetDashboardOverlay()->GetSavedCameraPose(slot);
-    if (!spose)
-    {
-      return;
-    }
-    *sd.Pose = *spose;
+    return;
   }
+
+  *sd.Pose = p_iter->second;
 
   this->Widgets->SaveLocationState(sd);
 
@@ -1308,9 +1376,11 @@ void vtkPVOpenVRHelper::ViewRemoved(vtkSMViewProxy* smview)
 
 void vtkPVOpenVRHelper::DoOneEvent()
 {
-  // TODO: use vtkVRRenderWindow
-  auto ovr_rw = vtkOpenVRRenderWindow::SafeDownCast(this->RenderWindow);
-  if (!ovr_rw)
+  if (auto* vr_rw = vtkVRRenderWindow::SafeDownCast(this->RenderWindow))
+  {
+    static_cast<vtkVRRenderWindowInteractor*>(this->Interactor)->DoOneEvent(vr_rw, this->Renderer);
+  }
+  else
   {
     double dist = this->Renderer->GetActiveCamera()->GetDistance();
     this->Renderer->ResetCameraClippingRange();
@@ -1318,12 +1388,6 @@ void vtkPVOpenVRHelper::DoOneEvent()
     this->Renderer->GetActiveCamera()->SetClippingRange(dist * 0.1, farz + 3 * dist);
     this->SMView->StillRender();
     this->NeedStillRender = false;
-  }
-  else
-  {
-    // TODO: vtk, create vtkVRRenderWindowInteractor and use DoOneEvent(vtkVRRenderWindow*)
-    static_cast<vtkOpenVRRenderWindowInteractor*>(this->Interactor)
-      ->DoOneEvent(ovr_rw, this->Renderer);
   }
 }
 
@@ -1731,15 +1795,7 @@ void vtkPVOpenVRHelper::SendToOpenVR(vtkSMViewProxy* smview)
   vtkOpenGLRenderWindow* pvRenderWindow =
     vtkOpenGLRenderWindow::SafeDownCast(pvRenderer->GetVTKWindow());
 
-  vtkOpenVRRenderWindow* ovr_rw = nullptr;
-  ovr_rw = vtkOpenVRRenderWindow::New();
-  this->RenderWindow = ovr_rw;
-  this->OpenVRPolyfill->SetRenderWindow(ovr_rw);
-  this->Renderer = vtkOpenVRRenderer::New();
-  auto ovriren = vtkOpenVRRenderWindowInteractor::New();
-
   std::string manifestFile;
-
   std::string pluginLocation = vtkPVOpenVRPluginLocation::GetPluginLocation();
   if (pluginLocation.size())
   {
@@ -1747,46 +1803,115 @@ void vtkPVOpenVRHelper::SendToOpenVR(vtkSMViewProxy* smview)
     pluginLocation = vtksys::SystemTools::GetFilenamePath(pluginLocation);
     manifestFile = pluginLocation + "/";
   }
-  manifestFile += "pv_openvr_actions.json";
-  ovriren->SetActionManifestFileName(manifestFile.c_str());
 
-  this->Interactor = ovriren;
-  static_cast<vtkOpenVRInteractorStyle*>(this->Interactor->GetInteractorStyle())
+  vtkVRRenderWindow* renWin = nullptr;
+  vtkVRRenderer* ren = nullptr;
+  vtkVRRenderWindowInteractor* vriren = nullptr;
+
+#if PARAVIEW_HAS_OPENXR_SUPPORT
+  if (this->UseOpenXR)
+  {
+    renWin = static_cast<vtkVRRenderWindow*>(vtkOpenXRRenderWindow::New());
+    renWin->MakeCurrent();
+    renWin->SetHelperWindow(pvRenderWindow);
+    ren = static_cast<vtkVRRenderer*>(vtkOpenXRRenderer::New());
+    vtkOpenXRRenderWindowInteractor* oxriren = vtkOpenXRRenderWindowInteractor::New();
+    vriren = static_cast<vtkVRRenderWindowInteractor*>(oxriren);
+    manifestFile += "pv_openxr_actions.json";
+    vriren->SetActionManifestFileName(manifestFile.c_str());
+
+    oxriren->AddAction("showmenu", [this](vtkEventData* ed) {
+      vtkEventDataForDevice* edd = ed->GetAsEventDataForDevice();
+      if (edd && edd->GetAction() == vtkEventDataAction::Press)
+      {
+        this->ToggleShowControls();
+      }
+    });
+
+    oxriren->AddAction("thickcropstart", [this](vtkEventData* ed) {
+      vtkEventDataForDevice* edd = ed->GetAsEventDataForDevice();
+      if (edd && edd->GetAction() == vtkEventDataAction::Press)
+      {
+        this->Widgets->MoveThickCrops(this->LeftTrackPadPosition[0] > 0.0);
+      }
+    });
+
+    oxriren->AddAction("thickcropdirection", [this](vtkEventData* ed) {
+      vtkEventDataDevice3D* edd = ed->GetAsEventDataDevice3D();
+      if (edd)
+      {
+        edd->GetTrackPadPosition(this->LeftTrackPadPosition);
+      }
+    });
+
+    oxriren->AddAction("forwardthickcrop", [this](vtkEventData* ed) {
+      vtkEventDataForDevice* edd = ed->GetAsEventDataForDevice();
+      if (edd && edd->GetAction() == vtkEventDataAction::Press)
+      {
+        this->Widgets->MoveThickCrops(true);
+      }
+    });
+
+    oxriren->AddAction("backthickcrop", [this](vtkEventData* ed) {
+      vtkEventDataForDevice* edd = ed->GetAsEventDataForDevice();
+      if (edd && edd->GetAction() == vtkEventDataAction::Press)
+      {
+        this->Widgets->MoveThickCrops(false);
+      }
+    });
+  }
+  else
+  {
+#endif
+    renWin = static_cast<vtkVRRenderWindow*>(vtkOpenVRRenderWindow::New());
+    renWin->SetHelperWindow(pvRenderWindow);
+    ren = static_cast<vtkVRRenderer*>(vtkOpenVRRenderer::New());
+    vtkOpenVRRenderWindowInteractor* ovriren = vtkOpenVRRenderWindowInteractor::New();
+    vriren = static_cast<vtkVRRenderWindowInteractor*>(ovriren);
+    manifestFile += "pv_openvr_actions.json";
+    vriren->SetActionManifestFileName(manifestFile.c_str());
+
+    ovriren->AddAction("/actions/vtk/in/ShowMenu", false, [this](vtkEventData* ed) {
+      vtkEventDataForDevice* edd = ed->GetAsEventDataForDevice();
+      if (edd && edd->GetAction() == vtkEventDataAction::Press)
+      {
+        this->ToggleShowControls();
+      }
+    });
+
+    ovriren->AddAction("/actions/vtk/in/ForwardThickCrop", false, [this](vtkEventData* ed) {
+      vtkEventDataForDevice* edd = ed->GetAsEventDataForDevice();
+      if (edd && edd->GetAction() == vtkEventDataAction::Press)
+      {
+        this->Widgets->MoveThickCrops(true);
+      }
+    });
+
+    ovriren->AddAction("/actions/vtk/in/BackThickCrop", false, [this](vtkEventData* ed) {
+      vtkEventDataForDevice* edd = ed->GetAsEventDataForDevice();
+      if (edd && edd->GetAction() == vtkEventDataAction::Press)
+      {
+        this->Widgets->MoveThickCrops(false);
+      }
+    });
+#if PARAVIEW_HAS_OPENXR_SUPPORT
+  }
+#endif
+
+  this->RenderWindow = static_cast<vtkOpenGLRenderWindow*>(renWin);
+  this->OpenVRPolyfill->SetRenderWindow(renWin);
+  this->Renderer = static_cast<vtkOpenGLRenderer*>(ren);
+
+  this->Interactor = vriren;
+  static_cast<vtkVRInteractorStyle*>(this->Interactor->GetInteractorStyle())
     ->MapInputToAction(vtkCommand::Select3DEvent, VTKIS_PICK);
 
-  ovriren->AddAction("/actions/vtk/in/ShowMenu", false, [this](vtkEventData* ed) {
-    vtkEventDataForDevice* edd = ed->GetAsEventDataForDevice();
-    if (edd && edd->GetAction() == vtkEventDataAction::Press)
-    {
-      this->ToggleShowControls();
-    }
-  });
-
-  ovriren->AddAction("/actions/vtk/in/ForwardThickCrop", false, [this](vtkEventData* ed) {
-    vtkEventDataForDevice* edd = ed->GetAsEventDataForDevice();
-    if (edd && edd->GetAction() == vtkEventDataAction::Press)
-    {
-      this->Widgets->MoveThickCrops(true);
-    }
-  });
-
-  ovriren->AddAction("/actions/vtk/in/BackThickCrop", false, [this](vtkEventData* ed) {
-    vtkEventDataForDevice* edd = ed->GetAsEventDataForDevice();
-    if (edd && edd->GetAction() == vtkEventDataAction::Press)
-    {
-      this->Widgets->MoveThickCrops(false);
-    }
-  });
-
-  ovr_rw->GetDashboardOverlay()->AddObserver(
-    vtkCommand::SaveStateEvent, this, &vtkPVOpenVRHelper::EventCallback, 1.0);
-  ovr_rw->GetDashboardOverlay()->AddObserver(
-    vtkCommand::LoadStateEvent, this, &vtkPVOpenVRHelper::EventCallback, 1.0);
+  this->AddObserver(vtkCommand::SaveStateEvent, this, &vtkPVOpenVRHelper::EventCallback, 1.0);
+  this->AddObserver(vtkCommand::LoadStateEvent, this, &vtkPVOpenVRHelper::EventCallback, 1.0);
 
   // pvRenderWindow is a vtkGenericOpenglRenderWindow
-  ovr_rw->SetHelperWindow(pvRenderWindow);
 
-  ovr_rw->SetBaseStationVisibility(this->BaseStationVisibility);
+  renWin->SetBaseStationVisibility(this->BaseStationVisibility);
   this->RenderWindow->SetNumberOfLayers(2);
   this->RenderWindow->AddRenderer(this->Renderer);
   this->RenderWindow->SetInteractor(this->Interactor);
@@ -1800,9 +1925,9 @@ void vtkPVOpenVRHelper::SendToOpenVR(vtkSMViewProxy* smview)
   zcam->SetViewUp(0.0, 0.0, 1.0);
   double distance = pvRenderer->GetActiveCamera()->GetDistance();
   zcam->SetPosition(fp[0] + distance, fp[1], fp[2]);
-  ovr_rw->InitializeViewFromCamera(zcam.Get());
+  renWin->InitializeViewFromCamera(zcam.Get());
 #else
-  ovr_rw->InitializeViewFromCamera(pvRenderer->GetActiveCamera());
+  renWin->InitializeViewFromCamera(pvRenderer->GetActiveCamera());
 #endif
 
   this->Renderer->SetUseImageBasedLighting(pvRenderer->GetUseImageBasedLighting());
@@ -1817,6 +1942,8 @@ void vtkPVOpenVRHelper::SendToOpenVR(vtkSMViewProxy* smview)
     vtkCommand::Select3DEvent, this, &vtkPVOpenVRHelper::InteractorEventCallback, 2.0);
   this->Interactor->AddObserver(
     vtkCommand::Move3DEvent, this, &vtkPVOpenVRHelper::InteractorEventCallback, 2.0);
+  this->Interactor->AddObserver(
+    vtkCommand::NextPose3DEvent, this, &vtkPVOpenVRHelper::InteractorEventCallback, 3.0);
 
   // create 4 lights for even lighting
   pvRenderer->GetLights()->RemoveAllItems();
@@ -1927,9 +2054,9 @@ void vtkPVOpenVRHelper::SendToOpenVR(vtkSMViewProxy* smview)
   this->Renderer = nullptr;
   this->Interactor->Delete();
   this->Interactor = nullptr;
-  if (ovr_rw)
+  if (renWin)
   {
-    ovr_rw->SetHelperWindow(nullptr);
+    renWin->SetHelperWindow(nullptr);
   }
   this->RenderWindow->Delete();
   this->RenderWindow = nullptr;

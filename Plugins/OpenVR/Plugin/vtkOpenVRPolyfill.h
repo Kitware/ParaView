@@ -16,12 +16,11 @@
 #define vtkOpenVRPolyfill_h
 
 #include "vtkObject.h"
+#include "vtkVRCamera.h" // For visibility of inner Pose class
 
 class vtkOpenGLRenderer;
 class vtkOpenGLRenderWindow;
-class vtkOpenVRCameraPose;
-class vtkOpenVRRenderer;
-class vtkOpenVRRenderWindow;
+class vtkVRRenderWindow;
 
 class vtkOpenVRPolyfill : public vtkObject
 {
@@ -53,19 +52,18 @@ public:
   void SetPhysicalViewUp(double* val) { this->SetPhysicalViewUp(val[0], val[1], val[2]); }
   void SetPhysicalViewUp(double, double, double);
 
-  vtkOpenVRCameraPose* GetPhysicalPose() { return this->PhysicalPose; }
+  vtkVRCamera::Pose* GetPhysicalPose() { return this->PhysicalPose; }
 
-  void SetPose(vtkOpenVRCameraPose* thePose, vtkOpenGLRenderer* ren, vtkOpenGLRenderWindow* renWin);
+  void SetPose(vtkVRCamera::Pose* thePose, vtkOpenGLRenderer* ren, vtkOpenGLRenderWindow* renWin);
 
-  void ApplyPose(
-    vtkOpenVRCameraPose* thePose, vtkOpenGLRenderer* ren, vtkOpenGLRenderWindow* renWin);
+  void ApplyPose(vtkVRCamera::Pose* thePose, vtkOpenGLRenderer* ren, vtkOpenGLRenderWindow* renWin);
 
 protected:
   vtkOpenVRPolyfill();
   ~vtkOpenVRPolyfill() override;
 
-  vtkOpenVRCameraPose* PhysicalPose;
-  vtkOpenVRRenderWindow* OpenVRRenderWindow;
+  vtkVRCamera::Pose* PhysicalPose;
+  vtkVRRenderWindow* VRRenderWindow;
   vtkOpenGLRenderWindow* RenderWindow;
   double ID;
 

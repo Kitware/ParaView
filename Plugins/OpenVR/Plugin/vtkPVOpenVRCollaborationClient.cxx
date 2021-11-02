@@ -18,7 +18,6 @@
 #include "vtkImplicitPlaneRepresentation.h"
 #include "vtkImplicitPlaneWidget2.h"
 #include "vtkObjectFactory.h"
-#include "vtkOpenVROverlayInternal.h"
 #include "vtkPVOpenVRHelper.h"
 #include "vtkTransform.h"
 #include "vtkVRModel.h"
@@ -26,7 +25,7 @@
 #include "vtkVRRenderWindow.h"
 #include <sstream>
 
-#ifdef OPENVR_HAS_COLLABORATION
+#if OPENVR_HAS_COLLABORATION
 #include "vtkOpenGLRenderer.h"
 #include "vtkOpenVRPolyfill.h"
 #include "vtkVRCollaborationClient.h"
@@ -99,7 +98,7 @@ protected:
           return;
         }
 
-        vtkOpenVRCameraPose pose;
+        vtkVRCamera::Pose pose;
         auto it = dvec.begin();
         std::copy(it, it + 3, pose.Position);
         it += 3;
@@ -280,14 +279,14 @@ vtkPVOpenVRCollaborationClient::~vtkPVOpenVRCollaborationClient()
 
 bool vtkPVOpenVRCollaborationClient::SupportsCollaboration()
 {
-#ifdef OPENVR_HAS_COLLABORATION
+#if OPENVR_HAS_COLLABORATION
   return true;
 #else
   return false;
 #endif
 }
 
-#ifdef OPENVR_HAS_COLLABORATION
+#if OPENVR_HAS_COLLABORATION
 bool vtkPVOpenVRCollaborationClient::Connect(vtkOpenGLRenderer* ren)
 {
   return this->Internal->Initialize(ren);
@@ -300,7 +299,7 @@ bool vtkPVOpenVRCollaborationClient::Connect(vtkOpenGLRenderer*)
 
 bool vtkPVOpenVRCollaborationClient::Disconnect()
 {
-#ifdef OPENVR_HAS_COLLABORATION
+#if OPENVR_HAS_COLLABORATION
   this->Internal->Disconnect();
 #endif
   return true;
@@ -308,12 +307,12 @@ bool vtkPVOpenVRCollaborationClient::Disconnect()
 
 void vtkPVOpenVRCollaborationClient::Render()
 {
-#ifdef OPENVR_HAS_COLLABORATION
+#if OPENVR_HAS_COLLABORATION
   this->Internal->Render();
 #endif
 }
 
-#ifdef OPENVR_HAS_COLLABORATION
+#if OPENVR_HAS_COLLABORATION
 void vtkPVOpenVRCollaborationClient::SetCollabHost(std::string const& val)
 {
   this->Internal->SetCollabHost(val);
@@ -360,7 +359,7 @@ void vtkPVOpenVRCollaborationClient::SetHelper(vtkPVOpenVRHelper* val)
 }
 
 void vtkPVOpenVRCollaborationClient::GoToPose(
-  vtkOpenVRCameraPose const& pose, double* collabTrans, double* collabDir)
+  vtkVRCamera::Pose const& pose, double* collabTrans, double* collabDir)
 {
   // store the data as a vector
   std::vector<double> dvec;
@@ -473,7 +472,7 @@ void vtkPVOpenVRCollaborationClient::ClearPointSource()
 }
 
 #else
-void vtkPVOpenVRCollaborationClient::GoToPose(vtkOpenVRCameraPose const&, double*, double*) {}
+void vtkPVOpenVRCollaborationClient::GoToPose(vtkVRCamera::Pose const&, double*, double*) {}
 void vtkPVOpenVRCollaborationClient::SetCollabHost(std::string const&) {}
 void vtkPVOpenVRCollaborationClient::SetCollabSession(std::string const&) {}
 void vtkPVOpenVRCollaborationClient::SetCollabName(std::string const&) {}

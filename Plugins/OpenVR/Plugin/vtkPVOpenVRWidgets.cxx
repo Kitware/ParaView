@@ -76,7 +76,7 @@
 
 vtkStandardNewMacro(vtkPVOpenVRWidgets);
 
-#ifdef OPENVR_HAS_IMAGO_SUPPORT
+#if OPENVR_HAS_IMAGO_SUPPORT
 #include "vtkPVImagoLoader.cxx"
 #else
 class vtkImagoLoader
@@ -133,14 +133,14 @@ vtkPVOpenVRWidgets::vtkPVOpenVRWidgets()
   this->PreviousPickedDataSet = nullptr;
   this->PreviousPickedRepresentation = nullptr;
 
-#ifdef OPENVR_HAS_IMAGO_SUPPORT
+#if OPENVR_HAS_IMAGO_SUPPORT
   this->ImagoLoader = new vtkImagoLoader();
 #endif
 }
 
 vtkPVOpenVRWidgets::~vtkPVOpenVRWidgets()
 {
-#ifdef OPENVR_HAS_IMAGO_SUPPORT
+#if OPENVR_HAS_IMAGO_SUPPORT
   delete this->ImagoLoader;
 #endif
   this->DistanceWidget->Delete();
@@ -907,7 +907,7 @@ void vtkPVOpenVRWidgets::ShowBillboard(
     }
 
 // is it a http reference
-#ifdef OPENVR_HAS_IMAGO_SUPPORT
+#if OPENVR_HAS_IMAGO_SUPPORT
     {
       bool success = false;
       if (!strncmp(textureFile.c_str(), "http", 4))
@@ -1059,7 +1059,7 @@ bool vtkPVOpenVRWidgets::IsCellImageDifferent(std::string const& oldimg, std::st
   }
 
 // deal with http and holeid: style values
-#ifdef OPENVR_HAS_IMAGO_SUPPORT
+#if OPENVR_HAS_IMAGO_SUPPORT
   return this->ImagoLoader->IsCellImageDifferent(oldimg, newimg);
 #else
   return oldimg != newimg;

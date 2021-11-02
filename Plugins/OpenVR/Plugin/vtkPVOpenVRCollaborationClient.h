@@ -23,6 +23,8 @@
 #include "vtkEventData.h"
 #include "vtkLogger.h" // for Verbosity enum
 #include "vtkObject.h"
+#include "vtkVRCamera.h" // For visibility of inner Pose class
+
 #include <functional> // for method
 #include <set>        // for ivar
 #include <vector>     // for sig
@@ -32,7 +34,6 @@ class vtkImplicitPlaneWidget2;
 class vtkOpenGLRenderer;
 class vtkPVOpenVRCollaborationClientInternal;
 class vtkPVOpenVRHelper;
-class vtkOpenVRCameraPose;
 class vtkVRModel;
 
 class vtkPVOpenVRCollaborationClient : public vtkObject
@@ -59,7 +60,7 @@ public:
   void SetCurrentLocation(int val) { this->CurrentLocation = val; }
   void SetLogCallback(
     std::function<void(std::string const& data, vtkLogger::Verbosity verbosity)> cb);
-  void GoToPose(vtkOpenVRCameraPose const& pose, double* collabTrans, double* collabDir);
+  void GoToPose(vtkVRCamera::Pose const& pose, double* collabTrans, double* collabDir);
 
   void RemoveAllCropPlanes();
   void UpdateCropPlane(size_t i, vtkImplicitPlaneWidget2*);

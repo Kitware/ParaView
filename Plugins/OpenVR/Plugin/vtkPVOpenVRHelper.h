@@ -25,6 +25,7 @@
 
 #include "vtkNew.h" // for ivars
 #include "vtkObject.h"
+#include "vtkVRCamera.h" // for visibility of inner "Pose" class
 
 #include <array>  // for method sig
 #include <map>    // for ivar
@@ -37,7 +38,6 @@ class vtkEventData;
 class vtkOpenGLCamera;
 class vtkOpenGLRenderer;
 class vtkOpenGLRenderWindow;
-class vtkOpenVRCameraPose;
 class vtkOpenVRPolyfill;
 class vtkPropCollection;
 class vtkPVOpenVRCollaborationClient;
@@ -46,6 +46,8 @@ class vtkPVOpenVRWidgets;
 class vtkPVRenderView;
 class vtkPVXMLElement;
 class vtkQWidgetWidget;
+class vtkVRRenderWindow;
+class vtkVRRenderer;
 class vtkRenderWindowInteractor;
 class vtkSMProxy;
 class vtkSMProxyLocator;
@@ -62,7 +64,7 @@ public:
   std::vector<std::pair<std::array<double, 3>, std::array<double, 3>>> CropPlaneStates;
   std::vector<std::array<double, 16>> ThickCropStates;
   std::map<vtkSMProxy*, bool> Visibility;
-  vtkOpenVRCameraPose* Pose;
+  vtkVRCamera::Pose* Pose;
 };
 
 class vtkPVOpenVRHelper : public vtkObject
@@ -107,6 +109,10 @@ public:
   vtkSetMacro(MultiSample, bool);
   vtkGetMacro(MultiSample, bool);
 
+  // Use OpenXR backend instead of OpenVR
+  void SetUseOpenXR(bool useOpenXr);
+  vtkGetMacro(UseOpenXR, bool);
+
   // hide base stations
   virtual void SetBaseStationVisibility(bool);
   vtkGetMacro(BaseStationVisibility, bool);
@@ -141,7 +147,7 @@ public:
 
   // bring other collaborators to you
   void ComeToMe();
-  void collabGoToPose(vtkOpenVRCameraPose* pose, double* collabTrans, double* collabDir);
+  void collabGoToPose(vtkVRCamera::Pose* pose, double* collabTrans, double* collabDir);
 
   // are we currently in VR
   bool InVR() { return this->Interactor != nullptr; }
@@ -234,8 +240,6 @@ protected:
 
   std::string FieldValues;
 
-  vtkRenderWindowInteractor* Interactor;
-
   bool InteractorEventCallback(vtkObject* object, unsigned long event, void* calldata);
   bool EventCallback(vtkObject* object, unsigned long event, void* calldata);
 
@@ -246,6 +250,7 @@ protected:
   vtkSMViewProxy* SMView;
   vtkOpenGLRenderer* Renderer;
   vtkOpenGLRenderWindow* RenderWindow;
+  vtkRenderWindowInteractor* Interactor;
   vtkPropCollection* AddedProps;
   vtkTimeStamp PropUpdateTime;
 
@@ -256,7 +261,16 @@ protected:
   // quit the event loop
   bool Done;
 
+  bool UseOpenXR = false;
+
+  std::map<int, vtkVRCamera::Pose> SavedCameraPoses;
+  int LastCameraPoseIndex = 0;
+
   void SaveLocationState(int slot);
+
+  void SavePoseInternal(vtkVRRenderWindow* vr_rw, int slot);
+  void LoadPoseInternal(vtkVRRenderWindow* vr_rw, int slot);
+  void LoadNextCameraPose();
 
   std::map<int, vtkPVOpenVRHelperLocation> Locations;
   int LoadLocationValue;
@@ -269,6 +283,10 @@ protected:
 
   vtkNew<vtkPVOpenVRExporter> Exporter;
   vtkNew<vtkPVOpenVRWidgets> Widgets;
+
+  // To simulate dpad with a trackpad on OpenXR we need to
+  // store the last position
+  double LeftTrackPadPosition[2];
 
 private:
   vtkPVOpenVRHelper(const vtkPVOpenVRHelper&) = delete;
