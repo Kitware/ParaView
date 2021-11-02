@@ -88,7 +88,7 @@ vtkSmartPointer<vtkTransferFunctionBoxItem> vtkTransferFunctionChartHistogram2D:
 
 //-------------------------------------------------------------------------------------------------
 vtkSmartPointer<vtkTransferFunctionBoxItem> vtkTransferFunctionChartHistogram2D::AddNewBox(
-  const vtkRectd& box, double* color, double alpha)
+  const vtkRectd& box, double* color, double alpha, bool addToTF2D)
 {
   if (!this->IsInitialized())
   {
@@ -109,12 +109,13 @@ vtkSmartPointer<vtkTransferFunctionBoxItem> vtkTransferFunctionChartHistogram2D:
   boxItem->SetValidBounds(xRange[0], xRange[1], yRange[0], yRange[1]);
   boxItem->SetBox(box.GetX(), box.GetY(), box.GetWidth(), box.GetHeight());
   boxItem->SetBoxColor(color[0], color[1], color[2], alpha);
-  this->AddBox(boxItem);
+  this->AddBox(boxItem, addToTF2D);
   return boxItem;
 }
 
 //-------------------------------------------------------------------------------------------------
-void vtkTransferFunctionChartHistogram2D::AddBox(vtkSmartPointer<vtkTransferFunctionBoxItem> box)
+void vtkTransferFunctionChartHistogram2D::AddBox(
+  vtkSmartPointer<vtkTransferFunctionBoxItem> box, bool addToTF2D)
 {
   if (!this->IsInitialized() || !box)
   {
@@ -126,13 +127,13 @@ void vtkTransferFunctionChartHistogram2D::AddBox(vtkSmartPointer<vtkTransferFunc
     // Plot index other than -1 indicates the chart already has the box
     return;
   }
-  if (this->TransferFunction2D)
-  {
-    this->TransferFunction2D->AddControlBox(box->GetTransferFunctionBox());
-  }
+
   // Add the observer to update the transfer function on interaction
-  box->AddObserver(vtkTransferFunctionBoxItem::BoxAddEvent, this,
-    &vtkTransferFunctionChartHistogram2D::OnTransferFunctionBoxItemModified);
+  if (addToTF2D)
+  {
+    box->AddObserver(vtkTransferFunctionBoxItem::BoxAddEvent, this,
+      &vtkTransferFunctionChartHistogram2D::OnTransferFunctionBoxItemModified);
+  }
   box->AddObserver(vtkTransferFunctionBoxItem::BoxEditEvent, this,
     &vtkTransferFunctionChartHistogram2D::OnTransferFunctionBoxItemModified);
   box->AddObserver(vtkTransferFunctionBoxItem::BoxSelectEvent, this,
@@ -196,6 +197,16 @@ void vtkTransferFunctionChartHistogram2D::SetInputData(vtkImageData* data, vtkId
 
     if (this->TransferFunction2D)
     {
+      auto boxes = this->TransferFunction2D->GetBoxes();
+      for (auto it = boxes.cbegin(); it != boxes.cend(); ++it)
+      {
+        auto const b = (*it);
+        double* c = b->GetColor();
+        // Add a box item to the chart based on existing boxes in the transfer function
+        // making sure that the box is not duplicated in the function (addToTF2D = false).
+        auto bItem = this->AddNewBox(b->GetBox(), c, c[3], false);
+        bItem->SetID(std::distance(boxes.cbegin(), it));
+      }
       this->GenerateTransfer2D();
     }
   }

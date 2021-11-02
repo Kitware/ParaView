@@ -49,12 +49,15 @@ public:
 
   ///@{
   /**
-   * Add a new box item to the chart
+   * Add a new box item to the chart.
+   * If addToTF2D is set to true (default), the box is also added to the client transfer function.
+   * This flag is set to false when adding box items corresponding to the boxes already existing in
+   * the transfer function.
    */
   vtkSmartPointer<vtkTransferFunctionBoxItem> AddNewBox();
   vtkSmartPointer<vtkTransferFunctionBoxItem> AddNewBox(
-    const vtkRectd& r, double* color, double alpha);
-  void AddBox(vtkSmartPointer<vtkTransferFunctionBoxItem> box);
+    const vtkRectd& r, double* color, double alpha, bool addToTF2D = true);
+  void AddBox(vtkSmartPointer<vtkTransferFunctionBoxItem> box, bool addToTF2D = true);
   ///@}
 
   /**
