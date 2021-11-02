@@ -26,7 +26,8 @@
 // VTK includes
 #include <vtkObject.h>
 
-#include "vtkRemotingViewsModule.h" // needed for export macro
+#include "vtkPVTransferFunction2DBox.h" // needed for ivar
+#include "vtkRemotingViewsModule.h"     // needed for export macro
 
 #include <vector> // needed for ivar
 
@@ -34,7 +35,6 @@
 class vtkImageData;
 class vtkPVTransferFunction2DInternals;
 class vtkRectd;
-class vtkPVTransferFunction2DBox;
 
 class VTKREMOTINGVIEWS_EXPORT vtkPVTransferFunction2D : public vtkObject
 {
@@ -97,15 +97,15 @@ public:
     double x, double y, double width, double height, double r, double g, double b, double a);
   int AddControlBox(double x, double y, double width, double height, double* color);
   int AddControlBox(vtkRectd& box, double* color);
-  int AddControlBox(vtkPVTransferFunction2DBox* box);
+  int AddControlBox(vtkSmartPointer<vtkPVTransferFunction2DBox> box);
   int RemoveControlBox(int id);
-  int RemoveControlBox(vtkPVTransferFunction2DBox* box);
+  int RemoveControlBox(vtkSmartPointer<vtkPVTransferFunction2DBox> box);
   ///@}
 
   /**
    * Get the control boxes defined on the function.
    */
-  std::vector<vtkPVTransferFunction2DBox*> GetBoxes();
+  std::vector<vtkSmartPointer<vtkPVTransferFunction2DBox>> GetBoxes();
 
   /**
    * Remove all control boxes from the transfer function.

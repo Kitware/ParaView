@@ -1592,7 +1592,7 @@ QList<QVariant> pqColorOpacityEditorWidget::transfer2DBoxes() const
   {
     return values;
   }
-  std::vector<vtkPVTransferFunction2DBox*> boxes = tf2d->GetBoxes();
+  std::vector<vtkSmartPointer<vtkPVTransferFunction2DBox>> boxes = tf2d->GetBoxes();
   for (auto it = boxes.cbegin(); it < boxes.cend(); ++it)
   {
     vtkPVTransferFunction2DBox* box = (*it);

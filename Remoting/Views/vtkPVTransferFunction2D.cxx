@@ -38,7 +38,7 @@ public:
   /**
    * Vector of boxes
    */
-  std::vector<vtkPVTransferFunction2DBox*> Boxes;
+  std::vector<vtkSmartPointer<vtkPVTransferFunction2DBox>> Boxes;
 
   /**
    * The transfer function
@@ -63,7 +63,6 @@ vtkPVTransferFunction2D::~vtkPVTransferFunction2D()
   {
     if (box)
     {
-      // box->UnRegister(this);
       box = nullptr;
     }
   }
@@ -228,7 +227,7 @@ void vtkPVTransferFunction2D::Build()
 }
 
 //-------------------------------------------------------------------------------------------------
-int vtkPVTransferFunction2D::AddControlBox(vtkPVTransferFunction2DBox* box)
+int vtkPVTransferFunction2D::AddControlBox(vtkSmartPointer<vtkPVTransferFunction2DBox> box)
 {
   if (!box)
   {
@@ -295,7 +294,7 @@ int vtkPVTransferFunction2D::RemoveControlBox(int id)
 }
 
 //-------------------------------------------------------------------------------------------------
-int vtkPVTransferFunction2D::RemoveControlBox(vtkPVTransferFunction2DBox* box)
+int vtkPVTransferFunction2D::RemoveControlBox(vtkSmartPointer<vtkPVTransferFunction2DBox> box)
 {
   int n = -1;
   auto it = std::find(this->Internals->Boxes.cbegin(), this->Internals->Boxes.cend(), box);
@@ -308,7 +307,7 @@ int vtkPVTransferFunction2D::RemoveControlBox(vtkPVTransferFunction2DBox* box)
 }
 
 //-------------------------------------------------------------------------------------------------
-std::vector<vtkPVTransferFunction2DBox*> vtkPVTransferFunction2D::GetBoxes()
+std::vector<vtkSmartPointer<vtkPVTransferFunction2DBox>> vtkPVTransferFunction2D::GetBoxes()
 {
   return this->Internals->Boxes;
 }
