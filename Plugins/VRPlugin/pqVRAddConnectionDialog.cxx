@@ -159,7 +159,7 @@ pqVRAddConnectionDialog::pqVRAddConnectionDialog(QWidget* parentObject, Qt::Wind
   // Restrict input in some line edits
   QRegExpValidator* connNameValidator = new QRegExpValidator(QRegExp("[0-9a-zA-Z]+"), this);
   QRegExpValidator* addressValidator =
-    new QRegExpValidator(QRegExp("([0-9a-zA-Z.]+@)?([a-zA-Z]+://)?[0-9a-zA-Z.]+"), this);
+    new QRegExpValidator(QRegExp("([0-9a-zA-Z.]+@)?[0-9a-zA-Z.:]+"), this);
   QRegExpValidator* inputIdValidator = new QRegExpValidator(QRegExp("[0-9]+"), this);
   QRegExpValidator* inputNameValidator = new QRegExpValidator(QRegExp("[0-9a-zA-Z]+"), this);
   this->Internals->connectionName->setValidator(connNameValidator);
