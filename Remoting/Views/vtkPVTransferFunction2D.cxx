@@ -73,7 +73,10 @@ vtkPVTransferFunction2D::~vtkPVTransferFunction2D()
 //------------------------------------------------------------------------------------------------
 void vtkPVTransferFunction2D::PrintSelf(ostream& os, vtkIndent indent)
 {
-  // os << indent << " = " << this-> << endl;
+  os << indent << "Range = (" << this->Range[0] << ", " << this->Range[1] << ", " << this->Range[2]
+     << ", " << this->Range[3] << ")" << endl;
+  os << indent << "OutputDimensions = (" << this->OutputDimensions[0] << ", "
+     << this->OutputDimensions[1] << ")" << endl;
 }
 
 //------------------------------------------------------------------------------------------------
