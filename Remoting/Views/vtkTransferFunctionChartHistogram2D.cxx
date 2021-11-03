@@ -263,7 +263,7 @@ void vtkTransferFunctionChartHistogram2D::GenerateTransfer2D()
   {
     return;
   }
-  const vtkIdType numPlots = this->GetNumberOfPlots();
+  // const vtkIdType numPlots = this->GetNumberOfPlots();
 
   vtkSmartPointer<vtkImageData> histogram =
     vtkPlotHistogram2D::SafeDownCast(this->GetPlot(0))->GetInputImageData();

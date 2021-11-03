@@ -690,7 +690,8 @@ vtkSmartPointer<vtkImageData> vtkSMTransferFunction2DProxy::ComputeDataHistogram
   this->Histogram2DCache->DeepCopy(hist2D);
 
   // Sanity check
-  if (this->Histogram2DCache->GetNumberOfPoints() < numberOfBins * numberOfBins)
+  if (this->Histogram2DCache->GetNumberOfPoints() <
+    static_cast<long long>(numberOfBins) * numberOfBins)
   {
     vtkErrorMacro("Histogram2D did not produce enough data");
     this->Histogram2DCache = nullptr;
