@@ -45,7 +45,21 @@ tran:Road, bldg:Building, gen:GenericCityObject, luse:LandUse
         <Documentation>Certain input files use app:transparency as
         opacity. Set this field true to show that correctly. The
         default is false.</Documentation>
-        </IntVectorProperty>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetBeginBuildingIndex"
+                         default_values="0"
+                         name="BeginBuildingIndex"
+                         number_of_elements="1"
+                         panel_visibility="advanced">
+        <Documentation>Reads buildings between [BeginBuildingIndex, EndBuildingIndex) in the file.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetEndBuildingIndex"
+                         default_values="2147483647"
+                         name="EndBuildingIndex"
+                         number_of_elements="1"
+                         panel_visibility="advanced">
+        <Documentation>Reads buildings between [BeginBuildingIndex, EndBuildingIndex) in the file.</Documentation>
+      </IntVectorProperty>
       <IntVectorProperty command="SetNumberOfBuildings"
                          default_values="2147483647"
                          name="NumberOfBuildings"
