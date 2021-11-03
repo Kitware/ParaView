@@ -76,6 +76,7 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${paraview_test_data_directory_input}/Data/blow.vtk}"
   "DATA{${paraview_test_data_directory_input}/Data/blow_data.myvtk}"
   "DATA{${paraview_test_data_directory_input}/Data/bluntfin.vts}"
+  "DATA{${paraview_test_data_directory_input}/Data/BoxWithFaceData.cgns}"
   "DATA{${paraview_test_data_directory_input}/Data/can.ex2}"
   "DATA{${paraview_test_data_directory_input}/Data/can.e.4/can.e.4.0}"
   "DATA{${paraview_test_data_directory_input}/Data/can.e.4/can.e.4.1}"
@@ -216,6 +217,8 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/CategoricalAutomaticAnnotationsInterC.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/CategoricalAutomaticAnnotationsInterD.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/CategoriesWithNaN.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/CGNSReaderCellMesh.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/CGNSReaderFaceMesh.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/ChartAxisRangeAndLabelsA.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/ChartAxisRangeAndLabelsB.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/ChartAxisRangeAndLabelsC.png}"
@@ -684,6 +687,7 @@ SET (TESTS_WITH_INLINE_COMPARES
   BlockLinkedSelection.xml
   CalculatorQuotedVariable.xml
   CameraLink.xml
+  CGNSReaderDataLocation.xml
   ChartLoadNoVariables.xml
   ClampAndUpdateColorMap.xml
   ColorOpacityTableEditorHistogram.xml
