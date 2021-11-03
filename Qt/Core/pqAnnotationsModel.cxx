@@ -604,7 +604,7 @@ void pqAnnotationsModel::removeAllAnnotations()
 
 //-----------------------------------------------------------------------------
 void pqAnnotationsModel::setAnnotations(
-  const std::vector<std::pair<QString, QString>>& newAnnotations)
+  const std::vector<std::pair<QString, QString>>& newAnnotations, bool quiet)
 {
   if (newAnnotations.empty())
   {
@@ -663,25 +663,28 @@ void pqAnnotationsModel::setAnnotations(
         }
       }
     }
-    if (colorFlag)
+    if (!quiet)
     {
-      Q_EMIT this->dataChanged(this->index(0, COLOR),
-        this->index(static_cast<int>(this->Internals->Items.size()) - 1, COLOR));
-    }
-    if (opacityFlag)
-    {
-      Q_EMIT this->dataChanged(this->index(0, OPACITY),
-        this->index(static_cast<int>(this->Internals->Items.size()) - 1, OPACITY));
-    }
-    if (valueFlag)
-    {
-      Q_EMIT this->dataChanged(this->index(0, VALUE),
-        this->index(static_cast<int>(this->Internals->Items.size()) - 1, VALUE));
-    }
-    if (annotationFlag)
-    {
-      Q_EMIT this->dataChanged(this->index(0, LABEL),
-        this->index(static_cast<int>(this->Internals->Items.size()) - 1, LABEL));
+      if (colorFlag)
+      {
+        Q_EMIT this->dataChanged(this->index(0, COLOR),
+          this->index(static_cast<int>(this->Internals->Items.size()) - 1, COLOR));
+      }
+      if (opacityFlag)
+      {
+        Q_EMIT this->dataChanged(this->index(0, OPACITY),
+          this->index(static_cast<int>(this->Internals->Items.size()) - 1, OPACITY));
+      }
+      if (valueFlag)
+      {
+        Q_EMIT this->dataChanged(this->index(0, VALUE),
+          this->index(static_cast<int>(this->Internals->Items.size()) - 1, VALUE));
+      }
+      if (annotationFlag)
+      {
+        Q_EMIT this->dataChanged(this->index(0, LABEL),
+          this->index(static_cast<int>(this->Internals->Items.size()) - 1, LABEL));
+      }
     }
   }
 }
