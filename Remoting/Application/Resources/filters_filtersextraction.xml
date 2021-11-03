@@ -454,7 +454,7 @@
             <Group name="sources"/>
             <Group name="filters"/>
           </ProxyGroupDomain>
-          <DataTypeDomain name="input_type">
+          <DataTypeDomain name="input_type" composite_data_supported="0">
             <DataType value="vtkDataSet"/>
           </DataTypeDomain>
           <Documentation>
@@ -470,7 +470,7 @@
             <Group name="sources"/>
             <Group name="filters"/>
           </ProxyGroupDomain>
-          <DataTypeDomain name="input_type">
+          <DataTypeDomain name="input_type" composite_data_supported="0">
             <DataType value="vtkDataSet"/>
           </DataTypeDomain>
           <Documentation>
