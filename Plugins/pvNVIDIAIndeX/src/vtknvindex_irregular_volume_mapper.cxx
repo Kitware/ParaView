@@ -381,6 +381,7 @@ bool vtknvindex_irregular_volume_mapper::initialize_mapper(vtkRenderer* /*ren*/,
     vtknvindex_dataset_parameters dataset_parameters;
     dataset_parameters.volume_type = vtknvindex_scene::VOLUME_TYPE_IRREGULAR;
     dataset_parameters.scalar_type = scalar_type;
+    dataset_parameters.scalar_components = m_scalar_array->GetNumberOfComponents();
     dataset_parameters.voxel_range[0] = static_cast<mi::Float32>(m_scalar_array->GetRange(0)[0]);
     dataset_parameters.voxel_range[1] = static_cast<mi::Float32>(m_scalar_array->GetRange(0)[1]);
     dataset_parameters.scalar_range[0] = static_cast<mi::Float32>(m_scalar_array->GetDataTypeMin());
