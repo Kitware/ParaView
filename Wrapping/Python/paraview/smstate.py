@@ -159,6 +159,10 @@ def get_state(options=None, source_set=[], filter=None, raw=False,
     trace = smtrace.TraceOutput()
     if preamble is None:
         trace.append("# state file generated using %s" % simple.GetParaViewSourceVersion())
+        trace.append("\n# uncomment the following three lines to ensure this script works in future versions")
+        trace.append("#import paraview")
+        trace.append("#paraview.compatibility.major = %d" % sm.vtkSMProxyManager.GetVersionMajor())
+        trace.append("#paraview.compatibility.minor = %d" % sm.vtkSMProxyManager.GetVersionMinor())
     elif preamble:
         trace.append(preamble)
     trace.append_separated(smtrace.get_current_trace_output_and_reset(raw=True))
