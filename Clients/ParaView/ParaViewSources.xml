@@ -20,6 +20,7 @@
     <Proxy group="sources" name="LiveProgrammableSource" />
     <Proxy group="sources" name="RandomHyperTreeGridSource" />
     <Proxy group="sources" name="RTAnalyticSource" />
+    <Proxy group="sources" name="UnstructuredCellTypes" />
   </Category>
   <Category name="GeometricShapes" menu_label="&amp;Geometric Shapes" preserve_order="1"
     show_in_toolbar="0">
