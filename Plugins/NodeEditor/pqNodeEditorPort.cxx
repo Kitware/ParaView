@@ -50,7 +50,7 @@ public:
   PortLabel(QString label, QGraphicsItem* parent)
     : pqNodeEditorLabel(label, parent, true){};
 
-  virtual ~PortLabel() = default;
+  ~PortLabel() override = default;
 
   void hoverEnterEvent(QGraphicsSceneHoverEvent* /*event*/) override
   {
@@ -76,7 +76,7 @@ public:
     this->setCursor(Qt::PointingHandCursor);
   }
 
-  virtual ~PortDisc() { this->deleteLine(); }
+  ~PortDisc() override { this->deleteLine(); }
 
 protected:
   void mousePressEvent(QGraphicsSceneMouseEvent* event) override
