@@ -311,8 +311,6 @@ QRectF pqNodeEditorNode::boundingRect() const
 // ----------------------------------------------------------------------------
 void pqNodeEditorNode::paint(QPainter* painter, const QStyleOptionGraphicsItem*, QWidget*)
 {
-  const auto& palette = QApplication::palette();
-
   QPainterPath path;
   // Make sure the whole node is redrawn to avoid artefacts
   constexpr double borderOffset = 0.5 * pqNodeEditorUtils::CONSTS::NODE_BORDER_WIDTH;
