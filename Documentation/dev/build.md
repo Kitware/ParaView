@@ -459,7 +459,9 @@ More advanced options:
     cleared for the internal VTK build.
 
 <!--
-These variables should be documented once they're effective again.
+These variables should be documented once they're effective again. Note that
+various settings have a dependency on this that is not mentioned since the
+option doesn't "exist" yet.
 
   * `PARAVIEW_USE_EXTERNAL_VTK` (default `OFF`): Use an externally provided
     VTK. Note that ParaView has fairly narrow requirements for the VTK it can
