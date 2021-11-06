@@ -44,7 +44,8 @@ int TestDataEncoder(int argc, char* argv[])
     vtkImageData* img = images[cc].GetPointer();
     img->Register(nullptr);
     images[cc] = nullptr;
-    encoder->PushAndTakeReference(cc % 3, img, 100);
+    encoder->Push(cc % 3, img, 100);
+    img->UnRegister(nullptr);
     vtksys::SystemTools::Delay(10); // 0.2s
   }
 

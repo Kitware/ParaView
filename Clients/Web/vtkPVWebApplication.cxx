@@ -199,8 +199,7 @@ vtkUnsignedCharArray* vtkPVWebApplication::StillRender(vtkSMViewProxy* view, int
 
   if (doThread || this->ImageEncoding)
   {
-    this->Internals->Encoder->PushAndTakeReference(
-      view->GetGlobalID(), image, quality, this->ImageEncoding);
+    this->Internals->Encoder->Push(view->GetGlobalID(), image, quality, this->ImageEncoding);
     assert(image == nullptr);
 
     if (value.Data == nullptr)
