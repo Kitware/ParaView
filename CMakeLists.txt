@@ -536,6 +536,15 @@ else ()
   mark_as_advanced(PARAVIEW_WINDOWS_PYTHON_DEBUGGABLE)
   set(VTK_WINDOWS_PYTHON_DEBUGGABLE ${PARAVIEW_WINDOWS_PYTHON_DEBUGGABLE})
 
+  cmake_dependent_option(PARAVIEW_SKIP_CLANG_TIDY_FOR_VTK "Skip `clang-tidy` rules for VTK source" ON
+    "CMAKE_C_CLANG_TIDY OR CMAKE_CXX_CLANG_TIDY" OFF)
+  if (PARAVIEW_SKIP_CLANG_TIDY_FOR_VTK)
+    set(CMAKE_C_CLANG_TIDY_save "${CMAKE_C_CLANG_TIDY}")
+    set(CMAKE_CXX_CLANG_TIDY_save "${CMAKE_CXX_CLANG_TIDY}")
+    set(CMAKE_C_CLANG_TIDY "")
+    set(CMAKE_CXX_CLANG_TIDY "")
+  endif ()
+
   vtk_module_build(
     MODULES             ${vtk_modules}
     KITS                ${vtk_kits}
@@ -555,6 +564,11 @@ else ()
     ENABLE_WRAPPING     ON
     TEST_INPUT_DATA_DIRECTORY   "${CMAKE_CURRENT_SOURCE_DIR}/VTK/Testing"
     TEST_OUTPUT_DATA_DIRECTORY  "${CMAKE_CURRENT_BINARY_DIR}/ExternalData/VTK/Testing")
+
+  if (PARAVIEW_SKIP_CLANG_TIDY_FOR_VTK)
+    set(CMAKE_C_CLANG_TIDY "${CMAKE_C_CLANG_TIDY_save}")
+    set(CMAKE_CXX_CLANG_TIDY "${CMAKE_CXX_CLANG_TIDY_save}")
+  endif ()
 
   install(
     FILES       "${CMAKE_CURRENT_SOURCE_DIR}/VTK/Copyright.txt"
