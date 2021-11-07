@@ -670,14 +670,14 @@ vtkSmartPointer<vtkImageData> vtkSMTransferFunction2DProxy::ComputeDataHistogram
   reducer.TakeReference(
     vtkSMSourceProxy::SafeDownCast(pxm->NewProxy("filters", "ReductionFilter")));
   vtkSMPropertyHelper(reducer, "Input").Set(histo);
-  vtkSMPropertyHelper(reducer, "PostGatherHelperName").Set("vtkImageAppend");
+  vtkSMPropertyHelper(reducer, "PostGatherHelperName").Set("vtkImageWeightedSum");
   reducer->UpdateVTKObjects();
 
   // Move it from server to client and save it to the case
   vtkSmartPointer<vtkSMSourceProxy> mover;
   mover.TakeReference(
     vtkSMSourceProxy::SafeDownCast(pxm->NewProxy("filters", "ClientServerMoveData")));
-  vtkSMPropertyHelper(mover, "Input").Set(reducer);
+  vtkSMPropertyHelper(mover, "Input").Set(histo);
   vtkSMPropertyHelper(mover, "OutputDataType").Set(VTK_IMAGE_DATA);
   mover->UpdateVTKObjects();
   mover->UpdatePipeline();
@@ -742,5 +742,3 @@ bool vtkSMTransferFunction2DProxy::RescaleTransferFunctionToDataRange(bool exten
   }
   return false;
 }
-
-//----------------------------------------------------------------------------
