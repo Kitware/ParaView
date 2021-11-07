@@ -666,18 +666,20 @@ vtkSmartPointer<vtkImageData> vtkSMTransferFunction2DProxy::ComputeDataHistogram
   histo->UpdateVTKObjects();
 
   // Reduce it
+  // Use vtkImageMathematics to add up all the image histograms (per pixel) from different server
+  // processes / mpi ranks
   vtkSmartPointer<vtkSMSourceProxy> reducer;
   reducer.TakeReference(
     vtkSMSourceProxy::SafeDownCast(pxm->NewProxy("filters", "ReductionFilter")));
   vtkSMPropertyHelper(reducer, "Input").Set(histo);
-  vtkSMPropertyHelper(reducer, "PostGatherHelperName").Set("vtkImageWeightedSum");
+  vtkSMPropertyHelper(reducer, "PostGatherHelperName").Set("vtkImageMathematics");
   reducer->UpdateVTKObjects();
 
   // Move it from server to client and save it to the case
   vtkSmartPointer<vtkSMSourceProxy> mover;
   mover.TakeReference(
     vtkSMSourceProxy::SafeDownCast(pxm->NewProxy("filters", "ClientServerMoveData")));
-  vtkSMPropertyHelper(mover, "Input").Set(histo);
+  vtkSMPropertyHelper(mover, "Input").Set(reducer);
   vtkSMPropertyHelper(mover, "OutputDataType").Set(VTK_IMAGE_DATA);
   mover->UpdateVTKObjects();
   mover->UpdatePipeline();
