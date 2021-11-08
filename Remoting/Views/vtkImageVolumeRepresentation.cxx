@@ -119,7 +119,10 @@ vtkImageVolumeRepresentation::vtkImageVolumeRepresentation()
 }
 
 //----------------------------------------------------------------------------
-vtkImageVolumeRepresentation::~vtkImageVolumeRepresentation() = default;
+vtkImageVolumeRepresentation::~vtkImageVolumeRepresentation()
+{
+  this->SetTransferFunction2D(nullptr);
+}
 
 //----------------------------------------------------------------------------
 int vtkImageVolumeRepresentation::FillInputPortInformation(int, vtkInformation* info)
@@ -588,21 +591,51 @@ void vtkImageVolumeRepresentation::SelectColorArray2Component(int component)
 //----------------------------------------------------------------------------
 void vtkImageVolumeRepresentation::SetTransferFunction2D(vtkPVTransferFunction2D* transfer2D)
 {
-  if (!transfer2D)
+  if (this->TransferFunction2D == nullptr && transfer2D == nullptr)
   {
     return;
   }
-  vtkImageData* func = transfer2D->GetFunction();
+  if (this->TransferFunction2D && transfer2D && this->TransferFunction2D == transfer2D)
+  {
+    return;
+  }
 
-  if (!func)
+  if (this->TransferFunction2D)
+  {
+    this->TransferFunction2D->RemoveObserver(this->TransferFunction2DObserver);
+    this->TransferFunction2D = nullptr;
+    this->Property->SetTransferFunction2D(nullptr);
+  }
+
+  if (transfer2D)
+  {
+    this->TransferFunction2D = transfer2D;
+    this->TransferFunction2DObserver = this->TransferFunction2D->AddObserver(
+      vtkCommand::ModifiedEvent, this, &vtkImageVolumeRepresentation::TransferFunction2DUpdated);
+    vtkImageData* func = this->TransferFunction2D->GetFunction();
+    if (func)
+    {
+      vtkDataArray* arr = func->GetPointData()->GetScalars();
+      if (!arr)
+      {
+        func->SetDimensions(10, 10, 1);
+        func->AllocateScalars(VTK_FLOAT, 4);
+      }
+      this->Property->SetTransferFunction2D(func);
+    }
+    this->MarkModified();
+  }
+}
+
+//----------------------------------------------------------------------------
+void vtkImageVolumeRepresentation::TransferFunction2DUpdated(
+  vtkObject* obj, unsigned long eid, void*)
+{
+  vtkPVTransferFunction2D* tf2d = reinterpret_cast<vtkPVTransferFunction2D*>(obj);
+  if (tf2d == nullptr || eid != vtkCommand::ModifiedEvent)
   {
     return;
   }
-  vtkDataArray* arr = func->GetPointData()->GetScalars();
-  if (!arr)
-  {
-    func->SetDimensions(10, 10, 1);
-    func->AllocateScalars(VTK_FLOAT, 4);
-  }
-  this->Property->SetTransferFunction2D(func);
+  tf2d->Build();
+  this->MarkModified();
 }

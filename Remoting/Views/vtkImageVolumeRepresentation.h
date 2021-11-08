@@ -169,6 +169,13 @@ protected:
   int ColorArray2FieldAssociation = -1;
   int ColorArray2Component = -1;
   std::string ColorArray2Name;
+  vtkWeakPointer<vtkPVTransferFunction2D> TransferFunction2D = nullptr;
+
+  /**
+   * Mark the representation to be updated since the transfer function was modified.
+   */
+  void TransferFunction2DUpdated(vtkObject* obj, unsigned long eid, void*);
+  unsigned long TransferFunction2DObserver = 0U;
 
 private:
   vtkImageVolumeRepresentation(const vtkImageVolumeRepresentation&) = delete;
