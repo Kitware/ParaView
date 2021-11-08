@@ -88,14 +88,6 @@ public:
   virtual vtkPVTransferFunction2D* GetTransferFunction2D();
   ///@}
 
-  //  ///@{
-  //  /**
-  //   * Set/Get the transfer 2d boxes item.
-  //   */
-  //  virtual void SetTransfer2DBoxesItem(vtkPVDiscretizableColorTransferFunction* t2dBoxes);
-  //  virtual vtkPVDiscretizableColorTransferFunction* GetTransfer2DBoxesItem();
-  //  ///@}
-
   ///@{
   /**
    * Set/Get the actively selected box.
@@ -140,7 +132,6 @@ protected:
 
   // Member variables;
   vtkWeakPointer<vtkPVTransferFunction2D> TransferFunction2D;
-  // vtkWeakPointer<vtkPVDiscretizableColorTransferFunction> Transfer2DBoxesItem;
   vtkSmartPointer<vtkTransferFunctionBoxItem> ActiveBox;
   std::vector<int> BoxesToRemove;
 
