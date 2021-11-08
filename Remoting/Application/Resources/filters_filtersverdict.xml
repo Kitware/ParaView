@@ -210,6 +210,16 @@
         <Documentation>This property indicates which quality measure will be
         used to evaluate hexahedral quality.</Documentation>
       </IntVectorProperty>
+      <IntVectorProperty command="SetLinearApproximation"
+                         default_values="0"
+                         name="LinearApproximation"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>If turned on, then non-linear cells quantities will be computed
+          by taking their linear approximate, i.e. ignoring their faces' curvature
+          in a second output array named "Quality (Linear Approx)".
+        </Documentation>
+      </IntVectorProperty>
       <!-- End MeshQuality -->
     </SourceProxy>
   </ProxyGroup>
