@@ -454,9 +454,14 @@ More advanced options:
   * `PARAVIEW_SERIAL_TESTS_USE_MPIEXEC` (default `OFF`): Used on HPC to run
     serial tests on compute nodes. If set, it prefixes serial tests with
     "${MPIEXEC_EXECUTABLE}" "${MPIEXEC_NUMPROC_FLAG}" "1" ${MPIEXEC_PREFLAGS}
+  * `PARAVIEW_SKIP_CLANG_TIDY_FOR_VTK` (defaults `ON`; requires
+    `CMAKE_<LANG>_CLANG_TIDY`): If set, any `clang-tidy` settings will be
+    cleared for the internal VTK build.
 
 <!--
-These variables should be documented once they're effective again.
+These variables should be documented once they're effective again. Note that
+various settings have a dependency on this that is not mentioned since the
+option doesn't "exist" yet.
 
   * `PARAVIEW_USE_EXTERNAL_VTK` (default `OFF`): Use an externally provided
     VTK. Note that ParaView has fairly narrow requirements for the VTK it can

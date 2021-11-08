@@ -578,13 +578,13 @@ int pqNodeEditorWidget::createNodeForSource(pqPipelineSource* proxy)
         [this, proxyAsFilter, idx](QGraphicsSceneMouseEvent* event) {
           if (event->button() == Qt::MouseButton::MiddleButton)
           {
-            this->setInput(proxyAsFilter, idx, true);
+            this->setInput(proxyAsFilter, static_cast<int>(idx), true);
             pqApplicationCore::instance()->render();
           }
           else if (event->button() == Qt::MouseButton::LeftButton &&
             (event->modifiers() & Qt::ControlModifier))
           {
-            this->setInput(proxyAsFilter, idx, false);
+            this->setInput(proxyAsFilter, static_cast<int>(idx), false);
           }
         });
     }
