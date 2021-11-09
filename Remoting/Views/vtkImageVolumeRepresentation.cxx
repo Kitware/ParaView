@@ -121,7 +121,7 @@ vtkImageVolumeRepresentation::vtkImageVolumeRepresentation()
 //----------------------------------------------------------------------------
 vtkImageVolumeRepresentation::~vtkImageVolumeRepresentation()
 {
-  this->SetTransferFunction2D(nullptr);
+  this->TransferFunction2D = nullptr;
 }
 
 //----------------------------------------------------------------------------
