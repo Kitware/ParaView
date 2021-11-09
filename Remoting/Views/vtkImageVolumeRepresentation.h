@@ -35,9 +35,10 @@
 #ifndef vtkImageVolumeRepresentation_h
 #define vtkImageVolumeRepresentation_h
 
-#include "vtkNew.h"                 // needed for vtkNew.
-#include "vtkRemotingViewsModule.h" //needed for exports
-#include "vtkSmartPointer.h"        // needed for vtkSmartPointer
+#include "vtkNew.h"                  // needed for vtkNew.
+#include "vtkPVTransferFunction2D.h" // needed for vtkPVTransferFunction2D
+#include "vtkRemotingViewsModule.h"  //needed for exports
+#include "vtkSmartPointer.h"         // needed for vtkSmartPointer
 #include "vtkVolumeRepresentation.h"
 
 #include <string> // for ivar
@@ -54,7 +55,6 @@ class vtkPolyDataMapper;
 class vtkPVLODVolume;
 class vtkVolumeMapper;
 class vtkVolumeProperty;
-class vtkPVTransferFunction2D;
 
 class VTKREMOTINGVIEWS_EXPORT vtkImageVolumeRepresentation : public vtkVolumeRepresentation
 {
