@@ -247,7 +247,9 @@ void vtkTransferFunctionChartHistogram2D::GenerateTransfer2D()
   int dims[3];
   histogram->GetDimensions(dims);
   this->TransferFunction2D->SetOutputDimensions(dims[0], dims[1]);
-  this->TransferFunction2D->Build();
+  // No need to build here as the build will be issued with
+  // vtkImageVolumeRepresentation::TransferFunction2DUpdated.
+  // this->TransferFunction2D->Build();
 
   this->InvokeEvent(vtkTransferFunctionChartHistogram2D::TransferFunctionModified, nullptr);
 }
