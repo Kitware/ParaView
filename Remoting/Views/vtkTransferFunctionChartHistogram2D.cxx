@@ -144,6 +144,7 @@ void vtkTransferFunctionChartHistogram2D::SetInputData(vtkImageData* data, vtkId
 {
   if (data)
   {
+    bool wasInitialized = this->IsInitialized();
     int bins[3];
     double origin[3], spacing[3];
     data->GetOrigin(origin);
@@ -175,7 +176,7 @@ void vtkTransferFunctionChartHistogram2D::SetInputData(vtkImageData* data, vtkId
     }
 
     // Now add the transfer function boxes from the color function
-    if (this->TransferFunction2D)
+    if (this->TransferFunction2D && !wasInitialized)
     {
       auto boxes = this->TransferFunction2D->GetBoxes();
       for (auto it = boxes.cbegin(); it != boxes.cend(); ++it)
