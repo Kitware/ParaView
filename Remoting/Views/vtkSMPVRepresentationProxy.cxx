@@ -689,6 +689,20 @@ bool vtkSMPVRepresentationProxy::SetScalarColoringInternal(
 
   if (vtkSMProperty* tf2dProperty = this->GetProperty("TransferFunction2D"))
   {
+    // Following commented out code would be required for separate 2D transfer function per pair of
+    // scalar arrays in the data
+    //    bool useGradientAsY =
+    //      (vtkSMPropertyHelper(this, "UseGradientForTransfer2D", true).GetAsInt() == 1);
+    //    std::string array2Name;
+    //    if (!useGradientAsY)
+    //    {
+    //      array2Name =
+    //        this->GetDecoratedArrayName(vtkSMPropertyHelper(this,
+    //        "ColorArray2Name").GetAsString());
+    //    }
+    //    vtkSMProxy* tf2dProxy =
+    //      mgr->GetTransferFunction2D(decoratedArrayName.c_str(), (array2Name.empty() ? nullptr :
+    //      array2Name.c_str()), this->GetSessionProxyManager());
     vtkSMProxy* tf2dProxy =
       mgr->GetTransferFunction2D(decoratedArrayName.c_str(), this->GetSessionProxyManager());
     vtkSMPropertyHelper(tf2dProperty).Set(tf2dProxy);

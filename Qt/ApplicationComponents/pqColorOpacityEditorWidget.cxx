@@ -207,6 +207,7 @@ public:
   vtkWeakPointer<vtkSMPropertyGroup> PropertyGroup;
   vtkWeakPointer<vtkSMProxy> ScalarOpacityFunctionProxy;
   vtkWeakPointer<vtkSMProxy> TransferFunction2DProxy;
+  vtkWeakPointer<vtkSMProxy> TransferFunction2DRepProxy;
   QScopedPointer<QAction> TempAction;
   QScopedPointer<pqChooseColorPresetReaction> ChoosePresetReaction;
   QScopedPointer<pqSignalsBlocker> SignalsBlocker;
@@ -217,6 +218,7 @@ public:
   vtkNew<vtkEventQtSlotConnect> TransferFunctionModifiedConnector;
   vtkNew<vtkEventQtSlotConnect> RangeConnector;
   vtkNew<vtkEventQtSlotConnect> ConsumerConnector;
+  vtkNew<vtkEventQtSlotConnect> TransferFunction2DConnector;
 
   pqTimer HistogramTimer;
   pqTimer Histogram2DTimer;
@@ -516,45 +518,6 @@ pqColorOpacityEditorWidget::pqColorOpacityEditorWidget(
   {
     this->addPropertyLink(
       this, "transferFunction2DProxy", SIGNAL(transferFunction2DProxyChanged()), smproperty);
-    //    smproperty = smgroup->GetProperty("Transfer2DRange");
-    //    if (smproperty)
-    //    {
-    //      double values[4];
-    //      vtkSMPropertyHelper(smproperty).Get(values, 4);
-    //      vtkSMTransferFunctionProxy::RescaleTransferFunction(this->proxy(), values);
-    //      vtkSMProxy* opacityProxy = this->Internals->ScalarOpacityFunctionProxy;
-    //      vtkSMTransferFunctionProxy::RescaleTransferFunction(opacityProxy, values);
-    //      vtkSmartPointer<vtkImageData> im =
-    //        vtkImageData::SafeDownCast(this->transferFunction2DProxy()->GetClientSideObject());
-    //      if (!im)
-    //      {
-    //        return;
-    //      }
-    //      im->SetOrigin(values[0], values[2], 0.0);
-    //      im->SetDimensions(numBins, numBins, 1);
-    //      im->SetSpacing((values[1] - values[0]) / numBins, (values[3] - values[2]) /
-    //      numBins, 1.0); QObject::connect(
-    //        ui.Transfer2DEditor, &pqTransferFunction2DWidget::transferFunctionModified, this,
-    //        [=]() {
-    //          vtkSmartPointer<vtkImageData> im =
-    //            vtkImageData::SafeDownCast(this->transferFunction2DProxy()->GetClientSideObject());
-    //          if (!im)
-    //          {
-    //            return;
-    //          }
-    //          double origin[3], spacing[3];
-    //          int dims[3];
-    //          im->GetOrigin(origin);
-    //          im->GetDimensions(dims);
-    //          im->GetSpacing(spacing);
-    //          double values[4];
-    //          values[0] = origin[0];
-    //          values[1] = origin[0] + dims[0] * spacing[0];
-    //          values[2] = origin[1];
-    //          values[3] = origin[1] + dims[1] * spacing[1];
-    //          vtkSMPropertyHelper(this->proxy(), "Transfer2DRange").Set(values, 4);
-    //        });
-    //    }
   }
 
   smproperty = smgroup->GetProperty("Use2DTransferFunction");
@@ -562,19 +525,14 @@ pqColorOpacityEditorWidget::pqColorOpacityEditorWidget(
   {
     this->addPropertyLink(
       this, "use2DTransferFunction", SIGNAL(use2DTransferFunctionChanged()), smproperty);
-    QObject::connect(
-      ui.Use2DTransferFunction, SIGNAL(clicked(bool)), this, SLOT(show2DHistogram(bool)));
+    QObject::connect(ui.Use2DTransferFunction, &QCheckBox::toggled, this,
+      &pqColorOpacityEditorWidget::show2DHistogram);
   }
   else
   {
     ui.Use2DTransferFunction->hide();
   }
 
-  // smproperty = smgroup->GetProperty("Transfer2DBoxes");
-  // if (smproperty)
-  // {
-  //   this->addPropertyLink(this, "transfer2DBoxes", SIGNAL(transfer2DBoxesChanged()), smproperty);
-  // }
   // Manage histogram computation if enabled
   // When creating the widget, we consider that the cost of recomputing the histogram table
   // can be paid systematically
@@ -749,18 +707,46 @@ void pqColorOpacityEditorWidget::setTransferFunction2DProxy(pqSMProxy tf2dProxy)
     this->links().removePropertyLink(this, "transfer2DBoxes", SIGNAL(transfer2DBoxesChanged()),
       internals.TransferFunction2DProxy, internals.TransferFunction2DProxy->GetProperty("Boxes"));
   }
+  if (internals.TransferFunction2DRepProxy)
+  {
+    this->links().removePropertyLink(this, "use2DTransferFunction",
+      SIGNAL(use2DTransferFunctionChanged()), internals.TransferFunction2DRepProxy,
+      internals.TransferFunction2DRepProxy->GetProperty("UseTransfer2D"));
+  }
   internals.TransferFunction2DProxy = newtf2dProxy;
   if (internals.TransferFunction2DProxy)
   {
-    // pqDataRepresentation* repr = pqActiveObjects::instance().activeRepresentation();
-    // vtkSMPVRepresentationProxy* proxy =
-    // vtkSMPVRepresentationProxy::SafeDownCast(repr->getProxy());
+    pqDataRepresentation* repr = pqActiveObjects::instance().activeRepresentation();
+    vtkSMPVRepresentationProxy* reprProxy =
+      vtkSMPVRepresentationProxy::SafeDownCast(repr->getProxy());
+
+    this->Internals->TransferFunction2DConnector->Disconnect();
+    vtkSMProperty* colorArray2Property = reprProxy->GetProperty("ColorArray2Name");
+    if (colorArray2Property)
+    {
+      this->Internals->TransferFunction2DConnector->Connect(
+        colorArray2Property, vtkCommand::ModifiedEvent, this, SLOT(setHistogramOutdated()));
+    }
+    vtkSMProperty* gradProperty = reprProxy->GetProperty("UseGradientForTransfer2D");
+    if (gradProperty)
+    {
+      this->Internals->TransferFunction2DConnector->Connect(
+        gradProperty, vtkCommand::ModifiedEvent, this, SLOT(setHistogramOutdated()));
+    }
 
     this->initializeTransfer2DEditor(tf2d);
 
     // add new property links.
     this->links().addPropertyLink(this, "transfer2DBoxes", SIGNAL(transfer2DBoxesChanged()),
       internals.TransferFunction2DProxy, internals.TransferFunction2DProxy->GetProperty("Boxes"));
+    vtkSMProperty* useTF2DProperty = reprProxy->GetProperty("UseTransfer2D");
+    if (useTF2DProperty)
+    {
+      internals.TransferFunction2DRepProxy = reprProxy;
+      this->links().addPropertyLink(this, "use2DTransferFunction",
+        SIGNAL(use2DTransferFunctionChanged()), internals.TransferFunction2DRepProxy,
+        useTF2DProperty);
+    }
   }
 }
 
