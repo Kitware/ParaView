@@ -51,6 +51,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <map>
 #include <set>
 #include <string>
+#include <unordered_set>
 #include <vector>
 
 //-----------------------------------------------------------------------------
@@ -124,6 +125,39 @@ bool pqBlockContextMenu::contextMenu(QMenu* menu, pqView*, const QPoint&,
       std::vector<std::string> value(checkedNodes.size());
       std::transform(checkedNodes.begin(), checkedNodes.end(), value.begin(),
         [](const QString& qstring) { return qstring.toStdString(); });
+
+      const std::vector<std::string>& prevValues = smProperty->GetElements();
+
+      if (!prevValues.empty() && prevValues[0] != "/" && prevValues[0] != "/Root")
+      {
+        // If there were blocks that were already hidden in the past, we want to keep them hidden.
+        // We don't have the information in the parameters of the method about the previous state,
+        // all we have is the current state of smProperty.
+        // So what we do is we put all strings from smProperty in a std::unordered_set<std::string>.
+        // We use this dictionary to do fast queries from the list of blocks that should be
+        // displayed (which are all in the `value` container).
+        // If a string is not in smProperty but is in value, then it was hidden in the past, so we
+        // delete this from value.
+
+        std::unordered_set<std::string> prevValuesDictionary;
+
+        for (const std::string& val : prevValues)
+        {
+          prevValuesDictionary.insert(val);
+        }
+
+        for (auto it = value.begin(); it != value.end();)
+        {
+          if (!prevValuesDictionary.count(*it))
+          {
+            it = value.erase(it);
+          }
+          else
+          {
+            ++it;
+          }
+        }
+      }
 
       BEGIN_UNDO_SET("Hide Block");
       smProperty->SetElements(value);
