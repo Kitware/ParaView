@@ -36,9 +36,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqContextMenuInterface.h"
 #include <QObject>
 
-#include <string>
-#include <vector>
-
 /**
  * @class pqBlockContextMenu
  * @brief add context menu items to control block appearance properties.
