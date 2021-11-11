@@ -128,6 +128,9 @@ endif ()
 
 if ("$ENV{CC}" STREQUAL "icc")
   list(APPEND test_exclusions
+    # OpenMPI outputs text that ends up getting detected as a test failure.
+    "^ParaViewExample-Catalyst2/CxxImageDataExample$"
+
     # Known-bad https://gitlab.kitware.com/paraview/paraview/-/issues/20108
     "^ParaViewExample-Catalyst$")
 endif ()
