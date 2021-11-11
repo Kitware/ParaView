@@ -101,6 +101,11 @@ protected Q_SLOTS:
    */
   void colorMenuTriggered(QAction* action);
 
+  /**
+   * called to show all blocks.
+   */
+  void showAllBlocks() const;
+
 protected:
   /**
    * called to build the color arrays submenu.

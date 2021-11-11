@@ -45,7 +45,6 @@ class vtkGraph;
 class vtkHyperTreeGrid;
 class vtkInformation;
 class vtkPVArrayInformation;
-class vtkPVCompositeDataInformation;
 class vtkPVDataInformationHelper;
 class vtkPVDataSetAttributesInformation;
 class vtkSelection;
