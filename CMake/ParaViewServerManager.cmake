@@ -280,7 +280,7 @@ function (paraview_server_manager_process_files)
 #include <string>
 #include <vector>
 
-void ${_paraview_sm_process_files_TARGET}_initialize(std::vector<std::string>& xmls)
+inline void ${_paraview_sm_process_files_TARGET}_initialize(std::vector<std::string>& xmls)
 {\n  (void)xmls;\n")
   foreach (_paraview_sm_process_files_file IN LISTS _paraview_sm_process_files_FILES)
     get_filename_component(_paraview_sm_process_files_name "${_paraview_sm_process_files_file}" NAME_WE)
