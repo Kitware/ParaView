@@ -253,7 +253,6 @@ private:
    */
   void create3DWidgets();
 
-private:
   Q_DISABLE_COPY(pqProxyWidget);
 
   QSet<QString> DefaultVisibilityLabels;

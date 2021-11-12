@@ -92,7 +92,6 @@ public:
    */
   void setData(int column, int role, const QVariant& v) override;
 
-public:
   class pqCallbackHandler
   {
   public:

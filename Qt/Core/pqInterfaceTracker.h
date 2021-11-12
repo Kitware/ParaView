@@ -106,7 +106,6 @@ protected:
    */
   void onPluginLoaded(vtkObject*, unsigned long, void* calldata);
 
-protected:
   QObjectList Interfaces;
   QObjectList RegisteredInterfaces;
   unsigned long ObserverID;

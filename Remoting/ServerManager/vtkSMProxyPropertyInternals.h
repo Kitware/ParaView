@@ -56,7 +56,6 @@ private:
 
   std::map<void*, unsigned long> ObserverIds;
 
-private:
   void UpdateProducerConsumerLinks()
   {
     if (this->Self == nullptr || this->Self->GetParent() == nullptr ||

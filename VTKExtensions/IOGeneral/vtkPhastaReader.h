@@ -104,7 +104,6 @@ private:
   static void readdatablock(int* fileDescriptor, const char keyphrase[], void* valueArray,
     int* nItems, const char datatype[], const char iotype[]);
 
-private:
   vtkPhastaReaderInternal* Internal;
 
   vtkPhastaReader(const vtkPhastaReader&) = delete;

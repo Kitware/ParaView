@@ -238,7 +238,6 @@ protected:
 private:
   void layoutPropertyModified(vtkObject*, unsigned long, void*);
 
-private:
   Q_DISABLE_COPY(pqMultiViewWidget)
 
   class pqInternals;

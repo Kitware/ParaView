@@ -66,7 +66,6 @@ private:
   void Restore();
   string LocateFile();
 
-private:
   pqRemoteCommandDialogUI* Ui;
 
   string CommandSetName;

@@ -120,7 +120,6 @@ private:
    */
   QString selectedPaletteColor() const;
 
-private:
   Q_DISABLE_COPY(pqColorPaletteLinkHelper)
 
   vtkWeakPointer<vtkSMProxy> SMProxy;

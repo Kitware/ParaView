@@ -113,7 +113,6 @@ private:
   QPointer<QAction> FirstCustomAction;
   pqTimer Timer;
 
-private:
   Q_DISABLE_COPY(pqPreviewMenuManager);
   void init(const QStringList& defaultItems, QMenu* parentMenu);
 };

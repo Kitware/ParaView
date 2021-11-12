@@ -223,7 +223,6 @@ private:
 
   int EnableAsynchronousCommunication;
 
-private:
   vtkAMRDualGridHelper(const vtkAMRDualGridHelper&) = delete;
   void operator=(const vtkAMRDualGridHelper&) = delete;
 };

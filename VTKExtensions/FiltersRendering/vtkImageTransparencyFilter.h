@@ -49,7 +49,6 @@ protected:
   // Override to set two inputs
   int FillInputPortInformation(int port, vtkInformation* info) override;
 
-protected:
   vtkImageTransparencyFilter();
   ~vtkImageTransparencyFilter() override;
 

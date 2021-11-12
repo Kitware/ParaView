@@ -80,7 +80,6 @@ protected Q_SLOTS:
 private:
   void CopyProperties(vtkSMSaveScreenshotProxy* shProxySaved, vtkSMSaveScreenshotProxy* shProxy);
 
-private:
   Q_DISABLE_COPY(pqSaveStateAndScreenshotReaction);
 
   QString Directory;

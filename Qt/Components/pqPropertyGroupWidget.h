@@ -88,7 +88,6 @@ private:
   void addIntValuePropertyLink(QWidget* widget, const char* propertyName, int smindex = -1);
   void addStringPropertyLink(QWidget* widget, const char* propertyName, int smindex);
 
-private:
   vtkSMPropertyGroup* PropertyGroup;
 };
 

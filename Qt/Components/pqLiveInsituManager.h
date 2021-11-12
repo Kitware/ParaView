@@ -136,7 +136,6 @@ protected:
   bool isTimeBreakpointHit() const;
   bool isTimeStepBreakpointHit() const;
 
-protected:
   double BreakpointTime;
   double Time;
   vtkIdType BreakpointTimeStep;

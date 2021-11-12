@@ -72,7 +72,6 @@ public:
     LastType = Link
   };
 
-public:
   pqCustomFilterDefinitionModel(QObject* parent = 0);
   ~pqCustomFilterDefinitionModel() override;
 
@@ -199,7 +198,6 @@ private:
    */
   pqCustomFilterDefinitionModelItem* getNextItem(pqCustomFilterDefinitionModelItem* item) const;
 
-private:
   pqCustomFilterDefinitionModelItem* Root; ///< The root of the model tree.
   QPixmap* PixmapList;                     ///< Stores the item icons.
 };

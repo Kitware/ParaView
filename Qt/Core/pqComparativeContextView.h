@@ -82,7 +82,6 @@ protected:
    */
   QWidget* createWidget() override;
 
-protected:
   /**
    * Constructor:
    * \c type  :- view type.

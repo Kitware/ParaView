@@ -60,7 +60,6 @@ class PQCOMPONENTS_EXPORT pqDisplayColorWidget : public QWidget
 public:
   typedef QPair<int, QString> ValueType;
 
-public:
   pqDisplayColorWidget(QWidget* parent = 0);
   ~pqDisplayColorWidget() override;
 
@@ -153,7 +152,6 @@ private:
    */
   int addOutOfDomainEntry(int association, const QString& arrayName);
 
-private:
   QIcon* CellDataIcon;
   QIcon* PointDataIcon;
   QIcon* FieldDataIcon;

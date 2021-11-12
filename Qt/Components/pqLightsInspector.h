@@ -66,8 +66,6 @@ public Q_SLOTS:
   void render();
   void updateAndRender();
 
-private Q_SLOTS:
-
 private:
   Q_DISABLE_COPY(pqLightsInspector);
 

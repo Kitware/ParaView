@@ -68,7 +68,6 @@ private:
   QPair<int, int> sectionSpan(int visualIndex) const;
   QString sectionDisplayText(int logicalIndex) const;
 
-private:
   Q_DISABLE_COPY(pqMultiColumnHeaderView);
 };
 

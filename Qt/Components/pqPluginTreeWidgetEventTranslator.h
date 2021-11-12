@@ -61,7 +61,6 @@ private Q_SLOTS:
 private:
   QString getIndexAsString(const QModelIndex&);
 
-private:
   pqPluginTreeWidgetEventTranslator(const pqPluginTreeWidgetEventTranslator&);
   pqPluginTreeWidgetEventTranslator& operator=(const pqPluginTreeWidgetEventTranslator&);
 

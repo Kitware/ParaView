@@ -66,7 +66,6 @@ public Q_SLOTS:
    */
   void updateEnableState() override;
 
-public Q_SLOTS:
   /**
    * Set the active representation.
    */

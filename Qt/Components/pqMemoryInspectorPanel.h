@@ -126,7 +126,6 @@ private:
 
   QWidget* NewGroupWidget(string name, string icon);
 
-private:
   pqMemoryInspectorPanelUI* Ui;
 
   bool ClientOnly;

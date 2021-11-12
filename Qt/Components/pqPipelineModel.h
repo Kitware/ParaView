@@ -101,7 +101,6 @@ public:
     SessionFilterRole = 34
   };
 
-public:
   pqPipelineModel(QObject* parent = 0);
 
   /**
@@ -450,7 +449,6 @@ private:
    */
   bool checkAndLoadPipelinePixmap(const QString& iconType);
 
-private:
   pqPipelineModelInternal* Internal; ///< Stores the pipeline representation.
   QMap<QString, QPixmap> PixmapMap;  ///< Stores the item icons.
   QPointer<pqView> View;

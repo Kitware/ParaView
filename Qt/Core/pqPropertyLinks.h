@@ -176,7 +176,6 @@ private:
   ConnectionType* addPropertyLinkInternal(QObject* qobject, const char* qproperty,
     const char* qsignal, vtkSMProxy* smproxy, vtkSMProperty* smproperty, int smindex = -1);
 
-private:
   Q_DISABLE_COPY(pqPropertyLinks)
 
   class pqInternals;

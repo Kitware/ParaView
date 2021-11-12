@@ -90,7 +90,6 @@ public:
     ExtendedSelection
   };
 
-public:
   /**
    * \brief
    *   Creates a flat tree view.
@@ -333,7 +332,6 @@ private:
   void drawFocus(
     QPainter& painter, const QRect& cell, const QStyleOptionViewItem& options, bool selected);
 
-private:
   QAbstractItemModel* Model;
   QItemSelectionModel* Selection;
   SelectionBehavior Behavior;

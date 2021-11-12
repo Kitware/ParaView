@@ -54,7 +54,6 @@ public:
    */
   bool supportsSelection() const override { return false; }
 
-public:
   pqXYBarChartView(const QString& group, const QString& name, vtkSMContextViewProxy* viewModule,
     pqServer* server, QObject* parent = nullptr);
 

@@ -70,7 +70,6 @@ public:
     Selection
   };
 
-public:
   /**
    * construct a links model
    */

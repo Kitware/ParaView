@@ -175,7 +175,6 @@ private:
   // Display/hide the tooltip of the selected point in mode SELECT_SURFACE_POINTS_TOOLTIP.
   void UpdateTooltip();
 
-private:
   Q_DISABLE_COPY(pqRenderViewSelectionReaction)
   QPointer<pqRenderView> View;
   QPointer<pqDataRepresentation> Representation;

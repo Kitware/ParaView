@@ -658,7 +658,6 @@ private:
   static vtkSMSessionProxyManager* New() { return nullptr; }
 #endif
 
-private:
   vtkSMSessionProxyManager(const vtkSMSessionProxyManager&) = delete;
   void operator=(const vtkSMSessionProxyManager&) = delete;
 };

@@ -69,11 +69,9 @@ protected Q_SLOTS:
 private:
   typedef pqPropertyGroupWidget Superclass;
 
-private:
   void changeColor(const char* propertyName);
   void fireGradientAndImageChanged(int oldType, int newType);
 
-private:
   Q_OBJECT
   Q_PROPERTY(bool gradientBackground READ gradientBackground WRITE setGradientBackground)
   Q_PROPERTY(bool imageBackground READ imageBackground WRITE setImageBackground)

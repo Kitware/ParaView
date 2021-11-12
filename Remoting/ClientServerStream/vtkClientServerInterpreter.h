@@ -219,7 +219,6 @@ private:
   // Internal implementation details.
   vtkClientServerInterpreterInternals* Internal;
 
-private:
   vtkClientServerInterpreter(const vtkClientServerInterpreter&) = delete;
   void operator=(const vtkClientServerInterpreter&) = delete;
   int NextAvailableId;

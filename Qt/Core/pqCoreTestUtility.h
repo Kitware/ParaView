@@ -64,7 +64,6 @@ public:
    */
   static QString fixPath(const QString& path);
 
-public:
   /**
    * Returns the absolute path to the PARAVIEW_DATA_ROOT in canonical form
    * (slashes forward), or empty string
