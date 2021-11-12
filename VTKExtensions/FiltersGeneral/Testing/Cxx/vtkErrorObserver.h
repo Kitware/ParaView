@@ -48,8 +48,8 @@ private:
 
   bool Error = false;
   bool Warning = false;
-  std::string ErrorMessage = "";
-  std::string WarningMessage = "";
+  std::string ErrorMessage;
+  std::string WarningMessage;
 };
 
 #endif

@@ -36,11 +36,7 @@ public:
   {
   public:
     ConfigInfo()
-      : OSDescriptor("")
-      , CPUDescriptor("")
-      , MemDescriptor("")
-      , HostName("")
-      , ProcessType(-1)
+      : ProcessType(-1)
       , SystemType(-1)
       , Rank(-1)
       , Pid(0)

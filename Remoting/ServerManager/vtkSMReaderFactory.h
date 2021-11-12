@@ -48,10 +48,10 @@ class vtkSMSession;
 
 struct FileTypeDetailed
 {
-  std::string Description = "";
+  std::string Description;
   std::vector<std::string> FilenamePatterns = {};
-  std::string Group = "";
-  std::string Name = "";
+  std::string Group;
+  std::string Name;
 };
 
 class VTKREMOTINGSERVERMANAGER_EXPORT vtkSMReaderFactory : public vtkSMObject
