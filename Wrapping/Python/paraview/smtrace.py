@@ -1595,6 +1595,19 @@ class CallFunction(TraceItem):
         to_trace.append("%s(%s)" % (functionname, ", ".join(args)))
         Trace.Output.append_separated(to_trace)
 
+class TraceText(TraceItem):
+    """Add text directly to the trace. For paraview client applications to use with non-proxy objects."""
+    def __init__(self, text, *args, **kwargs):
+        TraceItem.__init__(self)
+        to_trace = []
+        try:
+            to_trace.append("# " + kwargs["comment"])
+            del kwargs["comment"]
+        except KeyError:
+            pass
+        to_trace.append(text)
+        Trace.Output.append_separated(to_trace)
+
 class ChooseTexture(RenderingMixin, TraceItem):
     """Traces changes of texture object selection. For example renderview background."""
     def __init__(self, owner, texture, prop):
