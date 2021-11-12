@@ -260,10 +260,7 @@ Grid<gridType>::Grid()
 template <GridType gridType>
 Grid<gridType>::~Grid()
 {
-  if (this->Lev)
-  {
-    delete[] this->Lev;
-  }
+  delete[] this->Lev;
   delete this->Impl;
 }
 
