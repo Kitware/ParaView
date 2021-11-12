@@ -45,7 +45,7 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqPluginSettingsBehavior : public QObject
   typedef QObject Superclass;
 
 public:
-  pqPluginSettingsBehavior(QObject* parent = 0);
+  pqPluginSettingsBehavior(QObject* parent = nullptr);
 
 public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   void updateSettings();

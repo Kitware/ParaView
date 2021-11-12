@@ -45,7 +45,7 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqOMETransferFunctionsPropertyWidget : publ
 
 public:
   pqOMETransferFunctionsPropertyWidget(
-    vtkSMProxy* proxy, vtkSMPropertyGroup* smgroup, QWidget* parent = 0);
+    vtkSMProxy* proxy, vtkSMPropertyGroup* smgroup, QWidget* parent = nullptr);
   ~pqOMETransferFunctionsPropertyWidget() override;
 
   bool event(QEvent* evt) override;

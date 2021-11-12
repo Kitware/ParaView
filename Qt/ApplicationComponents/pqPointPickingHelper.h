@@ -52,7 +52,8 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqPointPickingHelper : public QObject
   typedef QObject Superclass;
 
 public:
-  pqPointPickingHelper(const QKeySequence& keySequence, bool pick_on_mesh, QObject* parent = 0);
+  pqPointPickingHelper(
+    const QKeySequence& keySequence, bool pick_on_mesh, QObject* parent = nullptr);
   ~pqPointPickingHelper() override;
 
   /**

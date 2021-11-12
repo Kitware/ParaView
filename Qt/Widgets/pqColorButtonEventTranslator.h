@@ -47,7 +47,7 @@ class PQWIDGETS_EXPORT pqColorButtonEventTranslator : public pqWidgetEventTransl
   typedef pqWidgetEventTranslator Superclass;
 
 public:
-  pqColorButtonEventTranslator(QObject* parent = 0);
+  pqColorButtonEventTranslator(QObject* parent = nullptr);
   ~pqColorButtonEventTranslator() override;
 
   /**

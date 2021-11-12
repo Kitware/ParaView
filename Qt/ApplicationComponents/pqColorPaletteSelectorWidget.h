@@ -63,7 +63,8 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqColorPaletteSelectorWidget : public pqPro
   typedef pqPropertyWidget Superclass;
 
 public:
-  pqColorPaletteSelectorWidget(vtkSMProxy* smproxy, vtkSMProperty* smproperty, QWidget* parent = 0);
+  pqColorPaletteSelectorWidget(
+    vtkSMProxy* smproxy, vtkSMProperty* smproperty, QWidget* parent = nullptr);
   ~pqColorPaletteSelectorWidget() override;
 
   QString paletteName() const;

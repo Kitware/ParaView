@@ -68,7 +68,7 @@ public:
    * \param model The list of registered custom filters to display.
    * \param parent The parent widget for the dialog.
    */
-  pqCustomFilterManager(pqCustomFilterManagerModel* model, QWidget* parent = 0);
+  pqCustomFilterManager(pqCustomFilterManagerModel* model, QWidget* parent = nullptr);
   ~pqCustomFilterManager() override;
 
 public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)

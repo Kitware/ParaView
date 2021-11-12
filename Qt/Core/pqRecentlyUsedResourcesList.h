@@ -79,7 +79,7 @@ class PQCORE_EXPORT pqRecentlyUsedResourcesList : public QObject
   typedef QObject Superclass;
 
 public:
-  pqRecentlyUsedResourcesList(QObject* parent = 0);
+  pqRecentlyUsedResourcesList(QObject* parent = nullptr);
   ~pqRecentlyUsedResourcesList() override;
 
   /**

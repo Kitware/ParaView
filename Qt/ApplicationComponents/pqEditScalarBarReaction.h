@@ -54,7 +54,7 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqEditScalarBarReaction : public pqReaction
   typedef pqReaction Superclass;
 
 public:
-  pqEditScalarBarReaction(QAction* parent = 0, bool track_active_objects = true);
+  pqEditScalarBarReaction(QAction* parent = nullptr, bool track_active_objects = true);
   ~pqEditScalarBarReaction() override;
 
 public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)

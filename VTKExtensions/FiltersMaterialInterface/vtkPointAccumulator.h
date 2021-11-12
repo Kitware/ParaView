@@ -37,7 +37,7 @@ class vtkPointAccumulator
 public:
   vtkPointAccumulator()
   {
-    this->PtStore = 0;
+    this->PtStore = nullptr;
     this->NPts = 0;
   }
   ~vtkPointAccumulator() { this->Clear(); }
@@ -47,11 +47,11 @@ public:
    */
   void Clear()
   {
-    if (this->PtStore != 0)
+    if (this->PtStore != nullptr)
     {
       free(this->PtStore);
     }
-    this->PtStore = 0;
+    this->PtStore = nullptr;
     this->NPts = 0;
   }
   //@}
@@ -70,7 +70,7 @@ public:
     // extend
     vtkIdType newNPts = this->NPts + n;
     T_CPP* newPointStore = static_cast<T_CPP*>(realloc(this->PtStore, newNPts * bytesPerPoint));
-    if (newPointStore == 0)
+    if (newPointStore == nullptr)
     {
 #ifndef NDEBUG
       abort();

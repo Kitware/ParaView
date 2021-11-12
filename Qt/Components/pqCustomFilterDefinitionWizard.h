@@ -91,7 +91,7 @@ public:
    *   model should not be null.
    * \param parent The parent widget for the wizard.
    */
-  pqCustomFilterDefinitionWizard(pqCustomFilterDefinitionModel* model, QWidget* parent = 0);
+  pqCustomFilterDefinitionWizard(pqCustomFilterDefinitionModel* model, QWidget* parent = nullptr);
   ~pqCustomFilterDefinitionWizard() override;
 
   /**

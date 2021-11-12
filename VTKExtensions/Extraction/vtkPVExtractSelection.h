@@ -66,7 +66,7 @@ public:
   /**
    * Removes all inputs from input port 1.
    */
-  void RemoveAllSelectionsInputs() { this->SetInputConnection(1, 0); }
+  void RemoveAllSelectionsInputs() { this->SetInputConnection(1, nullptr); }
 
 protected:
   vtkPVExtractSelection();

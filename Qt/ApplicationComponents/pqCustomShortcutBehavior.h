@@ -47,7 +47,7 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqCustomShortcutBehavior : public QObject
   typedef QObject Superclass;
 
 public:
-  pqCustomShortcutBehavior(QMainWindow* parent = 0);
+  pqCustomShortcutBehavior(QMainWindow* parent = nullptr);
 
 public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   void loadMenuItemShortcuts();

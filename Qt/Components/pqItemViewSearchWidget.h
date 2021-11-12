@@ -51,7 +51,7 @@ class PQCOMPONENTS_EXPORT pqItemViewSearchWidget : public QDialog
   typedef QDialog Superclass;
 
 public:
-  pqItemViewSearchWidget(QWidget* parent = 0);
+  pqItemViewSearchWidget(QWidget* parent = nullptr);
   ~pqItemViewSearchWidget() override;
   enum ItemSearchType
   {

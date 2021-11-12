@@ -67,7 +67,7 @@ public:
     SHOW_NON_INDEXED_COLORS_ONLY
   };
 
-  pqPresetDialog(QWidget* parent = 0, Modes mode = SHOW_ALL);
+  pqPresetDialog(QWidget* parent = nullptr, Modes mode = SHOW_ALL);
   ~pqPresetDialog() override;
 
   /**

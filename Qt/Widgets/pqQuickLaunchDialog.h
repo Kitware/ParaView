@@ -45,7 +45,7 @@ class PQWIDGETS_EXPORT pqQuickLaunchDialog : public QDialog
   typedef QDialog Superclass;
 
 public:
-  pqQuickLaunchDialog(QWidget* parent = 0);
+  pqQuickLaunchDialog(QWidget* parent = nullptr);
   ~pqQuickLaunchDialog() override;
 
   /**

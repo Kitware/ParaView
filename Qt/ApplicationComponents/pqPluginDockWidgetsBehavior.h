@@ -49,7 +49,7 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqPluginDockWidgetsBehavior : public QObjec
   typedef QObject Superclass;
 
 public:
-  pqPluginDockWidgetsBehavior(QMainWindow* parent = 0);
+  pqPluginDockWidgetsBehavior(QMainWindow* parent = nullptr);
 
 public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   void addPluginInterface(QObject* iface);

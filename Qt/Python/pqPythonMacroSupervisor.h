@@ -45,7 +45,7 @@ class PQPYTHON_EXPORT pqPythonMacroSupervisor : public QObject
 {
   Q_OBJECT
 public:
-  pqPythonMacroSupervisor(QObject* p = 0);
+  pqPythonMacroSupervisor(QObject* p = nullptr);
   ~pqPythonMacroSupervisor() override;
 
   // Description:

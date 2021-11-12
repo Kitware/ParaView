@@ -55,7 +55,7 @@ class PQCOMPONENTS_EXPORT pqAnimationManager : public QObject
 {
   Q_OBJECT
 public:
-  pqAnimationManager(QObject* parent = 0);
+  pqAnimationManager(QObject* parent = nullptr);
   ~pqAnimationManager() override;
 
   /**

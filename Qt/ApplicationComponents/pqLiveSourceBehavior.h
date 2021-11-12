@@ -56,7 +56,7 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqLiveSourceBehavior : public QObject
   typedef QObject Superclass;
 
 public:
-  pqLiveSourceBehavior(QObject* parent = 0);
+  pqLiveSourceBehavior(QObject* parent = nullptr);
   ~pqLiveSourceBehavior() override;
 
   /**

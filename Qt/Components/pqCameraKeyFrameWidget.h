@@ -49,7 +49,7 @@ class PQCOMPONENTS_EXPORT pqCameraKeyFrameWidget : public QWidget
   typedef QWidget Superclass;
 
 public:
-  pqCameraKeyFrameWidget(QWidget* parent = 0);
+  pqCameraKeyFrameWidget(QWidget* parent = nullptr);
   ~pqCameraKeyFrameWidget() override;
 
   bool usePathBasedMode() const;

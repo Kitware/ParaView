@@ -101,7 +101,7 @@ public:
     SessionFilterRole = 34
   };
 
-  pqPipelineModel(QObject* parent = 0);
+  pqPipelineModel(QObject* parent = nullptr);
 
   /**
    * \brief
@@ -109,7 +109,7 @@ public:
    * \param other The pipeline model to copy.
    * \param parent The parent object.
    */
-  pqPipelineModel(const pqPipelineModel& other, QObject* parent = 0);
+  pqPipelineModel(const pqPipelineModel& other, QObject* parent = nullptr);
 
   /**
    * \brief
@@ -117,7 +117,7 @@ public:
    * \param other Used to build a pipeline model.
    * \param parent The parent object.
    */
-  pqPipelineModel(const pqServerManagerModel& other, QObject* parent = 0);
+  pqPipelineModel(const pqServerManagerModel& other, QObject* parent = nullptr);
 
   ~pqPipelineModel() override;
 

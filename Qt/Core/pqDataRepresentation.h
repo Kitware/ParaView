@@ -56,7 +56,7 @@ class PQCORE_EXPORT pqDataRepresentation : public pqRepresentation
 
 public:
   pqDataRepresentation(const QString& group, const QString& name, vtkSMProxy* display,
-    pqServer* server, QObject* parent = 0);
+    pqServer* server, QObject* parent = nullptr);
   ~pqDataRepresentation() override;
 
   /**

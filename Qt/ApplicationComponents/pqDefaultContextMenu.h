@@ -64,7 +64,7 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqDefaultContextMenu
   using Superclass = pqContextMenuInterface;
 
 public:
-  pqDefaultContextMenu(QObject* parent = 0);
+  pqDefaultContextMenu(QObject* parent = nullptr);
   ~pqDefaultContextMenu() override;
 
   //@{

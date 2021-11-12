@@ -57,7 +57,7 @@ public:
    * constructor requires the proxy, property. Note that this will abort if the
    * property does not have a ProxyListDomain.
    */
-  pqProxySelectionWidget(vtkSMProperty* property, vtkSMProxy* proxy, QWidget* parent = 0);
+  pqProxySelectionWidget(vtkSMProperty* property, vtkSMProxy* proxy, QWidget* parent = nullptr);
   ~pqProxySelectionWidget() override;
 
   /**

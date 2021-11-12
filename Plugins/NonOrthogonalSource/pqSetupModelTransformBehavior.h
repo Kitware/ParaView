@@ -40,7 +40,7 @@ class pqSetupModelTransformBehavior : public QObject
   typedef QObject Superclass;
 
 public:
-  pqSetupModelTransformBehavior(QObject* parent = 0);
+  pqSetupModelTransformBehavior(QObject* parent = nullptr);
   ~pqSetupModelTransformBehavior() override;
 
 private:

@@ -41,7 +41,7 @@ class PQWIDGETS_EXPORT pqCollapsedGroup : public QGroupBox
   Q_OBJECT
   Q_PROPERTY(bool collapsed READ collapsed WRITE setCollapsed)
 public:
-  explicit pqCollapsedGroup(QWidget* p = 0);
+  explicit pqCollapsedGroup(QWidget* p = nullptr);
 
   bool collapsed() const;
   void setCollapsed(bool);

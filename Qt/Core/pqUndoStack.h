@@ -61,7 +61,7 @@ public:
    * If no \c builder is provided a default vtkSMUndoStackBuilder object will
    * be created.
    */
-  pqUndoStack(vtkSMUndoStackBuilder* builder = 0, QObject* parent = nullptr);
+  pqUndoStack(vtkSMUndoStackBuilder* builder = nullptr, QObject* parent = nullptr);
   ~pqUndoStack() override;
 
   /**

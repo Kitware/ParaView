@@ -49,7 +49,7 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqTextLocationWidget : public pqPropertyWid
   typedef pqPropertyWidget Superclass;
 
 public:
-  pqTextLocationWidget(vtkSMProxy* proxy, vtkSMPropertyGroup* smgroup, QWidget* parent = 0);
+  pqTextLocationWidget(vtkSMProxy* proxy, vtkSMPropertyGroup* smgroup, QWidget* parent = nullptr);
   ~pqTextLocationWidget() override;
 
   QString windowLocation() const;

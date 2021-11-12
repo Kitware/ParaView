@@ -59,7 +59,7 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqApplyBehavior : public QObject
   typedef QObject Superclass;
 
 public:
-  pqApplyBehavior(QObject* parent = 0);
+  pqApplyBehavior(QObject* parent = nullptr);
   ~pqApplyBehavior() override;
 
   /**

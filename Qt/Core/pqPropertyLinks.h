@@ -69,7 +69,7 @@ class PQCORE_EXPORT pqPropertyLinks : public QObject
   typedef QObject Superclass;
 
 public:
-  pqPropertyLinks(QObject* parent = 0);
+  pqPropertyLinks(QObject* parent = nullptr);
   ~pqPropertyLinks() override;
 
   /**

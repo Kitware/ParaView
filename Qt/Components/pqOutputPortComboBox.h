@@ -49,7 +49,7 @@ class PQCOMPONENTS_EXPORT pqOutputPortComboBox : public QComboBox
   typedef QComboBox Superclass;
 
 public:
-  pqOutputPortComboBox(QWidget* parent = 0);
+  pqOutputPortComboBox(QWidget* parent = nullptr);
   ~pqOutputPortComboBox() override;
 
   /**

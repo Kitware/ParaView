@@ -48,12 +48,12 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqMainControlsToolbar : public QToolBar
   typedef QToolBar Superclass;
 
 public:
-  pqMainControlsToolbar(const QString& title, QWidget* parentObject = 0)
+  pqMainControlsToolbar(const QString& title, QWidget* parentObject = nullptr)
     : Superclass(title, parentObject)
   {
     this->constructor();
   }
-  pqMainControlsToolbar(QWidget* parentObject = 0)
+  pqMainControlsToolbar(QWidget* parentObject = nullptr)
     : Superclass(parentObject)
   {
     this->constructor();

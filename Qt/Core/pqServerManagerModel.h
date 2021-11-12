@@ -88,7 +88,7 @@ public:
    * \c observer  :- instance of pqServerManagerObserver observing the server
    *                 manager.
    */
-  pqServerManagerModel(pqServerManagerObserver* observer, QObject* parent = 0);
+  pqServerManagerModel(pqServerManagerObserver* observer, QObject* parent = nullptr);
   ~pqServerManagerModel() override;
 
   /**
@@ -199,7 +199,7 @@ public:
    * Internal method.
    */
   static void findItemsHelper(const pqServerManagerModel* const model, const QMetaObject& mo,
-    QList<void*>* list, pqServer* server = 0);
+    QList<void*>* list, pqServer* server = nullptr);
 
   /**
    * Internal method.
@@ -397,7 +397,7 @@ inline QList<T> pqFindItems(const pqServerManagerModel* const model)
 {
   QList<T> list;
   pqServerManagerModel::findItemsHelper(
-    model, ((T)0)->staticMetaObject, reinterpret_cast<QList<void*>*>(&list), 0);
+    model, ((T)0)->staticMetaObject, reinterpret_cast<QList<void*>*>(&list), nullptr);
   return list;
 }
 

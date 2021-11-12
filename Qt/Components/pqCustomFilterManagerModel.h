@@ -60,7 +60,7 @@ class PQCOMPONENTS_EXPORT pqCustomFilterManagerModel : public QAbstractListModel
   Q_OBJECT
 
 public:
-  pqCustomFilterManagerModel(QObject* parent = 0);
+  pqCustomFilterManagerModel(QObject* parent = nullptr);
   ~pqCustomFilterManagerModel() override;
 
   /**

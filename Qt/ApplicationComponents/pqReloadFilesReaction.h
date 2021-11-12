@@ -48,7 +48,7 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqReloadFilesReaction : public pqReaction
   typedef pqReaction Superclass;
 
 public:
-  pqReloadFilesReaction(QAction* parent = 0);
+  pqReloadFilesReaction(QAction* parent = nullptr);
   ~pqReloadFilesReaction() override;
 
   /**

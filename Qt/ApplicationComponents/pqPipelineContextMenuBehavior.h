@@ -60,7 +60,7 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqPipelineContextMenuBehavior : public QObj
   typedef QObject Superclass;
 
 public:
-  pqPipelineContextMenuBehavior(QObject* parent = 0);
+  pqPipelineContextMenuBehavior(QObject* parent = nullptr);
   ~pqPipelineContextMenuBehavior() override;
 
 protected Q_SLOTS:

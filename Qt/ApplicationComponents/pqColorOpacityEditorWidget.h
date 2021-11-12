@@ -88,7 +88,8 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqColorOpacityEditorWidget : public pqPrope
   typedef pqPropertyWidget Superclass;
 
 public:
-  pqColorOpacityEditorWidget(vtkSMProxy* proxy, vtkSMPropertyGroup* smgroup, QWidget* parent = 0);
+  pqColorOpacityEditorWidget(
+    vtkSMProxy* proxy, vtkSMPropertyGroup* smgroup, QWidget* parent = nullptr);
   ~pqColorOpacityEditorWidget() override;
 
   /**

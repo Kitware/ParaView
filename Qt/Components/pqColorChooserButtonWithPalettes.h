@@ -66,7 +66,7 @@ class PQCOMPONENTS_EXPORT pqColorChooserButtonWithPalettes : public pqColorChoos
   typedef pqColorChooserButton Superclass;
 
 public:
-  pqColorChooserButtonWithPalettes(QWidget* parent = 0);
+  pqColorChooserButtonWithPalettes(QWidget* parent = nullptr);
   ~pqColorChooserButtonWithPalettes() override;
 
 private Q_SLOTS:

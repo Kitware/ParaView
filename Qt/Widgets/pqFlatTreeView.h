@@ -95,7 +95,7 @@ public:
    *   Creates a flat tree view.
    * \param parent The parent widget for this instance.
    */
-  pqFlatTreeView(QWidget* parent = 0);
+  pqFlatTreeView(QWidget* parent = nullptr);
   ~pqFlatTreeView() override;
 
   /**

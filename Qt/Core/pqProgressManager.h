@@ -50,7 +50,7 @@ class PQCORE_EXPORT pqProgressManager : public QObject
 {
   Q_OBJECT
 public:
-  pqProgressManager(QObject* parent = 0);
+  pqProgressManager(QObject* parent = nullptr);
   ~pqProgressManager() override;
 
   /**

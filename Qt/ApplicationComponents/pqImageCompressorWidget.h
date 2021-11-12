@@ -48,7 +48,7 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqImageCompressorWidget : public pqProperty
   Q_PROPERTY(QString compressorConfig READ compressorConfig WRITE setCompressorConfig);
 
 public:
-  pqImageCompressorWidget(vtkSMProxy* proxy, vtkSMProperty* smproperty, QWidget* parent = 0);
+  pqImageCompressorWidget(vtkSMProxy* proxy, vtkSMProperty* smproperty, QWidget* parent = nullptr);
   ~pqImageCompressorWidget() override;
 
   QString compressorConfig() const;

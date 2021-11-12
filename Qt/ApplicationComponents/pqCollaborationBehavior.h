@@ -49,7 +49,7 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqCollaborationBehavior : public QObject
   typedef QObject Superclass;
 
 public:
-  pqCollaborationBehavior(QObject* parent = 0);
+  pqCollaborationBehavior(QObject* parent = nullptr);
 
 private:
   Q_DISABLE_COPY(pqCollaborationBehavior)

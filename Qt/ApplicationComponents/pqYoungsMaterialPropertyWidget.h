@@ -56,7 +56,8 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqYoungsMaterialPropertyWidget
       normalArraysChanged);
 
 public:
-  pqYoungsMaterialPropertyWidget(vtkSMProxy* proxy, vtkSMPropertyGroup* group, QWidget* parent = 0);
+  pqYoungsMaterialPropertyWidget(
+    vtkSMProxy* proxy, vtkSMPropertyGroup* group, QWidget* parent = nullptr);
   ~pqYoungsMaterialPropertyWidget() override;
 
   //@{

@@ -45,12 +45,12 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqColorToolbar : public QToolBar
   typedef QToolBar Superclass;
 
 public:
-  pqColorToolbar(const QString& title, QWidget* parentObject = 0)
+  pqColorToolbar(const QString& title, QWidget* parentObject = nullptr)
     : Superclass(title, parentObject)
   {
     this->constructor();
   }
-  pqColorToolbar(QWidget* parentObject = 0)
+  pqColorToolbar(QWidget* parentObject = nullptr)
     : Superclass(parentObject)
   {
     this->constructor();

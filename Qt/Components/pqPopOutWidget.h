@@ -55,7 +55,7 @@ public:
    * the given string as the title of the dialog when the widget is
    * popped out.
    */
-  pqPopOutWidget(QWidget* widgetToPopOut, const QString& dialogTitle, QWidget* p = 0);
+  pqPopOutWidget(QWidget* widgetToPopOut, const QString& dialogTitle, QWidget* p = nullptr);
   ~pqPopOutWidget() override;
 
   /**

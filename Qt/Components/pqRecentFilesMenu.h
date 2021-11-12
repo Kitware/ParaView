@@ -68,7 +68,7 @@ public:
   /**
    * Assigns the menu that will display the list of files
    */
-  pqRecentFilesMenu(QMenu& menu, QObject* p = 0);
+  pqRecentFilesMenu(QMenu& menu, QObject* p = nullptr);
   ~pqRecentFilesMenu() override;
 
   /**

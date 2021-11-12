@@ -61,7 +61,7 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqLinePropertyWidget : public pqInteractive
   typedef pqInteractivePropertyWidget Superclass;
 
 public:
-  pqLinePropertyWidget(vtkSMProxy* proxy, vtkSMPropertyGroup* smgroup, QWidget* parent = 0);
+  pqLinePropertyWidget(vtkSMProxy* proxy, vtkSMPropertyGroup* smgroup, QWidget* parent = nullptr);
   ~pqLinePropertyWidget() override;
 
 public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)

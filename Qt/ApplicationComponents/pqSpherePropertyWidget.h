@@ -53,7 +53,7 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqSpherePropertyWidget : public pqInteracti
   typedef pqInteractivePropertyWidget Superclass;
 
 public:
-  pqSpherePropertyWidget(vtkSMProxy* proxy, vtkSMPropertyGroup* smgroup, QWidget* parent = 0);
+  pqSpherePropertyWidget(vtkSMProxy* proxy, vtkSMPropertyGroup* smgroup, QWidget* parent = nullptr);
   ~pqSpherePropertyWidget() override;
 
 public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)

@@ -48,7 +48,7 @@ class PQCOMPONENTS_EXPORT pqSelectionInputWidget : public QWidget
   typedef QWidget Superclass;
 
 public:
-  pqSelectionInputWidget(QWidget* parent = 0);
+  pqSelectionInputWidget(QWidget* parent = nullptr);
   ~pqSelectionInputWidget() override;
 
   virtual pqSMProxy selection() { return this->SelectionSource; }

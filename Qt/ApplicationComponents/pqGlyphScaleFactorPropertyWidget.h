@@ -47,7 +47,8 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqGlyphScaleFactorPropertyWidget
   typedef pqDoubleVectorPropertyWidget Superclass;
 
 public:
-  pqGlyphScaleFactorPropertyWidget(vtkSMProxy* proxy, vtkSMProperty* property, QWidget* parent = 0);
+  pqGlyphScaleFactorPropertyWidget(
+    vtkSMProxy* proxy, vtkSMProperty* property, QWidget* parent = nullptr);
   ~pqGlyphScaleFactorPropertyWidget() override;
 
 protected Q_SLOTS:

@@ -58,7 +58,7 @@ public:
   /**
    * create this dialog with a parent
    */
-  pqPluginDialog(pqServer* server, QWidget* p = 0);
+  pqPluginDialog(pqServer* server, QWidget* p = nullptr);
   /**
    * destroy this dialog
    */

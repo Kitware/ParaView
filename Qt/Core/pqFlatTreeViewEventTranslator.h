@@ -49,7 +49,7 @@ class PQCORE_EXPORT pqFlatTreeViewEventTranslator : public pqWidgetEventTranslat
   typedef pqWidgetEventTranslator Superclass;
 
 public:
-  pqFlatTreeViewEventTranslator(QObject* p = 0);
+  pqFlatTreeViewEventTranslator(QObject* p = nullptr);
 
   using Superclass::translateEvent;
   bool translateEvent(QObject* Object, QEvent* Event, bool& Error) override;

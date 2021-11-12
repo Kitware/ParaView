@@ -60,8 +60,8 @@ class PQWIDGETS_EXPORT pqTextEdit : public QTextEdit
   typedef QTextEdit Superclass;
 
 public:
-  pqTextEdit(QWidget* parent = 0);
-  pqTextEdit(const QString& contents, QWidget* parent = 0);
+  pqTextEdit(QWidget* parent = nullptr);
+  pqTextEdit(const QString& contents, QWidget* parent = nullptr);
 
   ~pqTextEdit() override;
 

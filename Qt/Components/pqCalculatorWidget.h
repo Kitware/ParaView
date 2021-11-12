@@ -51,7 +51,7 @@ class PQCOMPONENTS_EXPORT pqCalculatorWidget : public pqPropertyWidget
   typedef pqPropertyWidget Superclass;
 
 public:
-  pqCalculatorWidget(vtkSMProxy* proxy, vtkSMProperty* property, QWidget* parent = 0);
+  pqCalculatorWidget(vtkSMProxy* proxy, vtkSMProperty* property, QWidget* parent = nullptr);
   ~pqCalculatorWidget() override;
 
 protected Q_SLOTS:

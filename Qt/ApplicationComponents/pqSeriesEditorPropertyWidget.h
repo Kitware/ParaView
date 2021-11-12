@@ -84,7 +84,8 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqSeriesEditorPropertyWidget : public pqPro
   typedef pqPropertyWidget Superclass;
 
 public:
-  pqSeriesEditorPropertyWidget(vtkSMProxy* proxy, vtkSMPropertyGroup* smgroup, QWidget* parent = 0);
+  pqSeriesEditorPropertyWidget(
+    vtkSMProxy* proxy, vtkSMPropertyGroup* smgroup, QWidget* parent = nullptr);
   ~pqSeriesEditorPropertyWidget() override;
 
   //@{

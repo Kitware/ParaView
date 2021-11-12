@@ -43,7 +43,7 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqBackgroundEditorWidget : public pqPropert
 {
 public:
   pqBackgroundEditorWidget(vtkSMProxy* smproxy, vtkSMPropertyGroup* smgroup,
-    QWidget* parentObject = 0, bool forEnvironment = false);
+    QWidget* parentObject = nullptr, bool forEnvironment = false);
   ~pqBackgroundEditorWidget() override;
 
   bool gradientBackground() const;

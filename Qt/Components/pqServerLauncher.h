@@ -60,7 +60,7 @@ class PQCOMPONENTS_EXPORT pqServerLauncher : public QObject
   typedef QObject Superclass;
 
 public:
-  pqServerLauncher(const pqServerConfiguration& configuration, QObject* parent = 0);
+  pqServerLauncher(const pqServerConfiguration& configuration, QObject* parent = nullptr);
   ~pqServerLauncher() override;
 
   /**

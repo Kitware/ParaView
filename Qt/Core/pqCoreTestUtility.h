@@ -55,7 +55,7 @@ class PQCORE_EXPORT pqCoreTestUtility : public pqTestUtility
   typedef pqTestUtility Superclass;
 
 public:
-  pqCoreTestUtility(QObject* parent = 0);
+  pqCoreTestUtility(QObject* parent = nullptr);
   ~pqCoreTestUtility() override;
 
   /**

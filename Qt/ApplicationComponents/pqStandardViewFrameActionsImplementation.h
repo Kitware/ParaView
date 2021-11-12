@@ -93,7 +93,7 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqStandardViewFrameActionsImplementation
   Q_INTERFACES(pqViewFrameActionsInterface);
 
 public:
-  pqStandardViewFrameActionsImplementation(QObject* parent = 0);
+  pqStandardViewFrameActionsImplementation(QObject* parent = nullptr);
   ~pqStandardViewFrameActionsImplementation() override;
 
   /**

@@ -52,7 +52,7 @@ class PQCOMPONENTS_EXPORT pqComparativeCueWidget : public QTableWidget
   typedef QTableWidget Superclass;
 
 public:
-  pqComparativeCueWidget(QWidget* parent = 0);
+  pqComparativeCueWidget(QWidget* parent = nullptr);
   ~pqComparativeCueWidget() override;
 
   /**

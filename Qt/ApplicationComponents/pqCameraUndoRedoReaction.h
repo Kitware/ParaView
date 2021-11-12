@@ -52,7 +52,7 @@ public:
    * undo-reaction, else acts as redo reaction.
    * If \c view ==nullptr then active view is used.
    */
-  pqCameraUndoRedoReaction(QAction* parent, bool undo, pqView* view = 0);
+  pqCameraUndoRedoReaction(QAction* parent, bool undo, pqView* view = nullptr);
 
   /**
    * undo.

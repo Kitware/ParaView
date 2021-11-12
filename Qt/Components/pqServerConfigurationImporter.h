@@ -51,7 +51,7 @@ class PQCOMPONENTS_EXPORT pqServerConfigurationImporter : public QObject
   typedef QObject Superclass;
 
 public:
-  pqServerConfigurationImporter(QObject* parent = 0);
+  pqServerConfigurationImporter(QObject* parent = nullptr);
   ~pqServerConfigurationImporter() override;
 
   enum SourceMode

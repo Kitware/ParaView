@@ -51,7 +51,7 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqObjectPickingBehavior : public QObject
   typedef QObject Superclass;
 
 public:
-  pqObjectPickingBehavior(QObject* parent = 0);
+  pqObjectPickingBehavior(QObject* parent = nullptr);
   ~pqObjectPickingBehavior() override;
 
 protected:

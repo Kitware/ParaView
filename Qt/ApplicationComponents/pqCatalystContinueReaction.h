@@ -50,7 +50,7 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqCatalystContinueReaction
   typedef pqCatalystPauseSimulationReaction Superclass;
 
 public:
-  pqCatalystContinueReaction(QAction* parentTemp = 0)
+  pqCatalystContinueReaction(QAction* parentTemp = nullptr)
     : Superclass(parentTemp)
   {
   }

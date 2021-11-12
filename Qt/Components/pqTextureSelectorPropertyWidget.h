@@ -52,7 +52,8 @@ class PQCOMPONENTS_EXPORT pqTextureSelectorPropertyWidget : public pqPropertyWid
   Q_OBJECT
 
 public:
-  pqTextureSelectorPropertyWidget(vtkSMProxy* proxy, vtkSMProperty* property, QWidget* parent = 0);
+  pqTextureSelectorPropertyWidget(
+    vtkSMProxy* proxy, vtkSMProperty* property, QWidget* parent = nullptr);
   ~pqTextureSelectorPropertyWidget() override = default;
 
 protected Q_SLOTS:

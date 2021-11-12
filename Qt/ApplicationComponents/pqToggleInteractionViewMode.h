@@ -47,7 +47,7 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqToggleInteractionViewMode : public pqReac
   typedef pqReaction Superclass;
 
 public:
-  pqToggleInteractionViewMode(QAction* parent, pqView* view = 0);
+  pqToggleInteractionViewMode(QAction* parent, pqView* view = nullptr);
 
 protected:
   /**

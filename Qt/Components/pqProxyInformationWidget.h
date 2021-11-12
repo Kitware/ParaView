@@ -58,7 +58,7 @@ class PQCOMPONENTS_EXPORT pqProxyInformationWidget : public QWidget
   using Superclass = QWidget;
 
 public:
-  pqProxyInformationWidget(QWidget* p = 0);
+  pqProxyInformationWidget(QWidget* p = nullptr);
   ~pqProxyInformationWidget() override;
 
   /**

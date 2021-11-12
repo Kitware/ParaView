@@ -79,7 +79,7 @@ class PQWIDGETS_EXPORT pqTableView : public QTableView
   Q_PROPERTY(int padding READ padding WRITE setPadding);
 
 public:
-  pqTableView(QWidget* parent = 0);
+  pqTableView(QWidget* parent = nullptr);
   ~pqTableView() override;
 
   /**

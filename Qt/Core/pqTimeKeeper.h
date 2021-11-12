@@ -48,7 +48,7 @@ class PQCORE_EXPORT pqTimeKeeper : public pqProxy
   Q_OBJECT
 public:
   pqTimeKeeper(const QString& group, const QString& name, vtkSMProxy* timekeeper, pqServer* server,
-    QObject* parent = 0);
+    QObject* parent = nullptr);
   ~pqTimeKeeper() override;
 
   /**

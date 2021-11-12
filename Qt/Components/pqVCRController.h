@@ -50,7 +50,7 @@ class PQCOMPONENTS_EXPORT pqVCRController : public QObject
 {
   Q_OBJECT
 public:
-  pqVCRController(QObject* parent = 0);
+  pqVCRController(QObject* parent = nullptr);
   ~pqVCRController() override;
 
 Q_SIGNALS:

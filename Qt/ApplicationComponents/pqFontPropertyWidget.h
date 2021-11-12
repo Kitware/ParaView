@@ -56,7 +56,7 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqFontPropertyWidget : public pqPropertyGro
   typedef pqPropertyGroupWidget Superclass;
 
 public:
-  pqFontPropertyWidget(vtkSMProxy* proxy, vtkSMPropertyGroup* smgroup, QWidget* parent = 0);
+  pqFontPropertyWidget(vtkSMProxy* proxy, vtkSMPropertyGroup* smgroup, QWidget* parent = nullptr);
   ~pqFontPropertyWidget() override;
 
   QString HorizontalJustification() const;

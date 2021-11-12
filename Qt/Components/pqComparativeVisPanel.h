@@ -51,7 +51,7 @@ class PQCOMPONENTS_EXPORT pqComparativeVisPanel : public QWidget
   typedef QWidget Superclass;
 
 public:
-  pqComparativeVisPanel(QWidget* parent = 0);
+  pqComparativeVisPanel(QWidget* parent = nullptr);
   ~pqComparativeVisPanel() override;
 
   /**

@@ -44,7 +44,7 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqLinkSelectionReaction : public pqReaction
   typedef pqReaction Superclass;
 
 public:
-  pqLinkSelectionReaction(QAction* parent = 0);
+  pqLinkSelectionReaction(QAction* parent = nullptr);
 
   /**
    * Link selection of the current active source with

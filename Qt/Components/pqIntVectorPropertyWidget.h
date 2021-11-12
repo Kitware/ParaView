@@ -42,7 +42,7 @@ class PQCOMPONENTS_EXPORT pqIntVectorPropertyWidget : public pqPropertyWidget
   Q_OBJECT
 
 public:
-  pqIntVectorPropertyWidget(vtkSMProperty* property, vtkSMProxy* proxy, QWidget* parent = 0);
+  pqIntVectorPropertyWidget(vtkSMProperty* property, vtkSMProxy* proxy, QWidget* parent = nullptr);
   ~pqIntVectorPropertyWidget() override;
 
   /**

@@ -46,7 +46,7 @@ class PQCOMPONENTS_EXPORT pqPluginTreeWidgetEventTranslator : public pqWidgetEve
   typedef pqWidgetEventTranslator Superclass;
 
 public:
-  pqPluginTreeWidgetEventTranslator(QObject* parentObject = 0);
+  pqPluginTreeWidgetEventTranslator(QObject* parentObject = nullptr);
   ~pqPluginTreeWidgetEventTranslator() override;
 
   using Superclass::translateEvent;

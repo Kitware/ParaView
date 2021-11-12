@@ -58,7 +58,7 @@ class PQCOMPONENTS_EXPORT pqTabbedMultiViewWidget : public QWidget
   typedef QWidget Superclass;
   Q_PROPERTY(bool readOnly READ readOnly WRITE setReadOnly)
 public:
-  pqTabbedMultiViewWidget(QWidget* parent = 0);
+  pqTabbedMultiViewWidget(QWidget* parent = nullptr);
   ~pqTabbedMultiViewWidget() override;
 
   /**

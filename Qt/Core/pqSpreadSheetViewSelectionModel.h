@@ -59,7 +59,7 @@ class PQCORE_EXPORT pqSpreadSheetViewSelectionModel : public QItemSelectionModel
   typedef QItemSelectionModel Superclass;
 
 public:
-  pqSpreadSheetViewSelectionModel(pqSpreadSheetViewModel* model, QObject* parent = 0);
+  pqSpreadSheetViewSelectionModel(pqSpreadSheetViewModel* model, QObject* parent = nullptr);
   ~pqSpreadSheetViewSelectionModel() override;
 
 public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)

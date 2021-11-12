@@ -49,7 +49,7 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqLoadPaletteReaction : public pqReaction
   typedef pqReaction Superclass;
 
 public:
-  pqLoadPaletteReaction(QAction* parent = 0);
+  pqLoadPaletteReaction(QAction* parent = nullptr);
   ~pqLoadPaletteReaction() override;
 
 protected:

@@ -50,7 +50,7 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqModelTransformSupportBehavior : public QO
   typedef QObject Superclass;
 
 public:
-  pqModelTransformSupportBehavior(QObject* parent = 0);
+  pqModelTransformSupportBehavior(QObject* parent = nullptr);
   ~pqModelTransformSupportBehavior() override;
 
   static vtkTuple<double, 16> getChangeOfBasisMatrix(

@@ -49,7 +49,7 @@ class pqIntegrationModelSurfaceHelperWidget : public pqIntegrationModelHelperWid
 
 public:
   pqIntegrationModelSurfaceHelperWidget(
-    vtkSMProxy* smproxy, vtkSMProperty* smproperty, QWidget* parentObject = 0);
+    vtkSMProxy* smproxy, vtkSMProperty* smproperty, QWidget* parentObject = nullptr);
   ~pqIntegrationModelSurfaceHelperWidget() override = default;
 
   QList<QVariant> arrayToGenerate() const;

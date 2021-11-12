@@ -67,7 +67,7 @@ public:
    * @param[in] orientation Orientation for the header.
    * @param[in] parent The parent object
    */
-  pqCheckableHeaderView(Qt::Orientation orientation, QWidget* parent = 0);
+  pqCheckableHeaderView(Qt::Orientation orientation, QWidget* parent = nullptr);
   ~pqCheckableHeaderView() override;
 
   /**

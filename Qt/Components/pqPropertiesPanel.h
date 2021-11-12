@@ -63,7 +63,7 @@ class PQCOMPONENTS_EXPORT pqPropertiesPanel : public QWidget
   typedef QWidget Superclass;
 
 public:
-  pqPropertiesPanel(QWidget* parent = 0);
+  pqPropertiesPanel(QWidget* parent = nullptr);
   ~pqPropertiesPanel() override;
 
   /**

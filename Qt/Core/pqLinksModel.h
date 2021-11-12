@@ -73,7 +73,7 @@ public:
   /**
    * construct a links model
    */
-  pqLinksModel(QObject* parent = 0);
+  pqLinksModel(QObject* parent = nullptr);
 
   /**
    * destruct a links model

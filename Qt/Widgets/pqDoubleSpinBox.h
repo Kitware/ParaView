@@ -45,7 +45,7 @@ class PQWIDGETS_EXPORT pqDoubleSpinBox : public QDoubleSpinBox
   typedef QDoubleSpinBox Superclass;
 
 public:
-  explicit pqDoubleSpinBox(QWidget* parent = 0);
+  explicit pqDoubleSpinBox(QWidget* parent = nullptr);
 
   /**
    * Virtual function that is called whenever the user triggers a step.  We are

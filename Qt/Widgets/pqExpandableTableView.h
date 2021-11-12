@@ -52,7 +52,7 @@ class PQWIDGETS_EXPORT pqExpandableTableView : public pqTableView
   typedef pqTableView Superclass;
 
 public:
-  pqExpandableTableView(QWidget* parent = 0);
+  pqExpandableTableView(QWidget* parent = nullptr);
   ~pqExpandableTableView() override;
 
 Q_SIGNALS:

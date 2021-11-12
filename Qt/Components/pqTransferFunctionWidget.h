@@ -52,7 +52,7 @@ class PQCOMPONENTS_EXPORT pqTransferFunctionWidget : public QWidget
   typedef QWidget Superclass;
 
 public:
-  pqTransferFunctionWidget(QWidget* parent = 0);
+  pqTransferFunctionWidget(QWidget* parent = nullptr);
   ~pqTransferFunctionWidget() override;
 
   /**

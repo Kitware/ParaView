@@ -102,8 +102,9 @@ class PQCOMPONENTS_EXPORT pqSearchBox : public QWidget
 public:
   typedef QWidget Superclass;
 
-  pqSearchBox(QWidget* parent = 0);
-  pqSearchBox(bool advancedSearchEnabled, const QString& settingKey = "", QWidget* parent = 0);
+  pqSearchBox(QWidget* parent = nullptr);
+  pqSearchBox(
+    bool advancedSearchEnabled, const QString& settingKey = "", QWidget* parent = nullptr);
 
   ~pqSearchBox() override;
 

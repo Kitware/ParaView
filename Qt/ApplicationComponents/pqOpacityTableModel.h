@@ -45,7 +45,7 @@ class pqOpacityTableModel : public QAbstractTableModel
   typedef QAbstractTableModel Superclass;
 
 public:
-  pqOpacityTableModel(pqColorOpacityEditorWidget* widget, QObject* parentObject = 0);
+  pqOpacityTableModel(pqColorOpacityEditorWidget* widget, QObject* parentObject = nullptr);
 
   ~pqOpacityTableModel() override;
 

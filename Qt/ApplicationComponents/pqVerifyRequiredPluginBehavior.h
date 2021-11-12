@@ -50,7 +50,7 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqVerifyRequiredPluginBehavior : public QOb
   typedef QObject Superclass;
 
 public:
-  pqVerifyRequiredPluginBehavior(QObject* parent = 0);
+  pqVerifyRequiredPluginBehavior(QObject* parent = nullptr);
 
 protected Q_SLOTS:
   void requiredPluginsNotLoaded();

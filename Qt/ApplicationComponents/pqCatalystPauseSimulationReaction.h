@@ -50,7 +50,7 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqCatalystPauseSimulationReaction : public 
   typedef pqReaction Superclass;
 
 public:
-  pqCatalystPauseSimulationReaction(QAction* parent = 0);
+  pqCatalystPauseSimulationReaction(QAction* parent = nullptr);
 
 public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   void updateEnableState() override { updateEnableState(PAUSE); }

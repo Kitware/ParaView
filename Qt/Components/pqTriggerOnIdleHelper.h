@@ -54,7 +54,7 @@ class PQCOMPONENTS_EXPORT pqTriggerOnIdleHelper : public QObject
   typedef QObject Superclass;
 
 public:
-  pqTriggerOnIdleHelper(QObject* parent = 0);
+  pqTriggerOnIdleHelper(QObject* parent = nullptr);
   ~pqTriggerOnIdleHelper() override;
 
   /**

@@ -214,28 +214,28 @@ public:
   /**
    * Expand bounding box to contain the given polygon.
    */
-  void DrawPoly(float* points, int n, unsigned char* colors = 0, int nc_comps = 0) override;
+  void DrawPoly(float* points, int n, unsigned char* colors = nullptr, int nc_comps = 0) override;
 
   /**
    * Expand bounding rect to contain the given lines.
    */
-  void DrawLines(float* f, int n, unsigned char* colors = 0, int nc_comps = 0) override;
+  void DrawLines(float* f, int n, unsigned char* colors = nullptr, int nc_comps = 0) override;
 
   /**
    * Expand bounding rect to contain the given points.
    */
-  void DrawPoints(float* points, int n, unsigned char* colors = 0, int nc_comps = 0) override;
+  void DrawPoints(float* points, int n, unsigned char* colors = nullptr, int nc_comps = 0) override;
 
   /**
    * Expand bounding rect to contain the point sprites.
    */
-  void DrawPointSprites(vtkImageData* sprite, float* points, int n, unsigned char* colors = 0,
+  void DrawPointSprites(vtkImageData* sprite, float* points, int n, unsigned char* colors = nullptr,
     int nc_comps = 0) override;
 
   /**
    * Expand bounding rect to contain the markers.
    */
-  void DrawMarkers(int shape, bool highlight, float* points, int n, unsigned char* colors = 0,
+  void DrawMarkers(int shape, bool highlight, float* points, int n, unsigned char* colors = nullptr,
     int nc_comps = 0) override;
 
   /**

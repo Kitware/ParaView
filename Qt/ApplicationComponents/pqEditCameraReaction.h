@@ -47,7 +47,7 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqEditCameraReaction : public pqReaction
   typedef pqReaction Superclass;
 
 public:
-  pqEditCameraReaction(QAction* parent, pqView* view = 0);
+  pqEditCameraReaction(QAction* parent, pqView* view = nullptr);
 
   /**
    * Shows the dialog for the view.

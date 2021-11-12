@@ -53,7 +53,7 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqTransferFunctionWidgetPropertyWidget
 
 public:
   explicit pqTransferFunctionWidgetPropertyWidget(
-    vtkSMProxy* proxy, vtkSMProperty* property, QWidget* parent = 0);
+    vtkSMProxy* proxy, vtkSMProperty* property, QWidget* parent = nullptr);
   ~pqTransferFunctionWidgetPropertyWidget() override;
 
   friend pqTransferFunctionWidgetPropertyDialog;

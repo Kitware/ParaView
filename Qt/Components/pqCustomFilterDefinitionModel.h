@@ -72,7 +72,7 @@ public:
     LastType = Link
   };
 
-  pqCustomFilterDefinitionModel(QObject* parent = 0);
+  pqCustomFilterDefinitionModel(QObject* parent = nullptr);
   ~pqCustomFilterDefinitionModel() override;
 
   /**

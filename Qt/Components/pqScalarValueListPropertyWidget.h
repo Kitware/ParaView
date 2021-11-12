@@ -52,7 +52,8 @@ class PQCOMPONENTS_EXPORT pqScalarValueListPropertyWidget : public pqPropertyWid
   typedef pqPropertyWidget Superclass;
 
 public:
-  pqScalarValueListPropertyWidget(vtkSMProperty* property, vtkSMProxy* proxy, QWidget* parent = 0);
+  pqScalarValueListPropertyWidget(
+    vtkSMProperty* property, vtkSMProxy* proxy, QWidget* parent = nullptr);
   ~pqScalarValueListPropertyWidget() override;
 
   void setScalars(const QVariantList& scalars);

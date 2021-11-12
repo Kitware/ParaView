@@ -43,8 +43,10 @@ class PQCOMPONENTS_EXPORT pqArrayStatusPropertyWidget : public pqPropertyWidget
   typedef pqPropertyWidget Superclass;
 
 public:
-  pqArrayStatusPropertyWidget(vtkSMProxy* proxy, vtkSMPropertyGroup* group, QWidget* parent = 0);
-  pqArrayStatusPropertyWidget(vtkSMProxy* proxy, vtkSMProperty* property, QWidget* parent = 0);
+  pqArrayStatusPropertyWidget(
+    vtkSMProxy* proxy, vtkSMPropertyGroup* group, QWidget* parent = nullptr);
+  pqArrayStatusPropertyWidget(
+    vtkSMProxy* proxy, vtkSMProperty* property, QWidget* parent = nullptr);
   ~pqArrayStatusPropertyWidget() override;
 
 private:

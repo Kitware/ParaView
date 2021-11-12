@@ -52,7 +52,7 @@ namespace
 class pqTextBrowser : public QTextBrowser
 {
 public:
-  pqTextBrowser(QHelpEngine* helpEngine, QWidget* _parent = 0)
+  pqTextBrowser(QHelpEngine* helpEngine, QWidget* _parent = nullptr)
   {
     this->HelpEngine = helpEngine;
     this->setParent(_parent);

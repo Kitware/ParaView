@@ -54,7 +54,7 @@ class PQCORE_EXPORT pqSpreadSheetViewWidget : public QTableView
   typedef QTableView Superclass;
 
 public:
-  pqSpreadSheetViewWidget(QWidget* parent = 0);
+  pqSpreadSheetViewWidget(QWidget* parent = nullptr);
   ~pqSpreadSheetViewWidget() override;
 
   /**

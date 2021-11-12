@@ -61,7 +61,7 @@ class PQCOMPONENTS_EXPORT pqInputSelectorWidget : public pqPropertyWidget
   Q_PROPERTY(pqSMProxy selectedInput READ selectedInput WRITE setSelectedInput)
 
 public:
-  pqInputSelectorWidget(vtkSMProxy* proxy, vtkSMProperty* smproperty, QWidget* parent = 0);
+  pqInputSelectorWidget(vtkSMProxy* proxy, vtkSMProperty* smproperty, QWidget* parent = nullptr);
   ~pqInputSelectorWidget() override;
 
   /**

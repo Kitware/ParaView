@@ -50,7 +50,7 @@ class pqIntegrationModelHelperWidget : public pqPropertyWidget
 
 public:
   pqIntegrationModelHelperWidget(
-    vtkSMProxy* smproxy, vtkSMProperty* smproperty, QWidget* parentObject = 0);
+    vtkSMProxy* smproxy, vtkSMProperty* smproperty, QWidget* parentObject = nullptr);
   ~pqIntegrationModelHelperWidget() override = default;
 
 protected Q_SLOTS:

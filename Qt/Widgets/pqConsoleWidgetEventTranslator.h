@@ -48,7 +48,7 @@ class PQWIDGETS_EXPORT pqConsoleWidgetEventTranslator : public pqWidgetEventTran
   typedef pqWidgetEventTranslator Superclass;
 
 public:
-  pqConsoleWidgetEventTranslator(QObject* parent = 0);
+  pqConsoleWidgetEventTranslator(QObject* parent = nullptr);
   ~pqConsoleWidgetEventTranslator() override;
 
   /**

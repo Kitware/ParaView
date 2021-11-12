@@ -59,7 +59,7 @@ class PQCORE_EXPORT pqPluginManager : public QObject
   typedef QObject Superclass;
 
 public:
-  pqPluginManager(QObject* p = 0);
+  pqPluginManager(QObject* p = nullptr);
   ~pqPluginManager() override;
 
   /**
@@ -86,7 +86,7 @@ public:
    * message is put in the errorMsg string
    */
   LoadStatus loadExtension(
-    pqServer* session, const QString& lib, QString* errorMsg = 0, bool remote = true);
+    pqServer* session, const QString& lib, QString* errorMsg = nullptr, bool remote = true);
 
   /**
    * attempt to load all available plugins on a server, or client plugins if

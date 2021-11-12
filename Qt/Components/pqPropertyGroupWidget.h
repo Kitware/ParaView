@@ -60,7 +60,7 @@ class PQCOMPONENTS_EXPORT pqPropertyGroupWidget : public pqPropertyWidget
   typedef pqPropertyWidget Superclass;
 
 public:
-  pqPropertyGroupWidget(vtkSMProxy* proxy, vtkSMPropertyGroup* smGroup, QWidget* parent = 0);
+  pqPropertyGroupWidget(vtkSMProxy* proxy, vtkSMPropertyGroup* smGroup, QWidget* parent = nullptr);
   vtkSMPropertyGroup* propertyGroup() const { return this->PropertyGroup; }
   // make this function accessible without class prefix
   using Superclass::addPropertyLink;

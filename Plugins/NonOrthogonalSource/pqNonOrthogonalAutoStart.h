@@ -40,7 +40,7 @@ class pqNonOrthogonalAutoStart : public QObject
   typedef QObject Superclass;
 
 public:
-  pqNonOrthogonalAutoStart(QObject* parent = 0);
+  pqNonOrthogonalAutoStart(QObject* parent = nullptr);
   ~pqNonOrthogonalAutoStart() override;
 
   void startup();

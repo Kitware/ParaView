@@ -51,7 +51,7 @@ class PQCORE_EXPORT pqFileDialogEventTranslator : public pqWidgetEventTranslator
   typedef pqWidgetEventTranslator Superclass;
 
 public:
-  pqFileDialogEventTranslator(QObject* p = 0);
+  pqFileDialogEventTranslator(QObject* p = nullptr);
 
   using Superclass::translateEvent;
   bool translateEvent(QObject* Object, QEvent* Event, bool& Error) override;

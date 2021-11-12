@@ -55,7 +55,7 @@ public:
   /**
    * create this dialog with a parent
    */
-  pqLinksManager(QWidget* p = 0);
+  pqLinksManager(QWidget* p = nullptr);
   /**
    * destroy this dialog
    */

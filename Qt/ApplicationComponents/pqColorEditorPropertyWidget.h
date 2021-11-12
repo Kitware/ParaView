@@ -46,7 +46,7 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqColorEditorPropertyWidget : public pqProp
 public:
   typedef pqPropertyWidget Superclass;
 
-  pqColorEditorPropertyWidget(vtkSMProxy* proxy, QWidget* parent = 0);
+  pqColorEditorPropertyWidget(vtkSMProxy* proxy, QWidget* parent = nullptr);
   ~pqColorEditorPropertyWidget() override;
 
 private Q_SLOTS:

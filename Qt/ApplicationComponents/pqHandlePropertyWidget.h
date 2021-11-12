@@ -54,7 +54,7 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqHandlePropertyWidget : public pqInteracti
   typedef pqInteractivePropertyWidget Superclass;
 
 public:
-  pqHandlePropertyWidget(vtkSMProxy* proxy, vtkSMPropertyGroup* smgroup, QWidget* parent = 0);
+  pqHandlePropertyWidget(vtkSMProxy* proxy, vtkSMPropertyGroup* smgroup, QWidget* parent = nullptr);
   ~pqHandlePropertyWidget() override;
 
 public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)

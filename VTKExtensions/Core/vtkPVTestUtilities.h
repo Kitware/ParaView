@@ -60,8 +60,8 @@ public:
   char* GetTempFilePath(const char* name) { return this->GetFilePath(this->TempRoot, name); }
 
 protected:
-  vtkPVTestUtilities() { this->Initialize(0, 0); }
-  ~vtkPVTestUtilities() override { this->Initialize(0, 0); }
+  vtkPVTestUtilities() { this->Initialize(0, nullptr); }
+  ~vtkPVTestUtilities() override { this->Initialize(0, nullptr); }
 
 private:
   vtkPVTestUtilities(const vtkPVTestUtilities&) = delete;

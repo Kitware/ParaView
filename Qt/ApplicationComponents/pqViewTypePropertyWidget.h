@@ -50,7 +50,7 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqViewTypePropertyWidget : public pqPropert
   Q_PROPERTY(QString value READ value WRITE setValue);
 
 public:
-  pqViewTypePropertyWidget(vtkSMProxy* proxy, vtkSMProperty* smproperty, QWidget* parent = 0);
+  pqViewTypePropertyWidget(vtkSMProxy* proxy, vtkSMProperty* smproperty, QWidget* parent = nullptr);
   ~pqViewTypePropertyWidget() override;
 
   /**

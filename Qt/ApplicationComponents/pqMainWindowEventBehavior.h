@@ -50,7 +50,7 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqMainWindowEventBehavior : public QObject
   typedef QObject Superclass;
 
 public:
-  pqMainWindowEventBehavior(QObject* parent = 0);
+  pqMainWindowEventBehavior(QObject* parent = nullptr);
   ~pqMainWindowEventBehavior() override;
 
 public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)

@@ -49,7 +49,7 @@ class PQCOMPONENTS_EXPORT pqOrbitCreatorDialog : public QDialog
   typedef QDialog Superclass;
 
 public:
-  pqOrbitCreatorDialog(QWidget* parent = 0);
+  pqOrbitCreatorDialog(QWidget* parent = nullptr);
   ~pqOrbitCreatorDialog() override;
 
   /**

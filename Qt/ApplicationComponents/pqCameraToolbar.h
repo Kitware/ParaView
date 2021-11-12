@@ -48,12 +48,12 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqCameraToolbar : public QToolBar
   typedef QToolBar Superclass;
 
 public:
-  pqCameraToolbar(const QString& title, QWidget* parentObject = 0)
+  pqCameraToolbar(const QString& title, QWidget* parentObject = nullptr)
     : Superclass(title, parentObject)
   {
     this->constructor();
   }
-  pqCameraToolbar(QWidget* parentObject = 0)
+  pqCameraToolbar(QWidget* parentObject = nullptr)
     : Superclass(parentObject)
   {
     this->constructor();

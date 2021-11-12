@@ -62,7 +62,7 @@ class PQCOMPONENTS_EXPORT pqViewFrame : public QWidget
   typedef QWidget Superclass;
 
 public:
-  pqViewFrame(QWidget* parent = 0);
+  pqViewFrame(QWidget* parent = nullptr);
   ~pqViewFrame() override;
 
   /**
@@ -78,7 +78,7 @@ public:
    * widget will be deleted with pqViewFrame is deleted or another widget is set
    * using setCentralWidget().
    */
-  void setCentralWidget(QWidget* widget, pqView* view = 0);
+  void setCentralWidget(QWidget* widget, pqView* view = nullptr);
   QWidget* centralWidget() const;
 
   /**

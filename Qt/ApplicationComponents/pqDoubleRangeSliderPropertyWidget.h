@@ -55,7 +55,7 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqDoubleRangeSliderPropertyWidget : public 
 
 public:
   pqDoubleRangeSliderPropertyWidget(
-    vtkSMProxy* proxy, vtkSMProperty* property, QWidget* parent = 0);
+    vtkSMProxy* proxy, vtkSMProperty* property, QWidget* parent = nullptr);
   ~pqDoubleRangeSliderPropertyWidget() override;
 
   void apply() override;

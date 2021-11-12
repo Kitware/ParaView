@@ -63,7 +63,7 @@ public:
    */
   pqPropertyLinksConnection(QObject* qobject, const char* qproperty, const char* qsignal,
     vtkSMProxy* smproxy, vtkSMProperty* smproperty, int smindex, bool use_unchecked_modified_event,
-    QObject* parentObject = 0);
+    QObject* parentObject = nullptr);
 
   ~pqPropertyLinksConnection() override;
 

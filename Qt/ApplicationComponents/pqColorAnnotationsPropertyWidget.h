@@ -55,7 +55,7 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqColorAnnotationsPropertyWidget : public p
 
 public:
   pqColorAnnotationsPropertyWidget(
-    vtkSMProxy* proxy, vtkSMPropertyGroup* smgroup, QWidget* parent = 0);
+    vtkSMProxy* proxy, vtkSMPropertyGroup* smgroup, QWidget* parent = nullptr);
   ~pqColorAnnotationsPropertyWidget() override;
 
   //@{

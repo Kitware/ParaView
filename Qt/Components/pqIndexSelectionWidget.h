@@ -53,7 +53,7 @@ class PQCOMPONENTS_EXPORT pqIndexSelectionWidget : public pqPropertyWidget
   typedef pqPropertyWidget Superclass;
 
 public:
-  pqIndexSelectionWidget(vtkSMProxy* proxy, vtkSMProperty* property, QWidget* parent = 0);
+  pqIndexSelectionWidget(vtkSMProxy* proxy, vtkSMProperty* property, QWidget* parent = nullptr);
   ~pqIndexSelectionWidget() override;
 
 public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)

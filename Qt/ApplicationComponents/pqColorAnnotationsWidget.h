@@ -52,7 +52,7 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqColorAnnotationsWidget : public QWidget
   typedef QWidget Superclass;
 
 public:
-  pqColorAnnotationsWidget(QWidget* parent = 0);
+  pqColorAnnotationsWidget(QWidget* parent = nullptr);
   ~pqColorAnnotationsWidget() override;
 
   void setLookupTableProxy(vtkSMProxy* proxy);

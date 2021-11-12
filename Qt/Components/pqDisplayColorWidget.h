@@ -60,7 +60,7 @@ class PQCOMPONENTS_EXPORT pqDisplayColorWidget : public QWidget
 public:
   typedef QPair<int, QString> ValueType;
 
-  pqDisplayColorWidget(QWidget* parent = 0);
+  pqDisplayColorWidget(QWidget* parent = nullptr);
   ~pqDisplayColorWidget() override;
 
   /**
