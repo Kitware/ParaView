@@ -107,8 +107,7 @@ void vtkBinsAccumulator<FunctorT>::Initialize()
 
 //----------------------------------------------------------------------------
 template <typename FunctorT>
-const typename vtkBinsAccumulator<FunctorT>::BinsPointer vtkBinsAccumulator<FunctorT>::GetBins()
-  const
+typename vtkBinsAccumulator<FunctorT>::BinsPointer vtkBinsAccumulator<FunctorT>::GetBins() const
 {
   return this->Bins;
 }
