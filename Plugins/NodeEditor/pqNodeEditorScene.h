@@ -43,7 +43,7 @@ class pqNodeEditorScene : public QGraphicsScene
 
 public:
   pqNodeEditorScene(QObject* parent = nullptr);
-  virtual ~pqNodeEditorScene() = default;
+  ~pqNodeEditorScene() override = default;
 
 Q_SIGNALS:
   /**

@@ -105,12 +105,12 @@ public:
   /**
    * Enable/disable further connections for given port.
    */
-  virtual void DisableFurtherConnections(int port, bool disable) override;
+  void DisableFurtherConnections(int port, bool disable) override;
 
   /**
    * Returns true if the last check of connect ids was wrong.
    */
-  virtual bool GetWrongConnectID() override;
+  bool GetWrongConnectID() override;
 
 protected:
   vtkTCPNetworkAccessManager();

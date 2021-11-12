@@ -229,7 +229,7 @@ public:
 
 protected:
   vtkSMExtractsController();
-  ~vtkSMExtractsController();
+  ~vtkSMExtractsController() override;
 
   //@{
   /**

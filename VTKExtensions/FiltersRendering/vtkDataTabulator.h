@@ -133,7 +133,7 @@ public:
 
 protected:
   vtkDataTabulator();
-  ~vtkDataTabulator();
+  ~vtkDataTabulator() override;
 
   int FillOutputPortInformation(int port, vtkInformation* info) override;
   int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;

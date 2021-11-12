@@ -128,7 +128,7 @@ public:
   /**
    * Remove the node from the scene it has been added to.
    */
-  virtual ~pqNodeEditorNode();
+  ~pqNodeEditorNode() override;
 
   /**
    *  Get corresponding pqProxy of the node.

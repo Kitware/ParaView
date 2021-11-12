@@ -99,7 +99,7 @@ public:
    * pqPVApplicationCore (see class description).
    */
   pqPresetGroupsManager(QObject* p);
-  ~pqPresetGroupsManager();
+  ~pqPresetGroupsManager() override;
 
   /**
    * Returns the number of groups the manager knows of.

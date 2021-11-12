@@ -52,7 +52,7 @@ class pqNodeEditorWidget : public QDockWidget
 public:
   pqNodeEditorWidget(QWidget* parent = nullptr);
   pqNodeEditorWidget(const QString& title, QWidget* parent = nullptr);
-  virtual ~pqNodeEditorWidget() = default;
+  ~pqNodeEditorWidget() override = default;
 
 public Q_SLOTS:
   /**

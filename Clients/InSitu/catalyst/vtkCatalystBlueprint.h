@@ -45,7 +45,7 @@ public:
 
 protected:
   vtkCatalystBlueprint();
-  ~vtkCatalystBlueprint();
+  ~vtkCatalystBlueprint() override;
 
 private:
   vtkCatalystBlueprint(const vtkCatalystBlueprint&) = delete;

@@ -41,7 +41,7 @@ public:
 
 protected:
   vtkSMOMETIFFChannelCalculatorInitializationHelper();
-  ~vtkSMOMETIFFChannelCalculatorInitializationHelper();
+  ~vtkSMOMETIFFChannelCalculatorInitializationHelper() override;
 
 private:
   vtkSMOMETIFFChannelCalculatorInitializationHelper(

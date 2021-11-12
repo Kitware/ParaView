@@ -64,7 +64,7 @@ public:
 
 protected:
   vtkCPPythonScriptV2Pipeline();
-  ~vtkCPPythonScriptV2Pipeline();
+  ~vtkCPPythonScriptV2Pipeline() override;
 
 private:
   vtkCPPythonScriptV2Pipeline(const vtkCPPythonScriptV2Pipeline&) = delete;

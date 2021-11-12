@@ -49,7 +49,7 @@ public:
 
 protected:
   vtkOrderedCompositingHelper();
-  ~vtkOrderedCompositingHelper();
+  ~vtkOrderedCompositingHelper() override;
 
   std::vector<vtkBoundingBox> Boxes;
 

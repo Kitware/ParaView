@@ -35,7 +35,7 @@ public:
 
 protected:
   vtkPVContextViewDataDeliveryManager();
-  ~vtkPVContextViewDataDeliveryManager();
+  ~vtkPVContextViewDataDeliveryManager() override;
 
   void MoveData(vtkPVDataRepresentation* repr, bool low_res, int port) override;
 

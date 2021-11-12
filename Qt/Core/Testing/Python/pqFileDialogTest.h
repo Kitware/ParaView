@@ -14,8 +14,8 @@ class pqFileDialogTestUtility : public pqTestUtility
   Q_OBJECT
 public:
   pqFileDialogTestUtility();
-  ~pqFileDialogTestUtility();
-  virtual bool playTests(const QStringList& filenames);
+  ~pqFileDialogTestUtility() override;
+  bool playTests(const QStringList& filenames) override;
 public Q_SLOTS:
   void playTheTests();
 

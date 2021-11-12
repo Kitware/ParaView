@@ -286,7 +286,7 @@ public:
 
 protected:
   vtkRemotingCoreConfiguration();
-  ~vtkRemotingCoreConfiguration();
+  ~vtkRemotingCoreConfiguration() override;
 
 private:
   static vtkRemotingCoreConfiguration* New();

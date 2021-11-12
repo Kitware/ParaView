@@ -104,7 +104,7 @@ public:
 
 protected:
   vtkCPPythonScriptV2Helper();
-  ~vtkCPPythonScriptV2Helper();
+  ~vtkCPPythonScriptV2Helper() override;
 
   bool IsActivated(int timestep, double time);
   bool IsLiveActivated();

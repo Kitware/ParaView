@@ -47,7 +47,7 @@ public:
 
 protected:
   vtkAllToNRedistributeCompositePolyData();
-  ~vtkAllToNRedistributeCompositePolyData();
+  ~vtkAllToNRedistributeCompositePolyData() override;
 
   /**
    * Create a default executive.
@@ -55,13 +55,12 @@ protected:
    * in CreateDefaultExecutive() using NewInstance().
    * Otherwise, vtkStreamingDemandDrivenPipeline is created.
    */
-  virtual vtkExecutive* CreateDefaultExecutive() override;
+  vtkExecutive* CreateDefaultExecutive() override;
 
-  virtual int RequestDataObject(
-    vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
-  virtual int RequestData(vtkInformation* request, vtkInformationVector** inputVector,
+  int RequestDataObject(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
+  int RequestData(vtkInformation* request, vtkInformationVector** inputVector,
     vtkInformationVector* outputVector) override;
-  virtual int FillInputPortInformation(int port, vtkInformation* info) override;
+  int FillInputPortInformation(int port, vtkInformation* info) override;
 
   int NumberOfProcesses;
   vtkMultiProcessController* Controller;

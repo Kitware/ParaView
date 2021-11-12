@@ -52,7 +52,7 @@ public:
   static vtkMooseXfemClip* New();
   vtkTypeMacro(vtkMooseXfemClip, vtkUnstructuredGridAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent) override;
-  virtual int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
+  int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
 
   //@{
   /**
@@ -73,7 +73,7 @@ public:
 
 protected:
   vtkMooseXfemClip();
-  ~vtkMooseXfemClip();
+  ~vtkMooseXfemClip() override;
 
   int OutputPointsPrecision;
   vtkIncrementalPointLocator* Locator;

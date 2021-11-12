@@ -34,7 +34,7 @@ class pqSLACDataLoadManager : public QDialog
 
 public:
   pqSLACDataLoadManager(QWidget* p, Qt::WindowFlags f = Qt::WindowFlags{});
-  ~pqSLACDataLoadManager();
+  ~pqSLACDataLoadManager() override;
 
 public Q_SLOTS:
   virtual void checkInputValid();

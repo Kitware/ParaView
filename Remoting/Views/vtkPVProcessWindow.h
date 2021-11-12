@@ -55,7 +55,7 @@ public:
 
 protected:
   vtkPVProcessWindow();
-  ~vtkPVProcessWindow();
+  ~vtkPVProcessWindow() override;
 
   static vtkRenderWindow* NewWindow();
   static vtkRenderWindow* NewTileDisplayWindow();

@@ -67,7 +67,7 @@ public:
    */
   pqScaleByButton(const QMap<double, QString>& scaleFactorsAndLabels, QWidget* parent = nullptr);
 
-  virtual ~pqScaleByButton();
+  ~pqScaleByButton() override;
 
 Q_SIGNALS:
   /**

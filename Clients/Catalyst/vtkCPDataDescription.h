@@ -102,7 +102,7 @@ public:
 
 protected:
   vtkCPDataDescription();
-  virtual ~vtkCPDataDescription();
+  ~vtkCPDataDescription() override;
 
 private:
   vtkCPDataDescription(const vtkCPDataDescription&) = delete;

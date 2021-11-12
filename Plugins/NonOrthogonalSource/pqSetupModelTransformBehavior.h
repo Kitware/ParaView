@@ -41,7 +41,7 @@ class pqSetupModelTransformBehavior : public QObject
 
 public:
   pqSetupModelTransformBehavior(QObject* parent = 0);
-  virtual ~pqSetupModelTransformBehavior();
+  ~pqSetupModelTransformBehavior() override;
 
 private:
   Q_DISABLE_COPY(pqSetupModelTransformBehavior)

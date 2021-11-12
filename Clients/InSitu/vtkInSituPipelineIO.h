@@ -72,7 +72,7 @@ public:
 
 protected:
   vtkInSituPipelineIO();
-  ~vtkInSituPipelineIO();
+  ~vtkInSituPipelineIO() override;
 
 private:
   vtkInSituPipelineIO(const vtkInSituPipelineIO&) = delete;

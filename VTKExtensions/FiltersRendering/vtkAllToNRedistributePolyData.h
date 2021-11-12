@@ -46,7 +46,7 @@ public:
 
 protected:
   vtkAllToNRedistributePolyData();
-  ~vtkAllToNRedistributePolyData();
+  ~vtkAllToNRedistributePolyData() override;
 
   void MakeSchedule(vtkPolyData*, vtkCommSched*) override;
 

@@ -51,7 +51,7 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqMainWindowEventBehavior : public QObject
 
 public:
   pqMainWindowEventBehavior(QObject* parent = 0);
-  virtual ~pqMainWindowEventBehavior();
+  ~pqMainWindowEventBehavior() override;
 
 public Q_SLOTS:
   /**

@@ -54,7 +54,7 @@ public:
 
 protected:
   vtkPVDataUtilities();
-  ~vtkPVDataUtilities();
+  ~vtkPVDataUtilities() override;
 
 private:
   vtkPVDataUtilities(const vtkPVDataUtilities&) = delete;

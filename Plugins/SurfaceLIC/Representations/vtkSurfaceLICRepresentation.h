@@ -41,7 +41,7 @@ public:
   // typically called by the vtkView to request meta-data from the
   // representations or ask them to perform certain tasks e.g.
   // PrepareForRendering.
-  virtual int ProcessViewRequest(vtkInformationRequestKey* request_type, vtkInformation* inInfo,
+  int ProcessViewRequest(vtkInformationRequestKey* request_type, vtkInformation* inInfo,
     vtkInformation* outInfo) override;
 
   // Description:
@@ -98,7 +98,7 @@ public:
 
 protected:
   vtkSurfaceLICRepresentation();
-  ~vtkSurfaceLICRepresentation();
+  ~vtkSurfaceLICRepresentation() override;
 
   // Description:
   // Overridden method to set parameters on vtkProperty and vtkMapper.

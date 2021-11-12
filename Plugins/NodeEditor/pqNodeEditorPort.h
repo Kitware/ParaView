@@ -51,7 +51,7 @@ public:
    */
   pqNodeEditorPort(
     Type type, vtkIdType id, int portNumber, QString name = "", QGraphicsItem* parent = nullptr);
-  virtual ~pqNodeEditorPort() = default;
+  ~pqNodeEditorPort() override = default;
 
   /**
    * Return the label widget of the port

@@ -35,7 +35,7 @@ class PQWIDGETS_EXPORT pqDoubleSliderWidget : public QWidget
       setUseGlobalPrecisionAndNotation)
 public:
   pqDoubleSliderWidget(QWidget* parent = nullptr);
-  ~pqDoubleSliderWidget();
+  ~pqDoubleSliderWidget() override;
 
   /**
    * get the value

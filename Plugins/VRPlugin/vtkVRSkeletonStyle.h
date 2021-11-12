@@ -54,9 +54,9 @@ protected:
   vtkVRSkeletonStyle();
   ~vtkVRSkeletonStyle();
 
-  virtual void HandleButton(const vtkVREvent& event) override;
-  virtual void HandleAnalog(const vtkVREvent& event) override;
-  virtual void HandleTracker(const vtkVREvent& event) override;
+  void HandleButton(const vtkVREvent& event) override;
+  void HandleAnalog(const vtkVREvent& event) override;
+  void HandleTracker(const vtkVREvent& event) override;
 
   bool EnableReport;
 

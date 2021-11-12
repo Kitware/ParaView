@@ -53,7 +53,7 @@ class VTKREMOTINGVIEWS_EXPORT vtkIceTContext : public vtkObject
 public:
   vtkTypeMacro(vtkIceTContext, vtkObject);
   static vtkIceTContext* New();
-  virtual void PrintSelf(ostream& os, vtkIndent indent) override;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   //@{
   /**
@@ -94,7 +94,7 @@ public:
 
 protected:
   vtkIceTContext();
-  ~vtkIceTContext();
+  ~vtkIceTContext() override;
 
   vtkMultiProcessController* Controller;
 

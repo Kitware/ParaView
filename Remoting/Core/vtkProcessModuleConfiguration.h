@@ -119,7 +119,7 @@ public:
 
 protected:
   vtkProcessModuleConfiguration();
-  ~vtkProcessModuleConfiguration();
+  ~vtkProcessModuleConfiguration() override;
 
 private:
   vtkProcessModuleConfiguration(const vtkProcessModuleConfiguration&) = delete;

@@ -32,13 +32,13 @@ public:
   vtkTypeMacro(vtkSMRendererDomain, vtkSMStringListDomain);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  virtual void Update(vtkSMProperty*) override;
+  void Update(vtkSMProperty*) override;
 
 protected:
   vtkSMRendererDomain(){};
   ~vtkSMRendererDomain() override{};
 
-  virtual int ReadXMLAttributes(vtkSMProperty* prop, vtkPVXMLElement* element) override;
+  int ReadXMLAttributes(vtkSMProperty* prop, vtkPVXMLElement* element) override;
 
 private:
   vtkSMRendererDomain(const vtkSMRendererDomain&) = delete;

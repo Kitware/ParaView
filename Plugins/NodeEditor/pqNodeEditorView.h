@@ -45,11 +45,11 @@ public:
 
   void triggerDeleteAction() const;
 
-  virtual ~pqNodeEditorView() = default;
+  ~pqNodeEditorView() override = default;
 
 protected:
-  void wheelEvent(QWheelEvent* event);
-  void keyReleaseEvent(QKeyEvent* event);
+  void wheelEvent(QWheelEvent* event) override;
+  void keyReleaseEvent(QKeyEvent* event) override;
 
 private:
   QAction* deleteAction;

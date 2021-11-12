@@ -77,7 +77,7 @@ public:
    */
   pqPreviewMenuManager(const QStringList& defaultItems, QMenu* parent);
 
-  virtual ~pqPreviewMenuManager();
+  ~pqPreviewMenuManager() override;
 
   /**
    * Provides access to the parent menu.

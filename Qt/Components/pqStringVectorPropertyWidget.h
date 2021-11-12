@@ -43,7 +43,7 @@ class PQCOMPONENTS_EXPORT pqStringVectorPropertyWidget : public pqPropertyWidget
 public:
   pqStringVectorPropertyWidget(
     vtkSMProperty* property, vtkSMProxy* proxy, QWidget* parent = nullptr);
-  virtual ~pqStringVectorPropertyWidget();
+  ~pqStringVectorPropertyWidget() override;
 
   /**
    * Factory method to instantiate a hard-coded type of pqPropertyWidget

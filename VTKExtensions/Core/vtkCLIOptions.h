@@ -192,7 +192,7 @@ public:
 
 protected:
   vtkCLIOptions();
-  ~vtkCLIOptions();
+  ~vtkCLIOptions() override;
 
 private:
   vtkCLIOptions(const vtkCLIOptions&) = delete;

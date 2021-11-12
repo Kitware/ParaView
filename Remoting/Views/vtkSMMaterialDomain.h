@@ -43,13 +43,13 @@ public:
   /**
    * Overridden to get list of materials from materiallibrary singleton.
    */
-  virtual void Update(vtkSMProperty*) override;
+  void Update(vtkSMProperty*) override;
 
 protected:
   vtkSMMaterialDomain();
-  ~vtkSMMaterialDomain();
+  ~vtkSMMaterialDomain() override;
 
-  virtual int ReadXMLAttributes(vtkSMProperty* prop, vtkPVXMLElement* element) override;
+  int ReadXMLAttributes(vtkSMProperty* prop, vtkPVXMLElement* element) override;
 
   void CallMeSometime();
   friend class vtkSMMaterialObserver;

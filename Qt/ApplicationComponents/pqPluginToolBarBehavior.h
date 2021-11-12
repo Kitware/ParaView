@@ -57,7 +57,7 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqPluginToolBarBehavior : public QObject
 
 public:
   pqPluginToolBarBehavior(QMainWindow* parent = nullptr);
-  virtual ~pqPluginToolBarBehavior();
+  ~pqPluginToolBarBehavior() override;
 
 public Q_SLOTS:
   void addPluginInterface(QObject* iface);

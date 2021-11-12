@@ -50,7 +50,7 @@ class PQWIDGETS_EXPORT pqHighlightableToolButton : public QToolButton
 
 public:
   pqHighlightableToolButton(QWidget* parent = nullptr);
-  virtual ~pqHighlightableToolButton();
+  ~pqHighlightableToolButton() override;
 
 public Q_SLOTS:
   /**

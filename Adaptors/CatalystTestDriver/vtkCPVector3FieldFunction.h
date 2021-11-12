@@ -34,17 +34,17 @@ public:
   /**
    * Get the NumberOfComponents.
    */
-  virtual unsigned int GetNumberOfComponents() override { return 3; };
+  unsigned int GetNumberOfComponents() override { return 3; };
 
   /**
    * Compute the field value at Point.
    */
-  virtual double ComputeComponenentAtPoint(
+  double ComputeComponenentAtPoint(
     unsigned int component, double point[3], unsigned long timeStep, double time) override = 0;
 
 protected:
   vtkCPVector3FieldFunction();
-  ~vtkCPVector3FieldFunction();
+  ~vtkCPVector3FieldFunction() override;
 
 private:
   vtkCPVector3FieldFunction(const vtkCPVector3FieldFunction&) = delete;

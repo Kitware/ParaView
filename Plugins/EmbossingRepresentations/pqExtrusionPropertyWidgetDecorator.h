@@ -51,9 +51,9 @@ class pqExtrusionPropertyWidgetDecorator : public pqPropertyWidgetDecorator
 
 public:
   pqExtrusionPropertyWidgetDecorator(vtkPVXMLElement* config, pqPropertyWidget* parentObject);
-  virtual ~pqExtrusionPropertyWidgetDecorator();
+  ~pqExtrusionPropertyWidgetDecorator() override;
 
-  virtual bool canShowWidget(bool show_advanced) const;
+  bool canShowWidget(bool show_advanced) const override;
 
 private:
   Q_DISABLE_COPY(pqExtrusionPropertyWidgetDecorator)

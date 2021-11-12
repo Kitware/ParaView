@@ -42,7 +42,7 @@ class pqSLACManager : public QObject
 public:
   static pqSLACManager* instance();
 
-  ~pqSLACManager();
+  ~pqSLACManager() override;
 
   /// Get the action for the respective operation.
   QAction* actionDataLoadManager();

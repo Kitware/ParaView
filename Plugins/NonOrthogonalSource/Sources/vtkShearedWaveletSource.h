@@ -66,9 +66,9 @@ public:
 
 protected:
   vtkShearedWaveletSource();
-  ~vtkShearedWaveletSource();
+  ~vtkShearedWaveletSource() override;
 
-  virtual int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
+  int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
 
   bool EnableAxisTitles;
   bool EnableTimeLabel;

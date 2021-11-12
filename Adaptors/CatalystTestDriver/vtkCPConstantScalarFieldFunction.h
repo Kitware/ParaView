@@ -36,7 +36,7 @@ public:
   /**
    * Compute the field value at Point which is an array of length 3.
    */
-  virtual double ComputeComponenentAtPoint(
+  double ComputeComponenentAtPoint(
     unsigned int component, double* point, unsigned long timeStep, double time) override;
 
   //@{
@@ -49,7 +49,7 @@ public:
 
 protected:
   vtkCPConstantScalarFieldFunction();
-  ~vtkCPConstantScalarFieldFunction();
+  ~vtkCPConstantScalarFieldFunction() override;
 
 private:
   vtkCPConstantScalarFieldFunction(const vtkCPConstantScalarFieldFunction&) = delete;

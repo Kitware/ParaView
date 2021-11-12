@@ -43,18 +43,18 @@ public:
   /// it fills in the FieldNames array that the coprocessor requires
   /// in order to fulfill all the coprocessing requests for this
   /// TimeStep/Time combination.
-  virtual int RequestDataDescription(vtkCPDataDescription* dataDescription) override;
+  int RequestDataDescription(vtkCPDataDescription* dataDescription) override;
 
   /// Execute the pipeline. Returns 1 for success and 0 for failure.
-  virtual int CoProcess(vtkCPDataDescription* dataDescription) override;
+  int CoProcess(vtkCPDataDescription* dataDescription) override;
 
   /// Finalize the pipeline before deleting it. A default no-op implementation
   /// is given. Returns 1 for success and 0 for failure.
-  virtual int Finalize() override;
+  int Finalize() override;
 
 protected:
   vtkCPPythonScriptPipeline();
-  virtual ~vtkCPPythonScriptPipeline();
+  ~vtkCPPythonScriptPipeline() override;
 
   /// Set/get macro functinos for setting PythonScriptName.
   vtkSetStringMacro(PythonScriptName);

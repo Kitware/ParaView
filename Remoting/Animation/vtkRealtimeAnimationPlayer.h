@@ -46,8 +46,8 @@ public:
    *
    * Stride is not relevant for realtime animation so let it be always 1.
    */
-  void SetStride(int) override final{};
-  int GetStride() override final { return 1; }
+  void SetStride(int) final{};
+  int GetStride() final { return 1; }
   //@}
 
 protected:

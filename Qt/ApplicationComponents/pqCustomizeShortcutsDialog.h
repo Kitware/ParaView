@@ -41,7 +41,7 @@ class pqCustomizeShortcutsDialog : public QDialog
 
 public:
   pqCustomizeShortcutsDialog(QWidget* p = nullptr);
-  ~pqCustomizeShortcutsDialog();
+  ~pqCustomizeShortcutsDialog() override;
 
   static QString getActionName(QAction* action);
 

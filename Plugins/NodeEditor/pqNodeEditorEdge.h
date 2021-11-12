@@ -61,7 +61,7 @@ public:
   /**
    * Remove the edge from the scene it has been added to.
    */
-  virtual ~pqNodeEditorEdge();
+  ~pqNodeEditorEdge() override;
 
   //@{
   /*

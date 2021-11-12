@@ -41,7 +41,7 @@ class pqNonOrthogonalAutoStart : public QObject
 
 public:
   pqNonOrthogonalAutoStart(QObject* parent = 0);
-  virtual ~pqNonOrthogonalAutoStart();
+  ~pqNonOrthogonalAutoStart() override;
 
   void startup();
   void shutdown();

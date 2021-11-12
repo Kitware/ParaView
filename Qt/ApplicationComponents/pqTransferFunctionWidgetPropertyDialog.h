@@ -46,7 +46,7 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqTransferFunctionWidgetPropertyDialog : pu
 public:
   pqTransferFunctionWidgetPropertyDialog(const QString& label,
     vtkPiecewiseFunction* transferFunction, QWidget* propertyWdg, QWidget* parentWdg = nullptr);
-  ~pqTransferFunctionWidgetPropertyDialog();
+  ~pqTransferFunctionWidgetPropertyDialog() override;
 
 private:
   vtkSmartPointer<vtkPiecewiseFunction> TransferFunction;

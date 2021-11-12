@@ -44,7 +44,7 @@ class VTKSLACFILTERS_EXPORT vtkSamplePlaneSource : public vtkPolyDataAlgorithm
 public:
   vtkTypeMacro(vtkSamplePlaneSource, vtkPolyDataAlgorithm);
   static vtkSamplePlaneSource* New();
-  virtual void PrintSelf(ostream& os, vtkIndent indent) override;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   // Description:
   // The location of the center of the plane.  A point is guaranteed to be here.
@@ -70,7 +70,7 @@ public:
 
 protected:
   vtkSamplePlaneSource();
-  ~vtkSamplePlaneSource();
+  ~vtkSamplePlaneSource() override;
 
   double Center[3];
   double Normal[3];
@@ -78,9 +78,9 @@ protected:
 
   vtkMultiProcessController* Controller;
 
-  virtual int FillInputPortInformation(int port, vtkInformation* info) override;
+  int FillInputPortInformation(int port, vtkInformation* info) override;
 
-  virtual int RequestData(vtkInformation* request, vtkInformationVector** inputVector,
+  int RequestData(vtkInformation* request, vtkInformationVector** inputVector,
     vtkInformationVector* outputVector) override;
 
   // Description:
