@@ -637,8 +637,9 @@ bool pqServerLauncher::connectToPrelaunchedServer(bool showConnectionDialog)
       else
       {
         ui.message->setText(QString("Establishing connection to '%1' \n"
-                                    "Waiting %1 seconds for connection to server.")
-                              .arg(this->Internals->Configuration.name()));
+                                    "Waiting %2 seconds for connection to server.")
+                              .arg(this->Internals->Configuration.name())
+                              .arg(this->Internals->Configuration.connectionTimeout()));
         dialog.setWindowTitle("Waiting for Connection to Server");
       }
 
