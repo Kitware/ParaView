@@ -79,7 +79,7 @@ protected:
    */
   const QAbstractItemModel* getQModel() const;
 
-protected Q_SLOTS:
+protected Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   /**
    * called when the selection in the Qt-model changes.
    */

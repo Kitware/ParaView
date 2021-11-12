@@ -156,7 +156,7 @@ private Q_SLOTS:
   void updateGroups();
   void updateFiltering();
 
-private:
+private: // NOLINT(readability-redundant-access-specifiers)
   Q_DISABLE_COPY(pqPresetDialog)
   class pqInternals;
   const QScopedPointer<pqInternals> Internals;

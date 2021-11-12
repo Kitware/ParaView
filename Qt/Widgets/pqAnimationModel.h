@@ -154,7 +154,7 @@ public:
   void setEnabledHeaderToolTip(const QString& val);
   const QString& enabledHeaderToolTip() const { return this->EnabledHeaderToolTip; }
 
-public Q_SLOTS:
+public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
 
   /**
    * set the animation mode
@@ -218,7 +218,7 @@ protected Q_SLOTS:
   void trackNameChanged();
   void enabledChanged();
 
-protected:
+protected: // NOLINT(readability-redundant-access-specifiers)
   QPolygonF timeBarPoly(double time);
   double positionFromTime(double time);
   double timeFromPosition(double pos);

@@ -81,7 +81,7 @@ private Q_SLOTS:
    */
   void actionTriggered(QAction*);
 
-private:
+private: // NOLINT(readability-redundant-access-specifiers)
   Q_DISABLE_COPY(pqColorChooserButtonWithPalettes)
 
   /**

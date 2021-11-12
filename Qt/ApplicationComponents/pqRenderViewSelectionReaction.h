@@ -148,7 +148,7 @@ private Q_SLOTS:
    */
   void onMouseStop();
 
-private:
+private: // NOLINT(readability-redundant-access-specifiers)
   /**
    * callback called when the vtkPVRenderView is done with selection.
    */

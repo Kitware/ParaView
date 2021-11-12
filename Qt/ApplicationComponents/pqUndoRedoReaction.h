@@ -72,7 +72,7 @@ protected Q_SLOTS:
   void setLabel(const QString& label);
   void setUndoStack(pqUndoStack*);
 
-protected:
+protected: // NOLINT(readability-redundant-access-specifiers)
   /**
    * Called when the action is triggered.
    */

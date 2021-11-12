@@ -61,7 +61,7 @@ public:
   pqCylinderPropertyWidget(vtkSMProxy* proxy, vtkSMPropertyGroup* smgroup, QWidget* parent = 0);
   ~pqCylinderPropertyWidget() override;
 
-public Q_SLOTS:
+public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   /**
    * Set the cylinder axis to be along the X axis.
    */

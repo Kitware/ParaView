@@ -60,7 +60,7 @@ public:
 protected Q_SLOTS:
   void toggleSectionVisibility(QAction* action);
 
-protected:
+protected: // NOLINT(readability-redundant-access-specifiers)
   QPointer<QHeaderView> HeaderView;
 };
 

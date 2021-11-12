@@ -97,7 +97,7 @@ public:
   const QString& busyText() const { return this->BusyText; }
   //@}
 
-public Q_SLOTS:
+public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   /**
    * Set the progress. Progress must be enabled by calling 'enableProgress`
    * otherwise this method will have no effect.

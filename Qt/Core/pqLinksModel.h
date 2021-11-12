@@ -268,7 +268,7 @@ private Q_SLOTS:
   void refresh();
   void remove();
 
-private:
+private: // NOLINT(readability-redundant-access-specifiers)
   class pqInternal;
   pqInternal* Internal;
 

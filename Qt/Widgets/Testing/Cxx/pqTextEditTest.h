@@ -63,7 +63,7 @@ private Q_SLOTS:
   void testReTypeText();
   void testReTypeText_data();
 
-private:
+private: // NOLINT(readability-redundant-access-specifiers)
   pqTextEdit* TextEdit;
   QSignalSpy* TextChangedSpy;
   QSignalSpy* EditingFinishedSpy;

@@ -78,7 +78,7 @@ Q_SIGNALS:
 private Q_SLOTS:
   void scaleTriggered();
 
-private:
+private: // NOLINT(readability-redundant-access-specifiers)
   Q_DISABLE_COPY(pqScaleByButton);
   void constructor(const QMap<double, QString>& scaleFactors);
 };

@@ -55,7 +55,7 @@ public:
   pqSaveStateAndScreenshotReaction(QAction* saveAction, QAction* settingsAction);
   ~pqSaveStateAndScreenshotReaction() override = default;
 
-public Q_SLOTS:
+public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   /**
    * Updates the enabled state. Applications need not explicitly call this.
    */

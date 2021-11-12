@@ -64,7 +64,7 @@ Q_SIGNALS:
 protected:
   void UpdateProperty();
 
-protected Q_SLOTS:
+protected Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   void editButtonClicked();
   void propagateProxyPointsProperty();
   void resetRangeToDomainDefault();

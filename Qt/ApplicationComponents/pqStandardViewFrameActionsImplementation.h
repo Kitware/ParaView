@@ -142,7 +142,7 @@ protected Q_SLOTS:
    */
   void captureViewTriggered();
 
-protected:
+protected: // NOLINT(readability-redundant-access-specifiers)
   /**
    * called to setup empty frame.
    */

@@ -61,7 +61,7 @@ public:
    */
   void setData(int column, int role, const QVariant& v) override;
 
-public Q_SLOTS:
+public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   /**
    * get the check true/false
    */

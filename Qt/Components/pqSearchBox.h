@@ -197,7 +197,7 @@ public Q_SLOTS:
 protected:
   void keyPressEvent(QKeyEvent* e) override;
 
-protected Q_SLOTS:
+protected Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   void onAdvancedButtonClicked(bool);
   void updateSettings();
   void updateFromSettings();

@@ -175,7 +175,7 @@ protected Q_SLOTS:
    */
   void handleFileLineEditChanged(const QString& fileString);
 
-protected:
+protected: // NOLINT(readability-redundant-access-specifiers)
   QString Extension;
   QLineEdit* LineEdit;
   pqServer* Server;

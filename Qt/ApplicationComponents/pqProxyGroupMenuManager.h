@@ -146,7 +146,7 @@ public:
    */
   QString categoryLabel(const QString& category);
 
-public Q_SLOTS:
+public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   /**
    * Load a configuration XML. It will find the elements with resourceTagName
    * in the XML and populate the menu accordingly. Applications do not need to
@@ -208,7 +208,7 @@ protected Q_SLOTS:
    */
   void populateFavoritesMenu();
 
-protected:
+protected: // NOLINT(readability-redundant-access-specifiers)
   QString ResourceTagName;
   vtkPVXMLElement* MenuRoot;
   int RecentlyUsedMenuSize;

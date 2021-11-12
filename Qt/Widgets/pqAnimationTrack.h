@@ -81,7 +81,7 @@ public:
 
   QRectF boundingRect() const override;
 
-public Q_SLOTS:
+public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   void setProperty(const QVariant& p);
 
   void setBoundingRect(const QRectF& r);

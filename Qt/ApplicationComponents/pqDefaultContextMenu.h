@@ -106,7 +106,7 @@ protected Q_SLOTS:
    */
   void showAllBlocks() const;
 
-protected:
+protected: // NOLINT(readability-redundant-access-specifiers)
   /**
    * called to build the color arrays submenu.
    */

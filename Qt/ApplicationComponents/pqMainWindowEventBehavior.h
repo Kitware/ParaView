@@ -53,7 +53,7 @@ public:
   pqMainWindowEventBehavior(QObject* parent = 0);
   ~pqMainWindowEventBehavior() override;
 
-public Q_SLOTS:
+public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   /**
    * Triggered when a close event occurs on the main window.
    */

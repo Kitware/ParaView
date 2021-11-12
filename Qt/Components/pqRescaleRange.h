@@ -77,7 +77,7 @@ protected Q_SLOTS:
   void validate();
   void rescaleAndLock();
 
-protected:
+protected: // NOLINT(readability-redundant-access-specifiers)
   pqRescaleRangeForm* Form;
   bool Lock;
 };

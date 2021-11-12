@@ -66,7 +66,7 @@ public:
    */
   vtkSMProxy* scalarBarProxy() const;
 
-public Q_SLOTS:
+public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   /**
    * Set the active representation.
    */
@@ -83,7 +83,7 @@ protected Q_SLOTS:
    */
   void updateEnableState() override;
 
-protected:
+protected: // NOLINT(readability-redundant-access-specifiers)
   /**
    * Called when the action is triggered.
    */

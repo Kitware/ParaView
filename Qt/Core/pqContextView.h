@@ -99,7 +99,7 @@ protected Q_SLOTS:
   void endInteraction();
   //@}
 
-protected:
+protected: // NOLINT(readability-redundant-access-specifiers)
   /**
    * Constructor:
    * \c type  :- view type.

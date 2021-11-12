@@ -23,7 +23,7 @@ public:
   explicit pqWelcomeDialog(QWidget* parent = 0);
   ~pqWelcomeDialog() override;
 
-public Q_SLOTS:
+public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   virtual void onGettingStartedGuideClicked();
 
   virtual void onExampleVisualizationsClicked();

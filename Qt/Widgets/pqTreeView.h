@@ -125,7 +125,7 @@ protected:
 private Q_SLOTS:
   void invalidateLayout();
 
-private:
+private: // NOLINT(readability-redundant-access-specifiers)
   int ScrollPadding;
   int MaximumRowCountBeforeScrolling;
 };

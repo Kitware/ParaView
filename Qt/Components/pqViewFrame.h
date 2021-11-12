@@ -212,11 +212,11 @@ protected:
   void dragEnter(QDragEnterEvent*);
   void drop(QDropEvent*);
 
-protected Q_SLOTS:
+protected Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   void buttonClicked();
   void contextMenuRequested(const QPoint&);
 
-protected:
+protected: // NOLINT(readability-redundant-access-specifiers)
   bool DecorationsVisible;
   bool TitleBarVisible;
   bool BorderVisible;
@@ -243,7 +243,7 @@ private:
 
   class pqInternals;
   const QScopedPointer<pqInternals> Internals;
-private Q_SLOTS:
+private Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   void finishedDrag(pqViewFrame* source);
 };
 

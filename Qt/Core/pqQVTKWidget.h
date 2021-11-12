@@ -104,7 +104,7 @@ public:
   double effectiveDevicePixelRatio() const;
   void setViewSize(int width, int height);
 
-public Q_SLOTS:
+public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   void paintMousePointer(int x, int y);
 
 private Q_SLOTS:

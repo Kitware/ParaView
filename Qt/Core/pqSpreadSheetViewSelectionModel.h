@@ -62,7 +62,7 @@ public:
   pqSpreadSheetViewSelectionModel(pqSpreadSheetViewModel* model, QObject* parent = 0);
   ~pqSpreadSheetViewSelectionModel() override;
 
-public Q_SLOTS:
+public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   void select(const QModelIndex& index, QItemSelectionModel::SelectionFlags command) override
   {
     this->Superclass::select(index, command);
@@ -77,7 +77,7 @@ Q_SIGNALS:
 protected Q_SLOTS:
   void serverSelectionChanged(const QItemSelection&);
 
-protected:
+protected: // NOLINT(readability-redundant-access-specifiers)
   /**
    * Locate the selection source currently set on the representation being shown.
    * If no selection exists, or selection present is not "updatable" by this

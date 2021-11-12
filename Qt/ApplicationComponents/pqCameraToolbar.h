@@ -65,7 +65,7 @@ private Q_SLOTS:
   void updateEnabledState();
   void onRepresentationChanged(pqDataRepresentation*);
 
-private:
+private: // NOLINT(readability-redundant-access-specifiers)
   Q_DISABLE_COPY(pqCameraToolbar)
   void constructor();
   QAction* ZoomToDataAction;

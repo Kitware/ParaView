@@ -137,7 +137,7 @@ protected Q_SLOTS:
    */
   void onConnectIDChanged();
 
-protected:
+protected: // NOLINT(readability-redundant-access-specifiers)
   /**
    * Promote a new master
    */

@@ -253,7 +253,7 @@ public:
    */
   bool forceWaitingForConnection(bool force);
 
-public Q_SLOTS:
+public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   /**
    * Closes any open connections for reverse-connection.
    */

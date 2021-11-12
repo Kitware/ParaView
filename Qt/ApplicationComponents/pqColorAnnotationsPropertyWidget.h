@@ -122,7 +122,7 @@ private Q_SLOTS:
    */
   void updateIndexedLookupState();
 
-private:
+private: // NOLINT(readability-redundant-access-specifiers)
   Q_DISABLE_COPY(pqColorAnnotationsPropertyWidget)
 
   class pqInternals;

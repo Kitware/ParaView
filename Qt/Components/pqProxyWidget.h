@@ -237,7 +237,7 @@ private Q_SLOTS:
    */
   void onChangeFinished();
 
-private:
+private: // NOLINT(readability-redundant-access-specifiers)
   /**
    * create all widgets
    */

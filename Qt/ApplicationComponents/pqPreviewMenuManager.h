@@ -106,7 +106,7 @@ private Q_SLOTS:
    */
   void aboutToShow();
 
-private:
+private: // NOLINT(readability-redundant-access-specifiers)
   void updateCustomActions();
   QAction* findAction(int dx, int dy);
   bool prependCustomResolution(int dx, int dy, const QString& label);

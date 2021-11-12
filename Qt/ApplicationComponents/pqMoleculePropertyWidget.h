@@ -92,7 +92,7 @@ protected Q_SLOTS:
   void onResetBondRadiusToggled();
   //@}
 
-protected:
+protected: // NOLINT(readability-redundant-access-specifiers)
   /**
    * Set property documentation as widget tooltip.
    */

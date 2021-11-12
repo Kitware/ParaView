@@ -51,12 +51,12 @@ public:
     vtkSMProperty* prop, int index = -1);
   ~pqWidgetRangeDomain() override;
 
-public Q_SLOTS:
+public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   void domainChanged();
 protected Q_SLOTS:
   void internalDomainChanged();
 
-protected:
+protected: // NOLINT(readability-redundant-access-specifiers)
   virtual void setRange(QVariant min, QVariant max);
 
   QWidget* getWidget() const;

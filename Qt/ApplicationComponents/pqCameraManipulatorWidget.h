@@ -55,7 +55,7 @@ public:
    */
   QList<QVariant> manipulatorTypes() const;
 
-public Q_SLOTS:
+public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   /**
    * Set the manipulator types selection. This must have exactly 9 items or
    * less. Any missing items are treated as "None".

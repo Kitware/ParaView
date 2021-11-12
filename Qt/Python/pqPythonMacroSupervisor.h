@@ -132,7 +132,7 @@ protected Q_SLOTS:
   // open in a python edit
   void onEditMacroTriggered();
 
-protected:
+protected: // NOLINT(readability-redundant-access-specifiers)
   // Description:
   // Add a widget to be given macro actions.  QActions representing script macros
   // will be added to the widget.  This could be a QToolBar, QMenu, or other type

@@ -88,7 +88,7 @@ public:
     ERROR
   };
 
-public Q_SLOTS:
+public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   /**
    * Prints some text on the shell.
    */
@@ -153,7 +153,7 @@ protected Q_SLOTS:
   void pushScript(const QString&);
   void runScript();
 
-protected:
+protected: // NOLINT(readability-redundant-access-specifiers)
   pqConsoleWidget* ConsoleWidget;
   const char* Prompt;
   static QStringList Preamble;

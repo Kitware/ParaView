@@ -73,7 +73,7 @@ private Q_SLOTS:
    */
   void updateTimeDisplay();
 
-private:
+private: // NOLINT(readability-redundant-access-specifiers)
   Q_DISABLE_COPY(pqAnimationTimeToolbar)
   void constructor();
   QPointer<pqAnimationTimeWidget> AnimationTimeWidget;

@@ -60,7 +60,7 @@ protected:
    */
   bool eventFilter(QObject* caller, QEvent* e) override;
 
-protected Q_SLOTS:
+protected Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   /**
    * Called when a new view is added. We install event-filter to get click
    * events.

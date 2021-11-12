@@ -125,7 +125,7 @@ public:
   bool autoUpdateVTKObjects() const { return this->AutoUpdateVTKObjects; }
   bool useUncheckedProperties() const { return this->UseUncheckedProperties; }
 
-public Q_SLOTS:
+public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   /**
    * Remove all links.
    */
@@ -169,7 +169,7 @@ private Q_SLOTS:
   void onQtPropertyModified();
   void onSMPropertyModified();
 
-private:
+private: // NOLINT(readability-redundant-access-specifiers)
   bool addNewConnection(pqPropertyLinksConnection*);
 
   template <class ConnectionType>

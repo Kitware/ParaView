@@ -134,7 +134,7 @@ Q_SIGNALS:
 protected:
   void initialize(vtkSMPluginManager*);
 
-protected Q_SLOTS:
+protected Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   /**
    * attempts to load the configuration for plugins for the particular server.
    */

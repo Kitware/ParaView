@@ -94,11 +94,11 @@ protected Q_SLOTS:
 
   void updateIfNeeded();
 
-protected:
+protected: // NOLINT(readability-redundant-access-specifiers)
   void setDataRepresentation(pqDataRepresentation* repr);
   void setColorTransferFunction(vtkSMProxy* ctf);
 
-protected Q_SLOTS:
+protected Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   /**
    * update the enabled state for show/edit scalar bar buttons.
    */

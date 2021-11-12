@@ -326,7 +326,7 @@ protected Q_SLOTS:
    */
   virtual void onUndoStackChanged();
 
-protected:
+protected: // NOLINT(readability-redundant-access-specifiers)
   /**
    * Updates undo stack without actually performing the undo/redo actions.
    */

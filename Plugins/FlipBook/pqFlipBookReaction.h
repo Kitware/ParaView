@@ -57,7 +57,7 @@ public:
   pqFlipBookReaction(QAction* parent, QAction* playAction, QAction* stepAction, QSpinBox* autoVal);
   ~pqFlipBookReaction() override = default;
 
-public Q_SLOTS:
+public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   /**
    * Updates the enabled state. Applications need not explicitly call this.
    */
@@ -91,7 +91,7 @@ protected Q_SLOTS:
 
   void representationVisibilityChanged(pqRepresentation*, bool);
 
-protected:
+protected: // NOLINT(readability-redundant-access-specifiers)
   bool hasEnoughVisibleRepresentations();
 
   int getNumberOfVisibleRepresentations();

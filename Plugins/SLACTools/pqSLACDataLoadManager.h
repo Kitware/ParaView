@@ -36,7 +36,7 @@ public:
   pqSLACDataLoadManager(QWidget* p, Qt::WindowFlags f = Qt::WindowFlags{});
   ~pqSLACDataLoadManager() override;
 
-public Q_SLOTS:
+public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   virtual void checkInputValid();
   virtual void setupPipeline();
 

@@ -60,7 +60,7 @@ public:
    */
   void addActions(const QList<QAction*>& actions);
 
-public Q_SLOTS:
+public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   /**
    * Overridden to trigger the user selected action.
    */
@@ -73,7 +73,7 @@ protected Q_SLOTS:
    */
   void currentRowChanged(int);
 
-protected:
+protected: // NOLINT(readability-redundant-access-specifiers)
   /**
    * Overridden to capture key presses.
    */

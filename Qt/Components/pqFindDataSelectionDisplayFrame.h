@@ -55,7 +55,7 @@ public:
   pqFindDataSelectionDisplayFrame(QWidget* parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags{});
   ~pqFindDataSelectionDisplayFrame() override;
 
-public Q_SLOTS:
+public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   /**
    * Set the output port that is currently selected for which we are
    * controlling the selection display properties.
@@ -82,7 +82,7 @@ private Q_SLOTS:
    */
   void onSelectionModeChanged(bool frustum);
 
-private:
+private: // NOLINT(readability-redundant-access-specifiers)
   Q_DISABLE_COPY(pqFindDataSelectionDisplayFrame)
 
   void updateInteractiveSelectionLabelProperties();

@@ -52,7 +52,7 @@ public:
    */
   QSize customResolution() const;
 
-public Q_SLOTS:
+public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   /**
    * Sets the view size to the displayed resolution.
    */

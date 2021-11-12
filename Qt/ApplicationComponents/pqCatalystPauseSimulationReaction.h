@@ -52,7 +52,7 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqCatalystPauseSimulationReaction : public 
 public:
   pqCatalystPauseSimulationReaction(QAction* parent = 0);
 
-public Q_SLOTS:
+public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   void updateEnableState() override { updateEnableState(PAUSE); }
 
 protected:

@@ -59,7 +59,7 @@ public:
    */
   pqRepresentation* getRepresentation();
 
-public Q_SLOTS:
+public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   /**
    * TODO: get rid of this function once the server manager can
    * inform us of Representation property changes

@@ -75,7 +75,7 @@ Q_SIGNALS:
 private Q_SLOTS:
   void loadPalette(int);
 
-private:
+private: // NOLINT(readability-redundant-access-specifiers)
   Q_DISABLE_COPY(pqColorPaletteSelectorWidget)
   QPointer<QComboBox> ComboBox;
 };

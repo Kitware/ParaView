@@ -58,7 +58,7 @@ public:
 
   void setStream(QTextStream* stream) override;
 
-public Q_SLOTS:
+public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   /**
    * Record on event in xml file
    */

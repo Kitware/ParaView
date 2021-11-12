@@ -161,7 +161,7 @@ public:
    */
   void removeFromAllGroups(const QString& presetName);
 
-public Q_SLOTS:
+public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   /**
    * Save groups to settings
    */

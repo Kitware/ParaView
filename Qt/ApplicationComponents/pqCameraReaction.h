@@ -75,7 +75,7 @@ public:
   static void zoomToData(bool closest = false);
   static void rotateCamera(double angle);
 
-public Q_SLOTS:
+public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   /**
    * Updates the enabled state. Applications need not explicitly call
    * this.

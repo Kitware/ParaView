@@ -93,7 +93,7 @@ protected:
    */
   QStandardItem* currentItem();
 
-protected Q_SLOTS:
+protected Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   /**
    * Called when the ordering array is changed
    */

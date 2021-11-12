@@ -328,7 +328,7 @@ public:
    */
   void _paraview_client_environment_complete();
 
-public Q_SLOTS:
+public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
 
   /**
    * Applications calls this to ensure that any cleanup is performed correctly.

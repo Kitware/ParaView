@@ -116,7 +116,7 @@ private Q_SLOTS:
   void emitValueEdited();
   void emitIfDeferredValueEdited();
 
-private:
+private: // NOLINT(readability-redundant-access-specifiers)
   double Value;
   QSlider* Slider;
   pqDoubleLineEdit* DoubleLineEdit;

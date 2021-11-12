@@ -64,7 +64,7 @@ protected Q_SLOTS:
   virtual void viewAdded(pqView*);
   virtual void viewUpdated();
 
-protected:
+protected: // NOLINT(readability-redundant-access-specifiers)
   virtual void enableModelTransform(pqView*, vtkSMSourceProxy*);
   virtual void disableModelTransform(pqView*);
 

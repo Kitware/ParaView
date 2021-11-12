@@ -54,7 +54,7 @@ public:
 protected Q_SLOTS:
   void enable(bool);
 
-protected:
+protected: // NOLINT(readability-redundant-access-specifiers)
   /**
    * Called when the action is triggered.
    */

@@ -118,7 +118,7 @@ public:
    */
   void updateAllModifiedProxies();
 
-public Q_SLOTS:
+public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   void beginUndoSet(QString label);
   void endUndoSet();
 
@@ -171,7 +171,7 @@ Q_SIGNALS:
 private Q_SLOTS:
   void onStackChanged();
 
-private:
+private: // NOLINT(readability-redundant-access-specifiers)
   class pqImplementation;
   pqImplementation* Implementation;
 };

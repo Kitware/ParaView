@@ -221,7 +221,7 @@ protected:
   virtual void addInternalHelperProxy(const QString& key, vtkSMProxy*) const;
   virtual void removeInternalHelperProxy(const QString& key, vtkSMProxy*) const;
 
-protected Q_SLOTS:
+protected Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   // Used to monitor helper proxy registration when created on other clients
   void onProxyRegistered(const QString&, const QString&, vtkSMProxy*);
   void onProxyUnRegistered(const QString&, const QString&, vtkSMProxy*);

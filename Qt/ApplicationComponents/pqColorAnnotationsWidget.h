@@ -316,7 +316,7 @@ private Q_SLOTS:
    */
   void editPastLastRow();
 
-private:
+private: // NOLINT(readability-redundant-access-specifiers)
   Q_DISABLE_COPY(pqColorAnnotationsWidget)
 
   class pqInternals;

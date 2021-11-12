@@ -72,7 +72,7 @@ public:
    */
   vtkPVDataInformation* dataInformation() const;
 
-public Q_SLOTS:
+public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   /**
    * Set the display whose properties we want to edit.
    */
@@ -86,7 +86,7 @@ private Q_SLOTS:
   void updateUI();
   void updateSubsetUI();
 
-private:
+private: // NOLINT(readability-redundant-access-specifiers)
   Q_DISABLE_COPY(pqProxyInformationWidget);
 
   class pqInternals;

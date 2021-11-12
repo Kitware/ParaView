@@ -78,7 +78,7 @@ public:
    */
   void setUseBlankEntry(bool b) { this->UseBlankEntry = b; }
 
-public Q_SLOTS:
+public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   /**
    * Set the source whose properties this widget should list. If source is
    * null, the widget gets disabled.

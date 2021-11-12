@@ -60,7 +60,7 @@ public:
     Previous
   };
 
-public Q_SLOTS:
+public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   virtual void showSearchWidget();
 
 protected Q_SLOTS:
@@ -76,7 +76,7 @@ protected Q_SLOTS:
   virtual void findNext();
   virtual void findPrevious();
 
-protected:
+protected: // NOLINT(readability-redundant-access-specifiers)
   virtual void setBaseWidget(QWidget* baseWidget);
   /**
    * Overridden to capture key presses.

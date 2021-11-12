@@ -211,7 +211,7 @@ protected Q_SLOTS:
   void saveSourcesList();
   void cancelEditSources();
 
-protected:
+protected: // NOLINT(readability-redundant-access-specifiers)
   void editConfiguration(const pqServerConfiguration&);
 
 private:

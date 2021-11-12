@@ -73,7 +73,7 @@ public:
   // returns the resolution.
   int resolution() const;
 
-public Q_SLOTS:
+public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   // set the min range value
   void setMinimum(double);
   // set the max range value
@@ -95,7 +95,7 @@ protected:
 private Q_SLOTS:
   void updateValidator();
 
-private:
+private: // NOLINT(readability-redundant-access-specifiers)
   int Resolution;
   double Minimum;
   double Maximum;

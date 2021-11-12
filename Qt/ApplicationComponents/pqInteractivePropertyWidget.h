@@ -121,7 +121,7 @@ public:
    */
   void showEvent(QShowEvent*) override;
 
-public Q_SLOTS:
+public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   /**
    * Toggle the interactive widget's visibility. This, along with
    * pqPropertyWidget's selected state controls whether the widget proxy is

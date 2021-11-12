@@ -77,7 +77,7 @@ public:
 
   pqSMProxy proxyToEdit() const;
 
-public Q_SLOTS:
+public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   void setProxyToEdit(pqSMProxy);
 
 protected Q_SLOTS:

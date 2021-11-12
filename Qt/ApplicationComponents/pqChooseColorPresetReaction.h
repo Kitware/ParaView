@@ -77,7 +77,7 @@ public:
   pqChooseColorPresetReaction(QAction* parent, bool track_active_objects = true);
   ~pqChooseColorPresetReaction() override;
 
-public Q_SLOTS:
+public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   /**
    * Choose color preset for the representation set using setRepresentation().
    * Returns false if representation cannot be located or its is not using

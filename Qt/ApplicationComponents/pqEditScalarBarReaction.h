@@ -57,7 +57,7 @@ public:
   pqEditScalarBarReaction(QAction* parent = 0, bool track_active_objects = true);
   ~pqEditScalarBarReaction() override;
 
-public Q_SLOTS:
+public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   /**
    * Set the active representation. This should only be used when
    * \c track_active_objects is false. If used when \c track_active_objects is

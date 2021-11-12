@@ -118,7 +118,7 @@ private Q_SLOTS:
   void updateSelectedProxies();
   void updateEnabledState();
 
-private:
+private: // NOLINT(readability-redundant-access-specifiers)
   class pqLinksEditorProxyModel;
   void updatePropertyList(QListWidget* tw, vtkSMProxy* proxy);
 

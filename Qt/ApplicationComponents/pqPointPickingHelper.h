@@ -63,7 +63,7 @@ public:
    */
   bool pickOnMesh() const { return this->PickOnMesh; }
 
-public Q_SLOTS:
+public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   /**
    * Set the view on which the pick is active. We only support pqRenderView and
    * subclasses currently.
@@ -81,7 +81,7 @@ Q_SIGNALS:
 private Q_SLOTS:
   void pickPoint();
 
-private:
+private: // NOLINT(readability-redundant-access-specifiers)
   Q_DISABLE_COPY(pqPointPickingHelper)
   QKeySequence KeySequence;
   QPointer<pqRenderView> View;

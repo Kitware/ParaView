@@ -108,7 +108,7 @@ public:
    */
   QString getViewType() const { return this->ViewType; }
 
-public Q_SLOTS:
+public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   /**
    * Request a StillRender on idle. Multiple calls are collapsed into one.
    */
@@ -143,7 +143,7 @@ public Q_SLOTS:
    */
   virtual void resetDisplay(bool closest = false) { (void)closest; }
 
-public:
+public: // NOLINT(readability-redundant-access-specifiers)
   /**
    * Returns true if undo can be done.
    */

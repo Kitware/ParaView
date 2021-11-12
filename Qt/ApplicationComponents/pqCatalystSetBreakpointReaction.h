@@ -53,7 +53,7 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqCatalystSetBreakpointReaction : public pq
 public:
   pqCatalystSetBreakpointReaction(QAction* parent = 0);
 
-public Q_SLOTS:
+public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   void updateEnableState() override;
 
 protected:

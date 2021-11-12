@@ -56,7 +56,7 @@ public:
 protected Q_SLOTS:
   virtual void resetWidget() = 0;
 
-protected:
+protected: // NOLINT(readability-redundant-access-specifiers)
   vtkNew<vtkEventQtSlotConnect> VTKConnector;
   vtkSMProxyProperty* ModelProperty;
   vtkSMProxy* ModelPropertyValue;

@@ -59,7 +59,7 @@ public:
   pqPluginToolBarBehavior(QMainWindow* parent = nullptr);
   ~pqPluginToolBarBehavior() override;
 
-public Q_SLOTS:
+public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   void addPluginInterface(QObject* iface);
 
 private:

@@ -129,7 +129,7 @@ private Q_SLOTS:
   void assignCurrentViewpoint();
   void deleteRow();
 
-private:
+private: // NOLINT(readability-redundant-access-specifiers)
   pqCustomViewpointButtonDialog() {}
   QStringList Configurations;
   QString CurrentConfiguration;

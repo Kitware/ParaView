@@ -50,7 +50,7 @@ protected:
   // Update when the panel is made visible.
   void showEvent(QShowEvent* event) override;
 
-protected Q_SLOTS:
+protected Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
 
   // Description:
   // Configure the UI based on conneccted servers.

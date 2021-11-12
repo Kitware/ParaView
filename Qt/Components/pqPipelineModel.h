@@ -327,7 +327,7 @@ public:
    */
   void disableFilterSession();
 
-public Q_SLOTS:
+public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   /**
    * Called when a new server connection is detected. Adds the connection to the
    * list.
@@ -411,7 +411,7 @@ private Q_SLOTS:
   void updateData(pqServerManagerModelItem*, ItemType type = Proxy);
   void updateDataServer(pqServer* server);
 
-private:
+private: // NOLINT(readability-redundant-access-specifiers)
   friend class pqPipelineModelDataItem;
 
   // Add an item as a child under the parent at the given index.

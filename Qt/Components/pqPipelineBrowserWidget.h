@@ -135,7 +135,7 @@ protected Q_SLOTS:
   void handleIndexClicked(const QModelIndex& index);
   void expandWithModelIndexTranslation(const QModelIndex&);
 
-protected:
+protected: // NOLINT(readability-redundant-access-specifiers)
   /**
    * sets the visibility for items in the indices list.
    */

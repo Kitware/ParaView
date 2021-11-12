@@ -87,7 +87,7 @@ private Q_SLOTS:
   void heightTextEdited(const QString&);
   void lockAspectRatioToggled(bool);
 
-private:
+private: // NOLINT(readability-redundant-access-specifiers)
   Q_DISABLE_COPY(pqViewResolutionPropertyWidget);
   class pqInternals;
   QScopedPointer<pqInternals> Internals;

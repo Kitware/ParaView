@@ -53,7 +53,7 @@ public:
 
   QString compressorConfig() const;
 
-public Q_SLOTS:
+public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   void setCompressorConfig(const QString&);
 
 Q_SIGNALS:
@@ -62,7 +62,7 @@ private Q_SLOTS:
   void currentIndexChanged(int);
   void setConfigurationDefault(int);
 
-private:
+private: // NOLINT(readability-redundant-access-specifiers)
   Q_DISABLE_COPY(pqImageCompressorWidget)
   class pqInternals;
   pqInternals* Internals;

@@ -82,7 +82,7 @@ private Q_SLOTS:
   void removeAll();
   void editPastLastRow();
 
-private:
+private: // NOLINT(readability-redundant-access-specifiers)
   Q_DISABLE_COPY(pqScalarValueListPropertyWidget)
 
   bool getRange(double& range_min, double& range_max);

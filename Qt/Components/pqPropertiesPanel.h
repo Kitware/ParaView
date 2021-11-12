@@ -124,7 +124,7 @@ public:
    */
   bool canReset();
 
-public Q_SLOTS:
+public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   /**
    * Apply the changes properties to the proxies.
    *

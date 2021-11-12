@@ -60,7 +60,7 @@ Q_SIGNALS:
 protected:
   void setWindowLocation(QString&);
 
-protected Q_SLOTS:
+protected Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   void radioButtonLocationClicked();
   void radioButtonPositionClicked();
   void updateUI();

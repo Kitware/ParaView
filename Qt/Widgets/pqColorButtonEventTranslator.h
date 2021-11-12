@@ -59,7 +59,7 @@ public:
 private Q_SLOTS:
   void onColorChosen(const QColor&);
 
-private:
+private: // NOLINT(readability-redundant-access-specifiers)
   Q_DISABLE_COPY(pqColorButtonEventTranslator)
 };
 

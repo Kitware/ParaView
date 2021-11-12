@@ -47,7 +47,7 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqPluginSettingsBehavior : public QObject
 public:
   pqPluginSettingsBehavior(QObject* parent = 0);
 
-public Q_SLOTS:
+public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   void updateSettings();
 };
 

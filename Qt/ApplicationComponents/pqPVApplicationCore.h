@@ -110,7 +110,7 @@ public:
 
   void loadStateFromPythonFile(const QString& filename, pqServer* server);
 
-public Q_SLOTS:
+public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   /**
    * Pops-up the quick launch dialog.
    */

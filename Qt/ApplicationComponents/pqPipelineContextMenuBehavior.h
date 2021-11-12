@@ -71,7 +71,7 @@ protected Q_SLOTS:
    */
   void onViewAdded(pqView*);
 
-protected:
+protected: // NOLINT(readability-redundant-access-specifiers)
   /**
    * called to build the context menu for the given representation. If the
    * picked representation was a composite data set the block index of the

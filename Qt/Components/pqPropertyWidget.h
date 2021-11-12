@@ -229,13 +229,13 @@ private:
   friend class pqPropertyWidgetDecorator;
   friend class pqProxyWidget;
 
-private Q_SLOTS:
+private Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   /**
    * check if changeFinished() must be fired as well.
    */
   void onChangeAvailable();
 
-private:
+private: // NOLINT(readability-redundant-access-specifiers)
   vtkSMProxy* Proxy;
   vtkSMProperty* Property;
   QPointer<pqView> View;

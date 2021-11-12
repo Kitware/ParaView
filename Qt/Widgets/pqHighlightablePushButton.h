@@ -51,7 +51,7 @@ public:
   pqHighlightablePushButton(const QIcon& icon, const QString& text, QWidget* parent = 0);
   ~pqHighlightablePushButton() override;
 
-public Q_SLOTS:
+public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   /**
    * Slots to highlight (or clear the highlight).
    */

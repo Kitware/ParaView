@@ -51,7 +51,7 @@ public:
   pqExpanderButton(QWidget* parent = 0);
   ~pqExpanderButton() override;
 
-public Q_SLOTS:
+public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   /**
    * Toggles the state of the checkable button.
    */

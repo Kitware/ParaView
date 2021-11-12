@@ -102,7 +102,7 @@ private Q_SLOTS:
    */
   void changeCurrentPage();
 
-private:
+private: // NOLINT(readability-redundant-access-specifiers)
   Q_DISABLE_COPY(pqCameraKeyFrameWidget)
 
   class pqInternal;

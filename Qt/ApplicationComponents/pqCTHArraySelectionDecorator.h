@@ -53,7 +53,7 @@ public:
 private Q_SLOTS:
   void updateSelection();
 
-private:
+private: // NOLINT(readability-redundant-access-specifiers)
   Q_DISABLE_COPY(pqCTHArraySelectionDecorator)
   QStringList PropertyNames;
 };

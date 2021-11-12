@@ -285,7 +285,7 @@ private Q_SLOTS:
   void colorsTableModified();
   void opacitiesTableModified();
 
-private:
+private: // NOLINT(readability-redundant-access-specifiers)
   Q_DISABLE_COPY(pqDataAssemblyPropertyWidget);
   class pqInternals;
   QScopedPointer<pqInternals> Internals;

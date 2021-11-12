@@ -58,7 +58,7 @@ private Q_SLOTS:
   void onCollapsed(const QModelIndex&);
   void onCurrentChanged(const QModelIndex&);
 
-private:
+private: // NOLINT(readability-redundant-access-specifiers)
   QString getIndexAsString(const QModelIndex&);
 
   pqPluginTreeWidgetEventTranslator(const pqPluginTreeWidgetEventTranslator&);

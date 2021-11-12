@@ -54,7 +54,7 @@ public:
   pqNodeEditorWidget(const QString& title, QWidget* parent = nullptr);
   ~pqNodeEditorWidget() override = default;
 
-public Q_SLOTS:
+public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   /**
    * Update ParaView pipeline and views
    */

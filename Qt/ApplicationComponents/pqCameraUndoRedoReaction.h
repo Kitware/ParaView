@@ -68,7 +68,7 @@ protected Q_SLOTS:
   void setEnabled(bool enable) { this->parentAction()->setEnabled(enable); }
   void setActiveView(pqView*);
 
-protected:
+protected: // NOLINT(readability-redundant-access-specifiers)
   /**
    * Called when the action is triggered.
    */

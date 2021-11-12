@@ -90,7 +90,7 @@ public:
   /// consumers.
   static void destroyPipelineSourceAndConsumers(pqPipelineSource* source);
 
-public Q_SLOTS:
+public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   void showDataLoadManager();
   void checkActionEnabled();
   void onSourceCreated(pqPipelineSource* source);

@@ -52,7 +52,7 @@ public:
 private Q_SLOTS:
   void updateEnableState();
 
-private:
+private: // NOLINT(readability-redundant-access-specifiers)
   class pqInternals;
   pqInternals* Internals;
 

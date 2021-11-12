@@ -71,7 +71,7 @@ public:
 private Q_SLOTS:
   void updateState();
 
-private:
+private: // NOLINT(readability-redundant-access-specifiers)
   Q_DISABLE_COPY(pqGenericPropertyWidgetDecorator)
 
   class pqInternals;

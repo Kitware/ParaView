@@ -91,7 +91,7 @@ private Q_SLOTS:
   void onOpenResource(QAction*);
   void onOpenResource(const pqServerResource& resource);
 
-private:
+private: // NOLINT(readability-redundant-access-specifiers)
   pqRecentFilesMenu(const pqRecentFilesMenu&);
   pqRecentFilesMenu& operator=(const pqRecentFilesMenu&);
 

@@ -176,7 +176,7 @@ protected Q_SLOTS:
    */
   virtual void onInputChanged();
 
-protected:
+protected: // NOLINT(readability-redundant-access-specifiers)
   /**
    * Use this method to initialize the pqObject state using the
    * underlying vtkSMProxy. This needs to be done only once,

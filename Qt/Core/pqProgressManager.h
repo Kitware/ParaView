@@ -157,7 +157,7 @@ protected Q_SLOTS:
   void onProgress(vtkObject*);
   void onServerAdded(pqServer*);
 
-protected:
+protected: // NOLINT(readability-redundant-access-specifiers)
   QPointer<QObject> Lock;
   QList<QPointer<QObject>> NonBlockableObjects;
   int ProgressCount;

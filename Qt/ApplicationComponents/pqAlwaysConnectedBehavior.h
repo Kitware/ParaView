@@ -61,7 +61,7 @@ public:
 protected Q_SLOTS:
   void serverCheck();
 
-protected:
+protected: // NOLINT(readability-redundant-access-specifiers)
   pqServerResource DefaultServer;
   pqTimer Timer;
 

@@ -71,7 +71,7 @@ protected Q_SLOTS:
    */
   virtual void setScene(pqAnimationScene* scene);
 
-protected:
+protected: // NOLINT(readability-redundant-access-specifiers)
   vtkSMProxy* Proxy;
   vtkSMProperty* Property;
   pqAnimationScene* Scene;

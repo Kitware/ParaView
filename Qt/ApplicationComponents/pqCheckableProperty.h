@@ -92,7 +92,7 @@ public:
 
   bool enableCheckbox() const;
 
-public Q_SLOTS:
+public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   void setEnableCheckbox(bool enableCheckbox);
 
 private:

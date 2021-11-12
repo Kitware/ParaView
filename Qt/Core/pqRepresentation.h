@@ -84,7 +84,7 @@ public:
    */
   vtkSMViewProxy* getViewProxy() const;
 
-public Q_SLOTS:
+public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
 
   /**
    * Renders the view to which this representation has been added if any.
@@ -117,7 +117,7 @@ protected Q_SLOTS:
    */
   virtual void onVisibilityChanged();
 
-protected:
+protected: // NOLINT(readability-redundant-access-specifiers)
   friend class pqView;
 
   /**

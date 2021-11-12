@@ -94,7 +94,7 @@ public:
   void setTraceChanges(bool trace) { this->TraceChanges = trace; }
   bool traceChanges() const { return this->TraceChanges; }
 
-public Q_SLOTS:
+public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   /**
    * Copy values from ServerManager to Qt. If use_unchecked is true, unchecked
    * SMProperty values are used.

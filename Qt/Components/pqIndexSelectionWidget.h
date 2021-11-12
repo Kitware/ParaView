@@ -56,7 +56,7 @@ public:
   pqIndexSelectionWidget(vtkSMProxy* proxy, vtkSMProperty* property, QWidget* parent = 0);
   ~pqIndexSelectionWidget() override;
 
-public Q_SLOTS:
+public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   void setHeaderLabel(const QString& str);
   void setPushPropertyName(const QByteArray& pName);
 
@@ -78,7 +78,7 @@ protected Q_SLOTS:
    */
   void updatePropertyImpl();
 
-protected:
+protected: // NOLINT(readability-redundant-access-specifiers)
   bool eventFilter(QObject* obj, QEvent* e) override;
   /**
    * Update the widget state from the PropertyLink Qt property.

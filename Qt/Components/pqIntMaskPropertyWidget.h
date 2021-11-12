@@ -81,7 +81,7 @@ public:
    */
   int mask() const;
 
-public Q_SLOTS:
+public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   /**
    * Set the mask.
    */

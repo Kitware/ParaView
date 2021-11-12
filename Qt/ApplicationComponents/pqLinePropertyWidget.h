@@ -64,7 +64,7 @@ public:
   pqLinePropertyWidget(vtkSMProxy* proxy, vtkSMPropertyGroup* smgroup, QWidget* parent = 0);
   ~pqLinePropertyWidget() override;
 
-public Q_SLOTS:
+public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   void useXAxis() { this->useAxis(0); }
   void useYAxis() { this->useAxis(1); }
   void useZAxis() { this->useAxis(2); }

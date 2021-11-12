@@ -73,7 +73,7 @@ protected Q_SLOTS:
    */
   void updateViewWidgets(QWidget* container = nullptr);
 
-protected:
+protected: // NOLINT(readability-redundant-access-specifiers)
   /**
    * Creates a new instance of the QWidget subclass to be used to show this
    * view. Default implementation creates a pqQVTKWidgetBase.

@@ -122,7 +122,7 @@ private Q_SLOTS:
   void sliderPressed();
   void sliderReleased();
 
-private:
+private: // NOLINT(readability-redundant-access-specifiers)
   int Value;
   int Minimum;
   int Maximum;

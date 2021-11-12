@@ -92,7 +92,7 @@ private Q_SLOTS:
    */
   void currentIndexChanged(int);
 
-private:
+private: // NOLINT(readability-redundant-access-specifiers)
   class pqInternal;
   const QScopedPointer<pqInternal> Internal;
 

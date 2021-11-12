@@ -54,7 +54,7 @@ public:
   int bufferLength() const;
   bool isEnabled() const;
 
-public Q_SLOTS:
+public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   void refresh();
   void clear();
   void setTimeThreshold(float value);
@@ -73,7 +73,7 @@ protected:
   void showEvent(QShowEvent*) override;
   void hideEvent(QHideEvent*) override;
 
-protected Q_SLOTS:
+protected Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   void setTimeThresholdById(int id);
   void setBufferLengthById(int id);
 

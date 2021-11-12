@@ -57,7 +57,7 @@ public:
     QWidget* parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags(), bool autotracking = true);
   ~pqLightsInspector() override;
 
-public Q_SLOTS:
+public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   void addLight();
   void removeLight(vtkSMProxy* = nullptr);
   void syncLightToCamera(vtkSMProxy* = nullptr);

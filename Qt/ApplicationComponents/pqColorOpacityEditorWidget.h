@@ -139,7 +139,7 @@ public:
    */
   pqSMProxy scalarOpacityFunctionProxy() const;
 
-public Q_SLOTS:
+public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   /**
    * Sets the xvmsPoints that control the opacity transfer function.
    */
@@ -390,7 +390,7 @@ protected Q_SLOTS:
    */
   void realShowDataHistogram();
 
-protected:
+protected: // NOLINT(readability-redundant-access-specifiers)
   /**
    * Validate and adjust the current range before converting to a log range.
    */

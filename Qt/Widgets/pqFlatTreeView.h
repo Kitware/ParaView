@@ -232,7 +232,7 @@ protected Q_SLOTS:
   void updateData(const QModelIndex& topLeft, const QModelIndex& bottomRight);
   //@}
 
-protected:
+protected: // NOLINT(readability-redundant-access-specifiers)
   /**
    * \name Keyboard Event Handlers
    */
@@ -285,7 +285,7 @@ private Q_SLOTS:
   void changeSelection(const QItemSelection& selected, const QItemSelection& deselected);
   //@}
 
-private:
+private: // NOLINT(readability-redundant-access-specifiers)
   void resetRoot();
   void resetPreferredSizes();
 

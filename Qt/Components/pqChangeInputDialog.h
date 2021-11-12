@@ -74,7 +74,7 @@ protected Q_SLOTS:
   void inputPortToggled(bool);
   void selectionChanged();
 
-protected:
+protected: // NOLINT(readability-redundant-access-specifiers)
   void buildPortWidgets();
 
 private:

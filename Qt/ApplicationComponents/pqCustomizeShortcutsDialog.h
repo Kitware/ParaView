@@ -52,7 +52,7 @@ private Q_SLOTS:
   void onResetShortcut();
   void onResetAll();
 
-private:
+private: // NOLINT(readability-redundant-access-specifiers)
   Q_DISABLE_COPY(pqCustomizeShortcutsDialog);
 
   class pqInternals;

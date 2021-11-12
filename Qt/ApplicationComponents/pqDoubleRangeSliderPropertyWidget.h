@@ -72,7 +72,7 @@ private Q_SLOTS:
   void lowerChanged(double);
   void upperChanged(double);
 
-private:
+private: // NOLINT(readability-redundant-access-specifiers)
   Q_DISABLE_COPY(pqDoubleRangeSliderPropertyWidget)
 
   class pqInternals;

@@ -214,7 +214,7 @@ protected Q_SLOTS:
 
   void onLayoutNameChanged(pqServerManagerModelItem*);
 
-protected:
+protected: // NOLINT(readability-redundant-access-specifiers)
   bool eventFilter(QObject* obj, QEvent* event) override;
 
   /**

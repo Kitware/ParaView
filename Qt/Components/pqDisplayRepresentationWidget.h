@@ -61,7 +61,7 @@ public:
    */
   QString representationText() const;
 
-public Q_SLOTS:
+public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   /**
    * set the representation proxy or pqDataRepresentation instance.
    */

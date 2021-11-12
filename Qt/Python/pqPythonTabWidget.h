@@ -112,7 +112,7 @@ public:
 
   void loadFile(const QString& filename);
 
-public Q_SLOTS:
+public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   /**
    * @brief Add a new empty text area
    */
