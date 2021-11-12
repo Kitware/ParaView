@@ -95,7 +95,7 @@ public:
   class pqCallbackHandler
   {
   public:
-    virtual ~pqCallbackHandler(){};
+    virtual ~pqCallbackHandler() = default;
 
     /**
      * Called to indicate that the data is about to be changed.

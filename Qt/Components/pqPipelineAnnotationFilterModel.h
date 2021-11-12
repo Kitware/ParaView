@@ -58,7 +58,7 @@ class PQCOMPONENTS_EXPORT pqPipelineAnnotationFilterModel : public QSortFilterPr
 
 public:
   pqPipelineAnnotationFilterModel(QObject* parent = nullptr);
-  ~pqPipelineAnnotationFilterModel() override{};
+  ~pqPipelineAnnotationFilterModel() override = default;
 
   void enableAnnotationFilter(const QString& annotationKey);
   void disableAnnotationFilter();

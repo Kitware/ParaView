@@ -63,7 +63,7 @@ public:
   {
     std::string GroupName;
     std::string ProxyName;
-    ProxyType() {}
+    ProxyType() = default;
     ProxyType(const std::string& group, const std::string& name)
       : GroupName(group)
       , ProxyName(name)

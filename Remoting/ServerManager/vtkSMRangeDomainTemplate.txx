@@ -34,9 +34,7 @@ vtkSMRangeDomainTemplate<T>::vtkSMRangeDomainTemplate()
 
 //-----------------------------------------------------------------------------
 template <class T>
-vtkSMRangeDomainTemplate<T>::~vtkSMRangeDomainTemplate()
-{
-}
+vtkSMRangeDomainTemplate<T>::~vtkSMRangeDomainTemplate() = default;
 
 //-----------------------------------------------------------------------------
 template <class T>

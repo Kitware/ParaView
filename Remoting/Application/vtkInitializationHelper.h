@@ -134,8 +134,8 @@ public:
   static void Initialize(int argc, char** argv, int type, vtkPVOptions* options);
 
 protected:
-  vtkInitializationHelper(){};
-  ~vtkInitializationHelper() override{};
+  vtkInitializationHelper() = default;
+  ~vtkInitializationHelper() override = default;
 
   /**
    * Load user and site settings

@@ -50,8 +50,8 @@ public:
   void CopyFromStream(const vtkClientServerStream*) override {}
 
 protected:
-  vtkPVEnableStackTraceSignalHandler() {}
-  ~vtkPVEnableStackTraceSignalHandler() override {}
+  vtkPVEnableStackTraceSignalHandler() = default;
+  ~vtkPVEnableStackTraceSignalHandler() override = default;
 
 private:
   vtkPVEnableStackTraceSignalHandler(const vtkPVEnableStackTraceSignalHandler&) = delete;

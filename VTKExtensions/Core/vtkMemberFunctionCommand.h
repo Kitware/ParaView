@@ -136,7 +136,7 @@ private:
     this->Method2 = nullptr;
   }
 
-  ~vtkMemberFunctionCommand() override {}
+  ~vtkMemberFunctionCommand() override = default;
 
   ClassT* Object;
   void (ClassT::*Method)();

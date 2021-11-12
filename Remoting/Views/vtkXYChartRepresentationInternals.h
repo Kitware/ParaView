@@ -225,7 +225,7 @@ public:
   {
   }
 
-  virtual ~vtkInternals() {}
+  virtual ~vtkInternals() = default;
 
   //---------------------------------------------------------------------------
   /**

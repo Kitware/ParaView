@@ -305,7 +305,7 @@ class VTKPVVTKEXTENSIONSAMR_EXPORT vtkAMRDualGridHelperSeed
 {
 public:
   vtkAMRDualGridHelperSeed();
-  ~vtkAMRDualGridHelperSeed(){};
+  ~vtkAMRDualGridHelperSeed() = default;
 
   // Level is supplied externally.
   // This is the index of the adjacent dual point in the object.

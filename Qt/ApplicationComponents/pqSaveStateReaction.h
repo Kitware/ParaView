@@ -48,7 +48,7 @@ public:
    * Constructor. Parent cannot be nullptr.
    */
   pqSaveStateReaction(QAction* parent);
-  ~pqSaveStateReaction() override {}
+  ~pqSaveStateReaction() override = default;
 
   /**
    * Open File dialog in order to choose the location and the type of

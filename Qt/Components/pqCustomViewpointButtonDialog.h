@@ -130,7 +130,7 @@ private Q_SLOTS:
   void deleteRow();
 
 private: // NOLINT(readability-redundant-access-specifiers)
-  pqCustomViewpointButtonDialog() {}
+  pqCustomViewpointButtonDialog() = default;
   QStringList Configurations;
   QString CurrentConfiguration;
   pqCustomViewpointButtonDialogUI* ui;

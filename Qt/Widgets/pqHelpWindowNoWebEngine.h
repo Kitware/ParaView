@@ -58,7 +58,7 @@ public:
     this->setParent(_parent);
     this->setOpenLinks(false);
   }
-  ~pqTextBrowser() override {}
+  ~pqTextBrowser() override = default;
   static pqTextBrowser* newInstance(QHelpEngine* engine, pqHelpWindow* self)
   {
     pqTextBrowser* instance = new pqTextBrowser(engine, self);

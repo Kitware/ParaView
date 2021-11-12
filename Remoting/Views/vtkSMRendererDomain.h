@@ -35,8 +35,8 @@ public:
   void Update(vtkSMProperty*) override;
 
 protected:
-  vtkSMRendererDomain(){};
-  ~vtkSMRendererDomain() override{};
+  vtkSMRendererDomain() = default;
+  ~vtkSMRendererDomain() override = default;
 
   int ReadXMLAttributes(vtkSMProperty* prop, vtkPVXMLElement* element) override;
 

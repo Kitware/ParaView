@@ -188,7 +188,7 @@ protected: // NOLINT(readability-redundant-access-specifiers)
   {
     QString Label;
     QString Name;
-    ViewType() {}
+    ViewType() = default;
     ViewType(const QString& label, const QString& name)
       : Label(label)
       , Name(name)

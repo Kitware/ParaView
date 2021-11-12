@@ -149,11 +149,7 @@ private:
   public:
     vtkArgumentScope() = default;
 
-    vtkArgumentScope(const vtkArgumentScope& args)
-      : Args(args.Args)
-      , ArgNames(args.ArgNames)
-    {
-    }
+    vtkArgumentScope(const vtkArgumentScope& args) = default;
 
     /**
      * Adds an named argument as an fmt::arg() object.
