@@ -316,7 +316,7 @@ protected:
    * vtkCommunicator::SUM_OP are supported.
    */
   void AllReduce(
-    const vtkTypeUInt64 source, vtkTypeUInt64& dest, int operation, bool skip_data_server = false);
+    vtkTypeUInt64 source, vtkTypeUInt64& dest, int operation, bool skip_data_server = false);
 
   //@{
   /**

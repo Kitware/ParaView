@@ -100,9 +100,9 @@ public:
   // Description:
   // Append the data to the buffer. Return the index where
   // the data was written.
-  vtkIdType Pack(const double* pData, const int nComps, const vtkIdType nTups);
-  vtkIdType Pack(const float* pData, const int nComps, const vtkIdType nTups);
-  vtkIdType Pack(const int* pData, const int nComps, const vtkIdType nTups);
+  vtkIdType Pack(const double* pData, int nComps, vtkIdType nTups);
+  vtkIdType Pack(const float* pData, int nComps, vtkIdType nTups);
+  vtkIdType Pack(const int* pData, int nComps, vtkIdType nTups);
   vtkIdType Pack(vtkDoubleArray* da);
   vtkIdType Pack(vtkFloatArray* da);
   // Description:
@@ -110,11 +110,11 @@ public:
   void InitUnpack() { this->EOD = 0; }
   // Description:
   // Extract the next array from the buffer
-  int UnPack(double*& rData, const int nComps, const vtkIdType nTups, const bool copyFlag);
-  int UnPack(float*& rData, const int nComps, const vtkIdType nTups, const bool copyFlag);
-  int UnPack(int*& rData, const int nComps, const vtkIdType nTups, const bool copyFlag);
-  int UnPack(vtkDoubleArray* da, const int nComps, const vtkIdType nTups, const bool copyFlag);
-  int UnPack(vtkFloatArray* da, const int nComps, const vtkIdType nTups, const bool copyFlag);
+  int UnPack(double*& rData, int nComps, vtkIdType nTups, bool copyFlag);
+  int UnPack(float*& rData, int nComps, vtkIdType nTups, bool copyFlag);
+  int UnPack(int*& rData, int nComps, vtkIdType nTups, bool copyFlag);
+  int UnPack(vtkDoubleArray* da, int nComps, vtkIdType nTups, bool copyFlag);
+  int UnPack(vtkFloatArray* da, int nComps, vtkIdType nTups, bool copyFlag);
   // static void Resize(std::vector<vtkMaterialInterfaceCommBuffer> &buffers);
 private:
   vtkIdType EOD;

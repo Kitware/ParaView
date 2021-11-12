@@ -274,7 +274,7 @@ public:
    *   An index to the next item in the tree or an invalid index
    *   when the end of the tree is reached.
    */
-  QModelIndex getNextIndex(const QModelIndex index, const QModelIndex& root = QModelIndex()) const;
+  QModelIndex getNextIndex(QModelIndex index, const QModelIndex& root = QModelIndex()) const;
 
   /**
    * Provides access to the view.
