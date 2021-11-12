@@ -544,7 +544,6 @@ void PrintHistogram(vector<TCnt>& bins, vector<TLabel>& binIds)
     }
     cerr << "(" << bins[i] << ")" << endl;
   }
-  return;
 }
 //
 template <typename TCnt>
@@ -559,7 +558,6 @@ void PrintHistogram(vector<TCnt>& bins)
   }
   //
   PrintHistogram(bins, binIds);
-  return;
 }
 };
 #endif
