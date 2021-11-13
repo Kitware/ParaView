@@ -63,7 +63,7 @@ inline void ProcessArgsForPython(std::vector<char*>& pythonArgs,
     pythonArgs.push_back(vtksys::SystemTools::DuplicateString("-m"));
 
     std::string modulename = vtksys::SystemTools::GetFilenameWithoutLastExtension(
-      vtksys::SystemTools::GetFilenameName(args[0].c_str()));
+      vtksys::SystemTools::GetFilenameName(args[0]));
     pythonArgs.push_back(vtksys::SystemTools::DuplicateString(modulename.c_str()));
   }
   else
