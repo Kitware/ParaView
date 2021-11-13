@@ -61,7 +61,7 @@ struct PQCORE_EXPORT pqTextLinker
    * QTextEdit like objects
    */
   template <typename T, typename U>
-  explicit pqTextLinker(T* t, U* u)
+  explicit pqTextLinker(T* /*t*/, U* /*u*/)
   {
     static_assert(sizeof(T) == 0 && sizeof(U) == 0,
       "Only specializations of pqTextLinker(T* t, U* u) can be used");

@@ -105,7 +105,7 @@ public:
    * a new one
    */
   template <typename T>
-  void linkTo(T* obj)
+  void linkTo(T* /*obj*/)
   {
     static_assert(sizeof(T) == 0, "Only specializations of linkTo(T* t) can be used");
   }
