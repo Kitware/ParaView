@@ -179,6 +179,7 @@ class Paraview(CMakePackage, CudaPackage):
     depends_on('netcdf-c')
     depends_on('pegtl')
     depends_on('protobuf@3.4:')
+    depends_on('proj@7:')
     depends_on('libxml2')
     depends_on('lz4')
     depends_on('xz')
