@@ -673,6 +673,46 @@
       <!-- End of TimerLog -->
     </Proxy>
 
+    <Proxy class="vtkExecutableRunner"
+           name="ExecutableRunner"
+           processes="client|dataserver|renderserver">
+      <Documentation>Execute a process on server side.</Documentation>
+      <Property command="Execute"
+                name="Execute">
+        <Documentation>Execute the given command on the master server process. Also reset the output strings.</Documentation>
+      </Property>
+      <DoubleVectorProperty command="SetTimeout"
+                        default_values="5.0"
+                        name="Timeout">
+        <Documentation>Set the internal timeout of the runner.</Documentation>
+      </DoubleVectorProperty>
+      <StringVectorProperty command="SetCommand"
+                        default_values=""
+                        name="Command">
+        <Documentation>Set the command to execute.</Documentation>
+      </StringVectorProperty>
+      <StringVectorProperty command="GetStdOut"
+                        name="StdOut"
+                        number_of_elements="1"
+                        information_only="1">
+        <Documentation>Get the standard output of the command.</Documentation>
+      </StringVectorProperty>
+      <StringVectorProperty command="GetStdErr"
+                        name="StdErr"
+                        number_of_elements="1"
+                        information_only="1">
+        <Documentation>Get the error output of the command.</Documentation>
+      </StringVectorProperty>
+      <IntVectorProperty command="GetReturnValue"
+                        name="ReturnValue"
+                        number_of_elements="1"
+                        default_values="-1"
+                        information_only="1">
+        <Documentation>Get the return value of the command.</Documentation>
+      </IntVectorProperty>
+      <!-- End of ExecutableRunner -->
+    </Proxy>
+
     <!-- ================================================================= -->
     <Proxy name="LogRecorder" class="vtkLogRecorder">
       <IntVectorProperty name="RankEnabled"
