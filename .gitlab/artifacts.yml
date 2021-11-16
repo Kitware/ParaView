@@ -56,6 +56,9 @@
             # Virtual environment
             - build/ci-venv/
 
+            # proj.db
+            - build/share/vtk-*/proj/proj.db
+
 .cmake_test_artifacts:
     artifacts:
         expire_in: 1d
