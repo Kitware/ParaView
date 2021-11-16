@@ -48,9 +48,8 @@ namespace
 //----------------------------------------------------------------------------
 bool IsMixedShape(vtkUnstructuredGrid* unstructured_grid)
 {
-  vtkNew<vtkCellTypes> cell_types;
-  unstructured_grid->GetCellTypes(cell_types);
-  return cell_types->GetNumberOfTypes() > 1;
+  auto* cell_types = unstructured_grid->GetDistinctCellTypesArray();
+  return cell_types->GetNumberOfTuples() > 1;
 }
 
 //----------------------------------------------------------------------------

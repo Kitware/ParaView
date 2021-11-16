@@ -16,10 +16,9 @@ int TestPEnSightBinaryGoldReader(int argc, char* argv[])
   vtkMultiBlockDataSet* mb = reader->GetOutput();
   vtkUnstructuredGrid* ug = vtkUnstructuredGrid::SafeDownCast(mb->GetBlock(0));
 
-  vtkNew<vtkCellTypes> types;
-  ug->GetCellTypes(types);
+  auto* cell_types = ug->GetDistinctCellTypesArray();
 
-  auto nbOfTypes = types->GetNumberOfTypes();
+  auto nbOfTypes = cell_types->GetNumberOfTuples();
   if (nbOfTypes != 2)
   {
     std::cerr << "Wrong number of cell types. Expects 2 ( has " << nbOfTypes << ")." << std::endl;
