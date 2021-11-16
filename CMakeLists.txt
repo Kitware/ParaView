@@ -508,6 +508,12 @@ else ()
       "${vtk_required_modules};${vtk_unrecognized_modules}.")
   endif ()
 
+  # Handle the requirement of `sqlitebin` for `proj`.
+  set(vtk_sqlite_build_binary 0)
+  if ("VTK::libproj" IN_LIST vtk_modules)
+    set(vtk_sqlite_build_binary 1)
+  endif ()
+
   if (PARAVIEW_USE_PYTHON)
     find_package("Python3" 3.3 QUIET REQUIRED COMPONENTS Interpreter)
     set(PYTHON_VERSION_MAJOR "${Python3_VERSION_MAJOR}")
