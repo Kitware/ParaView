@@ -153,7 +153,6 @@ ParaViewMainWindow::ParaViewMainWindow()
   this->setCorner(Qt::BottomRightCorner, Qt::RightDockWidgetArea);
 
   this->tabifyDockWidget(this->Internals->colorMapEditorDock, this->Internals->memoryInspectorDock);
-  this->tabifyDockWidget(this->Internals->colorMapEditorDock, this->Internals->timeInspectorDock);
   this->tabifyDockWidget(
     this->Internals->colorMapEditorDock, this->Internals->comparativePanelDock);
   this->tabifyDockWidget(
@@ -177,6 +176,7 @@ ParaViewMainWindow::ParaViewMainWindow()
   this->tabifyDockWidget(this->Internals->animationViewDock, this->Internals->statisticsDock);
   this->tabifyDockWidget(this->Internals->animationViewDock, this->Internals->outputWidgetDock);
   this->tabifyDockWidget(this->Internals->animationViewDock, this->Internals->pythonShellDock);
+  this->tabifyDockWidget(this->Internals->animationViewDock, this->Internals->timeInspectorDock);
 
   // setup properties dock
   this->tabifyDockWidget(this->Internals->propertiesDock, this->Internals->viewPropertiesDock);
