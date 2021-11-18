@@ -35,8 +35,7 @@ del rw
 
 if ok:
   smtesting.ProcessCommandLineArguments()
-
-  LoadDistributedPlugin('SurfaceLIC', True, globals())
+  print("DATADIR ", smtesting.DataDir)
 
   smtesting.LoadServerManagerState(smtesting.StateXMLFileName)
 

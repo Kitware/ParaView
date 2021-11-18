@@ -21,14 +21,14 @@
 #define vtkSurfaceLICRepresentation_h
 
 #include "vtkGeometryRepresentationWithFaces.h"
-#include "vtkSurfaceLICRepresentationsModule.h" // for export macro
+#include "vtkRemotingViewsModule.h" // for export macro
 
 class vtkInformation;
 class vtkInformationRequestKey;
 
 class vtkCompositeSurfaceLICMapper;
 
-class VTKSURFACELICREPRESENTATIONS_EXPORT vtkSurfaceLICRepresentation
+class VTKREMOTINGVIEWS_EXPORT vtkSurfaceLICRepresentation
   : public vtkGeometryRepresentationWithFaces
 {
 public:
