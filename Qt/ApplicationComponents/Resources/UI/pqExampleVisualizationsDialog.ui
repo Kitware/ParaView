@@ -85,7 +85,33 @@
      </property>
     </widget>
    </item>
-   <item row="7" column="0" colspan="2">
+   <item row="8" column="1">
+    <widget class="QLabel" name="HeadSQExampleDescription">
+     <property name="text">
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Contouring CT scan of a head&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignHCenter|Qt::AlignTop</set>
+     </property>
+     <property name="wordWrap">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="8" column="0">
+    <widget class="QLabel" name="TosExampleDescription">
+     <property name="text">
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Sea surface temperatures&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignHCenter|Qt::AlignTop</set>
+     </property>
+     <property name="wordWrap">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="9" column="0" colspan="2">
     <widget class="QDialogButtonBox" name="buttonBox">
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
@@ -116,6 +142,48 @@
      <property name="icon">
       <iconset resource="../pqApplicationComponents.qrc">
        <normaloff>:/pqApplicationComponents/Thumbnails/WaveletExample.png</normaloff>:/pqApplicationComponents/Thumbnails/WaveletExample.png</iconset>
+     </property>
+     <property name="iconSize">
+      <size>
+       <width>300</width>
+       <height>225</height>
+      </size>
+     </property>
+     <property name="flat">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="7" column="1">
+    <widget class="QPushButton" name="HeadSQExampleButton">
+     <property name="text">
+      <string/>
+     </property>
+     <property name="icon">
+      <iconset resource="../pqApplicationComponents.qrc">
+        <normalon>:/pqApplicationComponents/Thumbnails/HeadSQExample.png</normalon>
+      </iconset>
+     </property>
+     <property name="iconSize">
+      <size>
+       <width>300</width>
+       <height>225</height>
+      </size>
+     </property>
+     <property name="flat">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="7" column="0">
+    <widget class="QPushButton" name="TosExampleButton">
+     <property name="text">
+      <string/>
+     </property>
+     <property name="icon">
+      <iconset resource="../pqApplicationComponents.qrc">
+        <normalon>:/pqApplicationComponents/Thumbnails/TosExample.png</normalon>
+      </iconset>
      </property>
      <property name="iconSize">
       <size>
@@ -201,8 +269,10 @@
  <tabstops>
   <tabstop>CanExampleButton</tabstop>
   <tabstop>DiskOutRefExampleButton</tabstop>
+  <tabstop>HeadSQExampleButton</tabstop>
   <tabstop>HotGasAnalysisExampleButton</tabstop>
   <tabstop>WaveletExampleButton</tabstop>
+  <tabstop>TosExampleButton</tabstop>
   <tabstop>buttonBox</tabstop>
  </tabstops>
  <resources>
