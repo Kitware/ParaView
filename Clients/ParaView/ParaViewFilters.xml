@@ -38,7 +38,7 @@
     <Proxy group="filters" name="ComputeQuartiles" />
     <Proxy group="filters" name="ExtractLocation" omit_from_toolbar="1" />
     <Proxy group="filters" name="PlotDataOverTime" omit_from_toolbar="1" />
-    <Proxy group="filters" name="ThresholdTable" />
+    <Proxy group="filters" name="ThresholdTable" omit_from_toolbar="1" />
   </Category>
   <Category name="Hyper Tree Grid" menu_label="&amp;Hyper Tree Grid">
     <Proxy group="filters" name="Clip" />
