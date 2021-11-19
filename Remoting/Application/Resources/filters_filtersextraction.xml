@@ -458,6 +458,10 @@
             <Group name="sources"/>
             <Group name="filters"/>
           </ProxyGroupDomain>
+          <InputArrayDomain attribute_type="point"
+                            name="particles_point_arrays"
+                            number_of_components="1"
+                            optional="1" />
           <DataTypeDomain name="input_type" composite_data_supported="0">
             <DataType value="vtkDataSet"/>
           </DataTypeDomain>
@@ -489,7 +493,7 @@
                               default_values="Global or Local IDs"
                               animateable="0">
               <ArrayListDomain
-                name="array_list" attribute_type="Scalars"
+                name="array_list" attribute_type="Scalars" input_domain_name="particles_point_arrays"
                 none_string="Global or Local IDs">
                 <RequiredProperties>
                   <Property name="Particles" function="Input"/>
@@ -505,6 +509,13 @@
             </Documentation>
         </StringVectorProperty>
 
+        <Hints>
+            <WarnOnCreate title="Potentially slow operation">
+              **Extract Particles Over Time** filter needs to process all timesteps
+              available in your dataset and can potentially take a long time to complete.
+              Do you want to continue?
+            </WarnOnCreate>
+        </Hints>
 
       <!-- End ExtractParticlesOverTime -->
     </SourceProxy>
