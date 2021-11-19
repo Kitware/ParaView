@@ -506,6 +506,11 @@ void pqTransferFunctionWidget::editColorAtCurrentControlPoint()
   vtkColorTransferFunction* ctf = cpitem->GetColorTransferFunction();
   assert(ctf != nullptr);
 
+  // Disable the interactor to ignore any events that may be issues
+  // from the operating system after the dialog is shown and closed.
+  // Fixes #20758.
+  this->Internals->Widget->interactor()->Disable();
+
   double xrgbms[6];
   ctf->GetNodeValue(currentIdx, xrgbms);
   QColor color = QColorDialog::getColor(QColor::fromRgbF(xrgbms[1], xrgbms[2], xrgbms[3]), this,
@@ -522,6 +527,10 @@ void pqTransferFunctionWidget::editColorAtCurrentControlPoint()
     vtkContextMouseEvent mouseEvent;
     mouseEvent.SetButton(vtkContextMouseEvent::LEFT_BUTTON);
     cpitem->MouseButtonReleaseEvent(mouseEvent);
+
+    // Re-enable the widget interactor a short time after the dialog closes.
+    // Fixes #20758.
+    QTimer::singleShot(100, [=]() { this->Internals->Widget->interactor()->Enable(); });
 
     Q_EMIT this->controlPointsModified();
   }
