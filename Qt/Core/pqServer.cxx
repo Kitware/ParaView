@@ -103,7 +103,8 @@ pqServer::pqServer(vtkIdType connectionID, QObject* _parent)
   if (this->isRemote() && serverInfo)
   {
     this->Internals->TimeoutCommand = serverInfo->GetTimeoutCommand();
-    this->Internals->RemainingLifeTime = serverInfo->GetTimeout();
+    int val = serverInfo->GetTimeout();
+    this->Internals->RemainingLifeTime = val > 0 ? val : -1;
   }
 
   if (!this->Internals->TimeoutCommand.empty()) // Setup server side command proxy
