@@ -495,7 +495,8 @@ void vtknvindex_import_bricks::execute_fragment(
 
           if (neighbor->is_data_available())
           {
-            neighbor->copy(svol_brick_data_raw, dest_brick_bbox, m_vol_fmt_size);
+            neighbor->copy(
+              svol_brick_data_raw, dest_brick_bbox, m_vol_fmt_size, m_source_scalar_type);
           }
           else
           {

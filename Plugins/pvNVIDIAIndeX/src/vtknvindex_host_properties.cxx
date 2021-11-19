@@ -143,7 +143,8 @@ inline bool bbox_interior_intersects(
 
 //-------------------------------------------------------------------------------------------------
 void vtknvindex_volume_neighbor_data::Neighbor_info::copy(mi::Uint8* dst_buffer,
-  const mi::math::Bbox<mi::Sint32, 3>& dst_buffer_bbox_global, mi::Size voxel_fmt_size) const
+  const mi::math::Bbox<mi::Sint32, 3>& dst_buffer_bbox_global, mi::Size voxel_fmt_size,
+  const std::string& source_scalar_type) const
 {
   const mi::Uint8* src_buffer;
   const mi::math::Bbox<mi::Sint32, 3>* src_buffer_bbox_global;
@@ -164,8 +165,18 @@ void vtknvindex_volume_neighbor_data::Neighbor_info::copy(mi::Uint8* dst_buffer,
     return; // no data available
   }
 
-  copy_brick(border_bbox, dst_buffer, dst_buffer_bbox_global, src_buffer, *src_buffer_bbox_global,
-    voxel_fmt_size);
+  if (data_buffer_is_local && source_scalar_type == "double")
+  {
+    // Data in local memory still needs to be converted from double to float, unlike data in shared
+    // memory or fetched from remote hosts
+    copy_brick_double_to_float(
+      border_bbox, dst_buffer, dst_buffer_bbox_global, src_buffer, *src_buffer_bbox_global);
+  }
+  else
+  {
+    copy_brick(border_bbox, dst_buffer, dst_buffer_bbox_global, src_buffer, *src_buffer_bbox_global,
+      voxel_fmt_size);
+  }
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -303,7 +314,8 @@ vtknvindex_volume_neighbor_data::vtknvindex_volume_neighbor_data(
           ni->border_bbox = border_bbox_clipped;
           ni->query_bbox = mi::math::Bbox<mi::Sint32, 3>(query_bbox);
           ni->data_bbox = data_bbox;
-          ni->data_buffer = nullptr; // will be filled by fetch_data()
+          ni->data_buffer = nullptr;        // will be filled by fetch_data()
+          ni->data_buffer_is_local = false; // will be filled by fetch_data()
           ni->host_id = shm_info->m_host_id;
           ni->rank_id = shm_info->m_rank_id;
 
@@ -362,8 +374,13 @@ void vtknvindex_volume_neighbor_data::fetch_data(
     if (neighbor->host_id == current_host)
     {
       // Data is available in local or shared memory
+      const vtknvindex_host_properties::shm_info* shm_info = nullptr;
       neighbor->data_buffer = host_props->get_subset_data_buffer(
-        mi::math::Bbox<mi::Float32, 3>(neighbor->query_bbox), time_step);
+        mi::math::Bbox<mi::Float32, 3>(neighbor->query_bbox), time_step, &shm_info);
+      if (neighbor->data_buffer && shm_info)
+      {
+        neighbor->data_buffer_is_local = (shm_info->m_subset_ptr != nullptr);
+      }
     }
     else if (neighbor->border_data_buffer)
     {
