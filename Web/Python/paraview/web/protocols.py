@@ -3655,7 +3655,7 @@ class ParaViewWebStartupPluginLoader(ParaViewWebProtocol):
         if not ParaViewWebStartupPluginLoader.loaded and plugins:
             ParaViewWebStartupPluginLoader.loaded = True
             for path in plugins.split(pathSeparator):
-                simple.LoadPlugin(path, ns=globals())
+                simple.LoadPlugin(path)
 
 
 # =============================================================================
