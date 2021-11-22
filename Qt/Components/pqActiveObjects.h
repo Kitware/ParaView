@@ -193,6 +193,20 @@ Q_SIGNALS:
    */
   void dataUpdated();
 
+  /**
+   * this signal is fired when the active representation fires the updated()
+   * signal. This is used by components in the GUI that need to be updated when
+   * the active representation updates.
+   */
+  void representationUpdated();
+
+  /**
+   * this signal is fired when the active view fires the dataUpdated()
+   * signal. This is used by components in the GUI that need to be updated when
+   * the active view updates.
+   */
+  void viewUpdated();
+
 private Q_SLOTS:
   /**
    * if a new server connection was established, and no active server is set,
