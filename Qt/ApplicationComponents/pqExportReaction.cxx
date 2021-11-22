@@ -51,6 +51,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QVBoxLayout>
 #include <QtDebug>
 
+#include "pqProxyWidgetDialog.h"
+
 //-----------------------------------------------------------------------------
 pqExportReaction::pqExportReaction(QAction* parentObject)
   : Superclass(parentObject)
@@ -152,21 +154,11 @@ QString pqExportReaction::exportActiveView()
     bool export_cancelled = false;
     if (proxyWidget->filterWidgets(true))
     {
-      QDialog* dialog = this->createConfigurationDialog(proxyWidget);
-
-      // While all widgets are shown, fix the size of the dialog. Add a bit to
-      // the width, since the default size doesn't leave much room for text in
-      // the line edits.
-      dialog->adjustSize();
-      dialog->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
-
-      // Hide advanced options:
-      proxyWidget->filterWidgets();
-
-      // Show the dialog:
-      int dialogCode = dialog->exec();
+      pqProxyWidgetDialog dialog(proxy, pqCoreUtilities::mainWidget());
+      dialog.setWindowTitle("Export Options");
+      dialog.setApplyChangesImmediately(true);
+      int dialogCode = dialog.exec();
       export_cancelled = (static_cast<QDialog::DialogCode>(dialogCode) != QDialog::Accepted);
-      delete dialog;
     }
 
     delete proxyWidget;
@@ -181,35 +173,4 @@ QString pqExportReaction::exportActiveView()
     }
   }
   return QString();
-}
-
-// ----------------------------------------------------------------------------
-QDialog* pqExportReaction::createConfigurationDialog(pqProxyWidget* proxyWidget)
-{
-  QDialog* dialog = new QDialog(pqCoreUtilities::mainWidget());
-  dialog->setWindowTitle(tr("Export Options"));
-
-  QLabel* label = new QLabel(dialog);
-  label->setText(tr("Show advanced options:"));
-
-  QToolButton* advancedButton = new QToolButton(dialog);
-  advancedButton->setIcon(QIcon(":/pqWidgets/Icons/pqAdvanced.svg"));
-  advancedButton->setCheckable(true);
-  connect(advancedButton, SIGNAL(toggled(bool)), proxyWidget, SLOT(filterWidgets(bool)));
-
-  QDialogButtonBox* bbox = new QDialogButtonBox(QDialogButtonBox::Save | QDialogButtonBox::Cancel);
-  connect(bbox, SIGNAL(accepted()), dialog, SLOT(accept()));
-  connect(bbox, SIGNAL(rejected()), dialog, SLOT(reject()));
-
-  QHBoxLayout* hbox = new QHBoxLayout();
-  hbox->addWidget(label);
-  hbox->addWidget(advancedButton);
-
-  QVBoxLayout* vbox = new QVBoxLayout(dialog);
-  vbox->addLayout(hbox);
-  vbox->addWidget(proxyWidget);
-  vbox->addStretch();
-  vbox->addWidget(bbox);
-
-  return dialog;
 }
