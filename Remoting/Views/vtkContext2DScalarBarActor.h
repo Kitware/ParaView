@@ -119,6 +119,14 @@ public:
 
   //@{
   /**
+   * Set the thickness of the scalar bar outline.
+   */
+  vtkSetClampMacro(ScalarBarOutlineThickness, int, 0, VTK_INT_MAX);
+  vtkGetMacro(ScalarBarOutlineThickness, int);
+  //@}
+
+  //@{
+  /**
    * Set whether the scalar bar is reversed ie from high
    * to low instead of from low to high. Default is false;
    */
@@ -271,6 +279,11 @@ private:
    * Flag that controls whether an outline is drawn around the scalar bar.
    */
   bool DrawScalarBarOutline;
+
+  /**
+   * Thickness of color bar outline.
+   */
+  int ScalarBarOutlineThickness;
 
   /**
    * Spacer between color swatches in the long dimension of the scalar

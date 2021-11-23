@@ -127,6 +127,7 @@ vtkContext2DScalarBarActor::vtkContext2DScalarBarActor()
   this->SetRangeLabelFormat("%g");
 
   this->DrawScalarBarOutline = true;
+  this->ScalarBarOutlineThickness = 1;
 
   this->Spacer = 4.0;
 
@@ -676,6 +677,7 @@ void vtkContext2DScalarBarActor::PaintColorBar(vtkContext2D* painter, double siz
 
       brush->SetOpacity(0);
       pen->SetLineType(vtkPen::SOLID_LINE);
+      pen->SetWidth(static_cast<float>(this->ScalarBarOutlineThickness));
       painter->DrawRect(
         outlineRect.GetX(), outlineRect.GetY(), outlineRect.GetWidth(), outlineRect.GetHeight());
     }

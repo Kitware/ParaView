@@ -1628,6 +1628,19 @@
           Draws an outline around the scalar bar.
         </Documentation>
       </IntVectorProperty>
+      <IntVectorProperty command="SetScalarBarOutlineThickness"
+                         default_values="1"
+                         name="ScalarBarOutlineThickness"
+                         number_of_elements="1">
+        <Documentation>
+          Set the thickness, in pixels, of the outline drawn around the scalar bar.
+        </Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="ShowWidgetDecorator">
+            <Property name="DrawScalarBarOutline" function="boolean" index="0" />
+          </PropertyWidgetDecorator>
+        </Hints>
+      </IntVectorProperty>
       <IntVectorProperty animateable="0"
                          command="SetReverseLegend"
                          default_values="0"
