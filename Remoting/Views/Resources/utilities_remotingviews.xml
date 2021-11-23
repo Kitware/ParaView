@@ -1628,6 +1628,20 @@
           Draws an outline around the scalar bar.
         </Documentation>
       </IntVectorProperty>
+      <DoubleVectorProperty command="SetScalarBarOutlineColor"
+                            default_values="1 1 1"
+                            name="ScalarBarOutlineColor"
+                            number_of_elements="3"
+                            panel_widget="color_selector">
+        <Documentation>
+          Color of the outline drawn around the scalar bar if it is shown.
+        </Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="ShowWidgetDecorator">
+            <Property name="DrawScalarBarOutline" function="boolean" index="0" />
+          </PropertyWidgetDecorator>
+        </Hints>
+      </DoubleVectorProperty>
       <IntVectorProperty command="SetScalarBarOutlineThickness"
                          default_values="1"
                          name="ScalarBarOutlineThickness"

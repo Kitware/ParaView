@@ -594,6 +594,7 @@
             <Property name="TextPosition" />
             <Property name="ReverseLegend" />
             <Property name="DrawScalarBarOutline" />
+            <Property name="ScalarBarOutlineColor" />
             <Property name="ScalarBarOutlineThickness" />
             <Property name="ScalarBarThickness" />
             <Property name="ScalarBarLength" />

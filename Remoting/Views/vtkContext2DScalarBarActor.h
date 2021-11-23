@@ -119,6 +119,14 @@ public:
 
   //@{
   /**
+   * Set the RGB color of the scalar bar outline.
+   */
+  vtkSetVector3Macro(ScalarBarOutlineColor, double);
+  vtkGetVector3Macro(ScalarBarOutlineColor, double);
+  //@}
+
+  //@{
+  /**
    * Set the thickness of the scalar bar outline.
    */
   vtkSetClampMacro(ScalarBarOutlineThickness, int, 0, VTK_INT_MAX);
@@ -257,6 +265,11 @@ private:
    * vertical orientation.
    */
   bool ForceHorizontalTitle;
+
+  /**
+   * Color of the scalar bar outline.
+   */
+  double ScalarBarOutlineColor[3];
 
   /**
    * Thickness of the color bar.
