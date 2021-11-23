@@ -69,7 +69,7 @@ class PQWIDGETS_EXPORT pqHierarchicalGridLayout : public QLayout
   typedef QLayout Superclass;
 
 public:
-  pqHierarchicalGridLayout(QWidget* parent = 0);
+  pqHierarchicalGridLayout(QWidget* parent = nullptr);
   ~pqHierarchicalGridLayout() override;
 
   //@{

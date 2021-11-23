@@ -47,12 +47,12 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqAxesToolbar : public QToolBar
   typedef QToolBar Superclass;
 
 public:
-  pqAxesToolbar(const QString& title, QWidget* parentObject = 0)
+  pqAxesToolbar(const QString& title, QWidget* parentObject = nullptr)
     : Superclass(title, parentObject)
   {
     this->constructor();
   }
-  pqAxesToolbar(QWidget* parentObject = 0)
+  pqAxesToolbar(QWidget* parentObject = nullptr)
     : Superclass(parentObject)
   {
     this->constructor();

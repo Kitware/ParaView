@@ -139,7 +139,7 @@ public:
    */
   int activeLayoutLocation() const;
 
-public Q_SLOTS:
+public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   /**
    * Set the active view. Changing the active view may lead to change in
    * active representation as well.

@@ -70,11 +70,10 @@ public:
     Selection
   };
 
-public:
   /**
    * construct a links model
    */
-  pqLinksModel(QObject* parent = 0);
+  pqLinksModel(QObject* parent = nullptr);
 
   /**
    * destruct a links model
@@ -269,7 +268,7 @@ private Q_SLOTS:
   void refresh();
   void remove();
 
-private:
+private: // NOLINT(readability-redundant-access-specifiers)
   class pqInternal;
   pqInternal* Internal;
 

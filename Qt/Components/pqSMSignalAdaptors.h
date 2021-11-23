@@ -68,7 +68,7 @@ public Q_SLOTS:
 protected Q_SLOTS:
   void handleProxyChanged();
 
-protected:
+protected: // NOLINT(readability-redundant-access-specifiers)
   QByteArray PropertyName;
 };
 

@@ -50,9 +50,9 @@ class PQWIDGETS_EXPORT pqHighlightableToolButton : public QToolButton
 
 public:
   pqHighlightableToolButton(QWidget* parent = nullptr);
-  virtual ~pqHighlightableToolButton();
+  ~pqHighlightableToolButton() override;
 
-public Q_SLOTS:
+public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   /**
    * Slots to highlight (or clear the highlight).
    */

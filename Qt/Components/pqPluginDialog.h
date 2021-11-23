@@ -58,13 +58,13 @@ public:
   /**
    * create this dialog with a parent
    */
-  pqPluginDialog(pqServer* server, QWidget* p = 0);
+  pqPluginDialog(pqServer* server, QWidget* p = nullptr);
   /**
    * destroy this dialog
    */
   ~pqPluginDialog() override;
 
-public Q_SLOTS:
+public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   void loadLocalPlugin();
   void loadRemotePlugin();
 
@@ -80,7 +80,7 @@ protected Q_SLOTS:
   void onLocalSelectionChanged();
   void resizeColumn(QTreeWidgetItem*);
 
-protected:
+protected: // NOLINT(readability-redundant-access-specifiers)
   void refreshLocal();
   void refreshRemote();
   void loadPlugin(pqServer* server, bool remote);

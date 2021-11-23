@@ -45,7 +45,7 @@ public:
 
 protected:
   vtkCPTensorFieldFunction();
-  ~vtkCPTensorFieldFunction();
+  ~vtkCPTensorFieldFunction() override;
 
 private:
   vtkCPTensorFieldFunction(const vtkCPTensorFieldFunction&) = delete;

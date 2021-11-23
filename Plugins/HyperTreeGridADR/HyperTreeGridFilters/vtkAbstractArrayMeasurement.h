@@ -217,7 +217,7 @@ protected:
    * @warning Accumulators are not allocated in the constructor.
    */
   vtkAbstractArrayMeasurement();
-  virtual ~vtkAbstractArrayMeasurement() override;
+  ~vtkAbstractArrayMeasurement() override;
   //@}
 
   /**

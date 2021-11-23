@@ -41,7 +41,7 @@ class pqCustomizeShortcutsDialog : public QDialog
 
 public:
   pqCustomizeShortcutsDialog(QWidget* p = nullptr);
-  ~pqCustomizeShortcutsDialog();
+  ~pqCustomizeShortcutsDialog() override;
 
   static QString getActionName(QAction* action);
 
@@ -52,7 +52,7 @@ private Q_SLOTS:
   void onResetShortcut();
   void onResetAll();
 
-private:
+private: // NOLINT(readability-redundant-access-specifiers)
   Q_DISABLE_COPY(pqCustomizeShortcutsDialog);
 
   class pqInternals;

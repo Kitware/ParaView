@@ -148,7 +148,7 @@ private Q_SLOTS:
    */
   void onMouseStop();
 
-private:
+private: // NOLINT(readability-redundant-access-specifiers)
   /**
    * callback called when the vtkPVRenderView is done with selection.
    */
@@ -175,7 +175,6 @@ private:
   // Display/hide the tooltip of the selected point in mode SELECT_SURFACE_POINTS_TOOLTIP.
   void UpdateTooltip();
 
-private:
   Q_DISABLE_COPY(pqRenderViewSelectionReaction)
   QPointer<pqRenderView> View;
   QPointer<pqDataRepresentation> Representation;

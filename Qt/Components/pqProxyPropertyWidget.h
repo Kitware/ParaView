@@ -49,7 +49,7 @@ class PQCOMPONENTS_EXPORT pqProxyPropertyWidget : public pqPropertyWidget
   typedef pqPropertyWidget Superclass;
 
 public:
-  pqProxyPropertyWidget(vtkSMProperty* property, vtkSMProxy* proxy, QWidget* parent = 0);
+  pqProxyPropertyWidget(vtkSMProperty* property, vtkSMProxy* proxy, QWidget* parent = nullptr);
 
   /**
    * Overridden to pass the calls to internal widgets.

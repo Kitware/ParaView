@@ -48,10 +48,10 @@ class PQWIDGETS_EXPORT pqExpanderButton : public QFrame
   Q_PROPERTY(QString text READ text WRITE setText)
   Q_PROPERTY(bool checked READ checked WRITE setChecked)
 public:
-  pqExpanderButton(QWidget* parent = 0);
+  pqExpanderButton(QWidget* parent = nullptr);
   ~pqExpanderButton() override;
 
-public Q_SLOTS:
+public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   /**
    * Toggles the state of the checkable button.
    */

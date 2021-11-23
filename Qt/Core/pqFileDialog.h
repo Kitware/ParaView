@@ -266,7 +266,7 @@ private Q_SLOTS:
    */
   void updateButtonStates();
 
-private:
+private: // NOLINT(readability-redundant-access-specifiers)
   pqFileDialog(const pqFileDialog&);
   pqFileDialog& operator=(const pqFileDialog&);
 

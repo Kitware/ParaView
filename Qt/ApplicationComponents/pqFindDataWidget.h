@@ -66,7 +66,7 @@ public:
 
   pqServer* server() const;
 
-public Q_SLOTS:
+public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   /**
    * Set the server to use.
    */
@@ -78,7 +78,7 @@ private Q_SLOTS:
    */
   void aboutToRemove(pqPipelineSource*);
 
-private:
+private: // NOLINT(readability-redundant-access-specifiers)
   Q_DISABLE_COPY(pqFindDataWidget);
 
   class pqInternals;

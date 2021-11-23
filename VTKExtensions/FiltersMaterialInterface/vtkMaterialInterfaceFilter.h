@@ -399,14 +399,14 @@ protected:
 
   // Sum/finalize attribute's contribution for those
   // which are split over multiple processes.
-  int ResolveIntegratedAttributes(const int controllingProcId);
+  int ResolveIntegratedAttributes(int controllingProcId);
   // Initialize our attribute arrays to ho9ld resolved attributes
   int PrepareToResolveIntegratedAttributes();
 
   // Send my integrated attributes to another process.
-  int SendIntegratedAttributes(const int recipientProcId);
+  int SendIntegratedAttributes(int recipientProcId);
   // Receive integrated attributes from another process.
-  int ReceiveIntegratedAttributes(const int sourceProcId);
+  int ReceiveIntegratedAttributes(int sourceProcId);
   // Size buffers etc...
   int PrepareToCollectIntegratedAttributes(std::vector<vtkMaterialInterfaceCommBuffer>& buffers,
     std::vector<vtkDoubleArray*>& volumes, std::vector<vtkDoubleArray*>& clipDepthMaxs,
@@ -430,9 +430,9 @@ protected:
     std::vector<std::vector<vtkDoubleArray*>>& massWtdAvgs,
     std::vector<std::vector<vtkDoubleArray*>>& sums);
   // Send my integrated attributes to all other processes.
-  int BroadcastIntegratedAttributes(const int sourceProcessId);
+  int BroadcastIntegratedAttributes(int sourceProcessId);
   // Send my geometric attribuites to a controller.
-  int SendGeometricAttributes(const int controllingProcId);
+  int SendGeometricAttributes(int controllingProcId);
   // size buffers & new containers
   int PrepareToCollectGeometricAttributes(std::vector<vtkMaterialInterfaceCommBuffer>& buffers,
     std::vector<vtkDoubleArray*>& coaabb, std::vector<vtkDoubleArray*>& obb,
@@ -449,7 +449,7 @@ protected:
   // size local copy to hold all.
   int PrepareToMergeGeometricAttributes();
   // Gather geometric attributes on a single process.
-  int GatherGeometricAttributes(const int recipientProcId);
+  int GatherGeometricAttributes(int recipientProcId);
   // Merge fragment's geometry that are split on this process
   void ResolveLocalFragmentGeometry();
   // Merge fragment's geometry that are split across processes

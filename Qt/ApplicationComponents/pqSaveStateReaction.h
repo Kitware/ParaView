@@ -48,7 +48,7 @@ public:
    * Constructor. Parent cannot be nullptr.
    */
   pqSaveStateReaction(QAction* parent);
-  ~pqSaveStateReaction() override {}
+  ~pqSaveStateReaction() override = default;
 
   /**
    * Open File dialog in order to choose the location and the type of
@@ -73,7 +73,7 @@ public:
    */
   static bool savePythonState(const QString& filename);
 
-public Q_SLOTS:
+public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   /**
    * Updates the enabled state. Applications need not explicitly call this.
    */

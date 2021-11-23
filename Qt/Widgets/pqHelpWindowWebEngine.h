@@ -61,7 +61,7 @@ public:
     : Engine(engine)
   {
   }
-  ~pqUrlSchemeHandler() {}
+  ~pqUrlSchemeHandler() = default;
 
   void requestStarted(QWebEngineUrlRequestJob* request) override
   {
@@ -104,7 +104,7 @@ public:
     : Superclass(parentObject)
   {
   }
-  ~pqWebView() {}
+  ~pqWebView() = default;
 
   static pqWebView* newInstance(QHelpEngine* engine, QWidget* parentObject)
   {

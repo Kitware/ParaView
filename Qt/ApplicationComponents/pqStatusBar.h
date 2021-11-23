@@ -53,7 +53,7 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqStatusBar : public QStatusBar
   typedef QStatusBar Superclass;
 
 public:
-  pqStatusBar(QWidget* parent = 0);
+  pqStatusBar(QWidget* parent = nullptr);
   ~pqStatusBar() override;
 
 protected Q_SLOTS:

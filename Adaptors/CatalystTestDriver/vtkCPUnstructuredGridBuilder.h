@@ -43,7 +43,7 @@ public:
    * that were returned were already built before.
    * vtkCPUnstructuredGridBuilder will also delete the grid.
    */
-  virtual vtkDataObject* GetGrid(unsigned long timeStep, double time, int& builtNewGrid) override;
+  vtkDataObject* GetGrid(unsigned long timeStep, double time, int& builtNewGrid) override;
 
   /**
    * Get the UnstructuredGrid.
@@ -72,7 +72,7 @@ public:
 
 protected:
   vtkCPUnstructuredGridBuilder();
-  ~vtkCPUnstructuredGridBuilder();
+  ~vtkCPUnstructuredGridBuilder() override;
 
   /**
    * Flag to indicate if UnstructuredGrid has been modified since last call

@@ -1008,7 +1008,6 @@ protected:
 
   vtkWeakPointer<vtkSMProxy> ParentProxy;
 
-protected:
   vtkSMProxyInternals* Internals;
   vtkSMProxyObserver* SubProxyObserver;
   vtkSMProxy(const vtkSMProxy&) = delete;

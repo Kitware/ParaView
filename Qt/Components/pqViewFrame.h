@@ -62,7 +62,7 @@ class PQCOMPONENTS_EXPORT pqViewFrame : public QWidget
   typedef QWidget Superclass;
 
 public:
-  pqViewFrame(QWidget* parent = 0);
+  pqViewFrame(QWidget* parent = nullptr);
   ~pqViewFrame() override;
 
   /**
@@ -78,7 +78,7 @@ public:
    * widget will be deleted with pqViewFrame is deleted or another widget is set
    * using setCentralWidget().
    */
-  void setCentralWidget(QWidget* widget, pqView* view = 0);
+  void setCentralWidget(QWidget* widget, pqView* view = nullptr);
   QWidget* centralWidget() const;
 
   /**
@@ -212,11 +212,11 @@ protected:
   void dragEnter(QDragEnterEvent*);
   void drop(QDropEvent*);
 
-protected Q_SLOTS:
+protected Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   void buttonClicked();
   void contextMenuRequested(const QPoint&);
 
-protected:
+protected: // NOLINT(readability-redundant-access-specifiers)
   bool DecorationsVisible;
   bool TitleBarVisible;
   bool BorderVisible;
@@ -243,7 +243,7 @@ private:
 
   class pqInternals;
   const QScopedPointer<pqInternals> Internals;
-private Q_SLOTS:
+private Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   void finishedDrag(pqViewFrame* source);
 };
 

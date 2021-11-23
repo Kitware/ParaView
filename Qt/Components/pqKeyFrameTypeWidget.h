@@ -53,7 +53,7 @@ public:
   pqKeyFrameTypeWidget(QWidget* parent = nullptr);
   ~pqKeyFrameTypeWidget() override;
 
-public Q_SLOTS:
+public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   void setType(const QString& text);
   void setBase(const QString& text);
   void setStartPower(const QString& text);
@@ -62,7 +62,7 @@ public Q_SLOTS:
   void setOffset(const QString& text);
   void setFrequency(const QString& text);
 
-public:
+public: // NOLINT(readability-redundant-access-specifiers)
   QString type() const;
   QString base() const;
   QString startPower() const;

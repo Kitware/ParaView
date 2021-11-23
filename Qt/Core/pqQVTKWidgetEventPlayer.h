@@ -48,7 +48,7 @@ class PQCORE_EXPORT pqQVTKWidgetEventPlayer : public pqWidgetEventPlayer
   typedef pqWidgetEventPlayer Superclass;
 
 public:
-  pqQVTKWidgetEventPlayer(QObject* p = 0);
+  pqQVTKWidgetEventPlayer(QObject* p = nullptr);
 
   using Superclass::playEvent;
   bool playEvent(

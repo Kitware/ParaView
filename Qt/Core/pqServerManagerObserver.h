@@ -56,7 +56,7 @@ class PQCORE_EXPORT pqServerManagerObserver : public QObject
   Q_OBJECT
 
 public:
-  pqServerManagerObserver(QObject* parent = 0);
+  pqServerManagerObserver(QObject* parent = nullptr);
   ~pqServerManagerObserver() override;
 
 Q_SIGNALS:

@@ -56,7 +56,8 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqYoungsMaterialPropertyWidget
       normalArraysChanged);
 
 public:
-  pqYoungsMaterialPropertyWidget(vtkSMProxy* proxy, vtkSMPropertyGroup* group, QWidget* parent = 0);
+  pqYoungsMaterialPropertyWidget(
+    vtkSMProxy* proxy, vtkSMPropertyGroup* group, QWidget* parent = nullptr);
   ~pqYoungsMaterialPropertyWidget() override;
 
   //@{
@@ -93,7 +94,7 @@ protected:
    */
   QStandardItem* currentItem();
 
-protected Q_SLOTS:
+protected Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   /**
    * Called when the ordering array is changed
    */

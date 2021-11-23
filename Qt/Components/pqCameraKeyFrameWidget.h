@@ -49,7 +49,7 @@ class PQCOMPONENTS_EXPORT pqCameraKeyFrameWidget : public QWidget
   typedef QWidget Superclass;
 
 public:
-  pqCameraKeyFrameWidget(QWidget* parent = 0);
+  pqCameraKeyFrameWidget(QWidget* parent = nullptr);
   ~pqCameraKeyFrameWidget() override;
 
   bool usePathBasedMode() const;
@@ -102,7 +102,7 @@ private Q_SLOTS:
    */
   void changeCurrentPage();
 
-private:
+private: // NOLINT(readability-redundant-access-specifiers)
   Q_DISABLE_COPY(pqCameraKeyFrameWidget)
 
   class pqInternal;

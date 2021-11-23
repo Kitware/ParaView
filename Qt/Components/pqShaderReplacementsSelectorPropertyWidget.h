@@ -59,7 +59,7 @@ protected Q_SLOTS:
   void onDelete();
   void onPresetChanged(int index);
 
-protected:
+protected: // NOLINT(readability-redundant-access-specifiers)
   bool loadShaderReplacements(const QString& filename);
   void refreshView();
 

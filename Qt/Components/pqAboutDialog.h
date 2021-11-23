@@ -60,7 +60,7 @@ public:
    */
   QString formatToText();
 
-public Q_SLOTS:
+public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
 
   /**
    * Saves about dialog formatted output to a file.

@@ -116,7 +116,7 @@ public Q_SLOTS:
 private Q_SLOTS:
   void sort(int);
 
-private:
+private: // NOLINT(readability-redundant-access-specifiers)
   Q_DISABLE_COPY(pqSignalAdaptorTreeWidget)
 
   /**

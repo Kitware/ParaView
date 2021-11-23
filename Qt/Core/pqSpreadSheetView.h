@@ -51,7 +51,6 @@ class PQCORE_EXPORT pqSpreadSheetView : public pqView
 public:
   static QString spreadsheetViewType() { return "SpreadSheetView"; }
 
-public:
   pqSpreadSheetView(const QString& group, const QString& name, vtkSMViewProxy* viewModule,
     pqServer* server, QObject* parent = nullptr);
   ~pqSpreadSheetView() override;

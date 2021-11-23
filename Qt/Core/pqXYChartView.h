@@ -49,7 +49,6 @@ class PQCORE_EXPORT pqXYChartView : public pqContextView
 public:
   static QString XYChartViewType() { return "XYChartView"; }
 
-public:
   pqXYChartView(const QString& group, const QString& name, vtkSMContextViewProxy* viewModule,
     pqServer* server, QObject* parent = nullptr);
 

@@ -66,7 +66,7 @@ class PQCOMPONENTS_EXPORT pqColorChooserButtonWithPalettes : public pqColorChoos
   typedef pqColorChooserButton Superclass;
 
 public:
-  pqColorChooserButtonWithPalettes(QWidget* parent = 0);
+  pqColorChooserButtonWithPalettes(QWidget* parent = nullptr);
   ~pqColorChooserButtonWithPalettes() override;
 
 private Q_SLOTS:
@@ -81,7 +81,7 @@ private Q_SLOTS:
    */
   void actionTriggered(QAction*);
 
-private:
+private: // NOLINT(readability-redundant-access-specifiers)
   Q_DISABLE_COPY(pqColorChooserButtonWithPalettes)
 
   /**
@@ -120,7 +120,6 @@ private:
    */
   QString selectedPaletteColor() const;
 
-private:
   Q_DISABLE_COPY(pqColorPaletteLinkHelper)
 
   vtkWeakPointer<vtkSMProxy> SMProxy;

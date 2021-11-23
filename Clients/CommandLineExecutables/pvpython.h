@@ -40,8 +40,8 @@ namespace ParaViewPython
 
 //---------------------------------------------------------------------------
 
-void ProcessArgsForPython(std::vector<char*>& pythonArgs, const std::vector<std::string>& args,
-  int vtkNotUsed(argc), char** argv)
+inline void ProcessArgsForPython(std::vector<char*>& pythonArgs,
+  const std::vector<std::string>& args, int vtkNotUsed(argc), char** argv)
 {
   pythonArgs.clear();
 
@@ -63,7 +63,7 @@ void ProcessArgsForPython(std::vector<char*>& pythonArgs, const std::vector<std:
     pythonArgs.push_back(vtksys::SystemTools::DuplicateString("-m"));
 
     std::string modulename = vtksys::SystemTools::GetFilenameWithoutLastExtension(
-      vtksys::SystemTools::GetFilenameName(args[0].c_str()));
+      vtksys::SystemTools::GetFilenameName(args[0]));
     pythonArgs.push_back(vtksys::SystemTools::DuplicateString(modulename.c_str()));
   }
   else
@@ -78,7 +78,7 @@ void ProcessArgsForPython(std::vector<char*>& pythonArgs, const std::vector<std:
 }
 
 //---------------------------------------------------------------------------
-int Run(int processType, int argc, char* argv[])
+inline int Run(int processType, int argc, char* argv[])
 {
   // Setup options
   vtkInitializationHelper::SetApplicationName("ParaView");

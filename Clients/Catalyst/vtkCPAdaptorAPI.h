@@ -60,7 +60,7 @@ public:
 
 protected:
   vtkCPAdaptorAPI();
-  ~vtkCPAdaptorAPI();
+  ~vtkCPAdaptorAPI() override;
 
   static vtkCPDataDescription* CoProcessorData;
   static vtkCPProcessor* CoProcessor;

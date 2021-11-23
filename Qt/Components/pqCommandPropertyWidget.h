@@ -47,7 +47,7 @@ class PQCOMPONENTS_EXPORT pqCommandPropertyWidget : public pqPropertyWidget
   typedef pqPropertyWidget Superclass;
 
 public:
-  pqCommandPropertyWidget(vtkSMProperty* property, vtkSMProxy* proxy, QWidget* parent = 0);
+  pqCommandPropertyWidget(vtkSMProperty* property, vtkSMProxy* proxy, QWidget* parent = nullptr);
   ~pqCommandPropertyWidget() override;
 
 protected Q_SLOTS:

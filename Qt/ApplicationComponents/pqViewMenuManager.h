@@ -70,7 +70,7 @@ protected Q_SLOTS:
    */
   virtual void updateMenu();
 
-protected:
+protected: // NOLINT(readability-redundant-access-specifiers)
   QPointer<QMenu> Menu;
   QPointer<QMenu> ToolbarsMenu;
   QPointer<QAction> DockPanelSeparators[2];

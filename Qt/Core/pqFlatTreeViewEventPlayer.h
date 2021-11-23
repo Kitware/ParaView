@@ -49,7 +49,7 @@ class PQCORE_EXPORT pqFlatTreeViewEventPlayer : public pqWidgetEventPlayer
   typedef pqWidgetEventPlayer Superclass;
 
 public:
-  pqFlatTreeViewEventPlayer(QObject* p = 0);
+  pqFlatTreeViewEventPlayer(QObject* p = nullptr);
 
   using Superclass::playEvent;
   bool playEvent(

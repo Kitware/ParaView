@@ -73,7 +73,7 @@ protected:
   void loadTexture();
   bool loadTexture(const QString& filename);
 
-protected Q_SLOTS:
+protected Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   void onCurrentIndexChanged(int index);
   void updateTextures();
   void proxyRegistered(const QString& group, const QString&, vtkSMProxy* proxy);

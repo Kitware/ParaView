@@ -117,7 +117,6 @@ protected:
    */
   std::string FromRelativeToMetaFile(const char* metaFileName, const char* fileName);
 
-protected:
   // Reader that handles requests for the meta-reader
   vtkAlgorithm* Reader;
   // Reader modification time after changing the Reader's FileName

@@ -40,7 +40,7 @@ public:
    * that were returned were already built before.
    * vtkCPUniformGridBuilder will also delete the grid.
    */
-  virtual vtkDataObject* GetGrid(unsigned long timeStep, double time, int& builtNewGrid) override;
+  vtkDataObject* GetGrid(unsigned long timeStep, double time, int& builtNewGrid) override;
 
   //@{
   /**
@@ -79,7 +79,7 @@ public:
 
 protected:
   vtkCPUniformGridBuilder();
-  ~vtkCPUniformGridBuilder();
+  ~vtkCPUniformGridBuilder() override;
 
 private:
   vtkCPUniformGridBuilder(const vtkCPUniformGridBuilder&) = delete;

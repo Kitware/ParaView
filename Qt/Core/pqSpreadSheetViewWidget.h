@@ -54,7 +54,7 @@ class PQCORE_EXPORT pqSpreadSheetViewWidget : public QTableView
   typedef QTableView Superclass;
 
 public:
-  pqSpreadSheetViewWidget(QWidget* parent = 0);
+  pqSpreadSheetViewWidget(QWidget* parent = nullptr);
   ~pqSpreadSheetViewWidget() override;
 
   /**
@@ -80,7 +80,7 @@ protected Q_SLOTS:
    */
   void onHeaderDataChanged();
 
-protected:
+protected: // NOLINT(readability-redundant-access-specifiers)
   /**
    * Overridden to tell the pqSpreadSheetViewModel about the active viewport.
    */

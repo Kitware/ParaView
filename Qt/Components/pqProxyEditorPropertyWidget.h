@@ -72,12 +72,13 @@ class PQCOMPONENTS_EXPORT pqProxyEditorPropertyWidget : public pqPropertyWidget
   Q_PROPERTY(pqSMProxy proxyToEdit READ proxyToEdit WRITE setProxyToEdit)
 
 public:
-  pqProxyEditorPropertyWidget(vtkSMProxy* proxy, vtkSMProperty* smproperty, QWidget* parent = 0);
+  pqProxyEditorPropertyWidget(
+    vtkSMProxy* proxy, vtkSMProperty* smproperty, QWidget* parent = nullptr);
   ~pqProxyEditorPropertyWidget() override;
 
   pqSMProxy proxyToEdit() const;
 
-public Q_SLOTS:
+public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   void setProxyToEdit(pqSMProxy);
 
 protected Q_SLOTS:

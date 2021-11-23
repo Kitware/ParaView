@@ -288,13 +288,13 @@ public Q_SLOTS:
    * Called to undo interaction.
    * View modules supporting interaction undo must override this method.
    */
-  virtual void undo() override;
+  void undo() override;
 
   /**
    * Called to redo interaction.
    * View modules supporting interaction undo must override this method.
    */
-  virtual void redo() override;
+  void redo() override;
 
   /**
    * Resets center of rotation if this->ResetCenterWithCamera is true.
@@ -326,7 +326,7 @@ protected Q_SLOTS:
    */
   virtual void onUndoStackChanged();
 
-protected:
+protected: // NOLINT(readability-redundant-access-specifiers)
   /**
    * Updates undo stack without actually performing the undo/redo actions.
    */

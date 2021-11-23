@@ -68,7 +68,7 @@ public:
 
 protected:
   vtkSMRegistrationNamesDomain();
-  ~vtkSMRegistrationNamesDomain();
+  ~vtkSMRegistrationNamesDomain() override;
 
   int ReadXMLAttributes(vtkSMProperty* prop, vtkPVXMLElement* element) override;
 

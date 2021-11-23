@@ -11,6 +11,6 @@ public:
   MainWindow();
   bool compareView(const QString& referenceImage, double threshold, const QString& tempDirectory);
   QPointer<pqRenderView> RenderView;
-public Q_SLOTS:
+public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   void processTest();
 };

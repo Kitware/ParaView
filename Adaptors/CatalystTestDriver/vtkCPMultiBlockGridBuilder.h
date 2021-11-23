@@ -41,7 +41,7 @@ public:
    * Return a grid.  BuiltNewGrid is 0 if the grid is the same
    * as the last time step.
    */
-  virtual vtkDataObject* GetGrid(unsigned long timeStep, double time, int& builtNewGrid) override;
+  vtkDataObject* GetGrid(unsigned long timeStep, double time, int& builtNewGrid) override;
 
   /**
    * Get the Grid.
@@ -75,7 +75,7 @@ public:
 
 protected:
   vtkCPMultiBlockGridBuilder();
-  ~vtkCPMultiBlockGridBuilder();
+  ~vtkCPMultiBlockGridBuilder() override;
 
   /**
    * Set the Grid.

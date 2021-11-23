@@ -56,7 +56,7 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqLightPropertyWidget : public pqInteractiv
   typedef pqInteractivePropertyWidget Superclass;
 
 public:
-  pqLightPropertyWidget(vtkSMProxy* proxy, vtkSMPropertyGroup* smgroup, QWidget* parent = 0);
+  pqLightPropertyWidget(vtkSMProxy* proxy, vtkSMPropertyGroup* smgroup, QWidget* parent = nullptr);
   ~pqLightPropertyWidget() override;
 
 protected Q_SLOTS:

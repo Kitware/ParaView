@@ -64,7 +64,7 @@ protected Q_SLOTS:
    */
   virtual void modifiersChanged() {}
 
-protected:
+protected: // NOLINT(readability-redundant-access-specifiers)
   /**
    * Get the current state of selection modifier, if any
    */

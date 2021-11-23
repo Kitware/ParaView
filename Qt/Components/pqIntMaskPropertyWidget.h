@@ -73,7 +73,7 @@ class PQCOMPONENTS_EXPORT pqIntMaskPropertyWidget : public pqPropertyWidget
   Q_PROPERTY(int mask READ mask WRITE setMask NOTIFY maskChanged);
 
 public:
-  pqIntMaskPropertyWidget(vtkSMProxy* proxy, vtkSMProperty* smproperty, QWidget* parent = 0);
+  pqIntMaskPropertyWidget(vtkSMProxy* proxy, vtkSMProperty* smproperty, QWidget* parent = nullptr);
   ~pqIntMaskPropertyWidget() override;
 
   /**
@@ -81,7 +81,7 @@ public:
    */
   int mask() const;
 
-public Q_SLOTS:
+public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   /**
    * Set the mask.
    */

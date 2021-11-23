@@ -50,7 +50,7 @@ public:
   pqPipelineTimeKeyFrameEditor(pqAnimationScene* scene, pqAnimationCue* cue, QWidget* p);
   ~pqPipelineTimeKeyFrameEditor() override;
 
-public Q_SLOTS:
+public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   /**
    * read the key frame data and display it
    */

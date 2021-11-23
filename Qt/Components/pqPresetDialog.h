@@ -67,7 +67,7 @@ public:
     SHOW_NON_INDEXED_COLORS_ONLY
   };
 
-  pqPresetDialog(QWidget* parent = 0, Modes mode = SHOW_ALL);
+  pqPresetDialog(QWidget* parent = nullptr, Modes mode = SHOW_ALL);
   ~pqPresetDialog() override;
 
   /**
@@ -156,7 +156,7 @@ private Q_SLOTS:
   void updateGroups();
   void updateFiltering();
 
-private:
+private: // NOLINT(readability-redundant-access-specifiers)
   Q_DISABLE_COPY(pqPresetDialog)
   class pqInternals;
   const QScopedPointer<pqInternals> Internals;

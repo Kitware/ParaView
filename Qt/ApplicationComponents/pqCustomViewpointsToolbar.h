@@ -50,13 +50,13 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqCustomViewpointsToolbar : public QToolBar
   typedef QToolBar Superclass;
 
 public:
-  pqCustomViewpointsToolbar(const QString& title, QWidget* parentObject = 0)
+  pqCustomViewpointsToolbar(const QString& title, QWidget* parentObject = nullptr)
     : Superclass(title, parentObject)
     , BasePixmap(64, 64)
   {
     this->constructor();
   }
-  pqCustomViewpointsToolbar(QWidget* parentObject = 0)
+  pqCustomViewpointsToolbar(QWidget* parentObject = nullptr)
     : Superclass(parentObject)
     , BasePixmap(64, 64)
   {

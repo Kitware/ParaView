@@ -56,7 +56,7 @@ class PQCORE_EXPORT pqDataRepresentation : public pqRepresentation
 
 public:
   pqDataRepresentation(const QString& group, const QString& name, vtkSMProxy* display,
-    pqServer* server, QObject* parent = 0);
+    pqServer* server, QObject* parent = nullptr);
   ~pqDataRepresentation() override;
 
   /**
@@ -176,7 +176,7 @@ protected Q_SLOTS:
    */
   virtual void onInputChanged();
 
-protected:
+protected: // NOLINT(readability-redundant-access-specifiers)
   /**
    * Use this method to initialize the pqObject state using the
    * underlying vtkSMProxy. This needs to be done only once,

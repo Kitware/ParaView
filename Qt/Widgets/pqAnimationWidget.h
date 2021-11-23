@@ -81,7 +81,7 @@ protected Q_SLOTS:
   void headerDeleteClicked(int);
   void headerEnabledClicked(int which);
 
-protected:
+protected: // NOLINT(readability-redundant-access-specifiers)
   void updateGeometries();
   void updateScrollBars();
   void updateWidgetPosition();

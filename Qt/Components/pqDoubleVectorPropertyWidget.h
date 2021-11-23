@@ -41,7 +41,8 @@ class PQCOMPONENTS_EXPORT pqDoubleVectorPropertyWidget : public pqPropertyWidget
   typedef pqPropertyWidget Superclass;
 
 public:
-  pqDoubleVectorPropertyWidget(vtkSMProperty* property, vtkSMProxy* proxy, QWidget* parent = 0);
+  pqDoubleVectorPropertyWidget(
+    vtkSMProperty* property, vtkSMProxy* proxy, QWidget* parent = nullptr);
 
   ~pqDoubleVectorPropertyWidget() override;
 

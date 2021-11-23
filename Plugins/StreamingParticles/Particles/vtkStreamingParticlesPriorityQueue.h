@@ -119,7 +119,7 @@ public:
 
 protected:
   vtkStreamingParticlesPriorityQueue();
-  ~vtkStreamingParticlesPriorityQueue();
+  ~vtkStreamingParticlesPriorityQueue() override;
 
   // Description:
   // Updates priorities and builds a BlocksToPurge list.

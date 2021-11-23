@@ -52,9 +52,9 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqCatalystRemoveBreakpointReaction : public
   typedef pqReaction Superclass;
 
 public:
-  pqCatalystRemoveBreakpointReaction(QAction* parent = 0);
+  pqCatalystRemoveBreakpointReaction(QAction* parent = nullptr);
 
-public Q_SLOTS:
+public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   void updateEnableState() override;
 
 protected:

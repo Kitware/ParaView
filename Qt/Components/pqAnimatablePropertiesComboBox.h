@@ -47,7 +47,7 @@ class PQCOMPONENTS_EXPORT pqAnimatablePropertiesComboBox : public QComboBox
   typedef QComboBox Superclass;
 
 public:
-  pqAnimatablePropertiesComboBox(QWidget* parent = 0);
+  pqAnimatablePropertiesComboBox(QWidget* parent = nullptr);
   ~pqAnimatablePropertiesComboBox() override;
 
   /**
@@ -78,7 +78,7 @@ public:
    */
   void setUseBlankEntry(bool b) { this->UseBlankEntry = b; }
 
-public Q_SLOTS:
+public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   /**
    * Set the source whose properties this widget should list. If source is
    * null, the widget gets disabled.

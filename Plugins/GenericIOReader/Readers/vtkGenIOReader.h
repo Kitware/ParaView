@@ -149,7 +149,7 @@ public:
 
 protected:
   vtkGenIOReader();
-  ~vtkGenIOReader();
+  ~vtkGenIOReader() override;
 
   bool doMPIDataSplitting(int numDataRanks, int numMPIranks, int myRank, int ranksRangeToLoad[2],
     std::vector<size_t>& readRowsInfo);

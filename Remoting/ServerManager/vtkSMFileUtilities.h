@@ -74,7 +74,7 @@ public:
 
 protected:
   vtkSMFileUtilities();
-  ~vtkSMFileUtilities();
+  ~vtkSMFileUtilities() override;
 
 private:
   vtkSMFileUtilities(const vtkSMFileUtilities&) = delete;

@@ -56,7 +56,7 @@ public:
   pqAnimationViewWidget(QWidget* parent = nullptr);
   ~pqAnimationViewWidget() override;
 
-public Q_SLOTS:
+public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
 
   /**
    * set the scene to view

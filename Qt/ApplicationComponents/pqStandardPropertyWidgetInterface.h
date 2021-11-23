@@ -47,7 +47,7 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqStandardPropertyWidgetInterface
   Q_OBJECT
   Q_INTERFACES(pqPropertyWidgetInterface)
 public:
-  pqStandardPropertyWidgetInterface(QObject* p = 0);
+  pqStandardPropertyWidgetInterface(QObject* p = nullptr);
   ~pqStandardPropertyWidgetInterface() override;
 
   /**

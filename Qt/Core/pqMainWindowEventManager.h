@@ -60,7 +60,7 @@ class PQCORE_EXPORT pqMainWindowEventManager : public QObject
   typedef QObject Superclass;
 
 public:
-  pqMainWindowEventManager(QObject* p = 0);
+  pqMainWindowEventManager(QObject* p = nullptr);
   ~pqMainWindowEventManager() override;
 
   /**

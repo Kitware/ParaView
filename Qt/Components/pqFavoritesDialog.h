@@ -92,7 +92,7 @@ protected Q_SLOTS:
    */
   void onSearchTextChanged(QString pattern);
 
-protected:
+protected: // NOLINT(readability-redundant-access-specifiers)
   /**
    * Populate the favorites tree from the favorites settings.
    */

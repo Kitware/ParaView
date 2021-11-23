@@ -55,7 +55,7 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqDoubleRangeSliderPropertyWidget : public 
 
 public:
   pqDoubleRangeSliderPropertyWidget(
-    vtkSMProxy* proxy, vtkSMProperty* property, QWidget* parent = 0);
+    vtkSMProxy* proxy, vtkSMProperty* property, QWidget* parent = nullptr);
   ~pqDoubleRangeSliderPropertyWidget() override;
 
   void apply() override;
@@ -72,7 +72,7 @@ private Q_SLOTS:
   void lowerChanged(double);
   void upperChanged(double);
 
-private:
+private: // NOLINT(readability-redundant-access-specifiers)
   Q_DISABLE_COPY(pqDoubleRangeSliderPropertyWidget)
 
   class pqInternals;

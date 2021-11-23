@@ -14,9 +14,9 @@ class pqFileDialogTestUtility : public pqTestUtility
   Q_OBJECT
 public:
   pqFileDialogTestUtility();
-  ~pqFileDialogTestUtility();
-  virtual bool playTests(const QStringList& filenames);
-public Q_SLOTS:
+  ~pqFileDialogTestUtility() override;
+  bool playTests(const QStringList& filenames) override;
+public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   void playTheTests();
 
 protected:
@@ -33,7 +33,7 @@ public:
 
   pqTestUtility* Tester() { return &this->TestUtility; }
 
-public Q_SLOTS:
+public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   void record();
   void openFileDialog();
   void emittedFiles(const QList<QStringList>& files);

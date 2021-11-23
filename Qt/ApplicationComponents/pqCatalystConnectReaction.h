@@ -49,7 +49,7 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqCatalystConnectReaction : public pqReacti
   typedef pqReaction Superclass;
 
 public:
-  pqCatalystConnectReaction(QAction* parent = 0);
+  pqCatalystConnectReaction(QAction* parent = nullptr);
   ~pqCatalystConnectReaction() override;
 
   /**

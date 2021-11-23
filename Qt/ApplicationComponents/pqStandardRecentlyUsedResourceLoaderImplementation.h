@@ -58,7 +58,7 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqStandardRecentlyUsedResourceLoaderImpleme
   typedef QObject Superclass;
 
 public:
-  pqStandardRecentlyUsedResourceLoaderImplementation(QObject* parent = 0);
+  pqStandardRecentlyUsedResourceLoaderImplementation(QObject* parent = nullptr);
   ~pqStandardRecentlyUsedResourceLoaderImplementation() override;
 
   bool canLoad(const pqServerResource& resource) override;

@@ -51,7 +51,7 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqCrashRecoveryBehavior : public QObject
   typedef QObject Superclass;
 
 public:
-  pqCrashRecoveryBehavior(QObject* parent = 0);
+  pqCrashRecoveryBehavior(QObject* parent = nullptr);
   ~pqCrashRecoveryBehavior() override;
 
 protected Q_SLOTS:

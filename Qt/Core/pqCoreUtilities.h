@@ -162,7 +162,7 @@ public:
    * DASHBOARD_TEST_FROM_CTEST environment variable is set. This may change in future.
    */
   static QMessageBox::Button promptUserGeneric(const QString& title, const QString& message,
-    const QMessageBox::Icon icon, QMessageBox::StandardButtons buttons, QWidget* parentWidget);
+    QMessageBox::Icon icon, QMessageBox::StandardButtons buttons, QWidget* parentWidget);
 
   /**
    * Converts a double value to a full precision QString.

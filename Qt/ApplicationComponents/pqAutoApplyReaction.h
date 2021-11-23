@@ -44,7 +44,7 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqAutoApplyReaction : public pqReaction
   typedef pqReaction Superclass;
 
 public:
-  pqAutoApplyReaction(QAction* parent = 0);
+  pqAutoApplyReaction(QAction* parent = nullptr);
 
   /**
    * Set the status of auto-apply.

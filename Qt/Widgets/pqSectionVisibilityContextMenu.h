@@ -46,7 +46,7 @@ class PQWIDGETS_EXPORT pqSectionVisibilityContextMenu : public QMenu
 {
   Q_OBJECT
 public:
-  pqSectionVisibilityContextMenu(QWidget* parent = 0);
+  pqSectionVisibilityContextMenu(QWidget* parent = nullptr);
   ~pqSectionVisibilityContextMenu() override;
 
   // Set the QHeaderView whose section visibility is affected by
@@ -60,7 +60,7 @@ public:
 protected Q_SLOTS:
   void toggleSectionVisibility(QAction* action);
 
-protected:
+protected: // NOLINT(readability-redundant-access-specifiers)
   QPointer<QHeaderView> HeaderView;
 };
 

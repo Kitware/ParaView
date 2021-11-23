@@ -45,7 +45,7 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqUndoRedoBehavior : public QObject
   typedef QObject Superclass;
 
 public:
-  pqUndoRedoBehavior(QObject* parent = 0);
+  pqUndoRedoBehavior(QObject* parent = nullptr);
 
 protected:
 private:

@@ -48,12 +48,12 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqVCRToolbar : public QToolBar
   typedef QToolBar Superclass;
 
 public:
-  pqVCRToolbar(const QString& title, QWidget* parentObject = 0)
+  pqVCRToolbar(const QString& title, QWidget* parentObject = nullptr)
     : Superclass(title, parentObject)
   {
     this->constructor();
   }
-  pqVCRToolbar(QWidget* parentObject = 0)
+  pqVCRToolbar(QWidget* parentObject = nullptr)
     : Superclass(parentObject)
   {
     this->constructor();

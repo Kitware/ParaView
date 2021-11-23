@@ -37,8 +37,8 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
 protected:
-  vtkPVOptionsXMLParser() {}
-  ~vtkPVOptionsXMLParser() override {}
+  vtkPVOptionsXMLParser() = default;
+  ~vtkPVOptionsXMLParser() override = default;
 
   void SetProcessType(const char* ptype) override;
 

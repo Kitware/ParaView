@@ -79,7 +79,7 @@ public:
 
   QRectF boundingRect() const override;
 
-public Q_SLOTS:
+public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   void setNormalizedStartTime(double t);
   void setNormalizedEndTime(double t);
   void setStartValue(const QVariant&);

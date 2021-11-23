@@ -53,7 +53,7 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqTransferFunctionWidgetPropertyWidget
 
 public:
   explicit pqTransferFunctionWidgetPropertyWidget(
-    vtkSMProxy* proxy, vtkSMProperty* property, QWidget* parent = 0);
+    vtkSMProxy* proxy, vtkSMProperty* property, QWidget* parent = nullptr);
   ~pqTransferFunctionWidgetPropertyWidget() override;
 
   friend pqTransferFunctionWidgetPropertyDialog;
@@ -64,7 +64,7 @@ Q_SIGNALS:
 protected:
   void UpdateProperty();
 
-protected Q_SLOTS:
+protected Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   void editButtonClicked();
   void propagateProxyPointsProperty();
   void resetRangeToDomainDefault();

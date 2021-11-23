@@ -50,7 +50,7 @@ class PQCORE_EXPORT pqProgressManager : public QObject
 {
   Q_OBJECT
 public:
-  pqProgressManager(QObject* parent = 0);
+  pqProgressManager(QObject* parent = nullptr);
   ~pqProgressManager() override;
 
   /**
@@ -157,7 +157,7 @@ protected Q_SLOTS:
   void onProgress(vtkObject*);
   void onServerAdded(pqServer*);
 
-protected:
+protected: // NOLINT(readability-redundant-access-specifiers)
   QPointer<QObject> Lock;
   QList<QPointer<QObject>> NonBlockableObjects;
   int ProgressCount;

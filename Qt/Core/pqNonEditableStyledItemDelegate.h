@@ -51,7 +51,7 @@ class PQCORE_EXPORT pqNonEditableStyledItemDelegate : public QStyledItemDelegate
   Q_OBJECT
 
 public:
-  pqNonEditableStyledItemDelegate(QObject* parent = 0);
+  pqNonEditableStyledItemDelegate(QObject* parent = nullptr);
   QWidget* createEditor(
     QWidget* parent, const QStyleOptionViewItem& option, const QModelIndex& index) const override;
 

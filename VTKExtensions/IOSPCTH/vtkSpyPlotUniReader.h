@@ -317,7 +317,6 @@ private:
   Variable* GetCellField(int field);
   int IsVolumeFraction(Variable* var);
 
-private:
   vtkSpyPlotUniReader(const vtkSpyPlotUniReader&) = delete;
   void operator=(const vtkSpyPlotUniReader&) = delete;
 };

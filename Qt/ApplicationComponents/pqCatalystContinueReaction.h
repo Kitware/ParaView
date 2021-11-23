@@ -50,12 +50,12 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqCatalystContinueReaction
   typedef pqCatalystPauseSimulationReaction Superclass;
 
 public:
-  pqCatalystContinueReaction(QAction* parentTemp = 0)
+  pqCatalystContinueReaction(QAction* parentTemp = nullptr)
     : Superclass(parentTemp)
   {
   }
 
-public Q_SLOTS:
+public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   void updateEnableState() override
   {
     pqCatalystPauseSimulationReaction::updateEnableState(CONTINUE);

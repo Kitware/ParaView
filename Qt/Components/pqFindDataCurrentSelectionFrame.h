@@ -89,7 +89,7 @@ private Q_SLOTS:
    */
   void updateSpreadSheet();
 
-private:
+private: // NOLINT(readability-redundant-access-specifiers)
   Q_DISABLE_COPY(pqFindDataCurrentSelectionFrame)
 
   class pqInternals;

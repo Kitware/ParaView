@@ -46,12 +46,12 @@ class PQWIDGETS_EXPORT pqHighlightablePushButton : public QPushButton
   typedef QPushButton Superclass;
 
 public:
-  pqHighlightablePushButton(QWidget* parent = 0);
-  pqHighlightablePushButton(const QString& text, QWidget* parent = 0);
-  pqHighlightablePushButton(const QIcon& icon, const QString& text, QWidget* parent = 0);
+  pqHighlightablePushButton(QWidget* parent = nullptr);
+  pqHighlightablePushButton(const QString& text, QWidget* parent = nullptr);
+  pqHighlightablePushButton(const QIcon& icon, const QString& text, QWidget* parent = nullptr);
   ~pqHighlightablePushButton() override;
 
-public Q_SLOTS:
+public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   /**
    * Slots to highlight (or clear the highlight).
    */

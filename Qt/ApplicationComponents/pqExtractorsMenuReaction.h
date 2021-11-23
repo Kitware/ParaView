@@ -48,7 +48,7 @@ public:
   pqExtractorsMenuReaction(pqProxyGroupMenuManager* menuManager, bool hideDisabledActions = false);
   ~pqExtractorsMenuReaction() override;
 
-public Q_SLOTS:
+public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   /**
    * Updates the enabled state for actions in the menu assigned to the
    * menuManager.

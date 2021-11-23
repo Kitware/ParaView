@@ -53,7 +53,7 @@ public:
    * constructor requires the proxy and property
    */
   pqAnimationShortcutWidget(QWidget* parent, vtkSMProxy* proxy, vtkSMProperty* property);
-  ~pqAnimationShortcutWidget();
+  ~pqAnimationShortcutWidget() override;
 
 protected Q_SLOTS:
   /**
@@ -71,7 +71,7 @@ protected Q_SLOTS:
    */
   virtual void setScene(pqAnimationScene* scene);
 
-protected:
+protected: // NOLINT(readability-redundant-access-specifiers)
   vtkSMProxy* Proxy;
   vtkSMProperty* Property;
   pqAnimationScene* Scene;

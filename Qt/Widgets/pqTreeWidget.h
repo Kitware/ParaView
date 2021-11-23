@@ -76,7 +76,7 @@ public:
   void setMaximumRowCountBeforeScrolling(int val) { this->MaximumRowCountBeforeScrolling = val; }
   int maximumRowCountBeforeScrolling() const { return this->MaximumRowCountBeforeScrolling; }
 
-public Q_SLOTS:
+public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   void allOn();
   void allOff();
 

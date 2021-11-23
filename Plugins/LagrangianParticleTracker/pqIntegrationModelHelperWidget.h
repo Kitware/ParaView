@@ -50,13 +50,13 @@ class pqIntegrationModelHelperWidget : public pqPropertyWidget
 
 public:
   pqIntegrationModelHelperWidget(
-    vtkSMProxy* smproxy, vtkSMProperty* smproperty, QWidget* parentObject = 0);
+    vtkSMProxy* smproxy, vtkSMProperty* smproperty, QWidget* parentObject = nullptr);
   ~pqIntegrationModelHelperWidget() override = default;
 
 protected Q_SLOTS:
   virtual void resetWidget() = 0;
 
-protected:
+protected: // NOLINT(readability-redundant-access-specifiers)
   vtkNew<vtkEventQtSlotConnect> VTKConnector;
   vtkSMProxyProperty* ModelProperty;
   vtkSMProxy* ModelPropertyValue;

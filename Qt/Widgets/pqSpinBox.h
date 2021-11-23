@@ -48,7 +48,7 @@ class PQWIDGETS_EXPORT pqSpinBox : public QSpinBox
   typedef QSpinBox Superclass;
 
 public:
-  explicit pqSpinBox(QWidget* parent = 0);
+  explicit pqSpinBox(QWidget* parent = nullptr);
 
   /**
    * Virtual function that is called whenever the user triggers a step.  We are
@@ -69,7 +69,7 @@ private Q_SLOTS:
   void onValueEdited();
   void onEditingFinished();
 
-private:
+private: // NOLINT(readability-redundant-access-specifiers)
   Q_DISABLE_COPY(pqSpinBox)
   bool EditingFinishedPending;
 };

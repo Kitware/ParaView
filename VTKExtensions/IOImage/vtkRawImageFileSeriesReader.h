@@ -52,14 +52,14 @@ public:
 
 protected:
   vtkRawImageFileSeriesReader();
-  ~vtkRawImageFileSeriesReader();
+  ~vtkRawImageFileSeriesReader() override;
 
   //@{
   /**
    * Update the reader extent if the image file format does not know
    * what it is (e.g. the raw format). Here we pass in values set by the user.
    */
-  virtual void UpdateReaderDataExtent() override;
+  void UpdateReaderDataExtent() override;
   //@}
 
   //@{

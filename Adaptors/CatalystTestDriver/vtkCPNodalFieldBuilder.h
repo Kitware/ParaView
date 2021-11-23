@@ -35,11 +35,11 @@ public:
   /**
    * Return a field on Grid.
    */
-  virtual void BuildField(unsigned long timeStep, double time, vtkDataSet* grid) override;
+  void BuildField(unsigned long timeStep, double time, vtkDataSet* grid) override;
 
 protected:
   vtkCPNodalFieldBuilder();
-  ~vtkCPNodalFieldBuilder();
+  ~vtkCPNodalFieldBuilder() override;
 
 private:
   vtkCPNodalFieldBuilder(const vtkCPNodalFieldBuilder&) = delete;

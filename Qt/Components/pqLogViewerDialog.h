@@ -94,7 +94,7 @@ private Q_SLOTS:
   // Set the verbosity of logs on a given process
   void setProcessVerbosity(int process, int index);
 
-private:
+private: // NOLINT(readability-redundant-access-specifiers)
   Q_DISABLE_COPY(pqLogViewerDialog)
 
   // Add a log view to the window

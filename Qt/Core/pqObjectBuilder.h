@@ -73,7 +73,7 @@ class PQCORE_EXPORT pqObjectBuilder : public QObject
   typedef QObject Superclass;
 
 public:
-  pqObjectBuilder(QObject* parent = 0);
+  pqObjectBuilder(QObject* parent = nullptr);
   ~pqObjectBuilder() override;
 
   //@{
@@ -207,18 +207,18 @@ public:
   /**
    * Destroy all sources/filters on a server.
    */
-  virtual void destroySources(pqServer* server = 0);
+  virtual void destroySources(pqServer* server = nullptr);
 
   /**
    * Destroy all lookup tables and scalar bars associated with them.
    */
-  virtual void destroyLookupTables(pqServer* server = 0);
+  virtual void destroyLookupTables(pqServer* server = nullptr);
 
   /**
    * Destroys all proxies that are involved in pipelines i.e. simply calls
    * destroySources(), destroyLookupTables().
    */
-  virtual void destroyPipelineProxies(pqServer* server = 0);
+  virtual void destroyPipelineProxies(pqServer* server = nullptr);
 
   /**
    * This method unregisters all proxies on the given server.
@@ -253,7 +253,7 @@ public:
    */
   bool forceWaitingForConnection(bool force);
 
-public Q_SLOTS:
+public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   /**
    * Closes any open connections for reverse-connection.
    */

@@ -48,7 +48,7 @@ class PQCORE_EXPORT pqQVTKWidgetEventTranslator : public pqWidgetEventTranslator
   typedef pqWidgetEventTranslator Superclass;
 
 public:
-  pqQVTKWidgetEventTranslator(QObject* p = 0);
+  pqQVTKWidgetEventTranslator(QObject* p = nullptr);
   ~pqQVTKWidgetEventTranslator() override;
 
   using Superclass::translateEvent;

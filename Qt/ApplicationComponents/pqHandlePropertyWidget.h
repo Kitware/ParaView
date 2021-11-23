@@ -54,10 +54,10 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqHandlePropertyWidget : public pqInteracti
   typedef pqInteractivePropertyWidget Superclass;
 
 public:
-  pqHandlePropertyWidget(vtkSMProxy* proxy, vtkSMPropertyGroup* smgroup, QWidget* parent = 0);
+  pqHandlePropertyWidget(vtkSMProxy* proxy, vtkSMPropertyGroup* smgroup, QWidget* parent = nullptr);
   ~pqHandlePropertyWidget() override;
 
-public Q_SLOTS:
+public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   /**
    * Update the widget's WorldPosition using current data bounds.
    */
@@ -73,7 +73,7 @@ private Q_SLOTS:
   void setWorldPosition(double x, double y, double z);
   void selectionChanged();
 
-private:
+private: // NOLINT(readability-redundant-access-specifiers)
   Q_DISABLE_COPY(pqHandlePropertyWidget);
   QPushButton* UseSelectionCenterButton = nullptr;
 };

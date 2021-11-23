@@ -45,7 +45,7 @@ class PQCOMPONENTS_EXPORT pqComponentsTestUtility : public pqCoreTestUtility
   typedef pqCoreTestUtility Superclass;
 
 public:
-  pqComponentsTestUtility(QObject* parentObj = 0);
+  pqComponentsTestUtility(QObject* parentObj = nullptr);
 
   /**
    * Compares the baseline with active view for testing purposes.

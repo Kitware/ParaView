@@ -225,7 +225,7 @@ public:
   {
   }
 
-  virtual ~vtkInternals() {}
+  virtual ~vtkInternals() = default;
 
   //---------------------------------------------------------------------------
   /**
@@ -352,7 +352,7 @@ public:
   virtual void UpdatePlotProperties(vtkXYChartRepresentation* self)
   {
     vtkChartXY* chartXY = self->GetChart();
-    vtkPlot* lastFunctionalBagPlot = 0;
+    vtkPlot* lastFunctionalBagPlot = nullptr;
     for (PlotsMap::iterator iter1 = this->SeriesPlots.begin(); iter1 != this->SeriesPlots.end();
          ++iter1)
     {

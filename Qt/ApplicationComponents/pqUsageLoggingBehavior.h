@@ -94,7 +94,7 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqUsageLoggingBehavior : public QObject
   typedef QObject Superclass;
 
 public:
-  pqUsageLoggingBehavior(QObject* parent = 0);
+  pqUsageLoggingBehavior(QObject* parent = nullptr);
   ~pqUsageLoggingBehavior() override;
 
   //@{

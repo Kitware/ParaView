@@ -44,7 +44,7 @@ class PQCORE_EXPORT pqXMLEventSource : public pqEventSource
 {
   Q_OBJECT
 public:
-  pqXMLEventSource(QObject* p = 0);
+  pqXMLEventSource(QObject* p = nullptr);
   ~pqXMLEventSource() override;
 
   void setContent(const QString& path) override;

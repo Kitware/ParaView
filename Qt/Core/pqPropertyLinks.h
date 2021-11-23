@@ -69,7 +69,7 @@ class PQCORE_EXPORT pqPropertyLinks : public QObject
   typedef QObject Superclass;
 
 public:
-  pqPropertyLinks(QObject* parent = 0);
+  pqPropertyLinks(QObject* parent = nullptr);
   ~pqPropertyLinks() override;
 
   /**
@@ -125,7 +125,7 @@ public:
   bool autoUpdateVTKObjects() const { return this->AutoUpdateVTKObjects; }
   bool useUncheckedProperties() const { return this->UseUncheckedProperties; }
 
-public Q_SLOTS:
+public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   /**
    * Remove all links.
    */
@@ -169,14 +169,13 @@ private Q_SLOTS:
   void onQtPropertyModified();
   void onSMPropertyModified();
 
-private:
+private: // NOLINT(readability-redundant-access-specifiers)
   bool addNewConnection(pqPropertyLinksConnection*);
 
   template <class ConnectionType>
   ConnectionType* addPropertyLinkInternal(QObject* qobject, const char* qproperty,
     const char* qsignal, vtkSMProxy* smproxy, vtkSMProperty* smproperty, int smindex = -1);
 
-private:
   Q_DISABLE_COPY(pqPropertyLinks)
 
   class pqInternals;

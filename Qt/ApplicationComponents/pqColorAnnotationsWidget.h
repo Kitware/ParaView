@@ -52,7 +52,7 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqColorAnnotationsWidget : public QWidget
   typedef QWidget Superclass;
 
 public:
-  pqColorAnnotationsWidget(QWidget* parent = 0);
+  pqColorAnnotationsWidget(QWidget* parent = nullptr);
   ~pqColorAnnotationsWidget() override;
 
   void setLookupTableProxy(vtkSMProxy* proxy);
@@ -316,7 +316,7 @@ private Q_SLOTS:
    */
   void editPastLastRow();
 
-private:
+private: // NOLINT(readability-redundant-access-specifiers)
   Q_DISABLE_COPY(pqColorAnnotationsWidget)
 
   class pqInternals;

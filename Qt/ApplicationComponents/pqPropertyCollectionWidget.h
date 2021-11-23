@@ -131,7 +131,8 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqPropertyCollectionWidget : public pqPrope
   typedef pqPropertyWidget Superclass;
 
 public:
-  pqPropertyCollectionWidget(vtkSMProxy* proxy, vtkSMPropertyGroup* smgroup, QWidget* parent = 0);
+  pqPropertyCollectionWidget(
+    vtkSMProxy* proxy, vtkSMPropertyGroup* smgroup, QWidget* parent = nullptr);
   ~pqPropertyCollectionWidget() override;
 
   /**

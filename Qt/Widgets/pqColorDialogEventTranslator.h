@@ -46,7 +46,7 @@ class PQWIDGETS_EXPORT pqColorDialogEventTranslator : public pqWidgetEventTransl
   typedef pqWidgetEventTranslator Superclass;
 
 public:
-  pqColorDialogEventTranslator(QObject* parent = 0);
+  pqColorDialogEventTranslator(QObject* parent = nullptr);
   ~pqColorDialogEventTranslator() override;
 
   /**
@@ -59,7 +59,7 @@ private Q_SLOTS:
   void onColorChosen(const QColor&);
   void onFinished(int);
 
-private:
+private: // NOLINT(readability-redundant-access-specifiers)
   Q_DISABLE_COPY(pqColorDialogEventTranslator)
 };
 

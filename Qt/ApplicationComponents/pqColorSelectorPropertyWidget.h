@@ -51,7 +51,7 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqColorSelectorPropertyWidget : public pqPr
 
 public:
   pqColorSelectorPropertyWidget(
-    vtkSMProxy* proxy, vtkSMProperty* property, bool withPalette, QWidget* parent = 0);
+    vtkSMProxy* proxy, vtkSMProperty* property, bool withPalette, QWidget* parent = nullptr);
   ~pqColorSelectorPropertyWidget() override;
 };
 

@@ -53,7 +53,7 @@ class PQCOMPONENTS_EXPORT pqDisplayRepresentationWidget : public QWidget
   typedef QWidget Superclass;
 
 public:
-  pqDisplayRepresentationWidget(QWidget* parent = 0);
+  pqDisplayRepresentationWidget(QWidget* parent = nullptr);
   ~pqDisplayRepresentationWidget() override;
 
   /**
@@ -61,7 +61,7 @@ public:
    */
   QString representationText() const;
 
-public Q_SLOTS:
+public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   /**
    * set the representation proxy or pqDataRepresentation instance.
    */
@@ -101,7 +101,7 @@ class PQCOMPONENTS_EXPORT pqDisplayRepresentationPropertyWidget : public pqPrope
   Q_OBJECT
 
 public:
-  pqDisplayRepresentationPropertyWidget(vtkSMProxy* proxy, QWidget* parent = 0);
+  pqDisplayRepresentationPropertyWidget(vtkSMProxy* proxy, QWidget* parent = nullptr);
   ~pqDisplayRepresentationPropertyWidget() override;
 
 private:

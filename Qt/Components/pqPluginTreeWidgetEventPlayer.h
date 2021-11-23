@@ -49,7 +49,7 @@ class PQCOMPONENTS_EXPORT pqPluginTreeWidgetEventPlayer : public pqWidgetEventPl
   typedef pqWidgetEventPlayer Superclass;
 
 public:
-  pqPluginTreeWidgetEventPlayer(QObject* parent = 0);
+  pqPluginTreeWidgetEventPlayer(QObject* parent = nullptr);
   ~pqPluginTreeWidgetEventPlayer() override;
 
   using Superclass::playEvent;

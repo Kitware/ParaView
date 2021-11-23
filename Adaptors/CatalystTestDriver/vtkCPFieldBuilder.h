@@ -36,7 +36,7 @@ public:
   /**
    * Return a field on Grid.
    */
-  virtual void BuildField(unsigned long TimeStep, double Time, vtkDataSet* Grid) override = 0;
+  void BuildField(unsigned long TimeStep, double Time, vtkDataSet* Grid) override = 0;
 
   /**
    * Return the highest order of discretization of the field.
@@ -61,7 +61,7 @@ public:
 
 protected:
   vtkCPFieldBuilder();
-  ~vtkCPFieldBuilder();
+  ~vtkCPFieldBuilder() override;
 
 private:
   vtkCPFieldBuilder(const vtkCPFieldBuilder&) = delete;

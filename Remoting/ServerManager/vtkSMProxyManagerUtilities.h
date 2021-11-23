@@ -86,7 +86,7 @@ public:
 
 protected:
   vtkSMProxyManagerUtilities();
-  ~vtkSMProxyManagerUtilities();
+  ~vtkSMProxyManagerUtilities() override;
 
 private:
   vtkSMProxyManagerUtilities(const vtkSMProxyManagerUtilities&) = delete;

@@ -49,7 +49,7 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqSpreadSheetVisibilityBehavior : public QO
   typedef QObject Superclass;
 
 public:
-  pqSpreadSheetVisibilityBehavior(QObject* parent = 0);
+  pqSpreadSheetVisibilityBehavior(QObject* parent = nullptr);
 
 protected Q_SLOTS:
   void showActiveSource(pqView*);

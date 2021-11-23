@@ -82,7 +82,7 @@ public:
    */
   void setExpanderState(const QMap<QString, bool>& state);
 
-public Q_SLOTS:
+public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   /**
    * Remove all proxy widgets added to the panel.
    */
@@ -154,7 +154,7 @@ private Q_SLOTS:
   void triggerChangeAvailable();
   void triggerRestartRequired();
 
-private:
+private: // NOLINT(readability-redundant-access-specifiers)
   Q_DISABLE_COPY(pqProxiesWidget)
 
   class pqInternals;

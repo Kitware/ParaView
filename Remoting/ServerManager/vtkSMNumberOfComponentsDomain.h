@@ -56,7 +56,7 @@ protected:
   /**
    * Set the appropriate ivars from the xml element.
    */
-  virtual int ReadXMLAttributes(vtkSMProperty* prop, vtkPVXMLElement* element) override;
+  int ReadXMLAttributes(vtkSMProperty* prop, vtkPVXMLElement* element) override;
 
   /**
    * Internal update method doing the actual work.

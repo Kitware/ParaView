@@ -48,7 +48,7 @@ public:
 
 protected:
   vtkSMSpreadSheetViewProxy();
-  ~vtkSMSpreadSheetViewProxy();
+  ~vtkSMSpreadSheetViewProxy() override;
 
 private:
   vtkSMSpreadSheetViewProxy(const vtkSMSpreadSheetViewProxy&) = delete;

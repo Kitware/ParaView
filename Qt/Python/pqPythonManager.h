@@ -92,7 +92,7 @@ public:
    */
   void updateMacroList();
 
-public Q_SLOTS:
+public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   /**
    * Executes the given script.  If the python interpreter hasn't been initialized
    * yet it will be initialized.

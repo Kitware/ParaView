@@ -37,13 +37,12 @@ public:
   /**
    * Return the model view matrix of model view transform given by zSpace SDK.
    */
-  virtual vtkMatrix4x4* GetModelViewTransformMatrix() override;
+  vtkMatrix4x4* GetModelViewTransformMatrix() override;
 
   /**
    * Return the projection transform matrix given by zSpace SDK.
    */
-  virtual vtkMatrix4x4* GetProjectionTransformMatrix(
-    double aspect, double nearz, double farz) override;
+  vtkMatrix4x4* GetProjectionTransformMatrix(double aspect, double nearz, double farz) override;
 
 protected:
   vtkZSpaceCamera() = default;

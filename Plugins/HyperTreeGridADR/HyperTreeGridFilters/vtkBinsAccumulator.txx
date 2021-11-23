@@ -107,8 +107,7 @@ void vtkBinsAccumulator<FunctorT>::Initialize()
 
 //----------------------------------------------------------------------------
 template <typename FunctorT>
-const typename vtkBinsAccumulator<FunctorT>::BinsPointer vtkBinsAccumulator<FunctorT>::GetBins()
-  const
+typename vtkBinsAccumulator<FunctorT>::BinsPointer vtkBinsAccumulator<FunctorT>::GetBins() const
 {
   return this->Bins;
 }
@@ -117,7 +116,7 @@ const typename vtkBinsAccumulator<FunctorT>::BinsPointer vtkBinsAccumulator<Func
 template <typename FunctorT>
 void vtkBinsAccumulator<FunctorT>::SetDiscretizationStep(double discretizationStep)
 {
-  if (this->Bins->size())
+  if (!this->Bins->empty())
   {
     vtkWarningMacro(<< "Setting DiscretizationStep while Bins are not empty");
   }

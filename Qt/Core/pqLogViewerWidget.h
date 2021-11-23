@@ -51,7 +51,7 @@ class PQCORE_EXPORT pqLogViewerWidget : public QWidget
 
 public:
   pqLogViewerWidget(QWidget* parent = nullptr);
-  virtual ~pqLogViewerWidget() override;
+  ~pqLogViewerWidget() override;
 
   /**
    * Set the contents of the log viewer to the provided txt.

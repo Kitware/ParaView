@@ -89,7 +89,7 @@ Q_SIGNALS:
 private:
   static MessageHandler* instance();
 
-private Q_SLOTS:
+private Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   void displayMessage(QtMsgType type, const QString& msg);
 };
 
@@ -134,7 +134,7 @@ public:
   void setFontSize(int fontSize);
   //@}
 
-public Q_SLOTS:
+public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   /**
    * Display a message in the widget. There's generally no need to use this
    * since one can have the same effect by triggering the message through Qt or

@@ -48,12 +48,12 @@ class PQCOMPONENTS_EXPORT pqSelectionInputWidget : public QWidget
   typedef QWidget Superclass;
 
 public:
-  pqSelectionInputWidget(QWidget* parent = 0);
+  pqSelectionInputWidget(QWidget* parent = nullptr);
   ~pqSelectionInputWidget() override;
 
   virtual pqSMProxy selection() { return this->SelectionSource; }
 
-public Q_SLOTS:
+public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   virtual void setSelection(pqSMProxy selection);
 
   /**
@@ -78,7 +78,7 @@ protected Q_SLOTS:
 
   void updateLabels();
 
-protected:
+protected: // NOLINT(readability-redundant-access-specifiers)
   pqSMProxy SelectionSource;
 
 private:

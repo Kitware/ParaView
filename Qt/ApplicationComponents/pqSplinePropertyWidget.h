@@ -67,8 +67,8 @@ public:
     POLYLINE = 1
   };
 
-  pqSplinePropertyWidget(
-    vtkSMProxy* proxy, vtkSMPropertyGroup* smgroup, ModeTypes mode = SPLINE, QWidget* parent = 0);
+  pqSplinePropertyWidget(vtkSMProxy* proxy, vtkSMPropertyGroup* smgroup, ModeTypes mode = SPLINE,
+    QWidget* parent = nullptr);
   ~pqSplinePropertyWidget() override;
 
   //@{

@@ -57,7 +57,7 @@ public:
   static void saveAnimationGeometry();
   static void saveAnimationGeometry(const QString& filename);
 
-public Q_SLOTS:
+public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   /**
    * Updates the enabled state. Applications need not explicitly call this.
    */

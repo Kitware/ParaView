@@ -87,7 +87,7 @@ protected Q_SLOTS:
    */
   void updateStatusMessage();
 
-protected:
+protected: // NOLINT(readability-redundant-access-specifiers)
   /**
    * Overridden to popup the context menu, if some actions have been added
    * using addMenuAction.

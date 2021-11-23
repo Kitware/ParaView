@@ -88,7 +88,7 @@ public:
 
 protected:
   vtkChartTextRepresentation();
-  ~vtkChartTextRepresentation();
+  ~vtkChartTextRepresentation() override;
 
   /**
    * Fill input port information.

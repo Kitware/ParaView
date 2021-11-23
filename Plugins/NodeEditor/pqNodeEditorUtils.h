@@ -86,13 +86,13 @@ public:
     , functor(fn)
   {
   }
-  ~Interceptor() = default;
+  ~Interceptor() override = default;
 
 protected:
   /**
    * Filters events if this object has been installed as an event filter for the watched object.
    */
-  bool eventFilter(QObject* object, QEvent* event) { return this->functor(object, event); }
+  bool eventFilter(QObject* object, QEvent* event) override { return this->functor(object, event); }
 
   F functor;
 };

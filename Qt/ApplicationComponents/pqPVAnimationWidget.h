@@ -45,7 +45,7 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqPVAnimationWidget : public pqAnimationVie
   typedef pqAnimationViewWidget Superclass;
 
 public:
-  pqPVAnimationWidget(QWidget* parent = 0);
+  pqPVAnimationWidget(QWidget* parent = nullptr);
 
 private:
   Q_DISABLE_COPY(pqPVAnimationWidget)

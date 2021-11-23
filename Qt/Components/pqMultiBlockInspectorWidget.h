@@ -88,7 +88,7 @@ public:
    */
   pqDataRepresentation* representation() const;
 
-public Q_SLOTS:
+public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   /**
    * When auto-tracking is disabled, sets the port to use to get the data
    * information for this widget to show.

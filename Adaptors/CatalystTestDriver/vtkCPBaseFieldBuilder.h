@@ -49,7 +49,7 @@ public:
 
 protected:
   vtkCPBaseFieldBuilder();
-  ~vtkCPBaseFieldBuilder();
+  ~vtkCPBaseFieldBuilder() override;
 
 private:
   vtkCPBaseFieldBuilder(const vtkCPBaseFieldBuilder&) = delete;

@@ -57,7 +57,7 @@ public:
   /**
    * constructor
    */
-  pqPropertyManager(QObject* p = 0);
+  pqPropertyManager(QObject* p = nullptr);
   /**
    * destructor
    */

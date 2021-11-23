@@ -83,12 +83,12 @@ public:
    */
   static QIcon getIcon(int fieldAssociation);
 
-public Q_SLOTS:
+public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   void domainChanged();
 protected Q_SLOTS:
   virtual void internalDomainChanged();
 
-protected:
+protected: // NOLINT(readability-redundant-access-specifiers)
   void markForUpdate(bool mark);
 
   class pqInternal;

@@ -172,7 +172,7 @@ public:
    * Returns unparsed / extra arguments left over from the most reset `Parse`
    * call.
    */
-  const std::vector<std::string> GetExtraArguments() const { return this->ExtraArguments; }
+  const std::vector<std::string>& GetExtraArguments() const { return this->ExtraArguments; }
   ///@}
 
   /**
@@ -192,7 +192,7 @@ public:
 
 protected:
   vtkCLIOptions();
-  ~vtkCLIOptions();
+  ~vtkCLIOptions() override;
 
 private:
   vtkCLIOptions(const vtkCLIOptions&) = delete;

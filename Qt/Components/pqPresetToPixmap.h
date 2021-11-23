@@ -53,7 +53,7 @@ class PQCOMPONENTS_EXPORT pqPresetToPixmap : public QObject
   typedef QObject Superclass;
 
 public:
-  pqPresetToPixmap(QObject* parent = 0);
+  pqPresetToPixmap(QObject* parent = nullptr);
   ~pqPresetToPixmap() override;
 
   /**

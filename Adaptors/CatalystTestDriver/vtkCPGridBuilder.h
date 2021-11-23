@@ -39,8 +39,7 @@ public:
    * that were returned were already built before.
    * vtkCPGridBuilder will also delete the grid.
    */
-  virtual vtkDataObject* GetGrid(
-    unsigned long timeStep, double time, int& builtNewGrid) override = 0;
+  vtkDataObject* GetGrid(unsigned long timeStep, double time, int& builtNewGrid) override = 0;
 
   //@{
   /**
@@ -52,7 +51,7 @@ public:
 
 protected:
   vtkCPGridBuilder();
-  ~vtkCPGridBuilder();
+  ~vtkCPGridBuilder() override;
 
 private:
   vtkCPGridBuilder(const vtkCPGridBuilder&) = delete;

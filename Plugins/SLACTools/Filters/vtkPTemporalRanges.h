@@ -39,18 +39,18 @@ class VTKSLACFILTERS_EXPORT vtkPTemporalRanges : public vtkTemporalRanges
 public:
   vtkTypeMacro(vtkPTemporalRanges, vtkTemporalRanges);
   static vtkPTemporalRanges* New();
-  virtual void PrintSelf(ostream& os, vtkIndent indent) override;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   vtkGetObjectMacro(Controller, vtkMultiProcessController);
   virtual void SetController(vtkMultiProcessController*);
 
 protected:
   vtkPTemporalRanges();
-  ~vtkPTemporalRanges();
+  ~vtkPTemporalRanges() override;
 
   vtkMultiProcessController* Controller;
 
-  virtual int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
+  int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
 
   virtual void Reduce(vtkTable* table);
 

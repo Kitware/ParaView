@@ -131,7 +131,7 @@ public Q_SLOTS:
 protected Q_SLOTS:
   void handleColorChanged();
 
-protected:
+protected: // NOLINT(readability-redundant-access-specifiers)
   QByteArray PropertyName;
   bool EnableAlpha;
 };

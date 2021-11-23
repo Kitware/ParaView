@@ -52,7 +52,7 @@ public:
   pqLockPanelsReaction(QAction* action);
   ~pqLockPanelsReaction() override;
 
-public Q_SLOTS:
+public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   void actionTriggered();
 
 private:

@@ -69,7 +69,7 @@ public:
   /**
    * Accessor to the accumulated Bins
    */
-  const BinsPointer GetBins() const;
+  BinsPointer GetBins() const;
 
   //@{
   /**

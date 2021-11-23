@@ -81,7 +81,7 @@ public:
   /**
    * Sets the volume property.  Overloads the virtual vtkVolume method.
    */
-  virtual void SetProperty(vtkVolumeProperty* property) override;
+  void SetProperty(vtkVolumeProperty* property) override;
 
   /**
    * Shallow copy of an LOD actor. Overloads the virtual vtkProp method.

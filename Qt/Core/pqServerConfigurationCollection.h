@@ -63,7 +63,7 @@ class PQCORE_EXPORT pqServerConfigurationCollection : public QObject
   typedef QObject Superclass;
 
 public:
-  pqServerConfigurationCollection(QObject* parent = 0);
+  pqServerConfigurationCollection(QObject* parent = nullptr);
   ~pqServerConfigurationCollection() override;
 
   /**

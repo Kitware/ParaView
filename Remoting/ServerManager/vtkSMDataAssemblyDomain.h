@@ -129,7 +129,7 @@ public:
 
 protected:
   vtkSMDataAssemblyDomain();
-  ~vtkSMDataAssemblyDomain();
+  ~vtkSMDataAssemblyDomain() override;
 
 private:
   vtkSMDataAssemblyDomain(const vtkSMDataAssemblyDomain&) = delete;

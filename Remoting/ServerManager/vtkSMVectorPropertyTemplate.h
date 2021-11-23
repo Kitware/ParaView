@@ -49,7 +49,8 @@ std::string AsString(const T& var)
 }
 
 template <>
-vtkMaybeUnused("not used in non-double specializations") std::string AsString(const double& var)
+vtkMaybeUnused("not used in non-double specializations") inline std::string
+  AsString(const double& var)
 {
   char buf[256];
   const double_conversion::DoubleToStringConverter& converter =
@@ -70,7 +71,7 @@ B vtkSMVPConvertFromString(const std::string& string_representation)
 }
 
 template <>
-vtkMaybeUnused("not used in non-string specializations") std::string
+vtkMaybeUnused("not used in non-string specializations") inline std::string
   vtkSMVPConvertFromString<std::string>(const std::string& string_representation)
 {
   return string_representation;
@@ -163,12 +164,12 @@ public:
   }
 
   //---------------------------------------------------------------------------
-  T* GetElements() { return (this->Values.size() > 0) ? &this->Values[0] : nullptr; }
+  T* GetElements() { return !this->Values.empty() ? &this->Values[0] : nullptr; }
 
   //---------------------------------------------------------------------------
   T* GetUncheckedElements()
   {
-    return (this->UncheckedValues.size() > 0) ? &this->UncheckedValues[0] : nullptr;
+    return (!this->UncheckedValues.empty()) ? &this->UncheckedValues[0] : nullptr;
   }
   //---------------------------------------------------------------------------
   T& GetUncheckedElement(unsigned int idx)
@@ -398,7 +399,7 @@ public:
         }
       }
     }
-    if (new_values.size() > 0)
+    if (!new_values.empty())
     {
       this->SetElements(&new_values[0], static_cast<unsigned int>(new_values.size()));
     }

@@ -31,7 +31,7 @@ class PQWIDGETS_EXPORT pqDiscreteDoubleWidget : public pqDoubleSliderWidget
 
 public:
   pqDiscreteDoubleWidget(QWidget* parent = nullptr);
-  ~pqDiscreteDoubleWidget();
+  ~pqDiscreteDoubleWidget() override;
 
   /**
    * Gets vector of allowed values

@@ -123,20 +123,20 @@ public:
   }
   void Reset()
   {
-    this->Object = 0;
-    this->Method2 = 0;
-    this->Method = 0;
+    this->Object = nullptr;
+    this->Method2 = nullptr;
+    this->Method = nullptr;
   }
 
 private:
   vtkMemberFunctionCommand()
   {
-    this->Object = 0;
-    this->Method = 0;
-    this->Method2 = 0;
+    this->Object = nullptr;
+    this->Method = nullptr;
+    this->Method2 = nullptr;
   }
 
-  ~vtkMemberFunctionCommand() override {}
+  ~vtkMemberFunctionCommand() override = default;
 
   ClassT* Object;
   void (ClassT::*Method)();

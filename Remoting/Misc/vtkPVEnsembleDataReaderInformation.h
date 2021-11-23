@@ -56,7 +56,7 @@ public:
   /**
    * Get the file path for the input row index.
    */
-  virtual std::string GetFilePath(const unsigned int);
+  virtual std::string GetFilePath(unsigned int);
 
 protected:
   vtkPVEnsembleDataReaderInformation();

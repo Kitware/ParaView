@@ -237,7 +237,7 @@ private Q_SLOTS:
    */
   void onChangeFinished();
 
-private:
+private: // NOLINT(readability-redundant-access-specifiers)
   /**
    * create all widgets
    */
@@ -253,7 +253,6 @@ private:
    */
   void create3DWidgets();
 
-private:
   Q_DISABLE_COPY(pqProxyWidget);
 
   QSet<QString> DefaultVisibilityLabels;

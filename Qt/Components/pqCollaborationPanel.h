@@ -52,7 +52,7 @@ class PQCOMPONENTS_EXPORT pqCollaborationPanel : public QWidget
   typedef QWidget Superclass;
 
 public:
-  pqCollaborationPanel(QWidget* parent = 0);
+  pqCollaborationPanel(QWidget* parent = nullptr);
   ~pqCollaborationPanel() override;
 
 Q_SIGNALS:
@@ -137,7 +137,7 @@ protected Q_SLOTS:
    */
   void onConnectIDChanged();
 
-protected:
+protected: // NOLINT(readability-redundant-access-specifiers)
   /**
    * Promote a new master
    */

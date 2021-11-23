@@ -103,7 +103,6 @@ private:
   // Used in StartTrackingPropertiesForTrace/EndTrackingPropertiesForTrace.
   vtkSMTrace::TraceItem* TraceItem;
 
-private:
   vtkSMScalarBarWidgetRepresentationProxy(const vtkSMScalarBarWidgetRepresentationProxy&) = delete;
   void operator=(const vtkSMScalarBarWidgetRepresentationProxy&) = delete;
 };

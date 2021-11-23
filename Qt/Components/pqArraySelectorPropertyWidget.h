@@ -85,7 +85,7 @@ public:
    */
   QList<QVariant> array() const;
 
-public Q_SLOTS:
+public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   /**
    * Set the chosen array name and association.
    */
@@ -110,7 +110,7 @@ Q_SIGNALS:
 private Q_SLOTS:
   void domainModified();
 
-private:
+private: // NOLINT(readability-redundant-access-specifiers)
   Q_DISABLE_COPY(pqArraySelectorPropertyWidget);
 
   class pqInternals;

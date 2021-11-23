@@ -92,7 +92,7 @@ public:
   Qt::ItemFlags flags(const QModelIndex& index) const override;
   bool setData(const QModelIndex& index, const QVariant& value, int role = Qt::EditRole) override;
 
-public Q_SLOTS:
+public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   /**
    * Called when a new source/filter is registered.
    */
@@ -120,7 +120,7 @@ private Q_SLOTS:
    */
   void refreshGeometrySizes();
 
-private:
+private: // NOLINT(readability-redundant-access-specifiers)
   pqDataInformationModelInternal* Internal;
 
   enum ColumnType

@@ -51,7 +51,7 @@ class pqMoleculePropertyWidget : public pqPropertyGroupWidget
 
 public:
   pqMoleculePropertyWidget(
-    vtkSMProxy* smproxy, vtkSMPropertyGroup* smgroup, QWidget* parentObject = 0);
+    vtkSMProxy* smproxy, vtkSMPropertyGroup* smgroup, QWidget* parentObject = nullptr);
   ~pqMoleculePropertyWidget() override = default;
 
   /**
@@ -92,7 +92,7 @@ protected Q_SLOTS:
   void onResetBondRadiusToggled();
   //@}
 
-protected:
+protected: // NOLINT(readability-redundant-access-specifiers)
   /**
    * Set property documentation as widget tooltip.
    */

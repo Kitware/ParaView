@@ -241,8 +241,8 @@ public:
    * used for status where the first value is the id of the element (for
    * example), the second value is its status and the third value is number of status.
    */
-  void SetStatus(const int key, int* values, int num_values);
-  bool GetStatus(const int key, int* values, int num_values) const;
+  void SetStatus(int key, int* values, int num_values);
+  bool GetStatus(int key, int* values, int num_values) const;
   //@}
 
   //@{
@@ -268,8 +268,8 @@ public:
    * used for status where the first value is the id of the element (for
    * example) and the second value is its status.
    */
-  void SetStatus(const int key, int value);
-  int GetStatus(const int key, int default_value = 0) const;
+  void SetStatus(int key, int value);
+  int GetStatus(int key, int default_value = 0) const;
   //@}
 
   //@{

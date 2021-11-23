@@ -51,7 +51,7 @@ class PQCOMPONENTS_EXPORT pqAnimatableProxyComboBox : public QComboBox
   typedef QComboBox Superclass;
 
 public:
-  pqAnimatableProxyComboBox(QWidget* parent = 0);
+  pqAnimatableProxyComboBox(QWidget* parent = nullptr);
   ~pqAnimatableProxyComboBox() override;
 
   /**

@@ -68,7 +68,7 @@ class PQWIDGETS_EXPORT pqDoubleLineEdit : public pqLineEdit
   using Superclass = pqLineEdit;
 
 public:
-  pqDoubleLineEdit(QWidget* parent = 0);
+  pqDoubleLineEdit(QWidget* parent = nullptr);
   ~pqDoubleLineEdit() override;
 
   /**
@@ -136,7 +136,7 @@ public:
   static QString formatDoubleUsingGlobalPrecisionAndNotation(double value);
   //@}
 
-public Q_SLOTS:
+public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   /**
    * Set the notation used to display the number.
    * \sa notation()

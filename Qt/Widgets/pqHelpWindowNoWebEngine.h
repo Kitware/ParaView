@@ -52,13 +52,13 @@ namespace
 class pqTextBrowser : public QTextBrowser
 {
 public:
-  pqTextBrowser(QHelpEngine* helpEngine, QWidget* _parent = 0)
+  pqTextBrowser(QHelpEngine* helpEngine, QWidget* _parent = nullptr)
   {
     this->HelpEngine = helpEngine;
     this->setParent(_parent);
     this->setOpenLinks(false);
   }
-  ~pqTextBrowser() override {}
+  ~pqTextBrowser() override = default;
   static pqTextBrowser* newInstance(QHelpEngine* engine, pqHelpWindow* self)
   {
     pqTextBrowser* instance = new pqTextBrowser(engine, self);

@@ -44,14 +44,14 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqChangePipelineInputReaction : public pqRe
   typedef pqReaction Superclass;
 
 public:
-  pqChangePipelineInputReaction(QAction* parent = 0);
+  pqChangePipelineInputReaction(QAction* parent = nullptr);
 
   /**
    * Changes the input for the active source.
    */
   static void changeInput();
 
-public Q_SLOTS:
+public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   /**
    * Updates the enabled state. Applications need not explicitly call
    * this.

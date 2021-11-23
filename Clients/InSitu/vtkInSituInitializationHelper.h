@@ -154,7 +154,7 @@ public:
 
 protected:
   vtkInSituInitializationHelper();
-  ~vtkInSituInitializationHelper();
+  ~vtkInSituInitializationHelper() override;
 
 private:
   vtkInSituInitializationHelper(const vtkInSituInitializationHelper&) = delete;

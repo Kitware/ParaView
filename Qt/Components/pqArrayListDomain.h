@@ -62,7 +62,7 @@ public:
 private Q_SLOTS:
   void domainChanged();
 
-private:
+private: // NOLINT(readability-redundant-access-specifiers)
   Q_DISABLE_COPY(pqArrayListDomain)
   class pqInternals;
   pqInternals* Internals;

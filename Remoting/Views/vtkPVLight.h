@@ -55,11 +55,11 @@ public:
    * Overridden for special treatment of OSPRay specific
    * ambient light type.
    */
-  virtual void SetLightType(int t) override;
+  void SetLightType(int t) override;
 
 protected:
   vtkPVLight();
-  ~vtkPVLight();
+  ~vtkPVLight() override;
 
 private:
   vtkPVLight(const vtkPVLight&) = delete;

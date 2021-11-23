@@ -48,7 +48,7 @@ class PQCORE_EXPORT pqFileDialogEventPlayer : public pqWidgetEventPlayer
   typedef pqWidgetEventPlayer Superclass;
 
 public:
-  pqFileDialogEventPlayer(QObject* p = 0);
+  pqFileDialogEventPlayer(QObject* p = nullptr);
 
   using Superclass::playEvent;
   bool playEvent(

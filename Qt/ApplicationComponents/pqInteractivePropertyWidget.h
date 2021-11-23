@@ -61,7 +61,7 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqInteractivePropertyWidget : public pqProp
 
 public:
   pqInteractivePropertyWidget(const char* widget_smgroup, const char* widget_smname,
-    vtkSMProxy* proxy, vtkSMPropertyGroup* smgroup, QWidget* parent = 0);
+    vtkSMProxy* proxy, vtkSMPropertyGroup* smgroup, QWidget* parent = nullptr);
   ~pqInteractivePropertyWidget() override;
 
   /**
@@ -121,7 +121,7 @@ public:
    */
   void showEvent(QShowEvent*) override;
 
-public Q_SLOTS:
+public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   /**
    * Toggle the interactive widget's visibility. This, along with
    * pqPropertyWidget's selected state controls whether the widget proxy is
@@ -183,7 +183,6 @@ protected:
 private:
   void handleUserEvent(vtkObject*, unsigned long, void*);
 
-private:
   Q_DISABLE_COPY(pqInteractivePropertyWidget)
 
   class pqInternals;

@@ -93,8 +93,8 @@ public:
     vtkSMSourceProxy* dataSource, int outputport);
 
 protected:
-  vtkSMSelectionHelper(){};
-  ~vtkSMSelectionHelper() override{};
+  vtkSMSelectionHelper() = default;
+  ~vtkSMSelectionHelper() override = default;
 
   static void ConvertSurfaceSelectionToVolumeSelectionInternal(
     vtkIdType connectionID, vtkSelection* input, vtkSelection* output, int global_ids);

@@ -99,7 +99,7 @@ public:
    * pqPVApplicationCore (see class description).
    */
   pqPresetGroupsManager(QObject* p);
-  ~pqPresetGroupsManager();
+  ~pqPresetGroupsManager() override;
 
   /**
    * Returns the number of groups the manager knows of.
@@ -161,7 +161,7 @@ public:
    */
   void removeFromAllGroups(const QString& presetName);
 
-public Q_SLOTS:
+public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   /**
    * Save groups to settings
    */

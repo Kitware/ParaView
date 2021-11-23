@@ -63,14 +63,14 @@ public:
   void onShutdown() {}
   void onStartup() {}
 
-public Q_SLOTS:
+public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   void onViewAdded(pqView*);
   void onViewRemoved(pqView*);
 
 protected Q_SLOTS:
   void onRenderEnded();
 
-protected:
+protected: // NOLINT(readability-redundant-access-specifiers)
   std::set<pqView*> Views;
 
 private:

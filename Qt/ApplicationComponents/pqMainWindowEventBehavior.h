@@ -50,10 +50,10 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqMainWindowEventBehavior : public QObject
   typedef QObject Superclass;
 
 public:
-  pqMainWindowEventBehavior(QObject* parent = 0);
-  virtual ~pqMainWindowEventBehavior();
+  pqMainWindowEventBehavior(QObject* parent = nullptr);
+  ~pqMainWindowEventBehavior() override;
 
-public Q_SLOTS:
+public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   /**
    * Triggered when a close event occurs on the main window.
    */

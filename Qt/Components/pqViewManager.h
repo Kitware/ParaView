@@ -43,7 +43,7 @@ class PQCOMPONENTS_EXPORT pqViewManager : public pqTabbedMultiViewWidget
   typedef pqTabbedMultiViewWidget Superclass;
 
 public:
-  pqViewManager(QWidget* parentW = 0);
+  pqViewManager(QWidget* parentW = nullptr);
   ~pqViewManager() override;
 
 private:

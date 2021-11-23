@@ -53,7 +53,7 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqListPropertyWidget : public pqPropertyWid
 
 public:
   explicit pqListPropertyWidget(
-    vtkSMProxy* smproxy, vtkSMProperty* smproperty, QWidget* parent = 0);
+    vtkSMProxy* smproxy, vtkSMProperty* smproperty, QWidget* parent = nullptr);
   ~pqListPropertyWidget() override;
 
   /**

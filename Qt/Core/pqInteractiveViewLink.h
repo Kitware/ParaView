@@ -78,7 +78,7 @@ protected:
   // method to set rendered flag to true
   virtual void linkedWindowRendered();
 
-protected Q_SLOTS:
+protected Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
 
   // draw pixels on the front buffer
   virtual void finalRenderDisplayView();

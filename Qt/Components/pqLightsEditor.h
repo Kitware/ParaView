@@ -44,7 +44,7 @@ class PQCOMPONENTS_EXPORT pqLightsEditor : public pqPropertyGroupWidget
   typedef pqPropertyGroupWidget Superclass;
 
 public:
-  pqLightsEditor(vtkSMProxy* proxy, vtkSMPropertyGroup* smGroup, QWidget* parent = 0);
+  pqLightsEditor(vtkSMProxy* proxy, vtkSMPropertyGroup* smGroup, QWidget* parent = nullptr);
   ~pqLightsEditor() override;
 
 protected Q_SLOTS:

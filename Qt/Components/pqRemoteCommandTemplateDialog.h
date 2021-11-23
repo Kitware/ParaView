@@ -31,7 +31,7 @@ public:
 private Q_SLOTS:
   void SetModified() { ++this->Modified; }
 
-private:
+private: // NOLINT(readability-redundant-access-specifiers)
   int Modified;
   pqRemoteCommandTemplateDialogUI* Ui;
 };

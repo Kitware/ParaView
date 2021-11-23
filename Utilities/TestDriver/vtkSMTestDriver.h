@@ -47,7 +47,8 @@ protected:
   int ProcessCommandLine(int argc, char* argv[]);
   void CollectConfiguredOptions();
   void CreateCommandLine(std::vector<const char*>& commandLine, const char* paraView,
-    ProcessType type, const char* numProc, int argStart = 0, int argEnd = 0, char* argv[] = 0);
+    ProcessType type, const char* numProc, int argStart = 0, int argEnd = 0,
+    char* argv[] = nullptr);
 
   int StartProcessAndWait(vtksysProcess* server, const char* name, std::vector<char>& out,
     std::vector<char>& err, const char* string_to_wait_for, std::string& matched_line);

@@ -61,7 +61,7 @@ public:
    * Create a link editor to create/edit a link.
    * Initial values are retrieved from the provided vtkSMLink.
    */
-  pqLinksEditor(vtkSMLink* link, QWidget* p = 0);
+  pqLinksEditor(vtkSMLink* link, QWidget* p = nullptr);
 
   /**
    * Destroy this dialog
@@ -118,7 +118,7 @@ private Q_SLOTS:
   void updateSelectedProxies();
   void updateEnabledState();
 
-private:
+private: // NOLINT(readability-redundant-access-specifiers)
   class pqLinksEditorProxyModel;
   void updatePropertyList(QListWidget* tw, vtkSMProxy* proxy);
 

@@ -108,7 +108,7 @@ public:
   ///@}
 protected:
   vtkPVDataMover();
-  ~vtkPVDataMover();
+  ~vtkPVDataMover() override;
 
 private:
   vtkPVDataMover(const vtkPVDataMover&) = delete;

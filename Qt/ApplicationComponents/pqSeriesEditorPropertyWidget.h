@@ -84,7 +84,8 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqSeriesEditorPropertyWidget : public pqPro
   typedef pqPropertyWidget Superclass;
 
 public:
-  pqSeriesEditorPropertyWidget(vtkSMProxy* proxy, vtkSMPropertyGroup* smgroup, QWidget* parent = 0);
+  pqSeriesEditorPropertyWidget(
+    vtkSMProxy* proxy, vtkSMPropertyGroup* smgroup, QWidget* parent = nullptr);
   ~pqSeriesEditorPropertyWidget() override;
 
   //@{
@@ -244,7 +245,7 @@ private Q_SLOTS:
    */
   void onPresetChanged(const QString& name);
 
-private:
+private: // NOLINT(readability-redundant-access-specifiers)
   Q_DISABLE_COPY(pqSeriesEditorPropertyWidget)
 
   class pqInternals;

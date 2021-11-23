@@ -51,7 +51,7 @@ public:
 
 protected:
   vtkCPXMLPWriterPipeline();
-  virtual ~vtkCPXMLPWriterPipeline();
+  ~vtkCPXMLPWriterPipeline() override;
 
 private:
   vtkCPXMLPWriterPipeline(const vtkCPXMLPWriterPipeline&) = delete;

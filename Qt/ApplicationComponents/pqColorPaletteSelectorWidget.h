@@ -63,7 +63,8 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqColorPaletteSelectorWidget : public pqPro
   typedef pqPropertyWidget Superclass;
 
 public:
-  pqColorPaletteSelectorWidget(vtkSMProxy* smproxy, vtkSMProperty* smproperty, QWidget* parent = 0);
+  pqColorPaletteSelectorWidget(
+    vtkSMProxy* smproxy, vtkSMProperty* smproperty, QWidget* parent = nullptr);
   ~pqColorPaletteSelectorWidget() override;
 
   QString paletteName() const;
@@ -75,7 +76,7 @@ Q_SIGNALS:
 private Q_SLOTS:
   void loadPalette(int);
 
-private:
+private: // NOLINT(readability-redundant-access-specifiers)
   Q_DISABLE_COPY(pqColorPaletteSelectorWidget)
   QPointer<QComboBox> ComboBox;
 };

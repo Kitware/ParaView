@@ -50,12 +50,12 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqAnimationTimeToolbar : public QToolBar
   typedef QToolBar Superclass;
 
 public:
-  pqAnimationTimeToolbar(const QString& _title, QWidget* _parent = 0)
+  pqAnimationTimeToolbar(const QString& _title, QWidget* _parent = nullptr)
     : Superclass(_title, _parent)
   {
     this->constructor();
   }
-  pqAnimationTimeToolbar(QWidget* _parent = 0)
+  pqAnimationTimeToolbar(QWidget* _parent = nullptr)
     : Superclass(_parent)
   {
     this->constructor();
@@ -73,7 +73,7 @@ private Q_SLOTS:
    */
   void updateTimeDisplay();
 
-private:
+private: // NOLINT(readability-redundant-access-specifiers)
   Q_DISABLE_COPY(pqAnimationTimeToolbar)
   void constructor();
   QPointer<pqAnimationTimeWidget> AnimationTimeWidget;

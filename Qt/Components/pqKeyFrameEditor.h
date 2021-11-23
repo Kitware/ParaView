@@ -62,7 +62,7 @@ public:
   void setValuesOnly(bool);
   bool valuesOnly() const;
 
-public Q_SLOTS:
+public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   /**
    * read the key frame data and display it
    */
@@ -79,7 +79,7 @@ private Q_SLOTS:
   void useCurrentCamera(QObject*);
   void updateCurrentCamera(QObject*);
 
-private:
+private: // NOLINT(readability-redundant-access-specifiers)
   class pqInternal;
   pqInternal* Internal;
 };

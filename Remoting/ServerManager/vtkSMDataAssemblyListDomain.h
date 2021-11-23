@@ -54,7 +54,7 @@ public:
 
 protected:
   vtkSMDataAssemblyListDomain();
-  ~vtkSMDataAssemblyListDomain();
+  ~vtkSMDataAssemblyListDomain() override;
 
 private:
   vtkSMDataAssemblyListDomain(const vtkSMDataAssemblyListDomain&) = delete;

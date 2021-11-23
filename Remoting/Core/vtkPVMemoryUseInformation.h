@@ -80,7 +80,6 @@ private:
     }
     void Print();
 
-  public:
     int ProcessType;
     int Rank;
     long long ProcMemUse;
@@ -88,7 +87,6 @@ private:
   };
   vector<MemInfo> MemInfos;
 
-private:
   vtkPVMemoryUseInformation(const vtkPVMemoryUseInformation&) = delete;
   void operator=(const vtkPVMemoryUseInformation&) = delete;
 };

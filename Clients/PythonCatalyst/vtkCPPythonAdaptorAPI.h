@@ -34,7 +34,7 @@ public:
 
 protected:
   vtkCPPythonAdaptorAPI();
-  ~vtkCPPythonAdaptorAPI();
+  ~vtkCPPythonAdaptorAPI() override;
 
 private:
   vtkCPPythonAdaptorAPI(const vtkCPPythonAdaptorAPI&) = delete;

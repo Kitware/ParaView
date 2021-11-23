@@ -47,7 +47,7 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqColorTableModel : public QAbstractTableMo
   typedef QAbstractTableModel Superclass;
 
 public:
-  pqColorTableModel(pqColorOpacityEditorWidget* widget, QObject* parentObject = 0);
+  pqColorTableModel(pqColorOpacityEditorWidget* widget, QObject* parentObject = nullptr);
 
   ~pqColorTableModel() override;
 

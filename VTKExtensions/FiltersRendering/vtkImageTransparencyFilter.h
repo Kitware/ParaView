@@ -42,16 +42,15 @@ public:
   vtkTypeMacro(vtkImageTransparencyFilter, vtkImageAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  virtual int RequestData(vtkInformation* request, vtkInformationVector** inputVector,
+  int RequestData(vtkInformation* request, vtkInformationVector** inputVector,
     vtkInformationVector* outputVector) override;
 
 protected:
   // Override to set two inputs
   int FillInputPortInformation(int port, vtkInformation* info) override;
 
-protected:
   vtkImageTransparencyFilter();
-  ~vtkImageTransparencyFilter();
+  ~vtkImageTransparencyFilter() override;
 
 private:
   vtkImageTransparencyFilter(const vtkImageTransparencyFilter&) = delete;

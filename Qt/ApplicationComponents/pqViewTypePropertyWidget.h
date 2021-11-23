@@ -50,7 +50,7 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqViewTypePropertyWidget : public pqPropert
   Q_PROPERTY(QString value READ value WRITE setValue);
 
 public:
-  pqViewTypePropertyWidget(vtkSMProxy* proxy, vtkSMProperty* smproperty, QWidget* parent = 0);
+  pqViewTypePropertyWidget(vtkSMProxy* proxy, vtkSMProperty* smproperty, QWidget* parent = nullptr);
   ~pqViewTypePropertyWidget() override;
 
   /**
@@ -58,7 +58,7 @@ public:
    */
   QString value() const;
 
-public Q_SLOTS:
+public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   /**
    * set the value for the widget.
    */

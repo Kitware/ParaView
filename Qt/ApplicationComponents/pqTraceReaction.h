@@ -69,7 +69,7 @@ protected:
    */
   void onTriggered() override;
 
-protected Q_SLOTS:
+protected Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   virtual void updateTrace();
 
 private:
