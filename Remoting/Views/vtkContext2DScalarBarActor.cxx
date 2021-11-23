@@ -126,7 +126,7 @@ vtkContext2DScalarBarActor::vtkContext2DScalarBarActor()
   this->RangeLabelFormat = nullptr;
   this->SetRangeLabelFormat("%g");
 
-  this->OutlineScalarBar = 0;
+  this->DrawScalarBarOutline = true;
 
   this->Spacer = 4.0;
 
@@ -670,7 +670,7 @@ void vtkContext2DScalarBarActor::PaintColorBar(vtkContext2D* painter, double siz
     // Finally, draw a rect around the scalar bar and out-of-range
     // colors, if they are enabled.  We should probably draw four
     // lines instead.
-    if (this->OutlineScalarBar)
+    if (this->DrawScalarBarOutline)
     {
       vtkRectf outlineRect = this->GetFullColorBarRect(size);
 

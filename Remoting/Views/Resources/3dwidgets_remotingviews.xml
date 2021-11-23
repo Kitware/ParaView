@@ -593,6 +593,7 @@
             <Property name="NanAnnotation" panel_visibility="advanced" />
             <Property name="TextPosition" />
             <Property name="ReverseLegend" />
+            <Property name="DrawScalarBarOutline" />
             <Property name="ScalarBarThickness" />
             <Property name="ScalarBarLength" />
           </PropertyGroup>
