@@ -2661,14 +2661,16 @@ class ProxyNamespace:
         self.session = session
 
     @staticmethod
-    def _getPyName(xml=None, smproxy=None):
+    def _getPyName(xml=None, smproxy=None, proxyname=None):
         """In ProxyNamespace, the proxies are named not using their XML name as
         provided in the definition, but using a sanitized version of their
         label. This change happened in ParaView 3.5. This method returns the
         name to use given a proxy definition XML or a proxy itself based on the
         compatibility version set."""
-        assert xml or smproxy
-        if paraview.compatibility.GetVersion() >= 3.5:
+        assert xml or smproxy or proxyname
+        if proxyname:
+            name = proxyname
+        elif paraview.compatibility.GetVersion() >= 3.5:
             if xml:
                 name = xml.GetAttributeOrDefault("label", xml.GetAttribute("name"))
             elif smproxy:
@@ -2687,7 +2689,10 @@ class ProxyNamespace:
         for group in self.xmlGroups:
             pditer = ProxyDefinitionIterator(pdm.NewSingleGroupIterator(group, pdm.ALL_DEFINITIONS))
             for item in pditer:
-                pname = self._getPyName(xml=item["xml"])
+                if (item["xml"].GetAttribute("name")):
+                    pname = self._getPyName(xml=item["xml"])
+                else:
+                    pname = self._getPyName(proxyname=pditer.GetProxyName())
                 if name and pname == name:
                     return item
                 elif xmlname and xmlname == item["key"]:
@@ -2700,7 +2705,10 @@ class ProxyNamespace:
         for group in self.xmlGroups:
             pditer = ProxyDefinitionIterator(pdm.NewSingleGroupIterator(group, pdm.ALL_DEFINITIONS))
             for item in pditer:
-                s.add(self._getPyName(xml=item["xml"]))
+                if (item["xml"].GetAttribute("name")):
+                    s.add(self._getPyName(xml=item["xml"]))
+                else:
+                    s.add(self._getPyName(proxyname=pditer.GetProxyName()))
         return s
 
     def __getattr__(self, name):
