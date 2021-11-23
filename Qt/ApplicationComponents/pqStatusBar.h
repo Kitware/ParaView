@@ -34,12 +34,18 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QStatusBar>
 
+#include "vtkNew.h"
+
 #include "pqApplicationComponentsModule.h"
+
+class vtkPVSystemConfigInformation;
+class QProgressBar;
 
 /**
  * pqStatusBar extends QStatusBar to support showing paraview progress.
  * It uses pqProgressManager provided by pqApplicationCore to show the
  * progress values. Internally uses pqProgressWidget to show the progress.
+ * It also shows a memory status bar that automatically updates.
  */
 class PQAPPLICATIONCOMPONENTS_EXPORT pqStatusBar : public QStatusBar
 {
@@ -49,6 +55,14 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqStatusBar : public QStatusBar
 public:
   pqStatusBar(QWidget* parent = 0);
   ~pqStatusBar() override;
+
+protected Q_SLOTS:
+  void updateServerConfigInfo();
+  void updateMemoryProgressBar();
+
+protected:
+  vtkNew<vtkPVSystemConfigInformation> ServerConfigsInfo;
+  QProgressBar* MemoryProgressBar;
 
 private:
   Q_DISABLE_COPY(pqStatusBar)

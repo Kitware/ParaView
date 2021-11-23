@@ -102,8 +102,25 @@ pqActiveObjects::~pqActiveObjects() = default;
 //-----------------------------------------------------------------------------
 void pqActiveObjects::resetActives()
 {
+  if (auto port = ::getPortFromPipelineProxy(this->ActivePipelineProxy))
+  {
+    port->disconnect(this);
+    auto source = port->getSource();
+    source->disconnect(this);
+  }
+
   this->ActivePipelineProxy = nullptr;
+
+  if (this->ActiveView)
+  {
+    this->ActiveView->disconnect(this);
+  }
   this->ActiveView = nullptr;
+
+  if (this->ActiveRepresentation)
+  {
+    this->ActiveRepresentation->disconnect(this);
+  }
   this->ActiveRepresentation = nullptr;
   this->Selection.clear();
 }
@@ -240,17 +257,20 @@ void pqActiveObjects::viewSelectionChanged()
 
   if (this->ActiveView)
   {
-    QObject::disconnect(this->ActiveView, nullptr, this, nullptr);
-  }
-  if (view)
-  {
-    QObject::connect(view, SIGNAL(representationAdded(pqRepresentation*)), this,
-      SLOT(updateRepresentation()), Qt::UniqueConnection);
-    QObject::connect(view, SIGNAL(representationRemoved(pqRepresentation*)), this,
-      SLOT(updateRepresentation()), Qt::UniqueConnection);
+    this->ActiveView->disconnect(this);
   }
 
   this->ActiveView = view;
+
+  if (this->ActiveView)
+  {
+    this->connect(this->ActiveView, SIGNAL(representationAdded(pqRepresentation*)),
+      SLOT(updateRepresentation()), Qt::UniqueConnection);
+    this->connect(this->ActiveView, SIGNAL(representationRemoved(pqRepresentation*)),
+      SLOT(updateRepresentation()), Qt::UniqueConnection);
+    this->connect(
+      this->ActiveView, SIGNAL(dataUpdated()), SIGNAL(viewUpdated()), Qt::UniqueConnection);
+  }
 
   // if view changed, then the active representation may have changed as well.
   this->updateRepresentation();
@@ -296,7 +316,8 @@ void pqActiveObjects::sourceSelectionChanged()
     this->connect(port, SIGNAL(representationAdded(pqOutputPort*, pqDataRepresentation*)),
       SLOT(updateRepresentation()));
     auto source = port->getSource();
-    this->connect(source, SIGNAL(dataUpdated(pqPipelineSource*)), SIGNAL(dataUpdated()));
+    this->connect(
+      source, SIGNAL(dataUpdated(pqPipelineSource*)), SIGNAL(dataUpdated()), Qt::UniqueConnection);
   }
 
   // Update the Selection.
@@ -487,10 +508,21 @@ void pqActiveObjects::setSelection(
 //-----------------------------------------------------------------------------
 void pqActiveObjects::updateRepresentation()
 {
+  if (this->ActiveRepresentation)
+  {
+    QObject::disconnect(
+      this->ActiveRepresentation, SIGNAL(updated()), this, SIGNAL(representationUpdated()));
+  }
+
   pqOutputPort* port = this->activePort();
   if (port)
   {
     this->ActiveRepresentation = port->getRepresentation(this->activeView());
+    if (this->ActiveRepresentation)
+    {
+      this->connect(this->ActiveRepresentation, SIGNAL(updated()), SIGNAL(representationUpdated()),
+        Qt::UniqueConnection);
+    }
   }
   else
   {
