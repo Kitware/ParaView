@@ -72,11 +72,6 @@ protected:
   void onTriggered() override { this->exportActiveView(); }
 
 private:
-  /**
-   * Creates a dialog widget containing the predefined proxyWidget.
-   */
-  QDialog* createConfigurationDialog(pqProxyWidget* proxyWidget);
-
   pqView* ConnectedView;
 
   Q_DISABLE_COPY(pqExportReaction)
