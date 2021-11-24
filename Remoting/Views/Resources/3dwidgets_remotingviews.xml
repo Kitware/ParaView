@@ -576,6 +576,7 @@
           <PropertyGroup label="Background Options">
             <Property name="DrawBackground" />
             <Property name="BackgroundColor" />
+            <Property name="BackgroundPadding" />
             <Property name="DrawScalarBarOutline" />
             <Property name="ScalarBarOutlineColor" />
             <Property name="ScalarBarOutlineThickness" />

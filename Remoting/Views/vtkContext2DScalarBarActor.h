@@ -144,6 +144,15 @@ public:
 
   //@{
   /**
+   * Set the padding to add to the background rectangle past the contents of
+   * the color legend contents.
+   */
+  //@}
+  vtkSetMacro(BackgroundPadding, double);
+  vtkGetMacro(BackgroundPadding, double);
+
+  //@{
+  /**
    * Set whether the scalar bar is reversed ie from high
    * to low instead of from low to high. Default is false;
    */
@@ -289,6 +298,11 @@ private:
    * Background Color. Includes opacity in the fourth element.
    */
   double BackgroundColor[4];
+
+  /**
+   * Padding to add to the background rectangle around the contents of the color legend.
+   */
+  double BackgroundPadding;
 
   /**
    * Length of the color bar.

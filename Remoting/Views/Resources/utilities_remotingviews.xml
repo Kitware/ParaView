@@ -1621,6 +1621,19 @@
           </PropertyWidgetDecorator>
         </Hints>
       </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetBackgroundPadding"
+                            default_values="2.0"
+                            name="BackgroundPadding"
+                            number_of_elements="1">
+        <DoubleRangeDomain min="0" />
+        <Documentation>Set the amount of padding around the outermost elements of the
+        color legend when the background is drawn.</Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="ShowWidgetDecorator">
+            <Property name="DrawBackground" function="boolean" index="0" />
+          </PropertyWidgetDecorator>
+        </Hints>
+      </DoubleVectorProperty>
       <IntVectorProperty command="SetScalarBarThickness"
                          default_values="16"
                          name="ScalarBarThickness"

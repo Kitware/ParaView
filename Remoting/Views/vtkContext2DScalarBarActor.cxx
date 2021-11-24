@@ -138,6 +138,8 @@ vtkContext2DScalarBarActor::vtkContext2DScalarBarActor()
   this->BackgroundColor[2] = 1.0;
   this->BackgroundColor[3] = 0.5;
 
+  this->BackgroundPadding = 2.0;
+
   this->Spacer = 4.0;
 
   this->DrawTickMarks = true;
@@ -1117,8 +1119,10 @@ bool vtkContext2DScalarBarActor::Paint(vtkContext2D* painter)
     pen->SetLineType(vtkPen::NO_PEN);
     brush->SetColorF(this->BackgroundColor[0], this->BackgroundColor[1], this->BackgroundColor[2],
       this->BackgroundColor[3]);
-    painter->DrawRect(this->CurrentBoundingRect.GetX(), this->CurrentBoundingRect.GetY(),
-      this->CurrentBoundingRect.GetWidth(), this->CurrentBoundingRect.GetHeight());
+    painter->DrawRect(this->CurrentBoundingRect.GetX() - this->BackgroundPadding,
+      this->CurrentBoundingRect.GetY() - this->BackgroundPadding,
+      this->CurrentBoundingRect.GetWidth() + 2.0 * this->BackgroundPadding,
+      this->CurrentBoundingRect.GetHeight() + 2.0 * this->BackgroundPadding);
   }
 
   this->PaintColorBar(painter, size);
