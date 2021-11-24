@@ -135,6 +135,15 @@ public:
 
   //@{
   /**
+   * Set color of background to draw behind the color bar. First three components,
+   * specify RGB color components, opacity is the fourth element.
+   */
+  //@}
+  vtkSetVector4Macro(BackgroundColor, double);
+  vtkGetVector4Macro(BackgroundColor, double);
+
+  //@{
+  /**
    * Set whether the scalar bar is reversed ie from high
    * to low instead of from low to high. Default is false;
    */
@@ -277,6 +286,11 @@ private:
   int ScalarBarThickness;
 
   /**
+   * Background Color. Includes opacity in the fourth element.
+   */
+  double BackgroundColor[4];
+
+  /**
    * Length of the color bar.
    */
   double ScalarBarLength;
@@ -330,6 +344,20 @@ private:
    * Axis for value labels, etc.
    */
   vtkAxis* Axis;
+
+  /**
+   * Keep track of whether we are currently computing the bounds.
+   */
+  bool InGetBoundingRect;
+
+  /**
+   * Stores the rect containing the full scalar bar actor.
+   * This needs to be computed before painting to figure out how large a
+   * background rectangle should be, but computing it during painting
+   * leads to an infinite recursion, so we compute it in RenderOverlay()
+   * before painting.
+   */
+  vtkRectf CurrentBoundingRect;
 
   /**
    * Update the image data used to display the colors in a continuous
@@ -391,7 +419,7 @@ private:
   void PaintAxis(vtkContext2D* painter, double size[2]);
 
   /**
-   * Set up the axis title.
+   * Set up the axis title. Returns the bounding rect of all elements in the color legend.
    */
   void PaintTitle(vtkContext2D* painter, double size[2]);
 

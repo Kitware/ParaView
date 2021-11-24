@@ -30,14 +30,6 @@
 
 #include "vtkContext2DScalarBarActor.h"
 
-//#define DEBUG_BOUNDING_BOX
-#if defined(DEBUG_BOUNDING_BOX)
-#include "vtkBrush.h"
-#include "vtkContext2D.h"
-#include "vtkContextDevice2D.h"
-#include "vtkPen.h"
-#endif
-
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVScalarBarRepresentation);
 
@@ -63,26 +55,6 @@ int vtkPVScalarBarRepresentation::RenderOverlay(vtkViewport* viewport)
   }
 
   vtkRectf boundingRect = actor->GetBoundingRect();
-
-#if defined(DEBUG_BOUNDING_BOX)
-  vtkNew<vtkContext2D> context;
-  vtkNew<vtkContextDevice2D> contextDevice;
-  contextDevice->Begin(viewport);
-  context->Begin(contextDevice.Get());
-  vtkPen* pen = context->GetPen();
-  pen->SetColor(255, 255, 255);
-  vtkBrush* brush = context->GetBrush();
-  brush->SetOpacityF(0.0);
-  double xx = this->PositionCoordinate->GetValue()[0];
-  double yy = this->PositionCoordinate->GetValue()[1];
-  viewport->NormalizedViewportToViewport(xx, yy);
-  viewport->ViewportToNormalizedDisplay(xx, yy);
-  viewport->NormalizedDisplayToDisplay(xx, yy);
-  context->DrawRect(xx + boundingRect.GetX(), yy + boundingRect.GetY(), boundingRect.GetWidth(),
-    boundingRect.GetHeight());
-  context->End();
-  contextDevice->End();
-#endif
 
   // Start with Lower Right corner.
   int* displaySize = viewport->GetSize();

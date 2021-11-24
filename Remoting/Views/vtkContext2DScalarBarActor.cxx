@@ -132,6 +132,12 @@ vtkContext2DScalarBarActor::vtkContext2DScalarBarActor()
   this->ScalarBarOutlineColor[2] = 1.0;
   this->ScalarBarOutlineThickness = 1;
 
+  this->DrawBackground = false;
+  this->BackgroundColor[0] = 1.0;
+  this->BackgroundColor[1] = 1.0;
+  this->BackgroundColor[2] = 1.0;
+  this->BackgroundColor[3] = 0.5;
+
   this->Spacer = 4.0;
 
   this->DrawTickMarks = true;
@@ -153,6 +159,8 @@ vtkContext2DScalarBarActor::vtkContext2DScalarBarActor()
 
   this->Axis = vtkAxis::New();
   this->Axis->SetScene(localScene);
+
+  this->InGetBoundingRect = false;
 }
 
 //----------------------------------------------------------------------------
@@ -197,6 +205,8 @@ void vtkContext2DScalarBarActor::SetCustomLabel(vtkIdType index, double value)
 int vtkContext2DScalarBarActor::RenderOverlay(vtkViewport* viewport)
 {
   this->CurrentViewport = viewport;
+
+  this->CurrentBoundingRect = this->GetBoundingRect();
 
   int returnValue = 0;
   if (this->ActorDelegate)
@@ -1101,6 +1111,16 @@ bool vtkContext2DScalarBarActor::Paint(vtkContext2D* painter)
   painter->PushMatrix();
   painter->AppendTransform(tform.GetPointer());
 
+  // Draw background if enabled
+  if (this->DrawBackground && !this->InGetBoundingRect)
+  {
+    pen->SetLineType(vtkPen::NO_PEN);
+    brush->SetColorF(this->BackgroundColor[0], this->BackgroundColor[1], this->BackgroundColor[2],
+      this->BackgroundColor[3]);
+    painter->DrawRect(this->CurrentBoundingRect.GetX(), this->CurrentBoundingRect.GetY(),
+      this->CurrentBoundingRect.GetWidth(), this->CurrentBoundingRect.GetHeight());
+  }
+
   this->PaintColorBar(painter, size);
   this->PaintAxis(painter, size);
   // IMPORTANT: this needs to be done *after* this->Axis->Update() is called
@@ -1119,8 +1139,12 @@ bool vtkContext2DScalarBarActor::Paint(vtkContext2D* painter)
 //----------------------------------------------------------------------------
 vtkRectf vtkContext2DScalarBarActor::GetBoundingRect()
 {
-  return vtkBoundingRectContextDevice2D::GetBoundingRect(
-    this->ScalarBarItem, this->CurrentViewport);
+  this->InGetBoundingRect = true;
+  vtkRectf rect =
+    vtkBoundingRectContextDevice2D::GetBoundingRect(this->ScalarBarItem, this->CurrentViewport);
+  this->InGetBoundingRect = false;
+
+  return rect;
 }
 
 //----------------------------------------------------------------------------

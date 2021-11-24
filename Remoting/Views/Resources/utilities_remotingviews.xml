@@ -1598,6 +1598,29 @@
           color bar.
         </Documentation>
       </IntVectorProperty>
+      <IntVectorProperty command="SetDrawBackground"
+                         name="DrawBackground"
+                         number_of_elements="1"
+                         default_values="0">
+        <BooleanDomain name="bool" />
+        <Documentation>Enable drawing a background behind the color legend.</Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty animateable="0"
+                            command="SetBackgroundColor"
+                            default_values="1 1 1 0.5"
+                            name="BackgroundColor"
+                            panel_widget="color_selector"
+                            number_of_elements="4">
+        <DoubleRangeDomain max="1 1 1 1"
+                           min="0 0 0 0"
+                           name="range" />
+        <Documentation>Set the color and opacity of the background behind the color legend.</Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="ShowWidgetDecorator">
+            <Property name="DrawBackground" function="boolean" index="0" />
+          </PropertyWidgetDecorator>
+        </Hints>
+      </DoubleVectorProperty>
       <IntVectorProperty command="SetScalarBarThickness"
                          default_values="16"
                          name="ScalarBarThickness"
