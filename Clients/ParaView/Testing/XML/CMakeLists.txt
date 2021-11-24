@@ -251,6 +251,7 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/ColorOpacityTableEditorHistogram_T.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/ColorOpacityTableEditorHistogram_U.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/ColorOpacityTableEditorHistogram_V.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/ColorLegendBackground.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/ColorLegendScaledScreenshot.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/ConnectivityCountAscending.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/ConnectivityCountDescending.png}"
@@ -932,6 +933,7 @@ list(APPEND TESTS_WITH_BASELINES
   ColorEditorControls.xml
   ColorEditorVolumeControls.xml
   ColorLegendMinMaxLabels.xml
+  ColorLegendBackground.xml
   ColorOpacityTableEditing.xml
   ColorOpacityEditorFreehandDrawing.xml
   ColorOpacityEditorRangeHandles.xml
@@ -1356,7 +1358,7 @@ if(PARAVIEW_USE_PYTHON)
     list(APPEND TESTS_WITHOUT_BASELINES
       PythonCalculatorOnTable.xml
       )
-    
+
     set(SpreadSheetSelectionTrace_DISABLE_CS TRUE)
     set(SpreadSheetSelectionTrace_DISABLE_CRS TRUE)
 
