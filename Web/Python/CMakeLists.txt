@@ -11,6 +11,7 @@ set(files
   paraview/web/pv_wslink.py
   paraview/web/test_server.py
   paraview/web/vtkjs_helper.py
+  paraview/web/venv.py
 )
 
 vtk_module_add_python_package(ParaView::PVWebPython
