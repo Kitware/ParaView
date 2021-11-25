@@ -253,13 +253,13 @@ bool vtkPVOpenVRHelper::CollaborationConnect()
   auto ovr_rw = vtkVRRenderWindow::SafeDownCast(this->RenderWindow);
   if (ovr_rw)
   {
-    vtkVRModel* cmodel = ovr_rw->GetTrackedDeviceModel(vtkEventDataDevice::LeftController);
+    vtkVRModel* cmodel = ovr_rw->GetModelForDevice(vtkEventDataDevice::LeftController);
     if (cmodel)
     {
       cmodel->GetRay()->AddObserver(
         vtkCommand::ModifiedEvent, this, &vtkPVOpenVRHelper::EventCallback);
     }
-    cmodel = ovr_rw->GetTrackedDeviceModel(vtkEventDataDevice::RightController);
+    cmodel = ovr_rw->GetModelForDevice(vtkEventDataDevice::RightController);
     if (cmodel)
     {
       cmodel->GetRay()->AddObserver(
@@ -275,12 +275,12 @@ bool vtkPVOpenVRHelper::CollaborationDisconnect()
   auto ovr_rw = vtkVRRenderWindow::SafeDownCast(this->RenderWindow);
   if (ovr_rw)
   {
-    vtkVRModel* cmodel = ovr_rw->GetTrackedDeviceModel(vtkEventDataDevice::LeftController);
+    vtkVRModel* cmodel = ovr_rw->GetModelForDevice(vtkEventDataDevice::LeftController);
     if (cmodel)
     {
       cmodel->GetRay()->RemoveObservers(vtkCommand::ModifiedEvent);
     }
-    cmodel = ovr_rw->GetTrackedDeviceModel(vtkEventDataDevice::RightController);
+    cmodel = ovr_rw->GetModelForDevice(vtkEventDataDevice::RightController);
     if (cmodel)
     {
       cmodel->GetRay()->RemoveObservers(vtkCommand::ModifiedEvent);
@@ -450,7 +450,7 @@ void vtkPVOpenVRHelper::ToggleShowControls()
     this->QWidgetWidget->SetInteractor(this->Interactor);
     this->QWidgetWidget->SetCurrentRenderer(this->Renderer);
     this->QWidgetWidget->SetEnabled(1);
-    vtkVRModel* vrmodel = vr_rw->GetTrackedDeviceModel(vtkEventDataDevice::RightController);
+    vtkVRModel* vrmodel = vr_rw->GetModelForDevice(vtkEventDataDevice::RightController);
     vrmodel->SetShowRay(true);
     vrmodel->SetRayLength(this->Renderer->GetActiveCamera()->GetClippingRange()[1]);
   }
@@ -604,7 +604,7 @@ void vtkPVOpenVRHelper::SetRightTriggerMode(std::string const& text)
     return;
   }
 
-  vtkVRModel* vrmodel = vr_rw->GetTrackedDeviceModel(vtkEventDataDevice::RightController);
+  vtkVRModel* vrmodel = vr_rw->GetModelForDevice(vtkEventDataDevice::RightController);
 
   if (vrmodel)
   {
@@ -1154,13 +1154,13 @@ bool vtkPVOpenVRHelper::EventCallback(vtkObject* caller, unsigned long eventID, 
       if (vr_rw && ray)
       {
         // find the model
-        vtkVRModel* model = vr_rw->GetTrackedDeviceModel(vtkEventDataDevice::LeftController);
+        vtkVRModel* model = vr_rw->GetModelForDevice(vtkEventDataDevice::LeftController);
         if (model && model->GetRay() == ray)
         {
           this->CollaborationClient->UpdateRay(model, vtkEventDataDevice::LeftController);
           return false;
         }
-        model = vr_rw->GetTrackedDeviceModel(vtkEventDataDevice::RightController);
+        model = vr_rw->GetModelForDevice(vtkEventDataDevice::RightController);
         if (model && model->GetRay() == ray)
         {
           this->CollaborationClient->UpdateRay(model, vtkEventDataDevice::RightController);
