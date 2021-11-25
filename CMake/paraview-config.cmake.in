@@ -52,21 +52,21 @@ unset("${CMAKE_FIND_PACKAGE_NAME}_FOUND")
 
 set(_paraview_use_external_vtk "@PARAVIEW_USE_EXTERNAL_VTK@")
 set(_paraview_find_package_args)
-if (NOT _paraview_use_external_vtk)
-  list(APPEND _paraview_find_package_args
-    PATHS "${CMAKE_CURRENT_LIST_DIR}/vtk"
-    NO_DEFAULT_PATH)
-endif ()
 if (${CMAKE_FIND_PACKAGE_NAME}_FIND_QUIETLY)
   list(APPEND _paraview_find_package_args
     QUIET)
 endif ()
-find_package(VTK REQUIRED
-  ${_paraview_find_package_args})
-if (NOT VTK_FOUND)
-  set("${CMAKE_FIND_PACKAGE_NAME}_FOUND" 0)
+if (NOT _paraview_use_external_vtk)
+  list(APPEND _paraview_find_package_args
+    PATHS "${CMAKE_CURRENT_LIST_DIR}/vtk"
+    NO_DEFAULT_PATH)
+  # Find VTK with just `CommonCore` to get the available targets first. Only
+  # required for a vendored VTK since external targets are not checked by CMake
+  # later.
+  find_package(VTK REQUIRED
+    ${_paraview_find_package_args}
+    COMPONENTS CommonCore)
 endif ()
-unset(_paraview_find_package_args)
 unset(_paraview_use_external_vtk)
 
 # Find Catalyst
@@ -102,6 +102,78 @@ include("${CMAKE_CURRENT_LIST_DIR}/${CMAKE_FIND_PACKAGE_NAME}Clients-targets.cma
 include("${CMAKE_CURRENT_LIST_DIR}/${CMAKE_FIND_PACKAGE_NAME}Clients-vtk-module-properties.cmake")
 
 include("${CMAKE_CURRENT_LIST_DIR}/ParaViewTools-targets.cmake" OPTIONAL)
+
+# Gather the list of required VTK components.
+set(_paraview_vtk_components_to_request_required)
+set(_paraview_vtk_components_to_request_optional)
+if (${CMAKE_FIND_PACKAGE_NAME}_FIND_COMPONENTS)
+  set(_paraview_search_components
+    "${${CMAKE_FIND_PACKAGE_NAME}_FIND_COMPONENTS}")
+else ()
+  set(_paraview_search_components
+    "@_paraview_all_components@")
+endif ()
+foreach (_paraview_component IN LISTS "${CMAKE_FIND_PACKAGE_NAME}_FIND_COMPONENTS")
+  # Ignore non-existent components here.
+  if (NOT TARGET "ParaView::${_paraview_component}")
+    continue ()
+  endif ()
+
+  # Get all module dependencies.
+  get_property(_paraview_component_depends
+    TARGET "ParaView::${_paraview_component}"
+    PROPERTY "INTERFACE_vtk_module_depends")
+  get_property(_paraview_component_private_depends
+    TARGET "ParaView::${_paraview_component}"
+    PROPERTY "INTERFACE_vtk_module_private_depends")
+  get_property(_paraview_component_optional_depends
+    TARGET "ParaView::${_paraview_component}"
+    PROPERTY "INTERFACE_vtk_module_optional_depends")
+
+  # Keep only VTK dependencies.
+  set(_paraview_component_vtk_depends
+    ${_paraview_component_depends}
+    ${_paraview_component_private_depends}
+    ${_paraview_component_optional_depends})
+  list(FILTER _paraview_component_vtk_depends INCLUDE REGEX "^VTK::")
+  string(REPLACE "VTK::" "" _paraview_component_vtk_depends "${_paraview_component_vtk_depends}")
+  if (${CMAKE_FIND_PACKAGE_NAME}_FIND_REQUIRED_${_paraview_component})
+    list(APPEND _paraview_vtk_components_to_request_required
+      ${_paraview_component_vtk_depends})
+  else ()
+    list(APPEND _paraview_vtk_components_to_request_optional
+      ${_paraview_component_vtk_depends})
+  endif ()
+endforeach ()
+unset(_paraview_component)
+unset(_paraview_component_depends)
+unset(_paraview_component_private_depends)
+unset(_paraview_component_optional_depends)
+unset(_paraview_component_vtk_depends)
+
+# Remove duplicate component requests.
+if (_paraview_vtk_components_to_request_required)
+  list(REMOVE_DUPLICATES _paraview_vtk_components_to_request_required)
+endif ()
+if (_paraview_vtk_components_to_request_optional)
+  list(REMOVE_DUPLICATES _paraview_vtk_components_to_request_optional)
+endif ()
+# Modules which are required should be removed from the optional component
+# list.
+list(REMOVE_ITEM _paraview_vtk_components_to_request_optional
+  ${_paraview_vtk_components_to_request_required})
+
+# Now find VTK with all of the components we require.
+find_package(VTK REQUIRED
+  ${_paraview_find_package_args}
+  COMPONENTS ${_paraview_vtk_components_to_request_required}
+  OPTIONAL_COMPONENTS ${_paraview_vtk_components_to_request_optional})
+if (NOT VTK_FOUND)
+  set("${CMAKE_FIND_PACKAGE_NAME}_FOUND" 0)
+endif ()
+unset(_paraview_find_package_args)
+unset(_paraview_vtk_components_to_request_required)
+unset(_paraview_vtk_components_to_request_optional)
 
 include("${CMAKE_CURRENT_LIST_DIR}/ParaViewClient.cmake")
 include("${CMAKE_CURRENT_LIST_DIR}/ParaViewPlugin.cmake")

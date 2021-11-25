@@ -16,6 +16,8 @@ if (TARGET ParaView::catalyst-paraview)
     PROPERTY paraview_catalyst_directory)
 endif ()
 
+string(REPLACE "ParaView::" "" _paraview_all_components "${paraview_modules};${paraview_client_modules}")
+
 configure_file(
   "${paraview_cmake_dir}/paraview-config.cmake.in"
   "${paraview_cmake_build_dir}/paraview-config.cmake"
