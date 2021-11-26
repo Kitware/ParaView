@@ -398,8 +398,7 @@ def setattr(proxy, pname, value):
                     "removed in ParaView 5.10. Please set the lower and upper "
                     "thresholds using the 'LowerThreshold' and 'UpperThreshold' "
                     "properties, then set the 'ThresholdMethod' property to "
-                    "'vtkThreshold.THRESHOLD_BETWEEN' to threshold between the "
-                    "lower and upper thresholds.")
+                    "'Between' to threshold between the lower and upper thresholds.")
 
     if not hasattr(proxy, pname):
         raise AttributeError()
@@ -816,8 +815,7 @@ def getattr(proxy, pname):
                     "removed in ParaView 5.10. Please set the lower and upper "
                     "thresholds using the 'LowerThreshold' and 'UpperThreshold' "
                     "properties, then set the 'ThresholdMethod' property to "
-                    "'vtkThreshold.THRESHOLD_BETWEEN' to threshold between the "
-                    "lower and upper thresholds.")
+                    "'Between' to threshold between the lower and upper thresholds.")
 
     raise Continue()
 
