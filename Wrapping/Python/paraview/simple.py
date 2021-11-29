@@ -1969,7 +1969,6 @@ def CreateScalarBar(**params):
     By default the returned widget is selectable and resizable.
     """
     sb = servermanager.rendering.ScalarBarWidgetRepresentation()
-    servermanager.Register(sb)
     sb.Selectable = 1
     sb.Resizable = 1
     sb.Enabled = 1
