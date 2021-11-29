@@ -573,6 +573,17 @@
                       number_of_elements="1" default_values="16"/>
           </PropertyGroup>
 
+          <PropertyGroup label="Appearance">
+            <Property name="ScalarBarThickness" />
+            <Property name="ScalarBarLength" />
+            <Property name="DrawBackground" panel_visibility="advanced" />
+            <Property name="BackgroundColor" panel_visibility="advanced" />
+            <Property name="BackgroundPadding" panel_visibility="advanced" />
+            <Property name="DrawScalarBarOutline" panel_visibility="advanced" />
+            <Property name="ScalarBarOutlineColor" panel_visibility="advanced" />
+            <Property name="ScalarBarOutlineThickness" panel_visibility="advanced" />
+          </PropertyGroup>
+
           <PropertyGroup label="Labels">
             <Property name="AutomaticLabelFormat" panel_visibility="advanced" />
             <Property name="LabelFormat" panel_visibility="advanced" />
@@ -582,7 +593,6 @@
             <Property name="CustomLabels" panel_visibility="advanced" />
             <Property name="AddRangeLabels" panel_visibility="advanced" />
             <Property name="RangeLabelFormat" panel_visibility="advanced" />
-
           </PropertyGroup>
 
           <PropertyGroup label="Annotations">
@@ -593,8 +603,6 @@
             <Property name="NanAnnotation" panel_visibility="advanced" />
             <Property name="TextPosition" />
             <Property name="ReverseLegend" />
-            <Property name="ScalarBarThickness" />
-            <Property name="ScalarBarLength" />
           </PropertyGroup>
         </ExposedProperties>
       </SubProxy>

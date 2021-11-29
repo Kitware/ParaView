@@ -126,7 +126,19 @@ vtkContext2DScalarBarActor::vtkContext2DScalarBarActor()
   this->RangeLabelFormat = nullptr;
   this->SetRangeLabelFormat("%g");
 
-  this->OutlineScalarBar = 0;
+  this->DrawScalarBarOutline = true;
+  this->ScalarBarOutlineColor[0] = 1.0;
+  this->ScalarBarOutlineColor[1] = 1.0;
+  this->ScalarBarOutlineColor[2] = 1.0;
+  this->ScalarBarOutlineThickness = 1;
+
+  this->DrawBackground = false;
+  this->BackgroundColor[0] = 1.0;
+  this->BackgroundColor[1] = 1.0;
+  this->BackgroundColor[2] = 1.0;
+  this->BackgroundColor[3] = 0.5;
+
+  this->BackgroundPadding = 2.0;
 
   this->Spacer = 4.0;
 
@@ -149,6 +161,8 @@ vtkContext2DScalarBarActor::vtkContext2DScalarBarActor()
 
   this->Axis = vtkAxis::New();
   this->Axis->SetScene(localScene);
+
+  this->InGetBoundingRect = false;
 }
 
 //----------------------------------------------------------------------------
@@ -193,6 +207,8 @@ void vtkContext2DScalarBarActor::SetCustomLabel(vtkIdType index, double value)
 int vtkContext2DScalarBarActor::RenderOverlay(vtkViewport* viewport)
 {
   this->CurrentViewport = viewport;
+
+  this->CurrentBoundingRect = this->GetBoundingRect();
 
   int returnValue = 0;
   if (this->ActorDelegate)
@@ -670,12 +686,14 @@ void vtkContext2DScalarBarActor::PaintColorBar(vtkContext2D* painter, double siz
     // Finally, draw a rect around the scalar bar and out-of-range
     // colors, if they are enabled.  We should probably draw four
     // lines instead.
-    if (this->OutlineScalarBar)
+    if (this->DrawScalarBarOutline)
     {
       vtkRectf outlineRect = this->GetFullColorBarRect(size);
 
       brush->SetOpacity(0);
       pen->SetLineType(vtkPen::SOLID_LINE);
+      pen->SetColorF(this->ScalarBarOutlineColor);
+      pen->SetWidth(static_cast<float>(this->ScalarBarOutlineThickness));
       painter->DrawRect(
         outlineRect.GetX(), outlineRect.GetY(), outlineRect.GetWidth(), outlineRect.GetHeight());
     }
@@ -1095,6 +1113,18 @@ bool vtkContext2DScalarBarActor::Paint(vtkContext2D* painter)
   painter->PushMatrix();
   painter->AppendTransform(tform.GetPointer());
 
+  // Draw background if enabled
+  if (this->DrawBackground && !this->InGetBoundingRect)
+  {
+    pen->SetLineType(vtkPen::NO_PEN);
+    brush->SetColorF(this->BackgroundColor[0], this->BackgroundColor[1], this->BackgroundColor[2],
+      this->BackgroundColor[3]);
+    painter->DrawRect(this->CurrentBoundingRect.GetX() - this->BackgroundPadding,
+      this->CurrentBoundingRect.GetY() - this->BackgroundPadding,
+      this->CurrentBoundingRect.GetWidth() + 2.0 * this->BackgroundPadding,
+      this->CurrentBoundingRect.GetHeight() + 2.0 * this->BackgroundPadding);
+  }
+
   this->PaintColorBar(painter, size);
   this->PaintAxis(painter, size);
   // IMPORTANT: this needs to be done *after* this->Axis->Update() is called
@@ -1113,8 +1143,12 @@ bool vtkContext2DScalarBarActor::Paint(vtkContext2D* painter)
 //----------------------------------------------------------------------------
 vtkRectf vtkContext2DScalarBarActor::GetBoundingRect()
 {
-  return vtkBoundingRectContextDevice2D::GetBoundingRect(
-    this->ScalarBarItem, this->CurrentViewport);
+  this->InGetBoundingRect = true;
+  vtkRectf rect =
+    vtkBoundingRectContextDevice2D::GetBoundingRect(this->ScalarBarItem, this->CurrentViewport);
+  this->InGetBoundingRect = false;
+
+  return rect;
 }
 
 //----------------------------------------------------------------------------

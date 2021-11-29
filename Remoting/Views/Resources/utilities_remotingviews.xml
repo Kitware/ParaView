@@ -1598,6 +1598,42 @@
           color bar.
         </Documentation>
       </IntVectorProperty>
+      <IntVectorProperty command="SetDrawBackground"
+                         name="DrawBackground"
+                         number_of_elements="1"
+                         default_values="0">
+        <BooleanDomain name="bool" />
+        <Documentation>Enable drawing a background behind the color legend.</Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty animateable="0"
+                            command="SetBackgroundColor"
+                            default_values="1 1 1 0.5"
+                            name="BackgroundColor"
+                            panel_widget="color_selector"
+                            number_of_elements="4">
+        <DoubleRangeDomain max="1 1 1 1"
+                           min="0 0 0 0"
+                           name="range" />
+        <Documentation>Set the color and opacity of the background behind the color legend.</Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="ShowWidgetDecorator">
+            <Property name="DrawBackground" function="boolean" index="0" />
+          </PropertyWidgetDecorator>
+        </Hints>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetBackgroundPadding"
+                            default_values="2.0"
+                            name="BackgroundPadding"
+                            number_of_elements="1">
+        <DoubleRangeDomain min="0" />
+        <Documentation>Set the amount of padding around the outermost elements of the
+        color legend when the background is drawn.</Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="ShowWidgetDecorator">
+            <Property name="DrawBackground" function="boolean" index="0" />
+          </PropertyWidgetDecorator>
+        </Hints>
+      </DoubleVectorProperty>
       <IntVectorProperty command="SetScalarBarThickness"
                          default_values="16"
                          name="ScalarBarThickness"
@@ -1619,6 +1655,42 @@
           horizontal or vertical, respectively.
         </Documentation>
       </DoubleVectorProperty>
+      <IntVectorProperty command="SetDrawScalarBarOutline"
+                         default_values="0"
+                         name="DrawScalarBarOutline"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Draws an outline around the scalar bar.
+        </Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty command="SetScalarBarOutlineColor"
+                            default_values="1 1 1"
+                            name="ScalarBarOutlineColor"
+                            number_of_elements="3"
+                            panel_widget="color_selector">
+        <Documentation>
+          Color of the outline drawn around the scalar bar if it is shown.
+        </Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="ShowWidgetDecorator">
+            <Property name="DrawScalarBarOutline" function="boolean" index="0" />
+          </PropertyWidgetDecorator>
+        </Hints>
+      </DoubleVectorProperty>
+      <IntVectorProperty command="SetScalarBarOutlineThickness"
+                         default_values="1"
+                         name="ScalarBarOutlineThickness"
+                         number_of_elements="1">
+        <Documentation>
+          Set the thickness, in pixels, of the outline drawn around the scalar bar.
+        </Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="ShowWidgetDecorator">
+            <Property name="DrawScalarBarOutline" function="boolean" index="0" />
+          </PropertyWidgetDecorator>
+        </Hints>
+      </IntVectorProperty>
       <IntVectorProperty animateable="0"
                          command="SetReverseLegend"
                          default_values="0"
