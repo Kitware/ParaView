@@ -1967,7 +1967,12 @@ def CreateScalarBar(**params):
         GetRenderView().Representations.append(bar)
 
     By default the returned widget is selectable and resizable.
+    ::deprecated:: 5.10
+    Use :func:`GetScalarBar` instead.
     """
+    import warnings
+    warnings.warn("`CreateScalarBar` is deprecated in ParaView 5.10. Use `GetScalarBar` instead",
+        DeprecationWarning)
     sb = servermanager.rendering.ScalarBarWidgetRepresentation()
     sb.Selectable = 1
     sb.Resizable = 1
