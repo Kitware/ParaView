@@ -1962,7 +1962,7 @@ def CreateScalarBar(**params):
     It is possible to pass the lookup table (and other properties) as arguments
     to this method::
 
-        lt = MakeBlueToRedLt(3.5, 7.5)
+        lt = MakeBlueToRedLT(3.5, 7.5)
         bar = CreateScalarBar(LookupTable=lt, Title="Velocity")
         GetRenderView().Representations.append(bar)
 
