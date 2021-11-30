@@ -120,9 +120,12 @@ public:
    * if the server is nullptr, files are browsed locally
    * the title, and start directory may be specified
    * the filter is a string of semi-colon separated filters
+   * if groupFiles is true, then file sequences are grouped into a file name where the sequence
+   * numbers are replaced by `..`
    */
   pqFileDialog(pqServer* server, QWidget* parent, const QString& title = QString(),
-    const QString& directory = QString(), const QString& filter = QString());
+    const QString& directory = QString(), const QString& filter = QString(),
+    bool groupFiles = true);
   ~pqFileDialog() override;
 
   /**

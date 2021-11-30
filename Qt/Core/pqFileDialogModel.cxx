@@ -363,14 +363,15 @@ public:
   }
 
   /// query the file system for information
-  vtkPVFileInformation* GetData(bool dirListing, const QString& path, bool specialDirs)
+  vtkPVFileInformation* GetData(
+    bool dirListing, const QString& path, bool specialDirs, bool groupFiles = true)
   {
-    return this->GetData(dirListing, this->CurrentPath, path, specialDirs);
+    return this->GetData(dirListing, this->CurrentPath, path, specialDirs, groupFiles);
   }
 
   /// query the file system for information
-  vtkPVFileInformation* GetData(
-    bool dirListing, const QString& workingDir, const QString& path, bool specialDirs)
+  vtkPVFileInformation* GetData(bool dirListing, const QString& workingDir, const QString& path,
+    bool specialDirs, bool groupFiles = true)
   {
     if (this->FileInformationHelperProxy)
     {
@@ -380,6 +381,7 @@ public:
       pqSMAdaptor::setElementProperty(helper->GetProperty("DirectoryListing"), dirListing);
       pqSMAdaptor::setElementProperty(helper->GetProperty("Path"), path.toUtf8());
       pqSMAdaptor::setElementProperty(helper->GetProperty("SpecialDirectories"), specialDirs);
+      pqSMAdaptor::setElementProperty(helper->GetProperty("GroupFileSequences"), groupFiles);
       helper->UpdateVTKObjects();
 
       // get data from server
@@ -393,6 +395,7 @@ public:
       helper->SetPath(path.toUtf8().data());
       helper->SetSpecialDirectories(specialDirs);
       helper->SetWorkingDirectory(workingDir.toUtf8().data());
+      helper->SetGroupFileSequences(groupFiles);
       this->FileInformation->CopyFromObject(helper);
     }
     return this->FileInformation;
@@ -620,12 +623,12 @@ pqServer* pqFileDialogModel::server() const
   return this->Implementation->getServer();
 }
 
-void pqFileDialogModel::setCurrentPath(const QString& path)
+void pqFileDialogModel::setCurrentPath(const QString& path, bool groupFiles)
 {
   this->beginResetModel();
   QString cPath = this->Implementation->cleanPath(path);
   vtkPVFileInformation* info;
-  info = this->Implementation->GetData(true, cPath, false);
+  info = this->Implementation->GetData(true, cPath, false, groupFiles);
   this->Implementation->Update(cPath, info);
   this->endResetModel();
 }

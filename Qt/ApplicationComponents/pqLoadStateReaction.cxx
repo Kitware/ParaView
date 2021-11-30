@@ -145,7 +145,8 @@ void pqLoadStateReaction::loadState()
 #if VTK_MODULE_ENABLE_ParaView_pqPython
     " *.py"
 #endif
-    ");;All files (*)");
+    ");;All files (*)",
+    false /* groupFiles */);
   fileDialog.setObjectName("FileLoadServerStateDialog");
   fileDialog.setFileMode(pqFileDialog::ExistingFile);
   if (fileDialog.exec() == QDialog::Accepted)

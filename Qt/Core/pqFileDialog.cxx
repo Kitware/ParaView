@@ -216,9 +216,9 @@ public:
     return this->Model->getCurrentPath();
   }
 
-  void setCurrentPath(const QString& p)
+  void setCurrentPath(const QString& p, bool groupFiles = true)
   {
-    this->Model->setCurrentPath(p);
+    this->Model->setCurrentPath(p, groupFiles);
     pqServer* s = this->Model->server();
     if (s)
     {
@@ -282,7 +282,7 @@ QString pqFileDialog::pqImplementation::LocalFilePath;
 // pqFileDialog
 
 pqFileDialog::pqFileDialog(pqServer* server, QWidget* p, const QString& title,
-  const QString& startDirectory, const QString& nameFilter)
+  const QString& startDirectory, const QString& nameFilter, bool groupFiles)
   : Superclass(p)
   , Implementation(new pqImplementation(this, server))
 {
@@ -417,7 +417,7 @@ pqFileDialog::pqFileDialog(pqServer* server, QWidget* p, const QString& title,
     startPath = impl.getStartPath();
   }
   impl.addHistory(startPath);
-  impl.setCurrentPath(startPath);
+  impl.setCurrentPath(startPath, groupFiles);
 
   impl.Ui.Files->resizeColumnToContents(0);
   impl.Ui.Files->setTextElideMode(Qt::ElideMiddle);

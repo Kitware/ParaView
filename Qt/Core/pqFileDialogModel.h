@@ -77,9 +77,11 @@ public:
   //@}
 
   /**
-   * Sets the path that the file dialog will display
+   * Sets the path that the file dialog will display.
+   * If groupFiles is true, then file sequences are grouped into a file name where the sequence
+   * numbers are replaced by `..`
    */
-  void setCurrentPath(const QString&);
+  void setCurrentPath(const QString&, bool groupFiles = true);
 
   /**
    * Returns the path the the file dialog will display
