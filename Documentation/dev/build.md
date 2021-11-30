@@ -1,11 +1,13 @@
 # Building ParaView
 
 This page describes how to build and install ParaView. It covers building for
-development, on both Unix-type systems (Linux, HP-UX, Solaris, macOS), and
-Windows. Note that Unix-like environments such as Cygwin and MinGW are not
-officially supported. However, patches to fix problems with these platforms
-will be considered for inclusion. ParaView builds on x86_64, PowerPC, and ARM
-architectures.
+development, on both Linux and Windows. Please Note that Linux (x86_64), Windows (x86_64)
+and macOS (x86_64 and arm64) version are built and tested by our continuous
+integration system and are considered supported environments.
+
+Any other environnements and architecture (including Cygwin, MingGW, PowerPC) are considered
+non-officially supported, however, patches to fix problems with these platforms will
+be considered for inclusion.
 
 ParaView depends on several open source tools and libraries such as Python, Qt,
 CGNS, HDF5, etc. Some of these are included in the ParaView source itself
@@ -287,7 +289,6 @@ Command Prompt" available with Visual Studio in the start menu.
 ParaView has a number of settings available for its build. These are categorized
 as build options, capability options, feature options and miscellaneous options.
 
-
 #### Build Options
 
 Options that impact the build begin with the prefix `PARAVIEW_BUILD_`.
@@ -387,7 +388,6 @@ More advanced / less common options include:
   * `PARAVIEW_ENABLE_COSMOTOOLS` (default `OFF`; requires `PARAVIEW_USE_MPI`
     and not available on Windows): Enable support for CosmoTools which includes
     GenericIO readers and writers as well as some point cloud algorithms.
-
 
 #### Plugin settings
 
