@@ -216,8 +216,7 @@ option(PARAVIEW_ENABLE_ADIOS2 "Enable ADIOS 2.x support." OFF)
 
 option(PARAVIEW_ENABLE_FIDES "Enable Fides support." OFF)
 
-cmake_dependent_option(PARAVIEW_ENABLE_FFMPEG "Enable FFMPEG Support." OFF
-  "UNIX" OFF)
+option(PARAVIEW_ENABLE_FFMPEG "Enable FFMPEG Support." OFF)
 
 # If building on Unix with MPI enabled, we will present another option to
 # enable building of CosmoTools VTK extensions. This option is by default
