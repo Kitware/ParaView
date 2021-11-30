@@ -155,6 +155,11 @@ public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
    */
   void setUseGlobalPrecisionAndNotation(bool value);
 
+  /**
+   * Set whether to always render at full precision
+   */
+  void setAlwaysUseFullPrecision(bool value);
+
 protected:
   void paintEvent(QPaintEvent* evt) override;
   void resizeEvent(QResizeEvent* event) override;

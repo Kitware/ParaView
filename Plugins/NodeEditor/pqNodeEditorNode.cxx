@@ -49,6 +49,12 @@
 #include <QStyleOptionGraphicsItem>
 #include <QVBoxLayout>
 
+// The pqDoubleLineEdit.h file is only included to handle the issue that the
+// simplified notation rendering of pqDoubleLineEdit widgets is currently not
+// working correctly in QT Graphics View Framework and therefore needs to be
+// explicitly disabled.
+#include <pqDoubleLineEdit.h>
+
 pqNodeEditorNode::Verbosity pqNodeEditorNode::DefaultNodeVerbosity{
   pqNodeEditorNode::Verbosity::NORMAL
 };
@@ -132,6 +138,13 @@ pqNodeEditorNode::pqNodeEditorNode(QGraphicsScene* qscene, pqProxy* prx, QGraphi
 
     this->proxyProperties->setObjectName("proxyPropertiesWidget");
     this->proxyProperties->updatePanel();
+
+    // Disable the simplified notation rendering for pqDoubleLineEdit widgets.
+    for (auto element : this->proxyProperties->findChildren<pqDoubleLineEdit*>())
+    {
+      element->setAlwaysUseFullPrecision(true);
+    }
+
     containerLayout->addWidget(this->proxyProperties);
   }
 
