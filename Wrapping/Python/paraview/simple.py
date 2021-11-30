@@ -1972,14 +1972,18 @@ def CreateScalarBar(**params):
     It is possible to pass the lookup table (and other properties) as arguments
     to this method::
 
-        lt = MakeBlueToRedLt(3.5, 7.5)
+        lt = MakeBlueToRedLT(3.5, 7.5)
         bar = CreateScalarBar(LookupTable=lt, Title="Velocity")
         GetRenderView().Representations.append(bar)
 
     By default the returned widget is selectable and resizable.
+    ::deprecated:: 5.10
+    Use :func:`GetScalarBar` instead.
     """
+    import warnings
+    warnings.warn("`CreateScalarBar` is deprecated in ParaView 5.10. Use `GetScalarBar` instead",
+        DeprecationWarning)
     sb = servermanager.rendering.ScalarBarWidgetRepresentation()
-    servermanager.Register(sb)
     sb.Selectable = 1
     sb.Resizable = 1
     sb.Enabled = 1
