@@ -451,6 +451,7 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/ResampleToHyperTreeGrid2DX.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/ResampleToHyperTreeGrid2DY.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/ResampleToHyperTreeGrid2DZ.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/ResampleToLine.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/ResampleWithDataset_A.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/ResampleWithDataset_B.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/ResampleWithDataset_C.png}"
@@ -770,6 +771,7 @@ SET(TESTS_WITH_BASELINES
   MoleculeScalarBar.xml
   PassArrays.xml
   PerlinNoise.xml
+  ResampleToLine.xml
   ReverseSense.xml
   SelectionByArray.xml
   SeriesPreset.xml
