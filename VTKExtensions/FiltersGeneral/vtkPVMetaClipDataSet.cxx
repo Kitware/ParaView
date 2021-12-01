@@ -206,8 +206,9 @@ int vtkPVMetaClipDataSet::RequestDataObject(
     return 0;
   }
 
-  if (vtkHyperTreeGrid::SafeDownCast(
-        inputVector[0]->GetInformationObject(0)->Get(vtkDataObject::DATA_OBJECT())))
+  vtkInformation* info = inputVector[0]->GetInformationObject(0);
+
+  if (info && vtkHyperTreeGrid::SafeDownCast(info->Get(vtkDataObject::DATA_OBJECT())))
   {
     this->SetOutputType(VTK_HYPER_TREE_GRID);
     this->Internal->Clip->SetClipFunction(this->ImplicitFunctions[METACLIP_HYPERTREEGRID]);
