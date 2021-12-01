@@ -177,6 +177,7 @@ set(classes
   vtkSpreadSheetRepresentation
   vtkSpreadSheetView
   vtkStructuredGridVolumeRepresentation
+  vtkSurfaceLICRepresentation
   vtkTextSourceRepresentation
   vtkThreeSliceFilter
   vtkTilesHelper
