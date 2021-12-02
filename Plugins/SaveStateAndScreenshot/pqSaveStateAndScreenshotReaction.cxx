@@ -61,9 +61,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QDateTime>
 #include <QDebug>
 #include <QFileInfo>
-#include <QKeySequence>
 #include <QRegularExpression>
-#include <QShortcut>
 
 #include <array>
 

@@ -344,18 +344,15 @@ pqSplinePropertyWidget::pqSplinePropertyWidget(vtkSMProxy* smproxy, vtkSMPropert
 
   pqPointPickingHelper* pickHelper = new pqPointPickingHelper(QKeySequence(tr("P")), false, this);
   pickHelper->connect(this, SIGNAL(viewChanged(pqView*)), SLOT(setView(pqView*)));
-  pickHelper->connect(this, SIGNAL(widgetVisibilityUpdated(bool)), SLOT(setShortcutEnabled(bool)));
   QObject::connect(pickHelper, &pqPointPickingHelper::pick, pickCurrent);
 
   pqPointPickingHelper* pickHelper2 =
     new pqPointPickingHelper(QKeySequence(tr("Ctrl+P")), true, this);
   pickHelper2->connect(this, SIGNAL(viewChanged(pqView*)), SLOT(setView(pqView*)));
-  pickHelper2->connect(this, SIGNAL(widgetVisibilityUpdated(bool)), SLOT(setShortcutEnabled(bool)));
   QObject::connect(pickHelper2, &pqPointPickingHelper::pick, pickCurrent);
 
   pqPointPickingHelper* pickHelper3 = new pqPointPickingHelper(QKeySequence(tr("1")), false, this);
   pickHelper3->connect(this, SIGNAL(viewChanged(pqView*)), SLOT(setView(pqView*)));
-  pickHelper3->connect(this, SIGNAL(widgetVisibilityUpdated(bool)), SLOT(setShortcutEnabled(bool)));
   QObject::connect(pickHelper3, &pqPointPickingHelper::pick, [&](double x, double y, double z) {
     this->setCurrentRow(internals.Model.setPoint(0, x, y, z));
   });
@@ -363,14 +360,12 @@ pqSplinePropertyWidget::pqSplinePropertyWidget(vtkSMProxy* smproxy, vtkSMPropert
   pqPointPickingHelper* pickHelper4 =
     new pqPointPickingHelper(QKeySequence(tr("Ctrl+1")), true, this);
   pickHelper4->connect(this, SIGNAL(viewChanged(pqView*)), SLOT(setView(pqView*)));
-  pickHelper4->connect(this, SIGNAL(widgetVisibilityUpdated(bool)), SLOT(setShortcutEnabled(bool)));
   QObject::connect(pickHelper4, &pqPointPickingHelper::pick, [&](double x, double y, double z) {
     this->setCurrentRow(internals.Model.setPoint(0, x, y, z));
   });
 
   pqPointPickingHelper* pickHelper5 = new pqPointPickingHelper(QKeySequence(tr("2")), false, this);
   pickHelper5->connect(this, SIGNAL(viewChanged(pqView*)), SLOT(setView(pqView*)));
-  pickHelper5->connect(this, SIGNAL(widgetVisibilityUpdated(bool)), SLOT(setShortcutEnabled(bool)));
   QObject::connect(pickHelper5, &pqPointPickingHelper::pick, [&](double x, double y, double z) {
     this->setCurrentRow(internals.Model.setPoint(-1, x, y, z));
   });
@@ -378,7 +373,6 @@ pqSplinePropertyWidget::pqSplinePropertyWidget(vtkSMProxy* smproxy, vtkSMPropert
   pqPointPickingHelper* pickHelper6 =
     new pqPointPickingHelper(QKeySequence(tr("Ctrl+2")), true, this);
   pickHelper6->connect(this, SIGNAL(viewChanged(pqView*)), SLOT(setView(pqView*)));
-  pickHelper6->connect(this, SIGNAL(widgetVisibilityUpdated(bool)), SLOT(setShortcutEnabled(bool)));
   QObject::connect(pickHelper6, &pqPointPickingHelper::pick, [&](double x, double y, double z) {
     this->setCurrentRow(internals.Model.setPoint(-1, x, y, z));
   });

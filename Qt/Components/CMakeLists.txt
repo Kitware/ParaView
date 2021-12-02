@@ -150,6 +150,7 @@ set(classes
   pqSettingsDialog
   pqShaderReplacementsComboBox
   pqShaderReplacementsSelectorPropertyWidget
+  pqShortcutDecorator
   pqSignalAdaptorKeyFrameType
   pqSignalAdaptorSelectionTreeWidget
   pqSignalAdaptorTreeWidget

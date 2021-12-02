@@ -13,10 +13,12 @@ ExternalData_add_test("${_vtk_build_TEST_DATA_TARGET}"
 
 set(MyTests
   LogViewerWidget.cxx
+  KeySequences.cxx
 )
 
 set(MocSources
   LogViewerWidget.h
+  KeySequences.h
 )
 
 create_test_sourcelist(Tests pqCoreTest.cxx ${MyTests})
