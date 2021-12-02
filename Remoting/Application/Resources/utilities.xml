@@ -474,6 +474,13 @@
                          number_of_elements="1">
         <BooleanDomain name="bool" />
       </IntVectorProperty>
+      <IntVectorProperty command="SetGroupFileSequences"
+                         default_values="1"
+                         name="GroupFileSequences"
+                         panel_visibility="never"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
       <StringVectorProperty command="GetPathSeparator"
                             information_only="1"
                             name="PathSeparator"
