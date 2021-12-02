@@ -131,7 +131,11 @@ class openPMDReader(VTKPythonAlgorithmBase):
         particles = set()
         species = set()
         for idx, iteration in self._series.iterations.items():
-            time = iteration.time()
+            # extract the time
+            if callable(iteration.time):  # prior to openPMD-api 0.13.0
+                time = iteration.time() * iteration.time_unit_SI()
+            else:
+                time = iteration.time * iteration.time_unit_SI
             timevalues.append(time)
             self._timemap[time] = idx
             arrays.update([
@@ -201,7 +205,10 @@ class openPMDReader(VTKPythonAlgorithmBase):
         theta_modes = None
         if var.geometry == io.Geometry.thetaMode:
             theta_modes = 3 # hardcoded, parse from geometry_parameters
-        return (var, np.array(var.grid_spacing)*var.grid_unit_SI, np.array(var.grid_global_offset)*var.grid_unit_SI, theta_modes)
+        return (var,
+            np.array(var.grid_spacing) * var.grid_unit_SI,
+            np.array(var.grid_global_offset) * var.grid_unit_SI,
+            theta_modes)
 
     def _get_num_particles(self, itr, species):
         sp = itr.particles[species]
@@ -240,7 +247,12 @@ class openPMDReader(VTKPythonAlgorithmBase):
             position_arrays.append(pos + off)
 
         flt = np.ravel(position_arrays, order='F')
-        return flt.reshape((flt.shape[0]//3, 3))
+        num_components = len(var) # 1D, 2D and 3D positions
+        flt = flt.reshape((flt.shape[0]//num_components, num_components))
+        # 1D and 2D particles: pad additional components with zero
+        while flt.shape[1] < 3:
+            flt = np.column_stack([flt, np.zeros_like(flt[:, 0])])
+        return flt
 
     def _load_species(self, itr, species, arrays, piece, npieces, ugrid):
         nparticles = self._get_num_particles(itr, species)
@@ -334,7 +346,8 @@ class openPMDReader(VTKPythonAlgorithmBase):
             if not theta_modes:
                 theta_modes = ary[3]
 
-        if theta_modes:
+        # fields/meshes: RZ
+        if theta_modes and shp is not None:
             et.SetWholeExtent(0, shp[0]-1, 0, shp[1]-1, 0, shp[2]-1)
             et.SetSplitModeToZSlab() # note: Y and Z are both fine
             et.SetPiece(piece)
@@ -405,8 +418,19 @@ class openPMDReader(VTKPythonAlgorithmBase):
             #     data.append((name, unit_SI * var[0].load_chunk(chunk_offset, chunk_extent)))
             # self._series.flush()
 
-        else:
-            et.SetWholeExtent(0, shp[0]-1, 0, shp[1]-1, 0, shp[2]-1)
+        # fields/meshes: 1D-3D
+        elif shp is not None:
+            whole_extent = []
+            # interleave shape with zeros
+            for s in shp:
+                whole_extent.append(0)
+                whole_extent.append(s-1)
+            # 1D and 2D data: pad with 0, 0 for extra dimensions
+            while len(whole_extent) < 6:
+                whole_extent.append(0)
+                whole_extent.append(0)
+            et.SetWholeExtent(*whole_extent)
+
             et.SetPiece(piece)
             et.SetNumberOfPieces(npieces)
             et.SetGhostLevel(nghosts)
@@ -416,11 +440,22 @@ class openPMDReader(VTKPythonAlgorithmBase):
             chunk_offset = [ext[0], ext[2], ext[4]]
             chunk_extent = [ext[1] - ext[0] + 1, ext[3] - ext[2] + 1, ext[5] - ext[4] + 1]
 
+            # 1D and 2D data: remove extra dimensions for load
+            del chunk_offset[len(shp):]
+            del chunk_extent[len(shp):]
+
             data = []
             for name, var in arrays:
                 values = self._load_array(var[0], chunk_offset, chunk_extent)
                 self._series.flush()
                 data.append((name, values))
+
+            # 1D and 2D data: pad spacing with extra 1 and grid_offset with
+            # extra 9 values until 3D
+            i = iter(spacing)
+            spacing = [next(i, 1) for _ in range(3)]
+            i = iter(grid_offset)
+            grid_offset = [next(i, 0) for _ in range(3)]
 
             img = vtkImageData()
             img.SetExtent(ext[0], ext[1], ext[2], ext[3], ext[4], ext[5])
@@ -437,6 +472,7 @@ class openPMDReader(VTKPythonAlgorithmBase):
             for name, array in data:
                 imgw.PointData.append(array, name)
 
+        # particles
         itr = self._series.iterations[idx]
         array_by_species = {}
         narrays = self._particlearrayselection.GetNumberOfArrays()
