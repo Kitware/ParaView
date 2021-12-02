@@ -582,6 +582,18 @@ paraview_add_plugin(ElevationFilter
 Simply add these in the server manager XML to expose parameters of the filter
 to the ParaView user.
 
+#### Button property
+
+This property appears as a button containing the text described by the value of the "name" attribute, here: "My Button".
+When a user click on the button, a call to the command, `MyButtonClicked` is performed directly on VTK class associated with the proxy.
+
+```xml
+<Property
+   name="MyButton"
+   command="MyButtonClicked">
+</Property>
+```
+
 #### Integer Property
 
 This property appears as a text box.
