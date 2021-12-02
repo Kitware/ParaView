@@ -1935,7 +1935,6 @@
         whether to merge coincident vertices.</Documentation>
       </IntVectorProperty>
       <Property command="ResetFieldCriteria"
-                immediate_update="1"
                 name="ResetFieldCriteria"></Property>
       <!-- End TessellatorFilter -->
     </SourceProxy>
