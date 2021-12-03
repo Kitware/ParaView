@@ -766,6 +766,7 @@
                proxyname="LogoRepresentation"></Proxy>
         <ExposedProperties>
           <Property name="Visibility" />
+          <Property name="WindowLocation" />
           <Property name="Position" />
           <Property name="Position2" />
           <Property name="PositionInfo" />
@@ -2010,8 +2011,29 @@
                             name="Position2Info">
         <SimpleDoubleInformationHelper />
       </DoubleVectorProperty>
+      <IntVectorProperty animateable="0"
+                         command="SetWindowLocation"
+                         default_values="0"
+                         name="WindowLocation"
+                         number_of_elements="1">
+        <EnumerationDomain name="enum">
+          <Entry text="Any Location"
+                 value="0" />
+          <Entry text="Lower Left Corner"
+                 value="1" />
+          <Entry text="Lower Right Corner"
+                 value="2" />
+          <Entry text="Lower Center"
+                 value="3" />
+          <Entry text="Upper Left Corner"
+                 value="4" />
+          <Entry text="Upper Right Corner"
+                 value="5" />
+          <Entry text="Upper Center"
+                 value="6" />
+        </EnumerationDomain>
+      </IntVectorProperty>
     </Proxy>
-
   </ProxyGroup>
   <!-- ****************************************************************** -->
   <ProxyGroup name="3d_widgets">

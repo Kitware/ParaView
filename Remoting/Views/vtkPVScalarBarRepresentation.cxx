@@ -34,15 +34,6 @@
 vtkStandardNewMacro(vtkPVScalarBarRepresentation);
 
 //-----------------------------------------------------------------------------
-vtkPVScalarBarRepresentation::vtkPVScalarBarRepresentation()
-{
-  this->WindowLocation = vtkPVScalarBarRepresentation::AnyLocation;
-}
-
-//-----------------------------------------------------------------------------
-vtkPVScalarBarRepresentation::~vtkPVScalarBarRepresentation() = default;
-
-//-----------------------------------------------------------------------------
 int vtkPVScalarBarRepresentation::RenderOverlay(vtkViewport* viewport)
 {
   // Query scalar bar size given the viewport
@@ -59,39 +50,39 @@ int vtkPVScalarBarRepresentation::RenderOverlay(vtkViewport* viewport)
   // Start with Lower Right corner.
   int* displaySize = viewport->GetSize();
 
-  if (this->WindowLocation != AnyLocation)
+  if (this->WindowLocation != vtkBorderRepresentation::AnyLocation)
   {
     double pad = 4.0;
     double x = 0.0;
     double y = 0.0;
     switch (this->WindowLocation)
     {
-      case LowerLeftCorner:
+      case vtkBorderRepresentation::LowerLeftCorner:
         x = 0.0 + pad;
         y = 0.0 + pad;
         break;
 
-      case LowerRightCorner:
+      case vtkBorderRepresentation::LowerRightCorner:
         x = displaySize[0] - 1.0 - boundingRect.GetWidth() - pad;
         y = 0.0 + pad;
         break;
 
-      case LowerCenter:
+      case vtkBorderRepresentation::LowerCenter:
         x = 0.5 * (displaySize[0] - boundingRect.GetWidth());
         y = 0.0 + pad;
         break;
 
-      case UpperLeftCorner:
+      case vtkBorderRepresentation::UpperLeftCorner:
         x = 0.0 + pad;
         y = displaySize[1] - 1.0 - boundingRect.GetHeight() - pad;
         break;
 
-      case UpperRightCorner:
+      case vtkBorderRepresentation::UpperRightCorner:
         x = displaySize[0] - 1.0 - boundingRect.GetWidth() - pad;
         y = displaySize[1] - 1.0 - boundingRect.GetHeight() - pad;
         break;
 
-      case UpperCenter:
+      case vtkBorderRepresentation::UpperCenter:
         x = 0.5 * (displaySize[0] - boundingRect.GetWidth());
         y = displaySize[1] - 1.0 - boundingRect.GetHeight() - pad;
 
@@ -110,45 +101,8 @@ int vtkPVScalarBarRepresentation::RenderOverlay(vtkViewport* viewport)
   return this->Superclass::RenderOverlay(viewport);
 }
 
-//-----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 void vtkPVScalarBarRepresentation::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
-
-  os << indent << "WindowLocation: ";
-  switch (this->WindowLocation)
-  {
-    case AnyLocation:
-      os << "AnyLocation";
-      break;
-
-    case LowerLeftCorner:
-      os << "LowerLeftCorner";
-      break;
-
-    case LowerRightCorner:
-      os << "LowerRightCorner";
-      break;
-
-    case LowerCenter:
-      os << "LowerCenter";
-      break;
-
-    case UpperLeftCorner:
-      os << "UpperLeftCorner";
-      break;
-
-    case UpperRightCorner:
-      os << "UpperRightCorner";
-      break;
-
-    case UpperCenter:
-      os << "UpperCenter";
-      break;
-
-    default:
-      // Do nothing
-      break;
-  }
-  os << endl;
 }

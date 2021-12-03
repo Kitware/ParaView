@@ -10512,15 +10512,19 @@
                            min="0"
                            name="range" />
       </DoubleVectorProperty>
-      <SubProxy command="SetLogoWidgetRepresentation">
+
+       <SubProxy command="SetLogoWidgetRepresentation">
         <Proxy name="LogoWidgetRepresentation"
                proxygroup="representations"
                proxyname="LogoWidgetRepresentation"></Proxy>
         <ExposedProperties>
-          <Property name="Position" />
-          <Property name="Position2" panel_visibility="never"/>
-          <Property name="PositionInfo" />
-          <Property name="Position2Info" />
+          <PropertyGroup name="LogoPosition" label="Logo Position" panel_widget="TextLocationEditor">
+            <Property name="WindowLocation" />
+            <Property name="Position" />
+            <Property name="Position2" panel_visibility="never"/>
+            <Property name="PositionInfo" />
+            <Property name="Position2Info" />
+          </PropertyGroup>
         </ExposedProperties>
       </SubProxy>
       <!-- End of LogoSourceRepresentation -->
