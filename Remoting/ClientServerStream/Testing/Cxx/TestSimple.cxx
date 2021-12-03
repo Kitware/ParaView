@@ -117,11 +117,6 @@ void ClientManager::RunTests()
     cerr << name << "\n";
   }
   stream.Reset();
-  stream << vtkClientServerStream::Invoke << instance_id << "SetReferenceCount" << 10
-         << vtkClientServerStream::End;
-  stream.GetData(&data, &len);
-  server->ProcessMessage(data, len);
-  stream.Reset();
   stream << vtkClientServerStream::Invoke << instance_id << "GetReferenceCount"
          << vtkClientServerStream::End;
   stream.GetData(&data, &len);
@@ -132,8 +127,6 @@ void ClientManager::RunTests()
     cerr << refcount << "\n";
   }
   stream.Reset();
-  stream << vtkClientServerStream::Invoke << instance_id << "SetReferenceCount" << 1
-         << vtkClientServerStream::End;
   stream << vtkClientServerStream::Delete << instance_id << vtkClientServerStream::End;
   stream.GetData(&data, &len);
   server->ProcessMessage(data, len);
