@@ -24,7 +24,9 @@
 
 #include "vtkObject.h"
 #include "vtkRemotingViewsModule.h" //needed for exports
+
 class vtkAlgorithm;
+class vtkCell;
 class vtkDataSet;
 
 class VTKREMOTINGVIEWS_EXPORT vtkPVRayCastPickingHelper : public vtkObject
@@ -73,9 +75,11 @@ public:
    */
   void ComputeIntersection();
 
-  // Description:
   // Provide access to the resulting intersection
   vtkGetVector3Macro(Intersection, double);
+
+  // Provide access to the resulting intersection normal
+  vtkGetVector3Macro(IntersectionNormal, double);
 
 protected:
   vtkPVRayCastPickingHelper();
@@ -86,7 +90,14 @@ protected:
    */
   void ComputeIntersectionFromDataSet(vtkDataSet* ds);
 
+  /**
+   * Compute the intersection normal either by interpolating the point normals at the
+   * intersected point, or by computing the plane normal for the 2D intersected face/cell.
+   */
+  int ComputeSurfaceNormal(vtkDataSet* data, vtkCell* cell, int subId, double* weights);
+
   double Intersection[3];
+  double IntersectionNormal[3];
   double PointA[3];
   double PointB[3];
   bool SnapOnMeshPoint;

@@ -32,6 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqDisplaySizedImplicitPlanePropertyWidget.h"
 #include "ui_pqDisplaySizedImplicitPlanePropertyWidget.h"
 
+#include "pqPointPickingHelper.h"
 #include "pqRenderView.h"
 #include "vtkCamera.h"
 #include "vtkSMIntVectorProperty.h"
@@ -140,6 +141,42 @@ pqDisplaySizedImplicitPlanePropertyWidget::pqDisplaySizedImplicitPlanePropertyWi
   // We want to show the translucent plane when interaction starts.
   this->connect(this, SIGNAL(startInteraction()), SLOT(showPlane()));
 
+  using PickOption = pqPointPickingHelper::PickOption;
+
+  // picking origin point actions
+  pqPointPickingHelper* pickPointHelper =
+    new pqPointPickingHelper(QKeySequence(tr("P")), false, this, PickOption::Coordinates);
+  pickPointHelper->connect(this, SIGNAL(viewChanged(pqView*)), SLOT(setView(pqView*)));
+  pickPointHelper->connect(
+    this, SIGNAL(widgetVisibilityUpdated(bool)), SLOT(setShortcutEnabled(bool)));
+  this->connect(
+    pickPointHelper, SIGNAL(pick(double, double, double)), SLOT(setOrigin(double, double, double)));
+
+  pqPointPickingHelper* pickPointHelper2 =
+    new pqPointPickingHelper(QKeySequence(tr("Ctrl+P")), true, this, PickOption::Coordinates);
+  pickPointHelper2->connect(this, SIGNAL(viewChanged(pqView*)), SLOT(setView(pqView*)));
+  pickPointHelper2->connect(
+    this, SIGNAL(widgetVisibilityUpdated(bool)), SLOT(setShortcutEnabled(bool)));
+  this->connect(pickPointHelper2, SIGNAL(pick(double, double, double)),
+    SLOT(setOrigin(double, double, double)));
+
+  // picking normal actions
+  pqPointPickingHelper* pickNormalHelper =
+    new pqPointPickingHelper(QKeySequence(tr("N")), false, this, PickOption::Normal);
+  pickNormalHelper->connect(this, SIGNAL(viewChanged(pqView*)), SLOT(setView(pqView*)));
+  pickNormalHelper->connect(
+    this, SIGNAL(widgetVisibilityUpdated(bool)), SLOT(setShortcutEnabled(bool)));
+  this->connect(pickNormalHelper, SIGNAL(pick(double, double, double)),
+    SLOT(setNormal(double, double, double)));
+
+  pqPointPickingHelper* pickNormalHelper2 =
+    new pqPointPickingHelper(QKeySequence(tr("Ctrl+N")), true, this, PickOption::Normal);
+  pickNormalHelper2->connect(this, SIGNAL(viewChanged(pqView*)), SLOT(setView(pqView*)));
+  pickNormalHelper2->connect(
+    this, SIGNAL(widgetVisibilityUpdated(bool)), SLOT(setShortcutEnabled(bool)));
+  this->connect(pickNormalHelper2, SIGNAL(pick(double, double, double)),
+    SLOT(setNormal(double, double, double)));
+
   this->placeWidget();
 }
 
@@ -154,6 +191,7 @@ void pqDisplaySizedImplicitPlanePropertyWidget::placeWidget()
   {
     return;
   }
+
   vtkSMNewWidgetRepresentationProxy* wdgProxy = this->widgetProxy();
   double scaleFactor = vtkSMPropertyHelper(wdgProxy, "PlaceFactor").GetAsDouble();
   pqAdjustBounds(bbox, scaleFactor);

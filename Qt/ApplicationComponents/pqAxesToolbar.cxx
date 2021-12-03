@@ -41,6 +41,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMRenderViewProxy.h"
 #include "vtkSMTrace.h"
 
+#include <cmath>
+
 class pqAxesToolbar::pqInternals : public Ui::pqAxesToolbar
 {
 public:
@@ -190,13 +192,14 @@ void pqAxesToolbar::pickCenterOfRotation(int posx, int posy)
   if (rm)
   {
     int posxy[2] = { posx, posy };
-    double center[3];
+    double center[3], normal[3];
 
     vtkSMRenderViewProxy* proxy = rm->getRenderViewProxy();
     SM_SCOPED_TRACE(PropertiesModified)
       .arg("proxy", proxy)
       .arg("comment", " update center of rotation");
-    if (proxy->ConvertDisplayToPointOnSurface(posxy, center))
+    proxy->ConvertDisplayToPointOnSurface(posxy, center, normal);
+    if (!std::isnan(center[0]) || !std::isnan(center[1]) || !std::isnan(center[2]))
     {
       rm->setCenterOfRotation(center);
       rm->render();

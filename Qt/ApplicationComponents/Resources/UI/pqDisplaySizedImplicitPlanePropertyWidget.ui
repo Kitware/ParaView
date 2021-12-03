@@ -102,7 +102,7 @@
       </font>
      </property>
      <property name="text">
-      <string/>
+      <string>Note: Use 'P' to pick 'Origin' on mesh or 'Ctrl+P' to snap to the closest mesh point. Also, use 'N' to pick &quot;Normal&quot; on mesh or 'Ctrl+N' to snap to the closest mesh point normal, if its availiable.</string>
      </property>
      <property name="wordWrap">
       <bool>true</bool>

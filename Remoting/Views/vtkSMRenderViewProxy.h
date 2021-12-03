@@ -94,12 +94,14 @@ public:
 
   /**
    * Given a location is display coordinates (pixels), tries to compute and
-   * return the world location on a surface, if possible. Returns true if the
-   * conversion was successful, else returns false.
-   * If Snap on mesh point is true, it will return a point from the mesh only
+   * return the world location and normal on a surface, if possible. Returns true if the
+   * conversion was successful, else assigns the focal point and plane normal and returns false.
+   * If Snap on mesh point is true, it will return a point and normal from the mesh only.
+   * If point or normal were not available, they will have a vector of
+   * std::numeric_limits<double>::quiet_NaN().
    */
-  bool ConvertDisplayToPointOnSurface(
-    const int display_position[2], double world_position[3], bool snapOnMeshPoint = false);
+  bool ConvertDisplayToPointOnSurface(const int display_position[2], double world_position[3],
+    double world_normal[3], bool snapOnMeshPoint = false);
 
   /**
    * Checks if color depth is sufficient to support selection.

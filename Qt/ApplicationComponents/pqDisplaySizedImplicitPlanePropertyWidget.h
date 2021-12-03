@@ -111,11 +111,10 @@ protected Q_SLOTS:
 
 private Q_SLOTS:
   void setOrigin(double x, double y, double z);
+  void setNormal(double x, double y, double z);
 
 private:
   Q_DISABLE_COPY(pqDisplaySizedImplicitPlanePropertyWidget)
-
-  void setNormal(double x, double y, double z);
 };
 
 #endif

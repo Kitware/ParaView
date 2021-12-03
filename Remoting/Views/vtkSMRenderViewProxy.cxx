@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   ParaView
-  Module:    $RCSfile$
+  Module:    vtkSMRenderViewProxy.cxx
 
   Copyright (c) Kitware, Inc.
   Copyright (c) 2017, NVIDIA CORPORATION.
@@ -19,7 +19,6 @@
 #include "vtkCamera.h"
 #include "vtkClientServerStream.h"
 #include "vtkCollection.h"
-#include "vtkDataArray.h"
 #include "vtkEventForwarderCommand.h"
 #include "vtkExtractSelectedFrustum.h"
 #include "vtkFloatArray.h"
@@ -34,13 +33,11 @@
 #include "vtkPVArrayInformation.h"
 #include "vtkPVDataInformation.h"
 #include "vtkPVEncodeSelectionForServer.h"
-#include "vtkPVLastSelectionInformation.h"
 #include "vtkPVRenderView.h"
 #include "vtkPVRenderingCapabilitiesInformation.h"
 #include "vtkPVServerInformation.h"
 #include "vtkPVXMLElement.h"
 #include "vtkPointData.h"
-#include "vtkProcessModule.h"
 #include "vtkRemotingCoreConfiguration.h"
 #include "vtkRenderWindow.h"
 #include "vtkRenderWindowInteractor.h"
@@ -48,14 +45,12 @@
 #include "vtkSMCollaborationManager.h"
 #include "vtkSMDataDeliveryManagerProxy.h"
 #include "vtkSMInputProperty.h"
-#include "vtkSMMaterialLibraryProxy.h"
 #include "vtkSMOutputPort.h"
 #include "vtkSMPVRepresentationProxy.h"
 #include "vtkSMProperty.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMPropertyIterator.h"
 #include "vtkSMRepresentationProxy.h"
-#include "vtkSMSelectionHelper.h"
 #include "vtkSMSession.h"
 #include "vtkSMSessionProxyManager.h"
 #include "vtkSMTrace.h"
@@ -65,7 +60,6 @@
 #include "vtkSelectionNode.h"
 #include "vtkSmartPointer.h"
 #include "vtkTransform.h"
-#include "vtkWeakPointer.h"
 
 #include <cassert>
 #include <map>
@@ -724,8 +718,8 @@ vtkSMRepresentationProxy* vtkSMRenderViewProxy::PickBlock(
 }
 
 //----------------------------------------------------------------------------
-bool vtkSMRenderViewProxy::ConvertDisplayToPointOnSurface(
-  const int display_position[2], double world_position[3], bool snapOnMeshPoint)
+bool vtkSMRenderViewProxy::ConvertDisplayToPointOnSurface(const int display_position[2],
+  double world_position[3], double world_normal[3], bool snapOnMeshPoint)
 {
   int region[4] = { display_position[0], display_position[1], display_position[0],
     display_position[1] };
@@ -789,7 +783,27 @@ bool vtkSMRenderViewProxy::ConvertDisplayToPointOnSurface(
     pickingHelper->UpdateProperty("Update", 1);
     vtkSMPropertyHelper(pickingHelper, "Intersection").UpdateValueFromServer();
     vtkSMPropertyHelper(pickingHelper, "Intersection").Get(world_position, 3);
+    vtkSMPropertyHelper(pickingHelper, "IntersectionNormal").UpdateValueFromServer();
+    vtkSMPropertyHelper(pickingHelper, "IntersectionNormal").Get(world_normal, 3);
     pickingHelper->Delete();
+
+    static constexpr double PI_2 = vtkMath::Pi() / 2.0f;
+    // Note: Fix normal direction in case the orientation of the picked cell is wrong.
+    // When you cast a ray to a 3d object from a specific view angle (camera normal), the angle
+    // between the camera normal and the normal of the cell surface that the ray intersected,
+    // can have an angle up to pi / 2. This is true because you can't see surface objects
+    // with a greater angle than pi / 2, therefore, you can't pick them. In case an angle greater
+    // than pi / 2 is computed, it must be a result of a wrong orientation of the picked cell.
+    // To solve this issue, we reverse the picked normal.
+    double cameraNormal[3];
+    this->GetRenderer()->GetActiveCamera()->GetViewPlaneNormal(cameraNormal);
+    if (vtkMath::AngleBetweenVectors(world_normal, cameraNormal) > PI_2)
+    {
+      world_normal[0] *= -1;
+      world_normal[1] *= -1;
+      world_normal[2] *= -1;
+    }
+    return true;
   }
   else
   {
@@ -797,14 +811,14 @@ bool vtkSMRenderViewProxy::ConvertDisplayToPointOnSurface(
     if (!this->IsSelectionAvailable())
     {
       vtkWarningMacro("Snapping to the surface is not available therefore "
-                      "the camera focal point will be used to determine "
+                      "the camera focal point and normal will be used to determine "
                       "the depth of the picking.");
     }
-
     // Use camera focal point to get some Zbuffer
     double cameraFP[4];
     vtkRenderer* renderer = this->GetRenderer();
     vtkCamera* camera = renderer->GetActiveCamera();
+    camera->GetViewPlaneNormal(world_normal);
     camera->GetFocalPoint(cameraFP);
     cameraFP[3] = 1.0;
     renderer->SetWorldPoint(cameraFP);
@@ -820,9 +834,8 @@ bool vtkSMRenderViewProxy::ConvertDisplayToPointOnSurface(
     {
       world_position[i] = world[i] / world[3];
     }
+    return false;
   }
-
-  return true;
 }
 
 //----------------------------------------------------------------------------
