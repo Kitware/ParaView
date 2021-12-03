@@ -24,6 +24,7 @@ set(PY_TESTS
   CompositeDataFieldArraysInformation.py,NO_VALID
   ConnectionProxyNamespaces.py,NO_VALID
   CSVWriterReader.py,NO_VALID
+  FailingRequestDataObject.py,NO_VALID
   GenerateIdScalarsBackwardsCompatibility.py,NO_VALID
   GetActiveCamera.py,NO_VALID
   GhostCellsInMergeBlocks.py
