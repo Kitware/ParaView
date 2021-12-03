@@ -44,6 +44,11 @@
 #include "vtksys/SystemTools.hxx"
 #include <QCoreApplication>
 
+#ifdef PARAVIEW_ENABLE_FFMPEG
+#include "vtkFFMPEGVideoSource.h"
+#include "vtkOpenGLMovieSphere.h"
+#endif
+
 vtkStandardNewMacro(vtkPVOpenVRExporter);
 
 void vtkPVOpenVRExporter::ExportLocationsAsSkyboxes(vtkPVOpenVRHelper* helper,
@@ -299,7 +304,7 @@ void vtkPVOpenVRExporter::ExportLocationsAsView(vtkPVOpenVRHelper* helper, vtkSM
     topel->SetIntAttribute("EnvironmentTexture", static_cast<int>(textures[cubetex]));
   }
 
-  // save floagpole and skybox locations
+  // save flagpole and skybox locations
   std::map<vtkActor*, std::vector<int>> specialActorLocations;
 
   vtkNew<vtkXMLDataElement> posesel;
@@ -633,7 +638,19 @@ void vtkPVOpenVRExporter::ExportLocationsAsView(vtkPVOpenVRHelper* helper, vtkSM
     vtkNew<vtkXMLDataElement> flagel;
     flagel->SetName("PhotoSphere");
 
+    // if we are built with ffmpeg support then export movies as well
+#ifdef PARAVIEW_ENABLE_FFMPEG
+    auto moviebox = vtkOpenGLMovieSphere::SafeDownCast(skybox);
+    if (moviebox) // movie maybe
+    {
+      std::string fname = moviebox->GetVideoSource()->GetFileName();
+      flagel->SetAttribute("TextureFile", fname.c_str());
+      defaultSkyboxes[it.second[0]] = fname;
+    }
+    else if (skybox->GetTexture() && skybox->GetTexture()->GetInput())
+#else // otherwise just normal image skyboxes
     if (skybox->GetTexture() && skybox->GetTexture()->GetInput())
+#endif
     {
       vtkTexture* texture = skybox->GetTexture();
       vtkNew<vtkJPEGWriter> jpeg;
