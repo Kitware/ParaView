@@ -109,15 +109,16 @@ target_compile_definitions(OpenVR PRIVATE QT_NO_KEYWORDS)
 
 # if we have ffmpeg enabled then add in the dependency
 # and set a define for the exporter to handle exporting movies
-if (PARAVIEW_ENABLE_FFMPEG AND TARGET VTK::RenderingFFMPEGOpenGL2)
-  set_property(SOURCE vtkPVOpenVRExporter.cxx APPEND PROPERTY
-    COMPILE_DEFINITIONS PARAVIEW_ENABLE_FFMPEG
-    )
+set(have_ffmpeg 0)
+if (TARGET VTK::RenderingFFMPEGOpenGL2)
+  set(have_ffmpeg 1)
   target_link_libraries(OpenVR
     PRIVATE
       VTK::RenderingFFMPEGOpenGL2
     )
 endif()
+set_property(SOURCE vtkPVOpenVRExporter.cxx APPEND PROPERTY
+  COMPILE_DEFINITIONS "PARAVIEW_ENABLE_FFMPEG=$<BOOL:${have_ffmpeg}>")
 
 if (PARAVIEW_USE_QTWEBENGINE)
   set_property(SOURCE vtkPVOpenVRWidgets.cxx APPEND PROPERTY
