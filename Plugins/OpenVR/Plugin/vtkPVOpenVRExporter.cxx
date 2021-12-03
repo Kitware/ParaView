@@ -44,7 +44,7 @@
 #include "vtksys/SystemTools.hxx"
 #include <QCoreApplication>
 
-#ifdef PARAVIEW_ENABLE_FFMPEG
+#if PARAVIEW_ENABLE_FFMPEG
 #include "vtkFFMPEGVideoSource.h"
 #include "vtkOpenGLMovieSphere.h"
 #endif
@@ -639,7 +639,7 @@ void vtkPVOpenVRExporter::ExportLocationsAsView(vtkPVOpenVRHelper* helper, vtkSM
     flagel->SetName("PhotoSphere");
 
     // if we are built with ffmpeg support then export movies as well
-#ifdef PARAVIEW_ENABLE_FFMPEG
+#if PARAVIEW_ENABLE_FFMPEG
     auto moviebox = vtkOpenGLMovieSphere::SafeDownCast(skybox);
     if (moviebox) // movie maybe
     {

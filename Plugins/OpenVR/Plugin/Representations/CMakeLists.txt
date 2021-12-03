@@ -5,7 +5,7 @@ set(sources)
 
 set(openvrXMLs OpenVRRepresentations.xml)
 
-if (PARAVIEW_ENABLE_FFMPEG AND TARGET VTK::RenderingFFMPEGOpenGL2)
+if (TARGET VTK::RenderingFFMPEGOpenGL2)
   find_package(Qt5 REQUIRED QUIET COMPONENTS Multimedia)
   list(APPEND classes vtkSkyboxMovieRepresentation)
   list(APPEND openvrXMLs  OpenVRSkyboxMovieRepresentation.xml)

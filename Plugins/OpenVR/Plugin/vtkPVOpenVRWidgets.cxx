@@ -68,7 +68,7 @@
 #include <regex>
 #include <sstream>
 
-#ifdef PARAVIEW_USE_QTWEBENGINE
+#if PARAVIEW_USE_QTWEBENGINE
 #include "vtkWebPageRepresentation.h"
 #endif
 
@@ -1689,7 +1689,7 @@ void vtkPVOpenVRWidgets::UpdateWidgetsFromParaView()
     this->WidgetsFromParaView[repr] = ps;
   }
 
-#ifdef PARAVIEW_USE_QTWEBENGINE
+#if PARAVIEW_USE_QTWEBENGINE
   // look for new widgets
   vtkSMPropertyHelper helper2(this->Helper->GetSMView(), "Representations");
   for (unsigned int i = 0; i < helper2.GetNumberOfElements(); i++)
