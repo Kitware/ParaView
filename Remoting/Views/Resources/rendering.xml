@@ -263,6 +263,11 @@
           <DataType value="vtkImageData" />
         </DataTypeDomain>
       </InputProperty>
+      <!-- This property without associated command is used to store the source filename containing the texture, as we lose this information when loading the texture from a vtkTexture directly -->
+      <StringVectorProperty animateable="0"
+                            name="FileName"
+                            number_of_elements="1">
+      </StringVectorProperty>
     </SourceProxy>
     <Proxy class="vtkTexture"
            name="ImageTexture"

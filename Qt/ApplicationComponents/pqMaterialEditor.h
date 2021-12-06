@@ -92,6 +92,7 @@ protected Q_SLOTS:
   void addMaterial();
   void removeMaterial();
   void attachMaterial();
+  void saveMaterials();
 
   void addProperty();
   void removeProperty();

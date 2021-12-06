@@ -377,6 +377,9 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/MaterialEditorCreateMaterials3.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/MaterialEditorLoadMaterials1.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/MaterialEditorLoadMaterials2.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/MaterialEditorSaveMaterials1.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/MaterialEditorSaveMaterials2.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/MaterialEditorSaveMaterials3.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/MathTextColumn.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/MergePointBlocks.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/MergeVectorComponents.png}"
@@ -1505,6 +1508,7 @@ if (paraview_use_materialeditor)
   list(APPEND TESTS_WITH_INLINE_COMPARES
     MaterialEditorCreateMaterials.xml
     MaterialEditorLoadMaterials.xml
+    MaterialEditorSaveMaterials.xml
   )
 endif ()
 
