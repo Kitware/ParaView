@@ -146,6 +146,12 @@ public:
   static QList<QVariant> getSelectionPropertyDomain(vtkSMProperty* Property);
 
   /**
+   * get the list of strings for the given property based on domain and current values.
+   */
+  static QList<QVariant> getStringListProperty(
+    vtkSMProperty* Property, PropertyValueType Type = CHECKED);
+
+  /**
    * get the enumeration for a property
    */
   static QVariant getEnumerationProperty(vtkSMProperty* Property, PropertyValueType Type = CHECKED);

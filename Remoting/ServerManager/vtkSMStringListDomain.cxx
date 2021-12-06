@@ -282,17 +282,23 @@ int vtkSMStringListDomain::SetDefaultValues(vtkSMProperty* prop, bool use_unchec
       return 1;
     }
 
-    if (svp->GetRepeatCommand() && svp->GetNumberOfElementsPerCommand() == 1)
+    int elements = svp->GetNumberOfElementsPerCommand();
+    if (svp->GetRepeatCommand() == 1 && elements > 0)
     {
       vtkNew<vtkStringList> strings;
       for (unsigned int cc = 0; cc < num_string; cc++)
       {
-        strings->AddString(this->GetString(cc));
+        for (int elem = 0; elem < elements; elem++)
+        {
+          strings->AddString(this->GetString(cc));
+        }
       }
-
       if (num_string == 0 && this->NoneString)
       {
-        strings->AddString(this->NoneString);
+        for (int elem = 0; elem < elements; elem++)
+        {
+          strings->AddString(this->NoneString);
+        }
       }
 
       if (use_unchecked_values)

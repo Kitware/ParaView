@@ -146,6 +146,7 @@ pqSMAdaptor::PropertyType pqSMAdaptor::getPropertyType(vtkSMProperty* Property)
     vtkSMProxyGroupDomain* proxyGroupDomain = nullptr;
     vtkSMFileListDomain* fileListDomain = nullptr;
     vtkSMStringListDomain* stringListDomain = nullptr;
+    vtkSMArrayListDomain* arrayListDomain = nullptr;
     vtkSMCompositeTreeDomain* compositeTreeDomain = nullptr;
     vtkSMChartSeriesSelectionDomain* chartSeriesSelectionDomain = nullptr;
 
@@ -172,6 +173,10 @@ pqSMAdaptor::PropertyType pqSMAdaptor::getPropertyType(vtkSMProperty* Property)
       {
         stringListDomain = vtkSMStringListDomain::SafeDownCast(iter->GetDomain());
       }
+      if (!arrayListDomain)
+      {
+        arrayListDomain = vtkSMArrayListDomain::SafeDownCast(iter->GetDomain());
+      }
       if (!compositeTreeDomain)
       {
         compositeTreeDomain = vtkSMCompositeTreeDomain::SafeDownCast(iter->GetDomain());
@@ -193,6 +198,11 @@ pqSMAdaptor::PropertyType pqSMAdaptor::getPropertyType(vtkSMProperty* Property)
       type = pqSMAdaptor::COMPOSITE_TREE;
     }
     else if (chartSeriesSelectionDomain)
+    {
+      type = pqSMAdaptor::MULTIPLE_ELEMENTS;
+    }
+    else if (VectorProperty && VectorProperty->GetNumberOfElementsPerCommand() > 1 &&
+      arrayListDomain)
     {
       type = pqSMAdaptor::MULTIPLE_ELEMENTS;
     }
@@ -375,6 +385,33 @@ QList<pqSMProxy> pqSMAdaptor::getProxyPropertyDomain(vtkSMProperty* Property)
     }
   }
   return proxydomain;
+}
+QList<QVariant> pqSMAdaptor::getStringListProperty(vtkSMProperty* Property, PropertyValueType Type)
+{
+  QList<QVariant> newPropList;
+
+  vtkSMStringVectorProperty* stringProp = vtkSMStringVectorProperty::SafeDownCast(Property);
+
+  if (!stringProp)
+  {
+    return newPropList;
+  }
+
+  QList<QVariant> domainList = pqSMAdaptor::getSelectionPropertyDomain(stringProp);
+
+  QList<QVariant> propList = pqSMAdaptor::getMultipleElementProperty(stringProp, Type);
+
+  for (const QVariant& domainVal : domainList)
+  {
+    int stringPos = propList.indexOf(domainVal);
+    // set prop value if still in domain. Init new elements with domain values.
+    for (int i = 0; i < stringProp->GetNumberOfElementsPerCommand(); i++)
+    {
+      newPropList.append(stringPos > -1 ? propList[stringPos + i] : domainVal);
+    }
+  }
+
+  return newPropList;
 }
 
 QList<QList<QVariant>> pqSMAdaptor::getSelectionProperty(
