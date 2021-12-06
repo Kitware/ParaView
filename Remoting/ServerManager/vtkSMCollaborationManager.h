@@ -159,7 +159,8 @@ public:
     UpdateUserList = 12347,
     UpdateMasterUser = 12348,
     FollowUserCamera = 12349,
-    CameraChanged = 12350
+    CameraChanged = 12350,
+    LastMessageUpdated = 12351
   };
 
   /**
@@ -189,6 +190,12 @@ public:
    * @param connectID the new connect-id for the server.
    */
   void SetConnectID(int connectID);
+
+  /**
+   * Allow to get the last received message from the chat.
+   * Easy API to be wrapped and used in python scripting.
+   */
+  const char* GetLastReceivedMessage() const;
 
 protected:
   /**

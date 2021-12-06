@@ -31,5 +31,5 @@ def processServerEvents():
   if servermanager.ActiveConnection:
      session = servermanager.ActiveConnection.Session
      if session.IsMultiClients() and session.IsNotBusy():
-        while vtkPVClientServerCoreCore.vtkProcessModule.GetProcessModule().GetNetworkAccessManager().ProcessEvents(100):
+        while servermanager.vtkProcessModule.GetProcessModule().GetNetworkAccessManager().ProcessEvents(100):
           pass
