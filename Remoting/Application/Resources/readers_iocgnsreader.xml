@@ -94,10 +94,63 @@
             <Property name="CellArrayInfo" function="ArrayList" />
           </RequiredProperties>
         </ArraySelectionDomain>
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="DataLocation"
+                                   value="0" />
+        </Hints>
         <Documentation>
           This property contains a list of the cell-centered arrays to read.
         </Documentation>
       </StringVectorProperty>
+
+      <StringVectorProperty name="FaceArrayInfo"
+                            information_only="1">
+        <ArraySelectionInformationHelper attribute_name="Face" />
+      </StringVectorProperty>
+
+      <StringVectorProperty name="FaceArrayStatus"
+                            command="SetFaceArrayStatus"
+                            number_of_elements="0"
+                            repeat_command="1"
+                            number_of_elements_per_command="2"
+                            element_types="2 0"
+                            information_property="FaceArrayInfo"
+                            label="Face Arrays">
+        <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+            <Property name="FaceArrayInfo" function="ArrayList" />
+          </RequiredProperties>
+        </ArraySelectionDomain>
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="DataLocation"
+                                   value="1" />
+        </Hints>
+        <Documentation>
+          This property contains a list of the face-centered arrays to read.
+        </Documentation>
+      </StringVectorProperty>
+
+      <IntVectorProperty animateable="0"
+                         command="SetDataLocation"
+                         default_values="0"
+                         name="DataLocation"
+                         number_of_elements="1">
+        <EnumerationDomain name="enum">
+          <Entry text="Cell Data"
+                 value="0" />
+          <Entry text="Face Data"
+                 value="1" />
+        </EnumerationDomain>
+        <Documentation>
+          Specifies whether to read cell or face information from the mesh.
+          Face-based reading is only available if the element connectivity is
+          defined with NGON_n element type.
+        </Documentation>
+      </IntVectorProperty>
 
       <IntVectorProperty name="LoadMesh"
                          command="SetLoadMesh"
@@ -280,8 +333,11 @@
           <Property name="Families" />
           <Property name="CellArrayInfo" />
           <Property name="CellArrayStatus" />
+          <Property name="FaceArrayInfo" />
+          <Property name="FaceArrayStatus" />
           <Property name="PointArrayInfo" />
           <Property name="PointArrayStatus" />
+          <Property name="DataLocation" />
           <Property name="LoadMesh" />
           <Property name="LoadPatches" />
           <Property name="DoublePrecisionMesh" />
