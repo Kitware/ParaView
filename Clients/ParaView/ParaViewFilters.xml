@@ -202,7 +202,6 @@
   <Proxy group="filters" name="Curvatures" />
   <Proxy group="filters" name="Cut" icon=":/pqWidgets/Icons/pqSlice.svg" />
   <Proxy group="filters" name="CutEverything" />
-  <Proxy group="filters" name="D3" />
   <Proxy group="filters" name="DataSetRegionSurfaceFilter" />
   <Proxy group="filters" name="DataSetSurfaceFilter" />
   <Proxy group="filters" name="DataSetTriangleFilter" />

@@ -840,7 +840,9 @@
                  label="D3"
                  name="D3">
       <Documentation long_help="Repartition a data set into load-balanced spatially convex regions.  Create ghost cells if requested."
-                     short_help="Repartition a data set.">The D3 filter is
+                      short_help="Repartition a data set.">
+                     This filter is deprecated, please use Redistribute Data Set
+                     and / or Generate Ghost Cells instead. The D3 filter is
                      available when ParaView is run in parallel. It operates on
                      any type of data set to evenly divide it across the
                      processors into spatially contiguous regions. The output
