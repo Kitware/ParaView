@@ -35,8 +35,6 @@ class QAction;
 class pqNodeEditorView : public QGraphicsView
 {
 public:
-  pqNodeEditorView(QWidget* parent = nullptr);
-
   /**
    * Create a view for the specified scene. Also construct a new pqDeleteReaction
    * for whenever a user tries to delete a node using the `Del` key on the keyboard.

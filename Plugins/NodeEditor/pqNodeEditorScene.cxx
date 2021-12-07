@@ -48,6 +48,12 @@ pqNodeEditorScene::pqNodeEditorScene(QObject* parent)
 {
 }
 
+QPointF pqNodeEditorScene::snapToGrid(const qreal& x, const qreal& y, const qreal& resolution)
+{
+  const auto gridSize = pqNodeEditorUtils::CONSTS::GRID_SIZE * resolution;
+  return QPointF(x - std::fmod(x, gridSize), y - std::fmod(y, gridSize));
+}
+
 // ----------------------------------------------------------------------------
 int pqNodeEditorScene::computeLayout(const std::unordered_map<vtkIdType, pqNodeEditorNode*>& nodes,
   std::unordered_map<vtkIdType, std::vector<pqNodeEditorEdge*>>& edges)
@@ -121,8 +127,8 @@ int pqNodeEditorScene::computeLayout(const std::unordered_map<vtkIdType, pqNodeE
 
     // describe the overall look of the graph. For example : rankdir=LR -> Left To Right layout
     // See https://www.graphviz.org/pdf/libguide.pdf for more detail
-    dotString +=
-      "digraph g {\nrankdir=LR;splines = line;graph[pad=\"0\", ranksep=\"1\", nodesep=\"1\"];\n" +
+    dotString += "digraph g {\nrankdir=LR;splines = line;graph[pad=\"0\", ranksep=\"0.6\", "
+                 "nodesep=\"0.6\"];\n" +
       nodeString.str() + edgeString.str() + "\n}";
   }
 
@@ -188,7 +194,7 @@ int pqNodeEditorScene::computeLayout(const std::unordered_map<vtkIdType, pqNodeE
         continue;
       }
 
-      it.second->setPos(coords[i], coords[i + 1]);
+      it.second->setPos(pqNodeEditorScene::snapToGrid(coords[i], coords[i + 1]));
     }
   }
 
@@ -236,7 +242,8 @@ int pqNodeEditorScene::computeLayout(const std::unordered_map<vtkIdType, pqNodeE
     {
       x = lastX + width + 10.0;
     }
-    it.first->setPos(x, maxY + maxHeight + 20.0);
+    it.first->setPos(pqNodeEditorScene::snapToGrid(
+      x, maxY + maxHeight + 2.0 * pqNodeEditorUtils::CONSTS::GRID_SIZE));
     lastX = x;
   }
 
@@ -251,23 +258,30 @@ int pqNodeEditorScene::computeLayout(const std::unordered_map<vtkIdType, pqNodeE
 // ----------------------------------------------------------------------------
 void pqNodeEditorScene::drawBackground(QPainter* painter, const QRectF& rect)
 {
-  constexpr int GRID_SIZE = 25;
+  painter->setPen(pqNodeEditorUtils::CONSTS::COLOR_GRID);
 
-  qreal left = int(rect.left()) - (int(rect.left()) % GRID_SIZE);
-  qreal top = int(rect.top()) - (int(rect.top()) % GRID_SIZE);
+  // get rectangle bounds
+  const qreal recL = rect.left();
+  const qreal recR = rect.right();
+  const qreal recT = rect.top();
+  const qreal recB = rect.bottom();
 
-  QVarLengthArray<QLineF, 100> lines;
+  // determine whether to use low or high resoltion grid
+  const qreal gridResolution = (recB - recT) > 2000 ? 4 : 1;
+  const qreal gridSize = gridResolution * pqNodeEditorUtils::CONSTS::GRID_SIZE;
 
-  for (qreal x = left; x < rect.right(); x += GRID_SIZE)
+  // find top left corner of active rectangle and snap to grid
+  const QPointF& snappedTopLeft = pqNodeEditorScene::snapToGrid(recL, recT, gridResolution);
+
+  // iterate over the x range of the rectangle to draw vertical lines
+  for (qreal x = snappedTopLeft.x(); x < recR; x += gridSize)
   {
-    lines.append(QLineF(x, rect.top(), x, rect.bottom()));
-  }
-  for (qreal y = top; y < rect.bottom(); y += GRID_SIZE)
-  {
-    lines.append(QLineF(rect.left(), y, rect.right(), y));
+    painter->drawLine(x, recT, x, recB);
   }
 
-  painter->setRenderHints(QPainter::Antialiasing);
-  painter->setPen(QColor(60, 60, 60));
-  painter->drawLines(lines.data(), lines.size());
+  // iterate over the y range of the rectangle to draw horizontal lines
+  for (qreal y = snappedTopLeft.y(); y < recB; y += gridSize)
+  {
+    painter->drawLine(recL, y, recR, y);
+  }
 }
