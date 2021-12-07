@@ -269,7 +269,7 @@ void pqActiveObjects::viewSelectionChanged()
     this->connect(this->ActiveView, SIGNAL(representationRemoved(pqRepresentation*)),
       SLOT(updateRepresentation()), Qt::UniqueConnection);
     this->connect(
-      this->ActiveView, SIGNAL(dataUpdated()), SIGNAL(viewUpdated()), Qt::UniqueConnection);
+      this->ActiveView, SIGNAL(updateDataEvent()), SIGNAL(viewUpdated()), Qt::UniqueConnection);
   }
 
   // if view changed, then the active representation may have changed as well.
