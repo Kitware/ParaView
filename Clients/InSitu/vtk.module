@@ -12,20 +12,12 @@ PRIVATE_DEPENDS
   ParaView::Catalyst
   ParaView::RemotingApplication
   ParaView::RemotingLive
-  ParaView::VTKExtensionsConduit
   ParaView::VTKExtensionsCore
-  ParaView::vtkcatalyst
 OPTIONAL_DEPENDS
   ParaView::PythonCatalyst
   ParaView::PythonInitializer
   ParaView::RemotingLive
+  VTK::IOCatalystConduit
   VTK::IOIOSS
   VTK::ParallelMPI
   VTK::WrappingPythonCore
-TEST_DEPENDS
-  ParaView::vtkcatalyst
-  VTK::CommonDataModel
-  VTK::TestingCore
-TEST_LABELS
-  Catalyst
-  ParaView

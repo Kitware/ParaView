@@ -417,6 +417,11 @@ if (TARGET VTK::IOOpenVDB)
     Resources/writers_ioopenvdb.xml)
 endif()
 
+if (TARGET VTK::IOCatalystConduit)
+  list(APPEND xml_files
+    Resources/proxies_conduit.xml)
+endif()
+
 if (PARAVIEW_USE_PYTHON)
   list(APPEND xml_files
     Resources/readers_openpmd.xml

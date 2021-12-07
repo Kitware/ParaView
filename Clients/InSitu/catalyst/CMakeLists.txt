@@ -46,7 +46,7 @@ target_link_libraries(catalyst-paraview
   PRIVATE
     ParaView::InSitu
     ParaView::VTKExtensionsCore
-    ParaView::VTKExtensionsConduit
+    VTK::IOCatalystConduit
     ParaView::RemotingServerManager)
 
 if (TARGET VTK::ParallelMPI)

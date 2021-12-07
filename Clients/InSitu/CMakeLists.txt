@@ -29,18 +29,14 @@
 #
 #==========================================================================
 set(classes
-  vtkDataObjectToConduit
+  vtkInSituInitializationHelper
   vtkInSituPipeline
   vtkInSituPipelineIO
   vtkInSituPipelinePython
-  vtkInSituInitializationHelper)
+  )
 
 vtk_module_add_module(ParaView::InSitu
   CLASSES ${classes})
 vtk_module_client_server_exclude()
-# vtk_module_link(ParaView::InSitu
-#   PRIVATE
-#     # for plugins, in case of static builds.
-#     ParaView::paraview_plugins)
 
 add_subdirectory(catalyst)
