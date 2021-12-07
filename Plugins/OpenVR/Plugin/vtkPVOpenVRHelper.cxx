@@ -70,6 +70,7 @@
 #include "vtkShaderProperty.h"
 #include "vtkStringArray.h"
 #include "vtkTimerLog.h"
+#include "vtkTransform.h"
 #include "vtkVRFollower.h"
 #include "vtkVRModel.h"
 #include "vtkVRRay.h"
