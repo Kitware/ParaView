@@ -31,7 +31,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ========================================================================*/
 #include "pqPointPickingHelper.h"
 
+#include "pqKeySequences.h"
+#include "pqModalShortcut.h"
 #include "pqRenderView.h"
+#include "pqShortcutDecorator.h"
 #include "vtkRenderWindowInteractor.h"
 #include "vtkSMRenderViewProxy.h"
 
@@ -40,31 +43,29 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 pqPointPickingHelper::pqPointPickingHelper(
-  const QKeySequence& keySequence, bool pick_on_mesh, QObject* parentObject)
-  : Superclass(parentObject)
-  , KeySequence(keySequence)
+  const QKeySequence& keySequence, bool pick_on_mesh, pqPropertyWidget* propWidget)
+  : Superclass(propWidget)
   , PickOnMesh(pick_on_mesh)
-  , ShortcutEnabled(true)
 {
+  if (!propWidget)
+  {
+    throw std::invalid_argument("Parent property-widget must be non-null.");
+  }
+  auto* decorator = propWidget->findChild<pqShortcutDecorator*>();
+  if (!decorator)
+  {
+    decorator = new pqShortcutDecorator(propWidget);
+  }
+  this->Shortcut =
+    pqKeySequences::instance().addModalShortcut(keySequence, /* action */ nullptr, propWidget);
+  decorator->addShortcut(this->Shortcut);
+  this->connect(this->Shortcut, SIGNAL(activated()), SLOT(pickPoint()));
 }
 
 //-----------------------------------------------------------------------------
 pqPointPickingHelper::~pqPointPickingHelper()
 {
   delete this->Shortcut;
-}
-
-//-----------------------------------------------------------------------------
-void pqPointPickingHelper::setShortcutEnabled(bool val)
-{
-  if (this->ShortcutEnabled != val)
-  {
-    this->ShortcutEnabled = val;
-    if (this->Shortcut)
-    {
-      this->Shortcut->setEnabled(val);
-    }
-  }
 }
 
 //-----------------------------------------------------------------------------
@@ -75,13 +76,10 @@ void pqPointPickingHelper::setView(pqView* view)
   {
     return;
   }
-  delete this->Shortcut;
   this->View = rview;
   if (rview)
   {
-    this->Shortcut = new QShortcut(this->KeySequence, view->widget());
-    this->Shortcut->setEnabled(this->ShortcutEnabled);
-    this->connect(this->Shortcut, SIGNAL(activated()), SLOT(pickPoint()));
+    this->Shortcut->setContextWidget(view->widget());
   }
 }
 

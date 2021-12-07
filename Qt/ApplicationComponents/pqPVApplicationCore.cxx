@@ -63,7 +63,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QDebug>
 #include <QFileOpenEvent>
 #include <QList>
-#include <QShortcut>
 
 //-----------------------------------------------------------------------------
 pqPVApplicationCore::pqPVApplicationCore(int& argc, char** argv, pqOptions* options)

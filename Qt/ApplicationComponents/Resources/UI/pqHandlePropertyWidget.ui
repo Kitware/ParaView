@@ -97,6 +97,14 @@
    <header>pqDoubleLineEdit.h</header>
   </customwidget>
  </customwidgets>
+ <tabstops>
+  <tabstop>show3DWidget</tabstop>
+  <tabstop>worldPositionX</tabstop>
+  <tabstop>worldPositionY</tabstop>
+  <tabstop>worldPositionZ</tabstop>
+  <tabstop>useCenterBounds</tabstop>
+  <tabstop>useSelectionCenter</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

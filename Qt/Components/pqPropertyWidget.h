@@ -35,9 +35,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqComponentsModule.h"
 
 #include "pqPropertyLinks.h"
+#include <QFrame>
 #include <QPointer>
 #include <QScopedPointer>
-#include <QWidget>
 
 class pqPropertyWidgetDecorator;
 class pqTimer;
@@ -50,7 +50,7 @@ class vtkSMProxy;
  * pqPropertyWidget represents a widget created for each property of a proxy on
  * the pqPropertiesPanel (for the proxy's properties or display properties).
  */
-class PQCOMPONENTS_EXPORT pqPropertyWidget : public QWidget
+class PQCOMPONENTS_EXPORT pqPropertyWidget : public QFrame
 {
   Q_OBJECT
   typedef QWidget Superclass;

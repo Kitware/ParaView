@@ -112,40 +112,34 @@ pqLinePropertyWidget::pqLinePropertyWidget(
 
   pqPointPickingHelper* pickHelper = new pqPointPickingHelper(QKeySequence(tr("P")), false, this);
   pickHelper->connect(this, SIGNAL(viewChanged(pqView*)), SLOT(setView(pqView*)));
-  pickHelper->connect(this, SIGNAL(widgetVisibilityUpdated(bool)), SLOT(setShortcutEnabled(bool)));
   this->connect(
     pickHelper, SIGNAL(pick(double, double, double)), SLOT(pick(double, double, double)));
 
   pqPointPickingHelper* pickHelper2 =
     new pqPointPickingHelper(QKeySequence(tr("Ctrl+P")), true, this);
   pickHelper2->connect(this, SIGNAL(viewChanged(pqView*)), SLOT(setView(pqView*)));
-  pickHelper2->connect(this, SIGNAL(widgetVisibilityUpdated(bool)), SLOT(setShortcutEnabled(bool)));
   this->connect(
     pickHelper2, SIGNAL(pick(double, double, double)), SLOT(pick(double, double, double)));
 
   pqPointPickingHelper* pickHelper3 = new pqPointPickingHelper(QKeySequence(tr("1")), false, this);
   pickHelper3->connect(this, SIGNAL(viewChanged(pqView*)), SLOT(setView(pqView*)));
-  pickHelper3->connect(this, SIGNAL(widgetVisibilityUpdated(bool)), SLOT(setShortcutEnabled(bool)));
   this->connect(
     pickHelper3, SIGNAL(pick(double, double, double)), SLOT(pickPoint1(double, double, double)));
 
   pqPointPickingHelper* pickHelper4 =
     new pqPointPickingHelper(QKeySequence(tr("Ctrl+1")), true, this);
   pickHelper4->connect(this, SIGNAL(viewChanged(pqView*)), SLOT(setView(pqView*)));
-  pickHelper4->connect(this, SIGNAL(widgetVisibilityUpdated(bool)), SLOT(setShortcutEnabled(bool)));
   this->connect(
     pickHelper4, SIGNAL(pick(double, double, double)), SLOT(pickPoint1(double, double, double)));
 
   pqPointPickingHelper* pickHelper5 = new pqPointPickingHelper(QKeySequence(tr("2")), false, this);
   pickHelper5->connect(this, SIGNAL(viewChanged(pqView*)), SLOT(setView(pqView*)));
-  pickHelper5->connect(this, SIGNAL(widgetVisibilityUpdated(bool)), SLOT(setShortcutEnabled(bool)));
   this->connect(
     pickHelper5, SIGNAL(pick(double, double, double)), SLOT(pickPoint2(double, double, double)));
 
   pqPointPickingHelper* pickHelper6 =
     new pqPointPickingHelper(QKeySequence(tr("Ctrl+2")), true, this);
   pickHelper6->connect(this, SIGNAL(viewChanged(pqView*)), SLOT(setView(pqView*)));
-  pickHelper6->connect(this, SIGNAL(widgetVisibilityUpdated(bool)), SLOT(setShortcutEnabled(bool)));
   this->connect(
     pickHelper6, SIGNAL(pick(double, double, double)), SLOT(pickPoint2(double, double, double)));
 

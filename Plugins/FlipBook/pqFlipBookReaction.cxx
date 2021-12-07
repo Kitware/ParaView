@@ -35,6 +35,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqApplicationCore.h"
 #include "pqCoreUtilities.h"
 #include "pqDataRepresentation.h"
+#include "pqKeySequences.h"
+#include "pqModalShortcut.h"
 #include "pqPipelineModel.h"
 #include "pqRenderView.h"
 #include "pqServerManagerModel.h"
@@ -45,7 +47,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMSourceProxy.h"
 
 #include <QKeySequence>
-#include <QShortcut>
 
 //-----------------------------------------------------------------------------
 pqFlipBookReaction::pqFlipBookReaction(
@@ -55,6 +56,9 @@ pqFlipBookReaction::pqFlipBookReaction(
   , StepAction(stepAction)
   , PlayDelay(playDelay)
 {
+  this->StepActionMode = pqKeySequences::instance().addModalShortcut(
+    QKeySequence(Qt::Key_Space), this->StepAction, toggleAction->parentWidget());
+
   QObject::connect(toggleAction, SIGNAL(toggled(bool)), this, SLOT(onToggled(bool)));
   QObject::connect(playAction, SIGNAL(triggered()), this, SLOT(onPlay()));
   QObject::connect(stepAction, SIGNAL(triggered(bool)), this, SLOT(onStepClicked()));
@@ -207,7 +211,7 @@ void pqFlipBookReaction::onToggled(bool checked)
     this->VisibilityIndex = 0;
     this->parseVisibleRepresentations();
 
-    this->StepAction->setShortcut(QKeySequence(Qt::Key_Space));
+    this->StepActionMode->setEnabled(true);
   }
   else
   {
@@ -224,7 +228,7 @@ void pqFlipBookReaction::onToggled(bool checked)
     this->VisibleRepresentations.clear();
     this->View->render();
 
-    this->StepAction->setShortcut(QKeySequence());
+    this->StepActionMode->setEnabled(false);
   }
   this->updateEnableState();
 }

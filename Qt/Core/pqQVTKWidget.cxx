@@ -38,6 +38,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "QVTKOpenGLNativeWidget.h"
 #include "pqApplicationCore.h"
 #include "pqEventDispatcher.h"
+#include "pqQVTKWidgetBase.h"
 #include "pqUndoStack.h"
 #include "vtkPVLogger.h"
 #include "vtkRemotingCoreConfiguration.h"
@@ -375,6 +376,7 @@ double pqQVTKWidget::effectiveDevicePixelRatio() const
     return baseClass.value<QVTKOpenGLNativeWidget*>()->effectiveDevicePixelRatio();
   }
 }
+
 //----------------------------------------------------------------------------
 void pqQVTKWidget::setViewSize(int width, int height)
 {
@@ -389,4 +391,11 @@ void pqQVTKWidget::setViewSize(int width, int height)
       this->ViewProxy->UpdateVTKObjects();
     }
   }
+}
+
+//----------------------------------------------------------------------------
+QWidget* pqQVTKWidget::renderWidget() const
+{
+  return this->useStereo ? static_cast<QWidget*>(this->baseClass.value<pqQVTKWidgetBase*>())
+                         : static_cast<QWidget*>(this->baseClass.value<QVTKOpenGLNativeWidget*>());
 }

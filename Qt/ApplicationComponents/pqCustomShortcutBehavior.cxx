@@ -33,6 +33,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqActiveObjects.h"
 #include "pqCustomizeShortcutsDialog.h"
+#include "pqKeySequences.h"
+#include "pqModalShortcut.h"
 #include "pqSettings.h"
 
 #include <QAction>
@@ -78,7 +80,8 @@ void loadShortcuts(const QList<QAction*>& actions, pqSettings& settings)
       auto variant = settings.value(actionName, QVariant());
       if (variant.canConvert<QKeySequence>())
       {
-        action->setShortcut(variant.value<QKeySequence>());
+        pqKeySequences::instance().addModalShortcut(
+          variant.value<QKeySequence>(), action, qobject_cast<QWidget*>(action->parent()));
       }
     }
   }

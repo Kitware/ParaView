@@ -37,6 +37,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QObject>
 #include <QPointer>
 
+class pqModalShortcut;
+class pqPropertyWidget;
 class pqRenderView;
 class pqView;
 class QShortcut;
@@ -53,7 +55,7 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqPointPickingHelper : public QObject
 
 public:
   pqPointPickingHelper(
-    const QKeySequence& keySequence, bool pick_on_mesh, QObject* parent = nullptr);
+    const QKeySequence& keySequence, bool pick_on_mesh, pqPropertyWidget* parent = nullptr);
   ~pqPointPickingHelper() override;
 
   /**
@@ -71,11 +73,6 @@ public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
    */
   void setView(pqView* view);
 
-  /**
-   * Enable/disable the pick point shortcut.
-   */
-  void setShortcutEnabled(bool);
-
 Q_SIGNALS:
   void pick(double x, double y, double z);
 
@@ -84,11 +81,9 @@ private Q_SLOTS:
 
 private: // NOLINT(readability-redundant-access-specifiers)
   Q_DISABLE_COPY(pqPointPickingHelper)
-  QKeySequence KeySequence;
   QPointer<pqRenderView> View;
   bool PickOnMesh;
-  bool ShortcutEnabled;
-  QPointer<QShortcut> Shortcut;
+  QPointer<pqModalShortcut> Shortcut;
 };
 
 #endif
