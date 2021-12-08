@@ -346,15 +346,15 @@
   </widget>
   <widget class="QDockWidget" name="timeInspectorDock">
    <property name="allowedAreas">
-    <set>Qt::AllDockWidgetAreas</set>
+    <set>Qt::BottomDockWidgetArea|Qt::TopDockWidgetArea</set>
    </property>
    <property name="windowTitle">
     <string>Time Inspector</string>
    </property>
    <attribute name="dockWidgetArea">
-    <number>2</number>
+    <number>8</number>
    </attribute>
-   <widget class="pqTimeInspectorWidget" name="timeInspectorPanel"/>
+  <widget class="pqTimeInspectorWidget" name="timeInspectorPanel"/>
   </widget>
   <widget class="QDockWidget" name="outputWidgetDock">
    <property name="floating">
