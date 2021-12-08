@@ -64,6 +64,7 @@
 
   <Category name="Temporal" menu_label="&amp;Temporal">
     <Proxy group="filters" name="AnimateModes" />
+    <Proxy group="filters" name="ExtractParticlesOverTime" />
     <Proxy group="filters" name="ExtractTimeSteps" />
     <Proxy group="filters" name="ForceTime" />
     <Proxy group="filters" name="GroupTimeSteps" />
@@ -227,6 +228,7 @@
   <Proxy group="filters" name="ExtractHierarchicalDataSets" />
   <Proxy group="filters" name="ExtractHistogram" icon=":/pqWidgets/Icons/pqHistogram24.png" />
   <Proxy group="filters" name="ExtractLocation" />
+  <Proxy group="filters" name="ExtractParticlesOverTime" />
   <Proxy group="filters" name="ExtractSelection" icon=":/pqWidgets/Icons/pqExtractSelection.svg" />
   <Proxy group="filters" name="ExtractSelectionOverTime" icon=":/pqWidgets/Icons/pqPlotSelectionOverTime.svg" />
   <Proxy group="filters" name="ExtractSubsetWithSeed" />
