@@ -1,6 +1,5 @@
 #ifndef vtkSpyPlotBlockIterator_h
 #define vtkSpyPlotBlockIterator_h
-#ifndef __VTK_WRAP__
 
 #include "vtkPVVTKExtensionsIOSPCTHModule.h" //needed for exports
 #include "vtkSpyPlotReaderMap.h"             // for vtkSpyPlotReaderMap iterator
@@ -174,7 +173,6 @@ inline int vtkSpyPlotBlockIterator::GetNumberOfFields() const
   return this->NumberOfFields;
 }
 
-#endif
 #endif
 
 // VTK-HeaderTest-Exclude: vtkSpyPlotBlockIterator.h

@@ -23,7 +23,6 @@
 // We'll use the VTKm decimation filter if TBB is enabled, otherwise we'll
 // fallback to vtkQuadricClustering, since vtkmLevelOfDetail is slow on the
 // serial backend.
-#ifndef __VTK_WRAP__
 #if VTK_MODULE_ENABLE_VTK_vtkm
 #include "vtkmConfigFilters.h" // for VTKM_ENABLE_TBB
 #endif
@@ -143,7 +142,6 @@ protected:
 vtkStandardNewMacro(DecimationFilterType);
 }
 #endif // VTKM_ENABLE_TBB
-#endif // __VTK_WRAP__
 
 #endif
 
