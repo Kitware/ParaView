@@ -33,6 +33,7 @@
 
 #include <QPainter>
 
+#include <cmath>
 #include <limits>
 #include <sstream>
 
