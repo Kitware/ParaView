@@ -50,4 +50,33 @@
       <!-- End of CGNSWriter -->
     </WriterProxy>
   </ProxyGroup>
+
+  <!-- =================================================================== -->
+  <ProxyGroup name="extract_writers">
+    <DataExtractWriterProxy name="CGNS">
+      <Documentation>
+        Extract writer to write data using the CGNS file format.
+      </Documentation>
+      <StringVectorProperty name="FileName"
+                            number_of_elements="1"
+                            default_values="dataset_{timestep:06d}.cgns">
+        <Documentation>
+          Specify the filename to use.
+        </Documentation>
+      </StringVectorProperty>
+      <SubProxy>
+        <Proxy name="Writer" proxygroup="writers" proxyname="CGNSWriter" />
+        <ExposedProperties>
+          <Property name="Input" />
+        </ExposedProperties>
+      </SubProxy>
+
+      <Hints>
+        <ShowInMenu category="Data" />
+      </Hints>
+      <!-- end of CGNS -->
+    </DataExtractWriterProxy>
+
+  <!-- end of "extract_writers" -->
+  </ProxyGroup>
 </ServerManagerConfiguration>
