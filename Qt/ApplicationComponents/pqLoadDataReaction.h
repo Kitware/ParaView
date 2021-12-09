@@ -33,6 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define pqLoadDataReaction_h
 
 #include "pqReaction.h"
+
 #include <QList>
 
 class QStringList;
@@ -89,7 +90,20 @@ public:
     const QString& readergroup = QString(), const QString& readername = QString(),
     pqServer* server = nullptr);
 
+  typedef QPair<QString, QString> ReaderPair;
+  typedef QSet<ReaderPair> ReaderSet;
+
+  ///@{
+  /**
+   * Convenience static method that shows a file dialog,
+   * let user select files and opens the selected files.
+   * readerSet is a set of `readergroup`, `readername` pair to restrict the proposed types
+   * of files shown to the user, not using it let the user choose between all files.
+   * Returns the list of opened file in the pipeline.
+   */
+  static QList<pqPipelineSource*> loadData(const ReaderSet& readerSet);
   static QList<pqPipelineSource*> loadData();
+  ///@}
 
 public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   /**

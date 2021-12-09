@@ -78,27 +78,40 @@ void pqLoadDataReaction::updateEnableState()
 //-----------------------------------------------------------------------------
 QList<pqPipelineSource*> pqLoadDataReaction::loadData()
 {
+  ReaderSet readerSet;
+  return pqLoadDataReaction::loadData(readerSet);
+}
+
+//-----------------------------------------------------------------------------
+QList<pqPipelineSource*> pqLoadDataReaction::loadData(const ReaderSet& readerSet)
+{
   pqServer* server = pqActiveObjects::instance().activeServer();
   vtkSMReaderFactory* readerFactory = vtkSMProxyManager::GetProxyManager()->GetReaderFactory();
+
   std::vector<FileTypeDetailed> filtersDetailed =
     readerFactory->GetSupportedFileTypesDetailed(server->session());
-
   QString filtersString;
+
   bool first = true;
   // Generates the filter string used by the fileDialog
   // For example, this could be "Supported Files (*.jpg *.jpeg *.png);;All Files (*);;JPEG Image
   // Files(*.jpg *.jpeg);;PNG Image Files (*.png)"
   for (auto const& filterDetailed : filtersDetailed)
   {
-    if (!first)
+    ReaderPair readerPair(
+      QString::fromStdString(filterDetailed.Group), QString::fromStdString(filterDetailed.Name));
+    if (readerSet.isEmpty() || readerSet.contains(readerPair))
     {
-      filtersString += ";;";
+      if (!first)
+      {
+        filtersString += ";;";
+      }
+
+      filtersString += QString::fromStdString(filterDetailed.Description) + " (" +
+        QString::fromStdString(vtksys::SystemTools::Join(filterDetailed.FilenamePatterns, " ")) +
+        ")";
+      first = false;
     }
-
-    filtersString += QString::fromStdString(filterDetailed.Description) + " (" +
-      QString::fromStdString(vtksys::SystemTools::Join(filterDetailed.FilenamePatterns, " ")) + ")";
-
-    first = false;
   }
 
   int constexpr SupportedFilesFilterIndex = 0;
