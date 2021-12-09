@@ -34,7 +34,6 @@
 #include <QPainter>
 
 #include <cmath>
-#include <limits>
 #include <sstream>
 
 #if NodeEditor_ENABLE_GRAPHVIZ
