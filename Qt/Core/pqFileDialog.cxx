@@ -52,6 +52,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QMessageBox>
 #include <QPoint>
 #include <QScopedValueRollback>
+#include <QShortcut>
 #include <QtDebug>
 
 #include <QKeyEvent>
@@ -345,6 +346,10 @@ pqFileDialog::pqFileDialog(pqServer* server, QWidget* p, const QString& title,
 
   impl.Ui.Favorites->setEditTriggers(QAbstractItemView::EditTrigger::EditKeyPressed);
 
+  auto shortcutDel = new QShortcut(QKeySequence::Delete, this);
+  QObject::connect(
+    shortcutDel, SIGNAL(activated()), this, SLOT(onRemoveCurrentDirectoryFromFavorites()));
+
   impl.Ui.AddCurrentDirectoryToFavorites->setIcon(QIcon(":/QtWidgets/Icons/pqPlus.svg"));
   QObject::connect(impl.Ui.AddCurrentDirectoryToFavorites, SIGNAL(clicked()), this,
     SLOT(onAddCurrentDirectoryToFavorites()));
@@ -616,8 +621,15 @@ void pqFileDialog::onAddCurrentDirectoryToFavorites()
 //-----------------------------------------------------------------------------
 void pqFileDialog::onRemoveCurrentDirectoryFromFavorites()
 {
-  QString const currentPath = this->Implementation->Model->getCurrentPath();
-  this->RemoveDirectoryFromFavorites(currentPath);
+  QModelIndex index = this->Implementation->Ui.Favorites->currentIndex();
+  if (index.isValid())
+  {
+    QString dirPath = this->Implementation->FavoriteModel->filePath(index);
+    if (!dirPath.isEmpty())
+    {
+      this->RemoveDirectoryFromFavorites(dirPath);
+    }
+  }
 }
 
 //-----------------------------------------------------------------------------
