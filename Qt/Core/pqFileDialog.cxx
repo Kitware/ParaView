@@ -348,9 +348,6 @@ pqFileDialog::pqFileDialog(pqServer* server, QWidget* p, const QString& title,
   impl.Ui.AddCurrentDirectoryToFavorites->setIcon(QIcon(":/QtWidgets/Icons/pqPlus.svg"));
   QObject::connect(impl.Ui.AddCurrentDirectoryToFavorites, SIGNAL(clicked()), this,
     SLOT(onAddCurrentDirectoryToFavorites()));
-  impl.Ui.RemoveCurrentDirectoryFromFavorites->setIcon(QIcon(":/QtWidgets/Icons/pqMinus.svg"));
-  QObject::connect(impl.Ui.RemoveCurrentDirectoryFromFavorites, SIGNAL(clicked()), this,
-    SLOT(onRemoveCurrentDirectoryFromFavorites()));
   impl.Ui.ResetFavortiesToSystemDefault->setIcon(QIcon(":/pqWidgets/Icons/pqReset.svg"));
   QObject::connect(impl.Ui.ResetFavortiesToSystemDefault, SIGNAL(clicked()), this,
     SLOT(onResetFavoritesToSystemDefault()));
