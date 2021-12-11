@@ -50,6 +50,9 @@ if ("$ENV{CMAKE_CONFIGURATION}" MATCHES "fedora")
     "\\.VariableSelector1$"
     "\\.VolumeCrop$"
 
+    # Image corruption.
+    "^pv\\.StreamLinesRepresentationThick$"
+
     # "Structure does not match. You must use CopyStructure before calling this
     # method."
     # https://gitlab.kitware.com/paraview/paraview/-/issues/20692
