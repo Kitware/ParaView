@@ -53,6 +53,11 @@ if ("$ENV{CMAKE_CONFIGURATION}" MATCHES "fedora")
     # Image corruption.
     "^pv\\.StreamLinesRepresentationThick$"
 
+    # Fides timeouts
+    # https://gitlab.kitware.com/paraview/paraview/-/issues/21131
+    "^pvcs\\.FidesReaderADIOS2$"
+    "^pvcrs\\.FidesReaderADIOS2$"
+
     # "Structure does not match. You must use CopyStructure before calling this
     # method."
     # https://gitlab.kitware.com/paraview/paraview/-/issues/20692
