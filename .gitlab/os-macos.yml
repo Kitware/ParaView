@@ -7,7 +7,7 @@
         GIT_CLONE_PATH: "$CI_BUILDS_DIR/paraview-ci-ext/$CI_CONCURRENT_ID"
         # TODO: Factor this out so that each job selects the Xcode version to
         # use so that different versions can be tested in a single pipeline.
-        DEVELOPER_DIR: "/Applications/Xcode-12.4.app/Contents/Developer"
+        DEVELOPER_DIR: "/Applications/Xcode-13.1.app/Contents/Developer"
 
 ### Build and test
 
@@ -43,7 +43,7 @@
         - paraview
         - macos
         - shell
-        - xcode-12.4
+        - xcode-13.1
         - nonconcurrent
 
 .macos_arm64_builder_tags:
@@ -51,7 +51,7 @@
         - paraview
         - macos-arm64
         - shell
-        - xcode-12.4
+        - xcode-13.1
         - nonconcurrent
 
 ## macOS-specific scripts
