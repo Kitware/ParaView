@@ -129,6 +129,9 @@ if ("$ENV{CMAKE_CONFIGURATION}" MATCHES "windows")
     # Fails sporadically (paraview/paraview#20702)
     "^pv\\.TestPythonConsole$"
 
+    # Flaky with timeouts
+    "^pvcs\\.UndoRedo1"
+
     # Fails consistently, needs debugging (paraview/paraview#20742)
     "^pv\\.PythonAlgorithmPlugin$"
     )
