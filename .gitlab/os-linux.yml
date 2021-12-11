@@ -20,9 +20,9 @@
     variables:
         LAUNCHER: "scl enable devtoolset-7 --"
 
-.fedora33:
+.fedora35:
     extends: .linux
-    image: "kitware/paraview:ci-fedora33-20210903"
+    image: "kitware/paraview:ci-fedora35-20220127"
 
 .el8_icc:
     extends: .linux
@@ -62,46 +62,46 @@
     variables:
         CMAKE_CONFIGURATION: el8_shared_icc_mpi_python
 
-.fedora33_static_mpi_offscreen_osmesa_python:
+.fedora35_static_mpi_offscreen_osmesa_python:
     extends:
-        - .fedora33
+        - .fedora35
         - .fedora_mpich_addon
 
     variables:
-        CMAKE_CONFIGURATION: fedora33_static_mpi_offscreen_osmesa_python
+        CMAKE_CONFIGURATION: fedora35_static_mpi_offscreen_osmesa_python
 
-.fedora33_shared_mpi_core:
+.fedora35_shared_mpi_core:
     extends:
-        - .fedora33
+        - .fedora35
         - .fedora_mpich_addon
 
     variables:
-        CMAKE_CONFIGURATION: fedora33_shared_mpi_core
+        CMAKE_CONFIGURATION: fedora35_shared_mpi_core
 
-.fedora33_shared_mpi_python_core:
+.fedora35_shared_mpi_python_core:
     extends:
-        - .fedora33
+        - .fedora35
         - .fedora_mpich_addon
 
     variables:
-        CMAKE_CONFIGURATION: fedora33_shared_mpi_python_core
+        CMAKE_CONFIGURATION: fedora35_shared_mpi_python_core
 
-.fedora33_shared_debug_mpi_python_qt:
+.fedora35_shared_debug_mpi_python_qt:
     extends:
-        - .fedora33
+        - .fedora35
         - .fedora_mpich_addon
 
     variables:
-        CMAKE_CONFIGURATION: fedora33_shared_mpi_python_qt
+        CMAKE_CONFIGURATION: fedora35_shared_mpi_python_qt
         CMAKE_BUILD_TYPE: Debug
 
-.fedora33_tidy:
+.fedora35_tidy:
     extends:
-        - .fedora33
+        - .fedora35
         - .fedora_mpich_addon
 
     variables:
-        CMAKE_CONFIGURATION: fedora33_shared_mpi_python_qt_tidy
+        CMAKE_CONFIGURATION: fedora35_shared_mpi_python_qt_tidy
         CTEST_NO_WARNINGS_ALLOWED: 1
 
 .linux_builder_tags:
