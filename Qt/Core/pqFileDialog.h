@@ -244,10 +244,10 @@ private Q_SLOTS:
 
   void AddDirectoryToFavorites(QString const&);
   void RemoveDirectoryFromFavorites(QString const&);
-  void FilterDirectoryFromFavorites(const QString&);
+  void FilterDirectoryFromFavorites(const QString& filter);
 
   void onAddCurrentDirectoryToFavorites();
-  void onRemoveCurrentDirectoryFromFavorites();
+  void onRemoveSelectedDirectoriesFromFavorites();
   void onResetFavoritesToSystemDefault();
 
   // Called when the user requests to create a new directory in the cwd
