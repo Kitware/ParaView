@@ -134,6 +134,7 @@ public:
   pqFileDialogModel* const Model;
   pqFileDialogFavoriteModel* const FavoriteModel;
   pqFileDialogRecentDirsModel* const RecentModel;
+  QSortFilterProxyModel* proxyFavoriteModel;
   pqFileDialogFilter FileFilter;
   QStringList FileNames; // list of file names in the FileName ui text edit
   QCompleter* Completer;
@@ -357,7 +358,11 @@ pqFileDialog::pqFileDialog(pqServer* server, QWidget* p, const QString& title,
   QObject::connect(impl.Ui.ResetFavortiesToSystemDefault, SIGNAL(clicked()), this,
     SLOT(onResetFavoritesToSystemDefault()));
 
-  impl.Ui.Favorites->setModel(impl.FavoriteModel);
+  impl.proxyFavoriteModel = new QSortFilterProxyModel(impl.FavoriteModel);
+  impl.proxyFavoriteModel->setFilterCaseSensitivity(Qt::CaseInsensitive);
+  impl.proxyFavoriteModel->setSourceModel(impl.FavoriteModel);
+
+  impl.Ui.Favorites->setModel(impl.proxyFavoriteModel);
   impl.Ui.Recent->setModel(impl.RecentModel);
 
   this->setFileMode(ExistingFile);
@@ -376,6 +381,9 @@ pqFileDialog::pqFileDialog(pqServer* server, QWidget* p, const QString& title,
 
   QObject::connect(impl.Ui.Favorites, SIGNAL(clicked(const QModelIndex&)), this,
     SLOT(onClickedFavorite(const QModelIndex&)));
+
+  QObject::connect(impl.Ui.favoritesSearchBar, SIGNAL(textChanged(const QString&)), this,
+    SLOT(FilterDirectoryFromFavorites(const QString&)));
 
   QObject::connect(impl.Ui.Recent, SIGNAL(clicked(const QModelIndex&)), this,
     SLOT(onClickedRecent(const QModelIndex&)));
@@ -609,6 +617,12 @@ void pqFileDialog::AddDirectoryToFavorites(QString const& directory)
 void pqFileDialog::RemoveDirectoryFromFavorites(QString const& directory)
 {
   this->Implementation->FavoriteModel->removeFromFavorites(directory);
+}
+
+//-----------------------------------------------------------------------------
+void pqFileDialog::FilterDirectoryFromFavorites(const QString& str)
+{
+  this->Implementation->proxyFavoriteModel->setFilterRegExp(str);
 }
 
 //-----------------------------------------------------------------------------

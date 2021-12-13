@@ -130,6 +130,10 @@
            </widget>
           </item>
           <item>
+           <widget class="QLineEdit" name="favoritesSearchBar">
+           </widget>
+          </item>
+          <item>
            <widget class="QPushButton" name="AddCurrentDirectoryToFavorites">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Fixed" vsizetype="Fixed">

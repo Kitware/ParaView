@@ -244,6 +244,7 @@ private Q_SLOTS:
 
   void AddDirectoryToFavorites(QString const&);
   void RemoveDirectoryFromFavorites(QString const&);
+  void FilterDirectoryFromFavorites(const QString&);
 
   void onAddCurrentDirectoryToFavorites();
   void onRemoveCurrentDirectoryFromFavorites();
