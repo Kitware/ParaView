@@ -121,7 +121,7 @@ paraview_add_test_mpi(
           -s "${CMAKE_CURRENT_SOURCE_DIR}/repeated_pipeline.py"
           -s
   TEST_SCRIPTS "repeated_pipeline.py" )
-set_tests_properties("Catalyst::WaveletMiniApp.repeated_pipeline"
+set_tests_properties("Catalyst::MPI::WaveletMiniApp.repeated_pipeline"
    PROPERTIES
       PASS_REGULAR_EXPRESSION "Importing 'repeated_pipeline' for 2-th time!")
 
