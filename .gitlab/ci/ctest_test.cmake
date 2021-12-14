@@ -50,6 +50,14 @@ if ("$ENV{CMAKE_CONFIGURATION}" MATCHES "fedora")
     "\\.VariableSelector1$"
     "\\.VolumeCrop$"
 
+    # Image corruption.
+    "^pv\\.StreamLinesRepresentationThick$"
+
+    # Fides timeouts
+    # https://gitlab.kitware.com/paraview/paraview/-/issues/21131
+    "^pvcs\\.FidesReaderADIOS2$"
+    "^pvcrs\\.FidesReaderADIOS2$"
+
     # "Structure does not match. You must use CopyStructure before calling this
     # method."
     # https://gitlab.kitware.com/paraview/paraview/-/issues/20692
@@ -120,6 +128,9 @@ if ("$ENV{CMAKE_CONFIGURATION}" MATCHES "windows")
 
     # Fails sporadically (paraview/paraview#20702)
     "^pv\\.TestPythonConsole$"
+
+    # Flaky with timeouts
+    "^pvcs\\.UndoRedo1"
 
     # Fails consistently, needs debugging (paraview/paraview#20742)
     "^pv\\.PythonAlgorithmPlugin$"
