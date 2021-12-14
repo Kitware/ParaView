@@ -817,6 +817,11 @@ def getattr(proxy, pname):
                     "properties, then set the 'ThresholdMethod' property to "
                     "'Between' to threshold between the lower and upper thresholds.")
 
+    if pname == "CutoffArray" and proxy.SMProxy.GetXMLName() != "SPHDataSetInterpolator":
+        raise NotSupportedException("The 'CutoffArray' property has been removed in ParaView 5.11."
+                    "If you are wishing to use this property, please use 'SPHDataSetInterpolator' "
+                    "instead. The 'CutoffArray' needs to be provided by the data set source.")
+
     raise Continue()
 
 # Depending on the compatibility version that has been set, older functionalities
