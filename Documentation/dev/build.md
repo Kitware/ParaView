@@ -453,7 +453,7 @@ More advanced options:
     build-machine-specific paths in the install tree.
   * `PARAVIEW_SERIAL_TESTS_USE_MPIEXEC` (default `OFF`): Used on HPC to run
     serial tests on compute nodes. If set, it prefixes serial tests with
-    "${MPIEXEC_EXECUTABLE}" "${MPIEXEC_NUMPROC_FLAG}" "1" ${MPIEXEC_PREFLAGS}
+    "${MPIEXEC_EXECUTABLE}" "${MPIEXEC_NUMPROC_FLAG}" "1" ${MPI_PREFLAGS}
   * `PARAVIEW_SKIP_CLANG_TIDY_FOR_VTK` (defaults `ON`; requires
     `CMAKE_<LANG>_CLANG_TIDY`): If set, any `clang-tidy` settings will be
     cleared for the internal VTK build.
