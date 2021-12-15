@@ -35,6 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqCoreModule.h"
 #include <QAbstractListModel>
+#include <QList>
 #include <QObject>
 
 class vtkProcessModule;
@@ -49,7 +50,7 @@ filesystem, as well as browsing of the local file system.
 */
 class PQCORE_EXPORT pqFileDialogFavoriteModel : public QAbstractListModel
 {
-  typedef QAbstractListModel base;
+  typedef QAbstractListModel Superclass;
 
   Q_OBJECT
 
@@ -98,17 +99,17 @@ public:
   /**
    * Adds a directory to the favorites
    */
-  void addToFavorites(QString const& dirPath);
+  virtual void addToFavorites(QString const& dirPath);
 
   /**
    * Removes a directory from the favorites
    */
-  void removeFromFavorites(QString const& dirPath);
+  virtual void removeFromFavorites(QString const& dirPath);
 
   /**
    * Resets the favorites to the system default
    */
-  void resetFavoritesToDefault();
+  virtual void resetFavoritesToDefault();
 
   /**
    * Flag to indicate if the ParaView Examples directory must be added when creating the settings
@@ -116,9 +117,19 @@ public:
    */
   static bool AddExamplesInFavorites;
 
-private:
-  class pqImplementation;
-  pqImplementation* const Implementation;
+protected:
+  struct pqFileDialogFavoriteModelFileInfo
+  {
+    QString Label;
+    QString FilePath;
+    int Type;
+  };
+
+  void LoadFavoritesFromSystem();
+
+  pqServer* Server = nullptr;
+  QList<pqFileDialogFavoriteModelFileInfo> FavoriteList;
+  QString SettingsKey;
 };
 
 #endif // !pqFileDialogFavoriteModel_h
