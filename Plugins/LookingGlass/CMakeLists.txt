@@ -19,6 +19,7 @@ list(APPEND sources
 
 paraview_add_plugin(LookingGlass
   VERSION "1.3"
+  EULA "EULA.txt"
   UI_FILES
     pqLookingGlassDockPanel.ui
   UI_INTERFACES ${interfaces}
