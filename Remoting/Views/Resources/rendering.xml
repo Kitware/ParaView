@@ -522,6 +522,10 @@
             unlink_if_modified="1" />
         </Hints>
       </DoubleVectorProperty>
+      <ExposedProperties>
+        <Property name="LineSpacing" />
+        <Property name="CellOffset" />
+      </ExposedProperties>
     </Proxy>
 
     <Proxy class="vtkTextProperty" name="ChartTextProperty"
