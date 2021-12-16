@@ -130,6 +130,10 @@
            </widget>
           </item>
           <item>
+           <widget class="QLineEdit" name="favoritesSearchBar">
+           </widget>
+          </item>
+          <item>
            <widget class="QPushButton" name="AddCurrentDirectoryToFavorites">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
@@ -145,26 +149,6 @@
             </property>
             <property name="icon">
              <iconset theme="list-add">
-              <normaloff>.</normaloff>.</iconset>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QPushButton" name="RemoveCurrentDirectoryFromFavorites">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
-            <property name="toolTip">
-             <string>Remove current directory from favorites</string>
-            </property>
-            <property name="text">
-             <string/>
-            </property>
-            <property name="icon">
-             <iconset theme="list-remove">
               <normaloff>.</normaloff>.</iconset>
             </property>
            </widget>

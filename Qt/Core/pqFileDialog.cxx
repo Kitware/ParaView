@@ -52,6 +52,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QMessageBox>
 #include <QPoint>
 #include <QScopedValueRollback>
+#include <QShortcut>
 #include <QtDebug>
 
 #include <QKeyEvent>
@@ -133,6 +134,7 @@ public:
   pqFileDialogModel* const Model;
   pqFileDialogFavoriteModel* const FavoriteModel;
   pqFileDialogRecentDirsModel* const RecentModel;
+  QSortFilterProxyModel* proxyFavoriteModel;
   pqFileDialogFilter FileFilter;
   QStringList FileNames; // list of file names in the FileName ui text edit
   QCompleter* Completer;
@@ -345,17 +347,24 @@ pqFileDialog::pqFileDialog(pqServer* server, QWidget* p, const QString& title,
 
   impl.Ui.Favorites->setEditTriggers(QAbstractItemView::EditTrigger::EditKeyPressed);
 
+  auto shortcutDel = new QShortcut(QKeySequence::Delete, this);
+  QObject::connect(shortcutDel, &QShortcut::activated, this,
+    &pqFileDialog::onRemoveSelectedDirectoriesFromFavorites);
+
   impl.Ui.AddCurrentDirectoryToFavorites->setIcon(QIcon(":/QtWidgets/Icons/pqPlus.svg"));
   QObject::connect(impl.Ui.AddCurrentDirectoryToFavorites, SIGNAL(clicked()), this,
     SLOT(onAddCurrentDirectoryToFavorites()));
-  impl.Ui.RemoveCurrentDirectoryFromFavorites->setIcon(QIcon(":/QtWidgets/Icons/pqMinus.svg"));
-  QObject::connect(impl.Ui.RemoveCurrentDirectoryFromFavorites, SIGNAL(clicked()), this,
-    SLOT(onRemoveCurrentDirectoryFromFavorites()));
   impl.Ui.ResetFavortiesToSystemDefault->setIcon(QIcon(":/pqWidgets/Icons/pqReset.svg"));
   QObject::connect(impl.Ui.ResetFavortiesToSystemDefault, SIGNAL(clicked()), this,
     SLOT(onResetFavoritesToSystemDefault()));
 
-  impl.Ui.Favorites->setModel(impl.FavoriteModel);
+  impl.proxyFavoriteModel = new QSortFilterProxyModel(impl.FavoriteModel);
+  impl.proxyFavoriteModel->setFilterCaseSensitivity(Qt::CaseInsensitive);
+  impl.proxyFavoriteModel->setSourceModel(impl.FavoriteModel);
+
+  impl.Ui.Favorites->setModel(impl.proxyFavoriteModel);
+  impl.Ui.Favorites->setSelectionMode(QAbstractItemView::ExtendedSelection);
+
   impl.Ui.Recent->setModel(impl.RecentModel);
 
   this->setFileMode(ExistingFile);
@@ -374,6 +383,9 @@ pqFileDialog::pqFileDialog(pqServer* server, QWidget* p, const QString& title,
 
   QObject::connect(impl.Ui.Favorites, SIGNAL(clicked(const QModelIndex&)), this,
     SLOT(onClickedFavorite(const QModelIndex&)));
+
+  QObject::connect(impl.Ui.favoritesSearchBar, &QLineEdit::textChanged, this,
+    &pqFileDialog::FilterDirectoryFromFavorites);
 
   QObject::connect(impl.Ui.Recent, SIGNAL(clicked(const QModelIndex&)), this,
     SLOT(onClickedRecent(const QModelIndex&)));
@@ -610,6 +622,12 @@ void pqFileDialog::RemoveDirectoryFromFavorites(QString const& directory)
 }
 
 //-----------------------------------------------------------------------------
+void pqFileDialog::FilterDirectoryFromFavorites(const QString& filter)
+{
+  this->Implementation->proxyFavoriteModel->setFilterRegExp(filter);
+}
+
+//-----------------------------------------------------------------------------
 void pqFileDialog::onAddCurrentDirectoryToFavorites()
 {
   QString const currentPath = this->Implementation->Model->getCurrentPath();
@@ -617,10 +635,20 @@ void pqFileDialog::onAddCurrentDirectoryToFavorites()
 }
 
 //-----------------------------------------------------------------------------
-void pqFileDialog::onRemoveCurrentDirectoryFromFavorites()
+void pqFileDialog::onRemoveSelectedDirectoriesFromFavorites()
 {
-  QString const currentPath = this->Implementation->Model->getCurrentPath();
-  this->RemoveDirectoryFromFavorites(currentPath);
+  QStringList selectedDirs;
+  for (const QModelIndex& index :
+    this->Implementation->Ui.Favorites->selectionModel()->selectedIndexes())
+  {
+    QString dirPath = this->Implementation->FavoriteModel->filePath(index);
+    selectedDirs.push_back(dirPath);
+  }
+
+  for (const QString& dir : selectedDirs)
+  {
+    this->Implementation->FavoriteModel->removeFromFavorites(dir);
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -650,7 +678,7 @@ void pqFileDialog::onFavoritesContextMenuRequested(const QPoint& menuPos)
     {
       auto removeFromFavorites = new QAction("Remove from favorites", this);
       QObject::connect(removeFromFavorites, &QAction::triggered,
-        [=] { this->Implementation->FavoriteModel->removeFromFavorites(dirPath); });
+        [=] { this->onRemoveSelectedDirectoriesFromFavorites(); });
       menu.addAction(removeFromFavorites);
 
       auto renameLabel = new QAction("Rename label", this);
