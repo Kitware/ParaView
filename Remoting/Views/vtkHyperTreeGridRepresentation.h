@@ -100,9 +100,9 @@ public:
 
   enum RepresentationTypes
   {
-    WIREFRAME = VTK_WIREFRAME,
-    SURFACE = VTK_SURFACE,
-    SURFACE_WITH_EDGES = 3
+    WIREFRAME = 1,
+    SURFACE,
+    SURFACE_WITH_EDGES
   };
 
   //@{
@@ -144,11 +144,11 @@ public:
   /**
    * Sets if scalars are mapped through a color-map or are used
    * directly as colors.
-   * 0 maps to VTK_COLOR_MODE_DIRECT_SCALARS
-   * 1 maps to VTK_COLOR_MODE_MAP_SCALARS
+   * false: maps to VTK_COLOR_MODE_DIRECT_SCALARS
+   * true: maps to VTK_COLOR_MODE_MAP_SCALARS
    * @see vtkScalarsToColors::MapScalars
    */
-  virtual void SetMapScalars(int val);
+  virtual void SetMapScalars(bool val);
   virtual void SetStatic(int val);
   //@}
 
@@ -252,14 +252,14 @@ protected:
    */
 
   vtkNew<vtkOpenGLHyperTreeGridMapper> Mapper;
-  vtkActor* Actor;
-  vtkProperty* Property;
+  vtkNew<vtkActor> Actor;
+  vtkNew<vtkProperty> Property;
 
-  double Ambient;
-  double Specular;
-  double Diffuse;
-  int Representation;
-  bool AdaptiveDecimation;
+  double Ambient = 0.0;
+  double Specular = 0.0;
+  double Diffuse = 1.0;
+  int Representation = SURFACE;
+  bool AdaptiveDecimation = true;
   double VisibleDataBounds[6];
 
 private:

@@ -5037,8 +5037,7 @@
                          name="Visibility"
                          number_of_elements="1">
         <BooleanDomain name="bool" />
-        <Documentation>Set the visibility of the
-        representation.</Documentation>
+        <Documentation>Set the visibility of the representation.</Documentation>
       </IntVectorProperty>
 
       <IntVectorProperty command="SetAdaptiveDecimation"
@@ -5091,6 +5090,31 @@
           <Group name="lookup_tables" />
         </ProxyGroupDomain>
       </ProxyProperty>
+      <IntVectorProperty default_values="0"
+                         name="UseSeparateColorMap"
+                         number_of_elements="1"
+                         panel_visibility="never">
+        <BooleanDomain name="bool" />
+        <Documentation>By default, ParaView shares a single color map among all datasets colored
+        by arrays that have the same name. When this option is enabled, the active dataset will
+        be assigned a separate color map not shared by other datasets.</Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty command="SetAmbient"
+                            default_values="0.0"
+                            name="AmbientColor"
+                            number_of_elements="1">
+        <DoubleRangeDomain max="1"
+                           min="0"
+                           name="range" />
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetDiffuse"
+                            default_values="1.0"
+                            name="DiffuseColor"
+                            number_of_elements="1">
+        <DoubleRangeDomain max="1"
+                           min="0"
+                           name="range" />
+      </DoubleVectorProperty>
 
       <DoubleVectorProperty command="SetOpacity"
                             default_values="1.0"
@@ -5112,6 +5136,7 @@
       <DoubleVectorProperty command="SetEdgeColor"
                             default_values="0 0 0.5"
                             name="EdgeColor"
+                            panel_widget="color_selector_with_palette"
                             number_of_elements="3">
         <Documentation>Set the edge color. This color is used to draw the edge
         for the hyper tree grid data when EdgeVisibility is on.</Documentation>
@@ -5120,10 +5145,24 @@
                            name="range" />
         <Hints>
           <PropertyLink group="settings" proxy="ColorPalette" property="EdgeColor" unlink_if_modified="1" />
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="Representation"
+                                   value="3" />
         </Hints>
       </DoubleVectorProperty>
 
-    <!--  End of SurfaceRepresentationBase -->
+      <PropertyGroup panel_visibility="default"
+                     panel_widget="ColorEditor"
+                     label="Coloring" >
+        <Property name="AmbientColor" />
+        <Property name="ColorArrayName" />
+        <Property name="DiffuseColor" />
+        <Property name="LookupTable" />
+        <Property name="UseSeparateColorMap" />
+      </PropertyGroup>
+
+    <!--  End of HyperTreeGridRepresentation -->
     </PVRepresentationProxy>
 
     <!-- ================================================================== -->

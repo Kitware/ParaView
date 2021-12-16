@@ -48,27 +48,12 @@ vtkStandardNewMacro(vtkHyperTreeGridRepresentation);
 
 vtkHyperTreeGridRepresentation::vtkHyperTreeGridRepresentation()
 {
-  this->Actor = vtkActor::New();
-  this->Property = vtkProperty::New();
-
-  this->Ambient = 0.0;
-  this->Diffuse = 1.0;
-  this->Specular = 0.0;
-  this->Representation = SURFACE;
-
-  this->AdaptiveDecimation = true;
-
   vtkMath::UninitializeBounds(this->VisibleDataBounds);
-
   this->SetupDefaults();
 }
 
 //----------------------------------------------------------------------------
-vtkHyperTreeGridRepresentation::~vtkHyperTreeGridRepresentation()
-{
-  this->Actor->Delete();
-  this->Property->Delete();
-}
+vtkHyperTreeGridRepresentation::~vtkHyperTreeGridRepresentation() = default;
 
 //----------------------------------------------------------------------------
 void vtkHyperTreeGridRepresentation::SetupDefaults()
@@ -81,9 +66,8 @@ void vtkHyperTreeGridRepresentation::SetupDefaults()
 
   // Not insanely thrilled about this API on vtkProp about properties, but oh
   // well. We have to live with it.
-  vtkInformation* keys = vtkInformation::New();
+  vtkNew<vtkInformation> keys;
   this->Actor->SetPropertyKeys(keys);
-  keys->Delete();
 }
 
 //----------------------------------------------------------------------------
@@ -124,10 +108,6 @@ int vtkHyperTreeGridRepresentation::ProcessViewRequest(
 
     outInfo->Set(
       vtkPVRenderView::NEED_ORDERED_COMPOSITING(), this->NeedsOrderedCompositing() ? 1 : 0);
-
-    // vtkNew<vtkMatrix4x4> matrix;
-    // this->Actor->GetMatrix(matrix);
-    // vtkPVRenderView::SetGeometryBounds(inInfo, this, this->VisibleDataBounds, matrix);
   }
   else if (request_type == vtkPVView::REQUEST_RENDER())
   {
@@ -168,7 +148,6 @@ int vtkHyperTreeGridRepresentation::RequestData(
 {
   if (inputVector[0]->GetNumberOfInformationObjects() == 1)
   {
-    // vtkLogF(INFO, "%s->RequestData", this->GetLogName().c_str());
     vtkInformation* inInfo = inputVector[0]->GetInformationObject(0);
     if (inInfo->Has(vtkStreamingDemandDrivenPipeline::WHOLE_EXTENT()))
     {
@@ -181,18 +160,9 @@ int vtkHyperTreeGridRepresentation::RequestData(
     }
     this->Mapper->SetInputConnection(this->GetInternalOutputPort());
   }
-  else
-  {
-    // FIXME
-    //    vtkNew<vtkMultiBlockDataSet> placeholder;
-    //    this->GeometryFilter->SetInputDataObject(0, placeholder);
-  }
 
   // essential to re-execute geometry filter consistently on all ranks since it
   // does use parallel communication (see #19963).
-  // FIXME
-  //  this->GeometryFilter->Modified();
-  //  this->MultiBlockMaker->Update();
   this->Mapper->Modified();
   return this->Superclass::RequestData(request, inputVector, outputVector);
 }
@@ -270,7 +240,7 @@ const char* vtkHyperTreeGridRepresentation::GetColorArrayName()
 //----------------------------------------------------------------------------
 void vtkHyperTreeGridRepresentation::UpdateColoringParameters()
 {
-  bool using_scalar_coloring = false;
+  bool usingScalarColoring = false;
 
   vtkInformation* info = this->GetInputArrayInformation(0);
   if (info && info->Has(vtkDataObject::FIELD_ASSOCIATION()) &&
@@ -288,7 +258,7 @@ void vtkHyperTreeGridRepresentation::UpdateColoringParameters()
       {
         case vtkDataObject::FIELD_ASSOCIATION_NONE:
           this->Mapper->SetScalarMode(VTK_SCALAR_MODE_USE_FIELD_DATA);
-          // Color entire block by zeroth tuple in the field data
+          // Color entire block by first tuple in the field data
           this->Mapper->SetFieldDataTupleId(0);
           break;
 
@@ -298,11 +268,11 @@ void vtkHyperTreeGridRepresentation::UpdateColoringParameters()
           this->Mapper->SetScalarMode(VTK_SCALAR_MODE_USE_CELL_FIELD_DATA);
           break;
       }
-      using_scalar_coloring = true;
+      usingScalarColoring = true;
     }
   }
 
-  if (!using_scalar_coloring)
+  if (!usingScalarColoring)
   {
     this->Mapper->SetScalarVisibility(0);
     this->Mapper->SelectColorArray(nullptr);
@@ -411,16 +381,9 @@ void vtkHyperTreeGridRepresentation::SetLookupTable(vtkScalarsToColors* val)
 }
 
 //----------------------------------------------------------------------------
-void vtkHyperTreeGridRepresentation::SetMapScalars(int val)
+void vtkHyperTreeGridRepresentation::SetMapScalars(bool val)
 {
-  if (val < 0 || val > 1)
-  {
-    vtkWarningMacro(<< "Invalid parameter for vtkHyperTreeGridRepresentation::SetMapScalars: "
-                    << val);
-    val = 0;
-  }
-  int mapToColorMode[] = { VTK_COLOR_MODE_DIRECT_SCALARS, VTK_COLOR_MODE_MAP_SCALARS };
-  this->Mapper->SetColorMode(mapToColorMode[val]);
+  this->Mapper->SetColorMode(val ? VTK_COLOR_MODE_MAP_SCALARS : VTK_COLOR_MODE_DIRECT_SCALARS);
 }
 
 //----------------------------------------------------------------------------
