@@ -31,6 +31,7 @@
 set(classes
   vtkExtractSelectionRange
   vtkPConvertSelection
+  vtkExtractCellsAlongLine
   vtkPVExtractSelection
   vtkPVSelectionSource
   vtkPVSingleOutputExtractSelection

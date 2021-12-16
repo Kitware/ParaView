@@ -311,8 +311,6 @@
           It must be different to `vtkGhostType` in order for the cells to be displayed.
         </Documentation>
       </StringVectorProperty>
-
-
     </SourceProxy>
 
     <!-- ==================================================================== -->
