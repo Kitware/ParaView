@@ -147,6 +147,42 @@
     </NewWidgetRepresentationProxy>
     <!-- ================================================================== -->
     <NewWidgetRepresentationProxy class="vtk3DWidgetRepresentation"
+                                  name="DisplaySizedImplicitPlaneWidgetRepresentation">
+      <IntVectorProperty command="SetEnabled"
+                         default_values="1"
+                         name="Enabled"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Enable/Disable widget interaction.</Documentation>
+      </IntVectorProperty>
+      <SubProxy>
+        <Proxy name="Prop"
+               proxygroup="3d_widget_representations"
+               proxyname="DisplaySizedImplicitPlaneRepresentation"></Proxy>
+        <ExposedProperties>
+          <Property name="DrawPlane" />
+          <Property name="ConstrainToWidgetBounds" />
+          <Property name="OutlineTranslation" />
+          <Property name="OriginInfo" />
+          <Property name="Origin" />
+          <Property name="NormalInfo" />
+          <Property name="Normal" />
+          <Property name="WidgetBounds" />
+          <Property name="Visibility" />
+          <Property name="PlaceFactor" />
+          <Property name="Reset" />
+          <Property name="AlwaysSnapToNearestAxis" />
+          <Property name="AlwaysSnapToNearestAxisInfo" />
+        </ExposedProperties>
+      </SubProxy>
+      <SubProxy>
+        <Proxy name="Widget"
+               proxygroup="3d_widgets"
+               proxyname="DisplaySizedImplicitPlaneWidget"></Proxy>
+      </SubProxy>
+    </NewWidgetRepresentationProxy>
+    <!-- ================================================================== -->
+    <NewWidgetRepresentationProxy class="vtk3DWidgetRepresentation"
                                   name="DistanceWidgetRepresentation">
       <IntVectorProperty command="SetEnabled"
                          default_values="0"
@@ -1431,6 +1467,13 @@
                          number_of_elements="1">
         <BooleanDomain name="bool" />
       </IntVectorProperty>
+      <IntVectorProperty animateable="1"
+                         command="SetDrawOutline"
+                         default_values="1"
+                         name="DrawOutline"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
       <IntVectorProperty command="SetOutlineTranslation"
                          default_values="0"
                          name="OutlineTranslation"
@@ -1493,6 +1536,98 @@
         <DoubleRangeDomain name="range" />
       </DoubleVectorProperty>
     </ImplicitPlaneRepresentationProxy>
+    <!-- ================================================================== -->
+    <DisplaySizedImplicitPlaneRepresentationProxy class="vtkPVDisplaySizedImplicitPlaneRepresentation"
+                                                  name="DisplaySizedImplicitPlaneRepresentation">
+      <IntVectorProperty animateable="1"
+                         command="SetVisibility"
+                         default_values="1"
+                         name="Visibility"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+      <IntVectorProperty animateable="1"
+                         command="SetDrawPlane"
+                         default_values="0"
+                         name="DrawPlane"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+      <IntVectorProperty command="SetConstrainToWidgetBounds"
+                         default_values="0"
+                         name="ConstrainToWidgetBounds"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+      <IntVectorProperty animateable="1"
+                         command="SetDrawOutline"
+                         default_values="1"
+                         name="DrawOutline"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+      <IntVectorProperty command="SetOutlineTranslation"
+                         default_values="0"
+                         name="OutlineTranslation"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+      <IntVectorProperty command="SetAlwaysSnapToNearestAxis"
+                         default_values="0"
+                         information_property="AlwaysSnapToNearestAxisInfo"
+                         name="AlwaysSnapToNearestAxis"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+      <IntVectorProperty command="GetAlwaysSnapToNearestAxis"
+                         information_only="1"
+                         default_values="0"
+                         name="AlwaysSnapToNearestAxisInfo"
+                         number_of_elements="1">
+        <SimpleIntInformationHelper />
+      </IntVectorProperty>
+
+      <Property command="Reset"
+                name="Reset"></Property>
+      <DoubleVectorProperty command="SetOrigin"
+                            default_values="0 0 0"
+                            information_property="OriginInfo"
+                            name="Origin"
+                            number_of_elements="3">
+        <DoubleRangeDomain name="range" />
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="GetOrigin"
+                            information_only="1"
+                            name="OriginInfo">
+        <SimpleDoubleInformationHelper />
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetNormal"
+                            default_values="1 0 0"
+                            information_property="NormalInfo"
+                            name="Normal"
+                            number_of_elements="3">
+        <DoubleRangeDomain name="range" />
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="GetNormal"
+                            information_only="1"
+                            name="NormalInfo">
+        <SimpleDoubleInformationHelper />
+      </DoubleVectorProperty>
+      <DoubleVectorProperty argument_is_array="1"
+                            command="SetWidgetBounds"
+                            default_values="none"
+                            is_internal="1"
+                            name="WidgetBounds"
+                            number_of_elements="6">
+        <DoubleRangeDomain name="range" />
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetPlaceFactor"
+                            default_values="1.2"
+                            name="PlaceFactor"
+                            number_of_elements="1">
+        <DoubleRangeDomain name="range" />
+      </DoubleVectorProperty>
+    </DisplaySizedImplicitPlaneRepresentationProxy>
     <!-- ================================================================== -->
     <Proxy class="vtkLineRepresentation"
            name="LineRepresentation">
@@ -2128,6 +2263,10 @@
            base_proxyname="WidgetBase"
            class="vtkImplicitPlaneWidget2"
            name="ImplicitPlaneWidget2"></Proxy>
+    <Proxy base_proxygroup="3d_widgets"
+           base_proxyname="WidgetBase"
+           class="vtkDisplaySizedImplicitPlaneWidget"
+           name="DisplaySizedImplicitPlaneWidget"></Proxy>
     <Proxy base_proxygroup="3d_widgets"
            base_proxyname="WidgetBase"
            class="vtkSplineWidget2"

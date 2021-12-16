@@ -38,14 +38,24 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkRenderWindowInteractor.h"
 #include "vtkSMRenderViewProxy.h"
 
+#include <QDebug>
 #include <QShortcut>
-#include <QWidget>
+
+#if QT_VERSION < QT_VERSION_CHECK(5, 14, 0)
+#define QT_ENDL endl
+#else
+#define QT_ENDL Qt::endl
+#endif
+
+#include <cmath>
 
 //-----------------------------------------------------------------------------
-pqPointPickingHelper::pqPointPickingHelper(
-  const QKeySequence& keySequence, bool pick_on_mesh, pqPropertyWidget* propWidget)
+pqPointPickingHelper::pqPointPickingHelper(const QKeySequence& keySequence, bool pick_on_mesh,
+  pqPropertyWidget* propWidget, PickOption pickOpt, bool pickCameraFocalInfo)
   : Superclass(propWidget)
   , PickOnMesh(pick_on_mesh)
+  , PickOpt(pickOpt)
+  , PickCameraFocalInfo(pickCameraFocalInfo)
 {
   if (!propWidget)
   {
@@ -97,11 +107,31 @@ void pqPointPickingHelper::pickPoint()
 
     // Get region
     const int* eventpos = rwi->GetEventPosition();
-    double position[3];
+    double position[3], normal[3];
     if (rview->getRenderViewProxy()->ConvertDisplayToPointOnSurface(
-          eventpos, position, this->PickOnMesh))
+          eventpos, position, normal, this->PickOnMesh) ||
+      this->PickCameraFocalInfo)
     {
-      Q_EMIT this->pick(position[0], position[1], position[2]);
+      if (this->PickOpt == PickOption::Coordinates)
+      {
+        if (!std::isnan(position[0]) || !std::isnan(position[1]) || !std::isnan(position[2]))
+        {
+          Q_EMIT this->pick(position[0], position[1], position[2]);
+        }
+        // else statement is not needed because vtkPVRayCastPickingHelper prints an error message
+      }
+      else // this->PickOpt == PickOption::Normal
+      {
+        // this is a check to ensure that the normal will not be changed if's not available
+        if (!std::isnan(normal[0]) || !std::isnan(normal[1]) || !std::isnan(normal[2]))
+        {
+          Q_EMIT this->pick(normal[0], normal[1], normal[2]);
+        }
+        else
+        {
+          qWarning() << "The intersection normal was not available" << QT_ENDL;
+        }
+      }
     }
   }
 }

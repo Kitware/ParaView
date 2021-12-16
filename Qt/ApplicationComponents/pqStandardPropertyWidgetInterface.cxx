@@ -49,6 +49,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqCylinderPropertyWidget.h"
 #include "pqDataAssemblyPropertyWidget.h"
 #include "pqDisplayRepresentationWidget.h"
+#include "pqDisplaySizedImplicitPlanePropertyWidget.h"
 #include "pqDoubleRangeSliderPropertyWidget.h"
 #include "pqEnableWidgetDecorator.h"
 #include "pqFileListPropertyWidget.h"
@@ -278,6 +279,10 @@ pqPropertyWidget* pqStandardPropertyWidgetInterface::createWidgetForPropertyGrou
     return new pqTextLocationWidget(proxy, group, parentWidget);
   }
   else if (panelWidget == "InteractivePlane")
+  {
+    return new pqDisplaySizedImplicitPlanePropertyWidget(proxy, group, parentWidget);
+  }
+  else if (panelWidget == "InteractivePlane2")
   {
     return new pqImplicitPlanePropertyWidget(proxy, group, parentWidget);
   }

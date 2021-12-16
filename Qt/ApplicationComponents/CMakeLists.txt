@@ -91,6 +91,7 @@ set(classes
   pqDefaultViewBehavior
   pqDeleteReaction
   pqDesktopServicesReaction
+  pqDisplaySizedImplicitPlanePropertyWidget
   pqDoubleRangeSliderPropertyWidget
   pqEditCameraReaction
   pqEditColorMapReaction

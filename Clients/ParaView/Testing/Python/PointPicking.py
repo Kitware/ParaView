@@ -18,9 +18,11 @@ view.ViewSize = [400, 400]
 Render()
 
 pt1 = [0, 0, 0]
+normal1 = [0, 0, 0]
 pt2 = [0, 0, 0]
-view.ConvertDisplayToPointOnSurface([100, 100], pt1)
-view.ConvertDisplayToPointOnSurface([245, 215], pt2)
+normal2 = [0, 0, 0]
+view.ConvertDisplayToPointOnSurface([100, 100], pt1, normal1)
+view.ConvertDisplayToPointOnSurface([245, 215], pt2, normal2)
 
 print("Point 1:")
 print(pt1)

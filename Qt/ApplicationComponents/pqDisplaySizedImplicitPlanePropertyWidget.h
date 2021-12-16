@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:  pqImplicitPlanePropertyWidget.h
+   Module:  pqDisplaySizedImplicitPlanePropertyWidget.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,16 +29,16 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef pqImplicitPlanePropertyWidget_h
-#define pqImplicitPlanePropertyWidget_h
+#ifndef pqDisplaySizedImplicitPlanePropertyWidget_h
+#define pqDisplaySizedImplicitPlanePropertyWidget_h
 
 #include "pqInteractivePropertyWidget.h"
 
 /**
- * pqImplicitPlanePropertyWidget is a custom property widget that uses
- * "ImplicitPlaneWidgetRepresentation" to help users interactively set the origin
+ * pqDisplaySizedImplicitPlanePropertyWidget is a custom property widget that uses
+ * "DisplaySizedImplicitPlaneWidgetRepresentation" to help users interactively set the origin
  * and normal for a plane. To use this widget for a property group
- * (vtkSMPropertyGroup), use "InteractivePlane2" as the "panel_widget" in the
+ * (vtkSMPropertyGroup), use "InteractivePlane" as the "panel_widget" in the
  * XML configuration for the proxy. The property group should have properties for
  * following functions:
  * \li \c Origin: a 3-tuple vtkSMDoubleVectorProperty that will be linked to the
@@ -48,16 +48,16 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * \li \c Input: (optional) a vtkSMInputProperty that is used to get data
  * information for bounds when placing/resetting the widget.
  */
-class PQAPPLICATIONCOMPONENTS_EXPORT pqImplicitPlanePropertyWidget
+class PQAPPLICATIONCOMPONENTS_EXPORT pqDisplaySizedImplicitPlanePropertyWidget
   : public pqInteractivePropertyWidget
 {
   Q_OBJECT
   typedef pqInteractivePropertyWidget Superclass;
 
 public:
-  pqImplicitPlanePropertyWidget(
-    vtkSMProxy* proxy, vtkSMPropertyGroup* smgroup, QWidget* parent = nullptr);
-  ~pqImplicitPlanePropertyWidget() override;
+  pqDisplaySizedImplicitPlanePropertyWidget(
+    vtkSMProxy* proxy, vtkSMPropertyGroup* smgroup, QWidget* parent = 0);
+  ~pqDisplaySizedImplicitPlanePropertyWidget() override;
 
   /**
    * Overridden to update the DrawPlane state.
@@ -65,7 +65,7 @@ public:
   void apply() override;
   void reset() override;
 
-public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
+public Q_SLOTS:
   /**
    * Slots used to toggle the visibility of the translucent plane.
    */
@@ -111,11 +111,10 @@ protected Q_SLOTS:
 
 private Q_SLOTS:
   void setOrigin(double x, double y, double z);
-
-private: // NOLINT(readability-redundant-access-specifiers)
-  Q_DISABLE_COPY(pqImplicitPlanePropertyWidget)
-
   void setNormal(double x, double y, double z);
+
+private:
+  Q_DISABLE_COPY(pqDisplaySizedImplicitPlanePropertyWidget)
 };
 
 #endif

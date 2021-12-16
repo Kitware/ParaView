@@ -2765,6 +2765,11 @@
                             information_only="1"
                             name="Intersection"
                             number_of_elements="3"></DoubleVectorProperty>
+      <DoubleVectorProperty command="GetIntersectionNormal"
+                            default_values="0.0 0.0 0.0"
+                            information_only="1"
+                            name="IntersectionNormal"
+                            number_of_elements="3"></DoubleVectorProperty>
       <Property command="ComputeIntersection"
                 name="Update"></Property>
       <ProxyProperty command="SetInput"

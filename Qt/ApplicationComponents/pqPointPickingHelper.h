@@ -46,7 +46,7 @@ class QShortcut;
 /**
  * pqPointPickingHelper is a helper class that is designed for use by
  * subclasses of pqInteractivePropertyWidget (or others) that want to support
- * using a shortcut key to pick a point on the surface mesh.
+ * using a shortcut key to pick a point or its normal on the surface mesh.
  */
 class PQAPPLICATIONCOMPONENTS_EXPORT pqPointPickingHelper : public QObject
 {
@@ -54,17 +54,34 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqPointPickingHelper : public QObject
   typedef QObject Superclass;
 
 public:
-  pqPointPickingHelper(
-    const QKeySequence& keySequence, bool pick_on_mesh, pqPropertyWidget* parent = nullptr);
+  enum PickOption
+  {
+    Coordinates,
+    Normal
+  };
+
+  pqPointPickingHelper(const QKeySequence& keySequence, bool pick_on_mesh,
+    pqPropertyWidget* parent = nullptr, PickOption pickOpt = Coordinates,
+    bool pickCameraFocalInfo = false);
   ~pqPointPickingHelper() override;
 
   /**
-   * Returns whether the helper will pick a point in the mesh or simply a point
+   * Returns whether the helper will pick a point/normal in the mesh or simply a point/normal
    * on the surface. In other words, if pickOnMesh returns true, then the
-   * picked point will always be a point specified in the points that form the
+   * picked point/normal will always be a point/normal specified in the points that form the
    * mesh.
    */
   bool pickOnMesh() const { return this->PickOnMesh; }
+
+  /**
+   * Returns whether the helper will pick a point or a normal.
+   */
+  PickOption getPickOption() const { return this->PickOpt; }
+
+  /**
+   * Returns whether the camera focal point/normal can be returned if the picking on mesh fails.
+   */
+  bool pickCameraFocalInfo() const { return this->PickCameraFocalInfo; }
 
 public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   /**
@@ -83,6 +100,8 @@ private: // NOLINT(readability-redundant-access-specifiers)
   Q_DISABLE_COPY(pqPointPickingHelper)
   QPointer<pqRenderView> View;
   bool PickOnMesh;
+  PickOption PickOpt;
+  bool PickCameraFocalInfo;
   QPointer<pqModalShortcut> Shortcut;
 };
 

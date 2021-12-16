@@ -79,6 +79,7 @@ set(classes
   vtkPVDataRepresentationPipeline
   vtkPVDefaultPass
   vtkPVDiscretizableColorTransferFunction
+  vtkPVDisplaySizedImplicitPlaneRepresentation
   vtkPVEncodeSelectionForServer
   vtkPVFrustumActor
   vtkPVGridAxes3DActor
@@ -138,6 +139,7 @@ set(classes
   vtkSMComparativeViewProxy
   vtkSMContextViewProxy
   vtkSMDataDeliveryManagerProxy
+  vtkSMDisplaySizedImplicitPlaneRepresentationProxy
   vtkSMImageExtractWriterProxy
   vtkSMImplicitPlaneRepresentationProxy
   vtkSMLightProxy
