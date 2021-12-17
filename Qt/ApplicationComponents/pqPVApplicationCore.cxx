@@ -163,14 +163,18 @@ void pqPVApplicationCore::quickLaunch()
         }
       }
     }
-    // If shift modifier is pressed, let's force the auto apply
-    bool forceAutoApply = QApplication::keyboardModifiers() & Qt::ShiftModifier;
-    bool autoApplyState = pqPropertiesPanel::autoApply();
-    pqPropertiesPanel::setAutoApply(autoApplyState || forceAutoApply);
     dialog.exec();
-    // Restore the auto apply state
-    pqPropertiesPanel::setAutoApply(autoApplyState);
+    if (dialog.quickApply())
+    {
+      this->applyPipeline();
+    }
   }
+}
+
+//-----------------------------------------------------------------------------
+void pqPVApplicationCore::applyPipeline()
+{
+  Q_EMIT this->triggerApply();
 }
 
 //-----------------------------------------------------------------------------

@@ -68,6 +68,7 @@ public:
   //@{
   /**
    * Automatically apply changes in the 'Properties' panel.
+   * Default is false.
    */
   vtkGetMacro(AutoApply, bool);
   vtkSetMacro(AutoApply, bool);
@@ -75,7 +76,18 @@ public:
 
   //@{
   /**
+   * Get/Set delay for auto apply.
+   * Not exposed in the UI.
+   * Default is 0.
+   */
+  vtkGetMacro(AutoApplyDelay, int);
+  vtkSetMacro(AutoApplyDelay, int);
+  //@}
+
+  //@{
+  /**
    * Automatically apply changes in the 'Properties' panel.
+   * Default is false.
    */
   vtkGetMacro(AutoApplyActiveOnly, bool);
   vtkSetMacro(AutoApplyActiveOnly, bool);
@@ -315,6 +327,7 @@ protected:
 
   int BlockColorsDistinctValues;
   bool AutoApply;
+  int AutoApplyDelay = 0;
   bool AutoApplyActiveOnly;
   char* DefaultViewType;
   int TransferFunctionResetMode;

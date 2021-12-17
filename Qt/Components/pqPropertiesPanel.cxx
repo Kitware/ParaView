@@ -158,9 +158,6 @@ private:
 unsigned long pqProxyWidgets::Counter = 0;
 };
 
-bool pqPropertiesPanel::AutoApply = false;
-int pqPropertiesPanel::AutoApplyDelay = 0; // in msec
-
 //*****************************************************************************
 class pqPropertiesPanel::pqInternals
 {
@@ -173,7 +170,6 @@ public:
   QPointer<pqProxyWidgets> DisplayWidgets;
   QPointer<pqProxyWidgets> ViewWidgets;
   bool ReceivedChangeAvailable;
-  pqTimer AutoApplyTimer;
   vtkNew<vtkSMProxyClipboard> SourceClipboard;
   vtkNew<vtkSMProxyClipboard> DisplayClipboard;
   vtkNew<vtkSMProxyClipboard> ViewClipboard;
@@ -227,9 +223,6 @@ public:
 
     // change the apply button palette so it is green when it is enabled.
     pqCoreUtilities::initializeClickMeButton(this->Ui.Accept);
-
-    this->AutoApplyTimer.setSingleShot(true);
-    panel->connect(&this->AutoApplyTimer, SIGNAL(timeout()), SLOT(apply()));
   }
 
   ~pqInternals()
@@ -242,8 +235,6 @@ public:
     delete this->DisplayWidgets;
     delete this->ViewWidgets;
   }
-
-  void triggerAutoApply() { this->AutoApplyTimer.start(pqPropertiesPanel::autoApplyDelay()); }
 
   //---------------------------------------------------------------------------
   void updateInformationAndDomains()
@@ -270,14 +261,6 @@ pqPropertiesPanel::pqPropertiesPanel(QWidget* parentObject)
   , Internals(new pqInternals(this))
   , PanelMode(pqPropertiesPanel::ALL_PROPERTIES)
 {
-  // Get AutoApply setting from GeneralSettings object.
-  vtkPVGeneralSettings* generalSettings = vtkPVGeneralSettings::GetInstance();
-  pqPropertiesPanel::AutoApply = generalSettings->GetAutoApply();
-
-  // every time the settings change, we need to update our auto-apply status.
-  pqCoreUtilities::connect(
-    generalSettings, vtkCommand::ModifiedEvent, this, SLOT(generalSettingsChanged()));
-
   //---------------------------------------------------------------------------
   // Listen to various signals from the application indicating changes in active
   // source/view/representation, etc.
@@ -403,34 +386,39 @@ void pqPropertiesPanel::setPanelMode(int val)
 }
 
 //-----------------------------------------------------------------------------
-void pqPropertiesPanel::generalSettingsChanged()
-{
-  vtkPVGeneralSettings* generalSettings = vtkPVGeneralSettings::GetInstance();
-  pqPropertiesPanel::AutoApply = generalSettings->GetAutoApply();
-}
-
-//-----------------------------------------------------------------------------
 void pqPropertiesPanel::setAutoApply(bool enabled)
 {
-  pqPropertiesPanel::AutoApply = enabled;
+  VTK_LEGACY_REPLACED_BODY(
+    pqPropertiesPanel::setAutoApply, "ParaView 5.11", vtkPVGeneralSettings::SetAutoApply());
+  vtkPVGeneralSettings* generalSettings = vtkPVGeneralSettings::GetInstance();
+  generalSettings->SetAutoApply(enabled);
 }
 
 //-----------------------------------------------------------------------------
 bool pqPropertiesPanel::autoApply()
 {
-  return pqPropertiesPanel::AutoApply;
+  VTK_LEGACY_REPLACED_BODY(
+    pqPropertiesPanel::autoApply, "ParaView 5.11", vtkPVGeneralSettings::GetAutoApply());
+  vtkPVGeneralSettings* generalSettings = vtkPVGeneralSettings::GetInstance();
+  return generalSettings->GetAutoApply();
 }
 
 //-----------------------------------------------------------------------------
 void pqPropertiesPanel::setAutoApplyDelay(int delay)
 {
-  pqPropertiesPanel::AutoApplyDelay = delay;
+  VTK_LEGACY_REPLACED_BODY(pqPropertiesPanel::setAutoApplyDelay, "ParaView 5.11",
+    vtkPVGeneralSettings::SetAutoApplyDelay());
+  vtkPVGeneralSettings* generalSettings = vtkPVGeneralSettings::GetInstance();
+  return generalSettings->SetAutoApplyDelay(delay);
 }
 
 //-----------------------------------------------------------------------------
 int pqPropertiesPanel::autoApplyDelay()
 {
-  return pqPropertiesPanel::AutoApplyDelay;
+  VTK_LEGACY_REPLACED_BODY(
+    pqPropertiesPanel::autoApplyDelay, "ParaView 5.11", vtkPVGeneralSettings::GetAutoApplyDelay());
+  vtkPVGeneralSettings* generalSettings = vtkPVGeneralSettings::GetInstance();
+  return generalSettings->GetAutoApplyDelay();
 }
 
 //-----------------------------------------------------------------------------
@@ -518,11 +506,7 @@ void pqPropertiesPanel::updatePropertiesPanel(pqProxy* source)
     this->Internals->SourceWidgets[source]->showWidgets(
       this->Internals->Ui.SearchBox->isAdvancedSearchActive(),
       this->Internals->Ui.SearchBox->text());
-
-    if (pqPropertiesPanel::AutoApply)
-    {
-      this->Internals->triggerAutoApply();
-    }
+    Q_EMIT this->modified();
   }
   else
   {
@@ -685,9 +669,9 @@ void pqPropertiesPanel::sourcePropertyChanged(bool change_finished /*=true*/)
   {
     this->Internals->Source->setModifiedState(pqProxy::MODIFIED);
   }
-  if (pqPropertiesPanel::AutoApply && change_finished)
+  if (change_finished)
   {
-    this->Internals->triggerAutoApply();
+    Q_EMIT this->modified();
   }
   this->updateButtonState();
 }
@@ -813,7 +797,6 @@ void pqPropertiesPanel::apply()
   vtkVLogScopeFunction(PARAVIEW_LOG_APPLICATION_VERBOSITY());
 
   vtkTimerLog::MarkStartEvent("PropertiesPanel::Apply");
-  this->Internals->AutoApplyTimer.stop();
 
   BEGIN_UNDO_SET("Apply");
 
@@ -849,8 +832,6 @@ void pqPropertiesPanel::apply()
 //-----------------------------------------------------------------------------
 void pqPropertiesPanel::reset()
 {
-  this->Internals->AutoApplyTimer.stop();
-
   bool onlyApplyCurrentPanel = vtkPVGeneralSettings::GetInstance()->GetAutoApplyActiveOnly();
   if (onlyApplyCurrentPanel)
   {
@@ -868,6 +849,7 @@ void pqPropertiesPanel::reset()
       widgets->reset();
     }
   }
+  Q_EMIT this->resetDone();
 
   this->Internals->updateInformationAndDomains();
   this->updateButtonState();

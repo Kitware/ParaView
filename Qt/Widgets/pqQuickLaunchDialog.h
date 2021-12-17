@@ -37,7 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /**
  * A borderless pop-up dialog used to show actions that the user can launch.
- * Provides search capabilities.
+ * Provides search and quick apply capabilities.
  */
 class PQWIDGETS_EXPORT pqQuickLaunchDialog : public QDialog
 {
@@ -59,6 +59,11 @@ public:
    * This adds to already added actions.
    */
   void addActions(const QList<QAction*>& actions);
+
+  /**
+   * check if quick apply was set when accepting the dialog
+   */
+  bool quickApply();
 
 public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   /**

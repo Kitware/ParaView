@@ -33,6 +33,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define pqPropertiesPanel_h
 
 #include "pqComponentsModule.h"
+#include "vtkParaViewDeprecation.h"
+
 #include <QWidget>
 
 class pqDataRepresentation;
@@ -69,21 +71,25 @@ public:
   /**
    * Enable/disable auto-apply.
    */
+  PARAVIEW_DEPRECATED_IN_5_11_0("Use `vtkPVGeneralSettings::SetAutoApply()` instead")
   static void setAutoApply(bool enabled);
 
   /**
    * Returns \c true if auto-apply is enabled.
    */
+  PARAVIEW_DEPRECATED_IN_5_11_0("Use `vtkPVGeneralSettings::GetAutoApply()` instead")
   static bool autoApply();
 
   /**
    * Sets the delay for auto-apply to \p delay (in msec).
    */
+  PARAVIEW_DEPRECATED_IN_5_11_0("Use `pqApplyBehavior::setAutoApplyDelay()` instead")
   static void setAutoApplyDelay(int delay);
 
   /**
    * Returns the delay for the auto-apply (in msec).
    */
+  PARAVIEW_DEPRECATED_IN_5_11_0("Use `pqApplyBehavior::autoApplyDelay()` instead")
   static int autoApplyDelay();
 
   /**
@@ -231,6 +237,9 @@ Q_SIGNALS:
    */
   void viewChanged(pqView*);
 
+  void modified();
+  void resetDone();
+
   /**
    * This signal is emitted when the user clicks the help button.
    */
@@ -293,12 +302,6 @@ private Q_SLOTS:
    */
   void updateButtonEnableState();
 
-  /**
-   * called when vtkPVGeneralSettings instance is modified. We update the
-   * auto-apply status.
-   */
-  void generalSettingsChanged();
-
   void copyProperties();
   void pasteProperties();
   void copyDisplay();
@@ -312,9 +315,6 @@ protected:
   void updateViewPanel(pqView* view);
 
 private:
-  static bool AutoApply;
-  static int AutoApplyDelay;
-
   class pqInternals;
   friend class pqInternals;
 
