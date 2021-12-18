@@ -616,6 +616,11 @@ Unlike `Fetch`, this new function does not bother applying any transformations t
 
 Since this can cause large datasets to be delivered the client, this must be used with caution in HPC environments.
 
+##  openPMD: 1D & 2D Support
+
+The openPMD python module now supports 1D and 2D particle and mesh data.
+API changes for openPMD-api 0.13+ were incorporated and several read bugs have been fixed.
+
 # Virtual reality improvements
 
 ## OpenVR Plugin improvements
