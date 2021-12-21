@@ -81,6 +81,7 @@ set(classes
   pqCustomizeShortcutsReaction
   pqCustomizeShortcutsDialog
   pqCheckableProperty
+  pqCoordinateFramePropertyWidget
   pqCustomViewpointsToolbar
   pqCylinderPropertyWidget
   pqDataAssemblyPropertyWidget
