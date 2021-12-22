@@ -422,7 +422,7 @@ bool pqMaterialProxyModel::setData(const QModelIndex& index, const QVariant& var
         ml->AddShaderVariable(this->MaterialName, varName, { variant.toDouble() });
     }
 
-    emit this->dataChanged(index, index);
+    Q_EMIT this->dataChanged(index, index);
     return true;
   }
 
