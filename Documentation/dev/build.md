@@ -457,6 +457,9 @@ More advanced options:
   * `PARAVIEW_SKIP_CLANG_TIDY_FOR_VTK` (defaults `ON`; requires
     `CMAKE_<LANG>_CLANG_TIDY`): If set, any `clang-tidy` settings will be
     cleared for the internal VTK build.
+  * `PARAVIEW_TEST_DIR`: Used on HPC to set the test directory (default is
+    "${CMAKE_BINARY_DIR}/Testing/Temporary") to a location that is writable from
+    the compute nodes. Typically the user home directory is not.
 
 <!--
 These variables should be documented once they're effective again. Note that
