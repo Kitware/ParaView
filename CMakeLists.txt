@@ -570,7 +570,8 @@ else ()
     USE_EXTERNAL        "${PARAVIEW_BUILD_WITH_EXTERNAL}"
     ENABLE_WRAPPING     ON
     TEST_INPUT_DATA_DIRECTORY   "${CMAKE_CURRENT_SOURCE_DIR}/VTK/Testing"
-    TEST_OUTPUT_DATA_DIRECTORY  "${CMAKE_CURRENT_BINARY_DIR}/ExternalData/VTK/Testing")
+    TEST_OUTPUT_DATA_DIRECTORY  "${CMAKE_CURRENT_BINARY_DIR}/ExternalData/VTK/Testing"
+    TEST_OUTPUT_DIRECTORY "${PARAVIEW_TEST_DIR}")
 
   if (PARAVIEW_SKIP_CLANG_TIDY_FOR_VTK)
     set(CMAKE_C_CLANG_TIDY "${CMAKE_C_CLANG_TIDY_save}")
@@ -619,7 +620,8 @@ vtk_module_build(
   BUILD_WITH_KITS     "${PARAVIEW_BUILD_WITH_KITS}"
   USE_EXTERNAL        "${PARAVIEW_BUILD_WITH_EXTERNAL}"
   TEST_INPUT_DATA_DIRECTORY   "${paraview_test_data_directory_input}"
-  TEST_OUTPUT_DATA_DIRECTORY  "${paraview_test_data_directory_output}")
+  TEST_OUTPUT_DATA_DIRECTORY  "${paraview_test_data_directory_output}"
+  TEST_OUTPUT_DIRECTORY "${PARAVIEW_TEST_DIR}")
 
 # Catalyst sanity check. See `ThirdParty/catalyst/CMakeLists.txt` for details.
 if (TARGET ParaView::vtkcatalyst)
@@ -668,7 +670,8 @@ vtk_module_build(
   BUILD_WITH_KITS     "${PARAVIEW_BUILD_WITH_KITS}"
   USE_EXTERNAL        "${PARAVIEW_BUILD_WITH_EXTERNAL}"
   TEST_INPUT_DATA_DIRECTORY   "${paraview_test_data_directory_input}"
-  TEST_OUTPUT_DATA_DIRECTORY  "${paraview_test_data_directory_output}")
+  TEST_OUTPUT_DATA_DIRECTORY  "${paraview_test_data_directory_output}"
+  TEST_OUTPUT_DIRECTORY "${PARAVIEW_TEST_DIR}")
 
 include(vtkModuleJson)
 vtk_module_json(

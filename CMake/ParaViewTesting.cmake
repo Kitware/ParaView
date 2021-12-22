@@ -63,8 +63,14 @@ function (_paraview_add_tests function)
   endif ()
 
   if (NOT DEFINED _paraview_add_tests_TEST_DIRECTORY)
-    set(_paraview_add_tests_TEST_DIRECTORY
-      "${CMAKE_BINARY_DIR}/Testing/Temporary")
+    if (NOT DEFINED PARAVIEW_TEST_DIR)
+      set(_paraview_add_tests_TEST_DIRECTORY
+        "${CMAKE_BINARY_DIR}/Testing/Temporary")
+    else()
+      set(_paraview_add_tests_TEST_DIRECTORY
+        "${PARAVIEW_TEST_DIR}")
+      set(_vtk_build_TEST_OUTPUT_DIRECTORY "${PARAVIEW_TEST_DIR}")
+    endif()
   endif ()
 
   if (NOT DEFINED _paraview_add_tests_DATA_DIRECTORY AND DEFINED _paraview_add_tests_default_data_directory)
