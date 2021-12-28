@@ -513,19 +513,24 @@ public:
 
     Json::Path settingPath(root);
     Json::Value& jsonValue = settingPath.make(this->SettingCollections[0].Value);
-    jsonValue[leaf] = Json::Value::nullSingleton();
 
     if (values.size() > 1)
     {
+      if (!jsonValue[leaf].isArray())
+      {
+        jsonValue[leaf] = Json::Value::nullSingleton();
+      }
       jsonValue[leaf].resize(static_cast<Json::Value::ArrayIndex>(values.size()));
 
+      bool modified = values.size() != previousValues.size();
       for (size_t i = 0; i < values.size(); ++i)
       {
-        if (i >= previousValues.size() || previousValues[i] != values[i])
-        {
-          this->Modified();
-        }
+        modified |= (i < previousValues.size() && (previousValues[i] != values[i]));
         jsonValue[leaf][static_cast<Json::Value::ArrayIndex>(i)] = values[i];
+      }
+      if (modified)
+      {
+        this->Modified();
       }
     }
     else
