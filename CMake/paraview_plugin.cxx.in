@@ -132,7 +132,7 @@ void @_paraview_build_plugin@Plugin::GetPythonSourceList(std::vector<std::string
     package_flags.push_back(packageFlags[cc]);
 
     // free allocated memory.
-    delete moduleSources[cc];
+    delete[] moduleSources[cc];
     moduleSources[cc] = nullptr;
   }
 }
