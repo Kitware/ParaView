@@ -45,15 +45,25 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMSessionProxyManager.h"
 
 // Qt Includes
+#include <QDebug>
 #include <QFileInfo>
-
-const std::string pqTextureComboBox::TEXTURES_GROUP = "textures";
 
 //-----------------------------------------------------------------------------
 pqTextureComboBox::pqTextureComboBox(vtkSMProxyGroupDomain* domain, QWidget* parent)
   : Superclass(parent)
   , Domain(domain)
+  , GroupName("")
 {
+  if (!this->Domain || this->Domain->GetNumberOfGroups() != 1)
+  {
+    qCritical() << "pqTextureSelectorPropertyWidget can only be used with a ProxyProperty"
+                   " with a ProxyGroupDomain containing a single domain with a name.";
+  }
+  else
+  {
+    this->GroupName = this->Domain->GetGroup(0);
+  }
+
   this->updateTextures();
   QObject::connect(this, SIGNAL(currentIndexChanged(int)), this, SLOT(onCurrentIndexChanged(int)));
 
@@ -81,8 +91,7 @@ void pqTextureComboBox::updateFromTexture(vtkSMProxy* texture)
 void pqTextureComboBox::proxyRegistered(
   const QString& group, const QString& vtkNotUsed(name), vtkSMProxy* proxy)
 {
-  if (group == QString(pqTextureComboBox::TEXTURES_GROUP.c_str()) &&
-    this->Domain->IsInDomain(proxy))
+  if (group == this->GroupName && this->Domain->IsInDomain(proxy))
   {
     this->updateTextures();
   }
@@ -92,7 +101,7 @@ void pqTextureComboBox::proxyRegistered(
 void pqTextureComboBox::proxyUnRegistered(
   const QString& group, const QString& vtkNotUsed(name), vtkSMProxy* vtkNotUsed(proxy))
 {
-  if (group == QString(pqTextureComboBox::TEXTURES_GROUP.c_str()))
+  if (group == this->GroupName)
   {
     this->updateTextures();
   }
@@ -161,6 +170,11 @@ void pqTextureComboBox::loadTexture()
 //-----------------------------------------------------------------------------
 bool pqTextureComboBox::loadTexture(const QString& filename)
 {
+  if (this->GroupName.isEmpty())
+  {
+    return false;
+  }
+
   QFileInfo finfo(filename);
   if (!finfo.isReadable())
   {
@@ -173,8 +187,8 @@ bool pqTextureComboBox::loadTexture(const QString& filename)
   vtkSMSessionProxyManager* spxm = pxm->GetActiveSessionProxyManager();
   vtkSMProxy* texture = pxm->NewProxy("textures", "ImageTexture");
   std::string proxyName = spxm->GetUniqueProxyName(
-    pqTextureComboBox::TEXTURES_GROUP.c_str(), finfo.baseName().toUtf8().data(), false);
-  pxm->RegisterProxy(pqTextureComboBox::TEXTURES_GROUP.c_str(), proxyName.c_str(), texture);
+    this->GroupName.toUtf8().data(), finfo.baseName().toUtf8().data(), false);
+  pxm->RegisterProxy(this->GroupName.toUtf8().data(), proxyName.c_str(), texture);
   vtkSMPropertyHelper(texture->GetProperty("FileName")).Set(filename.toUtf8().data());
   texture->UpdateVTKObjects();
   texture->Delete();

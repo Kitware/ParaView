@@ -60,8 +60,6 @@ public:
    */
   void updateFromTexture(vtkSMProxy* texture);
 
-  static const std::string TEXTURES_GROUP;
-
 Q_SIGNALS:
 
   /**
@@ -84,6 +82,7 @@ private:
 
   vtkSMProxyGroupDomain* Domain;
   vtkNew<vtkEventQtSlotConnect> VTKConnector;
+  QString GroupName;
 };
 
 #endif

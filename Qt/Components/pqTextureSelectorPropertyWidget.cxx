@@ -62,18 +62,9 @@ pqTextureSelectorPropertyWidget::pqTextureSelectorPropertyWidget(
   QVBoxLayout* l = new QVBoxLayout;
   l->setMargin(0);
 
-  // Recover domain and sanity check
-  this->Domain = smProperty->FindDomain<vtkSMProxyGroupDomain>();
-  if (!this->Domain || this->Domain->GetNumberOfGroups() != 1 ||
-    strcmp(this->Domain->GetGroup(0), pqTextureComboBox::TEXTURES_GROUP.c_str()) != 0)
-  {
-    qCritical() << "pqTextureSelectorPropertyWidget can only be used with a ProxyProperty"
-                   " with a ProxyGroupDomain containing only the \""
-                << QString(pqTextureComboBox::TEXTURES_GROUP.c_str()) << "\" group";
-  }
-
   // Create the combobox selector and set its value
-  this->Selector = new pqTextureComboBox(this->Domain, this);
+  auto* domain = smProperty->FindDomain<vtkSMProxyGroupDomain>();
+  this->Selector = new pqTextureComboBox(domain, this);
   this->onPropertyChanged();
   l->addWidget(this->Selector);
   this->setLayout(l);

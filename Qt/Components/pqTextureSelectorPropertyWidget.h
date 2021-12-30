@@ -44,7 +44,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * To use this widget for a property add the 'panel_widget="texture_selector"'
  * to the property's XML.
  */
-class vtkSMProxyGroupDomain;
 class pqTextureComboBox;
 class pqDataRepresentation;
 class PQCOMPONENTS_EXPORT pqTextureSelectorPropertyWidget : public pqPropertyWidget
@@ -64,7 +63,6 @@ protected Q_SLOTS:
 private:
   vtkNew<vtkEventQtSlotConnect> VTKConnector;
   pqTextureComboBox* Selector;
-  vtkSMProxyGroupDomain* Domain;
   pqDataRepresentation* Representation = nullptr;
   pqView* View = nullptr;
 };
