@@ -1,0 +1,282 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>CoordinateFramePropertyWidget</class>
+ <widget class="QWidget" name="CoordinateFramePropertyWidget">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>453</width>
+    <height>442</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <item>
+      <widget class="QCheckBox" name="show3DWidget">
+       <property name="toolTip">
+        <string>Show the coordinate axes in the 3D render view.</string>
+       </property>
+       <property name="text">
+        <string>Show Frame</string>
+       </property>
+       <property name="checked">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="horizontalSpacer">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QLabel" name="labelLockAxis">
+       <property name="text">
+        <string>Lock axis:</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QComboBox" name="lockAxis">
+       <item>
+        <property name="text">
+         <string>None</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>X Axis</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Y Axis</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Z Axis</string>
+        </property>
+       </item>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <layout class="QGridLayout" name="gridLayout">
+     <item row="0" column="0">
+      <widget class="QLabel" name="labelOrigin">
+       <property name="text">
+        <string>Origin</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="1">
+      <widget class="pqDoubleLineEdit" name="originX"/>
+     </item>
+     <item row="0" column="2">
+      <widget class="pqDoubleLineEdit" name="originY"/>
+     </item>
+     <item row="0" column="3">
+      <widget class="pqDoubleLineEdit" name="originZ"/>
+     </item>
+     <item row="1" column="0">
+      <widget class="QLabel" name="labelXAxis">
+       <property name="text">
+        <string>X Axis</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="1">
+      <widget class="pqDoubleLineEdit" name="xAxisX"/>
+     </item>
+     <item row="1" column="2">
+      <widget class="pqDoubleLineEdit" name="xAxisY"/>
+     </item>
+     <item row="1" column="3">
+      <widget class="pqDoubleLineEdit" name="xAxisZ"/>
+     </item>
+     <item row="2" column="0">
+      <widget class="QLabel" name="labelYAxis">
+       <property name="text">
+        <string>Y Axis</string>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="1">
+      <widget class="pqDoubleLineEdit" name="yAxisX"/>
+     </item>
+     <item row="2" column="2">
+      <widget class="pqDoubleLineEdit" name="yAxisY"/>
+     </item>
+     <item row="2" column="3">
+      <widget class="pqDoubleLineEdit" name="yAxisZ"/>
+     </item>
+     <item row="3" column="0">
+      <widget class="QLabel" name="labelZAxis">
+       <property name="text">
+        <string>Z Axis</string>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="1">
+      <widget class="pqDoubleLineEdit" name="zAxisX"/>
+     </item>
+     <item row="3" column="2">
+      <widget class="pqDoubleLineEdit" name="zAxisY"/>
+     </item>
+     <item row="3" column="3">
+      <widget class="pqDoubleLineEdit" name="zAxisZ"/>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <widget class="QLabel" name="pickLabel">
+     <property name="font">
+      <font>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
+     </property>
+     <property name="text">
+      <string>Note: Use 'P' to pick a &quot;Point&quot; on the mesh or 'Ctrl+P' to snap to the closest mesh point. Use 'N' to align a vector with a surface  &quot;Normal&quot; ( 'Ctrl+N' to snap to the closest mesh point's normal), if availiable. Use 'T' ('Ctrl+T') to point an axis &quot;Toward&quot; the clicked point (or its nearest mesh point).</string>
+     </property>
+     <property name="wordWrap">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <layout class="QGridLayout">
+     <property name="leftMargin">
+      <number>0</number>
+     </property>
+     <property name="topMargin">
+      <number>0</number>
+     </property>
+     <property name="rightMargin">
+      <number>0</number>
+     </property>
+     <property name="bottomMargin">
+      <number>0</number>
+     </property>
+     <property name="spacing">
+      <number>2</number>
+     </property>
+     <item row="1" column="0">
+      <widget class="QPushButton" name="useYNormal">
+       <property name="toolTip">
+        <string>Set the normal to the y-axis.</string>
+       </property>
+       <property name="text">
+        <string>&amp;Y Normal</string>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="0">
+      <widget class="QPushButton" name="useZNormal">
+       <property name="toolTip">
+        <string>Set the normal to the z-axis.</string>
+       </property>
+       <property name="text">
+        <string>&amp;Z Normal</string>
+       </property>
+      </widget>
+     </item>
+     <item row="5" column="0" colspan="2">
+      <widget class="QPushButton" name="resetCameraToNormal">
+       <property name="toolTip">
+        <string>Reset the camera to look along the normal.</string>
+       </property>
+       <property name="text">
+        <string>Reset Camera to Normal</string>
+       </property>
+      </widget>
+     </item>
+     <item row="6" column="0" colspan="2">
+      <widget class="QPushButton" name="resetToDataBounds">
+       <property name="toolTip">
+        <string>Reset the frame based on the data bounds.</string>
+       </property>
+       <property name="text">
+        <string>Reset to Data Bounds</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="0">
+      <widget class="QPushButton" name="useXNormal">
+       <property name="toolTip">
+        <string>Set the normal to the x-axis.</string>
+       </property>
+       <property name="text">
+        <string>&amp;X Normal</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="1">
+      <widget class="QPushButton" name="useCameraNormal">
+       <property name="toolTip">
+        <string>Set the normal to the camera's view direction.</string>
+       </property>
+       <property name="text">
+        <string>Camera Normal</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="1">
+      <widget class="QPushButton" name="resetToWorldXYZ">
+       <property name="text">
+        <string>Reset axes to world X, Y, Z</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+  </layout>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>pqDoubleLineEdit</class>
+   <extends>QLineEdit</extends>
+   <header>pqDoubleLineEdit.h</header>
+  </customwidget>
+ </customwidgets>
+ <tabstops>
+  <tabstop>show3DWidget</tabstop>
+  <tabstop>lockAxis</tabstop>
+  <tabstop>originX</tabstop>
+  <tabstop>originY</tabstop>
+  <tabstop>originZ</tabstop>
+  <tabstop>xAxisX</tabstop>
+  <tabstop>xAxisY</tabstop>
+  <tabstop>xAxisZ</tabstop>
+  <tabstop>yAxisX</tabstop>
+  <tabstop>yAxisY</tabstop>
+  <tabstop>yAxisZ</tabstop>
+  <tabstop>zAxisX</tabstop>
+  <tabstop>zAxisY</tabstop>
+  <tabstop>zAxisZ</tabstop>
+  <tabstop>useXNormal</tabstop>
+  <tabstop>useYNormal</tabstop>
+  <tabstop>useZNormal</tabstop>
+  <tabstop>useCameraNormal</tabstop>
+  <tabstop>resetToWorldXYZ</tabstop>
+  <tabstop>resetCameraToNormal</tabstop>
+  <tabstop>resetToDataBounds</tabstop>
+ </tabstops>
+ <resources/>
+ <connections/>
+</ui>

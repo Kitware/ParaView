@@ -161,6 +161,7 @@
                proxyname="DisplaySizedImplicitPlaneRepresentation"></Proxy>
         <ExposedProperties>
           <Property name="DrawPlane" />
+          <Property name="DrawOutline" />
           <Property name="ConstrainToWidgetBounds" />
           <Property name="OutlineTranslation" />
           <Property name="OriginInfo" />
@@ -179,6 +180,48 @@
         <Proxy name="Widget"
                proxygroup="3d_widgets"
                proxyname="DisplaySizedImplicitPlaneWidget"></Proxy>
+      </SubProxy>
+    </NewWidgetRepresentationProxy>
+    <!-- ================================================================== -->
+    <NewWidgetRepresentationProxy class="vtk3DWidgetRepresentation"
+                                  name="CoordinateFrameWidgetRepresentation">
+      <IntVectorProperty command="SetEnabled"
+                         default_values="1"
+                         name="Enabled"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Enable/Disable widget interaction.</Documentation>
+      </IntVectorProperty>
+      <SubProxy>
+        <Proxy name="Prop"
+               proxygroup="3d_widget_representations"
+               proxyname="CoordinateFrameRepresentation"></Proxy>
+        <ExposedProperties>
+          <Property name="OriginInfo" />
+          <Property name="Origin" />
+          <Property name="XAxis" />
+          <Property name="XAxisInfo" />
+          <Property name="YAxis" />
+          <Property name="YAxisInfo" />
+          <Property name="ZAxis" />
+          <Property name="ZAxisInfo" />
+          <Property name="WidgetBounds" />
+          <Property name="Visibility" />
+          <Property name="Reset" />
+          <Property name="ResetAxes" />
+          <Property name="UseCameraNormal" />
+          <Property name="Normal" />
+          <Property name="Direction" />
+          <Property name="LockedAxis" />
+          <Property name="LockedAxisInfo" />
+          <Property name="LengthFactor" />
+          <Property name="LengthFactorInfo" />
+        </ExposedProperties>
+      </SubProxy>
+      <SubProxy>
+        <Proxy name="Widget"
+               proxygroup="3d_widgets"
+               proxyname="CoordinateFrameWidget"></Proxy>
       </SubProxy>
     </NewWidgetRepresentationProxy>
     <!-- ================================================================== -->
@@ -1629,6 +1672,151 @@
       </DoubleVectorProperty>
     </DisplaySizedImplicitPlaneRepresentationProxy>
     <!-- ================================================================== -->
+    <Proxy class="vtkCoordinateFrameRepresentation"
+                         name="CoordinateFrameRepresentation">
+
+      <IntVectorProperty animateable="1"
+                         command="SetVisibility"
+                         default_values="1"
+                         name="Visibility"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+
+      <IntVectorProperty animateable="1"
+                         command="SetLockedAxis"
+                         default_values="-1"
+                         name="LockedAxis"
+                         number_of_elements="1">
+        <EnumerationDomain name="axis">
+          <Entry text="None" value="-1" />
+          <Entry text="X Axis" value="0" />
+          <Entry text="Y Axis" value="1" />
+          <Entry text="Z Axis" value="2" />
+        </EnumerationDomain>
+      </IntVectorProperty>
+      <IntVectorProperty command="GetLockedAxis"
+                         information_only="1"
+                         default_values="-1"
+                         name="LockedAxisInfo"
+                         number_of_elements="1">
+        <SimpleIntInformationHelper />
+      </IntVectorProperty>
+
+      <Property command="Reset"
+                name="Reset"></Property>
+
+      <Property command="ResetAxes"
+                name="ResetAxes"></Property>
+
+      <Property command="SetNormalToCamera"
+                name="UseCameraNormal"></Property>
+
+      <DoubleVectorProperty command="SetOrigin"
+                            default_values="0 0 0"
+                            information_property="OriginInfo"
+                            name="Origin"
+                            number_of_elements="3">
+        <DoubleRangeDomain name="range" />
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="GetOrigin"
+                            information_only="1"
+                            name="OriginInfo">
+        <SimpleDoubleInformationHelper />
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty command="SetLengthFactor"
+                            default_values="0.02"
+                            information_property="LengthFactorInfo"
+                            name="LengthFactor"
+                            number_of_elements="1">
+        <DoubleRangeDomain name="range" />
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="GetLengthFactor"
+                            information_only="1"
+                            name="LengthFactorInfo">
+        <SimpleDoubleInformationHelper />
+      </DoubleVectorProperty>
+
+      <!-- Note the information properties use a different method.
+           Get(X|Y|Z)VectorNormal() vs Set(X|Y|Z)AxisVector().
+           This is because setting one vector potentially changes
+           all three axes; the user-facing setters normalize the
+           input vector (which may be any length except 0) and set
+           all 3 axes.
+        -->
+      <DoubleVectorProperty command="SetXAxisVector"
+                            default_values="1 0 0"
+                            information_property="XAxisInfo"
+                            name="XAxis"
+                            number_of_elements="3">
+        <DoubleRangeDomain name="range" />
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="GetXVectorNormal"
+                            information_only="1"
+                            name="XAxisInfo">
+        <SimpleDoubleInformationHelper />
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty command="SetYAxisVector"
+                            default_values="0 1 0"
+                            information_property="YAxisInfo"
+                            name="YAxis"
+                            number_of_elements="3">
+        <DoubleRangeDomain name="range" />
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="GetYVectorNormal"
+                            information_only="1"
+                            name="YAxisInfo">
+        <SimpleDoubleInformationHelper />
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty command="SetZAxisVector"
+                            default_values="0 0 1"
+                            information_property="ZAxisInfo"
+                            name="ZAxis"
+                            number_of_elements="3">
+        <DoubleRangeDomain name="range" />
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="GetZVectorNormal"
+                            information_only="1"
+                            name="ZAxisInfo">
+        <SimpleDoubleInformationHelper />
+      </DoubleVectorProperty>
+
+      <!--
+        Special properties that set the locked or nearest axis (if none locked).
+        Their state is ignored and no defaults are provided because the methods
+        affect other state rather than representing a unique portion of the
+        proxy's state.
+      -->
+      <DoubleVectorProperty command="SetNormal"
+                            name="Normal"
+                            state_ignored="1"
+                            default_values="none"
+                            number_of_elements="3">
+        <DoubleRangeDomain name="range" />
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetDirection"
+                            name="Direction"
+                            state_ignored="1"
+                            default_values="none"
+                            number_of_elements="3">
+        <DoubleRangeDomain name="range" />
+      </DoubleVectorProperty>
+      <!--
+        Special property that places the base point centered in the bounds provided.
+      -->
+      <DoubleVectorProperty argument_is_array="1"
+                            command="PlaceWidget"
+                            default_values="none"
+                            is_internal="1"
+                            name="WidgetBounds"
+                            number_of_elements="6">
+        <DoubleRangeDomain name="range" />
+      </DoubleVectorProperty>
+    </Proxy>
+    <!-- ================================================================== -->
     <Proxy class="vtkLineRepresentation"
            name="LineRepresentation">
       <IntVectorProperty animateable="1"
@@ -2267,6 +2455,10 @@
            base_proxyname="WidgetBase"
            class="vtkDisplaySizedImplicitPlaneWidget"
            name="DisplaySizedImplicitPlaneWidget"></Proxy>
+    <Proxy base_proxygroup="3d_widgets"
+           base_proxyname="WidgetBase"
+           class="vtkCoordinateFrameWidget"
+           name="CoordinateFrameWidget"></Proxy>
     <Proxy base_proxygroup="3d_widgets"
            base_proxyname="WidgetBase"
            class="vtkSplineWidget2"

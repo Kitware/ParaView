@@ -46,6 +46,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqColorSelectorPropertyWidget.h"
 #include "pqCommandButtonPropertyWidget.h"
 #include "pqCompositePropertyWidgetDecorator.h"
+#include "pqCoordinateFramePropertyWidget.h"
 #include "pqCylinderPropertyWidget.h"
 #include "pqDataAssemblyPropertyWidget.h"
 #include "pqDisplayRepresentationWidget.h"
@@ -285,6 +286,10 @@ pqPropertyWidget* pqStandardPropertyWidgetInterface::createWidgetForPropertyGrou
   else if (panelWidget == "InteractivePlane2")
   {
     return new pqImplicitPlanePropertyWidget(proxy, group, parentWidget);
+  }
+  else if (panelWidget == "InteractiveFrame")
+  {
+    return new pqCoordinateFramePropertyWidget(proxy, group, parentWidget);
   }
   else if (panelWidget == "InteractiveBox")
   {

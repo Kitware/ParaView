@@ -35,7 +35,7 @@ void vtkSMDisplaySizedImplicitPlaneRepresentationProxy::SendRepresentation()
     vtkDisplaySizedImplicitPlaneRepresentation::SafeDownCast(this->GetClientSideObject());
 
   int repState = rep->GetRepresentationState();
-  // Don't bother to server if representation is the same.
+  // Don't bother to send to server if representation is the same.
   if (repState == this->RepresentationState)
   {
     return;
