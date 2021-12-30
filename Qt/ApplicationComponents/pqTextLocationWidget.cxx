@@ -137,8 +137,11 @@ QString pqTextLocationWidget::windowLocation() const
 void pqTextLocationWidget::radioButtonLocationClicked()
 {
   auto button = this->Internals->Ui.buttonGroupLocation->checkedButton();
-  QString locationStr(button->property("location").toString());
-  this->setWindowLocation(locationStr);
+  if (button)
+  {
+    QString locationStr(button->property("location").toString());
+    this->setWindowLocation(locationStr);
+  }
 }
 
 //-----------------------------------------------------------------------------
