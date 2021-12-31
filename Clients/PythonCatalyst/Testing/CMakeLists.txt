@@ -293,7 +293,7 @@ if (TARGET ParaView::paraview OR paraview_will_be_built)
       WaveletPhiThetaExtractsWithCinema.xml,CINEMA
       WaveletVolumeRenderWithCinema.xml,CINEMA)
   else ()
-    message(AUTHOR_WARNING
+    message(STATUS
       "'pandas' is missing. Skipping Cinema tests")
   endif()
 
