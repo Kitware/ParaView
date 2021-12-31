@@ -40,7 +40,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /**
  * This is a ComboBox that is used on the display tab to select available
  * textures. It can be used with Representations, Sources and Views.
- * It provides the user with an option to load new images as textures.
+ * It provides the user the optional feature of loading new images as
+ * textures directly from the combobox. One can choose to disable this
+ * feature by setting canLoadNew to false in the constructor. If omitted
+ * them CanLoadNew is true.
  */
 class vtkSMProxyGroupDomain;
 class vtkSMProxy;
@@ -52,6 +55,7 @@ class PQCOMPONENTS_EXPORT pqTextureComboBox : public QComboBox
 
 public:
   pqTextureComboBox(vtkSMProxyGroupDomain* domain, QWidget* parent = nullptr);
+  pqTextureComboBox(vtkSMProxyGroupDomain* domain, bool canLoadNew, QWidget* parent = nullptr);
   ~pqTextureComboBox() override = default;
 
   /**
@@ -83,6 +87,7 @@ private:
   vtkSMProxyGroupDomain* Domain;
   vtkNew<vtkEventQtSlotConnect> VTKConnector;
   QString GroupName;
+  bool CanLoadNew;
 };
 
 #endif

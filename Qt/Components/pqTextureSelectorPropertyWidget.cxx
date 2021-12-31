@@ -64,7 +64,18 @@ pqTextureSelectorPropertyWidget::pqTextureSelectorPropertyWidget(
 
   // Create the combobox selector and set its value
   auto* domain = smProperty->FindDomain<vtkSMProxyGroupDomain>();
-  this->Selector = new pqTextureComboBox(domain, this);
+  bool canLoadNew = true;
+  if (auto* hints = smProperty->GetHints())
+  {
+    auto* texHint = hints->FindNestedElementByName("TextureSelector");
+    QString attr = texHint ? texHint->GetAttributeOrEmpty("can_load_new") : "";
+    if (!attr.isEmpty())
+    {
+      canLoadNew = static_cast<bool>(attr.toInt());
+    }
+  }
+
+  this->Selector = new pqTextureComboBox(domain, canLoadNew, this);
   this->onPropertyChanged();
   l->addWidget(this->Selector);
   this->setLayout(l);
