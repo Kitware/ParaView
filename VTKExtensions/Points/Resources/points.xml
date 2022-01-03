@@ -642,21 +642,6 @@
         </ArrayListDomain>
       </StringVectorProperty>
 
-      <StringVectorProperty name="CutoffArray"
-        command="SetCutoffArrayName"
-        number_of_elements="1">
-        <Documentation>
-          Specify the Cutoff array name.  If not specified, then the radius at each point
-          will be computed as cutoff factor * smoothing length at a each point.
-        </Documentation>
-        <ArrayListDomain attribute_type="Scalars" name="array_list" none_string="None"
-          input_domain_name="point_scalars">
-          <RequiredProperties>
-            <Property function="Input" name="Input" />
-          </RequiredProperties>
-        </ArrayListDomain>
-      </StringVectorProperty>
-
       <StringVectorProperty name="ExcludedArrays"
         command="AddExcludedArray"
         clean_command="ClearExcludedArrays"
@@ -700,7 +685,6 @@
       <PropertyGroup label="Array Selections">
         <Property name="DensityArray" />
         <Property name="MassArray" />
-        <Property name="CutoffArray" />
         <Property name="ExcludedArrays" />
         <Property name="DerivativeArrays" />
       </PropertyGroup>
@@ -960,6 +944,21 @@
         </DataTypeDomain>
         <Documentation>The data source that provides the structure to be interpolated on.</Documentation>
       </InputProperty>
+
+      <StringVectorProperty name="CutoffArray"
+        command="SetCutoffArrayName"
+        number_of_elements="1">
+        <Documentation>
+          Specify the Cutoff array name.  If not specified, then the radius at each point
+          will be computed as cutoff factor * smoothing length at a each point.
+        </Documentation>
+        <ArrayListDomain attribute_type="Scalars" name="array_list" none_string="None"
+          input_domain_name="point_scalars">
+          <RequiredProperties>
+            <Property function="Input" name="Source" />
+          </RequiredProperties>
+        </ArrayListDomain>
+      </StringVectorProperty>
     </SourceProxy>
 
     <!-- =================================================================== -->
