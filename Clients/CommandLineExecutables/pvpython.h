@@ -129,9 +129,6 @@ inline int Run(int processType, int argc, char* argv[])
         ? vtkLogger::VERBOSITY_INFO
         : vtkLogger::VERBOSITY_TRACE);
 
-    // Start interpretor
-    vtkPythonInterpreter::Initialize();
-
     ret_val =
       vtkPythonInterpreter::PyMain(static_cast<int>(pythonArgs.size()) - 1, &pythonArgs.front());
 
