@@ -37,7 +37,7 @@
      </property>
     </widget>
    </item>
-   <item row="1" column="0" colspan="3">
+   <item row="2" column="0" colspan="4">
     <widget class="pqSpreadSheetViewWidget" name="spreadsheet">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Preferred" vsizetype="MinimumExpanding">
@@ -66,6 +66,29 @@
     </widget>
    </item>
    <item row="0" column="2">
+    <widget class="QToolButton" name="ToggleColumnVisibility">
+     <property name="toolTip">
+      <string>Toggle column visibility</string>
+     </property>
+     <property name="statusTip">
+      <string>Toggle column visibility</string>
+     </property>
+     <property name="whatsThis">
+      <string>Toggle column visibility</string>
+     </property>
+     <property name="text">
+      <string>Toggle column visibility</string>
+     </property>
+     <property name="icon">
+      <iconset>
+       <normaloff>:/pqWidgets/Icons/pqRectilinearGrid16.png</normaloff>:/pqWidgets/Icons/pqRectilinearGrid16.png</iconset>
+     </property>
+     <property name="popupMode">
+      <enum>QToolButton::InstantPopup</enum>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="3">
     <widget class="QCheckBox" name="invertSelectionCheckBox">
      <property name="enabled">
       <bool>false</bool>

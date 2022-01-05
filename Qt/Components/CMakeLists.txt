@@ -79,6 +79,7 @@ set(classes
   pqFileChooserWidget
   pqFindDataCurrentSelectionFrame
   pqFindDataSelectionDisplayFrame
+  pqSpreadSheetColumnsVisibility
   pqHighlightItemDelegate
   pqImageTip
   pqIndexSelectionWidget

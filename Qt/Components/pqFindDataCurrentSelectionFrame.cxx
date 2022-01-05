@@ -32,14 +32,19 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqFindDataCurrentSelectionFrame.h"
 #include "ui_pqFindDataCurrentSelectionFrame.h"
 
+#include "pqActiveObjects.h"
 #include "pqApplicationCore.h"
 #include "pqOutputPort.h"
 #include "pqPipelineSource.h"
 #include "pqPropertiesPanel.h"
 #include "pqSelectionManager.h"
 #include "pqServer.h"
+#include "pqSpreadSheetColumnsVisibility.h"
+#include "pqSpreadSheetView.h"
 #include "pqSpreadSheetViewModel.h"
 #include "pqTimer.h"
+#include "pqUndoStack.h"
+
 #include "vtkDataObject.h"
 #include "vtkLogger.h"
 #include "vtkNew.h"
@@ -49,14 +54,26 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMSessionProxyManager.h"
 #include "vtkSMSourceProxy.h"
+#include "vtkSMStringVectorProperty.h"
+#include "vtkSMTrace.h"
 #include "vtkSMViewProxy.h"
 #include "vtkSelectionNode.h"
 #include "vtkSmartPointer.h"
+#include "vtkView.h"
 
+#include <QCheckBox>
+#include <QMenu>
 #include <QPointer>
 #include <QSignalBlocker>
+#include <QWidgetAction>
+
+#include <QDebug>
+#include <QHBoxLayout>
+#include <QVBoxLayout>
+#include <QWidget>
 
 #include <cassert>
+#include <memory>
 
 namespace
 {
@@ -134,6 +151,7 @@ class pqFindDataCurrentSelectionFrame::pqInternals
 public:
   Ui::FindDataCurrentSelectionFrame Ui;
   QPointer<pqSelectionManager> SelectionManager;
+  QMenu ColumnToggleMenu;
 
   pqInternals(pqFindDataCurrentSelectionFrame* self)
   {
@@ -161,6 +179,10 @@ public:
   }
 
   ~pqInternals() { this->deleteSpreadSheet(); }
+
+  vtkSmartPointer<vtkSMViewProxy> GetViewProxy() const { return ViewProxy; }
+
+  QPointer<pqSpreadSheetViewModel> GetModel() const { return Model; }
 
   //---------------------------------------------------------------------------
   // setup the proxies needed for the spreadsheet view.
@@ -327,6 +349,12 @@ pqFindDataCurrentSelectionFrame::pqFindDataCurrentSelectionFrame(
   : Superclass(parentObject, wflags)
   , Internals(new pqInternals(this))
 {
+  auto& internals = *this->Internals;
+  internals.Ui.ToggleColumnVisibility->setMenu(&internals.ColumnToggleMenu);
+  QObject::connect(&internals.ColumnToggleMenu, &QMenu::aboutToShow, [&internals]() {
+    pqSpreadSheetColumnsVisibility::populateMenu(
+      internals.GetViewProxy(), internals.GetModel(), &internals.ColumnToggleMenu);
+  });
 }
 
 //-----------------------------------------------------------------------------
