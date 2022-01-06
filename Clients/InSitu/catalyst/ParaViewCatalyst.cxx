@@ -189,10 +189,15 @@ enum catalyst_status catalyst_initialize_paraview(const conduit_node* params)
 #if VTK_MODULE_ENABLE_VTK_ParallelMPI
   static_assert(sizeof(MPI_Fint) <= sizeof(vtkTypeUInt64),
     "MPI_Fint size is greater than 64bit! That is not supported.");
-  vtkTypeUInt64 comm = static_cast<vtkTypeUInt64>(MPI_Comm_c2f(MPI_COMM_WORLD));
-  if (cpp_params.has_path("catalyst/mpi_comm"))
+  vtkTypeUInt64 comm = 0;
+  int isMPIInitialized = 0;
+  if (MPI_Initialized(&isMPIInitialized) == MPI_SUCCESS && isMPIInitialized)
   {
-    comm = cpp_params["catalyst/mpi_comm"].to_int64();
+    comm = static_cast<vtkTypeUInt64>(MPI_Comm_c2f(MPI_COMM_WORLD));
+    if (cpp_params.has_path("catalyst/mpi_comm"))
+    {
+      comm = cpp_params["catalyst/mpi_comm"].to_int64();
+    }
   }
 #else
   const vtkTypeUInt64 comm = 0;
