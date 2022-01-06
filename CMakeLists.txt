@@ -35,7 +35,8 @@ project(ParaView)
 if (CMAKE_CURRENT_SOURCE_DIR STREQUAL CMAKE_CURRENT_BINARY_DIR)
   message(FATAL_ERROR
     "ParaView requires an out-of-source build. Please create a separate "
-    "binary directory and run CMake there.")
+    "binary directory and run CMake command there giving "
+    "in parameter the ParaView source directory.")
 endif ()
 
 #------------------------------------------------------------------------------
