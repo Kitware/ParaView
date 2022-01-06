@@ -54,6 +54,14 @@ public:
   vtkBooleanMacro(UseHDF5, bool);
   void SetUseHDF5(bool);
 
+  /**
+   * When WriteAllTimeSteps is turned ON, the writer is executed once for
+   * each timestep available from the reader.
+   */
+  vtkSetMacro(WriteAllTimeSteps, bool);
+  vtkGetMacro(WriteAllTimeSteps, bool);
+  vtkBooleanMacro(WriteAllTimeSteps, bool);
+
 protected:
   vtkCGNSWriter();
   ~vtkCGNSWriter() override;
@@ -61,6 +69,12 @@ protected:
   char* FileName;
   vtkDataObject* OriginalInput;
   bool UseHDF5; //
+  bool Collect;
+
+  bool WriteAllTimeSteps;
+  class vtkDoubleArray* TimeValues;
+  int NumberOfTimeSteps;
+  int CurrentTimeIndex;
 
   int ProcessRequest(vtkInformation* request, vtkInformationVector** inputVector,
     vtkInformationVector* outputVector) override;
