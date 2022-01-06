@@ -127,6 +127,8 @@ vtkInSituInitializationHelper::~vtkInSituInitializationHelper() = default;
 void vtkInSituInitializationHelper::Initialize(vtkTypeUInt64 comm)
 {
 #if VTK_MODULE_ENABLE_VTK_ParallelMPI
+  int isMPIInitialized = 0;
+  if (MPI_Initialized(&isMPIInitialized) == MPI_SUCCESS && isMPIInitialized)
   {
     vtkVLogScopeF(
       PARAVIEW_LOG_CATALYST_VERBOSITY(), "Initializing MPI communicator using 'comm' (%llu)", comm);
