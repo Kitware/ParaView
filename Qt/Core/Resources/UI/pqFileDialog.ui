@@ -120,17 +120,19 @@
       </property>
       <widget class="QWidget" name="favoritesLayoutWidget">
        <layout class="QVBoxLayout" name="favoritesVerticalLayout">
+        <property name="spacing">
+         <number>0</number>
+        </property>
         <item>
          <layout class="QHBoxLayout" name="favoritesHorizontalLayout">
+          <property name="spacing">
+           <number>5</number>
+          </property>
           <item>
            <widget class="QLabel" name="favoritesLabel">
             <property name="text">
              <string>Favorites</string>
             </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QLineEdit" name="favoritesSearchBar">
            </widget>
           </item>
           <item>
@@ -174,6 +176,46 @@
            </widget>
           </item>
          </layout>
+        </item>
+        <item>
+         <spacer name="verticalSpacer">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+          <property name="sizeType">
+           <enum>QSizePolicy::Minimum</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>20</width>
+            <height>6</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item>
+         <widget class="QLineEdit" name="favoritesSearchBar">
+          <property name="maximumSize">
+           <size>
+            <width>16777215</width>
+            <height>18</height>
+           </size>
+          </property>
+          <property name="font">
+           <font>
+            <pointsize>8</pointsize>
+           </font>
+          </property>
+          <property name="toolTip">
+           <string>Filter favorites panel</string>
+          </property>
+          <property name="placeholderText">
+           <string>Filter favorites</string>
+          </property>
+          <property name="clearButtonEnabled">
+           <bool>true</bool>
+          </property>
+         </widget>
         </item>
         <item>
          <widget class="QListView" name="Favorites">
