@@ -308,3 +308,26 @@ The snippet below shows these hints in use.
           <HideResetButton/>
         </Hints>
     </DoubleVectorProperty>
+
+TextureSelectorPropertyWidget
+-------------------------------
+
+Customize the `pqTextureSelectorPropertyWidget` with the `TextureSelector` hint using the following attribute:
+
+* `can_load_new` - if 0 then user will not be able to load new texture from the drop down. Default to 1.
+
+The snippet below shows these hints in use.
+
+```xml
+<ProxyProperty command="SetTexture"
+                  name="Texture"
+                  panel_widget="texture_selector"
+                  null_on_empty="1" >
+    <ProxyGroupDomain name="groups">
+      <Group name="textures" />
+    </ProxyGroupDomain>
+    <Hints>
+      <TextureSelector can_load_new="0" />
+    </Hints>
+  </ProxyProperty>
+```

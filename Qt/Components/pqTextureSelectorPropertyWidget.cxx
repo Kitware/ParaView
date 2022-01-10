@@ -62,18 +62,20 @@ pqTextureSelectorPropertyWidget::pqTextureSelectorPropertyWidget(
   QVBoxLayout* l = new QVBoxLayout;
   l->setMargin(0);
 
-  // Recover domain and sanity check
-  this->Domain = smProperty->FindDomain<vtkSMProxyGroupDomain>();
-  if (!this->Domain || this->Domain->GetNumberOfGroups() != 1 ||
-    strcmp(this->Domain->GetGroup(0), pqTextureComboBox::TEXTURES_GROUP.c_str()) != 0)
+  // Create the combobox selector and set its value
+  auto* domain = smProperty->FindDomain<vtkSMProxyGroupDomain>();
+  bool canLoadNew = true;
+  if (auto* hints = smProperty->GetHints())
   {
-    qCritical() << "pqTextureSelectorPropertyWidget can only be used with a ProxyProperty"
-                   " with a ProxyGroupDomain containing only the \""
-                << QString(pqTextureComboBox::TEXTURES_GROUP.c_str()) << "\" group";
+    auto* texHint = hints->FindNestedElementByName("TextureSelector");
+    QString attr = texHint ? texHint->GetAttributeOrEmpty("can_load_new") : "";
+    if (!attr.isEmpty())
+    {
+      canLoadNew = static_cast<bool>(attr.toInt());
+    }
   }
 
-  // Create the combobox selector and set its value
-  this->Selector = new pqTextureComboBox(this->Domain, this);
+  this->Selector = new pqTextureComboBox(domain, canLoadNew, this);
   this->onPropertyChanged();
   l->addWidget(this->Selector);
   this->setLayout(l);

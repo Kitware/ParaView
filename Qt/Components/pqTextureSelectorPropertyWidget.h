@@ -42,9 +42,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * Property widget for selecting the texture to apply to a surface.
  *
  * To use this widget for a property add the 'panel_widget="texture_selector"'
- * to the property's XML.
+ * to the property's XML. Also support the hint <TextureSelector />. See
+ * property hints documentation for more details.
  */
-class vtkSMProxyGroupDomain;
 class pqTextureComboBox;
 class pqDataRepresentation;
 class PQCOMPONENTS_EXPORT pqTextureSelectorPropertyWidget : public pqPropertyWidget
@@ -64,7 +64,6 @@ protected Q_SLOTS:
 private:
   vtkNew<vtkEventQtSlotConnect> VTKConnector;
   pqTextureComboBox* Selector;
-  vtkSMProxyGroupDomain* Domain;
   pqDataRepresentation* Representation = nullptr;
   pqView* View = nullptr;
 };
