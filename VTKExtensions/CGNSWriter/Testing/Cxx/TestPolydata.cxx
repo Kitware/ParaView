@@ -111,4 +111,21 @@ void Create(vtkPolyData* pd)
   cell->InsertNextId(6);
   cell->InsertNextId(3);
   pd->InsertNextCell(VTK_POLYGON, cell);
+
+  vtkNew<vtkDoubleArray> ptPres;
+  vtkNew<vtkDoubleArray> clPres;
+
+  for (vtkIdType i = 0; i < pts->GetNumberOfPoints(); ++i)
+  {
+    ptPres->InsertNextValue(i);
+  }
+  for (vtkIdType i = 0; i < pd->GetNumberOfCells(); ++i)
+  {
+    clPres->InsertNextValue(i);
+  }
+  ptPres->SetName("Pressure");
+  clPres->SetName("Pressure");
+
+  pd->GetPointData()->AddArray(ptPres);
+  pd->GetCellData()->AddArray(clPres);
 }

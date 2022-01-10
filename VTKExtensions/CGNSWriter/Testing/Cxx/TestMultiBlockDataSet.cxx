@@ -45,7 +45,6 @@ int TestMultiBlockDataSet(int argc, char* argv[])
   const char* filename = u->GetTempFilePath("multiblock.cgns");
 
   vtkNew<vtkCGNSWriter> w;
-  w->UseHDF5Off();
   w->SetFileName(filename);
   w->SetInputData(mb);
   int rc = w->Write();
@@ -57,13 +56,16 @@ int TestMultiBlockDataSet(int argc, char* argv[])
 
   vtkNew<vtkCGNSReader> r;
   r->SetFileName(filename);
+  // update information first to get all bases in the information
   r->UpdateInformation();
+  // then enable all bases get both bases (volume, surface) into the output
   r->EnableAllBases();
   r->Update();
 
   delete[] filename;
-
-  return MultiBlockTest(r->GetOutput());
+  vtkMultiBlockDataSet* read = r->GetOutput();
+  vtk_assert(2 == read->GetNumberOfBlocks());
+  return MultiBlockTest(read);
 }
 
 int MultiBlockTest(vtkMultiBlockDataSet* read)
