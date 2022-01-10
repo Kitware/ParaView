@@ -113,15 +113,6 @@ int vtkHyperTreeGridRepresentation::ProcessViewRequest(
   {
     this->SetVisibility(true);
     auto data = vtkPVView::GetDeliveredPiece(inInfo, this);
-    if (vtkHyperTreeGrid* htg = vtkHyperTreeGrid::SafeDownCast(data))
-    {
-      const unsigned* dims = htg->GetDimensions();
-      if (dims[0] > 1 && dims[1] > 1 && dims[2] > 1)
-      {
-        vtkErrorMacro("The current representation does not support 3D vtkHyperTreeGrid.");
-        return 0;
-      }
-    }
     this->Mapper->SetInputDataObject(data);
 
     // This is called just before the vtk-level render. In this pass, we simply
@@ -253,7 +244,7 @@ void vtkHyperTreeGridRepresentation::UpdateColoringParameters()
       this->Mapper->SetScalarVisibility(1);
       this->Mapper->SelectColorArray(colorArrayName);
       this->Mapper->SetUseLookupTableScalarRange(1);
-      this->Mapper->SetUseCameraFrustum(this->AdaptiveDecimation);
+      this->Mapper->SetUseAdaptiveDecimation(this->AdaptiveDecimation);
       switch (fieldAssociation)
       {
         case vtkDataObject::FIELD_ASSOCIATION_NONE:
@@ -370,33 +361,41 @@ void vtkHyperTreeGridRepresentation::PrintSelf(ostream& os, vtkIndent indent)
   this->Mapper->PrintSelf(os, indent.GetNextIndent());
 }
 
+//----------------------------------------------------------------------------
+void vtkHyperTreeGridRepresentation::SetUseOutline(int vtkNotUsed(val))
+{
+  vtkWarningMacro("Outline not supported by the HTG Representation.");
+
+  // since geometry filter needs to execute, we need to mark the representation
+  // modified.
+  this->MarkModified();
+}
+
 //****************************************************************************
 // Methods merely forwarding parameters to internal objects.
 //****************************************************************************
 
 //----------------------------------------------------------------------------
-void vtkHyperTreeGridRepresentation::SetLookupTable(vtkScalarsToColors* val)
+// Forwarded to vtkProperty
+//----------------------------------------------------------------------------
+
+//----------------------------------------------------------------------------
+void vtkHyperTreeGridRepresentation::SetAmbientColor(double r, double g, double b)
 {
-  this->Mapper->SetLookupTable(val);
+  this->Property->SetAmbientColor(r, g, b);
 }
 
 //----------------------------------------------------------------------------
-void vtkHyperTreeGridRepresentation::SetMapScalars(bool val)
+void vtkHyperTreeGridRepresentation::SetBaseColorTexture(vtkTexture* tex)
 {
-  this->Mapper->SetColorMode(val ? VTK_COLOR_MODE_MAP_SCALARS : VTK_COLOR_MODE_DIRECT_SCALARS);
-}
-
-//----------------------------------------------------------------------------
-void vtkHyperTreeGridRepresentation::SetInterpolateScalarsBeforeMapping(int val)
-{
-  // XXX This has no effect on HTG as they only have cell data
-  this->Mapper->SetInterpolateScalarsBeforeMapping(val);
-}
-
-//----------------------------------------------------------------------------
-void vtkHyperTreeGridRepresentation::SetStatic(int val)
-{
-  this->Mapper->SetStatic(val);
+  if (tex)
+  {
+    tex->UseSRGBColorSpaceOn();
+    tex->SetInterpolate(this->InterpolateTextures);
+    tex->SetRepeat(this->RepeatTextures);
+    tex->SetMipmap(this->UseMipmapTextures);
+  }
+  this->Property->SetBaseColorTexture(tex);
 }
 
 //----------------------------------------------------------------------------
@@ -406,21 +405,9 @@ void vtkHyperTreeGridRepresentation::SetColor(double r, double g, double b)
 }
 
 //----------------------------------------------------------------------------
-void vtkHyperTreeGridRepresentation::SetLineWidth(double val)
+void vtkHyperTreeGridRepresentation::SetDiffuseColor(double r, double g, double b)
 {
-  this->Property->SetLineWidth(val);
-}
-
-//----------------------------------------------------------------------------
-void vtkHyperTreeGridRepresentation::SetOpacity(double val)
-{
-  this->Property->SetOpacity(val);
-}
-
-//----------------------------------------------------------------------------
-void vtkHyperTreeGridRepresentation::SetRenderLinesAsTubes(bool val)
-{
-  this->Property->SetRenderLinesAsTubes(val);
+  this->Property->SetDiffuseColor(r, g, b);
 }
 
 //----------------------------------------------------------------------------
@@ -430,19 +417,284 @@ void vtkHyperTreeGridRepresentation::SetEdgeColor(double r, double g, double b)
 }
 
 //----------------------------------------------------------------------------
+void vtkHyperTreeGridRepresentation::SetEdgeTint(double r, double g, double b)
+{
+  this->Property->SetEdgeTint(r, g, b);
+}
+
+//----------------------------------------------------------------------------
+void vtkHyperTreeGridRepresentation::SetEmissiveFactor(double rval, double gval, double bval)
+{
+  this->Property->SetEmissiveFactor(rval, gval, bval);
+}
+
+//----------------------------------------------------------------------------
+void vtkHyperTreeGridRepresentation::SetEmissiveTexture(vtkTexture* tex)
+{
+  if (tex)
+  {
+    tex->UseSRGBColorSpaceOn();
+    tex->SetInterpolate(this->InterpolateTextures);
+    tex->SetRepeat(this->RepeatTextures);
+    tex->SetMipmap(this->UseMipmapTextures);
+  }
+  this->Property->SetEmissiveTexture(tex);
+}
+
+//----------------------------------------------------------------------------
+void vtkHyperTreeGridRepresentation::SetInteractiveSelectionColor(double r, double g, double b)
+{
+  this->Property->SetSelectionColor(r, g, b, 1.0);
+}
+
+//----------------------------------------------------------------------------
+void vtkHyperTreeGridRepresentation::SetInterpolation(int val)
+{
+  this->Property->SetInterpolation(val);
+}
+//----------------------------------------------------------------------------
+void vtkHyperTreeGridRepresentation::SetLineWidth(double val)
+{
+  this->Property->SetLineWidth(val);
+}
+
+//----------------------------------------------------------------------------
+void vtkHyperTreeGridRepresentation::SetMaterialTexture(vtkTexture* tex)
+{
+  if (tex)
+  {
+    tex->UseSRGBColorSpaceOff();
+    tex->SetInterpolate(this->InterpolateTextures);
+    tex->SetRepeat(this->RepeatTextures);
+    tex->SetMipmap(this->UseMipmapTextures);
+  }
+  this->Property->SetORMTexture(tex);
+}
+
+//----------------------------------------------------------------------------
+void vtkHyperTreeGridRepresentation::SetMetallic(double val)
+{
+  this->Property->SetMetallic(val);
+}
+
+//----------------------------------------------------------------------------
+void vtkHyperTreeGridRepresentation::SetNormalScale(double val)
+{
+  this->Property->SetNormalScale(val);
+}
+
+//----------------------------------------------------------------------------
+void vtkHyperTreeGridRepresentation::SetNormalTexture(vtkTexture* tex)
+{
+  if (tex)
+  {
+    tex->UseSRGBColorSpaceOff();
+    tex->SetInterpolate(this->InterpolateTextures);
+    tex->SetRepeat(this->RepeatTextures);
+    tex->SetMipmap(this->UseMipmapTextures);
+  }
+  this->Property->SetNormalTexture(tex);
+}
+
+//----------------------------------------------------------------------------
+void vtkHyperTreeGridRepresentation::SetOcclusionStrength(double val)
+{
+  this->Property->SetOcclusionStrength(val);
+}
+
+//----------------------------------------------------------------------------
+void vtkHyperTreeGridRepresentation::SetOpacity(double val)
+{
+  this->Property->SetOpacity(val);
+}
+
+//----------------------------------------------------------------------------
+void vtkHyperTreeGridRepresentation::SetPointSize(double val)
+{
+  this->Property->SetPointSize(val);
+}
+
+//----------------------------------------------------------------------------
+void vtkHyperTreeGridRepresentation::SetRenderLinesAsTubes(bool val)
+{
+  this->Property->SetRenderLinesAsTubes(val);
+}
+
+//----------------------------------------------------------------------------
+void vtkHyperTreeGridRepresentation::SetRenderPointsAsSpheres(bool val)
+{
+  this->Property->SetRenderPointsAsSpheres(val);
+}
+
+//----------------------------------------------------------------------------
+void vtkHyperTreeGridRepresentation::SetRoughness(double val)
+{
+  this->Property->SetRoughness(val);
+}
+
+//----------------------------------------------------------------------------
+void vtkHyperTreeGridRepresentation::SetSpecularColor(double r, double g, double b)
+{
+  this->Property->SetSpecularColor(r, g, b);
+}
+
+//----------------------------------------------------------------------------
+void vtkHyperTreeGridRepresentation::SetSpecularPower(double val)
+{
+  this->Property->SetSpecularPower(val);
+}
+
+//----------------------------------------------------------------------------
+// Actor
+//----------------------------------------------------------------------------
+
+//----------------------------------------------------------------------------
+void vtkHyperTreeGridRepresentation::SetFlipTextures(bool flip)
+{
+  vtkInformation* info = this->Actor->GetPropertyKeys();
+  info->Remove(vtkProp::GeneralTextureTransform());
+  if (flip)
+  {
+    double mat[] = { 1, 0, 0, 0, 0, -1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1 };
+    info->Set(vtkProp::GeneralTextureTransform(), mat, 16);
+  }
+  this->Actor->Modified();
+}
+
+//----------------------------------------------------------------------------
+void vtkHyperTreeGridRepresentation::SetOrientation(double x, double y, double z)
+{
+  this->Actor->SetOrientation(x, y, z);
+}
+
+//----------------------------------------------------------------------------
+void vtkHyperTreeGridRepresentation::SetOrigin(double x, double y, double z)
+{
+  this->Actor->SetOrigin(x, y, z);
+}
+
+//----------------------------------------------------------------------------
+void vtkHyperTreeGridRepresentation::SetPickable(int val)
+{
+  this->Actor->SetPickable(val);
+}
+
+//----------------------------------------------------------------------------
+void vtkHyperTreeGridRepresentation::SetPosition(double x, double y, double z)
+{
+  this->Actor->SetPosition(x, y, z);
+}
+
+//----------------------------------------------------------------------------
+void vtkHyperTreeGridRepresentation::SetScale(double x, double y, double z)
+{
+  this->Actor->SetScale(x, y, z);
+}
+
+//----------------------------------------------------------------------------
+void vtkHyperTreeGridRepresentation::SetTexture(vtkTexture* val)
+{
+  this->Actor->SetTexture(val);
+  if (val)
+  {
+    val->SetRepeat(this->RepeatTextures);
+    val->SetInterpolate(this->InterpolateTextures);
+    val->SetMipmap(this->UseMipmapTextures);
+  }
+}
+
+//----------------------------------------------------------------------------
+void vtkHyperTreeGridRepresentation::SetUserTransform(const double matrix[16])
+{
+  vtkNew<vtkTransform> transform;
+  transform->SetMatrix(matrix);
+  this->Actor->SetUserTransform(transform);
+}
+
+//----------------------------------------------------------------------------
+// Texture
+//----------------------------------------------------------------------------
+
+//----------------------------------------------------------------------------
+void vtkHyperTreeGridRepresentation::SetRepeatTextures(bool rep)
+{
+  if (this->Actor->GetTexture())
+  {
+    this->Actor->GetTexture()->SetRepeat(rep);
+  }
+  std::map<std::string, vtkTexture*>& tex = this->Actor->GetProperty()->GetAllTextures();
+  for (auto t : tex)
+  {
+    t.second->SetRepeat(rep);
+  }
+  this->RepeatTextures = rep;
+}
+
+//----------------------------------------------------------------------------
+void vtkHyperTreeGridRepresentation::SetInterpolateTextures(bool rep)
+{
+  if (this->Actor->GetTexture())
+  {
+    this->Actor->GetTexture()->SetInterpolate(rep);
+  }
+  std::map<std::string, vtkTexture*>& tex = this->Actor->GetProperty()->GetAllTextures();
+  for (auto t : tex)
+  {
+    t.second->SetInterpolate(rep);
+  }
+  this->InterpolateTextures = rep;
+}
+
+//----------------------------------------------------------------------------
+void vtkHyperTreeGridRepresentation::SetUseMipmapTextures(bool rep)
+{
+  if (this->Actor->GetTexture())
+  {
+    this->Actor->GetTexture()->SetMipmap(rep);
+  }
+  std::map<std::string, vtkTexture*>& tex = this->Actor->GetProperty()->GetAllTextures();
+  for (auto t : tex)
+  {
+    t.second->SetMipmap(rep);
+  }
+  this->UseMipmapTextures = rep;
+}
+
+//----------------------------------------------------------------------------
+// Mapper and LODMapper
+//----------------------------------------------------------------------------
+
+//----------------------------------------------------------------------------
+void vtkHyperTreeGridRepresentation::SetInterpolateScalarsBeforeMapping(int val)
+{
+  // XXX This has no effect on HTG as they only have cell data
+  this->Mapper->SetInterpolateScalarsBeforeMapping(val);
+}
+
+//----------------------------------------------------------------------------
+void vtkHyperTreeGridRepresentation::SetLookupTable(vtkScalarsToColors* val)
+{
+  this->Mapper->SetLookupTable(val);
+}
+
+//----------------------------------------------------------------------------
+
+//----------------------------------------------------------------------------
+void vtkHyperTreeGridRepresentation::SetMapScalars(bool val)
+{
+  this->Mapper->SetColorMode(val ? VTK_COLOR_MODE_MAP_SCALARS : VTK_COLOR_MODE_DIRECT_SCALARS);
+}
+
+//----------------------------------------------------------------------------
+void vtkHyperTreeGridRepresentation::SetStatic(int val)
+{
+  this->Mapper->SetStatic(val);
+}
+
+//----------------------------------------------------------------------------
 void vtkHyperTreeGridRepresentation::SetSelection(vtkSelection* selection)
 {
   // we need to shallow copy the existing selection instead of changing it in order to avoid
   // changing the MTime of the mapper to avoid rebuilding everything
   this->Mapper->GetSelection()->ShallowCopy(selection);
-}
-
-//----------------------------------------------------------------------------
-void vtkHyperTreeGridRepresentation::SetUseOutline(int vtkNotUsed(val))
-{
-  vtkWarningMacro("Outline not supported by the HTG Representation.");
-
-  // since geometry filter needs to execute, we need to mark the representation
-  // modified.
-  this->MarkModified();
 }

@@ -124,22 +124,61 @@ public:
    */
   vtkDataObject* GetRenderedDataObject(int port) override;
 
-  //***************************************************************************
-  // Forwarded to vtkPVGeometryFilter
   virtual void SetUseOutline(int);
+
+  // TODO remove point size/coloring stuff which has no meaning here
 
   //***************************************************************************
   // Forwarded to vtkProperty.
+  virtual void SetAmbientColor(double r, double g, double b);
+  virtual void SetBaseColorTexture(vtkTexture* tex);
   virtual void SetColor(double r, double g, double b);
+  virtual void SetDiffuseColor(double r, double g, double b);
   virtual void SetEdgeColor(double r, double g, double b);
+  virtual void SetEdgeTint(double r, double g, double b);
+  virtual void SetEmissiveFactor(double rval, double gval, double bval);
+  virtual void SetEmissiveTexture(vtkTexture* tex);
+  virtual void SetInteractiveSelectionColor(double r, double g, double b);
+  virtual void SetInterpolation(int val);
   virtual void SetLineWidth(double val);
+  virtual void SetMaterialTexture(vtkTexture* tex);
+  virtual void SetMetallic(double val);
+  virtual void SetNormalScale(double val);
+  virtual void SetNormalTexture(vtkTexture* tex);
+  virtual void SetOcclusionStrength(double val);
   virtual void SetOpacity(double val);
+  virtual void SetPointSize(double val);
   virtual void SetRenderLinesAsTubes(bool);
+  virtual void SetRenderPointsAsSpheres(bool);
+  virtual void SetRoughness(double val);
+  virtual void SetSpecularColor(double r, double g, double b);
+  virtual void SetSpecularPower(double val);
+
+  //***************************************************************************
+  // Forwarded to Actor.
+  virtual void SetFlipTextures(bool);
+  virtual void SetOrientation(double, double, double);
+  virtual void SetOrigin(double, double, double);
+  virtual void SetPickable(int val);
+  virtual void SetPosition(double, double, double);
+  virtual void SetScale(double, double, double);
+  virtual void SetTexture(vtkTexture*);
+  virtual void SetUserTransform(const double[16]);
+
+  //***************************************************************************
+  // Forwarded to all textures
+  virtual void SetRepeatTextures(bool);
+  vtkGetMacro(RepeatTextures, bool);
+  virtual void SetInterpolateTextures(bool);
+  vtkGetMacro(InterpolateTextures, bool);
+  virtual void SetUseMipmapTextures(bool);
+  vtkGetMacro(UseMipmapTextures, bool);
 
   //***************************************************************************
   // Forwarded to Mapper and LODMapper.
   virtual void SetInterpolateScalarsBeforeMapping(int val);
   virtual void SetLookupTable(vtkScalarsToColors* val);
+
   //@{
   /**
    * Sets if scalars are mapped through a color-map or are used
@@ -251,15 +290,22 @@ protected:
    * Fields
    */
 
+  // Specific to HTG mapper
   vtkNew<vtkOpenGLHyperTreeGridMapper> Mapper;
+  bool AdaptiveDecimation = false;
+
+  // Generic fields
   vtkNew<vtkActor> Actor;
   vtkNew<vtkProperty> Property;
 
+  int Representation = SURFACE;
+
+  bool RepeatTextures;
+  bool InterpolateTextures;
+  bool UseMipmapTextures;
   double Ambient = 0.0;
   double Specular = 0.0;
   double Diffuse = 1.0;
-  int Representation = SURFACE;
-  bool AdaptiveDecimation = true;
   double VisibleDataBounds[6];
 
 private:
