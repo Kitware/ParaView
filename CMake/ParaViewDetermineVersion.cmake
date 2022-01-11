@@ -62,7 +62,7 @@ function(determine_version source_dir git_command var_prefix)
       message(WARNING
         "Version from git (${tmp_VERSION}) disagrees with hard coded version (${${var_prefix}_VERSION}). Either update the git tags or version.txt.")
     endif()
-    foreach(suffix VERSION VERSION_MAJOR VERSION_MINOR VERSION_PATCH
+    foreach(suffix BRANCH VERSION VERSION_MAJOR VERSION_MINOR VERSION_PATCH
                    VERSION_PATCH_EXTRA VERSION_FULL VERSION_IS_RELEASE)
       set(${var_prefix}_${suffix} ${tmp_${suffix}} PARENT_SCOPE)
     endforeach()
@@ -84,7 +84,30 @@ function(extract_version_components version_string var_prefix)
     set(minor ${CMAKE_MATCH_3})
     set(patch ${CMAKE_MATCH_4})
     set(patch_extra ${CMAKE_MATCH_5})
+    set(branch "")
+    if (patch_extra)
+      execute_process(
+        COMMAND ${git_command}
+                name-rev
+                --name-only
+                --no-undefined          # error if these names don't work
+                --refs=refs/tags/*      # tags
+                --refs=refs/heads/*     # branches
+                --refs=refs/pipelines/* # CI
+                HEAD
+        WORKING_DIRECTORY ${source_dir}
+        RESULT_VARIABLE result
+        OUTPUT_VARIABLE output
+        ERROR_QUIET
+        OUTPUT_STRIP_TRAILING_WHITESPACE
+        ERROR_STRIP_TRAILING_WHITESPACE)
+      if (result EQUAL 0)
+        # The branch name.
+        set(branch "${output}")
+      endif()
+    endif ()
 
+    set(${var_prefix}_BRANCH "${branch}" PARENT_SCOPE)
     set(${var_prefix}_VERSION "${major}.${minor}" PARENT_SCOPE)
     set(${var_prefix}_VERSION_MAJOR ${major} PARENT_SCOPE)
     set(${var_prefix}_VERSION_MINOR ${minor} PARENT_SCOPE)
