@@ -201,10 +201,8 @@ QAction* pqSLACManager::actionCurrentTimeResetRange()
 //-----------------------------------------------------------------------------
 pqServer* pqSLACManager::getActiveServer()
 {
-  pqApplicationCore* app = pqApplicationCore::instance();
-  pqServerManagerModel* smModel = app->getServerManagerModel();
-  pqServer* server = smModel->getItemAtIndex<pqServer*>(0);
-  return server;
+  auto& objects = pqActiveObjects::instance();
+  return objects.activeServer();
 }
 
 //-----------------------------------------------------------------------------
