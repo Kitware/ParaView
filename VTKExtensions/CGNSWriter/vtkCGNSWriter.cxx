@@ -40,6 +40,7 @@ See Copyright.txt or http://www.paraview.org/HTML/Copyright.html for details.
 #include "vtkObjectFactory.h"
 #include "vtkPointData.h"
 #include "vtkPolyData.h"
+#include "vtkStdString.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
 #include "vtkStringArray.h"
 #include "vtkStructuredGrid.h"
@@ -63,7 +64,7 @@ using namespace std;
 #define cg_check_operation(op)                                                                     \
   if (CG_OK != (op))                                                                               \
   {                                                                                                \
-    error = cg_get_error();                                                                        \
+    error = string(__FUNCTION__) + ":" + to_string(__LINE__) + "> " + cg_get_error();              \
     return false;                                                                                  \
   }
 
@@ -75,12 +76,27 @@ struct write_info
   int F, B, Z, Sol;
   int CellDim;
   bool WritePolygonalZone;
+  bool WriteAllTimeSteps;
+  double TimeStep;
+  const char* FileName;
+  const char* BaseName;
+  const char* ZoneName;
+  const char* SolutionName;
+
+  map<string, int> SolutionNames;
 
   write_info()
   {
     F = B = Z = Sol = 0;
     CellDim = 3;
     WritePolygonalZone = false;
+    WriteAllTimeSteps = false;
+    TimeStep = 0.0;
+
+    FileName = nullptr;
+    BaseName = nullptr;
+    ZoneName = nullptr;
+    SolutionName = nullptr;
   }
 };
 
@@ -92,28 +108,32 @@ public:
   static bool WriteBase(write_info& info, const char* basename, string& error);
 
   // write a single data set to
-  static bool WriteStructuredGrid(vtkStructuredGrid* sg, const char* file, string& error);
-  static bool WritePointSet(vtkPointSet* grid, const char* file, string& error);
+  static bool WriteStructuredGrid(vtkStructuredGrid* sg, write_info& info, string& error);
+  static bool WritePointSet(vtkPointSet* grid, write_info& info, string& error);
 
   // write a multi-block dataset to
-  static bool WriteMultiBlock(vtkMultiBlockDataSet* mb, const char* file, string& error);
-  static bool WriteMultiPiece(vtkMultiPieceDataSet* mp, const char* file, string& error);
+  static bool WriteMultiBlock(vtkMultiBlockDataSet* mb, write_info& info, string& error);
+  static bool WriteMultiPiece(vtkMultiPieceDataSet* mp, write_info& info, string& error);
 
 protected:
+  // open and initialize a CGNS file
+  static bool InitCGNSFile(write_info& info, string& error);
+  static bool WriteBase(write_info& info, string& error);
+
   static bool WriteMultiBlock(write_info& info, vtkMultiBlockDataSet*, string& error);
   static bool WritePoints(write_info& info, vtkPoints* pts, string& error);
 
-  static bool WriteFieldArray(write_info& info, const char* solution,
-    CGNS_ENUMT(GridLocation_t) location, vtkDataSetAttributes* dsa,
-    map<unsigned char, vector<vtkIdType>>* cellTypeMap, string& error);
+  static bool WriteFieldArray(write_info& info, CGNS_ENUMT(GridLocation_t) location,
+    vtkDataSetAttributes* dsa, map<unsigned char, vector<vtkIdType>>* cellTypeMap, string& error);
 
-  static bool WriteStructuredGrid(
-    write_info& info, vtkStructuredGrid* sg, const char* zonename, string& error);
-  static bool WritePointSet(
-    write_info& info, vtkPointSet* grid, const char* zonename, string& error);
+  static bool WriteStructuredGrid(write_info& info, vtkStructuredGrid* sg, string& error);
+  static bool WritePointSet(write_info& info, vtkPointSet* grid, string& error);
   static bool WritePolygonalZone(write_info& info, vtkPointSet* grid, string& error);
   static bool WriteCells(write_info& info, vtkPointSet* grid,
     map<unsigned char, vector<vtkIdType>>& cellTypeMap, string& error);
+
+  static bool WriteBaseTimeInformation(write_info& info, string& error);
+  static bool WriteZoneTimeInformation(write_info& info, string& error);
 };
 
 bool vtkCGNSWriter::vtkPrivate::WriteCells(write_info& info, vtkPointSet* grid,
@@ -139,7 +159,7 @@ bool vtkCGNSWriter::vtkPrivate::WriteCells(write_info& info, vtkPointSet* grid,
   cgsize_t nCellsWritten(CGNS_COUNTING_OFFSET);
   for (auto& entry : cellTypeMap)
   {
-    unsigned char cellType = entry.first;
+    const unsigned char cellType = entry.first;
     CGNS_ENUMT(ElementType_t) cg_elem(CGNS_ENUMV(ElementTypeNull));
     const char* sectionname(nullptr);
     switch (cellType)
@@ -179,7 +199,7 @@ bool vtkCGNSWriter::vtkPrivate::WriteCells(write_info& info, vtkPointSet* grid,
     for (auto& cellId : cellIdsOfType)
     {
       vtkCell* cell = grid->GetCell(cellId);
-      int nIds = cell->GetNumberOfPoints();
+      const int nIds = cell->GetNumberOfPoints();
 
       for (int j = 0; j < nIds; ++j)
       {
@@ -189,9 +209,9 @@ bool vtkCGNSWriter::vtkPrivate::WriteCells(write_info& info, vtkPointSet* grid,
     }
 
     int dummy(0);
-    cgsize_t start(nCellsWritten);
-    cgsize_t end(static_cast<cgsize_t>(nCellsWritten + cellIdsOfType.size() - 1));
-    int nBoundary(0);
+    const cgsize_t start(nCellsWritten);
+    const cgsize_t end(static_cast<cgsize_t>(nCellsWritten + cellIdsOfType.size() - 1));
+    const int nBoundary(0);
     cg_check_operation(cg_section_write(info.F, info.B, info.Z, sectionname, cg_elem, start, end,
       nBoundary, cellsOfTypeArray.data(), &dummy));
 
@@ -312,8 +332,7 @@ bool vtkCGNSWriter::vtkPrivate::WritePolygonalZone(
   return true;
 }
 
-bool vtkCGNSWriter::vtkPrivate::WritePointSet(
-  write_info& info, vtkPointSet* grid, const char* zonename, string& error)
+bool vtkCGNSWriter::vtkPrivate::WritePointSet(write_info& info, vtkPointSet* grid, string& error)
 {
   const cgsize_t nPts = static_cast<cgsize_t>(grid->GetNumberOfPoints());
   const cgsize_t nCells = static_cast<cgsize_t>(grid->GetNumberOfCells());
@@ -325,10 +344,10 @@ bool vtkCGNSWriter::vtkPrivate::WritePointSet(
   cgsize_t dim[3] = { nPts, nCells, 0 };
 
   bool isPolygonal(false);
-  for (int i = 0; i < grid->GetNumberOfCells(); ++i)
+  for (vtkIdType i = 0; i < grid->GetNumberOfCells(); ++i)
   {
     vtkCell* cell = grid->GetCell(i);
-    unsigned char cellType = cell->GetCellType();
+    const unsigned char cellType = cell->GetCellType();
 
     isPolygonal |= cellType == VTK_POLYHEDRON;
     isPolygonal |= cellType == VTK_POLYGON;
@@ -336,7 +355,7 @@ bool vtkCGNSWriter::vtkPrivate::WritePointSet(
   info.WritePolygonalZone = isPolygonal;
 
   cg_check_operation(
-    cg_zone_write(info.F, info.B, zonename, dim, CGNS_ENUMV(Unstructured), &(info.Z)));
+    cg_zone_write(info.F, info.B, info.ZoneName, dim, CGNS_ENUMV(Unstructured), &(info.Z)));
 
   vtkPoints* pts = grid->GetPoints();
 
@@ -350,23 +369,97 @@ bool vtkCGNSWriter::vtkPrivate::WritePointSet(
     return false;
   }
 
-  if (!WriteFieldArray(info, "PointData", CGNS_ENUMV(Vertex), grid->GetPointData(), nullptr, error))
+  info.SolutionName = "PointData";
+  if (!WriteFieldArray(info, CGNS_ENUMV(Vertex), grid->GetPointData(), nullptr, error))
   {
     return false;
   }
 
+  info.SolutionName = "CellData";
   auto ptr = (isPolygonal ? nullptr : &cellTypeMap);
-  if (!WriteFieldArray(info, "CellData", CGNS_ENUMV(CellCenter), grid->GetCellData(), ptr, error))
+  if (!WriteFieldArray(info, CGNS_ENUMV(CellCenter), grid->GetCellData(), ptr, error))
   {
     return false;
   }
 
+  return WriteZoneTimeInformation(info, error);
+}
+
+bool vtkCGNSWriter::vtkPrivate::WriteZoneTimeInformation(write_info& info, string& error)
+{
+  if (info.SolutionNames.empty())
+  {
+    return true;
+  }
+
+  char* timeStepNames;
+  auto at = info.SolutionNames.find("CellData");
+  bool hasCellData = at != info.SolutionNames.end();
+  int cellDataS = hasCellData ? at->second : -1;
+  at = info.SolutionNames.find("PointData");
+  bool hasVertData = at != info.SolutionNames.end();
+  int vertDataS = hasVertData ? at->second : -1;
+
+  cgsize_t dim[2] = { 32, 1 };
+  if (hasCellData && hasVertData)
+  {
+    // how to write cell AND point data?!?!
+    timeStepNames = (char*)"CellData\0                       ";
+  }
+  else if (hasCellData)
+  {
+    timeStepNames = (char*)"CellData\0                       ";
+  }
+  else if (hasVertData)
+  {
+    timeStepNames = (char*)"PointData\0                      ";
+  }
+  else
+  {
+    error = "No cell data or vert data found, but solution names not empty.";
+    return false;
+  }
+
+  if (hasCellData || hasVertData)
+  {
+    cg_check_operation(cg_ziter_write(info.F, info.B, info.Z, "ZoneIterativeData_t"));
+    cg_check_operation(cg_goto(info.F, info.B, "Zone_t", info.Z, "ZoneIterativeData_t", 1, "end"));
+    cg_check_operation(
+      cg_array_write("FlowSolutionPointers", CGNS_ENUMV(Character), 2, dim, timeStepNames));
+
+    if (hasVertData)
+    {
+      int sol[1] = { vertDataS };
+      cg_check_operation(
+        cg_array_write("VertexSolutionIndices", CGNS_ENUMV(Integer), 1, &dim[1], sol));
+      cg_check_operation(cg_descriptor_write("VertexPrefix", "Vertex"));
+    }
+    if (hasCellData)
+    {
+      int sol[1] = { cellDataS };
+      cg_check_operation(cg_array_write("CellCenterIndices", CGNS_ENUMV(Integer), 1, &dim[1], sol));
+      cg_check_operation(cg_descriptor_write("CellCenterPrefix", "CellCenter"));
+    }
+  }
   return true;
 }
 
-bool vtkCGNSWriter::vtkPrivate::WritePointSet(vtkPointSet* grid, const char* file, string& error)
+bool vtkCGNSWriter::vtkPrivate::WriteBaseTimeInformation(write_info& info, string& error)
 {
-  write_info info;
+  double time[1] = { info.TimeStep };
+
+  cg_check_operation(cg_biter_write(info.F, info.B, "TimeIterValues", 1));
+  cg_check_operation(cg_goto(info.F, info.B, "BaseIterativeData_t", 1, "end"));
+
+  cgsize_t dimTimeValues[1] = { 1 };
+  cg_check_operation(cg_array_write("TimeValues", CGNS_ENUMV(RealDouble), 1, dimTimeValues, time));
+
+  cg_check_operation(cg_simulation_type_write(info.F, info.B, CGNS_ENUMV(TimeAccurate)));
+  return true;
+}
+
+bool vtkCGNSWriter::vtkPrivate::WritePointSet(vtkPointSet* grid, write_info& info, string& error)
+{
   if (grid->IsA("vtkPolyData"))
   {
     info.CellDim = 2;
@@ -385,17 +478,20 @@ bool vtkCGNSWriter::vtkPrivate::WritePointSet(vtkPointSet* grid, const char* fil
     }
   }
 
-  if (!InitCGNSFile(info, file, error))
+  if (!InitCGNSFile(info, error))
   {
     return false;
   }
-  if (!WriteBase(info, "Base", error))
+  info.BaseName = "Base";
+  if (!WriteBase(info, error))
   {
     return false;
   }
 
-  bool rc = WritePointSet(info, grid, "Zone 1", error);
-  cg_check_operation(cg_close(info.F)) return rc;
+  info.ZoneName = "Zone 1";
+  const bool rc = WritePointSet(info, grid, error);
+  cg_check_operation(cg_close(info.F));
+  return rc;
 }
 
 /*
@@ -426,7 +522,7 @@ void ReorderData(vector<double>& temp, map<unsigned char, vector<vtkIdType>>* ce
 }
 
 // writes a field array to a new solution
-bool vtkCGNSWriter::vtkPrivate::WriteFieldArray(write_info& info, const char* solution,
+bool vtkCGNSWriter::vtkPrivate::WriteFieldArray(write_info& info,
   CGNS_ENUMT(GridLocation_t) location, vtkDataSetAttributes* dsa,
   map<unsigned char, vector<vtkIdType>>* cellTypeMap, string& error)
 {
@@ -436,13 +532,16 @@ bool vtkCGNSWriter::vtkPrivate::WriteFieldArray(write_info& info, const char* so
     return false;
   }
 
-  int nArr = dsa->GetNumberOfArrays();
+  const int nArr = dsa->GetNumberOfArrays();
   if (nArr > 0)
   {
     vector<double> temp;
 
     int dummy(0);
-    cg_check_operation(cg_sol_write(info.F, info.B, info.Z, solution, location, &(info.Sol)));
+    cg_check_operation(
+      cg_sol_write(info.F, info.B, info.Z, info.SolutionName, location, &(info.Sol)));
+    info.SolutionNames.emplace(info.SolutionName, info.Sol);
+
     for (int i = 0; i < nArr; ++i)
     {
       vtkDataArray* da = dsa->GetArray(i);
@@ -452,7 +551,7 @@ bool vtkCGNSWriter::vtkPrivate::WriteFieldArray(write_info& info, const char* so
       temp.reserve(da->GetNumberOfTuples());
       if (da->GetNumberOfComponents() != 1)
       {
-        string fieldName = da->GetName();
+        const string fieldName = da->GetName();
         if (da->GetNumberOfComponents() == 3)
         {
           // here we have to stripe the XYZ values, same as with the vertices.
@@ -546,26 +645,44 @@ bool vtkCGNSWriter::vtkPrivate::WritePoints(write_info& info, vtkPoints* pts, st
   return true;
 }
 
-bool vtkCGNSWriter::vtkPrivate::InitCGNSFile(write_info& info, const char* file, string& error)
+bool vtkCGNSWriter::vtkPrivate::InitCGNSFile(write_info& info, string& error)
 {
-  cg_check_operation(cg_open(file, CG_MODE_WRITE, &(info.F)));
+  if (!info.FileName)
+  {
+    error = "File name not defined.";
+    return false;
+  }
+
+  cg_check_operation(cg_open(info.FileName, CG_MODE_WRITE, &(info.F)));
   return true;
 }
 
-bool vtkCGNSWriter::vtkPrivate::WriteBase(write_info& info, const char* basename, string& error)
+bool vtkCGNSWriter::vtkPrivate::WriteBase(write_info& info, string& error)
 {
-  cg_check_operation(cg_base_write(info.F, basename, info.CellDim, 3, &(info.B)));
-  return true;
+  if (!info.BaseName)
+  {
+    error = "Base name not defined.";
+    return false;
+  }
+
+  cg_check_operation(cg_base_write(info.F, info.BaseName, info.CellDim, 3, &(info.B)));
+  return WriteBaseTimeInformation(info, error);
 }
 
 bool vtkCGNSWriter::vtkPrivate::WriteStructuredGrid(
-  write_info& info, vtkStructuredGrid* sg, const char* zonename, string& error)
+  write_info& info, vtkStructuredGrid* sg, string& error)
 {
   if (sg->GetNumberOfCells() == 0 && sg->GetNumberOfPoints() == 0)
   {
     // don't write anything
     return true;
   }
+  if (!info.ZoneName)
+  {
+    error = "Zone name not defined.";
+    return false;
+  }
+
   cgsize_t dim[9];
 
   // set the dimensions
@@ -612,7 +729,7 @@ bool vtkCGNSWriter::vtkPrivate::WriteStructuredGrid(
 
   // create the structured zone. Cells are implicit
   cg_check_operation(
-    cg_zone_write(info.F, info.B, zonename, dim, CGNS_ENUMV(Structured), &(info.Z)));
+    cg_zone_write(info.F, info.B, info.ZoneName, dim, CGNS_ENUMV(Structured), &(info.Z)));
 
   vtkPoints* pts = sg->GetPoints();
 
@@ -621,12 +738,14 @@ bool vtkCGNSWriter::vtkPrivate::WriteStructuredGrid(
     return false;
   }
 
-  if (!WriteFieldArray(info, "PointData", CGNS_ENUMV(Vertex), sg->GetPointData(), nullptr, error))
+  info.SolutionName = "PointData";
+  if (!WriteFieldArray(info, CGNS_ENUMV(Vertex), sg->GetPointData(), nullptr, error))
   {
     return false;
   }
 
-  if (!WriteFieldArray(info, "CellData", CGNS_ENUMV(CellCenter), sg->GetCellData(), nullptr, error))
+  info.SolutionName = "CellData";
+  if (!WriteFieldArray(info, CGNS_ENUMV(CellCenter), sg->GetCellData(), nullptr, error))
   {
     return false;
   }
@@ -634,9 +753,10 @@ bool vtkCGNSWriter::vtkPrivate::WriteStructuredGrid(
 }
 
 bool vtkCGNSWriter::vtkPrivate::WriteStructuredGrid(
-  vtkStructuredGrid* sg, const char* file, string& error)
+  vtkStructuredGrid* sg, write_info& info, string& error)
 {
-  write_info info;
+  // get the structured grid IJK dimensions
+  // and set CellDim to the correct value.
   int* dims = sg->GetDimensions();
   info.CellDim = 0;
   for (int n = 0; n < 3; n++)
@@ -646,11 +766,15 @@ bool vtkCGNSWriter::vtkPrivate::WriteStructuredGrid(
       info.CellDim += 1;
     }
   }
-  if (!InitCGNSFile(info, file, error) || !WriteBase(info, "Base", error))
+
+  info.BaseName = "Base";
+  if (!InitCGNSFile(info, error) || !WriteBase(info, error))
   {
     return false;
   }
-  bool rc = WriteStructuredGrid(info, sg, "Zone 1", error);
+
+  info.ZoneName = "Zone 1";
+  const bool rc = WriteStructuredGrid(info, sg, error);
   cg_check_operation(cg_close(info.F));
   return rc;
 }
@@ -672,16 +796,15 @@ void Flatten(vtkMultiBlockDataSet* mb, vector<entry>& o2d, vector<entry>& o3d, i
   {
     string zonename = "Zone " + to_string(i + zoneOffset);
 
-    vtkInformation* md(nullptr);
     if (mb->HasMetaData(i))
     {
-      md = mb->GetMetaData(i);
+      vtkInformation* md = mb->GetMetaData(i);
       if (md->Has(vtkCompositeDataSet::NAME()))
       {
         zonename = md->Get(vtkCompositeDataSet::NAME());
         if (zonename.length() > 32)
         {
-          string oldname(zonename);
+          const string oldname(zonename);
           zonename = zonename.substr(0, 32);
           for (auto& e : o2d)
           {
@@ -714,11 +837,11 @@ void Flatten(vtkMultiBlockDataSet* mb, vector<entry>& o2d, vector<entry>& o3d, i
     }
 
     vtkDataObject* block = mb->GetBlock(i);
-    auto nested = vtkMultiBlockDataSet::SafeDownCast(block);
-    auto polydata = vtkPolyData::SafeDownCast(block);
+    const auto nested = vtkMultiBlockDataSet::SafeDownCast(block);
+    const auto polydata = vtkPolyData::SafeDownCast(block);
     if (polydata)
     {
-      o2d.push_back(entry(block, zonename));
+      o2d.emplace_back(block, zonename);
     }
     else if (nested)
     {
@@ -756,7 +879,7 @@ void Flatten(vtkMultiBlockDataSet* mb, vector<entry>& o2d, vector<entry>& o3d, i
       }
       if (CellDim == 3)
       {
-        o3d.push_back(entry(block, zonename));
+        o3d.emplace_back(block, zonename);
       }
       else
       {
@@ -781,27 +904,31 @@ bool vtkCGNSWriter::vtkPrivate::WriteMultiBlock(
   if (!volumeBlocks.empty())
   {
     info.CellDim = 3;
-    if (!WriteBase(info, "Base_Volume_Elements", error))
+    info.BaseName = "Base_Volume_Elements";
+    if (!WriteBase(info, error))
       return false;
 
     for (auto& e : volumeBlocks)
     {
+      info.ZoneName = e.name.c_str();
       vtkStructuredGrid* sg = vtkStructuredGrid::SafeDownCast(e.obj);
       if (sg)
       {
-        if (!WriteStructuredGrid(info, sg, e.name.c_str(), error))
+        if (!WriteStructuredGrid(info, sg, error))
         {
           return false;
         }
+        info.SolutionNames.clear();
         continue;
       }
       vtkPointSet* ps = vtkPointSet::SafeDownCast(e.obj);
       if (ps)
       {
-        if (!WritePointSet(info, ps, e.name.c_str(), error))
+        if (!WritePointSet(info, ps, error))
         {
           return false;
         }
+        info.SolutionNames.clear();
         continue;
       }
 
@@ -820,27 +947,31 @@ bool vtkCGNSWriter::vtkPrivate::WriteMultiBlock(
   if (!surfaceBlocks.empty())
   {
     info.CellDim = 2;
-    if (!WriteBase(info, "Base_Surface_Elements", error))
+    info.BaseName = "Base_Surface_Elements";
+    if (!WriteBase(info, error))
       return false;
 
     for (auto& e : surfaceBlocks)
     {
+      info.ZoneName = e.name.c_str();
       vtkStructuredGrid* sg = vtkStructuredGrid::SafeDownCast(e.obj);
       if (sg)
       {
-        if (!WriteStructuredGrid(info, sg, e.name.c_str(), error))
+        if (!WriteStructuredGrid(info, sg, error))
         {
           return false;
         }
+        info.SolutionNames.clear();
         continue;
       }
       vtkPointSet* ps = vtkPointSet::SafeDownCast(e.obj);
       if (ps)
       {
-        if (!WritePointSet(info, ps, e.name.c_str(), error))
+        if (!WritePointSet(info, ps, error))
         {
           return false;
         }
+        info.SolutionNames.clear();
       }
     }
   }
@@ -849,21 +980,20 @@ bool vtkCGNSWriter::vtkPrivate::WriteMultiBlock(
 }
 
 bool vtkCGNSWriter::vtkPrivate::WriteMultiBlock(
-  vtkMultiBlockDataSet* mb, const char* file, string& error)
+  vtkMultiBlockDataSet* mb, write_info& info, string& error)
 {
-  write_info info;
-  if (!InitCGNSFile(info, file, error))
+  if (!InitCGNSFile(info, error))
   {
     return false;
   }
 
-  bool rc = WriteMultiBlock(info, mb, error);
+  const bool rc = WriteMultiBlock(info, mb, error);
   cg_check_operation(cg_close(info.F));
   return rc;
 }
 
 bool vtkCGNSWriter::vtkPrivate::WriteMultiPiece(
-  vtkMultiPieceDataSet* vtkNotUsed(mp), const char* vtkNotUsed(file), string& error)
+  vtkMultiPieceDataSet* vtkNotUsed(mp), write_info& vtkNotUsed(info), string& error)
 {
   // todo: multi-piece writing to a single zone. Requires extensive rework, but may be done together
   // with parallel writing implementation?
@@ -875,9 +1005,21 @@ vtkStandardNewMacro(vtkCGNSWriter);
 
 vtkCGNSWriter::vtkCGNSWriter()
 {
+  this->UseHDF5 = true;
+  this->WasWritingSuccessful = true;
   this->FileName = (nullptr);
   this->OriginalInput = (nullptr);
+  this->TimeValues = nullptr;
+  this->WriteAllTimeSteps = false;
+  this->CurrentTimeIndex = 0;
+
   this->SetUseHDF5(true); // use the method, this will call the corresponding library method.
+}
+
+void vtkCGNSWriter::SetUseHDF5(bool value)
+{
+  this->UseHDF5 = value;
+  cg_set_file_type(value ? CG_FILE_HDF5 : CG_FILE_ADF);
 }
 
 vtkCGNSWriter::~vtkCGNSWriter()
@@ -886,6 +1028,12 @@ vtkCGNSWriter::~vtkCGNSWriter()
   if (this->OriginalInput)
   {
     this->OriginalInput->UnRegister(this);
+    this->OriginalInput = nullptr;
+  }
+
+  if (this->TimeValues)
+  {
+    this->TimeValues->Delete();
   }
 }
 
@@ -916,37 +1064,50 @@ int vtkCGNSWriter::ProcessRequest(
 }
 
 int vtkCGNSWriter::RequestInformation(vtkInformation* vtkNotUsed(request),
-  vtkInformationVector** vtkNotUsed(inputVector), vtkInformationVector* vtkNotUsed(outputVector))
+  vtkInformationVector** inputVector, vtkInformationVector* vtkNotUsed(outputVector))
 {
-  // todo: support writing time steps
-  // vtkInformation *inInfo = inputVector[0]->GetInformationObject(0);
-  // if (inInfo->Has(vtkStreamingDemandDrivenPipeline::TIME_STEPS()))
-  //{
-  //  this->NumberOfTimeSteps =
-  //    inInfo->Length(vtkStreamingDemandDrivenPipeline::TIME_STEPS());
-  //}
-  // else
-  //{
-  //  this->NumberOfTimeSteps = 0;
-  //}
+  vtkInformation* inInfo = inputVector[0]->GetInformationObject(0);
+  if (inInfo->Has(vtkStreamingDemandDrivenPipeline::TIME_STEPS()))
+  {
+    this->NumberOfTimeSteps = inInfo->Length(vtkStreamingDemandDrivenPipeline::TIME_STEPS());
+  }
+  else
+  {
+    this->NumberOfTimeSteps = 0;
+  }
 
   return 1;
 }
 
 int vtkCGNSWriter::RequestUpdateExtent(vtkInformation* vtkNotUsed(request),
-  vtkInformationVector** vtkNotUsed(inputVector), vtkInformationVector* vtkNotUsed(outputVector))
+  vtkInformationVector** inputVector, vtkInformationVector* vtkNotUsed(outputVector))
 {
-  // todo: support writing time steps
-  // vtkInformation *inInfo = inputVector[0]->GetInformationObject(0);
-  // if (this->WriteAllTimeSteps &&
-  //  inInfo->Has(vtkStreamingDemandDrivenPipeline::TIME_STEPS()))
-  //{
-  //  double* timeSteps =
-  //    inInfo->Get(vtkStreamingDemandDrivenPipeline::TIME_STEPS());
-  //  double timeReq = timeSteps[this->CurrentTimeIndex];
-  //  inputVector[0]->GetInformationObject(0)->Set
-  //  (vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEP(), timeReq);
-  //}
+  if (!this->TimeValues)
+  {
+    this->TimeValues = vtkDoubleArray::New();
+    vtkInformation* info = inputVector[0]->GetInformationObject(0);
+    double* data = info->Get(vtkStreamingDemandDrivenPipeline::TIME_STEPS());
+    int len = info->Length(vtkStreamingDemandDrivenPipeline::TIME_STEPS());
+    this->TimeValues->SetNumberOfValues(len);
+    if (data)
+    {
+      for (int i = 0; i < len; i++)
+      {
+        this->TimeValues->SetValue(i, data[i]);
+      }
+    }
+  }
+  if (this->TimeValues && this->WriteAllTimeSteps)
+  {
+    if (this->TimeValues->GetPointer(0))
+    {
+      double timeReq;
+      timeReq = this->TimeValues->GetValue(this->CurrentTimeIndex);
+      inputVector[0]->GetInformationObject(0)->Set(
+        vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEP(), timeReq);
+    }
+  }
+
   return 1;
 }
 
@@ -958,8 +1119,8 @@ int vtkCGNSWriter::FillInputPortInformation(int vtkNotUsed(port), vtkInformation
   return 1;
 }
 
-int vtkCGNSWriter::RequestData(vtkInformation* vtkNotUsed(request),
-  vtkInformationVector** inputVector, vtkInformationVector* vtkNotUsed(outputVector))
+int vtkCGNSWriter::RequestData(vtkInformation* request, vtkInformationVector** inputVector,
+  vtkInformationVector* vtkNotUsed(outputVector))
 {
   if (!this->FileName)
   {
@@ -973,48 +1134,71 @@ int vtkCGNSWriter::RequestData(vtkInformation* vtkNotUsed(request),
     this->OriginalInput->Register(this);
   }
 
+  // is this the first request
+  if (this->CurrentTimeIndex == 0 && this->WriteAllTimeSteps)
+  {
+    // Tell the pipeline to start looping.
+    request->Set(vtkStreamingDemandDrivenPipeline::CONTINUE_EXECUTING(), 1);
+  }
+
   this->WriteData();
-  if (!WasWritingSuccessful)
+  if (!this->WasWritingSuccessful)
     SetErrorCode(1L);
 
-  return WasWritingSuccessful ? 1 : 0;
-}
+  this->CurrentTimeIndex++;
+  if (this->CurrentTimeIndex >= this->NumberOfTimeSteps)
+  {
+    this->CurrentTimeIndex = 0;
+    if (this->WriteAllTimeSteps)
+    {
+      // Tell the pipeline to stop looping.
+      request->Set(vtkStreamingDemandDrivenPipeline::CONTINUE_EXECUTING(), 0);
+    }
+  }
 
-void vtkCGNSWriter::SetUseHDF5(bool value)
-{
-  this->UseHDF5 = value;
-  cg_set_file_type(value ? CG_FILE_HDF5 : CG_FILE_ADF);
+  return this->WasWritingSuccessful ? 1 : 0;
 }
 
 void vtkCGNSWriter::WriteData()
 {
-  WasWritingSuccessful = false;
+  this->WasWritingSuccessful = false;
   if (!this->FileName || !this->OriginalInput)
     return;
+
+  write_info info;
+  info.FileName = this->FileName;
+  info.WriteAllTimeSteps = this->WriteAllTimeSteps;
+  if (this->TimeValues && this->CurrentTimeIndex < this->TimeValues->GetNumberOfValues())
+  {
+    info.TimeStep = this->TimeValues->GetValue(this->CurrentTimeIndex);
+  }
+  else
+  {
+    info.TimeStep = 0.0;
+  }
 
   string error;
   if (this->OriginalInput->IsA("vtkMultiBlockDataSet"))
   {
     vtkMultiBlockDataSet* mb = vtkMultiBlockDataSet::SafeDownCast(this->OriginalInput);
-    WasWritingSuccessful = vtkCGNSWriter::vtkPrivate::WriteMultiBlock(mb, this->FileName, error);
+    this->WasWritingSuccessful = vtkCGNSWriter::vtkPrivate::WriteMultiBlock(mb, info, error);
   }
   else if (this->OriginalInput->IsA("vtkMultiPieceDataSet"))
   {
     vtkMultiPieceDataSet* ds = vtkMultiPieceDataSet::SafeDownCast(this->OriginalInput);
-    WasWritingSuccessful = vtkCGNSWriter::vtkPrivate::WriteMultiPiece(ds, this->FileName, error);
+    this->WasWritingSuccessful = vtkCGNSWriter::vtkPrivate::WriteMultiPiece(ds, info, error);
   }
   else if (this->OriginalInput->IsA("vtkDataSet"))
   {
     if (this->OriginalInput->IsA("vtkStructuredGrid"))
     {
       vtkStructuredGrid* sg = vtkStructuredGrid::SafeDownCast(this->OriginalInput);
-      WasWritingSuccessful =
-        vtkCGNSWriter::vtkPrivate::WriteStructuredGrid(sg, this->FileName, error);
+      this->WasWritingSuccessful = vtkCGNSWriter::vtkPrivate::WriteStructuredGrid(sg, info, error);
     }
     else if (this->OriginalInput->IsA("vtkPointSet"))
     {
       vtkPointSet* ug = vtkPointSet::SafeDownCast(this->OriginalInput);
-      WasWritingSuccessful = vtkCGNSWriter::vtkPrivate::WritePointSet(ug, this->FileName, error);
+      this->WasWritingSuccessful = vtkCGNSWriter::vtkPrivate::WritePointSet(ug, info, error);
     }
     else
     {
@@ -1029,7 +1213,17 @@ void vtkCGNSWriter::WriteData()
                   << "' on input.\nSupported types are vtkStructuredGrid, vtkPointSet, their "
                      "subclasses and multi-block datasets of said classes.");
   }
-  if (!WasWritingSuccessful)
+
+  // the writer can be used for multiple timesteps
+  // and the array is re-created at each use.
+  // except when writing multiple timesteps
+  if (!this->WriteAllTimeSteps && this->TimeValues)
+  {
+    this->TimeValues->Delete();
+    this->TimeValues = nullptr;
+  }
+
+  if (!this->WasWritingSuccessful)
   {
     vtkErrorMacro(<< " Writing failed: " << error);
   }
