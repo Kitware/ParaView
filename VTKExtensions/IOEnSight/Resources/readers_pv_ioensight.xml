@@ -68,7 +68,7 @@
         read.</Documentation>
       </StringVectorProperty>
       <Hints>
-        <ReaderFactory extensions="case CASE Case"
+        <ReaderFactory extensions="case CASE Case encas ENCAS Encas"
                        file_description="EnSight Files" />
       </Hints>
       <!-- End ensight -->
