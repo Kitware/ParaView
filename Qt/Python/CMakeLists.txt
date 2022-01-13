@@ -46,6 +46,7 @@ set(classes
 )
 
 set(headers
+  pqPythonUtils.h
   pqTextLinkerPython.h
 )
 
