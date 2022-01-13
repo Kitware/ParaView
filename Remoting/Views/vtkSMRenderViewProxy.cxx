@@ -522,7 +522,10 @@ void vtkSMRenderViewProxy::ZoomTo(vtkSMProxy* representation, bool closest)
     result.GetArgument(0, 0, bounds, 6);
   }
 
-  this->ResetCamera(bounds, closest);
+  if (bounds[1] >= bounds[0] && bounds[3] >= bounds[2] && bounds[5] >= bounds[4])
+  {
+    this->ResetCamera(bounds, closest);
+  }
   this->GetSession()->CleanupPendingProgress();
 }
 
