@@ -29,7 +29,17 @@ vtkPVExtractHistogram2D::vtkPVExtractHistogram2D()
 }
 
 //-------------------------------------------------------------------------------------------------
-vtkPVExtractHistogram2D::~vtkPVExtractHistogram2D() {}
+vtkPVExtractHistogram2D::~vtkPVExtractHistogram2D()
+{
+  if (this->ComponentArrayCache[1])
+  {
+    if (!strcmp(this->ComponentArrayCache[1]->GetName(), "GradientMag"))
+    {
+      this->ComponentArrayCache[1]->UnRegister(this);
+      this->ComponentArrayCache[1] = nullptr;
+    }
+  }
+}
 
 //------------------------------------------------------------------------------------------------
 void vtkPVExtractHistogram2D::PrintSelf(ostream& os, vtkIndent indent)

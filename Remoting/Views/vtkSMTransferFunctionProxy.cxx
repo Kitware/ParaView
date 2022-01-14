@@ -700,8 +700,9 @@ vtkImageData* vtkSMTransferFunctionProxy::ComputeDataHistogram2D(int numberOfBin
       // consumer is visible.
       vtkSMPropertyHelper(consumer, "Visibility", true).GetAsInt() == 1 &&
       // consumer is of volume representation type
-      strcmp(vtkSMPropertyHelper(consumer, "RepresentationType", true).GetAsString(), "Volume") ==
-        0 &&
+      // strcmp(vtkSMPropertyHelper(consumer, "RepresentationType", true).GetAsString(), "Volume")
+      // ==
+      // 0 &&
       // do not count proxy multiple times
       usedProxy.find(consumer) == usedProxy.end())
     {

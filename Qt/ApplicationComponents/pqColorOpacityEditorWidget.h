@@ -350,6 +350,11 @@ protected Q_SLOTS:
   void showDataHistogramClicked(bool show = true);
 
   /**
+   * Called when the use2DTransferFunction checkbox is clicked by the user.
+   */
+  void show2DHistogram(bool show = true);
+
+  /**
    * Called when the automaticDataHistogramComputation checkbox is clicked by the user.
    * We then add extra logic to show the histogram and update the UI.
    */
@@ -390,6 +395,12 @@ protected Q_SLOTS:
    * but should not be used directly
    */
   void realShowDataHistogram();
+
+  /**
+   * Slot called by a timer which is triggered in show2DHistogram
+   * This method actually sets up the 2D histogram
+   */
+  void realShow2DHistogram();
 
 protected: // NOLINT(readability-redundant-access-specifiers)
   /**

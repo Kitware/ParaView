@@ -210,6 +210,7 @@ public:
   vtkNew<vtkEventQtSlotConnect> ConsumerConnector;
 
   pqTimer HistogramTimer;
+  pqTimer Histogram2DTimer;
   bool HistogramOutdated = true;
 
   pqInternals(pqColorOpacityEditorWidget* self, vtkSMPropertyGroup* group)
@@ -251,6 +252,10 @@ public:
     this->HistogramTimer.setSingleShot(true);
     this->HistogramTimer.setInterval(1);
     QObject::connect(&this->HistogramTimer, SIGNAL(timeout()), self, SLOT(realShowDataHistogram()));
+
+    this->Histogram2DTimer.setSingleShot(true);
+    this->Histogram2DTimer.setInterval(1);
+    QObject::connect(&this->Histogram2DTimer, SIGNAL(timeout()), self, SLOT(realShow2DHistogram()));
   }
 
   void render()
@@ -320,9 +325,13 @@ pqColorOpacityEditorWidget::pqColorOpacityEditorWidget(
     &pqColorOpacityEditorWidget::updateDefaultPresetsList);
 
   // To avoid color editor widget movement when hidden
-  QSizePolicy sp_retain = ui.OpacityEditor->sizePolicy();
-  sp_retain.setRetainSizeWhenHidden(true);
-  ui.OpacityEditor->setSizePolicy(sp_retain);
+  // QSizePolicy sp_retain = ui.OpacityEditor->sizePolicy();
+  // sp_retain.setRetainSizeWhenHidden(true);
+  // ui.OpacityEditor->setSizePolicy(sp_retain);
+
+  // QSizePolicy sp2d_retain = ui.Transfer2DEditor->sizePolicy();
+  // sp2d_retain.setRetainSizeWhenHidden(true);
+  // ui.Transfer2DEditor->setSizePolicy(sp2d_retain);
 
   QObject::connect(ui.OpacityEditor, SIGNAL(currentPointChanged(vtkIdType)), this,
     SLOT(opacityCurrentChanged(vtkIdType)));
@@ -366,6 +375,8 @@ pqColorOpacityEditorWidget::pqColorOpacityEditorWidget(
   QObject::connect(ui.SaveAsPreset, SIGNAL(clicked()), this, SLOT(saveAsPreset()));
   QObject::connect(
     ui.ComputeDataHistogram, SIGNAL(clicked()), this, SLOT(showDataHistogramClicked()));
+  QObject::connect(
+    ui.Use2DTransferFunction, SIGNAL(toggled(bool)), this, SLOT(show2DHistogram(bool)));
   QObject::connect(ui.AdvancedButton, SIGNAL(clicked()), this, SLOT(updatePanel()));
 
   QObject::connect(
@@ -1202,6 +1213,19 @@ void pqColorOpacityEditorWidget::setDataHistogramNumberOfBins(int val)
 }
 
 //-----------------------------------------------------------------------------
+void pqColorOpacityEditorWidget::show2DHistogram(bool show)
+{
+  if (show)
+  {
+    this->Internals->Histogram2DTimer.start();
+  }
+  else
+  {
+    this->Internals->Ui.Transfer2DEditor->setHistogram(nullptr);
+  }
+}
+
+//-----------------------------------------------------------------------------
 void pqColorOpacityEditorWidget::showDataHistogramClicked(bool showDataHistogram)
 {
   this->updateDataHistogramEnableState();
@@ -1252,6 +1276,40 @@ void pqColorOpacityEditorWidget::realShowDataHistogram()
     }
   }
   this->Internals->Ui.OpacityEditor->setHistogramTable(histoTable);
+}
+
+//-----------------------------------------------------------------------------
+void pqColorOpacityEditorWidget::realShow2DHistogram()
+{
+  this->Internals->Ui.Transfer2DEditor->show();
+
+  vtkImageData* hist2D = vtkSMTransferFunctionProxy::GetHistogram2DCache(this->proxy());
+  if (!hist2D || this->Internals->HistogramOutdated)
+  {
+    this->Internals->Ui.ComputeDataHistogram->clear();
+    vtkSMTransferFunctionProxy* tfProxy = vtkSMTransferFunctionProxy::SafeDownCast(this->proxy());
+    hist2D =
+      tfProxy->ComputeDataHistogram2D(this->Internals->Ui.DataHistogramNumberOfBins->value());
+    this->Internals->Ui.Transfer2DEditor->setHistogram(hist2D);
+
+    // Add all consumers, even non-visible, to the consumer connnector
+    // so the histogram can be set outdated correctly
+    this->Internals->ConsumerConnector->Disconnect();
+    std::set<vtkSMProxy*> usedProxy;
+    for (unsigned int cc = 0, max = tfProxy->GetNumberOfConsumers(); cc < max; ++cc)
+    {
+      vtkSMProxy* proxy = tfProxy->GetConsumerProxy(cc);
+      proxy = proxy ? proxy->GetTrueParentProxy() : nullptr;
+      vtkSMPVRepresentationProxy* consumer = vtkSMPVRepresentationProxy::SafeDownCast(proxy);
+      if (consumer && usedProxy.find(consumer) == usedProxy.end())
+      {
+        this->Internals->ConsumerConnector->Connect(consumer->GetProperty("Visibility"),
+          vtkCommand::ModifiedEvent, this, SLOT(setHistogramOutdated()));
+        usedProxy.insert(consumer);
+      }
+    }
+  }
+  this->Internals->Ui.Transfer2DEditor->setHistogram(hist2D);
 }
 
 //-----------------------------------------------------------------------------

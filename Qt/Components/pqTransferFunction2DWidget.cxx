@@ -48,6 +48,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPlotHistogram2D.h"
 #include "vtkPointData.h"
 
+// Qt includes
+#include <QVBoxLayout>
+
 namespace paraviewTransfer2D
 {
 class vtkTransferFunctionChartHistogram2D : public vtkChartHistogram2D
@@ -58,24 +61,28 @@ public:
 
   void SetInputData(vtkImageData* data, vtkIdType z = 0) override
   {
-    int bins[3];
-    double origin[3], spacing[3];
-    data->GetOrigin(origin);
-    data->GetDimensions(bins);
-    data->GetSpacing(spacing);
+    if (data)
+    {
+      int bins[3];
+      double origin[3], spacing[3];
+      data->GetOrigin(origin);
+      data->GetDimensions(bins);
+      data->GetSpacing(spacing);
 
-    // Compute image bounds
-    const double xMin = origin[0];
-    const double xMax = bins[0] * spacing[0];
-    const double yMin = origin[1];
-    const double yMax = bins[1] * spacing[1];
+      // Compute image bounds
+      const double xMin = origin[0];
+      const double xMax = bins[0] * spacing[0];
+      const double yMin = origin[1];
+      const double yMax = bins[1] * spacing[1];
 
-    auto axis = GetAxis(vtkAxis::BOTTOM);
-    axis->SetRange(xMin, xMax);
-    axis = GetAxis(vtkAxis::LEFT);
-    axis->SetRange(yMin, yMax);
+      auto axis = GetAxis(vtkAxis::BOTTOM);
+      axis->SetUnscaledRange(xMin, xMax);
+      axis = GetAxis(vtkAxis::LEFT);
+      axis->SetUnscaledRange(yMin, yMax);
+      this->RecalculatePlotTransforms();
 
-    UpdateItemsBounds(xMin, xMax, yMin, yMax);
+      UpdateItemsBounds(xMin, xMax, yMin, yMax);
+    }
     vtkChartHistogram2D::SetInputData(data, z);
   }
 
@@ -134,10 +141,16 @@ public:
     this->Widget->setRenderWindow(this->Window);
     this->ContextView->SetRenderWindow(this->Window);
 
+    this->Widget->setParent(editor);
+    QVBoxLayout* layout = new QVBoxLayout(editor);
+    layout->setMargin(0);
+    layout->addWidget(this->Widget);
+
     this->Chart->SetAutoSize(true);
     this->Chart->SetShowLegend(true);
     this->Chart->SetZoomWithMouseWheel(false);
     this->ContextView->GetScene()->AddItem(this->Chart);
+    this->ContextView->SetInteractor(this->Widget->interactor());
     this->ContextView->GetRenderWindow()->SetLineSmoothing(true);
 
     this->Chart->SetActionToButton(vtkChart::PAN, -1);
@@ -173,15 +186,20 @@ public:
 
   void setHistogram(vtkImageData* histogram)
   {
+    this->Chart->SetInputData(histogram);
+
+    if (!histogram)
+    {
+      this->ContextView->Render();
+      return;
+    }
     vtkDataArray* arr = histogram->GetPointData()->GetScalars();
     if (!arr)
     {
       return;
     }
-
     double range[2];
     arr->GetRange(range, 0);
-    this->Chart->SetInputData(histogram);
 
     // A minimum of 1.0 is used in order to clip off histogram bins with a
     // single occurrence. This is also necessary to enable Log10 scale (required
