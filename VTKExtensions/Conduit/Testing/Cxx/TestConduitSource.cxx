@@ -125,12 +125,33 @@ bool ValidateMeshTypeUnstructured()
   VERIFY(ug->GetCellData()->GetArray("field") != nullptr, "missing 'field' cell-data array");
   return true;
 }
+
+bool ValidateFieldData()
+{
+  conduit_cpp::Node mesh;
+  conduit_cpp::BlueprintMesh::Example::basic("uniform", 3, 3, 3, mesh);
+
+  auto field_data_node = mesh["state/fields"];
+  auto integer_field_data = field_data_node["integer_field_data"];
+  integer_field_data.set_int32(42);
+
+  auto data = Convert(mesh);
+  auto pds = vtkPartitionedDataSet::SafeDownCast(data);
+  auto img = vtkImageData::SafeDownCast(pds->GetPartition(0));
+  auto field_data = img->GetFieldData();
+
+  VERIFY(field_data->GetNumberOfArrays() == 1,
+    "incorrect number of arrays in field data, expected 1, got %d",
+    field_data->GetNumberOfArrays());
+
+  return true;
+}
 }
 
 int TestConduitSource(int, char*[])
 {
   return ValidateMeshTypeUniform() && ValidateMeshTypeRectilinear() &&
-      ValidateMeshTypeStructured() && ValidateMeshTypeUnstructured()
+      ValidateMeshTypeStructured() && ValidateMeshTypeUnstructured() && ValidateFieldData()
     ? EXIT_SUCCESS
     : EXIT_FAILURE;
 }
