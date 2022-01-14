@@ -69,13 +69,40 @@ vtkSmartPointer<vtkTransferFunctionBoxItem> vtkTransferFunctionChartHistogram2D:
   auto leftAxis = this->GetAxis(vtkAxis::LEFT);
   leftAxis->GetRange(yRange);
 
+  const double width = (xRange[1] - xRange[0]) / 3.0;
+  const double height = (yRange[1] - yRange[0]) / 3.0;
+  vtkRectd box(xRange[0] + width, yRange[0] + height, width, height);
+  double color[3] = { 1, 0, 0 };
+  double alpha = 1.0;
+  auto boxItem = this->AddNewBox(box, color, alpha);
+  this->SetActiveBox(boxItem);
+  return boxItem;
+}
+
+//-------------------------------------------------------------------------------------------------
+vtkSmartPointer<vtkTransferFunctionBoxItem> vtkTransferFunctionChartHistogram2D::AddNewBox(
+  vtkRectd& box, double color[3], double alpha)
+{
+  if (!this->IsInitialized())
+  {
+    return nullptr;
+  }
+
+  double xRange[2];
+  auto bottomAxis = this->GetAxis(vtkAxis::BOTTOM);
+  bottomAxis->GetRange(xRange);
+
+  double yRange[2];
+  auto leftAxis = this->GetAxis(vtkAxis::LEFT);
+  leftAxis->GetRange(yRange);
+
   vtkNew<vtkTransferFunctionBoxItem> boxItem;
   // Set bounds in the box item so that it can only move within the
   // histogram's range.
   boxItem->SetValidBounds(xRange[0], xRange[1], yRange[0], yRange[1]);
-  const double width = (xRange[1] - xRange[0]) / 3.0;
-  const double height = (yRange[1] - yRange[0]) / 3.0;
-  boxItem->SetBox(xRange[0] + width, yRange[0] + height, width, height);
+  boxItem->SetBox(box.GetX(), box.GetY(), box.GetWidth(), box.GetHeight());
+  boxItem->SetColor(color);
+  boxItem->SetAlpha(alpha);
   // Add the observer to update the transfer function on interaction
   boxItem->AddObserver(vtkTransferFunctionBoxItem::BoxAddEvent, this,
     &vtkTransferFunctionChartHistogram2D::OnTransferFunctionBoxItemModified);
@@ -86,7 +113,6 @@ vtkSmartPointer<vtkTransferFunctionBoxItem> vtkTransferFunctionChartHistogram2D:
   boxItem->AddObserver(vtkTransferFunctionBoxItem::BoxDeleteEvent, this,
     &vtkTransferFunctionChartHistogram2D::OnTransferFunctionBoxItemModified);
   this->AddPlot(boxItem);
-  this->SetActiveBox(boxItem);
   return boxItem;
 }
 

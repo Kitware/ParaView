@@ -47,10 +47,13 @@ public:
    */
   bool IsInitialized();
 
+  ///@{
   /**
    * Add a new box item to the chart
    */
   vtkSmartPointer<vtkTransferFunctionBoxItem> AddNewBox();
+  vtkSmartPointer<vtkTransferFunctionBoxItem> AddNewBox(vtkRectd& r, double color[3], double alpha);
+  ///@}
 
   /**
    * Remove box item from the chart

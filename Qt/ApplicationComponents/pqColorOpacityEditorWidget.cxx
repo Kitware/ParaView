@@ -67,6 +67,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMTransferFunctionPresets.h"
 #include "vtkSMTransferFunctionProxy.h"
 #include "vtkTable.h"
+#include "vtkTransferFunctionBoxItem.h"
+#include "vtkTransferFunctionChartHistogram2D.h"
 #include "vtkVector.h"
 #include "vtkWeakPointer.h"
 #include "vtk_jsoncpp.h"
@@ -1513,4 +1515,59 @@ void pqColorOpacityEditorWidget::initializeTransfer2DEditor(vtkImageData* t2d)
 void pqColorOpacityEditorWidget::transfer2DChanged()
 {
   this->Internals->render();
+}
+
+//-----------------------------------------------------------------------------
+QList<QVariant> pqColorOpacityEditorWidget::transfer2DBoxes() const
+{
+  QList<QVariant> values;
+  Ui::ColorOpacityEditorWidget& ui = this->Internals->Ui;
+  vtkChart* chart = ui.Transfer2DEditor->chart();
+  for (int i = 0; i < chart->GetNumberOfPlots(); ++i)
+  {
+    auto box = vtkTransferFunctionBoxItem::SafeDownCast(chart->GetPlot(i));
+    if (!box)
+    {
+      continue;
+    }
+    const vtkRectd r = box->GetBox();
+    for (int j = 0; j < 4; ++j)
+    {
+      values.push_back(r[i]);
+    }
+    const double* color = box->GetColor();
+    for (int j = 0; j < 3; ++j)
+    {
+      values.push_back(color[i]);
+    }
+    values.push_back(box->GetAlpha());
+  }
+  return values;
+}
+
+//-----------------------------------------------------------------------------
+void pqColorOpacityEditorWidget::setTransfer2DBoxes(const QList<QVariant>& values)
+{
+  Ui::ColorOpacityEditorWidget& ui = this->Internals->Ui;
+  vtkTransferFunctionChartHistogram2D* chart =
+    vtkTransferFunctionChartHistogram2D::SafeDownCast(ui.Transfer2DEditor->chart());
+  if (!chart->IsInitialized())
+  {
+    return;
+  }
+  vtkRectd box;
+  double color[3];
+  double alpha;
+  for (int i = 0; i < values.size(); i = i + 8)
+  {
+    box.SetX(values[i].toDouble());
+    box.SetY(values[i + 1].toDouble());
+    box.SetWidth(values[i + 2].toDouble());
+    box.SetHeight(values[i + 3].toDouble());
+    color[0] = values[i + 4].toDouble();
+    color[1] = values[i + 5].toDouble();
+    color[2] = values[i + 6].toDouble();
+    alpha = values[i + 7].toDouble();
+    chart->AddNewBox(box, color, alpha);
+  }
 }

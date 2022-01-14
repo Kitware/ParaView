@@ -331,14 +331,14 @@ bool vtkTransferFunctionBoxItem::Paint(vtkContext2D* painter)
 //-------------------------------------------------------------------------------------------------
 void vtkTransferFunctionBoxItem::ComputeTexture()
 {
-  // double colorC[3] = { 255 * vtkMath::Random(), 255 * vtkMath::Random(), 255 * vtkMath::Random()
-  // };
   double colorC[3] = { 1.0, 1.0, 1.0 };
   colorC[0] = this->Color[0] * 255;
   colorC[1] = this->Color[1] * 255;
   colorC[2] = this->Color[2] * 255;
 
-  double opacity = this->Opacity * 255;
+  double amp = this->Alpha * 255;
+  double sigma = 80.0;
+  double expdenom = 2 * sigma * sigma;
 
   auto arr = vtkUnsignedCharArray::SafeDownCast(this->Texture->GetPointData()->GetScalars());
 
@@ -347,9 +347,7 @@ void vtkTransferFunctionBoxItem::ComputeTexture()
     for (vtkIdType j = 0; j < 256; ++j)
     {
       double color[4] = { colorC[0], colorC[1], colorC[2], 0.0 };
-      double sigma = 80.0;
-      double e = -1.0 * ((i - 128) * (i - 128) + (j - 128) * (j - 128)) / (2 * sigma * sigma);
-      double amp = 255.0;
+      double e = -1.0 * ((i - 128) * (i - 128) + (j - 128) * (j - 128)) / expdenom;
       color[3] = amp * std::exp(e);
       arr->SetTuple(i * 256 + j, color);
     }

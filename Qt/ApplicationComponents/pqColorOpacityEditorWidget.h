@@ -64,6 +64,10 @@ class vtkSMPropertyGroup;
  *                                                  mapping for opacity.
  * \li "UseOpacityControlPointsFreehandDrawing"  :- (optional) property used to enable/disable
  *                                                  freehand drawing for positioning control points
+ * \li "Transfer2DBoxes"                         :- (optional) property with (x0, y0, width, height,
+ *                                                  r, g, b, a) tuples that is controlled by the 2D
+ *                                                  transfer function editor
+ *                                                  (pqTransferFunction2DWidget).
  * Caveats:
  * \li Opacity editor:- pqColorOpacityEditorWidget shows an opacity editor widget.
  * Typically, opacity function is optional and used only when
@@ -89,6 +93,7 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqColorOpacityEditorWidget : public pqPrope
   Q_PROPERTY(
     pqSMProxy transferFunction2DProxy READ transferFunction2DProxy WRITE setTransferFunction2DProxy)
   Q_PROPERTY(bool use2DTransferFunction READ use2DTransferFunction WRITE setUse2DTransferFunction)
+  Q_PROPERTY(QList<QVariant> transfer2DBoxes READ transfer2DBoxes WRITE setTransfer2DBoxes)
   typedef pqPropertyWidget Superclass;
 
 public:
@@ -153,6 +158,12 @@ public:
    * Returns the value for use2DTransferFunction
    */
   bool use2DTransferFunction() const;
+
+  /**
+   * Returns the current list of boxes for the 2D transfer
+   * function. This a list of 8-tuples - [x0, y0, width, height, r, g, b, opacity].
+   */
+  QList<QVariant> transfer2DBoxes() const;
 
 public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   /**
@@ -254,6 +265,11 @@ public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
    * Set whether to use a 2D transfer function.
    */
   void setUse2DTransferFunction(bool value);
+
+  /**
+   * Sets the box items that control the 2D transfer function.
+   */
+  void setTransfer2DBoxes(const QList<QVariant>&);
 
 Q_SIGNALS:
   /**

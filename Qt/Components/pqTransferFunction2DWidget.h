@@ -38,6 +38,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // Forward declarations
 class vtkImageData;
+class vtkChart;
 
 /**
  * pqTransferFunction2DWidget provides a widget that can edit control boxes in a 2D histogram to
@@ -54,18 +55,23 @@ public:
   pqTransferFunction2DWidget(QWidget* parent = 0);
   ~pqTransferFunction2DWidget() override;
 
-  //@{
+  ///@{
   /**
    * Set/Get vtkImageData used to initialize the 2D histogram
    */
   vtkImageData* histogram() const;
   virtual void setHistogram(vtkImageData*);
-  //@}
+  ///@}
 
   /**
    * Initialize the pqTransferFunction2DWidget with a default box item.
    */
   void initialize(vtkImageData*);
+
+  /**
+   * Get access to the internal chart.
+   */
+  vtkChart* chart() const;
 
 public Q_SLOTS:
   /**

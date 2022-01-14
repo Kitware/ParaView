@@ -233,3 +233,9 @@ void pqTransferFunction2DWidget::showUsageStatus()
       2000);
   }
 }
+
+//-----------------------------------------------------------------------------
+vtkChart* pqTransferFunction2DWidget::chart() const
+{
+  return this->Internals->Chart;
+}

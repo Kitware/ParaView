@@ -1453,6 +1453,7 @@
         <Property name="ScalarOpacityFunction" function="ScalarOpacityFunction" />
         <Property name="TransferFunction2D" function="TransferFunction2D" />
         <Property name="Use2DTransferFunction" function="Use2DTransferFunction" />
+        <Property name="Transfer2DBoxes" function="Transfer2DBoxes" />
         <Property name="UseLogScale" function="UseLogScale" />
         <Property name="UseOpacityControlPointsFreehandDrawing" function="UseOpacityControlPointsFreehandDrawing" />
         <Property name="ShowDataHistogram" function="ShowDataHistogram" />

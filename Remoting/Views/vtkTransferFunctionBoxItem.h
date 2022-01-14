@@ -82,10 +82,10 @@ public:
 
   ///@{
   /**
-   * Set/Get the opacity to be used for this box.
+   * Set/Get the alpha to be used for this box.
    */
-  vtkSetMacro(Opacity, double);
-  vtkGetMacro(Opacity, double);
+  vtkSetMacro(Alpha, double);
+  vtkGetMacro(Alpha, double);
   ///@}
 
 protected:
@@ -209,7 +209,7 @@ private:
   const int NumPoints = 5;
   vtkRectd Box;
   double Color[3] = { 1, 1, 1 };
-  double Opacity = 1.0;
+  double Alpha = 1.0;
 
   vtkNew<vtkPen> Pen;
   vtkNew<vtkImageData> Texture;
