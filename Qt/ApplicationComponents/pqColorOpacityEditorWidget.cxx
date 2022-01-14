@@ -53,6 +53,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkCommand.h"
 #include "vtkDiscretizableColorTransferFunction.h"
 #include "vtkEventQtSlotConnect.h"
+#include "vtkImageData.h"
 #include "vtkNew.h"
 #include "vtkPVXMLElement.h"
 #include "vtkPiecewiseFunction.h"
@@ -198,6 +199,7 @@ public:
   QPointer<pqColorOpacityEditorWidgetDecorator> Decorator;
   vtkWeakPointer<vtkSMPropertyGroup> PropertyGroup;
   vtkWeakPointer<vtkSMProxy> ScalarOpacityFunctionProxy;
+  vtkWeakPointer<vtkSMProxy> TransferFunction2DProxy;
   QScopedPointer<QAction> TempAction;
   QScopedPointer<pqChooseColorPresetReaction> ChoosePresetReaction;
   QScopedPointer<pqSignalsBlocker> SignalsBlocker;
@@ -409,6 +411,14 @@ pqColorOpacityEditorWidget::pqColorOpacityEditorWidget(
   {
     this->addPropertyLink(
       this, "scalarOpacityFunctionProxy", SIGNAL(scalarOpacityFunctionProxyChanged()), smproperty);
+  }
+
+  ui.Transfer2DEditor->hide();
+  smproperty = smgroup->GetProperty("TransferFunction2D");
+  if (smproperty)
+  {
+    this->addPropertyLink(
+      this, "transferFunction2DProxy", SIGNAL(transferFunction2DProxyChanged()), smproperty);
   }
 
   smproperty = smgroup->GetProperty("EnableOpacityMapping");
@@ -627,6 +637,47 @@ void pqColorOpacityEditorWidget::setScalarOpacityFunctionProxy(pqSMProxy sofProx
 pqSMProxy pqColorOpacityEditorWidget::scalarOpacityFunctionProxy() const
 {
   return this->Internals->ScalarOpacityFunctionProxy.GetPointer();
+}
+
+//-----------------------------------------------------------------------------
+void pqColorOpacityEditorWidget::setTransferFunction2DProxy(pqSMProxy t2dProxy)
+{
+  pqInternals& internals = (*this->Internals);
+  // Ui::ColorOpacityEditorWidget& ui = internals.Ui;
+
+  vtkSMProxy* newT2dProxy = nullptr;
+  vtkImageData* t2d =
+    t2dProxy ? vtkImageData::SafeDownCast(t2dProxy->GetClientSideObject()) : nullptr;
+  if (t2dProxy && t2d)
+  {
+    newT2dProxy = t2dProxy;
+  }
+  if (internals.TransferFunction2DProxy == newT2dProxy)
+  {
+    return;
+  }
+  if (internals.TransferFunction2DProxy)
+  {
+    // cleanup old property links
+  }
+  internals.TransferFunction2DProxy = newT2dProxy;
+  if (internals.TransferFunction2DProxy)
+  {
+    // pqDataRepresentation* repr = pqActiveObjects::instance().activeRepresentation();
+    // vtkSMPVRepresentationProxy* proxy =
+    // vtkSMPVRepresentationProxy::SafeDownCast(repr->getProxy());
+
+    this->initializeTransfer2DEditor(t2d);
+
+    // add new property links.
+    //
+  }
+}
+
+//-----------------------------------------------------------------------------
+pqSMProxy pqColorOpacityEditorWidget::transferFunction2DProxy() const
+{
+  return this->Internals->TransferFunction2DProxy.GetPointer();
 }
 
 //-----------------------------------------------------------------------------

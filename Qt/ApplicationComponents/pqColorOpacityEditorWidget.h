@@ -38,9 +38,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QList>
 #include <QVariant>
 
+class pqColorMapModel;
+class vtkImageData;
 class vtkPiecewiseFunction;
 class vtkSMPropertyGroup;
-class pqColorMapModel;
 
 /**
  * pqColorOpacityEditorWidget provides an in-line editor widget for editing the
@@ -85,6 +86,8 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqColorOpacityEditorWidget : public pqPrope
       WRITE setUseOpacityControlPointsFreehandDrawing)
   Q_PROPERTY(pqSMProxy scalarOpacityFunctionProxy READ scalarOpacityFunctionProxy WRITE
       setScalarOpacityFunctionProxy)
+  Q_PROPERTY(
+    pqSMProxy transferFunction2DProxy READ transferFunction2DProxy WRITE setTransferFunction2DProxy)
   typedef pqPropertyWidget Superclass;
 
 public:
@@ -140,6 +143,11 @@ public:
    */
   pqSMProxy scalarOpacityFunctionProxy() const;
 
+  /**
+   * Returns the 2D transfer function (i.e. vtkImageData) proxy used, if any.
+   */
+  pqSMProxy transferFunction2DProxy() const;
+
 public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   /**
    * Sets the xvmsPoints that control the opacity transfer function.
@@ -185,6 +193,11 @@ public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
    * Set the scalar opacity function (or PiecewiseFunction) proxy to use.
    */
   void setScalarOpacityFunctionProxy(pqSMProxy sofProxy);
+
+  /**
+   * Set the 2D transfer function (or vtkImageData) proxy to use.
+   */
+  void setTransferFunction2DProxy(pqSMProxy t2dProxy);
 
   /**
    * Reset the transfer function ranges to active data source.
@@ -278,6 +291,11 @@ Q_SIGNALS:
    * ScalarOpacityFunction proxy used.
    */
   void scalarOpacityFunctionProxyChanged();
+
+  /**
+   * Signal fired when the transfer function 2D proxy is changed.
+   */
+  void transferFunction2DProxyChanged();
 
 protected Q_SLOTS:
   /**
