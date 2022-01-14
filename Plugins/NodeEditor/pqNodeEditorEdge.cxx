@@ -34,6 +34,7 @@
 #include <QPainter>
 #include <QStyleOptionGraphicsItem>
 
+#include <cmath>
 #include <sstream>
 
 // -----------------------------------------------------------------------------
