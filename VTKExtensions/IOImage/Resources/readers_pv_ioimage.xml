@@ -870,7 +870,7 @@
                          name="OutputGridDimension"
                          number_of_elements="1"
                          default_values="3"
-                         panel_visibility="always" >
+                         panel_visibility="default" >
         <EnumerationDomain name="enum">
           <Entry text="2D"
                  value="2" />
