@@ -47,6 +47,7 @@ OPTIONAL_DEPENDS
   VTK::ImagingGeneral
   VTK::ImagingHybrid
   VTK::ImagingSources
+  VTK::ImagingStatistics
   VTK::InteractionWidgets
   VTK::IOADIOS2
   VTK::IOCGNSReader

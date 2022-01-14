@@ -555,5 +555,102 @@
       </IntVectorProperty>
       <!-- End ReductionFilter -->
     </SourceProxy>
+
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkPVExtractHistogram2D"
+                 label="Histogram 2D"
+                 name="ExtractHistogram2D">
+      <Documentation long_help="Extract a 2D histogram from field data."
+                     short_help="Extract a 2D histogram from field data.">
+                     </Documentation>
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkDataObject" />
+        </DataTypeDomain>
+        <InputArrayDomain name="input_array">
+        </InputArrayDomain>
+        <Documentation>This property specifies the input to the Histogram
+        filter.</Documentation>
+      </InputProperty>
+      <StringVectorProperty animateable="0"
+                            command="SetInputArrayToProcess"
+                            element_types="0 0 0 0 2"
+                            name="SelectInputArray1"
+                            label="Input Array 1"
+                            number_of_elements="5">
+        <ArrayListDomain attribute_type="Scalars"
+                         name="array_list">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input" />
+          </RequiredProperties>
+        </ArrayListDomain>
+        <Documentation>This property indicates the name of the array from which
+        to compute the histogram.</Documentation>
+      </StringVectorProperty>
+      <IntVectorProperty animateable="0"
+                         command="SetComponent0"
+                         default_values="0"
+                         name="Component0"
+                         number_of_elements="1">
+        <NumberOfComponentsDomain name="comp0" enable_magnitude="1">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input" />
+            <Property function="ArraySelection"
+                      name="SelectInputArray1" />
+          </RequiredProperties>
+        </NumberOfComponentsDomain>
+        <Documentation>The value of this property specifies the array component
+        from which the histogram should be computed.</Documentation>
+        </IntVectorProperty>
+
+       <StringVectorProperty animateable="0"
+                            command="SetInputArrayToProcess"
+                            element_types="0 0 0 0 2"
+                            name="SelectInputArray2"
+                            label="Input Array 2"
+                            default_values="1 0 0 0 0"
+                            number_of_elements="5">
+        <ArrayListDomain attribute_type="Scalars"
+                         name="array_list">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input" />
+          </RequiredProperties>
+        </ArrayListDomain>
+        <Documentation>This property indicates the name of the array from which
+        to compute the histogram.</Documentation>
+      </StringVectorProperty>
+      <IntVectorProperty animateable="0"
+                         command="SetComponent1"
+                         default_values="0"
+                         name="Component1"
+                         number_of_elements="1">
+        <NumberOfComponentsDomain name="comp1" enable_magnitude="1">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input" />
+            <Property function="ArraySelection"
+                      name="SelectInputArray2" />
+          </RequiredProperties>
+        </NumberOfComponentsDomain>
+        <Documentation>The value of this property specifies the array component
+        from which the histogram should be computed.</Documentation>
+        </IntVectorProperty>
+      <IntVectorProperty animateable="0"
+                         command="SetNumberOfBins"
+                         default_values="256 256"
+                         name="NumberOfBins"
+                         label="Number of Bins"
+                         number_of_elements="2">
+        </IntVectorProperty>
+      <!-- End ExtractHistogram2D -->
+    </SourceProxy>
   </ProxyGroup>
 </ServerManagerConfiguration>

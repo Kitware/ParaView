@@ -23,6 +23,7 @@ PRIVATE_DEPENDS
   VTK::IOLegacy
   VTK::ParallelCore
   VTK::vtksys
+  VTK::FiltersImaging
 TEST_DEPENDS
   VTK::FiltersCore
   VTK::FiltersSources

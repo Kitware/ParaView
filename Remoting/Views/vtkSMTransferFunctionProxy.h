@@ -31,7 +31,10 @@
 
 #include <vtk_jsoncpp_fwd.h> // for forward declarations
 
+// Forward declarations
+class vtkImageData;
 class vtkPVArrayInformation;
+
 class VTKREMOTINGVIEWS_EXPORT vtkSMTransferFunctionProxy : public vtkSMProxy
 {
 public:
@@ -287,6 +290,21 @@ public:
   }
   //@}
 
+  //@(
+  /**
+   * Helper method used to compute a 2D histogram image with provided number of bins based on the
+   * data from all the visible representations using the transfer function.
+   * If successful, returns the histogram as a vtkImageData of type double.
+   * If not, returns nullptr.
+   */
+  virtual vtkImageData* ComputeDataHistogram2D(int numberOfBins);
+  static vtkImageData* ComputeDataHistogram2D(vtkSMProxy* proxy, int numberOfBins)
+  {
+    vtkSMTransferFunctionProxy* self = vtkSMTransferFunctionProxy::SafeDownCast(proxy);
+    return self ? self->ComputeDataHistogram2D(numberOfBins) : nullptr;
+  }
+  //@}
+
   //@{
   /**
    * Helper method used to recover the last histogram computed by ComputeDataHistogram
@@ -393,6 +411,11 @@ protected:
    * Cache for the histogram table
    */
   vtkSmartPointer<vtkTable> HistogramTableCache;
+
+  /*
+   * Cache for the 2D histogram image
+   */
+  vtkSmartPointer<vtkImageData> Histogram2DCache;
 
 private:
   vtkSMTransferFunctionProxy(const vtkSMTransferFunctionProxy&) = delete;

@@ -16,6 +16,7 @@
 
 #include "vtkAlgorithm.h"
 #include "vtkDoubleArray.h"
+#include "vtkImageData.h"
 #include "vtkIntArray.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
@@ -657,6 +658,134 @@ vtkTable* vtkSMTransferFunctionProxy::ComputeDataHistogramTable(int numberOfBins
   this->HistogramTableCache->RemoveColumn(1);
   this->HistogramTableCache->AddColumn(doubleValueArray);
   return this->HistogramTableCache;
+}
+
+//----------------------------------------------------------------------------
+vtkImageData* vtkSMTransferFunctionProxy::ComputeDataHistogram2D(int numberOfBins)
+{
+  if (this->Histogram2DCache)
+  {
+    this->Histogram2DCache->Delete();
+    this->Histogram2DCache = nullptr;
+  }
+
+  // Recover component property
+  int component = -1;
+  if (vtkSMPropertyHelper(this, "VectorMode").GetAsInt() == vtkScalarsToColors::COMPONENT)
+  {
+    component = vtkSMPropertyHelper(this, "VectorComponent").GetAsInt();
+  }
+
+  // Find the visible consumer using the transfer function proxy
+  vtkPVArrayInformation* arrayInfo = nullptr;
+  std::string arrayName;
+  int arrayAsso = -1;
+  bool hasData = false;
+  std::set<vtkSMProxy*> usedProxy;
+  for (unsigned int cc = 0, max = this->GetNumberOfConsumers(); cc < max; ++cc)
+  {
+    vtkSMProxy* proxy = this->GetConsumerProxy(cc);
+    // consumers could be subproxy of something; so, we locate the true-parent
+    // proxy for a proxy.
+    proxy = proxy ? proxy->GetTrueParentProxy() : nullptr;
+    vtkSMPVRepresentationProxy* consumer = vtkSMPVRepresentationProxy::SafeDownCast(proxy);
+    if (consumer &&
+      // consumer is visible.
+      vtkSMPropertyHelper(consumer, "Visibility", true).GetAsInt() == 1 &&
+      // consumer is of volume representation type
+      strcmp(vtkSMPropertyHelper(consumer, "RepresentationType", true).GetAsString(), "Volume") ==
+        0 &&
+      // do not count proxy multiple times
+      usedProxy.find(consumer) == usedProxy.end())
+    {
+      // Recover consumer color array
+      vtkPVArrayInformation* tmpArrayInfo = consumer->GetArrayInformationForColorArray(false);
+      if (!tmpArrayInfo)
+      {
+        continue;
+      }
+
+      if (!arrayInfo)
+      {
+        arrayInfo = tmpArrayInfo;
+        if (arrayInfo->GetNumberOfComponents() == 1)
+        {
+          // Set the right component value for single component array
+          component = 0;
+        }
+        if (component == -1)
+        {
+          // Set the right component value for magnitude component
+          component = arrayInfo->GetNumberOfComponents();
+        }
+        if (component > arrayInfo->GetNumberOfComponents())
+        {
+          vtkErrorMacro("Invalid component requested by the transfer function");
+          this->HistogramTableCache = nullptr;
+          return this->Histogram2DCache;
+        }
+
+        vtkSMPropertyHelper colorArrayHelper(consumer, "ColorArrayName");
+        arrayAsso = colorArrayHelper.GetInputArrayAssociation();
+        arrayName = colorArrayHelper.GetInputArrayNameToProcess();
+      }
+      else
+      {
+        // Check other consumers array infos against the first one
+        if (arrayInfo->GetNumberOfComponents() != tmpArrayInfo->GetNumberOfComponents())
+        {
+          vtkWarningMacro("A transfer function consumer is not providing an array with the right "
+                          "number of components. Ignored.");
+          continue;
+        }
+
+        vtkSMPropertyHelper colorArrayHelper(consumer, "ColorArrayName");
+        if (arrayAsso != colorArrayHelper.GetInputArrayAssociation())
+        {
+          vtkWarningMacro("A transfer function consumer is not providing an array with the right "
+                          "array association. Ignored");
+          continue;
+        }
+        if (arrayName != std::string(colorArrayHelper.GetInputArrayNameToProcess()))
+        {
+          vtkWarningMacro(
+            "A transfer function consumer is not providing an array with the right name. Ignored.");
+          continue;
+        }
+      }
+
+      usedProxy.insert(consumer);
+      // Found the consumer.
+      hasData = true;
+      break;
+      // Add consumer to group filter
+      // vtkSMSourceProxy* input =
+      //   vtkSMSourceProxy::SafeDownCast(vtkSMPropertyHelper(consumer, "Input").GetAsProxy());
+      // vtkSMPropertyHelper(group, "Input").Add(input);
+      // group->UpdateVTKObjects();
+    }
+  }
+
+  // No valid consumer
+  if (!hasData)
+  {
+    this->Histogram2DCache = nullptr;
+    return this->Histogram2DCache;
+  }
+
+  // Compute the histogram
+  this->Histogram2DCache = vtkSmartPointer<vtkImageData>::New();
+
+  //  vtkSmartPointer<vtkSMSourceProxy> grad;
+  //  grad.TakeReference(vtkSMSourceProxy::SafeDownCast(pxm->NewProxy("filters",
+  //  "GradientMagnitude")));
+  //  vtkSMPropertyHelper(grad, "Input").Set(consumer);
+  //  vtkSMPropertyHelper(grad, "Dimensionality").Set(3);
+  //  grad->UpdateVTKObjects();
+  //
+  //  // Append it to the input
+  //  vtkSmartPointer<vtkSMSourceProxy> append;
+  return this->Histogram2DCache;
 }
 
 //----------------------------------------------------------------------------
