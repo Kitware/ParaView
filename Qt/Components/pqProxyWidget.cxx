@@ -444,7 +444,7 @@ public:
       }
       else
       {
-        glayout->addWidget(this->LabelWidget, row, 0, Qt::AlignTop | Qt::AlignLeft);
+        glayout->addWidget(this->LabelWidget, row, 0, Qt::AlignVCenter | Qt::AlignLeft);
         glayout->addWidget(this->PropertyWidget, row, 1);
       }
     }
