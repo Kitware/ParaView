@@ -420,6 +420,12 @@ protected Q_SLOTS:
    */
   void realShow2DHistogram();
 
+  /**
+   * Slot to update active representation when the 2D transfer function has changed with the
+   * internal pqTransferFunction2DWidget class.
+   */
+  void transfer2DChanged();
+
 protected: // NOLINT(readability-redundant-access-specifiers)
   /**
    * Validate and adjust the current range before converting to a log range.

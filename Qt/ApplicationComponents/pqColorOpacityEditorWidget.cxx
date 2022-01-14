@@ -395,6 +395,10 @@ pqColorOpacityEditorWidget::pqColorOpacityEditorWidget(
   QObject::connect(
     ui.CurrentDataValue, SIGNAL(textChangedAndEditingFinished()), this, SLOT(currentDataEdited()));
 
+  // if the user edits the 2D transfer function item
+  QObject::connect(
+    ui.Transfer2DEditor, SIGNAL(transferFunctionModified()), this, SLOT(transfer2DChanged()));
+
   vtkSMProperty* smproperty = smgroup->GetProperty("XRGBPoints");
   if (smproperty)
   {
@@ -1426,4 +1430,10 @@ void pqColorOpacityEditorWidget::initializeTransfer2DEditor(vtkImageData* t2d)
 {
   Ui::ColorOpacityEditorWidget& ui = this->Internals->Ui;
   ui.Transfer2DEditor->initialize(t2d);
+}
+
+//-----------------------------------------------------------------------------
+void pqColorOpacityEditorWidget::transfer2DChanged()
+{
+  this->Internals->render();
 }

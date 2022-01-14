@@ -74,6 +74,13 @@ public Q_SLOTS:
    */
   void render();
 
+Q_SIGNALS:
+  /**
+   * Signal fired to indicate that the transfer function was modified either by
+   * adding/deleting/editing 2D boxes.
+   */
+  void transferFunctionModified();
+
 protected:
 protected Q_SLOTS:
   /**
