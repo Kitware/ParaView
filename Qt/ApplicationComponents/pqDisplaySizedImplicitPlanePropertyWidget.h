@@ -89,6 +89,11 @@ public Q_SLOTS:
   void useZNormal() { this->setNormal(0, 0, 1); }
 
   /**
+   * Reset the disk-radius size to the default size.
+   */
+  void resetRadiusSize();
+
+  /**
    * Update the widget's origin and bounds using current data bounds.
    */
   void resetToDataBounds();
