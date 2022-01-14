@@ -88,6 +88,7 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqColorOpacityEditorWidget : public pqPrope
       setScalarOpacityFunctionProxy)
   Q_PROPERTY(
     pqSMProxy transferFunction2DProxy READ transferFunction2DProxy WRITE setTransferFunction2DProxy)
+  Q_PROPERTY(bool use2DTransferFunction READ use2DTransferFunction WRITE setUse2DTransferFunction)
   typedef pqPropertyWidget Superclass;
 
 public:
@@ -147,6 +148,11 @@ public:
    * Returns the 2D transfer function (i.e. vtkImageData) proxy used, if any.
    */
   pqSMProxy transferFunction2DProxy() const;
+
+  /**
+   * Returns the value for use2DTransferFunction
+   */
+  bool use2DTransferFunction() const;
 
 public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   /**
@@ -244,6 +250,11 @@ public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
    */
   void resetColorMapComboBox();
 
+  /**
+   * Set whether to use a 2D transfer function.
+   */
+  void setUse2DTransferFunction(bool value);
+
 Q_SIGNALS:
   /**
    * Signal fired when the xrgbPoints change.
@@ -296,6 +307,11 @@ Q_SIGNALS:
    * Signal fired when the transfer function 2D proxy is changed.
    */
   void transferFunction2DProxyChanged();
+
+  /**
+   * Signal fired when use2DTransferFunction changes.
+   */
+  void use2DTransferFunctionChanged();
 
 protected Q_SLOTS:
   /**

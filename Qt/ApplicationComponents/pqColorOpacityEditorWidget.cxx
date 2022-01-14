@@ -421,8 +421,15 @@ pqColorOpacityEditorWidget::pqColorOpacityEditorWidget(
   {
     this->addPropertyLink(
       this, "transferFunction2DProxy", SIGNAL(transferFunction2DProxyChanged()), smproperty);
+  }
+
+  smproperty = smgroup->GetProperty("Use2DTransferFunction");
+  if (smproperty)
+  {
+    this->addPropertyLink(
+      this, "use2DTransferFunction", SIGNAL(use2DTransferFunctionChanged()), smproperty);
     QObject::connect(
-      ui.Use2DTransferFunction, SIGNAL(toggled(bool)), this, SLOT(show2DHistogram(bool)));
+      ui.Use2DTransferFunction, SIGNAL(clicked(bool)), this, SLOT(show2DHistogram(bool)));
   }
   else
   {
@@ -1272,6 +1279,19 @@ void pqColorOpacityEditorWidget::setDataHistogramNumberOfBins(int val)
 }
 
 //-----------------------------------------------------------------------------
+bool pqColorOpacityEditorWidget::use2DTransferFunction() const
+{
+  return this->Internals->Ui.Use2DTransferFunction->isChecked();
+}
+
+//-----------------------------------------------------------------------------
+void pqColorOpacityEditorWidget::setUse2DTransferFunction(bool val)
+{
+  Ui::ColorOpacityEditorWidget& ui = this->Internals->Ui;
+  ui.Use2DTransferFunction->setChecked(val);
+}
+
+//-----------------------------------------------------------------------------
 void pqColorOpacityEditorWidget::show2DHistogram(bool show)
 {
   if (show)
@@ -1299,6 +1319,8 @@ void pqColorOpacityEditorWidget::show2DHistogram(bool show)
   ui.Transfer2DEditor->setVisible(show);
   ui.ShowDataHistogram->setEnabled(!show);
   ui.DataHistogramNumberOfBins->setEnabled(show);
+
+  Q_EMIT this->use2DTransferFunctionChanged();
 }
 
 //-----------------------------------------------------------------------------
