@@ -137,13 +137,21 @@ if ("$ENV{CMAKE_CONFIGURATION}" MATCHES "windows")
     )
 endif ()
 
-if ("$ENV{CC}" STREQUAL "icc")
+if ("$ENV{CC}" STREQUAL "icx")
   list(APPEND test_exclusions
     # OpenMPI outputs text that ends up getting detected as a test failure.
     "^ParaViewExample-Catalyst2/CxxImageDataExample$"
 
     # Known-bad https://gitlab.kitware.com/paraview/paraview/-/issues/20108
-    "^ParaViewExample-Catalyst$")
+    "^ParaViewExample-Catalyst$"
+
+    # Shared memory limitations.
+    "^Catalyst::WaveletMiniApp.package_test$"
+    "^Catalyst::WaveletMiniApp.package_test_zip$"
+    "^ParaView::RemotingServerManagerPython-TestGlobbing$"
+    "^SurfaceLIC-OfficeContour-Batch$"
+    "^SurfaceLIC-OfficeSlices-Batch$"
+    )
 endif ()
 
 string(REPLACE ";" "|" test_exclusions "${test_exclusions}")

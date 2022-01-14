@@ -24,15 +24,14 @@
     extends: .linux
     image: "kitware/paraview:ci-fedora33-20210903"
 
-.fedora31_icc:
+.el8_icc:
     extends: .linux
-    # XXX(icc): See note below about git-lfs. That can be removed once this
-    # image contains git-lfs in it.
-    image: "kitware/paraview:ci-fedora31-icc-20201014"
+    image: "kitware/paraview:ci-el8-icc-20220114"
 
     variables:
-        CC: icc
-        CXX: icpc
+        CC: icx
+        CXX: icpx
+        FC: ifx
 
 .fedora_mpich_addon:
     variables:
@@ -49,13 +48,19 @@
         OMPI_ALLOW_RUN_AS_ROOT_CONFIRM: 1
         MODULES: mpi/openmpi-x86_64
 
-.fedora31_shared_icc_mpi_python:
+.el8_intelmpi_addon:
+    variables:
+        CMAKE_PREFIX_PATH: /usr/local/intelmpi
+        # Disable shared memory; it doesn't work so well inside of containers.
+        I_MPI_SHM: disable
+
+.el8_shared_icc_mpi_python:
     extends:
-        - .fedora31_icc
-        - .fedora_openmpi_addon
+        - .el8_icc
+        - .el8_intelmpi_addon
 
     variables:
-        CMAKE_CONFIGURATION: fedora31_shared_icc_mpi_python
+        CMAKE_CONFIGURATION: el8_shared_icc_mpi_python
 
 .fedora33_static_mpi_offscreen_osmesa_python:
     extends:
@@ -140,9 +145,6 @@
     - cmake --version
     - ninja --version
     - doxygen --version
-    # XXX(icc): The icc container lacks git-lfs. A rebuild of the container
-    # will be necessary.
-    - '[ "$CC" = "icc" ] && dnf install --setopt=install_weak_deps=False -y git-lfs'
     - "git submodule update --init --recursive || :"
     - git submodule foreach --recursive cmake -P "$PWD/.gitlab/ci/fetch_submodule.cmake"
     - git submodule sync --recursive
@@ -150,7 +152,7 @@
     # Load any modules that may be necessary.
     - '[ -n "$MODULES" ] && . /etc/profile.d/modules.sh && module load $MODULES'
     # Enable the Intel compiler if required.
-    - '[ "$CC" = "icc" ] && source /opt/intel/compilers_and_libraries/linux/bin/compilervars.sh intel64 || true'
+    - '[ "$CC" = "icx" ] && source /opt/intel/oneapi/setvars.sh || true'
 
 .cmake_build_linux:
     stage: build
