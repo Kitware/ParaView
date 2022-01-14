@@ -629,7 +629,9 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/ZoomClosestD.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/ZoomToData.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/ZoomToData_A.png}"
-  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/ZoomToData_B.png}")
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/ZoomToData_B.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/ZoomToEmptyData.png}"
+)
 
 SET (TESTS_WITHOUT_BASELINES
   AboutDialog.xml
@@ -789,6 +791,7 @@ SET(TESTS_WITH_BASELINES
   TestHiddenLineRemoval.xml
   TestOpacityRendering.xml
   ZoomToData.xml
+  ZoomToEmptyData.xml
 )
 
 if(PARAVIEW_ENABLE_VISITBRIDGE)

@@ -1091,7 +1091,7 @@ void vtkPVRenderView::SynchronizeGeometryBounds()
 double* vtkPVRenderView::ComputeVisibleBounds(vtkPVDataRepresentation* pvrepr)
 {
   // Reset RepresentationVisibleBounds
-  vtkBoundingBox bbox(-1, 1, -1, 1, -1, 1);
+  vtkBoundingBox bbox(1, -1, 1, -1, 1, -1);
   bbox.GetBounds(this->LastRepresentationVisibleBounds);
 
   // Get the active representation from composite repr if any
@@ -1119,7 +1119,7 @@ double* vtkPVRenderView::ComputeVisibleBounds(vtkPVDataRepresentation* pvrepr)
   this->AllReduce(bbox, result);
   if (!result.IsValid())
   {
-    result.SetBounds(-1, 1, -1, 1, -1, 1);
+    result.SetBounds(1, -1, 1, -1, 1, -1);
   }
 
   result.GetBounds(this->LastRepresentationVisibleBounds);
