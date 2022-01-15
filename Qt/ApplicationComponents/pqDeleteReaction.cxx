@@ -48,6 +48,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkNew.h"
 #include "vtkPVGeneralSettings.h"
 #include "vtkSMAnimationSceneProxy.h"
+#include "vtkSMOutputPort.h"
 #include "vtkSMPVRepresentationProxy.h"
 #include "vtkSMParaViewPipelineControllerWithRendering.h"
 #include "vtkSMProxySelectionModel.h"
@@ -60,7 +61,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QSet>
 
 //-----------------------------------------------------------------------------
-pqDeleteReaction::pqDeleteReaction(QAction* parentObject, bool delete_all)
+pqDeleteReaction::pqDeleteReaction(QAction* parentObject, DeleteModes mode /* = SELECTED*/)
   : Superclass(parentObject)
 {
   // needed to disable server reset while an animation is playing
@@ -69,8 +70,8 @@ pqDeleteReaction::pqDeleteReaction(QAction* parentObject, bool delete_all)
   QObject::connect(pqPVApplicationCore::instance()->animationManager(), SIGNAL(endPlay()), this,
     SLOT(updateEnableState()));
 
-  this->DeleteAll = delete_all;
-  if (!this->DeleteAll)
+  this->DeleteMode = mode;
+  if (this->DeleteMode != ALL)
   {
     QObject::connect(&pqActiveObjects::instance(), SIGNAL(portChanged(pqOutputPort*)), this,
       SLOT(updateEnableState()));
@@ -80,6 +81,19 @@ pqDeleteReaction::pqDeleteReaction(QAction* parentObject, bool delete_all)
     QObject::connect(pqApplicationCore::instance()->getServerManagerObserver(),
       SIGNAL(proxyUnRegistered(const QString&, const QString&, vtkSMProxy*)), this,
       SLOT(updateEnableState()));
+  }
+
+  if (this->DeleteMode == TREE)
+  {
+    // needed when dealing with multioutput filters. Without this, it's possible that clicking
+    // on one of the outputs in the pipeline browser will not trigger a call to updateEnableState,
+    // so ParaView thinks that Delete Tree can be invoked on the output when it actually can't.
+    QObject::connect(&pqActiveObjects::instance(), SIGNAL(pipelineProxyChanged(pqProxy*)), this,
+      SLOT(updateEnableState()));
+    // similar situation, except when trying to call delete tree when the selection contains
+    // multiple items
+    QObject::connect(&pqActiveObjects::instance(),
+      SIGNAL(selectionChanged(const pqProxySelection&)), this, SLOT(updateEnableState()));
   }
 
   this->updateEnableState();
@@ -94,9 +108,15 @@ void pqDeleteReaction::updateEnableState()
     return;
   }
 
-  if (this->DeleteAll)
+  if (this->DeleteMode == ALL)
   {
     this->parentAction()->setEnabled(true);
+    return;
+  }
+
+  if (this->DeleteMode == TREE)
+  {
+    this->parentAction()->setEnabled(this->canDeleteTree());
     return;
   }
 
@@ -184,6 +204,95 @@ void pqDeleteReaction::deleteSelected()
   QSet<pqProxy*> selectedSources;
   ::pqDeleteReactionGetSelectedSet(selModel, selectedSources);
   pqDeleteReaction::deleteSources(selectedSources);
+}
+
+//-----------------------------------------------------------------------------
+namespace
+{
+
+void addSubtreeToSelection(pqPipelineSource* source, pqProxySelection& selection)
+{
+  if (!source)
+  {
+    return;
+  }
+
+  QList<pqPipelineSource*> consumers = source->getAllConsumers();
+  for (auto consumer : consumers)
+  {
+    if (consumer)
+    {
+      addSubtreeToSelection(consumer, selection);
+      selection.push_back(consumer);
+    }
+  }
+}
+
+} // end anon namespace
+
+void pqDeleteReaction::deleteTree()
+{
+  if (!pqDeleteReaction::canDeleteTree())
+  {
+    return;
+  }
+
+  vtkSMProxySelectionModel* selModel = pqActiveObjects::instance().activeSourcesSelectionModel();
+
+  // have two pqProxySelection. both start out with the user's selected
+  // proxies for deletion, but userSelection is used for iterating to
+  // grab children proxes and fullSelection is the list that will be updated
+  pqProxySelection userSelection, fullSelection;
+  pqProxySelectionUtilities::copy(selModel, userSelection);
+  // convert all pqOutputPorts to pqPipelineSources
+  userSelection = pqProxySelectionUtilities::getPipelineProxies(userSelection);
+  fullSelection = userSelection;
+
+  // for each selection, add its children to the selection
+  for (auto iter = userSelection.begin(); iter != userSelection.end(); ++iter)
+  {
+    auto source = qobject_cast<pqPipelineSource*>(*iter);
+    addSubtreeToSelection(source, fullSelection);
+  }
+
+  QSet<pqProxy*> selectedSources;
+  for (auto& item : fullSelection)
+  {
+    if (auto proxy = qobject_cast<pqProxy*>(item))
+    {
+      selectedSources.insert(proxy);
+    }
+  }
+  pqDeleteReaction::deleteSources(selectedSources);
+}
+
+//-----------------------------------------------------------------------------
+bool pqDeleteReaction::canDeleteTree()
+{
+  vtkSMProxySelectionModel* selModel = pqActiveObjects::instance().activeSourcesSelectionModel();
+  if (selModel == nullptr || selModel->GetNumberOfSelectedProxies() == 0)
+  {
+    return false;
+  }
+
+  // Filters with single input and output -> can always delete
+  // Filters with multiple inputs -> can always delete
+  // Filters with multiple outputs -> can always delete if the filter is selected,
+  // if one of its outputs are selected for deletion instead, do not delete
+  for (unsigned int i = 0; i < selModel->GetNumberOfSelectedProxies(); ++i)
+  {
+    vtkSMOutputPort* outputPort = vtkSMOutputPort::SafeDownCast(selModel->GetSelectedProxy(i));
+    if (outputPort)
+    {
+      vtkSMSourceProxy* source = outputPort->GetSourceProxy();
+      if (source->GetNumberOfOutputPorts() > 1)
+      {
+        return false;
+      }
+    }
+  }
+
+  return true;
 }
 
 //-----------------------------------------------------------------------------
@@ -330,7 +439,7 @@ void pqDeleteReaction::aboutToDelete(pqProxy* source)
 //-----------------------------------------------------------------------------
 void pqDeleteReaction::onTriggered()
 {
-  if (this->DeleteAll)
+  if (this->DeleteMode == ALL)
   {
     if (pqCoreUtilities::promptUser("pqDeleteReaction::onTriggered", QMessageBox::Question,
           "Delete All?",
@@ -342,8 +451,12 @@ void pqDeleteReaction::onTriggered()
       pqDeleteReaction::deleteAll();
     }
   }
-  else
+  else if (this->DeleteMode == SELECTED)
   {
     pqDeleteReaction::deleteSelected();
+  }
+  else
+  {
+    pqDeleteReaction::deleteTree();
   }
 }
