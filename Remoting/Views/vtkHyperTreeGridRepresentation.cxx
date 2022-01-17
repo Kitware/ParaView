@@ -509,12 +509,6 @@ void vtkHyperTreeGridRepresentation::SetOpacity(double val)
 }
 
 //----------------------------------------------------------------------------
-void vtkHyperTreeGridRepresentation::SetPointSize(double val)
-{
-  this->Property->SetPointSize(val);
-}
-
-//----------------------------------------------------------------------------
 void vtkHyperTreeGridRepresentation::SetRenderLinesAsTubes(bool val)
 {
   this->Property->SetRenderLinesAsTubes(val);

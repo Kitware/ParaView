@@ -43,13 +43,6 @@ class vtkPiecewiseFunction;
 class vtkScalarsToColors;
 class vtkTexture;
 
-namespace vtkHyperTreeGridRepresentation_detail
-{
-// This is defined to either vtkQuadricClustering or vtkmLevelOfDetail in the
-// implementation file:
-class DecimationFilterType;
-}
-
 class VTKREMOTINGVIEWS_EXPORT vtkHyperTreeGridRepresentation : public vtkPVDataRepresentation
 {
 
@@ -75,7 +68,8 @@ public:
 
   //@{
   /**
-   * Use adaptive decimation to only render the part inside the camera frustum
+   * Use adaptive decimation to only render the part inside the camera frustum.
+   * Default to false, only works for 2D HTG with parallel projection.
    */
   vtkGetMacro(AdaptiveDecimation, bool);
   vtkSetMacro(AdaptiveDecimation, bool);
@@ -89,6 +83,7 @@ public:
    * \li When Representation is wireframe or points, it disables diffuse or
    * specular.
    * \li When scalar coloring is employed, it disabled specular.
+   * Default vaules: Ambient = 0, Specular = 0, Diffuse = 1.
    */
   vtkSetMacro(Ambient, double);
   vtkSetMacro(Diffuse, double);
@@ -107,7 +102,8 @@ public:
 
   //@{
   /**
-   * Set the representation type: WIREFRAME SURFACE SURFACE_WITH_EDGES
+   * Set the representation type: WIREFRAME SURFACE SURFACE_WITH_EDGES.
+   * Default is SURFACE.
    */
   vtkSetClampMacro(Representation, int, WIREFRAME, SURFACE_WITH_EDGES);
   vtkGetMacro(Representation, int);
@@ -115,7 +111,7 @@ public:
 
   /**
    * Overload to set representation type using string. Accepted strings are:
-   * "Points", "Wireframe", "Surface" and "Surface With Edges".
+   * "Wireframe", "Surface" and "Surface With Edges".
    */
   virtual void SetRepresentation(const char*);
 
@@ -124,12 +120,16 @@ public:
    */
   vtkDataObject* GetRenderedDataObject(int port) override;
 
+  /**
+   * Use Outline representation is **NOT SUPPORTED** by this representation.
+   */
   virtual void SetUseOutline(int);
 
-  // TODO remove point size/coloring stuff which has no meaning here
-
   //***************************************************************************
-  // Forwarded to vtkProperty.
+  //@{
+  /**
+   *  Forwarded to vtkProperty.
+   */
   virtual void SetAmbientColor(double r, double g, double b);
   virtual void SetBaseColorTexture(vtkTexture* tex);
   virtual void SetColor(double r, double g, double b);
@@ -147,15 +147,18 @@ public:
   virtual void SetNormalTexture(vtkTexture* tex);
   virtual void SetOcclusionStrength(double val);
   virtual void SetOpacity(double val);
-  virtual void SetPointSize(double val);
   virtual void SetRenderLinesAsTubes(bool);
   virtual void SetRenderPointsAsSpheres(bool);
   virtual void SetRoughness(double val);
   virtual void SetSpecularColor(double r, double g, double b);
   virtual void SetSpecularPower(double val);
+  //@}
 
   //***************************************************************************
-  // Forwarded to Actor.
+  //@{
+  /**
+   * Forwarded to Actor.
+   */
   virtual void SetFlipTextures(bool);
   virtual void SetOrientation(double, double, double);
   virtual void SetOrigin(double, double, double);
@@ -164,20 +167,29 @@ public:
   virtual void SetScale(double, double, double);
   virtual void SetTexture(vtkTexture*);
   virtual void SetUserTransform(const double[16]);
+  //@}
 
   //***************************************************************************
-  // Forwarded to all textures
+  //@{
+  /**
+   * Forwarded to all textures (and stored for later re-use)
+   */
   virtual void SetRepeatTextures(bool);
   vtkGetMacro(RepeatTextures, bool);
   virtual void SetInterpolateTextures(bool);
   vtkGetMacro(InterpolateTextures, bool);
   virtual void SetUseMipmapTextures(bool);
   vtkGetMacro(UseMipmapTextures, bool);
+  //@}
 
   //***************************************************************************
-  // Forwarded to Mapper and LODMapper.
+  //@{
+  /**
+   * Forwarded to Mapper and LODMapper.
+   */
   virtual void SetInterpolateScalarsBeforeMapping(int val);
   virtual void SetLookupTable(vtkScalarsToColors* val);
+  //@}
 
   //@{
   /**
@@ -300,9 +312,9 @@ protected:
 
   int Representation = SURFACE;
 
-  bool RepeatTextures;
-  bool InterpolateTextures;
-  bool UseMipmapTextures;
+  bool RepeatTextures = false;
+  bool InterpolateTextures = false;
+  bool UseMipmapTextures = false;
   double Ambient = 0.0;
   double Specular = 0.0;
   double Diffuse = 1.0;
