@@ -14,8 +14,8 @@
 =========================================================================*/
 #include "vtkHyperTreeGridRepresentation.h"
 
-#include "vtkActor.h"
 #include "vtkAlgorithmOutput.h"
+#include "vtkCellData.h"
 #include "vtkDataSet.h"
 #include "vtkHyperTreeGrid.h"
 #include "vtkInformation.h"
@@ -27,6 +27,7 @@
 #include "vtkObjectFactory.h"
 #include "vtkOpenGLHyperTreeGridMapper.h"
 #include "vtkPVGeometryFilter.h"
+#include "vtkPVLODActor.h"
 #include "vtkPVRenderView.h"
 #include "vtkPVTrivialProducer.h"
 #include "vtkProcessModule.h"
@@ -34,9 +35,15 @@
 #include "vtkRenderer.h"
 #include "vtkScalarsToColors.h"
 #include "vtkSelection.h"
+#include "vtkShader.h"
+#include "vtkShaderProperty.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
 #include "vtkTexture.h"
 #include "vtkTransform.h"
+
+#if VTK_MODULE_ENABLE_VTK_RenderingRayTracing
+#include "vtkOSPRayActorNode.h"
+#endif
 
 #include <vtk_jsoncpp.h>
 #include <vtksys/SystemTools.hxx>
@@ -100,12 +107,21 @@ int vtkHyperTreeGridRepresentation::ProcessViewRequest(
     // rendering nodes as and when needed.
     vtkPVView::SetPiece(inInfo, this, this->GetInput(0));
 
-    // We want to let vtkPVRenderView do redistribution of data as necessary,
-    // and use this representations data for determining a load balanced distribution
-    // if ordered is needed.
-    vtkPVRenderView::SetOrderedCompositingConfiguration(inInfo, this,
-      vtkPVRenderView::DATA_IS_REDISTRIBUTABLE | vtkPVRenderView::USE_DATA_FOR_LOAD_BALANCING);
-
+    if (this->UseDataPartitions == true)
+    {
+      // We want to use this representation's data bounds to redistribute all other data in the
+      // scene if ordered compositing is needed.
+      vtkPVRenderView::SetOrderedCompositingConfiguration(
+        inInfo, this, vtkPVRenderView::USE_BOUNDS_FOR_REDISTRIBUTION);
+    }
+    else
+    {
+      // We want to let vtkPVRenderView do redistribution of data as necessary,
+      // and use this representations data for determining a load balanced distribution
+      // if ordered is needed.
+      vtkPVRenderView::SetOrderedCompositingConfiguration(inInfo, this,
+        vtkPVRenderView::DATA_IS_REDISTRIBUTABLE | vtkPVRenderView::USE_DATA_FOR_LOAD_BALANCING);
+    }
     outInfo->Set(
       vtkPVRenderView::NEED_ORDERED_COMPOSITING(), this->NeedsOrderedCompositing() ? 1 : 0);
   }
@@ -137,6 +153,7 @@ int vtkHyperTreeGridRepresentation::RequestUpdateExtent(
 int vtkHyperTreeGridRepresentation::RequestData(
   vtkInformation* request, vtkInformationVector** inputVector, vtkInformationVector* outputVector)
 {
+
   if (inputVector[0]->GetNumberOfInformationObjects() == 1)
   {
     vtkInformation* inInfo = inputVector[0]->GetInformationObject(0);
@@ -151,6 +168,8 @@ int vtkHyperTreeGridRepresentation::RequestData(
     }
     this->Mapper->SetInputConnection(this->GetInternalOutputPort());
   }
+
+  this->Mapper->SetScalarModeToUseCellData();
 
   // essential to re-execute geometry filter consistently on all ranks since it
   // does use parallel communication (see #19963).
@@ -234,6 +253,7 @@ void vtkHyperTreeGridRepresentation::UpdateColoringParameters()
   bool usingScalarColoring = false;
 
   vtkInformation* info = this->GetInputArrayInformation(0);
+
   if (info && info->Has(vtkDataObject::FIELD_ASSOCIATION()) &&
     info->Has(vtkDataObject::FIELD_NAME()))
   {
@@ -357,7 +377,7 @@ bool vtkHyperTreeGridRepresentation::NeedsOrderedCompositing()
 void vtkHyperTreeGridRepresentation::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
-  os << "OpenGL HTG Mapper: " << std::endl;
+  os << indent << "OpenGL HTG Mapper: " << std::endl;
   this->Mapper->PrintSelf(os, indent.GetNextIndent());
 }
 
@@ -386,6 +406,12 @@ void vtkHyperTreeGridRepresentation::SetAmbientColor(double r, double g, double 
 }
 
 //----------------------------------------------------------------------------
+void vtkHyperTreeGridRepresentation::SetBaseIOR(double val)
+{
+  this->Property->SetBaseIOR(val);
+}
+
+//----------------------------------------------------------------------------
 void vtkHyperTreeGridRepresentation::SetBaseColorTexture(vtkTexture* tex)
 {
   if (tex)
@@ -396,6 +422,36 @@ void vtkHyperTreeGridRepresentation::SetBaseColorTexture(vtkTexture* tex)
     tex->SetMipmap(this->UseMipmapTextures);
   }
   this->Property->SetBaseColorTexture(tex);
+}
+
+//----------------------------------------------------------------------------
+void vtkHyperTreeGridRepresentation::SetCoatIOR(double val)
+{
+  this->Property->SetCoatIOR(val);
+}
+
+//----------------------------------------------------------------------------
+void vtkHyperTreeGridRepresentation::SetCoatStrength(double val)
+{
+  this->Property->SetCoatStrength(val);
+}
+
+//----------------------------------------------------------------------------
+void vtkHyperTreeGridRepresentation::SetCoatRoughness(double val)
+{
+  this->Property->SetCoatRoughness(val);
+}
+
+//----------------------------------------------------------------------------
+void vtkHyperTreeGridRepresentation::SetCoatColor(double a, double b, double c)
+{
+  this->Property->SetCoatColor(a, b, c);
+}
+
+//----------------------------------------------------------------------------
+void vtkHyperTreeGridRepresentation::SetCoatNormalScale(double val)
+{
+  this->Property->SetCoatNormalScale(val);
 }
 
 //----------------------------------------------------------------------------
@@ -459,6 +515,12 @@ void vtkHyperTreeGridRepresentation::SetLineWidth(double val)
 }
 
 //----------------------------------------------------------------------------
+void vtkHyperTreeGridRepresentation::SetMaterial(std::string name)
+{
+  this->Property->SetMaterialName(name.c_str());
+}
+
+//----------------------------------------------------------------------------
 void vtkHyperTreeGridRepresentation::SetMaterialTexture(vtkTexture* tex)
 {
   if (tex)
@@ -506,6 +568,12 @@ void vtkHyperTreeGridRepresentation::SetOcclusionStrength(double val)
 void vtkHyperTreeGridRepresentation::SetOpacity(double val)
 {
   this->Property->SetOpacity(val);
+}
+
+//----------------------------------------------------------------------------
+void vtkHyperTreeGridRepresentation::SetPointSize(double val)
+{
+  this->Property->SetPointSize(val);
 }
 
 //----------------------------------------------------------------------------
@@ -606,6 +674,67 @@ void vtkHyperTreeGridRepresentation::SetUserTransform(const double matrix[16])
 }
 
 //----------------------------------------------------------------------------
+// OSPray
+//----------------------------------------------------------------------------
+
+//----------------------------------------------------------------------------
+void vtkHyperTreeGridRepresentation::SetEnableScaling(int val)
+{
+#if VTK_MODULE_ENABLE_VTK_RenderingRayTracing
+  this->Actor->SetEnableScaling(val);
+#else
+  (void)val;
+#endif
+}
+
+//----------------------------------------------------------------------------
+void vtkHyperTreeGridRepresentation::SetScalingArrayName(const char* val)
+{
+#if VTK_MODULE_ENABLE_VTK_RenderingRayTracing
+  this->Actor->SetScalingArrayName(val);
+#else
+  (void)val;
+#endif
+}
+
+//----------------------------------------------------------------------------
+void vtkHyperTreeGridRepresentation::SetScalingFunction(vtkPiecewiseFunction* pwf)
+{
+#if VTK_MODULE_ENABLE_VTK_RenderingRayTracing
+  this->Actor->SetScalingFunction(pwf);
+#else
+  (void)pwf;
+#endif
+}
+
+//----------------------------------------------------------------------------
+void vtkHyperTreeGridRepresentation::SetMaterial(const char* val)
+{
+#if VTK_MODULE_ENABLE_VTK_RenderingRayTracing
+  if (!strcmp(val, "None"))
+  {
+    this->Property->SetMaterialName(nullptr);
+  }
+  else
+  {
+    this->Property->SetMaterialName(val);
+  }
+#else
+  (void)val;
+#endif
+}
+
+//----------------------------------------------------------------------------
+void vtkHyperTreeGridRepresentation::SetLuminosity(double val)
+{
+#if VTK_MODULE_ENABLE_VTK_RenderingRayTracing
+  vtkOSPRayActorNode::SetLuminosity(val, this->Property);
+#else
+  (void)val;
+#endif
+}
+
+//----------------------------------------------------------------------------
 // Texture
 //----------------------------------------------------------------------------
 
@@ -691,4 +820,122 @@ void vtkHyperTreeGridRepresentation::SetSelection(vtkSelection* selection)
   // we need to shallow copy the existing selection instead of changing it in order to avoid
   // changing the MTime of the mapper to avoid rebuilding everything
   this->Mapper->GetSelection()->ShallowCopy(selection);
+}
+
+//----------------------------------------------------------------------------
+void vtkHyperTreeGridRepresentation::SetUseShaderReplacements(bool useShaderRepl)
+{
+  if (this->UseShaderReplacements != useShaderRepl)
+  {
+    this->UseShaderReplacements = useShaderRepl;
+    this->Modified();
+    this->UpdateShaderReplacements();
+  }
+}
+
+//----------------------------------------------------------------------------
+void vtkHyperTreeGridRepresentation::SetShaderReplacements(const char* replacementsString)
+{
+  if (replacementsString != this->ShaderReplacementsString)
+  {
+    this->ShaderReplacementsString = std::string(replacementsString);
+    this->Modified();
+    this->UpdateShaderReplacements();
+  }
+}
+
+//----------------------------------------------------------------------------
+void vtkHyperTreeGridRepresentation::UpdateShaderReplacements()
+{
+  vtkShaderProperty* props = this->Actor->GetShaderProperty();
+
+  if (!props)
+  {
+    return;
+  }
+
+  props->ClearAllShaderReplacements();
+
+  if (!this->UseShaderReplacements || this->ShaderReplacementsString.empty())
+  {
+    return;
+  }
+
+  Json::CharReaderBuilder builder;
+  builder["collectComments"] = false;
+  Json::Value root;
+  std::unique_ptr<Json::CharReader> reader(builder.newCharReader());
+  bool success = reader->parse(this->ShaderReplacementsString.c_str(),
+    this->ShaderReplacementsString.c_str() + this->ShaderReplacementsString.length(), &root,
+    nullptr);
+  if (!success)
+  {
+    vtkGenericWarningMacro("Unable to parse the replacement Json string!");
+    return;
+  }
+  bool isArray = root.isArray();
+  size_t nbReplacements = isArray ? root.size() : 1;
+
+  std::vector<std::tuple<vtkShader::Type, std::string, std::string>> replacements;
+  for (size_t index = 0; index < nbReplacements; ++index)
+  {
+    const Json::Value& repl = isArray ? root[(int)index] : root;
+    if (!repl.isMember("type"))
+    {
+      vtkErrorMacro("Syntax error in shader replacements: a type is required.");
+      return;
+    }
+    std::string type = repl["type"].asString();
+    vtkShader::Type shaderType = vtkShader::Unknown;
+    if (type == "fragment")
+    {
+      shaderType = vtkShader::Fragment;
+    }
+    else if (type == "vertex")
+    {
+      shaderType = vtkShader::Vertex;
+    }
+    else if (type == "geometry")
+    {
+      shaderType = vtkShader::Geometry;
+    }
+    if (shaderType == vtkShader::Unknown)
+    {
+      vtkErrorMacro("Unknown shader type for replacement:" << type);
+      return;
+    }
+
+    if (!repl.isMember("original"))
+    {
+      vtkErrorMacro("Syntax error in shader replacements: an original pattern is required.");
+      return;
+    }
+    std::string original = repl["original"].asString();
+    if (!repl.isMember("replacement"))
+    {
+      vtkErrorMacro("Syntax error in shader replacements: a replacement pattern is required.");
+      return;
+    }
+    std::string replacement = repl["replacement"].asString();
+    replacements.push_back(std::make_tuple(shaderType, original, replacement));
+  }
+
+  for (const auto& r : replacements)
+  {
+    switch (std::get<0>(r))
+    {
+      case vtkShader::Fragment:
+        props->AddFragmentShaderReplacement(std::get<1>(r), true, std::get<2>(r), true);
+        break;
+      case vtkShader::Vertex:
+        props->AddVertexShaderReplacement(std::get<1>(r), true, std::get<2>(r), true);
+        break;
+      case vtkShader::Geometry:
+        props->AddGeometryShaderReplacement(std::get<1>(r), true, std::get<2>(r), true);
+        break;
+      default:
+        assert(false && "unknown shader replacement type");
+        break;
+    }
+  }
 }

@@ -28,15 +28,16 @@
 #ifndef vtkHyperTreeGridRepresentation_h
 #define vtkHyperTreeGridRepresentation_h
 
-#include "vtkNew.h" // for vtkNew
 #include "vtkPVDataRepresentation.h"
+
+#include "vtkNew.h"                 // for vtkNew
+#include "vtkPVLODActor.h"          // Upcast in vtkActor
 #include "vtkProperty.h"            // needed for VTK_POINTS etc.
 #include "vtkRemotingViewsModule.h" // needed for exports
 #include "vtkVector.h"              // for vtkVector.
 
 #include <string> // needed for std::string
 
-class vtkActor;
 class vtkOpenGLHyperTreeGridMapper;
 class vtkPVGeometryFilter;
 class vtkPiecewiseFunction;
@@ -131,7 +132,13 @@ public:
    *  Forwarded to vtkProperty.
    */
   virtual void SetAmbientColor(double r, double g, double b);
+  virtual void SetBaseIOR(double val);
   virtual void SetBaseColorTexture(vtkTexture* tex);
+  virtual void SetCoatIOR(double val);
+  virtual void SetCoatStrength(double val);
+  virtual void SetCoatRoughness(double val);
+  virtual void SetCoatColor(double a, double b, double c);
+  virtual void SetCoatNormalScale(double val);
   virtual void SetColor(double r, double g, double b);
   virtual void SetDiffuseColor(double r, double g, double b);
   virtual void SetEdgeColor(double r, double g, double b);
@@ -141,12 +148,14 @@ public:
   virtual void SetInteractiveSelectionColor(double r, double g, double b);
   virtual void SetInterpolation(int val);
   virtual void SetLineWidth(double val);
+  virtual void SetMaterial(std::string name);
   virtual void SetMaterialTexture(vtkTexture* tex);
   virtual void SetMetallic(double val);
   virtual void SetNormalScale(double val);
   virtual void SetNormalTexture(vtkTexture* tex);
   virtual void SetOcclusionStrength(double val);
   virtual void SetOpacity(double val);
+  virtual void SetPointSize(double val);
   virtual void SetRenderLinesAsTubes(bool);
   virtual void SetRenderPointsAsSpheres(bool);
   virtual void SetRoughness(double val);
@@ -167,6 +176,18 @@ public:
   virtual void SetScale(double, double, double);
   virtual void SetTexture(vtkTexture*);
   virtual void SetUserTransform(const double[16]);
+  //@}
+
+  //***************************************************************************
+  //@{
+  /**
+   * Forwarded to OSPray (via the Actor)
+   */
+  virtual void SetEnableScaling(int val);
+  virtual void SetScalingArrayName(const char* val);
+  virtual void SetScalingFunction(vtkPiecewiseFunction* pwf);
+  virtual void SetMaterial(const char* val);
+  virtual void SetLuminosity(double val);
   //@}
 
   //***************************************************************************
@@ -203,6 +224,32 @@ public:
   virtual void SetStatic(int val);
   //@}
 
+  // //***************************************************************************
+  // //@{
+  // /**
+  //  * Method defined to behave like the GeometryRepresentation which have no effect.
+  //  */
+  void AddBlockSelector(std::string) {}
+  void RemoveAllBlockSelectors() {}
+  void SetAnisotropy(float) {}
+  void SetAnisotropyRotation(float) {}
+  void SetBackfaceAmbientColor(float, float, float) {}
+  void SetBackfaceDiffuseColor(float, float, float) {}
+  void SetBackfaceOpacity(float) {}
+  void SetBackfaceRepresentation(int) {}
+  void SetBlockColorsDistinctValues(int) {}
+  void SetCoordinateShiftScaleMethod(int) {}
+  void SetNonlinearSubdivisionLevel(int) {}
+  void SetNormalArray(std::string) {}
+  void SetSeamlessU(int) {}
+  void SetSeamlessV(int) {}
+  void SetShowTexturesOnBackface(int) {}
+  void SetSuppressLOD(int) {}
+  void SetTCoordArray(const char*) {}
+  void SetTangentArray(const char*) {}
+  void SetTriangulate(int) {}
+  //@
+
   /**
    * Sets the selection used by the mapper.
    */
@@ -230,6 +277,32 @@ public:
    * Convenience method to get the array name used to scalar color with.
    */
   const char* GetColorArrayName();
+
+  //@{
+  /**
+   * Specify whether or not to redistribute the data. The default is false
+   * since that is the only way in general to guarantee correct rendering.
+   * Can set to true if all rendered data sets are based on the same
+   * data partitioning in order to save on the data redistribution.
+   */
+  vtkSetMacro(UseDataPartitions, bool);
+  vtkGetMacro(UseDataPartitions, bool);
+  //@}
+
+  //@{
+  /**
+   * Specify whether or not to shader replacements string must be used.
+   */
+  virtual void SetUseShaderReplacements(bool);
+  vtkGetMacro(UseShaderReplacements, bool);
+  //@}
+
+  /**
+   * Specify shader replacements using a Json string.
+   * Please refer to the XML definition of the property for details about
+   * the expected Json string format.
+   */
+  virtual void SetShaderReplacements(const char*);
 
 protected:
   vtkHyperTreeGridRepresentation();
@@ -291,6 +364,11 @@ protected:
   virtual vtkActor* GetRenderedProp() { return this->Actor; }
 
   /**
+   * Update the mapper with the shader replacement strings if feature is enabled.
+   */
+  void UpdateShaderReplacements();
+
+  /**
    * Returns true if this representation has translucent geometry. Unlike
    * `vtkActor::HasTranslucentPolygonalGeometry` which cannot be called in
    * `Update`, this method can be called in `Update` i.e. before the mapper has
@@ -307,7 +385,7 @@ protected:
   bool AdaptiveDecimation = false;
 
   // Generic fields
-  vtkNew<vtkActor> Actor;
+  vtkNew<vtkPVLODActor> Actor;
   vtkNew<vtkProperty> Property;
 
   int Representation = SURFACE;
@@ -319,6 +397,9 @@ protected:
   double Specular = 0.0;
   double Diffuse = 1.0;
   double VisibleDataBounds[6];
+  bool UseDataPartitions = false;
+  bool UseShaderReplacements = false;
+  std::string ShaderReplacementsString;
 
 private:
   vtkHyperTreeGridRepresentation(const vtkHyperTreeGridRepresentation&) = delete;
