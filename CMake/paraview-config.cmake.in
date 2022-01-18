@@ -160,8 +160,10 @@ if (_paraview_vtk_components_to_request_optional)
 endif ()
 # Modules which are required should be removed from the optional component
 # list.
-list(REMOVE_ITEM _paraview_vtk_components_to_request_optional
-  ${_paraview_vtk_components_to_request_required})
+if (_paraview_vtk_components_to_request_required)
+  list(REMOVE_ITEM _paraview_vtk_components_to_request_optional
+    ${_paraview_vtk_components_to_request_required})
+endif()
 
 # Now find VTK with all of the components we require.
 find_package(VTK REQUIRED
