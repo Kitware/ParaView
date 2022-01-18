@@ -1,0 +1,7 @@
+NAME
+  SimpleParaViewCustomFilters
+DESCRIPTION
+  An example paraview plugin to be loaded in SimpleParaview
+REQUIRES_MODULES
+  VTK::CommonCore
+  VTK::FiltersCore

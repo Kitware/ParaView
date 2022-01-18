@@ -45,6 +45,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define myMainWindow_h
 
 #include <QMainWindow>
+#include <QScopedPointer>
 
 class myMainWindow : public QMainWindow
 {
@@ -59,7 +60,7 @@ private:
   Q_DISABLE_COPY(myMainWindow)
 
   class pqInternals;
-  pqInternals* Internals;
+  QScopedPointer<pqInternals> Internals;
 };
 
 #endif

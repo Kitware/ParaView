@@ -32,13 +32,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "myMainWindow.h"
 #include "ui_myMainWindow.h"
 
-#include "pqApplicationCore.h"
-#include "pqCategoryToolbarsBehavior.h"
-#include "pqColorToolbar.h"
-#include "pqLoadDataReaction.h"
-#include "pqParaViewBehaviors.h"
-#include "pqParaViewMenuBuilders.h"
-#include "pqRepresentationToolbar.h"
+#include <pqApplicationCore.h>
+#include <pqCategoryToolbarsBehavior.h>
+#include <pqColorToolbar.h>
+#include <pqLoadDataReaction.h>
+#include <pqParaViewBehaviors.h>
+#include <pqParaViewMenuBuilders.h>
+#include <pqRepresentationToolbar.h>
 
 //-----------------------------------------------------------------------------
 class myMainWindow::pqInternals : public Ui::pqClientMainWindow
@@ -47,9 +47,9 @@ class myMainWindow::pqInternals : public Ui::pqClientMainWindow
 
 //-----------------------------------------------------------------------------
 myMainWindow::myMainWindow()
+  : Internals(new pqInternals())
 {
   // Setup default GUI layout.
-  this->Internals = new pqInternals();
   this->Internals->setupUi(this);
 
   // Setup the dock window corners to give the vertical docks more room.
@@ -93,7 +93,4 @@ myMainWindow::myMainWindow()
 }
 
 //-----------------------------------------------------------------------------
-myMainWindow::~myMainWindow()
-{
-  delete this->Internals;
-}
+myMainWindow::~myMainWindow() = default;

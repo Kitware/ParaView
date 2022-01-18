@@ -1,0 +1,6 @@
+NAME
+  ElevationFilters
+DEPENDS
+  VTK::FiltersCore
+PRIVATE_DEPENDS
+  VTK::CommonCore
