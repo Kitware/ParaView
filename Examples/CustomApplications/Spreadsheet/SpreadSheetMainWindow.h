@@ -29,11 +29,23 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
+
+/**
+ * An example of a very simple ParaView based application.
+ * It still contains all of ParaView features, but only a subset of features
+ * is shown to the user.
+ *
+ * It shows how to :
+ * * Only expose a handful of filters
+ * * Define your own menus and use only specific menus
+ * * Choose which toolbar and dockwidget to show
+ */
+
 #ifndef SpreadSheetMainWindow_h
 #define SpreadSheetMainWindow_h
-#include <QMainWindow>
 
-class pqPipelineSource;
+#include <QMainWindow>
+#include <QScopedPointer>
 
 class SpreadSheetMainWindow : public QMainWindow
 {
@@ -41,14 +53,14 @@ class SpreadSheetMainWindow : public QMainWindow
   typedef QMainWindow Superclass;
 
 public:
-  SpreadSheetMainWindow(QWidget* parent = 0, Qt::WindowFlags flags = 0);
-  ~SpreadSheetMainWindow();
-
-protected Q_SLOTS:
-  void showData(pqPipelineSource*);
+  SpreadSheetMainWindow();
+  ~SpreadSheetMainWindow() override;
 
 private:
   Q_DISABLE_COPY(SpreadSheetMainWindow)
+
+  class pqInternals;
+  QScopedPointer<pqInternals> Internals;
 };
 
 #endif
