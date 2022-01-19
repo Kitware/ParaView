@@ -382,7 +382,7 @@ protected:
 
   // Specific to HTG mapper
   vtkNew<vtkOpenGLHyperTreeGridMapper> Mapper;
-  bool AdaptiveDecimation = false;
+  bool AdaptiveDecimation = true;
 
   // Generic fields
   vtkNew<vtkPVLODActor> Actor;

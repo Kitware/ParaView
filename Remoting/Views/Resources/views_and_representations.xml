@@ -5050,11 +5050,12 @@
       <SubProxy>
         <Proxy name="HyperTreeGridRepresentation"
                proxygroup="representations"
-               proxyname="HyperTreeGridRepresentation">
-        </Proxy>
+               proxyname="HyperTreeGridRepresentation"/>
+
         <ShareProperties subproxy="SurfaceRepresentation">
           <Exception name="Input" />
         </ShareProperties>
+
       </SubProxy>
     </Extension>
 
@@ -7219,6 +7220,7 @@
                      name="Input">
         <DataTypeDomain name="input_type">
           <DataType value="vtkDataSet" />
+          <DataType value="vtkHyperTreeGrid" />
         </DataTypeDomain>
         <InputArrayDomain attribute_type="any"
                           name="input_array_any" />
