@@ -86,8 +86,7 @@ add_example(CustomApplications/Demo0)
 add_example(CustomApplications/Demo1)
 add_example(CustomApplications/MultiServerClient)
 add_example(CustomApplications/SimpleParaView)
-# TODO Update this custom application to load only specific data types.
-# add_example(CustomApplications/Spreadsheet)
+add_example(CustomApplications/Spreadsheet)
 
 # increate timeout for this test since it builds multiple executables
 # which be timeconsuming on static builds.
