@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>pqClientMainWindow</class>
+ <widget class="QMainWindow" name="pqClientMainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>970</width>
+    <height>700</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>MainWindow</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <layout class="QGridLayout" name="gridLayout">
+    <property name="leftMargin">
+     <number>0</number>
+    </property>
+    <property name="topMargin">
+     <number>0</number>
+    </property>
+    <property name="rightMargin">
+     <number>0</number>
+    </property>
+    <property name="bottomMargin">
+     <number>0</number>
+    </property>
+    <item row="0" column="0">
+     <widget class="pqViewManager" name="MultiViewManager" native="true"/>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>970</width>
+     <height>19</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menu_File">
+    <property name="title">
+     <string>&amp;File</string>
+    </property>
+    <addaction name="actionOpen"/>
+    <addaction name="actionExit"/>
+   </widget>
+   <widget class="QMenu" name="menuFilters">
+    <property name="title">
+     <string>&amp;Filters</string>
+    </property>
+   </widget>
+   <addaction name="menu_File"/>
+   <addaction name="menuFilters"/>
+  </widget>
+  <action name="actionOpen">
+   <property name="text">
+    <string>Open</string>
+   </property>
+  </action>
+  <action name="actionExit">
+   <property name="text">
+    <string>Quit</string>
+   </property>
+  </action>
+  <widget class="pqStatusBar" name="statusbar"/>
+  <widget class="QDockWidget" name="pipelineBrowserDock">
+   <property name="allowedAreas">
+    <set>Qt::LeftDockWidgetArea|Qt::RightDockWidgetArea</set>
+   </property>
+   <property name="windowTitle">
+    <string>Pipeline Browser</string>
+   </property>
+   <attribute name="dockWidgetArea">
+    <number>1</number>
+   </attribute>
+   <widget class="pqPipelineBrowserWidget" name="pipelineBrowser">
+    <property name="contextMenuPolicy">
+     <enum>Qt::DefaultContextMenu</enum>
+    </property>
+   </widget>
+  </widget>
+  <widget class="QDockWidget" name="colorMapEditorDock">
+   <property name="allowedAreas">
+    <set>Qt::LeftDockWidgetArea|Qt::RightDockWidgetArea</set>
+   </property>
+   <property name="windowTitle">
+    <string>Color Map Editor</string>
+   </property>
+   <attribute name="dockWidgetArea">
+    <number>2</number>
+   </attribute>
+   <widget class="pqColorMapEditor" name="colorMapEditorPanel"/>
+  </widget>
+  <widget class="QDockWidget" name="proxyTabDock">
+   <property name="allowedAreas">
+    <set>Qt::LeftDockWidgetArea|Qt::RightDockWidgetArea</set>
+   </property>
+   <property name="windowTitle">
+    <string>Properties</string>
+   </property>
+   <attribute name="dockWidgetArea">
+    <number>1</number>
+   </attribute>
+   <widget class="pqPropertiesPanel" name="proxyTabWidget"/>
+  </widget>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>pqPipelineBrowserWidget</class>
+   <extends>QWidget</extends>
+   <header>pqPipelineBrowserWidget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>pqDataInformationWidget</class>
+   <extends>QWidget</extends>
+   <header>pqDataInformationWidget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>pqStatusBar</class>
+   <extends>QStatusBar</extends>
+   <header>pqStatusBar.h</header>
+  </customwidget>
+  <customwidget>
+   <class>pqPropertiesPanel</class>
+   <extends>QWidget</extends>
+   <header>pqPropertiesPanel.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>pqViewManager</class>
+   <extends>QWidget</extends>
+   <header>pqViewManager.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>pqColorMapEditor</class>
+   <extends>QWidget</extends>
+   <header>pqColorMapEditor.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections/>
+</ui>
