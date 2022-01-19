@@ -649,10 +649,7 @@ void pqApplicationCore::loadConfigurationXML(const char* xmldata)
   // processing everytime the session startsup?
   vtkPVXMLElement* root = parser->GetRootElement();
 
-  // Load configuration files for server manager components since they don't
-  // listen to Qt signals.
-  vtkSMProxyManager::GetProxyManager()->GetReaderFactory()->UpdateAvailableReaders();
-  vtkSMProxyManager::GetProxyManager()->GetWriterFactory()->UpdateAvailableWriters();
+  this->updateAvailableReadersAndWriters();
 
   // Give a warning that if there is ParaViewReaders or ParaViewWriters in root
   // that it has been changed and people should change their code accordingly.
@@ -668,6 +665,15 @@ void pqApplicationCore::loadConfigurationXML(const char* xmldata)
   }
 
   Q_EMIT this->loadXML(root);
+}
+
+//-----------------------------------------------------------------------------
+void pqApplicationCore::updateAvailableReadersAndWriters()
+{
+  // Load configuration files for server manager components since they don't
+  // listen to Qt signals.
+  vtkSMProxyManager::GetProxyManager()->GetReaderFactory()->UpdateAvailableReaders();
+  vtkSMProxyManager::GetProxyManager()->GetWriterFactory()->UpdateAvailableWriters();
 }
 
 //-----------------------------------------------------------------------------

@@ -340,13 +340,21 @@ public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
    */
   void quit();
 
+  ///@{
   /**
    * Load configuration xml. This results in firing of the loadXML() signal
    * which different components that support configuration catch and process to
    * update their behavior.
+   * This also update available readers and writers.
    */
   void loadConfiguration(const QString& filename);
   void loadConfigurationXML(const char* xmldata);
+  ///@}
+
+  /**
+   * Update the available readers and writers using the factories
+   */
+  void updateAvailableReadersAndWriters();
 
   /**
    * Renders all windows
