@@ -262,6 +262,8 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/Contour1.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/Contour2.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/Contour3.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/ContourRange_A.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/ContourRange_B.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/ContourCellData.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/CONVERGECFDReaderMesh.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/CONVERGECFDReaderParcels.png}"
@@ -702,6 +704,7 @@ SET (TESTS_WITH_INLINE_COMPARES
   ColorOpacityTableEditorHistogram.xml
   Connectivity.xml
   Contour.xml
+  ContourRange.xml
   DataAxesGrid2X.xml
   EllipseSource.xml
   Ensemble.xml
@@ -780,7 +783,6 @@ if(NOT APPLE)
 endif()
 
 SET(TESTS_WITH_BASELINES
-  ContourRange.xml
   DataAxesGrid.xml
   MergeVectorComponents.xml
   MoleculeScalarBar.xml
