@@ -855,6 +855,7 @@ void pqAnimationViewWidget::updatePlayMode()
   {
     qWarning("Unrecognized play mode");
   }
+  this->updateStrideRange();
 }
 
 //-----------------------------------------------------------------------------
@@ -882,7 +883,9 @@ void pqAnimationViewWidget::updateTicks()
 void pqAnimationViewWidget::updateStrideRange()
 {
   int newMax = 1;
-  const QString& mode = this->Internal->PlayMode->currentText();
+  vtkSMProxy* pxy = this->Internal->Scene->getProxy();
+  const QString& mode =
+    pqSMAdaptor::getEnumerationProperty(pxy->GetProperty("PlayMode")).toString();
   if (mode == "Sequence")
   {
     newMax = this->Internal->Duration->text().toInt();
