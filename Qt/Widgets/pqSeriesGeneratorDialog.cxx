@@ -49,9 +49,18 @@ public:
     GEOMETRIC_RATIO,
   };
   Ui::SeriesGeneratorDialog Ui;
+  double DataMin;
+  double DataMax;
 
   bool validate();
   QVector<double> values() const;
+
+  void highlightIfNeeded()
+  {
+    double min = this->Ui.min->text().toDouble();
+    double max = this->Ui.max->text().toDouble();
+    this->Ui.reset->highlight(min == this->DataMin && max == this->DataMax);
+  }
 };
 
 //-----------------------------------------------------------------------------
@@ -199,6 +208,8 @@ pqSeriesGeneratorDialog::pqSeriesGeneratorDialog(
   , Internals(new pqSeriesGeneratorDialog::pqInternals())
 {
   auto& internals = (*this->Internals);
+  internals.DataMin = min;
+  internals.DataMax = max;
   internals.Ui.setupUi(this);
   internals.Ui.min->setValidator(new QDoubleValidator(this));
   internals.Ui.max->setValidator(new QDoubleValidator(this));
@@ -225,11 +236,17 @@ pqSeriesGeneratorDialog::pqSeriesGeneratorDialog(
       internals.validate();
     });
 
-  auto callback = [&internals]() { internals.validate(); };
+  auto callback = [&internals]() {
+    internals.validate();
+    internals.highlightIfNeeded();
+  };
+
   QObject::connect(internals.Ui.max, &pqLineEdit::textChanged, callback);
   QObject::connect(internals.Ui.min, &pqLineEdit::textChanged, callback);
   QObject::connect(internals.Ui.ratio, &pqLineEdit::textChanged, callback);
   QObject::connect(internals.Ui.nsamples, QOverload<int>::of(&QSpinBox::valueChanged), callback);
+  QObject::connect(internals.Ui.reset, &QPushButton::clicked, this,
+    &pqSeriesGeneratorDialog::resetRangeToDataRange);
 
   internals.Ui.min->setText(QVariant(min).toString());
   internals.Ui.max->setText(QVariant(max).toString());
@@ -237,6 +254,28 @@ pqSeriesGeneratorDialog::pqSeriesGeneratorDialog(
 
 //-----------------------------------------------------------------------------
 pqSeriesGeneratorDialog::~pqSeriesGeneratorDialog() = default;
+
+//-----------------------------------------------------------------------------
+void pqSeriesGeneratorDialog::setDataRange(double dataMin, double dataMax, bool reset)
+{
+  auto& internals = (*this->Internals);
+  internals.DataMin = dataMin;
+  internals.DataMax = dataMax;
+  internals.highlightIfNeeded();
+  if (reset)
+  {
+    this->resetRangeToDataRange();
+  }
+}
+
+//-----------------------------------------------------------------------------
+void pqSeriesGeneratorDialog::resetRangeToDataRange()
+{
+  auto& internals = (*this->Internals);
+  internals.Ui.min->setText(QVariant(internals.DataMin).toString());
+  internals.Ui.max->setText(QVariant(internals.DataMax).toString());
+  internals.Ui.reset->clear();
+}
 
 //-----------------------------------------------------------------------------
 QVector<double> pqSeriesGeneratorDialog::series() const
