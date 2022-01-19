@@ -34,7 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QMainWindow>
 
-/// MainWindow for the default ParaView application.
+// MainWindow for the default ParaView application.
 class myMainWindow : public QMainWindow
 {
   Q_OBJECT

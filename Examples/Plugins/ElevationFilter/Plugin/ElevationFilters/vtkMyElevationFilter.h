@@ -1,11 +1,11 @@
 /*=========================================================================
 
-  Program:   Visualization Toolkit
+  Program:   ParaView
   Module:    vtkMyElevationFilter.h
 
-  Copyright (c) Ken Martin, Will Schroeder, Bill Lorensen
+  Copyright (c) Kitware, Inc.
   All rights reserved.
-  See Copyright.txt or http://www.kitware.com/Copyright.htm for details.
+  See Copyright.txt or http://www.paraview.org/HTML/Copyright.html for details.
 
      This software is distributed WITHOUT ANY WARRANTY; without even
      the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
@@ -23,8 +23,9 @@
 #ifndef vtkMyElevationFilter_h
 #define vtkMyElevationFilter_h
 
+#include <vtkElevationFilter.h>
+
 #include "ElevationFiltersModule.h" // for export macro
-#include "vtkElevationFilter.h"
 
 class ELEVATIONFILTERS_EXPORT vtkMyElevationFilter : public vtkElevationFilter
 {

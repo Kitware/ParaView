@@ -1,7 +1,7 @@
 <ServerManagerConfiguration>
   <!-- This is the server manager configuration XML. It defines the interface to
        our new filter. As a rule of thumb, try to locate the configuration for
-       a filter already in ParaView (in Servers/ServerManager/Resources/*.xml)
+       a filter already in ParaView (in Remoting/Application/Resources/*.xml)
        that matches your filter and then model your xml on it -->
   <ProxyGroup name="filters">
    <SourceProxy name="MyElevationFilter" class="vtkMyElevationFilter" label="MyElevation">

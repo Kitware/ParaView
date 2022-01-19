@@ -65,11 +65,11 @@ myMainWindow::myMainWindow()
   this->Internals->colorMapEditorDock->hide();
 
   // Create a custom file menu with only Open and close
-  QList<QAction*> qa = this->Internals->menu_File->actions();
-  QAction* mqa = qa.at(0);
-  new pqLoadDataReaction(mqa);
+  QList<QAction*> actionList = this->Internals->menu_File->actions();
+  QAction* action = actionList.at(0);
+  new pqLoadDataReaction(action);
   QObject::connect(
-    qa.at(1), SIGNAL(triggered()), QApplication::instance(), SLOT(closeAllWindows()));
+    actionList.at(1), SIGNAL(triggered()), QApplication::instance(), SLOT(closeAllWindows()));
 
   // Build the filters menu
   pqParaViewMenuBuilders::buildFiltersMenu(*this->Internals->menuFilters, this);
@@ -94,7 +94,7 @@ myMainWindow::myMainWindow()
   QObject::connect(this->Internals->proxyTabWidget, &pqPropertiesPanel::helpRequested,
     &pqHelpReaction::showProxyHelp);
 
-  /// hook delete to pqDeleteReaction.
+  // hook delete to pqDeleteReaction.
   QAction* tempDeleteAction = new QAction(this);
   pqDeleteReaction* handler = new pqDeleteReaction(tempDeleteAction);
   handler->connect(this->Internals->proxyTabWidget, SIGNAL(deleteRequested(pqProxy*)),

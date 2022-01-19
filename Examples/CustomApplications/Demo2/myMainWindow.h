@@ -31,14 +31,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ========================================================================*/
 
 /**
- * An example of a very simple ParaView based application.
- * It still contains all of ParaView features, but only a subset of features
- * is shown to the user.
- *
- * It shows how to :
- * * Only expose a handful of filters
- * * Define your own menus and use only specific menus
- * * Choose which toolbar and dockwidget to show
+ * A main window class copied from SimpleParaView example
+ * Make sure to propagate any changes mades
  */
 
 #ifndef myMainWindow_h

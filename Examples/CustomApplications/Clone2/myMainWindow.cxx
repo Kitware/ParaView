@@ -32,26 +32,25 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "myMainWindow.h"
 #include "ui_myMainWindow.h"
 
-#include "pqAlwaysConnectedBehavior.h"
-#include "pqApplicationCore.h"
-#include "pqApplyBehavior.h"
-#include "pqAutoLoadPluginXMLBehavior.h"
-#include "pqDefaultViewBehavior.h"
-#include "pqHelpReaction.h"
-#include "pqInterfaceTracker.h"
-#include "pqParaViewBehaviors.h"
-#include "pqParaViewMenuBuilders.h"
-#include "pqStandardViewFrameActionsImplementation.h"
+#include <pqAlwaysConnectedBehavior.h>
+#include <pqApplicationCore.h>
+#include <pqApplyBehavior.h>
+#include <pqAutoLoadPluginXMLBehavior.h>
+#include <pqAxesToolbar.h>
+#include <pqDefaultViewBehavior.h>
+#include <pqHelpReaction.h>
+#include <pqInterfaceTracker.h>
+#include <pqLoadDataReaction.h>
+#include <pqMainControlsToolbar.h>
+#include <pqParaViewBehaviors.h>
+#include <pqParaViewMenuBuilders.h>
+#include <pqRepresentationToolbar.h>
+#include <pqSetName.h>
+#include <pqStandardViewFrameActionsImplementation.h>
 
 #include <QAction>
 #include <QList>
 #include <QToolBar>
-
-#include "pqAxesToolbar.h"
-#include "pqLoadDataReaction.h"
-#include "pqMainControlsToolbar.h"
-#include "pqRepresentationToolbar.h"
-#include "pqSetName.h"
 
 class myMainWindow::pqInternals : public Ui::pqClientMainWindow
 {
@@ -122,7 +121,7 @@ myMainWindow::myMainWindow()
   // Final step, define application behaviors. Since we want some paraview behaviors
   // we can use static method to configure the pqParaViewBehaviors and select
   // only the components we want
-  pqParaViewBehaviors::setEnableStandardPropertyWidgets(false);
+  pqParaViewBehaviors::setEnableStandardPropertyWidgets(true);
   pqParaViewBehaviors::setEnableStandardRecentlyUsedResourceLoader(false);
   pqParaViewBehaviors::setEnableDataTimeStepBehavior(false);
   pqParaViewBehaviors::setEnableSpreadSheetVisibilityBehavior(false);
