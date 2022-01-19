@@ -132,17 +132,71 @@ bool ValidateFieldData()
   conduit_cpp::BlueprintMesh::Example::basic("uniform", 3, 3, 3, mesh);
 
   auto field_data_node = mesh["state/fields"];
+
+  auto empty_field_data = field_data_node["empty_field_data"];
+
   auto integer_field_data = field_data_node["integer_field_data"];
-  integer_field_data.set_int32(42);
+  integer_field_data.set_int64(42);
+
+  auto float_field_data = field_data_node["float_field_data"];
+  float_field_data.set_float64(5.0);
+
+  auto string_field_data = field_data_node["string_field_data"];
+  string_field_data.set_string("test");
+
+  auto integer_vector_field_data = field_data_node["integer_vector_field_data"];
+  integer_vector_field_data.set_int64_vector({ 1, 2, 3 });
+
+  auto float_vector_field_data = field_data_node["float_vector_field_data"];
+  float_vector_field_data.set_float64_vector({ 4.0, 5.0, 6.0 });
 
   auto data = Convert(mesh);
-  auto pds = vtkPartitionedDataSet::SafeDownCast(data);
-  auto img = vtkImageData::SafeDownCast(pds->GetPartition(0));
-  auto field_data = img->GetFieldData();
+  auto field_data = data->GetFieldData();
 
-  VERIFY(field_data->GetNumberOfArrays() == 1,
-    "incorrect number of arrays in field data, expected 1, got %d",
+  VERIFY(field_data->GetNumberOfArrays() == 5,
+    "incorrect number of arrays in field data, expected 5, got %d",
     field_data->GetNumberOfArrays());
+
+  auto integer_field_array = field_data->GetAbstractArray(0);
+  VERIFY(std::string(integer_field_array->GetName()) == "integer_field_data",
+    "wrong array name, expected \"integer_field_data\", got %s", integer_field_array->GetName());
+  VERIFY(integer_field_array->GetNumberOfComponents() == 1, "wrong number of component");
+  VERIFY(integer_field_array->GetNumberOfTuples() == 1, "wrong number of tuples");
+  VERIFY(integer_field_array->GetVariantValue(0).ToInt() == 42, "wrong value");
+
+  auto float_field_array = field_data->GetAbstractArray(1);
+  VERIFY(std::string(float_field_array->GetName()) == "float_field_data",
+    "wrong array name, expected \"float_field_data\", got %s", float_field_array->GetName());
+  VERIFY(float_field_array->GetNumberOfComponents() == 1, "wrong number of component");
+  VERIFY(float_field_array->GetNumberOfTuples() == 1, "wrong number of tuples");
+  VERIFY(float_field_array->GetVariantValue(0).ToFloat() == 5.0, "wrong value");
+
+  auto string_field_array = field_data->GetAbstractArray(2);
+  VERIFY(std::string(string_field_array->GetName()) == "string_field_data",
+    "wrong array name, expected \"string_field_data\", got %s", string_field_array->GetName());
+  VERIFY(string_field_array->GetNumberOfComponents() == 1, "wrong number of component");
+  VERIFY(string_field_array->GetNumberOfTuples() == 1, "wrong number of tuples");
+  VERIFY(string_field_array->GetVariantValue(0).ToString() == "test", "wrong value");
+
+  auto integer_vector_field_array = field_data->GetAbstractArray(3);
+  VERIFY(std::string(integer_vector_field_array->GetName()) == "integer_vector_field_data",
+    "wrong array name, expected \"integer_vector_field_data\", got %s",
+    integer_vector_field_array->GetName());
+  VERIFY(integer_vector_field_array->GetNumberOfComponents() == 1, "wrong number of component");
+  VERIFY(integer_vector_field_array->GetNumberOfTuples() == 3, "wrong number of tuples");
+  VERIFY(integer_vector_field_array->GetVariantValue(0).ToInt() == 1, "wrong value");
+  VERIFY(integer_vector_field_array->GetVariantValue(1).ToInt() == 2, "wrong value");
+  VERIFY(integer_vector_field_array->GetVariantValue(2).ToInt() == 3, "wrong value");
+
+  auto float_vector_field_array = field_data->GetAbstractArray(4);
+  VERIFY(std::string(float_vector_field_array->GetName()) == "float_vector_field_data",
+    "wrong array name, expected \"float_vector_field_data\", got %s",
+    float_vector_field_array->GetName());
+  VERIFY(float_vector_field_array->GetNumberOfComponents() == 1, "wrong number of component");
+  VERIFY(float_vector_field_array->GetNumberOfTuples() == 3, "wrong number of tuples");
+  VERIFY(float_vector_field_array->GetVariantValue(0).ToInt() == 4.0, "wrong value");
+  VERIFY(float_vector_field_array->GetVariantValue(1).ToInt() == 5.0, "wrong value");
+  VERIFY(float_vector_field_array->GetVariantValue(2).ToInt() == 6.0, "wrong value");
 
   return true;
 }
