@@ -31,6 +31,7 @@
 set(classes
   pqAnimationCue
   pqAnimationScene
+  pqAnnotationsModel
   pqApplicationCore
   pqAutoStartInterface
   pqBoxChartView

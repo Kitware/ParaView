@@ -40,6 +40,7 @@ set(classes
   pqAnimationTimeWidget
   pqAnimationViewWidget
   pqArrayListDomain
+  pqArrayListWidget
   pqArraySelectionWidget
   pqArraySelectorPropertyWidget
   pqArrayStatusPropertyWidget
