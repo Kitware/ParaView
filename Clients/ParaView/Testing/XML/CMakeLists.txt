@@ -101,6 +101,7 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${paraview_test_data_directory_input}/Data/Fides/cartesian-attr.bp.dir/,REGEX:.*}"
   "DATA{${paraview_test_data_directory_input}/Data/Fides/tris-blocks-time-attr.bp}"
   "DATA{${paraview_test_data_directory_input}/Data/Fides/tris-blocks-time-attr.bp.dir/,REGEX:.*}"
+  "DATA{${paraview_test_data_directory_input}/Data/field.vtk}"
   "DATA{${paraview_test_data_directory_input}/Data/filters.xml}"
   "DATA{${paraview_test_data_directory_input}/Data/glTF/AnimatedMorphCube/,REGEX:.*}"
   "DATA{${paraview_test_data_directory_input}/Data/glTF/BoxAnimated/,REGEX:.*}"
@@ -611,6 +612,7 @@ ExternalData_Expand_Arguments(ParaViewData _
 
 SET (TESTS_WITHOUT_BASELINES
   AboutDialog.xml
+  AddFieldArrays.xml
   ArrayBoundsScaleDomain.xml
   CustomOutputFormat.xml
   DelimitedTextReader.xml

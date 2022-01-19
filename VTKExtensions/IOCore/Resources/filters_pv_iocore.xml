@@ -21,7 +21,7 @@
                             command="SetFileName"
                             name="FileName"
                             number_of_elements="1"
-                            panel_visibility="always">
+                            panel_visibility="default">
         <FileListDomain name="files" />
         <Documentation>
           This property specifies the file to read to get arrays
@@ -31,7 +31,7 @@
                 label="Reload"
                 name="Reload"
                 panel_widget="command_button"
-                panel_visibility="always">
+                panel_visibility="default">
         <Documentation> A convenient way to reload the data file </Documentation>
       </Property>
       <!-- End of AdditionalFieldReader -->
