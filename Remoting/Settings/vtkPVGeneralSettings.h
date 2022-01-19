@@ -321,6 +321,15 @@ public:
   vtkBooleanMacro(EnableStreaming, bool);
   //@}
 
+  //@{
+  /**
+   * Enable use of accelerated filters where available.
+   */
+  void SetUseAcceleratedFilters(bool);
+  bool GetUseAcceleratedFilters();
+  vtkBooleanMacro(UseAcceleratedFilters, bool);
+  //@}
+
 protected:
   vtkPVGeneralSettings();
   ~vtkPVGeneralSettings() override;

@@ -253,23 +253,42 @@ int vtkPVContourFilter::RequestDataObject(vtkInformation* vtkNotUsed(request),
 
 //----------------------------------------------------------------------------
 int vtkPVContourFilter::ContourUsingSuperclass(
-  vtkInformation* request, vtkInformationVector** inputVector, vtkInformationVector* outputVector)
+  vtkInformation*, vtkInformationVector** inputVector, vtkInformationVector* outputVector)
 {
+  // instantiate the superclass so as to use the object factory
+  vtkNew<Superclass> instance;
+  instance->SetNumberOfContours(this->GetNumberOfContours());
+  for (int i = 0; i < this->GetNumberOfContours(); ++i)
+  {
+    instance->SetValue(i, this->GetValue(i));
+  }
+  instance->SetComputeNormals(this->GetComputeNormals());
+  instance->SetComputeGradients(this->GetComputeGradients());
+  instance->SetComputeScalars(this->GetComputeScalars());
+  instance->SetUseScalarTree(this->GetUseScalarTree());
+  instance->SetScalarTree(this->GetScalarTree());
+  instance->SetLocator(this->GetLocator());
+  instance->SetArrayComponent(this->GetArrayComponent());
+  instance->SetGenerateTriangles(this->GetGenerateTriangles());
+  instance->SetOutputPointsPrecision(this->GetOutputPointsPrecision());
+  instance->SetInputArrayToProcess(0, this->GetInputArrayInformation(0));
+
+  vtkNew<vtkEventForwarderCommand> progressForwarder;
+  progressForwarder->SetTarget(this);
+  instance->AddObserver(vtkCommand::ProgressEvent, progressForwarder);
+
   vtkDataObject* inputDO = vtkDataObject::GetData(inputVector[0], 0);
   vtkDataObject* outputDO = vtkDataObject::GetData(outputVector, 0);
 
   vtkCompositeDataSet* inputCD = vtkCompositeDataSet::SafeDownCast(inputDO);
   if (!inputCD)
   {
-    auto retval = this->Superclass::RequestData(request, inputVector, outputVector);
-    if (retval)
-    {
-      if (auto polydata = vtkPolyData::GetData(outputVector, 0))
-      {
-        this->CleanOutputScalars(polydata->GetPointData()->GetScalars());
-      }
-    }
-    return retval;
+    instance->SetInputDataObject(inputDO);
+    instance->Update();
+    auto polydata = instance->GetOutput();
+    this->CleanOutputScalars(polydata->GetPointData()->GetScalars());
+    outputDO->ShallowCopy(polydata);
+    return 1;
   }
 
   vtkCompositeDataSet* outputCD = vtkCompositeDataSet::SafeDownCast(outputDO);
@@ -278,30 +297,12 @@ int vtkPVContourFilter::ContourUsingSuperclass(
   vtkSmartPointer<vtkCompositeDataIterator> iter;
   iter.TakeReference(inputCD->NewIterator());
 
-  // for input.
-  vtkSmartPointer<vtkInformationVector> newInInfoVec = vtkSmartPointer<vtkInformationVector>::New();
-  vtkSmartPointer<vtkInformation> newInInfo = vtkSmartPointer<vtkInformation>::New();
-  newInInfoVec->SetInformationObject(0, newInInfo);
-
-  // for output.
-  vtkSmartPointer<vtkInformationVector> newOutInfoVec =
-    vtkSmartPointer<vtkInformationVector>::New();
-  vtkSmartPointer<vtkInformation> newOutInfo = vtkSmartPointer<vtkInformation>::New();
-  newOutInfoVec->SetInformationObject(0, newOutInfo);
-
   // Loop over all the datasets.
   for (iter->InitTraversal(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
   {
-    newInInfo->Set(vtkDataObject::DATA_OBJECT(), iter->GetCurrentDataObject());
-    vtkPolyData* polydata = vtkPolyData::New();
-    newOutInfo->Set(vtkDataObject::DATA_OBJECT(), polydata);
-    polydata->FastDelete();
-
-    vtkInformationVector* newInInfoVecPtr = newInInfoVec.GetPointer();
-    if (!this->Superclass::RequestData(request, &newInInfoVecPtr, newOutInfoVec.GetPointer()))
-    {
-      return 0;
-    }
+    instance->SetInputDataObject(iter->GetCurrentDataObject());
+    instance->Update();
+    auto polydata = instance->GetOutput();
     this->CleanOutputScalars(polydata->GetPointData()->GetScalars());
     outputCD->SetDataSet(iter, polydata);
   }

@@ -179,6 +179,13 @@ void pqAboutDialog::AddClientInformation()
     ::addItem(tree, "OpenGL Version", glVersion);
     ::addItem(tree, "OpenGL Renderer", glRenderer);
   }
+
+#if VTK_MODULE_ENABLE_VTK_AcceleratorsVTKmFilters && VTK_ENABLE_VTKM_OVERRIDES
+  ::addItem(tree, "Accelerated filters overrides available", "Yes");
+#else
+  ::addItem(tree, "Accelerated filters overrides available", "No");
+#endif
+
   tree->header()->setSectionResizeMode(QHeaderView::ResizeToContents);
 }
 
@@ -293,6 +300,9 @@ void pqAboutDialog::AddServerInformation(pqServer* server, QTreeWidget* tree)
   {
     ::addItem(tree, "OpenGL", "Not supported");
   }
+
+  ::addItem(tree, "Accelerated filters overrides available",
+    serverInfo->GetAcceleratedFiltersOverrideAvailable() ? "Yes" : "No");
 }
 
 //-----------------------------------------------------------------------------
