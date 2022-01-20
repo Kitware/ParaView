@@ -191,6 +191,8 @@ bool vtkHyperTreeGridRepresentation::AddToView(vtkView* view)
   if (rview)
   {
     rview->GetRenderer()->AddActor(this->Actor);
+    // The HTG Mapper requires parallel projection if adaptive decimation is on
+    rview->SetParallelProjection(true);
 
     // Indicate that this is prop that we are rendering when hardware selection
     // is enabled.
