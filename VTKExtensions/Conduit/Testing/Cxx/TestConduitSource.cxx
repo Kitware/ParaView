@@ -150,11 +150,16 @@ bool ValidateFieldData()
   auto float_vector_field_data = field_data_node["float_vector_field_data"];
   float_vector_field_data.set_float64_vector({ 4.0, 5.0, 6.0 });
 
+  std::vector<int> integer_buffer = { 123, 456, 789 };
+  auto external_integer_vector_field_data = field_data_node["external_integer_vector"];
+  external_integer_vector_field_data.set_external_int32_ptr(
+    integer_buffer.data(), integer_buffer.size());
+
   auto data = Convert(mesh);
   auto field_data = data->GetFieldData();
 
-  VERIFY(field_data->GetNumberOfArrays() == 5,
-    "incorrect number of arrays in field data, expected 5, got %d",
+  VERIFY(field_data->GetNumberOfArrays() == 6,
+    "incorrect number of arrays in field data, expected 6, got %d",
     field_data->GetNumberOfArrays());
 
   auto integer_field_array = field_data->GetAbstractArray(0);
@@ -197,6 +202,17 @@ bool ValidateFieldData()
   VERIFY(float_vector_field_array->GetVariantValue(0).ToInt() == 4.0, "wrong value");
   VERIFY(float_vector_field_array->GetVariantValue(1).ToInt() == 5.0, "wrong value");
   VERIFY(float_vector_field_array->GetVariantValue(2).ToInt() == 6.0, "wrong value");
+
+  auto external_integer_vector_field_array = field_data->GetAbstractArray(5);
+  VERIFY(std::string(external_integer_vector_field_array->GetName()) == "external_integer_vector",
+    "wrong array name, expected \"external_integer_vector\", got %s",
+    external_integer_vector_field_array->GetName());
+  VERIFY(
+    external_integer_vector_field_array->GetNumberOfComponents() == 1, "wrong number of component");
+  VERIFY(external_integer_vector_field_array->GetNumberOfTuples() == 3, "wrong number of tuples");
+  VERIFY(external_integer_vector_field_array->GetVariantValue(0).ToInt() == 123, "wrong value");
+  VERIFY(external_integer_vector_field_array->GetVariantValue(1).ToInt() == 456, "wrong value");
+  VERIFY(external_integer_vector_field_array->GetVariantValue(2).ToInt() == 789, "wrong value");
 
   return true;
 }

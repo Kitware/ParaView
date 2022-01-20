@@ -479,76 +479,47 @@ bool AddFieldData(vtkDataObject* output, const conduit_cpp::Node& stateFields)
     auto field_node = stateFields.child(child_index);
     const auto field_name = field_node.name();
 
-    vtkSmartPointer<vtkAbstractArray> dataArray;
-
-    if (field_node.number_of_children() == 0)
+    try
     {
-      conduit_index_t number_of_elements = field_node.dtype().number_of_elements();
-      if (number_of_elements > 0)
+      size_t dataset_size = 0;
+      if (field_node.number_of_children() == 0)
       {
-        if (field_node.dtype().is_integer())
-        {
-          auto intArray = vtkSmartPointer<vtkIntArray>::New();
-          intArray->SetNumberOfTuples(number_of_elements);
-          for (conduit_index_t element_index = 0; element_index < number_of_elements;
-               ++element_index)
-          {
-            intArray->SetValue(element_index, field_node.as_int64_ptr()[element_index]);
-          }
-          dataArray = intArray;
-        }
-        else if (field_node.dtype().is_floating_point())
-        {
-          auto floatArray = vtkSmartPointer<vtkFloatArray>::New();
-          floatArray->SetNumberOfTuples(number_of_elements);
-          for (conduit_index_t element_index = 0; element_index < number_of_elements;
-               ++element_index)
-          {
-            floatArray->SetValue(element_index, field_node.as_float64_ptr()[element_index]);
-          }
-          dataArray = floatArray;
-        }
-        else if (field_node.dtype().is_string())
+        dataset_size = field_node.dtype().number_of_elements();
+      }
+      else
+      {
+        dataset_size = field_node.child(0).dtype().number_of_elements();
+      }
+
+      if (dataset_size > 0)
+      {
+        vtkSmartPointer<vtkAbstractArray> dataArray;
+        if (field_node.dtype().is_string())
         {
           auto stringArray = vtkSmartPointer<vtkStringArray>::New();
           stringArray->SetNumberOfTuples(1);
           stringArray->SetValue(0, field_node.as_string().c_str());
           dataArray = stringArray;
+          dataArray->SetName(field_name.c_str());
+        }
+        else
+        {
+          dataArray = vtkConduitArrayUtilities::MCArrayToVTKArray(
+            conduit_cpp::c_node(&field_node), field_name);
+        }
+
+        if (dataArray)
+        {
+          field_data->AddArray(dataArray);
         }
       }
     }
-
-    if (dataArray)
+    catch (std::exception& e)
     {
-      dataArray->SetName(field_name.c_str());
-      field_data->AddArray(dataArray);
+      vtkLogF(ERROR, "failed to process '../state/fields/%s'.", field_name.c_str());
+      vtkLogF(ERROR, "ERROR: \n%s\n", e.what());
+      return false;
     }
-
-    /*try
-  {
-    size_t dataset_size = 0;
-    if (field_node.number_of_children() == 0)
-    {
-      dataset_size = field_node.dtype().number_of_elements();
-    }
-    else
-    {
-      dataset_size = field_node.child(0).dtype().number_of_elements();
-    }
-
-    if (dataset_size > 0)
-    {
-      auto array =
-        vtkConduitArrayUtilities::MCArrayToVTKArray(conduit_cpp::c_node(&field_node), field_name);
-      field_data->AddArray(array);
-    }
-  }
-  catch (std::exception& e)
-  {
-    vtkLogF(ERROR, "failed to process '../state/fields/%s'.", field_name.c_str());
-    vtkLogF(ERROR, "ERROR: \n%s\n", e.what());
-    return false;
-  }*/
   }
   return true;
 }
