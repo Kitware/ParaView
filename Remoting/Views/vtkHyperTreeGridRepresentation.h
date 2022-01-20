@@ -14,14 +14,16 @@
 =========================================================================*/
 /**
  * @class   vtkHyperTreeGridRepresentation
- * @brief   representation for showing any datasets as
- * external shell of polygons.
+ * @brief   representation for showing vtkHyperTreeGrid as
+ * with optimized rendering for 2D datasets.
  *
- * vtkHyperTreeGridRepresentation is a representation for showing polygon geometry.
- * It handles non-polygonal datasets by extracting external surfaces. One can
- * use this representation to show surface/wireframe/points/surface-with-edges.
+ * vtkHyperTreeGridRepresentation is a representation for showing HyperTreeGrid.
+ * When given a 2D dataset, the new HTG representation uses the specific HTG
+ * mapper that benefits from the AdaptiveDecimation filter to only render part
+ * that are shown on the camera frustum. This requires the Parallel Profection
+ * to be enabled.
  * @par Thanks:
- * The addition of a transformation matrix was supported by CEA/DIF
+ * This work was supported by CEA/DIF
  * Commissariat a l'Energie Atomique, Centre DAM Ile-De-France, Arpajon, France.
  */
 
@@ -34,7 +36,6 @@
 #include "vtkPVLODActor.h"          // Upcast in vtkActor
 #include "vtkProperty.h"            // needed for VTK_POINTS etc.
 #include "vtkRemotingViewsModule.h" // needed for exports
-#include "vtkVector.h"              // for vtkVector.
 
 #include <string> // needed for std::string
 
@@ -62,7 +63,7 @@ public:
     vtkInformation* outInfo) override;
 
   /**
-   * Get/Set the visibility for this representation. When the visibility of
+   * Set the visibility for this representation. When the visibility of
    * representation of false, all view passes are ignored.
    */
   void SetVisibility(bool val) override;
@@ -79,12 +80,14 @@ public:
 
   //@{
   /**
-   * Set the lighting properties of the object. vtkHyperTreeGridRepresentation
+   * Set/Get the lighting properties of the object. vtkHyperTreeGridRepresentation
    * overrides these based of the following conditions:
    * \li When Representation is wireframe or points, it disables diffuse or
    * specular.
    * \li When scalar coloring is employed, it disabled specular.
    * Default vaules: Ambient = 0, Specular = 0, Diffuse = 1.
+   *
+   * Values are expected to be between 0 and 1.
    */
   vtkSetMacro(Ambient, double);
   vtkSetMacro(Diffuse, double);
@@ -124,7 +127,7 @@ public:
   /**
    * Use Outline representation is **NOT SUPPORTED** by this representation.
    */
-  virtual void SetUseOutline(int);
+  void SetUseOutline(int);
 
   //***************************************************************************
   //@{
@@ -212,43 +215,22 @@ public:
   virtual void SetLookupTable(vtkScalarsToColors* val);
   //@}
 
-  //@{
   /**
    * Sets if scalars are mapped through a color-map or are used
-   * directly as colors.
+   * directly as colors (rgb).
    * false: maps to VTK_COLOR_MODE_DIRECT_SCALARS
    * true: maps to VTK_COLOR_MODE_MAP_SCALARS
    * @see vtkScalarsToColors::MapScalars
    */
   virtual void SetMapScalars(bool val);
-  virtual void SetStatic(int val);
-  //@}
 
-  // //***************************************************************************
-  // //@{
-  // /**
-  //  * Method defined to behave like the GeometryRepresentation which have no effect.
-  //  */
-  void AddBlockSelector(std::string) {}
-  void RemoveAllBlockSelectors() {}
-  void SetAnisotropy(float) {}
-  void SetAnisotropyRotation(float) {}
-  void SetBackfaceAmbientColor(float, float, float) {}
-  void SetBackfaceDiffuseColor(float, float, float) {}
-  void SetBackfaceOpacity(float) {}
-  void SetBackfaceRepresentation(int) {}
-  void SetBlockColorsDistinctValues(int) {}
-  void SetCoordinateShiftScaleMethod(int) {}
-  void SetNonlinearSubdivisionLevel(int) {}
-  void SetNormalArray(std::string) {}
-  void SetSeamlessU(int) {}
-  void SetSeamlessV(int) {}
-  void SetShowTexturesOnBackface(int) {}
-  void SetSuppressLOD(int) {}
-  void SetTCoordArray(const char*) {}
-  void SetTangentArray(const char*) {}
-  void SetTriangulate(int) {}
-  //@
+  /**
+   * Turn on/off flag to control whether the mapper's data is static. Static data
+   * means that the mapper does not propagate updates down the pipeline, greatly
+   * decreasing the time it takes to update many mappers. This should only be
+   * used if the data never changes.
+   */
+  virtual void SetStatic(int val);
 
   /**
    * Sets the selection used by the mapper.
@@ -260,34 +242,14 @@ public:
    */
   vtkActor* GetActor() { return this->GetRenderedProp(); }
 
-  //@{
-  /**
-   * Get/Set the name of the assembly to use for mapping block visibilities,
-   * colors and opacities.
-   *
-   * This is simply a placeholder for the future. Since this
-   * representation doesn't really support PartitionedDataSetCollections and
-   * hence assembly, the only assembly supported is the
-   * `vtkDataAssemblyUtilities::HierarchyName`. All others are simply ignored.
-   */
-  void SetActiveAssembly(const char*){};
-  //@}
-
   /**
    * Convenience method to get the array name used to scalar color with.
+   * Can return nullptr if:
+   *  * GetInputArrayInformation returns nullptr, of
+   *  * the Input array information has no FIELD_ASSOCIATION, or
+   *  * the Input array information has no FIELD_NAME.
    */
   const char* GetColorArrayName();
-
-  //@{
-  /**
-   * Specify whether or not to redistribute the data. The default is false
-   * since that is the only way in general to guarantee correct rendering.
-   * Can set to true if all rendered data sets are based on the same
-   * data partitioning in order to save on the data redistribution.
-   */
-  vtkSetMacro(UseDataPartitions, bool);
-  vtkGetMacro(UseDataPartitions, bool);
-  //@}
 
   //@{
   /**
@@ -301,6 +263,7 @@ public:
    * Specify shader replacements using a Json string.
    * Please refer to the XML definition of the property for details about
    * the expected Json string format.
+   * Only used if UseShaderReplacements is true.
    */
   virtual void SetShaderReplacements(const char*);
 
@@ -332,12 +295,6 @@ protected:
    * annotation port whose selections are localized for a particular input data object.
    */
   int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
-
-  /**
-   * Overridden to request correct ghost-level to avoid internal surfaces.
-   */
-  int RequestUpdateExtent(vtkInformation* request, vtkInformationVector** inputVector,
-    vtkInformationVector* outputVector) override;
 
   /**
    * Adds the representation to the view.  This is called from
@@ -397,7 +354,6 @@ protected:
   double Specular = 0.0;
   double Diffuse = 1.0;
   double VisibleDataBounds[6];
-  bool UseDataPartitions = false;
   bool UseShaderReplacements = false;
   std::string ShaderReplacementsString;
 

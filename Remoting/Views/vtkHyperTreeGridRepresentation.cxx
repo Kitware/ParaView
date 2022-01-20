@@ -27,11 +27,9 @@
 #include "vtkObjectFactory.h"
 #include "vtkOpenGLHyperTreeGridMapper.h"
 #include "vtkPVGeometryFilter.h"
-#include "vtkPVLODActor.h"
 #include "vtkPVRenderView.h"
 #include "vtkPVTrivialProducer.h"
 #include "vtkProcessModule.h"
-#include "vtkProperty.h"
 #include "vtkRenderer.h"
 #include "vtkScalarsToColors.h"
 #include "vtkSelection.h"
@@ -71,8 +69,6 @@ void vtkHyperTreeGridRepresentation::SetupDefaults()
   this->Actor->SetMapper(this->Mapper);
   this->Actor->SetProperty(this->Property);
 
-  // Not insanely thrilled about this API on vtkProp about properties, but oh
-  // well. We have to live with it.
   vtkNew<vtkInformation> keys;
   this->Actor->SetPropertyKeys(keys);
 }
@@ -107,27 +103,17 @@ int vtkHyperTreeGridRepresentation::ProcessViewRequest(
     // rendering nodes as and when needed.
     vtkPVView::SetPiece(inInfo, this, this->GetInput(0));
 
-    if (this->UseDataPartitions == true)
-    {
-      // We want to use this representation's data bounds to redistribute all other data in the
-      // scene if ordered compositing is needed.
-      vtkPVRenderView::SetOrderedCompositingConfiguration(
-        inInfo, this, vtkPVRenderView::USE_BOUNDS_FOR_REDISTRIBUTION);
-    }
-    else
-    {
-      // We want to let vtkPVRenderView do redistribution of data as necessary,
-      // and use this representations data for determining a load balanced distribution
-      // if ordered is needed.
-      vtkPVRenderView::SetOrderedCompositingConfiguration(inInfo, this,
-        vtkPVRenderView::DATA_IS_REDISTRIBUTABLE | vtkPVRenderView::USE_DATA_FOR_LOAD_BALANCING);
-    }
+    // We want to let vtkPVRenderView do redistribution of data as necessary,
+    // and use this representations data for determining a load balanced distribution
+    // if ordered is needed.
+    vtkPVRenderView::SetOrderedCompositingConfiguration(inInfo, this,
+      vtkPVRenderView::DATA_IS_REDISTRIBUTABLE | vtkPVRenderView::USE_DATA_FOR_LOAD_BALANCING);
+
     outInfo->Set(
       vtkPVRenderView::NEED_ORDERED_COMPOSITING(), this->NeedsOrderedCompositing() ? 1 : 0);
   }
   else if (request_type == vtkPVView::REQUEST_RENDER())
   {
-    this->SetVisibility(true);
     auto data = vtkPVView::GetDeliveredPiece(inInfo, this);
     this->Mapper->SetInputDataObject(data);
     this->Mapper->SetUseAdaptiveDecimation(this->AdaptiveDecimation);
@@ -142,26 +128,16 @@ int vtkHyperTreeGridRepresentation::ProcessViewRequest(
 }
 
 //----------------------------------------------------------------------------
-int vtkHyperTreeGridRepresentation::RequestUpdateExtent(
-  vtkInformation* request, vtkInformationVector** inputVector, vtkInformationVector* outputVector)
-{
-  this->Superclass::RequestUpdateExtent(request, inputVector, outputVector);
-
-  return 1;
-}
-
-//----------------------------------------------------------------------------
 int vtkHyperTreeGridRepresentation::RequestData(
   vtkInformation* request, vtkInformationVector** inputVector, vtkInformationVector* outputVector)
 {
-
   if (inputVector[0]->GetNumberOfInformationObjects() == 1)
   {
     vtkInformation* inInfo = inputVector[0]->GetInformationObject(0);
     if (inInfo->Has(vtkStreamingDemandDrivenPipeline::WHOLE_EXTENT()))
     {
-      vtkAlgorithmOutput* aout = this->GetInternalOutputPort();
-      vtkPVTrivialProducer* prod = vtkPVTrivialProducer::SafeDownCast(aout->GetProducer());
+      vtkAlgorithmOutput* aOut = this->GetInternalOutputPort();
+      vtkPVTrivialProducer* prod = vtkPVTrivialProducer::SafeDownCast(aOut->GetProducer());
       if (prod)
       {
         prod->SetWholeExtent(inInfo->Get(vtkStreamingDemandDrivenPipeline::WHOLE_EXTENT()));
@@ -172,7 +148,7 @@ int vtkHyperTreeGridRepresentation::RequestData(
 
   this->Mapper->SetScalarModeToUseCellData();
 
-  // essential to re-execute geometry filter consistently on all ranks since it
+  // essential to re-execute AdaptiveDecimation filter consistently on all ranks since it
   // does use parallel communication (see #19963).
   this->Mapper->Modified();
   return this->Superclass::RequestData(request, inputVector, outputVector);
@@ -191,8 +167,6 @@ bool vtkHyperTreeGridRepresentation::AddToView(vtkView* view)
   if (rview)
   {
     rview->GetRenderer()->AddActor(this->Actor);
-    // The HTG Mapper requires parallel projection if adaptive decimation is on
-    rview->SetParallelProjection(true);
 
     // Indicate that this is prop that we are rendering when hardware selection
     // is enabled.
@@ -232,7 +206,7 @@ void vtkHyperTreeGridRepresentation::SetRepresentation(const char* type)
   }
   else
   {
-    vtkErrorMacro("Invalid type: " << type);
+    vtkErrorMacro("Invalid representation type: " << type);
   }
 }
 
@@ -300,10 +274,15 @@ void vtkHyperTreeGridRepresentation::UpdateColoringParameters()
       this->Property->SetEdgeVisibility(1);
       this->Property->SetRepresentation(VTK_SURFACE);
       break;
-
-    default:
+    case SURFACE:
       this->Property->SetEdgeVisibility(0);
-      this->Property->SetRepresentation(this->Representation);
+      this->Property->SetRepresentation(VTK_SURFACE);
+      break;
+    case WIREFRAME:
+      this->Property->SetRepresentation(VTK_WIREFRAME);
+      break;
+    default:
+      vtkErrorMacro("Invalid representation: " << this->Representation);
   }
 }
 
@@ -377,18 +356,33 @@ bool vtkHyperTreeGridRepresentation::NeedsOrderedCompositing()
 void vtkHyperTreeGridRepresentation::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
+
+  // HTG specific
+  os << indent << "AdaptiveDecimation: " << this->AdaptiveDecimation << std::endl;
   os << indent << "OpenGL HTG Mapper: " << std::endl;
   this->Mapper->PrintSelf(os, indent.GetNextIndent());
+
+  // Representation
+  os << indent << "Representation: " << this->Representation << std::endl;
+  os << indent << "Internal Actor: " << std::endl;
+  this->Actor->PrintSelf(os, indent.GetNextIndent());
+  os << indent << "Internal Property: " << std::endl;
+  this->Property->PrintSelf(os, indent.GetNextIndent());
+  os << indent << "RepeatTextures: " << this->RepeatTextures << std::endl;
+  os << indent << "InterpolateTextures: " << this->InterpolateTextures << std::endl;
+  os << indent << "UseMipmapTextures: " << this->UseMipmapTextures << std::endl;
+  os << indent << "Ambient: " << this->Ambient << std::endl;
+  os << indent << "Specular: " << this->Specular << std::endl;
+  os << indent << "Diffuse: " << this->Diffuse << std::endl;
+  os << indent << "VisibleDataBounds: " << this->VisibleDataBounds << std::endl;
+  os << indent << "UseShaderReplacements: " << this->UseShaderReplacements << std::endl;
+  os << indent << "ShaderReplacementsString: " << this->ShaderReplacementsString << std::endl;
 }
 
 //----------------------------------------------------------------------------
 void vtkHyperTreeGridRepresentation::SetUseOutline(int vtkNotUsed(val))
 {
   vtkWarningMacro("Outline not supported by the HTG Representation.");
-
-  // since geometry filter needs to execute, we need to mark the representation
-  // modified.
-  this->MarkModified();
 }
 
 //****************************************************************************
@@ -799,8 +793,6 @@ void vtkHyperTreeGridRepresentation::SetLookupTable(vtkScalarsToColors* val)
 {
   this->Mapper->SetLookupTable(val);
 }
-
-//----------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------
 void vtkHyperTreeGridRepresentation::SetMapScalars(bool val)
