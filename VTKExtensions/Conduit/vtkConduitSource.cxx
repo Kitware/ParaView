@@ -635,6 +635,12 @@ int vtkConduitSource::RequestData(
       // set the mesh name.
       output->GetMetaData(cc)->Set(vtkCompositeDataSet::NAME(), child.name().c_str());
       name_map[child.name()] = static_cast<unsigned int>(cc);
+
+      // set field data.
+      if (child.has_path("state/fields"))
+      {
+        detail::AddFieldData(pd, child["state/fields"]);
+      }
     }
 
     if (internals.AssemblyNodeValid)

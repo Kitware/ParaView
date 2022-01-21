@@ -24,6 +24,14 @@ def catalyst_execute(info):
             gridInfo.GetPointDataInformation().GetArrayInformation("velocity").GetComponentRange(0))
     print("  pressure-range:",
             gridInfo.GetCellDataInformation().GetArrayInformation("pressure").GetComponentRange(0))
+    print("  author:",
+            gridInfo.GetFieldDataInformation().GetArrayInformation("author").GetRangesAsString())
+    print("  mesh time:",
+            gridInfo.GetFieldDataInformation().GetArrayInformation("mesh time").GetComponentRange(0))
+    print("  mesh timestep:",
+            gridInfo.GetFieldDataInformation().GetArrayInformation("mesh timestep").GetComponentRange(0))
+    print("  mesh external data:",
+            gridInfo.GetFieldDataInformation().GetArrayInformation("mesh external data").GetComponentRange(0))
 
     print("particles:")
     print("  bounds:", particlesInfo.GetBounds())
