@@ -25,6 +25,7 @@
     <Proxy group="filters" name="Calculator" omit_from_toolbar="1" />
     <Proxy group="filters" name="ExtractCellsAlongLine" omit_from_toolbar="1" />
     <Proxy group="filters" name="ExtractCellsAlongLineCustom" omit_from_toolbar="1" />
+    <Proxy group="filters" name="ExtractCellsByType" omit_from_toolbar="1" />
     <Proxy group="filters" name="ExtractSelection" />
     <Proxy group="filters" name="ExtractSelectionOverTime" />
     <Proxy group="filters" name="ExtractHistogram" />
@@ -223,6 +224,7 @@
   <Proxy group="filters" name="ExtractBlock" icon=":/pqWidgets/Icons/pqGroupExtract.svg" />
   <Proxy group="filters" name="ExtractCellsAlongLine" />
   <Proxy group="filters" name="ExtractCellsAlongLineCustom" />
+  <Proxy group="filters" name="ExtractCellsByType" />
   <Proxy group="filters" name="ExtractComponent" />
   <Proxy group="filters" name="ExtractEdges" />
   <Proxy group="filters" name="ExtractEnclosedPoints" />
