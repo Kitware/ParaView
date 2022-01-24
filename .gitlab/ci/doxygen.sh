@@ -11,7 +11,7 @@ readonly tarball="$target.linux.bin.tar.gz"
 cd .gitlab
 
 echo "$sha256sum $tarball" > doxygen.sha256
-curl -OL "https://sourceforge.net/projects/doxygen/files/rel-$version/$tarball"
+curl -OL "https://www.paraview.org/files/dependencies/$tarball"
 sha256sum --check doxygen.sha256
 
 cmake/bin/cmake -E tar xf "$tarball"
