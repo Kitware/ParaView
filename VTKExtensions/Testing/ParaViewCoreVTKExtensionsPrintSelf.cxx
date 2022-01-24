@@ -35,7 +35,6 @@
 //#include "vtkEnzoReader.h"
 #include "vtkEquivalenceSet.h"
 #include "vtkExodusFileSeriesReader.h"
-#include "vtkExtractHistogram.h"
 #include "vtkExtractScatterPlot.h"
 #include "vtkFileSequenceParser.h"
 #include "vtkFileSeriesReader.h"
@@ -211,7 +210,6 @@ int ParaViewCoreVTKExtensionsPrintSelf(int, char*[])
   // PRINT_SELF(vtkEnzoReader);
   PRINT_SELF(vtkEquivalenceSet);
   PRINT_SELF(vtkExodusFileSeriesReader);
-  PRINT_SELF(vtkExtractHistogram);
   PRINT_SELF(vtkExtractScatterPlot);
   PRINT_SELF(vtkFileSequenceParser);
   PRINT_SELF(vtkFileSeriesReader);

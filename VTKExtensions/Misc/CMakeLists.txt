@@ -35,7 +35,6 @@ set(classes
   vtkCleanArrays
   vtkCompleteArrays
   vtkEnvironmentAnnotationFilter
-  vtkExtractHistogram
   vtkMergeBlocks
   vtkMinMax
   vtkPExtractHistogram
