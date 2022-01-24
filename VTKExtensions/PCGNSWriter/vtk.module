@@ -1,0 +1,34 @@
+NAME
+  ParaView::VTKExtensionsPCGNSWriter
+LIBRARY_NAME
+  vtkPVVTKExtensionsPCGNSWriter
+CONDITION
+  PARAVIEW_USE_MPI
+KIT
+  ParaView::CoreKit
+GROUPS
+  PARAVIEW_CANONICAL
+DEPENDS
+  VTK::IOCore
+  VTK::ParallelCore
+  VTK::mpi
+  ParaView::VTKExtensionsCGNSWriter
+PRIVATE_DEPENDS
+  VTK::cgns
+  VTK::CommonCore
+  VTK::CommonDataModel
+  VTK::CommonExecutionModel
+  VTK::FiltersCore
+  VTK::FiltersGeneral
+  VTK::ParallelMPI
+TEST_DEPENDS
+  ParaView::VTKExtensionsCore
+  VTK::vtksys
+  VTK::IOCGNSReader
+  VTK::TestingCore
+  VTK::ParallelMPI
+  VTK::CommonCore
+  VTK::CommonDataModel
+  VTK::CommonExecutionModel
+  VTK::FiltersCore
+  VTK::FiltersGeneral

@@ -1128,6 +1128,11 @@ int vtkCGNSWriter::RequestData(vtkInformation* request, vtkInformationVector** i
   }
 
   vtkInformation* inInfo = inputVector[0]->GetInformationObject(0);
+  if (this->OriginalInput)
+  {
+    this->OriginalInput->UnRegister(this);
+  }
+
   this->OriginalInput = vtkDataObject::SafeDownCast(inInfo->Get(vtkDataObject::DATA_OBJECT()));
   if (this->OriginalInput)
   {
