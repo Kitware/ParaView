@@ -1566,6 +1566,15 @@
           specified as a 4-tuple of the form (xmin, xmax, ymin, ymax).
         </Documentation>
       </DoubleVectorProperty>
+      <IntVectorProperty command="SetOutputDimensions"
+                         default_values="10 10"
+                         name="OutputDimensions"
+                         number_of_elements="2"
+                         panel_visibility="never" >
+        <Documentation>
+          The dimensions of the image that represents this 2D transfer function.
+        </Documentation>
+      </IntVectorProperty>
     </TransferFunction2DProxy>
     <!-- end of "transfer_2d_functions" -->
   </ProxyGroup>

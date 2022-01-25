@@ -85,6 +85,25 @@ inline vtkSMProperty* GetTransferFunction2DRangeProperty(vtkSMProxy* self)
 }
 
 //----------------------------------------------------------------------------
+inline vtkSMProperty* GetTransferFunction2DOutputDimensionsProperty(vtkSMProxy* self)
+{
+  vtkSMProperty* outDimsProperty = self->GetProperty("OutputDimensions");
+  if (!outDimsProperty)
+  {
+    vtkGenericWarningMacro("'OutputDimensions' property is required.");
+    return nullptr;
+  }
+  vtkSMPropertyHelper outDims(outDimsProperty);
+  unsigned int num_elements = outDims.GetNumberOfElements();
+  if (num_elements != 2)
+  {
+    vtkGenericWarningMacro("'OutputDimensions' property must have 2-tuples. Resizing.");
+    outDims.SetNumberOfElements(2);
+  }
+  return outDimsProperty;
+}
+
+//----------------------------------------------------------------------------
 // Normalize cntrlBoxes so that the two ranges go from (0, 1).
 // The cntrlBoxes are assumed to be using log-space interpolation
 // if "log_space" is true. The result is always in linear space
@@ -731,6 +750,15 @@ vtkSmartPointer<vtkImageData> vtkSMTransferFunction2DProxy::ComputeDataHistogram
     rangeHelper.Set(currentRange.GetData(), 4);
     this->UpdateVTKObjects();
   }
+
+  // Update the output dimensions property once the image is updated
+  vtkSMProperty* outDimsProperty = GetTransferFunction2DOutputDimensionsProperty(this);
+  vtkSMPropertyHelper outDimsHelper(outDimsProperty);
+  int outDims[2];
+  outDims[0] = numberOfBins;
+  outDims[1] = numberOfBins;
+  outDimsHelper.Set(outDims, 2);
+
   return this->Histogram2DCache;
 }
 

@@ -618,7 +618,8 @@ void vtkImageVolumeRepresentation::SetTransferFunction2D(vtkPVTransferFunction2D
       vtkDataArray* arr = func->GetPointData()->GetScalars();
       if (!arr)
       {
-        func->SetDimensions(10, 10, 1);
+        int* dims = this->TransferFunction2D->GetOutputDimensions();
+        func->SetDimensions(dims[0], dims[1], 1);
         func->AllocateScalars(VTK_FLOAT, 4);
       }
       this->Property->SetTransferFunction2D(func);
