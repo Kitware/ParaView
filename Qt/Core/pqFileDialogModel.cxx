@@ -348,7 +348,7 @@ public:
     this->FileInformation.TakeReference(vtkPVFileInformation::New());
 
     // current path
-    vtkPVFileInformation* info = this->GetData(false, "", ".", false);
+    vtkPVFileInformation* info = this->GetData(false, "", ".", false, true);
     this->CurrentPath = info->GetFullPath();
   }
 
@@ -364,14 +364,14 @@ public:
 
   /// query the file system for information
   vtkPVFileInformation* GetData(
-    bool dirListing, const QString& path, bool specialDirs, bool groupFiles = true)
+    bool dirListing, const QString& path, bool specialDirs, bool groupFiles)
   {
     return this->GetData(dirListing, this->CurrentPath, path, specialDirs, groupFiles);
   }
 
   /// query the file system for information
   vtkPVFileInformation* GetData(bool dirListing, const QString& workingDir, const QString& path,
-    bool specialDirs, bool groupFiles = true)
+    bool specialDirs, bool groupFiles)
   {
     if (this->FileInformationHelperProxy)
     {
@@ -646,7 +646,7 @@ QString pqFileDialogModel::absoluteFilePath(const QString& path)
   }
 
   vtkPVFileInformation* info;
-  info = this->Implementation->GetData(false, path, false);
+  info = this->Implementation->GetData(false, path, false, true);
   return this->Implementation->cleanPath(QString::fromUtf8(info->GetFullPath()));
 }
 
@@ -682,12 +682,12 @@ bool pqFileDialogModel::fileExists(const QString& file, QString& fullpath)
 {
   QString filePath = this->Implementation->cleanPath(file);
   vtkPVFileInformation* info;
-  info = this->Implementation->GetData(false, filePath, false);
+  info = this->Implementation->GetData(false, filePath, false, true);
 
   // try again for shortcut
   if (info->GetType() != vtkPVFileInformation::SINGLE_FILE)
   {
-    info = this->Implementation->GetData(false, filePath + ".lnk", false);
+    info = this->Implementation->GetData(false, filePath + ".lnk", false, true);
   }
 
   if (info->GetType() == vtkPVFileInformation::SINGLE_FILE)
@@ -726,7 +726,7 @@ bool pqFileDialogModel::mkdir(const QString& dirName)
   this->beginResetModel();
   QString cPath = this->Implementation->cleanPath(this->getCurrentPath());
   vtkPVFileInformation* info;
-  info = this->Implementation->GetData(true, cPath, false);
+  info = this->Implementation->GetData(true, cPath, false, true);
   this->Implementation->Update(cPath, info);
   this->endResetModel();
 
@@ -761,7 +761,7 @@ bool pqFileDialogModel::rmdir(const QString& dirName)
   this->beginResetModel();
   QString cPath = this->Implementation->cleanPath(this->getCurrentPath());
   vtkPVFileInformation* info;
-  info = this->Implementation->GetData(true, cPath, false);
+  info = this->Implementation->GetData(true, cPath, false, true);
   this->Implementation->Update(cPath, info);
   this->endResetModel();
 
@@ -779,7 +779,7 @@ bool pqFileDialogModel::rename(const QString& oldname, const QString& newname)
   }
 
   vtkPVFileInformation* info;
-  info = this->Implementation->GetData(false, oldPath, false);
+  info = this->Implementation->GetData(false, oldPath, false, true);
 
   int oldType = info->GetType();
 
@@ -789,7 +789,7 @@ bool pqFileDialogModel::rename(const QString& oldname, const QString& newname)
   }
 
   // don't replace file/dir
-  info = this->Implementation->GetData(false, newPath, false);
+  info = this->Implementation->GetData(false, newPath, false, true);
   if (info->GetType() == oldType)
   {
     QString message("Cannot rename to %1, which already exists");
@@ -815,7 +815,7 @@ bool pqFileDialogModel::rename(const QString& oldname, const QString& newname)
 
   this->beginResetModel();
   QString cPath = this->Implementation->cleanPath(this->getCurrentPath());
-  info = this->Implementation->GetData(true, cPath, false);
+  info = this->Implementation->GetData(true, cPath, false, true);
   this->Implementation->Update(cPath, info);
   this->endResetModel();
 
@@ -826,12 +826,12 @@ bool pqFileDialogModel::dirExists(const QString& path, QString& fullpath)
 {
   QString dir = this->Implementation->cleanPath(path);
   vtkPVFileInformation* info;
-  info = this->Implementation->GetData(false, dir, false);
+  info = this->Implementation->GetData(false, dir, false, true);
 
   // try again for shortcuts
   if (!vtkPVFileInformation::IsDirectory(info->GetType()))
   {
-    info = this->Implementation->GetData(false, dir + ".lnk", false);
+    info = this->Implementation->GetData(false, dir + ".lnk", false, true);
   }
 
   if (vtkPVFileInformation::IsDirectory(info->GetType()))
