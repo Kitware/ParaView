@@ -3,7 +3,7 @@
         {
             "group": "master",
             "site": "gitlab-ci",
-            "buildname": "[fedora31_shared_icc_mpi_python]"
+            "buildname": "[el8_shared_icc_mpi_python]"
         },
         {
             "group": "master",

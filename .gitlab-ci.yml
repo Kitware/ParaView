@@ -62,25 +62,25 @@ fedora33-static-mpi-offscreen-osmesa-python:test:
     needs:
         - fedora33-static-mpi-offscreen-osmesa-python:build
 
-fedora31-shared-icc-mpi-python:build:
+el8-shared-icc-mpi-python:build:
     extends:
-        - .fedora31_shared_icc_mpi_python
+        - .el8_shared_icc_mpi_python
         - .cmake_build_linux
         - .linux_builder_tags
         - .cmake_build_artifacts
         - .run_manually
 
-fedora31-shared-icc-mpi-python:test:
+el8-shared-icc-mpi-python:test:
     extends:
-        - .fedora31_shared_icc_mpi_python
+        - .el8_shared_icc_mpi_python
         - .cmake_test_linux
         - .linux_tester_tags
         - .cmake_test_artifacts
         - .run_automatically
     dependencies:
-        - fedora31-shared-icc-mpi-python:build
+        - el8-shared-icc-mpi-python:build
     needs:
-        - fedora31-shared-icc-mpi-python:build
+        - el8-shared-icc-mpi-python:build
 
 fedora33-shared-debug-mpi-python-qt:build:
     extends:
