@@ -22,11 +22,13 @@ def catalyst_execute(info):
     print("-----------------------------------")
     print("executing (cycle={}, time={})".format(info.cycle, info.time))
     print("grid:")
+    print("  type:", grid.GetDataInformation().GetDataSetTypeAsString())
     print("  time:", gridTime)
     print("  bounds:", grid.GetDataInformation().GetBounds())
     print("  velocity-range:", grid.PointData["velocity"].GetRange())
     print("  pressure-range:", grid .CellData["pressure"].GetRange(0))
 
     print("particles:")
+    print("  type:", particles.GetDataInformation().GetDataSetTypeAsString())
     print("  time:", particleTime)
     print("  bounds:", particles.GetDataInformation().GetBounds())

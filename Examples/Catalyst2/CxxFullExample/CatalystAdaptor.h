@@ -42,6 +42,7 @@ void Execute(int cycle, double time, Grid& grid, Attributes& attribs)
   auto state = exec_params["catalyst/state"];
   state["timestep"].set(cycle);
   state["time"].set(time);
+  state["multiblock"].set(1);
 
   // Add channels.
   // We only have 1 channel here. Let's name it 'grid'.

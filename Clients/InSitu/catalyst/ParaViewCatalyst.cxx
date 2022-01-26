@@ -47,7 +47,7 @@
 
 static bool update_producer_mesh_blueprint(const std::string& channel_name,
   const conduit_node* node, const conduit_node* global_fields, bool multimesh,
-  const conduit_node* assemblyNode)
+  const conduit_node* assemblyNode, bool multiblock)
 {
   auto producer = vtkInSituInitializationHelper::GetProducer(channel_name);
   if (producer == nullptr)
@@ -67,6 +67,7 @@ static bool update_producer_mesh_blueprint(const std::string& channel_name,
   algo->SetNode(node);
   algo->SetGlobalFieldsNode(global_fields);
   algo->SetUseMultiMeshProtocol(multimesh);
+  algo->SetOutputMultiBlock(multiblock);
   algo->SetAssemblyNode(assemblyNode);
   vtkInSituInitializationHelper::MarkProducerModified(channel_name);
   return true;
@@ -306,6 +307,9 @@ enum catalyst_status catalyst_execute_paraview(const conduit_node* params)
     : (root.has_path("state/cycle") ? root["state/cycle"].to_int64() : 0);
   const double time = root.has_path("state/time") ? root["state/time"].to_float64() : 0;
 
+  const int output_multiblock =
+    root.has_path("state/multiblock") ? root["state/multiblock"].to_int() : 0;
+
   vtkVLogScopeF(
     PARAVIEW_LOG_CATALYST_VERBOSITY(), "co-processing for timestep=%d, time=%f", timestep, time);
 
@@ -333,6 +337,10 @@ enum catalyst_status catalyst_execute_paraview(const conduit_node* params)
 
       const double channel_time =
         channel_node.has_path("state/time") ? channel_node["state/time"].to_float64() : time;
+
+      const int channel_output_multiblock = channel_node.has_path("state/multiblock")
+        ? channel_node["state/multiblock"].to_int()
+        : output_multiblock;
 
       if (type == "mesh")
       {
@@ -407,7 +415,8 @@ enum catalyst_status catalyst_execute_paraview(const conduit_node* params)
           assembly = conduit_cpp::c_node(&anode);
         }
         update_producer_mesh_blueprint(channel_name, conduit_cpp::c_node(&data_node),
-          conduit_cpp::c_node(&fields), type == "multimesh", assembly);
+          conduit_cpp::c_node(&fields), type == "multimesh", assembly,
+          channel_output_multiblock != 0);
       }
       else if (type == "ioss")
       {

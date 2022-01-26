@@ -17,6 +17,7 @@
 #include "vtkCellArray.h"
 #include "vtkCellArrayIterator.h"
 #include "vtkConduitArrayUtilities.h"
+#include "vtkConvertToMultiBlockDataSet.h"
 #include "vtkDataArray.h"
 #include "vtkDataAssembly.h"
 #include "vtkDataSetAttributes.h"
@@ -27,6 +28,7 @@
 #include "vtkInformationVector.h"
 #include "vtkIntArray.h"
 #include "vtkLogger.h"
+#include "vtkMultiBlockDataSet.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkPartitionedDataSet.h"
@@ -541,6 +543,7 @@ vtkStandardNewMacro(vtkConduitSource);
 vtkConduitSource::vtkConduitSource()
   : Internals(new vtkConduitSource::vtkInternals())
   , UseMultiMeshProtocol(false)
+  , OutputMultiBlock(false)
 {
   this->SetNumberOfInputPorts(0);
   this->SetNumberOfOutputPorts(1);
@@ -598,8 +601,10 @@ void vtkConduitSource::SetAssemblyNode(const conduit_node* node)
 int vtkConduitSource::RequestDataObject(
   vtkInformation*, vtkInformationVector**, vtkInformationVector* outputVector)
 {
-  const int dataType =
-    this->UseMultiMeshProtocol ? VTK_PARTITIONED_DATA_SET_COLLECTION : VTK_PARTITIONED_DATA_SET;
+  const int dataType = this->OutputMultiBlock
+    ? VTK_MULTIBLOCK_DATA_SET
+    : this->UseMultiMeshProtocol ? VTK_PARTITIONED_DATA_SET_COLLECTION : VTK_PARTITIONED_DATA_SET;
+
   return this->SetOutputDataObject(dataType, outputVector->GetInformationObject(0), /*exact=*/true)
     ? 1
     : 0;
@@ -610,30 +615,29 @@ int vtkConduitSource::RequestData(
   vtkInformation*, vtkInformationVector**, vtkInformationVector* outputVector)
 {
   auto& internals = (*this->Internals);
+  vtkDataObject* real_output = vtkDataObject::GetData(outputVector, 0);
   if (this->UseMultiMeshProtocol)
   {
-    auto output = vtkPartitionedDataSetCollection::GetData(outputVector, 0);
-    assert(output != nullptr);
-
+    vtkNew<vtkPartitionedDataSetCollection> pdc_output;
     const auto& node = internals.Node;
     const auto count = node.number_of_children();
-    output->SetNumberOfPartitionedDataSets(static_cast<unsigned int>(count));
+    pdc_output->SetNumberOfPartitionedDataSets(static_cast<unsigned int>(count));
 
     std::map<std::string, unsigned int> name_map;
     for (conduit_index_t cc = 0; cc < count; ++cc)
     {
       const auto child = node.child(cc);
-      auto pd = output->GetPartitionedDataSet(static_cast<unsigned int>(cc));
+      auto pd = pdc_output->GetPartitionedDataSet(static_cast<unsigned int>(cc));
       assert(pd != nullptr);
       if (!detail::RequestMesh(pd, child))
       {
         vtkLogF(ERROR, "Failed reading mesh '%s'", child.name().c_str());
-        output->Initialize();
+        real_output->Initialize();
         return 0;
       }
 
       // set the mesh name.
-      output->GetMetaData(cc)->Set(vtkCompositeDataSet::NAME(), child.name().c_str());
+      pdc_output->GetMetaData(cc)->Set(vtkCompositeDataSet::NAME(), child.name().c_str());
       name_map[child.name()] = static_cast<unsigned int>(cc);
 
       // set field data.
@@ -688,28 +692,38 @@ int vtkConduitSource::RequestData(
       };
       // assembly->SetRootNodeName(....); What should this be?
       helper(assembly->GetRootNode(), internals.AssemblyNode);
-      output->SetDataAssembly(assembly);
+      pdc_output->SetDataAssembly(assembly);
     }
+    real_output->ShallowCopy(pdc_output);
   }
   else
   {
-    auto output = vtkPartitionedDataSet::GetData(outputVector, 0);
-    assert(output != nullptr);
-    if (!detail::RequestMesh(output, internals.Node))
+    vtkNew<vtkPartitionedDataSet> pd_output;
+    if (!detail::RequestMesh(pd_output, internals.Node))
     {
+      vtkLogF(ERROR, "Failed reading mesh from '%s'", internals.Node.name().c_str());
+      real_output->Initialize();
       return 0;
     }
+    real_output->ShallowCopy(pd_output);
   }
 
-  auto dobj = vtkDataObject::GetData(outputVector, 0);
+  if (this->OutputMultiBlock)
+  {
+    vtkNew<vtkConvertToMultiBlockDataSet> converter;
+    converter->SetInputData(real_output);
+    converter->Update();
+    real_output->ShallowCopy(converter->GetOutput());
+  }
+
   if (internals.GlobalFieldsNodeValid)
   {
-    detail::AddGlobalData(dobj, internals.GlobalFieldsNode);
+    detail::AddGlobalData(real_output, internals.GlobalFieldsNode);
   }
 
   if (internals.Node.has_path("state/fields"))
   {
-    detail::AddFieldData(dobj, internals.Node["state/fields"]);
+    detail::AddFieldData(real_output, internals.Node["state/fields"]);
   }
 
   return 1;

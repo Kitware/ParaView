@@ -286,6 +286,18 @@ bool verify(const std::string& protocol, const conduit_cpp::Node& n)
   {
     vtkVLogF(PARAVIEW_LOG_CATALYST_VERBOSITY(), "'time' set to %lf", n["time"].to_float64());
   }
+
+  if (n.has_child("multiblock") && !n["multiblock"].dtype().is_integer())
+  {
+    vtkLogF(ERROR, "'multiblock' must be an integral.");
+    return false;
+  }
+  else
+  {
+    vtkVLogF(
+      PARAVIEW_LOG_CATALYST_VERBOSITY(), "'multiblock' set to %" PRIi32, n["multiblock"].to_int());
+  }
+
   return true;
 }
 } // namespace state
