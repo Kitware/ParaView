@@ -1,3 +1,8 @@
+# pvweb tests require asyncio.
+if (Python3_VERSION VERSION_LESS "3.7")
+  return ()
+endif ()
+
 include(FindPythonModules)
 find_python_module(wslink wslink_found)
 
