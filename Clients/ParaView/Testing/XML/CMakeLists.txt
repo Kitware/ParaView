@@ -275,6 +275,9 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/DataAxesGrid2X.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/DataAxesGrid-Custom.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/DataAxesGrid-CustomWithReset.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/DeleteSubtreePipelineBrowser0.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/DeleteSubtreePipelineBrowser1.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/DeleteSubtreePipelineBrowser2.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/EdgeTintPBR.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/EDLWithSubsampling.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/EllipseSource1.png}"
@@ -709,6 +712,7 @@ SET (TESTS_WITH_INLINE_COMPARES
   Contour.xml
   ContourRange.xml
   DataAxesGrid2X.xml
+  DeleteSubtreePipelineBrowser.xml
   EllipseSource.xml
   Ensemble.xml
   ExtractSubsetWithSeed.xml
