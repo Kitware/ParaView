@@ -200,6 +200,40 @@ bool vtkSMPVRepresentationProxy::GetUsingScalarColoring()
 }
 
 //----------------------------------------------------------------------------
+void vtkSMPVRepresentationProxy::SetupLookupTable(vtkSMProxy* proxy)
+{
+  if (vtkSMPVRepresentationProxy::GetUsingScalarColoring(proxy))
+  {
+    // If representation has been initialized to use scalar coloring and no
+    // transfer functions are setup, we setup the transfer functions.
+    vtkSMPropertyHelper helper(proxy, "ColorArrayName");
+    const char* arrayName = helper.GetInputArrayNameToProcess();
+    if (arrayName != nullptr && arrayName[0] != '\0')
+    {
+      vtkNew<vtkSMTransferFunctionManager> mgr;
+      if (vtkSMProperty* sofProperty = proxy->GetProperty("ScalarOpacityFunction"))
+      {
+        vtkSMProxy* sofProxy =
+          mgr->GetOpacityTransferFunction(arrayName, proxy->GetSessionProxyManager());
+        vtkSMPropertyHelper(sofProperty).Set(sofProxy);
+      }
+      if (vtkSMProperty* lutProperty = proxy->GetProperty("LookupTable"))
+      {
+        vtkSMTransferFunctionProxy* lutProxy = vtkSMTransferFunctionProxy::SafeDownCast(
+          mgr->GetColorTransferFunction(arrayName, proxy->GetSessionProxyManager()));
+        int rescaleMode =
+          vtkSMPropertyHelper(lutProxy, "AutomaticRescaleRangeMode", true).GetAsInt();
+        vtkSMPropertyHelper(lutProperty).Set(lutProxy);
+        bool extend = rescaleMode == vtkSMTransferFunctionManager::GROW_ON_APPLY;
+        bool force = false;
+        vtkSMPVRepresentationProxy::RescaleTransferFunctionToDataRange(proxy, extend, force);
+        proxy->UpdateVTKObjects();
+      }
+    }
+  }
+}
+
+//----------------------------------------------------------------------------
 bool vtkSMPVRepresentationProxy::RescaleTransferFunctionToDataRange(bool extend, bool force)
 {
   if (!this->GetUsingScalarColoring())

@@ -1062,6 +1062,7 @@ list(APPEND TESTS_WITH_BASELINES
   ClearCoatPBR.xml
   ConvertToMolecule.xml
   ContourCellData.xml
+  CopyPasteFilters.xml
   CopyPasteProperties.xml
   CustomTCoords.xml
   CTHAMRBaseline.xml

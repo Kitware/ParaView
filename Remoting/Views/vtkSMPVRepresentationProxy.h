@@ -72,6 +72,12 @@ public:
   ///@}
 
   /**
+   * Given the input registered representation `proxy`, sets up a lookup table associated with the
+   * representation if a scalar bar is being used for `proxy`.
+   */
+  static void SetupLookupTable(vtkSMProxy* proxy);
+
+  /**
    * Updates the ranges shown in the scalar bar.
    * If deleteRange is true, then the range stored for current representation proxy is deleted.
    * This should be done when the scalar bar gets separated or becomes not visible.

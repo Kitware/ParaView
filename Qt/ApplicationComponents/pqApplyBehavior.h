@@ -74,6 +74,8 @@ public:
   void unregisterPanel(pqPropertiesPanel* panel);
   ///@}
 
+  static void hideInputIfRequired(pqPipelineFilter* filter, pqView* view);
+
 Q_SIGNALS:
   void triggerApply();
 
@@ -89,7 +91,6 @@ private Q_SLOTS:
 
 protected:
   virtual void showData(pqPipelineSource* source, pqView* view);
-  void hideInputIfRequired(pqPipelineFilter* filter, pqView* view);
 
 private:
   Q_DISABLE_COPY(pqApplyBehavior)
