@@ -58,6 +58,7 @@ set(classes
   pqCatalystRemoveBreakpointReaction
   pqCatalystSetBreakpointReaction
   pqCategoryToolbarsBehavior
+  pqChangeFileNameReaction
   pqChangePipelineInputReaction
   pqChartSelectionReaction
   pqChooseColorPresetReaction

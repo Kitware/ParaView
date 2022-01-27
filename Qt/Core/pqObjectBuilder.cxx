@@ -59,6 +59,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqAnimationCue.h"
 #include "pqApplicationCore.h"
+#include "pqCoreUtilities.h"
 #include "pqDataRepresentation.h"
 #include "pqInterfaceTracker.h"
 #include "pqOutputPort.h"
@@ -235,30 +236,7 @@ pqPipelineSource* pqObjectBuilder::createReader(
     return nullptr;
   }
 
-  unsigned int numFiles = files.size();
-  QString reg_name = QFileInfo(files[0]).fileName();
-
-  if (numFiles > 1)
-  {
-    // Find the largest prefix that matches all filenames, and then append a '*'
-    // to signify that it is a collection of files.  If they all start with
-    // something different, just give up and add the '*' anyway.
-    for (unsigned int i = 1; i < numFiles; i++)
-    {
-      QString nextFile = QFileInfo(files[i]).fileName();
-      if (nextFile.startsWith(reg_name))
-        continue;
-      QString commonPrefix = reg_name;
-      do
-      {
-        commonPrefix.chop(1);
-      } while (!nextFile.startsWith(commonPrefix) && !commonPrefix.isEmpty());
-      if (commonPrefix.isEmpty())
-        break;
-      reg_name = commonPrefix;
-    }
-    reg_name += '*';
-  }
+  QString reg_name = pqCoreUtilities::findLargestPrefix(files);
 
   vtkNew<vtkSMParaViewPipelineController> controller;
   vtkSMSessionProxyManager* pxm = server->proxyManager();
@@ -287,7 +265,7 @@ pqPipelineSource* pqObjectBuilder::createReader(
       use_dir = true;
     }
 
-    if (numFiles == 1 || !prop->GetRepeatCommand())
+    if (files.size() == 1 || !prop->GetRepeatCommand())
     {
       pqSMAdaptor::setElementProperty(prop, pqObjectBuilderGetPath(files[0], use_dir));
     }

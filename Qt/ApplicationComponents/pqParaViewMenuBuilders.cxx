@@ -53,6 +53,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqCatalystRemoveBreakpointReaction.h"
 #include "pqCatalystSetBreakpointReaction.h"
 #include "pqCategoryToolbarsBehavior.h"
+#include "pqChangeFileNameReaction.h"
 #include "pqChangePipelineInputReaction.h"
 #include "pqColorToolbar.h"
 #include "pqCopyReaction.h"
@@ -208,6 +209,7 @@ void pqParaViewMenuBuilders::buildEditMenu(QMenu& menu, pqPropertiesPanel* prope
   new pqCameraUndoRedoReaction(ui.actionEditCameraUndo, true);
   new pqCameraUndoRedoReaction(ui.actionEditCameraRedo, false);
   new pqChangePipelineInputReaction(ui.actionChangeInput);
+  new pqChangeFileNameReaction(ui.actionChangeFile);
   new pqIgnoreSourceTimeReaction(ui.actionIgnoreTime);
   new pqDeleteReaction(ui.actionDelete);
   ui.actionDelete->setShortcut(QKeySequence(Qt::ALT + Qt::Key_D));
@@ -472,6 +474,15 @@ void pqParaViewMenuBuilders::buildPipelineBrowserContextMenu(QMenu& menu, QMainW
     "Reload data files in case they were changed externally.", Q_NULLPTR));
 #endif // QT_NO_TOOLTIP
 
+  QAction* actionPBChangeFile = new QAction(menu.parent());
+  actionPBChangeFile->setObjectName(QStringLiteral("actionPBChangeFile"));
+  actionPBChangeFile->setText(
+    QApplication::translate("pqPipelineBrowserContextMenu", "Change File", Q_NULLPTR));
+#ifndef QT_NO_STATUSTIP
+  actionPBChangeFile->setStatusTip(
+    QApplication::translate("pqPipelineBrowserContextMenu", "Change File", Q_NULLPTR));
+#endif // QT_NO_STATUSTIP
+
   QAction* actionPBIgnoreTime = new QAction(menu.parent());
   actionPBIgnoreTime->setObjectName(QStringLiteral("actionPBIgnoreTime"));
   actionPBIgnoreTime->setCheckable(true);
@@ -546,6 +557,7 @@ void pqParaViewMenuBuilders::buildPipelineBrowserContextMenu(QMenu& menu, QMainW
   menu.addAction(actionPBDelete);
   menu.addAction(actionPBRename);
   menu.addAction(actionPBReloadFiles);
+  menu.addAction(actionPBChangeFile);
   menu.addAction(actionPBIgnoreTime);
   menu.addSeparator();
   menu.addAction(actionPBChangeInput);
@@ -570,6 +582,7 @@ void pqParaViewMenuBuilders::buildPipelineBrowserContextMenu(QMenu& menu, QMainW
   new pqCreateCustomFilterReaction(actionPBCreateCustomFilter);
   new pqLinkSelectionReaction(actionPBLinkSelection);
   new pqRenameProxyReaction(actionPBRename, mainWindow);
+  new pqChangeFileNameReaction(actionPBChangeFile);
 }
 
 //-----------------------------------------------------------------------------
