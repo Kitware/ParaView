@@ -343,6 +343,54 @@
       <!-- End of ExtractSelection -->
     </SourceProxy>
 
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkPVExtractCellsByType"
+                 label="Extract Cells By Type"
+                 name="ExtractCellsByType">
+      <Documentation short_help="Extract cells based on their type.">
+        This filter extracts cells of the selected types.
+        If the data set does not contain cells of the chosen types, the output is empty.
+      </Documentation>
+
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkDataSet" />
+        </DataTypeDomain>
+        <Documentation>
+          This property specifies the input of the filter.
+        </Documentation>
+      </InputProperty>
+
+      <StringVectorProperty name="CellTypeSelectionInfo"
+                            command="GetCellTypeSelection"
+                            number_of_elements_per_command="2"
+                            information_only="1"
+                            si_class="vtkSIDataArraySelectionProperty" />
+
+      <StringVectorProperty name="CellTypes"
+                            command="GetCellTypeSelection"
+                            information_property="CellTypeSelectionInfo"
+                            number_of_elements_per_command="2"
+                            element_types="2 0"
+                            repeat_command="1"
+                            si_class="vtkSIDataArraySelectionProperty">
+        <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+            <Property function="ArrayList" name="CellTypeSelectionInfo" />
+          </RequiredProperties>
+        </ArraySelectionDomain>
+        <Documentation>
+          Select the cell types to extract.
+        </Documentation>
+      </StringVectorProperty>
+      <!-- End of ExtractCellsByType -->
+    </SourceProxy>
+
     <!-- end of filters -->
   </ProxyGroup>
 
