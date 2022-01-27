@@ -6,87 +6,109 @@
     <NullProxy name="Scalar"></NullProxy>
     <Proxy class="vtkPointLocator"
            name="PointLocator">
-      <Documentation>Point locator based on a search structure of uniform
-      fixed-resolution bins / buckets for point location and generic (zero or
-      non-zero) tolerance point insertion.</Documentation>
+      <Documentation>
+        Point locator based on a search structure of uniform
+        fixed-resolution bins / buckets for point location and generic (zero or
+        non-zero) tolerance point insertion.
+      </Documentation>
       <IntVectorProperty command="SetDivisions"
                          default_values="50 50 50"
                          name="Divisions"
                          number_of_elements="3">
-        <Documentation>Specify the number of divisions in each axis / direction
-        (x, y, z) for creating a search structure of uniform fixed-resolution
-        bins / buckets.</Documentation>
+        <Documentation>
+          Specify the number of divisions in each axis / direction
+          (x, y, z) for creating a search structure of uniform fixed-resolution
+          bins / buckets.
+        </Documentation>
       </IntVectorProperty>
       <IntVectorProperty command="SetNumberOfPointsPerBucket"
                          default_values="8"
                          label="Number of points per bucket"
                          name="NumberOfPointsPerBucket"
                          number_of_elements="1">
-        <Documentation>Specify the average number of points in each bin /
-        bucket that determines the initial and growing sizes (in terms of
-        number of points) of each bin / bucket.</Documentation>
+        <Documentation>
+          Specify the average number of points in each bin /
+          bucket that determines the initial and growing sizes (in terms of
+          number of points) of each bin / bucket.
+        </Documentation>
       </IntVectorProperty>
       <DoubleVectorProperty command="SetTolerance"
                             default_values="0.001"
                             name="Tolerance"
                             number_of_elements="1">
-        <Documentation>Specify an absolute tolerance for check-based /
-        tolerance-based point insertion.</Documentation>
+        <Documentation>
+          Specify an absolute tolerance for check-based /
+          tolerance-based point insertion.
+        </Documentation>
       </DoubleVectorProperty>
     </Proxy>
     <Proxy class="vtkMergePoints"
            label="Uniform Binning"
            name="MergePoints">
-      <Documentation>A point merger using a search structure of uniform
-      fixed-resolution bins / buckets for zero tolerance point insertion (to
-      avoid exactly duplicate / coincident points).</Documentation>
+      <Documentation>
+        A point merger using a search structure of uniform
+        fixed-resolution bins / buckets for zero tolerance point insertion (to
+        avoid exactly duplicate / coincident points).
+      </Documentation>
       <IntVectorProperty command="SetDivisions"
                          default_values="50 50 50"
                          name="Divisions"
                          number_of_elements="3">
-        <Documentation>Specify the number of divisions in each axis / direction
-        (x, y, z) for creating a search structure of uniform fixed-resolution
-        bins / buckets.</Documentation>
+        <Documentation>
+          Specify the number of divisions in each axis / direction
+          (x, y, z) for creating a search structure of uniform fixed-resolution
+          bins / buckets.
+        </Documentation>
       </IntVectorProperty>
       <IntVectorProperty command="SetNumberOfPointsPerBucket"
                          default_values="8"
                          label="Number of points per bucket"
                          name="NumberOfPointsPerBucket"
                          number_of_elements="1">
-        <Documentation>Specify the average number of points in each bin /
-        bucket that determines the initial and growing sizes (in terms of
-        number of points) of each bin / bucket.</Documentation>
+        <Documentation>
+          Specify the average number of points in each bin /
+          bucket that determines the initial and growing sizes (in terms of
+          number of points) of each bin / bucket.
+        </Documentation>
       </IntVectorProperty>
     </Proxy>
     <Proxy class="vtkNonMergingPointLocator"
            label="Don't Merge Points"
            name="NonMergingPointLocator">
-      <Documentation>Perform direct / check-free point insertion (any point is
-      inserted to a vtkPoints object) and therefore there can be duplicate
-      points.</Documentation>
+      <Documentation>
+        Perform direct / check-free point insertion (any point is
+        inserted to a vtkPoints object) and therefore there can be duplicate
+        points.
+      </Documentation>
       <IntVectorProperty command="SetDivisions"
                          default_values="50 50 50"
                          name="Divisions"
                          number_of_elements="3">
-        <Documentation>Specify the number of divisions in each axis / direction
-        (x, y, z) for creating a search structure of uniform fixed-resolution
-        bins / buckets.</Documentation>
+        <Documentation>
+          Specify the number of divisions in each axis / direction
+          (x, y, z) for creating a search structure of uniform fixed-resolution
+          bins / buckets.
+        </Documentation>
       </IntVectorProperty>
       <IntVectorProperty command="SetNumberOfPointsPerBucket"
                          default_values="8"
                          label="Number of points per bucket"
                          name="NumberOfPointsPerBucket"
                          number_of_elements="1">
-        <Documentation>Specify the average number of points in each bin /
-        bucket that determines the initial and growing sizes (in terms of
-        number of points) of each bin / bucket.</Documentation>
+        <Documentation>
+          Specify the average number of points in each bin /
+          bucket that determines the initial and growing sizes (in terms of
+          number of points) of each bin / bucket.
+        </Documentation>
       </IntVectorProperty>
     </Proxy>
     <Proxy class="vtkIncrementalOctreePointLocator"
            name="IncrementalOctreePointLocator">
-      <Documentation>Point locator based on a fast search structure of
-      data-aware multi-resolution octree nodes for point location and generic
-      (zero or non-zero) tolerance point insertion.</Documentation>
+      <Documentation>
+        Point locator based on a fast search structure of
+        data-aware multi-resolution octree nodes for point location and generic
+        (zero or non-zero) tolerance point insertion.
+      </Documentation>
       <IntVectorProperty command="SetMaxPointsPerLeaf"
                          default_values="128"
                          label="Max number of points per leaf"
@@ -94,29 +116,33 @@
                          number_of_elements="1">
         <IntRangeDomain max="256"
                         min="16"
-                        name="range" />
-        <Documentation>Specify the maximum number of points that a leaf node
-        may maintain. This value is a trade-off between the cost of dynamic
-        octree construction (top-down recursive node sub-division into eight
-        children as points are incrementally inserted to the octree) and the
-        speed of point location (particularly within a container leaf
-        node).</Documentation>
+                        name="range"/>
+        <Documentation>
+          Specify the maximum number of points that a leaf node
+          may maintain. This value is a trade-off between the cost of dynamic
+          octree construction (top-down recursive node sub-division into eight
+          children as points are incrementally inserted to the octree) and the
+          speed of point location (particularly within a container leaf node).
+        </Documentation>
       </IntVectorProperty>
       <DoubleVectorProperty command="SetTolerance"
                             default_values="0.001"
                             name="Tolerance"
                             number_of_elements="1">
-        <Documentation>Specify an absolute tolerance for check-based /
-        tolerance-based point insertion.</Documentation>
+        <Documentation>
+          Specify an absolute tolerance for check-based /
+          tolerance-based point insertion.
+        </Documentation>
       </DoubleVectorProperty>
     </Proxy>
     <Proxy class="vtkIncrementalOctreePointLocator"
            label="Octree Binning"
            name="IncrementalOctreeMergePoints">
-      <Documentation>A point merger exploiting a fast search structure of
-      data-aware multi-resolution octree nodes for zero-tolerance point
-      insertion (to avoid exactly duplicate / coincident
-      points).</Documentation>
+      <Documentation>
+        A point merger exploiting a fast search structure of
+        data-aware multi-resolution octree nodes for zero-tolerance point
+        insertion (to avoid exactly duplicate / coincident points).
+      </Documentation>
       <IntVectorProperty command="SetMaxPointsPerLeaf"
                          default_values="128"
                          label="Max number of points per leaf"
@@ -124,24 +150,26 @@
                          number_of_elements="1">
         <IntRangeDomain max="256"
                         min="16"
-                        name="range" />
+                        name="range"/>
         <Documentation>Specify the maximum number of points that a leaf node
-        may maintain. This value is a trade-off between the cost of dynamic
-        octree construction (top-down recursive node sub-division into eight
-        children as points are incrementally inserted to the octree) and the
-        speed of point location (particularly within a container leaf
-        node).</Documentation>
+          may maintain. This value is a trade-off between the cost of dynamic
+          octree construction (top-down recursive node sub-division into eight
+          children as points are incrementally inserted to the octree) and the
+          speed of point location (particularly within a container leaf
+          node).
+        </Documentation>
       </IntVectorProperty>
       <DoubleVectorProperty command="SetTolerance"
                             default_values="0.0"
                             name="Tolerance"
                             number_of_elements="1">
-        <Documentation>Always specify a zero tolerance for point insertion ---
-        merging points.</Documentation>
+        <Documentation>
+          Always specify a zero tolerance for point insertion --- merging points.
+        </Documentation>
       </DoubleVectorProperty>
       <Hints>
         <Property name="Tolerance"
-                  show="0" />
+                  show="0"/>
       </Hints>
     </Proxy>
     <!-- incremental point locators end -->
@@ -151,7 +179,7 @@
     <Proxy name="StaticPointLocator" label="Static Point Locator" class="vtkStaticPointLocator">
       <Documentation>
         This uses a spatial search object to quickly locate points
-        in 3D.  This locator works by dividing a specified region of
+        in 3D. This locator works by dividing a specified region of
         space into a regular array of cuboid buckets, and then keeping a
         list of points that lie in each bucket. Typical operation involves giving
         a position in 3D and finding the closest point; or finding the N closest
@@ -163,37 +191,38 @@
       </Documentation>
 
       <IntVectorProperty name="Automatic"
-        command="SetAutomatic"
-        number_of_elements="1"
-        default_values="1">
-        <BooleanDomain name="bool" />
+                         command="SetAutomatic"
+                         number_of_elements="1"
+                         default_values="1">
+        <BooleanDomain name="bool"/>
         <Documentation>
           Controls whether the locator resolution is computed automatically or not.
         </Documentation>
       </IntVectorProperty>
 
       <IntVectorProperty command="SetDivisions"
-        default_values="50 50 50"
-        name="Divisions"
-        number_of_elements="3">
-        <Documentation>Specify the number of divisions in each axis / direction
+                         default_values="50 50 50"
+                         name="Divisions"
+                         number_of_elements="3">
+        <Documentation>
+          Specify the number of divisions in each axis / direction
           (x, y, z) for creating a search structure of uniform fixed-resolution
           bins / buckets.
         </Documentation>
-        <IntRangeDomain name="range" min="1 1 1" />
+        <IntRangeDomain name="range" min="1 1 1"/>
         <Hints>
           <PropertyWidgetDecorator type="GenericDecorator"
-            mode="enabled_state"
-            property="Automatic"
-            value="0" />
+                                   mode="enabled_state"
+                                   property="Automatic"
+                                   value="0"/>
         </Hints>
       </IntVectorProperty>
 
       <IntVectorProperty name="NumberOfPointsPerBucket"
-        command="SetNumberOfPointsPerBucket"
-        number_of_elements="1"
-        default_values="5">
-        <IntRangeDomain name="range" min="1" />
+                         command="SetNumberOfPointsPerBucket"
+                         number_of_elements="1"
+                         default_values="5">
+        <IntRangeDomain name="range" min="1"/>
         <Documentation>
           Specify the average number of points in each bucket. This is
           used in conjunction with the **Automatic** (if enabled) to
@@ -201,34 +230,34 @@
         </Documentation>
         <Hints>
           <PropertyWidgetDecorator type="GenericDecorator"
-            mode="enabled_state"
-            property="Automatic"
-            value="1" />
+                                   mode="enabled_state"
+                                   property="Automatic"
+                                   value="1"/>
         </Hints>
       </IntVectorProperty>
 
       <PropertyGroup label="Locator Parameters">
-        <Property name="Automatic" />
-        <Property name="Divisions" />
-        <Property name="NumberOfPointsPerBucket" />
+        <Property name="Automatic"/>
+        <Property name="Divisions"/>
+        <Property name="NumberOfPointsPerBucket"/>
       </PropertyGroup>
     </Proxy>
 
   </ProxyGroup>
 
   <ProxyGroup name="cell_locators">
-     <Proxy class="vtkCellLocator"
-            name="CellLocator"
-            label="Cell Locator"/>
-     <Proxy class="vtkCellTreeLocator"
-            name="CellTreeLocator"
-            label="Tree Cell Locator"/>
-     <Proxy class="vtkOBBTree"
-            name="OBBTree"
-            label="OBB Tree Cell Locator"/>
-     <Proxy class="vtkStaticCellLocator"
-            name="StaticCellLocator"
-            label="Static Cell Locator"/>
+    <Proxy class="vtkCellLocator"
+           name="CellLocator"
+           label="Cell Locator"/>
+    <Proxy class="vtkCellTreeLocator"
+           name="CellTreeLocator"
+           label="Tree Cell Locator"/>
+    <Proxy class="vtkOBBTree"
+           name="OBBTree"
+           label="OBB Tree Cell Locator"/>
+    <Proxy class="vtkStaticCellLocator"
+           name="StaticCellLocator"
+           label="Static Cell Locator"/>
   </ProxyGroup>
 
   <ProxyGroup name="implicit_functions">
@@ -239,18 +268,18 @@
       <ProxyProperty command="SetPoints"
                      name="Points">
         <ProxyGroupDomain name="group">
-          <Group name="points" />
+          <Group name="points"/>
         </ProxyGroupDomain>
       </ProxyProperty>
       <ProxyProperty command="SetNormals"
                      name="Normals">
         <ProxyGroupDomain name="group">
-          <Group name="data_arrays" />
+          <Group name="data_arrays"/>
         </ProxyGroupDomain>
       </ProxyProperty>
     </Proxy>
     <Proxy class="vtkQuadric" name="Quadric">
-      <InputProperty is_internal="1" name="Input" />
+      <InputProperty is_internal="1" name="Input"/>
       <DoubleVectorProperty name="QuadricCoefficients"
                             command="SetCoefficients"
                             number_of_elements="10"
@@ -262,14 +291,14 @@
       </DoubleVectorProperty>
     </Proxy>
     <Proxy class="vtkSphere" name="Sphere">
-      <InputProperty is_internal="1" name="Input" />
+      <InputProperty is_internal="1" name="Input"/>
       <DoubleVectorProperty command="SetCenter"
                             default_values="0 0 0"
                             name="Center"
                             number_of_elements="3">
         <BoundsDomain default_mode="mid" mode="normal" name="range">
           <RequiredProperties>
-            <Property function="Input" name="Input" />
+            <Property function="Input" name="Input"/>
           </RequiredProperties>
         </BoundsDomain>
         <Documentation>
@@ -282,7 +311,7 @@
                             number_of_elements="1">
         <BoundsDomain name="range" mode="scaled_extent" scale_factor="0.5" default_mode="max">
           <RequiredProperties>
-            <Property function="Input" name="Input" />
+            <Property function="Input" name="Input"/>
           </RequiredProperties>
         </BoundsDomain>
         <Documentation>
@@ -290,13 +319,13 @@
         </Documentation>
       </DoubleVectorProperty>
       <PropertyGroup label="Point Cloud Parameters" panel_widget="InteractiveSphere">
-        <Property function="Center" name="Center" />
-        <Property function="Radius" name="Radius" />
-        <Property function="Input" name="Input" />
+        <Property function="Center" name="Center"/>
+        <Property function="Radius" name="Radius"/>
+        <Property function="Input" name="Input"/>
       </PropertyGroup>
       <Hints>
         <ProxyList>
-          <Link name="Input" with_property="Input" />
+          <Link name="Input" with_property="Input"/>
         </ProxyList>
       </Hints>
       <!-- End of Sphere -->
@@ -308,14 +337,14 @@
       <ProxyProperty command="SetMatrix"
                      name="MatrixProxy">
         <ProxyGroupDomain name="groups">
-          <Group name="matrices" />
+          <Group name="matrices"/>
         </ProxyGroupDomain>
       </ProxyProperty>
       <DoubleVectorProperty argument_is_array="1"
                             command="SetMatrix"
                             default_values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0"
                             name="Matrix"
-                            number_of_elements="16" />
+                            number_of_elements="16"/>
     </Proxy>
   </ProxyGroup>
   <ProxyGroup name="matrices">
@@ -337,7 +366,7 @@
                             number_of_elements_per_command="3"
                             repeat_command="1"
                             set_number_command="SetNumberOfPoints"
-                            use_index="1" />
+                            use_index="1"/>
     </Proxy>
   </ProxyGroup>
   <ProxyGroup name="data_arrays">
@@ -349,11 +378,11 @@
                             number_of_elements_per_command="1"
                             repeat_command="1"
                             set_number_command="SetNumberOfValues"
-                            use_index="1" />
+                            use_index="1"/>
       <IntVectorProperty command="SetNumberOfComponents"
                          default_values="1"
                          name="Components"
-                         number_of_elements="1" />
+                         number_of_elements="1"/>
     </Proxy>
   </ProxyGroup>
   <ProxyGroup name="internals">
@@ -367,9 +396,9 @@
                          number_of_elements="1">
         <EnumerationDomain name="enum">
           <Entry text="DataServer"
-                 value="2" />
+                 value="2"/>
           <Entry text="RenderServer"
-                 value="3" />
+                 value="3"/>
         </EnumerationDomain>
       </IntVectorProperty>
       <StringVectorProperty command="SetPortInformation"
@@ -378,7 +407,7 @@
                             number_of_elements_per_command="3"
                             repeat_command="1"
                             set_number_command="SetNumberOfConnections">
-                            </StringVectorProperty>
+      </StringVectorProperty>
     </Proxy>
   </ProxyGroup>
 
@@ -388,18 +417,19 @@
       <IntVectorProperty command="GetActiveFileIsDirectory"
                          information_only="1"
                          name="ActiveFileIsDirectory">
-        <SimpleIntInformationHelper />
+        <SimpleIntInformationHelper/>
       </IntVectorProperty>
       <IntVectorProperty command="GetActiveFileIsReadable"
                          information_only="1"
                          name="ActiveFileIsReadable">
-        <SimpleIntInformationHelper />
+        <SimpleIntInformationHelper/>
       </IntVectorProperty>
       <StringVectorProperty command="SetPath"
                             name="ActiveFileName"
                             number_of_elements="1">
-        <Documentation>Set the filename whose information we
-        need.</Documentation>
+        <Documentation>
+          Set the filename whose information we need.
+        </Documentation>
       </StringVectorProperty>
     </Proxy>
   </ProxyGroup>
@@ -413,33 +443,33 @@
                      name="Input"
                      port_index="0">
         <ProxyGroupDomain name="groups">
-          <Group name="sources" />
-          <Group name="filters" />
+          <Group name="sources"/>
+          <Group name="filters"/>
         </ProxyGroupDomain>
         <DataTypeDomain name="input_type">
-          <DataType value="vtkAnnotationLayers" />
-          <DataType value="vtkSelection" />
+          <DataType value="vtkAnnotationLayers"/>
+          <DataType value="vtkSelection"/>
         </DataTypeDomain>
       </InputProperty>
       <InputProperty command="SetInputConnection"
                      name="DomainMaps"
                      port_index="1">
         <ProxyGroupDomain name="groups">
-          <Group name="sources" />
-          <Group name="filters" />
+          <Group name="sources"/>
+          <Group name="filters"/>
         </ProxyGroupDomain>
         <DataTypeDomain name="input_type">
-          <DataType value="vtkTable" />
+          <DataType value="vtkTable"/>
         </DataTypeDomain>
       </InputProperty>
       <ProxyProperty command="SetAnnotations"
                      name="Annotations"></ProxyProperty>
       <OutputPort index="0"
-                  name="Annotations" />
+                  name="Annotations"/>
       <OutputPort index="1"
-                  name="Domain Maps" />
+                  name="Domain Maps"/>
       <OutputPort index="2"
-                  name="Selection" />
+                  name="Selection"/>
     </SourceProxy>
   </ProxyGroup>
 
@@ -455,51 +485,54 @@
 
       <!-- Fake properties that will be filled by the vtkSIDirectoryProxy
            class in the pull request -->
-      <StringVectorProperty name="FileList"      information_only="1"/>
+      <StringVectorProperty name="FileList" information_only="1"/>
       <StringVectorProperty name="DirectoryList" information_only="1"/>
     </DirectoryProxy>
     <Proxy class="vtkPVFileInformationHelper"
            name="FileInformationHelper">
       <StringVectorProperty command="SetPath"
-                            name="Path" />
+                            name="Path"/>
       <IntVectorProperty command="SetDirectoryListing"
                          default_values="0"
                          name="DirectoryListing"
                          number_of_elements="1">
-        <BooleanDomain name="bool" />
+        <BooleanDomain name="bool"/>
       </IntVectorProperty>
       <IntVectorProperty command="SetSpecialDirectories"
                          default_values="0"
                          name="SpecialDirectories"
                          number_of_elements="1">
-        <BooleanDomain name="bool" />
+        <BooleanDomain name="bool"/>
       </IntVectorProperty>
       <IntVectorProperty command="SetGroupFileSequences"
                          default_values="1"
                          name="GroupFileSequences"
                          panel_visibility="never"
                          number_of_elements="1">
-        <BooleanDomain name="bool" />
+        <BooleanDomain name="bool"/>
       </IntVectorProperty>
       <StringVectorProperty command="GetPathSeparator"
                             information_only="1"
                             name="PathSeparator"
                             number_of_elements="1">
-        <SimpleStringInformationHelper />
+        <SimpleStringInformationHelper/>
       </StringVectorProperty>
       <StringVectorProperty command="SetWorkingDirectory"
                             default_values=""
                             name="WorkingDirectory"
                             number_of_elements="1">
-        <Documentation>Override the working directory used to resolve relative
-        paths.</Documentation>
+        <Documentation>
+          Override the working directory used to resolve relative paths.
+        </Documentation>
       </StringVectorProperty>
       <IntVectorProperty command="SetReadDetailedFileInformation"
                          name="ReadDetailedFileInformation"
                          number_of_elements="1"
                          default_values="0">
-        <Documentation>Whether to read full file information.  This is slow when there are many files
-        in a directory so this defaults to false.</Documentation>
+        <Documentation>
+          Whether to read full file information. This is slow when there are many files
+          in a directory so this defaults to false.
+        </Documentation>
         <BooleanDomain name="bool"/>
       </IntVectorProperty>
       <!-- End of FileInformationHelper -->
@@ -509,51 +542,54 @@
       <IntVectorProperty command="MakeDirectory"
                          information_only="1"
                          name="MakeDirectory">
-        <SimpleIntInformationHelper />
+        <SimpleIntInformationHelper/>
       </IntVectorProperty>
       <IntVectorProperty command="DeleteDirectory"
                          information_only="1"
                          name="DeleteDirectory">
-        <SimpleIntInformationHelper />
+        <SimpleIntInformationHelper/>
       </IntVectorProperty>
       <IntVectorProperty command="OpenDirectory"
                          information_only="1"
                          name="OpenDirectory">
-        <SimpleIntInformationHelper />
+        <SimpleIntInformationHelper/>
       </IntVectorProperty>
       <IntVectorProperty command="RenameDirectory"
                          information_only="1"
                          name="RenameDirectory">
-        <SimpleIntInformationHelper />
+        <SimpleIntInformationHelper/>
       </IntVectorProperty>
       <IntVectorProperty command="IsDirectory"
                          information_only="1"
                          name="IsDirectory">
-        <SimpleIntInformationHelper />
+        <SimpleIntInformationHelper/>
       </IntVectorProperty>
       <IntVectorProperty command="GetActiveFileIsReadable"
                          information_only="1"
                          name="ActiveFileIsReadable">
-        <SimpleIntInformationHelper />
+        <SimpleIntInformationHelper/>
       </IntVectorProperty>
       <StringVectorProperty command="SetPath"
                             name="ActiveFileName"
                             number_of_elements="1">
-        <Documentation>Set the filename we need to use.
+        <Documentation>
+          Set the filename we need to use.
         </Documentation>
       </StringVectorProperty>
       <StringVectorProperty command="SetSecondaryPath"
                             name="SecondaryFileName"
                             number_of_elements="1">
-        <Documentation>Set the secondary filename we may
-        need to use.</Documentation>
+        <Documentation>
+          Set the secondary filename we may need to use.
+        </Documentation>
       </StringVectorProperty>
 
       <IntVectorProperty command="SetActiveGlobalId"
-                            name="ActiveGlobalId"
-                            default_values="0"
-                            number_of_elements="1">
-        <Documentation>Set the globalId of the vtkObject to use
+                         name="ActiveGlobalId"
+                         default_values="0"
+                         number_of_elements="1">
+        <Documentation>
+          Set the globalId of the vtkObject to use
         </Documentation>
       </IntVectorProperty>
     </Proxy>
@@ -561,30 +597,34 @@
     <Proxy class="vtkPVEnvironmentInformationHelper"
            name="EnvironmentInformationHelper">
       <StringVectorProperty command="SetVariable"
-                            name="Variable" />
+                            name="Variable"/>
       <!-- End of FileInformationHelper -->
     </Proxy>
     <TimeKeeperProxy class="vtkSMTimeKeeper"
                      name="TimeKeeper"
                      processes="client">
-      <Documentation>TimeKeeper is used to keep the pipeline time for the
-      application. All views added to the timekeeper show the same time as that
-      on the time keeper.</Documentation>
+      <Documentation>
+        TimeKeeper is used to keep the pipeline time for the
+        application. All views added to the timekeeper show the same time as that
+        on the timekeeper.
+      </Documentation>
       <DoubleVectorProperty command="SetTime"
                             default_values="0"
                             name="Time"
                             number_of_elements="1"
                             state_ignored="1">
         <!-- state-ignored simply makes this property not be saved in the UndoRedo state -->
-        <DoubleRangeDomain name="range" />
+        <DoubleRangeDomain name="range"/>
       </DoubleVectorProperty>
       <DoubleVectorProperty information_only="1"
                             repeatable="1"
                             name="TimestepValues">
-        <Documentation>The timesteps currently available. This property does
-        not have any information helper since vtkSMTimeKeeperProxy keeps this
-        updated without any need to call
-        UpdatePropertyInformation().</Documentation>
+        <Documentation>
+          The timesteps currently available. This property does
+          not have any information helper since vtkSMTimeKeeperProxy keeps this
+          updated without any need to call
+          UpdatePropertyInformation().
+        </Documentation>
       </DoubleVectorProperty>
       <DoubleVectorProperty default_values="0.0 0.0"
                             information_only="1"
@@ -592,9 +632,11 @@
                             number_of_elements="2"
                             state_ignored="1">
         <!-- state-ignored simply makes this property not be saved in the UndoRedo state -->
-        <Documentation>This is the time range. It's possible that there are no
-        TimestepValues but there is a valid TimeRange since some sources may
-        provide continuous time.</Documentation>
+        <Documentation>
+          This is the time range. It's possible that there are no
+          TimestepValues but there is a valid TimeRange since some sources may
+          provide continuous time.
+        </Documentation>
       </DoubleVectorProperty>
       <StringVectorProperty default_values="Time"
                             information_only="1"
@@ -602,10 +644,12 @@
                             number_of_elements="1"
                             state_ignored="1">
         <!-- state-ignored simply makes this property not be saved in the UndoRedo state -->
-        <Documentation>This is the string that is used as label to eventually
-        replace "time" by something else such as "frequency" or any user
-        specific label that the user want to set to use a 4th dimension that is
-        not time.</Documentation>
+        <Documentation>
+          This is the string that is used as label to eventually
+          replace "time" by something else such as "frequency" or any user
+          specific label that the user want to set to use a 4th dimension that is
+          not time.
+        </Documentation>
       </StringVectorProperty>
       <ProxyProperty argument_type="SMProxy"
                      command="AddView"
@@ -613,16 +657,19 @@
                      remove_command="RemoveView"
                      repeatable="1">
         <Documentation>Views with their view time linked with this time
-        keeper.</Documentation>
+          keeper.
+        </Documentation>
       </ProxyProperty>
       <ProxyProperty argument_type="SMProxy"
                      command="AddTimeSource"
                      name="TimeSources"
                      remove_command="RemoveTimeSource"
                      repeatable="1">
-        <Documentation>List of proxies that provide time. TimestepValues
-        property has a set of timesteps provided by all the sources added to
-        this property alone.</Documentation>
+        <Documentation>
+          List of proxies that provide time. TimestepValues
+          property has a set of timesteps provided by all the sources added to
+          this property alone.
+        </Documentation>
       </ProxyProperty>
       <ProxyProperty argument_type="SMProxy"
                      command="AddSuppressedTimeSource"
@@ -638,11 +685,13 @@
     <PluginLoaderProxy class="vtkPVPluginLoader"
                        name="PluginLoader"
                        processes="dataserver|renderserver">
-      <Documentation>Use this proxy to load a plugin remotely. This proxy has
-      no properties that users can set. Only information-properties are
-      provided that can be used to obtain various states.
-      vtkSMPluginLoaderProxy has API that can be used to load plugins,
-      configuration xmls etc.</Documentation>
+      <Documentation>
+        Use this proxy to load a plugin remotely. This proxy has
+        no properties that users can set. Only information-properties are
+        provided that can be used to obtain various states.
+        vtkSMPluginLoaderProxy has API that can be used to load plugins,
+        configuration xmls etc.
+      </Documentation>
       <IntVectorProperty command="GetLoaded"
                          information_only="1"
                          name="Loaded"></IntVectorProperty>
@@ -658,9 +707,11 @@
     <Proxy class="vtkTimerLog"
            name="TimerLog"
            processes="client|dataserver|renderserver">
-      <Documentation>This is a proxy used to control the timer log parameters
-      on all processes. Note that since vtkTimerLog has loads of static ivar,
-      most properties will affect all timer log instances.</Documentation>
+      <Documentation>
+        This is a proxy used to control the timer log parameters
+        on all processes. Note that since vtkTimerLog has loads of static ivar,
+        most properties will affect all timer log instances.
+      </Documentation>
       <Property command="ResetLog"
                 name="ResetLog">
         <Documentation>Resets the log on all processes.</Documentation>
@@ -668,14 +719,17 @@
       <IntVectorProperty command="SetLogging"
                          default_values="none"
                          name="Enable">
-        <EnumerationDomain name="enum" />
-        <Documentation>Enables the timer-log on all processes.</Documentation>
+        <EnumerationDomain name="enum"/>
+        <Documentation>
+          Enables the timer-log on all processes.
+        </Documentation>
       </IntVectorProperty>
       <IntVectorProperty command="SetMaxEntries"
                          default_values="none"
                          name="MaxEntries">
-        <Documentation>Set the maximum length for the log on all
-        processes.</Documentation>
+        <Documentation>
+          Set the maximum length for the log on all processes.
+        </Documentation>
       </IntVectorProperty>
       <!-- End of TimerLog -->
     </Proxy>
@@ -683,39 +737,53 @@
     <Proxy class="vtkExecutableRunner"
            name="ExecutableRunner"
            processes="client|dataserver|renderserver">
-      <Documentation>Execute a process on server side.</Documentation>
+      <Documentation>
+        Execute a process on server side.
+      </Documentation>
       <Property command="Execute"
                 name="Execute">
-        <Documentation>Execute the given command on the master server process. Also reset the output strings.</Documentation>
+        <Documentation>
+          Execute the given command on the master server process. Also reset the output strings.
+        </Documentation>
       </Property>
       <DoubleVectorProperty command="SetTimeout"
-                        default_values="5.0"
-                        name="Timeout">
-        <Documentation>Set the internal timeout of the runner.</Documentation>
+                            default_values="5.0"
+                            name="Timeout">
+        <Documentation>
+          Set the internal timeout of the runner.
+        </Documentation>
       </DoubleVectorProperty>
       <StringVectorProperty command="SetCommand"
-                        default_values=""
-                        name="Command">
-        <Documentation>Set the command to execute.</Documentation>
+                            default_values=""
+                            name="Command">
+        <Documentation>
+          Set the command to execute.
+        </Documentation>
       </StringVectorProperty>
       <StringVectorProperty command="GetStdOut"
-                        name="StdOut"
-                        number_of_elements="1"
-                        information_only="1">
-        <Documentation>Get the standard output of the command.</Documentation>
+                            name="StdOut"
+                            number_of_elements="1"
+                            information_only="1">
+        <Documentation>
+          Get the standard output of the command.
+        </Documentation>
       </StringVectorProperty>
       <StringVectorProperty command="GetStdErr"
-                        name="StdErr"
-                        number_of_elements="1"
-                        information_only="1">
-        <Documentation>Get the error output of the command.</Documentation>
+                            name="StdErr"
+                            number_of_elements="1"
+                            information_only="1">
+        <Documentation>
+          Get the error output of the command.
+        </Documentation>
       </StringVectorProperty>
       <IntVectorProperty command="GetReturnValue"
-                        name="ReturnValue"
-                        number_of_elements="1"
-                        default_values="-1"
-                        information_only="1">
-        <Documentation>Get the return value of the command.</Documentation>
+                         name="ReturnValue"
+                         number_of_elements="1"
+                         default_values="-1"
+                         information_only="1">
+        <Documentation>
+          Get the return value of the command.
+        </Documentation>
       </IntVectorProperty>
       <!-- End of ExecutableRunner -->
     </Proxy>
@@ -726,33 +794,45 @@
                          command="SetRankEnabled"
                          default_values="-1"
                          number_of_elements="1">
-        <Documentation>Set rank to enable logging.</Documentation>
+        <Documentation>
+          Set rank to enable logging.
+        </Documentation>
       </IntVectorProperty>
       <IntVectorProperty name="RankDisabled"
                          command="SetRankDisabled"
                          default_values="-1"
                          number_of_elements="1">
-        <Documentation>Set rank to disable logging.</Documentation>
+        <Documentation>
+          Set rank to disable logging.
+        </Documentation>
       </IntVectorProperty>
       <Property name="ClearLogs"
                 command="ClearLogs">
-        <Documentation>Invoke to clear logs.</Documentation>
+        <Documentation>
+          Invoke to clear logs.
+        </Documentation>
       </Property>
       <IntVectorProperty name="Verbosity"
                          command="SetVerbosity"
                          default_values="-2"
                          number_of_elements="1">
-        <Documentation>Set verbosity of desired log entries.</Documentation>
+        <Documentation>
+          Set verbosity of desired log entries.
+        </Documentation>
       </IntVectorProperty>
       <IntVectorProperty name="CategoryVerbosity"
                          command="SetCategoryVerbosity"
                          default_values="-1 0"
                          number_of_elements="2">
-        <Documentation>Set the verbosity of a specific ParaView logging category.</Documentation>
+        <Documentation>
+          Set the verbosity of a specific ParaView logging category.
+        </Documentation>
       </IntVectorProperty>
       <Property name="ResetCategoryVerbosities"
                 command="ResetCategoryVerbosities">
-        <Documentation>Invoke to clear verbosity elevations.</Documentation>
+        <Documentation>
+          Invoke to clear verbosity elevations.
+        </Documentation>
       </Property>
     </Proxy>
 
@@ -765,8 +845,8 @@
                          command="SetOutputDestination"
                          number_of_elements="1"
                          default_values="0"
-                         panel_visibility="never" />
-      <ProxyProperty name="Writer" command="SetWriter" />
+                         panel_visibility="never"/>
+      <ProxyProperty name="Writer" command="SetWriter"/>
     </SourceProxy>
 
     <!-- ================================================================= -->
@@ -777,14 +857,14 @@
         composite datasets and view/edit appearance properties.
       </Documentation>
 
-      <InputProperty name="Input" />
+      <InputProperty name="Input"/>
 
       <StringVectorProperty name="Assembly"
-        number_of_elements="1"
-        default_values="Hierarchy">
+                            number_of_elements="1"
+                            default_values="Hierarchy">
         <DataAssemblyListDomain name="data_assembly_list">
           <RequiredProperties>
-            <Property function="Input" name="Input" />
+            <Property function="Input" name="Input"/>
           </RequiredProperties>
         </DataAssemblyListDomain>
         <Documentation>
@@ -794,12 +874,12 @@
       </StringVectorProperty>
 
       <StringVectorProperty name="Selectors"
-        repeat_command="1"
-        number_of_elements_per_command="1">
+                            repeat_command="1"
+                            number_of_elements_per_command="1">
         <DataAssemblyDomain name="data_assembly">
           <RequiredProperties>
-            <Property function="Input" name="Input" />
-            <Property function="ActiveAssembly" name="Assembly" />
+            <Property function="Input" name="Input"/>
+            <Property function="ActiveAssembly" name="Assembly"/>
           </RequiredProperties>
         </DataAssemblyDomain>
         <Documentation>
@@ -809,12 +889,12 @@
       </StringVectorProperty>
 
       <PropertyGroup label="AssemblyOnly" panel_widget="DataAssemblyEditor">
-        <Property name="Assembly"  function="ActiveAssembly" />
-        <Property name="Selectors" function="Selectors" />
+        <Property name="Assembly" function="ActiveAssembly"/>
+        <Property name="Selectors" function="Selectors"/>
         <Hints>
           <DataAssemblyPropertyWidget
-            is_checkable="0"
-            use_inputname_as_header="1" />
+                  is_checkable="0"
+                  use_inputname_as_header="1"/>
         </Hints>
       </PropertyGroup>
       <!-- end of MultiBlockInspectorHelper -->
@@ -826,76 +906,83 @@
         on (sources, SelectionQuerySource) that way we can simply copy values
         to it -->
       <InputProperty name="Input"
-        label="Data Producer"
-        panel_widget="input_selector">
+                     label="Data Producer"
+                     panel_widget="input_selector">
+        <Documentation>
+          Specify the dataset that will be used to save selections for.
+        </Documentation>
         <ProxyGroupDomain name="groups">
-          <Group name="sources" />
-          <Group name="filters" />
+          <Group name="sources"/>
+          <Group name="filters"/>
         </ProxyGroupDomain>
       </InputProperty>
 
       <IntVectorProperty name="ElementType"
-        number_of_elements="1"
-        default_values="0">
+                         number_of_elements="1"
+                         default_values="0">
         <Documentation>
           Specify which type of mesh elements to select.
         </Documentation>
-        <FieldDataDomain name="enum" use_element_types="1" />
+        <FieldDataDomain name="enum" use_element_types="1">
+          <RequiredProperties>
+            <Property function="Input" name="Input"/>
+          </RequiredProperties>
+        </FieldDataDomain>
         <Hints>
           <PropertyWidgetDecorator type="InputDataTypeDecorator"
-            mode="enabled_state" name="vtkDataObject" />
+                                   mode="enabled_state" name="vtkDataObject"/>
         </Hints>
       </IntVectorProperty>
 
       <StringVectorProperty name="QueryString"
-        number_of_elements="1"
-        default_values=""
-        panel_widget="selection_query">
+                            number_of_elements="1"
+                            default_values=""
+                            panel_widget="selection_query">
         <Documentation>
           Specify the query string to use to find data.
         </Documentation>
         <SelectionQueryDomain name="domain">
           <RequiredProperties>
-            <Property name="ElementType" function="FieldAssociation" />
-            <Property name="Input" function="Input" />
+            <Property name="ElementType" function="FieldAssociation"/>
+            <Property name="Input" function="Input"/>
           </RequiredProperties>
         </SelectionQueryDomain>
       </StringVectorProperty>
 
       <IntVectorProperty name="InsideOut"
-        label="Invert Selection"
-        number_of_elements="1"
-        default_values="0"
-        panel_visibility="never">
-        <BooleanDomain name="bool" />
+                         label="Invert Selection"
+                         number_of_elements="1"
+                         default_values="0"
+                         panel_visibility="never">
+        <BooleanDomain name="bool"/>
         <Documentation>
           Invert the selection. Find elements that **don't**
-          match the chosen seletion criteria.
+          match the chosen selection criteria.
         </Documentation>
       </IntVectorProperty>
 
       <PropertyGroup label="Selection Criteria">
-        <Property name="Input" />
-        <Property name="ElementType" />
-        <Property name="QueryString" />
-        <Property name="InsideOut" />
+        <Property name="Input"/>
+        <Property name="ElementType"/>
+        <Property name="QueryString"/>
+        <Property name="InsideOut"/>
       </PropertyGroup>
 
       <IntVectorProperty name="ProcessID"
-        default_values="-1"
-        number_of_elements="1">
+                         default_values="-1"
+                         number_of_elements="1">
         <Hints>
           <PropertyWidgetDecorator type="SessionTypeDecorator" mode="enabled_state"
-            requires="parallel_data_server" />
+                                   requires="parallel_data_server"/>
         </Hints>
       </IntVectorProperty>
 
       <StringVectorProperty name="Assembly"
-        number_of_elements="1"
-        default_values="Hierarchy" >
+                            number_of_elements="1"
+                            default_values="Hierarchy">
         <DataAssemblyListDomain name="data_assembly">
           <RequiredProperties>
-            <Property function="Input" name="Input" />
+            <Property function="Input" name="Input"/>
           </RequiredProperties>
         </DataAssemblyListDomain>
         <Documentation>
@@ -905,14 +992,14 @@
       </StringVectorProperty>
 
       <StringVectorProperty name="Selectors"
-        repeat_command="1"
-        number_of_elements_per_command="1"
-        number_of_elements="1"
-        default_values="/">
+                            repeat_command="1"
+                            number_of_elements_per_command="1"
+                            number_of_elements="1"
+                            default_values="/">
         <DataAssemblyDomain name="data_assembly">
           <RequiredProperties>
-            <Property function="Input" name="Input" />
-            <Property function="ActiveAssembly" name="Assembly" />
+            <Property function="Input" name="Input"/>
+            <Property function="ActiveAssembly" name="Assembly"/>
           </RequiredProperties>
         </DataAssemblyDomain>
         <Documentation>
@@ -921,17 +1008,17 @@
         </Documentation>
       </StringVectorProperty>
 
-      <PropertyGroup label="Selection Qualifiers" >
-        <Property name="ProcessID" />
+      <PropertyGroup label="Selection Qualifiers">
+        <Property name="ProcessID"/>
       </PropertyGroup>
 
       <PropertyGroup label="Block Selectors" panel_widget="DataAssemblyEditor">
-        <Property name="Assembly" function="ActiveAssembly" />
-        <Property name="Selectors" function="Selectors" />
+        <Property name="Assembly" function="ActiveAssembly"/>
+        <Property name="Selectors" function="Selectors"/>
         <Hints>
           <PropertyWidgetDecorator type="InputDataTypeDecorator"
-            mode="visibility"
-            name="vtkMultiBlockDataSet vtkPartitionedDataSetCollection" />
+                                   mode="visibility"
+                                   name="vtkMultiBlockDataSet vtkPartitionedDataSetCollection"/>
         </Hints>
       </PropertyGroup>
 
@@ -945,19 +1032,19 @@
       </Documentation>
       <ProxyProperty name="Producer" command="SetProducer" skip_valid_check="1"/>
       <IntVectorProperty name="PortNumber" default_values="0"
-        number_of_elements="1" command="SetPortNumber" />
+                         number_of_elements="1" command="SetPortNumber"/>
       <IntVectorProperty name="GatherOnAllRanks" command="SetGatherOnAllRanks"
-        number_of_elements="1" default_values="0" />
+                         number_of_elements="1" default_values="0"/>
       <IntVectorProperty name="SourceRanks"
-        command="AddSourceRank"
-        clean_command="ClearAllSourceRanks"
-        number_of_elements_per_command="1"
-        repeat_command="1" />
+                         command="AddSourceRank"
+                         clean_command="ClearAllSourceRanks"
+                         number_of_elements_per_command="1"
+                         repeat_command="1"/>
       <IntVectorProperty name="SkipEmptyDataSets"
-         command="SetSkipEmptyDataSets"
-         number_of_elements="1"
-         default_values="0" />
-      <Property name="Execute" command="Execute" />
+                         command="SetSkipEmptyDataSets"
+                         number_of_elements="1"
+                         default_values="0"/>
+      <Property name="Execute" command="Execute"/>
     </Proxy>
 
     <!-- End of group "misc" -->
@@ -984,13 +1071,13 @@
       <DoubleVectorProperty default_values="0.0 0.0 0.5"
                             name="EdgeColor"
                             number_of_elements="3"></DoubleVectorProperty>
-      <IntVectorProperty    default_values="0"
-                            name="BackgroundColorMode"
-                            number_of_elements="1"></IntVectorProperty>
+      <IntVectorProperty default_values="0"
+                         name="BackgroundColorMode"
+                         number_of_elements="1"></IntVectorProperty>
     </Proxy>
 
     <!-- ================================================================= -->
-    <Proxy label = "White Background" name="WhiteBackground">
+    <Proxy label="White Background" name="WhiteBackground">
       <DoubleVectorProperty default_values="0.0 0.0 0.0"
                             name="ForegroundColor"
                             number_of_elements="3"></DoubleVectorProperty>
@@ -1009,9 +1096,9 @@
       <DoubleVectorProperty default_values="0.0 0.0 0.5"
                             name="EdgeColor"
                             number_of_elements="3"></DoubleVectorProperty>
-      <IntVectorProperty    default_values="0"
-                            name="BackgroundColorMode"
-                            number_of_elements="1"></IntVectorProperty>
+      <IntVectorProperty default_values="0"
+                         name="BackgroundColorMode"
+                         number_of_elements="1"></IntVectorProperty>
       <!-- End of (palettes, Print) -->
     </Proxy>
 
@@ -1035,9 +1122,9 @@
       <DoubleVectorProperty default_values="0.0 0.0 0.5"
                             name="EdgeColor"
                             number_of_elements="3"></DoubleVectorProperty>
-      <IntVectorProperty    default_values="0"
-                            name="BackgroundColorMode"
-                            number_of_elements="1"></IntVectorProperty>
+      <IntVectorProperty default_values="0"
+                         name="BackgroundColorMode"
+                         number_of_elements="1"></IntVectorProperty>
     </Proxy>
 
     <!-- ================================================================= -->
@@ -1060,9 +1147,9 @@
       <DoubleVectorProperty default_values="0.0 0.0 0.5"
                             name="EdgeColor"
                             number_of_elements="3"></DoubleVectorProperty>
-      <IntVectorProperty    default_values="0"
-                            name="BackgroundColorMode"
-                            number_of_elements="1"></IntVectorProperty>
+      <IntVectorProperty default_values="0"
+                         name="BackgroundColorMode"
+                         number_of_elements="1"></IntVectorProperty>
     </Proxy>
 
     <!-- ================================================================= -->
@@ -1085,9 +1172,9 @@
       <DoubleVectorProperty default_values="0.0 0.0 0.5"
                             name="EdgeColor"
                             number_of_elements="3"></DoubleVectorProperty>
-      <IntVectorProperty    default_values="0"
-                            name="BackgroundColorMode"
-                            number_of_elements="1"></IntVectorProperty>
+      <IntVectorProperty default_values="0"
+                         name="BackgroundColorMode"
+                         number_of_elements="1"></IntVectorProperty>
     </Proxy>
 
     <!-- ================================================================= -->
@@ -1110,9 +1197,9 @@
       <DoubleVectorProperty default_values="0.0 0.0 0.5"
                             name="EdgeColor"
                             number_of_elements="3"></DoubleVectorProperty>
-      <IntVectorProperty    default_values="0"
-                            name="BackgroundColorMode"
-                            number_of_elements="1"></IntVectorProperty>
+      <IntVectorProperty default_values="0"
+                         name="BackgroundColorMode"
+                         number_of_elements="1"></IntVectorProperty>
     </Proxy>
 
     <!-- ================================================================= -->
@@ -1138,9 +1225,9 @@
       <DoubleVectorProperty default_values="0.0 0.0 0.5"
                             name="EdgeColor"
                             number_of_elements="3"></DoubleVectorProperty>
-      <IntVectorProperty    default_values="1"
-                            name="BackgroundColorMode"
-                            number_of_elements="1"></IntVectorProperty>
+      <IntVectorProperty default_values="1"
+                         name="BackgroundColorMode"
+                         number_of_elements="1"></IntVectorProperty>
     </Proxy>
 
     <!-- End of group "palettes" -->
@@ -1153,102 +1240,105 @@
       </Documentation>
 
       <StringVectorProperty name="ExtractsOutputDirectory"
-        number_of_elements="1"
-        default_values="datasets">
+                            number_of_elements="1"
+                            default_values="datasets">
         <Documentation>
           Choose directory under which to save all extracts.
         </Documentation>
-        <FileListDomain name="directory" />
+        <FileListDomain name="directory"/>
         <Hints>
-          <UseDirectoryName />
-          <AcceptAnyFile />
+          <UseDirectoryName/>
+          <AcceptAnyFile/>
         </Hints>
       </StringVectorProperty>
 
       <IntVectorProperty name="GenerateCinemaSpecification"
-        number_of_elements="1"
-        default_values="0">
+                         number_of_elements="1"
+                         default_values="0">
         <Documentation>
           Generate Cinema specification to summarize generated extracts in a file named
           **data.csv** under the **Extracts Output Directory**.
         </Documentation>
-        <BooleanDomain name="bool" />
+        <BooleanDomain name="bool"/>
       </IntVectorProperty>
 
       <ProxyProperty name="GlobalTrigger">
         <ProxyListDomain name="proxy_list">
-          <Group name="extract_triggers" default="TimeStep" />
+          <Group name="extract_triggers" default="TimeStep"/>
         </ProxyListDomain>
-        <Documentation>This property sets the parameters of the trigger.</Documentation>
+        <Documentation>
+          This property sets the parameters of the trigger.
+        </Documentation>
       </ProxyProperty>
 
       <IntVectorProperty name="EnableCatalystLive"
-        number_of_elements="1"
-        default_values="0">
+                         number_of_elements="1"
+                         default_values="0">
         <Documentation>
           Enable Catalyst Live which allows connecting to a Catalyst instrumented simulation
           using the ParaView GUI.
         </Documentation>
-        <BooleanDomain name="bool" />
+        <BooleanDomain name="bool"/>
       </IntVectorProperty>
 
       <StringVectorProperty name="CatalystLiveURL"
-        label="Catalyst Live URL"
-        number_of_elements="1"
-        default_values="localhost:22222">
+                            label="Catalyst Live URL"
+                            number_of_elements="1"
+                            default_values="localhost:22222">
         <Documentation>
           Specify the hostname (or IP address) and port for the node on which a ParaView client will
           be listening for Catalyst Live connections.
         </Documentation>
         <Hints>
           <PropertyWidgetDecorator type="GenericDecorator"
-            mode="enabled_state"
-            property="EnableCatalystLive"
-            value="1" />
+                                   mode="enabled_state"
+                                   property="EnableCatalystLive"
+                                   value="1"/>
         </Hints>
       </StringVectorProperty>
 
       <ProxyProperty name="CatalystLiveTrigger" panel_visibility="advanced">
         <ProxyListDomain name="proxy_list">
-          <Proxy group="extract_triggers" name="TimeStep" />
+          <Proxy group="extract_triggers" name="TimeStep"/>
         </ProxyListDomain>
         <Hints>
           <PropertyWidgetDecorator type="GenericDecorator"
-            mode="enabled_state"
-            property="EnableCatalystLive"
-            value="1" />
+                                   mode="enabled_state"
+                                   property="EnableCatalystLive"
+                                   value="1"/>
         </Hints>
       </ProxyProperty>
 
       <PropertyGroup label="Directories">
-        <Property name="ExtractsOutputDirectory" />
+        <Property name="ExtractsOutputDirectory"/>
       </PropertyGroup>
 
       <PropertyGroup label="Global Options">
-        <Property name="GlobalTrigger" />
+        <Property name="GlobalTrigger"/>
       </PropertyGroup>
 
       <PropertyGroup label="Catalyst Live Options">
-        <Property name="EnableCatalystLive" />
-        <Property name="CatalystLiveURL" />
-        <Property name="CatalystLiveTrigger" />
+        <Property name="EnableCatalystLive"/>
+        <Property name="CatalystLiveURL"/>
+        <Property name="CatalystLiveTrigger"/>
       </PropertyGroup>
 
       <Hints>
-        <UseDocumentationForLabels />
+        <UseDocumentationForLabels/>
       </Hints>
     </Proxy>
 
     <Proxy name="CatalystGlobalOptions">
       <Documentation>
-        A proxy used to maintain global Catalyst state. This, combined with the pipeline shape and a choice of writers and screenshots define what Catalyst will do with and produce from the data that the simulation gives to it.
+        A proxy used to maintain global Catalyst state. This, combined with the pipeline shape and a choice of writers
+        and screenshots define what Catalyst will do with and produce from the data that the simulation gives to it.
       </Documentation>
 
       <IntVectorProperty name="EnableLive"
                          label="Enable Live Connections"
                          default_values="0"
                          number_of_elements="1">
-        <BooleanDomain name="bool" />
+        <BooleanDomain name="bool"/>
         <Documentation>
           Makes the generated Catalyst Script check for Live connections.
         </Documentation>
@@ -1259,7 +1349,7 @@
                          default_values="1"
                          number_of_elements="1"
                          panel_visibility="advanced">
-        <IntRangeDomain name="range" min="1" />
+        <IntRangeDomain name="range" min="1"/>
         <Documentation>
           Catalyst will update live connections only every N'th timestep.
         </Documentation>
@@ -1268,10 +1358,10 @@
       <StringVectorProperty name="DataExtractsRootDirectory"
                             number_of_elements="1"
                             default_values="">
-        <FileListDomain name="directory" />
+        <FileListDomain name="directory"/>
         <Hints>
           <UseDirectoryName/>
-          <AcceptAnyFile />
+          <AcceptAnyFile/>
         </Hints>
         <Documentation>
           Defines a top level directory where data extracts are placed under.
@@ -1281,11 +1371,11 @@
       <StringVectorProperty name="ImageExtractsRootDirectory"
                             number_of_elements="1"
                             default_values="">
-        <FileListDomain name="directory" />
+        <FileListDomain name="directory"/>
         <Hints>
           <UseDirectoryName/>
-          <BrowseLocalFileSystem />
-          <AcceptAnyFile />
+          <BrowseLocalFileSystem/>
+          <AcceptAnyFile/>
         </Hints>
         <Documentation>
           Defines a top level directory where image extracts are placed under.
@@ -1306,7 +1396,7 @@
                          default_values="0"
                          number_of_elements="1"
                          panel_visibility="advanced">
-        <BooleanDomain name="bool" />
+        <BooleanDomain name="bool"/>
         <Documentation>
           Tells Catalyst to ask for only those arrays that are currently enabled on the source rather than all of them.
         </Documentation>
@@ -1317,9 +1407,10 @@
                          default_values="0"
                          number_of_elements="1"
                          panel_visibility="advanced">
-        <IntRangeDomain name="range" min="0" />
+        <IntRangeDomain name="range" min="0"/>
         <Documentation>
-          Catalyst will skip this many startup cycles (possibly excepting ForceFirstOutput) before starting to write files.
+          Catalyst will skip this many startup cycles (possibly excepting ForceFirstOutput) before starting to write
+          files.
         </Documentation>
       </IntVectorProperty>
 
@@ -1327,9 +1418,10 @@
                          default_values="0"
                          number_of_elements="1"
                          panel_visibility="advanced">
-        <BooleanDomain name="bool" />
+        <BooleanDomain name="bool"/>
         <Documentation>
-          Tells Catalyst to always dump the first timestep it gets because it may take a long time to wait for WriteStart iterations.
+          Tells Catalyst to always dump the first timestep it gets because it may take a long time to wait for
+          WriteStart iterations.
         </Documentation>
       </IntVectorProperty>
 
@@ -1338,7 +1430,7 @@
                          default_values="0"
                          number_of_elements="1"
                          panel_visibility="advanced">
-        <BooleanDomain name="bool" />
+        <BooleanDomain name="bool"/>
         <Documentation>
           Adjusts the lookup table dynamically as the simulation progresses.
         </Documentation>
@@ -1348,17 +1440,17 @@
                          label="Save Cinema D Table"
                          default_values="0"
                          number_of_elements="1">
-        <BooleanDomain name="bool" />
+        <BooleanDomain name="bool"/>
         <Documentation>
           Creates a Cinema table that indexes all output files.
         </Documentation>
       </IntVectorProperty>
 
       <StringVectorProperty name="TimeInputFilePattern"
-                         label="Input File Pattern"
-                         number_of_elements="1"
-                         default_values="infile_*.vti"
-                         panel_visibility="advanced">
+                            label="Input File Pattern"
+                            number_of_elements="1"
+                            default_values="infile_*.vti"
+                            panel_visibility="advanced">
         <Documentation>
           A regular expression to that tells spatio-temporal scripts where to search for input files.
         </Documentation>
@@ -1368,14 +1460,14 @@
                          default_values="1"
                          number_of_elements="1"
                          panel_visibility="advanced">
-        <IntRangeDomain name="range" min="1" max="1000" />
+        <IntRangeDomain name="range" min="1" max="1000"/>
         <Documentation>
           The number of processes working together on a specific time step in a spatio-temporal style batch script.
         </Documentation>
       </IntVectorProperty>
       <PropertyGroup label="Spatio-Temporal Controls">
-        <Property name="TimeInputFilePattern" />
-        <Property name="TimeCompartmentSize" />
+        <Property name="TimeInputFilePattern"/>
+        <Property name="TimeCompartmentSize"/>
       </PropertyGroup>
     </Proxy>
   </ProxyGroup>
@@ -1386,395 +1478,395 @@
   <!-- ================================================================= -->
   <ProxyGroup name="insitu_writer_parameters">
     <SourceProxy name="XMLPImageDataWriter" class="vtkPVNullSource"
-      label="Parallel Image Data Writer">
+                 label="Parallel Image Data Writer">
       <InputProperty name="Input">
-          <ProxyGroupDomain name="groups">
-            <Group name="sources" />
-            <Group name="filters" />
-          </ProxyGroupDomain>
-          <DataTypeDomain name="input_type" composite_data_supported="0">
-            <DataType value="vtkImageData" />
-          </DataTypeDomain>
-          <Documentation>
-            The input.
-          </Documentation>
+        <ProxyGroupDomain name="groups">
+          <Group name="sources"/>
+          <Group name="filters"/>
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type" composite_data_supported="0">
+          <DataType value="vtkImageData"/>
+        </DataTypeDomain>
+        <Documentation>
+          The input.
+        </Documentation>
       </InputProperty>
 
       <StringVectorProperty name="FileName"
-        number_of_elements="1"
-        default_values="filename_%t.pvti">
-     </StringVectorProperty>
+                            number_of_elements="1"
+                            default_values="filename_%t.pvti">
+      </StringVectorProperty>
 
       <IntVectorProperty name="WriteFrequency"
-        number_of_elements="1"
-        default_values="1">
-        <IntRangeDomain name="range" min="1" />
+                         number_of_elements="1"
+                         default_values="1">
+        <IntRangeDomain name="range" min="1"/>
       </IntVectorProperty>
 
       <IntVectorProperty name="PaddingAmount"
-        number_of_elements="1"
-        default_values="0">
-        <IntRangeDomain name="range" min="0" />
-      </IntVectorProperty>
-
-     <Hints>
-      <!-- TODO: this doesn't work yet -->
-      <PipelineIcon name=":pqComponents/pqSave.svg" />
-
-      <!-- This will help us when exporting the script state -->
-      <WriterProxy group="writers" name="XMLPImageDataWriter" />
-     </Hints>
-     <!-- End of XMLPImageDataWriter -->
-    </SourceProxy>
-
-    <SourceProxy name="XMLPRectilinearGridWriter" class="vtkPVNullSource"
-      label="Parallel Rectilinear Grid Writer">
-      <InputProperty name="Input">
-          <ProxyGroupDomain name="groups">
-            <Group name="sources" />
-            <Group name="filters" />
-          </ProxyGroupDomain>
-          <DataTypeDomain name="input_type" composite_data_supported="0">
-            <DataType value="vtkRectilinearGrid" />
-          </DataTypeDomain>
-          <Documentation>
-            The input.
-          </Documentation>
-      </InputProperty>
-
-      <StringVectorProperty name="FileName"
-        number_of_elements="1"
-        default_values="filename_%t.pvtr">
-     </StringVectorProperty>
-
-      <IntVectorProperty name="WriteFrequency"
-        number_of_elements="1"
-        default_values="1">
-        <IntRangeDomain name="range" min="1" />
-      </IntVectorProperty>
-
-      <IntVectorProperty name="PaddingAmount"
-        number_of_elements="1"
-        default_values="0">
-        <IntRangeDomain name="range" min="0" />
-      </IntVectorProperty>
-
-     <Hints>
-      <!-- TODO: this doesn't work yet -->
-      <PipelineIcon name=":pqComponents/pqSave.svg" />
-
-      <!-- This will help us when exporting the script state -->
-      <WriterProxy group="writers" name="XMLPRectilinearGridWriter" />
-     </Hints>
-     <!-- End of XMLRectilinearGridWriter -->
-    </SourceProxy>
-
-    <SourceProxy name="XMLPStructuredGridWriter" class="vtkPVNullSource"
-      label="Parallel Structured Grid Writer">
-      <InputProperty name="Input">
-          <ProxyGroupDomain name="groups">
-            <Group name="sources" />
-            <Group name="filters" />
-          </ProxyGroupDomain>
-          <DataTypeDomain name="input_type">
-            <DataType value="vtkStructuredGrid" composite_data_supported="0"/>
-          </DataTypeDomain>
-          <Documentation>
-            The input.
-          </Documentation>
-      </InputProperty>
-
-      <StringVectorProperty name="FileName"
-        number_of_elements="1"
-        default_values="filename_%t.pvts">
-     </StringVectorProperty>
-
-      <IntVectorProperty name="WriteFrequency"
-        number_of_elements="1"
-        default_values="1">
-        <IntRangeDomain name="range" min="1" />
-      </IntVectorProperty>
-
-      <IntVectorProperty name="PaddingAmount"
-        number_of_elements="1"
-        default_values="0">
-        <IntRangeDomain name="range" min="0" />
-      </IntVectorProperty>
-
-     <Hints>
-      <!-- TODO: this doesn't work yet -->
-      <PipelineIcon name=":pqComponents/pqSave.svg" />
-
-      <!-- This will help us when exporting the script state -->
-      <WriterProxy group="writers" name="XMLPStructuredGridWriter" />
-     </Hints>
-     <!-- End of XMLPStructuredGridWriter -->
-    </SourceProxy>
-
-    <SourceProxy name="XMLPPolyDataWriter" class="vtkPVNullSource"
-      label="Parallel PolyData Writer">
-      <InputProperty name="Input">
-          <ProxyGroupDomain name="groups">
-            <Group name="sources" />
-            <Group name="filters" />
-          </ProxyGroupDomain>
-          <DataTypeDomain name="input_type" composite_data_supported="0">
-            <DataType value="vtkPolyData" />
-          </DataTypeDomain>
-          <Documentation>
-            The input.
-          </Documentation>
-      </InputProperty>
-
-      <StringVectorProperty name="FileName"
-        number_of_elements="1"
-        default_values="filename_%t.pvtp">
-     </StringVectorProperty>
-
-      <IntVectorProperty name="WriteFrequency"
-        number_of_elements="1"
-        default_values="1">
-        <IntRangeDomain name="range" min="1" />
-      </IntVectorProperty>
-
-      <IntVectorProperty name="PaddingAmount"
-        number_of_elements="1"
-        default_values="0">
-        <IntRangeDomain name="range" min="0" />
-      </IntVectorProperty>
-
-     <Hints>
-      <!-- TODO: this doesn't work yet -->
-      <PipelineIcon name=":pqComponents/pqSave.svg" />
-
-      <!-- This will help us when exporting the script state -->
-      <WriterProxy group="writers" name="XMLPPolyDataWriter" />
-     </Hints>
-     <!-- End of XMLPPolyDataWriter -->
-    </SourceProxy>
-
-    <SourceProxy name="XMLPUnstructuredGridWriter" class="vtkPVNullSource"
-      label="Parallel UnstructuredGrid Writer">
-      <InputProperty name="Input">
-          <ProxyGroupDomain name="groups">
-            <Group name="sources" />
-            <Group name="filters" />
-          </ProxyGroupDomain>
-          <DataTypeDomain name="input_type">
-            <DataType value="vtkUnstructuredGrid" composite_data_supported="0"/>
-          </DataTypeDomain>
-          <Documentation>
-            The input.
-          </Documentation>
-      </InputProperty>
-
-      <StringVectorProperty name="FileName"
-        number_of_elements="1"
-        default_values="filename_%t.pvtu">
-     </StringVectorProperty>
-
-      <IntVectorProperty name="WriteFrequency"
-        number_of_elements="1"
-        default_values="1">
-        <IntRangeDomain name="range" min="1" />
-      </IntVectorProperty>
-
-      <IntVectorProperty name="PaddingAmount"
-        number_of_elements="1"
-        default_values="0">
-        <IntRangeDomain name="range" min="0" />
-      </IntVectorProperty>
-
-     <Hints>
-      <!-- TODO: this doesn't work yet -->
-      <PipelineIcon name=":pqComponents/pqSave.svg" />
-
-      <!-- This will help us when exporting the script state -->
-      <WriterProxy group="writers" name="XMLPUnstructuredGridWriter" />
-     </Hints>
-     <!-- End of XMLPUnstructuredGridWriter -->
-    </SourceProxy>
-
-    <SourceProxy name="XMLMultiBlockDataWriter" class="vtkPVNullSource"
-      label="Parallel MultiBlockDataSet Writer">
-      <InputProperty name="Input">
-          <ProxyGroupDomain name="groups">
-            <Group name="sources" />
-            <Group name="filters" />
-          </ProxyGroupDomain>
-          <DataTypeDomain name="input_type">
-            <DataType value="vtkMultiBlockDataSet" />
-          </DataTypeDomain>
-          <Documentation>
-            The input.
-          </Documentation>
-      </InputProperty>
-
-      <StringVectorProperty name="FileName"
-        number_of_elements="1"
-        default_values="filename_%t.vtm">
-     </StringVectorProperty>
-
-      <IntVectorProperty name="WriteFrequency"
-        number_of_elements="1"
-        default_values="1">
-        <IntRangeDomain name="range" min="1" />
-      </IntVectorProperty>
-
-      <IntVectorProperty name="PaddingAmount"
-        number_of_elements="1"
-        default_values="0">
-        <IntRangeDomain name="range" min="0" />
-      </IntVectorProperty>
-
-     <Hints>
-      <!-- TODO: this doesn't work yet -->
-      <PipelineIcon name=":pqComponents/pqSave.svg" />
-
-      <!-- This will help us when exporting the script state -->
-      <WriterProxy group="writers" name="XMLMultiBlockDataWriter" />
-     </Hints>
-     <!-- End of XMLMultiBlockDataWriter -->
-    </SourceProxy>
-
-    <SourceProxy name="XMLHierarchicalBoxDataWriter" class="vtkPVNullSource"
-      label="Parallel Hierarchical Box Data Writer">
-      <InputProperty name="Input">
-          <ProxyGroupDomain name="groups">
-            <Group name="sources" />
-            <Group name="filters" />
-          </ProxyGroupDomain>
-          <DataTypeDomain name="input_type">
-            <DataType value="vtkOverlappingAMR" />
-          </DataTypeDomain>
-          <Documentation>
-            The input.
-          </Documentation>
-      </InputProperty>
-
-      <StringVectorProperty name="FileName"
-        number_of_elements="1"
-        default_values="filename_%t.vth">
-     </StringVectorProperty>
-
-      <IntVectorProperty name="WriteFrequency"
-        number_of_elements="1"
-        default_values="1">
-        <IntRangeDomain name="range" min="1" />
-      </IntVectorProperty>
-
-      <IntVectorProperty name="PaddingAmount"
-        number_of_elements="1"
-        default_values="0">
-        <IntRangeDomain name="range" min="0" />
-      </IntVectorProperty>
-
-     <Hints>
-      <!-- TODO: this doesn't work yet -->
-      <PipelineIcon name=":pqComponents/pqSave.svg" />
-
-      <!-- This will help us when exporting the script state -->
-      <WriterProxy group="writers" name="XMLHierarchicalBoxDataWriter" />
-     </Hints>
-     <!-- End of XMLHierarchicalBoxDataWriter -->
-    </SourceProxy>
-
-    <SourceProxy name="XMLUniformGridAMRWriter" class="vtkPVNullSource"
-      label="Parallel Uniform Grid AMR Writer">
-      <InputProperty name="Input">
-          <ProxyGroupDomain name="groups">
-            <Group name="sources" />
-            <Group name="filters" />
-          </ProxyGroupDomain>
-          <DataTypeDomain name="input_type">
-            <DataType value="vtkUniformGridAMR" />
-          </DataTypeDomain>
-          <Documentation>
-            The input.
-          </Documentation>
-      </InputProperty>
-
-      <StringVectorProperty name="FileName"
-        number_of_elements="1"
-        default_values="filename_%t.vth">
-     </StringVectorProperty>
-
-      <IntVectorProperty name="WriteFrequency"
-        number_of_elements="1"
-        default_values="1">
-        <IntRangeDomain name="range" min="1" />
-      </IntVectorProperty>
-
-      <IntVectorProperty name="PaddingAmount"
-        number_of_elements="1"
-        default_values="0">
-        <IntRangeDomain name="range" min="0" />
+                         number_of_elements="1"
+                         default_values="0">
+        <IntRangeDomain name="range" min="0"/>
       </IntVectorProperty>
 
       <Hints>
-      <!-- TODO: this doesn't work yet -->
-      <PipelineIcon name=":pqComponents/pqSave.svg" />
+        <!-- TODO: this doesn't work yet -->
+        <PipelineIcon name=":pqComponents/pqSave.svg"/>
 
-      <!-- This will help us when exporting the script state -->
-      <WriterProxy group="writers" name="XMLUniformGridAMRWriter" />
-     </Hints>
-     <!-- End of XMLUniformGridAMRWriter -->
+        <!-- This will help us when exporting the script state -->
+        <WriterProxy group="writers" name="XMLPImageDataWriter"/>
+      </Hints>
+      <!-- End of XMLPImageDataWriter -->
     </SourceProxy>
 
-    <SourceProxy name="CSVWriter" class="vtkPVNullSource"
-      label="CSV Table Writer">
+    <SourceProxy name="XMLPRectilinearGridWriter" class="vtkPVNullSource"
+                 label="Parallel Rectilinear Grid Writer">
       <InputProperty name="Input">
-          <ProxyGroupDomain name="groups">
-            <Group name="sources" />
-            <Group name="filters" />
-          </ProxyGroupDomain>
-          <DataTypeDomain name="input_type">
-            <DataType value="vtkTable" />
-          </DataTypeDomain>
-          <Documentation>
-            The input.
-          </Documentation>
+        <ProxyGroupDomain name="groups">
+          <Group name="sources"/>
+          <Group name="filters"/>
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type" composite_data_supported="0">
+          <DataType value="vtkRectilinearGrid"/>
+        </DataTypeDomain>
+        <Documentation>
+          The input.
+        </Documentation>
       </InputProperty>
 
       <StringVectorProperty name="FileName"
-        number_of_elements="1"
-        default_values="filename_%t.csv">
-     </StringVectorProperty>
+                            number_of_elements="1"
+                            default_values="filename_%t.pvtr">
+      </StringVectorProperty>
 
       <IntVectorProperty name="WriteFrequency"
-        number_of_elements="1"
-        default_values="1">
-        <IntRangeDomain name="range" min="1" />
+                         number_of_elements="1"
+                         default_values="1">
+        <IntRangeDomain name="range" min="1"/>
       </IntVectorProperty>
 
       <IntVectorProperty name="PaddingAmount"
-        number_of_elements="1"
-        default_values="0">
-        <IntRangeDomain name="range" min="0" />
+                         number_of_elements="1"
+                         default_values="0">
+        <IntRangeDomain name="range" min="0"/>
       </IntVectorProperty>
 
-     <Hints>
-      <!-- TODO: this doesn't work yet -->
-      <PipelineIcon name=":pqComponents/pqSave.svg" />
+      <Hints>
+        <!-- TODO: this doesn't work yet -->
+        <PipelineIcon name=":pqComponents/pqSave.svg"/>
 
-      <!-- This will help us when exporting the script state -->
-      <WriterProxy group="writers" name="CSVWriter" />
-     </Hints>
-     <!-- End of XMLHierarchicalBoxDataWriter -->
+        <!-- This will help us when exporting the script state -->
+        <WriterProxy group="writers" name="XMLPRectilinearGridWriter"/>
+      </Hints>
+      <!-- End of XMLRectilinearGridWriter -->
+    </SourceProxy>
+
+    <SourceProxy name="XMLPStructuredGridWriter" class="vtkPVNullSource"
+                 label="Parallel Structured Grid Writer">
+      <InputProperty name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources"/>
+          <Group name="filters"/>
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkStructuredGrid" composite_data_supported="0"/>
+        </DataTypeDomain>
+        <Documentation>
+          The input.
+        </Documentation>
+      </InputProperty>
+
+      <StringVectorProperty name="FileName"
+                            number_of_elements="1"
+                            default_values="filename_%t.pvts">
+      </StringVectorProperty>
+
+      <IntVectorProperty name="WriteFrequency"
+                         number_of_elements="1"
+                         default_values="1">
+        <IntRangeDomain name="range" min="1"/>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="PaddingAmount"
+                         number_of_elements="1"
+                         default_values="0">
+        <IntRangeDomain name="range" min="0"/>
+      </IntVectorProperty>
+
+      <Hints>
+        <!-- TODO: this doesn't work yet -->
+        <PipelineIcon name=":pqComponents/pqSave.svg"/>
+
+        <!-- This will help us when exporting the script state -->
+        <WriterProxy group="writers" name="XMLPStructuredGridWriter"/>
+      </Hints>
+      <!-- End of XMLPStructuredGridWriter -->
+    </SourceProxy>
+
+    <SourceProxy name="XMLPPolyDataWriter" class="vtkPVNullSource"
+                 label="Parallel PolyData Writer">
+      <InputProperty name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources"/>
+          <Group name="filters"/>
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type" composite_data_supported="0">
+          <DataType value="vtkPolyData"/>
+        </DataTypeDomain>
+        <Documentation>
+          The input.
+        </Documentation>
+      </InputProperty>
+
+      <StringVectorProperty name="FileName"
+                            number_of_elements="1"
+                            default_values="filename_%t.pvtp">
+      </StringVectorProperty>
+
+      <IntVectorProperty name="WriteFrequency"
+                         number_of_elements="1"
+                         default_values="1">
+        <IntRangeDomain name="range" min="1"/>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="PaddingAmount"
+                         number_of_elements="1"
+                         default_values="0">
+        <IntRangeDomain name="range" min="0"/>
+      </IntVectorProperty>
+
+      <Hints>
+        <!-- TODO: this doesn't work yet -->
+        <PipelineIcon name=":pqComponents/pqSave.svg"/>
+
+        <!-- This will help us when exporting the script state -->
+        <WriterProxy group="writers" name="XMLPPolyDataWriter"/>
+      </Hints>
+      <!-- End of XMLPPolyDataWriter -->
+    </SourceProxy>
+
+    <SourceProxy name="XMLPUnstructuredGridWriter" class="vtkPVNullSource"
+                 label="Parallel UnstructuredGrid Writer">
+      <InputProperty name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources"/>
+          <Group name="filters"/>
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkUnstructuredGrid" composite_data_supported="0"/>
+        </DataTypeDomain>
+        <Documentation>
+          The input.
+        </Documentation>
+      </InputProperty>
+
+      <StringVectorProperty name="FileName"
+                            number_of_elements="1"
+                            default_values="filename_%t.pvtu">
+      </StringVectorProperty>
+
+      <IntVectorProperty name="WriteFrequency"
+                         number_of_elements="1"
+                         default_values="1">
+        <IntRangeDomain name="range" min="1"/>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="PaddingAmount"
+                         number_of_elements="1"
+                         default_values="0">
+        <IntRangeDomain name="range" min="0"/>
+      </IntVectorProperty>
+
+      <Hints>
+        <!-- TODO: this doesn't work yet -->
+        <PipelineIcon name=":pqComponents/pqSave.svg"/>
+
+        <!-- This will help us when exporting the script state -->
+        <WriterProxy group="writers" name="XMLPUnstructuredGridWriter"/>
+      </Hints>
+      <!-- End of XMLPUnstructuredGridWriter -->
+    </SourceProxy>
+
+    <SourceProxy name="XMLMultiBlockDataWriter" class="vtkPVNullSource"
+                 label="Parallel MultiBlockDataSet Writer">
+      <InputProperty name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources"/>
+          <Group name="filters"/>
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkMultiBlockDataSet"/>
+        </DataTypeDomain>
+        <Documentation>
+          The input.
+        </Documentation>
+      </InputProperty>
+
+      <StringVectorProperty name="FileName"
+                            number_of_elements="1"
+                            default_values="filename_%t.vtm">
+      </StringVectorProperty>
+
+      <IntVectorProperty name="WriteFrequency"
+                         number_of_elements="1"
+                         default_values="1">
+        <IntRangeDomain name="range" min="1"/>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="PaddingAmount"
+                         number_of_elements="1"
+                         default_values="0">
+        <IntRangeDomain name="range" min="0"/>
+      </IntVectorProperty>
+
+      <Hints>
+        <!-- TODO: this doesn't work yet -->
+        <PipelineIcon name=":pqComponents/pqSave.svg"/>
+
+        <!-- This will help us when exporting the script state -->
+        <WriterProxy group="writers" name="XMLMultiBlockDataWriter"/>
+      </Hints>
+      <!-- End of XMLMultiBlockDataWriter -->
+    </SourceProxy>
+
+    <SourceProxy name="XMLHierarchicalBoxDataWriter" class="vtkPVNullSource"
+                 label="Parallel Hierarchical Box Data Writer">
+      <InputProperty name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources"/>
+          <Group name="filters"/>
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkOverlappingAMR"/>
+        </DataTypeDomain>
+        <Documentation>
+          The input.
+        </Documentation>
+      </InputProperty>
+
+      <StringVectorProperty name="FileName"
+                            number_of_elements="1"
+                            default_values="filename_%t.vth">
+      </StringVectorProperty>
+
+      <IntVectorProperty name="WriteFrequency"
+                         number_of_elements="1"
+                         default_values="1">
+        <IntRangeDomain name="range" min="1"/>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="PaddingAmount"
+                         number_of_elements="1"
+                         default_values="0">
+        <IntRangeDomain name="range" min="0"/>
+      </IntVectorProperty>
+
+      <Hints>
+        <!-- TODO: this doesn't work yet -->
+        <PipelineIcon name=":pqComponents/pqSave.svg"/>
+
+        <!-- This will help us when exporting the script state -->
+        <WriterProxy group="writers" name="XMLHierarchicalBoxDataWriter"/>
+      </Hints>
+      <!-- End of XMLHierarchicalBoxDataWriter -->
+    </SourceProxy>
+
+    <SourceProxy name="XMLUniformGridAMRWriter" class="vtkPVNullSource"
+                 label="Parallel Uniform Grid AMR Writer">
+      <InputProperty name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources"/>
+          <Group name="filters"/>
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkUniformGridAMR"/>
+        </DataTypeDomain>
+        <Documentation>
+          The input.
+        </Documentation>
+      </InputProperty>
+
+      <StringVectorProperty name="FileName"
+                            number_of_elements="1"
+                            default_values="filename_%t.vth">
+      </StringVectorProperty>
+
+      <IntVectorProperty name="WriteFrequency"
+                         number_of_elements="1"
+                         default_values="1">
+        <IntRangeDomain name="range" min="1"/>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="PaddingAmount"
+                         number_of_elements="1"
+                         default_values="0">
+        <IntRangeDomain name="range" min="0"/>
+      </IntVectorProperty>
+
+      <Hints>
+        <!-- TODO: this doesn't work yet -->
+        <PipelineIcon name=":pqComponents/pqSave.svg"/>
+
+        <!-- This will help us when exporting the script state -->
+        <WriterProxy group="writers" name="XMLUniformGridAMRWriter"/>
+      </Hints>
+      <!-- End of XMLUniformGridAMRWriter -->
+    </SourceProxy>
+
+    <SourceProxy name="CSVWriter" class="vtkPVNullSource"
+                 label="CSV Table Writer">
+      <InputProperty name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources"/>
+          <Group name="filters"/>
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkTable"/>
+        </DataTypeDomain>
+        <Documentation>
+          The input.
+        </Documentation>
+      </InputProperty>
+
+      <StringVectorProperty name="FileName"
+                            number_of_elements="1"
+                            default_values="filename_%t.csv">
+      </StringVectorProperty>
+
+      <IntVectorProperty name="WriteFrequency"
+                         number_of_elements="1"
+                         default_values="1">
+        <IntRangeDomain name="range" min="1"/>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="PaddingAmount"
+                         number_of_elements="1"
+                         default_values="0">
+        <IntRangeDomain name="range" min="0"/>
+      </IntVectorProperty>
+
+      <Hints>
+        <!-- TODO: this doesn't work yet -->
+        <PipelineIcon name=":pqComponents/pqSave.svg"/>
+
+        <!-- This will help us when exporting the script state -->
+        <WriterProxy group="writers" name="CSVWriter"/>
+      </Hints>
+      <!-- End of XMLHierarchicalBoxDataWriter -->
     </SourceProxy>
 
     <SourceProxy name="ExodusIIWriter" class="vtkPVNullSource"
                  label="ExodusII Writer">
       <InputProperty name="Input">
         <ProxyGroupDomain name="groups">
-          <Group name="sources" />
-          <Group name="filters" />
+          <Group name="sources"/>
+          <Group name="filters"/>
         </ProxyGroupDomain>
         <DataTypeDomain composite_data_supported="1"
                         name="input_type">
-          <DataType value="vtkImageData" />
-          <DataType value="vtkPolyData" />
-          <DataType value="vtkUnstructuredGrid" />
+          <DataType value="vtkImageData"/>
+          <DataType value="vtkPolyData"/>
+          <DataType value="vtkUnstructuredGrid"/>
         </DataTypeDomain>
 
         <Documentation>
@@ -1787,67 +1879,67 @@
                             default_values="filename.e-s">
       </StringVectorProperty>
       <IntVectorProperty name="WriteFrequency"
-        number_of_elements="1"
-        default_values="1">
-        <IntRangeDomain name="range" min="1" />
+                         number_of_elements="1"
+                         default_values="1">
+        <IntRangeDomain name="range" min="1"/>
       </IntVectorProperty>
 
       <IntVectorProperty name="PaddingAmount"
-        number_of_elements="1"
-        default_values="5">
-        <IntRangeDomain name="range" min="0" />
+                         number_of_elements="1"
+                         default_values="5">
+        <IntRangeDomain name="range" min="0"/>
       </IntVectorProperty>
 
       <Hints>
         <!-- TODO: this doesn't work yet -->
-        <PipelineIcon name=":pqComponents/pqSave.svg" />
+        <PipelineIcon name=":pqComponents/pqSave.svg"/>
 
         <!-- This will help us when exporting the script state -->
-        <WriterProxy group="writers" name="ExodusIIWriter" />
+        <WriterProxy group="writers" name="ExodusIIWriter"/>
       </Hints>
       <!-- End of ExodusIIWriter -->
     </SourceProxy>
 
     <SourceProxy name="HyperTreeGridWriter" class="vtkPVNullSource"
-      label="Parallel HyperTreeGrid Writer">
+                 label="Parallel HyperTreeGrid Writer">
       <InputProperty name="Input">
-          <ProxyGroupDomain name="groups">
-            <Group name="sources" />
-            <Group name="filters" />
-          </ProxyGroupDomain>
-          <DataTypeDomain name="input_type">
-            <DataType value="vtkHyperTreeGrid" />
-          </DataTypeDomain>
-          <Documentation>
-            The input.
-          </Documentation>
+        <ProxyGroupDomain name="groups">
+          <Group name="sources"/>
+          <Group name="filters"/>
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkHyperTreeGrid"/>
+        </DataTypeDomain>
+        <Documentation>
+          The input.
+        </Documentation>
       </InputProperty>
 
       <StringVectorProperty name="FileName"
-        number_of_elements="1"
-        default_values="filename_%t.htg">
-     </StringVectorProperty>
+                            number_of_elements="1"
+                            default_values="filename_%t.htg">
+      </StringVectorProperty>
 
       <IntVectorProperty name="WriteFrequency"
-        number_of_elements="1"
-        default_values="1">
-        <IntRangeDomain name="range" min="1" />
+                         number_of_elements="1"
+                         default_values="1">
+        <IntRangeDomain name="range" min="1"/>
       </IntVectorProperty>
 
       <IntVectorProperty name="PaddingAmount"
-        number_of_elements="1"
-        default_values="0">
-        <IntRangeDomain name="range" min="0" />
+                         number_of_elements="1"
+                         default_values="0">
+        <IntRangeDomain name="range" min="0"/>
       </IntVectorProperty>
 
-     <Hints>
-      <!-- TODO: this doesn't work yet -->
-      <PipelineIcon name=":pqComponents/pqSave.svg" />
+      <Hints>
+        <!-- TODO: this doesn't work yet -->
+        <PipelineIcon name=":pqComponents/pqSave.svg"/>
 
-      <!-- This will help us when exporting the script state -->
-      <WriterProxy group="writers" name="HyperTreeGridWriter" />
-     </Hints>
-     <!-- End of HyperTreeGridWriter -->
+        <!-- This will help us when exporting the script state -->
+        <WriterProxy group="writers" name="HyperTreeGridWriter"/>
+      </Hints>
+      <!-- End of HyperTreeGridWriter -->
     </SourceProxy>
   </ProxyGroup>
 
@@ -1857,21 +1949,21 @@
         Options proxy used to prompt user for tracing options when starting trace.
       </Documentation>
       <IntVectorProperty name="PropertiesToTraceOnCreate"
-        default_values="1"
-        number_of_elements="1">
+                         default_values="1"
+                         number_of_elements="1">
         <Documentation>
           Select which properties to save in trace
         </Documentation>
         <EnumerationDomain name="enum">
-          <Entry text="all properties" value="0" />
-          <Entry text="any *modified* properties" value="1" />
-          <Entry text="only *user-modified* properites" value="2" />
+          <Entry text="all properties" value="0"/>
+          <Entry text="any *modified* properties" value="1"/>
+          <Entry text="only *user-modified* properites" value="2"/>
         </EnumerationDomain>
       </IntVectorProperty>
 
       <IntVectorProperty name="FullyTraceSupplementalProxies"
-        number_of_elements="1"
-        default_values="0">
+                         number_of_elements="1"
+                         default_values="0">
         <BooleanDomain name="bool"/>
         <Documentation>
           Fully trace supplemental objects, such as color maps, color bars, etc.
@@ -1880,35 +1972,35 @@
       </IntVectorProperty>
 
       <IntVectorProperty name="SkipRenderingComponents"
-        number_of_elements="1"
-        default_values="0">
-        <BooleanDomain name="bool" />
+                         number_of_elements="1"
+                         default_values="0">
+        <BooleanDomain name="bool"/>
         <Documentation>
           Skip rendering components such as views, representations, etc.
         </Documentation>
       </IntVectorProperty>
 
       <IntVectorProperty name="ShowIncrementalTrace"
-          default_values="0"
-          number_of_elements="1">
-          <BooleanDomain name="bool" />
-          <Documentation>
-            Show trace as it is being generated.
-          </Documentation>
+                         default_values="0"
+                         number_of_elements="1">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          Show trace as it is being generated.
+        </Documentation>
       </IntVectorProperty>
 
       <PropertyGroup label="General options">
-        <Property name="PropertiesToTraceOnCreate" />
+        <Property name="PropertiesToTraceOnCreate"/>
       </PropertyGroup>
       <PropertyGroup label="Color maps, color bar etc.">
-        <Property name="FullyTraceSupplementalProxies" />
+        <Property name="FullyTraceSupplementalProxies"/>
       </PropertyGroup>
       <PropertyGroup label="Miscellaneous">
-        <Property name="SkipRenderingComponents" />
-        <Property name="ShowIncrementalTrace" />
+        <Property name="SkipRenderingComponents"/>
+        <Property name="ShowIncrementalTrace"/>
       </PropertyGroup>
       <Hints>
-        <UseDocumentationForLabels />
+        <UseDocumentationForLabels/>
       </Hints>
     </Proxy>
 
@@ -1917,14 +2009,14 @@
         Options proxy used to prompt user for python state options.
       </Documentation>
       <IntVectorProperty name="PropertiesToTraceOnCreate"
-        default_values="1"
-        number_of_elements="1">
+                         default_values="1"
+                         number_of_elements="1">
         <Documentation>
           Select which properties to save in state
         </Documentation>
         <EnumerationDomain name="enum">
-          <Entry text="all properties" value="0" />
-          <Entry text="any *modified* properties" value="1" />
+          <Entry text="all properties" value="0"/>
+          <Entry text="any *modified* properties" value="1"/>
           <!--
               state cannot have this option since we don't know which properties
               are user-modified when saving state.
@@ -1933,47 +2025,47 @@
         </EnumerationDomain>
       </IntVectorProperty>
       <IntVectorProperty name="SkipRenderingComponents"
-        number_of_elements="1"
-        default_values="0">
-        <BooleanDomain name="bool" />
+                         number_of_elements="1"
+                         default_values="0">
+        <BooleanDomain name="bool"/>
         <Documentation>
           Skip rendering components such as views, representations, etc.
         </Documentation>
       </IntVectorProperty>
       <IntVectorProperty name="SkipHiddenDisplayProperties"
-          default_values="1"
-          number_of_elements="1">
-          <BooleanDomain name="bool"/>
-          <Documentation>
-            Skip displays properties/representations for elements hidden in a view.
-          </Documentation>
+                         default_values="1"
+                         number_of_elements="1">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          Skip displays properties/representations for elements hidden in a view.
+        </Documentation>
         <Hints>
           <PropertyWidgetDecorator
-            type="GenericDecorator"
-            mode="enabled_state"
-            property="SkipRenderingComponents" value="0">
+                  type="GenericDecorator"
+                  mode="enabled_state"
+                  property="SkipRenderingComponents" value="0">
           </PropertyWidgetDecorator>
         </Hints>
       </IntVectorProperty>
       <SubProxy>
         <Proxy name="SaveExtractsOptions" proxygroup="misc" proxyname="SaveAnimationExtracts"/>
         <ExposedProperties>
-          <Property name="ExtractsOutputDirectory" />
+          <Property name="ExtractsOutputDirectory"/>
         </ExposedProperties>
       </SubProxy>
 
       <PropertyGroup label="General Options">
-        <Property name="PropertiesToTraceOnCreate" />
-        <Property name="SkipRenderingComponents" />
-        <Property name="SkipHiddenDisplayProperties" />
+        <Property name="PropertiesToTraceOnCreate"/>
+        <Property name="SkipRenderingComponents"/>
+        <Property name="SkipHiddenDisplayProperties"/>
       </PropertyGroup>
 
       <PropertyGroup label="Save Extracts Options">
-        <Property name="ExtractsOutputDirectory" />
+        <Property name="ExtractsOutputDirectory"/>
       </PropertyGroup>
 
       <Hints>
-        <UseDocumentationForLabels />
+        <UseDocumentationForLabels/>
       </Hints>
     </Proxy>
   </ProxyGroup>
@@ -2007,15 +2099,15 @@
       </Documentation>
 
       <IntVectorProperty name="LoadStateDataFileOptions"
-        default_values="0"
-        number_of_elements="1">
+                         default_values="0"
+                         number_of_elements="1">
         <Documentation>
           Decide how to locate data files in loaded state.
         </Documentation>
         <EnumerationDomain name="enum">
-          <Entry text="Use File Names From State" value="0" />
-          <Entry text="Search files under specified directory" value="1" />
-          <Entry text="Choose File Names" value="2" />
+          <Entry text="Use File Names From State" value="0"/>
+          <Entry text="Search files under specified directory" value="1"/>
+          <Entry text="Choose File Names" value="2"/>
         </EnumerationDomain>
       </IntVectorProperty>
 
@@ -2023,14 +2115,15 @@
                             command="SetDataDirectory"
                             number_of_elements="1"
                             default_values="">
-        <FileListDomain name="files" />
+        <FileListDomain name="files"/>
         <Documentation>
           Directory to look for data files under. Defaults to the state file's directory.
         </Documentation>
         <Hints>
-          <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="LoadStateDataFileOptions" value="1">
+          <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="LoadStateDataFileOptions"
+                                   value="1">
           </PropertyWidgetDecorator>
-          <UseDirectoryName />
+          <UseDirectoryName/>
         </Hints>
       </StringVectorProperty>
       <IntVectorProperty name="OnlyUseFilesInDataDirectory" number_of_elements="1" default_values="0">
@@ -2040,7 +2133,8 @@
           data directory rather than defaulting back to the absolute path in the state file.
         </Documentation>
         <Hints>
-          <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="LoadStateDataFileOptions" value="1">
+          <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="LoadStateDataFileOptions"
+                                   value="1">
           </PropertyWidgetDecorator>
         </Hints>
       </IntVectorProperty>
@@ -2054,32 +2148,35 @@
         Global setup for Cinema Image Database output.
       </Documentation>
       <IntVectorProperty name="DeferredRendering"
-        number_of_elements="1"
-        default_values="0">
+                         number_of_elements="1"
+                         default_values="0">
         <Documentation>
-          Deferred rendering cabability level for the database. None means that static images are created at each viewpoint (aka 'SpecA'). Composeable (aka 'SpecB') adds ability to hide/show individual objects. Recolorable (aka 'Spec C') adds colormap editability.
+          Deferred rendering cabability level for the database. None means that static images are created at each
+          viewpoint (aka 'SpecA'). Composeable (aka 'SpecB') adds ability to hide/show individual objects. Recolorable
+          (aka 'Spec C') adds colormap editability.
         </Documentation>
         <EnumerationDomain name="enum">
-          <Entry text="None" value="0" />
-          <Entry text="Composable" value="1" />
-          <Entry text="Composable+Recolorable" value="2" />
+          <Entry text="None" value="0"/>
+          <Entry text="Composable" value="1"/>
+          <Entry text="Composable+Recolorable" value="2"/>
         </EnumerationDomain>
       </IntVectorProperty>
       <IntVectorProperty name="CameraModel"
-        number_of_elements="1"
-        default_values="0">
+                         number_of_elements="1"
+                         default_values="0">
         <Documentation>
-          Camera capability level for the database. Static means the camera is fixed, phi-theta is an inward facing rectilinear sampling over a sphere, inward pose is similar but maintains samples more sparsely.
+          Camera capability level for the database. Static means the camera is fixed, phi-theta is an inward facing
+          rectilinear sampling over a sphere, inward pose is similar but maintains samples more sparsely.
         </Documentation>
         <EnumerationDomain name="enum">
-          <Entry text="Static" value="0" />
-          <Entry text="Phi-Theta" value="1" />
-          <Entry text="Inward Pose" value="2" />
+          <Entry text="Static" value="0"/>
+          <Entry text="Phi-Theta" value="1"/>
+          <Entry text="Inward Pose" value="2"/>
         </EnumerationDomain>
       </IntVectorProperty>
       <StringVectorProperty name="TrackObject"
-        number_of_elements="1"
-        default_values="None">
+                            number_of_elements="1"
+                            default_values="None">
         <Documentation>
           Name of a pipeline object to orient the camera with. Only meaningful for Pose camera.
         </Documentation>
@@ -2087,50 +2184,54 @@
           <PropertyWidgetDecorator type="CompositeDecorator">
             <Expression type="and">
               <Expression type="or">
-                <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="DeferredRendering" value="1" />
-                <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="DeferredRendering" value="2" />
+                <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="DeferredRendering"
+                                         value="1"/>
+                <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="DeferredRendering"
+                                         value="2"/>
               </Expression>
               <Expression type="or">
-                <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="CameraModel" value="2" />
-                <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="CameraModel" value="3" />
+                <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="CameraModel" value="2"/>
+                <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="CameraModel" value="3"/>
               </Expression>
             </Expression>
           </PropertyWidgetDecorator>
         </Hints>
       </StringVectorProperty>
       <IntVectorProperty name="Camera Phi Divisions"
-        number_of_elements="1"
-        default_values="12">
+                         number_of_elements="1"
+                         default_values="12">
         <Documentation>
           Specify number of longitudinal divisions. Only meaningful for Phi-Theta and Pose cameras.
         </Documentation>
-        <IntRangeDomain name="range" min="1" max="64" />
+        <IntRangeDomain name="range" min="1" max="64"/>
       </IntVectorProperty>
       <IntVectorProperty name="Camera Theta Divisions"
-        number_of_elements="1"
-        default_values="7">
+                         number_of_elements="1"
+                         default_values="7">
         <Documentation>
           Specify number of latitudinal divisions. Only meaningful for Phi-Theta and Pose cameras.
         </Documentation>
-        <IntRangeDomain name="range" min="1" max="32" />
+        <IntRangeDomain name="range" min="1" max="32"/>
       </IntVectorProperty>
       <IntVectorProperty name="Camera Roll Divisions"
-        number_of_elements="1"
-        default_values="1">
+                         number_of_elements="1"
+                         default_values="1">
         <Documentation>
           Specify number of roll divisions. Only meaningful for Pose camera.
         </Documentation>
-        <IntRangeDomain name="range" min="1" max="64" />
+        <IntRangeDomain name="range" min="1" max="64"/>
         <Hints>
           <PropertyWidgetDecorator type="CompositeDecorator">
             <Expression type="and">
               <Expression type="or">
-                <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="DeferredRendering" value="1" />
-                <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="DeferredRendering" value="2" />
+                <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="DeferredRendering"
+                                         value="1"/>
+                <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="DeferredRendering"
+                                         value="2"/>
               </Expression>
               <Expression type="or">
-                <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="CameraModel" value="2" />
-                <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="CameraModel" value="3" />
+                <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="CameraModel" value="2"/>
+                <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="CameraModel" value="3"/>
               </Expression>
             </Expression>
           </PropertyWidgetDecorator>
@@ -2138,7 +2239,7 @@
       </IntVectorProperty>
       <Hints>
         <FormatOptions extensions="cdb"
-          file_description="Cinema Image Exports" />
+                       file_description="Cinema Image Exports"/>
       </Hints>
     </Proxy>
   </ProxyGroup>
