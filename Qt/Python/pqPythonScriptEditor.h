@@ -110,6 +110,11 @@ public:
   void stopTrace(const QString& str);
 
   /**
+   * Run the code inside the current tab
+   */
+  void runCurrentTab();
+
+  /**
    * Utility function that provides a single instance of the editor.
    */
   static pqPythonScriptEditor* getUniqueInstance();

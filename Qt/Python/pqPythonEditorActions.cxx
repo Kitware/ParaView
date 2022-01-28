@@ -34,6 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqFileDialog.h"
 #include "pqPythonFileIO.h"
+#include "pqPythonManager.h"
 #include "pqPythonScriptEditor.h"
 #include "pqPythonTabWidget.h"
 #include "pqPythonTextArea.h"
@@ -83,6 +84,9 @@ pqPythonEditorActions::pqPythonEditorActions()
   this->GeneralActions[Action::SaveFileAsScript].setStatusTip(
     QObject::tr("Save the document as a Script"));
 
+  this->GeneralActions[Action::Run].setText(QObject::tr("Run..."));
+  this->GeneralActions[Action::Run].setStatusTip(QObject::tr("Run the currently edited script"));
+
   this->GeneralActions[Action::Cut].setText(QObject::tr("Cut"));
   this->GeneralActions[Action::Cut].setShortcut(QKeySequence::Cut);
   this->GeneralActions[Action::Cut].setStatusTip(
@@ -120,7 +124,7 @@ pqPythonEditorActions::pqPythonEditorActions()
 }
 
 //-----------------------------------------------------------------------------
-void pqPythonEditorActions::updateScriptsList()
+void pqPythonEditorActions::updateScriptsList(pqPythonManager* const python_mgr)
 {
   auto scripts = details::ListFiles(pqPythonScriptEditor::getScriptsDir());
 
@@ -160,6 +164,16 @@ void pqPythonEditorActions::updateScriptsList()
       QFile file(deletedFilename);
       file.remove();
       pqPythonScriptEditor::getUniqueInstance()->updateScriptList();
+    });
+
+    QAction* runAction = &actions[ScriptAction::Type::Run];
+    runAction->setText(filename);
+    QObject::connect(runAction, &QAction::triggered, [runAction, python_mgr]() {
+      const QString runFilename =
+        pqPythonScriptEditor::getScriptsDir() + "/" + runAction->text() + ".py";
+      python_mgr->executeScriptAndRender(runFilename);
+      auto scriptEditor = pqPythonScriptEditor::getUniqueInstance();
+      scriptEditor->open(runFilename);
     });
   }
 }
@@ -218,6 +232,8 @@ void pqPythonEditorActions::connect<pqPythonScriptEditor>(
 
   QObject::connect(
     &actions[Action::Exit], &QAction::triggered, scriptEditor, &pqPythonScriptEditor::close);
+  QObject::connect(
+    &actions[Action::Run], &QAction::triggered, scriptEditor, &pqPythonScriptEditor::runCurrentTab);
 }
 
 //-----------------------------------------------------------------------------
@@ -230,6 +246,7 @@ void pqPythonEditorActions::disconnect<pqPythonScriptEditor>(
   using Action = pqPythonEditorActions::GeneralActionType;
 
   actions[Action::Exit].disconnect();
+  actions[Action::Run].disconnect();
 }
 
 //-----------------------------------------------------------------------------
