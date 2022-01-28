@@ -309,16 +309,16 @@ void pqDeleteReaction::aboutToDelete(pqProxy* source)
       // it. We don't want to create a new representation, however.
       if (viewProxy->FindRepresentation(firstInput->getSourceProxy(), firstInput->getPortNumber()))
       {
-        vtkSMProxy* repr = controller->SetVisibility(
+        vtkSMProxy* reprProxy = controller->SetVisibility(
           firstInput->getSourceProxy(), firstInput->getPortNumber(), viewProxy, true);
         // since we turned on input representation, show scalar bar, if the user
         // preference is such.
-        if (repr &&
+        if (reprProxy &&
           vtkPVGeneralSettings::GetInstance()->GetScalarBarMode() ==
             vtkPVGeneralSettings::AUTOMATICALLY_SHOW_AND_HIDE_SCALAR_BARS &&
-          vtkSMPVRepresentationProxy::GetUsingScalarColoring(repr))
+          vtkSMPVRepresentationProxy::GetUsingScalarColoring(reprProxy))
         {
-          vtkSMPVRepresentationProxy::SetScalarBarVisibility(repr, viewProxy, true);
+          vtkSMPVRepresentationProxy::SetScalarBarVisibility(reprProxy, viewProxy, true);
         }
         view->render();
       }

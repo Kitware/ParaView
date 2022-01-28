@@ -480,8 +480,8 @@ void pqFileDialog::onCreateNewFolder()
   //    actually creating a new directory but this way I could reuse code.
   QString dirName = QString("New Folder");
   int i = 0;
-  QString fullDir;
-  while (impl.Model->dirExists(dirName, fullDir))
+  QString fullpath;
+  while (impl.Model->dirExists(dirName, fullpath))
   {
     dirName = QString("New Folder%1").arg(i++);
   }
