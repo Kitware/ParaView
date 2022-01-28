@@ -54,7 +54,7 @@ public:
    * un-initialized state.
    */
   ~vtkMaterialInterfacePieceTransactionMatrix();
-  void Initialize(int nProcs, int nFragments);
+  void Initialize(int nFragments, int nProcs);
   //@}
   /**
    * Free allocated resources and leave the object in an
