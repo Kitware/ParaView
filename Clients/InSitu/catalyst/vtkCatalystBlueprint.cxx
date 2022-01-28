@@ -290,6 +290,41 @@ bool verify(const std::string& protocol, const conduit_cpp::Node& n)
 }
 } // namespace state
 
+namespace state_fields
+{
+bool verify(const std::string& protocol, const conduit_cpp::Node& n)
+{
+  vtkVLogF(PARAVIEW_LOG_CATALYST_VERBOSITY(), "%s: verify", protocol.c_str());
+  if (!n.dtype().is_object())
+  {
+    vtkLogF(ERROR, "node must be an 'object'.");
+    return false;
+  }
+
+  const conduit_index_t nchildren = n.number_of_children();
+  for (conduit_index_t i = 0; i < nchildren; ++i)
+  {
+    auto child = n.child(i);
+    // String nodes are supported, let's check other types.
+    if (!child.dtype().is_string())
+    {
+      conduit_cpp::Node info;
+      if (!conduit_cpp::BlueprintMcArray::verify(child, info))
+      {
+        // in some-cases, this may directly be an array of numeric values; is so, handle that.
+        if (!child.dtype().is_number())
+        {
+          vtkLogF(ERROR, "Validation of mesh state field '%s' failed.", child.name().c_str());
+          return false;
+        }
+      }
+    }
+  }
+
+  return true;
+}
+} // namespace state_fields
+
 namespace channel
 {
 bool verify(const std::string& protocol, const conduit_cpp::Node& n)
@@ -337,6 +372,14 @@ bool verify(const std::string& protocol, const conduit_cpp::Node& n)
       /* vtkVLog(PARAVIEW_LOG_CATALYST_VERBOSITY(), << info.to_json()); */
       return false;
     }
+
+    if (n.has_path("state/fields"))
+    {
+      if (!state_fields::verify(protocol + "::state::fields", n["state/fields"]))
+      {
+        return false;
+      }
+    }
   }
   else if (type == "multimesh")
   {
@@ -356,6 +399,14 @@ bool verify(const std::string& protocol, const conduit_cpp::Node& n)
         vtkLogF(ERROR, "%s: Conduit Mesh blueprint validate failed!", child.name().c_str());
         /* vtkVLog(PARAVIEW_LOG_CATALYST_VERBOSITY(), << info.to_json()); */
         return false;
+      }
+
+      if (child.has_path("state/fields"))
+      {
+        if (!state_fields::verify(protocol + "::state::fields", child["state/fields"]))
+        {
+          return false;
+        }
       }
     }
     vtkVLogScopeF(PARAVIEW_LOG_CATALYST_VERBOSITY(), "multimesh blueprint verified.");
@@ -399,6 +450,7 @@ bool verify(const std::string& protocol, const conduit_cpp::Node& n)
 }
 
 } // namespace channels
+
 bool verify(const std::string& protocol, const conduit_cpp::Node& n)
 {
   vtkVLogScopeF(PARAVIEW_LOG_CATALYST_VERBOSITY(), "%s: verify", protocol.c_str());
