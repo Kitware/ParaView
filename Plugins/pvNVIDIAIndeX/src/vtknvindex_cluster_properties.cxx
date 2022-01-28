@@ -667,7 +667,7 @@ bool vtknvindex_cluster_properties::retrieve_cluster_configuration(
       }
 
       host_properties->set_shminfo(time_step, current_rankid, ss.str(), current_bbox, shm_size,
-        reinterpret_cast<void*>(all_data_ptrs[i]));
+        reinterpret_cast<void*>(all_data_ptrs[i])); // NOLINT(performance-no-int-to-ptr)
     }
   }
 
