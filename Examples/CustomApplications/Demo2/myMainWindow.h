@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module: SpreadSheetMainWindow.h
+   Module:    myMainWindow.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,26 +29,29 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef SpreadSheetMainWindow_h
-#define SpreadSheetMainWindow_h
+
+/**
+ * A main window class copied from SimpleParaView example
+ * Make sure to propagate any changes mades
+ */
+
+#ifndef myMainWindow_h
+#define myMainWindow_h
 
 #include <QMainWindow>
 #include <QScopedPointer>
 
-/**
- * An example of a paraview main window showing only data in a spreadsheet.
- */
-class SpreadSheetMainWindow : public QMainWindow
+class myMainWindow : public QMainWindow
 {
   Q_OBJECT
   typedef QMainWindow Superclass;
 
 public:
-  SpreadSheetMainWindow();
-  ~SpreadSheetMainWindow() override;
+  myMainWindow();
+  ~myMainWindow() override;
 
 private:
-  Q_DISABLE_COPY(SpreadSheetMainWindow)
+  Q_DISABLE_COPY(myMainWindow)
 
   class pqInternals;
   QScopedPointer<pqInternals> Internals;

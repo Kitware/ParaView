@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.8)
-project(Clone2)
+project(Demo2)
 
 find_package(ParaView REQUIRED)
 
@@ -16,23 +16,20 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_BINDIR}"
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_LIBDIR}")
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_LIBDIR}")
 
+find_package(Qt5 REQUIRED COMPONENTS Widgets)
+
 set(CMAKE_AUTOMOC 1)
 set(CMAKE_AUTOUIC 1)
 
 set(sources
   myMainWindow.cxx
-  myMainWindow.h)
-set(ui_files
+  myMainWindow.h
   myMainWindow.ui)
-set(xml_files
-  ParaViewFilters.xml
-  ParaViewSources.xml)
 
-paraview_client_add(
-  NAME paraview_clone2
-  VERSION "1.1.1"
-  SOURCES ${sources} ${ui_files}
-  APPLICATION_XMLS ${xml_files}
-  MAIN_WINDOW_CLASS myMainWindow
-  ORGANIZATION "Kitware, Inc."
-  TITLE "ParaView (ReVisEd)")
+add_executable(DemoApp2 DemoApp2.cxx ${sources})
+target_link_libraries(DemoApp2
+  PRIVATE
+    ParaView::pqApplicationComponents
+    Qt5::Widgets)
+
+configure_file(ParaViewFilters.xml ${CMAKE_BINARY_DIR} COPYONLY)

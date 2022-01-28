@@ -32,68 +32,73 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "myMainWindow.h"
 #include "ui_myMainWindow.h"
 
-#include <pqQtConfig.h>
-
-#ifdef PARAVIEW_USE_QTHELP
+#include <pqApplicationCore.h>
+#include <pqCategoryToolbarsBehavior.h>
+#include <pqColorToolbar.h>
+#include <pqDeleteReaction.h>
 #include <pqHelpReaction.h>
-#endif
+#include <pqLoadDataReaction.h>
 #include <pqParaViewBehaviors.h>
 #include <pqParaViewMenuBuilders.h>
+#include <pqRepresentationToolbar.h>
 
+//-----------------------------------------------------------------------------
 class myMainWindow::pqInternals : public Ui::pqClientMainWindow
 {
 };
 
 //-----------------------------------------------------------------------------
 myMainWindow::myMainWindow()
+  : Internals(new pqInternals())
 {
-  this->Internals = new pqInternals();
+  // Setup default GUI layout.
   this->Internals->setupUi(this);
 
-  // Setup default GUI layout.
-
-  // Set up the dock window corners to give the vertical docks more room.
+  // Setup the dock window corners to give the vertical docks more room.
   this->setCorner(Qt::BottomLeftCorner, Qt::LeftDockWidgetArea);
   this->setCorner(Qt::BottomRightCorner, Qt::RightDockWidgetArea);
 
-  this->Internals->animationViewDock->hide();
-  this->Internals->statisticsDock->hide();
-  this->Internals->comparativePanelDock->hide();
-  this->tabifyDockWidget(this->Internals->animationViewDock, this->Internals->statisticsDock);
+  // Setup color editor
+  // Provide access to the color-editor panel for the application and hide it
+  pqApplicationCore::instance()->registerManager(
+    "COLOR_EDITOR_PANEL", this->Internals->colorMapEditorDock);
+  this->Internals->colorMapEditorDock->hide();
 
-  // Enable help from the properties panel.
-  QObject::connect(this->Internals->proxyTabWidget,
-    SIGNAL(helpRequested(const QString&, const QString&)), this,
-    SLOT(showHelpForProxy(const QString&, const QString&)));
+  // Create a custom file menu with only Open and close
+  QList<QAction*> actionList = this->Internals->menu_File->actions();
+  QAction* action = actionList.at(0);
+  new pqLoadDataReaction(action);
+  QObject::connect(
+    actionList.at(1), SIGNAL(triggered()), QApplication::instance(), SLOT(closeAllWindows()));
 
-  // Populate application menus with actions.
-  pqParaViewMenuBuilders::buildFileMenu(*this->Internals->menu_File);
-  pqParaViewMenuBuilders::buildEditMenu(*this->Internals->menu_Edit);
-
-  // Populate sources menu.
-  pqParaViewMenuBuilders::buildSourcesMenu(*this->Internals->menuSources, this);
-
-  // Populate filters menu.
+  // Build the filters menu
   pqParaViewMenuBuilders::buildFiltersMenu(*this->Internals->menuFilters, this);
 
-  // Populate Tools menu.
-  pqParaViewMenuBuilders::buildToolsMenu(*this->Internals->menuTools);
-
-  // setup the context menu for the pipeline browser.
+  // Setup the context menu for the pipeline browser.
   pqParaViewMenuBuilders::buildPipelineBrowserContextMenu(
     *this->Internals->pipelineBrowser->contextMenu());
 
-  pqParaViewMenuBuilders::buildToolbars(*this);
+  // Add the ColorToolbar
+  QToolBar* colorToolbar = new pqColorToolbar(this);
+  colorToolbar->layout()->setSpacing(0);
+  this->addToolBar(colorToolbar);
 
-  // Setup the View menu. This must be setup after all toolbars and dockwidgets
-  // have been created.
-  pqParaViewMenuBuilders::buildViewMenu(*this->Internals->menu_View, *this);
+  // Add the Representation Toolbar
+  QToolBar* reprToolbar = new pqRepresentationToolbar(this);
+  reprToolbar->setObjectName("Representation");
+  reprToolbar->layout()->setSpacing(0);
+  this->addToolBar(reprToolbar);
 
-  // Setup the menu to show macros.
-  pqParaViewMenuBuilders::buildMacrosMenu(*this->Internals->menu_Macros);
+  // Enable help from the properties panel.
+  // This is not really working as the documentation is not built in this app
+  QObject::connect(this->Internals->proxyTabWidget, &pqPropertiesPanel::helpRequested,
+    &pqHelpReaction::showProxyHelp);
 
-  // Setup the help menu.
-  pqParaViewMenuBuilders::buildHelpMenu(*this->Internals->menu_Help);
+  // hook delete to pqDeleteReaction.
+  QAction* tempDeleteAction = new QAction(this);
+  pqDeleteReaction* handler = new pqDeleteReaction(tempDeleteAction);
+  handler->connect(this->Internals->proxyTabWidget, SIGNAL(deleteRequested(pqProxy*)),
+    SLOT(deleteSource(pqProxy*)));
 
   // Final step, define application behaviors. Since we want all ParaView
   // behaviors, we use this convenience method.
@@ -101,15 +106,4 @@ myMainWindow::myMainWindow()
 }
 
 //-----------------------------------------------------------------------------
-myMainWindow::~myMainWindow()
-{
-  delete this->Internals;
-}
-
-//-----------------------------------------------------------------------------
-void myMainWindow::showHelpForProxy(const QString& groupname, const QString& proxyname)
-{
-#ifdef PARAVIEW_USE_QTHELP
-  pqHelpReaction::showProxyHelp(groupname, proxyname);
-#endif
-}
+myMainWindow::~myMainWindow() = default;

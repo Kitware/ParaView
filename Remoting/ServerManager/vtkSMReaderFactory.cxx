@@ -42,6 +42,9 @@
 #include <vtksys/RegularExpression.hxx>
 #include <vtksys/SystemTools.hxx>
 
+const std::string vtkSMReaderFactory::SUPPORTED_TYPES_DESCRIPTION = "Supported Types";
+const std::string vtkSMReaderFactory::ALL_FILES_DESCRIPTION = "All Files";
+
 static void string_replace(std::string& string, char c, std::string str)
 {
   size_t cc = string.find(c);
@@ -531,7 +534,7 @@ static std::string vtkJoin(
 const char* vtkSMReaderFactory::GetSupportedFileTypes(vtkSMSession* session)
 {
   std::ostringstream all_types;
-  all_types << "Supported Files (";
+  all_types << vtkSMReaderFactory::SUPPORTED_TYPES_DESCRIPTION << " (";
 
   auto case_insensitive_comp = [](const std::string& s1, const std::string& s2) {
     return vtksys::SystemTools::Strucmp(s1.c_str(), s2.c_str()) < 0;
@@ -590,7 +593,7 @@ std::vector<FileTypeDetailed> vtkSMReaderFactory::GetSupportedFileTypesDetailed(
 {
   std::vector<FileTypeDetailed> result;
   FileTypeDetailed supportedFiles;
-  supportedFiles.Description = "Supported Files";
+  supportedFiles.Description = vtkSMReaderFactory::SUPPORTED_TYPES_DESCRIPTION;
 
   for (auto& proto : this->Internals->Prototypes)
   {
@@ -644,7 +647,7 @@ std::vector<FileTypeDetailed> vtkSMReaderFactory::GetSupportedFileTypesDetailed(
     });
 
   FileTypeDetailed allFiles;
-  allFiles.Description = "All Files";
+  allFiles.Description = vtkSMReaderFactory::ALL_FILES_DESCRIPTION;
   allFiles.FilenamePatterns = { "*" };
   result.insert(result.begin(), { supportedFiles, allFiles });
 

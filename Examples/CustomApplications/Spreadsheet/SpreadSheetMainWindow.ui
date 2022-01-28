@@ -1,21 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>SpreadSheetMainWindow</class>
- <widget class="QMainWindow" name="SpreadSheetMainWindow">
+ <class>pqClientMainWindow</class>
+ <widget class="QMainWindow" name="pqClientMainWindow">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>559</width>
-    <height>518</height>
+    <width>970</width>
+    <height>700</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>MainWindow</string>
-  </property>
-  <property name="windowIcon">
-   <iconset resource="SpreadSheet.qrc">
-    <normaloff>:/SpreadSheet_Icons/ss_icon.png</normaloff>:/SpreadSheet_Icons/ss_icon.png</iconset>
   </property>
   <widget class="QWidget" name="centralwidget"/>
   <widget class="QMenuBar" name="menubar">
@@ -23,53 +19,50 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>559</width>
-     <height>26</height>
+     <width>970</width>
+     <height>19</height>
     </rect>
    </property>
+   <widget class="QMenu" name="menuRecent_Files">
+    <property name="title">
+     <string>Recent Files</string>
+    </property>
+   </widget>
    <widget class="QMenu" name="menu_File">
     <property name="title">
      <string>&amp;File</string>
     </property>
-    <widget class="QMenu" name="menuRecent_Datasets">
-     <property name="title">
-      <string>Recent Datasets</string>
-     </property>
-    </widget>
-    <addaction name="action_Open_Dataset"/>
-    <addaction name="menuRecent_Datasets"/>
-    <addaction name="action_Exit"/>
-   </widget>
-   <widget class="QMenu" name="menu_Help">
-    <property name="title">
-     <string>&amp;Help</string>
-    </property>
+    <addaction name="actionOpen"/>
+    <addaction name="menuRecent_Files"/>
+    <addaction name="actionExit"/>
    </widget>
    <addaction name="menu_File"/>
-   <addaction name="menu_Help"/>
   </widget>
-  <widget class="QStatusBar" name="statusbar"/>
-  <action name="action_Open_Dataset">
+  <action name="actionOpen">
    <property name="text">
-    <string>&amp;Open Dataset</string>
+    <string>Open</string>
    </property>
   </action>
-  <action name="action_Exit">
+  <action name="actionExit">
    <property name="text">
-    <string>&amp;Exit</string>
-   </property>
-   <property name="shortcut">
-    <string>Ctrl+Q</string>
+    <string>Quit</string>
    </property>
   </action>
-  <action name="actionFo">
-   <property name="text">
-    <string>fo</string>
-   </property>
-  </action>
+  <widget class="pqStatusBar" name="statusbar"/>
  </widget>
- <resources>
-  <include location="SpreadSheet.qrc"/>
- </resources>
+ <customwidgets>
+  <customwidget>
+   <class>pqStatusBar</class>
+   <extends>QStatusBar</extends>
+   <header>pqStatusBar.h</header>
+  </customwidget>
+  <customwidget>
+   <class>pqViewManager</class>
+   <extends>QWidget</extends>
+   <header>pqViewManager.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
+ <resources/>
  <connections/>
 </ui>

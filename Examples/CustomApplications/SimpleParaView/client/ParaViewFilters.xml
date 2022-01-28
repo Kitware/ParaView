@@ -1,0 +1,7 @@
+<ParaViewFilters>
+  <Category name="Simple" menu_label="&amp;Simple" preserve_order="1" show_in_toolbar="1">
+    <Proxy group="filters" name="Calculator" icon=":/pqWidgets/Icons/pqCalculator.svg"/>
+    <Proxy group="filters" name="Contour" icon=":/pqWidgets/Icons/pqIsosurface.svg"/>
+    <Proxy group="filters" name="Clip" icon=":/pqWidgets/Icons/pqClip.svg"/>
+  </Category>
+</ParaViewFilters>

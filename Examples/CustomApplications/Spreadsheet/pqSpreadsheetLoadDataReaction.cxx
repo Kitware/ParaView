@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module: SpreadSheetMainWindow.h
+   Module: pqSpreadsheetLoadDataReaction.cxx
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,29 +29,25 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef SpreadSheetMainWindow_h
-#define SpreadSheetMainWindow_h
+#include "pqSpreadsheetLoadDataReaction.h"
 
-#include <QMainWindow>
-#include <QScopedPointer>
+#include <QSet>
 
-/**
- * An example of a paraview main window showing only data in a spreadsheet.
- */
-class SpreadSheetMainWindow : public QMainWindow
+//-----------------------------------------------------------------------------
+pqSpreadsheetLoadDataReaction::pqSpreadsheetLoadDataReaction(QAction* parentObject)
+  : Superclass(parentObject)
 {
-  Q_OBJECT
-  typedef QMainWindow Superclass;
+}
 
-public:
-  SpreadSheetMainWindow();
-  ~SpreadSheetMainWindow() override;
+//-----------------------------------------------------------------------------
+void pqSpreadsheetLoadDataReaction::onTriggered()
+{
+  ReaderSet readerSet{ { "sources", "XMLPolyDataReader" }, { "sources", "LegacyVTKFileReader" },
+    { "sources", "PVDReader" } };
+  QList<pqPipelineSource*> sources = pqLoadDataReaction::loadData(readerSet);
 
-private:
-  Q_DISABLE_COPY(SpreadSheetMainWindow)
-
-  class pqInternals;
-  QScopedPointer<pqInternals> Internals;
-};
-
-#endif
+  Q_FOREACH (pqPipelineSource* source, sources)
+  {
+    Q_EMIT this->loadedData(source);
+  }
+}

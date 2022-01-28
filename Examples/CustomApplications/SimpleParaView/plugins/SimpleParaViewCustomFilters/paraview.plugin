@@ -1,0 +1,8 @@
+NAME
+  SimpleParaViewCustomFilters
+DESCRIPTION
+  An example paraview plugin to be loaded in SimpleParaview
+  Copied from ElevationFilters example
+REQUIRES_MODULES
+  VTK::CommonCore
+  VTK::FiltersCore

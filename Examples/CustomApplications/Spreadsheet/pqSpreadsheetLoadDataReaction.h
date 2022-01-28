@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module: SpreadSheetMainWindow.h
+   Module: pqSpreadsheetLoadDataReaction.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,29 +29,27 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef SpreadSheetMainWindow_h
-#define SpreadSheetMainWindow_h
+#ifndef pqSpreadsheetLoadDataReaction_h
+#define pqSpreadsheetLoadDataReaction_h
 
-#include <QMainWindow>
-#include <QScopedPointer>
+#include <pqLoadDataReaction.h>
 
 /**
- * An example of a paraview main window showing only data in a spreadsheet.
+ * A Load data reaction loading only .vtp, .pvd and .vtk.
  */
-class SpreadSheetMainWindow : public QMainWindow
+class pqSpreadsheetLoadDataReaction : public pqLoadDataReaction
 {
   Q_OBJECT
-  typedef QMainWindow Superclass;
+  typedef pqLoadDataReaction Superclass;
 
 public:
-  SpreadSheetMainWindow();
-  ~SpreadSheetMainWindow() override;
+  pqSpreadsheetLoadDataReaction(QAction* parent);
+
+protected:
+  void onTriggered() override;
 
 private:
-  Q_DISABLE_COPY(SpreadSheetMainWindow)
-
-  class pqInternals;
-  QScopedPointer<pqInternals> Internals;
+  Q_DISABLE_COPY(pqSpreadsheetLoadDataReaction)
 };
 
 #endif

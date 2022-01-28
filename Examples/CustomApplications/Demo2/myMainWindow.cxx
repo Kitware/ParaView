@@ -32,13 +32,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "myMainWindow.h"
 #include "ui_myMainWindow.h"
 
-#include "pqApplicationCore.h"
-#include "pqCategoryToolbarsBehavior.h"
-#include "pqColorToolbar.h"
-#include "pqLoadDataReaction.h"
-#include "pqParaViewBehaviors.h"
-#include "pqParaViewMenuBuilders.h"
-#include "pqRepresentationToolbar.h"
+#include <pqApplicationCore.h>
+#include <pqCategoryToolbarsBehavior.h>
+#include <pqColorToolbar.h>
+#include <pqDeleteReaction.h>
+#include <pqHelpReaction.h>
+#include <pqLoadDataReaction.h>
+#include <pqParaViewBehaviors.h>
+#include <pqParaViewMenuBuilders.h>
+#include <pqRepresentationToolbar.h>
 
 //-----------------------------------------------------------------------------
 class myMainWindow::pqInternals : public Ui::pqClientMainWindow
@@ -47,9 +49,9 @@ class myMainWindow::pqInternals : public Ui::pqClientMainWindow
 
 //-----------------------------------------------------------------------------
 myMainWindow::myMainWindow()
+  : Internals(new pqInternals())
 {
   // Setup default GUI layout.
-  this->Internals = new pqInternals();
   this->Internals->setupUi(this);
 
   // Setup the dock window corners to give the vertical docks more room.
@@ -63,11 +65,11 @@ myMainWindow::myMainWindow()
   this->Internals->colorMapEditorDock->hide();
 
   // Create a custom file menu with only Open and close
-  QList<QAction*> qa = this->Internals->menu_File->actions();
-  QAction* mqa = qa.at(0);
-  new pqLoadDataReaction(mqa);
+  QList<QAction*> actionList = this->Internals->menu_File->actions();
+  QAction* action = actionList.at(0);
+  new pqLoadDataReaction(action);
   QObject::connect(
-    qa.at(1), SIGNAL(triggered()), QApplication::instance(), SLOT(closeAllWindows()));
+    actionList.at(1), SIGNAL(triggered()), QApplication::instance(), SLOT(closeAllWindows()));
 
   // Build the filters menu
   pqParaViewMenuBuilders::buildFiltersMenu(*this->Internals->menuFilters, this);
@@ -87,13 +89,21 @@ myMainWindow::myMainWindow()
   reprToolbar->layout()->setSpacing(0);
   this->addToolBar(reprToolbar);
 
+  // Enable help from the properties panel.
+  // This is not really working as the documentation is not built in this app
+  QObject::connect(this->Internals->proxyTabWidget, &pqPropertiesPanel::helpRequested,
+    &pqHelpReaction::showProxyHelp);
+
+  // hook delete to pqDeleteReaction.
+  QAction* tempDeleteAction = new QAction(this);
+  pqDeleteReaction* handler = new pqDeleteReaction(tempDeleteAction);
+  handler->connect(this->Internals->proxyTabWidget, SIGNAL(deleteRequested(pqProxy*)),
+    SLOT(deleteSource(pqProxy*)));
+
   // Final step, define application behaviors. Since we want all ParaView
   // behaviors, we use this convenience method.
   new pqParaViewBehaviors(this, this);
 }
 
 //-----------------------------------------------------------------------------
-myMainWindow::~myMainWindow()
-{
-  delete this->Internals;
-}
+myMainWindow::~myMainWindow() = default;

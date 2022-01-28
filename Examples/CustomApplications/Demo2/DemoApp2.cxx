@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module: SpreadSheetMainWindow.h
+   Module: DemoApp2.cxx
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,29 +29,24 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef SpreadSheetMainWindow_h
-#define SpreadSheetMainWindow_h
+#include "myMainWindow.h"
 
-#include <QMainWindow>
-#include <QScopedPointer>
+#include <pqPVApplicationCore.h>
 
-/**
- * An example of a paraview main window showing only data in a spreadsheet.
- */
-class SpreadSheetMainWindow : public QMainWindow
+#include <QApplication>
+
+int main(int argc, char** argv)
 {
-  Q_OBJECT
-  typedef QMainWindow Superclass;
+  QApplication app(argc, argv);
+  pqPVApplicationCore appCore(argc, argv);
 
-public:
-  SpreadSheetMainWindow();
-  ~SpreadSheetMainWindow() override;
+  // Create the window which initialize all paraview behaviors
+  myMainWindow window;
+  window.setWindowTitle("Demo App");
 
-private:
-  Q_DISABLE_COPY(SpreadSheetMainWindow)
+  // Load a configuration XML in order to have access to filters and readers
+  appCore.loadConfiguration(qApp->applicationDirPath() + "/../ParaViewFilters.xml");
 
-  class pqInternals;
-  QScopedPointer<pqInternals> Internals;
-};
-
-#endif
+  window.show();
+  return app.exec();
+}
