@@ -839,7 +839,7 @@ bool TestFieldData()
   auto string_field_node = expected_node["state/fields/string array"];
   string_field_node.set_string("Kitware");
   auto int_field_node = expected_node["state/fields/int array"];
-  int_field_node.set_int64_vector({ 100, 200, 300 });
+  int_field_node.set_int32_vector({ 100, 200, 300 });
 
   conduit_cpp::Node diff_info;
   bool are_nodes_different = node.diff(expected_node, diff_info, 1e-6);
