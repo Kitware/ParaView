@@ -247,6 +247,7 @@ QIcon pqFileDialogModelIconProvider::icon(QFileIconProvider::IconType ico) const
   return QFileIconProvider::icon(ico);
 }
 
+// NOLINTNEXTLINE(readability-redundant-member-init)
 Q_GLOBAL_STATIC(pqFileDialogModelIconProvider, Icons);
 
 namespace
