@@ -16,7 +16,6 @@
 #include "vtkMath.h"
 #include "vtkObjectFactory.h"
 #include "vtkOpenGLRenderer.h"
-#include "vtkOpenVROverlayInternal.h"
 #include "vtkOpenVRRenderWindow.h"
 
 vtkStandardNewMacro(vtkOpenVRPolyfill);
@@ -24,9 +23,9 @@ vtkStandardNewMacro(vtkOpenVRPolyfill);
 vtkOpenVRPolyfill::vtkOpenVRPolyfill()
 {
   this->RenderWindow = nullptr;
-  this->OpenVRRenderWindow = nullptr;
+  this->VRRenderWindow = nullptr;
 
-  this->PhysicalPose = new vtkOpenVRCameraPose();
+  this->PhysicalPose = new vtkVRCamera::Pose();
   this->PhysicalPose->Distance = 1.0;
   std::fill(this->PhysicalPose->Translation, this->PhysicalPose->Translation + 3, 0.0);
   this->PhysicalPose->PhysicalViewDirection[0] = 0;
@@ -49,16 +48,16 @@ vtkOpenVRPolyfill::~vtkOpenVRPolyfill()
 
 void vtkOpenVRPolyfill::SetRenderWindow(vtkOpenGLRenderWindow* rw)
 {
-  auto ovr = vtkOpenVRRenderWindow::SafeDownCast(rw);
-  this->OpenVRRenderWindow = ovr;
+  auto vr = vtkVRRenderWindow::SafeDownCast(rw);
+  this->VRRenderWindow = vr;
   this->RenderWindow = rw;
 }
 
 double vtkOpenVRPolyfill::GetPhysicalScale()
 {
-  if (this->OpenVRRenderWindow)
+  if (this->VRRenderWindow)
   {
-    return this->OpenVRRenderWindow->GetPhysicalScale();
+    return this->VRRenderWindow->GetPhysicalScale();
   }
 
   return this->PhysicalPose->Distance;
@@ -66,18 +65,18 @@ double vtkOpenVRPolyfill::GetPhysicalScale()
 
 void vtkOpenVRPolyfill::SetPhysicalScale(double val)
 {
-  if (this->OpenVRRenderWindow)
+  if (this->VRRenderWindow)
   {
-    this->OpenVRRenderWindow->SetPhysicalScale(val);
+    this->VRRenderWindow->SetPhysicalScale(val);
   }
   this->PhysicalPose->Distance = val;
 }
 
 double* vtkOpenVRPolyfill::GetPhysicalTranslation()
 {
-  if (this->OpenVRRenderWindow)
+  if (this->VRRenderWindow)
   {
-    return this->OpenVRRenderWindow->GetPhysicalTranslation();
+    return this->VRRenderWindow->GetPhysicalTranslation();
   }
 
   return this->PhysicalPose->Translation;
@@ -85,9 +84,9 @@ double* vtkOpenVRPolyfill::GetPhysicalTranslation()
 
 void vtkOpenVRPolyfill::SetPhysicalTranslation(double v1, double v2, double v3)
 {
-  if (this->OpenVRRenderWindow)
+  if (this->VRRenderWindow)
   {
-    this->OpenVRRenderWindow->SetPhysicalTranslation(v1, v2, v3);
+    this->VRRenderWindow->SetPhysicalTranslation(v1, v2, v3);
   }
 
   this->PhysicalPose->Translation[0] = v1;
@@ -97,9 +96,9 @@ void vtkOpenVRPolyfill::SetPhysicalTranslation(double v1, double v2, double v3)
 
 double* vtkOpenVRPolyfill::GetPhysicalViewDirection()
 {
-  if (this->OpenVRRenderWindow)
+  if (this->VRRenderWindow)
   {
-    return this->OpenVRRenderWindow->GetPhysicalViewDirection();
+    return this->VRRenderWindow->GetPhysicalViewDirection();
   }
 
   return this->PhysicalPose->PhysicalViewDirection;
@@ -107,9 +106,9 @@ double* vtkOpenVRPolyfill::GetPhysicalViewDirection()
 
 void vtkOpenVRPolyfill::SetPhysicalViewDirection(double v1, double v2, double v3)
 {
-  if (this->OpenVRRenderWindow)
+  if (this->VRRenderWindow)
   {
-    this->OpenVRRenderWindow->SetPhysicalViewDirection(v1, v2, v3);
+    this->VRRenderWindow->SetPhysicalViewDirection(v1, v2, v3);
   }
 
   this->PhysicalPose->PhysicalViewDirection[0] = v1;
@@ -119,9 +118,9 @@ void vtkOpenVRPolyfill::SetPhysicalViewDirection(double v1, double v2, double v3
 
 double* vtkOpenVRPolyfill::GetPhysicalViewUp()
 {
-  if (this->OpenVRRenderWindow)
+  if (this->VRRenderWindow)
   {
-    return this->OpenVRRenderWindow->GetPhysicalViewUp();
+    return this->VRRenderWindow->GetPhysicalViewUp();
   }
 
   return this->PhysicalPose->PhysicalViewUp;
@@ -129,9 +128,9 @@ double* vtkOpenVRPolyfill::GetPhysicalViewUp()
 
 void vtkOpenVRPolyfill::SetPhysicalViewUp(double v1, double v2, double v3)
 {
-  if (this->OpenVRRenderWindow)
+  if (this->VRRenderWindow)
   {
-    this->OpenVRRenderWindow->SetPhysicalViewUp(v1, v2, v3);
+    this->VRRenderWindow->SetPhysicalViewUp(v1, v2, v3);
   }
 
   this->PhysicalPose->PhysicalViewUp[0] = v1;
@@ -140,14 +139,13 @@ void vtkOpenVRPolyfill::SetPhysicalViewUp(double v1, double v2, double v3)
 }
 
 void vtkOpenVRPolyfill::SetPose(
-  vtkOpenVRCameraPose* thePose, vtkOpenGLRenderer* ren, vtkOpenGLRenderWindow* renWin)
+  vtkVRCamera::Pose* thePose, vtkOpenGLRenderer* ren, vtkOpenGLRenderWindow* renWin)
 {
   auto cam = ren->GetActiveCamera();
-  auto ovrcam = vtkOpenVRCamera::SafeDownCast(cam);
-  if (ovrcam)
+  auto vrcam = vtkVRCamera::SafeDownCast(cam);
+  if (vrcam)
   {
-    // TODO: vtk modif, modify vtkOpenVRCameraPose::Set to handle vtkVRCamera and vtkVRRenderWindow
-    thePose->Set(ovrcam, static_cast<vtkOpenVRRenderWindow*>(renWin));
+    vrcam->SetPoseFromCamera(thePose, static_cast<vtkVRRenderWindow*>(renWin));
   }
   else
   {
@@ -160,21 +158,17 @@ void vtkOpenVRPolyfill::SetPose(
 
     cam->GetPosition(thePose->Position);
     cam->GetDirectionOfProjection(thePose->ViewDirection);
-
-    thePose->Loaded = true;
   }
 }
 
 void vtkOpenVRPolyfill::ApplyPose(
-  vtkOpenVRCameraPose* thePose, vtkOpenGLRenderer* ren, vtkOpenGLRenderWindow* renWin)
+  vtkVRCamera::Pose* thePose, vtkOpenGLRenderer* ren, vtkOpenGLRenderWindow* renWin)
 {
   auto cam = ren->GetActiveCamera();
-  auto ovrcam = vtkOpenVRCamera::SafeDownCast(cam);
-  if (ovrcam)
+  auto vrcam = vtkVRCamera::SafeDownCast(cam);
+  if (vrcam)
   {
-    // TODO: vtk modif, modify vtkOpenVRCameraPose::Apply to handle vtkVRCamera and
-    // vtkVRRenderWindow
-    thePose->Apply(ovrcam, static_cast<vtkOpenVRRenderWindow*>(renWin));
+    vrcam->ApplyPoseToCamera(thePose, static_cast<vtkVRRenderWindow*>(renWin));
   }
   else
   {

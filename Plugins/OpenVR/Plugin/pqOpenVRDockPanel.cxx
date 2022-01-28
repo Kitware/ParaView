@@ -120,8 +120,35 @@ void pqOpenVRDockPanel::constructor()
     this->Internals->outputWindow->hide();
   }
 
+#if PARAVIEW_HAS_OPENXR_SUPPORT
+  static const std::string OPENVR_LABEL = "OpenVR";
+  static const std::string OPENXR_LABEL = "OpenXR";
+
+  this->Internals->chooseBackendCombo->clear();
+  this->Internals->chooseBackendCombo->addItem(OPENVR_LABEL.c_str());
+  this->Internals->chooseBackendCombo->addItem(OPENXR_LABEL.c_str());
+
+  QObject::connect(this->Internals->chooseBackendCombo,
+    QOverload<const QString&>::of(&QComboBox::activated), [=](QString const& text) {
+      if (text.length())
+      {
+        if (text == OPENXR_LABEL.c_str())
+        {
+          this->Helper->SetUseOpenXR(true);
+        }
+        else
+        {
+          this->Helper->SetUseOpenXR(false);
+        }
+      }
+    });
+#else
+  this->Internals->chooseBackendCombo->hide();
+  this->Internals->sendToOpenVRLabel->hide();
+#endif
+
 // hide/show widgets based on Imago support
-#ifdef OPENVR_HAS_IMAGO_SUPPORT
+#if OPENVR_HAS_IMAGO_SUPPORT
   QObject::connect(this->Internals->imagoLoginButton, &QPushButton::clicked, [&]() {
     std::string uid = this->Internals->imagoUserValue->text().toUtf8().toStdString();
     std::string pw = this->Internals->imagoPasswordValue->text().toUtf8().toStdString();
@@ -251,7 +278,7 @@ void pqOpenVRDockPanel::fieldValuesChanged(const QString& text)
 
 void pqOpenVRDockPanel::sendToOpenVR()
 {
-  if (this->Internals->sendToOpenVRButton->text() == "Send to OpenVR")
+  if (this->Internals->sendToOpenVRButton->text() == "Send to VR")
   {
     pqView* view = pqActiveObjects::instance().activeView();
 
@@ -269,7 +296,7 @@ void pqOpenVRDockPanel::sendToOpenVR()
       this->Helper->SendToOpenVR(smview);
       this->Internals->cConnectButton->setEnabled(false);
       this->Internals->cConnectButton->setText("Connect");
-      this->Internals->sendToOpenVRButton->setText("Send to OpenVR");
+      this->Internals->sendToOpenVRButton->setText("Send to VR");
       this->Internals->attachToCurrentViewButton->setEnabled(true);
     }
   }

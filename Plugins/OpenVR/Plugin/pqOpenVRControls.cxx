@@ -24,7 +24,6 @@
 #include "pqVCRController.h"
 #include "ui_pqOpenVRControls.h"
 #include "vtkEventData.h"
-#include "vtkOpenVRDefaultOverlay.h"
 #include "vtkOpenVRInteractorStyle.h"
 #include "vtkPVOpenVRHelper.h"
 #include "vtkRenderWindowInteractor.h"

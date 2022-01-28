@@ -1,5 +1,22 @@
 find_package(Qt5 REQUIRED COMPONENTS Widgets Network)
 
+set(required_modules "")
+set(openxr_support FALSE)
+
+if (TARGET VTK::RenderingOpenXR)
+  list(APPEND required_modules 
+    VTK::RenderingOpenXR
+  )
+  find_package(OpenXR REQUIRED)
+  set(openxr_support TRUE)
+endif()
+
+if (TARGET VTK::RenderingOpenVR)
+  list(APPEND required_modules 
+    VTK::RenderingOpenVR
+  )
+endif()
+
 set(interfaces)
 set(sources
   pqOpenVRControls.cxx
@@ -52,29 +69,43 @@ cmake_dependent_option(PARAVIEW_OpenVR_Imago_Support
     "Turn on support for the Imago Image Loading" OFF "PARAVIEW_PLUGIN_ENABLE_OpenVR;WIN32" OFF)
 mark_as_advanced(PARAVIEW_OpenVR_Imago_Support)
 
-if (PARAVIEW_OpenVR_Imago_Support)
-  set_property(
-    SOURCE
-      pqOpenVRDockPanel.cxx
-      vtkPVOpenVRWidgets.cxx
-    APPEND PROPERTY
-      COMPILE_DEFINITIONS OPENVR_HAS_IMAGO_SUPPORT)
-endif()
+set_property(
+  SOURCE
+    pqOpenVRDockPanel.cxx
+    vtkPVOpenVRWidgets.cxx
+  APPEND PROPERTY
+    COMPILE_DEFINITIONS "OPENVR_HAS_IMAGO_SUPPORT=$<BOOL:${PARAVIEW_OpenVR_Imago_Support}>")
 
-if (VTK_ENABLE_VR_COLLABORATION)
-  set_property(SOURCE vtkPVOpenVRCollaborationClient.cxx APPEND PROPERTY
-    COMPILE_DEFINITIONS OPENVR_HAS_COLLABORATION
-    )
-endif()
-
-set(openvr_input_files
+set(vr_input_files
   pv_openvr_actions.json
   pv_openvr_binding_hpmotioncontroller.json
   pv_openvr_binding_vive_controller.json
   pv_openvr_binding_oculus_touch.json
 )
 
-foreach(inputfile IN LISTS openvr_input_files)
+set_property(
+  SOURCE
+    pqOpenVRDockPanel.cxx
+    vtkPVOpenVRHelper.cxx
+  APPEND PROPERTY
+    COMPILE_DEFINITIONS "PARAVIEW_HAS_OPENXR_SUPPORT=$<BOOL:${openxr_support}>")
+
+if (openxr_support)
+  list(APPEND vr_input_files 
+    pv_openxr_actions.json
+    pv_openxr_binding_khr_simple_controller.json
+    pv_openxr_binding_valve_index_controller.json
+    pv_openxr_binding_vive_controller.json
+  )
+endif()
+
+set_property(
+  SOURCE 
+    vtkPVOpenVRCollaborationClient.cxx 
+  APPEND PROPERTY
+    COMPILE_DEFINITIONS "OPENVR_HAS_COLLABORATION=$<BOOL:${VTK_ENABLE_VR_COLLABORATION}>")
+
+foreach(inputfile IN LISTS vr_input_files)
   configure_file(
     ${CMAKE_CURRENT_SOURCE_DIR}/${inputfile}
     "${CMAKE_BINARY_DIR}/${_paraview_build_plugin_directory}/${inputfile}"
@@ -82,29 +113,34 @@ foreach(inputfile IN LISTS openvr_input_files)
 endforeach()
 
 install(
-  FILES ${openvr_input_files}
+  FILES ${vr_input_files}
   DESTINATION "${_paraview_build_plugin_directory}"
   COMPONENT   "${_paraview_build_PLUGINS_COMPONENT}"
 )
 
+list(APPEND required_modules
+  ParaView::pqApplicationComponents
+  ParaView::RemotingCore
+  ParaView::RemotingServerManager
+  ParaView::RemotingViews
+  VTK::CommonCore
+  VTK::CommonDataModel
+  VTK::CommonSystem
+  VTK::IOCore
+  VTK::IOImage
+  VTK::IOXML
+  VTK::IOXMLParser
+  VTK::InteractionWidgets
+  VTK::RenderingCore
+  VTK::RenderingOpenGL2
+  VTK::RenderingVR
+  VTK::ViewsCore
+)
+
 target_link_libraries(OpenVR
   PRIVATE
-    ParaView::pqApplicationComponents
-    ParaView::RemotingCore
-    ParaView::RemotingServerManager
-    ParaView::RemotingViews
-    VTK::CommonCore
-    VTK::CommonDataModel
-    VTK::CommonSystem
-    VTK::IOCore
-    VTK::IOImage
-    VTK::IOXML
-    VTK::IOXMLParser
-    VTK::InteractionWidgets
-    VTK::RenderingCore
-    VTK::RenderingOpenGL2
-    VTK::RenderingOpenVR
-    VTK::ViewsCore)
+  ${required_modules}
+)
 target_compile_definitions(OpenVR PRIVATE QT_NO_KEYWORDS)
 
 # if we have ffmpeg enabled then add in the dependency
