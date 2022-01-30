@@ -81,6 +81,7 @@ public:
   };
 };
 
+// NOLINTNEXTLINE(performance-no-int-to-ptr)
 Q_DECLARE_METATYPE(pqAnimatablePropertiesComboBox::pqInternal::PropertyInfo);
 
 //-----------------------------------------------------------------------------

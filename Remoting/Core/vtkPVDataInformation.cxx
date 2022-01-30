@@ -856,6 +856,7 @@ bool vtkPVDataInformation::HasDataSetType(int typeId) const
   {
     for (auto& leafType : this->UniqueBlockTypes)
     {
+      // NOLINTNEXTLINE(readability-suspicious-call-argument)
       if (vtkDataObjectTypes::TypeIdIsA(leafType, typeId))
       {
         return true;

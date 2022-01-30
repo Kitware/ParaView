@@ -1,5 +1,11 @@
 #!/bin/sh
 
+set -e
+
+dnf install -y --setopt=install_weak_deps=False \
+  glx-utils mesa-dri-drivers mesa-libGL* libxcrypt-compat.x86_64 libxkbcommon \
+  libxkbcommon-x11
+
 # Install extra dependencies for ParaView
 dnf install -y --setopt=install_weak_deps=False \
     bzip2 patch doxygen git-core git-lfs
@@ -45,20 +51,20 @@ python3 -m pip install wslink
 
 # Plugin dependencies
 dnf install -y --setopt=install_weak_deps=False \
-    gmsh-4.6.0 libcurl-devel
+    gmsh-devel libcurl-devel
 
 # External repository support
 dnf install -y --setopt=install_weak_deps=False \
     dnf-plugins-core
 
 # Openturns dependencies
-dnf config-manager --add-repo https://download.opensuse.org/repositories/science:/openturns/Fedora_33/science:openturns.repo
+dnf config-manager --add-repo https://download.opensuse.org/repositories/science:/openturns/Fedora_35/science:openturns.repo
 dnf install -y --setopt=install_weak_deps=False \
     openturns-libs openturns-devel
 
 # RPMFusion
 dnf install -y --setopt=install_weak_deps=False \
-    https://mirrors.rpmfusion.org/free/fedora/rpmfusion-free-release-33.noarch.rpm
+    https://mirrors.rpmfusion.org/free/fedora/rpmfusion-free-release-35.noarch.rpm
 
 dnf install -y --setopt=install_weak_deps=False \
     ffmpeg-devel

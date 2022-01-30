@@ -8,17 +8,17 @@
         {
             "group": "master",
             "site": "gitlab-ci",
-            "buildname": "[fedora33_static_mpi_offscreen_osmesa_python]"
+            "buildname": "[fedora35_static_mpi_offscreen_osmesa_python]"
         },
         {
             "group": "master",
             "site": "gitlab-ci",
-            "buildname": "[fedora33_shared_mpi_python_qt]"
+            "buildname": "[fedora35_shared_mpi_python_qt]"
         },
         {
             "group": "master",
             "site": "gitlab-ci",
-            "buildname": "[fedora33_shared_mpi_python_qt_tidy]"
+            "buildname": "[fedora35_shared_mpi_python_qt_tidy]"
         },
         {
             "group": "master",
@@ -55,12 +55,12 @@
         {
             "group": "master",
             "site": "gitlab-ci",
-            "buildname": "[fedora33_shared_mpi_core]"
+            "buildname": "[fedora35_shared_mpi_core]"
         },
         {
             "group": "master",
             "site": "gitlab-ci",
-            "buildname": "[fedora33_shared_mpi_python_core]"
+            "buildname": "[fedora35_shared_mpi_python_core]"
         }
     ]
 }

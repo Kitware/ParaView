@@ -42,25 +42,25 @@ spack-centos7:build:
 
 ## Linux
 
-fedora33-static-mpi-offscreen-osmesa-python:build:
+fedora35-static-mpi-offscreen-osmesa-python:build:
     extends:
-        - .fedora33_static_mpi_offscreen_osmesa_python
+        - .fedora35_static_mpi_offscreen_osmesa_python
         - .cmake_build_linux
         - .linux_builder_tags
         - .cmake_build_artifacts
         - .run_manually
 
-fedora33-static-mpi-offscreen-osmesa-python:test:
+fedora35-static-mpi-offscreen-osmesa-python:test:
     extends:
-        - .fedora33_static_mpi_offscreen_osmesa_python
+        - .fedora35_static_mpi_offscreen_osmesa_python
         - .cmake_test_linux
         - .linux_builder_tags
         - .cmake_test_artifacts
         - .run_automatically
     dependencies:
-        - fedora33-static-mpi-offscreen-osmesa-python:build
+        - fedora35-static-mpi-offscreen-osmesa-python:build
     needs:
-        - fedora33-static-mpi-offscreen-osmesa-python:build
+        - fedora35-static-mpi-offscreen-osmesa-python:build
 
 el8-shared-icc-mpi-python:build:
     extends:
@@ -82,74 +82,74 @@ el8-shared-icc-mpi-python:test:
     needs:
         - el8-shared-icc-mpi-python:build
 
-fedora33-shared-debug-mpi-python-qt:build:
+fedora35-shared-debug-mpi-python-qt:build:
     extends:
-        - .fedora33_shared_debug_mpi_python_qt
+        - .fedora35_shared_debug_mpi_python_qt
         - .cmake_build_linux
         - .linux_qt_builder_tags
         - .cmake_build_artifacts
         - .run_manually
 
-fedora33-shared-debug-mpi-python-qt:test:
+fedora35-shared-debug-mpi-python-qt:test:
     extends:
-        - .fedora33_shared_debug_mpi_python_qt
+        - .fedora35_shared_debug_mpi_python_qt
         - .cmake_test_linux
         - .linux_qt_tester_tags
         - .cmake_test_artifacts
         - .run_automatically
     dependencies:
-        - fedora33-shared-debug-mpi-python-qt:build
+        - fedora35-shared-debug-mpi-python-qt:build
     needs:
-        - fedora33-shared-debug-mpi-python-qt:build
+        - fedora35-shared-debug-mpi-python-qt:build
     timeout: 120 minutes
 
 ## Catalyst editions
 
-fedora33-shared-mpi-core:build:
+fedora35-shared-mpi-core:build:
     extends:
-        - .fedora33_shared_mpi_core
+        - .fedora35_shared_mpi_core
         - .cmake_build_linux
         - .linux_builder_tags
         - .cmake_build_artifacts
         - .run_manually
 
-fedora33-shared-mpi-core:test:
+fedora35-shared-mpi-core:test:
     extends:
-        - .fedora33_shared_mpi_core
+        - .fedora35_shared_mpi_core
         - .cmake_test_linux
         - .linux_tester_tags
         - .cmake_test_artifacts
         - .run_automatically
     dependencies:
-        - fedora33-shared-mpi-core:build
+        - fedora35-shared-mpi-core:build
     needs:
-        - fedora33-shared-mpi-core:build
+        - fedora35-shared-mpi-core:build
 
-fedora33-shared-mpi-python-core:build:
+fedora35-shared-mpi-python-core:build:
     extends:
-        - .fedora33_shared_mpi_python_core
+        - .fedora35_shared_mpi_python_core
         - .cmake_build_linux
         - .linux_builder_tags
         - .cmake_build_artifacts
         - .run_manually
 
-fedora33-shared-mpi-python-core:test:
+fedora35-shared-mpi-python-core:test:
     extends:
-        - .fedora33_shared_mpi_python_core
+        - .fedora35_shared_mpi_python_core
         - .cmake_test_linux
         - .linux_tester_tags
         - .cmake_test_artifacts
         - .run_automatically
     dependencies:
-        - fedora33-shared-mpi-python-core:build
+        - fedora35-shared-mpi-python-core:build
     needs:
-        - fedora33-shared-mpi-python-core:build
+        - fedora35-shared-mpi-python-core:build
 
 ## Static analysis
 
-fedora33-tidy:build:
+fedora35-tidy:build:
     extends:
-        - .fedora33_tidy
+        - .fedora35_tidy
         - .cmake_build_linux
         - .linux_qt_builder_tags
         - .cmake_tidy_artifacts
@@ -248,7 +248,7 @@ windows-vs2019-qt:test:
 
 documentation:build:
     extends:
-        - .fedora33
+        - .fedora35
         - .doxygen_build_linux
         - .linux_qt_builder_tags
         - .doxygen_log_artifacts

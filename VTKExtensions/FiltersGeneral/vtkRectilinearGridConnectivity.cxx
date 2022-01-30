@@ -449,11 +449,13 @@ vtkRectilinearGridConnectivityFace* vtkRectilinearGridConnectivityFaceHash::AddF
   // we just need to find the three smallest point ids
   if (pt1 > pt2 && pt1 > pt3 && pt1 > pt4)
   {
+    // NOLINTNEXTLINE(readability-suspicious-call-argument)
     return this->AddFace(pt2, pt3, pt4);
   }
 
   if (pt2 > pt3 && pt2 > pt4)
   {
+    // NOLINTNEXTLINE(readability-suspicious-call-argument)
     return this->AddFace(pt1, pt3, pt4);
   }
 

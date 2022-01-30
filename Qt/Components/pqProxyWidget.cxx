@@ -193,7 +193,6 @@ class pqProxyWidgetItem : public QObject
   pqProxyWidgetItem(QObject* parentObj)
     : Superclass(parentObj)
     , Group(false)
-    , GroupTag()
     , Advanced(false)
     , InformationOnly(false)
   {

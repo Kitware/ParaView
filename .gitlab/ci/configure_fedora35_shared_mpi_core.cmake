@@ -2,4 +2,4 @@
 set(PARAVIEW_PLUGIN_ENABLE_VRPlugin ON CACHE BOOL "")
 set(PARAVIEW_PLUGIN_VRPlugin_USE_VRUI ON CACHE BOOL "")
 
-include("${CMAKE_CURRENT_LIST_DIR}/configure_fedora33.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/configure_fedora35.cmake")

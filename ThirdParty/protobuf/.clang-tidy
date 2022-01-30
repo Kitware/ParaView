@@ -3,12 +3,10 @@
 # we enable a single set of checks (because disabling all checks is an error).
 Checks: "-*,\
 bugprone-*,\
--bugprone-branch-clone,\
 -bugprone-easily-swappable-parameters,\
 -bugprone-implicit-widening-of-multiplication-result,\
--bugprone-narrowing-conversions,\
 -bugprone-not-null-terminated-result,\
--bugprone-reserved-identifier,\
--bugprone-signed-char-misuse,\
+-bugprone-sizeof-expression,\
+-bugprone-string-integer-assignment,\
 "
 ...
