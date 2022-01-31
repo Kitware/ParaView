@@ -18,6 +18,7 @@
 #include "vtkCellType.h"
 #include "vtkDoubleArray.h"
 #include "vtkInformation.h"
+#include "vtkLogger.h"
 #include "vtkMultiBlockDataSet.h"
 #include "vtkNew.h"
 #include "vtkPVTestUtilities.h"
@@ -42,7 +43,7 @@ int TestTimeWriting(int argc, char* argv[])
   double time[1] = { 10.0 };
   double range[2] = { 10.0, 10.0 };
   vtkInformation* inputInformation = w->GetInputInformation();
-  vtk_assert(inputInformation != nullptr);
+  vtkLogIfF(ERROR, inputInformation == nullptr, "Information is NULL");
 
   inputInformation->Set(vtkStreamingDemandDrivenPipeline::TIME_STEPS(), &time[0], 1);
   inputInformation->Set(vtkStreamingDemandDrivenPipeline::TIME_RANGE(), range, 2);
@@ -60,13 +61,15 @@ int TestTimeWriting(int argc, char* argv[])
 
   delete[] filename;
   vtkInformation* outputInformation = r->GetOutputInformation(0);
-  vtk_assert(outputInformation != nullptr);
-  vtk_assert(outputInformation->Has(vtkStreamingDemandDrivenPipeline::TIME_STEPS()));
-  vtk_assert(1 == outputInformation->Length(vtkStreamingDemandDrivenPipeline::TIME_STEPS()));
+  vtkLogIfF(ERROR, outputInformation == nullptr, "Output information is NULL");
+  vtkLogIfF(ERROR, !outputInformation->Has(vtkStreamingDemandDrivenPipeline::TIME_STEPS()),
+    "No timesteps found in information");
+  vtkLogIfF(ERROR, 1 != outputInformation->Length(vtkStreamingDemandDrivenPipeline::TIME_STEPS()),
+    "Time steps length does not match");
 
   double* readTime = outputInformation->Get(vtkStreamingDemandDrivenPipeline::TIME_STEPS());
-  vtk_assert(readTime != nullptr);
-  vtk_assert(*readTime == 10.0);
+  vtkLogIfF(ERROR, readTime == nullptr, "Time array is NULL");
+  vtkLogIfF(ERROR, *readTime != 10.0, "Expected time=10.0, got %3.2f", *readTime);
 
   return EXIT_SUCCESS;
 }

@@ -63,18 +63,18 @@ public:
   vtkBooleanMacro(WriteAllTimeSteps, bool);
 
 protected:
+  bool WasWritingSuccessful = false;
+  char* FileName = nullptr;
+  vtkDataObject* OriginalInput = nullptr;
+  bool UseHDF5 = true;
+
+  bool WriteAllTimeSteps = false;
+  class vtkDoubleArray* TimeValues = nullptr;
+  int NumberOfTimeSteps = 0;
+  int CurrentTimeIndex = 0;
+
   vtkCGNSWriter();
   ~vtkCGNSWriter() override;
-
-  char* FileName;
-  vtkDataObject* OriginalInput;
-  bool UseHDF5; //
-  bool Collect;
-
-  bool WriteAllTimeSteps;
-  class vtkDoubleArray* TimeValues;
-  int NumberOfTimeSteps;
-  int CurrentTimeIndex;
 
   int ProcessRequest(vtkInformation* request, vtkInformationVector** inputVector,
     vtkInformationVector* outputVector) override;
@@ -90,7 +90,6 @@ protected:
   int RequestData(vtkInformation* request, vtkInformationVector** inputVector,
     vtkInformationVector* outputVector) override;
 
-  bool WasWritingSuccessful;
   void WriteData() override; // pure virtual override from vtkWriter
 
 private:

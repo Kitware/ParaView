@@ -17,6 +17,7 @@
 #include "vtkCellData.h"
 #include "vtkCellType.h"
 #include "vtkDoubleArray.h"
+#include "vtkLogger.h"
 #include "vtkMappedUnstructuredGridGenerator.h"
 #include "vtkMultiBlockDataSet.h"
 #include "vtkNew.h"
@@ -56,15 +57,19 @@ int TestMappedUnstructuredGrid(int argc, char* argv[])
 
 int MappedUnstructuredGridTest(vtkMultiBlockDataSet* read, unsigned int b0, unsigned int b1, int N)
 {
-  vtk_assert(nullptr != read);
-  vtk_assert(b0 < read->GetNumberOfBlocks());
+  vtkLogIfF(ERROR, nullptr == read, "Read multiblock is NULL");
+  vtkLogIfF(ERROR, b0 >= read->GetNumberOfBlocks(), "Expected at least %d blocks, got %d.", b0,
+    read->GetNumberOfBlocks());
 
   vtkMultiBlockDataSet* block0 = vtkMultiBlockDataSet::SafeDownCast(read->GetBlock(b0));
-  vtk_assert(nullptr != block0);
-  vtk_assert(b1 < block0->GetNumberOfBlocks());
+  vtkLogIfF(ERROR, nullptr == block0, "Block 0 is NULL");
+  vtkLogIfF(ERROR, b1 >= block0->GetNumberOfBlocks(), "Expected at least %d blocks, got %d.", b0,
+    block0->GetNumberOfBlocks());
 
   vtkUnstructuredGrid* target = vtkUnstructuredGrid::SafeDownCast(block0->GetBlock(b1));
-  vtk_assert(nullptr != target);
-  vtk_assert(N == target->GetNumberOfCells());
+  vtkLogIfF(ERROR, nullptr == target, "Grid is NULL");
+  vtkLogIfF(ERROR, N != target->GetNumberOfCells(), "Expected %d cells, got %lld", N,
+    target->GetNumberOfCells());
+
   return EXIT_SUCCESS;
 }

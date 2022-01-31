@@ -20,40 +20,25 @@ See Copyright.txt or http://www.paraview.org/HTML/Copyright.html for details.
 #include "vtkPCGNSWriter.h"
 
 #include <vtkAppendDataSets.h>
-#include <vtkCompositeDataSet.h>
 #include <vtkDataObject.h>
 #include <vtkDataObjectTreeIterator.h>
-#include <vtkDataSet.h>
 #include <vtkDoubleArray.h>
 #include <vtkInformation.h>
 #include <vtkInformationVector.h>
+#include <vtkLogger.h>
 #include <vtkMPIController.h>
 #include <vtkMultiBlockDataSet.h>
 #include <vtkMultiProcessController.h>
 #include <vtkNew.h>
 #include <vtkObjectFactory.h>
+#include <vtkPartitionedDataSet.h>
+#include <vtkPartitionedDataSetCollection.h>
 #include <vtkPolyData.h>
 #include <vtkStreamingDemandDrivenPipeline.h>
-
-#include "cgnslib.h"
-#include "mpi.h"
 
 #include <map>
 #include <sstream>
 #include <vector>
-
-using namespace std;
-
-// macro to check a CGNS operation that can return CG_OK or CG_ERROR
-// the macro will set the 'error' (std::string) variable to the CGNS error
-// and return false.
-#define cg_check_operation(op)                                                                     \
-  if (CG_OK != (op))                                                                               \
-  {                                                                                                \
-    vtkMultiProcessController* _c = vtkMultiProcessController::GetGlobalController();              \
-    error = to_string(_c->GetLocalProcessId()) + __FUNCTION__ + ": " + cg_get_error();             \
-    return false;                                                                                  \
-  }
 
 namespace
 {
@@ -62,7 +47,7 @@ namespace
 // a list of blocks.
 //------------------------------------------------------------------------------
 void Flatten(const vtkSmartPointer<vtkMultiBlockDataSet>& merged,
-  const vector<vtkSmartPointer<vtkDataObject>>& collected)
+  const std::vector<vtkSmartPointer<vtkDataObject>>& collected)
 {
   if (collected.empty())
     return;
@@ -104,7 +89,7 @@ void Flatten(const vtkSmartPointer<vtkMultiBlockDataSet>& merged,
       }
       else if (block->IsA("vtkMultiBlockDataSet"))
       {
-        vector<vtkSmartPointer<vtkDataObject>> sub;
+        std::vector<vtkSmartPointer<vtkDataObject>> sub;
         for (auto& entry : collected)
         {
           sub.push_back(vtkSmartPointer<vtkDataObject>::Take(
@@ -119,6 +104,72 @@ void Flatten(const vtkSmartPointer<vtkMultiBlockDataSet>& merged,
     }
   }
 }
+
+void Flatten(const vtkSmartPointer<vtkPartitionedDataSet>& merged,
+  const std::vector<vtkSmartPointer<vtkDataObject>>& collected)
+{
+  unsigned item(0);
+  for (auto& entry : collected)
+  {
+    vtkPartitionedDataSet* partition = vtkPartitionedDataSet::SafeDownCast(entry);
+    if (partition)
+    {
+      const unsigned nPartitions = partition->GetNumberOfPartitions();
+      for (unsigned i = 0; i < nPartitions; ++i)
+      {
+        vtkDataObject* dataObject = partition->GetPartitionAsDataObject(i);
+        if (dataObject)
+        {
+          merged->SetPartition(item++, dataObject);
+        }
+      }
+    }
+    else
+    {
+      vtkErrorWithObjectMacro(
+        nullptr, << "Expected a vtkPartitionedDataSet, got " << entry->GetClassName());
+    }
+  }
+}
+
+void Flatten(const vtkSmartPointer<vtkPartitionedDataSetCollection>& mergedCollection,
+  const std::vector<vtkSmartPointer<vtkDataObject>>& collected)
+{
+  for (auto& entry : collected)
+  {
+    vtkPartitionedDataSetCollection* partitionedCollection =
+      vtkPartitionedDataSetCollection::SafeDownCast(entry);
+    if (partitionedCollection)
+    {
+      const unsigned nDataSets = partitionedCollection->GetNumberOfPartitionedDataSets();
+      mergedCollection->SetNumberOfPartitionedDataSets(nDataSets);
+
+      for (unsigned idx = 0; idx < nDataSets; ++idx)
+      {
+        const auto merged = mergedCollection->GetPartitionedDataSet(idx);
+        const unsigned nPartitions = partitionedCollection->GetNumberOfPartitions(idx);
+        for (unsigned i = 0; i < nPartitions; ++i)
+        {
+          vtkDataObject* dataObject = partitionedCollection->GetPartitionAsDataObject(idx, i);
+          if (dataObject)
+          {
+            merged->SetPartition(i, dataObject);
+          }
+        }
+        if (partitionedCollection->HasMetaData(idx))
+        {
+          mergedCollection->GetMetaData(idx)->Append(partitionedCollection->GetMetaData(idx));
+        }
+      }
+    }
+    else
+    {
+      vtkErrorWithObjectMacro(
+        nullptr, << "Expected a vtkPartitionedDataSetCollection, got " << entry->GetClassName());
+    }
+  }
+}
+
 } // anonymous namespace
 
 vtkStandardNewMacro(vtkPCGNSWriter);
@@ -229,7 +280,7 @@ void vtkPCGNSWriter::WriteData()
 
   this->WasWritingSuccessful = false;
 
-  vector<vtkSmartPointer<vtkDataObject>> collected;
+  std::vector<vtkSmartPointer<vtkDataObject>> collected;
   // what happens in the Gather step is that each part is
   // serialized on its processor using vtkUnstructuredGridWriter
   // that writes in binary to a string. This string is then
@@ -260,14 +311,30 @@ void vtkPCGNSWriter::WriteData()
       else if (this->OriginalInput->IsA("vtkMultiBlockDataSet"))
       {
         vtkNew<vtkMultiBlockDataSet> mb;
-        ::Flatten(mb, collected);
+        ::Flatten(mb.GetPointer(), collected);
         toWrite = mb;
+        toWrite->Register(this);
+      }
+      else if (this->OriginalInput->IsA("vtkPartitionedDataSet"))
+      {
+        vtkNew<vtkPartitionedDataSet> partitioned;
+        ::Flatten(partitioned.GetPointer(), collected);
+        toWrite = partitioned;
+        toWrite->Register(this);
+      }
+      else if (this->OriginalInput->IsA("vtkPartitionedDataSetCollection"))
+      {
+        vtkNew<vtkPartitionedDataSetCollection> partitionedCollection;
+        ::Flatten(partitionedCollection.GetPointer(), collected);
+        toWrite = partitionedCollection;
         toWrite->Register(this);
       }
       else
       {
         vtkErrorMacro(<< "Unable to write data object of class "
                       << this->OriginalInput->GetClassName());
+        this->WasWritingSuccessful = false;
+        return;
       }
 
       // exchange OriginalInput and write with the superclass

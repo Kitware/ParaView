@@ -16,12 +16,12 @@
 #include "vtkCGNSReader.h"
 #include "vtkCell.h"
 #include "vtkInformation.h"
+#include "vtkLogger.h"
 #include "vtkMPIController.h"
 #include "vtkMultiBlockDataSet.h"
 #include "vtkNew.h"
 #include "vtkPCGNSWriter.h"
 #include "vtkPVTestUtilities.h"
-#include "vtkPointData.h"
 #include "vtkPolyData.h"
 #include "vtkUnstructuredGrid.h"
 
@@ -73,7 +73,8 @@ int TestMultiBlockData(int argc, char* argv[])
   mpiController->Finalize();
   if (rc == 1 && rank == 0)
   {
-    vtk_assert(vtksys::SystemTools::FileExists(filename));
+    vtkLogIfF(ERROR, !vtksys::SystemTools::FileExists(filename), "File '%s' not found", filename);
+
     vtkNew<vtkCGNSReader> reader;
     reader->SetFileName(filename);
     // update information first to get all bases in the information
@@ -83,32 +84,30 @@ int TestMultiBlockData(int argc, char* argv[])
     reader->Update();
 
     unsigned long err = reader->GetErrorCode();
-    vtk_assert(err == 0);
+    vtkLogIfF(ERROR, err != 0, "Reading CGNS file failed.");
 
     vtkMultiBlockDataSet* output = reader->GetOutput();
-    vtk_assert(nullptr != output);
-    vtk_assert2(2, output->GetNumberOfBlocks());
+    vtkLogIfF(ERROR, nullptr == output, "No CGNS reader output.");
+    vtkLogIfF(ERROR, 2 != output->GetNumberOfBlocks(), "Expected 2 base blocks.");
     {
       vtkMultiBlockDataSet* firstBlock = vtkMultiBlockDataSet::SafeDownCast(output->GetBlock(0));
-      vtk_assert(nullptr != firstBlock);
-
-      vtk_assert(1 == firstBlock->GetNumberOfBlocks());
+      vtkLogIfF(ERROR, nullptr == firstBlock, "First block is NULL");
+      vtkLogIfF(ERROR, 1 != firstBlock->GetNumberOfBlocks(), "Expected 1 zone block.");
 
       vtkUnstructuredGrid* outputGrid = vtkUnstructuredGrid::SafeDownCast(firstBlock->GetBlock(0));
-      vtk_assert(nullptr != outputGrid);
-
-      vtk_assert2(std::max(2, size), outputGrid->GetNumberOfCells());
+      vtkLogIfF(ERROR, nullptr == outputGrid, "Read grid is NULL");
+      vtkLogIfF(ERROR, std::max(2, size) != outputGrid->GetNumberOfCells(),
+        "Expected %d cells, got %lld.", std::max(2, size), outputGrid->GetNumberOfCells());
     }
     {
       vtkMultiBlockDataSet* secondBlock = vtkMultiBlockDataSet::SafeDownCast(output->GetBlock(1));
-      vtk_assert(nullptr != secondBlock);
-
-      vtk_assert(1 == secondBlock->GetNumberOfBlocks());
+      vtkLogIfF(ERROR, nullptr == secondBlock, "Second block is NULL");
+      vtkLogIfF(ERROR, 1 != secondBlock->GetNumberOfBlocks(), "Expected 1 zone block.");
 
       vtkUnstructuredGrid* outputGrid = vtkUnstructuredGrid::SafeDownCast(secondBlock->GetBlock(0));
-      vtk_assert(nullptr != outputGrid);
-
-      vtk_assert(std::max(2, size) == outputGrid->GetNumberOfCells());
+      vtkLogIfF(ERROR, nullptr == outputGrid, "Read grid is NULL");
+      vtkLogIfF(ERROR, std::max(2, size) != outputGrid->GetNumberOfCells(),
+        "Expected %d cells, got %lld.", std::max(2, size), outputGrid->GetNumberOfCells());
     }
     rc = err == 0 ? 1 : 0;
   }

@@ -19,6 +19,7 @@ See Copyright.txt or http://www.paraview.org/HTML/Copyright.html for details.
 
 #include "vtkCGNSWriter.h"
 
+#include "vtkAppendDataSets.h"
 #include "vtkArrayIteratorIncludes.h"
 #include "vtkCellArray.h"
 #include "vtkCellData.h"
@@ -54,6 +55,7 @@ See Copyright.txt or http://www.paraview.org/HTML/Copyright.html for details.
 
 #include <map>
 #include <set>
+#include <sstream>
 #include <vector>
 
 using namespace std;
@@ -107,26 +109,35 @@ public:
   static bool InitCGNSFile(write_info& info, const char* filename, string& error);
   static bool WriteBase(write_info& info, const char* basename, string& error);
 
-  // write a single data set to
-  static bool WriteStructuredGrid(vtkStructuredGrid* sg, write_info& info, string& error);
+  // write a single data set to file
+  static bool WriteStructuredGrid(
+    vtkStructuredGrid* structuredGrid, write_info& info, string& error);
   static bool WritePointSet(vtkPointSet* grid, write_info& info, string& error);
 
-  // write a multi-block dataset to
-  static bool WriteMultiBlock(vtkMultiBlockDataSet* mb, write_info& info, string& error);
-  static bool WriteMultiPiece(vtkMultiPieceDataSet* mp, write_info& info, string& error);
+  // write a composite dataset to file
+  static bool WriteComposite(vtkCompositeDataSet* composite, write_info& info, string& error);
+
+  static void Flatten(vtkCompositeDataSet* composite,
+    vector<vtkSmartPointer<vtkDataObject>>& objects2D,
+    vector<vtkSmartPointer<vtkDataObject>>& objects3d, int zoneOffset, string& name);
+  static int DetermineCellDimension(vtkPointSet* pointSet);
+  static void SetNameToLength(string& name, const vector<vtkSmartPointer<vtkDataObject>>& objects);
+  static bool WriteGridsToBase(vector<vtkSmartPointer<vtkDataObject>> blocks,
+    vector<vtkSmartPointer<vtkDataObject>> otherBlocks, write_info& info, string& error);
 
 protected:
   // open and initialize a CGNS file
   static bool InitCGNSFile(write_info& info, string& error);
   static bool WriteBase(write_info& info, string& error);
 
-  static bool WriteMultiBlock(write_info& info, vtkMultiBlockDataSet*, string& error);
+  static bool WriteComposite(write_info& info, vtkCompositeDataSet*, string& error);
   static bool WritePoints(write_info& info, vtkPoints* pts, string& error);
 
   static bool WriteFieldArray(write_info& info, CGNS_ENUMT(GridLocation_t) location,
     vtkDataSetAttributes* dsa, map<unsigned char, vector<vtkIdType>>* cellTypeMap, string& error);
 
-  static bool WriteStructuredGrid(write_info& info, vtkStructuredGrid* sg, string& error);
+  static bool WriteStructuredGrid(
+    write_info& info, vtkStructuredGrid* structuredGrid, string& error);
   static bool WritePointSet(write_info& info, vtkPointSet* grid, string& error);
   static bool WritePolygonalZone(write_info& info, vtkPointSet* grid, string& error);
   static bool WriteCells(write_info& info, vtkPointSet* grid,
@@ -670,9 +681,9 @@ bool vtkCGNSWriter::vtkPrivate::WriteBase(write_info& info, string& error)
 }
 
 bool vtkCGNSWriter::vtkPrivate::WriteStructuredGrid(
-  write_info& info, vtkStructuredGrid* sg, string& error)
+  write_info& info, vtkStructuredGrid* structuredGrid, string& error)
 {
-  if (sg->GetNumberOfCells() == 0 && sg->GetNumberOfPoints() == 0)
+  if (structuredGrid->GetNumberOfCells() == 0 && structuredGrid->GetNumberOfPoints() == 0)
   {
     // don't write anything
     return true;
@@ -686,11 +697,11 @@ bool vtkCGNSWriter::vtkPrivate::WriteStructuredGrid(
   cgsize_t dim[9];
 
   // set the dimensions
-  int* pointDims = sg->GetDimensions();
+  int* pointDims = structuredGrid->GetDimensions();
   int cellDims[3];
   int j;
 
-  sg->GetCellDims(cellDims);
+  structuredGrid->GetCellDims(cellDims);
 
   if (!pointDims)
   {
@@ -731,7 +742,7 @@ bool vtkCGNSWriter::vtkPrivate::WriteStructuredGrid(
   cg_check_operation(
     cg_zone_write(info.F, info.B, info.ZoneName, dim, CGNS_ENUMV(Structured), &(info.Z)));
 
-  vtkPoints* pts = sg->GetPoints();
+  vtkPoints* pts = structuredGrid->GetPoints();
 
   if (!WritePoints(info, pts, error))
   {
@@ -739,13 +750,13 @@ bool vtkCGNSWriter::vtkPrivate::WriteStructuredGrid(
   }
 
   info.SolutionName = "PointData";
-  if (!WriteFieldArray(info, CGNS_ENUMV(Vertex), sg->GetPointData(), nullptr, error))
+  if (!WriteFieldArray(info, CGNS_ENUMV(Vertex), structuredGrid->GetPointData(), nullptr, error))
   {
     return false;
   }
 
   info.SolutionName = "CellData";
-  if (!WriteFieldArray(info, CGNS_ENUMV(CellCenter), sg->GetCellData(), nullptr, error))
+  if (!WriteFieldArray(info, CGNS_ENUMV(CellCenter), structuredGrid->GetCellData(), nullptr, error))
   {
     return false;
   }
@@ -753,11 +764,11 @@ bool vtkCGNSWriter::vtkPrivate::WriteStructuredGrid(
 }
 
 bool vtkCGNSWriter::vtkPrivate::WriteStructuredGrid(
-  vtkStructuredGrid* sg, write_info& info, string& error)
+  vtkStructuredGrid* structuredGrid, write_info& info, string& error)
 {
   // get the structured grid IJK dimensions
   // and set CellDim to the correct value.
-  int* dims = sg->GetDimensions();
+  int* dims = structuredGrid->GetDimensions();
   info.CellDim = 0;
   for (int n = 0; n < 3; n++)
   {
@@ -774,173 +785,239 @@ bool vtkCGNSWriter::vtkPrivate::WriteStructuredGrid(
   }
 
   info.ZoneName = "Zone 1";
-  const bool rc = WriteStructuredGrid(info, sg, error);
+  const bool rc = WriteStructuredGrid(info, structuredGrid, error);
   cg_check_operation(cg_close(info.F));
   return rc;
 }
 
-struct entry
+int vtkCGNSWriter::vtkPrivate::DetermineCellDimension(vtkPointSet* pointSet)
 {
-  vtkDataObject* obj;
-  string name;
-  entry(vtkDataObject* o, string objectName)
+  int CellDim = 0;
+  vtkStructuredGrid* structuredGrid = vtkStructuredGrid::SafeDownCast(pointSet);
+  if (structuredGrid)
   {
-    obj = o;
-    name = objectName;
+    int* dims = structuredGrid->GetDimensions();
+    CellDim = 0;
+    for (int n = 0; n < 3; n++)
+    {
+      if (dims[n] > 1)
+      {
+        CellDim += 1;
+      }
+    }
   }
-};
-
-void Flatten(vtkMultiBlockDataSet* mb, vector<entry>& o2d, vector<entry>& o3d, int zoneOffset)
-{
-  for (unsigned int i = 0; i < mb->GetNumberOfBlocks(); ++i)
+  else
   {
-    string zonename = "Zone " + to_string(i + zoneOffset);
-
-    if (mb->HasMetaData(i))
+    vtkUnstructuredGrid* unstructuredGrid = vtkUnstructuredGrid::SafeDownCast(pointSet);
+    if (unstructuredGrid)
     {
-      vtkInformation* md = mb->GetMetaData(i);
-      if (md->Has(vtkCompositeDataSet::NAME()))
+      CellDim = 1;
+      for (vtkIdType n = 0; n < unstructuredGrid->GetNumberOfCells(); ++n)
       {
-        zonename = md->Get(vtkCompositeDataSet::NAME());
-        if (zonename.length() > 32)
+        vtkCell* cell = unstructuredGrid->GetCell(n);
+        int curCellDim = cell->GetCellDimension();
+        if (CellDim < curCellDim)
         {
-          const string oldname(zonename);
-          zonename = zonename.substr(0, 32);
-          for (auto& e : o2d)
-          {
-            int j = 1;
-            while (e.name == zonename && j < 100)
-            {
-              zonename = zonename.substr(0, j < 10 ? 31 : 30) + to_string(j);
-              ++j;
-            }
-            // if there are 100 duplicate zones after truncation, give up.
-            // an error will be given by CGNS that a duplicate name has been found.
-          }
-          for (auto& e : o3d)
-          {
-            int j = 1;
-            while (e.name == zonename && j < 100)
-            {
-              zonename = zonename.substr(0, j < 10 ? 31 : 30) + to_string(j);
-              ++j;
-            }
-            // if there are 100 duplicate zones after truncation, give up.
-            // an error will be given by CGNS that a duplicate name has been found.
-          }
-
-          vtkWarningWithObjectMacro(
-            nullptr, << "Zone name '" << oldname << "' has been truncated to '" << zonename
-                     << " to conform to 32-character limit on names in CGNS.");
+          CellDim = curCellDim;
         }
       }
     }
+  }
+  return CellDim;
+}
 
-    vtkDataObject* block = mb->GetBlock(i);
-    const auto nested = vtkMultiBlockDataSet::SafeDownCast(block);
-    const auto polydata = vtkPolyData::SafeDownCast(block);
-    if (polydata)
+void vtkCGNSWriter::vtkPrivate::SetNameToLength(
+  string& name, const vector<vtkSmartPointer<vtkDataObject>>& objects)
+{
+  if (name.length() > 32)
+  {
+    const string oldname(name);
+    name = name.substr(0, 32);
+    for (auto& e : objects)
     {
-      o2d.emplace_back(block, zonename);
-    }
-    else if (nested)
-    {
-      Flatten(nested, o2d, o3d, zoneOffset + 1);
-    }
-    else if (block)
-    {
-      int CellDim = 3;
-      if (block->IsA("vtkStructuredGrid"))
+      int j = 1;
+      const char* objectName(nullptr);
+      vtkInformation* info = e->GetInformation();
+      if (info && info->Has(vtkCompositeDataSet::NAME()))
       {
-        vtkStructuredGrid* sg = vtkStructuredGrid::SafeDownCast(block);
-        int* dims = sg->GetDimensions();
-        CellDim = 0;
-        for (int n = 0; n < 3; n++)
+        objectName = info->Get(vtkCompositeDataSet::NAME());
+      }
+      while (objectName && objectName == name && j < 100)
+      {
+        name = name.substr(0, j < 10 ? 31 : 30) + to_string(j);
+        ++j;
+      }
+      // if there are 100 duplicate zones after truncation, give up.
+      // an error will be given by CGNS that a duplicate name has been found.
+    }
+
+    vtkWarningWithObjectMacro(nullptr, << "Zone name '" << oldname << "' has been truncated to '"
+                                       << name
+                                       << " to conform to 32-character limit on names in CGNS.");
+  }
+}
+
+void vtkCGNSWriter::vtkPrivate::Flatten(vtkCompositeDataSet* composite,
+  vector<vtkSmartPointer<vtkDataObject>>& o2d, vector<vtkSmartPointer<vtkDataObject>>& o3d,
+  int zoneOffset, string& name)
+{
+  vtkPartitionedDataSet* partitioned = vtkPartitionedDataSet::SafeDownCast(composite);
+  if (partitioned)
+  {
+    vtkNew<vtkAppendDataSets> append;
+    append->SetMergePoints(true);
+    if (name.length() <= 0)
+    {
+      name = "Zone " + to_string(zoneOffset);
+    }
+
+    for (unsigned i = 0; i < partitioned->GetNumberOfPartitions(); ++i)
+    {
+      vtkDataObject* partition = partitioned->GetPartitionAsDataObject(i);
+      if (partition)
+      {
+        append->AddInputDataObject(partition);
+        if (partitioned->HasMetaData(i) &&
+          partitioned->GetMetaData(i)->Has(vtkCompositeDataSet::NAME()))
         {
-          if (dims[n] > 1)
-          {
-            CellDim += 1;
-          }
+          name = partitioned->GetMetaData(i)->Get(vtkCompositeDataSet::NAME());
         }
       }
-      else if (block->IsA("vtkUnstructuredGrid"))
+    }
+    append->Update();
+    vtkDataObject* result = append->GetOutputDataObject(0);
+    vtkPointSet* pointSet = vtkPointSet::SafeDownCast(result);
+    if (pointSet)
+    {
+      pointSet->GetInformation()->Set(vtkCompositeDataSet::NAME(), name.c_str());
+      const int cellDim = DetermineCellDimension(pointSet);
+      if (cellDim == 3)
       {
-        vtkUnstructuredGrid* ug = vtkUnstructuredGrid::SafeDownCast(block);
-        CellDim = 1;
-        for (int n = 0; n < ug->GetNumberOfCells(); ++n)
-        {
-          vtkCell* cell = ug->GetCell(n);
-          int curCellDim = cell->GetCellDimension();
-          if (CellDim < curCellDim)
-          {
-            CellDim = curCellDim;
-          }
-        }
-      }
-      if (CellDim == 3)
-      {
-        o3d.emplace_back(block, zonename);
+        o3d.emplace_back(pointSet);
       }
       else
       {
-        o2d.push_back(entry(block, zonename));
+        o2d.emplace_back(pointSet);
+      }
+    }
+    return;
+  }
+
+  vtkSmartPointer<vtkDataObjectTreeIterator> iter;
+  iter.TakeReference(vtkDataObjectTree::SafeDownCast(composite)->NewTreeIterator());
+  iter->VisitOnlyLeavesOff();
+  iter->TraverseSubTreeOff();
+  iter->SkipEmptyNodesOff();
+  int i(0);
+  for (iter->InitTraversal(); !iter->IsDoneWithTraversal(); iter->GoToNextItem(), ++i)
+  {
+    name = "Zone " + to_string(i + zoneOffset);
+    if (iter->HasCurrentMetaData() && iter->GetCurrentMetaData()->Has(vtkCompositeDataSet::NAME()))
+    {
+      name = iter->GetCurrentMetaData()->Get(vtkCompositeDataSet::NAME());
+    }
+    vtkDataObject* curDO = iter->GetCurrentDataObject();
+    if (!curDO)
+    {
+      continue;
+    }
+
+    vtkCompositeDataSet* subComposite = vtkCompositeDataSet::SafeDownCast(curDO);
+    if (subComposite)
+    {
+      Flatten(subComposite, o2d, o3d, ++zoneOffset, name);
+    }
+    vtkPointSet* pointSet = vtkPointSet::SafeDownCast(curDO);
+    if (pointSet)
+    {
+      if (name.length() > 0)
+      {
+        pointSet->GetInformation()->Set(vtkCompositeDataSet::NAME(), name);
+      }
+
+      const int cellDim = DetermineCellDimension(pointSet);
+      if (cellDim == 3)
+      {
+        o3d.emplace_back(pointSet);
+      }
+      else
+      {
+        o2d.emplace_back(pointSet);
       }
     }
   }
 }
 
-bool vtkCGNSWriter::vtkPrivate::WriteMultiBlock(
-  write_info& info, vtkMultiBlockDataSet* mb, string& error)
+bool vtkCGNSWriter::vtkPrivate::WriteGridsToBase(vector<vtkSmartPointer<vtkDataObject>> blocks,
+  vector<vtkSmartPointer<vtkDataObject>> otherBlocks, write_info& info, string& error)
 {
-  vector<entry> surfaceBlocks, volumeBlocks;
-  if (mb->GetNumberOfCells() == 0 && mb->GetNumberOfPoints() == 0)
+  for (auto& block : blocks)
+  {
+    string name = block->GetInformation()->Get(vtkCompositeDataSet::NAME());
+    SetNameToLength(name, blocks);
+    SetNameToLength(name, otherBlocks);
+    info.ZoneName = name.c_str();
+
+    vtkStructuredGrid* structuredGrid = vtkStructuredGrid::SafeDownCast(block);
+    vtkPointSet* pointSet = vtkPointSet::SafeDownCast(block);
+
+    // test for structured grid first. it is also a vtkPointSet
+    // but it needs to be written structured.
+    if (structuredGrid)
+    {
+      if (!WriteStructuredGrid(info, structuredGrid, error))
+      {
+        return false;
+      }
+    }
+    else if (pointSet)
+    {
+      if (!WritePointSet(info, pointSet, error))
+      {
+        return false;
+      }
+    }
+    else if (block)
+    {
+      std::stringstream ss;
+      ss << "Writing of block type '" << block->GetClassName() << "' not supported.";
+      error = ss.str();
+      return false;
+    }
+    else
+    {
+      vtkWarningWithObjectMacro(nullptr, << "Writing of empty block skipped.");
+    }
+    info.SolutionNames.clear();
+  }
+  return true;
+}
+
+bool vtkCGNSWriter::vtkPrivate::WriteComposite(
+  write_info& info, vtkCompositeDataSet* composite, string& error)
+{
+  vector<vtkSmartPointer<vtkDataObject>> surfaceBlocks, volumeBlocks;
+  if (composite->GetNumberOfCells() == 0 && composite->GetNumberOfPoints() == 0)
   {
     // don't write anything
     return true;
   }
 
-  Flatten(mb, surfaceBlocks, volumeBlocks, 0);
+  string name;
+  Flatten(composite, surfaceBlocks, volumeBlocks, 0, name);
 
   if (!volumeBlocks.empty())
   {
     info.CellDim = 3;
     info.BaseName = "Base_Volume_Elements";
     if (!WriteBase(info, error))
-      return false;
-
-    for (auto& e : volumeBlocks)
     {
-      info.ZoneName = e.name.c_str();
-      vtkStructuredGrid* sg = vtkStructuredGrid::SafeDownCast(e.obj);
-      if (sg)
-      {
-        if (!WriteStructuredGrid(info, sg, error))
-        {
-          return false;
-        }
-        info.SolutionNames.clear();
-        continue;
-      }
-      vtkPointSet* ps = vtkPointSet::SafeDownCast(e.obj);
-      if (ps)
-      {
-        if (!WritePointSet(info, ps, error))
-        {
-          return false;
-        }
-        info.SolutionNames.clear();
-        continue;
-      }
+      return false;
+    }
 
-      if (e.obj)
-      {
-        vtkErrorWithObjectMacro(
-          nullptr, << "Writing of block type '" << e.obj->GetClassName() << "' not supported.");
-      }
-      else
-      {
-        vtkWarningWithObjectMacro(nullptr, << "Writing of unsupported block type skipped.");
-      }
+    if (!WriteGridsToBase(volumeBlocks, surfaceBlocks, info, error))
+    {
+      return false;
     }
   }
 
@@ -949,71 +1026,37 @@ bool vtkCGNSWriter::vtkPrivate::WriteMultiBlock(
     info.CellDim = 2;
     info.BaseName = "Base_Surface_Elements";
     if (!WriteBase(info, error))
-      return false;
-
-    for (auto& e : surfaceBlocks)
     {
-      info.ZoneName = e.name.c_str();
-      vtkStructuredGrid* sg = vtkStructuredGrid::SafeDownCast(e.obj);
-      if (sg)
-      {
-        if (!WriteStructuredGrid(info, sg, error))
-        {
-          return false;
-        }
-        info.SolutionNames.clear();
-        continue;
-      }
-      vtkPointSet* ps = vtkPointSet::SafeDownCast(e.obj);
-      if (ps)
-      {
-        if (!WritePointSet(info, ps, error))
-        {
-          return false;
-        }
-        info.SolutionNames.clear();
-      }
+      return false;
+    }
+    if (!WriteGridsToBase(surfaceBlocks, volumeBlocks, info, error))
+    {
+      return false;
     }
   }
 
   return true;
 }
 
-bool vtkCGNSWriter::vtkPrivate::WriteMultiBlock(
-  vtkMultiBlockDataSet* mb, write_info& info, string& error)
+bool vtkCGNSWriter::vtkPrivate::WriteComposite(
+  vtkCompositeDataSet* composite, write_info& info, string& error)
 {
   if (!InitCGNSFile(info, error))
   {
     return false;
   }
 
-  const bool rc = WriteMultiBlock(info, mb, error);
+  const bool rc = WriteComposite(info, composite, error);
   cg_check_operation(cg_close(info.F));
   return rc;
-}
-
-bool vtkCGNSWriter::vtkPrivate::WriteMultiPiece(
-  vtkMultiPieceDataSet* vtkNotUsed(mp), write_info& vtkNotUsed(info), string& error)
-{
-  // todo: multi-piece writing to a single zone. Requires extensive rework, but may be done together
-  // with parallel writing implementation?
-  error = "Not implemented.";
-  return false;
 }
 
 vtkStandardNewMacro(vtkCGNSWriter);
 
 vtkCGNSWriter::vtkCGNSWriter()
 {
-  this->UseHDF5 = true;
-  this->WasWritingSuccessful = true;
-  this->FileName = (nullptr);
-  this->OriginalInput = (nullptr);
-  this->TimeValues = nullptr;
-  this->WriteAllTimeSteps = false;
-  this->CurrentTimeIndex = 0;
-
-  this->SetUseHDF5(true); // use the method, this will call the corresponding library method.
+  // use the method, this will call the corresponding library method.
+  this->SetUseHDF5(this->UseHDF5);
 }
 
 void vtkCGNSWriter::SetUseHDF5(bool value)
@@ -1183,27 +1226,24 @@ void vtkCGNSWriter::WriteData()
   }
 
   string error;
-  if (this->OriginalInput->IsA("vtkMultiBlockDataSet"))
+  if (this->OriginalInput->IsA("vtkCompositeDataSet"))
   {
-    vtkMultiBlockDataSet* mb = vtkMultiBlockDataSet::SafeDownCast(this->OriginalInput);
-    this->WasWritingSuccessful = vtkCGNSWriter::vtkPrivate::WriteMultiBlock(mb, info, error);
-  }
-  else if (this->OriginalInput->IsA("vtkMultiPieceDataSet"))
-  {
-    vtkMultiPieceDataSet* ds = vtkMultiPieceDataSet::SafeDownCast(this->OriginalInput);
-    this->WasWritingSuccessful = vtkCGNSWriter::vtkPrivate::WriteMultiPiece(ds, info, error);
+    vtkCompositeDataSet* composite = vtkCompositeDataSet::SafeDownCast(this->OriginalInput);
+    this->WasWritingSuccessful = vtkCGNSWriter::vtkPrivate::WriteComposite(composite, info, error);
   }
   else if (this->OriginalInput->IsA("vtkDataSet"))
   {
     if (this->OriginalInput->IsA("vtkStructuredGrid"))
     {
-      vtkStructuredGrid* sg = vtkStructuredGrid::SafeDownCast(this->OriginalInput);
-      this->WasWritingSuccessful = vtkCGNSWriter::vtkPrivate::WriteStructuredGrid(sg, info, error);
+      vtkStructuredGrid* structuredGrid = vtkStructuredGrid::SafeDownCast(this->OriginalInput);
+      this->WasWritingSuccessful =
+        vtkCGNSWriter::vtkPrivate::WriteStructuredGrid(structuredGrid, info, error);
     }
     else if (this->OriginalInput->IsA("vtkPointSet"))
     {
-      vtkPointSet* ug = vtkPointSet::SafeDownCast(this->OriginalInput);
-      this->WasWritingSuccessful = vtkCGNSWriter::vtkPrivate::WritePointSet(ug, info, error);
+      vtkPointSet* unstructuredGrid = vtkPointSet::SafeDownCast(this->OriginalInput);
+      this->WasWritingSuccessful =
+        vtkCGNSWriter::vtkPrivate::WritePointSet(unstructuredGrid, info, error);
     }
     else
     {

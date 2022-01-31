@@ -16,6 +16,7 @@
 #include "vtkCGNSWriter.h"
 #include "vtkCellData.h"
 #include "vtkDoubleArray.h"
+#include "vtkLogger.h"
 #include "vtkMultiBlockDataSet.h"
 #include "vtkNew.h"
 #include "vtkPVTestUtilities.h"
@@ -54,7 +55,7 @@ int TestStructuredGrid(int argc, char* argv[])
   }
   {
     vtkNew<vtkStructuredGrid> sg2D;
-    int i(10), j(10), k(1); // 2D in K-direction
+    const int i(10), j(10), k(1); // 2D in K-direction
     Create(sg2D, i, j, k);
     const char* filename = u->GetTempFilePath("structured_grid_2d.cgns");
     vtkNew<vtkCGNSWriter> w;
@@ -80,31 +81,31 @@ int TestStructuredGrid(int argc, char* argv[])
 int StructuredGridTest(
   vtkMultiBlockDataSet* read, unsigned int b0, unsigned int b1, int I, int J, int K)
 {
-  vtk_assert(nullptr != read);
-  vtk_assert(b0 < read->GetNumberOfBlocks());
+  vtkLogIfF(ERROR, nullptr == read, "Multiblock dataset is NULL");
+  vtkLogIfF(ERROR, b0 >= read->GetNumberOfBlocks(), "Number of blocks does not match");
 
   vtkMultiBlockDataSet* block0 = vtkMultiBlockDataSet::SafeDownCast(read->GetBlock(b0));
-  vtk_assert(nullptr != block0);
-  vtk_assert(b1 < block0->GetNumberOfBlocks());
+  vtkLogIfF(ERROR, nullptr == block0, "Block is NULL");
+  vtkLogIfF(ERROR, b1 >= block0->GetNumberOfBlocks(), "Number of blocks does not match");
 
   vtkStructuredGrid* target = vtkStructuredGrid::SafeDownCast(block0->GetBlock(b1));
-  cout << block0->GetBlock(b1)->GetDataObjectType() << endl;
-  vtk_assert(nullptr != target);
+  vtkLogIfF(ERROR, nullptr == target, "OUtput grid is NULL");
+  const vtkIdType nPts = I * J * K;
+  vtkLogIfF(ERROR, nPts != target->GetNumberOfPoints(), "Expected %lld points, got %lld", nPts,
+    target->GetNumberOfPoints());
 
-  vtk_assert_equal(I * J * K, target->GetNumberOfPoints());
-  vtk_assert(I * J * K == target->GetNumberOfPoints());
-
-  int Im1 = std::max(1, I - 1);
-  int Jm1 = std::max(1, J - 1);
-  int Km1 = std::max(1, K - 1);
-  vtk_assert_equal(Im1 * Jm1 * Km1, target->GetNumberOfCells());
+  const vtkIdType Im1 = std::max(1, I - 1);
+  const vtkIdType Jm1 = std::max(1, J - 1);
+  const vtkIdType Km1 = std::max(1, K - 1);
+  vtkLogIfF(ERROR, Im1 * Jm1 * Km1 != target->GetNumberOfCells(), "Expected %lld cells, got %lld",
+    Im1 * Jm1 * Km1, target->GetNumberOfCells());
 
   return EXIT_SUCCESS;
 }
 
-void Create(vtkStructuredGrid* sg, int I, int J, int K)
+void Create(vtkStructuredGrid* sg, vtkIdType I, vtkIdType J, vtkIdType K)
 {
-  int i, j, k;
+  vtkIdType i, j, k;
   vtkNew<vtkPoints> pts;
 
   vtkNew<vtkDoubleArray> cellPressure;
@@ -132,27 +133,34 @@ void Create(vtkStructuredGrid* sg, int I, int J, int K)
   for (i = 0; i < I; ++i)
   {
     xyz[0] = 1.0 * i;
+    const auto di = static_cast<double>(i);
     for (j = 0; j < J; ++j)
     {
       xyz[1] = j / 2.0;
+      const auto dj = static_cast<double>(j);
       for (k = 0; k < K; ++k)
       {
         xyz[2] = k * 3.0;
+        const auto dk = static_cast<double>(k);
+
         pts->InsertNextPoint(xyz);
-        vertexPressure->InsertNextValue(i + j + k);
-        vertexVelocity->InsertNextTuple3(i, j, k);
+        vertexPressure->InsertNextValue(di + dj + dk);
+        vertexVelocity->InsertNextTuple3(di, dj, dk);
       }
     }
   }
 
   for (i = 0; i < I - 1; ++i)
   {
+    const auto di = static_cast<double>(i);
     for (j = 0; j < J - 1; ++j)
     {
+      const auto dj = static_cast<double>(j);
       for (k = 0; k < K - 1; ++k)
       {
-        cellPressure->InsertNextValue(i + j + k);
-        cellVelocity->InsertNextTuple3(i, j, k);
+        const auto dk = static_cast<double>(k);
+        cellPressure->InsertNextValue(di + dj + dk);
+        cellVelocity->InsertNextTuple3(di, dj, dk);
       }
     }
   }
