@@ -213,7 +213,8 @@ void pqParaViewMenuBuilders::buildEditMenu(QMenu& menu, pqPropertiesPanel* prope
   new pqIgnoreSourceTimeReaction(ui.actionIgnoreTime);
   new pqDeleteReaction(ui.actionDelete);
   ui.actionDelete->setShortcut(QKeySequence(Qt::ALT + Qt::Key_D));
-  new pqDeleteReaction(ui.actionDelete_All, true);
+  new pqDeleteReaction(ui.actionDeleteTree, pqDeleteReaction::DeleteModes::TREE);
+  new pqDeleteReaction(ui.actionDelete_All, pqDeleteReaction::DeleteModes::ALL);
   new pqShowHideAllReaction(ui.actionShow_All, pqShowHideAllReaction::ActionType::Show);
   new pqShowHideAllReaction(ui.actionHide_All, pqShowHideAllReaction::ActionType::Hide);
   new pqSaveScreenshotReaction(ui.actionCopyScreenshotToClipboard, true);
@@ -518,6 +519,16 @@ void pqParaViewMenuBuilders::buildPipelineBrowserContextMenu(QMenu& menu, QMainW
       menu.parent(), SIGNAL(deleteKey()), actionPBDelete, SLOT(trigger()), Qt::QueuedConnection);
   }
 
+  QAction* actionPBDeleteTree = new QAction(menu.parent());
+  actionPBDeleteTree->setObjectName(QStringLiteral("actionPBDeleteTree"));
+  actionPBDeleteTree->setIcon(icon);
+  actionPBDeleteTree->setText(QApplication::translate(
+    "pqPipelineBrowserContextMenu", "Delete This and Downstream Filters", Q_NULLPTR));
+#ifndef QT_NO_STATUSTIP
+  actionPBDeleteTree->setStatusTip(QApplication::translate(
+    "pqPipelineBrowserContextMenu", "Delete selection and all downstream filters", Q_NULLPTR));
+#endif // QT_NO_STATUSTIP
+
   QAction* actionPBCreateCustomFilter = new QAction(menu.parent());
   actionPBCreateCustomFilter->setObjectName(QStringLiteral("actionPBCreateCustomFilter"));
   actionPBCreateCustomFilter->setText(
@@ -555,6 +566,7 @@ void pqParaViewMenuBuilders::buildPipelineBrowserContextMenu(QMenu& menu, QMainW
   menu.addAction(actionPBPaste);
   menu.addSeparator();
   menu.addAction(actionPBDelete);
+  menu.addAction(actionPBDeleteTree);
   menu.addAction(actionPBRename);
   menu.addAction(actionPBReloadFiles);
   menu.addAction(actionPBChangeFile);
@@ -579,6 +591,7 @@ void pqParaViewMenuBuilders::buildPipelineBrowserContextMenu(QMenu& menu, QMainW
   new pqReloadFilesReaction(actionPBReloadFiles);
   new pqIgnoreSourceTimeReaction(actionPBIgnoreTime);
   new pqDeleteReaction(actionPBDelete);
+  new pqDeleteReaction(actionPBDeleteTree, pqDeleteReaction::DeleteModes::TREE);
   new pqCreateCustomFilterReaction(actionPBCreateCustomFilter);
   new pqLinkSelectionReaction(actionPBLinkSelection);
   new pqRenameProxyReaction(actionPBRename, mainWindow);
