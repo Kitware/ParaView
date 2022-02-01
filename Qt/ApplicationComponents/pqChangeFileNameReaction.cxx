@@ -26,6 +26,7 @@
 #include "vtkNew.h"
 #include "vtkPVXMLElement.h"
 #include "vtkSMArraySelectionDomain.h"
+#include "vtkSMInputProperty.h"
 #include "vtkSMParaViewPipelineController.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMPropertyIterator.h"
@@ -189,16 +190,17 @@ void CreateReader(vtkSMSourceProxy* proxy, const QStringList& files, const char*
     {
       continue;
     }
-    unsigned int proxyId = 0;
-    for (; proxyId < prop->GetNumberOfProxies(); ++proxyId)
+    for (unsigned int proxyId = 0; proxyId < prop->GetNumberOfProxies(); ++proxyId)
     {
       if (proxy == prop->GetProxy(proxyId))
       {
+        vtkSMPropertyHelper helper(prop);
+        helper.Set(proxyId, newProxy,
+          vtkSMInputProperty::SafeDownCast(prop) ? helper.GetOutputPort(proxyId) : 0);
+        consumer->UpdateVTKObjects();
         break;
       }
     }
-    vtkSMPropertyHelper(prop).Set(proxyId, newProxy);
-    consumer->UpdateVTKObjects();
   }
 
   // We don't need the legacy proxy anymore, we can delete it.
