@@ -55,6 +55,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QApplication>
 #include <QFileInfo>
+#include <QString>
+#include <QStringList>
 #include <QtDebug>
 
 #include "pqAnimationCue.h"
@@ -80,6 +82,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <windows.h>
 #endif
 
+#include <algorithm>
 #include <cassert>
 #include <chrono>
 
@@ -236,7 +239,10 @@ pqPipelineSource* pqObjectBuilder::createReader(
     return nullptr;
   }
 
-  QString reg_name = pqCoreUtilities::findLargestPrefix(files);
+  std::vector<std::string> filesStd(files.size());
+  std::transform(files.constBegin(), files.constEnd(), filesStd.begin(),
+    [](const QString& str) -> std::string { return str.toStdString(); });
+  QString reg_name = QString(vtkSMCoreUtilities::FindLargestPrefix(filesStd).c_str());
 
   vtkNew<vtkSMParaViewPipelineController> controller;
   vtkSMSessionProxyManager* pxm = server->proxyManager();

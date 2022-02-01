@@ -102,6 +102,7 @@ paraview_add_test_python(
   Plot3DReader.py
   SaveDataWithArraySelection.py
   ReadTimeArray.py
+  ReplaceReaderFileName.py
 )
 
 # These tests could run safely in serial and parallel.

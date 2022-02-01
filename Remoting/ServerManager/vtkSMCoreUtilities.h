@@ -129,6 +129,21 @@ public:
    */
   static const char* GetStringForCellType(int cellType);
 
+  /**
+   * Replaces input proxy, which should be a reader proxy, by a new proxy in the pipeline.
+   * The new input files are stored in files, and `propName` should be the file name property
+   * in the reader (usually "FileName" or "FileNames").
+   */
+  static void ReplaceReaderFileName(
+    vtkSMProxy* proxy, const std::vector<std::string>& files, const char* propName);
+
+  /**
+   * Find the largest prefix that matches all file names in files, and then append a '*'
+   * to signify that it is a collection of files. If they all start with something different,
+   * this returns '*'.
+   */
+  static std::string FindLargestPrefix(const std::vector<std::string>& files);
+
 protected:
   vtkSMCoreUtilities();
   ~vtkSMCoreUtilities() override;

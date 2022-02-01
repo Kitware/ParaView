@@ -115,13 +115,6 @@ public:
   static QString getParaViewApplicationDirectory();
 
   /**
-   * Find the largest prefix that matches all file names in files, and then append a '*'
-   * to signify that it is a collection of files. If they all start with something different,
-   * this returns '*'.
-   */
-  static QString findLargestPrefix(const QStringList& files);
-
-  /**
    * Return the list of full available path that exists inside the shared
    * application path and the user specific one
    */

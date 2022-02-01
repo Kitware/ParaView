@@ -102,38 +102,6 @@ QString pqCoreUtilities::getParaViewApplicationDirectory()
 }
 
 //-----------------------------------------------------------------------------
-QString pqCoreUtilities::findLargestPrefix(const QStringList& files)
-{
-  unsigned int numFiles = files.size();
-  QString regName = QFileInfo(files[0]).fileName();
-
-  if (numFiles > 1)
-  {
-    for (unsigned int i = 1; i < numFiles; i++)
-    {
-      QString nextFile = QFileInfo(files[i]).fileName();
-      if (nextFile.startsWith(regName))
-      {
-        continue;
-      }
-      QString commonPrefix = regName;
-      do
-      {
-        commonPrefix.chop(1);
-      } while (!nextFile.startsWith(commonPrefix) && !commonPrefix.isEmpty());
-      if (commonPrefix.isEmpty())
-      {
-        break;
-      }
-      regName = commonPrefix;
-    }
-    regName += '*';
-  }
-
-  return regName;
-}
-
-//-----------------------------------------------------------------------------
 QStringList pqCoreUtilities::findParaviewPaths(
   QString directoryOrFileName, bool lookupInAppDir, bool lookupInUserDir)
 {
