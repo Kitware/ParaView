@@ -146,9 +146,18 @@ public:
 
   //@{
   /**
+   * Get/Set which process to limit the selection to. `-1` is treated as
+   * all processes.
+   */
+  vtkSetClampMacro(ProcessID, int, -1, VTK_INT_MAX);
+  vtkGetMacro(ProcessID, int);
+  //@}
+
+  //@{
+  /**
    * Set the field type for the generated selection.
    * Possible values are as defined by
-   * vtkSelection::SelectionField.
+   * vtkSelectionNode::SelectionField.
    */
   vtkSetMacro(FieldType, int);
   vtkGetMacro(FieldType, int);
@@ -209,6 +218,7 @@ protected:
   };
 
   Modes Mode;
+  int ProcessID;
   int FieldType;
   int ContainingCells;
   int Inverse;

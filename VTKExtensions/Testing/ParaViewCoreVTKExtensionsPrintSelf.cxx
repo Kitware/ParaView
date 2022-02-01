@@ -127,7 +127,6 @@
 #include "vtkPlotEdges.h"
 #include "vtkPointHandleRepresentationSphere.h"
 #include "vtkPolyLineToRectilinearGridFilter.h"
-#include "vtkQuerySelectionSource.h"
 #include "vtkRectilinearGridConnectivity.h"
 #include "vtkReductionFilter.h"
 #include "vtkSciVizStatistics.h"

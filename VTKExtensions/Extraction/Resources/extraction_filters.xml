@@ -251,22 +251,20 @@
           Set the ContentType for the output.
         </Documentation>
         <EnumerationDomain name="enum">
-          <Entry text="SELECTIONS"
-                 value="0"/>
           <Entry text="GLOBALIDs"
-                 value="1"/>
+                 value="0"/>
           <Entry text="PEDIGREEIDS"
-                 value="2"/>
+                 value="1"/>
           <Entry text="VALUES"
-                 value="3"/>
+                 value="2"/>
           <Entry text="INDICES"
-                 value="4"/>
+                 value="3"/>
           <Entry text="FRUSTUM"
+                 value="4"/>
+          <Entry text="LOCATIONS"
                  value="5"/>
-          <Entry text="LOCATION"
-                 value="6"/>
           <Entry text="THRESHOLDS"
-                 value="7"/>
+                 value="6"/>
         </EnumerationDomain>
       </IntVectorProperty>
       <StringVectorProperty clean_command="ClearArrayNames"
@@ -406,8 +404,18 @@
 
   <ProxyGroup name="sources">
     <!-- ==================================================================== -->
-    <SourceProxy class="vtkQuerySelectionSource"
+    <SourceProxy class="vtkSelectionSource"
                  name="SelectionQuerySource">
+      <IntVectorProperty command="SetContentType"
+                         default_values="9"
+                         name="ContentType"
+                         number_of_elements="1">
+      </IntVectorProperty>
+      <IntVectorProperty command="SetFieldTypeOption"
+                         default_values="1"
+                         name="FieldTypeOption"
+                         number_of_elements="1">
+      </IntVectorProperty>
       <IntVectorProperty command="SetElementType"
                          default_values="1"
                          name="ElementType"
@@ -423,12 +431,12 @@
                             number_of_elements="1"
                             panel_visibility="default">
       </StringVectorProperty>
-      <IntVectorProperty command="SetAMRLevel"
+      <IntVectorProperty command="SetHierarchicalLevel"
                          default_values="-1"
                          name="HierarchicalLevel"
                          number_of_elements="1">
       </IntVectorProperty>
-      <IntVectorProperty command="SetAMRIndex"
+      <IntVectorProperty command="SetHierarchicalIndex"
                          default_values="-1"
                          name="HierarchicalIndex"
                          number_of_elements="1">
@@ -438,14 +446,6 @@
                          name="ProcessID"
                          number_of_elements="1">
       </IntVectorProperty>
-      <StringVectorProperty command="GetUserFriendlyText"
-                            information_only="1"
-                            name="UserFriendlyText">
-        <SimpleStringInformationHelper/>
-        <Documentation>
-          Reconstructs the query as a user-friendly text, e.g., "IDs &gt;= 12".
-        </Documentation>
-      </StringVectorProperty>
       <StringVectorProperty name="Assembly"
                             command="SetAssemblyName"
                             number_of_elements="1"
@@ -457,7 +457,7 @@
       </StringVectorProperty>
       <StringVectorProperty name="Selectors"
                             command="AddSelector"
-                            clean_command="ClearSelectors"
+                            clean_command="RemoveAllSelectors"
                             repeat_command="1"
                             number_of_elements_per_command="1">
         <Documentation>
@@ -474,6 +474,17 @@
           When this property is false the selection describes everything that should be extracted.
           When this is true the selection describes everything that should NOT be extracted.
         </Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetContainingCells"
+                         default_values="0"
+                         name="ContainingCells"
+                         number_of_elements="1">
+        <Documentation>
+          When field type is POINT, this controls whether single vertex cells will be produced
+          for each selected point, or whether the cells that contain each selected point will be produced.
+          When field type is CELL this has no effect.
+        </Documentation>
+        <BooleanDomain name="bool"/>
       </IntVectorProperty>
       <IntVectorProperty command="SetNumberOfLayers"
                          default_values="0"
