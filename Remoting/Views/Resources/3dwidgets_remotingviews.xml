@@ -671,7 +671,14 @@
             <Property name="UseCustomLabels" panel_visibility="advanced" />
             <Property name="CustomLabels" panel_visibility="advanced" />
             <Property name="AddRangeLabels" panel_visibility="advanced" />
+            <Property name="DataRangeMin" />
+            <Property name="DataRangeMax" />
             <Property name="RangeLabelFormat" panel_visibility="advanced" />
+          </PropertyGroup>
+
+          <PropertyGroup label="Visible Data Range">
+            <Property name="DrawDataRange" />
+            <Property  name="DataRangeLabelFormat" />
           </PropertyGroup>
 
           <PropertyGroup label="Annotations">

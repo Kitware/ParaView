@@ -219,6 +219,14 @@ public:
 
   //@{
   /**
+   * Printf format for range labels.
+   */
+  vtkSetStringMacro(DataRangeLabelFormat);
+  vtkGetStringMacro(DataRangeLabelFormat);
+  //@}
+
+  //@{
+  /**
    * Set number of custom labels.
    */
   void SetNumberOfCustomLabels(vtkIdType numLabels);
@@ -266,9 +274,57 @@ public:
    */
   int GetEstimatedNumberOfAnnotations();
 
+  ///@{
+  /**
+   * If true, the ranges of the arrays linked to the scalar bar are displayed
+   * in the widget. By default, it is set to false.
+   */
+  vtkSetMacro(DrawDataRange, bool);
+  vtkGetMacro(DrawDataRange, bool);
+  vtkBooleanMacro(DrawDataRange, bool);
+  ///@}
+
+  ///@{
+  /**
+   * Set/Get the minimum value of arrays linked to this scalar bar actor.
+   * This value can be set to a minimum value that is not the same as the LUT range and is displayed
+   * in the color legend when `"DrawDataRange"` is set to `true`.
+   */
+  vtkSetMacro(DataRangeMin, double);
+  vtkGetMacro(DataRangeMin, double);
+  ///@}
+
+  ///@{
+  /**
+   * Set/Get the maximum value of arrays linked to this scalar bar actor.
+   * This value can be set to a minimum value that is not the same as the LUT range and is displayed
+   * in the color legend when `"DrawDataRange"` is set to `true`.
+   */
+  vtkSetMacro(DataRangeMax, double);
+  vtkGetMacro(DataRangeMax, double);
+  ///@}
+
 protected:
   vtkContext2DScalarBarActor();
   ~vtkContext2DScalarBarActor() override;
+
+  /**
+   * Flag to show the range on the scalar bar.
+   */
+  bool DrawDataRange;
+
+  ///@{
+  /**
+   * Range to be displayed.
+   */
+  double DataRangeMin;
+  double DataRangeMax;
+  ///@}
+
+  /**
+   * Offset applied to scalar bar when `DrawDataRange` is true.
+   */
+  int VerticalOffset = 0;
 
 private:
   vtkContext2DScalarBarActor(const vtkContext2DScalarBarActor&) = delete;
@@ -315,6 +371,7 @@ private:
   int AutomaticAnnotations;
   int AddRangeAnnotations;
   char* RangeLabelFormat;
+  char* DataRangeLabelFormat;
 
   /**
    * Flag that controls whether an outline is drawn around the scalar bar.
@@ -391,7 +448,7 @@ private:
    * the rect containing only the color map, not the out-of-range
    * or NaN color swatches.
    */
-  vtkRectf GetColorBarRect(double size[2]);
+  vtkRectf GetColorBarRect(double size[2], bool includeSwatch = true);
 
   /**
    * Compute the rect that contains the out-of-range color swatches
@@ -437,6 +494,11 @@ private:
    */
   void PaintTitle(vtkContext2D* painter, double size[2]);
 
+  /**
+   * Adds the min and max range of the displayed representations on the scalar bar.
+   */
+  void PaintRange(vtkContext2D* painter, double size[2]);
+
   class vtkAnnotationMap;
 
   /**
@@ -457,6 +519,16 @@ private:
    */
   void PaintAnnotationsHorizontally(
     vtkContext2D* painter, double size[2], const vtkAnnotationMap& map);
+
+  /**
+   * Annotation height when the scalar bar is in horizontal mode.
+   */
+  float HorizontalAnnotationHeight;
+
+  /**
+   * Range data height.
+   */
+  float VerticalRangeDataHeight;
 };
 
 #endif // vtkContext2DScalarBarActor_h

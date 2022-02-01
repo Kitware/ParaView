@@ -56,6 +56,7 @@ vtkSMPVRepresentationProxy::vtkSMPVRepresentationProxy()
   this->SetSIClassName("vtkSIPVRepresentationProxy");
   this->RepresentationSubProxies = new vtkStringSet();
   this->InReadXMLAttributes = false;
+  this->LastLUTProxy = nullptr;
 }
 
 //----------------------------------------------------------------------------
@@ -703,6 +704,67 @@ int vtkSMPVRepresentationProxy::IsScalarBarStickyVisible(vtkSMProxy* view)
 }
 
 //----------------------------------------------------------------------------
+bool vtkSMPVRepresentationProxy::UpdateScalarBarRange(vtkSMProxy* view, bool deleteRange)
+{
+  bool usingScalarBarColoring = this->GetUsingScalarColoring();
+
+  vtkSMProperty* lutProperty = this->GetProperty("LookupTable");
+  if (!lutProperty)
+  {
+    vtkWarningMacro("Missing 'LookupTable' property");
+    return false;
+  }
+
+  vtkSMPropertyHelper lutPropertyHelper(lutProperty);
+  vtkSMProxy* lutProxy =
+    usingScalarBarColoring ? lutPropertyHelper.GetAsProxy(0) : this->LastLUTProxy.GetPointer();
+
+  if (!lutProxy)
+  {
+    return false;
+  }
+
+  vtkSMScalarBarWidgetRepresentationProxy* sbProxy =
+    vtkSMScalarBarWidgetRepresentationProxy::SafeDownCast(
+      vtkSMTransferFunctionProxy::FindScalarBarRepresentation(lutProxy, view));
+
+  if (!sbProxy)
+  {
+    return false;
+  }
+
+  vtkNew<vtkSMTransferFunctionManager> mgr;
+  vtkSMProxy* sbSMProxy = mgr->GetScalarBarRepresentation(lutProxy, view);
+
+  vtkSMProperty* maxRangeProp = sbSMProxy->GetProperty("DataRangeMax");
+  vtkSMProperty* minRangeProp = sbSMProxy->GetProperty("DataRangeMin");
+
+  if (minRangeProp && maxRangeProp)
+  {
+    vtkSMPropertyHelper minRangePropHelper(minRangeProp);
+    vtkSMPropertyHelper maxRangePropHelper(maxRangeProp);
+
+    // We remove the range that was potentially previously stored
+    sbProxy->RemoveRange(this);
+
+    // If we do not want to delete this range, then we update it with its potential new value.
+    if (!deleteRange)
+    {
+      sbProxy->AddRange(this);
+    }
+
+    double updatedRange[2];
+    sbProxy->GetRange(updatedRange);
+    minRangePropHelper.Set(updatedRange[0]);
+    maxRangePropHelper.Set(updatedRange[1]);
+  }
+  sbSMProxy->UpdateVTKObjects();
+
+  this->LastLUTProxy = usingScalarBarColoring ? lutProxy : nullptr;
+  return true;
+}
+
+//----------------------------------------------------------------------------
 bool vtkSMPVRepresentationProxy::SetScalarBarVisibility(vtkSMProxy* view, bool visible)
 {
   if (!view)
@@ -788,6 +850,7 @@ bool vtkSMPVRepresentationProxy::SetScalarBarVisibility(vtkSMProxy* view, bool v
 
   vtkSMProperty* titleProp = sbSMProxy->GetProperty("Title");
   vtkSMProperty* compProp = sbSMProxy->GetProperty("ComponentTitle");
+
   if (titleProp && compProp && titleProp->IsValueDefault() && compProp->IsValueDefault())
   {
     vtkSMSettings* settings = vtkSMSettings::GetInstance();
@@ -802,7 +865,14 @@ bool vtkSMPVRepresentationProxy::SetScalarBarVisibility(vtkSMProxy* view, bool v
 
     std::string arrayTitle = settings->GetSettingAsString(prefix.str().c_str(), arrayName);
 
-    vtkSMPropertyHelper(titleProp).Set(arrayTitle.c_str());
+    vtkSMPropertyHelper titlePropHelper(titleProp);
+
+    if (sbProxy && strcmp(titlePropHelper.GetAsString(), arrayTitle.c_str()) != 0)
+    {
+      sbProxy->ClearRange();
+    }
+
+    titlePropHelper.Set(arrayTitle.c_str());
 
     // now, determine a name for it if possible.
     vtkPVArrayInformation* arrayInfo = this->GetArrayInformationForColorArray();
@@ -1064,4 +1134,21 @@ bool vtkSMPVRepresentationProxy::GetVolumeIndependentRanges()
   return (vtkSMPropertyHelper(msProperty).GetAsInt() != 0 &&
     (vtkSMPropertyHelper(mcmProperty).GetAsInt() != 0 ||
       vtkSMPropertyHelper(uoaProperty).GetAsInt() != 0));
+}
+
+//----------------------------------------------------------------------------
+void vtkSMPVRepresentationProxy::ViewUpdated(vtkSMProxy* view)
+{
+  if (this->GetProperty("Visibility"))
+  {
+    if (vtkSMPropertyHelper(this, "Visibility").GetAsInt() && this->GetUsingScalarColoring())
+    {
+      this->UpdateScalarBarRange(view, false /* deleteRange */);
+    }
+    else
+    {
+      this->UpdateScalarBarRange(view, true /* deleteRange */);
+    }
+  }
+  this->Superclass::ViewUpdated(view);
 }
