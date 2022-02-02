@@ -734,22 +734,26 @@ vtkSmartPointer<vtkImageData> vtkSMTransferFunction2DProxy::ComputeDataHistogram
   s->SetValue(1, (useGradientAsY ? "Gradient Magnitude" : array2Name.c_str()));
   this->Histogram2DCache->GetFieldData()->AddArray(s);
 
-  if (useGradientAsY)
-  {
-    vtkSMProperty* rangeProperty = GetTransferFunction2DRangeProperty(this);
+  // Set the Y axis range on the 2D transfer function.
+  // This is ideally only required when the Y axis is the gradient function.
+  // Applying to all cases right now as ParaView doesn't support custom ranges
+  // for Y axis of the transfer function yet.
+  // if (useGradientAsY)
+  // {
+  vtkSMProperty* rangeProperty = GetTransferFunction2DRangeProperty(this);
 
-    vtkSMPropertyHelper rangeHelper(rangeProperty);
+  vtkSMPropertyHelper rangeHelper(rangeProperty);
 
-    // Check if the range needs to be updated.
-    vtkTuple<double, 4> currentRange;
-    rangeHelper.Get(currentRange.GetData(), 4);
-    double bounds[6];
-    this->Histogram2DCache->GetBounds(bounds);
-    currentRange[2] = bounds[2];
-    currentRange[3] = bounds[3];
-    rangeHelper.Set(currentRange.GetData(), 4);
-    this->UpdateVTKObjects();
-  }
+  // Check if the range needs to be updated.
+  vtkTuple<double, 4> currentRange;
+  rangeHelper.Get(currentRange.GetData(), 4);
+  double bounds[6];
+  this->Histogram2DCache->GetBounds(bounds);
+  currentRange[2] = bounds[2];
+  currentRange[3] = bounds[3];
+  rangeHelper.Set(currentRange.GetData(), 4);
+  this->UpdateVTKObjects();
+  // }
 
   // Update the output dimensions property once the image is updated
   vtkSMProperty* outDimsProperty = GetTransferFunction2DOutputDimensionsProperty(this);
