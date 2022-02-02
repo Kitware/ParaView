@@ -172,7 +172,7 @@ void vtkPVTransferFunction2D::Build()
   auto arrRange = vtk::DataArrayValueRange(arr);
   std::fill(arrRange.begin(), arrRange.end(), 0.0);
 
-  for (const auto box : this->Internals->Boxes)
+  for (const auto& box : this->Internals->Boxes)
   {
     if (!box)
     {
