@@ -4633,14 +4633,13 @@
                         name="input_type">
           <DataType value="vtkDataSet" />
           <DataType value="vtkGenericDataSet" />
-          <DataType value="vtkHyperTreeGrid" />
 
           <!-- for MB, we want to match if any of the leaf nodes is of the following type -->
           <DataType value="vtkDataObjectTree" child_match="any">
             <DataType value="vtkDataSet" />
             <DataType value="vtkGenericDataSet" />
-            <DataType value="vtkHyperTreeGrid" />
           </DataType>
+
         </DataTypeDomain>
         <InputArrayDomain attribute_type="cell"
                           name="input_array_cell"
@@ -4652,6 +4651,7 @@
       </InputProperty>
       <!-- End of GeometryRepresentation -->
     </PVRepresentationProxy>
+
     <!-- ================================================================== -->
     <PVRepresentationProxy base_proxygroup="representations"
                            base_proxyname="UnstructuredGridRepresentation"
@@ -4664,7 +4664,6 @@
     </PVRepresentationProxy>
 
     <!-- ================================================================== -->
-
     <PVRepresentationProxy base_proxygroup="internal_representations"
                            base_proxyname="PVRepresentationBase"
                            class="vtkPVCompositeRepresentation"
@@ -4804,6 +4803,8 @@
       </Hints>
       <!-- End of StructuredGridRepresentation -->
     </PVRepresentationProxy>
+
+    <!-- ================================================================== -->
     <PVRepresentationProxy base_proxygroup="internal_representations"
                            base_proxyname="PVRepresentationBase"
                            class="vtkPVCompositeRepresentation"
@@ -4942,6 +4943,7 @@
       </Hints>
       <!-- End of UniformGridRepresentation -->
     </PVRepresentationProxy>
+
     <!-- ================================================================== -->
     <PVRepresentationProxy base_proxygroup="internal_representations"
                            base_proxyname="PVRepresentationBase"
@@ -5016,6 +5018,236 @@
 
       <!-- End of AMRRepresentation -->
     </PVRepresentationProxy>
+
+    <!-- ================================================================== -->
+    <PVRepresentationProxy class="vtkPVCompositeRepresentation"
+                           name="HyperTreeGridRepresentation"
+                           base_proxygroup="internal_representations"
+                           base_proxyname="PVRepresentationBase"
+                           processes="client|renderserver|dataserver">
+      <Documentation>Representation to show Hyper Tree Grids in the render view
+      based on the Composite Representation.</Documentation>
+
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <DataTypeDomain composite_data_supported="0"
+                        name="input_type">
+          <DataType value="vtkHyperTreeGrid" />
+        </DataTypeDomain>
+        <Documentation>Set the input to the representation.</Documentation>
+      </InputProperty>
+
+    </PVRepresentationProxy>
+
+    <PVRepresentationProxy class="vtkHyperTreeGridRepresentation"
+                           name="FastHyperTreeGridRepresentation"
+                           processes="client|renderserver|dataserver"
+                           si_class="vtkSIProxy">
+      <Documentation>Dedicated representation to show 2D Hyper Tree Grid.
+        Use an adaptive decimation mechanism for improved performances.
+      </Documentation>
+
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <DataTypeDomain composite_data_supported="0"
+                        name="input_type">
+          <DataType value="vtkHyperTreeGrid" />
+        </DataTypeDomain>
+        <InputArrayDomain attribute_type="cell"
+                          name="input_array_cell"
+                          optional="1">
+        </InputArrayDomain>
+        <Documentation>Set the input to the representation.</Documentation>
+      </InputProperty>
+
+      <IntVectorProperty command="SetAdaptiveDecimation"
+                         default_values="0"
+                         name="AdaptiveDecimation"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Enable the use of the Adaptive decimation to only map the part
+          of the HTG inside the camera frustum. Only support 2D HTG with
+          parallel prokjection.
+        </Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="CompositeDecorator">
+            <Expression type="or">
+              <PropertyWidgetDecorator type="GenericDecorator"
+                                       mode="visibility"
+                                       property="Representation"
+                                       value="HTG Surface" />
+              <PropertyWidgetDecorator type="GenericDecorator"
+                                       mode="visibility"
+                                       property="Representation"
+                                       value="HTG Surface With Edges" />
+              <PropertyWidgetDecorator type="GenericDecorator"
+                                       mode="visibility"
+                                       property="Representation"
+                                       value="HTG Wireframe" />
+            </Expression>
+          </PropertyWidgetDecorator>
+        </Hints>
+      </IntVectorProperty>
+
+      <IntVectorProperty command="SetRepresentation"
+                         default_values="1"
+                         name="Representation"
+                         panel_widget="display_representation_selector"
+                         number_of_elements="1">
+        <EnumerationDomain name="enum">
+          <Entry text="Wireframe"
+                 value="1" />
+          <Entry text="Surface"
+                 value="2" />
+          <Entry text="Surface With Edges"
+                 value="3" />
+        </EnumerationDomain>
+      </IntVectorProperty>
+
+      <StringVectorProperty command="SetInputArrayToProcess"
+                            element_types="0 0 0 0 2"
+                            name="ColorArrayName"
+                            no_custom_default="1"
+                            number_of_elements="5">
+        <Documentation>
+          Set the array to color with. One must specify the field association and
+          the array name of the array. If the array is missing, scalar coloring will
+          automatically be disabled.
+        </Documentation>
+        <RepresentedArrayListDomain name="array_list"
+                         input_domain_name="input_array_any">
+          <RequiredProperties>
+            <Property function="Input" name="Input" />
+          </RequiredProperties>
+        </RepresentedArrayListDomain>
+      </StringVectorProperty>
+
+      <!-- Coloring -->
+
+      <IntVectorProperty command="SetMapScalars"
+                         default_values="1"
+                         name="MapScalars"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>When set to True, LookupTable will always be
+        used for scalar mapping. Otherwise, when up to 4 component
+        scalars are present, the components are clamped to a valid
+        color interval (0-255 for an integral type and 0.0-1.0 for a
+        floating point type) and then directly used as
+        color.</Documentation>
+      </IntVectorProperty>
+      <ProxyProperty command="SetLookupTable"
+                     name="LookupTable" >
+        <Documentation>Set the lookup-table to use to map data array to colors.
+        Lookuptable is only used with MapScalars to ON.</Documentation>
+        <ProxyGroupDomain name="groups">
+          <Group name="lookup_tables" />
+        </ProxyGroupDomain>
+      </ProxyProperty>
+      <IntVectorProperty default_values="0"
+                         name="UseSeparateColorMap"
+                         number_of_elements="1"
+                         panel_visibility="never">
+        <BooleanDomain name="bool" />
+        <Documentation>By default, ParaView shares a single color map among all datasets colored
+        by arrays that have the same name. When this option is enabled, the active dataset will
+        be assigned a separate color map not shared by other datasets.</Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty command="SetDiffuseColor"
+                            default_values="1.0 1.0 1.0"
+                            name="DiffuseColor"
+                            number_of_elements="3">
+        <DoubleRangeDomain max="1 1 1"
+                           min="0 0 0"
+                           name="range" />
+        <Hints>
+          <PropertyLink group="settings" proxy="ColorPalette" property="SurfaceColor" unlink_if_modified="1" />
+        </Hints>
+        <Documentation>
+          The solid color of the model.
+        </Documentation>
+      </DoubleVectorProperty>
+
+      <!-- Edges parameters -->
+
+      <DoubleVectorProperty command="SetEdgeColor"
+                            default_values="0 0 0.5"
+                            name="EdgeColor"
+                            panel_widget="color_selector_with_palette"
+                            number_of_elements="3">
+        <Documentation>Set the edge color. This color is used to draw the edge
+        for the hyper tree grid data when EdgeVisibility is on.</Documentation>
+        <DoubleRangeDomain max="1 1 1"
+                           min="0 0 0"
+                           name="range" />
+        <Hints>
+          <PropertyLink group="settings" proxy="ColorPalette" property="EdgeColor" unlink_if_modified="1" />
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="Representation"
+                                   value="3" />
+        </Hints>
+      </DoubleVectorProperty>
+
+      <!-- Position -->
+
+      <DoubleVectorProperty command="SetPosition"
+                            default_values="0 0 0"
+                            label="Translation"
+                            name="Position"
+                            panel_visibility="advanced"
+                            number_of_elements="3">
+        <DoubleRangeDomain name="range" />
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetScale"
+                            default_values="1 1 1"
+                            name="Scale"
+                            panel_visibility="advanced"
+                            number_of_elements="3">
+        <DoubleRangeDomain name="range" />
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetOrientation"
+                            default_values="0 0 0"
+                            name="Orientation"
+                            panel_visibility="advanced"
+                            number_of_elements="3">
+        <DoubleRangeDomain name="range" />
+      </DoubleVectorProperty>
+
+      <!-- UI -->
+
+    </PVRepresentationProxy>
+
+    <Extension name="HyperTreeGridRepresentation">
+      <Documentation>
+        Extends standard HTG Representation by adding
+        Fast2DHyperTreeGridRepresentation as a new type of representation.
+      </Documentation>
+
+      <RepresentationType subproxy="FastHyperTreeGridRepresentation"
+        text="HTG Surface" subtype="Surface"/>
+      <RepresentationType subproxy="FastHyperTreeGridRepresentation"
+        text="HTG Surface With Edges" subtype="Surface With Edges"/>
+      <RepresentationType subproxy="FastHyperTreeGridRepresentation"
+        text="HTG Wireframe" subtype="Wireframe"/>
+
+      <SubProxy>
+        <Proxy name="FastHyperTreeGridRepresentation"
+               proxygroup="representations"
+               proxyname="FastHyperTreeGridRepresentation">
+        </Proxy>
+        <ShareProperties subproxy="SurfaceRepresentation">
+          <Exception name="Input" />
+        </ShareProperties>
+        <ExposedProperties>
+          <PropertyGroup panel_visibility="default"
+                         label="HTG Rendering" >
+            <Property name="AdaptiveDecimation" />
+          </PropertyGroup>
+        </ExposedProperties>
+      </SubProxy>
+    </Extension>
 
     <!-- ================================================================== -->
     <RepresentationProxy class="vtkStructuredGridVolumeRepresentation"
@@ -7178,7 +7410,6 @@
                      name="Input">
         <DataTypeDomain name="input_type">
           <DataType value="vtkDataSet" />
-          <DataType value="vtkHyperTreeGrid" />
         </DataTypeDomain>
         <InputArrayDomain attribute_type="any"
                           name="input_array_any" />
@@ -12582,7 +12813,7 @@
       <!-- end of AMRVolumeRepresentation -->
     </RepresentationProxy>
 
-    <!-- ================================================================== -->
+  <!-- ================================================================== -->
     <RepresentationProxy class="vtkGeometryRepresentation"
                          name="SurfaceRepresentationBase"
                          processes="client|renderserver|dataserver">

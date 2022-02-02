@@ -313,7 +313,7 @@ bool vtkSMPVRepresentationProxy::RescaleTransferFunctionToDataRange(
     component = vtkSMPropertyHelper(lut, "VectorComponent").GetAsInt();
   }
 
-  if (component < info->GetNumberOfComponents())
+  if (lut && component < info->GetNumberOfComponents())
   {
     int indexedLookup = vtkSMPropertyHelper(lut, "IndexedLookup").GetAsInt();
     if (indexedLookup)
