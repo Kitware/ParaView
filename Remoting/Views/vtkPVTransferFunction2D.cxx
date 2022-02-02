@@ -57,7 +57,8 @@ vtkPVTransferFunction2D::~vtkPVTransferFunction2D()
 {
   if (this->Internals->Function != nullptr)
   {
-    this->Internals->Function->UnRegister(this);
+    this->Internals->Function->Delete();
+    this->Internals->Function = nullptr;
   }
   for (auto box : this->Internals->Boxes)
   {
