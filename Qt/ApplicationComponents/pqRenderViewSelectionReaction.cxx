@@ -534,7 +534,7 @@ void pqRenderViewSelectionReaction::selectionChanged(vtkObject*, unsigned long, 
   switch (this->Mode)
   {
     case SELECT_SURFACE_CELLS:
-      this->View->selectOnSurface(region, selectionModifier);
+      this->View->selectCellsOnSurface(region, selectionModifier);
       break;
 
     case SELECT_SURFACE_POINTS:
@@ -542,7 +542,7 @@ void pqRenderViewSelectionReaction::selectionChanged(vtkObject*, unsigned long, 
       break;
 
     case SELECT_FRUSTUM_CELLS:
-      this->View->selectFrustum(region);
+      this->View->selectFrustumCells(region);
       break;
 
     case SELECT_FRUSTUM_POINTS:
@@ -936,7 +936,7 @@ void pqRenderViewSelectionReaction::onLeftButtonRelease()
 
           if (association == vtkDataObject::CELL)
           {
-            this->View->selectOnSurface(region, selectionModifier, arrayName);
+            this->View->selectCellsOnSurface(region, selectionModifier, arrayName);
           }
           else
           {
@@ -948,7 +948,7 @@ void pqRenderViewSelectionReaction::onLeftButtonRelease()
     break;
 
     case SELECT_SURFACE_CELLS_INTERACTIVELY:
-      this->View->selectOnSurface(region, selectionModifier);
+      this->View->selectCellsOnSurface(region, selectionModifier);
       break;
 
     case SELECT_SURFACE_POINTS_INTERACTIVELY:

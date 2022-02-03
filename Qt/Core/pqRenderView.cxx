@@ -53,18 +53,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSelection.h"
 #include "vtkSelectionNode.h"
 #include "vtkSmartPointer.h"
-#include "vtkStructuredData.h"
 
 // Qt includes.
 #include <QEvent>
-#include <QFileInfo>
 #include <QGridLayout>
 #include <QList>
 #include <QMenu>
 #include <QMouseEvent>
 #include <QPainter>
 #include <QPointer>
-#include <QSet>
 #include <QtDebug>
 
 // ParaView includes.
@@ -544,7 +541,7 @@ void pqRenderView::resetViewDirection(
 }
 
 //-----------------------------------------------------------------------------
-void pqRenderView::selectOnSurface(int rect[4], int selectionModifier, const char* array)
+void pqRenderView::selectCellsOnSurface(int rect[4], int selectionModifier, const char* array)
 {
   QList<pqOutputPort*> opPorts;
   this->selectOnSurfaceInternal(rect, opPorts, false, selectionModifier, false, array);
@@ -829,7 +826,7 @@ void pqRenderView::selectPolygonInternal(vtkIntArray* polygon, QList<pqOutputPor
 }
 
 //-----------------------------------------------------------------------------
-void pqRenderView::selectFrustum(int rect[4])
+void pqRenderView::selectFrustumCells(int rect[4])
 {
   vtkSMRenderViewProxy* renderModuleP = this->getRenderViewProxy();
 
