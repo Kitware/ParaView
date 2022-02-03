@@ -74,7 +74,7 @@
       </DoubleVectorProperty>
       <!-- End ExtractSelectionRange -->
     </SourceProxy>
-    <!-- end of internal_filters -->
+    <!-- End of internal_filters -->
   </ProxyGroup>
 
   <ProxyGroup name="filters">
@@ -135,6 +135,7 @@
         <Property function="Point1WorldPosition" name="Point1"/>
         <Property function="Point2WorldPosition" name="Point2"/>
       </PropertyGroup>
+      <!-- End ExtractCellsAlongLine -->
     </SourceProxy>
 
     <!-- ==================================================================== -->
@@ -173,6 +174,7 @@
           to extract cells in the input.
         </Documentation>
       </InputProperty>
+      <!-- End ExtractCellsAlongLineCustom -->
     </SourceProxy>
 
     <!-- ==================================================================== -->
@@ -399,7 +401,82 @@
       <!-- End of ExtractCellsByType -->
     </SourceProxy>
 
-    <!-- end of filters -->
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkAppendSelection"
+                 name="AppendSelections"
+                 processes="client|renderserver|dataserver">
+      <Documentation long_help="Append selections"
+                     short_help="Append multiple selections into one selection.">
+        Append multiple selections with one or many nodes, with the same fieldType,
+        and possibly different content type, to create a combined selection. Each
+        selection has a name and a boolean expression can be set using the selection
+        names to define the relation between the selections.
+      </Documentation>
+      <InputProperty clean_command="RemoveAllInputs"
+                     command="AddInputConnection"
+                     multiple_input="1"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources"/>
+          <Group name="filters"/>
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkSelection"/>
+        </DataTypeDomain>
+        <Documentation>
+          This property indicates the inputs to the AppendSelections filter.
+        </Documentation>
+      </InputProperty>
+
+      <IntVectorProperty name="AppendByUnion"
+                         command="SetAppendByUnion"
+                         number_of_elements="1"
+                         default_values="0"
+                         panel_visibility="never">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          Allows by default to not append by union, so that an expression can be used.
+        </Documentation>
+      </IntVectorProperty>
+      <StringVectorProperty name="Expression"
+                            animateable="0"
+                            command="SetExpression"
+                            number_of_elements="1">
+        <Documentation>
+          This property specifies the expression which defines the relation between the input selections.
+        </Documentation>
+      </StringVectorProperty>
+      <IntVectorProperty command="SetInverse"
+                         default_values="0"
+                         name="InsideOut"
+                         number_of_elements="1">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          When this property is false the selection describes everything that should be extracted.
+          When this is true the selection describes everything that should NOT be extracted.
+        </Documentation>
+      </IntVectorProperty>
+      <StringVectorProperty name="SelectionNames"
+                            command="SetInputName"
+                            number_of_elements_per_command="1"
+                            repeat_command="1"
+                            use_index="1"
+                            clean_command="RemoveAllInputNames">
+        <Documentation>
+          Specify names to use for each input selection.
+        </Documentation>
+        <RegistrationNamesDomain name="names_list" registration_group="sources">
+          <RequiredProperties>
+            <Property name="Input" function="Proxies"/>
+          </RequiredProperties>
+        </RegistrationNamesDomain>
+      </StringVectorProperty>
+      <Hints>
+        <Visibility replace_input="1"/>
+      </Hints>
+      <!-- End of AppendSelections -->
+    </SourceProxy>
+    <!-- End of filters -->
   </ProxyGroup>
 
   <ProxyGroup name="sources">
@@ -495,7 +572,7 @@
         </Documentation>
         <IntRangeDomain name="range" min="0"/>
       </IntVectorProperty>
-      <!-- end of SelectionQuerySource -->
+      <!-- End of SelectionQuerySource -->
     </SourceProxy>
     <!-- ==================================================================== -->
     <Proxy name="SelectionSourceBase">
@@ -842,5 +919,6 @@
       </DoubleVectorProperty>
       <!-- End of LocationSelectionSource -->
     </SourceProxy>
+    <!-- End of sources -->
   </ProxyGroup>
 </ServerManagerConfiguration>

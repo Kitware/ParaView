@@ -826,7 +826,7 @@
       <Hints>
         <Visibility replace_input="1" />
       </Hints>
-      <!-- End GroupDataSets -->
+      <!-- End GroupTimeSteps -->
     </SourceProxy>
 
     <!-- ==================================================================== -->
