@@ -5030,9 +5030,12 @@
 
       <InputProperty command="SetInputConnection"
                      name="Input">
-        <DataTypeDomain composite_data_supported="0"
+        <DataTypeDomain composite_data_supported="1"
                         name="input_type">
           <DataType value="vtkHyperTreeGrid" />
+          <DataType value="vtkDataObjectTree" child_match="all">
+            <DataType value="vtkHyperTreeGrid" />
+          </DataType>
         </DataTypeDomain>
         <Documentation>Set the input to the representation.</Documentation>
       </InputProperty>

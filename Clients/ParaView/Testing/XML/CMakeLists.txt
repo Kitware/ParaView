@@ -353,6 +353,7 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/HyperTreeGridCellCenters.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/HyperTreeGridContour.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/HyperTreeGridDepthLimiter.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/HyperTreeGridMultiBlock.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/HyperTreeGridObliquePlaneCutter.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/HyperTreeGridPlaneCutter.png}"
   #"DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/HyperTreeGridThreshold.png}"
@@ -725,6 +726,7 @@ SET (TESTS_WITH_INLINE_COMPARES
   HyperTreeGridCellCenters.xml
   HyperTreeGridContour.xml
   HyperTreeGridDepthLimiter.xml
+  HyperTreeGridMultiBlock.xml
   HyperTreeGridObliquePlaneCutter.xml
   HyperTreeGridPlaneCutter.xml
   HyperTreeGridThreshold.xml
