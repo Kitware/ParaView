@@ -462,13 +462,7 @@ void vtkPVFileInformation::CopyFromObject(vtkObject* object)
 
   if (this->IsDirectory(this->Type) && helper->GetDirectoryListing())
   {
-// Since we want a directory listing, we now to platform specific listing
-// with intelligent pattern matching hee-haa.
-#if defined(_WIN32)
-    this->GetWindowsDirectoryListing();
-#else
-    this->GetDirectoryListing();
-#endif
+    this->FetchDirectoryListing();
   }
 }
 
@@ -629,9 +623,22 @@ void vtkPVFileInformation::GetSpecialDirectories()
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVFileInformation::GetWindowsDirectoryListing()
+void vtkPVFileInformation::FetchDirectoryListing()
 {
 #if defined(_WIN32)
+  this->FetchWindowsDirectoryListing();
+#else
+  this->FetchUnixDirectoryListing();
+#endif
+}
+
+//-----------------------------------------------------------------------------
+void vtkPVFileInformation::FetchWindowsDirectoryListing()
+{
+#if !defined(_WIN32)
+  vtkErrorMacro("FetchWindowsDirectoryListing cannot be called on non-Windows systems.");
+#else
+
   vtkPVFileInformationSet info_set;
 
   if (IsNetworkPath(this->FullPath))
@@ -809,9 +816,6 @@ void vtkPVFileInformation::GetWindowsDirectoryListing()
   {
     this->Contents->AddItem(*iter);
   }
-
-#else
-  vtkErrorMacro("GetWindowsDirectoryListing cannot be called on non-Windows systems.");
 #endif
 }
 
@@ -825,13 +829,10 @@ support and glibc/Linux system headers:
 #endif
 
 //-----------------------------------------------------------------------------
-void vtkPVFileInformation::GetDirectoryListing()
+void vtkPVFileInformation::FetchUnixDirectoryListing()
 {
 #if defined(_WIN32)
-
-  vtkErrorMacro("GetDirectoryListing() cannot be called on Windows systems.");
-  return;
-
+  vtkErrorMacro("FetchUnixDirectoryListing() cannot be called on Windows systems.");
 #else
 
   vtkPVFileInformationSet info_set;
