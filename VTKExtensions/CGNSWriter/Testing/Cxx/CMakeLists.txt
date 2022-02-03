@@ -4,6 +4,7 @@ vtk_add_test_cxx(vtkPVVTKExtensionsCGNSWriterCxxTests tests
   TestUnstructuredGrid.cxx
   TestPolydata.cxx
   TestPolyhedral.cxx
+  TestCellAndPointData.cxx
   TestMultiBlockDataSet.cxx
   TestMappedUnstructuredGrid.cxx
   TestTimeWriting.cxx

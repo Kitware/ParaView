@@ -16,6 +16,7 @@ int UnstructuredGridTest(vtkMultiBlockDataSet*, unsigned int, unsigned int, int)
 int StructuredGridTest(vtkMultiBlockDataSet*, unsigned int, unsigned int, int, int, int);
 int MappedUnstructuredGridTest(vtkMultiBlockDataSet*, unsigned int, unsigned int, int);
 int PolyhedralTest(vtkMultiBlockDataSet*, unsigned int, unsigned int);
+int CellAndPointDataTest(vtkMultiBlockDataSet*, unsigned int, unsigned int, int);
 
 #define vtk_assert(x)                                                                              \
   if (!(x))                                                                                        \
