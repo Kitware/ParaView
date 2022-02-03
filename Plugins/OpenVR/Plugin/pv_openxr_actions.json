@@ -67,6 +67,10 @@
       "controller_type": "khr_simple"
     },
     {
+      "binding_url": "pv_openxr_binding_oculus_touch_controller.json",
+      "controller_type": "oculus_touch"
+    },
+    {
       "binding_url": "pv_openxr_binding_valve_index_controller.json",
       "controller_type": "valve_index_controller"
     }
