@@ -4,7 +4,7 @@ set(required_modules "")
 set(openxr_support FALSE)
 
 if (TARGET VTK::RenderingOpenXR)
-  list(APPEND required_modules 
+  list(APPEND required_modules
     VTK::RenderingOpenXR
   )
   find_package(OpenXR REQUIRED)
@@ -12,7 +12,7 @@ if (TARGET VTK::RenderingOpenXR)
 endif()
 
 if (TARGET VTK::RenderingOpenVR)
-  list(APPEND required_modules 
+  list(APPEND required_modules
     VTK::RenderingOpenVR
   )
 endif()
@@ -91,17 +91,18 @@ set_property(
     COMPILE_DEFINITIONS "PARAVIEW_HAS_OPENXR_SUPPORT=$<BOOL:${openxr_support}>")
 
 if (openxr_support)
-  list(APPEND vr_input_files 
+  list(APPEND vr_input_files
     pv_openxr_actions.json
     pv_openxr_binding_khr_simple_controller.json
     pv_openxr_binding_valve_index_controller.json
     pv_openxr_binding_vive_controller.json
+    pv_openxr_binding_oculus_touch_controller.json
   )
 endif()
 
 set_property(
-  SOURCE 
-    vtkPVOpenVRCollaborationClient.cxx 
+  SOURCE
+    vtkPVOpenVRCollaborationClient.cxx
   APPEND PROPERTY
     COMPILE_DEFINITIONS "OPENVR_HAS_COLLABORATION=$<BOOL:${VTK_ENABLE_VR_COLLABORATION}>")
 
