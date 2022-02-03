@@ -695,6 +695,14 @@ bool pqFileDialogModel::fileExists(const QString& file, QString& fullpath)
   return false;
 }
 
+int pqFileDialogModel::fileType(const QString& file)
+{
+  QString filePath = this->Implementation->cleanPath(file);
+  vtkPVFileInformation* info;
+  info = this->Implementation->GetData(false, filePath, false, true);
+  return info->GetType();
+}
+
 bool pqFileDialogModel::mkdir(const QString& dirName)
 {
   QString path;
@@ -834,6 +842,23 @@ bool pqFileDialogModel::dirExists(const QString& path, QString& fullpath)
   if (vtkPVFileInformation::IsDirectory(info->GetType()))
   {
     fullpath = info->GetFullPath();
+    return true;
+  }
+  return false;
+}
+
+bool pqFileDialogModel::dirIsEmpty(const QString& path, QString& fullpath)
+{
+  if (!this->dirExists(path, fullpath))
+  {
+    return false;
+  }
+
+  vtkPVFileInformation* info;
+  info = this->Implementation->GetData(false, fullpath, false, true);
+  info->FetchDirectoryListing();
+  if (info->GetContents()->GetNumberOfItems() == 0)
+  {
     return true;
   }
   return false;

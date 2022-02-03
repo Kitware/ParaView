@@ -37,8 +37,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QAbstractListModel>
 #include <QList>
 #include <QObject>
+#include <QPointer>
 
 class vtkProcessModule;
+class pqFileDialogModel;
 class pqServer;
 class QModelIndex;
 
@@ -59,7 +61,7 @@ public:
    * server is the server for which we need the listing.
    * if the server is nullptr, we get file listings from the builtin server
    */
-  pqFileDialogFavoriteModel(pqServer* server, QObject* Parent);
+  pqFileDialogFavoriteModel(pqFileDialogModel* model, pqServer* server, QObject* Parent);
   ~pqFileDialogFavoriteModel() override;
 
   /**
@@ -127,6 +129,7 @@ protected:
 
   void LoadFavoritesFromSystem();
 
+  QPointer<pqFileDialogModel> FileDialogModel;
   pqServer* Server = nullptr;
   QList<pqFileDialogFavoriteModelFileInfo> FavoriteList;
   QString SettingsKey;
