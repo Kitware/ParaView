@@ -392,7 +392,6 @@ bool vtkCGNSWriter::vtkPrivate::WriteZoneTimeInformation(write_info& info, strin
     return true;
   }
 
-  char* timeStepNames;
   auto at = info.SolutionNames.find("CellData");
   bool hasCellData = at != info.SolutionNames.end();
   int cellDataS = hasCellData ? at->second : -1;
@@ -401,20 +400,7 @@ bool vtkCGNSWriter::vtkPrivate::WriteZoneTimeInformation(write_info& info, strin
   int vertDataS = hasVertData ? at->second : -1;
 
   cgsize_t dim[2] = { 32, 1 };
-  if (hasCellData && hasVertData)
-  {
-    // how to write cell AND point data?!?!
-    timeStepNames = (char*)"CellData\0                       ";
-  }
-  else if (hasCellData)
-  {
-    timeStepNames = (char*)"CellData\0                       ";
-  }
-  else if (hasVertData)
-  {
-    timeStepNames = (char*)"PointData\0                      ";
-  }
-  else
+  if (!hasCellData && !hasVertData)
   {
     error = "No cell data or vert data found, but solution names not empty.";
     return false;
@@ -424,12 +410,13 @@ bool vtkCGNSWriter::vtkPrivate::WriteZoneTimeInformation(write_info& info, strin
   {
     cg_check_operation(cg_ziter_write(info.F, info.B, info.Z, "ZoneIterativeData_t"));
     cg_check_operation(cg_goto(info.F, info.B, "Zone_t", info.Z, "ZoneIterativeData_t", 1, "end"));
-    cg_check_operation(
-      cg_array_write("FlowSolutionPointers", CGNS_ENUMV(Character), 2, dim, timeStepNames));
 
     if (hasVertData)
     {
       int sol[1] = { vertDataS };
+      const char* timeStepNames = "PointData\0                      ";
+      cg_check_operation(
+        cg_array_write("FlowSolutionVertexPointers", CGNS_ENUMV(Character), 2, dim, timeStepNames));
       cg_check_operation(
         cg_array_write("VertexSolutionIndices", CGNS_ENUMV(Integer), 1, &dim[1], sol));
       cg_check_operation(cg_descriptor_write("VertexPrefix", "Vertex"));
@@ -437,6 +424,9 @@ bool vtkCGNSWriter::vtkPrivate::WriteZoneTimeInformation(write_info& info, strin
     if (hasCellData)
     {
       int sol[1] = { cellDataS };
+      const char* timeStepNames = "CellData\0                       ";
+      cg_check_operation(
+        cg_array_write("FlowSolutionCellPointers", CGNS_ENUMV(Character), 2, dim, timeStepNames));
       cg_check_operation(cg_array_write("CellCenterIndices", CGNS_ENUMV(Integer), 1, &dim[1], sol));
       cg_check_operation(cg_descriptor_write("CellCenterPrefix", "CellCenter"));
     }
@@ -749,7 +739,8 @@ bool vtkCGNSWriter::vtkPrivate::WriteStructuredGrid(
   {
     return false;
   }
-  return true;
+
+  return WriteZoneTimeInformation(info, error);
 }
 
 bool vtkCGNSWriter::vtkPrivate::WriteStructuredGrid(
