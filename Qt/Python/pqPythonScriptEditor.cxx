@@ -186,7 +186,8 @@ void pqPythonScriptEditor::createMenus()
     this->tr("Open a python script in a new tab"));
   this->scriptMenus[ScriptActionType::Open]->setToolTipsVisible(true);
 
-  this->scriptMenus[ScriptActionType::Load] = menu->addMenu(this->tr("Use as current script..."));
+  this->scriptMenus[ScriptActionType::Load] =
+    menu->addMenu(this->tr("Load script into current editor tab..."));
   this->scriptMenus[ScriptActionType::Load]->setStatusTip(
     this->tr("Load a python script in the current opened tab and override its content"));
   this->scriptMenus[ScriptActionType::Load]->setToolTipsVisible(true);
