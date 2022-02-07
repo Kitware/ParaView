@@ -129,6 +129,7 @@ protected:
 
   void InitializeCache();
   void GetInputArrays(vtkInformationVector**);
+  void ComputeVectorMagnitude(vtkDataArray*, vtkDataArray*&);
   void ComputeComponentRange();
 
 private:

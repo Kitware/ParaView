@@ -5,6 +5,7 @@ Copyright and License information
 #include "vtkPVExtractHistogram2D.h"
 
 // VTK includes
+#include "vtkCellData.h"
 #include "vtkDataArray.h"
 #include "vtkDataArrayRange.h"
 #include "vtkDataObject.h"
@@ -31,6 +32,14 @@ vtkPVExtractHistogram2D::vtkPVExtractHistogram2D()
 //-------------------------------------------------------------------------------------------------
 vtkPVExtractHistogram2D::~vtkPVExtractHistogram2D()
 {
+  if (this->ComponentArrayCache[0])
+  {
+    if (!strcmp(this->ComponentArrayCache[0]->GetName(), "Magnitude"))
+    {
+      this->ComponentArrayCache[0]->UnRegister(this);
+      this->ComponentArrayCache[0] = nullptr;
+    }
+  }
   if (this->ComponentArrayCache[1])
   {
     if (!strcmp(this->ComponentArrayCache[1]->GetName(), "GradientMag"))
@@ -141,6 +150,43 @@ void vtkPVExtractHistogram2D::InitializeCache()
 }
 
 //------------------------------------------------------------------------------------------------
+void vtkPVExtractHistogram2D::ComputeVectorMagnitude(vtkDataArray* arr, vtkDataArray*& res)
+{
+  if (res)
+  {
+    res->UnRegister(this);
+    res = nullptr;
+  }
+
+  int numComps = arr->GetNumberOfComponents();
+  if (numComps == 1)
+  {
+    res = arr;
+    return;
+  }
+
+  int numTuples = arr->GetNumberOfTuples();
+  res = vtkDoubleArray::New();
+  res->SetName("Magnitude");
+  res->SetNumberOfComponents(1);
+  res->SetNumberOfTuples(numTuples);
+
+  auto arrRange = vtk::DataArrayTupleRange(arr);
+  auto magRange = vtk::DataArrayTupleRange(res);
+
+  for (vtk::TupleIdType tupleId = 0; tupleId < numTuples; ++tupleId)
+  {
+    double sqSum = 0;
+    for (vtk::ComponentIdType cId = 0; cId < numComps; ++cId)
+    {
+      double val = static_cast<double>(arrRange[tupleId][cId]);
+      sqSum += val * val;
+    }
+    magRange[tupleId][0] = std::sqrt(sqSum);
+  }
+}
+
+//------------------------------------------------------------------------------------------------
 void vtkPVExtractHistogram2D::GetInputArrays(vtkInformationVector** inputVector)
 {
   if (!inputVector)
@@ -150,14 +196,54 @@ void vtkPVExtractHistogram2D::GetInputArrays(vtkInformationVector** inputVector)
 
   // TODO: Handle a composite dataset
 
-  this->ComponentArrayCache[0] = this->GetInputArrayToProcess(0, inputVector);
+  vtkDataArray* inputArray0 = this->GetInputArrayToProcess(0, inputVector);
+  if (this->Component0 == inputArray0->GetNumberOfComponents())
+  {
+    this->ComputeVectorMagnitude(inputArray0, this->ComponentArrayCache[0]);
+  }
+  else
+  {
+    this->ComponentArrayCache[0] = inputArray0;
+  }
 
   // Figure out if we are using the gradient magnitude for the Y axis
   if (this->UseGradientForYAxis)
   {
     vtkInformation* inInfo = inputVector[0]->GetInformationObject(0);
     vtkDataObject* input = inInfo->Get(vtkDataObject::DATA_OBJECT());
+    vtkDataSet* inputDS = vtkDataSet::SafeDownCast(input);
+    if (this->ComponentArrayCache[0] != inputArray0)
+    {
+      // Vector Magnitude
+      // Add the array to the input
+      if (!inputDS)
+      {
+        vtkErrorMacro("Using the magnitude component of a vector array with gradient for Y axis "
+                      "is only supported for vtkDataSet and subclasses.");
+        return;
+      }
+      if (this->GetInputArrayAssociation(0, inputVector) == vtkDataObject::FIELD_ASSOCIATION_POINTS)
+      {
+        inputDS->GetPointData()->AddArray(this->ComponentArrayCache[0]);
+      }
+      else
+      {
+        inputDS->GetCellData()->AddArray(this->ComponentArrayCache[0]);
+      }
+    }
     this->ComputeGradient(input);
+
+    if (this->ComponentArrayCache[0] != inputArray0)
+    {
+      if (this->GetInputArrayAssociation(0, inputVector) == vtkDataObject::FIELD_ASSOCIATION_POINTS)
+      {
+        inputDS->GetPointData()->RemoveArray("Magnitude");
+      }
+      else
+      {
+        inputDS->GetCellData()->RemoveArray("Magnitude");
+      }
+    }
   }
   else
   {
@@ -324,10 +410,23 @@ void vtkPVExtractHistogram2D::ComputeGradient(vtkDataObject* input)
 
   auto gradMagRange = vtk::DataArrayTupleRange(this->ComponentArrayCache[1]);
 
+  // For each component, the gradient is a (3 component) tuple i.e. for input array with 3
+  // components, the gradient array will have 9 components.
+  // Compute the magnitude accounting for the component and accommodate the magnitude of the vector.
+  int comp0 = this->Component0;
+  if (comp0 == this->ComponentArrayCache[0]->GetNumberOfComponents())
+  {
+    comp0 = 0;
+  }
+
   for (vtk::TupleIdType tupleId = 0; tupleId < numTuples; ++tupleId)
   {
-    double grad[3];
-    gradientArrRange[tupleId].GetTuple(grad);
-    gradMagRange[tupleId][0] = vtkMath::Norm(grad);
+    double sqSum = 0;
+    for (vtk::ComponentIdType cId = comp0 * 3; cId < comp0 * 3 + 3; ++cId)
+    {
+      double val = static_cast<double>(gradientArrRange[tupleId][cId]);
+      sqSum += val * val;
+    }
+    gradMagRange[tupleId][0] = std::sqrt(sqSum);
   }
 }
