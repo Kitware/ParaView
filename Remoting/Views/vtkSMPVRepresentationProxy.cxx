@@ -696,13 +696,19 @@ bool vtkSMPVRepresentationProxy::SetScalarColoringInternal(
     std::string array2Name;
     if (!useGradientAsY)
     {
-      array2Name =
-        this->GetDecoratedArrayName(vtkSMPropertyHelper(this, "ColorArray2Name").GetAsString());
+      vtkSMProperty* colorArray2Property = this->GetProperty("ColorArray2Name");
+      if (colorArray2Property)
+      {
+        vtkSMPropertyHelper colorArray2Helper(colorArray2Property);
+        array2Name = colorArray2Helper.GetInputArrayNameToProcess();
+      }
+      array2Name = this->GetDecoratedArrayName(array2Name);
+      //      array2Name =
+      //        this->GetDecoratedArrayName(vtkSMPropertyHelper(this,
+      //        "ColorArray2Name").GetAsString());
     }
     vtkSMProxy* tf2dProxy = mgr->GetTransferFunction2D(decoratedArrayName.c_str(),
       (array2Name.empty() ? nullptr : array2Name.c_str()), this->GetSessionProxyManager());
-    // vtkSMProxy* tf2dProxy =
-    //   mgr->GetTransferFunction2D(decoratedArrayName.c_str(), this->GetSessionProxyManager());
     vtkSMPropertyHelper(tf2dProperty).Set(tf2dProxy);
   }
 

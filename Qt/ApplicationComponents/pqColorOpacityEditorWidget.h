@@ -448,6 +448,7 @@ protected Q_SLOTS:
    * When the vector mode or vector component is changed
    * When the visibility of a consumer is changed
    * When the number of bins is changed
+   * When the 2D transfer function arrays are changed
    */
   void setHistogramOutdated();
 
@@ -469,6 +470,11 @@ protected Q_SLOTS:
    * internal pqTransferFunction2DWidget class.
    */
   void transfer2DChanged();
+
+  /**
+   * Slot to update the 2D transfer function proxy when the Y axis scalar array is changed.
+   */
+  void updateTransferFunction2DProxy();
 
 protected: // NOLINT(readability-redundant-access-specifiers)
   /**

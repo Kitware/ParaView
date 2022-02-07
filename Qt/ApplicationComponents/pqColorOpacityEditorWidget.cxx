@@ -724,14 +724,14 @@ void pqColorOpacityEditorWidget::setTransferFunction2DProxy(pqSMProxy tf2dProxy)
     vtkSMProperty* colorArray2Property = reprProxy->GetProperty("ColorArray2Name");
     if (colorArray2Property)
     {
-      this->Internals->TransferFunction2DConnector->Connect(
-        colorArray2Property, vtkCommand::ModifiedEvent, this, SLOT(setHistogramOutdated()));
+      this->Internals->TransferFunction2DConnector->Connect(colorArray2Property,
+        vtkCommand::ModifiedEvent, this, SLOT(updateTransferFunction2DProxy()));
     }
     vtkSMProperty* gradProperty = reprProxy->GetProperty("UseGradientForTransfer2D");
     if (gradProperty)
     {
       this->Internals->TransferFunction2DConnector->Connect(
-        gradProperty, vtkCommand::ModifiedEvent, this, SLOT(setHistogramOutdated()));
+        gradProperty, vtkCommand::ModifiedEvent, this, SLOT(updateTransferFunction2DProxy()));
     }
 
     this->initializeTransfer2DEditor(tf2d);
@@ -754,6 +754,32 @@ void pqColorOpacityEditorWidget::setTransferFunction2DProxy(pqSMProxy tf2dProxy)
 pqSMProxy pqColorOpacityEditorWidget::transferFunction2DProxy() const
 {
   return this->Internals->TransferFunction2DProxy.GetPointer();
+}
+
+//-----------------------------------------------------------------------------
+void pqColorOpacityEditorWidget::updateTransferFunction2DProxy()
+{
+  pqDataRepresentation* repr = pqActiveObjects::instance().activeRepresentation();
+  vtkSMPVRepresentationProxy* reprProxy =
+    vtkSMPVRepresentationProxy::SafeDownCast(repr->getProxy());
+  vtkSMProperty* colorArrayProperty = reprProxy->GetProperty("ColorArrayName");
+  if (colorArrayProperty)
+  {
+    vtkSMPropertyHelper colorArrayHelper(colorArrayProperty);
+    std::string arrayName(colorArrayHelper.GetInputArrayNameToProcess());
+    int association = colorArrayHelper.GetInputArrayAssociation();
+    vtkSMPVRepresentationProxy::SetScalarColoring(reprProxy, arrayName.c_str(), association);
+    vtkSMProperty* tf2dProperty = reprProxy->GetProperty("TransferFunction2D");
+    if (tf2dProperty)
+    {
+      vtkSMPropertyHelper tf2dPropHelper(tf2dProperty);
+      if (this->transferFunction2DProxy() != tf2dPropHelper.GetAsProxy())
+      {
+        this->setTransferFunction2DProxy(tf2dPropHelper.GetAsProxy());
+      }
+    }
+  }
+  this->setHistogramOutdated();
 }
 
 //-----------------------------------------------------------------------------
