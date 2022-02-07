@@ -396,15 +396,20 @@ bool vtkSMCinemaVolumetricImageExtractWriterProxy::WriteInternal(
         }
       }
     } // if (!colorTFProxy && !opacityTFProxy)
+
     otf_points = GetOpacityTransferFunction(!single_function_only, number_of_functions,
       number_of_opacity_levels, maximum_number_of_functions, otf_index, lut_range,
       maximum_opacity_value);
-    vtkSMPropertyHelper otf_helper(opacityTFProxy, "Points");
-    otf_helper.SetNumberOfElements(static_cast<unsigned int>(otf_points.size()));
-    otf_helper.Set(otf_points.data(), static_cast<unsigned int>(otf_points.size()));
-    opacityTFProxy->UpdateVTKObjects();
 
-    if (exportTransferFunctions)
+    if (opacityTFProxy)
+    {
+      vtkSMPropertyHelper otf_helper(opacityTFProxy, "Points");
+      otf_helper.SetNumberOfElements(static_cast<unsigned int>(otf_points.size()));
+      otf_helper.Set(otf_points.data(), static_cast<unsigned int>(otf_points.size()));
+      opacityTFProxy->UpdateVTKObjects();
+    }
+
+    if (colorTFProxy && exportTransferFunctions)
     {
       std::ostringstream str;
       str << "/cinemavolume_" << otf_index << ".json";
@@ -418,14 +423,14 @@ bool vtkSMCinemaVolumetricImageExtractWriterProxy::WriteInternal(
     status = this->Superclass::WriteInternal(extractor, tparams);
   }
 
-  if (!old_otf.empty())
+  if (opacityTFProxy && !old_otf.empty())
   {
     vtkSMPropertyHelper otf_helper(opacityTFProxy, "Points");
     otf_helper.SetNumberOfElements(static_cast<unsigned int>(old_otf.size()));
     otf_helper.Set(old_otf.data(), static_cast<unsigned int>(old_otf.size()));
     opacityTFProxy->UpdateVTKObjects();
   }
-  if (!old_ctf.empty())
+  if (colorTFProxy && !old_ctf.empty())
   {
     vtkSMPropertyHelper ctf_helper(colorTFProxy, "RGBPoints");
     ctf_helper.SetNumberOfElements(static_cast<unsigned int>(old_ctf.size()));
