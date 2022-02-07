@@ -837,9 +837,10 @@ bool TestFieldData()
   topologies_node["coordset"] = "coords";
 
   auto string_field_node = expected_node["state/fields/string array"];
-  string_field_node.set_string("Kitware");
+  string_field_node.set_string(stringArray->GetValue(0));
   auto int_field_node = expected_node["state/fields/int array"];
-  int_field_node.set_int32_vector({ 100, 200, 300 });
+  int_field_node.set_int32_vector(
+    { intArray->GetValue(0), intArray->GetValue(1), intArray->GetValue(2) });
 
   conduit_cpp::Node diff_info;
   bool are_nodes_different = node.diff(expected_node, diff_info, 1e-6);

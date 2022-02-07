@@ -126,6 +126,34 @@ bool ValidateMeshTypeUnstructured()
   return true;
 }
 
+bool CheckFieldDataMeshConversion(conduit_cpp::Node& mesh_node, int expected_number_of_arrays,
+  const std::string& expected_array_name, int expected_number_of_components,
+  std::vector<vtkVariant> expected_values)
+{
+  auto data = Convert(mesh_node);
+  auto field_data = data->GetFieldData();
+  VERIFY(field_data->GetNumberOfArrays() == expected_number_of_arrays,
+    "incorrect number of arrays in field data, expected 0, got %d",
+    field_data->GetNumberOfArrays());
+
+  if (expected_number_of_arrays > 0)
+  {
+    auto field_array = field_data->GetAbstractArray(0);
+
+    VERIFY(std::string(field_array->GetName()) == expected_array_name,
+      "wrong array name, expected \"integer_field_data\", got %s", field_array->GetName());
+    VERIFY(field_array->GetNumberOfComponents() == expected_number_of_components,
+      "wrong number of component");
+    VERIFY(field_array->GetNumberOfTuples() == expected_values.size(), "wrong number of tuples");
+    for (size_t i = 0; i < expected_values.size(); ++i)
+    {
+      VERIFY(field_array->GetVariantValue(i) == expected_values[i], "wrong value");
+    }
+  }
+
+  return true;
+}
+
 bool ValidateFieldData()
 {
   conduit_cpp::Node mesh;
@@ -134,85 +162,48 @@ bool ValidateFieldData()
   auto field_data_node = mesh["state/fields"];
 
   auto empty_field_data = field_data_node["empty_field_data"];
+  VERIFY(CheckFieldDataMeshConversion(mesh, 0, empty_field_data.name(), 0, {}),
+    "Verification failed for empty field data.");
 
+  field_data_node.remove(0);
   auto integer_field_data = field_data_node["integer_field_data"];
   integer_field_data.set_int64(42);
+  VERIFY(CheckFieldDataMeshConversion(mesh, 1, integer_field_data.name(), 1, { 42 }),
+    "Verification failed for integer field data.");
 
+  field_data_node.remove(0);
   auto float_field_data = field_data_node["float_field_data"];
   float_field_data.set_float64(5.0);
+  VERIFY(CheckFieldDataMeshConversion(mesh, 1, float_field_data.name(), 1, { 5.0 }),
+    "Verification failed for float field data.");
 
+  field_data_node.remove(0);
   auto string_field_data = field_data_node["string_field_data"];
   string_field_data.set_string("test");
+  VERIFY(CheckFieldDataMeshConversion(mesh, 1, string_field_data.name(), 1, { "test" }),
+    "Verification failed for string field data.");
 
+  field_data_node.remove(0);
   auto integer_vector_field_data = field_data_node["integer_vector_field_data"];
   integer_vector_field_data.set_int64_vector({ 1, 2, 3 });
+  VERIFY(CheckFieldDataMeshConversion(mesh, 1, integer_vector_field_data.name(), 1, { 1, 2, 3 }),
+    "Verification failed for integer vector field data.");
 
+  field_data_node.remove(0);
   auto float_vector_field_data = field_data_node["float_vector_field_data"];
   float_vector_field_data.set_float64_vector({ 4.0, 5.0, 6.0 });
+  VERIFY(
+    CheckFieldDataMeshConversion(mesh, 1, float_vector_field_data.name(), 1, { 4.0, 5.0, 6.0 }),
+    "Verification failed for float vector field data.");
 
+  field_data_node.remove(0);
   std::vector<int> integer_buffer = { 123, 456, 789 };
   auto external_integer_vector_field_data = field_data_node["external_integer_vector"];
   external_integer_vector_field_data.set_external_int32_ptr(
     integer_buffer.data(), integer_buffer.size());
-
-  auto data = Convert(mesh);
-  auto field_data = data->GetFieldData();
-
-  VERIFY(field_data->GetNumberOfArrays() == 6,
-    "incorrect number of arrays in field data, expected 6, got %d",
-    field_data->GetNumberOfArrays());
-
-  auto integer_field_array = field_data->GetAbstractArray(0);
-  VERIFY(std::string(integer_field_array->GetName()) == "integer_field_data",
-    "wrong array name, expected \"integer_field_data\", got %s", integer_field_array->GetName());
-  VERIFY(integer_field_array->GetNumberOfComponents() == 1, "wrong number of component");
-  VERIFY(integer_field_array->GetNumberOfTuples() == 1, "wrong number of tuples");
-  VERIFY(integer_field_array->GetVariantValue(0).ToInt() == 42, "wrong value");
-
-  auto float_field_array = field_data->GetAbstractArray(1);
-  VERIFY(std::string(float_field_array->GetName()) == "float_field_data",
-    "wrong array name, expected \"float_field_data\", got %s", float_field_array->GetName());
-  VERIFY(float_field_array->GetNumberOfComponents() == 1, "wrong number of component");
-  VERIFY(float_field_array->GetNumberOfTuples() == 1, "wrong number of tuples");
-  VERIFY(float_field_array->GetVariantValue(0).ToFloat() == 5.0, "wrong value");
-
-  auto string_field_array = field_data->GetAbstractArray(2);
-  VERIFY(std::string(string_field_array->GetName()) == "string_field_data",
-    "wrong array name, expected \"string_field_data\", got %s", string_field_array->GetName());
-  VERIFY(string_field_array->GetNumberOfComponents() == 1, "wrong number of component");
-  VERIFY(string_field_array->GetNumberOfTuples() == 1, "wrong number of tuples");
-  VERIFY(string_field_array->GetVariantValue(0).ToString() == "test", "wrong value");
-
-  auto integer_vector_field_array = field_data->GetAbstractArray(3);
-  VERIFY(std::string(integer_vector_field_array->GetName()) == "integer_vector_field_data",
-    "wrong array name, expected \"integer_vector_field_data\", got %s",
-    integer_vector_field_array->GetName());
-  VERIFY(integer_vector_field_array->GetNumberOfComponents() == 1, "wrong number of component");
-  VERIFY(integer_vector_field_array->GetNumberOfTuples() == 3, "wrong number of tuples");
-  VERIFY(integer_vector_field_array->GetVariantValue(0).ToInt() == 1, "wrong value");
-  VERIFY(integer_vector_field_array->GetVariantValue(1).ToInt() == 2, "wrong value");
-  VERIFY(integer_vector_field_array->GetVariantValue(2).ToInt() == 3, "wrong value");
-
-  auto float_vector_field_array = field_data->GetAbstractArray(4);
-  VERIFY(std::string(float_vector_field_array->GetName()) == "float_vector_field_data",
-    "wrong array name, expected \"float_vector_field_data\", got %s",
-    float_vector_field_array->GetName());
-  VERIFY(float_vector_field_array->GetNumberOfComponents() == 1, "wrong number of component");
-  VERIFY(float_vector_field_array->GetNumberOfTuples() == 3, "wrong number of tuples");
-  VERIFY(float_vector_field_array->GetVariantValue(0).ToInt() == 4.0, "wrong value");
-  VERIFY(float_vector_field_array->GetVariantValue(1).ToInt() == 5.0, "wrong value");
-  VERIFY(float_vector_field_array->GetVariantValue(2).ToInt() == 6.0, "wrong value");
-
-  auto external_integer_vector_field_array = field_data->GetAbstractArray(5);
-  VERIFY(std::string(external_integer_vector_field_array->GetName()) == "external_integer_vector",
-    "wrong array name, expected \"external_integer_vector\", got %s",
-    external_integer_vector_field_array->GetName());
-  VERIFY(
-    external_integer_vector_field_array->GetNumberOfComponents() == 1, "wrong number of component");
-  VERIFY(external_integer_vector_field_array->GetNumberOfTuples() == 3, "wrong number of tuples");
-  VERIFY(external_integer_vector_field_array->GetVariantValue(0).ToInt() == 123, "wrong value");
-  VERIFY(external_integer_vector_field_array->GetVariantValue(1).ToInt() == 456, "wrong value");
-  VERIFY(external_integer_vector_field_array->GetVariantValue(2).ToInt() == 789, "wrong value");
+  VERIFY(CheckFieldDataMeshConversion(
+           mesh, 1, external_integer_vector_field_data.name(), 1, { 123, 456, 789 }),
+    "Verification failed for external integer vector field data.");
 
   return true;
 }

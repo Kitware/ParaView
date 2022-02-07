@@ -314,7 +314,10 @@ bool verify(const std::string& protocol, const conduit_cpp::Node& n)
         // in some-cases, this may directly be an array of numeric values; if so, handle that.
         if (!child.dtype().is_number())
         {
-          vtkLogF(ERROR, "Validation of mesh state field '%s' failed.", child.name().c_str());
+          vtkLogF(ERROR,
+            "Validation of mesh state field '%s' failed. Expected types are: string, MCArrays or "
+            "numeric values.",
+            child.name().c_str());
           return false;
         }
       }

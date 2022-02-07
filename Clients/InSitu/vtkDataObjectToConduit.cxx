@@ -402,6 +402,13 @@ bool FillFields(
         if (string_array->GetNumberOfValues() > 0)
         {
           field_node.set_string(string_array->GetValue(0));
+          if (string_array->GetNumberOfValues() > 1)
+          {
+            vtkLog(WARNING,
+              "The string array '" << string_array->GetName()
+                                   << "' contains more than one element. Only the first one will "
+                                      "be converted to conduit node.")
+          }
         }
       }
       else if (auto data_array = vtkDataArray::SafeDownCast(array))
