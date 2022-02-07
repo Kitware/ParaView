@@ -66,6 +66,8 @@ public:
    * Returns a 2D transfer function proxy (aka Image Data) instance.
    */
   virtual vtkSMProxy* GetTransferFunction2D(const char* arrayName, vtkSMSessionProxyManager* pxm);
+  virtual vtkSMProxy* GetTransferFunction2D(
+    const char* arrayName, const char* array2Name, vtkSMSessionProxyManager* pxm);
 
   /**
    * Returns the scalar-bar (color-legend) representation corresponding to the

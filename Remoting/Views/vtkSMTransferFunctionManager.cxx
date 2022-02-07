@@ -181,13 +181,29 @@ vtkSMProxy* vtkSMTransferFunctionManager::GetOpacityTransferFunction(
 vtkSMProxy* vtkSMTransferFunctionManager::GetTransferFunction2D(
   const char* arrayName, vtkSMSessionProxyManager* pxm)
 {
+  return this->GetTransferFunction2D(arrayName, nullptr, pxm);
+}
+
+//----------------------------------------------------------------------------
+vtkSMProxy* vtkSMTransferFunctionManager::GetTransferFunction2D(
+  const char* arrayName, const char* array2Name, vtkSMSessionProxyManager* pxm)
+{
+  // ok to have the array2Name be empty (used when the gradient of the array is used as array2)
   assert(arrayName != nullptr && pxm != nullptr);
 
   // sanitize the arrayName. This is necessary since sometimes array names have
   // characters that can mess up regular expressions.
   std::string sanitizedArrayName = vtkSMCoreUtilities::SanitizeName(arrayName);
   arrayName = sanitizedArrayName.c_str();
-  vtkSMProxy* proxy = FindProxy("transfer_2d_functions", arrayName, pxm);
+  std::string sanitizedArray2Name = vtkSMCoreUtilities::SanitizeName(array2Name);
+  array2Name = sanitizedArray2Name.c_str();
+  std::ostringstream coupledArrayName;
+  coupledArrayName << arrayName;
+  if (array2Name && array2Name[0] != '\0')
+  {
+    coupledArrayName << "." << array2Name;
+  }
+  vtkSMProxy* proxy = FindProxy("transfer_2d_functions", coupledArrayName.str().c_str(), pxm);
   if (proxy)
   {
     return proxy;
@@ -197,20 +213,16 @@ vtkSMProxy* vtkSMTransferFunctionManager::GetTransferFunction2D(
   proxy = pxm->NewProxy("transfer_2d_functions", "TransferFunction2D");
   if (!proxy)
   {
-    vtkErrorMacro("Failed to create 2DTransferFunction proxy.");
+    vtkErrorMacro("Failed to create 2D TransferFunction proxy");
     return nullptr;
   }
-  //  vtkPVTransferFunction2D* tf2d =
-  //  vtkPVTransferFunction2D::SafeDownCast(proxy->GetClientSideObject()); im->SetDimensions(2, 2,
-  //  2); im->AllocateScalars(VTK_FLOAT, 4);
 
   vtkNew<vtkSMParaViewPipelineController> controller;
   controller->PreInitializeProxy(proxy);
   controller->PostInitializeProxy(proxy);
 
-  std::ostringstream proxyName;
-  proxyName << arrayName << ".TransferFunction2D";
-  controller->RegisterTransferFunction2D(proxy, proxyName.str().c_str());
+  coupledArrayName << ".TransferFunction2D";
+  controller->RegisterTransferFunction2D(proxy, coupledArrayName.str().c_str());
   proxy->FastDelete();
   proxy->UpdateVTKObjects();
   return proxy;
