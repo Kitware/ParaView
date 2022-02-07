@@ -83,6 +83,14 @@ void Execute(int cycle, double time, Grid& grid, Attributes& attribs, Particles&
   fields_grid["velocity/topology"].set_string("mesh");
   fields_grid["velocity/volume_dependent"].set_string("false");
 
+  // Field data (aka meta-data) are declared in the mesh "state" node.
+  auto mesh_grid_state_fields = mesh_grid["state/fields"];
+  mesh_grid_state_fields["author"] = "Kitware";
+  mesh_grid_state_fields["mesh time"] = time;
+  mesh_grid_state_fields["mesh timestep"] = cycle;
+  mesh_grid_state_fields["mesh external data"].set_external(
+    grid.GetPointsArray(), grid.GetNumberOfPoints(), 0, 3 * sizeof(double));
+
   // velocity is stored in non-interlaced form (unlike points).
   fields_grid["velocity/values/x"].set_external(
     attribs.GetVelocityArray(), grid.GetNumberOfPoints(), /*offset=*/0);

@@ -24,6 +24,7 @@
 #include <vtkNew.h>
 #include <vtkPointData.h>
 #include <vtkRectilinearGrid.h>
+#include <vtkStringArray.h>
 #include <vtkStructuredGrid.h>
 #include <vtkTable.h>
 #include <vtkUnstructuredGrid.h>
@@ -787,6 +788,72 @@ bool TestUnstructuredGrid()
   return is_success;
 }
 
+bool TestFieldData()
+{
+  conduit_cpp::Node node;
+  vtkNew<vtkImageData> image;
+
+  image->SetDimensions(2, 3, 1);
+  image->SetSpacing(10, 20, 30);
+  image->SetOrigin(-1, -2, -3);
+
+  vtkNew<vtkStringArray> stringArray;
+  stringArray->SetName("string array");
+  stringArray->InsertNextValue("Kitware");
+  stringArray->InsertNextValue("ignored");
+  image->GetFieldData()->AddArray(stringArray);
+
+  vtkNew<vtkIntArray> intArray;
+  intArray->SetName("int array");
+  intArray->InsertNextValue(100);
+  intArray->InsertNextValue(200);
+  intArray->InsertNextValue(300);
+  image->GetFieldData()->AddArray(intArray);
+
+  bool is_success =
+    vtkDataObjectToConduit::FillConduitNode(vtkDataObject::SafeDownCast(image), node);
+
+  if (!is_success)
+  {
+    std::cerr << "FillConduitNode failed for TestImageData" << std::endl;
+    return is_success;
+  }
+
+  conduit_cpp::Node expected_node;
+  auto coords_node = expected_node["coordsets/coords"];
+  coords_node["type"] = "uniform";
+  coords_node["dims/i"] = image->GetDimensions()[0];
+  coords_node["dims/j"] = image->GetDimensions()[1];
+  coords_node["dims/k"] = image->GetDimensions()[2];
+  coords_node["origin/x"] = image->GetOrigin()[0];
+  coords_node["origin/y"] = image->GetOrigin()[1];
+  coords_node["origin/z"] = image->GetOrigin()[2];
+  coords_node["spacing/dx"] = image->GetSpacing()[0];
+  coords_node["spacing/dy"] = image->GetSpacing()[1];
+  coords_node["spacing/dz"] = image->GetSpacing()[2];
+
+  auto topologies_node = expected_node["topologies/mesh"];
+  topologies_node["type"] = "uniform";
+  topologies_node["coordset"] = "coords";
+
+  auto string_field_node = expected_node["state/fields/string array"];
+  string_field_node.set_string(stringArray->GetValue(0));
+  auto int_field_node = expected_node["state/fields/int array"];
+  int_field_node.set_int32_vector(
+    { intArray->GetValue(0), intArray->GetValue(1), intArray->GetValue(2) });
+
+  conduit_cpp::Node diff_info;
+  bool are_nodes_different = node.diff(expected_node, diff_info, 1e-6);
+  if (are_nodes_different)
+  {
+    diff_info.print();
+  }
+
+  is_success = !are_nodes_different;
+
+  return is_success;
+}
+
 int TestDataObjectToConduit(int, char*[])
 {
   bool is_success = true;
@@ -796,6 +863,7 @@ int TestDataObjectToConduit(int, char*[])
   is_success &= TestRectilinearGrid();
   is_success &= TestStructuredGrid();
   is_success &= TestUnstructuredGrid();
+  is_success &= TestFieldData();
 
   return is_success ? EXIT_SUCCESS : EXIT_FAILURE;
 }

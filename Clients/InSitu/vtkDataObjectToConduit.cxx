@@ -27,6 +27,7 @@
 #include "vtkPoints.h"
 #include "vtkRectilinearGrid.h"
 #include "vtkSOADataArrayTemplate.h"
+#include "vtkStringArray.h"
 #include "vtkStructuredGrid.h"
 #include "vtkTypeFloat32Array.h"
 #include "vtkTypeFloat64Array.h"
@@ -383,7 +384,7 @@ bool FillFields(
   int array_count = field_data->GetNumberOfArrays();
   for (int array_index = 0; is_success && array_index < array_count; ++array_index)
   {
-    auto array = field_data->GetArray(array_index);
+    auto array = field_data->GetAbstractArray(array_index);
     auto name = array->GetName();
     if (!name)
     {
@@ -391,13 +392,50 @@ bool FillFields(
       continue;
     }
 
-    auto field_node = conduit_node["fields"][name];
-    field_node["association"] = association;
-    field_node["topology"] = "mesh";
-    field_node["volume_dependent"] = "false";
+    if (association.empty())
+    {
+      // VTK Field Data are translated to state/fields childs.
+      auto field_node = conduit_node["state/fields"][name];
 
-    auto values_node = field_node["values"];
-    is_success = ConvertDataArrayToMCArray(array, values_node);
+      if (auto string_array = vtkStringArray::SafeDownCast(array))
+      {
+        if (string_array->GetNumberOfValues() > 0)
+        {
+          field_node.set_string(string_array->GetValue(0));
+          if (string_array->GetNumberOfValues() > 1)
+          {
+            vtkLog(WARNING,
+              "The string array '" << string_array->GetName()
+                                   << "' contains more than one element. Only the first one will "
+                                      "be converted to conduit node.")
+          }
+        }
+      }
+      else if (auto data_array = vtkDataArray::SafeDownCast(array))
+      {
+        is_success = ConvertDataArrayToMCArray(data_array, field_node);
+      }
+      else
+      {
+        vtkLogF(ERROR, "Unknown array type '%s' in Field Data.", name);
+        is_success = false;
+      }
+    }
+    else if (auto data_array = vtkDataArray::SafeDownCast(array))
+    {
+      auto field_node = conduit_node["fields"][name];
+      field_node["association"] = association;
+      field_node["topology"] = "mesh";
+      field_node["volume_dependent"] = "false";
+
+      auto values_node = field_node["values"];
+      is_success = ConvertDataArrayToMCArray(data_array, values_node);
+    }
+    else
+    {
+      vtkLogF(ERROR, "Unknown array type '%s' associated to: %s", name, association.c_str());
+      is_success = false;
+    }
   }
 
   return is_success;
@@ -426,10 +464,10 @@ bool FillFields(vtkDataSet* data_set, conduit_cpp::Node& conduit_node)
 
   if (auto field_data = data_set->GetFieldData())
   {
-    if (field_data->GetNumberOfArrays() > 0)
+    if (!FillFields(field_data, "", conduit_node))
     {
-      vtkVLog(vtkLogger::VERBOSITY_WARNING,
-        "Field without associated topology is not supported by conduit. Will be ignored.");
+      vtkVLog(vtkLogger::VERBOSITY_ERROR, "FillFields with field data failed.");
+      return false;
     }
   }
 
