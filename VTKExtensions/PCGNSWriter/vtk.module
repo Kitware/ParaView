@@ -7,7 +7,7 @@ CONDITION
 KIT
   ParaView::CoreKit
 GROUPS
-  PARAVIEW_CANONICAL
+  MPI
 DEPENDS
   VTK::IOCore
   VTK::ParallelCore
