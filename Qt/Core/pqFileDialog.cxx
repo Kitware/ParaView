@@ -157,7 +157,7 @@ public:
   pqImplementation(pqFileDialog* p, pqServer* server)
     : QObject(p)
     , Model(new pqFileDialogModel(server, nullptr))
-    , FavoriteModel(new pqFileDialogFavoriteModel(server, nullptr))
+    , FavoriteModel(new pqFileDialogFavoriteModel(Model, server, nullptr))
     , RecentModel(new pqFileDialogRecentDirsModel(Model, server, nullptr))
     , FileFilter(this->Model)
     , Completer(new QCompleter(&this->FileFilter, nullptr))
@@ -584,16 +584,13 @@ void pqFileDialog::onContextMenuRequested(const QPoint& menuPos)
   // Delete directory action
   if (isCurrentIndexADirectory)
   {
-    QString const fullPath =
-      this->Implementation->Model->data(sourceItemIndex, Qt::UserRole).toString();
-    QDir dir(fullPath);
-    if (dir.isEmpty())
+    QString temp;
+    QString dir = impl.Model->data(sourceItemIndex, Qt::UserRole).toString();
+    if (this->Implementation->Model->dirIsEmpty(dir, temp))
     {
       auto deleteDirectoryAction = new QAction("Delete empty directory", this);
-      QObject::connect(deleteDirectoryAction, &QAction::triggered, [=]() {
-        this->Implementation->Model->rmdir(
-          this->Implementation->Model->data(sourceItemIndex, Qt::DisplayRole).toString());
-      });
+      QObject::connect(deleteDirectoryAction, &QAction::triggered,
+        [=]() { this->Implementation->Model->rmdir(dir); });
       menu.addAction(deleteDirectoryAction);
     }
   }
@@ -1323,10 +1320,9 @@ bool pqFileDialog::acceptInternal(const QStringList& selected_files)
         return false;
 
       case AnyFile:
-        QDir dir = QFileInfo(file).absoluteDir();
-        if (!dir.exists())
+        if (!impl.Model->dirExists(file, file))
         {
-          qWarning() << "'" << dir.absolutePath() << "' does not exist";
+          qWarning() << "'" << file << "' does not exist";
         }
         this->addToFilesSelected(QStringList(file));
         return true;

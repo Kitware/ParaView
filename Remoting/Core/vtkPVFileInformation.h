@@ -85,7 +85,7 @@ public:
 
   //@{
   /**
-   * Helper that returns true if file-type is a group i.e.
+   * Helper that returns true if file-type is a network related file i.e.
    * either a FILE_GROUP or a DIRECTORY_GROUP.
    */
   static bool IsGroup(int type)
@@ -164,6 +164,11 @@ public:
   //@}
 
   /**
+   * Fetch the directory listing to be able to use GetSize or GetContents with directories
+   */
+  void FetchDirectoryListing();
+
+  /**
    * Returns the path to the base data directory path holding various files
    * packaged with ParaView.
    */
@@ -198,8 +203,8 @@ protected:
   vtkSetStringMacro(Name);
   vtkSetStringMacro(FullPath);
 
-  void GetWindowsDirectoryListing();
-  void GetDirectoryListing();
+  void FetchWindowsDirectoryListing();
+  void FetchUnixDirectoryListing();
 
   // Goes thru the collection of vtkPVFileInformation objects
   // are creates file groups, if possible.
