@@ -48,7 +48,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqNonEditableStyledItemDelegate.h"
 #include "pqOutputPort.h"
 #include "pqPipelineSource.h"
-#include "pqSMAdaptor.h"
 #include "pqServer.h"
 #include "pqSpreadSheetViewModel.h"
 #include "pqSpreadSheetViewSelectionModel.h"

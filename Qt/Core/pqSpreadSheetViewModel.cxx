@@ -33,10 +33,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkArrayDispatch.h"
 #include "vtkCSVExporter.h"
-#include "vtkCellType.h"
 #include "vtkDataArrayAccessor.h"
 #include "vtkEventQtSlotConnect.h"
-#include "vtkIdList.h"
 #include "vtkIdTypeArray.h"
 #include "vtkInformation.h"
 #include "vtkPVArrayInformation.h"
@@ -49,8 +47,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMSourceProxy.h"
 #include "vtkSMStringVectorProperty.h"
 #include "vtkSMTrace.h"
-#include "vtkSelection.h"
-#include "vtkSelectionNode.h"
 #include "vtkSmartPointer.h"
 #include "vtkSpreadSheetView.h"
 #include "vtkTable.h"
@@ -67,14 +63,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqDataRepresentation.h"
 #include "pqOutputPort.h"
 #include "pqPipelineSource.h"
-#include "pqSMAdaptor.h"
 #include "pqTimer.h"
 
 #include <cassert>
 
 static uint qHash(pqSpreadSheetViewModel::vtkIndex index)
 {
-  return qHash(index.Tuple[2]);
+  return qHash(index[2]);
 }
 
 //-----------------------------------------------------------------------------
@@ -507,33 +502,33 @@ QSet<pqSpreadSheetViewModel::vtkIndex> pqSpreadSheetViewModel::getVTKIndices(
     {
       continue;
     }
-    vtkIndex value;
+    vtkIndex index;
     vtkVariant processId = view->GetValueByName(row, "vtkOriginalProcessIds");
 
     int pid = processId.IsValid() ? processId.ToInt() : -1;
-    value.Tuple[1] = pid;
+    index[1] = pid;
 
     vtkVariant cid = view->GetValueByName(row, "vtkCompositeIndexArray");
     if (cid.IsValid())
     {
-      // cid is either a single value (as uint) or a pair of values.
+      // cid is either a single index (as uint) or a pair of values.
       // In the latter case the vtkVariant returns it as a vtkAbstractArray.
       if (cid.IsArray())
       {
         vtkUnsignedIntArray* array = vtkUnsignedIntArray::SafeDownCast(cid.ToArray());
         assert(array->GetNumberOfTuples() * array->GetNumberOfComponents() == 2);
-        value.Tuple[0] = static_cast<vtkIdType>(array->GetValue(0));
-        value.Tuple[1] = static_cast<vtkIdType>(array->GetValue(1));
+        index[0] = static_cast<vtkIdType>(array->GetValue(0));
+        index[1] = static_cast<vtkIdType>(array->GetValue(1));
       }
       else
       {
-        value.Tuple[0] = cid.ToUnsignedInt();
+        index[0] = cid.ToUnsignedInt();
       }
     }
 
     vtkVariant vtkindex = view->GetValueByName(row, "vtkOriginalIndices");
-    value.Tuple[2] = static_cast<vtkIdType>(vtkindex.ToLongLong());
-    vtkindices.insert(value);
+    index[2] = static_cast<vtkIdType>(vtkindex.ToLongLong());
+    vtkindices.insert(index);
   }
 
   return vtkindices;

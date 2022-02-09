@@ -90,8 +90,7 @@ protected: // NOLINT(readability-redundant-access-specifiers)
 private:
   Q_DISABLE_COPY(pqSpreadSheetViewSelectionModel)
 
-  class pqInternal;
-  pqInternal* Internal;
+  pqSpreadSheetViewModel* Model;
 };
 
 #endif

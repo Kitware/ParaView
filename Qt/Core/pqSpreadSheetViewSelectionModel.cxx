@@ -71,14 +71,8 @@ public:
 
 static uint qHash(pqSpreadSheetViewModel::vtkIndex index)
 {
-  return qHash(index.Tuple[2]);
+  return qHash(index[2]);
 }
-
-class pqSpreadSheetViewSelectionModel::pqInternal
-{
-public:
-  pqSpreadSheetViewModel* Model;
-};
 
 //-----------------------------------------------------------------------------
 pqSpreadSheetViewSelectionModel::pqSpreadSheetViewSelectionModel(
@@ -86,18 +80,14 @@ pqSpreadSheetViewSelectionModel::pqSpreadSheetViewSelectionModel(
   : Superclass(amodel, _parent)
 {
   this->UpdatingSelection = false;
-  this->Internal = new pqInternal();
-  this->Internal->Model = amodel;
+  this->Model = amodel;
 
   QObject::connect(amodel, SIGNAL(selectionChanged(const QItemSelection&)), this,
     SLOT(serverSelectionChanged(const QItemSelection&)));
 }
 
 //-----------------------------------------------------------------------------
-pqSpreadSheetViewSelectionModel::~pqSpreadSheetViewSelectionModel()
-{
-  delete this->Internal;
-}
+pqSpreadSheetViewSelectionModel::~pqSpreadSheetViewSelectionModel() = default;
 
 //-----------------------------------------------------------------------------
 void pqSpreadSheetViewSelectionModel::serverSelectionChanged(const QItemSelection& sel)
@@ -125,17 +115,15 @@ void pqSpreadSheetViewSelectionModel::serverSelectionChanged(const QItemSelectio
 
   QSet<int> toDeselectRows = currentRows - newRows;
   QSet<int> toSelectRows = newRows - currentRows;
-  // cout << "Selecting: " << toSelectRows.size()
-  //      << " De-Selection: " << toDeselectRows.size() <<  endl;
   Q_FOREACH (int idx, toDeselectRows)
   {
-    this->select(this->Internal->Model->index(idx, 0),
-      QItemSelectionModel::Deselect | QItemSelectionModel::Rows);
+    this->select(
+      this->Model->index(idx, 0), QItemSelectionModel::Deselect | QItemSelectionModel::Rows);
   }
   Q_FOREACH (int idx, toSelectRows)
   {
-    this->select(this->Internal->Model->index(idx, 0),
-      QItemSelectionModel::Select | QItemSelectionModel::Rows);
+    this->select(
+      this->Model->index(idx, 0), QItemSelectionModel::Select | QItemSelectionModel::Rows);
   }
 }
 
@@ -163,7 +151,7 @@ void pqSpreadSheetViewSelectionModel::select(
 
   vtkSMVectorProperty* vp = vtkSMVectorProperty::SafeDownCast(selSource->GetProperty("IDs"));
   QList<QVariant> ids = pqSMAdaptor::getMultipleElementProperty(vp);
-  int numElemsPerCommand = vp->GetNumberOfElementsPerCommand();
+  int numElementsPerCommand = vp->GetNumberOfElementsPerCommand();
   if (command & QItemSelectionModel::Clear)
   {
     ids.clear();
@@ -173,62 +161,56 @@ void pqSpreadSheetViewSelectionModel::select(
   {
     // Get the (process id, index) pairs for the indices indicated in the
     // selection.
-    QSet<pqSpreadSheetViewModel::vtkIndex> vtkIndices =
-      this->Internal->Model->getVTKIndices(sel.indexes());
+    QSet<pqSpreadSheetViewModel::vtkIndex> vtkIndices = this->Model->getVTKIndices(sel.indexes());
 
-    QSet<pqSpreadSheetViewModel::vtkIndex> curIndices;
-    for (int cc = 0; (cc + numElemsPerCommand) <= ids.size();)
+    QSet<pqSpreadSheetViewModel::vtkIndex> currentIndices;
+    for (int cc = 0; (cc + numElementsPerCommand) <= ids.size();)
     {
-      pqSpreadSheetViewModel::vtkIndex index(0, -1, 0);
-      if (numElemsPerCommand == 3)
+      pqSpreadSheetViewModel::vtkIndex index;
+      if (numElementsPerCommand == 3)
       {
-        index.Tuple[0] = ids[cc].value<vtkIdType>();
-        cc++;
-        index.Tuple[1] = ids[cc].value<vtkIdType>();
-        cc++;
-        index.Tuple[2] = ids[cc].value<vtkIdType>();
-        cc++;
+        index[0] = ids[cc++].value<vtkIdType>();
+        index[1] = ids[cc++].value<vtkIdType>();
+        index[2] = ids[cc++].value<vtkIdType>();
       }
-      else // numElemsPerCommand == 2
+      else // numElementsPerCommand == 2
       {
-        index.Tuple[1] = ids[cc].value<vtkIdType>();
-        cc++;
-        index.Tuple[2] = ids[cc].value<vtkIdType>();
-        cc++;
+        index[0] = 0;
+        index[1] = ids[cc++].value<vtkIdType>();
+        index[2] = ids[cc++].value<vtkIdType>();
       }
-      curIndices.insert(index);
+      currentIndices.insert(index);
     }
 
     if (command & QItemSelectionModel::Select)
     {
-      curIndices += vtkIndices;
+      currentIndices += vtkIndices;
     }
     if (command & QItemSelectionModel::Deselect)
     {
-      curIndices -= vtkIndices;
+      currentIndices -= vtkIndices;
     }
     if (command & QItemSelectionModel::Toggle)
     {
-      QSet<pqSpreadSheetViewModel::vtkIndex> toSelect = vtkIndices - curIndices;
+      QSet<pqSpreadSheetViewModel::vtkIndex> toSelect = vtkIndices - currentIndices;
       QSet<pqSpreadSheetViewModel::vtkIndex> toDeselect = vtkIndices - toSelect;
-      curIndices -= toDeselect;
-      curIndices += toSelect;
+      currentIndices -= toDeselect;
+      currentIndices += toSelect;
     }
 
     ids.clear();
-    QSet<pqSpreadSheetViewModel::vtkIndex>::iterator iter;
-    for (iter = curIndices.begin(); iter != curIndices.end(); ++iter)
+    for (const auto& index : currentIndices)
     {
-      if (numElemsPerCommand == 3)
+      if (numElementsPerCommand == 3)
       {
-        ids.push_back(iter->Tuple[0]);
-        ids.push_back(iter->Tuple[1]);
-        ids.push_back(iter->Tuple[2]);
+        ids.push_back(index[0]);
+        ids.push_back(index[1]);
+        ids.push_back(index[2]);
       }
-      else // numElemsPerCommand == 2
+      else // numElementsPerCommand == 2
       {
-        ids.push_back(iter->Tuple[1]);
-        ids.push_back(iter->Tuple[2]);
+        ids.push_back(index[1]);
+        ids.push_back(index[2]);
       }
     }
   }
