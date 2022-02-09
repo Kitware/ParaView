@@ -702,7 +702,7 @@ bool vtkSMPVRepresentationProxy::SetScalarColoringInternal(
         vtkSMPropertyHelper colorArray2Helper(colorArray2Property);
         array2Name = colorArray2Helper.GetInputArrayNameToProcess();
       }
-      array2Name = this->GetDecoratedArrayName(array2Name);
+      // array2Name = this->GetDecoratedArrayName(array2Name);
       //      array2Name =
       //        this->GetDecoratedArrayName(vtkSMPropertyHelper(this,
       //        "ColorArray2Name").GetAsString());
@@ -719,14 +719,35 @@ bool vtkSMPVRepresentationProxy::SetScalarColoringInternal(
 //----------------------------------------------------------------------------
 std::string vtkSMPVRepresentationProxy::GetDecoratedArrayName(const std::string& arrayname)
 {
+  std::ostringstream ss;
+  ss << arrayname;
+  if (vtkSMProperty* tf2dProperty = this->GetProperty("TransferFunction2D"))
+  {
+    bool useGradientAsY =
+      (vtkSMPropertyHelper(this, "UseGradientForTransfer2D", true).GetAsInt() == 1);
+    if (!useGradientAsY)
+    {
+      std::string array2Name;
+      vtkSMProperty* colorArray2Property = this->GetProperty("ColorArray2Name");
+      if (colorArray2Property)
+      {
+        vtkSMPropertyHelper colorArray2Helper(colorArray2Property);
+        array2Name = colorArray2Helper.GetInputArrayNameToProcess();
+      }
+      if (!array2Name.empty())
+      {
+        ss << "_" << array2Name;
+      }
+    }
+  }
   if (vtkSMPropertyHelper(this, "UseSeparateColorMap", true).GetAsInt())
   {
     // Use global id for separate color map
-    std::ostringstream ss;
-    ss << "Separate_" << this->GetGlobalIDAsString() << "_" << arrayname;
-    return ss.str();
+    std::ostringstream ss1;
+    ss1 << "Separate_" << this->GetGlobalIDAsString() << "_" << ss.str();
+    return ss1.str();
   }
-  return arrayname;
+  return ss.str();
 }
 
 //----------------------------------------------------------------------------

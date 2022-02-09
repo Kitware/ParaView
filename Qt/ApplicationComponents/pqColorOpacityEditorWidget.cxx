@@ -769,17 +769,17 @@ void pqColorOpacityEditorWidget::updateTransferFunction2DProxy()
     std::string arrayName(colorArrayHelper.GetInputArrayNameToProcess());
     int association = colorArrayHelper.GetInputArrayAssociation();
     vtkSMPVRepresentationProxy::SetScalarColoring(reprProxy, arrayName.c_str(), association);
-    vtkSMProperty* tf2dProperty = reprProxy->GetProperty("TransferFunction2D");
-    if (tf2dProperty)
-    {
-      vtkSMPropertyHelper tf2dPropHelper(tf2dProperty);
-      if (this->transferFunction2DProxy() != tf2dPropHelper.GetAsProxy())
-      {
-        this->setTransferFunction2DProxy(tf2dPropHelper.GetAsProxy());
-      }
-    }
+    // vtkSMProperty* tf2dProperty = reprProxy->GetProperty("TransferFunction2D");
+    // if (tf2dProperty)
+    //{
+    // vtkSMPropertyHelper tf2dPropHelper(tf2dProperty);
+    //      if (this->transferFunction2DProxy() != tf2dPropHelper.GetAsProxy())
+    //      {
+    //        this->setTransferFunction2DProxy(tf2dPropHelper.GetAsProxy());
+    //      }
+    //}
   }
-  this->setHistogramOutdated();
+  // this->setHistogramOutdated();
 }
 
 //-----------------------------------------------------------------------------
