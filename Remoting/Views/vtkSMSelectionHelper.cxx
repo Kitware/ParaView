@@ -156,23 +156,20 @@ vtkSMProxy* vtkSMSelectionHelper::NewSelectionSourceFromSelectionInternal(vtkSMS
   // Set some common property values using the state of the vtkSelection.
   if (selProperties->Has(vtkSelectionNode::FIELD_TYPE()))
   {
-    vtkSMIntVectorProperty* ivp =
-      vtkSMIntVectorProperty::SafeDownCast(selSource->GetProperty("FieldType"));
-    ivp->SetElement(0, selProperties->Get(vtkSelectionNode::FIELD_TYPE()));
+    vtkSMPropertyHelper(selSource, "FieldType")
+      .Set(selProperties->Get(vtkSelectionNode::FIELD_TYPE()));
   }
 
   if (selProperties->Has(vtkSelectionNode::CONTAINING_CELLS()))
   {
-    vtkSMIntVectorProperty* ivp =
-      vtkSMIntVectorProperty::SafeDownCast(selSource->GetProperty("ContainingCells"));
-    ivp->SetElement(0, selProperties->Get(vtkSelectionNode::CONTAINING_CELLS()));
+    vtkSMPropertyHelper(selSource, "ContainingCells")
+      .Set(selProperties->Get(vtkSelectionNode::CONTAINING_CELLS()));
   }
 
   if (selProperties->Has(vtkSelectionNode::INVERSE()))
   {
-    vtkSMIntVectorProperty* ivp =
-      vtkSMIntVectorProperty::SafeDownCast(selSource->GetProperty("InsideOut"));
-    ivp->SetElement(0, selProperties->Get(vtkSelectionNode::INVERSE()));
+    vtkSMPropertyHelper(selSource, "InsideOut")
+      .Set(selProperties->Get(vtkSelectionNode::INVERSE()));
   }
 
   if (contentType == vtkSelectionNode::FRUSTUM)
@@ -264,7 +261,7 @@ vtkSMProxy* vtkSMSelectionHelper::NewSelectionSourceFromSelectionInternal(vtkSMS
       vtkSMIdTypeVectorProperty::SafeDownCast(selSource->GetProperty("IDs"));
     if (!originalSelSource)
     {
-      // remove default values set by the XML if we created a brand new proxy.
+      // remove default values set by the XML if we created a brand-new proxy.
       ids->SetNumberOfElements(0);
     }
     vtkIdTypeArray* idList = vtkIdTypeArray::SafeDownCast(selection->GetSelectionList());
@@ -283,16 +280,12 @@ vtkSMProxy* vtkSMSelectionHelper::NewSelectionSourceFromSelectionInternal(vtkSMS
       }
       else if (use_composite)
       {
-        vtkIdType composite_index = 0;
-        if (selProperties->Has(vtkSelectionNode::COMPOSITE_INDEX()))
-        {
-          composite_index = selProperties->Get(vtkSelectionNode::COMPOSITE_INDEX());
-        }
+        vtkIdType compositeIndex = selProperties->Get(vtkSelectionNode::COMPOSITE_INDEX());
 
         std::vector<vtkIdType> newVals(3 * numIDs);
         for (vtkIdType cc = 0; cc < numIDs; cc++)
         {
-          newVals[3 * cc] = composite_index;
+          newVals[3 * cc] = compositeIndex;
           newVals[3 * cc + 1] = procID;
           newVals[3 * cc + 2] = idList->GetValue(cc);
         }
@@ -408,18 +401,17 @@ vtkSMProxy* vtkSMSelectionHelper::ConvertSelection(
 
     case vtkSelectionNode::INDICES:
     {
-      const char* dataName = dataSource->GetOutputPort(dataPort)->GetDataClassName();
+      auto dataInformation = dataSource->GetOutputPort(dataPort)->GetDataInformation();
       outproxyname = "IDSelectionSource";
-      if (dataName)
+      // check if subclass of vtkUniformGridAMR
+      if (dataInformation->GetNumberOfAMRLevels() > 0)
       {
-        if (strcmp(dataName, "vtkHierarchicalBoxDataSet") == 0)
-        {
-          outproxyname = "HierarchicalDataIDSelectionSource";
-        }
-        else if (strcmp(dataName, "vtkMultiBlockDataSet") == 0)
-        {
-          outproxyname = "CompositeDataIDSelectionSource";
-        }
+        outproxyname = "HierarchicalDataIDSelectionSource";
+      }
+      // since it's not subclass of vtkUniformGridAMR, check if it's a composite dataSet
+      else if (dataInformation->IsCompositeDataSet())
+      {
+        outproxyname = "CompositeDataIDSelectionSource";
       }
     }
     break;
