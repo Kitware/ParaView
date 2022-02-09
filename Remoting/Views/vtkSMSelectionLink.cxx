@@ -102,7 +102,6 @@ vtkSMSelectionLink::vtkSMSelectionLink()
   this->Internals = new vtkSMSelectionLinkInternals;
   this->Internals->SelectionObserver = vtkSMSelectionLinkObserver::New();
   this->Internals->SelectionObserver->Link = this;
-  this->ModifyingSelection = false;
   this->ConvertToIndices = true;
 }
 

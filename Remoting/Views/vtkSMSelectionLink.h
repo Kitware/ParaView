@@ -130,8 +130,6 @@ protected:
 private:
   vtkSMSelectionLinkInternals* Internals;
 
-  // lock flag to prevent multiple selection modification at the same time
-  bool ModifyingSelection;
   bool ConvertToIndices;
 
   vtkSMSelectionLink(const vtkSMSelectionLink&) = delete;
