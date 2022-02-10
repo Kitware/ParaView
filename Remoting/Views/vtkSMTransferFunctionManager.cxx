@@ -217,6 +217,7 @@ vtkSMProxy* vtkSMTransferFunctionManager::GetTransferFunction2D(
     return nullptr;
   }
 
+  proxy->SetLogName((std::string("tf2d-for-") + coupledArrayName.str()).c_str());
   vtkNew<vtkSMParaViewPipelineController> controller;
   controller->PreInitializeProxy(proxy);
   controller->PostInitializeProxy(proxy);
