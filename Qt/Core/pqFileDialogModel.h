@@ -77,9 +77,11 @@ public:
   //@}
 
   /**
-   * Sets the path that the file dialog will display
+   * Sets the path that the file dialog will display.
+   * If groupFiles is true, then file sequences are grouped into a file name where the sequence
+   * numbers are replaced by `..`
    */
-  void setCurrentPath(const QString&);
+  void setCurrentPath(const QString&, bool groupFiles = true);
 
   /**
    * Returns the path the the file dialog will display
@@ -118,6 +120,12 @@ public:
   bool dirExists(const QString& dir, QString& fullpath);
 
   /**
+   * Returns true if a directory exists and is empty
+   * also returns the full path, which could be a resolved shortcut
+   */
+  bool dirIsEmpty(const QString& dir, QString& fullpath);
+
+  /**
    * returns the path delimiter, could be \ or / depending on the platform
    * this model is browsing
    */
@@ -127,6 +135,11 @@ public:
    * return the absolute path for this file
    */
   QString absoluteFilePath(const QString&);
+
+  /**
+   * return the file type of a file
+   */
+  int fileType(const QString&);
 
   /**
    * Returns the set of file paths associated with the given row

@@ -43,6 +43,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqCustomShortcutBehavior.h"
 #include "pqDataTimeStepBehavior.h"
 #include "pqDefaultViewBehavior.h"
+#include "pqFileDialogFavoriteModel.h"
 #include "pqInterfaceTracker.h"
 #include "pqLiveSourceBehavior.h"
 #include "pqLockPanelsBehavior.h"
@@ -161,6 +162,7 @@ PQ_BEHAVIOR_DEFINE_FLAG(LiveSourceBehavior, true);
 PQ_BEHAVIOR_DEFINE_FLAG(CustomShortcutBehavior, true);
 PQ_BEHAVIOR_DEFINE_FLAG(MainWindowEventBehavior, true);
 PQ_BEHAVIOR_DEFINE_FLAG(UsageLoggingBehavior, false);
+PQ_BEHAVIOR_DEFINE_FLAG(AddExamplesInFavoritesBehavior, true);
 #undef PQ_BEHAVIOR_DEFINE_FLAG
 
 #define PQ_IS_BEHAVIOR_ENABLED(_name) enable##_name()
@@ -189,6 +191,9 @@ pqParaViewBehaviors::pqParaViewBehaviors(QMainWindow* mainWindow, QObject* paren
     // Register standard recent file menu handlers.
     pgm->addInterface(new pqStandardRecentlyUsedResourceLoaderImplementation(pgm));
   }
+
+  pqFileDialogFavoriteModel::AddExamplesInFavorites =
+    PQ_IS_BEHAVIOR_ENABLED(AddExamplesInFavoritesBehavior);
 
   // Define application behaviors.
   if (PQ_IS_BEHAVIOR_ENABLED(DataTimeStepBehavior))

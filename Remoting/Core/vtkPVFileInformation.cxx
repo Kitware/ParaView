@@ -366,6 +366,7 @@ vtkPVFileInformation::vtkPVFileInformation()
   this->Hidden = false;
   this->Extension = nullptr;
   this->Size = 0;
+  this->GroupFileSequences = true;
 #ifdef _WIN32
   this->ModificationTime = _time64(nullptr);
 #else
@@ -406,6 +407,8 @@ void vtkPVFileInformation::CopyFromObject(vtkObject* object)
     vtkErrorMacro("Can collect information only from a vtkPVFileInformationHelper.");
     return;
   }
+
+  this->GroupFileSequences = helper->GetGroupFileSequences();
 
   if (helper->GetSpecialDirectories())
   {
@@ -462,29 +465,13 @@ void vtkPVFileInformation::CopyFromObject(vtkObject* object)
 
   if (this->IsDirectory(this->Type) && helper->GetDirectoryListing())
   {
-// Since we want a directory listing, we now to platform specific listing
-// with intelligent pattern matching hee-haa.
-#if defined(_WIN32)
-    this->GetWindowsDirectoryListing();
-#else
-    this->GetDirectoryListing();
-#endif
+    this->FetchDirectoryListing();
   }
 }
 
 //-----------------------------------------------------------------------------
 void vtkPVFileInformation::GetSpecialDirectories()
 {
-  std::string examplesPath = vtkPVFileInformation::GetParaViewExampleFilesDirectory();
-  if (vtksys::SystemTools::FileIsDirectory(examplesPath))
-  {
-    vtkNew<vtkPVFileInformation> info;
-    info->SetFullPath(examplesPath.c_str());
-    info->SetName("Examples");
-    info->Type = DIRECTORY;
-    this->Contents->AddItem(info.Get());
-  }
-
 #if defined(_WIN32)
   // Return favorite directories ...
 
@@ -629,9 +616,22 @@ void vtkPVFileInformation::GetSpecialDirectories()
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVFileInformation::GetWindowsDirectoryListing()
+void vtkPVFileInformation::FetchDirectoryListing()
 {
 #if defined(_WIN32)
+  this->FetchWindowsDirectoryListing();
+#else
+  this->FetchUnixDirectoryListing();
+#endif
+}
+
+//-----------------------------------------------------------------------------
+void vtkPVFileInformation::FetchWindowsDirectoryListing()
+{
+#if !defined(_WIN32)
+  vtkErrorMacro("FetchWindowsDirectoryListing cannot be called on non-Windows systems.");
+#else
+
   vtkPVFileInformationSet info_set;
 
   if (IsNetworkPath(this->FullPath))
@@ -809,9 +809,6 @@ void vtkPVFileInformation::GetWindowsDirectoryListing()
   {
     this->Contents->AddItem(*iter);
   }
-
-#else
-  vtkErrorMacro("GetWindowsDirectoryListing cannot be called on non-Windows systems.");
 #endif
 }
 
@@ -825,13 +822,10 @@ support and glibc/Linux system headers:
 #endif
 
 //-----------------------------------------------------------------------------
-void vtkPVFileInformation::GetDirectoryListing()
+void vtkPVFileInformation::FetchUnixDirectoryListing()
 {
 #if defined(_WIN32)
-
-  vtkErrorMacro("GetDirectoryListing() cannot be called on Windows systems.");
-  return;
-
+  vtkErrorMacro("FetchUnixDirectoryListing() cannot be called on Windows systems.");
 #else
 
   vtkPVFileInformationSet info_set;
@@ -1013,52 +1007,56 @@ void vtkPVFileInformation::OrganizeCollection(vtkPVFileInformationSet& info_set)
   std::string prefix = this->FullPath;
   vtkPVFileInformationAddTerminatingSlash(prefix);
 
-  for (vtkPVFileInformationSet::iterator iter = info_set.begin(); iter != info_set.end();)
+  if (this->GroupFileSequences)
   {
-    vtkSmartPointer<vtkPVFileInformation> obj = *iter;
-    // we're going to skip non-groupable file types. Note, we may get INVALID
-    // here since when this->FastFileTypeDetection is true, the grouping
-    // happens before the file types are detected.
-    if (obj->Type != FILE_GROUP && obj->Type != DRIVE && obj->Type != NETWORK_ROOT &&
-      obj->Type != NETWORK_DOMAIN && obj->Type != NETWORK_SERVER && obj->Type != NETWORK_SHARE &&
-      obj->Type != DIRECTORY_GROUP)
+    for (vtkPVFileInformationSet::iterator iter = info_set.begin(); iter != info_set.end();)
     {
-      if (this->SequenceParser->ParseFileSequence(obj->GetName()))
+      vtkSmartPointer<vtkPVFileInformation> obj = *iter;
+      // we're going to skip non-groupable file types. Note, we may get INVALID
+      // here since when this->FastFileTypeDetection is true, the grouping
+      // happens before the file types are detected.
+      if (obj->Type != FILE_GROUP && obj->Type != DRIVE && obj->Type != NETWORK_ROOT &&
+        obj->Type != NETWORK_DOMAIN && obj->Type != NETWORK_SERVER && obj->Type != NETWORK_SHARE &&
+        obj->Type != DIRECTORY_GROUP)
       {
-        const std::string groupName = this->SequenceParser->GetSequenceName();
-        std::string suffixString = this->SequenceParser->GetSequenceIndexString();
-        int sequenceIndex = this->SequenceParser->GetSequenceIndex();
-
-        // since I want to keep file groups and directory groups separate, for
-        // the key, I'm creating a new key by prefixing it with the group
-        // type.
-        const std::string key_prefix(vtkPVFileInformation::IsDirectory(obj->Type) ? "d." : "f.");
-        const std::string key(key_prefix + groupName);
-
-        MapOfStringToInfo::iterator iter2 = fileGroups.find(key);
-        if (iter2 == fileGroups.end())
+        if (this->SequenceParser->ParseFileSequence(obj->GetName()))
         {
-          vtkNew<vtkPVFileInformation> group;
-          ;
-          group->SetName(groupName.c_str());
-          group->SetFullPath((prefix + groupName).c_str());
-          group->Type = vtkPVFileInformation::IsDirectory(obj->Type) ? DIRECTORY_GROUP : FILE_GROUP;
-          // the group inherits the hidden flag of the first item in the group
-          group->Hidden = obj->Hidden;
-          group->FastFileTypeDetection = this->FastFileTypeDetection;
+          const std::string groupName = this->SequenceParser->GetSequenceName();
+          std::string suffixString = this->SequenceParser->GetSequenceIndexString();
+          int sequenceIndex = this->SequenceParser->GetSequenceIndex();
 
-          vtkInfo info;
-          info.Group = group.GetPointer();
-          iter2 = fileGroups.insert(std::pair<std::string, vtkInfo>(key, info)).first;
+          // since I want to keep file groups and directory groups separate, for
+          // the key, I'm creating a new key by prefixing it with the group
+          // type.
+          const std::string key_prefix(vtkPVFileInformation::IsDirectory(obj->Type) ? "d." : "f.");
+          const std::string key(key_prefix + groupName);
+
+          MapOfStringToInfo::iterator iter2 = fileGroups.find(key);
+          if (iter2 == fileGroups.end())
+          {
+            vtkNew<vtkPVFileInformation> group;
+            ;
+            group->SetName(groupName.c_str());
+            group->SetFullPath((prefix + groupName).c_str());
+            group->Type =
+              vtkPVFileInformation::IsDirectory(obj->Type) ? DIRECTORY_GROUP : FILE_GROUP;
+            // the group inherits the hidden flag of the first item in the group
+            group->Hidden = obj->Hidden;
+            group->FastFileTypeDetection = this->FastFileTypeDetection;
+
+            vtkInfo info;
+            info.Group = group.GetPointer();
+            iter2 = fileGroups.insert(std::pair<std::string, vtkInfo>(key, info)).first;
+          }
+
+          iter2->second.Children[std::make_pair(sequenceIndex, suffixString)] = obj;
+
+          iter = info_set.erase(iter);
+          continue; // needed to skip the ++iter, since we already incremented.
         }
-
-        iter2->second.Children[std::make_pair(sequenceIndex, suffixString)] = obj;
-
-        iter = info_set.erase(iter);
-        continue; // needed to skip the ++iter, since we already incremented.
       }
+      ++iter;
     }
-    ++iter;
   }
 
   // Now scan through all created groups and dissolve trivial groups
@@ -1186,6 +1184,7 @@ void vtkPVFileInformation::Initialize()
   this->Contents->RemoveAllItems();
   this->SetExtension(nullptr);
   this->Size = 0;
+  this->GroupFileSequences = true;
 #ifdef _WIN32
   this->ModificationTime = _time64(nullptr);
 #else

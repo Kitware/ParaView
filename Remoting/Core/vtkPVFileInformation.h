@@ -85,7 +85,7 @@ public:
 
   //@{
   /**
-   * Helper that returns true if file-type is a group i.e.
+   * Helper that returns true if file-type is a network related file i.e.
    * either a FILE_GROUP or a DIRECTORY_GROUP.
    */
   static bool IsGroup(int type)
@@ -137,6 +137,18 @@ public:
   vtkGetMacro(Hidden, bool);
   //@}
 
+  ///@{
+  /**
+   * Groups file sequences when found. A file sequence could be [foo1.png, foo2.png, foo6.png].
+   * When turned on, the series of files is grouped and our sequence example is named foo..png
+   * and original files are discarded from the listing.
+   * By default, this flag is set to true.
+   */
+  vtkGetMacro(GroupFileSequences, bool);
+  vtkSetMacro(GroupFileSequences, bool);
+  vtkBooleanMacro(GroupFileSequences, bool);
+  ///@}
+
   //@{
   /**
    * Get the Contents for this directory.
@@ -150,6 +162,11 @@ public:
   vtkGetMacro(Size, long long);
   vtkGetMacro(ModificationTime, time_t);
   //@}
+
+  /**
+   * Fetch the directory listing to be able to use GetSize or GetContents with directories
+   */
+  void FetchDirectoryListing();
 
   /**
    * Returns the path to the base data directory path holding various files
@@ -186,8 +203,8 @@ protected:
   vtkSetStringMacro(Name);
   vtkSetStringMacro(FullPath);
 
-  void GetWindowsDirectoryListing();
-  void GetDirectoryListing();
+  void FetchWindowsDirectoryListing();
+  void FetchUnixDirectoryListing();
 
   // Goes thru the collection of vtkPVFileInformation objects
   // are creates file groups, if possible.
@@ -198,6 +215,7 @@ protected:
   void SetHiddenFlag();
   int FastFileTypeDetection;
   bool ReadDetailedFileInformation;
+  bool GroupFileSequences;
 
 private:
   vtkPVFileInformation(const vtkPVFileInformation&) = delete;
