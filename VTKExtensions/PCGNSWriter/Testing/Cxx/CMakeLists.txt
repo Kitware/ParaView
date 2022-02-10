@@ -7,6 +7,8 @@ if (PARAVIEW_USE_MPI)
         TestMultiBlockData.cxx
         TestUnstructuredGrid.cxx
         TestPartialData.cxx
+        TestPartitionedDataSet.cxx
+        TestPartitionedDataSetCollection.cxx
         TestPolyData.cxx
         TestPolygonalData.cxx
         TestPolyhedralGrid.cxx

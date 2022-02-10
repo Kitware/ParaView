@@ -18,6 +18,7 @@
 #include "vtkCellType.h"
 #include "vtkDoubleArray.h"
 #include "vtkIdList.h"
+#include "vtkLogger.h"
 #include "vtkMultiBlockDataSet.h"
 #include "vtkNew.h"
 #include "vtkPVTestUtilities.h"
@@ -56,18 +57,20 @@ int TestPolyhedral(int argc, char* argv[])
 
 int PolyhedralTest(vtkMultiBlockDataSet* read, unsigned int b0, unsigned int b1)
 {
-  vtk_assert(nullptr != read);
-  vtk_assert(b0 < read->GetNumberOfBlocks());
+  vtkLogIfF(ERROR, nullptr == read, "Read dataset is NULL");
+  vtkLogIfF(ERROR, b0 >= read->GetNumberOfBlocks(), "Number of blocks does not match");
 
   vtkMultiBlockDataSet* block0 = vtkMultiBlockDataSet::SafeDownCast(read->GetBlock(b0));
-  vtk_assert(nullptr != block0);
-  vtk_assert(b1 < block0->GetNumberOfBlocks());
+  vtkLogIfF(ERROR, nullptr == block0, "Block0 is NULL");
+  vtkLogIfF(ERROR, b1 >= block0->GetNumberOfBlocks(), "Number of blocks does not match");
 
   vtkUnstructuredGrid* target = vtkUnstructuredGrid::SafeDownCast(block0->GetBlock(b1));
-  vtk_assert(nullptr != target);
+  vtkLogIfF(ERROR, nullptr == target, "Output grid is NULL");
 
-  vtk_assert(16 == target->GetNumberOfPoints());
-  vtk_assert(2 == target->GetNumberOfCells());
+  vtkLogIfF(ERROR, 2 != target->GetNumberOfCells(), "Expected 2 cells, got %lld",
+    target->GetNumberOfCells());
+  vtkLogIfF(ERROR, 16 != target->GetNumberOfPoints(), "Expected 16 points, got %lld",
+    target->GetNumberOfPoints());
 
   return EXIT_SUCCESS;
 }

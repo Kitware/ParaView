@@ -17,6 +17,8 @@
 #include "vtkCellData.h"
 #include "vtkCellType.h"
 #include "vtkDoubleArray.h"
+#include "vtkInformation.h"
+#include "vtkLogger.h"
 #include "vtkMultiBlockDataSet.h"
 #include "vtkNew.h"
 #include "vtkPVTestUtilities.h"
@@ -49,31 +51,38 @@ int TestUnstructuredGrid(int argc, char* argv[])
 
   delete[] filename;
 
-  return UnstructuredGridTest(r->GetOutput(), 0, 0, 10);
+  return UnstructuredGridTest(r->GetOutput(), 0, 0, 10, "Zone 1");
 }
 
-int UnstructuredGridTest(vtkMultiBlockDataSet* read, unsigned int b0, unsigned int b1, int N)
+int UnstructuredGridTest(
+  vtkMultiBlockDataSet* read, unsigned int b0, unsigned int b1, int N, const char* name)
 {
-  vtk_assert(nullptr != read);
-  vtk_assert(b0 < read->GetNumberOfBlocks());
+  vtkLogIfF(ERROR, nullptr == read, "Multiblock data set is NULL");
+  vtkLogIfF(ERROR, b0 >= read->GetNumberOfBlocks(), "NUmber of blocks does not match");
 
   vtkMultiBlockDataSet* block0 = vtkMultiBlockDataSet::SafeDownCast(read->GetBlock(b0));
-  vtk_assert(nullptr != block0);
-  vtk_assert(b1 < block0->GetNumberOfBlocks());
+  vtkLogIfF(ERROR, nullptr == block0, "Block0 is NULL");
+  vtkLogIfF(ERROR, b1 >= block0->GetNumberOfBlocks(), "Number of blocks does not match");
+  const char* blockName = block0->GetMetaData(b1)->Get(vtkCompositeDataSet::NAME());
+
+  vtkLogIfF(ERROR, 0 != strncmp(name, blockName, std::min(strlen(name), strlen(blockName))),
+    "Name '%s' does not match expected name '%s'", blockName, name);
 
   vtkUnstructuredGrid* target = vtkUnstructuredGrid::SafeDownCast(block0->GetBlock(b1));
-  vtk_assert(nullptr != target);
-  vtk_assert(N * N * N == target->GetNumberOfPoints());
+  vtkLogIfF(ERROR, nullptr == target, "output grid is NULL");
+  vtkLogIfF(ERROR, N * N * N != target->GetNumberOfPoints(), "Expected %d points, got %lld",
+    N * N * N, target->GetNumberOfPoints());
   int M = N - 1;
-  vtk_assert(M * M * M == target->GetNumberOfCells());
+  vtkLogIfF(ERROR, M * M * M != target->GetNumberOfCells(), "Expected %d cells, got %lld",
+    M * M * M, target->GetNumberOfCells());
   return EXIT_SUCCESS;
 }
 
-void Create(vtkUnstructuredGrid* ug, int N)
+void Create(vtkUnstructuredGrid* ug, vtkIdType N)
 {
   vtkNew<vtkPoints> pts;
 
-  int i, j, k;
+  vtkIdType i, j, k;
   vtkNew<vtkDoubleArray> cellPressure;
   cellPressure->SetName("Pressure");
   cellPressure->Allocate(N * N * N);
@@ -99,23 +108,26 @@ void Create(vtkUnstructuredGrid* ug, int N)
   for (i = 0; i < N; ++i)
   {
     xyz[0] = 1.0 * i;
+    const auto di = static_cast<double>(i);
     for (j = 0; j < N; ++j)
     {
       xyz[1] = j / 2.0;
+      const auto dj = static_cast<double>(j);
       for (k = 0; k < N; ++k)
       {
+        const auto dk = static_cast<double>(k);
         xyz[2] = k * 3.0;
         pts->InsertNextPoint(xyz);
-        vertexPressure->InsertNextValue(i + j + k);
-        vertexVelocity->InsertNextTuple3(i, j, k);
+        vertexPressure->InsertNextValue(di + dj + dk);
+        vertexVelocity->InsertNextTuple3(di, dj, dk);
       }
     }
   }
 
   ug->SetPoints(pts);
 
-  auto calc = [=](int a, int b, int c) {
-    int value = a + b * N + c * N * N;
+  auto calc = [=](vtkIdType a, vtkIdType b, vtkIdType c) {
+    vtkIdType value = a + b * N + c * N * N;
     if (value < 0 || value >= N * N * N)
     {
       throw std::runtime_error("Value out of range");
@@ -127,12 +139,15 @@ void Create(vtkUnstructuredGrid* ug, int N)
   cellIds->Allocate(8);
   for (i = 0; i < N - 1; ++i)
   {
+    const auto di = static_cast<double>(i);
     for (j = 0; j < N - 1; ++j)
     {
+      const auto dj = static_cast<double>(j);
       for (k = 0; k < N - 1; ++k)
       {
-        cellPressure->InsertNextValue(i + j + k);
-        cellVelocity->InsertNextTuple3(i, j, k);
+        const auto dk = static_cast<double>(k);
+        cellPressure->InsertNextValue(di + dj + dk);
+        cellVelocity->InsertNextTuple3(di, dj, dk);
 
         cellIds->Reset();
 

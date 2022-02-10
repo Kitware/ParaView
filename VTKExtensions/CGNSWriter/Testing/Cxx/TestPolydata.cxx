@@ -17,6 +17,8 @@
 #include "vtkCellData.h"
 #include "vtkCellType.h"
 #include "vtkDoubleArray.h"
+#include "vtkInformation.h"
+#include "vtkLogger.h"
 #include "vtkMultiBlockDataSet.h"
 #include "vtkNew.h"
 #include "vtkPVTestUtilities.h"
@@ -52,30 +54,34 @@ int TestPolydata(int argc, char* argv[])
   vtkMultiBlockDataSet* read = r->GetOutput();
   delete[] filename;
 
-  return PolydataTest(read, 0, 0);
+  return PolydataTest(read, 0, 0, "Zone 1");
 }
 
-int PolydataTest(vtkMultiBlockDataSet* read, unsigned int b0, unsigned int b1)
+int PolydataTest(vtkMultiBlockDataSet* read, unsigned int b0, unsigned int b1, const char* name)
 {
-  vtk_assert(nullptr != read);
-  vtk_assert(b0 < read->GetNumberOfBlocks());
+  vtkLogIfF(ERROR, nullptr == read, "Read dataset is NULL");
+  vtkLogIfF(ERROR, b0 >= read->GetNumberOfBlocks(), "Number of blocks does not match");
 
   vtkMultiBlockDataSet* block0 = vtkMultiBlockDataSet::SafeDownCast(read->GetBlock(b0));
-  vtk_assert(nullptr != block0);
-  vtk_assert(b1 < block0->GetNumberOfBlocks());
+  vtkLogIfF(ERROR, nullptr == block0, "Block0 is NULL");
+  vtkLogIfF(ERROR, b1 >= block0->GetNumberOfBlocks(), "Number of blocks does not match");
+  const char* blockName = block0->GetMetaData(b1)->Get(vtkCompositeDataSet::NAME());
+  vtkLogIfF(ERROR, 0 != strncmp(name, blockName, std::min(strlen(name), strlen(blockName))),
+    "Name '%s' is not expected. Expected is %s", blockName, name);
 
   vtkUnstructuredGrid* target = vtkUnstructuredGrid::SafeDownCast(block0->GetBlock(b1));
-  vtk_assert(nullptr != target);
+  vtkLogIfF(ERROR, nullptr == target, "Output grid is NULL");
 
-  vtk_assert(3 == target->GetNumberOfCells());
-  vtk_assert(7 == target->GetNumberOfPoints());
+  vtkLogIfF(ERROR, 3 != target->GetNumberOfCells(), "Expected 3 cells, got %lld",
+    target->GetNumberOfCells());
+  vtkLogIfF(ERROR, 7 != target->GetNumberOfPoints(), "Expected 7 points, got %lld",
+    target->GetNumberOfPoints());
 
   return EXIT_SUCCESS;
 }
 
 void Create(vtkPolyData* pd)
 {
-
   vtkNew<vtkPoints> pts;
 
   pd->SetPoints(pts);
