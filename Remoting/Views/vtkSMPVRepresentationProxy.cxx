@@ -98,6 +98,17 @@ void vtkSMPVRepresentationProxy::OnPropertyUpdated(vtkObject*, unsigned long, vo
   {
     this->InvalidateDataInformation();
   }
+  else if (pname && (strcmp(pname, "UseGradientForTransfer2D") == 0) ||
+    (strcmp(pname, "ColorArray2Name") == 0))
+  {
+    if (auto colorArrayProperty = this->GetProperty("ColorArrayName"))
+    {
+      vtkSMPropertyHelper colorArrayHelper(colorArrayProperty);
+      std::string arrayName(colorArrayHelper.GetInputArrayNameToProcess());
+      int association = colorArrayHelper.GetInputArrayAssociation();
+      vtkSMPVRepresentationProxy::SetScalarColoring(this, arrayName.c_str(), association);
+    }
+  }
 }
 
 //----------------------------------------------------------------------------
@@ -604,11 +615,13 @@ bool vtkSMPVRepresentationProxy::SetScalarColoringInternal(
   // Now, setup transfer functions.
   bool haveComponent = useComponent;
   bool separate = (vtkSMPropertyHelper(this, "UseSeparateColorMap", true).GetAsInt() != 0);
+  bool useTransfer2D = (vtkSMPropertyHelper(this, "UseTransfer2D", true).GetAsInt() != 0);
   std::string decoratedArrayName = this->GetDecoratedArrayName(arrayname);
   vtkNew<vtkSMTransferFunctionManager> mgr;
+  vtkSMProxy* lutProxy = nullptr;
   if (vtkSMProperty* lutProperty = this->GetProperty("LookupTable"))
   {
-    vtkSMProxy* lutProxy =
+    lutProxy =
       mgr->GetColorTransferFunction(decoratedArrayName.c_str(), this->GetSessionProxyManager());
     if (useComponent)
     {
@@ -710,6 +723,11 @@ bool vtkSMPVRepresentationProxy::SetScalarColoringInternal(
     vtkSMProxy* tf2dProxy = mgr->GetTransferFunction2D(decoratedArrayName.c_str(),
       (array2Name.empty() ? nullptr : array2Name.c_str()), this->GetSessionProxyManager());
     vtkSMPropertyHelper(tf2dProperty).Set(tf2dProxy);
+    if (useTransfer2D)
+    {
+      vtkSMPropertyHelper(lutProxy, "Use2DTransferFunction").Set(useTransfer2D);
+      lutProxy->UpdateVTKObjects();
+    }
   }
 
   this->UpdateVTKObjects();

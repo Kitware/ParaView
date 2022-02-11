@@ -724,14 +724,14 @@ void pqColorOpacityEditorWidget::setTransferFunction2DProxy(pqSMProxy tf2dProxy)
     vtkSMProperty* colorArray2Property = reprProxy->GetProperty("ColorArray2Name");
     if (colorArray2Property)
     {
-      this->Internals->TransferFunction2DConnector->Connect(colorArray2Property,
-        vtkCommand::ModifiedEvent, this, SLOT(updateTransferFunction2DProxy()));
+      this->Internals->TransferFunction2DConnector->Connect(
+        colorArray2Property, vtkCommand::ModifiedEvent, this, SLOT(setHistogramOutdated()));
     }
     vtkSMProperty* gradProperty = reprProxy->GetProperty("UseGradientForTransfer2D");
     if (gradProperty)
     {
       this->Internals->TransferFunction2DConnector->Connect(
-        gradProperty, vtkCommand::ModifiedEvent, this, SLOT(updateTransferFunction2DProxy()));
+        gradProperty, vtkCommand::ModifiedEvent, this, SLOT(setHistogramOutdated()));
     }
 
     this->initializeTransfer2DEditor(tf2d);
