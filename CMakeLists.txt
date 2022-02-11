@@ -229,6 +229,13 @@ else ()
       "${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.${VTK_BUILD_VERSION}")
   determine_version("${CMAKE_CURRENT_SOURCE_DIR}/VTK" "${GIT_EXECUTABLE}" "VTK")
 
+  # When building from a source tarball, the VTK_VERSION_FULL is empty at this point.
+  # Check for that condition here and set a value for VTK_VERSION_FULL.
+  if (NOT VTK_VERSION_FULL)
+    set(VTK_VERSION_FULL "${VTK_VERSION}")
+  endif()
+  message(STATUS "VTK version: ${VTK_VERSION_FULL}")
+
   if (PARAVIEW_USE_PYTHON)
     include(vtkModuleWrapPython)
   endif ()
