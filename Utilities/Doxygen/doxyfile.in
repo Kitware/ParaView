@@ -61,10 +61,8 @@ EXCLUDE              = \
     "@ParaView_SOURCE_DIR@/ParaViewCore/VTKExtensions/H5PartReader/H5Part/src" \
     "@ParaView_SOURCE_DIR@/Plugins" \
     "@ParaView_SOURCE_DIR@/ThirdParty" \
-    "@ParaView_SOURCE_DIR@/Utilities/ColorSeriesToXML" \
     "@ParaView_SOURCE_DIR@/Utilities/Git" \
     "@ParaView_SOURCE_DIR@/Utilities/GitSetup" \
-    "@ParaView_SOURCE_DIR@/Utilities/LegacyColorMapXMLToJSON" \
     "@ParaView_SOURCE_DIR@/Utilities/Maintenance" \
     "@ParaView_SOURCE_DIR@/Utilities/MinimalBuildTools" \
     "@ParaView_SOURCE_DIR@/Utilities/ProcessXML" \
