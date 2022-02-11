@@ -720,10 +720,11 @@ bool vtkSMPVRepresentationProxy::SetScalarColoringInternal(
       //        this->GetDecoratedArrayName(vtkSMPropertyHelper(this,
       //        "ColorArray2Name").GetAsString());
     }
-    vtkSMProxy* tf2dProxy = mgr->GetTransferFunction2D(decoratedArrayName.c_str(),
-      (array2Name.empty() ? nullptr : array2Name.c_str()), this->GetSessionProxyManager());
+    vtkSMProxy* tf2dProxy =
+      mgr->GetTransferFunction2D(decoratedArrayName.c_str(), this->GetSessionProxyManager());
     vtkSMPropertyHelper(tf2dProperty).Set(tf2dProxy);
-    if (useTransfer2D)
+    this->UpdateProperty("TransferFunction2D");
+    if (lutProxy && useTransfer2D)
     {
       vtkSMPropertyHelper(lutProxy, "Use2DTransferFunction").Set(useTransfer2D);
       lutProxy->UpdateVTKObjects();

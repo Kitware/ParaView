@@ -43,7 +43,7 @@ public:
   /**
    * The transfer function
    */
-  vtkImageData* Function = nullptr;
+  vtkSmartPointer<vtkImageData> Function;
 };
 
 //-------------------------------------------------------------------------------------------------
@@ -55,11 +55,12 @@ vtkPVTransferFunction2D::vtkPVTransferFunction2D()
 //-------------------------------------------------------------------------------------------------
 vtkPVTransferFunction2D::~vtkPVTransferFunction2D()
 {
-  if (this->Internals->Function != nullptr)
-  {
-    this->Internals->Function->Delete();
-    this->Internals->Function = nullptr;
-  }
+  this->Internals->Function = nullptr;
+  // if (this->Internals->Function != nullptr)
+  // {
+  //   this->Internals->Function->Delete();
+  //   this->Internals->Function = nullptr;
+  // }
   for (auto box : this->Internals->Boxes)
   {
     if (box)
@@ -150,12 +151,15 @@ void vtkPVTransferFunction2D::Build()
 
   if (!this->Internals->Function)
   {
-    this->Internals->Function = vtkImageData::New();
+    this->Internals->Function = vtkSmartPointer<vtkImageData>::New();
   }
-
-  if (auto oldScalars = this->Internals->Function->GetPointData()->GetScalars())
+  else
   {
-    this->Internals->Function->GetPointData()->RemoveArray(oldScalars->GetName());
+    auto pd = this->Internals->Function->GetPointData();
+    if (pd && pd->GetScalars())
+    {
+      pd->RemoveArray(pd->GetScalars()->GetName());
+    }
   }
 
   // this->UpdateRange();

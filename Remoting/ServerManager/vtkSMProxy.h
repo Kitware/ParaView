@@ -613,6 +613,8 @@ public:
    */
   const char* GetLogNameOrDefault();
 
+  bool GetPropertiesModified() { return this->PropertiesModified; }
+
 protected:
   vtkSMProxy();
   ~vtkSMProxy() override;
