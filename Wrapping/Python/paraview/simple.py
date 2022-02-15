@@ -2476,6 +2476,16 @@ def CreateTexture(filename=None):
 #==============================================================================
 # Miscellaneous functions.
 #==============================================================================
+def Show2DWidgets(proxy=None):
+    """If possible in the current environment, this method will
+    request the application to show the 2D widget(s) for proxy"""
+    Show3DWidgets(proxy)
+
+def Hide2DWidgets(proxy=None):
+    """If possible in the current environment, this method will
+    request the application to hide the 2D widget(s) for proxy"""
+    Hide3DWidgets(proxy)
+
 def Show3DWidgets(proxy=None):
     """If possible in the current environment, this method will
     request the application to show the 3D widget(s) for proxy"""
