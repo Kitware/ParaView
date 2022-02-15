@@ -97,6 +97,11 @@ void pqInteractiveProperty2DWidget::setWidgetVisible(bool val)
 {
   if (this->WidgetVisibility != val)
   {
+    SM_SCOPED_TRACE(CallFunction)
+      .arg(val ? "Show2DWidgets" : "Hide2DWidgets")
+      .arg("proxy", this->proxy())
+      .arg("comment", "toggle 2D widget visibility (only when running from the GUI)");
+
     this->WidgetVisibility = val;
     this->updateWidgetVisibility();
     Q_EMIT this->widgetVisibilityToggled(val);
