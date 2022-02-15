@@ -85,7 +85,7 @@ pqCoordinateFramePropertyWidget::pqCoordinateFramePropertyWidget(
   Ui::CoordinateFramePropertyWidget ui;
   ui.setupUi(this);
 
-  if (vtkSMProperty* lockAxis = this->widgetProxy()->GetProperty("LockedAxis"))
+  if (this->widgetProxy()->GetProperty("LockedAxis"))
   {
     vtkSMProperty* lockAxisInfo = this->widgetProxy()->GetProperty("LockedAxisInfo");
     this->addPropertyLink(this, "lockedAxis", SIGNAL(lockedAxisChangedByUser(int)), lockAxisInfo);
