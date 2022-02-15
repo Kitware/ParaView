@@ -2,25 +2,48 @@ GmshReader Plugin
 ParaView/VTK reader for visualization of high-order polynomial solutions under the Gmsh format.
 Version: 1.0
 
-See Copyright.txt, License.txt and Credits.txt for respective copyright,
-license and credits information. You should have received a copy of
-these files along with ParaViewGMSHReaderPlugin.
 
--For more information on Gmsh see http://geuz.org/gmsh/
--For more information on ParaView see http://paraview.org/
+General information:
+--------------------
 
-WARNING: this reader is deprecated in the favor of the GmshIO plugin.
----------------------------------------------------------
+See Copyright.txt and Credits.txt for information about the license of this plugin and its contributors.
+
+For more information on Gmsh see http://geuz.org/gmsh/
+For more information on ParaView see http://paraview.org/
+
+Note that another initiative to read msh files with ParaView has been implemented in the plugin GmshIO.
+The main advantages of both plugins are briefly described below. In the future, both plugins will be merged
+so that all features available in both plugins are provided in a single one.
+
+The GmshIO plugin is developed on top of Gmsh 4.7 public APIs. It is able to read one single Gmsh file stored under
+the msh v4 format which contains both the mesh and solution information. However, this plugin is limited to linear
+elements and works only in serial in ParaView.
+
+The GmshReader plugin has been developed to read high-order mesh and solution fields generated from massively
+parallel simulations. The resulting mesh and solution files can be stored separately in a one-file-per-partition format.
+Consequently, this plugin works natively in parallel when ParaView is used in client/server mode.
+It can also reads mesh and solution fields of any arbitrary order, including varying order in space for a given field,
+and different orders between fields. In order to visualize high-order mesh and solution fields, a linear VTK data
+structure is generated in two steps. First, a visualization grid is constructed from the local or uniform refinement of
+the original high-order mesh. Then, the high-order solution fields associated with the original mesh are interpolated on
+the new nodes of the visualization grid. See the reference mentioned in Credits.txt for more details.
+This plugin does not read directly msh files like GmshIO but rather relies on an XML interface file where the path to the
+mesh and solutions files stored under the msh format are specified, along with time step information and refinement level
+for the visualization grid (see description below). However, the format of the XML interface file used by this plugin is
+described below but should be made official in the Gmsh documentation. The GmshReader plugin also relies on private Gmsh
+APIs, which may not be supported in the long term. These drawbacks will be addressed in the future merged plugin.
+
 
 Contact Info:
-------------
+-------------
 
 This plugin can certainly be improved and any suggestions or contributions are welcome.
-Please report all bugs, problems and suggestions to <michel.rasquin@cenaero.be>,
-<joachim.pouderoux@kitware.com> and <mathieu.westphal@kitware.com>.
+Please report all bugs, problems and suggestions to <michel.rasquin@cenaero.be>
+ and <mathieu.westphal@kitware.com>.
+
 
 Pre-requirements for building GmshReader Plugin:
-----------------------------------------------------
+------------------------------------------------
 
 To build this plugin you will need a version of the Gmsh library compiled with specific options.
 The Gmsh version required by this plugin must be at least 4.1.0.
@@ -49,6 +72,7 @@ Beware: the default Gmsh library provided by some Linux distributions under thei
 It is strongly advised to build your own version of the Gmsh library using the cmake variables listed above.
 Please contact us if you can't build your own version with the cmake command above.
 
+
 Building GmshReader Plugin at compilation of ParaView:
 ------------------------------------------------------
 
@@ -65,7 +89,7 @@ In this case, it is advised though to help cmake find the paths to the right ver
 
 
 Loading the ParaView Gmsh reader plugin:
----------------------------------------
+----------------------------------------
 
 First make sure that libgmsh.so will be found at runtime.
 This will be automatic if you have set a standard CMAKE_INSTALL_PREFIX for gmsh.
@@ -77,8 +101,9 @@ Selected it and click on "Load Selected".
 You may want to expand it and check the "Auto Load" box.
 This plugin is a client and server plugin, so make sure to load it in both in client and server mode.
 
+
 Note on the MSH file format:
----------------------------
+----------------------------
 
 This plugin supports Gmsh IO format version 2.0, which is still supported under Gmsh 4.1.0.
 Under IO format version 2.0, a partitioned mesh with N parts can be saved in
@@ -95,8 +120,9 @@ To save a partitioned mesh in N distinct files from the Gmsh GUI, follow this pr
 
 Note that the Gmsh IO format version 4.0 is currently being developped and is not supported yet by the plugin.
 
+
 Reading your msh files:
-----------------------
+-----------------------
 
 Once the Gmsh plugin is loaded, you should now be able to select and load an XML interface file with the extension ".mshi" file (MSH Input).
 This XML file specifies all the information required by the plugin.
