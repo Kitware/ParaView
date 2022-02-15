@@ -151,6 +151,7 @@ set(classes
   vtkSMMultiSliceViewProxy
   vtkSMNew2DWidgetRepresentationProxy
   vtkSMNewWidgetRepresentationProxy
+  vtkSMNewWidgetRepresentationProxyAbstract
   vtkSMOrthographicSliceViewProxy
   vtkSMParaViewPipelineControllerWithRendering
   vtkSMPlotMatrixViewProxy
