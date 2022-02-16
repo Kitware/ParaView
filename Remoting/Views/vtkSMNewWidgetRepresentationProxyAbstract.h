@@ -18,19 +18,26 @@
 #include "vtkRemotingViewsModule.h" //needed for exports
 #include "vtkSMProxy.h"
 
-#include "vtkCommand.h"
-#include "vtkSmartPointer.h"
-#include "vtkWeakPointer.h"
+#include "vtkCommand.h"      // for vtkCommand
+#include "vtkSmartPointer.h" // for vtkSmartPointer
+#include "vtkWeakPointer.h"  // for vtkWeakPointer
 
-#include <list>
+#include <list> // for std::list
 
 class vtkSMLink;
 class vtkSMPropertyGroup;
 
+/**
+ * @class   vtkSMNewWidgetRepresentationProxyAbstract
+ * @brief   Abstract class for proxies for 2D and 3D widgets.
+ *
+ * vtkSMNewWidgetRepresentationProxyAbstract is an abstract class for
+ * proxies representing 2D or 3D widgets. It sets up all the properties link
+ * needed so proxies are in sync.
+ */
 class VTKREMOTINGVIEWS_EXPORT vtkSMNewWidgetRepresentationProxyAbstract : public vtkSMProxy
 {
 public:
-  static vtkSMNewWidgetRepresentationProxyAbstract* New();
   vtkTypeMacro(vtkSMNewWidgetRepresentationProxyAbstract, vtkSMProxy);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
@@ -52,9 +59,10 @@ protected:
   ~vtkSMNewWidgetRepresentationProxyAbstract() override;
 
   /**
-   * Called every time the user interacts with the widget.
+   * Called every time the user interacts with the widget. This should be override
+   * by each subclass.
    */
-  virtual void ExecuteEvent(unsigned long event);
+  virtual void ExecuteEvent(unsigned long event) = 0;
 
   /**
    * Called everytime a controlled property's unchecked values change.
@@ -94,7 +102,7 @@ public:
   vtkSMWidgetObserver();
   void Execute(vtkObject* caller, unsigned long event, void*) override;
 
-  vtkSMNewWidgetRepresentationProxyAbstract* Proxy;
+  vtkWeakPointer<vtkSMNewWidgetRepresentationProxyAbstract> WidgetRepresentation;
 };
 
 #endif

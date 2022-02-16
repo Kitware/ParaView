@@ -37,16 +37,19 @@ public:
   vtkTypeMacro(vtkSMNew2DWidgetRepresentationProxy, vtkSMNewWidgetRepresentationProxyAbstract);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  //@{
   /**
    * Get Representation Proxy.
    */
   vtkGetObjectMacro(ContextItemProxy, vtkSMProxy);
-  //@}
 
 protected:
   vtkSMNew2DWidgetRepresentationProxy();
   ~vtkSMNew2DWidgetRepresentationProxy() override;
+
+  /**
+   * Called every time the user interacts with the widget.
+   */
+  void ExecuteEvent(unsigned long event) override;
 
   /**
    * Overridden from vtkSMProxy to call BeginCreateVTKObjects() and

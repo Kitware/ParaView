@@ -18,7 +18,7 @@
               proxyname="EqualizerContextItem"></Proxy>
         <ExposedProperties>
           <Property name="Visibility" />
-          <Property name="EqualizerPointsFunc" />
+          <Property name="EqualizerPoints" />
         </ExposedProperties>
       </SubProxy>
 
@@ -28,9 +28,8 @@
 
   <ProxyGroup name="2d_widget_representations">
     <!-- ================================================================== -->
-      <Proxy class="vtkEqualizerContextItem"
-            name="EqualizerContextItem"
-            post_creation="InstantiateHandleRepresentation">
+      <ContextItemWidgetProxy class="vtkEqualizerContextItem"
+            name="EqualizerContextItem">
         <IntVectorProperty animateable="1"
                           command="SetVisible"
                           default_values="1"
@@ -41,13 +40,13 @@
         <StringVectorProperty animateable="1"
                               command="SetPoints"
                               label="Equalizer Points"
-                              name="EqualizerPointsFunc"
+                              name="EqualizerPoints"
                               number_of_elements="1"
                               element_types="2"
                               panel_visibility="never">
           <Documentation>This property defines the interactive points of the equalizer.</Documentation>
         </StringVectorProperty>
-      </Proxy>
+      </ContextItemWidgetProxy>
     <!-- End of EqualizerContextItem -->
   </ProxyGroup>
 </ServerManagerConfiguration>

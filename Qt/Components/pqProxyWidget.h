@@ -188,6 +188,10 @@ public Q_SLOTS:
    */
   bool filterWidgets(bool show_advanced = false, const QString& filterText = QString());
 
+  /**
+   * Show any interactive widget linked to a specific output port
+   * this proxyWdiget has. See XML hint <WidgetVisibilityLink port="X" />.
+   */
   void showLinkedInteractiveWidget(int portIndex, bool show);
 
   /**

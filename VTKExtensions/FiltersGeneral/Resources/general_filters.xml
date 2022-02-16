@@ -4202,8 +4202,8 @@ Every Nth Point.
                       min="-50"
                       name="range" />
       <Documentation>
-        A coefficient for gain a Spectrum of input signal in dB.
-        Using only for more convenient view.
+        Specify a gain coefficient (in dB) to apply to the spectrum of the input signal.
+        Used only for convenient viewing.
       </Documentation>
     </IntVectorProperty>
 
@@ -4215,9 +4215,9 @@ Every Nth Point.
       <Documentation>This property defines the interactive points of the equalizer.</Documentation>
     </StringVectorProperty>
 
-    <PropertyGroup name="Equilizer Filtering Points" panel_widget="EqualizerPropertyWidget">
-      <Property function="EqualizerPointsFunc" name="EqualizerPoints" />
-      <Property function="Input" name="Input" />
+    <PropertyGroup name="Equalizer Filtering Points" panel_widget="EqualizerPropertyWidget">
+      <Property name="EqualizerPoints" />
+      <Property name="SamplingFrequency" />
       <Hints>
         <WidgetVisibilityLink port="2" />
       </Hints>

@@ -70,21 +70,7 @@ public:
    */
   vtkSMNewWidgetRepresentationProxy* widgetProxy() const { return this->WidgetProxy; };
 
-  /**
-   * Toggle the interactive widget's visibility. This, along with
-   * pqPropertyWidget's selected state controls whether the widget proxy is
-   * visible in a view.
-   */
-  void setWidgetVisible(bool val) override;
-
 protected:
-  /**
-   * This method is called to update the state of Visibility and Enabled
-   * properties on the widget based on the state of isWidgetVisible() and
-   * isSelected().
-   */
-  void updateWidgetVisibility() override;
-
   /**
    * Get the internal instance of the widget proxy.
    */

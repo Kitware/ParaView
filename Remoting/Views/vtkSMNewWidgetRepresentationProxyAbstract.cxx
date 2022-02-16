@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   ParaView
-  Module:    vtkSMNewWidgetRepresentationProxyAbstract.h
+  Module:    vtkSMNewWidgetRepresentationProxyAbstract.cxx
 
   Copyright (c) Kitware, Inc.
   All rights reserved.
@@ -29,41 +29,34 @@
 #include <cassert>
 
 //----------------------------------------------------------------------------
-vtkSMNewWidgetRepresentationProxyAbstract::vtkSMWidgetObserver::vtkSMWidgetObserver()
-  : Proxy(nullptr)
-{
-}
+vtkSMNewWidgetRepresentationProxyAbstract::vtkSMWidgetObserver::vtkSMWidgetObserver() = default;
+
+//----------------------------------------------------------------------------
 void vtkSMNewWidgetRepresentationProxyAbstract::vtkSMWidgetObserver::Execute(
-  vtkObject* caller, unsigned long event, void*)
+  vtkObject* caller, unsigned long event, void* vtkNotUsed(userData))
 {
-  if (this->Proxy)
+  if (this->WidgetRepresentation)
   {
     if (vtkAbstractWidget::SafeDownCast(caller) || vtkContextItem::SafeDownCast(caller))
     {
-      this->Proxy->ExecuteEvent(event);
+      this->WidgetRepresentation->ExecuteEvent(event);
     }
     else if (vtkSMProperty* prop = vtkSMProperty::SafeDownCast(caller))
     {
-      this->Proxy->ProcessLinkedPropertyEvent(prop, event);
+      this->WidgetRepresentation->ProcessLinkedPropertyEvent(prop, event);
     }
   }
 }
 
 //----------------------------------------------------------------------------
-vtkStandardNewMacro(vtkSMNewWidgetRepresentationProxyAbstract);
-
-//============================================================================
 vtkSMNewWidgetRepresentationProxyAbstract::vtkSMNewWidgetRepresentationProxyAbstract()
 {
-  this->Observer->Proxy = this;
+  this->Observer->WidgetRepresentation = this;
   this->SetLocation(vtkPVSession::CLIENT_AND_SERVERS);
 }
 
 //----------------------------------------------------------------------------
-vtkSMNewWidgetRepresentationProxyAbstract::~vtkSMNewWidgetRepresentationProxyAbstract()
-{
-  this->Observer->Proxy = nullptr;
-}
+vtkSMNewWidgetRepresentationProxyAbstract::~vtkSMNewWidgetRepresentationProxyAbstract() = default;
 
 //----------------------------------------------------------------------------
 bool vtkSMNewWidgetRepresentationProxyAbstract::LinkProperties(
@@ -147,12 +140,6 @@ void vtkSMNewWidgetRepresentationProxyAbstract::SetupPropertiesLinks()
 }
 
 //----------------------------------------------------------------------------
-void vtkSMNewWidgetRepresentationProxyAbstract::ExecuteEvent(unsigned long event)
-{
-  this->InvokeEvent(event);
-}
-
-//----------------------------------------------------------------------------
 void vtkSMNewWidgetRepresentationProxyAbstract::ProcessLinkedPropertyEvent(
   vtkSMProperty* caller, unsigned long event)
 {
@@ -190,5 +177,26 @@ void vtkSMNewWidgetRepresentationProxyAbstract::ProcessLinkedPropertyEvent(
 //----------------------------------------------------------------------------
 void vtkSMNewWidgetRepresentationProxyAbstract::PrintSelf(ostream& os, vtkIndent indent)
 {
-  return this->Superclass::PrintSelf(os, indent);
+  this->Superclass::PrintSelf(os, indent);
+  os << indent << "ControlledProxy:";
+  if (this->ControlledProxy)
+  {
+    os << std::endl;
+    this->ControlledProxy->PrintSelf(os, indent.GetNextIndent());
+  }
+  else
+  {
+    os << "nullptr" << std::endl;
+  }
+  os << indent << "ControlledPropertyGroup:";
+  if (this->ControlledPropertyGroup)
+  {
+    os << std::endl;
+    this->ControlledPropertyGroup->PrintSelf(os, indent.GetNextIndent());
+  }
+  else
+  {
+    os << "nullptr" << std::endl;
+  }
+  os << indent << "Links: size " << this->Links.size() << std::endl;
 }

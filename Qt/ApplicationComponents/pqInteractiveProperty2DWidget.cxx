@@ -15,20 +15,14 @@
 #include "pqInteractiveProperty2DWidget.h"
 
 #include "pqApplicationCore.h"
-#include "pqContextView.h"
-#include "pqCoreUtilities.h"
 #include "pqLiveInsituVisualizationManager.h"
 #include "pqServer.h"
 #include "pqServerManagerModel.h"
 #include "pqUndoStack.h"
 #include "pqView.h"
-#include "vtkPVDataInformation.h"
-#include "vtkSMParaViewPipelineController.h"
-#include "vtkSMPropertyGroup.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMProxy.h"
 #include "vtkSMSessionProxyManager.h"
-#include "vtkSMSourceProxy.h"
 #include "vtkSMTrace.h"
 #include "vtkSmartPointer.h"
 
@@ -85,40 +79,10 @@ pqInteractiveProperty2DWidget::~pqInteractiveProperty2DWidget()
   pqView* oldview = this->view();
   if (oldview != nullptr)
   {
-    vtkSMPropertyHelper(oldview->getProxy(), "HiddenRepresentations").Remove(this->WidgetProxy);
+    vtkSMPropertyHelper(oldview->getProxy(), "HiddenRepresentations", true)
+      .Remove(this->WidgetProxy);
     oldview->getProxy()->UpdateVTKObjects();
 
     this->pqPropertyWidget::setView(nullptr);
   }
-}
-
-//-----------------------------------------------------------------------------
-void pqInteractiveProperty2DWidget::setWidgetVisible(bool val)
-{
-  if (this->WidgetVisibility != val)
-  {
-    SM_SCOPED_TRACE(CallFunction)
-      .arg(val ? "Show2DWidgets" : "Hide2DWidgets")
-      .arg("proxy", this->proxy())
-      .arg("comment", "toggle 2D widget visibility (only when running from the GUI)");
-
-    this->WidgetVisibility = val;
-    this->updateWidgetVisibility();
-    Q_EMIT this->widgetVisibilityToggled(val);
-  }
-}
-
-//-----------------------------------------------------------------------------
-void pqInteractiveProperty2DWidget::updateWidgetVisibility()
-{
-  bool visible = this->isSelected() && this->isWidgetVisible() && this->view();
-  vtkSMProxy* wdgProxy = this->WidgetProxy;
-  assert(wdgProxy);
-
-  vtkSMPropertyHelper(wdgProxy, "Enabled", true).Set(visible);
-  vtkSMPropertyHelper(wdgProxy, "Visibility", true).Set(visible);
-  wdgProxy->UpdateVTKObjects();
-
-  this->render();
-  Q_EMIT this->widgetVisibilityUpdated(visible);
 }

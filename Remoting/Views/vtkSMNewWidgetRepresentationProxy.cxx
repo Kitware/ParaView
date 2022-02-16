@@ -42,10 +42,7 @@
 vtkStandardNewMacro(vtkSMNewWidgetRepresentationProxy);
 
 //----------------------------------------------------------------------------
-vtkSMNewWidgetRepresentationProxy::vtkSMNewWidgetRepresentationProxy()
-  : Superclass()
-{
-}
+vtkSMNewWidgetRepresentationProxy::vtkSMNewWidgetRepresentationProxy() = default;
 
 //----------------------------------------------------------------------------
 vtkSMNewWidgetRepresentationProxy::~vtkSMNewWidgetRepresentationProxy()
@@ -123,7 +120,7 @@ void vtkSMNewWidgetRepresentationProxy::CreateVTKObjects()
 //-----------------------------------------------------------------------------
 void vtkSMNewWidgetRepresentationProxy::ExecuteEvent(unsigned long event)
 {
-  this->Superclass::ExecuteEvent(event);
+  this->InvokeEvent(event);
 
   vtkSMWidgetRepresentationProxy* widgetRepresentation =
     vtkSMWidgetRepresentationProxy::SafeDownCast(this->RepresentationProxy);

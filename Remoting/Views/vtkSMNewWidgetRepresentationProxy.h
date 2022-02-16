@@ -73,7 +73,7 @@ protected:
   /**
    * Called every time the user interacts with the widget.
    */
-  virtual void ExecuteEvent(unsigned long event);
+  void ExecuteEvent(unsigned long event) override;
 
 private:
   vtkSMNewWidgetRepresentationProxy(const vtkSMNewWidgetRepresentationProxy&) = delete;

@@ -20,17 +20,12 @@
 #include "vtkContextView.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVContextView.h"
-#include "vtkPVXYChartView.h"
 
 //------------------------------------------------------------------------------
 vtkStandardNewMacro(vtk2DWidgetRepresentation);
 
 //------------------------------------------------------------------------------
 vtk2DWidgetRepresentation::vtk2DWidgetRepresentation()
-  : ContextItem(nullptr)
-  , Enabled(false)
-  , View(nullptr)
-  , ObserverTag(0)
 {
   this->SetNumberOfInputPorts(0);
 }
@@ -38,28 +33,27 @@ vtk2DWidgetRepresentation::vtk2DWidgetRepresentation()
 //------------------------------------------------------------------------------
 vtk2DWidgetRepresentation::~vtk2DWidgetRepresentation()
 {
-  if (this->View)
+  if (this->View && this->ContextItem)
   {
     this->View->GetContextView()->GetScene()->RemoveItem(this->ContextItem);
-    this->View = nullptr;
-    this->ContextItem = nullptr;
   }
 }
 
 //------------------------------------------------------------------------------
 bool vtk2DWidgetRepresentation::AddToView(vtkView* view)
 {
-  vtkPVXYChartView* pvview = vtkPVXYChartView::SafeDownCast(view);
+  vtkPVContextView* pvview = vtkPVContextView::SafeDownCast(view);
   if (pvview)
   {
     this->View = pvview;
     vtkContextScene* scene = this->View->GetContextView()->GetScene();
+
+    // let's find and apply transforms to the widget if needed
     auto itemsCount = scene->GetNumberOfItems();
     for (unsigned int i = 0; i < itemsCount; ++i)
     {
       vtkAbstractContextItem* item = scene->GetItem(i);
-      vtkChartXY* chart = vtkChartXY::SafeDownCast(item);
-      if (chart)
+      if (vtkChartXY* chart = vtkChartXY::SafeDownCast(item))
       {
         auto transforms = chart->GetTransforms();
         this->ContextItem->SetTransform(transforms.at(0));
@@ -79,53 +73,41 @@ bool vtk2DWidgetRepresentation::AddToView(vtkView* view)
 //------------------------------------------------------------------------------
 bool vtk2DWidgetRepresentation::RemoveFromView(vtkView* view)
 {
-  // TODO: see for details
-  // https://gitlab.kitware.com/paraview/paraview/-/merge_requests/3546#note_955876
   vtkPVContextView* pvview = vtkPVContextView::SafeDownCast(view);
   if (pvview)
   {
-    this->View = pvview;
     vtkContextScene* scene = this->View->GetContextView()->GetScene();
     scene->RemoveItem(this->ContextItem);
+    this->View = nullptr;
+
     return true;
   }
   return false;
 }
 
 //------------------------------------------------------------------------------
-void vtk2DWidgetRepresentation::OnContextItemModified()
-{
-  if (this->View != nullptr)
-  {
-    this->View->Update();
-  }
-}
-
-//------------------------------------------------------------------------------
 void vtk2DWidgetRepresentation::PrintSelf(std::ostream& os, vtkIndent indent)
 {
-  vtkDataRepresentation::PrintSelf(os, indent);
-}
-
-//------------------------------------------------------------------------------
-void vtk2DWidgetRepresentation::SetContextItem(vtkContextItem* item)
-{
-  if (this->ContextItem == item)
+  this->Superclass::PrintSelf(os, indent);
+  os << indent << "Enabled:" << this->Enabled << std::endl;
+  os << indent << "View:";
+  if (this->View)
   {
-    return;
+    os << std::endl;
+    this->View->PrintSelf(os, indent.GetNextIndent());
   }
-
+  else
+  {
+    os << "nullptr" << std::endl;
+  }
+  os << indent << "ContextItem:";
   if (this->ContextItem)
   {
-    this->ContextItem->RemoveObserver(this->ObserverTag);
-    this->ObserverTag = 0;
+    os << std::endl;
+    this->ContextItem->PrintSelf(os, indent.GetNextIndent());
   }
-
-  this->ContextItem = item;
-
-  if (this->ContextItem)
+  else
   {
-    this->ObserverTag = this->ContextItem->AddObserver(
-      vtkCommand::ModifiedEvent, this, &vtk2DWidgetRepresentation::OnContextItemModified);
+    os << "nullptr" << std::endl;
   }
 }

@@ -97,39 +97,10 @@ pqInteractivePropertyWidget::~pqInteractivePropertyWidget()
   pqView* oldview = this->view();
   if (oldview != nullptr)
   {
-    vtkSMPropertyHelper(oldview->getProxy(), "HiddenRepresentations").Remove(this->WidgetProxy);
+    vtkSMPropertyHelper(oldview->getProxy(), "HiddenRepresentations", true)
+      .Remove(this->WidgetProxy);
     oldview->getProxy()->UpdateVTKObjects();
 
     this->pqPropertyWidget::setView(nullptr);
   }
-}
-
-//-----------------------------------------------------------------------------
-void pqInteractivePropertyWidget::setWidgetVisible(bool val)
-{
-  if (this->WidgetVisibility != val)
-  {
-    SM_SCOPED_TRACE(CallFunction)
-      .arg(val ? "Show3DWidgets" : "Hide3DWidgets")
-      .arg("proxy", this->proxy())
-      .arg("comment", "toggle 3D widget visibility (only when running from the GUI)");
-
-    this->WidgetVisibility = val;
-    this->updateWidgetVisibility();
-    Q_EMIT this->widgetVisibilityToggled(val);
-  }
-}
-
-//-----------------------------------------------------------------------------
-void pqInteractivePropertyWidget::updateWidgetVisibility()
-{
-  bool visible = this->isSelected() && this->isWidgetVisible() && this->view();
-  vtkSMProxy* wdgProxy = this->WidgetProxy;
-  assert(wdgProxy);
-
-  vtkSMPropertyHelper(wdgProxy, "Visibility", true).Set(visible);
-  vtkSMPropertyHelper(wdgProxy, "Enabled", true).Set(visible);
-  wdgProxy->UpdateVTKObjects();
-  this->render();
-  Q_EMIT this->widgetVisibilityUpdated(visible);
 }
