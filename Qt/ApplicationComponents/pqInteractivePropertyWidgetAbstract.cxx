@@ -60,14 +60,12 @@ struct pqInteractivePropertyWidgetAbstract::pqInternals
 };
 
 //-----------------------------------------------------------------------------
-pqInteractivePropertyWidgetAbstract::pqInteractivePropertyWidgetAbstract(const char* widget_smgroup,
-  const char* widget_smname, vtkSMProxy* smproxy, vtkSMPropertyGroup* smgroup,
-  QWidget* parentObject)
+pqInteractivePropertyWidgetAbstract::pqInteractivePropertyWidgetAbstract(
+  const char* /* widget_smgroup */, const char* /* widget_smname */, vtkSMProxy* smproxy,
+  vtkSMPropertyGroup* smgroup, QWidget* parentObject)
   : Superclass(smproxy, parentObject)
   , Internals(new pqInteractivePropertyWidgetAbstract::pqInternals())
 {
-  assert(widget_smgroup);
-  assert(widget_smname);
   assert(smproxy);
   assert(smgroup);
   this->Internals->SMGroup = smgroup;
@@ -93,11 +91,10 @@ pqInteractivePropertyWidgetAbstract::pqInteractivePropertyWidgetAbstract(const c
 //-----------------------------------------------------------------------------
 pqInteractivePropertyWidgetAbstract::~pqInteractivePropertyWidgetAbstract()
 {
-  pqInternals& internals = (*this->Internals);
-  if (internals.UserEventObserverId > 0 && this->proxy())
+  if (this->Internals->UserEventObserverId > 0 && this->proxy())
   {
-    this->proxy()->RemoveObserver(internals.UserEventObserverId);
-    internals.UserEventObserverId = 0;
+    this->proxy()->RemoveObserver(this->Internals->UserEventObserverId);
+    this->Internals->UserEventObserverId = 0;
   }
 }
 
@@ -111,26 +108,24 @@ void pqInteractivePropertyWidgetAbstract::setupConnections(
 
   // Setup links between the proxy that the widget is going to be controlling
   widget->LinkProperties(smproxy, smgroup);
-
   widget->UpdateVTKObjects();
 
   // Marking this as a prototype ensures that the undo/redo system doesn't track
   // changes to the widget.
   widget->PrototypeOn();
 
-  pqCoreUtilities::connect(widget, vtkCommand::InteractionEvent, this, SIGNAL(changeAvailable()));
-  pqCoreUtilities::connect(widget, vtkCommand::EndInteractionEvent, this, SIGNAL(changeFinished()));
-
   pqCoreUtilities::connect(
     widget, vtkCommand::StartInteractionEvent, this, SIGNAL(startInteraction()));
   pqCoreUtilities::connect(
     widget, vtkCommand::StartInteractionEvent, this, SIGNAL(changeAvailable()));
   pqCoreUtilities::connect(widget, vtkCommand::InteractionEvent, this, SIGNAL(interaction()));
+  pqCoreUtilities::connect(widget, vtkCommand::InteractionEvent, this, SIGNAL(changeAvailable()));
   pqCoreUtilities::connect(widget, vtkCommand::EndInteractionEvent, this, SIGNAL(endInteraction()));
+  pqCoreUtilities::connect(widget, vtkCommand::EndInteractionEvent, this, SIGNAL(changeFinished()));
 
   if (vtkSMProperty* input = smgroup->GetProperty("Input"))
   {
-    this->addPropertyLink(this, "dataSource", SIGNAL(dummySignal()), input);
+    this->setDataSource(vtkSMPropertyHelper(input).GetAsProxy());
   }
   else
   {
@@ -270,6 +265,22 @@ void pqInteractivePropertyWidgetAbstract::reset()
 }
 
 //-----------------------------------------------------------------------------
+void pqInteractivePropertyWidgetAbstract::setWidgetVisible(bool val)
+{
+  if (this->WidgetVisibility != val)
+  {
+    SM_SCOPED_TRACE(CallFunction)
+      .arg(val ? "ShowInteractiveWidgets" : "HideInteractiveWidgets")
+      .arg("proxy", this->proxy())
+      .arg("comment", "toggle interactive widget visibility (only when running from the GUI)");
+
+    this->WidgetVisibility = val;
+    this->updateWidgetVisibility();
+    Q_EMIT this->widgetVisibilityToggled(val);
+  }
+}
+
+//-----------------------------------------------------------------------------
 void pqInteractivePropertyWidgetAbstract::handleUserEvent(
   vtkObject* caller, unsigned long eventid, void* calldata)
 {
@@ -303,4 +314,18 @@ void pqInteractivePropertyWidgetAbstract::hideEvent(QHideEvent*)
 void pqInteractivePropertyWidgetAbstract::showEvent(QShowEvent*)
 {
   this->setWidgetVisible(this->VisibleState);
+}
+
+//-----------------------------------------------------------------------------
+void pqInteractivePropertyWidgetAbstract::updateWidgetVisibility()
+{
+  bool visible = this->isSelected() && this->isWidgetVisible() && this->view();
+  vtkSMProxy* wdgProxy = this->internalWidgetProxy();
+  assert(wdgProxy);
+
+  vtkSMPropertyHelper(wdgProxy, "Visibility", true).Set(visible);
+  vtkSMPropertyHelper(wdgProxy, "Enabled", true).Set(visible);
+  wdgProxy->UpdateVTKObjects();
+  this->render();
+  Q_EMIT this->widgetVisibilityUpdated(visible);
 }

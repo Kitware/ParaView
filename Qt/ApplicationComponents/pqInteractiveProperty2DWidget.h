@@ -45,7 +45,6 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqInteractiveProperty2DWidget
 {
   Q_OBJECT
   typedef pqInteractivePropertyWidgetAbstract Superclass;
-  Q_PROPERTY(pqSMProxy dataSource READ dataSource WRITE setDataSource);
 
 public:
   pqInteractiveProperty2DWidget(const char* widget_smgroup, const char* widget_smname,
@@ -57,75 +56,7 @@ public:
    */
   vtkSMNew2DWidgetRepresentationProxy* widgetProxy() const { return this->WidgetProxy; };
 
-  /**
-   * Returns the interactive widget's visibility. Note that the widget may
-   * still not be visible in the view if the pqPropertyWidget is not
-   * selected. An interactive widget may be visible in the view when
-   * this->isWidgetVisible() and this->isSelected() both return true and the view
-   * is of the right type.
-   */
-  bool isWidgetVisible() const;
-
-  /**
-   * Returns bounds from the dataSource, if possible. May return invalid bounds
-   * when no dataSource exists of hasn't been updated to produce valid data.
-   */
-  vtkBoundingBox dataBounds() const;
-
-  /**
-   * Returns the vtkSMPropertyGroup pass to the constructor.
-   */
-  vtkSMPropertyGroup* propertyGroup() const;
-
-public Q_SLOTS:
-  /**
-   * Toggle the interactive widget's visibility. This, along with
-   * pqPropertyWidget's selected state controls whether the widget proxy is
-   * visible in a view.
-   */
-  void setWidgetVisible(bool val) override;
-
-protected Q_SLOTS:
-  /**
-   * Places the interactive widget using current data source information.
-   */
-  virtual void placeWidget() = 0;
-
-  /**
-   * Safe call render on the view.
-   */
-  void render();
-
-Q_SIGNALS:
-  /**
-   * Fired whenever setWidgetVisible() changes the widget's visibility.
-   */
-  void widgetVisibilityToggled(bool);
-
-  /**
-   * Fired whenever the widgets visibility is updated for whatever reason, be
-   * it because the panel was selected/deselected or the view changed, etc.
-   */
-  void widgetVisibilityUpdated(bool);
-
-  /**
-   * Signals fired when the interactive widget proxy fires the corresponding
-   * events.
-   */
-  void startInteraction();
-  void interaction();
-  void endInteraction();
-
-  void dummySignal();
-
-private Q_SLOTS:
-  /**
-   * This method is called to update the state of Visibility and Enabled
-   * properties on the widget based on the state of isWidgetVisible() and
-   * isSelected().
-   */
-  void updateWidgetVisibility() override;
-
+protected:
   /**
    * Get the internal instance of the widget proxy.
    */

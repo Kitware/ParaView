@@ -63,7 +63,7 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqInteractivePropertyWidgetAbstract : publi
 
 public:
   pqInteractivePropertyWidgetAbstract(const char* widget_smgroup, const char* widget_smname,
-    vtkSMProxy* proxy, vtkSMPropertyGroup* smgroup, QWidget* parent = 0);
+    vtkSMProxy* proxy, vtkSMPropertyGroup* smgroup, QWidget* parent = nullptr);
   ~pqInteractivePropertyWidgetAbstract() override;
 
   /**
@@ -127,9 +127,9 @@ public Q_SLOTS:
   /**
    * Toggle the interactive widget's visibility. This, along with
    * pqPropertyWidget's selected state controls whether the widget proxy is
-   * visible in a view. This should be implemented by children classes.
+   * visible in a view.
    */
-  virtual void setWidgetVisible(bool val) = 0;
+  virtual void setWidgetVisible(bool val);
 
   /**
    * DataSource is used by interactive widgets to determine now to place the
@@ -150,10 +150,11 @@ protected Q_SLOTS:
   void render();
 
   /**
-   * This method is called to update the state of relevant properties on the widget
-   * based on its state. This should be implement by children classes.
+   * This method is called to update the state of Visibility and Enabled
+   * properties on the widget based on the state of isWidgetVisible(),
+   * isSelected() and the active view.
    */
-  virtual void updateWidgetVisibility() = 0;
+  virtual void updateWidgetVisibility();
 
 Q_SIGNALS:
   /**
@@ -168,15 +169,14 @@ Q_SIGNALS:
   void widgetVisibilityUpdated(bool);
 
   //@{
-  /**Renderinteractive widget proxy fires the corresponding
-   * events.
+  /**
+   * Fired by the underlying interactive widget representation proxy, for each
+   * respective events.
    */
   void startInteraction();
   void interaction();
   void endInteraction();
   //@}
-
-  void dummySignal();
 
 protected:
   /**

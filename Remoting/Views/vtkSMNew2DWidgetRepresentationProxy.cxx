@@ -20,6 +20,7 @@
 #include "vtkContextItem.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVSession.h"
+#include "vtkSMContextItemWidgetProxy.h"
 #include "vtkSMProperty.h"
 #include "vtkSMPropertyGroup.h"
 #include "vtkSMPropertyIterator.h"
@@ -32,16 +33,10 @@
 vtkStandardNewMacro(vtkSMNew2DWidgetRepresentationProxy);
 
 //----------------------------------------------------------------------------
-vtkSMNew2DWidgetRepresentationProxy::vtkSMNew2DWidgetRepresentationProxy()
-  : Superclass()
-{
-}
+vtkSMNew2DWidgetRepresentationProxy::vtkSMNew2DWidgetRepresentationProxy() = default;
 
 //----------------------------------------------------------------------------
-vtkSMNew2DWidgetRepresentationProxy::~vtkSMNew2DWidgetRepresentationProxy()
-{
-  this->ContextItemProxy = nullptr;
-}
+vtkSMNew2DWidgetRepresentationProxy::~vtkSMNew2DWidgetRepresentationProxy() = default;
 
 //----------------------------------------------------------------------------
 void vtkSMNew2DWidgetRepresentationProxy::CreateVTKObjects()
@@ -61,8 +56,8 @@ void vtkSMNew2DWidgetRepresentationProxy::CreateVTKObjects()
 
   this->Superclass::CreateVTKObjects();
 
-  // Location 0 is for prototype objects !!! No need to send to the server something.
-  if (!this->ContextItemProxy || this->Location == 0)
+  // Location NONE is for prototype objects ! No need to send to the server something.
+  if (!this->ContextItemProxy || this->Location == vtkPVSession::NONE)
   {
     return;
   }
@@ -87,8 +82,68 @@ void vtkSMNew2DWidgetRepresentationProxy::CreateVTKObjects()
   this->SetupPropertiesLinks();
 }
 
+//-----------------------------------------------------------------------------
+void vtkSMNew2DWidgetRepresentationProxy::ExecuteEvent(unsigned long event)
+{
+  this->InvokeEvent(event);
+
+  vtkSMContextItemWidgetProxy* widgetProxy =
+    vtkSMContextItemWidgetProxy::SafeDownCast(this->ContextItemProxy);
+
+  if (event == vtkCommand::StartInteractionEvent)
+  {
+    this->ContextItemProxy->UpdatePropertyInformation();
+    this->UpdateVTKObjects();
+
+    if (widgetProxy)
+    {
+      widgetProxy->OnStartInteraction();
+    }
+  }
+  else if (event == vtkCommand::InteractionEvent)
+  {
+    this->ContextItemProxy->UpdatePropertyInformation();
+    this->UpdateVTKObjects();
+
+    if (widgetProxy)
+    {
+      widgetProxy->OnInteraction();
+    }
+  }
+  else if (event == vtkCommand::EndInteractionEvent)
+  {
+    this->ContextItemProxy->UpdatePropertyInformation();
+    this->UpdateVTKObjects();
+
+    if (widgetProxy)
+    {
+      widgetProxy->OnEndInteraction();
+    }
+  }
+}
+
 //----------------------------------------------------------------------------
 void vtkSMNew2DWidgetRepresentationProxy::PrintSelf(std::ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
+  os << indent << "ContextItem:";
+  if (this->ContextItem)
+  {
+    os << std::endl;
+    this->ContextItem->PrintSelf(os, indent.GetNextIndent());
+  }
+  else
+  {
+    os << "nullptr" << std::endl;
+  }
+  os << indent << "ContextItemProxy:";
+  if (this->ContextItemProxy)
+  {
+    os << std::endl;
+    this->ContextItemProxy->PrintSelf(os, indent.GetNextIndent());
+  }
+  else
+  {
+    os << "nullptr" << std::endl;
+  }
 }

@@ -140,6 +140,7 @@ set(classes
   vtkSMComparativeAnimationCueUndoElement
   vtkSMComparativeViewProxy
   vtkSMContextViewProxy
+  vtkSMContextItemWidgetProxy
   vtkSMDataDeliveryManagerProxy
   vtkSMDisplaySizedImplicitPlaneRepresentationProxy
   vtkSMImageExtractWriterProxy

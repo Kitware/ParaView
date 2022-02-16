@@ -1,9 +1,9 @@
-**Add the ability to adding interactive 2D widgets from ParaView**
+**Interactive 2D widgets and the equalizer filter**
 
- - add the ability to adding interactive 2D widgets
- - add Equalizer filter with interactive 2d widget as example
+ParaView now has the needed code base to support interactive widgets in context views such as the Line Chart View.
+One of the first filter using this feature is the equalizer filter.
 
-Here is an example of using vtkEqualizerFilter and vtkEqualizerContextItem.
+Here is an example of what you can do using the equalizer filter in ParaView
 
 Source data:
 ![Equalizer filter and Interactive 2D](interactive_2d_before.png  "Equalizer filter")
@@ -11,5 +11,5 @@ Source data:
 After applying the filter:
 ![Equalizer filter and Interactive 2D](interactive_2d_after.png  "Equalizer filter")
 
-See the suggestions posted here:
-[Discussion](https://discourse.paraview.org/t/is-there-any-abilities-to-add-a-interactive-widgets-on-linechartview-same-as-3d-widgets-on-renderview/2273)
+This proposition was first discussed on discourse and implemented by the community, then fully integrated by Kitware.
+See the [discourse thread](https://discourse.paraview.org/t/is-there-any-abilities-to-add-a-interactive-widgets-on-linechartview-same-as-3d-widgets-on-renderview/2273).

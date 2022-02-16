@@ -15,11 +15,11 @@
 #ifndef vtk2DWidgetRepresentation_h
 #define vtk2DWidgetRepresentation_h
 
+#include "vtkContextItem.h" // needed for vtkWeakPOinter<vtkContextItem>
 #include "vtkDataRepresentation.h"
-#include "vtkRemotingViewsModule.h" //needed for exports
-#include "vtkWeakPointer.h"
+#include "vtkRemotingViewsModule.h" // needed for exports
+#include "vtkWeakPointer.h"         // needed for WeakPointer
 
-class vtkContextItem;
 class vtkPVContextView;
 
 /**
@@ -27,7 +27,7 @@ class vtkPVContextView;
  *
  * vtk2DWidgetRepresentation is a vtkDataRepresentation subclass for 2D widgets
  * and their representations. It makes it possible to add 2D widgets to
- * vtkPVContextView.
+ * vtkPVContextView. This class does not hold the memory of its context item.
  */
 
 class VTKREMOTINGVIEWS_EXPORT vtk2DWidgetRepresentation : public vtkDataRepresentation
@@ -41,8 +41,8 @@ public:
   /**
    * Get/Set the representation.
    */
-  void SetContextItem(vtkContextItem*);
-  vtkGetObjectMacro(ContextItem, vtkContextItem);
+  vtkSetMacro(ContextItem, vtkContextItem*);
+  virtual vtkContextItem* GetContextItem() const { return this->ContextItem; };
   //@}
 
   //@{
@@ -66,23 +66,19 @@ protected:
   bool AddToView(vtkView* view) override;
 
   /**
-   * Removes the representation to the view.  This is called from
+   * Removes the representation from the view.  This is called from
    * vtkView::RemoveRepresentation().  Subclasses should override this method.
    * Returns true if the removal succeeds.
    */
   bool RemoveFromView(vtkView* view) override;
 
-  void OnContextItemModified();
-
-  vtkContextItem* ContextItem;
-  bool Enabled;
+  vtkWeakPointer<vtkContextItem> ContextItem;
   vtkWeakPointer<vtkPVContextView> View;
+  bool Enabled = false;
 
 private:
   vtk2DWidgetRepresentation(const vtk2DWidgetRepresentation&) = delete;
   void operator=(const vtk2DWidgetRepresentation&) = delete;
-
-  unsigned long ObserverTag;
 };
 
 #endif
