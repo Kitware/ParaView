@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqSpreadSheetViewSelectionModel.h
+   Module:  pqSpreadSheetViewSelectionModel.h
 
    Copyright (c) 2005-2008 Sandia Corporation, Kitware Inc.
    All rights reserved.

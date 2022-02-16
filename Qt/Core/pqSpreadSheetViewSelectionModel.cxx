@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqSpreadSheetViewSelectionModel.cxx
+   Module:  pqSpreadSheetViewSelectionModel.cxx
 
    Copyright (c) 2005-2008 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -35,11 +35,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVDataInformation.h"
 #include "vtkProcessModule.h"
 #include "vtkSMPropertyHelper.h"
+#include "vtkSMSelectionHelper.h"
 #include "vtkSMSessionProxyManager.h"
 #include "vtkSMSourceProxy.h"
 #include "vtkSMTrace.h"
 #include "vtkSMVectorProperty.h"
-#include "vtkSelection.h"
 #include "vtkSelectionNode.h"
 
 // Qt Includes.
@@ -137,19 +137,18 @@ void pqSpreadSheetViewSelectionModel::select(
     return;
   }
 
-  // Update VTK Selection.
-  // * Obtain the currently set sel on the selected source (if none, a
-  //    new one is created).
-  // * We then update the ids selected on the
-  vtkSmartPointer<vtkSMSourceProxy> selSource;
-  selSource.TakeReference(this->getSelectionSource());
-  if (!selSource)
+  // Obtain the currently set (or create a new one) append selections with its selection source
+  // We then update the ids selected on the selection source
+  vtkSmartPointer<vtkSMSourceProxy> appendSelections;
+  appendSelections.TakeReference(this->getSelectionSource());
+  if (!appendSelections)
   {
     Q_EMIT this->selection(nullptr);
     return;
   }
 
-  vtkSMVectorProperty* vp = vtkSMVectorProperty::SafeDownCast(selSource->GetProperty("IDs"));
+  auto selectionSource = vtkSMPropertyHelper(appendSelections, "Input").GetAsProxy(0);
+  vtkSMVectorProperty* vp = vtkSMVectorProperty::SafeDownCast(selectionSource->GetProperty("IDs"));
   QList<QVariant> ids = pqSMAdaptor::getMultipleElementProperty(vp);
   int numElementsPerCommand = vp->GetNumberOfElementsPerCommand();
   if (command & QItemSelectionModel::Clear)
@@ -217,15 +216,15 @@ void pqSpreadSheetViewSelectionModel::select(
 
   if (ids.empty())
   {
-    selSource = nullptr;
+    appendSelections = nullptr;
   }
   else
   {
     pqSMAdaptor::setMultipleElementProperty(vp, ids);
-    selSource->UpdateVTKObjects();
+    selectionSource->UpdateVTKObjects();
 
     // Map from selection source proxy name to trace function
-    std::string functionName(selSource->GetXMLName());
+    std::string functionName(selectionSource->GetXMLName());
     functionName.erase(functionName.size() - sizeof("SelectionSource") + 1);
     functionName.append("s");
     functionName.insert(0, "Select");
@@ -233,12 +232,12 @@ void pqSpreadSheetViewSelectionModel::select(
     // Trace the selection
     SM_SCOPED_TRACE(CallFunction)
       .arg(functionName.c_str())
-      .arg("IDs", vtkSMPropertyHelper(selSource, "IDs").GetIntArray())
-      .arg("FieldType", vtkSMPropertyHelper(selSource, "FieldType").GetAsInt())
-      .arg("ContainingCells", vtkSMPropertyHelper(selSource, "ContainingCells").GetAsInt());
+      .arg("IDs", vtkSMPropertyHelper(selectionSource, "IDs").GetIntArray())
+      .arg("FieldType", vtkSMPropertyHelper(selectionSource, "FieldType").GetAsInt())
+      .arg("ContainingCells", vtkSMPropertyHelper(selectionSource, "ContainingCells").GetAsInt());
   }
 
-  Q_EMIT this->selection(selSource);
+  Q_EMIT this->selection(appendSelections);
 }
 
 //-----------------------------------------------------------------------------
@@ -247,35 +246,35 @@ void pqSpreadSheetViewSelectionModel::select(
 // model, we create a new selection.
 vtkSMSourceProxy* pqSpreadSheetViewSelectionModel::getSelectionSource()
 {
-  pqDataRepresentation* repr = this->Internal->Model->activeRepresentation();
+  pqDataRepresentation* repr = this->Model->activeRepresentation();
   if (!repr)
   {
     return nullptr;
   }
 
-  // Convert field_type to selection field type if convert-able.
-  int field_type = this->Internal->Model->getFieldType();
-  int selection_field_type = -1;
-  switch (field_type)
+  // Convert fieldType to selection field type if convert-able.
+  int fieldType = this->Model->getFieldType();
+  int selectionFieldType = -1;
+  switch (fieldType)
   {
     case vtkDataObject::FIELD_ASSOCIATION_POINTS:
-      selection_field_type = vtkSelectionNode::POINT;
+      selectionFieldType = vtkSelectionNode::POINT;
       break;
 
     case vtkDataObject::FIELD_ASSOCIATION_CELLS:
-      selection_field_type = vtkSelectionNode::CELL;
+      selectionFieldType = vtkSelectionNode::CELL;
       break;
 
     case vtkDataObject::FIELD_ASSOCIATION_VERTICES:
-      selection_field_type = vtkSelectionNode::VERTEX;
+      selectionFieldType = vtkSelectionNode::VERTEX;
       break;
 
     case vtkDataObject::FIELD_ASSOCIATION_EDGES:
-      selection_field_type = vtkSelectionNode::EDGE;
+      selectionFieldType = vtkSelectionNode::EDGE;
       break;
 
     case vtkDataObject::FIELD_ASSOCIATION_ROWS:
-      selection_field_type = vtkSelectionNode::ROW;
+      selectionFieldType = vtkSelectionNode::ROW;
       break;
 
     default:
@@ -283,13 +282,9 @@ vtkSMSourceProxy* pqSpreadSheetViewSelectionModel::getSelectionSource()
   }
 
   pqOutputPort* opport = repr->getOutputPortFromInput();
-  vtkSMSourceProxy* selsource = opport->getSelectionInput();
+  vtkSMSourceProxy* appendSelections = opport->getSelectionInput();
 
-  // We may be able to simply update the currently existing selection, if any.
-  bool updatable = (selsource != nullptr);
-
-  // Determine what selection proxy name we want. If the name differs then not
-  // updatable.
+  // Determine what selection proxy name we want.
   const char* proxyname = "IDSelectionSource";
   vtkPVDataInformation* dinfo = opport->getDataInformation();
   if (dinfo->IsCompositeDataSet())
@@ -297,30 +292,34 @@ vtkSMSourceProxy* pqSpreadSheetViewSelectionModel::getSelectionSource()
     proxyname = "CompositeDataIDSelectionSource";
   }
 
-  if (updatable && strcmp(selsource->GetXMLName(), proxyname) != 0)
+  // We may be able to simply update the currently existing selection.
+  bool updatable = false;
+  if (appendSelections != nullptr &&
+    vtkSMPropertyHelper(appendSelections, "Input").GetNumberOfElements() == 1)
   {
-    updatable = false;
-  }
-
-  // If field types differ, not updatable.
-  if (updatable &&
-    pqSMAdaptor::getElementProperty(selsource->GetProperty("FieldType")).toInt() !=
-      selection_field_type)
-  {
-    updatable = false;
+    auto selectionSource = vtkSMPropertyHelper(appendSelections, "Input").GetAsProxy(0);
+    updatable = strcmp(selectionSource->GetXMLName(), proxyname) == 0 &&
+      pqSMAdaptor::getElementProperty(selectionSource->GetProperty("FieldType")).toInt() ==
+        selectionFieldType;
   }
 
   if (updatable)
   {
-    selsource->Register(nullptr);
+    appendSelections->Register(nullptr);
   }
   else
   {
+    // create a new selection source
     vtkSMSessionProxyManager* pxm = repr->proxyManager();
-    selsource = vtkSMSourceProxy::SafeDownCast(pxm->NewProxy("sources", proxyname));
-    pqSMAdaptor::setElementProperty(selsource->GetProperty("FieldType"), selection_field_type);
-    selsource->UpdateVTKObjects();
+    vtkSmartPointer<vtkSMSourceProxy> selectionSource;
+    selectionSource.TakeReference(
+      vtkSMSourceProxy::SafeDownCast(pxm->NewProxy("sources", proxyname)));
+    pqSMAdaptor::setElementProperty(selectionSource->GetProperty("FieldType"), selectionFieldType);
+    selectionSource->UpdateVTKObjects();
+    // create a new append Selections filter and append the selection source
+    appendSelections = vtkSMSourceProxy::SafeDownCast(
+      vtkSMSelectionHelper::NewAppendSelectionsFromSelectionSource(selectionSource));
   }
 
-  return selsource;
+  return appendSelections;
 }

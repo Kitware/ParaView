@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    $RCSfile$
+   Module:  pqPipelineContextMenuBehavior.cxx
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -34,12 +34,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqActiveObjects.h"
 #include "pqContextMenuInterface.h"
 #include "pqDefaultContextMenu.h"
-#include "pqEditColorMapReaction.h"
 #include "pqInterfaceTracker.h"
 #include "pqPVApplicationCore.h"
 #include "pqRenderView.h"
-#include "pqSelectionManager.h"
 #include "pqServerManagerModel.h"
+
 #include "vtkDataAssemblyUtilities.h"
 #include "vtkPVDataInformation.h"
 #include "vtkSMIdTypeVectorProperty.h"
@@ -48,26 +47,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMStringVectorProperty.h"
 #include "vtksys/SystemTools.hxx"
 
-#include <QAction>
 #include <QApplication>
 #include <QMenu>
 #include <QMouseEvent>
-#include <QtDebug>
-
-#include <tuple>
 
 namespace
 {
-/**
- * Returns true if the selection source is a block selection producer.
- */
-bool isBlockSelection(vtkSMSourceProxy* source)
-{
-  return (source &&
-    (strcmp(source->GetXMLName(), "BlockSelectorsSelectionSource") == 0 ||
-      strcmp(source->GetXMLName(), "BlockSelectionSource") == 0));
-}
-
+//-----------------------------------------------------------------------------
 std::pair<QList<unsigned int>, QStringList> getSelectedBlocks(
   pqDataRepresentation* repr, unsigned int blockIndex, int rank)
 {
@@ -80,10 +66,50 @@ std::pair<QList<unsigned int>, QStringList> getSelectedBlocks(
 
   QList<unsigned int> legacyPickedBlocks;
   QStringList pickedSelectors;
-  if (!isBlockSelection(producerPort->getSelectionInput()))
+
+  auto appendSelections = producerPort->getSelectionInput();
+  bool blockSelectionDetected = false;
+  unsigned int numInputs =
+    appendSelections ? vtkSMPropertyHelper(appendSelections, "Input").GetNumberOfElements() : 0;
+  for (unsigned int i = 0; i < numInputs; ++i)
   {
-    // If active selection is not block selection, the blocks will be simply the
-    // one the user clicked on.
+    auto selectionSource =
+      vtkSMSourceProxy::SafeDownCast(vtkSMPropertyHelper(appendSelections, "Input").GetAsProxy(i));
+    // if actively selected data a block-type of selection, then we show properties
+    // for the selected set of blocks.
+    if (strcmp(selectionSource->GetXMLName(), "BlockSelectorsSelectionSource") == 0)
+    {
+      auto svp =
+        vtkSMStringVectorProperty::SafeDownCast(selectionSource->GetProperty("BlockSelectors"));
+      const auto& elements = svp->GetElements();
+      std::transform(elements.begin(), elements.end(), std::back_inserter(pickedSelectors),
+        [](const std::string& str) { return QString::fromStdString(str); });
+
+      // convert selectors to ids (should we do this only for MBs, since it's
+      // going to be incorrect for PDCs or PDCs in parallel?
+      auto ids =
+        vtkDataAssemblyUtilities::GetSelectedCompositeIds(elements, dataInfo->GetHierarchy());
+      std::copy(ids.begin(), ids.end(), std::back_inserter(legacyPickedBlocks));
+      blockSelectionDetected = true;
+    }
+    else if (strcmp(selectionSource->GetXMLName(), "BlockSelectionSource") == 0)
+    {
+      auto idvp = vtkSMIdTypeVectorProperty::SafeDownCast(selectionSource->GetProperty("Blocks"));
+      const auto& elements = idvp->GetElements();
+      std::copy(elements.begin(), elements.end(), std::back_inserter(legacyPickedBlocks));
+
+      // convert ids to selectors; should we only do this for PDCs?
+      const auto selectors = vtkDataAssemblyUtilities::GetSelectorsForCompositeIds(
+        std::vector<unsigned int>(elements.begin(), elements.end()), dataInfo->GetHierarchy());
+      std::transform(selectors.begin(), selectors.end(), std::back_inserter(pickedSelectors),
+        [](const std::string& str) { return QString::fromStdString(str); });
+      blockSelectionDetected = true;
+    }
+  }
+  // If no active selection or no block selection detected, the blocks will be simply the
+  // one the user clicked on.
+  if (!blockSelectionDetected)
+  {
     legacyPickedBlocks.push_back(blockIndex);
     auto rankDataInfo = producerPort->getRankDataInformation(rank);
     auto selector =
@@ -92,47 +118,9 @@ std::pair<QList<unsigned int>, QStringList> getSelectedBlocks(
     {
       pickedSelectors.push_back(QString::fromStdString(selector));
     }
-    return std::make_pair(legacyPickedBlocks, pickedSelectors);
   }
-
-  // if actively selected data a block-type of selection, then we show properties
-  // for the selected set of blocks.
-  auto selectionProducer = producerPort->getSelectionInput();
-  if (strcmp(selectionProducer->GetXMLName(), "BlockSelectorsSelectionSource") == 0)
-  {
-    auto svp =
-      vtkSMStringVectorProperty::SafeDownCast(selectionProducer->GetProperty("BlockSelectors"));
-    const auto& elements = svp->GetElements();
-    std::transform(elements.begin(), elements.end(), std::back_inserter(pickedSelectors),
-      [](const std::string& str) { return QString::fromStdString(str); });
-
-    // convert selectors to ids (should we do this only for MBs, since it's
-    // going to be incorrect for PDCs or PDCs in parallel?
-    auto ids =
-      vtkDataAssemblyUtilities::GetSelectedCompositeIds(elements, dataInfo->GetHierarchy());
-    std::copy(ids.begin(), ids.end(), std::back_inserter(legacyPickedBlocks));
-  }
-  else if (strcmp(selectionProducer->GetXMLName(), "BlockSelectionSource") == 0)
-  {
-    auto idvp = vtkSMIdTypeVectorProperty::SafeDownCast(selectionProducer->GetProperty("Blocks"));
-    const auto& elements = idvp->GetElements();
-    std::copy(elements.begin(), elements.end(), std::back_inserter(legacyPickedBlocks));
-
-    // convert ids to selectors; should we only do this for PDCs?
-    const auto selectors = vtkDataAssemblyUtilities::GetSelectorsForCompositeIds(
-      std::vector<unsigned int>(elements.begin(), elements.end()), dataInfo->GetHierarchy());
-    std::transform(selectors.begin(), selectors.end(), std::back_inserter(pickedSelectors),
-      [](const std::string& str) { return QString::fromStdString(str); });
-  }
-  else
-  {
-    // should never happen!
-    qCritical() << "Unexpected selectionProducer: " << selectionProducer->GetXMLName();
-  }
-
   return std::make_pair(legacyPickedBlocks, pickedSelectors);
 }
-
 } // end of namespace {}
 
 //-----------------------------------------------------------------------------

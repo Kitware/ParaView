@@ -62,7 +62,6 @@
 #include "vtkTransform.h"
 
 #include <cassert>
-#include <map>
 
 vtkStandardNewMacro(vtkSMRenderViewProxy);
 //----------------------------------------------------------------------------
@@ -656,8 +655,8 @@ vtkSMRepresentationProxy* vtkSMRenderViewProxy::PickBlock(
   rank = 0;
 
   vtkSMRepresentationProxy* repr = nullptr;
-  vtkSmartPointer<vtkCollection> reprs = vtkSmartPointer<vtkCollection>::New();
-  vtkSmartPointer<vtkCollection> sources = vtkSmartPointer<vtkCollection>::New();
+  vtkNew<vtkCollection> reprs;
+  vtkNew<vtkCollection> sources;
   int region[4] = { x, y, x, y };
   if (this->SelectSurfaceCells(region, reprs, sources, false))
   {
@@ -677,10 +676,11 @@ vtkSMRepresentationProxy* vtkSMRenderViewProxy::PickBlock(
   auto input = vtkSMPropertyHelper(repr, "Input", /*quiet*/ true).GetAsOutputPort();
   auto info = input ? input->GetDataInformation() : nullptr;
 
-  // get selection in order to determine which block of the data set
-  // set was selected (if it is a composite data set)
+  // get selection in order to determine which block of the dataset
+  // was selected (if it is a composite data set)
   if (info && info->IsCompositeDataSet())
   {
+    // selection Source is NOT an appendSelections filter, so we can continue as usual
     auto selectionSource = vtkSMProxy::SafeDownCast(sources->GetItemAsObject(0));
 
     // since SelectSurfaceCells can ever only return a
@@ -1077,7 +1077,7 @@ bool vtkSMRenderViewProxy::SelectFrustumInternal(const int region[4],
   selectionSource->UpdateVTKObjects();
 
   // 2) Figure out which representation is "selected".
-  vtkExtractSelectedFrustum* extractor = vtkExtractSelectedFrustum::New();
+  vtkNew<vtkExtractSelectedFrustum> extractor;
   extractor->CreateFrustum(frustum);
 
   // Now we just use the first selected representation,
@@ -1117,7 +1117,6 @@ bool vtkSMRenderViewProxy::SelectFrustumInternal(const int region[4],
     }
   }
 
-  extractor->Delete();
   selectionSource->Delete();
   return true;
 }

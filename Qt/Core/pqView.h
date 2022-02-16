@@ -193,12 +193,6 @@ public: // NOLINT(readability-redundant-access-specifiers)
    */
   bool canDisplay(pqOutputPort* opPort) const;
 
-  /**
-   * Called when a selection is made, passing in the mode as the sole
-   * argument.
-   */
-  virtual void emitSelectionSignals(bool frustum);
-
 Q_SIGNALS:
   /**
    * Fired when the vtkSMViewProxy fires the vtkCommand::UpdateDataEvent
@@ -253,12 +247,6 @@ Q_SIGNALS:
    *    have been initialized to a selection source.
    */
   void selected(pqOutputPort* opport);
-
-  /**
-   * Fired when the selection changes.
-   * \c frustum is a boolean indicating whether the selection is frustum-based.
-   */
-  void selectionModeChanged(bool frustum);
 
   /**
    * Fired when a port is picked.

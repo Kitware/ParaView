@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqRenderView.h
+   Module:  pqRenderView.h
 
    Copyright (c) 2005-2008 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -216,8 +216,10 @@ public:
    * Creates a new frustum selection given the rectangle in display
    * coordinates.
    */
-  virtual void selectFrustumCells(int rectangle[4]);
-  virtual void selectFrustumPoints(int rectangle[4]);
+  virtual void selectFrustumCells(
+    int rectangle[4], int selectionModifier = pqView::PV_SELECTION_DEFAULT);
+  virtual void selectFrustumPoints(
+    int rectangle[4], int selectionModifier = pqView::PV_SELECTION_DEFAULT);
   ///@}
 
   /**

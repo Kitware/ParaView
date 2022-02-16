@@ -2903,6 +2903,8 @@ def __determineGroup(proxy):
     xmlname = proxy.GetXMLName()
     if xmlgroup == "sources":
         if xmlname in ["BlockSelectionSource",
+                       "BlockSelectorsSelectionSource",
+                       "SelectionQuerySource",
                        "FrustumSelectionSource",
                        "GlobalIDSelectionSource",
                        "PedigreeIDSelectionSource",
@@ -2914,6 +2916,8 @@ def __determineGroup(proxy):
             return "selection_sources"
         return "sources"
     elif xmlgroup == "filters":
+        if xmlname == "AppendSelections":
+            return "selection_sources"
         return "sources"
     elif xmlgroup == "representations":
         if xmlname == "ScalarBarWidgetRepresentation":

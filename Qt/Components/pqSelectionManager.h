@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqSelectionManager.h
+   Module:  pqSelectionManager.h
 
    Copyright (c) 2005-2008 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -47,7 +47,6 @@ class pqServerManagerModelItem;
 class pqView;
 class vtkDataObject;
 class vtkSelection;
-class vtkSMClientDeliveryRepresentationProxy;
 class vtkSMProxy;
 class vtkSMSession;
 class vtkSMSourceProxy;

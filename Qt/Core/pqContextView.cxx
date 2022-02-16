@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqContextView.cxx
+   Module:  pqContextView.cxx
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -33,13 +33,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqDataRepresentation.h"
 #include "pqEventDispatcher.h"
-#include "pqImageUtil.h"
 #include "pqOutputPort.h"
 #include "pqPipelineSource.h"
 #include "pqQVTKWidget.h"
 #include "pqSMAdaptor.h"
 #include "pqServer.h"
 #include "pqUndoStack.h"
+
 #include "vtkAnnotationLink.h"
 #include "vtkChartXY.h"
 #include "vtkCommand.h"
@@ -52,7 +52,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVDataInformation.h"
 #include "vtkPVXMLElement.h"
 #include "vtkProcessModule.h"
-#include "vtkRenderWindow.h"
 #include "vtkSMContextViewProxy.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMSelectionHelper.h"
@@ -60,13 +59,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMTrace.h"
 #include "vtkSelection.h"
 #include "vtkSelectionNode.h"
-#include "vtkVariant.h"
 #include <vtksys/SystemTools.hxx>
 
 #include <QDebug>
 #include <QList>
 #include <QPointer>
-#include <QVariant>
 
 #include <cassert>
 
@@ -92,13 +89,11 @@ private:
 class pqContextView::pqInternal
 {
 public:
-  bool InitializedAfterObjectsCreated;
   int SelectionAction;
 
   pqInternal()
+    : SelectionAction(vtkChart::SELECT_RECTANGLE)
   {
-    this->InitializedAfterObjectsCreated = false;
-    this->SelectionAction = vtkChart::SELECT_RECTANGLE;
   }
   ~pqInternal() = default;
 
@@ -219,17 +214,20 @@ void pqContextView::setSelection(vtkSelection* sel)
 
   repSource->CleanSelectionInputs(opPort->getPortNumber());
 
-  vtkSMProxy* selectionSource =
-    vtkSMSelectionHelper::NewSelectionSourceFromSelection(repSource->GetSession(), sel);
+  vtkSmartPointer<vtkSMSourceProxy> selectionSource;
+  selectionSource.TakeReference(vtkSMSourceProxy::SafeDownCast(
+    vtkSMSelectionHelper::NewSelectionSourceFromSelection(repSource->GetSession(), sel)));
 
   // If not selection has been made,
   // the selection source can be null.
   if (selectionSource)
   {
+    // create a new append Selections filter and append the selection source
+    vtkSmartPointer<vtkSMSourceProxy> appendSelections;
+    appendSelections.TakeReference(vtkSMSourceProxy::SafeDownCast(
+      vtkSMSelectionHelper::NewAppendSelectionsFromSelectionSource(selectionSource)));
     // Set the selection on the representation's source
-    repSource->SetSelectionInput(
-      opPort->getPortNumber(), vtkSMSourceProxy::SafeDownCast(selectionSource), 0);
-    selectionSource->Delete();
+    repSource->SetSelectionInput(opPort->getPortNumber(), appendSelections, 0);
 
     // Trace the selection
     if (strcmp(selectionSource->GetXMLName(), "ThresholdSelectionSource") == 0)
