@@ -525,7 +525,7 @@ void pqFileDialog::onContextMenuRequested(const QPoint& menuPos)
 {
   auto& impl = *this->Implementation;
 
-  QMenu menu;
+  QMenu menu(this); // Make sure to set the parent to `this` to solve #20981
   menu.setObjectName("FileDialogContextMenu");
 
   QModelIndex proxyItemIndex = this->Implementation->Ui.Files->indexAt(menuPos).siblingAtColumn(0);
