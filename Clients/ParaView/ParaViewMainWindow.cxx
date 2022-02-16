@@ -47,9 +47,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqSettings.h"
 #include "pqTimer.h"
 #include "pqWelcomeDialog.h"
+
 #include "vtkCommand.h"
 #include "vtkPVGeneralSettings.h"
-#include "vtkProcessModule.h"
 #include "vtkRemotingCoreConfiguration.h"
 #include "vtkSMSettings.h"
 #include "vtksys/SystemTools.hxx"
@@ -60,7 +60,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endif
 
 #include <QDragEnterEvent>
-#include <QDropEvent>
 #include <QMessageBox>
 #include <QTextCodec>
 #include <QtDebug>
@@ -172,6 +171,7 @@ ParaViewMainWindow::ParaViewMainWindow()
   this->Internals->colorMapEditorDock->hide();
   this->Internals->timeInspectorDock->hide();
   this->Internals->lightInspectorDock->hide();
+  this->Internals->selectionEditorDock->hide();
 
   this->tabifyDockWidget(this->Internals->animationViewDock, this->Internals->statisticsDock);
   this->tabifyDockWidget(this->Internals->animationViewDock, this->Internals->outputWidgetDock);
