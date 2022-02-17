@@ -13,6 +13,7 @@ DEPENDS
   VTK::CommonExecutionModel
 PRIVATE_DEPENDS
   ParaView::vtkcatalyst
+  VTK::FiltersCore
 TEST_DEPENDS
   ParaView::vtkcatalyst
   VTK::TestingCore

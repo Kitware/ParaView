@@ -101,6 +101,8 @@ invocation.
   0.0 is assumed.
 * catalyst/state/parameters: (optional) list of optional runtime parameters. If present,
   they must be of type 'list' with each child node of type 'string'.
+* catalyst/state/multiblock: (optional) integral value. When present and set to 1,
+  output will be a legacy vtkMultiBlockDataSet.
 
 **channels**: channels are used to communicate simulation data. The **channels**
 node can have one or more children, each corresponding to a named channel. A
@@ -138,6 +140,7 @@ The 'channel' protocol is as follows:
 * channel/state/time: (optional) if present, overrides catalyst/state/time for this channel
   a channel will default to using the catalyst/state/ values for these parameters for each
   channel/state parameter not specified.
+* channel/state/multiblock: (optional) if present, overrides catalyst/state/multiblock for this channel
 
 ### protocol: 'finalize'
 
