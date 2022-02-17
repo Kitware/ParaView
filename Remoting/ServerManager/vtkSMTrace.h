@@ -191,6 +191,7 @@ public:
     TraceItemArgs& arg(int val);
     TraceItemArgs& arg(double val);
     TraceItemArgs& arg(bool val);
+    TraceItemArgs& arg(const std::vector<std::string>& val);
 
   private:
     TraceItemArgs(const TraceItemArgs&);

@@ -21,194 +21,23 @@
 #include "pqPipelineSource.h"
 #include "pqServer.h"
 #include "pqServerManagerModel.h"
+#include "pqServerManagerModelItem.h"
 
 #include "vtkCollection.h"
 #include "vtkNew.h"
 #include "vtkPVXMLElement.h"
-#include "vtkSMArraySelectionDomain.h"
-#include "vtkSMInputProperty.h"
-#include "vtkSMParaViewPipelineController.h"
-#include "vtkSMPropertyHelper.h"
-#include "vtkSMPropertyIterator.h"
-#include "vtkSMProxy.h"
-#include "vtkSMProxyManager.h"
-#include "vtkSMProxyProperty.h"
-#include "vtkSMSessionProxyManager.h"
+#include "vtkSMCoreUtilities.h"
 #include "vtkSMSourceProxy.h"
 #include "vtkSMStringVectorProperty.h"
-#include "vtkSMViewProxy.h"
+#include "vtkSMTrace.h"
 #include <vtksys/SystemTools.hxx>
 
 #include <QInputDialog>
 
+#include <algorithm>
 #include <string>
 #include <unordered_map>
 #include <vector>
-
-namespace
-{
-//-----------------------------------------------------------------------------
-void CreateReader(vtkSMSourceProxy* proxy, const QStringList& files, const char* propName)
-{
-  auto newProxy = vtkSmartPointer<vtkSMSourceProxy>::Take(vtkSMSourceProxy::SafeDownCast(
-    vtkSMProxyManager::GetProxyManager()->GetActiveSessionProxyManager()->NewProxy(
-      proxy->GetXMLGroup(), proxy->GetXMLName())));
-  auto fileNameProp = vtkSMStringVectorProperty::SafeDownCast(proxy->GetProperty(propName));
-  auto newFileNameProp = vtkSMStringVectorProperty::SafeDownCast(newProxy->GetProperty(propName));
-
-  std::set<std::string> fileNames;
-  for (unsigned int fileId = 0; fileId < fileNameProp->GetNumberOfElements(); ++fileId)
-  {
-    fileNames.insert(std::string(fileNameProp->GetElement(fileId)));
-  }
-
-  unsigned int numberOfCommonFiles = 0;
-  for (const QString& file : files)
-  {
-    numberOfCommonFiles += static_cast<unsigned int>(fileNames.count(file.toStdString()));
-  }
-
-  if (numberOfCommonFiles == fileNameProp->GetNumberOfElements())
-  {
-    // No need to create a new reader, the user just selected the same set of files.
-    return;
-  }
-
-  vtkNew<vtkSMParaViewPipelineController> controller;
-  controller->PreInitializeProxy(newProxy);
-
-  for (const QString& file : files)
-  {
-    newFileNameProp->SetElement(0, file.toStdString().c_str());
-  }
-
-  newProxy->UpdateVTKObjects();
-  controller->PostInitializeProxy(newProxy);
-
-  // We want to copy properties from the old proxy to the new proxy.  We have to handle array
-  // names very carefully:
-  // We create a lookup from array name to its state ("1" or "0" depending of if it is checked).
-  // Then, we iterate on the new proxy, and for any array that was already present in the old proxy,
-  // we copy its state.
-  // This is only valid for properties that have a vtkSMArraySelectionDomain.
-  // For other properties, we blindly copy what once was.
-  std::unordered_map<std::string, std::unordered_map<std::string, std::string>> arraySelectionState;
-
-  // Creating the lookup
-  {
-    auto iter = vtkSmartPointer<vtkSMPropertyIterator>::Take(proxy->NewPropertyIterator());
-    for (iter->Begin(); !iter->IsAtEnd(); iter->Next())
-    {
-      if (auto prop = vtkSMStringVectorProperty::SafeDownCast(iter->GetProperty()))
-      {
-        // We only want to copy array selections, which shall have 2 elements per command
-        // and have a pattern [str int] for each command.
-        if (prop->FindDomain<vtkSMArraySelectionDomain>() &&
-          prop->GetNumberOfElementsPerCommand() == 2 && prop->GetElementType(0) == 2 &&
-          prop->GetElementType(1) == 0)
-        {
-          const std::vector<std::string>& elements = prop->GetElements();
-          auto& selection = arraySelectionState[std::string(iter->GetKey())];
-          for (int elementId = 0; elementId < static_cast<int>(elements.size()); elementId += 2)
-          {
-            // inserting elements of style { "name", "0" }  or { "name", "1" }
-            selection[elements[elementId]] = elements[elementId + 1];
-          }
-        }
-      }
-    }
-  }
-
-  // Copying
-  {
-    auto iter = vtkSmartPointer<vtkSMPropertyIterator>::Take(newProxy->NewPropertyIterator());
-    for (iter->Begin(); !iter->IsAtEnd(); iter->Next())
-    {
-      const char* key = iter->GetKey();
-      vtkSMProperty* newProp = iter->GetProperty();
-      if (newProp)
-      {
-        if (strcmp(key, propName) != 0)
-        {
-          if (vtkSMProperty* prop = proxy->GetProperty(key))
-          {
-            auto newPropStr = vtkSMStringVectorProperty::SafeDownCast(newProp);
-
-            // For properties holding arrays, we copy the previous state as much as we can
-            if (newPropStr && newPropStr->FindDomain<vtkSMArraySelectionDomain>() &&
-              newPropStr->GetNumberOfElementsPerCommand() == 2 &&
-              newPropStr->GetElementType(0) == 2 && newPropStr->GetElementType(1) == 0)
-            {
-              const std::vector<std::string>& elements = newPropStr->GetElements();
-              const auto& selection = arraySelectionState.at(std::string(key));
-              for (int elementId = 0; elementId < static_cast<int>(elements.size()); elementId += 2)
-              {
-                auto it = selection.find(elements[elementId]);
-                if (it != selection.end())
-                {
-                  newPropStr->SetElement(elementId + 1, it->second.c_str());
-                }
-              }
-            }
-            // For other properties, we just copy
-            else if (!vtkSMProxyProperty::SafeDownCast(newProp))
-            {
-              newProp->Copy(prop);
-            }
-          }
-        }
-      }
-    }
-  }
-  newProxy->UpdateVTKObjects();
-
-  QString fileName = files.size() > 1
-    ? pqCoreUtilities::findLargestPrefix(files)
-    : QString(vtksys::SystemTools::GetFilenameName(files[0].toStdString()).c_str());
-
-  // We need to register the new proxy before we change the input property of the consumers of the
-  // legacy proxy
-  controller->RegisterPipelineProxy(newProxy, fileName.toStdString().c_str());
-
-  // For some reason, consumers from proxy get wiped out when setting new input proxies,
-  // so we rely on a copy of the consumers
-  unsigned int numberOfConsumers = proxy->GetNumberOfConsumers();
-  std::vector<vtkSmartPointer<vtkSMProxy>> consumers(numberOfConsumers);
-  std::vector<vtkSmartPointer<vtkSMProperty>> consumerProperties(numberOfConsumers);
-  for (unsigned int id = 0; id < numberOfConsumers; ++id)
-  {
-    consumers[id] = proxy->GetConsumerProxy(id);
-    consumerProperties[id] = proxy->GetConsumerProperty(id);
-  }
-
-  // Setting up consumers input to new proxy
-  for (unsigned int id = 0; id < numberOfConsumers; ++id)
-  {
-    vtkSMProxy* consumer = consumers[id];
-    auto prop = vtkSMProxyProperty::SafeDownCast(consumerProperties[id]);
-    if (!prop)
-    {
-      continue;
-    }
-    for (unsigned int proxyId = 0; proxyId < prop->GetNumberOfProxies(); ++proxyId)
-    {
-      if (proxy == prop->GetProxy(proxyId))
-      {
-        vtkSMPropertyHelper helper(prop);
-        helper.Set(proxyId, newProxy,
-          vtkSMInputProperty::SafeDownCast(prop) ? helper.GetOutputPort(proxyId) : 0);
-        consumer->UpdateVTKObjects();
-        break;
-      }
-    }
-  }
-
-  // We don't need the legacy proxy anymore, we can delete it.
-  controller->UnRegisterPipelineProxy(proxy);
-
-  newProxy->UpdatePipeline();
-}
-} // anonymous namespace
 
 //-----------------------------------------------------------------------------
 pqChangeFileNameReaction::pqChangeFileNameReaction(QAction* parentObject)
@@ -297,18 +126,22 @@ void pqChangeFileNameReaction::changeFileName()
   if (fileDialog.exec() == QDialog::Accepted)
   {
     QStringList files = fileDialog.getSelectedFiles();
+    std::vector<std::string> filesStd(files.size());
+    std::transform(files.constBegin(), files.constEnd(), filesStd.begin(),
+      [](const QString& str) -> std::string { return str.toStdString(); });
 
-    if (vtkSMStringVectorProperty::SafeDownCast(proxy->GetProperty("FileName")))
+    for (const auto propertyName : { "FileName", "FileNames" })
     {
-      ::CreateReader(proxy, files, "FileName");
-    }
-    else if (vtkSMStringVectorProperty::SafeDownCast(proxy->GetProperty("FileNames")))
-    {
-      ::CreateReader(proxy, files, "FileNames");
-    }
-    else
-    {
-      qWarning("FileName or FileNames property not present in the source, or is of wrong type.");
+      if (vtkSMStringVectorProperty::SafeDownCast(proxy->GetProperty(propertyName)))
+      {
+        SM_SCOPED_TRACE(CallFunction)
+          .arg("ReplaceReaderFileName")
+          .arg(proxy)
+          .arg(filesStd)
+          .arg(propertyName);
+        vtkSMCoreUtilities::ReplaceReaderFileName(proxy, filesStd, propertyName);
+        break;
+      }
     }
   }
 }

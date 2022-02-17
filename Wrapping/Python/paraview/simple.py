@@ -1233,6 +1233,12 @@ def ExtendFileSeries(proxy=None):
     return helper.ExtendFileSeries(proxy.SMProxy)
 
 # -----------------------------------------------------------------------------
+def ReplaceReaderFileName(readerProxy, files, propName):
+    """Replaces the readerProxy by a new one given a list of files. PropName
+    should be "FileNames" or "FileName" depending on the property name in the reader."""
+    servermanager.vtkSMCoreUtilities.ReplaceReaderFileName(readerProxy.SMProxy, files, propName)
+
+# -----------------------------------------------------------------------------
 def ImportCinema(filename, view=None):
     """::deprecated:: 5.9
 
