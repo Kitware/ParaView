@@ -338,12 +338,12 @@ std::string vtkSMCoreUtilities::FindLargestPrefix(const std::vector<std::string>
     return std::string();
   }
 
-  unsigned int numFiles = files.size();
+  size_t numFiles = files.size();
   std::string regName = vtksys::SystemTools::GetFilenameName(files[0]);
 
   if (numFiles > 1)
   {
-    for (unsigned int i = 1; i < numFiles; i++)
+    for (size_t i = 1; i < numFiles; i++)
     {
       std::string nextFile = vtksys::SystemTools::GetFilenameName(files[i]);
       if (nextFile.substr(0, regName.size()) == regName)
