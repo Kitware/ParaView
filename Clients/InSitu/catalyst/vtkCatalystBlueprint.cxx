@@ -292,7 +292,7 @@ bool verify(const std::string& protocol, const conduit_cpp::Node& n)
     vtkLogF(ERROR, "'multiblock' must be an integral.");
     return false;
   }
-  else
+  else if (n.has_child("multiblock"))
   {
     vtkVLogF(
       PARAVIEW_LOG_CATALYST_VERBOSITY(), "'multiblock' set to %" PRIi32, n["multiblock"].to_int());
