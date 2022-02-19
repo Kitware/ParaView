@@ -68,7 +68,7 @@
         </Hints>
       </IntVectorProperty>
 
-      <IntVectorProperty name="Rate"
+      <IntVectorProperty name="FrameRate"
         command="SetRate"
         number_of_elements="1"
         default_values="15"
