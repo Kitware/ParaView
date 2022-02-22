@@ -144,7 +144,8 @@ bool CheckFieldDataMeshConversion(conduit_cpp::Node& mesh_node, int expected_num
       "wrong array name, expected \"integer_field_data\", got %s", field_array->GetName());
     VERIFY(field_array->GetNumberOfComponents() == expected_number_of_components,
       "wrong number of component");
-    VERIFY(field_array->GetNumberOfTuples() == expected_values.size(), "wrong number of tuples");
+    VERIFY(static_cast<size_t>(field_array->GetNumberOfTuples()) == expected_values.size(),
+      "wrong number of tuples");
     for (size_t i = 0; i < expected_values.size(); ++i)
     {
       VERIFY(field_array->GetVariantValue(i) == expected_values[i], "wrong value");
