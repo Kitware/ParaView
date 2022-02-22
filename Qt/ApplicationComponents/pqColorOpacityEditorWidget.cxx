@@ -1443,8 +1443,8 @@ void pqColorOpacityEditorWidget::realShowDataHistogram()
     // No cache or we are outdated, compute the histogram
     this->Internals->Ui.ComputeDataHistogram->clear();
     vtkSMTransferFunctionProxy* tfProxy = vtkSMTransferFunctionProxy::SafeDownCast(this->proxy());
-    histoTable =
-      tfProxy->ComputeDataHistogramTable(this->Internals->Ui.DataHistogramNumberOfBins->value());
+    Q_ASSERT(tfProxy);
+    histoTable = tfProxy->ComputeDataHistogramTable(this->dataHistogramNumberOfBins());
     this->Internals->Ui.OpacityEditor->setHistogramTable(histoTable);
 
     // Add all consumers, even non-visible, to the consumer connnector
@@ -1479,8 +1479,8 @@ void pqColorOpacityEditorWidget::realShow2DHistogram()
     this->Internals->Ui.ComputeDataHistogram->clear();
     vtkSMTransferFunction2DProxy* tfProxy =
       vtkSMTransferFunction2DProxy::SafeDownCast(this->transferFunction2DProxy());
-    hist2D =
-      tfProxy->ComputeDataHistogram2D(this->Internals->Ui.DataHistogramNumberOfBins->value());
+    Q_ASSERT(tfProxy);
+    hist2D = tfProxy->ComputeDataHistogram2D(this->dataHistogramNumberOfBins());
     this->Internals->Ui.Transfer2DEditor->setHistogram(hist2D);
 
     // Add all consumers, even non-visible, to the consumer connnector
