@@ -203,6 +203,7 @@ class pqFileDialogModelIconProvider : protected QFileIconProvider
 public:
   enum IconType
   {
+    Invalid,
     Computer,
     Drive,
     Folder,
@@ -221,6 +222,7 @@ protected:
   QIcon icon(const QFileInfo& info) const override;
   QIcon icon(QFileIconProvider::IconType ico) const override;
 
+  QIcon InvalidIcon;
   QIcon FolderLinkIcon;
   QIcon FileLinkIcon;
   QIcon DomainIcon;

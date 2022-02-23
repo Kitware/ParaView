@@ -89,8 +89,20 @@ pqFileDialogFavoriteModel::pqFileDialogFavoriteModel(
     for (QVariant const& fileInfo : fileInfos)
     {
       auto fileInfoList = fileInfo.toList();
+      QString path = fileInfoList[1].toString();
+
+      // If it is the Examples dir placeholder, replace it with the real path to the examples.
+      if (path == "_examples_path_")
+      {
+        // this will not be stored in the favorites
+        path = QString::fromStdString(vtkPVFileInformation::GetParaViewExampleFilesDirectory());
+      }
+
+      // Check type and existence on creation
+      int type = this->FileDialogModel->fileType(path);
+
       this->FavoriteList.push_back(pqFileDialogFavoriteModelFileInfo{
-        fileInfoList[0].toString(), fileInfoList[1].toString(), fileInfoList[2].toInt() });
+        fileInfoList[0].toString(), fileInfoList[1].toString(), type });
     }
   }
   else
@@ -156,7 +168,6 @@ QVariant pqFileDialogFavoriteModel::data(const QModelIndex& idx, int role) const
   }
 
   QString temp;
-  bool exist = this->FileDialogModel->dirExists(dir, temp);
   switch (role)
   {
     case Qt::DisplayRole:
@@ -165,16 +176,16 @@ QVariant pqFileDialogFavoriteModel::data(const QModelIndex& idx, int role) const
     case Qt::UserRole:
       return dir;
     case Qt::ItemDataRole::ToolTipRole:
-      if (exist)
+      if (file.Type != vtkPVFileInformation::INVALID)
       {
         return dir;
       }
       else
       {
-        return dir + " (Warning: does not exist)";
+        return dir + " (Warning: invalid)";
       }
     case Qt::ItemDataRole::FontRole:
-      if (exist)
+      if (file.Type != vtkPVFileInformation::INVALID)
       {
         return {};
       }
@@ -186,7 +197,7 @@ QVariant pqFileDialogFavoriteModel::data(const QModelIndex& idx, int role) const
       }
 
     case Qt::ItemDataRole::ForegroundRole:
-      if (exist)
+      if (file.Type != vtkPVFileInformation::INVALID)
       {
         return {};
       }
@@ -198,14 +209,7 @@ QVariant pqFileDialogFavoriteModel::data(const QModelIndex& idx, int role) const
       }
 
     case Qt::DecorationRole:
-      if (exist)
-      {
-        return Icons()->icon(static_cast<vtkPVFileInformation::FileTypes>(file.Type));
-      }
-      else
-      {
-        return QApplication::style()->standardIcon(QStyle::SP_MessageBoxWarning);
-      }
+      return Icons()->icon(static_cast<vtkPVFileInformation::FileTypes>(file.Type));
   }
 
   return QVariant();
