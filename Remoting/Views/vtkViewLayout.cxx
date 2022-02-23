@@ -448,7 +448,7 @@ void vtkViewLayout::Paint(vtkViewport* vp)
     {
       auto renWin = vtkOpenGLRenderWindow::SafeDownCast(item.View->GetRenderWindow());
       const int* size = renWin->GetActualSize();
-      if (auto fbo = renWin ? renWin->GetRenderFramebuffer() : nullptr)
+      if (auto fbo = renWin ? renWin->GetDisplayFramebuffer() : nullptr)
       {
         vtkVLogF(PARAVIEW_LOG_RENDERING_VERBOSITY(), "paste back results from `%s`",
           item.View->GetLogName().c_str());
