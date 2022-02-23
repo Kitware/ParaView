@@ -174,6 +174,7 @@ private:
 pqFileDialogModelIconProvider::pqFileDialogModelIconProvider()
 {
   QStyle* style = QApplication::style();
+  this->InvalidIcon = style->standardIcon(QStyle::SP_MessageBoxWarning);
   this->FolderLinkIcon = style->standardIcon(QStyle::SP_DirLinkIcon);
   this->FileLinkIcon = style->standardIcon(QStyle::SP_FileLinkIcon);
   this->DomainIcon.addPixmap(QPixmap(":/pqCore/Icons/pqDomain16.png"));
@@ -184,6 +185,8 @@ QIcon pqFileDialogModelIconProvider::icon(IconType t) const
 {
   switch (t)
   {
+    case Invalid:
+      return this->InvalidIcon;
     case Computer:
       return QFileIconProvider::icon(QFileIconProvider::Computer);
     case Drive:
@@ -208,6 +211,10 @@ QIcon pqFileDialogModelIconProvider::icon(IconType t) const
 
 QIcon pqFileDialogModelIconProvider::icon(vtkPVFileInformation::FileTypes f) const
 {
+  if (f == vtkPVFileInformation::INVALID)
+  {
+    return icon(pqFileDialogModelIconProvider::Invalid);
+  }
   if (f == vtkPVFileInformation::DIRECTORY_LINK)
   {
     return icon(pqFileDialogModelIconProvider::FolderLink);
