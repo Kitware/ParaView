@@ -39,9 +39,6 @@
 #include "vtkGarbageCollector.h"
 #include "vtkGenericDataSet.h"
 #include "vtkGenericGeometryFilter.h"
-#include "vtkGeometryFilter.h"
-#include "vtkHierarchicalBoxDataIterator.h"
-#include "vtkHierarchicalBoxDataSet.h"
 #include "vtkHyperTreeGrid.h"
 #include "vtkHyperTreeGridGeometry.h"
 #include "vtkImageData.h"
@@ -55,6 +52,7 @@
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkOutlineSource.h"
+#include "vtkOverlappingAMR.h"
 #include "vtkPVRecoverGeometryWireframe.h"
 #include "vtkPVTrivialProducer.h"
 #include "vtkPartitionedDataSetCollection.h"
@@ -63,7 +61,6 @@
 #include "vtkPolygon.h"
 #include "vtkRectilinearGrid.h"
 #include "vtkRectilinearGridOutlineFilter.h"
-#include "vtkSelectionNode.h"
 #include "vtkSmartPointer.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
 #include "vtkStripper.h"
@@ -72,16 +69,12 @@
 #include "vtkTimerLog.h"
 #include "vtkTriangleFilter.h"
 #include "vtkUniformGrid.h"
-#include "vtkUnsignedCharArray.h"
 #include "vtkUnsignedIntArray.h"
 #include "vtkUnstructuredGrid.h"
 #include "vtkUnstructuredGridGeometryFilter.h"
 
-#include <algorithm>
 #include <cassert>
 #include <cmath>
-#include <map>
-#include <set>
 #include <string>
 #include <vector>
 
@@ -353,29 +346,6 @@ int vtkPVGeometryFilter::CheckAttributes(vtkDataObject* input)
 int vtkPVGeometryFilter::RequestUpdateExtent(
   vtkInformation* request, vtkInformationVector** inputVector, vtkInformationVector* outputVector)
 {
-  /*
-  vtkUnstructuredGrid* ug_input =
-    vtkUnstructuredGrid::GetData(inputVector[0], 0);
-  vtkCompositeDataSet* cd_input =
-    vtkCompositeDataSet::GetData(inputVector[0], 0);
-  if (ug_input || cd_input)
-    {
-    vtkInformation *inInfo = inputVector[0]->GetInformationObject(0);
-    vtkInformation *outInfo = outputVector->GetInformationObject(0);
-    int numPieces, ghostLevels;
-    numPieces =
-      outInfo->Get(vtkStreamingDemandDrivenPipeline::UPDATE_NUMBER_OF_PIECES());
-    ghostLevels =
-      outInfo->Get(vtkStreamingDemandDrivenPipeline::UPDATE_NUMBER_OF_GHOST_LEVELS());
-    if (numPieces > 1)
-      {
-      ++ghostLevels;
-      }
-    inInfo->Set(vtkStreamingDemandDrivenPipeline::UPDATE_NUMBER_OF_GHOST_LEVELS(),
-      ghostLevels);
-    }
-
-  */
   return this->Superclass::RequestUpdateExtent(request, inputVector, outputVector);
 }
 
@@ -498,56 +468,43 @@ void vtkPVGeometryFilter::ExecuteBlock(vtkDataObject* input, vtkPolyData* output
   if (input->IsA("vtkImageData"))
   {
     this->ImageDataExecute(
-      static_cast<vtkImageData*>(input), output, doCommunicate, updatePiece, wholeExtent);
-    return;
+      vtkImageData::SafeDownCast(input), output, doCommunicate, updatePiece, wholeExtent);
   }
-
-  if (input->IsA("vtkStructuredGrid"))
+  else if (input->IsA("vtkStructuredGrid"))
   {
-    this->StructuredGridExecute(static_cast<vtkStructuredGrid*>(input), output, updatePiece,
+    this->StructuredGridExecute(vtkStructuredGrid::SafeDownCast(input), output, updatePiece,
       updateNumPieces, updateGhosts, wholeExtent);
-    return;
   }
-
-  if (input->IsA("vtkRectilinearGrid"))
+  else if (input->IsA("vtkRectilinearGrid"))
   {
-    this->RectilinearGridExecute(static_cast<vtkRectilinearGrid*>(input), output, updatePiece,
+    this->RectilinearGridExecute(vtkRectilinearGrid::SafeDownCast(input), output, updatePiece,
       updateNumPieces, updateGhosts, wholeExtent);
-    return;
   }
-
-  if (input->IsA("vtkUnstructuredGridBase"))
+  else if (input->IsA("vtkUnstructuredGridBase"))
   {
     this->UnstructuredGridExecute(
-      static_cast<vtkUnstructuredGridBase*>(input), output, doCommunicate);
-    return;
+      vtkUnstructuredGridBase::SafeDownCast(input), output, doCommunicate);
   }
-
-  if (input->IsA("vtkPolyData"))
+  else if (input->IsA("vtkPolyData"))
   {
-    this->PolyDataExecute(static_cast<vtkPolyData*>(input), output, doCommunicate);
-    return;
+    this->PolyDataExecute(vtkPolyData::SafeDownCast(input), output, doCommunicate);
   }
-  if (input->IsA("vtkHyperTreeGrid"))
+  else if (input->IsA("vtkHyperTreeGrid"))
   {
-    this->HyperTreeGridExecute(static_cast<vtkHyperTreeGrid*>(input), output, doCommunicate);
-    return;
+    this->HyperTreeGridExecute(vtkHyperTreeGrid::SafeDownCast(input), output, doCommunicate);
   }
-  if (input->IsA("vtkExplicitStructuredGrid"))
+  else if (input->IsA("vtkExplicitStructuredGrid"))
   {
     this->ExplicitStructuredGridExecute(
-      static_cast<vtkExplicitStructuredGrid*>(input), output, doCommunicate, wholeExtent);
-    return;
+      vtkExplicitStructuredGrid::SafeDownCast(input), output, doCommunicate, wholeExtent);
   }
-  if (input->IsA("vtkDataSet"))
+  else if (input->IsA("vtkDataSet"))
   {
     this->DataSetExecute(static_cast<vtkDataSet*>(input), output, doCommunicate);
-    return;
   }
-  if (input->IsA("vtkGenericDataSet"))
+  else if (input->IsA("vtkGenericDataSet"))
   {
     this->GenericDataSetExecute(static_cast<vtkGenericDataSet*>(input), output, doCommunicate);
-    return;
   }
 }
 
@@ -673,10 +630,9 @@ static vtkPolyData* vtkPVGeometryFilterMergePieces(vtkPartitionedDataSet* mp)
     return nullptr;
   }
 
-  vtkPolyData* output = vtkPolyData::New();
-  vtkAppendPolyData* appender = vtkAppendPolyData::New();
-  appender->ExecuteAppend(output, &inputs[0], static_cast<int>(inputs.size()));
-  appender->Delete();
+  vtkNew<vtkPolyData> output;
+  vtkNew<vtkAppendPolyData> appender;
+  appender->ExecuteAppend(output, inputs.data(), static_cast<int>(inputs.size()));
   inputs.clear();
 
   std::vector<int> points_offsets, verts_offsets, lines_offsets, polys_offsets, strips_offsets;
@@ -705,19 +661,18 @@ static vtkPolyData* vtkPVGeometryFilterMergePieces(vtkPartitionedDataSet* mp)
   }
 
   mp->SetPartition(0, output);
-  output->FastDelete();
 
   vtkInformation* metadata = mp->GetMetaData(static_cast<unsigned int>(0));
   metadata->Set(
-    vtkPVGeometryFilter::POINT_OFFSETS(), &points_offsets[0], static_cast<int>(num_pieces));
+    vtkPVGeometryFilter::POINT_OFFSETS(), points_offsets.data(), static_cast<int>(num_pieces));
   metadata->Set(
-    vtkPVGeometryFilter::VERTS_OFFSETS(), &verts_offsets[0], static_cast<int>(num_pieces));
+    vtkPVGeometryFilter::VERTS_OFFSETS(), verts_offsets.data(), static_cast<int>(num_pieces));
   metadata->Set(
-    vtkPVGeometryFilter::LINES_OFFSETS(), &lines_offsets[0], static_cast<int>(num_pieces));
+    vtkPVGeometryFilter::LINES_OFFSETS(), lines_offsets.data(), static_cast<int>(num_pieces));
   metadata->Set(
-    vtkPVGeometryFilter::POLYS_OFFSETS(), &polys_offsets[0], static_cast<int>(num_pieces));
+    vtkPVGeometryFilter::POLYS_OFFSETS(), polys_offsets.data(), static_cast<int>(num_pieces));
   metadata->Set(
-    vtkPVGeometryFilter::STRIPS_OFFSETS(), &strips_offsets[0], static_cast<int>(num_pieces));
+    vtkPVGeometryFilter::STRIPS_OFFSETS(), strips_offsets.data(), static_cast<int>(num_pieces));
   return output;
 }
 };
@@ -725,52 +680,47 @@ static vtkPolyData* vtkPVGeometryFilterMergePieces(vtkPartitionedDataSet* mp)
 //----------------------------------------------------------------------------
 void vtkPVGeometryFilter::AddCompositeIndex(vtkPolyData* pd, unsigned int index)
 {
-  vtkUnsignedIntArray* cindex = vtkUnsignedIntArray::New();
+  vtkNew<vtkUnsignedIntArray> cindex;
   cindex->SetNumberOfComponents(1);
   cindex->SetNumberOfTuples(pd->GetNumberOfCells());
   cindex->FillTypedComponent(0, index);
   cindex->SetName("vtkCompositeIndex");
   pd->GetCellData()->AddArray(cindex);
-  cindex->FastDelete();
 
-  vtkUnsignedIntArray* pindex = vtkUnsignedIntArray::New();
+  vtkNew<vtkUnsignedIntArray> pindex;
   pindex->SetNumberOfComponents(1);
   pindex->SetNumberOfTuples(pd->GetNumberOfPoints());
   pindex->FillTypedComponent(0, index);
   pindex->SetName("vtkCompositeIndex");
   pd->GetPointData()->AddArray(pindex);
-  pindex->FastDelete();
 }
 
 //----------------------------------------------------------------------------
 void vtkPVGeometryFilter::AddBlockColors(vtkDataObject* pd, unsigned int index)
 {
-  vtkUnsignedIntArray* cindex = vtkUnsignedIntArray::New();
+  vtkNew<vtkUnsignedIntArray> cindex;
   cindex->SetNumberOfComponents(1);
   cindex->SetNumberOfTuples(1);
   cindex->SetValue(0, index % this->BlockColorsDistinctValues);
   cindex->SetName("vtkBlockColors");
   pd->GetFieldData()->AddArray(cindex);
-  cindex->FastDelete();
 }
 
 //----------------------------------------------------------------------------
 void vtkPVGeometryFilter::AddHierarchicalIndex(
   vtkPolyData* pd, unsigned int level, unsigned int index)
 {
-  vtkUnsignedIntArray* dslevel = vtkUnsignedIntArray::New();
+  vtkNew<vtkUnsignedIntArray> dslevel;
   dslevel->SetNumberOfTuples(pd->GetNumberOfCells());
   dslevel->FillTypedComponent(0, level);
   dslevel->SetName("vtkAMRLevel");
   pd->GetCellData()->AddArray(dslevel);
-  dslevel->FastDelete();
 
-  vtkUnsignedIntArray* dsindex = vtkUnsignedIntArray::New();
+  vtkNew<vtkUnsignedIntArray> dsindex;
   dsindex->SetNumberOfTuples(pd->GetNumberOfCells());
   dsindex->FillTypedComponent(0, index);
   dsindex->SetName("vtkAMRIndex");
   pd->GetCellData()->AddArray(dsindex);
-  dsindex->FastDelete();
 }
 
 //----------------------------------------------------------------------------
@@ -781,14 +731,14 @@ int vtkPVGeometryFilter::RequestAMRData(
 
   // STEP 0: Acquire input & output object
   vtkMultiBlockDataSet* output = vtkMultiBlockDataSet::GetData(outputVector, 0);
-  if (output == nullptr)
+  if (!output)
   {
     vtkErrorMacro("Output AMR multi-block dataset is NULL");
     return 0;
   }
 
   vtkUniformGridAMR* amr = vtkUniformGridAMR::GetData(inputVector[0], 0);
-  if (amr == nullptr)
+  if (!amr)
   {
     vtkErrorMacro("Input AMR dataset is NULL");
     return 0;
@@ -983,22 +933,16 @@ int vtkPVGeometryFilter::RequestDataObjectTree(
       continue;
     }
 
-    vtkPolyData* tmpOut = vtkPolyData::New();
+    vtkNew<vtkPolyData> tmpOut;
     this->ExecuteBlock(block, tmpOut, 0, 0, 1, 0, wholeExtent);
     this->CleanupOutputData(tmpOut, 0);
     // skip empty nodes.
     if (tmpOut->GetNumberOfPoints() > 0)
     {
       output->SetDataSet(inIter, tmpOut);
-      tmpOut->FastDelete();
 
       const unsigned int current_flat_index = inIter->GetCurrentFlatIndex();
       this->AddCompositeIndex(tmpOut, current_flat_index);
-    }
-    else
-    {
-      tmpOut->Delete();
-      tmpOut = nullptr;
     }
 
     numInputs++;
@@ -1091,10 +1035,9 @@ int vtkPVGeometryFilter::RequestDataObjectTree(
           index < static_cast<unsigned int>(reduced_non_null_leaves.size()) &&
           reduced_non_null_leaves[index] != 0)
         {
-          vtkPolyData* trivalInput = vtkPolyData::New();
+          vtkNew<vtkPolyData> trivalInput;
           this->AddCompositeIndex(trivalInput, index);
           output->SetDataSet(outIter, trivalInput);
-          trivalInput->FastDelete();
         }
       }
     }
@@ -1190,7 +1133,7 @@ void vtkPVGeometryFilter::ExecuteCellNormals(vtkPolyData* output, int doCommunic
   }
 
   double polyNorm[3];
-  vtkFloatArray* cellNormals = vtkFloatArray::New();
+  vtkNew<vtkFloatArray> cellNormals;
   cellNormals->SetName("cellNormals");
   cellNormals->SetNumberOfComponents(3);
   cellNormals->Allocate(3 * output->GetNumberOfCells());
@@ -1219,8 +1162,6 @@ void vtkPVGeometryFilter::ExecuteCellNormals(vtkPolyData* output, int doCommunic
 
   output->GetCellData()->AddArray(cellNormals);
   output->GetCellData()->SetActiveNormals(cellNormals->GetName());
-  cellNormals->Delete();
-  cellNormals = nullptr;
 }
 
 //----------------------------------------------------------------------------
@@ -1374,20 +1315,18 @@ void vtkPVGeometryFilter::ImageDataExecute(
     bounds[4] = spacing[2] * ((float)ext[4]) + origin[2];
     bounds[5] = spacing[2] * ((float)ext[5]) + origin[2];
 
-    vtkOutlineSource* outline = vtkOutlineSource::New();
+    vtkNew<vtkOutlineSource> outline;
     outline->SetBounds(bounds);
     outline->Update();
 
     output->SetPoints(outline->GetOutput()->GetPoints());
     output->SetLines(outline->GetOutput()->GetLines());
     output->SetPolys(outline->GetOutput()->GetPolys());
-    outline->Delete();
   }
   else
   {
-    vtkPoints* pts = vtkPoints::New();
+    vtkNew<vtkPoints> pts;
     output->SetPoints(pts);
-    pts->Delete();
   }
 }
 
@@ -1621,8 +1560,8 @@ void vtkPVGeometryFilter::PolyDataExecute(
     this->OutlineFlag = 0;
     if (this->UseStrips)
     {
-      vtkPolyData* inCopy = vtkPolyData::New();
-      vtkStripper* stripper = vtkStripper::New();
+      vtkNew<vtkPolyData> inCopy;
+      vtkNew<vtkStripper> stripper;
       stripper->SetPassThroughCellIds(this->PassThroughCellIds);
       // stripper->SetPassThroughPointIds(this->PassThroughPointIds);
       inCopy->ShallowCopy(input);
@@ -1632,8 +1571,6 @@ void vtkPVGeometryFilter::PolyDataExecute(
       output->CopyStructure(stripper->GetOutput());
       output->GetPointData()->ShallowCopy(stripper->GetOutput()->GetPointData());
       output->GetCellData()->ShallowCopy(stripper->GetOutput()->GetCellData());
-      inCopy->Delete();
-      stripper->Delete();
     }
     else
     {
@@ -1714,16 +1651,14 @@ void vtkPVGeometryFilter::HyperTreeGridExecute(
   {
     this->OutlineFlag = 0;
 
-    vtkHyperTreeGridGeometry* internalFilter = vtkHyperTreeGridGeometry::New();
+    vtkNew<vtkHyperTreeGridGeometry> internalFilter;
     // internalFilter->SetPassThroughPointIds(this->PassThroughPointIds);
     // internalFilter->SetPassThroughPointIds(this->PassThroughPointIds);
-    vtkHyperTreeGrid* htgCopy = vtkHyperTreeGrid::New();
+    vtkNew<vtkHyperTreeGrid> htgCopy;
     htgCopy->ShallowCopy(input);
     internalFilter->SetInputData(htgCopy);
     internalFilter->Update();
     output->ShallowCopy(internalFilter->GetOutput());
-    htgCopy->Delete();
-    internalFilter->Delete();
     return;
   }
 

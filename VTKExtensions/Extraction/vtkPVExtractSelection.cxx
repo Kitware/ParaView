@@ -20,7 +20,6 @@
 #include "vtkDataSet.h"
 #include "vtkExecutive.h"
 #include "vtkGraph.h"
-#include "vtkHierarchicalBoxDataIterator.h"
 #include "vtkIdTypeArray.h"
 #include "vtkInformation.h"
 #include "vtkInformationExecutivePortKey.h"
@@ -32,6 +31,7 @@
 #include "vtkSelector.h"
 #include "vtkSmartPointer.h"
 #include "vtkTable.h"
+#include "vtkUniformGridAMRDataIterator.h"
 
 #if VTK_MODULE_ENABLE_ParaView_VTKExtensionsExtractionPython
 #include "vtkPythonSelector.h"
@@ -164,20 +164,17 @@ int vtkPVExtractSelection::RequestData(
       }
     }
 
-    // For composite datasets, the output of this filter is
-    // vtkSelectionNode::SELECTIONS instance with vtkSelection instances for some
-    // nodes in the composite dataset. COMPOSITE_INDEX() or
-    // HIERARCHICAL_LEVEL(), HIERARCHICAL_INDEX() keys are set on each of the
-    // vtkSelection instances correctly to help identify the block they came
-    // from.
+    // COMPOSITE_INDEX() or HIERARCHICAL_LEVEL(), HIERARCHICAL_INDEX() keys are set on
+    // each of the vtkSelection instances correctly to help identify the block they came from.
     vtkCompositeDataIterator* iter = cdInput->NewIterator();
-    vtkHierarchicalBoxDataIterator* hbIter = vtkHierarchicalBoxDataIterator::SafeDownCast(iter);
+    vtkUniformGridAMRDataIterator* hierIter = vtkUniformGridAMRDataIterator::SafeDownCast(iter);
     for (iter->InitTraversal(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
     {
       vtkSelectionNode* curSel = this->LocateSelection(iter->GetCurrentFlatIndex(), sel);
-      if (!curSel && hbIter)
+      if (!curSel && hierIter)
       {
-        curSel = this->LocateSelection(hbIter->GetCurrentLevel(), hbIter->GetCurrentIndex(), sel);
+        curSel =
+          this->LocateSelection(hierIter->GetCurrentLevel(), hierIter->GetCurrentIndex(), sel);
       }
 
       outputDO = vtkDataObject::SafeDownCast(cdOutput->GetDataSet(iter));

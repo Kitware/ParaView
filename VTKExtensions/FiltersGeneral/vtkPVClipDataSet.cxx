@@ -16,12 +16,9 @@
 
 #include "vtkAMRDualClip.h"
 #include "vtkAppendFilter.h"
-#include "vtkCompositeDataIterator.h"
 #include "vtkCompositeDataPipeline.h"
 #include "vtkDataSet.h"
 #include "vtkDemandDrivenPipeline.h"
-#include "vtkHierarchicalBoxDataIterator.h"
-#include "vtkHierarchicalBoxDataSet.h"
 #include "vtkHyperTreeGrid.h"
 #include "vtkHyperTreeGridAxisClip.h"
 #include "vtkInformation.h"
@@ -38,13 +35,12 @@
 #include "vtkQuadric.h"
 #include "vtkSmartPointer.h"
 #include "vtkSphere.h"
-#include "vtkStreamingDemandDrivenPipeline.h"
 #include "vtkTransform.h"
+#include "vtkUniformGridAMR.h"
+#include "vtkUniformGridAMRDataIterator.h"
 #include "vtkUnstructuredGrid.h"
 
 #include "vtkInformationStringVectorKey.h"
-
-#include <cassert>
 
 vtkStandardNewMacro(vtkPVClipDataSet);
 
@@ -102,7 +98,7 @@ int vtkPVClipDataSet::RequestData(
   }
 
   // Check if the input data is AMR and we are doing clip by cell scalars.
-  if (vtkHierarchicalBoxDataSet::SafeDownCast(inDataObj))
+  if (vtkUniformGridAMR::SafeDownCast(inDataObj))
   {
     // Using scalars.
     if (!this->GetClipFunction())
@@ -400,8 +396,8 @@ int vtkPVClipDataSet::ClipUsingSuperclass(
 
   outputCD->CopyStructure(inputCD);
 
-  vtkSmartPointer<vtkHierarchicalBoxDataIterator> itr(nullptr);
-  itr.TakeReference(vtkHierarchicalBoxDataIterator::SafeDownCast(inputCD->NewIterator()));
+  vtkSmartPointer<vtkUniformGridAMRDataIterator> itr(nullptr);
+  itr.TakeReference(vtkUniformGridAMRDataIterator::SafeDownCast(inputCD->NewIterator()));
 
   // Loop over all the datasets.
   for (itr->InitTraversal(); !itr->IsDoneWithTraversal(); itr->GoToNextItem())
@@ -442,7 +438,7 @@ int vtkPVClipDataSet::RequestDataObject(vtkInformation* vtkNotUsed(request),
     return 0;
   }
 
-  vtkHierarchicalBoxDataSet* input = vtkHierarchicalBoxDataSet::GetData(inInfo);
+  vtkUniformGridAMR* input = vtkUniformGridAMR::GetData(inInfo);
   vtkInformation* outInfo = outputVector->GetInformationObject(0);
 
   if (input)
@@ -492,7 +488,7 @@ int vtkPVClipDataSet::FillInputPortInformation(int port, vtkInformation* info)
   this->Superclass::FillInputPortInformation(port, info);
   vtkInformationStringVectorKey::SafeDownCast(
     info->GetKey(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE()))
-    ->Append(info, "vtkHierarchicalBoxDataSet");
+    ->Append(info, "vtkUniformGridAMR");
   return 1;
 }
 

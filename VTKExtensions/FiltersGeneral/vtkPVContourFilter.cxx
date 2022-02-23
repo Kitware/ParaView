@@ -26,7 +26,6 @@
 #include "vtkDataObject.h"
 #include "vtkDemandDrivenPipeline.h"
 #include "vtkEventForwarderCommand.h"
-#include "vtkHierarchicalBoxDataSet.h"
 #include "vtkHyperTreeGrid.h"
 #include "vtkHyperTreeGridContour.h"
 #include "vtkInformation.h"
@@ -39,6 +38,7 @@
 #include "vtkPointData.h"
 #include "vtkSMPTools.h"
 #include "vtkSmartPointer.h"
+#include "vtkUniformGridAMR.h"
 #include "vtkUnstructuredGrid.h"
 
 #include <cmath>
@@ -104,7 +104,7 @@ int vtkPVContourFilter::RequestData(
   }
 
   // Check if input is AMR data.
-  if (vtkHierarchicalBoxDataSet::SafeDownCast(inDataObj))
+  if (vtkUniformGridAMR::SafeDownCast(inDataObj))
   {
     // This is a lot to go through to get the name of the array to process.
     vtkInformation* inArrayInfo = this->GetInputArrayInformation(0);
@@ -220,7 +220,7 @@ int vtkPVContourFilter::RequestDataObject(vtkInformation* vtkNotUsed(request),
     return 0;
   }
 
-  vtkHierarchicalBoxDataSet* input = vtkHierarchicalBoxDataSet::GetData(inInfo);
+  vtkUniformGridAMR* input = vtkUniformGridAMR::GetData(inInfo);
   vtkInformation* outInfo = outputVector->GetInformationObject(0);
 
   if (input)
@@ -323,7 +323,7 @@ int vtkPVContourFilter::FillInputPortInformation(int port, vtkInformation* info)
 
   // According to the documentation this is the way to append additional
   // input data set type since VTK 5.2.
-  info->Append(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkHierarchicalBoxDataSet");
+  info->Append(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkUniformGridAMR");
   info->Append(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkHyperTreeGrid");
   return 1;
 }
