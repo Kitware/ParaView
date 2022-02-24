@@ -1532,6 +1532,7 @@
     <!-- ================================================================== -->
     <TransferFunction2DProxy class="vtkPVTransferFunction2D"
                            name="TransferFunction2D"
+                           post_push="Build"
                            processes="client|renderserver|dataserver">
       <DoubleVectorProperty clean_command="RemoveAllBoxes"
                             command="AddControlBox"
@@ -1575,6 +1576,7 @@
           The dimensions of the image that represents this 2D transfer function.
         </Documentation>
       </IntVectorProperty>
+      <Property command="Build" name="Build" panel_visibility="never" />
     </TransferFunction2DProxy>
     <!-- end of "transfer_2d_functions" -->
   </ProxyGroup>

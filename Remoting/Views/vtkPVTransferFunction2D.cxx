@@ -22,6 +22,7 @@
 #include "vtkDataArrayRange.h"
 #include "vtkFloatArray.h"
 #include "vtkImageData.h"
+#include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkPointData.h"
 #include "vtkSmartPointer.h"
@@ -43,7 +44,8 @@ public:
   /**
    * The transfer function
    */
-  vtkSmartPointer<vtkImageData> Function;
+  vtkImageData* Function = nullptr;
+  vtkTimeStamp BuildTime;
 };
 
 //-------------------------------------------------------------------------------------------------
@@ -55,12 +57,11 @@ vtkPVTransferFunction2D::vtkPVTransferFunction2D()
 //-------------------------------------------------------------------------------------------------
 vtkPVTransferFunction2D::~vtkPVTransferFunction2D()
 {
-  this->Internals->Function = nullptr;
-  // if (this->Internals->Function != nullptr)
-  // {
-  //   this->Internals->Function->Delete();
-  //   this->Internals->Function = nullptr;
-  // }
+  if (this->Internals->Function != nullptr)
+  {
+    this->Internals->Function->UnRegister(this);
+    this->Internals->Function = nullptr;
+  }
   for (auto box : this->Internals->Boxes)
   {
     if (box)
@@ -144,35 +145,25 @@ bool vtkPVTransferFunction2D::UpdateRange()
 //------------------------------------------------------------------------------------------------
 void vtkPVTransferFunction2D::Build()
 {
-  //  if (this->Internals->Boxes.empty())
-  //  {
-  //    return;
-  //  }
+  if (this->Internals->BuildTime > this->GetMTime())
+  {
+    return;
+  }
 
   if (!this->Internals->Function)
   {
-    this->Internals->Function = vtkSmartPointer<vtkImageData>::New();
+    this->Internals->Function = vtkImageData::New();
   }
-  else
-  {
-    auto pd = this->Internals->Function->GetPointData();
-    if (pd && pd->GetScalars())
-    {
-      pd->RemoveArray(pd->GetScalars()->GetName());
-    }
-  }
+  this->Internals->Function->Initialize();
 
-  // this->UpdateRange();
-
-  auto func = this->Internals->Function;
-  func->SetOrigin(this->Range[0], this->Range[2], 0.0);
-  func->SetDimensions(this->OutputDimensions[0], this->OutputDimensions[1], 1);
+  this->Internals->Function->SetDimensions(this->OutputDimensions[0], this->OutputDimensions[1], 1);
+  this->Internals->Function->SetOrigin(this->Range[0], this->Range[2], 0.0);
   double spacing[2];
   spacing[0] = (this->Range[1] - this->Range[0]) / this->OutputDimensions[0];
   spacing[1] = (this->Range[3] - this->Range[2]) / this->OutputDimensions[1];
-  func->SetSpacing(spacing[0], spacing[1], 1.0);
-  func->AllocateScalars(VTK_FLOAT, 4);
-  auto arr = vtkFloatArray::SafeDownCast(func->GetPointData()->GetScalars());
+  this->Internals->Function->SetSpacing(spacing[0], spacing[1], 1.0);
+  this->Internals->Function->AllocateScalars(VTK_FLOAT, 4);
+  auto arr = vtkFloatArray::SafeDownCast(this->Internals->Function->GetPointData()->GetScalars());
   auto arrRange = vtk::DataArrayValueRange(arr);
   std::fill(arrRange.begin(), arrRange.end(), 0.0);
 
@@ -223,7 +214,7 @@ void vtkPVTransferFunction2D::Build()
           fptr[tp] = ptr[tp] / 255.0;
         }
         // composite this color with the current color
-        float* c = static_cast<float*>(func->GetScalarPointer(ii, jj, 0));
+        float* c = static_cast<float*>(this->Internals->Function->GetScalarPointer(ii, jj, 0));
         for (int tp = 0; tp < 3; ++tp)
         {
           c[tp] = fptr[tp] + c[tp] * (1 - fptr[3]);
@@ -232,6 +223,7 @@ void vtkPVTransferFunction2D::Build()
       }
     }
   }
+  this->Internals->BuildTime.Modified();
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -371,6 +363,9 @@ void vtkPVTransferFunction2D::RemoveAllBoxes()
 //------------------------------------------------------------------------------------------------
 vtkImageData* vtkPVTransferFunction2D::GetFunction()
 {
-  this->Build();
+  if (!this->Internals->Function)
+  {
+    this->Build();
+  }
   return this->Internals->Function;
 }

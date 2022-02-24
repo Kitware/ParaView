@@ -727,6 +727,7 @@ bool vtkSMPVRepresentationProxy::SetScalarColoringInternal(
     if (lutProxy && useTransfer2D)
     {
       vtkSMPropertyHelper(lutProxy, "Use2DTransferFunction").Set(useTransfer2D);
+      // lutProxy->UpdateProperty("TransferFunction2D");
       lutProxy->UpdateVTKObjects();
     }
   }

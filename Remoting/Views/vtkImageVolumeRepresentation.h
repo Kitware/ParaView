@@ -35,10 +35,9 @@
 #ifndef vtkImageVolumeRepresentation_h
 #define vtkImageVolumeRepresentation_h
 
-#include "vtkNew.h"                  // needed for vtkNew.
-#include "vtkPVTransferFunction2D.h" // needed for vtkPVTransferFunction2D
-#include "vtkRemotingViewsModule.h"  //needed for exports
-#include "vtkSmartPointer.h"         // needed for vtkSmartPointer
+#include "vtkNew.h"                 // needed for vtkNew.
+#include "vtkRemotingViewsModule.h" //needed for exports
+#include "vtkSmartPointer.h"        // needed for vtkSmartPointer
 #include "vtkVolumeRepresentation.h"
 
 #include <string> // for ivar
@@ -50,9 +49,10 @@ class vtkFixedPointVolumeRayCastMapper;
 class vtkImageData;
 class vtkImplicitFunction;
 class vtkOutlineSource;
+class vtkPVLODVolume;
+class vtkPVTransferFunction2D;
 class vtkPiecewiseFunction;
 class vtkPolyDataMapper;
-class vtkPVLODVolume;
 class vtkVolumeMapper;
 class vtkVolumeProperty;
 
@@ -166,16 +166,10 @@ protected:
   // 2D transfer function support
   bool UseTransfer2D = false;
   bool UseGradientForTransfer2D = true;
+  vtkWeakPointer<vtkPVTransferFunction2D> TransferFunction2D = nullptr;
   int ColorArray2FieldAssociation = -1;
   int ColorArray2Component = -1;
   std::string ColorArray2Name;
-  vtkWeakPointer<vtkPVTransferFunction2D> TransferFunction2D = nullptr;
-
-  /**
-   * Mark the representation to be updated since the transfer function was modified.
-   */
-  void TransferFunction2DUpdated(vtkObject* obj, unsigned long eid, void*);
-  unsigned long TransferFunction2DObserver = 0U;
 
 private:
   vtkImageVolumeRepresentation(const vtkImageVolumeRepresentation&) = delete;

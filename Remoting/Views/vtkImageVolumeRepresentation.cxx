@@ -602,7 +602,6 @@ void vtkImageVolumeRepresentation::SetTransferFunction2D(vtkPVTransferFunction2D
 
   if (this->TransferFunction2D)
   {
-    this->TransferFunction2D->RemoveObserver(this->TransferFunction2DObserver);
     this->TransferFunction2D = nullptr;
     this->Property->SetTransferFunction2D(nullptr);
   }
@@ -610,13 +609,11 @@ void vtkImageVolumeRepresentation::SetTransferFunction2D(vtkPVTransferFunction2D
   if (transfer2D)
   {
     this->TransferFunction2D = transfer2D;
-    this->TransferFunction2DObserver = this->TransferFunction2D->AddObserver(
-      vtkCommand::ModifiedEvent, this, &vtkImageVolumeRepresentation::TransferFunction2DUpdated);
     vtkImageData* func = this->TransferFunction2D->GetFunction();
     if (func)
     {
-      vtkDataArray* arr = func->GetPointData()->GetScalars();
-      if (!arr)
+      vtkPointData* pd = func->GetPointData();
+      if (!pd || (pd->GetScalars() == nullptr) || pd->GetScalars()->GetNumberOfComponents() != 4)
       {
         int* dims = this->TransferFunction2D->GetOutputDimensions();
         func->SetDimensions(dims[0], dims[1], 1);
@@ -626,17 +623,4 @@ void vtkImageVolumeRepresentation::SetTransferFunction2D(vtkPVTransferFunction2D
     }
     this->MarkModified();
   }
-}
-
-//----------------------------------------------------------------------------
-void vtkImageVolumeRepresentation::TransferFunction2DUpdated(
-  vtkObject* obj, unsigned long eid, void*)
-{
-  vtkPVTransferFunction2D* tf2d = reinterpret_cast<vtkPVTransferFunction2D*>(obj);
-  if (tf2d == nullptr || eid != vtkCommand::ModifiedEvent)
-  {
-    return;
-  }
-  tf2d->Build();
-  this->MarkModified();
 }
