@@ -35,6 +35,7 @@
 
 #include "vtkRemotingViewsModule.h" //needed for exports
 #include "vtkSMRepresentationProxy.h"
+#include "vtkSmartPointer.h" // For LastLUTProxy
 
 class vtkPVArrayInformation;
 
@@ -63,6 +64,15 @@ public:
     return self ? self->GetUsingScalarColoring() : false;
   }
   //@}
+
+  /**
+   * Updates the ranges shown in the scalar bar.
+   * If deleteRange is true, then the range stored for current representation proxy is deleted.
+   * This should be done when the scalar bar gets separated or becomes not visible.
+   * If deleteRange is false, then the range stored for current representation proxy is updated
+   * with the new range value.
+   */
+  bool UpdateScalarBarRange(vtkSMProxy* view, bool deleteRange);
 
   /**
    * Enable/disable scalar coloring using the specified array. This will set up a
@@ -347,6 +357,11 @@ public:
   int IsScalarBarStickyVisible(vtkSMProxy* view);
   //@}
 
+  /**
+   * Called after the view updates.
+   */
+  void ViewUpdated(vtkSMProxy* view) override;
+
 protected:
   vtkSMPVRepresentationProxy();
   ~vtkSMPVRepresentationProxy() override;
@@ -390,6 +405,13 @@ protected:
    */
   virtual bool SetScalarColoringInternal(
     const char* arrayname, int attribute_type, bool useComponent, int component);
+
+  /**
+   * Used as a memory of what was the last LUT proxy linked to this representation.
+   * This is used in `UpdateScalarBarRange` to update the scalar bar range when
+   * turning off the coloring for this representation.
+   */
+  vtkSmartPointer<vtkSMProxy> LastLUTProxy;
 
 private:
   vtkSMPVRepresentationProxy(const vtkSMPVRepresentationProxy&) = delete;

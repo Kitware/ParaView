@@ -38,7 +38,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class pqDataRepresentation;
 class pqDisplayColorWidget;
-class vtkSMProxy;
 
 /**
  * @ingroup Reactions

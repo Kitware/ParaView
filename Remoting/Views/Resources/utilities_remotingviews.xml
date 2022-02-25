@@ -1551,6 +1551,35 @@
                             number_of_elements="1">
         <Documentation>Set the title text with respect to the color legend.</Documentation>
       </StringVectorProperty>
+      <DoubleVectorProperty animateable="0"
+                            command="SetDataRangeMin"
+                            default_values="0"
+                            no_custom_default="1"
+                            name="DataRangeMin"
+                            number_of_elements="1"
+                            panel_visibility="never">
+        <Documentation>Set the minimum range with respect to the displayed representations.</Documentation>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty animateable="0"
+                            command="SetDataRangeMax"
+                            default_values="0"
+                            no_custom_default="1"
+                            name="DataRangeMax"
+                            number_of_elements="1"
+                            panel_visibility="never">
+        <Documentation>Set the maximum range with respect to the displayed representations.</Documentation>
+      </DoubleVectorProperty>
+      <IntVectorProperty command="SetDrawDataRange"
+                         default_values="0"
+                         name="DrawDataRange"
+                         label="Draw Data Range Labels"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Hints>
+          <NoDefault />
+        </Hints>
+        <Documentation>Show labels with the visible data range for the arrays this color legend represents.</Documentation>
+      </IntVectorProperty>
       <StringVectorProperty animateable="0"
                             command="SetComponentTitle"
                             default_values="Component"
@@ -1784,6 +1813,21 @@
         <Hints>
           <PropertyWidgetDecorator type="EnableWidgetDecorator">
             <Property name="AddRangeLabels" function="boolean" index="0" />
+          </PropertyWidgetDecorator>
+        </Hints>
+        <Documentation>
+          Set number format for range labels (specified as a C-style printf format string). Can be used only if Add Range Labels is enabled.
+        </Documentation>
+      </StringVectorProperty>
+      <StringVectorProperty animateable="0"
+                            command="SetDataRangeLabelFormat"
+                            number_of_elements="1"
+                            default_values="%-#6.1e"
+                            name="DataRangeLabelFormat"
+                            label="Data Range Label Format">
+        <Hints>
+          <PropertyWidgetDecorator type="EnableWidgetDecorator">
+            <Property name="DrawDataRange" function="boolean" index="0" />
           </PropertyWidgetDecorator>
         </Hints>
         <Documentation>

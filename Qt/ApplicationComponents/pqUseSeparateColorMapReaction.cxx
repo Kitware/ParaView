@@ -34,8 +34,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqActiveObjects.h"
 #include "pqDataRepresentation.h"
 #include "pqDisplayColorWidget.h"
+#include "pqView.h"
 #include "vtkSMPVRepresentationProxy.h"
 #include "vtkSMPropertyHelper.h"
+#include "vtkSMProxy.h"
+#include "vtkSMScalarBarWidgetRepresentationProxy.h"
+#include "vtkSMTransferFunctionProxy.h"
 
 //-----------------------------------------------------------------------------
 pqUseSeparateColorMapReaction::pqUseSeparateColorMapReaction(
@@ -115,6 +119,36 @@ void pqUseSeparateColorMapReaction::onTriggered()
     if (vtkSMPropertyHelper(sepProperty).GetAsInt() == 0)
     {
       vtkSMPropertyHelper(mcmProperty).Set(0);
+    }
+  }
+
+  pqView* view = pqActiveObjects::instance().activeView();
+  vtkSMProxy* viewProxy = view ? view->getProxy() : nullptr;
+
+  if (proxy->GetUsingScalarColoring())
+  {
+    if (vtkSMProperty* lutProperty = proxy->GetProperty("LookupTable"))
+    {
+      vtkSMPropertyHelper lutPropertyHelper(lutProperty);
+      if (lutPropertyHelper.GetNumberOfElements() != 0 && lutPropertyHelper.GetAsProxy(0))
+      {
+        vtkSMProxy* lutProxy = lutPropertyHelper.GetAsProxy(0);
+
+        vtkSMScalarBarWidgetRepresentationProxy* sbProxy =
+          vtkSMScalarBarWidgetRepresentationProxy::SafeDownCast(
+            vtkSMTransferFunctionProxy::FindScalarBarRepresentation(lutProxy, viewProxy));
+
+        sbProxy->RemoveRange(proxy);
+        sbProxy->UpdateVTKObjects();
+      }
+      else
+      {
+        qWarning("Failed to determine the LookupTable being used.");
+      }
+    }
+    else
+    {
+      qWarning("Missing 'LookupTable' property");
     }
   }
 

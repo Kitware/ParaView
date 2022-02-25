@@ -19,6 +19,7 @@
 #include "vtkObjectFactory.h"
 #include "vtkPVArrayInformation.h"
 #include "vtkProcessModule.h"
+#include "vtkSMPVRepresentationProxy.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMProxyProperty.h"
 #include "vtkScalarBarActor.h"
@@ -26,6 +27,7 @@
 #include "vtkTuple.h"
 
 #include <algorithm>
+#include <limits>
 #include <sstream>
 #include <string>
 #include <vector>
@@ -304,4 +306,72 @@ void vtkSMScalarBarWidgetRepresentationProxy::ScalarBarLengthToScalarBarWidgetPo
   repr->GetPosition2Coordinate()->GetValue(pos2);
   pos2[index] = length;
   repr->SetPosition2(pos2);
+}
+
+//----------------------------------------------------------------------------
+void vtkSMScalarBarWidgetRepresentationProxy::AddRange(vtkSMPVRepresentationProxy* proxy)
+{
+  if (proxy->GetArrayInformationForColorArray())
+  {
+    this->Proxies.emplace(proxy, proxy);
+  }
+}
+
+//----------------------------------------------------------------------------
+void vtkSMScalarBarWidgetRepresentationProxy::RemoveRange(vtkSMPVRepresentationProxy* proxy)
+{
+  this->Proxies.erase(proxy);
+}
+
+//----------------------------------------------------------------------------
+void vtkSMScalarBarWidgetRepresentationProxy::GetRange(double range[2])
+{
+  bool valid = false;
+  if (!this->Proxies.empty())
+  {
+    double min = std::numeric_limits<double>::infinity();
+    double max = -min;
+
+    std::vector<vtkSMPVRepresentationProxy*> trash;
+
+    for (const auto& pair : this->Proxies)
+    {
+      vtkSMPVRepresentationProxy* proxy = pair.second;
+      if (!proxy)
+      {
+        // The weak pointer is nullptr, we need to delete this proxy.
+        trash.emplace_back(pair.first);
+        continue;
+      }
+      vtkPVArrayInformation* info = proxy->GetArrayInformationForColorArray();
+      if (!info)
+      {
+        continue;
+      }
+      valid = true;
+      const double* localRange = info->GetComponentRange(-1);
+      min = std::min(min, localRange[0]);
+      max = std::max(max, localRange[1]);
+    }
+
+    range[0] = min;
+    range[1] = max;
+
+    for (vtkSMPVRepresentationProxy* proxy : trash)
+    {
+      this->Proxies.erase(proxy);
+    }
+  }
+
+  if (!valid)
+  {
+    range[0] = std::numeric_limits<double>::quiet_NaN();
+    range[1] = std::numeric_limits<double>::quiet_NaN();
+  }
+}
+
+//----------------------------------------------------------------------------
+void vtkSMScalarBarWidgetRepresentationProxy::ClearRange()
+{
+  this->Proxies.clear();
 }
