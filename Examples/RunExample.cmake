@@ -33,7 +33,7 @@ execute_process(
       "-DParaView_CATALYST_DIR:PATH=${paraview_catalyst_dir}"
     --test-command
       "${ctest}"
-        -C ${config}
+        -C "${config}"
         --output-on-failure
   RESULT_VARIABLE res)
 
