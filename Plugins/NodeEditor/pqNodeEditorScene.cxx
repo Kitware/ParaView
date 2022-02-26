@@ -37,9 +37,13 @@
 #include <sstream>
 
 #if NodeEditor_ENABLE_GRAPHVIZ
+// Older Graphviz releases (before 2.40.0) require `HAVE_CONFIG_H` to define
+// `POINTS_PER_INCH`.
+#define HAVE_CONFIG_H
 #include <cgraph.h>
 #include <geom.h>
 #include <gvc.h>
+#undef HAVE_CONFIG_H
 #endif // NodeEditor_ENABLE_GRAPHVIZ
 
 // ----------------------------------------------------------------------------
