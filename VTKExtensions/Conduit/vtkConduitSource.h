@@ -57,7 +57,7 @@ public:
 
   ///@{
   /**
-   * vtkConduitSource supports output vtkMultiBlock instead of vtkPartionedDataSetCollection
+   * vtkConduitSource supports output vtkMultiBlock instead of vtkPartitionedDataSetCollection
    * Set this to true if the source should output vtkMultiBlock (default is false).
    */
   vtkSetMacro(OutputMultiBlock, bool);
