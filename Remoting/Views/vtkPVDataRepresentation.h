@@ -231,6 +231,13 @@ public:
   using Superclass::AddInputConnection;
   //@}
 
+  /**
+   * Specify the array names used for the selection.
+   * Empty method to be implemented by inheriting classes
+   */
+  virtual void SetArrayIdNames(
+    const char* vtkNotUsed(pointArray), const char* vtkNotUsed(cellArray)){};
+
 protected:
   vtkPVDataRepresentation();
   ~vtkPVDataRepresentation() override;
