@@ -98,17 +98,6 @@ void vtkSMPVRepresentationProxy::OnPropertyUpdated(vtkObject*, unsigned long, vo
   {
     this->InvalidateDataInformation();
   }
-  else if (pname && (strcmp(pname, "UseGradientForTransfer2D") == 0) ||
-    (strcmp(pname, "ColorArray2Name") == 0))
-  {
-    if (auto colorArrayProperty = this->GetProperty("ColorArrayName"))
-    {
-      vtkSMPropertyHelper colorArrayHelper(colorArrayProperty);
-      std::string arrayName(colorArrayHelper.GetInputArrayNameToProcess());
-      int association = colorArrayHelper.GetInputArrayAssociation();
-      vtkSMPVRepresentationProxy::SetScalarColoring(this, arrayName.c_str(), association);
-    }
-  }
 }
 
 //----------------------------------------------------------------------------
