@@ -723,7 +723,7 @@ void pqFileDialog::setFileMode(pqFileDialog::FileMode mode)
 
   impl.Ui.Navigate->show();
   impl.Ui.Navigate->setEnabled(false);
-  impl.Ui.CreateFolder->setEnabled(
+  impl.Ui.CreateFolder->setVisible(
     impl.Mode == pqFileDialog::AnyFile || impl.Mode == pqFileDialog::Directory);
   this->updateButtonStates();
 }
