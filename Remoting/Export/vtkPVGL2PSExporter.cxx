@@ -24,6 +24,8 @@
 #include "vtkRenderer.h"
 #include "vtkRendererCollection.h"
 
+#include "vtksys/SystemTools.hxx"
+
 #include <cstdio> // for rename
 
 vtkStandardNewMacro(vtkPVGL2PSExporter);
@@ -108,13 +110,21 @@ void vtkPVGL2PSExporter::WriteData()
       tmpFileName += ".svg";
       break;
   }
+
+  std::string fromPath(tmpFileName);
+  std::string toPath(this->FileName);
+
   if (this->Compress)
   {
-    tmpFileName += ".gz";
+    fromPath += ".gz";
+    toPath += ".gz";
   }
 
-  int result = this->Compress ? std::rename(tmpFileName.c_str(), (this->FileName + ".gz").c_str())
-                              : std::rename(tmpFileName.c_str(), this->FileName.c_str());
+  if (vtksys::SystemTools::FileExists(toPath))
+  {
+    vtksys::SystemTools::RemoveFile(toPath);
+  }
+  int result = std::rename(fromPath.c_str(), toPath.c_str());
 
   if (result != 0)
   {
