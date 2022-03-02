@@ -61,7 +61,7 @@ class vtkSMProxy;
  * destroying these objects. The application layer accesses the
  * ObjectBuilder through the pqApplicationCore singleton.
  * NOTE: pqObjectBuilder replaces the previously supported
- * pqPipelineBuilder. Unlink, pqPipelineBuilder, this class
+ * pqPipelineBuilder. Unlike pqPipelineBuilder, this class
  * no longer deals with undo/redo stack. The application layer
  * components that use the ObjectBuilder are supposed to bother
  * about the undo stack i.e. call begin/end on the undo stack

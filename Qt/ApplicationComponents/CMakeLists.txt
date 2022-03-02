@@ -174,6 +174,7 @@ set(classes
   pqSaveStateReaction
   pqScalarBarVisibilityReaction
   pqSearchItemReaction
+  pqSelectionEditor
   pqSelectionQueryPropertyWidget
   pqSelectionReaction
   pqSeriesEditorPropertyWidget
@@ -268,6 +269,7 @@ set(ui_files
   Resources/UI/pqPropertyCollectionWidget.ui
   Resources/UI/pqResetScalarRangeToDataOverTime.ui
   Resources/UI/pqSavePresetOptions.ui
+  Resources/UI/pqSelectionEditor.ui
   Resources/UI/pqSeriesEditorPropertyWidget.ui
   Resources/UI/pqSpherePropertyWidget.ui
   Resources/UI/pqSplinePropertyWidget.ui

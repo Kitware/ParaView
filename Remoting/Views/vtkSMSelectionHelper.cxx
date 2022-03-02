@@ -17,7 +17,6 @@
 #include "vtkClientServerStream.h"
 #include "vtkCollection.h"
 #include "vtkCompositeRepresentation.h"
-#include "vtkDataRepresentation.h"
 #include "vtkDoubleArray.h"
 #include "vtkIdTypeArray.h"
 #include "vtkInformation.h"
@@ -41,24 +40,278 @@
 #include "vtkSMSourceProxy.h"
 #include "vtkSelection.h"
 #include "vtkSelectionNode.h"
-#include "vtkSelectionSerializer.h"
 #include "vtkSmartPointer.h"
 #include "vtkStringArray.h"
 #include "vtkUnsignedIntArray.h"
 #include "vtkView.h"
 
 #include <cassert>
+#include <list>
 #include <map>
+#include <regex>
 #include <set>
-#include <sstream>
 #include <vector>
 
+namespace
+{
+//------------------------------------------------------------------------------
+void ReplaceString(std::string& source, const std::string& replace, const std::string& with)
+{
+  const std::regex reg("[a-zA-Z0-9]+");
+  for (auto match = std::sregex_iterator(source.begin(), source.end(), reg);
+       match != std::sregex_iterator(); ++match)
+  {
+    if (match->str() == replace)
+    {
+      source.replace(match->position(), match->length(), with);
+    }
+  }
+}
+}
+
+//------------------------------------------------------------------------------
+const std::string vtkSMSelectionHelper::SubSelectionBaseName = "s";
+
+//-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSMSelectionHelper);
 
 //-----------------------------------------------------------------------------
 void vtkSMSelectionHelper::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
+}
+
+//-----------------------------------------------------------------------------
+vtkSMProxy* vtkSMSelectionHelper::NewAppendSelectionsFromSelectionSource(
+  vtkSMSourceProxy* selectionSource)
+{
+  if (!selectionSource)
+  {
+    return nullptr;
+  }
+  vtkSMSessionProxyManager* pxm =
+    vtkSMProxyManager::GetProxyManager()->GetSessionProxyManager(selectionSource->GetSession());
+  vtkSMProxy* appendSelections = pxm->NewProxy("filters", "AppendSelections");
+  const std::string selectionName = vtkSMSelectionHelper::SubSelectionBaseName + "0";
+  vtkSMPropertyHelper(appendSelections, "Input").Add(selectionSource);
+  vtkSMPropertyHelper(appendSelections, "SelectionNames").Set(selectionName.c_str());
+  vtkSMPropertyHelper(appendSelections, "Expression").Set(selectionName.c_str());
+  appendSelections->UpdateVTKObjects();
+  return appendSelections;
+}
+
+bool vtkSMSelectionHelper::CombineSelection(vtkSMSourceProxy* appendSelections1,
+  vtkSMSourceProxy* appendSelections2, CombineOperation combineOperation, bool deepCopy)
+{
+  if (!appendSelections1 || !appendSelections2)
+  {
+    return false;
+  }
+  if (vtkSMPropertyHelper(appendSelections2, "Input").GetNumberOfElements() == 0)
+  {
+    return false;
+  }
+  if (deepCopy)
+  {
+    if (vtkSMPropertyHelper(appendSelections1, "Input").GetNumberOfElements() == 0)
+    {
+      // create a combined appendSelections which is deep copy of appendSelections2
+      vtkSMSessionProxyManager* pxm = vtkSMProxyManager::GetProxyManager()->GetSessionProxyManager(
+        appendSelections2->GetSession());
+      vtkSmartPointer<vtkSMSourceProxy> combinedAppendSelections;
+      combinedAppendSelections.TakeReference(
+        vtkSMSourceProxy::SafeDownCast(pxm->NewProxy("filters", "AppendSelections")));
+
+      vtkSMPropertyHelper(combinedAppendSelections, "Expression")
+        .Set(vtkSMPropertyHelper(appendSelections2, "Expression").GetAsString());
+      vtkSMPropertyHelper(combinedAppendSelections, "InsideOut")
+        .Set(vtkSMPropertyHelper(appendSelections2, "InsideOut").GetAsInt());
+
+      // add selection input and names of appendSelections2
+      unsigned int numInputs =
+        vtkSMPropertyHelper(appendSelections2, "Input").GetNumberOfElements();
+      for (unsigned int i = 0; i < numInputs; ++i)
+      {
+        auto selectionSource = vtkSMPropertyHelper(appendSelections2, "Input").GetAsProxy(i);
+        vtkSmartPointer<vtkSMSourceProxy> selectionSourceCopy;
+        selectionSourceCopy.TakeReference(
+          vtkSMSourceProxy::SafeDownCast(pxm->NewProxy("sources", selectionSource->GetXMLName())));
+        selectionSourceCopy->Copy(selectionSource);
+        selectionSourceCopy->UpdateVTKObjects();
+
+        vtkSMPropertyHelper(combinedAppendSelections, "Input").Add(selectionSourceCopy);
+        vtkSMPropertyHelper(combinedAppendSelections, "SelectionNames")
+          .Set(i, vtkSMPropertyHelper(appendSelections2, "SelectionNames").GetAsString(i));
+      }
+      appendSelections2->Copy(combinedAppendSelections);
+      appendSelections2->UpdateVTKObjects();
+      return true;
+    }
+  }
+  else
+  {
+    if (vtkSMPropertyHelper(appendSelections1, "Input").GetNumberOfElements() == 0)
+    {
+      return true;
+    }
+  }
+  if (combineOperation == CombineOperation::DEFAULT)
+  {
+    return true;
+  }
+  // appendSelections1 serves as input1 and appendSelections2 serves as input2.
+  // The result of this function will be appended into appendSelections2.
+
+  // The appendSelections1 is combine-able with the appendSelections2 if they have the same
+  // FieldType/ElementType and if they have the same ContainingCells
+  // Checking only one of the inputs is sufficient.
+  vtkSMProxy* firstSelectionSourceAP1 =
+    vtkSMPropertyHelper(appendSelections1, "Input").GetAsProxy(0);
+  vtkSMProxy* firstSelectionSourceAP2 =
+    vtkSMPropertyHelper(appendSelections2, "Input").GetAsProxy(0);
+
+  // SelectionQuerySource has element type and not field type
+  int fieldTypeOfFirstSelectionSourceAP1 = firstSelectionSourceAP1->GetProperty("FieldType")
+    ? vtkSMPropertyHelper(firstSelectionSourceAP1, "FieldType").GetAsInt()
+    : vtkSelectionNode::ConvertAttributeTypeToSelectionField(
+        vtkSMPropertyHelper(firstSelectionSourceAP1, "ElementType").GetAsInt());
+  int fieldTypeOfFirstSelectionSourceAP2 = firstSelectionSourceAP2->GetProperty("FieldType")
+    ? vtkSMPropertyHelper(firstSelectionSourceAP2, "FieldType").GetAsInt()
+    : vtkSelectionNode::ConvertAttributeTypeToSelectionField(
+        vtkSMPropertyHelper(firstSelectionSourceAP2, "ElementType").GetAsInt());
+  if (fieldTypeOfFirstSelectionSourceAP1 != fieldTypeOfFirstSelectionSourceAP2)
+  {
+    return false;
+  }
+
+  if (vtkSMPropertyHelper(firstSelectionSourceAP1, "ContainingCells", true).GetAsInt() !=
+    vtkSMPropertyHelper(firstSelectionSourceAP2, "ContainingCells", true).GetAsInt())
+  {
+    return false;
+  }
+
+  unsigned int numInputsAP1 = vtkSMPropertyHelper(appendSelections1, "Input").GetNumberOfElements();
+  // find the largest selection name id of the appendSelections2
+  int maxId = -1;
+  for (unsigned int i = 0; i < numInputsAP1; ++i)
+  {
+    // get the selection name
+    std::string selectionName =
+      vtkSMPropertyHelper(appendSelections1, "SelectionNames").GetAsString(i);
+    // remove the S prefix
+    selectionName.erase(0, vtkSMSelectionHelper::SubSelectionBaseName.size());
+    // get the id
+    maxId = std::max(maxId, std::stoi(selectionName));
+  }
+
+  // create new expression and selection names from appendSelections2's selections sources
+  std::string newExpressionAP2 = vtkSMPropertyHelper(appendSelections2, "Expression").GetAsString();
+  unsigned int numInputsAP2 = vtkSMPropertyHelper(appendSelections2, "Input").GetNumberOfElements();
+  std::list<std::string> newSelectionNamesAP2;
+  for (int i = static_cast<int>(numInputsAP2) - 1; i >= 0; --i)
+  {
+    const std::string oldSelectionName = vtkSMPropertyHelper(appendSelections2, "SelectionNames")
+                                           .GetAsString(static_cast<unsigned int>(i));
+    std::string newSelectionName = oldSelectionName;
+    // remove the S prefix
+    newSelectionName.erase(0, vtkSMSelectionHelper::SubSelectionBaseName.size());
+    // compute new selection name id
+    int selectionNameId = std::atoi(newSelectionName.c_str()) + maxId + 1;
+    newSelectionName = vtkSMSelectionHelper::SubSelectionBaseName + std::to_string(selectionNameId);
+    // save new selection name
+    newSelectionNamesAP2.push_front(newSelectionName);
+    // update the expression
+    ReplaceString(newExpressionAP2, oldSelectionName, newSelectionName);
+  }
+
+  // create a combined appendSelections
+  vtkSMSessionProxyManager* pxm =
+    vtkSMProxyManager::GetProxyManager()->GetSessionProxyManager(appendSelections2->GetSession());
+  vtkSmartPointer<vtkSMSourceProxy> combinedAppendSelections;
+  combinedAppendSelections.TakeReference(
+    vtkSMSourceProxy::SafeDownCast(pxm->NewProxy("filters", "AppendSelections")));
+  // add selection input and names of appendSelections1 to appendSelections2
+  for (unsigned int i = 0; i < numInputsAP1; ++i)
+  {
+    auto selectionSource = vtkSMPropertyHelper(appendSelections1, "Input").GetAsProxy(i);
+    if (deepCopy)
+    {
+      vtkSmartPointer<vtkSMSourceProxy> selectionSourceCopy;
+      selectionSourceCopy.TakeReference(
+        vtkSMSourceProxy::SafeDownCast(pxm->NewProxy("sources", selectionSource->GetXMLName())));
+      selectionSourceCopy->Copy(selectionSource);
+      selectionSourceCopy->UpdateVTKObjects();
+      vtkSMPropertyHelper(combinedAppendSelections, "Input").Add(selectionSourceCopy);
+    }
+    else
+    {
+      vtkSMPropertyHelper(combinedAppendSelections, "Input").Add(selectionSource);
+    }
+    vtkSMPropertyHelper(combinedAppendSelections, "SelectionNames")
+      .Set(i, vtkSMPropertyHelper(appendSelections1, "SelectionNames").GetAsString(i));
+  }
+  auto iter = newSelectionNamesAP2.begin();
+  for (unsigned int i = 0; i < numInputsAP2; ++i, ++iter)
+  {
+    auto selectionSource = vtkSMPropertyHelper(appendSelections2, "Input").GetAsProxy(i);
+    if (deepCopy)
+    {
+      vtkSmartPointer<vtkSMSourceProxy> selectionSourceCopy;
+      selectionSourceCopy.TakeReference(
+        vtkSMSourceProxy::SafeDownCast(pxm->NewProxy("sources", selectionSource->GetXMLName())));
+      selectionSourceCopy->Copy(selectionSource);
+      selectionSourceCopy->UpdateVTKObjects();
+      vtkSMPropertyHelper(combinedAppendSelections, "Input").Add(selectionSourceCopy);
+    }
+    else
+    {
+      vtkSMPropertyHelper(combinedAppendSelections, "Input").Add(selectionSource);
+    }
+    vtkSMPropertyHelper(combinedAppendSelections, "SelectionNames")
+      .Set(numInputsAP1 + i, iter->c_str());
+  }
+
+  // add inside out qualifier to the expressions
+  const int insideOutAP1 = vtkSMPropertyHelper(appendSelections1, "InsideOut").GetAsInt();
+  std::string newExpressionAP1 = vtkSMPropertyHelper(appendSelections1, "Expression").GetAsString();
+  if (numInputsAP1 > 1)
+  {
+    newExpressionAP1 = '(' + newExpressionAP1 + ')';
+  }
+  newExpressionAP1 = (insideOutAP1 ? "!" : "") + newExpressionAP1;
+
+  const int insideOutAP2 = vtkSMPropertyHelper(appendSelections2, "InsideOut").GetAsInt();
+  if (numInputsAP2 > 1)
+  {
+    newExpressionAP2 = '(' + newExpressionAP2 + ')';
+  }
+  newExpressionAP2 = (insideOutAP2 ? "!" : "") + newExpressionAP2;
+
+  // combine appendSelections1 and appendSelections2 expressions
+  std::string newCombinedExpression;
+  switch (combineOperation)
+  {
+    case CombineOperation::ADDITION:
+    {
+      newCombinedExpression = newExpressionAP1 + '|' + newExpressionAP2;
+      break;
+    }
+    case CombineOperation::SUBTRACTION:
+    {
+      newCombinedExpression = newExpressionAP1 + "&!" + newExpressionAP2;
+      break;
+    }
+    case CombineOperation::TOGGLE:
+    default:
+    {
+      newCombinedExpression = newExpressionAP1 + '^' + newExpressionAP2;
+      break;
+    }
+  }
+  vtkSMPropertyHelper(combinedAppendSelections, "Expression").Set(newCombinedExpression.c_str());
+  appendSelections2->Copy(combinedAppendSelections);
+  appendSelections2->UpdateVTKObjects();
+  return true;
 }
 
 //-----------------------------------------------------------------------------
@@ -156,23 +409,20 @@ vtkSMProxy* vtkSMSelectionHelper::NewSelectionSourceFromSelectionInternal(vtkSMS
   // Set some common property values using the state of the vtkSelection.
   if (selProperties->Has(vtkSelectionNode::FIELD_TYPE()))
   {
-    vtkSMIntVectorProperty* ivp =
-      vtkSMIntVectorProperty::SafeDownCast(selSource->GetProperty("FieldType"));
-    ivp->SetElement(0, selProperties->Get(vtkSelectionNode::FIELD_TYPE()));
+    vtkSMPropertyHelper(selSource, "FieldType")
+      .Set(selProperties->Get(vtkSelectionNode::FIELD_TYPE()));
   }
 
   if (selProperties->Has(vtkSelectionNode::CONTAINING_CELLS()))
   {
-    vtkSMIntVectorProperty* ivp =
-      vtkSMIntVectorProperty::SafeDownCast(selSource->GetProperty("ContainingCells"));
-    ivp->SetElement(0, selProperties->Get(vtkSelectionNode::CONTAINING_CELLS()));
+    vtkSMPropertyHelper(selSource, "ContainingCells")
+      .Set(selProperties->Get(vtkSelectionNode::CONTAINING_CELLS()));
   }
 
   if (selProperties->Has(vtkSelectionNode::INVERSE()))
   {
-    vtkSMIntVectorProperty* ivp =
-      vtkSMIntVectorProperty::SafeDownCast(selSource->GetProperty("InsideOut"));
-    ivp->SetElement(0, selProperties->Get(vtkSelectionNode::INVERSE()));
+    vtkSMPropertyHelper(selSource, "InsideOut")
+      .Set(selProperties->Get(vtkSelectionNode::INVERSE()));
   }
 
   if (contentType == vtkSelectionNode::FRUSTUM)
@@ -264,7 +514,7 @@ vtkSMProxy* vtkSMSelectionHelper::NewSelectionSourceFromSelectionInternal(vtkSMS
       vtkSMIdTypeVectorProperty::SafeDownCast(selSource->GetProperty("IDs"));
     if (!originalSelSource)
     {
-      // remove default values set by the XML if we created a brand new proxy.
+      // remove default values set by the XML if we created a brand-new proxy.
       ids->SetNumberOfElements(0);
     }
     vtkIdTypeArray* idList = vtkIdTypeArray::SafeDownCast(selection->GetSelectionList());
@@ -283,16 +533,12 @@ vtkSMProxy* vtkSMSelectionHelper::NewSelectionSourceFromSelectionInternal(vtkSMS
       }
       else if (use_composite)
       {
-        vtkIdType composite_index = 0;
-        if (selProperties->Has(vtkSelectionNode::COMPOSITE_INDEX()))
-        {
-          composite_index = selProperties->Get(vtkSelectionNode::COMPOSITE_INDEX());
-        }
+        vtkIdType compositeIndex = selProperties->Get(vtkSelectionNode::COMPOSITE_INDEX());
 
         std::vector<vtkIdType> newVals(3 * numIDs);
         for (vtkIdType cc = 0; cc < numIDs; cc++)
         {
-          newVals[3 * cc] = composite_index;
+          newVals[3 * cc] = compositeIndex;
           newVals[3 * cc + 1] = procID;
           newVals[3 * cc + 2] = idList->GetValue(cc);
         }
@@ -375,8 +621,60 @@ vtkSMProxy* vtkSMSelectionHelper::NewSelectionSourceFromSelection(
 }
 
 //-----------------------------------------------------------------------------
-vtkSMProxy* vtkSMSelectionHelper::ConvertSelection(
-  int outputType, vtkSMProxy* selectionSourceProxy, vtkSMSourceProxy* dataSource, int dataPort)
+vtkSMProxy* vtkSMSelectionHelper::ConvertAppendSelections(int outputType,
+  vtkSMSourceProxy* appendSelections, vtkSMSourceProxy* dataSource, int dataPort,
+  bool& selectionChanged)
+{
+  selectionChanged = false;
+  if (!appendSelections || !dataSource)
+  {
+    return nullptr;
+  }
+  unsigned int numInputs = vtkSMPropertyHelper(appendSelections, "Input").GetNumberOfElements();
+  // create a new append selections proxy
+  vtkSMSourceProxy* newAppendSelections = vtkSMSourceProxy::SafeDownCast(
+    appendSelections->GetSessionProxyManager()->NewProxy("filters", "AppendSelections"));
+  // copy needed values
+  vtkSMPropertyHelper(newAppendSelections, "Expression")
+    .Set(vtkSMPropertyHelper(appendSelections, "Expression").GetAsString());
+  vtkSMPropertyHelper(newAppendSelections, "InsideOut")
+    .Set(vtkSMPropertyHelper(appendSelections, "InsideOut").GetAsInt());
+
+  // convert all sub selections source append selections to the new type
+  for (unsigned int i = 0; i < numInputs; ++i)
+  {
+    auto selectionSource =
+      vtkSMSourceProxy::SafeDownCast(vtkSMPropertyHelper(appendSelections, "Input").GetAsProxy(i));
+    // note, if the selection source is already the correct type, it will be returned as is
+    // otherwise, a new one will be created
+    auto outputTypeSelectionSource =
+      vtkSMSourceProxy::SafeDownCast(vtkSMSelectionHelper::ConvertSelectionSource(
+        outputType, selectionSource, dataSource, dataPort));
+    if (outputTypeSelectionSource)
+    {
+      // if the selection source is not outputType, update the selection source
+      if (outputTypeSelectionSource != selectionSource)
+      {
+        outputTypeSelectionSource->UpdateVTKObjects();
+        selectionChanged = true;
+      }
+      vtkSMPropertyHelper(newAppendSelections, "Input").Add(outputTypeSelectionSource);
+      outputTypeSelectionSource->Delete();
+    }
+    else
+    {
+      vtkSMPropertyHelper(newAppendSelections, "Input").Add(selectionSource);
+    }
+    vtkSMPropertyHelper(newAppendSelections, "SelectionNames")
+      .Set(i, vtkSMPropertyHelper(appendSelections, "SelectionNames").GetAsString(i));
+  }
+  newAppendSelections->UpdateVTKObjects();
+  return newAppendSelections;
+}
+
+//-----------------------------------------------------------------------------
+vtkSMProxy* vtkSMSelectionHelper::ConvertSelectionSource(int outputType,
+  vtkSMSourceProxy* selectionSourceProxy, vtkSMSourceProxy* dataSource, int dataPort)
 {
   const char* inproxyname = selectionSourceProxy ? selectionSourceProxy->GetXMLName() : nullptr;
   const char* outproxyname = nullptr;
@@ -408,18 +706,17 @@ vtkSMProxy* vtkSMSelectionHelper::ConvertSelection(
 
     case vtkSelectionNode::INDICES:
     {
-      const char* dataName = dataSource->GetOutputPort(dataPort)->GetDataClassName();
+      auto dataInformation = dataSource->GetOutputPort(dataPort)->GetDataInformation();
       outproxyname = "IDSelectionSource";
-      if (dataName)
+      // check if subclass of vtkUniformGridAMR
+      if (dataInformation->GetNumberOfAMRLevels() > 0)
       {
-        if (strcmp(dataName, "vtkHierarchicalBoxDataSet") == 0)
-        {
-          outproxyname = "HierarchicalDataIDSelectionSource";
-        }
-        else if (strcmp(dataName, "vtkMultiBlockDataSet") == 0)
-        {
-          outproxyname = "CompositeDataIDSelectionSource";
-        }
+        outproxyname = "HierarchicalDataIDSelectionSource";
+      }
+      // since it's not subclass of vtkUniformGridAMR, check if it's a composite dataSet
+      else if (dataInformation->IsCompositeDataSet())
+      {
+        outproxyname = "CompositeDataIDSelectionSource";
       }
     }
     break;
@@ -441,29 +738,26 @@ vtkSMProxy* vtkSMSelectionHelper::ConvertSelection(
   {
     vtkSMVectorProperty* ids = nullptr;
     ids = vtkSMVectorProperty::SafeDownCast(selectionSourceProxy->GetProperty("IDs"));
-    // this "if" condition does not do any conversion in input is GLOBALIDS
-    // selection with no ids.
-
+    // This "if" condition avoid doing any conversion if input is an ID based
+    // selection and has no ids.
     if (!ids || ids->GetNumberOfElements() > 0)
     {
       // convert from *anything* to indices.
       return vtkSMSelectionHelper::ConvertInternal(
-        vtkSMSourceProxy::SafeDownCast(selectionSourceProxy), dataSource, dataPort,
-        vtkSelectionNode::INDICES);
+        selectionSourceProxy, dataSource, dataPort, vtkSelectionNode::INDICES);
     }
   }
   else if (outputType == vtkSelectionNode::GLOBALIDS && selectionSourceProxy)
   {
     vtkSMVectorProperty* ids =
       vtkSMVectorProperty::SafeDownCast(selectionSourceProxy->GetProperty("IDs"));
-    // This "if" condition avoid doing any conversion if input is a ID based
+    // This "if" condition avoid doing any conversion if input is a GLOBALIDS based
     // selection and has no ids.
     if (!ids || ids->GetNumberOfElements() > 0)
     {
       // convert from *anything* to global IDs.
       return vtkSMSelectionHelper::ConvertInternal(
-        vtkSMSourceProxy::SafeDownCast(selectionSourceProxy), dataSource, dataPort,
-        vtkSelectionNode::GLOBALIDS);
+        selectionSourceProxy, dataSource, dataPort, vtkSelectionNode::GLOBALIDS);
     }
   }
   else if ((outputType == vtkSelectionNode::BLOCKS ||
@@ -474,7 +768,7 @@ vtkSMProxy* vtkSMSelectionHelper::ConvertSelection(
       strcmp(inproxyname, "CompositeDataIDSelectionSource") == 0))
   {
     return vtkSMSelectionHelper::ConvertInternal(
-      vtkSMSourceProxy::SafeDownCast(selectionSourceProxy), dataSource, dataPort, outputType);
+      selectionSourceProxy, dataSource, dataPort, outputType);
   }
 
   // Conversion not possible, so simply create a new proxy of the requested
@@ -516,561 +810,27 @@ vtkSMProxy* vtkSMSelectionHelper::ConvertInternal(
   dataSource->UpdatePipeline();
 
   // * Filter that converts selections.
-  vtkSMSourceProxy* convertor =
-    vtkSMSourceProxy::SafeDownCast(pxm->NewProxy("filters", "ConvertSelection"));
-  // convertor->SetServers(inSource->GetServers());
+  vtkSmartPointer<vtkSMSourceProxy> convertor;
+  convertor.TakeReference(
+    vtkSMSourceProxy::SafeDownCast(pxm->NewProxy("filters", "ConvertSelection")));
 
-  vtkSMInputProperty* ip = vtkSMInputProperty::SafeDownCast(convertor->GetProperty("Input"));
-  ip->AddInputConnection(inSource, 0);
-
-  ip = vtkSMInputProperty::SafeDownCast(convertor->GetProperty("DataInput"));
-  ip->AddInputConnection(dataSource, dataPort);
-
-  vtkSMIntVectorProperty* ivp =
-    vtkSMIntVectorProperty::SafeDownCast(convertor->GetProperty("OutputType"));
-  ivp->SetElement(0, outputType);
-
-  vtkSMIntVectorProperty* ivp2 =
-    vtkSMIntVectorProperty::SafeDownCast(convertor->GetProperty("AllowMissingArray"));
-  ivp2->SetElement(0, true);
-
+  vtkSMPropertyHelper(convertor, "Input").Set(inSource, dataPort);
+  vtkSMPropertyHelper(convertor, "DataInput").Set(dataSource, dataPort);
+  vtkSMPropertyHelper(convertor, "OutputType").Set(outputType);
+  vtkSMPropertyHelper(convertor, "AllowMissingArray").Set(true);
   convertor->UpdateVTKObjects();
 
   // * Request conversion.
   convertor->UpdatePipeline();
 
   // * And finally gathering the information back
-  vtkPVSelectionInformation* selInfo = vtkPVSelectionInformation::New();
+  vtkNew<vtkPVSelectionInformation> selInfo;
   convertor->GatherInformation(selInfo);
 
   vtkSMProxy* outSource = vtkSMSelectionHelper::NewSelectionSourceFromSelection(
     inSource->GetSession(), selInfo->GetSelection());
 
-  // cleanup.
-  convertor->Delete();
-  selInfo->Delete();
   return outSource;
-}
-
-//-----------------------------------------------------------------------------
-bool vtkSMSelectionHelper::MergeSelection(
-  vtkSMSourceProxy* output, vtkSMSourceProxy* input, vtkSMSourceProxy* dataSource, int dataPort)
-{
-  if (!output || !input)
-  {
-    return false;
-  }
-
-  // Currently only index based selections i.e. ids, global ids based selections
-  // are mergeable and that too only is input and output are identical in all
-  // respects (except the indices ofcourse).
-  if (vtkSMPropertyHelper(output, "FieldType").GetAsInt() !=
-    vtkSMPropertyHelper(input, "FieldType").GetAsInt())
-  {
-    return false;
-  }
-
-  if (vtkSMPropertyHelper(output, "ContainingCells", true).GetAsInt() !=
-    vtkSMPropertyHelper(input, "ContainingCells", true).GetAsInt())
-  {
-    return false;
-  }
-
-  if (vtkSMPropertyHelper(output, "InsideOut").GetAsInt() !=
-    vtkSMPropertyHelper(input, "InsideOut").GetAsInt())
-  {
-    return false;
-  }
-
-  vtkSmartPointer<vtkSMSourceProxy> tempInput;
-  if (strcmp(output->GetXMLName(), input->GetXMLName()) != 0)
-  {
-    // before totally giving up, check to see if the input selection can be
-    // converted to the same type as the output.
-    std::string inputType = input->GetXMLName();
-    std::string outputType = output->GetXMLName();
-
-    if ((inputType == "GlobalIDSelectionSource" && outputType == "IDSelectionSource") ||
-      (inputType == "GlobalIDSelectionSource" && outputType == "CompositeDataIDSelectionSource") ||
-      (inputType == "IDSelectionSource" && outputType == "GlobalIDSelectionSource") ||
-      (inputType == "CompositeDataIDSelectionSource" && outputType == "GlobalIDSelectionSource"))
-    {
-      int type = vtkSelectionNode::INDICES;
-      if (outputType == "GlobalIDSelectionSource")
-      {
-        type = vtkSelectionNode::GLOBALIDS;
-      }
-
-      // Conversion is possible!.
-      tempInput.TakeReference(vtkSMSourceProxy::SafeDownCast(
-        vtkSMSelectionHelper::ConvertSelection(type, input, dataSource, dataPort)));
-      input = tempInput;
-    }
-    else
-    {
-      return false;
-    }
-  }
-
-  // merges IDs, Values or Blocks properties.
-  if (output->GetProperty("IDs") && input->GetProperty("IDs"))
-  {
-    vtkSMPropertyHelper outputIDs(output, "IDs");
-    vtkSMPropertyHelper inputIDs(input, "IDs");
-
-    unsigned int cc;
-    unsigned int iCount = inputIDs.GetNumberOfElements();
-    unsigned int oCount = outputIDs.GetNumberOfElements();
-    std::vector<vtkIdType> ids;
-    ids.reserve(iCount + oCount);
-    for (cc = 0; cc < iCount; cc++)
-    {
-      ids.emplace_back(inputIDs.GetAsIdType(cc));
-    }
-    for (cc = 0; cc < oCount; cc++)
-    {
-      ids.emplace_back(outputIDs.GetAsIdType(cc));
-    }
-    outputIDs.Set(ids.data(), static_cast<unsigned int>(ids.size()));
-    output->UpdateVTKObjects();
-    return true;
-  }
-
-  if (output->GetProperty("Values") && input->GetProperty("Values"))
-  {
-    vtkSMPropertyHelper outputIDs(output, "Values");
-    vtkSMPropertyHelper inputIDs(input, "Values");
-
-    unsigned int cc;
-    unsigned int iCount = inputIDs.GetNumberOfElements();
-    unsigned int oCount = outputIDs.GetNumberOfElements();
-    std::vector<vtkIdType> ids;
-    ids.reserve(iCount + oCount);
-    for (cc = 0; cc < iCount; cc++)
-    {
-      ids.emplace_back(inputIDs.GetAsIdType(cc));
-    }
-    for (cc = 0; cc < oCount; cc++)
-    {
-      ids.emplace_back(outputIDs.GetAsIdType(cc));
-    }
-    outputIDs.Set(ids.data(), static_cast<unsigned int>(ids.size()));
-    output->UpdateVTKObjects();
-    return true;
-  }
-
-  if (output->GetProperty("Blocks") && input->GetProperty("Blocks"))
-  {
-    vtkSMPropertyHelper outputIDs(output, "Blocks");
-    vtkSMPropertyHelper inputIDs(input, "Blocks");
-
-    unsigned int cc;
-    unsigned int iCount = inputIDs.GetNumberOfElements();
-    unsigned int oCount = outputIDs.GetNumberOfElements();
-    std::vector<vtkIdType> ids;
-    ids.reserve(iCount + oCount);
-    for (cc = 0; cc < iCount; cc++)
-    {
-      ids.emplace_back(inputIDs.GetAsIdType(cc));
-    }
-    for (cc = 0; cc < oCount; cc++)
-    {
-      ids.emplace_back(outputIDs.GetAsIdType(cc));
-    }
-    outputIDs.Set(ids.data(), static_cast<unsigned int>(ids.size()));
-    output->UpdateVTKObjects();
-    return true;
-  }
-
-  return false;
-}
-
-//-----------------------------------------------------------------------------
-bool vtkSMSelectionHelper::SubtractSelection(
-  vtkSMSourceProxy* output, vtkSMSourceProxy* input, vtkSMSourceProxy* dataSource, int dataPort)
-{
-  if (!output || !input)
-  {
-    return false;
-  }
-
-  // Currently only index based selections i.e. ids, global ids based selections
-  // are subtractable and that too only is input and output are identical in all
-  // respects (except the indices ofcourse).
-  if (vtkSMPropertyHelper(output, "FieldType").GetAsInt() !=
-    vtkSMPropertyHelper(input, "FieldType").GetAsInt())
-  {
-    return false;
-  }
-
-  if (vtkSMPropertyHelper(output, "ContainingCells", true).GetAsInt() !=
-    vtkSMPropertyHelper(input, "ContainingCells", true).GetAsInt())
-  {
-    return false;
-  }
-
-  if (vtkSMPropertyHelper(output, "InsideOut").GetAsInt() !=
-    vtkSMPropertyHelper(input, "InsideOut").GetAsInt())
-  {
-    return false;
-  }
-
-  vtkSmartPointer<vtkSMSourceProxy> tempInput;
-  if (strcmp(output->GetXMLName(), input->GetXMLName()) != 0)
-  {
-    // before totally giving up, check to see if the input selection can be
-    // converted to the same type as the output.
-    std::string inputType = input->GetXMLName();
-    std::string outputType = output->GetXMLName();
-
-    if ((inputType == "GlobalIDSelectionSource" && outputType == "IDSelectionSource") ||
-      (inputType == "GlobalIDSelectionSource" && outputType == "CompositeDataIDSelectionSource") ||
-      (inputType == "IDSelectionSource" && outputType == "GlobalIDSelectionSource") ||
-      (inputType == "CompositeDataIDSelectionSource" && outputType == "GlobalIDSelectionSource"))
-    {
-      int type = vtkSelectionNode::INDICES;
-      if (outputType == "GlobalIDSelectionSource")
-      {
-        type = vtkSelectionNode::GLOBALIDS;
-      }
-
-      // Conversion is possible!.
-      tempInput.TakeReference(vtkSMSourceProxy::SafeDownCast(
-        vtkSMSelectionHelper::ConvertSelection(type, input, dataSource, dataPort)));
-      input = tempInput;
-    }
-    else
-    {
-      return false;
-    }
-  }
-
-  // Recover type of selection, so we know what is contained in selection source
-  std::string inputType = input->GetXMLName();
-  int selectionTupleSize = 1;
-  if (inputType == "ThresholdSelectionSource" || inputType == "IDSelectionSource" ||
-    inputType == "ValueSelectionSource")
-  {
-    selectionTupleSize = 2;
-  }
-  else if (inputType == "CompositeDataIDSelectionSource" ||
-    inputType == "HierarchicalDataIDSelectionSource")
-  {
-    selectionTupleSize = 3;
-  }
-
-  // subtract IDs, Values or Blocks properties.
-  if (output->GetProperty("IDs") && input->GetProperty("IDs"))
-  {
-    vtkSMPropertyHelper outputIDs(output, "IDs");
-    vtkSMPropertyHelper inputIDs(input, "IDs");
-
-    // Store ids to remove as vector , so set is ordered correctly.
-    std::vector<vtkIdType> ids;
-    std::set<std::vector<vtkIdType>> idsToRemove;
-    unsigned int cc;
-    unsigned int count = outputIDs.GetNumberOfElements() / selectionTupleSize;
-    for (cc = 0; cc < count; cc++)
-    {
-      std::vector<vtkIdType> id;
-      id.reserve(selectionTupleSize);
-      for (int i = 0; i < selectionTupleSize; i++)
-      {
-        id.push_back(outputIDs.GetAsIdType(cc * selectionTupleSize + i));
-      }
-      idsToRemove.insert(id);
-    }
-
-    // Insert ids only if non present in set.
-    count = inputIDs.GetNumberOfElements() / selectionTupleSize;
-    for (cc = 0; cc < count; cc++)
-    {
-      std::vector<vtkIdType> id;
-      id.reserve(selectionTupleSize);
-      for (int i = 0; i < selectionTupleSize; i++)
-      {
-        id.push_back(inputIDs.GetAsIdType(cc * selectionTupleSize + i));
-      }
-      if (idsToRemove.find(id) == idsToRemove.end())
-      {
-        for (int i = 0; i < selectionTupleSize; i++)
-        {
-          ids.push_back(id[i]);
-        }
-      }
-    }
-    outputIDs.Set(ids.data(), static_cast<unsigned int>(ids.size()));
-    output->UpdateVTKObjects();
-    return true;
-  }
-
-  if (output->GetProperty("Values") && input->GetProperty("Values"))
-  {
-    vtkSMPropertyHelper outputIDs(output, "Values");
-    vtkSMPropertyHelper inputIDs(input, "Values");
-
-    // Store ids to remove as vector, so set is ordered correctly.
-    std::vector<vtkIdType> ids;
-    std::set<std::vector<vtkIdType>> idsToRemove;
-    unsigned int cc;
-    unsigned int count = outputIDs.GetNumberOfElements() / selectionTupleSize;
-    for (cc = 0; cc < count; cc++)
-    {
-      std::vector<vtkIdType> id;
-      id.reserve(selectionTupleSize);
-      for (int i = 0; i < selectionTupleSize; i++)
-      {
-        id.push_back(outputIDs.GetAsIdType(cc * selectionTupleSize + i));
-      }
-      idsToRemove.insert(id);
-    }
-
-    // Insert ids only if non present in set.
-    count = inputIDs.GetNumberOfElements() / selectionTupleSize;
-    for (cc = 0; cc < count; cc++)
-    {
-      std::vector<vtkIdType> id;
-      id.reserve(selectionTupleSize);
-      for (int i = 0; i < selectionTupleSize; i++)
-      {
-        id.push_back(inputIDs.GetAsIdType(cc * selectionTupleSize + i));
-      }
-      if (idsToRemove.find(id) == idsToRemove.end())
-      {
-        for (int i = 0; i < selectionTupleSize; i++)
-        {
-          ids.push_back(id[i]);
-        }
-      }
-    }
-    outputIDs.Set(ids.data(), static_cast<unsigned int>(ids.size()));
-    output->UpdateVTKObjects();
-    return true;
-  }
-
-  if (output->GetProperty("Blocks") && input->GetProperty("Blocks"))
-  {
-    vtkSMPropertyHelper outputIDs(output, "Blocks");
-    vtkSMPropertyHelper inputIDs(input, "Blocks");
-
-    std::vector<vtkIdType> ids;
-    std::set<vtkIdType> idsToRemove;
-    unsigned int cc;
-    unsigned int count = outputIDs.GetNumberOfElements();
-    for (cc = 0; cc < count; cc++)
-    {
-      idsToRemove.insert(outputIDs.GetAsIdType(cc));
-    }
-
-    count = inputIDs.GetNumberOfElements();
-    for (cc = 0; cc < count; cc++)
-    {
-      vtkIdType id = inputIDs.GetAsIdType(cc);
-      if (idsToRemove.find(id) == idsToRemove.end())
-      {
-        ids.push_back(inputIDs.GetAsIdType(cc));
-      }
-    }
-    outputIDs.Set(ids.data(), static_cast<unsigned int>(ids.size()));
-    output->UpdateVTKObjects();
-    return true;
-  }
-
-  return false;
-}
-
-//-----------------------------------------------------------------------------
-bool vtkSMSelectionHelper::ToggleSelection(
-  vtkSMSourceProxy* output, vtkSMSourceProxy* input, vtkSMSourceProxy* dataSource, int dataPort)
-{
-  if (!output || !input)
-  {
-    return false;
-  }
-
-  // Currently only index based selections i.e. ids, global ids based selections
-  // are subtractable and that too only is input and output are identical in all
-  // respects (except the indices ofcourse).
-  if (vtkSMPropertyHelper(output, "FieldType").GetAsInt() !=
-    vtkSMPropertyHelper(input, "FieldType").GetAsInt())
-  {
-    return false;
-  }
-
-  if (vtkSMPropertyHelper(output, "ContainingCells", true).GetAsInt() !=
-    vtkSMPropertyHelper(input, "ContainingCells", true).GetAsInt())
-  {
-    return false;
-  }
-
-  if (vtkSMPropertyHelper(output, "InsideOut").GetAsInt() !=
-    vtkSMPropertyHelper(input, "InsideOut").GetAsInt())
-  {
-    return false;
-  }
-
-  vtkSmartPointer<vtkSMSourceProxy> tempInput;
-  if (strcmp(output->GetXMLName(), input->GetXMLName()) != 0)
-  {
-    // before totally giving up, check to see if the input selection can be
-    // converted to the same type as the output.
-    std::string inputType = input->GetXMLName();
-    std::string outputType = output->GetXMLName();
-
-    if ((inputType == "GlobalIDSelectionSource" && outputType == "IDSelectionSource") ||
-      (inputType == "GlobalIDSelectionSource" && outputType == "CompositeDataIDSelectionSource") ||
-      (inputType == "IDSelectionSource" && outputType == "GlobalIDSelectionSource") ||
-      (inputType == "CompositeDataIDSelectionSource" && outputType == "GlobalIDSelectionSource"))
-    {
-      int type = vtkSelectionNode::INDICES;
-      if (outputType == "GlobalIDSelectionSource")
-      {
-        type = vtkSelectionNode::GLOBALIDS;
-      }
-
-      // Conversion is possible!.
-      tempInput.TakeReference(vtkSMSourceProxy::SafeDownCast(
-        vtkSMSelectionHelper::ConvertSelection(type, input, dataSource, dataPort)));
-      input = tempInput;
-    }
-    else
-    {
-      return false;
-    }
-  }
-
-  // Recover type of selection, so we know what is contained in selection source
-  std::string inputType = input->GetXMLName();
-  int selectionTupleSize = 1;
-  if (inputType == "ThresholdSelectionSource" || inputType == "IDSelectionSource")
-  {
-    selectionTupleSize = 2;
-  }
-  else if (inputType == "CompositeDataIDSelectionSource" ||
-    inputType == "HierarchicalDataIDSelectionSource")
-  {
-    selectionTupleSize = 3;
-  }
-
-  // Toggle IDs or Blocks properties.
-  if (output->GetProperty("IDs") && input->GetProperty("IDs"))
-  {
-    vtkSMPropertyHelper outputIDs(output, "IDs");
-    vtkSMPropertyHelper inputIDs(input, "IDs");
-
-    // Store ids to toggle as vector , so set is ordered correctly.
-    std::vector<vtkIdType> ids;
-    std::set<std::vector<vtkIdType>> idsToToggle;
-    unsigned int cc;
-    unsigned int count = outputIDs.GetNumberOfElements() / selectionTupleSize;
-    for (cc = 0; cc < count; cc++)
-    {
-      std::vector<vtkIdType> id;
-      id.reserve(selectionTupleSize);
-      for (int i = 0; i < selectionTupleSize; i++)
-      {
-        id.push_back(outputIDs.GetAsIdType(cc * selectionTupleSize + i));
-      }
-      idsToToggle.insert(id);
-    }
-
-    // Insert ids only if non present in set. remove for idToToggle if present
-    count = inputIDs.GetNumberOfElements() / selectionTupleSize;
-    for (cc = 0; cc < count; cc++)
-    {
-      std::vector<vtkIdType> id;
-      id.reserve(selectionTupleSize);
-      for (int i = 0; i < selectionTupleSize; i++)
-      {
-        id.push_back(inputIDs.GetAsIdType(cc * selectionTupleSize + i));
-      }
-      if (idsToToggle.find(id) == idsToToggle.end())
-      {
-        for (int i = 0; i < selectionTupleSize; i++)
-        {
-          ids.push_back(id[i]);
-        }
-      }
-      else
-      {
-        idsToToggle.erase(id);
-      }
-    }
-
-    // Insert new element, remaining in idToToggle
-    for (std::set<std::vector<vtkIdType>>::const_iterator it = idsToToggle.begin();
-         it != idsToToggle.end(); it++)
-    {
-      for (int i = 0; i < selectionTupleSize; i++)
-      {
-        ids.push_back((*it)[i]);
-      }
-    }
-
-    outputIDs.Set(ids.data(), static_cast<unsigned int>(ids.size()));
-    output->UpdateVTKObjects();
-    return true;
-  }
-
-  if (output->GetProperty("Blocks") && input->GetProperty("Blocks"))
-  {
-    vtkSMPropertyHelper outputIDs(output, "Blocks");
-    vtkSMPropertyHelper inputIDs(input, "Blocks");
-
-    // Store ids to toggle as vector , so set is ordered correctly.
-    std::vector<vtkIdType> ids;
-    std::set<std::vector<vtkIdType>> idsToToggle;
-    unsigned int cc;
-    unsigned int count = outputIDs.GetNumberOfElements() / selectionTupleSize;
-    for (cc = 0; cc < count; cc++)
-    {
-      std::vector<vtkIdType> id;
-      id.reserve(selectionTupleSize);
-      for (int i = 0; i < selectionTupleSize; i++)
-      {
-        id.push_back(outputIDs.GetAsIdType(cc * selectionTupleSize + i));
-      }
-      idsToToggle.insert(id);
-    }
-
-    // Insert ids only if non present in set. remove for idToToggle if present
-    count = inputIDs.GetNumberOfElements() / selectionTupleSize;
-    for (cc = 0; cc < count; cc++)
-    {
-      std::vector<vtkIdType> id;
-      id.reserve(selectionTupleSize);
-      for (int i = 0; i < selectionTupleSize; i++)
-      {
-        id.push_back(inputIDs.GetAsIdType(cc * selectionTupleSize + i));
-      }
-      if (idsToToggle.find(id) == idsToToggle.end())
-      {
-        for (int i = 0; i < selectionTupleSize; i++)
-        {
-          ids.push_back(id[i]);
-        }
-      }
-      else
-      {
-        idsToToggle.erase(id);
-      }
-    }
-
-    // Insert new element, remaining in idToToggle
-    for (std::set<std::vector<vtkIdType>>::const_iterator it = idsToToggle.begin();
-         it != idsToToggle.end(); it++)
-    {
-      for (int i = 0; i < selectionTupleSize; i++)
-      {
-        ids.push_back((*it)[i]);
-      }
-    }
-
-    outputIDs.Set(ids.data(), static_cast<unsigned int>(ids.size()));
-    output->UpdateVTKObjects();
-    return true;
-  }
-  return false;
 }
 
 namespace

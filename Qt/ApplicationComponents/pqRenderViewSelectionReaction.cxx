@@ -109,15 +109,6 @@ pqRenderViewSelectionReaction::pqRenderViewSelectionReaction(
     }
   }
 
-  if (this->Mode == SELECT_FRUSTUM_CELLS || this->Mode == SELECT_FRUSTUM_POINTS)
-  {
-    this->DisableSelectionModifiers = true;
-  }
-  else
-  {
-    this->DisableSelectionModifiers = false;
-  }
-
   this->setRepresentation(nullptr);
   if (this->Mode == SELECT_SURFACE_POINTDATA_INTERACTIVELY ||
     this->Mode == SELECT_SURFACE_CELLDATA_INTERACTIVELY)
@@ -197,16 +188,26 @@ void pqRenderViewSelectionReaction::updateEnableState()
     case SHRINK_SELECTION:
       if (pqPVApplicationCore* core = pqPVApplicationCore::instance())
       {
-        bool can_shrink = false;
+        bool canShrink = false;
         for (auto port : core->selectionManager()->getSelectedPorts())
         {
-          if (auto selsource = port->getSelectionInput())
+          if (auto appendSelections = port->getSelectionInput())
           {
-            vtkSMPropertyHelper helper(selsource, "NumberOfLayers");
-            can_shrink |= (helper.GetAsInt() >= 1);
+            bool canShrinkAppendSelections = true;
+            unsigned int numInputs =
+              vtkSMPropertyHelper(appendSelections, "Input").GetNumberOfElements();
+            // for all the selections of this port
+            for (unsigned int i = 0; i < numInputs; ++i)
+            {
+              auto selectionSource = vtkSMPropertyHelper(appendSelections, "Input").GetAsProxy(i);
+              // check if the number of layers is at least 1
+              canShrinkAppendSelections &=
+                (vtkSMPropertyHelper(selectionSource, "NumberOfLayers").GetAsInt() >= 1);
+            }
+            canShrink |= canShrinkAppendSelections;
           }
         }
-        paction->setEnabled(can_shrink);
+        paction->setEnabled(canShrink);
       }
       else
       {
@@ -324,9 +325,6 @@ void pqRenderViewSelectionReaction::beginSelection()
     // Some other selection was active, end it before we start a new one.
     pqRenderViewSelectionReaction::ActiveReaction->endSelection();
   }
-
-  // Enable/Disable selection if supported
-  this->disableSelectionModifiers(this->DisableSelectionModifiers);
 
   pqRenderViewSelectionReaction::ActiveReaction = this;
 
@@ -534,7 +532,7 @@ void pqRenderViewSelectionReaction::selectionChanged(vtkObject*, unsigned long, 
   switch (this->Mode)
   {
     case SELECT_SURFACE_CELLS:
-      this->View->selectOnSurface(region, selectionModifier);
+      this->View->selectCellsOnSurface(region, selectionModifier);
       break;
 
     case SELECT_SURFACE_POINTS:
@@ -542,11 +540,11 @@ void pqRenderViewSelectionReaction::selectionChanged(vtkObject*, unsigned long, 
       break;
 
     case SELECT_FRUSTUM_CELLS:
-      this->View->selectFrustum(region);
+      this->View->selectFrustumCells(region, selectionModifier);
       break;
 
     case SELECT_FRUSTUM_POINTS:
-      this->View->selectFrustumPoints(region);
+      this->View->selectFrustumPoints(region, selectionModifier);
       break;
 
     case SELECT_SURFACE_CELLS_POLYGON:
@@ -580,13 +578,6 @@ void pqRenderViewSelectionReaction::selectionChanged(vtkObject*, unsigned long, 
   END_UNDO_EXCLUDE();
 
   this->endSelection();
-
-  if (this->View)
-  {
-    bool frustumSelection = this->Mode == pqRenderViewSelectionReaction::SELECT_FRUSTUM_CELLS ||
-      this->Mode == pqRenderViewSelectionReaction::SELECT_FRUSTUM_POINTS;
-    this->View->emitSelectionSignals(frustumSelection);
-  }
 }
 
 //-----------------------------------------------------------------------------
@@ -936,7 +927,7 @@ void pqRenderViewSelectionReaction::onLeftButtonRelease()
 
           if (association == vtkDataObject::CELL)
           {
-            this->View->selectOnSurface(region, selectionModifier, arrayName);
+            this->View->selectCellsOnSurface(region, selectionModifier, arrayName);
           }
           else
           {
@@ -948,7 +939,7 @@ void pqRenderViewSelectionReaction::onLeftButtonRelease()
     break;
 
     case SELECT_SURFACE_CELLS_INTERACTIVELY:
-      this->View->selectOnSurface(region, selectionModifier);
+      this->View->selectCellsOnSurface(region, selectionModifier);
       break;
 
     case SELECT_SURFACE_POINTS_INTERACTIVELY:

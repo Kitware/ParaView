@@ -99,7 +99,7 @@
         <bool>false</bool>
        </property>
        <property name="toolTip">
-        <string>Clear selection criteria and qualifiters</string>
+        <string>Clear selection criteria and qualifiers</string>
        </property>
        <property name="text">
         <string>Clear</string>

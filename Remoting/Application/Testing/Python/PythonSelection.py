@@ -2,11 +2,12 @@ from paraview.simple import *
 from paraview.selection import *
 
 from paraview import smtesting
+
 smtesting.ProcessCommandLineArguments()
 
 s = Sphere()
-c =Cone(Resolution=10)
-GroupDatasets(Input=[s,c])
+c = Cone(Resolution=10)
+GroupDatasets(Input=[s, c])
 g = GenerateIds()
 
 sel = SelectCells("CellIds > 4")
@@ -17,26 +18,30 @@ r.ColorArrayName = None
 RenderView1 = Render()
 
 if not smtesting.DoRegressionTesting(RenderView1.SMProxy):
-  # This will lead to VTK object leaks.
-  import sys
-  sys.exit(1)
+    # This will lead to VTK object leaks.
+    import sys
+
+    sys.exit(1)
 
 counter = 0
+
+
 def CheckSelection(numPoints=None, numCells=None):
-  global counter
-  Render()
-  SaveScreenshot("tmp%d.png" % counter)
-  print("Saving %s" % ("tmp%d.png" % counter))
-  counter = counter + 1
-  es = ExtractSelection()
-  es.UpdatePipeline()
-  info = es.GetDataInformation()
-  print("Points and cells:", info.GetNumberOfPoints(), info.GetNumberOfCells())
-  if numPoints:
-    assert numPoints == info.GetNumberOfPoints()
-  if numCells:
-    assert numCells == info.GetNumberOfCells()
-  del es
+    global counter
+    Render()
+    SaveScreenshot("tmp%d.png" % counter)
+    print("Saving %s" % ("tmp%d.png" % counter))
+    counter = counter + 1
+    es = ExtractSelection()
+    es.UpdatePipeline()
+    info = es.GetDataInformation()
+    print("Points and cells:", info.GetNumberOfPoints(), info.GetNumberOfCells())
+    if numPoints:
+        assert numPoints == info.GetNumberOfPoints()
+    if numCells:
+        assert numCells == info.GetNumberOfCells()
+    del es
+
 
 SetActiveSource(s)
 Show(s)
@@ -80,7 +85,7 @@ SelectSurfaceBlocks(Rectangle=[100, 100, 200, 200])
 CheckSelection(numPoints=61, numCells=107)
 
 try:
-  SelectSurfacePoints(Rectangle=[0, 0], Polygon=[0, 0])
-  sys.exit(1) # Should not get here
+    SelectSurfacePoints(Rectangle=[0, 0], Polygon=[0, 0])
+    sys.exit(1)  # Should not get here
 except:
-  pass # Exception thrown as expected
+    pass  # Exception thrown as expected

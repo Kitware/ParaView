@@ -5,9 +5,9 @@
                          name="FFTSelectionOverTime">
       <Documentation long_help="Extracts selection over time and plots the FFT"
                      short_help="Extracts selection over time and plots the FFT">
-                     Extracts the data of a selection (e.g. points or cells)
-                     over time, takes the FFT of them, and plots
-                     them.</Documentation>
+        Extracts the data of a selection (e.g. points or cells)
+        over time, takes the FFT of them, and plots them.
+      </Documentation>
       <Proxy compound_name="PlotSelectionOverTime1"
              group="filters"
              id="734"
@@ -18,37 +18,37 @@
                   number_of_elements="1">
           <Domain id="734.Input.groups"
                   name="groups">
-            <Group value="sources" />
-            <Group value="filters" />
+            <Group value="sources"/>
+            <Group value="filters"/>
           </Domain>
           <Domain id="734.Input.input_type"
                   name="input_type">
-            <DataType value="vtkDataSet" />
-            <DataType value="vtkCompositeDataSet" />
+            <DataType value="vtkDataSet"/>
+            <DataType value="vtkCompositeDataSet"/>
           </Domain>
         </Property>
         <Property id="734.Selection"
                   name="Selection"
                   number_of_elements="1">
           <Proxy output_port="0"
-                 value="742" />
+                 value="741"/>
           <Domain id="734.Selection.groups"
                   name="groups">
-            <Group value="sources" />
-            <Group value="filters" />
+            <Group value="sources"/>
+            <Group value="filters"/>
           </Domain>
           <Domain id="734.Selection.input_type"
                   name="input_type">
-            <DataType value="vtkSelection" />
+            <DataType value="vtkSelection"/>
           </Domain>
         </Property>
         <Property id="734.SetReportStatisticsOnly"
                   name="Only Report Selection Statistics"
                   number_of_elements="1">
           <Element index="0"
-                   value="0" />
+                   value="0"/>
           <Domain id="734.SetReportStatisticsOnly.bool"
-                  name="bool" />
+                  name="bool"/>
         </Property>
       </Proxy>
       <Proxy compound_name="TableFFT1"
@@ -60,28 +60,54 @@
                   name="Input"
                   number_of_elements="1">
           <Proxy output_port="0"
-                 value="734" />
+                 value="734"/>
           <Domain id="812.Input.groups"
                   name="groups">
-            <Group value="sources" />
-            <Group value="filters" />
+            <Group value="sources"/>
+            <Group value="filters"/>
           </Domain>
           <Domain id="812.Input.input_array"
                   name="input_array">
             <InputArray attribute_type="row"
-                        number_of_components="1" />
+                        number_of_components="1"/>
           </Domain>
           <Domain id="812.Input.input_type"
                   name="input_type">
-            <DataType value="vtkTable" />
+            <DataType value="vtkTable"/>
           </Domain>
         </Property>
         <Property id="812.CreateFrequencyColumn"
                   name="CreateFrequencyColumn"
                   number_of_elements="1">
-          <Element index="0" value="0" />
+          <Element index="0" value="0"/>
           <Domain id="812.CreateFrequencyColumn.bool"
-                  name="bool" />
+                  name="bool"/>
+        </Property>
+      </Proxy>
+      <Proxy compound_name="auto_741"
+             group="filters"
+             id="741"
+             servers="1"
+             type="AppendSelections">
+        <Property name="AppendByUnion" id="741.AppendByUnion" number_of_elements="1">
+          <Element index="0" value="0"/>
+          <Domain name="bool" id="741.AppendByUnion.bool"/>
+        </Property>
+        <Property name="Expression" id="741.Expression" number_of_elements="1">
+          <Element index="0" value="s0"/>
+        </Property>
+        <Property name="Input" id="741.Input" number_of_elements="1">
+          <Proxy value="742" output_port="0"/>
+          <Domain name="groups" id="741.Input.groups"/>
+          <Domain name="input_type" id="18228.Input.input_type"/>
+        </Property>
+        <Property name="InsideOut" id="741.InsideOut" number_of_elements="1">
+          <Element index="0" value="0"/>
+          <Domain name="bool" id="741.InsideOut.bool"/>
+        </Property>
+        <Property name="SelectionNames" id="741.SelectionNames" number_of_elements="1">
+          <Element index="0" value="s0"/>
+          <Domain name="names_list" id="741.SelectionNames.names_list"/>
         </Property>
       </Proxy>
       <Proxy compound_name="auto_742"
@@ -93,65 +119,65 @@
                   name="ContainingCells"
                   number_of_elements="1">
           <Element index="0"
-                   value="0" />
+                   value="0"/>
           <Domain id="742.ContainingCells.bool"
-                  name="bool" />
+                  name="bool"/>
         </Property>
         <Property id="742.FieldType"
                   name="FieldType"
                   number_of_elements="1">
           <Element index="0"
-                   value="0" />
+                   value="0"/>
           <Domain id="742.FieldType.enum"
                   name="enum">
             <Entry text="CELL"
-                   value="0" />
+                   value="0"/>
             <Entry text="POINT"
-                   value="1" />
+                   value="1"/>
             <Entry text="FIELD"
-                   value="2" />
+                   value="2"/>
             <Entry text="VERTEX"
-                   value="3" />
+                   value="3"/>
             <Entry text="EDGE"
-                   value="4" />
+                   value="4"/>
           </Domain>
         </Property>
         <Property id="742.IDs"
                   name="IDs"
                   number_of_elements="3">
           <Element index="0"
-                   value="2" />
+                   value="2"/>
           <Element index="1"
-                   value="-1" />
+                   value="-1"/>
           <Element index="2"
-                   value="3892" />
+                   value="3892"/>
         </Property>
         <Property id="742.InsideOut"
                   name="InsideOut"
                   number_of_elements="1">
           <Element index="0"
-                   value="0" />
+                   value="0"/>
           <Domain id="742.InsideOut.bool"
-                  name="bool" />
+                  name="bool"/>
         </Property>
       </Proxy>
       <ExposedProperties>
         <Property exposed_name="Input"
                   name="Input"
-                  proxy_name="PlotSelectionOverTime1" />
+                  proxy_name="PlotSelectionOverTime1"/>
         <Property exposed_name="Selection"
                   name="Selection"
-                  proxy_name="PlotSelectionOverTime1" />
+                  proxy_name="PlotSelectionOverTime1"/>
       </ExposedProperties>
       <OutputPort name="Output"
                   port_index="0"
-                  proxy="TableFFT1" />
+                  proxy="TableFFT1"/>
       <Hints>
         <!-- View can be used to specify the preferred view for the proxy -->
-        <View type="XYChartView" />
-        <Plotable />
+        <View type="XYChartView"/>
+        <Plotable/>
       </Hints>
-    <!-- FFTSelectionOverTime -->
-  </CompoundSourceProxy>
+      <!-- FFTSelectionOverTime -->
+    </CompoundSourceProxy>
   </ProxyGroup>
 </ServerManagerConfiguration>

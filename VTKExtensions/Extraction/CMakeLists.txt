@@ -35,8 +35,7 @@ set(classes
   vtkPVExtractCellsByType
   vtkPVExtractSelection
   vtkPVSelectionSource
-  vtkPVSingleOutputExtractSelection
-  vtkQuerySelectionSource)
+  vtkPVSingleOutputExtractSelection)
 
 vtk_module_add_module(ParaView::VTKExtensionsExtraction
   CLASSES ${classes})

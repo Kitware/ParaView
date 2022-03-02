@@ -102,29 +102,26 @@ vtkSMSelectionLink::vtkSMSelectionLink()
   this->Internals = new vtkSMSelectionLinkInternals;
   this->Internals->SelectionObserver = vtkSMSelectionLinkObserver::New();
   this->Internals->SelectionObserver->Link = this;
-  this->ModifyingSelection = false;
   this->ConvertToIndices = true;
 }
 
 //-----------------------------------------------------------------------------
 vtkSMSelectionLink::~vtkSMSelectionLink()
 {
-  vtkSMSelectionLinkInternals::LinkedSelectionType::iterator iter =
-    this->Internals->LinkedSelections.begin();
-  for (; iter != this->Internals->LinkedSelections.end(); ++iter)
+  for (auto& linkedSelection : this->Internals->LinkedSelections)
   {
-    if (iter->Proxy.GetPointer() != nullptr)
+    if (linkedSelection.Proxy.GetPointer() != nullptr)
     {
-      if (iter->UpdateDirection & INPUT)
+      if (linkedSelection.UpdateDirection & INPUT)
       {
-        iter->Proxy->RemoveObserver(this->Internals->SelectionObserver);
+        linkedSelection.Proxy->RemoveObserver(this->Internals->SelectionObserver);
       }
-      if (iter->UpdateDirection & OUTPUT)
+      if (linkedSelection.UpdateDirection & OUTPUT)
       {
-        for (unsigned int i = 0; i < iter->Proxy->GetNumberOfAlgorithmOutputPorts(); i++)
+        for (unsigned int i = 0; i < linkedSelection.Proxy->GetNumberOfAlgorithmOutputPorts(); i++)
         {
           this->Internals->SelectionObserver->InProgress = true;
-          iter->Proxy->CleanSelectionInputs(i);
+          linkedSelection.Proxy->CleanSelectionInputs(i);
           this->Internals->SelectionObserver->InProgress = false;
         }
       }
@@ -143,11 +140,10 @@ void vtkSMSelectionLink::AddLinkedSelection(vtkSMProxy* proxy, int updateDir)
     int addToList = 1;
     int addObserver = updateDir & INPUT;
 
-    vtkSMSelectionLinkInternals::LinkedSelectionType::iterator iter =
-      this->Internals->LinkedSelections.begin();
-    for (; iter != this->Internals->LinkedSelections.end(); ++iter)
+    for (auto& linkedSelection : this->Internals->LinkedSelections)
     {
-      if (iter->Proxy.GetPointer() == sourceProxy && iter->UpdateDirection == updateDir)
+      if (linkedSelection.Proxy.GetPointer() == sourceProxy &&
+        linkedSelection.UpdateDirection == updateDir)
       {
         addObserver = 0;
         addToList = 0;
@@ -199,9 +195,8 @@ void vtkSMSelectionLink::RemoveAllLinks()
 //-----------------------------------------------------------------------------
 void vtkSMSelectionLink::RemoveLinkedSelection(vtkSMProxy* proxy)
 {
-  vtkSMSelectionLinkInternals::LinkedSelectionType::iterator iter =
-    this->Internals->LinkedSelections.begin();
-  for (; iter != this->Internals->LinkedSelections.end();)
+  for (auto iter = this->Internals->LinkedSelections.begin();
+       iter != this->Internals->LinkedSelections.end();)
   {
     if (iter->Proxy.Get() == proxy)
     {
@@ -228,8 +223,7 @@ unsigned int vtkSMSelectionLink::GetNumberOfLinkedObjects()
 //-----------------------------------------------------------------------------
 vtkSMProxy* vtkSMSelectionLink::GetLinkedProxy(int index)
 {
-  vtkSMSelectionLinkInternals::LinkedSelectionType::iterator iter =
-    this->Internals->LinkedSelections.begin();
+  auto iter = this->Internals->LinkedSelections.begin();
   for (int i = 0; i < index && iter != this->Internals->LinkedSelections.end(); i++)
   {
     iter++;
@@ -244,8 +238,7 @@ vtkSMProxy* vtkSMSelectionLink::GetLinkedProxy(int index)
 //-----------------------------------------------------------------------------
 int vtkSMSelectionLink::GetLinkedObjectDirection(int index)
 {
-  vtkSMSelectionLinkInternals::LinkedSelectionType::iterator iter =
-    this->Internals->LinkedSelections.begin();
+  auto iter = this->Internals->LinkedSelections.begin();
   for (int i = 0; i < index && iter != this->Internals->LinkedSelections.end(); i++)
   {
     iter++;
@@ -260,22 +253,20 @@ int vtkSMSelectionLink::GetLinkedObjectDirection(int index)
 //-----------------------------------------------------------------------------
 void vtkSMSelectionLink::SaveXMLState(const char* linkname, vtkPVXMLElement* parent)
 {
-  vtkPVXMLElement* root = vtkPVXMLElement::New();
+  vtkNew<vtkPVXMLElement> root;
   root->SetName("SelectionLink");
   root->AddAttribute("name", linkname);
-  vtkSMSelectionLinkInternals::LinkedSelectionType::iterator iter =
-    this->Internals->LinkedSelections.begin();
-  for (; iter != this->Internals->LinkedSelections.end(); ++iter)
+  for (auto& linkedSelection : this->Internals->LinkedSelections)
   {
-    vtkPVXMLElement* child = vtkPVXMLElement::New();
+    vtkNew<vtkPVXMLElement> child;
     child->SetName("Selection");
-    child->AddAttribute("id", static_cast<unsigned int>(iter->Proxy.GetPointer()->GetGlobalID()));
-    child->AddAttribute("direction", ((iter->UpdateDirection & INPUT) ? "input" : "output"));
+    child->AddAttribute(
+      "id", static_cast<unsigned int>(linkedSelection.Proxy.GetPointer()->GetGlobalID()));
+    child->AddAttribute(
+      "direction", ((linkedSelection.UpdateDirection & INPUT) ? "input" : "output"));
     root->AddNestedElement(child);
-    child->Delete();
   }
   parent->AddNestedElement(root);
-  root->Delete();
 }
 
 //-----------------------------------------------------------------------------
@@ -381,17 +372,15 @@ void vtkSMSelectionLink::UpdateState()
 
   this->State->ClearExtension(LinkState::link);
 
-  vtkSMSelectionLinkInternals::LinkedSelectionType::iterator iter =
-    this->Internals->LinkedSelections.begin();
-  for (; iter != this->Internals->LinkedSelections.end(); ++iter)
+  for (auto& linkedSelection : this->Internals->LinkedSelections)
   {
-    if (!iter->Proxy.GetPointer())
+    if (!linkedSelection.Proxy.GetPointer())
     {
       continue;
     }
     LinkState_LinkDescription* link = this->State->AddExtension(LinkState::link);
-    link->set_proxy(iter->Proxy.GetPointer()->GetGlobalID());
-    switch (iter->UpdateDirection)
+    link->set_proxy(linkedSelection.Proxy.GetPointer()->GetGlobalID());
+    switch (linkedSelection.UpdateDirection)
     {
       case vtkSMLink::NONE:
         link->set_direction(LinkState_LinkDescription::NONE);
@@ -412,15 +401,12 @@ void vtkSMSelectionLink::UpdateState()
 //-----------------------------------------------------------------------------
 void vtkSMSelectionLink::SelectionModified(vtkSMSourceProxy* caller, unsigned int portIndex)
 {
-  vtkSMSourceProxy* selectionInput = nullptr;
   bool callerFound = false;
-  vtkSMSelectionLinkInternals::LinkedSelectionType::iterator iter;
-  for (iter = this->Internals->LinkedSelections.begin();
-       iter != this->Internals->LinkedSelections.end(); iter++)
+  for (auto& linkedSelection : this->Internals->LinkedSelections)
   {
-    if (caller == iter->Proxy.Get())
+    if (caller == linkedSelection.Proxy.Get())
     {
-      if (iter->UpdateDirection & INPUT)
+      if (linkedSelection.UpdateDirection & INPUT)
       {
         callerFound = true;
         break;
@@ -429,41 +415,38 @@ void vtkSMSelectionLink::SelectionModified(vtkSMSourceProxy* caller, unsigned in
   }
   if (callerFound)
   {
-    selectionInput = caller->GetSelectionInput(portIndex);
-    if (this->ConvertToIndices && selectionInput)
+    vtkSMSourceProxy* appendSelections = caller->GetSelectionInput(portIndex);
+    if (this->ConvertToIndices && appendSelections)
     {
       // Convert selection input to indices based selection
-      vtkSMSourceProxy* newSelectionInput =
-        vtkSMSourceProxy::SafeDownCast(vtkSMSelectionHelper::ConvertSelection(
-          vtkSelectionNode::INDICES, selectionInput, caller, portIndex));
-      selectionInput = newSelectionInput;
+      bool selectionChanged;
+      appendSelections =
+        vtkSMSourceProxy::SafeDownCast(vtkSMSelectionHelper::ConvertAppendSelections(
+          vtkSelectionNode::INDICES, appendSelections, caller, portIndex, selectionChanged));
     }
-    if (selectionInput == nullptr)
+    if (!appendSelections)
     {
-      for (iter = this->Internals->LinkedSelections.begin();
-           iter != this->Internals->LinkedSelections.end(); iter++)
+      for (auto& linkedSelection : this->Internals->LinkedSelections)
       {
-        if (iter->UpdateDirection & OUTPUT && iter->Proxy != caller)
+        if (linkedSelection.UpdateDirection & OUTPUT && linkedSelection.Proxy != caller)
         {
-          iter->Proxy->CleanSelectionInputs(portIndex);
+          linkedSelection.Proxy->CleanSelectionInputs(portIndex);
         }
       }
     }
     else
     {
-      for (iter = this->Internals->LinkedSelections.begin();
-           iter != this->Internals->LinkedSelections.end(); iter++)
+      for (auto& linkedSelection : this->Internals->LinkedSelections)
       {
-        if (iter->UpdateDirection & OUTPUT && iter->Proxy != caller)
+        if (linkedSelection.UpdateDirection & OUTPUT && linkedSelection.Proxy != caller)
         {
-          iter->Proxy->SetSelectionInput(portIndex, selectionInput, 0);
+          linkedSelection.Proxy->SetSelectionInput(portIndex, appendSelections, 0);
         }
       }
-
       // Delete registered proxy
       if (this->ConvertToIndices)
       {
-        selectionInput->Delete();
+        appendSelections->Delete();
       }
     }
   }

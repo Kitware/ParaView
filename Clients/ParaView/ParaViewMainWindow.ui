@@ -272,6 +272,18 @@
    </attribute>
    <widget class="pqColorMapEditor" name="colorMapEditorPanel"/>
   </widget>
+  <widget class="QDockWidget" name="selectionEditorDock">
+   <property name="allowedAreas">
+    <set>Qt::LeftDockWidgetArea|Qt::RightDockWidgetArea</set>
+   </property>
+   <property name="windowTitle">
+    <string>Selection Editor</string>
+   </property>
+   <attribute name="dockWidgetArea">
+    <number>2</number>
+   </attribute>
+   <widget class="pqSelectionEditor" name="selectionEditorPanel"/>
+  </widget>
   <widget class="QDockWidget" name="materialEditorDock">
    <property name="allowedAreas">
     <set>Qt::LeftDockWidgetArea|Qt::RightDockWidgetArea</set>
@@ -542,6 +554,12 @@
    <class>pqLightsInspector</class>
    <extends>QWidget</extends>
    <header>pqLightsInspector.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>pqSelectionEditor</class>
+   <extends>QWidget</extends>
+   <header>pqSelectionEditor.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>

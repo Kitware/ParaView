@@ -33,7 +33,6 @@ class vtkFloatArray;
 class vtkIntArray;
 class vtkRenderer;
 class vtkRenderWindow;
-class vtkRenderWinwInteractor;
 class vtkSMViewProxyInteractorHelper;
 
 class VTKREMOTINGVIEWS_EXPORT vtkSMRenderViewProxy : public vtkSMViewProxy

@@ -180,7 +180,6 @@ private: // NOLINT(readability-redundant-access-specifiers)
   QPointer<pqDataRepresentation> Representation;
   QMetaObject::Connection RepresentationConnection;
   SelectionMode Mode;
-  bool DisableSelectionModifiers;
   int PreviousRenderViewMode;
   vtkWeakPointer<vtkObject> ObservedObject;
   unsigned long ObserverIds[4];

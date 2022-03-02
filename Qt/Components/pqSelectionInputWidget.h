@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqSelectionInputWidget.h
+   Module:  pqSelectionInputWidget.h
 
    Copyright (c) 2005-2008 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -51,10 +51,10 @@ public:
   pqSelectionInputWidget(QWidget* parent = nullptr);
   ~pqSelectionInputWidget() override;
 
-  virtual pqSMProxy selection() { return this->SelectionSource; }
+  virtual pqSMProxy selection() { return this->AppendSelections; }
 
 public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
-  virtual void setSelection(pqSMProxy selection);
+  virtual void setSelection(pqSMProxy newAppendSelections);
 
   /**
    * This must be connected to the panel-accept signal to ensure that the new
@@ -79,13 +79,13 @@ protected Q_SLOTS:
   void updateLabels();
 
 protected: // NOLINT(readability-redundant-access-specifiers)
-  pqSMProxy SelectionSource;
+  pqSMProxy AppendSelections;
 
 private:
   Q_DISABLE_COPY(pqSelectionInputWidget)
 
-  class UI;
-  UI* ui;
+  class pqUi;
+  pqUi* Ui;
 };
 
 #endif

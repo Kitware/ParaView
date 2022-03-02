@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    $RCSfile$
+   Module:  pqFindDataCurrentSelectionFrame.cxx
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -46,7 +46,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqUndoStack.h"
 
 #include "vtkDataObject.h"
-#include "vtkLogger.h"
 #include "vtkNew.h"
 #include "vtkPVDataInformation.h"
 #include "vtkSMFieldDataDomain.h"
@@ -55,21 +54,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMSessionProxyManager.h"
 #include "vtkSMSourceProxy.h"
 #include "vtkSMStringVectorProperty.h"
-#include "vtkSMTrace.h"
 #include "vtkSMViewProxy.h"
 #include "vtkSelectionNode.h"
 #include "vtkSmartPointer.h"
 #include "vtkView.h"
 
 #include <QCheckBox>
+#include <QDebug>
 #include <QMenu>
 #include <QPointer>
-#include <QSignalBlocker>
-#include <QWidgetAction>
-
-#include <QDebug>
-#include <QHBoxLayout>
-#include <QVBoxLayout>
 #include <QWidget>
 
 #include <cassert>
@@ -262,9 +255,11 @@ public:
       vtkSMPropertyHelper(this->RepresentationProxy, "Input")
         .Set(port->getSource()->getProxy(), port->getPortNumber());
 
-      vtkSMSourceProxy* selectionSource = port->getSelectionInput();
-      if (new_selection && selectionSource)
+      vtkSMSourceProxy* appendSelections = port->getSelectionInput();
+      if (new_selection && appendSelections)
       {
+        // Checking only one of the inputs of the appendSelections is sufficient
+        vtkSMProxy* selectionSource = vtkSMPropertyHelper(appendSelections, "Input").GetAsProxy(0);
         // if the selection is a new one, we try to show the element type more
         // appropriate based on the type of selection itself, i.e. if points are
         // being selected, show points. If cells are being selected show cells.
@@ -288,7 +283,7 @@ public:
         {
           const QSignalBlocker blocker(this->Ui.showTypeComboBox);
           this->Ui.showTypeComboBox->setCurrentIndex(index);
-          this->Ui.showTypeComboBox->setEnabled(true);
+          // this->Ui.showTypeComboBox->setEnabled(true);
         }
         else
         {
@@ -298,7 +293,7 @@ public:
       this->updateFieldType();
 
       bool checked =
-        selectionSource && (vtkSMPropertyHelper(selectionSource, "InsideOut").GetAsInt() != 0);
+        appendSelections && (vtkSMPropertyHelper(appendSelections, "InsideOut").GetAsInt() != 0);
       prev = this->Ui.invertSelectionCheckBox->blockSignals(true);
       this->Ui.invertSelectionCheckBox->setChecked(checked);
       this->Ui.invertSelectionCheckBox->blockSignals(prev);

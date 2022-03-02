@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    $RCSfile$
+   Module:  pqFindDataSelectionDisplayFrame.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -73,14 +73,7 @@ private Q_SLOTS:
   void updatePanel();
   void editLabelPropertiesSelection();
   void editLabelPropertiesInteractiveSelection();
-  void showFrustum(bool);
   void onDataUpdated();
-
-  /**
-   * List for selection changes and enable/disable UI elements as appropriate.
-   * \c frustum indicates whether the selection is frustum-based or not.
-   */
-  void onSelectionModeChanged(bool frustum);
 
 private: // NOLINT(readability-redundant-access-specifiers)
   Q_DISABLE_COPY(pqFindDataSelectionDisplayFrame)

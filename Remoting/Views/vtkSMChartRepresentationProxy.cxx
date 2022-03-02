@@ -19,7 +19,6 @@
 #include "vtkObjectFactory.h"
 #include "vtkPVExtractSelection.h"
 #include "vtkPVXMLElement.h"
-#include "vtkSMChartSeriesListDomain.h"
 #include "vtkSMDomain.h"
 #include "vtkSMProperty.h"
 #include "vtkSMPropertyHelper.h"

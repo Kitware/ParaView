@@ -127,11 +127,9 @@
 #include "vtkPlotEdges.h"
 #include "vtkPointHandleRepresentationSphere.h"
 #include "vtkPolyLineToRectilinearGridFilter.h"
-#include "vtkQuerySelectionSource.h"
 #include "vtkRectilinearGridConnectivity.h"
 #include "vtkReductionFilter.h"
 #include "vtkSciVizStatistics.h"
-#include "vtkSelectionConverter.h"
 #include "vtkSelectionSerializer.h"
 #include "vtkSortedTableStreamer.h"
 #include "vtkSpyPlotBlock.h"
@@ -306,7 +304,6 @@ int ParaViewCoreVTKExtensionsPrintSelf(int, char*[])
   PRINT_SELF(vtkRectilinearGridConnectivity);
   PRINT_SELF(vtkReductionFilter);
   PRINT_SELF(vtkSciVizStatistics);
-  PRINT_SELF(vtkSelectionConverter);
   PRINT_SELF(vtkSelectionSerializer);
   PRINT_SELF(vtkSortedTableStreamer);
   // PRINT_SELF(vtkSpyPlotBlock);

@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqSpreadSheetViewSelectionModel.h
+   Module:  pqSpreadSheetViewSelectionModel.h
 
    Copyright (c) 2005-2008 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -90,8 +90,7 @@ protected: // NOLINT(readability-redundant-access-specifiers)
 private:
   Q_DISABLE_COPY(pqSpreadSheetViewSelectionModel)
 
-  class pqInternal;
-  pqInternal* Internal;
+  pqSpreadSheetViewModel* Model;
 };
 
 #endif

@@ -47,7 +47,6 @@
 #include "vtkRenderer.h"
 #include "vtkScalarsToColors.h"
 #include "vtkSelection.h"
-#include "vtkSelectionConverter.h"
 #include "vtkSelectionNode.h"
 #include "vtkShaderProperty.h"
 #include "vtkStreamingDemandDrivenPipeline.h"

@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqRenderView.h
+   Module:  pqRenderView.h
 
    Copyright (c) 2005-2008 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -137,12 +137,14 @@ public:
    */
   bool supportsUndo() const override { return true; }
 
+  ///@{
   /**
    * Returns if the view module can undo/redo interaction given the current
    * state of the interaction undo stack.
    */
   bool canUndo() const override;
   bool canRedo() const override;
+  ///@}
 
   /**
    * Returns if this view module can support image capture. Returns false by
@@ -150,6 +152,7 @@ public:
    */
   bool supportsCapture() const override { return true; }
 
+  ///@{
   /**
    * For linking of interaction undo stacks.
    * This method is used by pqLinksModel to link interaction undo stack for
@@ -157,6 +160,7 @@ public:
    */
   virtual void linkUndoStack(pqRenderView* other);
   virtual void unlinkUndoStack(pqRenderView* other);
+  ///@}
 
   /**
    * Clears interaction undo stack of this view (and all linked views, if any).
@@ -177,14 +181,16 @@ public:
    */
   virtual void setCursor(const QCursor&);
 
+  ///@{
   /**
    * Creates a new surface selection given the rectangle in display
    * coordinates.
    */
-  virtual void selectOnSurface(int rectangle[4],
+  virtual void selectCellsOnSurface(int rectangle[4],
     int selectionModifier = pqView::PV_SELECTION_DEFAULT, const char* array = nullptr);
   virtual void selectPointsOnSurface(int rectangle[4],
     int selectionModifier = pqView::PV_SELECTION_DEFAULT, const char* array = nullptr);
+  ///@}
 
   /**
    * Picks the representation at the given position.
@@ -205,12 +211,16 @@ public:
    */
   virtual pqDataRepresentation* pickBlock(int pos[2], unsigned int& flatIndex, int& rank);
 
+  ///@{
   /**
    * Creates a new frustum selection given the rectangle in display
    * coordinates.
    */
-  virtual void selectFrustum(int rectangle[4]);
-  virtual void selectFrustumPoints(int rectangle[4]);
+  virtual void selectFrustumCells(
+    int rectangle[4], int selectionModifier = pqView::PV_SELECTION_DEFAULT);
+  virtual void selectFrustumPoints(
+    int rectangle[4], int selectionModifier = pqView::PV_SELECTION_DEFAULT);
+  ///@}
 
   /**
    * Creates a "block" selection given the rectangle in display coordinates.
@@ -218,19 +228,16 @@ public:
    */
   virtual void selectBlock(int rectangle[4], int selectionModifier = pqView::PV_SELECTION_DEFAULT);
 
+  ///@{
   /**
-   * Creates a new surface points selection given the polygon in display
+   * Creates a new surface selection given the polygon in display
    * coordinates.
    */
   virtual void selectPolygonPoints(
     vtkIntArray* polygon, int selectionModifier = pqView::PV_SELECTION_DEFAULT);
-
-  /**
-   * Creates a new surface cells selection given the polygon in display
-   * coordinates.
-   */
   virtual void selectPolygonCells(
     vtkIntArray* polygon, int selectionModifier = pqView::PV_SELECTION_DEFAULT);
+  ///@}
 
 Q_SIGNALS:
   // Triggered when interaction mode change underneath
