@@ -134,6 +134,11 @@ public:
   void setFontSize(int fontSize);
   //@}
 
+  /**
+   * Get the state of the 'Always open for new messages' checkbox.
+   */
+  bool shouldOpenForNewMessages();
+
 public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   /**
    * Display a message in the widget. There's generally no need to use this
@@ -143,6 +148,11 @@ public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
    * @returns true if the message was displayed, otherwise false.
    */
   bool displayMessage(const QString& message, QtMsgType type = QtInfoMsg);
+
+  /**
+   * Always open the messages window for every new message unless it is docked.
+   */
+  void alwaysOpenForNewMessages(bool val);
 
   /**
    * Show full messages instead of grouped messages.
@@ -163,6 +173,11 @@ public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
    * Clears the console.
    */
   void clear();
+
+  /**
+   * Record the first ever show event.
+   */
+  void showEvent(QShowEvent* event) override;
 
 Q_SIGNALS:
   /**
