@@ -23,12 +23,8 @@ else ()
     "${catalyst_rel_rpath}")
 endif ()
 
+# setup this property so other place in the code can use catalyst (c.f. Examples)
 set_property(GLOBAL PROPERTY paraview_catalyst_directory "${catalyst_library_destination}")
-
-# Transport the variable needed for Catalyst's CMake API from
-# `ThirdParty/catalyst/CMakeLists.txt`.
-get_property(_catalyst_macro_directory GLOBAL
-  PROPERTY paraview_catalyst_macro_directory)
 
 catalyst_implementation(
   NAME    paraview
@@ -39,7 +35,7 @@ catalyst_implementation(
     ParaViewCatalyst.cxx
     vtkCatalystBlueprint.cxx
     vtkCatalystBlueprint.h
-  CATALYST_TARGET ParaView::vtkcatalyst)
+  CATALYST_TARGET catalyst::catalyst)
 add_library(ParaView::catalyst-paraview ALIAS catalyst-paraview)
 
 target_link_libraries(catalyst-paraview
