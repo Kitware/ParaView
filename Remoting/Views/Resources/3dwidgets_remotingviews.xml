@@ -125,6 +125,7 @@
                proxyname="ImplicitPlaneRepresentation"></Proxy>
         <ExposedProperties>
           <Property name="DrawPlane" />
+          <Property name="DrawOutline" />
           <Property name="ConstrainToWidgetBounds" />
           <Property name="OutlineTranslation" />
           <Property name="OriginInfo" />
@@ -160,9 +161,11 @@
                proxygroup="3d_widget_representations"
                proxyname="DisplaySizedImplicitPlaneRepresentation"></Proxy>
         <ExposedProperties>
+          <Property name="RadiusMultiplier" />
           <Property name="DrawPlane" />
           <Property name="DrawOutline" />
           <Property name="ConstrainToWidgetBounds" />
+          <Property name="ConstrainMaximumSizeToWidgetBounds" />
           <Property name="OutlineTranslation" />
           <Property name="OriginInfo" />
           <Property name="Origin" />
@@ -1596,6 +1599,12 @@
                          number_of_elements="1">
         <BooleanDomain name="bool" />
       </IntVectorProperty>
+      <DoubleVectorProperty command="SetRadiusMultiplier"
+                            default_values="1.0"
+                            name="RadiusMultiplier"
+                            number_of_elements="1">
+        <DoubleRangeDomain name="range" />
+      </DoubleVectorProperty>
       <IntVectorProperty animateable="1"
                          command="SetDrawPlane"
                          default_values="0"
@@ -1606,6 +1615,12 @@
       <IntVectorProperty command="SetConstrainToWidgetBounds"
                          default_values="0"
                          name="ConstrainToWidgetBounds"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+      <IntVectorProperty command="SetConstrainMaximumSizeToWidgetBounds"
+                         default_values="1"
+                         name="ConstrainMaximumSizeToWidgetBounds"
                          number_of_elements="1">
         <BooleanDomain name="bool" />
       </IntVectorProperty>

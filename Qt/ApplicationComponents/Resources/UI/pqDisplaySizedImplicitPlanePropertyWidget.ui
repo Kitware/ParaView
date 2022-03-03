@@ -102,7 +102,7 @@
       </font>
      </property>
      <property name="text">
-      <string>Note: Use 'P' to pick 'Origin' on mesh or 'Ctrl+P' to snap to the closest mesh point. Also, use 'N' to pick &quot;Normal&quot; on mesh or 'Ctrl+N' to snap to the closest mesh point normal, if its availiable.</string>
+      <string>Note: Use 'P' to pick 'Origin' on mesh or 'Ctrl+P' to snap to the closest mesh point. Also, use 'N' to pick &quot;Normal&quot; on mesh or 'Ctrl+N' to snap to the closest mesh point normal, if it's available.</string>
      </property>
      <property name="wordWrap">
       <bool>true</bool>
@@ -183,6 +183,16 @@
        </property>
        <property name="text">
         <string>Reset Camera to Normal</string>
+       </property>
+      </widget>
+     </item>
+     <item row="7" column="0" colspan="2">
+      <widget class="QPushButton" name="resetRadiusSize">
+       <property name="toolTip">
+        <string>Reset the radius size of the disk plane to its default value.</string>
+       </property>
+       <property name="text">
+        <string>Reset Radius Size</string>
        </property>
       </widget>
      </item>

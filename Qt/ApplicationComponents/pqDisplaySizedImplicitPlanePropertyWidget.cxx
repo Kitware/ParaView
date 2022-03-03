@@ -132,6 +132,7 @@ pqDisplaySizedImplicitPlanePropertyWidget::pqDisplaySizedImplicitPlanePropertyWi
   this->connect(ui.useCameraNormal, SIGNAL(clicked()), SLOT(useCameraNormal()));
   this->connect(ui.resetCameraToNormal, SIGNAL(clicked()), SLOT(resetCameraToNormal()));
   this->connect(ui.resetToDataBounds, SIGNAL(clicked()), SLOT(resetToDataBounds()));
+  this->connect(ui.resetRadiusSize, SIGNAL(clicked()), SLOT(resetRadiusSize()));
 
   // link show3DWidget checkbox
   this->connect(ui.show3DWidget, SIGNAL(toggled(bool)), SLOT(setWidgetVisible(bool)));
@@ -214,6 +215,17 @@ void pqDisplaySizedImplicitPlanePropertyWidget::reset()
 {
   this->setDrawPlane(false);
   this->Superclass::reset();
+}
+
+//-----------------------------------------------------------------------------
+void pqDisplaySizedImplicitPlanePropertyWidget::resetRadiusSize()
+{
+  vtkSMProxy* wdgProxy = this->widgetProxy();
+  vtkSMPropertyHelper(wdgProxy, "RadiusMultiplier").Set(1.0);
+  wdgProxy->UpdateProperty("RadiusMultiplier", true);
+  wdgProxy->UpdateVTKObjects();
+  Q_EMIT this->changeAvailable();
+  this->render();
 }
 
 //-----------------------------------------------------------------------------
