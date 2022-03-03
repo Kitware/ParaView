@@ -57,11 +57,6 @@ vtkPVGeneralSettings::vtkPVGeneralSettings()
   , AutoApply(false)
   , AutoApplyActiveOnly(false)
   , DefaultViewType(nullptr)
-#if VTK_MODULE_ENABLE_ParaView_RemotingViews
-  , TransferFunctionResetMode(vtkSMTransferFunctionManager::GROW_ON_APPLY)
-#else
-  , TransferFunctionResetMode(0)
-#endif
   , ScalarBarMode(vtkPVGeneralSettings::AUTOMATICALLY_HIDE_SCALAR_BARS)
   , AnimationGeometryCacheLimit(0)
   , AnimationTimePrecision(6)
@@ -296,7 +291,6 @@ void vtkPVGeneralSettings::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "AutoApplyDelay: " << this->AutoApplyDelay << "\n";
   os << indent << "AutoApplyActiveOnly: " << this->AutoApplyActiveOnly << "\n";
   os << indent << "DefaultViewType: " << this->DefaultViewType << "\n";
-  os << indent << "TransferFunctionResetMode: " << this->TransferFunctionResetMode << "\n";
   os << indent << "ScalarBarMode: " << this->ScalarBarMode << "\n";
   os << indent << "CacheGeometryForAnimation: " << this->CacheGeometryForAnimation << "\n";
   os << indent << "AnimationGeometryCacheLimit: " << this->AnimationGeometryCacheLimit << "\n";

@@ -1164,20 +1164,6 @@ void vtkSMTransferFunctionProxy::ResetPropertiesToDefaults(
 }
 
 //----------------------------------------------------------------------------
-void vtkSMTransferFunctionProxy::ResetRescaleModeToGlobalSetting()
-{
-  vtkSMSessionProxyManager* pxm = this->GetSessionProxyManager();
-  vtkSMProxy* settingsProxy = pxm->GetProxy("settings", "GeneralSettings");
-  // Guard against the settings proxies not being available.
-  if (settingsProxy)
-  {
-    int globalResetMode =
-      vtkSMPropertyHelper(settingsProxy, "TransferFunctionResetMode").GetAsInt();
-    vtkSMPropertyHelper(this, "AutomaticRescaleRangeMode").Set(globalResetMode);
-  }
-}
-
-//----------------------------------------------------------------------------
 Json::Value vtkSMTransferFunctionProxy::ConvertLegacyColorMapXMLToJSON(vtkPVXMLElement* xml)
 {
   if (!xml || !xml->GetName() || strcmp(xml->GetName(), "ColorMap") != 0)
