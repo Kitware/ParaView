@@ -419,6 +419,7 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/OffsetSliceWithPlane.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/OMFReader.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/OpacityWidgetRange.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/ParallelCoordinatesView.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/PartitionedDataSet_Slice.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/PartitionedDataSet_Slice_1.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/PartitionedDataSet_Slice_2.png}"
@@ -745,6 +746,7 @@ SET (TESTS_WITH_INLINE_COMPARES
   NestedViews.xml
   NonlinearSubdivisionDisplay.xml
   PaletteBackgrounds.xml
+  ParallelCoordinatesView.xml
   PartitionedDataSet.xml
   PartitionedDataSetCollection.xml
   Preview.xml
@@ -1060,7 +1062,6 @@ list(APPEND TESTS_WITH_BASELINES
   OrthographicView.xml
   OutOfRangeColors.xml
   PBRSpheres.xml
-  ParallelCoordinatesView.xml
   PlotDataOverTime-NonDistributed.xml
   PlotEdges2.xml
   # PlotEdges.xml see paraview/paraview#20659
