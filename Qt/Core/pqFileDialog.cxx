@@ -1279,10 +1279,6 @@ bool pqFileDialog::acceptInternal(const QStringList& selected_files)
         return false;
 
       case AnyFile:
-        if (!impl.Model->dirExists(file, file))
-        {
-          qWarning() << "'" << file << "' does not exist";
-        }
         this->addToFilesSelected(QStringList(file));
         return true;
     }
