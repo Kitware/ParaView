@@ -142,18 +142,24 @@ class CoProcessor(object):
                 if self.__RequestedArrays:
                     for key in self.__RequestedArrays:
                         for v in self.__RequestedArrays[key]:
-                            datadescription.GetInputDescriptionByName(key).AddField(v[0], v[1])
+                            inputDescription = datadescription.GetInputDescriptionByName(key)
+                            if inputDescription:
+                                inputDescription.AddField(v[0], v[1])
                 elif self.__InitialFrequencies:
                     # __ProducersMap will not be filled up until after the first call to
                     # DoCoProcessing so we rely on __InitialFrequencies initially but then
                     # __ProducersMap after that as __InitialFrequencies will be cleared out.
                     for key in self.__InitialFrequencies:
-                        datadescription.GetInputDescriptionByName(key).AllFieldsOn()
-                        datadescription.GetInputDescriptionByName(key).GenerateMeshOn()
+                        inputDescription = datadescription.GetInputDescriptionByName(key)
+                        if inputDescription:
+                            inputDescription.AllFieldsOn()
+                            inputDescription.GenerateMeshOn()
                 else:
                     for key in self.__ProducersMap:
-                        datadescription.GetInputDescriptionByName(key).AllFieldsOn()
-                        datadescription.GetInputDescriptionByName(key).GenerateMeshOn()
+                        inputDescription = datadescription.GetInputDescriptionByName(key)
+                        if inputDescription:
+                            inputDescription.AllFieldsOn()
+                            inputDescription.GenerateMeshOn()
                 return
 
         # if we haven't processed the pipeline yet in DoCoProcessing() we
@@ -165,13 +171,17 @@ class CoProcessor(object):
             if self.__RequestedArrays:
                 for key in self.__RequestedArrays:
                     for v in self.__RequestedArrays[key]:
-                        datadescription.GetInputDescriptionByName(key).AddField(v[0], v[1])
+                        inputDescription = datadescription.GetInputDescriptionByName(key)
+                        if inputDescription:
+                            inputDescription.AddField(v[0], v[1])
             elif self.__InitialFrequencies:
                 for key in self.__InitialFrequencies:
                     freqs = self.__InitialFrequencies.get(key, [])
                     if self.__EnableLiveVisualization or self.IsInModulo(datadescription, freqs):
-                        datadescription.GetInputDescriptionByName(key).AllFieldsOn()
-                        datadescription.GetInputDescriptionByName(key).GenerateMeshOn()
+                        inputDescription = datadescription.GetInputDescriptionByName(key)
+                        if inputDescription:
+                            inputDescription.AllFieldsOn()
+                            inputDescription.GenerateMeshOn()
         else:
             # the catalyst pipeline may have been changed by a Live connection
             # so we need to regenerate the frequencies
