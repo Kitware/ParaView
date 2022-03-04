@@ -152,6 +152,12 @@ def _get_execute_parameters():
         params.append(slist.GetString(cc))
     return params
 
+def _get_script_filename():
+    helper = vtkCPPythonScriptV2Helper.GetActiveInstance()
+    if not helper:
+        return None
+    return helper.GetScriptFileName()
+
 def has_customized_execution(module):
     return hasattr(module, "catalyst_execute") or \
         hasattr(module, "RequestDataDescription") or \
