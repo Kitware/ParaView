@@ -28,6 +28,9 @@ paraview_add_plugin(LookingGlass
   MODULE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/Settings/vtk.module"
 )
 
+target_compile_definitions(LookingGlass
+  PRIVATE
+    QT_NO_KEYWORDS)
 target_link_libraries(LookingGlass
   PRIVATE
     ParaView::pqApplicationComponents
