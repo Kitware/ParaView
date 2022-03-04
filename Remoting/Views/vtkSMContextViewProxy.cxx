@@ -211,7 +211,7 @@ void vtkSMContextViewProxy::OnInteractionEvent()
 void vtkSMContextViewProxy::OnLeftButtonReleaseEvent()
 {
   vtkChart* chart = vtkChart::SafeDownCast(this->GetContextItem());
-  if (chart)
+  if (chart && chart->GetLegend())
   {
     int pos[2];
     pos[0] = static_cast<int>(chart->GetLegend()->GetPointVector().GetX());
