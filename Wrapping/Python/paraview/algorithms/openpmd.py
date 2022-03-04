@@ -1,3 +1,6 @@
+# Authors: Berk Geveci, Axel Huebl, Utkarsh Ayachit
+#
+
 from vtkmodules.util.vtkAlgorithm import VTKPythonAlgorithmBase
 
 from .. import print_error
@@ -290,21 +293,11 @@ class openPMDReader(VTKPythonAlgorithmBase):
         ugrid.VTKObject.SetCells(vtkConstants.VTK_VERTEX, ca)
 
 
-    def RequestData(self, request, inInfoVec, outInfoVec):
-        global _has_openpmd
-        if not _has_openpmd:
-            print_error("Required Python module 'openpmd_api' missing!")
-            return 0
-
-        from vtkmodules.vtkCommonDataModel import vtkImageData, vtkUnstructuredGrid
-        from vtkmodules.vtkCommonDataModel import vtkPartitionedDataSet,vtkPartitionedDataSetCollection
-        from vtkmodules.vtkCommonExecutionModel import vtkExtentTranslator, vtkStreamingDemandDrivenPipeline
+    def _RequestFieldData(self, executive, output, outInfo):
         from vtkmodules.numpy_interface import dataset_adapter as dsa
+        from vtkmodules.vtkCommonDataModel import vtkImageData
+        from vtkmodules.vtkCommonExecutionModel import vtkExtentTranslator
 
-        executive = vtkStreamingDemandDrivenPipeline
-        output = vtkPartitionedDataSet.GetData(outInfoVec, 0)
-        poutput = vtkPartitionedDataSetCollection.GetData(outInfoVec, 1)
-        outInfo = outInfoVec.GetInformationObject(0)
         piece = outInfo.Get(executive.UPDATE_PIECE_NUMBER())
         npieces = outInfo.Get(executive.UPDATE_NUMBER_OF_PIECES())
         nghosts = outInfo.Get(executive.UPDATE_NUMBER_OF_GHOST_LEVELS())
@@ -312,8 +305,8 @@ class openPMDReader(VTKPythonAlgorithmBase):
 
         data_time = self._get_update_time(outInfo)
         idx = self._timemap[data_time]
-
         itr = self._series.iterations[idx]
+
         arrays = []
         narrays = self._arrayselection.GetNumberOfArrays()
         for i in range(narrays):
@@ -472,8 +465,18 @@ class openPMDReader(VTKPythonAlgorithmBase):
             for name, array in data:
                 imgw.PointData.append(array, name)
 
-        # particles
+
+    def _RequestParticleData(self, executive, poutput, outInfo):
+        from vtkmodules.numpy_interface import dataset_adapter as dsa
+        from vtkmodules.vtkCommonDataModel import vtkUnstructuredGrid, vtkPartitionedDataSet
+
+        piece = outInfo.Get(executive.UPDATE_PIECE_NUMBER())
+        npieces = outInfo.Get(executive.UPDATE_NUMBER_OF_PIECES())
+
+        data_time = self._get_update_time(outInfo)
+        idx = self._timemap[data_time]
         itr = self._series.iterations[idx]
+
         array_by_species = {}
         narrays = self._particlearrayselection.GetNumberOfArrays()
         for i in range(narrays):
@@ -494,5 +497,31 @@ class openPMDReader(VTKPythonAlgorithmBase):
             ids += 1
             self._load_species(
                 itr, species, arrays, piece, npieces, dsa.WrapDataObject(ugrid))
+
+
+    def RequestData(self, request, inInfoVec, outInfoVec):
+        global _has_openpmd
+        if not _has_openpmd:
+            print_error("Required Python module 'openpmd_api' missing!")
+            return 0
+
+        from vtkmodules.vtkCommonDataModel import vtkPartitionedDataSet, vtkPartitionedDataSetCollection
+        from vtkmodules.vtkCommonExecutionModel import vtkStreamingDemandDrivenPipeline
+
+        executive = vtkStreamingDemandDrivenPipeline
+        numInfo = outInfoVec.GetNumberOfInformationObjects()
+
+        for i in range(numInfo):
+            outInfo = outInfoVec.GetInformationObject(i)
+            if i == 0:
+                output = vtkPartitionedDataSet.GetData(outInfoVec, 0)
+                self._RequestFieldData(executive, output, outInfo)
+            elif i == 1:
+                poutput = vtkPartitionedDataSetCollection.GetData(outInfoVec, 1)
+                self._RequestParticleData(executive, poutput, outInfo)
+            else:
+                print_error("numInfo number is wrong! "
+                            "It should be exactly 2, is=", numInfo)
+                return 0
 
         return 1
