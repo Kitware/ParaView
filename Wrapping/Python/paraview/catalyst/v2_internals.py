@@ -131,17 +131,23 @@ def _get_active_data_description():
     return helper.GetDataDescription()
 
 def _get_active_arguments():
-    helper = vtkCPPythonScriptV2Helper.GetActiveInstance()
-    slist = helper.GetArgumentsAsStringList()
     args = []
+    helper = vtkCPPythonScriptV2Helper.GetActiveInstance()
+    if not helper:
+        # happens when script is executed in pvbatch, and not catalyst
+        return args
+    slist = helper.GetArgumentsAsStringList()
     for cc in range(slist.GetLength()):
         args.append(slist.GetString(cc))
     return args
 
 def _get_execute_parameters():
-    helper = vtkCPPythonScriptV2Helper.GetActiveInstance()
-    slist = helper.GetParametersAsStringList()
     params = []
+    helper = vtkCPPythonScriptV2Helper.GetActiveInstance()
+    if not helper:
+        # happens when script is executed in pvbatch, and not catalyst
+        return params
+    slist = helper.GetParametersAsStringList()
     for cc in range(slist.GetLength()):
         params.append(slist.GetString(cc))
     return params
