@@ -114,7 +114,6 @@ protected:
 
   class pqInternal;
   pqInternal* Internal = nullptr;
-  ;
 
 private:
   void constructor();
