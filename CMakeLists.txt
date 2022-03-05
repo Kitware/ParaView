@@ -288,6 +288,7 @@ set(paraview_default_plugins
   AnalyzeNIfTIReaderWriter
   ArrowGlyph
   BagPlotViewsAndFilters
+  CFSReader
   Datamine
   DigitalRockPhysics
   EULATestPlugin

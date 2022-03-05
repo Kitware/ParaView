@@ -1,0 +1,306 @@
+<ServerManagerConfiguration>
+
+  <ProxyGroup name="sources">
+   <SourceProxy name="CFSReader"
+                class="vtkCFSReader"
+                label="openCFS HDF5 reader">
+     <Documentation
+       short_help="Read an openCFS HDF5 file"
+       long_help="Read an openCFS result file in HDF5 encoding.">
+       openCFS stores its data in HDF5 format (www.hdfgroup.org).
+     </Documentation>
+     <StringVectorProperty
+        name="FileName"
+        animateable="0"
+        command="SetFileName"
+        number_of_elements="1">
+        <FileListDomain name="files"/>
+        <Documentation>
+          Name of the openCFS HDF5 reader.
+        </Documentation>
+     </StringVectorProperty>
+
+     <!-- General section do declare valid file extensions and to make 'hidden' properties visible -->
+     <Hints>
+       <ReaderFactory extensions="cfs h5ref nrf nmf"
+                      file_description="openCFS Result/Mesh Files" />
+     </Hints>
+
+     <!-- ==================================== -->
+     <!--  Region Selection Widget             -->
+     <!-- ==================================== -->
+     <StringVectorProperty name="RegionArrayInfo" information_only="1">
+       <ArraySelectionInformationHelper attribute_name="Region"/>
+     </StringVectorProperty>
+     <StringVectorProperty name="RegionArrayStatus"
+       command="SetRegionArrayStatus"
+       number_of_elements="0"
+       repeat_command="1"
+       number_of_elements_per_command="2"
+       element_types="2 0"
+       information_property="RegionArrayInfo"
+       label="Regions">
+       <ArraySelectionDomain name="array_list">
+         <RequiredProperties>
+           <Property name="RegionArrayInfo" function="RegionList"/>
+         </RequiredProperties>
+       </ArraySelectionDomain>
+       <Documentation>
+         Select which regions to read in.
+       </Documentation>
+     </StringVectorProperty>
+
+     <!-- ==================================== -->
+     <!--  Element Group Selection Widget      -->
+     <!-- ==================================== -->
+     <StringVectorProperty name="NamedElementArrayInfo" information_only="1">
+       <ArraySelectionInformationHelper attribute_name="NamedElement"/>
+     </StringVectorProperty>
+     <StringVectorProperty name="NamedElementArrayStatus"
+       command="SetNamedElementArrayStatus"
+       number_of_elements="0"
+       repeat_command="1"
+       number_of_elements_per_command="2"
+       element_types="2 0"
+       information_property="NamedElementArrayInfo"
+       label="Element Groups">
+       <ArraySelectionDomain name="array_list">
+         <RequiredProperties>
+           <Property name="NamedElementArrayInfo" function="NamedElementList"/>
+         </RequiredProperties>
+       </ArraySelectionDomain>
+       <Documentation>
+         Select which element groups to read in.
+       </Documentation>
+     </StringVectorProperty>
+
+     <!-- ==================================== -->
+     <!--  Nodal Group Selection Widget        -->
+     <!-- ==================================== -->
+     <StringVectorProperty name="NamedNodeArrayInfo"
+       information_only="1">
+       <ArraySelectionInformationHelper attribute_name="NamedNode"/>
+     </StringVectorProperty>
+     <StringVectorProperty name="NamedNodeArrayStatus"
+       command="SetNamedNodeArrayStatus"
+       number_of_elements="0"
+       repeat_command="1"
+       number_of_elements_per_command="2"
+       element_types="2 0"
+       information_property="NamedNodeArrayInfo"
+       label="Nodal Groups">
+       <ArraySelectionDomain name="array_list">
+         <RequiredProperties>
+           <Property name="NamedNodeArrayInfo" function="NamedNodeList"/>
+         </RequiredProperties>
+       </ArraySelectionDomain>
+       <Documentation>
+         Select which nodal groups to read in.
+       </Documentation>
+     </StringVectorProperty>
+
+     <!-- ==================================== -->
+     <!--  Select Analysis Step                -->
+     <!-- ==================================== -->
+     <IntVectorProperty name="AnalysisStep"
+       command="SetMultiSequenceStep"
+       number_of_elements="1"
+       animateable="1"
+       default_values="1">
+       <IntRangeDomain name="range">
+         <RequiredProperties>
+           <Property name="MultiSequenceRangeInfo" function="Range"/>
+         </RequiredProperties>
+       </IntRangeDomain>
+       <Documentation>
+         Select the current analysis step.
+       </Documentation>
+     </IntVectorProperty>
+
+     <!-- Get time/freq range of current multisequence step -->
+     <IntVectorProperty name="TimeStepNumberRangeInfo"
+       command="GetTimeStepNumberRange"
+       number_of_elements="2"
+       information_only="1"
+       default_values="1 1">
+       <SimpleIntInformationHelper/>
+     </IntVectorProperty>
+
+     <!-- ==================================== -->
+     <!--  Switch: Harmonic Mode Shape        -->
+     <!-- ==================================== -->
+     <IntVectorProperty
+         name="InterpretHarmonicDataAsModeShape"
+         command="SetHarmonicDataAsModeShape"
+         number_of_elements="1"
+         default_values="0"
+         label="Animate Harmonic / Modal Results"
+         animateable="0">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          By switching on this flag, the reader will generate continuous transient data of one
+          period of the harmonic oscillation. There will be a time range [0, 1]
+          corresponding to an interval [0, 2*pi] for the argument of the rotating phasor.
+        </Documentation>
+     </IntVectorProperty>
+
+     <!-- ==================================== -->
+     <!--  Select Frequency Step               -->
+     <!-- ==================================== -->
+     <IntVectorProperty name="TimeStep"
+       command="SetTimeStep"
+       number_of_elements="1"
+       animateable="1"
+       default_values="0"
+       label="Frequency Step">
+       <!--information_property="TimestepValues"-->
+       <IntRangeDomain name="range">
+         <RequiredProperties>
+           <Property name="TimeStepNumberRangeInfo" function="Range"/>
+         </RequiredProperties>
+       </IntRangeDomain>
+       <Documentation>
+         Select the step to animate over one oscillation period.
+       </Documentation>
+     </IntVectorProperty>
+
+     <!-- ==================================== -->
+     <!--  Switch: Complex Mode                -->
+     <!-- ==================================== -->
+
+     <IntVectorProperty
+         name="ComplexPartReal"
+         command="SetComplexReal"
+         number_of_elements="1"
+         default_values="1"
+         label="Real"
+         animateable="0">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          Provide real part of complex valued result (called *Real)
+        </Documentation>
+     </IntVectorProperty>
+     <IntVectorProperty
+         name="ComplexPartImaginary"
+         command="SetComplexImaginary"
+         number_of_elements="1"
+         default_values="1"
+         label="Imaginary"
+         animateable="0">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          Provide imaginary part of complex valued result (called *Imag)
+        </Documentation>
+     </IntVectorProperty>
+     <IntVectorProperty
+         name="ComplexPartAmplitude"
+         command="SetComplexAmplitude"
+         number_of_elements="1"
+         default_values="0"
+         label="Amplitude"
+         animateable="0">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          Provide amplitude of complex valued result (called *Ampl)
+        </Documentation>
+     </IntVectorProperty>
+     <IntVectorProperty
+         name="ComplexPartPhase"
+         command="SetComplexPhase"
+         number_of_elements="1"
+         default_values="0"
+         label="Phase"
+         animateable="0">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          Provide phase of complex valued result (called *Phase)
+        </Documentation>
+     </IntVectorProperty>
+     <PropertyGroup panel_widget="Line" label="Complex Parts">
+       <Property function="SetComplexReal" name="ComplexPartReal" />
+       <Property function="SetComplexImaginary" name="ComplexPartImaginary" />
+       <Property function="SetComplexAmplitude" name="ComplexPartAmplitude" />
+       <Property function="SetComplexPhase" name="ComplexPartPhase" />
+       </PropertyGroup>
+
+     <!-- Get number of multisequence steps -->
+     <IntVectorProperty name="MultiSequenceRangeInfo"
+       command="GetMultiSequenceRange"
+       number_of_elements="2"
+       information_only="1"
+       default_values="1 1">
+       <SimpleIntInformationHelper/>
+     </IntVectorProperty>
+
+     <!-- ==================================== -->
+     <!--  Switch: Fill Missing Resuls         -->
+     <!-- ==================================== -->
+     <IntVectorProperty
+       name="FillMissingResults"
+       command="SetFillMissingResults"
+       number_of_elements="1"
+       label = "Fill Missing Results"
+       default_values="0" >
+       <BooleanDomain name="bool"/>
+       <Documentation>
+         If activated, results, which are just defined for some regions, will be
+         filled with zeros on the remaining regions.
+         It will require more memory, but prevents problem e.g. with StreamTracer.
+       </Documentation>
+     </IntVectorProperty>
+
+     <!-- ==================================== -->
+     <!--  Switch: Add Dimensional Units       -->
+     <!-- ==================================== -->
+     <IntVectorProperty
+        name="AddDimensionsToArrayNames"
+        command="SetAddDimensionsToArrayNames"
+        number_of_elements="1"
+        default_values="0"
+        label="Add Dimensional Units To Results"
+        animateable="0">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          Read dimensional units from field data and add them to array names as human-readable string.
+        </Documentation>
+     </IntVectorProperty>
+
+     <!-- ===================================== -->
+     <!--  Show Current Time or Frequency Value -->
+     <!-- ===================================== -->
+     <StringVectorProperty name="TimeOrFrequencyValue"
+       number_of_elements="1"
+       command="GetTimeOrFrequencyValueStr"
+       information_only="1"
+       panel_visibility="default"
+       animateable="1"
+       default_values="0.0"
+       label="Frequency">
+       <Documentation>
+          Current time / frequency value.
+       </Documentation>
+     </StringVectorProperty>
+
+     <!-- This property is used by the property panel to show the available timesteps in the data. -->
+     <DoubleVectorProperty name="TimestepValues"
+                            repeatable="1"
+                            information_only="1">
+       <TimeStepsInformationHelper />
+       <Documentation>
+          Choose time step (frequency step/ eigenvector) for
+          transient animation via ParaView.
+       </Documentation>
+     </DoubleVectorProperty>
+
+     <DoubleVectorProperty name="TimeRange" information_only="1">
+       <TimeRangeInformationHelper/>
+       <Documentation>
+          Sends time range information to the animation panel.
+          ParaView uses this information to set the range of time
+          for the animation.
+       </Documentation>
+     </DoubleVectorProperty>
+   <!-- End CFSReader -->
+   </SourceProxy>
+  </ProxyGroup>
+</ServerManagerConfiguration>

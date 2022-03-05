@@ -1,0 +1,18 @@
+<?xml version="1.0" ?>
+<pqevents>
+  <!-- Open file Single_Region_Opt.cfs -->
+  <pqevent object="pqClientMainWindow/MainControlsToolbar/actionOpenData" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/FileOpenDialog" command="filesSelected" arguments="$PARAVIEW_DATA_ROOT/Plugins/CFSReader/Testing/Data/openCFS/Single_Region_Opt.cfs" />
+
+  <!-- Select physicalPseudoDensity element result, show last iteration and hide decoration -->
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel" command="mousePress" arguments="1,1,0,74,55" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel" command="mouseRelease" arguments="1,0,0,74,55" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/variableToolbar/displayColor/Variables" command="activated" arguments="physicalPseudoDensity" />
+  <pqevent object="pqClientMainWindow/VCRToolbar/actionVCRNextFrame" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/variableToolbar/actionResetRange" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/axesToolbar/actionShowOrientationAxes" command="set_boolean" arguments="false" />
+  <pqevent object="pqClientMainWindow/variableToolbar/actionScalarBarVisibility" command="set_boolean" arguments="false" />
+
+  <!-- Compare what we see is done automatically as we have a single baseline image only (CFSReaderTest.png)-->
+</pqevents>

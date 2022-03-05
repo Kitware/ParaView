@@ -1,0 +1,11 @@
+NAME
+  CFSReader::Reader
+LIBRARY_NAME
+  vtkCFSReader
+DEPENDS
+  VTK::CommonCore
+  VTK::CommonMisc
+  VTK::CommonExecutionModel
+  VTK::hdf5
+PRIVATE_DEPENDS
+  VTK::vtksys
