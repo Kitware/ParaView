@@ -1,4 +1,4 @@
-<VRPluginState>
+<CAVEInteractionState>
   <VRConnectionManager>
     <VRUIConnection name="vrui" address="localhost" port="8555">
       <Button id="0" name="1"/>
@@ -19,4 +19,4 @@
       <Tracker role="Tracker" name="vrui.wand"/>
     </Style>
   </VRInteractorStyles>
-</VRPluginState>
+</CAVEInteractionState>

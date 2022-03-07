@@ -33,10 +33,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // --------------------------------------------------------------------includes
 #include "pqApplicationCore.h"
-#if PARAVIEW_PLUGIN_VRPlugin_USE_VRPN
+#if PARAVIEW_PLUGIN_CAVEInteraction_USE_VRPN
 #include "pqVRPNConnection.h"
 #endif
-#if PARAVIEW_PLUGIN_VRPlugin_USE_VRUI
+#if PARAVIEW_PLUGIN_CAVEInteraction_USE_VRUI
 #include "pqVRUIConnection.h"
 #endif
 
@@ -72,10 +72,10 @@ pqVRConnectionManager* pqVRConnectionManager::instance()
 class pqVRConnectionManager::pqInternals
 {
 public:
-#if PARAVIEW_PLUGIN_VRPlugin_USE_VRPN
+#if PARAVIEW_PLUGIN_CAVEInteraction_USE_VRPN
   QList<QPointer<pqVRPNConnection>> VRPNConnections;
 #endif
-#if PARAVIEW_PLUGIN_VRPlugin_USE_VRUI
+#if PARAVIEW_PLUGIN_CAVEInteraction_USE_VRUI
   QList<QPointer<pqVRUIConnection>> VRUIConnections;
 #endif
   vtkWeakPointer<vtkVRQueue> Queue;
@@ -100,7 +100,7 @@ pqVRConnectionManager::~pqVRConnectionManager()
   delete this->Internals;
 }
 
-#if PARAVIEW_PLUGIN_VRPlugin_USE_VRPN
+#if PARAVIEW_PLUGIN_CAVEInteraction_USE_VRPN
 // ----------------------------------------------------------------------------
 void pqVRConnectionManager::add(pqVRPNConnection* conn)
 {
@@ -135,7 +135,7 @@ pqVRPNConnection* pqVRConnectionManager::GetVRPNConnection(const QString& name)
 }
 #endif
 
-#if PARAVIEW_PLUGIN_VRPlugin_USE_VRUI
+#if PARAVIEW_PLUGIN_CAVEInteraction_USE_VRUI
 // ----------------------------------------------------------------------------
 void pqVRConnectionManager::add(pqVRUIConnection* conn)
 {
@@ -174,10 +174,10 @@ pqVRUIConnection* pqVRConnectionManager::GetVRUIConnection(const QString& name)
 void pqVRConnectionManager::clear()
 {
   this->stop();
-#if PARAVIEW_PLUGIN_VRPlugin_USE_VRPN
+#if PARAVIEW_PLUGIN_CAVEInteraction_USE_VRPN
   this->Internals->VRPNConnections.clear();
 #endif
-#if PARAVIEW_PLUGIN_VRPlugin_USE_VRUI
+#if PARAVIEW_PLUGIN_CAVEInteraction_USE_VRUI
   this->Internals->VRUIConnections.clear();
 #endif
   Q_EMIT this->connectionsChanged();
@@ -187,7 +187,7 @@ void pqVRConnectionManager::clear()
 QList<QString> pqVRConnectionManager::connectionNames() const
 {
   QList<QString> result;
-#if PARAVIEW_PLUGIN_VRPlugin_USE_VRPN
+#if PARAVIEW_PLUGIN_CAVEInteraction_USE_VRPN
   Q_FOREACH (pqVRPNConnection* conn, this->Internals->VRPNConnections)
   {
     if (conn)
@@ -196,7 +196,7 @@ QList<QString> pqVRConnectionManager::connectionNames() const
     }
   }
 #endif
-#if PARAVIEW_PLUGIN_VRPlugin_USE_VRUI
+#if PARAVIEW_PLUGIN_CAVEInteraction_USE_VRUI
   Q_FOREACH (pqVRUIConnection* conn, this->Internals->VRUIConnections)
   {
     if (conn)
@@ -213,7 +213,7 @@ QList<QString> pqVRConnectionManager::connectionNames() const
 int pqVRConnectionManager::numConnections() const
 {
   int result = 0;
-#if PARAVIEW_PLUGIN_VRPlugin_USE_VRPN
+#if PARAVIEW_PLUGIN_CAVEInteraction_USE_VRPN
   Q_FOREACH (pqVRPNConnection* conn, this->Internals->VRPNConnections)
   {
     if (conn)
@@ -222,7 +222,7 @@ int pqVRConnectionManager::numConnections() const
     }
   }
 #endif
-#if PARAVIEW_PLUGIN_VRPlugin_USE_VRUI
+#if PARAVIEW_PLUGIN_CAVEInteraction_USE_VRUI
   Q_FOREACH (pqVRUIConnection* conn, this->Internals->VRUIConnections)
   {
     if (conn)
@@ -237,7 +237,7 @@ int pqVRConnectionManager::numConnections() const
 // ----------------------------------------------------------------------------
 void pqVRConnectionManager::start()
 {
-#if PARAVIEW_PLUGIN_VRPlugin_USE_VRPN
+#if PARAVIEW_PLUGIN_CAVEInteraction_USE_VRPN
   Q_FOREACH (pqVRPNConnection* conn, this->Internals->VRPNConnections)
   {
     if (conn && conn->init())
@@ -246,7 +246,7 @@ void pqVRConnectionManager::start()
     }
   }
 #endif
-#if PARAVIEW_PLUGIN_VRPlugin_USE_VRUI
+#if PARAVIEW_PLUGIN_CAVEInteraction_USE_VRUI
   Q_FOREACH (pqVRUIConnection* conn, this->Internals->VRUIConnections)
   {
     if (conn && conn->init())
@@ -260,7 +260,7 @@ void pqVRConnectionManager::start()
 // ----------------------------------------------------------------------------
 void pqVRConnectionManager::stop()
 {
-#if PARAVIEW_PLUGIN_VRPlugin_USE_VRPN
+#if PARAVIEW_PLUGIN_CAVEInteraction_USE_VRPN
   Q_FOREACH (pqVRPNConnection* conn, this->Internals->VRPNConnections)
   {
     if (conn)
@@ -269,7 +269,7 @@ void pqVRConnectionManager::stop()
     }
   }
 #endif
-#if PARAVIEW_PLUGIN_VRPlugin_USE_VRUI
+#if PARAVIEW_PLUGIN_CAVEInteraction_USE_VRUI
   Q_FOREACH (pqVRUIConnection* conn, this->Internals->VRUIConnections)
   {
     if (conn)
@@ -302,7 +302,7 @@ void pqVRConnectionManager::configureConnections(vtkPVXMLElement* xml, vtkSMProx
           const char* address = child->GetAttributeOrEmpty("address");
           (void)name;
           (void)address;
-#if PARAVIEW_PLUGIN_VRPlugin_USE_VRPN
+#if PARAVIEW_PLUGIN_CAVEInteraction_USE_VRPN
           // TODO: Need to throw some warning if VRPN is used when not
           // compiled. For now we will simply ignore VRPN configuration
           pqVRPNConnection* device = new pqVRPNConnection(this);
@@ -314,7 +314,7 @@ void pqVRConnectionManager::configureConnections(vtkPVXMLElement* xml, vtkSMProx
         }
         else if (strcmp(child->GetName(), "VRUIConnection") == 0)
         {
-#if PARAVIEW_PLUGIN_VRPlugin_USE_VRUI
+#if PARAVIEW_PLUGIN_CAVEInteraction_USE_VRUI
           // TODO: Need to throw some warning if VRUI is used when not
           // compiled. For now we will simply ignore VRUI configuration
           const char* name = child->GetAttributeOrEmpty("name");
@@ -348,7 +348,7 @@ void pqVRConnectionManager::saveConnectionsConfiguration(vtkPVXMLElement* root)
   assert(root != nullptr);
   vtkPVXMLElement* tempParent = vtkPVXMLElement::New();
   tempParent->SetName("VRConnectionManager");
-#if PARAVIEW_PLUGIN_VRPlugin_USE_VRPN
+#if PARAVIEW_PLUGIN_CAVEInteraction_USE_VRPN
   Q_FOREACH (pqVRPNConnection* conn, this->Internals->VRPNConnections)
   {
     vtkPVXMLElement* child = conn->saveConfiguration();
@@ -359,7 +359,7 @@ void pqVRConnectionManager::saveConnectionsConfiguration(vtkPVXMLElement* root)
     }
   }
 #endif
-#if PARAVIEW_PLUGIN_VRPlugin_USE_VRUI
+#if PARAVIEW_PLUGIN_CAVEInteraction_USE_VRUI
   Q_FOREACH (pqVRUIConnection* conn, this->Internals->VRUIConnections)
   {
     vtkPVXMLElement* child = conn->saveConfiguration();

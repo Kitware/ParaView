@@ -45,7 +45,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QtDebug>
 
 // Used for testing:
-#if PARAVIEW_PLUGIN_VRPlugin_USE_VRPN
+#if PARAVIEW_PLUGIN_CAVEInteraction_USE_VRPN
 #include <pqVRPNConnection.h>
 class pqVREventPlayer : public pqWidgetEventPlayer
 {
@@ -117,7 +117,7 @@ public:
     }
   }
 };
-#endif // PARAVIEW_PLUGIN_VRPlugin_USE_VRPN
+#endif // PARAVIEW_PLUGIN_CAVEInteraction_USE_VRPN
 
 //-----------------------------------------------------------------------------
 class pqVRStarter::pqInternals
@@ -138,10 +138,10 @@ pqVRStarter::pqVRStarter(QObject* _parent /*=0*/)
   this->Internals->Handler = nullptr;
   this->Internals->StyleFactory = nullptr;
 
-#if PARAVIEW_PLUGIN_VRPlugin_USE_VRPN
+#if PARAVIEW_PLUGIN_CAVEInteraction_USE_VRPN
   pqVREventPlayer* player = new pqVREventPlayer(nullptr);
   pqApplicationCore::instance()->testUtility()->eventPlayer()->addWidgetEventPlayer(player);
-#endif // PARAVIEW_PLUGIN_VRPlugin_USE_VRPN
+#endif // PARAVIEW_PLUGIN_CAVEInteraction_USE_VRPN
 
   this->IsShutdown = true;
 }

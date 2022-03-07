@@ -33,10 +33,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ui_pqVRAddStyleDialog.h"
 
 #include "pqVRConnectionManager.h"
-#if PARAVIEW_PLUGIN_VRPlugin_USE_VRPN
+#if PARAVIEW_PLUGIN_CAVEInteraction_USE_VRPN
 #include "pqVRPNConnection.h"
 #endif
-#if PARAVIEW_PLUGIN_VRPlugin_USE_VRUI
+#if PARAVIEW_PLUGIN_CAVEInteraction_USE_VRUI
 #include "pqVRUIConnection.h"
 #endif
 
@@ -104,7 +104,7 @@ pqVRAddStyleDialog::pqVRAddStyleDialog(QWidget* parentObject, Qt::WindowFlags f)
     trackers.clear();
     // Lookup connection
     bool found = false;
-#if PARAVIEW_PLUGIN_VRPlugin_USE_VRPN
+#if PARAVIEW_PLUGIN_CAVEInteraction_USE_VRPN
     if (pqVRPNConnection* conn = mgr->GetVRPNConnection(connName))
     {
       analogs = conn->analogMap();
@@ -113,7 +113,7 @@ pqVRAddStyleDialog::pqVRAddStyleDialog(QWidget* parentObject, Qt::WindowFlags f)
       found = true;
     }
 #endif
-#if PARAVIEW_PLUGIN_VRPlugin_USE_VRUI
+#if PARAVIEW_PLUGIN_CAVEInteraction_USE_VRUI
     if (pqVRUIConnection* conn = mgr->GetVRUIConnection(connName))
     {
       if (!found)

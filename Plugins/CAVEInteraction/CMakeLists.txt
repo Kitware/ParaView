@@ -3,10 +3,10 @@ find_package(Qt5 QUIET REQUIRED COMPONENTS Network)
 list(INSERT CMAKE_MODULE_PATH 0
   "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
-option(PARAVIEW_PLUGIN_VRPlugin_USE_VRPN "Build VRPlugin with VRPN support" OFF)
-mark_as_advanced(PARAVIEW_PLUGIN_VRPlugin_USE_VRPN)
-option(PARAVIEW_PLUGIN_VRPlugin_USE_VRUI "Build VRPlugin with VRUI support" OFF)
-mark_as_advanced(PARAVIEW_PLUGIN_VRPlugin_USE_VRUI)
+option(PARAVIEW_PLUGIN_CAVEInteraction_USE_VRPN "Build CAVEInteraction plugin with VRPN support" OFF)
+mark_as_advanced(PARAVIEW_PLUGIN_CAVEInteraction_USE_VRPN)
+option(PARAVIEW_PLUGIN_CAVEInteraction_USE_VRUI "Build CAVEInteraction plugin with VRUI support" OFF)
+mark_as_advanced(PARAVIEW_PLUGIN_CAVEInteraction_USE_VRUI)
 
 find_package(Qt5 REQUIRED COMPONENTS Network)
 
@@ -61,7 +61,7 @@ set(sources
   "${CMAKE_CURRENT_BINARY_DIR}/vtkPVVRConfig.h")
 
 
-if (PARAVIEW_PLUGIN_VRPlugin_USE_VRPN)
+if (PARAVIEW_PLUGIN_CAVEInteraction_USE_VRPN)
   find_package(VRPN REQUIRED)
   list(APPEND sources
     pqVRPNConnection.cxx
@@ -72,7 +72,7 @@ if (PARAVIEW_PLUGIN_VRPlugin_USE_VRPN)
     vtkVRPNCallBackHandlers.h)
 endif ()
 
-if (PARAVIEW_PLUGIN_VRPlugin_USE_VRUI)
+if (PARAVIEW_PLUGIN_CAVEInteraction_USE_VRUI)
   list(APPEND sources
     pqVRUIConnection.cxx
     pqVRUIConnection.h
@@ -111,17 +111,17 @@ list(APPEND interfaces
 list(APPEND sources
   ${dock_sources})
 
-paraview_add_plugin(VRPlugin
+paraview_add_plugin(CAVEInteraction
   VERSION "1.0"
   UI_INTERFACES ${interfaces}
   UI_FILES ${ui_files}
   SOURCES ${sources})
 
-target_include_directories(VRPlugin
+target_include_directories(CAVEInteraction
   PRIVATE
     "${CMAKE_CURRENT_BINARY_DIR}")
 
-target_link_libraries(VRPlugin
+target_link_libraries(CAVEInteraction
   PRIVATE
     ParaView::RemotingCore
     ParaView::RemotingServerManager
@@ -132,10 +132,10 @@ target_link_libraries(VRPlugin
     VTK::CommonTransforms
     VTK::RenderingCore
     Qt5::Network)
-  target_compile_definitions(VRPlugin PRIVATE QT_NO_KEYWORDS)
+  target_compile_definitions(CAVEInteraction PRIVATE QT_NO_KEYWORDS)
 
-if (PARAVIEW_PLUGIN_VRPlugin_USE_VRPN)
-  target_link_libraries(VRPlugin
+if (PARAVIEW_PLUGIN_CAVEInteraction_USE_VRPN)
+  target_link_libraries(CAVEInteraction
     PRIVATE
       VRPN::VRPN)
 endif ()

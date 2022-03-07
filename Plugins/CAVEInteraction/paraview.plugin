@@ -1,7 +1,7 @@
 NAME
-  VRPlugin
+  CAVEInteraction
 DESCRIPTION
-  Virtual Reality Devices and Interactor styles
+  Interaction with Cave Automatic Virtual Environments
 CONDITION
   PARAVIEW_USE_QT
 REQUIRES_MODULES

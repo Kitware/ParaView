@@ -36,10 +36,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkPVVRConfig.h"
 
-#if PARAVIEW_PLUGIN_VRPlugin_USE_VRPN
+#if PARAVIEW_PLUGIN_CAVEInteraction_USE_VRPN
 class pqVRPNConnection;
 #endif
-#if PARAVIEW_PLUGIN_VRPlugin_USE_VRUI
+#if PARAVIEW_PLUGIN_CAVEInteraction_USE_VRUI
 class pqVRUIConnection;
 #endif
 
@@ -52,12 +52,12 @@ public:
   pqVRAddConnectionDialog(QWidget* parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags{});
   virtual ~pqVRAddConnectionDialog();
 
-#if PARAVIEW_PLUGIN_VRPlugin_USE_VRPN
+#if PARAVIEW_PLUGIN_CAVEInteraction_USE_VRPN
   void setConnection(pqVRPNConnection* conn);
   pqVRPNConnection* getVRPNConnection();
   bool isVRPN();
 #endif
-#if PARAVIEW_PLUGIN_VRPlugin_USE_VRUI
+#if PARAVIEW_PLUGIN_CAVEInteraction_USE_VRUI
   void setConnection(pqVRUIConnection* conn);
   pqVRUIConnection* getVRUIConnection();
   bool isVRUI();

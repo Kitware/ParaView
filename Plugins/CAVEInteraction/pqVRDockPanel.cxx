@@ -46,10 +46,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqVRQueueHandler.h"
 #include "pqView.h"
 
-#if PARAVIEW_PLUGIN_VRPlugin_USE_VRPN
+#if PARAVIEW_PLUGIN_CAVEInteraction_USE_VRPN
 #include "pqVRPNConnection.h"
 #endif
-#if PARAVIEW_PLUGIN_VRPlugin_USE_VRUI
+#if PARAVIEW_PLUGIN_CAVEInteraction_USE_VRUI
 #include "pqVRUIConnection.h"
 #endif
 
@@ -222,14 +222,14 @@ void pqVRDockPanel::editConnection(QListWidgetItem* item)
 
   pqVRAddConnectionDialog dialog(this);
   bool set = false;
-#if PARAVIEW_PLUGIN_VRPlugin_USE_VRPN
+#if PARAVIEW_PLUGIN_CAVEInteraction_USE_VRPN
   if (pqVRPNConnection* vrpnConn = mgr->GetVRPNConnection(connName))
   {
     set = true;
     dialog.setConnection(vrpnConn);
   }
 #endif
-#if PARAVIEW_PLUGIN_VRPlugin_USE_VRUI
+#if PARAVIEW_PLUGIN_CAVEInteraction_USE_VRUI
   if (pqVRUIConnection* vruiConn = mgr->GetVRUIConnection(connName))
   {
     if (!set)
@@ -273,14 +273,14 @@ void pqVRDockPanel::addConnection()
     pqVRConnectionManager* mgr = pqVRConnectionManager::instance();
     (void)mgr; // Avoid unusued local variable warning if VRPN and VRUI not enabled
     dialog.updateConnection();
-#if PARAVIEW_PLUGIN_VRPlugin_USE_VRPN
+#if PARAVIEW_PLUGIN_CAVEInteraction_USE_VRPN
     if (dialog.isVRPN())
     {
       pqVRPNConnection* conn = dialog.getVRPNConnection();
       mgr->add(conn);
     }
 #endif
-#if PARAVIEW_PLUGIN_VRPlugin_USE_VRUI
+#if PARAVIEW_PLUGIN_CAVEInteraction_USE_VRUI
     if (dialog.isVRUI())
     {
       pqVRUIConnection* conn = dialog.getVRUIConnection();
@@ -303,14 +303,14 @@ void pqVRDockPanel::removeConnection()
   (void)mgr; // Avoid unusued local variable warning if VRPN and VRUI not enabled
 
   pqVRAddConnectionDialog dialog(this);
-#if PARAVIEW_PLUGIN_VRPlugin_USE_VRPN
+#if PARAVIEW_PLUGIN_CAVEInteraction_USE_VRPN
   if (pqVRPNConnection* vrpnConn = mgr->GetVRPNConnection(name))
   {
     mgr->remove(vrpnConn);
     return;
   }
 #endif
-#if PARAVIEW_PLUGIN_VRPlugin_USE_VRUI
+#if PARAVIEW_PLUGIN_CAVEInteraction_USE_VRUI
   if (pqVRUIConnection* vruiConn = mgr->GetVRUIConnection(name))
   {
     mgr->remove(vruiConn);
@@ -479,8 +479,8 @@ void pqVRDockPanel::setActiveView(pqView* view)
 //-----------------------------------------------------------------------------
 void pqVRDockPanel::saveState()
 {
-  pqFileDialog fileDialog(nullptr, pqCoreUtilities::mainWidget(), "Save VR plugin template",
-    QString(), "VR plugin template files (*.pvvr)");
+  pqFileDialog fileDialog(nullptr, pqCoreUtilities::mainWidget(), "Save CAVE Interaction template",
+    QString(), "CAVE Interaction template files (*.pvvr)");
 
   fileDialog.setFileMode(pqFileDialog::AnyFile);
 
@@ -493,7 +493,7 @@ void pqVRDockPanel::saveState()
   QString filename = fileDialog.getSelectedFiles().first();
 
   vtkNew<vtkPVXMLElement> root;
-  root->SetName("VRPluginState");
+  root->SetName("CAVEInteractionState");
 
   if (pqVRConnectionManager* connMgr = pqVRConnectionManager::instance())
   {
@@ -511,8 +511,8 @@ void pqVRDockPanel::saveState()
 //-----------------------------------------------------------------------------
 void pqVRDockPanel::restoreState()
 {
-  pqFileDialog fileDialog(nullptr, pqCoreUtilities::mainWidget(), "Load VR plugin template",
-    QString(), "VR plugin template files (*.pvvr);;ParaView state files (*.pvsm)");
+  pqFileDialog fileDialog(nullptr, pqCoreUtilities::mainWidget(), "Load CAVE Interaction template",
+    QString(), "CAVE Interaction template files (*.pvvr);;ParaView state files (*.pvsm)");
 
   fileDialog.setFileMode(pqFileDialog::ExistingFile);
 
