@@ -78,6 +78,7 @@ int vtkHyperTreeGridRepresentation::FillInputPortInformation(
   int vtkNotUsed(port), vtkInformation* info)
 {
   info->Set(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkHyperTreeGrid");
+  info->Append(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkCompositeDataSet");
 
   // Saying INPUT_IS_OPTIONAL() is essential, since representations don't have
   // any inputs on client-side (in client-server, client-render-server mode) and
