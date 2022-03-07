@@ -74,4 +74,13 @@
 
   <pqcompareview object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.0/CentralWidgetFrame/Viewport" baseline="$PARAVIEW_DATA_ROOT/Clients/ParaView/Testing/Data/Baseline/ScalarBar6.png" width="300" height="300" />
 
+  <!-- Try multiple scalar bars with multiple arrays (used to not update properly) -->
+  <pqevent object="pqClientMainWindow/menubar/menuFilters/pqProxyGroupMenuManager0/Contour" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/variableToolbar/displayColor/Variables" command="activated" arguments="Normals" />
+  <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser" command="mousePress" arguments="1,1,0,7,6,/0:0/0:0/1:1" />
+  <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser" command="mouseRelease" arguments="1,0,0,7,6,/0:0/0:0/1:1" />
+
+  <pqcompareview object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.0/CentralWidgetFrame/Viewport" baseline="$PARAVIEW_DATA_ROOT/Clients/ParaView/Testing/Data/Baseline/ScalarBar8.png" width="300" height="300" />
+
 </pqevents>
