@@ -65,7 +65,7 @@ public:
   void apply() override;
   void reset() override;
 
-public Q_SLOTS:
+public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   /**
    * Slots used to toggle the visibility of the translucent plane.
    */
@@ -118,7 +118,7 @@ private Q_SLOTS:
   void setOrigin(double x, double y, double z);
   void setNormal(double x, double y, double z);
 
-private:
+private: // NOLINT(readability-redundant-access-specifiers)
   Q_DISABLE_COPY(pqDisplaySizedImplicitPlanePropertyWidget)
 };
 
