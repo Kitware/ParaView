@@ -74,6 +74,11 @@ public Q_SLOTS: // NOLINT(readability-redundant-access-specifiers)
   void setDrawPlane(bool val);
 
   /**
+   * Set draw outline and intersection edges.
+   */
+  void setDrawOutlineAndIntersectionEdges(bool val);
+
+  /**
    * Set the widget normal to be along the X axis.
    */
   void useXNormal() { this->setNormal(1, 0, 0); }
