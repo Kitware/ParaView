@@ -1,28 +1,28 @@
+/*=========================================================================
+ *
+ *  Program:   Visualization Toolkit
+ *  Module:    cdi_tools.cxx
+ *
+ *  Copyright (c) 2018 Niklas Roeber, DKRZ Hamburg
+ *  All rights reserved.
+ *  See Copyright.txt or http://www.kitware.com/Copyright.htm for details.
+ *
+ *     This software is distributed WITHOUT ANY WARRANTY; without even
+ *     the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ *     PURPOSE.  See the above copyright notice for more information.
+ *
+ *  =========================================================================*/
+
 #include "cdi_tools.h"
 #include "vtk_netcdf.h"
+#include "vtksys/SystemTools.hxx"
 
-#include "cdi.h"
-#include "helpers.h"
+#include <cstring>
 
-#include <string.h>
-
-using namespace std;
-
-string GuessGridFileFromUri(const string FileName)
+//----------------------------------------------------------------------------
+std::string get_att_str(const std::string& filename, const std::string& var, const std::string& att)
 {
-  string guess = "";
-  // NETCDF-CALL:
-  string uri_filename = GetBasenameFromUri(get_att_str(FileName, "NC_GLOBAL", "grid_file_uri"));
-  if (uri_filename != "")
-  {
-    guess = GetPathName(FileName) + "/" + uri_filename;
-  }
-  return guess;
-}
-
-string get_att_str(const string filename, const string var, const string att)
-{
-  string result = "";
+  std::string result;
 
   int ncFD;
   nc_open(filename.c_str(), NC_NOWRITE, &ncFD);
@@ -50,13 +50,31 @@ string get_att_str(const string filename, const string var, const string att)
   return result;
 }
 
-string ParseTimeUnits(const int vdate, const int vtime)
+namespace cdi_tools
 {
+//----------------------------------------------------------------------------
+std::string GuessGridFileFromUri(const std::string& FileName)
+{
+  std::string guess;
+  // NETCDF-CALL:
+  std::string uri_filename =
+    vtksys::SystemTools::GetFilenameName(::get_att_str(FileName, "NC_GLOBAL", "grid_file_uri"));
+  if (!uri_filename.empty())
+  {
+    std::string dir = vtksys::SystemTools::GetParentDirectory(FileName);
+    // guess = vtksys::SystemTools::JoinPath({dir, uri_filename});
+    guess = dir + "/" + uri_filename;
+  }
+  return guess;
+}
 
-  string date = ::ConvertInt(vdate);
-  string time = ::ConvertInt(vtime);
-  string time_units = "";
-  if (strlen(date.c_str()) < 8)
+//----------------------------------------------------------------------------
+std::string ParseTimeUnits(const int& vdate, const int& vtime)
+{
+  std::string date = std::to_string(vdate);
+  std::string time = std::to_string(vtime);
+  std::string time_units;
+  if (date.size() < 8)
   {
     time_units = "days since 0-1-1 ";
   }
@@ -70,7 +88,7 @@ string ParseTimeUnits(const int vdate, const int vtime)
     time_units += date.substr(6, 2);
     time_units += " ";
   }
-  if (strlen(time.c_str()) < 6)
+  if (time.size() < 6)
   {
     time_units += "00:00:00";
   }
@@ -85,9 +103,10 @@ string ParseTimeUnits(const int vdate, const int vtime)
   return time_units;
 }
 
-string ParseCalendar(const int calendar)
+//----------------------------------------------------------------------------
+std::string ParseCalendar(const int& calendar)
 {
-  string calendar_name = "";
+  std::string calendar_name;
   switch (calendar)
   {
     case CALENDAR_STANDARD:
@@ -124,24 +143,21 @@ void cdi_set_cur(CDIVar* cdiVar, int Timestep, int level)
   cdiVar->LevelID = level;
 }
 
-// These pass on to CDI functions where function overloading is broken due to F interface stuff, or
-// so.
 void readslice(int streamID, int varID, int levelID, double data[], SizeType* nmiss)
 {
   streamReadVarSlice(streamID, varID, levelID, data, nmiss);
 }
-
 void readslice(int streamID, int varID, int levelID, float data[], SizeType* nmiss)
 {
   streamReadVarSliceF(streamID, varID, levelID, data, nmiss);
 }
-
 void readvar(int streamID, int varID, double data[], SizeType* nmiss)
 {
   streamReadVar(streamID, varID, data, nmiss);
 }
-
 void readvar(int streamID, int varID, float data[], SizeType* nmiss)
 {
   streamReadVarF(streamID, varID, data, nmiss);
 }
+
+}; // end of namespace cdi_tools

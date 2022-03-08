@@ -1,3 +1,17 @@
+/*=========================================================================
+ *
+ *  Program:   Visualization Toolkit
+ *  Module:    cdi_tools.h
+ *
+ *  Copyright (c) 2018 Niklas Roeber, DKRZ Hamburg
+ *  All rights reserved.
+ *  See Copyright.txt or http://www.kitware.com/Copyright.htm for details.
+ *
+ *     This software is distributed WITHOUT ANY WARRANTY; without even
+ *     the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ *     PURPOSE.  See the above copyright notice for more information.
+ *
+ *  =========================================================================*/
 
 #ifndef CDI_TOOLS
 #define CDI_TOOLS
@@ -5,6 +19,8 @@
 #include "cdi.h"
 #include <string>
 
+namespace cdi_tools
+{
 struct CDIVar
 {
   int StreamID;
@@ -20,22 +36,21 @@ struct CDIVar
   char Name[CDI_MAX_NAME];
 };
 
-std::string GuessGridFileFromUri(const std::string FileName);
-std::string get_att_str(const std::string filename, const std::string var, const std::string att);
-std::string ParseTimeUnits(const int vdate, const int vtime);
-std::string ParseCalendar(const int calendar);
+std::string GuessGridFileFromUri(const std::string& FileName);
+std::string ParseTimeUnits(const int& vdate, const int& vtime);
+std::string ParseCalendar(const int& calendar);
 
 void cdi_set_cur(CDIVar* cdiVar, int Timestep, int level);
 
-// These pass on to CDI functions where function overloading is broken due to F interface stuff, or
-// so.
+//@{
+/**
+ * Interface to forward to cdi float or double variant.
+ */
 void readslice(int streamID, int varID, int levelID, double data[], SizeType* nmiss);
-
 void readslice(int streamID, int varID, int levelID, float data[], SizeType* nmiss);
-
 void readvar(int streamID, int varID, double data[], SizeType* nmiss);
-
 void readvar(int streamID, int varID, float data[], SizeType* nmiss);
+//@}
 
 template <class T>
 void cdi_get_part_unstruct(CDIVar* cdiVar, int start, size_t size, T* buffer, int nlevels);
@@ -116,5 +131,7 @@ void cdi_get_part_unstruct(CDIVar* cdiVar, int start, size_t size, T* buffer, in
     streamReadVarPart(
       cdiVar->StreamID, cdiVar->VarID, cdiVar->Type, start, size, buffer, &nmiss, memtype);
 }
+
+}; // end of namespace
 
 #endif /* CDI_TOOLS */

@@ -1,4 +1,3 @@
-// -*- c++ -*-
 /*=========================================================================
  *
  *  Program:   Visualization Toolkit
@@ -13,58 +12,51 @@
  *     PURPOSE.  See the above copyright notice for more information.
  *
  *  =========================================================================*/
-// .NAME vtkCDIReader - reads ICON/CDI netCDF data sets
-// .SECTION Description
-// vtkCDIReader is based on the vtk MPAS netCDF reader developed by
-// Christine Ahrens (cahrens@lanl.gov). The plugin reads all ICON/CDI
-// netCDF data sets with point and cell variables, both 2D and 3D. It allows
-// spherical (standard), as well as equidistant cylindrical and Cassini projection.
-// 3D data can be visualized using slices, as well as 3D unstructured mesh. If
-// bathymetry information (wet_c) is present in the data, this can be used for
-// masking out continents. For more information, also check out our ParaView tutorial:
-// https://www.dkrz.de/Nutzerportal-en/doku/vis/sw/paraview
-//
-// .SECTION Caveats
-// The integrated visualization of performance data is not yet fully developed
-// and documented. If interested in using it, see the following presentation
-// https://www.dkrz.de/about/media/galerie/Vis/performance/perf-vis
-// and/or contact Niklas Roeber at roeber@dkrz.de
-//
-// .SECTION Thanks
-// Thanks to Uwe Schulzweida for the CDI code (uwe.schulzweida@mpimet.mpg.de)
-// Thanks to Moritz Hanke for the sorting code (hanke@dkrz.de)
 
-// Test
-// Correct Plotting 3D, Wrapping
-// Parallel Visualization of Cell Data
-// Visualization of other Grids, Point, Edge etc.
+/**
+ *
+ * @class vtkCDIReader
+ * @brief reads ICON/CDI netCDF data sets
+ *
+ * vtkCDIReader is based on the vtk MPAS netCDF reader developed by
+ * Christine Ahrens (cahrens@lanl.gov). The plugin reads all ICON/CDI
+ * netCDF data sets with point and cell variables, both 2D and 3D. It allows
+ * spherical (standard), as well as equidistant cylindrical and Cassini projection.
+ * 3D data can be visualized using slices, as well as 3D unstructured mesh. If
+ * bathymetry information (wet_c) is present in the data, this can be used for
+ * masking out continents. For more information, also check out our ParaView tutorial:
+ * https://www.dkrz.de/Nutzerportal-en/doku/vis/sw/paraview
+ *
+ * @section caveats Caveats
+ * The integrated visualization of performance data is not yet fully developed
+ * and documented. If interested in using it, see the following presentation
+ * https://www.dkrz.de/about/media/galerie/Vis/performance/perf-vis
+ * and/or contact Niklas Roeber at roeber@dkrz.de
+ *
+ * @section thanks Thanks
+ * Thanks to Uwe Schulzweida for the CDI code (uwe.schulzweida@mpimet.mpg.de)
+ * Thanks to Moritz Hanke for the sorting code (hanke@dkrz.de)
+ */
 
 #ifndef vtkCDIReader_h
 #define vtkCDIReader_h
 
-#define DEBUG 0
-#define MAX_VARS 100
-
 #include "vtkCDIReaderModule.h" // for export macro
-#include "vtkDataArraySelection.h"
-#include "vtkIntArray.h"     // for ivars
-#include "vtkSmartPointer.h" // for ivars
 #include "vtkUnstructuredGridAlgorithm.h"
 
-#ifdef PARAVIEW_USE_MPI
-class vtkMultiProcessController;
-#endif
+#include "vtkDataArraySelection.h" // for ivars
+#include "vtkSmartPointer.h"       // for ivars
+#include "vtkStringArray.h"        // for ivars
 
-#ifdef PARAVIEW_PLUGIN_BUILD_CDIReader_WITH_GRIB
-#include "eccodes.h"
-#include "grib_api.h"
-#endif
+#include "projections.h" // for projection enum
 
-#include "projections.h"
+#include <memory> // for unique_ptr
+#include <vector> // for std::vector
 
 class vtkCallbackCommand;
 class vtkDoubleArray;
-class vtkStringArray;
+class vtkFieldData;
+class vtkMultiProcessController;
 
 class VTKCDIREADER_EXPORT vtkCDIReader : public vtkUnstructuredGridAlgorithm
 {
@@ -80,9 +72,8 @@ public:
   vtkGetMacro(NumberOfCellVars, int);
   vtkGetMacro(NumberOfPointVars, int);
 
-  vtkStringArray* VariableDimensions;
-  vtkStringArray* AllDimensions;
-  vtkSmartPointer<vtkIntArray> LoadingDimensions;
+  vtkSmartPointer<vtkStringArray> VariableDimensions;
+  vtkSmartPointer<vtkStringArray> AllDimensions;
   void SetDimensions(const char* dimensions);
   vtkStringArray* GetAllVariableArrayNames();
   vtkSmartPointer<vtkStringArray> AllVariableArrayNames;
@@ -178,14 +169,13 @@ public:
   void SetShowMultilayerView(bool val);
   vtkGetMacro(ShowMultilayerView, bool);
 
-#ifdef PARAVIEW_USE_MPI
   vtkGetObjectMacro(Controller, vtkMultiProcessController);
   virtual void SetController(vtkMultiProcessController*);
-#endif
 
 protected:
   vtkCDIReader();
   ~vtkCDIReader() override;
+
   int OpenFile();
   void DestroyData();
   void SetDefaults();
@@ -238,7 +228,7 @@ protected:
     static_cast<vtkCDIReader*>(clientdata)->Modified();
   }
 
-  int getTimeIndex(double DataTimeStep);
+  int GetTimeIndex(double DataTimeStep);
   int GetDims();
   int ReadHorizontalGridData();
   int ReadVerticalGridData();
@@ -247,13 +237,11 @@ protected:
   int AddMirrorPointX(int index, double dividerX, double offset);
   int AddMirrorPointY(int index, double dividerY, double offset);
 
-#ifdef PARAVIEW_USE_MPI
   vtkMultiProcessController* Controller;
-#endif
-  bool initialized;
+
+  bool Initialized;
 
   int NumberOfProcesses;
-  bool FilenameSet;
   double CustomMaskValue;
   int BeginPoint, EndPoint, BeginCell, EndCell;
   int Piece, NumPieces;
@@ -275,7 +263,6 @@ protected:
   std::string FileNameGridSelect;
   std::string FileSeriesFirstName;
   std::string MaskingVarname;
-  int* VariableType;
   int NumberOfTimeSteps;
   int NumberOfAllTimeSteps;
   std::vector<int> TimeSeriesTimeSteps;
@@ -285,8 +272,7 @@ protected:
   std::vector<double> TimeSteps;
   int FileSeriesNumber;
   int NumberOfFiles;
-  double TStepDistance;
-  double bloat;
+  double Bloat;
 
   bool UseMask;
   bool InvertMask;
@@ -295,19 +281,18 @@ protected:
 
   bool SkipGrid;
 
-  vtkCallbackCommand* SelectionObserver;
+  vtkNew<vtkCallbackCommand> SelectionObserver;
   bool InfoRequested;
   bool DataRequested;
   bool Grib;
-  bool gridSelected;
 
-  vtkDataArraySelection* CellDataArraySelection;
-  vtkDataArraySelection* PointDataArraySelection;
-  vtkDataArraySelection* DomainDataArraySelection;
+  vtkNew<vtkDataArraySelection> CellDataArraySelection;
+  vtkNew<vtkDataArraySelection> PointDataArraySelection;
+  vtkNew<vtkDataArraySelection> DomainDataArraySelection;
 
-  vtkDataArray** CellVarDataArray;
-  vtkDataArray** PointVarDataArray;
-  vtkDoubleArray** DomainVarDataArray;
+  vtkNew<vtkFieldData> CellVarDataArray;
+  vtkNew<vtkFieldData> PointVarDataArray;
+  vtkNew<vtkFieldData> DomainVarDataArray;
 
   int VerticalLevelSelected;
   int VerticalLevelRange[2];
@@ -322,7 +307,7 @@ protected:
   int DimensionSelection;
   bool InvertZAxis;
   bool AddCoordinateVars;
-  projection ProjectionMode;
+  projection::Projection ProjectionMode;
   bool DoublePrecision;
   bool ShowClonClat;
   bool ShowMultilayerView;
@@ -345,8 +330,6 @@ protected:
   bool NeedVerticalGridFile;
   bool WrapOn;
 
-  double* CLonVertices;
-  double* CLatVertices;
   std::vector<double> CLon;
   std::vector<double> CLat;
   double* DepthVar;
@@ -356,7 +339,6 @@ protected:
   std::vector<int> OrigConnections;
   std::vector<int> ModConnections;
   std::vector<bool> CellMask;
-  int* DomainMask;
   double* DomainCellVar;
   int MaximumCells;
   int MaximumPoints;
@@ -365,7 +347,6 @@ protected:
   int NumberOfCellVars;
   int NumberOfPointVars;
   int NumberOfDomainVars;
-  double* PointVarData;
   bool GridReconstructed;
 
   int StreamID;
@@ -376,17 +357,16 @@ protected:
 
   std::string TimeUnits;
   std::string Calendar;
-  vtkSmartPointer<vtkIntArray> maskArray;
-  vtkSmartPointer<vtkDoubleArray> clonArray;
-  vtkSmartPointer<vtkDoubleArray> clatArray;
-  vtkSmartPointer<vtkUnstructuredGrid> Output;
+  vtkSmartPointer<vtkDoubleArray> ClonArray;
+  vtkSmartPointer<vtkDoubleArray> ClatArray;
+  vtkNew<vtkUnstructuredGrid> Output;
 
 private:
   vtkCDIReader(const vtkCDIReader&) = delete;
   void operator=(const vtkCDIReader&) = delete;
 
   class Internal;
-  Internal* Internals;
+  std::unique_ptr<Internal> Internals;
 
   template <typename ValueType>
   int LoadCellVarDataTemplate(int variable, double dTime, vtkDataArray* dataArray);

@@ -288,6 +288,10 @@
         </Documentation>
         <Hints>
           <Visibility replace_input="1" />
+          <PropertyWidgetDecorator type="GenericDecorator"
+            mode="enabled_state"
+            property="Show3DSurface"
+            value="1" />
         </Hints>
       </IntVectorProperty>
 
@@ -306,6 +310,12 @@
         <Documentation>
 	  We don't know where to start the vertical colums (we don't have bounds). So we need one additional value. This will affect the thickness of the first layer in 3D.
         </Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+            mode="enabled_state"
+            property="Show3DSurface"
+            value="1" />
+        </Hints>
       </DoubleVectorProperty>
 
       <IntVectorProperty name="VerticalLevelRangeInfo"
@@ -323,6 +333,12 @@
             <Property name="VerticalLevelRangeInfo" function="Range"/>
           </RequiredProperties>
         </IntRangeDomain>
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+            mode="enabled_state"
+            property="Show3DSurface"
+            value="0" />
+        </Hints>
         <Documentation>
           Adjust the vertical level that is displayed. This is only available for 3D data sets.
         </Documentation>
