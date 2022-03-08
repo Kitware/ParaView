@@ -37,8 +37,29 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkObject.h"
 #include "vtkZSpaceViewModule.h" // for export macro
 
-#include <vector>   // for std::vector
-#include <zspace.h> // zspace header
+#include <Windows.h> // for HMODULE, see if fast-forwardable
+
+#include <C:\zSpace\zSpaceSdks\CoreCompatibility_1.0.0.12\Inc\zSpaceCoreCompatibility.h> // zspace header
+#include <vector> // for std::vector
+
+/**
+ * Structure holding the loaded zSpace Core Compatibility
+ * API entry point function pointers
+ */
+struct zSpaceCoreCompatEntryPoints
+{
+  // Use the zSpace Core Compatibilty API function name reflection macro to
+  // auto-generate function pointer members for all zSpace Core Compatibility
+  // API entry point functions.
+
+#define ZC_COMPAT_SAMPLE_LOCAL_ENTRY_POINT_MEMBER(undecoratedFuncName)                             \
+  ZCCompat##undecoratedFuncName##FuncPtrType zccompat##undecoratedFuncName;                        \
+  /**/
+
+  ZC_COMPAT_REFLECTION_LIST_UNDECORATED_FUNC_NAMES(ZC_COMPAT_SAMPLE_LOCAL_ENTRY_POINT_MEMBER)
+
+#undef ZC_COMPAT_SAMPLE_LOCAL_ENTRY_POINT_MEMBER
+};
 
 class vtkRenderWindow;
 class vtkCamera;
@@ -57,6 +78,13 @@ public:
    * Return the singleton instance with no reference counting.
    */
   static vtkZSpaceSDKManager* GetInstance();
+
+  /**
+   * Load the "zSpaceCoreCompatibility64.dll" shared library then load the
+   * zSpace Core Compatibility API entry point functions (at runtime)
+   */
+  bool loadZspaceCoreCompatibilityEntryPoints(const char* zSpaceCoreCompatDllFilePath,
+    HMODULE& zSpaceCoreCompatDllModuleHandle, zSpaceCoreCompatEntryPoints& entryPoints);
 
   /**
    * Initialize the zSpace SDK and check for zSpace devices :
@@ -260,16 +288,19 @@ public:
   vtkSetEnumMacro(RightButtonState, ButtonState);
   //@}
 
+  void BeginFrame();
+  void EndFrame();
+
 protected:
   vtkZSpaceSDKManager();
   ~vtkZSpaceSDKManager() override;
 
-  ZCContext ZSpaceContext = nullptr;
-  ZCHandle DisplayHandle = nullptr;
-  ZCHandle BufferHandle = nullptr;
-  ZCHandle ViewportHandle = nullptr;
-  ZCHandle FrustumHandle = nullptr;
-  ZCHandle StylusHandle = nullptr;
+  ZCCompatContext ZSpaceContext = nullptr;
+  ZCCompatDisplay DisplayHandle = nullptr;
+  // ZCHandle BufferHandle = nullptr;
+  ZCCompatViewport ViewportHandle = nullptr;
+  ZCCompatFrustum FrustumHandle = nullptr;
+  ZCCompatTarget StylusHandle = nullptr;
 
   vtkNew<vtkMatrix4x4> CenterEyeViewMatrix;
   vtkNew<vtkMatrix4x4> LeftEyeViewMatrix;
@@ -314,6 +345,12 @@ protected:
   // Store buttons state to iterate over them
   ButtonState* ButtonsState[NumberOfButtons] = { &MiddleButtonState, &RightButtonState,
     &LeftButtonState };
+
+  // Store the API functions entry points
+  zSpaceCoreCompatEntryPoints EntryPts;
+
+  //
+  HMODULE zSpaceCoreCompatDllModuleHandle;
 
 private:
   vtkZSpaceSDKManager(const vtkZSpaceSDKManager&) = delete;

@@ -104,7 +104,7 @@ void vtkPVZSpaceView::ResetCamera()
   {
     double bounds[6];
     this->GeometryBounds.GetBounds(bounds);
-    // Find parameters computed by zSpace SDK
+    // Insure an optimal initial position of the geometry in the scene
     this->CalculateFit(bounds);
   }
 }
@@ -114,6 +114,7 @@ void vtkPVZSpaceView::ResetCamera(double bounds[6])
 {
   if (!this->LockBounds && this->DiscreteCameras == nullptr)
   {
+    // Insure an optimal initial position of the geometry in the scene
     this->CalculateFit(bounds);
   }
 }
@@ -188,12 +189,17 @@ void vtkPVZSpaceView::CalculateFit(double* bounds)
 //------------------------------------------------------------------------------
 void vtkPVZSpaceView::Render(bool interactive, bool skip_rendering)
 {
+  vtkZSpaceSDKManager* sdkManager = vtkZSpaceSDKManager::GetInstance();
+  sdkManager->BeginFrame();
+
   if (!this->GetMakingSelection())
   {
     vtkZSpaceRenderWindowInteractor::SafeDownCast(this->Interactor)->HandleInteractions();
   }
 
   this->Superclass::Render(interactive, skip_rendering || this->GetMakingSelection());
+
+  sdkManager->EndFrame();
 }
 
 //----------------------------------------------------------------------------
