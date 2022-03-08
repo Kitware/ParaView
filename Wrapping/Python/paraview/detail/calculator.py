@@ -13,7 +13,7 @@ import vtkmodules.numpy_interface.dataset_adapter as dsa
 from vtkmodules.numpy_interface.algorithms import *
 # -- this will import vtkMultiProcessController and vtkMPI4PyCommunicator
 
-from paraview.vtk import vtkDoubleArray, vtkSelectionNode, vtkSelection, vtkStreamingDemandDrivenPipeline
+from paraview.vtk import vtkDataObject, vtkDoubleArray, vtkSelectionNode, vtkSelection, vtkStreamingDemandDrivenPipeline
 from paraview.modules import vtkPVVTKExtensionsFiltersPython
 
 import sys
@@ -197,11 +197,10 @@ def execute(self, expression):
     output = dsa.WrapDataObject(self.GetOutputDataObject(0))
 
     if self.GetCopyArrays():
-        if self.GetInputDataObject(0, 0).IsA('vtkTable'):
-            output.GetRowData().PassData(inputs[0].GetRowData())
-        else:
-            output.GetPointData().PassData(inputs[0].GetPointData())
-            output.GetCellData().PassData(inputs[0].GetCellData())
+        for attr in range(vtkDataObject.NUMBER_OF_ATTRIBUTE_TYPES):
+            if inputs[0].HasAttributes(attr):
+                inputAttribute = inputs[0].GetAttributes(attr)
+                output.GetAttributes(attr).PassData(inputAttribute)
 
     # get a dictionary for arrays in the dataset attributes. We pass that
     # as the variables in the eval namespace for compute.

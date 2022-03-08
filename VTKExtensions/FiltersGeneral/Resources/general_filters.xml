@@ -385,6 +385,7 @@ being of a vtkDoubleArray.</Documentation>
           <DataType value="vtkDataSet" />
           <DataType value="vtkGraph"/>
           <DataType value="vtkTable"/>
+          <DataType value="vtkHyperTreeGrid"/>
         </DataTypeDomain>
         <InputArrayDomain name="input_array" optional="1"/>
         <Documentation>This property specifies the input dataset (vtkDataSet, vtkTable or vtkGraph) to the

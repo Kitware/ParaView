@@ -953,8 +953,7 @@ bool vtkPVDataInformation::IsAttributeValid(int fieldAssociation) const
           vtkDataObjectTypes::TypeIdIsA(dtype, VTK_HYPER_TREE_GRID);
 
       case vtkDataObject::FIELD_ASSOCIATION_VERTICES:
-        return vtkDataObjectTypes::TypeIdIsA(dtype, VTK_GRAPH) ||
-          vtkDataObjectTypes::TypeIdIsA(dtype, VTK_HYPER_TREE_GRID);
+        return vtkDataObjectTypes::TypeIdIsA(dtype, VTK_GRAPH);
 
       case vtkDataObject::FIELD_ASSOCIATION_EDGES:
         return vtkDataObjectTypes::TypeIdIsA(dtype, VTK_GRAPH);
