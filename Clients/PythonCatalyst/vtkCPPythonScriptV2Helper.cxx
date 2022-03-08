@@ -270,6 +270,12 @@ bool vtkCPPythonScriptV2Helper::PrepareFromScript(const std::string& fname)
 }
 
 //----------------------------------------------------------------------------
+const std::string& vtkCPPythonScriptV2Helper::GetScriptFileName() const
+{
+  return this->Filename;
+}
+
+//----------------------------------------------------------------------------
 bool vtkCPPythonScriptV2Helper::IsImported() const
 {
   auto& internals = (*this->Internals);

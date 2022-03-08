@@ -410,6 +410,8 @@ if (PARAVIEW_USE_PYTHON)
   list(APPEND xml_files
     Resources/readers_openpmd.xml
     Resources/readers_savg.xml)
+  list(APPEND xml_files
+    Resources/extractors_python.xml)
 endif()
 
 paraview_add_server_manager_xmls(

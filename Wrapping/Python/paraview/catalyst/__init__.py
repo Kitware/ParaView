@@ -45,3 +45,11 @@ def get_execute_params():
     """
     from . import v2_internals
     return v2_internals._get_execute_parameters()
+
+def get_script_filename():
+    """For the active pipeline script, returns its filename. This is provided in
+    the same form as it was passed to
+    `vtkCPPythonScriptV2Helper::PrepareFromScript`.
+    """
+    from . import v2_internals
+    return v2_internals._get_script_filename()

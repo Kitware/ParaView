@@ -46,6 +46,11 @@ public:
   bool PrepareFromScript(const std::string& fname);
 
   /**
+   * Returns the name of the script passed in to PrepareFromScript.
+   */
+  const std::string& GetScriptFileName() const;
+
+  /**
    * Returns if the package/module has been imported.
    */
   bool IsImported() const;
