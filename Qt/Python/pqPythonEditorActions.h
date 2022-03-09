@@ -43,6 +43,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <cstddef>
 #include <vector>
 
+class pqPythonManager;
+
 /**
  * @struct EditorActionGroup
  * @brief A template group of action
@@ -130,6 +132,7 @@ struct pqPythonEditorActions
     // Editor Actions
     CloseCurrentTab,
     Exit,
+    Run,
 
     END
   };
@@ -143,6 +146,7 @@ struct pqPythonEditorActions
     Open,
     Load,
     Delete,
+    Run,
 
     END
   };
@@ -177,8 +181,9 @@ struct pqPythonEditorActions
   /**
    * @brief Updates the list of actions by listing
    * the files contained into the default Script dir
+   * @param python_mgr: instance of the python manager
    */
-  void updateScriptsList();
+  void updateScriptsList(pqPythonManager* const python_mgr);
 
   /**
    * @brief Fill the input menus with the current actions

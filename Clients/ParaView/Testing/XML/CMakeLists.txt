@@ -145,6 +145,7 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${paraview_test_data_directory_input}/Data/quadratic_tets_with_ghost_cells_1.vtu}"
   "DATA{${paraview_test_data_directory_input}/Data/sample.h5part}"
   "DATA{${paraview_test_data_directory_input}/Data/servers-wiki.pvsc}"
+  "DATA{${paraview_test_data_directory_input}/Data/Udirectory/coneScript.py}"
   "DATA{${paraview_test_data_directory_input}/Data/Udirectory/simpleScript.py}"
   "DATA{${paraview_test_data_directory_input}/Data/sineWaves.csv}"
   "DATA{${paraview_test_data_directory_input}/Data/singleSphereAnimation.pvd}"
@@ -1338,6 +1339,7 @@ if(PARAVIEW_USE_PYTHON)
     ColorByComponentNames.xml # needs programmable filter
     LiveProgrammableSource.xml
     PythonShellRunScript.xml
+    PythonEditorRun.xml
     SaveLoadStatePython.xml
     TraceExodus.xml
     TraceExportAndSaveData.xml
