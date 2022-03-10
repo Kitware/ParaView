@@ -27,7 +27,6 @@
 #include "vtkDataRepresentation.h"
 #include "vtkFXAAOptions.h"
 #include "vtkFloatArray.h"
-#include "vtkGeometryRepresentation.h"
 #include "vtkInformation.h"
 #include "vtkInformationDoubleKey.h"
 #include "vtkInformationDoubleVectorKey.h"
@@ -848,9 +847,9 @@ bool vtkPVRenderView::PrepareSelect(int fieldAssociation, const char* array)
   {
     for (int i = 0; i < this->GetNumberOfRepresentations(); i++)
     {
-      vtkGeometryRepresentation* geom =
-        vtkGeometryRepresentation::SafeDownCast(this->GetRepresentation(i));
-      if (geom)
+      vtkPVDataRepresentation* repr =
+        vtkPVDataRepresentation::SafeDownCast(this->GetRepresentation(i));
+      if (repr)
       {
         const char* pointIdArray = nullptr;
         const char* cellIdArray = nullptr;
@@ -863,7 +862,7 @@ bool vtkPVRenderView::PrepareSelect(int fieldAssociation, const char* array)
           cellIdArray = array;
         }
         // any existing custom array id names are overwritten
-        geom->SetArrayIdNames(pointIdArray, cellIdArray);
+        repr->SetArrayIdNames(pointIdArray, cellIdArray);
       }
     }
   }
@@ -913,12 +912,12 @@ void vtkPVRenderView::PostSelect(vtkSelection* sel, const char* array)
   // restore ids
   for (int i = 0; i < this->GetNumberOfRepresentations(); i++)
   {
-    vtkGeometryRepresentation* geom =
-      vtkGeometryRepresentation::SafeDownCast(this->GetRepresentation(i));
-    if (geom)
+    vtkPVDataRepresentation* repr =
+      vtkPVDataRepresentation::SafeDownCast(this->GetRepresentation(i));
+    if (repr)
     {
       // restore the array id names to the original ones
-      geom->SetArrayIdNames(nullptr, nullptr);
+      repr->SetArrayIdNames(nullptr, nullptr);
     }
   }
 
