@@ -20,10 +20,10 @@
   <pqevent object="pqClientMainWindow/pqCameraDialog" command="key" arguments="16777248" />
   <pqevent object="pqClientMainWindow/pqCameraDialog/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents_2/elevationAngle" command="set_double" arguments="20" />
   <pqevent object="pqClientMainWindow/pqCameraDialog/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents_2/elevationAngle" command="key" arguments="16777248" />
-  <pqevent object="pqClientMainWindow/pqCameraDialog/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents_2/elevationButton" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/pqCameraDialog/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents_2/elevationPlusButton" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/pqCameraDialog/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents_2/azimuthAngle" command="set_double" arguments="20" />
   <pqevent object="pqClientMainWindow/pqCameraDialog/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents_2/azimuthAngle" command="key" arguments="16777248" />
-  <pqevent object="pqClientMainWindow/pqCameraDialog/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents_2/azimuthButton" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/pqCameraDialog/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents_2/azimuthPlusButton" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/pqCameraDialog/buttonBox/1QPushButton0" command="activate" arguments="" />
 
   <!-- Activate the Material Editor -->

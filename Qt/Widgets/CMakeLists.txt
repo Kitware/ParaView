@@ -70,6 +70,7 @@ set(classes
   pqProgressWidget
   pqQuickLaunchDialog
   pqScaleByButton
+  pqScaledSpinBox
   pqSectionVisibilityContextMenu
   pqSeriesGeneratorDialog
   pqSetData
