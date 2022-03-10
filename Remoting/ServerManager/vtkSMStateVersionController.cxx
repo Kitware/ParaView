@@ -246,18 +246,7 @@ struct Process_5_4_to_5_5
       }
       else
       {
-        if (this->Session)
-        {
-          vtkSMSessionProxyManager* pxm = this->Session->GetSessionProxyManager();
-          vtkSMProxy* settingsProxy = pxm->GetProxy("settings", "GeneralSettings");
-          int globalResetMode =
-            vtkSMPropertyHelper(settingsProxy, "TransferFunctionResetMode").GetAsInt();
-          element.attribute("value").set_value(toString(globalResetMode).c_str());
-        }
-        else
-        {
-          vtkGenericWarningMacro("Could not get TransferFunctionResetMode from settings.");
-        }
+        element.attribute("value").set_value('0');
       }
     }
 

@@ -96,10 +96,6 @@ vtkSMProxy* vtkSMTransferFunctionManager::GetColorTransferFunction(
   vtkNew<vtkSMParaViewPipelineController> controller;
   controller->PreInitializeProxy(proxy);
 
-  // Set the range reset mode based on the global setting
-  vtkSMTransferFunctionProxy* tfProxy = vtkSMTransferFunctionProxy::SafeDownCast(proxy);
-  tfProxy->ResetRescaleModeToGlobalSetting();
-
   vtkSMSettings* settings = vtkSMSettings::GetInstance();
 
   // Load array-specific preset, if specified.

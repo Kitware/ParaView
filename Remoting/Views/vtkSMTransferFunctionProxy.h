@@ -328,12 +328,6 @@ public:
   using Superclass::ResetPropertiesToXMLDefaults;
   //@}
 
-  /**
-   * Reset the transfer function's AutomaticRescaleResetMode to the global
-   * TransferFunctionRresetMode setting.
-   */
-  void ResetRescaleModeToGlobalSetting();
-
   //@{
   /**
    * Method to convert legacy color map preset XML to JSON. Use this to convert

@@ -132,14 +132,11 @@ def setattr(proxy, pname, value):
 
     if pname == "LockScalarRange" and proxy.SMProxy.GetProperty("AutomaticRescaleRangeMode"):
         if paraview.compatibility.GetVersion() <= 5.4:
+            from paraview.modules.vtkRemotingViews import vtkSMTransferFunctionManager
             if value:
-                from paraview.modules.vtkRemotingViews import vtkSMTransferFunctionManager
                 proxy.GetProperty("AutomaticRescaleRangeMode").SetData(vtkSMTransferFunctionManager.NEVER)
             else:
-                pxm = proxy.SMProxy.GetSessionProxyManager()
-                settingsProxy = pxm.GetProxy("settings", "GeneralSettings")
-                mode = settingsProxy.GetProperty("TransferFunctionResetMode").GetElement(0)
-                proxy.GetProperty("AutomaticRescaleRangeMode").SetData(mode)
+                proxy.GetProperty("AutomaticRescaleRangeMode").SetData(vtkSMTransferFunctionManager.GROW_ON_APPLY)
 
             raise Continue()
         else:

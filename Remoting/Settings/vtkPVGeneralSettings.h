@@ -127,14 +127,6 @@ public:
 
   //@{
   /**
-   * Get/Set the transfer function reset mode.
-   */
-  vtkGetMacro(TransferFunctionResetMode, int);
-  vtkSetMacro(TransferFunctionResetMode, int);
-  //@}
-
-  //@{
-  /**
    * Enum for ScalarBarMode.
    */
   enum
@@ -330,7 +322,6 @@ protected:
   int AutoApplyDelay = 0;
   bool AutoApplyActiveOnly;
   char* DefaultViewType;
-  int TransferFunctionResetMode;
   int ScalarBarMode;
   bool CacheGeometryForAnimation;
   unsigned long AnimationGeometryCacheLimit;

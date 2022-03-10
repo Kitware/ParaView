@@ -222,26 +222,6 @@
         <IntRangeDomain min="2" name="range" />
       </IntVectorProperty>
 
-      <IntVectorProperty name="TransferFunctionResetMode"
-        number_of_elements="1"
-        default_values="0"
-        command="SetTransferFunctionResetMode">
-        <Documentation>
-          Color transfer functions (or color maps) are used to map data values to colors
-          for pseudo coloring. Set the default way ParaView decides to update the data
-          range used for this mapping. Newly created transfer functions will update
-          the range according to this setting, but it can later be changed per
-          transfer function via the transfer function's 'Automatic Rescale Range Mode'
-          setting.
-        </Documentation>
-        <EnumerationDomain name="enum">
-          <Entry text="Grow and update on 'Apply'" value="0" />
-          <Entry text="Grow and update every timestep" value="1" />
-          <Entry text="Update on 'Apply'" value="2" />
-          <Entry text="Clamp and update every timestep" value="3" />
-        </EnumerationDomain>
-      </IntVectorProperty>
-
       <IntVectorProperty name="ScalarBarMode"
         command="SetScalarBarMode"
         number_of_elements="1"
@@ -477,7 +457,6 @@
       </PropertyGroup>
 
       <PropertyGroup label="Color/Opacity Map Range Options">
-        <Property name="TransferFunctionResetMode" />
         <Property name="ScalarBarMode" />
       </PropertyGroup>
 
