@@ -2989,8 +2989,27 @@ void vtkPVRenderView::SetCameraManipulators(vtkPVInteractorStyle* style, const i
 }
 
 //----------------------------------------------------------------------------
+void vtkPVRenderView::SetReverseMouseWheelZoomDirection(bool reverse)
+{
+  this->ReverseMouseWheelZoomDirection = reverse;
+
+  // Always give positive factors to the SetXXXMotionFactor functions
+  if (this->TwoDInteractorStyle)
+  {
+    double factor = this->TwoDInteractorStyle->GetMouseWheelMotionFactor();
+    this->SetCamera2DMouseWheelMotionFactor(factor < 0 ? -factor : factor);
+  }
+  if (this->ThreeDInteractorStyle)
+  {
+    double factor = this->ThreeDInteractorStyle->GetMouseWheelMotionFactor();
+    this->SetCamera3DMouseWheelMotionFactor(factor < 0 ? -factor : factor);
+  }
+}
+
+//----------------------------------------------------------------------------
 void vtkPVRenderView::SetCamera2DMouseWheelMotionFactor(double factor)
 {
+  factor *= this->ReverseMouseWheelZoomDirection ? -1 : 1;
   if (this->TwoDInteractorStyle)
   {
     this->TwoDInteractorStyle->SetMouseWheelMotionFactor(factor);
@@ -3000,6 +3019,7 @@ void vtkPVRenderView::SetCamera2DMouseWheelMotionFactor(double factor)
 //----------------------------------------------------------------------------
 void vtkPVRenderView::SetCamera3DMouseWheelMotionFactor(double factor)
 {
+  factor *= this->ReverseMouseWheelZoomDirection ? -1 : 1;
   if (this->ThreeDInteractorStyle)
   {
     this->ThreeDInteractorStyle->SetMouseWheelMotionFactor(factor);

@@ -2009,6 +2009,22 @@
         </Hints>
         <Documentation>Set the wheel motion factor for 3D interaction.</Documentation>
       </DoubleVectorProperty>
+      <IntVectorProperty name="ReverseMouseWheelZoomDirection"
+                         command="SetReverseMouseWheelZoomDirection"
+                         default_values="0"
+                         number_of_elements="1"
+                         label="Reverse Mouse Wheel Zoom Direction"
+                         panel_visibility="never">
+        <BooleanDomain name="bool" />
+        <Hints>
+          <PropertyLink group="settings"
+                        proxy="RenderViewInteractionSettings"
+                        property="ReverseMouseWheelZoomDirection"/>
+        </Hints>
+        <Documentation>
+          This option changes the direction of the mouse wheel for zooming in and out.
+        </Documentation>
+      </IntVectorProperty>
       <IntVectorProperty command="SetUseLightKit"
                          default_values="1"
                          name="UseLight"

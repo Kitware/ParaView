@@ -829,6 +829,16 @@
                            resolution="1000" />
         <Documentation>Set the wheel motion factor for 2D interaction.</Documentation>
       </DoubleVectorProperty>
+      <IntVectorProperty name="ReverseMouseWheelZoomDirection"
+                         command="SetReverseMouseWheelZoomDirection"
+                         default_values="0"
+                         number_of_elements="1"
+                         label="Reverse Mouse Wheel Zoom Direction">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          This option changes the direction of the mouse wheel for zooming in and out.
+        </Documentation>
+      </IntVectorProperty>
       <PropertyGroup label="2D Interaction Options">
         <Property name="Camera2DManipulators" />
         <Property name="Camera2DMouseWheelMotionFactor" />
@@ -836,6 +846,9 @@
       <PropertyGroup label="3D Interaction Options">
         <Property name="Camera3DManipulators" />
         <Property name="Camera3DMouseWheelMotionFactor" />
+      </PropertyGroup>
+      <PropertyGroup label="Mouse Wheel Options">
+        <Property name="ReverseMouseWheelZoomDirection" />
       </PropertyGroup>
       <Hints>
         <UseDocumentationForLabels />
