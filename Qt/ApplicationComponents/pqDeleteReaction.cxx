@@ -37,6 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqCoreUtilities.h"
 #include "pqObjectBuilder.h"
 #include "pqOutputPort.h"
+#include "pqOutputWidget.h"
 #include "pqPVApplicationCore.h"
 #include "pqPipelineFilter.h"
 #include "pqProxySelection.h"
@@ -185,6 +186,13 @@ void pqDeleteReaction::deleteAll()
   if (pqServer* server = pqActiveObjects::instance().activeServer())
   {
     pqApplicationCore::instance()->getObjectBuilder()->resetServer(server);
+  }
+  if (QWidget* mainWidget = pqCoreUtilities::mainWidget())
+  {
+    if (pqOutputWidget* output = mainWidget->findChild<pqOutputWidget*>())
+    {
+      output->clear();
+    }
   }
   END_UNDO_EXCLUDE();
   CLEAR_UNDO_STACK();
