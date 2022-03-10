@@ -8,8 +8,8 @@ set(_paraview_add_tests_default_test_data_target ParaViewData)
 ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/Data/NetCDF/ts.nc}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/Data/NetCDF/fesom.nc}"
-  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/Data/Baseline/ts.png,:}"
-  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/Data/Baseline/fesom.png,:}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/Data/Baseline/CDISimpleRead.png,:}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/Data/Baseline/CDIUseMask.png,:}"
 )
 
 set (xml_tests
