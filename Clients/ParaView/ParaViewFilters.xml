@@ -63,6 +63,7 @@
     <Proxy group="filters" name="KMeans" />
     <Proxy group="filters" name="MulticorrelativeStatistics" />
     <Proxy group="filters" name="PCAStatistics" />
+    <Proxy group="filters" name="TemporalStatistics" />
   </Category>
 
   <Category name="Temporal" menu_label="&amp;Temporal">
