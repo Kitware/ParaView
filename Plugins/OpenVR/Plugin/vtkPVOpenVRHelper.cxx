@@ -151,24 +151,68 @@ vtkPVOpenVRHelper::~vtkPVOpenVRHelper()
 
 void vtkPVOpenVRHelper::ExportLocationsAsSkyboxes(vtkSMViewProxy* view)
 {
+  this->SMView = view;
+  this->View = vtkPVRenderView::SafeDownCast(view->GetClientSideView());
+
   // record the state if we are currently in vr
   if (this->Interactor)
   {
     this->RecordState();
   }
 
-  this->Exporter->ExportLocationsAsSkyboxes(this, view, this->Locations);
+  // save the old values and create temp values to use
+  vtkSmartPointer<vtkOpenGLRenderWindow> oldrw = this->RenderWindow;
+  vtkSmartPointer<vtkOpenGLRenderer> oldr = this->Renderer;
+  vtkSmartPointer<vtkRenderWindowInteractor> oldi = this->Interactor;
+  this->RenderWindow = vtkOpenGLRenderWindow::SafeDownCast(vtkRenderWindow::New());
+  this->Renderer = vtkOpenGLRenderer::SafeDownCast(vtkRenderer::New());
+  this->RenderWindow->AddRenderer(this->Renderer);
+  this->Interactor = vtkRenderWindowInteractor::New();
+  this->RenderWindow->SetInteractor(this->Interactor);
+
+  this->Exporter->ExportLocationsAsSkyboxes(this, view, this->Locations, this->Renderer);
+
+  // restore previous values
+  this->Widgets->ReleaseGraphicsResources(); // must delete before the interactor
+  this->Renderer->Delete();
+  this->Renderer = oldr;
+  this->Interactor->Delete();
+  this->Interactor = oldi;
+  this->RenderWindow->Delete();
+  this->RenderWindow = oldrw;
 }
 
 void vtkPVOpenVRHelper::ExportLocationsAsView(vtkSMViewProxy* view)
 {
+  this->SMView = view;
+  this->View = vtkPVRenderView::SafeDownCast(view->GetClientSideView());
+
   // record the state if we are currently in vr
   if (this->Interactor)
   {
     this->RecordState();
   }
 
+  // save the old values and create temp values to use
+  vtkSmartPointer<vtkOpenGLRenderWindow> oldrw = this->RenderWindow;
+  vtkSmartPointer<vtkOpenGLRenderer> oldr = this->Renderer;
+  vtkSmartPointer<vtkRenderWindowInteractor> oldi = this->Interactor;
+  this->RenderWindow = vtkOpenGLRenderWindow::SafeDownCast(vtkRenderWindow::New());
+  this->Renderer = vtkOpenGLRenderer::SafeDownCast(vtkRenderer::New());
+  this->RenderWindow->AddRenderer(this->Renderer);
+  this->Interactor = vtkRenderWindowInteractor::New();
+  this->RenderWindow->SetInteractor(this->Interactor);
+
   this->Exporter->ExportLocationsAsView(this, view, this->Locations);
+
+  // restore previous values
+  this->Widgets->ReleaseGraphicsResources(); // must delete before the interactor
+  this->Renderer->Delete();
+  this->Renderer = oldr;
+  this->Interactor->Delete();
+  this->Interactor = oldi;
+  this->RenderWindow->Delete();
+  this->RenderWindow = oldrw;
 }
 
 void vtkPVOpenVRHelper::TakeMeasurement()

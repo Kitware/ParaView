@@ -52,16 +52,14 @@
 vtkStandardNewMacro(vtkPVOpenVRExporter);
 
 void vtkPVOpenVRExporter::ExportLocationsAsSkyboxes(vtkPVOpenVRHelper* helper,
-  vtkSMViewProxy* smview, std::map<int, vtkPVOpenVRHelperLocation>& locations)
+  vtkSMViewProxy* smview, std::map<int, vtkPVOpenVRHelperLocation>& locations, vtkRenderer* ren)
 {
   auto* view = vtkPVRenderView::SafeDownCast(smview->GetClientSideView());
   vtkRenderer* pvRenderer = view->GetRenderView()->GetRenderer();
 
-  vtkNew<vtkRenderWindow> renWin;
+  vtkRenderWindow* renWin = vtkRenderWindow::SafeDownCast(ren->GetVTKWindow());
   renWin->SetSize(1024, 1024);
-  vtkNew<vtkRenderer> ren;
   ren->SetBackground(pvRenderer->GetBackground());
-  renWin->AddRenderer(ren);
   ren->SetClippingRangeExpansion(0.05);
 
   {
