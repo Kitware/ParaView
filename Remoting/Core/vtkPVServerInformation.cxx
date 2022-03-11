@@ -100,6 +100,12 @@ vtkPVServerInformation::vtkPVServerInformation()
 
   this->SMPBackendName = vtkSMPTools::GetBackend() ? vtkSMPTools::GetBackend() : "";
   this->SMPMaxNumberOfThreads = vtkSMPTools::GetEstimatedNumberOfThreads();
+
+#if VTK_MODULE_ENABLE_VTK_AcceleratorsVTKmFilters && VTK_ENABLE_VTKM_OVERRIDES
+  this->AcceleratedFiltersOverrideAvailable = true;
+#else
+  this->AcceleratedFiltersOverrideAvailable = false;
+#endif
 }
 
 //----------------------------------------------------------------------------
@@ -127,6 +133,9 @@ void vtkPVServerInformation::PrintSelf(ostream& os, vtkIndent indent)
      << endl;
   os << indent << "SMPBackendName: " << this->SMPBackendName << endl;
   os << indent << "SMPMaxNumberOfThreads: " << this->SMPMaxNumberOfThreads << endl;
+  os << indent
+     << "AcceleratedFiltersOverrideAvailable: " << this->AcceleratedFiltersOverrideAvailable
+     << endl;
 }
 
 //----------------------------------------------------------------------------
@@ -147,6 +156,7 @@ void vtkPVServerInformation::DeepCopy(vtkPVServerInformation* info)
   info->GetTileDimensions(this->TileDimensions);
   this->SMPBackendName = info->GetSMPBackendName();
   this->SMPMaxNumberOfThreads = info->GetSMPMaxNumberOfThreads();
+  this->AcceleratedFiltersOverrideAvailable = info->GetAcceleratedFiltersOverrideAvailable();
 }
 
 //----------------------------------------------------------------------------
@@ -235,6 +245,8 @@ void vtkPVServerInformation::AddInformation(vtkPVInformation* info)
     this->SMPBackendName = serverInfo->GetSMPBackendName();
     this->SMPMaxNumberOfThreads = serverInfo->GetSMPMaxNumberOfThreads();
     this->SetIdTypeSize(serverInfo->GetIdTypeSize());
+    this->AcceleratedFiltersOverrideAvailable =
+      serverInfo->GetAcceleratedFiltersOverrideAvailable();
   }
 }
 
@@ -260,6 +272,7 @@ void vtkPVServerInformation::CopyToStream(vtkClientServerStream* css)
   *css << this->TileDimensions[0] << this->TileDimensions[1];
   *css << this->SMPBackendName;
   *css << this->SMPMaxNumberOfThreads;
+  *css << this->AcceleratedFiltersOverrideAvailable;
   *css << vtkClientServerStream::End;
 }
 
@@ -361,6 +374,11 @@ void vtkPVServerInformation::CopyFromStream(const vtkClientServerStream* css)
   if (!css->GetArgument(0, idx++, &this->SMPMaxNumberOfThreads))
   {
     vtkErrorMacro("Error parsing SMPMaxNumberOfThreads from message.");
+    return;
+  }
+  if (!css->GetArgument(0, idx++, &this->AcceleratedFiltersOverrideAvailable))
+  {
+    vtkErrorMacro("Error parsing AcceleratedFiltersOverrideAvailable from message.");
     return;
   }
 }

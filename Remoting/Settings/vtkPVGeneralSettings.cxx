@@ -18,6 +18,7 @@
 
 #include "vtkPVGeneralSettings.h"
 
+#include "vtkAlgorithm.h"
 #include "vtkLegacy.h"
 #include "vtkObjectFactory.h"
 #include "vtkProcessModule.h"
@@ -36,6 +37,10 @@
 #include "vtkSMChartSeriesSelectionDomain.h"
 #include "vtkSMParaViewPipelineControllerWithRendering.h"
 #include "vtkSMTransferFunctionManager.h"
+#endif
+
+#if VTK_MODULE_ENABLE_VTK_AcceleratorsVTKmFilters
+#include "vtkmFilterOverrides.h"
 #endif
 
 #include <cassert>
@@ -280,6 +285,30 @@ void vtkPVGeneralSettings::SetEnableStreaming(bool val)
 #endif
     this->Modified();
   }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVGeneralSettings::SetUseAcceleratedFilters(bool val)
+{
+  static_cast<void>(val);
+
+#if VTK_MODULE_ENABLE_VTK_AcceleratorsVTKmFilters
+  if (this->GetUseAcceleratedFilters() != val)
+  {
+    vtkmFilterOverrides::SetEnabled(val);
+    this->Modified();
+  }
+#endif
+}
+
+//----------------------------------------------------------------------------
+bool vtkPVGeneralSettings::GetUseAcceleratedFilters()
+{
+#if VTK_MODULE_ENABLE_VTK_AcceleratorsVTKmFilters
+  return vtkmFilterOverrides::GetEnabled();
+#else
+  return false;
+#endif
 }
 
 //----------------------------------------------------------------------------

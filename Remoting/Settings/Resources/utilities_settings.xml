@@ -432,6 +432,17 @@
         </Hints>
       </IntVectorProperty>
 
+      <IntVectorProperty name="UseAcceleratedFilters"
+        command="SetUseAcceleratedFilters"
+        number_of_elements="1"
+        default_values="1"
+        panel_visibility="default">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Use VTK-m accelerated filters where available.
+        </Documentation>
+      </IntVectorProperty>
+
       <PropertyGroup label="General Options">
         <Property name="ShowWelcomeDialog" />
         <Property name="ShowSaveStateOnExit" />
