@@ -36,7 +36,7 @@
 #define vtkImageVolumeRepresentation_h
 
 #include "vtkNew.h"                 // needed for vtkNew.
-#include "vtkRemotingViewsModule.h" //needed for exports
+#include "vtkRemotingViewsModule.h" // needed for exports
 #include "vtkSmartPointer.h"        // needed for vtkSmartPointer
 #include "vtkVolumeRepresentation.h"
 
@@ -166,7 +166,7 @@ protected:
   // 2D transfer function support
   bool UseTransfer2D = false;
   bool UseGradientForTransfer2D = true;
-  vtkWeakPointer<vtkPVTransferFunction2D> TransferFunction2D = nullptr;
+  vtkPVTransferFunction2D* TransferFunction2D = nullptr;
   int ColorArray2FieldAssociation = -1;
   int ColorArray2Component = -1;
   std::string ColorArray2Name;
