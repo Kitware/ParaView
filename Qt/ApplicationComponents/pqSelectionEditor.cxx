@@ -157,7 +157,7 @@ public:
     }
     this->beginInsertRows(QModelIndex(), 0, selectionInputs->GetNumberOfProxies() - 1);
     this->SavedSelections.resize(selectionInputs->GetNumberOfProxies());
-    for (auto i = 0; i < selectionInputs->GetNumberOfProxies(); ++i)
+    for (unsigned int i = 0; i < selectionInputs->GetNumberOfProxies(); ++i)
     {
       this->SavedSelections[i].Name = selectionNames->GetElement(i);
       this->SavedSelections[i].Type =
