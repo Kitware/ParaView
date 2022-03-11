@@ -4,6 +4,6 @@ This representation behave like the GeometryRepresentation by default and add 3 
 * HTG Surface
 * HTG Surface With Edges
 * HTG Wireframe
-When using these mode, if the Camera Parallel Projection is set to ON (and the HTG is 2Dimensional),
-then we can activate the AdaptiveDecimation to only map the part of the HTG visible on the screen.
-This should result in better rendering performance.
+When using these mode, if the Camera Parallel Projection is enabled (and the HTG is 2-Dimensional),
+the AdaptiveDecimation filter is used to only map the part of the HTG visible on the screen.
+This should result in enhanced rendering performance.
