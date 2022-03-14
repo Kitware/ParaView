@@ -90,6 +90,15 @@ public:
 
   //@{
   /**
+   * When enabled, mouse wheel  will zoom to the projected point under the cursor position.
+   * There is no need to hold down Ctrl key to achieve this.
+   */
+  vtkSetMacro(MouseWheelZoomsToCursor, bool);
+  vtkGetMacro(MouseWheelZoomsToCursor, bool);
+  //@}
+
+  //@{
+  /**
    * Propagates the center to the manipulators.
    * This simply sets an internal ivar.
    * It is propagated to a manipulator before the event
@@ -140,6 +149,7 @@ protected:
   void Dolly(double factor) override;
 
   vtkCameraManipulator* CurrentManipulator;
+  bool MouseWheelZoomsToCursor = false;
   double CenterOfRotation[3];
   double RotationFactor;
 
