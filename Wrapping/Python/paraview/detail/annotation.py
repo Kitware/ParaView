@@ -113,7 +113,8 @@ def execute_on_attribute_data(self, evaluate_locally):
 
     info = self.GetInputArrayInformation(0)
     association = info.Get(vtkDataObject.FIELD_ASSOCIATION())
-    array_name = info.Get(vtkDataObject.FIELD_NAME())
+    # sanitize name
+    array_name = paraview.make_name_valid(info.Get(vtkDataObject.FIELD_NAME()))
 
     # note: _get_ns() needs to be called on all ranks to avoid deadlocks.
     ns = _get_ns(self, inputs[0], association)
