@@ -15,3 +15,6 @@ RUN sh /root/install_openvr.sh
 
 COPY install_index.sh /root/install_index.sh
 RUN sh /root/install_index.sh
+
+COPY install_cdi.sh /root/install_cdi.sh
+RUN sh /root/install_cdi.sh

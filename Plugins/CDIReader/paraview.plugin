@@ -1,7 +1,7 @@
 NAME
   CDIReader
 DESCRIPTION
-  ICON netCDF/CDI Reader
+  Irregular Grid netCDF/GRIB Reader
 REQUIRES_MODULES
   ParaView::VTKExtensionsIOCore
   VTK::CommonCore
