@@ -95,10 +95,6 @@ struct write_info
 class vtkCGNSWriter::vtkPrivate
 {
 public:
-  // open and initialize a CGNS file
-  static bool InitCGNSFile(write_info& info, const char* filename, std::string& error);
-  static bool WriteBase(write_info& info, const char* basename, std::string& error);
-
   // write a single data set to file
   static bool WriteStructuredGrid(
     vtkStructuredGrid* structuredGrid, write_info& info, std::string& error);
