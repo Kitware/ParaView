@@ -343,11 +343,10 @@ bool vtkSMTransferFunctionProxy::RescaleTransferFunction(
     rangeMax = std::max(rangeMax, preNormalizationRange[1]);
   }
 
-  //  // Setting the "LastRange" here because, it should match the current range of the control
-  //  points.
-  //  // Aside from that, it will also be used for computing the 1D and 2D histograms.
-  //  this->LastRange[0] = rangeMin;
-  //  this->LastRange[1] = rangeMax;
+  // Setting the "LastRange" here because, it should match the current range of the control points.
+  // Aside from that, it will also be used for computing the 1D and 2D histograms.
+  this->LastRange[0] = rangeMin;
+  this->LastRange[1] = rangeMax;
   if (preNormalizationRange[0] == rangeMin && preNormalizationRange[1] == rangeMax)
   {
     // current range is same as the new range. Nothing to do here.
