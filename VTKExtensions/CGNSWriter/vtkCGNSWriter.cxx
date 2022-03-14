@@ -21,31 +21,22 @@ See Copyright.txt or http://www.paraview.org/HTML/Copyright.html for details.
 
 #include "vtkAppendDataSets.h"
 #include "vtkArrayIteratorIncludes.h"
-#include "vtkCellArray.h"
 #include "vtkCellData.h"
 #include "vtkCellTypes.h"
-#include "vtkCompositeDataIterator.h"
 #include "vtkCompositeDataSet.h"
 #include "vtkDataObject.h"
 #include "vtkDataObjectTreeIterator.h"
 #include "vtkDoubleArray.h"
-#include "vtkFieldData.h"
-#include "vtkFloatArray.h"
-#include "vtkIdList.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
-#include "vtkIntArray.h"
 #include "vtkMultiBlockDataSet.h"
 #include "vtkMultiPieceDataSet.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkPointData.h"
 #include "vtkPolyData.h"
-#include "vtkStdString.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
-#include "vtkStringArray.h"
 #include "vtkStructuredGrid.h"
-#include "vtkThreshold.h"
 #include "vtkUnstructuredGrid.h"
 
 // clang-format off
@@ -56,6 +47,7 @@ See Copyright.txt or http://www.paraview.org/HTML/Copyright.html for details.
 #include <map>
 #include <set>
 #include <sstream>
+#include <string>
 #include <vector>
 
 // macro to check a CGNS operation that can return CG_OK or CG_ERROR
