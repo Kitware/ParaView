@@ -866,6 +866,10 @@ void vtkCGNSWriter::vtkPrivate::Flatten(vtkCompositeDataSet* composite,
   vtkPartitionedDataSet* partitioned = vtkPartitionedDataSet::SafeDownCast(composite);
   if (partitioned)
   {
+    if (partitioned->GetNumberOfPartitions() == 0)
+    {
+      return;
+    }
     vtkNew<vtkAppendDataSets> append;
     append->SetMergePoints(true);
     if (name.length() <= 0)
