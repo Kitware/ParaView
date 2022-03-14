@@ -1,14 +1,14 @@
 vtk_add_test_cxx(vtkPVVTKExtensionsCGNSWriterCxxTests tests
-  NO_VALID NO_DATA
-  TestStructuredGrid.cxx
-  TestUnstructuredGrid.cxx
-  TestPartitionedDataSet.cxx
-  TestPartitionedDataSetCollection.cxx
-  TestPolydata.cxx
-  TestPolyhedral.cxx
-  TestCellAndPointData.cxx
-  TestMultiBlockDataSet.cxx
-  TestMappedUnstructuredGrid.cxx
-  TestTimeWriting.cxx
+  TestStructuredGrid.cxx,NO_VALID,NO_DATA
+  TestUnstructuredGrid.cxx,NO_VALID,NO_DATA
+  TestPartitionedDataSet.cxx,NO_VALID,NO_DATA
+  TestPartitionedDataSetCollection.cxx,NO_VALID,NO_DATA
+  TestPartitionedDataSetCollection2.cxx,NO_VALID
+  TestPolydata.cxx,NO_VALID,NO_DATA
+  TestPolyhedral.cxx,NO_VALID,NO_DATA
+  TestCellAndPointData.cxx,NO_VALID,NO_DATA
+  TestMultiBlockDataSet.cxx,NO_VALID,NO_DATA
+  TestMappedUnstructuredGrid.cxx,NO_VALID,NO_DATA
+  TestTimeWriting.cxx,NO_VALID,NO_DATA
 )
 vtk_test_cxx_executable(vtkPVVTKExtensionsCGNSWriterCxxTests tests)
