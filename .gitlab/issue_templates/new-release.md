@@ -18,7 +18,7 @@ Please remove this comment.
 
   - Update ParaView guides
     - User manual
-      - [ ] Rename to ParaViewGuide-@VERSION@.pdf
+      - [ ] Rename to ParaViewTutorial-@VERSION@.pdf
       - [ ] Upload to www.paraview.org/files/v@MAJOR@.@MINOR@
     - Catalyst Guide
       - [ ] Rename to ParaViewCatalystGuide-@VERSION@.pdf
@@ -26,6 +26,8 @@ Please remove this comment.
     - Getting Started Guide
       - [ ] Rename to ParaViewGettingStarted-@VERSION@.pdf
       - [ ] Upload to www.paraview.org/files/v@MAJOR@.@MINOR@
+    - macOS sigining machine
+      - [ ] if the machine is offline, request to be switched on.
 
 # Update ParaView
 
@@ -73,6 +75,7 @@ Please remove this comment.
             Merge Request (see script for usage)
         - Pull the script for each release; it may have been updated since it
           was last used
+        - `release-mr.py -t TOKEN_STRING -c .kitware-release.json -m @BRANCHPOINT@`
         - The script outputs the information it will be using to create the
           merge request. Please verify that it is all correct before creating
           the merge request. See usage at the top of the script to provide
@@ -84,7 +87,8 @@ Please remove this comment.
   - Create tarballs
     - [ ] ParaView (`Utilities/Maintenance/create_tarballs.bash --txz --tgz --zip -v v@VERSION@@RC@`)
   - Upload tarballs to `paraview.org`
-    - [ ] `rsync -rptv $tarballs user@host:ParaView_Release/v@MAJOR@.@MINOR@/`
+    - [ ] Setup your `~/.ssh/config` and add the web host (@vbolea).
+    - [ ] `rsync -rptv $tarballs web:ParaView_Release/v@MAJOR@.@MINOR@/`
   - Software process updates (these can all be done independently)
     - [ ] Update kwrobot with the new `release` branch rules (@ben.boeckel)
     - [ ] Run [this script][cdash-update-groups] to update the CDash groups
@@ -107,24 +111,25 @@ git checkout @BASEBRANCH@
 git merge --ff-only origin/@BASEBRANCH@
 git submodule update --recursive --init
 ```
-  - [ ] Update `version.txt` and tag the commit
-```
-git checkout -b update-to-v@VERSION@@RC@ @BRANCHPOINT@
-echo @VERSION@@RC@ > version.txt
-git commit -m 'Update version number to @VERSION@@RC@' version.txt
-```
+  - [ ] Create new branch `git checkout -b update-to-v@VERSION@@RC@ @BRANCHPOINT@`
 
   - Integrate changes.
     - Update versions
       - [ ] Guide selections in `versions.cmake`
       - [ ] `paraview_SOURCE_SELECTION` version in `README.md`
+      - [ ] `PARAVIEW_VERSION_DEFAULT` in  CMakeLists.txt
       - [ ] Docker: update default tag strings (in `Scripts/docker/ubuntu/development/Dockerfile`)
         - [ ] ARG PARAVIEW_TAG=v@VERSION@@RC@
         - [ ] ARG SUPERBUILD_TAG=v@VERSION@@RC@
         - [ ] ARG PARAVIEW_VERSION_STRING=paraview-@MAJOR@.@MINOR@
       - [ ] Commit changes
-        - [ ] `git add versions.cmake CMakeLists.txt Scripts/docker/ubuntu/development/Dockerfile`
+        - [ ] `git add README.md versions.cmake CMakeLists.txt Scripts/docker/ubuntu/development/Dockerfile`
         - [ ] `git commit -m "Update the default version to @VERSION@@RC@"`
+      - Make a commit for each of these `release`-only changes
+        - [ ] Update `.gitlab/ci/cdash-groups.json` to track the `release` CDash
+              groups (if `@BASEBRANCH@` is `master`)
+      - Create a commit which will be tagged:
+        - [ ] `git commit --allow-empty -m "paraview: add release @VERSION@"`
       - [ ] Created tag: `git tag -a -m 'ParaView superbuild @VERSION@@RC@' v@VERSION@@RC@ HEAD`
       - Force `@VERSION@@RC@` in CMakeLists.txt
         - [ ] Append to the top of CMakeLists.txt (After project...) The following
@@ -134,12 +139,6 @@ git commit -m 'Update version number to @VERSION@@RC@' version.txt
             set(paraview_FROM_SOURCE_DIR OFF CACHE BOOL "Force source dir off" FORCE)
             ```
          - [ ] Create fixup commit `git commit -a --fixup=@`
-         - [ ] `git gitlab-push`
-  - Make a commit for each of these `release`-only changes
-    - [ ] Update `.gitlab/ci/cdash-groups.json` to track the `release` CDash
-          groups (if `@BASEBRANCH@` is `master`)
-  - Create a commit which will be tagged:
-    - [ ] `git commit --allow-empty -m "paraview: add release @VERSION@"`
   - Create a merge request targeting `release`
     - [ ] Obtain a GitLab API token for the `kwrobot.release.paraview` user
           (ask @ben.boeckel if you do not have one)
@@ -149,6 +148,7 @@ git commit -m 'Update version number to @VERSION@@RC@' version.txt
           Merge Request (see script for usage)
       - Pull the script for each release; it may have been updated since it
         was last used
+      - `release-mr.py -t TOKEN_STRING -c .kitware-release.json -m @BRANCHPOINT@`
   - [ ] Build binaries
     - [ ] Build binaries (start all pipelines)
     - [ ] Download the binaries that have been generated from the Pipeline
@@ -166,8 +166,11 @@ git commit -m 'Update version number to @VERSION@@RC@' version.txt
     - [ ] Add (or update if `@BASEBRANCH@` is `release`) version selection entry
           in paraview-superbuild
 
-# Sign macOS binaries
+# Sign Windows binaries
+  -  [ ] Request Windows binary siginings (only .exe archives) on the Package
+         Signing repo. Example request [here][win-sign-example].
 
+# Sign macOS binaries
   - [ ] Upload to signing server, run script, download resulting .pkg and .dmg files
   - [ ] Install from .pkg and verify that it is signed with `codesign -dvvv /Applications/ParaView-@VERSION@@RC@.app/`
   - [ ] Install from .dmg and verify that it is signed with `codesign -dvvv /Applications/ParaView-@VERSION@@RC@.app/`
@@ -191,8 +194,6 @@ Show(Text(Text="$A^2$"))
   - OSPRay raycasting and pathtracing runs
   - OptiX pathtracing runs
   - IndeX runs
-  - AutoMPI
-
 
 Binary checklist
   - [ ] macOS arm64
@@ -229,9 +230,9 @@ updateMD5sum.sh v@MAJOR@.@MINOR@
 If making a non-RC release:
 
 # Update documentation
-  - [ ] Submit a Merge Request that updates the version to @VERSION@ in https://gitlab.kitware.com/paraview/paraview-docs/-/blob/master/doc/source/conf.py` for `paraview-docs`
+  - [ ] Submit a Merge Request for release that updates the version to @VERSION@ in https://gitlab.kitware.com/paraview/paraview-docs/-/blob/master/doc/source/conf.py` for `paraview-docs`
   - [ ] Upload versioned documentation to `https://github.com/kitware/paraview-docs` (see `https://github.com/Kitware/paraview-docs/blob/master/README.md`)
-  - [ ] Tag the [ParaView docs](https://gitlab.kitware.com/paraview/paraview-docs/-/tags) with v@VERSION@.
+  - [ ] Tag the HEAD of release in [ParaView docs](https://gitlab.kitware.com/paraview/paraview-docs/-/tags) with v@VERSION@.
   - [ ] Activate the tag on [readthedocs](https://readthedocs.org/projects/paraview/versions/) and build it [here](https://readthedocs.org/projects/paraview/)
   - [ ] Go to readthedocs.org and activate
   - [ ] Write and publish blog post with release notes.
@@ -261,3 +262,5 @@ If making a non-RC release:
 /cc @charles.gueunet
 
 /label ~"priority:required"
+
+[win-sign-example]:  https://kwgitlab.kitware.com/software-process/package-signing/-/issues/12
