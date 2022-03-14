@@ -719,6 +719,7 @@ public:
   virtual void SetCamera2DManipulators(const int manipulators[9]);
   virtual void SetCamera3DManipulators(const int manipulators[9]);
   void SetCameraManipulators(vtkPVInteractorStyle* style, const int manipulators[9]);
+  virtual void SetReverseMouseWheelZoomDirection(bool reverse);
   virtual void SetCamera2DMouseWheelMotionFactor(double factor);
   virtual void SetCamera3DMouseWheelMotionFactor(double factor);
 
@@ -1196,6 +1197,8 @@ protected:
   // 2D and 3D interactor style
   vtkPVInteractorStyle* TwoDInteractorStyle;
   vtkPVInteractorStyle* ThreeDInteractorStyle;
+
+  bool ReverseMouseWheelZoomDirection = false;
 
   // Active interactor style either [TwoDInteractorStyle, ThreeDInteractorStyle]
   vtkPVInteractorStyle* InteractorStyle;
