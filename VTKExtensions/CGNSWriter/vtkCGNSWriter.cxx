@@ -63,6 +63,7 @@ See Copyright.txt or http://www.paraview.org/HTML/Copyright.html for details.
 // CGNS starts counting at 1
 #define CGNS_COUNTING_OFFSET 1
 
+//------------------------------------------------------------------------------
 struct write_info
 {
   int F, B, Z, Sol;
@@ -92,6 +93,7 @@ struct write_info
   }
 };
 
+//------------------------------------------------------------------------------
 class vtkCGNSWriter::vtkPrivate
 {
 public:
@@ -135,6 +137,7 @@ protected:
   static bool WriteZoneTimeInformation(write_info& info, std::string& error);
 };
 
+//------------------------------------------------------------------------------
 bool vtkCGNSWriter::vtkPrivate::WriteCells(write_info& info, vtkPointSet* grid,
   std::map<unsigned char, std::vector<vtkIdType>>& cellTypeMap, std::string& error)
 {
@@ -220,6 +223,7 @@ bool vtkCGNSWriter::vtkPrivate::WriteCells(write_info& info, vtkPointSet* grid,
   return true;
 }
 
+//------------------------------------------------------------------------------
 bool vtkCGNSWriter::vtkPrivate::WritePolygonalZone(
   write_info& info, vtkPointSet* grid, std::string& error)
 {
@@ -331,6 +335,7 @@ bool vtkCGNSWriter::vtkPrivate::WritePolygonalZone(
   return true;
 }
 
+//------------------------------------------------------------------------------
 bool vtkCGNSWriter::vtkPrivate::WritePointSet(
   write_info& info, vtkPointSet* grid, std::string& error)
 {
@@ -385,6 +390,7 @@ bool vtkCGNSWriter::vtkPrivate::WritePointSet(
   return vtkPrivate::WriteZoneTimeInformation(info, error);
 }
 
+//------------------------------------------------------------------------------
 bool vtkCGNSWriter::vtkPrivate::WriteZoneTimeInformation(write_info& info, std::string& error)
 {
   if (info.SolutionNames.empty())
@@ -434,6 +440,7 @@ bool vtkCGNSWriter::vtkPrivate::WriteZoneTimeInformation(write_info& info, std::
   return true;
 }
 
+//------------------------------------------------------------------------------
 bool vtkCGNSWriter::vtkPrivate::WriteBaseTimeInformation(write_info& info, std::string& error)
 {
   double time[1] = { info.TimeStep };
@@ -448,6 +455,7 @@ bool vtkCGNSWriter::vtkPrivate::WriteBaseTimeInformation(write_info& info, std::
   return true;
 }
 
+//------------------------------------------------------------------------------
 bool vtkCGNSWriter::vtkPrivate::WritePointSet(
   vtkPointSet* grid, write_info& info, std::string& error)
 {
@@ -485,13 +493,14 @@ bool vtkCGNSWriter::vtkPrivate::WritePointSet(
   return rc;
 }
 
-/*
- This function assigns the correct order of data elements for cases where
- multiple element types are written in different sections in a CGNS zone.
- Because all similar cells are grouped in the CGNS file, this means that
- the order of the cells is different in the file compared to the data arrays.
- To compensate for that, the data is reordered to follow the cell order in the file.
-*/
+//------------------------------------------------------------------------------
+/**
+ * This function assigns the correct order of data elements for cases where
+ * multiple element types are written in different sections in a CGNS zone.
+ * Because all similar cells are grouped in the CGNS file, this means that
+ * the order of the cells is different in the file compared to the data arrays.
+ * To compensate for that, the data is reordered to follow the cell order in the file.
+ */
 void ReorderData(
   std::vector<double>& temp, std::map<unsigned char, std::vector<vtkIdType>>* cellTypeMap)
 {
@@ -513,6 +522,7 @@ void ReorderData(
   }
 }
 
+//------------------------------------------------------------------------------
 // writes a field array to a new solution
 bool vtkCGNSWriter::vtkPrivate::WriteFieldArray(write_info& info,
   CGNS_ENUMT(GridLocation_t) location, vtkDataSetAttributes* dsa,
@@ -602,6 +612,7 @@ bool vtkCGNSWriter::vtkPrivate::WriteFieldArray(write_info& info,
   return true;
 }
 
+//------------------------------------------------------------------------------
 bool vtkCGNSWriter::vtkPrivate::WritePoints(write_info& info, vtkPoints* pts, std::string& error)
 {
   // is there a better way to do this, other than creating temp array and striping X, Y an Z into
@@ -637,6 +648,7 @@ bool vtkCGNSWriter::vtkPrivate::WritePoints(write_info& info, vtkPoints* pts, st
   return true;
 }
 
+//------------------------------------------------------------------------------
 bool vtkCGNSWriter::vtkPrivate::InitCGNSFile(write_info& info, std::string& error)
 {
   if (!info.FileName)
@@ -649,6 +661,7 @@ bool vtkCGNSWriter::vtkPrivate::InitCGNSFile(write_info& info, std::string& erro
   return true;
 }
 
+//------------------------------------------------------------------------------
 bool vtkCGNSWriter::vtkPrivate::WriteBase(write_info& info, std::string& error)
 {
   if (!info.BaseName)
@@ -661,6 +674,7 @@ bool vtkCGNSWriter::vtkPrivate::WriteBase(write_info& info, std::string& error)
   return vtkPrivate::WriteBaseTimeInformation(info, error);
 }
 
+//------------------------------------------------------------------------------
 bool vtkCGNSWriter::vtkPrivate::WriteStructuredGrid(
   write_info& info, vtkStructuredGrid* structuredGrid, std::string& error)
 {
@@ -747,6 +761,7 @@ bool vtkCGNSWriter::vtkPrivate::WriteStructuredGrid(
   return vtkPrivate::WriteZoneTimeInformation(info, error);
 }
 
+//------------------------------------------------------------------------------
 bool vtkCGNSWriter::vtkPrivate::WriteStructuredGrid(
   vtkStructuredGrid* structuredGrid, write_info& info, std::string& error)
 {
@@ -774,6 +789,7 @@ bool vtkCGNSWriter::vtkPrivate::WriteStructuredGrid(
   return rc;
 }
 
+//------------------------------------------------------------------------------
 int vtkCGNSWriter::vtkPrivate::DetermineCellDimension(vtkPointSet* pointSet)
 {
   int CellDim = 0;
@@ -810,6 +826,7 @@ int vtkCGNSWriter::vtkPrivate::DetermineCellDimension(vtkPointSet* pointSet)
   return CellDim;
 }
 
+//------------------------------------------------------------------------------
 void vtkCGNSWriter::vtkPrivate::SetNameToLength(
   std::string& name, const std::vector<vtkSmartPointer<vtkDataObject>>& objects)
 {
@@ -841,6 +858,7 @@ void vtkCGNSWriter::vtkPrivate::SetNameToLength(
   }
 }
 
+//------------------------------------------------------------------------------
 void vtkCGNSWriter::vtkPrivate::Flatten(vtkCompositeDataSet* composite,
   std::vector<vtkSmartPointer<vtkDataObject>>& o2d,
   std::vector<vtkSmartPointer<vtkDataObject>>& o3d, int zoneOffset, std::string& name)
@@ -932,6 +950,7 @@ void vtkCGNSWriter::vtkPrivate::Flatten(vtkCompositeDataSet* composite,
   }
 }
 
+//------------------------------------------------------------------------------
 bool vtkCGNSWriter::vtkPrivate::WriteGridsToBase(std::vector<vtkSmartPointer<vtkDataObject>> blocks,
   std::vector<vtkSmartPointer<vtkDataObject>> otherBlocks, write_info& info, std::string& error)
 {
@@ -977,6 +996,7 @@ bool vtkCGNSWriter::vtkPrivate::WriteGridsToBase(std::vector<vtkSmartPointer<vtk
   return true;
 }
 
+//------------------------------------------------------------------------------
 bool vtkCGNSWriter::vtkPrivate::WriteComposite(
   write_info& info, vtkCompositeDataSet* composite, std::string& error)
 {
@@ -1022,6 +1042,7 @@ bool vtkCGNSWriter::vtkPrivate::WriteComposite(
   return true;
 }
 
+//------------------------------------------------------------------------------
 bool vtkCGNSWriter::vtkPrivate::WriteComposite(
   vtkCompositeDataSet* composite, write_info& info, std::string& error)
 {
@@ -1035,20 +1056,24 @@ bool vtkCGNSWriter::vtkPrivate::WriteComposite(
   return rc;
 }
 
+//------------------------------------------------------------------------------
 vtkStandardNewMacro(vtkCGNSWriter);
 
+//------------------------------------------------------------------------------
 vtkCGNSWriter::vtkCGNSWriter()
 {
   // use the method, this will call the corresponding library method.
   this->SetUseHDF5(this->UseHDF5);
 }
 
+//------------------------------------------------------------------------------
 void vtkCGNSWriter::SetUseHDF5(bool value)
 {
   this->UseHDF5 = value;
   cg_set_file_type(value ? CG_FILE_HDF5 : CG_FILE_ADF);
 }
 
+//------------------------------------------------------------------------------
 vtkCGNSWriter::~vtkCGNSWriter()
 {
   delete[] this->FileName;
@@ -1064,12 +1089,14 @@ vtkCGNSWriter::~vtkCGNSWriter()
   }
 }
 
+//------------------------------------------------------------------------------
 void vtkCGNSWriter::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
   os << indent << "FileName " << (this->FileName ? this->FileName : "(none)") << endl;
 }
 
+//------------------------------------------------------------------------------
 int vtkCGNSWriter::ProcessRequest(
   vtkInformation* request, vtkInformationVector** inputVector, vtkInformationVector* outputVector)
 {
@@ -1090,6 +1117,7 @@ int vtkCGNSWriter::ProcessRequest(
   return this->Superclass::ProcessRequest(request, inputVector, outputVector);
 }
 
+//------------------------------------------------------------------------------
 int vtkCGNSWriter::RequestInformation(vtkInformation* vtkNotUsed(request),
   vtkInformationVector** inputVector, vtkInformationVector* vtkNotUsed(outputVector))
 {
@@ -1106,6 +1134,7 @@ int vtkCGNSWriter::RequestInformation(vtkInformation* vtkNotUsed(request),
   return 1;
 }
 
+//------------------------------------------------------------------------------
 int vtkCGNSWriter::RequestUpdateExtent(vtkInformation* vtkNotUsed(request),
   vtkInformationVector** inputVector, vtkInformationVector* vtkNotUsed(outputVector))
 {
@@ -1138,6 +1167,7 @@ int vtkCGNSWriter::RequestUpdateExtent(vtkInformation* vtkNotUsed(request),
   return 1;
 }
 
+//------------------------------------------------------------------------------
 int vtkCGNSWriter::FillInputPortInformation(int vtkNotUsed(port), vtkInformation* info)
 {
   info->Remove(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE());
@@ -1146,6 +1176,7 @@ int vtkCGNSWriter::FillInputPortInformation(int vtkNotUsed(port), vtkInformation
   return 1;
 }
 
+//------------------------------------------------------------------------------
 int vtkCGNSWriter::RequestData(vtkInformation* request, vtkInformationVector** inputVector,
   vtkInformationVector* vtkNotUsed(outputVector))
 {
@@ -1193,6 +1224,7 @@ int vtkCGNSWriter::RequestData(vtkInformation* request, vtkInformationVector** i
   return this->WasWritingSuccessful ? 1 : 0;
 }
 
+//------------------------------------------------------------------------------
 void vtkCGNSWriter::WriteData()
 {
   this->WasWritingSuccessful = false;
