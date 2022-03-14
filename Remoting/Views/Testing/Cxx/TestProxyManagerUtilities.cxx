@@ -152,6 +152,7 @@ std::set<vtkSMProxy*> CreatePipeline(
   {
     result.insert(lut);
     result.insert(vtkSMPropertyHelper(lut, "ScalarOpacityFunction").GetAsProxy());
+    result.insert(vtkSMPropertyHelper(lut, "TransferFunction2D").GetAsProxy());
   }
 
   // add material library explicitly, if present.
