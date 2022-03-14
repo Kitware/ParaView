@@ -38,10 +38,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class vtkVRQueue;
 class vtkPVXMLElement;
 class vtkSMProxyLocator;
-#if PARAVIEW_PLUGIN_VRPlugin_USE_VRUI
+#if PARAVIEW_PLUGIN_CAVEInteraction_USE_VRUI
 class pqVRUIConnection;
 #endif
-#if PARAVIEW_PLUGIN_VRPlugin_USE_VRPN
+#if PARAVIEW_PLUGIN_CAVEInteraction_USE_VRPN
 class pqVRPNConnection;
 #endif
 
@@ -53,12 +53,12 @@ class pqVRConnectionManager : public QObject
 public:
   pqVRConnectionManager(vtkVRQueue* queue, QObject* parent = 0);
   virtual ~pqVRConnectionManager();
-#if PARAVIEW_PLUGIN_VRPlugin_USE_VRPN
+#if PARAVIEW_PLUGIN_CAVEInteraction_USE_VRPN
   void add(pqVRPNConnection* conn);
   void remove(pqVRPNConnection* conn);
   pqVRPNConnection* GetVRPNConnection(const QString& name);
 #endif
-#if PARAVIEW_PLUGIN_VRPlugin_USE_VRUI
+#if PARAVIEW_PLUGIN_CAVEInteraction_USE_VRUI
   void add(pqVRUIConnection* conn);
   void remove(pqVRUIConnection* conn);
   pqVRUIConnection* GetVRUIConnection(const QString& name);

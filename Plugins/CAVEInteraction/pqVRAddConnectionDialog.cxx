@@ -33,10 +33,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ui_pqVRAddConnectionDialog.h"
 
 #include "pqVRConnectionManager.h"
-#if PARAVIEW_PLUGIN_VRPlugin_USE_VRPN
+#if PARAVIEW_PLUGIN_CAVEInteraction_USE_VRPN
 #include "pqVRPNConnection.h"
 #endif
-#if PARAVIEW_PLUGIN_VRPlugin_USE_VRUI
+#if PARAVIEW_PLUGIN_CAVEInteraction_USE_VRUI
 #include "pqVRUIConnection.h"
 #endif
 
@@ -91,7 +91,7 @@ public:
   {
     switch (type)
     {
-#if PARAVIEW_PLUGIN_VRPlugin_USE_VRPN
+#if PARAVIEW_PLUGIN_CAVEInteraction_USE_VRPN
       case pqInternals::VRPN:
       {
         int ind = this->connectionType->findText("VRPN");
@@ -103,7 +103,7 @@ public:
         return true;
       }
 #endif
-#if PARAVIEW_PLUGIN_VRPlugin_USE_VRUI
+#if PARAVIEW_PLUGIN_CAVEInteraction_USE_VRUI
       case pqInternals::VRUI:
       {
         int ind = this->connectionType->findText("VRUI");
@@ -121,11 +121,11 @@ public:
     }
   }
 
-#if PARAVIEW_PLUGIN_VRPlugin_USE_VRPN
+#if PARAVIEW_PLUGIN_CAVEInteraction_USE_VRPN
   pqVRPNConnection* VRPNConn;
   void updateVRPNConnection();
 #endif
-#if PARAVIEW_PLUGIN_VRPlugin_USE_VRUI
+#if PARAVIEW_PLUGIN_CAVEInteraction_USE_VRUI
   pqVRUIConnection* VRUIConn;
   void updateVRUIConnection();
 #endif
@@ -146,11 +146,11 @@ pqVRAddConnectionDialog::pqVRAddConnectionDialog(QWidget* parentObject, Qt::Wind
 {
   this->Internals->setupUi(this);
   this->Internals->Type = pqInternals::None;
-#if PARAVIEW_PLUGIN_VRPlugin_USE_VRPN
+#if PARAVIEW_PLUGIN_CAVEInteraction_USE_VRPN
   this->Internals->VRPNConn = nullptr;
   this->Internals->connectionType->addItem("VRPN");
 #endif
-#if PARAVIEW_PLUGIN_VRPlugin_USE_VRUI
+#if PARAVIEW_PLUGIN_CAVEInteraction_USE_VRUI
   this->Internals->VRUIConn = nullptr;
   this->Internals->connectionType->addItem("VRUI");
 #endif
@@ -179,7 +179,7 @@ pqVRAddConnectionDialog::~pqVRAddConnectionDialog()
   delete this->Internals;
 }
 
-#if PARAVIEW_PLUGIN_VRPlugin_USE_VRPN
+#if PARAVIEW_PLUGIN_CAVEInteraction_USE_VRPN
 //-----------------------------------------------------------------------------
 void pqVRAddConnectionDialog::setConnection(pqVRPNConnection* conn)
 {
@@ -212,7 +212,7 @@ bool pqVRAddConnectionDialog::isVRPN()
 }
 #endif
 
-#if PARAVIEW_PLUGIN_VRPlugin_USE_VRUI
+#if PARAVIEW_PLUGIN_CAVEInteraction_USE_VRUI
 //-----------------------------------------------------------------------------
 void pqVRAddConnectionDialog::setConnection(pqVRUIConnection* conn)
 {
@@ -251,12 +251,12 @@ void pqVRAddConnectionDialog::updateConnection()
 {
   switch (this->Internals->Type)
   {
-#if PARAVIEW_PLUGIN_VRPlugin_USE_VRPN
+#if PARAVIEW_PLUGIN_CAVEInteraction_USE_VRPN
     case pqInternals::VRPN:
       this->Internals->updateVRPNConnection();
       return;
 #endif
-#if PARAVIEW_PLUGIN_VRPlugin_USE_VRUI
+#if PARAVIEW_PLUGIN_CAVEInteraction_USE_VRUI
     case pqInternals::VRUI:
       this->Internals->updateVRUIConnection();
       return;
@@ -265,12 +265,12 @@ void pqVRAddConnectionDialog::updateConnection()
     case pqInternals::None:
       switch (this->Internals->GetSelectedConnectionType())
       {
-#if PARAVIEW_PLUGIN_VRPlugin_USE_VRPN
+#if PARAVIEW_PLUGIN_CAVEInteraction_USE_VRPN
         case pqInternals::VRPN:
           this->Internals->updateVRPNConnection();
           return;
 #endif
-#if PARAVIEW_PLUGIN_VRPlugin_USE_VRUI
+#if PARAVIEW_PLUGIN_CAVEInteraction_USE_VRUI
         case pqInternals::VRUI:
           this->Internals->updateVRUIConnection();
           return;
@@ -376,7 +376,7 @@ void pqVRAddConnectionDialog::connectionTypeChanged()
 //-----------------------------pqInternals methods-----------------------------
 //-----------------------------------------------------------------------------
 
-#if PARAVIEW_PLUGIN_VRPlugin_USE_VRPN
+#if PARAVIEW_PLUGIN_CAVEInteraction_USE_VRPN
 //-----------------------------------------------------------------------------
 void pqVRAddConnectionDialog::pqInternals::updateVRPNConnection()
 {
@@ -394,7 +394,7 @@ void pqVRAddConnectionDialog::pqInternals::updateVRPNConnection()
 }
 #endif
 
-#if PARAVIEW_PLUGIN_VRPlugin_USE_VRUI
+#if PARAVIEW_PLUGIN_CAVEInteraction_USE_VRUI
 //-----------------------------------------------------------------------------
 void pqVRAddConnectionDialog::pqInternals::updateVRUIConnection()
 {

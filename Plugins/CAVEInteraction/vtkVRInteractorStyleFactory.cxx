@@ -52,7 +52,7 @@ vtkVRInteractorStyleFactory* vtkVRInteractorStyleFactory::Instance = nullptr;
 
 //-----------------------------------------------------------------------------
 // Constructor() method
-//   This is where all the InteractorStyle classes are connected to the VR Plugin.
+//   This is where all the InteractorStyle classes are connected to the CAVE Interaction.
 //   This should be the ONLY place where interactor styles are mentioned by name.
 //   TODO: figure out how to store an array of New() methods so the
 //     NewInteractorStyleFromClassName() method doesn't have to explicitly
