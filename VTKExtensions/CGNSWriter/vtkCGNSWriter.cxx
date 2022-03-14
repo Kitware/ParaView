@@ -1,7 +1,7 @@
 /*=========================================================================
 
 Program:   Visualization Toolkit
-Module:    vtkCGNSWriter.h
+Module:    vtkCGNSWriter.cxx
 
 Copyright (c) Ken Martin, Will Schroeder, Bill Lorensen
 All rights reserved.
@@ -1273,14 +1273,14 @@ void vtkCGNSWriter::WriteData()
     {
       error = std::string("Unsupported class type '") + this->OriginalInput->GetClassName() +
         "' on input.\nSupported types are vtkStructuredGrid, vtkPointSet, their subclasses and "
-        "multi-block datasets of said classes.";
+        "composite datasets of said classes.";
     }
   }
   else
   {
     vtkErrorMacro(<< "Unsupported class type '" << this->OriginalInput->GetClassName()
                   << "' on input.\nSupported types are vtkStructuredGrid, vtkPointSet, their "
-                     "subclasses and multi-block datasets of said classes.");
+                     "subclasses and composite datasets of said classes.");
   }
 
   // the writer can be used for multiple timesteps
