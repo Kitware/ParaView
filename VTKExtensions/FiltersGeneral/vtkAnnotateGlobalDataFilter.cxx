@@ -97,7 +97,6 @@ struct Printer
   }
 
   std::array<char, 4> StringTypeFormats = { { 'c', 'C', 's', 'S' } };
-  std::array<char, 2> StringTypes = { { VTK_STRING, VTK_UNICODE_STRING } };
   std::array<char, 8> FloatTypeFormats = { { 'a', 'A', 'e', 'E', 'f', 'F', 'g', 'G' } };
   std::array<int, 2> FloatTypes = { { VTK_FLOAT, VTK_DOUBLE } };
   std::array<char, 6> IntegralTypeFormats = { { 'd', 'i', 'o', 'u', 'x', 'X' } };
@@ -116,8 +115,7 @@ struct Printer
     std::string typeString = regex.match(7);
 
     bool validType = false;
-    if (std::find(this->StringTypes.begin(), this->StringTypes.end(), typeID) !=
-      this->StringTypes.end())
+    if (VTK_STRING == typeID)
     {
       validType = std::find(this->StringTypeFormats.begin(), this->StringTypeFormats.end(),
                     typeString[0]) != this->StringTypeFormats.end();
