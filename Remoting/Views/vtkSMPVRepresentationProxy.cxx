@@ -794,6 +794,18 @@ bool vtkSMPVRepresentationProxy::SetScalarBarVisibility(vtkSMProxy* view, bool v
     .arg("comment", visible ? "show color bar/color legend" : "hide color bar/color legend");
 
   vtkSMProxy* lutProxy = lutPropertyHelper.GetAsProxy(0);
+
+  // If the lut proxy changed, we need to remove ourself (representation proxy)
+  // from the scalar bar widget that we used to be linked to.
+  if (this->LastLUTProxy && lutProxy != this->LastLUTProxy)
+  {
+    if (auto lastSBProxy = vtkSMScalarBarWidgetRepresentationProxy::SafeDownCast(
+          vtkSMTransferFunctionProxy::FindScalarBarRepresentation(this->LastLUTProxy, view)))
+    {
+      lastSBProxy->RemoveRange(this);
+    }
+  }
+
   vtkSMScalarBarWidgetRepresentationProxy* sbProxy =
     vtkSMScalarBarWidgetRepresentationProxy::SafeDownCast(
       vtkSMTransferFunctionProxy::FindScalarBarRepresentation(lutProxy, view));
