@@ -22,6 +22,7 @@
 #include "pqServer.h"
 #include "pqServerManagerModel.h"
 #include "pqServerManagerModelItem.h"
+#include "pqUndoStack.h"
 
 #include "vtkCollection.h"
 #include "vtkNew.h"
@@ -140,6 +141,7 @@ void pqChangeFileNameReaction::changeFileName()
           .arg(filesStd)
           .arg(propertyName);
         vtkSMCoreUtilities::ReplaceReaderFileName(proxy, filesStd, propertyName);
+        CLEAR_UNDO_STACK();
         break;
       }
     }
