@@ -1098,6 +1098,15 @@ void vtkCGNSWriter::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
   os << indent << "FileName " << (this->FileName ? this->FileName : "(none)") << endl;
+  os << indent << "UseHDF5 " << (this->UseHDF5 ? "On" : "Off") << endl;
+  os << indent << "WriteAllTimeSteps " << (this->WriteAllTimeSteps ? "On" : "Off") << endl;
+  os << indent << "NumberOfTimeSteps " << this->NumberOfTimeSteps << endl;
+  os << indent << "CurrentTimeIndex " << this->CurrentTimeIndex << endl;
+  os << indent << "TimeValues " << (this->TimeValues ? this->TimeValues->GetName() : "(none)")
+     << endl;
+  os << indent << "OriginalInput "
+     << (this->OriginalInput ? this->OriginalInput->GetClassName() : "(none)") << endl;
+  os << indent << "WasWritingSuccessful " << (this->WasWritingSuccessful ? "Yes" : "No") << endl;
 }
 
 //------------------------------------------------------------------------------
