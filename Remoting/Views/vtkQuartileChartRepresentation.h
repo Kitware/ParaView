@@ -88,12 +88,21 @@ public:
   vtkGetMacro(MaxVisibility, bool);
   //@}
 
+  //@{
+  /**
+   * When set to true, the max curve is rendered.
+   */
+  vtkSetMacro(SumVisibility, bool);
+  vtkGetMacro(SumVisibility, bool);
+  //@}
+
 protected:
   vtkQuartileChartRepresentation();
   ~vtkQuartileChartRepresentation() override;
 
   bool AverageVisibility;
   bool HasOnlyOnePoint;
+  bool SumVisibility;
   bool MaxVisibility;
   bool MedianVisibility;
   bool MinVisibility;
