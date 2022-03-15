@@ -26,6 +26,7 @@
 class vtkSMViewProxy;
 class vtkPVOpenVRHelperLocation;
 class vtkPVOpenVRHelper;
+class vtkRenderer;
 
 class vtkPVOpenVRExporter : public vtkObject
 {
@@ -36,7 +37,7 @@ public:
   // export the data for each saved location
   // as a skybox
   void ExportLocationsAsSkyboxes(vtkPVOpenVRHelper* helper, vtkSMViewProxy* view,
-    std::map<int, vtkPVOpenVRHelperLocation>& locations);
+    std::map<int, vtkPVOpenVRHelperLocation>& locations, vtkRenderer* ren);
 
   // export the data for each saved location
   // in a form mineview can load. Bacially
