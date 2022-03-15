@@ -44,12 +44,12 @@ See Copyright.txt or http://www.paraview.org/HTML/Copyright.html for details.
 #define vtkPCGNSWriter_h
 
 #include "vtkCGNSWriter.h"
-#include "vtkPVVTKExtensionsPCGNSWriterModule.h" // for export macro
-#include "vtkSmartPointer.h"                     // for Controller member
+#include "vtkPVVTKExtensionsIOParallelCGNSWriterModule.h" // for export macro
+#include "vtkSmartPointer.h"                              // for Controller member
 
 class vtkMultiProcessController;
 
-class VTKPVVTKEXTENSIONSPCGNSWRITER_EXPORT vtkPCGNSWriter : public vtkCGNSWriter
+class VTKPVVTKEXTENSIONSIOPARALLELCGNSWRITER_EXPORT vtkPCGNSWriter : public vtkCGNSWriter
 {
 public:
   static vtkPCGNSWriter* New();

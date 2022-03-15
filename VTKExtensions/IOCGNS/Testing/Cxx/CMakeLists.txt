@@ -1,4 +1,4 @@
-vtk_add_test_cxx(vtkPVVTKExtensionsCGNSWriterCxxTests tests
+vtk_add_test_cxx(vtkPVVTKExtensionsIOCGNSWriterCxxTests tests
   TestStructuredGrid.cxx,NO_VALID,NO_DATA
   TestUnstructuredGrid.cxx,NO_VALID,NO_DATA
   TestPartitionedDataSet.cxx,NO_VALID,NO_DATA
@@ -11,4 +11,4 @@ vtk_add_test_cxx(vtkPVVTKExtensionsCGNSWriterCxxTests tests
   TestMappedUnstructuredGrid.cxx,NO_VALID,NO_DATA
   TestTimeWriting.cxx,NO_VALID,NO_DATA
 )
-vtk_test_cxx_executable(vtkPVVTKExtensionsCGNSWriterCxxTests tests)
+vtk_test_cxx_executable(vtkPVVTKExtensionsIOCGNSWriterCxxTests tests)

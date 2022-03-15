@@ -31,10 +31,10 @@ See Copyright.txt or http://www.paraview.org/HTML/Copyright.html for details.
 #ifndef vtkCGNSWriter_h
 #define vtkCGNSWriter_h
 
-#include "vtkPVVTKExtensionsCGNSWriterModule.h" // for export macro
+#include "vtkPVVTKExtensionsIOCGNSWriterModule.h" // for export macro
 #include "vtkWriter.h"
 
-class VTKPVVTKEXTENSIONSCGNSWRITER_EXPORT vtkCGNSWriter : public vtkWriter
+class VTKPVVTKEXTENSIONSIOCGNSWRITER_EXPORT vtkCGNSWriter : public vtkWriter
 {
 public:
   static vtkCGNSWriter* New();

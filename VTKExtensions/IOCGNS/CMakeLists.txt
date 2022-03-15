@@ -1,7 +1,7 @@
 set(classes
   vtkCGNSWriter)
 
-vtk_module_add_module(ParaView::VTKExtensionsCGNSWriter
+vtk_module_add_module(ParaView::VTKExtensionsIOCGNSWriter
   CLASSES ${classes})
 
 paraview_add_server_manager_xmls(

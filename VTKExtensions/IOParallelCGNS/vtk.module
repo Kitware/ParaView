@@ -1,7 +1,7 @@
 NAME
-  ParaView::VTKExtensionsPCGNSWriter
+  ParaView::VTKExtensionsIOParallelCGNSWriter
 LIBRARY_NAME
-  vtkPVVTKExtensionsPCGNSWriter
+  vtkPVVTKExtensionsIOParallelCGNSWriter
 CONDITION
   PARAVIEW_USE_MPI
 KIT
@@ -12,7 +12,7 @@ DEPENDS
   VTK::IOCore
   VTK::ParallelCore
   VTK::mpi
-  ParaView::VTKExtensionsCGNSWriter
+  ParaView::VTKExtensionsIOCGNSWriter
 PRIVATE_DEPENDS
   VTK::cgns
   VTK::CommonCore
