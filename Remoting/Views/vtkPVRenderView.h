@@ -720,6 +720,7 @@ public:
   virtual void SetCamera3DManipulators(const int manipulators[9]);
   void SetCameraManipulators(vtkPVInteractorStyle* style, const int manipulators[9]);
   virtual void SetReverseMouseWheelZoomDirection(bool reverse);
+  virtual void SetMouseWheelZoomsToCursor(bool value);
   virtual void SetCamera2DMouseWheelMotionFactor(double factor);
   virtual void SetCamera3DMouseWheelMotionFactor(double factor);
 

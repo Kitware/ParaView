@@ -839,6 +839,16 @@
           This option changes the direction of the mouse wheel for zooming in and out.
         </Documentation>
       </IntVectorProperty>
+      <IntVectorProperty name="MouseWheelZoomsToCursor"
+                         command="SetMouseWheelZoomsToCursor"
+                         default_values="0"
+                         number_of_elements="1"
+                         label="Mouse Wheel Zooms To Cursor">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Zooms the renderer's camera to the projected point under the cursor position.
+        </Documentation>
+      </IntVectorProperty>
       <PropertyGroup label="2D Interaction Options">
         <Property name="Camera2DManipulators" />
         <Property name="Camera2DMouseWheelMotionFactor" />
@@ -849,6 +859,7 @@
       </PropertyGroup>
       <PropertyGroup label="Mouse Wheel Options">
         <Property name="ReverseMouseWheelZoomDirection" />
+        <Property name="MouseWheelZoomsToCursor" />
       </PropertyGroup>
       <Hints>
         <UseDocumentationForLabels />

@@ -2025,6 +2025,22 @@
           This option changes the direction of the mouse wheel for zooming in and out.
         </Documentation>
       </IntVectorProperty>
+      <IntVectorProperty name="MouseWheelZoomsToCursor"
+                         command="SetMouseWheelZoomsToCursor"
+                         default_values="0"
+                         number_of_elements="1"
+                         label="Mouse Wheel Zooms To Cursor"
+                         panel_visibility="never">
+        <BooleanDomain name="bool" />
+        <Hints>
+          <PropertyLink group="settings"
+                        proxy="RenderViewInteractionSettings"
+                        property="MouseWheelZoomsToCursor"/>
+        </Hints>
+        <Documentation>
+          Zooms the renderer's camera to the projected point under the cursor position.
+        </Documentation>
+      </IntVectorProperty>
       <IntVectorProperty command="SetUseLightKit"
                          default_values="1"
                          name="UseLight"
