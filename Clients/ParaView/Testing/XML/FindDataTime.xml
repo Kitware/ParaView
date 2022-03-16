@@ -10,7 +10,7 @@
   <pqevent object="pqClientMainWindow/menubar/menu_View" command="activate" arguments="Find Data" />
   <pqevent object="pqClientMainWindow/findDataDock/findDataScrollArea/scrollArea/qt_scrollarea_viewport/findDataWidget/container/1pqProxyWidget0/Input/1QComboBox0" command="activated" arguments="can.ex2" />
   <pqevent object="pqClientMainWindow/findDataDock/findDataScrollArea/scrollArea/qt_scrollarea_viewport/findDataWidget/container/1pqProxyWidget0/ElementType/ComboBox" command="activated" arguments="Point" />
-  <pqevent object="pqClientMainWindow/findDataDock/findDataScrollArea/scrollArea/qt_scrollarea_viewport/findDataWidget/container/1pqProxyWidget0/QueryString/1QWidget0/1QComboBox0" command="activated" arguments="accl (magnitude)" />
+  <pqevent object="pqClientMainWindow/findDataDock/findDataScrollArea/scrollArea/qt_scrollarea_viewport/findDataWidget/container/1pqProxyWidget0/QueryString/1QWidget0/1QComboBox0" command="activated" arguments="ACCL (magnitude)" />
   <pqevent object="pqClientMainWindow/findDataDock/findDataScrollArea/scrollArea/qt_scrollarea_viewport/findDataWidget/container/1pqProxyWidget0/QueryString/1QWidget0/1QComboBox1" command="activated" arguments="is max" />
   <pqevent object="pqClientMainWindow/findDataDock/findDataScrollArea/scrollArea/qt_scrollarea_viewport/findDataWidget/findData" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/findDataDock/findDataScrollArea/scrollArea/qt_scrollarea_viewport/findDataWidget/createExpander/icon" command="mousePress" arguments="1,1,0,12,10" />

@@ -54,7 +54,7 @@ calculator = PythonCalculator(Expression="t_index*t_value*time_index*time_value"
 
 # Annotation filter
 annotation = PythonAnnotation()
-annotation.Expression = '"%f %f %f" % (xmom, ymom, zmom)'
+annotation.Expression = '"%f %f %f" % (XMOM, YMOM, ZMOM)'
 
 # Update time and trigger pipeline execution
 time = timesteps[5]
