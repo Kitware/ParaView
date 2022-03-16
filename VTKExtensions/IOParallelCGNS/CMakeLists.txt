@@ -20,6 +20,3 @@ if(CGNS_ENABLE_PARALLEL)
     PRIVATE CGNS_HAS_PARALLEL
   )
 endif()
-
-paraview_add_server_manager_xmls(
-  XMLS resources/PCGNSWriter.xml)

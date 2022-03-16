@@ -3,6 +3,3 @@ set(classes
 
 vtk_module_add_module(ParaView::VTKExtensionsIOCGNSWriter
   CLASSES ${classes})
-
-paraview_add_server_manager_xmls(
-  XMLS  resources/CGNSWriter.xml)

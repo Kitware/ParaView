@@ -355,7 +355,12 @@ endif()
 
 if (TARGET VTK::IOCGNSReader)
   list(APPEND xml_files
-    Resources/readers_iocgnsreader.xml)
+    Resources/readers_iocgns.xml)
+endif()
+
+if (TARGET ParaView::VTKExtensionsIOCGNSWriter)
+  list(APPEND xml_files
+    Resources/writers_iocgns.xml)
 endif()
 
 if (TARGET VTK::FiltersOpenTURNS)
