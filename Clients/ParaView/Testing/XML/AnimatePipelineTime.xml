@@ -24,7 +24,7 @@
   <pqevent object="pqPipelineTimeKeyFrameEditor/container/pqKeyFrameEditor/tableView" command="mousePress" arguments="1,1,0,64,23,/0:2" />
   <pqevent object="pqPipelineTimeKeyFrameEditor/container/pqKeyFrameEditor/tableView" command="mouseRelease" arguments="1,0,0,64,23,/0:2" />
   <pqevent object="pqPipelineTimeKeyFrameEditor/1QDialogButtonBox0/1QPushButton0" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/variableToolbar/displayColor/Variables" command="set_string" arguments="vel" />
+  <pqevent object="pqClientMainWindow/variableToolbar/displayColor/Variables" command="set_string" arguments="VEL" />
   <pqevent object="pqClientMainWindow/variableToolbar/actionScalarBarVisibility" command="set_boolean" arguments="false" />
   <pqevent object="pqClientMainWindow/animationViewDock/qt_dockwidget_closebutton" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/VCRToolbar/actionVCRPlay" command="activate" arguments="" />
