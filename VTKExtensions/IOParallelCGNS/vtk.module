@@ -4,6 +4,8 @@ LIBRARY_NAME
   vtkPVVTKExtensionsIOParallelCGNSWriter
 CONDITION
   PARAVIEW_USE_MPI
+IMPLEMENTS
+  ParaView::VTKExtensionsIOCGNSWriter
 KIT
   ParaView::CoreKit
 GROUPS

@@ -172,7 +172,7 @@ void Flatten(const vtkSmartPointer<vtkPartitionedDataSetCollection>& mergedColle
 
 } // anonymous namespace
 
-vtkStandardNewMacro(vtkPCGNSWriter);
+vtkObjectFactoryNewMacro(vtkPCGNSWriter);
 
 //------------------------------------------------------------------------------
 vtkPCGNSWriter::vtkPCGNSWriter()
@@ -204,10 +204,15 @@ void vtkPCGNSWriter::SetController(vtkMultiProcessController* controller)
 }
 
 //------------------------------------------------------------------------------
+vtkMultiProcessController* vtkPCGNSWriter::GetController()
+{
+  return this->Controller;
+};
+
+//------------------------------------------------------------------------------
 void vtkPCGNSWriter::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
-  os << indent << "FileName " << (this->FileName ? this->FileName : "(none)") << endl;
   os << indent << "Number of pieces " << this->NumberOfPieces << endl;
   os << indent << "Request piece " << this->RequestPiece << endl;
   os << indent << "Controller ";

@@ -45,7 +45,7 @@ See Copyright.txt or http://www.paraview.org/HTML/Copyright.html for details.
 
 #include "vtkCGNSWriter.h"
 #include "vtkPVVTKExtensionsIOParallelCGNSWriterModule.h" // for export macro
-#include "vtkSmartPointer.h"                              // for Controller member
+#include "vtkSmartPointer.h"                              // for vtkSmartPointer
 
 class vtkMultiProcessController;
 
@@ -58,20 +58,21 @@ public:
 
   //@{
   /**
-   * Set the MPI controller.
+   * Set/Get the MPI controller.
    */
-  void SetController(vtkMultiProcessController*);
+  virtual void SetController(vtkMultiProcessController*);
+  virtual vtkMultiProcessController* GetController();
   //@}
 
 protected:
   vtkPCGNSWriter();
-  ~vtkPCGNSWriter() = default;
+  ~vtkPCGNSWriter() override = default;
 
   int ProcessRequest(vtkInformation* request, vtkInformationVector** inputVector,
     vtkInformationVector* outputVector) override;
 
   int RequestInformation(vtkInformation* request, vtkInformationVector** inputVector,
-    vtkInformationVector* outputVector);
+    vtkInformationVector* outputVector) override;
 
   int RequestUpdateExtent(vtkInformation* request, vtkInformationVector** inputVector,
     vtkInformationVector* outputVector) override;

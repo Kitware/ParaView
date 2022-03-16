@@ -1061,7 +1061,7 @@ bool vtkCGNSWriter::vtkPrivate::WriteComposite(
 }
 
 //------------------------------------------------------------------------------
-vtkStandardNewMacro(vtkCGNSWriter);
+vtkObjectFactoryNewMacro(vtkCGNSWriter);
 
 //------------------------------------------------------------------------------
 vtkCGNSWriter::vtkCGNSWriter()

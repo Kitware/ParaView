@@ -83,7 +83,7 @@ protected:
   int ProcessRequest(vtkInformation* request, vtkInformationVector** inputVector,
     vtkInformationVector* outputVector) override;
 
-  int RequestInformation(vtkInformation* request, vtkInformationVector** inputVector,
+  virtual int RequestInformation(vtkInformation* request, vtkInformationVector** inputVector,
     vtkInformationVector* outputVector);
 
   virtual int RequestUpdateExtent(vtkInformation* request, vtkInformationVector** inputVector,

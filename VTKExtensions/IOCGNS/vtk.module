@@ -2,6 +2,7 @@ NAME
   ParaView::VTKExtensionsIOCGNSWriter
 LIBRARY_NAME
   vtkPVVTKExtensionsIOCGNSWriter
+IMPLEMENTABLE
 KIT
   ParaView::CoreKit
 GROUPS
