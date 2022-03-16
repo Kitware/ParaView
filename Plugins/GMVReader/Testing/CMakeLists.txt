@@ -6,6 +6,7 @@ endif ()
 set(GMV_READER_TESTS
   GMVReaderBasicRead${suffix}.xml
   GMVReaderInvalidFiles${suffix}.xml
+  GMVReaderOneOrTwoVertices.xml
 )
 
 set(_paraview_add_tests_default_test_data_target ParaViewData)
