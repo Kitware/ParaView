@@ -1,7 +1,7 @@
 /*=========================================================================
 
 Program:   Visualization Toolkit
-Module:    vtkPCGNSWriter.h
+Module:    vtkPCGNSWriter.cxx
 
 Copyright (c) Ken Martin, Will Schroeder, Bill Lorensen
 All rights reserved.
@@ -28,6 +28,7 @@ See Copyright.txt or http://www.paraview.org/HTML/Copyright.html for details.
 #include "vtkLogger.h"
 #include "vtkMPIController.h"
 #include "vtkMultiBlockDataSet.h"
+#include "vtkMultiPieceDataSet.h"
 #include "vtkMultiProcessController.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
@@ -74,18 +75,20 @@ void Flatten(const vtkSmartPointer<vtkPartitionedDataSet>& mergedPD,
 // something the CGNS standard supports. Therefore, flatten nested blocks into
 // a list of blocks.
 //------------------------------------------------------------------------------
-void Flatten(const vtkSmartPointer<vtkMultiBlockDataSet>& merged,
+void Flatten(const vtkSmartPointer<vtkMultiBlockDataSet>& mergedMB,
   const std::vector<vtkSmartPointer<vtkDataObject>>& collected)
 {
   if (collected.empty())
-    return;
-
-  vtkMultiBlockDataSet* mb = vtkMultiBlockDataSet::SafeDownCast(collected.front());
-  if (mb)
   {
-    for (unsigned int i = 0; i < mb->GetNumberOfBlocks(); ++i)
+    return;
+  }
+
+  auto mbFirst = vtkMultiBlockDataSet::SafeDownCast(collected.front());
+  if (mbFirst)
+  {
+    for (unsigned int i = 0; i < mbFirst->GetNumberOfBlocks(); ++i)
     {
-      auto block = mb->GetBlock(i);
+      auto block = mbFirst->GetBlock(i);
       if (!block)
       {
         continue;
@@ -98,10 +101,10 @@ void Flatten(const vtkSmartPointer<vtkMultiBlockDataSet>& merged,
 
         for (auto& entry : collected)
         {
-          vtkMultiBlockDataSet* mb2 = vtkMultiBlockDataSet::SafeDownCast(entry);
-          if (mb2)
+          auto mb = vtkMultiBlockDataSet::SafeDownCast(entry);
+          if (mb)
           {
-            auto grid = mb2->GetBlock(i);
+            auto grid = mb->GetBlock(i);
 
             // the following is needed to distinguish
             // between surface and volume grids in the CGNSWriter
@@ -112,22 +115,42 @@ void Flatten(const vtkSmartPointer<vtkMultiBlockDataSet>& merged,
         }
 
         append->Update(); // perform the merge!
-        merged->SetBlock(i, append->GetOutputDataObject(0));
-        merged->GetMetaData(i)->Append(mb->GetMetaData(i));
+        mergedMB->SetBlock(i, append->GetOutputDataObject(0));
+        if (mbFirst->HasMetaData(i))
+        {
+          mergedMB->GetMetaData(i)->Append(mbFirst->GetMetaData(i));
+        }
+      }
+      else if (block->IsA("vtkMultiPieceDataSet"))
+      {
+        std::vector<vtkSmartPointer<vtkDataObject>> sub;
+        for (auto& entry : collected)
+        {
+          sub.push_back((vtkMultiBlockDataSet::SafeDownCast(entry)->GetBlock(i)));
+        }
+        vtkNew<vtkMultiPieceDataSet> mergedSub;
+        ::Flatten(mergedSub.GetPointer(), sub);
+        mergedMB->SetBlock(i, mergedSub);
+        if (mbFirst->HasMetaData(i))
+        {
+          mergedMB->GetMetaData(i)->Append(mbFirst->GetMetaData(i));
+        }
       }
       else if (block->IsA("vtkMultiBlockDataSet"))
       {
         std::vector<vtkSmartPointer<vtkDataObject>> sub;
         for (auto& entry : collected)
         {
-          sub.push_back(vtkSmartPointer<vtkDataObject>::Take(
-            vtkMultiBlockDataSet::SafeDownCast(entry)->GetBlock(i)));
+          sub.push_back(vtkMultiBlockDataSet::SafeDownCast(entry)->GetBlock(i));
         }
 
-        auto mergedSub = vtkSmartPointer<vtkMultiBlockDataSet>::New();
-        ::Flatten(mergedSub, sub);
-        merged->SetBlock(i, mergedSub);
-        merged->GetMetaData(i)->Append(mb->GetMetaData(i));
+        vtkNew<vtkMultiBlockDataSet> mergedSub;
+        ::Flatten(mergedSub.GetPointer(), sub);
+        mergedMB->SetBlock(i, mergedSub);
+        if (mbFirst->HasMetaData(i))
+        {
+          mergedMB->GetMetaData(i)->Append(mbFirst->GetMetaData(i));
+        }
       }
     }
   }
