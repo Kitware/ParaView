@@ -157,39 +157,31 @@ void Flatten(const vtkSmartPointer<vtkMultiBlockDataSet>& mergedMB,
 }
 
 //------------------------------------------------------------------------------
-void Flatten(const vtkSmartPointer<vtkPartitionedDataSetCollection>& mergedCollection,
+void Flatten(const vtkSmartPointer<vtkPartitionedDataSetCollection>& mergedPCD,
   const std::vector<vtkSmartPointer<vtkDataObject>>& collected)
 {
-  for (auto& entry : collected)
+  if (collected.empty())
   {
-    auto partitionedCollection = vtkPartitionedDataSetCollection::SafeDownCast(entry);
-    if (partitionedCollection)
-    {
-      const unsigned nDataSets = partitionedCollection->GetNumberOfPartitionedDataSets();
-      mergedCollection->SetNumberOfPartitionedDataSets(nDataSets);
+    return;
+  }
 
-      for (unsigned idx = 0; idx < nDataSets; ++idx)
-      {
-        const auto merged = mergedCollection->GetPartitionedDataSet(idx);
-        const unsigned nPartitions = partitionedCollection->GetNumberOfPartitions(idx);
-        for (unsigned i = 0; i < nPartitions; ++i)
-        {
-          vtkDataObject* dataObject = partitionedCollection->GetPartitionAsDataObject(idx, i);
-          if (dataObject)
-          {
-            merged->SetPartition(i, dataObject);
-          }
-        }
-        if (partitionedCollection->HasMetaData(idx))
-        {
-          mergedCollection->GetMetaData(idx)->Append(partitionedCollection->GetMetaData(idx));
-        }
-      }
-    }
-    else
+  auto pdcFirst = vtkPartitionedDataSetCollection::SafeDownCast(collected.front());
+  const unsigned numberOfPartitionedDatasets = pdcFirst->GetNumberOfPartitionedDataSets();
+  mergedPCD->SetNumberOfPartitionedDataSets(numberOfPartitionedDatasets);
+
+  for (unsigned i = 0; i < numberOfPartitionedDatasets; ++i)
+  {
+    std::vector<vtkSmartPointer<vtkDataObject>> sub;
+    for (auto& entry : collected)
     {
-      vtkErrorWithObjectMacro(
-        nullptr, << "Expected a vtkPartitionedDataSetCollection, got " << entry->GetClassName());
+      sub.push_back(vtkPartitionedDataSetCollection::SafeDownCast(entry)->GetPartitionedDataSet(i));
+    }
+    vtkNew<vtkPartitionedDataSet> mergedSub;
+    ::Flatten(mergedSub.GetPointer(), sub);
+    mergedPCD->SetPartitionedDataSet(i, mergedSub);
+    if (pdcFirst->HasMetaData(i))
+    {
+      mergedPCD->GetMetaData(i)->Append(pdcFirst->GetMetaData(i));
     }
   }
 }
