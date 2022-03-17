@@ -387,8 +387,8 @@ int vtkPVSelectionSource::RequestData(vtkInformation* vtkNotUsed(request),
       // Add integer IDs
       if (!this->Internal->PedigreeIDs.empty())
       {
-        source->SetNumberOfNodes(this->Internal->PedigreeIDs.size());
-        size_t nodeId = 0;
+        source->SetNumberOfNodes(static_cast<unsigned int>(this->Internal->PedigreeIDs.size()));
+        unsigned int nodeId = 0;
         for (const auto& idsOfSpecificPedigree : this->Internal->PedigreeIDs)
         {
           source->SetContentType(nodeId, vtkSelectionNode::PEDIGREEIDS);
@@ -408,8 +408,9 @@ int vtkPVSelectionSource::RequestData(vtkInformation* vtkNotUsed(request),
       // Add String IDs
       else if (!this->Internal->PedigreeStringIDs.empty())
       {
-        source->SetNumberOfNodes(this->Internal->PedigreeStringIDs.size());
-        size_t nodeId = 0;
+        source->SetNumberOfNodes(
+          static_cast<unsigned int>(this->Internal->PedigreeStringIDs.size()));
+        unsigned int nodeId = 0;
         for (const auto& stringIdsOfSpecificPedigree : this->Internal->PedigreeStringIDs)
         {
           source->SetContentType(nodeId, vtkSelectionNode::PEDIGREEIDS);
@@ -432,7 +433,7 @@ int vtkPVSelectionSource::RequestData(vtkInformation* vtkNotUsed(request),
     case COMPOSITEID:
     {
       source->SetNumberOfNodes(this->Internal->CompositeIDs.size());
-      size_t nodeId = 0;
+      unsigned int nodeId = 0;
       for (const auto& pieceIdsOfSpecificCompositeId : this->Internal->CompositeIDs)
       {
         source->SetContentType(nodeId, vtkSelectionNode::INDICES);
@@ -454,7 +455,7 @@ int vtkPVSelectionSource::RequestData(vtkInformation* vtkNotUsed(request),
     case HIERARCHICALID:
     {
       source->SetNumberOfNodes(this->Internal->HierarchicalIDs.size());
-      size_t nodeId = 0;
+      unsigned int nodeId = 0;
       for (const auto& idsOfSpecificHierarchicalId : this->Internal->HierarchicalIDs)
       {
         source->SetContentType(nodeId, vtkSelectionNode::INDICES);

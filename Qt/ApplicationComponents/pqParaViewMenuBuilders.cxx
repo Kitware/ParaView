@@ -675,8 +675,10 @@ void pqParaViewMenuBuilders::buildHelpMenu(QMenu& menu)
     (menu.addAction(QIcon(":/pqWidgets/Icons/pdf.png"), "ParaView Self-directed Tutorial")
       << pqSetName("actionTutorialNotes")));
 
-  // Sandia National Labs Tutorials
-  new pqDesktopServicesReaction(QUrl("https://www.paraview.org/Wiki/ParaView_Classroom_Tutorials"),
+  // Classroom Tutorials by Sandia National Laboratories
+  QString classroomTutorialsURL =
+    QString("https://docs.paraview.org/en/v%1/ClassroomTutorials/index.html").arg(versionString);
+  new pqDesktopServicesReaction(QUrl(classroomTutorialsURL),
     (menu.addAction("ParaView Classroom Tutorials") << pqSetName("actionClassroomTutorial")));
 
   // Example Data Sets

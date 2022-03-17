@@ -125,6 +125,12 @@ pqDisplaySizedImplicitPlanePropertyWidget::pqDisplaySizedImplicitPlanePropertyWi
     }
   }
 
+  vtkSMNewWidgetRepresentationProxy* wdgProxy = this->widgetProxy();
+  const bool drawOutlineAndIntersectionEdges =
+    vtkSMPropertyHelper(wdgProxy, "DrawOutline").GetAsInt() != 0 &&
+    vtkSMPropertyHelper(wdgProxy, "DrawIntersectionEdges").GetAsInt() != 0;
+  ui.showOutlineAndIntersectionEdges->setChecked(drawOutlineAndIntersectionEdges);
+
   // link a few buttons
   this->connect(ui.useXNormal, SIGNAL(clicked()), SLOT(useXNormal()));
   this->connect(ui.useYNormal, SIGNAL(clicked()), SLOT(useYNormal()));
@@ -138,6 +144,10 @@ pqDisplaySizedImplicitPlanePropertyWidget::pqDisplaySizedImplicitPlanePropertyWi
   this->connect(ui.show3DWidget, SIGNAL(toggled(bool)), SLOT(setWidgetVisible(bool)));
   ui.show3DWidget->connect(this, SIGNAL(widgetVisibilityToggled(bool)), SLOT(setChecked(bool)));
   this->setWidgetVisible(ui.show3DWidget->isChecked());
+  this->connect(ui.show3DWidget, &QCheckBox::toggled, ui.showOutlineAndIntersectionEdges,
+    &QCheckBox::setEnabled);
+  this->connect(ui.showOutlineAndIntersectionEdges, &QCheckBox::toggled, this,
+    &pqDisplaySizedImplicitPlanePropertyWidget::setDrawOutlineAndIntersectionEdges);
 
   // We want to show the translucent plane when interaction starts.
   this->connect(this, SIGNAL(startInteraction()), SLOT(showPlane()));
@@ -199,6 +209,15 @@ void pqDisplaySizedImplicitPlanePropertyWidget::setDrawPlane(bool val)
 {
   vtkSMNewWidgetRepresentationProxy* wdgProxy = this->widgetProxy();
   vtkSMPropertyHelper(wdgProxy, "DrawPlane").Set(val ? 1 : 0);
+  wdgProxy->UpdateVTKObjects();
+  this->render();
+}
+
+void pqDisplaySizedImplicitPlanePropertyWidget::setDrawOutlineAndIntersectionEdges(bool val)
+{
+  vtkSMNewWidgetRepresentationProxy* wdgProxy = this->widgetProxy();
+  vtkSMPropertyHelper(wdgProxy, "DrawOutline").Set(val ? 1 : 0);
+  vtkSMPropertyHelper(wdgProxy, "DrawIntersectionEdges").Set(val ? 1 : 0);
   wdgProxy->UpdateVTKObjects();
   this->render();
 }

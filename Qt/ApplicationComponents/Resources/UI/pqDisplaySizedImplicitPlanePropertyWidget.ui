@@ -43,6 +43,22 @@
     </widget>
    </item>
    <item>
+    <widget class="QCheckBox" name="showOutlineAndIntersectionEdges">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="toolTip">
+      <string>Show the outline of the data the intersection edges of the plane with the outline.</string>
+     </property>
+     <property name="text">
+      <string>Show Outline and Intersection Edges</string>
+     </property>
+    </widget>
+   </item>
+   <item>
     <layout class="QGridLayout">
      <property name="leftMargin">
       <number>0</number>

@@ -164,6 +164,7 @@
           <Property name="RadiusMultiplier" />
           <Property name="DrawPlane" />
           <Property name="DrawOutline" />
+          <Property name="DrawIntersectionEdges" />
           <Property name="ConstrainToWidgetBounds" />
           <Property name="ConstrainMaximumSizeToWidgetBounds" />
           <Property name="OutlineTranslation" />
@@ -1628,6 +1629,13 @@
                          command="SetDrawOutline"
                          default_values="1"
                          name="DrawOutline"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+      <IntVectorProperty animateable="1"
+                         command="SetDrawIntersectionEdges"
+                         default_values="1"
+                         name="DrawIntersectionEdges"
                          number_of_elements="1">
         <BooleanDomain name="bool" />
       </IntVectorProperty>
