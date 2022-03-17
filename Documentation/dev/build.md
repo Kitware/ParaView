@@ -69,7 +69,7 @@ cmake -GNinja -DPARAVIEW_USE_PYTHON=ON -DPARAVIEW_USE_MPI=ON -DVTK_SMP_IMPLEMENT
 ninja
 ```
 
-To build a specific ParaView version, eg: v5.6.0 , please run the following commands in a terminal while replacing "tag" by the version you want to build
+To build a specific ParaView version, eg: v5.9.1, please run the following commands in a terminal while replacing "tag" by the version you want to build
 ```sh
 git clone https://gitlab.kitware.com/paraview/paraview.git
 mkdir paraview_build
@@ -90,17 +90,19 @@ Double click on the paraview executable in the `/bin` directory or run in the pr
 
 ### Windows
 
-Note: the following steps concerning Visual Studio 2015 can also be applied to Visual Studio 2017 and 2019.
-If so, be sure to use the msvc2017_64/msvc2019_64 Qt Version and the Developer Command Prompt for VS 2017/2019.
+Note: The following steps concerning Visual Studio 2019 can also be applied to newer versions.
+If so, be sure to use the respective Qt Version (e.g. for VS 2022, use msvc2022_64) and the Native Tools Command Prompt.
 
 #### Dependencies
  * Download and install [git bash for windows][gitforwindows]
  * Download and install [cmake][cmake-download]
- * Download and install [Visual Studio 2015 Community Edition][visual-studio]
+ * Download and install [Visual Studio 2019 Community Edition][visual-studio]
  * Download [ninja-build][ninja] and drop `ninja.exe` in `C:\Windows\`
  * Download and install both `msmpisetup.exe` and `msmpisdk.msi` from [Microsoft MPI][msmpi]
- * Download and install [Python for windows][pythonwindows], make sure to add the path to your Python installation folder to the `PATH` environnement variable.
- * Download and install [Qt 5.12.3][qt-download-5.12.3] for Windows, make sure to check the MSVC 2015 64-bit component during installation, make sure to add `C:\Qt\Qt5.12.3\5.12.3\msvc2015_64\bin` to your `PATH` environment variable.
+ * Download and install [Python for Windows][pythonwindows], make sure to add the path to your Python installation folder to the `PATH` environnement variable.
+ * Download and install [Qt 5.15.3][qt-download-5.15.3] for Windows, make sure to check the MSVC 2019 64-bit component during installation.
+    * Make sure to add `C:\Qt\Qt5.15.3\5.15.3\msvc2019_64\bin` to your `PATH` environment variable.
+    * You may also need to add an environment variable `QT_QPA_PLATFORM_PLUGIN_PATH`: `C:\Qt\Qt5.15.3\5.15.3\msvc2019_64\plugins\platforms`.
 
 #### Recover the source
  * Open git bash
@@ -115,7 +117,7 @@ mv paraview pv
 mkdir pvb
 ```
 
- * Or, to build a specific ParaView version, eg: v5.6.0 , please run the following commands while replacing "tag" by the version you want to build
+ * Or, to build a specific ParaView version, eg: v5.9.1, please run the following commands while replacing "tag" by the version you want to build
 
 ```sh
 cd C:
@@ -131,16 +133,18 @@ git submodule update --init --recursive
 
 #### Build
 
- * Open VS2015 x64 Native Tools Command Prompt and run the following commands
+ * Open VS2019 x64 Native Tools Command Prompt and run the following commands
 ```sh
 cd C:\pv\pvb
-cmake -GNinja -DPARAVIEW_USE_PYTHON=ON -DPARAVIEW_USE_MPI=ON -DVTK_SMP_IMPLEMENTATION_TYPE=OpenMP -DCMAKE_BUILD_TYPE=Release ..\pv
+cmake -GNinja -DPARAVIEW_USE_PYTHON=ON -DPARAVIEW_USE_MPI=ON -DVTK_SMP_IMPLEMENTATION_TYPE=STDThread -DCMAKE_BUILD_TYPE=Release ..\pv
 ninja
 ```
 
+Note: If you want to build ParaView with `CMAKE_BUILD_TYPE=Debug` you also need to add the option `-DPARAVIEW_WINDOWS_PYTHON_DEBUGGABLE=ON`.
+
 #### Run
 
- * Double click on the `C:\pv\pvb\bin\paraview` executable
+ * Double click on the `C:\pv\pvb\bin\paraview.exe` executable
 
 ## Complete Compilation Guide
 
@@ -174,7 +178,7 @@ Required:
     - IBM XL 16.1 or newer
     - Clang 4 or newer
     - Xcode 9 or newer
-    - Visual Studio 2015 or newer
+    - Visual Studio 2019 or newer
 
 Optional dependencies:
 
@@ -255,7 +259,7 @@ please file a new [issue][paraview-issues].
 
 #### Windows
 
-  * [Visual Studio 2015 Community Edition][visual-studio]
+  * [Visual Studio 2019 Community Edition][visual-studio]
   * Use "x64 Native Tools Command Prompt" for the installed Visual Studio
     version to configure with CMake and to build with ninja.
   * Get [ninja][ninja]. Unzip the binary and put it in `PATH`.
@@ -603,7 +607,7 @@ steps:
 [pythonwindows]: https://www.python.org/downloads/windows/
 [qt-download]: https://download.qt.io/official_releases/qt
 [qt]: https://qt.io
-[qt-download-5.12.3]: https://download.qt.io/archive/qt/5.12/5.12.3/
+[qt-download-5.15.3]: https://download.qt.io/archive/qt/5.15/5.15.3/
 [tbb]: https://github.com/intel/tbb/releases
 [visual-studio]: https://visualstudio.microsoft.com/vs/older-downloads
 [spack]: https://spack.io/
