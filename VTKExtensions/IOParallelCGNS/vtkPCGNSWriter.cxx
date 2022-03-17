@@ -19,22 +19,22 @@ See Copyright.txt or http://www.paraview.org/HTML/Copyright.html for details.
 
 #include "vtkPCGNSWriter.h"
 
-#include <vtkAppendDataSets.h>
-#include <vtkDataObject.h>
-#include <vtkDataObjectTreeIterator.h>
-#include <vtkDoubleArray.h>
-#include <vtkInformation.h>
-#include <vtkInformationVector.h>
-#include <vtkLogger.h>
-#include <vtkMPIController.h>
-#include <vtkMultiBlockDataSet.h>
-#include <vtkMultiProcessController.h>
-#include <vtkNew.h>
-#include <vtkObjectFactory.h>
-#include <vtkPartitionedDataSet.h>
-#include <vtkPartitionedDataSetCollection.h>
-#include <vtkPolyData.h>
-#include <vtkStreamingDemandDrivenPipeline.h>
+#include "vtkAppendDataSets.h"
+#include "vtkDataObject.h"
+#include "vtkDataObjectTreeIterator.h"
+#include "vtkDoubleArray.h"
+#include "vtkInformation.h"
+#include "vtkInformationVector.h"
+#include "vtkLogger.h"
+#include "vtkMPIController.h"
+#include "vtkMultiBlockDataSet.h"
+#include "vtkMultiProcessController.h"
+#include "vtkNew.h"
+#include "vtkObjectFactory.h"
+#include "vtkPartitionedDataSet.h"
+#include "vtkPartitionedDataSetCollection.h"
+#include "vtkPolyData.h"
+#include "vtkStreamingDemandDrivenPipeline.h"
 
 #include <map>
 #include <sstream>
@@ -42,6 +42,34 @@ See Copyright.txt or http://www.paraview.org/HTML/Copyright.html for details.
 
 namespace
 {
+//------------------------------------------------------------------------------
+void Flatten(const vtkSmartPointer<vtkPartitionedDataSet>& mergedPD,
+  const std::vector<vtkSmartPointer<vtkDataObject>>& collected)
+{
+  unsigned item(0);
+  for (auto& entry : collected)
+  {
+    vtkPartitionedDataSet* partition = vtkPartitionedDataSet::SafeDownCast(entry);
+    if (partition)
+    {
+      const unsigned nPartitions = partition->GetNumberOfPartitions();
+      for (unsigned i = 0; i < nPartitions; ++i)
+      {
+        vtkDataObject* dataObject = partition->GetPartitionAsDataObject(i);
+        if (dataObject)
+        {
+          mergedPD->SetPartition(item++, dataObject);
+        }
+      }
+    }
+    else
+    {
+      vtkErrorWithObjectMacro(
+        nullptr, << "Expected a vtkPartitionedDataSet, got " << entry->GetClassName());
+    }
+  }
+}
+
 // A multiblock dataset may consist of nested blocks in blocks. This is not
 // something the CGNS standard supports. Therefore, flatten nested blocks into
 // a list of blocks.
@@ -105,40 +133,13 @@ void Flatten(const vtkSmartPointer<vtkMultiBlockDataSet>& merged,
   }
 }
 
-void Flatten(const vtkSmartPointer<vtkPartitionedDataSet>& merged,
-  const std::vector<vtkSmartPointer<vtkDataObject>>& collected)
-{
-  unsigned item(0);
-  for (auto& entry : collected)
-  {
-    vtkPartitionedDataSet* partition = vtkPartitionedDataSet::SafeDownCast(entry);
-    if (partition)
-    {
-      const unsigned nPartitions = partition->GetNumberOfPartitions();
-      for (unsigned i = 0; i < nPartitions; ++i)
-      {
-        vtkDataObject* dataObject = partition->GetPartitionAsDataObject(i);
-        if (dataObject)
-        {
-          merged->SetPartition(item++, dataObject);
-        }
-      }
-    }
-    else
-    {
-      vtkErrorWithObjectMacro(
-        nullptr, << "Expected a vtkPartitionedDataSet, got " << entry->GetClassName());
-    }
-  }
-}
-
+//------------------------------------------------------------------------------
 void Flatten(const vtkSmartPointer<vtkPartitionedDataSetCollection>& mergedCollection,
   const std::vector<vtkSmartPointer<vtkDataObject>>& collected)
 {
   for (auto& entry : collected)
   {
-    vtkPartitionedDataSetCollection* partitionedCollection =
-      vtkPartitionedDataSetCollection::SafeDownCast(entry);
+    auto partitionedCollection = vtkPartitionedDataSetCollection::SafeDownCast(entry);
     if (partitionedCollection)
     {
       const unsigned nDataSets = partitionedCollection->GetNumberOfPartitionedDataSets();
@@ -172,6 +173,7 @@ void Flatten(const vtkSmartPointer<vtkPartitionedDataSetCollection>& mergedColle
 
 } // anonymous namespace
 
+//------------------------------------------------------------------------------
 vtkObjectFactoryNewMacro(vtkPCGNSWriter);
 
 //------------------------------------------------------------------------------
