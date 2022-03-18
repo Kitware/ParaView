@@ -21,9 +21,11 @@ See Copyright.txt or http://www.paraview.org/HTML/Copyright.html for details.
  * @class vtkPCGNSWriter
  * @brief Writes CGNS file in parallel using serial I/O
  *
- * This writer writes datasets that may consist of
+ * This writer writes (composite) datasets that may consist of
+ *   - vtkStructuredGrid
  *   - vtkUnstructuredGrid
  *   - vtkPolydata
+ *   - vtkCompositeDataSet
  *
  * The writer is intended to be used in a distributed MPI process
  * and lets each process write to the same CGNS file. The writing
@@ -41,13 +43,13 @@ See Copyright.txt or http://www.paraview.org/HTML/Copyright.html for details.
 #ifndef vtkPCGNSWriter_h
 #define vtkPCGNSWriter_h
 
-#include <vtkCGNSWriter.h>
-#include <vtkPVVTKExtensionsPCGNSWriterModule.h> // for export macro
-#include <vtkSmartPointer.h>                     // for Controller member
+#include "vtkCGNSWriter.h"
+#include "vtkPVVTKExtensionsIOParallelCGNSWriterModule.h" // for export macro
+#include "vtkSmartPointer.h"                              // for vtkSmartPointer
 
 class vtkMultiProcessController;
 
-class VTKPVVTKEXTENSIONSPCGNSWRITER_EXPORT vtkPCGNSWriter : public vtkCGNSWriter
+class VTKPVVTKEXTENSIONSIOPARALLELCGNSWRITER_EXPORT vtkPCGNSWriter : public vtkCGNSWriter
 {
 public:
   static vtkPCGNSWriter* New();
@@ -56,20 +58,21 @@ public:
 
   //@{
   /**
-   * Set the MPI controller.
+   * Set/Get the MPI controller.
    */
-  void SetController(vtkMultiProcessController*);
+  virtual void SetController(vtkMultiProcessController*);
+  virtual vtkMultiProcessController* GetController();
   //@}
 
 protected:
   vtkPCGNSWriter();
-  ~vtkPCGNSWriter() = default;
+  ~vtkPCGNSWriter() override = default;
 
   int ProcessRequest(vtkInformation* request, vtkInformationVector** inputVector,
     vtkInformationVector* outputVector) override;
 
   int RequestInformation(vtkInformation* request, vtkInformationVector** inputVector,
-    vtkInformationVector* outputVector);
+    vtkInformationVector* outputVector) override;
 
   int RequestUpdateExtent(vtkInformation* request, vtkInformationVector** inputVector,
     vtkInformationVector* outputVector) override;

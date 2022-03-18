@@ -512,12 +512,12 @@ paraview_require_module(
 
 paraview_require_module(
   CONDITION PARAVIEW_BUILD_CANONICAL AND PARAVIEW_ENABLE_NONESSENTIAL
-  MODULES   ParaView::VTKExtensionsCGNSWriter)
+  MODULES   ParaView::VTKExtensionsIOCGNSWriter)
 
 paraview_require_module(
   CONDITION PARAVIEW_USE_MPI AND PARAVIEW_BUILD_CANONICAL AND PARAVIEW_ENABLE_NONESSENTIAL
   MODULES   VTK::IOParallelNetCDF
-            ParaView::VTKExtensionsPCGNSWriter)
+            ParaView::VTKExtensionsIOParallelCGNSWriter)
 
 paraview_require_module(
   CONDITION PARAVIEW_BUILD_CANONICAL AND PARAVIEW_ENABLE_RENDERING AND PARAVIEW_ENABLE_NONESSENTIAL

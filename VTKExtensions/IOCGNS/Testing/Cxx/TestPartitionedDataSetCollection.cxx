@@ -14,7 +14,6 @@
 #include "TestFunctions.h"
 #include "vtkCGNSReader.h"
 #include "vtkCGNSWriter.h"
-#include "vtkCell.h"
 #include "vtkInformation.h"
 #include "vtkLogger.h"
 #include "vtkMultiBlockDataSet.h"

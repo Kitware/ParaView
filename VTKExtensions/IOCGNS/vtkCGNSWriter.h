@@ -25,61 +25,65 @@ See Copyright.txt or http://www.paraview.org/HTML/Copyright.html for details.
  *   - vtkStructuredGrid
  *   - vtkUnstructuredGrid
  *   - vtkPolydata
- *   - vtkMultiBlockDataSet
- *   - vtkMultiPieceDataSet (currently not implemented)
+ *   - vtkCompositeDataSet
  */
 
 #ifndef vtkCGNSWriter_h
 #define vtkCGNSWriter_h
 
-#include "vtkPVVTKExtensionsCGNSWriterModule.h" // for export macro
+#include "vtkPVVTKExtensionsIOCGNSWriterModule.h" // for export macro
 #include "vtkWriter.h"
 
-class VTKPVVTKEXTENSIONSCGNSWRITER_EXPORT vtkCGNSWriter : public vtkWriter
+class vtkDoubleArray;
+
+class VTKPVVTKEXTENSIONSIOCGNSWRITER_EXPORT vtkCGNSWriter : public vtkWriter
 {
 public:
   static vtkCGNSWriter* New();
   vtkTypeMacro(vtkCGNSWriter, vtkWriter);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
+  ///@{
   /**
-   * Name for the output file.  If writing in parallel, the number
-   * of processes and the process rank will be appended to the name,
-   * so each process is writing out a separate file.
-   * If not set, this class will make up a file name.
+   * Set/Get Name for the output file.
    */
-
   vtkSetStringMacro(FileName);
   vtkGetStringMacro(FileName);
-  vtkBooleanMacro(UseHDF5, bool);
-  void SetUseHDF5(bool);
+  ///@}
 
+  ///@{
+  /**
+   * When UseHDF5 is turned ON, the CGNS file will use HDF5 as
+   * the underlying file format. When turned OFF, the file will use ADF as the
+   * underlying file format.
+   *
+   * The Default is ON.
+   */
+  void SetUseHDF5(bool);
+  vtkGetMacro(UseHDF5, bool);
+  vtkBooleanMacro(UseHDF5, bool);
+  ///@}
+
+  ///@{
   /**
    * When WriteAllTimeSteps is turned ON, the writer is executed once for
    * each timestep available from the reader.
+   *
+   * The Default is OFF.
    */
   vtkSetMacro(WriteAllTimeSteps, bool);
   vtkGetMacro(WriteAllTimeSteps, bool);
   vtkBooleanMacro(WriteAllTimeSteps, bool);
+  ///@}
 
 protected:
-  bool WasWritingSuccessful = false;
-  char* FileName = nullptr;
-  vtkDataObject* OriginalInput = nullptr;
-  bool UseHDF5 = true;
-
-  bool WriteAllTimeSteps = false;
-  class vtkDoubleArray* TimeValues = nullptr;
-  int NumberOfTimeSteps = 0;
-  int CurrentTimeIndex = 0;
-
   vtkCGNSWriter();
   ~vtkCGNSWriter() override;
 
   int ProcessRequest(vtkInformation* request, vtkInformationVector** inputVector,
     vtkInformationVector* outputVector) override;
 
-  int RequestInformation(vtkInformation* request, vtkInformationVector** inputVector,
+  virtual int RequestInformation(vtkInformation* request, vtkInformationVector** inputVector,
     vtkInformationVector* outputVector);
 
   virtual int RequestUpdateExtent(vtkInformation* request, vtkInformationVector** inputVector,
@@ -91,6 +95,17 @@ protected:
     vtkInformationVector* outputVector) override;
 
   void WriteData() override; // pure virtual override from vtkWriter
+
+  char* FileName = nullptr;
+  bool UseHDF5 = true;
+  bool WriteAllTimeSteps = false;
+
+  int NumberOfTimeSteps = 0;
+  int CurrentTimeIndex = 0;
+  vtkDoubleArray* TimeValues = nullptr;
+
+  vtkDataObject* OriginalInput = nullptr;
+  bool WasWritingSuccessful = false;
 
 private:
   vtkCGNSWriter(const vtkCGNSWriter&) = delete;

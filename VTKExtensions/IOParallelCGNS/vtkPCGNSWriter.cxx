@@ -1,7 +1,7 @@
 /*=========================================================================
 
 Program:   Visualization Toolkit
-Module:    vtkPCGNSWriter.h
+Module:    vtkPCGNSWriter.cxx
 
 Copyright (c) Ken Martin, Will Schroeder, Bill Lorensen
 All rights reserved.
@@ -19,22 +19,23 @@ See Copyright.txt or http://www.paraview.org/HTML/Copyright.html for details.
 
 #include "vtkPCGNSWriter.h"
 
-#include <vtkAppendDataSets.h>
-#include <vtkDataObject.h>
-#include <vtkDataObjectTreeIterator.h>
-#include <vtkDoubleArray.h>
-#include <vtkInformation.h>
-#include <vtkInformationVector.h>
-#include <vtkLogger.h>
-#include <vtkMPIController.h>
-#include <vtkMultiBlockDataSet.h>
-#include <vtkMultiProcessController.h>
-#include <vtkNew.h>
-#include <vtkObjectFactory.h>
-#include <vtkPartitionedDataSet.h>
-#include <vtkPartitionedDataSetCollection.h>
-#include <vtkPolyData.h>
-#include <vtkStreamingDemandDrivenPipeline.h>
+#include "vtkAppendDataSets.h"
+#include "vtkDataObject.h"
+#include "vtkDataObjectTreeIterator.h"
+#include "vtkDoubleArray.h"
+#include "vtkInformation.h"
+#include "vtkInformationVector.h"
+#include "vtkLogger.h"
+#include "vtkMPIController.h"
+#include "vtkMultiBlockDataSet.h"
+#include "vtkMultiPieceDataSet.h"
+#include "vtkMultiProcessController.h"
+#include "vtkNew.h"
+#include "vtkObjectFactory.h"
+#include "vtkPartitionedDataSet.h"
+#include "vtkPartitionedDataSetCollection.h"
+#include "vtkPolyData.h"
+#include "vtkStreamingDemandDrivenPipeline.h"
 
 #include <map>
 #include <sstream>
@@ -42,70 +43,8 @@ See Copyright.txt or http://www.paraview.org/HTML/Copyright.html for details.
 
 namespace
 {
-// A multiblock dataset may consist of nested blocks in blocks. This is not
-// something the CGNS standard supports. Therefore, flatten nested blocks into
-// a list of blocks.
 //------------------------------------------------------------------------------
-void Flatten(const vtkSmartPointer<vtkMultiBlockDataSet>& merged,
-  const std::vector<vtkSmartPointer<vtkDataObject>>& collected)
-{
-  if (collected.empty())
-    return;
-
-  vtkMultiBlockDataSet* mb = vtkMultiBlockDataSet::SafeDownCast(collected.front());
-  if (mb)
-  {
-    for (unsigned int i = 0; i < mb->GetNumberOfBlocks(); ++i)
-    {
-      auto block = mb->GetBlock(i);
-      if (!block)
-      {
-        continue;
-      }
-
-      if (block->IsA("vtkPointSet"))
-      {
-        vtkNew<vtkAppendDataSets> append;
-        append->SetMergePoints(true);
-
-        for (auto& entry : collected)
-        {
-          vtkMultiBlockDataSet* mb2 = vtkMultiBlockDataSet::SafeDownCast(entry);
-          if (mb2)
-          {
-            auto grid = mb2->GetBlock(i);
-
-            // the following is needed to distinguish
-            // between surface and volume grids in the CGNSWriter
-            // => set the output data type
-            append->SetOutputDataSetType(grid->GetDataObjectType());
-            append->AddInputData(grid);
-          }
-        }
-
-        append->Update(); // perform the merge!
-        merged->SetBlock(i, append->GetOutputDataObject(0));
-        merged->GetMetaData(i)->Append(mb->GetMetaData(i));
-      }
-      else if (block->IsA("vtkMultiBlockDataSet"))
-      {
-        std::vector<vtkSmartPointer<vtkDataObject>> sub;
-        for (auto& entry : collected)
-        {
-          sub.push_back(vtkSmartPointer<vtkDataObject>::Take(
-            vtkMultiBlockDataSet::SafeDownCast(entry)->GetBlock(i)));
-        }
-
-        auto mergedSub = vtkSmartPointer<vtkMultiBlockDataSet>::New();
-        ::Flatten(mergedSub, sub);
-        merged->SetBlock(i, mergedSub);
-        merged->GetMetaData(i)->Append(mb->GetMetaData(i));
-      }
-    }
-  }
-}
-
-void Flatten(const vtkSmartPointer<vtkPartitionedDataSet>& merged,
+void Flatten(const vtkSmartPointer<vtkPartitionedDataSet>& mergedPD,
   const std::vector<vtkSmartPointer<vtkDataObject>>& collected)
 {
   unsigned item(0);
@@ -120,7 +59,7 @@ void Flatten(const vtkSmartPointer<vtkPartitionedDataSet>& merged,
         vtkDataObject* dataObject = partition->GetPartitionAsDataObject(i);
         if (dataObject)
         {
-          merged->SetPartition(item++, dataObject);
+          mergedPD->SetPartition(item++, dataObject);
         }
       }
     }
@@ -132,47 +71,125 @@ void Flatten(const vtkSmartPointer<vtkPartitionedDataSet>& merged,
   }
 }
 
-void Flatten(const vtkSmartPointer<vtkPartitionedDataSetCollection>& mergedCollection,
+// A multiblock dataset may consist of nested blocks in blocks. This is not
+// something the CGNS standard supports. Therefore, flatten nested blocks into
+// a list of blocks.
+//------------------------------------------------------------------------------
+void Flatten(const vtkSmartPointer<vtkMultiBlockDataSet>& mergedMB,
   const std::vector<vtkSmartPointer<vtkDataObject>>& collected)
 {
-  for (auto& entry : collected)
+  if (collected.empty())
   {
-    vtkPartitionedDataSetCollection* partitionedCollection =
-      vtkPartitionedDataSetCollection::SafeDownCast(entry);
-    if (partitionedCollection)
-    {
-      const unsigned nDataSets = partitionedCollection->GetNumberOfPartitionedDataSets();
-      mergedCollection->SetNumberOfPartitionedDataSets(nDataSets);
+    return;
+  }
 
-      for (unsigned idx = 0; idx < nDataSets; ++idx)
+  auto mbFirst = vtkMultiBlockDataSet::SafeDownCast(collected.front());
+  if (mbFirst)
+  {
+    for (unsigned int i = 0; i < mbFirst->GetNumberOfBlocks(); ++i)
+    {
+      auto block = mbFirst->GetBlock(i);
+      if (!block)
       {
-        const auto merged = mergedCollection->GetPartitionedDataSet(idx);
-        const unsigned nPartitions = partitionedCollection->GetNumberOfPartitions(idx);
-        for (unsigned i = 0; i < nPartitions; ++i)
+        continue;
+      }
+
+      if (block->IsA("vtkPointSet"))
+      {
+        vtkNew<vtkAppendDataSets> append;
+        append->SetMergePoints(true);
+
+        for (auto& entry : collected)
         {
-          vtkDataObject* dataObject = partitionedCollection->GetPartitionAsDataObject(idx, i);
-          if (dataObject)
+          auto mb = vtkMultiBlockDataSet::SafeDownCast(entry);
+          if (mb)
           {
-            merged->SetPartition(i, dataObject);
+            auto grid = mb->GetBlock(i);
+
+            // the following is needed to distinguish
+            // between surface and volume grids in the CGNSWriter
+            // => set the output data type
+            append->SetOutputDataSetType(grid->GetDataObjectType());
+            append->AddInputData(grid);
           }
         }
-        if (partitionedCollection->HasMetaData(idx))
+
+        append->Update(); // perform the merge!
+        mergedMB->SetBlock(i, append->GetOutputDataObject(0));
+        if (mbFirst->HasMetaData(i))
         {
-          mergedCollection->GetMetaData(idx)->Append(partitionedCollection->GetMetaData(idx));
+          mergedMB->GetMetaData(i)->Append(mbFirst->GetMetaData(i));
+        }
+      }
+      else if (block->IsA("vtkMultiPieceDataSet"))
+      {
+        std::vector<vtkSmartPointer<vtkDataObject>> sub;
+        for (auto& entry : collected)
+        {
+          sub.push_back((vtkMultiBlockDataSet::SafeDownCast(entry)->GetBlock(i)));
+        }
+        vtkNew<vtkMultiPieceDataSet> mergedSub;
+        ::Flatten(mergedSub.GetPointer(), sub);
+        mergedMB->SetBlock(i, mergedSub);
+        if (mbFirst->HasMetaData(i))
+        {
+          mergedMB->GetMetaData(i)->Append(mbFirst->GetMetaData(i));
+        }
+      }
+      else if (block->IsA("vtkMultiBlockDataSet"))
+      {
+        std::vector<vtkSmartPointer<vtkDataObject>> sub;
+        for (auto& entry : collected)
+        {
+          sub.push_back(vtkMultiBlockDataSet::SafeDownCast(entry)->GetBlock(i));
+        }
+
+        vtkNew<vtkMultiBlockDataSet> mergedSub;
+        ::Flatten(mergedSub.GetPointer(), sub);
+        mergedMB->SetBlock(i, mergedSub);
+        if (mbFirst->HasMetaData(i))
+        {
+          mergedMB->GetMetaData(i)->Append(mbFirst->GetMetaData(i));
         }
       }
     }
-    else
+  }
+}
+
+//------------------------------------------------------------------------------
+void Flatten(const vtkSmartPointer<vtkPartitionedDataSetCollection>& mergedPCD,
+  const std::vector<vtkSmartPointer<vtkDataObject>>& collected)
+{
+  if (collected.empty())
+  {
+    return;
+  }
+
+  auto pdcFirst = vtkPartitionedDataSetCollection::SafeDownCast(collected.front());
+  const unsigned numberOfPartitionedDatasets = pdcFirst->GetNumberOfPartitionedDataSets();
+  mergedPCD->SetNumberOfPartitionedDataSets(numberOfPartitionedDatasets);
+
+  for (unsigned i = 0; i < numberOfPartitionedDatasets; ++i)
+  {
+    std::vector<vtkSmartPointer<vtkDataObject>> sub;
+    for (auto& entry : collected)
     {
-      vtkErrorWithObjectMacro(
-        nullptr, << "Expected a vtkPartitionedDataSetCollection, got " << entry->GetClassName());
+      sub.push_back(vtkPartitionedDataSetCollection::SafeDownCast(entry)->GetPartitionedDataSet(i));
+    }
+    vtkNew<vtkPartitionedDataSet> mergedSub;
+    ::Flatten(mergedSub.GetPointer(), sub);
+    mergedPCD->SetPartitionedDataSet(i, mergedSub);
+    if (pdcFirst->HasMetaData(i))
+    {
+      mergedPCD->GetMetaData(i)->Append(pdcFirst->GetMetaData(i));
     }
   }
 }
 
 } // anonymous namespace
 
-vtkStandardNewMacro(vtkPCGNSWriter);
+//------------------------------------------------------------------------------
+vtkObjectFactoryNewMacro(vtkPCGNSWriter);
 
 //------------------------------------------------------------------------------
 vtkPCGNSWriter::vtkPCGNSWriter()
@@ -204,10 +221,15 @@ void vtkPCGNSWriter::SetController(vtkMultiProcessController* controller)
 }
 
 //------------------------------------------------------------------------------
+vtkMultiProcessController* vtkPCGNSWriter::GetController()
+{
+  return this->Controller;
+};
+
+//------------------------------------------------------------------------------
 void vtkPCGNSWriter::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
-  os << indent << "FileName " << (this->FileName ? this->FileName : "(none)") << endl;
   os << indent << "Number of pieces " << this->NumberOfPieces << endl;
   os << indent << "Request piece " << this->RequestPiece << endl;
   os << indent << "Controller ";

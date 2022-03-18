@@ -1,7 +1,8 @@
 NAME
-  ParaView::VTKExtensionsCGNSWriter
+  ParaView::VTKExtensionsIOCGNSWriter
 LIBRARY_NAME
-  vtkPVVTKExtensionsCGNSWriter
+  vtkPVVTKExtensionsIOCGNSWriter
+IMPLEMENTABLE
 KIT
   ParaView::CoreKit
 GROUPS
@@ -14,8 +15,10 @@ PRIVATE_DEPENDS
   VTK::CommonDataModel
   VTK::CommonExecutionModel
   VTK::FiltersCore
+  VTK::fmt
 TEST_DEPENDS
   VTK::IOCGNSReader
+  VTK::IOIOSS
   VTK::CommonCore
   VTK::CommonDataModel
   VTK::TestingCore
