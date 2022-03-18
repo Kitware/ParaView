@@ -1379,6 +1379,7 @@ if(PARAVIEW_USE_PYTHON)
   find_python_module(numpy numpy_found)
   if (numpy_found)
     list(APPEND TESTS_WITH_BASELINES
+      AnnotateNotSanitizedArray.xml
       ContextViewSelectionTrace.xml
       ExodusModeShapes.xml
       FindDataNameSanitization.xml
