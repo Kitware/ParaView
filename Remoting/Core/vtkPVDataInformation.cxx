@@ -585,10 +585,6 @@ void vtkPVDataInformation::CopyFromDataObject(vtkDataObject* dobj)
 
     htg->GetBounds(this->Bounds);
     htg->GetExtent(this->Extent);
-
-    // I don't understand this clunkiness; why doesn't HTG return number of
-    // vertices when GetNumberOfElements(vtkDataObject::VERTEX) is called? Oh well.
-    this->NumberOfElements[vtkDataObject::VERTEX] = htg->GetNumberOfVertices();
   }
 }
 
