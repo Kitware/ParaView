@@ -62,16 +62,6 @@ vtkSMProxy* lutProxy(pqPipelineRepresentation* repr)
   }
   return nullptr;
 }
-
-vtkSMProxy* tf2dProxy(pqPipelineRepresentation* repr)
-{
-  vtkSMProxy* reprProxy = repr ? repr->getProxy() : nullptr;
-  if (vtkSMPVRepresentationProxy::GetUsingScalarColoring(reprProxy))
-  {
-    return vtkSMPropertyHelper(reprProxy, "TransferFunction2D", true).GetAsProxy();
-  }
-  return nullptr;
-}
 }
 
 //-----------------------------------------------------------------------------
@@ -202,24 +192,6 @@ bool pqResetScalarRangeReaction::resetScalarRangeToCustom(pqPipelineRepresentati
     separateOpacity = helper.GetAsInt() == 1;
   }
 
-  bool transfer2D = false;
-  //  if (proxy->GetProperty("UseTransfer2D") && proxy->GetProperty("TransferFuncion2D"))
-  //  {
-  //    vtkSMPropertyHelper helper(proxy, "UseTransfer2D", true /*quiet*/);
-  //    transfer2D = helper.GetAsInt() == 1;
-  //  }
-
-  transfer2D = (proxy->GetProperty("TransferFunction2D") != nullptr);
-
-  if (transfer2D)
-  {
-    vtkSMProxy* tf2d = tf2dProxy(repr);
-    if (pqResetScalarRangeReaction::resetScalarRangeToCustom(tf2d))
-    {
-      repr->renderViewEventually();
-      return true;
-    }
-  }
   vtkSMProxy* lut = lutProxy(repr);
   if (pqResetScalarRangeReaction::resetScalarRangeToCustom(lut, separateOpacity))
   {
@@ -235,9 +207,6 @@ bool pqResetScalarRangeReaction::resetScalarRangeToCustom(vtkSMProxy* lut, bool 
   vtkSMTransferFunctionProxy* tfProxy = vtkSMTransferFunctionProxy::SafeDownCast(lut);
   if (tfProxy)
   {
-    //    return false;
-    //  }
-
     double range[2];
     if (!tfProxy->GetRange(range))
     {
@@ -250,6 +219,8 @@ bool pqResetScalarRangeReaction::resetScalarRangeToCustom(vtkSMProxy* lut, bool 
     dialog.showOpacityControls(separateOpacity);
     vtkSMTransferFunctionProxy* sofProxy = vtkSMTransferFunctionProxy::SafeDownCast(
       vtkSMPropertyHelper(lut, "ScalarOpacityFunction", true).GetAsProxy());
+    vtkSMTransferFunction2DProxy* tf2dProxy = vtkSMTransferFunction2DProxy::SafeDownCast(
+      vtkSMPropertyHelper(lut, "TransferFunction2D", true).GetAsProxy());
     if (sofProxy && true)
     {
       if (!sofProxy->GetRange(range))
@@ -275,6 +246,18 @@ bool pqResetScalarRangeReaction::resetScalarRangeToCustom(vtkSMProxy* lut, bool 
         }
         vtkSMTransferFunctionProxy::RescaleTransferFunction(sofProxy, range[0], range[1]);
       }
+      if (tf2dProxy)
+      {
+        double tf2dRange[4];
+        if (!tf2dProxy->GetRange(tf2dRange))
+        {
+          tf2dRange[1] = 0.0;
+          tf2dRange[2] = 1.0;
+        }
+        tf2dRange[0] = range[0];
+        tf2dRange[1] = range[1];
+        tf2dProxy->RescaleTransferFunction(tf2dRange);
+      }
       // disable auto-rescale of transfer function since the user has set on
       // explicitly (BUG #14371).
       if (dialog.lock())
@@ -287,43 +270,6 @@ bool pqResetScalarRangeReaction::resetScalarRangeToCustom(vtkSMProxy* lut, bool 
       return true;
     }
     return false;
-  }
-  else
-  {
-    vtkSMTransferFunction2DProxy* tf2dProxy = vtkSMTransferFunction2DProxy::SafeDownCast(lut);
-    if (!tf2dProxy)
-    {
-      return false;
-    }
-
-    double range[4];
-    if (!tf2dProxy->GetRange(range))
-    {
-      range[0] = 0.0;
-      range[1] = 1.0;
-      range[2] = 0.0;
-      range[3] = 1.0;
-    }
-
-    pqRescaleRange dialog(pqCoreUtilities::mainWidget());
-    dialog.setRange(range[0], range[1]);
-    dialog.showOpacityControls(false);
-    if (dialog.exec() == QDialog::Accepted)
-    {
-      BEGIN_UNDO_SET("Reset transfer function 2D ranges");
-      range[0] = dialog.minimum();
-      range[1] = dialog.maximum();
-      tf2dProxy->RescaleTransferFunction(range);
-    }
-    // disable auto-rescale of transfer function as the user has set it explicitly
-    if (dialog.lock())
-    {
-      vtkSMPropertyHelper(lut, "AutomaticRescaleRangeMode")
-        .Set(vtkSMTransferFunctionManager::NEVER);
-      lut->UpdateVTKObjects();
-    }
-    END_UNDO_SET();
-    return true;
   }
   return false;
 }
