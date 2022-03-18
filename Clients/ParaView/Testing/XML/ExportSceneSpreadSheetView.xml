@@ -13,8 +13,8 @@
   <pqevent object="pqClientMainWindow/menubar/menuFilters/Alphabetical" command="activate" arguments="ExtractSelectionOverTime" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
 
-    <!-- uncheck accl (Magnitude) -->
-  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/DisplayFrame/ProxyPanel/SeriesEditor/SeriesTable/AnnotationsTable" command="setCheckState" arguments="8.0,0" />
+    <!-- uncheck ACCL (Magnitude) -->
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/DisplayFrame/ProxyPanel/SeriesEditor/SeriesTable/AnnotationsTable" command="setCheckState" arguments="3.0,0" />
 
   <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menu_File" />
   <pqevent object="pqClientMainWindow/menubar/menu_File" command="activate" arguments="actionExport" />
