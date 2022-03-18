@@ -15,6 +15,7 @@ PRIVATE_DEPENDS
   VTK::CommonDataModel
   VTK::CommonExecutionModel
   VTK::FiltersCore
+  VTK::fmt
 TEST_DEPENDS
   VTK::IOCGNSReader
   VTK::IOIOSS

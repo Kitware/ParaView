@@ -38,10 +38,14 @@ See Copyright.txt or http://www.paraview.org/HTML/Copyright.html for details.
 #include "vtkStreamingDemandDrivenPipeline.h"
 #include "vtkStructuredGrid.h"
 #include "vtkUnstructuredGrid.h"
+#include <vtksys/SystemTools.hxx>
 
 // clang-format off
 #include "vtk_cgns.h"
 #include VTK_CGNS(cgnslib.h)
+
+#include "vtk_fmt.h"
+#include VTK_FMT(fmt/core.h)
 // clang-format on
 
 #include <map>
@@ -69,7 +73,6 @@ struct write_info
   int F, B, Z, Sol;
   int CellDim;
   bool WritePolygonalZone;
-  bool WriteAllTimeSteps;
   double TimeStep;
   const char* FileName;
   const char* BaseName;
@@ -83,7 +86,6 @@ struct write_info
     F = B = Z = Sol = 0;
     CellDim = 3;
     WritePolygonalZone = false;
-    WriteAllTimeSteps = false;
     TimeStep = 0.0;
 
     FileName = nullptr;
@@ -1160,10 +1162,7 @@ int vtkCGNSWriter::RequestUpdateExtent(vtkInformation* vtkNotUsed(request),
     this->TimeValues->SetNumberOfValues(len);
     if (data)
     {
-      for (int i = 0; i < len; i++)
-      {
-        this->TimeValues->SetValue(i, data[i]);
-      }
+      std::copy(data, data + len, this->TimeValues->GetPointer(0));
     }
   }
   if (this->TimeValues && this->WriteAllTimeSteps)
@@ -1247,14 +1246,28 @@ void vtkCGNSWriter::WriteData()
   }
 
   write_info info;
-  info.FileName = this->FileName;
-  info.WriteAllTimeSteps = this->WriteAllTimeSteps;
+  std::string fileNameWithTimeStep;
   if (this->TimeValues && this->CurrentTimeIndex < this->TimeValues->GetNumberOfValues())
   {
+    if (this->WriteAllTimeSteps && this->TimeValues->GetNumberOfValues() > 1)
+    {
+      const std::string fileNamePath = vtksys::SystemTools::GetFilenamePath(this->FileName);
+      const std::string baseName =
+        vtksys::SystemTools::GetFilenameWithoutLastExtension(this->FileName);
+      const std::string extension = vtksys::SystemTools::GetFilenameLastExtension(this->FileName);
+      fileNameWithTimeStep =
+        fmt::format("{}/{}_{:06d}{}", fileNamePath, baseName, this->CurrentTimeIndex, extension);
+      info.FileName = fileNameWithTimeStep.c_str();
+    }
+    else
+    {
+      info.FileName = this->FileName;
+    }
     info.TimeStep = this->TimeValues->GetValue(this->CurrentTimeIndex);
   }
   else
   {
+    info.FileName = this->FileName;
     info.TimeStep = 0.0;
   }
 

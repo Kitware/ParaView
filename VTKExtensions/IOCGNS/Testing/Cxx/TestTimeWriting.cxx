@@ -36,6 +36,7 @@ int TestTimeWriting(int argc, char* argv[])
   const char* filename = u->GetTempFilePath("unstructured_grid_time.cgns");
 
   vtkNew<vtkCGNSWriter> w;
+  w->WriteAllTimeStepsOn();
   w->UseHDF5Off();
   w->SetFileName(filename);
   w->SetInputData(ug);
