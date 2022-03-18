@@ -34,11 +34,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define pqVCRController_h
 
 #include "pqComponentsModule.h"
+#include "vtkParaViewDeprecation.h" // for PARAVIEW_DEPRECATED_IN_5_11_0
 #include <QObject>
 #include <QPointer>
 
 class pqPipelineSource;
 class pqAnimationScene;
+class vtkObject;
 
 // pqVCRController is the QObject that encapsulates the
 // VCR control functionality.
@@ -56,9 +58,15 @@ public:
 Q_SIGNALS:
   void timestepChanged();
 
-  // emitted with playing(true) when play begins and
-  // playing(false) when play ends.
+  // deprecated in 5.11.0
+  PARAVIEW_DEPRECATED_IN_5_11_0("Use overload with additional reversed argument.")
   void playing(bool);
+
+  // emitted as `playing(true, reversed)` when playback
+  // begins and `playing(false, reversed)` when playback ends.
+  // The value of `reversed` argument is true if
+  // playback was requested in backward direction.
+  void playing(bool, bool);
 
   // Fired when the enable state of the VCR control changes.
   // fired each time setAnimationScene() is called. If
@@ -86,14 +94,15 @@ public Q_SLOTS:
   void onNextFrame();
   void onLastFrame();
   void onPlay();
+  void onReverse();
   void onPause();
   void onLoop(bool checked);
 
 protected Q_SLOTS:
   void onTick();
   void onLoopPropertyChanged();
-  void onBeginPlay();
-  void onEndPlay();
+  void onBeginPlay(vtkObject* caller, unsigned long, void*, void* reversed);
+  void onEndPlay(vtkObject* caller, unsigned long, void*, void* reversed);
 
 private:
   Q_DISABLE_COPY(pqVCRController)

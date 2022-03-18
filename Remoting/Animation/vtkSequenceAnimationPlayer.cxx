@@ -81,6 +81,27 @@ double vtkSequenceAnimationPlayer::GetNextTime(double curtime)
 }
 
 //----------------------------------------------------------------------------
+double vtkSequenceAnimationPlayer::GetPreviousTime(double curtime)
+{
+  if (this->FrameNo == 0 && curtime > this->StartTime)
+  {
+    // Invalid Frame No, compute it correctly
+    this->FrameNo = static_cast<int>(
+      (curtime - this->StartTime) * (this->NumberOfFrames - 1) / (this->EndTime - this->StartTime) +
+      0.5);
+  }
+  this->FrameNo -= this->GetStride();
+  if (this->StartTime >= this->EndTime && this->FrameNo <= 0)
+  {
+    return VTK_DOUBLE_MIN;
+  }
+
+  double time = this->StartTime +
+    ((this->EndTime - this->StartTime) * this->FrameNo) / (this->NumberOfFrames - 1);
+  return time;
+}
+
+//----------------------------------------------------------------------------
 double vtkSequenceAnimationPlayer::GoToNext(double start, double end, double curtime)
 {
   double delta = static_cast<double>(end - start) / (this->NumberOfFrames - 1);

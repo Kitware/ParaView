@@ -75,8 +75,10 @@ void pqVCRController::setAnimationScene(pqAnimationScene* scene)
     QObject::connect(this->Scene, SIGNAL(loopChanged()), this, SLOT(onLoopPropertyChanged()));
     QObject::connect(
       this->Scene, SIGNAL(clockTimeRangesChanged()), this, SLOT(onTimeRangesChanged()));
-    QObject::connect(this->Scene, SIGNAL(beginPlay()), this, SLOT(onBeginPlay()));
-    QObject::connect(this->Scene, SIGNAL(endPlay()), this, SLOT(onEndPlay()));
+    QObject::connect(this->Scene, SIGNAL(beginPlay(vtkObject*, unsigned long, void*, void*)), this,
+      SLOT(onBeginPlay(vtkObject*, unsigned long, void*, void*)));
+    QObject::connect(this->Scene, SIGNAL(endPlay(vtkObject*, unsigned long, void*, void*)), this,
+      SLOT(onEndPlay(vtkObject*, unsigned long, void*, void*)));
     bool loop_checked =
       pqSMAdaptor::getElementProperty(scene->getProxy()->GetProperty("Loop")).toBool();
     Q_EMIT this->loop(loop_checked);
@@ -120,6 +122,29 @@ void pqVCRController::onPlay()
 }
 
 //-----------------------------------------------------------------------------
+void pqVCRController::onReverse()
+{
+  if (!this->Scene)
+  {
+    qDebug() << "No active scene. Cannot play backwards.";
+    return;
+  }
+
+  CLEAR_UNDO_STACK();
+  BEGIN_UNDO_EXCLUDE();
+
+  SM_SCOPED_TRACE(CallMethod).arg(this->Scene->getProxy()).arg("Reverse");
+
+  this->Scene->getProxy()->InvokeCommand("Reverse");
+
+  // NOTE: This is a blocking call, returns only after the
+  // the animation has stopped.
+  END_UNDO_EXCLUDE();
+
+  pqApplicationCore::instance()->render();
+}
+
+//-----------------------------------------------------------------------------
 void pqVCRController::onTick()
 {
   // No need to explicitly update all views,
@@ -131,17 +156,19 @@ void pqVCRController::onTick()
 }
 
 //-----------------------------------------------------------------------------
-void pqVCRController::onBeginPlay()
+void pqVCRController::onBeginPlay(vtkObject*, unsigned long, void*, void* reversed)
 {
-  Q_EMIT this->playing(true);
+  bool* reversedPtr = reinterpret_cast<bool*>(reversed);
+  Q_EMIT this->playing(true, reversedPtr != nullptr ? *reversedPtr : false);
   CLEAR_UNDO_STACK();
   BEGIN_UNDO_EXCLUDE();
 }
 
 //-----------------------------------------------------------------------------
-void pqVCRController::onEndPlay()
+void pqVCRController::onEndPlay(vtkObject*, unsigned long, void*, void* reversed)
 {
-  Q_EMIT this->playing(false);
+  bool* reversedPtr = reinterpret_cast<bool*>(reversed);
+  Q_EMIT this->playing(false, reversedPtr != nullptr ? *reversedPtr : false);
   END_UNDO_EXCLUDE();
 }
 

@@ -89,6 +89,18 @@ double vtkCompositeAnimationPlayer::GetNextTime(double currentime)
 }
 
 //----------------------------------------------------------------------------
+double vtkCompositeAnimationPlayer::GetPreviousTime(double currenttime)
+{
+  vtkAnimationPlayer* player = this->GetActivePlayer();
+  if (player)
+  {
+    return player->GetPreviousTime(currenttime);
+  }
+
+  return VTK_DOUBLE_MIN;
+}
+
+//----------------------------------------------------------------------------
 double vtkCompositeAnimationPlayer::GoToNext(double start, double end, double currenttime)
 {
   vtkAnimationPlayer* player = this->GetActivePlayer();

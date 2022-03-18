@@ -44,8 +44,10 @@ public:
   /**
    * Start playing the animation.
    * Fires StartEvent when play begins and EndEvent when play stops.
+   * If dir = 0, play the animation in reverse back to the beginning,
+   * else play it in the forward direction.
    */
-  void Play();
+  void Play(const int dir = 1);
 
   /**
    * Stop playing the animation.
@@ -111,6 +113,11 @@ protected:
    * Return the next time given the current time.
    */
   virtual double GetNextTime(double currentime) = 0;
+
+  /**
+   * Return the previous time given the current time.
+   */
+  virtual double GetPreviousTime(double currenttime) = 0;
 
   virtual double GoToNext(double start, double end, double currenttime) = 0;
   virtual double GoToPrevious(double start, double end, double currenttime) = 0;

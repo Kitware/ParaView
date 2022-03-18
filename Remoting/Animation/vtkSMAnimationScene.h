@@ -153,6 +153,7 @@ public:
   void SetLoop(int val);
   int GetLoop();
   void Play();
+  void Reverse();
   void Stop();
   void GoToNext();
   void GoToPrevious();
