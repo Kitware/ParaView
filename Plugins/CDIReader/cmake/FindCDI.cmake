@@ -1,28 +1,9 @@
-find_path(CDI_INCLUDE_DIRECTORY
-  cdi.h
-  DOC "The CDI include directory"
+# use this because CDI is installed in <prefix>/lib/cmake, but cmake does not look for that path
+# (see https://cmake.org/cmake/help/latest/command/find_package.html#config-mode-search-procedure)
+# This file may be removed once fixed in CDI as can be the CMAKE_MODULE_PATH leading to here.
+find_package(CDI
+  ${PACKAGE_FIND_VERSION}
+  PATHS ${CDI_DIR}
+  PATH_SUFFIXES lib/cmake lib64/cmake
+  REQUIRED
   )
-mark_as_advanced(CDI_INCLUDE_DIRECTORY)
-
-find_library(CDI_LIBRARY
-  NAMES cdi
-  DOC "The CDI library"
-  )
-mark_as_advanced(CDI_LIBRARY)
-
-include(FindPackageHandleStandardArgs)
-find_package_handle_standard_args(CDI
-  REQUIRED_VARS CDI_INCLUDE_DIRECTORY CDI_LIBRARY
-  )
-
-if (CDI_FOUND)
-  set(CDI_INCLUDE_DIRS "${CDI_INCLUDE_DIRECTORY}")
-  set(CDI_LIBRARIES "${CDI_LIBRARY}")
-
-  if (NOT TARGET CDI::CDI)
-    add_library(CDI::CDI UNKNOWN IMPORTED)
-    set_target_properties(CDI::CDI PROPERTIES
-      IMPORTED_LOCATION "${CDI_LIBRARIES}"
-      INTERFACE_INCLUDE_DIRECTORIES "${CDI_INCLUDE_DIRS}")
-  endif()
-endif()
