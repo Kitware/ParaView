@@ -30,6 +30,6 @@
 #==========================================================================
 
 vtk_module_third_party_internal(
-  LICENSE_FILES "vtkicet/README.md" # TODO: include a license file
+  LICENSE_FILES "vtkicet/Copyright.txt"
   VERSION       "2.2.0"
   INTERFACE)
