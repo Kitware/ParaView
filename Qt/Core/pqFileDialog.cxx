@@ -713,6 +713,31 @@ void pqFileDialog::setFileMode(pqFileDialog::FileMode mode)
       break;
   }
 
+  impl.Model->setDirectoryItemFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
+  impl.Model->setFileItemFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
+  switch (mode)
+  {
+    case Directory:
+      // final selectable entities will be limited to directories.
+      impl.Ui.EntityNameLabel->setText("Directory name:");
+      impl.Ui.EntityTypeLabel->setVisible(false);
+      impl.Ui.EntityType->setVisible(false);
+      impl.Model->setFileItemFlags(Qt::NoItemFlags);
+      break;
+    case ExistingFilesAndDirectories:
+      // final selectable entities can be files or directories.
+      impl.Ui.EntityNameLabel->setText("Name:");
+      impl.Ui.EntityTypeLabel->setVisible(true);
+      impl.Ui.EntityType->setVisible(true);
+      break;
+    default:
+      // final selectable entities will be limited to files.
+      impl.Ui.EntityNameLabel->setText("File name:");
+      impl.Ui.EntityTypeLabel->setVisible(true);
+      impl.Ui.EntityType->setVisible(true);
+      break;
+  }
+
   if (setupMultipleFileHelp)
   {
     // only set the tooltip and window title the first time through
