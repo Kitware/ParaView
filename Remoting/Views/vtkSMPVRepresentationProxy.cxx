@@ -691,24 +691,6 @@ bool vtkSMPVRepresentationProxy::SetScalarColoringInternal(
 
   if (vtkSMProperty* tf2dProperty = this->GetProperty("TransferFunction2D"))
   {
-    // Following commented out code would be required for separate 2D transfer function per pair of
-    // scalar arrays in the data
-    bool useGradientAsY =
-      (vtkSMPropertyHelper(this, "UseGradientForTransfer2D", true).GetAsInt() == 1);
-    std::string array2Name;
-    if (!useGradientAsY)
-    {
-      vtkSMProperty* colorArray2Property = this->GetProperty("ColorArray2Name");
-      if (colorArray2Property)
-      {
-        vtkSMPropertyHelper colorArray2Helper(colorArray2Property);
-        array2Name = colorArray2Helper.GetInputArrayNameToProcess();
-      }
-      // array2Name = this->GetDecoratedArrayName(array2Name);
-      //      array2Name =
-      //        this->GetDecoratedArrayName(vtkSMPropertyHelper(this,
-      //        "ColorArray2Name").GetAsString());
-    }
     vtkSMProxy* tf2dProxy =
       mgr->GetTransferFunction2D(decoratedArrayName.c_str(), this->GetSessionProxyManager());
     vtkSMPropertyHelper(tf2dProperty).Set(tf2dProxy);
@@ -716,7 +698,6 @@ bool vtkSMPVRepresentationProxy::SetScalarColoringInternal(
     if (lutProxy && useTransfer2D)
     {
       vtkSMPropertyHelper(lutProxy, "Use2DTransferFunction").Set(useTransfer2D);
-      // lutProxy->UpdateProperty("TransferFunction2D");
       lutProxy->UpdateVTKObjects();
     }
   }
