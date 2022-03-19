@@ -605,6 +605,10 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/TransferFunctionResetOnVisibilityChange_AllBlocks.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/TransferFunctionResetOnVisibilityChange_OneBlock.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/TransferFunctionResetOnVisibilityChange_TwoBlocks.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/TransferFunction2DEditor.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/TransferFunction2DYScalarsEditor.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/TransferFunction2DYScalarsEditor_1.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/TransferFunction2DYScalarsEditor_2.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/UniformInverseTransformSamplingGlyph_A.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/UniformInverseTransformSamplingGlyph_B.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/UniformInverseTransformSamplingGlyph_C.png}"
@@ -1805,6 +1809,9 @@ SET (AnisotropyPBR_DISABLE_CRS TRUE)
 ## image data delivery is not supported in render server mode
 SET (TransferFunction2D_DISABLE_CRS TRUE)
 SET (TransferFunction2DYScalars_DISABLE_CRS TRUE)
+## The 2D transfer function editor baselines are different on different machines
+SET (TransferFunction2D_THRESHOLD 300)
+SET (TransferFunction2DYScalars_THRESHOLD 500)
 
 # Plugins are only built as shared libraries.
 IF (NOT BUILD_SHARED_LIBS)
