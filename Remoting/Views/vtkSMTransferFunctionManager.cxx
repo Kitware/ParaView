@@ -201,7 +201,7 @@ vtkSMProxy* vtkSMTransferFunctionManager::GetTransferFunction2D(
   coupledArrayName << arrayName;
   if (array2Name && array2Name[0] != '\0')
   {
-    coupledArrayName << "." << array2Name;
+    coupledArrayName << "_" << array2Name;
   }
   vtkSMProxy* proxy = FindProxy("transfer_2d_functions", coupledArrayName.str().c_str(), pxm);
   if (proxy)
