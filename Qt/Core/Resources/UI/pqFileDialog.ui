@@ -309,17 +309,17 @@
           <number>6</number>
          </property>
          <item row="0" column="0">
-          <widget class="QLabel" name="label_2">
+          <widget class="QLabel" name="EntityNameLabel">
            <property name="text">
             <string>File name:</string>
            </property>
           </widget>
          </item>
          <item row="0" column="1">
-          <widget class="QLineEdit" name="FileName"/>
+          <widget class="QLineEdit" name="EntityName"/>
          </item>
          <item row="1" column="0">
-          <widget class="QLabel" name="label">
+          <widget class="QLabel" name="EntityTypeLabel">
            <property name="text">
             <string>Files of type:</string>
            </property>
@@ -353,7 +353,7 @@
           </widget>
          </item>
          <item row="1" column="1" colspan="2">
-          <widget class="pqFileComboBox" name="FileType">
+          <widget class="pqFileComboBox" name="EntityType">
            <property name="sizeAdjustPolicy">
             <enum>QComboBox::AdjustToContentsOnFirstShow</enum>
            </property>
@@ -375,8 +375,8 @@
   </customwidget>
  </customwidgets>
  <tabstops>
-  <tabstop>FileName</tabstop>
-  <tabstop>FileType</tabstop>
+  <tabstop>EntityName</tabstop>
+  <tabstop>EntityType</tabstop>
   <tabstop>OK</tabstop>
   <tabstop>Cancel</tabstop>
   <tabstop>Parents</tabstop>
