@@ -239,14 +239,11 @@ bool vtkCGNSWriter::vtkPrivate::WritePolygonalZone(
 
   // if a cell is not a volume cell, write it as an NGON_n entry only.
 
-  std::vector<cgsize_t> cellDataArr;
   std::vector<cgsize_t> faceDataArr;
-  std::vector<cgsize_t> cellDataIdx;
   std::vector<cgsize_t> faceDataIdx;
-  cellDataIdx.push_back(0);
   faceDataIdx.push_back(0);
 
-  cgsize_t ngons(0), ncells(0);
+  cgsize_t ncells(0), ngons(0);
   for (vtkIdType i = 0; i < grid->GetNumberOfCells(); ++i)
   {
     vtkCell* cell = grid->GetCell(i);
@@ -268,18 +265,11 @@ bool vtkCGNSWriter::vtkPrivate::WritePolygonalZone(
       continue;
     }
 
-#if CGNS_VERSION >= 3400
-    cellDataIdx.push_back(nFaces);
-#else
-    cellDataArr.push_back(nFaces);
-#endif
     for (int f = 0; f < nFaces; ++f)
     {
       vtkCell* face = cell->GetFace(f);
       cgsize_t nPts = static_cast<cgsize_t>(face->GetNumberOfPoints());
 
-      // NFACE_n references an ngon in the NGON_n array
-      cellDataArr.push_back(CGNS_COUNTING_OFFSET + ngons); // ngons start counting at 0
 #if CGNS_VERSION >= 3400
       faceDataIdx.push_back(nPts);
 #else
@@ -292,6 +282,34 @@ bool vtkCGNSWriter::vtkPrivate::WritePolygonalZone(
       ++ngons;
     }
     ++ncells;
+  }
+
+  std::vector<cgsize_t> cellDataArr;
+  std::vector<cgsize_t> cellDataIdx;
+  cellDataIdx.push_back(0);
+  cgsize_t ngon(0);
+  for (vtkIdType i = 0; i < grid->GetNumberOfCells(); ++i)
+  {
+    vtkCell* cell = grid->GetCell(i);
+    int nFaces = cell->GetNumberOfFaces();
+    if (nFaces == 0)
+    {
+      ++ngon;
+      continue;
+    }
+
+#if CGNS_VERSION >= 3400
+    cellDataIdx.push_back(nFaces);
+#else
+    cellDataArr.push_back(nFaces);
+#endif
+    for (int f = 0; f < nFaces; ++f)
+    {
+      // NFACE_n references an ngon in the NGON_n array
+      // that array starts with offset 'ncells' so take that into account
+      cellDataArr.push_back(CGNS_COUNTING_OFFSET + ncells + ngon); // ngon start counting at 0
+      ++ngon;
+    }
   }
 
 #if CGNS_VERSION >= 3400
@@ -308,26 +326,26 @@ bool vtkCGNSWriter::vtkPrivate::WritePolygonalZone(
 
   int dummy(0);
   int nBoundary(0);
-  if (ncells > 0)
-  {
-#if CGNS_VERSION >= 3400
-    cg_check_operation(
-      cg_poly_section_write(info.F, info.B, info.Z, "Elem_NFACE_n", CGNS_ENUMV(NFACE_n), 1 + ngons,
-        ncells + ngons, nBoundary, cellDataArr.data(), cellDataIdx.data(), &dummy));
-#else
-    cg_check_operation(cg_section_write(info.F, info.B, info.Z, "Elem_NFACE_n", CGNS_ENUMV(NFACE_n),
-      1 + ngons, ncells + ngons, nBoundary, cellDataArr.data(), &dummy));
-#endif
-  }
-
   if (ngons > 0)
   {
 #if CGNS_VERSION >= 3400
-    cg_check_operation(cg_poly_section_write(info.F, info.B, info.Z, "Elem_NGON_n",
-      CGNS_ENUMV(NGON_n), 1, ngons, nBoundary, faceDataArr.data(), faceDataIdx.data(), &dummy));
+    cg_check_operation(
+      cg_poly_section_write(info.F, info.B, info.Z, "Elem_NGON_n", CGNS_ENUMV(NGON_n), 1 + ncells,
+        ncells + ngons, nBoundary, faceDataArr.data(), faceDataIdx.data(), &dummy));
 #else
     cg_check_operation(cg_section_write(info.F, info.B, info.Z, "Elem_NGON_n", CGNS_ENUMV(NGON_n),
-      1, ngons, nBoundary, faceDataArr.data(), &dummy));
+      1 + ncells, ncells + ngons, nBoundary, faceDataArr.data(), &dummy));
+#endif
+  }
+
+  if (ncells > 0)
+  {
+#if CGNS_VERSION >= 3400
+    cg_check_operation(cg_poly_section_write(info.F, info.B, info.Z, "Elem_NFACE_n",
+      CGNS_ENUMV(NFACE_n), 1, ncells, nBoundary, cellDataArr.data(), cellDataIdx.data(), &dummy));
+#else
+    cg_check_operation(cg_section_write(info.F, info.B, info.Z, "Elem_NFACE_n", CGNS_ENUMV(NFACE_n),
+      1, ncells, nBoundary, cellDataArr.data(), &dummy));
 #endif
   }
 
@@ -373,15 +391,15 @@ bool vtkCGNSWriter::vtkPrivate::WritePointSet(
     return false;
   }
 
-  info.SolutionName = "PointData";
-  if (!vtkPrivate::WriteFieldArray(info, CGNS_ENUMV(Vertex), grid->GetPointData(), nullptr, error))
+  info.SolutionName = "CellData";
+  auto ptr = (isPolygonal ? nullptr : &cellTypeMap);
+  if (!vtkPrivate::WriteFieldArray(info, CGNS_ENUMV(CellCenter), grid->GetCellData(), ptr, error))
   {
     return false;
   }
 
-  info.SolutionName = "CellData";
-  auto ptr = (isPolygonal ? nullptr : &cellTypeMap);
-  if (!vtkPrivate::WriteFieldArray(info, CGNS_ENUMV(CellCenter), grid->GetCellData(), ptr, error))
+  info.SolutionName = "PointData";
+  if (!vtkPrivate::WriteFieldArray(info, CGNS_ENUMV(Vertex), grid->GetPointData(), nullptr, error))
   {
     return false;
   }
@@ -416,6 +434,16 @@ bool vtkCGNSWriter::vtkPrivate::WriteZoneTimeInformation(write_info& info, std::
     cg_check_operation(cg_ziter_write(info.F, info.B, info.Z, "ZoneIterativeData_t"));
     cg_check_operation(cg_goto(info.F, info.B, "Zone_t", info.Z, "ZoneIterativeData_t", 1, "end"));
 
+    if (hasCellData)
+    {
+      int sol[1] = { cellDataS };
+      const char* timeStepNames = "CellData\0                       ";
+      cg_check_operation(
+        cg_array_write("FlowSolutionCellPointers", CGNS_ENUMV(Character), 2, dim, timeStepNames));
+      cg_check_operation(cg_array_write("CellCenterIndices", CGNS_ENUMV(Integer), 1, &dim[1], sol));
+      cg_check_operation(cg_descriptor_write("CellCenterPrefix", "CellCenter"));
+    }
+
     if (hasVertData)
     {
       int sol[1] = { vertDataS };
@@ -425,15 +453,6 @@ bool vtkCGNSWriter::vtkPrivate::WriteZoneTimeInformation(write_info& info, std::
       cg_check_operation(
         cg_array_write("VertexSolutionIndices", CGNS_ENUMV(Integer), 1, &dim[1], sol));
       cg_check_operation(cg_descriptor_write("VertexPrefix", "Vertex"));
-    }
-    if (hasCellData)
-    {
-      int sol[1] = { cellDataS };
-      const char* timeStepNames = "CellData\0                       ";
-      cg_check_operation(
-        cg_array_write("FlowSolutionCellPointers", CGNS_ENUMV(Character), 2, dim, timeStepNames));
-      cg_check_operation(cg_array_write("CellCenterIndices", CGNS_ENUMV(Integer), 1, &dim[1], sol));
-      cg_check_operation(cg_descriptor_write("CellCenterPrefix", "CellCenter"));
     }
   }
   return true;
