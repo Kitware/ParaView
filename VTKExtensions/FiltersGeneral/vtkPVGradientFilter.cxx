@@ -16,6 +16,8 @@
 #include "vtkPVGradientFilter.h"
 
 #include "vtkDemandDrivenPipeline.h"
+#include "vtkHyperTreeGrid.h"
+#include "vtkHyperTreeGridGradient.h"
 #include "vtkImageData.h"
 #include "vtkImageGradient.h"
 #include "vtkInformation.h"
@@ -33,12 +35,56 @@ void vtkPVGradientFilter::PrintSelf(ostream& os, vtkIndent indent)
 }
 
 //----------------------------------------------------------------------------
+int vtkPVGradientFilter::FillInputPortInformation(int port, vtkInformation* info)
+{
+  auto res = this->Superclass::FillInputPortInformation(port, info);
+  if (port == 0)
+  {
+    info->Append(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkHyperTreeGrid");
+  }
+  return res;
+}
+
+//----------------------------------------------------------------------------
+int vtkPVGradientFilter::FillOutputPortInformation(int port, vtkInformation* info)
+{
+  auto res = this->Superclass::FillOutputPortInformation(port, info);
+  if (port == 0)
+  {
+    info->Set(vtkDataObject::DATA_TYPE_NAME(), "vtkDataObject");
+  }
+  return res;
+}
+
+//----------------------------------------------------------------------------
+int vtkPVGradientFilter::RequestDataObject(
+  vtkInformation* request, vtkInformationVector** inputVector, vtkInformationVector* outputVector)
+{
+  vtkHyperTreeGrid* inHTG = vtkHyperTreeGrid::GetData(inputVector[0]);
+
+  if (inHTG)
+  {
+    vtkInformation* info = outputVector->GetInformationObject(0);
+    vtkDataObject* output = vtkDataObject::SafeDownCast(info->Get(vtkDataObject::DATA_OBJECT()));
+    if (!output || !output->IsA(inHTG->GetClassName()))
+    {
+      vtkHyperTreeGrid* newOutput = inHTG->NewInstance();
+      info->Set(vtkDataObject::DATA_OBJECT(), newOutput);
+      newOutput->Delete();
+    }
+    return 1;
+  }
+  return this->Superclass::RequestDataObject(request, inputVector, outputVector);
+}
+
+//----------------------------------------------------------------------------
 int vtkPVGradientFilter::RequestData(
   vtkInformation* request, vtkInformationVector** inputVector, vtkInformationVector* outputVector)
 {
   vtkDataObject* inDataObj = vtkDataObject::GetData(inputVector[0]);
+  vtkHyperTreeGrid* inHTG = vtkHyperTreeGrid::GetData(inputVector[0]);
 
-  if (!inDataObj)
+  if (!inDataObj && !inHTG)
   {
     vtkErrorMacro(<< "Failed to get input data object.");
     return 0;
@@ -61,6 +107,19 @@ int vtkPVGradientFilter::RequestData(
     imageGradFilter->SetDimensionality(this->Dimensionality);
     imageGradFilter->Update();
     outDataObj->ShallowCopy(imageGradFilter->GetOutput(0));
+
+    return 1;
+  }
+
+  // the vtkHyperTreeGrid has a specific processing
+  if (inHTG)
+  {
+    vtkNew<vtkHyperTreeGridGradient> htgGradient;
+    htgGradient->SetInputData(0, inHTG);
+    htgGradient->SetResultArrayName(this->ResultArrayName);
+    htgGradient->SetInputArrayToProcess(0, this->GetInputArrayInformation(0));
+    htgGradient->Update();
+    outDataObj->ShallowCopy(htgGradient->GetOutput(0));
 
     return 1;
   }
