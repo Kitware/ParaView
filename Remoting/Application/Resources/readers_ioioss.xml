@@ -561,6 +561,14 @@
         </Documentation>
       </IntVectorProperty>
 
+      <DoubleVectorProperty command="SetDisplacementMagnitude"
+                            default_values="1"
+                            name="DisplacementMagnitude"
+                            number_of_elements="1">
+        <DoubleRangeDomain name="range" />
+        <Documentation>When displacements are being applied, they are scaled by
+        this amount. Set to 1 for no scaling.</Documentation>
+      </DoubleVectorProperty>
 
       <IntVectorProperty name="RemoveUnusedPoints"
         command="SetRemoveUnusedPoints"
@@ -669,6 +677,7 @@
       </PropertyGroup>
 
       <PropertyGroup label="Miscellaneous">
+        <Property name="DisplacementMagnitude" />
         <Property name="ApplyDisplacements" />
         <Property name="RemoveUnusedPoints" />
         <Property name="GenerateFileId" />
