@@ -409,6 +409,9 @@ being of a vtkDoubleArray.</Documentation>
                          name="CoordinateResults"
                          number_of_elements="1">
         <BooleanDomain name="bool" />
+        <Hints>
+            <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="AttributeType" value="0" inverse="0" />
+        </Hints>
         <Documentation>The value of this property determines whether the
         results of this computation should be used as point coordinates or as a
         new array.</Documentation>
