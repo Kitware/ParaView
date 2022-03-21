@@ -32,12 +32,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqViewResolutionPropertyWidget.h"
 #include "ui_pqViewResolutionPropertyWidget.h"
 
+#include "pqApplicationCore.h"
 #include "pqCoreUtilities.h"
+#include "pqSettings.h"
 #include "vtkCommand.h"
 #include "vtkSMDomain.h"
 #include "vtkSMProperty.h"
 #include "vtkSMProxy.h"
 
+#include <QAction>
 #include <QIntValidator>
 #include <QStyle>
 
@@ -45,7 +48,7 @@ class pqViewResolutionPropertyWidget::pqInternals
 {
 public:
   Ui::ViewResolutionPropertyWidget Ui;
-  QSize SizeForAspect;
+  QSize RecentResolution, SizeForAspect;
 
   void resetAspect()
   {
@@ -54,6 +57,30 @@ public:
     {
       this->SizeForAspect = QSize(1, 1);
     }
+  }
+
+  QString getRecentResolutionKey(vtkSMProxy* smproxy)
+  {
+    return QString("%1Dialog.RecentResolution").arg(smproxy->GetXMLName());
+  }
+
+  void saveRecentResolution(vtkSMProxy* smproxy)
+  {
+    this->RecentResolution = QSize(this->Ui.width->text().toInt(), this->Ui.height->text().toInt());
+    QByteArray ba;
+    QDataStream ds(&ba, QIODevice::WriteOnly);
+    ds << this->RecentResolution;
+    pqSettings* settings = pqApplicationCore::instance()->settings();
+    settings->setValue(this->getRecentResolutionKey(smproxy), ba);
+  }
+
+  void getRecentResolution(vtkSMProxy* smproxy)
+  {
+    pqSettings* settings = pqApplicationCore::instance()->settings();
+    QByteArray ba =
+      settings->value(this->getRecentResolutionKey(smproxy), QSize(0, 0)).toByteArray();
+    QDataStream ds(&ba, QIODevice::ReadOnly);
+    ds >> this->RecentResolution;
   }
 };
 
@@ -85,6 +112,28 @@ pqViewResolutionPropertyWidget::pqViewResolutionPropertyWidget(
     Qt::QueuedConnection);
   this->connect(ui.height, SIGNAL(textEdited(const QString&)),
     SLOT(heightTextEdited(const QString&)), Qt::QueuedConnection);
+
+  QStringList defaultItems;
+  defaultItems << "1280 x 720 (HD)"
+               << "1280 x 800 (WXGA)"
+               << "1280 x 1024 (SXGA)"
+               << "1600 x 900 (HD+)"
+               << "1920 x 1080 (FHD)"
+               << "3840 x 2160 (4K UHD)";
+  ui.presetResolution->setToolButtonStyle(Qt::ToolButtonIconOnly);
+  ui.presetResolution->setToolTip("Presets");
+  ui.presetResolution->setPopupMode(QToolButton::InstantPopup);
+  Q_FOREACH (const QString& txt, defaultItems)
+  {
+    QAction* actn = new QAction(txt, ui.presetResolution);
+    actn->setObjectName(QString("%1X").arg(txt));
+    actn->setData(txt);
+    ui.presetResolution->addAction(actn);
+    this->connect(actn, SIGNAL(triggered()), SLOT(applyPreset()));
+  }
+
+  this->Internals->getRecentResolution(smproxy);
+  this->connect(ui.recentResolution, SIGNAL(clicked()), SLOT(applyRecent()));
 
   this->connect(ui.scaleBy, SIGNAL(scale(double)), SLOT(scale(double)));
   this->connect(ui.lockAspectRatio, SIGNAL(toggled(bool)), SLOT(lockAspectRatioToggled(bool)));
@@ -125,6 +174,7 @@ void pqViewResolutionPropertyWidget::resetButtonClicked()
 void pqViewResolutionPropertyWidget::apply()
 {
   this->Superclass::apply();
+  this->Internals->saveRecentResolution(this->proxy());
   Q_EMIT this->clearHighlight();
 }
 
@@ -143,6 +193,31 @@ void pqViewResolutionPropertyWidget::scale(double factor)
     QString::number(static_cast<int>(ui.width->text().toInt() * factor)));
   ui.height->setTextAndResetCursor(
     QString::number(static_cast<int>(ui.height->text().toInt() * factor)));
+}
+
+//-----------------------------------------------------------------------------
+void pqViewResolutionPropertyWidget::applyPreset()
+{
+  QRegExp re("^(\\d+) x (\\d+)"); // parse the width and height from the resolution string (w x h)
+  QAction* actn = qobject_cast<QAction*>(this->sender());
+  if (actn != nullptr && re.indexIn(actn->text()) != -1)
+  {
+    Ui::ViewResolutionPropertyWidget& ui = this->Internals->Ui;
+    ui.width->setTextAndResetCursor(QString::number(static_cast<int>(re.cap(1).toInt())));
+    ui.height->setTextAndResetCursor(QString::number(static_cast<int>(re.cap(2).toInt())));
+  }
+}
+
+//-----------------------------------------------------------------------------
+void pqViewResolutionPropertyWidget::applyRecent()
+{
+  const QSize& resolution = this->Internals->RecentResolution;
+  if (!resolution.isEmpty())
+  {
+    Ui::ViewResolutionPropertyWidget& ui = this->Internals->Ui;
+    ui.width->setTextAndResetCursor(QString::number(static_cast<int>(resolution.width())));
+    ui.height->setTextAndResetCursor(QString::number(static_cast<int>(resolution.height())));
+  }
 }
 
 //-----------------------------------------------------------------------------

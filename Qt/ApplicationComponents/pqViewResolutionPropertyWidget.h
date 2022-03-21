@@ -84,6 +84,8 @@ Q_SIGNALS:
 private Q_SLOTS:
   void resetButtonClicked();
   void scale(double factor);
+  void applyPreset();
+  void applyRecent();
   void widthTextEdited(const QString&);
   void heightTextEdited(const QString&);
   void lockAspectRatioToggled(bool);
