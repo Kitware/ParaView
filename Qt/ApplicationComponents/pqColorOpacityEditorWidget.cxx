@@ -1646,8 +1646,9 @@ void pqColorOpacityEditorWidget::chooseBoxColorAlpha()
 
   QColor initialColor;
   initialColor.setRgbF(color[0], color[1], color[2], color[3]);
-  QColor c = QColorDialog::getColor(
-    initialColor, this, tr("Choose box color"), QColorDialog::ShowAlphaChannel);
+  // Avoid using native color dialog because QtTesting fails to choose color on mac
+  QColor c = QColorDialog::getColor(initialColor, this, tr("Choose box color"),
+    QColorDialog::ShowAlphaChannel | QColorDialog::DontUseNativeDialog);
   if (c.isValid())
   {
     chart->SetActiveBoxColorAlpha(c.redF(), c.greenF(), c.blueF(), c.alphaF());
