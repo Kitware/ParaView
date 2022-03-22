@@ -192,6 +192,11 @@ public:
 
   vtkGetObjectMacro(Renderer, vtkOpenGLRenderer);
 
+  /**
+   * Set the physical up direction of the render window.
+   */
+  void SetViewUp(const std::string& axis);
+
   void SaveCameraPose(int loc);
   void LoadCameraPose(int loc);
   void SetScaleFactor(float val);

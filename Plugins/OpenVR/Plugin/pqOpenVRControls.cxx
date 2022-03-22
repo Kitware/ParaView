@@ -108,6 +108,14 @@ void pqOpenVRControls::constructor(vtkPVOpenVRHelper* val)
   QObject::connect(this->Internals->cropSnapping, &QCheckBox::stateChanged,
     std::bind(&vtkPVOpenVRHelper::SetCropSnapping, this->Helper, std::placeholders::_1));
 
+  QObject::connect(
+    this->Internals->viewUpCombo, QCOMBOBOX_TEXT_ACTIVATED_SLOT, [=](QString const& text) {
+      if (!text.isEmpty())
+      {
+        this->Helper->SetViewUp(text.toUtf8().toStdString());
+      }
+    });
+
   QObject::connect(this->Internals->showFloorCheckbox, &QCheckBox::stateChanged, [&](int state) {
     auto ovrr = vtkVRRenderer::SafeDownCast(this->Helper->GetRenderer());
     if (ovrr)
@@ -118,7 +126,7 @@ void pqOpenVRControls::constructor(vtkPVOpenVRHelper* val)
 
   QObject::connect(
     this->Internals->scaleFactorCombo, QCOMBOBOX_TEXT_ACTIVATED_SLOT, [=](QString const& text) {
-      if (!this->NoForward && text.length())
+      if (!this->NoForward && !text.isEmpty())
       {
         this->Helper->SetScaleFactor(std::stof(text.toUtf8().toStdString()));
       }
@@ -126,7 +134,7 @@ void pqOpenVRControls::constructor(vtkPVOpenVRHelper* val)
 
   QObject::connect(
     this->Internals->motionFactorCombo, QCOMBOBOX_TEXT_ACTIVATED_SLOT, [=](QString const& text) {
-      if (!this->NoForward && text.length())
+      if (!this->NoForward && !text.isEmpty())
       {
         this->Helper->SetMotionFactor(std::stof(text.toUtf8().toStdString()));
       }
@@ -134,7 +142,7 @@ void pqOpenVRControls::constructor(vtkPVOpenVRHelper* val)
 
   QObject::connect(
     this->Internals->loadCameraCombo, QCOMBOBOX_TEXT_ACTIVATED_SLOT, [=](QString const& text) {
-      if (!this->NoForward && text.length())
+      if (!this->NoForward && !text.isEmpty())
       {
         this->Helper->LoadCameraPose(std::stoi(text.toUtf8().toStdString()));
       }
@@ -142,7 +150,7 @@ void pqOpenVRControls::constructor(vtkPVOpenVRHelper* val)
 
   QObject::connect(
     this->Internals->saveCameraCombo, QCOMBOBOX_TEXT_ACTIVATED_SLOT, [=](QString const& text) {
-      if (text.length())
+      if (!text.isEmpty())
       {
         this->Helper->SaveCameraPose(std::stoi(text.toUtf8().toStdString()));
       }
