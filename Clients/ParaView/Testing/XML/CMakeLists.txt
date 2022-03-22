@@ -1059,6 +1059,7 @@ list(APPEND TESTS_WITH_BASELINES
   MoleculeToLines.xml
   # MultiBlockAttributes1.xml
   MultiBlockInspector.xml
+  MultiBlockInspectorExtractBlocks.xml
   MultiBlockSingleBlock.xml
   MultiBlockVolumeRendering.xml
   MultiSliceMultiBlock.xml

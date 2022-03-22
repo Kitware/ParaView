@@ -34,21 +34,20 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqActiveObjects.h"
 #include "pqApplicationCore.h"
+#include "pqObjectBuilder.h"
 #include "pqOutputPort.h"
 #include "pqProxyWidget.h"
-#include "pqServer.h"
 #include "pqSettings.h"
-#include "vtkPVLogger.h"
+
 #include "vtkSMPropertyGroup.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMProxy.h"
 #include "vtkSMSessionProxyManager.h"
 #include "vtkSMSourceProxy.h"
+#include "vtkSMStringVectorProperty.h"
 #include "vtkSmartPointer.h"
 
 #include <QPointer>
-
-#include <cassert>
 
 //=============================================================================
 class pqMultiBlockInspectorWidget::pqInternals : public QObject
@@ -140,6 +139,35 @@ public:
       this->Representation = repr;
       this->update();
     }
+    this->Ui.extractBlocks->setEnabled(repr != nullptr);
+  }
+
+  void extract()
+  {
+    // first save selectors, because if you create the filter first
+    // the port/representation of the inspector will change and the selectors will be reset.
+    auto helperProxy = this->HelperProxyWidget->proxy();
+    // we need to check both BlockSelectors and Selectors because different properties are available
+    // if hasAppearanceProperties is true, see update()
+    auto selectorsProperty = vtkSMStringVectorProperty::SafeDownCast(
+      helperProxy->GetProperty("BlockSelectors") ? helperProxy->GetProperty("BlockSelectors")
+                                                 : helperProxy->GetProperty("Selectors"));
+    Q_ASSERT(selectorsProperty != nullptr);
+    std::vector<std::string> selectors(selectorsProperty->GetUncheckedElements());
+    // create extract block filter
+    pqObjectBuilder* builder = pqApplicationCore::instance()->getObjectBuilder();
+    auto extractBlockFilter = builder->createFilter(
+      "filters", "ExtractBlock", this->OutputPort->getSource(), this->OutputPort->getPortNumber());
+    auto extractBlockProxy = extractBlockFilter->getProxy();
+    // set assembly
+    vtkSMPropertyHelper(extractBlockProxy, "Assembly").Set("Hierarchy");
+    // copy selectors
+    unsigned int idx = 0;
+    for (const auto& selector : selectors)
+    {
+      vtkSMPropertyHelper(extractBlockProxy, "Selectors").Set(idx++, selector.c_str());
+    }
+    extractBlockProxy->UpdateVTKObjects();
   }
 };
 
@@ -198,6 +226,8 @@ pqMultiBlockInspectorWidget::pqMultiBlockInspectorWidget(
     QObject::connect(&activeObjects,
       QOverload<pqDataRepresentation*>::of(&pqActiveObjects::representationChanged), &internals,
       &pqInternals::setRepresentation);
+    QObject::connect(
+      internals.Ui.extractBlocks, &QPushButton::clicked, &internals, &pqInternals::extract);
 
     internals.setOutputPort(activeObjects.activePort());
     internals.setRepresentation(activeObjects.activeRepresentation());
