@@ -23,6 +23,7 @@
   <ul class="wy-breadcrumbs">
     {%- block breadcrumbs %}
       <li><a href="{{ pathto(master_doc) }}" class="icon icon-home"></a> &raquo;</li>
+      {% trans path=pathto('genindex') %}<a href="{{ path }}" class="float-right">Index</a> {% endtrans %}
         {%- for doc in parents %}
           <li><a href="{{ doc.link|e }}">{{ doc.title }}</a> &raquo;</li>
         {%- endfor %}

@@ -136,7 +136,12 @@
           {%- if logo and theme_logo_only %}
             <a href="{{ pathto(master_doc) }}">
           {%- else %}
-            <a href="{{ pathto(master_doc) }}" class="icon icon-home"> {{ project }}
+            <ul>
+              <li> <a href="{{ pathto(master_doc) }}">
+                <img src="{{ pathto('_static/' + logo, 1) }}"
+                alt="{{ project }}"></img></a> </li>
+              <li class="version"> version {{ release }}</li>
+            </ul>
           {%- endif %}
 
           {%- if logo %}
