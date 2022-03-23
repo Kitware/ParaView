@@ -32,7 +32,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqCylinderPropertyWidget.h"
 #include "ui_pqCylinderPropertyWidget.h"
 
+#include "pqActiveObjects.h"
 #include "pqRenderView.h"
+
 #include "vtkCamera.h"
 #include "vtkMath.h"
 #include "vtkSMNewWidgetRepresentationProxy.h"
@@ -153,7 +155,8 @@ pqCylinderPropertyWidget::pqCylinderPropertyWidget(
   this->AdvancedPropertyWidgets[0] = ui.scaling;
   this->AdvancedPropertyWidgets[1] = ui.outlineTranslation;
 
-  this->placeWidget();
+  QObject::connect(&pqActiveObjects::instance(), &pqActiveObjects::dataUpdated, this,
+    &pqCylinderPropertyWidget::placeWidget);
 }
 
 //-----------------------------------------------------------------------------

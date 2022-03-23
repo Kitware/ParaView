@@ -32,7 +32,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqBoxPropertyWidget.h"
 #include "ui_pqBoxPropertyWidget.h"
 
+#include "pqActiveObjects.h"
 #include "pqUndoStack.h"
+
 #include "vtkSMNewWidgetRepresentationProxy.h"
 #include "vtkSMPropertyGroup.h"
 #include "vtkSMUncheckedPropertyHelper.h"
@@ -193,47 +195,55 @@ pqBoxPropertyWidget::pqBoxPropertyWidget(
   ui.show3DWidget->connect(this, SIGNAL(widgetVisibilityToggled(bool)), SLOT(setChecked(bool)));
   this->setWidgetVisible(ui.show3DWidget->isChecked());
 
-  QObject::connect(ui.resetBounds, &QAbstractButton::clicked, [this, wdgProxy](bool) {
-    auto bbox = this->dataBounds();
-    if (!bbox.IsValid())
-    {
-      return;
-    }
-    if (this->BoxIsRelativeToInput ||
-      vtkSMUncheckedPropertyHelper(wdgProxy, "UseReferenceBounds").GetAsInt() == 1)
-    {
-      double bds[6];
-      bbox.GetBounds(bds);
-      vtkSMPropertyHelper(wdgProxy, "ReferenceBounds").Set(bds, 6);
+  QMetaObject::Connection placeWidgetConnection;
 
-      const double scale[3] = { 1, 1, 1 };
-      vtkSMPropertyHelper(wdgProxy, "Scale").Set(scale, 3);
+  QObject::connect(
+    ui.resetBounds, &QAbstractButton::clicked, [this, wdgProxy, &placeWidgetConnection](bool) {
+      auto bbox = this->dataBounds();
+      if (!bbox.IsValid())
+      {
+        return;
+      }
+      if (this->BoxIsRelativeToInput ||
+        vtkSMUncheckedPropertyHelper(wdgProxy, "UseReferenceBounds").GetAsInt() == 1)
+      {
+        double bds[6];
+        bbox.GetBounds(bds);
+        vtkSMPropertyHelper(wdgProxy, "ReferenceBounds").Set(bds, 6);
 
-      const double pos[3] = { 0, 0, 0 };
-      vtkSMPropertyHelper(wdgProxy, "Position").Set(pos, 3);
+        const double scale[3] = { 1, 1, 1 };
+        vtkSMPropertyHelper(wdgProxy, "Scale").Set(scale, 3);
 
-      const double orient[3] = { 0, 0, 0 };
-      vtkSMPropertyHelper(wdgProxy, "Rotation").Set(orient, 3);
-    }
-    else
-    {
-      double bds[6] = { 0, 1, 0, 1, 0, 1 };
-      vtkSMPropertyHelper(wdgProxy, "ReferenceBounds").Set(bds, 6);
+        const double pos[3] = { 0, 0, 0 };
+        vtkSMPropertyHelper(wdgProxy, "Position").Set(pos, 3);
 
-      double lengths[3];
-      bbox.GetLengths(lengths);
-      vtkSMPropertyHelper(wdgProxy, "Scale").Set(lengths, 3);
+        const double orient[3] = { 0, 0, 0 };
+        vtkSMPropertyHelper(wdgProxy, "Rotation").Set(orient, 3);
+      }
+      else
+      {
+        double bds[6] = { 0, 1, 0, 1, 0, 1 };
+        vtkSMPropertyHelper(wdgProxy, "ReferenceBounds").Set(bds, 6);
 
-      const double orient[3] = { 0, 0, 0 };
-      vtkSMPropertyHelper(wdgProxy, "Rotation").Set(orient, 3);
+        double lengths[3];
+        bbox.GetLengths(lengths);
+        vtkSMPropertyHelper(wdgProxy, "Scale").Set(lengths, 3);
 
-      vtkSMPropertyHelper(wdgProxy, "Position").Set(bbox.GetMinPoint(), 3);
-    }
-    wdgProxy->UpdateVTKObjects();
-    Q_EMIT this->changeAvailable();
-    this->placeWidget();
-    this->render();
-  });
+        const double orient[3] = { 0, 0, 0 };
+        vtkSMPropertyHelper(wdgProxy, "Rotation").Set(orient, 3);
+
+        vtkSMPropertyHelper(wdgProxy, "Position").Set(bbox.GetMinPoint(), 3);
+      }
+      wdgProxy->UpdateVTKObjects();
+      Q_EMIT this->changeAvailable();
+      if (placeWidgetConnection)
+      {
+        QObject::disconnect(placeWidgetConnection);
+      }
+      placeWidgetConnection = QObject::connect(&pqActiveObjects::instance(),
+        &pqActiveObjects::dataUpdated, this, &pqBoxPropertyWidget::placeWidget);
+      this->render();
+    });
 }
 
 //-----------------------------------------------------------------------------
