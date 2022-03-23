@@ -165,6 +165,7 @@ public:
   Ui::propertiesPanel Ui;
   QPointer<pqView> View;
   QPointer<pqProxy> Source;
+  int SourcePort;
   QPointer<pqDataRepresentation> Representation;
   QMap<void*, QPointer<pqProxyWidgets>> SourceWidgets;
   QPointer<pqProxyWidgets> DisplayWidgets;
@@ -178,7 +179,8 @@ public:
 
   //---------------------------------------------------------------------------
   pqInternals(pqPropertiesPanel* panel)
-    : ReceivedChangeAvailable(false)
+    : SourcePort(-1)
+    , ReceivedChangeAvailable(false)
   {
     this->Ui.setupUi(panel);
 
@@ -241,7 +243,6 @@ public:
   {
     if (this->Source)
     {
-      // this->Source->updatePipeline();
       vtkSMProxy* proxy = this->Source->getProxy();
       if (vtkSMSourceProxy* sourceProxy = vtkSMSourceProxy::SafeDownCast(proxy))
       {
@@ -446,8 +447,18 @@ void pqPropertiesPanel::setPipelineProxy(pqProxy* proxy)
 {
   if (auto port = qobject_cast<pqOutputPort*>(proxy))
   {
+    this->Internals->SourcePort = port->getPortNumber();
     proxy = port->getSource();
   }
+  else if (proxy)
+  {
+    this->Internals->SourcePort = 0;
+  }
+  else
+  {
+    this->Internals->SourcePort = -1;
+  }
+
   this->updatePropertiesPanel(proxy);
   this->updateButtonState();
 }
@@ -456,6 +467,11 @@ void pqPropertiesPanel::setPipelineProxy(pqProxy* proxy)
 void pqPropertiesPanel::updatePanel()
 {
   auto& internals = (*this->Internals);
+  if (!internals.Source.isNull() && internals.SourcePort < 0)
+  {
+    internals.SourcePort = 0;
+  }
+
   this->updatePropertiesPanel(internals.Source);
   this->updateDisplayPanel(internals.Representation);
   this->updateViewPanel(internals.View);
@@ -501,11 +517,19 @@ void pqPropertiesPanel::updatePropertiesPanel(pqProxy* source)
   // update widgets.
   if (source)
   {
+    auto sourceWidgets = this->Internals->SourceWidgets[source];
+
     this->Internals->Ui.PropertiesButton->setText(
       tr("Properties") + QString(" (%1)").arg(source->getSMName()));
-    this->Internals->SourceWidgets[source]->showWidgets(
-      this->Internals->Ui.SearchBox->isAdvancedSearchActive(),
+    sourceWidgets->showWidgets(this->Internals->Ui.SearchBox->isAdvancedSearchActive(),
       this->Internals->Ui.SearchBox->text());
+
+    // update interactive widgets specifically
+    if (this->Internals->SourcePort >= 0)
+    {
+      sourceWidgets->Panel->showLinkedInteractiveWidget(this->Internals->SourcePort, true);
+    }
+
     Q_EMIT this->modified();
   }
   else

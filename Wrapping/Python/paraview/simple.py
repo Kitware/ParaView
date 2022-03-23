@@ -2476,34 +2476,60 @@ def CreateTexture(filename=None):
 #==============================================================================
 # Miscellaneous functions.
 #==============================================================================
-def Show3DWidgets(proxy=None):
+def ShowInteractiveWidgets(proxy=None):
     """If possible in the current environment, this method will
-    request the application to show the 3D widget(s) for proxy"""
+    request the application to show the interactive widget(s) for proxy"""
     proxy = proxy if proxy else GetActiveSource()
     if not proxy:
         raise ValueError ("No 'proxy' was provided and no active source was found.")
-    _Invoke3DWidgetUserEvent(proxy, "ShowWidget")
+    _InvokeWidgetUserEvent(proxy, "ShowWidget")
+
+def HideInteractiveWidgets(proxy=None):
+    """If possible in the current environment, this method will
+    request the application to hide the interactive widget(s) for proxy"""
+    proxy = proxy if proxy else GetActiveSource()
+    if not proxy:
+        raise ValueError ("No 'proxy' was provided and no active source was found.")
+    _InvokeWidgetUserEvent(proxy, "HideWidget")
+
+def Show3DWidgets(proxy=None):
+    """
+    If possible in the current environment, this method will
+    request the application to show the 3D widget(s) for proxy
+
+    ::deprecated:: 5.11
+    Use :func:`ShowInteractiveWidgets` instead.
+    """
+    import warnings
+    warnings.warn("`Show3DWidgets` is deprecated in ParaView 5.11. Use `ShowInteractiveWidgets` instead",
+        DeprecationWarning)
+    ShowInteractiveWidgets(proxy)
 
 def Hide3DWidgets(proxy=None):
-    """If possible in the current environment, this method will
-    request the application to hide the 3D widget(s) for proxy"""
-    proxy = proxy if proxy else GetActiveSource()
-    if not proxy:
-        raise ValueError ("No 'proxy' was provided and no active source was found.")
-    _Invoke3DWidgetUserEvent(proxy, "HideWidget")
+    """
+    If possible in the current environment, this method will
+    request the application to show the 3D widget(s) for proxy
 
-def _Invoke3DWidgetUserEvent(proxy, event):
-    """Internal method used by Show3DWidgets/Hide3DWidgets"""
+    ::deprecated:: 5.11
+    Use :func:`HideInteractiveWidgets` instead.
+    """
+    import warnings
+    warnings.warn("`Hide3DWidgets` is deprecated in ParaView 5.11. Use `HideInteractiveWidgets` instead",
+        DeprecationWarning)
+    HideInteractiveWidgets(proxy)
+
+def _InvokeWidgetUserEvent(proxy, event):
+    """Internal method used by ShowInteractiveWidgets/HideInteractiveWidgets"""
     if proxy:
         proxy.InvokeEvent('UserEvent', event)
-        # Since in 5.0 and earlier, Show3DWidgets/Hide3DWidgets was called with the
-        # proxy being the filter proxy (eg. Clip) and not the proxy that has the
-        # widget i.e. (Clip.ClipType), we explicitly handle it by iterating of
-        # proxy list properties and then invoking the event on their value proxies
-        # too.
+        # Since in 5.0 and earlier, ShowInteractiveWidgets/HideInteractiveWidgets
+        # was called with the proxy being the filter proxy (eg. Clip) and not the
+        # proxy that has the widget i.e. (Clip.ClipType), we explicitly handle it
+        # by iterating of proxy list properties and then invoking the event on
+        # their value proxies too.
         for smproperty in proxy:
             if smproperty.FindDomain("vtkSMProxyListDomain"):
-                _Invoke3DWidgetUserEvent(smproperty.GetData(), event)
+                _InvokeWidgetUserEvent(smproperty.GetData(), event)
 
 def ExportView(filename, view=None, **params):
     """Export a view to the specified output file."""

@@ -62,16 +62,22 @@ public:
   virtual void apply();
   virtual void reset();
 
+  //@{
   /**
    * These methods are called by pqPropertiesPanel when the panel for proxy
    * becomes active/deactive.
-   * Only widgets that have 3D widgets need to
-   * override these methods to select/deselect the 3D widgets.
+   * Only widgets that have interactive widgets need to
+   * override these methods to select/deselect the interactive widgets.
+   * `selectPort(int)` allows to specify an output port index and conditionnaly
+   * select the interactive widget if the XML hint `WidgetVisibilityLink`
+   * has been set.
    * Default implementation does nothing.
    */
   virtual void select() { this->Selected = true; }
+  virtual void selectPort(int portIndex) { Q_UNUSED(portIndex); }
   virtual void deselect() { this->Selected = false; }
   bool isSelected() const { return this->Selected; }
+  //@}
 
   // This method is called on pqPropertyWidget instances that pqProxyWidget
   // deems that should be shown in current configuration. Subclasses can

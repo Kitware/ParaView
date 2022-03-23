@@ -4131,5 +4131,116 @@ Every Nth Point.
      </StringVectorProperty>
      <!-- End ComputeConnectedSurfaceProperties -->
    </SourceProxy>
+
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkEqualizerFilter"
+                 name="EqualizerFilter"
+                 label="Equalizer Filter">
+      <Documentation long_help="Filter for signal modification.">
+        The Equalizer Filter implements an algorithm that selectively corrects
+        the signal amplitude depending on the frequency characteristics.
+      </Documentation>
+      <InputProperty name="Input"
+                     command="SetInputConnection">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources"/>
+          <Group name="filters"/>
+        </ProxyGroupDomain>
+        <DataTypeDomain composite_data_supported="1"
+                        name="input_type">
+          <DataType value="vtkTable"/>
+        </DataTypeDomain>
+      </InputProperty>
+
+    <IntVectorProperty command="SetSamplingFrequency"
+                       default_values="1000"
+                       name="SamplingFrequency"
+                       label="Sampling Frequency, Hz"
+                       number_of_elements="1">
+      <Documentation>
+        Set sampling frequency of signal.
+      </Documentation>
+    </IntVectorProperty>
+
+    <StringVectorProperty name="Array"
+                          command="SetArray"
+                          number_of_elements="1"
+                          animateable="0">
+          <ArrayListDomain
+            name="array_list" attribute_type="Scalars"
+            input_domain_name="inputs_array">
+            <RequiredProperties>
+              <Property name="Input" function="Input"/>
+            </RequiredProperties>
+          </ArrayListDomain>
+        <Documentation>
+          Specify the name of a scalar array which will be used to FFT.
+        </Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="ShowWidgetDecorator">
+            <Property name="AllColumns" function="boolean_invert" />
+          </PropertyWidgetDecorator>
+        </Hints>
+    </StringVectorProperty>
+
+    <IntVectorProperty command="SetAllColumns"
+                       default_values="0"
+                       name="AllColumns"
+                       number_of_elements="1">
+      <BooleanDomain name="bool" />
+        <Documentation>Use for all columns of table.
+      </Documentation>
+    </IntVectorProperty>
+
+    <IntVectorProperty animateable="1"
+                       command="SetSpectrumGain"
+                       default_values="0"
+                       name="SpectrumGain"
+                       label="Spectrum Gain, dB"
+                       number_of_elements="1">
+      <IntRangeDomain max="50"
+                      min="-50"
+                      name="range" />
+      <Documentation>
+        Specify a gain coefficient (in dB) to apply to the spectrum of the input signal.
+        Used only for convenient viewing.
+      </Documentation>
+    </IntVectorProperty>
+
+    <StringVectorProperty animateable="1"
+                          command="SetPoints"
+                          label="Equalizer Points"
+                          name="EqualizerPoints"
+                          number_of_elements="1" >
+      <Documentation>This property defines the interactive points of the equalizer.</Documentation>
+    </StringVectorProperty>
+
+    <PropertyGroup name="Equalizer Filtering Points" panel_widget="EqualizerPropertyWidget">
+      <Property name="EqualizerPoints" />
+      <Property name="SamplingFrequency" />
+      <Hints>
+        <WidgetVisibilityLink port="2" />
+      </Hints>
+    </PropertyGroup>
+
+    <OutputPort index="0" name="Spectrum" />
+    <OutputPort index="1" name="Result" />
+    <OutputPort index="2" name="Normalized Spectrum" />
+
+    <Hints>
+      <PipelineIcon port="0" name="XYChartView" />
+      <View port="0" type="None" />
+
+      <PipelineIcon port="1" name="XYChartView" />
+      <View port="1" type="None" />
+
+      <PipelineIcon port="2" name="XYChartView" />
+      <View port="2" type="XYChartView" />
+
+      <RepresentationType view="XYChartView" type="XYChartRepresentation" />
+    </Hints>
+
+    </SourceProxy>
+    <!-- End vtkEqualizerFilter -->
   </ProxyGroup>
 </ServerManagerConfiguration>

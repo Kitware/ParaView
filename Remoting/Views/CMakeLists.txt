@@ -29,6 +29,7 @@
 #
 #==========================================================================
 set(classes
+  vtk2DWidgetRepresentation
   vtk3DWidgetRepresentation
   vtkAMROutlineRepresentation
   vtkAMRStreamingPriorityQueue
@@ -139,6 +140,7 @@ set(classes
   vtkSMComparativeAnimationCueUndoElement
   vtkSMComparativeViewProxy
   vtkSMContextViewProxy
+  vtkSMContextItemWidgetProxy
   vtkSMDataDeliveryManagerProxy
   vtkSMDisplaySizedImplicitPlaneRepresentationProxy
   vtkSMImageExtractWriterProxy
@@ -147,7 +149,9 @@ set(classes
   vtkSMMaterialDomain
   vtkSMMaterialLibraryProxy
   vtkSMMultiSliceViewProxy
+  vtkSMNew2DWidgetRepresentationProxy
   vtkSMNewWidgetRepresentationProxy
+  vtkSMNewWidgetRepresentationProxyAbstract
   vtkSMOrthographicSliceViewProxy
   vtkSMParaViewPipelineControllerWithRendering
   vtkSMPlotMatrixViewProxy
@@ -246,7 +250,8 @@ vtk_module_add_module(ParaView::RemotingViews
   PRIVATE_HEADERS ${vtk_object_factory_header} ${private_headers})
 
 paraview_add_server_manager_xmls(
-  XMLS Resources/3dwidgets_remotingviews.xml
+  XMLS Resources/2dwidgets_remotingviews.xml
+       Resources/3dwidgets_remotingviews.xml
        Resources/extractors_remotingviews.xml
        Resources/rendering.xml
        Resources/sources_remotingviews.xml

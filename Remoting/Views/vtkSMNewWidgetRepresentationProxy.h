@@ -30,18 +30,16 @@
 #define vtkSMNewWidgetRepresentationProxy_h
 
 #include "vtkRemotingViewsModule.h" //needed for exports
-#include "vtkSMProxy.h"
+#include "vtkSMNewWidgetRepresentationProxyAbstract.h"
 class vtkSMViewProxy;
-class vtkSMNewWidgetRepresentationObserver;
 class vtkAbstractWidget;
 
-struct vtkSMNewWidgetRepresentationInternals;
-
-class VTKREMOTINGVIEWS_EXPORT vtkSMNewWidgetRepresentationProxy : public vtkSMProxy
+class VTKREMOTINGVIEWS_EXPORT vtkSMNewWidgetRepresentationProxy
+  : public vtkSMNewWidgetRepresentationProxyAbstract
 {
 public:
   static vtkSMNewWidgetRepresentationProxy* New();
-  vtkTypeMacro(vtkSMNewWidgetRepresentationProxy, vtkSMProxy);
+  vtkTypeMacro(vtkSMNewWidgetRepresentationProxy, vtkSMNewWidgetRepresentationProxyAbstract);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
   //@{
@@ -58,19 +56,6 @@ public:
   vtkGetObjectMacro(RepresentationProxy, vtkSMProxy);
   //@}
 
-  //@{
-  /**
-   * Called to link properties from a Widget to \c controlledProxy i.e. a
-   * proxy whose properties are being manipulated using this Widget.
-   * Currently, we only support linking with one controlled proxy at a time. One
-   * must call UnlinkProperties() before one can call this method on another
-   * controlledProxy. The \c controlledPropertyGroup is used to determine the
-   * mapping between this widget properties and controlledProxy properties.
-   */
-  bool LinkProperties(vtkSMProxy* controlledProxy, vtkSMPropertyGroup* controlledPropertyGroup);
-  bool UnlinkProperties(vtkSMProxy* controlledProxy);
-  //@}
-
 protected:
   vtkSMNewWidgetRepresentationProxy();
   ~vtkSMNewWidgetRepresentationProxy() override;
@@ -81,23 +66,14 @@ protected:
    */
   void CreateVTKObjects() override;
 
-  vtkSMProxy* RepresentationProxy;
-  vtkSMProxy* WidgetProxy;
-  vtkAbstractWidget* Widget;
-  vtkSMNewWidgetRepresentationObserver* Observer;
-  vtkSMNewWidgetRepresentationInternals* Internal;
-
-  friend class vtkSMNewWidgetRepresentationObserver;
+  vtkSMProxy* RepresentationProxy = nullptr;
+  vtkSMProxy* WidgetProxy = nullptr;
+  vtkAbstractWidget* Widget = nullptr;
 
   /**
    * Called every time the user interacts with the widget.
    */
-  virtual void ExecuteEvent(unsigned long event);
-
-  /**
-   * Called everytime a controlled property's unchecked values change.
-   */
-  void ProcessLinkedPropertyEvent(vtkSMProperty* controlledProperty, unsigned long event);
+  void ExecuteEvent(unsigned long event) override;
 
 private:
   vtkSMNewWidgetRepresentationProxy(const vtkSMNewWidgetRepresentationProxy&) = delete;
