@@ -681,6 +681,8 @@ vtkSmartPointer<vtkImageData> vtkSMTransferFunction2DProxy::ComputeDataHistogram
   vtkSMPropertyHelper(histo, "CustomBinRangesX").Set(range, 2);
   vtkSMPropertyHelper(histo, "UseGradientForYAxis").Set(useGradientAsY);
   vtkSMPropertyHelper(histo, "UseCustomBinRangesY").Set(false);
+  // Use the input ranges for the histogram bounds so that the editor shows true ranges
+  vtkSMPropertyHelper(histo, "UseInputRangesForOutputBounds").Set(true);
   //  vtkSMPropertyHelper(histo, "CustomBinRangesY").Set(range + 2, 2);
   histo->UpdateVTKObjects();
 

@@ -570,12 +570,13 @@
           <Group name="filters" />
         </ProxyGroupDomain>
         <DataTypeDomain name="input_type">
-          <DataType value="vtkDataObject" />
+          <DataType value="vtkDataSet" />
         </DataTypeDomain>
         <InputArrayDomain name="input_array">
         </InputArrayDomain>
-        <Documentation>This property specifies the input to the Histogram
-        filter.</Documentation>
+        <Documentation>
+            This property specifies the input to the Histogram filter.
+        </Documentation>
       </InputProperty>
       <StringVectorProperty animateable="0"
                             command="SetInputArrayToProcess"
@@ -752,6 +753,49 @@
         <Hints>
           <PropertyWidgetDecorator type="ShowWidgetDecorator">
             <Property name="UseCustomBinRangesY" function="boolean" />
+          </PropertyWidgetDecorator>
+        </Hints>
+      </DoubleVectorProperty>
+      <IntVectorProperty command="SetUseInputRangesForOutputBounds"
+                         default_values="0"
+                         name="UseInputRangesForOutputBounds"
+                         label="Histogram Bounds from Input"
+                         number_of_elements="1"
+                         panel_visibility="advanced">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          When set to true, the input scalar ranges will be used to compute the histogram origin and spacing. By default, set to false.
+        </Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty command="SetOutputOrigin"
+                            default_values="0.0 0.0"
+                            name="OutputOrigin"
+                            number_of_elements="2"
+                            label="Histogram Origin"
+                            panel_visibility="advanced">
+        <Documentation>
+          The origin of the output histogram image. These are used only when
+          UseInputRangesForOutputBounds is set to false.
+        </Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="ShowWidgetDecorator">
+            <Property name="UseInputRangesForOutputBounds" function="boolean_invert" />
+          </PropertyWidgetDecorator>
+        </Hints>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetOutputSpacing"
+                            default_values="1.0 1.0"
+                            name="OutputSpacing"
+                            number_of_elements="2"
+                            label="Histogram Spacing"
+                            panel_visibility="advanced">
+        <Documentation>
+          The pixel spacing of the output histogram image. These are used only when
+          UseInputRangesForOutputBounds is set to false.
+        </Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="ShowWidgetDecorator">
+            <Property name="UseInputRangesForOutputBounds" function="boolean_invert" />
           </PropertyWidgetDecorator>
         </Hints>
       </DoubleVectorProperty>

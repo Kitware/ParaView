@@ -53,7 +53,17 @@ vtkPVExtractHistogram2D::~vtkPVExtractHistogram2D()
 //------------------------------------------------------------------------------------------------
 void vtkPVExtractHistogram2D::PrintSelf(ostream& os, vtkIndent indent)
 {
-  // os << indent << " = " << this-><< endl;
+  this->Superclass::PrintSelf(os, indent);
+  os << indent << "NumberOfBins = [" << this->NumberOfBins[0] << ", " << this->NumberOfBins[1]
+     << "]" << endl;
+  os << indent << "UseGradientForYAxis = " << (this->GetUseGradientForYAxis() ? "True" : "False")
+     << endl;
+  os << indent << "UseCustomBinRanges0 = " << this->UseCustomBinRanges0 << endl;
+  os << indent << "CustomBinRanges0 = [" << this->CustomBinRanges0[0] << ", "
+     << this->CustomBinRanges0[1] << "]" << endl;
+  os << indent << "UseCustomBinRanges1 = " << this->UseCustomBinRanges1 << endl;
+  os << indent << "CustomBinRanges1 = [" << this->CustomBinRanges1[0] << ", "
+     << this->CustomBinRanges1[1] << "]" << endl;
 }
 
 //------------------------------------------------------------------------------------------------
@@ -61,7 +71,7 @@ int vtkPVExtractHistogram2D::FillInputPortInformation(int port, vtkInformation* 
 {
   this->Superclass::FillInputPortInformation(port, info);
 
-  info->Set(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkDataObject");
+  info->Set(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkDataSet");
   return 1;
 }
 
@@ -72,21 +82,22 @@ int vtkPVExtractHistogram2D::RequestInformation(vtkInformation* vtkNotUsed(reque
   vtkInformation* outInfo = outputVector->GetInformationObject(0);
   this->InitializeCache();
   this->GetInputArrays(inputVector);
-  if (!this->ComponentArrayCache[0])
-  {
-    return 0;
-  }
   this->ComputeComponentRange();
 
   int ext[6] = { 0, this->NumberOfBins[0] - 1, 0, this->NumberOfBins[1] - 1, 0, 0 };
   outInfo->Set(vtkStreamingDemandDrivenPipeline::WHOLE_EXTENT(), ext, 6);
-  double sp[3] = { 1, 1, 1 };
-  sp[0] =
-    (this->ComponentRangeCache[0][1] - this->ComponentRangeCache[0][0]) / this->NumberOfBins[0];
-  sp[1] =
-    (this->ComponentRangeCache[1][1] - this->ComponentRangeCache[1][0]) / this->NumberOfBins[1];
+  double sp[3] = { this->OutputSpacing[0], this->OutputSpacing[1], 1.0 };
+  double o[3] = { this->OutputOrigin[0], this->OutputOrigin[1], 0.0 };
+  if (this->GetUseInputRangesForOutputBounds())
+  {
+    sp[0] =
+      (this->ComponentRangeCache[0][1] - this->ComponentRangeCache[0][0]) / this->NumberOfBins[0];
+    sp[1] =
+      (this->ComponentRangeCache[1][1] - this->ComponentRangeCache[1][0]) / this->NumberOfBins[1];
+    o[0] = this->ComponentRangeCache[0][0];
+    o[1] = this->ComponentRangeCache[1][0];
+  }
   outInfo->Set(vtkDataObject::SPACING(), sp, 3);
-  double o[3] = { this->ComponentRangeCache[0][0], this->ComponentRangeCache[1][0], 0 };
   outInfo->Set(vtkDataObject::ORIGIN(), o, 3);
 
   outInfo->Set(vtkStreamingDemandDrivenPipeline::UNRESTRICTED_UPDATE_EXTENT(), 1);
@@ -97,7 +108,7 @@ int vtkPVExtractHistogram2D::RequestInformation(vtkInformation* vtkNotUsed(reque
 
 //------------------------------------------------------------------------------------------------
 int vtkPVExtractHistogram2D::RequestUpdateExtent(vtkInformation* vtkNotUsed(request),
-  vtkInformationVector** inputVector, vtkInformationVector* outputVector)
+  vtkInformationVector** inputVector, vtkInformationVector* vtkNotUsed(outputVector))
 {
   vtkInformation* inInfo = inputVector[0]->GetInformationObject(0);
   if (inInfo->Has(vtkStreamingDemandDrivenPipeline::WHOLE_EXTENT()))
@@ -122,13 +133,19 @@ int vtkPVExtractHistogram2D::RequestData(vtkInformation* vtkNotUsed(request),
 
   vtkInformation* outInfo = outputVector->GetInformationObject(0);
   vtkImageData* output = vtkImageData::SafeDownCast(outInfo->Get(vtkDataObject::DATA_OBJECT()));
-  output->SetOrigin(this->ComponentRangeCache[0][0], this->ComponentRangeCache[1][0], 0.0);
+  double o[3] = { this->OutputOrigin[0], this->OutputOrigin[1], 0.0 };
+  double sp[3] = { this->OutputSpacing[0], this->OutputSpacing[1], 1.0 };
+  if (this->GetUseInputRangesForOutputBounds())
+  {
+    o[0] = this->ComponentRangeCache[0][0];
+    o[1] = this->ComponentRangeCache[1][0];
+    sp[0] =
+      (this->ComponentRangeCache[0][1] - this->ComponentRangeCache[0][0]) / this->NumberOfBins[0];
+    sp[1] =
+      (this->ComponentRangeCache[1][1] - this->ComponentRangeCache[1][0]) / this->NumberOfBins[1];
+  }
   output->SetDimensions(this->NumberOfBins[0], this->NumberOfBins[1], 1);
-  double sp[3] = { 1, 1, 1 };
-  sp[0] =
-    (this->ComponentRangeCache[0][1] - this->ComponentRangeCache[0][0]) / this->NumberOfBins[0];
-  sp[1] =
-    (this->ComponentRangeCache[1][1] - this->ComponentRangeCache[1][0]) / this->NumberOfBins[1];
+  output->SetOrigin(o);
   output->SetSpacing(sp);
   output->AllocateScalars(VTK_DOUBLE, 1);
   this->ComputeHistogram2D(output);
@@ -196,7 +213,12 @@ void vtkPVExtractHistogram2D::GetInputArrays(vtkInformationVector** inputVector)
 
   // TODO: Handle a composite dataset
 
-  vtkDataArray* inputArray0 = this->GetInputArrayToProcess(0, inputVector);
+  vtkDataArray* inputArray0 =
+    vtkDataArray::SafeDownCast(this->GetInputArrayToProcess(0, inputVector));
+  if (!inputArray0)
+  {
+    return;
+  }
   if (this->Component0 == inputArray0->GetNumberOfComponents())
   {
     this->ComputeVectorMagnitude(inputArray0, this->ComponentArrayCache[0]);

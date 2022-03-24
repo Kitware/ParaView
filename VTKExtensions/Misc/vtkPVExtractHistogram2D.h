@@ -94,6 +94,31 @@ public:
   vtkBooleanMacro(UseGradientForYAxis, bool);
   ///@}
 
+  ///@{
+  /**
+   * Set/Get whether the output image bounds are obtained from input data array ranges.
+   * This means that if the input data array ranges are [r1min, r1max] and [r2min, r2max], the
+   * output histogram image would have bounds [r1min, r1max, r2min, r2max, 0, 0], when this flag is
+   * enabled. The output spacing is determined based on these bounds and the number of bins.
+   * \sa SetNumberOfBins(), SetOutputSpacing(), SetOutputOrigin()
+   */
+  vtkSetMacro(UseInputRangesForOutputBounds, bool);
+  vtkGetMacro(UseInputRangesForOutputBounds, bool);
+  vtkBooleanMacro(UseInputRangesForOutputBounds, bool);
+  ///@}
+
+  ///@{
+  /**
+   * Set/Get the output histogram image origin and spacing.
+   * \note This is only used if UseInputRangesForOutputBounds is disabled.
+   * \sa SetUseInputRangesForOutputBounds()
+   */
+  vtkSetVector2Macro(OutputOrigin, double);
+  vtkGetVector2Macro(OutputOrigin, double);
+  vtkSetVector2Macro(OutputSpacing, double);
+  vtkGetVector2Macro(OutputSpacing, double);
+  ///@}
+
 protected:
   vtkPVExtractHistogram2D();
   ~vtkPVExtractHistogram2D() override;
@@ -121,6 +146,9 @@ protected:
   bool UseCustomBinRanges0 = false;
   bool UseCustomBinRanges1 = false;
   vtkMultiProcessController* Controller = nullptr;
+  bool UseInputRangesForOutputBounds = true;
+  double OutputOrigin[2] = { 0.0, 0.0 };
+  double OutputSpacing[2] = { 1.0, 1.0 };
 
   // Cache of internal array and range
   int ComponentIndexCache[2];
