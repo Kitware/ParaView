@@ -32,9 +32,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqCoordinateFramePropertyWidget.h"
 #include "ui_pqCoordinateFramePropertyWidget.h"
 
+#include "pqActiveObjects.h"
 #include "pqPointPickingHelper.h"
-#include "pqPropertyLinks.h"
 #include "pqRenderView.h"
+
 #include "vtkCamera.h"
 #include "vtkSMDomain.h"
 #include "vtkSMDoubleVectorProperty.h"
@@ -89,7 +90,7 @@ pqCoordinateFramePropertyWidget::pqCoordinateFramePropertyWidget(
   {
     vtkSMProperty* lockAxisInfo = this->widgetProxy()->GetProperty("LockedAxisInfo");
     this->addPropertyLink(this, "lockedAxis", SIGNAL(lockedAxisChangedByUser(int)), lockAxisInfo);
-    QObject::connect(ui.lockAxis, (void (QComboBox::*)(int)) & QComboBox::currentIndexChanged, this,
+    QObject::connect(ui.lockAxis, QOverload<int>::of(&QComboBox::currentIndexChanged), this,
       &pqCoordinateFramePropertyWidget::currentIndexChangedLockAxis);
   }
   else
@@ -234,7 +235,8 @@ pqCoordinateFramePropertyWidget::pqCoordinateFramePropertyWidget(
   this->connect(pickDirectionHelper2, SIGNAL(pick(double, double, double)),
     SLOT(setDirection(double, double, double)));
 
-  this->placeWidget();
+  QObject::connect(&pqActiveObjects::instance(), &pqActiveObjects::dataUpdated, this,
+    &pqCoordinateFramePropertyWidget::placeWidget);
 }
 
 pqCoordinateFramePropertyWidget::~pqCoordinateFramePropertyWidget() = default;

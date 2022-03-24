@@ -32,8 +32,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqDisplaySizedImplicitPlanePropertyWidget.h"
 #include "ui_pqDisplaySizedImplicitPlanePropertyWidget.h"
 
+#include "pqActiveObjects.h"
 #include "pqPointPickingHelper.h"
 #include "pqRenderView.h"
+
 #include "vtkCamera.h"
 #include "vtkSMIntVectorProperty.h"
 #include "vtkSMNewWidgetRepresentationProxy.h"
@@ -180,7 +182,8 @@ pqDisplaySizedImplicitPlanePropertyWidget::pqDisplaySizedImplicitPlanePropertyWi
   this->connect(pickNormalHelper2, SIGNAL(pick(double, double, double)),
     SLOT(setNormal(double, double, double)));
 
-  this->placeWidget();
+  QObject::connect(&pqActiveObjects::instance(), &pqActiveObjects::dataUpdated, this,
+    &pqDisplaySizedImplicitPlanePropertyWidget::placeWidget);
 }
 
 //-----------------------------------------------------------------------------
