@@ -49,8 +49,20 @@ class vtkIndent;
 class PQCORE_EXPORT pqServerConfiguration
 {
 public:
+  /**
+   * Create an empty server configuration with the default name.
+   */
   pqServerConfiguration();
+
+  /**
+   * Default destructor
+   */
   ~pqServerConfiguration();
+
+  /**
+   * Create an empty server configuration with a provided name.
+   */
+  pqServerConfiguration(const QString& name);
 
   /**
    * Create a server configuration with the provided xml.
@@ -76,6 +88,11 @@ public:
    * configurations.
    */
   bool isNameDefault() const;
+
+  /**
+   * Returns the default name of a server configuration.
+   */
+  static const QString defaultName();
 
   /**
    * Get/Set the resource that describes the server scheme, hostname(s) and port(s).
@@ -204,6 +221,7 @@ protected:
   static QString lookForCommand(QString command);
 
 private:
+  void constructor(const QString& name);
   void constructor(vtkPVXMLElement*);
   bool Mutable;
   vtkSmartPointer<vtkPVXMLElement> XML;

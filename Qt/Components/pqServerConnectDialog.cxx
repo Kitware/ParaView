@@ -319,7 +319,28 @@ void pqServerConnectDialog::onServerSelected()
 //-----------------------------------------------------------------------------
 void pqServerConnectDialog::addServer()
 {
-  this->editConfiguration(pqServerConfiguration());
+  // Edit an empty server configuration with a non already existing name
+  QString originalName = "My Server";
+  QString name = originalName;
+  if (this->serverNameExists(name))
+  {
+    bool found = false;
+    for (unsigned int i = 1; i < std::numeric_limits<unsigned int>::max(); i++)
+    {
+      name = originalName + QString::number(i);
+      if (!this->serverNameExists(name))
+      {
+        found = true;
+        break;
+      }
+    }
+    if (!found)
+    {
+      name = pqServerConfiguration::defaultName();
+    }
+  }
+
+  this->editConfiguration(pqServerConfiguration(name));
   Q_EMIT serverAdded();
 }
 
@@ -433,22 +454,28 @@ void pqServerConnectDialog::editConfiguration(const pqServerConfiguration& confi
 }
 
 //-----------------------------------------------------------------------------
+bool pqServerConnectDialog::serverNameExists(const QString& name)
+{
+  Q_FOREACH (const pqServerConfiguration& config, this->Internals->Configurations)
+  {
+    if (config.name() == name)
+    {
+      return true;
+    }
+  }
+  return false;
+}
+
+//-----------------------------------------------------------------------------
 void pqServerConnectDialog::onNameChanged()
 {
   bool acceptable = true;
   QString current_name = this->Internals->name->text();
   if (current_name != this->Internals->OriginalName)
   {
-    Q_FOREACH (const pqServerConfiguration& config, this->Internals->Configurations)
-    {
-      if (config.name() == current_name)
-      {
-        acceptable = false;
-        break;
-      }
-    }
+    acceptable = !this->serverNameExists(current_name);
   }
-  else if (current_name.trimmed().isEmpty() || current_name == "unknown")
+  else if (current_name.trimmed().isEmpty() || current_name == pqServerConfiguration::defaultName())
   {
     acceptable = false;
   }

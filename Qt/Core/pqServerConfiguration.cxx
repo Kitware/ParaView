@@ -48,21 +48,33 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <cassert>
 #include <sstream>
 
-#define SERVER_CONFIGURATION_DEFAULT_NAME "unknown"
+static constexpr const char* SERVER_CONFIGURATION_DEFAULT_NAME = "unknown";
 
 //-----------------------------------------------------------------------------
 pqServerConfiguration::pqServerConfiguration()
 {
-  vtkNew<vtkPVXMLParser> parser;
-  parser->Parse("<Server name='" SERVER_CONFIGURATION_DEFAULT_NAME
-                "' configuration=''><ManualStartup/></Server>");
-  this->constructor(parser->GetRootElement());
+  this->constructor(SERVER_CONFIGURATION_DEFAULT_NAME);
+}
+
+//-----------------------------------------------------------------------------
+pqServerConfiguration::pqServerConfiguration(const QString& name)
+{
+  this->constructor(name);
 }
 
 //-----------------------------------------------------------------------------
 pqServerConfiguration::pqServerConfiguration(vtkPVXMLElement* xml)
 {
   this->constructor(xml);
+}
+
+//-----------------------------------------------------------------------------
+void pqServerConfiguration::constructor(const QString& name)
+{
+  QString xml = QString("<Server name='") + name + "' configuration=''><ManualStartup/></Server>";
+  vtkNew<vtkPVXMLParser> parser;
+  parser->Parse(xml.toUtf8().data());
+  this->constructor(parser->GetRootElement());
 }
 
 //-----------------------------------------------------------------------------
@@ -87,6 +99,12 @@ void pqServerConfiguration::setName(const QString& arg_name)
 QString pqServerConfiguration::name() const
 {
   return this->XML->GetAttributeOrDefault("name", "");
+}
+
+//-----------------------------------------------------------------------------
+const QString pqServerConfiguration::defaultName()
+{
+  return SERVER_CONFIGURATION_DEFAULT_NAME;
 }
 
 //-----------------------------------------------------------------------------
