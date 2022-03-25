@@ -39,6 +39,7 @@ set(classes
   vtkChartRepresentation
   vtkChartSelectionRepresentation
   vtkChartTextRepresentation
+  vtkChartLogoRepresentation
   vtkChartWarning
   vtkCompositeRepresentation
   vtkContext2DScalarBarActor

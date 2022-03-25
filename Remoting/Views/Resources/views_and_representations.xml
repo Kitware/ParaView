@@ -8894,6 +8894,76 @@
 
     </ChartRepresentationProxy>
 
+<!-- =================================================================== -->
+    <ChartRepresentationProxy class="vtkChartLogoRepresentation"
+                              name="ChartLogoRepresentation"
+                              processes="client|dataserver|renderserver">
+      <Documentation>Representation to show logo in Chart views</Documentation>
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <Documentation>Data input for the representation.</Documentation>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkDataObject" />
+        </DataTypeDomain>
+      </InputProperty>
+      <IntVectorProperty command="SetVisibility"
+                         default_values="1"
+                         name="Visibility"
+                         number_of_elements="1"
+                         panel_visibility="never">
+        <BooleanDomain name="bool" />
+        <Documentation>Visibility of the representation.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetForceUseCache"
+                         default_values="0"
+                         is_internal="1"
+                         name="ForceUseCache"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Typically UseCache and CacheKey are updated by the View
+        and representations cache based on what the view tells it. However in
+        some cases we may want to force a representation to cache irrespective
+        of the view (e.g. comparative views). In which case these ivars can up
+        set. If ForcedCacheKey is true, it overrides UseCache and CacheKey.
+        Instead, ForcedCacheKey is used.</Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty command="SetForcedCacheKey"
+                            default_values="none"
+                            is_internal="1"
+                            name="ForcedCacheKey"
+                            number_of_elements="1">
+        <DoubleRangeDomain name="range" />
+        <Documentation>Typically UseCache and CacheKey are updated by the View
+        and representations cache based on what the view tells it. However in
+        some cases we may want to force a representation to cache irrespective
+        of the view (e.g. comparative views). In which case these ivars can up
+        set. If ForcedCacheKey is true, it overrides UseCache and CacheKey.
+        Instead, ForcedCacheKey is used.</Documentation>
+      </DoubleVectorProperty>
+      <IntVectorProperty command="SetLogoLocation"
+                         default_values="4"
+                         name="LogoLocation"
+                         number_of_elements="1">
+        <EnumerationDomain name="enum">
+          <!-- for now, we skip interactive placement functionality
+          <Entry text="Any Location" value="0" />
+          -->
+          <Entry text="Lower Left Corner" value="1" />
+          <Entry text="Lower Right Corner" value="2" />
+          <Entry text="Lower Center" value="3" />
+          <Entry text="Upper Left Corner" value="4" />
+          <Entry text="Upper Right Corner" value="5" />
+          <Entry text="Upper Center" value="6" />
+        </EnumerationDomain>
+        <Documentation>Specify placement of the logo actor.</Documentation>
+      </IntVectorProperty>
+
+      <PropertyGroup label="Logo Position" panel_widget="LogoLocationEditor">
+        <Property name="LogoLocation" function="WindowLocation" />
+      </PropertyGroup>
+
+    </ChartRepresentationProxy>
+
     <!-- =================================================================== -->
     <ChartRepresentationProxy base_proxygroup="representations"
                               class="vtkXYChartRepresentation"
