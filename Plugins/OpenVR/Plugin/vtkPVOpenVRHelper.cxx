@@ -459,6 +459,48 @@ void vtkPVOpenVRHelper::ComeToMe()
   }
 }
 
+//----------------------------------------------------------------------------
+void vtkPVOpenVRHelper::SetViewUp(const std::string& axis)
+{
+  if (vtkVRRenderWindow* renWin = vtkVRRenderWindow::SafeDownCast(this->RenderWindow))
+  {
+    if (axis == "+X")
+    {
+      renWin->SetPhysicalViewUp(1.0, 0.0, 0.0);
+      renWin->SetPhysicalViewDirection(0.0, 1.0, 0.0);
+    }
+    else if (axis == "-X")
+    {
+      renWin->SetPhysicalViewUp(-1.0, 0.0, 0.0);
+      renWin->SetPhysicalViewDirection(0.0, 1.0, 0.0);
+    }
+    else if (axis == "+Y")
+    {
+      renWin->SetPhysicalViewUp(0.0, 1.0, 0.0);
+      renWin->SetPhysicalViewDirection(0.0, 0.0, -1.0);
+    }
+    else if (axis == "-Y")
+    {
+      renWin->SetPhysicalViewUp(0.0, -1.0, 0.0);
+      renWin->SetPhysicalViewDirection(0.0, 0.0, 1.0);
+    }
+    else if (axis == "+Z")
+    {
+      renWin->SetPhysicalViewUp(0.0, 0.0, 1.0);
+      renWin->SetPhysicalViewDirection(0.0, 1.0, 0.0);
+    }
+    else if (axis == "-Z")
+    {
+      renWin->SetPhysicalViewUp(0.0, 0.0, -1.0);
+      renWin->SetPhysicalViewDirection(0.0, 1.0, 0.0);
+    }
+
+    // Close menu
+    this->ToggleShowControls();
+  }
+}
+
+//----------------------------------------------------------------------------
 void vtkPVOpenVRHelper::SetScaleFactor(float val)
 {
   auto style = this->Interactor
