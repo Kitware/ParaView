@@ -311,6 +311,10 @@ const char* vtkSMContextViewProxy::GetRepresentationType(vtkSMSourceProxy* produ
         {
           return "ChartTextRepresentation";
         }
+        if (strcmp(childType, "logo") == 0)
+        {
+          return "ChartLogoRepresentation";
+        }
       }
     }
   }

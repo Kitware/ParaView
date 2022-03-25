@@ -115,6 +115,7 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${paraview_test_data_directory_input}/Data/img2.png}"
   "DATA{${paraview_test_data_directory_input}/Data/iron_protein.vtk}"
   "DATA{${paraview_test_data_directory_input}/Data/linesPolydata.vtk}"
+  "DATA{${paraview_test_data_directory_input}/Data/LogoSourcesInChartViews.png}"
   "DATA{${paraview_test_data_directory_input}/Data/manyTypes.vtu}"
   "DATA{${paraview_test_data_directory_input}/Data/mb_with_pieces.vtm}"
   "DATA{${paraview_test_data_directory_input}/Data/mb_with_pieces/pvi_Material_Remap2_0005_0_0.vtu}"
@@ -384,6 +385,7 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/LogColorMap7.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/LogColorMapToggle1.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/LogColorMapToggle2.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/LogoSourcesInChartViews.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/MaterialEditorCreateMaterials1.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/MaterialEditorCreateMaterials2.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/MaterialEditorCreateMaterials3.png}"
@@ -744,6 +746,7 @@ SET (TESTS_WITH_INLINE_COMPARES
   LoadStateMultiView.xml
   LogColorMap.xml
   LogColorMapToggle.xml
+  LogoSourcesInChartViews.xml
   MemoryInspectorPanel.xml
   Molecule.xml
   # temporary disabling since we don't support
@@ -1779,9 +1782,10 @@ set (FFTOverTime_THRESHOLD 70) # since there's a plot, account for minor
 SET (ColorEditorVolumeControls_DISABLE_CS TRUE)
 SET (ColorEditorVolumeControls_DISABLE_CRS TRUE)
 
-# ViewSettingsDialog and TextureUsages uses texture which are not supported in pvcrs mode.
+# ViewSettingsDialog, TextureUsages and LogoSourcesInChartViews use texture which are not supported in pvcrs mode.
 SET (ViewSettingsDialog_DISABLE_CRS TRUE)
 SET (TextureUsages_DISABLE_CRS TRUE)
+SET (LogoSourcesInChartViews_DISABLE_CRS TRUE)
 
 # MultiBlockAttributes1 requires selection which doesn't work on pvcrs
 SET (MultiBlockAttributes1_DISABLE_CRS TRUE)
