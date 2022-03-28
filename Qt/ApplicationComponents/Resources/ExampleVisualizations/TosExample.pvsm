@@ -5278,7 +5278,7 @@
     </Proxy>
     <Proxy group="sources" type="netCDFReader" id="71137" servers="1">
       <Property name="FileName" id="71137.FileName" number_of_elements="1">
-        <Element index="0" value="$PARAVIEW_EXAMPLES_DATA/tos_O1_2001-2002.nc"/>
+        <Element index="0" value="$PARAVIEW_EXAMPLES_DATA/netCDF/tos_O1_2001-2002.nc"/>
         <Domain name="files" id="71137.FileName.files"/>
       </Property>
       <Property name="TimestepValues" id="71137.TimestepValues" number_of_elements="24">
