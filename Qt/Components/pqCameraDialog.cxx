@@ -32,6 +32,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqCameraDialog.h"
 #include "ui_pqCameraDialog.h"
 
+#include "pqScaledSpinBox.h"
+
 // VTK / ParaView Server Manager includes.
 #include "vtkCamera.h"
 #include "vtkCollection.h"
@@ -241,11 +243,18 @@ pqCameraDialog::pqCameraDialog(QWidget* _p /*=nullptr*/, Qt::WindowFlags f /*=0*
   QObject::connect(this->Internal->AutoResetCenterOfRotation, SIGNAL(toggled(bool)), this,
     SLOT(resetRotationCenterWithCamera()));
 
-  QObject::connect(this->Internal->rollButton, SIGNAL(clicked()), this, SLOT(applyCameraRoll()));
   QObject::connect(
-    this->Internal->elevationButton, SIGNAL(clicked()), this, SLOT(applyCameraElevation()));
+    this->Internal->rollPlusButton, SIGNAL(clicked()), this, SLOT(applyCameraRollPlus()));
   QObject::connect(
-    this->Internal->azimuthButton, SIGNAL(clicked()), this, SLOT(applyCameraAzimuth()));
+    this->Internal->rollMinusButton, SIGNAL(clicked()), this, SLOT(applyCameraRollMinus()));
+  QObject::connect(
+    this->Internal->elevationPlusButton, SIGNAL(clicked()), this, SLOT(applyCameraElevationPlus()));
+  QObject::connect(this->Internal->elevationMinusButton, SIGNAL(clicked()), this,
+    SLOT(applyCameraElevationMinus()));
+  QObject::connect(
+    this->Internal->azimuthPlusButton, SIGNAL(clicked()), this, SLOT(applyCameraAzimuthPlus()));
+  QObject::connect(
+    this->Internal->azimuthMinusButton, SIGNAL(clicked()), this, SLOT(applyCameraAzimuthMinus()));
   QObject::connect(
     this->Internal->zoomInButton, SIGNAL(clicked()), this, SLOT(applyCameraZoomIn()));
   QObject::connect(
@@ -463,11 +472,14 @@ void pqCameraDialog::SetCameraGroupsEnabled(bool enabled)
   internal.loadCameraConfiguration->setEnabled(enabled);
   internal.saveCameraConfiguration->setEnabled(enabled);
 
-  internal.rollButton->setEnabled(enabled);
+  internal.rollPlusButton->setEnabled(enabled);
+  internal.rollMinusButton->setEnabled(enabled);
   internal.rollAngle->setEnabled(enabled);
-  internal.elevationButton->setEnabled(enabled);
+  internal.elevationPlusButton->setEnabled(enabled);
+  internal.elevationMinusButton->setEnabled(enabled);
   internal.elevationAngle->setEnabled(enabled);
-  internal.azimuthButton->setEnabled(enabled);
+  internal.azimuthPlusButton->setEnabled(enabled);
+  internal.azimuthMinusButton->setEnabled(enabled);
   internal.azimuthAngle->setEnabled(enabled);
   internal.zoomInButton->setEnabled(enabled);
   internal.zoomFactor->setEnabled(enabled);
@@ -560,21 +572,39 @@ void pqCameraDialog::adjustCamera(CameraAdjustmentType enType, double value)
 }
 
 //-----------------------------------------------------------------------------
-void pqCameraDialog::applyCameraRoll()
+void pqCameraDialog::applyCameraRollPlus()
 {
   this->adjustCamera(pqCameraDialog::Roll, this->Internal->rollAngle->value());
 }
 
 //-----------------------------------------------------------------------------
-void pqCameraDialog::applyCameraElevation()
+void pqCameraDialog::applyCameraRollMinus()
+{
+  this->adjustCamera(pqCameraDialog::Roll, -this->Internal->rollAngle->value());
+}
+
+//-----------------------------------------------------------------------------
+void pqCameraDialog::applyCameraElevationPlus()
 {
   this->adjustCamera(pqCameraDialog::Elevation, this->Internal->elevationAngle->value());
 }
 
 //-----------------------------------------------------------------------------
-void pqCameraDialog::applyCameraAzimuth()
+void pqCameraDialog::applyCameraElevationMinus()
+{
+  this->adjustCamera(pqCameraDialog::Elevation, -this->Internal->elevationAngle->value());
+}
+
+//-----------------------------------------------------------------------------
+void pqCameraDialog::applyCameraAzimuthPlus()
 {
   this->adjustCamera(pqCameraDialog::Azimuth, this->Internal->azimuthAngle->value());
+}
+
+//-----------------------------------------------------------------------------
+void pqCameraDialog::applyCameraAzimuthMinus()
+{
+  this->adjustCamera(pqCameraDialog::Azimuth, -this->Internal->azimuthAngle->value());
 }
 
 //-----------------------------------------------------------------------------

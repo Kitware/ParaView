@@ -38,6 +38,7 @@ class pqCameraDialogInternal;
 class pqView;
 class pqSettings;
 class vtkSMRenderViewProxy;
+class QDoubleSpinBox;
 
 class PQCOMPONENTS_EXPORT pqCameraDialog : public pqDialog
 {
@@ -110,9 +111,12 @@ private Q_SLOTS:
   void resetViewDirection(
     double look_x, double look_y, double look_z, double up_x, double up_y, double up_z);
 
-  void applyCameraRoll();
-  void applyCameraElevation();
-  void applyCameraAzimuth();
+  void applyCameraRollPlus();
+  void applyCameraRollMinus();
+  void applyCameraElevationPlus();
+  void applyCameraElevationMinus();
+  void applyCameraAzimuthPlus();
+  void applyCameraAzimuthMinus();
   void applyCameraZoomIn();
   void applyCameraZoomOut();
 
