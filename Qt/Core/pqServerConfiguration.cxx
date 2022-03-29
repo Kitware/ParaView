@@ -82,8 +82,6 @@ void pqServerConfiguration::constructor(vtkPVXMLElement* xml)
 {
   assert(xml && xml->GetName() && strcmp(xml->GetName(), "Server") == 0);
   this->XML = xml;
-  this->Mutable = true;
-  this->parseSshPortForwardingXML();
 }
 
 //-----------------------------------------------------------------------------
@@ -114,8 +112,11 @@ bool pqServerConfiguration::isNameDefault() const
 }
 
 //-----------------------------------------------------------------------------
-pqServerResource pqServerConfiguration::actualResource() const
+pqServerResource pqServerConfiguration::actualResource()
 {
+  // Update the actual URI
+  this->parseSshPortForwardingXML();
+
   return pqServerResource(this->ActualURI, *this);
 }
 
@@ -128,7 +129,7 @@ pqServerResource pqServerConfiguration::resource() const
 //-----------------------------------------------------------------------------
 QString pqServerConfiguration::URI() const
 {
-  return this->resource().toURI();
+  return this->resource().schemeHostsPorts().toURI();
 }
 
 //-----------------------------------------------------------------------------
@@ -141,9 +142,6 @@ void pqServerConfiguration::setResource(const pqServerResource& arg_resource)
 void pqServerConfiguration::setResource(const QString& str)
 {
   this->XML->SetAttribute("resource", str.toUtf8().data());
-
-  // Make sure this->ActualURI is correctly updated if needed
-  this->parseSshPortForwardingXML();
 }
 
 //-----------------------------------------------------------------------------
@@ -337,7 +335,7 @@ QString pqServerConfiguration::lookForCommand(QString command)
 void pqServerConfiguration::parseSshPortForwardingXML()
 {
   pqServerResource resource = this->resource();
-  this->ActualURI = resource.toURI();
+  this->ActualURI = resource.schemeHostsPorts().toURI();
   this->PortForwarding = false;
   this->SSHCommand = false;
   vtkPVXMLElement* commandStartup = this->XML->FindNestedElementByName("CommandStartup");
@@ -373,7 +371,7 @@ void pqServerConfiguration::parseSshPortForwardingXML()
             {
               resource.setHost("localhost");
               resource.setPort(this->PortForwardingLocalPort.toInt());
-              this->ActualURI = resource.toURI();
+              this->ActualURI = resource.schemeHostsPorts().toURI();
             }
           }
         }

@@ -160,6 +160,19 @@ pqServer* pqServerManagerModel::findServer(const pqServerResource& resource) con
 }
 
 //-----------------------------------------------------------------------------
+pqServer* pqServerManagerModel::findServer(const QString& name) const
+{
+  Q_FOREACH (pqServer* server, this->Internal->Servers)
+  {
+    if (server && server->getResource().serverName() == name)
+    {
+      return server;
+    }
+  }
+  return nullptr;
+}
+
+//-----------------------------------------------------------------------------
 pqServerManagerModelItem* pqServerManagerModel::findItemHelper(
   const pqServerManagerModel* const model, const QMetaObject& vtkNotUsed(mo), vtkSMProxy* proxy)
 {

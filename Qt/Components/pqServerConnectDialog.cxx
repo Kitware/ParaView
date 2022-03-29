@@ -287,7 +287,7 @@ void pqServerConnectDialog::updateConfigurations()
   Q_FOREACH (const pqServerConfiguration& config, this->Internals->Configurations)
   {
     QTableWidgetItem* item1 = new QTableWidgetItem(config.name());
-    QTableWidgetItem* item2 = new QTableWidgetItem(config.resource().toURI());
+    QTableWidgetItem* item2 = new QTableWidgetItem(config.resource().schemeHostsPorts().toURI());
 
     // setup tooltips.
     item1->setToolTip(item1->text());
@@ -733,23 +733,50 @@ bool pqServerConnectDialog::selectServer(pqServerConfiguration& selected_configu
 {
   // see if only 1 server matched the selector (if valid). In that case, no
   // need to popup the dialog.
+  bool useResource = false;
   if (!selector.scheme().isEmpty())
   {
-    QList<pqServerConfiguration> configs =
-      pqApplicationCore::instance()->serverConfigurations().configurations(selector);
-    if (configs.size() == 1)
+    pqServerConfigurationCollection& configsCollection =
+      pqApplicationCore::instance()->serverConfigurations();
+
+    if (!selector.serverName().isEmpty())
     {
-      selected_configuration = configs[0];
-      return true;
+      const pqServerConfiguration* config =
+        configsCollection.configuration(selector.serverName().toUtf8().data());
+      if (config)
+      {
+        selected_configuration = *config;
+        return true;
+      }
+      else
+      {
+        useResource = true;
+      }
     }
-    else if (configs.empty())
+    else
     {
-      // Ne configs found, still add resource so config can be used somehow
-      selected_configuration.setResource(selector);
-      return true;
+      QList<pqServerConfiguration> configs = configsCollection.configurations(selector);
+      if (configs.size() == 1)
+      {
+        selected_configuration = configs[0];
+        return true;
+      }
+      else if (configs.empty())
+      {
+        useResource = true;
+      }
     }
   }
 
+  if (useResource)
+  {
+    // No configs found for a valid resource, try to use the provided resource to connnect to a
+    // server anyway
+    selected_configuration.setResource(selector);
+    return true;
+  }
+
+  // No unique server configuration identified, show the dialog
   pqServerConnectDialog dialog(dialogParent, selector);
   if (dialog.exec() == QDialog::Accepted)
   {

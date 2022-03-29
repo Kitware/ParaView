@@ -146,14 +146,22 @@ void pqRecentFilesMenu::buildMenu()
       const pqServerConfiguration& config = resource.configuration();
       if (config.isNameDefault())
       {
-        pqServerResource hostResource = (resource.scheme() == "session")
-          ? resource.sessionServer().schemeHostsPorts()
-          : resource.schemeHostsPorts();
-        key = hostResource.toURI();
+        QString serverName = resource.serverName();
+        if (!serverName.isEmpty())
+        {
+          key = serverName;
+        }
+        else
+        {
+          pqServerResource hostResource = (resource.scheme() == "session")
+            ? resource.sessionServer().schemeHostsPorts()
+            : resource.schemeHostsPorts();
+          key = hostResource.toURI();
+        }
       }
       else
       {
-        key = resource.configuration().URI();
+        key = resource.configuration().name();
       }
     }
     clusteredResources[key].push_back(resource);
@@ -201,20 +209,29 @@ void pqRecentFilesMenu::onOpenResource(QAction* action)
   QString data = action ? action->data().toString() : QString();
   if (!data.isEmpty())
   {
-    this->onOpenResource(pqServerResource(action->data().toString()));
+    this->onOpenResource(pqServerResource(data));
   }
 }
 
 //-----------------------------------------------------------------------------
 void pqRecentFilesMenu::onOpenResource(const pqServerResource& resource)
 {
-  const pqServerResource server = resource.scheme() == "session"
+  const pqServerResource serverResource = resource.scheme() == "session"
     ? resource.sessionServer().schemeHostsPorts()
-    : resource.schemeHostsPorts();
+    : resource.schemeHostsPortsServerName();
 
   pqServerManagerModel* smModel = pqApplicationCore::instance()->getServerManagerModel();
-  pqServer* pq_server = smModel->findServer(server);
-  if (!pq_server)
+  pqServer* server;
+  if (resource.serverName().isEmpty())
+  {
+    server = smModel->findServer(serverResource);
+  }
+  else
+  {
+    server = smModel->findServer(resource.serverName());
+  }
+
+  if (!server)
   {
     int ret =
       QMessageBox::warning(pqCoreUtilities::mainWidget(), tr("Disconnect from current server?"),
@@ -228,19 +245,19 @@ void pqRecentFilesMenu::onOpenResource(const pqServerResource& resource)
     }
     pqServerConfiguration config_to_connect;
     if (pqServerConnectDialog::selectServer(
-          config_to_connect, pqCoreUtilities::mainWidget(), server))
+          config_to_connect, pqCoreUtilities::mainWidget(), resource))
     {
       QScopedPointer<pqServerLauncher> launcher(pqServerLauncher::newInstance(config_to_connect));
       if (launcher->connectToServer())
       {
-        pq_server = launcher->connectedServer();
+        server = launcher->connectedServer();
       }
     }
   }
 
-  if (pq_server)
+  if (server)
   {
-    this->open(pq_server, resource);
+    this->open(server, resource);
   }
 }
 

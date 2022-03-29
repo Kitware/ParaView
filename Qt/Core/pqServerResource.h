@@ -116,9 +116,7 @@ public:
   const pqServerConfiguration& configuration() const;
 
   /**
-   * Returns a compact string representation of the resource in URI format
-   * Prefer using configuration->URI() if a configuration is available
-   * and not default.
+   * Returns a compact string representation of the complete resource in URI format, see above.
    */
   QString toURI() const;
 
@@ -174,6 +172,10 @@ public:
   pqServerResource sessionServer() const;
   void setSessionServer(const pqServerResource&);
 
+  QString serverName() const;
+  void setServerName(const QString& name);
+  pqServerResource serverNameServer() const;
+
   // add extra data to this resource
   void addData(const QString& key, const QString& value);
   // get extra data from this resource
@@ -181,15 +183,21 @@ public:
   QString data(const QString& key, const QString& default_value) const;
   bool hasData(const QString& key) const;
 
+  pqServerResource schemeHostsPortsServerName() const;
+
   /** Returns a copy of this resource containing only server information -
   scheme, host, and port numbers */
   pqServerResource schemeHostsPorts() const;
+
   /** Returns a copy of this resource containing a subset of server information -
   scheme and host (no port numbers */
   pqServerResource schemeHosts() const;
+
   /** Returns a copy of this resource containing only host and path information -
   scheme, port numbers, and server session are excluded */
   pqServerResource hostPath() const;
+
+  pqServerResource pathServerName() const;
 
   bool operator==(const pqServerResource&) const;
   bool operator!=(const pqServerResource&) const;

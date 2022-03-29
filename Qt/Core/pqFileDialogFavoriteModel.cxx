@@ -41,7 +41,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <pqCoreConfiguration.h>
 #include <pqFileDialogModel.h>
 #include <pqServer.h>
-#include <pqServerConfiguration.h>
 #include <pqServerResource.h>
 #include <pqSettings.h>
 #include <vtkClientServerStream.h>
@@ -77,11 +76,18 @@ pqFileDialogFavoriteModel::pqFileDialogFavoriteModel(
   // from the pqSettings. If server==nullptr, we use the "builtin:" resource.
   pqServerResource resource = server ? server->getResource() : pqServerResource("builtin:");
 
-  QString uri = resource.configuration().URI();
+  QString key = "UserFavorites/";
+  if (resource.serverName().isEmpty())
+  {
+    key += resource.toURI();
+  }
+  else
+  {
+    key += resource.serverName();
+  }
+
   pqApplicationCore* core = pqApplicationCore::instance();
   pqSettings* settings = core->settings();
-
-  QString key = QString("UserFavorites/%1").arg(uri);
   if (settings->contains(key))
   {
     QVariantList const fileInfos = settings->value(key).toList();

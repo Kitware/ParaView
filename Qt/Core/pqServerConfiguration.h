@@ -110,10 +110,10 @@ public:
    * Using this method is needed only when using low level tcp api.
    * ressource() method should be used in any other cases.
    */
-  pqServerResource actualResource() const;
+  pqServerResource actualResource();
 
   /**
-   * get the resource URI
+   * get the resource URI, does not contain the server name
    */
   QString URI() const;
 
@@ -223,10 +223,10 @@ protected:
 private:
   void constructor(const QString& name);
   void constructor(vtkPVXMLElement*);
-  bool Mutable;
+  bool Mutable = true;
   vtkSmartPointer<vtkPVXMLElement> XML;
-  bool PortForwarding;
-  bool SSHCommand;
+  bool PortForwarding = false;
+  bool SSHCommand = false;
   QString PortForwardingLocalPort;
   QString ActualURI;
 };

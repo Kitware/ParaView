@@ -49,11 +49,14 @@ pqRecentlyUsedResourcesList::~pqRecentlyUsedResourcesList() = default;
 void pqRecentlyUsedResourcesList::add(const pqServerResource& resource)
 {
   // Remove any existing resources that match the resource we're about to add ...
-  // Note: we consider a resource a "match" if it has the same host(s) and path;
+  // Note: we consider a resource a "match" if it has the same serverName if any, host(s) and path;
   // we ignore scheme and port(s)
+  bool emptyName = resource.serverName().isEmpty();
+
   for (int cc = 0; cc < this->ResourceList.size(); cc++)
   {
-    if (this->ResourceList[cc].hostPath() == resource.hostPath())
+    if ((emptyName && this->ResourceList[cc].hostPath() == resource.hostPath()) ||
+      (!emptyName && this->ResourceList[cc].pathServerName() == resource.pathServerName()))
     {
       this->ResourceList.removeAt(cc);
       cc--;
