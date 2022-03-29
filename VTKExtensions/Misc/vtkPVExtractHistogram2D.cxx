@@ -390,7 +390,6 @@ void vtkPVExtractHistogram2D::ComputeHistogram2D(vtkImageData* histogram)
     vtkIdType histIndex = bin2 * this->NumberOfBins[0] + bin1;
     histArray->SetTuple1(histIndex, histArray->GetTuple1(histIndex) + 1);
   }
-  return;
 }
 
 //------------------------------------------------------------------------------------------------

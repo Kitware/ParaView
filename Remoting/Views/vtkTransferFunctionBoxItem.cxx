@@ -101,7 +101,6 @@ void vtkTransferFunctionBoxItem::UpdateBoxPoints()
 
 //-------------------------------------------------------------------------------------------------
 vtkTransferFunctionBoxItem::vtkTransferFunctionBoxItem()
-  : Superclass()
 {
   this->Internals = new vtkTransferFunctionBoxItemInternals();
   this->Internals->TransferFunctionBox = vtkPVTransferFunction2DBox::New();
@@ -344,7 +343,6 @@ void vtkTransferFunctionBoxItem::SetControlPoint(
   vtkIdType vtkNotUsed(index), double* vtkNotUsed(point))
 {
   // This method does nothing as this item has a fixed number of points (4).
-  return;
 }
 
 //-------------------------------------------------------------------------------------------------
