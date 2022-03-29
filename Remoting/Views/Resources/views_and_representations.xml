@@ -8875,9 +8875,7 @@
                          name="LabelLocation"
                          number_of_elements="1">
         <EnumerationDomain name="enum">
-          <!-- for now, we skip interactive placement functionality
           <Entry text="Any Location" value="0" />
-          -->
           <Entry text="Lower Left Corner" value="1" />
           <Entry text="Lower Right Corner" value="2" />
           <Entry text="Lower Center" value="3" />
@@ -8885,11 +8883,27 @@
           <Entry text="Upper Right Corner" value="5" />
           <Entry text="Upper Center" value="6" />
         </EnumerationDomain>
-        <Documentation>Specify placement of the scalar bar actor.</Documentation>
+        <Documentation>
+          Placement of the text inside of the window.
+        </Documentation>
       </IntVectorProperty>
+
+      <DoubleVectorProperty command="SetPosition"
+                            name="Position"
+                            default_values="0.05 0.05"
+                            number_of_elements="2"
+                            information_property="PositionInfo">
+        <DoubleRangeDomain min="0 0"
+                           max="1 1"
+                           name="range" />
+        <Documentation>
+          Normalized position of the bottom left corner of the text box in pixels.
+        </Documentation>
+      </DoubleVectorProperty>
 
       <PropertyGroup label="Text Position" panel_widget="TextLocationEditor">
         <Property name="LabelLocation" function="WindowLocation" />
+        <Property name="Position" />
       </PropertyGroup>
 
     </ChartRepresentationProxy>
