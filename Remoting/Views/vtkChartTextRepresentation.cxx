@@ -28,10 +28,9 @@
 #include "vtkVariant.h"
 
 vtkStandardNewMacro(vtkChartTextRepresentation);
+
 //----------------------------------------------------------------------------
 vtkChartTextRepresentation::vtkChartTextRepresentation()
-  : Position{ 0, 0 }
-  , LabelLocation(vtkChartTextRepresentation::AnyLocation)
 {
   // don't render any background.
   this->BlockItem->GetBrush()->SetColorF(1.0, 1.0, 1.0, 0.0);
@@ -47,14 +46,13 @@ vtkChartTextRepresentation::vtkChartTextRepresentation()
 }
 
 //----------------------------------------------------------------------------
-vtkChartTextRepresentation::~vtkChartTextRepresentation() = default;
-
-//----------------------------------------------------------------------------
 void vtkChartTextRepresentation::OnInteractionEvent()
 {
   float dims[4];
+  int size[2];
   this->BlockItem->GetDimensions(dims);
-  this->SetPosition(dims[0], dims[1]);
+  this->BlockItem->GetScene()->GetGeometry(size);
+  this->SetPosition(dims[0] / size[0], dims[1] / size[1]);
   this->InvokeEvent(vtkCommand::InteractionEvent);
 }
 
@@ -192,8 +190,10 @@ int vtkChartTextRepresentation::ProcessViewRequest(
     }
     if (this->LabelLocation == AnyLocation)
     {
-      this->BlockItem->SetDimensions(
-        static_cast<float>(this->Position[0]), static_cast<float>(this->Position[1]), 10, 10);
+      int size[2];
+      this->BlockItem->GetScene()->GetGeometry(size);
+      this->BlockItem->SetDimensions(static_cast<float>(this->Position[0] * size[0]),
+        static_cast<float>(this->Position[1] * size[1]), 10, 10);
     }
     auto pvview = vtkPVContextView::SafeDownCast(this->GetView());
     if (auto chart = (pvview ? vtkChart::SafeDownCast(pvview->GetContextItem()) : nullptr))
