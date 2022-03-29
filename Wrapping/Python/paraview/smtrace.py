@@ -654,6 +654,7 @@ class PropertyTraceHelper(object):
         will either be a string used to refer to another proxy or a string used
         to refer to the proxy in a proxy list domain."""
         myobject = self.get_object()
+        fileListDomain = myobject.SMProperty.FindDomain("vtkSMFileListDomain")
         if isinstance(myobject, sm.ProxyProperty):
             data = myobject[:]
             if self.has_proxy_list_domain():
@@ -675,8 +676,9 @@ class PropertyTraceHelper(object):
                   return data[0]
             except IndexError:
                 return "None"
-        elif myobject.SMProperty.IsA("vtkSMStringVectorProperty"):
+        elif myobject.SMProperty.IsA("vtkSMStringVectorProperty") and not (fileListDomain and fileListDomain.GetIsOptional() == 0):
             # handle multiline properties (see #18480)
+            # but, not if the property is a list of files (see #21100)
             return self.create_multiline_string(repr(myobject))
         else:
             return repr(myobject)
