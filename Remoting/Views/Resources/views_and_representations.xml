@@ -8904,7 +8904,7 @@
         <Documentation>Specify placement of the logo actor.</Documentation>
       </IntVectorProperty>
 
-      <PropertyGroup label="Logo Position" panel_widget="LogoLocationEditor">
+      <PropertyGroup label="Logo Position" panel_widget="TextLocationEditor">
         <Property name="LogoLocation" function="WindowLocation" />
       </PropertyGroup>
 
