@@ -1,78 +1,4 @@
 <ServerManagerConfiguration>
-  <ProxyGroup name="internal_writers">
-    <!-- ================================================================= -->
-    <Proxy class="vtkCSVWriter" name="CSVWriter">
-      <Documentation short_help="Writer to write CSV files">
-        Writer to write comma or tab delimited files from a table. If the file extension is tsv
-        it uses the tab character for the delimiter. Otherwise, it uses a comma.
-      </Documentation>
-
-      <InputProperty name="DummyInput" panel_visibility="never">
-      </InputProperty>
-
-      <IntVectorProperty command="SetPrecision"
-                         default_values="5"
-                         name="Precision"
-                         number_of_elements="1">
-        <IntRangeDomain min="0"
-                        name="range"/>
-      </IntVectorProperty>
-      <IntVectorProperty command="SetUseScientificNotation"
-                         default_values="0"
-                         name="UseScientificNotation"
-                         number_of_elements="1">
-        <BooleanDomain name="bool"/>
-      </IntVectorProperty>
-      <StringVectorProperty command="SetFieldDelimiter"
-                            name="FieldDelimiter"
-                            default_values=","
-                            number_of_elements="1">
-        <Documentation>
-          Used to set the delimiter character. This is hidden from the user
-          and set automatically based on the file extension. An extension of .tsv will set
-          the delimiter character to a tab. Otherwise a comma will be used as the delimiter.
-        </Documentation>
-      </StringVectorProperty>
-      <IntVectorProperty command="SetFieldAssociation"
-                         default_values="0"
-                         name="FieldAssociation"
-                         number_of_elements="1">
-        <Documentation>
-          Select the attribute data to pass.
-        </Documentation>
-        <FieldDataDomain name="enum" enable_field_data="1">
-          <RequiredProperties>
-            <Property function="Input" name="DummyInput"/>
-          </RequiredProperties>
-        </FieldDataDomain>
-      </IntVectorProperty>
-      <IntVectorProperty command="SetAddMetaData"
-                         default_values="1"
-                         name="AddMetaData"
-                         number_of_elements="1">
-        <Documentation>
-          It is possible for this filter to add additional meta-data to the field
-          data such as point coordinates (when point attributes are selected and
-          input is point-set) or structured coordinates etc. To enable this addition
-          of extra information, turn this flag on.
-        </Documentation>
-        <BooleanDomain name="bool"/>
-      </IntVectorProperty>
-      <IntVectorProperty command="SetAddTime"
-                         default_values="0"
-                         name="AddTime"
-                         number_of_elements="1">
-        <Documentation>
-          When set, the writer will add a "Time" column to the generated
-          file indicating the current dataset time, if any.
-        </Documentation>
-        <BooleanDomain name="bool"/>
-      </IntVectorProperty>
-      <!-- End of CSVWriter -->
-    </Proxy>
-    <!-- end of "internal_writers" -->
-  </ProxyGroup>
-
   <!-- =================================================================== -->
   <ProxyGroup name="writers">
     <!-- ================================================================= -->
@@ -226,19 +152,19 @@
     </PWriterProxy>
 
     <!-- ================================================================= -->
-    <PWriterProxy class="vtkFileSeriesWriter"
+    <PWriterProxy class="vtkCSVWriter"
                   file_name_method="SetFileName"
                   name="CSVWriter">
       <Documentation short_help="Writer to write CSV files">
-        Writer to write comma or tab
-        delimited files from any dataset. Set FieldAssociation to choose whether cell
-        data/point data needs to be saved. If the file extension is tsv it uses the tab character
-        for the delimiter. Otherwise it uses a comma.
+        Writer to write comma or tab delimited files from any dataset. Set FieldAssociation to
+        choose whether cell data/point data needs to be saved. If the file extension is tsv it
+        uses the tab character for the delimiter. Otherwise, it uses a comma.
       </Documentation>
       <InputProperty command="SetInputConnection"
                      panel_visibility="never"
                      name="Input">
         <DataTypeDomain name="input_type">
+          <DataType value="vtkCompositeDataSet"/>
           <DataType value="vtkDataSet"/>
           <DataType value="vtkTable"/>
         </DataTypeDomain>
@@ -308,25 +234,84 @@
         </LinkProperties>
       </SubProxy>
 
-      <SubProxy>
-        <Proxy name="Writer"
-               proxygroup="internal_writers"
-               proxyname="CSVWriter"></Proxy>
-        <ExposedProperties>
-          <PropertyGroup label="CSV Writer Parameters">
-            <Property name="Precision"/>
-            <Property name="FieldDelimiter"
-                      panel_visibility="never"/>
-            <Property name="UseScientificNotation"/>
-            <Property name="FieldAssociation"/>
-            <Property name="AddMetaData"/>
-            <Property name="AddTime"/>
-          </PropertyGroup>
-        </ExposedProperties>
-        <LinkProperties>
-          <Property name="DummyInput" with_property="Input"/>
-        </LinkProperties>
-      </SubProxy>
+      <IntVectorProperty command="SetPrecision"
+                         default_values="5"
+                         name="Precision"
+                         number_of_elements="1">
+        <IntRangeDomain min="0"
+                        name="range"/>
+      </IntVectorProperty>
+      <StringVectorProperty command="SetFieldDelimiter"
+                            name="FieldDelimiter"
+                            default_values=","
+                            number_of_elements="1"
+                            panel_visibility="never">
+        <Documentation>
+          Used to set the delimiter character. This is hidden from the user
+          and set automatically based on the file extension. An extension of .tsv will set
+          the delimiter character to a tab. Otherwise a comma will be used as the delimiter.
+        </Documentation>
+      </StringVectorProperty>
+      <IntVectorProperty command="SetUseScientificNotation"
+                         default_values="0"
+                         name="UseScientificNotation"
+                         number_of_elements="1">
+        <BooleanDomain name="bool"/>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetFieldAssociation"
+                         default_values="0"
+                         name="FieldAssociation"
+                         number_of_elements="1">
+        <Documentation>
+          Select the attribute data to pass.
+        </Documentation>
+        <FieldDataDomain name="enum" enable_field_data="1">
+          <RequiredProperties>
+            <Property function="Input" name="Input"/>
+          </RequiredProperties>
+        </FieldDataDomain>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetAddMetaData"
+                         default_values="1"
+                         name="AddMetaData"
+                         number_of_elements="1">
+        <Documentation>
+          It is possible for this filter to add additional meta-data to the field
+          data such as point coordinates (when point attributes are selected and
+          input is point-set) or structured coordinates etc. To enable this addition
+          of extra information, turn this flag on.
+        </Documentation>
+        <BooleanDomain name="bool"/>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetAddTimeStep"
+                         default_values="0"
+                         name="AddTimeStep"
+                         number_of_elements="1">
+        <Documentation>
+          When set, the writer will add a "TimeStep" column to the generated
+          file indicating the current dataset time step, if any.
+        </Documentation>
+        <BooleanDomain name="bool"/>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetAddTime"
+                         default_values="0"
+                         name="AddTime"
+                         number_of_elements="1">
+        <Documentation>
+          When set, the writer will add a "Time" column to the generated
+          file indicating the current dataset time, if any.
+        </Documentation>
+        <BooleanDomain name="bool"/>
+      </IntVectorProperty>
+      <PropertyGroup label="CSV Writer Parameters">
+        <Property name="Precision"/>
+        <Property name="FieldDelimiter"/>
+        <Property name="UseScientificNotation"/>
+        <Property name="FieldAssociation"/>
+        <Property name="AddMetaData"/>
+        <Property name="AddTimeStep"/>
+        <Property name="AddTime"/>
+      </PropertyGroup>
 
       <Hints>
         <WriterFactory extensions="csv txt tsv"
@@ -337,7 +322,7 @@
     </PWriterProxy>
 
     <!-- ================================================================= -->
-    <PWriterProxy class="vtkFileSeriesWriter"
+    <PWriterProxy class="vtkCSVWriter"
                   file_name_method="SetFileName"
                   name="DataSetCSVWriter"
                   base_proxygroup="writers"
@@ -372,6 +357,7 @@
           <Property name="Precision" panel_visibility="advanced"/>
           <Property name="UseScientificNotation" panel_visibility="advanced"/>
           <Property name="AddMetaData" panel_visibility="advanced"/>
+          <Property name="AddTimeStep" panel_visibility="advanced"/>
           <Property name="AddTime" panel_visibility="advanced"/>
         </ExposedProperties>
       </SubProxy>
