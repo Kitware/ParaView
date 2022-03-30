@@ -76,6 +76,18 @@ public:
   vtkBooleanMacro(WriteAllTimeSteps, bool);
   ///@}
 
+  //@{
+  /**
+   * Provides an option to pad the time step when writing out time series data.
+   * Only allow this format: ABC%.Xd where ABC is an arbitrary string which may
+   * or may not exist and d must exist and d must be the last character
+   * '.' and X may or may not exist, X must be an integer if it exists.
+   * Default is nullptr.
+   */
+  vtkGetStringMacro(FileNameSuffix);
+  vtkSetStringMacro(FileNameSuffix);
+  //@}
+
 protected:
   vtkCGNSWriter();
   ~vtkCGNSWriter() override;
@@ -99,6 +111,7 @@ protected:
   char* FileName = nullptr;
   bool UseHDF5 = true;
   bool WriteAllTimeSteps = false;
+  char* FileNameSuffix = nullptr;
 
   int NumberOfTimeSteps = 0;
   int CurrentTimeIndex = 0;

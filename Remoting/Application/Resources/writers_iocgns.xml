@@ -50,8 +50,27 @@
           executed once for each time step available from the reader.
         </Documentation>
       </IntVectorProperty>
+      <StringVectorProperty command="SetFileNameSuffix"
+                            default_values="_%d"
+                            label="File name suffix"
+                            name="FileNameSuffix"
+                            number_of_elements="1">
+        <Documentation>
+          The suffix to append to the file name when writing files at different timesteps.
+          (File extensions such as .csv should be excluded.)
+          The % format specifiers are used. For example, _%d will write files as FileName_0,
+          FileName_1, FileName_2, etc., and _%.3d will write files as FileName_000,
+          FileName_001, FileName_002 etc.
+        </Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="EnableWidgetDecorator">
+            <Property name="WriteAllTimeSteps" function="boolean"/>
+          </PropertyWidgetDecorator>
+        </Hints>
+      </StringVectorProperty>
       <PropertyGroup label="File Series">
         <Property name="WriteAllTimeSteps"/>
+        <Property name="FileNameSuffix"/>
       </PropertyGroup>
       <Hints>
         <Property name="Input" show="0"/>
