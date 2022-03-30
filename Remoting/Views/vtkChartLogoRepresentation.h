@@ -28,7 +28,6 @@
 #include "vtkNew.h" // for vtkNew
 #include "vtkPVDataRepresentation.h"
 
-class vtkPolyData;
 class vtkImageItem;
 
 class VTKREMOTINGVIEWS_EXPORT vtkChartLogoRepresentation : public vtkPVDataRepresentation
@@ -103,7 +102,7 @@ private:
 
   vtkNew<vtkImageItem> ImageItem;
   vtkNew<vtkImageData> PreparedData;
-  double Position[2] = { 0, 0 };
+  double Position[2] = { 0.05, 0.05 };
   int LogoLocation = AnyLocation;
 };
 
