@@ -85,6 +85,20 @@ public:
   vtkBooleanMacro(WriteAllTimeSteps, bool);
   ///@}
 
+  ///@{
+  /**
+   * When WriteAllTimeStepsSeparately is turned ON and WriteAllTimeSteps is ON,
+   * the writer is executed once for each timestep available from its input,
+   * and writes the timesteps to separate files, otherwise, the timesteps are written
+   * in one file.
+   *
+   * The Default is OFF.
+   */
+  vtkSetMacro(WriteAllTimeStepsSeparately, bool);
+  vtkGetMacro(WriteAllTimeStepsSeparately, bool);
+  vtkBooleanMacro(WriteAllTimeStepsSeparately, bool);
+  ///@}
+
   //@{
   /**
    * Provides an option to pad the time step when writing out time series data.
@@ -198,6 +212,7 @@ protected:
 
   char* FileName;
   bool WriteAllTimeSteps;
+  bool WriteAllTimeStepsSeparately;
   char* FileNameSuffix;
   char* FieldDelimiter;
   char* StringDelimiter;

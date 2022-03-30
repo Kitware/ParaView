@@ -55,6 +55,7 @@ vtkCSVWriter::vtkCSVWriter()
   this->SetFieldDelimiter(",");
   this->FileName = nullptr;
   this->WriteAllTimeSteps = false;
+  this->WriteAllTimeStepsSeparately = false;
   this->FileNameSuffix = nullptr;
   this->Precision = 5;
   this->UseScientificNotation = true;
@@ -305,14 +306,26 @@ public:
   {
   }
 
-  int Open(const char* filename)
+  enum class OpenMode
+  {
+    Write,
+    Append
+  };
+
+  int Open(const char* filename, OpenMode mode)
   {
     if (!filename)
     {
       return vtkErrorCode::NoFileNameError;
     }
-
-    this->Stream.open(filename, ios::out);
+    if (OpenMode::Write == mode)
+    {
+      this->Stream.open(filename, ios::out);
+    }
+    else // (OpenMode::Append == mode)
+    {
+      this->Stream.open(filename, ios::app);
+    }
     if (this->Stream.fail())
     {
       return vtkErrorCode::CannotOpenFileError;
@@ -320,64 +333,76 @@ public:
     return vtkErrorCode::NoError;
   }
 
-  void WriteHeader(vtkTable* table, vtkCSVWriter* self)
+  void WriteHeader(vtkTable* table, vtkCSVWriter* self, OpenMode mode)
   {
-    this->WriteHeader(table->GetRowData(), self);
+    this->WriteHeader(table->GetRowData(), self, mode);
   }
 
-  void WriteHeader(vtkDataSetAttributes* dsa, vtkCSVWriter* self)
+  void WriteHeader(vtkDataSetAttributes* dsa, vtkCSVWriter* self, OpenMode mode)
   {
-    bool add_delimiter = false;
-    if (this->TimeStep >= 0)
+    if (OpenMode::Write == mode)
     {
-      this->Stream << "TimeStep";
-      add_delimiter = true;
-    }
-    if (!vtkMath::IsNan(this->Time))
-    {
-      if (add_delimiter)
+      bool add_delimiter = false;
+      if (this->TimeStep >= 0)
       {
-        // add separator for all but the very first column
-        this->Stream << self->GetFieldDelimiter();
+        this->Stream << "TimeStep";
+        add_delimiter = true;
       }
-      // add a time column.
-      this->Stream << "Time";
-      add_delimiter = true;
-    }
-    for (int cc = 0, numArrays = dsa->GetNumberOfArrays(); cc < numArrays; ++cc)
-    {
-      auto array = dsa->GetAbstractArray(cc);
-      const int num_comps = array->GetNumberOfComponents();
-
-      // save order of arrays written out in header
-      this->ColumnInfo.push_back(std::make_pair(std::string(array->GetName()), num_comps));
-
-      for (int comp = 0; comp < num_comps; ++comp)
+      if (!vtkMath::IsNan(this->Time))
       {
         if (add_delimiter)
         {
           // add separator for all but the very first column
           this->Stream << self->GetFieldDelimiter();
         }
+        // add a time column.
+        this->Stream << "Time";
         add_delimiter = true;
+      }
+      for (int cc = 0, numArrays = dsa->GetNumberOfArrays(); cc < numArrays; ++cc)
+      {
+        auto array = dsa->GetAbstractArray(cc);
+        const int num_comps = array->GetNumberOfComponents();
 
-        std::ostringstream array_name;
-        array_name << array->GetName();
-        if (array->GetNumberOfComponents() > 1)
+        // save order of arrays written out in header
+        this->ColumnInfo.push_back(std::make_pair(std::string(array->GetName()), num_comps));
+
+        for (int comp = 0; comp < num_comps; ++comp)
         {
-          array_name << ":" << comp;
+          if (add_delimiter)
+          {
+            // add separator for all but the very first column
+            this->Stream << self->GetFieldDelimiter();
+          }
+          add_delimiter = true;
+
+          std::ostringstream array_name;
+          array_name << array->GetName();
+          if (array->GetNumberOfComponents() > 1)
+          {
+            array_name << ":" << comp;
+          }
+          this->Stream << self->GetString(array_name.str());
         }
-        this->Stream << self->GetString(array_name.str());
+      }
+      this->Stream << "\n";
+    }
+    else // (OpenMode::Append == mode)
+    {
+      for (int cc = 0, numArrays = dsa->GetNumberOfArrays(); cc < numArrays; ++cc)
+      {
+        auto array = dsa->GetAbstractArray(cc);
+        const int num_comps = array->GetNumberOfComponents();
+
+        // save order of arrays written out in header
+        this->ColumnInfo.push_back(std::make_pair(std::string(array->GetName()), num_comps));
       }
     }
-    this->Stream << "\n";
-
     // push the floating point precision/notation type.
     if (self->GetUseScientificNotation())
     {
       this->Stream << std::scientific;
     }
-
     this->Stream << std::setprecision(self->GetPrecision());
   }
 
@@ -493,7 +518,7 @@ void vtkCSVWriter::WriteData()
 
   // define filename
   std::ostringstream filename;
-  if (this->WriteAllTimeSteps && this->NumberOfTimeSteps > 1)
+  if (this->WriteAllTimeSteps && this->WriteAllTimeStepsSeparately && this->NumberOfTimeSteps > 1)
   {
     const std::string path = vtksys::SystemTools::GetFilenamePath(this->FileName);
     const std::string filenameNoExt =
@@ -572,10 +597,14 @@ void vtkCSVWriter::WriteData()
     (controller->GetNumberOfProcesses() == 1 && controller->GetLocalProcessId() == 0))
   {
     vtkCSVWriter::CSVFile file(timeStep, time);
-    int error_code = file.Open(filename.str().c_str());
+    CSVFile::OpenMode openMode =
+      this->WriteAllTimeSteps && !this->WriteAllTimeStepsSeparately && this->CurrentTimeIndex > 0
+      ? CSVFile::OpenMode::Append
+      : CSVFile::OpenMode::Write;
+    int error_code = file.Open(filename.str().c_str(), openMode);
     if (error_code == vtkErrorCode::NoError)
     {
-      file.WriteHeader(table, this);
+      file.WriteHeader(table, this, openMode);
       file.WriteData(table, this);
     }
     this->SetErrorCode(error_code);
@@ -622,7 +651,11 @@ void vtkCSVWriter::WriteData()
   else
   {
     vtkCSVWriter::CSVFile file(timeStep, time);
-    int error_code = file.Open(filename.str().c_str());
+    CSVFile::OpenMode openMode =
+      this->WriteAllTimeSteps && !this->WriteAllTimeStepsSeparately && this->CurrentTimeIndex > 0
+      ? CSVFile::OpenMode::Append
+      : CSVFile::OpenMode::Write;
+    int error_code = file.Open(filename.str().c_str(), openMode);
     controller->Broadcast(&error_code, 1, 0);
     if (error_code != vtkErrorCode::NoError)
     {
@@ -662,7 +695,7 @@ void vtkCSVWriter::WriteData()
     columns.CopyAllocate(tmp, vtkDataSetAttributes::PASSDATA, /*sz=*/1, 0);
 
     // first write headers.
-    file.WriteHeader(tmp, this);
+    file.WriteHeader(tmp, this, openMode);
 
     for (int rank = 0; rank < numRanks; ++rank)
     {
@@ -708,6 +741,8 @@ void vtkCSVWriter::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "UseStringDelimiter: " << this->UseStringDelimiter << endl;
   os << indent << "FileName: " << (this->FileName ? this->FileName : "(none)") << endl;
   os << indent << "WriteAllTimeSteps " << (this->WriteAllTimeSteps ? "Yes" : "No") << endl;
+  os << indent << "WriteAllTimeStepsSeparately "
+     << (this->WriteAllTimeStepsSeparately ? "Yes" : "No") << endl;
   os << indent << "FileNameSuffix: " << (this->FileNameSuffix ? this->FileNameSuffix : "(none)")
      << endl;
   os << indent << "UseScientificNotation: " << this->UseScientificNotation << endl;

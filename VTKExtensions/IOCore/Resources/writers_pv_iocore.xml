@@ -190,6 +190,23 @@
           executed once for each timestep available from its input.
         </Documentation>
       </IntVectorProperty>
+      <IntVectorProperty command="SetWriteAllTimeStepsSeparately"
+                         default_values="0"
+                         name="WriteTimeStepsSeparately"
+                         number_of_elements="1">
+        <Documentation>
+          When WriteTimeSteps is turned ON, the writer is
+          executed once for each timestep available from its input,
+          and the timesteps can be written to separate files, otherwise,
+          the timesteps are written in one file.
+        </Documentation>
+        <BooleanDomain name="bool"/>
+        <Hints>
+          <PropertyWidgetDecorator type="EnableWidgetDecorator">
+            <Property name="WriteTimeSteps" function="boolean"/>
+          </PropertyWidgetDecorator>
+        </Hints>
+      </IntVectorProperty>
       <StringVectorProperty command="SetFileNameSuffix"
                             default_values="_%d"
                             label="File name suffix"
@@ -203,8 +220,15 @@
           FileName_001, FileName_002 etc.
         </Documentation>
         <Hints>
-          <PropertyWidgetDecorator type="EnableWidgetDecorator">
-            <Property name="WriteTimeSteps" function="boolean"/>
+          <PropertyWidgetDecorator type="CompositeDecorator">
+            <Expression type="and">
+              <PropertyWidgetDecorator type="EnableWidgetDecorator">
+                <Property name="WriteTimeSteps" function="boolean"/>
+              </PropertyWidgetDecorator>
+              <PropertyWidgetDecorator type="EnableWidgetDecorator">
+                <Property name="WriteTimeStepsSeparately" function="boolean"/>
+              </PropertyWidgetDecorator>
+            </Expression>
           </PropertyWidgetDecorator>
         </Hints>
       </StringVectorProperty>
