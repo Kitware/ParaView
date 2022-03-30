@@ -130,6 +130,30 @@ int vtkChartLogoRepresentation::ProcessViewRequest(
       int dims[3];
       vtkRectf chartRect = chart->GetSize();
       this->ImageItem->GetImage()->GetDimensions(dims);
+
+      // Rescale logo
+      double logoWidth = 0.075 * chartRect.GetRight();
+      double logoHeight = 0.075 * chartRect.GetTop();
+
+      double ratio = static_cast<double>(dims[0]) / static_cast<double>(dims[1]);
+      if (ratio > 1)
+      {
+        dims[0] = logoWidth;
+        dims[1] = dims[0] / ratio;
+      }
+      else
+      {
+        dims[1] = logoHeight;
+        dims[0] = dims[1] * ratio;
+      }
+
+      vtkNew<vtkImageResize> resize;
+      resize->SetInputData(this->ImageItem->GetImage());
+      resize->SetResizeMethod(vtkImageResize::OUTPUT_DIMENSIONS);
+      resize->SetOutputDimensions(dims);
+      resize->Update();
+      this->ImageItem->SetImage(resize->GetOutput(0));
+
       float position[2] = { 0, 0 };
       if (this->LogoLocation == AnyLocation)
       {
