@@ -8905,9 +8905,7 @@
                          name="LogoLocation"
                          number_of_elements="1">
         <EnumerationDomain name="enum">
-          <!-- for now, we skip interactive placement functionality
           <Entry text="Any Location" value="0" />
-          -->
           <Entry text="Lower Left Corner" value="1" />
           <Entry text="Lower Right Corner" value="2" />
           <Entry text="Lower Center" value="3" />
@@ -8917,9 +8915,22 @@
         </EnumerationDomain>
         <Documentation>Specify placement of the logo actor.</Documentation>
       </IntVectorProperty>
+      <DoubleVectorProperty command="SetPosition"
+                            name="Position"
+                            default_values="0.05 0.05"
+                            number_of_elements="2"
+                            information_property="PositionInfo">
+        <DoubleRangeDomain min="0 0"
+            max="1 1"
+            name="range" />
+        <Documentation>
+        Normalized position of the bottom left corner of the text box in pixels.
+        </Documentation>
+      </DoubleVectorProperty>
 
       <PropertyGroup label="Logo Position" panel_widget="TextLocationEditor">
         <Property name="LogoLocation" function="WindowLocation" />
+        <Property name="Position"/>
       </PropertyGroup>
 
     </ChartRepresentationProxy>
