@@ -359,14 +359,19 @@ void pqPythonMacroSupervisor::removeMacro(const QString& fileName)
 void pqPythonMacroSupervisor::onMacroTriggered()
 {
   QObject* action = this->sender();
+  // Get the filenames before executing the corresponding scripts. (See #18261)
+  QList<QString> filenames;
   QMap<QString, QAction*>::const_iterator itr = this->Internal->RunActionMap.constBegin();
   for (; itr != this->Internal->RunActionMap.constEnd(); ++itr)
   {
     if (itr.value() == action)
     {
-      const QString& filename = itr.key();
-      Q_EMIT this->executeScriptRequested(filename);
+      filenames.append(itr.key());
     }
+  }
+  Q_FOREACH (QString filename, filenames)
+  {
+    Q_EMIT this->executeScriptRequested(filename);
   }
 }
 //----------------------------------------------------------------------------
