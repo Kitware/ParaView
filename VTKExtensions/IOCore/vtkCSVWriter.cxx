@@ -99,17 +99,17 @@ namespace
 //-----------------------------------------------------------------------------
 template <class iterT>
 void vtkCSVWriterGetDataString(
-  iterT* iter, vtkIdType tupleIndex, ostream& stream, vtkCSVWriter* writer, bool* first)
+  iterT* iter, vtkIdType tupleIndex, ostream& stream, vtkCSVWriter* writer, bool& first)
 {
   int numComps = iter->GetNumberOfComponents();
   vtkIdType index = tupleIndex * numComps;
   for (int cc = 0; cc < numComps; cc++)
   {
-    if (!(*first))
+    if (!first)
     {
       stream << writer->GetFieldDelimiter();
     }
-    *first = false;
+    first = false;
     if ((index + cc) < iter->GetNumberOfValues())
     {
       stream << iter->GetValue(index + cc);
@@ -120,17 +120,17 @@ void vtkCSVWriterGetDataString(
 //-----------------------------------------------------------------------------
 template <>
 void vtkCSVWriterGetDataString(vtkArrayIteratorTemplate<vtkStdString>* iter, vtkIdType tupleIndex,
-  ostream& stream, vtkCSVWriter* writer, bool* first)
+  ostream& stream, vtkCSVWriter* writer, bool& first)
 {
   int numComps = iter->GetNumberOfComponents();
   vtkIdType index = tupleIndex * numComps;
   for (int cc = 0; cc < numComps; cc++)
   {
-    if (!(*first))
+    if (!first)
     {
       stream << writer->GetFieldDelimiter();
     }
-    (*first) = false;
+    first = false;
     if ((index + cc) < iter->GetNumberOfValues())
     {
       stream << writer->GetString(iter->GetValue(index + cc));
@@ -141,17 +141,17 @@ void vtkCSVWriterGetDataString(vtkArrayIteratorTemplate<vtkStdString>* iter, vtk
 //-----------------------------------------------------------------------------
 template <>
 void vtkCSVWriterGetDataString(vtkArrayIteratorTemplate<char>* iter, vtkIdType tupleIndex,
-  ostream& stream, vtkCSVWriter* writer, bool* first)
+  ostream& stream, vtkCSVWriter* writer, bool& first)
 {
   int numComps = iter->GetNumberOfComponents();
   vtkIdType index = tupleIndex * numComps;
   for (int cc = 0; cc < numComps; cc++)
   {
-    if (!(*first))
+    if (!first)
     {
       stream << writer->GetFieldDelimiter();
     }
-    (*first) = false;
+    first = false;
     if ((index + cc) < iter->GetNumberOfValues())
     {
       stream << static_cast<int>(iter->GetValue(index + cc));
@@ -162,7 +162,7 @@ void vtkCSVWriterGetDataString(vtkArrayIteratorTemplate<char>* iter, vtkIdType t
 //-----------------------------------------------------------------------------
 template <>
 void vtkCSVWriterGetDataString(vtkArrayIteratorTemplate<unsigned char>* iter, vtkIdType tupleIndex,
-  ostream& stream, vtkCSVWriter* writer, bool* first)
+  ostream& stream, vtkCSVWriter* writer, bool& first)
 {
   int numComps = iter->GetNumberOfComponents();
   vtkIdType index = tupleIndex * numComps;
@@ -170,20 +170,20 @@ void vtkCSVWriterGetDataString(vtkArrayIteratorTemplate<unsigned char>* iter, vt
   {
     if ((index + cc) < iter->GetNumberOfValues())
     {
-      if (*first == false)
+      if (!first)
       {
         stream << writer->GetFieldDelimiter();
       }
-      *first = false;
+      first = false;
       stream << static_cast<int>(iter->GetValue(index + cc));
     }
     else
     {
-      if (*first == false)
+      if (!first)
       {
         stream << writer->GetFieldDelimiter();
       }
-      *first = false;
+      first = false;
     }
   }
 }
@@ -304,7 +304,7 @@ public:
         switch (iter->GetDataType())
         {
           vtkArrayIteratorTemplateMacro(vtkCSVWriterGetDataString(
-            static_cast<VTK_TT*>(iter.GetPointer()), cc, this->Stream, self, &first_column));
+            static_cast<VTK_TT*>(iter.GetPointer()), cc, this->Stream, self, first_column));
         }
       }
       this->Stream << "\n";
