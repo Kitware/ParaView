@@ -169,10 +169,17 @@ public:
   virtual void clearUndoStack();
 
   /**
-   * Reset camera view direction
+   * Reset/Adjust camera view direction.
    */
   virtual void resetViewDirection(
     double look_x, double look_y, double look_z, double up_x, double up_y, double up_z);
+  virtual void adjustView(const int& adjustType, const double& angle);
+  virtual void resetViewDirectionToPositiveX();
+  virtual void resetViewDirectionToNegativeX();
+  virtual void resetViewDirectionToPositiveY();
+  virtual void resetViewDirectionToNegativeY();
+  virtual void resetViewDirectionToPositiveZ();
+  virtual void resetViewDirectionToNegativeZ();
 
   /**
    * Let internal class handle which internal widget should change its cursor

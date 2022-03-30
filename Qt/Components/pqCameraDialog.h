@@ -132,14 +132,7 @@ protected:
 private:
   pqCameraDialogInternal* Internal;
 
-  enum CameraAdjustmentType
-  {
-    Roll = 0,
-    Elevation,
-    Azimuth,
-    Zoom
-  };
-  void adjustCamera(CameraAdjustmentType enType, double value);
+  void adjustCamera(const int& enType, double value);
 };
 
 #endif

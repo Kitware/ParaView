@@ -1627,8 +1627,13 @@ class SaveCameras(RenderingMixin, BookkeepingItem):
     """This is used to request recording of cameras in trace"""
     # This is a little hackish at this point. We'll figure something cleaner out
     # in time.
-    def __init__(self, proxy=None):
+    def __init__(self, proxy=None, **kwargs):
         trace = self.get_trace(proxy)
+        try:
+            Trace.Output.append(["# " + kwargs["comment"]])
+            del kwargs["comment"]
+        except KeyError:
+            pass
         if trace:
             Trace.Output.append_separated(trace)
 

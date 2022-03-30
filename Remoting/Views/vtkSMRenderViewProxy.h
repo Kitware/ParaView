@@ -151,10 +151,30 @@ public:
    */
   vtkRenderer* GetRenderer();
 
+  enum class CameraAdjustmentType : int
+  {
+    Roll = 0,
+    Elevation,
+    Azimuth,
+    Zoom
+  };
+  //@{
   /**
-   * Returns the client-side camera object.
+   * Returns the client-side active camera object.
+   * Helper methods to adjust its orientation and position.
    */
   vtkCamera* GetActiveCamera();
+  void AdjustActiveCamera(const CameraAdjustmentType&, const double&);
+  void AdjustActiveCamera(const int&, const double&);
+  void ResetActiveCameraToDirection(const double& look_x, const double& look_y,
+    const double& look_z, const double& up_x, const double& up_y, const double& up_z);
+  void ResetActiveCameraToPositiveX();
+  void ResetActiveCameraToNegativeX();
+  void ResetActiveCameraToPositiveY();
+  void ResetActiveCameraToNegativeY();
+  void ResetActiveCameraToPositiveZ();
+  void ResetActiveCameraToNegativeZ();
+  //@}
 
   /**
    * This method calls UpdateInformation on the Camera Proxy
