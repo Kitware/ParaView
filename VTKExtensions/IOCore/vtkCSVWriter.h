@@ -14,8 +14,8 @@
 =========================================================================*/
 /**
  * @class   vtkCSVWriter
- * @brief   CSV writer for vtkTable
- * Writes a vtkTable as a delimited text file (such as CSV).
+ * @brief   CSV writer for vtkTable/vtkDataSet/vtkCompositeDataSet
+ * Writes a vtkTable/vtkDataSet/vtkCompositeDataSet as a delimited text file (such as CSV).
  */
 
 #ifndef vtkCSVWriter_h
