@@ -56,17 +56,15 @@ pqScalarBarRepresentation::~pqScalarBarRepresentation() = default;
 //-----------------------------------------------------------------------------
 #define PUSH_PROPERTY(name)                                                                        \
   {                                                                                                \
-    vtkSMPropertyModificationUndoElement* elem = vtkSMPropertyModificationUndoElement::New();      \
+    vtkNew<vtkSMPropertyModificationUndoElement> elem;                                             \
     elem->ModifiedProperty(proxy, name);                                                           \
     ADD_UNDO_ELEM(elem);                                                                           \
-    elem->Delete();                                                                                \
   }
 
 //-----------------------------------------------------------------------------
 void pqScalarBarRepresentation::startInteraction()
 {
   BEGIN_UNDO_SET("Move Color Legend");
-
   vtkSMProxy* proxy = this->getProxy();
   PUSH_PROPERTY("Position");
   PUSH_PROPERTY("ScalarBarLength");

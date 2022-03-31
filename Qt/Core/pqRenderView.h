@@ -33,7 +33,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define pqRenderView_h
 
 #include "pqRenderViewBase.h"
-#include <QColor> // needed for return type.
+#include "vtkParaViewDeprecation.h" // for PARAVIEW_DEPRECATION
+#include <QColor>                   // needed for return type.
 
 class pqDataRepresentation;
 class QAction;
@@ -186,6 +187,12 @@ public:
    * Creates a new surface selection given the rectangle in display
    * coordinates.
    */
+  PARAVIEW_DEPRECATED_IN_5_11_0("Use selectCellsOnSurface instead.")
+  virtual void selectOnSurface(int rectangle[4],
+    int selectionModifier = pqView::PV_SELECTION_DEFAULT, const char* array = nullptr)
+  {
+    this->selectCellsOnSurface(rectangle, selectionModifier, array);
+  }
   virtual void selectCellsOnSurface(int rectangle[4],
     int selectionModifier = pqView::PV_SELECTION_DEFAULT, const char* array = nullptr);
   virtual void selectPointsOnSurface(int rectangle[4],
@@ -216,6 +223,8 @@ public:
    * Creates a new frustum selection given the rectangle in display
    * coordinates.
    */
+  PARAVIEW_DEPRECATED_IN_5_11_0("Use selectFrustumCells instead.")
+  virtual void selectFrustum(int rectangle[4]) { this->selectFrustumCells(rectangle); }
   virtual void selectFrustumCells(
     int rectangle[4], int selectionModifier = pqView::PV_SELECTION_DEFAULT);
   virtual void selectFrustumPoints(
