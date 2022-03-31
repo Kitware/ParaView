@@ -4,22 +4,23 @@ derived quantities.
 """
 
 try:
-  import numpy as np
+    import numpy as np
 except ImportError:
-  raise RuntimeError ("'numpy' module is not found. numpy is needed for "\
-    "this functionality to work. Please install numpy and try again.")
+    raise RuntimeError("'numpy' module is not found. numpy is needed for this functionality to work. ")
 
 import paraview
 import vtkmodules.numpy_interface.dataset_adapter as dsa
 from vtkmodules.numpy_interface.algorithms import *
-    # -- this will import vtkMultiProcessController and vtkMPI4PyCommunicator
+# -- this will import vtkMultiProcessController and vtkMPI4PyCommunicator
 
 from paraview.vtk import vtkDoubleArray, vtkSelectionNode, vtkSelection, vtkStreamingDemandDrivenPipeline
 from paraview.modules import vtkPVVTKExtensionsFiltersPython
 
 import sys
+
 if sys.version_info >= (3,):
     xrange = range
+
 
 def get_arrays(attribs, controller=None):
     """Returns a 'dict' referring to arrays in dsa.DataSetAttributes or
@@ -31,14 +32,13 @@ def get_arrays(attribs, controller=None):
     expressions evaluate without issues due to missing arrays on certain ranks.
     """
     if not isinstance(attribs, dsa.DataSetAttributes) and \
-        not isinstance(attribs, dsa.CompositeDataSetAttributes):
-            raise ValueError (
-                "Argument must be DataSetAttributes or CompositeDataSetAttributes.")
+            not isinstance(attribs, dsa.CompositeDataSetAttributes):
+        raise ValueError(
+            "Argument must be DataSetAttributes or CompositeDataSetAttributes.")
     arrays = dict()
     for key in attribs.keys():
         varname = paraview.make_name_valid(key)
         arrays[varname] = attribs[key]
-
 
     # If running in parallel, ensure that the arrays are synced up so that
     # missing arrays get NoneArray assigned to them avoiding any unnecessary
@@ -56,7 +56,7 @@ def get_arrays(attribs, controller=None):
         # gather to root and then broadcast
         # I couldn't get Allgather/Allreduce to work properly with strings.
         gathered_names = comm.gather(arraynames, root=0)
-          # gathered_names is a list of lists.
+        # gathered_names is a list of lists.
         if rank == 0:
             result = set()
             for alist in gathered_names:
@@ -67,6 +67,7 @@ def get_arrays(attribs, controller=None):
             if name not in arrays:
                 arrays[name] = dsa.NoneArray
     return arrays
+
 
 def pointIsNear(locations, distance, inputs):
     array = vtkDoubleArray()
@@ -100,6 +101,7 @@ def pointIsNear(locations, distance, inputs):
 
     return output.PointData.GetArray('vtkInsidedness')
 
+
 def cellContainsPoint(inputs, locations):
     array = vtkDoubleArray()
     array.SetNumberOfComponents(3)
@@ -131,6 +133,7 @@ def cellContainsPoint(inputs, locations):
 
     return output.CellData.GetArray('vtkInsidedness')
 
+
 def compute(inputs, expression, ns=None):
     #  build the locals environment used to eval the expression.
     mylocals = dict()
@@ -139,7 +142,8 @@ def compute(inputs, expression, ns=None):
     mylocals["inputs"] = inputs
     try:
         mylocals["points"] = inputs[0].Points
-    except AttributeError: pass
+    except AttributeError:
+        pass
 
     finalRet = None
     for subEx in expression.split(' and '):
@@ -147,15 +151,17 @@ def compute(inputs, expression, ns=None):
         if finalRet is None:
             finalRet = retVal
         else:
-            finalRet = dsa.VTKArray([a & b for a,b in zip(finalRet, retVal)])
+            finalRet = dsa.VTKArray([a & b for a, b in zip(finalRet, retVal)])
 
     return finalRet
+
 
 def get_data_time(self, do, ininfo):
     dinfo = do.GetInformation()
     if dinfo and dinfo.Has(do.DATA_TIME_STEP()):
         t = dinfo.Get(do.DATA_TIME_STEP())
-    else: t = None
+    else:
+        t = None
 
     key = vtkStreamingDemandDrivenPipeline.TIME_STEPS()
     t_index = None
@@ -166,6 +172,7 @@ def get_data_time(self, do, ininfo):
         except ValueError:
             pass
     return (t, t_index)
+
 
 def execute(self, expression):
     """
@@ -199,18 +206,16 @@ def execute(self, expression):
     # get a dictionary for arrays in the dataset attributes. We pass that
     # as the variables in the eval namespace for compute.
     variables = get_arrays(inputs[0].GetAttributes(self.GetArrayAssociation()))
-    variables.update({ "time_value": inputs[0].time_value,
-                       "t_value": inputs[0].t_value,
-                       "time_index": inputs[0].time_index,
-                       "t_index": inputs[0].t_index })
+    variables.update({"time_value": inputs[0].time_value,
+                      "t_value": inputs[0].t_value,
+                      "time_index": inputs[0].time_index,
+                      "t_index": inputs[0].t_index})
     retVal = compute(inputs, expression, ns=variables)
 
     if retVal is not None:
         if hasattr(retVal, "Association"):
-            output.GetAttributes(retVal.Association).append(\
-              retVal, self.GetArrayName())
+            output.GetAttributes(retVal.Association).append(retVal, self.GetArrayName())
         else:
             # if somehow the association was removed we
             # fall back to the input array association
-            output.GetAttributes(self.GetArrayAssociation()).append(\
-              retVal, self.GetArrayName())
+            output.GetAttributes(self.GetArrayAssociation()).append(retVal, self.GetArrayName())
