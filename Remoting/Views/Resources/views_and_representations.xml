@@ -8901,7 +8901,7 @@
         Instead, ForcedCacheKey is used.</Documentation>
       </DoubleVectorProperty>
       <IntVectorProperty command="SetLogoLocation"
-                         default_values="4"
+                         default_values="5"
                          name="LogoLocation"
                          number_of_elements="1">
         <EnumerationDomain name="enum">
