@@ -412,9 +412,13 @@ void pqFindDataWidget::setServer(pqServer* aserver)
   // enable buttons on modification.
   QObject::connect(
     internals.ProxyWidget.data(), &pqProxyWidget::changeAvailable, [&internals, proxy]() {
-      vtkSMUncheckedPropertyHelper helper(proxy, "Input");
-      const bool hasInput = (helper.GetAsProxy(0) != nullptr);
-      internals.Ui.findData->setEnabled(hasInput);
+      vtkSMUncheckedPropertyHelper inputHelper(proxy, "Input");
+      const bool hasInput = (inputHelper.GetAsProxy(0) != nullptr);
+      vtkSMUncheckedPropertyHelper queryStringHelper(proxy, "QueryString");
+      const bool hasQueryString =
+        (queryStringHelper.GetAsString() != nullptr ? strlen(queryStringHelper.GetAsString()) : 0) >
+        0;
+      internals.Ui.findData->setEnabled(hasInput && hasQueryString);
 
       internals.Ui.reset->setEnabled(true);
       internals.Ui.clear->setEnabled(true);
