@@ -148,6 +148,7 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${paraview_test_data_directory_input}/Data/servers-wiki.pvsc}"
   "DATA{${paraview_test_data_directory_input}/Data/Udirectory/coneScript.py}"
   "DATA{${paraview_test_data_directory_input}/Data/Udirectory/simpleScript.py}"
+  "DATA{${paraview_test_data_directory_input}/Data/Udirectory/resetSession.py}"
   "DATA{${paraview_test_data_directory_input}/Data/sineWaves.csv}"
   "DATA{${paraview_test_data_directory_input}/Data/singleSphereAnimation.pvd}"
   "DATA{${paraview_test_data_directory_input}/Data/singleSphereAnimation/,REGEX:.*}"
@@ -1369,6 +1370,7 @@ if(PARAVIEW_USE_PYTHON)
   list(APPEND TESTS_WITHOUT_BASELINES
     PythonCalculator.xml
     PythonEditorTab.xml
+    PythonResetSessionMacro.xml
     ProgrammableSourcePythonEditorLink.xml
     TraceIntegrateVariables.xml
   )

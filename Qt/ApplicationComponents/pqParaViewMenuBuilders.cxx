@@ -608,8 +608,8 @@ void pqParaViewMenuBuilders::buildMacrosMenu(QMenu& menu)
   if (manager)
   {
     new pqMacroReaction(menu.addAction("Import new macro...") << pqSetName("actionMacroCreate"));
-    QMenu* editMenu = menu.addMenu("Edit...");
-    QMenu* deleteMenu = menu.addMenu("Delete...");
+    QMenu* editMenu = menu.addMenu("Edit...") << pqSetName("menuMacroEdit");
+    QMenu* deleteMenu = menu.addMenu("Delete...") << pqSetName("menuMacroDelete");
     menu.addSeparator();
     manager->addWidgetForRunMacros(&menu);
     manager->addWidgetForEditMacros(editMenu);
