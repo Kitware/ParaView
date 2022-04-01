@@ -43,9 +43,6 @@ See Copyright.txt or http://www.paraview.org/HTML/Copyright.html for details.
 // clang-format off
 #include "vtk_cgns.h"
 #include VTK_CGNS(cgnslib.h)
-
-#include "vtk_fmt.h"
-#include VTK_FMT(fmt/core.h)
 // clang-format on
 
 #include <map>
@@ -1082,7 +1079,8 @@ void vtkCGNSWriter::SetUseHDF5(bool value)
 //------------------------------------------------------------------------------
 vtkCGNSWriter::~vtkCGNSWriter()
 {
-  delete[] this->FileName;
+  this->SetFileName(nullptr);
+  this->SetFileNameSuffix(nullptr);
   if (this->OriginalInput)
   {
     this->OriginalInput->UnRegister(this);
@@ -1169,8 +1167,7 @@ int vtkCGNSWriter::RequestUpdateExtent(vtkInformation* vtkNotUsed(request),
   {
     if (this->TimeValues->GetPointer(0))
     {
-      double timeReq;
-      timeReq = this->TimeValues->GetValue(this->CurrentTimeIndex);
+      double timeReq = this->TimeValues->GetValue(this->CurrentTimeIndex);
       inputVector[0]->GetInformationObject(0)->Set(
         vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEP(), timeReq);
     }
@@ -1236,6 +1233,38 @@ int vtkCGNSWriter::RequestData(vtkInformation* request, vtkInformationVector** i
   return this->WasWritingSuccessful ? 1 : 0;
 }
 
+//-----------------------------------------------------------------------------
+static bool SuffixValidation(char* fileNameSuffix)
+{
+  std::string suffix(fileNameSuffix);
+  // Only allow this format: ABC%.Xd
+  // ABC is an arbitrary string which may or may not exist
+  // % and d must exist and d must be the last char
+  // . and X may or may not exist, X must be an integer if it exists
+  if (suffix.empty() || suffix[suffix.size() - 1] != 'd')
+  {
+    return false;
+  }
+  std::string::size_type lastPercentage = suffix.find_last_of('%');
+  if (lastPercentage == std::string::npos)
+  {
+    return false;
+  }
+  if (suffix.size() - lastPercentage > 2 && !isdigit(suffix[lastPercentage + 1]) &&
+    suffix[lastPercentage + 1] != '.')
+  {
+    return false;
+  }
+  for (std::string::size_type i = lastPercentage + 2; i < suffix.size() - 1; ++i)
+  {
+    if (!isdigit(suffix[i]))
+    {
+      return false;
+    }
+  }
+  return true;
+}
+
 //------------------------------------------------------------------------------
 void vtkCGNSWriter::WriteData()
 {
@@ -1246,24 +1275,47 @@ void vtkCGNSWriter::WriteData()
   }
 
   write_info info;
-  std::string fileNameWithTimeStep;
+  std::ostringstream fileNameWithTimeStep;
   if (this->TimeValues && this->CurrentTimeIndex < this->TimeValues->GetNumberOfValues())
   {
     if (this->WriteAllTimeSteps && this->TimeValues->GetNumberOfValues() > 1)
     {
       const std::string fileNamePath = vtksys::SystemTools::GetFilenamePath(this->FileName);
-      const std::string baseName =
+      const std::string filenameNoExt =
         vtksys::SystemTools::GetFilenameWithoutLastExtension(this->FileName);
       const std::string extension = vtksys::SystemTools::GetFilenameLastExtension(this->FileName);
-      fileNameWithTimeStep =
-        fmt::format("{}/{}_{:06d}{}", fileNamePath, baseName, this->CurrentTimeIndex, extension);
-      info.FileName = fileNameWithTimeStep.c_str();
+      if (this->FileNameSuffix && SuffixValidation(this->FileNameSuffix))
+      {
+        char suffix[100];
+        snprintf(suffix, 100, this->FileNameSuffix, this->CurrentTimeIndex);
+        if (!fileNamePath.empty())
+        {
+          fileNameWithTimeStep << fileNamePath << "/";
+        }
+        fileNameWithTimeStep << filenameNoExt << suffix << extension;
+        info.FileName = fileNameWithTimeStep.str().c_str();
+        info.TimeStep = this->TimeValues->GetValue(this->CurrentTimeIndex);
+      }
+      else
+      {
+        vtkErrorMacro(
+          "Invalid file suffix:" << (this->FileNameSuffix ? this->FileNameSuffix : "null")
+                                 << ". Expected valid % format specifiers!");
+        return;
+      }
     }
     else
     {
+      if (this->OriginalInput->GetInformation()->Has(vtkDataObject::DATA_TIME_STEP()))
+      {
+        info.TimeStep = this->OriginalInput->GetInformation()->Get(vtkDataObject::DATA_TIME_STEP());
+      }
+      else
+      {
+        info.TimeStep = 0.0;
+      }
       info.FileName = this->FileName;
     }
-    info.TimeStep = this->TimeValues->GetValue(this->CurrentTimeIndex);
   }
   else
   {
