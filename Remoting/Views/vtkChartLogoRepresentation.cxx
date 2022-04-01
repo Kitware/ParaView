@@ -130,6 +130,10 @@ int vtkChartLogoRepresentation::ProcessViewRequest(
       int dims[3];
       vtkRectf chartRect = chart->GetSize();
       this->ImageItem->GetImage()->GetDimensions(dims);
+      if (dims[0] == 0 || dims[1] == 0 || dims[2] == 0)
+      {
+        return 1;
+      }
 
       // Rescale logo
       double logoWidth = 0.075 * chartRect.GetRight();
