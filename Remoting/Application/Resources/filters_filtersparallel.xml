@@ -1050,9 +1050,19 @@
                  name="IntegrateAttributes">
       <Documentation long_help="This filter integrates cell and point attributes."
                      short_help="Integrates over lines, surfaces or vectors.">
-                     The Integrate Attributes filter integrates point and cell
-                     data over lines and surfaces. It also computes length of
-                     lines, area of surface, or volume.</Documentation>
+                     The Integrate Attributes filter integrates all point and cell data
+                     attributes while computing the total length, area or volume. This filter
+                     does not integrate point and cell data for 0-D cells (vertex and polyvertex).
+                     If the input dataset has mixed dimensionality, only the cells of highest dimension
+                     will be used for integration. Ex: In a dataset with lines, triangles
+                     and hexahedra, the integration process will ignore contribution from
+                     lines and triangles. When the highest dimension is 1, the sum
+                     variable corresponds to the total length. Similarly, for 2-D and 3-D
+                     integration the sum variable is the total area and total volume respectively.
+                     The output of this filter is a single point and vertex. The attributes
+                     for this point and vertex will contain the integration results for
+                     the corresponding input attributes and the sum variable.
+                     </Documentation>
       <InputProperty command="SetInputConnection"
                      name="Input">
         <ProxyGroupDomain name="groups">
@@ -1070,9 +1080,10 @@
                          default_values="0"
                          number_of_elements="1">
         <Documentation>
-          This property specifies if the output data will be divided by the
-          volume/area computed for the integrated cells.  If it is on, then each
-          value in the output cell data will be divided by the area/volume.
+          This option concerns the output cell data. If it is turned on, then each
+          value in the output cell data will be divided by the total length/area/volume.
+          If the dataset is distributed among MPI nodes, the total length/volume/area
+          is is the sum of the individual total contributions from all pieces.
         </Documentation>
         <BooleanDomain name="bool"/>
       </IntVectorProperty>
