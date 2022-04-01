@@ -312,9 +312,11 @@ The snippet below shows these hints in use.
 TextureSelectorPropertyWidget
 -------------------------------
 
-Customize the `pqTextureSelectorPropertyWidget` with the `TextureSelector` hint using the following attribute:
+Customize the `pqTextureSelectorPropertyWidget` with the `TextureSelectorWidget` hint using the following attribute:
 
-* `can_load_new` - if 0 then user will not be able to load new texture from the drop down. Default to 1.
+* `can_load_new` - if 0 then user will not be able to load new texture from the drop down. Default is 1.
+* `check_tcoords` - if 1 then user will be able to use a texture only if the source has texture coordinates. Default is 0.
+* `check_tangents` - if 1 then user will be able to use a texture only if the source has tangents. Default is 0.
 
 The snippet below shows these hints in use.
 
@@ -324,10 +326,12 @@ The snippet below shows these hints in use.
                   panel_widget="texture_selector"
                   null_on_empty="1" >
     <ProxyGroupDomain name="groups">
-      <Group name="textures" />
+      <Group name="myTextureGroup" />
     </ProxyGroupDomain>
     <Hints>
-      <TextureSelector can_load_new="0" />
+      <TextureSelectorWidget
+        can_load_new="0"
+        check_tcoords="1"/>
     </Hints>
   </ProxyProperty>
 ```
