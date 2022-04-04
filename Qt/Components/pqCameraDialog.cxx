@@ -86,47 +86,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace
 {
-void RotateElevation(vtkCamera* camera, double angle)
-{
-  vtkNew<vtkTransform> transform;
-
-  double scale = vtkMath::Norm(camera->GetPosition());
-  if (scale <= 0.0)
-  {
-    scale = vtkMath::Norm(camera->GetFocalPoint());
-    if (scale <= 0.0)
-    {
-      scale = 1.0;
-    }
-  }
-  double* temp = camera->GetFocalPoint();
-  camera->SetFocalPoint(temp[0] / scale, temp[1] / scale, temp[2] / scale);
-  temp = camera->GetPosition();
-  camera->SetPosition(temp[0] / scale, temp[1] / scale, temp[2] / scale);
-
-  double v2[3];
-  // translate to center
-  // we rotate around 0,0,0 rather than the center of rotation
-  transform->Identity();
-
-  // elevation
-  camera->OrthogonalizeViewUp();
-  double* viewUp = camera->GetViewUp();
-  vtkMath::Cross(camera->GetDirectionOfProjection(), viewUp, v2);
-  transform->RotateWXYZ(-angle, v2[0], v2[1], v2[2]);
-
-  // translate back
-  // we are already at 0,0,0
-
-  camera->ApplyTransform(transform.GetPointer());
-  camera->OrthogonalizeViewUp();
-
-  // For rescale back.
-  temp = camera->GetFocalPoint();
-  camera->SetFocalPoint(temp[0] * scale, temp[1] * scale, temp[2] * scale);
-  temp = camera->GetPosition();
-  camera->SetPosition(temp[0] * scale, temp[1] * scale, temp[2] * scale);
-}
 
 template <typename EnumT>
 constexpr typename std::underlying_type<EnumT>::type to_underlying(const EnumT& e) noexcept
