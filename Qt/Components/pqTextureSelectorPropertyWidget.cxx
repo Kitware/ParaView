@@ -65,14 +65,13 @@ pqTextureSelectorPropertyWidget::pqTextureSelectorPropertyWidget(
   // Create the combobox selector and set its value
   auto* domain = smProperty->FindDomain<vtkSMProxyGroupDomain>();
   bool canLoadNew = true;
-  if (auto* hints = smProperty->GetHints())
+  vtkPVXMLElement* hints = smProperty->GetHints()
+    ? smProperty->GetHints()->FindNestedElementByName("TextureSelectorWidget")
+    : nullptr;
+  if (hints)
   {
-    auto* texHint = hints->FindNestedElementByName("TextureSelector");
-    QString attr = texHint ? texHint->GetAttributeOrEmpty("can_load_new") : "";
-    if (!attr.isEmpty())
-    {
-      canLoadNew = static_cast<bool>(attr.toInt());
-    }
+    QString attr = hints->GetAttributeOrDefault("can_load_new", "1");
+    canLoadNew = static_cast<bool>(attr.toInt());
   }
 
   this->Selector = new pqTextureComboBox(domain, canLoadNew, this);
@@ -90,9 +89,6 @@ pqTextureSelectorPropertyWidget::pqTextureSelectorPropertyWidget(
 
   // If check_tcoords="1" is specified, we enabled the widget only if tcoords are available
   // Valid only for a RepresentationProxy
-  vtkPVXMLElement* hints = smProperty->GetHints()
-    ? smProperty->GetHints()->FindNestedElementByName("TextureSelectorWidget")
-    : nullptr;
   if (hints)
   {
     bool checkTCoords = strcmp(hints->GetAttributeOrDefault("check_tcoords", ""), "1") == 0;
