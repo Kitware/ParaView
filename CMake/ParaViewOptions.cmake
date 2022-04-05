@@ -225,6 +225,16 @@ cmake_dependent_option(PARAVIEW_ENABLE_COSMOTOOLS
   "Build ParaView with CosmoTools VTK Extensions" OFF
   "UNIX;PARAVIEW_USE_MPI" OFF)
 
+# PARAVIEW_ENABLE_CGNS_* option is only shown when PARAVIEW_ENABLE_NONESSENTIAL is
+# OFF and then it defaults to OFF. If PARAVIEW_ENABLE_NONESSENTIAL is ON, then
+# PARAVIEW_ENABLE_CGNS_* is set to ON as well and presented to the user at all.
+cmake_dependent_option(PARAVIEW_ENABLE_CGNS_READER
+  "Enable CGNS Reader Support" OFF
+  "NOT PARAVIEW_ENABLE_NONESSENTIAL" ON)
+cmake_dependent_option(PARAVIEW_ENABLE_CGNS_WRITER
+  "Enable CGNS Reader Support" OFF
+  "NOT PARAVIEW_ENABLE_NONESSENTIAL" ON)
+
 #========================================================================
 # MISCELLANEOUS OPTIONS:
 # Options that are hard to classify. Keep this list minimal.
@@ -429,6 +439,21 @@ paraview_require_module(
   EXCLUSIVE)
 
 paraview_require_module(
+  CONDITION PARAVIEW_ENABLE_CGNS_READER
+  MODULES   VTK::IOCGNSReader
+  EXCLUSIVE)
+
+paraview_require_module(
+  CONDITION PARAVIEW_ENABLE_CGNS_WRITER
+  MODULES   ParaView::VTKExtensionsIOCGNSWriter
+  EXCLUSIVE)
+
+paraview_require_module(
+  CONDITION PARAVIEW_ENABLE_CGNS_WRITER AND PARAVIEW_USE_MPI
+  MODULES   ParaView::VTKExtensionsIOParallelCGNSWriter
+  EXCLUSIVE)
+
+paraview_require_module(
   CONDITION PARAVIEW_ENABLE_WEB AND PARAVIEW_USE_PYTHON
   MODULES   VTK::WebCore
             VTK::WebPython
@@ -476,7 +501,6 @@ paraview_require_module(
 paraview_require_module(
   CONDITION PARAVIEW_BUILD_CANONICAL AND PARAVIEW_ENABLE_NONESSENTIAL
   MODULES   VTK::IOAMR
-            VTK::IOCGNSReader
             VTK::IOCityGML
             VTK::IOCONVERGECFD
             VTK::IOIOSS
@@ -511,13 +535,8 @@ paraview_require_module(
             VTK::IOMPIImage)
 
 paraview_require_module(
-  CONDITION PARAVIEW_BUILD_CANONICAL AND PARAVIEW_ENABLE_NONESSENTIAL
-  MODULES   ParaView::VTKExtensionsIOCGNSWriter)
-
-paraview_require_module(
   CONDITION PARAVIEW_USE_MPI AND PARAVIEW_BUILD_CANONICAL AND PARAVIEW_ENABLE_NONESSENTIAL
-  MODULES   VTK::IOParallelNetCDF
-            ParaView::VTKExtensionsIOParallelCGNSWriter)
+  MODULES   VTK::IOParallelNetCDF)
 
 paraview_require_module(
   CONDITION PARAVIEW_BUILD_CANONICAL AND PARAVIEW_ENABLE_RENDERING AND PARAVIEW_ENABLE_NONESSENTIAL
@@ -535,13 +554,20 @@ if (NOT PARAVIEW_ENABLE_NONESSENTIAL)
   # This ensures that we don't ever enable certain problematic
   # modules when PARAVIEW_ENABLE_NONESSENTIAL is OFF.
   set(nonessential_modules
-    VTK::cgns
-    VTK::hdf5
     VTK::netcdf
     VTK::ogg
     VTK::theora
     VTK::xdmf2
     VTK::xdmf3)
+
+  # PARAVIEW_ENABLE_CGNS_* are the only options that can force the need for cgns and
+  # hdf5 TPLs when PARAVIEW_ENABLE_NONESSENTIAL is true.
+  if (NOT PARAVIEW_ENABLE_CGNS_READER AND NOT PARAVIEW_ENABLE_CGNS_WRITER)
+    list(APPEND nonessential_modules
+      VTK::cgns
+      VTK::hdf5)
+  endif()
+
   list(APPEND paraview_rejected_modules
     ${nonessential_modules})
   foreach (nonessential_module IN LISTS nonessential_modules)
