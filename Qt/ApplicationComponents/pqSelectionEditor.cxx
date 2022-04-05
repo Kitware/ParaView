@@ -351,7 +351,7 @@ public:
     this->ElementTypeInfo->setText(imageName + " " + elementTypeName);
   }
 
-  int ElementType;
+  int ElementType = vtkDataObject::POINT;
   pqSelectionProxyModel SelectionModel;
   QPointer<pqServer> Server;
   QPointer<pqOutputPort> SavedPort;
