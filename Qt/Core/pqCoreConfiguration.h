@@ -153,6 +153,7 @@ private:
 
   std::string StateFileName;
   std::vector<std::string> DataFileNames;
+  std::vector<std::string> PositionalFileNames;
   std::string PythonScript;
   std::string BaselineDirectory;
   std::string TestDirectory;
