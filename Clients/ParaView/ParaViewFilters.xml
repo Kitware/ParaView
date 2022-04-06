@@ -71,6 +71,7 @@
     <Proxy group="filters" name="ExtractParticlesOverTime" />
     <Proxy group="filters" name="ExtractTimeSteps" />
     <Proxy group="filters" name="ForceTime" />
+    <Proxy group="filters" name="GenerateTimeSteps" />
     <Proxy group="filters" name="GroupTimeSteps" />
     <Proxy group="filters" name="MergeTime" />
     <Proxy group="filters" name="ParticlePath" />
@@ -248,6 +249,7 @@
   <Proxy group="filters" name="GaussianSplatter" />
   <Proxy group="filters" name="GenerateGlobalIds" />
   <Proxy group="filters" name="GenerateIdScalars" />
+  <Proxy group="filters" name="GenerateTimeSteps" />
   <Proxy group="filters" name="GenericClip" />
   <Proxy group="filters" name="GenericContour" />
   <Proxy group="filters" name="GenericCut" />
