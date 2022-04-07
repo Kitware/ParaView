@@ -72,6 +72,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // STL
 #include <sstream>
 #include <string>
+#include <type_traits>
 
 #if QT_VERSION < QT_VERSION_CHECK(5, 14, 0)
 #define QT_ENDL endl
@@ -85,46 +86,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace
 {
-void RotateElevation(vtkCamera* camera, double angle)
+
+template <typename EnumT>
+constexpr typename std::underlying_type<EnumT>::type to_underlying(const EnumT& e) noexcept
 {
-  vtkNew<vtkTransform> transform;
-
-  double scale = vtkMath::Norm(camera->GetPosition());
-  if (scale <= 0.0)
-  {
-    scale = vtkMath::Norm(camera->GetFocalPoint());
-    if (scale <= 0.0)
-    {
-      scale = 1.0;
-    }
-  }
-  double* temp = camera->GetFocalPoint();
-  camera->SetFocalPoint(temp[0] / scale, temp[1] / scale, temp[2] / scale);
-  temp = camera->GetPosition();
-  camera->SetPosition(temp[0] / scale, temp[1] / scale, temp[2] / scale);
-
-  double v2[3];
-  // translate to center
-  // we rotate around 0,0,0 rather than the center of rotation
-  transform->Identity();
-
-  // elevation
-  camera->OrthogonalizeViewUp();
-  double* viewUp = camera->GetViewUp();
-  vtkMath::Cross(camera->GetDirectionOfProjection(), viewUp, v2);
-  transform->RotateWXYZ(-angle, v2[0], v2[1], v2[2]);
-
-  // translate back
-  // we are already at 0,0,0
-
-  camera->ApplyTransform(transform.GetPointer());
-  camera->OrthogonalizeViewUp();
-
-  // For rescale back.
-  temp = camera->GetFocalPoint();
-  camera->SetFocalPoint(temp[0] * scale, temp[1] * scale, temp[2] * scale);
-  temp = camera->GetPosition();
-  camera->SetPosition(temp[0] * scale, temp[1] * scale, temp[2] * scale);
+  return static_cast<typename std::underlying_type<EnumT>::type>(e);
 }
 
 QStringList getListOfStrings(pqSettings* settings, const QString& defaultTxt, int min, int max)
@@ -499,74 +465,63 @@ void pqCameraDialog::resetViewDirection(
 //-----------------------------------------------------------------------------
 void pqCameraDialog::resetViewDirectionPosX()
 {
-  this->resetViewDirection(1, 0, 0, 0, 0, 1);
+  if (this->Internal->RenderModule)
+  {
+    this->Internal->RenderModule->resetViewDirectionToPositiveX();
+  }
 }
 //-----------------------------------------------------------------------------
 void pqCameraDialog::resetViewDirectionNegX()
 {
-  this->resetViewDirection(-1, 0, 0, 0, 0, 1);
+  if (this->Internal->RenderModule)
+  {
+    this->Internal->RenderModule->resetViewDirectionToNegativeX();
+  }
 }
 
 //-----------------------------------------------------------------------------
 void pqCameraDialog::resetViewDirectionPosY()
 {
-  this->resetViewDirection(0, 1, 0, 0, 0, 1);
+  if (this->Internal->RenderModule)
+  {
+    this->Internal->RenderModule->resetViewDirectionToPositiveY();
+  }
 }
 
 //-----------------------------------------------------------------------------
 void pqCameraDialog::resetViewDirectionNegY()
 {
-  this->resetViewDirection(0, -1, 0, 0, 0, 1);
+  if (this->Internal->RenderModule)
+  {
+    this->Internal->RenderModule->resetViewDirectionToNegativeY();
+  }
 }
 
 //-----------------------------------------------------------------------------
 void pqCameraDialog::resetViewDirectionPosZ()
 {
-  this->resetViewDirection(0, 0, 1, 0, 1, 0);
+  if (this->Internal->RenderModule)
+  {
+    this->Internal->RenderModule->resetViewDirectionToPositiveZ();
+  }
 }
 
 //-----------------------------------------------------------------------------
 void pqCameraDialog::resetViewDirectionNegZ()
 {
-  this->resetViewDirection(0, 0, -1, 0, 1, 0);
+  if (this->Internal->RenderModule)
+  {
+    this->Internal->RenderModule->resetViewDirectionToNegativeZ();
+  }
 }
 
 //-----------------------------------------------------------------------------
-void pqCameraDialog::adjustCamera(CameraAdjustmentType enType, double value)
+void pqCameraDialog::adjustCamera(const int& enType, double value)
 {
   if (this->Internal->RenderModule)
   {
     vtkSMRenderViewProxy* proxy = this->Internal->RenderModule->getRenderViewProxy();
-    proxy->SynchronizeCameraProperties();
-    vtkCamera* camera = proxy->GetActiveCamera();
-    if (!camera)
-    {
-      return;
-    }
-    if (enType == pqCameraDialog::Roll)
-    {
-      camera->Roll(value);
-    }
-    else if (enType == pqCameraDialog::Elevation)
-    {
-      RotateElevation(camera, value);
-    }
-    else if (enType == pqCameraDialog::Azimuth)
-    {
-      camera->Azimuth(value);
-    }
-    else if (enType == pqCameraDialog::Zoom)
-    {
-      if (camera->GetParallelProjection())
-      {
-        camera->SetParallelScale(camera->GetParallelScale() / value);
-      }
-      else
-      {
-        camera->Dolly(value);
-      }
-    } // if (pqCameraDialog::Zoom)
-    proxy->SynchronizeCameraProperties();
+    proxy->AdjustActiveCamera(enType, value);
     this->Internal->RenderModule->render();
   }
 }
@@ -574,49 +529,57 @@ void pqCameraDialog::adjustCamera(CameraAdjustmentType enType, double value)
 //-----------------------------------------------------------------------------
 void pqCameraDialog::applyCameraRollPlus()
 {
-  this->adjustCamera(pqCameraDialog::Roll, this->Internal->rollAngle->value());
+  this->adjustCamera(to_underlying(vtkSMRenderViewProxy::CameraAdjustmentType::Roll),
+    this->Internal->rollAngle->value());
 }
 
 //-----------------------------------------------------------------------------
 void pqCameraDialog::applyCameraRollMinus()
 {
-  this->adjustCamera(pqCameraDialog::Roll, -this->Internal->rollAngle->value());
+  this->adjustCamera(to_underlying(vtkSMRenderViewProxy::CameraAdjustmentType::Roll),
+    -this->Internal->rollAngle->value());
 }
 
 //-----------------------------------------------------------------------------
 void pqCameraDialog::applyCameraElevationPlus()
 {
-  this->adjustCamera(pqCameraDialog::Elevation, this->Internal->elevationAngle->value());
+  this->adjustCamera(to_underlying(vtkSMRenderViewProxy::CameraAdjustmentType::Elevation),
+    this->Internal->elevationAngle->value());
 }
 
 //-----------------------------------------------------------------------------
 void pqCameraDialog::applyCameraElevationMinus()
 {
-  this->adjustCamera(pqCameraDialog::Elevation, -this->Internal->elevationAngle->value());
+  this->adjustCamera(to_underlying(vtkSMRenderViewProxy::CameraAdjustmentType::Elevation),
+    -this->Internal->elevationAngle->value());
 }
 
 //-----------------------------------------------------------------------------
 void pqCameraDialog::applyCameraAzimuthPlus()
 {
-  this->adjustCamera(pqCameraDialog::Azimuth, this->Internal->azimuthAngle->value());
+  this->adjustCamera(to_underlying(vtkSMRenderViewProxy::CameraAdjustmentType::Azimuth),
+    this->Internal->azimuthAngle->value());
 }
 
 //-----------------------------------------------------------------------------
 void pqCameraDialog::applyCameraAzimuthMinus()
 {
-  this->adjustCamera(pqCameraDialog::Azimuth, -this->Internal->azimuthAngle->value());
+  this->adjustCamera(to_underlying(vtkSMRenderViewProxy::CameraAdjustmentType::Azimuth),
+    -this->Internal->azimuthAngle->value());
 }
 
 //-----------------------------------------------------------------------------
 void pqCameraDialog::applyCameraZoomIn()
 {
-  this->adjustCamera(pqCameraDialog::Zoom, this->Internal->zoomFactor->value());
+  this->adjustCamera(to_underlying(vtkSMRenderViewProxy::CameraAdjustmentType::Zoom),
+    this->Internal->zoomFactor->value());
 }
 
 //-----------------------------------------------------------------------------
 void pqCameraDialog::applyCameraZoomOut()
 {
-  this->adjustCamera(pqCameraDialog::Zoom, 1.0 / this->Internal->zoomFactor->value());
+  this->adjustCamera(to_underlying(vtkSMRenderViewProxy::CameraAdjustmentType::Zoom),
+    1.0 / this->Internal->zoomFactor->value());
 }
 
 //-----------------------------------------------------------------------------

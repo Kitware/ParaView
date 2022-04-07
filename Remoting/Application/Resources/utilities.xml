@@ -1973,6 +1973,16 @@
         </Documentation>
       </IntVectorProperty>
 
+      <IntVectorProperty name="FullyTraceCameraAdjustments"
+                         number_of_elements="1"
+                         default_values="0">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          The camera direction and view properties are captured in still renders.
+          Continuous camera movements are not traced to avoid a bloated trace output.
+        </Documentation>
+      </IntVectorProperty>
+
       <IntVectorProperty name="SkipRenderingComponents"
                          number_of_elements="1"
                          default_values="0">
@@ -2000,6 +2010,7 @@
       <PropertyGroup label="Miscellaneous">
         <Property name="SkipRenderingComponents"/>
         <Property name="ShowIncrementalTrace"/>
+        <Property name="FullyTraceCameraAdjustments"/>
       </PropertyGroup>
       <Hints>
         <UseDocumentationForLabels/>

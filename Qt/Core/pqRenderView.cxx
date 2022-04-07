@@ -527,14 +527,71 @@ void pqRenderView::fakeInteraction(bool start)
 void pqRenderView::resetViewDirection(
   double look_x, double look_y, double look_z, double up_x, double up_y, double up_z)
 {
-  vtkSMProxy* proxy = this->getProxy();
-  double pos[3] = { 0, 0, 0 };
-  double focal_point[3] = { look_x, look_y, look_z };
-  double view_up[3] = { up_x, up_y, up_z };
-  vtkSMPropertyHelper(proxy, "CameraPosition").Set(pos, 3);
-  vtkSMPropertyHelper(proxy, "CameraFocalPoint").Set(focal_point, 3);
-  vtkSMPropertyHelper(proxy, "CameraViewUp").Set(view_up, 3);
-  proxy->UpdateVTKObjects();
+  vtkSMRenderViewProxy* const proxy = this->getRenderViewProxy();
+  proxy->ResetActiveCameraToDirection(look_x, look_y, look_z, up_x, up_y, up_z);
+  this->resetCamera();
+  this->render();
+}
+
+//-----------------------------------------------------------------------------
+void pqRenderView::adjustView(const int& adjustType, const double& angle)
+{
+  vtkSMRenderViewProxy* const proxy = this->getRenderViewProxy();
+  proxy->AdjustActiveCamera(adjustType, angle);
+  this->resetCamera();
+  this->render();
+}
+
+//-----------------------------------------------------------------------------
+void pqRenderView::resetViewDirectionToPositiveX()
+{
+  vtkSMRenderViewProxy* const proxy = this->getRenderViewProxy();
+  proxy->ResetActiveCameraToPositiveX();
+  this->resetCamera();
+  this->render();
+}
+
+//-----------------------------------------------------------------------------
+void pqRenderView::resetViewDirectionToNegativeX()
+{
+  vtkSMRenderViewProxy* const proxy = this->getRenderViewProxy();
+  proxy->ResetActiveCameraToNegativeX();
+  this->resetCamera();
+  this->render();
+}
+
+//-----------------------------------------------------------------------------
+void pqRenderView::resetViewDirectionToPositiveY()
+{
+  vtkSMRenderViewProxy* const proxy = this->getRenderViewProxy();
+  proxy->ResetActiveCameraToPositiveY();
+  this->resetCamera();
+  this->render();
+}
+
+//-----------------------------------------------------------------------------
+void pqRenderView::resetViewDirectionToNegativeY()
+{
+  vtkSMRenderViewProxy* const proxy = this->getRenderViewProxy();
+  proxy->ResetActiveCameraToNegativeY();
+  this->resetCamera();
+  this->render();
+}
+
+//-----------------------------------------------------------------------------
+void pqRenderView::resetViewDirectionToPositiveZ()
+{
+  vtkSMRenderViewProxy* const proxy = this->getRenderViewProxy();
+  proxy->ResetActiveCameraToPositiveZ();
+  this->resetCamera();
+  this->render();
+}
+
+//-----------------------------------------------------------------------------
+void pqRenderView::resetViewDirectionToNegativeZ()
+{
+  vtkSMRenderViewProxy* const proxy = this->getRenderViewProxy();
+  proxy->ResetActiveCameraToNegativeZ();
   this->resetCamera();
   this->render();
 }

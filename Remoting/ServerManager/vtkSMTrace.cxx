@@ -64,6 +64,7 @@ vtkSMTrace::vtkSMTrace()
   , PropertiesToTraceOnCreate(vtkSMTrace::RECORD_MODIFIED_PROPERTIES)
   , FullyTraceSupplementalProxies(false)
   , SkipRenderingComponents(false)
+  , FullyTraceCameraAdjustments(false)
   , Internals(new vtkSMTrace::vtkInternals())
 {
 #if VTK_MODULE_ENABLE_VTK_PythonInterpreter && VTK_MODULE_ENABLE_VTK_Python &&                     \

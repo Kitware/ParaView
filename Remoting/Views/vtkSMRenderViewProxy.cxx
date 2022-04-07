@@ -63,6 +63,50 @@
 
 #include <cassert>
 
+namespace
+{
+void RotateElevation(vtkCamera* camera, double angle)
+{
+  vtkNew<vtkTransform> transform;
+
+  double scale = vtkMath::Norm(camera->GetPosition());
+  if (scale <= 0.0)
+  {
+    scale = vtkMath::Norm(camera->GetFocalPoint());
+    if (scale <= 0.0)
+    {
+      scale = 1.0;
+    }
+  }
+  double* temp = camera->GetFocalPoint();
+  camera->SetFocalPoint(temp[0] / scale, temp[1] / scale, temp[2] / scale);
+  temp = camera->GetPosition();
+  camera->SetPosition(temp[0] / scale, temp[1] / scale, temp[2] / scale);
+
+  double v2[3];
+  // translate to center
+  // we rotate around 0,0,0 rather than the center of rotation
+  transform->Identity();
+
+  // elevation
+  camera->OrthogonalizeViewUp();
+  double* viewUp = camera->GetViewUp();
+  vtkMath::Cross(camera->GetDirectionOfProjection(), viewUp, v2);
+  transform->RotateWXYZ(-angle, v2[0], v2[1], v2[2]);
+
+  // translate back
+  // we are already at 0,0,0
+  camera->ApplyTransform(transform.GetPointer());
+  camera->OrthogonalizeViewUp();
+
+  // For rescale back.
+  temp = camera->GetFocalPoint();
+  camera->SetFocalPoint(temp[0] * scale, temp[1] * scale, temp[2] * scale);
+  temp = camera->GetPosition();
+  camera->SetPosition(temp[0] * scale, temp[1] * scale, temp[2] * scale);
+}
+}
+
 vtkStandardNewMacro(vtkSMRenderViewProxy);
 //----------------------------------------------------------------------------
 vtkSMRenderViewProxy::vtkSMRenderViewProxy()
@@ -244,6 +288,12 @@ void vtkSMRenderViewProxy::PostRender(bool interactive)
   cameraProxy->UpdatePropertyInformation();
   this->SynchronizeCameraProperties();
   this->Superclass::PostRender(interactive);
+  vtkSMTrace* tracer = nullptr;
+  if (!interactive && (tracer = vtkSMTrace::GetActiveTracer()) &&
+    tracer->GetFullyTraceCameraAdjustments())
+  {
+    SM_SCOPED_TRACE(SaveCameras).arg("proxy", this).arg("comment", "Adjust camera");
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -285,6 +335,108 @@ vtkCamera* vtkSMRenderViewProxy::GetActiveCamera()
   this->CreateVTKObjects();
   vtkPVRenderView* rv = vtkPVRenderView::SafeDownCast(this->GetClientSideObject());
   return rv ? rv->GetActiveCamera() : nullptr;
+}
+
+//----------------------------------------------------------------------------
+void vtkSMRenderViewProxy::AdjustActiveCamera(const int& adjustType, const double& angle)
+{
+  if (adjustType >= 0 && adjustType < 4)
+  {
+    this->AdjustActiveCamera(
+      static_cast<vtkSMRenderViewProxy::CameraAdjustmentType>(adjustType), angle);
+  }
+}
+
+//----------------------------------------------------------------------------
+void vtkSMRenderViewProxy::AdjustActiveCamera(
+  const CameraAdjustmentType& adjustType, const double& angle)
+{
+  SM_SCOPED_TRACE(CallMethod)
+    .arg(this)
+    .arg("AdjustActiveCamera")
+    .arg(static_cast<std::underlying_type<vtkSMRenderViewProxy::CameraAdjustmentType>::type>(
+      adjustType))
+    .arg(angle);
+  vtkCamera* camera = this->GetActiveCamera();
+  if (!camera)
+  {
+    return;
+  }
+  switch (adjustType)
+  {
+    case CameraAdjustmentType::Azimuth:
+      camera->Azimuth(angle);
+      break;
+    case CameraAdjustmentType::Roll:
+      camera->Roll(angle);
+      break;
+    case CameraAdjustmentType::Elevation:
+      RotateElevation(camera, angle);
+      //      camera->Elevation(angle); // sometimes, this can cause an invalid view-up vector
+      break;
+    case CameraAdjustmentType::Zoom:
+      if (camera->GetParallelProjection())
+      {
+        camera->SetParallelScale(camera->GetParallelScale() / angle);
+      }
+      else
+      {
+        camera->Dolly(angle);
+      }
+      break;
+    default:
+      break;
+  }
+  this->SynchronizeCameraProperties();
+}
+
+//----------------------------------------------------------------------------
+void vtkSMRenderViewProxy::ResetActiveCameraToDirection(const double& look_x, const double& look_y,
+  const double& look_z, const double& up_x, const double& up_y, const double& up_z)
+{
+  if (vtkCamera* cam = this->GetActiveCamera())
+  {
+    cam->SetPosition(0, 0, 0);
+    cam->SetFocalPoint(look_x, look_y, look_z);
+    cam->SetViewUp(up_x, up_y, up_z);
+  }
+}
+
+//----------------------------------------------------------------------------
+void vtkSMRenderViewProxy::ResetActiveCameraToPositiveX()
+{
+  SM_SCOPED_TRACE(CallMethod).arg(this).arg("ResetActiveCameraToPositiveX");
+  this->ResetActiveCameraToDirection(1, 0, 0, 0, 0, 1);
+}
+//----------------------------------------------------------------------------
+void vtkSMRenderViewProxy::ResetActiveCameraToNegativeX()
+{
+  SM_SCOPED_TRACE(CallMethod).arg(this).arg("ResetActiveCameraToNegativeX");
+  this->ResetActiveCameraToDirection(-1, 0, 0, 0, 0, 1);
+}
+//----------------------------------------------------------------------------
+void vtkSMRenderViewProxy::ResetActiveCameraToPositiveY()
+{
+  SM_SCOPED_TRACE(CallMethod).arg(this).arg("ResetActiveCameraToPositiveY");
+  this->ResetActiveCameraToDirection(0, 1, 0, 0, 0, 1);
+}
+//----------------------------------------------------------------------------
+void vtkSMRenderViewProxy::ResetActiveCameraToNegativeY()
+{
+  SM_SCOPED_TRACE(CallMethod).arg(this).arg("ResetActiveCameraToNegativeY");
+  this->ResetActiveCameraToDirection(0, -1, 0, 0, 0, 1);
+}
+//----------------------------------------------------------------------------
+void vtkSMRenderViewProxy::ResetActiveCameraToPositiveZ()
+{
+  SM_SCOPED_TRACE(CallMethod).arg(this).arg("ResetActiveCameraToPositiveZ");
+  this->ResetActiveCameraToDirection(0, 0, 1, 0, 1, 0);
+}
+//----------------------------------------------------------------------------
+void vtkSMRenderViewProxy::ResetActiveCameraToNegativeZ()
+{
+  SM_SCOPED_TRACE(CallMethod).arg(this).arg("ResetActiveCameraToNegativeZ");
+  this->ResetActiveCameraToDirection(0, 0, -1, 0, 1, 0);
 }
 
 //----------------------------------------------------------------------------

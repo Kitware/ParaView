@@ -142,6 +142,8 @@ void pqTraceReaction::start()
     {
       pqCoreUtilities::connect(trace, vtkCommand::UpdateEvent, this, SLOT(updateTrace()));
     }
+    trace->SetFullyTraceCameraAdjustments(
+      vtkSMPropertyHelper(proxy, "FullyTraceCameraAdjustments").GetAsInt() == 1);
   }
 }
 
