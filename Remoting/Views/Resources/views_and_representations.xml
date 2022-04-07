@@ -8798,24 +8798,6 @@
              the text right now -->
       </IntVectorProperty>
 
-      <SubProxy command="SetTextProperty">
-        <Proxy name="Prop2DProperty" proxygroup="properties" proxyname="ChartTextProperty" />
-        <ExposedProperties>
-          <PropertyGroup label="Font Properties" panel_widget="FontEditor">
-            <Property name="Color" function="Color" />
-            <Property name="Opacity" function="Opacity"/>
-            <Property name="FontFamily" function="Family"/>
-            <Property name="FontFile" function="File"/>
-            <Property name="Bold" function="Bold"/>
-            <Property name="Italic" function="Italics" />
-            <Property name="Shadow" function="Shadow"/>
-            <Property name="FontSize" function="Size"/>
-            <Property name="Justification" function="Justification"/>
-            <Property name="VerticalJustification" default_values="1" />
-          </PropertyGroup>
-        </ExposedProperties>
-      </SubProxy>
-
       <IntVectorProperty command="SetLabelLocation"
                          default_values="4"
                          name="LabelLocation"
@@ -8851,6 +8833,24 @@
         <Property name="LabelLocation" function="WindowLocation" />
         <Property name="Position" />
       </PropertyGroup>
+
+      <SubProxy command="SetTextProperty">
+        <Proxy name="Prop2DProperty" proxygroup="properties" proxyname="ChartTextProperty" />
+        <ExposedProperties>
+          <PropertyGroup label="Font Properties" panel_widget="FontEditor">
+            <Property name="Color" function="Color" />
+            <Property name="Opacity" function="Opacity"/>
+            <Property name="FontFamily" function="Family"/>
+            <Property name="FontFile" function="File"/>
+            <Property name="Bold" function="Bold"/>
+            <Property name="Italic" function="Italics" />
+            <Property name="Shadow" function="Shadow"/>
+            <Property name="FontSize" function="Size"/>
+            <Property name="Justification" function="Justification"/>
+            <Property name="VerticalJustification" default_values="1" />
+          </PropertyGroup>
+        </ExposedProperties>
+      </SubProxy>
 
     </ChartRepresentationProxy>
 

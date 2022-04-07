@@ -324,7 +324,7 @@ void vtkSMChartSeriesSelectionDomain::PopulateArrayComponents(vtkChartRepresenta
   if (arrayInfo && (!this->HidePartialArrays || arrayInfo->GetIsPartial() == 0))
   {
     int dataType = arrayInfo->GetDataType();
-    if (dataType != VTK_STRING && dataType != VTK_UNICODE_STRING && dataType != VTK_VARIANT)
+    if (dataType != VTK_STRING && dataType != VTK_VARIANT)
     {
       if (arrayInfo->GetNumberOfComponents() > 1 && flattenTable)
       {

@@ -91,11 +91,6 @@ public:
   /**
    * Expand bounding box to contain the string's bounding box.
    */
-  void DrawString(float* point, const vtkUnicodeString& string) override;
-
-  /**
-   * Expand bounding box to contain the string's bounding box.
-   */
   void DrawMathTextString(float* point, const vtkStdString& string) override;
 
   /**
@@ -254,11 +249,6 @@ public:
    * Forward string bounds calculation to the delegate device.
    */
   void ComputeStringBounds(const vtkStdString& string, float bounds[4]) override;
-
-  /**
-   * Forward string bounds calculation to the delegate device.
-   */
-  void ComputeStringBounds(const vtkUnicodeString& string, float bounds[4]) override;
 
   /**
    * Forward string bounds calculation to the delegate device.
