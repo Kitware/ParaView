@@ -23,6 +23,11 @@
         {
             "group": "master",
             "site": "gitlab-ci",
+            "buildname": "[fedora35_shared_mpi_python_qt_vtkmoverride]"
+        },
+        {
+            "group": "master",
+            "site": "gitlab-ci",
             "buildname": "[macos_arm64_python_qt]"
         },
         {

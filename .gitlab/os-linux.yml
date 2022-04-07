@@ -95,6 +95,14 @@
         CMAKE_CONFIGURATION: fedora35_shared_mpi_python_qt
         CMAKE_BUILD_TYPE: Debug
 
+.fedora35_shared_mpi_python_qt_vtkmoverride:
+    extends:
+        - .fedora35
+        - .fedora_mpich_addon
+
+    variables:
+        CMAKE_CONFIGURATION: fedora35_shared_mpi_python_qt_vtkmoverride
+
 .fedora35_tidy:
     extends:
         - .fedora35
