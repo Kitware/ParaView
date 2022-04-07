@@ -41,6 +41,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqServer.h"
 #include "pqStandardRecentlyUsedResourceLoaderImplementation.h"
 #include "pqUndoStack.h"
+#include "vtkFileSequenceParser.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMProxy.h"
 #include "vtkSMProxyManager.h"
@@ -53,6 +54,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QDebug>
 #include <QInputDialog>
+#include <QMap>
 
 #include <cassert>
 
@@ -330,7 +332,21 @@ pqPipelineSource* pqLoadDataReaction::loadData(
   const QStringList& files, const QString& smgroup, const QString& smname, pqServer* server)
 {
   QList<QStringList> f;
-  f.append(files);
+  QMap<std::string, QStringList> fileGroups;
+  vtkNew<vtkFileSequenceParser> sequenceParser;
+  // --- detect file series
+  for (const auto& _file : files)
+  {
+    if (sequenceParser->ParseFileSequence(_file.toUtf8()))
+    {
+      fileGroups[sequenceParser->GetSequenceName()].append(_file);
+    }
+    else
+    {
+      f.append(QStringList(_file));
+    }
+  }
+  f << fileGroups.values();
   return pqLoadDataReaction::loadData(f, smgroup, smname, server);
 }
 
