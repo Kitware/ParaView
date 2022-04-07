@@ -34,6 +34,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkCLIOptions.h"
 #include "vtk_cli11.h"
 
+namespace
+{
+bool EndsWith(const std::string& name, const std::string& suffix)
+{
+  return (name.size() >= suffix.size() && name.substr(name.size() - suffix.size()) == suffix);
+}
+}
+
 //-----------------------------------------------------------------------------
 pqCoreConfiguration::pqCoreConfiguration() = default;
 
@@ -152,12 +160,35 @@ bool pqCoreConfiguration::populateOptions(vtkCLIOptions* options)
       "--script", this->PythonScript, "Python script to execute when the application starts.")
     ->excludes("--state");
   groupStartup
-    ->add_option("data,--data", this->DataFileNames,
+    ->add_option("--data", this->DataFileNames,
       "Load the specified data file(s) when the client starts. To choose a file series, "
       "replace the numeral with a '.', for example,  my0.vtk, my1.vtk...myN.vtk becomes my..vtk, "
       "etc.")
     ->excludes("--state")
     ->excludes("--script");
+
+  groupStartup
+    ->add_option("filenames", this->PositionalFileNames,
+      "Positional arguments may be used to pass either data (--data), state (--state), "
+      "or script (--script) files. `.pvsm` files are treated as state files, `.py` are treated "
+      "as scripts and all others are treated as data files.")
+    ->excludes("--state")
+    ->excludes("--script")
+    ->excludes("--data")
+    ->each([this](const std::string& value) {
+      if (::EndsWith(value, ".pvsm"))
+      {
+        this->StateFileName = value;
+      }
+      else if (::EndsWith(value, ".py"))
+      {
+        this->PythonScript = value;
+      }
+      else
+      {
+        this->DataFileNames.push_back(value);
+      }
+    });
 
   groupStartup
     ->add_option("--live", this->CatalystLivePort,
