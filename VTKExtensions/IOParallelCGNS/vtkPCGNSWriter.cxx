@@ -152,6 +152,11 @@ void Flatten(const vtkSmartPointer<vtkMultiBlockDataSet>& mergedMB,
           mergedMB->GetMetaData(i)->Append(mbFirst->GetMetaData(i));
         }
       }
+      else
+      {
+        vtkLog(ERROR, "Block with data type '" << block->GetClassName() << "' not supported.");
+        return;
+      }
     }
   }
 }
@@ -362,6 +367,8 @@ void vtkPCGNSWriter::WriteData()
       // exchange OriginalInput and write with the superclass
       vtkDataObject* myOriginalInput = this->OriginalInput;
       this->OriginalInput = toWrite;
+      // set the information present on the original input
+      toWrite->SetInformation(myOriginalInput->GetInformation());
       vtkCGNSWriter::WriteData();
       this->OriginalInput = myOriginalInput;
       toWrite->UnRegister(this);
