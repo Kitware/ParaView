@@ -249,6 +249,15 @@ bool vtkSMScalarBarWidgetRepresentationProxy::PlaceInView(vtkSMProxy* view)
     }
   }
 
+  // A scalar bar with ::AnyLocation implies that it is free to move around, hence do not consider
+  // it an 'occupied' location
+  auto locationTypeIsAny = [](const int& loc) {
+    return loc == static_cast<int>(vtkScalarBarRepresentation::AnyLocation);
+  };
+  occupiedLocations.erase(
+    std::remove_if(occupiedLocations.begin(), occupiedLocations.end(), locationTypeIsAny),
+    occupiedLocations.end());
+
   if (IsAvailable(vtkSMPropertyHelper(this, "WindowLocation").GetAsInt(), occupiedLocations))
   {
     // current position and if available, just return.
