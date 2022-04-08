@@ -1,4 +1,4 @@
-if (PARAVIEW_USE_MPI)
+if (PARAVIEW_USE_MPI AND TARGET VTK::IOCGNSReader)
   set(vtkPVVTKExtensionsIOParallelCGNSWriterCxxTests_NUMPROCS 4)
   vtk_add_test_mpi(
     vtkPVVTKExtensionsIOParallelCGNSWriterCxxTests mpi_tests
@@ -17,4 +17,4 @@ if (PARAVIEW_USE_MPI)
     TestFunctions.cxx
     TestFunctions.h
     )
-endif(PARAVIEW_USE_MPI)
+endif()
