@@ -392,6 +392,15 @@ More advanced / less common options include:
   * `PARAVIEW_ENABLE_COSMOTOOLS` (default `OFF`; requires `PARAVIEW_USE_MPI`
     and not available on Windows): Enable support for CosmoTools which includes
     GenericIO readers and writers as well as some point cloud algorithms.
+  * `PARAVIEW_ENABLE_CGNS_READER` (default `ON` for CANONICAL builds, `OFF` for
+    non-CANONICAL builds): Enable support for reading CGNS files. When building
+    ParaView for e.g. CATALYST, this option allows building support for reading
+    CGNS files. It will also build CGNSReader dependencies: HDF5 and CGNS.
+  * `PARAVIEW_ENABLE_CGNS_WRITER` (default `ON` for CANONICAL builds, `OFF` for
+    non-CANONICAL builds): Enable support for writing CGNS files. When building
+    ParaView for e.g. CATALYST, this option allows building support for writing
+    CGNS files. It will also build CGNSReader dependencies: HDF5 and CGNS. If
+    `PARAVIEW_ENABLE_MPI` is `ON`, the parallel CGNS writer will also be built.
 
 #### Plugin settings
 
