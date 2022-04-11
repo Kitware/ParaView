@@ -385,6 +385,7 @@ being of a vtkDoubleArray.</Documentation>
           <DataType value="vtkDataSet" />
           <DataType value="vtkGraph"/>
           <DataType value="vtkTable"/>
+          <DataType value="vtkHyperTreeGrid"/>
         </DataTypeDomain>
         <InputArrayDomain name="input_array" optional="1"/>
         <Documentation>This property specifies the input dataset (vtkDataSet, vtkTable or vtkGraph) to the
@@ -409,6 +410,9 @@ being of a vtkDoubleArray.</Documentation>
                          name="CoordinateResults"
                          number_of_elements="1">
         <BooleanDomain name="bool" />
+        <Hints>
+            <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="AttributeType" value="0" inverse="0" />
+        </Hints>
         <Documentation>The value of this property determines whether the
         results of this computation should be used as point coordinates or as a
         new array.</Documentation>

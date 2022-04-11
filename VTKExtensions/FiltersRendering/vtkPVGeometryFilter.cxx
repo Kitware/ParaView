@@ -1665,7 +1665,7 @@ void vtkPVGeometryFilter::HyperTreeGridExecute(
   this->OutlineFlag = 1;
   double bds[6];
   int procid = 0;
-  if (!doCommunicate && input->GetNumberOfVertices() == 0)
+  if (!doCommunicate && input->GetNumberOfCells() == 0)
   {
     return;
   }

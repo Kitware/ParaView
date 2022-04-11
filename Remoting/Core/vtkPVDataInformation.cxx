@@ -585,10 +585,6 @@ void vtkPVDataInformation::CopyFromDataObject(vtkDataObject* dobj)
 
     htg->GetBounds(this->Bounds);
     htg->GetExtent(this->Extent);
-
-    // I don't understand this clunkiness; why doesn't HTG return number of
-    // vertices when GetNumberOfElements(vtkDataObject::VERTEX) is called? Oh well.
-    this->NumberOfElements[vtkDataObject::VERTEX] = htg->GetNumberOfVertices();
   }
 }
 
@@ -957,8 +953,7 @@ bool vtkPVDataInformation::IsAttributeValid(int fieldAssociation) const
           vtkDataObjectTypes::TypeIdIsA(dtype, VTK_HYPER_TREE_GRID);
 
       case vtkDataObject::FIELD_ASSOCIATION_VERTICES:
-        return vtkDataObjectTypes::TypeIdIsA(dtype, VTK_GRAPH) ||
-          vtkDataObjectTypes::TypeIdIsA(dtype, VTK_HYPER_TREE_GRID);
+        return vtkDataObjectTypes::TypeIdIsA(dtype, VTK_GRAPH);
 
       case vtkDataObject::FIELD_ASSOCIATION_EDGES:
         return vtkDataObjectTypes::TypeIdIsA(dtype, VTK_GRAPH);

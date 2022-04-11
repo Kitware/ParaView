@@ -1368,7 +1368,6 @@ if(PARAVIEW_USE_PYTHON)
   set(SelectPointsTrace_DISABLE_CRS TRUE)
 
   list(APPEND TESTS_WITHOUT_BASELINES
-    PythonCalculator.xml
     PythonEditorTab.xml
     PythonResetSessionMacro.xml
     ProgrammableSourcePythonEditorLink.xml
@@ -1406,7 +1405,8 @@ if(PARAVIEW_USE_PYTHON)
       )
 
     list(APPEND TESTS_WITHOUT_BASELINES
-      PythonCalculatorOnTable.xml
+      PythonCalculator.xml
+      PythonCalculatorInput.xml
       )
 
     set(SpreadSheetSelectionTrace_DISABLE_CS TRUE)
