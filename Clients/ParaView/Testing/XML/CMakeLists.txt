@@ -1025,6 +1025,7 @@ list(APPEND TESTS_WITH_BASELINES
   FollowHiddenData.xml
   ForceTime.xml
   Fractal2D.xml
+  GenerateTimeSteps.xml
   glTFReaderAnimatedMorphing.xml
   glTFReaderMultipleAnimations.xml
   glTFReaderMultipleScenes.xml
