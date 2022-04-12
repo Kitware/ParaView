@@ -8849,6 +8849,14 @@
             <Property name="Justification" function="Justification"/>
             <Property name="VerticalJustification" default_values="1" />
           </PropertyGroup>
+
+          <PropertyGroup label="Multi Cell Properties">
+            <Property name="LineSpacing" panel_visibility="advanced" />
+            <Property name="CellOffset" panel_visibility="advanced" />
+            <Property name="InteriorLinesWidth" panel_visibility="advanced" />
+            <Property name="InteriorLinesColor" panel_visibility="advanced" />
+            <Property name="InteriorLinesVisibility" panel_visibility="advanced" />
+          </PropertyGroup>
         </ExposedProperties>
       </SubProxy>
 
