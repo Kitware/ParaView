@@ -42,6 +42,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVArrayInformation.h"
 #include "vtkPVDataInformation.h"
 #include "vtkPVDataSetAttributesInformation.h"
+#include "vtkPVGeneralSettings.h"
 #include "vtkSMCoreUtilities.h"
 #include "vtkSMInputProperty.h"
 #include "vtkSMIntVectorProperty.h"
@@ -86,7 +87,7 @@ public:
   {
     this->Dirty = true;
     this->VTKConnect = vtkSmartPointer<vtkEventQtSlotConnect>::New();
-    this->DecimalPrecision = 6;
+    this->DecimalPrecision = vtkPVGeneralSettings::GetInstance()->GetRealNumberDisplayedPrecision();
     this->FixedRepresentation = false;
     this->ActiveRegion[0] = this->ActiveRegion[1] = -1;
     this->VTKView = nullptr;
