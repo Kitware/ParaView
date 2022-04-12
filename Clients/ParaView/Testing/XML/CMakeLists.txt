@@ -74,6 +74,7 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${paraview_test_data_directory_input}/Data/amr/,REGEX:.*}"
   "DATA{${paraview_test_data_directory_input}/Data/amr/wavelet/,REGEX:.*}"
   "DATA{${paraview_test_data_directory_input}/Data/artifact.dta}"
+  "DATA{${paraview_test_data_directory_input}/Data/amr_gaussian_pulse.hdf}"
   "DATA{${paraview_test_data_directory_input}/Data/blow.vtk}"
   "DATA{${paraview_test_data_directory_input}/Data/blow_data.myvtk}"
   "DATA{${paraview_test_data_directory_input}/Data/bluntfin.vts}"
@@ -711,6 +712,7 @@ SET (TESTS_WITHOUT_BASELINES
   PartialArrayInLineChart.xml
   PlotOverLineLegacy.xml
   PointCellDataConversion.xml
+  ReadIOHDFAMRMaxLevels.xml
   ReloadCGNSFile.xml
   SearchBox.xml
   ServerConnectDialog.xml
