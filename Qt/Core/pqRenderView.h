@@ -174,6 +174,7 @@ public:
   virtual void resetViewDirection(
     double look_x, double look_y, double look_z, double up_x, double up_y, double up_z);
   virtual void adjustView(const int& adjustType, const double& angle);
+  virtual void applyIsometricView();
   virtual void resetViewDirectionToPositiveX();
   virtual void resetViewDirectionToNegativeX();
   virtual void resetViewDirectionToPositiveY();

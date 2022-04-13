@@ -62,9 +62,13 @@
 #include "vtkTransform.h"
 
 #include <cassert>
+#include <cmath>
 
 namespace
 {
+// magic number used as elevation to achieve an isometric view direction.
+const double isometric_elev = vtkMath::DegreesFromRadians(std::asin(std::tan(vtkMath::Pi() / 6.0)));
+
 void RotateElevation(vtkCamera* camera, double angle)
 {
   vtkNew<vtkTransform> transform;
@@ -388,6 +392,18 @@ void vtkSMRenderViewProxy::AdjustActiveCamera(
       break;
   }
   this->SynchronizeCameraProperties();
+}
+
+//----------------------------------------------------------------------------
+void vtkSMRenderViewProxy::ApplyIsometricView()
+{
+  SM_SCOPED_TRACE(CallMethod).arg(this).arg("ApplyIsometricView");
+  vtkCamera* cam = this->GetActiveCamera();
+  // Ref: Fig 2.4 - Brian Griffith: "Engineering Drawing for Manufacture", DOI
+  // https://doi.org/10.1016/B978-185718033-6/50016-1
+  this->ResetActiveCameraToDirection(0, 0, -1, 0, 1, 0);
+  cam->Azimuth(45.);
+  RotateElevation(cam, isometric_elev);
 }
 
 //----------------------------------------------------------------------------
