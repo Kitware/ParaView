@@ -88,8 +88,10 @@ pqAnimationScene::pqAnimationScene(const QString& group, const QString& name, vt
     proxy->GetProperty("Cues"), vtkCommand::ModifiedEvent, this, SLOT(onCuesChanged()));
   connector->Connect(animationScene, vtkCommand::AnimationCueTickEvent, this,
     SLOT(onTick(vtkObject*, unsigned long, void*, void*)));
-  connector->Connect(animationScene, vtkCommand::StartEvent, this, SIGNAL(beginPlay()));
-  connector->Connect(animationScene, vtkCommand::EndEvent, this, SIGNAL(endPlay()));
+  connector->Connect(animationScene, vtkCommand::StartEvent, this,
+    SIGNAL(beginPlay(vtkObject*, unsigned long, void*, void*)));
+  connector->Connect(animationScene, vtkCommand::EndEvent, this,
+    SIGNAL(endPlay(vtkObject*, unsigned long, void*, void*)));
 
   connector->Connect(
     proxy->GetProperty("PlayMode"), vtkCommand::ModifiedEvent, this, SIGNAL(playModeChanged()));

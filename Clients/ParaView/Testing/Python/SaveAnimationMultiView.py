@@ -83,7 +83,7 @@ objectSaveAnimationDialog = 'FileSaveAnimationDialog'
 QtTesting.playCommand(objectSaveAnimationDialog, 'filesSelected', '$PARAVIEW_TEST_ROOT/movie_test.png')
 
 time.sleep(3);
-objectPlayButton = 'pqClientMainWindow/VCRToolbar/1QToolButton2'
+objectPlayButton = 'pqClientMainWindow/VCRToolbar/1QToolButton3'
 while QtTesting.getProperty(objectPlayButton, "text") != 'Play' :
   time.sleep(1);
 

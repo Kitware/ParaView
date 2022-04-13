@@ -25,6 +25,17 @@
     <string>&amp;Play</string>
    </property>
   </action>
+  <action name="actionVCRReverse" >
+   <property name="enabled" >
+    <bool>false</bool>
+   </property>
+   <property name="icon" >
+    <iconset resource="../../../Components/Resources/pqComponents.qrc" >:/pqWidgets/Icons/pqVcrReverse.svg</iconset>
+   </property>
+   <property name="text" >
+    <string>&amp;Reverse</string>
+   </property>
+  </action>
 
   <action name="actionVCRPreviousFrame" >
    <property name="enabled" >
@@ -100,6 +111,7 @@
 
   <addaction name="actionVCRFirstFrame" />
   <addaction name="actionVCRPreviousFrame" />
+  <addaction name="actionVCRReverse" />
   <addaction name="actionVCRPlay" />
   <addaction name="actionVCRNextFrame" />
   <addaction name="actionVCRLastFrame" />

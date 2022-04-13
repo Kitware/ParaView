@@ -249,6 +249,8 @@
       </IntVectorProperty>
       <Property command="Play"
                 name="Play" />
+      <Property command="Reverse"
+                name="Reverse" />
       <Property command="Stop"
                 name="Stop" />
       <Property command="GoToNext"

@@ -62,7 +62,7 @@ public:
 
 protected Q_SLOTS:
   void setTimeRanges(double, double);
-  void onPlaying(bool);
+  void onPlaying(bool, bool);
 
 private:
   Q_DISABLE_COPY(pqVCRToolbar)
