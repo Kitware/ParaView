@@ -186,18 +186,15 @@ bool pqStandardRecentlyUsedResourceLoaderImplementation::addStateFileToRecentRes
   if (server)
   {
     // Needed to get the display resource in case of port forwarding
-    pqServerResource tmpResource = server->getResource();
-    pqServerConfiguration config = tmpResource.configuration();
+    pqServerResource resource = server->getResource();
+    pqServerConfiguration config = resource.configuration();
     if (!config.isNameDefault())
     {
-      tmpResource = config.resource();
+      resource = config.resource();
     }
 
     // Add this to the list of recent server resources ...
-    pqServerResource resource;
-    resource.setScheme("session");
     resource.setPath(filename);
-    resource.setSessionServer(tmpResource);
     resource.addData("PARAVIEW_STATE", "1");
     pqApplicationCore* core = pqApplicationCore::instance();
     core->recentlyUsedResources().add(resource);

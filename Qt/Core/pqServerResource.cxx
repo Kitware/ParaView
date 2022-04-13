@@ -94,11 +94,6 @@ public:
         this->Path = path.cap(2);
       }
     }
-    else if (this->Scheme == "session")
-    {
-      this->Path = temp.path();
-      this->SessionServer = temp.fragment();
-    }
     else
     {
       this->Host = temp.host();
@@ -136,8 +131,7 @@ public:
       this->DataServerHost == rhs.DataServerHost && this->DataServerPort == rhs.DataServerPort &&
       this->RenderServerHost == rhs.RenderServerHost &&
       this->RenderServerPort == rhs.RenderServerPort && this->Path == rhs.Path &&
-      this->SessionServer == rhs.SessionServer;
-    this->ServerName == rhs.ServerName;
+      this->ServerName == rhs.ServerName;
   }
 
   bool operator!=(const pqImplementation& rhs) { return !(*this == rhs); }
@@ -160,9 +154,6 @@ public:
       return this->RenderServerPort < rhs.RenderServerPort;
     if (this->Path != rhs.Path)
       return this->Path < rhs.Path;
-    if (this->SessionServer != rhs.SessionServer)
-      return this->SessionServer < rhs.SessionServer;
-
     return this->ServerName < rhs.ServerName;
   }
 
@@ -174,7 +165,6 @@ public:
   QString RenderServerHost;
   int RenderServerPort;
   QString Path;
-  QString SessionServer;
   QString ServerName;
   QMap<QString, QString> ExtraData;
   pqServerConfiguration Configuration;
@@ -254,10 +244,6 @@ QString pqServerResource::toURI() const
     result += this->Implementation->Path;
   }
 
-  if (!this->Implementation->SessionServer.isEmpty())
-  {
-    result += "#" + this->Implementation->SessionServer;
-  }
   else if (!this->Implementation->ServerName.isEmpty())
   {
     result += "#" + this->Implementation->ServerName;
@@ -456,51 +442,14 @@ void pqServerResource::setPath(const QString& rhs)
   this->Implementation->Path = rhs;
 }
 
-pqServerResource pqServerResource::sessionServer() const
-{
-  if (this->Implementation->Scheme != "session")
-  {
-    return QString("");
-  }
-
-  return this->Implementation->SessionServer;
-}
-
-void pqServerResource::setSessionServer(const pqServerResource& rhs)
-{
-  if (this->Implementation->Scheme != "session")
-  {
-    return;
-  }
-
-  this->Implementation->SessionServer = rhs.toURI();
-}
-
 QString pqServerResource::serverName() const
 {
-  // Sanity check we are not in session mode
-  // TODO merge with session ?
-  if (this->Implementation->Scheme == "session")
-  {
-    return QString("");
-  }
-
   return this->Implementation->ServerName;
 }
 
 void pqServerResource::setServerName(const QString& name)
 {
   this->Implementation->ServerName = name;
-}
-
-pqServerResource pqServerResource::serverNameServer() const
-{
-  if (this->Implementation->Scheme == "session")
-  {
-    return QString("");
-  }
-
-  return this->toURI();
 }
 
 pqServerResource pqServerResource::schemeHostsPortsServerName() const

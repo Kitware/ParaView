@@ -48,7 +48,7 @@ class pqServerConfiguration;
  *
  * To specify a data file, the following syntax is used:
  * \verbatim
- * <connection-scheme>:[//<server-details>]/<path-to-data-file>
+ * <connection-scheme>:[//<server-details>]/<path-to-data-file>[#serverName]
  * \endverbatim
  *
  * \c connection-scheme can be
@@ -66,7 +66,7 @@ class pqServerConfiguration;
  * \verbatim
  * builtin:/home/user/foo.vtk
  * cs://amber1:11112/C:\Users\User\foo.vtk
- * cdsrsrc://amber2:11111/amber3:22222/home/user/foo.vtk
+ * cdsrsrc://amber2:11111/amber3:22222/home/user/foo.vtk#amberDRS
  * \endverbatim
  *
  * To specify a state file, the following syntax is used:
@@ -92,10 +92,12 @@ class pqServerConfiguration;
  * As with data-files, port numbers are always optional in when specifying
  * server-details.
  *
+ * Server name is also optional but will be used if available.
+ *
  * Arbitrary data can be added to a resource. ParaView leverages this mechanism
- * to save additional files in a file series when referring to a data file, or
- * details about how to connect to the server when referring to a
- * server-connection.
+ * to identify statefiles, to save additional files in a file series
+ * when referring to a data file, or details about how to connect to the server
+ * when referring to a server-connection.
  *
  * \sa pqServerResources, pqServer
  */
@@ -127,7 +129,7 @@ public:
   QString serializeString() const;
 
   /** Returns the resource scheme -
-  builtin, cs, csrc, cdsrs, cdsrsrc, or session */
+  builtin, cs, csrc, cdsrs or cdsrsrc */
   QString scheme() const;
 
   /**
@@ -140,7 +142,7 @@ public:
    */
   bool isReverse() const;
 
-  /** Returns the resource host, or empty string for builtin, session,
+  /** Returns the resource host, or empty string for builtin,
   cdsrs, and cdsrsrc schemes */
   QString host() const;
   /**
@@ -169,12 +171,8 @@ public:
   QString path() const;
   void setPath(const QString&);
 
-  pqServerResource sessionServer() const;
-  void setSessionServer(const pqServerResource&);
-
   QString serverName() const;
   void setServerName(const QString& name);
-  pqServerResource serverNameServer() const;
 
   // add extra data to this resource
   void addData(const QString& key, const QString& value);
@@ -194,7 +192,7 @@ public:
   pqServerResource schemeHosts() const;
 
   /** Returns a copy of this resource containing only host and path information -
-  scheme, port numbers, and server session are excluded */
+  scheme, and port numbers are excluded */
   pqServerResource hostPath() const;
 
   pqServerResource pathServerName() const;

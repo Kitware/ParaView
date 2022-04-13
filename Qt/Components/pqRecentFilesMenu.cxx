@@ -153,10 +153,7 @@ void pqRecentFilesMenu::buildMenu()
         }
         else
         {
-          pqServerResource hostResource = (resource.scheme() == "session")
-            ? resource.sessionServer().schemeHostsPorts()
-            : resource.schemeHostsPorts();
-          key = hostResource.toURI();
+          key = resource.schemeHostsPorts().toURI();
         }
       }
       else
@@ -216,10 +213,7 @@ void pqRecentFilesMenu::onOpenResource(QAction* action)
 //-----------------------------------------------------------------------------
 void pqRecentFilesMenu::onOpenResource(const pqServerResource& resource)
 {
-  const pqServerResource serverResource = resource.scheme() == "session"
-    ? resource.sessionServer().schemeHostsPorts()
-    : resource.schemeHostsPortsServerName();
-
+  const pqServerResource serverResource = resource.schemeHostsPortsServerName();
   pqServerManagerModel* smModel = pqApplicationCore::instance()->getServerManagerModel();
   pqServer* server;
   if (resource.serverName().isEmpty())
