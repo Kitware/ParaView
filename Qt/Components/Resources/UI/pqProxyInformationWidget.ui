@@ -59,7 +59,7 @@
      </property>
     </widget>
    </item>
-   <item row="16" column="1">
+   <item row="18" column="1">
     <widget class="QLabel" name="extents">
      <property name="text">
       <string>0 - 100
@@ -206,7 +206,7 @@
      </property>
     </widget>
    </item>
-   <item row="20" column="0" colspan="2">
+   <item row="22" column="0" colspan="2">
     <widget class="pqTreeView" name="timeValues">
      <property name="alternatingRowColors">
       <bool>true</bool>
@@ -260,7 +260,7 @@
      </property>
     </widget>
    </item>
-   <item row="16" column="0">
+   <item row="18" column="0">
     <widget class="QLabel" name="labelExtents">
      <property name="text">
       <string>Extents</string>
@@ -283,7 +283,7 @@
      </property>
     </widget>
    </item>
-   <item row="17" column="0" colspan="2">
+   <item row="19" column="0" colspan="2">
     <layout class="QVBoxLayout" name="verticalLayout_4">
      <property name="spacing">
       <number>0</number>
@@ -297,7 +297,7 @@
         </font>
        </property>
        <property name="text">
-        <string>Data Arrays (time: 0)</string>
+        <string>Data Arrays</string>
        </property>
       </widget>
      </item>
@@ -310,13 +310,13 @@
      </item>
     </layout>
    </item>
-   <item row="19" column="0" colspan="2">
+   <item row="21" column="0" colspan="2">
     <layout class="QVBoxLayout" name="verticalLayout_7" stretch="0,0">
      <property name="spacing">
       <number>0</number>
      </property>
      <item>
-      <widget class="QLabel" name="label_21">
+      <widget class="QLabel" name="labelTimes">
        <property name="font">
         <font>
          <weight>75</weight>
@@ -337,7 +337,7 @@
      </item>
     </layout>
    </item>
-   <item row="15" column="1">
+   <item row="17" column="1">
     <widget class="QLabel" name="bounds">
      <property name="text">
       <string>0.000	- 0.000
@@ -362,7 +362,7 @@
      </property>
     </widget>
    </item>
-   <item row="14" column="1">
+   <item row="16" column="1">
     <widget class="QLabel" name="memory">
      <property name="text">
       <string>TextLabel</string>
@@ -399,7 +399,7 @@
      </property>
     </widget>
    </item>
-   <item row="18" column="0" colspan="2">
+   <item row="20" column="0" colspan="2">
     <widget class="pqTreeView" name="dataArraysTable">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Ignored" vsizetype="MinimumExpanding">
@@ -445,14 +445,14 @@
      </item>
     </layout>
    </item>
-   <item row="14" column="0">
+   <item row="16" column="0">
     <widget class="QLabel" name="labelMemory">
      <property name="text">
       <string>Memory:</string>
      </property>
     </widget>
    </item>
-   <item row="15" column="0">
+   <item row="17" column="0">
     <widget class="QLabel" name="labelBounds">
      <property name="text">
       <string>Bounds</string>
@@ -552,6 +552,34 @@
      </property>
      <property name="text">
       <string>(n/a)</string>
+     </property>
+    </widget>
+   </item>
+   <item row="14" column="0">
+    <widget class="QLabel" name="labelTimeSteps">
+     <property name="text">
+      <string># of TimeSteps</string>
+     </property>
+    </widget>
+   </item>
+   <item row="14" column="1">
+    <widget class="QLabel" name="timeSteps">
+     <property name="text">
+      <string>1</string>
+     </property>
+    </widget>
+   </item>
+   <item row="15" column="0">
+    <widget class="QLabel" name="labelCurrentTime">
+     <property name="text">
+      <string>Current Time</string>
+     </property>
+    </widget>
+   </item>
+   <item row="15" column="1">
+    <widget class="QLabel" name="currentTime">
+     <property name="text">
+      <string>1 (range: [0, 1])</string>
      </property>
     </widget>
    </item>
