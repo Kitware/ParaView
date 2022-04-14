@@ -23,6 +23,7 @@
 #include "pqView.h"
 
 #include "QVTKOpenGLWindow.h"
+#include <QComboBox>
 #include <QDebug>
 #include <QFileDialog>
 #include <QMessageBox>
@@ -132,6 +133,19 @@ void pqLookingGlassDockPanel::constructor()
   this->connect(activeObjects, SIGNAL(viewChanged(pqView*)), SLOT(activeViewChanged(pqView*)));
 
   this->updateSaveRecordVisibility();
+
+  // Populate target device dropdown
+  auto devices = vtkLookingGlassInterface::GetDevices();
+  for (auto device : devices)
+  {
+    ui.TargetDeviceComboBox->addItem(
+      QString::fromStdString(device.second), QString::fromStdString(device.first));
+  }
+  ui.TargetDeviceComboBox->setCurrentIndex(-1);
+
+  this->connect(ui.TargetDeviceComboBox,
+    static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged), this,
+    &pqLookingGlassDockPanel::onTargetDeviceChanged);
 }
 
 pqLookingGlassDockPanel::~pqLookingGlassDockPanel()
@@ -209,7 +223,8 @@ void pqLookingGlassDockPanel::setView(pqView* view)
     proxyWidget = new pqProxyWidget(settings, this);
     proxyWidget->setApplyChangesImmediately(true);
     QVBoxLayout* layout = qobject_cast<QVBoxLayout*>(this->widget()->layout());
-    layout->insertWidget(4, proxyWidget);
+    layout->insertWidget(2, proxyWidget);
+
     QObject::connect(proxyWidget, SIGNAL(changeFinished()), this->View, SLOT(tryRender()));
   }
 }
@@ -247,7 +262,13 @@ void pqLookingGlassDockPanel::onRender()
   if (!this->DisplayWindow)
   {
     this->Interface = vtkLookingGlassInterface::New();
+    this->Interface->SetDeviceType(
+      this->Internal->Ui.TargetDeviceComboBox->currentData().toString().toStdString());
     this->Interface->Initialize();
+
+    // Update the combo box to default to the attached device
+    auto deviceType = this->Interface->GetDeviceType();
+    this->setAttachedDevice(deviceType);
 
     srcWin->MakeCurrent();
 
@@ -562,8 +583,13 @@ void pqLookingGlassDockPanel::updateSaveRecordVisibility()
   bool visible = this->Interface && this->DisplayWindow;
 
   auto& ui = this->Internal->Ui;
-  ui.SaveQuilt->setVisible(visible);
-  ui.RecordQuilt->setVisible(visible);
+  ui.SaveQuilt->setEnabled(visible);
+  ui.RecordQuilt->setEnabled(visible);
+  ui.ResetToCenterOfRotationButton->setEnabled(visible);
+  ui.PushFocalPlaneBackButton->setEnabled(visible);
+  ui.PullFocalPlaneForwardButton->setEnabled(visible);
+  ui.TargetDeviceComboBox->setEnabled(visible);
+  ui.TargetDeviceLabel->setEnabled(visible);
 }
 
 QString pqLookingGlassDockPanel::getQuiltFileSuffix()
@@ -613,6 +639,7 @@ void pqLookingGlassDockPanel::saveQuilt()
     }
   }
 
+  // Update the interface with the GUI values
   this->Interface->SaveQuilt(this->DisplayWindow, filepath.toUtf8().data());
 
   auto text = QString("Saved to \"%1\"").arg(filepath);
@@ -641,6 +668,46 @@ void pqLookingGlassDockPanel::onRecordQuiltClicked()
   else
   {
     ui.RecordQuilt->setText("Record Quilt");
+  }
+}
+
+void pqLookingGlassDockPanel::onTargetDeviceChanged(int index)
+{
+  // Check if we are currently rendering to a device
+  if (this->Interface != nullptr)
+  {
+    // Reset
+    this->reset();
+
+    // Restart
+    onRenderOnLookingGlassClicked();
+  }
+}
+
+void pqLookingGlassDockPanel::setAttachedDevice(const std::string& deviceType)
+{
+  auto& ui = this->Internal->Ui;
+
+  // Only set if the user hasn't made a selection
+  if (!ui.TargetDeviceComboBox->currentData().isValid())
+  {
+
+    // Set the selection in the combo box
+    if (!deviceType.empty())
+    {
+      auto index = ui.TargetDeviceComboBox->findData(QString::fromStdString(deviceType));
+      if (index < 0)
+      {
+        qWarning() << "Unrecognized device type:" << QString::fromStdString(deviceType);
+      }
+      else
+      {
+        // Block the signal so we don't trigger currentIndexChanged
+        ui.TargetDeviceComboBox->blockSignals(true);
+        ui.TargetDeviceComboBox->setCurrentIndex(index);
+        ui.TargetDeviceComboBox->blockSignals(false);
+      }
+    }
   }
 }
 
@@ -688,6 +755,10 @@ void pqLookingGlassDockPanel::startRecordingQuilt()
       return;
     }
   }
+  // Update the interface with the GUI values
+  auto& ui = this->Internal->Ui;
+  ui.TargetDeviceLabel->setEnabled(false);
+  ui.TargetDeviceComboBox->setEnabled(false);
 
   this->Interface->StartRecordingQuilt(this->DisplayWindow, filepath.toUtf8().data());
   this->IsRecording = true;
@@ -703,6 +774,10 @@ void pqLookingGlassDockPanel::stopRecordingQuilt()
   {
     return;
   }
+
+  auto& ui = this->Internal->Ui;
+  ui.TargetDeviceLabel->setEnabled(true);
+  ui.TargetDeviceComboBox->setEnabled(true);
 
   this->Interface->StopRecordingQuilt();
   this->IsRecording = false;

@@ -68,6 +68,8 @@ protected Q_SLOTS:
   void updateSaveRecordVisibility();
   void saveQuilt();
   void onRecordQuiltClicked();
+  void onTargetDeviceChanged(int index);
+  void setAttachedDevice(const std::string& deviceType);
 
   void startRecordingQuilt();
   void stopRecordingQuilt();

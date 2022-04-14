@@ -22,6 +22,20 @@
     </widget>
    </item>
    <item>
+    <layout class="QHBoxLayout" name="TargetDeviceLayout">
+     <item>
+      <widget class="QLabel" name="TargetDeviceLabel">
+       <property name="text">
+        <string>Target Device:</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QComboBox" name="TargetDeviceComboBox"/>
+     </item>
+    </layout>
+   </item>
+   <item>
     <widget class="QPushButton" name="ResetToCenterOfRotationButton">
      <property name="text">
       <string>Reset to Center of Rotation</string>
