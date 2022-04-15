@@ -111,6 +111,7 @@ private Q_SLOTS:
   void resetViewDirection(
     double look_x, double look_y, double look_z, double up_x, double up_y, double up_z);
 
+  void applyIsometricView();
   void applyCameraRollPlus();
   void applyCameraRollMinus();
   void applyCameraElevationPlus();
@@ -131,8 +132,6 @@ protected:
 
 private:
   pqCameraDialogInternal* Internal;
-
-  void adjustCamera(const int& enType, double value);
 };
 
 #endif
