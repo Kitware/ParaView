@@ -19,6 +19,7 @@
 #include "vtkStatisticsAlgorithm.h"
 #include "vtkStringArray.h"
 #include "vtkTable.h"
+#include "vtkUnsignedCharArray.h"
 #include "vtkVariantArray.h"
 
 #include <set>
@@ -429,7 +430,20 @@ int vtkSciVizStatistics::RequestData(
     // Create a table to hold the input data (unless the TrainingFraction is exactly 1.0)
     vtkSmartPointer<vtkTable> train = nullptr;
     vtkIdType N = inTable->GetNumberOfRows();
-    vtkIdType M = this->Task == MODEL_INPUT ? N : this->GetNumberOfObservationsForTraining(inTable);
+
+    vtkUnsignedCharArray* ghosts = inTable->GetRowData()->GetGhostArray();
+    if (ghosts)
+    {
+      for (vtkIdType id = 0; id < ghosts->GetNumberOfValues(); ++id)
+      {
+        if (ghosts->GetValue(id))
+        {
+          --N;
+        }
+      }
+    }
+
+    vtkIdType M = this->Task == MODEL_INPUT ? N : this->GetNumberOfObservationsForTraining(N);
     if (M == N)
     {
       train = inTable;
@@ -589,6 +603,12 @@ int vtkSciVizStatistics::PrepareFullDataTable(vtkTable* inTable, vtkFieldData* d
     }
   }
 
+  // If there's a ghost array in the input, we want it in the table.
+  if (vtkUnsignedCharArray* ghosts = dataAttrIn->GetGhostArray())
+  {
+    inTable->AddColumn(ghosts);
+  }
+
   vtkIdType ncols = inTable->GetNumberOfColumns();
   if (ncols < 1)
   {
@@ -604,12 +624,19 @@ int vtkSciVizStatistics::PrepareTrainingTable(
 {
   // FIXME: this should eventually eliminate duplicate points as well as subsample...
   //        but will require the original ugrid/polydata/graph.
+
+  vtkUnsignedCharArray* ghosts = fullDataTable->GetRowData()->GetGhostArray();
+
   std::set<vtkIdType> trainRows;
   vtkIdType N = fullDataTable->GetNumberOfRows();
   double frac = static_cast<double>(M) / static_cast<double>(N);
   vtkNew<vtkMinimalStandardRandomSequence> rand;
   for (vtkIdType i = 0; i < N; ++i)
   {
+    if (ghosts && ghosts->GetValue(i))
+    {
+      continue;
+    }
     rand->Next();
     if (rand->GetValue() < frac)
     {
@@ -628,7 +655,10 @@ int vtkSciVizStatistics::PrepareTrainingTable(
   {
     rand->Next();
     vtkIdType rec = static_cast<vtkIdType>(rand->GetRangeValue(0, N));
-    trainRows.insert(rec);
+    if (!ghosts || !ghosts->GetValue(rec))
+    {
+      trainRows.insert(rec);
+    }
   }
   // Finally, copy the subset into the training table
   trainingTable->Initialize();
@@ -651,9 +681,8 @@ int vtkSciVizStatistics::PrepareTrainingTable(
   return 1;
 }
 
-vtkIdType vtkSciVizStatistics::GetNumberOfObservationsForTraining(vtkTable* observations)
+vtkIdType vtkSciVizStatistics::GetNumberOfObservationsForTraining(vtkIdType N)
 {
-  vtkIdType N = observations->GetNumberOfRows();
   vtkIdType M = static_cast<vtkIdType>(N * this->TrainingFraction);
   return M < 100 ? (N < 100 ? N : 100) : M;
 }

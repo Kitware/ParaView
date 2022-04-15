@@ -193,11 +193,9 @@ protected:
    * observations->GetNumberOfRows() * this->TrainingFraction and
    * min( observations->GetNumberOfRows(), 100 ).
    * Thus, it will require the entire set of observations unless there are more than 100.
-
-   * @param[in] observations - a table containing the full number of available observations (in
-   this process).
+   * Parameter N is the number of non-ghost observations.
    */
-  virtual vtkIdType GetNumberOfObservationsForTraining(vtkTable* observations);
+  virtual vtkIdType GetNumberOfObservationsForTraining(vtkIdType N);
 
   /**
    * A variant of shallow copy that calls vtkDataObject::ShallowCopy() and then
