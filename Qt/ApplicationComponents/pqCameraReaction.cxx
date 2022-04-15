@@ -127,6 +127,10 @@ void pqCameraReaction::onTriggered()
       this->resetNegativeZ();
       break;
 
+    case APPLY_ISOMETRIC_VIEW:
+      this->applyIsometricView();
+      break;
+
     case ZOOM_TO_DATA:
       this->zoomToData();
       break;
@@ -252,5 +256,15 @@ void pqCameraReaction::rotateCamera(double angle)
   if (renModule)
   {
     renModule->adjustView(to_underlying(vtkSMRenderViewProxy::CameraAdjustmentType::Roll), angle);
+  }
+}
+
+//-----------------------------------------------------------------------------
+void pqCameraReaction::applyIsometricView()
+{
+  pqRenderView* renModule = qobject_cast<pqRenderView*>(pqActiveObjects::instance().activeView());
+  if (renModule)
+  {
+    renModule->applyIsometricView();
   }
 }

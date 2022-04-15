@@ -543,6 +543,15 @@ void pqRenderView::adjustView(const int& adjustType, const double& angle)
 }
 
 //-----------------------------------------------------------------------------
+void pqRenderView::applyIsometricView()
+{
+  vtkSMRenderViewProxy* const proxy = this->getRenderViewProxy();
+  proxy->ApplyIsometricView();
+  this->resetCamera();
+  this->render();
+}
+
+//-----------------------------------------------------------------------------
 void pqRenderView::resetViewDirectionToPositiveX()
 {
   vtkSMRenderViewProxy* const proxy = this->getRenderViewProxy();
