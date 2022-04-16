@@ -302,12 +302,14 @@ void pqLookingGlassDockPanel::onRender()
   int* renWinSize = this->getRenderWindow()->GetSize();
   origSize[0] = renWinSize[0];
   origSize[1] = renWinSize[1];
+  srcWin->UseOffScreenBuffersOn();
   srcWin->SetSize(renderSize[0], renderSize[1]);
 
   this->Interface->RenderQuilt(srcWin);
 
   // restore the original size
   srcWin->SetSize(origSize[0], origSize[1]);
+  srcWin->UseOffScreenBuffersOff();
 
   // finally render. The callback will actually do the fullscreen quad
   // in the middle of this call
