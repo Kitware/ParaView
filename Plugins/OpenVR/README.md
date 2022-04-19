@@ -2,9 +2,9 @@
 
 ## Building the plugin (and build options)
 
-If you are on windows and turn on PARAVIEW_OpenVR_Imago_Support then this
+If you are on Windows and turn on PARAVIEW_OpenVR_Imago_Support then this
 plugin will include settings for loading images from imago.live and
-displaying them in VR. This requirs that your data (typically borehole
+displaying them in VR. This requires that your data (typically borehole
 plots) have the correct cell data values to link to the online images.
 
 If you turn on VTK_ENABLE_VR_COLLABORATION then you will get collaboration
@@ -24,7 +24,7 @@ representation that will show up under the Sources menu. The
 webPageRepresentation enables you to place web pages into your 3D view and
 interact with them. The web page to load is pyut into the text table
 property. In VR the laser pointers can be used to interact with the web page
-and text can be entered as well from the properties panel for the
+and text can be entered as well from the properties' panel for the
 representation.
 
 ## Building the plugin with OpenXR support
