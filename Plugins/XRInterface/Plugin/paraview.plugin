@@ -1,0 +1,24 @@
+NAME
+  XRInterface
+DESCRIPTION
+  XRInterface Support
+CONDITION
+  PARAVIEW_USE_QT
+REQUIRES_MODULES
+  ParaView::pqApplicationComponents
+  ParaView::RemotingCore
+  ParaView::RemotingServerManager
+  ParaView::RemotingViews
+  VTK::CommonCore
+  VTK::CommonDataModel
+  VTK::CommonSystem
+  VTK::IOCore
+  VTK::IOImage
+  VTK::IOXML
+  VTK::IOXMLParser
+  VTK::InteractionWidgets
+  VTK::RenderingCore
+  VTK::RenderingOpenGL2
+  VTK::RenderingVR
+  VTK::RenderingOpenVR
+  VTK::ViewsCore
