@@ -16,10 +16,11 @@ PRIVATE_DEPENDS
   VTK::CommonExecutionModel
   VTK::FiltersCore
 TEST_DEPENDS
-  VTK::IOCGNSReader
-  VTK::IOIOSS
   VTK::CommonCore
   VTK::CommonDataModel
   VTK::TestingCore
   VTK::TestingDataModel
   ParaView::VTKExtensionsCore
+TEST_OPTIONAL_DEPENDS
+  VTK::IOCGNSReader
+  VTK::IOIOSS

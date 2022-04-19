@@ -26,7 +26,6 @@ PRIVATE_DEPENDS
 TEST_DEPENDS
   ParaView::VTKExtensionsCore
   VTK::vtksys
-  VTK::IOCGNSReader
   VTK::TestingCore
   VTK::ParallelMPI
   VTK::CommonCore
@@ -34,3 +33,5 @@ TEST_DEPENDS
   VTK::CommonExecutionModel
   VTK::FiltersCore
   VTK::FiltersGeneral
+TEST_OPTIONAL_DEPENDS
+  VTK::IOCGNSReader
