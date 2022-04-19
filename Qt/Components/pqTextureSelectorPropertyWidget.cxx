@@ -104,8 +104,8 @@ pqTextureSelectorPropertyWidget::pqTextureSelectorPropertyWidget(
 
       QObject::connect(this->Representation, &pqDataRepresentation::attrArrayNameModified, this,
         [=] { this->checkAttributes(checkTCoords, checkTangents); });
+      this->checkAttributes(checkTCoords, checkTangents);
     }
-    this->checkAttributes(checkTCoords, checkTangents);
   }
 }
 
