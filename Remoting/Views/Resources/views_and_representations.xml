@@ -5635,7 +5635,7 @@
         element_types="0 0 0 0 2"
         label="Vectors">
         <ArrayListDomain name="array_list" attribute_type="Vectors"
-          input_domain_name="input_vectors">
+          input_domain_name="input_array_point_3">
           <RequiredProperties>
             <Property name="Input" function="Input"/>
           </RequiredProperties>
