@@ -166,6 +166,10 @@ public:
   vtkCamera* GetActiveCamera();
   void AdjustActiveCamera(const CameraAdjustmentType&, const double&);
   void AdjustActiveCamera(const int&, const double&);
+  void AdjustAzimuth(const double& value);
+  void AdjustElevation(const double& value);
+  void AdjustRoll(const double& value);
+  void AdjustZoom(const double& value);
   void ApplyIsometricView();
   void ResetActiveCameraToDirection(const double& look_x, const double& look_y,
     const double& look_z, const double& up_x, const double& up_y, const double& up_z);

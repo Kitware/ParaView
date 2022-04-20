@@ -39,15 +39,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVXMLElement.h"
 #include "vtkSMRenderViewProxy.h"
 
-namespace
-{
-template <typename EnumT>
-constexpr typename std::underlying_type<EnumT>::type to_underlying(const EnumT& e) noexcept
-{
-  return static_cast<typename std::underlying_type<EnumT>::type>(e);
-}
-}
-
 //-----------------------------------------------------------------------------
 pqCameraReaction::pqCameraReaction(QAction* parentObject, pqCameraReaction::Mode mode)
   : Superclass(parentObject)
@@ -255,7 +246,7 @@ void pqCameraReaction::rotateCamera(double angle)
 
   if (renModule)
   {
-    renModule->adjustView(to_underlying(vtkSMRenderViewProxy::CameraAdjustmentType::Roll), angle);
+    renModule->adjustRoll(angle);
   }
 }
 

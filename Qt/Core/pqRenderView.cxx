@@ -538,7 +538,38 @@ void pqRenderView::adjustView(const int& adjustType, const double& angle)
 {
   vtkSMRenderViewProxy* const proxy = this->getRenderViewProxy();
   proxy->AdjustActiveCamera(adjustType, angle);
-  this->resetCamera();
+  this->render();
+}
+
+//-----------------------------------------------------------------------------
+void pqRenderView::adjustAzimuth(const double& value)
+{
+  vtkSMRenderViewProxy* const proxy = this->getRenderViewProxy();
+  proxy->AdjustAzimuth(value);
+  this->render();
+}
+
+//-----------------------------------------------------------------------------
+void pqRenderView::adjustElevation(const double& value)
+{
+  vtkSMRenderViewProxy* const proxy = this->getRenderViewProxy();
+  proxy->AdjustElevation(value);
+  this->render();
+}
+
+//-----------------------------------------------------------------------------
+void pqRenderView::adjustRoll(const double& value)
+{
+  vtkSMRenderViewProxy* const proxy = this->getRenderViewProxy();
+  proxy->AdjustRoll(value);
+  this->render();
+}
+
+//-----------------------------------------------------------------------------
+void pqRenderView::adjustZoom(const double& value)
+{
+  vtkSMRenderViewProxy* const proxy = this->getRenderViewProxy();
+  proxy->AdjustZoom(value);
   this->render();
 }
 

@@ -355,41 +355,81 @@ void vtkSMRenderViewProxy::AdjustActiveCamera(const int& adjustType, const doubl
 void vtkSMRenderViewProxy::AdjustActiveCamera(
   const CameraAdjustmentType& adjustType, const double& angle)
 {
-  SM_SCOPED_TRACE(CallMethod)
-    .arg(this)
-    .arg("AdjustActiveCamera")
-    .arg(static_cast<std::underlying_type<vtkSMRenderViewProxy::CameraAdjustmentType>::type>(
-      adjustType))
-    .arg(angle);
+  switch (adjustType)
+  {
+    case CameraAdjustmentType::Azimuth:
+      this->AdjustAzimuth(angle);
+      break;
+    case CameraAdjustmentType::Roll:
+      this->AdjustRoll(angle);
+      break;
+    case CameraAdjustmentType::Elevation:
+      this->AdjustElevation(angle);
+      break;
+    case CameraAdjustmentType::Zoom:
+      this->AdjustZoom(angle);
+      break;
+    default:
+      break;
+  }
+}
+
+//----------------------------------------------------------------------------
+void vtkSMRenderViewProxy::AdjustAzimuth(const double& value)
+{
+  SM_SCOPED_TRACE(CallMethod).arg(this).arg("AdjustAzimuth").arg(value);
   vtkCamera* camera = this->GetActiveCamera();
   if (!camera)
   {
     return;
   }
-  switch (adjustType)
+  camera->Azimuth(value);
+  this->SynchronizeCameraProperties();
+}
+
+//----------------------------------------------------------------------------
+void vtkSMRenderViewProxy::AdjustElevation(const double& value)
+{
+  SM_SCOPED_TRACE(CallMethod).arg(this).arg("AdjustElevation").arg(value);
+  vtkCamera* camera = this->GetActiveCamera();
+  if (!camera)
   {
-    case CameraAdjustmentType::Azimuth:
-      camera->Azimuth(angle);
-      break;
-    case CameraAdjustmentType::Roll:
-      camera->Roll(angle);
-      break;
-    case CameraAdjustmentType::Elevation:
-      RotateElevation(camera, angle);
-      //      camera->Elevation(angle); // sometimes, this can cause an invalid view-up vector
-      break;
-    case CameraAdjustmentType::Zoom:
-      if (camera->GetParallelProjection())
-      {
-        camera->SetParallelScale(camera->GetParallelScale() / angle);
-      }
-      else
-      {
-        camera->Dolly(angle);
-      }
-      break;
-    default:
-      break;
+    return;
+  }
+  // camera->Elevation(angle); // sometimes, this can cause an invalid view-up vector
+  RotateElevation(camera, value);
+  this->SynchronizeCameraProperties();
+}
+
+//----------------------------------------------------------------------------
+void vtkSMRenderViewProxy::AdjustRoll(const double& value)
+{
+  SM_SCOPED_TRACE(CallMethod).arg(this).arg("AdjustRoll").arg(value);
+  vtkCamera* camera = this->GetActiveCamera();
+  if (!camera)
+  {
+    return;
+  }
+  camera->Roll(value);
+  this->SynchronizeCameraProperties();
+}
+
+//----------------------------------------------------------------------------
+void vtkSMRenderViewProxy::AdjustZoom(const double& value)
+{
+  SM_SCOPED_TRACE(CallMethod).arg(this).arg("AdjustZoom").arg(value);
+  vtkCamera* camera = this->GetActiveCamera();
+  if (!camera)
+  {
+    return;
+  }
+  if (camera->GetParallelProjection())
+  {
+    camera->SetParallelScale(camera->GetParallelScale() / value);
+  }
+  else
+  {
+    camera->Dolly(value);
   }
   this->SynchronizeCameraProperties();
 }
@@ -404,6 +444,7 @@ void vtkSMRenderViewProxy::ApplyIsometricView()
   this->ResetActiveCameraToDirection(0, 0, -1, 0, 1, 0);
   cam->Azimuth(45.);
   RotateElevation(cam, isometric_elev);
+  this->SynchronizeCameraProperties();
 }
 
 //----------------------------------------------------------------------------
@@ -415,6 +456,7 @@ void vtkSMRenderViewProxy::ResetActiveCameraToDirection(const double& look_x, co
     cam->SetPosition(0, 0, 0);
     cam->SetFocalPoint(look_x, look_y, look_z);
     cam->SetViewUp(up_x, up_y, up_z);
+    this->SynchronizeCameraProperties();
   }
 }
 
