@@ -351,7 +351,7 @@ public:
     this->ElementTypeInfo->setText(imageName + " " + elementTypeName);
   }
 
-  int ElementType = vtkDataObject::POINT;
+  int ElementType = -1; // This value is assigned to remove a compiler warning.
   pqSelectionProxyModel SelectionModel;
   QPointer<pqServer> Server;
   QPointer<pqOutputPort> SavedPort;

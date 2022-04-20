@@ -665,21 +665,19 @@ void pqParaViewMenuBuilders::buildHelpMenu(QMenu& menu)
   menu.addSeparator();
 
   // ParaView Tutorial
-  QString tutorialURL = QString("https://www.paraview.org/paraview-downloads/"
-                                "download.php?submit=Download&version=v%1.%2&type=binary&os="
-                                "Sources&downloadFile=ParaViewTutorial-%1.%2.%3.pdf")
-                          .arg(vtkSMProxyManager::GetVersionMajor())
-                          .arg(vtkSMProxyManager::GetVersionMinor())
-                          .arg(vtkSMProxyManager::GetVersionPatch());
-  new pqDesktopServicesReaction(QUrl(tutorialURL),
-    (menu.addAction(QIcon(":/pqWidgets/Icons/pdf.png"), "ParaView Self-directed Tutorial")
-      << pqSetName("actionTutorialNotes")));
+  QString selfDirectedTutorialURL =
+    QString("https://docs.paraview.org/en/v%1/Tutorials/SelfDirectedTutorial/index.html")
+      .arg(versionString);
+  new pqDesktopServicesReaction(QUrl(selfDirectedTutorialURL),
+    (menu.addAction("ParaView Self-directed Tutorial")
+      << pqSetName("actionSelfDirectedTutorialNotes")));
 
   // Classroom Tutorials by Sandia National Laboratories
   QString classroomTutorialsURL =
-    QString("https://docs.paraview.org/en/v%1/ClassroomTutorials/index.html").arg(versionString);
+    QString("https://docs.paraview.org/en/v%1/Tutorials/ClassroomTutorials/index.html")
+      .arg(versionString);
   new pqDesktopServicesReaction(QUrl(classroomTutorialsURL),
-    (menu.addAction("ParaView Classroom Tutorials") << pqSetName("actionClassroomTutorial")));
+    (menu.addAction("ParaView Classroom Tutorials") << pqSetName("actionClassroomTutorials")));
 
   // Example Data Sets
 
