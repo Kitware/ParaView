@@ -131,7 +131,10 @@ set(PVBATCH_SYMMETRIC_TESTS
   )
 
 set(PVBATCH_TESTS_5_RANKS
-    ParallelSerialWriterMultipleRankIO.py)
+  ParallelSerialWriterMultipleRankIO.py)
+
+set(PVBATCH_TESTS_5_RANKS_NO_SYMMETRIC
+  GatherRankSpecificDataInformation.py,NO_VALID)
 
 IF (MPIEXEC_EXECUTABLE)
   set(vtkRemotingApplication_NUMPROCS 2)
@@ -144,6 +147,7 @@ IF (MPIEXEC_EXECUTABLE)
   paraview_add_test_pvbatch_mpi(
     JUST_VALID
     ${PVBATCH_TESTS_5_RANKS}
+    ${PVBATCH_TESTS_5_RANKS_NO_SYMMETRIC}
     )
 
   set(vtkRemotingApplication_NUMPROCS 2)
