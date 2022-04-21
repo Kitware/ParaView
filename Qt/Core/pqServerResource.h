@@ -46,9 +46,9 @@ class pqServerConfiguration;
  * <scheme>://<scheme-specific-parameters>
  * \endverbatim
  *
- * To specify a data file, the following syntax is used:
+ * To specify a data or state file, the following syntax is used:
  * \verbatim
- * <connection-scheme>:[//<server-details>]/<path-to-data-file>[#serverName]
+ * <connection-scheme>:[//<server-details>]/<path-to-data-file>[#serverName]:KEY:1
  * \endverbatim
  *
  * \c connection-scheme can be
@@ -62,19 +62,14 @@ class pqServerConfiguration;
  * \c \<dataserver-hostname\>:\<dataserver-port\>/\<renderserver-hostname\>:\<render-server-port\>
  * as applicable. Port numbers are always optional.
  *
+ * The KEY should be PARAVIEW_DATA for data file and PARAVIEW_STATE for state file.
+ *
  * Examples:
  * \verbatim
  * builtin:/home/user/foo.vtk
  * cs://amber1:11112/C:\Users\User\foo.vtk
  * cdsrsrc://amber2:11111/amber3:22222/home/user/foo.vtk#amberDRS
  * \endverbatim
- *
- * To specify a state file, the following syntax is used:
- * \verbatim
- * session:/<path-to-state-file>
- * \endverbatim
- *
- * Session files are not associated with any connection.
  *
  * To specify a server-connection, without pointing to any data file(s), the
  * following syntax may be used:
