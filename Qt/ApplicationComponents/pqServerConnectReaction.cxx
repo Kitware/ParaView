@@ -119,6 +119,10 @@ bool pqServerConnectReaction::connectToServer(
 {
   pqServerConfiguration config;
   config.setResource(resource);
+  if (!resource.serverName().isEmpty())
+  {
+    config.setName(resource.serverName());
+  }
   return pqServerConnectReaction::connectToServerUsingConfiguration(config, showConnectionDialog);
 }
 

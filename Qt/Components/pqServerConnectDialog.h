@@ -213,6 +213,7 @@ protected Q_SLOTS:
 
 protected: // NOLINT(readability-redundant-access-specifiers)
   void editConfiguration(const pqServerConfiguration&);
+  bool serverNameExists(const QString& name);
 
 private:
   Q_DISABLE_COPY(pqServerConnectDialog)

@@ -48,7 +48,7 @@ class pqServerConfiguration;
  *
  * To specify a data file, the following syntax is used:
  * \verbatim
- * <connection-scheme>:[//<server-details>]/<path-to-data-file>
+ * <connection-scheme>:[//<server-details>]/<path-to-data-file>[#serverName]
  * \endverbatim
  *
  * \c connection-scheme can be
@@ -66,7 +66,7 @@ class pqServerConfiguration;
  * \verbatim
  * builtin:/home/user/foo.vtk
  * cs://amber1:11112/C:\Users\User\foo.vtk
- * cdsrsrc://amber2:11111/amber3:22222/home/user/foo.vtk
+ * cdsrsrc://amber2:11111/amber3:22222/home/user/foo.vtk#amberDRS
  * \endverbatim
  *
  * To specify a state file, the following syntax is used:
@@ -92,10 +92,12 @@ class pqServerConfiguration;
  * As with data-files, port numbers are always optional in when specifying
  * server-details.
  *
+ * Server name is also optional but will be used if available.
+ *
  * Arbitrary data can be added to a resource. ParaView leverages this mechanism
- * to save additional files in a file series when referring to a data file, or
- * details about how to connect to the server when referring to a
- * server-connection.
+ * to identify statefiles, to save additional files in a file series
+ * when referring to a data file, or details about how to connect to the server
+ * when referring to a server-connection.
  *
  * \sa pqServerResources, pqServer
  */
@@ -103,33 +105,43 @@ class PQCORE_EXPORT pqServerResource
 {
 public:
   pqServerResource();
-  pqServerResource(const QString&);
-  pqServerResource(const QString&, const pqServerConfiguration&);
-  pqServerResource(const pqServerResource&);
-  pqServerResource& operator=(const pqServerResource&);
   ~pqServerResource();
+  pqServerResource& operator=(const pqServerResource&);
 
   /**
-   * Returns the pqServerConfiguration from which this resource was created, if
-   * any.
+   * Create an pqServerResource from a provided URI
+   */
+  pqServerResource(const QString& uri);
+
+  /**
+   * Create an pqServerResource from a provided URI and store related configuration
+   * If the configuration is named, the configuration name will be used as a serverName
+   */
+  pqServerResource(const QString& uri, const pqServerConfiguration& config);
+
+  /**
+   * Create a pqServerResource by copy
+   */
+  pqServerResource(const pqServerResource&);
+
+  /**
+   * Returns the pqServerConfiguration from which this resource was created, if any.
    */
   const pqServerConfiguration& configuration() const;
 
   /**
-   * Returns a compact string representation of the resource in URI format
-   * Prefer using configuration->URI() if a configuration is available
-   * and not default.
+   * Returns a compact string representation of the complete resource in URI format, see above.
    */
   QString toURI() const;
 
   /**
-   * Returns a compact string representation of the resource including extra
-   * data
+   * Returns a compact string representation of the resource including extra data
    */
   QString serializeString() const;
 
-  /** Returns the resource scheme -
-  builtin, cs, csrc, cdsrs, cdsrsrc, or session */
+  /**
+   * Returns the resource scheme, builtin, cs, csrc, cdsrs or cdsrsrc
+   */
   QString scheme() const;
 
   /**
@@ -142,58 +154,154 @@ public:
    */
   bool isReverse() const;
 
-  /** Returns the resource host, or empty string for builtin, session,
-  cdsrs, and cdsrsrc schemes */
+  /**
+   * Returns the resource host, or empty string for builtin, cdsrs, and cdsrsrc schemes
+   */
   QString host() const;
+
   /**
    * Sets the resource host
    */
   void setHost(const QString&);
 
+  /**
+   * Return the resource port, or -1 for builtin, cdsrs, and cdsrsrc schemes
+   */
   int port() const;
+
+  /**
+   * Return the resource port, or default_port for builtin, cdsrs, and cdsrsrc schemes
+   */
   int port(int default_port) const;
+
+  /**
+   * Set the resource port
+   */
   void setPort(int);
 
+  /**
+   * Return the data server host, if any
+   */
   QString dataServerHost() const;
+
+  /**
+   * Set the data server host
+   */
   void setDataServerHost(const QString&);
 
+  /**
+   * Return the data server port, if any, or -1
+   */
   int dataServerPort() const;
+
+  /**
+   * Return the data server port, if any, or default_port
+   */
   int dataServerPort(int default_port) const;
+
+  /**
+   * Set the data server port
+   */
   void setDataServerPort(int);
 
+  /**
+   * Return the render server host, if any
+   */
   QString renderServerHost() const;
+
+  /**
+   * Set the render server host
+   */
   void setRenderServerHost(const QString&);
 
+  /**
+   * Return the render server port, if any, or -1
+   */
   int renderServerPort() const;
+
+  /**
+   * Return the render server port, if any, or default_port
+   */
   int renderServerPort(int default_port) const;
+
+  /**
+   * Set the render server port
+   */
   void setRenderServerPort(int);
 
+  /**
+   * Return the path to the resource, if any
+   */
   QString path() const;
+
+  /**
+   * Set the path to the resource
+   */
   void setPath(const QString&);
 
-  pqServerResource sessionServer() const;
-  void setSessionServer(const pqServerResource&);
+  /**
+   * Return the server name of the resource, if any
+   */
+  QString serverName() const;
 
-  // add extra data to this resource
+  /**
+   * Set the server name of the resource
+   */
+  void setServerName(const QString& name);
+
+  /**
+   * Add a data on this resource, with a key/value logic
+   */
   void addData(const QString& key, const QString& value);
-  // get extra data from this resource
+
+  /**
+   * Get data from this resource, associated with the provided key, if any
+   */
   QString data(const QString& key) const;
+
+  /**
+   * Get data from this resource, associated with the provided key, if any. If not, return
+   * default_value.
+   */
   QString data(const QString& key, const QString& default_value) const;
+
+  /**
+   * Return true if this resource has data associated with the provided key, false otherwise.
+   */
   bool hasData(const QString& key) const;
 
-  /** Returns a copy of this resource containing only server information -
-  scheme, host, and port numbers */
+  /**
+   * Returns a copy of this resource containing only server connection information -
+   * scheme, host, and port numbers
+   */
   pqServerResource schemeHostsPorts() const;
-  /** Returns a copy of this resource containing a subset of server information -
-  scheme and host (no port numbers */
+
+  /**
+   * Returns a copy of this resource containing a subset of server information -
+   * scheme and host (no port numbers)
+   */
   pqServerResource schemeHosts() const;
-  /** Returns a copy of this resource containing only host and path information -
-  scheme, port numbers, and server session are excluded */
+
+  /**
+   * Returns a copy of this resource containing only host and path information -
+   * scheme and port numbers are excluded
+   */
   pqServerResource hostPath() const;
 
+  /**
+   * Returns a copy of this resource containing only path and server name information -
+   * scheme, host and port numbers are excluded
+   */
+  pqServerResource pathServerName() const;
+
+  //@{
+  /**
+   * Operators comparing all elements of the resource
+   */
   bool operator==(const pqServerResource&) const;
   bool operator!=(const pqServerResource&) const;
   bool operator<(const pqServerResource&) const;
+  //@}
 
 private:
   class pqImplementation;

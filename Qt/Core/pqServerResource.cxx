@@ -94,16 +94,18 @@ public:
         this->Path = path.cap(2);
       }
     }
-    else if (this->Scheme == "session")
-    {
-      this->Path = temp.path();
-      this->SessionServer = temp.fragment();
-    }
     else
     {
       this->Host = temp.host();
       this->Port = temp.port();
       this->Path = temp.path();
+    }
+    this->ServerName = temp.fragment();
+
+    // Use configuration name if provided
+    if (this->ServerName.isEmpty() && !config.isNameDefault())
+    {
+      this->ServerName = config.name();
     }
 
     if (this->Path.size() > 2 && this->Path[0] == '/' && this->Path[2] == ':')
@@ -130,7 +132,7 @@ public:
       this->DataServerHost == rhs.DataServerHost && this->DataServerPort == rhs.DataServerPort &&
       this->RenderServerHost == rhs.RenderServerHost &&
       this->RenderServerPort == rhs.RenderServerPort && this->Path == rhs.Path &&
-      this->SessionServer == rhs.SessionServer;
+      this->ServerName == rhs.ServerName;
   }
 
   bool operator!=(const pqImplementation& rhs) { return !(*this == rhs); }
@@ -153,8 +155,7 @@ public:
       return this->RenderServerPort < rhs.RenderServerPort;
     if (this->Path != rhs.Path)
       return this->Path < rhs.Path;
-
-    return this->SessionServer < rhs.SessionServer;
+    return this->ServerName < rhs.ServerName;
   }
 
   QString Scheme;
@@ -165,7 +166,7 @@ public:
   QString RenderServerHost;
   int RenderServerPort;
   QString Path;
-  QString SessionServer;
+  QString ServerName;
   QMap<QString, QString> ExtraData;
   pqServerConfiguration Configuration;
 };
@@ -234,9 +235,6 @@ QString pqServerResource::toURI() const
       result += ":" + QString::number(this->Implementation->RenderServerPort);
     }
   }
-  else if (this->Implementation->Scheme == "session")
-  {
-  }
 
   if (!this->Implementation->Path.isEmpty())
   {
@@ -247,9 +245,9 @@ QString pqServerResource::toURI() const
     result += this->Implementation->Path;
   }
 
-  if (!this->Implementation->SessionServer.isEmpty())
+  if (!this->Implementation->ServerName.isEmpty())
   {
-    result += "#" + this->Implementation->SessionServer;
+    result += "#" + this->Implementation->ServerName;
   }
 
   return result;
@@ -445,36 +443,22 @@ void pqServerResource::setPath(const QString& rhs)
   this->Implementation->Path = rhs;
 }
 
-pqServerResource pqServerResource::sessionServer() const
+QString pqServerResource::serverName() const
 {
-  if (this->Implementation->Scheme != "session")
-  {
-    return QString("");
-  }
-
-  return this->Implementation->SessionServer;
+  return this->Implementation->ServerName;
 }
 
-void pqServerResource::setSessionServer(const pqServerResource& rhs)
+void pqServerResource::setServerName(const QString& name)
 {
-  if (this->Implementation->Scheme != "session")
-  {
-    return;
-  }
-
-  this->Implementation->SessionServer = rhs.toURI();
+  this->Implementation->ServerName = name;
 }
 
 pqServerResource pqServerResource::schemeHostsPorts() const
 {
-  pqServerResource result;
+  pqServerResource result = this->schemeHosts();
 
-  result.setScheme(this->Implementation->Scheme);
-  result.setHost(this->Implementation->Host);
   result.setPort(this->Implementation->Port);
-  result.setDataServerHost(this->Implementation->DataServerHost);
   result.setDataServerPort(this->Implementation->DataServerPort);
-  result.setRenderServerHost(this->Implementation->RenderServerHost);
   result.setRenderServerPort(this->Implementation->RenderServerPort);
 
   return result;
@@ -500,6 +484,16 @@ pqServerResource pqServerResource::hostPath() const
   result.setDataServerHost(this->Implementation->DataServerHost);
   result.setRenderServerHost(this->Implementation->RenderServerHost);
   result.setPath(this->Implementation->Path);
+
+  return result;
+}
+
+pqServerResource pqServerResource::pathServerName() const
+{
+  pqServerResource result;
+
+  result.setPath(this->Implementation->Path);
+  result.setServerName(this->Implementation->ServerName);
 
   return result;
 }

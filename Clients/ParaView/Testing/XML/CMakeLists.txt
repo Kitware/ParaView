@@ -1102,6 +1102,7 @@ list(APPEND TESTS_WITH_BASELINES
   QuadraticGhostCells.xml
   ReadPIOWithHTG.xml
   ReadXMLPolyDataFileSeries.xml
+  RecentFiles.xml
   RectilinearVolumeRendering.xml
   RedistributeDataSetFilter.xml
   RepresentationSelector.xml
@@ -1614,6 +1615,7 @@ set (CustomViewpoints_FORCE_SERIAL TRUE)
 set (ExodusModeShapes_FORCE_SERIAL TRUE)
 set (LoadSaveStateAnimation_FORCE_SERIAL TRUE)
 set (BlockContextMenu_FORCE_SERIAL TRUE) # requires context menu
+set (RecentFiles_FORCE_SERIAL TRUE) # use key events
 
 # We don't support volume rendering of image data in data server & render server mode
 set(AdaptiveResampleToImage_DISABLE_CRS TRUE)

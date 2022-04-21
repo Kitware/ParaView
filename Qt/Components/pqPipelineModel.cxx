@@ -812,8 +812,8 @@ QVariant pqPipelineModel::data(const QModelIndex& idx, int role) const
         {
           const pqServerResource& resource = server->getResource();
           const bool is_configuration_default = resource.configuration().isNameDefault();
-          const auto name =
-            is_configuration_default ? resource.toURI() : resource.configuration().name();
+          const auto name = is_configuration_default ? resource.schemeHostsPorts().toURI()
+                                                     : resource.configuration().name();
           int time = server->getRemainingLifeTime();
           QString timeLeft =
             time > -1 ? QString(" (%1min left)").arg(QString::number(time)) : QString();

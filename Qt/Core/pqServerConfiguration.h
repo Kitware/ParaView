@@ -49,8 +49,20 @@ class vtkIndent;
 class PQCORE_EXPORT pqServerConfiguration
 {
 public:
+  /**
+   * Create an empty server configuration with the default name.
+   */
   pqServerConfiguration();
+
+  /**
+   * Default destructor
+   */
   ~pqServerConfiguration();
+
+  /**
+   * Create an empty server configuration with a provided name.
+   */
+  pqServerConfiguration(const QString& name);
 
   /**
    * Create a server configuration with the provided xml.
@@ -78,6 +90,11 @@ public:
   bool isNameDefault() const;
 
   /**
+   * Returns the default name of a server configuration.
+   */
+  static const QString defaultName();
+
+  /**
    * Get/Set the resource that describes the server scheme, hostname(s) and port(s).
    */
   pqServerResource resource() const;
@@ -93,10 +110,10 @@ public:
    * Using this method is needed only when using low level tcp api.
    * ressource() method should be used in any other cases.
    */
-  pqServerResource actualResource() const;
+  pqServerResource actualResource();
 
   /**
-   * get the resource URI
+   * get the resource URI, does not contain the server name
    */
   QString URI() const;
 
@@ -204,11 +221,12 @@ protected:
   static QString lookForCommand(QString command);
 
 private:
+  void constructor(const QString& name);
   void constructor(vtkPVXMLElement*);
-  bool Mutable;
+  bool Mutable = true;
   vtkSmartPointer<vtkPVXMLElement> XML;
-  bool PortForwarding;
-  bool SSHCommand;
+  bool PortForwarding = false;
+  bool SSHCommand = false;
   QString PortForwardingLocalPort;
   QString ActualURI;
 };

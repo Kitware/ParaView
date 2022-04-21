@@ -61,7 +61,7 @@ pqFileDialogRecentDirsModel::pqFileDialogRecentDirsModel(
   // from the pqSettings. If server==nullptr, we use the "builtin:" resource.
   pqServerResource resource = server ? server->getResource() : pqServerResource("builtin:");
 
-  QString uri = resource.configuration().URI();
+  QString uri = resource.toURI();
   pqApplicationCore* core = pqApplicationCore::instance();
   pqSettings* settings = core->settings();
 

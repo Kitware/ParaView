@@ -110,6 +110,11 @@ public:
   pqServer* findServer(const pqServerResource& resource) const;
 
   /**
+   * Given a server name, locates the pqServer instance with this name, if any.
+   */
+  pqServer* findServer(const QString& name) const;
+
+  /**
    * Book end events for removing a server.
    */
   void beginRemoveServer(pqServer* server);

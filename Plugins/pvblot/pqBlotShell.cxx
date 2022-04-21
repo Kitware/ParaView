@@ -97,7 +97,7 @@ void pqBlotShell::initialize()
     QString("servermanager.ActiveConnection = servermanager.Connection(%1)\n")
       .arg(this->ActiveServer->GetConnectionID()));
   this->executePythonCommand(QString("servermanager.ActiveConnection.SetHost(\"%1\",0)\n")
-                               .arg(this->ActiveServer->getResource().toURI()));
+                               .arg(this->ActiveServer->getResource().schemeHostsPorts().toURI()));
   this->executePythonCommand("servermanager.ToggleProgressPrinting()\n");
   this->executePythonCommand("servermanager.fromGUI = True\n");
   this->executePythonCommand("import paraview.simple\n");
