@@ -453,15 +453,6 @@ void pqServerResource::setServerName(const QString& name)
   this->Implementation->ServerName = name;
 }
 
-pqServerResource pqServerResource::schemeHostsPortsServerName() const
-{
-  pqServerResource result = this->schemeHostsPorts();
-
-  result.setServerName(this->Implementation->ServerName);
-
-  return result;
-}
-
 pqServerResource pqServerResource::schemeHostsPorts() const
 {
   pqServerResource result = this->schemeHosts();

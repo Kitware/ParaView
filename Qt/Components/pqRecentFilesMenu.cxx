@@ -213,11 +213,13 @@ void pqRecentFilesMenu::onOpenResource(QAction* action)
 //-----------------------------------------------------------------------------
 void pqRecentFilesMenu::onOpenResource(const pqServerResource& resource)
 {
-  const pqServerResource serverResource = resource.schemeHostsPortsServerName();
   pqServerManagerModel* smModel = pqApplicationCore::instance()->getServerManagerModel();
   pqServer* server;
+
+  // If a server name is set, use it to find the server, if not, use the schemehostsports instead
   if (resource.serverName().isEmpty())
   {
+    const pqServerResource serverResource = resource.schemeHostsPorts();
     server = smModel->findServer(serverResource);
   }
   else

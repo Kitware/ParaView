@@ -630,9 +630,6 @@ pqServer* pqObjectBuilder::createServer(const pqServerResource& resource, int co
 
   pqObjectBuilderNS::ContinueWaiting = true;
 
-  // Create a modified version of the resource that only contains server information
-  const pqServerResource server_resource = resource.schemeHostsPortsServerName();
-
   pqServerManagerModel* smModel = pqApplicationCore::instance()->getServerManagerModel();
 
   if (!vtkProcessModule::GetProcessModule()->GetMultipleSessionsSupport())
@@ -642,13 +639,17 @@ pqServer* pqObjectBuilder::createServer(const pqServerResource& resource, int co
     // connected servers are disconnected.
     // determine if we're already connected to this server.
     pqServer* server = nullptr;
-    if (server_resource.serverName().isEmpty())
+
+    // If a server name is set, use it to find the server, if not, use the schemehostsports instead
+    if (resource.serverName().isEmpty())
     {
+      // Create a modified version of the resource that only contains server information
+      const pqServerResource server_resource = resource.schemeHostsPorts();
       server = smModel->findServer(server_resource);
     }
     else
     {
-      server = smModel->findServer(server_resource.serverName());
+      server = smModel->findServer(resource.serverName());
     }
 
     if (server)

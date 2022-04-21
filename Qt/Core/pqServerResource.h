@@ -271,12 +271,6 @@ public:
   bool hasData(const QString& key) const;
 
   /**
-   * Returns a copy of this resource containing complete server information -
-   * scheme, host, port numbers and server name
-   */
-  pqServerResource schemeHostsPortsServerName() const;
-
-  /**
    * Returns a copy of this resource containing only server connection information -
    * scheme, host, and port numbers
    */
