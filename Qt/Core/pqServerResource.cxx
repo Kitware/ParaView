@@ -99,9 +99,10 @@ public:
       this->Host = temp.host();
       this->Port = temp.port();
       this->Path = temp.path();
-      this->ServerName = temp.fragment();
     }
+    this->ServerName = temp.fragment();
 
+    // Use configuration name if provided
     if (this->ServerName.isEmpty() && !config.isNameDefault())
     {
       this->ServerName = config.name();
@@ -244,7 +245,7 @@ QString pqServerResource::toURI() const
     result += this->Implementation->Path;
   }
 
-  else if (!this->Implementation->ServerName.isEmpty())
+  if (!this->Implementation->ServerName.isEmpty())
   {
     result += "#" + this->Implementation->ServerName;
   }
