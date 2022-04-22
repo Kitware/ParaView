@@ -613,10 +613,7 @@ public:
     ui.timeSteps->setVisible(dinfo && dinfo->GetHasTime());
     if (dinfo && dinfo->GetHasTime())
     {
-      ui.timeSteps->setText(QString("%1")
-                              .arg(l.toString(dinfo->GetNumberOfTimeSteps()))
-                              .arg(dinfo->GetTimeRange()[0])
-                              .arg(dinfo->GetTimeRange()[1]));
+      ui.timeSteps->setText(l.toString(dinfo->GetNumberOfTimeSteps()));
     }
 
     ui.labelCurrentTime->setVisible(dinfo && dinfo->GetHasTime());
