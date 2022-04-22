@@ -46,13 +46,32 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "projections.h" // for projection enum
 
+#include "DataSource.h"
 #include <memory> // for unique_ptr
+#include <unordered_set>
 #include <vector> // for std::vector
 
 class vtkCallbackCommand;
 class vtkDoubleArray;
 class vtkFieldData;
 class vtkMultiProcessController;
+
+struct dimset
+{
+  size_t DimsetID;
+  int GridID;
+  int ZAxisID;
+  size_t GridSize;
+  int NLevel;
+  std::string label;
+};
+
+struct Grid
+{
+  int GridID;
+  size_t Size;
+  int PointsPerCell;
+};
 
 /**
  *
@@ -326,6 +345,8 @@ protected:
   double Layer0OffsetRange[2];
 
   int DimensionSelection;
+  std::vector<dimset> DimensionSets;
+  std::vector<Grid> Grids;
   bool InvertZAxis;
   bool AddCoordinateVars;
   projection::Projection ProjectionMode;
@@ -370,11 +391,10 @@ protected:
   int NumberOfDomainVars;
   bool GridReconstructed;
 
-  int StreamID;
-  int VListID;
+  DataSource::CDIObject DataFile, GridFile, VGridFile;
   int GridID;
   int ZAxisID;
-  int SurfID;
+  std::unordered_set<int> SurfIDs;
 
   std::string TimeUnits;
   std::string Calendar;
