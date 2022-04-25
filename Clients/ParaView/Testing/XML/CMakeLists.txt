@@ -661,6 +661,7 @@ SET (TESTS_WITHOUT_BASELINES
   AboutDialog.xml
   AddFieldArrays.xml
   ArrayBoundsScaleDomain.xml
+  ArraySelectionWidget.xml
   CustomOutputFormat.xml
   DefaultReadersSetting.xml
   DelimitedTextReader.xml
