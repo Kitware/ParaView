@@ -60,6 +60,12 @@
         information_only="1"
         si_class="vtkSIDataArraySelectionProperty" />
 
+      <StringVectorProperty name="EdgeBlocksIdInfo"
+        command="GetEdgeBlockIdMapAsString"
+        number_of_elements_per_command="2"
+        information_only="1"
+        si_class="vtkSIDataArrayProperty"/>
+
       <StringVectorProperty name="EdgeBlocks"
         command="GetEdgeBlockSelection"
         information_property="EdgeBlockInfo"
@@ -83,6 +89,12 @@
         number_of_elements_per_command="2"
         information_only="1"
         si_class="vtkSIDataArraySelectionProperty" />
+
+      <StringVectorProperty name="FaceBlocksIdInfo"
+        command="GetFaceBlockIdMapAsString"
+        number_of_elements_per_command="2"
+        information_only="1"
+        si_class="vtkSIDataArrayProperty"/>
 
       <StringVectorProperty name="FaceBlocks"
         command="GetFaceBlockSelection"
@@ -108,6 +120,12 @@
         information_only="1"
         si_class="vtkSIDataArraySelectionProperty" />
 
+      <StringVectorProperty name="ElementBlocksIdInfo"
+        command="GetElementBlockIdMapAsString"
+        number_of_elements_per_command="2"
+        information_only="1"
+        si_class="vtkSIDataArrayProperty"/>
+
       <StringVectorProperty name="ElementBlocks"
         command="GetElementBlockSelection"
         information_property="ElementBlockInfo"
@@ -132,6 +150,12 @@
         number_of_elements_per_command="2"
         information_only="1"
         si_class="vtkSIDataArraySelectionProperty" />
+
+      <StringVectorProperty name="StructuredBlocksIdInfo"
+        command="GetStructuredBlockIdMapAsString"
+        number_of_elements_per_command="2"
+        information_only="1"
+        si_class="vtkSIDataArrayProperty"/>
 
       <StringVectorProperty name="StructuredBlocks"
         command="GetStructuredBlockSelection"
@@ -277,6 +301,12 @@
         information_only="1"
         si_class="vtkSIDataArraySelectionProperty" />
 
+      <StringVectorProperty name="NodeSetsIdInfo"
+        command="GetNodeSetIdMapAsString"
+        number_of_elements_per_command="2"
+        information_only="1"
+        si_class="vtkSIDataArrayProperty"/>
+
       <StringVectorProperty name="NodeSets"
         command="GetNodeSetSelection"
         information_property="NodeSetInfo"
@@ -300,6 +330,12 @@
         number_of_elements_per_command="2"
         information_only="1"
         si_class="vtkSIDataArraySelectionProperty" />
+
+      <StringVectorProperty name="EdgeSetsIdInfo"
+        command="GetEdgeSetIdMapAsString"
+        number_of_elements_per_command="2"
+        information_only="1"
+        si_class="vtkSIDataArrayProperty"/>
 
       <StringVectorProperty name="EdgeSets"
         command="GetEdgeSetSelection"
@@ -325,6 +361,12 @@
         information_only="1"
         si_class="vtkSIDataArraySelectionProperty" />
 
+      <StringVectorProperty name="FaceSetsIdInfo"
+        command="GetFaceSetIdMapAsString"
+        number_of_elements_per_command="2"
+        information_only="1"
+        si_class="vtkSIDataArrayProperty"/>
+
       <StringVectorProperty name="FaceSets"
         command="GetFaceSetSelection"
         information_property="FaceSetInfo"
@@ -349,6 +391,12 @@
         information_only="1"
         si_class="vtkSIDataArraySelectionProperty" />
 
+      <StringVectorProperty name="ElementSetsIdInfo"
+        command="GetElementSetIdMapAsString"
+        number_of_elements_per_command="2"
+        information_only="1"
+        si_class="vtkSIDataArrayProperty"/>
+
       <StringVectorProperty name="ElementSets"
         command="GetElementSetSelection"
         information_property="ElementSetInfo"
@@ -372,6 +420,12 @@
         number_of_elements_per_command="2"
         information_only="1"
         si_class="vtkSIDataArraySelectionProperty" />
+
+      <StringVectorProperty name="SideSetsIdInfo"
+        command="GetSideSetIdMapAsString"
+        number_of_elements_per_command="2"
+        information_only="1"
+        si_class="vtkSIDataArrayProperty"/>
 
       <StringVectorProperty name="SideSets"
         command="GetSideSetSelection"
@@ -638,6 +692,17 @@
         <Property name="StructuredBlocks" />
         <Property name="EdgeBlocks" />
         <Property name="FaceBlocks" />
+
+        <Hints>
+          <ArrayStatusPropertyWidget customColumnCount="1">
+            <Column label="id">
+              <Property key="ElementBlocks"    name="ElementBlocksIdInfo" />
+              <Property key="StructuredBlocks" name="StructuredBlocksIdInfo" />
+              <Property key="EdgeBlocks"       name="EdgeBlocksIdInfo" />
+              <Property key="FaceBlocks"       name="FaceBlocksIdInfo" />
+            </Column>
+          </ArrayStatusPropertyWidget>
+        </Hints>
       </PropertyGroup>
 
       <PropertyGroup label="Block Arrays"
@@ -658,6 +723,19 @@
         <Property name="FaceSets" />
         <Property name="ElementSets" />
         <Property name="SideSets" />
+
+        <Hints>
+          <ArrayStatusPropertyWidget customColumnCount="1">
+            <Column label="id">
+              <Property key="NodeSets"    name="NodeSetsIdInfo" />
+              <Property key="EdgeSets"    name="EdgeSetsIdInfo" />
+              <Property key="FaceSets"    name="FaceSetsIdInfo" />
+              <Property key="ElementSets" name="ElementSetsIdInfo" />
+              <Property key="SideSets"    name="SideSetsIdInfo" />
+            </Column>
+          </ArrayStatusPropertyWidget>
+        </Hints>
+
       </PropertyGroup>
 
       <PropertyGroup label="Set Arrays"
