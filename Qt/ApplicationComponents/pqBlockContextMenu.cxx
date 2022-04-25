@@ -42,6 +42,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMProxy.h"
 #include "vtkSMStringVectorProperty.h"
+#include "vtkSMTrace.h"
 
 #include <QColorDialog>
 #include <QMenu>
@@ -159,6 +160,7 @@ bool pqBlockContextMenu::contextMenu(QMenu* menu, pqView*, const QPoint&,
         }
       }
 
+      SM_SCOPED_TRACE(PropertiesModified).arg("proxy", reprProxy);
       BEGIN_UNDO_SET("Hide Block");
       smProperty->SetElements(value);
       reprProxy->UpdateVTKObjects();
@@ -169,6 +171,7 @@ bool pqBlockContextMenu::contextMenu(QMenu* menu, pqView*, const QPoint&,
 
     menu->addAction(QIcon(":/pqWidgets/Icons/pqEyeball.svg"), "Show Only Block",
       [dataBlockContext, smProperty, reprProxy, repr]() {
+        SM_SCOPED_TRACE(PropertiesModified).arg("proxy", reprProxy);
         BEGIN_UNDO_SET("Show Only Block");
         smProperty->SetElements(dataBlockContext);
         reprProxy->UpdateVTKObjects();
@@ -178,6 +181,7 @@ bool pqBlockContextMenu::contextMenu(QMenu* menu, pqView*, const QPoint&,
 
     menu->addAction(
       QIcon(":/pqWidgets/Icons/pqEyeball.svg"), "Show All Blocks", [smProperty, reprProxy, repr]() {
+        SM_SCOPED_TRACE(PropertiesModified).arg("proxy", reprProxy);
         BEGIN_UNDO_SET("Show All Blocks");
         smProperty->SetElements(std::vector<std::string>({ "/" }));
         reprProxy->UpdateVTKObjects();
@@ -198,6 +202,7 @@ bool pqBlockContextMenu::contextMenu(QMenu* menu, pqView*, const QPoint&,
       {
         double colorF[3] = { color.redF(), color.greenF(), color.blueF() };
         vtkSMPropertyHelper helper(smProperty);
+        SM_SCOPED_TRACE(PropertiesModified).arg("proxy", reprProxy);
         BEGIN_UNDO_SET("Set Block Color");
         for (const auto& selector : dataBlockContext)
         {
@@ -209,6 +214,7 @@ bool pqBlockContextMenu::contextMenu(QMenu* menu, pqView*, const QPoint&,
       }
     });
     menu->addAction(QIcon(":/pqWidgets/Icons/inherited_color.png"), "Unset Block Color", [=]() {
+      SM_SCOPED_TRACE(PropertiesModified).arg("proxy", reprProxy);
       BEGIN_UNDO_SET("Unset Block Color");
       vtkSMPropertyHelper helper(smProperty);
       for (const auto& selector : dataBlockContext)
@@ -232,6 +238,7 @@ bool pqBlockContextMenu::contextMenu(QMenu* menu, pqView*, const QPoint&,
       {
         double opacity = qBound(0.0, dialog.value(), 1.0);
         vtkSMPropertyHelper helper(smProperty);
+        SM_SCOPED_TRACE(PropertiesModified).arg("proxy", reprProxy);
         BEGIN_UNDO_SET("Set Block Opacity");
         for (const auto& selector : dataBlockContext)
         {
@@ -244,7 +251,8 @@ bool pqBlockContextMenu::contextMenu(QMenu* menu, pqView*, const QPoint&,
     });
 
     menu->addAction(QIcon(":/pqWidgets/Icons/inherited_opacity.png"), "Unset Block Opacity", [=]() {
-      BEGIN_UNDO_SET("Unset Block Color");
+      SM_SCOPED_TRACE(PropertiesModified).arg("proxy", reprProxy);
+      BEGIN_UNDO_SET("Unset Block Opacity");
       vtkSMPropertyHelper helper(smProperty);
       for (const auto& selector : dataBlockContext)
       {
