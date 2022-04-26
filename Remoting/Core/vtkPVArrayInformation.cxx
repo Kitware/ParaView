@@ -17,6 +17,7 @@
 #include "vtkAbstractArray.h"
 #include "vtkClientServerStream.h"
 #include "vtkDataArray.h"
+#include "vtkFieldData.h"
 #include "vtkGenericAttribute.h"
 #include "vtkInformation.h"
 #include "vtkInformationIterator.h"
@@ -260,7 +261,7 @@ void vtkPVArrayInformation::DeepCopy(vtkPVArrayInformation* other)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVArrayInformation::CopyFromArray(vtkAbstractArray* array)
+void vtkPVArrayInformation::CopyFromArray(vtkAbstractArray* array, vtkFieldData* fd)
 {
   assert(array != nullptr);
   this->Name = array->GetName() ? array->GetName() : "";
@@ -296,8 +297,13 @@ void vtkPVArrayInformation::CopyFromArray(vtkAbstractArray* array)
     for (int comp = -1; comp < numComponents; ++comp)
     {
       auto& compInfo = this->Components.at(comp + 1);
-      dataArray->GetRange(compInfo.Range.GetData(), comp);
-      dataArray->GetFiniteRange(compInfo.FiniteRange.GetData(), comp);
+      if (!fd || !array->GetName() ||
+        !fd->GetRange(dataArray->GetName(), compInfo.Range.GetData(), comp) ||
+        !fd->GetFiniteRange(dataArray->GetName(), compInfo.FiniteRange.GetData(), comp))
+      {
+        dataArray->GetRange(compInfo.Range.GetData(), comp);
+        dataArray->GetFiniteRange(compInfo.FiniteRange.GetData(), comp);
+      }
     }
   }
   else if (auto sarray = vtkStringArray::SafeDownCast(array))
