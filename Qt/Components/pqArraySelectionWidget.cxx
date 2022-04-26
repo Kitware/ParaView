@@ -132,40 +132,29 @@ public:
   void setStatus(const QString& key, const std::map<QString, bool>& value_map)
   {
     auto& items_map = this->GroupedItemsMap[key];
-    // any items not in value_map should be removed.
+    // We want to keep arrays order from "value_map", not previous order.
+    // Easiest way is to clear all and recreate rows.
     for (auto iter = items_map.begin(); iter != items_map.end();)
     {
-      if (value_map.find(iter->first) == value_map.end())
-      {
-        this->removeRow(iter->second);
-        iter = items_map.erase(iter);
-      }
-      else
-      {
-        ++iter;
-      }
+      this->removeRow(iter->second);
+      iter = items_map.erase(iter);
     }
 
     const QVariant pixmap = this->Pixmaps.contains(key) ? QVariant(this->Pixmaps[key]) : QVariant();
 
     for (const auto& pair : value_map)
     {
-      auto iter = items_map.find(pair.first);
-      if (iter == items_map.end())
-      {
-        auto item = new QStandardItem(pair.first);
-        item->setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsUserCheckable |
-          Qt::ItemNeverHasChildren);
-        item->setData(pixmap, Qt::DecorationRole);
-        this->appendRow(item);
+      auto item = new QStandardItem(pair.first);
+      item->setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsUserCheckable |
+        Qt::ItemNeverHasChildren);
+      item->setData(pixmap, Qt::DecorationRole);
+      this->appendRow(item);
 
-        // add to map.
-        iter = items_map.insert(std::pair<QString, QStandardItem*>(pair.first, item)).first;
-      }
-      assert(iter != items_map.end());
-      assert(iter->second != nullptr);
+      // add to map.
+      auto iter = items_map.insert(std::pair<QString, QStandardItem*>(pair.first, item)).first;
       iter->second->setCheckState(pair.second ? Qt::Checked : Qt::Unchecked);
     }
+
     // potentially changed, so just indicate that.
     this->emitHeaderDataChanged();
   }
