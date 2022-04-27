@@ -34,6 +34,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqComponentsModule.h" // for exports
 #include "pqTreeView.h"
+#include <QMap>     // for QMap.
+#include <QPointer> // for QPointer
+
+class pqTimer;
 
 /**
  * @class pqArraySelectionWidget
@@ -65,6 +69,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * To help the user with checking multiple items, filtering, and sorting, you
  * may want to connect pqArraySelectionWidget with a pqTreeViewSelectionHelper.
  *
+ * @section AdditionalColumns Additional columns
+ *
+ * In certain case, it's helpful to show additional columns that provide
+ * additional information about each of the row e.g. for exodus files, we may
+ * want to show exodus block ids. Such columns can be added by using
+ * `setColumnData` to provide a map with the mapping. In that case, the
+ * pqArraySelectionWidget must be created by passing the target column count in
+ * the constructor.
  */
 class PQCOMPONENTS_EXPORT pqArraySelectionWidget : public pqTreeView
 {
@@ -72,6 +84,7 @@ class PQCOMPONENTS_EXPORT pqArraySelectionWidget : public pqTreeView
   typedef pqTreeView Superclass;
 
 public:
+  pqArraySelectionWidget(int numColumns, QWidget* parent = nullptr);
   pqArraySelectionWidget(QWidget* parent = nullptr);
   ~pqArraySelectionWidget() override;
 
@@ -80,15 +93,16 @@ public:
    */
   bool event(QEvent* e) override;
 
-  //@{
+  ///@{
   /**
    * Specify a label to use for the horizontal header for the view.
    */
-  void setHeaderLabel(const QString& label);
-  QString headerLabel() const;
-  //@}
+  void setHeaderLabel(const QString& label) { this->setHeaderLabel(0, label); }
+  void setHeaderLabel(int column, const QString& label);
+  QString headerLabel(int column = 0) const;
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Specify an icon type to use for a property with the given name.
    * Supported icon types are point, cell, field, vertex, edge, row,
@@ -97,7 +111,20 @@ public:
    */
   void setIconType(const QString& pname, const QString& icon_type);
   const QString& iconType(const QString& pname) const;
-  //@}
+  ///@}
+
+  ///@{
+  /**
+   * Add additional column with meta-data for each row.
+   */
+  void setColumnData(int column, const QString& pname, QMap<QString, QString>&& mapping);
+  ///@}
+
+  /**
+   * API to add custom item data for each column.
+   */
+  void setColumnItemData(int column, int role, const QVariant& data);
+
 Q_SIGNALS:
   /**
    * fired whenever the check state has been modified.
@@ -114,7 +141,13 @@ private:
 
   void updateProperty(const QString& pname, const QVariant& value);
 
+  /**
+   * Eventually resize sections.
+   */
+  void resizeSectionsEventually();
+
   bool UpdatingProperty;
+  QPointer<pqTimer> Timer;
 
   class Model;
   friend class Model;

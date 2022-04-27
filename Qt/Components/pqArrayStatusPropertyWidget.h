@@ -33,7 +33,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define pqArrayStatusPropertyWidget_h
 
 #include "pqPropertyWidget.h"
+#include <QScopedPointer>
 
+class vtkObject;
 class vtkPVXMLElement;
 class vtkSMPropertyGroup;
 
@@ -49,8 +51,14 @@ public:
     vtkSMProxy* proxy, vtkSMProperty* property, QWidget* parent = nullptr);
   ~pqArrayStatusPropertyWidget() override;
 
+private Q_SLOTS:
+  void updateColumn(vtkObject*);
+
 private:
-  Q_DISABLE_COPY(pqArrayStatusPropertyWidget)
+  Q_DISABLE_COPY(pqArrayStatusPropertyWidget);
+  class pqInternals;
+  friend class pqInternals;
+  QScopedPointer<pqInternals> Internals;
 };
 
 #endif
