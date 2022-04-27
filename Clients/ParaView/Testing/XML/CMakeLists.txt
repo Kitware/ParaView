@@ -756,7 +756,7 @@ SET (TESTS_WITH_INLINE_COMPARES
   # temporary disabling since we don't support
   # selection in the MB-inspector right now.
   # (see #20525)
-  # MultiBlockInspectorSelection.xml
+  MultiBlockInspectorSelection.xml
   MultiBlockChartSelection.xml
   NestedViews.xml
   NonlinearSubdivisionDisplay.xml
