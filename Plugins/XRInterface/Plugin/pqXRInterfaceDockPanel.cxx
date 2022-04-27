@@ -431,7 +431,7 @@ void pqXRInterfaceDockPanel::loadState(vtkPVXMLElement* root, vtkSMProxyLocator*
   if (!e)
   {
     // For backwards compatibility
-    e = root->FindNestedElement("OpenVR");
+    e = root->FindNestedElementByName("OpenVR");
   }
   if (e)
   {

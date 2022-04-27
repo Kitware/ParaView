@@ -27,22 +27,22 @@
 
 #if XRINTERFACE_HAS_COLLABORATION
 #include "vtkOpenGLRenderer.h"
-#include "vtkOpenVRPolyfill.h"
 #include "vtkVRCollaborationClient.h"
+#include "vtkXRInterfacePolyfill.h"
 
 class vtkPVOpenVRCollaborationClientInternal : public vtkVRCollaborationClient
 {
 public:
   static vtkPVOpenVRCollaborationClientInternal* New();
   vtkTypeMacro(vtkPVOpenVRCollaborationClientInternal, vtkVRCollaborationClient);
-  void SetHelper(vtkPVOpenVRHelper* l) { this->Helper = l; }
+  void SetHelper(vtkPVXRInterfaceHelper* l) { this->Helper = l; }
 
   vtkPVOpenVRCollaborationClientInternal()
   {
     // override the scale callback to use polyfill
     // so that desktop views look reasonable
     this->ScaleCallback = [this]() {
-      return this->Helper->GetOpenVRPolyfill()->GetPhysicalScale();
+      return this->Helper->GetXRInterfacePolyfill()->GetPhysicalScale();
     };
   }
 
@@ -250,7 +250,7 @@ protected:
     }
   }
 
-  vtkPVOpenVRHelper* Helper;
+  vtkPVXRInterfaceHelper* Helper;
 };
 #else
 class vtkPVOpenVRCollaborationClientInternal : public vtkObject
@@ -353,7 +353,7 @@ void vtkPVXRInterfaceCollaborationClient::GoToSavedLocation(int index)
   }
 }
 
-void vtkPVXRInterfaceCollaborationClient::SetHelper(vtkPVOpenVRHelper* val)
+void vtkPVXRInterfaceCollaborationClient::SetHelper(vtkPVXRInterfaceHelper* val)
 {
   this->Internal->SetHelper(val);
 }
