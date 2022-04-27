@@ -44,6 +44,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqTreeViewExpandState.h"
 #include "pqTreeViewSelectionHelper.h"
 
+#include "vtkPVGeneralSettings.h"
+
 #include "vtkCommand.h"
 #include "vtkDataAssembly.h"
 #include "vtkDataAssemblyUtilities.h"
@@ -980,8 +982,10 @@ pqDataAssemblyPropertyWidget::pqDataAssemblyPropertyWidget(
     internals.Ui.removeOpacities, internals.Ui.removeAllOpacities);
 
   int linkActiveSelection = 0;
+  bool enableActiveSelectionProperty =
+    vtkPVGeneralSettings::GetInstance()->GetSelectionOnClickMultiBlockInspector();
   if (groupHints && groupHints->GetScalarAttribute("link_active_selection", &linkActiveSelection) &&
-    linkActiveSelection == 1)
+    linkActiveSelection == 1 && enableActiveSelectionProperty)
   {
     hookupActiveSelection(
       smproxy, internals.Ui.hierarchy->selectionModel(), internals.AssemblyTreeModel);

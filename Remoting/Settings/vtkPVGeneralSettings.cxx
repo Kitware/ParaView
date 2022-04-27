@@ -76,6 +76,7 @@ vtkPVGeneralSettings::vtkPVGeneralSettings()
   , ColorByBlockColorsOnApply(true)
   , AnimationTimeNotation(vtkPVGeneralSettings::MIXED)
   , EnableStreaming(false)
+  , SelectionOnClickMultiBlockInspector(true)
 {
   this->SetDefaultViewType("RenderView");
 }
