@@ -132,7 +132,8 @@ set(classes
   pqXYHistogramChartView
   vtkPVGUIPluginInterface)
 
-set(headers)
+set(headers
+    pqQVTKWidgetBase.h)
 
 configure_file(
   "${CMAKE_CURRENT_SOURCE_DIR}/pqQtConfig.h.in"
