@@ -104,12 +104,14 @@ class pqArraySelectionWidget::Model : public QStandardItemModel
 
   QMap<QString, QString> IconTypeMap;
   QVector<QMap<QString, QMap<QString, QString>>> Columns;
+  QVector<QMap<int, QVariant>> ColumnItemData;
 
 public:
   Model(int rs, int cs, pqArraySelectionWidget* parentObject)
     : Superclass(rs, cs, parentObject)
     , Widget(parentObject)
     , Columns(cs)
+    , ColumnItemData(cs)
   {
   }
 
@@ -130,6 +132,11 @@ public:
 
     current = std::move(mapping);
     this->updateColumnData(column, key);
+  }
+
+  void setColumnItemData(int column, int role, const QVariant& data)
+  {
+    this->ColumnItemData[column][role] = data;
   }
 
   // Here, `key` is the dynamic property name,
@@ -168,6 +175,7 @@ public:
         Qt::ItemNeverHasChildren);
       item->setData(pixmap, Qt::DecorationRole);
       item->setCheckState(pair.second ? Qt::Checked : Qt::Unchecked);
+      this->updateItemData(0, item);
       this->appendRow(item);
 
       // add to map.
@@ -377,6 +385,7 @@ private:
       auto iter = current.find(pair.first);
       auto* item = new QStandardItem(iter != current.end() ? iter.value() : QString());
       item->setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemNeverHasChildren);
+      this->updateItemData(column, item);
       this->setItem(row, column, item);
     }
   }
@@ -385,6 +394,15 @@ private:
   {
     this->HeaderCheckState.clear();
     Q_EMIT this->headerDataChanged(Qt::Horizontal, 0, 0);
+  }
+
+  void updateItemData(int column, QStandardItem* item)
+  {
+    const auto& qmap = this->ColumnItemData[column];
+    for (auto iter = qmap.begin(); iter != qmap.end(); ++iter)
+    {
+      item->setData(iter.value(), /*role=*/iter.key());
+    }
   }
 
   std::map<QString, std::map<QString, QStandardItem*>> GroupedItemsMap;
@@ -608,7 +626,7 @@ void pqArraySelectionWidget::setColumnData(
   int column, const QString& pname, QMap<QString, QString>&& mapping)
 {
   auto* amodel = this->realModel();
-  if (column <= 0 || column >= amodel->columnCount())
+  if (column < 0 || column >= amodel->columnCount())
   {
     qCritical() << "Incorrect column (" << column << ") specified!";
     return;
@@ -622,6 +640,18 @@ void pqArraySelectionWidget::setColumnData(
 
   amodel->setColumnData(column, pname, std::move(mapping));
   this->resizeSectionsEventually();
+}
+
+//-----------------------------------------------------------------------------
+void pqArraySelectionWidget::setColumnItemData(int column, int role, const QVariant& value)
+{
+  auto* amodel = this->realModel();
+  if (column < 0 || column >= amodel->columnCount())
+  {
+    qCritical() << "Incorrect column (" << column << ") specified!";
+    return;
+  }
+  amodel->setColumnItemData(column, role, value);
 }
 
 //-----------------------------------------------------------------------------

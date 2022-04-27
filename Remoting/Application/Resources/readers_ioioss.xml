@@ -695,7 +695,7 @@
 
         <Hints>
           <ArrayStatusPropertyWidget customColumnCount="1">
-            <Column label="id">
+            <Column label="id" align="right">
               <Property key="ElementBlocks"    name="ElementBlocksIdInfo" />
               <Property key="StructuredBlocks" name="StructuredBlocksIdInfo" />
               <Property key="EdgeBlocks"       name="EdgeBlocksIdInfo" />
@@ -726,7 +726,7 @@
 
         <Hints>
           <ArrayStatusPropertyWidget customColumnCount="1">
-            <Column label="id">
+            <Column label="id" align="right">
               <Property key="NodeSets"    name="NodeSetsIdInfo" />
               <Property key="EdgeSets"    name="EdgeSetsIdInfo" />
               <Property key="FaceSets"    name="FaceSetsIdInfo" />

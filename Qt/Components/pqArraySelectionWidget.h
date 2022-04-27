@@ -120,6 +120,11 @@ public:
   void setColumnData(int column, const QString& pname, QMap<QString, QString>&& mapping);
   ///@}
 
+  /**
+   * API to add custom item data for each column.
+   */
+  void setColumnItemData(int column, int role, const QVariant& data);
+
 Q_SIGNALS:
   /**
    * fired whenever the check state has been modified.

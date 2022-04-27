@@ -44,6 +44,31 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QHeaderView>
 #include <QtDebug>
 
+namespace
+{
+
+int parseAlignment(const char* data)
+{
+  if (data && strcmp(data, "right") == 0)
+  {
+    return Qt::AlignRight;
+  }
+
+  if (data && strcmp(data, "center") == 0)
+  {
+    return Qt::AlignHCenter;
+  }
+
+  if (data && strcmp(data, "justify") == 0)
+  {
+    return Qt::AlignJustify;
+  }
+
+  return Qt::AlignLeft;
+}
+
+}
+
 class pqArrayStatusPropertyWidget::pqInternals
 {
   QPointer<pqArraySelectionWidget> ArraySelectionWidget;
@@ -141,6 +166,10 @@ pqArrayStatusPropertyWidget::pqArrayStatusPropertyWidget(
     {
       const char* label = child->GetAttributeOrEmpty("label");
       selectorWidget->setHeaderLabel(column, label);
+      if (auto* align = child->GetAttribute("align"))
+      {
+        selectorWidget->setColumnItemData(column, Qt::TextAlignmentRole, ::parseAlignment(align));
+      }
 
       for (unsigned int kk = 0; kk < child->GetNumberOfNestedElements(); ++kk)
       {
