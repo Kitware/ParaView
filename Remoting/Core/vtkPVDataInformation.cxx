@@ -175,7 +175,7 @@ vtkPVDataInformation::~vtkPVDataInformation()
 void vtkPVDataInformation::CopyParametersToStream(vtkMultiProcessStream& str)
 {
   str << 828792 << this->PortNumber << std::string(this->SubsetSelector ? SubsetSelector : "")
-      << std::string(this->SubsetAssemblyName ? this->SubsetAssemblyName : "");
+      << std::string(this->SubsetAssemblyName ? this->SubsetAssemblyName : "") << this->Rank;
 }
 
 //----------------------------------------------------------------------------
@@ -183,7 +183,7 @@ void vtkPVDataInformation::CopyParametersFromStream(vtkMultiProcessStream& str)
 {
   int magic_number;
   std::string path, name;
-  str >> magic_number >> this->PortNumber >> path >> name;
+  str >> magic_number >> this->PortNumber >> path >> name >> this->Rank;
   if (magic_number != 828792)
   {
     vtkErrorMacro("Magic number mismatch.");
@@ -200,6 +200,7 @@ void vtkPVDataInformation::PrintSelf(ostream& os, vtkIndent indent)
   this->Superclass::PrintSelf(os, indent);
 
   os << indent << "PortNumber: " << this->PortNumber << endl;
+  os << indent << "Rank: " << this->Rank << endl;
   os << indent << "SubsetSelector: " << (this->SubsetSelector ? this->SubsetSelector : "(nullptr)")
      << endl;
   os << indent << "SubsetAssemblyName: "
