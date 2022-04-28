@@ -652,6 +652,7 @@ void pqAnimationViewWidget::setKeyFrameTime(
 
   if (i < keyFrames.size())
   {
+    SM_SCOPED_TRACE(PropertiesModified).arg(keyFrames[i]);
     QPair<double, double> timeRange = this->Internal->Scene->getClockTimeRange();
     double normTime = (time - timeRange.first) / (timeRange.second - timeRange.first);
     pqSMAdaptor::setElementProperty(keyFrames[i]->GetProperty("KeyTime"), normTime);
@@ -1074,6 +1075,7 @@ void pqAnimationViewWidget::createTrack()
     {
       // update key frame parameters based on the orbit points.
       vtkSMProxy* kf = cue->getKeyFrame(0);
+      SM_SCOPED_TRACE(PropertiesModified).arg(kf);
       pqSMAdaptor::setMultipleElementProperty(
         kf->GetProperty("PositionPathPoints"), creator.orbitPoints(7));
       pqSMAdaptor::setMultipleElementProperty(kf->GetProperty("FocalPathPoints"), creator.center());
