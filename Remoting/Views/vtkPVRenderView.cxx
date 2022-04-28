@@ -1514,6 +1514,9 @@ void vtkPVRenderView::Render(bool interactive, bool skip_rendering)
   // Update background.
   this->UpdateBackground();
 
+  auto rvsettings = vtkPVRenderViewSettings::GetInstance();
+  this->GetRenderer()->SetTwoSidedLighting(rvsettings->GetTwoSidedLighting());
+
   if ((!interactive && this->UseDistributedRenderingForRender) ||
     (interactive && this->UseDistributedRenderingForLODRender))
   {
