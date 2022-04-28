@@ -406,6 +406,7 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/MultiBlockInspectorSelection-SelectBlock2.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/MultiBlockInspectorSelection-SelectElementBlocks.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/MultiBlockInspectorSelection-HideBlock1.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/MultiBlockNonSelectionSetting.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/NestedViews.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/NestedViews_1.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/NonlinearSubdivision0Display.png}"
@@ -1068,6 +1069,7 @@ list(APPEND TESTS_WITH_BASELINES
   MultiBlockInspectorExtractBlocks.xml
   MultiBlockSingleBlock.xml
   MultiBlockVolumeRendering.xml
+  MultiBlockNonSelectionSetting.xml
   MultiSliceMultiBlock.xml
   MultiSliceWavelet.xml
   NormalGlyphs.xml
