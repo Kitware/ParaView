@@ -907,6 +907,7 @@ void pqAnimationViewWidget::toggleTrackEnabled(pqAnimationTrack* track)
     return;
   }
   BEGIN_UNDO_SET("Toggle Animation Track");
+  SM_SCOPED_TRACE(PropertiesModified).arg(cue->getProxy());
   cue->setEnabled(!track->isEnabled());
   END_UNDO_SET();
 }
@@ -920,6 +921,7 @@ void pqAnimationViewWidget::deleteTrack(pqAnimationTrack* track)
     return;
   }
   BEGIN_UNDO_SET("Remove Animation Track");
+  SM_SCOPED_TRACE(Delete).arg(cue->getProxy());
   this->Internal->Scene->removeCue(cue);
   END_UNDO_SET();
 }
@@ -1158,6 +1160,7 @@ void pqAnimationViewWidget::onStrideChanged()
 {
   int strideValue = this->Internal->Stride->text().toInt();
   vtkSMProxy* proxy = this->Internal->Scene->getProxy();
+  SM_SCOPED_TRACE(PropertiesModified).arg(proxy);
   vtkSMPropertyHelper(proxy->GetProperty("Stride"), false).Set(strideValue);
   proxy->UpdateProperty("Stride");
 
