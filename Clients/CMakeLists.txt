@@ -9,3 +9,7 @@ if (PARAVIEW_USE_QT)
       "limited support, The `paraview` Qt client will not be built.")
   endif ()
 endif ()
+
+if (PARAVIEW_ENABLE_FIDES AND PARAVIEW_ENABLE_CATALYST)
+  add_subdirectory(ADIOS)
+endif()
