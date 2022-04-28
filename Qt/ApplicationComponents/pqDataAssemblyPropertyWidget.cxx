@@ -983,7 +983,7 @@ pqDataAssemblyPropertyWidget::pqDataAssemblyPropertyWidget(
 
   int linkActiveSelection = 0;
   bool enableActiveSelectionProperty =
-    vtkPVGeneralSettings::GetInstance()->GetSelectionOnClickMultiBlockInspector();
+    vtkPVGeneralSettings::GetInstance()->GetSelectOnClickMultiBlockInspector();
   if (groupHints && groupHints->GetScalarAttribute("link_active_selection", &linkActiveSelection) &&
     linkActiveSelection == 1 && enableActiveSelectionProperty)
   {

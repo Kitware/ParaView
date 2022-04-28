@@ -241,7 +241,7 @@
     <set>Qt::LeftDockWidgetArea|Qt::RightDockWidgetArea</set>
    </property>
    <property name="windowTitle">
-    <string>Multi-block Inspector</string>
+    <string>MultiBlock Inspector</string>
    </property>
    <attribute name="dockWidgetArea">
     <number>2</number>

@@ -327,8 +327,8 @@ public:
    * ActiveSelection is hooked up in the MultiBlock Inspector such that a click on a/multiple
    * block(s) selects it/them. Default is true.
    */
-  vtkGetMacro(SelectionOnClickMultiBlockInspector, bool);
-  vtkSetMacro(SelectionOnClickMultiBlockInspector, bool);
+  vtkGetMacro(SelectOnClickMultiBlockInspector, bool);
+  vtkSetMacro(SelectOnClickMultiBlockInspector, bool);
   //@}
 
 protected:
@@ -356,7 +356,7 @@ protected:
   bool ColorByBlockColorsOnApply;
   int AnimationTimeNotation;
   bool EnableStreaming;
-  bool SelectionOnClickMultiBlockInspector;
+  bool SelectOnClickMultiBlockInspector;
 
 private:
   vtkPVGeneralSettings(const vtkPVGeneralSettings&) = delete;
