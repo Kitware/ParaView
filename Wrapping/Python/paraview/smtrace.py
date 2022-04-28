@@ -265,6 +265,14 @@ class Trace(object):
             return True
         if cls.get_registered_name(obj, "animation"):
             return cls._create_accessor_for_animation_proxies(obj)
+        if obj.SMProxy.GetXMLName() == "RepresentationAnimationHelper":
+            sourceAccessor = cls.get_accessor(obj.Source)
+            varname = cls.get_varname("%sRepresentationAnimationHelper" % (sourceAccessor))
+            accessor = ProxyAccessor(varname, obj)
+            cls.Output.append_separated([\
+                " # get animation representation helper for '%s'" % (sourceAccessor),
+                "%s = GetRepresentationAnimationHelper(%s)" % (accessor, sourceAccessor)])
+            return True
         if not skip_rendering and cls.get_registered_name(obj, "layouts"):
             view = simple.GetActiveView()
             if view and obj.GetViewLocation(view.SMProxy) != -1:
