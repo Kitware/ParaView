@@ -119,6 +119,7 @@ set(classes
   pqInteractivePropertyWidget
   pqInteractivePropertyWidgetAbstract
   pqLightPropertyWidget
+  pqLightToolbar
   pqLinePropertyWidget
   pqLinkSelectionReaction
   pqListPropertyWidget
@@ -264,6 +265,7 @@ set(ui_files
   Resources/UI/pqImageCompressorWidget.ui
   Resources/UI/pqImplicitPlanePropertyWidget.ui
   Resources/UI/pqLightPropertyWidget.ui
+  Resources/UI/pqLightToolbar.ui
   Resources/UI/pqLinePropertyWidget.ui
   Resources/UI/pqMainControlsToolbar.ui
   Resources/UI/pqMoleculePropertyWidget.ui

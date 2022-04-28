@@ -88,6 +88,8 @@
         <file>Icons/pqIsometricView.svg</file>
         <file>Icons/pqIsosurface.svg</file>
         <file>Icons/pqItalics24.png</file>
+        <file>Icons/pqLightOn.svg</file>
+        <file>Icons/pqLightOff.svg</file>
         <file>Icons/pqLineChart16.png</file>
         <file>Icons/pqLinkBack16.png</file>
         <file>Icons/pqLinkIn16.png</file>
