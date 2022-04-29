@@ -214,8 +214,8 @@ void pqTransferFunction2DWidget::initialize(vtkPVTransferFunction2D* tf2d)
 
   this->Internals->initialize(tf2d);
 
-  pqCoreUtilities::connect(
-    this->Internals->Chart, vtkCommand::MouseMoveEvent, this, SLOT(showUsageStatus()));
+  pqCoreUtilities::connect(this->Internals->Widget->interactor(), vtkCommand::MouseMoveEvent, this,
+    SLOT(showUsageStatus()));
   pqCoreUtilities::connect(this->Internals->Chart,
     vtkTransferFunctionChartHistogram2D::TransferFunctionModified, this,
     SIGNAL(transferFunctionModified()));
@@ -239,8 +239,8 @@ void pqTransferFunction2DWidget::showUsageStatus()
   QMainWindow* mainWindow = qobject_cast<QMainWindow*>(pqCoreUtilities::mainWidget());
   if (mainWindow)
   {
-    mainWindow->statusBar()->showMessage(tr("Double click to add a box."
-                                            "Grab and drag to move the mox."),
+    mainWindow->statusBar()->showMessage(tr("Double click to add a box. "
+                                            "Grab and drag to move the box."),
       2000);
   }
 }
