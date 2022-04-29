@@ -310,6 +310,8 @@ Less common, but variables which may be of interest to some:
     will be added as tests to the ParaView test suite.
   * `PARAVIEW_BUILD_DEVELOPER_DOCUMENTATION` (default `OFF`): If set, the HTML
     documentation for ParaView's C++, Python, and proxies will be generated.
+  * `PARAVIEW_PLUGIN_DISABLE_XML_DOCUMENTATION` (default `OFF`): Whether
+    plugin XML documentation is forcefully disabled.
   * `PARAVIEW_BUILD_TESTING` (default `OFF`): Whether to build tests or not.
     Valid values are `OFF` (no testing), `WANT` (enable tests as possible), and
     `ON` (enable all tests; may error out if features otherwise disabled are

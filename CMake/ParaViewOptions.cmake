@@ -44,6 +44,9 @@ cmake_dependent_option(PARAVIEW_BUILD_VTK_TESTING "Enable VTK testing" OFF
   "PARAVIEW_BUILD_TESTING" OFF)
 option(PARAVIEW_BUILD_DEVELOPER_DOCUMENTATION "Generate ParaView C++/Python docs" "${doc_default}")
 
+option(PARAVIEW_PLUGIN_DISABLE_XML_DOCUMENTATION "Forcefully disable XML documentation generation" OFF)
+mark_as_advanced(PARAVIEW_PLUGIN_DISABLE_XML_DOCUMENTATION)
+
 set(PARAVIEW_BUILD_EDITION "CANONICAL"
   CACHE STRING "Enable ParaView components essential for requested capabilities.")
 set_property(CACHE PARAVIEW_BUILD_EDITION

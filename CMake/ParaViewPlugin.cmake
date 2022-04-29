@@ -295,7 +295,8 @@ paraview_plugin_build(
   [LIBRARY_SUBDIRECTORY <subdirectory>]
   [ADD_INSTALL_RPATHS <ON|OFF>]
 
-  [PLUGINS_FILE_NAME <filename>])
+  [PLUGINS_FILE_NAME <filename>]
+  [DISABLE_XML_DOCUMENTATION <ON|OFF>])
 ```
 
   * `PLUGINS`: (Required) The list of plugins to build. May be empty.
@@ -331,11 +332,13 @@ paraview_plugin_build(
     built plugins. This file will be placed under
     `<LIBRARY_DESTINATION>/<LIBRARY_SUBDIRECTORY>`. It will be installed with
     the `plugin` component.
+  * `DISABLE_XML_DOCUMENTATION`: (Defaults to `OFF`) Whether to forcefully
+    disable XML documentation or not.
 #]==]
 function (paraview_plugin_build)
   cmake_parse_arguments(_paraview_build
     ""
-    "HEADERS_DESTINATION;RUNTIME_DESTINATION;LIBRARY_DESTINATION;LIBRARY_SUBDIRECTORY;TARGET;PLUGINS_FILE_NAME;INSTALL_EXPORT;CMAKE_DESTINATION;PLUGINS_COMPONENT;TARGET_COMPONENT;ADD_INSTALL_RPATHS;INSTALL_HEADERS"
+    "HEADERS_DESTINATION;RUNTIME_DESTINATION;LIBRARY_DESTINATION;LIBRARY_SUBDIRECTORY;TARGET;PLUGINS_FILE_NAME;INSTALL_EXPORT;CMAKE_DESTINATION;PLUGINS_COMPONENT;TARGET_COMPONENT;ADD_INSTALL_RPATHS;INSTALL_HEADERS;DISABLE_XML_DOCUMENTATION"
     "PLUGINS;AUTOLOAD"
     ${ARGN})
 
@@ -362,6 +365,10 @@ function (paraview_plugin_build)
 
   if (NOT DEFINED _paraview_build_LIBRARY_SUBDIRECTORY)
     set(_paraview_build_LIBRARY_SUBDIRECTORY "")
+  endif ()
+
+  if (NOT _paraview_build_DISABLE_XML_DOCUMENTATION)
+    set(_paraview_build_DISABLE_XML_DOCUMENTATION OFF)
   endif ()
 
   if (NOT DEFINED _paraview_build_INSTALL_HEADERS)
@@ -992,16 +999,18 @@ function (paraview_add_plugin name)
   if (NOT DEFINED _paraview_add_plugin_XML_DOCUMENTATION)
     set(_paraview_add_plugin_XML_DOCUMENTATION ON)
   endif ()
-
-  if (NOT DEFINED _paraview_add_plugin_FORCE_STATIC)
-    set(_paraview_add_plugin_FORCE_STATIC OFF)
-  endif ()
-
   if (DEFINED _paraview_add_plugin_DOCUMENTATION_DIR AND
       NOT _paraview_add_plugin_XML_DOCUMENTATION)
     message(FATAL_ERROR
       "Specifying `DOCUMENTATION_DIR` and turning off `XML_DOCUMENTATION` "
       "makes no sense.")
+  endif ()
+  if (_paraview_build_DISABLE_XML_DOCUMENTATION)
+    set(_paraview_add_plugin_XML_DOCUMENTATION OFF)
+  endif ()
+
+  if (NOT DEFINED _paraview_add_plugin_FORCE_STATIC)
+    set(_paraview_add_plugin_FORCE_STATIC OFF)
   endif ()
 
   if (DEFINED _paraview_add_plugin_EXPORT)
