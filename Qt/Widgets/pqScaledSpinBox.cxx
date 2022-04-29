@@ -34,7 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QKeyEvent>
 
-#include <math.h>
+#include <cmath>
 
 // constructor
 pqScaledSpinBox::pqScaledSpinBox(QWidget* parent)

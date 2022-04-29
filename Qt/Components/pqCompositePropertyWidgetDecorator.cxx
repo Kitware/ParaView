@@ -113,11 +113,11 @@ struct Operation : public BaseOperation
   }
 };
 
-struct OperationAnd : public Operation<std::logical_and<bool>, true, true>
+struct OperationAnd : public Operation<std::logical_and<>, true, true>
 {
 };
 
-struct OperationOr : public Operation<std::logical_or<bool>, false, true>
+struct OperationOr : public Operation<std::logical_or<>, false, true>
 {
 };
 }

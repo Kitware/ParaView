@@ -432,7 +432,7 @@ int vtkPVSelectionSource::RequestData(vtkInformation* vtkNotUsed(request),
 
     case COMPOSITEID:
     {
-      source->SetNumberOfNodes(this->Internal->CompositeIDs.size());
+      source->SetNumberOfNodes(static_cast<int>(this->Internal->CompositeIDs.size()));
       unsigned int nodeId = 0;
       for (const auto& pieceIdsOfSpecificCompositeId : this->Internal->CompositeIDs)
       {
@@ -454,7 +454,7 @@ int vtkPVSelectionSource::RequestData(vtkInformation* vtkNotUsed(request),
 
     case HIERARCHICALID:
     {
-      source->SetNumberOfNodes(this->Internal->HierarchicalIDs.size());
+      source->SetNumberOfNodes(static_cast<int>(this->Internal->HierarchicalIDs.size()));
       unsigned int nodeId = 0;
       for (const auto& idsOfSpecificHierarchicalId : this->Internal->HierarchicalIDs)
       {

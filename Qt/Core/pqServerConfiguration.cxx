@@ -100,7 +100,7 @@ QString pqServerConfiguration::name() const
 }
 
 //-----------------------------------------------------------------------------
-const QString pqServerConfiguration::defaultName()
+QString pqServerConfiguration::defaultName()
 {
   return SERVER_CONFIGURATION_DEFAULT_NAME;
 }
