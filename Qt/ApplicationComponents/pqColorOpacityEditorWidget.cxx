@@ -51,7 +51,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqTransferFunctionWidget.h"
 #include "pqUndoStack.h"
 #include "vtkCommand.h"
-#include "vtkContextScene.h"
 #include "vtkDiscretizableColorTransferFunction.h"
 #include "vtkEventQtSlotConnect.h"
 #include "vtkImageData.h"
@@ -497,11 +496,9 @@ pqColorOpacityEditorWidget::pqColorOpacityEditorWidget(
     ui.AutomaticDataHistogramComputation->hide();
   }
 
-  int numBins = 10;
   smproperty = smgroup->GetProperty("DataHistogramNumberOfBins");
   if (smproperty)
   {
-    numBins = vtkSMPropertyHelper(smproperty).GetAsInt();
     this->addPropertyLink(
       this, "dataHistogramNumberOfBins", SIGNAL(dataHistogramNumberOfBinsEdited()), smproperty);
     QObject::connect(ui.DataHistogramNumberOfBins, SIGNAL(valueEdited(int)), this,
