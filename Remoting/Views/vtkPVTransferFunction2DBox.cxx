@@ -46,6 +46,7 @@ vtkPVTransferFunction2DBox::~vtkPVTransferFunction2DBox()
 //------------------------------------------------------------------------------------------------
 void vtkPVTransferFunction2DBox::PrintSelf(ostream& os, vtkIndent indent)
 {
+  this->Superclass::PrintSelf(os, indent);
   os << indent << "Box [xmin, xmax, ymin, ymax]: [" << this->Box.GetLeft() << ", "
      << this->Box.GetRight() << ", " << this->Box.GetBottom() << ", " << this->Box.GetTop() << "]"
      << endl;
@@ -54,7 +55,15 @@ void vtkPVTransferFunction2DBox::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "Texture Size [width, height]: [" << this->TextureSize[0] << ", "
      << this->TextureSize[1] << "]" << endl;
   os << indent << "GaussianSigmaFactor: " << this->GaussianSigmaFactor << endl;
-  Superclass::PrintSelf(os, indent);
+  os << indent << "Texture: ";
+  if (this->Texture)
+  {
+    this->Texture->PrintSelf(os, indent.GetNextIndent());
+  }
+  else
+  {
+    os << "(nullptr)" << endl;
+  }
 }
 
 //------------------------------------------------------------------------------------------------
@@ -109,7 +118,7 @@ void vtkPVTransferFunction2DBox::ComputeTexture()
 
   this->Texture->SetDimensions(this->TextureSize[0], this->TextureSize[1], 1);
   this->Texture->AllocateScalars(VTK_UNSIGNED_CHAR, 4);
-  auto arr = vtkUnsignedCharArray::SafeDownCast(this->Texture->GetPointData()->GetScalars());
+  auto arr = vtkUnsignedCharArray::FastDownCast(this->Texture->GetPointData()->GetScalars());
   arr->SetName("Transfer2DBoxScalars");
   const auto dataPtr = arr->GetVoidPointer(0);
   memset(dataPtr, 0, this->TextureSize[0] * this->TextureSize[1] * 4 * sizeof(unsigned char));

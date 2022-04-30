@@ -29,12 +29,12 @@
 #include "vtkPVTransferFunction2DBox.h" // needed for ivar
 #include "vtkRemotingViewsModule.h"     // needed for export macro
 
+#include <memory> // for unique_ptr
 #include <vector> // needed for ivar
 
 // Forward declarations
 class vtkImageData;
 class vtkPVTransferFunction2DInternals;
-class vtkRectd;
 
 class VTKREMOTINGVIEWS_EXPORT vtkPVTransferFunction2D : public vtkObject
 {
@@ -56,25 +56,6 @@ public:
    * Generate the transfer function image data
    */
   virtual void Build();
-
-  //  ///@{
-  //  /**
-  //   * Set/Get whether to use a custom range for the transfer function.
-  //   * This determines the bounds of the image data that is the transfer function.
-  //   */
-  //  vtkSetMacro(UseCustomRange, bool);
-  //  vtkGetMacro(UseCustomRange, bool);
-  //  vtkBooleanMacro(UseCustomRange, bool);
-  //  ///@}
-  //
-  //  ///@{
-  //  /**
-  //   * Set/Get the custom range for the transfer function.
-  //   * This determines the bounds of the image data that is the transfer function.
-  //   */
-  //  vtkSetVector4Macro(CustomRange, double);
-  //  vtkGetVector4Macro(CustomRange, double);
-  //  ///@}
 
   ///@{
   /**
@@ -129,7 +110,7 @@ public:
 
 protected:
   vtkPVTransferFunction2D();
-  ~vtkPVTransferFunction2D();
+  ~vtkPVTransferFunction2D() override;
 
   // Helper members
   /**
@@ -152,7 +133,7 @@ protected:
 
 private:
   // Helper members
-  vtkPVTransferFunction2DInternals* Internals;
+  std::unique_ptr<vtkPVTransferFunction2DInternals> Internals;
 
   vtkPVTransferFunction2D(const vtkPVTransferFunction2D&) = delete;
   void operator=(const vtkPVTransferFunction2D) = delete;

@@ -50,8 +50,8 @@ public:
 
 //-------------------------------------------------------------------------------------------------
 vtkPVTransferFunction2D::vtkPVTransferFunction2D()
+  : Internals(new vtkPVTransferFunction2DInternals())
 {
-  this->Internals = new vtkPVTransferFunction2DInternals();
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -70,30 +70,35 @@ vtkPVTransferFunction2D::~vtkPVTransferFunction2D()
     }
   }
   this->Internals->Boxes.clear();
-  delete this->Internals;
 }
 
 //------------------------------------------------------------------------------------------------
 void vtkPVTransferFunction2D::PrintSelf(ostream& os, vtkIndent indent)
 {
+  this->Superclass::PrintSelf(os, indent);
   os << indent << "Range = (" << this->Range[0] << ", " << this->Range[1] << ", " << this->Range[2]
      << ", " << this->Range[3] << ")" << endl;
   os << indent << "OutputDimensions = (" << this->OutputDimensions[0] << ", "
      << this->OutputDimensions[1] << ")" << endl;
+  os << indent << "Function: ";
+  if (this->Internals->Function)
+  {
+    this->Internals->Function->PrintSelf(os, indent.GetNextIndent());
+  }
+  else
+  {
+    os << "(nullptr)" << endl;
+  }
+  os << "Boxes: " << (this->Internals->Boxes.size() > 0 ? "" : "(None)");
+  for (auto box : this->Internals->Boxes)
+  {
+    box->PrintSelf(os, indent.GetNextIndent());
+  }
 }
 
 //------------------------------------------------------------------------------------------------
 bool vtkPVTransferFunction2D::UpdateRange()
 {
-  //  if (this->UseCustomRange)
-  //  {
-  //    this->Range[0] = this->CustomRange[0];
-  //    this->Range[1] = this->CustomRange[1];
-  //    this->Range[2] = this->CustomRange[2];
-  //    this->Range[3] = this->CustomRange[3];
-  //    return false;
-  //  }
-
   double oldRange[4];
   oldRange[0] = this->Range[0];
   oldRange[1] = this->Range[1];
@@ -163,7 +168,7 @@ void vtkPVTransferFunction2D::Build()
   spacing[1] = (this->Range[3] - this->Range[2]) / this->OutputDimensions[1];
   this->Internals->Function->SetSpacing(spacing[0], spacing[1], 1.0);
   this->Internals->Function->AllocateScalars(VTK_FLOAT, 4);
-  auto arr = vtkFloatArray::SafeDownCast(this->Internals->Function->GetPointData()->GetScalars());
+  auto arr = vtkFloatArray::FastDownCast(this->Internals->Function->GetPointData()->GetScalars());
   auto arrRange = vtk::DataArrayValueRange(arr);
   std::fill(arrRange.begin(), arrRange.end(), 0.0);
 
@@ -234,12 +239,6 @@ int vtkPVTransferFunction2D::AddControlBox(vtkSmartPointer<vtkPVTransferFunction
     return -1;
   }
   this->Internals->Boxes.push_back(box);
-  // If range is updated, modified has been invoked -> don't invoke again.
-  //  bool modifiedInvoked = this->UpdateRange();
-  //  if (!modifiedInvoked)
-  //  {
-  //    this->Modified();
-  //  }
   this->Modified();
   return static_cast<int>(this->Internals->Boxes.size()) - 1;
 }
@@ -278,7 +277,7 @@ int vtkPVTransferFunction2D::AddControlBox(vtkRectd& box, double* color)
 //-------------------------------------------------------------------------------------------------
 int vtkPVTransferFunction2D::SetControlBox(int id, vtkSmartPointer<vtkPVTransferFunction2DBox> b)
 {
-  if (id >= this->Internals->Boxes.size())
+  if (id >= static_cast<int>(this->Internals->Boxes.size()))
   {
     return this->AddControlBox(b);
   }
@@ -297,12 +296,6 @@ int vtkPVTransferFunction2D::RemoveControlBox(int id)
     return -1;
   }
   this->Internals->Boxes.erase(this->Internals->Boxes.begin() + id);
-  // If range is updated, modified has been invoked -> don't invoke again.
-  //  bool modifiedInvoked = this->UpdateRange();
-  //  if (!modifiedInvoked)
-  //  {
-  //    this->Modified();
-  //  }
   this->Modified();
   return id;
 }
@@ -330,35 +323,8 @@ std::vector<vtkSmartPointer<vtkPVTransferFunction2DBox>> vtkPVTransferFunction2D
 void vtkPVTransferFunction2D::RemoveAllBoxes()
 {
   this->Internals->Boxes.clear();
-  // If range is updated, modified has been invoked -> don't invoke again.
-  //  bool modifiedInvoked = this->UpdateRange();
-  //  if (!modifiedInvoked)
-  //  {
-  //    this->Modified();
-  //  }
   this->Modified();
 }
-
-////-------------------------------------------------------------------------------------------------
-// double* vtkPVTransferFunction2D::GetRange()
-//{
-//  return this->Range;
-//}
-//
-////-------------------------------------------------------------------------------------------------
-// void vtkPVTransferFunction2D::GetRange(double& arg1, double& arg2, double& arg3, double& arg4)
-//{
-//  arg1 = this->Range[0];
-//  arg2 = this->Range[1];
-//  arg3 = this->Range[2];
-//  arg4 = this->Range[3];
-//}
-//
-////-------------------------------------------------------------------------------------------------
-// void vtkPVTransferFunction2D::GetRange(double arg[4])
-//{
-//  this->GetRange(arg[0], arg[1], arg[2], arg[3]);
-//}
 
 //------------------------------------------------------------------------------------------------
 vtkImageData* vtkPVTransferFunction2D::GetFunction()

@@ -119,19 +119,6 @@ bool vtkNormalize(
     return true;
   }
 
-  //  if (cntrlBoxes.size() == 1)
-  //  {
-  //    if (originalRange)
-  //    {
-  //      (*originalRange)[0] = cntrlBoxes[0][0];
-  //      (*originalRange)[1] = cntrlBoxes[0][0] + cntrlBoxes[0][2];
-  //      (*originalRange)[2] = cntrlBoxes[0][1];
-  //      (*originalRange)[3] = cntrlBoxes[0][1] + cntrlBoxes[0][3];
-  //    }
-  //    // Only 1 control box in the property
-  //    return true;
-  //  }
-
   // if in log_space, let's convert all the box values to log.
   if (log_space)
   {
@@ -376,20 +363,6 @@ bool vtkSMTransferFunction2DProxy::RescaleTransferFunction(
 
   if (extend)
   {
-    //    vtkSMProperty* rngProp = this->GetProperty("CustomRange");
-    //    if (!rngProp)
-    //    {
-    //      vtkGenericWarningMacro("'CustomRange' property is required.");
-    //      return false;
-    //    }
-    //    vtkSMPropertyHelper rng(rngProp);
-    //    unsigned int rng_num_elements = rng.GetNumberOfElements();
-    //    if (rng_num_elements != 4)
-    //    {
-    //      vtkGenericWarningMacro(
-    //        "'CustomRange' property must have 4-tuples. Found " << rng_num_elements);
-    //      return false;
-    //    }
     rangeXMin = std::min(rangeXMin, currentRange[0]);
     rangeXMax = std::max(rangeXMax, currentRange[1]);
     rangeYMin = std::min(rangeYMin, currentRange[2]);
@@ -457,68 +430,6 @@ bool vtkSMTransferFunction2DProxy::ComputeDataRange(double range[4])
   range[2] = VTK_DOUBLE_MAX;
   range[3] = VTK_DOUBLE_MIN;
 
-  //  int component = -1;
-  //  if (vtkSMPropertyHelper(this, "VectorMode").GetAsInt() == vtkScalarsToColors::COMPONENT)
-  //  {
-  //    component = vtkSMPropertyHelper(this, "VectorComponent").GetAsInt();
-  //  }
-  //
-  //  // Find the visible consumer using the transfer function proxy
-  //  vtkPVArrayInformation* arrayInfo = nullptr;
-  //  std::string arrayName;
-  //  int arrayAsso = -1;
-  //  bool hasData = false;
-  //  std::set<vtkSMProxy*> usedProxy;
-  //  vtkSMSourceProxy* input = nullptr;
-  //  bool useGradientAsY = true;
-  //  std::string array2Name;
-  //  int array2Asso = -1;
-  //  int array2Component = 0;
-  //
-  //  for (unsigned int cc = 0, max = this->GetNumberOfConsumers(); cc < max; ++cc)
-  //  {
-  //    vtkSMProxy* proxy = this->GetConsumerProxy(cc);
-  //    // consumers could be subproxy of something; so, we locate the true-parent
-  //    // proxy for a proxy.
-  //    proxy = proxy ? proxy->GetTrueParentProxy() : nullptr;
-  //    vtkSMPVRepresentationProxy* consumer = vtkSMPVRepresentationProxy::SafeDownCast(proxy);
-  //    if (consumer &&
-  //      // consumer is visible.
-  //      vtkSMPropertyHelper(consumer, "Visibility", true).GetAsInt() == 1 &&
-  //      // consumer is using scalar coloring.
-  //      consumer->GetUsingScalarColoring())
-  //    {
-  //    }
-  //      // Recover consumer color array
-  //      vtkPVArrayInformation* tmpArrayInfo = consumer->GetArrayInformationForColorArray(false);
-  //      if (!tmpArrayInfo)
-  //      {
-  //        continue;
-  //      }
-  //
-  //      if (!arrayInfo)
-  //      {
-  //        arrayInfo = tmpArrayInfo;
-  //        if (arrayInfo->GetNumberOfComponents() == 1)
-  //        {
-  //          // Set the right component value for single component array
-  //          component = 0;
-  //        }
-  //        if (component == -1)
-  //        {
-  //          // Set the right component value for magnitude component
-  //          component = arrayInfo->GetNumberOfComponents();
-  //        }
-  //        if (component > arrayInfo->GetNumberOfComponents())
-  //        {
-  //          vtkErrorMacro("Invalid component requested by the transfer function");
-  //          this->HistogramTableCache = nullptr;
-  //          return this->Histogram2DCache;
-  //        }
-  //
-  //        vtkSMPropertyHelper colorArrayHelper(consumer, "ColorArrayName");
-  //        arrayAsso = colorArrayHelper.GetInputArrayAssociation();
-  //        arrayName = colorArrayHelper.GetInputArrayNameToProcess();
   return (range[0] <= range[1]);
 }
 
@@ -527,10 +438,6 @@ vtkSmartPointer<vtkImageData> vtkSMTransferFunction2DProxy::ComputeDataHistogram
 {
   // Recover component property
   int component = -1;
-  //  if (vtkSMPropertyHelper(this, "VectorMode").GetAsInt() == vtkScalarsToColors::COMPONENT)
-  //  {
-  //    component = vtkSMPropertyHelper(this, "VectorComponent").GetAsInt();
-  //  }
 
   // Find the visible consumer using the transfer function proxy
   vtkPVArrayInformation* arrayInfo = nullptr;
@@ -553,10 +460,6 @@ vtkSmartPointer<vtkImageData> vtkSMTransferFunction2DProxy::ComputeDataHistogram
     if (consumer &&
       // consumer is visible.
       vtkSMPropertyHelper(consumer, "Visibility", true).GetAsInt() == 1 &&
-      // consumer is of volume representation type
-      // strcmp(vtkSMPropertyHelper(consumer, "RepresentationType", true).GetAsString(), "Volume")
-      // ==
-      // 0 &&
       // do not count proxy multiple times
       usedProxy.find(consumer) == usedProxy.end())
     {
@@ -642,11 +545,6 @@ vtkSmartPointer<vtkImageData> vtkSMTransferFunction2DProxy::ComputeDataHistogram
       input = vtkSMSourceProxy::SafeDownCast(vtkSMPropertyHelper(consumer, "Input").GetAsProxy());
       hasData = true;
       break;
-      // Add consumer to group filter
-      // vtkSMSourceProxy* input =
-      //   vtkSMSourceProxy::SafeDownCast(vtkSMPropertyHelper(consumer, "Input").GetAsProxy());
-      // vtkSMPropertyHelper(group, "Input").Add(input);
-      // group->UpdateVTKObjects();
     }
   }
 

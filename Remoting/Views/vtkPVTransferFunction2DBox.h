@@ -95,7 +95,7 @@ public:
 
 protected:
   vtkPVTransferFunction2DBox();
-  ~vtkPVTransferFunction2DBox();
+  ~vtkPVTransferFunction2DBox() override;
 
   // Helper members
   vtkRectd Box;
