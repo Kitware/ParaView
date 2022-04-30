@@ -29,10 +29,8 @@
 #include "vtkDiscretizableColorTransferFunction.h"
 
 #include "vtkRemotingViewsModule.h" // needed for export macro
-// #include "vtkTransferFunctionBoxItem.h" // needed for ivar
 
-#include <vector> // needed for ivar
-
+// Forward declarations
 class vtkAbstractArray;
 class vtkDoubleArray;
 class vtkPVTransferFunction2D;
