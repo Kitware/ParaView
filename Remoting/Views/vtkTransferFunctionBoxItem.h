@@ -19,10 +19,11 @@
 
 #include "vtkRemotingViewsModule.h" // needed for export macro
 
+// STL includes
+#include <memory> // needed for unique_ptr
+
 // Forward declarations
 class vtkImageData;
-class vtkPen;
-class vtkPoints2D;
 class vtkTransferFunctionBoxItemInternals;
 class vtkPVTransferFunction2DBox;
 
@@ -55,9 +56,9 @@ public:
    */
   void SetBox(const double x, const double y, const double width, const double height);
 
-  //  /**
-  //   * Get access to the texture of this box item
-  //   */
+  /**
+   * Get access to the texture of this box item
+   */
   vtkSmartPointer<vtkImageData> GetTexture() const;
 
   /*
@@ -104,7 +105,7 @@ public:
 
 protected:
   vtkTransferFunctionBoxItem();
-  ~vtkTransferFunctionBoxItem();
+  ~vtkTransferFunctionBoxItem() override;
 
   vtkIdType AddPoint(const double x, const double y);
   vtkIdType AddPoint(double* pos) override;
@@ -173,8 +174,6 @@ protected:
   bool KeyReleaseEvent(const vtkContextKeyEvent& key) override;
   //@}
 
-  // virtual void ComputeTexture();
-
   /**
    * Highlight this box
    */
@@ -210,9 +209,6 @@ private:
    */
   bool BoxIsWithinBounds(const double deltaX, const double deltaY);
 
-  // bool IsInitialized();
-  // bool NeedsTextureUpdate();
-
   /**
    * Customized vtkControlPointsItem::FindPoint implementation for this Item.
    * vtkControlPointsItem::FindPoint stops searching for control points once the
@@ -226,9 +222,8 @@ private:
   vtkIdType FindBoxPoint(double* _pos);
 
   // Helper members
-  vtkTransferFunctionBoxItemInternals* Internals;
+  std::unique_ptr<vtkTransferFunctionBoxItemInternals> Internals;
 
-  // vtkNew<vtkImageData> Texture;
   bool Initialized = false;
   bool Selected = false;
   int ID = -1;

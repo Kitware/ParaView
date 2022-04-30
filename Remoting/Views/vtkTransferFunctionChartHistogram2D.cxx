@@ -58,7 +58,7 @@ bool vtkTransferFunctionChartHistogram2D::MouseDoubleClickEvent(const vtkContext
   {
     this->AddNewBox();
   }
-  return Superclass::MouseDoubleClickEvent(mouse);
+  return this->Superclass::MouseDoubleClickEvent(mouse);
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -157,13 +157,13 @@ void vtkTransferFunctionChartHistogram2D::SetInputData(vtkImageData* data, vtkId
     const double yMin = origin[1];
     const double yMax = origin[1] + bins[1] * spacing[1];
 
-    auto axis = GetAxis(vtkAxis::BOTTOM);
+    auto axis = this->GetAxis(vtkAxis::BOTTOM);
     axis->SetUnscaledRange(xMin, xMax);
-    axis = GetAxis(vtkAxis::LEFT);
+    axis = this->GetAxis(vtkAxis::LEFT);
     axis->SetUnscaledRange(yMin, yMax);
     this->RecalculatePlotTransforms();
 
-    UpdateItemsBounds(xMin, xMax, yMin, yMax);
+    this->UpdateItemsBounds(xMin, xMax, yMin, yMax);
 
     // Set the histogram and initialize the chart
     this->Superclass::SetInputData(data, z);
@@ -210,10 +210,10 @@ void vtkTransferFunctionChartHistogram2D::UpdateItemsBounds(
   const double xMin, const double xMax, const double yMin, const double yMax)
 {
   // Set the new bounds to its current box items (plots).
-  const vtkIdType numPlots = GetNumberOfPlots();
+  const vtkIdType numPlots = this->GetNumberOfPlots();
   for (vtkIdType i = 0; i < numPlots; i++)
   {
-    auto boxItem = vtkControlPointsItem::SafeDownCast(GetPlot(i));
+    auto boxItem = vtkControlPointsItem::SafeDownCast(this->GetPlot(i));
     if (!boxItem)
     {
       continue;
@@ -230,8 +230,6 @@ void vtkTransferFunctionChartHistogram2D::GenerateTransfer2D()
   {
     return;
   }
-  // const vtkIdType numPlots = this->GetNumberOfPlots();
-
   vtkSmartPointer<vtkImageData> histogram =
     vtkPlotHistogram2D::SafeDownCast(this->GetPlot(0))->GetInputImageData();
   if (!histogram)
@@ -369,10 +367,10 @@ void vtkTransferFunctionChartHistogram2D::RemoveBox(vtkSmartPointer<vtkTransferF
     return;
   }
 
-  const vtkIdType numPlots = GetNumberOfPlots();
+  const vtkIdType numPlots = this->GetNumberOfPlots();
   for (vtkIdType i = 0; i < numPlots; i++)
   {
-    auto boxItem = vtkControlPointsItem::SafeDownCast(GetPlot(i));
+    auto boxItem = vtkControlPointsItem::SafeDownCast(this->GetPlot(i));
     if (!boxItem)
     {
       continue;
@@ -406,5 +404,5 @@ bool vtkTransferFunctionChartHistogram2D::Paint(vtkContext2D* painter)
     this->BoxesToRemove.clear();
     this->GenerateTransfer2D();
   }
-  return Superclass::Paint(painter);
+  return this->Superclass::Paint(painter);
 }

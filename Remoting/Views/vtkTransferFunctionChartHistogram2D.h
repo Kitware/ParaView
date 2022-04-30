@@ -76,13 +76,13 @@ public:
   bool KeyPressEvent(const vtkContextKeyEvent& key) override;
 
   /**
-   * Set the input image data for the 2D histogram.
+   * Set the input image data for the 2D histogram
    */
   void SetInputData(vtkImageData*, vtkIdType z = 0) override;
 
   ///@{
   /**
-   * Set/Get the image data that will be populated with the 2D transfer function.
+   * Set/Get the 2D transfer function
    */
   virtual void SetTransferFunction2D(vtkPVTransferFunction2D* transfer2D);
   virtual vtkPVTransferFunction2D* GetTransferFunction2D();
@@ -110,7 +110,7 @@ public:
   bool Paint(vtkContext2D* painter) override;
 
 protected:
-  vtkTransferFunctionChartHistogram2D() {}
+  vtkTransferFunctionChartHistogram2D() = default;
   ~vtkTransferFunctionChartHistogram2D() override = default;
 
   /**

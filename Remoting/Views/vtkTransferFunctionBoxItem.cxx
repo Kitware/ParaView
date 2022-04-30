@@ -101,8 +101,8 @@ void vtkTransferFunctionBoxItem::UpdateBoxPoints()
 
 //-------------------------------------------------------------------------------------------------
 vtkTransferFunctionBoxItem::vtkTransferFunctionBoxItem()
+  : Internals(new vtkTransferFunctionBoxItemInternals())
 {
-  this->Internals = new vtkTransferFunctionBoxItemInternals();
   this->Internals->TransferFunctionBox = vtkPVTransferFunction2DBox::New();
 
   this->ValidBounds[0] = 0.0;
@@ -127,22 +127,12 @@ vtkTransferFunctionBoxItem::vtkTransferFunctionBoxItem()
   this->Pen->SetWidth(1.);
   this->SelectedPointPen->SetColor(255, 0, 255, 200);
   this->SelectedPointPen->SetWidth(2.);
-
-  //  // Initialize texture
-  //  auto tex = this->Texture.GetPointer();
-  //  const int texSize = 256;
-  //  tex->SetDimensions(texSize, texSize, 1);
-  //  tex->AllocateScalars(VTK_UNSIGNED_CHAR, 4);
-  //  auto arr = vtkUnsignedCharArray::SafeDownCast(tex->GetPointData()->GetScalars());
-  //  const auto dataPtr = arr->GetVoidPointer(0);
-  //  memset(dataPtr, 0, texSize * texSize * 4 * sizeof(unsigned char));
 }
 
 //-------------------------------------------------------------------------------------------------
 vtkTransferFunctionBoxItem::~vtkTransferFunctionBoxItem()
 {
   this->Internals->TransferFunctionBox->Delete();
-  delete this->Internals;
   this->Internals = nullptr;
 }
 
@@ -244,7 +234,7 @@ vtkIdType vtkTransferFunctionBoxItem::AddPoint(double* pos)
   this->StartChanges();
 
   const vtkIdType id = this->Internals->BoxPoints->InsertNextPoint(pos[0], pos[1]);
-  Superclass::AddPointId(id);
+  this->Superclass::AddPointId(id);
 
   this->EndChanges();
 
@@ -387,7 +377,7 @@ bool vtkTransferFunctionBoxItem::Paint(vtkContext2D* painter)
   auto texture = this->Internals->TransferFunctionBox->GetTexture();
   if (!texture)
   {
-    return Superclass::Paint(painter);
+    return this->Superclass::Paint(painter);
   }
 
   auto brush = painter->GetBrush();
@@ -408,40 +398,8 @@ bool vtkTransferFunctionBoxItem::Paint(vtkContext2D* painter)
     painter->ApplyPen(this->SelectedPointPen);
     painter->DrawPolygon(this->Internals->BoxPoints);
   }
-  return Superclass::Paint(painter);
+  return this->Superclass::Paint(painter);
 }
-
-//-------------------------------------------------------------------------------------------------
-// void vtkTransferFunctionBoxItem::ComputeTexture()
-//{
-//  if (this->Texture->GetMTime() > this->GetMTime())
-//  {
-//    return;
-//  }
-//  double colorC[3] = { 1.0, 1.0, 1.0 };
-//  colorC[0] = this->BoxColor[0] * 255;
-//  colorC[1] = this->BoxColor[1] * 255;
-//  colorC[2] = this->BoxColor[2] * 255;
-//
-//  double amp = this->BoxAlpha * 255;
-//  double sigma = 80.0;
-//  double expdenom = 2 * sigma * sigma;
-//
-//  auto arr = vtkUnsignedCharArray::SafeDownCast(this->Texture->GetPointData()->GetScalars());
-//
-//  for (vtkIdType i = 0; i < 256; ++i)
-//  {
-//    for (vtkIdType j = 0; j < 256; ++j)
-//    {
-//      double color[4] = { colorC[0], colorC[1], colorC[2], 0.0 };
-//      double e = -1.0 * ((i - 128) * (i - 128) + (j - 128) * (j - 128)) / expdenom;
-//      color[3] = amp * std::exp(e);
-//      arr->SetTuple(i * 256 + j, color);
-//    }
-//  }
-//  this->Texture->Modified();
-//  this->InvokeEvent(vtkTransferFunctionBoxItem::BoxEditEvent);
-//}
 
 //-------------------------------------------------------------------------------------------------
 bool vtkTransferFunctionBoxItem::Hit(const vtkContextMouseEvent& mouse)
@@ -507,13 +465,13 @@ bool vtkTransferFunctionBoxItem::MouseButtonPressEvent(const vtkContextMouseEven
 //-------------------------------------------------------------------------------------------------
 bool vtkTransferFunctionBoxItem::MouseButtonReleaseEvent(const vtkContextMouseEvent& mouse)
 {
-  return Superclass::MouseButtonReleaseEvent(mouse);
+  return this->Superclass::MouseButtonReleaseEvent(mouse);
 }
 
 //-------------------------------------------------------------------------------------------------
 bool vtkTransferFunctionBoxItem::MouseDoubleClickEvent(const vtkContextMouseEvent& mouse)
 {
-  return Superclass::MouseDoubleClickEvent(mouse);
+  return this->Superclass::MouseDoubleClickEvent(mouse);
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -564,13 +522,13 @@ bool vtkTransferFunctionBoxItem::KeyPressEvent(const vtkContextKeyEvent& key)
   {
     this->InvokeEvent(vtkTransferFunctionBoxItem::BoxDeleteEvent);
   }
-  return Superclass::KeyPressEvent(key);
+  return this->Superclass::KeyPressEvent(key);
 }
 
 //-------------------------------------------------------------------------------------------------
 bool vtkTransferFunctionBoxItem::KeyReleaseEvent(const vtkContextKeyEvent& key)
 {
-  return Superclass::KeyPressEvent(key);
+  return this->Superclass::KeyPressEvent(key);
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -580,25 +538,13 @@ void vtkTransferFunctionBoxItem::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "Selected: " << (this->GetSelected() ? "true" : "false") << endl;
   os << indent << "Transfer Function Box: " << endl;
   this->Internals->TransferFunctionBox->PrintSelf(os, indent.GetNextIndent());
-  Superclass::PrintSelf(os, indent);
+  this->Superclass::PrintSelf(os, indent);
 }
 
 //-------------------------------------------------------------------------------------------------
 const vtkRectd& vtkTransferFunctionBoxItem::GetBox()
 {
   return this->Internals->TransferFunctionBox->GetBox();
-  //  double lowerBound[2];
-  //  this->BoxPoints->GetPoint(BOTTOM_LEFT, lowerBound);
-  //
-  //  double upperBound[2];
-  //  this->BoxPoints->GetPoint(TOP_RIGHT, upperBound);
-  //
-  //  const double width = upperBound[0] - lowerBound[0];
-  //  const double height = upperBound[1] - lowerBound[1];
-  //
-  //  this->Box.Set(lowerBound[0], lowerBound[1], width, height);
-
-  //  return this->Box;
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -616,29 +562,6 @@ void vtkTransferFunctionBoxItem::SetBox(
 
   this->StartChanges();
   this->UpdateBoxPoints();
-  //  double pos[2];
-  //  pos[0] = x;
-  //  pos[1] = y;
-  //
-  //  this->ClampToValidPosition(pos);
-  //  this->Internals->BoxPoints->SetPoint(0, pos);
-  //  this->Internals->BoxPoints->SetPoint(4, pos);
-  //
-  //  pos[0] = x + width;
-  //  pos[1] = y;
-  //  this->ClampToValidPosition(pos);
-  //  this->Internals->BoxPoints->SetPoint(1, pos);
-  //
-  //  pos[0] = x + width;
-  //  pos[1] = y + height;
-  //  this->ClampToValidPosition(pos);
-  //  this->Internals->BoxPoints->SetPoint(2, pos);
-  //
-  //  pos[0] = x;
-  //  pos[1] = y + height;
-  //  this->ClampToValidPosition(pos);
-  //  this->Internals->BoxPoints->SetPoint(3, pos);
-
   this->EndChanges();
   this->InvokeEvent(vtkTransferFunctionBoxItem::BoxEditEvent);
 }
@@ -713,7 +636,7 @@ vtkIdType vtkTransferFunctionBoxItem::FindBoxPoint(double* _pos)
   return pointId;
 }
 
-////-------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
 vtkSmartPointer<vtkImageData> vtkTransferFunctionBoxItem::GetTexture() const
 {
   return this->Internals->TransferFunctionBox->GetTexture();
@@ -729,19 +652,6 @@ void vtkTransferFunctionBoxItem::SetValidBounds(double x0, double x1, double y0,
   }
 
   this->UpdateBoxPoints();
-
-  //  for (vtkIdType id = 0; id < this->Internals->NumPoints; id++)
-  //  {
-  //    double pos[2];
-  //    this->BoxPoints->GetPoint(id, pos);
-  //    pos[0] =
-  //      (pos[0] - this->ValidBounds[0]) * (x1 - x0) / (this->ValidBounds[1] -
-  //      this->ValidBounds[0]) + x0;
-  //    pos[1] =
-  //      (pos[1] - this->ValidBounds[2]) * (y1 - y0) / (this->ValidBounds[3] -
-  //      this->ValidBounds[2]) + y0;
-  //    this->BoxPoints->SetPoint(id, pos);
-  //  }
   this->Superclass::SetValidBounds(x0, x1, y0, y1);
 }
 
@@ -766,11 +676,9 @@ void vtkTransferFunctionBoxItem::SetTransferFunctionBox(vtkPVTransferFunction2DB
   }
   if (this->Internals->TransferFunctionBox)
   {
-    // this->Internals->TransferFunctionBox->UnRegister(this);
     this->Internals->TransferFunctionBox->Delete();
   }
   this->Internals->TransferFunctionBox = b;
-  // this->Internals->TransferFunctionBox->Register(this);
   this->UpdateBoxPoints();
 }
 
