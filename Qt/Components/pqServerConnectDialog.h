@@ -152,9 +152,10 @@ protected Q_SLOTS:
   void onNameChanged();
 
   /**
-   * called to delete a server.
+   * called to delete one or all servers.
    */
   void deleteServer();
+  void deleteAllServers();
 
   /**
    * called to load/save servers.

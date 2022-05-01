@@ -84,6 +84,9 @@ pqPythonEditorActions::pqPythonEditorActions()
   this->GeneralActions[Action::SaveFileAsScript].setStatusTip(
     QObject::tr("Save the document as a Script"));
 
+  this->GeneralActions[Action::DeleteAll].setText("Delete All");
+  this->GeneralActions[Action::DeleteAll].setStatusTip(QObject::tr("Delete all scripts from disk"));
+
   this->GeneralActions[Action::Run].setText(QObject::tr("Run..."));
   this->GeneralActions[Action::Run].setStatusTip(QObject::tr("Run the currently edited script"));
 
@@ -361,6 +364,19 @@ void pqPythonEditorActions::connect<pqPythonTabWidget>(
   });
   QObject::connect(&actions[Action::CloseCurrentTab], &QAction::triggered, tWidget,
     &pqPythonTabWidget::closeCurrentTab);
+  QObject::connect(&actions[Action::DeleteAll], &QAction::triggered, tWidget, [tWidget]() {
+    QMessageBox::StandardButton ret =
+      QMessageBox::question(tWidget, "Delete All", "All scripts will be deleted. Are you sure?");
+    if (ret == QMessageBox::StandardButton::Yes)
+    {
+      pqCoreUtilities::removeRecursively(pqPythonScriptEditor::getScriptsDir());
+      for (int i = tWidget->count() - 1; i >= 0; --i)
+      {
+        Q_EMIT tWidget->tabCloseRequested(i);
+      }
+      pqPythonScriptEditor::updateScriptList();
+    }
+  });
 }
 
 //-----------------------------------------------------------------------------
@@ -375,4 +391,5 @@ void pqPythonEditorActions::disconnect<pqPythonTabWidget>(
   actions[Action::NewFile].disconnect();
   actions[Action::OpenFile].disconnect();
   actions[Action::CloseCurrentTab].disconnect();
+  actions[Action::DeleteAll].disconnect();
 }

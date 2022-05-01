@@ -98,6 +98,23 @@
           <number>0</number>
          </property>
          <item>
+          <widget class="QPushButton" name="deleteAll">
+           <property name="toolTip">
+            <string>Delete all user server configurations</string>
+           </property>
+           <property name="statusTip">
+            <string>Delete all user server configurations</string>
+           </property>
+           <property name="text">
+            <string>Delete All</string>
+           </property>
+           <property name="icon">
+            <iconset resource="../../../Widgets/Resources/QtWidgets.qrc">
+             <normaloff>:/QtWidgets/Icons/pqDelete.svg</normaloff>:/QtWidgets/Icons/pqDelete.svg</iconset>
+           </property>
+          </widget>
+         </item>
+         <item>
           <spacer>
            <property name="orientation">
             <enum>Qt::Horizontal</enum>

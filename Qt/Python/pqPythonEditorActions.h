@@ -119,6 +119,7 @@ struct pqPythonEditorActions
     SaveFileAs,
     SaveFileAsMacro,
     SaveFileAsScript,
+    DeleteAll,
 
     // Undo/Redo Actions
     Undo,
