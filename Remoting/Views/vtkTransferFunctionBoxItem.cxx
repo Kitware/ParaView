@@ -132,8 +132,11 @@ vtkTransferFunctionBoxItem::vtkTransferFunctionBoxItem()
 //-------------------------------------------------------------------------------------------------
 vtkTransferFunctionBoxItem::~vtkTransferFunctionBoxItem()
 {
-  this->Internals->TransferFunctionBox->Delete();
-  this->Internals = nullptr;
+  if (this->Internals->TransferFunctionBox)
+  {
+    this->Internals->TransferFunctionBox->Delete();
+    this->Internals = nullptr;
+  }
 }
 
 //-------------------------------------------------------------------------------------------------
