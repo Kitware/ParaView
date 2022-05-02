@@ -92,7 +92,7 @@ public:
   /**
    * Returns the default name of a server configuration.
    */
-  static const QString defaultName();
+  static QString defaultName();
 
   /**
    * Get/Set the resource that describes the server scheme, hostname(s) and port(s).

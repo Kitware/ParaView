@@ -204,7 +204,7 @@ private:
 
   void handleUserEvent(vtkObject*, unsigned long, void*);
 
-  class pqInternals;
+  struct pqInternals;
   QScopedPointer<pqInternals> Internals;
 };
 
