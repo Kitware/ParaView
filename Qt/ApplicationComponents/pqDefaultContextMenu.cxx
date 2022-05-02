@@ -54,6 +54,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMSourceProxy.h"
 #include "vtkSMStringVectorProperty.h"
+#include "vtkSMTrace.h"
 #include "vtkSMTransferFunctionManager.h"
 #include "vtkSMViewProxy.h"
 #include "vtksys/SystemTools.hxx"
@@ -242,6 +243,7 @@ void pqDefaultContextMenu::showAllBlocks() const
         continue;
       }
 
+      SM_SCOPED_TRACE(PropertiesModified).arg("proxy", proxy);
       BEGIN_UNDO_SET("Show All Blocks");
       smProperty->SetElements(std::vector<std::string>({ "/" }));
       proxy->UpdateVTKObjects();
@@ -308,6 +310,7 @@ void pqDefaultContextMenu::reprTypeChanged(QAction* action)
   pqDataRepresentation* repr = this->PickedRepresentation;
   if (repr)
   {
+    SM_SCOPED_TRACE(PropertiesModified).arg("proxy", repr->getProxy());
     BEGIN_UNDO_SET("Representation Type Changed");
     pqSMAdaptor::setEnumerationProperty(
       repr->getProxy()->GetProperty("Representation"), action->text());
@@ -323,6 +326,7 @@ void pqDefaultContextMenu::hide()
   pqDataRepresentation* repr = this->PickedRepresentation;
   if (repr)
   {
+    SM_SCOPED_TRACE(PropertiesModified).arg("proxy", repr->getProxy());
     BEGIN_UNDO_SET("Visibility Changed");
     repr->setVisible(false);
     repr->renderViewEventually();
