@@ -367,6 +367,7 @@ void vtkPVExtractHistogram2D::ComputeHistogram2D(vtkImageData* histogram)
 
   const auto arr1Range = vtk::DataArrayTupleRange(this->ComponentArrayCache[0]);
   const auto arr2Range = vtk::DataArrayTupleRange(this->ComponentArrayCache[1]);
+  auto histRange = vtk::DataArrayValueRange(histArray);
 
   const vtk::TupleIdType numTuples = arr1Range.size();
   if (arr2Range.size() != numTuples)
@@ -388,7 +389,7 @@ void vtkPVExtractHistogram2D::ComputeHistogram2D(vtkImageData* histogram)
         (this->ComponentRangeCache[1][1] - this->ComponentRangeCache[1][0]));
     bin2 = bin2 >= this->NumberOfBins[1] ? this->NumberOfBins[1] - 1 : bin2;
     vtkIdType histIndex = bin2 * this->NumberOfBins[0] + bin1;
-    histArray->SetTuple1(histIndex, histArray->GetTuple1(histIndex) + 1);
+    histRange[histIndex]++;
   }
 }
 

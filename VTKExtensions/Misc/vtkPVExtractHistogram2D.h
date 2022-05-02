@@ -16,7 +16,6 @@ Copyright and License information
 // VTK includes
 #include "vtkImageAlgorithm.h"
 #include "vtkPVVTKExtensionsMiscModule.h" // needed for exports
-#include "vtkSmartPointer.h"              // needed for smart pointer
 
 // Forward declarations
 class vtkDataArray;
