@@ -406,6 +406,7 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/MultiBlockInspectorSelection-SelectBlock2.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/MultiBlockInspectorSelection-SelectElementBlocks.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/MultiBlockInspectorSelection-HideBlock1.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/MultiBlockInspectorWithoutSelectOnClickSetting.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/NestedViews.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/NestedViews_1.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/NonlinearSubdivision0Display.png}"
@@ -753,10 +754,7 @@ SET (TESTS_WITH_INLINE_COMPARES
   LogoSourcesInChartViews.xml
   MemoryInspectorPanel.xml
   Molecule.xml
-  # temporary disabling since we don't support
-  # selection in the MB-inspector right now.
-  # (see #20525)
-  # MultiBlockInspectorSelection.xml
+  MultiBlockInspectorSelection.xml
   MultiBlockChartSelection.xml
   NestedViews.xml
   NonlinearSubdivisionDisplay.xml
@@ -1068,6 +1066,7 @@ list(APPEND TESTS_WITH_BASELINES
   MultiBlockInspectorExtractBlocks.xml
   MultiBlockSingleBlock.xml
   MultiBlockVolumeRendering.xml
+  MultiBlockInspectorWithoutSelectOnClickSetting.xml
   MultiSliceMultiBlock.xml
   MultiSliceWavelet.xml
   NormalGlyphs.xml

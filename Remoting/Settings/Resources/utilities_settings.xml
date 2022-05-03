@@ -443,6 +443,20 @@
         </Documentation>
       </IntVectorProperty>
 
+      <IntVectorProperty name="SelectOnClickInMultiBlockInspector"
+        command="SetSelectOnClickMultiBlockInspector"
+        number_of_elements="1"
+        default_values="1"
+        panel_visibility="advanced">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Create block selections when clicking on blocks in the MultiBlock Inspector (and other data assembly representation widgets).
+        </Documentation>
+        <Hints>
+          <RestartRequired />
+        </Hints>
+      </IntVectorProperty>
+
       <PropertyGroup label="General Options">
         <Property name="ShowWelcomeDialog" />
         <Property name="ShowSaveStateOnExit" />
@@ -494,6 +508,7 @@
         <Property name="DefaultTimeStep" />
         <Property name="MaximumNumberOfDataRepresentationLabels" />
         <Property name="IgnoreNegativeLogAxisWarning" />
+        <Property name="SelectOnClickInMultiBlockInspector" />
       </PropertyGroup>
       <Hints>
         <UseDocumentationForLabels />
