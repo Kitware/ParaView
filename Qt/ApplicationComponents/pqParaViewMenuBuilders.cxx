@@ -71,6 +71,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqHelpReaction.h"
 #endif
 #include "pqIgnoreSourceTimeReaction.h"
+#include "pqLightToolbar.h"
 #include "pqLinkSelectionReaction.h"
 #include "pqLoadDataReaction.h"
 #include "pqLoadMaterialsReaction.h"
@@ -784,6 +785,10 @@ void pqParaViewMenuBuilders::buildToolbars(QMainWindow& mainWindow)
   QToolBar* axesToolbar = new pqAxesToolbar(&mainWindow) << pqSetName("axesToolbar");
   axesToolbar->layout()->setSpacing(0);
   mainWindow.addToolBar(Qt::TopToolBarArea, axesToolbar);
+
+  QToolBar* lightingToolbar = new pqLightToolbar(&mainWindow) << pqSetName("lightingToolbar");
+  lightingToolbar->layout()->setSpacing(0);
+  mainWindow.addToolBar(Qt::TopToolBarArea, lightingToolbar);
 
 #if VTK_MODULE_ENABLE_ParaView_pqPython
   // Give the macros menu to the pqPythonMacroSupervisor
