@@ -55,6 +55,7 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${paraview_test_data_directory_input}/Data/OMETIFF/multi-channel-time-series.ome.tif}"
   "DATA{${paraview_test_data_directory_input}/Data/OverridePropertyPlugin.xml}"
   "DATA{${paraview_test_data_directory_input}/Data/PlotOverLineLegacy.pvsm}"
+  "DATA{${paraview_test_data_directory_input}/Data/PLOAD_C_xMax.bdf}"
   "DATA{${paraview_test_data_directory_input}/Data/PNGReadersPlugin.xml}"
   "DATA{${paraview_test_data_directory_input}/Data/PropertyLink.pvsm}"
   "DATA{${paraview_test_data_directory_input}/Data/RectGrid2.vtk}"
@@ -813,6 +814,7 @@ if(NOT APPLE)
 endif()
 
 SET(TESTS_WITH_BASELINES
+  BDFReader.xml
   DataAxesGrid.xml
   MergeVectorComponents.xml
   MoleculeScalarBar.xml
