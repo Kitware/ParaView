@@ -277,6 +277,11 @@ int vtkPVTransferFunction2D::AddControlBox(vtkRectd& box, double* color)
 //-------------------------------------------------------------------------------------------------
 int vtkPVTransferFunction2D::SetControlBox(int id, vtkSmartPointer<vtkPVTransferFunction2DBox> b)
 {
+  if (id < 0)
+  {
+    // invalid id
+    return -1;
+  }
   if (id >= static_cast<int>(this->Internals->Boxes.size()))
   {
     return this->AddControlBox(b);
