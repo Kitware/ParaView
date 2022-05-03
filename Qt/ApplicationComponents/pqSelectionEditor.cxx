@@ -543,10 +543,6 @@ void pqSelectionEditor::onTableSelectionChanged(
 //-----------------------------------------------------------------------------
 void pqSelectionEditor::showInteractiveSelection(unsigned int selectedRow)
 {
-  if (selectedRow < 0)
-  {
-    return;
-  }
   if (!this->Internal->RemoveSelectedSelection->isEnabled())
   {
     this->Internal->RemoveSelectedSelection->setEnabled(true);
