@@ -2105,8 +2105,8 @@ def AnimateReader(reader=None, view=None):
 
 # -----------------------------------------------------------------------------
 
-def _GetRepresentationAnimationHelper(sourceproxy):
-    """Internal method that returns the representation animation helper for a
+def GetRepresentationAnimationHelper(sourceproxy):
+    """Method that returns the representation animation helper for a
        source proxy. It creates a new one if none exists."""
     # ascertain that proxy is a source proxy
     if not sourceproxy in GetSources().values():
@@ -2154,8 +2154,8 @@ def GetAnimationTrack(propertyname_or_property, index=None, proxy=None):
     # To handle the case where the property is actually a "display" property, in
     # which case we are actually animating the "RepresentationAnimationHelper"
     # associated with the source.
-    if propertyname in ["Visibility", "Opacity"]:
-        proxy = _GetRepresentationAnimationHelper(proxy)
+    if propertyname in ["Visibility", "Opacity"] and proxy.GetXMLName() != "RepresentationAnimationHelper":
+        proxy = GetRepresentationAnimationHelper(proxy)
     if not proxy or not proxy.GetProperty(propertyname):
         raise AttributeError ("Failed to locate property %s" % propertyname)
 

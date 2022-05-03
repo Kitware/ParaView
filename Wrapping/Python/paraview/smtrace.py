@@ -265,6 +265,14 @@ class Trace(object):
             return True
         if cls.get_registered_name(obj, "animation"):
             return cls._create_accessor_for_animation_proxies(obj)
+        if obj.SMProxy.GetXMLName() == "RepresentationAnimationHelper":
+            sourceAccessor = cls.get_accessor(obj.Source)
+            varname = cls.get_varname("%sRepresentationAnimationHelper" % (sourceAccessor))
+            accessor = ProxyAccessor(varname, obj)
+            cls.Output.append_separated([\
+                " # get animation representation helper for '%s'" % (sourceAccessor),
+                "%s = GetRepresentationAnimationHelper(%s)" % (accessor, sourceAccessor)])
+            return True
         if not skip_rendering and cls.get_registered_name(obj, "layouts"):
             view = simple.GetActiveView()
             if view and obj.GetViewLocation(view.SMProxy) != -1:
@@ -428,6 +436,12 @@ class Trace(object):
             return True
         if obj.GetXMLName() == "PythonAnimationCue":
             raise Untraceable("PythonAnimationCue's are currently not supported in trace")
+        if obj.GetXMLGroup() == "animation_keyframes":
+            accessor = ProxyAccessor(cls.get_varname(pname), obj)
+            ctor = sm._make_name_valid(obj.GetXMLLabel())
+            cls.Output.append_separated("# create a new key frame")
+            cls.Output.append(accessor.trace_ctor(ctor, ProxyFilter()))
+            return True
         return False
 
 class Untraceable(Exception):
@@ -1464,20 +1478,10 @@ class CreateAnimationTrack(TraceItem):
 
         # We let Trace create an accessor for the cue. We will then simply log the
         # default property values.
-        accessor = Trace.get_accessor(self.Cue)
-
-        trace = TraceOutput()
-        trace.append("# create keyframes for this animation track")
-
-        # Create accessors for each of the animation key frames.
-        for keyframeProxy in self.Cue.KeyFrames:
-            pname = Trace.get_registered_name(keyframeProxy, "animation")
-            kfaccessor = ProxyAccessor(Trace.get_varname(pname), keyframeProxy)
-            ctor = sm._make_name_valid(keyframeProxy.GetXMLLabel())
-            trace.append_separated("# create a key frame")
-            trace.append(kfaccessor.trace_ctor(ctor, AnimationProxyFilter()))
+        accessor = Trace.get_accessor(self.Cue) # type: RealProxyAccessor
 
         # Now trace properties on the cue.
+        trace = TraceOutput()
         trace.append_separated("# initialize the animation track")
         trace.append(accessor.trace_ctor(None, AnimationProxyFilter()))
         Trace.Output.append_separated(trace.raw_data())

@@ -35,6 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMProxy.h"
 #include "vtkSMProxyProperty.h"
 #include "vtkSMSessionProxyManager.h"
+#include "vtkSMTrace.h"
 
 #include <QList>
 #include <QtDebug>
@@ -91,6 +92,7 @@ void pqAnimationCue::addKeyFrameInternal(vtkSMProxy* keyframe)
 //-----------------------------------------------------------------------------
 void pqAnimationCue::removeKeyFrameInternal(vtkSMProxy* keyframe)
 {
+  SM_SCOPED_TRACE(Delete).arg(keyframe);
   vtkSMSessionProxyManager* pxm = this->proxyManager();
   pxm->UnRegisterProxy("animation", pxm->GetProxyName("animation", keyframe), keyframe);
 }

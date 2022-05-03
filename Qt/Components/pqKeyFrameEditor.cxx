@@ -45,6 +45,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QVBoxLayout>
 
 #include <vtkSMRenderViewProxy.h>
+#include <vtkSMTrace.h>
 
 #include "pqActiveObjects.h"
 #include "pqAnimationCue.h"
@@ -533,6 +534,7 @@ void pqKeyFrameEditor::writeKeyFrameData()
   int newNumber = this->Internal->Model.rowCount();
 
   BEGIN_UNDO_SET("Edit Keyframes");
+  SM_SCOPED_TRACE(PropertiesModified).arg("proxy", this->Internal->Cue->getProxy());
 
   if (camera)
   {
@@ -562,6 +564,8 @@ void pqKeyFrameEditor::writeKeyFrameData()
   for (int i = 0; i < newNumber; i++)
   {
     vtkSMProxy* keyFrame = this->Internal->Cue->getKeyFrame(i);
+    SM_SCOPED_TRACE(PropertiesModified).arg("proxy", keyFrame);
+
     int j = sortedKeyFrames[i].first;
 
     QModelIndex idx = this->Internal->Model.index(j, 0);
