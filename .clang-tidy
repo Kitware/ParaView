@@ -64,6 +64,7 @@ modernize-*,\
 -modernize-use-equals-delete,\
 -modernize-use-trailing-return-type,\
 -modernize-use-using,\
+-modernize-use-transparent-functors,\
 mpi-*,\
 openmp-*,\
 performance-*,\
