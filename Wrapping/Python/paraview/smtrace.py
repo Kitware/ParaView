@@ -247,6 +247,10 @@ class Trace(object):
             pname = cls.get_registered_name(obj, "piecewise_functions")
             if cls._create_accessor_for_tf(obj, pname):
                 return True
+        if not skip_rendering and cls.get_registered_name(obj, "transfer_2d_functions"):
+            pname = cls.get_registered_name(obj, "transfer_2d_functions")
+            if cls._create_accessor_for_tf(obj, pname):
+                return True
         if not skip_rendering and cls.get_registered_name(obj, "scalar_bars"):
             # trace scalar bar.
             lutAccessor = cls.get_accessor(obj.LookupTable)
@@ -375,7 +379,7 @@ class Trace(object):
                 comment = "color transfer function/color map"
               method = "GetColorTransferFunction"
               varsuffix = "LUT"
-            else:
+            elif proxy.GetXMLGroup() == "piecewise_functions":
               arrayName, varname, rep = cls.rename_separate_tf_and_get_representation(arrayName)
               if rep:
                 repAccessor = Trace.get_accessor(rep)
@@ -386,6 +390,18 @@ class Trace(object):
                 comment = "opacity transfer function/opacity map"
               method = "GetOpacityTransferFunction"
               varsuffix = "PWF"
+            else:
+              arrayName, varname, rep = cls.rename_separate_tf_and_get_representation(arrayName)
+              if rep:
+                repAccessor = Trace.get_accessor(rep)
+                args = ("'%s', %s, separate=True" % (arrayName, repAccessor))
+                comment = "separate 2D transfer function"
+              else :
+                args = ("'%s'" % arrayName)
+                comment = "2D transfer function"
+              method = "GetTransferFunction2D"
+              varsuffix = "TF2D"
+
             varname = cls.get_varname("%s%s" % (varname, varsuffix))
             accessor = ProxyAccessor(varname, proxy)
             #cls.Output.append_separated([\

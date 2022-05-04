@@ -31,7 +31,9 @@
 
 #include <vtk_jsoncpp_fwd.h> // for forward declarations
 
+// Forward declarations
 class vtkPVArrayInformation;
+
 class VTKREMOTINGVIEWS_EXPORT vtkSMTransferFunctionProxy : public vtkSMProxy
 {
 public:

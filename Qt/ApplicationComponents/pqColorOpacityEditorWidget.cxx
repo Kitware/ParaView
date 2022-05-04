@@ -53,7 +53,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkCommand.h"
 #include "vtkDiscretizableColorTransferFunction.h"
 #include "vtkEventQtSlotConnect.h"
+#include "vtkImageData.h"
 #include "vtkNew.h"
+#include "vtkPVTransferFunction2D.h"
+#include "vtkPVTransferFunction2DBox.h"
 #include "vtkPVXMLElement.h"
 #include "vtkPiecewiseFunction.h"
 #include "vtkSMCoreUtilities.h"
@@ -63,13 +66,17 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMRenderViewProxy.h"
 #include "vtkSMSessionProxyManager.h"
+#include "vtkSMTransferFunction2DProxy.h"
 #include "vtkSMTransferFunctionPresets.h"
 #include "vtkSMTransferFunctionProxy.h"
 #include "vtkTable.h"
+#include "vtkTransferFunctionBoxItem.h"
+#include "vtkTransferFunctionChartHistogram2D.h"
 #include "vtkVector.h"
 #include "vtkWeakPointer.h"
 #include "vtk_jsoncpp.h"
 
+#include <QColorDialog>
 #include <QMessageBox>
 #include <QPainter>
 #include <QPointer>
@@ -198,6 +205,8 @@ public:
   QPointer<pqColorOpacityEditorWidgetDecorator> Decorator;
   vtkWeakPointer<vtkSMPropertyGroup> PropertyGroup;
   vtkWeakPointer<vtkSMProxy> ScalarOpacityFunctionProxy;
+  vtkWeakPointer<vtkSMProxy> TransferFunction2DProxy;
+  vtkWeakPointer<vtkSMProxy> TransferFunction2DRepProxy;
   QScopedPointer<QAction> TempAction;
   QScopedPointer<pqChooseColorPresetReaction> ChoosePresetReaction;
   QScopedPointer<pqSignalsBlocker> SignalsBlocker;
@@ -208,8 +217,10 @@ public:
   vtkNew<vtkEventQtSlotConnect> TransferFunctionModifiedConnector;
   vtkNew<vtkEventQtSlotConnect> RangeConnector;
   vtkNew<vtkEventQtSlotConnect> ConsumerConnector;
+  vtkNew<vtkEventQtSlotConnect> TransferFunction2DConnector;
 
   pqTimer HistogramTimer;
+  pqTimer Histogram2DTimer;
   bool HistogramOutdated = true;
 
   pqInternals(pqColorOpacityEditorWidget* self, vtkSMPropertyGroup* group)
@@ -251,6 +262,10 @@ public:
     this->HistogramTimer.setSingleShot(true);
     this->HistogramTimer.setInterval(1);
     QObject::connect(&this->HistogramTimer, SIGNAL(timeout()), self, SLOT(realShowDataHistogram()));
+
+    this->Histogram2DTimer.setSingleShot(true);
+    this->Histogram2DTimer.setInterval(1);
+    QObject::connect(&this->Histogram2DTimer, SIGNAL(timeout()), self, SLOT(realShow2DHistogram()));
   }
 
   void render()
@@ -320,9 +335,13 @@ pqColorOpacityEditorWidget::pqColorOpacityEditorWidget(
     &pqColorOpacityEditorWidget::updateDefaultPresetsList);
 
   // To avoid color editor widget movement when hidden
-  QSizePolicy sp_retain = ui.OpacityEditor->sizePolicy();
-  sp_retain.setRetainSizeWhenHidden(true);
-  ui.OpacityEditor->setSizePolicy(sp_retain);
+  // QSizePolicy sp_retain = ui.OpacityEditor->sizePolicy();
+  // sp_retain.setRetainSizeWhenHidden(true);
+  // ui.OpacityEditor->setSizePolicy(sp_retain);
+
+  // QSizePolicy sp2d_retain = ui.Transfer2DEditor->sizePolicy();
+  // sp2d_retain.setRetainSizeWhenHidden(true);
+  // ui.Transfer2DEditor->setSizePolicy(sp2d_retain);
 
   QObject::connect(ui.OpacityEditor, SIGNAL(currentPointChanged(vtkIdType)), this,
     SLOT(opacityCurrentChanged(vtkIdType)));
@@ -364,8 +383,18 @@ pqColorOpacityEditorWidget::pqColorOpacityEditorWidget(
 
   QObject::connect(ui.ChoosePreset, SIGNAL(clicked()), this, SLOT(choosePreset()));
   QObject::connect(ui.SaveAsPreset, SIGNAL(clicked()), this, SLOT(saveAsPreset()));
-  QObject::connect(
-    ui.ComputeDataHistogram, SIGNAL(clicked()), this, SLOT(showDataHistogramClicked()));
+  QObject::connect(ui.ComputeDataHistogram, &QAbstractButton::clicked, this, [=]() {
+    if (ui.Use2DTransferFunction->isChecked())
+    {
+      this->show2DHistogram(true);
+    }
+    else
+    {
+      this->showDataHistogramClicked(true);
+    }
+  });
+  QObject::connect(ui.ChooseBoxColor, &QAbstractButton::clicked, this,
+    &pqColorOpacityEditorWidget::chooseBoxColorAlpha);
   QObject::connect(ui.AdvancedButton, SIGNAL(clicked()), this, SLOT(updatePanel()));
 
   QObject::connect(
@@ -381,6 +410,12 @@ pqColorOpacityEditorWidget::pqColorOpacityEditorWidget(
   // if the user edits the "DataValue", we need to update the transfer function.
   QObject::connect(
     ui.CurrentDataValue, SIGNAL(textChangedAndEditingFinished()), this, SLOT(currentDataEdited()));
+
+  // if the user edits the 2D transfer function item
+  QObject::connect(
+    ui.Transfer2DEditor, SIGNAL(transferFunctionModified()), this, SLOT(transfer2DChanged()));
+  QObject::connect(ui.Transfer2DEditor, SIGNAL(transferFunctionModified()), this,
+    SIGNAL(transfer2DBoxesChanged()));
 
   vtkSMProperty* smproperty = smgroup->GetProperty("XRGBPoints");
   if (smproperty)
@@ -474,13 +509,41 @@ pqColorOpacityEditorWidget::pqColorOpacityEditorWidget(
     ui.DataHistogramNumberOfBins->hide();
   }
 
+  ui.Transfer2DEditor->hide();
+  smproperty = smgroup->GetProperty("TransferFunction2D");
+  if (smproperty)
+  {
+    this->addPropertyLink(
+      this, "transferFunction2DProxy", SIGNAL(transferFunction2DProxyChanged()), smproperty);
+  }
+
+  smproperty = smgroup->GetProperty("Use2DTransferFunction");
+  if (smproperty)
+  {
+    this->addPropertyLink(
+      this, "use2DTransferFunction", SIGNAL(use2DTransferFunctionChanged()), smproperty);
+    QObject::connect(ui.Use2DTransferFunction, &QCheckBox::toggled, this,
+      &pqColorOpacityEditorWidget::show2DHistogram);
+  }
+  else
+  {
+    ui.Use2DTransferFunction->hide();
+  }
+
   // Manage histogram computation if enabled
   // When creating the widget, we consider that the cost of recomputing the histogram table
   // can be paid systematically
   // We hide it to avoid seeing it before the timer ends and triggers the actual computation
-  this->updateDataHistogramEnableState();
-  this->Internals->Ui.OpacityEditor->setVisible(!ui.ShowDataHistogram->isChecked());
-  this->showDataHistogramClicked(ui.ShowDataHistogram->isChecked());
+  if (this->Internals->Ui.Use2DTransferFunction->isChecked())
+  {
+    this->show2DHistogram(true);
+  }
+  else
+  {
+    this->updateDataHistogramEnableState();
+    this->Internals->Ui.OpacityEditor->setVisible(!ui.ShowDataHistogram->isChecked());
+    this->showDataHistogramClicked(ui.ShowDataHistogram->isChecked());
+  }
 
   // if proxy has a property named IndexedLookup, we hide this entire widget
   // when IndexedLookup is ON.
@@ -609,13 +672,101 @@ void pqColorOpacityEditorWidget::setScalarOpacityFunctionProxy(pqSMProxy sofProx
       internals.ScalarOpacityFunctionProxy,
       internals.ScalarOpacityFunctionProxy->GetProperty("UseLogScale"));
   }
-  ui.OpacityEditor->setVisible(newSofProxy != nullptr);
+  ui.OpacityEditor->setVisible(newSofProxy != nullptr && !ui.Use2DTransferFunction->isChecked());
 }
 
 //-----------------------------------------------------------------------------
 pqSMProxy pqColorOpacityEditorWidget::scalarOpacityFunctionProxy() const
 {
   return this->Internals->ScalarOpacityFunctionProxy.GetPointer();
+}
+
+//-----------------------------------------------------------------------------
+void pqColorOpacityEditorWidget::setTransferFunction2DProxy(pqSMProxy tf2dProxy)
+{
+  pqInternals& internals = (*this->Internals);
+  // Ui::ColorOpacityEditorWidget& ui = internals.Ui;
+
+  vtkSMProxy* newtf2dProxy = nullptr;
+  vtkPVTransferFunction2D* tf2d =
+    tf2dProxy ? vtkPVTransferFunction2D::SafeDownCast(tf2dProxy->GetClientSideObject()) : nullptr;
+  if (tf2dProxy && tf2d)
+  {
+    newtf2dProxy = tf2dProxy;
+  }
+  if (internals.TransferFunction2DProxy == newtf2dProxy)
+  {
+    return;
+  }
+  if (internals.TransferFunction2DProxy)
+  {
+    // cleanup old property links.
+    this->links().removePropertyLink(this, "transfer2DBoxes", SIGNAL(transfer2DBoxesChanged()),
+      internals.TransferFunction2DProxy, internals.TransferFunction2DProxy->GetProperty("Boxes"));
+  }
+  if (internals.TransferFunction2DRepProxy)
+  {
+    this->links().removePropertyLink(this, "use2DTransferFunction",
+      SIGNAL(use2DTransferFunctionChanged()), internals.TransferFunction2DRepProxy,
+      internals.TransferFunction2DRepProxy->GetProperty("UseTransfer2D"));
+  }
+  internals.TransferFunction2DProxy = newtf2dProxy;
+  if (internals.TransferFunction2DProxy)
+  {
+    pqDataRepresentation* repr = pqActiveObjects::instance().activeRepresentation();
+    vtkSMPVRepresentationProxy* reprProxy =
+      vtkSMPVRepresentationProxy::SafeDownCast(repr->getProxy());
+
+    this->Internals->TransferFunction2DConnector->Disconnect();
+    vtkSMProperty* colorArray2Property = reprProxy->GetProperty("ColorArray2Name");
+    if (colorArray2Property)
+    {
+      this->Internals->TransferFunction2DConnector->Connect(colorArray2Property,
+        vtkCommand::ModifiedEvent, this, SLOT(updateTransferFunction2DProxy()));
+    }
+    vtkSMProperty* gradProperty = reprProxy->GetProperty("UseGradientForTransfer2D");
+    if (gradProperty)
+    {
+      this->Internals->TransferFunction2DConnector->Connect(
+        gradProperty, vtkCommand::ModifiedEvent, this, SLOT(updateTransferFunction2DProxy()));
+    }
+
+    this->initializeTransfer2DEditor(tf2d);
+
+    // add new property links.
+    this->links().addPropertyLink(this, "transfer2DBoxes", SIGNAL(transfer2DBoxesChanged()),
+      internals.TransferFunction2DProxy, internals.TransferFunction2DProxy->GetProperty("Boxes"));
+    vtkSMProperty* useTF2DProperty = reprProxy->GetProperty("UseTransfer2D");
+    if (useTF2DProperty)
+    {
+      internals.TransferFunction2DRepProxy = reprProxy;
+      this->links().addPropertyLink(this, "use2DTransferFunction",
+        SIGNAL(use2DTransferFunctionChanged()), internals.TransferFunction2DRepProxy,
+        useTF2DProperty);
+    }
+  }
+}
+
+//-----------------------------------------------------------------------------
+pqSMProxy pqColorOpacityEditorWidget::transferFunction2DProxy() const
+{
+  return this->Internals->TransferFunction2DProxy.GetPointer();
+}
+
+//-----------------------------------------------------------------------------
+void pqColorOpacityEditorWidget::updateTransferFunction2DProxy()
+{
+  pqDataRepresentation* repr = pqActiveObjects::instance().activeRepresentation();
+  vtkSMPVRepresentationProxy* reprProxy =
+    vtkSMPVRepresentationProxy::SafeDownCast(repr->getProxy());
+  vtkSMProperty* colorArrayProperty = reprProxy->GetProperty("ColorArrayName");
+  if (colorArrayProperty)
+  {
+    vtkSMPropertyHelper colorArrayHelper(colorArrayProperty);
+    std::string arrayName(colorArrayHelper.GetInputArrayNameToProcess());
+    int association = colorArrayHelper.GetInputArrayAssociation();
+    vtkSMPVRepresentationProxy::SetScalarColoring(reprProxy, arrayName.c_str(), association);
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -979,6 +1130,7 @@ void pqColorOpacityEditorWidget::resetRangeToData()
   // passing in nullptr ensure pqResetScalarRangeReaction simply uses active representation.
   if (pqResetScalarRangeReaction::resetScalarRangeToData(nullptr))
   {
+    this->setHistogramOutdated();
     this->Internals->render();
     Q_EMIT this->changeFinished();
   }
@@ -1049,6 +1201,7 @@ void pqColorOpacityEditorWidget::resetRangeToCustom()
 
   if (changed)
   {
+    this->setHistogramOutdated();
     this->Internals->render();
     Q_EMIT this->changeFinished();
   }
@@ -1202,6 +1355,53 @@ void pqColorOpacityEditorWidget::setDataHistogramNumberOfBins(int val)
 }
 
 //-----------------------------------------------------------------------------
+bool pqColorOpacityEditorWidget::use2DTransferFunction() const
+{
+  return this->Internals->Ui.Use2DTransferFunction->isChecked();
+}
+
+//-----------------------------------------------------------------------------
+void pqColorOpacityEditorWidget::setUse2DTransferFunction(bool val)
+{
+  Ui::ColorOpacityEditorWidget& ui = this->Internals->Ui;
+  ui.Use2DTransferFunction->setChecked(val);
+}
+
+//-----------------------------------------------------------------------------
+void pqColorOpacityEditorWidget::show2DHistogram(bool show)
+{
+  if (show)
+  {
+    this->Internals->Histogram2DTimer.start();
+  }
+  else
+  {
+    this->Internals->Ui.Transfer2DEditor->setHistogram(nullptr);
+  }
+  Ui::ColorOpacityEditorWidget& ui = this->Internals->Ui;
+  ui.ColorEditor->setVisible(!show);
+  ui.ColorTable->setEnabled(!show);
+  ui.OpacityTable->setEnabled(!show);
+  ui.OpacityEditor->setVisible(!show);
+  ui.UseLogScale->setEnabled(!show);
+  ui.UseLogScaleOpacity->setEnabled(!show);
+  ui.UseOpacityControlPointsFreehandDrawing->setEnabled(!show);
+  ui.EnableOpacityMapping->setEnabled(!show);
+  ui.ChoosePreset->setEnabled(!show);
+  ui.SaveAsPreset->setEnabled(!show);
+  ui.InvertTransferFunctions->setEnabled(!show);
+  ui.ChooseBoxColor->setVisible(show);
+
+  ui.AutomaticDataHistogramComputation->setEnabled(show);
+  ui.Transfer2DEditor->setVisible(show);
+  ui.ShowDataHistogram->setEnabled(!show);
+  ui.DataHistogramNumberOfBins->setEnabled(show);
+  ui.ComputeDataHistogram->setEnabled(!ui.AutomaticDataHistogramComputation->isChecked());
+
+  Q_EMIT this->use2DTransferFunctionChanged();
+}
+
+//-----------------------------------------------------------------------------
 void pqColorOpacityEditorWidget::showDataHistogramClicked(bool showDataHistogram)
 {
   this->updateDataHistogramEnableState();
@@ -1230,8 +1430,8 @@ void pqColorOpacityEditorWidget::realShowDataHistogram()
     // No cache or we are outdated, compute the histogram
     this->Internals->Ui.ComputeDataHistogram->clear();
     vtkSMTransferFunctionProxy* tfProxy = vtkSMTransferFunctionProxy::SafeDownCast(this->proxy());
-    histoTable =
-      tfProxy->ComputeDataHistogramTable(this->Internals->Ui.DataHistogramNumberOfBins->value());
+    Q_ASSERT(tfProxy);
+    histoTable = tfProxy->ComputeDataHistogramTable(this->dataHistogramNumberOfBins());
     this->Internals->Ui.OpacityEditor->setHistogramTable(histoTable);
 
     // Add all consumers, even non-visible, to the consumer connnector
@@ -1255,11 +1455,57 @@ void pqColorOpacityEditorWidget::realShowDataHistogram()
 }
 
 //-----------------------------------------------------------------------------
+void pqColorOpacityEditorWidget::realShow2DHistogram()
+{
+  this->Internals->Ui.Transfer2DEditor->show();
+
+  vtkImageData* hist2D =
+    vtkSMTransferFunction2DProxy::GetHistogram2DCache(this->transferFunction2DProxy());
+  if (!hist2D || this->Internals->HistogramOutdated)
+  {
+    this->Internals->Ui.ComputeDataHistogram->clear();
+    vtkSMTransferFunction2DProxy* tfProxy =
+      vtkSMTransferFunction2DProxy::SafeDownCast(this->transferFunction2DProxy());
+    Q_ASSERT(tfProxy);
+    hist2D = tfProxy->ComputeDataHistogram2D(this->dataHistogramNumberOfBins());
+    this->Internals->Ui.Transfer2DEditor->setHistogram(hist2D);
+
+    // Add all consumers, even non-visible, to the consumer connnector
+    // so the histogram can be set outdated correctly
+    this->Internals->ConsumerConnector->Disconnect();
+    std::set<vtkSMProxy*> usedProxy;
+    for (unsigned int cc = 0, max = tfProxy->GetNumberOfConsumers(); cc < max; ++cc)
+    {
+      vtkSMProxy* proxy = tfProxy->GetConsumerProxy(cc);
+      proxy = proxy ? proxy->GetTrueParentProxy() : nullptr;
+      vtkSMPVRepresentationProxy* consumer = vtkSMPVRepresentationProxy::SafeDownCast(proxy);
+      if (consumer && usedProxy.find(consumer) == usedProxy.end())
+      {
+        this->Internals->ConsumerConnector->Connect(consumer->GetProperty("Visibility"),
+          vtkCommand::ModifiedEvent, this, SLOT(setHistogramOutdated()));
+        usedProxy.insert(consumer);
+      }
+    }
+  }
+  else
+  {
+    this->Internals->Ui.Transfer2DEditor->setHistogram(hist2D);
+  }
+}
+
+//-----------------------------------------------------------------------------
 void pqColorOpacityEditorWidget::automaticDataHistogramComputationClicked(bool val)
 {
   if (val)
   {
-    this->showDataHistogramClicked(true);
+    if (this->Internals->Ui.Use2DTransferFunction->isChecked())
+    {
+      this->show2DHistogram(true);
+    }
+    else
+    {
+      this->showDataHistogramClicked(true);
+    }
   }
   this->updateDataHistogramEnableState();
   Q_EMIT this->automaticDataHistogramComputationChanged();
@@ -1278,7 +1524,14 @@ void pqColorOpacityEditorWidget::setHistogramOutdated()
   this->Internals->HistogramOutdated = true;
   if (this->Internals->Ui.AutomaticDataHistogramComputation->isChecked())
   {
-    this->showDataHistogramClicked(this->showDataHistogram());
+    if (this->Internals->Ui.Use2DTransferFunction->isChecked())
+    {
+      this->show2DHistogram(true);
+    }
+    else
+    {
+      this->showDataHistogramClicked(this->showDataHistogram());
+    }
   }
   else
   {
@@ -1289,6 +1542,10 @@ void pqColorOpacityEditorWidget::setHistogramOutdated()
 //-----------------------------------------------------------------------------
 void pqColorOpacityEditorWidget::updateDataHistogramEnableState()
 {
+  if (this->Internals->Ui.Use2DTransferFunction->isChecked())
+  {
+    return;
+  }
   bool showDataHistogram = this->Internals->Ui.ShowDataHistogram->isChecked();
   this->Internals->Ui.AutomaticDataHistogramComputation->setEnabled(showDataHistogram);
   this->Internals->Ui.DataHistogramNumberOfBins->setEnabled(showDataHistogram);
@@ -1305,6 +1562,92 @@ void pqColorOpacityEditorWidget::onRangeHandlesRangeChanged(double rangeMin, dou
 
   vtkSMTransferFunctionProxy::RescaleTransferFunction(colorProxy, range);
   vtkSMTransferFunctionProxy::RescaleTransferFunction(opacityProxy, range);
+  vtkSMTransferFunction2DProxy::RescaleTransferFunction(
+    this->transferFunction2DProxy(), range[0], range[1], range[0], range[1]);
   this->Internals->render();
   Q_EMIT this->changeFinished();
+}
+
+//-----------------------------------------------------------------------------
+void pqColorOpacityEditorWidget::initializeTransfer2DEditor(vtkPVTransferFunction2D* tf2d)
+{
+  Ui::ColorOpacityEditorWidget& ui = this->Internals->Ui;
+  ui.Transfer2DEditor->initialize(tf2d);
+}
+
+//-----------------------------------------------------------------------------
+void pqColorOpacityEditorWidget::transfer2DChanged()
+{
+  this->Internals->render();
+}
+
+//-----------------------------------------------------------------------------
+QList<QVariant> pqColorOpacityEditorWidget::transfer2DBoxes() const
+{
+  vtkPVTransferFunction2D* tf2d = vtkPVTransferFunction2D::SafeDownCast(
+    this->Internals->TransferFunction2DProxy->GetClientSideObject());
+  QList<QVariant> values;
+  if (tf2d == nullptr || !this->Internals->Ui.Transfer2DEditor->isInitialized())
+  {
+    return values;
+  }
+  std::vector<vtkSmartPointer<vtkPVTransferFunction2DBox>> boxes = tf2d->GetBoxes();
+  for (auto it = boxes.cbegin(); it < boxes.cend(); ++it)
+  {
+    vtkPVTransferFunction2DBox* box = (*it);
+    if (!box)
+    {
+      continue;
+    }
+    const vtkRectd r = box->GetBox();
+    for (int j = 0; j < 4; ++j)
+    {
+      values.push_back(r[j]);
+    }
+    const double* color = box->GetColor();
+    for (int j = 0; j < 4; ++j)
+    {
+      values.push_back(color[j]);
+    }
+  }
+  return values;
+}
+
+//-----------------------------------------------------------------------------
+void pqColorOpacityEditorWidget::setTransfer2DBoxes(const QList<QVariant>& values)
+{
+  Q_UNUSED(values);
+  // Since the vtkPVTransferFunction2D connected to the widget is directly obtained
+  // from the proxy, we don't need to do anything here. The widget will be
+  // updated when the proxy updates.
+}
+
+//-----------------------------------------------------------------------------
+void pqColorOpacityEditorWidget::chooseBoxColorAlpha()
+{
+  Ui::ColorOpacityEditorWidget& ui = this->Internals->Ui;
+  vtkTransferFunctionChartHistogram2D* chart =
+    vtkTransferFunctionChartHistogram2D::SafeDownCast(ui.Transfer2DEditor->chart());
+  if (!chart->IsInitialized())
+  {
+    return;
+  }
+  auto activeBox = chart->GetActiveBox();
+  if (!activeBox)
+  {
+    vtkGenericWarningMacro("No transfer function box selected. Click on a box to select it.");
+    return;
+  }
+  double color[4];
+  activeBox->GetBoxColor(color);
+
+  QColor initialColor;
+  initialColor.setRgbF(color[0], color[1], color[2], color[3]);
+  // Avoid using native color dialog because QtTesting fails to choose color on mac
+  QColor c = QColorDialog::getColor(initialColor, this, tr("Choose box color"),
+    QColorDialog::ShowAlphaChannel | QColorDialog::DontUseNativeDialog);
+  if (c.isValid())
+  {
+    chart->SetActiveBoxColorAlpha(c.redF(), c.greenF(), c.blueF(), c.alphaF());
+  }
 }

@@ -1857,6 +1857,27 @@ def GetOpacityTransferFunction(arrayname, representation=None, separate=False, *
     SetProperties(otf, **params)
     return otf
 
+def GetTransferFunction2D(arrayname, array2name=None, representation=None, separate=False,
+        **params):
+    """Get the 2D transfer function used to map either two data arrays or a data array against its
+    gradient to color and opacity. Representation is used to modify the array name when using a
+    separate color transfer function. separate can be used to recover the separate transfer function
+    even if it is not used by the representation. This may create a new 2D transfer function if none
+    exists, or return an existing one"""
+    array2name = "" if array2name is None else ("_%s" % array2name)
+    if representation:
+      if separate or representation.UseSeparateColorMap:
+        arrayname = ("%s%s_%s%s" % ("Separate_", representation.SMProxy.GetGlobalIDAsString(),
+            arrayname, array2name))
+    if not servermanager.ActiveConnection:
+        raise RuntimeError ("Missing active session")
+    session = servermanager.ActiveConnection.Session
+    tfmgr = servermanager.vtkSMTransferFunctionManager()
+    tf2d = servermanager._getPyProxy(\
+            tfmgr.GetTransferFunction2D(arrayname, session.GetSessionProxyManager()))
+    SetProperties(tf2d, **params)
+    return tf2d
+
 # -----------------------------------------------------------------------------
 def ImportPresets(filename):
     """Import presets from a file. The file can be in the legacy color map xml

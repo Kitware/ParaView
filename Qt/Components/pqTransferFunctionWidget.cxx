@@ -475,8 +475,8 @@ void pqTransferFunctionWidget::initialize(
     this->Internals->ChartXY->SetTFRange(vtkVector2d(ctf->GetRange()));
   }
 
-  pqCoreUtilities::connect(
-    this->Internals->ChartXY, vtkCommand::MouseMoveEvent, this, SLOT(showUsageStatus()));
+  pqCoreUtilities::connect(this->Internals->Widget->interactor(), vtkCommand::MouseMoveEvent, this,
+    SLOT(showUsageStatus()));
 }
 
 //-----------------------------------------------------------------------------

@@ -36,8 +36,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkType.h"
 #include <QWidget>
 
-class vtkScalarsToColors;
 class vtkPiecewiseFunction;
+class vtkScalarsToColors;
 class vtkTable;
 
 /**

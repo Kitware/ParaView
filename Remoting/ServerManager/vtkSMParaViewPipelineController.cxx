@@ -845,6 +845,25 @@ bool vtkSMParaViewPipelineController::RegisterOpacityTransferFunction(
 }
 
 //----------------------------------------------------------------------------
+bool vtkSMParaViewPipelineController::RegisterTransferFunction2D(
+  vtkSMProxy* proxy, const char* proxyname)
+{
+  if (!proxy)
+  {
+    return false;
+  }
+
+  // Register proxies created for proxy list domains.
+  this->RegisterProxiesForProxyListDomains(proxy);
+
+  // Handle initialization helpers.
+  this->ProcessInitializationHelperRegistration(proxy);
+
+  proxy->GetSessionProxyManager()->RegisterProxy("transfer_2d_functions", proxyname, proxy);
+  return true;
+}
+
+//----------------------------------------------------------------------------
 bool vtkSMParaViewPipelineController::RegisterAnimationProxy(vtkSMProxy* proxy)
 {
   if (!proxy)

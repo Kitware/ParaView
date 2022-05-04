@@ -30,7 +30,9 @@
 #include "vtkOutlineSource.h"
 #include "vtkPVLODVolume.h"
 #include "vtkPVRenderView.h"
+#include "vtkPVTransferFunction2D.h"
 #include "vtkPartitionedDataSet.h"
+#include "vtkPointData.h"
 #include "vtkPolyDataMapper.h"
 #include "vtkRectilinearGrid.h"
 #include "vtkRenderer.h"
@@ -117,7 +119,10 @@ vtkImageVolumeRepresentation::vtkImageVolumeRepresentation()
 }
 
 //----------------------------------------------------------------------------
-vtkImageVolumeRepresentation::~vtkImageVolumeRepresentation() = default;
+vtkImageVolumeRepresentation::~vtkImageVolumeRepresentation()
+{
+  this->TransferFunction2D = nullptr;
+}
 
 //----------------------------------------------------------------------------
 int vtkImageVolumeRepresentation::FillInputPortInformation(int, vtkInformation* info)
@@ -397,27 +402,46 @@ void vtkImageVolumeRepresentation::UpdateMapperParameters()
       this->Property->SetIndependentComponents(false);
     }
 
-    // Update the mapper's vector mode
-    vtkColorTransferFunction* ctf = this->Property->GetRGBTransferFunction(0);
-
-    // When vtkScalarsToColors::MAGNITUDE mode is active, vtkSmartVolumeMapper
-    // uses an internally generated (single-component) dataset.  However,
-    // unchecking MapScalars (e.g. IndependentComponents == 0) requires 2C or 4C
-    // data. In that case, vtkScalarsToColors::COMPONENT is forced in order to
-    // make vtkSmartVolumeMapper use the original multiple-component dataset.
-    int const indep = this->Property->GetIndependentComponents();
-    int const mode = indep ? ctf->GetVectorMode() : vtkScalarsToColors::COMPONENT;
-    int const comp = indep ? ctf->GetVectorComponent() : 0;
-
-    if (auto smartVolumeMapper = vtkSmartVolumeMapper::SafeDownCast(this->VolumeMapper))
+    if (this->UseTransfer2D)
     {
-      smartVolumeMapper->SetVectorMode(mode);
-      smartVolumeMapper->SetVectorComponent(comp);
+      this->Property->SetTransferFunctionMode(vtkVolumeProperty::TF_2D);
+      if (auto mbMapper = vtkMultiBlockVolumeMapper::SafeDownCast(this->VolumeMapper))
+      {
+        if (!this->UseGradientForTransfer2D && !this->ColorArray2Name.empty())
+        {
+          mbMapper->SetTransfer2DYAxisArray(this->ColorArray2Name.c_str());
+        }
+        else
+        {
+          mbMapper->SetTransfer2DYAxisArray(nullptr);
+        }
+      }
     }
-    else if (auto mbMapper = vtkMultiBlockVolumeMapper::SafeDownCast(this->VolumeMapper))
+    else
     {
-      mbMapper->SetVectorMode(mode);
-      mbMapper->SetVectorComponent(comp);
+      this->Property->SetTransferFunctionMode(vtkVolumeProperty::TF_1D);
+      // Update the mapper's vector mode
+      vtkColorTransferFunction* ctf = this->Property->GetRGBTransferFunction(0);
+
+      // When vtkScalarsToColors::MAGNITUDE mode is active, vtkSmartVolumeMapper
+      // uses an internally generated (single-component) dataset.  However,
+      // unchecking MapScalars (e.g. IndependentComponents == 0) requires 2C or 4C
+      // data. In that case, vtkScalarsToColors::COMPONENT is forced in order to
+      // make vtkSmartVolumeMapper use the original multiple-component dataset.
+      int const indep = this->Property->GetIndependentComponents();
+      int const mode = indep ? ctf->GetVectorMode() : vtkScalarsToColors::COMPONENT;
+      int const comp = indep ? ctf->GetVectorComponent() : 0;
+
+      if (auto smartVolumeMapper = vtkSmartVolumeMapper::SafeDownCast(this->VolumeMapper))
+      {
+        smartVolumeMapper->SetVectorMode(mode);
+        smartVolumeMapper->SetVectorComponent(comp);
+      }
+      else if (auto mbMapper = vtkMultiBlockVolumeMapper::SafeDownCast(this->VolumeMapper))
+      {
+        mbMapper->SetVectorMode(mode);
+        mbMapper->SetVectorComponent(comp);
+      }
     }
   }
 }
@@ -430,6 +454,11 @@ void vtkImageVolumeRepresentation::PrintSelf(ostream& os, vtkIndent indent)
      << ", " << this->CroppingOrigin[2] << endl;
   os << indent << "Cropping Scale: " << this->CroppingScale[0] << ", " << this->CroppingScale[1]
      << ", " << this->CroppingScale[2] << endl;
+  os << indent << "UseTransfer2D: " << this->UseTransfer2D << endl;
+  os << indent << "UseGradientForTransfer2D: " << this->UseGradientForTransfer2D << endl;
+  os << indent << "ColorArray2Name: " << this->ColorArray2Name << endl;
+  os << indent << "ColorArray2FieldAssociation: " << this->ColorArray2FieldAssociation << endl;
+  os << indent << "ColorArray2Component: " << this->ColorArray2Component << endl;
 }
 
 //----------------------------------------------------------------------------
@@ -504,4 +533,94 @@ void vtkImageVolumeRepresentation::SetIsosurfaceValue(int i, double value)
 void vtkImageVolumeRepresentation::SetNumberOfIsosurfaces(int number)
 {
   this->Property->GetIsoSurfaceValues()->SetNumberOfContours(number);
+}
+
+//----------------------------------------------------------------------------
+void vtkImageVolumeRepresentation::SetUseTransfer2D(bool value)
+{
+  if (this->UseTransfer2D != value)
+  {
+    this->UseTransfer2D = value;
+    this->MarkModified();
+  }
+}
+
+//----------------------------------------------------------------------------
+void vtkImageVolumeRepresentation::SetUseGradientForTransfer2D(bool value)
+{
+  if (this->UseGradientForTransfer2D != value)
+  {
+    this->UseGradientForTransfer2D = value;
+    this->MarkModified();
+  }
+}
+
+//----------------------------------------------------------------------------
+void vtkImageVolumeRepresentation::SelectColorArray2(
+  int, int, int, int fieldAssociation, const char* name)
+{
+  std::string newName;
+  if (name)
+  {
+    newName = std::string(name);
+  }
+
+  if (this->ColorArray2Name != newName)
+  {
+    this->ColorArray2Name = newName;
+    this->MarkModified();
+  }
+
+  if (this->ColorArray2FieldAssociation != fieldAssociation)
+  {
+    this->ColorArray2FieldAssociation = fieldAssociation;
+    this->MarkModified();
+  }
+}
+
+//----------------------------------------------------------------------------
+void vtkImageVolumeRepresentation::SelectColorArray2Component(int component)
+{
+  if (this->ColorArray2Component != component)
+  {
+    this->ColorArray2Component = component;
+    this->MarkModified();
+  }
+}
+
+//----------------------------------------------------------------------------
+void vtkImageVolumeRepresentation::SetTransferFunction2D(vtkPVTransferFunction2D* transfer2D)
+{
+  if (this->TransferFunction2D == nullptr && transfer2D == nullptr)
+  {
+    return;
+  }
+  if (this->TransferFunction2D && transfer2D && this->TransferFunction2D == transfer2D)
+  {
+    return;
+  }
+
+  if (this->TransferFunction2D)
+  {
+    this->TransferFunction2D = nullptr;
+    this->Property->SetTransferFunction2D(nullptr);
+  }
+
+  if (transfer2D)
+  {
+    this->TransferFunction2D = transfer2D;
+    vtkImageData* func = this->TransferFunction2D->GetFunction();
+    if (func)
+    {
+      vtkPointData* pd = func->GetPointData();
+      if (!pd || (pd->GetScalars() == nullptr) || pd->GetScalars()->GetNumberOfComponents() != 4)
+      {
+        int* dims = this->TransferFunction2D->GetOutputDimensions();
+        func->SetDimensions(dims[0], dims[1], 1);
+        func->AllocateScalars(VTK_FLOAT, 4);
+      }
+      this->Property->SetTransferFunction2D(func);
+    }
+    this->MarkModified();
+  }
 }

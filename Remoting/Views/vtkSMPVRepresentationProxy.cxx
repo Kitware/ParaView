@@ -35,6 +35,7 @@
 #include "vtkSMSettings.h"
 #include "vtkSMStringVectorProperty.h"
 #include "vtkSMTrace.h"
+#include "vtkSMTransferFunction2DProxy.h"
 #include "vtkSMTransferFunctionManager.h"
 #include "vtkSMTransferFunctionProxy.h"
 #include "vtkStringList.h"
@@ -290,7 +291,8 @@ bool vtkSMPVRepresentationProxy::RescaleTransferFunctionToDataRange(
 
   vtkSMProperty* lutProperty = this->GetProperty("LookupTable");
   vtkSMProperty* sofProperty = this->GetProperty("ScalarOpacityFunction");
-  if (!lutProperty && !sofProperty)
+  vtkSMProperty* tf2dProperty = this->GetProperty("TransferFunction2D");
+  if (!lutProperty && !sofProperty && !tf2dProperty)
   {
     vtkWarningMacro("No 'LookupTable' and 'ScalarOpacityFunction' found.");
     return false;
@@ -298,6 +300,7 @@ bool vtkSMPVRepresentationProxy::RescaleTransferFunctionToDataRange(
 
   vtkSMProxy* lut = vtkSMPropertyHelper(lutProperty).GetAsProxy();
   vtkSMProxy* sof = vtkSMPropertyHelper(sofProperty).GetAsProxy();
+  vtkSMProxy* tf2d = vtkSMPropertyHelper(tf2dProperty).GetAsProxy();
 
   if (force == false &&
     vtkSMPropertyHelper(lut, "AutomaticRescaleRangeMode", true).GetAsInt() ==
@@ -429,7 +432,16 @@ bool vtkSMPVRepresentationProxy::RescaleTransferFunctionToDataRange(
       {
         vtkSMTransferFunctionProxy::RescaleTransferFunction(sof, rangeOpacity, extend);
       }
-      return (lut || sof);
+
+      if (tf2d && rangeColor[1] >= rangeColor[0])
+      {
+        double range2D[4];
+        vtkSMTransferFunction2DProxy::GetRange(tf2d, range2D);
+        range2D[0] = rangeColor[0];
+        range2D[1] = rangeColor[1];
+        vtkSMTransferFunction2DProxy::RescaleTransferFunction(tf2d, range2D);
+      }
+      return (lut || sof || tf2d);
     }
   }
   return false;
@@ -478,14 +490,22 @@ bool vtkSMPVRepresentationProxy::RescaleTransferFunctionToVisibleRange(
 
   vtkSMProperty* lutProperty = this->GetProperty("LookupTable");
   vtkSMProperty* sofProperty = this->GetProperty("ScalarOpacityFunction");
-  if (!lutProperty && !sofProperty)
+  vtkSMProperty* useTransfer2DProperty = this->GetProperty("UseTransfer2D");
+  vtkSMProperty* transfer2DProperty = this->GetProperty("TransferFunction2D");
+  if ((!lutProperty && !sofProperty) || (!useTransfer2DProperty && !transfer2DProperty))
   {
     // No LookupTable and ScalarOpacityFunction found.
+    // No UseTransfer2D and TransferFunction2D found.
     return false;
   }
 
   vtkSMProxy* lut = lutProperty ? vtkSMPropertyHelper(lutProperty).GetAsProxy() : nullptr;
   vtkSMProxy* sof = sofProperty ? vtkSMPropertyHelper(sofProperty).GetAsProxy() : nullptr;
+  bool useTransfer2D =
+    useTransfer2DProperty ? vtkSMPropertyHelper(useTransfer2DProperty).GetAsInt() == 1 : false;
+  vtkSMProxy* tf2d = (useTransfer2D && transfer2DProperty)
+    ? vtkSMPropertyHelper(transfer2DProperty).GetAsProxy()
+    : nullptr;
 
   // We need to determine the component number to use from the lut.
   int component = -1;
@@ -506,18 +526,32 @@ bool vtkSMPVRepresentationProxy::RescaleTransferFunctionToVisibleRange(
     return false;
   }
 
-  if (lut)
+  if (!useTransfer2D)
   {
-    vtkSMTransferFunctionProxy::RescaleTransferFunction(lut, range, false);
-    vtkSMProxy* sof_lut = vtkSMPropertyHelper(lut, "ScalarOpacityFunction", true).GetAsProxy();
-    if (sof_lut && sof != sof_lut)
+    if (lut)
     {
-      vtkSMTransferFunctionProxy::RescaleTransferFunction(sof_lut, range, false);
+      vtkSMTransferFunctionProxy::RescaleTransferFunction(lut, range, false);
+      vtkSMProxy* sof_lut = vtkSMPropertyHelper(lut, "ScalarOpacityFunction", true).GetAsProxy();
+      if (sof_lut && sof != sof_lut)
+      {
+        vtkSMTransferFunctionProxy::RescaleTransferFunction(sof_lut, range, false);
+      }
+    }
+    if (sof)
+    {
+      vtkSMTransferFunctionProxy::RescaleTransferFunction(sof, range, false);
     }
   }
-  if (sof)
+  else
   {
-    vtkSMTransferFunctionProxy::RescaleTransferFunction(sof, range, false);
+    if (tf2d)
+    {
+      double r[4];
+      vtkSMTransferFunction2DProxy::GetRange(tf2d, r);
+      r[0] = range[0];
+      r[1] = range[1];
+      vtkSMTransferFunction2DProxy::RescaleTransferFunction(tf2d, r, false);
+    }
   }
   return true;
 }
@@ -570,11 +604,13 @@ bool vtkSMPVRepresentationProxy::SetScalarColoringInternal(
   // Now, setup transfer functions.
   bool haveComponent = useComponent;
   bool separate = (vtkSMPropertyHelper(this, "UseSeparateColorMap", true).GetAsInt() != 0);
+  bool useTransfer2D = (vtkSMPropertyHelper(this, "UseTransfer2D", true).GetAsInt() != 0);
   std::string decoratedArrayName = this->GetDecoratedArrayName(arrayname);
   vtkNew<vtkSMTransferFunctionManager> mgr;
+  vtkSMProxy* lutProxy = nullptr;
   if (vtkSMProperty* lutProperty = this->GetProperty("LookupTable"))
   {
-    vtkSMProxy* lutProxy =
+    lutProxy =
       mgr->GetColorTransferFunction(decoratedArrayName.c_str(), this->GetSessionProxyManager());
     if (useComponent)
     {
@@ -653,6 +689,19 @@ bool vtkSMPVRepresentationProxy::SetScalarColoringInternal(
     vtkSMPropertyHelper(sofProperty).Set(sofProxy);
   }
 
+  if (vtkSMProperty* tf2dProperty = this->GetProperty("TransferFunction2D"))
+  {
+    vtkSMProxy* tf2dProxy =
+      mgr->GetTransferFunction2D(decoratedArrayName.c_str(), this->GetSessionProxyManager());
+    vtkSMPropertyHelper(tf2dProperty).Set(tf2dProxy);
+    this->UpdateProperty("TransferFunction2D");
+    if (lutProxy && useTransfer2D)
+    {
+      vtkSMPropertyHelper(lutProxy, "Use2DTransferFunction").Set(useTransfer2D);
+      lutProxy->UpdateVTKObjects();
+    }
+  }
+
   this->UpdateVTKObjects();
   return true;
 }
@@ -660,14 +709,35 @@ bool vtkSMPVRepresentationProxy::SetScalarColoringInternal(
 //----------------------------------------------------------------------------
 std::string vtkSMPVRepresentationProxy::GetDecoratedArrayName(const std::string& arrayname)
 {
+  std::ostringstream ss;
+  ss << arrayname;
+  if (vtkSMProperty* tf2dProperty = this->GetProperty("TransferFunction2D"))
+  {
+    bool useGradientAsY =
+      (vtkSMPropertyHelper(this, "UseGradientForTransfer2D", true).GetAsInt() == 1);
+    if (!useGradientAsY)
+    {
+      std::string array2Name;
+      vtkSMProperty* colorArray2Property = this->GetProperty("ColorArray2Name");
+      if (colorArray2Property)
+      {
+        vtkSMPropertyHelper colorArray2Helper(colorArray2Property);
+        array2Name = colorArray2Helper.GetInputArrayNameToProcess();
+      }
+      if (!array2Name.empty())
+      {
+        ss << "_" << array2Name;
+      }
+    }
+  }
   if (vtkSMPropertyHelper(this, "UseSeparateColorMap", true).GetAsInt())
   {
     // Use global id for separate color map
-    std::ostringstream ss;
-    ss << "Separate_" << this->GetGlobalIDAsString() << "_" << arrayname;
-    return ss.str();
+    std::ostringstream ss1;
+    ss1 << "Separate_" << this->GetGlobalIDAsString() << "_" << ss.str();
+    return ss1.str();
   }
-  return arrayname;
+  return ss.str();
 }
 
 //----------------------------------------------------------------------------

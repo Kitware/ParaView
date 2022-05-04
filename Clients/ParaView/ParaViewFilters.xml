@@ -26,10 +26,11 @@
     <Proxy group="filters" name="ExtractCellsAlongLine" omit_from_toolbar="1" />
     <Proxy group="filters" name="ExtractCellsAlongLineCustom" omit_from_toolbar="1" />
     <Proxy group="filters" name="ExtractCellsByType" omit_from_toolbar="1" />
+    <Proxy group="filters" name="ExtractFieldDataOverTime" />
     <Proxy group="filters" name="ExtractSelection" />
     <Proxy group="filters" name="ExtractSelectionOverTime" />
     <Proxy group="filters" name="ExtractHistogram" />
-    <Proxy group="filters" name="ExtractFieldDataOverTime" />
+    <Proxy group="filters" name="ExtractHistogram2D" omit_from_toolbar="1" />
     <Proxy group="filters" name="IntegrateAttributes" omit_from_toolbar="1" />
     <Proxy group="filters" name="ProbeLine" />
     <Proxy group="filters" name="ProbePoint" />
@@ -237,6 +238,7 @@
   <Proxy group="filters" name="ExtractGrid" icon=":/pqWidgets/Icons/pqExtractGrid.svg" />
   <Proxy group="filters" name="ExtractHierarchicalDataSets" />
   <Proxy group="filters" name="ExtractHistogram" icon=":/pqWidgets/Icons/pqHistogram24.png" />
+  <Proxy group="filters" name="ExtractHistogram2D" />
   <Proxy group="filters" name="ExtractLocation" />
   <Proxy group="filters" name="ExtractParticlesOverTime" />
   <Proxy group="filters" name="ExtractSelection" icon=":/pqWidgets/Icons/pqExtractSelection.svg" />

@@ -30,8 +30,10 @@
 
 #include "vtkRemotingViewsModule.h" // needed for export macro
 
+// Forward declarations
 class vtkAbstractArray;
 class vtkDoubleArray;
+class vtkPVTransferFunction2D;
 class vtkVariantArray;
 
 class VTKREMOTINGVIEWS_EXPORT vtkPVDiscretizableColorTransferFunction
@@ -83,6 +85,14 @@ public:
    */
   void Build() override;
 
+  ///@{
+  /**
+   * Set/get the 2D transfer function.
+   */
+  virtual void SetTransferFunction2D(vtkPVTransferFunction2D* f);
+  virtual vtkPVTransferFunction2D* GetTransferFunction2D() const;
+  ///@}
+
 protected:
   vtkPVDiscretizableColorTransferFunction();
   ~vtkPVDiscretizableColorTransferFunction() override;
@@ -117,6 +127,11 @@ private:
    * Build time for this subclass.
    */
   vtkTimeStamp BuildTime;
+
+  /**
+   * 2D transfer function
+   */
+  vtkSmartPointer<vtkPVTransferFunction2D> TransferFunction2D;
 };
 
 #endif

@@ -1,0 +1,24 @@
+<ServerManagerConfiguration>
+  <ProxyGroup name="filters">
+
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkImageAccumulate"
+                 name="ImageAccumulate"
+                 label="Image Accumulate">
+    <Documentation>
+    </Documentation>
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkImageData" />
+        </DataTypeDomain>
+        <Documentation>This property specifies the input to the Image Accumulate
+        filter.</Documentation>
+      </InputProperty>
+  </SourceProxy>
+  </ProxyGroup>
+</ServerManagerConfiguration>

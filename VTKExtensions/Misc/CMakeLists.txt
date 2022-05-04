@@ -38,6 +38,7 @@ set(classes
   vtkMergeBlocks
   vtkMinMax
   vtkPExtractHistogram
+  vtkPVExtractHistogram2D
   vtkPVBox
   vtkPVChangeOfBasisHelper
   vtkPVCylinder

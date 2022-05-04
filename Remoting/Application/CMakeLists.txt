@@ -182,6 +182,11 @@ if (TARGET VTK::ImagingSources)
     Resources/sources_imagingsources.xml)
 endif ()
 
+if (TARGET VTK::ImagingStatistics)
+  list(APPEND xml_files
+    Resources/filters_imagingstatistics.xml)
+endif ()
+
 if (TARGET VTK::FiltersParallelDIY2)
   list(APPEND xml_files
     Resources/filters_filtersparalleldiy2.xml)

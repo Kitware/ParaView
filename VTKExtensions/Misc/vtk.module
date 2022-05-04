@@ -20,6 +20,8 @@ PRIVATE_DEPENDS
   ParaView::RemotingCore
   ParaView::VTKExtensionsCore
   VTK::FiltersCore # needed for append
+  VTK::FiltersGeneral
+  VTK::FiltersImaging
   VTK::IOLegacy
   VTK::ParallelCore
   VTK::vtksys

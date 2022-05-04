@@ -1164,6 +1164,29 @@
         </Hints>
       </ProxyProperty>
 
+      <ProxyProperty command="SetTransferFunction2D"
+                     name="TransferFunction2D" >
+        <ProxyGroupDomain name="groups">
+          <Group name="transfer_2d_functions" />
+        </ProxyGroupDomain>
+        <Documentation>
+          Proxy property used by the ColorOpacityWidget to store a 2D transfer function (vtkImageData).
+        </Documentation>
+        <Hints>
+          <!-- when resetting to XML defaults, we don't want this property to
+               get reset. This is managed explicitly. So let's just skip this
+               from the default mechanism -->
+          <NoDefault />
+        </Hints>
+      </ProxyProperty>
+      <IntVectorProperty default_values="0"
+                         name="Use2DTransferFunction"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Proxy only property used by the ColorOpacityWidget to know if a 2D transfer function is being used.
+        </Documentation>
+      </IntVectorProperty>
       <DoubleVectorProperty clean_command="RemoveAllPoints"
                             command="AddRGBPoint"
                             name="RGBPoints"
@@ -1427,6 +1450,8 @@
         <Property name="EnableOpacityMapping" function="EnableOpacityMapping" />
         <Property name="RGBPoints" function="XRGBPoints" />
         <Property name="ScalarOpacityFunction" function="ScalarOpacityFunction" />
+        <Property name="TransferFunction2D" function="TransferFunction2D" />
+        <Property name="Use2DTransferFunction" function="Use2DTransferFunction" />
         <Property name="UseLogScale" function="UseLogScale" />
         <Property name="UseOpacityControlPointsFreehandDrawing" function="UseOpacityControlPointsFreehandDrawing" />
         <Property name="ShowDataHistogram" function="ShowDataHistogram" />
@@ -1500,6 +1525,81 @@
     </TransferFunctionProxy>
 
     <!-- end of "transfer_functions" -->
+  </ProxyGroup>
+
+  <!-- ==================================================================== -->
+  <ProxyGroup name="transfer_2d_functions">
+    <!-- ================================================================== -->
+    <TransferFunction2DProxy class="vtkPVTransferFunction2D"
+                           name="TransferFunction2D"
+                           post_push="Build"
+                           processes="client|renderserver|dataserver">
+      <IntVectorProperty default_values="0"
+                         name="AutomaticRescaleRangeMode"
+                         number_of_elements="1">
+        <EnumerationDomain name="enum">
+          <Entry value="-1" text="Never"/>
+          <Entry value="0" text="Grow and update on 'Apply'"/>
+          <Entry value="1" text="Grow and update every timestep"/>
+          <Entry value="2" text="Update on 'Apply'"/>
+          <Entry value="3" text="Clamp and update every timestep"/>
+        </EnumerationDomain>
+        <Documentation>
+          Choose whether and how to automatically rescale the color map range.
+          "Never" means the color map range will never be changed.
+          "Grow and update on 'Apply'" will expand the range to contain the
+          union of the current range and the range of the current data source.
+          "Grow and update every timestep" will expand the range to contain
+          the union of the current range and the range of the current data source
+          when the timestep is changed. "Clamp and update every timestep" will
+          update the color map range to the current source data range.
+        </Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty clean_command="RemoveAllBoxes"
+                            command="AddControlBox"
+                            name="Boxes"
+                            number_of_elements_per_command="8"
+                            repeat_command="1">
+        <Documentation>
+          Specify the box parameters for the 2D transfer function. These are
+          a list of 8-tuples of the form (x, y, width, height, r, g, b, a) where
+          (x, y) is the position i.e. the range-min of the box, (width, height)
+          specify the dimensions of the box in the scalar units and (r, g, b, a)
+          denote the color with maximum alpha of the box. The color and alpha
+          components are in the range [0, 1].
+        </Documentation>
+      </DoubleVectorProperty>
+      <IntVectorProperty default_values="0"
+                         name="ScalarRangeInitialized"
+                         number_of_elements="1"
+                         panel_visibility="never" >
+        <Documentation>
+          Set to 1 to indicate that the scalar range has been initialized.
+        </Documentation>
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+      <DoubleVectorProperty command="SetRange"
+                         default_values="0.0 1.0 0.0 1.0"
+                         name="Range"
+                         number_of_elements="4"
+                         panel_visibility="never" >
+        <Documentation>
+          The range of the X and Y axes of the transfer function. This is
+          specified as a 4-tuple of the form (xmin, xmax, ymin, ymax).
+        </Documentation>
+      </DoubleVectorProperty>
+      <IntVectorProperty command="SetOutputDimensions"
+                         default_values="10 10"
+                         name="OutputDimensions"
+                         number_of_elements="2"
+                         panel_visibility="never" >
+        <Documentation>
+          The dimensions of the image that represents this 2D transfer function.
+        </Documentation>
+      </IntVectorProperty>
+      <Property command="Build" name="Build" panel_visibility="never" />
+    </TransferFunction2DProxy>
+    <!-- end of "transfer_2d_functions" -->
   </ProxyGroup>
 
   <!-- ==================================================================== -->

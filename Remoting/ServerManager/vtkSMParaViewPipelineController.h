@@ -204,6 +204,15 @@ public:
   }
 
   /**
+   * Registration method for 2D transfer function proxies.
+   */
+  virtual bool RegisterTransferFunction2D(vtkSMProxy* proxy, const char* proxyname);
+  virtual bool RegisterTransferFunction2D(vtkSMProxy* proxy)
+  {
+    return this->RegisterTransferFunction2D(proxy, nullptr);
+  }
+
+  /**
    * Use this method after PreInitializeProxy() and PostInitializeProxy() to
    * register a light proxy with the proxy manager. This will also perform
    * needed python tracing.

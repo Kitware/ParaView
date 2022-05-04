@@ -555,5 +555,251 @@
       </IntVectorProperty>
       <!-- End ReductionFilter -->
     </SourceProxy>
+
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkPVExtractHistogram2D"
+                 label="Histogram 2D"
+                 name="ExtractHistogram2D">
+      <Documentation long_help="Extract a 2D histogram from field data."
+                     short_help="Extract a 2D histogram from field data.">
+                     </Documentation>
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkDataSet" />
+        </DataTypeDomain>
+        <InputArrayDomain name="input_array">
+        </InputArrayDomain>
+        <Documentation>
+            This property specifies the input to the Histogram filter.
+        </Documentation>
+      </InputProperty>
+      <StringVectorProperty animateable="0"
+                            command="SetInputArrayToProcess"
+                            element_types="0 0 0 0 2"
+                            name="SelectInputArray1"
+                            label="Input Array for X-Axis"
+                            number_of_elements="5">
+        <ArrayListDomain attribute_type="Scalars"
+                         name="array_list">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input" />
+          </RequiredProperties>
+        </ArrayListDomain>
+        <Documentation>This property indicates the name of the array from which
+        to compute the histogram.</Documentation>
+      </StringVectorProperty>
+      <IntVectorProperty animateable="0"
+                         command="SetComponent0"
+                         default_values="0"
+                         name="Component0"
+                         label="Component for X-Axis array"
+                         number_of_elements="1">
+        <NumberOfComponentsDomain name="comp0" enable_magnitude="0">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input" />
+            <Property function="ArraySelection"
+                      name="SelectInputArray1" />
+          </RequiredProperties>
+        </NumberOfComponentsDomain>
+        <Documentation>The value of this property specifies the array component
+        from which the histogram should be computed.</Documentation>
+        </IntVectorProperty>
+
+       <StringVectorProperty animateable="0"
+                            command="SetInputArrayToProcess"
+                            element_types="0 0 0 0 2"
+                            name="SelectInputArray2"
+                            label="Input Array for Y-Axis"
+                            default_values="1 0 0 0 0"
+                            number_of_elements="5">
+        <ArrayListDomain attribute_type="Scalars"
+                         name="array_list">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input" />
+          </RequiredProperties>
+        </ArrayListDomain>
+        <Documentation>
+          This property indicates the name of the array from which
+          to compute the histogram.
+        </Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="ShowWidgetDecorator">
+            <Property name="UseGradientForYAxis" function="boolean_invert" />
+          </PropertyWidgetDecorator>
+        </Hints>
+      </StringVectorProperty>
+      <IntVectorProperty animateable="0"
+                         command="SetComponent1"
+                         default_values="0"
+                         name="Component1"
+                         label="Component for Y-Axis array"
+                         number_of_elements="1">
+        <NumberOfComponentsDomain name="comp1" enable_magnitude="1">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input" />
+            <Property function="ArraySelection"
+                      name="SelectInputArray2" />
+          </RequiredProperties>
+        </NumberOfComponentsDomain>
+        <Documentation>
+          The value of this property specifies the array component
+          from which the histogram should be computed.
+        </Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="ShowWidgetDecorator">
+            <Property name="UseGradientForYAxis" function="boolean_invert" />
+          </PropertyWidgetDecorator>
+        </Hints>
+      </IntVectorProperty>
+      <IntVectorProperty animateable="0"
+                         command="SetNumberOfBins"
+                         default_values="256 256"
+                         name="NumberOfBins"
+                         label="Number of Bins"
+                         number_of_elements="2">
+      </IntVectorProperty>
+      <IntVectorProperty command="SetUseGradientForYAxis"
+                         default_values="1"
+                         name="UseGradientForYAxis"
+                         label="Use Gradient as Y-Axis Array"
+                         number_of_elements="1"
+                         panel_visibility="advanced">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          If this property is on, the gradient of the input scalar array will be used for the Y
+          axis of the 2D histogram.
+        </Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetUseCustomBinRanges0"
+                         default_values="0"
+                         name="UseCustomBinRangesX"
+                         label="Use Custom Bin Ranges for X-Axis"
+                         number_of_elements="1"
+                         panel_visibility="advanced">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          When set to true, custom bin ranges will be used instead of using the full range for the
+          selected array for X axis. By default, set to false.
+        </Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty command="SetCustomBinRanges0"
+                            default_values="0.0 100.0"
+                            name="CustomBinRangesX"
+                            number_of_elements="2"
+                            label="Custom Bin Ranges for X-Axis"
+                            panel_visibility="advanced">
+        <Documentation>
+          Set custom bin ranges to use. These are used only when
+          UseCustomBinRanges is set to true.
+        </Documentation>
+        <ArrayRangeDomain name="scalar_range">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input" />
+            <Property function="ArraySelection"
+                      name="SelectInputArray1" />
+          </RequiredProperties>
+        </ArrayRangeDomain>
+        <Hints>
+          <PropertyWidgetDecorator type="ShowWidgetDecorator">
+            <Property name="UseCustomBinRangesX" function="boolean" />
+          </PropertyWidgetDecorator>
+        </Hints>
+      </DoubleVectorProperty>
+      <IntVectorProperty command="SetUseCustomBinRanges1"
+                         default_values="0"
+                         name="UseCustomBinRangesY"
+                         label="Use Custom Bin Ranges for Y-Axis"
+                         number_of_elements="1"
+                         panel_visibility="advanced">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          When set to true, custom bin ranges will be used instead of using the full range for the
+          selected array for X axis. By default, set to false.
+        </Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="ShowWidgetDecorator">
+            <Property name="UseGradientForYAxis" function="boolean_invert" />
+          </PropertyWidgetDecorator>
+        </Hints>
+      </IntVectorProperty>
+      <DoubleVectorProperty command="SetCustomBinRanges1"
+                            default_values="0.0 100.0"
+                            name="CustomBinRangesY"
+                            number_of_elements="2"
+                            label="Custom Bin Ranges for Y-Axis"
+                            panel_visibility="advanced">
+        <Documentation>
+          Set custom bin ranges to use. These are used only when
+          UseCustomBinRanges is set to true.
+        </Documentation>
+        <ArrayRangeDomain name="scalar_range">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input" />
+            <Property function="ArraySelection"
+                      name="SelectInputArray2" />
+          </RequiredProperties>
+        </ArrayRangeDomain>
+        <Hints>
+          <PropertyWidgetDecorator type="ShowWidgetDecorator">
+            <Property name="UseCustomBinRangesY" function="boolean" />
+          </PropertyWidgetDecorator>
+        </Hints>
+      </DoubleVectorProperty>
+      <IntVectorProperty command="SetUseInputRangesForOutputBounds"
+                         default_values="0"
+                         name="UseInputRangesForOutputBounds"
+                         label="Histogram Bounds from Input"
+                         number_of_elements="1"
+                         panel_visibility="advanced">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          When set to true, the input scalar ranges will be used to compute the histogram origin and spacing. By default, set to false.
+        </Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty command="SetOutputOrigin"
+                            default_values="0.0 0.0"
+                            name="OutputOrigin"
+                            number_of_elements="2"
+                            label="Histogram Origin"
+                            panel_visibility="advanced">
+        <Documentation>
+          The origin of the output histogram image. These are used only when
+          UseInputRangesForOutputBounds is set to false.
+        </Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="ShowWidgetDecorator">
+            <Property name="UseInputRangesForOutputBounds" function="boolean_invert" />
+          </PropertyWidgetDecorator>
+        </Hints>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetOutputSpacing"
+                            default_values="1.0 1.0"
+                            name="OutputSpacing"
+                            number_of_elements="2"
+                            label="Histogram Spacing"
+                            panel_visibility="advanced">
+        <Documentation>
+          The pixel spacing of the output histogram image. These are used only when
+          UseInputRangesForOutputBounds is set to false.
+        </Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="ShowWidgetDecorator">
+            <Property name="UseInputRangesForOutputBounds" function="boolean_invert" />
+          </PropertyWidgetDecorator>
+        </Hints>
+      </DoubleVectorProperty>
+      <!-- End ExtractHistogram2D -->
+    </SourceProxy>
   </ProxyGroup>
 </ServerManagerConfiguration>
