@@ -32,15 +32,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqComponentsInit.h"
 #include "pqCoreInit.h"
+#include "pqWidgetsInit.h"
 #include <QObject> // for Q_INIT_RESOURCE
 
 void pqComponentsInit()
 {
-#if !BUILD_SHARED_LIBS
   // init dependents
   pqCoreInit();
+  pqWidgetsInit();
 
   // init resources
   Q_INIT_RESOURCE(pqComponents);
-#endif
 }

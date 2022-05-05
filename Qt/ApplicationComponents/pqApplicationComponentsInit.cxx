@@ -37,11 +37,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 void pqApplicationComponentsInit()
 {
-#if !BUILD_SHARED_LIBS
   // init dependents
   pqComponentsInit();
 
   // init resources
   Q_INIT_RESOURCE(pqApplicationComponents);
-#endif
 }

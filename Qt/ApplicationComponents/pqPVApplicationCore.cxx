@@ -76,9 +76,10 @@ pqPVApplicationCore::pqPVApplicationCore(int& argc, char** argv, vtkCLIOptions* 
   bool addStandardArgs /*=true*/, QObject* parentObject /*=nullptr*/)
   : Superclass(argc, argv, options, addStandardArgs, parentObject)
 {
-  // Initialize pqComponents resources.
+  // Initialize pqComponents resources, only for static builds.
+#if !BUILD_SHARED_LIBS
   pqApplicationComponentsInit();
-
+#endif
   this->AnimationManager = new pqAnimationManager(this);
   this->SelectionManager = new pqSelectionManager(this);
 
