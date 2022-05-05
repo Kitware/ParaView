@@ -1,4 +1,4 @@
-![ParaView](Documentation/img/paraview.png)
+![ParaView](Utilities/Doxygen/images/paraview-logo-small.png)
 
 Introduction
 ============
