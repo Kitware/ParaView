@@ -207,14 +207,12 @@ public:
         vtkSMPropertyHelper(repr->getProxy(), pname.toUtf8().data(), /*quiet=*/true).GetAsString();
     }
 
-    bool found = false;
     for (QAction* action : menu.actions())
     {
       action->setCheckable(true);
       if (arrayName.isEmpty() == false && action->data().toString() == arrayName)
       {
         action->setChecked(true);
-        found = true;
       }
     }
   }
