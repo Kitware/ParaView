@@ -36,8 +36,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 void pqCoreInit()
 {
-#if !BUILD_SHARED_LIBS
+  // #if !BUILD_SHARED_LIBS
   Q_INIT_RESOURCE(pqCore);
-  Q_INIT_RESOURCE(QtWidgets);
-#endif
+  // Q_INIT_RESOURCE(QtWidgets);
+  // #endif
 }

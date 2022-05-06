@@ -89,7 +89,8 @@ set(classes
   pqTreeWidgetItemObject
   pqTreeWidgetSelectionHelper
   pqVectorWidget
-  pqWaitCursor)
+  pqWaitCursor
+  pqWidgetsInit)
 
 set(headers)
 
