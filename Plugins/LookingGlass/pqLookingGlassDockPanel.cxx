@@ -27,18 +27,13 @@
 #include <QFileDialog>
 #include <QMessageBox>
 #include <QOpenGLContext>
-#include <QOpenGLExtraFunctions>
 
-#include "vtkCamera.h"
 #include "vtkCollection.h"
 #include "vtkGenericOpenGLRenderWindow.h"
 #include "vtkLookingGlassInterface.h"
 #include "vtkOpenGLFramebufferObject.h"
-#include "vtkOpenGLRenderWindow.h"
 #include "vtkOpenGLState.h"
 #include "vtkPVRenderView.h"
-#include "vtkRenderer.h"
-#include "vtkRendererCollection.h"
 #include "vtkSMParaViewPipelineController.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMRenderViewProxy.h"
@@ -291,45 +286,15 @@ void pqLookingGlassDockPanel::onRender()
     this->updateSaveRecordVisibility();
   }
 
-  vtkCollectionSimpleIterator rsit;
-
-  // loop over the tiles, render,and blit
-  vtkOpenGLFramebufferObject* renderFramebuffer;
-  vtkOpenGLFramebufferObject* quiltFramebuffer;
-  this->Interface->GetFramebuffers(srcWin, renderFramebuffer, quiltFramebuffer);
-  auto ostate = srcWin->GetState();
-  ostate->PushFramebufferBindings();
-  renderFramebuffer->Bind(GL_READ_FRAMEBUFFER);
-
-  // default to our standard alpha blend eqn, some vtk classes rely on this
-  // and do not set it themselves
-  ostate->vtkglEnable(GL_BLEND);
-  ostate->vtkglBlendFuncSeparate(
-    GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
-
   int renderSize[2];
   this->Interface->GetRenderSize(renderSize);
 
-  int tcount = this->Interface->GetNumberOfTiles();
-
-  // save the original camera settings
-  vtkRenderer* aren;
-  std::vector<vtkCamera*> Cameras;
-  auto* renderers = srcWin->GetRenderers();
-  for (renderers->InitTraversal(rsit); (aren = renderers->GetNextRenderer(rsit));)
-  {
-    auto oldCam = aren->GetActiveCamera();
-    oldCam->SetLeftEye(1);
-    oldCam->Register(this->DisplayWindow);
-    Cameras.push_back(oldCam);
-    vtkNew<vtkCamera> newCam;
-    aren->SetActiveCamera(newCam);
-  }
-
   std::vector<double> clippingLimits =
     vtkSMPropertyHelper(settings, "ClippingLimits").GetArray<double>();
-  double nearClippingLimit = clippingLimits[0];
-  double farClippingLimit = clippingLimits[1];
+
+  this->Interface->SetUseClippingLimits(true);
+  this->Interface->SetNearClippingLimit(clippingLimits[0]);
+  this->Interface->SetFarClippingLimit(clippingLimits[1]);
 
   // save the current size and temporarily set the new size to the render
   // framebuffer size
@@ -340,79 +305,11 @@ void pqLookingGlassDockPanel::onRender()
   srcWin->UseOffScreenBuffersOn();
   srcWin->SetSize(renderSize[0], renderSize[1]);
 
-  // loop over all the tiles and render then and blit them to the quilt
-  for (int tile = 0; tile < tcount; ++tile)
-  {
-    renderFramebuffer->Bind(GL_DRAW_FRAMEBUFFER);
-    ostate->vtkglViewport(0, 0, renderSize[0], renderSize[1]);
-    ostate->vtkglScissor(0, 0, renderSize[0], renderSize[1]);
-
-    {
-      int count = 0;
-      for (renderers->InitTraversal(rsit); (aren = renderers->GetNextRenderer(rsit)); ++count)
-      {
-        // adjust camera
-        auto cam = aren->GetActiveCamera();
-        cam->DeepCopy(Cameras[count]);
-        this->Interface->AdjustCamera(cam, tile);
-
-        // limit the clipping range to limit parallex
-        double* cRange = cam->GetClippingRange();
-        double cameraDistance = cam->GetDistance();
-
-        double newRange[2];
-        newRange[0] = cRange[0];
-        newRange[1] = cRange[1];
-        if (cRange[0] < cameraDistance * nearClippingLimit)
-        {
-          newRange[0] = cameraDistance * nearClippingLimit;
-        }
-        if (cRange[1] > cameraDistance * farClippingLimit)
-        {
-          newRange[1] = cameraDistance * farClippingLimit;
-        }
-        cam->SetClippingRange(newRange);
-      }
-      renderers->Render();
-    }
-
-    quiltFramebuffer->Bind(GL_DRAW_FRAMEBUFFER);
-
-    int destPos[2];
-    this->Interface->GetTilePosition(tile, destPos);
-
-    // blit to quilt
-    ostate->vtkglViewport(destPos[0], destPos[1], renderSize[0], renderSize[1]);
-    ostate->vtkglScissor(destPos[0], destPos[1], renderSize[0], renderSize[1]);
-
-    QOpenGLExtraFunctions* f = ctx->extraFunctions();
-    if (!f)
-    {
-      qCritical("required glBlitFramebuffer call not available");
-      break;
-    }
-    f->glBlitFramebuffer(0, 0, renderSize[0], renderSize[1], destPos[0], destPos[1],
-      destPos[0] + renderSize[0], destPos[1] + renderSize[1], GL_COLOR_BUFFER_BIT, GL_LINEAR);
-  }
-
-  if (this->IsRecording)
-  {
-    this->Interface->WriteQuiltMovieFrame();
-  }
+  this->Interface->RenderQuilt(srcWin);
 
   // restore the original size
   srcWin->SetSize(origSize[0], origSize[1]);
   srcWin->UseOffScreenBuffersOff();
-
-  ostate->PopFramebufferBindings();
-
-  // restore the original camera settings
-  int count = 0;
-  for (renderers->InitTraversal(rsit); (aren = renderers->GetNextRenderer(rsit)); ++count)
-  {
-    aren->SetActiveCamera(Cameras[count]);
-    Cameras[count]->Delete();
-  }
 
   // finally render. The callback will actually do the fullscreen quad
   // in the middle of this call
