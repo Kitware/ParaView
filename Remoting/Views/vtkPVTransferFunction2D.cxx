@@ -89,7 +89,7 @@ void vtkPVTransferFunction2D::PrintSelf(ostream& os, vtkIndent indent)
   {
     os << "(nullptr)" << endl;
   }
-  os << "Boxes: " << (this->Internals->Boxes.size() > 0 ? "" : "(None)");
+  os << "Boxes: " << (!this->Internals->Boxes.empty() ? "" : "(None)");
   for (auto box : this->Internals->Boxes)
   {
     box->PrintSelf(os, indent.GetNextIndent());
