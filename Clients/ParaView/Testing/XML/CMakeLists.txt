@@ -614,6 +614,7 @@ SET (TESTS_WITHOUT_BASELINES
   AboutDialog.xml
   AddFieldArrays.xml
   ArrayBoundsScaleDomain.xml
+  ArraySelectionWidget.xml
   CustomOutputFormat.xml
   DelimitedTextReader.xml
   DynamicFieldDataDomain.xml
