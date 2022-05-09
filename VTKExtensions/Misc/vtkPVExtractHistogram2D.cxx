@@ -443,10 +443,11 @@ void vtkPVExtractHistogram2D::ComputeGradient(vtkDataObject* input)
 
   for (vtk::TupleIdType tupleId = 0; tupleId < numTuples; ++tupleId)
   {
-    double sqSum = 0;
+    double sqSum = 0.0;
     for (vtk::ComponentIdType cId = comp0 * 3; cId < comp0 * 3 + 3; ++cId)
     {
       double val = static_cast<double>(gradientArrRange[tupleId][cId]);
+      val = val < 1e-5 ? 0.0 : val;
       sqSum += val * val;
     }
     gradMagRange[tupleId][0] = std::sqrt(sqSum);
