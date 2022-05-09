@@ -95,12 +95,19 @@ public:
         "Multi-valued options can be specified by providing the option multiple times or "
         "separating "
         "the values by a comma (','). Thus, '--moption=foo,bar' and '--moption=foo --moption=bar' "
-        "are "
-        "equivalent.\n\n"
+        "are equivalent.\n\n"
         "Short-named options with more than one character name are no longer supported, and should "
-        "simply be "
-        "specified as long-named option by adding an addition '-'. Thus, use '--dr' instead of "
-        "'-dr'.\n";
+        "simply be specified as long-named option by adding an additional '-'. Thus, use '--dr' "
+        "instead of "
+        "'-dr'.\n\n"
+        "Some options are described in this help text with the format '--moption TYPE:name' where "
+        "'TYPE' specifies what kind of value is expected for the option 'name'. Type 'ENUM' means "
+        "there "
+        "are several possible predefined values for the option. Type 'TEXT' means that the "
+        "filename option is any text string.\n\n"
+        "Numeric specifiers 'INT' and 'FLOAT' in this help text indicate the expected option value "
+        "type of "
+        "some options, either an integer or floating point number.\n\n";
     }
     return FormatParagraph(0, usage);
   }
