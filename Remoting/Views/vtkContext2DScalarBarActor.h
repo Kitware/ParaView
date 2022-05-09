@@ -317,8 +317,8 @@ protected:
   /**
    * Range to be displayed.
    */
-  double DataRangeMin;
-  double DataRangeMax;
+  double DataRangeMin = 0;
+  double DataRangeMax = 0;
   ///@}
 
   /**
