@@ -8,6 +8,9 @@
 #
 # it does nothing but report the version number
 
+Version = "2.2"
 
-Version = "2.0"
+def version():
+    return Version
+
 

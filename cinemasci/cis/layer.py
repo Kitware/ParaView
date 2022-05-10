@@ -1,37 +1,65 @@
-from . import channel
-
+#
+# layer class
+#
 class layer:
-    """Layer Class
-    A layer is a collection of values that comprise an element of an image. 
-    A layer is an integer size (wxh) that is equal to or lesser than the size of the image. 
-    Therefore the offset from the image origin must be given in integer form to describe its placement.
-    A layer contains one or more channels. 
+    """Composible Image Set layer class
+
+    A layer contains:
+    - a set of channels.
+        - one channel may be depth
+        - one channel may be shadow
+    - dimensions: integer width and height.
+    - offset: integer x, y dimension from the image origin.
     """
 
     def __init__(self, name):
-        self.name     = name
-        self.offset   = [0,0]
-        self.dims     = [0,0]
-        self.channels = {}
+        self.depth = None
+        self.shadow = None
 
-    def set_offset(self, x, y):
-        self.offset = [x, y]
+    @property
+    def name(self):
+        return self._name
 
-    def set_dims(self, w, h):
-        self.dims = [w, h]
+    @name.setter
+    def name(self, value):
+        self._name = value
 
-    def add_channel(self, name):
-        self.channels[name] = channel.channel(name)
-        self.channels[name].set_dims(self.dims[0], self.dims[1])
+    @property
+    def channel(self):
+        return self._channel
 
-        return self.channels[name]
+    @channel.setter
+    def channel(self, value):
+        self._channel = value
 
-    def get_channels(self):
-        for c in self.channels:
-            yield c
+    @property
+    def dims(self):
+        return self._dims
 
-    def get_channel(self, name):
-        result = False
-        if name in self.channels:
-            result = self.channels[name]
-        return result
+    @dims.setter
+    def dims(self, value):
+        self._dims = value
+
+    @property
+    def offset(self):
+        return self._offset
+
+    @offset.setter
+    def offset(self, value):
+        self._offset = value
+
+    @property
+    def depth(self):
+        return self._depth
+
+    @depth.setter
+    def depth(self, value):
+        self._depth = value
+
+    @property
+    def shadow(self):
+        return self._shadow
+
+    @shadow.setter
+    def shadow(self, value):
+        self._shadow = value

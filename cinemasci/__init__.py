@@ -1,4 +1,6 @@
-__all__ = ["cis", "cdb", "viewers", "pynb"]
+__all__ = ["cis", "cdb", "viewers", "pynb", "install"]
+
+import os
 
 #
 # new factory function
@@ -15,3 +17,10 @@ def new( vtype, args ):
         print("ERROR: unsupported viewer type: {}".format(vtype))
 
     return result
+
+def path():
+    path = os.path.abspath(__file__)
+    return os.path.dirname(path)
+
+def version():
+    return "1.7.9"
