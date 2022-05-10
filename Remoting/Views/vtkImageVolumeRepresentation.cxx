@@ -536,6 +536,40 @@ void vtkImageVolumeRepresentation::SetShade(bool val)
 }
 
 //----------------------------------------------------------------------------
+void vtkImageVolumeRepresentation::SetAnisotropy(float val)
+{
+  this->Property->SetScatteringAnisotropy(val);
+}
+
+//----------------------------------------------------------------------------
+void vtkImageVolumeRepresentation::SetGlobalIlluminationReach(float val)
+{
+  if (auto smartVolumeMapper = vtkSmartVolumeMapper::SafeDownCast(this->VolumeMapper))
+  {
+    smartVolumeMapper->SetGlobalIlluminationReach(val);
+  }
+  else if (auto mbMapper = vtkMultiBlockVolumeMapper::SafeDownCast(this->VolumeMapper))
+  {
+    mbMapper->SetGlobalIlluminationReach(val);
+  }
+  this->Modified();
+}
+
+//----------------------------------------------------------------------------
+void vtkImageVolumeRepresentation::SetVolumetricScatteringBlending(float val)
+{
+  if (auto smartVolumeMapper = vtkSmartVolumeMapper::SafeDownCast(this->VolumeMapper))
+  {
+    smartVolumeMapper->SetVolumetricScatteringBlending(val);
+  }
+  else if (auto mbMapper = vtkMultiBlockVolumeMapper::SafeDownCast(this->VolumeMapper))
+  {
+    mbMapper->SetVolumetricScatteringBlending(val);
+  }
+  this->Modified();
+}
+
+//----------------------------------------------------------------------------
 void vtkImageVolumeRepresentation::SetSliceFunction(vtkImplicitFunction* slice)
 {
   this->Property->SetSliceFunction(slice);
