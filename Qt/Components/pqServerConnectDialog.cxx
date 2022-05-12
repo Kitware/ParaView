@@ -364,18 +364,21 @@ void pqServerConnectDialog::updateButtons()
     // Convert the row number to original index (since servers can be sorted).
     int original_index = this->Internals->servers->item(row, 0)->data(Qt::UserRole).toInt();
 
-    bool is_mutable = false;
+    bool isMutable = false;
+    bool isReverse = false;
     if (original_index >= 0 && original_index < this->Internals->servers->rowCount())
     {
-      is_mutable = this->Internals->Configurations[original_index].isMutable();
+      isMutable = this->Internals->Configurations[original_index].isMutable();
+      isReverse = this->Internals->Configurations[original_index].resource().isReverse();
     }
-    this->Internals->editServer->setEnabled(is_mutable);
-    this->Internals->deleteServer->setEnabled(is_mutable);
+    this->Internals->editServer->setEnabled(isMutable);
+    this->Internals->deleteServer->setEnabled(isMutable);
+    this->Internals->timeoutSpinBox->setEnabled(isMutable);
     this->Internals->connect->setEnabled(true);
     this->Internals->timeoutLabel->setVisible(true);
     this->Internals->timeoutSpinBox->setVisible(true);
     this->Internals->timeoutSpinBox->setValue(
-      this->Internals->Configurations[original_index].connectionTimeout());
+      this->Internals->Configurations[original_index].connectionTimeout(isReverse ? -1 : 60));
   }
 }
 

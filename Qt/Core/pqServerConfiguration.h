@@ -120,9 +120,9 @@ public:
   /**
    * Get/Set the timeout in seconds that will be used when connecting
    * 0 means no retry and -1 means infinite retries.
-   * If not set in the XML, default is 60.
+   * If not set in the XML, the defaultTimeout is retuned.
    */
-  int connectionTimeout() const;
+  int connectionTimeout(int defaultTimeout = 60) const;
   void setConnectionTimeout(int connectionTimeout);
 
   /**
