@@ -25,6 +25,7 @@ It should now be:
 * Adding a new `timeout` attribute on the XML of the **server** and connect it to the timeout spinbox in the UI
 
 This new parameter let you control how long will the client try to connect to the server, in seconds.
+Default is 60 for standard connection and infinite for reverse connection.
 You can now write:
 ```
   <Server name="SimpleServer" configuration="" resource="cs://localhost:11111" timeout="15">
@@ -36,4 +37,4 @@ You can now write:
 
 * Add support for connection abort in all cases (except catalyst). Before that it was only limited to reverse connection.
 * Add support for connection retry in case of timeout on connection.
-* Add support for timeout with reverse connections
+* Add support for timeout with reverse connections, client side only.

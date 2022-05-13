@@ -108,7 +108,7 @@ public:
    * which can be different than the server where the pvserver is running.
    * eg. it will give you localhost:8080, instead of serverip:serverport when using port forwarding.
    * Using this method is needed only when using low level tcp api.
-   * ressource() method should be used in any other cases.
+   * resource() method should be used in any other cases.
    */
   pqServerResource actualResource();
 
@@ -206,7 +206,7 @@ public:
   /**
    * Get the port forwarding local port.
    * Initialized by the server xml if port forwarding is used.
-   * Equal to the ressource port if port forwarding is not used.
+   * Equal to the resource port if port forwarding is not used.
    */
   QString portForwardingLocalPort() const;
 
