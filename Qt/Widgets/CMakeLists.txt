@@ -67,6 +67,7 @@ set(classes
   pqListWidgetCheckHelper
   pqListWidgetItemObject
   pqMultiColumnHeaderView
+  pqOneLinerTextEdit
   pqProgressWidget
   pqQuickLaunchDialog
   pqScaleByButton
