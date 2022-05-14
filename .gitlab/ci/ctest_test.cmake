@@ -85,7 +85,10 @@ endif ()
 if ("$ENV{CMAKE_CONFIGURATION}" MATCHES "macos_arm64")
   list(APPEND test_exclusions
     # https://gitlab.kitware.com/paraview/paraview/-/issues/20743
-    "^pv\\.ExtrusionRepresentationCellData$")
+    "^pv\\.ExtrusionRepresentationCellData$"
+    # paraview/paraview/#21397
+    "^pv\\.TextSourceBorder$")
+
 endif ()
 
 if ("$ENV{CMAKE_CONFIGURATION}" MATCHES "windows")
