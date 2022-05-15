@@ -38,3 +38,9 @@ if (TEST "pvcs.GMVReaderInvalidFiles${suffix}")
     PROPERTY
       PASS_REGULAR_EXPRESSION "server process exited with code 0")
 endif ()
+
+# Increase timeout for BasicRead as the data can take some time to read in parallel
+if (TEST "pvcs.GMVReaderBasicRead${suffix}")
+  set_property(TEST "pvcs.GMVReaderBasicRead${suffix}"
+    PROPERTY TIMEOUT 300)
+endif ()
