@@ -5,3 +5,4 @@
 .ExternalData/config/
 .ExternalData/SHA512/
 .DS_Store
+CMakeUserPresets.json
