@@ -45,6 +45,7 @@ class vtkDataObjectToTable;
 class vtkFieldData;
 class vtkInformationIntegerKey;
 class vtkMultiBlockDataSet;
+class vtkMultiProcessController;
 class vtkSciVizStatisticsP;
 class vtkStatisticsAlgorithm;
 
@@ -103,6 +104,14 @@ public:
   vtkSetClampMacro(TrainingFraction, double, 0.0, 1.0);
   vtkGetMacro(TrainingFraction, double);
   //@}
+
+  ///@{
+  /**
+   * Get/Set the multiprocess controller. If no controller is set, single process is assumed.
+   */
+  virtual void SetController(vtkMultiProcessController*);
+  vtkGetObjectMacro(Controller, vtkMultiProcessController);
+  ///@}
 
   /**\brief Possible tasks the filter can perform.
    *
@@ -208,6 +217,7 @@ protected:
   int Task;
   double TrainingFraction;
   vtkSciVizStatisticsP* P;
+  vtkMultiProcessController* Controller;
 
 private:
   vtkSciVizStatistics(const vtkSciVizStatistics&) = delete;

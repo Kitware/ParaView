@@ -14,7 +14,9 @@
 #include "vtkInformationVector.h"
 #include "vtkMinimalStandardRandomSequence.h"
 #include "vtkMultiBlockDataSet.h"
+#include "vtkMultiProcessController.h"
 #include "vtkNew.h"
+#include "vtkObjectFactory.h"
 #include "vtkPointData.h"
 #include "vtkStatisticsAlgorithm.h"
 #include "vtkStringArray.h"
@@ -24,6 +26,8 @@
 
 #include <set>
 #include <sstream>
+
+vtkCxxSetObjectMacro(vtkSciVizStatistics, Controller, vtkMultiProcessController);
 
 vtkInformationKeyMacro(vtkSciVizStatistics, MULTIPLE_MODELS, Integer);
 
@@ -35,6 +39,8 @@ vtkSciVizStatistics::vtkSciVizStatistics()
   this->Task = MODEL_AND_ASSESS;
   this->SetNumberOfInputPorts(2);  // data + optional model
   this->SetNumberOfOutputPorts(2); // model + assessed input
+  this->Controller = nullptr;
+  this->SetController(vtkMultiProcessController::GetGlobalController());
 }
 
 vtkSciVizStatistics::~vtkSciVizStatistics()
@@ -496,19 +502,21 @@ int vtkSciVizStatistics::RequestData(
   {
     outData->ShallowCopy(inData);
   }
+  vtkMultiBlockDataSet* outModelDS = vtkMultiBlockDataSet::SafeDownCast(outModel);
+  if (!outModelDS)
+  {
+    vtkErrorMacro("No model output dataset or incorrect type");
+    return 0;
+  }
   if (this->Task != CREATE_MODEL && this->Task != MODEL_INPUT)
   {
     // Assess the data using the input or the just-created model
-    vtkMultiBlockDataSet* outModelDS = vtkMultiBlockDataSet::SafeDownCast(outModel);
-    if (!outModelDS)
-    {
-      vtkErrorMacro("No model output dataset or incorrect type");
-      stat = 0;
-    }
-    else
-    {
-      stat = this->AssessData(inTable, outData, outModelDS);
-    }
+    stat = this->AssessData(inTable, outData, outModelDS);
+  }
+  // We remove the output model in ranks other than the root
+  if (this->Controller && this->Controller->GetLocalProcessId() != 0)
+  {
+    vtkMultiBlockDataSet::SafeDownCast(outModelDS)->Initialize();
   }
   return stat ? 1 : 0;
 }
