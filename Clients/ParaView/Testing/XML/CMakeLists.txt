@@ -129,6 +129,13 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${paraview_test_data_directory_input}/Data/multicomb_0.vts}"
   "DATA{${paraview_test_data_directory_input}/Data/multicomb_1.vts}"
   "DATA{${paraview_test_data_directory_input}/Data/multicomb_2.vts}"
+  "DATA{${paraview_test_data_directory_input}/Data/MultiPiece.vtm}"
+  "DATA{${paraview_test_data_directory_input}/Data/MultiPiece/Piece1.vts}"
+  "DATA{${paraview_test_data_directory_input}/Data/MultiPiece/Piece2.vts}"
+  "DATA{${paraview_test_data_directory_input}/Data/MultiPiece/Piece3.vts}"
+  "DATA{${paraview_test_data_directory_input}/Data/MultiPiece/Piece4.vts}"
+  "DATA{${paraview_test_data_directory_input}/Data/MultiPiece/Piece5.vts}"
+  "DATA{${paraview_test_data_directory_input}/Data/MultiPiece/Piece6.vts}"
   "DATA{${paraview_test_data_directory_input}/Data/non_convex_polygon.vtu}"
   "DATA{${paraview_test_data_directory_input}/Data/office.binary.vtk}"
   "DATA{${paraview_test_data_directory_input}/Data/OMF/test_file.omf}"
@@ -543,6 +550,7 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/SeriesPresetRegexpNoRegexp.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/SeriesPresetRegexpYD.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/SeriesPresetRegexp.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/ShowMultiPieceFieldData.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/Slice.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/SliceDirectDoubleColoring.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/SliceWithPlaneCellData.png}"
@@ -823,6 +831,7 @@ SET(TESTS_WITH_BASELINES
   SelectionByArray.xml
   SeriesPreset.xml
   SeriesPresetRegexp.xml
+  ShowMultiPieceFieldData.xml
   TestHiddenLineRemoval.xml
   TestOpacityRendering.xml
   TransferFunction2D.xml

@@ -630,10 +630,17 @@ static vtkPolyData* vtkPVGeometryFilterMergePieces(vtkPartitionedDataSet* mp)
     return nullptr;
   }
 
+  // Save field data attached to pieces as we want to preserve it (the vtkAppendPolydata filter
+  // removes it). The field data is expected to be the same for all pieces of the multipiece so we
+  // take it from the first one. See paraview/paraview#20748
+  vtkFieldData* fd = inputs[0]->GetFieldData();
+
   vtkNew<vtkPolyData> output;
   vtkNew<vtkAppendPolyData> appender;
   appender->ExecuteAppend(output, inputs.data(), static_cast<int>(inputs.size()));
   inputs.clear();
+
+  output->SetFieldData(fd);
 
   std::vector<int> points_offsets, verts_offsets, lines_offsets, polys_offsets, strips_offsets;
   polys_offsets.resize(num_pieces);
