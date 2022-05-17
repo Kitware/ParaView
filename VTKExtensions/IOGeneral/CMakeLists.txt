@@ -30,6 +30,7 @@
 #==========================================================================
 set(classes
   vtkEnsembleDataReader
+  vtkNastranBDFReader
   vtkPhastaReader
   vtkPPhastaReader
   vtkPVPLYWriter
