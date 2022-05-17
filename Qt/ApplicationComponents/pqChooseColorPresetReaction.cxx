@@ -157,6 +157,8 @@ bool pqChooseColorPresetReaction::choosePreset(const char* presetName)
   this->connect(PresetDialog.data(), &pqPresetDialog::applyPreset, this,
     &pqChooseColorPresetReaction::applyCurrentPreset);
   PresetDialog->show();
+  PresetDialog->raise();
+  PresetDialog->activateWindow();
   return true;
 }
 
