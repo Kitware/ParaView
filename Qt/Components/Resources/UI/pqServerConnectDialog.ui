@@ -120,7 +120,7 @@
          <item>
           <widget class="QSpinBox" name="timeoutSpinBox">
            <property name="toolTip">
-            <string>Specify the timeout in seconds to use when waiting for server connection. Set it to -1 to wait indefinitely. This value will be saved in your settings for this server.</string>
+            <string>Specify the timeout in seconds to use when waiting for server connection. Set it to -1 to wait indefinitely. This value will be saved in your settings for this server once you click connect.</string>
            </property>
            <property name="value">
             <number>60</number>

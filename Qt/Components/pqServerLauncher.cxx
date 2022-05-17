@@ -616,6 +616,10 @@ bool pqServerLauncher::connectToPrelaunchedServer(bool showConnectionDialog)
 {
   pqObjectBuilder* builder = pqApplicationCore::instance()->getObjectBuilder();
 
+  //  default timeout of reverse connection is infinite, 60s otherwise
+  int timeout =
+    this->Internals->Configuration.connectionTimeout(this->isReverseConnection() ? -1 : 60);
+
   vtkNetworkAccessManager::ConnectionResult result;
   do
   {
@@ -627,7 +631,7 @@ bool pqServerLauncher::connectToPrelaunchedServer(bool showConnectionDialog)
       Ui::pqServerLauncherDialog ui;
       ui.setupUi(&dialog);
 
-      if (this->isReverseConnection())
+      if (timeout < 0)
       {
         ui.message->setText(QString("Establishing connection to '%1' \n"
                                     "Waiting for server to connect.")
@@ -639,7 +643,7 @@ bool pqServerLauncher::connectToPrelaunchedServer(bool showConnectionDialog)
         ui.message->setText(QString("Establishing connection to '%1' \n"
                                     "Waiting %2 seconds for connection to server.")
                               .arg(this->Internals->Configuration.name())
-                              .arg(this->Internals->Configuration.connectionTimeout()));
+                              .arg(timeout));
         dialog.setWindowTitle("Waiting for Connection to Server");
       }
 
@@ -650,16 +654,15 @@ bool pqServerLauncher::connectToPrelaunchedServer(bool showConnectionDialog)
     }
 
     const pqServerResource& resource = this->Internals->Configuration.actualResource();
-    this->Internals->Server =
-      builder->createServer(resource, this->Internals->Configuration.connectionTimeout(), result);
+    this->Internals->Server = builder->createServer(resource, timeout, result);
 
     // Make sure events have been processed
     pqEventDispatcher::processEventsAndWait(100);
 
   } while (result == vtkNetworkAccessManager::ConnectionResult::CONNECTION_TIMEOUT &&
     QMessageBox::question(pqCoreUtilities::mainWidget(), QString("Connection Failed"),
-      QString("Unable to connect sucessfully. Try again for %1 seconds ?")
-        .arg(this->Internals->Configuration.connectionTimeout())) == QMessageBox::Yes);
+      QString("Unable to connect sucessfully. Try again for %1 seconds ?").arg(timeout)) ==
+      QMessageBox::Yes);
 
   return this->Internals->Server != nullptr;
 }

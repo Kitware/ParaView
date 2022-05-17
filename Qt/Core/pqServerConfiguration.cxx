@@ -145,9 +145,11 @@ void pqServerConfiguration::setResource(const QString& str)
 }
 
 //-----------------------------------------------------------------------------
-int pqServerConfiguration::connectionTimeout() const
+int pqServerConfiguration::connectionTimeout(int defaultTimeout) const
 {
-  return QString(this->XML->GetAttributeOrDefault("timeout", "60")).toInt();
+  return QString(
+    this->XML->GetAttributeOrDefault("timeout", QString::number(defaultTimeout).toUtf8().data()))
+    .toInt();
 }
 
 //-----------------------------------------------------------------------------

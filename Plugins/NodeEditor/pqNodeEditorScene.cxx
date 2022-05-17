@@ -182,7 +182,7 @@ int pqNodeEditorScene::computeLayout(const std::unordered_map<vtkIdType, pqNodeE
     status += gvFreeContext(gvc);
     if (status)
     {
-      vtkLogF(WARNING, "[NodeEditorPlugin] Error when freeing Graphviz ressources.");
+      vtkLogF(WARNING, "[NodeEditorPlugin] Error when freeing Graphviz resources.");
     }
   }
 

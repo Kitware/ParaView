@@ -362,6 +362,6 @@ into an existing category or a new category, as well as set the icon.
     <SourceProxy ...>
       ...
       <Hints>
-        <ShowInMenu category="Category" icon=":/path/to/ressource/icon.png" />
+        <ShowInMenu category="Category" icon=":/path/to/resource/icon.png" />
       </Hints>
     </SourceProxy>

@@ -19,6 +19,8 @@ differentiate more generally between servers of the same schemehostports URI.
 When not available, behavior stays as before.
 
 pqServerResource concept of `session` scheme has been removed and related methods have been deprecated.
+Instead of using pqServerResource::get/setSessionServer, just use the resource directly.
+
 This causes a small retro compatibility issue where `session` recent state file will not be detected.
 Resetting the settings (`Edit -> Reset to default settings`) is a simple fix to that.
 Also application code relying on this `session` scheme to parse pqServerResource will not be able to do so anymore.
