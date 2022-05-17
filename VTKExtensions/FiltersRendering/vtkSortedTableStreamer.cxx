@@ -51,6 +51,7 @@
 
 #include <algorithm>
 #include <map>
+#include <numeric>
 #include <set>
 #include <vector>
 
@@ -641,13 +642,17 @@ public:
     this->CommonRange[0] /= globalRatio;
     this->CommonRange[1] /= globalRatio;
 
-    double delta = (this->CommonRange[1] - this->CommonRange[0]);
+    double delta = std::fabs(this->CommonRange[1] - this->CommonRange[0]);
     delta *= delta;
-    bool sortable = delta > FLT_EPSILON;
+
+    double epsilon = std::nextafter(this->CommonRange[0], std::numeric_limits<double>::max());
+    epsilon = std::fabs(epsilon - this->CommonRange[0]);
+
+    bool sortable = delta > epsilon;
 
     // Extend range with epsilon to make sure that a computed magnitude will fit in
-    this->CommonRange[0] -= FLT_EPSILON;
-    this->CommonRange[1] += FLT_EPSILON;
+    this->CommonRange[0] -= epsilon;
+    this->CommonRange[1] += epsilon;
 
     return sortable;
   }
