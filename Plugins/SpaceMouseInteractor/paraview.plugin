@@ -1,0 +1,18 @@
+NAME
+  SpaceMouseInteractor
+DESCRIPTION
+  SpaceMouse from 3Dconnexion
+REQUIRES_MODULES
+  ParaView::RemotingApplication
+  ParaView::RemotingCore
+  ParaView::RemotingServerManager
+  ParaView::RemotingViews
+  ParaView::pqApplicationComponents
+  ParaView::VTKExtensionsMisc
+  VTK::CommonCore
+  VTK::CommonDataModel
+  VTK::CommonExecutionModel
+  VTK::CommonMath
+  VTK::CommonTransforms
+  VTK::FiltersGeneral
+  VTK::ImagingCore
