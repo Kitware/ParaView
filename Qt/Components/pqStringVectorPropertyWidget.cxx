@@ -56,6 +56,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqExpandableTableView.h"
 #include "pqFileChooserWidget.h"
 #include "pqLineEdit.h"
+#include "pqOneLinerTextEdit.h"
 #include "pqPopOutWidget.h"
 #include "pqQtDeprecated.h"
 #include "pqSMAdaptor.h"
@@ -99,6 +100,7 @@ pqStringVectorPropertyWidget::pqStringVectorPropertyWidget(
   vtkPVXMLElement* hints = svp->GetHints();
 
   bool multiline_text = false;
+  bool wrap_text = false;
   bool python = false;
   bool showLabel = false;
   QString placeholderText;
@@ -109,6 +111,11 @@ pqStringVectorPropertyWidget::pqStringVectorPropertyWidget(
       strcmp(widgetHint->GetAttribute("type"), "multi_line") == 0)
     {
       multiline_text = true;
+    }
+    else if (widgetHint && widgetHint->GetAttribute("type") &&
+      strcmp(widgetHint->GetAttribute("type"), "one_liner_wrapped") == 0)
+    {
+      wrap_text = true;
     }
     if (widgetHint && widgetHint->GetAttribute("syntax") &&
       strcmp(widgetHint->GetAttribute("syntax"), "python") == 0)
@@ -390,19 +397,37 @@ pqStringVectorPropertyWidget::pqStringVectorPropertyWidget(
     }
     else
     {
-      vtkVLogF(PARAVIEW_LOG_APPLICATION_VERBOSITY(), "use `pqLineEdit`.");
       // add a single line edit.
-      QLineEdit* lineEdit = new pqLineEdit(this);
+      QWidget* lineEdit;
+      if (wrap_text)
+      {
+        vtkVLogF(PARAVIEW_LOG_APPLICATION_VERBOSITY(), "use `pqOneLinerTextEdit`.");
+        auto line = new pqOneLinerTextEdit(this);
+        if (!placeholderText.isEmpty())
+        {
+          line->setPlaceholderText(placeholderText);
+        }
+
+        this->addPropertyLink(line, "plainText", SIGNAL(textChanged()), smProperty);
+        lineEdit = line;
+      }
+      else
+      {
+        vtkVLogF(PARAVIEW_LOG_APPLICATION_VERBOSITY(), "use `pqLineEdit`.");
+        pqLineEdit* line = new pqLineEdit(this);
+        if (!placeholderText.isEmpty())
+        {
+          line->setPlaceholderText(placeholderText);
+        }
+
+        this->addPropertyLink(line, "text", SIGNAL(textChanged(const QString&)), smProperty);
+        lineEdit = line;
+      }
+
       lineEdit->setObjectName(smProxy->GetPropertyName(smProperty));
-      this->addPropertyLink(lineEdit, "text", SIGNAL(textChanged(const QString&)), smProperty);
       this->connect(
         lineEdit, SIGNAL(textChangedAndEditingFinished()), this, SIGNAL(changeFinished()));
       this->setChangeAvailableAsChangeFinished(false);
-
-      if (!placeholderText.isEmpty())
-      {
-        lineEdit->setPlaceholderText(placeholderText);
-      }
 
       vbox->addWidget(lineEdit);
     }
