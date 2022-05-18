@@ -69,11 +69,6 @@ if (NOT _paraview_use_external_vtk)
 endif ()
 unset(_paraview_use_external_vtk)
 
-# Find Catalyst
-find_package(catalyst REQUIRED QUIET
-  PATHS "${CMAKE_CURRENT_LIST_DIR}/catalyst"
-  NO_DEFAULT_PATH)
-
 set(PARAVIEW_USE_QT "@PARAVIEW_USE_QT@")
 set(PARAVIEW_USE_MPI "@PARAVIEW_USE_MPI@")
 set(PARAVIEW_USE_PYTHON "@PARAVIEW_USE_PYTHON@")

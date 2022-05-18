@@ -17,7 +17,9 @@
 #include "vtkArrayDispatch.h"
 #include "vtkCPCxxHelper.h"
 #include "vtkCallbackCommand.h"
+#if VTK_MODULE_ENABLE_VTK_IOCatalystConduit
 #include "vtkConduitSource.h"
+#endif
 #include "vtkDataArrayAccessor.h"
 #include "vtkFieldData.h"
 #include "vtkInSituPipelinePython.h"
@@ -420,6 +422,7 @@ int vtkInSituInitializationHelper::GetAttributeTypeFromString(const std::string&
 //----------------------------------------------------------------------------
 void vtkInSituInitializationHelper::UpdateSteerableProxies()
 {
+#if VTK_MODULE_ENABLE_VTK_IOCatalystConduit
   auto& internals = (*vtkInSituInitializationHelper::Internals);
 
   for (auto& steerable_proxies : internals.SteerableProxies)
@@ -544,6 +547,9 @@ void vtkInSituInitializationHelper::UpdateSteerableProxies()
       }
     }
   }
+#else
+  vtkErrorWithObjectMacro(nullptr, << "module IOCatalystConduit is disabled, cannot use steering.");
+#endif
 }
 
 //----------------------------------------------------------------------------

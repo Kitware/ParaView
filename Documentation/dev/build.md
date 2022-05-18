@@ -317,6 +317,8 @@ Less common, but variables which may be of interest to some:
   * `PARAVIEW_BUILD_VTK_TESTING` (default `OFF`): Whether to build tests for the
     VTK codebase built by ParaView. Valid values are same as
     `PARAVIEW_BUILD_TESTING`.
+  * `PARAVIEW_ENABLE_CATALYST` (default `OFF`): Whether to build the ParaView
+    implementation of Catalyst.
 
 More advanced build options are:
 

@@ -4,9 +4,10 @@ notice.
 """
 from .. import logger
 
-from ..modules.vtkPVInSitu import vtkInSituInitializationHelper, vtkInSituPipelinePython
+from ..modules.vtkPVInSitu import vtkInSituPipelinePython
 
 from ..modules.vtkPVPythonCatalyst import vtkCPPythonScriptV2Helper
+
 
 def _get_active_helper():
     return vtkCPPythonScriptV2Helper.GetActiveInstance()
@@ -47,6 +48,9 @@ def IsLegacyCatalystAdaptor():
     instead of the Conduit-based in situ API"""
     return _get_active_data_description() is not None
 
+if IsInsitu() and not IsLegacyCatalystAdaptor():
+    from ..modules.vtkPVInSitu import vtkInSituInitializationHelper
+
 def IsCatalystInSituAPI():
     """Returns True if the active execution environment is from within
     an implementation of the Conduit-based Catalyst In Situ API."""
@@ -57,7 +61,7 @@ def IsInsituInput(name):
         return False
     name = _transform_registration_name(name)
     dataDesc = _get_active_data_description()
-    if dataDesc:
+    if IsLegacyCatalystAdaptor():
         # Legacy Catalyst
         if dataDesc.GetInputDescriptionByName(name) is not None:
             return True

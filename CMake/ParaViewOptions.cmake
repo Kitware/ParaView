@@ -203,6 +203,8 @@ option(PARAVIEW_ENABLE_LOOKINGGLASS "Enable LookingGlass displays" OFF)
 
 option(PARAVIEW_ENABLE_VISITBRIDGE "Enable VisIt readers." OFF)
 
+option(PARAVIEW_ENABLE_CATALYST "Enable ParaViewCatalyst implementation" OFF)
+
 # default to ON for CANONICAL builds, else OFF.
 set(xdmf2_default OFF)
 if (PARAVIEW_BUILD_CANONICAL AND PARAVIEW_ENABLE_NONESSENTIAL)
@@ -261,7 +263,6 @@ vtk_obsolete_setting(PARAVIEW_ENABLE_COMMANDLINE_TOOLS)
 vtk_obsolete_setting(PARAVIEW_FREEZE_PYTHON)
 vtk_obsolete_setting(PARAVIEW_USE_MPI_SSEND)
 vtk_obsolete_setting(PARAVIEW_USE_ICE_T)
-vtk_obsolete_setting(PARAVIEW_ENABLE_CATALYST)
 
 #========================================================================================
 # Build up list of required and rejected modules
@@ -549,6 +550,11 @@ paraview_require_module(
 paraview_require_module(
   CONDITION PARAVIEW_USE_PYTHON
   MODULES   ParaView::CinemaPython)
+
+paraview_require_module(
+  CONDITION PARAVIEW_ENABLE_CATALYST
+  MODULES   VTK::IOCatalystConduit
+  EXCLUSIVE)
 
 if (NOT PARAVIEW_ENABLE_NONESSENTIAL)
   # This ensures that we don't ever enable certain problematic
