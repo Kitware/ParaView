@@ -2080,3 +2080,6 @@ configure_file (
 paraview_add_client_tests(
   FORCE_SERIAL
   TEST_SCRIPTS ${CMAKE_CURRENT_BINARY_DIR}/ServerConnectConfigured.xml)
+
+# Some tests can take a long time, increasing their timeout
+set_property(TEST pvcrs.UndoRedo1 PROPERTY TIMEOUT 300)
