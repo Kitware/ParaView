@@ -45,6 +45,7 @@ vtkSciVizStatistics::vtkSciVizStatistics()
 
 vtkSciVizStatistics::~vtkSciVizStatistics()
 {
+  this->SetController(nullptr);
   delete this->P;
 }
 
