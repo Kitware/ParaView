@@ -55,6 +55,12 @@ public:
   pqExpandableTableView(QWidget* parent = nullptr);
   ~pqExpandableTableView() override;
 
+  /**
+   * Enable pasting in table from clipboard.
+   * Default is true.
+   */
+  void setPasteEnabled(bool enable);
+
 Q_SIGNALS:
   /**
    * signal fired when the user edits past the last row. Handlers can add a new
@@ -81,6 +87,8 @@ protected:
    * Overridden to capture Ctrl-V for pasting table data into the table.
    */
   void keyPressEvent(QKeyEvent* event) override;
+
+  bool PasteEnabled;
 
 private:
   Q_DISABLE_COPY(pqExpandableTableView)

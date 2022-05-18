@@ -75,6 +75,9 @@ set(classes
   pqDisplayRepresentationWidget
   pqDockWindowInterface
   pqDoubleVectorPropertyWidget
+  pqExpressionsDialog
+  pqExpressionsManager
+  pqExpressionsTableModel
   pqFavoritesDialog
   pqFavoritesTreeWidget
   pqFileChooserWidget
@@ -204,6 +207,7 @@ set(ui_files
   Resources/UI/pqCustomFilterDefinitionWizard.ui
   Resources/UI/pqCustomFilterManager.ui
   Resources/UI/pqCustomViewpointButtonDialog.ui
+  Resources/UI/pqExpressionsDialog.ui
   Resources/UI/pqDisplayRepresentationWidget.ui
   Resources/UI/pqFindDataCurrentSelectionFrame.ui
   Resources/UI/pqFindDataSelectionDisplayFrame.ui

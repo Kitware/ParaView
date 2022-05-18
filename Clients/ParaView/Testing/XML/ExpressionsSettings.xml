@@ -1,0 +1,55 @@
+<?xml version="1.0" ?>
+<pqevents>
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuTools" />
+  <pqevent object="pqClientMainWindow/menubar/menuTools" command="activate" arguments="actionToolsManageExpressions" />
+
+  <!-- add some python expressions -->
+  <pqevent object="pqClientMainWindow/ExpressionsManagerDialog/add" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/ExpressionsManagerDialog/expressions" command="setCurrent" arguments="0.0" />
+  <pqevent object="pqClientMainWindow/ExpressionsManagerDialog/expressions" command="edit" arguments="0.0" />
+  <pqevent object="pqClientMainWindow/ExpressionsManagerDialog/expressions/qt_scrollarea_viewport/1QComboBox0" command="activated" arguments="Python" />
+  <pqevent object="pqClientMainWindow/ExpressionsManagerDialog/expressions" command="setCurrent" arguments="0.2" />
+  <pqevent object="pqClientMainWindow/ExpressionsManagerDialog/expressions" command="edit" arguments="0.2" />
+  <pqevent object="pqClientMainWindow/ExpressionsManagerDialog/expressions" command="editAccepted" arguments="0.2,numpy.tan(Z)" />
+
+  <pqevent object="pqClientMainWindow/ExpressionsManagerDialog/add" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/ExpressionsManagerDialog/expressions" command="setCurrent" arguments="0.0" />
+  <pqevent object="pqClientMainWindow/ExpressionsManagerDialog/expressions" command="edit" arguments="0.0" />
+  <pqevent object="pqClientMainWindow/ExpressionsManagerDialog/expressions/qt_scrollarea_viewport/1QComboBox0" command="activated" arguments="Python" />
+  <pqevent object="pqClientMainWindow/ExpressionsManagerDialog/expressions" command="setCurrent" arguments="0.2" />
+  <pqevent object="pqClientMainWindow/ExpressionsManagerDialog/expressions" command="edit" arguments="0.2" />
+  <pqevent object="pqClientMainWindow/ExpressionsManagerDialog/expressions" command="editAccepted" arguments="0.2,numpy.cos(X)" />
+
+  <!-- save, modify, cancel, reopen : should restore saved state -->
+  <pqevent object="pqClientMainWindow/ExpressionsManagerDialog/save" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/ExpressionsManagerDialog/expressions" command="setCurrent" arguments="0.2" />
+  <pqevent object="pqClientMainWindow/ExpressionsManagerDialog/expressions" command="edit" arguments="0.2" />
+  <pqevent object="pqClientMainWindow/ExpressionsManagerDialog/expressions" command="editAccepted" arguments="0.2,wrongEntry" />
+  <pqevent object="pqClientMainWindow/ExpressionsManagerDialog/cancel" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuTools" />
+  <pqevent object="pqClientMainWindow/menubar/menuTools" command="activate" arguments="actionToolsManageExpressions" />
+  <pqcheck object="pqClientMainWindow/ExpressionsManagerDialog/expressions" property="modelRowCount" arguments="2" />
+  <pqcheck object="pqClientMainWindow/ExpressionsManagerDialog/expressions" property="modelItemData" arguments="0.0,Python" />
+  <pqcheck object="pqClientMainWindow/ExpressionsManagerDialog/expressions" property="modelItemData" arguments="0.2,numpy.cos(X)" />
+
+  <!-- add some calculator expressions -->
+  <pqevent object="pqClientMainWindow/ExpressionsManagerDialog/add" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/ExpressionsManagerDialog/expressions" command="setCurrent" arguments="0.0" />
+  <pqevent object="pqClientMainWindow/ExpressionsManagerDialog/expressions" command="edit" arguments="0.0" />
+  <pqevent object="pqClientMainWindow/ExpressionsManagerDialog/expressions/qt_scrollarea_viewport/1QComboBox0" command="activated" arguments="Expression" />
+  <pqevent object="pqClientMainWindow/ExpressionsManagerDialog/expressions" command="setCurrent" arguments="0.2" />
+  <pqevent object="pqClientMainWindow/ExpressionsManagerDialog/expressions" command="edit" arguments="0.2" />
+  <pqevent object="pqClientMainWindow/ExpressionsManagerDialog/expressions" command="editAccepted" arguments="0.2,cos(Z)*kHat" />
+
+  <!-- close and reopen : table should have been saved and populated -->
+  <pqevent object="pqClientMainWindow/ExpressionsManagerDialog/close" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuTools" />
+  <pqevent object="pqClientMainWindow/menubar/menuTools" command="activate" arguments="actionToolsManageExpressions" />
+  <pqcheck object="pqClientMainWindow/ExpressionsManagerDialog/expressions" property="modelRowCount" arguments="3" />
+  <pqcheck object="pqClientMainWindow/ExpressionsManagerDialog/expressions" property="modelItemData" arguments="0.0,Expression" />
+  <pqcheck object="pqClientMainWindow/ExpressionsManagerDialog/expressions" property="modelItemData" arguments="0.2,cos(Z)*kHat" />
+  <pqcheck object="pqClientMainWindow/ExpressionsManagerDialog/expressions" property="modelItemData" arguments="1.2,numpy.cos(X)" />
+  <pqcheck object="pqClientMainWindow/ExpressionsManagerDialog/expressions" property="modelItemData" arguments="2.0,Python" />
+
+  <pqevent object="pqClientMainWindow/ExpressionsManagerDialog/close" command="activate" arguments="" />
+</pqevents>

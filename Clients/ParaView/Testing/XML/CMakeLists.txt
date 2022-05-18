@@ -686,6 +686,9 @@ SET (TESTS_WITHOUT_BASELINES
   DynamicFieldDataDomain.xml
   ExportFilteredColumnsSpreadsheet.xml
   ExportSpreadsheetFormatting.xml
+  ExpressionsDialog.xml
+  ExpressionsExporter.xml
+  ExpressionsSettings.xml
   ExtractParticlesOverTime.xml
   FavoritesFilters.xml
   FindWidget.xml

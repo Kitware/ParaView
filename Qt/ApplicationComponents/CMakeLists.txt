@@ -135,6 +135,7 @@ set(classes
   pqMainControlsToolbar
   pqMainWindowEventBehavior
   pqManageCustomFiltersReaction
+  pqManageExpressionsReaction
   pqManageFavoritesReaction
   pqManageLinksReaction
   pqManagePluginsReaction
