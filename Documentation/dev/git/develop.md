@@ -38,7 +38,7 @@ Before you begin, perform initial setup:
     called `gitlab` to refer to it.
 
 5.  (Optional but highly recommended.)
-    [Register](https://open.cdash.org/register.php) with the ParaView project
+    [Register][cdash-registration] with the ParaView project
     on Kitware's CDash instance to better know how your code performs in
     regression tests.  After registering and signing in, click on
     "All Dashboards" link in the upper left corner, scroll down and click
@@ -47,6 +47,7 @@ Before you begin, perform initial setup:
 [GitLab Access]: https://gitlab.kitware.com/users/sign_in
 [Fork ParaView]: https://gitlab.kitware.com/paraview/paraview/-/forks/new
 [developer setup script]: /Utilities/SetupForDevelopment.sh
+[cdash-registration]: https://open.cdash.org/register
 
 Workflow
 --------
