@@ -29,6 +29,7 @@
 #include "vtkTemporalInterpolatedVelocityField.h"
 
 using namespace vtkParticleTracerBaseNamespace;
+using IDStates = vtkTemporalInterpolatedVelocityField::IDStates;
 
 vtkStandardNewMacro(vtkInSituPParticlePathFilter);
 
@@ -198,7 +199,7 @@ void vtkInSituPParticlePathFilter::AssignSeedsToProcessors(double t, vtkDataSet*
       // since this is first test, avoid bad cache tests
       this->GetInterpolator()->ClearCache();
       int searchResult = this->GetInterpolator()->TestPoint(pos);
-      if (searchResult == ID_INSIDE_ALL || searchResult == ID_OUTSIDE_T0)
+      if (searchResult == IDStates::INSIDE_ALL || searchResult == IDStates::OUTSIDE_T0)
       {
         // this particle is in this process's domain for the latest time step
         owningProcess[i] = myRank;
