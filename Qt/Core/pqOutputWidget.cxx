@@ -358,7 +358,7 @@ public:
       this->Parent->showFullMessages(
         settings->value(QString("%1.ShowFullMessages").arg(key), false).toBool());
       this->Parent->alwaysOpenForNewMessages(
-        settings->value(QString("%1.AlwaysOpenForNewMessages").arg(key), false).toBool());
+        settings->value(QString("%1.AlwaysOpenForNewMessages").arg(key), true).toBool());
     }
   }
 
@@ -431,8 +431,6 @@ pqOutputWidget::pqOutputWidget(QWidget* parentObject, Qt::WindowFlags f)
 
   // Install the message handler
   MessageHandler::install(this);
-
-  this->setSettingsKey("pqOutputWidget");
 }
 
 //-----------------------------------------------------------------------------
