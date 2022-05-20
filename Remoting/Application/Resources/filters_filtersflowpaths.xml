@@ -321,14 +321,37 @@
           that would return the exact same result.
         </Documentation>
       </IntVectorProperty>
-      <IntVectorProperty command="SetStaticMesh"
+      <IntVectorProperty command="SetMeshOverTime"
                          default_values="0"
-                         name="StaticMesh"
+                         name="MeshOverTime"
                          number_of_elements="1">
-        <BooleanDomain name="bool"/>
+        <EnumerationDomain name="enum">
+          <Entry text="Different" value="0"/>
+          <Entry text="Static" value="1"/>
+          <Entry text="Linear Transformation" value="2"/>
+          <Entry text="Same Topology" value="3"/>
+        </EnumerationDomain>
         <Documentation>
-          If the input grid is not changing, then this can be set to 1 to avoid having to create
-          cell locators for each update.
+          The input mesh can either be 1) different over time, or 2) static over time,
+          or 3) a linear transformation of the first time step over time, or 4) have the same topology over time.
+          If a value other than Different are used, then performance can be improved significantly because certain
+          data structures, such as locators or cell links are not rebuilt for each timestep.
+        </Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetInterpolatorType"
+                         default_values="1"
+                         name="InterpolatorType"
+                         number_of_elements="1"
+                         panel_visibility="advanced">
+        <EnumerationDomain name="enum">
+          <Entry text="Interpolator with Point Locator"
+                 value="0"/>
+          <Entry text="Interpolator with Cell Locator"
+                 value="1"/>
+        </EnumerationDomain>
+        <Documentation>
+          This property determines which interpolator to use for evaluating the velocity vector field. The first is
+          faster though the second is more robust in locating cells during streamline integration.
         </Documentation>
       </IntVectorProperty>
       <StringVectorProperty animateable="0"
@@ -438,14 +461,37 @@
           that would return the exact same result.
         </Documentation>
       </IntVectorProperty>
-      <IntVectorProperty command="SetStaticMesh"
+      <IntVectorProperty command="SetMeshOverTime"
                          default_values="0"
-                         name="StaticMesh"
+                         name="MeshOverTime"
                          number_of_elements="1">
-        <BooleanDomain name="bool"/>
+        <EnumerationDomain name="enum">
+          <Entry text="Different" value="0"/>
+          <Entry text="Static" value="1"/>
+          <Entry text="Linear Transformation" value="2"/>
+          <Entry text="Same Topology" value="3"/>
+        </EnumerationDomain>
         <Documentation>
-          If the input grid is not changing, then this can be set to 1 to avoid having to create cell locators for
-          each update.
+          The input mesh can either be 1) different over time, or 2) static over time,
+          or 3) a linear transformation of the first time step over time, or 4) have the same topology over time.
+          If a value other than Different are used, then performance can be improved significantly because certain
+          data structures, such as locators or cell links are not rebuilt for each timestep.
+        </Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetInterpolatorType"
+                         default_values="1"
+                         name="InterpolatorType"
+                         number_of_elements="1"
+                         panel_visibility="advanced">
+        <EnumerationDomain name="enum">
+          <Entry text="Interpolator with Point Locator"
+                 value="0"/>
+          <Entry text="Interpolator with Cell Locator"
+                 value="1"/>
+        </EnumerationDomain>
+        <Documentation>
+          This property determines which interpolator to use for evaluating the velocity vector field. The first is
+          faster though the second is more robust in locating cells during streamline integration.
         </Documentation>
       </IntVectorProperty>
 
@@ -545,14 +591,37 @@
           that would return the exact same result.
         </Documentation>
       </IntVectorProperty>
-      <IntVectorProperty command="SetStaticMesh"
+      <IntVectorProperty command="SetMeshOverTime"
                          default_values="0"
-                         name="StaticMesh"
+                         name="MeshOverTime"
                          number_of_elements="1">
-        <BooleanDomain name="bool"/>
+        <EnumerationDomain name="enum">
+          <Entry text="Different" value="0"/>
+          <Entry text="Static" value="1"/>
+          <Entry text="Linear Transformation" value="2"/>
+          <Entry text="Same Topology" value="3"/>
+        </EnumerationDomain>
         <Documentation>
-          If the input grid is not changing, then this can be set to 1 to avoid having to create cell locators for
-          each update.
+          The input mesh can either be 1) different over time, or 2) static over time,
+          or 3) a linear transformation of the first time step over time, or 4) have the same topology over time.
+          If a value other than Different are used, then performance can be improved significantly because certain
+          data structures, such as locators or cell links are not rebuilt for each timestep.
+        </Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetInterpolatorType"
+                         default_values="1"
+                         name="InterpolatorType"
+                         number_of_elements="1"
+                         panel_visibility="advanced">
+        <EnumerationDomain name="enum">
+          <Entry text="Interpolator with Point Locator"
+                 value="0"/>
+          <Entry text="Interpolator with Cell Locator"
+                 value="1"/>
+        </EnumerationDomain>
+        <Documentation>
+          This property determines which interpolator to use for evaluating the velocity vector field. The first is
+          faster though the second is more robust in locating cells during streamline integration.
         </Documentation>
       </IntVectorProperty>
       <InputProperty clean_command="RemoveAllSources"
