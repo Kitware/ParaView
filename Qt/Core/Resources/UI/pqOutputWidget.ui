@@ -80,6 +80,9 @@
        <property name="text">
         <string>Always open for new messages</string>
        </property>
+       <property name="checked">
+        <bool>true</bool>
+       </property>
       </widget>
      </item>
      <item>
