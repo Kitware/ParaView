@@ -49,7 +49,7 @@ public:
   {
     auto iter =
       std::find_if(this->Links.begin(), this->Links.end(), [source, target](const Item& item) {
-        return (item.Source == source && item.Target == target) ? true : false;
+        return (item.Source == source && item.Target == target);
       });
     return (iter != this->Links.end()) ? &(*iter) : nullptr;
   }
@@ -309,13 +309,16 @@ void vtkSMSettingsProxy::SaveLinksState(vtkPVXMLElement* root)
   internals.Prune();
   for (const auto& item : internals.Links)
   {
-    vtkNew<vtkPVXMLElement> property;
-    property->SetName("Property");
-    property->AddAttribute("source_property", item.SourceName.c_str());
-    property->AddAttribute("target_id", item.TargetProxy->GetGlobalIDAsString());
-    property->AddAttribute("target_property", item.TargetName.c_str());
-    property->AddAttribute("unlink_if_modified", (item.ObserverId > 0 ? 1 : 0));
-    links->AddNestedElement(property);
+    if (item.TargetProxy)
+    {
+      vtkNew<vtkPVXMLElement> property;
+      property->SetName("Property");
+      property->AddAttribute("source_property", item.SourceName.c_str());
+      property->AddAttribute("target_id", item.TargetProxy->GetGlobalIDAsString());
+      property->AddAttribute("target_property", item.TargetName.c_str());
+      property->AddAttribute("unlink_if_modified", (item.ObserverId > 0 ? 1 : 0));
+      links->AddNestedElement(property);
+    } // else target proxy is something that got deleted at some point
   }
 }
 
