@@ -335,6 +335,8 @@ private:
   vtkSMViewProxy(const vtkSMViewProxy&) = delete;
   void operator=(const vtkSMViewProxy&) = delete;
 
+  bool InRender;
+
   vtkSMDataDeliveryManagerProxy* DeliveryManager;
   static bool TransparentBackground;
 

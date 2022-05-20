@@ -302,6 +302,7 @@ vtkSMViewProxy::vtkSMViewProxy()
   this->SetLocation(vtkProcessModule::CLIENT_AND_SERVERS);
   this->DefaultRepresentationName = nullptr;
   this->Enable = true;
+  this->InRender = false;
   this->DeliveryManager = nullptr;
 }
 
@@ -349,6 +350,13 @@ void vtkSMViewProxy::CreateVTKObjects()
 //----------------------------------------------------------------------------
 void vtkSMViewProxy::StillRender()
 {
+  // avoid recursive rendering calls
+  // see paraview/paraview#21400
+  if (this->InRender)
+  {
+    return;
+  }
+
   // bug 0013947
   // on Mac OSX don't render into invalid drawable, all subsequent
   // OpenGL calls fail with invalid framebuffer operation.
@@ -356,6 +364,8 @@ void vtkSMViewProxy::StillRender()
   {
     return;
   }
+
+  this->InRender = true;
 
   int interactive = 0;
   this->InvokeEvent(vtkCommand::StartEvent, &interactive);
@@ -398,12 +408,27 @@ void vtkSMViewProxy::StillRender()
 
   this->PostRender(interactive == 1);
   this->GetSession()->CleanupPendingProgress();
+
+  // I am not sure if InRender should be toggled before or after the event.
+  // Before seems okay in case applications want to call render repeatedly, but
+  // may need to be moved to after.
+  this->InRender = false;
+
   this->InvokeEvent(vtkCommand::EndEvent, &interactive);
 }
 
 //----------------------------------------------------------------------------
 void vtkSMViewProxy::InteractiveRender()
 {
+  // avoid recursive rendering calls
+  // see paraview/paraview#21400
+  if (this->InRender)
+  {
+    return;
+  }
+
+  this->InRender = true;
+
   int interactive = 1;
   this->InvokeEvent(vtkCommand::StartEvent, &interactive);
   this->GetSession()->PrepareProgress();
@@ -429,6 +454,7 @@ void vtkSMViewProxy::InteractiveRender()
 
   this->PostRender(interactive == 1);
   this->GetSession()->CleanupPendingProgress();
+  this->InRender = false;
   this->InvokeEvent(vtkCommand::EndEvent, &interactive);
 }
 
