@@ -711,7 +711,8 @@ paraview_plugin_build(
   TARGET_COMPONENT  "development"
   PLUGINS_COMPONENT "plugins"
   PLUGINS ${paraview_plugins}
-  AUTOLOAD ${autoload_plugins})
+  AUTOLOAD ${autoload_plugins}
+  DISABLE_XML_DOCUMENTATION "${PARAVIEW_PLUGIN_DISABLE_XML_DOCUMENTATION}")
 
 set(CMAKE_INSTALL_RPATH
   "${_paraview_CMAKE_INSTALL_RPATH_save}")
