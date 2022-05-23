@@ -101,6 +101,7 @@ paraview_add_test_python(
   LoadStateWithDataSets.py
   Plot3DReader.py
   SaveDataWithArraySelection.py
+  SaveDataWithArrayAndBlockSelection.py
   ReadTimeArray.py
   ReplaceReaderFileName.py
 )
@@ -112,6 +113,7 @@ set(PVBATCH_TESTS
   PLYWriter.py
   VolumeCellSelection.py
   SaveDataWithArraySelection.py,NO_VALID
+  # SaveDataWithArrayAndBlockSelection.py,NO_VALID # BUG #21419
 )
 if(NOT APPLE)
   # temporarily disable on mac due to bugs in

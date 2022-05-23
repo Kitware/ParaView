@@ -47,7 +47,9 @@
       <SubProxy>
         <Proxy name="PassArrays" proxygroup="internal_writers" proxyname="PassArrays" />
         <ExposedProperties>
-          <Property name="ChooseArraysToWrite"/>
+        <PropertyGroup label="Data Selection">
+          <Property name="ChooseArraysToWrite" />
+        </PropertyGroup>
           <PropertyGroup label="Array Selection" panel_widget="ArrayStatus">
             <Property name="PointDataArrays" />
             <Property name="CellDataArrays" />
@@ -102,7 +104,9 @@
       <SubProxy>
         <Proxy name="PassArrays" proxygroup="internal_writers" proxyname="PassArrays" />
         <ExposedProperties>
-          <Property name="ChooseArraysToWrite"/>
+        <PropertyGroup label="Data Selection">
+          <Property name="ChooseArraysToWrite" />
+        </PropertyGroup>
           <PropertyGroup label="Array Selection" panel_widget="ArrayStatus">
             <Property name="PointDataArrays" />
             <Property name="CellDataArrays" />
@@ -207,13 +211,150 @@
 
       <!-- End of FileSeriesWriter -->
     </Proxy>
+
+    <!-- ================================================================= -->
+    <Proxy name="FileSeriesWriterComposite">
+      <StringVectorProperty command="SetFileName"
+                            name="FileName"
+                            number_of_elements="1"
+                            panel_visibility="never">
+        <Documentation>The name of the file to be written.</Documentation>
+      </StringVectorProperty>
+
+      <SubProxy>
+        <Proxy name="SelectArraysExtractBlocks" proxygroup="internal_filters" proxyname="SelectArraysExtractBlocks" />
+        <ExposedProperties>
+          <PropertyGroup label="Data Selection">
+            <Property name="ChooseArraysToWrite"/>
+          </PropertyGroup>
+          <PropertyGroup label="Array Selection" panel_widget="ArrayStatus">
+            <Property name="PointDataArrays" />
+            <Property name="CellDataArrays" />
+            <Property name="FieldDataArrays" />
+            <Property name="VertexDataArrays" />
+            <Property name="EdgeDataArrays" />
+            <Property name="RowDataArrays" />
+            <Hints>
+              <PropertyWidgetDecorator type="GenericDecorator"
+                                       mode="visibility"
+                                       property="ChooseArraysToWrite"
+                                       value="1" />
+              <!-- show this widget when ChooseArraysToWrite==1 -->
+            </Hints>
+          </PropertyGroup>
+          <PropertyGroup>
+            <Property name="ChooseBlocksToWrite"/>
+          </PropertyGroup>
+          <PropertyGroup label="Blocks" panel_widget="DataAssemblyEditor">
+            <Property name="Assembly" function="ActiveAssembly"/>
+            <Property name="Selectors" function="Selectors"/>
+            <Hints>
+              <PropertyWidgetDecorator type="GenericDecorator"
+                                       mode="visibility"
+                                       property="ChooseBlocksToWrite"
+                                       value="1" />
+              <!-- show this widget when ChooseBlocksToWrite==1 -->
+            </Hints>
+          </PropertyGroup>
+        </ExposedProperties>
+        <LinkProperties>
+          <Property name="Input" with_property="Input" />
+        </LinkProperties>
+      </SubProxy>
+
+      <IntVectorProperty command="SetWriteAllTimeSteps"
+                         default_values="0"
+                         label="Write timesteps as file-series"
+                         name="WriteTimeSteps"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>When WriteTimeSteps is OFF, the writer
+        writes only the current timestep. Otherwise it is called once
+        for each time step within the min and max range. If those are
+        not set, the writer is called for all time steps available in
+        its input.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetMinTimeStep"
+                         default_values="0"
+                         label="First time step"
+                         name="MinTimeStep"
+                         number_of_elements="1">
+        <IntRangeDomain min="0"
+                        name="range" />
+        <Documentation>Sets the lower bound for timesteps to write.</Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="EnableWidgetDecorator">
+            <Property name="WriteTimeSteps" function="boolean" />
+          </PropertyWidgetDecorator>
+        </Hints>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetMaxTimeStep"
+                         default_values="-1"
+                         label="Last time step"
+                         name="MaxTimeStep"
+                         number_of_elements="1">
+        <Documentation>Sets the upper bound for timesteps to write. If
+        less than min, the last time step is used.</Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="EnableWidgetDecorator">
+            <Property name="WriteTimeSteps" function="boolean" />
+          </PropertyWidgetDecorator>
+        </Hints>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetTimeStepStride"
+                         default_values="1"
+                         label="Time step stride"
+                         name="TimeStepStride"
+                         number_of_elements="1">
+        <IntRangeDomain min="1"
+                        name="range" />
+        <Documentation>Sets the stride to go through the time steps.</Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="EnableWidgetDecorator">
+            <Property name="WriteTimeSteps" function="boolean" />
+          </PropertyWidgetDecorator>
+        </Hints>
+      </IntVectorProperty>
+
+      <StringVectorProperty command="SetFileNameSuffix"
+                            default_values="_%d"
+                            label = "File name suffix"
+                            name="FileNameSuffix"
+                            number_of_elements="1">
+        <Documentation>
+        The suffix to append to the file name when writing files at different timesteps.
+        File extensions such as .vtk should be excluded.
+        The `%` format specifiers are used. For example, _%d will write files as FileName_0,
+        FileName_1, FileName_2, etc., and _%.3d will write files as FileName_000,
+        FileName_001, FileName_002 etc.
+        </Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="EnableWidgetDecorator">
+            <Property name="WriteTimeSteps" function="boolean" />
+          </PropertyWidgetDecorator>
+        </Hints>
+      </StringVectorProperty>
+
+      <PropertyGroup label="File Series">
+        <Property name="WriteTimeSteps" />
+        <Property name="FileNameSuffix"/>
+        <Property name="MinTimeStep" />
+        <Property name="MaxTimeStep" />
+        <Property name="TimeStepStride" />
+      </PropertyGroup>
+
+      <!-- End of FileSeriesWriterComposite -->
+    </Proxy>
+
     <!-- ================================================================= -->
     <Proxy name="ParallelFileSeriesWriter">
 
       <SubProxy>
         <Proxy name="PassArrays" proxygroup="internal_writers" proxyname="PassArrays" />
         <ExposedProperties>
-          <Property name="ChooseArraysToWrite"/>
+        <PropertyGroup label="Data Selection">
+          <Property name="ChooseArraysToWrite" />
+        </PropertyGroup>
           <PropertyGroup label="Array Selection" panel_widget="ArrayStatus">
             <Property name="PointDataArrays" />
             <Property name="CellDataArrays" />
@@ -324,8 +465,6 @@
         <Property name="MaxTimeStep" />
         <Property name="TimeStepStride" />
       </PropertyGroup>
-
-
       <!-- End of ParallelFileSeriesWriter -->
     </Proxy>
 
@@ -335,7 +474,9 @@
       <SubProxy>
         <Proxy name="PassArrays" proxygroup="internal_writers" proxyname="PassArrays" />
         <ExposedProperties>
-          <Property name="ChooseArraysToWrite"/>
+        <PropertyGroup label="Data Selection">
+          <Property name="ChooseArraysToWrite" />
+        </PropertyGroup>
           <PropertyGroup label="Array Selection" panel_widget="ArrayStatus">
             <Property name="PointDataArrays" />
             <Property name="CellDataArrays" />
