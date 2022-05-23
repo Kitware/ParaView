@@ -234,7 +234,7 @@ bool vtkSMReaderFactory::vtkInternals::vtkValue::ExtensionTest(
     {
       for (auto& ext : extensions)
       {
-        if (ext == hint_ext)
+        if (vtksys::SystemTools::Strucmp(ext.c_str(), hint_ext.c_str()) == 0)
         {
           return true;
         }
