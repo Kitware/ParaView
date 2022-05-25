@@ -81,6 +81,17 @@ public:
   vtkGetVector2Macro(PlaybackTimeWindow, double);
   //@}
 
+  //@{
+  /**
+   * Set/Get The stride which is used to extract the next frame.
+   * E.g. 1, 2, 3, would have stride = 1, while 1, 3, 5 would have stride = 2.
+   *
+   * Default value is 1.
+   */
+  vtkSetMacro(Stride, int);
+  vtkGetMacro(Stride, int);
+  //@}
+
 protected:
   vtkSMAnimationSceneWriter();
   ~vtkSMAnimationSceneWriter() override;
@@ -115,6 +126,7 @@ protected:
   char* FileName;
   double PlaybackTimeWindow[2];
   int StartFileCount;
+  int Stride = 1;
 
 private:
   vtkSMAnimationSceneWriter(const vtkSMAnimationSceneWriter&) = delete;

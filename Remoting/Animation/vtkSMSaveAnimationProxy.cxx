@@ -274,7 +274,7 @@ protected:
     writer->SetInputData(nullptr);
 
     success &= writer->GetErrorCode() == vtkErrorCode::NoError;
-    this->Counter += success ? 1 : 0;
+    this->Counter += success ? this->Stride : 0;
     return success;
   }
 
@@ -443,13 +443,14 @@ bool vtkSMSaveAnimationProxy::WriteAnimationLocally(const char* filename)
   {
     vtkErrorMacro("Unknown format type "
       << (formatObj ? formatObj->GetClassName() : "")
-      << ". Currently, on vtkImageWriter or vtkGenericMovieWriter subclasses "
+      << ". Currently, only vtkImageWriter or vtkGenericMovieWriter subclasses "
       << "are supported.");
     return false;
   }
 
   writer->SetAnimationScene(sceneProxy);
   writer->SetFileName(filename);
+  writer->SetStride(vtkSMPropertyHelper(this, "FrameStride").GetAsInt());
 
   // FIXME: we should consider cleaning up this API on vtkSMAnimationSceneWriter. For now,
   //        keeping it unchanged. This largely lifted from old code in
