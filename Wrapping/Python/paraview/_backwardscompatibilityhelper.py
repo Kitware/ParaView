@@ -397,6 +397,16 @@ def setattr(proxy, pname, value):
                     "properties, then set the 'ThresholdMethod' property to "
                     "'Between' to threshold between the lower and upper thresholds.")
 
+    # In 5.11, we changed the ParticleTracer/ParticlePath/StreakLine's the StaticMesh
+    # property to be called MeshOverTime since more capabilities were added.
+    if pname == "StaticMesh" and proxy.SMProxy.GetXMLName() in ["ParticleTracer, ParticlePath, StreakLine"]:
+        if paraview.compatibility.GetVersion() <= 5.10:
+            proxy.GetProperty("MeshOverTime").SetData(value)
+            raise Continue()
+        else:
+            raise NotSupportedException("'StaticMesh' is obsolete.  Use 'MeshOverTime' property of " +
+                                        proxy.SMProxy.GetXMLName() + " filter instead.")
+
     if not hasattr(proxy, pname):
         raise AttributeError()
     proxy.__dict__[pname] = value
@@ -819,6 +829,14 @@ def getattr(proxy, pname):
                     "If you are wishing to use this property, please use 'SPHDataSetInterpolator' "
                     "instead. The 'CutoffArray' needs to be provided by the data set source.")
 
+    if pname == "StaticMesh" and proxy.SMProxy.GetXMLName() in ["ParticleTracer, ParticlePath, StreakLine"]:
+        if paraview.compatibility.GetVersion() <= 5.10:
+            return proxy.GetProperty("MeshOverTime").GetData()
+        else:
+            raise NotSupportedException(
+                "The " + proxy.SMProxy.GetXMLName() + ".StaticMesh property has been changed in ParaView 5.11. " \
+                "Please set the MeshOverTime property instead.")
+
     raise Continue()
 
 # Depending on the compatibility version that has been set, older functionalities
@@ -877,6 +895,13 @@ def GetProxy(module, key, **kwargs):
             # into a unique 'Gradient" filter.
             gradient = builtins.getattr(module, "GradientLegacy")(**kwargs)
             return gradient
+    if version <= 5.10:
+        if key in ["ParticleTracer, ParticlePath, StreakLine"]:
+            # in 5.11, we changed the StaticMesh flag of ParticleTracer, ParticlePath and StreakLine
+            # This restores the previous StaticMesh.
+            particleTracerBase = builtins.getattr(module, key)(**kwargs)
+            particleTracerBase.MeshOverTime = 0
+            return particleTracerBase
 
     return builtins.getattr(module, key)(**kwargs)
 
