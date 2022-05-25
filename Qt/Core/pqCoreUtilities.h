@@ -203,6 +203,18 @@ public:
    */
   static void setPaletteHighlightToCritical(QPalette& palette);
 
+  /**
+   * Safely delete a directory recursively. This function indicates any errors with a modal popup
+   * dialog.
+   */
+  static void removeRecursively(QDir dir);
+
+  /**
+   * Safely delete a file. This function indicates any errors
+   * with a modal popup dialog.
+   */
+  static void remove(const QString& filePath);
+
 private:
   static QWidget* findMainWindow();
   static QPointer<QWidget> MainWidget;

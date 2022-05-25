@@ -213,6 +213,9 @@ void pqPythonScriptEditor::createMenus()
     this->tr("Load a python script in a new tab and run it"));
   this->scriptMenus[ScriptActionType::Run]->setToolTipsVisible(true);
 
+  menu->addSeparator();
+  menu->addAction(&this->Actions[Action::DeleteAll]);
+
   this->Actions.FillQMenu(this->scriptMenus);
 }
 

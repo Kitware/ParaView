@@ -30,6 +30,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
 #include "pqServerConnectDialog.h"
+#include "pqCoreUtilities.h"
 #include "pqQtDeprecated.h"
 #include "ui_pqServerConnectDialog.h"
 
@@ -170,6 +171,8 @@ pqServerConnectDialog::pqServerConnectDialog(
   QObject::connect(this->Internals->addServer, SIGNAL(clicked()), this, SLOT(addServer()));
 
   QObject::connect(this->Internals->editServer, SIGNAL(clicked()), this, SLOT(editServer()));
+
+  QObject::connect(this->Internals->deleteAll, SIGNAL(clicked()), this, SLOT(deleteAllServers()));
 
   QObject::connect(
     this->Internals->name, SIGNAL(textChanged(const QString&)), this, SLOT(onNameChanged()));
@@ -672,6 +675,18 @@ void pqServerConnectDialog::deleteServer()
   }
 
   Q_EMIT serverDeleted();
+}
+
+//-----------------------------------------------------------------------------
+void pqServerConnectDialog::deleteAllServers()
+{
+
+  QMessageBox::StandardButton ret =
+    QMessageBox::question(this, "Delete All", "All servers will be deleted. Are you sure?");
+  if (ret == QMessageBox::StandardButton::Yes)
+  {
+    pqApplicationCore::instance()->serverConfigurations().removeUserConfigurations();
+  }
 }
 
 //-----------------------------------------------------------------------------

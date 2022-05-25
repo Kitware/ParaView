@@ -114,6 +114,12 @@ public:
    */
   const pqServerConfiguration* configuration(const char* configuration_name) const;
 
+public Q_SLOTS:
+  /**
+   * Remove all user configurations. This deletes the user servers.pvsc file.
+   */
+  void removeUserConfigurations();
+
 Q_SIGNALS:
   /**
    * fired when the collection is modified.
