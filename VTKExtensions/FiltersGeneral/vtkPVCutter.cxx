@@ -14,34 +14,27 @@
 =========================================================================*/
 #include "vtkPVCutter.h"
 
-#include "vtkAppendFilter.h"
-#include "vtkCompositeDataIterator.h"
-#include "vtkCompositeDataPipeline.h"
 #include "vtkDataSet.h"
 #include "vtkDemandDrivenPipeline.h"
 #include "vtkHyperTreeGrid.h"
-#include "vtkHyperTreeGridAxisCut.h"
-#include "vtkHyperTreeGridPlaneCutter.h"
+#include "vtkImageData.h"
+#include "vtkIncrementalPointLocator.h"
 #include "vtkInformation.h"
 #include "vtkInformationStringVectorKey.h"
 #include "vtkInformationVector.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVPlane.h"
+#include "vtkPVPlaneCutter.h"
 #include "vtkPolyData.h"
 #include "vtkSmartPointer.h"
-#include "vtkStreamingDemandDrivenPipeline.h"
+#include "vtkUnstructuredGridBase.h"
 
-#include <cassert>
-
+//----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVCutter);
 
 //----------------------------------------------------------------------------
-vtkPVCutter::vtkPVCutter()
-{
-  this->SetNumberOfOutputPorts(1);
-  this->Dual = false;
-}
+vtkPVCutter::vtkPVCutter() = default;
 
 //----------------------------------------------------------------------------
 vtkPVCutter::~vtkPVCutter() = default;
@@ -57,75 +50,53 @@ int vtkPVCutter::RequestData(
   vtkInformation* request, vtkInformationVector** inputVector, vtkInformationVector* outputVector)
 {
   vtkInformation* inInfo = inputVector[0]->GetInformationObject(0);
-
-  if (!inInfo)
-  {
-    vtkErrorMacro(<< "Failed to get input information.");
-    return 0;
-  }
-
-  vtkDataObject* inDataObj = inInfo->Get(vtkDataObject::DATA_OBJECT());
-
-  if (!inDataObj)
-  {
-    vtkErrorMacro(<< "Failed to get input data object.");
-    return 0;
-  }
-
   vtkInformation* outInfo = outputVector->GetInformationObject(0);
-  if (!outInfo)
-  {
-    vtkErrorMacro(<< "Failed to get output information.");
-  }
 
-  vtkDataObject* outDataObj = outInfo->Get(vtkDataObject::DATA_OBJECT());
-  if (!outDataObj)
-  {
-    vtkErrorMacro(<< "Failed to get output data object.");
-  }
+  vtkDataObject* input = vtkDataObject::GetData(inInfo);
+  vtkDataObject* output = vtkDataObject::GetData(outInfo);
 
-  vtkHyperTreeGrid* inHyperTreeGrid = vtkHyperTreeGrid::SafeDownCast(inDataObj);
-  if (inHyperTreeGrid)
+  vtkPVPlane* plane = vtkPVPlane::SafeDownCast(this->CutFunction);
+  if (plane && this->GetNumberOfContours() == 1 && this->GetGenerateCutScalars() == 0)
   {
-    vtkPVPlane* plane = vtkPVPlane::SafeDownCast(this->CutFunction);
-    if (plane && plane->GetAxisAligned())
+    if (vtkHyperTreeGrid::SafeDownCast(input))
     {
-      vtkNew<vtkHyperTreeGridAxisCut> axisCutter;
-      double* normal = plane->GetNormal();
-      axisCutter->SetPlanePosition(-plane->EvaluateFunction(0, 0, 0));
-      int planeNormalAxis = 0;
-      if (normal[1] > normal[0])
+      if (this->Locator == nullptr)
       {
-        planeNormalAxis = 1;
+        this->CreateDefaultLocator();
       }
-      if (normal[2] > normal[0])
-      {
-        planeNormalAxis = 2;
-      }
-      axisCutter->SetPlanePosition(-plane->EvaluateFunction(0, 0, 0));
-      axisCutter->SetPlaneNormalAxis(planeNormalAxis);
-      axisCutter->SetInputData(0, inHyperTreeGrid);
-
-      axisCutter->Update();
-      outDataObj->ShallowCopy(axisCutter->GetOutput(0));
+      this->PlaneCutter->SetInputData(input);
+      this->PlaneCutter->SetPlane(plane);
+      this->PlaneCutter->SetGeneratePolygons(!this->GetGenerateTriangles());
+      this->PlaneCutter->BuildTreeOff();
+      bool mergePoints =
+        this->GetLocator() && !this->GetLocator()->IsA("vtkNonMergingPointLocator");
+      this->PlaneCutter->SetMergePoints(mergePoints);
+      this->PlaneCutter->SetDual(this->GetDual());
+      this->PlaneCutter->SetOutputPointsPrecision(this->GetOutputPointsPrecision());
+      this->PlaneCutter->ComputeNormalsOff();
+      this->PlaneCutter->Update();
+      output->ShallowCopy(this->PlaneCutter->GetOutput());
       return 1;
     }
-    else if (plane)
+    else
     {
-      vtkNew<vtkHyperTreeGridPlaneCutter> planeCutter;
-      double* normal = plane->GetNormal();
-      planeCutter->SetPlane(normal[0], normal[1], normal[2], -plane->EvaluateFunction(0, 0, 0));
-      planeCutter->SetDual(this->GetDual());
-      planeCutter->SetInputData(0, inHyperTreeGrid);
-
-      planeCutter->Update();
-      outDataObj->ShallowCopy(planeCutter->GetOutput(0));
-      return 1;
+      return this->Superclass::RequestData(request, inputVector, outputVector);
     }
-    return 0;
   }
-  // Not dealing with hyper tree grids, we execute RequestData of vktCutter
-  return this->Superclass::RequestData(request, inputVector, outputVector);
+  else
+  {
+    // vtkHyperTreeGrid support only plane as cut function
+    if (vtkHyperTreeGrid::SafeDownCast(input))
+    {
+      vtkErrorMacro(<< input->GetClassName()
+                    << " doesn't support the cut function: " << this->CutFunction->GetClassName());
+      return 0;
+    }
+    else
+    {
+      return this->Superclass::RequestData(request, inputVector, outputVector);
+    }
+  }
 }
 
 //----------------------------------------------------------------------------
@@ -145,9 +116,7 @@ int vtkPVCutter::ProcessRequest(
 int vtkPVCutter::FillInputPortInformation(int port, vtkInformation* info)
 {
   this->Superclass::FillInputPortInformation(port, info);
-  vtkInformationStringVectorKey::SafeDownCast(
-    info->GetKey(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE()))
-    ->Append(info, "vtkHyperTreeGrid");
+  info->Append(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkHyperTreeGrid");
   return 1;
 }
 
@@ -163,19 +132,16 @@ int vtkPVCutter::RequestDataObject(vtkInformation* vtkNotUsed(request),
   vtkInformationVector** inputVector, vtkInformationVector* outputVector)
 {
   vtkInformation* inInfo = inputVector[0]->GetInformationObject(0);
-  if (!inInfo)
-  {
-    return 0;
-  }
+  vtkInformation* outInfo = outputVector->GetInformationObject(0);
+
+  auto inputDO = vtkDataObject::GetData(inInfo);
   if (!this->GetCutFunction())
   {
     vtkErrorMacro(<< "No cut function");
     return 0;
   }
 
-  vtkInformation* outInfo = outputVector->GetInformationObject(0);
-
-  if (vtkHyperTreeGrid::SafeDownCast(inInfo))
+  if (vtkHyperTreeGrid::SafeDownCast(inputDO))
   {
     vtkPVPlane* plane = vtkPVPlane::SafeDownCast(this->GetCutFunction());
     if (!plane)
@@ -209,7 +175,7 @@ int vtkPVCutter::RequestDataObject(vtkInformation* vtkNotUsed(request),
     }
     return 1;
   }
-  else if (vtkDataSet::SafeDownCast(inInfo))
+  else if (vtkDataSet::SafeDownCast(inputDO))
   {
     vtkPolyData* output = vtkPolyData::GetData(outInfo);
     if (!output)

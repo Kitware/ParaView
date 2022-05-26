@@ -2988,7 +2988,7 @@ Every Nth Point.
                                    mode="visibility"/>
         </Hints>
         <ProxyListDomain name="proxy_list">
-          <Group name="slice_htg_implicit_functions" default="Plane"/>
+          <Group name="slice_htg_amr_implicit_functions" default="Plane"/>
         </ProxyListDomain>
         <Documentation>This property sets the parameters of the slice
         function.</Documentation>
@@ -3290,6 +3290,224 @@ Every Nth Point.
         <Visibility replace_input="2" />
       </Hints>
       <!-- End Threshold -->
+    </SourceProxy>
+
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkPVPlaneCutter"
+                 name="SliceWithPlane"
+                 label="Slice With Plane">
+      <Documentation
+              long_help="This filter slices a data set with a plane. Slicing is similar to a contour. It creates surfaces from volumes and lines from surfaces. This filter is faster than the standard Slice filter."
+              short_help="Slice datasets with a plane.">
+        This filter extracts the portion of the input dataset that lies along
+        the specified plane. The Slice filter takes any type of
+        dataset as input. This is a multithreaded implementation.
+      </Documentation>
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources"/>
+          <Group name="filters"/>
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkDataSet"/>
+          <DataType value="vtkCompositeDataSet"/>
+          <DataType value="vtkHyperTreeGrid"/>
+        </DataTypeDomain>
+        <Documentation>
+          This property specifies the input of the slice filter.
+        </Documentation>
+      </InputProperty>
+      <ProxyProperty command="SetPlane"
+                     label="Plane Type"
+                     name="Plane">
+        <ProxyListDomain name="proxy_list">
+          <Group name="slice_htg_amr_implicit_functions" default="Plane"/>
+        </ProxyListDomain>
+        <Documentation>
+          This property sets the parameters of the plane function.
+        </Documentation>
+      </ProxyProperty>
+      <IntVectorProperty animateable="0"
+                         command="SetBuildTree"
+                         default_values="1"
+                         name="BuildTree"
+                         panel_visibility="advanced"
+                         number_of_elements="1">
+        <BooleanDomain name="bool"/>
+        <Hints>
+          <PropertyWidgetDecorator type="InputDataTypeDecorator"
+                                   name="vtkHyperTreeGrid vtkOverlappingAMR"
+                                   exclude="1"
+                                   mode="visibility"/>
+        </Hints>
+        <Documentation>
+          If enabled and input is not an Image Data, Sphere Tree will be computed, for a faster slice computation.
+        </Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty animateable="0"
+                         command="SetBuildHierarchy"
+                         default_values="1"
+                         name="BuildHierarchy"
+                         panel_visibility="advanced"
+                         number_of_elements="1">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          If enabled and input is not an Image Data, Tree hierarchy will be computed, for a faster slice computation.
+        </Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="CompositeDecorator">
+            <Expression type="and">
+              <PropertyWidgetDecorator type="InputDataTypeDecorator"
+                                       name="vtkHyperTreeGrid vtkOverlappingAMR"
+                                       exclude="1"
+                                       mode="visibility"/>
+              <PropertyWidgetDecorator type="ShowWidgetDecorator">
+                <Property name="BuildTree" function="boolean"/>
+              </PropertyWidgetDecorator>
+            </Expression>
+          </PropertyWidgetDecorator>
+        </Hints>
+      </IntVectorProperty>
+      <IntVectorProperty animateable="0"
+                         command="SetComputeNormals"
+                         default_values="0"
+                         name="ComputeNormals"
+                         panel_visibility="advanced"
+                         number_of_elements="1">
+        <BooleanDomain name="bool"/>
+        <Hints>
+          <PropertyWidgetDecorator type="InputDataTypeDecorator"
+                                   name="vtkHyperTreeGrid vtkOverlappingAMR"
+                                   exclude="1"
+                                   mode="visibility"/>
+        </Hints>
+        <Documentation>
+          If enabled, compute the normal on each cell. Since all output cells are coplanar,
+          the normal generated is simply the normal of the plane used to slice with.
+          By default, computing of normals is disabled.
+        </Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty animateable="0"
+                         command="SetInterpolateAttributes"
+                         default_values="1"
+                         name="InterpolateAttributes"
+                         panel_visibility="advanced"
+                         number_of_elements="1">
+        <BooleanDomain name="bool"/>
+        <Hints>
+          <PropertyWidgetDecorator type="InputDataTypeDecorator"
+                                   name="vtkHyperTreeGrid vtkOverlappingAMR"
+                                   exclude="1"
+                                   mode="visibility"/>
+        </Hints>
+        <Documentation>
+          If enabled, interpolate attribute data. By default this is
+          enabled. Point data is always interpolated. Cell data is transferred
+          unless input is an image data.
+        </Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty animateable="0"
+                         command="SetGeneratePolygons"
+                         default_values="1"
+                         name="GeneratePolygons"
+                         panel_visibility="advanced"
+                         number_of_elements="1">
+        <BooleanDomain name="bool"/>
+        <Hints>
+          <PropertyWidgetDecorator type="InputDataTypeDecorator"
+                                   name="vtkHyperTreeGrid vtkOverlappingAMR"
+                                   exclude="1"
+                                   mode="visibility"/>
+        </Hints>
+        <Documentation>
+          If enabled and input is a vtkImageData, vtkStructuredGrid or vtkRectilinearGrid,
+          output slice will consist of polygons instead of only triangles.
+        </Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetMergePoints"
+                         default_values="0"
+                         name="MergePoints"
+                         label="Merge duplicated points in the slice"
+                         number_of_elements="1">
+        <BooleanDomain name="bool"/>
+        <Documentation>This parameter controls whether to merge duplicated points in the slice.</Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="InputDataTypeDecorator"
+                                   name="vtkHyperTreeGrid vtkOverlappingAMR"
+                                   exclude="1"
+                                   mode="visibility"/>
+        </Hints>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetDual"
+                         default_values="0"
+                         label="Use Dual"
+                         name="SetDual"
+                         number_of_elements="1">
+        <Hints>
+          <PropertyWidgetDecorator type="CompositeDecorator">
+            <Expression type="and">
+              <PropertyWidgetDecorator type="InputDataTypeDecorator"
+                                       mode="visibility"
+                                       name="vtkHyperTreeGrid"/>
+              <PropertyWidgetDecorator type="GenericDecorator"
+                                       mode="visibility"
+                                       property="Plane"
+                                       value="Plane"/>
+            </Expression>
+          </PropertyWidgetDecorator>
+        </Hints>
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          If checked, uses the dual of the hyper tree grid.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty command="SetLevelOfResolution"
+                         default_values="0"
+                         name="Level"
+                         number_of_elements="1">
+        <Hints>
+          <PropertyWidgetDecorator type="InputDataTypeDecorator"
+                                   mode="visibility"
+                                   name="vtkOverlappingAMR"/>
+        </Hints>
+        <AMRLevelsDomain default_mode="max"
+                         name="range">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input"/>
+          </RequiredProperties>
+        </AMRLevelsDomain>
+        <Documentation>
+          Set maximum slice resolution.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty command="SetUseNativeCutter"
+                         default_values="0"
+                         name="UseNativeCutter"
+                         number_of_elements="1">
+        <BooleanDomain name="bool"/>
+        <Hints>
+          <PropertyWidgetDecorator type="CompositeDecorator">
+            <Expression type="and">
+              <PropertyWidgetDecorator type="InputDataTypeDecorator"
+                                       mode="visibility"
+                                       name="vtkOverlappingAMR"/>
+              <PropertyWidgetDecorator type="GenericDecorator"
+                                       mode="visibility"
+                                       property="Plane"
+                                       value="Plane"/>
+            </Expression>
+          </PropertyWidgetDecorator>
+        </Hints>
+        <Documentation>
+          This property specifies whether the ParaView's generic
+          dataset cutter is used instead of the specialized AMR cutter.
+        </Documentation>
+      </IntVectorProperty>
+      <!-- End SliceWithPlane -->
     </SourceProxy>
 
     <!-- ==================================================================== -->
