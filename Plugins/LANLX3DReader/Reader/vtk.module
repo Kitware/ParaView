@@ -1,0 +1,8 @@
+NAME
+  LANLX3DReader::vtkLANLX3DReader
+LIBRARY_NAME
+  vtkLANLX3DReader
+DEPENDS
+  VTK::FiltersCore
+PRIVATE_DEPENDS
+  VTK::CommonCore

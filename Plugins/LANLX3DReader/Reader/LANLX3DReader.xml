@@ -1,0 +1,37 @@
+<ServerManagerConfiguration>
+  <ProxyGroup name="sources">
+    <SourceProxy name="LANLX3DReader" class="vtkLANLX3DReader" label="LANLX3DReader">
+      <Documentation
+        long_help="Read a LANL X3D (Los Alamos National Laboratory X3D format) file."
+        short_help="Read a LANL X3D file.">
+      </Documentation>
+      <StringVectorProperty
+        name="FileName"
+        animateable="0"
+        command="SetFileName"
+        number_of_elements="1">
+        <FileListDomain name="files"/>
+        <Documentation>
+          This property specifies the file name for the LANL X3D reader.
+        </Documentation>
+      </StringVectorProperty>
+      <IntVectorProperty
+        name="ReadAllPieces"
+        animateable="0"
+        command="SetReadAllPieces"
+        number_of_elements="1"
+        default_values="1">
+        <Documentation>
+          Turns on/off reading of all pieces (processors) from a parallel
+          LANL X3D file set. If off, reads only the piece (one processor) specified.
+        </Documentation>
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+      <Hints>
+        <ReaderFactory
+          extensions="x3d"
+          file_description="LANL X3D File Format" />
+      </Hints>
+    </SourceProxy>
+  </ProxyGroup>
+</ServerManagerConfiguration>
