@@ -386,6 +386,10 @@
       <Documentation long_help="Planar Cut of an AMR grid dataset"
                      short_help="Planar Cut of an AMR grid dataset">This filter
                      creates a cut-plane of the</Documentation>
+      <Deprecated deprecated_in="5.11" to_remove_in="5.13">
+        AMR CutPlane has been deprecated, because it has been integrated inside the Slice with plane filter.
+        Use the Slice with plane filter with Plane type = Plane to achieve the same functionality.
+      </Deprecated>
       <InputProperty command="SetInputConnection"
                      name="Input">
         <ProxyGroupDomain name="groups">
@@ -435,7 +439,8 @@
                             label="Normal"
                             name="Normal"
                             number_of_elements="3"
-                            panel_visibility="never"></DoubleVectorProperty>
+                            panel_visibility="never">
+      </DoubleVectorProperty>
       <PropertyGroup label="Plane Parameters" panel_widget="InteractivePlane">
         <Property function="Origin" name="Center" />
         <Property function="Normal" name="Normal" />
@@ -534,8 +539,13 @@
                  label="Slice AMR data"
                  name="AMRSlice">
       <Documentation long_help="Slices AMR Data"
-                     short_help="Slices AMR Data">This filter slices AMR
-                     data.</Documentation>
+                     short_help="Slices AMR Data">
+        This filter slices AMR data.
+      </Documentation>
+      <Deprecated deprecated_in="5.11" to_remove_in="5.13">
+        Slice AMR data has been deprecated, because it has been integrated inside the Slice with plane filter.
+        Use the Slice with plane filter with Plane type = Axis Aligned Plane to achieve the same functionality.
+      </Deprecated>
       <InputProperty command="SetInputConnection"
                      name="Input">
         <ProxyGroupDomain name="groups">
