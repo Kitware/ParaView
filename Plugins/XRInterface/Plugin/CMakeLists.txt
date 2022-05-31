@@ -79,6 +79,7 @@ set_property(
 set(xr_input_files
   pv_openvr_actions.json
   pv_openvr_binding_hpmotioncontroller.json
+  pv_openvr_binding_knuckles.json
   pv_openvr_binding_vive_controller.json
   pv_openvr_binding_oculus_touch.json
 )
@@ -94,7 +95,7 @@ if (openxr_support)
   list(APPEND xr_input_files
     pv_openxr_actions.json
     pv_openxr_binding_khr_simple_controller.json
-    pv_openxr_binding_valve_index_controller.json
+    pv_openxr_binding_knuckles.json
     pv_openxr_binding_vive_controller.json
     pv_openxr_binding_oculus_touch_controller.json
   )

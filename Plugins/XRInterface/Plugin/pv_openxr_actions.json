@@ -1,6 +1,18 @@
 {
   "actions": [
     {
+      "name": "backthickcrop",
+      "type": "boolean"
+    },
+    {
+      "name": "elevation",
+      "type": "vector2"
+    },
+    {
+      "name": "forwardthickcrop",
+      "type": "boolean"
+    },
+    {
       "name": "handpose",
       "type": "pose"
     },
@@ -9,27 +21,23 @@
       "type": "pose"
     },
     {
-      "name": "forwardthickcrop",
+      "name": "haptic",
+      "type": "vibration"
+    },
+    {
+      "name": "leftgripaction",
       "type": "boolean"
     },
     {
-      "name": "backthickcrop",
-      "type": "boolean"
-    },
-    {
-      "name": "shownavigationpanel",
-      "type": "boolean"
+      "name": "movement",
+      "type": "vector2"
     },
     {
       "name": "nextcamerapose",
       "type": "boolean"
     },
     {
-      "name": "triggeraction",
-      "type": "boolean"
-    },
-    {
-      "name": "leftgripaction",
+      "name": "positionprop",
       "type": "boolean"
     },
     {
@@ -41,11 +49,23 @@
       "type": "boolean"
     },
     {
+      "name": "shownavigationpanel",
+      "type": "boolean"
+    },
+    {
+      "name": "squeezeforce",
+      "type": "float"
+    },
+    {
+      "name": "startelevation",
+      "type": "boolean"
+    },
+    {
       "name": "startmovement",
       "type": "boolean"
     },
     {
-      "name": "movement",
+      "name": "thickcropdirection",
       "type": "vector2"
     },
     {
@@ -53,15 +73,11 @@
       "type": "boolean"
     },
     {
-      "name": "thickcropdirection",
-      "type": "vector2"
+      "name": "triggeraction",
+      "type": "boolean"
     }
   ],
   "default_bindings": [
-    {
-      "binding_url": "pv_openxr_binding_vive_controller.json",
-      "controller_type": "vive_controller"
-    },
     {
       "binding_url": "pv_openxr_binding_khr_simple_controller.json",
       "controller_type": "khr_simple"
@@ -71,8 +87,12 @@
       "controller_type": "oculus_touch"
     },
     {
-      "binding_url": "pv_openxr_binding_valve_index_controller.json",
-      "controller_type": "valve_index_controller"
+      "binding_url": "pv_openxr_binding_knuckles.json",
+      "controller_type": "knuckles"
+    },
+    {
+      "binding_url": "pv_openxr_binding_vive_controller.json",
+      "controller_type": "vive_controller"
     }
   ],
   "action_sets": [
@@ -83,19 +103,24 @@
   ],
   "localization": [
     {
-      "movement": "Trackpad Movement",
       "backthickcrop": "Move Thick Crop Back",
+      "elevation": "Elevation",
       "forwardthickcrop": "Move Thick Crop Forward",
-      "thickcropstart": "Start moving the trick crop",
-      "thickcropdirection": "what direction to move",
-      "leftgripaction": "Left Grip Action",
-      "nextcamerapose": "Next Camera Pose",
-      "rightgripaction": "Right Grip Action",
-      "showmenu": "Show Menu",
       "handpose": "Hand Pose",
       "handposehandgrip": "Hand Pose Hand Grip",
+      "haptic": "Haptic Vibration",
+      "leftgripaction": "Left Grip Action",
+      "movement": "Trackpad Movement",
+      "nextcamerapose": "Next Camera Pose",
+      "positionprop": "Position Prop",
+      "rightgripaction": "Right Grip Action",
+      "showmenu": "Show Menu",
       "shownavigationpanel": "Show Navigation Panel",
+      "squeezeforce": "Squeeze Force",
+      "startelevation": "Start Elevation",
       "startmovement": "Start Movement",
+      "thickcropdirection": "Thick Crop Direction",
+      "thickcropstart": "Start Thick Crop Movement",
       "triggeraction": "Trigger Action",
       "language_tag": "en_US"
     }
