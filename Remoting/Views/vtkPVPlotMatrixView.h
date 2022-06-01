@@ -149,6 +149,13 @@ public:
 
   //@{
   /**
+   * Set the padding that applied an uniform padding on each charts.
+   */
+  virtual void SetPadding(float padding);
+  //@}
+
+  //@{
+  /**
    * Set/get the borders of the chart matrix (space in pixels around each chart).
    * These methods should not be called directly. They are made public only so
    * that the client-server-stream-interpreter can invoke them. Use the
