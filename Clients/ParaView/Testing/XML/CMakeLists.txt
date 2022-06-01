@@ -1433,6 +1433,7 @@ if(PARAVIEW_USE_PYTHON)
       )
 
     list(APPEND TESTS_WITHOUT_BASELINES
+      ExpressionChooser.xml
       PythonCalculator.xml
       PythonCalculatorInput.xml
       )

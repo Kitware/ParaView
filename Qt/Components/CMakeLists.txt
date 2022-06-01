@@ -75,6 +75,7 @@ set(classes
   pqDisplayRepresentationWidget
   pqDockWindowInterface
   pqDoubleVectorPropertyWidget
+  pqExpressionChooserButton
   pqExpressionsDialog
   pqExpressionsManager
   pqExpressionsTableModel

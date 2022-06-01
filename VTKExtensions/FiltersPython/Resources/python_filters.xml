@@ -40,7 +40,7 @@
                             name="Expression"
                             number_of_elements="1">
         <Hints>
-          <Widget type="one_liner_wrapped" />
+          <Widget type="one_liner_wrapped" syntax="python" />
         </Hints>
         <Documentation>The Python expression evaluated during
         execution. Set of potentially available variables [inputs, points, t_value,
@@ -213,7 +213,7 @@ annotation text.
                             name="Expression"
                             number_of_elements="1">
         <Hints>
-          <Widget type="one_liner_wrapped" />
+          <Widget type="one_liner_wrapped" syntax="python" />
         </Hints>
         <Documentation>The Python expression evaluated during execution.
         FieldData arrays are directly available through their name. Set of
