@@ -3310,9 +3310,12 @@ bool vtkPVRenderView::GetEnableOSPRay()
 void vtkPVRenderView::SetMaterialLibrary(vtkPVMaterialLibrary* ml)
 {
 #if VTK_MODULE_ENABLE_VTK_RenderingRayTracing
-  vtkRenderer* ren = this->GetRenderer();
-  vtkOSPRayRendererNode::SetMaterialLibrary(
-    vtkOSPRayMaterialLibrary::SafeDownCast(ml->GetMaterialLibrary()), ren);
+  if (ml)
+  {
+    vtkRenderer* ren = this->GetRenderer();
+    vtkOSPRayRendererNode::SetMaterialLibrary(
+      vtkOSPRayMaterialLibrary::SafeDownCast(ml->GetMaterialLibrary()), ren);
+  }
 #else
   (void)ml;
 #endif
