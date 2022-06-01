@@ -31,6 +31,7 @@ set(PY_TESTS
   SpreadSheetViewPartialArrays.py,NO_VALID
   TransferFunctionPresets.py,NO_VALID
   TestSurfaceLIC.py,NO_VALID
+  RenderViewOSPRayParameters.py,NO_VALID
   )
 
 if (PARAVIEW_USE_MPI)
