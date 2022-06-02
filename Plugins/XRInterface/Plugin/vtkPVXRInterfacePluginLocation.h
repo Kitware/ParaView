@@ -16,6 +16,9 @@
  * @brief   Stores ands returns runtime location of a plugin
  *
  */
+#ifndef vtkPVXRInterfacePluginLocation_h
+#define vtkPVXRInterfacePluginLocation_h
+
 #include <string>
 
 class vtkPVXRInterfacePluginLocation
@@ -36,3 +39,5 @@ public:
 protected:
   static std::string PluginLocation;
 };
+
+#endif

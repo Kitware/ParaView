@@ -20,6 +20,9 @@
  * can be used. Instantiated by the pqXRInterfaceDockPanel.
  */
 
+#ifndef pqXRInterfaceControls_h
+#define pqXRInterfaceControls_h
+
 #include <QWidget>
 
 class pqPipelineSource;
@@ -70,3 +73,5 @@ private:
 
   pqVCRController* Controller;
 };
+
+#endif
