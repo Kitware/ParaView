@@ -1,17 +1,58 @@
 /*=========================================================================
- *
- *  Program:   Visualization Toolkit
- *  Module:    vtkCDIReader.h
- *
- *  Copyright (c) 2018 Niklas Roeber, DKRZ Hamburg
- *  All rights reserved.
- *  See Copyright.txt or http://www.kitware.com/Copyright.htm for details.
- *
- *     This software is distributed WITHOUT ANY WARRANTY; without even
- *     the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
- *     PURPOSE.  See the above copyright notice for more information.
- *
- *  =========================================================================*/
+
+   Program: ParaView
+   Module:  vtkCDIReader.h
+
+   Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
+   All rights reserved.
+
+   ParaView is a free software; you can redistribute it and/or modify it
+   under the terms of the ParaView license version 1.2.
+
+   See License_v1.2.txt for the full ParaView license.
+   A copy of this license can be obtained by contacting
+   Kitware Inc.
+   28 Corporate Drive
+   Clifton Park, NY 12065
+   USA
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE AUTHORS OR
+CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+========================================================================*/
+
+/*-------------------------------------------------------------------------
+   Copyright (c) 2018 Niklas Roeber, DKRZ Hamburg
+  -------------------------------------------------------------------------*/
+
+#ifndef vtkCDIReader_h
+#define vtkCDIReader_h
+
+#include "vtkCDIReaderModule.h" // for export macro
+#include "vtkUnstructuredGridAlgorithm.h"
+
+#include "vtkDataArraySelection.h" // for ivars
+#include "vtkSmartPointer.h"       // for ivars
+#include "vtkStringArray.h"        // for ivars
+
+#include "projections.h" // for projection enum
+
+#include <memory> // for unique_ptr
+#include <vector> // for std::vector
+
+class vtkCallbackCommand;
+class vtkDoubleArray;
+class vtkFieldData;
+class vtkMultiProcessController;
 
 /**
  *
@@ -37,26 +78,6 @@
  * Thanks to Uwe Schulzweida for the CDI code (uwe.schulzweida@mpimet.mpg.de)
  * Thanks to Moritz Hanke for the sorting code (hanke@dkrz.de)
  */
-
-#ifndef vtkCDIReader_h
-#define vtkCDIReader_h
-
-#include "vtkCDIReaderModule.h" // for export macro
-#include "vtkUnstructuredGridAlgorithm.h"
-
-#include "vtkDataArraySelection.h" // for ivars
-#include "vtkSmartPointer.h"       // for ivars
-#include "vtkStringArray.h"        // for ivars
-
-#include "projections.h" // for projection enum
-
-#include <memory> // for unique_ptr
-#include <vector> // for std::vector
-
-class vtkCallbackCommand;
-class vtkDoubleArray;
-class vtkFieldData;
-class vtkMultiProcessController;
 
 class VTKCDIREADER_EXPORT vtkCDIReader : public vtkUnstructuredGridAlgorithm
 {
