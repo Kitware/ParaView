@@ -91,6 +91,13 @@ if ("$ENV{CMAKE_CONFIGURATION}" MATCHES "macos_arm64")
 
 endif ()
 
+if ("$ENV{CMAKE_CONFIGURATION}" MATCHES "macos_x86_64")
+  list(APPEND test_exclusions
+    # https://gitlab.kitware.com/paraview/paraview/-/issues/21421
+    "\\.PythonEditorRun$")
+
+endif ()
+
 if ("$ENV{CMAKE_CONFIGURATION}" MATCHES "windows")
   list(APPEND test_exclusions
     # Known-bad https://gitlab.kitware.com/paraview/paraview/-/issues/17433
