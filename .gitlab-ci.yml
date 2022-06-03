@@ -103,6 +103,27 @@ fedora35-shared-debug-mpi-python-qt:test:
         - fedora35-shared-debug-mpi-python-qt:build
     timeout: 120 minutes
 
+fedora35-shared-mpi-python-qt-vtkmoverride:build:
+    extends:
+        - .fedora35_shared_mpi_python_qt_vtkmoverride
+        - .cmake_build_linux
+        - .linux_qt_builder_tags
+        - .cmake_build_artifacts
+        - .run_manually
+
+fedora35-shared-mpi-python-qt-vtkmoverride:test:
+    extends:
+        - .fedora35_shared_mpi_python_qt_vtkmoverride
+        - .cmake_test_linux
+        - .linux_qt_tester_tags
+        - .cmake_test_artifacts
+        - .run_automatically
+    dependencies:
+        - fedora35-shared-mpi-python-qt-vtkmoverride:build
+    needs:
+        - fedora35-shared-mpi-python-qt-vtkmoverride:build
+    timeout: 90 minutes
+
 ## Catalyst editions
 
 fedora35-shared-mpi-core:build:

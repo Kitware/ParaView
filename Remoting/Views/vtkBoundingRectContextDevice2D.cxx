@@ -1,6 +1,3 @@
-// Hide VTK_DEPRECATED_IN_9_1_0() warnings for this class (vtkUnicodeString).
-#define VTK_DEPRECATION_LEVEL 0
-
 #include "vtkBoundingRectContextDevice2D.h"
 
 #include "vtkAbstractContextItem.h"
