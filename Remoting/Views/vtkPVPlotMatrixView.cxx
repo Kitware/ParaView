@@ -338,6 +338,15 @@ void vtkPVPlotMatrixView::SetGutterY(float value)
 }
 
 //----------------------------------------------------------------------------
+void vtkPVPlotMatrixView::SetPadding(float padding)
+{
+  if (this->PlotMatrix)
+  {
+    this->PlotMatrix->SetPadding(padding);
+  }
+}
+
+//----------------------------------------------------------------------------
 void vtkPVPlotMatrixView::SetBorders(int left, int bottom, int right, int top)
 {
   if (this->PlotMatrix)

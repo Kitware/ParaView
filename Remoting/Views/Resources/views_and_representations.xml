@@ -3541,6 +3541,13 @@
                          panel_visibility="advanced">
         <IntRangeDomain min="0" name="range" />
       </IntVectorProperty>
+      <DoubleVectorProperty command="SetPadding"
+                         default_values="0.05"
+                         name="Padding"
+                         number_of_elements="1"
+                         panel_visibility="advanced">
+      <DoubleRangeDomain min="0.0" max="0.25" name="range" />
+      </DoubleVectorProperty>
       <IntVectorProperty command="SetNumberOfAnimationFrames"
                          default_values="25"
                          name="NumberOfAnimationFrames"
@@ -3559,6 +3566,7 @@
       <PropertyGroup label="Spacing (Gutter)">
         <Property name="GutterX"/>
         <Property name="GutterY"/>
+        <Property name="Padding"/>
       </PropertyGroup>
 
       <DoubleVectorProperty command="SetScatterPlotSelectedRowColumnColor"
