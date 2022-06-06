@@ -23,6 +23,7 @@
 
 #include "pqActiveObjects.h"
 #include "pqApplicationCore.h"
+#include "pqCoreUtilities.h"
 #include "pqObjectBuilder.h"
 #include "pqOutputPort.h"
 #include "pqPipelineFilter.h"
@@ -200,17 +201,6 @@ pqServer* pqSLACManager::getActiveServer()
 }
 
 //-----------------------------------------------------------------------------
-QWidget* pqSLACManager::getMainWindow()
-{
-  foreach (QWidget* topWidget, QApplication::topLevelWidgets())
-  {
-    if (qobject_cast<QMainWindow*>(topWidget))
-      return topWidget;
-  }
-  return nullptr;
-}
-
-//-----------------------------------------------------------------------------
 pqView* pqSLACManager::findView(pqPipelineSource* source, int port, const QString& viewType)
 {
   // Step 1, try to find a view in which the source is already shown.
@@ -324,7 +314,7 @@ void pqSLACManager::destroyPipelineSourceAndConsumers(pqPipelineSource* source)
 //-----------------------------------------------------------------------------
 void pqSLACManager::showDataLoadManager()
 {
-  pqSLACDataLoadManager* dialog = new pqSLACDataLoadManager(this->getMainWindow());
+  pqSLACDataLoadManager* dialog = new pqSLACDataLoadManager(pqCoreUtilities::mainWidget());
   dialog->setAttribute(Qt::WA_DeleteOnClose, true);
   QObject::connect(dialog, SIGNAL(createdPipeline()), this, SLOT(checkActionEnabled()));
   QObject::connect(dialog, SIGNAL(createdPipeline()), this, SLOT(showEField()));
