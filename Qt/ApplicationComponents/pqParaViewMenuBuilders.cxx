@@ -614,24 +614,23 @@ void pqParaViewMenuBuilders::buildMacrosMenu(QMenu& menu)
     QMenu* editMenu = menu.addMenu("Edit...") << pqSetName("menuMacroEdit");
     QMenu* deleteMenu = menu.addMenu("Delete...") << pqSetName("menuMacroDelete");
     QAction* deleteAllAction = menu.addAction(QObject::tr("Delete All"));
-    QObject::connect(
-      deleteAllAction, &QAction::triggered, pqPythonScriptEditor::getUniqueInstance(), []() {
-        QMessageBox::StandardButton ret = QMessageBox::question(
-          pqCoreUtilities::mainWidget(), "Delete All", "All macros will be deleted. Are you sure?");
-        if (ret == QMessageBox::StandardButton::Yes)
+    QObject::connect(deleteAllAction, &QAction::triggered, []() {
+      QMessageBox::StandardButton ret = QMessageBox::question(
+        pqCoreUtilities::mainWidget(), "Delete All", "All macros will be deleted. Are you sure?");
+      if (ret == QMessageBox::StandardButton::Yes)
+      {
+        // The script editor shows macros about to be deleted. remove those tabs.
+        pqPythonTabWidget* const tWidget =
+          pqPythonScriptEditor::getUniqueInstance()->findChild<pqPythonTabWidget*>();
+        for (int i = tWidget->count() - 1; i >= 0; --i)
         {
-          // The script editor shows macros about to be deleted. remove those tabs.
-          pqPythonTabWidget* const tWidget =
-            pqPythonScriptEditor::getUniqueInstance()->findChild<pqPythonTabWidget*>();
-          for (int i = tWidget->count() - 1; i >= 0; --i)
-          {
-            Q_EMIT tWidget->tabCloseRequested(i);
-          }
-          // remove user Macros dir
-          pqCoreUtilities::removeRecursively(pqPythonScriptEditor::getMacrosDir());
-          pqPVApplicationCore::instance()->pythonManager()->updateMacroList();
+          Q_EMIT tWidget->tabCloseRequested(i);
         }
-      });
+        // remove user Macros dir
+        pqCoreUtilities::removeRecursively(pqPythonScriptEditor::getMacrosDir());
+        pqPVApplicationCore::instance()->pythonManager()->updateMacroList();
+      }
+    });
     menu.addSeparator();
     manager->addWidgetForRunMacros(&menu);
     manager->addWidgetForEditMacros(editMenu);
