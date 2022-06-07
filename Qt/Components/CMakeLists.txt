@@ -105,6 +105,7 @@ set(classes
   pqMemoryInspectorPanel
   pqMultiBlockInspectorWidget
   pqMultiViewWidget
+  pqOneLinerTextEdit
   pqOrbitCreatorDialog
   pqOutputPortComboBox
   pqPipelineAnnotationFilterModel

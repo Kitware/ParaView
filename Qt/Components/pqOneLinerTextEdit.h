@@ -32,8 +32,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef pqOneLinerTextEdit_h
 #define pqOneLinerTextEdit_h
 
+#include "pqComponentsModule.h"
 #include "pqTextEdit.h"
-#include "pqWidgetsModule.h"
 
 /**
  * pqOneLinerTextEdit is a specialization of pqTextEdit to handle one-liner expressions.
@@ -43,7 +43,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *  * Text is wrapped to fit the widget width.
  *  * Widget height is adapted to the content, so the whole text is displayed.
  */
-class PQWIDGETS_EXPORT pqOneLinerTextEdit : public pqTextEdit
+class PQCOMPONENTS_EXPORT pqOneLinerTextEdit : public pqTextEdit
 {
   Q_OBJECT
   typedef pqTextEdit Superclass;
