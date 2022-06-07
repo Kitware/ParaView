@@ -74,6 +74,197 @@
       </DoubleVectorProperty>
       <!-- End ExtractSelectionRange -->
     </SourceProxy>
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkSelectArraysExtractBlocks" name="SelectArraysExtractBlocks">
+      <Documentation long_help="The SelectArraysExtractBlocks filter is a meta-filter combining
+                     the PassArray filter and the ExtractBlock filter."
+                     short_help="Combines the PassArray and the ExtractBlock filter.">
+                     The SelectArraysExtractBlocks filter is a meta-filter combining the PassArray
+                     filter and the ExtractBlock filter. It's intended to be used as a pre-processing
+                     filter for MultiBlockDataSet, UniformGridAMR and PartitionedDataSetCollection
+                     writers. It allows to select specific data arrays and/or blocks to write.
+      </Documentation>
+      <InputProperty command="SetInputConnection" name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkMultiBlockDataSet"/>
+          <DataType value="vtkUniformGridAMR"/>
+          <DataType value="vtkPartitionedDataSetCollection"/>
+        </DataTypeDomain>
+        <InputArrayDomain name="point_arrays" attribute_type="point" optional="1" />
+        <InputArrayDomain name="cell_arrays" attribute_type="cell" optional="1" />
+        <InputArrayDomain name="field_arrays" attribute_type="field" optional="1" />
+        <InputArrayDomain name="vertex_arrays" attribute_type="vertex" optional="1" />
+        <InputArrayDomain name="edge_arrays" attribute_type="edge" optional="1" />
+        <InputArrayDomain name="row_arrays" attribute_type="row" optional="1" />
+      </InputProperty>
+
+      <IntVectorProperty name="ChooseArraysToWrite"
+        command="SetPassArraysEnabled"
+        default_values="0"
+        number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Explicitly choose which arrays to write.
+        </Documentation>
+      </IntVectorProperty>
+      <StringVectorProperty
+          name="PointDataArrays"
+          command="GetPointDataArraySelection"
+          number_of_elements_per_command="1"
+          repeat_command="1"
+          si_class="vtkSIDataArraySelectionProperty">
+          <ArrayListDomain name="array_list" input_domain_name="point_arrays">
+            <RequiredProperties>
+              <Property name="Input" function="Input" />
+            </RequiredProperties>
+          </ArrayListDomain>
+          <Documentation>
+            Select the point data arrays to pass through.
+          </Documentation>
+          <Hints>
+            <ArraySelectionWidget icon_type="point"/>
+          </Hints>
+      </StringVectorProperty>
+      <StringVectorProperty
+          name="CellDataArrays"
+          command="GetCellDataArraySelection"
+          number_of_elements_per_command="1"
+          repeat_command="1"
+          si_class="vtkSIDataArraySelectionProperty">
+          <ArrayListDomain name="array_list" input_domain_name="cell_arrays">
+            <RequiredProperties>
+              <Property name="Input" function="Input" />
+            </RequiredProperties>
+          </ArrayListDomain>
+          <Documentation>
+            Select the cell data arrays to pass through.
+          </Documentation>
+          <Hints>
+            <ArraySelectionWidget icon_type="cell"/>
+          </Hints>
+      </StringVectorProperty>
+      <StringVectorProperty
+          name="FieldDataArrays"
+          command="GetFieldDataArraySelection"
+          number_of_elements_per_command="1"
+          repeat_command="1"
+          si_class="vtkSIDataArraySelectionProperty">
+          <ArrayListDomain name="array_list" input_domain_name="field_arrays">
+            <RequiredProperties>
+              <Property name="Input" function="Input" />
+            </RequiredProperties>
+          </ArrayListDomain>
+          <Documentation>
+            Select the field data arrays to pass through.
+          </Documentation>
+          <Hints>
+            <ArraySelectionWidget icon_type="field"/>
+          </Hints>
+      </StringVectorProperty>
+      <StringVectorProperty
+          name="VertexDataArrays"
+          command="GetVertexDataArraySelection"
+          number_of_elements_per_command="1"
+          repeat_command="1"
+          si_class="vtkSIDataArraySelectionProperty">
+          <ArrayListDomain name="array_list" input_domain_name="vertex_arrays">
+            <RequiredProperties>
+              <Property name="Input" function="Input" />
+            </RequiredProperties>
+          </ArrayListDomain>
+          <Documentation>
+            Select the vertex data arrays to pass through.
+          </Documentation>
+          <Hints>
+            <ArraySelectionWidget icon_type="vertex"/>
+          </Hints>
+      </StringVectorProperty>
+      <StringVectorProperty
+          name="EdgeDataArrays"
+          command="GetEdgeDataArraySelection"
+          number_of_elements_per_command="1"
+          repeat_command="1"
+          si_class="vtkSIDataArraySelectionProperty">
+          <ArrayListDomain name="array_list" input_domain_name="edge_arrays">
+            <RequiredProperties>
+              <Property name="Input" function="Input" />
+            </RequiredProperties>
+          </ArrayListDomain>
+          <Documentation>
+            Select the edge data arrays to pass through.
+          </Documentation>
+          <Hints>
+            <ArraySelectionWidget icon_type="edge"/>
+          </Hints>
+      </StringVectorProperty>
+      <StringVectorProperty
+          name="RowDataArrays"
+          command="GetRowDataArraySelection"
+          number_of_elements_per_command="1"
+          repeat_command="1"
+          si_class="vtkSIDataArraySelectionProperty">
+          <ArrayListDomain name="array_list" input_domain_name="row_arrays">
+            <RequiredProperties>
+              <Property name="Input" function="Input" />
+            </RequiredProperties>
+          </ArrayListDomain>
+          <Documentation>
+            Select the row data arrays to pass through.
+          </Documentation>
+          <Hints>
+            <ArraySelectionWidget icon_type="row"/>
+          </Hints>
+      </StringVectorProperty>
+
+      <IntVectorProperty name="ChooseBlocksToWrite"
+        command="SetExtractBlocksEnabled"
+        default_values="0"
+        number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Explicitly choose which blocks to write.
+        </Documentation>
+      </IntVectorProperty>
+      <StringVectorProperty name="Assembly"
+                            command="SetAssemblyName"
+                            number_of_elements="1"
+                            default_values="Hierarchy">
+        <DataAssemblyListDomain name="data_assembly_list">
+          <RequiredProperties>
+            <Property function="Input" name="Input"/>
+          </RequiredProperties>
+        </DataAssemblyListDomain>
+        <Documentation>
+          Select which assembly is used when specifying selectors
+          to choose blocks to extract.
+        </Documentation>
+      </StringVectorProperty>
+      <StringVectorProperty name="Selectors"
+                            command="AddSelector"
+                            clean_command="ClearSelectors"
+                            repeat_command="1"
+                            number_of_elements_per_command="1">
+        <DataAssemblyDomain name="data_assembly">
+          <RequiredProperties>
+            <Property function="Input" name="Input"/>
+            <Property function="ActiveAssembly" name="Assembly"/>
+          </RequiredProperties>
+        </DataAssemblyDomain>
+        <Documentation>
+          Specify the selectors for the data assembly chosen using **Assembly**
+          to choose the blocks to extract from the input dataset.
+        </Documentation>
+      </StringVectorProperty>
+
+      <PropertyGroup label="Blocks" panel_widget="DataAssemblyEditor">
+        <Property name="Assembly" function="ActiveAssembly"/>
+        <Property name="Selectors" function="Selectors"/>
+      </PropertyGroup>
+    </SourceProxy>
     <!-- End of internal_filters -->
   </ProxyGroup>
 

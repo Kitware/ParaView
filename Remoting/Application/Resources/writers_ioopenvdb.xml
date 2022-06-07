@@ -107,7 +107,9 @@
       <SubProxy>
         <Proxy name="PassArrays" proxygroup="internal_writers" proxyname="PassArrays" />
         <ExposedProperties>
-          <Property name="ChooseArraysToWrite"/>
+          <PropertyGroup label="Data Selection">
+            <Property name="ChooseArraysToWrite" />
+          </PropertyGroup>
           <PropertyGroup label="Array Selection" panel_widget="ArrayStatus">
             <Property name="PointDataArrays" />
             <Property name="CellDataArrays" />
