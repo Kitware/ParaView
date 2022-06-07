@@ -78,6 +78,7 @@ set(classes
   pqExpressionsDialog
   pqExpressionsManager
   pqExpressionsTableModel
+  pqExpressionsWidget
   pqFavoritesDialog
   pqFavoritesTreeWidget
   pqFileChooserWidget
