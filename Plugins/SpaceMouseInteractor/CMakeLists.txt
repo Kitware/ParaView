@@ -15,25 +15,29 @@ if (PARAVIEW_USE_QT)
     ${autostart_interface})
   list(APPEND sources
     ${autostart_sources})
-  if (WIN32)
+  if (WIN32 OR APPLE)
     list(APPEND sources
-      pqSpaceMouseImplWin.cxx
-      pqSpaceMouseImplWin.h)
+      pqSpaceMouseImpl.cxx
+      pqSpaceMouseImpl.h)
     find_package(3DxWareSDK)
   else()
-    # this is a do-nothing implementation for now
+    # this is a do-nothing implementation until 3DConnexion releases support.
     list(APPEND sources
       pqSpaceMouseImplLinux.cxx
       pqSpaceMouseImplLinux.h)
   endif()
 endif ()
 
+# support std::make_unique
+set(CMAKE_CXX_STANDARD 14)
 
-set(CMAKE_CXX_STANDARD 11)
 paraview_add_plugin(SpaceMouseInteractor
   VERSION       "1.0"
   UI_INTERFACES ${interfaces}
   SOURCES       ${sources})
+
+# support __declspec(property) on Mac
+target_compile_options(SpaceMouseInteractor PRIVATE "$<$<COMPILE_LANG_AND_ID:CXX,AppleClang,Clang>:-fdeclspec>")
 
 if (PARAVIEW_USE_QT)
   target_link_libraries(SpaceMouseInteractor
@@ -43,7 +47,7 @@ if (PARAVIEW_USE_QT)
       ParaView::RemotingServerManager
       ParaView::RemotingViews
       ParaView::pqApplicationComponents)
-  if (WIN32)
+  if (WIN32 OR APPLE)
     target_link_libraries(SpaceMouseInteractor
       PRIVATE
         3Dconnexion::3DxWareSDK)

@@ -6,5 +6,4 @@ renderview. The 3Dconnexion Settings app provided with the driver
 can be used to change the style of interaction from object-centered
 to camera-centered (flying).
 
-Only works on Windows currently. A linux SDK is not available, but
-an equivalent Mac implementation is planned.
+Works on Windows and Mac. A linux SDK is not available.

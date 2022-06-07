@@ -58,8 +58,6 @@ public:
 public Q_SLOTS:
   /// which view are we controlling? The active one.
   void setActiveView(pqView* view);
-  /// the active camera changed.
-  void cameraChanged();
 
 public:
   void render();
