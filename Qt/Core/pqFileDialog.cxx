@@ -143,6 +143,7 @@ public:
   QList<QStringList> SelectedFiles;
   int SelectedFilterIndex;
   QStringList Filters;
+  bool GroupPaths;
   bool SuppressOverwriteWarning;
   bool ShowMultipleFileHelp;
   QString FileNamesSeperator;
@@ -162,6 +163,7 @@ public:
     , FileFilter(this->Model)
     , Completer(new QCompleter(&this->FileFilter, nullptr))
     , Mode(ExistingFile)
+    , GroupPaths(true)
     , SuppressOverwriteWarning(false)
     , ShowMultipleFileHelp(false)
     , FileNamesSeperator(";")
@@ -219,9 +221,11 @@ public:
     return this->Model->getCurrentPath();
   }
 
-  void setCurrentPath(const QString& p, bool groupFiles = true)
+  void setGroupPaths(bool group) { this->GroupPaths = group; }
+
+  void setCurrentPath(const QString& p)
   {
-    this->Model->setCurrentPath(p, groupFiles);
+    this->Model->setCurrentPath(p, this->GroupPaths);
     pqServer* s = this->Model->server();
     if (s)
     {
@@ -430,7 +434,8 @@ pqFileDialog::pqFileDialog(pqServer* server, QWidget* p, const QString& title,
     startPath = impl.getStartPath();
   }
   impl.addHistory(startPath);
-  impl.setCurrentPath(startPath, groupFiles);
+  impl.setGroupPaths(groupFiles);
+  impl.setCurrentPath(startPath);
 
   impl.Ui.Files->resizeColumnToContents(0);
   impl.Ui.Files->setTextElideMode(Qt::ElideMiddle);
