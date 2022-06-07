@@ -133,6 +133,7 @@
         <DataTypeDomain name="input_type">
           <DataType value="vtkDataSet" />
           <DataType value="vtkCompositeDataSet" />
+          <DataType value="vtkHyperTreeGrid" />
         </DataTypeDomain>
         <InputArrayDomain name="input_array" />
         <Documentation>This property specifies the dataset from which to obtain
