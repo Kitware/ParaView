@@ -14,5 +14,5 @@ numpy==1.19.3
 pandas==1.1.3
 
 # ParaViewWeb
-aiohttp==3.7.4.post0
-wslink==1.0.5
+aiohttp==3.8.1
+wslink==1.6.5
