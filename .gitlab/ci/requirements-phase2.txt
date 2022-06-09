@@ -8,7 +8,7 @@ netcdftime==1.0.0a2
 # numpy
 # Note that Linux will need 1.19.4
 # See https://developercommunity.visualstudio.com/content/problem/1207405/fmod-after-an-update-to-windows-2004-is-causing-a.html
-numpy==1.19.3
+numpy==1.21.0
 
 # Cinema
 pandas==1.1.3
