@@ -52,12 +52,14 @@ find_path(3DxWareSDK_INCLUDE_DIR navlib/navlib.h
   PATH_SUFFIXES
     inc
     include
+    Headers
   DOC "Path to the 3DxWareSDK include directory"
 )
 mark_as_advanced(3DxWareSDK_INCLUDE_DIR)
 
+# windows and apple names.
 find_library(3DxWareSDK_LIBRARY
-  NAMES TDxNavLib
+  NAMES TDxNavLib 3DconnexionNavlib
   HINTS
     ${3DxWareSDK_ROOT}
     ENV 3DxWareSDK_DIR
@@ -66,6 +68,9 @@ find_library(3DxWareSDK_LIBRARY
     lib/x64
     lib/x86
     lib
+    lib/arm64
+    lib/x86_64
+    ""
   DOC "Path to the 3DxWareSDK library"
 )
 mark_as_advanced(3DxWareSDK_LIBRARY)

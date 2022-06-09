@@ -35,7 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endif
 
 #include "pqSpaceMouseAutoStart.h"
-#ifdef _MSC_VER
+#if defined(_MSC_VER) || defined(APPLE)
 #include "pqSpaceMouseImplWin.h"
 #else
 #include "pqSpaceMouseImplLinux.h"

@@ -32,10 +32,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifdef _MSC_VER
 #pragma warning(push)
 #pragma warning(disable : 4201) // nonstandard extension, nameless union
-// #pragma warning(disable: 4100) // unused params
 #endif
 
-#include "pqSpaceMouseImplWin.h"
+#include "pqSpaceMouseImpl.h"
 
 #include "pqActiveObjects.h"
 #include "pqCoreUtilities.h"
@@ -76,44 +75,10 @@ void pqSpaceMouseImpl::setActiveView(pqView* view)
   {
     this->Enable3DNavigation();
     this->Camera = renPxy->GetActiveCamera();
-    // if (this->Camera)
-    // {
-    //   pqCoreUtilities::connect(
-    //     this->Camera, vtkCommand::ModifiedEvent, this, SLOT(cameraChanged()));
-    // }
-    // this->cameraChanged();
   }
   else
   {
     this->Disable3DNavigation();
-  }
-}
-
-void pqSpaceMouseImpl::cameraChanged()
-{
-  // vtkWarningWithObjectMacro(nullptr, "CameraChanged");
-  if (this->Camera)
-  {
-    double pos[3];
-    this->Camera->GetPosition(pos);
-    double dp[3];
-    this->Camera->GetDirectionOfProjection(dp);
-    double vu[3];
-    this->Camera->GetViewUp(vu);
-    // auto* fp = this->Camera->GetFocalPoint();
-    // vtkWarningWithObjectMacro(nullptr, << "ps " << pos[0] << " " << pos[1] << " " << pos[2] );
-    // vtkWarningWithObjectMacro(nullptr, << "dp " << dp[0] << " " << dp[1] << " " << dp[2] );
-    // vtkWarningWithObjectMacro(nullptr, << "vu " << vu[0] << " " << vu[1] << " " << vu[2] );
-    // double m[16], n[16];
-    // vtkMatrix4x4::DeepCopy(m, this->Camera->GetModelViewTransformMatrix());
-    // vtkWarningWithObjectMacro(nullptr, << "vtkCM [" << m[0] << ", " << m[1] << ", " << m[2] << ",
-    // " << m[3] << "] [" << m[4] << ", " << m[5] << ", " << m[6] << ", " << m[7] << "] [" << m[8]
-    // << ", " << m[9] << ", " << m[10] << ", " << m[11] << "] [" << m[12] << ", " << m[13] << ", "
-    // << m[14] << ", " << m[15] << "] " ); vtkMatrix4x4::Invert(m, n);
-    // vtkWarningWithObjectMacro(nullptr, << "invCM [" << n[0] << ", " << n[1] << ", " << n[2] << ",
-    // " << n[3] << "] [" << n[4] << ", " << n[5] << ", " << n[6] << ", " << n[7] << "] [" << n[8]
-    // << ", " << n[9] << ", " << n[10] << ", " << n[11] << "] [" << n[12] << ", " << n[13] << ", "
-    // << n[14] << ", " << n[15] << "] " );
   }
 }
 
