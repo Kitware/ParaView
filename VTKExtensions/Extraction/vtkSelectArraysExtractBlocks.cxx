@@ -14,6 +14,7 @@
 =========================================================================*/
 #include "vtkSelectArraysExtractBlocks.h"
 
+#include <algorithm>
 #include <vtkCompositeDataSet.h>
 #include <vtkExtractBlockUsingDataAssembly.h>
 #include <vtkInformation.h>
