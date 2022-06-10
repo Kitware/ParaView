@@ -271,6 +271,7 @@ set(paraview_default_plugins
   GMVReader
   HyperTreeGridADR
   LagrangianParticleTracker
+  LANLX3DReader
   LegacyExodusReader
   Moments
   MooseXfemClip

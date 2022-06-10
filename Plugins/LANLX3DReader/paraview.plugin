@@ -1,0 +1,7 @@
+NAME
+  LANLX3DReader
+DESCRIPTION
+  A reader for LANL X3D files.
+REQUIRES_MODULES
+  VTK::CommonCore
+  VTK::FiltersCore
