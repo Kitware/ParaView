@@ -22,6 +22,12 @@
   <pqevent object="pqClientMainWindow/ApplicationSettings/tabBar" command="set_tab_with_text" arguments="Miscellaneous" />
   <pqevent object="pqClientMainWindow/ApplicationSettings/stackedWidget/ScrollAreaRepresentedArrayListSettings/qt_scrollarea_viewport/Container/ProxyWidget/ReaderDetails/ScalarValueList/Table" command="edit" arguments="0.0" />
   <pqevent object="pqClientMainWindow/ApplicationSettings/stackedWidget/ScrollAreaRepresentedArrayListSettings/qt_scrollarea_viewport/Container/ProxyWidget/ReaderDetails/ScalarValueList/Table/qt_scrollarea_viewport/1QExpandingLineEdit0" command="set_string" arguments="*2.png" />
+  <pqevent object="pqClientMainWindow" command="pause" arguments="500"/>
+  <pqevent object="pqClientMainWindow/ApplicationSettings/buttonBox/1QPushButton2" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/ApplicationSettings/buttonBox/1QPushButton0" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/menubar/menu_Edit" command="activate" arguments="actionEditSettings" />
+  <pqevent object="pqClientMainWindow/ApplicationSettings/tabBar" command="set_tab_with_text" arguments="Miscellaneous" />
+  <pqcheck object="pqClientMainWindow/ApplicationSettings/stackedWidget/ScrollAreaRepresentedArrayListSettings/qt_scrollarea_viewport/Container/ProxyWidget/ReaderDetails/ScalarValueList/Table" property="modelItemData" arguments="0.0,*2.png" />
   <pqevent object="pqClientMainWindow/ApplicationSettings/buttonBox/1QPushButton0" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/MainControlsToolbar/actionOpenData" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/FileOpenDialog" command="filesSelected" arguments="$PARAVIEW_DATA_ROOT/Testing/Data/img2.png" />

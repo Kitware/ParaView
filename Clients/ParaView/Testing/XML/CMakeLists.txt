@@ -1637,7 +1637,6 @@ set (LoadSaveStateAnimation_FORCE_SERIAL TRUE)
 set (BlockContextMenu_FORCE_SERIAL TRUE) # requires context menu
 set (RecentFiles_FORCE_SERIAL TRUE) # use key events
 set (TraceMultiViews_FORCE_SERIAL TRUE) # Seems to works better in serial
-set (DefaultReadersSetting_FORCE_SERIAL TRUE) # Seems to works better in serial
 
 # We don't support volume rendering of image data in data server & render server mode
 set(AdaptiveResampleToImage_DISABLE_CRS TRUE)
