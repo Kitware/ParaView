@@ -2949,29 +2949,12 @@
       </IntVectorProperty>
       <DoubleVectorProperty
           name="VolumeAnisotropy"
-          command="SetVolumeAnisotropy"
           default_values="0.0"
+          panel_visibility="never"
           animateable="0"
           number_of_elements="1">
-        <DoubleRangeDomain
-            min="-1.0"
-            max="1.0"
-            name="range"/>
-        <Documentation>Set the tendency for light to scatter back towards (negative) or away from (positive) the light source within path traced volumes.</Documentation>
-        <Hints>
-          <PropertyWidgetDecorator type="OSPRayHidingDecorator" />
-          <PropertyWidgetDecorator type="CompositeDecorator">
-            <Expression type="and">
-              <PropertyWidgetDecorator type="GenericDecorator"
-                                       mode="visibility"
-                                       property="EnableOSPRay"
-                                       values="1" />
-              <PropertyWidgetDecorator type="EnableWidgetDecorator">
-                 <Property name="OSPRayRendererType" function="equals" value="OSPRay pathtracer"/>
-              </PropertyWidgetDecorator>
-            </Expression>
-	  </PropertyWidgetDecorator>
-        </Hints>
+        <Documentation>DEPRECATED_IN_5.11 (Use SetAnisotropy of vtkImageVolumeRepresentation instead):
+          Set the tendency for light to scatter back towards (negative) or away from (positive) the light source within path traced volumes.</Documentation>
       </DoubleVectorProperty>
       <IntVectorProperty
           name="Denoise"
@@ -3302,7 +3285,6 @@
         <Property name="RouletteDepth"/>
         <Property name="MaxFrames"/>
         <Property name="Denoise"/>
-        <Property name="VolumeAnisotropy"/>
         <Property name="LightScale"/>
         <Property name="OSPRayTemporalCacheSize"/>
         <Property name="BackgroundNorth"/>
