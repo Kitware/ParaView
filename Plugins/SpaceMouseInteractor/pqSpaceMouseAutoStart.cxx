@@ -35,8 +35,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endif
 
 #include "pqSpaceMouseAutoStart.h"
-#if defined(_MSC_VER) || defined(APPLE)
-#include "pqSpaceMouseImplWin.h"
+#if defined(_MSC_VER) || defined(__APPLE__)
+#include "pqSpaceMouseImpl.h"
 #else
 #include "pqSpaceMouseImplLinux.h"
 #endif
@@ -78,8 +78,3 @@ void pqSpaceMouseAutoStart::shutdown()
 {
   m_p->setActiveView(nullptr);
 }
-
-// void pqSpaceMouseAutoStart::setActiveView(pqView* view)
-// {
-//   m_p->setActiveView(view);
-// }
