@@ -169,28 +169,16 @@ void pqColorMapEditor::updateActive()
 
   this->setDataRepresentation(repr);
 
-  QString arrayNameLabel(tr("Array Name: "));
-
   // Set the current LUT proxy to edit.
   if (repr && vtkSMPVRepresentationProxy::GetUsingScalarColoring(repr->getProxy()))
   {
     this->setColorTransferFunction(
       vtkSMPropertyHelper(repr->getProxy(), "LookupTable", true).GetAsProxy());
-
-    vtkPVArrayInformation* arrayInfo =
-      vtkSMPVRepresentationProxy::GetArrayInformationForColorArray(repr->getProxy());
-    if (arrayInfo)
-    {
-      arrayNameLabel.append(arrayInfo->GetName());
-    }
   }
   else
   {
     this->setColorTransferFunction(nullptr);
-    arrayNameLabel.append(QString("<%1>").arg("none"));
   }
-
-  this->Internals->Ui.ArrayLabel->setText(arrayNameLabel);
 }
 
 //-----------------------------------------------------------------------------

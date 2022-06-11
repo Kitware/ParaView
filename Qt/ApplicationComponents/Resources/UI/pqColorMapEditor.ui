@@ -10,6 +10,12 @@
     <height>149</height>
    </rect>
   </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
+  </property>
   <property name="minimumSize">
    <size>
     <width>390</width>
@@ -69,22 +75,6 @@
     </layout>
    </item>
    <item>
-    <widget class="QLabel" name="ArrayLabel">
-     <property name="font">
-      <font>
-       <weight>50</weight>
-       <bold>false</bold>
-      </font>
-     </property>
-     <property name="text">
-      <string>Array Name:</string>
-     </property>
-     <property name="textFormat">
-      <enum>Qt::AutoText</enum>
-     </property>
-    </widget>
-   </item>
-   <item>
     <widget class="QScrollArea" name="scrollArea">
      <property name="frameShape">
       <enum>QFrame::NoFrame</enum>
@@ -105,7 +95,7 @@
        </rect>
       </property>
       <layout class="QVBoxLayout" name="ScrollAreaLayout" stretch="0,0,1">
-       <property name="margin">
+       <property name="margin" stdset="0">
         <number>0</number>
        </property>
        <item>
