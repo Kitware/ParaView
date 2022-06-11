@@ -99,9 +99,9 @@ void pqRenameProxyReaction::onTriggered()
     {
       SM_SCOPED_TRACE(CallFunction)
         .arg("RenameProxy")
-        .arg(newName.toUtf8().data())
+        .arg(proxy->getProxy())
         .arg(proxy->getSMGroup().toUtf8().data())
-        .arg(proxy->getProxy());
+        .arg(newName.toUtf8().data());
     }
     BEGIN_UNDO_SET(tr("Rename") + " " + group);
     proxy->rename(newName);
