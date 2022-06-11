@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>410</width>
-    <height>774</height>
+    <width>472</width>
+    <height>925</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -24,6 +24,67 @@
     <number>6</number>
    </property>
    <item>
+    <widget class="QCheckBox" name="Use2DTransferFunction">
+     <property name="text">
+      <string>Use 2D Transfer Function</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QCheckBox" name="ShowDataHistogram">
+     <property name="toolTip">
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;When checked, a data histogram will be shown below the opacity function. Please update it by clicking on its dedicated button when needed.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     </property>
+     <property name="text">
+      <string>Display Data Histogram</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QCheckBox" name="AutomaticDataHistogramComputation">
+     <property name="toolTip">
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;When checked, the data histogram will be automatically recomputed when needed instead of needing to click on the compute data histogram button.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     </property>
+     <property name="text">
+      <string>Automatically recompute data histogram</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout1" stretch="0,1">
+     <item>
+      <widget class="QLabel" name="NumBinsLabel">
+       <property name="text">
+        <string>Number of Bins:</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="pqIntRangeWidget" name="DataHistogramNumberOfBins">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="minimum" stdset="0">
+        <number>1</number>
+       </property>
+       <property name="maximum" stdset="0">
+        <number>256</number>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <widget class="Line" name="line_2">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+    </widget>
+   </item>
+   <item>
     <widget class="QComboBox" name="DefaultPresetsComboBox">
      <property name="toolTip">
       <string>Select a color map from default presets</string>
@@ -31,12 +92,39 @@
     </widget>
    </item>
    <item>
+    <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,1">
+     <item>
+      <widget class="QLabel" name="CurrentDataLabel">
+       <property name="text">
+        <string>Data:</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="pqDoubleLineEdit" name="CurrentDataValue">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="toolTip">
+        <string>Set the data value for the selected control point</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
     <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="1,0">
      <property name="spacing">
       <number>0</number>
      </property>
+     <property name="sizeConstraint">
+      <enum>QLayout::SetDefaultConstraint</enum>
+     </property>
      <item>
-      <layout class="QVBoxLayout" name="verticalLayout" stretch="1,0,1">
+      <layout class="QVBoxLayout" name="verticalLayout" stretch="1,0,0,0,0,0,1,0,0,0,1">
        <property name="spacing">
         <number>0</number>
        </property>
@@ -45,11 +133,67 @@
        </property>
        <item>
         <widget class="pqTransferFunctionWidget" name="OpacityEditor" native="true">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
          <property name="minimumSize">
           <size>
            <width>0</width>
-           <height>80</height>
+           <height>240</height>
           </size>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QCheckBox" name="UseOpacityControlPointsFreehandDrawing">
+         <property name="toolTip">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;When checked, the control point of the opacity transfer fonction can be &quot;drawn&quot; instead of being placed one by one.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
+         <property name="text">
+          <string>Enable Freehand Drawing Of Opacity Transfer Function</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QCheckBox" name="EnableOpacityMapping">
+         <property name="text">
+          <string>Enable Opacity Mapping For Surfaces</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QCheckBox" name="UseLogScaleOpacity">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
+         <property name="text">
+          <string>Use Log Scale When Mapping Data To Opacity</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="OpacityLabel">
+         <property name="text">
+          <string>Opacity transfer function values</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="pqExpandableTableView" name="OpacityTable">
+         <property name="editTriggers">
+          <set>QAbstractItemView::DoubleClicked</set>
+         </property>
+         <property name="alternatingRowColors">
+          <bool>true</bool>
+         </property>
+         <property name="selectionBehavior">
+          <enum>QAbstractItemView::SelectRows</enum>
+         </property>
+         <property name="maximumRowCountBeforeScrolling" stdset="0">
+          <number>10</number>
          </property>
         </widget>
        </item>
@@ -79,11 +223,50 @@
         </widget>
        </item>
        <item>
+        <widget class="QCheckBox" name="UseLogScale">
+         <property name="toolTip">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;When checked, the mapping from data to colors is done using a log-scale. Note that this does not affect the mapping of data to opacity.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
+         <property name="text">
+          <string>Use Log Scale When Mapping Data To Colors</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="ColorLabel">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="text">
+          <string>Color transfer function values</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="pqExpandableTableView" name="ColorTable">
+         <property name="editTriggers">
+          <set>QAbstractItemView::DoubleClicked</set>
+         </property>
+         <property name="alternatingRowColors">
+          <bool>true</bool>
+         </property>
+         <property name="selectionBehavior">
+          <enum>QAbstractItemView::SelectRows</enum>
+         </property>
+         <property name="maximumRowCountBeforeScrolling" stdset="0">
+          <number>10</number>
+         </property>
+        </widget>
+       </item>
+       <item>
         <widget class="pqTransferFunction2DWidget" name="Transfer2DEditor" native="true">
          <property name="minimumSize">
           <size>
            <width>100</width>
-           <height>100</height>
+           <height>400</height>
           </size>
          </property>
          <property name="visible">
@@ -173,19 +356,6 @@ background-image: url(:/pqWidgets/Icons/pqEdgeCenterData.svg);</string>
         </widget>
        </item>
        <item>
-        <spacer name="verticalSpacer">
-         <property name="orientation">
-          <enum>Qt::Vertical</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>0</width>
-           <height>1</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
-       <item>
         <widget class="QToolButton" name="ChoosePreset">
          <property name="toolTip">
           <string>Choose preset</string>
@@ -242,219 +412,28 @@ background-image: url(:/pqWidgets/Icons/pqEdgeCenterData.svg);</string>
         </widget>
        </item>
        <item>
-        <widget class="QToolButton" name="AdvancedButton">
-         <property name="toolTip">
-          <string>Manually edit transfer functions</string>
+        <spacer name="verticalSpacer_2">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
          </property>
-         <property name="text">
-          <string/>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
          </property>
-         <property name="icon">
-          <iconset resource="../../../Components/Resources/pqComponents.qrc">
-           <normaloff>:/pqWidgets/Icons/pqAdvanced.svg</normaloff>:/pqWidgets/Icons/pqAdvanced.svg</iconset>
-         </property>
-         <property name="checkable">
-          <bool>true</bool>
-         </property>
-        </widget>
+        </spacer>
        </item>
       </layout>
      </item>
     </layout>
    </item>
    <item>
-    <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,1">
-     <item>
-      <widget class="QLabel" name="label">
-       <property name="text">
-        <string>Data:</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="pqDoubleLineEdit" name="CurrentDataValue">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="toolTip">
-        <string>Set the data value for the selected control point</string>
-       </property>
-      </widget>
-     </item>
-    </layout>
-   </item>
-   <item>
-    <widget class="QCheckBox" name="UseOpacityControlPointsFreehandDrawing">
-     <property name="toolTip">
-      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;When checked, the control point of the opacity transfer fonction can be &quot;drawn&quot; instead of being placed one by one.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-     </property>
-     <property name="text">
-      <string>Enable Freehand Drawing Of Opacity Transfer Function</string>
+    <widget class="Line" name="line_3">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
      </property>
     </widget>
-   </item>
-   <item>
-    <widget class="QCheckBox" name="UseLogScale">
-     <property name="toolTip">
-      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;When checked, the mapping from data to colors is done using a log-scale. Note that this does not affect the mapping of data to opacity.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-     </property>
-     <property name="text">
-      <string>Use Log Scale When Mapping Data To Colors</string>
-     </property>
-    </widget>
-   </item>
-   <item>
-    <widget class="QCheckBox" name="EnableOpacityMapping">
-     <property name="text">
-      <string>Enable Opacity Mapping For Surfaces</string>
-     </property>
-    </widget>
-   </item>
-   <item>
-    <widget class="QCheckBox" name="UseLogScaleOpacity">
-     <property name="enabled">
-      <bool>false</bool>
-     </property>
-     <property name="text">
-      <string>Use Log Scale When Mapping Data To Opacity</string>
-     </property>
-    </widget>
-   </item>
-   <item>
-    <widget class="QCheckBox" name="Use2DTransferFunction">
-     <property name="text">
-      <string>Edit 2D Transfer Function</string>
-     </property>
-    </widget>
-   </item>
-   <item>
-    <widget class="QLabel" name="ColorLabel">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
-     <property name="text">
-      <string>Color transfer function values</string>
-     </property>
-    </widget>
-   </item>
-   <item>
-    <widget class="pqExpandableTableView" name="ColorTable">
-     <property name="editTriggers">
-      <set>QAbstractItemView::DoubleClicked</set>
-     </property>
-     <property name="alternatingRowColors">
-      <bool>true</bool>
-     </property>
-     <property name="selectionBehavior">
-      <enum>QAbstractItemView::SelectRows</enum>
-     </property>
-     <property name="maximumRowCountBeforeScrolling" stdset="0">
-      <number>10</number>
-     </property>
-    </widget>
-   </item>
-   <item>
-    <widget class="QLabel" name="OpacityLabel">
-     <property name="text">
-      <string>Opacity transfer function values</string>
-     </property>
-    </widget>
-   </item>
-   <item>
-    <widget class="pqExpandableTableView" name="OpacityTable">
-     <property name="editTriggers">
-      <set>QAbstractItemView::DoubleClicked</set>
-     </property>
-     <property name="alternatingRowColors">
-      <bool>true</bool>
-     </property>
-     <property name="selectionBehavior">
-      <enum>QAbstractItemView::SelectRows</enum>
-     </property>
-     <property name="maximumRowCountBeforeScrolling" stdset="0">
-      <number>10</number>
-     </property>
-    </widget>
-   </item>
-   <item>
-    <layout class="QVBoxLayout" name="verticalLayout_3">
-     <property name="spacing">
-      <number>0</number>
-     </property>
-     <item>
-      <widget class="QLabel" name="label_2">
-       <property name="text">
-        <string>&lt;html&gt;&lt;b&gt;Data Histogram&lt;/b&gt;&lt;/html&gt;</string>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignBottom|Qt::AlignLeading|Qt::AlignLeft</set>
-       </property>
-       <property name="wordWrap">
-        <bool>true</bool>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="Line" name="line">
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-      </widget>
-     </item>
-    </layout>
-   </item>
-   <item>
-    <widget class="QCheckBox" name="ShowDataHistogram">
-     <property name="toolTip">
-      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;When checked, a data histogram will be shown below the opacity function. Please update it by clicking on its dedicated button when needed.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-     </property>
-     <property name="text">
-      <string>Display Data Histogram</string>
-     </property>
-    </widget>
-   </item>
-   <item>
-    <widget class="QCheckBox" name="AutomaticDataHistogramComputation">
-     <property name="toolTip">
-      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;When checked, the data histogram will be automatically recomputed when needed instead of needing to click on the compute data histogram button.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-     </property>
-     <property name="text">
-      <string>Automatically Recompute Data Histogram</string>
-     </property>
-    </widget>
-   </item>
-   <item>
-    <layout class="QHBoxLayout" name="horizontalLayout1" stretch="0,1">
-     <item>
-      <widget class="QLabel" name="label1">
-       <property name="text">
-        <string>Number of Bins:</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="pqIntRangeWidget" name="DataHistogramNumberOfBins">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="minimum" stdset="0">
-        <number>1</number>
-       </property>
-       <property name="maximum" stdset="0">
-        <number>256</number>
-       </property>
-      </widget>
-     </item>
-    </layout>
    </item>
   </layout>
  </widget>
@@ -496,4 +475,21 @@ background-image: url(:/pqWidgets/Icons/pqEdgeCenterData.svg);</string>
   <include location="../../../Components/Resources/pqComponents.qrc"/>
  </resources>
  <connections/>
+ <designerdata>
+  <property name="gridDeltaX">
+   <number>10</number>
+  </property>
+  <property name="gridDeltaY">
+   <number>10</number>
+  </property>
+  <property name="gridSnapX">
+   <bool>true</bool>
+  </property>
+  <property name="gridSnapY">
+   <bool>true</bool>
+  </property>
+  <property name="gridVisible">
+   <bool>true</bool>
+  </property>
+ </designerdata>
 </ui>
