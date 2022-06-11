@@ -1287,23 +1287,27 @@ void pqColorOpacityEditorWidget::show2DHistogram(bool show)
     this->Internals->Ui.Transfer2DEditor->setHistogram(nullptr);
   }
   Ui::ColorOpacityEditorWidget& ui = this->Internals->Ui;
+
+  ui.ShowDataHistogram->setEnabled(!show);
+  ui.AutomaticDataHistogramComputation->setVisible(show || ui.ShowDataHistogram->isChecked());
+  ui.DataHistogramNumberOfBins->setVisible(show || ui.ShowDataHistogram->isChecked());
+  ui.NumBinsLabel->setVisible(show || ui.ShowDataHistogram->isChecked());
+  ui.DefaultPresetsComboBox->setVisible(!show);
+  ui.CurrentDataLabel->setVisible(!show);
+  ui.CurrentDataValue->setVisible(!show);
   ui.ColorEditor->setVisible(!show);
+  ui.OpacityEditor->setVisible(!show);
+  ui.UseLogScale->setVisible(!show);
   ui.ColorTable->setEnabled(!show);
   ui.OpacityTable->setEnabled(!show);
-  ui.OpacityEditor->setVisible(!show);
-  ui.UseLogScale->setEnabled(!show);
-  ui.UseLogScaleOpacity->setEnabled(!show);
-  ui.UseOpacityControlPointsFreehandDrawing->setEnabled(!show);
-  ui.EnableOpacityMapping->setEnabled(!show);
+  ui.UseLogScaleOpacity->setVisible(!show);
+  ui.UseOpacityControlPointsFreehandDrawing->setVisible(!show);
+  ui.EnableOpacityMapping->setVisible(!show);
   ui.ChoosePreset->setEnabled(!show);
   ui.SaveAsPreset->setEnabled(!show);
   ui.InvertTransferFunctions->setEnabled(!show);
   ui.ChooseBoxColor->setVisible(show);
-
-  ui.AutomaticDataHistogramComputation->setEnabled(show);
   ui.Transfer2DEditor->setVisible(show);
-  ui.ShowDataHistogram->setEnabled(!show);
-  ui.DataHistogramNumberOfBins->setEnabled(show);
   ui.ComputeDataHistogram->setEnabled(!ui.AutomaticDataHistogramComputation->isChecked());
 
   Q_EMIT this->use2DTransferFunctionChanged();
@@ -1455,8 +1459,9 @@ void pqColorOpacityEditorWidget::updateDataHistogramEnableState()
     return;
   }
   bool showDataHistogram = this->Internals->Ui.ShowDataHistogram->isChecked();
-  this->Internals->Ui.AutomaticDataHistogramComputation->setEnabled(showDataHistogram);
-  this->Internals->Ui.DataHistogramNumberOfBins->setEnabled(showDataHistogram);
+  this->Internals->Ui.AutomaticDataHistogramComputation->setVisible(showDataHistogram);
+  this->Internals->Ui.DataHistogramNumberOfBins->setVisible(showDataHistogram);
+  this->Internals->Ui.NumBinsLabel->setVisible(showDataHistogram);
   this->Internals->Ui.ComputeDataHistogram->setEnabled(
     showDataHistogram && !this->Internals->Ui.AutomaticDataHistogramComputation->isChecked());
 }
