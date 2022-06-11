@@ -536,6 +536,32 @@ pqColorOpacityEditorWidget::~pqColorOpacityEditorWidget()
 }
 
 //-----------------------------------------------------------------------------
+void pqColorOpacityEditorWidget::observeRepresentationModified(
+  vtkSMProxy* reprProxy, vtkPiecewiseFunction* pwf)
+{
+  vtkSMProperty* msProp = reprProxy->GetProperty("MapScalars");
+  vtkSMProperty* mcmProp = reprProxy->GetProperty("MultiComponentsMapping");
+  vtkSMProperty* uoaProperty = reprProxy->GetProperty("UseSeparateOpacityArray");
+  if (msProp && (mcmProp || uoaProperty))
+  {
+    this->Internals->RangeConnector->Connect(msProp, vtkCommand::ModifiedEvent, this,
+      SLOT(multiComponentsMappingChanged(vtkObject*, unsigned long, void*, void*)), pwf);
+
+    if (mcmProp)
+    {
+      this->Internals->RangeConnector->Connect(mcmProp, vtkCommand::ModifiedEvent, this,
+        SLOT(multiComponentsMappingChanged(vtkObject*, unsigned long, void*, void*)), pwf);
+    }
+
+    if (uoaProperty)
+    {
+      this->Internals->RangeConnector->Connect(uoaProperty, vtkCommand::ModifiedEvent, this,
+        SLOT(multiComponentsMappingChanged(vtkObject*, unsigned long, void*, void*)), pwf);
+    }
+  }
+}
+
+//-----------------------------------------------------------------------------
 void pqColorOpacityEditorWidget::setScalarOpacityFunctionProxy(pqSMProxy sofProxy)
 {
   pqInternals& internals = (*this->Internals);
@@ -571,27 +597,7 @@ void pqColorOpacityEditorWidget::setScalarOpacityFunctionProxy(pqSMProxy sofProx
     // When representation changes, we have to initialize the opacity widget when
     // "MultiComponentsMapping" is modified
     this->Internals->RangeConnector->Disconnect();
-    vtkSMProperty* msProp = proxy->GetProperty("MapScalars");
-    vtkSMProperty* mcmProp = proxy->GetProperty("MultiComponentsMapping");
-    vtkSMProperty* uoaProperty = proxy->GetProperty("UseSeparateOpacityArray");
-    if (msProp && (mcmProp || uoaProperty))
-    {
-      this->Internals->RangeConnector->Connect(msProp, vtkCommand::ModifiedEvent, this,
-        SLOT(multiComponentsMappingChanged(vtkObject*, unsigned long, void*, void*)), pwf);
-
-      if (mcmProp)
-      {
-        this->Internals->RangeConnector->Connect(mcmProp, vtkCommand::ModifiedEvent, this,
-          SLOT(multiComponentsMappingChanged(vtkObject*, unsigned long, void*, void*)), pwf);
-      }
-
-      if (uoaProperty)
-      {
-        this->Internals->RangeConnector->Connect(uoaProperty, vtkCommand::ModifiedEvent, this,
-          SLOT(multiComponentsMappingChanged(vtkObject*, unsigned long, void*, void*)), pwf);
-      }
-    }
-
+    this->observeRepresentationModified(proxy, pwf);
     this->initializeOpacityEditor(pwf);
 
     // add new property links.
@@ -1002,26 +1008,7 @@ void pqColorOpacityEditorWidget::representationOrViewChanged()
   // When representation changes, we have to initialize the opacity widget when
   // "MultiComponentsMapping" is modified
   this->Internals->RangeConnector->Disconnect();
-  vtkSMProperty* msProp = repr->getProxy()->GetProperty("MapScalars");
-  vtkSMProperty* mcmProp = repr->getProxy()->GetProperty("MultiComponentsMapping");
-  vtkSMProperty* uoaProp = repr->getProxy()->GetProperty("UseSeparateOpacityArray");
-  if (msProp && (mcmProp || uoaProp))
-  {
-    this->Internals->RangeConnector->Connect(msProp, vtkCommand::ModifiedEvent, this,
-      SLOT(multiComponentsMappingChanged(vtkObject*, unsigned long, void*, void*)), pwf);
-
-    if (mcmProp)
-    {
-      this->Internals->RangeConnector->Connect(mcmProp, vtkCommand::ModifiedEvent, this,
-        SLOT(multiComponentsMappingChanged(vtkObject*, unsigned long, void*, void*)), pwf);
-    }
-
-    if (uoaProp)
-    {
-      this->Internals->RangeConnector->Connect(uoaProp, vtkCommand::ModifiedEvent, this,
-        SLOT(multiComponentsMappingChanged(vtkObject*, unsigned long, void*, void*)), pwf);
-    }
-  }
+  this->observeRepresentationModified(repr->getProxy(), pwf);
   this->initializeOpacityEditor(pwf);
 }
 

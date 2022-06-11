@@ -486,6 +486,11 @@ protected: // NOLINT(readability-redundant-access-specifiers)
    */
   void initializeTransfer2DEditor(vtkPVTransferFunction2D* tf2d);
 
+  /**
+   * When representation has changed, gotta reconnect some internal observers.
+   */
+  void observeRepresentationModified(vtkSMProxy* reprProxy, vtkPiecewiseFunction* pwf);
+
 private:
   Q_DISABLE_COPY(pqColorOpacityEditorWidget)
 
