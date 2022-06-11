@@ -104,6 +104,11 @@ public:
   ~pqColorOpacityEditorWidget() override;
 
   /**
+   * updates the panel to show/hide advanced settings
+   */
+  void updateWidget(bool showing_advanced_properties) override;
+
+  /**
    * Returns the current list of control points for the color transfer
    * function. This a list of 4-tuples.
    */
@@ -350,11 +355,6 @@ protected Q_SLOTS:
   void colorCurrentChanged(vtkIdType);
 
   /**
-   * updates the panel to show/hide advanced settings
-   */
-  void updatePanel();
-
-  /**
    * updates the text shown in the "current data" input.
    */
   void updateCurrentData();
@@ -373,12 +373,6 @@ protected Q_SLOTS:
    * Updates the default presets combo box when the list changes
    */
   void updateDefaultPresetsList();
-
-  /**
-   * Ensures that the color-swatches for indexedColors are shown only when this
-   * is set to true.
-   */
-  void updateIndexedLookupState();
 
   /**
    * called when "MultiComponentsMappingChanged" checkbox is modified.

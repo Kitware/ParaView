@@ -93,38 +93,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace
 {
-//-----------------------------------------------------------------------------
-// Decorator used to hide the widget when using IndexedLookup.
-class pqColorOpacityEditorWidgetDecorator : public pqPropertyWidgetDecorator
-{
-  typedef pqPropertyWidgetDecorator Superclass;
-  bool Hidden;
-
-public:
-  pqColorOpacityEditorWidgetDecorator(vtkPVXMLElement* xmlArg, pqPropertyWidget* parentArg)
-    : Superclass(xmlArg, parentArg)
-    , Hidden(false)
-  {
-  }
-  ~pqColorOpacityEditorWidgetDecorator() override = default;
-
-  void setHidden(bool val)
-  {
-    if (val != this->Hidden)
-    {
-      this->Hidden = val;
-      Q_EMIT this->visibilityChanged();
-    }
-  }
-  bool canShowWidget(bool show_advanced) const override
-  {
-    Q_UNUSED(show_advanced);
-    return !this->Hidden;
-  }
-
-private:
-  Q_DISABLE_COPY(pqColorOpacityEditorWidgetDecorator)
-};
 
 class pqColorMapDelegate : public QStyledItemDelegate
 {
@@ -202,7 +170,6 @@ public:
   Ui::ColorOpacityEditorWidget Ui;
   pqColorTableModel ColorTableModel;
   pqOpacityTableModel OpacityTableModel;
-  QPointer<pqColorOpacityEditorWidgetDecorator> Decorator;
   vtkWeakPointer<vtkSMPropertyGroup> PropertyGroup;
   vtkWeakPointer<vtkSMProxy> ScalarOpacityFunctionProxy;
   vtkWeakPointer<vtkSMProxy> TransferFunction2DProxy;
@@ -211,8 +178,6 @@ public:
   QScopedPointer<pqChooseColorPresetReaction> ChoosePresetReaction;
   QScopedPointer<pqSignalsBlocker> SignalsBlocker;
 
-  // We use this pqPropertyLinks instance to simply monitor smproperty changes.
-  pqPropertyLinks LinksForMonitoringChanges;
   vtkNew<vtkEventQtSlotConnect> TransferFunctionConnector;
   vtkNew<vtkEventQtSlotConnect> TransferFunctionModifiedConnector;
   vtkNew<vtkEventQtSlotConnect> RangeConnector;
@@ -233,9 +198,6 @@ public:
   {
     this->Ui.setupUi(self);
     this->Ui.mainLayout->setMargin(pqPropertiesPanel::suggestedMargin());
-
-    this->Decorator = new pqColorOpacityEditorWidgetDecorator(nullptr, self);
-
     this->Ui.ColorTable->setModel(&this->ColorTableModel);
     this->Ui.ColorTable->horizontalHeader()->setHighlightSections(false);
     this->Ui.ColorTable->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
@@ -395,7 +357,6 @@ pqColorOpacityEditorWidget::pqColorOpacityEditorWidget(
   });
   QObject::connect(ui.ChooseBoxColor, &QAbstractButton::clicked, this,
     &pqColorOpacityEditorWidget::chooseBoxColorAlpha);
-  QObject::connect(ui.AdvancedButton, SIGNAL(clicked()), this, SLOT(updatePanel()));
 
   QObject::connect(
     ui.OpacityEditor, SIGNAL(chartRangeModified()), this, SLOT(setHistogramOutdated()));
@@ -545,21 +506,6 @@ pqColorOpacityEditorWidget::pqColorOpacityEditorWidget(
     this->showDataHistogramClicked(ui.ShowDataHistogram->isChecked());
   }
 
-  // if proxy has a property named IndexedLookup, we hide this entire widget
-  // when IndexedLookup is ON.
-  if (smproxy->GetProperty("IndexedLookup"))
-  {
-    // we are not controlling the IndexedLookup property, we are merely
-    // observing it to ensure the UI is updated correctly. Hence we don't fire
-    // any signal to update the smproperty.
-    this->Internals->TransferFunctionConnector->Connect(smproxy->GetProperty("IndexedLookup"),
-      vtkCommand::ModifiedEvent, this, SLOT(updateIndexedLookupState()));
-    this->updateIndexedLookupState();
-
-    // Add decorator so the widget can be hidden when IndexedLookup is ON.
-    this->addDecorator(this->Internals->Decorator);
-  }
-
   if (smproxy->GetProperty("VectorMode"))
   {
     this->Internals->TransferFunctionConnector->Connect(smproxy->GetProperty("VectorMode"),
@@ -571,13 +517,6 @@ pqColorOpacityEditorWidget::pqColorOpacityEditorWidget(
       vtkCommand::ModifiedEvent, this, SLOT(setHistogramOutdated()));
   }
 
-  pqSettings* settings = pqApplicationCore::instance()->settings();
-  if (settings)
-  {
-    this->Internals->Ui.AdvancedButton->setChecked(
-      settings->value("showAdvancedPropertiesColorOpacityEditorWidget", false).toBool());
-  }
-
   // Connect with the SignalsBlocker in between to be able to call QObject::blockSignals on it
   // because otherwise no QObject would be emiting a signal, meaning it could not be blocked
   // to avoid loops
@@ -587,20 +526,11 @@ pqColorOpacityEditorWidget::pqColorOpacityEditorWidget(
     &pqColorOpacityEditorWidget::resetColorMapComboBox);
 
   this->updateCurrentData();
-  this->updatePanel();
 }
 
 //-----------------------------------------------------------------------------
 pqColorOpacityEditorWidget::~pqColorOpacityEditorWidget()
 {
-  pqSettings* settings = pqApplicationCore::instance()->settings();
-  if (settings)
-  {
-    // save the state of the advanced button in the widget
-    settings->setValue("showAdvancedPropertiesColorOpacityEditorWidget",
-      this->Internals->Ui.AdvancedButton->isChecked());
-  }
-
   delete this->Internals;
   this->Internals = nullptr;
 }
@@ -770,16 +700,6 @@ void pqColorOpacityEditorWidget::updateTransferFunction2DProxy()
 }
 
 //-----------------------------------------------------------------------------
-void pqColorOpacityEditorWidget::updateIndexedLookupState()
-{
-  if (this->proxy()->GetProperty("IndexedLookup"))
-  {
-    bool val = vtkSMPropertyHelper(this->proxy(), "IndexedLookup").GetAsInt() != 0;
-    this->Internals->Decorator->setHidden(val);
-  }
-}
-
-//-----------------------------------------------------------------------------
 void pqColorOpacityEditorWidget::multiComponentsMappingChanged(vtkObject* vtkNotUsed(sender),
   unsigned long vtkNotUsed(event), void* clientData, void* vtkNotUsed(callData))
 {
@@ -847,15 +767,16 @@ void pqColorOpacityEditorWidget::colorCurrentChanged(vtkIdType index)
 }
 
 //-----------------------------------------------------------------------------
-void pqColorOpacityEditorWidget::updatePanel()
+void pqColorOpacityEditorWidget::updateWidget(bool showing_advanced_properties)
 {
   if (this->Internals)
   {
-    bool advancedVisible = this->Internals->Ui.AdvancedButton->isChecked();
-    this->Internals->Ui.ColorLabel->setVisible(advancedVisible);
-    this->Internals->Ui.ColorTable->setVisible(advancedVisible);
-    this->Internals->Ui.OpacityLabel->setVisible(advancedVisible);
-    this->Internals->Ui.OpacityTable->setVisible(advancedVisible);
+    bool show =
+      showing_advanced_properties && !this->Internals->Ui.Use2DTransferFunction->isChecked();
+    this->Internals->Ui.ColorLabel->setVisible(show);
+    this->Internals->Ui.ColorTable->setVisible(show);
+    this->Internals->Ui.OpacityLabel->setVisible(show);
+    this->Internals->Ui.OpacityTable->setVisible(show);
   }
 }
 

@@ -1613,6 +1613,11 @@
         <Property name="ShowDataHistogram" function="ShowDataHistogram" />
         <Property name="AutomaticDataHistogramComputation" function="AutomaticDataHistogramComputation" />
         <Property name="DataHistogramNumberOfBins" function="DataHistogramNumberOfBins" />
+        <Hints>
+          <PropertyWidgetDecorator type="ShowWidgetDecorator">
+            <Property name="IndexedLookup" function="boolean_invert"/>
+          </PropertyWidgetDecorator>
+        </Hints>
       </PropertyGroup>
 
       <PropertyGroup label="Mapping Parameters">
