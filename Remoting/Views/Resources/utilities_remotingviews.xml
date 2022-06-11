@@ -1622,8 +1622,13 @@
       </PropertyGroup>
 
       <PropertyGroup label="Color Discretization">
-        <Property name="NumberOfTableValues" />
         <Property name="Discretize" />
+        <Property name="NumberOfTableValues" />
+        <Hints>
+          <PropertyWidgetDecorator type="ShowWidgetDecorator">
+            <Property name="Use2DTransferFunction" function="boolean_invert"/>
+          </PropertyWidgetDecorator>
+        </Hints>
       </PropertyGroup>
 
       <PropertyGroup label="Categories" panel_widget="AnnotationsEditor">
