@@ -1286,17 +1286,6 @@
         </Documentation>
       </IntVectorProperty>
 
-      <IntVectorProperty name="EnableOpacityMapping"
-                         command="SetEnableOpacityMapping"
-                         number_of_elements="1"
-                         default_values="0">
-        <BooleanDomain name="bool" />
-        <Documentation>
-          When enabled, the opacity transfer function is used for
-          rendering, if applicable.
-        </Documentation>
-      </IntVectorProperty>
-
       <ProxyProperty name="ScalarOpacityFunction"
         command="SetScalarOpacityFunction">
         <Hints>
@@ -1588,6 +1577,22 @@
           Opacities used when using IndexedLookup is true.
         </Documentation>
       </DoubleVectorProperty>
+
+      <IntVectorProperty name="EnableOpacityMapping"
+                         command="SetEnableOpacityMapping"
+                         number_of_elements="1"
+                         default_values="0">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          When enabled, the opacity transfer function is used for
+          rendering, if applicable.
+        </Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="ShowWidgetDecorator">
+            <Property name="Use2DTransferFunction" function="boolean_invert"/>
+          </PropertyWidgetDecorator>
+        </Hints>
+      </IntVectorProperty>
 
       <PropertyGroup label="Mapping Data" panel_widget="ColorOpacityEditor">
         <Property name="EnableOpacityMapping" function="EnableOpacityMapping" />
