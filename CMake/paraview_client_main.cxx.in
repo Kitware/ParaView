@@ -65,7 +65,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 int main(int argc, char* argv[])
 {
-#if defined(_WIN32) && !defined(__MINGW32__)
+#if defined(_WIN32)
   auto converter = vtksys::Encoding::CommandLineArguments::Main(argc, nullptr);
   const char* const* utf8data = converter.argv();
   std::vector<char*> args;
