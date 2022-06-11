@@ -1594,7 +1594,7 @@
         </Hints>
       </IntVectorProperty>
 
-      <PropertyGroup label="Mapping Data" panel_widget="ColorOpacityEditor">
+      <PropertyGroup label="Transfer Functions" panel_widget="ColorOpacityEditor">
         <Property name="EnableOpacityMapping" function="EnableOpacityMapping" />
         <Property name="RGBPoints" function="XRGBPoints" />
         <Property name="ScalarOpacityFunction" function="ScalarOpacityFunction" />
@@ -1607,7 +1607,7 @@
         <Property name="DataHistogramNumberOfBins" function="DataHistogramNumberOfBins" />
       </PropertyGroup>
 
-      <PropertyGroup label="Color Mapping Parameters">
+      <PropertyGroup label="Mapping Parameters">
         <Property name="ColorSpace" />
         <Property name="NanColor" />
         <Property name="NanOpacity" />
@@ -1618,7 +1618,7 @@
         <Property name="Discretize" />
       </PropertyGroup>
 
-      <PropertyGroup label="Annotations" panel_widget="AnnotationsEditor">
+      <PropertyGroup label="Categories" panel_widget="AnnotationsEditor">
         <Property name="Annotations" />
         <Property name="EnableOpacityMapping" function="EnableOpacityMapping" />
         <Property name="IndexedColors" />
