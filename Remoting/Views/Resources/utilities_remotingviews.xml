@@ -1391,6 +1391,14 @@
           In Step mode, the color of an interval is the color of the second point
           of the interval.
         </Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="ShowWidgetDecorator">
+            <Property name = "IndexedLookup" function="boolean_invert"/>
+          </PropertyWidgetDecorator>
+          <PropertyWidgetDecorator type="ShowWidgetDecorator">
+            <Property name="Use2DTransferFunction" function="boolean_invert"/>
+          </PropertyWidgetDecorator>
+        </Hints>
       </IntVectorProperty>
       <IntVectorProperty command="SetUseBelowRangeColor"
                          default_values="0"
