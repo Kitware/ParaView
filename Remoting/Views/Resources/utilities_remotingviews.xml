@@ -1490,7 +1490,7 @@
           that must be present in the transfer function.
         </Documentation>
         <Hints>
-          <PropertyWidgetDecorator type="EnableWidgetDecorator">
+          <PropertyWidgetDecorator type="ShowWidgetDecorator">
             <Property name="Discretize" function="boolean" index="0" />
           </PropertyWidgetDecorator>
         </Hints>
