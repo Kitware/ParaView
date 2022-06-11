@@ -192,6 +192,7 @@ void pqColorAnnotationsPropertyWidget::updateIndexedLookupState()
     pqDataRepresentation* repr = pqActiveObjects::instance().activeRepresentation();
     if (val && repr && repr->isVisible())
     {
+      this->Internals->AnnotationsWidget->supportsOpacityMapping(true);
       vtkSMPropertyHelper annotationsInitialized(this->proxy(), "AnnotationsInitialized");
       if (!annotationsInitialized.GetAsInt())
       {
@@ -216,6 +217,10 @@ void pqColorAnnotationsPropertyWidget::updateIndexedLookupState()
           annotationsInitialized.Set(1);
         }
       }
+    }
+    else
+    {
+      this->Internals->AnnotationsWidget->supportsOpacityMapping(false);
     }
   }
 }
