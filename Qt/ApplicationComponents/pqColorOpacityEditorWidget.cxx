@@ -503,6 +503,7 @@ pqColorOpacityEditorWidget::pqColorOpacityEditorWidget(
   {
     this->updateDataHistogramEnableState();
     this->Internals->Ui.OpacityEditor->setVisible(!ui.ShowDataHistogram->isChecked());
+    this->Internals->Ui.ChooseBoxColor->setVisible(false);
     this->showDataHistogramClicked(ui.ShowDataHistogram->isChecked());
   }
 
