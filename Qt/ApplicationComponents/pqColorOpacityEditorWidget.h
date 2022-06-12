@@ -466,6 +466,12 @@ protected Q_SLOTS:
   void transfer2DChanged();
 
   /**
+   * Slot to update active representation when the piecewise function for opacity is modified.
+   * For ex, editing the midpoint, sharpness around a piecewise control point modifies the function.
+   */
+  void opacityFunctionModified();
+
+  /**
    * Slot to update the 2D transfer function proxy when the Y axis scalar array is changed.
    */
   void updateTransferFunction2DProxy();

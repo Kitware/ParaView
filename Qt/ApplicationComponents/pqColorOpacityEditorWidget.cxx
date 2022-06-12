@@ -183,6 +183,7 @@ public:
   vtkNew<vtkEventQtSlotConnect> RangeConnector;
   vtkNew<vtkEventQtSlotConnect> ConsumerConnector;
   vtkNew<vtkEventQtSlotConnect> TransferFunction2DConnector;
+  vtkNew<vtkEventQtSlotConnect> OpacityFunctionConnector;
 
   pqTimer HistogramTimer;
   pqTimer Histogram2DTimer;
@@ -746,6 +747,12 @@ void pqColorOpacityEditorWidget::initializeOpacityEditor(vtkPiecewiseFunction* p
     stc = vtkScalarsToColors::SafeDownCast(this->proxy()->GetClientSideObject());
   }
   ui.OpacityEditor->initialize(stc, false, pwf, true);
+  if (pwf != nullptr)
+  {
+    this->Internals->OpacityFunctionConnector->Disconnect();
+    this->Internals->OpacityFunctionConnector->Connect(
+      pwf, vtkCommand::ModifiedEvent, this, SLOT(opacityFunctionModified()));
+  }
 
   // The opacity editor has been initialized, set the data histogram table if needed
   this->showDataHistogramClicked(this->Internals->Ui.ShowDataHistogram->isChecked());
@@ -1491,6 +1498,12 @@ void pqColorOpacityEditorWidget::initializeTransfer2DEditor(vtkPVTransferFunctio
 
 //-----------------------------------------------------------------------------
 void pqColorOpacityEditorWidget::transfer2DChanged()
+{
+  this->Internals->render();
+}
+
+//-----------------------------------------------------------------------------
+void pqColorOpacityEditorWidget::opacityFunctionModified()
 {
   this->Internals->render();
 }
