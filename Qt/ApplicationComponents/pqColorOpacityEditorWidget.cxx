@@ -1289,7 +1289,7 @@ void pqColorOpacityEditorWidget::show2DHistogram(bool show)
   }
   Ui::ColorOpacityEditorWidget& ui = this->Internals->Ui;
 
-  ui.ShowDataHistogram->setEnabled(!show);
+  ui.ShowDataHistogram->setVisible(!show);
   ui.AutomaticDataHistogramComputation->setVisible(show || ui.ShowDataHistogram->isChecked());
   ui.DataHistogramNumberOfBins->setVisible(show || ui.ShowDataHistogram->isChecked());
   ui.NumBinsLabel->setVisible(show || ui.ShowDataHistogram->isChecked());
