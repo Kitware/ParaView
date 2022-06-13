@@ -25,7 +25,8 @@
 #define vtkPVPluginsInformation_h
 
 #include "vtkPVInformation.h"
-#include "vtkRemotingCoreModule.h" //needed for exports
+#include "vtkParaViewDeprecation.h" // needed for deprecation
+#include "vtkRemotingCoreModule.h"  // needed for exports
 
 class VTKREMOTINGCORE_EXPORT vtkPVPluginsInformation : public vtkPVInformation
 {
@@ -50,11 +51,13 @@ public:
   bool GetAutoLoad(unsigned int);
   //@}
 
+  //@{
   /**
-   * Note that unlike other properties, this one is updated as a consequence of
-   * calling PluginRequirementsSatisfied().
+   * Set/Get the plugin status message for a specific plugin
    */
   const char* GetPluginStatusMessage(unsigned int);
+  void SetPluginStatusMessage(unsigned int, const char*);
+  //@}
 
   /**
    * API to change auto-load status.
@@ -108,6 +111,7 @@ public:
    * is empty for a loaded plugin, it implies that everything is fine. If some
    * requirement is not met, the StatusMessage includes the error message.
    */
+  PARAVIEW_DEPRECATED_IN_5_11_0("Use `vtkSMProxyManager::SatisfyPluginRequirements()` instead")
   static bool PluginRequirementsSatisfied(
     vtkPVPluginsInformation* client_plugins, vtkPVPluginsInformation* server_plugins);
 

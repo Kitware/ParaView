@@ -302,3 +302,96 @@ void vtkSMPluginManager::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
 }
+
+//----------------------------------------------------------------------------
+bool vtkSMPluginManager::FulfillPluginRequirements(vtkSMSession* session, bool onlyCheck)
+{
+  vtkPVPluginsInformation* clientPlugins = this->GetLocalInformation();
+  vtkPVPluginsInformation* serverPlugins = this->GetRemoteInformation(session);
+
+  if (!clientPlugins || !serverPlugins)
+  {
+    return false;
+  }
+
+  std::map<std::string, unsigned int> clientMap;
+  for (unsigned int i = 0; i < clientPlugins->GetNumberOfPlugins(); i++)
+  {
+    clientMap.emplace(clientPlugins->GetPluginName(i), i);
+  }
+
+  std::map<std::string, unsigned int> serverMap;
+  for (unsigned int i = 0; i < serverPlugins->GetNumberOfPlugins(); i++)
+  {
+    serverMap.emplace(serverPlugins->GetPluginName(i), i);
+  }
+  // XXX here it would be nice tu actually check the "RequiredPlugins" but this may be complex
+  // as a recursion would be needed somewhere.
+
+  // client plugin can load server plugins, but not the other way around
+  bool ret = true;
+  ret = this->FulfillPluginClientServerRequirements(
+    session, clientMap, clientPlugins, serverMap, serverPlugins, true, onlyCheck);
+  ret &= this->FulfillPluginClientServerRequirements(
+    session, serverMap, serverPlugins, clientMap, clientPlugins, false, true);
+  return ret;
+}
+
+//----------------------------------------------------------------------------
+bool vtkSMPluginManager::FulfillPluginClientServerRequirements(vtkSMSession* session,
+  const std::map<std::string, unsigned int>& inputMap, vtkPVPluginsInformation* inputPluginInfo,
+  const std::map<std::string, unsigned int>& outputMap, vtkPVPluginsInformation* outputPluginInfo,
+  bool clientInput, bool onlyCheck)
+{
+  bool ret = true;
+  std::string locationName = clientInput ? "server" : "client";
+  for (auto const& iter : inputMap)
+  {
+    inputPluginInfo->SetPluginStatusMessage(iter.second, "");
+
+    // Check plugin is loaded
+    if (!inputPluginInfo->GetPluginLoaded(iter.second))
+    {
+      continue;
+    }
+
+    // Check if it is required on the other side
+    if (!(clientInput ? inputPluginInfo->GetRequiredOnServer(iter.second)
+                      : inputPluginInfo->GetRequiredOnClient(iter.second)))
+    {
+      continue;
+    }
+
+    // Required plugin, check is loaded/loadable on the other side
+    std::map<std::string, unsigned int>::const_iterator iter2 = outputMap.find(iter.first);
+    if (iter2 == outputMap.cend())
+    {
+      ret = false;
+      inputPluginInfo->SetPluginStatusMessage(iter.second,
+        std::string("Must be loaded on " + locationName + " as well but it is not present")
+          .c_str());
+    }
+    else if (!outputPluginInfo->GetPluginLoaded(iter2->second))
+    {
+      if (onlyCheck || !clientInput)
+      {
+        ret = false;
+        inputPluginInfo->SetPluginStatusMessage(iter.second,
+          std::string("Must be loaded on " + locationName + " as well but it is not loaded")
+            .c_str());
+      }
+      else
+      {
+        // Available required remote plugins are automatically loaded
+        if (!this->LoadRemotePlugin(outputPluginInfo->GetPluginFileName(iter2->second), session))
+        {
+          ret = false;
+          inputPluginInfo->SetPluginStatusMessage(iter.second,
+            std::string("Must be loaded on " + locationName + " as well but it does not load")
+              .c_str());
+        }
+      }
+    }
+  }
+  return ret;
+}
