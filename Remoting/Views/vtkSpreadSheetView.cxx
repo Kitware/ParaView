@@ -87,6 +87,9 @@ struct OrderByNames : std::binary_function<vtkAbstractArray*, vtkAbstractArray*,
     // we can reach here only when both array names are not in the "priority"
     // set or they are the same (which does happen, see BUG #9808).
     assert((a1Index == VTK_INT_MAX && a2Index == VTK_INT_MAX) || (a1Name == a2Name));
+
+    std::transform(a1Name.begin(), a1Name.end(), a1Name.begin(), ::tolower);
+    std::transform(a2Name.begin(), a2Name.end(), a2Name.begin(), ::tolower);
     return (a1Name < a2Name);
   }
 };
