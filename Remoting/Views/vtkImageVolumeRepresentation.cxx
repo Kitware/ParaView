@@ -24,6 +24,7 @@
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
 #include "vtkMath.h"
+#include "vtkMultiBlockDataSet.h"
 #include "vtkMultiBlockVolumeMapper.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
@@ -129,7 +130,7 @@ int vtkImageVolumeRepresentation::FillInputPortInformation(int, vtkInformation* 
 {
   info->Set(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkImageData");
   info->Append(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkRectilinearGrid");
-  info->Append(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkPartitionedDataSet");
+  info->Append(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkDataObjectTree");
   info->Set(vtkAlgorithm::INPUT_IS_OPTIONAL(), 1);
   return 1;
 }
@@ -146,6 +147,11 @@ int vtkImageVolumeRepresentation::ProcessViewRequest(
   {
     // pass the actual volumetric data.
     vtkPVRenderView::SetPiece(inInfo, this, this->Cache, this->DataSize, 0);
+
+    // We never want the volumetric data to be delivered to the client.
+    vtkPVRenderView::SetDeliverToClientAndRenderingProcesses(inInfo, this,
+      /*deliver_to_client*/ false,
+      /*gather_before_delivery*/ false, 0);
 
     // pass the outline data, used on ranks where the data may not be available.
     vtkPVRenderView::SetPiece(inInfo, this, this->OutlineSource->GetOutputDataObject(0), 0, 1);
@@ -284,13 +290,51 @@ int vtkImageVolumeRepresentation::RequestData(
             cache->SetPartition(cc, partitionRG);
           }
         }
-        cache->GetBounds(this->DataBounds);
         this->Cache = cache.GetPointer();
+
+        cache->GetBounds(this->DataBounds);
+        this->OutlineSource->SetBounds(this->DataBounds);
+        this->OutlineSource->Update();
+        this->DataSize = cache->GetActualMemorySize();
       }
+    }
+    else if (auto doTree = vtkDataObjectTree::GetData(inputVector[0], 0))
+    {
+      auto images = vtkCompositeDataSet::GetDataSets(doTree);
+      images.erase(std::remove_if(images.begin(), images.end(),
+                     [](vtkDataSet* ds) {
+                       return vtkRectilinearGrid::SafeDownCast(ds) == nullptr &&
+                         vtkImageData::SafeDownCast(ds) == nullptr;
+                     }),
+        images.end());
+
+      vtkNew<vtkPartitionedDataSet> cache;
+      for (unsigned int cc = 0; cc < static_cast<unsigned int>(images.size()); ++cc)
+      {
+        auto* partition = images[cc];
+        if (this->UseSeparateOpacityArray)
+        {
+          this->AppendOpacityComponent(partition);
+        }
+        cache->SetPartition(cc, partition);
+      }
+
+      this->Cache = cache.GetPointer();
+
+      cache->GetBounds(this->DataBounds);
+      this->OutlineSource->SetBounds(this->DataBounds);
+      this->OutlineSource->Update();
+      this->DataSize = cache->GetActualMemorySize();
     }
   }
   else
   {
+    // We just need an empty data object on the client side
+    // so that the pipelines can update properly. Since we never deliver
+    // this data to the client, we don't have to worry too much about the types
+    // matching. Just creating a vtkPartitionedDataSet does the trick
+    this->Cache = vtk::TakeSmartPointer(vtkPartitionedDataSet::New());
+
     // when no input is present, it implies that this processes is on a node
     // without the data input i.e. either client or render-server, in which case
     // we show only the outline.
