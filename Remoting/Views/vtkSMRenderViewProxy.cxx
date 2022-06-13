@@ -34,6 +34,7 @@
 #include "vtkPVDataInformation.h"
 #include "vtkPVEncodeSelectionForServer.h"
 #include "vtkPVRenderView.h"
+#include "vtkPVRenderViewSettings.h"
 #include "vtkPVRenderingCapabilitiesInformation.h"
 #include "vtkPVServerInformation.h"
 #include "vtkPVXMLElement.h"
@@ -819,7 +820,12 @@ void vtkSMRenderViewProxy::MarkDirty(vtkSMProxy* modifiedProxy)
     const bool isSelectionRepresentation =
       strcmp(modifiedProxy->GetXMLGroup(), "representations") == 0 &&
       strcmp(modifiedProxy->GetXMLName(), "SelectionRepresentation") == 0;
-    forceClearCache = !(isPVExtractSelectionFilter || isSelectionRepresentation);
+
+    const bool isFastPreSelection = strcmp(modifiedProxy->GetXMLGroup(), "representations") == 0 &&
+      vtkPVRenderViewSettings::GetInstance()->GetEnableFastPreselection();
+
+    forceClearCache =
+      !(isPVExtractSelectionFilter || isSelectionRepresentation || isFastPreSelection);
   }
 
   const bool cacheCleared = this->ClearSelectionCache(forceClearCache);
