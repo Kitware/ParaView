@@ -68,8 +68,6 @@ find_library(3DxWareSDK_LIBRARY
     lib/x64
     lib/x86
     lib
-    lib/arm64
-    lib/x86_64
     ""
   DOC "Path to the 3DxWareSDK library"
 )
@@ -81,12 +79,17 @@ find_package_handle_standard_args(3DxWareSDK
 
 if (3DxWareSDK_FOUND)
     set(3DxWareSDK_LIBRARIES ${3DxWareSDK_LIBRARY})
+    if (APPLE)
+      # CMake should be treating this as a -framework, but we need to 
+      # list the lib explicitly
+      set(3DxWareSDK_LIBRARIES ${3DxWareSDK_LIBRARY}/3DconnexionNavlib)
+    endif()
     set(3DxWareSDK_INCLUDE_DIRS ${3DxWareSDK_INCLUDE_DIR})
 
     if (NOT TARGET 3Dconnexion::3DxWareSDK)
         add_library(3Dconnexion::3DxWareSDK UNKNOWN IMPORTED)
         set_target_properties(3Dconnexion::3DxWareSDK PROPERTIES
-            IMPORTED_LOCATION "${3DxWareSDK_LIBRARY}"
+            IMPORTED_LOCATION "${3DxWareSDK_LIBRARIES}"
             INTERFACE_INCLUDE_DIRECTORIES "${3DxWareSDK_INCLUDE_DIR}")
     endif ()
 endif ()
