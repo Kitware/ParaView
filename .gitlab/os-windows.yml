@@ -99,8 +99,7 @@
         # This may be necessary when running manually.
         # Set-ExecutionPolicy -Scope CurrentUser RemoteSigned
         - . .\build\ci-venv\Scripts\Activate.ps1
-        - pip install -qq -r $pwdpath\.gitlab\ci\requirements-phase1.txt
-        - pip install -qq -r $pwdpath\.gitlab\ci\requirements-phase2.txt
+        - pip install -qq -r $pwdpath\.gitlab\ci\requirements.txt
         - Set-Item -Force -Path "env:PATH" -Value "$env:PATH;$env:SCCACHE_PATH"
         - Invoke-Expression -Command .gitlab/ci/vcvarsall.ps1
         - sccache --start-server

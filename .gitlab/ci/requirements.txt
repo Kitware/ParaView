@@ -2,8 +2,7 @@
 # we are actually testing at any given point.
 
 # NetCDFTimeAnnotationPlugin
-# Needs Cython installed before it can be `pip install`'d
-netcdftime==1.0.0a2
+cftime==1.6.0
 
 # numpy
 # Note that Linux will need 1.19.4
