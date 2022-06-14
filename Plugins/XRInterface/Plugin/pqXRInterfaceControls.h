@@ -51,9 +51,30 @@ public:
 
   void SetAvailablePositions(std::vector<int> const& slots);
 
+  /**
+   * Set the value of the Save Camera Pose combobox.
+   */
+  void SetCurrentSavedPosition(int val);
+
+  /**
+   * Set the value of the Load Camera Pose combobox.
+   */
   void SetCurrentPosition(int val);
+
+  /**
+   * Set the value of the Motion Factor combobox.
+   */
   void SetCurrentMotionFactor(double val);
+
+  /**
+   * Set the value of the Scale Factor combobox.
+   */
   void SetCurrentScaleFactor(double val);
+
+  /**
+   * Set the value of the View Up combobox.
+   */
+  void SetCurrentViewUp(std::string dir);
 
   void SetFieldValues(std::string vals);
 
