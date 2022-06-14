@@ -37,6 +37,6 @@
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/Expression/Expression" command="set_string" arguments="std(Cylinders)+MPG" />
 
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
-  <pqcheck object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.2/CentralWidgetFrame/Viewport/1pqSpreadSheetViewWidget0" property="modelItemData" arguments="0.17,19.7036" />
-  <pqcheck object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.2/CentralWidgetFrame/Viewport/1pqSpreadSheetViewWidget0" property="modelItemData" arguments="1.17,16.7036" />
+  <pqcheck object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.2/CentralWidgetFrame/Viewport/1pqSpreadSheetViewWidget0" property="modelItemData" arguments="0.15,19.7036" />
+  <pqcheck object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.2/CentralWidgetFrame/Viewport/1pqSpreadSheetViewWidget0" property="modelItemData" arguments="1.15,16.7036" />
 </pqevents>
