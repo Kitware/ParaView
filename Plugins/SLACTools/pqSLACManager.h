@@ -61,9 +61,6 @@ public:
   /// Convenience function for getting the current server.
   pqServer* getActiveServer();
 
-  /// Convenience function for getting the main window.
-  QWidget* getMainWindow();
-
   /// Get the window used for viewing the mesh.
   pqView* getMeshView();
   pqRenderView* getMeshRenderView();
