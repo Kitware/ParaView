@@ -21,6 +21,8 @@ if (PARAVIEW_USE_QT)
 endif ()
 
 paraview_add_plugin(zSpace
+  REQUIRED_ON_CLIENT
+  REQUIRED_ON_SERVER
   VERSION "1.0"
   UI_INTERFACES ${interfaces}
   SOURCES ${sources}

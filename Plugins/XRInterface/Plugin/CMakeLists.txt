@@ -55,6 +55,8 @@ list(APPEND sources
   ${dock_sources} ${location_sources})
 
 paraview_add_plugin(XRInterface
+  REQUIRED_ON_CLIENT
+  REQUIRED_ON_SERVER
   VERSION "1.2"
   UI_FILES pqXRInterfaceDockPanel.ui pqXRInterfaceControls.ui
   UI_INTERFACES ${interfaces}

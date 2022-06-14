@@ -1,4 +1,5 @@
 paraview_add_plugin(GenericIOReader
+  REQUIRED_ON_CLIENT
   REQUIRED_ON_SERVER
   VERSION "1.0"
   MODULES GenericIOReader::vtkGenericIOReader

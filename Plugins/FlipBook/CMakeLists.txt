@@ -19,6 +19,7 @@ list(APPEND interfaces ${toolbar_interfaces})
 list(APPEND sources ${toolbar_sources})
 
 paraview_add_plugin(FlipBookPlugin
+  REQUIRED_ON_CLIENT
   VERSION "1.0"
   UI_INTERFACES ${interfaces}
   UI_RESOURCES ${qrc_files}

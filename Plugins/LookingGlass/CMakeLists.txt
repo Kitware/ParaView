@@ -18,6 +18,8 @@ list(APPEND sources
 )
 
 paraview_add_plugin(LookingGlass
+  REQUIRED_ON_CLIENT
+  REQUIRED_ON_SERVER
   VERSION "1.3"
   EULA "EULA.txt"
   UI_FILES

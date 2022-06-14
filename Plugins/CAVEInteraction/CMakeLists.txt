@@ -112,6 +112,7 @@ list(APPEND sources
   ${dock_sources})
 
 paraview_add_plugin(CAVEInteraction
+  REQUIRED_ON_CLIENT
   VERSION "1.0"
   UI_INTERFACES ${interfaces}
   UI_FILES ${ui_files}
