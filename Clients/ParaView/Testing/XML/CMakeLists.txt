@@ -2080,8 +2080,18 @@ configure_file (
   "${CMAKE_CURRENT_BINARY_DIR}/ServerConnectConfigured.xml" @ONLY)
 
 paraview_add_client_tests(
-  FORCE_SERIAL
-  TEST_SCRIPTS ${CMAKE_CURRENT_BINARY_DIR}/ServerConnectConfigured.xml)
+    FORCE_SERIAL
+    TEST_SCRIPTS ${CMAKE_CURRENT_BINARY_DIR}/ServerConnectConfigured.xml)
+
+if (PARAVIEW_PLUGIN_ENABLE_ArrowGlyph)
+  configure_file (
+    "${CMAKE_CURRENT_SOURCE_DIR}/ServerConnectPluginLoad.xml.in"
+    "${CMAKE_CURRENT_BINARY_DIR}/ServerConnectPluginLoad.xml" @ONLY)
+
+  paraview_add_client_tests(
+    FORCE_SERIAL
+    TEST_SCRIPTS ${CMAKE_CURRENT_BINARY_DIR}/ServerConnectPluginLoad.xml)
+endif ()
 
 # Some tests can take a long time, increasing their timeout
 set_property(TEST pvcrs.UndoRedo1 PROPERTY TIMEOUT 300)
