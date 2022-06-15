@@ -1,4 +1,6 @@
 paraview_add_plugin(SMMyProxy
+  REQUIRED_ON_CLIENT
+  REQUIRED_ON_SERVER
   VERSION "1.0"
   MODULES MyProxy
   MODULE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/MyProxy/vtk.module"

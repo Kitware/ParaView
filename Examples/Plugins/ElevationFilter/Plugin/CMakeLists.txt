@@ -14,6 +14,8 @@ set(table_of_contents
 </toc>")
 
 paraview_add_plugin(ElevationFilter
+  REQUIRED_ON_CLIENT
+  REQUIRED_ON_SERVER
   VERSION "1.0"
   DOCUMENTATION_DIR "${CMAKE_CURRENT_SOURCE_DIR}/Documentation"
   DOCUMENTATION_ADD_PATTERNS

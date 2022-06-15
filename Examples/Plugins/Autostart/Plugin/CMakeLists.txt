@@ -15,6 +15,7 @@ list(APPEND sources
   ${autostart_sources})
 
 paraview_add_plugin(Autostart
+  REQUIRED_ON_CLIENT
   VERSION "1.0"
   UI_INTERFACES ${interfaces}
   SOURCES ${sources})
