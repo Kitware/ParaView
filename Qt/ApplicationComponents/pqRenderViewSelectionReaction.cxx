@@ -457,6 +457,11 @@ void pqRenderViewSelectionReaction::beginSelection()
         vtkCommand::MouseWheelForwardEvent, this, &pqRenderViewSelectionReaction::onWheelRotate);
       this->ObserverIds[3] = this->ObservedObject->AddObserver(
         vtkCommand::MouseWheelBackwardEvent, this, &pqRenderViewSelectionReaction::onWheelRotate);
+
+      this->ObserverIds[4] = this->ObservedObject->AddObserver(vtkCommand::RightButtonPressEvent,
+        this, &pqRenderViewSelectionReaction::onRightButtonPressed);
+      this->ObserverIds[5] = this->ObservedObject->AddObserver(vtkCommand::RightButtonReleaseEvent,
+        this, &pqRenderViewSelectionReaction::onRightButtonRelease);
       break;
 
     case SELECT_SURFACE_POINTS_TOOLTIP:
@@ -464,6 +469,10 @@ void pqRenderViewSelectionReaction::beginSelection()
       this->ObservedObject = rmp->GetInteractor();
       this->ObserverIds[0] = this->ObservedObject->AddObserver(
         vtkCommand::MouseMoveEvent, this, &pqRenderViewSelectionReaction::onMouseMove);
+      this->ObserverIds[1] = this->ObservedObject->AddObserver(vtkCommand::RightButtonPressEvent,
+        this, &pqRenderViewSelectionReaction::onRightButtonPressed);
+      this->ObserverIds[2] = this->ObservedObject->AddObserver(vtkCommand::RightButtonReleaseEvent,
+        this, &pqRenderViewSelectionReaction::onRightButtonRelease);
       break;
 
     default:
@@ -472,6 +481,7 @@ void pqRenderViewSelectionReaction::beginSelection()
         vtkCommand::SelectionChangedEvent, this, &pqRenderViewSelectionReaction::selectionChanged);
       break;
   }
+
   this->parentAction()->setChecked(true);
 }
 
@@ -583,6 +593,12 @@ void pqRenderViewSelectionReaction::selectionChanged(vtkObject*, unsigned long, 
 //-----------------------------------------------------------------------------
 void pqRenderViewSelectionReaction::onMouseMove()
 {
+  // Preselection can sometimes be disabled when a rotation is performed
+  if (this->DisablePreSelection)
+  {
+    return;
+  }
+
   switch (this->Mode)
   {
     case SELECT_SURFACE_POINTS_TOOLTIP:
@@ -1007,4 +1023,15 @@ void pqRenderViewSelectionReaction::onWheelRotate()
   {
     this->onMouseMove();
   }
+}
+
+//-----------------------------------------------------------------------------
+void pqRenderViewSelectionReaction::onRightButtonPressed()
+{
+  this->DisablePreSelection = true;
+}
+//-----------------------------------------------------------------------------
+void pqRenderViewSelectionReaction::onRightButtonRelease()
+{
+  this->DisablePreSelection = false;
 }

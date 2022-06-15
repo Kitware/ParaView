@@ -165,6 +165,8 @@ private: // NOLINT(readability-redundant-access-specifiers)
    */
   void onLeftButtonRelease();
   void onWheelRotate();
+  void onRightButtonPressed();
+  void onRightButtonRelease();
 
   // Get the current state of selection modifier
   int getSelectionModifier() override;
@@ -182,11 +184,12 @@ private: // NOLINT(readability-redundant-access-specifiers)
   SelectionMode Mode;
   int PreviousRenderViewMode;
   vtkWeakPointer<vtkObject> ObservedObject;
-  unsigned long ObserverIds[4];
+  unsigned long ObserverIds[6];
   QCursor ZoomCursor;
   QTimer MouseMovingTimer;
   bool MouseMoving;
   int MousePosition[2];
+  bool DisablePreSelection = false;
   vtkSMPVRepresentationProxy* CurrentRepresentation = nullptr;
 
   static QPointer<pqRenderViewSelectionReaction> ActiveReaction;
