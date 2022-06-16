@@ -40,10 +40,12 @@
 #define QCOMBOBOX_TEXT_ACTIVATED_SLOT &QComboBox::textActivated
 #endif
 
+//------------------------------------------------------------------------------
 class pqXRInterfaceControls::pqInternals : public Ui::pqXRInterfaceControls
 {
 };
 
+//------------------------------------------------------------------------------
 void pqXRInterfaceControls::constructor(vtkPVXRInterfaceHelper* val)
 {
   this->Helper = val;
@@ -159,16 +161,19 @@ void pqXRInterfaceControls::constructor(vtkPVXRInterfaceHelper* val)
   // this->Internals->addSource->setMenu(menu);
 }
 
+//------------------------------------------------------------------------------
 pqXRInterfaceControls::~pqXRInterfaceControls()
 {
   delete this->Internals;
 }
 
+//------------------------------------------------------------------------------
 void pqXRInterfaceControls::resetPositions()
 {
   this->Helper->ResetPositions();
 }
 
+//------------------------------------------------------------------------------
 void pqXRInterfaceControls::assignFieldValue()
 {
   // get the current combo setting
@@ -177,11 +182,13 @@ void pqXRInterfaceControls::assignFieldValue()
   this->Helper->SetEditableFieldValue(val);
 }
 
+//------------------------------------------------------------------------------
 void pqXRInterfaceControls::SetRightTriggerMode(std::string const& text)
 {
   this->Internals->rightTrigger->setCurrentText(text.c_str());
 }
 
+//------------------------------------------------------------------------------
 pqPipelineSource* pqXRInterfaceControls::GetSelectedPipelineSource()
 {
   QItemSelectionModel* smodel = this->Internals->pipelineBrowser->getSelectionModel();
@@ -200,6 +207,7 @@ pqPipelineSource* pqXRInterfaceControls::GetSelectedPipelineSource()
   return qobject_cast<pqPipelineSource*>(smModelItem);
 }
 
+//------------------------------------------------------------------------------
 namespace
 {
 std::string trim(std::string const& str)
@@ -214,6 +222,7 @@ std::string trim(std::string const& str)
 }
 }
 
+//------------------------------------------------------------------------------
 void pqXRInterfaceControls::SetFieldValues(std::string vals)
 {
   this->Internals->fieldValueCombo->clear();
@@ -231,6 +240,7 @@ void pqXRInterfaceControls::SetFieldValues(std::string vals)
   this->Internals->fieldValueCombo->addItems(list);
 }
 
+//------------------------------------------------------------------------------
 void pqXRInterfaceControls::SetAvailablePositions(std::vector<int> const& vals)
 {
   this->Internals->loadCameraCombo->clear();
@@ -243,6 +253,17 @@ void pqXRInterfaceControls::SetAvailablePositions(std::vector<int> const& vals)
   this->Internals->loadCameraCombo->addItems(list);
 }
 
+//------------------------------------------------------------------------------
+void pqXRInterfaceControls::SetCurrentSavedPosition(int val)
+{
+  this->NoForward = true;
+
+  auto idx = this->Internals->saveCameraCombo->findText(QString::number(val));
+  this->Internals->saveCameraCombo->setCurrentIndex(idx);
+  this->NoForward = false;
+}
+
+//------------------------------------------------------------------------------
 void pqXRInterfaceControls::SetCurrentPosition(int val)
 {
   this->NoForward = true;
@@ -252,6 +273,7 @@ void pqXRInterfaceControls::SetCurrentPosition(int val)
   this->NoForward = false;
 }
 
+//------------------------------------------------------------------------------
 void pqXRInterfaceControls::SetCurrentScaleFactor(double val)
 {
   this->NoForward = true;
@@ -261,6 +283,7 @@ void pqXRInterfaceControls::SetCurrentScaleFactor(double val)
   this->NoForward = false;
 }
 
+//------------------------------------------------------------------------------
 void pqXRInterfaceControls::SetCurrentMotionFactor(double val)
 {
   this->NoForward = true;
@@ -268,4 +291,11 @@ void pqXRInterfaceControls::SetCurrentMotionFactor(double val)
   auto idx = this->Internals->motionFactorCombo->findText(QString::number(val));
   this->Internals->motionFactorCombo->setCurrentIndex(idx);
   this->NoForward = false;
+}
+
+//------------------------------------------------------------------------------
+void pqXRInterfaceControls::SetCurrentViewUp(std::string dir)
+{
+  auto idx = this->Internals->viewUpCombo->findText(QString::fromStdString(dir));
+  this->Internals->viewUpCombo->setCurrentIndex(idx);
 }
