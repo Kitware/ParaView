@@ -164,6 +164,7 @@ set(classes
   pqPropertyCollectionWidget
   pqProxyGroupMenuManager
   pqReaction
+  pqMetaDataPropertyWidget
   pqReloadFilesReaction
   pqRenameProxyReaction
   pqRenderViewSelectionReaction

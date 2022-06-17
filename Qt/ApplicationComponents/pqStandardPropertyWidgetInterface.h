@@ -110,6 +110,7 @@ public:
    * \li \c DataAssemblyEditor: pqDataAssemblyPropertyWidget
    * \li \c CheckableProperty : pqCheckableProperty
    * \li \c EqualizerPropertyWidget : pqEqualizerPropertyWidget
+   * \li \c MetaDataPropertyWidget : pqMetaDataPropertyWidget
    */
   pqPropertyWidget* createWidgetForPropertyGroup(
     vtkSMProxy* proxy, vtkSMPropertyGroup* group, QWidget* parentWidget) override;
