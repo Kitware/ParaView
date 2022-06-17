@@ -111,7 +111,7 @@ void pqExpandableTableView::closeEditor(QWidget* editor, QAbstractItemDelegate::
 //-----------------------------------------------------------------------------
 void pqExpandableTableView::keyPressEvent(QKeyEvent* e)
 {
-  if (e->modifiers() == Qt::ControlModifier && e->key() == Qt::Key_V)
+  if (e->matches(QKeySequence::Paste))
   {
     // Get text from the clipboard. Text is expected to be tabular in form,
     // delimited by arbitrary whitespace.
