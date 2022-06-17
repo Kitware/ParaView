@@ -307,6 +307,15 @@ const char* vtkPVPluginsInformation::GetPluginStatusMessage(unsigned int cc)
 }
 
 //----------------------------------------------------------------------------
+void vtkPVPluginsInformation::SetPluginStatusMessage(unsigned int cc, const char* message)
+{
+  if (cc < this->GetNumberOfPlugins())
+  {
+    (*this->Internals)[cc].StatusMessage = message;
+  }
+}
+
+//----------------------------------------------------------------------------
 const char* vtkPVPluginsInformation::GetPluginFileName(unsigned int cc)
 {
   if (cc < this->GetNumberOfPlugins())

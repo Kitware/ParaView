@@ -17,6 +17,8 @@ list(APPEND sources
   ${proxy_sources})
 
 paraview_add_plugin(AddPQProxy
+  REQUIRED_ON_CLIENT
+  REQUIRED_ON_SERVER
   VERSION "1.0"
   XML_DOCUMENTATION OFF
   SERVER_MANAGER_XML AddPQProxy.xml

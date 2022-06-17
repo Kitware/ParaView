@@ -32,6 +32,7 @@ endif ()
 set(CMAKE_CXX_STANDARD 14)
 
 paraview_add_plugin(SpaceMouseInteractor
+  REQUIRED_ON_CLIENT
   VERSION       "1.0"
   UI_INTERFACES ${interfaces}
   SOURCES       ${sources})

@@ -19,6 +19,8 @@ if (PARAVIEW_USE_QT)
 endif ()
 
 paraview_add_plugin(StreamLinesRepresentation
+  REQUIRED_ON_CLIENT
+  REQUIRED_ON_SERVER
   VERSION "0.1"
   UI_INTERFACES ${interfaces}
   SOURCES ${sources}

@@ -6,6 +6,7 @@ if (PARAVIEW_USE_QT)
 endif ()
 
 paraview_add_plugin(BagPlotViewsAndFilters
+  REQUIRED_ON_CLIENT
   REQUIRED_ON_SERVER
   VERSION "1.0"
   SERVER_MANAGER_XML BagPlotViewsAndFilters.xml
