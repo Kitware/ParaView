@@ -152,7 +152,7 @@ target_compile_definitions(XRInterface PRIVATE QT_NO_KEYWORDS)
 set(have_ffmpeg 0)
 if (TARGET VTK::RenderingFFMPEGOpenGL2)
   set(have_ffmpeg 1)
-  target_link_libraries(xr_input_files
+  target_link_libraries(XRInterface
     PRIVATE
       VTK::RenderingFFMPEGOpenGL2
     )
