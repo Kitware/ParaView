@@ -537,7 +537,7 @@ void pqLookingGlassDockPanel::saveQuilt()
   }
 
   // Update the interface with the GUI values
-  this->Interface->SaveQuilt(this->DisplayWindow, filepath.toUtf8().data());
+  this->Interface->SaveQuilt(filepath.toUtf8().data());
 
   auto text = QString("Saved to \"%1\"").arg(filepath);
   QMessageBox::information(this, "Quilt Saved", filepath);
@@ -657,7 +657,7 @@ void pqLookingGlassDockPanel::startRecordingQuilt()
   ui.TargetDeviceLabel->setEnabled(false);
   ui.TargetDeviceComboBox->setEnabled(false);
 
-  this->Interface->StartRecordingQuilt(this->DisplayWindow, filepath.toUtf8().data());
+  this->Interface->StartRecordingQuilt(filepath.toUtf8().data());
   this->IsRecording = true;
   this->MovieFilepath = filepath;
 
