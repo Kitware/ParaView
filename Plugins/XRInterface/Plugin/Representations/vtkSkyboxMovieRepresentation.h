@@ -21,14 +21,14 @@
 #ifndef vtkSkyboxMovieRepresentation_h
 #define vtkSkyboxMovieRepresentation_h
 
-#include "vtkNew.h"                         // for ivars
-#include "vtkOpenVRRepresentationsModule.h" // for export macro
+#include "vtkNew.h" // for ivars
 #include "vtkPVDataRepresentation.h"
+#include "vtkXRInterfaceRepresentationsModule.h" // for export macro
 
 class vtkOpenGLMovieSphere;
 class vtkFFMPEGVideoSource;
 
-class VTKXRInterfaceREPRESENTATIONS_EXPORT vtkSkyboxMovieRepresentation
+class VTKXRINTERFACEREPRESENTATIONS_EXPORT vtkSkyboxMovieRepresentation
   : public vtkPVDataRepresentation
 {
 public:
