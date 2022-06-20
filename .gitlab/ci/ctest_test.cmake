@@ -19,6 +19,11 @@ set(CTEST_TEST_TIMEOUT 100)
 
 set(test_exclusions)
 
+list(APPEND test_exclusions
+  # see paraview/paraview#21440
+  "\\.TraceExodus$"
+  )
+
 if ("$ENV{CMAKE_CONFIGURATION}" MATCHES "_mpi")
   # tests that have issues in parallel
   list(APPEND test_exclusions
