@@ -63,7 +63,7 @@ std::vector<std::string> vtkSMFunctionalBagChartSeriesSelectionDomain::GetDefaul
     else if (vtksys::SystemTools::StringEndsWith(name, "_median"))
     {
       vtksys::SystemTools::ReplaceString(name, "_median", "");
-      name = "Median (" + name + ")";
+      name = "Higher density (" + name + ")";
     }
     values.push_back(name.c_str());
     return values;
