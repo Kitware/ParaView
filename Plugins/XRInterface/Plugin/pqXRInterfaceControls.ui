@@ -145,6 +145,27 @@
        </widget>
       </item>
       <item>
+       <widget class="QLabel" name="movementStyleLabel">
+        <property name="text">
+         <string>Movement Style</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QComboBox" name="movementStyle">
+        <item>
+         <property name="text">
+          <string>Flying</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Grounded</string>
+         </property>
+        </item>
+       </widget>
+      </item>
+      <item>
        <widget class="QPushButton" name="resetPositionsButton">
         <property name="minimumSize">
          <size>
@@ -266,8 +287,8 @@ font: 75 12pt &quot;Arial&quot;;</string>
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>98</width>
-            <height>28</height>
+            <width>698</width>
+            <height>668</height>
            </rect>
           </property>
          </widget>
@@ -1066,7 +1087,7 @@ font: 75 12pt &quot;Arial&quot;;</string>
   </customwidget>
  </customwidgets>
  <resources>
-  <include location="../../Qt/Components/Resources/pqComponents.qrc"/>
+  <include location="../../../Qt/Components/Resources/pqComponents.qrc"/>
  </resources>
  <connections/>
 </ui>

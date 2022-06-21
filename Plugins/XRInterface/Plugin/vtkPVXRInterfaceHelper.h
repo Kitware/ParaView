@@ -39,7 +39,8 @@
 
 #include "vtkNew.h" // for ivars
 #include "vtkObject.h"
-#include "vtkVRCamera.h" // for visibility of inner "Pose" class
+#include "vtkVRCamera.h"          // for visibility of inner "Pose" class
+#include "vtkVRInteractorStyle.h" // for visibility of enum "MovementStyle"
 
 #include <array>  // for method sig
 #include <map>    // for ivar
@@ -206,6 +207,11 @@ public:
 
   // set what the right trigger will do when pressed
   void SetRightTriggerMode(std::string const& mode);
+
+  /**
+   * Set the movement style of the interactor style.
+   */
+  void SetMovementStyle(vtkVRInteractorStyle::MovementStyle style);
 
   vtkGetObjectMacro(Renderer, vtkOpenGLRenderer);
 
