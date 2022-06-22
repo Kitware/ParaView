@@ -809,6 +809,19 @@ void vtkPVXRInterfaceHelper::SetRightTriggerMode(std::string const& text)
 }
 
 //----------------------------------------------------------------------------
+void vtkPVXRInterfaceHelper::SetMovementStyle(vtkVRInteractorStyle::MovementStyle style)
+{
+  // Get interactor style
+  auto interactorStyle = this->Interactor
+    ? vtkVRInteractorStyle::SafeDownCast(this->Interactor->GetInteractorStyle())
+    : nullptr;
+  if (interactorStyle)
+  {
+    interactorStyle->SetStyle(style);
+  }
+}
+
+//----------------------------------------------------------------------------
 bool vtkPVXRInterfaceHelper::InteractorEventCallback(
   vtkObject*, unsigned long eventID, void* calldata)
 {

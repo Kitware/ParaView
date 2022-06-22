@@ -25,6 +25,7 @@
 #include "vtkOpenVRInteractorStyle.h"
 #include "vtkPVXRInterfaceHelper.h"
 #include "vtkRenderWindowInteractor.h"
+#include "vtkVRInteractorStyle.h"
 #include "vtkVRRenderer.h"
 
 #include <QItemSelectionModel>
@@ -85,6 +86,23 @@ void pqXRInterfaceControls::constructor(vtkPVXRInterfaceHelper* val)
     this->Internals->rightTrigger, &QComboBox::currentTextChanged, [&](QString const& text) {
       std::string mode = text.toUtf8().toStdString();
       this->Helper->SetRightTriggerMode(mode);
+    });
+
+  QObject::connect(
+    this->Internals->movementStyle, &QComboBox::currentTextChanged, [&](QString const& text) {
+      std::string style = text.toUtf8().toStdString();
+      if (style == "Flying")
+      {
+        this->Helper->SetMovementStyle(vtkVRInteractorStyle::FLY_STYLE);
+      }
+      else if (style == "Grounded")
+      {
+        this->Helper->SetMovementStyle(vtkVRInteractorStyle::GROUNDED_STYLE);
+      }
+      else
+      {
+        qWarning("Unrecognised movement style.");
+      }
     });
 
   QObject::connect(this->Internals->fieldValueButton, &QPushButton::clicked, this,
