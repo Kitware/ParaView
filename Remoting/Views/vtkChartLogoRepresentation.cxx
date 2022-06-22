@@ -207,6 +207,10 @@ int vtkChartLogoRepresentation::ProcessViewRequest(
         }
       }
       this->ImageItem->SetPosition(position);
+
+      // Also update the Position member variable so calls to GetPosition() return valid info
+      this->Position[0] = position[0] / chartRect.GetRight();
+      this->Position[1] = position[1] / chartRect.GetTop();
     }
   }
 
