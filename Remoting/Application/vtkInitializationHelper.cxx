@@ -180,6 +180,17 @@ bool vtkInitializationHelper::Initialize(vtkStringList* slist, int type)
 bool vtkInitializationHelper::Initialize(
   int argc, char** argv, int type, vtkCLIOptions* options, bool addStandardArgs)
 {
+  if (!vtkInitializationHelper::InitializeOptions(argc, argv, type, options, addStandardArgs))
+  {
+    return false;
+  }
+  return vtkInitializationHelper::InitializeMiscellaneous(type);
+}
+
+//----------------------------------------------------------------------------
+bool vtkInitializationHelper::InitializeOptions(
+  int argc, char** argv, int type, vtkCLIOptions* options, bool addStandardArgs)
+{
   if (vtkProcessModule::GetProcessModule())
   {
     vtkLogF(ERROR, "Process already initialize! `Initialize` should only be called once.");
@@ -275,7 +286,13 @@ bool vtkInitializationHelper::Initialize(
     vtkInitializationHelper::ExitCode = EXIT_SUCCESS;
     return false;
   }
+  return true;
+}
 
+//----------------------------------------------------------------------------
+bool vtkInitializationHelper::InitializeMiscellaneous(int type)
+{
+  auto coreConfig = vtkRemotingCoreConfiguration::GetInstance();
   // this has to happen after process module is initialized and options have
   // been set.
   paraview_initialize();

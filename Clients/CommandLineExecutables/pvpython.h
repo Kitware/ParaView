@@ -80,11 +80,29 @@ inline void ProcessArgsForPython(std::vector<char*>& pythonArgs,
 //---------------------------------------------------------------------------
 inline int Run(int processType, int argc, char* argv[])
 {
-  // Setup options
   vtkInitializationHelper::SetApplicationName("ParaView");
 
+  // Setup options
   auto options = vtk::TakeSmartPointer(vtkCLIOptions::New());
-  const auto status = vtkInitializationHelper::Initialize(argc, argv, processType, options);
+  auto status = vtkInitializationHelper::InitializeOptions(argc, argv, processType, options);
+  if (!status)
+  {
+    return vtkInitializationHelper::GetExitCode();
+  }
+
+  // register callback to initialize modules statically. The callback is
+  // empty when BUILD_SHARED_LIBS is ON.
+  vtkPVInitializePythonModules();
+
+  // Setup python options
+  std::vector<char*> pythonArgs;
+  ProcessArgsForPython(pythonArgs, options->GetExtraArguments(), argc, argv);
+  pythonArgs.push_back(nullptr);
+  vtkPythonInterpreter::InitializeWithArgs(
+    1, static_cast<int>(pythonArgs.size()) - 1, &pythonArgs.front());
+
+  // Do the rest of the initialization
+  status = vtkInitializationHelper::InitializeMiscellaneous(processType);
   if (!status)
   {
     return vtkInitializationHelper::GetExitCode();
@@ -97,10 +115,6 @@ inline int Run(int processType, int argc, char* argv[])
   }
 
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-
-  // register callback to initialize modules statically. The callback is
-  // empty when BUILD_SHARED_LIBS is ON.
-  vtkPVInitializePythonModules();
 
   // register static plugins
   ParaView_paraview_plugins_initialize();
@@ -116,11 +130,6 @@ inline int Run(int processType, int argc, char* argv[])
   }
   else
   {
-    // Process arguments
-    std::vector<char*> pythonArgs;
-    ProcessArgsForPython(pythonArgs, options->GetExtraArguments(), argc, argv);
-    pythonArgs.push_back(nullptr);
-
     // if user specified verbosity option on command line, then we make vtkPythonInterpreter post
     // log information as INFO, otherwise we leave it at default which is TRACE.
     auto pmConfig = vtkProcessModuleConfiguration::GetInstance();
@@ -131,13 +140,14 @@ inline int Run(int processType, int argc, char* argv[])
 
     ret_val =
       vtkPythonInterpreter::PyMain(static_cast<int>(pythonArgs.size()) - 1, &pythonArgs.front());
-
-    // Free python args
-    for (auto& ptr : pythonArgs)
-    {
-      delete[] ptr;
-    }
   }
+
+  // Free python args
+  for (auto& ptr : pythonArgs)
+  {
+    delete[] ptr;
+  }
+
   // Exit application
   vtkInitializationHelper::Finalize();
   return ret_val;
