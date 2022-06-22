@@ -291,6 +291,7 @@ public:
     int count = this->Model.rowCount();
 
     QVariant time = this->TimeRange.first;
+
     if (count == row && row != 0)
     {
       time = this->TimeRange.second;
@@ -622,6 +623,11 @@ void pqKeyFrameEditor::newKeyFrame()
   if (idx.isValid())
   {
     row = idx.row();
+    // inserting at index 0 acts as insert at index 1
+    if (count > 1 && row == 0)
+    {
+      row++;
+    }
   }
   else
   {
