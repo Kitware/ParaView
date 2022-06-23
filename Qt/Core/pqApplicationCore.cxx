@@ -35,15 +35,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqApplicationCore.h"
 
+#include "pqQtConfig.h" // for PARAVIEW_USE_QTHELP
+
 #include <vtksys/SystemTools.hxx>
 
 // Qt includes.
 #include <QApplication>
 #include <QDebug>
 #include <QFile>
-#ifdef PARAVIEW_USE_QTHELP
 #include <QHelpEngine>
-#endif
 #include <QMainWindow>
 #include <QMap>
 #include <QPointer>
@@ -178,9 +178,7 @@ void pqApplicationCore::constructor()
   this->RecentlyUsedResourcesList = nullptr;
   this->ServerConfigurations = nullptr;
   this->Settings = nullptr;
-#ifdef PARAVIEW_USE_QTHELP
   this->HelpEngine = nullptr;
-#endif
 
   // initialize statics in case we're a static library
   pqCoreInit();
@@ -275,15 +273,15 @@ pqApplicationCore::~pqApplicationCore()
   delete this->Settings;
   this->Settings = nullptr;
 
-#ifdef PARAVIEW_USE_QTHELP
   if (this->HelpEngine)
   {
+#ifdef PARAVIEW_USE_QTHELP
     QString collectionFile = this->HelpEngine->collectionFile();
     delete this->HelpEngine;
     QFile::remove(collectionFile);
+#endif
   }
   this->HelpEngine = nullptr;
-#endif
 
   // We don't call delete on these since we have already setup parent on these
   // correctly so they will be deleted. It's possible that the user calls delete
@@ -692,10 +690,10 @@ void pqApplicationCore::onHelpEngineWarning(const QString& msg)
   qWarning() << msg;
 }
 
-#ifdef PARAVIEW_USE_QTHELP
 //-----------------------------------------------------------------------------
 QHelpEngine* pqApplicationCore::helpEngine()
 {
+#ifdef PARAVIEW_USE_QTHELP
   if (!this->HelpEngine)
   {
     QTemporaryFile tFile;
@@ -726,10 +724,10 @@ QHelpEngine* pqApplicationCore::helpEngine()
     }
     this->HelpEngine->setupData();
   }
+#endif
 
   return this->HelpEngine;
 }
-#endif
 
 //-----------------------------------------------------------------------------
 void pqApplicationCore::registerDocumentation(const QString& filename)
@@ -751,6 +749,8 @@ void pqApplicationCore::registerDocumentation(const QString& filename)
   {
     engine->registerDocumentation(filename);
   }
+#else
+  (void)filename;
 #endif
 }
 

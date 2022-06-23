@@ -33,7 +33,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define pqApplicationCore_h
 
 #include "pqCoreModule.h"
-#include "pqQtConfig.h"             // for PARAVIEW_USE_QTHELP
 #include "vtkParaViewDeprecation.h" // for PARAVIEW_DEPRECATED_IN_5_10_0
 #include "vtkSmartPointer.h"        // for vtkSmartPointer
 #include <QObject>
@@ -58,9 +57,7 @@ class pqSettings;
 class pqTestUtility;
 class pqUndoStack;
 class QApplication;
-#ifdef PARAVIEW_USE_QTHELP
 class QHelpEngine;
-#endif
 class QStringList;
 class vtkPVXMLElement;
 class vtkSMProxyLocator;
@@ -164,13 +161,11 @@ public:
    */
   void unRegisterManager(const QString& function);
 
-#ifdef PARAVIEW_USE_QTHELP
   /**
    * provides access to the help engine. The engine is created the first time
    * this method is called.
    */
   QHelpEngine* helpEngine();
-#endif
 
   /**
    * QHelpEngine doesn't like filenames in resource space. This method creates
@@ -443,9 +438,7 @@ protected:
   pqRecentlyUsedResourcesList* RecentlyUsedResourcesList;
   pqServerConfigurationCollection* ServerConfigurations;
   pqSettings* Settings;
-#ifdef PARAVIEW_USE_QTHELP
   QHelpEngine* HelpEngine;
-#endif
   QPointer<pqTestUtility> TestUtility;
 
 private:
