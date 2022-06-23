@@ -1,10 +1,6 @@
-PARAVIEW_ADD_PLUGIN(LANLX3DReader
+paraview_add_plugin(LANLX3DReader
   REQUIRED_ON_CLIENT
   REQUIRED_ON_SERVER
   VERSION "1.2"
   MODULES LANLX3DReader::vtkLANLX3DReader
   MODULE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/Reader/vtk.module")
-
-#if (BUILD_TESTING)
-#  add_subdirectory(Testing)
-#endif ()

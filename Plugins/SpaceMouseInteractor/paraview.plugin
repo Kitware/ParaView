@@ -2,6 +2,8 @@ NAME
   SpaceMouseInteractor
 DESCRIPTION
   SpaceMouse from 3Dconnexion
+CONDITION
+  PARAVIEW_USE_QT
 REQUIRES_MODULES
   ParaView::RemotingApplication
   ParaView::RemotingCore
